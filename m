@@ -1,53 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <70600880-A890-450D-9A97-B06C6A7EF04E@holtmann.org>
+Message-Id: <44A822C0-C143-4F39-BA74-FC414EC613DD@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Florian Schwehn <f.schwehn@wizai.com>
-In-Reply-To: <6E2954C9-3AF9-4111-A87F-11C168B77753@wizai.com>
+To: David Merrill <dmerrill@media.mit.edu>
+In-Reply-To: <f86d2a880811040903i3ee0a5e7tdf9b52775108dab0@mail.gmail.com>
 Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
 Mime-Version: 1.0 (Apple Message framework v929.2)
-Subject: Re: Question about power tables or other transmit power limit
-Date: Mon, 24 Nov 2008 04:03:38 +0100
-References: <6E2954C9-3AF9-4111-A87F-11C168B77753@wizai.com>
+Subject: Re: how to: Inquiry with RSSI?
+Date: Mon, 24 Nov 2008 04:00:13 +0100
+References: <f86d2a880811040903i3ee0a5e7tdf9b52775108dab0@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Florian,
+Hi David,
 
-> we are looking into limiting transmit power for our bluetooth file  
-> server project. The idea is to limit sending radius so that people  
-> don't feel harassed if they do not want to receive files.
+> First, thanks to the developers for creating Bluez - it's so nice to
+> have such a useful, open-source Bluetooth option.
 >
-> First we tried to read the RSSI during device discovery and base our  
-> decision on that. But the readings varied too much because of power  
-> saving methods like power tables.
+> I am writing with a question: how can I do an inquiry scan with RSSI,
+> and read out the RSSI values? (without making a connection to devices)
+> When I run "hciconfig hci0 inqmode" I get the following:
 >
-> Since we cannot update the firmware of the mobile phones, we decided  
-> to try to limit the transmit power for our device discovery HCI  
-> device. After reading about things a bit and browsing through the  
-> docs that CSR provides, we tried to cap the maximum power or to  
-> change the power tables with the bccmd. Unfortunately, the dongle  
-> doesn't seem to accept the change. After setting the value and re- 
-> reading it, the change is gone:
+> Inquiry mode: Inquiry with RSSI
 >
-> [root@horst Desktop]# bccmd psget 0x0017
-> Maximum transmit power: 0x0004 (4)
-> [root@horst Desktop]# bccmd psset 0x0017 0
-> [root@horst Desktop]# bccmd psget 0x0017
-> Maximum transmit power: 0x0004 (4)
->
-> I also tried dump all PS keys and restoring the modified dump - same  
-> issue.
->
-> Does anybody have experience with this? Do we need special BT  
-> dongles? We are also inquiring with CSR at the moment, but using a  
-> windows software is not an option, as our project is using embedded  
-> Linux (of course :).
+> ..so I think the adapter supports this, and is in the correct
+> configuration - but when I run "hcitool scan", I only get the HW
+> address and name of local adapters - no RSSI. Is there some flag, or
+> option that I need to pass to hcitool in order to get RSSI as well?
 
-this is a hardware detail that you better discuss with CSR people  
-since while I know a lot about their hardware, I am not that deep into  
-all the details. And messing with PS keys can result in unexpected  
-things.
+run hcidump to see that you get the right events. Also just use the D- 
+Bus interface of bluetoothd since that gives you the RSSI values.
 
 Regards
 
