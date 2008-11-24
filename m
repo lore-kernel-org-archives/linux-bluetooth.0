@@ -1,38 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 24 Nov 2008 12:00:37 +0100
-From: Stefan Seyfried <seife@suse.de>
+From: "Liu, Raymond" <raymond.liu@intel.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: compat/Makefile.am manpages fix / pand/dund question
-Message-ID: <20081124110037.GC28799@suse.de>
-References: <20081110092009.GD11057@suse.de> <226D5095-C45F-49D8-8001-9D62F17D8122@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 24 Nov 2008 18:11:20 +0800
+Subject: RE: Can we change org.openobex.Client's dbus node path?
+Message-ID: <0463F45F3606F4428ED35AC8C709F92E021C55AE@pdsmsx502.ccr.corp.intel.com>
+References: <0463F45F3606F4428ED35AC8C709F92E0217A981@pdsmsx502.ccr.corp.intel.com>
+ <CD8AC205-7C97-4078-A211-871D62407247@holtmann.org>
+ <0463F45F3606F4428ED35AC8C709F92E0217AA44@pdsmsx502.ccr.corp.intel.com>
+ <C0D77808-B8E7-4BF3-81D8-52EE39667C6C@holtmann.org>
+ <0463F45F3606F4428ED35AC8C709F92E0217AAF9@pdsmsx502.ccr.corp.intel.com>
+ <D964A4DB-60BA-4B95-A970-4D7E3E289670@holtmann.org>
+In-Reply-To: <D964A4DB-60BA-4B95-A970-4D7E3E289670@holtmann.org>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <226D5095-C45F-49D8-8001-9D62F17D8122@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-
-On Mon, Nov 24, 2008 at 03:58:11AM +0100, Marcel Holtmann wrote:
->> package? I guess that I should not package hidd, no matter how much
->> users would like it, though ;-)
 >
-> You can put hidd in bluez-compat if you like. It is useful for debugging 
-> since it can show the actual kernel state of the hidp.ko module.
+>so first, please fix the coding style here. I can tell from just the
+>pure email that you are mixing up tabs and spaces and also that you
+>are missing whitespaces here and there. Check that your mail client
+>doesn't mangle it. If in doubt send it as attachment.
+>
+>Regards
+>
+>Marcel
 
-Fortunately nobody has requested it for quite some time.
-Would it be helpful to remove the "--server" code from hidd, since I guess
-that this will not be useful anymore (and I fear that once I package up
-hidd, people _will_ use "hidd --server", because they read that in some
-outdated README). I can come op with a patch for that, if wanted.
 
-Thanks,
+Hi Marcel
 
-	seife
--- 
-Stefan Seyfried
-R&D Team Mobile Devices            |              "Any ideas, John?"
-SUSE LINUX Products GmbH, Nürnberg | "Well, surrounding them's out." 
+Thanks for point out the tabs and spaces issue, I think this is might be re=
+lated to my terminal setting when I do the copy/paste with the diff output.=
+ And 3 whitespaces added. So here it is:
 
-This footer brought to you by insane German lawmakers:
-SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG Nürnberg)
+---------------------------------------------------------------------------
+
+diff --git a/gdbus/object.c b/gdbus/object.c
+index a417ab9..9cf6f09 100644
+--- a/gdbus/object.c
++++ b/gdbus/object.c
+@@ -299,25 +299,28 @@ static void invalidate_parent_data(DBusConnection *co=
+nn, const char *child_path)
+ 	char *parent_path, *slash;
+=20
+ 	parent_path =3D g_strdup(child_path);
+-	slash =3D strrchr(parent_path, '/');
+-	if (!slash)
+-		goto done;
+-
+-	*slash =3D '\0';
+-	if (!strlen(parent_path))
+-		goto done;
++	do {
++		slash =3D strrchr(parent_path, '/');
++		if (!slash)
++			break;
+=20
+-	if (!dbus_connection_get_object_path_data(conn, parent_path,
+-							(void *) &data))
+-		goto done;
++		if (slash =3D=3D parent_path) {
++			*(slash + 1) =3D '\0';
++		} else {
++			*slash =3D '\0';
++		}
+=20
+-	if (!data)
+-		goto done;
++		if (!dbus_connection_get_object_path_data(conn, parent_path,
++								(void *) &data))
++			continue;
+=20
+-	g_free(data->introspect);
+-	data->introspect =3D NULL;
++		if (!data)
++			continue;
+=20
+-done:
++		g_free(data->introspect);
++		data->introspect =3D NULL;
++	} while (slash !=3D parent_path);
++=09
+ 	g_free(parent_path);
+ }
+
+---------------------------------------------
+
+Raymond
