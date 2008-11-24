@@ -1,14 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Li, Zhigang" <zhigang.li@intel.com>
-To: Vinicius Gomes <vinicius.gomes@openbossa.org>
-Date: Mon, 24 Nov 2008 17:08:48 +0800
-Message-ID: <B94C62E7C2870743865418621F040C1301E82860@pdsmsx502.ccr.corp.intel.com>
-References: <B94C62E7C2870743865418621F040C1301E82411@pdsmsx502.ccr.corp.intel.com>
-	<2a9506370811210705g3a81a1c5kc772cf5f81a2bbed@mail.gmail.com>
-In-Reply-To: <2a9506370811210705g3a81a1c5kc772cf5f81a2bbed@mail.gmail.com>
-MIME-Version: 1.0
-Cc: "bluez-devel@lists.sourceforge.net" <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] What's the maximum size of file by FTP transfer
+Message-Id: <19AE64BB-CF8A-4062-BCE9-69A1BF5C5FC3@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: walmis@balticum-tv.lt,
+	BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1225712964.6241.44.camel@ubuntu>
+Mime-Version: 1.0 (Apple Message framework v929.2)
+Date: Mon, 24 Nov 2008 04:04:22 +0100
+References: <1225712964.6241.44.camel@ubuntu>
+Subject: Re: [Bluez-devel] Bug: "Connected" device property is always False
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,42 +17,27 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="gb2312"
+Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-SGkgVmluaWNpdXMsDQpZb3UgYXJlIHJpZ2h0LiBJdCdzIG5vdCBvYmV4LWNsaWVudCBpc3N1ZS4N
-ClRoZSBwcm9ibGVtIGNvdWxkIGJlIG15IFBDIGZpbGVzeXN0ZW0gaXNzdWUuIEJlY2F1c2UgSSBj
-YW4ndCBzZW5kIHRoZSBjb3BpZWQgZmlsZSBpbiB0aGF0IGRpciBpZiBJIHB1dCB0aGVtIHRvIC90
-bXAgdGhhdCdzIG9rLg0KSSB3aWxsIGNoZWNrIG15IGZpbGVzeXN0ZW0uDQpUaGFua3MgeW91ciBn
-cmVhdCByZXNwb25zZS4NCg0KWmhpZ2FuZw0KDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0t
-DQpGcm9tOiBWaW5pY2l1cyBHb21lcyBbbWFpbHRvOnZpbmljaXVzLmdvbWVzQG9wZW5ib3NzYS5v
-cmddIA0KU2VudDogMjAwOMTqMTHUwjIxyNUgMjM6MDYNClRvOiBMaSwgWmhpZ2FuZw0KQ2M6IGJs
-dWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldA0KU3ViamVjdDogUmU6IFdoYXQncyB0aGUg
-bWF4aW11bSBzaXplIG9mIGZpbGUgYnkgRlRQIHRyYW5zZmVyDQoNCkhpLA0KDQpPbiBGcmksIE5v
-diAyMSwgMjAwOCBhdCA1OjEwIEFNLCBMaSwgWmhpZ2FuZyA8emhpZ2FuZy5saUBpbnRlbC5jb20+
-IHdyb3RlOg0KPiBISSBWaW5pY2l1cywNCj4NCj4gSSBoYXZlIG9uZSBwcm9ibGVtIGZvciBiaWdn
-ZXIgZmlsZSB0cmFuc2Zlci4NCj4NCj4gSSBjYW4ndCB0cmFuc2ZlciA5TUIgLm1wMyBmaWxlIGJ1
-dCAxTUIgZmlsZSBpcyBvayBieSBGVFAuDQo+DQo+IEkga25vdyBpdCdzIGRpZmZpY3VsdCB0byB0
-cmFuc2ZlciBhIGJpZ2dlciBmaWxlIHdoaWNoIG1vcmUgdGhhbiAxME1CIGJ5DQo+IEJsdWV0b290
-aC4NCj4NCj4gSSB1c2VkIGxhdGVzdCByZWxlYXNlIHZlcnNpb24gaW4gYmx1ZXoub3JnLg0KPg0K
-PiBJdCBldmVuIGNhbid0IG9wZW4gdGhlIGZpbGUsIGl0J3Mgbm90IGZpbGUgc2VsZiBwcm9ibGVt
-Lg0KPg0KPiBmZCA9IG9wZW4oZmlsZW5hbWUsIE9fUkRPTkxZKTsNCj4NCj4gV2hhdCdzIHRoZSBs
-aW1pdGF0aW9uIGluIGZ0cCBjbGllbnQgc2lkZT8gSSBzYXcgdGhlIHNpemUgc2hvdWxkIGJlIDJH
-Qi4NCj4NCg0KQXMgeW91IGFscmVhZHkgc2FpZCwgdGhlIG9ubHkgbGltaXRhdGlvbiByZWFsbHkg
-aXMgdGhlIHNpemUgb2YgdGhlIG9iamVjdA0KbGVuZ3RoIGhlYWRlciAoMzIgYml0cykuDQoNCj4g
-RG8geW91IGhhdmUgc2FtZSBwcm9ibGVtPyBPciBhbnkgaWRlYS8NCg0KTm8uIEkganVzdCB0ZXN0
-ZWQgaXQgaGVyZSwgYW5kIGl0IHdvcmtlZCBmaW5lLiBCdXQgaWYgaXQgaXMgZmFpbGluZyBvbiB0
-aGUgb3Blbg0KY2FsbCwgaXQgc2VlbXMgaXQgaXNuJ3QgYSBvYmV4LWNsaWVudCBpc3N1ZS4NCg0K
-QnV0IEkgd291bGQgbGlrZSB0byBrbm93IG1vcmUsIHBlcmhhcHMgYSBzdHJhY2Ugd291bGQgZ2l2
-ZSBtb3JlDQppbmZvcm1hdGlvbiBvbiB3aGF0IG1pZ2h0IGJlIGhhcHBlbmluZy4NCg0KPg0KPiBU
-aGFua3MNCj4NCj4NCg0KQ2hlZXJzLA0KLS0gDQpWaW5pY2l1cyBHb21lcw0KSU5kVCAtIEluc3Rp
-dHV0byBOb2tpYSBkZSBUZWNub2xvZ2lhDQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tClRoaXMgU0YuTmV0IGVt
-YWlsIGlzIHNwb25zb3JlZCBieSB0aGUgTW9ibGluIFlvdXIgTW92ZSBEZXZlbG9wZXIncyBjaGFs
-bGVuZ2UKQnVpbGQgdGhlIGNvb2xlc3QgTGludXggYmFzZWQgYXBwbGljYXRpb25zIHdpdGggTW9i
-bGluIFNESyAmIHdpbiBncmVhdCBwcml6ZXMKR3JhbmQgcHJpemUgaXMgYSB0cmlwIGZvciB0d28g
-dG8gYW4gT3BlbiBTb3VyY2UgZXZlbnQgYW55d2hlcmUgaW4gdGhlIHdvcmxkCmh0dHA6Ly9tb2Js
-aW4tY29udGVzdC5vcmcvcmVkaXJlY3QucGhwP2Jhbm5lcl9pZD0xMDAmdXJsPS8KX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1ZXotZGV2ZWwgbWFpbGlu
-ZyBsaXN0CkJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNv
-dXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbAo=
+Hi,
+
+> Done some digging around and it seems
+> adapter_search_active_conn_by_bdaddr always returns NULL.
+
+I assume that this has fixed with the latest release.
+
+Regards
+
+Marcel
+
+
+-------------------------------------------------------------------------
+This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
+Build the coolest Linux based applications with Moblin SDK & win great prizes
+Grand prize is a trip for two to an Open Source event anywhere in the world
+http://moblin-contest.org/redirect.php?banner_id=100&url=/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
