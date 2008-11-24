@@ -1,37 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Message-Id: <226D5095-C45F-49D8-8001-9D62F17D8122@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <F9029075-34B5-4DE1-98EA-E990C82C7495@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Stefan Seyfried <seife@suse.de>
-In-Reply-To: <20081110092009.GD11057@suse.de>
+To: Matthieu CASTET <matthieu.castet@parrot.com>
+In-Reply-To: <491868E6.6000406@parrot.com>
 Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
 Mime-Version: 1.0 (Apple Message framework v929.2)
-Subject: Re: compat/Makefile.am manpages fix / pand/dund question
-Date: Mon, 24 Nov 2008 03:58:11 +0100
-References: <20081110092009.GD11057@suse.de>
+Subject: Re: btusb and HCI_RAW
+Date: Mon, 24 Nov 2008 03:57:01 +0100
+References: <491868E6.6000406@parrot.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Stefan,
+Hi Matthieu,
 
-> pand.1 and dund.1 are always installed. Fix below.
-
-I fixed that already. Thanks for reporting.
-
-> Then some kind of packaging question:
-> I got users that request pand and dund. I am under the impression
-> that this should be handled by the networking service, however was
-> unable to find anything understandable on the WIKI where I can point
-> them to.
+> with HCI_RAW, application can bypass the bluez stack and send raw  
+> stuff
+> to dongle.
 >
-> Am I still "allowed" to package pand and dund, e.g. in a "bluez- 
-> compat"
-> package? I guess that I should not package hidd, no matter how much
-> users would like it, though ;-)
+> This seems not possible anymore with btusb because it uses
+> "hdev->conn_hash" to check if ACLDATA/SCODATA should be send/received.
+>
+> These checks make the HCI_RAW mode a bit useless (ie not working for  
+> acl
+> and sco).
+>
+> Can we make the HCI_RAW work like before with acl and sco data ?
+> For example we can ignore theses check in HCI_RAW mode and send a  
+> notify
+> event when we turn on/off HCI_RAW mode.
 
-You can put hidd in bluez-compat if you like. It is useful for  
-debugging since it can show the actual kernel state of the hidp.ko  
-module.
+we could, but that will cost a lot of CPU power. The SCO data packets  
+are just not an option here. Also without a full blown Bluetooth  
+stack, you don't know with alternate setting to use. So this is a  
+little bit pointless here and before just worked by pure luck. Why do  
+you want this support in the first place?
 
 Regards
 
