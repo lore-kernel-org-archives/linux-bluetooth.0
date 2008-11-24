@@ -1,35 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <44A822C0-C143-4F39-BA74-FC414EC613DD@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <226D5095-C45F-49D8-8001-9D62F17D8122@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: David Merrill <dmerrill@media.mit.edu>
-In-Reply-To: <f86d2a880811040903i3ee0a5e7tdf9b52775108dab0@mail.gmail.com>
+To: Stefan Seyfried <seife@suse.de>
+In-Reply-To: <20081110092009.GD11057@suse.de>
 Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
 Mime-Version: 1.0 (Apple Message framework v929.2)
-Subject: Re: how to: Inquiry with RSSI?
-Date: Mon, 24 Nov 2008 04:00:13 +0100
-References: <f86d2a880811040903i3ee0a5e7tdf9b52775108dab0@mail.gmail.com>
+Subject: Re: compat/Makefile.am manpages fix / pand/dund question
+Date: Mon, 24 Nov 2008 03:58:11 +0100
+References: <20081110092009.GD11057@suse.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hi Stefan,
 
-> First, thanks to the developers for creating Bluez - it's so nice to
-> have such a useful, open-source Bluetooth option.
->
-> I am writing with a question: how can I do an inquiry scan with RSSI,
-> and read out the RSSI values? (without making a connection to devices)
-> When I run "hciconfig hci0 inqmode" I get the following:
->
-> Inquiry mode: Inquiry with RSSI
->
-> ..so I think the adapter supports this, and is in the correct
-> configuration - but when I run "hcitool scan", I only get the HW
-> address and name of local adapters - no RSSI. Is there some flag, or
-> option that I need to pass to hcitool in order to get RSSI as well?
+> pand.1 and dund.1 are always installed. Fix below.
 
-run hcidump to see that you get the right events. Also just use the D- 
-Bus interface of bluetoothd since that gives you the RSSI values.
+I fixed that already. Thanks for reporting.
+
+> Then some kind of packaging question:
+> I got users that request pand and dund. I am under the impression
+> that this should be handled by the networking service, however was
+> unable to find anything understandable on the WIKI where I can point
+> them to.
+>
+> Am I still "allowed" to package pand and dund, e.g. in a "bluez- 
+> compat"
+> package? I guess that I should not package hidd, no matter how much
+> users would like it, though ;-)
+
+You can put hidd in bluez-compat if you like. It is useful for  
+debugging since it can show the actual kernel state of the hidp.ko  
+module.
 
 Regards
 
