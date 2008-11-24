@@ -1,40 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <97A79091-A35F-4A53-8AAF-DCD527C574DA@holtmann.org>
+Message-Id: <0FA78263-FBE1-4B03-8849-C0E05380E827@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: David Merrill <dmerrill@media.mit.edu>
-In-Reply-To: <f86d2a880811181148x724e7ff8s474a1821d50c58e3@mail.gmail.com>
+To: Ron Murray <rjmx@rjmx.net>
+In-Reply-To: <4924548A.5020909@rjmx.net>
 Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
 Mime-Version: 1.0 (Apple Message framework v929.2)
-Subject: Re: one "talker" multiple "listeners" possible for inquiry scan with RSSI?
-Date: Mon, 24 Nov 2008 03:51:26 +0100
-References: <f86d2a880811181148x724e7ff8s474a1821d50c58e3@mail.gmail.com>
+Subject: Re: bcm203x bluetooth dongle still does not work in kernel 2.6.27.6
+Date: Mon, 24 Nov 2008 03:50:06 +0100
+References: <4924548A.5020909@rjmx.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hi Ron,
 
-> I am getting to know bluez, reading the BT spec, playing with pybluez
-> - and I have a multi-adapter question I hope someone may know the
-> answer to.
+>   I have a couple of boxes that I'm using with (admittedly fairly old)
+> Tecon bluetooth devices using the BCM-2033 chipset, and I've been  
+> having
+> trouble with them since you switched to the workqueue. For quite some
+> time I applied the patch referred to in the message below, and that
+> worked, but it wouldn't apply on kernel 2.6.27. Rather than fix it, I
+> decided to try the kernel driver as-is, with patchy results. Sometimes
+> it works, sometimes it doesn't. The symptoms are the same as below: my
+> syslog says
 >
-> I want to capture the RSSI from a mobile phone from several Bluetooth
-> radio dongles on a linux system, so I can try to estimate where the
-> mobile phone is. I find that when I have all radios doing inquiry
-> scans with RSSI at the same time, it generates a lot of radio traffic,
-> and WiFi in the area slows down.
+> Nov 19 12:38:45 rjmx kernel: firmware: requesting BCM2033-MD.hex
+> Nov 19 12:38:45 rjmx kernel: firmware: requesting BCM2033-FW.bin
 >
-> So I'm wondering, can I have one radio initiate the inquiry scan with
-> RSSI, and have the other 5 radios just listen for the replies from the
-> mobile phone without "talking"? Could this be accomplished just by
-> setting the hardware address of the "listeners" to match the address
-> of the "talker", then they would receive the replies - or is there
-> some hand-shaking / delivery guarantee algorithm that is required that
-> would not be possible if the listeners remain quiet?
+>   but nothing seems to happen: an 'lsusb' still gives
+>
+> Bus 001 Device 004: ID 0a5c:2033 Broadcom Corp. BCM2033 Bluetooth
+>
+>   ... which is the wrong ID for a device that's had its firmware
+> properly loaded. The firmware files themselves seem to be readable,  
+> and
+> in fact an 'ls -lut' gives me a "last access time" similar to the  
+> actual
+> time I tried plugging in the device.
 
-the simple answer is no. It is not how Bluetooth works. For more  
-details you should get a book on Bluetooth that explains how the radio/ 
-baseband actually works.
+I don't have the Tecon device and my BCM2033 is at home. So I can't  
+tell you what's going on here. Play with the drivers source code. It  
+is pretty simple.
 
 Regards
 
