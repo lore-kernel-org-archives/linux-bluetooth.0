@@ -1,77 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 25 Nov 2008 14:14:54 +0100 (CET)
-From: Julia Lawall <julia@diku.dk>
-To: marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH 4/5] drivers/bluetooth: change simple_strtol to simple_strtoul
-Message-ID: <Pine.LNX.4.64.0811251414330.11897@pc-004.diku.dk>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Message-Id: <C2133416-B233-4FFF-B29B-0BCF3B3402E1@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <492BB3F2.3050005@gmail.com>
+Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
+Mime-Version: 1.0 (Apple Message framework v929.2)
+Subject: Re: HBH-PV270 headset get locked
+Date: Tue, 25 Nov 2008 11:15:59 +0200
+References: <492B7A98.90603@gmail.com> <492BB3F2.3050005@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Julia Lawall <julia@diku.dk>
+Hi,
 
-Since size, addr, fcs, and tmp are unsigned, it would seem better to use
-simple_strtoul that simple_strtol.
+Thanks for taking the time to investigate this.
 
-A simplified version of the semantic patch that makes this change is as
-follows: (http://www.emn.fr/x-info/coccinelle/)
+On Nov 25, 2008, at 10:14, Sam Lin wrote:
+> I traced code and found in some case headset is not unlocked well.
+> for example when something goes wrong in headset_resume_complete(),
+> client->dev = NULL
+>
+> so client_cb() will skip headset_unlock()
+>
+> then headset will be locked forever until restart bluetoothd.
+>
+> I have no idea what's the lock idea behind, BTW still unclear how the
+> problem happens to cause this.
 
-// <smpl>
-@r2@
-long e;
-position p;
-@@
+The lock part is used for making sure that only one unix socket client  
+can have read or write access to a remote device at a time. The part  
+that's setting client->dev to NULL seems definitely wrong to me but  
+I'll let Luiz comment on it before making any changes (since according  
+to git blame he was the last one to touch this part of the code). The  
+A2DP resume function has similar logic so it probably needs fixing too.
 
-e = simple_strtol@p(...)
-
-@@
-position p != r2.p;
-type T;
-T e;
-@@
-
-e = 
-- simple_strtol@p
-+ simple_strtoul
-  (...)
-// </smpl>
-
-Signed-off-by: Julia Lawall <julia@diku.dk>
-
----
-
- drivers/bluetooth/bt3c_cs.c |    8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff -u -p a/drivers/bluetooth/bt3c_cs.c b/drivers/bluetooth/bt3c_cs.c
---- a/drivers/bluetooth/bt3c_cs.c
-+++ b/drivers/bluetooth/bt3c_cs.c
-@@ -502,15 +502,15 @@ static int bt3c_load_firmware(bt3c_info_
- 
- 		memset(b, 0, sizeof(b));
- 		memcpy(b, ptr + 2, 2);
--		size = simple_strtol(b, NULL, 16);
-+		size = simple_strtoul(b, NULL, 16);
- 
- 		memset(b, 0, sizeof(b));
- 		memcpy(b, ptr + 4, 8);
--		addr = simple_strtol(b, NULL, 16);
-+		addr = simple_strtoul(b, NULL, 16);
- 
- 		memset(b, 0, sizeof(b));
- 		memcpy(b, ptr + (size * 2) + 2, 2);
--		fcs = simple_strtol(b, NULL, 16);
-+		fcs = simple_strtoul(b, NULL, 16);
- 
- 		memset(b, 0, sizeof(b));
- 		for (tmp = 0, i = 0; i < size; i++) {
-@@ -530,7 +530,7 @@ static int bt3c_load_firmware(bt3c_info_
- 			memset(b, 0, sizeof(b));
- 			for (i = 0; i < (size - 4) / 2; i++) {
- 				memcpy(b, ptr + (i * 4) + 12, 4);
--				tmp = simple_strtol(b, NULL, 16);
-+				tmp = simple_strtoul(b, NULL, 16);
- 				bt3c_put(iobase, tmp);
- 			}
- 		}
+Johan
