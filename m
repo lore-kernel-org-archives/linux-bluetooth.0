@@ -1,95 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <40aff9180810311704q7f7d1380rd7c80cda2f5fe47b@mail.gmail.com>
-Date: Sat, 1 Nov 2008 01:04:09 +0100
-From: Fiorellino <fiorellino@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: any TFM to read about BlueZ 4.x setup? (almost solved)
+Message-ID: <2a9506370811242042s8ac516ep5ee181ffe4eb1f0f@mail.gmail.com>
+Date: Tue, 25 Nov 2008 01:42:29 -0300
+From: "Vinicius Gomes" <vinicius.gomes@openbossa.org>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <BD8ED0C257AAA247BB6C9A92879522C10D827E1C@CNSCNEVS01.ap.sony.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
-List-ID: <linux-bluetooth.vger.kernel.org>
+References: <BD8ED0C257AAA247BB6C9A92879522C10D827E1C@CNSCNEVS01.ap.sony.com>
+Subject: Re: [Bluez-devel] What's the API different between in
+	adapter-api.txt and dbus-api.txt in bluez-utils-3.36.tar.gz
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi,
 
-and thanks a lot Sreevani.
+On Mon, Nov 24, 2008 at 10:57 PM, WanYan, Uranus
+<Uranus.WanYan@sony.com.cn> wrote:
+> Hello Every Developer;
+>
+>          I am a fresh man in bluez. I studied bluez through
+> http://wiki.bluez.org/.
+>
+>          But now I am confused by the bluez documentation. BlueZ D-Bus
+> Adapter API were described in adapter-api(bluez-utils-3.36\doc). Also
+> they were described in dbus-api.txt(bluez-utils-3.36\hcid). Please
+> reference attachment.
+>
+>          So could you tell me why there are two documents describing
+> Adapter API?
+>
 
-Thanks to your hint I got much closer. I think now the pairing is
-done, I just need to work on xorg.conf configuration to accept the
-keyboard input. Now I see the led blinking when I press buttons, but
-they don't seem to reach my X.
+hcid/dbus-api.txt describes the 'old' 3.X series API
 
-Anyway, some hints for future people in trouble like me. Sorry if some
-steps are missing, but I didn't trace everything so I will use my
-memory a lot.
+the documents in the doc/ directory describe the new API, that is the only API
+of the 4.X series, which I suggest for you to take a look. And because
+3.36 is not developed
+anymore, are you are missing a much simplified API and some very nice
+features ;-)
 
-My aim was to pair my wireless keyboard using just command line tools.
-For some reason, using 3.xx the pairing was not asking me any PIN.
+This mailing list is going to be closed soon, so please take a look at
+[1] for alternatives.
 
-First, compile the main package (latest bluez-4.xx.tar.gz from
-http://www.bluez.org/download/)
-
-If you don't usually compile you need a lot of additional packages
-(check README for a list of packages).
-
-after compiling hciconfig will list your devices.
-
-type hciconfig <yourdev> up (e.g. hciconfig hci0 up)
-
-search for available devices: hcitool scan (remember to put your
-device in discoverable mode)
-
-so far so good... now it's were it got tricky for me. hcid (from bluez
-3.xx) got renamed bluetoothd in bluez 4.xx ...
-
-you can run it FOR NOW this way: bluetooth -nd for your tests...
-
-then go in the test folder and run:
-
-voyage:~/bluez-4.17/test# ./simple-agent hci0 00:18:00:00:78:86
-(obviously this will be the HW address you got from hcitool scan)
-RequestPinCode (/org/bluez/hci0/dev_00_18_00_00_78_86)
-Enter PIN Code: 2233
-Release
-New device (/org/bluez/hci0/dev_00_18_00_00_78_86)
-
-Again, if you don't have python you might need to install some stuff
-(I needed python python-gtk2 python-dbus)
-
-Is that simple... :)
+>  Thank you for your help!
+>
+> Uranus
+>
+>
+> -------------------------------------------------------------------------
+> This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
+> Build the coolest Linux based applications with Moblin SDK & win great prizes
+> Grand prize is a trip for two to an Open Source event anywhere in the world
+> http://moblin-contest.org/redirect.php?banner_id=100&url=/
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+>
 
 Cheers,
+-- 
+Vinicius Gomes
+INdT - Instituto Nokia de Tecnologia
 
-alfonso
+[1] http://www.bluez.org/contact/
 
-On Fri, Oct 31, 2008 at 11:46 AM, sreevani medhahal
-<sreevani.medhahal@gmail.com> wrote:
-> Hi,
->  Under the test folder in bluez. there is a python script
-> simple-agent which allows to do pairing on the command line.
-> format:./simple-agent hci0 <bd_addr>
->
-> let me know if it doesnt work.
-> Regards,
-> Sreevani
->
-> On Fri, Oct 31, 2008 at 3:10 PM, Fiorellino <fiorellino@gmail.com> wrote:
->> Hi there,
->>
->> http://wiki.bluez.org/wiki/HOWTO/Bonding refers to bluez-gnome
->> (graphical tool) and passkey-agent.c which is not any more in any
->> package (checked bluez-4.17.tar.gz bluez-gnome-1.8.tar.gz
->> bluez-firmware-1.2.tar.gz and bluez-hcidump-1.42.tar.gz).
->>
->> Is there any way to do pairing using command line tools?
->>
->> Can anyone please post an example of pure command line bonding / pairing?
->>
->> Thank you,
->>
->> alfonso
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->
+-------------------------------------------------------------------------
+This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
+Build the coolest Linux based applications with Moblin SDK & win great prizes
+Grand prize is a trip for two to an Open Source event anywhere in the world
+http://moblin-contest.org/redirect.php?banner_id=100&url=/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
