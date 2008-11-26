@@ -1,41 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <492D1F90.9070706@gmail.com>
-Date: Wed, 26 Nov 2008 18:06:08 +0800
-From: Sam Lin <itrs.lin@gmail.com>
+From: "Liu, Raymond" <raymond.liu@intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Wed, 26 Nov 2008 16:18:05 +0800
+Subject: Pbap Client code for review
+Message-ID: <0463F45F3606F4428ED35AC8C709F92E021C5FB3@pdsmsx502.ccr.corp.intel.com>
+References: <37367b3a0811250804s138fc2d2q453280c7c25286bd@mail.gmail.com>
+ <11F32435-24AF-4ACE-9C4F-0FB98127FB6B@holtmann.org>
+In-Reply-To: <11F32435-24AF-4ACE-9C4F-0FB98127FB6B@holtmann.org>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: Johan Hedberg <johan.hedberg@gmail.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: HBH-PV270 headset get locked
-References: <492B7A98.90603@gmail.com> <492BB3F2.3050005@gmail.com>	 <C2133416-B233-4FFF-B29B-0BCF3B3402E1@gmail.com> <2d5a2c100811250634vd53daafvce6791992a3c621@mail.gmail.com>
-In-Reply-To: <2d5a2c100811250634vd53daafvce6791992a3c621@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-1. so do you suggest to just remove the client->dev = NULL statement in 
-headset_setup_complete() and headset_resume_complete() ?
+Hi Marcel
 
-2. for the file descriptor sending issue have you any suggestion ?
-(a hint to trigger this is repeatly run aplay, what i found is while 
-finishing aplay the hcidump still takes some time to make traffics 
-settle down (about 3-7 secs), if i repeat aplay in this period it's easy 
-to trigger the problem)
+	I have finished the initial code for PBAP client. Can you help to have a r=
+eview?  I have to write another get function for PBAP since the current cod=
+e does not read application header information
 
-Thanks,
+	The code is at:
+	http://git.moblin.org/repos/users/raymond/obexd.git dev
 
-Sam Lin
-
-
-Luiz Augusto von Dentz 提到:
-> yep, client->dev = NULL seems to be a bug, although by looking the log
->  it seems there is another problem, the sco connection doesn't succeed
-> but it still attempt to send the file descriptor. The logic on a2dp is
-> a little different, since it doesn't start the stream on
-> BT_SETCONFIGURATION_REQ and unlock the sep in any possible error.
->
-> Btw, I couldn't reproduce the problem here by using aplay, arecord or
-> even both together.
->
->   
-
+Thanks.
+Raymond
