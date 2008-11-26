@@ -1,38 +1,148 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <492E6E6A.80509@koala.ie>
-Date: Thu, 27 Nov 2008 09:54:50 +0000
-From: Simon Kenyon <simon@koala.ie>
+Message-ID: <37367b3a0811260719q520f1db2s5824f485bc8946f8@mail.gmail.com>
+Date: Wed, 26 Nov 2008 15:19:33 +0000
+From: "Alan Carvalho de Assis" <acassis@gmail.com>
+To: "Marcel Holtmann" <marcel@holtmann.org>
+Subject: Re: agent.c
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <11F32435-24AF-4ACE-9C4F-0FB98127FB6B@holtmann.org>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Sony BD Remote (help requested)
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+References: <37367b3a0811250804s138fc2d2q453280c7c25286bd@mail.gmail.com>
+	 <11F32435-24AF-4ACE-9C4F-0FB98127FB6B@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-i'm trying to get y BD Remote to work.
+Sorry, now reply to all
 
-this is what i have done so far:
+On Wed, Nov 26, 2008 at 4:57 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Alan,
+>
+>> I am updating agent.c in order to it works with new bluez versions.
+>
+> please send patches and not full *.c source code.
+>
 
-installed bluez from git (as of yesterday)
-configured it (i think)
-when i:
+Sorry!
 
-hidd --search
+Please find it below (I hope my email client don't mess this code)
 
-i see the remote
+--- agent_orig.c        2008-10-04 16:32:08.000000000 +0000
++++ agent.c     2008-11-25 13:59:57.000000000 +0000
+@@ -177,14 +177,31 @@
+ static DBusHandlerResult agent_message(DBusConnection *conn,
+                                               DBusMessage *msg, void *data)
+ {
+-       if (dbus_message_is_method_call(msg, "org.bluez.Agent", "Request"))
+-               return request_message(conn, msg, data);
+-
+-       if (dbus_message_is_method_call(msg, "org.bluez.Agent", "Cancel"))
+-               return cancel_message(conn, msg, data);
++       printf("Agent_message was called!\n");
 
-by using udev rules i create /dev/bdremote (which links to 
-/dev/input/event<x>, for the correct <x>)
-i can see the key presses on the remote being transmitted (using hcidump)
+       if (dbus_message_is_method_call(msg, "org.bluez.Agent", "Release"))
+-               return release_message(conn, msg, data);
++               printf("Agent called: Release\n");
++
++       if (dbus_message_is_method_call(msg, "org.bluez.Agent",
+"RequestPinCode"))
++               printf("Agent called: RequestPinCode\n");
++
++       if (dbus_message_is_method_call(msg, "org.bluez.Agent",
+"RequestPasskey"))
++               printf("Agent called: RequestPasskey\n");
++
++       if (dbus_message_is_method_call(msg, "org.bluez.Agent",
+"DisplayPasskey"))
++               printf("Agent called: DisplayPasskey\n");
++
++       if (dbus_message_is_method_call(msg, "org.bluez.Agent",
+"RequestConfirmation"))
++               printf("Agent called: RequestConfirmation\n");
++
++       if (dbus_message_is_method_call(msg, "org.bluez.Agent", "Authorize"))
++               printf("Agent called: Authorize\n");
++
++       if (dbus_message_is_method_call(msg, "org.bluez.Agent",
+"ConfirmModeChange"))
++               printf("Agent called: ConfirmModeChange\n");
++
++       if (dbus_message_is_method_call(msg, "org.bluez.Agent", "Cancel"))
++               printf("Agent called: Cancel\n");
 
-what i cannot do see is ny events occuring (by loading evbug)
-i'm trying to get the events into lirc
+       return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+ }
+@@ -279,18 +296,46 @@
+       return 0;
+ }
 
-i promise to write up the steps if i get it working
+-static char *get_device(const char *device)
++static char *get_device(DBusConnection *conn)
+ {
+-       char *path;
++       char *path, *device_path = NULL;
++       DBusMessage *msg, *reply;
++       DBusError err;
++
++       msg = dbus_message_new_method_call("org.bluez", "/",
++                                       "org.bluez.Manager", "DefaultAdapter");
++       if (!msg) {
++               fprintf(stderr, "Can't allocate new method call\n");
++               return NULL;
++       }
++
++       dbus_error_init(&err);
 
-i'm running a pretty standard gentoo setup with kde (not gnome)
+-       path = strdup("/org/bluez/hci0");
++       reply = dbus_connection_send_with_reply_and_block(conn, msg, -1, &err);
 
-any help would be appreciated
---
-simon
+-       return path;
++       dbus_message_unref(msg);
++
++       if (!reply) {
++               fprintf(stderr, "Can't get Adapter path\n");
++               if (dbus_error_is_set(&err)) {
++                       fprintf(stderr, "%s\n", err.message);
++                       dbus_error_free(&err);
++               }
++               return NULL;
++       }
++
++       dbus_message_get_args(reply, NULL, DBUS_TYPE_OBJECT_PATH,
+&device_path, DBUS_TYPE_INVALID);
++
++       dbus_message_unref(reply);
++
++       dbus_connection_flush(conn);
++
++       return device_path;
+ }
 
+ static void usage(void)
+ {
+-       printf("Bluetooth agent ver %s\n\n", VERSION);
++       printf("Bluetooth agent ver %s\n\n", "4.18");
+
+       printf("Usage:\n"
+               "\tagent [--device interface] [--path agent-path] <passkey>\n"
+@@ -365,7 +410,9 @@
+       }
+
+       if (!device_path)
+-               device_path = get_device(device_id);
++               device_path = get_device(conn);
++
++       printf("Adapter path: %s\n", device_path);
+
+       if (register_agent(conn, device_path, agent_path, capabilities) < 0) {
+               dbus_connection_unref(conn);
+
+
+> Regards
+>
+> Marcel
+>
+>
+
+Best Regards,
+
+Alan
