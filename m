@@ -1,34 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Sony BD Remote (help requested)
-From: Bastien Nocera <hadess@hadess.net>
-To: Simon Kenyon <simon@koala.ie>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <492E6E6A.80509@koala.ie>
-References: <492E6E6A.80509@koala.ie>
-Content-Type: text/plain
-Date: Thu, 27 Nov 2008 10:56:36 +0000
-Message-Id: <1227783396.27994.1750.camel@cookie.hadess.net>
-Mime-Version: 1.0
+Message-ID: <492E6E6A.80509@koala.ie>
+Date: Thu, 27 Nov 2008 09:54:50 +0000
+From: Simon Kenyon <simon@koala.ie>
+MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org
+Subject: Sony BD Remote (help requested)
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2008-11-27 at 09:54 +0000, Simon Kenyon wrote:
-> i'm trying to get y BD Remote to work.
-> 
-> this is what i have done so far:
-> 
-> installed bluez from git (as of yesterday)
-> configured it (i think)
-> when i:
-> 
-> hidd --search
-> 
-> i see the remote
+i'm trying to get y BD Remote to work.
 
-Your remote won't work using hidd. There's no code in hidd to decode the
-custom protocol.
+this is what i have done so far:
 
-Pair it with the bluetooth-wizard and you can be on your way.
+installed bluez from git (as of yesterday)
+configured it (i think)
+when i:
 
-Cheers
+hidd --search
+
+i see the remote
+
+by using udev rules i create /dev/bdremote (which links to 
+/dev/input/event<x>, for the correct <x>)
+i can see the key presses on the remote being transmitted (using hcidump)
+
+what i cannot do see is ny events occuring (by loading evbug)
+i'm trying to get the events into lirc
+
+i promise to write up the steps if i get it working
+
+i'm running a pretty standard gentoo setup with kde (not gnome)
+
+any help would be appreciated
+--
+simon
 
