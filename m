@@ -1,38 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Sony BD Remote (the saga continues)
-From: Bastien Nocera <hadess@hadess.net>
-To: Simon Kenyon <simon@koala.ie>
+Subject: Re: [RFC/PATCH] sbc: new filtering function for 8 band fixed point
+	encoding
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Jaska Uimonen <jaska.uimonen@nokia.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <492FCDD1.1010304@koala.ie>
-References: <492FC4A3.4020601@koala.ie>  <492FCDD1.1010304@koala.ie>
+In-Reply-To: <1227879337.20555.12.camel@esdhcp03999.research.nokia.com>
+References: <1227879337.20555.12.camel@esdhcp03999.research.nokia.com>
 Content-Type: text/plain
-Date: Fri, 28 Nov 2008 14:22:06 +0000
-Message-Id: <1227882126.26649.1099.camel@cookie.hadess.net>
+Date: Fri, 28 Nov 2008 15:18:52 +0100
+Message-Id: <1227881932.31311.2.camel@violet.holtmann.net>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 2008-11-28 at 10:54 +0000, Simon Kenyon wrote:
-> Simon Kenyon wrote:
-> > so i decided to start working my way through the code and found 
-> > references to uinput in input/device.c
-> > this gave me another keyword to use in google and lo and behold this 
-> > popped up:
-> >
-> > Fri Oct 17 2008 - Bastien Nocera <bnocera@redhat.com 
-> > <mailto:bnocera@redhat.com>> - 4.14-2
-> > - Add script to autoload uinput on startup, so the PS3 remote
-> >  works out-of-the-box
-> >
-> >
-> > sure enough i did not have this module in my kernel.
-> > just building now in hope that this might be the issue
-> well that got me nowhere - still no events
-> but at least i now have a /dev/input/uinput
+Hi Jaska,
 
-You need to press buttons on the remote for it to connect to the
-computer. It will disconnect automatically after some time of idleness.
+> I did some testing on the current 8 band fixed point 
+> encoding and it seems to attenuate frequencies below 800Hz 
+> and above 18kHz. There might be some other stuff happening 
+> also, because at least to me the bass seemed to lack some 
+> "definition".
+> 
+> I didn't quite understand how the current tables are calculated
+> and how the filtering works so I wrote a new filtering function
+> and calculated new filter tables for it. It is written
+> using 16 bit fixed point without any platform specific optimizations.
+> I only unrolled some loops etc. I tried to follow the
+> flow chart in MPEG-1 annex c.
+> 
+> With this new filtering the low and high frequencies are there, but
+> I haven't done any more thorough testing. At least it sounds
+> a little bit better to my ears :)
 
-After that you need to use a new enough X server, or LIRC to get the
-events to your X applications.
+thanks for looking at it. I am seriously lost when it comes to audio
+codecs and my ears normally don't count for much.
+
+So do you think we should throw all away any you start over providing a
+correct implementation with fixed point integer and then we start
+optimizing step by step (while testing against SBC conformance) or how
+should we continue. For sure we have to fix our codec.
+
+Regards
+
+Marcel
+
 
