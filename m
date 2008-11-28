@@ -1,47 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [RFC/PATCH] sbc: new filtering function for 8 band fixed point
-	encoding
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Jaska Uimonen <jaska.uimonen@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1227879337.20555.12.camel@esdhcp03999.research.nokia.com>
-References: <1227879337.20555.12.camel@esdhcp03999.research.nokia.com>
-Content-Type: text/plain
-Date: Fri, 28 Nov 2008 15:18:52 +0100
-Message-Id: <1227881932.31311.2.camel@violet.holtmann.net>
-Mime-Version: 1.0
+Message-ID: <492FFB09.7020704@powercraft.nl>
+Date: Fri, 28 Nov 2008 15:07:05 +0100
+From: Jelle de Jong <jelledejong@powercraft.nl>
+MIME-Version: 1.0
+To: Simon Kenyon <simon@koala.ie>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: Sony BD Remote (the saga continues)
+References: <492FC4A3.4020601@koala.ie> <492FCDD1.1010304@koala.ie> <492FDF90.9010305@koala.ie> <492FEF38.3020702@koala.ie> <492FF071.8030909@powercraft.nl> <492FF7D5.6060202@koala.ie>
+In-Reply-To: <492FF7D5.6060202@koala.ie>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaska,
-
-> I did some testing on the current 8 band fixed point 
-> encoding and it seems to attenuate frequencies below 800Hz 
-> and above 18kHz. There might be some other stuff happening 
-> also, because at least to me the bass seemed to lack some 
-> "definition".
+Simon Kenyon wrote:
+> Jelle de Jong wrote:
+>> Hi Simon, I share your frustrations :-p. I will do some testing with the
+>> latest git this weekend. You may want to look at my previous postings in
+>> the archive.
+>>
+>> I advice you to give it a few hours rest and let me do some tesing on
+>> Debian SID with the latested bluez-git. I don't know for sure if the
+>> manatory xorg patch made it into the experimental packages...
+>>   
+> it is rather frustrating
+> i've had this remote for 6 months now and would like to get it working 
+> "properly"
 > 
-> I didn't quite understand how the current tables are calculated
-> and how the filtering works so I wrote a new filtering function
-> and calculated new filter tables for it. It is written
-> using 16 bit fixed point without any platform specific optimizations.
-> I only unrolled some loops etc. I tried to follow the
-> flow chart in MPEG-1 annex c.
+> what i would love to getis a description of a working configuration 
+> (config files in particular)
+> i don't know if i'm supposed to put something into one or more of the 
+> /etc/bluetooth config files.
+> or something in hal or dbus for that matter
 > 
-> With this new filtering the low and high frequencies are there, but
-> I haven't done any more thorough testing. At least it sounds
-> a little bit better to my ears :)
+> we've both been told "it just works" but it doesn't
+> --
+> simon
 
-thanks for looking at it. I am seriously lost when it comes to audio
-codecs and my ears normally don't count for much.
+I know it is frustrating, and I also got this device a while and spent
+way to much time getting it working "out of the box"
 
-So do you think we should throw all away any you start over providing a
-correct implementation with fixed point integer and then we start
-optimizing step by step (while testing against SBC conformance) or how
-should we continue. For sure we have to fix our codec.
+As I said in my first response it does not yet just works, but I am not
+an developer of bluez, just an heavy user and tester. BTW you should not
+have to make any changes to the bluez config files.
 
-Regards
+I will look into it, this weekend and report back.
 
-Marcel
+If you really want to try out right now, use the latest bluez git of
+bluez-utils and bluez-gnome and the latest xorg git and try to get an
+input event.
 
+Best regards,
+
+Jelle
 
