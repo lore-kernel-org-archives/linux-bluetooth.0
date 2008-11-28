@@ -1,363 +1,251 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <37367b3a0811280738t4fa4f39bv5f03eb51f8cdb27d@mail.gmail.com>
-Date: Fri, 28 Nov 2008 15:38:26 +0000
-From: "Alan Carvalho de Assis" <acassis@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Modification on agent.c in order to it support new API
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: [PATCH] Move PIN codes to an external database
+From: Bastien Nocera <hadess@hadess.net>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="=-Txxtf+7WEaY/momOmAQQ"
+Date: Fri, 28 Nov 2008 15:36:55 +0000
+Message-Id: <1227886615.26649.1181.camel@cookie.hadess.net>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is my effort to adapt agent.c to new API.
 
-I started doing it as single agent, but jhe suggest me to separate it
-on two agents, but after doing that none agent Methods are called.
+--=-Txxtf+7WEaY/momOmAQQ
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-As single agent I got it:
+Heya,
 
-# agent 00:0E:ED:29:4F:2D
-Pairing to 00:0E:ED:29:4F:2D
-Adapter path: /org/bluez/1780/hci0
-Agent_message was called!
-Agent called: RequestPinCode
-Device path = /org/bluez/1780/hci0/dev_00_0E_ED_29_4F_2D
-Agent has been released
-Agent_message was called!
-Agent called: Cancel
-Request canceled for device
-Agent_message was called!
-Agent called: Release
-Agent has been released
+This is a patch to move the PIN quirks to an external tab-separated text
+file. The parser is very simple and naive, but does the job for all the
+devices I tested.
 
-To test it as double agent just remove C++ style comments on main
-scope, then execute:
+string_to_type() should probably be using an array instead of the
+current code, and I've managed to move the current quirks to the
+external file without a problem.
 
-# agent &
+When this gets in, I'll work on moving all the quirks filed as bugs
+against the wizard[1] into bluez-gnome proper.
 
-# agent 00:0E:ED:29:4F:2D
-Pairing to 00:0E:ED:29:4F:2D
-Adapter path: /org/bluez/1780/hci0
+Cheers
 
-As you can see it doesn't call any agent methods.
+[1]: http://bugzilla.gnome.org/buglist.cgi?product=bluez-gnome&bug_status=NEW&bug_status=REOPENED&bug_status=ASSIGNED&bug_status=UNCONFIRMED&component=wizard
 
-Please, some idea about this problem?
+--=-Txxtf+7WEaY/momOmAQQ
+Content-Disposition: attachment; filename="0001-Move-the-PIN-quirks-to-an-external-database.patch"
+Content-Type: text/x-patch; name="0001-Move-the-PIN-quirks-to-an-external-database.patch"; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
 
-Best Regards,
+>From a09d96d61f1fdf691abd9a35ade5151c466992d1 Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Fri, 28 Nov 2008 15:27:54 +0000
+Subject: [PATCH] Move the PIN quirks to an external database
 
-Alan
-
-
-Signed-off-by: Alan Carvalho <acassis@gmail.com>
+Move the PIN quirks to a simple tab-separated text file.
 ---
- test/agent.c |  194 ++++++++++++++++++++++++++++++++++++++++++----------------
- 1 files changed, 142 insertions(+), 52 deletions(-)
+ wizard/Makefile.am           |    7 ++-
+ wizard/main.c                |  112 ++++++++++++++++++++++++++++++++++--------
+ wizard/pin-code-database.txt |   24 +++++++++
+ 3 files changed, 120 insertions(+), 23 deletions(-)
+ create mode 100644 wizard/pin-code-database.txt
 
-diff --git a/test/agent.c b/test/agent.c
-index a8d880a..fdab641 100644
---- a/test/agent.c
-+++ b/test/agent.c
-@@ -35,7 +35,7 @@
-
- #include <dbus/dbus.h>
-
--static char *passkey = NULL;
-+static char *devaddr = NULL, *pincode = "0000";
-
- static int do_reject = 0;
-
-@@ -70,28 +70,19 @@ static DBusHandlerResult agent_filter(DBusConnection *conn,
- 	return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
- }
-
--static DBusHandlerResult request_message(DBusConnection *conn,
+diff --git a/wizard/Makefile.am b/wizard/Makefile.am
+index 0a2ba45..ddf2cab 100644
+--- a/wizard/Makefile.am
++++ b/wizard/Makefile.am
+@@ -6,12 +6,15 @@ bluetooth_wizard_SOURCES = main.c
+ bluetooth_wizard_LDADD = $(top_builddir)/common/libcommon.a \
+ 						@GTK_LIBS@ @DBUS_LIBS@
+ 
+-AM_CFLAGS = @DBUS_CFLAGS@ @GTK_CFLAGS@
++AM_CFLAGS = -DPKGDATADIR="\"$(pkgdatadir)\"" @DBUS_CFLAGS@ @GTK_CFLAGS@
+ 
+ INCLUDES = -I$(top_srcdir)/common
+ 
++pin_DATA = pin-code-database.txt
++pindir = $(pkgdatadir)
 +
-+static DBusHandlerResult cancel_message(DBusConnection *conn,
- 						DBusMessage *msg, void *data)
- {
- 	DBusMessage *reply;
- 	const char *path, *address;
--	dbus_bool_t numeric;
--
--	if (!passkey)
--		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-
--	if (!dbus_message_get_args(msg, NULL,
--			DBUS_TYPE_STRING, &path, DBUS_TYPE_STRING, &address,
--			DBUS_TYPE_BOOLEAN, &numeric, DBUS_TYPE_INVALID)) {
--		fprintf(stderr, "Invalid arguments for passkey Request method");
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_INVALID)) {
-+		fprintf(stderr, "Invalid arguments for Cancel method");
- 		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
- 	}
-
--	if (do_reject) {
--		reply = dbus_message_new_error(msg,
--					"org.bluez.Error.Rejected", "");
--		goto send;
--	}
-+	printf("Request canceled for device %s\n", address);
-
- 	reply = dbus_message_new_method_return(msg);
- 	if (!reply) {
-@@ -99,12 +90,6 @@ static DBusHandlerResult
-request_message(DBusConnection *conn,
- 		return DBUS_HANDLER_RESULT_NEED_MEMORY;
- 	}
-
--	printf("Passkey request for device %s\n", address);
--
--	dbus_message_append_args(reply, DBUS_TYPE_STRING, &passkey,
--					DBUS_TYPE_INVALID);
--
--send:
- 	dbus_connection_send(conn, reply, NULL);
-
- 	dbus_connection_flush(conn);
-@@ -114,20 +99,23 @@ send:
- 	return DBUS_HANDLER_RESULT_HANDLED;
- }
-
--static DBusHandlerResult cancel_message(DBusConnection *conn,
-+static DBusHandlerResult reqpincode_message(DBusConnection *conn,
- 						DBusMessage *msg, void *data)
- {
- 	DBusMessage *reply;
--	const char *path, *address;
-+	char *dev_path;
-
--	if (!dbus_message_get_args(msg, NULL,
--			DBUS_TYPE_STRING, &path, DBUS_TYPE_STRING, &address,
--							DBUS_TYPE_INVALID)) {
--		fprintf(stderr, "Invalid arguments for passkey Confirm method");
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH,
-&dev_path, DBUS_TYPE_INVALID)) {
-+		fprintf(stderr, "Invalid arguments for RequestPinCode method");
- 		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
- 	}
-
--	printf("Request canceled for device %s\n", address);
-+	printf("Device path = %s\n",dev_path);
-+
-+	if (!__io_canceled)
-+		fprintf(stderr, "Agent has been released\n");
-+
-+	//__io_terminated = 1;
-
- 	reply = dbus_message_new_method_return(msg);
- 	if (!reply) {
-@@ -135,6 +123,9 @@ static DBusHandlerResult
-cancel_message(DBusConnection *conn,
- 		return DBUS_HANDLER_RESULT_NEED_MEMORY;
- 	}
-
-+	dbus_message_append_args(reply, DBUS_TYPE_STRING, &pincode,
-+					DBUS_TYPE_INVALID);
-+
- 	dbus_connection_send(conn, reply, NULL);
-
- 	dbus_connection_flush(conn);
-@@ -177,14 +168,37 @@ static DBusHandlerResult
-release_message(DBusConnection *conn,
- static DBusHandlerResult agent_message(DBusConnection *conn,
- 						DBusMessage *msg, void *data)
- {
--	if (dbus_message_is_method_call(msg, "org.bluez.Agent", "Request"))
--		return request_message(conn, msg, data);
-+	printf("Agent_message was called!\n");
-
--	if (dbus_message_is_method_call(msg, "org.bluez.Agent", "Cancel"))
--		return cancel_message(conn, msg, data);
--
--	if (dbus_message_is_method_call(msg, "org.bluez.Agent", "Release"))
-+	if (dbus_message_is_method_call(msg, "org.bluez.Agent", "Release")){
-+		printf("Agent called: Release\n");
- 		return release_message(conn, msg, data);
-+	}
-+
-+	if (dbus_message_is_method_call(msg, "org.bluez.Agent", "RequestPinCode")){
-+		printf("Agent called: RequestPinCode\n");
-+		return reqpincode_message(conn, msg, data);
-+	}
-+
-+	if (dbus_message_is_method_call(msg, "org.bluez.Agent", "RequestPasskey"))
-+		printf("Agent called: RequestPasskey\n");
-+
-+	if (dbus_message_is_method_call(msg, "org.bluez.Agent", "DisplayPasskey"))
-+		printf("Agent called: DisplayPasskey\n");
-+
-+	if (dbus_message_is_method_call(msg, "org.bluez.Agent",
-"RequestConfirmation"))
-+		printf("Agent called: RequestConfirmation\n");
-+
-+	if (dbus_message_is_method_call(msg, "org.bluez.Agent", "Authorize"))
-+		printf("Agent called: Authorize\n");
-+
-+	if (dbus_message_is_method_call(msg, "org.bluez.Agent", "ConfirmModeChange"))
-+		printf("Agent called: ConfirmModeChange\n");
-+
-+	if (dbus_message_is_method_call(msg, "org.bluez.Agent", "Cancel")){
-+		printf("Agent called: Cancel\n");
-+		return cancel_message(conn, msg, data);
-+	}
-
- 	return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
- }
-@@ -279,21 +293,88 @@ static int unregister_agent(DBusConnection
-*conn, const char *device_path,
- 	return 0;
- }
-
--static char *get_device(const char *device)
-+static char *get_device(DBusConnection *conn)
- {
--	char *path;
-+	char *path, *device_path = NULL;
-+	DBusMessage *msg, *reply;
-+	DBusError err;
-
--	path = strdup("/org/bluez/hci0");
-+	msg = dbus_message_new_method_call("org.bluez", "/",
-+					"org.bluez.Manager", "DefaultAdapter");
-+	if (!msg) {
-+		fprintf(stderr, "Can't allocate new method call\n");
-+		return NULL;
-+	}
-
--	return path;
-+	dbus_error_init(&err);
-+
-+	reply = dbus_connection_send_with_reply_and_block(conn, msg, -1, &err);
-+
-+	dbus_message_unref(msg);
-+
-+	if (!reply) {
-+		fprintf(stderr, "Can't get Adapter path\n");
-+		if (dbus_error_is_set(&err)) {
-+			fprintf(stderr, "%s\n", err.message);
-+			dbus_error_free(&err);
-+		}
-+		return NULL;
-+	}
-+
-+	dbus_message_get_args(reply, NULL, DBUS_TYPE_OBJECT_PATH,
-&device_path, DBUS_TYPE_INVALID);
-+
-+	dbus_message_unref(reply);
-+
-+	dbus_connection_flush(conn);
-+
-+	return device_path;
+ man_MANS = bluetooth-wizard.1
+ 
+-EXTRA_DIST = $(man_MANS)
++EXTRA_DIST = $(man_MANS) $(pin_DATA)
+ 
+ MAINTAINERCLEANFILES = Makefile.in
+diff --git a/wizard/main.c b/wizard/main.c
+index 09209a9..b29552c 100644
+--- a/wizard/main.c
++++ b/wizard/main.c
+@@ -37,6 +37,7 @@
+ #include "helper.h"
+ 
+ #define AGENT_PATH "/org/bluez/agent/wizard"
++#define PIN_CODE_DB "pin-code-database.txt"
+ 
+ static BluetoothClient *client;
+ static BluetoothAgent *agent;
+@@ -56,32 +57,100 @@ static GtkWidget *label_passkey = NULL;
+ 
+ static GtkTreeSelection *search_selection = NULL;
+ 
++#define TYPE_IS(x, r) {				\
++	if (g_str_equal(type, x)) return r;	\
 +}
 +
-+static int pair_device(DBusConnection *conn, const char *device_path,
-+					const char *agent_path,
-+					const char *capabilities)
++static guint string_to_type(const char *type)
 +{
-+	DBusMessage *msg;
-+	DBusPendingCall *pending;
-+	int ret;
++	TYPE_IS ("any", BLUETOOTH_TYPE_ANY);
++	TYPE_IS ("mouse", BLUETOOTH_TYPE_MOUSE);
++	TYPE_IS ("keyboard", BLUETOOTH_TYPE_KEYBOARD);
++	TYPE_IS ("headset", BLUETOOTH_TYPE_HEADSET);
++	TYPE_IS ("headphone", BLUETOOTH_TYPE_HEADPHONE);
 +
++	g_warning ("unhandled type '%s'", type);
++	return BLUETOOTH_TYPE_ANY;
++}
 +
-+	printf("Adapter path: %s\n", device_path);
++static char *set_pincode_for_device(guint type, const char *address, const char *name)
++{
++	char *contents, **lines;
++	char *ret_pin = NULL;
++	guint i;
 +
-+	msg = dbus_message_new_method_call("org.bluez", device_path,
-+					"org.bluez.Adapter", "CreatePairedDevice");
-+	if (!msg) {
-+		fprintf(stderr, "Can't allocate new method call\n");
-+		return -1;
++	/* Load the PIN database and split it in lines */
++	if (!g_file_get_contents(PIN_CODE_DB, &contents, NULL, NULL)) {
++		char *filename;
++
++		filename = g_build_filename(PKGDATADIR, PIN_CODE_DB, NULL);
++		if (!g_file_get_contents(filename, &contents, NULL, NULL)) {
++			g_warning("Could not load "PIN_CODE_DB);
++			g_free (filename);
++			return NULL;
++		}
++		g_free (filename);
 +	}
 +
-+	dbus_message_append_args(msg, DBUS_TYPE_STRING, &devaddr,
-+					DBUS_TYPE_OBJECT_PATH, &agent_path,
-+					DBUS_TYPE_STRING, &capabilities,
-+							DBUS_TYPE_INVALID);
-+
-+	ret = dbus_connection_send_with_reply(conn, msg, &pending, 100000);
-+
-+	if (!ret) {
-+		fprintf(stderr, "Can't pair to device\n");
-+		return -1;
++	lines = g_strsplit(contents, "\n", -1);
++	g_free (contents);
++	if (lines == NULL) {
++		g_warning("Could not parse "PIN_CODE_DB);
++		return NULL;
 +	}
 +
-+	dbus_message_unref(msg);
++	/* And now process each line */
++	for (i = 0; lines[i] != NULL; i++) {
++		char **items;
++		guint ltype;
++		const char *laddress, *lname, *lpin;
 +
-+	dbus_connection_flush(conn);
++		/* Ignore comments and empty lines */
++		if (lines[i][0] == '#' || lines[i][0] == '\0')
++			continue;
 +
-+	dbus_pending_call_block(pending);
++		items = g_strsplit(lines[i], "\t", 4);
++		ltype = string_to_type(items[0]);
 +
-+	return 0;
- }
-
- static void usage(void)
++		if (ltype != BLUETOOTH_TYPE_ANY && ltype != type) {
++			g_strfreev (items);
++			continue;
++		}
++		laddress = items[1];
++		lname = items[2];
++		lpin = items[3];
++
++		/* If we have an address, does the OUI prefix match? */
++		if (strlen(laddress) > 0 && g_str_has_prefix(address, laddress) == FALSE) {
++			g_strfreev (items);
++			continue;
++		}
++
++		/* If we have a name, does it match? */
++		if (strlen(lname) > 0 && g_str_equal(name, lname) == FALSE) {
++			g_strfreev (items);
++			continue;
++		}
++
++		/* Everything matches, we have a pincode */
++		ret_pin = g_strdup(lpin);
++		g_strfreev(items);
++		break;
++	}
++
++	g_strfreev(lines);
++	return ret_pin;
++}
++
+ static gboolean pincode_callback(DBusGMethodInvocation *context,
+ 					DBusGProxy *device, gpointer user_data)
  {
--	printf("Bluetooth agent ver %s\n\n", VERSION);
-+	printf("Bluetooth agent ver %s\n\n", "4.18");
-
- 	printf("Usage:\n"
--		"\tagent [--device interface] [--path agent-path] <passkey>\n"
-+		"\tagent <device address> [pincode]\n"
- 		"\n");
+-	const char *pincode = target_pincode;
++	char *pincode;
+ 	gchar *text;
+ 
+-	/* Apple Wireless and Mighty Mouse */
+-	if (target_type == BLUETOOTH_TYPE_MOUSE && 
+-				(g_str_has_prefix(target_address,
+-							"00:0A:95:") == TRUE ||
+-				g_str_has_prefix(target_address,
+-							"00:14:51:") == TRUE))
+-		pincode = "0000";
+-
+-	/* Most headsets are using 0000 as pincode */
+-	if (target_type == BLUETOOTH_TYPE_HEADSET ||
+-				target_type == BLUETOOTH_TYPE_HEADPHONE)
+-		pincode = "0000";
+-
+-	/* Most GPS devices are using 0000 as pincode */
+-	if (g_str_has_prefix(target_address, "00:0D:B5") == TRUE &&
+-				(g_str_equal(target_name,
+-					"TomTom Wireless GPS MkII") == TRUE ||
+-				g_str_equal(target_name,
+-						"GPS-GW-005") == TRUE))
+-		pincode = "0000";
++	pincode = set_pincode_for_device(target_type, target_address, target_name);
++	if (pincode == NULL)
++		pincode = g_strdup(target_pincode);
+ 
+ 	text = g_strdup_printf(_("Please enter the following PIN code: %s"),
+ 								pincode);
+@@ -89,6 +158,7 @@ static gboolean pincode_callback(DBusGMethodInvocation *context,
+ 	g_free(text);
+ 
+ 	dbus_g_method_return(context, pincode);
++	g_free(pincode);
+ 
+ 	return TRUE;
  }
-
-@@ -348,12 +429,10 @@ int main(int argc, char *argv[])
- 	argv += optind;
- 	optind = 0;
-
--	if (argc < 1) {
-+	/*if (argc < 1) {
- 		usage();
- 		exit(1);
--	}
--
--	passkey = strdup(argv[0]);
-+	}*/
-
- 	if (!agent_path)
- 		agent_path = strdup(default_path);
-@@ -365,12 +444,25 @@ int main(int argc, char *argv[])
- 	}
-
- 	if (!device_path)
--		device_path = get_device(device_id);
-+		device_path = get_device(conn);
-
--	if (register_agent(conn, device_path, agent_path, capabilities) < 0) {
--		dbus_connection_unref(conn);
--		exit(1);
--	}
+diff --git a/wizard/pin-code-database.txt b/wizard/pin-code-database.txt
+new file mode 100644
+index 0000000..653fc2c
+--- /dev/null
++++ b/wizard/pin-code-database.txt
+@@ -0,0 +1,24 @@
++# This is a PIN code database for use in the Bluetooth wizard.
++#
++# The syntax is a simple tab-separated file with 4 fields:
++# type	bdaddr_prefix	device_name	device_pin
++# 
++# Lines starting with # (such as this one) and empty lines are ignored
++# Recognised types are:
++# any, mouse, keyboard, headset, headphones
++# 
++# The bdaddr_prefix and device_name fields can be left empty
 +
-+	//if (argc >= 1){
-+		devaddr = strdup(argv[0]);
-+		printf("Pairing to %s\n",devaddr);
-+		if (pair_device(conn, device_path, agent_path, capabilities) < 0){
-+				dbus_connection_unref(conn);
-+				printf("Pairing failed\n");
-+				exit(1);
-+		}
-+	//}
-+	//else {
-+		if (register_agent(conn, device_path, agent_path, capabilities) < 0) {
-+			dbus_connection_unref(conn);
-+			exit(1);
-+		}
++# Apple Wireless and Mighty Mouse
++mouse	00:0A:95:		0000
++mouse	00:14:51:		0000
 +
-+	//}
-
- 	if (!dbus_connection_add_filter(conn, agent_filter, NULL, NULL))
- 		fprintf(stderr, "Can't add signal filter");
-@@ -395,11 +487,9 @@ int main(int argc, char *argv[])
- 	if (!__io_terminated)
- 		unregister_agent(conn, device_path, agent_path);
-
--	free(device_path);
-+	free(devaddr);
- 	free(agent_path);
-
--	free(passkey);
--
- 	dbus_connection_unref(conn);
-
- 	return 0;
++# GPS devices
++any	00:0D:B5:	TomTom Wireless GPS MkII	0000
++any	00:0D:B5:	GPS-GW-005	0000
++
++######## Generic type ########
++
++# Headphones and headsets
++headphone			0000
++headset			0000
 -- 
-1.5.6.3
+1.6.0.4
+
+
+--=-Txxtf+7WEaY/momOmAQQ--
+
