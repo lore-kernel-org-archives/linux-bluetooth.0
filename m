@@ -1,35 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Sony BD Remote (the saga continues)
-From: Bastien Nocera <hadess@hadess.net>
-To: Simon Kenyon <simon@koala.ie>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <49307404.6080003@koala.ie>
-References: <492FC4A3.4020601@koala.ie>  <492FCDD1.1010304@koala.ie>
-	 <1227882126.26649.1099.camel@cookie.hadess.net> <49307404.6080003@koala.ie>
-Content-Type: text/plain
-Date: Sat, 29 Nov 2008 00:59:41 +0000
-Message-Id: <1227920381.26649.1749.camel@cookie.hadess.net>
-Mime-Version: 1.0
+Message-ID: <493034B4.6010905@dtsp.co.nz>
+Date: Sat, 29 Nov 2008 07:13:08 +1300
+From: David Sainty <david.sainty@dtsp.co.nz>
+MIME-Version: 1.0
+To: Jaska Uimonen <jaska.uimonen@nokia.com>
+CC: ext Jelle de Jong <jelledejong@powercraft.nl>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC/PATCH] sbc: new filtering function for 8 band fixed point
+ encoding
+References: <1227879337.20555.12.camel@esdhcp03999.research.nokia.com>	 <1227881932.31311.2.camel@violet.holtmann.net>	 <492FFF3B.7000702@powercraft.nl> <1227885606.20555.37.camel@esdhcp03999.research.nokia.com>
+In-Reply-To: <1227885606.20555.37.camel@esdhcp03999.research.nokia.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 2008-11-28 at 22:43 +0000, Simon Kenyon wrote:
-> Bastien Nocera wrote:
-<snip>
-> > You need to press buttons on the remote for it to connect to the
-> > computer. It will disconnect automatically after some time of idleness.
-> >
-> > After that you need to use a new enough X server, or LIRC to get the
-> > events to your X applications.
-> >   
-> what causes the /dev/input/eventX file to be created?
-> ie. is it bluetoothd or hidd?
+Jaska Uimonen wrote:
+> Hi,
+>
+> I did the git clone this morning and made the patch on top of that.
+>
+> Johan already came to tell me that I have whitespace instead 
+> of tabs in the changed parts. Sorry about that, I'll fix it. 
+> He said it will take 1 minutes to fix that but it was 
+> at least 1/2 hour with emacs :)
+>
+> br,
+> Jaska
+>
+>   
 
-It is obviously bluetoothd (actually bluetoothd's input plugin) as I've
-said a couple of days ago (and on numerous occasions on this list) that
-hidd has no code to handle the PS3 BD remote's protocol. If you're using
-hidd, it won't ever work, period.
-
-If the PS3 remote isn't connected properly, it won't show up in
-bluetooth-properties.
+M-x tabify ?
 
