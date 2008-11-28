@@ -1,49 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <492FB646.3010808@parrot.com>
-Date: Fri, 28 Nov 2008 10:13:42 +0100
-From: Matthieu CASTET <matthieu.castet@parrot.com>
+Message-ID: <492FB1A9.5000505@koala.ie>
+Date: Fri, 28 Nov 2008 08:54:01 +0000
+From: Simon Kenyon <simon@koala.ie>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: btusb and HCI_RAW
-References: <491868E6.6000406@parrot.com> <F9029075-34B5-4DE1-98EA-E990C82C7495@holtmann.org> <492ED29E.1060702@parrot.com> <E076769D-FF2D-4ADC-8E00-4CCAFD5A53FA@holtmann.org>
-In-Reply-To: <E076769D-FF2D-4ADC-8E00-4CCAFD5A53FA@holtmann.org>
-Content-Type: text/plain; charset=ISO-8859-1
+To: David Sainty <David.Sainty@dtsp.co.nz>
+CC: Bastien Nocera <hadess@hadess.net>, linux-bluetooth@vger.kernel.org
+Subject: Re: Sony BD Remote (help requested)
+References: <492E6E6A.80509@koala.ie> <1227783396.27994.1750.camel@cookie.hadess.net> <492F28EF.7090506@koala.ie> <492F6306.9080609@dtsp.co.nz>
+In-Reply-To: <492F6306.9080609@dtsp.co.nz>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-
-Marcel Holtmann a écrit :
-> Hi Matthieu,
-> 
->> But hci_usb wasn't doing that (ie always use max alternate setting +
->> submit sco/alc urb), and I wasn't under the impression that it costs too
->> much CPU power.
-> 
-> there is not concept of max alternate setting. You just have to use the
-> right one and powertop showed the difference in power consumption.
-> 
-Ok, but in normal case HCI_RAW isn't enabled ?
-So the high power consumption only happen when you use this mode, which
-shouldn't happen for normal users ?
-
->>> So this is a little bit
->>> pointless here and before just worked by pure luck. Why do you want this
->>> support in the first place?
+David Sainty wrote:
+> Simon Kenyon wrote:
+>> Bastien Nocera wrote:
 >>>
->> This can be helpful to test userspace bluetooth stack or do some fuzzing.
-> 
-> I seriously couldn't care less about any userspace Bluetooth stack. Also
-> why is RAW not working for ACL packets.
-Do you mean HCI_RAW or l2cap raw ?
+>>> Pair it with the bluetooth-wizard and you can be on your way.
+>>>
+>>> Cheers
+>>>
+>>>   
+>> but when i run bluetooth-wizard nothing is shown
+>
+> In great excitement I rushed out and bought one of these :)  A 
+> Bluetooth remote - brilliant!  I might even think about buying a 
+> Playstation 3 to go with it :)  Infrared is for suckers...
+>
+> In order to get it into pairing mode (and thus be able to see it from 
+> bluetooth-wizard) it looks like you need to press *AND HOLD* the 
+> "Enter" and "Start" buttons at the same time (for something like one 
+> second).  The Fedora Wiki page is lamely unclear about that.
+>
+> Sadly I can't pair with it yet, pairing fails - for reasons I'll try 
+> and figure out later...
+>
+i did know that thanks
 
-For HCI_RAW case, what will call hci_connect for ACL_LINK ?
-This seems need to have "hdev->conn_hash.acl_num > 0" .
+why is this so difficult?
 
-> adapter is brought up properly and switched to RUNNING state. SCO will
-> not be possible without magic.
-Also why in hci_sock_sendmsg there isn't check to return error if it is
-impossible to send raw sco/acl ?
+i suspect all these suboptimal solutions like bdremoted are around 
+because people having been banging there head against a brick wall have 
+mostly given up on doing things the "correct" way and resort to 
+"anything that will work"
 
-Regards,
-Matthieu
+i really didn't want to do this as my focus was on mythtv, but i will 
+have to start hacking the bluetooth system (just like i had to do with 
+lirc before)
+seems kind of crazy that all the snippets of bluetooth documentation is 
+spread all over the place and not on the bluez.org site. oh well.
+--
+simon
