@@ -1,18 +1,18 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 28 Nov 2008 18:14:35 +0100
-From: Stefan Seyfried <seife@suse.de>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Bastien Nocera <hadess@hadess.net>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
 Subject: Re: [PATCH] Move PIN codes to an external database
-Message-ID: <20081128171435.GC15589@suse.de>
-References: <1227886615.26649.1181.camel@cookie.hadess.net> <1227887446.19071.1.camel@violet.holtmann.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+From: Bastien Nocera <hadess@hadess.net>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 In-Reply-To: <1227887446.19071.1.camel@violet.holtmann.net>
+References: <1227886615.26649.1181.camel@cookie.hadess.net>
+	 <1227887446.19071.1.camel@violet.holtmann.net>
+Content-Type: text/plain
+Date: Fri, 28 Nov 2008 16:15:59 +0000
+Message-Id: <1227888959.26649.1222.camel@cookie.hadess.net>
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Nov 28, 2008 at 04:50:46PM +0100, Marcel Holtmann wrote:
+On Fri, 2008-11-28 at 16:50 +0100, Marcel Holtmann wrote:
 > Hi Bastien,
 > 
 > > This is a patch to move the PIN quirks to an external tab-separated text
@@ -28,12 +28,4 @@ On Fri, Nov 28, 2008 at 04:50:46PM +0100, Marcel Holtmann wrote:
 > 
 > should we not better store this in GConf?
 
-Hopefully some day Tom will port his kde4 stuff to BlueZ-4, then it will be
-nice if we have one global database, not one per project.
--- 
-Stefan Seyfried
-R&D Team Mobile Devices            |              "Any ideas, John?"
-SUSE LINUX Products GmbH, Nürnberg | "Well, surrounding them's out." 
-
-This footer brought to you by insane German lawmakers:
-SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG Nürnberg)
+GConf is a configuration database. This isn't configuration...
