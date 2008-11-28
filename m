@@ -1,45 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <49307404.6080003@koala.ie>
-Date: Fri, 28 Nov 2008 22:43:16 +0000
-From: Simon Kenyon <simon@koala.ie>
+Date: Fri, 28 Nov 2008 18:14:35 +0100
+From: Stefan Seyfried <seife@suse.de>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Bastien Nocera <hadess@hadess.net>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Move PIN codes to an external database
+Message-ID: <20081128171435.GC15589@suse.de>
+References: <1227886615.26649.1181.camel@cookie.hadess.net> <1227887446.19071.1.camel@violet.holtmann.net>
 MIME-Version: 1.0
-To: Bastien Nocera <hadess@hadess.net>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: Sony BD Remote (the saga continues)
-References: <492FC4A3.4020601@koala.ie>  <492FCDD1.1010304@koala.ie> <1227882126.26649.1099.camel@cookie.hadess.net>
-In-Reply-To: <1227882126.26649.1099.camel@cookie.hadess.net>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1227887446.19071.1.camel@violet.holtmann.net>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Bastien Nocera wrote:
-> On Fri, 2008-11-28 at 10:54 +0000, Simon Kenyon wrote:
->   
->> Simon Kenyon wrote:
->>     
->>> so i decided to start working my way through the code and found 
->>> references to uinput in input/device.c
->>> this gave me another keyword to use in google and lo and behold this 
->>> popped up:
->>>
->>> Fri Oct 17 2008 - Bastien Nocera <bnocera@redhat.com 
->>> <mailto:bnocera@redhat.com>> - 4.14-2
->>> - Add script to autoload uinput on startup, so the PS3 remote
->>>  works out-of-the-box
->>>
->>>
->>> sure enough i did not have this module in my kernel.
->>> just building now in hope that this might be the issue
->>>       
->> well that got me nowhere - still no events
->> but at least i now have a /dev/input/uinput
->>     
->
-> You need to press buttons on the remote for it to connect to the
-> computer. It will disconnect automatically after some time of idleness.
->
-> After that you need to use a new enough X server, or LIRC to get the
-> events to your X applications.
->   
-what causes the /dev/input/eventX file to be created?
-ie. is it bluetoothd or hidd?
+On Fri, Nov 28, 2008 at 04:50:46PM +0100, Marcel Holtmann wrote:
+> Hi Bastien,
+> 
+> > This is a patch to move the PIN quirks to an external tab-separated text
+> > file. The parser is very simple and naive, but does the job for all the
+> > devices I tested.
+> > 
+> > string_to_type() should probably be using an array instead of the
+> > current code, and I've managed to move the current quirks to the
+> > external file without a problem.
+> > 
+> > When this gets in, I'll work on moving all the quirks filed as bugs
+> > against the wizard[1] into bluez-gnome proper.
+> 
+> should we not better store this in GConf?
+
+Hopefully some day Tom will port his kde4 stuff to BlueZ-4, then it will be
+nice if we have one global database, not one per project.
+-- 
+Stefan Seyfried
+R&D Team Mobile Devices            |              "Any ideas, John?"
+SUSE LINUX Products GmbH, Nürnberg | "Well, surrounding them's out." 
+
+This footer brought to you by insane German lawmakers:
+SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG Nürnberg)
