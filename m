@@ -1,49 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Bluetooth and "IRQ 19 and nobody cared" on a HP 8510w with
- Debian 2.6.24 or 2.6.26
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Tyson Whitehead <twhitehead@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, david@hardeman.nu,
-	drzues@drzues.cx
-In-Reply-To: <200811271149.35176.twhitehead@gmail.com>
-References: <200811271149.35176.twhitehead@gmail.com>
-Content-Type: text/plain
-Date: Sun, 30 Nov 2008 09:49:23 +0100
-Message-Id: <1228034963.9176.2.camel@violet.holtmann.net>
-Mime-Version: 1.0
+Message-ID: <49317C95.7060808@powercraft.nl>
+Date: Sat, 29 Nov 2008 18:32:05 +0100
+From: Jelle de Jong <jelledejong@powercraft.nl>
+MIME-Version: 1.0
+To: Bastien Nocera <hadess@hadess.net>
+CC: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] More PIN quirks
+References: <1227976757.26649.2692.camel@cookie.hadess.net>
+In-Reply-To: <1227976757.26649.2692.camel@cookie.hadess.net>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tyson,
-
-> I've been getting these "irq 19: nobody cared (try booting with "irqpoll" 
-> option)" messages on my HP 8510w.  Recently I googled it, which lead me to the 
-> following discussion from another fellow with the same problem on the LKML
+Bastien Nocera wrote:
+> This builds on top of the move to a PIN database.
 > 
-> http://lkml.org/lkml/2008/6/24/357
+> This fixes all but one bug filed against the wizard in the GNOME
+> bugzilla.
 > 
-> In this discussion it was mentioned that pressing the radio kill switch 
-> stopped this message from appearing, which implied it might be iwl4965.
+> I hope it shows that the PIN database is workable.
 > 
-> I had already tried blacklisting the iwl4965 module (adding it to 
-> /etc/modprobe.d/blacklist) with no success.  But it got me thinking radio, so 
-> I tried blacklisting hci_usb and there were no more "irq 19: nobody cared" 
-> messages.  Loading hci_usb subsequently resulted in a message within 10min.
+> Cheers
 > 
-> I tried this another three times to verify it (reboot, wait 30min with no 
-> messages, load hci_usb, and a message appears within 10min).  Hopefully David 
-> will be able to verify these results also apply to his 8510w as well.
-> 
-> I've attached the output of "lsusb -v".  Is there any other information that 
-> would help, or something I can do (kernel log messages are as was given by 
-> David in the original LKML list, but I could attach another if you wish)?
 
-start using the btusb driver instead of hci_usb. And even while you
-think this might be caused by Bluetooth, you should report it to the USB
-guys since the USB host controller is responsible for that interrupt.
+Thank you Bastien for your hard work!
 
-Regards
+I have a few questions about these kind of patches, would it not be
+easer to maintainable and more usefull to add this kind of information
+separate from gnome related packages, and move them to a desktop
+independent configuration?
 
-Marcel
+Of course there is nothing wrong with using gnome bugreports or using
+gnome applications with the data. However I have seen a lot of patches
+that apply to the gnome wizard application and the commandline tools or
+kde tools do not use this information, but it would really like the same
+functionality in the command line tools so it does work platform
+independent.
 
+I know there is not much priority on fixing a commandline tool but, it
+can be smart to move device specific info into a general system that all
+user frontend systems can use. This will make it a lot easer of other
+developers to create new frontends that do not need to reverse engineer
+the gnome apps and create duplicated hard to maintain code....
 
+Does this make any sense? Or is there just no time or do we not care
+about other users then gnome?
+
+Best regards,
+
+Jelle
