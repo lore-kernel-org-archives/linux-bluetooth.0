@@ -1,56 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <93FCE176-8E54-4DB1-9F6E-F93FF921E4ED@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <001301c93b42$0366d140$0a3473c0$@de>
-Mime-Version: 1.0 (Apple Message framework v929.2)
-Date: Sat, 1 Nov 2008 00:18:34 +0100
-References: <001301c93b42$0366d140$0a3473c0$@de>
-Cc: 'Frans de Bont' <frans.de.bont@philips.com>
-Subject: Re: [Bluez-devel] Patch to correct SBC gain mismatch and to test
-	the encoding performance
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Message-ID: <6633.83.160.35.87.1228059524.squirrel@webmail.xs4all.nl>
+Date: Sun, 30 Nov 2008 16:38:44 +0100 (CET)
+From: "menno van der klein" <jongerenchaos@zonnet.nl>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-users] Bluez delayed audio with asterisk pbx chan_mobile
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-users>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 Content-Type: text/plain; charset="us-ascii"
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Christian,
+I use chan_mobile for incomming and outbound calls. This works well but i
+think there is a problem with the audio buffer. Some examples:
 
-> attached you will find a patch to correct the following issues.
->
-> 1.) Gain of the decoder is corrected (before it was 6.02dB or twice  
-> too low)
-> 2.) Gain of the encoder is corrected (empirical gathered values were  
-> used to
-> correct the filter tables)
-> 3.) "sbcenc" supports more command line options.
+Inbound call (from cellphone):
+Audio from cellphone to asterisk is delayed (with 1 second and after a
+while this will be bigger and bigger)
+Audio from asterisk to the cellphone is NOT delayed
 
-it would be nice if you just follow our coding style conventions. I  
-fixed this up for you this time. Please compare the result that I  
-pushed to the repository and your version.
+Outbound call (to the cellphone) with nocallsetup=no
+Audio from cellphone to asterisk is delayed (with 1 second and after a
+while this will be bigger and bigger)
+Audio from asterisk to the cellphone is NOT delayed
 
-> 4.) A testing procedure for SBC is added including a script to test  
-> and a
-> remote interface to PEAQ. It requires the reference version of SBC
-> (available at the Bluetooth SIG website) and wine. Please note, that  
-> the
-> remote access to PEAQ is restricted and only available by request  
-> for a
-> limited time. Requesty from all unknown IP addresses are blocked by  
-> default.
+Outbound call (to the cellphone) with nocallsetup=yes
+Audio from cellphone to asterisk is NOT delayed
+Audio from asterisk to the cellphone is NOT delayed
+But after a while (2 minutes) the audio delayed too. And the delay is
+bigger and bigger if you make a long call.
 
-So what is wrong with using sbctester program?
+I use:
+- Asterisk SVN-trunk-r159475
+- CSR BC4
+- 2.6.27-7 ubuntu kernel
+- bluez 4.19 (tar.gz version)
+- L6 motorola phones
 
-Regards
 
-Marcel
+I think there is a problem with the buffer. I make the Frame size smaller
+but this doesn't work. I think he can't loose the buffer and the frame
+size is bigger and bigger or something.
+
+More info:
+http://bugs.digium.com/view.php?id=13995
+
+I use this chan_mobile.c file:
+http://svn.digium.com/view/asterisk-addons/trunk/channels/chan_mobile.c
+
+
+Is there a solution to resolve this?
 
 
 -------------------------------------------------------------------------
@@ -59,6 +64,6 @@ Build the coolest Linux based applications with Moblin SDK & win great prizes
 Grand prize is a trip for two to an Open Source event anywhere in the world
 http://moblin-contest.org/redirect.php?banner_id=100&url=/
 _______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
