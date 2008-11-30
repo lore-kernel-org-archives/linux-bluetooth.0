@@ -1,38 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Allow SCO with Asus WL-BTD202 dongle in btusb
+Subject: Re: Creation of AF_BLUETOOTH socket with HCI_DEV__REG
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Guillaume Bedot <littletux@zarb.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1225167617.7998.10.camel@localhost>
-References: <1225152042.17240.18.camel@localhost>
-	 <1225159804.7157.41.camel@californication>
-	 <1225167617.7998.10.camel@localhost>
+To: pavan_savoy@indiatimes.com
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1033346798.461081225729570756.JavaMail.root@mbv7.indiatimes.com>
+References: <1033346798.461081225729570756.JavaMail.root@mbv7.indiatimes.com>
 Content-Type: text/plain
-Date: Sun, 30 Nov 2008 11:46:08 +0100
-Message-Id: <1228041968.9176.12.camel@violet.holtmann.net>
+Date: Sun, 30 Nov 2008 11:35:38 +0100
+Message-Id: <1228041338.9176.11.camel@violet.holtmann.net>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Guillaume,
+Hi,
 
-> > > This an other patch that allows my dongle to be configured correctly for
-> > > the voice/sco profile.
-> > > 
-> > > I already sent one for hci_usb some time ago, so it may sound familiar,
-> > > but it probably didn't have correct style...
-> > 
-> > you have to prove this one. Boot a kernel without the patch and call
-> > hciconfig hci0 up and then show me the output of hciconfig -a.
+> I have an application that does a hci_open_dev, and what I am trying to understand from the stack code is why can't [and further on how can..] my application do the hci_open_dev [basically the socket(AF_BLUETOOTH)], without the hcid service being On.
 > 
-> The file "hciconfig-...-before" was the output without the patch.
-> The file "hciconfig-...-after" is the output with the patch.
-> The last file contains some info from "/proc/bus/usb/devices".
-> 
-> Is it just proof that my dongle's firmware is out-of-date ?
+> note: I have to do hciattach because I need to use UART.
 
-I applied a modified patch to my tree since it didn't apply clean
-anymore. Thanks.
+it still makes no sense. And you don't need hcid to make Bluetooth work.
+However you will be fairly limited to what you can do when it you run a
+system without hcid or bluetoothd for that matter.
 
 Regards
 
