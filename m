@@ -1,21 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <49327089.5020003@koala.ie>
-Date: Sun, 30 Nov 2008 10:52:57 +0000
-From: Simon Kenyon <simon@koala.ie>
-MIME-Version: 1.0
-To: Jelle de Jong <jelledejong@powercraft.nl>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: Sony BD Remote (the saga continues)
-References: <492FC4A3.4020601@koala.ie> <492FCDD1.1010304@koala.ie> <492FDF90.9010305@koala.ie> <492FEF38.3020702@koala.ie> <492FF071.8030909@powercraft.nl> <492FF7D5.6060202@koala.ie> <492FFB09.7020704@powercraft.nl> <493173E4.3060001@powercraft.nl>
-In-Reply-To: <493173E4.3060001@powercraft.nl>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: Re: [PATCH] Allow SCO with Asus WL-BTD202 dongle in btusb
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Guillaume Bedot <littletux@zarb.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1225167617.7998.10.camel@localhost>
+References: <1225152042.17240.18.camel@localhost>
+	 <1225159804.7157.41.camel@californication>
+	 <1225167617.7998.10.camel@localhost>
+Content-Type: text/plain
+Date: Sun, 30 Nov 2008 11:46:08 +0100
+Message-Id: <1228041968.9176.12.camel@violet.holtmann.net>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Jelle de Jong wrote:
-> I will wait until the next debian update of libx11 and hope an input
-> event will be created when connecting the device.
-why would X11 be involved in creating the event device?
-i might be using the remote without X
---
-simon
+Hi Guillaume,
+
+> > > This an other patch that allows my dongle to be configured correctly for
+> > > the voice/sco profile.
+> > > 
+> > > I already sent one for hci_usb some time ago, so it may sound familiar,
+> > > but it probably didn't have correct style...
+> > 
+> > you have to prove this one. Boot a kernel without the patch and call
+> > hciconfig hci0 up and then show me the output of hciconfig -a.
+> 
+> The file "hciconfig-...-before" was the output without the patch.
+> The file "hciconfig-...-after" is the output with the patch.
+> The last file contains some info from "/proc/bus/usb/devices".
+> 
+> Is it just proof that my dongle's firmware is out-of-date ?
+
+I applied a modified patch to my tree since it didn't apply clean
+anymore. Thanks.
+
+Regards
+
+Marcel
+
+
