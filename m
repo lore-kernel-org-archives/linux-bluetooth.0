@@ -1,26 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Creation of AF_BLUETOOTH socket with HCI_DEV__REG
+Subject: Re: Dell Wireless 365 requires reset quirk
 From: Marcel Holtmann <marcel@holtmann.org>
-To: pavan_savoy@indiatimes.com
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1033346798.461081225729570756.JavaMail.root@mbv7.indiatimes.com>
-References: <1033346798.461081225729570756.JavaMail.root@mbv7.indiatimes.com>
+To: Tim Gardner <tim.gardner@canonical.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Mario Limonciello <mario_limonciello@dell.com>
+In-Reply-To: <491CCD86.7050904@canonical.com>
+References: <20081104162448.A338EF8A65@sepang.rtg.net>
+	 <20081111145706.9bfb4627.akpm@linux-foundation.org>
+	 <491CCD86.7050904@canonical.com>
 Content-Type: text/plain
-Date: Sun, 30 Nov 2008 11:35:38 +0100
-Message-Id: <1228041338.9176.11.camel@violet.holtmann.net>
+Date: Sun, 30 Nov 2008 11:33:39 +0100
+Message-Id: <1228041219.9176.10.camel@violet.holtmann.net>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Tim,
 
-> I have an application that does a hci_open_dev, and what I am trying to understand from the stack code is why can't [and further on how can..] my application do the hci_open_dev [basically the socket(AF_BLUETOOTH)], without the hcid service being On.
+> >> >From 931ccb629d739aa563347a4e866bc26107e6b545 Mon Sep 17 00:00:00 2001
+> >> From: Tim Gardner <tim.gardner@canonical.com>
+> >> Date: Tue, 4 Nov 2008 09:18:06 -0700
+> >> Subject: [PATCH] Dell Wireless 365 needs BTUSB_RESET quirk.
+> >>  OriginalAuthor: Mario Limonciello <mario_limonciello@dell.com>
+> >>
+> >> Signed-off-by: Tim Gardner <tim.gardner@canonical.com>
+> >> Cc: stable@kernel.org
+> >> ---
+> >>  drivers/bluetooth/btusb.c |    3 +++
+> >>  1 files changed, 3 insertions(+), 0 deletions(-)
+> >>
+> >> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> >> index af472e0..051b758 100644
+> >> --- a/drivers/bluetooth/btusb.c
+> >> +++ b/drivers/bluetooth/btusb.c
+> >> @@ -125,6 +125,9 @@ static struct usb_device_id blacklist_table[] = {
+> >>  	/* Dell laptop with Broadcom chip */
+> >>  	{ USB_DEVICE(0x413c, 0x8126), .driver_info = BTUSB_RESET | BTUSB_WRONG_SCO_MTU },
+> >>  
+> >> +	/* Dell Wireless 365 */
+> >> +	{ USB_DEVICE(0x413c, 0x8160), .driver_info = BTUSB_RESET },
+> >> +
+> >>  	/* Dell Wireless 370 */
+> >>  	{ USB_DEVICE(0x413c, 0x8156), .driver_info = BTUSB_RESET | BTUSB_WRONG_SCO_MTU },
+> >>  
+> > 
+> > I shall assume that this patch was authored by Mario.  This should have
+> > been communicated by adding his From: line right at the top of the
+> > changelog.  Mario's signed-off-by: is absent, but that is tolerable
+> > because we have yours.
+> > 
+> > The (absent) changelog fails to explain what effect this patch has. 
+> > _why_ does this driver need this quirk?
+> > 
+> > As it stands, there is insufficient information here for making
+> > 2.6.28-vs-2.6.29 decisions, let alone 2.6.27.x, 2.6.26.x, etc.
+> > 
 > 
-> note: I have to do hciattach because I need to use UART.
+> Is this better (aside from being an attachment) ?
 
-it still makes no sense. And you don't need hcid to make Bluetooth work.
-However you will be fairly limited to what you can do when it you run a
-system without hcid or bluetoothd for that matter.
+the patch will no longer be needed. I am making HCI Reset the default
+and only letting the old drivers quirk a NO_RESET.
 
 Regards
 
