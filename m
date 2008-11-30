@@ -1,41 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <35c90d960811301800o114b9b58pafeae86c09d668e9@mail.gmail.com>
-References: <35c90d960811201824o64e0d814s8cf55ba6ee145517@mail.gmail.com>
-	 <1228035841.9176.9.camel@violet.holtmann.net>
-	 <35c90d960811301800o114b9b58pafeae86c09d668e9@mail.gmail.com>
-Date: Sun, 30 Nov 2008 18:02:20 -0800
-Message-ID: <35c90d960811301802l62b26c0eq72e896e48ea917b3@mail.gmail.com>
-Subject: Re: patch: Respect HCI_UART_DEBUG config in hci_ll.c
-From: Nick Pelly <npelly@google.com>
-To: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Date: Sun, 30 Nov 2008 10:36:55 -0800
+From: Andrew Morton <akpm@linux-foundation.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: bugme-daemon@bugzilla.kernel.org, johannes@sipsolutions.net
+Subject: Re: [Bugme-new] [Bug 12125] New: bt stops working after
+ suspend/resume
+Message-Id: <20081130103655.d2d202c1.akpm@linux-foundation.org>
+In-Reply-To: <bug-12125-10286@http.bugzilla.kernel.org/>
+References: <bug-12125-10286@http.bugzilla.kernel.org/>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Author: Nick Pelly <npelly@google.com>
-Date:   Mon Apr 21 12:18:51 2008 -0700
 
-  bluetooth: Respect HCI_UART_DEBUG config in hci_ll.c
+(switched to email.  Please respond via emailed reply-to-all, not via the
+bugzilla web interface).
 
-  Following the pattern from hci_*.c, turn off BT_DBG messages unless
-  they have been requested via HCI_UART_DEBUG
+On Sun, 30 Nov 2008 08:08:42 -0800 (PST) bugme-daemon@bugzilla.kernel.org wrote:
 
-  Signed-off-by: Nick Pelly <npelly@google.com>
-  Acked-by: Brian Swetland <swetland@google.com>
+> http://bugzilla.kernel.org/show_bug.cgi?id=12125
+> 
+>            Summary: bt stops working after suspend/resume
+>            Product: Drivers
+>            Version: 2.5
+>      KernelVersion: 2.6.28-rc6-wl-dirty
+>           Platform: All
+>         OS/Version: Linux
+>               Tree: Mainline
+>             Status: NEW
+>           Severity: normal
+>           Priority: P1
+>          Component: Bluetooth
+>         AssignedTo: drivers_bluetooth@kernel-bugs.osdl.org
+>         ReportedBy: johannes@sipsolutions.net
+> 
+> 
+> Latest working kernel version: unknown
+> Earliest failing kernel version: unknown
+> Distribution: debian/unstable
+> Hardware Environment: powerbook
+> Software Environment: btusb
+> Problem Description: bluetooth stops working after suspend/resume
+> 
+> Steps to reproduce:
+> 
+> suspend laptop, resume:
+> 
+> # hcitool scan
+> Device is not available: No such device
+> 
+> # sdptool browse
+> Inquiring ...
+> Inquiry failed
+> 
+> 
+> I'm fairly sure this used to work (most of the time at least!) with hci-usb.
+> 
 
-diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
-index b91d45a..2d2f66e 100644
---- a/drivers/bluetooth/hci_ll.c
-+++ b/drivers/bluetooth/hci_ll.c
-@@ -51,6 +51,11 @@
-
- #include "hci_uart.h"
-
-+#ifndef CONFIG_BT_HCIUART_DEBUG
-+#undef  BT_DBG
-+#define BT_DBG( A... )
-+#endif
-+
- /* HCILL commands */
- #define HCILL_GO_TO_SLEEP_IND  0x30
- #define HCILL_GO_TO_SLEEP_ACK  0x31
