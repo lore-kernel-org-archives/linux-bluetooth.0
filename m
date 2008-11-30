@@ -1,66 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Dell Wireless 365 requires reset quirk
+Subject: Re: patch: Respect HCI_UART_DEBUG config in hci_ll.c
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Tim Gardner <tim.gardner@canonical.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Mario Limonciello <mario_limonciello@dell.com>
-In-Reply-To: <491CCD86.7050904@canonical.com>
-References: <20081104162448.A338EF8A65@sepang.rtg.net>
-	 <20081111145706.9bfb4627.akpm@linux-foundation.org>
-	 <491CCD86.7050904@canonical.com>
+To: Nick Pelly <npelly@google.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <35c90d960811201824o64e0d814s8cf55ba6ee145517@mail.gmail.com>
+References: <35c90d960811201824o64e0d814s8cf55ba6ee145517@mail.gmail.com>
 Content-Type: text/plain
-Date: Sun, 30 Nov 2008 11:33:39 +0100
-Message-Id: <1228041219.9176.10.camel@violet.holtmann.net>
+Date: Sun, 30 Nov 2008 10:04:01 +0100
+Message-Id: <1228035841.9176.9.camel@violet.holtmann.net>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tim,
+Hi Nick,
 
-> >> >From 931ccb629d739aa563347a4e866bc26107e6b545 Mon Sep 17 00:00:00 2001
-> >> From: Tim Gardner <tim.gardner@canonical.com>
-> >> Date: Tue, 4 Nov 2008 09:18:06 -0700
-> >> Subject: [PATCH] Dell Wireless 365 needs BTUSB_RESET quirk.
-> >>  OriginalAuthor: Mario Limonciello <mario_limonciello@dell.com>
-> >>
-> >> Signed-off-by: Tim Gardner <tim.gardner@canonical.com>
-> >> Cc: stable@kernel.org
-> >> ---
-> >>  drivers/bluetooth/btusb.c |    3 +++
-> >>  1 files changed, 3 insertions(+), 0 deletions(-)
-> >>
-> >> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> >> index af472e0..051b758 100644
-> >> --- a/drivers/bluetooth/btusb.c
-> >> +++ b/drivers/bluetooth/btusb.c
-> >> @@ -125,6 +125,9 @@ static struct usb_device_id blacklist_table[] = {
-> >>  	/* Dell laptop with Broadcom chip */
-> >>  	{ USB_DEVICE(0x413c, 0x8126), .driver_info = BTUSB_RESET | BTUSB_WRONG_SCO_MTU },
-> >>  
-> >> +	/* Dell Wireless 365 */
-> >> +	{ USB_DEVICE(0x413c, 0x8160), .driver_info = BTUSB_RESET },
-> >> +
-> >>  	/* Dell Wireless 370 */
-> >>  	{ USB_DEVICE(0x413c, 0x8156), .driver_info = BTUSB_RESET | BTUSB_WRONG_SCO_MTU },
-> >>  
-> > 
-> > I shall assume that this patch was authored by Mario.  This should have
-> > been communicated by adding his From: line right at the top of the
-> > changelog.  Mario's signed-off-by: is absent, but that is tolerable
-> > because we have yours.
-> > 
-> > The (absent) changelog fails to explain what effect this patch has. 
-> > _why_ does this driver need this quirk?
-> > 
-> > As it stands, there is insufficient information here for making
-> > 2.6.28-vs-2.6.29 decisions, let alone 2.6.27.x, 2.6.26.x, etc.
-> > 
+> Author: Nick Pelly <npelly@google.com>
+> Date:   Mon Apr 21 12:18:51 2008 -0700
 > 
-> Is this better (aside from being an attachment) ?
+>     bluetooth: Respect HCI_UART_DEBUG config in hci_ll.c
+> 
+>     Following the pattern from hci_*.c, turn off BT_DBG messages unless
+>     they have been requested via HCI_UART_DEBUG
+> 
+>     Signed-off-by: Brian Swetland <swetland@google.com>
 
-the patch will no longer be needed. I am making HCI Reset the default
-and only letting the old drivers quirk a NO_RESET.
+you have to fix your mail client to _NOT_ send mutli-part crap. Please
+follow the proper guidelines for sending kernel patches. Otherwise you
+make it complicated for me to apply patches. Especially these no
+brainers.
+
+So who wrote this patch? You are Brian. If you wrote the patch like
+author indicated, then Brian should do an Acked-by unless he actually
+sends the patch to me. In this case you send the patch so it should look
+like this:
+
+Signed-off-by: Nick Pelly <npelly@google.com>
+Acked-by: Brian Swetland <swetland@google.com>
+
+If you wrote the patch and Brian sent it to me, then he has to do
+Signed-off since he is part of the chain. It is all documented in the
+kernel source code :)
 
 Regards
 
