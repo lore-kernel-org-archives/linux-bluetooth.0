@@ -1,40 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <BLU122-W235D3BB30CEAE0876237B8E6390@phx.gbl>
-From: Kasamsetty Divakar <divani_k@hotmail.com>
-To: <bluez-users@lists.sourceforge.net>
-Date: Mon, 6 Oct 2008 13:13:25 +0530
 MIME-Version: 1.0
-Subject: [Bluez-users] Bluez for HFP
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-users>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Errors-To: bluez-users-bounces@lists.sourceforge.net
+In-Reply-To: <35c90d960811301800o114b9b58pafeae86c09d668e9@mail.gmail.com>
+References: <35c90d960811201824o64e0d814s8cf55ba6ee145517@mail.gmail.com>
+	 <1228035841.9176.9.camel@violet.holtmann.net>
+	 <35c90d960811301800o114b9b58pafeae86c09d668e9@mail.gmail.com>
+Date: Sun, 30 Nov 2008 18:02:20 -0800
+Message-ID: <35c90d960811301802l62b26c0eq72e896e48ea917b3@mail.gmail.com>
+Subject: Re: patch: Respect HCI_UART_DEBUG config in hci_ll.c
+From: Nick Pelly <npelly@google.com>
+To: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=ISO-8859-1
+List-ID: <linux-bluetooth.vger.kernel.org>
 
+Author: Nick Pelly <npelly@google.com>
+Date:   Mon Apr 21 12:18:51 2008 -0700
 
-Hi,
-How to test the HFP profile in bluez , [VOIP softwares like skype or any other VOIP solutions]. Any member using this Profile kindly write a small how to test the HFP feature.
+  bluetooth: Respect HCI_UART_DEBUG config in hci_ll.c
 
-I am using bluez4.6 . should i also install anyother software apart from Bluez Software to make VOIP[For VOIP should can i use Skype ?] calls via HandsFree Headset.
-thanks & regards,
-Regards,
-sm
+  Following the pattern from hci_*.c, turn off BT_DBG messages unless
+  they have been requested via HCI_UART_DEBUG
 
-_________________________________________________________________
-Searching for weekend getaways? Try Live.com
-http://www.live.com/?scope=video&form=MICOAL
--------------------------------------------------------------------------
-This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
-Build the coolest Linux based applications with Moblin SDK & win great prizes
-Grand prize is a trip for two to an Open Source event anywhere in the world
-http://moblin-contest.org/redirect.php?banner_id=100&url=/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+  Signed-off-by: Nick Pelly <npelly@google.com>
+  Acked-by: Brian Swetland <swetland@google.com>
+
+diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
+index b91d45a..2d2f66e 100644
+--- a/drivers/bluetooth/hci_ll.c
++++ b/drivers/bluetooth/hci_ll.c
+@@ -51,6 +51,11 @@
+
+ #include "hci_uart.h"
+
++#ifndef CONFIG_BT_HCIUART_DEBUG
++#undef  BT_DBG
++#define BT_DBG( A... )
++#endif
++
+ /* HCILL commands */
+ #define HCILL_GO_TO_SLEEP_IND  0x30
+ #define HCILL_GO_TO_SLEEP_ACK  0x31
