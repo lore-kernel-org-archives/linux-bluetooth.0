@@ -1,23 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 2 Dec 2008 00:22:48 +0300
-Reply-To: Dmitry <Dmitry.Jurasov@gmail.com>
-Message-ID: <9635469171.20081202002248@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Intrested student
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-From: Dmitry <dmitry.jurasov@gmail.com>
+Subject: Re: New property for DeviceFound signals to distinguish EIR devices
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Johan Hedberg <johan.hedberg@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20081201164559.GA30372@localhost>
+References: <20081201155356.GA28077@localhost>
+	 <1228147977.31158.149.camel@violet.holtmann.net>
+	 <20081201164559.GA30372@localhost>
+Content-Type: text/plain
+Date: Mon, 01 Dec 2008 18:05:44 +0100
+Message-Id: <1228151144.31158.151.camel@violet.holtmann.net>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello linux-bluetooth,
+Hi Johan,
 
-My name is Dmitry, I'm a student from Russia. I'm interested in
-developing your project and participating in next Summer of Code (2009).
-I want to know about ideas, which I can take part in. And I'm going to
-make this work to be my master thesis at University.  
+> > so I do like the idea of a boolean property. That is pretty simple. So
+> > my current proposal would be "LegacyPairing". Since the Simple Pairing
+> > should become the default and handles all the use cases right, we only
+> > need to detect the cases for the old 2.0 and before devices.
+> > 
+> > However this has a limitation. We make the assumption that we always get
+> > the Extended Inquiry Result. So setting LegacyPairing=True doesn't mean
+> > that we are not doing Simple Pairing. It just means that we don't know
+> > at this point of time if the remote device supports its. In practice we
+> > might not be seeing this, but it is not mandatory for 2.1 devices to
+> > enable Extended Inquiry Response.
+> 
+> I'd be fine with adding a LecacyPairing boolean both to the DeviceFound
+> signal and the Device interface. I don't think the false-positive case
+> is too bad since it shouldn't happen often and the UI can simply fall
+> back to SSP then (which is a potential source of confusion for the user
+> but at least the pairing can proceed).
 
--- 
-Best regards,
- Dmitry                          mailto:Dmitry.Jurasov@gmail.com
+okay. Then lets add a boolean "LegacyPairing" property and see how far
+this helps us with improving the wizard.
+
+Regards
+
+Marcel
+
 
