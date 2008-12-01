@@ -1,43 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <200812012201.mB1M155p001654@imap1.linux-foundation.org>
-Subject: [patch for 2.6.28? 1/1] bluetooth: Dell Wireless 365 requires reset quirk
-To: davem@davemloft.net
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        akpm@linux-foundation.org, mario_limonciello@dell.com,
-        hidave.darkstar@gmail.com, marcel@holtmann.org, stable@kernel.org,
-        tim.gardner@canonical.com
-From: akpm@linux-foundation.org
-Date: Mon, 01 Dec 2008 14:01:05 -0800
+Message-ID: <49345A86.1040902@mobileinteraction.com>
+Date: Mon, 01 Dec 2008 22:43:34 +0100
+From: Erik Stackenland <erik@mobileinteraction.com>
+MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org
+Subject: bug in hci_read_remote_name?
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mario Limonciello <mario_limonciello@dell.com>
+I'm new to bluetooth and BlueZ, so it might be that I just don't know what I'm
+talking about but this does not seem right.
 
-This patch causes the BT365 to be reset when the driver is loaded. 
-Without it, the machine is unable to connect to other devices or to scan
-for devices.
+The problem is in hci_read_remote_name
 
-Signed-off-by: Mario Limonciello <mario_limonciello@dell.com>
-Signed-off-by: Tim Gardner <tim.gardner@canonical.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Dave Young <hidave.darkstar@gmail.com>
-Cc: <stable@kernel.org>
-Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
----
+<code>
+...
+char bt[20];
+ba2str(&bdaddr, bt);
+printf("get name: %s\n", bt);
 
- drivers/bluetooth/btusb.c |    3 +++
- 1 file changed, 3 insertions(+)
+/* Get the name */
+if (hci_read_remote_name(dd, &bdaddr, sizeof(name_str), name_str, timeOut) < 0)
+{
+  return -1;
+}
 
-diff -puN drivers/bluetooth/btusb.c~bluetooth-dell-wireless-365-requires-reset-quirk drivers/bluetooth/btusb.c
---- a/drivers/bluetooth/btusb.c~bluetooth-dell-wireless-365-requires-reset-quirk
-+++ a/drivers/bluetooth/btusb.c
-@@ -125,6 +125,9 @@ static struct usb_device_id blacklist_ta
- 	/* Dell laptop with Broadcom chip */
- 	{ USB_DEVICE(0x413c, 0x8126), .driver_info = BTUSB_RESET | BTUSB_WRONG_SCO_MTU },
- 
-+	/* Dell Wireless 365 */
-+	{ USB_DEVICE(0x413c, 0x8160), .driver_info = BTUSB_RESET },
-+
- 	/* Dell Wireless 370 */
- 	{ USB_DEVICE(0x413c, 0x8156), .driver_info = BTUSB_RESET | BTUSB_WRONG_SCO_MTU },
- 
-_
+printf("found name: %s\n",name_str);
+...
+</code>
+
+<printout>
+...
+get name: 00:17:D5:5A:86:85
+get name: 00:1E:45:08:36:28
+found name: SGH-X820
+...
+</printout>
+
+The problem here is that I know for a fact that 00:1E:45:08:36:28 is not
+SGH-X820, but should be named W910i, and that 00:17:D5:5A:86:85 is SGH-X820.
+
+I'm using 1000 millis timeout for hci_read_remote_name, so my assumption is that
+the time runs out before the response is received and when I ask with an other
+bt address a few millis later I get the response for the earlier request.
+
+So is it possible that this is a bug?
+
+System is debian-40r5 standard installation installed today. Dont know how to
+check BlueZ version.
+
+Thanks!
+
+
