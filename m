@@ -1,48 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <49347D69.7070807@tpi.com>
-Date: Mon, 01 Dec 2008 17:12:25 -0700
-From: Tim Gardner <tcanonical@tpi.com>
-Reply-To: tim.gardner@canonical.com
+Message-ID: <2d5a2c100812011446j76dc3514sb320d0b4ab929f3b@mail.gmail.com>
+Date: Mon, 1 Dec 2008 19:46:17 -0300
+From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+To: Dmitry <Dmitry.Jurasov@gmail.com>
+Subject: Re: Intrested student
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <9635469171.20081202002248@gmail.com>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: akpm@linux-foundation.org, davem@davemloft.net,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	mario_limonciello@dell.com, hidave.darkstar@gmail.com,
-	stable@kernel.org, tim.gardner@canonical.com
-Subject: Re: [patch for 2.6.28? 1/1] bluetooth: Dell Wireless 365 requires
- reset quirk
-References: <200812012201.mB1M155p001654@imap1.linux-foundation.org> <1228169030.31158.154.camel@violet.holtmann.net>
-In-Reply-To: <1228169030.31158.154.camel@violet.holtmann.net>
 Content-Type: text/plain; charset=ISO-8859-1
+References: <9635469171.20081202002248@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Marcel Holtmann wrote:
-> Hi Andrew,
-> 
->> This patch causes the BT365 to be reset when the driver is loaded. 
->> Without it, the machine is unable to connect to other devices or to scan
->> for devices.
->>
->> Signed-off-by: Mario Limonciello <mario_limonciello@dell.com>
->> Signed-off-by: Tim Gardner <tim.gardner@canonical.com>
->> Cc: Marcel Holtmann <marcel@holtmann.org>
->> Cc: Dave Young <hidave.darkstar@gmail.com>
->> Cc: <stable@kernel.org>
->> Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
-> 
-> NAK. I fixed this differently by making the reset quirk default.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
+Hi Dmitry,
 
-Does that mean the devices in blacklist_table that have _only_
-BTUSB_RESET should be removed? It would get rid of roughly half of the
-entries.
+We don't have yet the projects for 2009, but you can check for some
+ideas from 2008 here:
+http://wiki.bluez.org/wiki/GSoC2008
 
-rtg
+And of course you can also suggest project ideas and see if there
+someone interested in mentoring. You got plenty of time for this, I
+guess the program will only start on April maybe March.
+
 -- 
-Tim Gardner tim.gardner@canonical.com
+Luiz Augusto von Dentz
+Engenheiro de Computação
