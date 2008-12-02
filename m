@@ -1,44 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 2 Dec 2008 12:15:20 -0800 (PST)
-From: Jim Carter <jimc@math.ucla.edu>
-To: Jaska Uimonen <jaska.uimonen@nokia.com>
-cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC/PATCH] sbc: new filtering function for 8 band fixed point
- encoding
-In-Reply-To: <1227879337.20555.12.camel@esdhcp03999.research.nokia.com>
-Message-ID: <Pine.LNX.4.64.0812021203290.6346@xena.cft.ca.us>
-References: <1227879337.20555.12.camel@esdhcp03999.research.nokia.com>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [patch for 2.6.28? 1/1] bluetooth: Dell Wireless 365 requires
+ reset quirk
+From: Marcel Holtmann <marcel@holtmann.org>
+To: tim.gardner@canonical.com
+Cc: akpm@linux-foundation.org, davem@davemloft.net,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	mario_limonciello@dell.com, hidave.darkstar@gmail.com,
+	stable@kernel.org
+In-Reply-To: <49347D69.7070807@tpi.com>
+References: <200812012201.mB1M155p001654@imap1.linux-foundation.org>
+	 <1228169030.31158.154.camel@violet.holtmann.net> <49347D69.7070807@tpi.com>
+Content-Type: text/plain
+Date: Tue, 02 Dec 2008 01:22:19 +0100
+Message-Id: <1228177339.31158.155.camel@violet.holtmann.net>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 28 Nov 2008, Jaska Uimonen wrote:
+Hi Tim,
 
-> I did some testing on the current 8 band fixed point 
-> encoding and it seems to attenuate frequencies below 800Hz 
-> and above 18kHz. There might be some other stuff happening 
-> also, because at least to me the bass seemed to lack some 
-> "definition".
+> >> This patch causes the BT365 to be reset when the driver is loaded. 
+> >> Without it, the machine is unable to connect to other devices or to scan
+> >> for devices.
+> >>
+> >> Signed-off-by: Mario Limonciello <mario_limonciello@dell.com>
+> >> Signed-off-by: Tim Gardner <tim.gardner@canonical.com>
+> >> Cc: Marcel Holtmann <marcel@holtmann.org>
+> >> Cc: Dave Young <hidave.darkstar@gmail.com>
+> >> Cc: <stable@kernel.org>
+> >> Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+> > 
+> > NAK. I fixed this differently by making the reset quirk default.
+>
+> Does that mean the devices in blacklist_table that have _only_
+> BTUSB_RESET should be removed? It would get rid of roughly half of the
+> entries.
 
-I have the same subjective impression: on (inexpensive) Motorola HT-820 
-phones, A2DP is noticeably anemic compared to the same phones with the 
-provided wire.
+that has already been done. See the pull request I sent to Dave.
 
-> I didn't quite understand how the current tables are calculated
-> and how the filtering works so I wrote a new filtering function
-> and calculated new filter tables for it. It is written
-> using 16 bit fixed point without any platform specific optimizations.
-> I only unrolled some loops etc. I tried to follow the
-> flow chart in MPEG-1 annex c.
+Regards
 
-This is very exciting!  But it's been about 1.5 years since I read the A2DP 
-spec so I can't remember: does the headphone require standard band 
-breakpoints?  Or are the breakpoints implicit in the encoding, so if you 
-adjust them to make better use of the Bluetooth bandwidth, the headphone 
-will automatically go along?
+Marcel
 
 
-James F. Carter          Voice 310 825 2897    FAX 310 206 6673
-UCLA-Mathnet;  6115 MSA; 405 Hilgard Ave.; Los Angeles, CA, USA 90095-1555
-Email: jimc@math.ucla.edu  http://www.math.ucla.edu/~jimc (q.v. for PGP key)
