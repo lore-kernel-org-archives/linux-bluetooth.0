@@ -1,57 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 5 Dec 2008 19:11:14 +0100
-From: Christian Birchinger <joker@netswarm.net>
-To: linux-bluetooth@vger.kernel.org
-Subject: How to avoid PS3 SIXAXIS mouse functionality
-Message-ID: <20081205181114.GA31660@netswarm.net>
+From: Luca Santarelli <hrk@users.sourceforge.net>
+To: marcel@holtmann.org
+Subject: [PATCH] bluetooth usb hci: ISSC usb dongle with buggy SCO support
+Date: Fri, 5 Dec 2008 00:02:13 +0100
+Cc: linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200812050002.13560.hrk@users.sourceforge.net>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello
+From: Luca Santarelli <hrk <t> users.sourceforge.net>
 
-After some nasty workarounds i managed to configure the
-Playstation 3 gamepad in bluetooth mode in a way that a
-single press on the "PS" button registers the device as
-bluetooth HID gamepad and is ready to use.
+As reported at:
+http://bugs.gentoo.org/show_bug.cgi?id=249523
+and in reference of similar patches such as:
+http://thread.gmane.org/gmane.linux.bluez.devel/15067
 
-I'm using bluez-utils-3.36 with the input plugin.
+This patch changes the blacklist entry for the ISSC bluetooth USB
+dongle fixing the issue of the repeatedly appearing message
 
-The problem is that the gamepad also re registred as
-a mouse input device:
+  hci_scodata_packet: hci0 SCO packet for unknown connection handle 92
 
-/proc/bus/input/devices:
-N: Name="PLAYSTATION(R)3 Controller"
-H: Handlers=mouse1 event7 js2 
+in the kernel logs.
 
-dbus info:
-method return sender=:1.51 -> dest=:1.70 reply_serial=2
-array [
-  string "/org/bluez/input/gamepad0"
-]
+Sighed-off-by: Luca Santarelli <hrk <at> users.sourceforge.net>
+---
+This is my first kernel patch ever, I read the docs, but please notify
+me if I made any mistake. Thank you all for your work, I'm happy to have
+been able to contribute to this!
 
-While js and event is perfect, the mouse part causes
-problems because it's not really a mouse device. You
-cannot relativly control the mouse pointer. It only
-gets temporarily moved when the left analog stick gets
-moved then snaps back.
+The patch has been run against 2.6.27.7 and has been tested on three x86
+machines, showing no issues. In my own tests, the dongle has been then
+used to connect to devices and everything worked fine.
 
-The big annoyance here is that i depend on evdev support
-in X and that automaticaly adds everything as mouse when
-detected. I did not manage to stop that behavious yet
-(tested with AutoAddDevices==false in ServerFlags).
-
-The old "hidd" daemon did only add js and event (no mouse).
-This somehow tells me the gamepad doesn't tell the daemon
-that it's also a mouse, but the new input plugin makes
-something up (of course i could be wrong here).
-
-In USB mode those gamepads also only get registred as
-event and js devices (not mouse).
-
-Can i somehow avoid that input.so in bluez-utils-3.36 adds
-mouse support to gamepads?
-
-Thanks for your help
-Christian
+--- linux-2.6.27.7/drivers/bluetooth/hci_usb.c.orig	2008-12-04 20:18:38.000000000 +0100
++++ linux-2.6.27.7/drivers/bluetooth/hci_usb.c	2008-12-04 20:19:37.000000000 +0100
+@@ -148,8 +148,8 @@ static struct usb_device_id blacklist_id
+ 	{ USB_DEVICE(0x047d, 0x105d), .driver_info = HCI_RESET },
+ 	{ USB_DEVICE(0x047d, 0x105e), .driver_info = HCI_RESET | HCI_WRONG_SCO_MTU },
+ 
+-	/* ISSC Bluetooth Adapter v3.1 */
+-	{ USB_DEVICE(0x1131, 0x1001), .driver_info = HCI_RESET },
++	/* ISSC Bluetooth Adapter v3.1 with buggy SCO support */
++	{ USB_DEVICE(0x1131, 0x1001), .driver_info = HCI_RESET | HCI_BROKEN_ISOC },
+ 
+ 	/* RTX Telecom based adapters with buggy SCO support */
+ 	{ USB_DEVICE(0x0400, 0x0807), .driver_info = HCI_BROKEN_ISOC },
