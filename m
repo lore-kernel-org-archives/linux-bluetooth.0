@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <e343e5940812050154i52fb8eb3x46cf6e73e5a0c8f9@mail.gmail.com>
-Date: Fri, 5 Dec 2008 12:54:35 +0300
-From: "Yuriy Vikulov" <vikulov@jami.ru>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <COL102-W12443FB0254944C58D2F2FA8020@phx.gbl>
+Message-ID: <COL102-W12443FB0254944C58D2F2FA8020@phx.gbl>
+From: Evgenios Metaxas <eumetaxas@hotmail.com>
+To: <bluez-devel@lists.sourceforge.net>
+Date: Thu, 4 Dec 2008 15:39:15 +0000
 MIME-Version: 1.0
-References: <COL102-W12443FB0254944C58D2F2FA8020@phx.gbl>
-Subject: Re: [Bluez-devel] MA-720 does not work
+Subject: [Bluez-devel] MA-720 does not work
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,127 +14,108 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============5951194699534574789=="
+Content-Type: multipart/mixed; boundary="===============7391644743421070590=="
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============5951194699534574789==
+--===============7391644743421070590==
 Content-Type: multipart/alternative;
-	boundary="----=_Part_590_4904980.1228470875598"
+	boundary="_fae4bb9b-1703-41fc-800c-2639e2caacb3_"
 
-------=_Part_590_4904980.1228470875598
-Content-Type: text/plain; charset=KOI8-R
-Content-Transfer-Encoding: base64
-Content-Disposition: inline
-
-SGVsbG8sCgp0cnkgdGhpcwoKKm1vZHByb2JlKiBoY2lfdXNiICp2ZW5kb3IqPTBkZjcgcHJvZHVj
-dD0wNzIyCgpvciBzb21ldGhpbmcgbGlrZSB0aGF0CgoKMjAwOC8xMi80IEV2Z2VuaW9zIE1ldGF4
-YXMgPGV1bWV0YXhhc0Bob3RtYWlsLmNvbT4KCj4gIEhlbGxvLAo+Cj4gSSBoYXZlIGEgTUE3MjAg
-bW9iaWxlIGFjdGlvbiBibHVldG9vdGggdXNiIHRvbmdsZSB0aGF0IGRvZXMgbm90IHdvcmsgdW5k
-ZXIKPiB1YnVudHUgNy4wNC04LjEwIGFuZCBPcGVuU3VzZS4KPiBJIGhhdmUgdHJpZWQgZGlmZmVy
-ZW50IGhvdy10byBidXQgbm9uZSB3b3JrZWQuCj4gR29vZ2xpbmcgYXJvdW5kIGZvdW5kIHRoYXQg
-bWFueSBoYWQgcHJvYmxlbXMgd2l0aCB0aGF0IGRvbmdsZS4gTUE3MDAgaXMKPiBzdXBwb3J0ZWQg
-YnV0IG5vdCBNQTcyMC4KPiBJIGFsc28gZm91bmQgdGhhdCBwb3N0Cj4gaHR0cDovL3RocmVhZC5n
-bWFuZS5vcmcvZ21hbmUubGludXguYmx1ZXouZGV2ZWwvMTM1MTUKPgo+IG15IGxzdXNiIGlzCj4g
-QnVzIDAwMiBEZXZpY2UgMDA0OiBJRCAwZGY3OjA3MjIgTW9iaWxlIEFjdGlvbiBUZWNobm9sb2d5
-LCBJbmMuCj4KPiBkbWVzZwo+Cj4gWyA0NjM0LjAwMTg4N10gdXNiIDItMjogbmV3IGxvdyBzcGVl
-ZCBVU0IgZGV2aWNlIHVzaW5nIHVoY2lfaGNkIGFuZCBhZGRyZXNzCj4gNAo+IFsgNDYzNC4xODQx
-MjldIHVzYiAyLTI6IGNvbmZpZ3VyYXRpb24gIzEgY2hvc2VuIGZyb20gMSBjaG9pY2UKPgo+IGFu
-ZAo+Cj4gL3Byb2MvYnVzL3VzYi9kZXZpY2VzCj4gYmFzaDogL3Byb2MvYnVzL3VzYi9kZXZpY2Vz
-OiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5Cj4KPiBDdXJyZW50bHkgaSBhbSBpbiBVYnVudHUg
-OC4wNCwgYWxsIHVwZGF0ZXMgZG9uZSwgY29tcGFxIG54OTAxMCBsYXB0b3AuCj4gT3RoZXIgdXNi
-IHRvbmdsZXMgdGhhdCBpIGhhdmUgdGVzdGVkIHdvcmtlZAo+Cj4gVGhhbngKPgo+IE1ldGF4YXMg
-RXVnZW5pb3MKPgo+Cj4KPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KPiBDb25uZWN0
-IHRvIHRoZSBuZXh0IGdlbmVyYXRpb24gb2YgTVNOIE1lc3NlbmdlciAgR2V0IGl0IG5vdyEKPiA8
-aHR0cDovL2ltYWdpbmUtbXNuLmNvbS9tZXNzZW5nZXIvbGF1bmNoODAvZGVmYXVsdC5hc3B4P2xv
-Y2FsZT1lbi11cyZzb3VyY2U9d2xtYWlsdGFnbGluZT4KPgo+IC0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KPiBU
-aGlzIFNGLk5ldCBlbWFpbCBpcyBzcG9uc29yZWQgYnkgdGhlIE1vYmxpbiBZb3VyIE1vdmUgRGV2
-ZWxvcGVyJ3MKPiBjaGFsbGVuZ2UKPiBCdWlsZCB0aGUgY29vbGVzdCBMaW51eCBiYXNlZCBhcHBs
-aWNhdGlvbnMgd2l0aCBNb2JsaW4gU0RLICYgd2luIGdyZWF0Cj4gcHJpemVzCj4gR3JhbmQgcHJp
-emUgaXMgYSB0cmlwIGZvciB0d28gdG8gYW4gT3BlbiBTb3VyY2UgZXZlbnQgYW55d2hlcmUgaW4g
-dGhlIHdvcmxkCj4gaHR0cDovL21vYmxpbi1jb250ZXN0Lm9yZy9yZWRpcmVjdC5waHA/YmFubmVy
-X2lkPTEwMCZ1cmw9Lwo+IF9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fCj4gQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0Cj4gQmx1ZXotZGV2ZWxAbGlzdHMuc291
-cmNlZm9yZ2UubmV0Cj4gaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGlu
-Zm8vYmx1ZXotZGV2ZWwKPgo+CgoKLS0gCiAgICAgICAgICAgICDzINXXwdbFzsnFzSwKCiAgICAg
-ICAgICAgIODSycog98nL1czP1woKICAgICD3xcTV3cnKINDSz8fSwc3NydPUCgog98vV087ZxSDN
-z8LJzNjO2cUg08XS18nT2QoK78bJ0zogICAgICAgICAgICAgICAgICs3ICg0OTUpIDc4MC05MjM4
-Cgrtz8LJzNjO2co6ICAgICAgICArNyAoOTE2KSAxOTQgMjcxMQoKdmlrdWxvdkBqYW1pLnJ1ICAg
-IHwgICAgd3d3LmphbWkucnUKCiAgICAgICAgICAgICAgbG9nby1qYW1pLXNtYWxsCg==
-------=_Part_590_4904980.1228470875598
-Content-Type: text/html; charset=KOI8-R
-Content-Transfer-Encoding: base64
-Content-Disposition: inline
-
-SGVsbG8sPGJyPjxicj50cnkgdGhpczxicj48YnI+IDxlbT5tb2Rwcm9iZTwvZW0+IGhjaV91c2Ig
-PGVtPnZlbmRvcjwvZW0+PTBkZjcgcHJvZHVjdD0wNzIyPGJyPjxicj5vciBzb21ldGhpbmcgbGlr
-ZSB0aGF0PGJyPjxicj48YnI+PGRpdiBjbGFzcz0iZ21haWxfcXVvdGUiPjIwMDgvMTIvNCBFdmdl
-bmlvcyBNZXRheGFzIDxzcGFuIGRpcj0ibHRyIj4mbHQ7PGEgaHJlZj0ibWFpbHRvOmV1bWV0YXhh
-c0Bob3RtYWlsLmNvbSI+ZXVtZXRheGFzQGhvdG1haWwuY29tPC9hPiZndDs8L3NwYW4+PGJyPgo8
-YmxvY2txdW90ZSBjbGFzcz0iZ21haWxfcXVvdGUiIHN0eWxlPSJib3JkZXItbGVmdDogMXB4IHNv
-bGlkIHJnYigyMDQsIDIwNCwgMjA0KTsgbWFyZ2luOiAwcHQgMHB0IDBwdCAwLjhleDsgcGFkZGlu
-Zy1sZWZ0OiAxZXg7Ij4KCgoKPGRpdj4KSGVsbG8sPGJyPjxicj5JIGhhdmUgYSBNQTcyMCBtb2Jp
-bGUgYWN0aW9uIGJsdWV0b290aCB1c2IgdG9uZ2xlIHRoYXQgZG9lcyBub3Qgd29yayB1bmRlciB1
-YnVudHUgNy4wNC04LjEwIGFuZCBPcGVuU3VzZS48YnI+SSBoYXZlIHRyaWVkIGRpZmZlcmVudCBo
-b3ctdG8gYnV0IG5vbmUgd29ya2VkLjxicj5Hb29nbGluZyBhcm91bmQgZm91bmQgdGhhdCBtYW55
-IGhhZCBwcm9ibGVtcyB3aXRoIHRoYXQgZG9uZ2xlLiBNQTcwMCBpcyBzdXBwb3J0ZWQgYnV0IG5v
-dCBNQTcyMC48YnI+CkkgYWxzbyBmb3VuZCB0aGF0IHBvc3QgPGJyPjxhIGhyZWY9Imh0dHA6Ly90
-aHJlYWQuZ21hbmUub3JnL2dtYW5lLmxpbnV4LmJsdWV6LmRldmVsLzEzNTE1IiB0YXJnZXQ9Il9i
-bGFuayI+aHR0cDovL3RocmVhZC5nbWFuZS5vcmcvZ21hbmUubGludXguYmx1ZXouZGV2ZWwvMTM1
-MTU8L2E+PGJyPjxicj5teSBsc3VzYiBpcyA8YnI+QnVzIDAwMiBEZXZpY2UgMDA0OiBJRCAwZGY3
-OjA3MjIgTW9iaWxlIEFjdGlvbiBUZWNobm9sb2d5LCBJbmMuIDxicj4KPGJyPmRtZXNnIDxicj48
-YnI+WyA0NjM0LjAwMTg4N10gdXNiIDItMjogbmV3IGxvdyBzcGVlZCBVU0IgZGV2aWNlIHVzaW5n
-IHVoY2lfaGNkIGFuZCBhZGRyZXNzIDQ8YnI+WyA0NjM0LjE4NDEyOV0gdXNiIDItMjogY29uZmln
-dXJhdGlvbiAjMSBjaG9zZW4gZnJvbSAxIGNob2ljZTxicj48YnI+YW5kIDxicj48YnI+L3Byb2Mv
-YnVzL3VzYi9kZXZpY2VzPGJyPmJhc2g6IC9wcm9jL2J1cy91c2IvZGV2aWNlczogTm8gc3VjaCBm
-aWxlIG9yIGRpcmVjdG9yeTxicj4KPGJyPkN1cnJlbnRseSBpIGFtIGluIFVidW50dSA4LjA0LCBh
-bGwgdXBkYXRlcyBkb25lLCBjb21wYXEgbng5MDEwIGxhcHRvcC48YnI+T3RoZXIgdXNiIHRvbmds
-ZXMgdGhhdCBpIGhhdmUgdGVzdGVkIHdvcmtlZCA8YnI+PGJyPlRoYW54PGJyPjxicj5NZXRheGFz
-IEV1Z2VuaW9zPGJyPjxkaXYgY2xhc3M9Ildnb1IwZCI+PGJyPjxicj48YnI+PGhyPkNvbm5lY3Qg
-dG8gdGhlIG5leHQgZ2VuZXJhdGlvbiBvZiBNU04gTWVzc2VuZ2VyJm5ic3A7ICA8YSBocmVmPSJo
-dHRwOi8vaW1hZ2luZS1tc24uY29tL21lc3Nlbmdlci9sYXVuY2g4MC9kZWZhdWx0LmFzcHg/bG9j
-YWxlPWVuLXVzJmFtcDtzb3VyY2U9d2xtYWlsdGFnbGluZSIgdGFyZ2V0PSJfYmxhbmsiPkdldCBp
-dCBub3chIDwvYT48L2Rpdj4KPC9kaXY+Cjxicj4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tPGJyPgpUaGlzIFNG
-Lk5ldCBlbWFpbCBpcyBzcG9uc29yZWQgYnkgdGhlIE1vYmxpbiBZb3VyIE1vdmUgRGV2ZWxvcGVy
-JiMzOTtzIGNoYWxsZW5nZTxicj4KQnVpbGQgdGhlIGNvb2xlc3QgTGludXggYmFzZWQgYXBwbGlj
-YXRpb25zIHdpdGggTW9ibGluIFNESyAmYW1wOyB3aW4gZ3JlYXQgcHJpemVzPGJyPgpHcmFuZCBw
-cml6ZSBpcyBhIHRyaXAgZm9yIHR3byB0byBhbiBPcGVuIFNvdXJjZSBldmVudCBhbnl3aGVyZSBp
-biB0aGUgd29ybGQ8YnI+CjxhIGhyZWY9Imh0dHA6Ly9tb2JsaW4tY29udGVzdC5vcmcvcmVkaXJl
-Y3QucGhwP2Jhbm5lcl9pZD0xMDAmYW1wO3VybD0vIiB0YXJnZXQ9Il9ibGFuayI+aHR0cDovL21v
-Ymxpbi1jb250ZXN0Lm9yZy9yZWRpcmVjdC5waHA/YmFubmVyX2lkPTEwMCZhbXA7dXJsPS88L2E+
-PGJyPl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fPGJyPgpC
-bHVlei1kZXZlbCBtYWlsaW5nIGxpc3Q8YnI+CjxhIGhyZWY9Im1haWx0bzpCbHVlei1kZXZlbEBs
-aXN0cy5zb3VyY2Vmb3JnZS5uZXQiPkJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldDwv
-YT48YnI+CjxhIGhyZWY9Imh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3Rp
-bmZvL2JsdWV6LWRldmVsIiB0YXJnZXQ9Il9ibGFuayI+aHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3Jn
-ZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWw8L2E+PGJyPgo8YnI+PC9ibG9ja3F1b3Rl
-PjwvZGl2Pjxicj48YnIgY2xlYXI9ImFsbCI+PGJyPi0tIDxicj4gJm5ic3A7ICZuYnNwOyAmbmJz
-cDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A78yDV18HWxc7Jxc0sPGJyPjxicj4gJm5ic3A7
-ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsg4NLJyiD3ycvVzM/XPGJyPjxicj4g
-Jm5ic3A7ICZuYnNwOyAmbmJzcDv3xcTV3cnKINDSz8fSwc3NydPUPGJyPjxicj4gJm5ic3A798vV
-087ZxSDNz8LJzNjO2cUg08XS18nT2Txicj48YnI+78bJ0zogJm5ic3A7ICZuYnNwOyAmbmJzcDsg
-Jm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyArNyAoNDk1KSA3ODAtOTIzODxicj4K
-PGJyPu3PwsnM2M7ZyjogJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7KzcgKDkxNikgMTk0IDI3
-MTE8YnI+PGJyPiA8YSBocmVmPSJtYWlsdG86dmlrdWxvdkBqYW1pLnJ1Ij52aWt1bG92QGphbWku
-cnU8L2E+ICZuYnNwOyAmbmJzcDt8ICZuYnNwOyAmbmJzcDs8YSBocmVmPSJodHRwOi8vd3d3Lmph
-bWkucnUiPnd3dy5qYW1pLnJ1PC9hPjxicj48YnI+ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNw
-OyAmbmJzcDsgJm5ic3A7ICZuYnNwOyBsb2dvLWphbWktc21hbGw8YnI+Cg==
-------=_Part_590_4904980.1228470875598--
+--_fae4bb9b-1703-41fc-800c-2639e2caacb3_
+Content-Type: text/plain; charset="iso-8859-7"
+Content-Transfer-Encoding: quoted-printable
 
 
---===============5951194699534574789==
+Hello=2C
+
+I have a MA720 mobile action bluetooth usb tongle that does not work under =
+ubuntu 7.04-8.10 and OpenSuse.
+I have tried different how-to but none worked.
+Googling around found that many had problems with that dongle. MA700 is sup=
+ported but not MA720.
+I also found that post=20
+http://thread.gmane.org/gmane.linux.bluez.devel/13515
+
+my lsusb is=20
+Bus 002 Device 004: ID 0df7:0722 Mobile Action Technology=2C Inc.=20
+
+dmesg=20
+
+[ 4634.001887] usb 2-2: new low speed USB device using uhci_hcd and address=
+ 4
+[ 4634.184129] usb 2-2: configuration #1 chosen from 1 choice
+
+and=20
+
+/proc/bus/usb/devices
+bash: /proc/bus/usb/devices: No such file or directory
+
+Currently i am in Ubuntu 8.04=2C all updates done=2C compaq nx9010 laptop.
+Other usb tongles that i have tested worked=20
+
+Thanx
+
+Metaxas Eugenios
+
+
+
+_________________________________________________________________
+Connect to the next generation of MSN Messenger=A0
+http://imagine-msn.com/messenger/launch80/default.aspx?locale=3Den-us&sourc=
+e=3Dwlmailtagline=
+
+--_fae4bb9b-1703-41fc-800c-2639e2caacb3_
+Content-Type: text/html; charset="iso-8859-7"
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+<head>
+<style>
+.hmmessage P
+{
+margin:0px=3B
+padding:0px
+}
+body.hmmessage
+{
+font-size: 10pt=3B
+font-family:Verdana
+}
+</style>
+</head>
+<body class=3D'hmmessage'>
+Hello=2C<br><br>I have a MA720 mobile action bluetooth usb tongle that does=
+ not work under ubuntu 7.04-8.10 and OpenSuse.<br>I have tried different ho=
+w-to but none worked.<br>Googling around found that many had problems with =
+that dongle. MA700 is supported but not MA720.<br>I also found that post <b=
+r>http://thread.gmane.org/gmane.linux.bluez.devel/13515<br><br>my lsusb is =
+<br>Bus 002 Device 004: ID 0df7:0722 Mobile Action Technology=2C Inc. <br><=
+br>dmesg <br><br>[ 4634.001887] usb 2-2: new low speed USB device using uhc=
+i_hcd and address 4<br>[ 4634.184129] usb 2-2: configuration #1 chosen from=
+ 1 choice<br><br>and <br><br>/proc/bus/usb/devices<br>bash: /proc/bus/usb/d=
+evices: No such file or directory<br><br>Currently i am in Ubuntu 8.04=2C a=
+ll updates done=2C compaq nx9010 laptop.<br>Other usb tongles that i have t=
+ested worked <br><br>Thanx<br><br>Metaxas Eugenios<br><br><br><br /><hr />C=
+onnect to the next generation of MSN Messenger=A0  <a href=3D'http://imagin=
+e-msn.com/messenger/launch80/default.aspx?locale=3Den-us&source=3Dwlmailtag=
+line' target=3D'_new'>Get it now! </a></body>
+</html>=
+
+--_fae4bb9b-1703-41fc-800c-2639e2caacb3_--
+
+
+--===============7391644743421070590==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-------------------------------------------------------------------------------
-SF.Net email is Sponsored by MIX09, March 18-20, 2009 in Las Vegas, Nevada.
-The future of the web can't happen without you.  Join us at MIX09 to help
-pave the way to the Next Web now. Learn more and register at
-http://ad.doubleclick.net/clk;208669438;13503038;i?http://2009.visitmix.com/
---===============5951194699534574789==
+-------------------------------------------------------------------------
+This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
+Build the coolest Linux based applications with Moblin SDK & win great prizes
+Grand prize is a trip for two to an Open Source event anywhere in the world
+http://moblin-contest.org/redirect.php?banner_id=100&url=/
+--===============7391644743421070590==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -147,4 +126,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============5951194699534574789==--
+--===============7391644743421070590==--
