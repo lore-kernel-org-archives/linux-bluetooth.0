@@ -1,14 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <89b6ba3a0812050920q1dea080i148d9c4677b6ed04@mail.gmail.com>
+Message-ID: <89b6ba3a0812050920q1dea080i148d9c4677b6ed04@mail.gmail.com>
+Date: Fri, 5 Dec 2008 18:20:22 +0100
+From: "Patryk Zawadzki" <patrys@pld-linux.org>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <BAY127-W1206CF6F607105AA558C2DA8FE0@phx.gbl>
+MIME-Version: 1.0
 References: <COL102-W12443FB0254944C58D2F2FA8020@phx.gbl>
 	<e343e5940812050154i52fb8eb3x46cf6e73e5a0c8f9@mail.gmail.com>
 	<BAY127-W1206CF6F607105AA558C2DA8FE0@phx.gbl>
-	<89b6ba3a0812050920q1dea080i148d9c4677b6ed04@mail.gmail.com>
-Date: Fri, 05 Dec 2008 19:40:17 +0100
-Message-Id: <1228502417.28839.33.camel@violet.holtmann.net>
-Mime-Version: 1.0
 Subject: Re: [Bluez-devel] MA-720 does not work
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -22,25 +21,21 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Patryk,
+On Fri, Dec 5, 2008 at 6:10 PM, Evgenios Metaxas <eumetaxas@hotmail.com> wrote:
+> Thank you for your answer,
+>
+> modprobe hci_usb gives no error, but
+>
+> modprobe  vendor=0df7 or modprobe product=0722
+> gives
+>
+> FATAL: Module vendor=0df7 not found
 
-> > modprobe hci_usb gives no error, but
-> >
-> > modprobe  vendor=0df7 or modprobe product=0722
-> > gives
-> >
-> > FATAL: Module vendor=0df7 not found
-> 
-> You are supposed to pass all 3 in a single line. product and vendor
-> are options for the hci_usb module.
+You are supposed to pass all 3 in a single line. product and vendor
+are options for the hci_usb module.
 
-no they are not.
-
-Regards
-
-Marcel
-
-
+-- 
+Patryk Zawadzki
 
 ------------------------------------------------------------------------------
 SF.Net email is Sponsored by MIX09, March 18-20, 2009 in Las Vegas, Nevada.
