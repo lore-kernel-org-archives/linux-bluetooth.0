@@ -1,15 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <COL102-W7079DBA98D2EA5B8835568A8FF0@phx.gbl>
-From: Evgenios Metaxas <eumetaxas@hotmail.com>
-To: <bluez-devel@lists.sourceforge.net>
-Date: Sat, 6 Dec 2008 18:55:09 +0000
-In-Reply-To: <89b6ba3a0812050920q1dea080i148d9c4677b6ed04@mail.gmail.com>
-References: <COL102-W12443FB0254944C58D2F2FA8020@phx.gbl>
-	<e343e5940812050154i52fb8eb3x46cf6e73e5a0c8f9@mail.gmail.com>
-	<BAY127-W1206CF6F607105AA558C2DA8FE0@phx.gbl>
-	<89b6ba3a0812050920q1dea080i148d9c4677b6ed04@mail.gmail.com>
+Message-ID: <4939BB42.1080607@slackdot.org>
+Date: Fri, 05 Dec 2008 18:37:38 -0500
+From: "Rob \"Deker\" Dekelbaum" <deker@slackdot.org>
 MIME-Version: 1.0
-Subject: Re: [Bluez-devel] MA-720 does not work
+To: BlueZ development <bluez-devel@lists.sourceforge.net>,
+ steve@sparta.com
+Subject: [Bluez-devel] Continued SCO audio issues...
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,140 +15,137 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============2717441880434290826=="
+Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============2717441880434290826==
-Content-Type: multipart/alternative;
-	boundary="_3679ae7f-c24c-4c91-bf87-d459012d7ef6_"
 
---_3679ae7f-c24c-4c91-bf87-d459012d7ef6_
-Content-Type: text/plain; charset="iso-8859-7"
-Content-Transfer-Encoding: quoted-printable
+I posted a while back about having some issues getting SCO audio to work 
+on some Compulab em-x270 boards. Well, we're still not there, but we've 
+tried a lot more things. I'm going to describe the problem in some more 
+detail now in the hopes that somebody here can help point me in a 
+direction to get this working.
+
+Symptoms:
+
+  - Everything involved (bt headset, ALSA, aplay/mplayer/pulseaudio, 
+etc) seems to think everything is working.
+  - No sound comes out of the headset. We hear a hissing from the 
+headset during actual audio playback (or when I have pulseaudio talking 
+to it via 'module-alsa-sink' and the sink is not suspended).
+
+Config(s) Tested:
+
+ - Kernels: 2.6.23, 2.6.26, 2.6.27
+ - Bluez: 3.26, 3.36, 4.12, 4.18
+ - ALSA drivers: as shipped w/ kernels above
+
+We've been through about every possible combination of the above. We've 
+tried hci_usb and btusb. We've tested with 3 models of bt headset and 2 
+development boards. For some reason, the ONLY place I can make SCO audio 
+work is under a stock Ubuntu 8.10 (which uses Bluez 4.12, kernel 2.6.27, 
+and ALSA 1.0.17 for the record).
+
+I'm stumped. Here is some sample output from various pieces as we try to 
+play a file. Right now we're using Bluez 3.36 (getting 4.x running on 
+this platform was a bit of a PITA and was somewhat unstable so we backed 
+out to what currently ships with openembedded)
+
+We've tried with separate USB dongles (using the same chipset, that 
+works under Ubuntu 8.10) so it's not the onboard BT chipset...
+
+# hciconfig hci0 version
+hci0:    Type: USB
+    BD Address: 00:02:5B:00:A5:A5 ACL MTU: 310:10 SCO MTU: 64:8
+    HCI Ver: 2.0 (0x3) HCI Rev: 0xc5c LMP Ver: 2.0 (0x3) LMP Subver: 0xc5c
+    Manufacturer: Cambridge Silicon Radio (10)
+
+# hciconfig hci0 revision
+hci0:    Type: USB
+    BD Address: 00:02:5B:00:A5:A5 ACL MTU: 310:10 SCO MTU: 64:8
+    Unified 21e
+    Chip version: BlueCore4-ROM
+    Max key size: 128 bit
+    SCO mapping:  PCM
 
 
-Hi=2C
+~/.asoundrc:
 
-i did at first pass all 3 in a single line and did not work=2C
-then i've read somewhere at modprobe uses only one "module" at a time and t=
-ried one by one=2C which did not work either.
-
-thanx for answering
-
-Eugene
-
-> Date: Fri=2C 5 Dec 2008 18:20:22 +0100
-> From: patrys@pld-linux.org
-> To: bluez-devel@lists.sourceforge.net
-> Subject: Re: [Bluez-devel] MA-720 does not work
->=20
-> On Fri=2C Dec 5=2C 2008 at 6:10 PM=2C Evgenios Metaxas <eumetaxas@hotmail=
-.com> wrote:
-> > Thank you for your answer=2C
-> >
-> > modprobe hci_usb gives no error=2C but
-> >
-> > modprobe  vendor=3D0df7 or modprobe product=3D0722
-> > gives
-> >
-> > FATAL: Module vendor=3D0df7 not found
->=20
-> You are supposed to pass all 3 in a single line. product and vendor
-> are options for the hci_usb module.
->=20
-> --=20
-> Patryk Zawadzki
->=20
-> -------------------------------------------------------------------------=
------
-> SF.Net email is Sponsored by MIX09=2C March 18-20=2C 2009 in Las Vegas=2C=
- Nevada.
-> The future of the web can't happen without you.  Join us at MIX09 to help
-> pave the way to the Next Web now. Learn more and register at
-> http://ad.doubleclick.net/clk=3B208669438=3B13503038=3Bi?http://2009.visi=
-tmix.com/
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-_________________________________________________________________
-Invite your mail contacts to join your friends list with Windows Live Space=
-s. It's easy!
-http://spaces.live.com/spacesapi.aspx?wx_action=3Dcreate&wx_url=3D/friends.=
-aspx&mkt=3Den-us=
-
---_3679ae7f-c24c-4c91-bf87-d459012d7ef6_
-Content-Type: text/html; charset="iso-8859-7"
-Content-Transfer-Encoding: quoted-printable
-
-<html>
-<head>
-<style>
-.hmmessage P
-{
-margin:0px=3B
-padding:0px
+pcm.bt {
+        type bluetooth
+        device 00:0B:2E:D5:27:DA
+        profile voice
 }
-body.hmmessage
-{
-font-size: 10pt=3B
-font-family:Verdana
+
+pcm.rbt {
+        type plug
+        slave {
+                pcm bt
+        }
 }
-</style>
-</head>
-<body class=3D'hmmessage'>
-Hi=2C<br><br>i did at first pass all 3 in a single line and did not work=2C=
-<br>then i've read somewhere at modprobe uses only one "module" at a time a=
-nd tried one by one=2C which did not work either.<br><br>thanx for answerin=
-g<br><br>Eugene<br><br>&gt=3B Date: Fri=2C 5 Dec 2008 18:20:22 +0100<br>&gt=
-=3B From: patrys@pld-linux.org<br>&gt=3B To: bluez-devel@lists.sourceforge.=
-net<br>&gt=3B Subject: Re: [Bluez-devel] MA-720 does not work<br>&gt=3B <br=
->&gt=3B On Fri=2C Dec 5=2C 2008 at 6:10 PM=2C Evgenios Metaxas &lt=3Beumeta=
-xas@hotmail.com&gt=3B wrote:<br>&gt=3B &gt=3B Thank you for your answer=2C<=
-br>&gt=3B &gt=3B<br>&gt=3B &gt=3B modprobe hci_usb gives no error=2C but<br=
->&gt=3B &gt=3B<br>&gt=3B &gt=3B modprobe  vendor=3D0df7 or modprobe product=
-=3D0722<br>&gt=3B &gt=3B gives<br>&gt=3B &gt=3B<br>&gt=3B &gt=3B FATAL: Mod=
-ule vendor=3D0df7 not found<br>&gt=3B <br>&gt=3B You are supposed to pass a=
-ll 3 in a single line. product and vendor<br>&gt=3B are options for the hci=
-_usb module.<br>&gt=3B <br>&gt=3B -- <br>&gt=3B Patryk Zawadzki<br>&gt=3B <=
-br>&gt=3B -----------------------------------------------------------------=
--------------<br>&gt=3B SF.Net email is Sponsored by MIX09=2C March 18-20=
-=2C 2009 in Las Vegas=2C Nevada.<br>&gt=3B The future of the web can't happ=
-en without you.  Join us at MIX09 to help<br>&gt=3B pave the way to the Nex=
-t Web now. Learn more and register at<br>&gt=3B http://ad.doubleclick.net/c=
-lk=3B208669438=3B13503038=3Bi?http://2009.visitmix.com/<br>&gt=3B _________=
-______________________________________<br>&gt=3B Bluez-devel mailing list<b=
-r>&gt=3B Bluez-devel@lists.sourceforge.net<br>&gt=3B https://lists.sourcefo=
-rge.net/lists/listinfo/bluez-devel<br><br /><hr />Invite your mail contacts=
- to join your friends list with Windows Live Spaces. It's easy! <a href=3D'=
-http://spaces.live.com/spacesapi.aspx?wx_action=3Dcreate&wx_url=3D/friends.=
-aspx&mkt=3Den-us' target=3D'_new'>Try it!</a></body>
-</html>=
 
---_3679ae7f-c24c-4c91-bf87-d459012d7ef6_--
+/etc/bluetooth/audio.conf:
+[General]
+SCORouting=PCM
+
+[Headset]
+HFP=false
 
 
---===============2717441880434290826==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Pertinent output of "hcid -n -d" (this is what happens when I actually 
+try to play audio with "aplay -D bt -f S16_LE test.wav". Yes, the test 
+wavfile is 8Khz S16_LE PCM WAV audio):
+
+hcid[1383]: Accepted new client connection on unix socket (fd=22)
+hcid[1383]: Audio API: received BT_GETCAPABILITIES_REQ
+hcid[1383]: Audio API: sending BT_GETCAPABILITIES_RSP
+hcid[1383]: Audio API: received BT_SETCONFIGURATION_REQ
+hcid[1383]: config sco - device = 00:0B:2E:D5:27:DA access_mode = 2
+hcid[1383]: State changed /org/bluez/audio/device0: 
+HEADSET_STATE_DISCONNECTED -> HEADSET_STATE_CONNECT_IN_PROGRESS
+hcid[1383]: /org/bluez/audio/device0: Connecting to 00:0B:2E:D5:27:DA 
+channel 2
+hcid[1383]: link_key_request (sba=00:02:5B:00:A5:A5, dba=00:0B:2E:D5:27:DA)
+hcid[1383]: kernel auth requirements = 0x00
+hcid[1383]: stored link key type = 0x00
+hcid[1383]: /org/bluez/audio/device0: Connected to 00:0B:2E:D5:27:DA
+hcid[1383]: State changed /org/bluez/audio/device0: 
+HEADSET_STATE_CONNECT_IN_PROGRESS -> HEADSET_STATE_CONNECTED
+hcid[1383]: State changed /org/bluez/audio/device0: 
+HEADSET_STATE_CONNECTED -> HEADSET_STATE_PLAY_IN_PROGRESS
+hcid[1383]: SCO socket opened for headset /org/bluez/audio/device0
+hcid[1383]: SCO fd=24
+hcid[1383]: Audio API: sending BT_SETCONFIGURATION_RSP
+hcid[1383]: State changed /org/bluez/audio/device0: 
+HEADSET_STATE_PLAY_IN_PROGRESS -> HEADSET_STATE_PLAYING
+hcid[1383]: Audio API: received BT_STREAMSTART_REQ
+hcid[1383]: Audio API: sending BT_STREAMSTART_RSP
+hcid[1383]: Audio API: sending BT_STREAMFD_IND
+hcid[1383]: Unix client disconnected (fd=22)
+hcid[1383]: State changed /org/bluez/audio/device0: 
+HEADSET_STATE_PLAYING -> HEADSET_STATE_CONNECTED
+hcid[1383]: State changed /org/bluez/audio/device0: 
+HEADSET_STATE_CONNECTED -> HEADSET_STATE_DISCONNECTED
+
+
+I'm open to any suggestions. If more info is needed, tell me what you'd 
+like to see and I'll post it up.
+
+Thanks in advance,
+
+-d
+
+
+
+
+
+
 
 ------------------------------------------------------------------------------
 SF.Net email is Sponsored by MIX09, March 18-20, 2009 in Las Vegas, Nevada.
 The future of the web can't happen without you.  Join us at MIX09 to help
 pave the way to the Next Web now. Learn more and register at
 http://ad.doubleclick.net/clk;208669438;13503038;i?http://2009.visitmix.com/
---===============2717441880434290826==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============2717441880434290826==--
