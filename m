@@ -1,15 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <e343e5940812061301w368d0614s85e4f82938e76c3a@mail.gmail.com>
-Date: Sun, 7 Dec 2008 03:01:57 +0600
-From: "Yuriy Vikulov" <vikulov@jami.ru>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <COL102-W7079DBA98D2EA5B8835568A8FF0@phx.gbl>
-MIME-Version: 1.0
+Message-ID: <COL102-W7079DBA98D2EA5B8835568A8FF0@phx.gbl>
+From: Evgenios Metaxas <eumetaxas@hotmail.com>
+To: <bluez-devel@lists.sourceforge.net>
+Date: Sat, 6 Dec 2008 18:55:09 +0000
+In-Reply-To: <89b6ba3a0812050920q1dea080i148d9c4677b6ed04@mail.gmail.com>
 References: <COL102-W12443FB0254944C58D2F2FA8020@phx.gbl>
 	<e343e5940812050154i52fb8eb3x46cf6e73e5a0c8f9@mail.gmail.com>
 	<BAY127-W1206CF6F607105AA558C2DA8FE0@phx.gbl>
 	<89b6ba3a0812050920q1dea080i148d9c4677b6ed04@mail.gmail.com>
-	<COL102-W7079DBA98D2EA5B8835568A8FF0@phx.gbl>
+MIME-Version: 1.0
 Subject: Re: [Bluez-devel] MA-720 does not work
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -20,154 +19,121 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============2418472545771645991=="
+Content-Type: multipart/mixed; boundary="===============2717441880434290826=="
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============2418472545771645991==
+--===============2717441880434290826==
 Content-Type: multipart/alternative;
-	boundary="----=_Part_46445_4545574.1228597317265"
+	boundary="_3679ae7f-c24c-4c91-bf87-d459012d7ef6_"
 
-------=_Part_46445_4545574.1228597317265
-Content-Type: text/plain; charset=KOI8-R
-Content-Transfer-Encoding: base64
-Content-Disposition: inline
-
-aW4gdGhpcyBsaW5lIHRoZXJlIGlzIG9ubHkgb25lIG1vZHVsZSBoY2lfdXNiLiB0aGUgb3RoZXIg
-d29yZHMgYXJlCnBhcmFtZXRlcnMgZm9yIHRoaXMgbW9kdWxlLgpidXQgaSAgZG9uJ3QgIGtub3cg
-ZXhhY3RseSBpZiB3ZSBjYW4gdXNlIHRob3NlIHBhcmFtZXRlcnMuCkkgdHJpZWQgdG8gaGVscCB5
-b3UgaW4gdGhpcyB3YXkgYmVjYXVzZSBlYXJseSAgSSBkaWQgbGlrZSB0aGlzIGZvciBtb2R1bGUK
-J3VzYnNlcmlhbCcuIHNvIEkgc3VwcG9zZWQgaXQgd291bGQgYmUgaGVscGZ1bAoKCjIwMDgvMTIv
-NyBFdmdlbmlvcyBNZXRheGFzIDxldW1ldGF4YXNAaG90bWFpbC5jb20+Cgo+ICBIaSwKPgo+IGkg
-ZGlkIGF0IGZpcnN0IHBhc3MgYWxsIDMgaW4gYSBzaW5nbGUgbGluZSBhbmQgZGlkIG5vdCB3b3Jr
-LAo+IHRoZW4gaSd2ZSByZWFkIHNvbWV3aGVyZSBhdCBtb2Rwcm9iZSB1c2VzIG9ubHkgb25lICJt
-b2R1bGUiIGF0IGEgdGltZSBhbmQKPiB0cmllZCBvbmUgYnkgb25lLCB3aGljaCBkaWQgbm90IHdv
-cmsgZWl0aGVyLgo+Cj4gdGhhbnggZm9yIGFuc3dlcmluZwo+Cj4gRXVnZW5lCj4KPiA+IERhdGU6
-IEZyaSwgNSBEZWMgMjAwOCAxODoyMDoyMiArMDEwMAo+ID4gRnJvbTogcGF0cnlzQHBsZC1saW51
-eC5vcmcKPiA+IFRvOiBibHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKPiA+IFN1Ympl
-Y3Q6IFJlOiBbQmx1ZXotZGV2ZWxdIE1BLTcyMCBkb2VzIG5vdCB3b3JrCj4gPgo+ID4gT24gRnJp
-LCBEZWMgNSwgMjAwOCBhdCA2OjEwIFBNLCBFdmdlbmlvcyBNZXRheGFzIDxldW1ldGF4YXNAaG90
-bWFpbC5jb20+Cj4gd3JvdGU6Cj4gPiA+IFRoYW5rIHlvdSBmb3IgeW91ciBhbnN3ZXIsCj4gPiA+
-Cj4gPiA+IG1vZHByb2JlIGhjaV91c2IgZ2l2ZXMgbm8gZXJyb3IsIGJ1dAo+ID4gPgo+ID4gPiBt
-b2Rwcm9iZSB2ZW5kb3I9MGRmNyBvciBtb2Rwcm9iZSBwcm9kdWN0PTA3MjIKPiA+ID4gZ2l2ZXMK
-PiA+ID4KPiA+ID4gRkFUQUw6IE1vZHVsZSB2ZW5kb3I9MGRmNyBub3QgZm91bmQKPiA+Cj4gPiBZ
-b3UgYXJlIHN1cHBvc2VkIHRvIHBhc3MgYWxsIDMgaW4gYSBzaW5nbGUgbGluZS4gcHJvZHVjdCBh
-bmQgdmVuZG9yCj4gPiBhcmUgb3B0aW9ucyBmb3IgdGhlIGhjaV91c2IgbW9kdWxlLgo+ID4KPiA+
-IC0tCj4gPiBQYXRyeWsgWmF3YWR6a2kKPiA+Cj4gPgo+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+
-ID4gU0YuTmV0IGVtYWlsIGlzIFNwb25zb3JlZCBieSBNSVgwOSwgTWFyY2ggMTgtMjAsIDIwMDkg
-aW4gTGFzIFZlZ2FzLAo+IE5ldmFkYS4KPiA+IFRoZSBmdXR1cmUgb2YgdGhlIHdlYiBjYW4ndCBo
-YXBwZW4gd2l0aG91dCB5b3UuIEpvaW4gdXMgYXQgTUlYMDkgdG8gaGVscAo+ID4gcGF2ZSB0aGUg
-d2F5IHRvIHRoZSBOZXh0IFdlYiBub3cuIExlYXJuIG1vcmUgYW5kIHJlZ2lzdGVyIGF0Cj4gPgo+
-IGh0dHA6Ly9hZC5kb3VibGVjbGljay5uZXQvY2xrOzIwODY2OTQzODsxMzUwMzAzODtpP2h0dHA6
-Ly8yMDA5LnZpc2l0bWl4LmNvbS8KPiA+IF9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fCj4gPiBCbHVlei1kZXZlbCBtYWlsaW5nIGxpc3QKPiA+IEJsdWV6LWRl
-dmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldAo+ID4gaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5u
-ZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwKPgo+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLQo+IEludml0ZSB5b3VyIG1haWwgY29udGFjdHMgdG8gam9pbiB5b3VyIGZyaWVuZHMg
-bGlzdCB3aXRoIFdpbmRvd3MgTGl2ZQo+IFNwYWNlcy4gSXQncyBlYXN5ISBUcnkgaXQhPGh0dHA6
-Ly9zcGFjZXMubGl2ZS5jb20vc3BhY2VzYXBpLmFzcHg/d3hfYWN0aW9uPWNyZWF0ZSZ3eF91cmw9
-L2ZyaWVuZHMuYXNweCZta3Q9ZW4tdXM+Cj4KPgo+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+IFNG
-Lk5ldCBlbWFpbCBpcyBTcG9uc29yZWQgYnkgTUlYMDksIE1hcmNoIDE4LTIwLCAyMDA5IGluIExh
-cyBWZWdhcywgTmV2YWRhLgo+IFRoZSBmdXR1cmUgb2YgdGhlIHdlYiBjYW4ndCBoYXBwZW4gd2l0
-aG91dCB5b3UuICBKb2luIHVzIGF0IE1JWDA5IHRvIGhlbHAKPiBwYXZlIHRoZSB3YXkgdG8gdGhl
-IE5leHQgV2ViIG5vdy4gTGVhcm4gbW9yZSBhbmQgcmVnaXN0ZXIgYXQKPgo+IGh0dHA6Ly9hZC5k
-b3VibGVjbGljay5uZXQvY2xrOzIwODY2OTQzODsxMzUwMzAzODtpP2h0dHA6Ly8yMDA5LnZpc2l0
-bWl4LmNvbS8KPiBfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-Xwo+IEJsdWV6LWRldmVsIG1haWxpbmcgbGlzdAo+IEJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZv
-cmdlLm5ldAo+IGh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2Js
-dWV6LWRldmVsCj4KPgoKCi0tIAogICAgICAgICAgICAg8yDV18HWxc7Jxc0sCgogICAgICAgICAg
-ICDg0snKIPfJy9XMz9cKCiAgICAg98XE1d3JyiDQ0s/H0sHNzcnT1AoKIPfL1dPO2cUgzc/CyczY
-ztnFINPF0tfJ09kKCu/GydM6ICAgICAgICAgICAgICAgICArNyAoNDk1KSA3ODAtOTIzOAoK7c/C
-yczYztnKOiAgICAgICAgKzcgKDkxNikgMTk0IDI3MTEKCnZpa3Vsb3ZAamFtaS5ydSAgICB8ICAg
-IHd3dy5qYW1pLnJ1CgogICAgICAgICAgICAgIGxvZ28tamFtaS1zbWFsbAo=
-------=_Part_46445_4545574.1228597317265
-Content-Type: text/html; charset=KOI8-R
-Content-Transfer-Encoding: base64
-Content-Disposition: inline
-
-aW4gdGhpcyBsaW5lIHRoZXJlIGlzIG9ubHkgb25lIG1vZHVsZSBoY2lfdXNiLiB0aGUgb3RoZXIg
-d29yZHMgYXJlIHBhcmFtZXRlcnMgZm9yIHRoaXMgbW9kdWxlLjxicj5idXQgaSZuYnNwOyBkb24m
-IzM5O3QmbmJzcDsga25vdyBleGFjdGx5IGlmIHdlIGNhbiB1c2UgdGhvc2UgcGFyYW1ldGVycy4g
-PGJyPkkgdHJpZWQgdG8gaGVscCB5b3UgaW4gdGhpcyB3YXkgYmVjYXVzZSBlYXJseSZuYnNwOyBJ
-IGRpZCBsaWtlIHRoaXMgZm9yIG1vZHVsZSAmIzM5O3VzYnNlcmlhbCYjMzk7LiBzbyBJIHN1cHBv
-c2VkIGl0IHdvdWxkIGJlIGhlbHBmdWw8YnI+Cjxicj48YnI+PGRpdiBjbGFzcz0iZ21haWxfcXVv
-dGUiPjIwMDgvMTIvNyBFdmdlbmlvcyBNZXRheGFzIDxzcGFuIGRpcj0ibHRyIj4mbHQ7PGEgaHJl
-Zj0ibWFpbHRvOmV1bWV0YXhhc0Bob3RtYWlsLmNvbSI+ZXVtZXRheGFzQGhvdG1haWwuY29tPC9h
-PiZndDs8L3NwYW4+PGJyPjxibG9ja3F1b3RlIGNsYXNzPSJnbWFpbF9xdW90ZSIgc3R5bGU9ImJv
-cmRlci1sZWZ0OiAxcHggc29saWQgcmdiKDIwNCwgMjA0LCAyMDQpOyBtYXJnaW46IDBwdCAwcHQg
-MHB0IDAuOGV4OyBwYWRkaW5nLWxlZnQ6IDFleDsiPgoKCgoKPGRpdj4KSGksPGJyPjxicj5pIGRp
-ZCBhdCBmaXJzdCBwYXNzIGFsbCAzIGluIGEgc2luZ2xlIGxpbmUgYW5kIGRpZCBub3Qgd29yayw8
-YnI+dGhlbiBpJiMzOTt2ZSByZWFkIHNvbWV3aGVyZSBhdCBtb2Rwcm9iZSB1c2VzIG9ubHkgb25l
-ICZxdW90O21vZHVsZSZxdW90OyBhdCBhIHRpbWUgYW5kIHRyaWVkIG9uZSBieSBvbmUsIHdoaWNo
-IGRpZCBub3Qgd29yayBlaXRoZXIuPGJyPjxicj50aGFueCBmb3IgYW5zd2VyaW5nPGJyPgo8YnI+
-RXVnZW5lPGJyPjxicj4mZ3Q7IERhdGU6IEZyaSwgNSBEZWMgMjAwOCAxODoyMDoyMiArMDEwMDxi
-cj4mZ3Q7IEZyb206IDxhIGhyZWY9Im1haWx0bzpwYXRyeXNAcGxkLWxpbnV4Lm9yZyIgdGFyZ2V0
-PSJfYmxhbmsiPnBhdHJ5c0BwbGQtbGludXgub3JnPC9hPjxkaXYgY2xhc3M9IkloMkUzZCI+PGJy
-PiZndDsgVG86IDxhIGhyZWY9Im1haWx0bzpibHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5u
-ZXQiIHRhcmdldD0iX2JsYW5rIj5ibHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQ8L2E+
-PGJyPgomZ3Q7IFN1YmplY3Q6IFJlOiBbQmx1ZXotZGV2ZWxdIE1BLTcyMCBkb2VzIG5vdCB3b3Jr
-PGJyPiZndDsgPGJyPjwvZGl2PjxkaXY+PGRpdj48L2Rpdj48ZGl2IGNsYXNzPSJXajNDN2MiPiZn
-dDsgT24gRnJpLCBEZWMgNSwgMjAwOCBhdCA2OjEwIFBNLCBFdmdlbmlvcyBNZXRheGFzICZsdDs8
-YSBocmVmPSJtYWlsdG86ZXVtZXRheGFzQGhvdG1haWwuY29tIiB0YXJnZXQ9Il9ibGFuayI+ZXVt
-ZXRheGFzQGhvdG1haWwuY29tPC9hPiZndDsgd3JvdGU6PGJyPgomZ3Q7ICZndDsgVGhhbmsgeW91
-IGZvciB5b3VyIGFuc3dlciw8YnI+Jmd0OyAmZ3Q7PGJyPiZndDsgJmd0OyBtb2Rwcm9iZSBoY2lf
-dXNiIGdpdmVzIG5vIGVycm9yLCBidXQ8YnI+Jmd0OyAmZ3Q7PGJyPiZndDsgJmd0OyBtb2Rwcm9i
-ZSAgdmVuZG9yPTBkZjcgb3IgbW9kcHJvYmUgcHJvZHVjdD0wNzIyPGJyPiZndDsgJmd0OyBnaXZl
-czxicj4mZ3Q7ICZndDs8YnI+Jmd0OyAmZ3Q7IEZBVEFMOiBNb2R1bGUgdmVuZG9yPTBkZjcgbm90
-IGZvdW5kPGJyPgomZ3Q7IDxicj4mZ3Q7IFlvdSBhcmUgc3VwcG9zZWQgdG8gcGFzcyBhbGwgMyBp
-biBhIHNpbmdsZSBsaW5lLiBwcm9kdWN0IGFuZCB2ZW5kb3I8YnI+Jmd0OyBhcmUgb3B0aW9ucyBm
-b3IgdGhlIGhjaV91c2IgbW9kdWxlLjxicj4mZ3Q7IDxicj4mZ3Q7IC0tIDxicj4mZ3Q7IFBhdHJ5
-ayBaYXdhZHpraTxicj4mZ3Q7IDxicj4mZ3Q7IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLTxicj4KJmd0
-OyBTRi5OZXQgZW1haWwgaXMgU3BvbnNvcmVkIGJ5IE1JWDA5LCBNYXJjaCAxOC0yMCwgMjAwOSBp
-biBMYXMgVmVnYXMsIE5ldmFkYS48YnI+Jmd0OyBUaGUgZnV0dXJlIG9mIHRoZSB3ZWIgY2FuJiMz
-OTt0IGhhcHBlbiB3aXRob3V0IHlvdS4gIEpvaW4gdXMgYXQgTUlYMDkgdG8gaGVscDxicj4mZ3Q7
-IHBhdmUgdGhlIHdheSB0byB0aGUgTmV4dCBXZWIgbm93LiBMZWFybiBtb3JlIGFuZCByZWdpc3Rl
-ciBhdDxicj4KJmd0OyA8YSBocmVmPSJodHRwOi8vYWQuZG91YmxlY2xpY2submV0L2NsazsyMDg2
-Njk0Mzg7MTM1MDMwMzg7aT9odHRwOi8vMjAwOS52aXNpdG1peC5jb20vIiB0YXJnZXQ9Il9ibGFu
-ayI+aHR0cDovL2FkLmRvdWJsZWNsaWNrLm5ldC9jbGs7MjA4NjY5NDM4OzEzNTAzMDM4O2k/aHR0
-cDovLzIwMDkudmlzaXRtaXguY29tLzwvYT48YnI+Jmd0OyBfX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fXzxicj4KJmd0OyBCbHVlei1kZXZlbCBtYWlsaW5nIGxp
-c3Q8YnI+Jmd0OyA8YSBocmVmPSJtYWlsdG86Qmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2Uu
-bmV0IiB0YXJnZXQ9Il9ibGFuayI+Qmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0PC9h
-Pjxicj4mZ3Q7IDxhIGhyZWY9Imh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xp
-c3RpbmZvL2JsdWV6LWRldmVsIiB0YXJnZXQ9Il9ibGFuayI+aHR0cHM6Ly9saXN0cy5zb3VyY2Vm
-b3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWw8L2E+PGJyPgo8YnI+PC9kaXY+PC9k
-aXY+PGhyPkludml0ZSB5b3VyIG1haWwgY29udGFjdHMgdG8gam9pbiB5b3VyIGZyaWVuZHMgbGlz
-dCB3aXRoIFdpbmRvd3MgTGl2ZSBTcGFjZXMuIEl0JiMzOTtzIGVhc3khIDxhIGhyZWY9Imh0dHA6
-Ly9zcGFjZXMubGl2ZS5jb20vc3BhY2VzYXBpLmFzcHg/d3hfYWN0aW9uPWNyZWF0ZSZhbXA7d3hf
-dXJsPS9mcmllbmRzLmFzcHgmYW1wO21rdD1lbi11cyIgdGFyZ2V0PSJfYmxhbmsiPlRyeSBpdCE8
-L2E+PC9kaXY+Cgo8YnI+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tPGJyPgpTRi5OZXQgZW1haWwgaXMg
-U3BvbnNvcmVkIGJ5IE1JWDA5LCBNYXJjaCAxOC0yMCwgMjAwOSBpbiBMYXMgVmVnYXMsIE5ldmFk
-YS48YnI+ClRoZSBmdXR1cmUgb2YgdGhlIHdlYiBjYW4mIzM5O3QgaGFwcGVuIHdpdGhvdXQgeW91
-LiAmbmJzcDtKb2luIHVzIGF0IE1JWDA5IHRvIGhlbHA8YnI+CnBhdmUgdGhlIHdheSB0byB0aGUg
-TmV4dCBXZWIgbm93LiBMZWFybiBtb3JlIGFuZCByZWdpc3RlciBhdDxicj4KPGEgaHJlZj0iaHR0
-cDovL2FkLmRvdWJsZWNsaWNrLm5ldC9jbGs7MjA4NjY5NDM4OzEzNTAzMDM4O2k/aHR0cDovLzIw
-MDkudmlzaXRtaXguY29tLyIgdGFyZ2V0PSJfYmxhbmsiPmh0dHA6Ly9hZC5kb3VibGVjbGljay5u
-ZXQvY2xrOzIwODY2OTQzODsxMzUwMzAzODtpP2h0dHA6Ly8yMDA5LnZpc2l0bWl4LmNvbS88L2E+
-PGJyPl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fPGJyPgoK
-Qmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0PGJyPgo8YSBocmVmPSJtYWlsdG86Qmx1ZXotZGV2ZWxA
-bGlzdHMuc291cmNlZm9yZ2UubmV0Ij5CbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQ8
-L2E+PGJyPgo8YSBocmVmPSJodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0
-aW5mby9ibHVlei1kZXZlbCIgdGFyZ2V0PSJfYmxhbmsiPmh0dHBzOi8vbGlzdHMuc291cmNlZm9y
-Z2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVsPC9hPjxicj4KPGJyPjwvYmxvY2txdW90
-ZT48L2Rpdj48YnI+PGJyIGNsZWFyPSJhbGwiPjxicj4tLSA8YnI+ICZuYnNwOyAmbmJzcDsgJm5i
-c3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwO/Mg1dfB1sXOycXNLDxicj48YnI+ICZuYnNw
-OyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7IODSycog98nL1czP1zxicj48YnI+
-ICZuYnNwOyAmbmJzcDsgJm5ic3A798XE1d3JyiDQ0s/H0sHNzcnT1Dxicj48YnI+ICZuYnNwO/fL
-1dPO2cUgzc/CyczYztnFINPF0tfJ09k8YnI+PGJyPu/GydM6ICZuYnNwOyAmbmJzcDsgJm5ic3A7
-ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgKzcgKDQ5NSkgNzgwLTkyMzg8YnI+
-Cjxicj7tz8LJzNjO2co6ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOys3ICg5MTYpIDE5NCAy
-NzExPGJyPjxicj4gPGEgaHJlZj0ibWFpbHRvOnZpa3Vsb3ZAamFtaS5ydSI+dmlrdWxvdkBqYW1p
-LnJ1PC9hPiAmbmJzcDsgJm5ic3A7fCAmbmJzcDsgJm5ic3A7PGEgaHJlZj0iaHR0cDovL3d3dy5q
-YW1pLnJ1Ij53d3cuamFtaS5ydTwvYT48YnI+PGJyPiAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJz
-cDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgbG9nby1qYW1pLXNtYWxsPGJyPgo=
-------=_Part_46445_4545574.1228597317265--
+--_3679ae7f-c24c-4c91-bf87-d459012d7ef6_
+Content-Type: text/plain; charset="iso-8859-7"
+Content-Transfer-Encoding: quoted-printable
 
 
---===============2418472545771645991==
+Hi=2C
+
+i did at first pass all 3 in a single line and did not work=2C
+then i've read somewhere at modprobe uses only one "module" at a time and t=
+ried one by one=2C which did not work either.
+
+thanx for answering
+
+Eugene
+
+> Date: Fri=2C 5 Dec 2008 18:20:22 +0100
+> From: patrys@pld-linux.org
+> To: bluez-devel@lists.sourceforge.net
+> Subject: Re: [Bluez-devel] MA-720 does not work
+>=20
+> On Fri=2C Dec 5=2C 2008 at 6:10 PM=2C Evgenios Metaxas <eumetaxas@hotmail=
+.com> wrote:
+> > Thank you for your answer=2C
+> >
+> > modprobe hci_usb gives no error=2C but
+> >
+> > modprobe  vendor=3D0df7 or modprobe product=3D0722
+> > gives
+> >
+> > FATAL: Module vendor=3D0df7 not found
+>=20
+> You are supposed to pass all 3 in a single line. product and vendor
+> are options for the hci_usb module.
+>=20
+> --=20
+> Patryk Zawadzki
+>=20
+> -------------------------------------------------------------------------=
+-----
+> SF.Net email is Sponsored by MIX09=2C March 18-20=2C 2009 in Las Vegas=2C=
+ Nevada.
+> The future of the web can't happen without you.  Join us at MIX09 to help
+> pave the way to the Next Web now. Learn more and register at
+> http://ad.doubleclick.net/clk=3B208669438=3B13503038=3Bi?http://2009.visi=
+tmix.com/
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+_________________________________________________________________
+Invite your mail contacts to join your friends list with Windows Live Space=
+s. It's easy!
+http://spaces.live.com/spacesapi.aspx?wx_action=3Dcreate&wx_url=3D/friends.=
+aspx&mkt=3Den-us=
+
+--_3679ae7f-c24c-4c91-bf87-d459012d7ef6_
+Content-Type: text/html; charset="iso-8859-7"
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+<head>
+<style>
+.hmmessage P
+{
+margin:0px=3B
+padding:0px
+}
+body.hmmessage
+{
+font-size: 10pt=3B
+font-family:Verdana
+}
+</style>
+</head>
+<body class=3D'hmmessage'>
+Hi=2C<br><br>i did at first pass all 3 in a single line and did not work=2C=
+<br>then i've read somewhere at modprobe uses only one "module" at a time a=
+nd tried one by one=2C which did not work either.<br><br>thanx for answerin=
+g<br><br>Eugene<br><br>&gt=3B Date: Fri=2C 5 Dec 2008 18:20:22 +0100<br>&gt=
+=3B From: patrys@pld-linux.org<br>&gt=3B To: bluez-devel@lists.sourceforge.=
+net<br>&gt=3B Subject: Re: [Bluez-devel] MA-720 does not work<br>&gt=3B <br=
+>&gt=3B On Fri=2C Dec 5=2C 2008 at 6:10 PM=2C Evgenios Metaxas &lt=3Beumeta=
+xas@hotmail.com&gt=3B wrote:<br>&gt=3B &gt=3B Thank you for your answer=2C<=
+br>&gt=3B &gt=3B<br>&gt=3B &gt=3B modprobe hci_usb gives no error=2C but<br=
+>&gt=3B &gt=3B<br>&gt=3B &gt=3B modprobe  vendor=3D0df7 or modprobe product=
+=3D0722<br>&gt=3B &gt=3B gives<br>&gt=3B &gt=3B<br>&gt=3B &gt=3B FATAL: Mod=
+ule vendor=3D0df7 not found<br>&gt=3B <br>&gt=3B You are supposed to pass a=
+ll 3 in a single line. product and vendor<br>&gt=3B are options for the hci=
+_usb module.<br>&gt=3B <br>&gt=3B -- <br>&gt=3B Patryk Zawadzki<br>&gt=3B <=
+br>&gt=3B -----------------------------------------------------------------=
+-------------<br>&gt=3B SF.Net email is Sponsored by MIX09=2C March 18-20=
+=2C 2009 in Las Vegas=2C Nevada.<br>&gt=3B The future of the web can't happ=
+en without you.  Join us at MIX09 to help<br>&gt=3B pave the way to the Nex=
+t Web now. Learn more and register at<br>&gt=3B http://ad.doubleclick.net/c=
+lk=3B208669438=3B13503038=3Bi?http://2009.visitmix.com/<br>&gt=3B _________=
+______________________________________<br>&gt=3B Bluez-devel mailing list<b=
+r>&gt=3B Bluez-devel@lists.sourceforge.net<br>&gt=3B https://lists.sourcefo=
+rge.net/lists/listinfo/bluez-devel<br><br /><hr />Invite your mail contacts=
+ to join your friends list with Windows Live Spaces. It's easy! <a href=3D'=
+http://spaces.live.com/spacesapi.aspx?wx_action=3Dcreate&wx_url=3D/friends.=
+aspx&mkt=3Den-us' target=3D'_new'>Try it!</a></body>
+</html>=
+
+--_3679ae7f-c24c-4c91-bf87-d459012d7ef6_--
+
+
+--===============2717441880434290826==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -178,7 +144,7 @@ SF.Net email is Sponsored by MIX09, March 18-20, 2009 in Las Vegas, Nevada.
 The future of the web can't happen without you.  Join us at MIX09 to help
 pave the way to the Next Web now. Learn more and register at
 http://ad.doubleclick.net/clk;208669438;13503038;i?http://2009.visitmix.com/
---===============2418472545771645991==
+--===============2717441880434290826==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -189,4 +155,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============2418472545771645991==--
+--===============2717441880434290826==--
