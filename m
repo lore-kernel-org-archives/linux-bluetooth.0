@@ -1,31 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <493BC885.5030303@gentoo.org>
-Date: Sun, 07 Dec 2008 12:58:45 +0000
-From: Daniel Drake <dsd@gentoo.org>
-MIME-Version: 1.0
-To: Andrew Morton <akpm@linux-foundation.org>
-CC: Luca Santarelli <hrk@users.sourceforge.net>, marcel@holtmann.org,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] bluetooth usb hci: ISSC usb dongle with buggy SCO  support
-References: <200812050002.13560.hrk@users.sourceforge.net> <20081207001953.c04b9357.akpm@linux-foundation.org>
-In-Reply-To: <20081207001953.c04b9357.akpm@linux-foundation.org>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Date: Sun, 7 Dec 2008 00:19:53 -0800
+From: Andrew Morton <akpm@linux-foundation.org>
+To: Luca Santarelli <hrk@users.sourceforge.net>
+Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] bluetooth usb hci: ISSC usb dongle with buggy SCO
+ support
+Message-Id: <20081207001953.c04b9357.akpm@linux-foundation.org>
+In-Reply-To: <200812050002.13560.hrk@users.sourceforge.net>
+References: <200812050002.13560.hrk@users.sourceforge.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Andrew Morton wrote:
-> commit 12421b40b81d101d7535e03f1af197365adc932b
-> Author: Marcel Holtmann <marcel@holtmann.org>
-> Date:   Sun Nov 30 12:17:21 2008 +0100
-> 
->     Bluetooth: Remove deprecated hci_usb driver
->     
->     The old hci_usb driver has been fully replaced with the new btusb driver
->     and all major distributions switched to the new driver now. This removes
->     it since it should not be used at all anymore.
-> 
-> so please confirm that btusb correctly supports that hardware?
+On Fri, 5 Dec 2008 00:02:13 +0100 Luca Santarelli <hrk@users.sourceforge.net> wrote:
 
-And if it doesn't, it should be trivial to come up with an equivalent 
-patch to modify blacklist_table in btusb.
+> From: Luca Santarelli <hrk <t> users.sourceforge.net>
+> 
+> As reported at:
+> http://bugs.gentoo.org/show_bug.cgi?id=249523
+> and in reference of similar patches such as:
+> http://thread.gmane.org/gmane.linux.bluez.devel/15067
+> 
+> This patch changes the blacklist entry for the ISSC bluetooth USB
+> dongle fixing the issue of the repeatedly appearing message
+> 
+>   hci_scodata_packet: hci0 SCO packet for unknown connection handle 92
+> 
+> in the kernel logs.
+> 
+> Sighed-off-by: Luca Santarelli <hrk <at> users.sourceforge.net>
+> ---
+> This is my first kernel patch ever, I read the docs, but please notify
+> me if I made any mistake. Thank you all for your work, I'm happy to have
+> been able to contribute to this!
+> 
+> The patch has been run against 2.6.27.7 and has been tested on three x86
+> machines, showing no issues. In my own tests, the dongle has been then
+> used to connect to devices and everything worked fine.
+> 
+> --- linux-2.6.27.7/drivers/bluetooth/hci_usb.c.orig	2008-12-04 20:18:38.000000000 +0100
+> +++ linux-2.6.27.7/drivers/bluetooth/hci_usb.c	2008-12-04 20:19:37.000000000 +0100
+> @@ -148,8 +148,8 @@ static struct usb_device_id blacklist_id
+>  	{ USB_DEVICE(0x047d, 0x105d), .driver_info = HCI_RESET },
+>  	{ USB_DEVICE(0x047d, 0x105e), .driver_info = HCI_RESET | HCI_WRONG_SCO_MTU },
+>  
+> -	/* ISSC Bluetooth Adapter v3.1 */
+> -	{ USB_DEVICE(0x1131, 0x1001), .driver_info = HCI_RESET },
+> +	/* ISSC Bluetooth Adapter v3.1 with buggy SCO support */
+> +	{ USB_DEVICE(0x1131, 0x1001), .driver_info = HCI_RESET | HCI_BROKEN_ISOC },
+>  
+>  	/* RTX Telecom based adapters with buggy SCO support */
+>  	{ USB_DEVICE(0x0400, 0x0807), .driver_info = HCI_BROKEN_ISOC },
 
-Daniel
+linux-next has:
+
+commit 12421b40b81d101d7535e03f1af197365adc932b
+Author: Marcel Holtmann <marcel@holtmann.org>
+Date:   Sun Nov 30 12:17:21 2008 +0100
+
+    Bluetooth: Remove deprecated hci_usb driver
+    
+    The old hci_usb driver has been fully replaced with the new btusb driver
+    and all major distributions switched to the new driver now. This removes
+    it since it should not be used at all anymore.
+
+so please confirm that btusb correctly supports that hardware?
