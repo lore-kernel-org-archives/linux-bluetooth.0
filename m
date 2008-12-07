@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <493B281E.3000200@slackdot.org>
+Date: Sat, 06 Dec 2008 20:34:22 -0500
+From: "Rob \"Deker\" Dekelbaum" <deker@slackdot.org>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <493B281E.3000200@slackdot.org>
 References: <4939BB42.1080607@slackdot.org>
 	<1228598207.28839.49.camel@violet.holtmann.net>
-	<493B281E.3000200@slackdot.org>
-Date: Sun, 07 Dec 2008 03:14:15 +0100
-Message-Id: <1228616055.28839.51.camel@violet.holtmann.net>
-Mime-Version: 1.0
+In-Reply-To: <1228598207.28839.49.camel@violet.holtmann.net>
 Subject: Re: [Bluez-devel] Continued SCO audio issues...
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,24 +20,25 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Rob,
-
-> > you never thought that routing the SCO packets via the chips internal
-> > PCM (instead of HCI) might be a problem if you wanna use ALSA?
+Marcel Holtmann wrote:
 >
->  I'm not certain I'm understanding you correctly. Are you saying that 
-> audio SHOULD be routed through the HCI? We are currently routing the 
-> audio via the PCM via the "SCORouting=PCM"...I may have forgotten to put 
-> that into the message, but it is indeed in the config file.
+> you never thought that routing the SCO packets via the chips internal
+> PCM (instead of HCI) might be a problem if you wanna use ALSA?
+>
+> Regards
+>
+>   
 
-then why are you messing with the ALSA plugin? Just use D-Bus to
-establish the connection.
+Marcel,
 
-Regards
+ I'm not certain I'm understanding you correctly. Are you saying that 
+audio SHOULD be routed through the HCI? We are currently routing the 
+audio via the PCM via the "SCORouting=PCM"...I may have forgotten to put 
+that into the message, but it is indeed in the config file.
 
-Marcel
+Thanks,
 
-
+-d
 
 ------------------------------------------------------------------------------
 SF.Net email is Sponsored by MIX09, March 18-20, 2009 in Las Vegas, Nevada.
