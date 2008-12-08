@@ -1,13 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <493D6925.3070206@slackdot.org>
-Date: Mon, 08 Dec 2008 13:36:21 -0500
-From: "Rob \"Deker\" Dekelbaum" <deker@slackdot.org>
+Message-ID: <493CE4E7.9090400@powercraft.nl>
+Date: Mon, 08 Dec 2008 10:12:07 +0100
+From: Jelle de Jong <jelledejong@powercraft.nl>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <4939BB42.1080607@slackdot.org>	<1228598207.28839.49.camel@violet.holtmann.net>	<493B281E.3000200@slackdot.org>	<1228616055.28839.51.camel@violet.holtmann.net>
-	<493BF4F8.4050609@slackdot.org>
-In-Reply-To: <493BF4F8.4050609@slackdot.org>
-Subject: Re: [Bluez-devel] Continued SCO audio issues...
+References: <000401c95911$b1b22cd0$15168670$@de>
+In-Reply-To: <000401c95911$b1b22cd0$15168670$@de>
+Cc: 'Brad Midgley' <bmidgley@xmission.com>
+Subject: Re: [Bluez-devel] SBC debugging takes place here
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,75 +20,51 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Christian Hoene wrote:
+> Hello,
+> 
+> we are trying to fix the SBC bugs here:
+> http://github.com/hoene/bluez-sbc/tree/sbc.debugging
+> Question? Meet me at Skype "christian.hoene"
+> 
+> Regards,
+>   Christian
 
-I've done a little more looking and you are correct that my SCO routing 
-on the embedded devices I'm using (Compulab EM-X270) is incorrect 
-(hciconfig revision reports SCO routing to PCM rather than HCI). 
-Unfortunately, bccmd doesn't seem to work right on this platform (I 
-haven't dug into why yet) so I'm at a loss as to how to change it. Any 
-suggestions are really appreciated.
+Hi Christian,
 
-Thanks,
+Thank you for your great initiative. I would like to follow the process
+and do some possible testing, but I have a few questions.
 
--d
+Is your git tree a branch from the original one, was it not possible to
+enhance the original branch? You could have made a new configuration
+flag to enable and test your code for compilation. I have had very bad
+experiences with developers taking out code from the mainstream and then
+trying to fix it, it provided a lot of resistance when merging the code
+back. It is highly advisable to keep the code at one place for
+everybody. I am also not possible to test two different code sources..
 
-deker wrote:
-> I'd be happy to give it a shot. Could you direct me to some docs as to 
-> how do that?
->
-> Thanks,
->
-> -d
->
-> Marcel Holtmann wrote:
->   
->> Hi Rob,
->>
->>   
->>     
->>>> you never thought that routing the SCO packets via the chips internal
->>>> PCM (instead of HCI) might be a problem if you wanna use ALSA?
->>>>       
->>>>         
->>>  I'm not certain I'm understanding you correctly. Are you saying that 
->>> audio SHOULD be routed through the HCI? We are currently routing the 
->>> audio via the PCM via the "SCORouting=PCM"...I may have forgotten to put 
->>> that into the message, but it is indeed in the config file.
->>>     
->>>       
->> then why are you messing with the ALSA plugin? Just use D-Bus to
->> establish the connection.
->>
->> Regards
->>
->> Marcel
->>
->>
->>
->> ------------------------------------------------------------------------------
->> SF.Net email is Sponsored by MIX09, March 18-20, 2009 in Las Vegas, Nevada.
->> The future of the web can't happen without you.  Join us at MIX09 to help
->> pave the way to the Next Web now. Learn more and register at
->> http://ad.doubleclick.net/clk;208669438;13503038;i?http://2009.visitmix.com/
->> _______________________________________________
->> Bluez-devel mailing list
->> Bluez-devel@lists.sourceforge.net
->> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->>   
->>     
->
->
-> ------------------------------------------------------------------------------
-> SF.Net email is Sponsored by MIX09, March 18-20, 2009 in Las Vegas, Nevada.
-> The future of the web can't happen without you.  Join us at MIX09 to help
-> pave the way to the Next Web now. Learn more and register at
-> http://ad.doubleclick.net/clk;208669438;13503038;i?http://2009.visitmix.com/
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->   
+I am also not possible to use the proprietary skype, it is not possible
+to use two streams at once when using bluetooth speakers, and the alsa
+compliance of the skype program is not there at all. Could you please
+use IRC and the #bluez channel on chat.freenode.org?
 
+Maybe an other bluez developer can help out Christian, with commit
+access and code reviewing for the original git repository, so we don't
+have to branch the code repositories to different places and development
+styles...
+
+There is a good book about how to produce open source software and can
+possibly give some guidelines how to do some things, the book can be
+found here: http://producingoss.com/
+
+When I reply to all your email address is replaced to an reply header of
+Brad Midgley is this correct?
+
+Just some few comments, I thing your initiative is great!
+
+Best regards,
+
+Jelle de Jong
 
 ------------------------------------------------------------------------------
 SF.Net email is Sponsored by MIX09, March 18-20, 2009 in Las Vegas, Nevada.
