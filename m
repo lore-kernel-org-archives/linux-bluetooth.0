@@ -1,133 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <493D7110.1020508@tommie-lie.de>
-Date: Mon, 08 Dec 2008 20:10:08 +0100
-From: Thomas Liebetraut <thomas@tommie-lie.de>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: How to set link policy with Logitech diNovo dongle
-Content-Type: text/plain; charset=ISO-8859-15
+Subject: Re: [PATCH] Add parent dev in rfcomm tty sysfs registration
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Alban Browaeys <prahal@yahoo.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <493D6E2F.7000406@yahoo.com>
+References: <493D6E2F.7000406@yahoo.com>
+Content-Type: text/plain
+Date: Mon, 08 Dec 2008 20:07:51 +0100
+Message-Id: <1228763271.28839.91.camel@violet.holtmann.net>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Alban,
 
-Hi everyone,
+> This is an attempt at getting the parent device to be bound to the sysfs 
+> entry of rfcomm tty.
+> This let hal detect it properly when connecting. No more.
+> 
+> Thus one have to :
+> $ rfcomm connect 0
+> after adding his configuration for the device to connect to in 
+> /etc/bluetooth/rfcomm.conf
+> One need a patch to hal (for to add the address and channel data to the 
+> hald/linux/device.c serial handler) and an fdi for  to add the  
+> capabilities  to get  the serial line to be recognized as a modem by 
+> NetworkManager.
+> 
+> Maybe it could be achieved at bind. Though this would either requires a 
+> change to rfcomm to get the sysfs data available at bind and not connect 
+> or to have hal poll bluez (I don't know yet if udev send event at rfcomm 
+> bind /dev/rfcommX creation so if polling could be avoided).
+> 
+> 
+> Also this does not address the lack of presence of rfcomm tty in 
+> /sys/devices. This I am too lost in the different device_move to know if 
+> it is registered in /sys/devices then moved to /sys/class/bluetooth or 
+> if something is missing for to get the entries in /sys/devices . Tty 
+> available documentation implying it should be automatic lead me to think 
+> device_move is the key of this issue.
+> 
+> So it is not a panacea but with this at least it becomes "possible" to 
+> get something out of hal and with a single script that rfcomm connect to 
+> get the bluetooth serial device in NetworkManager.
 
-I recently got a used Logitech diNovo Media Desktop. It has a bluetooth
-hub and the Logitech MX900 bluetooth mouse. I first connected everything
-to my laptop with integrated Cambridge Silicon Bluetooth and everything
-worked fine. Then I plugged the Logitech hub to my desktop PC and used
-hid2hci to switch it over to HCI mode. I configured bluetooth for my
-system and connected to all the devices. Keyboard and Media Pad work
-fine, but the mouse is jumpy, as if some packets get buffered for some
-milliseconds before being send.
-I googled around and found a message from 2004 [1] stating that the
-link policy has to be set correctly. As you can see from my output of
-hciconfig -a (see below), it is not. I have a correct lp line in my
-/etc/bluetooth/hcid.conf (see below) and the exact same configuration
-enables all lp flags on my laptop's internal bluetooth (plugging in the
-Logitech hub to my laptop doesn't set the hub to proper lp either, but
-the internal bluetooth works!).
-Is there a way I can manually set the link policy? I understand that I
-can't use much of the tips from the thread refered to in [1], as the
-tools used there are outdated (I don't even have a hcid on my Ubuntu
-Intrepid Ibex 8.10 with bluez-utils 4.12 and kernel 2.6.27).
-Using another bluetooth mouse (Logitech Travel Mouse) on the Logitech
-hub connected to my PC works fine, the problem only occurs with the MX900.
+so how do you handle the case where we have BDADDR_ANY as source and
+multiple adapters attached. At time of binding the RFCOMM TTY we don't
+know which adapter it will use when actually opening it.
 
-Thanks in advance for any help.
+Regards
 
-Regards,
-Thomas
-
-[1] http://osdir.com/ml/linux.bluez.user/2004-03/msg00147.html
-
-Output of hciconfig -a:
-hci0:   Type: USB
-        BD Address: 00:07:61:19:49:79 ACL MTU: 192:8 SCO MTU: 64:8
-        UP RUNNING PSCAN
-        RX bytes:688561 acl:44090 sco:0 events:194 errors:0
-        TX bytes:3136 acl:107 sco:0 commands:60 errors:0
-        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy:
-        Link mode: SLAVE ACCEPT
-        Name: 'Majestix'
-        Class: 0x0a0104
-        Service Classes: Networking, Capturing
-        Device Class: Computer, Desktop workstation
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x34e LMP Ver: 1.1 (0x1) LMP Subver:
-0x34e
-        Manufacturer: Cambridge Silicon Radio (10)
+Marcel
 
 
-/etc/bluetooth/hcid.conf
-#
-# HCI daemon configuration file.
-#
-
-# HCId options
-options {
-        # Automatically initialize new devices
-        autoinit yes;
-
-        # Security Manager mode
-        #   none - Security manager disabled
-        #   auto - Use local PIN for incoming connections
-        #   user - Always ask user for a PIN
-        #
-        security user;
-
-        # Pairing mode
-        #   none  - Pairing disabled
-        #   multi - Allow pairing with already paired devices
-        #   once  - Pair once and deny successive attempts
-        pairing multi;
-
-        # Default PIN code for incoming connections
-        passkey "1234";
-}
-
-# Default settings for HCI devices
-device {
-        # Local device name
-        #   %d - device id
-        #   %h - host name
-        name "%h-%d";
-
-        # Local device class
-        class 0x000100;
-
-        # Default packet type
-        #pkt_type DH1,DM1,HV1;
-
-        # Inquiry and Page scan
-        iscan enable; pscan enable;
-        discovto 0;
-
-        # Default link mode
-        #   none   - no specific policy
-        #   accept - always accept incoming connections
-        #   master - become master on incoming connections,
-        #            deny role switch on outgoing connections
-        lm accept;
-
-        # Default link policy
-        #   none    - no specific policy
-        #   rswitch - allow role switch
-        #   hold    - allow hold mode
-        #   sniff   - allow sniff mode
-        #   park    - allow park mode
-        lp rswitch,hold,sniff,park;
-}
-
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
-
-iEYEARECAAYFAkk9cRAACgkQxVmZpTAq4IiPVQCfX92BhmnXfIDmQa2IYF3TA7YE
-fQMAn0I6DuSTcikL6UYgmfdyxkPbS7RQ
-=0OVJ
------END PGP SIGNATURE-----
