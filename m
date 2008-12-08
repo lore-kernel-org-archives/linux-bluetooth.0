@@ -1,32 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 9 Dec 2008 04:17:37 +0530 (IST)
-From: pavan_savoy@indiatimes.com
-To: <linux-bluetooth@vger.kernel.org>
-Message-ID: <676689813.95741228776457856.JavaMail.root@mbv7.indiatimes.com>
-Subject: ObexFTP killing the Local SDP server
+Message-ID: <493D9EA5.5000101@tommie-lie.de>
+Date: Mon, 08 Dec 2008 23:24:37 +0100
+From: Thomas Liebetraut <thomas@tommie-lie.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: How to set link policy with Logitech diNovo dongle
+References: <493D7110.1020508@tommie-lie.de> <1228765907.28839.95.camel@violet.holtmann.net>
+In-Reply-To: <1228765907.28839.95.camel@violet.holtmann.net>
+Content-Type: text/plain; charset=ISO-8859-15
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-I have a blueZ [version 3.35, wrongly claimed as 3.36] hcid daemon running on a machine, and I have put on it an ObexFTP daemon application [openobex + obexftp] which is statically linked with [bluez-libs-3.36].
+Hi Marcel,
 
-The problem I face is, when I start obexftpd it says cannot register with SDP server,
-register to SDP Server failed, and comes out & then waits for a connecttion.
+Marcel Holtmann schrieb:
+> However to be sure what is going on you have to run "hcidump -X -V" and
+> you can set the link policy manually via "hciconfig hci0 lp".
+Using "hciconfig hci0 lp RSWITCH,SNIFF" results in
+| Can't set link policy on hci0: Connection timed out (110)
+And I get this output from hcidump when issuing this command:
+| HCI sniffer - Bluetooth packet analyzer ver 1.42
+| device: hci0 snap_len: 1028 filter: 0xffffffff
+| < HCI Command: Write Default Link Policy Settings (0x02|0x000f) plen 2
+|     policy 0x05
+|     Link policy: RSWITCH SNIFF
+| > HCI Event: Command Status (0x0f) plen 4
+|     Write Default Link Policy Settings (0x02|0x000f) status 0x01 ncmd 1
+|     Error: Unknown HCI Command
 
-When I looked into it, it was failing in the function "sdp_connect_local" in bluez-libs/src/sdp.c & it also caused the SDP server to kill, So I cannot even do an sdptool browse local after this.
-[I checked sdptool browse local before running obexftpd & it is fine...]
-
-Is it a problem with permissions given to unix domain sockets on platform ? Or something to do with the version mis-match ? Or something totally different ?
+I hope I find some time tomorrow to play around with other versions of
+bluez-utils.
 
 
-regards,
-Pavan
+Regards,
+Thomas
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
 
-
---
-
-"KLUB MJ Hunt, Search for India's First Movie Jockey"
-For more details log on to http://www.zeecinema.com
+iEYEARECAAYFAkk9nqQACgkQxVmZpTAq4Ij3xgCfZryUQ0LkvPvTiwcMdKEcSOdl
+RSAAn38IZwNpeLCQ0mF+Rn5o+i+UPP2N
+=zpxU
+-----END PGP SIGNATURE-----
