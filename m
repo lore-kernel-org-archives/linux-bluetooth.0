@@ -1,89 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-From: Markos Chandras <markos.chandras@gmail.com>
-To: Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH] bluetooth usb hci: ISSC usb dongle with buggy SCO support
-Date: Tue, 9 Dec 2008 14:31:41 +0200
-Cc: Luca Santarelli <hrk@users.sourceforge.net>, marcel@holtmann.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <200812050002.13560.hrk@users.sourceforge.net> <20081207001953.c04b9357.akpm@linux-foundation.org>
-In-Reply-To: <20081207001953.c04b9357.akpm@linux-foundation.org>
+Message-ID: <c2a31c480812090423o66229619ob7f7848d04106938@mail.gmail.com>
+Date: Tue, 9 Dec 2008 17:53:56 +0530
+From: "sreevani medhahal" <sreevani.medhahal@gmail.com>
+To: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: bluez-4.22 + twinkle -> Unable to lock headset
+Cc: "Stuart Pook" <linux-bluetooth4@pook.es>
+In-Reply-To: <2d5a2c100812081042v2b9f4688h3dafd6947a55ea5c@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200812091431.41917.markos.chandras@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+References: <48E29416.3030402@pook.es>
+	 <632D4195-1EFF-4191-98D9-4A0953223590@gmail.com>
+	 <48EA7B66.1050208@pook.es>
+	 <1223326990.11272.229.camel@violet.holtmann.net>
+	 <48EA7ED9.9080801@pook.es>
+	 <1223328106.11272.232.camel@violet.holtmann.net>
+	 <48EA93F7.4060000@pook.es>
+	 <14CF8002-9C68-48AF-AAB7-783C16CAC8CA@gmail.com>
+	 <493A6CC6.7000205@pook.es>
+	 <2d5a2c100812081042v2b9f4688h3dafd6947a55ea5c@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sunday 07 December 2008 10:19:53 Andrew Morton wrote:
-> On Fri, 5 Dec 2008 00:02:13 +0100 Luca Santarelli 
-<hrk@users.sourceforge.net> wrote:
-> > From: Luca Santarelli <hrk <t> users.sourceforge.net>
-> >
-> > As reported at:
-> > http://bugs.gentoo.org/show_bug.cgi?id=249523
-> > and in reference of similar patches such as:
-> > http://thread.gmane.org/gmane.linux.bluez.devel/15067
-> >
-> > This patch changes the blacklist entry for the ISSC bluetooth USB
-> > dongle fixing the issue of the repeatedly appearing message
-> >
-> >   hci_scodata_packet: hci0 SCO packet for unknown connection handle 92
-> >
-> > in the kernel logs.
-> >
-> > Sighed-off-by: Luca Santarelli <hrk <at> users.sourceforge.net>
-> > ---
-> > This is my first kernel patch ever, I read the docs, but please notify
-> > me if I made any mistake. Thank you all for your work, I'm happy to have
-> > been able to contribute to this!
-> >
-> > The patch has been run against 2.6.27.7 and has been tested on three x86
-> > machines, showing no issues. In my own tests, the dongle has been then
-> > used to connect to devices and everything worked fine.
-> >
-> > --- linux-2.6.27.7/drivers/bluetooth/hci_usb.c.orig	2008-12-04
-> > 20:18:38.000000000 +0100 +++
-> > linux-2.6.27.7/drivers/bluetooth/hci_usb.c	2008-12-04 20:19:37.000000000
-> > +0100 @@ -148,8 +148,8 @@ static struct usb_device_id blacklist_id
-> >  	{ USB_DEVICE(0x047d, 0x105d), .driver_info = HCI_RESET },
-> >  	{ USB_DEVICE(0x047d, 0x105e), .driver_info = HCI_RESET |
-> > HCI_WRONG_SCO_MTU },
-> >
-> > -	/* ISSC Bluetooth Adapter v3.1 */
-> > -	{ USB_DEVICE(0x1131, 0x1001), .driver_info = HCI_RESET },
-> > +	/* ISSC Bluetooth Adapter v3.1 with buggy SCO support */
-> > +	{ USB_DEVICE(0x1131, 0x1001), .driver_info = HCI_RESET |
-> > HCI_BROKEN_ISOC },
-> >
-> >  	/* RTX Telecom based adapters with buggy SCO support */
-> >  	{ USB_DEVICE(0x0400, 0x0807), .driver_info = HCI_BROKEN_ISOC },
+Hi,
+ I too face the similar issue with Skype. Is there any workaround to
+sort this issue.
+contents of asoundrc:
+Headset used Planetronics:P590
+pcm.bluetooth {
+        type bluetooth
+        device 00:19:7F:22:B7:8A
+        profile "voice"
+}
+
+version of Bluez used:4.17
+kernel:2.6.27
+
+Snippet of the /var/log/messages
+Dec  9 14:34:07 training01 bluetoothd[15235]: Accepted new client
+connection on unix socket (fd=25)
+Dec  9 14:34:07 training01 bluetoothd[15235]: Audio API: received
+BT_GETCAPABILITIES_REQ
+Dec  9 14:34:07 training01 bluetoothd[15235]: Audio API: sending
+BT_GETCAPABILITIES_RSP
+Dec  9 14:34:07 training01 bluetoothd[15235]: Unix client disconnected (fd=25)
+Dec  9 14:34:07 training01 bluetoothd[15235]: Accepted new client
+connection on unix socket (fd=25)
+Dec  9 14:34:07 training01 bluetoothd[15235]: Audio API: received
+BT_GETCAPABILITIES_REQ
+Dec  9 14:34:07 training01 bluetoothd[15235]: Audio API: sending
+BT_GETCAPABILITIES_RSP
+Dec  9 14:34:07 training01 bluetoothd[15235]: Audio API: received
+BT_SETCONFIGURATION_REQ
+Dec  9 14:34:07 training01 bluetoothd[15235]: config sco - device =
+00:19:7F:22:B7:8A access_mode = 2
+Dec  9 14:34:07 training01 bluetoothd[15235]: State changed
+/org/bluez/hci0/dev_00_19_7F_22_B7_8A: HEADSET_STATE_CONNECTED ->
+HEADSET_STATE_PLAY_IN_PROGRESS
+Dec  9 14:34:47 training01 bluetoothd[15235]: connect(): Connection
+timed out (110)
+Dec  9 14:34:47 training01 bluetoothd[15235]: Unable to lock headset
+Dec  9 14:34:47 training01 bluetoothd[15235]: config failed
+Dec  9 14:34:47 training01 bluetoothd[15235]: Audio API: sending
+BT_SETCONFIGURATION_RSP
+
+Regards,
+Sreevani M
+On Tue, Dec 9, 2008 at 12:12 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> You basically already answer your question, if arecord -D JX10 -f
+> S16_LE | aplay -D JX10 -f S16_LE does work, twinkle should work too.
+> The problem seems to be that twinkle leaves the connection open and
+> attempt to acquire the lock again and again, this is probably a bad
+> use of alsa API by twinkle as snd_pcm_prepare should not be called
+> more than once.
 >
-> linux-next has:
->
-> commit 12421b40b81d101d7535e03f1af197365adc932b
-> Author: Marcel Holtmann <marcel@holtmann.org>
-> Date:   Sun Nov 30 12:17:21 2008 +0100
->
->     Bluetooth: Remove deprecated hci_usb driver
->
->     The old hci_usb driver has been fully replaced with the new btusb
-> driver and all major distributions switched to the new driver now. This
-> removes it since it should not be used at all anymore.
->
-> so please confirm that btusb correctly supports that hardware?
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+> Luiz Augusto von Dentz
+> Engenheiro de Computação
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
 > the body of a message to majordomo@vger.kernel.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
-Unfortunatelly it doesnt work here. The new driver cant recognize my device. I 
-am using gentoo-sources-2.6.26-r4 ( which means linux-sources-2.6.26-5).
-
-I ll post again my device info from lsusb. I ll try to come up with a patch is 
-possible
-
-Bus 002 Device 002: ID 1131:1001 Integrated System Solution Corp. KY-BT100 
-Bluetooth Adapter
-
-Thanks
--- 
-Markos Chandras
+>
