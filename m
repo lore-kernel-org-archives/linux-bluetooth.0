@@ -1,26 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 10 Dec 2008 21:25:30 +0530 (IST)
-From: pavan_savoy@indiatimes.com
-To: <linux-bluetooth@vger.kernel.org>
-Message-ID: <643074291.26281228924530061.JavaMail.root@mbv7.indiatimes.com>
-Subject: Release Note for BlueZ versions
+Message-ID: <493ECC7C.6070508@tommie-lie.de>
+Date: Tue, 09 Dec 2008 20:52:28 +0100
+From: Thomas Liebetraut <thomas@tommie-lie.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: How to set link policy with Logitech diNovo dongle
+References: <493D7110.1020508@tommie-lie.de> <1228765907.28839.95.camel@violet.holtmann.net> <493D9EA5.5000101@tommie-lie.de>
+In-Reply-To: <493D9EA5.5000101@tommie-lie.de>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="------------enig1282689E812F960EC232F3F2"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enig1282689E812F960EC232F3F2
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Transfer-Encoding: quoted-printable
 
-How do I know what BlueZ versions refer to what Bluetooth specification & confrom to which version ?
-I am particularly interested about BlueZ 3.36.
+Thomas Liebetraut schrieb:
+> I hope I find some time tomorrow to play around with other versions of
+> bluez-utils.
+I just tried bluez 4.21 as a Debian package and 4.22 compiled by myself
+and neither worked. The problem is still the same, my MX900 is jumpy and
+ trying to set the link policy with hciconfig results in a "Connection
+timed out (110)" error.
 
-It shows me a error "Can't read simple pairing mode" on a v2.1 hardware.
+Anything else I could try?
 
-regards,
-Pavan
+Regards,
+Thomas
 
 
---
 
-"KLUB MJ Hunt, Search for India's First Movie Jockey"
-For more details log on to http://www.zeecinema.com
+--------------enig1282689E812F960EC232F3F2
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
+
+iEYEARECAAYFAkk+zIEACgkQxVmZpTAq4Igf+QCfX2C3ee0C8KhueeqJmiwRdF9G
+2+MAnjKjBWg6oJHM+cu6mb/5KA8QJg85
+=3pei
+-----END PGP SIGNATURE-----
+
+--------------enig1282689E812F960EC232F3F2--
