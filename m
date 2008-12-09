@@ -1,41 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 9 Dec 2008 15:39:50 +0300
-From: Alexander Beregalov <a.beregalov@gmail.com>
-To: marcel@holtmann.org, linux-bluetooth@vger.kernel.org, mingo@elte.hu,
-	linux-next@vger.kernel.org
-Subject: [PATCH] rfcomm/sock: fix build problem
-Message-ID: <20081209123950.GA31294@orion>
+From: Markos Chandras <markos.chandras@gmail.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH] bluetooth usb hci: ISSC usb dongle with buggy SCO support
+Date: Tue, 9 Dec 2008 14:31:41 +0200
+Cc: Luca Santarelli <hrk@users.sourceforge.net>, marcel@holtmann.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <200812050002.13560.hrk@users.sourceforge.net> <20081207001953.c04b9357.akpm@linux-foundation.org>
+In-Reply-To: <20081207001953.c04b9357.akpm@linux-foundation.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200812091431.41917.markos.chandras@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-net/bluetooth/rfcomm/sock.c: In function 'rfcomm_sock_ioctl':
-net/bluetooth/rfcomm/sock.c:795: error: 'sk' undeclared (first use in this function)
-net/bluetooth/rfcomm/sock.c:795: error: (Each undeclared identifier is reported only once
-net/bluetooth/rfcomm/sock.c:795: error: for each function it appears in.)
+On Sunday 07 December 2008 10:19:53 Andrew Morton wrote:
+> On Fri, 5 Dec 2008 00:02:13 +0100 Luca Santarelli 
+<hrk@users.sourceforge.net> wrote:
+> > From: Luca Santarelli <hrk <t> users.sourceforge.net>
+> >
+> > As reported at:
+> > http://bugs.gentoo.org/show_bug.cgi?id=249523
+> > and in reference of similar patches such as:
+> > http://thread.gmane.org/gmane.linux.bluez.devel/15067
+> >
+> > This patch changes the blacklist entry for the ISSC bluetooth USB
+> > dongle fixing the issue of the repeatedly appearing message
+> >
+> >   hci_scodata_packet: hci0 SCO packet for unknown connection handle 92
+> >
+> > in the kernel logs.
+> >
+> > Sighed-off-by: Luca Santarelli <hrk <at> users.sourceforge.net>
+> > ---
+> > This is my first kernel patch ever, I read the docs, but please notify
+> > me if I made any mistake. Thank you all for your work, I'm happy to have
+> > been able to contribute to this!
+> >
+> > The patch has been run against 2.6.27.7 and has been tested on three x86
+> > machines, showing no issues. In my own tests, the dongle has been then
+> > used to connect to devices and everything worked fine.
+> >
+> > --- linux-2.6.27.7/drivers/bluetooth/hci_usb.c.orig	2008-12-04
+> > 20:18:38.000000000 +0100 +++
+> > linux-2.6.27.7/drivers/bluetooth/hci_usb.c	2008-12-04 20:19:37.000000000
+> > +0100 @@ -148,8 +148,8 @@ static struct usb_device_id blacklist_id
+> >  	{ USB_DEVICE(0x047d, 0x105d), .driver_info = HCI_RESET },
+> >  	{ USB_DEVICE(0x047d, 0x105e), .driver_info = HCI_RESET |
+> > HCI_WRONG_SCO_MTU },
+> >
+> > -	/* ISSC Bluetooth Adapter v3.1 */
+> > -	{ USB_DEVICE(0x1131, 0x1001), .driver_info = HCI_RESET },
+> > +	/* ISSC Bluetooth Adapter v3.1 with buggy SCO support */
+> > +	{ USB_DEVICE(0x1131, 0x1001), .driver_info = HCI_RESET |
+> > HCI_BROKEN_ISOC },
+> >
+> >  	/* RTX Telecom based adapters with buggy SCO support */
+> >  	{ USB_DEVICE(0x0400, 0x0807), .driver_info = HCI_BROKEN_ISOC },
+>
+> linux-next has:
+>
+> commit 12421b40b81d101d7535e03f1af197365adc932b
+> Author: Marcel Holtmann <marcel@holtmann.org>
+> Date:   Sun Nov 30 12:17:21 2008 +0100
+>
+>     Bluetooth: Remove deprecated hci_usb driver
+>
+>     The old hci_usb driver has been fully replaced with the new btusb
+> driver and all major distributions switched to the new driver now. This
+> removes it since it should not be used at all anymore.
+>
+> so please confirm that btusb correctly supports that hardware?
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Please read the FAQ at  http://www.tux.org/lkml/
+Unfortunatelly it doesnt work here. The new driver cant recognize my device. I 
+am using gentoo-sources-2.6.26-r4 ( which means linux-sources-2.6.26-5).
 
-It is a conflict between a418b893
-(Bluetooth: Enable per-module dynamic debug messages)
-and 45555c0e
-(bluetooth: fix warning in net/bluetooth/rfcomm/sock.c)
+I ll post again my device info from lsusb. I ll try to come up with a patch is 
+possible
 
-Signed-off-by: Alexander Beregalov <a.beregalov@gmail.com>
----
+Bus 002 Device 002: ID 1131:1001 Integrated System Solution Corp. KY-BT100 
+Bluetooth Adapter
 
- net/bluetooth/rfcomm/sock.c |    2 --
- 1 files changed, 0 insertions(+), 2 deletions(-)
-
-diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-index ad00cbf..d63040f 100644
---- a/net/bluetooth/rfcomm/sock.c
-+++ b/net/bluetooth/rfcomm/sock.c
-@@ -787,9 +787,7 @@ static int rfcomm_sock_getsockopt(struct socket *sock, int level, int optname, c
- 
- static int rfcomm_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
- {
--#if defined(CONFIG_BT_RFCOMM_TTY) || defined(CONFIG_BT_RFCOMM_DEBUG)
- 	struct sock *sk = sock->sk;
--#endif
- 	int err;
- 
- 	BT_DBG("sk %p cmd %x arg %lx", sk, cmd, arg);
+Thanks
+-- 
+Markos Chandras
