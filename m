@@ -1,50 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <493ECC7C.6070508@tommie-lie.de>
-Date: Tue, 09 Dec 2008 20:52:28 +0100
-From: Thomas Liebetraut <thomas@tommie-lie.de>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: How to set link policy with Logitech diNovo dongle
-References: <493D7110.1020508@tommie-lie.de> <1228765907.28839.95.camel@violet.holtmann.net> <493D9EA5.5000101@tommie-lie.de>
-In-Reply-To: <493D9EA5.5000101@tommie-lie.de>
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="------------enig1282689E812F960EC232F3F2"
+From: Luca Santarelli <hrk@users.sourceforge.net>
+To: Andrew Morton <akpm@linux-foundation.org>
+In-Reply-To: <F469DC97-2EE0-4CE5-BB1C-7419B8A31985@users.sourceforge.net>
+Subject: Re: [PATCH] bluetooth usb hci: ISSC usb dongle with buggy SCO  support
+References: <200812050002.13560.hrk@users.sourceforge.net> <20081207001953.c04b9357.akpm@linux-foundation.org> <F469DC97-2EE0-4CE5-BB1C-7419B8A31985@users.sourceforge.net>
+Message-Id: <42AA6D4E-DCE6-487B-9B70-2B0A7EFA76EC@users.sourceforge.net>
+Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
+Mime-Version: 1.0 (Apple Message framework v929.2)
+Date: Tue, 9 Dec 2008 20:22:27 +0100
+Cc: marcel@holtmann.org,
+ linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enig1282689E812F960EC232F3F2
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: quoted-printable
 
-Thomas Liebetraut schrieb:
-> I hope I find some time tomorrow to play around with other versions of
-> bluez-utils.
-I just tried bluez 4.21 as a Debian package and 4.22 compiled by myself
-and neither worked. The problem is still the same, my MX900 is jumpy and
- trying to set the link policy with hciconfig results in a "Connection
-timed out (110)" error.
+Il giorno 09/dic/08, alle ore 00:07, Luca Santarelli ha scritto:
 
-Anything else I could try?
+>
+> Il giorno 07/dic/08, alle ore 09:19, Andrew Morton ha scritto:
+>
+>> linux-next has:
+>>
+>> commit 12421b40b81d101d7535e03f1af197365adc932b
+>> Author: Marcel Holtmann <marcel@holtmann.org>
+>> Date:   Sun Nov 30 12:17:21 2008 +0100
+>>
+>>   Bluetooth: Remove deprecated hci_usb driver
+>>
+>>   The old hci_usb driver has been fully replaced with the new btusb  
+>> driver
+>>   and all major distributions switched to the new driver now. This  
+>> removes
+>>   it since it should not be used at all anymore.
+>>
+>> so please confirm that btusb correctly supports that hardware?
+>
+>
+> Thanks for the heads up! I'll compile the new sources and let you  
+> know if it's supported. However, since the hci_usb is being  
+> deprecated but not removed, shouldn't the patch be incorporated  
+> nonetheless?
+>
+> Luca
 
-Regards,
-Thomas
+Ok, I'm back. I compiled the latest sources and the device is  
+recognized and works with the new btusb driver. What about the  
+deprecated driver? Will it be fixed or kept as it is?
 
-
-
---------------enig1282689E812F960EC232F3F2
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
-
-iEYEARECAAYFAkk+zIEACgkQxVmZpTAq4Igf+QCfX2C3ee0C8KhueeqJmiwRdF9G
-2+MAnjKjBWg6oJHM+cu6mb/5KA8QJg85
-=3pei
------END PGP SIGNATURE-----
-
---------------enig1282689E812F960EC232F3F2--
+Luca
