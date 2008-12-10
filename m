@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <OFDB593D66.4F9C0904-ON65257514.0044834D-65257515.004C4F06@lntemsys.com>
-References: <OFDB593D66.4F9C0904-ON65257514.0044834D-65257515.004C4F06@lntemsys.com>
-Date: Fri, 12 Dec 2008 02:51:37 +0100
-Message-Id: <1229046697.22285.27.camel@violet.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Setting up Bluetooth Audio (A2DP)
+Message-ID: <12404.62.140.137.157.1228902324.squirrel@webmail.xs4all.nl>
+Date: Wed, 10 Dec 2008 10:45:24 +0100 (CET)
+From: "menno" <jongerenchaos@zonnet.nl>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-users] Bluez 4.20/4.21/4.22
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,44 +17,24 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Hello,
 
->         I intend to use the A2DP profile of BlueZ, by playing some
-> music over my desktop(Having Broadcom USB bluetooth adaptor) and
-> listering it on BT-headset. 
-> 
-> System Details: 
-> Linux Flavour:        Fedora Core 4 
-> Linux Kernel:           2.6.26 
-> BlueZ version:        4.18 
-> DBUS version:        1.2.4 
-> GLIB version:        2.14 
-> ALSA version:        1.013 
-> 
-> HCID: 
->         When I start bluetooth service, hcid throws error: Unable to
-> get on DBUS and continues to run. I proceed further to pair with
-> headset, wherein in gives, Can't connect: Input/Output error. But
-> surprisingly it can connect with other bluetooth devices like mobile
-> phones. Behaviour is alike irrespective of pin-helpers,bluepin or
-> bluez-pin. 
-> Bluetoothd: 
->          Yes, I know that version 4.xx replaces hcid wiht bluetoothd.
-> I edited the /etc/ini.d/bluetooth script to spawn bluetoothd daemon,
-> instead of hcid daemon. Even Bleutoothd daemon throws error:  Unable
-> to get on DBUS and exits. 
-> 
-> Im attaching the debug log herewith. Any help in this regard is deeply
-> appreciated. 
+I use Bluez incombination with asterisk (chan_mobile.c module). The
+chan_mobile module accepts calls from bluetooth enabled cell-phones.
 
-your system is seriously screwed up and old. Why don't you just upgrade
-to a more recent Fedora 10. The A2DP support should work out of the box
-there using ALSA, GStreamer or PulseAudio.
+When i use bluez < 4.19 this works but there is an audio delay from
+asterisk to the connected mobile phone. But the connection is stable and
+the cellphone doesn't discconnect from asterisk.
 
-Regards
+When i use bluez > 4.20 (& 4.21 & 4.22) this works better (with audio) and
+there is an short delay when the call is begin. After some seconds (i
+think between 5 & 10 seconds) the delay is away. But after 15 seconds the
+audio is dropped and asterisk disconnect the bluetooth phone.
+Only when i restart the mobile phone he is connected again.
 
-Marcel
-
+My Question: Is it possible to develop a version that the mobile
+connection don't disconnect from the asterisk pabx and also with good (no
+delayed) audio capabilties??
 
 
 ------------------------------------------------------------------------------
