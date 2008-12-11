@@ -1,30 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 11 Dec 2008 08:14:14 +0000 (GMT)
-From: =?euc-kr?B?udrC+b+t?= <chanyeol.park@samsung.com>
-Subject: Does anyone help me to setup PAN connection?
+From: Bea Lam <blam@trolltech.com>
 To: linux-bluetooth@vger.kernel.org
-Reply-to: chanyeol.park@samsung.com
-Message-id: <3708754.307311228983254624.JavaMail.weblogic@epml14>
-MIME-version: 1.0
-MIME-version: 1.0
-Content-type: text/plain; charset=euc-kr
+Subject: Adapter API - Devices property not updated if connection initiated by remote device
+Date: Thu, 11 Dec 2008 13:57:58 +1000
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200812111357.59004.blam@trolltech.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-DQoNCiBEZWFyIEFsbC4NCg0KRG9lcyBhbnlvbmUgaGVscCBtZSB0byBzZXR1cCBQQU4gY29ubmVj
-dGlvbj8NCg0KRW52aXJvbm1lbnQNCk5BUCBSb2xlIDogTm90ZSBQQyAuIFdpbmRvd3MgWFAsIEpB
-QlJBIGEzMjBzIHN0YWNrIChCVCBhZGRyZXNzIDAwOjE2OjM4OkJGOjEyOkM0KQ0KUEFOIFJvbGUg
-OiBEZXNrdG9wIExpbnV4IDIuNi4yNC0yMi1nZW5lcmljIEJsdWVaIDQuMjIgDQoNCg0KSSB1c2Ug
-ZGJ1cy1zZW5kIGNvbm5lY3QgY29tbWFuZCBsaWtlIHRoaXMuDQojPmRidXMtc2VuZCAtLXN5c3Rl
-bSAtLXR5cGU9bWV0aG9kX2NhbGwgLS1wcmludC1yZXBseSAtLWRlc3Q9Im9yZy5ibHVleiIgL29y
-Zy9ibHVlei8xMDA0My9oY2kwL2Rldl8wMF8xNl8zOF9CRl8xMl9DNCBvcmcuYmx1ZXouTmV0d29y
-ay5Db25uZWN0IHN0cmluZzoiMDAwMDExMTYtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiIg0K
-DQpCdXQgYW55dGhpbmcgd291bGQgbm90IGhhcHBlbiChpi4oIEkgZXhwZWN0IEJORVAgY29ubmVj
-dGlvbi4uICkNCioqKk5ldHdvcmsgSW50ZXJmYWNlIGlzIGNvcnJlY3RseSBpbnN0YWxsZWQgb24g
-Ymx1ZXouDQojPmRidXMtc2VuZCAtLXN5c3RlbSAtLXR5cGU9bWV0aG9kX2NhbGwgLS1wcmludC1y
-ZXBseSAtLWRlc3Q9Im9yZy5ibHVleiIgL29yZy9ibHVlei8xMDA0My9oY2kwL2Rldl8wMF8xNl8z
-OF9CRl8xMl9DNCBvcmcuYmx1ZXouTmV0d29yay5HZXRQcm9wZXJ0aWVzDQoNCkhvd2V2ZXIsIGlm
-IFdpbmRvd3MgaW5pdGlhdGVzIHRoZSBQQU4gY29ubmVjdGlvbiwgaXQgd29ya3Mgd2VsbC4gDQoN
-ClRoYW5rcyENCg==
+When using the org.bluez.Adapter interface, if I initiate a connection to a 
+remote device, then the adapter's Devices property is updated to include the 
+remote device, as expected. However, if the remote device initiates the 
+connection to my device instead, it isn't added to the Devices list. This 
+would appear to be a bug.
 
+This can be problematic if I am trying to identify whether any remote devices 
+are currently connected to the local adapter; it is not possible to identify 
+the connected devices if they have initiated the connection.
 
+It would be much appreciated if someone could look into this. Perhaps the 
+adapter->devices list could be updated when adapter_add_active_conn() is 
+called, but I'm not sure if this is correct.
