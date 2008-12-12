@@ -1,52 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4942BCD8.3050802@tommie-lie.de>
-Date: Fri, 12 Dec 2008 20:34:48 +0100
-From: Thomas Liebetraut <thomas@tommie-lie.de>
+Message-ID: <d89ddf300812121119o601fe1acs229741960a98835c@mail.gmail.com>
+Date: Fri, 12 Dec 2008 12:19:20 -0700
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: "Siarhei Siamashka" <siarhei.siamashka@nokia.com>
+Subject: Re: [RFC/PATCH] sbc: new filtering function for 8 band fixed point encoding
+Cc: "Jaska Uimonen" <jaska.uimonen@nokia.com>,
+	linux-bluetooth@vger.kernel.org
+In-Reply-To: <200812121914.48340.siarhei.siamashka@nokia.com>
 MIME-Version: 1.0
-To: Jelle de Jong <jelledejong@powercraft.nl>
-CC: linux-bluetooth@vger.kernel.org,
- Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: How to set link policy with Logitech diNovo dongle
-References: <493D7110.1020508@tommie-lie.de>	 <1228765907.28839.95.camel@violet.holtmann.net>	 <493D9EA5.5000101@tommie-lie.de> <1229046523.22285.25.camel@violet.holtmann.net> <49429EDF.4050900@tommie-lie.de> <4942ADE3.6020503@powercraft.nl>
-In-Reply-To: <4942ADE3.6020503@powercraft.nl>
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="------------enig343377B94C272FA6FE67BF98"
+Content-Type: text/plain; charset=ISO-8859-1
+References: <1227879337.20555.12.camel@esdhcp03999.research.nokia.com>
+	 <Pine.LNX.4.64.0812021203290.6346@xena.cft.ca.us>
+	 <200812121914.48340.siarhei.siamashka@nokia.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enig343377B94C272FA6FE67BF98
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Guys
 
-Hi Jelle,
+One mistake we made was not keeping track of what functions we were
+applying to the published tables as we worked things to look less and
+less like the pseudocode in the spec. So if you start again from one
+of the tables in the spec, keep a comment like
 
-> I got a few thoughts about this, I also have a few Logitech devices wit=
-h
-> Logitech bluetooth adapters, but they where kind of special and contain=
+/* ourtable(x) = (int32)(table1(x) << 16) */
 
-> a button that must be used to connect the device I think its some kind
-> of auto pairing button. Do your dongles contains such buttons?
-Yes it has, but it seems to have no effect when in HCI mode. In HID
-mode, the button is used to connect to the mouse and keyboard, that's rig=
-ht.
+Which in this case would mean that in ourtable we've shifted the
+original table1 float value left 16 bits and truncated it to an int32.
 
-Regards,
-Thomas
+I also combined tables or split tables to simplify our loop logic or
+eliminate operations; an explanation in a comment would have been
+appropriate.
+
+Brad
+
+On Fri, Dec 12, 2008 at 10:14 AM, Siarhei Siamashka
+<siarhei.siamashka@nokia.com> wrote:
+> On Fri, 28 Nov 2008, Jaska Uimonen wrote:
+>> I did some testing on the current 8 band fixed point
+>> encoding and it seems to attenuate frequencies below 800Hz
+>> and above 18kHz. There might be some other stuff happening
+>> also, because at least to me the bass seemed to lack some
+>> "definition".
+>> I didn't quite understand how the current tables are calculated
+>> and how the filtering works so I wrote a new filtering function
+>> and calculated new filter tables for it. It is written
+>> using 16 bit fixed point without any platform specific optimizations.
+>> I only unrolled some loops etc. I tried to follow the
+>> flow chart in MPEG-1 annex c.
+>
+>> +/*
+>> + * to produce this Q15 format table:
+>> + *
+>> + * Get the filter coeffs from the spec and multiply them by 2^15.
+>> + */
+>> +static const signed short _sbc_proto_fixed8[80] = {
+>> +       0, 5, 11, 18, 26, 37, 48, 58, 65, 68,
+>> +       65, 52, 29, -5, -54, -114, 185, 263, 342, 417,
+>> +       480, 521, 531, 501, 423, 290, 95, -161, -479, -855,
+>> +       -1280, -1742, 2228, 2719, 3197, 3643, 4039, 4366, 4612, 4764,
+>> +       4815, 4764, 4612, 4366, 4039, 3643, 3197, 2719, -2228, -1742,
+>> +       -1280, -855, -479, -161, 95, 290, 423, 501, 531, 521,
+>> +       480, 417, 342, 263, -185, -114, -54, -5, 29, 52,
+>> +       65, 68, 65, 58, 48, 37, 26, 18, 11, 5
+>> +};
+>
+> Just remembered to check this. Precision and audio quality should be a bit
+> better if the original floating values are not truncated, but rounded when put
+> into tables.
+>
+> For example, the fifth element is 26 in _sbc_proto_fixed8 table, but it was
+> 26.998194372608 after multiplication and before conversion to integer.
+> Using 27 would have been a bit more correct here.
+>
+> --
+> Best regards,
+> Siarhei Siamashka
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
 
 
---------------enig343377B94C272FA6FE67BF98
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
-
-iEYEARECAAYFAklCvNgACgkQxVmZpTAq4IieQACbBCj9482ya2C3T7TARQ3KyXXR
-W5UAn3ak3eSpXS6KdKSsEdniI8UpLr20
-=YnDV
------END PGP SIGNATURE-----
-
---------------enig343377B94C272FA6FE67BF98--
+-- 
+Brad Midgley
