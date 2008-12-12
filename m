@@ -1,40 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: How to set link policy with Logitech diNovo dongle
+Subject: Re: ObexFTP killing the Local SDP server
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Thomas Liebetraut <thomas@tommie-lie.de>
+To: pavan_savoy@indiatimes.com
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <493D9EA5.5000101@tommie-lie.de>
-References: <493D7110.1020508@tommie-lie.de>
-	 <1228765907.28839.95.camel@violet.holtmann.net>
-	 <493D9EA5.5000101@tommie-lie.de>
+In-Reply-To: <676689813.95741228776457856.JavaMail.root@mbv7.indiatimes.com>
+References: <676689813.95741228776457856.JavaMail.root@mbv7.indiatimes.com>
 Content-Type: text/plain
-Date: Fri, 12 Dec 2008 02:48:43 +0100
-Message-Id: <1229046523.22285.25.camel@violet.holtmann.net>
+Date: Fri, 12 Dec 2008 02:47:39 +0100
+Message-Id: <1229046459.22285.24.camel@violet.holtmann.net>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Thomas,
+Hi Pavan,
 
-> > However to be sure what is going on you have to run "hcidump -X -V" and
-> > you can set the link policy manually via "hciconfig hci0 lp".
-> Using "hciconfig hci0 lp RSWITCH,SNIFF" results in
-> | Can't set link policy on hci0: Connection timed out (110)
-> And I get this output from hcidump when issuing this command:
-> | HCI sniffer - Bluetooth packet analyzer ver 1.42
-> | device: hci0 snap_len: 1028 filter: 0xffffffff
-> | < HCI Command: Write Default Link Policy Settings (0x02|0x000f) plen 2
-> |     policy 0x05
-> |     Link policy: RSWITCH SNIFF
-> | > HCI Event: Command Status (0x0f) plen 4
-> |     Write Default Link Policy Settings (0x02|0x000f) status 0x01 ncmd 1
-> |     Error: Unknown HCI Command
+> I have a blueZ [version 3.35, wrongly claimed as 3.36] hcid daemon running on a machine, and I have put on it an ObexFTP daemon application [openobex + obexftp] which is statically linked with [bluez-libs-3.36].
 > 
-> I hope I find some time tomorrow to play around with other versions of
-> bluez-utils.
+> The problem I face is, when I start obexftpd it says cannot register with SDP server,
+> register to SDP Server failed, and comes out & then waits for a connecttion.
+> 
+> When I looked into it, it was failing in the function "sdp_connect_local" in bluez-libs/src/sdp.c & it also caused the SDP server to kill, So I cannot even do an sdptool browse local after this.
+> [I checked sdptool browse local before running obexftpd & it is fine...]
+> 
+> Is it a problem with permissions given to unix domain sockets on platform ? Or something to do with the version mis-match ? Or something totally different ?
 
-this is a serious problem. Please show me hciconfig -a of your dongle. I
-have never seen a dongle that doesn't support Default Link Policy.
+I don't know. Your system seems to be screwed up. Why don't you start
+using something more recent like 4.22.
 
 Regards
 
