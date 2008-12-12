@@ -1,54 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4942AFFC.30307@tommie-lie.de>
-Date: Fri, 12 Dec 2008 19:39:56 +0100
-From: Thomas Liebetraut <thomas@tommie-lie.de>
+Message-ID: <4942ADE3.6020503@powercraft.nl>
+Date: Fri, 12 Dec 2008 19:30:59 +0100
+From: Jelle de Jong <jelledejong@powercraft.nl>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth@vger.kernel.org
+To: Thomas Liebetraut <thomas@tommie-lie.de>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+ linux-bluetooth@vger.kernel.org
 Subject: Re: How to set link policy with Logitech diNovo dongle
-References: <493D7110.1020508@tommie-lie.de>	 <1228765907.28839.95.camel@violet.holtmann.net>	 <493D9EA5.5000101@tommie-lie.de>	 <1229046523.22285.25.camel@violet.holtmann.net>	 <49429EDF.4050900@tommie-lie.de>	 <1229104138.22285.113.camel@violet.holtmann.net>	 <4942A74E.2020409@tommie-lie.de> <1229105266.22285.116.camel@violet.holtmann.net>
-In-Reply-To: <1229105266.22285.116.camel@violet.holtmann.net>
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="------------enig89A9364146CC04A7D0E502AB"
+References: <493D7110.1020508@tommie-lie.de>	 <1228765907.28839.95.camel@violet.holtmann.net>	 <493D9EA5.5000101@tommie-lie.de> <1229046523.22285.25.camel@violet.holtmann.net> <49429EDF.4050900@tommie-lie.de>
+In-Reply-To: <49429EDF.4050900@tommie-lie.de>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enig89A9364146CC04A7D0E502AB
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: quoted-printable
+Thomas Liebetraut wrote:
+> Hi Marcel,
+> 
+> Marcel Holtmann schrieb:
+>> this is a serious problem. Please show me hciconfig -a of your dongle. I
+>> have never seen a dongle that doesn't support Default Link Policy.
+> 
+> Here is the output from hciconfig -a:
+> | thomas@Majestix:~/src/bluez-4.22$ hciconfig -a
+> | hci0:   Type: USB
+> |         BD Address: 00:07:61:19:49:79 ACL MTU: 192:8 SCO MTU: 64:8
+> |         UP RUNNING PSCAN
+> |         RX bytes:27144 acl:1558 sco:0 events:162 errors:0
+> |         TX bytes:1935 acl:59 sco:0 commands:68 errors:0
+> |         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+> |         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+> |         Link policy:
+> |         Link mode: SLAVE ACCEPT
+> |         Name: 'Majestix-0'
+> |         Class: 0x0a0104
+> |         Service Classes: Networking, Capturing
+> |         Device Class: Computer, Desktop workstation
+> |         HCI Ver: 1.1 (0x1) HCI Rev: 0x34e LMP Ver: 1.1 (0x1) LMP
+> Subver: 0x34e
+> |         Manufacturer: Cambridge Silicon Radio (10)
+> 
+> And the output from lsusb to identify the dongle:
+> thomas@Majestix:~$ lsusb
+> Bus 004 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+> Bus 003 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+> Bus 002 Device 006: ID 046d:c707 Logitech, Inc. Bluetooth wireless hub
+> Bus 002 Device 005: ID 046d:c704 Logitech, Inc.
+> Bus 002 Device 004: ID 0451:2036 Texas Instruments, Inc. TUSB2036 Hub
+> Bus 002 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+> Bus 001 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+> 
+> The second Logitech device seems to be the USB HID adapter from the
+> exact same dongle.
+> 
 
-Hi Marcel,
+Hi Thomas,
 
-Marcel Holtmann schrieb:
-> Problem is that this particular firmware is a custom build for Logitech=
+I got a few thoughts about this, I also have a few Logitech devices with
+Logitech bluetooth adapters, but they where kind of special and contain
+a button that must be used to connect the device I think its some kind
+of auto pairing button. Do your dongles contains such buttons?
 
-> (or beta firmware) as it looks like. Also you have other problems with
-> not having AFH enabled when you have WiFi around.
->
-> I think that I do have the exact same mouse and keyboard at home
-> somewhere. But not supporting Default Link Policy is just pure stupid.
-So I better go any buy a new dongle? Or do you see any chance to make
-this old one work?
-Any recommendations for a new dongle? Are those small cheap noname
-dongles for 8 Euros (10 USD) any good? Or does quality have its price?
+Best regards,
 
-Regards,
-Thomas
-
-
---------------enig89A9364146CC04A7D0E502AB
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
-
-iEYEARECAAYFAklCr/wACgkQxVmZpTAq4IgFHACeJv8G+cFCAgi4PcnnKWbkMbx7
-a2wAnifUY/4wG3XRY5hv8BrL8ym4zfma
-=AFAh
------END PGP SIGNATURE-----
-
---------------enig89A9364146CC04A7D0E502AB--
+Jelle
