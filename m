@@ -1,30 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Does anyone help me to setup PAN connection?
+Subject: Re: [PATCH] sbc: bitstream packing optimization for encoder.
 From: Marcel Holtmann <marcel@holtmann.org>
-To: chanyeol.park@samsung.com
+To: Siarhei Siamashka <siarhei.siamashka@nokia.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <3708754.307311228983254624.JavaMail.weblogic@epml14>
-References: <3708754.307311228983254624.JavaMail.weblogic@epml14>
+In-Reply-To: <200812112227.07170.siarhei.siamashka@nokia.com>
+References: <200812112227.07170.siarhei.siamashka@nokia.com>
 Content-Type: text/plain
-Date: Fri, 12 Dec 2008 02:41:14 +0100
-Message-Id: <1229046074.22285.19.camel@violet.holtmann.net>
+Date: Fri, 12 Dec 2008 02:39:34 +0100
+Message-Id: <1229045974.22285.18.camel@violet.holtmann.net>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Siarhei,
 
-> Does anyone help me to setup PAN connection?
-> 
-> Environment
-> NAP Role : Note PC . Windows XP, JABRA a320s stack (BT address 00:16:38:BF:12:C4)
-> PAN Role : Desktop Linux 2.6.24-22-generic BlueZ 4.22 
-> 
-> 
-> I use dbus-send connect command like this.
-> #>dbus-send --system --type=method_call --print-reply --dest="org.bluez" /org/bluez/10043/hci0/dev_00_16_38_BF_12_C4 org.bluez.Network.Connect string:"00001116-0000-1000-8000-00805f9b34fb"
+> Appears that bitstream packing is also one of the most CPU hungry
+> operations in SBC encoder, which did not get proper attention yet.
+> Could somebody review this patch and provide feedback/comments?
 
-might be a bug with the UUID. Try using "nap".
+again thanks for working on this. I am actually willing to include your
+patches quickly in one of the next releases to get more wider testing
+audience.
+
+One comment from my side is that this should work with little-endian and
+big-endian as input streams. Please keep that in mind.
 
 Regards
 
