@@ -1,79 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
-To: "ext Marcel Holtmann" <marcel@holtmann.org>
-Subject: Re: [PATCH] sbc: bitstream packing optimization for encoder.
-Date: Fri, 12 Dec 2008 11:37:17 +0200
-Cc: linux-bluetooth@vger.kernel.org
-References: <200812112227.07170.siarhei.siamashka@nokia.com> <1229045974.22285.18.camel@violet.holtmann.net>
-In-Reply-To: <1229045974.22285.18.camel@violet.holtmann.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="utf-8"
-Message-Id: <200812121137.18041.siarhei.siamashka@nokia.com>
+Subject: Re: ObexFTP killing the Local SDP server
+From: Per Thomas Jahr <perja@extern.uio.no>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Cc: pavan_savoy@indiatimes.com
+In-Reply-To: <1229046459.22285.24.camel@violet.holtmann.net>
+References: <676689813.95741228776457856.JavaMail.root@mbv7.indiatimes.com>
+	 <1229046459.22285.24.camel@violet.holtmann.net>
+Content-Type: text/plain
+Date: Fri, 12 Dec 2008 10:11:29 +0100
+Message-Id: <1229073089.3899.21.camel@apollo2>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Friday 12 December 2008 03:39:34 ext Marcel Holtmann wrote:
-> Hi Siarhei,
->
-> > Appears that bitstream packing is also one of the most CPU hungry
-> > operations in SBC encoder, which did not get proper attention yet.
-> > Could somebody review this patch and provide feedback/comments?
->
-> again thanks for working on this. I am actually willing to include your
-> patches quickly in one of the next releases to get more wider testing
-> audience.
+On Fri, 2008-12-12 at 02:47 +0100, Marcel Holtmann wrote:
+> Hi Pavan,
+> 
+> > I have a blueZ [version 3.35, wrongly claimed as 3.36] hcid daemon running on a machine, and I have put on it an ObexFTP daemon application [openobex + obexftp] which is statically linked with [bluez-libs-3.36].
+> > 
+> > The problem I face is, when I start obexftpd it says cannot register with SDP server,
+> > register to SDP Server failed, and comes out & then waits for a connecttion.
+> > 
+> > When I looked into it, it was failing in the function "sdp_connect_local" in bluez-libs/src/sdp.c & it also caused the SDP server to kill, So I cannot even do an sdptool browse local after this.
+> > [I checked sdptool browse local before running obexftpd & it is fine...]
+> > 
+> > Is it a problem with permissions given to unix domain sockets on platform ? Or something to do with the version mis-match ? Or something totally different ?
+> 
+> I don't know. Your system seems to be screwed up. Why don't you start
+> using something more recent like 4.22.
 
-Thanks. Are the contributors of the last SBC-related modifications reachable
-nowadays? They could probably help with the review of our patches.
+If you are on Fedora, there was an security update of dbus a couple of
+days ago that screwed up bluetooth (and a couple of other things) for
+most users. Maybe that is the problem.
 
-SBC code still can be improved in many ways from the performance point of
-view. The current implementation follows SBC specification pretty much
-literally. But rearranging the code a bit and getting rid of multidimentional
-arrays can provide identical output, but work noticeably faster. Also SBC
-can benefit from ARM assembly optimizations (for ARM11 and Cortex-A8),
-so these could be applied a bit later once all the high level stuff is in
-place.
+http://forums.fedoraforum.org/showthread.php?t=207069 
 
-Current implementation only needs to be checked to ensure that it is correct
-and fully adheres to the specification before applying large scale
-optimizations.
+-- 
+Cheers
+Per Thomas
 
-> One comment from my side is that this should work with little-endian and
-> big-endian as input streams. Please keep that in mind.
-
-Yes, it should work fine on both big and little endian systems, though I did
-not test it on big-endian hardware myself. Actually SBC bitstream packer
-favors big-endian systems, because the following part...
-
-+               if (bits_count >= 16) {\
-+                       bits_count -= 8;\
-+                       *data_ptr++ = (uint8_t)(bits_cache >> bits_count);\
-+                       bits_count -= 8;\
-+                       *data_ptr++ = (uint8_t)(bits_cache >> bits_count);\
-+               }\
-
-...could be implemented as something like this for big-endian systems
-(provided that we additionally take care of alignment and convert 'data_ptr'
-into a pointer to uint16_t):
-
-+               if (bits_count >= 16) {\
-+                       bits_count -= 16;\
-+                       *data_ptr++ = (uint16_t)(bits_cache >> bits_count);\
-+               }\
-
-But for little endian-systems and also to ensure endian neutrality, data
-writes are done one byte at a time.
-
-
-And Just an additional comment about portability, there are also systems where
-uint8_t data type is not supported (and CHAR_BIT is different from 8). For
-example, there is a port SBC encoder from bluez to C55x DSP [1].  I'm in no
-way involved in this project, but they could probably want to submit some
-changes to mainline SBC code to make it usable on such systems with a bit
-less tweaks.
-
-1. https://garage.maemo.org/projects/dsp-sbc
-
-
-Best regards,
-Siarhei Siamashka
