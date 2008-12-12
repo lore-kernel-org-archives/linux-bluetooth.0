@@ -1,64 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: how bluez supports ESCO link?
+Subject: Re: Release Note for BlueZ versions
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Shi Buyun-FVBP83 <FVBP83@motorola.com>
+To: pavan_savoy@indiatimes.com
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <15A39AF0EC0CC0418BE4B70B810E61B70143C694@zmy16exm72.ds.mot.com>
-References: <15A39AF0EC0CC0418BE4B70B810E61B70143C694@zmy16exm72.ds.mot.com>
+In-Reply-To: <643074291.26281228924530061.JavaMail.root@mbv7.indiatimes.com>
+References: <643074291.26281228924530061.JavaMail.root@mbv7.indiatimes.com>
 Content-Type: text/plain
-Date: Fri, 12 Dec 2008 02:46:41 +0100
-Message-Id: <1229046401.22285.23.camel@violet.holtmann.net>
+Date: Fri, 12 Dec 2008 02:44:27 +0100
+Message-Id: <1229046267.22285.22.camel@violet.holtmann.net>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Pavan,
 
-> In the current linux 2.6.25 kernel code, can Bluez setup ESCO link?
-> I found in net/bluetooth/sco.c, sco_connect defined as:
+> How do I know what BlueZ versions refer to what Bluetooth specification & confrom to which version ?
+> I am particularly interested about BlueZ 3.36.
 > 
-> static int sco_connect(struct sock *sk)
-> {
->  if (lmp_esco_capable(hdev) && !disable_esco)
->   type = ESCO_LINK;
->  else
->   type = SCO_LINK;
->  
->  hcon = hci_connect(hdev, type, dst, HCI_AT_NO_BONDING);
->  }
-> this code shows bluez supports ESCO link.
->  
-> But in function struct hci_conn * hci_connect(struct hci_dev *hdev, int
-> type, bdaddr_t *dst)
-> {
->  if (type == SCO_LINK) {
->   struct hci_conn *sco;
->  
->   if (!(sco = hci_conn_hash_lookup_ba(hdev, SCO_LINK, dst))) {
->    if (!(sco = hci_conn_add(hdev, SCO_LINK, dst))) {
->     hci_conn_put(acl);
->     return NULL;
->    }
->   }
->   acl->link = sco;
->   sco->link = acl;
->  
->   hci_conn_hold(sco);
->  
->   if (acl->state == BT_CONNECTED && 
->     (sco->state == BT_OPEN || sco->state == BT_CLOSED))
->    hci_add_sco(sco, acl->handle);
->  
->   return sco;
->  } else {
->   return acl;
->  }
-> } 
-> the else switch shows it does nothing when type NOT equal to SCO_LINK.
-> Should this code need to modify or this is intended to designed?
+> It shows me a error "Can't read simple pairing mode" on a v2.1 hardware.
 
-the hci_connect from a 2.6.27 kernel looks different. So you might wanna
-test with a later kernel.
+make sure you use hcidump -X -V to capture what is going on there. Maybe
+your hardware doesn't support Simple Pairing. It is possible to built
+2.1 devices without Simple Pairing support.
+
+Also you should switch to 4.22 or something more recent.
 
 Regards
 
