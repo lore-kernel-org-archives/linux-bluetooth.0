@@ -1,41 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: ObexFTP killing the Local SDP server
-From: Per Thomas Jahr <perja@extern.uio.no>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: pavan_savoy@indiatimes.com
-In-Reply-To: <1229046459.22285.24.camel@violet.holtmann.net>
-References: <676689813.95741228776457856.JavaMail.root@mbv7.indiatimes.com>
-	 <1229046459.22285.24.camel@violet.holtmann.net>
-Content-Type: text/plain
-Date: Fri, 12 Dec 2008 10:11:29 +0100
-Message-Id: <1229073089.3899.21.camel@apollo2>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Bea Lam <blam@trolltech.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: Adapter API - Devices property not updated if connection initiated by remote device
+Date: Fri, 12 Dec 2008 14:52:37 +1000
+Cc: linux-bluetooth@vger.kernel.org
+References: <200812111357.59004.blam@trolltech.com> <1229046197.22285.21.camel@violet.holtmann.net>
+In-Reply-To: <1229046197.22285.21.camel@violet.holtmann.net>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200812121452.37564.blam@trolltech.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 2008-12-12 at 02:47 +0100, Marcel Holtmann wrote:
-> Hi Pavan,
-> 
-> > I have a blueZ [version 3.35, wrongly claimed as 3.36] hcid daemon running on a machine, and I have put on it an ObexFTP daemon application [openobex + obexftp] which is statically linked with [bluez-libs-3.36].
-> > 
-> > The problem I face is, when I start obexftpd it says cannot register with SDP server,
-> > register to SDP Server failed, and comes out & then waits for a connecttion.
-> > 
-> > When I looked into it, it was failing in the function "sdp_connect_local" in bluez-libs/src/sdp.c & it also caused the SDP server to kill, So I cannot even do an sdptool browse local after this.
-> > [I checked sdptool browse local before running obexftpd & it is fine...]
-> > 
-> > Is it a problem with permissions given to unix domain sockets on platform ? Or something to do with the version mis-match ? Or something totally different ?
-> 
-> I don't know. Your system seems to be screwed up. Why don't you start
-> using something more recent like 4.22.
+Hi Marcel,
 
-If you are on Fedora, there was an security update of dbus a couple of
-days ago that screwed up bluetooth (and a couple of other things) for
-most users. Maybe that is the problem.
+Yes, FindDevice() is useful when I need to check whether a particular device 
+is connected at the moment. But what if I don't know the address of the 
+connecting device? That is, should BlueZ also be able to tell me when some 
+random, unknown device connects to me?
 
-http://forums.fedoraforum.org/showthread.php?t=207069 
+thanks
 
--- 
-Cheers
-Per Thomas
+Bea
 
+
+On Friday 12 December 2008 11:43:17 am Marcel Holtmann wrote:
+> Hi Bea,
+>
+> > When using the org.bluez.Adapter interface, if I initiate a connection to
+> > a remote device, then the adapter's Devices property is updated to
+> > include the remote device, as expected. However, if the remote device
+> > initiates the connection to my device instead, it isn't added to the
+> > Devices list. This would appear to be a bug.
+> >
+> > This can be problematic if I am trying to identify whether any remote
+> > devices are currently connected to the local adapter; it is not possible
+> > to identify the connected devices if they have initiated the connection.
+> >
+> > It would be much appreciated if someone could look into this. Perhaps the
+> > adapter->devices list could be updated when adapter_add_active_conn() is
+> > called, but I'm not sure if this is correct.
+>
+> I know that Johan fixed a bug where FindDevice would not give any result
+> for temporary devices. So you can use FindDevice to get the device
+> object. Adding it to the device list? I am not sure about that.
+>
+> Regards
+>
+> Marcel
