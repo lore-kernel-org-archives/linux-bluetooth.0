@@ -1,12 +1,18 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <BD8ED0C257AAA247BB6C9A92879522C10D9C0DEE@CNSCNEVS01.ap.sony.com>
-References: <BD8ED0C257AAA247BB6C9A92879522C10D9C0DEE@CNSCNEVS01.ap.sony.com>
-Date: Fri, 12 Dec 2008 02:54:03 +0100
-Message-Id: <1229046843.22285.29.camel@violet.holtmann.net>
+In-Reply-To: <493D878C.3040300@slackdot.org>
+References: <4939BB42.1080607@slackdot.org>
+	<1228598207.28839.49.camel@violet.holtmann.net>
+	<493B281E.3000200@slackdot.org>
+	<1228616055.28839.51.camel@violet.holtmann.net>
+	<493BF4F8.4050609@slackdot.org> <493D6925.3070206@slackdot.org>
+	<1228766182.28839.99.camel@violet.holtmann.net>
+	<493D878C.3040300@slackdot.org>
+Date: Fri, 12 Dec 2008 02:49:50 +0100
+Message-Id: <1229046590.22285.26.camel@violet.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] StartDiscovery doesn't exist
+Subject: Re: [Bluez-devel] Continued SCO audio issues...
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,37 +25,17 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hi Rob,
 
-> 	I am appreciating for your answer my question about "What's the
-> API different between inadapter-api.txt and dbus-api.txt in
-> bluez-utils-3.36.tar.gz".
-> 	
-> 	Now I develop application with Bluez 4.x. But something happens
-> abnormally. 
-> When I call function StartDiscovery over python-dbus, the system raise a
-> error:
-> 
-> File "/usr/lib/python2.5/site-packages/dbus/connection.py", line 607, in
-> call_blocking message, timeout)
-> dbus.exceptions.DBusException: org.freedesktop.DBus.Error.UnknownMethod:
-> Method "StartDiscovery" with signature "" on interface
-> "org.bluez.Adapter" doesn't exist
-> 
-> But the SetProperty, GetProperty are all right(These functions all come
-> from bluez4.x/doc/adapter-api.txt ).
-> 
-> 	So I think maybe there are some librarys or other things version
-> too old.
-> 	
-> 	OS version:	Suse linux 11, 2.6.25.5-1.1-pae
-> 	Daemon name: 	hcid
-> 	
-> 	So what's the problem? (Need I change the daemon hcid to
-> bluetoothd? If I need, how to do)
+> Ok, sorry for the confusion. :) We're using the Compulab EM-X270 SBC. It 
+> has a CSR BT chip on it that's connected to the machine via USB (a 
+> diagram of the basic interconnects in the system can be see in the 
+> document at http://www.compulab.co.il/x270em/download/x270-em-man.pdf). 
+> So, as far as I know it should be working in a similar fashion to a 
+> desktop PC.
 
-if you develop against bluez-4.x, then please re-read the *-api.txt
-documents since some method names changed for the final 4.x releases.
+this mailing list using bottom-posting so please respect that and stop
+top-posting.
 
 Regards
 
