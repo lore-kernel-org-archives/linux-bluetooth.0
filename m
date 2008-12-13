@@ -1,50 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
-To: "ext Brad Midgley" <bmidgley@gmail.com>
-Subject: Re: [RFC/PATCH] sbc: new filtering function for 8 band fixed point encoding
-Date: Mon, 15 Dec 2008 14:54:19 +0200
-Cc: "Jaska Uimonen" <jaska.uimonen@nokia.com>,
-	linux-bluetooth@vger.kernel.org
-References: <1227879337.20555.12.camel@esdhcp03999.research.nokia.com> <200812121914.48340.siarhei.siamashka@nokia.com> <d89ddf300812121119o601fe1acs229741960a98835c@mail.gmail.com>
-In-Reply-To: <d89ddf300812121119o601fe1acs229741960a98835c@mail.gmail.com>
+Message-ID: <4943E5C5.9050108@tommie-lie.de>
+Date: Sat, 13 Dec 2008 17:41:41 +0100
+From: Thomas Liebetraut <thomas@tommie-lie.de>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200812151454.19090.siarhei.siamashka@nokia.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: How to set link policy with Logitech diNovo dongle
+References: <493D7110.1020508@tommie-lie.de>	 <1228765907.28839.95.camel@violet.holtmann.net>	 <493D9EA5.5000101@tommie-lie.de>	 <1229046523.22285.25.camel@violet.holtmann.net>	 <49429EDF.4050900@tommie-lie.de>	 <1229104138.22285.113.camel@violet.holtmann.net>	 <4942A74E.2020409@tommie-lie.de>	 <1229105266.22285.116.camel@violet.holtmann.net>	 <4942AFFC.30307@tommie-lie.de> <1229107433.22285.138.camel@violet.holtmann.net>
+In-Reply-To: <1229107433.22285.138.camel@violet.holtmann.net>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="------------enig8A714B72956BF5ECF276AF15"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Friday 12 December 2008 21:19:20 ext Brad Midgley wrote:
-> Guys
->
-> One mistake we made was not keeping track of what functions we were
-> applying to the published tables as we worked things to look less and
-> less like the pseudocode in the spec. So if you start again from one
-> of the tables in the spec, keep a comment like
->
-> /* ourtable(x) = (int32)(table1(x) << 16) */
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enig8A714B72956BF5ECF276AF15
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Transfer-Encoding: quoted-printable
 
-This part can be probably done just by having a macro, something like
-#define F_TO_Q15(x) (int16_t)((x>0) ? ((x)*(1<<15)+0.5) : ((x)*(1<<15)-0.5))
-And then using plain floating point numbers from the SBC specification in the
-table, wrapped into this macro. Though I wonder if it is possible to use such
-conditional expression in the static table initializer list with all versions
-of gcc/other compilers.
+Marcel Holtmann schrieb:
+> as long as you get one with a CSR or Broadcom chip and Bluetooth 2.1
+> your are in a good position. The new ones are really really tiny and
+> stick only out 1cm or so. Personally I prefer CSR based dongles.
+Everything works now with a new CSR dongle. And it sticks out less than
+a centimeter ;-)
 
-> Which in this case would mean that in ourtable we've shifted the
-> original table1 float value left 16 bits and truncated it to an int32.
->
-> I also combined tables or split tables to simplify our loop logic or
-> eliminate operations; an explanation in a comment would have been
-> appropriate.
+Thanks for all your help.
 
-Yes, any transformations or simplifications should be extensively commented.
-So that it will be always possible to reproduce them or verify their
-correctness.
+Regards,
+Thomas
 
-Can anybody try to remember/explain what transformations were applied to
-the existing fixed point implementation?
 
--- 
-Best regards,
-Siarhei Siamashka
+--------------enig8A714B72956BF5ECF276AF15
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
+
+iEYEARECAAYFAklD5ckACgkQxVmZpTAq4Ijw3ACfXxTZd7jtQegJ+Sskm1WBdDWP
+IzcAnAxhCdaxdcLkboAz2zZEg8UlpoWg
+=s3n5
+-----END PGP SIGNATURE-----
+
+--------------enig8A714B72956BF5ECF276AF15--
