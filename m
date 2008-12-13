@@ -1,48 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4943E5C5.9050108@tommie-lie.de>
-Date: Sat, 13 Dec 2008 17:41:41 +0100
-From: Thomas Liebetraut <thomas@tommie-lie.de>
+Message-ID: <2d5a2c100812121702j5db4d6b4sbdbbd2f5e0cdc0fe@mail.gmail.com>
+Date: Fri, 12 Dec 2008 22:02:46 -0300
+From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+To: "Johan Hedberg" <johan.hedberg@nokia.com>
+Subject: Re: Adapter API - Devices property not updated if connection initiated by remote device
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20081212132850.GA2126@localhost>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: How to set link policy with Logitech diNovo dongle
-References: <493D7110.1020508@tommie-lie.de>	 <1228765907.28839.95.camel@violet.holtmann.net>	 <493D9EA5.5000101@tommie-lie.de>	 <1229046523.22285.25.camel@violet.holtmann.net>	 <49429EDF.4050900@tommie-lie.de>	 <1229104138.22285.113.camel@violet.holtmann.net>	 <4942A74E.2020409@tommie-lie.de>	 <1229105266.22285.116.camel@violet.holtmann.net>	 <4942AFFC.30307@tommie-lie.de> <1229107433.22285.138.camel@violet.holtmann.net>
-In-Reply-To: <1229107433.22285.138.camel@violet.holtmann.net>
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="------------enig8A714B72956BF5ECF276AF15"
+Content-Type: text/plain; charset=ISO-8859-1
+References: <200812111357.59004.blam@trolltech.com>
+	 <1229046197.22285.21.camel@violet.holtmann.net>
+	 <200812121452.37564.blam@trolltech.com>
+	 <1229079527.22285.38.camel@violet.holtmann.net>
+	 <20081212132850.GA2126@localhost>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enig8A714B72956BF5ECF276AF15
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: quoted-printable
+Hi
 
-Marcel Holtmann schrieb:
-> as long as you get one with a CSR or Broadcom chip and Bluetooth 2.1
-> your are in a good position. The new ones are really really tiny and
-> stick only out 1cm or so. Personally I prefer CSR based dongles.
-Everything works now with a new CSR dongle. And it sticks out less than
-a centimeter ;-)
+On Fri, Dec 12, 2008 at 10:28 AM, Johan Hedberg <johan.hedberg@nokia.com> wrote:
+> There definitely needs to be a way to know that a remote device has
+> connected to us even if it is not paired. I think we should just
+> populate the Devices list in this case and then remove the device from
+> it once it disconnects (if it didn't pair before that) and also send all
+> appropriate signals while doing this. For knowing if the device is
+> paired or not we already have the separate Paired property.
 
-Thanks for all your help.
+We could create the device object, but we should be careful to not
+start a service discovery and end up with this device on the storage.
+Note that this can be a security problem, since normally connections
+should at least trigger authorization which requires the object
+anyway, so someone is not really asking to the agent to authorize a
+incoming connection.
 
-Regards,
-Thomas
 
-
---------------enig8A714B72956BF5ECF276AF15
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
-
-iEYEARECAAYFAklD5ckACgkQxVmZpTAq4Ijw3ACfXxTZd7jtQegJ+Sskm1WBdDWP
-IzcAnAxhCdaxdcLkboAz2zZEg8UlpoWg
-=s3n5
------END PGP SIGNATURE-----
-
---------------enig8A714B72956BF5ECF276AF15--
+-- 
+Luiz Augusto von Dentz
+Engenheiro de Computação
