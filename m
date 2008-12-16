@@ -1,391 +1,206 @@
 Return-Path: <cyrus@holtmann.org>
 From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
-To: "ext Brad Midgley" <bmidgley@gmail.com>
-Subject: Re: [RFC/PATCH] sbc: new filtering function for 8 band fixed point encoding
-Date: Wed, 17 Dec 2008 00:37:48 +0200
-Cc: "Jaska Uimonen" <jaska.uimonen@nokia.com>,
-	linux-bluetooth@vger.kernel.org
-References: <1227879337.20555.12.camel@esdhcp03999.research.nokia.com> <200812151454.19090.siarhei.siamashka@nokia.com> <d89ddf300812150716y7ac88ee5y19baf38a4d91bcfb@mail.gmail.com>
-In-Reply-To: <d89ddf300812150716y7ac88ee5y19baf38a4d91bcfb@mail.gmail.com>
+To: "ext Marcel Holtmann" <marcel@holtmann.org>
+Subject: Re: [PATCH] sbc: bitstream packing optimization for encoder.
+Date: Tue, 16 Dec 2008 23:46:38 +0200
+Cc: linux-bluetooth@vger.kernel.org
+References: <200812112227.07170.siarhei.siamashka@nokia.com> <1229045974.22285.18.camel@violet.holtmann.net>
+In-Reply-To: <1229045974.22285.18.camel@violet.holtmann.net>
 MIME-Version: 1.0
 Content-Type: Multipart/Mixed;
-  boundary="Boundary-00=_82CSJiWMvGzlF36"
-Message-Id: <200812170037.48141.siarhei.siamashka@nokia.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+  boundary="Boundary-00=_/GCSJieAcbS+Rv6"
+Message-Id: <200812162346.39089.siarhei.siamashka@nokia.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---Boundary-00=_82CSJiWMvGzlF36
+--Boundary-00=_/GCSJieAcbS+Rv6
 Content-Type: text/plain;
-  charset="iso-8859-1"
+  charset="utf-8"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-On Monday 15 December 2008 17:16:58 ext Brad Midgley wrote:
-> I like your idea of using a macro with the original floating point
-> tables, as long as we know it is done at compile time, not runtime :)
-
-What about something like this modification to Jaska's patch? It contains
-floating point constants wrapped into a macro.
-
-This version is using 16-bit multiplications only (additional natural change
-would be just to convert 'sbc_encoder_state->' to int16_t because it does not
-need to be int32_t), which is good for performance for the platforms with fast
-16-bit integer multiplication. But it is also flexible enough to be changed to
-use 32x32->64 multiplications just by replacing FIXED_A and FIXED_T types
-to int64_t and int32_t respectively (for better precision or experiments with
-conformance testing).
-
-> > Can anybody try to remember/explain what transformations were applied to
-> > the existing fixed point implementation?
+On Friday 12 December 2008 03:39:34 ext Marcel Holtmann wrote:
+> Hi Siarhei,
 >
-> it was done by several people and the only record we have is in cvs.
-> (part of it is in the old btsco project's cvs)
+> > Appears that bitstream packing is also one of the most CPU hungry
+> > operations in SBC encoder, which did not get proper attention yet.
+> > Could somebody review this patch and provide feedback/comments?
+>
+> again thanks for working on this. I am actually willing to include your
+> patches quickly in one of the next releases to get more wider testing
+> audience.
 
-Regarding the code optimizations. Looking at the tables, It can be seen that
-'cos_table_fixed_8[0+hop]' is always equal to 'cos_table_fixed_8[8+hop]'.
-The same is true for 'cos_table_fixed_8[1+hop]' and 'cos_table_fixed_8[7+hop]'
-So it is possible to join 't1[0] + t1[8]', 't1[1]+ t1[7]' and the other such
-pairs, effectively halving the number of counters. This looks very much like
-the optimization that was applied to the current fixed point code :)
+Well, after doing a bit more testing, appears that a bug slipped in:
++					PUT_BITS(audio_sample, bits[ch][sb]);
 
-But now it would be very interesting to see if the conformance tests pass
-rate is better with the new filtering function.
+There should be the following line instead:
++					PUT_BITS(audio_sample & levels[ch][sb], bits[ch][sb]);
 
+Updated patch is attached. Any additional testing/feedback is very much
+welcome.
 
-Best regards,
+Best regards
 Siarhei Siamashka
 
---Boundary-00=_82CSJiWMvGzlF36
+--Boundary-00=_/GCSJieAcbS+Rv6
 Content-Type: text/x-diff;
-  charset="iso-8859-1";
-  name="analyze_eight_modified.diff"
+  charset="utf-8";
+  name="0001-sbc-bitstream-writing-optimization-for-encoder-try2.patch"
 Content-Transfer-Encoding: 8bit
 Content-Disposition: inline;
-	filename="analyze_eight_modified.diff"
+	filename="0001-sbc-bitstream-writing-optimization-for-encoder-try2.patch"
+
+>From 0a3818bd86342c60cda2fa87c59ecd5f9d6d4591 Mon Sep 17 00:00:00 2001
+From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
+Date: Thu, 11 Dec 2008 21:21:28 +0200
+Subject: [PATCH] sbc: bitstream writing optimization for encoder.
+
+SBC encoder performance improvement up to 1.5x for ARM11
+and almost twice faster for Intel Core2 in some cases.
+
+Signed-off-by: Siarhei Siamashka <siarhei.siamashka@nokia.com>
+---
+ sbc/sbc.c |   65 ++++++++++++++++++++++++++++++++++--------------------------
+ 1 files changed, 37 insertions(+), 28 deletions(-)
 
 diff --git a/sbc/sbc.c b/sbc/sbc.c
-index 7072673..656abe5 100644
+index 7072673..c495a75 100644
 --- a/sbc/sbc.c
 +++ b/sbc/sbc.c
-@@ -40,6 +40,7 @@
- #include <string.h>
- #include <stdlib.h>
- #include <sys/types.h>
-+#include <limits.h>
- 
- #include "sbc_math.h"
- #include "sbc_tables.h"
-@@ -742,124 +743,107 @@ static inline void sbc_analyze_four(struct sbc_encoder_state *state,
- 
- static inline void _sbc_analyze_eight(const int32_t *in, int32_t *out)
- {
--	sbc_fixed_t t[8], s[8];
--
--	t[0] = SCALE8_STAGE1( /* Q10 */
--		MULA(_sbc_proto_8[0], (in[16] - in[64]), /* Q18 = Q18 * Q0 */
--		MULA(_sbc_proto_8[1], (in[32] - in[48]),
--		MULA(_sbc_proto_8[2], in[4],
--		MULA(_sbc_proto_8[3], in[20],
--		MULA(_sbc_proto_8[4], in[36],
--		MUL( _sbc_proto_8[5], in[52])))))));
--
--	t[1] = SCALE8_STAGE1(
--		MULA(_sbc_proto_8[6], in[2],
--		MULA(_sbc_proto_8[7], in[18],
--		MULA(_sbc_proto_8[8], in[34],
--		MULA(_sbc_proto_8[9], in[50],
--		MUL(_sbc_proto_8[10], in[66]))))));
--
--	t[2] = SCALE8_STAGE1(
--		MULA(_sbc_proto_8[11], in[1],
--		MULA(_sbc_proto_8[12], in[17],
--		MULA(_sbc_proto_8[13], in[33],
--		MULA(_sbc_proto_8[14], in[49],
--		MULA(_sbc_proto_8[15], in[65],
--		MULA(_sbc_proto_8[16], in[3],
--		MULA(_sbc_proto_8[17], in[19],
--		MULA(_sbc_proto_8[18], in[35],
--		MULA(_sbc_proto_8[19], in[51],
--		MUL( _sbc_proto_8[20], in[67])))))))))));
--
--	t[3] = SCALE8_STAGE1(
--		MULA( _sbc_proto_8[21], in[5],
--		MULA( _sbc_proto_8[22], in[21],
--		MULA( _sbc_proto_8[23], in[37],
--		MULA( _sbc_proto_8[24], in[53],
--		MULA( _sbc_proto_8[25], in[69],
--		MULA(-_sbc_proto_8[15], in[15],
--		MULA(-_sbc_proto_8[14], in[31],
--		MULA(-_sbc_proto_8[13], in[47],
--		MULA(-_sbc_proto_8[12], in[63],
--		MUL( -_sbc_proto_8[11], in[79])))))))))));
--
--	t[4] = SCALE8_STAGE1(
--		MULA( _sbc_proto_8[26], in[6],
--		MULA( _sbc_proto_8[27], in[22],
--		MULA( _sbc_proto_8[28], in[38],
--		MULA( _sbc_proto_8[29], in[54],
--		MULA( _sbc_proto_8[30], in[70],
--		MULA(-_sbc_proto_8[10], in[14],
--		MULA(-_sbc_proto_8[9], in[30],
--		MULA(-_sbc_proto_8[8], in[46],
--		MULA(-_sbc_proto_8[7], in[62],
--		MUL( -_sbc_proto_8[6], in[78])))))))))));
--
--	t[5] = SCALE8_STAGE1(
--		MULA( _sbc_proto_8[31], in[7],
--		MULA( _sbc_proto_8[32], in[23],
--		MULA( _sbc_proto_8[33], in[39],
--		MULA( _sbc_proto_8[34], in[55],
--		MULA( _sbc_proto_8[35], in[71],
--		MULA(-_sbc_proto_8[20], in[13],
--		MULA(-_sbc_proto_8[19], in[29],
--		MULA(-_sbc_proto_8[18], in[45],
--		MULA(-_sbc_proto_8[17], in[61],
--		MUL( -_sbc_proto_8[16], in[77])))))))))));
--
--	t[6] = SCALE8_STAGE1(
--		MULA( _sbc_proto_8[36], (in[8] + in[72]),
--		MULA( _sbc_proto_8[37], (in[24] + in[56]),
--		MULA( _sbc_proto_8[38], in[40],
--		MULA(-_sbc_proto_8[39], in[12],
--		MULA(-_sbc_proto_8[5], in[28],
--		MULA(-_sbc_proto_8[4], in[44],
--		MULA(-_sbc_proto_8[3], in[60],
--		MUL( -_sbc_proto_8[2], in[76])))))))));
--
--	t[7] = SCALE8_STAGE1(
--		MULA( _sbc_proto_8[35], in[9],
--		MULA( _sbc_proto_8[34], in[25],
--		MULA( _sbc_proto_8[33], in[41],
--		MULA( _sbc_proto_8[32], in[57],
--		MULA( _sbc_proto_8[31], in[73],
--		MULA(-_sbc_proto_8[25], in[11],
--		MULA(-_sbc_proto_8[24], in[27],
--		MULA(-_sbc_proto_8[23], in[43],
--		MULA(-_sbc_proto_8[22], in[59],
--		MUL( -_sbc_proto_8[21], in[75])))))))))));
--
--	s[0] = MULA(  _anamatrix8[0], t[0],
--		MUL(  _anamatrix8[1], t[6]));
--	s[1] = MUL(   _anamatrix8[7], t[1]);
--	s[2] = MULA(  _anamatrix8[2], t[2],
--		MULA( _anamatrix8[3], t[3],
--		MULA( _anamatrix8[4], t[5],
--		MUL(  _anamatrix8[5], t[7]))));
--	s[3] = MUL(   _anamatrix8[6], t[4]);
--	s[4] = MULA(  _anamatrix8[3], t[2],
--		MULA(-_anamatrix8[5], t[3],
--		MULA(-_anamatrix8[2], t[5],
--		MUL( -_anamatrix8[4], t[7]))));
--	s[5] = MULA(  _anamatrix8[4], t[2],
--		MULA(-_anamatrix8[2], t[3],
--		MULA( _anamatrix8[5], t[5],
--		MUL(  _anamatrix8[3], t[7]))));
--	s[6] = MULA(  _anamatrix8[1], t[0],
--		MUL( -_anamatrix8[0], t[6]));
--	s[7] = MULA(  _anamatrix8[5], t[2],
--		MULA(-_anamatrix8[4], t[3],
--		MULA( _anamatrix8[3], t[5],
--		MUL( -_anamatrix8[2], t[7]))));
--
--	out[0] = SCALE8_STAGE2( s[0] + s[1] + s[2] + s[3]);
--	out[1] = SCALE8_STAGE2( s[1] - s[3] + s[4] + s[6]);
--	out[2] = SCALE8_STAGE2( s[1] - s[3] + s[5] - s[6]);
--	out[3] = SCALE8_STAGE2(-s[0] + s[1] + s[3] + s[7]);
--	out[4] = SCALE8_STAGE2(-s[0] + s[1] + s[3] - s[7]);
--	out[5] = SCALE8_STAGE2( s[1] - s[3] - s[5] - s[6]);
--	out[6] = SCALE8_STAGE2( s[1] - s[3] - s[4] + s[6]);
--	out[7] = SCALE8_STAGE2( s[0] + s[1] - s[2] + s[3]);
-+	FIXED_A t1[16];
-+	FIXED_T t2[16];
-+	int i = 0, hop = 0, R = 0;
-+
-+	/* rounding coefficient */
-+	R = 1 << (SBC_PROTO_FIXED8_SCALE-1);
-+
-+	/* low pass polyphase filter */
-+	t1[0] =  (FIXED_A)in[0] * _sbc_proto_fixed8[0];
-+	t1[1] =  (FIXED_A)in[1] * _sbc_proto_fixed8[1];
-+	t1[2] =  (FIXED_A)in[2] * _sbc_proto_fixed8[2];
-+	t1[3] =  (FIXED_A)in[3] * _sbc_proto_fixed8[3];
-+	t1[4] =  (FIXED_A)in[4] * _sbc_proto_fixed8[4];
-+	t1[5] =  (FIXED_A)in[5] * _sbc_proto_fixed8[5];
-+	t1[6] =  (FIXED_A)in[6] * _sbc_proto_fixed8[6];
-+	t1[7] =  (FIXED_A)in[7] * _sbc_proto_fixed8[7];
-+	t1[8] =  (FIXED_A)in[8] * _sbc_proto_fixed8[8];
-+	t1[9] =  (FIXED_A)in[9] * _sbc_proto_fixed8[9];
-+	t1[10] = (FIXED_A)in[10] * _sbc_proto_fixed8[10];
-+	t1[11] = (FIXED_A)in[11] * _sbc_proto_fixed8[11];
-+	/* t1[12] = (FIXED_A)in[12] * _sbc_proto_fixed8[12]; */
-+	t1[13] = (FIXED_A)in[13] * _sbc_proto_fixed8[13];
-+	t1[14] = (FIXED_A)in[14] * _sbc_proto_fixed8[14];
-+	t1[15] = (FIXED_A)in[15] * _sbc_proto_fixed8[15];
-+
-+	hop = 16;
-+	for (i = 0; i < 4; i++) {
-+		t1[0] +=  (FIXED_A)in[hop] * _sbc_proto_fixed8[hop];
-+		t1[1] +=  (FIXED_A)in[hop + 1] * _sbc_proto_fixed8[hop + 1];
-+		t1[2] +=  (FIXED_A)in[hop + 2] * _sbc_proto_fixed8[hop + 2];
-+		t1[3] +=  (FIXED_A)in[hop + 3] * _sbc_proto_fixed8[hop + 3];
-+		t1[4] +=  (FIXED_A)in[hop + 4] * _sbc_proto_fixed8[hop + 4];
-+		t1[5] +=  (FIXED_A)in[hop + 5] * _sbc_proto_fixed8[hop + 5];
-+		t1[6] +=  (FIXED_A)in[hop + 6] * _sbc_proto_fixed8[hop + 6];
-+		t1[7] +=  (FIXED_A)in[hop + 7] * _sbc_proto_fixed8[hop + 7];
-+		t1[8] +=  (FIXED_A)in[hop + 8] * _sbc_proto_fixed8[hop + 8];
-+		t1[9] +=  (FIXED_A)in[hop + 9] * _sbc_proto_fixed8[hop + 9];
-+		t1[10] += (FIXED_A)in[hop + 10] * _sbc_proto_fixed8[hop + 10];
-+		t1[11] += (FIXED_A)in[hop + 11] * _sbc_proto_fixed8[hop + 11];
-+		/* t1[12] += (FIXED_A)in[hop + 12] * _sbc_proto_fixed8[hop + 12]; */
-+		t1[13] += (FIXED_A)in[hop + 13] * _sbc_proto_fixed8[hop + 13];
-+		t1[14] += (FIXED_A)in[hop + 14] * _sbc_proto_fixed8[hop + 14];
-+		t1[15] += (FIXED_A)in[hop + 15] * _sbc_proto_fixed8[hop + 15];
-+		
-+		hop += 16;
-+	}
-+
-+	/* scaling */
-+	t2[0] = (t1[0] + R) >> SBC_PROTO_FIXED8_SCALE;
-+	t2[1] = (t1[1] + R) >> SBC_PROTO_FIXED8_SCALE;
-+	t2[2] = (t1[2] + R) >> SBC_PROTO_FIXED8_SCALE;
-+	t2[3] = (t1[3] + R) >> SBC_PROTO_FIXED8_SCALE;
-+	t2[4] = (t1[4] + R) >> SBC_PROTO_FIXED8_SCALE;
-+	t2[5] = (t1[5] + R) >> SBC_PROTO_FIXED8_SCALE;
-+	t2[6] = (t1[6] + R) >> SBC_PROTO_FIXED8_SCALE;
-+	t2[7] = (t1[7] + R) >> SBC_PROTO_FIXED8_SCALE;
-+	t2[8] = (t1[8] + R) >> SBC_PROTO_FIXED8_SCALE;
-+	t2[9] = (t1[9] + R) >> SBC_PROTO_FIXED8_SCALE;
-+	t2[10] = (t1[10] + R) >> SBC_PROTO_FIXED8_SCALE;
-+	t2[11] = (t1[11] + R) >> SBC_PROTO_FIXED8_SCALE;
-+	/* t2[12] = (t1[12] + R) >> SBC_PROTO_FIXED8_SCALE; */
-+	t2[13] = (t1[13] + R) >> SBC_PROTO_FIXED8_SCALE;
-+	t2[14] = (t1[14] + R) >> SBC_PROTO_FIXED8_SCALE;
-+	t2[15] = (t1[15] + R) >> SBC_PROTO_FIXED8_SCALE;
-+
-+	R = 1 << (SBC_COS_TABLE_FIXED8_SCALE-1);
-+
-+	/* do the cos transform */
-+	hop = 0;
-+	for (i = 0; i < 8; i++) {
-+		t1[i]  = (FIXED_A)t2[0] * cos_table_fixed_8[0 + hop];
-+		t1[i] += (FIXED_A)t2[1] * cos_table_fixed_8[1 + hop];
-+		t1[i] += (FIXED_A)t2[2] * cos_table_fixed_8[2 + hop];
-+		t1[i] += (FIXED_A)t2[3] * cos_table_fixed_8[3 + hop];
-+		/* cos_table_fixed_8[4 + hop] = 1.0 */
-+		t1[i] += (FIXED_A)t2[4] << SBC_COS_TABLE_FIXED8_SCALE;
-+		t1[i] += (FIXED_A)t2[5] * cos_table_fixed_8[5 + hop];
-+		t1[i] += (FIXED_A)t2[6] * cos_table_fixed_8[6 + hop];
-+		t1[i] += (FIXED_A)t2[7] * cos_table_fixed_8[7 + hop];
-+		t1[i] += (FIXED_A)t2[8] * cos_table_fixed_8[8 + hop];
-+		t1[i] += (FIXED_A)t2[9] * cos_table_fixed_8[9 + hop];
-+		t1[i] += (FIXED_A)t2[10] * cos_table_fixed_8[10 + hop];
-+		t1[i] += (FIXED_A)t2[11] * cos_table_fixed_8[11 + hop];
-+		/* cos_table_fixed_8[12 + hop] = 0.0 */
-+		/* t1[i] += (FIXED_A)t2[12] * cos_table_fixed_8[12 + hop]; */
-+		t1[i] += (FIXED_A)t2[13] * cos_table_fixed_8[13 + hop];
-+		t1[i] += (FIXED_A)t2[14] * cos_table_fixed_8[14 + hop];
-+		t1[i] += (FIXED_A)t2[15] * cos_table_fixed_8[15 + hop];
-+
-+		hop += 16;
-+	}
-+
-+	/* scaling */
-+	out[0] = (t1[0] + R) >> SBC_COS_TABLE_FIXED8_SCALE;
-+	out[1] = (t1[1] + R) >> SBC_COS_TABLE_FIXED8_SCALE;
-+	out[2] = (t1[2] + R) >> SBC_COS_TABLE_FIXED8_SCALE;
-+	out[3] = (t1[3] + R) >> SBC_COS_TABLE_FIXED8_SCALE;
-+	out[4] = (t1[4] + R) >> SBC_COS_TABLE_FIXED8_SCALE;
-+	out[5] = (t1[5] + R) >> SBC_COS_TABLE_FIXED8_SCALE;
-+	out[6] = (t1[6] + R) >> SBC_COS_TABLE_FIXED8_SCALE;
-+	out[7] = (t1[7] + R) >> SBC_COS_TABLE_FIXED8_SCALE;
+@@ -909,6 +909,29 @@ static int sbc_analyze_audio(struct sbc_encoder_state *state,
+ 	}
  }
  
- static inline void sbc_analyze_eight(struct sbc_encoder_state *state,
-diff --git a/sbc/sbc_tables.h b/sbc/sbc_tables.h
-index f5daaa7..6e63f48 100644
---- a/sbc/sbc_tables.h
-+++ b/sbc/sbc_tables.h
-@@ -166,3 +166,81 @@ static const int32_t synmatrix8[16][8] = {
- 	{ SN8(0xf9592678), SN8(0x018f8b84), SN8(0x07d8a5f0), SN8(0x0471ced0),
- 	  SN8(0xfb8e3130), SN8(0xf8275a10), SN8(0xfe70747c), SN8(0x06a6d988) }
- };
++/* Supplementary bitstream writing macros for 'sbc_pack_frame' */
 +
-+/* data type for fixed point accumulator */
-+#define FIXED_A int32_t
-+/* data type for fixed point constants */
-+#define FIXED_T int16_t
++#define PUT_BITS(v, n)\
++	{\
++		bits_cache = (v) | (bits_cache << (n));\
++		bits_count += (n);\
++		if (bits_count >= 16) {\
++			bits_count -= 8;\
++			*data_ptr++ = (uint8_t)(bits_cache >> bits_count);\
++			bits_count -= 8;\
++			*data_ptr++ = (uint8_t)(bits_cache >> bits_count);\
++		}\
++	} while (0);\
 +
-+/* A2DP specification: Section 12.8 Tables */
-+#define SBC_PROTO_FIXED8_SCALE (sizeof(FIXED_T)*CHAR_BIT - 1)
-+#define F(x) (FIXED_T)((x)*((FIXED_A)1<<SBC_PROTO_FIXED8_SCALE)+0.5)
-+static const FIXED_T _sbc_proto_fixed8[80] = {
-+	 F(0.00000000E+00), F(1.56575398E-04), F(3.43256425E-04), F(5.54620202E-04),
-+	 F(8.23919506E-04), F(1.13992507E-03), F(1.47640169E-03), F(1.78371725E-03),
-+	 F(2.01182542E-03), F(2.10371989E-03), F(1.99454554E-03), F(1.61656283E-03),
-+	 F(9.02154502E-04),-F(1.78805361E-04),-F(1.64973098E-03),-F(3.49717454E-03),
-+	 F(5.65949473E-03), F(8.02941163E-03), F(1.04584443E-02), F(1.27472335E-02),
-+	 F(1.46525263E-02), F(1.59045603E-02), F(1.62208471E-02), F(1.53184106E-02),
-+	 F(1.29371806E-02), F(8.85757540E-03), F(2.92408442E-03),-F(4.91578024E-03),
-+	-F(1.46404076E-02),-F(2.61098752E-02),-F(3.90751381E-02),-F(5.31873032E-02),
-+	 F(6.79989431E-02), F(8.29847578E-02), F(9.75753918E-02), F(1.11196689E-01),
-+	 F(1.23264548E-01), F(1.33264415E-01), F(1.40753505E-01), F(1.45389847E-01),
-+	 F(1.46955068E-01), F(1.45389847E-01), F(1.40753505E-01), F(1.33264415E-01),
-+	 F(1.23264548E-01), F(1.11196689E-01), F(9.75753918E-02), F(8.29847578E-02),
-+	-F(6.79989431E-02),-F(5.31873032E-02),-F(3.90751381E-02),-F(2.61098752E-02),
-+	-F(1.46404076E-02),-F(4.91578024E-03), F(2.92408442E-03), F(8.85757540E-03),
-+	 F(1.29371806E-02), F(1.53184106E-02), F(1.62208471E-02), F(1.59045603E-02),
-+	 F(1.46525263E-02), F(1.27472335E-02), F(1.04584443E-02), F(8.02941163E-03),
-+	-F(5.65949473E-03),-F(3.49717454E-03),-F(1.64973098E-03),-F(1.78805361E-04),
-+	 F(9.02154502E-04), F(1.61656283E-03), F(1.99454554E-03), F(2.10371989E-03),
-+	 F(2.01182542E-03), F(1.78371725E-03), F(1.47640169E-03), F(1.13992507E-03),
-+	 F(8.23919506E-04), F(5.54620202E-04), F(3.43256425E-04), F(1.56575398E-04),
-+};
-+#undef F
++#define FLUSH_BITS()\
++	while (bits_count >= 8) {\
++		bits_count -= 8;\
++		*data_ptr++ = (uint8_t)(bits_cache >> bits_count);\
++	}\
++	if (bits_count > 0) {\
++	    *data_ptr++ = (uint8_t)(bits_cache << (8 - bits_count));\
++	}\
 +
-+/*
-+ * To produce this cosine matrix in Octave:
-+ *
-+ * b = zeros(8, 16);
-+ * for i = 0:7 for j = 0:15 b(i+1, j+1) = cos( (i + 0.5) * (j - 4) * (pi/8) ) endfor endfor;
-+ * printf("%.10f, ", b');
-+ *
-+ */
-+#define SBC_COS_TABLE_FIXED8_SCALE (sizeof(FIXED_T)*CHAR_BIT - 1)
-+#define F(x) (FIXED_T)((x)*((FIXED_A)1<<SBC_COS_TABLE_FIXED8_SCALE)+0.5)
-+static const FIXED_T cos_table_fixed_8[128] = {
-+	 F(0.7071067812), F(0.8314696123), F(0.9238795325), F(0.9807852804),
-+	 F(1.0000000000), F(0.9807852804), F(0.9238795325), F(0.8314696123),
-+	 F(0.7071067812), F(0.5555702330), F(0.3826834324), F(0.1950903220),
-+	 F(0.0000000000),-F(0.1950903220),-F(0.3826834324),-F(0.5555702330),
-+	-F(0.7071067812),-F(0.1950903220), F(0.3826834324), F(0.8314696123),
-+	 F(1.0000000000), F(0.8314696123), F(0.3826834324),-F(0.1950903220),
-+	-F(0.7071067812),-F(0.9807852804),-F(0.9238795325),-F(0.5555702330),
-+	-F(0.0000000000), F(0.5555702330), F(0.9238795325), F(0.9807852804),
-+	-F(0.7071067812),-F(0.9807852804),-F(0.3826834324), F(0.5555702330),
-+	 F(1.0000000000), F(0.5555702330),-F(0.3826834324),-F(0.9807852804),
-+	-F(0.7071067812), F(0.1950903220), F(0.9238795325), F(0.8314696123),
-+	 F(0.0000000000),-F(0.8314696123),-F(0.9238795325),-F(0.1950903220),
-+	 F(0.7071067812),-F(0.5555702330),-F(0.9238795325), F(0.1950903220),
-+	 F(1.0000000000), F(0.1950903220),-F(0.9238795325),-F(0.5555702330),
-+	 F(0.7071067812), F(0.8314696123),-F(0.3826834324),-F(0.9807852804),
-+	-F(0.0000000000), F(0.9807852804), F(0.3826834324),-F(0.8314696123),
-+	 F(0.7071067812), F(0.5555702330),-F(0.9238795325),-F(0.1950903220),
-+	 F(1.0000000000),-F(0.1950903220),-F(0.9238795325), F(0.5555702330),
-+	 F(0.7071067812),-F(0.8314696123),-F(0.3826834324), F(0.9807852804),
-+	 F(0.0000000000),-F(0.9807852804), F(0.3826834324), F(0.8314696123),
-+	-F(0.7071067812), F(0.9807852804),-F(0.3826834324),-F(0.5555702330),
-+	 F(1.0000000000),-F(0.5555702330),-F(0.3826834324), F(0.9807852804),
-+	-F(0.7071067812),-F(0.1950903220), F(0.9238795325),-F(0.8314696123),
-+	-F(0.0000000000), F(0.8314696123),-F(0.9238795325), F(0.1950903220),
-+	-F(0.7071067812), F(0.1950903220), F(0.3826834324),-F(0.8314696123),
-+	 F(1.0000000000),-F(0.8314696123), F(0.3826834324), F(0.1950903220),
-+	-F(0.7071067812), F(0.9807852804),-F(0.9238795325), F(0.5555702330),
-+	-F(0.0000000000),-F(0.5555702330), F(0.9238795325),-F(0.9807852804),
-+	 F(0.7071067812),-F(0.8314696123), F(0.9238795325),-F(0.9807852804),
-+	 F(1.0000000000),-F(0.9807852804), F(0.9238795325),-F(0.8314696123),
-+	 F(0.7071067812),-F(0.5555702330), F(0.3826834324),-F(0.1950903220),
-+	-F(0.0000000000), F(0.1950903220),-F(0.3826834324), F(0.5555702330),
-+};
-+#undef F
+ /*
+  * Packs the SBC frame from frame into the memory at data. At most len
+  * bytes will be used, should more memory be needed an appropriate
+@@ -926,14 +949,18 @@ static int sbc_analyze_audio(struct sbc_encoder_state *state,
+ 
+ static int sbc_pack_frame(uint8_t *data, struct sbc_frame *frame, size_t len)
+ {
+-	int produced;
++	/* Bitstream writer starts from the fourth byte */
++	uint8_t *data_ptr = data + 4;
++	uint32_t bits_cache = 0;
++	uint32_t bits_count = 0;
++
+ 	/* Will copy the header parts for CRC-8 calculation here */
+ 	uint8_t crc_header[11] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+ 	int crc_pos = 0;
+ 
+ 	uint16_t audio_sample;
+ 
+-	int ch, sb, blk, bit;	/* channel, subband, block and bit counters */
++	int ch, sb, blk;	/* channel, subband, block and bit counters */
+ 	int bits[2][8];		/* bits distribution */
+ 	int levels[2][8];	/* levels are derived from that */
+ 
+@@ -973,8 +1000,6 @@ static int sbc_pack_frame(uint8_t *data, struct sbc_frame *frame, size_t len)
+ 
+ 	/* Can't fill in crc yet */
+ 
+-	produced = 32;
+-
+ 	crc_header[0] = data[1];
+ 	crc_header[1] = data[2];
+ 	crc_pos = 16;
+@@ -999,6 +1024,7 @@ static int sbc_pack_frame(uint8_t *data, struct sbc_frame *frame, size_t len)
+ 		u_int32_t scalefactor_j[2];
+ 		uint8_t scale_factor_j[2];
+ 
++		uint8_t joint = 0;
+ 		frame->joint = 0;
+ 
+ 		for (sb = 0; sb < frame->subbands - 1; sb++) {
+@@ -1031,6 +1057,7 @@ static int sbc_pack_frame(uint8_t *data, struct sbc_frame *frame, size_t len)
+ 			if ((scalefactor[0][sb] + scalefactor[1][sb]) >
+ 					(scalefactor_j[0] + scalefactor_j[1]) ) {
+ 				/* use joint stereo for this subband */
++				joint |= 1 << (frame->subbands - 1 - sb);
+ 				frame->joint |= 1 << sb;
+ 				frame->scale_factor[0][sb] = scale_factor_j[0];
+ 				frame->scale_factor[1][sb] = scale_factor_j[1];
+@@ -1045,24 +1072,16 @@ static int sbc_pack_frame(uint8_t *data, struct sbc_frame *frame, size_t len)
+ 			}
+ 		}
+ 
+-		data[4] = 0;
+-		for (sb = 0; sb < frame->subbands - 1; sb++)
+-			data[4] |= ((frame->joint >> sb) & 0x01) << (frame->subbands - 1 - sb);
+-
+-		crc_header[crc_pos >> 3] = data[4];
+-
+-		produced += frame->subbands;
++		PUT_BITS(joint, frame->subbands);
++		crc_header[crc_pos >> 3] = joint;
+ 		crc_pos += frame->subbands;
+ 	}
+ 
+ 	for (ch = 0; ch < frame->channels; ch++) {
+ 		for (sb = 0; sb < frame->subbands; sb++) {
+-			data[produced >> 3] <<= 4;
++			PUT_BITS(frame->scale_factor[ch][sb] & 0x0F, 4);
+ 			crc_header[crc_pos >> 3] <<= 4;
+-			data[produced >> 3] |= frame->scale_factor[ch][sb] & 0x0F;
+ 			crc_header[crc_pos >> 3] |= frame->scale_factor[ch][sb] & 0x0F;
+-
+-			produced += 4;
+ 			crc_pos += 4;
+ 		}
+ 	}
+@@ -1088,25 +1107,15 @@ static int sbc_pack_frame(uint8_t *data, struct sbc_frame *frame, size_t len)
+ 						(uint16_t) ((((frame->sb_sample_f[blk][ch][sb]*levels[ch][sb]) >>
+ 									(frame->scale_factor[ch][sb] + 1)) +
+ 								levels[ch][sb]) >> 1);
+-					audio_sample <<= 16 - bits[ch][sb];
+-					for (bit = 0; bit < bits[ch][sb]; bit++) {
+-						data[produced >> 3] <<= 1;
+-						if (audio_sample & 0x8000)
+-							data[produced >> 3] |= 0x1;
+-						audio_sample <<= 1;
+-						produced++;
+-					}
++					PUT_BITS(audio_sample & levels[ch][sb], bits[ch][sb]);
+ 				}
+ 			}
+ 		}
+ 	}
+ 
+-	/* align the last byte */
+-	if (produced % 8) {
+-		data[produced >> 3] <<= 8 - (produced % 8);
+-	}
++	FLUSH_BITS();
+ 
+-	return (produced + 7) >> 3;
++	return data_ptr - data;
+ }
+ 
+ struct sbc_priv {
+-- 
+1.5.6.5
 
---Boundary-00=_82CSJiWMvGzlF36--
+
+--Boundary-00=_/GCSJieAcbS+Rv6--
