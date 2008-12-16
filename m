@@ -1,61 +1,391 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Li, Zhigang" <zhigang.li@intel.com>
-To: Johan Hedberg <johan.hedberg@nokia.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Wed, 17 Dec 2008 10:17:09 +0800
-Subject: RE: To enablue DID in coming bluez release
-Message-ID: <B94C62E7C2870743865418621F040C1303B80C0F@pdsmsx502.ccr.corp.intel.com>
-References: <B94C62E7C2870743865418621F040C1303A6354C@pdsmsx502.ccr.corp.intel.com>
- <1229046931.22285.30.camel@violet.holtmann.net>
- <B94C62E7C2870743865418621F040C1303A640A8@pdsmsx502.ccr.corp.intel.com>
- <B94C62E7C2870743865418621F040C1303B80AB8@pdsmsx502.ccr.corp.intel.com>
- <20081216102928.GA12914@localhost>
-In-Reply-To: <20081216102928.GA12914@localhost>
-Content-Type: text/plain; charset="gb2312"
+From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
+To: "ext Brad Midgley" <bmidgley@gmail.com>
+Subject: Re: [RFC/PATCH] sbc: new filtering function for 8 band fixed point encoding
+Date: Wed, 17 Dec 2008 00:37:48 +0200
+Cc: "Jaska Uimonen" <jaska.uimonen@nokia.com>,
+	linux-bluetooth@vger.kernel.org
+References: <1227879337.20555.12.camel@esdhcp03999.research.nokia.com> <200812151454.19090.siarhei.siamashka@nokia.com> <d89ddf300812150716y7ac88ee5y19baf38a4d91bcfb@mail.gmail.com>
+In-Reply-To: <d89ddf300812150716y7ac88ee5y19baf38a4d91bcfb@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: Multipart/Mixed;
+  boundary="Boundary-00=_82CSJiWMvGzlF36"
+Message-Id: <200812170037.48141.siarhei.siamashka@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-UGxlYXNlIGNoZWNrIGl0IGFnYWluLg0KTWFyY2VsIG1lbnRpb24gaXQgaW4gSVJDIGZvciBWSUQv
-UElEL1ZFUg0KDQotLS0gYS9tYWluLmMJVHVlIERlYyAxNiAxNzo0MzoyNCAyMDA4ICswODAwDQor
-KysgYi9tYWluLmMJV2VkIERlYyAxNyAwOTo1NzozNyAyMDA4ICswODAwDQpAQCAtMTc0LDYgKzE3
-NCwxNyBAQCBzdGF0aWMgdm9pZCBwYXJzZV9jb25maWcoR0tleUZpbGUgKmNvbmZpDQogCQltYWlu
-X29wdHMuaW5xbW9kZSA9IHZhbDsNCiAJfQ0KIA0KKwlzdHIgPSBnX2tleV9maWxlX2dldF9zdHJp
-bmcoY29uZmlnLCAiR2VuZXJhbCIsDQorCQkJCQkiVklEL1BJRC9WRVIiLCAmZXJyKTsNCisJaWYg
-KGVycikgew0KKwkJZGVidWcoIiVzIiwgZXJyLT5tZXNzYWdlKTsNCisJCWdfY2xlYXJfZXJyb3Io
-JmVycik7DQorCX0gZWxzZSB7DQorCQlkZWJ1ZygidmlkL3BpZC92ZXI9JXMiLCBzdHIpOw0KKwkJ
-c3RybmNweShtYWluX29wdHMuZGV2aWNlaWQsIHN0ciwgc2l6ZW9mKG1haW5fb3B0cy5kZXZpY2Vp
-ZCkpOw0KKwkJZ19mcmVlKHN0cik7DQorCX0NCisNCiAJbWFpbl9vcHRzLmxpbmtfbW9kZSA9IEhD
-SV9MTV9BQ0NFUFQ7DQogDQogCW1haW5fb3B0cy5saW5rX3BvbGljeSA9IEhDSV9MUF9SU1dJVENI
-IHwgSENJX0xQX1NOSUZGIHwNCmRpZmYgLXIgNjU1NTY1MDI5MTFkIG1haW4uY29uZg0KLS0tIGEv
-bWFpbi5jb25mCVR1ZSBEZWMgMTYgMTc6NDM6MjQgMjAwOCArMDgwMA0KKysrIGIvbWFpbi5jb25m
-CVR1ZSBEZWMgMTYgMTc6NTA6MzEgMjAwOCArMDgwMA0KQEAgLTI4LDMgKzI4LDkgQEAgT2ZmTW9k
-ZSA9IE5vU2Nhbg0KICMgRGlzY292ZXIgc2NoZWR1bGVyIGludGVydmFsIHVzZWQgaW4gQWRhcHRl
-ci5EaXNjb3ZlckRldmljZXMNCiAjIFRoZSB2YWx1ZSBpcyBpbiBzZWNvbmRzLiBEZWZhdWx0cyBp
-cyAwIHRvIHVzZSBjb250cm9sbGVyIHNjaGVkdWxlcg0KIERpc2NvdmVyU2NoZWR1bGVySW50ZXJ2
-YWwgPSAwDQorDQorDQorIyBVc2VyIHZlcm5kb3IgYW5kIHByb2R1Y3QgYW5kIHZlcnNpb24gaW5m
-b3JtYXRpb24gYXJlIHVzZWQgaW4gRElEIHByb2ZpbGUNCisjICI6IiB0byBpZGVudGlmeSB0aGUg
-dmFsdWUuIEZGRkYgaXMgcmVzZXJ2ZWQgZm9yIFZlbmRvcklkIGJ5IGRlZmF1bHQuDQorVklEL1BJ
-RC9WRVIgPSAxMjM0OjU2Nzg6YWJjZA0KKw0KDQpUaGFua3MNCg0KLS0tLS1PcmlnaW5hbCBNZXNz
-YWdlLS0tLS0NCkZyb206IGxpbnV4LWJsdWV0b290aC1vd25lckB2Z2VyLmtlcm5lbC5vcmcgW21h
-aWx0bzpsaW51eC1ibHVldG9vdGgtb3duZXJAdmdlci5rZXJuZWwub3JnXSBPbiBCZWhhbGYgT2Yg
-Sm9oYW4gSGVkYmVyZw0KU2VudDogMjAwOMTqMTLUwjE2yNUgMTg6MjkNClRvOiBsaW51eC1ibHVl
-dG9vdGhAdmdlci5rZXJuZWwub3JnDQpTdWJqZWN0OiBSZTogVG8gZW5hYmx1ZSBESUQgaW4gY29t
-aW5nIGJsdWV6IHJlbGVhc2UNCg0KSGksDQoNCkNvdXBsZSBvZiBjb21tZW50czoNCg0KT24gVHVl
-LCBEZWMgMTYsIDIwMDgsIExpLCBaaGlnYW5nIHdyb3RlOg0KPiAgCQltYWluX29wdHMuaW5xbW9k
-ZSA9IHZhbDsNCj4gIAl9DQo+ICsJc3RyID0gZ19rZXlfZmlsZV9nZXRfc3RyaW5nKGNvbmZpZywg
-IkdlbmVyYWwiLA0KDQpDb2Rpbmcgc3R5bGU6IGFkZCBlbXB0eSBsaW5lIGFmdGVyIHRoZSBjbG9z
-aW5nIGJyYWNrZXQuDQoNCj4gKwkJCQkJIlZJRC9QSUQvVkVSIiwgJmVycik7DQoNCkRpZCB5b3Ug
-YWdyZWUgd2l0aCB0aGlzICJWSUQvUElEL1ZFUiIgbmFtZSB3aXRoIE1hcmNlbD8gSSdkIGhhdmUg
-dXNlZA0Kc29tZXRoaW5nIGxpa2UgIkRldmljZUlEIiwgIkRldmljZUlESW5mbyIgb3IgIkRJRElu
-Zm8iLg0KDQo+ICsJCXN0cmNweSggbWFpbl9vcHRzLmRldmljZWlkLHN0cik7DQoNCkZpcnN0LCBj
-b2Rpbmcgc3R5bGU6IHJlbW92ZSB0aGUgZXh0cmEgc3BhY2UgYWZ0ZXIgdGhlIG9wZW5pbmcNCnBh
-cmVudGhlc2lzIGFuZCBhZGQgdGhlIG1pc3Npbmcgb25lIGFmdGVyIHRoZSBjb21tYS4gU2Vjb25k
-LCB5b3UncmUNCm92ZXJmbG93aW5nIG1haW5fb3B0cy5kZXZpY2VpZCBpZiB0aGUgc3RyaW5nIHBy
-b3ZpZGVkIGluIG1haW4uY29uZiBpcw0KbG9uZ2VyIHRoYW4gMTQgY2hhcmFjdGVycy4gU28gdGhl
-IGNhbGwgc2hvdWxkIGJlOg0Kc3RybmNweShtYWluX29wdHMuZGV2aWNlaWQsIHNyYywgc2l6ZW9m
-KG1haW5fb3B0cy5kZXZpY2VpZCkpOw0KDQpKb2hhbg0KLS0NClRvIHVuc3Vic2NyaWJlIGZyb20g
-dGhpcyBsaXN0OiBzZW5kIHRoZSBsaW5lICJ1bnN1YnNjcmliZSBsaW51eC1ibHVldG9vdGgiIGlu
-DQp0aGUgYm9keSBvZiBhIG1lc3NhZ2UgdG8gbWFqb3Jkb21vQHZnZXIua2VybmVsLm9yZw0KTW9y
-ZSBtYWpvcmRvbW8gaW5mbyBhdCAgaHR0cDovL3ZnZXIua2VybmVsLm9yZy9tYWpvcmRvbW8taW5m
-by5odG1sDQo=
+--Boundary-00=_82CSJiWMvGzlF36
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+On Monday 15 December 2008 17:16:58 ext Brad Midgley wrote:
+> I like your idea of using a macro with the original floating point
+> tables, as long as we know it is done at compile time, not runtime :)
+
+What about something like this modification to Jaska's patch? It contains
+floating point constants wrapped into a macro.
+
+This version is using 16-bit multiplications only (additional natural change
+would be just to convert 'sbc_encoder_state->' to int16_t because it does not
+need to be int32_t), which is good for performance for the platforms with fast
+16-bit integer multiplication. But it is also flexible enough to be changed to
+use 32x32->64 multiplications just by replacing FIXED_A and FIXED_T types
+to int64_t and int32_t respectively (for better precision or experiments with
+conformance testing).
+
+> > Can anybody try to remember/explain what transformations were applied to
+> > the existing fixed point implementation?
+>
+> it was done by several people and the only record we have is in cvs.
+> (part of it is in the old btsco project's cvs)
+
+Regarding the code optimizations. Looking at the tables, It can be seen that
+'cos_table_fixed_8[0+hop]' is always equal to 'cos_table_fixed_8[8+hop]'.
+The same is true for 'cos_table_fixed_8[1+hop]' and 'cos_table_fixed_8[7+hop]'
+So it is possible to join 't1[0] + t1[8]', 't1[1]+ t1[7]' and the other such
+pairs, effectively halving the number of counters. This looks very much like
+the optimization that was applied to the current fixed point code :)
+
+But now it would be very interesting to see if the conformance tests pass
+rate is better with the new filtering function.
+
+
+Best regards,
+Siarhei Siamashka
+
+--Boundary-00=_82CSJiWMvGzlF36
+Content-Type: text/x-diff;
+  charset="iso-8859-1";
+  name="analyze_eight_modified.diff"
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline;
+	filename="analyze_eight_modified.diff"
+
+diff --git a/sbc/sbc.c b/sbc/sbc.c
+index 7072673..656abe5 100644
+--- a/sbc/sbc.c
++++ b/sbc/sbc.c
+@@ -40,6 +40,7 @@
+ #include <string.h>
+ #include <stdlib.h>
+ #include <sys/types.h>
++#include <limits.h>
+ 
+ #include "sbc_math.h"
+ #include "sbc_tables.h"
+@@ -742,124 +743,107 @@ static inline void sbc_analyze_four(struct sbc_encoder_state *state,
+ 
+ static inline void _sbc_analyze_eight(const int32_t *in, int32_t *out)
+ {
+-	sbc_fixed_t t[8], s[8];
+-
+-	t[0] = SCALE8_STAGE1( /* Q10 */
+-		MULA(_sbc_proto_8[0], (in[16] - in[64]), /* Q18 = Q18 * Q0 */
+-		MULA(_sbc_proto_8[1], (in[32] - in[48]),
+-		MULA(_sbc_proto_8[2], in[4],
+-		MULA(_sbc_proto_8[3], in[20],
+-		MULA(_sbc_proto_8[4], in[36],
+-		MUL( _sbc_proto_8[5], in[52])))))));
+-
+-	t[1] = SCALE8_STAGE1(
+-		MULA(_sbc_proto_8[6], in[2],
+-		MULA(_sbc_proto_8[7], in[18],
+-		MULA(_sbc_proto_8[8], in[34],
+-		MULA(_sbc_proto_8[9], in[50],
+-		MUL(_sbc_proto_8[10], in[66]))))));
+-
+-	t[2] = SCALE8_STAGE1(
+-		MULA(_sbc_proto_8[11], in[1],
+-		MULA(_sbc_proto_8[12], in[17],
+-		MULA(_sbc_proto_8[13], in[33],
+-		MULA(_sbc_proto_8[14], in[49],
+-		MULA(_sbc_proto_8[15], in[65],
+-		MULA(_sbc_proto_8[16], in[3],
+-		MULA(_sbc_proto_8[17], in[19],
+-		MULA(_sbc_proto_8[18], in[35],
+-		MULA(_sbc_proto_8[19], in[51],
+-		MUL( _sbc_proto_8[20], in[67])))))))))));
+-
+-	t[3] = SCALE8_STAGE1(
+-		MULA( _sbc_proto_8[21], in[5],
+-		MULA( _sbc_proto_8[22], in[21],
+-		MULA( _sbc_proto_8[23], in[37],
+-		MULA( _sbc_proto_8[24], in[53],
+-		MULA( _sbc_proto_8[25], in[69],
+-		MULA(-_sbc_proto_8[15], in[15],
+-		MULA(-_sbc_proto_8[14], in[31],
+-		MULA(-_sbc_proto_8[13], in[47],
+-		MULA(-_sbc_proto_8[12], in[63],
+-		MUL( -_sbc_proto_8[11], in[79])))))))))));
+-
+-	t[4] = SCALE8_STAGE1(
+-		MULA( _sbc_proto_8[26], in[6],
+-		MULA( _sbc_proto_8[27], in[22],
+-		MULA( _sbc_proto_8[28], in[38],
+-		MULA( _sbc_proto_8[29], in[54],
+-		MULA( _sbc_proto_8[30], in[70],
+-		MULA(-_sbc_proto_8[10], in[14],
+-		MULA(-_sbc_proto_8[9], in[30],
+-		MULA(-_sbc_proto_8[8], in[46],
+-		MULA(-_sbc_proto_8[7], in[62],
+-		MUL( -_sbc_proto_8[6], in[78])))))))))));
+-
+-	t[5] = SCALE8_STAGE1(
+-		MULA( _sbc_proto_8[31], in[7],
+-		MULA( _sbc_proto_8[32], in[23],
+-		MULA( _sbc_proto_8[33], in[39],
+-		MULA( _sbc_proto_8[34], in[55],
+-		MULA( _sbc_proto_8[35], in[71],
+-		MULA(-_sbc_proto_8[20], in[13],
+-		MULA(-_sbc_proto_8[19], in[29],
+-		MULA(-_sbc_proto_8[18], in[45],
+-		MULA(-_sbc_proto_8[17], in[61],
+-		MUL( -_sbc_proto_8[16], in[77])))))))))));
+-
+-	t[6] = SCALE8_STAGE1(
+-		MULA( _sbc_proto_8[36], (in[8] + in[72]),
+-		MULA( _sbc_proto_8[37], (in[24] + in[56]),
+-		MULA( _sbc_proto_8[38], in[40],
+-		MULA(-_sbc_proto_8[39], in[12],
+-		MULA(-_sbc_proto_8[5], in[28],
+-		MULA(-_sbc_proto_8[4], in[44],
+-		MULA(-_sbc_proto_8[3], in[60],
+-		MUL( -_sbc_proto_8[2], in[76])))))))));
+-
+-	t[7] = SCALE8_STAGE1(
+-		MULA( _sbc_proto_8[35], in[9],
+-		MULA( _sbc_proto_8[34], in[25],
+-		MULA( _sbc_proto_8[33], in[41],
+-		MULA( _sbc_proto_8[32], in[57],
+-		MULA( _sbc_proto_8[31], in[73],
+-		MULA(-_sbc_proto_8[25], in[11],
+-		MULA(-_sbc_proto_8[24], in[27],
+-		MULA(-_sbc_proto_8[23], in[43],
+-		MULA(-_sbc_proto_8[22], in[59],
+-		MUL( -_sbc_proto_8[21], in[75])))))))))));
+-
+-	s[0] = MULA(  _anamatrix8[0], t[0],
+-		MUL(  _anamatrix8[1], t[6]));
+-	s[1] = MUL(   _anamatrix8[7], t[1]);
+-	s[2] = MULA(  _anamatrix8[2], t[2],
+-		MULA( _anamatrix8[3], t[3],
+-		MULA( _anamatrix8[4], t[5],
+-		MUL(  _anamatrix8[5], t[7]))));
+-	s[3] = MUL(   _anamatrix8[6], t[4]);
+-	s[4] = MULA(  _anamatrix8[3], t[2],
+-		MULA(-_anamatrix8[5], t[3],
+-		MULA(-_anamatrix8[2], t[5],
+-		MUL( -_anamatrix8[4], t[7]))));
+-	s[5] = MULA(  _anamatrix8[4], t[2],
+-		MULA(-_anamatrix8[2], t[3],
+-		MULA( _anamatrix8[5], t[5],
+-		MUL(  _anamatrix8[3], t[7]))));
+-	s[6] = MULA(  _anamatrix8[1], t[0],
+-		MUL( -_anamatrix8[0], t[6]));
+-	s[7] = MULA(  _anamatrix8[5], t[2],
+-		MULA(-_anamatrix8[4], t[3],
+-		MULA( _anamatrix8[3], t[5],
+-		MUL( -_anamatrix8[2], t[7]))));
+-
+-	out[0] = SCALE8_STAGE2( s[0] + s[1] + s[2] + s[3]);
+-	out[1] = SCALE8_STAGE2( s[1] - s[3] + s[4] + s[6]);
+-	out[2] = SCALE8_STAGE2( s[1] - s[3] + s[5] - s[6]);
+-	out[3] = SCALE8_STAGE2(-s[0] + s[1] + s[3] + s[7]);
+-	out[4] = SCALE8_STAGE2(-s[0] + s[1] + s[3] - s[7]);
+-	out[5] = SCALE8_STAGE2( s[1] - s[3] - s[5] - s[6]);
+-	out[6] = SCALE8_STAGE2( s[1] - s[3] - s[4] + s[6]);
+-	out[7] = SCALE8_STAGE2( s[0] + s[1] - s[2] + s[3]);
++	FIXED_A t1[16];
++	FIXED_T t2[16];
++	int i = 0, hop = 0, R = 0;
++
++	/* rounding coefficient */
++	R = 1 << (SBC_PROTO_FIXED8_SCALE-1);
++
++	/* low pass polyphase filter */
++	t1[0] =  (FIXED_A)in[0] * _sbc_proto_fixed8[0];
++	t1[1] =  (FIXED_A)in[1] * _sbc_proto_fixed8[1];
++	t1[2] =  (FIXED_A)in[2] * _sbc_proto_fixed8[2];
++	t1[3] =  (FIXED_A)in[3] * _sbc_proto_fixed8[3];
++	t1[4] =  (FIXED_A)in[4] * _sbc_proto_fixed8[4];
++	t1[5] =  (FIXED_A)in[5] * _sbc_proto_fixed8[5];
++	t1[6] =  (FIXED_A)in[6] * _sbc_proto_fixed8[6];
++	t1[7] =  (FIXED_A)in[7] * _sbc_proto_fixed8[7];
++	t1[8] =  (FIXED_A)in[8] * _sbc_proto_fixed8[8];
++	t1[9] =  (FIXED_A)in[9] * _sbc_proto_fixed8[9];
++	t1[10] = (FIXED_A)in[10] * _sbc_proto_fixed8[10];
++	t1[11] = (FIXED_A)in[11] * _sbc_proto_fixed8[11];
++	/* t1[12] = (FIXED_A)in[12] * _sbc_proto_fixed8[12]; */
++	t1[13] = (FIXED_A)in[13] * _sbc_proto_fixed8[13];
++	t1[14] = (FIXED_A)in[14] * _sbc_proto_fixed8[14];
++	t1[15] = (FIXED_A)in[15] * _sbc_proto_fixed8[15];
++
++	hop = 16;
++	for (i = 0; i < 4; i++) {
++		t1[0] +=  (FIXED_A)in[hop] * _sbc_proto_fixed8[hop];
++		t1[1] +=  (FIXED_A)in[hop + 1] * _sbc_proto_fixed8[hop + 1];
++		t1[2] +=  (FIXED_A)in[hop + 2] * _sbc_proto_fixed8[hop + 2];
++		t1[3] +=  (FIXED_A)in[hop + 3] * _sbc_proto_fixed8[hop + 3];
++		t1[4] +=  (FIXED_A)in[hop + 4] * _sbc_proto_fixed8[hop + 4];
++		t1[5] +=  (FIXED_A)in[hop + 5] * _sbc_proto_fixed8[hop + 5];
++		t1[6] +=  (FIXED_A)in[hop + 6] * _sbc_proto_fixed8[hop + 6];
++		t1[7] +=  (FIXED_A)in[hop + 7] * _sbc_proto_fixed8[hop + 7];
++		t1[8] +=  (FIXED_A)in[hop + 8] * _sbc_proto_fixed8[hop + 8];
++		t1[9] +=  (FIXED_A)in[hop + 9] * _sbc_proto_fixed8[hop + 9];
++		t1[10] += (FIXED_A)in[hop + 10] * _sbc_proto_fixed8[hop + 10];
++		t1[11] += (FIXED_A)in[hop + 11] * _sbc_proto_fixed8[hop + 11];
++		/* t1[12] += (FIXED_A)in[hop + 12] * _sbc_proto_fixed8[hop + 12]; */
++		t1[13] += (FIXED_A)in[hop + 13] * _sbc_proto_fixed8[hop + 13];
++		t1[14] += (FIXED_A)in[hop + 14] * _sbc_proto_fixed8[hop + 14];
++		t1[15] += (FIXED_A)in[hop + 15] * _sbc_proto_fixed8[hop + 15];
++		
++		hop += 16;
++	}
++
++	/* scaling */
++	t2[0] = (t1[0] + R) >> SBC_PROTO_FIXED8_SCALE;
++	t2[1] = (t1[1] + R) >> SBC_PROTO_FIXED8_SCALE;
++	t2[2] = (t1[2] + R) >> SBC_PROTO_FIXED8_SCALE;
++	t2[3] = (t1[3] + R) >> SBC_PROTO_FIXED8_SCALE;
++	t2[4] = (t1[4] + R) >> SBC_PROTO_FIXED8_SCALE;
++	t2[5] = (t1[5] + R) >> SBC_PROTO_FIXED8_SCALE;
++	t2[6] = (t1[6] + R) >> SBC_PROTO_FIXED8_SCALE;
++	t2[7] = (t1[7] + R) >> SBC_PROTO_FIXED8_SCALE;
++	t2[8] = (t1[8] + R) >> SBC_PROTO_FIXED8_SCALE;
++	t2[9] = (t1[9] + R) >> SBC_PROTO_FIXED8_SCALE;
++	t2[10] = (t1[10] + R) >> SBC_PROTO_FIXED8_SCALE;
++	t2[11] = (t1[11] + R) >> SBC_PROTO_FIXED8_SCALE;
++	/* t2[12] = (t1[12] + R) >> SBC_PROTO_FIXED8_SCALE; */
++	t2[13] = (t1[13] + R) >> SBC_PROTO_FIXED8_SCALE;
++	t2[14] = (t1[14] + R) >> SBC_PROTO_FIXED8_SCALE;
++	t2[15] = (t1[15] + R) >> SBC_PROTO_FIXED8_SCALE;
++
++	R = 1 << (SBC_COS_TABLE_FIXED8_SCALE-1);
++
++	/* do the cos transform */
++	hop = 0;
++	for (i = 0; i < 8; i++) {
++		t1[i]  = (FIXED_A)t2[0] * cos_table_fixed_8[0 + hop];
++		t1[i] += (FIXED_A)t2[1] * cos_table_fixed_8[1 + hop];
++		t1[i] += (FIXED_A)t2[2] * cos_table_fixed_8[2 + hop];
++		t1[i] += (FIXED_A)t2[3] * cos_table_fixed_8[3 + hop];
++		/* cos_table_fixed_8[4 + hop] = 1.0 */
++		t1[i] += (FIXED_A)t2[4] << SBC_COS_TABLE_FIXED8_SCALE;
++		t1[i] += (FIXED_A)t2[5] * cos_table_fixed_8[5 + hop];
++		t1[i] += (FIXED_A)t2[6] * cos_table_fixed_8[6 + hop];
++		t1[i] += (FIXED_A)t2[7] * cos_table_fixed_8[7 + hop];
++		t1[i] += (FIXED_A)t2[8] * cos_table_fixed_8[8 + hop];
++		t1[i] += (FIXED_A)t2[9] * cos_table_fixed_8[9 + hop];
++		t1[i] += (FIXED_A)t2[10] * cos_table_fixed_8[10 + hop];
++		t1[i] += (FIXED_A)t2[11] * cos_table_fixed_8[11 + hop];
++		/* cos_table_fixed_8[12 + hop] = 0.0 */
++		/* t1[i] += (FIXED_A)t2[12] * cos_table_fixed_8[12 + hop]; */
++		t1[i] += (FIXED_A)t2[13] * cos_table_fixed_8[13 + hop];
++		t1[i] += (FIXED_A)t2[14] * cos_table_fixed_8[14 + hop];
++		t1[i] += (FIXED_A)t2[15] * cos_table_fixed_8[15 + hop];
++
++		hop += 16;
++	}
++
++	/* scaling */
++	out[0] = (t1[0] + R) >> SBC_COS_TABLE_FIXED8_SCALE;
++	out[1] = (t1[1] + R) >> SBC_COS_TABLE_FIXED8_SCALE;
++	out[2] = (t1[2] + R) >> SBC_COS_TABLE_FIXED8_SCALE;
++	out[3] = (t1[3] + R) >> SBC_COS_TABLE_FIXED8_SCALE;
++	out[4] = (t1[4] + R) >> SBC_COS_TABLE_FIXED8_SCALE;
++	out[5] = (t1[5] + R) >> SBC_COS_TABLE_FIXED8_SCALE;
++	out[6] = (t1[6] + R) >> SBC_COS_TABLE_FIXED8_SCALE;
++	out[7] = (t1[7] + R) >> SBC_COS_TABLE_FIXED8_SCALE;
+ }
+ 
+ static inline void sbc_analyze_eight(struct sbc_encoder_state *state,
+diff --git a/sbc/sbc_tables.h b/sbc/sbc_tables.h
+index f5daaa7..6e63f48 100644
+--- a/sbc/sbc_tables.h
++++ b/sbc/sbc_tables.h
+@@ -166,3 +166,81 @@ static const int32_t synmatrix8[16][8] = {
+ 	{ SN8(0xf9592678), SN8(0x018f8b84), SN8(0x07d8a5f0), SN8(0x0471ced0),
+ 	  SN8(0xfb8e3130), SN8(0xf8275a10), SN8(0xfe70747c), SN8(0x06a6d988) }
+ };
++
++/* data type for fixed point accumulator */
++#define FIXED_A int32_t
++/* data type for fixed point constants */
++#define FIXED_T int16_t
++
++/* A2DP specification: Section 12.8 Tables */
++#define SBC_PROTO_FIXED8_SCALE (sizeof(FIXED_T)*CHAR_BIT - 1)
++#define F(x) (FIXED_T)((x)*((FIXED_A)1<<SBC_PROTO_FIXED8_SCALE)+0.5)
++static const FIXED_T _sbc_proto_fixed8[80] = {
++	 F(0.00000000E+00), F(1.56575398E-04), F(3.43256425E-04), F(5.54620202E-04),
++	 F(8.23919506E-04), F(1.13992507E-03), F(1.47640169E-03), F(1.78371725E-03),
++	 F(2.01182542E-03), F(2.10371989E-03), F(1.99454554E-03), F(1.61656283E-03),
++	 F(9.02154502E-04),-F(1.78805361E-04),-F(1.64973098E-03),-F(3.49717454E-03),
++	 F(5.65949473E-03), F(8.02941163E-03), F(1.04584443E-02), F(1.27472335E-02),
++	 F(1.46525263E-02), F(1.59045603E-02), F(1.62208471E-02), F(1.53184106E-02),
++	 F(1.29371806E-02), F(8.85757540E-03), F(2.92408442E-03),-F(4.91578024E-03),
++	-F(1.46404076E-02),-F(2.61098752E-02),-F(3.90751381E-02),-F(5.31873032E-02),
++	 F(6.79989431E-02), F(8.29847578E-02), F(9.75753918E-02), F(1.11196689E-01),
++	 F(1.23264548E-01), F(1.33264415E-01), F(1.40753505E-01), F(1.45389847E-01),
++	 F(1.46955068E-01), F(1.45389847E-01), F(1.40753505E-01), F(1.33264415E-01),
++	 F(1.23264548E-01), F(1.11196689E-01), F(9.75753918E-02), F(8.29847578E-02),
++	-F(6.79989431E-02),-F(5.31873032E-02),-F(3.90751381E-02),-F(2.61098752E-02),
++	-F(1.46404076E-02),-F(4.91578024E-03), F(2.92408442E-03), F(8.85757540E-03),
++	 F(1.29371806E-02), F(1.53184106E-02), F(1.62208471E-02), F(1.59045603E-02),
++	 F(1.46525263E-02), F(1.27472335E-02), F(1.04584443E-02), F(8.02941163E-03),
++	-F(5.65949473E-03),-F(3.49717454E-03),-F(1.64973098E-03),-F(1.78805361E-04),
++	 F(9.02154502E-04), F(1.61656283E-03), F(1.99454554E-03), F(2.10371989E-03),
++	 F(2.01182542E-03), F(1.78371725E-03), F(1.47640169E-03), F(1.13992507E-03),
++	 F(8.23919506E-04), F(5.54620202E-04), F(3.43256425E-04), F(1.56575398E-04),
++};
++#undef F
++
++/*
++ * To produce this cosine matrix in Octave:
++ *
++ * b = zeros(8, 16);
++ * for i = 0:7 for j = 0:15 b(i+1, j+1) = cos( (i + 0.5) * (j - 4) * (pi/8) ) endfor endfor;
++ * printf("%.10f, ", b');
++ *
++ */
++#define SBC_COS_TABLE_FIXED8_SCALE (sizeof(FIXED_T)*CHAR_BIT - 1)
++#define F(x) (FIXED_T)((x)*((FIXED_A)1<<SBC_COS_TABLE_FIXED8_SCALE)+0.5)
++static const FIXED_T cos_table_fixed_8[128] = {
++	 F(0.7071067812), F(0.8314696123), F(0.9238795325), F(0.9807852804),
++	 F(1.0000000000), F(0.9807852804), F(0.9238795325), F(0.8314696123),
++	 F(0.7071067812), F(0.5555702330), F(0.3826834324), F(0.1950903220),
++	 F(0.0000000000),-F(0.1950903220),-F(0.3826834324),-F(0.5555702330),
++	-F(0.7071067812),-F(0.1950903220), F(0.3826834324), F(0.8314696123),
++	 F(1.0000000000), F(0.8314696123), F(0.3826834324),-F(0.1950903220),
++	-F(0.7071067812),-F(0.9807852804),-F(0.9238795325),-F(0.5555702330),
++	-F(0.0000000000), F(0.5555702330), F(0.9238795325), F(0.9807852804),
++	-F(0.7071067812),-F(0.9807852804),-F(0.3826834324), F(0.5555702330),
++	 F(1.0000000000), F(0.5555702330),-F(0.3826834324),-F(0.9807852804),
++	-F(0.7071067812), F(0.1950903220), F(0.9238795325), F(0.8314696123),
++	 F(0.0000000000),-F(0.8314696123),-F(0.9238795325),-F(0.1950903220),
++	 F(0.7071067812),-F(0.5555702330),-F(0.9238795325), F(0.1950903220),
++	 F(1.0000000000), F(0.1950903220),-F(0.9238795325),-F(0.5555702330),
++	 F(0.7071067812), F(0.8314696123),-F(0.3826834324),-F(0.9807852804),
++	-F(0.0000000000), F(0.9807852804), F(0.3826834324),-F(0.8314696123),
++	 F(0.7071067812), F(0.5555702330),-F(0.9238795325),-F(0.1950903220),
++	 F(1.0000000000),-F(0.1950903220),-F(0.9238795325), F(0.5555702330),
++	 F(0.7071067812),-F(0.8314696123),-F(0.3826834324), F(0.9807852804),
++	 F(0.0000000000),-F(0.9807852804), F(0.3826834324), F(0.8314696123),
++	-F(0.7071067812), F(0.9807852804),-F(0.3826834324),-F(0.5555702330),
++	 F(1.0000000000),-F(0.5555702330),-F(0.3826834324), F(0.9807852804),
++	-F(0.7071067812),-F(0.1950903220), F(0.9238795325),-F(0.8314696123),
++	-F(0.0000000000), F(0.8314696123),-F(0.9238795325), F(0.1950903220),
++	-F(0.7071067812), F(0.1950903220), F(0.3826834324),-F(0.8314696123),
++	 F(1.0000000000),-F(0.8314696123), F(0.3826834324), F(0.1950903220),
++	-F(0.7071067812), F(0.9807852804),-F(0.9238795325), F(0.5555702330),
++	-F(0.0000000000),-F(0.5555702330), F(0.9238795325),-F(0.9807852804),
++	 F(0.7071067812),-F(0.8314696123), F(0.9238795325),-F(0.9807852804),
++	 F(1.0000000000),-F(0.9807852804), F(0.9238795325),-F(0.8314696123),
++	 F(0.7071067812),-F(0.5555702330), F(0.3826834324),-F(0.1950903220),
++	-F(0.0000000000), F(0.1950903220),-F(0.3826834324), F(0.5555702330),
++};
++#undef F
+
+--Boundary-00=_82CSJiWMvGzlF36--
