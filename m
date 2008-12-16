@@ -1,38 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 16 Dec 2008 12:29:28 +0200
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: To enablue DID in coming bluez release
-Message-ID: <20081216102928.GA12914@localhost>
-References: <B94C62E7C2870743865418621F040C1303A6354C@pdsmsx502.ccr.corp.intel.com> <1229046931.22285.30.camel@violet.holtmann.net> <B94C62E7C2870743865418621F040C1303A640A8@pdsmsx502.ccr.corp.intel.com> <B94C62E7C2870743865418621F040C1303B80AB8@pdsmsx502.ccr.corp.intel.com>
+From: "Li, Zhigang" <zhigang.li@intel.com>
+To: "Li, Zhigang" <zhigang.li@intel.com>, Marcel Holtmann
+	<marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Tue, 16 Dec 2008 17:59:57 +0800
+Subject: RE: To enablue DID in coming bluez release
+Message-ID: <B94C62E7C2870743865418621F040C1303B80AB8@pdsmsx502.ccr.corp.intel.com>
+References: <B94C62E7C2870743865418621F040C1303A6354C@pdsmsx502.ccr.corp.intel.com>
+ <1229046931.22285.30.camel@violet.holtmann.net>
+ <B94C62E7C2870743865418621F040C1303A640A8@pdsmsx502.ccr.corp.intel.com>
+In-Reply-To: <B94C62E7C2870743865418621F040C1303A640A8@pdsmsx502.ccr.corp.intel.com>
+Content-Type: text/plain; charset="gb2312"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <B94C62E7C2870743865418621F040C1303B80AB8@pdsmsx502.ccr.corp.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-Couple of comments:
-
-On Tue, Dec 16, 2008, Li, Zhigang wrote:
->  		main_opts.inqmode = val;
->  	}
-> +	str = g_key_file_get_string(config, "General",
-
-Coding style: add empty line after the closing bracket.
-
-> +					"VID/PID/VER", &err);
-
-Did you agree with this "VID/PID/VER" name with Marcel? I'd have used
-something like "DeviceID", "DeviceIDInfo" or "DIDInfo".
-
-> +		strcpy( main_opts.deviceid,str);
-
-First, coding style: remove the extra space after the opening
-parenthesis and add the missing one after the comma. Second, you're
-overflowing main_opts.deviceid if the string provided in main.conf is
-longer than 14 characters. So the call should be:
-strncpy(main_opts.deviceid, src, sizeof(main_opts.deviceid));
-
-Johan
+UmVzZW5kOg0KDQotLS0gYS9tYWluLmMJVHVlIERlYyAxNiAxNzo0MzoyNCAyMDA4ICswODAwDQor
+KysgYi9tYWluLmMJVHVlIERlYyAxNiAxNzo0NDo0MyAyMDA4ICswODAwDQpAQCAtMTczLDYgKzE3
+MywxNiBAQCBzdGF0aWMgdm9pZCBwYXJzZV9jb25maWcoR0tleUZpbGUgKmNvbmZpDQogCQlkZWJ1
+ZygiaW5xbW9kZT0lZCIsIHZhbCk7DQogCQltYWluX29wdHMuaW5xbW9kZSA9IHZhbDsNCiAJfQ0K
+KwlzdHIgPSBnX2tleV9maWxlX2dldF9zdHJpbmcoY29uZmlnLCAiR2VuZXJhbCIsDQorCQkJCQki
+VklEL1BJRC9WRVIiLCAmZXJyKTsNCisJaWYgKGVycikgew0KKwkJZGVidWcoIiVzIiwgZXJyLT5t
+ZXNzYWdlKTsNCisJCWdfY2xlYXJfZXJyb3IoJmVycik7DQorCX0gZWxzZSB7DQorCQlkZWJ1Zygi
+dmlkL3BpZC92ZXI9JXMiLCBzdHIpOw0KKwkJc3RyY3B5KCBtYWluX29wdHMuZGV2aWNlaWQsc3Ry
+KTsNCisJCWdfZnJlZShzdHIpOw0KKwl9DQogDQogCW1haW5fb3B0cy5saW5rX21vZGUgPSBIQ0lf
+TE1fQUNDRVBUOw0KDQotLS0gYS9tYWluLmNvbmYJVHVlIERlYyAxNiAxNzo0MzoyNCAyMDA4ICsw
+ODAwDQorKysgYi9tYWluLmNvbmYJVHVlIERlYyAxNiAxNzo1MDozMSAyMDA4ICswODAwDQpAQCAt
+MjgsMyArMjgsOSBAQCBPZmZNb2RlID0gTm9TY2FuDQogIyBEaXNjb3ZlciBzY2hlZHVsZXIgaW50
+ZXJ2YWwgdXNlZCBpbiBBZGFwdGVyLkRpc2NvdmVyRGV2aWNlcw0KICMgVGhlIHZhbHVlIGlzIGlu
+IHNlY29uZHMuIERlZmF1bHRzIGlzIDAgdG8gdXNlIGNvbnRyb2xsZXIgc2NoZWR1bGVyDQogRGlz
+Y292ZXJTY2hlZHVsZXJJbnRlcnZhbCA9IDANCisNCisNCisjIFVzZXIgdmVybmRvciBhbmQgcHJv
+ZHVjdCBhbmQgdmVyc2lvbiBpbmZvcm1hdGlvbiBhcmUgdXNlZCBpbiBESUQgcHJvZmlsZQ0KKyMg
+IjoiIHRvIGlkZW50aWZ5IHRoZSB2YWx1ZS4gRkZGRiBpcyByZXNlcnZlZCBmb3IgVmVuZG9ySWQg
+YnkgZGVmYXVsdC4NCitWSUQvUElEL1ZFUiA9IDEyMzQ6NTY3ODphYmNkDQorDQoNCg0KVGhhbmtz
+DQoNCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IGxpbnV4LWJsdWV0b290aC1v
+d25lckB2Z2VyLmtlcm5lbC5vcmcgW21haWx0bzpsaW51eC1ibHVldG9vdGgtb3duZXJAdmdlci5r
+ZXJuZWwub3JnXSBPbiBCZWhhbGYgT2YgTGksIFpoaWdhbmcNClNlbnQ6IDIwMDjE6jEy1MIxNsjV
+IDE1OjU2DQpUbzogTWFyY2VsIEhvbHRtYW5uDQpDYzogbGludXgtYmx1ZXRvb3RoQHZnZXIua2Vy
+bmVsLm9yZw0KU3ViamVjdDogUkU6IFRvIGVuYWJsdWUgRElEIGluIGNvbWluZyBibHVleiByZWxl
+YXNlDQoNClBsZWFzZSBzZWUgdGhlIGF0dGFjaGVkIA0KVGhlIHBhdGNoIGlzIHZhbGlkYXRlZCBp
+biBteSBwYyB3aXRoIDQuMTggdmVyc2lvbiBhbmQgd29ya3MgZmluZS4NCklmIGl0J3Mgb2sgZm9y
+IHlvdSBwbGVhc2UgbWVyZ2UgaXQgaW50byB1cHN0cmVhbS4NClRoYW5rcw0KDQoNCi0tLS0tT3Jp
+Z2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBNYXJjZWwgSG9sdG1hbm4gW21haWx0bzptYXJjZWxA
+aG9sdG1hbm4ub3JnXSANClNlbnQ6IDIwMDjE6jEy1MIxMsjVIDk6NTYNClRvOiBMaSwgWmhpZ2Fu
+Zw0KQ2M6IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNClN1YmplY3Q6IFJlOiBUbyBl
+bmFibHVlIERJRCBpbiBjb21pbmcgYmx1ZXogcmVsZWFzZQ0KDQpIaSBaaGlnYW5nLA0KDQo+IENv
+dWxkIHlvdSBwbGVhc2UgZW5hYmxlIHRoaXMgcHJvZmlsZSBpbiB0aGUgY29taW5nIHJlbGVhc2U/
+DQo+IFRvIHVwZGF0ZToNCj4gQWRkIFZJRCxQSUQsVkVSIHNldHRpbmcgaW4gbWFpbi5jb25mDQo+
+IA0KPiBJIHRoaW5rIHRoZSBwYXJzZV9jb25maWcgYWxzbyBuZWVkIGFkZCBjb2RlIGluIG9yZGVy
+IHRvIHBhcnNlIHRoZXNlIHZhbHVlIHRvIG1haW5fb3B0LmRpZC4NCg0KSSB3YXMgZXhwZWN0aW5n
+IHRoYXQgeW91IHNlbmQgbWUgYSBwYXRjaCBmb3IgaXQuDQoNClJlZ2FyZHMNCg0KTWFyY2VsDQoN
+Cg0K
