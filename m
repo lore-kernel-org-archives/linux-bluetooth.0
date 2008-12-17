@@ -1,72 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH] sbc: fix for overflow bug in quantization code
-Date: Wed, 17 Dec 2008 22:43:27 +0200
-MIME-Version: 1.0
-Content-Type: Multipart/Mixed;
-  boundary="Boundary-00=_vRWSJJTdo04dqkg"
-Message-Id: <200812172243.27442.siarhei.siamashka@nokia.com>
+Subject: RE: To enablue DID in coming bluez release
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Li, Zhigang" <zhigang.li@intel.com>
+Cc: Johan Hedberg <johan.hedberg@nokia.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <B94C62E7C2870743865418621F040C1303B80C87@pdsmsx502.ccr.corp.intel.com>
+References: <B94C62E7C2870743865418621F040C1303A6354C@pdsmsx502.ccr.corp.intel.com>
+	 <1229046931.22285.30.camel@violet.holtmann.net>
+	 <B94C62E7C2870743865418621F040C1303A640A8@pdsmsx502.ccr.corp.intel.com>
+	 <B94C62E7C2870743865418621F040C1303B80AB8@pdsmsx502.ccr.corp.intel.com>
+	 <20081216102928.GA12914@localhost> <1229481492.10889.1.camel@violet>
+	 <B94C62E7C2870743865418621F040C1303B80C87@pdsmsx502.ccr.corp.intel.com>
+Content-Type: text/plain
+Date: Wed, 17 Dec 2008 20:59:13 +0100
+Message-Id: <1229543953.10889.16.camel@violet>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---Boundary-00=_vRWSJJTdo04dqkg
-Content-Type: text/plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Hi Zhigang,
 
-Hello all,
+so first things first. NO top-posting on this mailing list.
 
-This simple patch resolves one more SBC encoding quality issue. Now SBC
-audio encoding quality should be fine in almost all cases after applying it
-together with a new 8 subband filter.
+> Updated:
+> --- a/main.c	Tue Dec 16 17:43:24 2008 +0800
+> +++ b/main.c	Wed Dec 17 11:57:47 2008 +0800
+> @@ -174,6 +174,17 @@ static void parse_config(GKeyFile *confi
+>  		main_opts.inqmode = val;
+>  	}
+>  
+> +	str = g_key_file_get_string(config, "General",
+> +					"DeviceID", &err);
+> +	if (err) {
+> +		debug("%s", err->message);
+> +		g_clear_error(&err);
+> +	} else {
+> +		debug("deviceid=%s", str);
+> +		strncpy(main_opts.deviceid, str, sizeof(main_opts.deviceid));
+> +		g_free(str);
+> +	}
+> +
+>  	main_opts.link_mode = HCI_LM_ACCEPT;
+>  
+>  	main_opts.link_policy = HCI_LP_RSWITCH | HCI_LP_SNIFF |
 
-The patch conflicts with the bitstream packing optimization, but I hope that
-after all the encoding quality problems are fixed, we can get back to it.
+I always need patches against the latest GIT tree. Otherwise I can't
+merge them and submitting them in a proper format helps me to apply
+them.
 
+> diff -r 65556502911d main.conf
+> --- a/main.conf	Tue Dec 16 17:43:24 2008 +0800
+> +++ b/main.conf	Tue Dec 17 11:57:51 2008 +0800
+> @@ -28,3 +28,9 @@ OffMode = NoScan
+>  # Discover scheduler interval used in Adapter.DiscoverDevices
+>  # The value is in seconds. Defaults is 0 to use controller scheduler
+>  DiscoverSchedulerInterval = 0
+> +
+> +
+> +# User verndor and product and version information are used in DID profile
+> +# ":" to identify the value. FFFF is reserved for VendorId by default.
+> +DeviceID = 1234:5678:abcd
 
-Best regards,
-Siarhei Siamashka
+So the option should be commented out by default since otherwise every
+installation now uses vendor id 1234 and that is actually a valid one.
+Also the description above makes no sense.
 
---Boundary-00=_vRWSJJTdo04dqkg
-Content-Type: text/x-diff;
-  charset="us-ascii";
-  name="0001-sbc-fix-for-overflow-bug-in-quantization-code.patch"
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline;
-	filename="0001-sbc-fix-for-overflow-bug-in-quantization-code.patch"
+I committed a patch by myself to the GIT tree now that should fix this.
+However there is one thing missing. The DID supports USB based vendor
+ids and Bluetooth based ones. So we need to support both. Feel free to
+come up with something.
 
->From 12088ac2053709bf89c3c84d47aef46b7f2da475 Mon Sep 17 00:00:00 2001
-From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
-Date: Wed, 17 Dec 2008 22:32:11 +0200
-Subject: [PATCH] sbc: fix for overflow bug in quantization code
+Regards
 
-The result of multiplication does not always fit into 32-bits. Using 64-bit
-calculations helps to avoid overflows and sound quality problems in encoded
-audio. Overflows are more likely to show up when using high values for
-bitpool setting.
-
-Signed-off-by: Siarhei Siamashka <siarhei.siamashka@nokia.com>
----
- sbc/sbc.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
-
-diff --git a/sbc/sbc.c b/sbc/sbc.c
-index 7072673..6624921 100644
---- a/sbc/sbc.c
-+++ b/sbc/sbc.c
-@@ -1085,7 +1085,7 @@ static int sbc_pack_frame(uint8_t *data, struct sbc_frame *frame, size_t len)
- 			for (sb = 0; sb < frame->subbands; sb++) {
- 				if (levels[ch][sb] > 0) {
- 					audio_sample =
--						(uint16_t) ((((frame->sb_sample_f[blk][ch][sb]*levels[ch][sb]) >>
-+						(uint16_t) (((((int64_t)frame->sb_sample_f[blk][ch][sb]*levels[ch][sb]) >>
- 									(frame->scale_factor[ch][sb] + 1)) +
- 								levels[ch][sb]) >> 1);
- 					audio_sample <<= 16 - bits[ch][sb];
--- 
-1.5.6.5
+Marcel
 
 
---Boundary-00=_vRWSJJTdo04dqkg--
