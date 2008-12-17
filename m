@@ -1,100 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <494862FE.8060805@dtsp.co.nz>
-Date: Wed, 17 Dec 2008 15:25:02 +1300
-From: David Sainty <david.sainty@dtsp.co.nz>
+From: "Li, Zhigang" <zhigang.li@intel.com>
+To: Johan Hedberg <johan.hedberg@nokia.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Wed, 17 Dec 2008 10:17:09 +0800
+Subject: RE: To enablue DID in coming bluez release
+Message-ID: <B94C62E7C2870743865418621F040C1303B80C0F@pdsmsx502.ccr.corp.intel.com>
+References: <B94C62E7C2870743865418621F040C1303A6354C@pdsmsx502.ccr.corp.intel.com>
+ <1229046931.22285.30.camel@violet.holtmann.net>
+ <B94C62E7C2870743865418621F040C1303A640A8@pdsmsx502.ccr.corp.intel.com>
+ <B94C62E7C2870743865418621F040C1303B80AB8@pdsmsx502.ccr.corp.intel.com>
+ <20081216102928.GA12914@localhost>
+In-Reply-To: <20081216102928.GA12914@localhost>
+Content-Type: text/plain; charset="gb2312"
 MIME-Version: 1.0
-To: "Li, Zhigang" <zhigang.li@intel.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: To enablue DID in coming bluez release
-References: <B94C62E7C2870743865418621F040C1303A6354C@pdsmsx502.ccr.corp.intel.com> <1229046931.22285.30.camel@violet.holtmann.net> <B94C62E7C2870743865418621F040C1303A640A8@pdsmsx502.ccr.corp.intel.com> <B94C62E7C2870743865418621F040C1303B80AB8@pdsmsx502.ccr.corp.intel.com> <20081216102928.GA12914@localhost> <B94C62E7C2870743865418621F040C1303B80C0F@pdsmsx502.ccr.corp.intel.com>
-In-Reply-To: <B94C62E7C2870743865418621F040C1303B80C0F@pdsmsx502.ccr.corp.intel.com>
-Content-Type: text/plain; charset=gb2312
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Typo in main.conf: "verndor"
-
-
-Li, Zhigang wrote:
-> Please check it again.
-> Marcel mention it in IRC for VID/PID/VER
->
-> --- a/main.c	Tue Dec 16 17:43:24 2008 +0800
-> +++ b/main.c	Wed Dec 17 09:57:37 2008 +0800
-> @@ -174,6 +174,17 @@ static void parse_config(GKeyFile *confi
->  		main_opts.inqmode = val;
->  	}
->  
-> +	str = g_key_file_get_string(config, "General",
-> +					"VID/PID/VER", &err);
-> +	if (err) {
-> +		debug("%s", err->message);
-> +		g_clear_error(&err);
-> +	} else {
-> +		debug("vid/pid/ver=%s", str);
-> +		strncpy(main_opts.deviceid, str, sizeof(main_opts.deviceid));
-> +		g_free(str);
-> +	}
-> +
->  	main_opts.link_mode = HCI_LM_ACCEPT;
->  
->  	main_opts.link_policy = HCI_LP_RSWITCH | HCI_LP_SNIFF |
-> diff -r 65556502911d main.conf
-> --- a/main.conf	Tue Dec 16 17:43:24 2008 +0800
-> +++ b/main.conf	Tue Dec 16 17:50:31 2008 +0800
-> @@ -28,3 +28,9 @@ OffMode = NoScan
->  # Discover scheduler interval used in Adapter.DiscoverDevices
->  # The value is in seconds. Defaults is 0 to use controller scheduler
->  DiscoverSchedulerInterval = 0
-> +
-> +
-> +# User verndor and product and version information are used in DID profile
-> +# ":" to identify the value. FFFF is reserved for VendorId by default.
-> +VID/PID/VER = 1234:5678:abcd
-> +
->
-> Thanks
->
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Johan Hedberg
-> Sent: 2008ƒÍ12‘¬16»’ 18:29
-> To: linux-bluetooth@vger.kernel.org
-> Subject: Re: To enablue DID in coming bluez release
->
-> Hi,
->
-> Couple of comments:
->
-> On Tue, Dec 16, 2008, Li, Zhigang wrote:
->   
->>  		main_opts.inqmode = val;
->>  	}
->> +	str = g_key_file_get_string(config, "General",
->>     
->
-> Coding style: add empty line after the closing bracket.
->
->   
->> +					"VID/PID/VER", &err);
->>     
->
-> Did you agree with this "VID/PID/VER" name with Marcel? I'd have used
-> something like "DeviceID", "DeviceIDInfo" or "DIDInfo".
->
->   
->> +		strcpy( main_opts.deviceid,str);
->>     
->
-> First, coding style: remove the extra space after the opening
-> parenthesis and add the missing one after the comma. Second, you're
-> overflowing main_opts.deviceid if the string provided in main.conf is
-> longer than 14 characters. So the call should be:
-> strncpy(main_opts.deviceid, src, sizeof(main_opts.deviceid));
->
-> Johan
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Nãß≤ÊÏr∏õy˙Ëöÿb≤X¨∂«ßvÿ^Å)ﬁ∫{.nÅ+â∑•ä{±n[û∂Å-Å)ÌÖÊËw*jg¨±Å∂âöéä›¢j/ÅÍ‰zπﬁñäÅô®Ë≠Å&Å)ﬂ°´a∂⁄˛¯ÆG´ùÈhÅÊj:+vâ®äwËÜŸ•
-
+UGxlYXNlIGNoZWNrIGl0IGFnYWluLg0KTWFyY2VsIG1lbnRpb24gaXQgaW4gSVJDIGZvciBWSUQv
+UElEL1ZFUg0KDQotLS0gYS9tYWluLmMJVHVlIERlYyAxNiAxNzo0MzoyNCAyMDA4ICswODAwDQor
+KysgYi9tYWluLmMJV2VkIERlYyAxNyAwOTo1NzozNyAyMDA4ICswODAwDQpAQCAtMTc0LDYgKzE3
+NCwxNyBAQCBzdGF0aWMgdm9pZCBwYXJzZV9jb25maWcoR0tleUZpbGUgKmNvbmZpDQogCQltYWlu
+X29wdHMuaW5xbW9kZSA9IHZhbDsNCiAJfQ0KIA0KKwlzdHIgPSBnX2tleV9maWxlX2dldF9zdHJp
+bmcoY29uZmlnLCAiR2VuZXJhbCIsDQorCQkJCQkiVklEL1BJRC9WRVIiLCAmZXJyKTsNCisJaWYg
+KGVycikgew0KKwkJZGVidWcoIiVzIiwgZXJyLT5tZXNzYWdlKTsNCisJCWdfY2xlYXJfZXJyb3Io
+JmVycik7DQorCX0gZWxzZSB7DQorCQlkZWJ1ZygidmlkL3BpZC92ZXI9JXMiLCBzdHIpOw0KKwkJ
+c3RybmNweShtYWluX29wdHMuZGV2aWNlaWQsIHN0ciwgc2l6ZW9mKG1haW5fb3B0cy5kZXZpY2Vp
+ZCkpOw0KKwkJZ19mcmVlKHN0cik7DQorCX0NCisNCiAJbWFpbl9vcHRzLmxpbmtfbW9kZSA9IEhD
+SV9MTV9BQ0NFUFQ7DQogDQogCW1haW5fb3B0cy5saW5rX3BvbGljeSA9IEhDSV9MUF9SU1dJVENI
+IHwgSENJX0xQX1NOSUZGIHwNCmRpZmYgLXIgNjU1NTY1MDI5MTFkIG1haW4uY29uZg0KLS0tIGEv
+bWFpbi5jb25mCVR1ZSBEZWMgMTYgMTc6NDM6MjQgMjAwOCArMDgwMA0KKysrIGIvbWFpbi5jb25m
+CVR1ZSBEZWMgMTYgMTc6NTA6MzEgMjAwOCArMDgwMA0KQEAgLTI4LDMgKzI4LDkgQEAgT2ZmTW9k
+ZSA9IE5vU2Nhbg0KICMgRGlzY292ZXIgc2NoZWR1bGVyIGludGVydmFsIHVzZWQgaW4gQWRhcHRl
+ci5EaXNjb3ZlckRldmljZXMNCiAjIFRoZSB2YWx1ZSBpcyBpbiBzZWNvbmRzLiBEZWZhdWx0cyBp
+cyAwIHRvIHVzZSBjb250cm9sbGVyIHNjaGVkdWxlcg0KIERpc2NvdmVyU2NoZWR1bGVySW50ZXJ2
+YWwgPSAwDQorDQorDQorIyBVc2VyIHZlcm5kb3IgYW5kIHByb2R1Y3QgYW5kIHZlcnNpb24gaW5m
+b3JtYXRpb24gYXJlIHVzZWQgaW4gRElEIHByb2ZpbGUNCisjICI6IiB0byBpZGVudGlmeSB0aGUg
+dmFsdWUuIEZGRkYgaXMgcmVzZXJ2ZWQgZm9yIFZlbmRvcklkIGJ5IGRlZmF1bHQuDQorVklEL1BJ
+RC9WRVIgPSAxMjM0OjU2Nzg6YWJjZA0KKw0KDQpUaGFua3MNCg0KLS0tLS1PcmlnaW5hbCBNZXNz
+YWdlLS0tLS0NCkZyb206IGxpbnV4LWJsdWV0b290aC1vd25lckB2Z2VyLmtlcm5lbC5vcmcgW21h
+aWx0bzpsaW51eC1ibHVldG9vdGgtb3duZXJAdmdlci5rZXJuZWwub3JnXSBPbiBCZWhhbGYgT2Yg
+Sm9oYW4gSGVkYmVyZw0KU2VudDogMjAwOMTqMTLUwjE2yNUgMTg6MjkNClRvOiBsaW51eC1ibHVl
+dG9vdGhAdmdlci5rZXJuZWwub3JnDQpTdWJqZWN0OiBSZTogVG8gZW5hYmx1ZSBESUQgaW4gY29t
+aW5nIGJsdWV6IHJlbGVhc2UNCg0KSGksDQoNCkNvdXBsZSBvZiBjb21tZW50czoNCg0KT24gVHVl
+LCBEZWMgMTYsIDIwMDgsIExpLCBaaGlnYW5nIHdyb3RlOg0KPiAgCQltYWluX29wdHMuaW5xbW9k
+ZSA9IHZhbDsNCj4gIAl9DQo+ICsJc3RyID0gZ19rZXlfZmlsZV9nZXRfc3RyaW5nKGNvbmZpZywg
+IkdlbmVyYWwiLA0KDQpDb2Rpbmcgc3R5bGU6IGFkZCBlbXB0eSBsaW5lIGFmdGVyIHRoZSBjbG9z
+aW5nIGJyYWNrZXQuDQoNCj4gKwkJCQkJIlZJRC9QSUQvVkVSIiwgJmVycik7DQoNCkRpZCB5b3Ug
+YWdyZWUgd2l0aCB0aGlzICJWSUQvUElEL1ZFUiIgbmFtZSB3aXRoIE1hcmNlbD8gSSdkIGhhdmUg
+dXNlZA0Kc29tZXRoaW5nIGxpa2UgIkRldmljZUlEIiwgIkRldmljZUlESW5mbyIgb3IgIkRJRElu
+Zm8iLg0KDQo+ICsJCXN0cmNweSggbWFpbl9vcHRzLmRldmljZWlkLHN0cik7DQoNCkZpcnN0LCBj
+b2Rpbmcgc3R5bGU6IHJlbW92ZSB0aGUgZXh0cmEgc3BhY2UgYWZ0ZXIgdGhlIG9wZW5pbmcNCnBh
+cmVudGhlc2lzIGFuZCBhZGQgdGhlIG1pc3Npbmcgb25lIGFmdGVyIHRoZSBjb21tYS4gU2Vjb25k
+LCB5b3UncmUNCm92ZXJmbG93aW5nIG1haW5fb3B0cy5kZXZpY2VpZCBpZiB0aGUgc3RyaW5nIHBy
+b3ZpZGVkIGluIG1haW4uY29uZiBpcw0KbG9uZ2VyIHRoYW4gMTQgY2hhcmFjdGVycy4gU28gdGhl
+IGNhbGwgc2hvdWxkIGJlOg0Kc3RybmNweShtYWluX29wdHMuZGV2aWNlaWQsIHNyYywgc2l6ZW9m
+KG1haW5fb3B0cy5kZXZpY2VpZCkpOw0KDQpKb2hhbg0KLS0NClRvIHVuc3Vic2NyaWJlIGZyb20g
+dGhpcyBsaXN0OiBzZW5kIHRoZSBsaW5lICJ1bnN1YnNjcmliZSBsaW51eC1ibHVldG9vdGgiIGlu
+DQp0aGUgYm9keSBvZiBhIG1lc3NhZ2UgdG8gbWFqb3Jkb21vQHZnZXIua2VybmVsLm9yZw0KTW9y
+ZSBtYWpvcmRvbW8gaW5mbyBhdCAgaHR0cDovL3ZnZXIua2VybmVsLm9yZy9tYWpvcmRvbW8taW5m
+by5odG1sDQo=
