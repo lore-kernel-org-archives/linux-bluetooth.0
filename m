@@ -1,39 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <ac290f760812171407te7a079eycf45c36d376b0c5c@mail.gmail.com>
-Date: Wed, 17 Dec 2008 14:07:52 -0800
-From: "jaikumar Ganesh" <jaikumarg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: conn->state vs conn->sk->sk_state
-In-Reply-To: <ac290f760812171405r79473a67l6769913bc7e62d2e@mail.gmail.com>
+From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH] sbc: fix for overflow bug in quantization code
+Date: Wed, 17 Dec 2008 22:43:27 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <ac290f760812171405r79473a67l6769913bc7e62d2e@mail.gmail.com>
+Content-Type: Multipart/Mixed;
+  boundary="Boundary-00=_vRWSJJTdo04dqkg"
+Message-Id: <200812172243.27442.siarhei.siamashka@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
- Folks,
-     I have a device which supports only SCO connections.  So when the
-application calls sco_sock_connect -> sco_connect, the conn->state is
-set to BT_CONNECT and then bt_sock_state is called waiting for the
-conn->sk->sk_state to be set to BT_CONNECTED.
-     When the HCI Connection Complete event comes, the conn->state is
-set to BT_CONNECTED.
+--Boundary-00=_vRWSJJTdo04dqkg
+Content-Type: text/plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-     In 2.6.25 ->  hci_proto_connect_cfm(conn, ev->status) was called
-at the end of hci_conn_complete_evt which used to set the
-conn->sk->sk_state to BT_CONNECTED in sco_conn_ready.
-     In 2.6.27->  hci_proto_connect_cfm(conn, ev->status) is called
-only if the ev_status is 1.
-                      Hence, the conn->sk->sk_state doesn't get set to
-BT_CONNECTED and hence the connect() times out.
+Hello all,
 
-    Should we be calling sco_conn_ready in sco_connect similar to
-sco_connect_cfm if conn != null ?
-    I didn't see anyone else complain so am I missing something obvious ?
+This simple patch resolves one more SBC encoding quality issue. Now SBC
+audio encoding quality should be fine in almost all cases after applying it
+together with a new 8 subband filter.
+
+The patch conflicts with the bitstream packing optimization, but I hope that
+after all the encoding quality problems are fixed, we can get back to it.
 
 
-     * I am new to this list so please excuse me if the above doesn't
-make sense.
+Best regards,
+Siarhei Siamashka
 
- Thanks
- Jaikumar
+--Boundary-00=_vRWSJJTdo04dqkg
+Content-Type: text/x-diff;
+  charset="us-ascii";
+  name="0001-sbc-fix-for-overflow-bug-in-quantization-code.patch"
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline;
+	filename="0001-sbc-fix-for-overflow-bug-in-quantization-code.patch"
+
+>From 12088ac2053709bf89c3c84d47aef46b7f2da475 Mon Sep 17 00:00:00 2001
+From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
+Date: Wed, 17 Dec 2008 22:32:11 +0200
+Subject: [PATCH] sbc: fix for overflow bug in quantization code
+
+The result of multiplication does not always fit into 32-bits. Using 64-bit
+calculations helps to avoid overflows and sound quality problems in encoded
+audio. Overflows are more likely to show up when using high values for
+bitpool setting.
+
+Signed-off-by: Siarhei Siamashka <siarhei.siamashka@nokia.com>
+---
+ sbc/sbc.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/sbc/sbc.c b/sbc/sbc.c
+index 7072673..6624921 100644
+--- a/sbc/sbc.c
++++ b/sbc/sbc.c
+@@ -1085,7 +1085,7 @@ static int sbc_pack_frame(uint8_t *data, struct sbc_frame *frame, size_t len)
+ 			for (sb = 0; sb < frame->subbands; sb++) {
+ 				if (levels[ch][sb] > 0) {
+ 					audio_sample =
+-						(uint16_t) ((((frame->sb_sample_f[blk][ch][sb]*levels[ch][sb]) >>
++						(uint16_t) (((((int64_t)frame->sb_sample_f[blk][ch][sb]*levels[ch][sb]) >>
+ 									(frame->scale_factor[ch][sb] + 1)) +
+ 								levels[ch][sb]) >> 1);
+ 					audio_sample <<= 16 - bits[ch][sb];
+-- 
+1.5.6.5
+
+
+--Boundary-00=_vRWSJJTdo04dqkg--
