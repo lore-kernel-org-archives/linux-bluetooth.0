@@ -1,59 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Li, Zhigang" <zhigang.li@intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Johan Hedberg <johan.hedberg@nokia.com>, "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>, "Zhao, Forrest" <forrest.zhao@intel.com>
-Date: Thu, 18 Dec 2008 13:55:46 +0800
-Subject: RE: To enablue DID in coming bluez release
-Message-ID: <B94C62E7C2870743865418621F040C1303B81154@pdsmsx502.ccr.corp.intel.com>
-References: <B94C62E7C2870743865418621F040C1303A6354C@pdsmsx502.ccr.corp.intel.com>
-	 <1229046931.22285.30.camel@violet.holtmann.net>
-	 <B94C62E7C2870743865418621F040C1303A640A8@pdsmsx502.ccr.corp.intel.com>
-	 <B94C62E7C2870743865418621F040C1303B80AB8@pdsmsx502.ccr.corp.intel.com>
-	 <20081216102928.GA12914@localhost> <1229481492.10889.1.camel@violet>
-	 <B94C62E7C2870743865418621F040C1303B80C87@pdsmsx502.ccr.corp.intel.com>
- <1229543953.10889.16.camel@violet>
-In-Reply-To: <1229543953.10889.16.camel@violet>
-Content-Type: text/plain; charset="gb2312"
+Message-ID: <ac290f760812171407te7a079eycf45c36d376b0c5c@mail.gmail.com>
+Date: Wed, 17 Dec 2008 14:07:52 -0800
+From: "jaikumar Ganesh" <jaikumarg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: conn->state vs conn->sk->sk_state
+In-Reply-To: <ac290f760812171405r79473a67l6769913bc7e62d2e@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <ac290f760812171405r79473a67l6769913bc7e62d2e@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTWFyY2VsLA0KSWYgVVNCIFZlbmRvciBJRCBhbmQgQmx1ZXRvb3RoIFZlbmRvciBJRCBhcmUg
-Ym90aCBleGlzdCB3aGljaCBvbmUgeW91IHByZWZlciBpbiBESUQ/IFdlIGNhbid0IGFkZCBib3Ro
-IHJpZ2h0Pw0KVGhhbmtzDQoNCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IE1h
-cmNlbCBIb2x0bWFubiBbbWFpbHRvOm1hcmNlbEBob2x0bWFubi5vcmddIA0KU2VudDogMjAwOMTq
-MTLUwjE4yNUgMzo1OQ0KVG86IExpLCBaaGlnYW5nDQpDYzogSm9oYW4gSGVkYmVyZzsgbGludXgt
-Ymx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZw0KU3ViamVjdDogUkU6IFRvIGVuYWJsdWUgRElEIGlu
-IGNvbWluZyBibHVleiByZWxlYXNlDQoNCkhpIFpoaWdhbmcsDQoNCnNvIGZpcnN0IHRoaW5ncyBm
-aXJzdC4gTk8gdG9wLXBvc3Rpbmcgb24gdGhpcyBtYWlsaW5nIGxpc3QuDQoNCj4gVXBkYXRlZDoN
-Cj4gLS0tIGEvbWFpbi5jCVR1ZSBEZWMgMTYgMTc6NDM6MjQgMjAwOCArMDgwMA0KPiArKysgYi9t
-YWluLmMJV2VkIERlYyAxNyAxMTo1Nzo0NyAyMDA4ICswODAwDQo+IEBAIC0xNzQsNiArMTc0LDE3
-IEBAIHN0YXRpYyB2b2lkIHBhcnNlX2NvbmZpZyhHS2V5RmlsZSAqY29uZmkNCj4gIAkJbWFpbl9v
-cHRzLmlucW1vZGUgPSB2YWw7DQo+ICAJfQ0KPiAgDQo+ICsJc3RyID0gZ19rZXlfZmlsZV9nZXRf
-c3RyaW5nKGNvbmZpZywgIkdlbmVyYWwiLA0KPiArCQkJCQkiRGV2aWNlSUQiLCAmZXJyKTsNCj4g
-KwlpZiAoZXJyKSB7DQo+ICsJCWRlYnVnKCIlcyIsIGVyci0+bWVzc2FnZSk7DQo+ICsJCWdfY2xl
-YXJfZXJyb3IoJmVycik7DQo+ICsJfSBlbHNlIHsNCj4gKwkJZGVidWcoImRldmljZWlkPSVzIiwg
-c3RyKTsNCj4gKwkJc3RybmNweShtYWluX29wdHMuZGV2aWNlaWQsIHN0ciwgc2l6ZW9mKG1haW5f
-b3B0cy5kZXZpY2VpZCkpOw0KPiArCQlnX2ZyZWUoc3RyKTsNCj4gKwl9DQo+ICsNCj4gIAltYWlu
-X29wdHMubGlua19tb2RlID0gSENJX0xNX0FDQ0VQVDsNCj4gIA0KPiAgCW1haW5fb3B0cy5saW5r
-X3BvbGljeSA9IEhDSV9MUF9SU1dJVENIIHwgSENJX0xQX1NOSUZGIHwNCg0KSSBhbHdheXMgbmVl
-ZCBwYXRjaGVzIGFnYWluc3QgdGhlIGxhdGVzdCBHSVQgdHJlZS4gT3RoZXJ3aXNlIEkgY2FuJ3QN
-Cm1lcmdlIHRoZW0gYW5kIHN1Ym1pdHRpbmcgdGhlbSBpbiBhIHByb3BlciBmb3JtYXQgaGVscHMg
-bWUgdG8gYXBwbHkNCnRoZW0uDQoNCj4gZGlmZiAtciA2NTU1NjUwMjkxMWQgbWFpbi5jb25mDQo+
-IC0tLSBhL21haW4uY29uZglUdWUgRGVjIDE2IDE3OjQzOjI0IDIwMDggKzA4MDANCj4gKysrIGIv
-bWFpbi5jb25mCVR1ZSBEZWMgMTcgMTE6NTc6NTEgMjAwOCArMDgwMA0KPiBAQCAtMjgsMyArMjgs
-OSBAQCBPZmZNb2RlID0gTm9TY2FuDQo+ICAjIERpc2NvdmVyIHNjaGVkdWxlciBpbnRlcnZhbCB1
-c2VkIGluIEFkYXB0ZXIuRGlzY292ZXJEZXZpY2VzDQo+ICAjIFRoZSB2YWx1ZSBpcyBpbiBzZWNv
-bmRzLiBEZWZhdWx0cyBpcyAwIHRvIHVzZSBjb250cm9sbGVyIHNjaGVkdWxlcg0KPiAgRGlzY292
-ZXJTY2hlZHVsZXJJbnRlcnZhbCA9IDANCj4gKw0KPiArDQo+ICsjIFVzZXIgdmVybmRvciBhbmQg
-cHJvZHVjdCBhbmQgdmVyc2lvbiBpbmZvcm1hdGlvbiBhcmUgdXNlZCBpbiBESUQgcHJvZmlsZQ0K
-PiArIyAiOiIgdG8gaWRlbnRpZnkgdGhlIHZhbHVlLiBGRkZGIGlzIHJlc2VydmVkIGZvciBWZW5k
-b3JJZCBieSBkZWZhdWx0Lg0KPiArRGV2aWNlSUQgPSAxMjM0OjU2Nzg6YWJjZA0KDQpTbyB0aGUg
-b3B0aW9uIHNob3VsZCBiZSBjb21tZW50ZWQgb3V0IGJ5IGRlZmF1bHQgc2luY2Ugb3RoZXJ3aXNl
-IGV2ZXJ5DQppbnN0YWxsYXRpb24gbm93IHVzZXMgdmVuZG9yIGlkIDEyMzQgYW5kIHRoYXQgaXMg
-YWN0dWFsbHkgYSB2YWxpZCBvbmUuDQpBbHNvIHRoZSBkZXNjcmlwdGlvbiBhYm92ZSBtYWtlcyBu
-byBzZW5zZS4NCg0KSSBjb21taXR0ZWQgYSBwYXRjaCBieSBteXNlbGYgdG8gdGhlIEdJVCB0cmVl
-IG5vdyB0aGF0IHNob3VsZCBmaXggdGhpcy4NCkhvd2V2ZXIgdGhlcmUgaXMgb25lIHRoaW5nIG1p
-c3NpbmcuIFRoZSBESUQgc3VwcG9ydHMgVVNCIGJhc2VkIHZlbmRvcg0KaWRzIGFuZCBCbHVldG9v
-dGggYmFzZWQgb25lcy4gU28gd2UgbmVlZCB0byBzdXBwb3J0IGJvdGguIEZlZWwgZnJlZSB0bw0K
-Y29tZSB1cCB3aXRoIHNvbWV0aGluZy4NCg0KUmVnYXJkcw0KDQpNYXJjZWwNCg0KDQo=
+ Folks,
+     I have a device which supports only SCO connections.  So when the
+application calls sco_sock_connect -> sco_connect, the conn->state is
+set to BT_CONNECT and then bt_sock_state is called waiting for the
+conn->sk->sk_state to be set to BT_CONNECTED.
+     When the HCI Connection Complete event comes, the conn->state is
+set to BT_CONNECTED.
+
+     In 2.6.25 ->  hci_proto_connect_cfm(conn, ev->status) was called
+at the end of hci_conn_complete_evt which used to set the
+conn->sk->sk_state to BT_CONNECTED in sco_conn_ready.
+     In 2.6.27->  hci_proto_connect_cfm(conn, ev->status) is called
+only if the ev_status is 1.
+                      Hence, the conn->sk->sk_state doesn't get set to
+BT_CONNECTED and hence the connect() times out.
+
+    Should we be calling sco_conn_ready in sco_connect similar to
+sco_connect_cfm if conn != null ?
+    I didn't see anyone else complain so am I missing something obvious ?
+
+
+     * I am new to this list so please excuse me if the above doesn't
+make sense.
+
+ Thanks
+ Jaikumar
