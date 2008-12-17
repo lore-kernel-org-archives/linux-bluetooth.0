@@ -1,55 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Li, Zhigang" <zhigang.li@intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
-	<johan.hedberg@nokia.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Wed, 17 Dec 2008 11:10:40 +0800
-Subject: RE: To enablue DID in coming bluez release
-Message-ID: <B94C62E7C2870743865418621F040C1303B80C87@pdsmsx502.ccr.corp.intel.com>
-References: <B94C62E7C2870743865418621F040C1303A6354C@pdsmsx502.ccr.corp.intel.com>
-	 <1229046931.22285.30.camel@violet.holtmann.net>
-	 <B94C62E7C2870743865418621F040C1303A640A8@pdsmsx502.ccr.corp.intel.com>
-	 <B94C62E7C2870743865418621F040C1303B80AB8@pdsmsx502.ccr.corp.intel.com>
-	 <20081216102928.GA12914@localhost> <1229481492.10889.1.camel@violet>
-In-Reply-To: <1229481492.10889.1.camel@violet>
-Content-Type: text/plain; charset="gb2312"
-MIME-Version: 1.0
+Subject: Re: [PATCH] Gateway profile
+From: Marcel Holtmann <marcel@holtmann.org>
+To: event <event.riga@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <664d43d60812151514m6c225403i528453fcb6f08430@mail.gmail.com>
+References: <664d43d60812151512y6631ebf2j9665e1473193077d@mail.gmail.com>
+	 <664d43d60812151514m6c225403i528453fcb6f08430@mail.gmail.com>
+Content-Type: text/plain
+Date: Wed, 17 Dec 2008 03:48:53 +0100
+Message-Id: <1229482133.10889.5.camel@violet>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-VXBkYXRlZDoNCi0tLSBhL21haW4uYwlUdWUgRGVjIDE2IDE3OjQzOjI0IDIwMDggKzA4MDANCisr
-KyBiL21haW4uYwlXZWQgRGVjIDE3IDExOjU3OjQ3IDIwMDggKzA4MDANCkBAIC0xNzQsNiArMTc0
-LDE3IEBAIHN0YXRpYyB2b2lkIHBhcnNlX2NvbmZpZyhHS2V5RmlsZSAqY29uZmkNCiAJCW1haW5f
-b3B0cy5pbnFtb2RlID0gdmFsOw0KIAl9DQogDQorCXN0ciA9IGdfa2V5X2ZpbGVfZ2V0X3N0cmlu
-Zyhjb25maWcsICJHZW5lcmFsIiwNCisJCQkJCSJEZXZpY2VJRCIsICZlcnIpOw0KKwlpZiAoZXJy
-KSB7DQorCQlkZWJ1ZygiJXMiLCBlcnItPm1lc3NhZ2UpOw0KKwkJZ19jbGVhcl9lcnJvcigmZXJy
-KTsNCisJfSBlbHNlIHsNCisJCWRlYnVnKCJkZXZpY2VpZD0lcyIsIHN0cik7DQorCQlzdHJuY3B5
-KG1haW5fb3B0cy5kZXZpY2VpZCwgc3RyLCBzaXplb2YobWFpbl9vcHRzLmRldmljZWlkKSk7DQor
-CQlnX2ZyZWUoc3RyKTsNCisJfQ0KKw0KIAltYWluX29wdHMubGlua19tb2RlID0gSENJX0xNX0FD
-Q0VQVDsNCiANCiAJbWFpbl9vcHRzLmxpbmtfcG9saWN5ID0gSENJX0xQX1JTV0lUQ0ggfCBIQ0lf
-TFBfU05JRkYgfA0KZGlmZiAtciA2NTU1NjUwMjkxMWQgbWFpbi5jb25mDQotLS0gYS9tYWluLmNv
-bmYJVHVlIERlYyAxNiAxNzo0MzoyNCAyMDA4ICswODAwDQorKysgYi9tYWluLmNvbmYJVHVlIERl
-YyAxNyAxMTo1Nzo1MSAyMDA4ICswODAwDQpAQCAtMjgsMyArMjgsOSBAQCBPZmZNb2RlID0gTm9T
-Y2FuDQogIyBEaXNjb3ZlciBzY2hlZHVsZXIgaW50ZXJ2YWwgdXNlZCBpbiBBZGFwdGVyLkRpc2Nv
-dmVyRGV2aWNlcw0KICMgVGhlIHZhbHVlIGlzIGluIHNlY29uZHMuIERlZmF1bHRzIGlzIDAgdG8g
-dXNlIGNvbnRyb2xsZXIgc2NoZWR1bGVyDQogRGlzY292ZXJTY2hlZHVsZXJJbnRlcnZhbCA9IDAN
-CisNCisNCisjIFVzZXIgdmVybmRvciBhbmQgcHJvZHVjdCBhbmQgdmVyc2lvbiBpbmZvcm1hdGlv
-biBhcmUgdXNlZCBpbiBESUQgcHJvZmlsZQ0KKyMgIjoiIHRvIGlkZW50aWZ5IHRoZSB2YWx1ZS4g
-RkZGRiBpcyByZXNlcnZlZCBmb3IgVmVuZG9ySWQgYnkgZGVmYXVsdC4NCitEZXZpY2VJRCA9IDEy
-MzQ6NTY3ODphYmNkDQorDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBsaW51
-eC1ibHVldG9vdGgtb3duZXJAdmdlci5rZXJuZWwub3JnIFttYWlsdG86bGludXgtYmx1ZXRvb3Ro
-LW93bmVyQHZnZXIua2VybmVsLm9yZ10gT24gQmVoYWxmIE9mIE1hcmNlbCBIb2x0bWFubg0KU2Vu
-dDogMjAwOMTqMTLUwjE3yNUgMTA6MzgNClRvOiBKb2hhbiBIZWRiZXJnDQpDYzogbGludXgtYmx1
-ZXRvb3RoQHZnZXIua2VybmVsLm9yZw0KU3ViamVjdDogUmU6IFRvIGVuYWJsdWUgRElEIGluIGNv
-bWluZyBibHVleiByZWxlYXNlDQoNCkhpIEpvaGFuLA0KDQo+IENvdXBsZSBvZiBjb21tZW50czoN
-Cj4gDQo+IE9uIFR1ZSwgRGVjIDE2LCAyMDA4LCBMaSwgWmhpZ2FuZyB3cm90ZToNCj4gPiAgCQlt
-YWluX29wdHMuaW5xbW9kZSA9IHZhbDsNCj4gPiAgCX0NCj4gPiArCXN0ciA9IGdfa2V5X2ZpbGVf
-Z2V0X3N0cmluZyhjb25maWcsICJHZW5lcmFsIiwNCj4gDQo+IENvZGluZyBzdHlsZTogYWRkIGVt
-cHR5IGxpbmUgYWZ0ZXIgdGhlIGNsb3NpbmcgYnJhY2tldC4NCj4gDQo+ID4gKwkJCQkJIlZJRC9Q
-SUQvVkVSIiwgJmVycik7DQo+IA0KPiBEaWQgeW91IGFncmVlIHdpdGggdGhpcyAiVklEL1BJRC9W
-RVIiIG5hbWUgd2l0aCBNYXJjZWw/IEknZCBoYXZlIHVzZWQNCj4gc29tZXRoaW5nIGxpa2UgIkRl
-dmljZUlEIiwgIkRldmljZUlESW5mbyIgb3IgIkRJREluZm8iLg0KDQpJIHRoaW5rICJEZXZpY2VJ
-RCIgc291bmRzIHJlYXNvbmFibGUuIExldHMgdXNlIHRoYXQgb25lLg0KDQpSZWdhcmRzDQoNCk1h
-cmNlbA0KDQoNCi0tDQpUbyB1bnN1YnNjcmliZSBmcm9tIHRoaXMgbGlzdDogc2VuZCB0aGUgbGlu
-ZSAidW5zdWJzY3JpYmUgbGludXgtYmx1ZXRvb3RoIiBpbg0KdGhlIGJvZHkgb2YgYSBtZXNzYWdl
-IHRvIG1ham9yZG9tb0B2Z2VyLmtlcm5lbC5vcmcNCk1vcmUgbWFqb3Jkb21vIGluZm8gYXQgIGh0
-dHA6Ly92Z2VyLmtlcm5lbC5vcmcvbWFqb3Jkb21vLWluZm8uaHRtbA0K
+Hi Leonid,
+
+> I've implemented gateway profile. I've tested basic things, like
+> place/cancel/answer call. Others are in development. Some could not be
+> tested as my carrier doesn't provide corresponding services (like
+> 3-way call, etc.) so any help welcome.
+
+thanks for the works, but can you please base the patch against the
+latest GIT tree. It is kinda hard to review things that might already
+have been implemented like sco_listen.
+
+ audio/audio-api.txt  |   94 +++++
+ audio/device.h       |    7 
+ audio/gateway.c      |  938 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ audio/gateway.h      |   11 
+ audio/manager.c      |  124 ++++--
+ common/glib-helper.c |   85 +++-
+ common/glib-helper.h |    1 
+ 7 files changed, 1205 insertions(+), 55 deletions(-)
+
+So any changes to glib-helper.[ch] have to be in a separate patch and
+need to be discussed independent from the gateway implementation.
+
+Any audio-api.txt stuff should also go separately since that has to be
+discussed. Also we can't send PCM data over D-Bus. It just doesn't work
+like that. We do have the internal IPC for that and plugins for ALSA,
+GStreamer and PulseAudio that should be used.
+
+However the most important part is that you follow the coding style and
+that is the kernel coding style. You make it really hard for us to
+review the code like this and it can't be applied. I really want you to
+add support for the gateway role to BlueZ, but the overall code in the
+project needs to follow the same rules.
+
+So please fix these issues first and then we do a deep review of it.
+
+Regards
+
+Marcel
+
+
