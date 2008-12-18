@@ -1,49 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Li, Zhigang" <zhigang.li@intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Johan Hedberg <johan.hedberg@nokia.com>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>, "Zhao, Forrest" <forrest.zhao@intel.com>
+Date: Thu, 18 Dec 2008 13:55:46 +0800
+Subject: RE: To enablue DID in coming bluez release
+Message-ID: <B94C62E7C2870743865418621F040C1303B81154@pdsmsx502.ccr.corp.intel.com>
+References: <B94C62E7C2870743865418621F040C1303A6354C@pdsmsx502.ccr.corp.intel.com>
+	 <1229046931.22285.30.camel@violet.holtmann.net>
+	 <B94C62E7C2870743865418621F040C1303A640A8@pdsmsx502.ccr.corp.intel.com>
+	 <B94C62E7C2870743865418621F040C1303B80AB8@pdsmsx502.ccr.corp.intel.com>
+	 <20081216102928.GA12914@localhost> <1229481492.10889.1.camel@violet>
+	 <B94C62E7C2870743865418621F040C1303B80C87@pdsmsx502.ccr.corp.intel.com>
+ <1229543953.10889.16.camel@violet>
+In-Reply-To: <1229543953.10889.16.camel@violet>
+Content-Type: text/plain; charset="gb2312"
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----_=_NextPart_001_01C9611F.B3410FD7"
-Subject: [PATCH] rfcomm/sock.c: rfcomm_sock_sendmsg() does not return error on a connection faulure
-Date: Thu, 18 Dec 2008 15:48:33 +0100
-Message-ID: <C36B5BF556750D4282E3E0FA9ABEE628023B1019@nl-exc-01.intra.local>
-From: "Victor Shcherbatyuk" <Victor.Shcherbatyuk@tomtom.com>
-To: <linux-bluetooth@vger.kernel.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
-
-------_=_NextPart_001_01C9611F.B3410FD7
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-
-Hi,
-
-We noticed a problem, when a connection from the remote device is
-dropper the write() function does not return the error in the user
-space, returning 0 instead - indicating that 0 bytes are sent. We've
-also noticed that with some older kernels it used to work (2.6.13 vs
-2.6.23-17). The patch fixes the problem.
-
-Regards,
-    Victor.
-
-------_=_NextPart_001_01C9611F.B3410FD7
-Content-Type: application/octet-stream;
-	name="sock.c.patch"
-Content-Transfer-Encoding: base64
-Content-Description: sock.c.patch
-Content-Disposition: attachment;
-	filename="sock.c.patch"
-
-LS0tIGEvbmV0L2JsdWV0b290aC9yZmNvbW0vc29jay5jCTIwMDgtMTItMTggMTU6MjA6MTUuMDAw
-MDAwMDAwICswMTAwCisrKyBiL25ldC9ibHVldG9vdGgvcmZjb21tL3NvY2suYwkyMDA4LTEyLTE4
-IDE1OjE4OjAwLjAwMDAwMDAwMCArMDEwMApAQCAtNTc1LDggKzU3NSwxMSBAQAogCiAJCXNrYiA9
-IHNvY2tfYWxsb2Nfc2VuZF9za2Ioc2ssIHNpemUgKyBSRkNPTU1fU0tCX1JFU0VSVkUsCiAJCQkJ
-bXNnLT5tc2dfZmxhZ3MgJiBNU0dfRE9OVFdBSVQsICZlcnIpOwotCQlpZiAoIXNrYikKKwkJaWYg
-KCFza2IpIHsKKwkJCWlmIChzZW50ID09IDApCisJCQkJc2VudCA9IGVycjsKIAkJCWJyZWFrOwor
-CQl9CiAJCXNrYl9yZXNlcnZlKHNrYiwgUkZDT01NX1NLQl9IRUFEX1JFU0VSVkUpOwogCiAJCWVy
-ciA9IG1lbWNweV9mcm9taW92ZWMoc2tiX3B1dChza2IsIHNpemUpLCBtc2ctPm1zZ19pb3YsIHNp
-emUpOwo=
-
-------_=_NextPart_001_01C9611F.B3410FD7--
+SGkgTWFyY2VsLA0KSWYgVVNCIFZlbmRvciBJRCBhbmQgQmx1ZXRvb3RoIFZlbmRvciBJRCBhcmUg
+Ym90aCBleGlzdCB3aGljaCBvbmUgeW91IHByZWZlciBpbiBESUQ/IFdlIGNhbid0IGFkZCBib3Ro
+IHJpZ2h0Pw0KVGhhbmtzDQoNCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IE1h
+cmNlbCBIb2x0bWFubiBbbWFpbHRvOm1hcmNlbEBob2x0bWFubi5vcmddIA0KU2VudDogMjAwOMTq
+MTLUwjE4yNUgMzo1OQ0KVG86IExpLCBaaGlnYW5nDQpDYzogSm9oYW4gSGVkYmVyZzsgbGludXgt
+Ymx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZw0KU3ViamVjdDogUkU6IFRvIGVuYWJsdWUgRElEIGlu
+IGNvbWluZyBibHVleiByZWxlYXNlDQoNCkhpIFpoaWdhbmcsDQoNCnNvIGZpcnN0IHRoaW5ncyBm
+aXJzdC4gTk8gdG9wLXBvc3Rpbmcgb24gdGhpcyBtYWlsaW5nIGxpc3QuDQoNCj4gVXBkYXRlZDoN
+Cj4gLS0tIGEvbWFpbi5jCVR1ZSBEZWMgMTYgMTc6NDM6MjQgMjAwOCArMDgwMA0KPiArKysgYi9t
+YWluLmMJV2VkIERlYyAxNyAxMTo1Nzo0NyAyMDA4ICswODAwDQo+IEBAIC0xNzQsNiArMTc0LDE3
+IEBAIHN0YXRpYyB2b2lkIHBhcnNlX2NvbmZpZyhHS2V5RmlsZSAqY29uZmkNCj4gIAkJbWFpbl9v
+cHRzLmlucW1vZGUgPSB2YWw7DQo+ICAJfQ0KPiAgDQo+ICsJc3RyID0gZ19rZXlfZmlsZV9nZXRf
+c3RyaW5nKGNvbmZpZywgIkdlbmVyYWwiLA0KPiArCQkJCQkiRGV2aWNlSUQiLCAmZXJyKTsNCj4g
+KwlpZiAoZXJyKSB7DQo+ICsJCWRlYnVnKCIlcyIsIGVyci0+bWVzc2FnZSk7DQo+ICsJCWdfY2xl
+YXJfZXJyb3IoJmVycik7DQo+ICsJfSBlbHNlIHsNCj4gKwkJZGVidWcoImRldmljZWlkPSVzIiwg
+c3RyKTsNCj4gKwkJc3RybmNweShtYWluX29wdHMuZGV2aWNlaWQsIHN0ciwgc2l6ZW9mKG1haW5f
+b3B0cy5kZXZpY2VpZCkpOw0KPiArCQlnX2ZyZWUoc3RyKTsNCj4gKwl9DQo+ICsNCj4gIAltYWlu
+X29wdHMubGlua19tb2RlID0gSENJX0xNX0FDQ0VQVDsNCj4gIA0KPiAgCW1haW5fb3B0cy5saW5r
+X3BvbGljeSA9IEhDSV9MUF9SU1dJVENIIHwgSENJX0xQX1NOSUZGIHwNCg0KSSBhbHdheXMgbmVl
+ZCBwYXRjaGVzIGFnYWluc3QgdGhlIGxhdGVzdCBHSVQgdHJlZS4gT3RoZXJ3aXNlIEkgY2FuJ3QN
+Cm1lcmdlIHRoZW0gYW5kIHN1Ym1pdHRpbmcgdGhlbSBpbiBhIHByb3BlciBmb3JtYXQgaGVscHMg
+bWUgdG8gYXBwbHkNCnRoZW0uDQoNCj4gZGlmZiAtciA2NTU1NjUwMjkxMWQgbWFpbi5jb25mDQo+
+IC0tLSBhL21haW4uY29uZglUdWUgRGVjIDE2IDE3OjQzOjI0IDIwMDggKzA4MDANCj4gKysrIGIv
+bWFpbi5jb25mCVR1ZSBEZWMgMTcgMTE6NTc6NTEgMjAwOCArMDgwMA0KPiBAQCAtMjgsMyArMjgs
+OSBAQCBPZmZNb2RlID0gTm9TY2FuDQo+ICAjIERpc2NvdmVyIHNjaGVkdWxlciBpbnRlcnZhbCB1
+c2VkIGluIEFkYXB0ZXIuRGlzY292ZXJEZXZpY2VzDQo+ICAjIFRoZSB2YWx1ZSBpcyBpbiBzZWNv
+bmRzLiBEZWZhdWx0cyBpcyAwIHRvIHVzZSBjb250cm9sbGVyIHNjaGVkdWxlcg0KPiAgRGlzY292
+ZXJTY2hlZHVsZXJJbnRlcnZhbCA9IDANCj4gKw0KPiArDQo+ICsjIFVzZXIgdmVybmRvciBhbmQg
+cHJvZHVjdCBhbmQgdmVyc2lvbiBpbmZvcm1hdGlvbiBhcmUgdXNlZCBpbiBESUQgcHJvZmlsZQ0K
+PiArIyAiOiIgdG8gaWRlbnRpZnkgdGhlIHZhbHVlLiBGRkZGIGlzIHJlc2VydmVkIGZvciBWZW5k
+b3JJZCBieSBkZWZhdWx0Lg0KPiArRGV2aWNlSUQgPSAxMjM0OjU2Nzg6YWJjZA0KDQpTbyB0aGUg
+b3B0aW9uIHNob3VsZCBiZSBjb21tZW50ZWQgb3V0IGJ5IGRlZmF1bHQgc2luY2Ugb3RoZXJ3aXNl
+IGV2ZXJ5DQppbnN0YWxsYXRpb24gbm93IHVzZXMgdmVuZG9yIGlkIDEyMzQgYW5kIHRoYXQgaXMg
+YWN0dWFsbHkgYSB2YWxpZCBvbmUuDQpBbHNvIHRoZSBkZXNjcmlwdGlvbiBhYm92ZSBtYWtlcyBu
+byBzZW5zZS4NCg0KSSBjb21taXR0ZWQgYSBwYXRjaCBieSBteXNlbGYgdG8gdGhlIEdJVCB0cmVl
+IG5vdyB0aGF0IHNob3VsZCBmaXggdGhpcy4NCkhvd2V2ZXIgdGhlcmUgaXMgb25lIHRoaW5nIG1p
+c3NpbmcuIFRoZSBESUQgc3VwcG9ydHMgVVNCIGJhc2VkIHZlbmRvcg0KaWRzIGFuZCBCbHVldG9v
+dGggYmFzZWQgb25lcy4gU28gd2UgbmVlZCB0byBzdXBwb3J0IGJvdGguIEZlZWwgZnJlZSB0bw0K
+Y29tZSB1cCB3aXRoIHNvbWV0aGluZy4NCg0KUmVnYXJkcw0KDQpNYXJjZWwNCg0KDQo=
