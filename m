@@ -1,27 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: doing hcitool name [addr] while a hcitool inq is running
+Subject: Re: [PATCH] rfcomm/sock.c: rfcomm_sock_sendmsg() does not return
+ error on a connection faulure
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Folkert van Heusden <folkert@vanheusden.com>
+To: Victor Shcherbatyuk <Victor.Shcherbatyuk@tomtom.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20081212122043.GC19659@vanheusden.com>
-References: <20081212122043.GC19659@vanheusden.com>
+In-Reply-To: <C36B5BF556750D4282E3E0FA9ABEE628023B1019@nl-exc-01.intra.local>
+References: <C36B5BF556750D4282E3E0FA9ABEE628023B1019@nl-exc-01.intra.local>
 Content-Type: text/plain
-Date: Fri, 19 Dec 2008 08:02:02 +0100
-Message-Id: <1229670122.17082.30.camel@violet>
+Date: Fri, 19 Dec 2008 08:00:42 +0100
+Message-Id: <1229670042.17082.29.camel@violet>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Folkert,
+Hi Victor,
 
-> Am I right that one cannot do a
-> 	hcitool name 00:11:22:33:44:55
-> while a
-> 	hcitool inq
-> is running on the same bluetooth device?
+> We noticed a problem, when a connection from the remote device is
+> dropper the write() function does not return the error in the user
+> space, returning 0 instead - indicating that 0 bytes are sent. We've
+> also noticed that with some older kernels it used to work (2.6.13 vs
+> 2.6.23-17). The patch fixes the problem.
 
-and that is expected. You can do a page, while doing inquiry and vice
-versa.
+that is a bug and your patch looks good. However can you use
+git-format-patch and sent it again with proper Signed-off-by line for me
+to apply.
 
 Regards
 
