@@ -1,30 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <6F8E4829F275487887832A64E4125229@freqonedev>
-From: "David Stockwell" <dstockwell@frequency-one.com>
-To: <linux-bluetooth@vger.kernel.org>
-Subject: FYI, regarding AVRCP
-Date: Fri, 19 Dec 2008 20:24:36 -0600
+Message-ID: <d89ddf300812191451q5a94a6b7n91423f1ce5a91a9f@mail.gmail.com>
+Date: Fri, 19 Dec 2008 15:51:52 -0700
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+Subject: Re: [PATCH] sbc: fix for overflow bug in quantization code
+Cc: "Siarhei Siamashka" <siarhei.siamashka@nokia.com>, jaska.uimonen@nokia.com,
+	"ext Marcel Holtmann" <marcel@holtmann.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <2d5a2c100812191423g301a6aebr103d3602e8ec984c@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	format=flowed;
-	charset="iso-8859-1";
-	reply-type=original
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+References: <200812172243.27442.siarhei.siamashka@nokia.com>
+	 <1229641160.17082.0.camel@violet>
+	 <200812192325.46796.siarhei.siamashka@nokia.com>
+	 <2d5a2c100812191423g301a6aebr103d3602e8ec984c@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Marcel, Johan, et al,
+Luiz,
 
-Since our meeting in PortlandI have been busy dealing with both "day 
-job" issues, as well as finishing up some Intellectual Property issues 
-surrounding my ongoing evening/weekend project, of which AVRCP and my 
-remote are a small but critical part.  Within the next two weeks I will 
-reengage AVRCP and expect to soon bring it up to 1.3 (metadata transfer) 
-as we discussed in Portland.  Sorry it has taken so long.
+> So what about the subband filters fixes and 16 bit fixed point, do you
+> thing it can be done? I left this out since the last patch was only
+> dealing with 8 subband and was 32 bit.
 
-With regard to the question from Park Chan-Yeol, I suggest we consider a 
-Bluez/DBUS "version" property (for simplicity, a String) for the 
-org.bluez.Control interface, to allow users to know just what they are 
-dealing with.  Any thoughts?
+FYI, I made some testing changes some time ago from 32-bit to 16-bit
+integers that didn't improve performance on arm at all... we shouldn't
+sacrifice quality for no real improvement in performance.
 
-David Stockwell 
+The story may be different on a mips etc core, but I think we should
+realize real performance improvements in order to justify lowering
+fidelity.
 
+Brad
