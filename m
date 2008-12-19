@@ -1,40 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: RE: To enablue DID in coming bluez release
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Li, Zhigang" <zhigang.li@intel.com>
-Cc: Johan Hedberg <johan.hedberg@nokia.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"Zhao, Forrest" <forrest.zhao@intel.com>
-In-Reply-To: <B94C62E7C2870743865418621F040C1303B81154@pdsmsx502.ccr.corp.intel.com>
-References: <B94C62E7C2870743865418621F040C1303A6354C@pdsmsx502.ccr.corp.intel.com>
-	 <1229046931.22285.30.camel@violet.holtmann.net>
-	 <B94C62E7C2870743865418621F040C1303A640A8@pdsmsx502.ccr.corp.intel.com>
-	 <B94C62E7C2870743865418621F040C1303B80AB8@pdsmsx502.ccr.corp.intel.com>
-	 <20081216102928.GA12914@localhost> <1229481492.10889.1.camel@violet>
-	 <B94C62E7C2870743865418621F040C1303B80C87@pdsmsx502.ccr.corp.intel.com>
-	 <1229543953.10889.16.camel@violet>
-	 <B94C62E7C2870743865418621F040C1303B81154@pdsmsx502.ccr.corp.intel.com>
-Content-Type: text/plain
-Date: Fri, 19 Dec 2008 20:01:35 +0100
-Message-Id: <1229713295.879.12.camel@californication>
-Mime-Version: 1.0
+Message-Id: <E13683A3-C5FF-4F4E-AD0F-F639F8369ECD@cam.ac.uk>
+From: Simon Hay <sjeh3@cam.ac.uk>
+To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1229712597.879.2.camel@californication>
+Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
+Mime-Version: 1.0 (Apple Message framework v930.3)
+Subject: Re: Connection time behaviour question
+Date: Fri, 19 Dec 2008 17:58:52 +0000
+References: <B5F305E0-C554-4753-AAB5-71DA06305A1D@cam.ac.uk> <1229712597.879.2.camel@californication>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Zhigang,
+Hi Marcel,
 
-please stop top-posting. This is an open source mailing list and we do
-bottom posting and inline quoting.
+On 19 Dec 2008, at 18:49, Marcel Holtmann wrote:
 
-> If USB Vendor ID and Bluetooth Vendor ID are both exist which one you prefer in DID? We can't add both right?
-
-Default is Bluetooth since we are doing Bluetooth here and not USB. USB
-would need a specific prefix. So I prefer usb:1223:1233:1223 for
-indicating USB ids and without we default to Bluetooth. Care to send a
-patch for it.
-
-Regards
-
-Marcel
+>
+> I don't see any issue here, but the whole concept of connecting to a
+> remote device to read its RSSI is broken by design. The RSSI value  
+> of an
+> already connection is basically useless. What you want is the link
+> quality, but even that doesn't really help you since it is vendor
+> specific and every company defines it differently.
 
 
+Thanks for the reply.  I appreciate your point about RSSI vs link  
+quality, and understand the issue there, but actually that's  
+incidental to the point I'm really trying to understand - reading the  
+RSSI is just something to do with the connection before I throw it  
+away again.  I'm trying to get to the bottom of what's changed to  
+cause the different behaviour in the connection times - why passing in  
+a clock offset doesn't seem to make a difference any more, and why we  
+see this regular pattern of times going up and up then jumping back  
+down again.  Is there anything that was deliberately changed in this  
+regard, or is it a side effect of something else?
+
+I really appreciate all your help and patience on this!
+
+Simon
