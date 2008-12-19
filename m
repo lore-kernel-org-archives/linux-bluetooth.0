@@ -1,32 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 19 Dec 2008 16:21:01 +0900
-From: Chan-Yeol Park <chanyeol.park@samsung.com>
-Subject: How can I know BlueZ A2DP, AVRCP profile version.?
-To: linux-bluetooth@vger.kernel.org
-Message-id: <003501c961aa$588a4100$099ec300$%park@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+Subject: Re: doing hcitool name [addr] while a hcitool inq is running
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Folkert van Heusden <folkert@vanheusden.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20081212122043.GC19659@vanheusden.com>
+References: <20081212122043.GC19659@vanheusden.com>
+Content-Type: text/plain
+Date: Fri, 19 Dec 2008 08:02:02 +0100
+Message-Id: <1229670122.17082.30.camel@violet>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dear all
+Hi Folkert,
 
-How can I know BlueZ A2DP, AVRCP profile version.?
+> Am I right that one cannot do a
+> 	hcitool name 00:11:22:33:44:55
+> while a
+> 	hcitool inq
+> is running on the same bluetooth device?
 
-As far as I search on the web site, A2DP,AVRCP version is 1.0 respectively
-
-But I expect BlueZ version is higher than we search.
-
-
-Thanks!
-
+and that is expected. You can do a page, while doing inquiry and vice
+versa.
 
 Regards
 
-Chanyeol, Park
-
-
-
-
+Marcel
 
 
