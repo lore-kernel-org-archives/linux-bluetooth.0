@@ -1,27 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: /var/lib/bluetooth/$BDADDR/names, when does that file get
- updated?
+Subject: Re: conn->state vs conn->sk->sk_state
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Folkert van Heusden <folkert@vanheusden.com>
+To: jaikumar Ganesh <jaikumarg@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20081212180131.GI19659@vanheusden.com>
-References: <20081212180131.GI19659@vanheusden.com>
+In-Reply-To: <ac290f760812181815h719d9c95nb724872a4beb04ca@mail.gmail.com>
+References: <ac290f760812171405r79473a67l6769913bc7e62d2e@mail.gmail.com>
+	 <ac290f760812171407te7a079eycf45c36d376b0c5c@mail.gmail.com>
+	 <ac290f760812181815h719d9c95nb724872a4beb04ca@mail.gmail.com>
 Content-Type: text/plain
-Date: Fri, 19 Dec 2008 19:59:54 +0100
-Message-Id: <1229713194.879.10.camel@californication>
+Date: Fri, 19 Dec 2008 19:58:00 +0100
+Message-Id: <1229713080.879.8.camel@californication>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Folkert,
+Hi Jaikumar,
 
-> When does /var/lib/bluetooth/$BDADDR/names get updated?
-> Because hcitool inq does not tell the names while hcitool scan does not
-> tell class of the devices.
+> Looking at this a bit further, I see a discrepancy between the code in
+> function  hci_conn_complete_evt and hci_sync_conn_complete_evt.
+> Is this intentional or a bug ? Like I said below, using
+> hci_conn_complete_evt (when the AG doesn't support eSCO) results in
+> the connect() never returning because the socket state is not updated.
 
-every time a HCI remote name complete event is received. Or in case of
-Bluetooth 2.1 when an Extended Inquiry Result with name information is
-recieved.
+I still have no idea what's your problem. It doesn't matter if the
+remote side supports eSCO or not. The sync setup commands can be used
+even for setting up SCO channels.
 
 Regards
 
