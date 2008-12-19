@@ -1,49 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <ac290f760812191028p8aa03d6l4374410d742aa9dc@mail.gmail.com>
-Date: Fri, 19 Dec 2008 10:28:24 -0800
-From: "jaikumar Ganesh" <jaikumarg@gmail.com>
-To: "Marcel Holtmann" <marcel@holtmann.org>
-Subject: Re: conn->state vs conn->sk->sk_state
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1229713080.879.8.camel@californication>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <ac290f760812171405r79473a67l6769913bc7e62d2e@mail.gmail.com>
-	 <ac290f760812171407te7a079eycf45c36d376b0c5c@mail.gmail.com>
-	 <ac290f760812181815h719d9c95nb724872a4beb04ca@mail.gmail.com>
-	 <1229713080.879.8.camel@californication>
+Message-Id: <460D2014-0925-42BE-A769-697E9795D4A4@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1229712795.879.6.camel@californication>
+Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
+Mime-Version: 1.0 (Apple Message framework v930.3)
+Subject: Re: How can I know BlueZ A2DP, AVRCP profile version.?
+Date: Fri, 19 Dec 2008 20:12:43 +0200
+References: <003501c961aa$588a4100$099ec300$%park@samsung.com> <1229712795.879.6.camel@californication>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi,
 
-On Fri, Dec 19, 2008 at 10:58 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Jaikumar,
+On Dec 19, 2008, at 20:53, Marcel Holtmann wrote:
+>> How can I know BlueZ A2DP, AVRCP profile version.?
+>>
+>> As far as I search on the web site, A2DP,AVRCP version is 1.0  
+>> respectively
+>>
+>> But I expect BlueZ version is higher than we search.
 >
->> Looking at this a bit further, I see a discrepancy between the code in
->> function  hci_conn_complete_evt and hci_sync_conn_complete_evt.
->> Is this intentional or a bug ? Like I said below, using
->> hci_conn_complete_evt (when the AG doesn't support eSCO) results in
->> the connect() never returning because the socket state is not updated.
->
-> I still have no idea what's your problem. It doesn't matter if the
-> remote side supports eSCO or not. The sync setup commands can be used
-> even for setting up SCO channels.
->
+> I think that Johan and Luiz can give you more detailed answers here.
+> However normally BlueZ follows the latest specs., but in the case of
+> AVRCP I am sure we only implement some of the optional features.
 
-  So here is the problem:
-     The  AG doesn't support eSCO i.e disable_esco is Y and
-lmp_esco_capable(dev) evaluates to 0, so we try to establish a SCO
-channel irrespective of whether the remote support eSCO or not.
+For A2DP we support 1.2, or at least that's the spec version I've been  
+using when doing the implementation. For AVRCP we've used the latest  
+spec. version but since we don't have metadata transfer support yet we  
+can only claim 1.0 conformance (the code might actually register a SDP  
+record with a higher version so you'll need to modify that if you  
+intend to do qualification).
 
-  So sco_connect is called, and after the hci_connect, hcon->state is
-BT_CONNECT and the sk->sk_state = BT_CONNECT.
-  When we get a response from the remote device
-hci_connect_complete_evt is called which sets the conn->state to
-BT_CONNECTED. However, as
-  hci_proto_connect_cfm is not called (this was being called in
-2.6.25) ,  sk->sk_state remained in BT_CONNECT state. Hence, we get
-stuck in bt_sock_wait_state
-  and the connect() times out.
-
-Thanks
-Jaikumar
+Johan
