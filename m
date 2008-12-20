@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <494CE2CD.9010303@morrigan.ch>
-References: <494CE2CD.9010303@morrigan.ch>
-Date: Wed, 24 Dec 2008 00:13:56 +0100
-Message-Id: <1230074036.4954.15.camel@californication>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] BlueZ4.x, headset and oss problem
+Message-ID: <494CE2CD.9010303@morrigan.ch>
+Date: Sat, 20 Dec 2008 13:19:25 +0100
+From: manuel gysin <gwydion.dot@morrigan.ch>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] BlueZ4.x, headset and oss problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,25 +17,21 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Manuel,
+Hello,
 
-> I've manged to get my headset running with BlueZ4. Sound and Voice is 
-> working very well with Skype.
-> 
-> Now I tried to use my headset with teamspeak. I tried to run it with 
-> aoss teamspeak, but the problem is now I have no /dev/dspx device for 
-> the headset.
+I've manged to get my headset running with BlueZ4. Sound and Voice is 
+working very well with Skype.
 
-I don't even have any idea what /dev/dspx is used for. Remember that all
-Bluetooth audio is virtual and lives in userspace. So if you require a
-kernel device node, then the kernel (meaning ALSA) has to do some magic
-here.
+Now I tried to use my headset with teamspeak. I tried to run it with 
+aoss teamspeak, but the problem is now I have no /dev/dspx device for 
+the headset.
 
-Regards
-
-Marcel
+Is there a way to solve this?
 
 
+Greets and thanks
+
+Manuel
 
 ------------------------------------------------------------------------------
 _______________________________________________
