@@ -1,64 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Christian Hoene" <hoene@uni-tuebingen.de>
-To: <linux-bluetooth@vger.kernel.org>
-Subject: Fix for not decoding a too small SBC frame
-Date: Mon, 22 Dec 2008 17:16:21 +0100
-Message-ID: <011b01c96450$a0b927e0$e22b77a0$@de>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_NextPart_000_011C_01C96459.027D8FE0"
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <ac290f760812191028p8aa03d6l4374410d742aa9dc@mail.gmail.com>
+References: <ac290f760812171405r79473a67l6769913bc7e62d2e@mail.gmail.com>
+	 <ac290f760812171407te7a079eycf45c36d376b0c5c@mail.gmail.com>
+	 <ac290f760812181815h719d9c95nb724872a4beb04ca@mail.gmail.com>
+	 <1229713080.879.8.camel@californication>
+	 <ac290f760812191028p8aa03d6l4374410d742aa9dc@mail.gmail.com>
+Date: Mon, 22 Dec 2008 08:16:02 -0800
+Message-ID: <35c90d960812220816g6670580dlb01e49bf9ca56f3e@mail.gmail.com>
+Subject: Re: conn->state vs conn->sk->sk_state
+From: Nick Pelly <npelly@google.com>
+To: jaikumar Ganesh <jaikumarg@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dies ist eine mehrteilige Nachricht im MIME-Format.
+On Fri, Dec 19, 2008 at 10:28 AM, jaikumar Ganesh <jaikumarg@gmail.com> wrote:
+> Hi Marcel,
+>
+> On Fri, Dec 19, 2008 at 10:58 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+>> Hi Jaikumar,
+>>
+>>> Looking at this a bit further, I see a discrepancy between the code in
+>>> function  hci_conn_complete_evt and hci_sync_conn_complete_evt.
+>>> Is this intentional or a bug ? Like I said below, using
+>>> hci_conn_complete_evt (when the AG doesn't support eSCO) results in
+>>> the connect() never returning because the socket state is not updated.
+>>
+>> I still have no idea what's your problem. It doesn't matter if the
+>> remote side supports eSCO or not. The sync setup commands can be used
+>> even for setting up SCO channels.
+>>
+>
+>  So here is the problem:
+>     The  AG doesn't support eSCO i.e disable_esco is Y and
+> lmp_esco_capable(dev) evaluates to 0, so we try to establish a SCO
+> channel irrespective of whether the remote support eSCO or not.
+>
+>  So sco_connect is called, and after the hci_connect, hcon->state is
+> BT_CONNECT and the sk->sk_state = BT_CONNECT.
+>  When we get a response from the remote device
+> hci_connect_complete_evt is called which sets the conn->state to
+> BT_CONNECTED. However, as
+>  hci_proto_connect_cfm is not called (this was being called in
+> 2.6.25) ,  sk->sk_state remained in BT_CONNECT state. Hence, we get
+> stuck in bt_sock_wait_state
+>  and the connect() times out.
 
-------=_NextPart_000_011C_01C96459.027D8FE0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
 
-Hello,
+Explained another way:
 
-is it for any good that SBC tries to decode a frame even if it is too =
-small
-or missing?
-Attached you find a patch.
+JK found that in 2.6.27 with "echo Y >
+/sys/module/sco/parameters/disable_esco" the socket state is never
+updated to BT_CONNECTED. The userspace connect() call then times out,
+even though the transport is connected. This appears to be because
+hci_proto_connect_cfm() is not called when the connection complete
+event arrives. Below is a patch that resolves this issue for us.
 
-Greetings
+This is a request for comment as to whether this patch is correct. It
+contradicts Marcel's change 769be974 which explicitly moved
+hci_proto_connect_cfm() into the ev->status conditional.
 
- Christian
-
-
---------------------------------------------------------
-Dr.-Ing. Christian Hoene
-Computer Networks and Internet, University of T=FCbingen
-Sand 13, 72076 T=FCbingen, Germany, Phone +49 7071 2970532
-http://net.informatik.uni-tuebingen.de/~hoene
+Thanks,
+Nick
 
 
 
-------=_NextPart_000_011C_01C96459.027D8FE0
-Content-Type: application/octet-stream;
-	name="do_not_decode_frame_that_is_too_small.patch"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: attachment;
-	filename="do_not_decode_frame_that_is_too_small.patch"
+commit 654488a822615b645c43605ab24f0305b56b40dc
+Author: Jaikumar Ganesh <jaikumar@google.com>
+Date:   Fri Dec 19 14:17:53 2008 -0800
 
-diff --git a/sbc/sbc.c b/sbc/sbc.c=0A=
-index 5411893..263d46a 100644=0A=
---- a/sbc/sbc.c=0A=
-+++ b/sbc/sbc.c=0A=
-@@ -1196,6 +1196,9 @@ int sbc_decode(sbc_t *sbc, void *input, int =
-input_len, void *output,=0A=
- 	if (written)=0A=
- 		*written =3D 0;=0A=
- =0A=
-+	if (framelen<=3D0)=0A=
-+		return framelen;=0A=
-+=0A=
- 	samples =3D sbc_synthesize_audio(&priv->dec_state, &priv->frame);=0A=
- =0A=
- 	ptr =3D output;=0A=
+    [Bluetooth] Fix SCO connection issue
 
-------=_NextPart_000_011C_01C96459.027D8FE0--
+    When the AG supports only SCO connections, on receipt of the
+    HCI_EV_CONN_COMPLETE packet, the connect state is changed to
+    BT_CONNECTED but the socket state is not updated. Hence, the
+    connect() call times out even though the SCO connection has
+    been established.
 
+    Signed-off-by: Jaikumar Ganesh <jaikumar@google.com>
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index ad7a553..3cba788 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -916,8 +916,8 @@ static inline void hci_conn_complete_evt(struct
+hci_dev *hdev, struct sk_buff *s
+                }
+        }
+
++       hci_proto_connect_cfm(conn, ev->status);
+        if (ev->status) {
+-               hci_proto_connect_cfm(conn, ev->status);
+                hci_conn_del(conn);
+        }
