@@ -1,81 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: conn->state vs conn->sk->sk_state
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Nick Pelly <npelly@google.com>
-Cc: jaikumar Ganesh <jaikumarg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-In-Reply-To: <35c90d960812220816g6670580dlb01e49bf9ca56f3e@mail.gmail.com>
-References: <ac290f760812171405r79473a67l6769913bc7e62d2e@mail.gmail.com>
-	 <ac290f760812171407te7a079eycf45c36d376b0c5c@mail.gmail.com>
-	 <ac290f760812181815h719d9c95nb724872a4beb04ca@mail.gmail.com>
-	 <1229713080.879.8.camel@californication>
-	 <ac290f760812191028p8aa03d6l4374410d742aa9dc@mail.gmail.com>
-	 <35c90d960812220816g6670580dlb01e49bf9ca56f3e@mail.gmail.com>
-Content-Type: text/plain
-Date: Mon, 22 Dec 2008 20:18:14 +0100
-Message-Id: <1229973494.8047.13.camel@californication>
-Mime-Version: 1.0
+Message-ID: <2d5a2c100812220950i369f2c7aq5d7580f2a233eb0a@mail.gmail.com>
+Date: Mon, 22 Dec 2008 14:50:51 -0300
+From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+To: "Marcel Holtmann" <marcel@holtmann.org>
+Subject: Re: [PATCH] sbc: fix for overflow bug in quantization code
+Cc: "Siarhei Siamashka" <siarhei.siamashka@nokia.com>,
+	"ext Brad Midgley" <bmidgley@gmail.com>, jaska.uimonen@nokia.com,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1229948944.8047.3.camel@californication>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <200812172243.27442.siarhei.siamashka@nokia.com>
+	 <2d5a2c100812191423g301a6aebr103d3602e8ec984c@mail.gmail.com>
+	 <d89ddf300812191451q5a94a6b7n91423f1ce5a91a9f@mail.gmail.com>
+	 <200812221337.53781.siarhei.siamashka@nokia.com>
+	 <1229948944.8047.3.camel@californication>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nick,
+Hi,
 
-> >>> Looking at this a bit further, I see a discrepancy between the code in
-> >>> function  hci_conn_complete_evt and hci_sync_conn_complete_evt.
-> >>> Is this intentional or a bug ? Like I said below, using
-> >>> hci_conn_complete_evt (when the AG doesn't support eSCO) results in
-> >>> the connect() never returning because the socket state is not updated.
-> >>
-> >> I still have no idea what's your problem. It doesn't matter if the
-> >> remote side supports eSCO or not. The sync setup commands can be used
-> >> even for setting up SCO channels.
-> >>
-> >
-> >  So here is the problem:
-> >     The  AG doesn't support eSCO i.e disable_esco is Y and
-> > lmp_esco_capable(dev) evaluates to 0, so we try to establish a SCO
-> > channel irrespective of whether the remote support eSCO or not.
-> >
-> >  So sco_connect is called, and after the hci_connect, hcon->state is
-> > BT_CONNECT and the sk->sk_state = BT_CONNECT.
-> >  When we get a response from the remote device
-> > hci_connect_complete_evt is called which sets the conn->state to
-> > BT_CONNECTED. However, as
-> >  hci_proto_connect_cfm is not called (this was being called in
-> > 2.6.25) ,  sk->sk_state remained in BT_CONNECT state. Hence, we get
-> > stuck in bt_sock_wait_state
-> >  and the connect() times out.
-> 
-> 
-> Explained another way:
-> 
-> JK found that in 2.6.27 with "echo Y >
-> /sys/module/sco/parameters/disable_esco" the socket state is never
-> updated to BT_CONNECTED. The userspace connect() call then times out,
-> even though the transport is connected. This appears to be because
-> hci_proto_connect_cfm() is not called when the connection complete
-> event arrives. Below is a patch that resolves this issue for us.
-> 
-> This is a request for comment as to whether this patch is correct. It
-> contradicts Marcel's change 769be974 which explicitly moved
-> hci_proto_connect_cfm() into the ev->status conditional.
+If I remember it correctly we announce our bitpool range 2-64 bits, so
+if we could maintain a good quality in this scenarios there is no
+reason to not adopt 16 bit.
 
-now I get what you are talking about. You guys should have sent the
-patch from the beginning since that makes it clear what you are trying
-to achieve.
-
-So the patch is wrong, because it breaks Simple Pairing. What you have
-to do is check if it is an ACL link, then the code is doing the right
-thing and doing features requests first.
-
-        if (ev->status) {
-                hci_proto_connect_cfm(conn, ev->status);
-                hci_conn_del(conn);
-        } else if (ev->link_type != ACL_LINK)
-                hci_proto_connect_cfm(conn, ev->status);
-
-Regards
-
-Marcel
-
-
+-- 
+Luiz Augusto von Dentz
+Engenheiro de Computação
