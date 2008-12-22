@@ -1,29 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <2d5a2c100812220950i369f2c7aq5d7580f2a233eb0a@mail.gmail.com>
-Date: Mon, 22 Dec 2008 14:50:51 -0300
-From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-To: "Marcel Holtmann" <marcel@holtmann.org>
-Subject: Re: [PATCH] sbc: fix for overflow bug in quantization code
-Cc: "Siarhei Siamashka" <siarhei.siamashka@nokia.com>,
-	"ext Brad Midgley" <bmidgley@gmail.com>, jaska.uimonen@nokia.com,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1229948944.8047.3.camel@californication>
+From: "Christian Hoene" <hoene@uni-tuebingen.de>
+To: <linux-bluetooth@vger.kernel.org>
+Subject: Fix for not decoding a too small SBC frame
+Date: Mon, 22 Dec 2008 17:16:21 +0100
+Message-ID: <011b01c96450$a0b927e0$e22b77a0$@de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <200812172243.27442.siarhei.siamashka@nokia.com>
-	 <2d5a2c100812191423g301a6aebr103d3602e8ec984c@mail.gmail.com>
-	 <d89ddf300812191451q5a94a6b7n91423f1ce5a91a9f@mail.gmail.com>
-	 <200812221337.53781.siarhei.siamashka@nokia.com>
-	 <1229948944.8047.3.camel@californication>
+Content-Type: multipart/mixed;
+	boundary="----=_NextPart_000_011C_01C96459.027D8FE0"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Dies ist eine mehrteilige Nachricht im MIME-Format.
 
-If I remember it correctly we announce our bitpool range 2-64 bits, so
-if we could maintain a good quality in this scenarios there is no
-reason to not adopt 16 bit.
+------=_NextPart_000_011C_01C96459.027D8FE0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Luiz Augusto von Dentz
-Engenheiro de Computação
+Hello,
+
+is it for any good that SBC tries to decode a frame even if it is too =
+small
+or missing?
+Attached you find a patch.
+
+Greetings
+
+ Christian
+
+
+--------------------------------------------------------
+Dr.-Ing. Christian Hoene
+Computer Networks and Internet, University of T=FCbingen
+Sand 13, 72076 T=FCbingen, Germany, Phone +49 7071 2970532
+http://net.informatik.uni-tuebingen.de/~hoene
+
+
+
+------=_NextPart_000_011C_01C96459.027D8FE0
+Content-Type: application/octet-stream;
+	name="do_not_decode_frame_that_is_too_small.patch"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: attachment;
+	filename="do_not_decode_frame_that_is_too_small.patch"
+
+diff --git a/sbc/sbc.c b/sbc/sbc.c=0A=
+index 5411893..263d46a 100644=0A=
+--- a/sbc/sbc.c=0A=
++++ b/sbc/sbc.c=0A=
+@@ -1196,6 +1196,9 @@ int sbc_decode(sbc_t *sbc, void *input, int =
+input_len, void *output,=0A=
+ 	if (written)=0A=
+ 		*written =3D 0;=0A=
+ =0A=
++	if (framelen<=3D0)=0A=
++		return framelen;=0A=
++=0A=
+ 	samples =3D sbc_synthesize_audio(&priv->dec_state, &priv->frame);=0A=
+ =0A=
+ 	ptr =3D output;=0A=
+
+------=_NextPart_000_011C_01C96459.027D8FE0--
+
