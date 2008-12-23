@@ -1,86 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [RFC/PATCH] sbc: new filtering function for 8 band fixed point
- encoding
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Siarhei Siamashka <siarhei.siamashka@nokia.com>
-Cc: ext Brad Midgley <bmidgley@gmail.com>,
-	Jaska Uimonen <jaska.uimonen@nokia.com>,
-	linux-bluetooth@vger.kernel.org
-In-Reply-To: <200812231245.14493.siarhei.siamashka@nokia.com>
-References: <1227879337.20555.12.camel@esdhcp03999.research.nokia.com>
-	 <200812230130.43968.siarhei.siamashka@nokia.com>
-	 <1229994015.8047.27.camel@californication>
-	 <200812231245.14493.siarhei.siamashka@nokia.com>
-Content-Type: text/plain
-Date: Tue, 23 Dec 2008 12:48:08 +0100
-Message-Id: <1230032888.8047.34.camel@californication>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
+To: "Uimonen Jaska (Nokia-D/Helsinki)" <Jaska.Uimonen@nokia.com>
+Subject: Re: [RFC/PATCH] sbc: new filtering function for 8 band fixed point encoding
+Date: Tue, 23 Dec 2008 13:14:14 +0200
+Cc: "ext Marcel Holtmann" <marcel@holtmann.org>,
+        "ext Brad Midgley" <bmidgley@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+References: <1227879337.20555.12.camel@esdhcp03999.research.nokia.com> <1229994015.8047.27.camel@californication> <701586182114824C876BD526F939600A0118BEEB@vaebe103.NOE.Nokia.com>
+In-Reply-To: <701586182114824C876BD526F939600A0118BEEB@vaebe103.NOE.Nokia.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200812231314.14270.siarhei.siamashka@nokia.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Siarhei,
+On Tuesday 23 December 2008 10:20:25 Uimonen Jaska (Nokia-D/Helsinki) wrote:
+> Hi Guys,
+>
+> As Siarhei said, we had a talk last week about
+> The optimizations to the code.
+>
+> I added the modifications to the code, which reduce
+> The amount of operations quite a lot.
 
-> > > > We had a talk with Jaska Uimonen here, and now I'm kind of delegated to
-> > > > finish the work on this filtering function for SBC encoder (including
-> > > > the final addition of ARM assembly optimizations).  He provided me with
-> > > > his last variant of code, which contains some more optimizations to
-> > > > reduce the number of operations and also loops unrolling. I will add
-> > > > his changes to the patch on next iteration.
-> > > >
-> > > > Now the question is how to best integrate a fixed filtering function to
-> > > > git repository? If I just continue adding changes to the patch in order
-> > > > to make it a faster, it will be also not so obvious to see how we got
-> > > > to these code transformations just from the commit log.
-> > >
-> > > Next iteration done.  Added support for 4 subbands, number of arithmetic
-> > > operations reduced (but without loop unrolling for better code
-> > > readability), precision improved for both 16-bit and 32-bit fixed point,
-> > > 'neginv' macro is now more portable and faster. The rest is in the code
-> > > comments.
-> >
-> > I don't mind having patches as attachment, but this makes it hard to
-> > review and comment on them.
-> 
-> I thought that as long as the attachments are plain text and 'suggest
-> automatic display' property is set, there should not be much problems
-> reviewing them.
-> 
-> I'm sorry for my incompetence in this part, but what do you recommend for
-> posting patches? A link to some guide is sufficient.
-> 
-> Well, it is good to always learn some new things.
+Yes, thank you very much for doing this part of work, I included these
+modifications into the last revision of my patch. And of course, your
+initial patch to fix the SBC quality issues was invaluable. I hope that you
+will not be forgotten to be credited properly when the filtering functions
+are complete and committed.
 
-the kernel contains good documentation about how to send inline patches.
-However as I said, I don't mind that much since I can easily apply them,
-but for commenting on patches inline is easier.
+> The problem 
+> With this modification is that it also reduces the 
+> Readability of the code.
 
-> > Especially when it comes to stuff like 
-> > coding style (since I have no ideas about the rest).
-> >
-> > +       t1[0] = t1[1] = t1[2] = t1[3] =
-> > +               (FIXED_A)1 << (SBC_PROTO_FIXED4_SCALE-1);
-> >
-> > Should be like this: (FIXED_A) 1 << (SBC_PROTO_FIXED4_SCALE - 1);
-> 
-> Do you have a reference to the coding style standard guide? This
-> particular
-> requirement for casts and a space seems quite unusual and I have never
-> seen
-> it before.
+Yes, that's one of the reasons why I'm trying to post different revisions
+here, so all the history of modifications can be tracked if somebody is
+interested.
 
-It is the kernel coding style. Check Greg KH's paper from OLS some years
-ago.
+> So because of the redundancy in the cosine transform
+> it is possible to reduce the number of variables
+> and operations in the preceding filtering.
+> This is very hard to explain with comments in the code
+> (so you would write something like "here should be t[12], but
+> The table goes only to 8 because of redundancy in the following
+> Cosine transform). To really make the stuff
+> Understandable one should write some small
+> Wikipage or extensive comments to the code.
+>
+> So this is the path the previous code also took, but
+> At some point there was a mistake. I really don't still
+> Get how the anamatrix stuff was calculated, but as
+> You see it takes time to reverse engineer :)
+>
+> But I suggest me and Siarhei clean the code internally
+> And try really hard to follow the conventions. It starts
+> To get little bit messy, because we both have many
+> Versions of the code.
 
-> OK, I'll try to fix these. Getting rid of some spaces was done to try fitting 
-> some lines into 80 characters (that's also not always achieved yet).
+I think that my last revision of patch is more or less complete and needs
+only minor tweaks and cosmetic changes. It's not too obfuscated yet, and
+the logic still can be seen (hopefully).
 
-This depends on the code. In normal code you could use continue and
-break a lot, but within SBC this might not generate good binaries.
+I intentionally decided not to include loops unrolling part as it actually
+makes code harder to optimize further (for example add SIMD optimizations).
+The idea is to have some kind of "reference" implementation, which is
+reasonably compact and simple and also configurable for having high
+precision mode (very useful for testing purposes).
 
-Don't try to omit whitespaces. Just don't.
+Implementations, optimized for various platforms can be derived from it:
+1. Platforms where multiplications are expensive and you want to avoid as many
+of them as possible (reintroduce 'anamatrix' table, have shifts and additions
+instead of multiplications, etc)
+2. Platforms where the total number of operations is desired to be kept at
+minimum (tables need to have unused and duplicate elements removed in
+order to reduce the number of operations for loading constants)
+3. Platforms where SIMD optimizations are possible (the code and tables should
+have a regular structure, suitable for vectorizing, some table elements may
+have to be be reordered)
 
-Regards
+As one can see, these platform specific optimizations have somewhat
+contradictory requirements. I tried to arrange the code in such a way, that
+any of such further optimizations can be easily introduced based on it.
 
-Marcel
-
-
+-- 
+Best regards,
+Siarhei Siamashka
