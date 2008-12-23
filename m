@@ -1,27 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <3D8E1963-54E4-4974-98B3-6E9095046D30@gmail.com>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <ac8af0be0812221733j262e8077re27476f18772079e@mail.gmail.com>
-Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
-Mime-Version: 1.0 (Apple Message framework v930.3)
-Subject: Re: [patch] fix the bug of obex_object_resume(), obex_server() in openobex
-Date: Wed, 24 Dec 2008 03:23:26 +0200
-References: <ac8af0be0812221733j262e8077re27476f18772079e@mail.gmail.com>
+Subject: Re: python examples for keyboard connection
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Brad Midgley <bmidgley@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <d89ddf300812212120n31776bc9m9fc26790287f4d99@mail.gmail.com>
+References: <d89ddf300812212120n31776bc9m9fc26790287f4d99@mail.gmail.com>
+Content-Type: text/plain
+Date: Wed, 24 Dec 2008 00:11:51 +0100
+Message-Id: <1230073911.4954.13.camel@californication>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Forrest,
+Hi Brad,
 
-On Dec 23, 2008, at 3:33, Zhao Forrest wrote:
-> When developing the PBAP server in obexd we found that
-> obex_object_resume() can't work as expected. After debugging openobex
-> we post this patch to fix the bug. We did the internal test with PBAP
-> server/client. The below patch fixes the bug in obex_object_resume()
-> and obex_server().
+> I'm working on gumstix overo/oe so the regular gnome stuff is not
+> available. This system is running bluez 3.36. I can work on updating
+> to 4.x if it helps.
 
-The patch seems fine and has been pushed upstream, thanks! Btw, in the  
-future please use the openobex-users mailing list for openobex  
-specific patches.
+you should do that since the 3.x series is kinda outdated.
 
-Johan
+Regards
+
+Marcel
+
+
