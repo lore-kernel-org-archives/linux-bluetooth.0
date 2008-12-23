@@ -1,46 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: understading bluetooth init
+Subject: RE: Does anyone know how to change the a2dp audio output stream
+ between Speaker and bluetooth stereo headset?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Claudio Fiorini <claudio@cfiorini.it>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1230059514.11446.19.camel@netbimbo>
-References: <1229977280.13720.5.camel@netbimbo>
-	 <1229993505.8047.19.camel@californication>
-	 <1230059514.11446.19.camel@netbimbo>
+To: Chan-Yeol Park <chanyeol.park@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	=?UTF-8?Q?=27=EB=B0=95=EC=88=98=EC=A7=84/S/W?= Platform
+	 =?UTF-8?Q?Lab=2E=28=ED=86=B5=EC=8B=A0=EC=97=B0=29/E5=28=EC=B1=85?=
+	 =?UTF-8?Q?=EC=9E=84=29/=EC=82=BC=EC=84=B1=EC=A0=84=EC=9E=90=27?=
+	<cooliceman@samsung.com>
+In-Reply-To: <003a01c964f6$a8df7900$fa9e6b00$%park@samsung.com>
+References: <003301c964ee$78dd8fb0$6a98af10$%park@samsung.com>
+	 <1230032972.8047.35.camel@californication>
+	 <003a01c964f6$a8df7900$fa9e6b00$%park@samsung.com>
 Content-Type: text/plain
-Date: Wed, 24 Dec 2008 00:10:40 +0100
-Message-Id: <1230073840.4954.12.camel@californication>
+Date: Wed, 24 Dec 2008 00:06:24 +0100
+Message-Id: <1230073584.4954.9.camel@californication>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi,
 
-first things first, don't top-post on the mailing list. It is a proper
-open source mailing list that uses bottom posting and inline quoting.
+> Somebody said that Pulse audio needs a lot of resource.
+> ( I don't know well pulse audio.. but in case of me I should check the performance )
 
-> I'm using an arduino board and a ps3 gamepad to move 3 servos for a
-> small robotic arm. I would like to put a BT dongle to the arduino, the
-> one that is used from a normal computer, without buy a bluetooth module
-> that cost too much for now because my arm is just a prototype for
-> something that i'll build in the few months.
-> Anyway to make it short, i don't need to make huge data transfer, but
-> just some bytes, so i can skip many USB and BT features to do that?
-> 
-> I know something about bluez because is searched inside source code to
-> create Rbluez, ruby c extension, but i tried to find out what exactly
-> happen, in kernel space and user space, when i plug a usb dongle but,
-> for me, is too much now.
-> 
-> Maybe to start this search you can tell me which file is have to
-> investigate!
+I don't know how much resources PulseAudio actually consumes and you
+better ask the Pulse guys directly.
 
-as I said before, there is no easy answer to such a question. You can
-grab one of my old presentation that I did around 2003, but even that
-might not help that much. It is a really complex system. Sorry, there is
-nothing I can really do in a quick answer. If you wanna look into the
-kernel code, look at net/bluetooth/ and include/net/bluetooth/. The
-actual drivers for the USB dongle is at drivers/bluetooth/btusb.c.
+> Do you think that this matter is solved only by pulse audio or like that..?
+
+The BlueZ implementation for A2DP is not responsible for mixing or
+anything else. It is just an audio transport. It is like _one_ audio
+card with hotplug. Every mixing or stream switching must be done by the
+audio system itself.
 
 Regards
 
