@@ -1,55 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Two updated patches
+Subject: Re: Patch for supporting even more command line parameters in
+	sbcenc UPDATE
 From: Christian Hoene <hoene@uni-tuebingen.de>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary="=-RFvknRiuNTm1xqtFpLdL"
-Date: Tue, 23 Dec 2008 17:07:58 +0100
-Message-Id: <1230048478.20536.10.camel@hoene-desktop>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1230036980.20536.5.camel@hoene-desktop>
+References: <1230027491.20536.2.camel@hoene-desktop>
+	 <1230028921.8047.28.camel@californication>
+	 <1230036980.20536.5.camel@hoene-desktop>
+Content-Type: multipart/mixed; boundary="=-6ijm1bx1/nOxWcu6CUOn"
+Date: Tue, 23 Dec 2008 15:28:30 +0100
+Message-Id: <1230042510.20536.7.camel@hoene-desktop>
 Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
---=-RFvknRiuNTm1xqtFpLdL
+--=-6ijm1bx1/nOxWcu6CUOn
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
-Hello,
 
-again. Hopefully, I got all coding style rules right this time.
-Here my two patches.
+> Fixed. Attached the patch.
 
-Merry Christmas
+Sorry, not perfect yet. Here an UPDATE.
 
- Christian
+> 
+>  Christian
+> 
+> 
+> 
 
---=-RFvknRiuNTm1xqtFpLdL
-Content-Disposition: attachment; filename=patch_again_empty_frames.diff
-Content-Type: text/x-patch; name=patch_again_empty_frames.diff; charset=UTF-8
+--=-6ijm1bx1/nOxWcu6CUOn
+Content-Disposition: attachment; filename=patch_for_empty_frames_and_more_sbcenc_parameters2.diff
+Content-Type: text/x-patch; name=patch_for_empty_frames_and_more_sbcenc_parameters2.diff; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 diff --git a/sbc/sbc.c b/sbc/sbc.c
-index 5411893..a3a3ac1 100644
+index 5411893..263d46a 100644
 --- a/sbc/sbc.c
 +++ b/sbc/sbc.c
 @@ -1196,6 +1196,9 @@ int sbc_decode(sbc_t *sbc, void *input, int input_len, void *output,
  	if (written)
  		*written = 0;
  
-+	if (framelen <= 0)
++	if (framelen<=0)
 +		return framelen;
 +
  	samples = sbc_synthesize_audio(&priv->dec_state, &priv->frame);
  
  	ptr = output;
-
---=-RFvknRiuNTm1xqtFpLdL
-Content-Disposition: attachment; filename=patch_for_more_cmdline_parameters.diff
-Content-Type: text/x-patch; name=patch_for_more_cmdline_parameters.diff; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-
 diff --git a/sbc/sbcenc.c b/sbc/sbcenc.c
-index 74a3434..e553935 100644
+index 74a3434..362c77d 100644
 --- a/sbc/sbcenc.c
 +++ b/sbc/sbcenc.c
 @@ -72,8 +72,8 @@ static ssize_t __write(int fd, const void *buf, size_t count)
@@ -59,7 +60,7 @@ index 74a3434..e553935 100644
 -static void encode(char *filename, int subbands,
 -					int bitpool, int joint, int snr)
 +static void encode(char *filename, int subbands, int bitpool, int joint,
-+			int dualchannel, int snr, int blocks)
++   			int dualchannel, int snr, int blocks)
  {
  	struct au_header *au_hdr;
  	unsigned char input[2048], output[2048];
@@ -79,11 +80,12 @@ index 74a3434..e553935 100644
 +	} else if (joint && !dualchannel)
  		sbc.mode = SBC_MODE_JOINT_STEREO;
 -	else
+-		sbc.mode = SBC_MODE_STEREO;
 +	else if (!joint && dualchannel)
-+		sbc.mode = SBC_MODE_DUAL_CHANNEL;
++    		sbc.mode = SBC_MODE_DUAL_CHANNEL;
 +	else if (!joint && !dualchannel)
- 		sbc.mode = SBC_MODE_STEREO;
-+	else {
++    		sbc.mode = SBC_MODE_STEREO;
++	else  {
 +		fprintf(stderr, "Both joint and dualchannel mode have been"
 +				"specified\n");
 +		goto done;
@@ -160,7 +162,7 @@ index 74a3434..e553935 100644
  			break;
  
 +		case 'B':
-+			blocks = atoi(optarg);
++    		        blocks = atoi(optarg);
 +			if (blocks != 16 && blocks != 12 &&
 +				blocks != 8 && blocks != 4) {
 +				fprintf(stderr, "Invalid blocks %d!\n",
@@ -177,11 +179,10 @@ index 74a3434..e553935 100644
  
  	for (i = 0; i < argc; i++)
 -		encode(argv[i], subbands, bitpool, joint, snr);
-+		encode(argv[i], subbands, bitpool, joint, dualchannel,
-+			snr, blocks);
++	        encode(argv[i], subbands, bitpool, joint, dualchannel,
++		       snr, blocks);
  
  	return 0;
  }
 
---=-RFvknRiuNTm1xqtFpLdL--
-
+--=-6ijm1bx1/nOxWcu6CUOn--
