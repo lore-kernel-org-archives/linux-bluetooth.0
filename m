@@ -1,108 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <ac8af0be0812221733j262e8077re27476f18772079e@mail.gmail.com>
-Date: Tue, 23 Dec 2008 09:33:51 +0800
-From: "Zhao Forrest" <forrest.zhao@gmail.com>
-To: "Johan Hedberg" <johan.hedberg@nokia.com>,
-	"Marcel Holtmann" <marcel@holtmann.org>
-Subject: [patch] fix the bug of obex_object_resume(), obex_server() in openobex
-Cc: linux-bluetooth@vger.kernel.org
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [RFC/PATCH] sbc: new filtering function for 8 band fixed point
+ encoding
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Siarhei Siamashka <siarhei.siamashka@nokia.com>
+Cc: ext Brad Midgley <bmidgley@gmail.com>,
+	Jaska Uimonen <jaska.uimonen@nokia.com>,
+	linux-bluetooth@vger.kernel.org
+In-Reply-To: <200812230130.43968.siarhei.siamashka@nokia.com>
+References: <1227879337.20555.12.camel@esdhcp03999.research.nokia.com>
+	 <200812170037.48141.siarhei.siamashka@nokia.com>
+	 <200812200012.08430.siarhei.siamashka@nokia.com>
+	 <200812230130.43968.siarhei.siamashka@nokia.com>
+Content-Type: text/plain
+Date: Tue, 23 Dec 2008 02:00:15 +0100
+Message-Id: <1229994015.8047.27.camel@californication>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Siarhei,
 
-When developing the PBAP server in obexd we found that
-obex_object_resume() can't work as expected. After debugging openobex
-we post this patch to fix the bug. We did the internal test with PBAP
-server/client. The below patch fixes the bug in obex_object_resume()
-and obex_server().
+> > We had a talk with Jaska Uimonen here, and now I'm kind of delegated to
+> > finish the work on this filtering function for SBC encoder (including the
+> > final addition of ARM assembly optimizations).  He provided me with his
+> > last variant of code, which contains some more optimizations to reduce the
+> > number of operations and also loops unrolling. I will add his changes to
+> > the patch on next iteration.
+> >
+> > Now the question is how to best integrate a fixed filtering function to git
+> > repository? If I just continue adding changes to the patch in order to make
+> > it a faster, it will be also not so obvious to see how we got to these code
+> > transformations just from the commit log.
+> 
+> Next iteration done.  Added support for 4 subbands, number of arithmetic
+> operations reduced (but without loop unrolling for better code readability),
+> precision improved for both 16-bit and 32-bit fixed point, 'neginv' macro is
+> now more portable and faster. The rest is in the code comments.
 
-Thanks,
-Forrest
+I don't mind having patches as attachment, but this makes it hard to
+review and comment on them. Especially when it comes to stuff like
+coding style (since I have no ideas about the rest).
 
-diff --git a/lib/obex_object.c b/lib/obex_object.c
-index 482e6a7..0af0108 100644
---- a/lib/obex_object.c
-+++ b/lib/obex_object.c
-@@ -908,24 +908,38 @@ int obex_object_suspend(obex_object_t *object)
++       t1[0] = t1[1] = t1[2] = t1[3] =
++               (FIXED_A)1 << (SBC_PROTO_FIXED4_SCALE-1);
 
- int obex_object_resume(obex_t *self, obex_object_t *object)
- {
-+	int ret;
-+
- 	if (!object->suspend)
- 		return 0;
+Should be like this: (FIXED_A) 1 << (SBC_PROTO_FIXED4_SCALE - 1);
 
- 	object->suspend = 0;
+Also do you need the (FIXED_A) cast?
 
--	if (object->first_packet_sent && !object->continue_received)
-+ 	if (object->first_packet_sent && !object->continue_received)
- 		return 0;
++       for (hop = 0; hop < 40; hop += 8) {
++               t1[0] +=  (FIXED_A)in[hop] * _sbc_proto_fixed4[hop];
 
--	if (obex_object_send(self, object, TRUE, FALSE) < 0) {
--		obex_deliver_event(self, OBEX_EV_LINKERR, object->opcode, 0, TRUE);
-+	ret = obex_object_send(self, object, TRUE, FALSE);
-+
-+	if (ret < 0) {
-+		obex_deliver_event(self, OBEX_EV_LINKERR, object->opcode &
-~OBEX_FINAL, 0, TRUE);
- 		return -1;
--	}
-+	} else if (ret == 0){
+Same here. There has to be a space after every case.
 
--	obex_deliver_event(self, OBEX_EV_PROGRESS, object->opcode, 0, FALSE);
-+		obex_deliver_event(self, OBEX_EV_PROGRESS, object->opcode &
-~OBEX_FINAL, 0, FALSE);
-+		object->first_packet_sent = 1;
-+		object->continue_received = 0;
-+	} else {
-+		if (self->state & MODE_SRV) {
-+			obex_deliver_event(self, OBEX_EV_REQDONE, object->opcode &
-~OBEX_FINAL, 0, TRUE);
-+			self->state = MODE_SRV | STATE_IDLE;
-+			return 0;
-+		}
-+	}
++               t1[i]  = (FIXED_A)1 << (SBC_COS_TABLE_FIXED4_SCALE-1-SCALE_OUT_BITS);
 
--	self->state = MODE_CLI | STATE_REC;
--	object->first_packet_sent = 1;
--	object->continue_received = 0;
-+	if (self->state & MODE_SRV)
-+		self->state = MODE_SRV | STATE_REC;
-+	else
-+		self->state = MODE_CLI | STATE_REC;
+And between every operation there has to be a space: SCALE - 1 - SCALE.
+In this case I would actually put the - 1 at the end, but that is pure
+cosmetics and not a coding style violation.
 
- 	return 0;
- }
-diff --git a/lib/obex_server.c b/lib/obex_server.c
-index f27c8ee..cf19529 100644
---- a/lib/obex_server.c
-+++ b/lib/obex_server.c
-@@ -159,7 +159,7 @@ int obex_server(obex_t *self, buf_t *msg, int final)
- 			} else
- 				obex_deliver_event(self, OBEX_EV_PROGRESS, cmd, 0, FALSE);
- 			break; /* Stay in this state if not final */
--		} else {
-+		} else if (!self->object->first_packet_sent) {
- 			DEBUG(4, "We got a request!\n");
- 			/* More connect-magic woodoo stuff */
- 			if (cmd == OBEX_CMD_CONNECT)
-@@ -234,10 +234,17 @@ int obex_server(obex_t *self, buf_t *msg, int final)
- 		 * See Obex spec v1.2, chapter 3.2, page 21 and 22.
- 		 * See also example on chapter 7.3, page 47.
- 		 * So, force the final bit here. - Jean II */
-+		self->object->continue_received = 1;
-+
-+		if (self->object->suspend)
-+			break;
-+
- 		ret = obex_object_send(self, self->object, TRUE, TRUE);
- 		if (ret == 0) {
- 			/* Made some progress */
- 			obex_deliver_event(self, OBEX_EV_PROGRESS, cmd, 0, FALSE);
-+			self->object->first_packet_sent = 1;
-+			self->object->continue_received = 0;
- 		} else if (ret < 0) {
- 			/* Error sending response */
- 			obex_deliver_event(self, OBEX_EV_LINKERR, cmd, 0, TRUE);
+Please fix all of these. There at least 8 or so.
+
++#define neginv(x) ((-2 >> 1 == -1) ? \
++                ((((int32_t)(x)) >> 31) ^ (int32_t)(x)) : \
++                ((x >= 0) ? (x) : -(x)-1))
+
+Space after cast. Space before and after operator.
+
++#ifdef SBC_HIGH_PRECISION
++# define FIXED_A int64_t /* data type for fixed point accumulator */
++# define FIXED_T int32_t /* data type for fixed point constants */
++# define SBC_FIXED8_EXTRA_BITS 16
++#else
++# define FIXED_A int32_t /* data type for fixed point accumulator */
++# define FIXED_T int16_t /* data type for fixed point constants */
++# define SBC_FIXED8_EXTRA_BITS 0
++#endif
+
+No space between # and define. I know that this is meant to improve
+readability, but I don't see it.
+
+Regards
+
+Marcel
+
+
