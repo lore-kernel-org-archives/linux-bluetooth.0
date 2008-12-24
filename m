@@ -1,61 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4951808D.8020907@morrigan.ch>
+Date: Wed, 24 Dec 2008 01:21:33 +0100
+From: manuel gysin <gwydion.dot@morrigan.ch>
 MIME-Version: 1.0
-Date: Mon, 1 Dec 2008 09:41:54 +0800
-Message-ID: <BD8ED0C257AAA247BB6C9A92879522C10D9C0DEE@CNSCNEVS01.ap.sony.com>
-From: "WanYan, Uranus" <Uranus.WanYan@sony.com.cn>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] StartDiscovery doesn't exist
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <494CE2CD.9010303@morrigan.ch>
+	<1230074036.4954.15.camel@californication>
+In-Reply-To: <1230074036.4954.15.camel@californication>
+Subject: Re: [Bluez-users] BlueZ4.x, headset and oss problem
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-users>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 Content-Type: text/plain; charset="us-ascii"
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello Every Developer;
+Hi Marcel,
 
-	I am appreciating for your answer my question about "What's the
-API different between inadapter-api.txt and dbus-api.txt in
-bluez-utils-3.36.tar.gz".
-	
-	Now I develop application with Bluez 4.x. But something happens
-abnormally. 
-When I call function StartDiscovery over python-dbus, the system raise a
-error:
+> Hi Manuel,
+> 
+>> I've manged to get my headset running with BlueZ4. Sound and Voice is 
+>> working very well with Skype.
+>>
+>> Now I tried to use my headset with teamspeak. I tried to run it with 
+>> aoss teamspeak, but the problem is now I have no /dev/dspx device for 
+>> the headset.
+> 
+> I don't even have any idea what /dev/dspx is used for. Remember that all
+> Bluetooth audio is virtual and lives in userspace. So if you require a
+> kernel device node, then the kernel (meaning ALSA) has to do some magic
+> here.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
 
-File "/usr/lib/python2.5/site-packages/dbus/connection.py", line 607, in
-call_blocking message, timeout)
-dbus.exceptions.DBusException: org.freedesktop.DBus.Error.UnknownMethod:
-Method "StartDiscovery" with signature "" on interface
-"org.bluez.Adapter" doesn't exist
+/dev/dspx should be an oss device like /dev/dsp0.
+In the old version of BlueZ there was a plugin called snd-bt-sco and 
+created an entry under /proc/asounds/cards.
 
-But the SetProperty, GetProperty are all right(These functions all come
-from bluez4.x/doc/adapter-api.txt ).
+With that the oss emulation created a dsp-device of the alsa device. But 
+the wiki tells that this is no longer needed.
 
-	So I think maybe there are some librarys or other things version
-too old.
-	
-	OS version:	Suse linux 11, 2.6.25.5-1.1-pae
-	Daemon name: 	hcid
-	
-	So what's the problem? (Need I change the daemon hcid to
-bluetoothd? If I need, how to do)
+I use a 2.6.26 kernel with "ALSA for SoC audio support" (I know SoC is 
+not ScO, I think this is not what I'm need).
 
-Thank you very much!
+My problem is now, that I can't use the aoss command cause there is no 
+card entry for the headset and so no /dev/dspx will be created.
 
-Uranus
+I searched around the internet but find nothing about it. So I don't 
+know if it a mistake from my side or bluez does not have such a feature.
 
--------------------------------------------------------------------------
-This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
-Build the coolest Linux based applications with Moblin SDK & win great prizes
-Grand prize is a trip for two to an Open Source event anywhere in the world
-http://moblin-contest.org/redirect.php?banner_id=100&url=/
+The man page of aoss told me that I can "fake" such e device with
+"pcm.dsp0 {      type plug      slave.pcm "headset" }"
+in ~/.asoundrc.
+But this will not work, there is no such routing to the bluetooth device.
+
+Regards
+Manuel
+
+PS: I hope my English is not to bad to understand
+
+------------------------------------------------------------------------------
 _______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
