@@ -1,23 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=US-ASCII
+Message-ID: <49595692.5070902@villagepublishing.com.au>
+Date: Tue, 30 Dec 2008 10:00:34 +1100
+From: David Thornton <david@villagepublishing.com.au>
 MIME-Version: 1.0
-From: "Krishnan R" <r_krish@email.com>
 To: linux-bluetooth@vger.kernel.org
-Date: Mon, 29 Dec 2008 20:19:31 -0500
-Subject: Manufacturer ID
-Message-Id: <20081230011931.D0F1ABE4078@ws1-9.us4.outblaze.com>
+Subject: Re: BCCMDs
+References: <49595134.7060701@villagepublishing.com.au>
+In-Reply-To: <49595134.7060701@villagepublishing.com.au>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-hci_read_local_version gives the manufacturer of the BT chip. The same id is used in get_inquiry_mode to get the inquiry mode. But I am not seeing any details elsewhere regarding this. Mainly, I am concerned whether manufacturer can be used to find the BT chip make?
+Also (and this was my main problem) how do you dissect bccmd responses - 
+lol i know 0x04 then 0xff then im stumped!
 
-Regards,
-Krishnan
+(do bccmds generate COMMAND_STATUS (0x0f) HCI responses ? )
 
--- 
-Be Yourself @ mail.com!
-Choose From 200+ Email Addresses
-Get a Free Account at www.mail.com
+thanks again!
+
+David Thornton wrote:
+> Hi,
+>
+> (sorry, i posted to Marcel - then joined the mailing list so it looked 
+> like i posted to him directly sorry!)
+>
+> Well any way: i was wondering if someone could show me a quick 
+> bluecore comand demo - like a warm reset or something
+> (in a C array, and if you could heavily commented :)
+>
+> Anything you have to teach me about bccmds would be appreciated!
+>
+> Thanks
+> -- 
+> To unsubscribe from this list: send the line "unsubscribe 
+> linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
 
