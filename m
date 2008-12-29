@@ -1,43 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4958A3E5.4030105@powercraft.nl>
-Date: Mon, 29 Dec 2008 11:18:13 +0100
-From: Jelle de Jong <jelledejong@powercraft.nl>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: can somebody show me an example asound configuration for dmixing
- with hifi bluetooth speakers/headset
-References: <494E2ACD.2080900@powercraft.nl>
-In-Reply-To: <494E2ACD.2080900@powercraft.nl>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: Testing SBC filtering functions
+From: Marcel Holtmann <marcel@holtmann.org>
+To: hoene@uni-tuebingen.de
+Cc: 'Siarhei Siamashka' <siarhei.siamashka@nokia.com>,
+	'ext Brad Midgley' <bmidgley@gmail.com>,
+	'Jaska Uimonen' <jaska.uimonen@nokia.com>,
+	linux-bluetooth@vger.kernel.org
+In-Reply-To: <001501c96996$20018070$60048150$@hoene@gmx.net>
+References: <1227879337.20555.12.camel@esdhcp03999.research.nokia.com>
+	 <200812230130.43968.siarhei.siamashka@nokia.com>
+	 <1229994015.8047.27.camel@californication>
+	 <200812231245.14493.siarhei.siamashka@nokia.com>
+	 <1230032888.8047.34.camel@californication>
+	 <001501c96996$20018070$60048150$@hoene@gmx.net>
+Content-Type: text/plain
+Date: Mon, 29 Dec 2008 11:00:37 +0100
+Message-Id: <1230544837.13620.44.camel@californication>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> Hello everybody,
-> 
-> I have been periodically trying to get multiple audio sources to play
-> together (dmixing) to a hifi bluetooth speaker system or hifi bluetooth
-> headset.
-> 
-> I am using only alsa and no pulseaudio, esd, jack, mas of something else
-> just alsa with asoundrc configuration files and no graphical environment.
-> 
-> Can somebody show me an example asoundrc config file to make it possible
-> to use software audio mixing with my bluetooth devices. If this is
-> currently not possible, please tell why and what we can do about it. I
-> am willing to donate some payal money to the person providing me with a
-> working asoundrc configuration file that allows me to play multiple
-> audio sources at the same time.
-> 
-> Thanks in advance,
-> 
-> Jelle
-> 
+Hi Christian,
 
-Bumping up this mail, I would really like to see a solution for my
-problem or receive information why the problem is not possible not solvable?
+> I wrote this script to make some tests on the SBC decoder and encoder using
+> the recommended testing procedure with the reference bitstreams, the
+> reference codec and PEAQ. 
+> http://net.cs.uni-tuebingen.de/html/nexgenvoip/html/
+> I got little bit confused with all the latest patches and whether they are
+> included or not. Just send me an email on which patch you like to have
+> tested. Running the tests just takes half an hour; me to answer my emails
+> maybe a bit longer.
 
-Thanks in advance for any help,
+I leave the patches to the guys that actually know what they are doing.
 
-Best regards,
+So I like the test script, but I would really prefer if we can use
+sbctester.c program to verify the results. What do you think?
 
-Jelle
+Regards
+
+Marcel
+
+
