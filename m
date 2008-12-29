@@ -1,60 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: RE: Testing SBC filtering functions
+Subject: Re: [RFC/PATCH] sbc: new filtering function for 8 band fixed point
+ encoding
 From: Marcel Holtmann <marcel@holtmann.org>
-To: hoene@uni-tuebingen.de
-Cc: 'Siarhei Siamashka' <siarhei.siamashka@nokia.com>,
-	'ext Brad Midgley' <bmidgley@gmail.com>,
-	'Jaska Uimonen' <jaska.uimonen@nokia.com>,
+To: Siarhei Siamashka <siarhei.siamashka@nokia.com>
+Cc: ext Brad Midgley <bmidgley@gmail.com>,
+	Jaska Uimonen <jaska.uimonen@nokia.com>,
 	linux-bluetooth@vger.kernel.org
-In-Reply-To: <002001c969a3$fd7f1680$f87d4380$@hoene@gmx.net>
+In-Reply-To: <200812291246.22288.siarhei.siamashka@nokia.com>
 References: <1227879337.20555.12.camel@esdhcp03999.research.nokia.com>
-	 <200812230130.43968.siarhei.siamashka@nokia.com>
 	 <1229994015.8047.27.camel@californication>
 	 <200812231245.14493.siarhei.siamashka@nokia.com>
-	 <1230032888.8047.34.camel@californication>
-	 <001501c96996$20018070$60048150$@hoene@gmx.net>
-	 <1230544837.13620.44.camel@californication>
-	 <002001c969a3$fd7f1680$f87d4380$@hoene@gmx.net>
+	 <200812291246.22288.siarhei.siamashka@nokia.com>
 Content-Type: text/plain
-Date: Mon, 29 Dec 2008 13:03:01 +0100
-Message-Id: <1230552181.15666.10.camel@californication>
+Date: Mon, 29 Dec 2008 12:56:11 +0100
+Message-Id: <1230551771.15666.3.camel@californication>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Christian,
+Hi Siarhei,
 
-> > I leave the patches to the guys that actually know what they are doing.
-> > 
-> > So I like the test script, but I would really prefer if we can use
-> > sbctester.c program to verify the results. What do you think?
+> > Right now I'm also doublechecking correctness of the code to ensure that
+> > there are no overflows of other problems related to audio quality.
 > 
-> The sbctester.c works fine for the decoder and is used in the testing
-> script. The testing of the encoder might also work with test procedure
-> implemented in sbctester.c. However, the official Bluetooth testing spec
-> requires that
-> "9.2.2.1 SBC Encoder ... [E2] The subjective quality (measured by
-> standardized way or by objective testing
-> methods, see [6]and [7]) shall be equivalent to that of reference encoder."
-> with " [6] Rec. ITU-R BS.1116-1, "METHODS FOR THE SUBJECTIVE ASSESSMENT OF
-> SMALL IMPAIRMENTS IN AUDIO SYSTEMS INCLUDING MULTICHANNEL SOUND SYSTEMS",
-> 1994-1997
-> [7] Rec. ITU-R BS.1387-1, "METHOD FOR OBJECTIVE MEASUREMENTS OF PERCEIVED
-> AUDIO QUALITY", 2001".
-> Until the encoder works fine, we should use BS.1387-1 (PEAQ). If all errors
-> have been fixed, then sbctester.c might can be used instead of ITU-R
-> BS.1387-1. However, then, we might still need the reference implementations
-> or some pretranslated wav and sbc files.
+> Here is (hopefully) the final revision of patch. I tested it with all the possible files
+> that I could find or generate myself and it seems to work fine in all cases.
+> 
+> The code was reverted to use fabs macro. After all, looks like it is the right
+> way to handle scale factors and adheres to the specification. The weird
+> effects on sound quality related to the use of fabs and the modified macro
+> which was tried as a replacement have been apparently the side effects of
+> other bugs.
+> 
+> Also I have to admit that the change from
+> http://marc.info/?l=linux-bluetooth&m=122946440507726&w=2
+> is not needed and the original patch was in fact correct. The output of
+> quantizer is strictly a positive number (unless there are bugs or overflows).
+> This was also changed back.
+> 
+> Rounding for the values in the final analysis function output was removed
+> (we already keep a lot of extra bits in output, so it does not matter for
+> precision). Also the change of SCALE_OUT_BITS to 15 has a nice feature
+> that the shifting of output values is not needed at all for 16-bit version
+> (and naturally rounding is not needed here too), this should be good for
+> performance.
 
-I really prefer if we have an open source solution available to
-everybody for the SBC conformance testing. If sbctester.c is not good
-enough than we have to write one. I also don't mind using the reference
-encoder/decoder and the reference files. Using wine is not optimal, but
-I don't really mind it.
-
-Another question that I have is how you use the sbc_enc_test_01.wav and
-sbc_enc_test_02.wav files with Windows reference encoder? It turns into
-a busy loop for me.
+I applied your patch to the upstream tree. Thanks for your work. I know
+like to get feedback from other people if this helps us with the SBC
+conformance testing and the audio quality.
 
 Regards
 
