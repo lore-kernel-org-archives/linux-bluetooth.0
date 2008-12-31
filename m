@@ -1,14 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <23748.83.160.35.87.1230717749.squirrel@webmail.xs4all.nl>
-Date: Wed, 31 Dec 2008 11:02:29 +0100 (CET)
-Subject: Bluez disconnect Motorola phone when using in combination with
-     Asterisk
+Message-ID: <25531.83.160.35.87.1230718419.squirrel@webmail.xs4all.nl>
+Date: Wed, 31 Dec 2008 11:13:39 +0100 (CET)
+Subject: Bluez disconnect Motorola phone when using in combination with     
+      Asterisk
 From: "menno" <jongerenchaos@zonnet.nl>
 To: linux-bluetooth@vger.kernel.org
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
+
 
 I use chan_mobile for incomming and outbound calls in combination with
 bluez 4.19. This works well but i
