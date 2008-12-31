@@ -1,20 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <60739.209.216.239.242.1230770692.squirrel@webmail.ipns.com>
-Date: Wed, 31 Dec 2008 17:44:52 -0700 (MST)
-Subject: How do I get headset button events without .btscorc?
-From: "Dave Schile" <dave@schile.com>
-To: linux-bluetooth@vger.kernel.org
+Message-ID: <2d5a2c100812311304u562e6363wc16f1bdf28ac9552@mail.gmail.com>
+Date: Wed, 31 Dec 2008 18:04:20 -0300
+From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+To: "Siarhei Siamashka" <siarhei.siamashka@nokia.com>
+Subject: Re: [PATCH] Added possibility to analyze 4 blocks at once in SBC encoder
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <200812311729.30975.siarhei.siamashka@nokia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=ISO-8859-1
+References: <200812311729.30975.siarhei.siamashka@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I have searched all over the place and can't figure out how to do this.  I
-have a bluetooth headset connected to twinkle softphone.  There are
-commands available to send to twinkle, but with the new bluez drivers
-(without btsco) I don't know how to get the button event.  Can anyone help
-me?
+Hi Siarhei,
 
-Thanks,
-David
 
+> Nevertheless, I think it is time to focus on performance :) The attached patch
+> contains code preparations which are needed for SIMD optimizations for
+> the analysis filter. Also theoretically it should be possible to tweak code to
+> have both 32-bit and 16-bit fixed point analysis filter compiled in and switch
+> between them at runtime (at user's request or semi-intelligently depending
+> on audio bitrate).
+
+Picking a implementation at runtime would be really great, that is why
+I suggested using liboil in the other thread.
+
+
+-- 
+Luiz Augusto von Dentz
+Engenheiro de Computação
