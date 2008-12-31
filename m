@@ -1,50 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <25531.83.160.35.87.1230718419.squirrel@webmail.xs4all.nl>
-Date: Wed, 31 Dec 2008 11:13:39 +0100 (CET)
-Subject: Bluez disconnect Motorola phone when using in combination with     
-      Asterisk
-From: "menno" <jongerenchaos@zonnet.nl>
-To: linux-bluetooth@vger.kernel.org
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 31 Dec 2008 10:43:54 +0100
+From: Steffen Pankratz <kratz00@gmx.de>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: hci_usb problem after rmmod/modprobe
+Message-ID: <20081231104354.1bf8f381@hermes>
+In-Reply-To: <1230668540.30789.1.camel@californication>
+References: <20081230211526.5136a798@hermes>
+	<1230668540.30789.1.camel@californication>
+Mime-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/Ge.uEbMcmhk/zrNT+qspKjy";
+ protocol="application/pgp-signature"; micalg=PGP-SHA1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+--Sig_/Ge.uEbMcmhk/zrNT+qspKjy
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-I use chan_mobile for incomming and outbound calls in combination with
-bluez 4.19. This works well but i
-think there is a problem with the audio buffer. Some examples:
+On Tue, 30 Dec 2008 21:22:20 +0100
+Marcel Holtmann <marcel@holtmann.org> wrote:
 
-Inbound call (from cellphone):
-Audio from cellphone to asterisk is delayed (with 1 second and after a
-while this will be bigger and bigger)
-Audio from asterisk to the cellphone is NOT delayed
+> Hi Steffen,
+>=20
+> > everything is fine until I unload and reload hci_usb:
+> >=20
+> > hciconfig hci0 up
+> > Can't init device hci0: Input/output error (5)
+> >=20
+> > from dmesg:
+> > hci_usb_intr_rx_submit: hci0 intr rx submit failed urb f406cf54 err -2
+> >=20
+> > I tried 'modprobe hci_usb reset=3D1' which did not solve the problem.
+> >=20
+> > To get it working again I have to do:
+> >=20
+> > rmmod hci_usb bluetooth uhci_hcd
+> > modprobe uhci_hcd
+> > modprobe hci_usb
+> >=20
+> > Not sure what information could be helpful:
+> >=20
+> > Linux hermes 2.6.28 #2 PREEMPT Tue Dec 30 16:30:47 CET 2008 i686 i686
+> > i386 GNU/Linux
+>=20
+> if you are using 2.6.28 kernel, then just use the btusb driver instead
+> of hci_usb. The hci_usb will be removed with 2.6.29 anyway.
+>=20
+> Regards
+>=20
+> Marcel
+>=20
 
-Outbound call (to the cellphone):
-Audio from cellphone to asterisk is delayed (with 1 second and after a
-while this will be bigger and bigger)
-Audio from asterisk to the cellphone is NOT delayed
+Hi Marcel,
 
-I use:
-- Asterisk SVN-trunk-r166731
-- CSR BC4(bluetooth dongle)
-- 2.6.28-3-server ubuntu kernel
-- bluez 4.19 (tar.gz version)
-- L6 motorola phones
-- Class: 0x200404
-- Chan_mobile (
-http://svn.digium.com/svn/asterisk-addons/trunk/channels/chan_mobile.c )
+thanks for your suggestion.
+I am now using the btusb driver but the problem remains,
+except the kernel message has changed:
 
-I think there is a problem with the buffer. I think he can't loose the
-bufferoverflow and the frame size is bigger and bigger or something.
+btusb_submit_intr_urb: hci0 urb f61e37c0 submission failed (2)
 
-When i use bluez 4.25 the audio is in the begin also delayed (short delay
-<0.5 second). But within 1 minute the delay is away for the next 5
-minutes! After 5 minutes the delay becomes again higher and higher and
-after 20 <> 40 minutes the connection is broken between the bluetooth
-phone and asterisk.
+Regards
+-Steffen
 
-How can we resolve this problem (can anybody look at the chan_mobile file
-and give a patch so that i can test it)??
+--=20
+Hermes powered by LFS SVN-20070420 (Linux 2.6.28)
 
+Best regards, Steffen Pankratz.
 
+--Sig_/Ge.uEbMcmhk/zrNT+qspKjy
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Disposition: attachment; filename=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAklbPtoACgkQqmIF0LCII9tb3gCgs/cOlz1dGxG4qiorQvCXbnns
+X3IAoM3+jvyayY7cRSmmvGFEkqpAOEKT
+=ftaX
+-----END PGP SIGNATURE-----
+
+--Sig_/Ge.uEbMcmhk/zrNT+qspKjy--
