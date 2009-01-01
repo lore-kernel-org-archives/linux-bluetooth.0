@@ -1,53 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Reply-To: <hoene@uni-tuebingen.de>
-From: "Christian Hoene" <christian.hoene@gmx.net>
-To: "'Siarhei Siamashka'" <siarhei.siamashka@nokia.com>
-Cc: "'Marcel Holtmann'" <marcel@holtmann.org>,
-	"'Bont, Frans de'" <frans.de.bont@philips.com>,
-	<linux-bluetooth@vger.kernel.org>
-References: <200812301246.25781.siarhei.siamashka@nokia.com>
-In-Reply-To: <200812301246.25781.siarhei.siamashka@nokia.com>
-Subject: SBC encoder conformance test for version 4.25 passed!
-Date: Thu, 1 Jan 2009 15:24:21 +0100
-Message-ID: <000a01c96c1c$a4c86390$ee592ab0$@hoene@gmx.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+Subject: Re: hci_usb problem after rmmod/modprobe
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Steffen Pankratz <kratz00@gmx.de>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20081231104354.1bf8f381@hermes>
+References: <20081230211526.5136a798@hermes>
+	 <1230668540.30789.1.camel@californication> <20081231104354.1bf8f381@hermes>
+Content-Type: text/plain
+Date: Thu, 01 Jan 2009 09:59:01 +0100
+Message-Id: <1230800341.4530.4.camel@californication>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Siarhei,
+Hi Steffen,
 
-sorry for the delay - these days my family comes first ;-)
-
-Good news! All tests passed! 
-http://net.cs.uni-tuebingen.de/html/nexgenvoip/
-
-Congratulations and a happy new year!
-
- Christian 
-
-
-> -----Original Message-----
-> From: Siarhei Siamashka [mailto:siarhei.siamashka@nokia.com]
-> Sent: Tuesday, December 30, 2008 11:46 AM
-> To: ext Christian Hoene
-> Subject: SBC encoder conformance test for version 4.25
+> > > everything is fine until I unload and reload hci_usb:
+> > > 
+> > > hciconfig hci0 up
+> > > Can't init device hci0: Input/output error (5)
+> > > 
+> > > from dmesg:
+> > > hci_usb_intr_rx_submit: hci0 intr rx submit failed urb f406cf54 err -2
+> > > 
+> > > I tried 'modprobe hci_usb reset=1' which did not solve the problem.
+> > > 
+> > > To get it working again I have to do:
+> > > 
+> > > rmmod hci_usb bluetooth uhci_hcd
+> > > modprobe uhci_hcd
+> > > modprobe hci_usb
+> > > 
+> > > Not sure what information could be helpful:
+> > > 
+> > > Linux hermes 2.6.28 #2 PREEMPT Tue Dec 30 16:30:47 CET 2008 i686 i686
+> > > i386 GNU/Linux
+> > 
+> > if you are using 2.6.28 kernel, then just use the btusb driver instead
+> > of hci_usb. The hci_usb will be removed with 2.6.29 anyway.
 > 
-> Hello Christian,
+> thanks for your suggestion.
+> I am now using the btusb driver but the problem remains,
+> except the kernel message has changed:
 > 
-> Could you please rebuild SBC encoder test results on
-> http://net.cs.uni-tuebingen.de/html/nexgenvoip/html/
-> for the just released version 4.25?
-> 
-> I'm going to submit SIMD optimizations for the analysis filter which are
-> almost done now (using ARM NEON, but Intel MMX/SSE2 requires only a
-> minor modification). In any case I would prefer to make sure that the
-> current C code is in a good shape first.
-> 
-> Thanks a lot for your participation. I hope that with our combined
-efforts,
-> we can make SBC really much better and faster.
-> 
-> --
-> Best regards,
-> Siarhei Siamashka
+> btusb_submit_intr_urb: hci0 urb f61e37c0 submission failed (2)
+
+run "hcidump -X -V" and see what is going on and what exactly fails.
+
+Regards
+
+Marcel
+
+
