@@ -1,73 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <62091.209.216.239.242.1230871687.squirrel@webmail.ipns.com>
-In-Reply-To: <60678.209.216.239.242.1230838200.squirrel@webmail.ipns.com>
-References: <60678.209.216.239.242.1230838200.squirrel@webmail.ipns.com>
-Date: Thu, 1 Jan 2009 21:48:07 -0700 (MST)
-Subject: Re: How do I get headset button events without .btscorc?
-From: "Dave Schile" <dave@schile.com>
-To: "Dave Schile" <dave@schile.com>
-Cc: linux-bluetooth@vger.kernel.org
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Message-Id: <4B40718A-55AA-40D1-AD54-469C0917070F@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <60689.209.216.239.242.1230838689.squirrel@webmail.ipns.com>
+Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
+Mime-Version: 1.0 (Apple Message framework v930.3)
+Subject: Re: incoming connection conflicting with alsa?
+Date: Thu, 1 Jan 2009 23:25:36 +0200
+References: <60689.209.216.239.242.1230838689.squirrel@webmail.ipns.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> I screwed up the posting of this and made it part of a totally unrelated
-> thread.  So, Im posting it agin so that people might see it in proper
-> order.  Sorry.  I'm new at mailing lists.
->
-> I figured this one out all  on my own!  Here is a script in python that
-> uses dbus to get the bluetooth headset button press.  I think it might be
-> helpful to add this to the wiki.
->
-> <pre>
->
-> def handler(sender=None):
->         os.system ('/usr/bin/twinkle --cmd answerbye') # <- that's the
-> part
-> specific to twinkle
-> import dbus, os,  gobject
-> from dbus.mainloop.glib import DBusGMainLoop
-> DBusGMainLoop(set_as_default=True)
-> bus = dbus.SystemBus()
-> bus.add_signal_receiver(handler, signal_name="AnswerRequested")
-> loop = gobject.MainLoop()
-> loop.run()
->
-> </pre>
->
-> Dave
->
-> Original message:
->
-> I have searched all over the place and can't figure out how to do this.  I
-> have a bluetooth headset connected to twinkle softphone.  There are
-> commands available to send to twinkle, but with the new bluez drivers
-> (without btsco) I don't know how to get the button event.  Can anyone help
-> me?
->
-> Thanks,
-> David
->
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+Hi Dave,
 
+On Jan 1, 2009, at 21:38, Dave Schile wrote:
+> I think I'm having  a conflict between alsa and my headset device  
+> making
+> its own connection.  If there is no connection, programs that are  
+> set to
+> use the alsa bluetooth  device connect fine.  If I have press the  
+> button
+> on the headset before alsa can connect to it, te device makes its  
+> own ACL
+> connection and alsa becomes unable to get the device.
+>
+> If alsa makes the connection first then  press the button on the  
+> headset
+> the incoming connection takes the place of the alsa connection and  
+> alsa
+> loses the device.
+>
+> How can I solve this?  I've tried a number of hciconfig settings,  
+> but the
+> button press always creates a connection, breaking the alsa one.
 
+It shouldn't matter if the headset is already connected or if  
+bluetoothd needs to create the connection on-demand (when needed by an  
+alsa application). In both cases the alsa application should be able  
+to pick up the bluetooth audio stream just fine. Could you post the  
+output of hcidump -XV when the headset creates a connection to you and  
+also when you try to use it with alsa after this (which fails)? Any  
+debug output from bluetoothd when this happens could also help.
 
-hello,
+One potential cause that comes to my mind is that this headset might  
+have a buggy HSP implementation (I assume you've got HFP disabled  
+based on your other email about the AnswerRequested signal which is  
+only available for HSP connections). Maybe the headset tries to  
+connect HFP, fails (since you don't have it enabled) but stops there  
+even though the correct behavior would be to continue trying to  
+connect HSP instead. Which headset model is this btw?
 
-After further work on this, I find that it's not working exactly right. 
-The python code above gets the signal correctly, but that doesn't help
-when you are trying to answer a call.  Terminating a call works fine,
-because you are connected, but when a call is ringing in, there is no
-connection so the signal event never is called.  Anyone know of a way to
-make this work?
-
-Thank you,
-Dave
-
+Johan
