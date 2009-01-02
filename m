@@ -1,31 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d89ddf300901020827w20c48a5fgb37d35ff33ea5fd3@mail.gmail.com>
-Date: Fri, 2 Jan 2009 09:27:33 -0700
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "Siarhei Siamashka" <siarhei.siamashka@nokia.com>
-Subject: Re: [PATCH/RFC] SIMD optimizations for SBC encoder analysis filter
+From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
+To: "ext Marcel Holtmann" <marcel@holtmann.org>
+Subject: Re: [PATCH] Added possibility to analyze 4 blocks at once in SBC encoder
+Date: Fri, 2 Jan 2009 18:13:57 +0200
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <200901021807.17443.siarhei.siamashka@nokia.com>
+References: <200812311729.30975.siarhei.siamashka@nokia.com> <1230800042.4530.0.camel@californication>
+In-Reply-To: <1230800042.4530.0.camel@californication>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <200812311803.45279.siarhei.siamashka@nokia.com>
-	 <1230800283.4530.3.camel@californication>
-	 <200901021807.17443.siarhei.siamashka@nokia.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200901021813.57181.siarhei.siamashka@nokia.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Siarhei
+On Thursday 01 January 2009 10:54:02 ext Marcel Holtmann wrote:
+> Hi Siarhei,
+>
+> > With bluez-4.25 release I hope that the SBC encoder sound quality issues
+> > are now solved (though this is yet to be confirmed).
+> >
+> > Nevertheless, I think it is time to focus on performance :) The attached
+> > patch contains code preparations which are needed for SIMD optimizations
+> > for the analysis filter. Also theoretically it should be possible to
+> > tweak code to have both 32-bit and 16-bit fixed point analysis filter
+> > compiled in and switch between them at runtime (at user's request or
+> > semi-intelligently depending on audio bitrate).
+> >
+> > This patch should be stable and ready to be committed.
+>
+> your patch has been applied. Thanks.
 
-> I wonder what CPU architectures are the most important for bluez?
+Thank you very much for taking a good care of my patches :)
 
-This is not an easy question, but one perspective is to consider the
-impact on battery life. Running sbc encoding on a phone will have a
-greater impact on battery life than it does to run it on a laptop.
 
-The ideal is to have portable devices mitigate this with dsp hardware,
-but we can't count on the hardware or the driver to be there in all
-cases. (see https://garage.maemo.org/projects/dsp-sbc/ for some work
-using the TI dsp)
-
--- 
-Brad Midgley
+Best regards,
+Siarhei Siamashka
