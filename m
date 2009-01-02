@@ -1,135 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <2ced936d0901030200y205b1f8fqb758a0483025dea8@mail.gmail.com>
-Date: Sat, 3 Jan 2009 07:00:28 -0300
-From: "Breno Jacinto" <breno@freeunix.com.br>
-To: linux-bluetooth@vger.kernel.org
-Subject: BNEP and Raw Ethernet Sockets
+Message-ID: <2d5a2c100901021140w7211d8e5r8e59316592951497@mail.gmail.com>
+Date: Fri, 2 Jan 2009 16:40:48 -0300
+From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+To: "Siarhei Siamashka" <siarhei.siamashka@nokia.com>
+Subject: Re: [PATCH/RFC] SIMD optimizations for SBC encoder analysis filter
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <200901021833.13342.siarhei.siamashka@nokia.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_211991_26038317.1230976828411"
+Content-Type: text/plain; charset=ISO-8859-1
+References: <200812311803.45279.siarhei.siamashka@nokia.com>
+	 <2d5a2c100812311255p2d10b74crc31ff3211ca1939d@mail.gmail.com>
+	 <200901021833.13342.siarhei.siamashka@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-------=_Part_211991_26038317.1230976828411
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi Siarhei,
 
-Hello,
+On Fri, Jan 2, 2009 at 1:33 PM, Siarhei Siamashka
+<siarhei.siamashka@nokia.com> wrote:
+> On Wednesday 31 December 2008 22:55:24 ext Luiz Augusto von Dentz wrote:
+>> I wonder why don't we use liboil
+>> (http://liboil.freedesktop.org/wiki/).
+>
+> Can you clarify your proposal a bit? Which functions/implementations from
+> liboil do you suggest for use in bluez sbc?
 
-    I've been trying for a while to make a BNEP network exchange
-messages through raw ethernet sockets, but up to now I could not come
-with a reasonable explanation of why it is not working. I have done
-the following experiments:
-
-1) Build the network according to the BlueZ PAN Howto
-(http://bluez.sourceforge.net/contrib/HOWTO-PAN), consisting of 2
-nodes, then 3 nodes with bridging.
-
-2) Tested simple UDP broadcasts: worked fine, everyone receives the packet.
-
-3) Tested with Raw Ethernet sockets: Source Node sends, but the frame
-simply doesnt seem to reach the destinations (it is also a broadcast,
-but a link-layer one).
-
-    The codes I have been testing are attached, if anyone has
-experienced the same situation and found a solution, or if anyone is
-suspicious about what might be happening, I'd be glad to hear.
-
-    My main suspect is that hand-made Ethernet frames are not what the
-BNEP layer is expecting (and thus I see some errors in Wireshark), but
-then, what is it that BNEP expects?
+Liboil stands to optimized inner loops, that exactly what we need,
+transforming the whole code will, already is, depend on each simd
+extention to be implemented. What we basically do is multiply and
+accumulate arrays, what could be done with:
+http://liboil.freedesktop.org/documentation/liboil-liboilfuncs-math.html#oil-multsum-f32
 
 
-best regards,
---=20
---=20
-:: Breno Jacinto ::
-:: breno - at - gprt.ufpe.br ::
-:: FingerPrint ::
-   2F15 8A61 F566 E442 8581
-   E3C0 EFF4 E202 74B7 7484
-:: Persistir no dif=EDcil =E9 a =FAnica maneira de torn=E1-lo f=E1cil algum=
- dia.  ::
+> Or do you suggest to submit the sbc analysis filter function to liboil, add it
+> as sbc dependency and hope that somebody would translate the code to the
+> instruction sets of other architectures? Will it turn out to be beneficial?
+> IMHO It may easily become just an unnecessary burden and wasted effort too.
 
-------=_Part_211991_26038317.1230976828411
-Content-Type: application/x-gzip; name=source.tar.gz
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_fpi3lw192
-Content-Disposition: attachment; filename=source.tar.gz
+What about if there is any other codec that might benefit from the
+code we are producing, Im not talking about the whole sbc analysis
+filter but the inner loops.
 
-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
-------=_Part_211991_26038317.1230976828411--
+Also read careful what liboil does, there is a whole instruction set
+detection/benchmark system very similar to what you have proposed for
+choosing implementation in runtime.
+
+
+-- 
+Luiz Augusto von Dentz
+Engenheiro de Computação
