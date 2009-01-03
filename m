@@ -1,105 +1,135 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: bnep module in 2.6.27 fails to provide bnep0 device
-From: Mick Semb Wever <mick@semb.wever.org>
+Message-ID: <2ced936d0901030200y205b1f8fqb758a0483025dea8@mail.gmail.com>
+Date: Sat, 3 Jan 2009 07:00:28 -0300
+From: "Breno Jacinto" <breno@freeunix.com.br>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-IokPgmRJh5hc5DZtKhIW"
-Date: Sat, 03 Jan 2009 12:52:47 +0100
-Message-Id: <1230983567.6118.25.camel@localhost>
-Mime-Version: 1.0
+Subject: BNEP and Raw Ethernet Sockets
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_Part_211991_26038317.1230976828411"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
---=-IokPgmRJh5hc5DZtKhIW
-Content-Type: text/plain
+------=_Part_211991_26038317.1230976828411
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+Hello,
+
+    I've been trying for a while to make a BNEP network exchange
+messages through raw ethernet sockets, but up to now I could not come
+with a reasonable explanation of why it is not working. I have done
+the following experiments:
+
+1) Build the network according to the BlueZ PAN Howto
+(http://bluez.sourceforge.net/contrib/HOWTO-PAN), consisting of 2
+nodes, then 3 nodes with bridging.
+
+2) Tested simple UDP broadcasts: worked fine, everyone receives the packet.
+
+3) Tested with Raw Ethernet sockets: Source Node sends, but the frame
+simply doesnt seem to reach the destinations (it is also a broadcast,
+but a link-layer one).
+
+    The codes I have been testing are attached, if anyone has
+experienced the same situation and found a solution, or if anyone is
+suspicious about what might be happening, I'd be glad to hear.
+
+    My main suspect is that hand-made Ethernet frames are not what the
+BNEP layer is expecting (and thus I see some errors in Wireshark), but
+then, what is it that BNEP expects?
 
 
-This used to work for me but after some system updates is now broken.
-
-I'm using the following combination on gentoo:
-
- linux-2.6.27 (64-bit)
- bluez-libs-3.36
- bluez-utils-3.36
-
-Restarting bluetooth, with the usb bluetooth dongle in, gives in the
-system log:
-
-[hcid] Bluetooth HCI daemon
-[hcid] Parsing /etc/bluetooth/main.conf failed: No such file or directory
-[hcid] Starting SDP server
-[hcid] Unix socket created: 11
-[hcid] Registered manager path:/org/bluez/audio
-[hcid] Registered input manager path:/org/bluez/input
-[hcid] Starting experimental netlink support
-[kernel] pan0: Dropping NETIF_F_UFO since no NETIF_F_HW_CSUM feature.
-[hcid] Failed to find Bluetooth netlink family
-[hcid] Can't init plugin /usr/lib64/bluetooth/plugins/netlink.so
-[hcid] bridge pan0 created
-[hcid] Registered manager path:/org/bluez/network
-[hcid] Registered server path:/org/bluez/network/nap
-[hcid] Registered server path:/org/bluez/network/gn
-[hcid] Registered server path:/org/bluez/network/panu
-[hcid] Registered manager path:/org/bluez/serial
-[hcid] HCI dev 0 registered
-[hcid] HCI dev 0 already up
-[hcid] Device hci0 has been added
-[hcid] Starting security manager 0
-[hcid] Device hci0 has been activated
-
-
-Then running "pand -c XX" I get:
-
-[pand] Connecting to 00:19:63:14:8C:6C
-[hcid] link_key_request (sba=3D00:10:60:D1:7C:31, dba=3D00:19:63:14:8C:6C)
-[pand] bnep0 connected
-[/etc/init.d/net.bnep0] ERROR: interface bnep0 does not exist
-[/etc/init.d/net.bnep0] Ensure that you have loaded the correct kernel modu=
-le for your hardware
-[/etc/init.d/net.bnep0] ERROR: net.bnep0 failed to start
-
-
-It seems pand connects through the bnep0 device, and indeed the mobile
-phone i'm connecting to registers the connection and itself connects to
-the 3g network, but the kernel complains and the connection is quickly drop=
-ped...
-
-I have googled around without any luck at all.
-The bnep module is definitely loaded, i have tried reloading it, and
-restarting the system. And recompiling the kernel with modules built-in
-instead.
-
-I'm quite lost here and hoping anybody can help, or instruct what more
-information is required.
-
-
-~mck
-
-
-
-
-ps this was original posted to http://gmane.linux.network which i
-presumed, too late, is an advanced development list. I gather this is
-the right list as it is the conglomeration of the previous bluez.users
-and bluez.devel lists.
-
+best regards,
 --=20
-"Don't use Outlook. Outlook is really just a security hole with a small
-e-mail client attached to it." Brian Trosko=20
-| semb.wever.org | sesat.no | sesam.no |
+--=20
+:: Breno Jacinto ::
+:: breno - at - gprt.ufpe.br ::
+:: FingerPrint ::
+   2F15 8A61 F566 E442 8581
+   E3C0 EFF4 E202 74B7 7484
+:: Persistir no dif=EDcil =E9 a =FAnica maneira de torn=E1-lo f=E1cil algum=
+ dia.  ::
 
---=-IokPgmRJh5hc5DZtKhIW
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
+------=_Part_211991_26038317.1230976828411
+Content-Type: application/x-gzip; name=source.tar.gz
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_fpi3lw192
+Content-Disposition: attachment; filename=source.tar.gz
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.9 (GNU/Linux)
-
-iEYEABECAAYFAklfUY8ACgkQkdPrePiuutM+xgCeLu0i6npDPOApopW6dhvrOwxY
-N20An2GWzx4+id0tp/CgyMhjbznnVv5H
-=mk3V
------END PGP SIGNATURE-----
-
---=-IokPgmRJh5hc5DZtKhIW--
-
+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
+------=_Part_211991_26038317.1230976828411--
