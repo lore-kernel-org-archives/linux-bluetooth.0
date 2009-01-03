@@ -1,15 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-From: Fazer <fazerxlo@o2.pl>
-To: linux-bluetooth@vger.kernel.org
-Subject: how to pair devices in konsole
-Date: Sat, 3 Jan 2009 16:56:39 +0100
+Message-ID: <2d5a2c100901030726r1dbc7ea8ib9832cde6c4f3a24@mail.gmail.com>
+Date: Sat, 3 Jan 2009 12:26:51 -0300
+From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+To: "Breno Jacinto" <breno@freeunix.com.br>
+Subject: Re: BNEP and Raw Ethernet Sockets
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <2ced936d0901030200y205b1f8fqb758a0483025dea8@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200901031656.39394.fazerxlo@o2.pl>
+Content-Type: text/plain; charset=ISO-8859-1
+References: <2ced936d0901030200y205b1f8fqb758a0483025dea8@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-i'm using linux with onlu text mode and i'm unable to pair my phone with 
-bluez-4.19-1.5
+Hi Breno,
 
+> 1) Build the network according to the BlueZ PAN Howto
+> (http://bluez.sourceforge.net/contrib/HOWTO-PAN), consisting of 2
+> nodes, then 3 nodes with bridging.
+
+This document is outdated, bluetoothd should be able to handle devices
+with PAN profile, pand is deprecated.
+
+-- 
+Luiz Augusto von Dentz
+Engenheiro de Computação
