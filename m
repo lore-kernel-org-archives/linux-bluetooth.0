@@ -1,41 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Simon Pickering" <S.G.Pickering@bath.ac.uk>
-To: "'Siarhei Siamashka'" <siarhei.siamashka@nokia.com>,
-	"'ext Brad Midgley'" <bmidgley@gmail.com>
-Cc: <linux-bluetooth@vger.kernel.org>
-References: <200812311803.45279.siarhei.siamashka@nokia.com> <200901021807.17443.siarhei.siamashka@nokia.com> <d89ddf300901020827w20c48a5fgb37d35ff33ea5fd3@mail.gmail.com> <200901021911.20265.siarhei.siamashka@nokia.com>
-Subject: RE: [PATCH/RFC] SIMD optimizations for SBC encoder analysis filter
-Date: Mon, 5 Jan 2009 11:08:39 -0000
-Message-ID: <004501c96f25$f66d96a0$6f41268a@enpcsmm11>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-In-Reply-To: <200901021911.20265.siarhei.siamashka@nokia.com>
+Subject: Re: understading bluetooth init
+From: Claudio Fiorini <claudio@cfiorini.it>
+To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1230073840.4954.12.camel@californication>
+References: <1229977280.13720.5.camel@netbimbo>
+	 <1229993505.8047.19.camel@californication>
+	 <1230059514.11446.19.camel@netbimbo>
+	 <1230073840.4954.12.camel@californication>
+Content-Type: text/plain
+Date: Mon, 05 Jan 2009 11:52:17 +0100
+Message-Id: <1231152737.15775.5.camel@netbimbo>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Wed, 2008-12-24 at 00:10 +0100, Marcel Holtmann wrote:
+> You can
+> grab one of my old presentation that I did around 2003, but even that
+> might not help that much. It is a really complex system. Sorry, there
+> is
+> nothing I can really do in a quick answer. If you wanna look into the
+> kernel code, look at net/bluetooth/ and include/net/bluetooth/. The
+> actual drivers for the USB dongle is at drivers/bluetooth/btusb.c.
 
-> > The ideal is to have portable devices mitigate this with dsp
-hardware,
-> > but we can't count on the hardware or the driver to be there in all
-> > cases. (see https://garage.maemo.org/projects/dsp-sbc/ for some work
-> > using the TI dsp)
-> 
-> Yes, I know about this project. And its maintainer should be 
-> subscribed here
-> too :)
+thanks for your answer.
+last year i bought a book about linux kernel network internals, but i
+never had time to read, could it be useful to help me out?
 
-He is now :)
-
-> Making code a bit more C55x friendly is not difficult at all 
-> and can be surely
-> done.
-
-I'm catching up on the flood of patches and will have a look at this
-soon,
-
-Cheers,
-
-
-Simon
+thanks
+claudio
 
