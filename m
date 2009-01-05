@@ -1,40 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
 From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
-To: hoene@uni-tuebingen.de
-Subject: Re: SBC encoder conformance test for version 4.25 passed!
-Date: Mon, 5 Jan 2009 10:27:57 +0200
-Cc: "'Marcel Holtmann'" <marcel@holtmann.org>,
-        "'Bont, Frans de'" <frans.de.bont@philips.com>,
-        linux-bluetooth@vger.kernel.org
-References: <200812301246.25781.siarhei.siamashka@nokia.com> <000a01c96c1c$a4c86390$ee592ab0$@hoene@gmx.net>
-In-Reply-To: <000a01c96c1c$a4c86390$ee592ab0$@hoene@gmx.net>
+To: linux-bluetooth@vger.kernel.org
+Subject: SBC big endian issues?
+Date: Mon, 5 Jan 2009 10:15:20 +0200
 MIME-Version: 1.0
 Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200901051027.57446.siarhei.siamashka@nokia.com>
+  charset="us-ascii"
+Message-Id: <200901051015.20512.siarhei.siamashka@nokia.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thursday 01 January 2009 16:24:21 ext Christian Hoene wrote:
-> Hello Siarhei,
->
-> sorry for the delay - these days my family comes first ;-)
->
-> Good news! All tests passed!
-> http://net.cs.uni-tuebingen.de/html/nexgenvoip/
+Hello all,
 
-Thank you very much. Sorry for the delay with reply too.
+SBC encoder contains the following fragment:
 
-I wonder if we need to do something about test 08?
+> #if __BYTE_ORDER == __LITTLE_ENDIAN
+> 			if (sbc->endian == SBC_BE)
+> #elif __BYTE_ORDER == __BIG_ENDIAN
+> 			if (sbc->endian == SBC_LE)
+> #else
+> #error "Unknown byte order"
+> #endif
+> 				s = (ptr[0] & 0xff) << 8 | (ptr[1] & 0xff);
+> 			else
+> 				s = (ptr[0] & 0xff) | (ptr[1] & 0xff) << 8;
 
-Also could you try running a special test of version 4.25 with
-SBC_HIGH_PRECISION enabled? The point is that it uses the best
-possible precision for the analysis filter and minimizes effects of
-rounding errors (I would estimate that the precision should be even
-better than single precision floating point). Having the test run with this
-precision settings can expose some of the other minor bugs in the code
-(if they exist), which can now be hidden under the slight precision loss
-because of using 16-bit fixed point calculations.
-
+This does not look right. Because as far as I can see, it will work
+differently on big and little endian systems (though I did not test it
+on real hardware). Is anybody using SBC on big endian systems?
+Does it actually work as expected?
 
 Best regards,
 Siarhei Siamashka
