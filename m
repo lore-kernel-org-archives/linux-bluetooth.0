@@ -1,40 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d89ddf300901050736n2615d812r85c8cc1d5df36898@mail.gmail.com>
-Date: Mon, 5 Jan 2009 08:36:57 -0700
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "Siarhei Siamashka" <siarhei.siamashka@nokia.com>
-Subject: Re: SBC big endian issues?
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <200901051015.20512.siarhei.siamashka@nokia.com>
+From: "Christian Hoene" <hoene@uni-tuebingen.de>
+To: "'Siarhei Siamashka'" <siarhei.siamashka@nokia.com>
+Cc: <linux-bluetooth@vger.kernel.org>
+References: <200812301246.25781.siarhei.siamashka@nokia.com> <200901051522.25993.siarhei.siamashka@nokia.com> <002701c96f43$dc833c90$9589b5b0$@de> <200901051718.44559.siarhei.siamashka@nokia.com>
+In-Reply-To: <200901051718.44559.siarhei.siamashka@nokia.com>
+Subject: RE: [PATCH] SBC Encoder program
+Date: Mon, 5 Jan 2009 16:33:10 +0100
+Message-ID: <004501c96f4a$ea4f0500$beed0f00$@de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <200901051015.20512.siarhei.siamashka@nokia.com>
+Content-Type: text/plain;
+	charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Siarhei
+> I mean that 'return pos > len ? pos : len' and 'return pos' expressions are
+> completely interexchangeable in this context.
 
-> SBC encoder contains the following fragment:
->
->> #if __BYTE_ORDER == __LITTLE_ENDIAN
->>                       if (sbc->endian == SBC_BE)
->> #elif __BYTE_ORDER == __BIG_ENDIAN
->>                       if (sbc->endian == SBC_LE)
->> #else
->> #error "Unknown byte order"
->> #endif
->>                               s = (ptr[0] & 0xff) << 8 | (ptr[1] & 0xff);
->>                       else
->>                               s = (ptr[0] & 0xff) | (ptr[1] & 0xff) << 8;
->
-> This does not look right. Because as far as I can see, it will work
-> differently on big and little endian systems
+They are slightly different but really, I do not care. Both fixes will work. At least one must be applied.
+BTW: Why not use fread instead? ;-)
 
-I tested it some time ago on powerpc and I know Marcel also has a
-powerpc for testing. I'll need to update my machine for bluez 4.x.
+Greetings
 
-The logic here seems to be to swap bytes if the endian set in the sbc
-struct does not match host endian.
+ Christian
 
--- 
-Brad Midgley
+
