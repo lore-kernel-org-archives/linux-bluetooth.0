@@ -1,46 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
-To: "ext Christian Hoene" <hoene@uni-tuebingen.de>
-Subject: Re: [PATCH] SBC Encoder program
-Date: Mon, 5 Jan 2009 17:18:44 +0200
-Cc: linux-bluetooth@vger.kernel.org
-References: <200812301246.25781.siarhei.siamashka@nokia.com> <200901051522.25993.siarhei.siamashka@nokia.com> <002701c96f43$dc833c90$9589b5b0$@de>
-In-Reply-To: <002701c96f43$dc833c90$9589b5b0$@de>
+From: "Christian Hoene" <hoene@uni-tuebingen.de>
+To: "'Siarhei Siamashka'" <siarhei.siamashka@nokia.com>
+Cc: <linux-bluetooth@vger.kernel.org>
+References: <200812301246.25781.siarhei.siamashka@nokia.com> <000a01c96c1c$a4c86390$ee592ab0$@hoene@gmx.net> <200901051027.57446.siarhei.siamashka@nokia.com>
+In-Reply-To: <200901051027.57446.siarhei.siamashka@nokia.com>
+Subject: RE: SBC encoder conformance test for version 4.25 passed!
+Date: Mon, 5 Jan 2009 15:55:27 +0100
+Message-ID: <002901c96f45$a7bbf770$f733e650$@de>
 MIME-Version: 1.0
 Content-Type: text/plain;
-  charset="utf-8"
-Message-Id: <200901051718.44559.siarhei.siamashka@nokia.com>
+	charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Monday 05 January 2009 16:42:39 ext Christian Hoene wrote:
-> > There are some parts that look a bit redundant/suspicious:
-> > > @@ -47,7 +47,7 @@ static ssize_t __read(int fd, void *buf, size_t
-> > > count) while (count > 0) {
-> > >                 len = read(fd, buf + pos, count);
-> > >                 if (len <= 0)
-> > > -                       return len;
-> > > +                       return pos > len ? pos : len;
-> > >
-> > >                 count -= len;
-> > >                 pos   += len;
-> >
-> > Is the ternary '?' operator really needed here? In this part of code we
-> > know for sure that 'len' is less or equal to zero, also 'pos ' is a
-> > positive number or zero. Having just 'return pos' should be enough.
->
-> No. If read returns an error, the this error is passed to __read, too.
+> > Good news! All tests passed!
+> > http://net.cs.uni-tuebingen.de/html/nexgenvoip/
+> 
+> Thank you very much. Sorry for the delay with reply too.
+> 
+> I wonder if we need to do something about test 08?
 
-I mean that 'return pos > len ? pos : len' and 'return pos' expressions are
-completely interexchangeable in this context.
+Done.
 
-Regarding this particular change itself, was there a reproducible problem in
-your testing that strictly required this fix? Was it involving sockets or
-pipes?
+> Also could you try running a special test of version 4.25 with
+> SBC_HIGH_PRECISION enabled? The point is that it uses the best
+> possible precision for the analysis filter and minimizes effects of
+> rounding errors (I would estimate that the precision should be even
+> better than single precision floating point). Having the test run with
+this
+> precision settings can expose some of the other minor bugs in the code
+> (if they exist), which can now be hidden under the slight precision loss
+> because of using 16-bit fixed point calculations.
 
-But the bug in 'sbc_get_codesize' is the unquestionable one for sure. Good job
-finding and fixing it.
+I have uploaded the results to
+http://net.cs.uni-tuebingen.de/html/nexgenvoip/4.25_high_precision
 
--- 
+The encoding results did not change. 
+
 Best regards,
-Siarhei Siamashka
+
+ Christian 
+
