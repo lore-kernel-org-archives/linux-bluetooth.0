@@ -1,43 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Christian Hoene" <hoene@uni-tuebingen.de>
-To: "'Siarhei Siamashka'" <siarhei.siamashka@nokia.com>
-Cc: <linux-bluetooth@vger.kernel.org>
-References: <200812301246.25781.siarhei.siamashka@nokia.com> <000a01c96c1c$a4c86390$ee592ab0$@hoene@gmx.net> <200901051027.57446.siarhei.siamashka@nokia.com>
-In-Reply-To: <200901051027.57446.siarhei.siamashka@nokia.com>
-Subject: RE: SBC encoder conformance test for version 4.25 passed!
-Date: Mon, 5 Jan 2009 15:55:27 +0100
-Message-ID: <002901c96f45$a7bbf770$f733e650$@de>
+From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
+To: "ext Christian Hoene" <hoene@uni-tuebingen.de>
+Subject: Re: [PATCH] SBC Encoder program
+Date: Mon, 5 Jan 2009 16:48:48 +0200
+Cc: "'Luiz Augusto von Dentz'" <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+References: <200812301246.25781.siarhei.siamashka@nokia.com> <2d5a2c100901050513t73cbd8a0v924f7d52e0cae271@mail.gmail.com> <002801c96f43$dd2e70b0$978b5210$@de>
+In-Reply-To: <002801c96f43$dd2e70b0$978b5210$@de>
 MIME-Version: 1.0
 Content-Type: text/plain;
-	charset="us-ascii"
+  charset="iso-8859-1"
+Message-Id: <200901051648.48096.siarhei.siamashka@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> > Good news! All tests passed!
-> > http://net.cs.uni-tuebingen.de/html/nexgenvoip/
-> 
-> Thank you very much. Sorry for the delay with reply too.
-> 
-> I wonder if we need to do something about test 08?
+On Monday 05 January 2009 16:42:39 ext Christian Hoene wrote:
+> > Just the codesize is 16 bit, right? So I guess the following changes
+> > are not really necessary:
+> >
+> >
+> > +	uint16_t subbands, channels, blocks;
+>
+> No, but then we have to change the last line of the function to
+>   return ((uint16_t)subbands) * blocks * channels * 2;
 
-Done.
+Not quite so. There is such thing as "integer promotion" defined in C
+standard. And integer type is guaranteed to be at least 16 bit. But I
+agree that explicitly having uint16_t is much more likely not to raise
+any doubts about its correctness :)
 
-> Also could you try running a special test of version 4.25 with
-> SBC_HIGH_PRECISION enabled? The point is that it uses the best
-> possible precision for the analysis filter and minimizes effects of
-> rounding errors (I would estimate that the precision should be even
-> better than single precision floating point). Having the test run with
-this
-> precision settings can expose some of the other minor bugs in the code
-> (if they exist), which can now be hidden under the slight precision loss
-> because of using 16-bit fixed point calculations.
-
-I have uploaded the results to
-http://net.cs.uni-tuebingen.de/html/nexgenvoip/4.25_high_precision
-
-The encoding results did not change. 
-
+-- 
 Best regards,
-
- Christian 
-
+Siarhei Siamashka
