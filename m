@@ -1,62 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
 From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
-To: "ext Brad Midgley" <bmidgley@gmail.com>
-Subject: Re: SBC big endian issues?
-Date: Mon, 5 Jan 2009 20:19:15 +0200
+To: "ext Christian Hoene" <hoene@uni-tuebingen.de>
+Subject: Re: [PATCH] SBC Encoder program
+Date: Mon, 5 Jan 2009 19:39:23 +0200
 Cc: linux-bluetooth@vger.kernel.org
-References: <200901051015.20512.siarhei.siamashka@nokia.com> <200901051755.29164.siarhei.siamashka@nokia.com> <d89ddf300901050825h1654c869l22563783beeee7a8@mail.gmail.com>
-In-Reply-To: <d89ddf300901050825h1654c869l22563783beeee7a8@mail.gmail.com>
+References: <200812301246.25781.siarhei.siamashka@nokia.com> <200901051718.44559.siarhei.siamashka@nokia.com> <004501c96f4a$ea4f0500$beed0f00$@de>
+In-Reply-To: <004501c96f4a$ea4f0500$beed0f00$@de>
 MIME-Version: 1.0
 Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200901052019.15656.siarhei.siamashka@nokia.com>
+  charset="utf-8"
+Message-Id: <200901051939.23341.siarhei.siamashka@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Monday 05 January 2009 18:25:24 ext Brad Midgley wrote:
-> Siarhei
+On Monday 05 January 2009 17:33:10 ext Christian Hoene wrote:
+> > I mean that 'return pos > len ? pos : len' and 'return pos' expressions
+> > are completely interexchangeable in this context.
 >
-> > The logic is that the first line contains a portable endian neutral read
-> > of
-> >
-> > big endian data into native format:
-> >>                               s = (ptr[0] & 0xff) << 8 | (ptr[1] &
-> >> 0xff);
->
-> the intent is to swap bytes using this first statement if either
->
-> - host order is little endian and the ptr array is stored big endian
-> - host order is big endian and the ptr array is stored little endian
->
-> the second case could be done with a cast to a 16-bit int rather than
-> bit arithmetic.
->
-> We don't exercise all the various cases.
+> They are slightly different but really, I do not care. Both fixes will work.
 
-No, it's a bit different. There is no 'swap byte' operation here, but just
-portable reading of data in big endian format.
+Yes, because they provide exactly identical results :-) In this sense, your
+fix is a bit broken, because it will never allow to pass through and return a
+negative error code.
 
-Let's suppose that we have the following two bytes in memory:
+> At least one must be applied. BTW: Why not use fread instead? ;-) 
 
-0x12 0x34
+Agreed here. What's the point of having double underscored versions (such
+identifiers are reserved and not allowed to be used by programs) of read and
+write functions? Maybe they can be purged and just normal read/write calls
+could be used instead? Or alternatively fread/fwrite indeed?
 
-This equals to 0x1234 for big endian systems or 0x3412 for little endian
-systems if you read data via int16_t * pointer.
+Also there seems to be a performance issue: memove calls are redundant and
+can be avoided in SBC encoder program.
 
-But in the case of SBC, data is read one byte at a time and results in the
-same value regardless of the endianness of the system. It will be always
-0x1234 and this is generally a portable, but slow way of reading big endian
-data (host system endian order does not matter).
+I can confirm that getting rid of the __read and __write functions (or fixing
+them with your patch or its modification) is the only change, needed to pass
+encoder test 08.
 
-So unless __BYTE_ORDER is somehow defined to be __LITTLE_ENDIAN on big
-endian systems (two bugs which cancel each other ;-) ),  the code from SBC is
-supposed to work incorrectly and sbcenc should produce broken files
-with distorted sound (though somewhat resembling the original file). I just
-want somebody to verify this on real big endian hardware.
+All the other changes are not directly related to this particular testcase,
+though a fix for 'codesize' is also nice to have. It would be required for a
+faster, memmove-free version of the encoder.
 
-PS. I'm interested in this code because it is very slow and needs to be
-optimized. In the case of single channel and no endian conversion, just
-memcpy can be used. Other cases can be improved too.
+You have found and fixed two definite bugs (as I can see it now), that's very
+good. Now it would be nice to apply the fixes to git with the descriptive
+commit messages and move forward ;-)
 
 -- 
 Best regards,
