@@ -1,45 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d89ddf300901051126g3f8c8dadq8effa23e0a7bf73f@mail.gmail.com>
-Date: Mon, 5 Jan 2009 12:26:17 -0700
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "Siarhei Siamashka" <siarhei.siamashka@nokia.com>
+From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
+To: "ext Brad Midgley" <bmidgley@gmail.com>
 Subject: Re: SBC big endian issues?
+Date: Mon, 5 Jan 2009 20:19:15 +0200
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <200901052019.15656.siarhei.siamashka@nokia.com>
+References: <200901051015.20512.siarhei.siamashka@nokia.com> <200901051755.29164.siarhei.siamashka@nokia.com> <d89ddf300901050825h1654c869l22563783beeee7a8@mail.gmail.com>
+In-Reply-To: <d89ddf300901050825h1654c869l22563783beeee7a8@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <200901051015.20512.siarhei.siamashka@nokia.com>
-	 <200901051755.29164.siarhei.siamashka@nokia.com>
-	 <d89ddf300901050825h1654c869l22563783beeee7a8@mail.gmail.com>
-	 <200901052019.15656.siarhei.siamashka@nokia.com>
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200901052019.15656.siarhei.siamashka@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Siarhei
-
-The copy is inefficient but it would be even better if we didn't have
-to do it at all. I was investigating zero copy here and came up with a
-patch but it was too complicated to be accepted.
-
-The messy part here is we let the caller specify the byte order of the
-array. It would simplify a lot to standardize on host endian. I don't
-remember what the reasoning was against this.
-
-> Let's suppose that we have the following two bytes in memory:
+On Monday 05 January 2009 18:25:24 ext Brad Midgley wrote:
+> Siarhei
 >
-> 0x12 0x34
+> > The logic is that the first line contains a portable endian neutral read
+> > of
+> >
+> > big endian data into native format:
+> >>                               s = (ptr[0] & 0xff) << 8 | (ptr[1] &
+> >> 0xff);
 >
-> This equals to 0x1234 for big endian systems or 0x3412 for little endian
-> systems if you read data via int16_t * pointer.
+> the intent is to swap bytes using this first statement if either
+>
+> - host order is little endian and the ptr array is stored big endian
+> - host order is big endian and the ptr array is stored little endian
+>
+> the second case could be done with a cast to a 16-bit int rather than
+> bit arithmetic.
+>
+> We don't exercise all the various cases.
 
-if sbc->endian is set to the same as the host endian, then this could
-be done with a memcopy or skipped (zero copy).
+No, it's a bit different. There is no 'swap byte' operation here, but just
+portable reading of data in big endian format.
 
-I believe sbc->endian is always set to little endian the way it works
-now, meaning the array is storing data little endian regardless of the
-architecture. The patch I wrote made a copy of the memory, swapping
-bytes, if sbc->endian didn't match host endian. The way we use the
-code, this swapping only happens on big endian machines.
+Let's suppose that we have the following two bytes in memory:
+
+0x12 0x34
+
+This equals to 0x1234 for big endian systems or 0x3412 for little endian
+systems if you read data via int16_t * pointer.
+
+But in the case of SBC, data is read one byte at a time and results in the
+same value regardless of the endianness of the system. It will be always
+0x1234 and this is generally a portable, but slow way of reading big endian
+data (host system endian order does not matter).
+
+So unless __BYTE_ORDER is somehow defined to be __LITTLE_ENDIAN on big
+endian systems (two bugs which cancel each other ;-) ),  the code from SBC is
+supposed to work incorrectly and sbcenc should produce broken files
+with distorted sound (though somewhat resembling the original file). I just
+want somebody to verify this on real big endian hardware.
+
+PS. I'm interested in this code because it is very slow and needs to be
+optimized. In the case of single channel and no endian conversion, just
+memcpy can be used. Other cases can be improved too.
 
 -- 
-Brad Midgley
+Best regards,
+Siarhei Siamashka
