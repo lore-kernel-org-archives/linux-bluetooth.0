@@ -1,33 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4962C9D0.1030005@dtsp.co.nz>
-Date: Tue, 06 Jan 2009 16:02:40 +1300
-From: David Sainty <david.sainty@dtsp.co.nz>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Khem Raj <raj.khem@gmail.com>, linux-bluetooth@vger.kernel.org
-Subject: Re: [patch] hid2hci check usb_init return value
-References: <20081225231444.GA23751@gmail.com>	 <1230552751.15666.17.camel@californication>	 <20081230062656.GA31902@gmail.com> <1231210468.13304.20.camel@californication>
-In-Reply-To: <1231210468.13304.20.camel@californication>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: FYI, regarding AVRCP
+From: Marcel Holtmann <marcel@holtmann.org>
+To: David Stockwell <dstockwell@frequency-one.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <6F8E4829F275487887832A64E4125229@freqonedev>
+References: <6F8E4829F275487887832A64E4125229@freqonedev>
+Content-Type: text/plain
+Date: Tue, 06 Jan 2009 03:56:30 +0100
+Message-Id: <1231210590.13304.21.camel@californication>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Marcel Holtmann wrote:
->> What you have is libusb-0.1 which has older API I suppose. There is 
->> libusb-compat which can be used as a wrapper over libusb1 to give
->> libusb0 like interfaces. 
->>
->> Actually I was using libusb-1.0.0 API as mentioned here
->> http://libusb.sourceforge.net/api-1.0/group__lib.html
->> that also means that the patch I attached should have been using
->> libusb_init() instead. 
->>
->> Here is updated patch
->>     
->
-> this still breaks with a system that has libusb-0.1 installed like the
-> current Ubuntu 8.10 does. So either we switch to libusb-1.0 completely
-> or we leave it as it is.
->   
+Hi David,
 
-This looks like a job for autoconf?
+so lets try this again since it seems vger eat my last reply :(
+
+> Since our meeting in PortlandI have been busy dealing with both "day 
+> job" issues, as well as finishing up some Intellectual Property issues 
+> surrounding my ongoing evening/weekend project, of which AVRCP and my 
+> remote are a small but critical part.  Within the next two weeks I will 
+> reengage AVRCP and expect to soon bring it up to 1.3 (metadata transfer) 
+> as we discussed in Portland.  Sorry it has taken so long.
+
+great, because I was going to ping you about that part :)
+
+> With regard to the question from Park Chan-Yeol, I suggest we consider a 
+> Bluez/DBUS "version" property (for simplicity, a String) for the 
+> org.bluez.Control interface, to allow users to know just what they are 
+> dealing with.  Any thoughts?
+
+Yeah. Looks good to me.
+
+Regards
+
+Marcel
+
+
