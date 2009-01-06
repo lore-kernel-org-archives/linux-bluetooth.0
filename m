@@ -1,51 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <EE05154550284C96A30F932447EC944F@freqonedev>
-From: "David Stockwell" <dstockwell@frequency-one.com>
-To: "Marcel Holtmann" <marcel@holtmann.org>
+Reply-To: <hoene@uni-tuebingen.de>
+From: "Christian Hoene" <christian.hoene@gmx.net>
+To: "'Marcel Holtmann'" <marcel@holtmann.org>,
+	"'Siarhei Siamashka'" <siarhei.siamashka@nokia.com>
 Cc: <linux-bluetooth@vger.kernel.org>
-References: <6F8E4829F275487887832A64E4125229@freqonedev> <1231210590.13304.21.camel@californication>
-Subject: Re: FYI, regarding AVRCP
-Date: Mon, 5 Jan 2009 23:39:24 -0600
+References: <200812311803.45279.siarhei.siamashka@nokia.com>	 <1230800283.4530.3.camel@californication>	 <200901021807.17443.siarhei.siamashka@nokia.com> <1231210146.13304.15.camel@californication>
+In-Reply-To: <1231210146.13304.15.camel@californication>
+Subject: RE: [PATCH/RFC] SIMD optimizations for SBC encoder analysis filter
+Date: Tue, 6 Jan 2009 06:27:37 +0100
+Message-ID: <006c01c96fbf$7f9a38e0$7eceaaa0$@hoene@gmx.net>
 MIME-Version: 1.0
 Content-Type: text/plain;
-	format=flowed;
-	charset="iso-8859-1";
-	reply-type=original
+	charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel...got your previous responses, thanks.  Believe it or not, 
-this list works pretty well.
+> Do we still need the high precession stuff. I wanna cut down the number
+> of ifdefs in the code as much as possible.
 
-Regards...
+Yes, because provides better audio quality.
 
+Greetings
 
-> Hi David,
->
-> so lets try this again since it seems vger eat my last reply :(
->
->> Since our meeting in PortlandI have been busy dealing with both "day
->> job" issues, as well as finishing up some Intellectual Property 
->> issues
->> surrounding my ongoing evening/weekend project, of which AVRCP and my
->> remote are a small but critical part.  Within the next two weeks I 
->> will
->> reengage AVRCP and expect to soon bring it up to 1.3 (metadata 
->> transfer)
->> as we discussed in Portland.  Sorry it has taken so long.
->
-> great, because I was going to ping you about that part :)
->
->> With regard to the question from Park Chan-Yeol, I suggest we 
->> consider a
->> Bluez/DBUS "version" property (for simplicity, a String) for the
->> org.bluez.Control interface, to allow users to know just what they 
->> are
->> dealing with.  Any thoughts?
->
-> Yeah. Looks good to me.
->
-> Regards
->
-> Marcel
->
-> 
+ Christian
