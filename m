@@ -1,6 +1,6 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 6 Jan 2009 11:01:10 +0200 (IST)
-Message-Id: <200901060901.n0691A06027348@indigo.cs.bgu.ac.il>
+Date: Tue, 6 Jan 2009 11:01:08 +0200 (IST)
+Message-Id: <200901060901.n06918wg027343@indigo.cs.bgu.ac.il>
 From: "eial@cs.bgu.ac.il" <eial@cs.bgu.ac.il>
 To: linux-bluetooth@vger.kernel.org
 Subject: Re: can't seem to be able to get bluez working with motorola H500 headset
