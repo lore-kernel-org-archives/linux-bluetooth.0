@@ -1,98 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Wed, 7 Jan 2009 13:35:58 -0800
-Message-ID: <ee007d8e0901071335kc57db3dyd95f4277d345ba13@mail.gmail.com>
-Subject: Setting TIOCM_CD and TIOCM_RI in rfcomm (i.e. acting like a DCE)
-From: Adam Bliss <abliss@google.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: SBC big endian issues?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Siarhei Siamashka <siarhei.siamashka@nokia.com>
+Cc: ext Brad Midgley <bmidgley@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+In-Reply-To: <200901071440.01872.siarhei.siamashka@nokia.com>
+References: <200901051015.20512.siarhei.siamashka@nokia.com>
+	 <200901052019.15656.siarhei.siamashka@nokia.com>
+	 <d89ddf300901051126g3f8c8dadq8effa23e0a7bf73f@mail.gmail.com>
+	 <200901071440.01872.siarhei.siamashka@nokia.com>
+Content-Type: text/plain
+Date: Wed, 07 Jan 2009 14:43:57 +0100
+Message-Id: <1231335837.5298.0.camel@californication>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi there,
+Hi Siarhei,
 
-I apologize if I am mailing the wrong list; I saw the address posted
-on bluez.org.
+> > The messy part here is we let the caller specify the byte order of the
+> > array. It would simplify a lot to standardize on host endian. I don't
+> > remember what the reasoning was against this.
+> >
+> > > Let's suppose that we have the following two bytes in memory:
+> > >
+> > > 0x12 0x34
+> > >
+> > > This equals to 0x1234 for big endian systems or 0x3412 for little endian
+> > > systems if you read data via int16_t * pointer.
+> >
+> > if sbc->endian is set to the same as the host endian, then this could
+> > be done with a memcopy or skipped (zero copy).
+> >
+> > I believe sbc->endian is always set to little endian the way it works
+> > now, meaning the array is storing data little endian regardless of the
+> > architecture. The patch I wrote made a copy of the memory, swapping
+> > bytes, if sbc->endian didn't match host endian. The way we use the
+> > code, this swapping only happens on big endian machines.
+> 
+> Well, having no other option to verify this big endian bug, I used this MIPS
+> big endian QEMU image for testing: 
+> http://people.debian.org/~aurel32/qemu/mips/
+> 
+> The current code is indeed broken on big endian systems. The attached
+> patch makes it work correct. Of course this part needs heavy performance
+> optimizations (as discussed above), but even just fixing it may be a good
+> idea at the moment.
 
-I would like to set the CD (Carrier Detect) and RI (Ring Indicator)
-signals on an rfcomm line.  I understand that these are typically DCE
--> DTE signals, but in rfcomm there doesn't seem to be much meaning to
-this distinction.  My use case is a linux box with a bluetooth
-adapter, talking to a BGB203.
+patch has been applied. Thanks.
 
-Now I see in the rfcomm driver that that tiocmset() should be able to
-handle these signals:
+Regards
 
-http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=blob;f=net/bluetooth/rfcomm/tty.c;hb=09c7d8293a2d1317d16ef4ddb9f6dd2553d0694e
-1019 static int rfcomm_tty_tiocmset(struct tty_struct *tty, struct
-file *filp, unsigned int set, unsigned int clear)
-   ...
-1033         if (set & TIOCM_RI)
-1034                 v24_sig |= RFCOMM_V24_IC;
-1035         if (set & TIOCM_CD)
-1036                 v24_sig |= RFCOMM_V24_DV;
-   ...
-
-So I tried to write code like this:
-
-fd = open("/dev/rfcomm1", O_RDWR | O_NDELAY);
-ri = TIOCM_RI;
-ioctl(fd, TIOCMSET, &ri);
-
-But it doesn't work.  (I'm fully able to connect the rfcomm link and
-pass characters over it.  Moreover, I can control the DTR signal in
-this manner.  But not RI or CD.)
-
-I recompiled the net/bluetooth/rfcomm.ko driver with BT_DBG turned on,
-tried setting ri to 0xffff, and saw this:
-
-rfcomm_tty_tiocmset: tty d25bc800 dev c34369c0 set 0xe006 clear 0x00
-
-This mask is conspicuously missing the RI and CD bits (0x40 and 0x80).
- This behavior seems to come from the tty driver:
-
-http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=blob;f=drivers/char/tty_io.c;h=d33e5ab061779a67e63b305b30b29d01f6fe38ca;hb=HEAD
-   ...
-2452 static int tty_tiocmset(struct tty_struct *tty, struct file
-*file, unsigned int cmd,
-2453              unsigned __user *p)
-   ...
-2477         set &= TIOCM_DTR|TIOCM_RTS|TIOCM_OUT1|TIOCM_OUT2|TIOCM_LOOP;
-2478         clear &= TIOCM_DTR|TIOCM_RTS|TIOCM_OUT1|TIOCM_OUT2|TIOCM_LOOP;
-2479         return tty->ops->tiocmset(tty, file, set, clear);
-
-(The mask on line 2477 comes out to 0xe006.)
-
-I don't know the purpose of these lines, but they seem to imply that
-it is impossible to set the RI and CD signals using tiocmset() an
-rfcomm device.  To test my theory, I tried out this patch against my
-2.6.22 kernel:
-
---- net/bluetooth/rfcomm/tty.c  2009-01-07 10:06:50.000000000 +0000
-+++ net/bluetooth/rfcomm/tty.c~ 2009-01-07 10:05:40.000000000 +0000
-@@ -1030,18 +1006,18 @@
-                v24_sig |= RFCOMM_V24_RTC;
-        if (set & TIOCM_RTS || set & TIOCM_CTS)
-                v24_sig |= RFCOMM_V24_RTR;
--       if (set & TIOCM_RI)
-+       if (set & TIOCM_OUT1)
-                v24_sig |= RFCOMM_V24_IC;
--       if (set & TIOCM_CD)
-+       if (set & TIOCM_OUT2)
-                v24_sig |= RFCOMM_V24_DV;
+Marcel
 
 
-I then changed my code snippet to use TIOCM_OUT1 instead of TIOCM_RI.
-It worked perfectly, setting the Ring Indicator signal on the rfcomm
-link, which was reflected on my BGB203.
-
-Is there any way to set RI and CD using the stock rfcomm driver?  If
-not, should something be changed either in net/bluetooth/rfcomm/tty.c
-or in drivers/char/tty_io.c ?  I don't know the purpose of TIOCM_OUT1
-/ TIOCM_OUT2, but they do not seem to be used elsewhere in rfcomm, so
-perhaps this remapping won't hurt anything.  (If anyone has a
-suggestion for a simple fix, I would be happy to try to submit a
-patch, but it would be my first.)
-
-Thanks,
---Adam Bliss
