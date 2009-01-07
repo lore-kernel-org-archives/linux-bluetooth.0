@@ -1,162 +1,274 @@
 Return-Path: <cyrus@holtmann.org>
-From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
-To: "ext Brad Midgley" <bmidgley@gmail.com>
-Subject: Re: SBC big endian issues?
-Date: Wed, 7 Jan 2009 14:40:01 +0200
-Cc: linux-bluetooth@vger.kernel.org
-References: <200901051015.20512.siarhei.siamashka@nokia.com> <200901052019.15656.siarhei.siamashka@nokia.com> <d89ddf300901051126g3f8c8dadq8effa23e0a7bf73f@mail.gmail.com>
-In-Reply-To: <d89ddf300901051126g3f8c8dadq8effa23e0a7bf73f@mail.gmail.com>
+Message-ID: <49647B4D.2020907@powercraft.nl>
+Date: Wed, 07 Jan 2009 10:52:13 +0100
+From: Jelle de Jong <jelledejong@powercraft.nl>
 MIME-Version: 1.0
-Content-Type: Multipart/Mixed;
-  boundary="Boundary-00=_hKKZJez5KaE7lsS"
-Message-Id: <200901071440.01872.siarhei.siamashka@nokia.com>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: can somebody show me an example asound configuration for dmixing
+ with hifi bluetooth speakers/headset
+References: <494E2ACD.2080900@powercraft.nl> <4958A3E5.4030105@powercraft.nl>	 <49632D4C.6060207@powercraft.nl> <664d43d60901061352y72c39fdctdeae5d7242ce559d@mail.gmail.com>
+In-Reply-To: <664d43d60901061352y72c39fdctdeae5d7242ce559d@mail.gmail.com>
+Content-Type: multipart/mixed;
+ boundary="------------060706080204020802090800"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---Boundary-00=_hKKZJez5KaE7lsS
-Content-Type: text/plain;
-  charset="iso-8859-1"
+This is a multi-part message in MIME format.
+--------------060706080204020802090800
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
-On Monday 05 January 2009 21:26:17 ext Brad Midgley wrote:
-> Siarhei
+event wrote:
+> On Tue, Jan 6, 2009 at 12:07, Jelle de Jong <jelledejong@powercraft.nl> wrote:
+>> Jelle de Jong wrote:
+>>>> Hello everybody,
+>>>>
+>>>> I have been periodically trying to get multiple audio sources to play
+>>>> together (dmixing) to a hifi bluetooth speaker system or hifi bluetooth
+>>>> headset.
+>>>>
+>>>> I am using only alsa and no pulseaudio, esd, jack, mas of something else
+>>>> just alsa with asoundrc configuration files and no graphical environment.
+>>>>
+>>>> Can somebody show me an example asoundrc config file to make it possible
+>>>> to use software audio mixing with my bluetooth devices. If this is
+>>>> currently not possible, please tell why and what we can do about it. I
+>>>> am willing to donate some payal money to the person providing me with a
+>>>> working asoundrc configuration file that allows me to play multiple
+>>>> audio sources at the same time.
+>>>>
+>>>> Thanks in advance,
+>>>>
+>>>> Jelle
+>>>>
+>>> Bumping up this mail, I would really like to see a solution for my
+>>> problem or receive information why the problem is not possible not solvable?
+>>>
+>>> Thanks in advance for any help,
+>>>
+>>> Best regards,
+>>>
+>>> Jelle
+>> Bump for the mail, I still have this issue, and would really appreciate
+>> somebody taking a look at. I don't know if there is code limitation or
+>> that it is just a asoundrc configuration issue.
+>>
+>> Please help,
+>>
+>> Best regards,
+>>
+>> Jelle
 >
-> The copy is inefficient but it would be even better if we didn't have
-> to do it at all. I was investigating zero copy here and came up with a
-> patch but it was too complicated to be accepted.
-
-Yes, it is possible to reduce the number of data copies. Having
-both 'sbc_encoder_state->X' and 'sbc_frame->pcm_sample' arrays
-is obviously redundant and only one of them should remain.
-
-But eliminating any kind of data copies completely is hardly possible. The
-encoder needs to always have data for the 72 or 36 previous samples, so
-they need to be stored somewhere between the calls to frame encode
-function. And frame encode function will probably get data in small chunks
-if having low latency is desired. So at least this part of data will need to
-be moved around. Additionally, SIMD optimizations require input data
-permutation, so they can't work directly with the input buffer.
-
-Preserving the input samples 'history' is currently achieved by having 
-'sbc_encoder_state->X' array which works as some kind of ring buffer.
-If this buffer had infinite size, we would not have to duplicate information
-in the lower and higher halves of this buffer. But this is of course not
-possible due to the need to keep memory use reasonable and also in order to
-efficiently use data cache. Anyway, increasing 'sbc_encoder_state->X' size
-to some reasonable value may help to reduce extra overhead. One of the
-variants is to have space in X buffer for all the input data of a frame plus
-these 72/36 samples from the previous frame, copy the previous 72/36 samples
-to it, and then perform "endian conversion + channels deinterleaving + do SIMD
-permutation" in one pass directly into the X buffer from the buffer provided
-by the user at the entry of the frame packing function. Increasing X buffer
-more may allow to copy the previous 72/36 samples only once per 2 frames, once
-per 3 frames or whatever.
-
-This is not complicated at all, but is indeed a bit intrusive in the sense
-that it will touch quite a large part of code. But we are ready to do it now,
-am I right?
-
-> The messy part here is we let the caller specify the byte order of the
-> array. It would simplify a lot to standardize on host endian. I don't
-> remember what the reasoning was against this.
+> Hello Jelle,
+> could you please provide more details:
+> 1. what happen when you play from two sources simultaneously?
+> 2. what happen if you play only one source?
+> 3. please provide your asoundrc (at least the pcm.bluetooth part)
+> 4. does it work fine with other output device?
 >
-> > Let's suppose that we have the following two bytes in memory:
-> >
-> > 0x12 0x34
-> >
-> > This equals to 0x1234 for big endian systems or 0x3412 for little endian
-> > systems if you read data via int16_t * pointer.
->
-> if sbc->endian is set to the same as the host endian, then this could
-> be done with a memcopy or skipped (zero copy).
->
-> I believe sbc->endian is always set to little endian the way it works
-> now, meaning the array is storing data little endian regardless of the
-> architecture. The patch I wrote made a copy of the memory, swapping
-> bytes, if sbc->endian didn't match host endian. The way we use the
-> code, this swapping only happens on big endian machines.
+> Vale,
+> event
 
-Well, having no other option to verify this big endian bug, I used this MIPS
-big endian QEMU image for testing: 
-http://people.debian.org/~aurel32/qemu/mips/
+Thank you for responding, I had reattached the configurations and
+outputs with some more info. I have already spent a bloody awful lot of
+time on testing with trial and error. I am not an alsa or bluetooth
+developer I cannot get it to work. If a capable person could get it
+working I would be very great full.
 
-The current code is indeed broken on big endian systems. The attached
-patch makes it work correct. Of course this part needs heavy performance
-optimizations (as discussed above), but even just fixing it may be a good
-idea at the moment.
+I am also not able to get bluetooth working without adding a sound card
+to my system, so i put in a usb sound dongle just to get bluetooth with
+alsa working, alsa won't load its modules without it first finding a
+soundcard. It is all very very confusing.
 
-There is one more suspicious part of code which may cause problems:
-> 	unsigned char input[2048], output[2048];
-> ...
-> 	au_hdr = (struct au_header *) input;
-> 	if (au_hdr->magic != AU_MAGIC ||
-> 			BE_INT(au_hdr->hdr_size) > 128 ||
-> 			BE_INT(au_hdr->hdr_size) < 24 ||
-> 			BE_INT(au_hdr->encoding) != AU_FMT_LIN16) {
-> 		fprintf(stderr, "Not in Sun/NeXT audio S16_BE format\n");
-> 		goto done;
-> 	}
-
-As 'input' array is only guaranteed to have byte alignment and the code later
-accesses 32-bit au_hdr data, it may cause problems and the compiler
-rightfully issues a warning about it.
-
+Thanks in advance for any help,
 
 Best regards,
-Siarhei Siamashka
 
---Boundary-00=_hKKZJez5KaE7lsS
-Content-Type: text/x-diff;
-  charset="iso-8859-1";
-  name="0001-Fix-for-big-endian-problems-in-SBC-codec.patch"
-Content-Transfer-Encoding: 8bit
+Jelle
+
+--------------060706080204020802090800
+Content-Type: text/plain;
+ name="asoundrc"
+Content-Transfer-Encoding: base64
 Content-Disposition: inline;
-	filename="0001-Fix-for-big-endian-problems-in-SBC-codec.patch"
+ filename="asoundrc"
 
->From 0ee38e8976bd728e16fa4523f53d7b8400754294 Mon Sep 17 00:00:00 2001
-From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
-Date: Wed, 7 Jan 2009 14:28:48 +0200
-Subject: [PATCH] Fix for big endian problems in SBC codec
+cGNtLmhlYWRzZXQgewogICAgdHlwZSBibHVldG9vdGgKICAgICN+IGRldmljZSAwMDowRDox
+ODpBMDozNTo3MAogICAgI34gZGV2aWNlIDAwOjUzOjUzOkZCOjdFOjlDICMgTm9raWEgQkgt
+ODAxCiAgICAjfiBkZXZpY2UgMDA6MEM6NTU6RDE6Qzk6NzggIyBNb3Rvcm9sYSBTODA1CiAg
+ICAjfiBkZXZpY2UgMDA6MEQ6RkQ6MTg6NkU6M0MgIyBNb3Rvcm9sYSBTOQogICAgI34gZGV2
+aWNlIDIwOjA3OjA5OjE1OkE5OjVBICMgU2Ftc3VuZyBXRVAyMTAKICAgICN+IHB5dGhvbiAu
+c2ltcGxlLWFnZW50LnB5IGhjaTAgMDA6MUE6ODA6QUI6MEE6QjEKICAgIGRldmljZSAwMDox
+QTo4MDpBQjowQTpCMSAjIFNvbnkgU1JTLUJUMTAwCiAgICBwcm9maWxlIGhpZmkKICAgICNw
+cm9maWxlIHZvaWNlCiAgICAjcHJvZmlsZSBhdXRvCiAgICBtb2RlIHN0ZXJlbwp9CnBjbS5z
+b2Z0dm9sIHsKICAgIHR5cGUgc29mdHZvbAogICAgc2xhdmUucGNtIGhlYWRzZXQKICAgIGNv
+bnRyb2wubmFtZSBIZWFkc2V0CiAgICBjb250cm9sLmNhcmQgMAp9CnBjbS4hZGVmYXVsdCB7
+CiAgICAjfiB0eXBlIGh3CiAgICAjfiBjYXJkIDAKICAgIHR5cGUgcGx1ZwogICAgc2xhdmUu
+cGNtIHNvZnR2b2wKfQo=
+--------------060706080204020802090800
+Content-Type: text/x-log;
+ name="asoundrc.log"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="asoundrc.log"
 
----
- sbc/sbc.c |   12 ------------
- 1 files changed, 0 insertions(+), 12 deletions(-)
+# first terminal with the first audio stream
+------------------------------------------------------------------------
 
-diff --git a/sbc/sbc.c b/sbc/sbc.c
-index 8fff277..651981f 100644
---- a/sbc/sbc.c
-+++ b/sbc/sbc.c
-@@ -1157,13 +1157,7 @@ int sbc_decode(sbc_t *sbc, void *input, int input_len, void *output,
- 			int16_t s;
- 			s = priv->frame.pcm_sample[ch][i];
- 
--#if __BYTE_ORDER == __LITTLE_ENDIAN
- 			if (sbc->endian == SBC_BE) {
--#elif __BYTE_ORDER == __BIG_ENDIAN
--			if (sbc->endian == SBC_LE) {
--#else
--#error "Unknown byte order"
--#endif
- 				*ptr++ = (s & 0xff00) >> 8;
- 				*ptr++ = (s & 0x00ff);
- 			} else {
-@@ -1224,13 +1218,7 @@ int sbc_encode(sbc_t *sbc, void *input, int input_len, void *output,
- 	for (i = 0; i < priv->frame.subbands * priv->frame.blocks; i++) {
- 		for (ch = 0; ch < priv->frame.channels; ch++) {
- 			int16_t s;
--#if __BYTE_ORDER == __LITTLE_ENDIAN
- 			if (sbc->endian == SBC_BE)
--#elif __BYTE_ORDER == __BIG_ENDIAN
--			if (sbc->endian == SBC_LE)
--#else
--#error "Unknown byte order"
--#endif
- 				s = (ptr[0] & 0xff) << 8 | (ptr[1] & 0xff);
- 			else
- 				s = (ptr[0] & 0xff) | (ptr[1] & 0xff) << 8;
--- 
-1.5.6.5
+$ speaker-test -c2
+
+speaker-test 1.0.16
+
+Playback device is default
+Stream parameters are 48000Hz, S16_LE, 2 channels
+Using 16 octaves of pink noise
+Rate set to 48000Hz (requested 48000Hz)
+Buffer size range from 6144 to 6144
+Period size range from 512 to 2048
+Using max buffer size 6144
+Periods = 4
+was set period_size = 2048
+was set buffer_size = 6144
+ 0 - Front Left
+ 1 - Front Right
+Time per period = 5.865569
+ 0 - Front Left
+ 1 - Front Right
+Time per period = 5.999629
+ 0 - Front Left
+ 1 - Front Right
+^C
+
+# second terminal with the second audio stream, that fails
+------------------------------------------------------------------------
+
+$ speaker-test -c2
+
+speaker-test 1.0.16
+
+Playback device is default
+Stream parameters are 48000Hz, S16_LE, 2 channels
+Using 16 octaves of pink noise
+Rate set to 48000Hz (requested 48000Hz)
+Buffer size range from 6144 to 6144
+Period size range from 512 to 2048
+Using max buffer size 6144
+Periods = 4
+was set period_size = 2048
+was set buffer_size = 6144
+ALSA lib pcm_bluetooth.c:712:(bluetooth_a2dp_hw_params) BT_SETCONFIGURATION failed : Input/output error(5)
+Unable to set hw params for playback: Input/output error
+Setting of hwparams failed: Input/output error
 
 
---Boundary-00=_hKKZJez5KaE7lsS--
+--------------060706080204020802090800
+Content-Type: text/plain;
+ name="asoundrcdmix"
+Content-Transfer-Encoding: base64
+Content-Disposition: inline;
+ filename="asoundrcdmix"
+
+cGNtLmhlYWRzZXQgewogICAgdHlwZSBibHVldG9vdGgKICAgICN+IGRldmljZSAwMDowRDox
+ODpBMDozNTo3MAogICAgI34gZGV2aWNlIDAwOjUzOjUzOkZCOjdFOjlDICMgTm9raWEgQkgt
+ODAxCiAgICAjfiBkZXZpY2UgMDA6MEM6NTU6RDE6Qzk6NzggIyBNb3Rvcm9sYSBTODA1CiAg
+ICAjfiBkZXZpY2UgMDA6MEQ6RkQ6MTg6NkU6M0MgIyBNb3Rvcm9sYSBTOQogICAgI34gZGV2
+aWNlIDIwOjA3OjA5OjE1OkE5OjVBICMgU2Ftc3VuZyBXRVAyMTAKICAgICN+IHB5dGhvbiAu
+c2ltcGxlLWFnZW50LnB5IGhjaTAgMDA6MUE6ODA6QUI6MEE6QjEKICAgIGRldmljZSAwMDox
+QTo4MDpBQjowQTpCMSAjIFNvbnkgU1JTLUJUMTAwCiAgICBwcm9maWxlIGhpZmkKICAgICNw
+cm9maWxlIHZvaWNlCiAgICAjcHJvZmlsZSBhdXRvCiAgICBtb2RlIHN0ZXJlbwp9CnBjbS4h
+ZGVmYXVsdCB7CiAgIHR5cGUgcGx1ZwogICBzbGF2ZS5wY20gZG1peGVyCn0KcGNtLmRtaXhl
+ciB7CiAgIHR5cGUgZG1peAogICBzbGF2ZS5wY20gaGVhZHNldAp9CmN0bC5kbWl4ZXIgewog
+ICB0eXBlIGh3CiAgIGNhcmQgMAp9CnBjbS5kc3AgewogICAgdHlwZSBwbHVnCiAgICBzbGF2
+ZS5wY20gZG1peGVyCn0KY3RsLm1peGVyIHsKICAgIHR5cGUgaHcKICAgIGNhcmQgMAp9Cgoj
+IGZpcnN0IHRlcm1pbmFsIHdpdGggdGhlIGZpcnN0IGF1ZGlvIHN0cmVhbQotLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0KCiQgc3BlYWtlci10ZXN0IC1jMgoKc3BlYWtlci10ZXN0IDEuMC4xNgoKUGxh
+eWJhY2sgZGV2aWNlIGlzIGRlZmF1bHQKU3RyZWFtIHBhcmFtZXRlcnMgYXJlIDQ4MDAwSHos
+IFMxNl9MRSwgMiBjaGFubmVscwpVc2luZyAxNiBvY3RhdmVzIG9mIHBpbmsgbm9pc2UKQUxT
+QSBsaWIgcGNtX2RpcmVjdC5jOjE0Nzk6KF9zbmRfcGNtX2RpcmVjdF9nZXRfc2xhdmVfaXBj
+X29mZnNldCkgSW52YWxpZCB0eXBlICdibHVldG9vdGgnIGZvciBzbGF2ZSBQQ00KClBsYXli
+YWNrIG9wZW4gZXJyb3I6IC0yMixJbnZhbGlkIGFyZ3VtZW50CkFMU0EgbGliIHBjbV9kaXJl
+Y3QuYzoxNDc5Oihfc25kX3BjbV9kaXJlY3RfZ2V0X3NsYXZlX2lwY19vZmZzZXQpIEludmFs
+aWQgdHlwZSAnYmx1ZXRvb3RoJyBmb3Igc2xhdmUgUENNCgpQbGF5YmFjayBvcGVuIGVycm9y
+OiAtMjIsSW52YWxpZCBhcmd1bWVudApBTFNBIGxpYiBwY21fZGlyZWN0LmM6MTQ3OTooX3Nu
+ZF9wY21fZGlyZWN0X2dldF9zbGF2ZV9pcGNfb2Zmc2V0KSBJbnZhbGlkIHR5cGUgJ2JsdWV0
+b290aCcgZm9yIHNsYXZlIFBDTQoKUGxheWJhY2sgb3BlbiBlcnJvcjogLTIyLEludmFsaWQg
+YXJndW1lbnQKXkMK
+--------------060706080204020802090800
+Content-Type: text/x-log;
+ name="asoundrcdmix.log"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="asoundrcdmix.log"
+
+# first terminal with the first audio stream
+------------------------------------------------------------------------
+
+$ speaker-test -c2
+
+speaker-test 1.0.16
+
+Playback device is default
+Stream parameters are 48000Hz, S16_LE, 2 channels
+Using 16 octaves of pink noise
+ALSA lib pcm_direct.c:1479:(_snd_pcm_direct_get_slave_ipc_offset) Invalid type 'bluetooth' for slave PCM
+
+Playback open error: -22,Invalid argument
+ALSA lib pcm_direct.c:1479:(_snd_pcm_direct_get_slave_ipc_offset) Invalid type 'bluetooth' for slave PCM
+
+Playback open error: -22,Invalid argument
+ALSA lib pcm_direct.c:1479:(_snd_pcm_direct_get_slave_ipc_offset) Invalid type 'bluetooth' for slave PCM
+
+Playback open error: -22,Invalid argument
+^C
+
+
+--------------060706080204020802090800
+Content-Type: text/plain;
+ name="asoundrcdmix1"
+Content-Transfer-Encoding: base64
+Content-Disposition: inline;
+ filename="asoundrcdmix1"
+
+cGNtLmhlYWRzZXQgewogICAgdHlwZSBibHVldG9vdGgKICAgICN+IGRldmljZSAwMDowRDox
+ODpBMDozNTo3MAogICAgI34gZGV2aWNlIDAwOjUzOjUzOkZCOjdFOjlDICMgTm9raWEgQkgt
+ODAxCiAgICAjfiBkZXZpY2UgMDA6MEM6NTU6RDE6Qzk6NzggIyBNb3Rvcm9sYSBTODA1CiAg
+ICAjfiBkZXZpY2UgMDA6MEQ6RkQ6MTg6NkU6M0MgIyBNb3Rvcm9sYSBTOQogICAgI34gZGV2
+aWNlIDIwOjA3OjA5OjE1OkE5OjVBICMgU2Ftc3VuZyBXRVAyMTAKICAgICN+IHB5dGhvbiAu
+c2ltcGxlLWFnZW50LnB5IGhjaTAgMDA6MUE6ODA6QUI6MEE6QjEKICAgIGRldmljZSAwMDox
+QTo4MDpBQjowQTpCMSAjIFNvbnkgU1JTLUJUMTAwCiAgICBwcm9maWxlIGhpZmkKICAgICNw
+cm9maWxlIHZvaWNlCiAgICAjcHJvZmlsZSBhdXRvCiAgICBtb2RlIHN0ZXJlbwp9CgpwY20u
+c29mdHZvbCB7CiAgICB0eXBlIHNvZnR2b2wKICAgIHNsYXZlLnBjbSBkbWl4OmhlYWRzZXQK
+ICAgIGNvbnRyb2wubmFtZSBNYXN0ZXIKICAgIGNvbnRyb2wuY2FyZCAwCn0KCnBjbS4hZGVm
+YXVsdCB7CiAgICB0eXBlIHBsdWcKICAgIHNsYXZlLnBjbSBzb2Z0dm9sCn0KCmN0bC4hZGVm
+YXVsdCB7CiAgICB0eXBlIGh3CiAgICBjYXJkIDAKfQo=
+--------------060706080204020802090800
+Content-Type: text/x-log;
+ name="asoundrcdmix1.log"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="asoundrcdmix1.log"
+
+# first terminal with the first audio stream
+------------------------------------------------------------------------
+
+$ speaker-test -c2
+
+speaker-test 1.0.16
+
+Playback device is default
+Stream parameters are 48000Hz, S16_LE, 2 channels
+Using 16 octaves of pink noise
+ALSA lib confmisc.c:768:(parse_card) cannot find card 'headset'
+ALSA lib conf.c:3513:(_snd_config_evaluate) function snd_func_card_driver returned error: No such device
+ALSA lib confmisc.c:392:(snd_func_concat) error evaluating strings
+ALSA lib conf.c:3513:(_snd_config_evaluate) function snd_func_concat returned error: No such device
+ALSA lib confmisc.c:1251:(snd_func_refer) error evaluating name
+ALSA lib conf.c:3513:(_snd_config_evaluate) function snd_func_refer returned error: No such device
+ALSA lib conf.c:3985:(snd_config_expand) Evaluate error: No such device
+ALSA lib pcm.c:2144:(snd_pcm_open_noupdate) Unknown PCM dmix:headset
+Playback open error: -19,No such device
+^C
+
+
+--------------060706080204020802090800--
