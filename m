@@ -1,61 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: "=?ISO-8859-1?B?WUFPIFll?=" <yesiryao@qq.com>
-To: "=?ISO-8859-1?B?bGludXgtYmx1ZXRvb3Ro?=" <linux-bluetooth@vger.kernel.org>
-Cc: "=?ISO-8859-1?B?bWFyY2Vs?=" <marcel@holtmann.org>
-Sender: yesiryao@qq.com
-Subject: openobex vs. obexd vs. obex-data-server
-Mime-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_4965EC72_0860B8F0_743F5290"
-Date: Thu, 8 Jan 2009 20:07:14 +0800
-Message-ID: <tencent_3B1ED45643B84E67486BBA7F@qq.com>
+From: "Liu, Raymond" <raymond.liu@intel.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 8 Jan 2009 14:29:02 +0800
+Subject: Anyone familiar with SAP prifile or ISO7816 or SIM card related
+ applications?
+Message-ID: <0463F45F3606F4428ED35AC8C709F92E047EBD5D@pdsmsx502.ccr.corp.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
+Hi 
 
-------=_NextPart_4965EC72_0860B8F0_743F5290
-Content-Type: text/plain;
-	charset="ISO-8859-1"
-Content-Transfer-Encoding: base64
+	Is there anybody familiar with SAP on other platform or SIM card related applications?
+	We are trying to implement SAP (SIM Access Profile) for BlueZ.
 
-SGFwcHkgbmV3IHllYXIsIGV2ZXJ5b25lICEgDQogVGh4IGZvciB0aGUgZ3JlYXQgU1cgLS0g
-Ymx1ZXogIQ0KIEkgYW0gYSBuZXcgdXNlciBvZiBibHVlei4gTXkgcXVlc3Rpb25zIGlzIGFi
-b3V0IGZpbGUgdHJhbnNmZXIgYmFzZWQgb24gYmx1ZXouDQogIA0KIHdoYXQgaXMgdGhlIGRl
-ZmZlcmVuY2UgYmV0d2Vlbjogb3Blbm9iZXgsIG9iZXhkLCBvYmV4LWRhdGEtc2VydmVyID8N
-CiBJIGhhdmUgcG9ydGluZyBibHVlejQgdG8gbXkgcHhhMzEwIGhhbmRoZWxkIHBsYXRmb3Jt
-Lg0KIHNvLCB3aGljaCBvbmUgaXMgdGhlIGJlc3QvbW9yZSBzdWl0IG9uZSBmb3IgbWUgdG8g
-dXNlID8NCiAgDQogLS0tLS0tLS0tLQ0Kb2JleCBzZXJ2ZXJzIGFuZCBjbGllbnRzOiANCkNo
-b29zZSBqdXN0IG9uZSBvZiB0aGVzZSBzaW5jZSB0aGV5IGNhbm5vdCBiZSBydW4gYXQgdGhl
-IHNhbWUgdGltZS4NCiBvYmV4ZC0wLjgudGFyLmd6IA0Kb2JleC1kYXRhLXNlcnZlci0wLjQu
-Mi50YXIuZ3ogDQogIA0KICAtLS0tLS0tLS0tLS0tLS0tLS0NCiBFbWFpbDE6IHllc2lyeWFv
-QHRvbS5jb20NCiBFbWFpbDI6IHllc2lyeWFvQHFxLmNvbQ0KIE1TTiA6IHllc2lyeWFvQGhv
-dG1haWwuY29t
+	While I notice that except GSM 11.11 / GSM 11.14 / ISO 7816, there are PC/SC standard build upon ISO7816 for smartcard reader.
+	And there are existing library say libpcsclite and libchipcard etc for PC/SC.
 
-------=_NextPart_4965EC72_0860B8F0_743F5290
-Content-Type: text/html;
-	charset="ISO-8859-1"
-Content-Transfer-Encoding: base64
+	So, my question is
+	1 seems to handle smartcard reader is somehow standardized already. While how's case that a sim card is attached to BP modem, and modem will expose its own interface to access sim card? Is there any standard interface? (I don't see one)
+	2 Should SAP be implemented independent with the current smartcard reader library and provide the data exchange method through dbus or should we somehow extend the current card reader related library and the pass on the data for user to a sap service (this way seems we might need to parse part of the SIM card APDU command)
 
-PERJVj5IYXBweSBuZXcgeWVhciwgZXZlcnlvbmUgISA8L0RJVj4NCjxESVY+VGh4IGZvciB0
-aGUgZ3JlYXQgU1cgLS0gYmx1ZXogITwvRElWPg0KPERJVj5JIGFtIGEgbmV3IHVzZXIgb2Yg
-Ymx1ZXouIE15IHF1ZXN0aW9ucyBpcyBhYm91dCBmaWxlIHRyYW5zZmVyIGJhc2VkIG9uIGJs
-dWV6LjwvRElWPg0KPERJVj4mbmJzcDs8L0RJVj4NCjxESVY+d2hhdCBpcyB0aGUgZGVmZmVy
-ZW5jZSBiZXR3ZWVuOiBvcGVub2JleCwgb2JleGQsIG9iZXgtZGF0YS1zZXJ2ZXIgPzwvRElW
-Pg0KPERJVj5JIGhhdmUgcG9ydGluZyBibHVlejQgdG8gbXkgcHhhMzEwIGhhbmRoZWxkIHBs
-YXRmb3JtLjwvRElWPg0KPERJVj5zbywgd2hpY2ggb25lIGlzIHRoZSBiZXN0L21vcmUgc3Vp
-dCBvbmUgZm9yIG1lIHRvIHVzZSA/PC9ESVY+DQo8RElWPiZuYnNwOzwvRElWPg0KPERJVj4t
-LS0tLS0tLS0tPEJSPm9iZXggc2VydmVycyBhbmQgY2xpZW50czogPEJSPkNob29zZSBqdXN0
-IG9uZSBvZiB0aGVzZSBzaW5jZSB0aGV5IGNhbm5vdCBiZSBydW4gYXQgdGhlIHNhbWUgdGlt
-ZS48L0RJVj4NCjxESVY+b2JleGQtMC44LnRhci5neiA8QlI+b2JleC1kYXRhLXNlcnZlci0w
-LjQuMi50YXIuZ3ogPC9ESVY+DQo8RElWPiZuYnNwOzwvRElWPg0KPERJVj48c2lnbiBzaWdu
-aWQ9IjAiPg0KPERJViBzdHlsZT0iRk9OVC1TSVpFOiAxMnB4OyBDT0xPUjogIzkwOTA5MDsg
-Rk9OVC1GQU1JTFk6IEFyaWFsIE5hcnJvdyI+LS0tLS0tLS0tLS0tLS0tLS0tPC9ESVY+DQo8
-RElWPkVtYWlsMTogPEEgaHJlZj0ibWFpbHRvOnllc2lyeWFvQHRvbS5jb20iPnllc2lyeWFv
-QHRvbS5jb208L0E+PC9ESVY+DQo8RElWPkVtYWlsMjogPEEgaHJlZj0ibWFpbHRvOnllc2ly
-eWFvQHFxLmNvbSI+eWVzaXJ5YW9AcXEuY29tPC9BPjwvRElWPg0KPERJVj5NU04gOiA8QSBo
-cmVmPSJtYWlsdG86eWVzaXJ5YW9AaG90bWFpbC5jb20iPnllc2lyeWFvQGhvdG1haWwuY29t
-PC9BPjwvRElWPjwvc2lnbj48L0RJVj4NCjxESVY+PHF6b25lIHNpZ25pZD0iIj48L3F6b25l
-PjwvRElWPg0KPERJVj48dGFvdGFvIHNpZ25pZD0iIj48L3Rhb3Rhbz48L0RJVj4NCjxESVY+
-Jm5ic3A7PC9ESVY+
+	Can anyone have related experience give me some advises?
+	Thanks 
 
-------=_NextPart_4965EC72_0860B8F0_743F5290--
+Best Regards,
+Raymond 
+
