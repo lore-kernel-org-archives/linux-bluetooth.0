@@ -1,31 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Liu, Raymond" <raymond.liu@intel.com>
-To: YAO Ye <yesiryao@qq.com>
-CC: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Fri, 9 Jan 2009 10:05:19 +0800
-Subject: RE: openobex vs. obexd vs. obex-data-server
-Message-ID: <0463F45F3606F4428ED35AC8C709F92E047EC02E@pdsmsx502.ccr.corp.intel.com>
-References: <tencent_35783ED162416CF800F4F938@qq.com>
-In-Reply-To: <tencent_35783ED162416CF800F4F938@qq.com>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+Date: Thu, 8 Jan 2009 14:30:32 -0800
+Message-ID: <35c90d960901081430s5f5d1067pbff846525842e27e@mail.gmail.com>
+Subject: [RFC] Suggest to revert commit 9719f8af (Disconnect when encryption
+	gets disabled) due to role switch issues
+From: Nick Pelly <npelly@google.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi YaoYe
->
->Happy new year, everyone !
->Thx for the great SW -- bluez !
->I am a new user of bluez. My questions is about file transfer based on bluez.
->
->what is the defference between: openobex, obexd, obex-data-server ?
+This original commit drops an L2CAP or RFCOMM connection if encryption
+was requested and the remote side disables encryption.
 
-I think openobex is the implementation of obex protocol, while obexd and obex-data-server is the implementation of the profiles base on obex.
+The problem occurs during Role Switch. Bluetooth 2.0 devices have to
+drop encryption temporarily during the role switch, but when this
+remote side does this we immediately disconnect due to this patch.
+Here is an example:
 
->I have porting bluez4 to my pxa310 handheld platform.
->so, which one is the best/more suit one for me to use ?
->
+2009-01-08 11:17:52.972625 > HCI Event: Encrypt Change (0x08) plen 4
+   status 0x00 handle 1 encrypt 0x00
+2009-01-08 11:17:53.021362 < ACL data: handle 1 flags 0x02 dlen 8
+   L2CAP(d): cid 0x009c len 4 [psm 3]
+     RFCOMM(s): DISC: cr 1 dlci 4 pf 1 ilen 0 fcs 0x77
+2009-01-08 11:17:53.139648 > HCI Event: Role Change (0x12) plen 8
+   status 0x00 bdaddr 00:1A:0E:7E:6B:70 role 0x01
+   Role: Slave
+2009-01-08 11:17:53.142120 > HCI Event: Number of Completed Packets
+(0x13) plen 5
+   handle 1 packets 1
+2009-01-08 11:17:53.165161 < ACL data: handle 1 flags 0x02 dlen 12
+   L2CAP(s): Disconn req: dcid 0x009b scid 0x0040
+2009-01-08 11:17:53.279174 > HCI Event: Encrypt Change (0x08) plen 4
+   status 0x00 handle 1 encrypt 0x01
 
-For a handheld platform, I guess openobex + obexd might be somehow more suitable for you since obexd is aim to be light-weighted to support FTP/PBAP/OPP etc with a single daemon. But it really depends on your own choice.
+(With Bluetooth 2.1 this is solved with the Encryption pause and
+resume LMP command)
 
-Raymond
+Reverting this patch is unfortunate because it leaves us less secure -
+we continue happily even if the remote side drops encryption. In
+practice this does not normally happen. However we cannot ship a HFP
+product with this commit because many CSR headsets like to role
+switch. This will be affecting all bluez users that use LM_ENCRYPT or
+LM_SECURE with devices that role switch and maybe the best approach is
+to also revert this commit in mainline.
+
+The other alternative is to introduce a timer that starts when the
+remote side drops encryption. They then have say 5 seconds to complete
+a role switch and re-establish encryption, otherwise the RFCOMM link
+is dropped. Any other ideas?
+
+Nick
+
+
+
+Here is the commit in question:
+
+commit 9719f8afce34d3d04e884873a8a5e3483e30974c
+Author: Marcel Holtmann <marcel@holtmann.org>
+Date:   Mon Jul 14 20:13:45 2008 +0200
+
+    [Bluetooth] Disconnect when encryption gets disabled
+
+    The Bluetooth specification allows to enable or disable the encryption
+    of an ACL link at any time by either the peer or the remote device. If
+    a L2CAP or RFCOMM connection requested an encrypted link, they will now
+    disconnect that link if the encryption gets disabled. Higher protocols
+    that don't care about encryption (like SDP) are not affected.
+
+    Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
