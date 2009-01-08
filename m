@@ -1,31 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <b014639a0901081044w3a0d6b44gc065bb1289ade64c@mail.gmail.com>
-Date: Thu, 8 Jan 2009 13:44:35 -0500
-From: "Mike Lockwood" <lockwood@android.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Fix a bogus pointer crash that occurred when reconnecting A2DP.
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+From: "=?ISO-8859-1?B?WUFPIFll?=" <yesiryao@qq.com>
+To: "=?ISO-8859-1?B?bGludXgtYmx1ZXRvb3Ro?="
+	<linux-bluetooth@vger.kernel.org>
+Subject: openobex vs. obexd vs. obex-data-server
+Mime-Version: 1.0
+Content-Type: text/plain;
+	charset="ISO-8859-1"
+Date: Thu, 8 Jan 2009 20:16:36 +0800
+Message-ID: <tencent_35783ED162416CF800F4F938@qq.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-commit af5d46b22852f4ec1ca0d7c43c7a7e71292fe334
-Author: Mike Lockwood <lockwood@android.com>
-Date:   Thu Jan 8 13:34:06 2009 -0500
+SGFwcHkgbmV3IHllYXIsIGV2ZXJ5b25lICEgDQpUaHggZm9yIHRoZSBncmVhdCBTVyAtLSBi
+bHVleiAhDQpJIGFtIGEgbmV3IHVzZXIgb2YgYmx1ZXouIE15IHF1ZXN0aW9ucyBpcyBhYm91
+dCBmaWxlIHRyYW5zZmVyIGJhc2VkIG9uIGJsdWV6Lg0KDQp3aGF0IGlzIHRoZSBkZWZmZXJl
+bmNlIGJldHdlZW46IG9wZW5vYmV4LCBvYmV4ZCwgb2JleC1kYXRhLXNlcnZlciA/DQpJIGhh
+dmUgcG9ydGluZyBibHVlejQgdG8gbXkgcHhhMzEwIGhhbmRoZWxkIHBsYXRmb3JtLg0Kc28s
+IHdoaWNoIG9uZSBpcyB0aGUgYmVzdC9tb3JlIHN1aXQgb25lIGZvciBtZSB0byB1c2UgPw0K
+DQotLS0tLS0tLS0tDQpvYmV4IHNlcnZlcnMgYW5kIGNsaWVudHM6IA0KQ2hvb3NlIGp1c3Qg
+b25lIG9mIHRoZXNlIHNpbmNlIHRoZXkgY2Fubm90IGJlIHJ1biBhdCB0aGUgc2FtZSB0aW1l
+Lg0KDQpvYmV4ZC0wLjgudGFyLmd6IA0Kb2JleC1kYXRhLXNlcnZlci0wLjQuMi50YXIuZ3og
 
-    Fix a bogus pointer crash that occurred when reconnecting A2DP.
 
-    Signed-off-by: Mike Lockwood <lockwood@android.com>
-
-diff --git a/audio/unix.c b/audio/unix.c
-index 1e4dd2d..ad31181 100644
---- a/audio/unix.c
-+++ b/audio/unix.c
-@@ -919,6 +919,7 @@ static int handle_a2dp_transport(struct unix_client *client,
-        if (client->caps) {
-                g_slist_foreach(client->caps, (GFunc) g_free, NULL);
-                g_slist_free(client->caps);
-+               client->caps = NULL;
-        }
-
-        media_transport = avdtp_service_cap_new(AVDTP_MEDIA_TRANSPORT,
