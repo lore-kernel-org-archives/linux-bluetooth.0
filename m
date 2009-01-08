@@ -1,23 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <49655A2A.1020709@villagepublishing.com.au>
-Date: Thu, 08 Jan 2009 12:43:06 +1100
-From: David Thornton <david@villagepublishing.com.au>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: clock offset
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 07 Jan 2009 17:23:28 -0800 (PST)
+Message-Id: <20090107.172328.193611931.davem@davemloft.net>
+To: marcel@holtmann.org
+Cc: shemminger@vyatta.com, netdev@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 03/42] bluetooth: driver API update
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <1231293232.14901.13.camel@californication>
+References: <20090107003316.784424362@vyatta.com>
+	<20090107003345.753201945@vyatta.com>
+	<1231293232.14901.13.camel@californication>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+From: Marcel Holtmann <marcel@holtmann.org>
+Date: Wed, 07 Jan 2009 02:53:52 +0100
 
-I know this is a general question, not related to bluez (but to 
-blutooth) and if I should post it here, please - shout me down.
+> > Convert to net_device_ops and use internal net_device_stats in bnep
+> > device. 
+> > 
+> > Note: no need for bnep_net_ioctl since if ioctl is not set, then
+> > dev_ifsioc handles it by returning -EOPNOTSUPP
+> > 
+> > Signed-off-by: Stephen Hemminger <shemminger@vyatta.com>
+> 
+> looks good to me.
+> 
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-its about the clock offset field in an HCI packet that queries another 
-device. If i set the valid flag to 0, does that mean it disregards the 
-clock offset - and i could set  the whole field to zero?
+Applied.
 
-I dont want it to be light speed and optimized, just work (for now...)
+> Dave, I assume you take the whole series in one go, so I leave it up to
+> you to apply.
 
-Thanks
+Yep, thanks.
