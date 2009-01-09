@@ -1,23 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <ac8af0be0901081946k6ef782c1m14079490fd30b68a@mail.gmail.com>
-Date: Fri, 9 Jan 2009 11:46:44 +0800
-From: "Zhao Forrest" <forrest.zhao@gmail.com>
-To: event.riga@gmail.org
-Subject: About HFP Gateway profile patch
-Cc: linux-bluetooth@vger.kernel.org
+From: "Liu, Raymond" <raymond.liu@intel.com>
+To: YAO Ye <yesiryao@qq.com>
+CC: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Fri, 9 Jan 2009 10:05:19 +0800
+Subject: RE: openobex vs. obexd vs. obex-data-server
+Message-ID: <0463F45F3606F4428ED35AC8C709F92E047EC02E@pdsmsx502.ccr.corp.intel.com>
+References: <tencent_35783ED162416CF800F4F938@qq.com>
+In-Reply-To: <tencent_35783ED162416CF800F4F938@qq.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Event,
+Hi YaoYe
+>
+>Happy new year, everyone !
+>Thx for the great SW -- bluez !
+>I am a new user of bluez. My questions is about file transfer based on bluez.
+>
+>what is the defference between: openobex, obexd, obex-data-server ?
 
-I'm working on BlueZ integration for Moblin2.0(http://moblin.org/).
-Your patch for HFP Gateway profile is really a good start and we need
-the support for HFP Gateway profile in BlueZ to do the integration
-work. Could you please share the information of when you plan to push
-this patch into BlueZ? Or do you need our help to push this patch into
-BlueZ?
+I think openobex is the implementation of obex protocol, while obexd and obex-data-server is the implementation of the profiles base on obex.
 
-Thanks,
-Forrest
+>I have porting bluez4 to my pxa310 handheld platform.
+>so, which one is the best/more suit one for me to use ?
+>
+
+For a handheld platform, I guess openobex + obexd might be somehow more suitable for you since obexd is aim to be light-weighted to support FTP/PBAP/OPP etc with a single daemon. But it really depends on your own choice.
+
+Raymond
