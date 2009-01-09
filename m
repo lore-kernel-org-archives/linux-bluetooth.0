@@ -1,36 +1,156 @@
 Return-Path: <cyrus@holtmann.org>
-From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
-To: "ext Marcel Holtmann" <marcel@holtmann.org>
-Subject: Re: [PATCH/RFC] SIMD optimizations for SBC encoder analysis filter
-Date: Fri, 9 Jan 2009 18:50:54 +0200
-Cc: linux-bluetooth@vger.kernel.org
-References: <200812311803.45279.siarhei.siamashka@nokia.com> <200901021807.17443.siarhei.siamashka@nokia.com> <1231210146.13304.15.camel@californication>
-In-Reply-To: <1231210146.13304.15.camel@californication>
+Message-ID: <11f7a7550901090852s30060e38g7c9240731d3a9a4f@mail.gmail.com>
+Date: Fri, 9 Jan 2009 17:52:22 +0100
+From: "Daniele Benucci" <d.benux@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Fwd: Inconsistencies with UUIDs in XML service descriptors
+In-Reply-To: <11f7a7550901090850x4c276806v6c3c4bfad804986f@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="utf-8"
-Message-Id: <200901091850.55032.siarhei.siamashka@nokia.com>
+Content-Type: multipart/mixed;
+	boundary="----=_Part_325318_18071797.1231519942625"
+References: <11f7a7550901090850x4c276806v6c3c4bfad804986f@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tuesday 06 January 2009 04:49:06 ext Marcel Holtmann wrote:
-> > The attached patch contains what I would consider to be a final variant.
-> > MMX support is now complete. It works for both x86 and amd64, has runtime
-> > autodetection of MMX availability, supports 4 and 8 subbands cases. I
-> > also ensured that only original MMX instructions are used (and no SSE or
-> > other later additions), so the code should work fine even on the old
-> > Pentium1 MMX. New MMX optimized functions produce bit identical results
-> > when compared with bluez-4.25 release.
-> >
-> > With this patch applied, new filtering functions are noticeably faster
-> > than than the old ones on x86 (so now they are both faster and have
-> > better quality). Assembly optimizations for the other platforms can be
-> > easily added too.
->
-> can you re-base your patch against the latest tree and re-send the
-> patch.
+------=_Part_325318_18071797.1231519942625
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Yes, I will submit an updated SIMD optimizations patchset in a few days.
+I've noticed a strange behaviour in the last versions of Bluez (at
+least >= 4.19) when retrieving services via the DBus method in
+org.bluez.Device.DiscoverServices:
+the XMLs returned by this DBus call have the "value" attribute of
+_every_ "uuid" element set to "0x0019", for the records with 16-bit
+uuids.
+128-bit uuids are not correctly represented too, seeming to be 4-bytes
+right-shifted.
+When performing service discovery via sdptool with the --xml parameter
+the output is correct.
 
+I'm attaching two examples for the two cases
 
-Best regards,
-Siarhei Siamashka
+I experienced this in Bluez 4.19 shipped with OpenSuse 11.1, and in
+Bluez 4.25 packaged for Ubuntu 8.10 (unofficial) at
+http://ppa.launchpad.net/blueman/. This does not happen in Bluez 4.12
+shipped with Ubuntu 8.10
+
+I'm posting here this report as I didn't find a Bluez bug tracker and
+the bug seems to be distribution-independant
+
+Thanks for your attention
+
+Daniele Benucci
+
+--
+Grabel's Law:
+2 is not equal to 3 -- not even for large values of 2.
+
+------=_Part_325318_18071797.1231519942625
+Content-Type: text/plain; name="BluezBug - UUID16.txt"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_fpr33vui0
+Content-Disposition: attachment; filename="BluezBug - UUID16.txt"
+
+WE1MIG9idGFpbmVkIHdpdGggc2RwdG9vbAo9PT09PT09PT09PT09PT09PT09PT09PT09Cgo8P3ht
+bCB2ZXJzaW9uPSIxLjAiIGVuY29kaW5nPSJVVEYtOCIgPz4KCjxyZWNvcmQ+Cgk8YXR0cmlidXRl
+IGlkPSIweDAwMDAiPgoJCTx1aW50MzIgdmFsdWU9IjB4MDAwMTAwMDUiIC8+Cgk8L2F0dHJpYnV0
+ZT4KCTxhdHRyaWJ1dGUgaWQ9IjB4MDAwMSI+CgkJPHNlcXVlbmNlPgoJCQk8dXVpZCB2YWx1ZT0i
+MHgxMTA1IiAvPgkJCTwtLS0tIE5vdGUgaGVyZQoJCTwvc2VxdWVuY2U+Cgk8L2F0dHJpYnV0ZT4K
+CTxhdHRyaWJ1dGUgaWQ9IjB4MDAwMiI+CgkJPHVpbnQzMiB2YWx1ZT0iMHgwMDAwMDAwNyIgLz4K
+CTwvYXR0cmlidXRlPgoJPGF0dHJpYnV0ZSBpZD0iMHgwMDA0Ij4KCQk8c2VxdWVuY2U+CgkJCTxz
+ZXF1ZW5jZT4KCQkJCTx1dWlkIHZhbHVlPSIweDAxMDAiIC8+CQk8LS0tLSBOb3RlIGhlcmUKCQkJ
+PC9zZXF1ZW5jZT4KCQkJPHNlcXVlbmNlPgoJCQkJPHV1aWQgdmFsdWU9IjB4MDAwMyIgLz4JCTwt
+LS0tIE5vdGUgaGVyZQoJCQkJPHVpbnQ4IHZhbHVlPSIweDA5IiAvPgoJCQk8L3NlcXVlbmNlPgoJ
+CQk8c2VxdWVuY2U+CgkJCQk8dXVpZCB2YWx1ZT0iMHgwMDA4IiAvPgkJPC0tLS0gTm90ZSBoZXJl
+CgkJCTwvc2VxdWVuY2U+CgkJPC9zZXF1ZW5jZT4KCTwvYXR0cmlidXRlPgoJPGF0dHJpYnV0ZSBp
+ZD0iMHgwMDA1Ij4KCQk8c2VxdWVuY2U+CgkJCTx1dWlkIHZhbHVlPSIweDEwMDIiIC8+CQkJPC0t
+LS0gTm90ZSBoZXJlCgkJPC9zZXF1ZW5jZT4KCTwvYXR0cmlidXRlPgoJPGF0dHJpYnV0ZSBpZD0i
+MHgwMDA2Ij4KCQk8c2VxdWVuY2U+CgkJCTx1aW50MTYgdmFsdWU9IjB4NDU0ZSIgLz4KCQkJPHVp
+bnQxNiB2YWx1ZT0iMHgwMDZhIiAvPgoJCQk8dWludDE2IHZhbHVlPSIweDAxMDAiIC8+CgkJPC9z
+ZXF1ZW5jZT4KCTwvYXR0cmlidXRlPgoJPGF0dHJpYnV0ZSBpZD0iMHgwMDA5Ij4KCQk8c2VxdWVu
+Y2U+CgkJCTxzZXF1ZW5jZT4KCQkJCTx1dWlkIHZhbHVlPSIweDExMDUiIC8+CQk8LS0tLSBOb3Rl
+IGhlcmUKCQkJCTx1aW50MTYgdmFsdWU9IjB4MDEwMCIgLz4KCQkJPC9zZXF1ZW5jZT4KCQk8L3Nl
+cXVlbmNlPgoJPC9hdHRyaWJ1dGU+Cgk8YXR0cmlidXRlIGlkPSIweDAxMDAiPgoJCTx0ZXh0IHZh
+bHVlPSJPQkVYIE9iamVjdCBQdXNoIiAvPgoJPC9hdHRyaWJ1dGU+Cgk8YXR0cmlidXRlIGlkPSIw
+eDAzMDMiPgoJCTxzZXF1ZW5jZT4KCQkJPHVpbnQ4IHZhbHVlPSIweGZmIiAvPgoJCTwvc2VxdWVu
+Y2U+Cgk8L2F0dHJpYnV0ZT4KPC9yZWNvcmQ+CgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoKU2FtZSBYTUwgb2J0YWluZWQgd2l0
+aCBEQnVzIERpc2NvdmVyU2VydmljZXMgY2FsbAo9PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09Cgo8P3htbCB2ZXJzaW9uPSIxLjAiIGVuY29kaW5nPSJVVEYt
+OCIgPz4KCjxyZWNvcmQ+Cgk8YXR0cmlidXRlIGlkPSIweDAwMDAiPgoJCTx1aW50MzIgdmFsdWU9
+IjB4MDAwMTAwMDUiIC8+Cgk8L2F0dHJpYnV0ZT4KCTxhdHRyaWJ1dGUgaWQ9IjB4MDAwMSI+CgkJ
+PHNlcXVlbmNlPgoJCQk8dXVpZCB2YWx1ZT0iMHgwMDE5IiAvPgkJCTwtLS0tIE5vdGUgaGVyZQoJ
+CTwvc2VxdWVuY2U+Cgk8L2F0dHJpYnV0ZT4KCTxhdHRyaWJ1dGUgaWQ9IjB4MDAwMiI+CgkJPHVp
+bnQzMiB2YWx1ZT0iMHgwMDAwMDAwNyIgLz4KCTwvYXR0cmlidXRlPgoJPGF0dHJpYnV0ZSBpZD0i
+MHgwMDA0Ij4KCQk8c2VxdWVuY2U+CgkJCTxzZXF1ZW5jZT4KCQkJCTx1dWlkIHZhbHVlPSIweDAw
+MTkiIC8+CQk8LS0tLSBOb3RlIGhlcmUKCQkJPC9zZXF1ZW5jZT4KCQkJPHNlcXVlbmNlPgoJCQkJ
+PHV1aWQgdmFsdWU9IjB4MDAxOSIgLz4JCTwtLS0tIE5vdGUgaGVyZQoJCQkJPHVpbnQ4IHZhbHVl
+PSIweDA5IiAvPgoJCQk8L3NlcXVlbmNlPgoJCQk8c2VxdWVuY2U+CgkJCQk8dXVpZCB2YWx1ZT0i
+MHgwMDE5IiAvPgkJPC0tLS0gTm90ZSBoZXJlCgkJCTwvc2VxdWVuY2U+CgkJPC9zZXF1ZW5jZT4K
+CTwvYXR0cmlidXRlPgoJPGF0dHJpYnV0ZSBpZD0iMHgwMDA1Ij4KCQk8c2VxdWVuY2U+CgkJCTx1
+dWlkIHZhbHVlPSIweDAwMTkiIC8+CQkJPC0tLS0gTm90ZSBoZXJlCgkJPC9zZXF1ZW5jZT4KCTwv
+YXR0cmlidXRlPgoJPGF0dHJpYnV0ZSBpZD0iMHgwMDA2Ij4KCQk8c2VxdWVuY2U+CgkJCTx1aW50
+MTYgdmFsdWU9IjB4NDU0ZSIgLz4KCQkJPHVpbnQxNiB2YWx1ZT0iMHgwMDZhIiAvPgoJCQk8dWlu
+dDE2IHZhbHVlPSIweDAxMDAiIC8+CgkJPC9zZXF1ZW5jZT4KCTwvYXR0cmlidXRlPgoJPGF0dHJp
+YnV0ZSBpZD0iMHgwMDA5Ij4KCQk8c2VxdWVuY2U+CgkJCTxzZXF1ZW5jZT4KCQkJCTx1dWlkIHZh
+bHVlPSIweDAwMTkiIC8+CQk8LS0tLSBOb3RlIGhlcmUKCQkJCTx1aW50MTYgdmFsdWU9IjB4MDEw
+MCIgLz4KCQkJPC9zZXF1ZW5jZT4KCQk8L3NlcXVlbmNlPgoJPC9hdHRyaWJ1dGU+Cgk8YXR0cmli
+dXRlIGlkPSIweDAxMDAiPgoJCTx0ZXh0IHZhbHVlPSJPQkVYIE9iamVjdCBQdXNoIiAvPgoJPC9h
+dHRyaWJ1dGU+Cgk8YXR0cmlidXRlIGlkPSIweDAzMDMiPgoJCTxzZXF1ZW5jZT4KCQkJPHVpbnQ4
+IHZhbHVlPSIweGZmIiAvPgoJCTwvc2VxdWVuY2U+Cgk8L2F0dHJpYnV0ZT4KPC9yZWNvcmQ+Cg==
+
+------=_Part_325318_18071797.1231519942625
+Content-Type: text/plain; name="BluezBug - UUID128.txt"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_fpr344fj1
+Content-Disposition: attachment; filename="BluezBug - UUID128.txt"
+
+WE1MIG9idGFpbmVkIHdpdGggc2RwdG9vbAo9PT09PT09PT09PT09PT09PT09PT09PT09Cgo8P3ht
+bCB2ZXJzaW9uPSIxLjAiIGVuY29kaW5nPSJVVEYtOCIgPz4KCjxyZWNvcmQ+Cgk8YXR0cmlidXRl
+IGlkPSIweDAwMDAiPgoJCTx1aW50MzIgdmFsdWU9IjB4MDAwMTAwMDMiIC8+Cgk8L2F0dHJpYnV0
+ZT4KCTxhdHRyaWJ1dGUgaWQ9IjB4MDAwMSI+CgkJPHNlcXVlbmNlPgoJCQk8dXVpZCB2YWx1ZT0i
+MDAwMDAwMDItMDAwMC0xMDAwLTgwMDAtMDAwMmVlMDAwMDAyIiAvPgkJPC0tLS0gTm90ZSBoZXJl
+CgkJPC9zZXF1ZW5jZT4KCTwvYXR0cmlidXRlPgoJPGF0dHJpYnV0ZSBpZD0iMHgwMDAyIj4KCQk8
+dWludDMyIHZhbHVlPSIweDAwMDAwMDA2IiAvPgoJPC9hdHRyaWJ1dGU+Cgk8YXR0cmlidXRlIGlk
+PSIweDAwMDQiPgoJCTxzZXF1ZW5jZT4KCQkJPHNlcXVlbmNlPgoJCQkJPHV1aWQgdmFsdWU9IjB4
+MDEwMCIgLz4JCQkJCTwtLS0tIE5vdGUgaGVyZQoJCQk8L3NlcXVlbmNlPgoJCQk8c2VxdWVuY2U+
+CgkJCQk8dXVpZCB2YWx1ZT0iMHgwMDAzIiAvPgkJCQkJPC0tLS0gTm90ZSBoZXJlCgkJCQk8dWlu
+dDggdmFsdWU9IjB4MGIiIC8+CgkJCTwvc2VxdWVuY2U+CgkJCTxzZXF1ZW5jZT4KCQkJCTx1dWlk
+IHZhbHVlPSIweDAwMDgiIC8+CQkJCQk8LS0tLSBOb3RlIGhlcmUKCQkJPC9zZXF1ZW5jZT4KCQk8
+L3NlcXVlbmNlPgoJPC9hdHRyaWJ1dGU+Cgk8YXR0cmlidXRlIGlkPSIweDAwMDUiPgoJCTxzZXF1
+ZW5jZT4KCQkJPHV1aWQgdmFsdWU9IjB4MTAwMiIgLz4JCQkJCQk8LS0tLSBOb3RlIGhlcmUKCQk8
+L3NlcXVlbmNlPgoJPC9hdHRyaWJ1dGU+Cgk8YXR0cmlidXRlIGlkPSIweDAwMDYiPgoJCTxzZXF1
+ZW5jZT4KCQkJPHVpbnQxNiB2YWx1ZT0iMHg0NTRlIiAvPgoJCQk8dWludDE2IHZhbHVlPSIweDAw
+NmEiIC8+CgkJCTx1aW50MTYgdmFsdWU9IjB4MDEwMCIgLz4KCQk8L3NlcXVlbmNlPgoJPC9hdHRy
+aWJ1dGU+Cgk8YXR0cmlidXRlIGlkPSIweDAwMDkiPgoJCTxzZXF1ZW5jZT4KCQkJPHNlcXVlbmNl
+PgoJCQkJPHV1aWQgdmFsdWU9IjAwMDAwMDAyLTAwMDAtMTAwMC04MDAwLTAwMDJlZTAwMDAwMiIg
+Lz4JPC0tLS0gTm90ZSBoZXJlCgkJCQk8dWludDE2IHZhbHVlPSIweDAxMDAiIC8+CgkJCTwvc2Vx
+dWVuY2U+CgkJPC9zZXF1ZW5jZT4KCTwvYXR0cmlidXRlPgoJPGF0dHJpYnV0ZSBpZD0iMHgwMTAw
+Ij4KCQk8dGV4dCB2YWx1ZT0iU3luY01MQ2xpZW50IiAvPgoJPC9hdHRyaWJ1dGU+CjwvcmVjb3Jk
+PgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0KClNhbWUgWE1MIG9idGFpbmVkIHdpdGggREJ1cyBEaXNjb3ZlclNlcnZpY2VzIGNh
+bGwKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQoKPD94
+bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiID8+Cgo8cmVjb3JkPgoJPGF0dHJpYnV0
+ZSBpZD0iMHgwMDAwIj4KCQk8dWludDMyIHZhbHVlPSIweDAwMDEwMDAzIiAvPgoJPC9hdHRyaWJ1
+dGU+Cgk8YXR0cmlidXRlIGlkPSIweDAwMDEiPgoJCTxzZXF1ZW5jZT4KCQkJPHV1aWQgdmFsdWU9
+IjFjMDAwMDAwLTAwMDAtMDAwMi0wMDAwLTEwMDA4MDAwMDAwMiIgLz4JCTwtLS0tIE5vdGUgaGVy
+ZQoJCTwvc2VxdWVuY2U+Cgk8L2F0dHJpYnV0ZT4KCTxhdHRyaWJ1dGUgaWQ9IjB4MDAwMiI+CgkJ
+PHVpbnQzMiB2YWx1ZT0iMHgwMDAwMDAwNiIgLz4KCTwvYXR0cmlidXRlPgoJPGF0dHJpYnV0ZSBp
+ZD0iMHgwMDA0Ij4KCQk8c2VxdWVuY2U+CgkJCTxzZXF1ZW5jZT4KCQkJCTx1dWlkIHZhbHVlPSIw
+eDAwMTkiIC8+CQkJCQk8LS0tLSBOb3RlIGhlcmUKCQkJPC9zZXF1ZW5jZT4KCQkJPHNlcXVlbmNl
+PgoJCQkJPHV1aWQgdmFsdWU9IjB4MDAxOSIgLz4JCQkJCTwtLS0tIE5vdGUgaGVyZQoJCQkJPHVp
+bnQ4IHZhbHVlPSIweDBiIiAvPgoJCQk8L3NlcXVlbmNlPgoJCQk8c2VxdWVuY2U+CgkJCQk8dXVp
+ZCB2YWx1ZT0iMHgwMDE5IiAvPgkJCQkJPC0tLS0gTm90ZSBoZXJlCgkJCTwvc2VxdWVuY2U+CgkJ
+PC9zZXF1ZW5jZT4KCTwvYXR0cmlidXRlPgoJPGF0dHJpYnV0ZSBpZD0iMHgwMDA1Ij4KCQk8c2Vx
+dWVuY2U+CgkJCTx1dWlkIHZhbHVlPSIweDAwMTkiIC8+CQkJCQkJPC0tLS0gTm90ZSBoZXJlCgkJ
+PC9zZXF1ZW5jZT4KCTwvYXR0cmlidXRlPgoJPGF0dHJpYnV0ZSBpZD0iMHgwMDA2Ij4KCQk8c2Vx
+dWVuY2U+CgkJCTx1aW50MTYgdmFsdWU9IjB4NDU0ZSIgLz4KCQkJPHVpbnQxNiB2YWx1ZT0iMHgw
+MDZhIiAvPgoJCQk8dWludDE2IHZhbHVlPSIweDAxMDAiIC8+CgkJPC9zZXF1ZW5jZT4KCTwvYXR0
+cmlidXRlPgoJPGF0dHJpYnV0ZSBpZD0iMHgwMDA5Ij4KCQk8c2VxdWVuY2U+CgkJCTxzZXF1ZW5j
+ZT4KCQkJCTx1dWlkIHZhbHVlPSIxYzAwMDAwMC0wMDAwLTAwMDItMDAwMC0xMDAwODAwMDAwMDIi
+IC8+CTwtLS0tIE5vdGUgaGVyZQoJCQkJPHVpbnQxNiB2YWx1ZT0iMHgwMTAwIiAvPgoJCQk8L3Nl
+cXVlbmNlPgoJCTwvc2VxdWVuY2U+Cgk8L2F0dHJpYnV0ZT4KCTxhdHRyaWJ1dGUgaWQ9IjB4MDEw
+MCI+CgkJPHRleHQgdmFsdWU9IlN5bmNNTENsaWVudCIgLz4KCTwvYXR0cmlidXRlPgo8L3JlY29y
+ZD4=
+------=_Part_325318_18071797.1231519942625--
