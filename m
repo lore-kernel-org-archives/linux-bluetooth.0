@@ -1,56 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <7752.83.160.35.87.1231526092.squirrel@webmail.xs4all.nl>
-Date: Fri, 9 Jan 2009 19:34:52 +0100 (CET)
-Subject: Re: About HFP Gateway profile patch
-From: "menno" <jongerenchaos@zonnet.nl>
-To: "event" <event.riga@gmail.com>
-Cc: "Zhao Forrest" <forrest.zhao@gmail.com>,
-	linux-bluetooth@vger.kernel.org
+From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
+To: "ext Marcel Holtmann" <marcel@holtmann.org>
+Subject: Re: [PATCH/RFC] SIMD optimizations for SBC encoder analysis filter
+Date: Fri, 9 Jan 2009 18:50:54 +0200
+Cc: linux-bluetooth@vger.kernel.org
+References: <200812311803.45279.siarhei.siamashka@nokia.com> <200901021807.17443.siarhei.siamashka@nokia.com> <1231210146.13304.15.camel@californication>
+In-Reply-To: <1231210146.13304.15.camel@californication>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200901091850.55032.siarhei.siamashka@nokia.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Is it possible that this problem (to use this function 100%) is in
-relation with this bug (big latency with audio)?
-http://bugs.digium.com/view.php?id=12567
-
-
-> On 2009-01-09, Zhao Forrest <forrest.zhao@gmail.com> wrote:
->> Hi Event,
->>
->> I'm working on BlueZ integration for Moblin2.0(http://moblin.org/).
->> Your patch for HFP Gateway profile is really a good start and we need
->> the support for HFP Gateway profile in BlueZ to do the integration
->> work. Could you please share the information of when you plan to push
->> this patch into BlueZ? Or do you need our help to push this patch into
->> BlueZ?
->>
->> Thanks,
->> Forrest
->> --
->> To unsubscribe from this list: send the line "unsubscribe
->> linux-bluetooth"
->> in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
+On Tuesday 06 January 2009 04:49:06 ext Marcel Holtmann wrote:
+> > The attached patch contains what I would consider to be a final variant.
+> > MMX support is now complete. It works for both x86 and amd64, has runtime
+> > autodetection of MMX availability, supports 4 and 8 subbands cases. I
+> > also ensured that only original MMX instructions are used (and no SSE or
+> > other later additions), so the code should work fine even on the old
+> > Pentium1 MMX. New MMX optimized functions produce bit identical results
+> > when compared with bluez-4.25 release.
+> >
+> > With this patch applied, new filtering functions are noticeably faster
+> > than than the old ones on x86 (so now they are both faster and have
+> > better quality). Assembly optimizations for the other platforms can be
+> > easily added too.
 >
-> Hello Forrest,
->
-> The only thing which is missing for basic part is little
-> infrastructure support for voice data transfer. I hope I can do it in
-> no more then 2-3 weeks.
->
-> --
-> Vale,
-> Leonid Movshovich
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+> can you re-base your patch against the latest tree and re-send the
+> patch.
+
+Yes, I will submit an updated SIMD optimizations patchset in a few days.
 
 
-
+Best regards,
+Siarhei Siamashka
