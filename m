@@ -1,51 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <49696D00.9030604@gmail.com>
-Date: Sun, 11 Jan 2009 06:52:32 +0300
-From: Ilya Rubtsov <lusyaru@gmail.com>
+Date: Sat, 10 Jan 2009 17:59:59 +0000 (GMT)
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: "packet types" wrong in libbluetooth
+In-Reply-To: <1231604005.5229.5.camel@californication>
+References: <1231595402.312160.19752.nullmailer@galant.ukfsn.org>
+ <1231597284.5229.2.camel@californication>  <1231603296.653256.942.nullmailer@galant.ukfsn.org>
+ <1231604005.5229.5.camel@californication>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: app doesn't recieve signal DeviceDisappeared
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Message-Id: <1231610399.472890.11276.nullmailer@galant.ukfsn.org>
+From: Iain Hibbert <plunky@rya-online.net>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
+On Sat, 10 Jan 2009, Marcel Holtmann wrote:
+> the Create Connection displays the actual bits set. And that is how it
+> suppose to be. The above line means EDR disabled. You set the bitmask
+> and that the meaning of some bits is disabled instead of enabled is a
+> different story.
 
-Excuse me for my English.
+Well I see what you are saying
 
-I need help with using Bluez and dbus. Here is my small program in Python:
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+    bdaddr 00:19:63:B4:99:17 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
 
-------------
+The actual bitwise value is clearly shown as "0xcc18". That the human
+readable output does not show the correct meaning by design seems weird.
 
-import dbus
-import dbus.glib
-import gobject
-
-def device_found(addr, values):
-	print 'Found:', addr
-
-def device_disapp(addr):    
-	print 'Disappeared:', addr
-
-bus = dbus.SystemBus()
-obj = bus.get_object('org.bluez', '/org/bluez/hci0')
-adapter = dbus.Interface(obj, 'org.bluez.Adapter')
-adapter.connect_to_signal('DeviceFound', device_found)
-adapter.connect_to_signal('DeviceDisappeared', device_disapp)
-
-adapter.StartDiscovery()
-
-gobject.threads_init()
-dbus.glib.init_threads()
-main_loop = gobject.MainLoop()
-main_loop.run()
-
-
------------
-
-And I have problem with DeviceDisappeared signal. I run program, then it 
-finds my bluetooth enabled phone and prints it's address every ~10 
-seconds (periodical discovery). Than I turn off bluetooth in phone, but 
-Bluez doesn't send signal 'DeviceDisappeared', so program doesn't print 
-"Disappeared: ...". What's wrong in my program? Do I have 
-misunderstanding of Bluez Adapter API?
+(imho of course :)
+iain
