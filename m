@@ -1,29 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [RFC] Some kernel changes
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Ville Tervo <ville.tervo@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	ext Nick Pelly <npelly@google.com>, johan.hedberg@nokia.com
-In-Reply-To: <496895AB.4050902@nokia.com>
-References: <496895AB.4050902@nokia.com>
-Content-Type: text/plain
-Date: Sat, 10 Jan 2009 15:18:18 +0100
-Message-Id: <1231597098.5229.0.camel@californication>
-Mime-Version: 1.0
+Date: Sat, 10 Jan 2009 13:50:01 +0000 (GMT)
+To: linux-bluetooth@vger.kernel.org
+Subject: "packet types" wrong in libbluetooth
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Message-Id: <1231595402.312160.19752.nullmailer@galant.ukfsn.org>
+From: Iain Hibbert <plunky@rya-online.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ville,
+Hi,
 
-> Here is set of unclean patches for discussion. These are still untested 
-> and contain issues, but I would like to know if we should continue with 
-> these or change something radically. Also commit messages are somewhat 
-> misleading in some places.
+The HCI packet type functions ptypetostr() and strtoptype() in lib/hci.c
+don't work correctly. This is because the HCI spec is messed up wrt the 2
+and 3 Mbps packet types, which are indicated by inverted bit logic (see
+"Create Connection Command" in core spec document)
 
-any reason why patch 0003 is missing?
+I think (you might like to verify that) that the patch below will calm
+this hienous situation before anybody needs to call the cops.
 
-Regards
+regards,
+iain
 
-Marcel
+--- lib/hci.c.orig	2009-01-09 20:11:59.000000000 +0000
++++ lib/hci.c	2009-01-09 20:12:02.000000000 +0000
+@@ -232,12 +232,18 @@
 
+ char *hci_ptypetostr(unsigned int ptype)
+ {
++	ptype ^= (HCI_2DH1|HCI_2DH3|HCI_2DH5|HCI_3DH1|HCI_3DH3|HCI_3DH5);
+ 	return hci_bit2str(pkt_type_map, ptype);
+ }
 
+ int hci_strtoptype(char *str, unsigned int *val)
+ {
+-	return hci_str2bit(pkt_type_map, str, val);
++
++	if (hci_str2bit(pkt_type_map, str, val) == 0)
++		return 0;
++
++	*val ^= (HCI_2DH1|HCI_2DH3|HCI_2DH5|HCI_3DH1|HCI_3DH3|HCI_3DH5);
++	return 1;
+ }
+
+ char *hci_scoptypetostr(unsigned int ptype)
