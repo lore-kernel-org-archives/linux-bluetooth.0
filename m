@@ -1,27 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <664d43d60901100347ve9c7c42r4d47e3b7e52ce2ee@mail.gmail.com>
+Date: Sat, 10 Jan 2009 13:47:35 +0200
+From: event <event.riga@gmail.com>
+To: menno <jongerenchaos@zonnet.nl>
+Subject: Re: About HFP Gateway profile patch
+Cc: "Zhao Forrest" <forrest.zhao@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+In-Reply-To: <7752.83.160.35.87.1231526092.squirrel@webmail.xs4all.nl>
 MIME-Version: 1.0
-In-Reply-To: <11f7a7550901090852s30060e38g7c9240731d3a9a4f@mail.gmail.com>
-References: <11f7a7550901090850x4c276806v6c3c4bfad804986f@mail.gmail.com>
-	 <11f7a7550901090852s30060e38g7c9240731d3a9a4f@mail.gmail.com>
-Date: Sat, 10 Jan 2009 13:02:46 +0100
-Message-ID: <11f7a7550901100402o790bd614ud46a613e2dce1dbd@mail.gmail.com>
-Subject: Re: Inconsistencies with UUIDs in XML service descriptors
-From: Daniele Benucci <d.benux@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
+References: <7752.83.160.35.87.1231526092.squirrel@webmail.xs4all.nl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-2009/1/9 Daniele Benucci <d.benux@gmail.com>
-> I've noticed a strange behaviour in the last versions of Bluez (at
-> least >= 4.19) when retrieving services via the DBus method in
-> org.bluez.Device.DiscoverServices:
+On 2009-01-09, menno <jongerenchaos@zonnet.nl> wrote:
+> Is it possible that this problem (to use this function 100%) is in
+> relation with this bug (big latency with audio)?
+> http://bugs.digium.com/view.php?id=12567
+>
+>
+>> On 2009-01-09, Zhao Forrest <forrest.zhao@gmail.com> wrote:
+>>> Hi Event,
+>>>
+>>> I'm working on BlueZ integration for Moblin2.0(http://moblin.org/).
+>>> Your patch for HFP Gateway profile is really a good start and we need
+>>> the support for HFP Gateway profile in BlueZ to do the integration
+>>> work. Could you please share the information of when you plan to push
+>>> this patch into BlueZ? Or do you need our help to push this patch into
+>>> BlueZ?
+>>>
+>>> Thanks,
+>>> Forrest
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe
+>>> linux-bluetooth"
+>>> in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>>
+>>
+>> Hello Forrest,
+>>
+>> The only thing which is missing for basic part is little
+>> infrastructure support for voice data transfer. I hope I can do it in
+>> no more then 2-3 weeks.
+>>
+>> --
+>> Vale,
+>> Leonid Movshovich
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+>> in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>
+>
+>
+>
 
-I compiled 4.18 from source and the result of DiscoverServices reports
-the correct UUIDs both for 16-bit and 128-bit
+Hi menno,
 
-Daniele Benucci
+The implementation could suffer from the bug you mentioined. But i'm
+currently really far for such tests.
 
---
-Grabel's Law:
-2 is not equal to 3 -- not even for large values of 2.
+Vale,
+Leonid Movshovich
