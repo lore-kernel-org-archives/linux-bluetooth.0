@@ -1,52 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Li, Zhigang" <zhigang.li@intel.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Tue, 13 Jan 2009 10:43:58 +0800
-Subject: Question for PAN connection
-Message-ID: <B94C62E7C2870743865418621F040C1303CEBFD8@pdsmsx502.ccr.corp.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+Message-ID: <2d5a2c100901121247m6b689a5cm2ec72cbf87314368@mail.gmail.com>
+Date: Mon, 12 Jan 2009 17:47:17 -0300
+From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+To: "Johan Hedberg" <johan.hedberg@gmail.com>
+Subject: Re: Inconsistencies with UUIDs in XML service descriptors
+Cc: "BlueZ development" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <25F32EEE-D3D4-473F-8B8D-7447B2C024B5@gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <11f7a7550901090850x4c276806v6c3c4bfad804986f@mail.gmail.com>
+	 <11f7a7550901090852s30060e38g7c9240731d3a9a4f@mail.gmail.com>
+	 <11f7a7550901100402o790bd614ud46a613e2dce1dbd@mail.gmail.com>
+	 <20090110124119.GA20941@localhost>
+	 <11f7a7550901120618r84faa0dwd1e1234bc3dfe63@mail.gmail.com>
+	 <25F32EEE-D3D4-473F-8B8D-7447B2C024B5@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-HI all,
+Hi,
 
-There are some problem in my PAN connection can somebody tell where is wrong and show the right step.
+I fix has been pushed upstream, thanks for reporting it.
 
-1, NAP Server side
-
-  Pand - M ( there was strange behavior and the result look like pand -h ) Same result in upstream.  Maybe it's a bug
-
-So only thing I have to change it by hciconfig 
-
-Pand -s -r NAP
-
-Pand -c [target device address] --service NAP
- 
-
-I wrote a dhclient script at /etc/sysconfig/network-script/
-
-DEVICE=bnep0
-
-BOOTPROTO=dhcp
-
-ONBOOT=no
-
-
-Also I modified the network.conf file to use default interface
-
-2, PANU side
-
-Pand -c [server bdaddr] - service PANU
-
-3, pand -show 
-
-  Nothing display
-
-Ifconfig bnep0 
-
-   Error report device not found
-
-Thanks
-
-
+-- 
+Luiz Augusto von Dentz
+Engenheiro de Computação
