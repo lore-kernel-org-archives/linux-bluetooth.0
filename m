@@ -1,25 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: "=?ISO-8859-1?B?WUFPIFll?=" <yesiryao@qq.com>
-To: "=?ISO-8859-1?B?bGludXgtYmx1ZXRvb3Ro?="
+From: "Kartikey Parmar" <Kartikey.Parmar@Matrixtelesol.com>
+To: <marcel@holtmann.org>,
 	<linux-bluetooth@vger.kernel.org>
-Subject: define of DBUS_SYSTEM_CONFIG_FILE ?
-Mime-Version: 1.0
+Cc: <kartikey.parmar@matrixtelesol.com>
+Subject: Urgent: Error in BlueZ-4.26 installation
+Date: Mon, 12 Jan 2009 12:08:33 +0530
+MIME-Version: 1.0
 Content-Type: text/plain;
-	charset="ISO-8859-1"
-Date: Mon, 12 Jan 2009 15:56:09 +0800
-Message-ID: <tencent_4270E83E57935D5B5D5706A2@qq.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+	charset="us-ascii"
+Message-Id: <20090112063804.7D94B8B547@mail.holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-aGksIGJsdWV6IHVzZXJzOg0KICAgICBmb3Igc29tZSByZWFzb24sIGkgbmVlZCB0byBjaGFu
-Z2UgdGhlIGRlZmluZSBvZiBEQlVTX1NZU1RFTV9DT05GSUdfRklMRSwgYnV0IGkgY2FuJ3Qg
-ZmluZCB3aGVyZSBpdCBpcyBkZWZpbmVkIGluIHRoZSBzb3VyY2UgY29kZSBvZiBibHVlei9k
-YnVzL2RidXMtZ2xpYiwgZXRjLg0KDQpjb3VsZCB5b3UgdGVsbCBtZSBzb21lIGluZm8gYWJ1
-b3V0IERCVVNfU1lTVEVNX0NPTkZJR19GSUxFID8NCnRoYW5rcyBhIGxvdCENCg0KLy9mb2xs
-b3dpbmcgaXMgdGhlIHNvdXJjZSBjb2RlIGluIGRidXMvZGJ1cy9kYnVzLXN5c2RlcHMtdW5p
-eC5jDQovL0RCVVNfU1lTVEVNX0NPTkZJR19GSUxFIGRlZmF1bHQgc2V0IHRvICJweGFsaW51
-eC9yZWwvaG9zdC9ldGMvZGJ1cy0xL3N5c3RlbS5jb25mIg0KZGJ1c19ib29sX3QgX2RidXNf
-YXBwZW5kX3N5c3RlbV9jb25maWdfZmlsZSAoREJ1c1N0cmluZyAqc3RyKQ0Kew0KICAgICAg
-cmV0dXJuIF9kYnVzX3N0cmluZ19hcHBlbmQgKHN0ciwgREJVU19TWVNURU1fQ09ORklHX0ZJ
-TEUpOw0KfQ==
 
+Dear Sir / Madam
+
+ I have downloaded the latest bluez stack release (bluez-4.26.tar.gz) from
+ur official website.
+
+While configuring, it does not show any error but when I write command "Make
+&& Make Install" it gives me below mentioned error and the compilation &
+installation procedure terminates here.
+
+
+============================================================================
+=========================
+
+gstrtpsbcpay.c: In Function 'gst_rtp_sbc_pay_flush_buffers'
+
+gstrtpsbcpay.c:201: Warning: Implicit declaration of function
+'get_adapter_copy'
+
+gstrtpsbcpay.c: In Function 'gst_rtp_sbc_pay_class_init':
+
+gstrtpsbcpay.c:288: error: 'GstBaseRTPPaylocalClass' has no member named
+'handle_event'
+
+make[3]: ***[libgstbluetooth_la_gstrtpsbcpay.lo] Error1
+
+make[3]: Leaving directory 'bluez-4.26/audio'
+
+make[2]: ***[all] Error2
+
+make[2]: Leaving directory 'bluez-4.26/audio'
+
+make[1]: ***[all_recursive] Error1
+
+make[1]: Leaving directory 'bluez-4.26'
+
+make: ***[all] Error2
+
+ 
+============================================================================
+=========================
+
+Kindly guide me through, wht steps I need to follow to resolve this error?
+
+Pls reply me as early as possible so I can finish the installation and work
+on the latest bluez stack.
+
+Awaiting for reply.
+
+Regards,
+Kartikey Parmar
+R&D Software Engineer
+Matrix Telecom Pvt Ltd
+Baroda - 390010 (Gujarat) India
+(0) +91-265-2630555 Ext: 340
