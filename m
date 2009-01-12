@@ -1,34 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20090110124119.GA20941@localhost>
-References: <11f7a7550901090850x4c276806v6c3c4bfad804986f@mail.gmail.com>
-	 <11f7a7550901090852s30060e38g7c9240731d3a9a4f@mail.gmail.com>
-	 <11f7a7550901100402o790bd614ud46a613e2dce1dbd@mail.gmail.com>
-	 <20090110124119.GA20941@localhost>
-Date: Mon, 12 Jan 2009 15:18:55 +0100
-Message-ID: <11f7a7550901120618r84faa0dwd1e1234bc3dfe63@mail.gmail.com>
-Subject: Re: Inconsistencies with UUIDs in XML service descriptors
-From: Daniele Benucci <d.benux@gmail.com>
-To: Johan Hedberg <johan.hedberg@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [RFC] Some kernel changes
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Ville Tervo <ville.tervo@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	ext Nick Pelly <npelly@google.com>, johan.hedberg@nokia.com
+In-Reply-To: <496895AB.4050902@nokia.com>
+References: <496895AB.4050902@nokia.com>
+Content-Type: text/plain
+Date: Mon, 12 Jan 2009 14:53:33 +0100
+Message-Id: <1231768413.23749.1.camel@californication>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-2009/1/10 Johan Hedberg <johan.hedberg@nokia.com>:
-> Could you perhaps try to use git bisect
-> to determine the exact patch that causes the bug?
+Hi Ville,
 
-According to git-bisect commit introducing the bug is
+> Here is set of unclean patches for discussion. These are still untested 
+> and contain issues, but I would like to know if we should continue with 
+> these or change something radically. Also commit messages are somewhat 
+> misleading in some places.
+> 
+> Basically idea is to implement connection rejection support for l2cap 
+> and rfcomm sockets. IOW possibility to check initiator bd-address and 
+> ask for authorization before accepting connection.
+> 
+> Other goal is to fix encryption and authentication levels to fulfill 2.1 
+> requirements.
 
-204180c7dc2e20b9b701275a3fefb52707720f54
-
-(Make use of sdp_copy_record.)
+so I pushed my re-worked and pending patches to bluetooth-testing.git
+now. This adds support for BT_DEFER_SETUP and BT_SECURITY (only the
+logic and not the actual socket option).
 
 Regards
 
-Daniele.
+Marcel
 
--- 
-Grabel's Law:
-2 is not equal to 3 -- not even for large values of 2.
+
