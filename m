@@ -1,29 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <a172fe730901120058g49333ea7o2e07f34ab0e4f4d6@mail.gmail.com>
-References: <a172fe730901120058g49333ea7o2e07f34ab0e4f4d6@mail.gmail.com>
-Date: Mon, 12 Jan 2009 17:08:02 +0800
-Message-ID: <a172fe730901120108n27b21584ydec4107cf8b7f469@mail.gmail.com>
-Subject: disconnect incoming ACL connection
-From: =?GB2312?B?seXA2g==?= <mykofzone@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: "=?ISO-8859-1?B?WUFPIFll?=" <yesiryao@qq.com>
+To: "=?ISO-8859-1?B?bGludXgtYmx1ZXRvb3Ro?="
+	<linux-bluetooth@vger.kernel.org>
+Subject: define of DBUS_SYSTEM_CONFIG_FILE ?
+Mime-Version: 1.0
+Content-Type: text/plain;
+	charset="ISO-8859-1"
+Date: Mon, 12 Jan 2009 15:56:09 +0800
+Message-ID: <tencent_4270E83E57935D5B5D5706A2@qq.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
-    I'm debugging Qtopia bluetooth in my EVB, and found this issue:
-    If it is a incoming HFP connection, after pressed "Disconnect
-HFP", the Qtopia only release rfcomm device and disconnect rfcomm
-connection, and the ACL incoming connection can't be
-disconnected(check this by 'hcitool con'). Is this a bug or something
-else? Thanks. And happy new year!
-    My develop environment:
-    kernel : 2.6.18.8 + some patches
-    BlueZ : 3.26
-    BT HW : STLC2500
-    Headset : iTech
+aGksIGJsdWV6IHVzZXJzOg0KICAgICBmb3Igc29tZSByZWFzb24sIGkgbmVlZCB0byBjaGFu
+Z2UgdGhlIGRlZmluZSBvZiBEQlVTX1NZU1RFTV9DT05GSUdfRklMRSwgYnV0IGkgY2FuJ3Qg
+ZmluZCB3aGVyZSBpdCBpcyBkZWZpbmVkIGluIHRoZSBzb3VyY2UgY29kZSBvZiBibHVlei9k
+YnVzL2RidXMtZ2xpYiwgZXRjLg0KDQpjb3VsZCB5b3UgdGVsbCBtZSBzb21lIGluZm8gYWJ1
+b3V0IERCVVNfU1lTVEVNX0NPTkZJR19GSUxFID8NCnRoYW5rcyBhIGxvdCENCg0KLy9mb2xs
+b3dpbmcgaXMgdGhlIHNvdXJjZSBjb2RlIGluIGRidXMvZGJ1cy9kYnVzLXN5c2RlcHMtdW5p
+eC5jDQovL0RCVVNfU1lTVEVNX0NPTkZJR19GSUxFIGRlZmF1bHQgc2V0IHRvICJweGFsaW51
+eC9yZWwvaG9zdC9ldGMvZGJ1cy0xL3N5c3RlbS5jb25mIg0KZGJ1c19ib29sX3QgX2RidXNf
+YXBwZW5kX3N5c3RlbV9jb25maWdfZmlsZSAoREJ1c1N0cmluZyAqc3RyKQ0Kew0KICAgICAg
+cmV0dXJuIF9kYnVzX3N0cmluZ19hcHBlbmQgKHN0ciwgREJVU19TWVNURU1fQ09ORklHX0ZJ
+TEUpOw0KfQ==
 
-BR.
-LeiBian
-2008-12-31
