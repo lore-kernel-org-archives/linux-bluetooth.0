@@ -1,43 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1231768413.23749.1.camel@californication>
-References: <496895AB.4050902@nokia.com>
-	 <1231768413.23749.1.camel@californication>
-Date: Mon, 12 Jan 2009 09:15:10 -0800
-Message-ID: <35c90d960901120915g76235db9ra480cf3431d3025@mail.gmail.com>
-Subject: Re: [RFC] Some kernel changes
-From: Nick Pelly <npelly@google.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Ville Tervo <ville.tervo@nokia.com>, linux-bluetooth@vger.kernel.org,
-        johan.hedberg@nokia.com
-Content-Type: text/plain; charset=ISO-8859-1
+Message-Id: <25F32EEE-D3D4-473F-8B8D-7447B2C024B5@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <11f7a7550901120618r84faa0dwd1e1234bc3dfe63@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
+Mime-Version: 1.0 (Apple Message framework v930.3)
+Subject: Re: Inconsistencies with UUIDs in XML service descriptors
+Date: Mon, 12 Jan 2009 15:32:33 +0100
+References: <11f7a7550901090850x4c276806v6c3c4bfad804986f@mail.gmail.com> <11f7a7550901090852s30060e38g7c9240731d3a9a4f@mail.gmail.com> <11f7a7550901100402o790bd614ud46a613e2dce1dbd@mail.gmail.com> <20090110124119.GA20941@localhost> <11f7a7550901120618r84faa0dwd1e1234bc3dfe63@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jan 12, 2009 at 5:53 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Ville,
+Hi Daniele,
+
+On Jan 12, 2009, at 15:18, Daniele Benucci wrote:
+> 2009/1/10 Johan Hedberg <johan.hedberg@nokia.com>:
+>> Could you perhaps try to use git bisect
+>> to determine the exact patch that causes the bug?
 >
->> Here is set of unclean patches for discussion. These are still untested
->> and contain issues, but I would like to know if we should continue with
->> these or change something radically. Also commit messages are somewhat
->> misleading in some places.
->>
->> Basically idea is to implement connection rejection support for l2cap
->> and rfcomm sockets. IOW possibility to check initiator bd-address and
->> ask for authorization before accepting connection.
->>
->> Other goal is to fix encryption and authentication levels to fulfill 2.1
->> requirements.
+> According to git-bisect commit introducing the bug is
 >
-> so I pushed my re-worked and pending patches to bluetooth-testing.git
-> now. This adds support for BT_DEFER_SETUP and BT_SECURITY (only the
-> logic and not the actual socket option).
+> 204180c7dc2e20b9b701275a3fefb52707720f54
+>
+> (Make use of sdp_copy_record.)
 
-Ville: thanks for the patches, pausing RFCOMM while encryption is
-disabled is a nice fix.
+Thanks a lot! This will really help in investigating and fixing the  
+issue. We'll most likely have it fixed for the next BlueZ release  
+(Luiz, who authored the sdp_copy_record function, is now looking into  
+it).
 
-I imagine that if encryption is not quickly re-established we need to
-drop the RFCOMM link rather than leaving it paused though.
-
-We will do some testing of the current rfcomm-pause patches.
-
-Nick
+Johan
