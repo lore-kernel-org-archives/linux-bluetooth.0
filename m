@@ -1,26 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <2d5a2c100901121247m6b689a5cm2ec72cbf87314368@mail.gmail.com>
-Date: Mon, 12 Jan 2009 17:47:17 -0300
-From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-To: "Johan Hedberg" <johan.hedberg@gmail.com>
-Subject: Re: Inconsistencies with UUIDs in XML service descriptors
-Cc: "BlueZ development" <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <25F32EEE-D3D4-473F-8B8D-7447B2C024B5@gmail.com>
 MIME-Version: 1.0
+In-Reply-To: <1231768413.23749.1.camel@californication>
+References: <496895AB.4050902@nokia.com>
+	 <1231768413.23749.1.camel@californication>
+Date: Mon, 12 Jan 2009 09:15:10 -0800
+Message-ID: <35c90d960901120915g76235db9ra480cf3431d3025@mail.gmail.com>
+Subject: Re: [RFC] Some kernel changes
+From: Nick Pelly <npelly@google.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Ville Tervo <ville.tervo@nokia.com>, linux-bluetooth@vger.kernel.org,
+        johan.hedberg@nokia.com
 Content-Type: text/plain; charset=ISO-8859-1
-References: <11f7a7550901090850x4c276806v6c3c4bfad804986f@mail.gmail.com>
-	 <11f7a7550901090852s30060e38g7c9240731d3a9a4f@mail.gmail.com>
-	 <11f7a7550901100402o790bd614ud46a613e2dce1dbd@mail.gmail.com>
-	 <20090110124119.GA20941@localhost>
-	 <11f7a7550901120618r84faa0dwd1e1234bc3dfe63@mail.gmail.com>
-	 <25F32EEE-D3D4-473F-8B8D-7447B2C024B5@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Mon, Jan 12, 2009 at 5:53 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Ville,
+>
+>> Here is set of unclean patches for discussion. These are still untested
+>> and contain issues, but I would like to know if we should continue with
+>> these or change something radically. Also commit messages are somewhat
+>> misleading in some places.
+>>
+>> Basically idea is to implement connection rejection support for l2cap
+>> and rfcomm sockets. IOW possibility to check initiator bd-address and
+>> ask for authorization before accepting connection.
+>>
+>> Other goal is to fix encryption and authentication levels to fulfill 2.1
+>> requirements.
+>
+> so I pushed my re-worked and pending patches to bluetooth-testing.git
+> now. This adds support for BT_DEFER_SETUP and BT_SECURITY (only the
+> logic and not the actual socket option).
 
-I fix has been pushed upstream, thanks for reporting it.
+Ville: thanks for the patches, pausing RFCOMM while encryption is
+disabled is a nice fix.
 
--- 
-Luiz Augusto von Dentz
-Engenheiro de Computação
+I imagine that if encryption is not quickly re-established we need to
+drop the RFCOMM link rather than leaving it paused though.
+
+We will do some testing of the current rfcomm-pause patches.
+
+Nick
