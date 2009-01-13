@@ -1,29 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <e6fea9c20901130535h88b819bve691e84642b02b59@mail.gmail.com>
-Date: Tue, 13 Jan 2009 14:35:03 +0100
-From: "Thierry Pierret" <tpi@qspin.be>
-To: linux-bluetooth@vger.kernel.org
-Subject: Obexd 0.8 : howto
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain;
+	charset="US-ASCII"
+Subject: RE: passkey agent in bluez4.X
+Date: Tue, 13 Jan 2009 21:27:30 +0800
+Message-ID: <9F2B2656C8747B498D56A7B30FF5EB9FE7675A@CNMAIL13.cn.utstarcom.com>
+In-Reply-To: <2d5a2c100901130508s7c083c8dh21d4ac56e3b72b3a@mail.gmail.com>
+From: "Yao Ye" <yeyao@utstar.com>
+To: <linux-bluetooth@vger.kernel.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+
+My platform didn't support python, so I need a C version
+agent.c/passkey-agent.c for bluez4.
+
+I have tried http://thread.gmane.org/gmane.linux.bluez.kernel/813,
+but it can't work.
+
+I am a new user of bluez.
+May I ask some help at this point ?
+Regards.
+
+-----Original Message-----
 Hi,
 
-I'm only an end-user. Ans as is, I'm not comfortable with D-Bus stuff,
-neither with Python samples. Hence the current request may look dumb
-for you. Apologizes. Be indulgent.
+test/agent.c seems to be outdated, but you can use test/simple-agent if
+your platform supports python.
 
-I'm trying to transfer files through OBEX. obexd (-o -a -r /var/obex)
-and obex-client are running on my target.
-1°/ Any attempt to push a file to my target ends with a "HUP" message.
-What's happening ? What should I do ?
-2°/ How to push a file from my target using the dbus commands ? Any
-call fails, but the error certainly lies in the given pathes and
-arguments.
-I'm diving in D-Bus doc, but I would earn some times with some
-examples. Note that those examples in the wiki would be appreciated.
 
-Many thanks.
-Regards.
