@@ -1,49 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <e6fea9c20901130025w21145356yacf4a4d051033e76@mail.gmail.com>
-Date: Tue, 13 Jan 2009 09:25:45 +0100
-From: "Thierry Pierret" <tpi@qspin.be>
-To: linux-bluetooth@vger.kernel.org
-Subject: BlueZ 4.26 : headset profile
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain;
+	charset="US-ASCII"
+Subject: RE: define of DBUS_SYSTEM_CONFIG_FILE ?
+Date: Tue, 13 Jan 2009 14:57:35 +0800
+Message-ID: <9F2B2656C8747B498D56A7B30FF5EB9FE557B9@CNMAIL13.cn.utstarcom.com>
+In-Reply-To: <9F2B2656C8747B498D56A7B30FF5EB9FE556FC@CNMAIL13.cn.utstarcom.com>
+From: "Yao Ye" <yeyao@utstar.com>
+To: <linux-bluetooth@vger.kernel.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+I have fixed this problem !
+It is defined in Makefile, not in config.h !
 
-I wish my computer to play the role of a headset, with the aim to play
-music from my bluetooth-capable player onto the computer soundcard.
+[root@localhost dbus-1.2.6-arm]# grep -r 'DBUS_SYSTEM_CONFIG_FILE' ./
+./ChangeLog.pre-1-2:    * dbus/Makefile.am (INCLUDES): move
+DBUS_SYSTEM_CONFIG_FILE and
+./dbus/Makefile.in:
+-DDBUS_SYSTEM_CONFIG_FILE=\""$(configdir)/system.conf"\"
+\
+./dbus/Makefile:
+-DDBUS_SYSTEM_CONFIG_FILE=\""$(configdir)/system.conf"\"
+\
+./dbus/Makefile.am:
+-DDBUS_SYSTEM_CONFIG_FILE=\""$(configdir)/system.conf"\"
+\
+./dbus/dbus-sysdeps-unix.c: //     _dbus_warn
+("\nDBUS_SYSTEM_CONFIG_FILE= %s!\n",  DBUS_SYSTEM_CONFIG_FILE);
+./bus/Makefile.in:
+-DDBUS_SYSTEM_CONFIG_FILE=\""$(configdir)/system.conf"\"        \
+./bus/Makefile: -DDBUS_SYSTEM_CONFIG_FILE=\""$(configdir)/system.conf"\"
+\
+./bus/activation-helper.c://  if (!_dbus_string_append (&config_file,
+DBUS_SYSTEM_CONFIG_FILE))
+./bus/Makefile.am:
+-DDBUS_SYSTEM_CONFIG_FILE=\""$(configdir)/system.conf"\" 
 
-First I had to enable the "Gateway" option in the "audio.conf" file in
-order to get the Headset service exposed. By the same way, you must
-enable the "Headset" option in order to be an audio gateway). It
-sounds already weird to me.
-
-Then I have to configure the .asoundrc file for the alsa-plugin
-configuration. How do I specify my own bluetooth adapter as the music
-source ? I tried this :
-
-pcm.bluetooth {
-       type bluetooth
-       device XX:XX:XX:XX:XX:XX
-       profile hifi
-}
-
-where the specified address is the local address. But it did not work,
-of course :
-
-$ arecord -D bluetooth -f S16_LE /var/tmp/record.wav &
-bluetoothd[1826]: Accepted new client connection on unix socket (fd=13)
-bluetoothd[1826]: Audio API: BT_REQUEST <- BT_GET_CAPABILITIES
-bluetoothd[1826]: Audio API: BT_ERROR -> BT_GET_CAPABILITIES
-ALSA lib pcm_bluetooth.c:1561:(audioservice_expect)
-BT_GET_CAPABILITIES failed : Input/output error(5)
-bluetoothd[1826]: Unix client disconnected (fd=13)
-arecord: main:552: audio open error: Input/output error
-
-
-May I ask some help at this point ?
-
-Regards.
-
-Thierry Pierret
