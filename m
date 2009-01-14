@@ -1,32 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: Bringing A2DP over embedded platforms.
+Message-ID: <e6fea9c20901140148k55c1c5f8i6e1a65878e69f803@mail.gmail.com>
+Date: Wed, 14 Jan 2009 10:48:22 +0100
+From: "Thierry Pierret" <tpi@qspin.be>
+To: "Liu, Raymond" <raymond.liu@intel.com>
+Subject: Re: Obexd 0.8 : howto
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <0463F45F3606F4428ED35AC8C709F92E04839CD5@pdsmsx502.ccr.corp.intel.com>
 MIME-Version: 1.0
-Message-ID: <OF57D96ADE.BC0A6ACE-ON6525753F.001CC16B-6525753F.001CCA71@lntemsys.com>
-From: Dhinakaran K <Dhinakaran.K@Lntemsys.com>
-Date: Thu, 15 Jan 2009 10:51:01 +0530
-Content-Type: text/plain; charset="US-ASCII"
+Content-Type: text/plain; charset=ISO-8859-1
+References: <e6fea9c20901130535h88b819bve691e84642b02b59@mail.gmail.com>
+	 <0463F45F3606F4428ED35AC8C709F92E04839CD5@pdsmsx502.ccr.corp.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-        I wish to test bluetooth audio(A2DP) over embedded platform(ARM 
-i.MX27 board). As an exercise,I tried A2DP over desktop running FC9, and I 
-was able to stream audio onto my headset. Now when I try on i.MX27, after 
-bringing up bluez-3.36, nothing seems working. So, if someone summaries a 
-list of packages(version) needed to bring up A2DP over i.MX27 board, it 
-will of great help. I've attached my system and package details below.
+>        Well, under OBEXD 0.8, you can use test/send-files to verify that is your whole env. is setting correctly for the obexd and OPP profile. Though I know you are not comfortable with python, but this is the quickest way to verify it. And there is an API doc at doc/client-api.txt
 
-My System Details:
-Platform    : ARM i.MX27 eval board.
-OS        : linux 2.6.22 kernel
-BlueZ         : 3.36
-Alsa        :1.013
-Glib        : 2.14.0
-dbus        : 1.2.4 (without x11)
+The mentioned files are indeed the ones I use as documentation.
+Finaly, Python is not so complicated to read and to understand ;-)
 
-Any suggestions/re-directions will be of great help.
+>        And what's your meaning for using dbus commands? You mean using libdbus or using dbus-send? For using libdbus or dbus's glib binding, I guess you can also read Meamo's tutorial doc for some example.  And for using dbus-send, it's a little bit complicate to send a dict as input parameter to dbus, man dbus-send is a good start. But actually using Python will be easier :)
 
+Python is not installed on the platform I'm testing. That's the reason
+why I could not use the test samples and I'm attempting to test the
+bluetooth features with the dbus-send command. And as you said, I'm
+stucked with the dict parameter. I think I will have to install Python
+anyway.
 
-Warm Regards
-Dhinakaran  K  
+> Raymond
+
+Thanks for your answer.
+
+Does anyone have an idea for the 1st of my questions : why any attempt
+to push a file to the obexd server fails with a "HUP" message ?
+
+Thierry
