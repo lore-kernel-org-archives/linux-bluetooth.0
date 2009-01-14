@@ -1,45 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Liu, Raymond" <raymond.liu@intel.com>
-To: Thierry Pierret <tpi@qspin.be>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Wed, 14 Jan 2009 10:14:31 +0800
-Subject: RE: Obexd 0.8 : howto
-Message-ID: <0463F45F3606F4428ED35AC8C709F92E04839CD5@pdsmsx502.ccr.corp.intel.com>
-References: <e6fea9c20901130535h88b819bve691e84642b02b59@mail.gmail.com>
-In-Reply-To: <e6fea9c20901130535h88b819bve691e84642b02b59@mail.gmail.com>
-Content-Type: text/plain; charset="iso-8859-1"
+Date: Tue, 13 Jan 2009 19:19:52 -0500 (EST)
+From: Jim Faulkner <jfaulkne@ccs.neu.edu>
+To: linux-bluetooth@vger.kernel.org
+Subject: Sony BD Remote pairing problems with new distributions
+Message-ID: <alpine.GSO.2.00.0901131907350.14823@denali.ccs.neu.edu>
 MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Pierret
 
->Hi,
->
->I'm only an end-user. Ans as is, I'm not comfortable with D-Bus stuff,
->neither with Python samples. Hence the current request may look dumb
->for you. Apologizes. Be indulgent.
->
->I'm trying to transfer files through OBEX. obexd (-o -a -r /var/obex)
->and obex-client are running on my target.
->1°/ Any attempt to push a file to my target ends with a "HUP" message.
->What's happening ? What should I do ?
+My sony BD remote (aka PS3 remote) requires a convoluted process to get it 
+working each and every time my computer boots.  A description of the 
+process I must use is here:
+http://www.mythtv.org/wiki/index.php/Talk:Sony_PS3_BD_Remote
 
-	Well, under OBEXD 0.8, you can use test/send-files to verify that is your whole env. is setting correctly for the obexd and OPP profile. Though I know you are not comfortable with python, but this is the quickest way to verify it. And there is an API doc at doc/client-api.txt
+In short, I must hold down shift+enter on the remote to pair the device, 
+kill some processes, and start some processes each time the computer 
+boots.
 
-	And without your detail information of how you are doing on your PC, I guess no one know what's happening on you side.
+This apparently did not used to be necessary with some older 
+distributions.  For example, this was not necessary under Ubuntu 8.04, but 
+is necessary under Ubuntu 8.10:
+http://ubuntuforums.org/archive/index.php/t-874284.html
+(page is down as I type so here's the google cache):
+http://74.125.47.132/search?q=cache:YuyKFubNWPMJ:ubuntuforums.org/archive/index.php/t-874284.html+bdremoted&hl=en&ct=clnk&cd=8&gl=us&client=firefox-a
 
->2°/ How to push a file from my target using the dbus commands ? Any
->call fails, but the error certainly lies in the given pathes and
->arguments.
->I'm diving in D-Bus doc, but I would earn some times with some
->examples. Note that those examples in the wiki would be appreciated.
->
->Many thanks.
->Regards.
+I am running 64-bit Gentoo, kernel 2.6.27.10.  I've tried both the 2.25 
+userspace and the 4.21 userspace with no luck.
 
+My questions are:  Are you guys aware of this problem?  Is there any known 
+fix, besides downgrading to an older distribution?
 
-	And what's your meaning for using dbus commands? You mean using libdbus or using dbus-send? For using libdbus or dbus's glib binding, I guess you can also read Meamo's tutorial doc for some example.  And for using dbus-send, it's a little bit complicate to send a dict as input parameter to dbus, man dbus-send is a good start. But actually using Python will be easier :)
+thanks,
+Jim Faulkner
 
-Raymond
-
+PS please CC me on any replies, I'm not subscribed to this list.
