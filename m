@@ -1,61 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [RFC] Some kernel changes
-From: Marcel Holtmann <marcel@holtmann.org>
-To: jaikumar Ganesh <jaikumarg@gmail.com>
-Cc: Nick Pelly <npelly@google.com>,
-	Ville Tervo <ville.tervo@nokia.com>,
-	linux-bluetooth@vger.kernel.org, johan.hedberg@nokia.com
-In-Reply-To: <ac290f760901151113jfd2d3b2t8bce890dd186ecbd@mail.gmail.com>
-References: <496895AB.4050902@nokia.com>
-	 <1231768413.23749.1.camel@californication>
-	 <35c90d960901120915g76235db9ra480cf3431d3025@mail.gmail.com>
-	 <1231873966.12234.2.camel@californication>
-	 <ac290f760901151113jfd2d3b2t8bce890dd186ecbd@mail.gmail.com>
+Subject: Re: Sony BD Remote pairing problems with new distributions
+From: Bastien Nocera <hadess@hadess.net>
+To: Jim Faulkner <jfaulkne@ccs.neu.edu>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <alpine.GSO.2.00.0901151411450.9769@denali.ccs.neu.edu>
+References: <alpine.GSO.2.00.0901131907350.14823@denali.ccs.neu.edu>
+	 <alpine.GSO.2.00.0901151411450.9769@denali.ccs.neu.edu>
 Content-Type: text/plain
-Date: Fri, 16 Jan 2009 00:25:46 +0100
-Message-Id: <1232061946.15331.1.camel@californication>
+Date: Thu, 15 Jan 2009 20:28:03 +0000
+Message-Id: <1232051283.16333.1.camel@snoogens.fab.redhat.com>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
->         so I pushed another set of patches to the
->         bluetooth-testing.git tree and
->         it should include the full BT_SECURITY implemention,
->         BT_DEFER_SETUP for
->         RFCOMM and SCO rejection if no listen socket is present.
->         
->         It currently only drops the connection is encryption is
->         disabled when
->         using BT_SECURITY_HIGH. That is only used for SAP anyway. For
->         all other
->         profiles we use BT_SECURITY_MEDIUM.
->     
->     I updated our build with the patches and after picking up 6e26576c
-> (Pause RFCOMM TX when encryption drops) and fixes upto f32ef1836
-> (Enforce authentication before encryption) I see a couple of
-> problems::
+On Thu, 2009-01-15 at 14:23 -0500, Jim Faulkner wrote:
+> On Tue, 13 Jan 2009, Jim Faulkner wrote:
 > 
->    a)   I see that in rfcomm/core.c in function rfcomm_security_cfm:
-> when the remote side has dropped the encryption for the role change,
-> we set the RFCOMM_SEC_PENDING bit but we don't set RFCOMM_AUTH_PENDING
-> as suggested in Ville's original patch and so when encryption is
-> re-established we dont get past the - test_and_clear_bit
-> (RFCOMM_AUTH_PENDING) check in the function.
+> > My sony BD remote (aka PS3 remote) requires a convoluted process to get it 
+> > working each and every time my computer boots.
+> 
+> I just wanted to follow up on this.  I have managed to get my BD remote 
+> permanently paired with my computer.  I no longer need to to go through 
+> the process of pairing it each time the computer boots.
 
-why do you wanna set AUTH_PENDING again. That is not needed we only
-wanna know once encryption comes back on. If no in time, then we just
-disconnect the link. That simple.
+It doesn't need actual pairing, because there's no PIN code exchange.
+Also, hidd doesn't know how to drive the device whatsoever.
 
->    b) I also see that we are not clearing the timer and hence after
-> RFCOMM_AUTH_TIMEOUT period expires we bring down the RFCOMM connection
-> even though the encryption has been established.
+Using bluez-gnome to pair the device using the wizard should just work.
+See the archives for more discussion about that.
 
-Good catch. Fixed it.
-
-Regards
-
-Marcel
-
+Cheers
 
