@@ -1,154 +1,167 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <ac290f760901151113jfd2d3b2t8bce890dd186ecbd@mail.gmail.com>
-Date: Thu, 15 Jan 2009 11:13:15 -0800
-From: "jaikumar Ganesh" <jaikumarg@gmail.com>
+Message-ID: <8b5debfa0901150713v3b54cb64r36222f72686bb09@mail.gmail.com>
+Date: Thu, 15 Jan 2009 20:43:50 +0530
+From: "alok barsode" <alokbarsode@gmail.com>
 To: "Marcel Holtmann" <marcel@holtmann.org>
-Subject: Re: [RFC] Some kernel changes
-Cc: "Nick Pelly" <npelly@google.com>, "Ville Tervo" <ville.tervo@nokia.com>,
-	linux-bluetooth@vger.kernel.org, johan.hedberg@nokia.com
-In-Reply-To: <1231873966.12234.2.camel@californication>
+Subject: [PATCH][NETLINK] devup command
+Cc: linux-bluetooth@vger.kernel.org
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_3813_8226107.1232046795918"
-References: <496895AB.4050902@nokia.com>
-	 <1231768413.23749.1.camel@californication>
-	 <35c90d960901120915g76235db9ra480cf3431d3025@mail.gmail.com>
-	 <1231873966.12234.2.camel@californication>
+Content-Type: multipart/mixed;
+	boundary="----=_Part_9323_7471078.1232032430497"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-------=_Part_3813_8226107.1232046795918
+------=_Part_9323_7471078.1232032430497
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-Hi Marcel,
+Marcel,
 
-On Tue, Jan 13, 2009 at 11:12 AM, Marcel Holtmann <marcel@holtmann.org>wrote:
+Here is the modified netlink patch.
+Let me know what needs to be changed.
 
-> Hi Nick,
->
-> > >> Here is set of unclean patches for discussion. These are still
-> untested
-> > >> and contain issues, but I would like to know if we should continue
-> with
-> > >> these or change something radically. Also commit messages are somewhat
-> > >> misleading in some places.
-> > >>
-> > >> Basically idea is to implement connection rejection support for l2cap
-> > >> and rfcomm sockets. IOW possibility to check initiator bd-address and
-> > >> ask for authorization before accepting connection.
-> > >>
-> > >> Other goal is to fix encryption and authentication levels to fulfill
-> 2.1
-> > >> requirements.
-> > >
-> > > so I pushed my re-worked and pending patches to bluetooth-testing.git
-> > > now. This adds support for BT_DEFER_SETUP and BT_SECURITY (only the
-> > > logic and not the actual socket option).
-> >
-> > Ville: thanks for the patches, pausing RFCOMM while encryption is
-> > disabled is a nice fix.
-> >
-> > I imagine that if encryption is not quickly re-established we need to
-> > drop the RFCOMM link rather than leaving it paused though.
-> >
-> > We will do some testing of the current rfcomm-pause patches.
->
-> so I pushed another set of patches to the bluetooth-testing.git tree and
-> it should include the full BT_SECURITY implemention, BT_DEFER_SETUP for
-> RFCOMM and SCO rejection if no listen socket is present.
->
-> It currently only drops the connection is encryption is disabled when
-> using BT_SECURITY_HIGH. That is only used for SAP anyway. For all other
-> profiles we use BT_SECURITY_MEDIUM.
+-Alok.
 
+------=_Part_9323_7471078.1232032430497
+Content-Type: text/x-diff;
+ name=0001-Adding-netlink-support-to-bluetooth.patch
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_fpzk9qjw0
+Content-Disposition: attachment;
+ filename=0001-Adding-netlink-support-to-bluetooth.patch
 
-    I updated our build with the patches and after picking up 6e26576c
-(Pause RFCOMM TX when encryption drops) and fixes upto f32ef1836 (Enforce
-authentication before encryption) I see a couple of problems::
-
-   a)   I see that in rfcomm/core.c in function rfcomm_security_cfm: when
-the remote side has dropped the encryption for the role change, we set the
-RFCOMM_SEC_PENDING bit but we don't set RFCOMM_AUTH_PENDING as suggested in
-Ville's original patch and so when encryption is re-established we dont get
-past the - test_and_clear_bit (RFCOMM_AUTH_PENDING) check in the function.
-
-   b) I also see that we are not clearing the timer and hence after
-RFCOMM_AUTH_TIMEOUT period expires we bring down the RFCOMM connection even
-though the encryption has been established.
-
-   Sorry, I don't have a patch ready as yet and hence the description above
-to check if you have encountered the same.
-
-Thanks
-Jaikumar
-
->
->
-> Regards
->
-> Marcel
->
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-
-------=_Part_3813_8226107.1232046795918
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi Marcel,<br><br><div class="gmail_quote">On Tue, Jan 13, 2009 at 11:12 AM, Marcel Holtmann <span dir="ltr">&lt;<a href="mailto:marcel@holtmann.org">marcel@holtmann.org</a>&gt;</span> wrote:<br><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
-Hi Nick,<br>
-<div class="Ih2E3d"><br>
-&gt; &gt;&gt; Here is set of unclean patches for discussion. These are still untested<br>
-&gt; &gt;&gt; and contain issues, but I would like to know if we should continue with<br>
-&gt; &gt;&gt; these or change something radically. Also commit messages are somewhat<br>
-&gt; &gt;&gt; misleading in some places.<br>
-&gt; &gt;&gt;<br>
-&gt; &gt;&gt; Basically idea is to implement connection rejection support for l2cap<br>
-&gt; &gt;&gt; and rfcomm sockets. IOW possibility to check initiator bd-address and<br>
-&gt; &gt;&gt; ask for authorization before accepting connection.<br>
-&gt; &gt;&gt;<br>
-&gt; &gt;&gt; Other goal is to fix encryption and authentication levels to fulfill 2.1<br>
-&gt; &gt;&gt; requirements.<br>
-&gt; &gt;<br>
-&gt; &gt; so I pushed my re-worked and pending patches to bluetooth-testing.git<br>
-&gt; &gt; now. This adds support for BT_DEFER_SETUP and BT_SECURITY (only the<br>
-&gt; &gt; logic and not the actual socket option).<br>
-&gt;<br>
-&gt; Ville: thanks for the patches, pausing RFCOMM while encryption is<br>
-&gt; disabled is a nice fix.<br>
-&gt;<br>
-&gt; I imagine that if encryption is not quickly re-established we need to<br>
-&gt; drop the RFCOMM link rather than leaving it paused though.<br>
-&gt;<br>
-&gt; We will do some testing of the current rfcomm-pause patches.<br>
-<br>
-</div>so I pushed another set of patches to the bluetooth-testing.git tree and<br>
-it should include the full BT_SECURITY implemention, BT_DEFER_SETUP for<br>
-RFCOMM and SCO rejection if no listen socket is present.<br>
-<br>
-It currently only drops the connection is encryption is disabled when<br>
-using BT_SECURITY_HIGH. That is only used for SAP anyway. For all other<br>
-profiles we use BT_SECURITY_MEDIUM.</blockquote><div>&nbsp; &nbsp; <br>&nbsp; &nbsp; I updated our build with the patches and after picking up 6e26576c (Pause RFCOMM TX when encryption drops) and fixes upto f32ef1836 (Enforce authentication before encryption) I see a couple of problems::<br>
-<br>&nbsp;&nbsp; a) &nbsp; I see that in rfcomm/core.c in function rfcomm_security_cfm: when the remote side has dropped the encryption for the role change, we set the RFCOMM_SEC_PENDING bit but we don&#39;t set RFCOMM_AUTH_PENDING as suggested in Ville&#39;s original patch and so when encryption is re-established we dont get past the - test_and_clear_bit (RFCOMM_AUTH_PENDING) check in the function.<br>
-<br>&nbsp;&nbsp; b) I also see that we are not clearing the timer and hence after RFCOMM_AUTH_TIMEOUT period expires we bring down the RFCOMM connection even though the encryption has been established.<br><br>&nbsp;&nbsp; Sorry, I don&#39;t have a patch ready as yet and hence the description above to check if you have encountered the same.<br>
-<br>Thanks<br>Jaikumar<br></div><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;"><br>
-<br>
-Regards<br>
-<font color="#888888"><br>
-Marcel<br>
-</font><div><div></div><div class="Wj3C7c"><br>
-<br>
---<br>
-To unsubscribe from this list: send the line &quot;unsubscribe linux-bluetooth&quot; in<br>
-the body of a message to <a href="mailto:majordomo@vger.kernel.org">majordomo@vger.kernel.org</a><br>
-More majordomo info at &nbsp;<a href="http://vger.kernel.org/majordomo-info.html" target="_blank">http://vger.kernel.org/majordomo-info.html</a><br>
-</div></div></blockquote></div><br>
-
-------=_Part_3813_8226107.1232046795918--
+RnJvbSA1MmUxMDliNzcxNTBhOWUyOWQ4ODYxNzk0YTJkZGUyYjk5YTk0Y2M4IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBBbG9rIEJhcnNvZGUgPGFsb2tiYXJzb2RlQGdtYWlsLmNvbT4K
+RGF0ZTogV2VkLCAxNCBKYW4gMjAwOSAxODozNDo1NSArMDUzMApTdWJqZWN0OiBbUEFUQ0hdIEFk
+ZGluZyBuZXRsaW5rIHN1cHBvcnQgdG8gYmx1ZXRvb3RoLgogQWRkaW5nIGZpbGVzIG5ldGxpbmsu
+YyBhbmQgbmV0bGluay5oIHRvIG5ldC9ibHVldG9vdGggZm9yIG5ldGxpbmsgc3VwcG9ydC4KIEFk
+ZGluZyBzdXBwb3J0IGZvciBERVZVUC4KIFJlZGVmaW5pbmcgaGNpX3JlcV9sb2NrIHRvIHVzZSBk
+b3duX3RyeWxvY2sKClNpZ25lZC1vZmYtYnk6IEFsb2sgQmFyc29kZSA8YWxva2JhcnNvZGVAZ21h
+aWwuY29tPgotLS0KIGluY2x1ZGUvbmV0L2JsdWV0b290aC9ibHVldG9vdGguaCB8ICAgIDMgKwog
+aW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmggIHwgICAgNCArLQogbmV0L2JsdWV0b290
+aC9NYWtlZmlsZSAgICAgICAgICAgIHwgICAgMiArLQogbmV0L2JsdWV0b290aC9hZl9ibHVldG9v
+dGguYyAgICAgIHwgICAgNiArKwogbmV0L2JsdWV0b290aC9oY2lfY29yZS5jICAgICAgICAgIHwg
+ICAgNiArKwogbmV0L2JsdWV0b290aC9uZXRsaW5rLmMgICAgICAgICAgIHwgIDE2OCArKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrCiBuZXQvYmx1ZXRvb3RoL25ldGxpbmsuaCAg
+ICAgICAgICAgfCAgIDI4ICsrKysrKwogNyBmaWxlcyBjaGFuZ2VkLCAyMTUgaW5zZXJ0aW9ucygr
+KSwgMiBkZWxldGlvbnMoLSkKIGNyZWF0ZSBtb2RlIDEwMDY0NCBuZXQvYmx1ZXRvb3RoL25ldGxp
+bmsuYwogY3JlYXRlIG1vZGUgMTAwNjQ0IG5ldC9ibHVldG9vdGgvbmV0bGluay5oCgpkaWZmIC0t
+Z2l0IGEvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2JsdWV0b290aC5oIGIvaW5jbHVkZS9uZXQvYmx1
+ZXRvb3RoL2JsdWV0b290aC5oCmluZGV4IDYyNGRhNGQuLmFjNWU0MGUgMTAwNjQ0Ci0tLSBhL2lu
+Y2x1ZGUvbmV0L2JsdWV0b290aC9ibHVldG9vdGguaAorKysgYi9pbmNsdWRlL25ldC9ibHVldG9v
+dGgvYmx1ZXRvb3RoLmgKQEAgLTE4OSw0ICsxODksNyBAQCBleHRlcm4gdm9pZCBidF9zeXNmc19j
+bGVhbnVwKHZvaWQpOwogCiBleHRlcm4gc3RydWN0IGNsYXNzICpidF9jbGFzczsKIAorZXh0ZXJu
+IGludCBibHVldG9vdGhfbmV0bGlua19pbml0KHZvaWQpOworZXh0ZXJuIHZvaWQgYmx1ZXRvb3Ro
+X25ldGxpbmtfY2xlYW51cCh2b2lkKTsKKwogI2VuZGlmIC8qIF9fQkxVRVRPT1RIX0ggKi8KZGlm
+ZiAtLWdpdCBhL2luY2x1ZGUvbmV0L2JsdWV0b290aC9oY2lfY29yZS5oIGIvaW5jbHVkZS9uZXQv
+Ymx1ZXRvb3RoL2hjaV9jb3JlLmgKaW5kZXggNGIxNDk3Mi4uNzQ0MTQ2ZSAxMDA2NDQKLS0tIGEv
+aW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmgKKysrIGIvaW5jbHVkZS9uZXQvYmx1ZXRv
+b3RoL2hjaV9jb3JlLmgKQEAgLTY3NSw5ICs2NzUsMTEgQEAgc3RydWN0IGhjaV9zZWNfZmlsdGVy
+IHsKICNkZWZpbmUgSENJX1JFUV9QRU5ECSAgMQogI2RlZmluZSBIQ0lfUkVRX0NBTkNFTEVEICAy
+CiAKLSNkZWZpbmUgaGNpX3JlcV9sb2NrKGQpCQlkb3duKCZkLT5yZXFfbG9jaykKKyNkZWZpbmUg
+aGNpX3JlcV9sb2NrKGQpCQlkb3duX3RyeWxvY2soJmQtPnJlcV9sb2NrKQogI2RlZmluZSBoY2lf
+cmVxX3VubG9jayhkKQl1cCgmZC0+cmVxX2xvY2spCiAKIHZvaWQgaGNpX3JlcV9jb21wbGV0ZShz
+dHJ1Y3QgaGNpX2RldiAqaGRldiwgaW50IHJlc3VsdCk7CiAKKy8qIEZJWE1FOiBUaGlzIGlzIHRl
+bXBvcmFyaWx5IGFkZGVkIHRvIGV4cG9ydCBfX2hjaV9yZXF1ZXN0IGFuZCBoY2lfaW5pdF9yZXEg
+Ki8KK2ludCBoY2lfaW5pdF9yZXF1ZXN0KHN0cnVjdCBoY2lfZGV2ICpoZGV2KTsKICNlbmRpZiAv
+KiBfX0hDSV9DT1JFX0ggKi8KZGlmZiAtLWdpdCBhL25ldC9ibHVldG9vdGgvTWFrZWZpbGUgYi9u
+ZXQvYmx1ZXRvb3RoL01ha2VmaWxlCmluZGV4IGQxZTQzM2YuLmYwMTRkNDggMTAwNjQ0Ci0tLSBh
+L25ldC9ibHVldG9vdGgvTWFrZWZpbGUKKysrIGIvbmV0L2JsdWV0b290aC9NYWtlZmlsZQpAQCAt
+MTAsNCArMTAsNCBAQCBvYmotJChDT05GSUdfQlRfQk5FUCkJKz0gYm5lcC8KIG9iai0kKENPTkZJ
+R19CVF9DTVRQKQkrPSBjbXRwLwogb2JqLSQoQ09ORklHX0JUX0hJRFApCSs9IGhpZHAvCiAKLWJs
+dWV0b290aC1vYmpzIDo9IGFmX2JsdWV0b290aC5vIGhjaV9jb3JlLm8gaGNpX2Nvbm4ubyBoY2lf
+ZXZlbnQubyBoY2lfc29jay5vIGhjaV9zeXNmcy5vIGxpYi5vCitibHVldG9vdGgtb2JqcyA6PSBh
+Zl9ibHVldG9vdGgubyBoY2lfY29yZS5vIGhjaV9jb25uLm8gaGNpX2V2ZW50Lm8gaGNpX3NvY2su
+byBoY2lfc3lzZnMubyBsaWIubyBuZXRsaW5rLm8KZGlmZiAtLWdpdCBhL25ldC9ibHVldG9vdGgv
+YWZfYmx1ZXRvb3RoLmMgYi9uZXQvYmx1ZXRvb3RoL2FmX2JsdWV0b290aC5jCmluZGV4IDc0NGVk
+M2YuLmI3NzhhMGUgMTAwNjQ0Ci0tLSBhL25ldC9ibHVldG9vdGgvYWZfYmx1ZXRvb3RoLmMKKysr
+IGIvbmV0L2JsdWV0b290aC9hZl9ibHVldG9vdGguYwpAQCAtNDI1LDYgKzQyNSwxMCBAQCBzdGF0
+aWMgaW50IF9faW5pdCBidF9pbml0KHZvaWQpCiAJaWYgKGVyciA8IDApCiAJCXJldHVybiBlcnI7
+CiAKKwllcnIgPSBibHVldG9vdGhfbmV0bGlua19pbml0KCk7CisJaWYgKGVyciA8IDApCisJCXJl
+dHVybiBlcnI7CisKIAllcnIgPSBzb2NrX3JlZ2lzdGVyKCZidF9zb2NrX2ZhbWlseV9vcHMpOwog
+CWlmIChlcnIgPCAwKSB7CiAJCWJ0X3N5c2ZzX2NsZWFudXAoKTsKQEAgLTQ0NSw2ICs0NDksOCBA
+QCBzdGF0aWMgdm9pZCBfX2V4aXQgYnRfZXhpdCh2b2lkKQogCXNvY2tfdW5yZWdpc3RlcihQRl9C
+TFVFVE9PVEgpOwogCiAJYnRfc3lzZnNfY2xlYW51cCgpOworCisJYmx1ZXRvb3RoX25ldGxpbmtf
+Y2xlYW51cCgpOwogfQogCiBzdWJzeXNfaW5pdGNhbGwoYnRfaW5pdCk7CmRpZmYgLS1naXQgYS9u
+ZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmMgYi9uZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmMKaW5kZXgg
+YmE3OGNjMS4uMmE4ZmI3YSAxMDA2NDQKLS0tIGEvbmV0L2JsdWV0b290aC9oY2lfY29yZS5jCisr
+KyBiL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuYwpAQCAtMjUxLDYgKzI1MSwxMiBAQCBzdGF0aWMg
+dm9pZCBoY2lfaW5pdF9yZXEoc3RydWN0IGhjaV9kZXYgKmhkZXYsIHVuc2lnbmVkIGxvbmcgb3B0
+KQogCWhjaV9zZW5kX2NtZChoZGV2LCBIQ0lfT1BfV1JJVEVfQ0FfVElNRU9VVCwgMiwgJnBhcmFt
+KTsKIH0KIAoraW50IGhjaV9pbml0X3JlcXVlc3Qoc3RydWN0IGhjaV9kZXYgKmhkZXYpCit7CisJ
+cmV0dXJuIF9faGNpX3JlcXVlc3QoaGRldiwgaGNpX2luaXRfcmVxLCAwLAorCQkJbXNlY3NfdG9f
+amlmZmllcyhIQ0lfSU5JVF9USU1FT1VUKSk7Cit9CisKIHN0YXRpYyB2b2lkIGhjaV9zY2FuX3Jl
+cShzdHJ1Y3QgaGNpX2RldiAqaGRldiwgdW5zaWduZWQgbG9uZyBvcHQpCiB7CiAJX191OCBzY2Fu
+ID0gb3B0OwpkaWZmIC0tZ2l0IGEvbmV0L2JsdWV0b290aC9uZXRsaW5rLmMgYi9uZXQvYmx1ZXRv
+b3RoL25ldGxpbmsuYwpuZXcgZmlsZSBtb2RlIDEwMDY0NAppbmRleCAwMDAwMDAwLi5kYzlmYjIw
+Ci0tLSAvZGV2L251bGwKKysrIGIvbmV0L2JsdWV0b290aC9uZXRsaW5rLmMKQEAgLTAsMCArMSwx
+NjggQEAKKy8qCisgKiBUaGlzIGlzIHRoZSBuZXRsaW5rLWJhc2VkIGJsdWV0b290aCBpbnRlcmZh
+Y2UuCisgKgorICogQ29weXJpZ2h0IDIwMDggQWxvayBCYXJzb2RlIDxhbG9rLmJhcnNvZGVAYXpp
+bmdvLmNvbT4KKyAqLworCisjaW5jbHVkZSA8YXNtL3N5c3RlbS5oPgorI2luY2x1ZGUgPGFzbS91
+YWNjZXNzLmg+CisjaW5jbHVkZSA8YXNtL3VuYWxpZ25lZC5oPgorCisjaW5jbHVkZSA8bmV0L2dl
+bmV0bGluay5oPgorI2luY2x1ZGUgPGxpbnV4L21vZHVsZS5oPgorI2luY2x1ZGUgPGxpbnV4L2tl
+cm5lbC5oPgorCisjaW5jbHVkZSA8bmV0L2JsdWV0b290aC9ibHVldG9vdGguaD4KKyNpbmNsdWRl
+IDxuZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmg+CisKKyNpbmNsdWRlICJuZXRsaW5rLmgiCisKKy8q
+IGZhbWlseSBkZWZpbml0aW9uICovCitzdGF0aWMgc3RydWN0IGdlbmxfZmFtaWx5IGJsdWV0b290
+aF9mYW0gPSB7CisJLmlkID0gR0VOTF9JRF9HRU5FUkFURSwKKwkuaGRyc2l6ZSA9IDAsCisJLm5h
+bWUgPSAiYmx1ZXRvb3RoIiwKKwkudmVyc2lvbiA9IFZFUlNJT04sCisJLm1heGF0dHIgPSBBVFRS
+X01BWAorfTsKKworc3RhdGljIHN0cnVjdCBubGFfcG9saWN5IGJsdWV0b290aF9wb2xpY3lbQVRU
+Ul9NQVggKyAxXSA9IHsKKwlbREVWSURdID0geyAudHlwZSA9IE5MQV9VMTYgfSwKKwlbRkxBR10J
+PSB7IC50eXBlID0gTkxBX1UxNiB9LAorfTsKKworc3RhdGljIGludCBibHVldG9vdGhfZGV2dXAo
+c3RydWN0IHNrX2J1ZmYgKnNrYiwgc3RydWN0IGdlbmxfaW5mbyAqaW5mbykKK3sKKwlpbnQgcmV0
+PTA7CisJIF9fdTE2IGRldjsKKwl2b2lkICpoZHI7CisJc3RydWN0IHNrX2J1ZmYgKm1zZzsKKwlz
+dHJ1Y3QgaGNpX2RldiAqaGRldjsKKworCWlmICghaW5mby0+YXR0cnNbREVWSURdKQorCQlyZXR1
+cm4gLUVJTlZBTDsKKworCWRldiA9IG5sYV9nZXRfdTE2KGluZm8tPmF0dHJzW0RFVklEXSk7CisK
+Kwltc2cgPSBubG1zZ19uZXcoTkxNU0dfR09PRFNJWkUsIEdGUF9LRVJORUwpOworCisJaWYgKCFt
+c2cpCisJCXJldHVybiAtRU5PQlVGUzsKKworCWhkciA9IGdlbmxtc2dfcHV0KG1zZywgaW5mby0+
+c25kX3BpZCwgaW5mby0+c25kX3NlcSwgJmJsdWV0b290aF9mYW0sIDAsIERFVlVQKTsKKworCWlm
+IChoZHIgPT0gTlVMTCl7CisJCW5sbXNnX2ZyZWUobXNnKTsKKwkJcmV0dXJuIC1FTk9CVUZTOwor
+CX0KKworCWlmICghKGhkZXYgPSBoY2lfZGV2X2dldChkZXYpKSl7CisJCW5sbXNnX2ZyZWUobXNn
+KTsKKwkJcmV0dXJuIC1FTk9ERVY7CisJfQorCisJcHJpbnRrKCIlcyAlcCIsIGhkZXYtPm5hbWUs
+IGhkZXYpOworCisJaWYgKGhjaV9yZXFfbG9jayhoZGV2KSkgeworCQlyZXQgPSAtRUJVU1k7CisJ
+CWdvdG8gZG9uZTsKKwl9CisKKwlpZiAodGVzdF9iaXQoSENJX1VQLCAmaGRldi0+ZmxhZ3MpKSB7
+CisJCXJldCA9IC1FQUxSRUFEWTsKKwkJZ290byBkb25lOworCX0KKworCWlmICh0ZXN0X2JpdChI
+Q0lfUVVJUktfUkFXX0RFVklDRSwgJmhkZXYtPnF1aXJrcykpCisJCXNldF9iaXQoSENJX1JBVywg
+JmhkZXYtPmZsYWdzKTsKKworCWlmIChoZGV2LT5vcGVuKGhkZXYpKSB7CisJCXJldCA9IC1FSU87
+CisJCWdvdG8gZG9uZTsKKwl9CisKKwlOTEFfUFVUX1UxNihtc2csIERFVklELCBkZXYpOworCisJ
+aWYgKCF0ZXN0X2JpdChIQ0lfUkFXLCAmaGRldi0+ZmxhZ3MpKSB7CisJCWF0b21pY19zZXQoJmhk
+ZXYtPmNtZF9jbnQsIDEpOworCQlzZXRfYml0KEhDSV9JTklULCAmaGRldi0+ZmxhZ3MpOworCisJ
+CS8vX19oY2lfcmVxdWVzdChoZGV2LCBoY2lfaW5pdF9yZXEsIDAsIEhaKTsKKwkJcmV0ID0gaGNp
+X2luaXRfcmVxdWVzdChoZGV2KTsKKworCQljbGVhcl9iaXQoSENJX0lOSVQsICZoZGV2LT5mbGFn
+cyk7CisJfQorCisJaWYgKCFyZXQpIHsKKwkJaGNpX2Rldl9ob2xkKGhkZXYpOworCQlzZXRfYml0
+KEhDSV9VUCwgJmhkZXYtPmZsYWdzKTsKKwkJTkxBX1BVVF9VMTYobXNnLCBGTEFHLCBIQ0lfREVW
+X1VQKTsKKwl9IGVsc2UgeworCQkvKiBJbml0IGZhaWxlZCwgY2xlYW51cCAqLworCQl0YXNrbGV0
+X2tpbGwoJmhkZXYtPnJ4X3Rhc2spOworCQl0YXNrbGV0X2tpbGwoJmhkZXYtPnR4X3Rhc2spOwor
+CQl0YXNrbGV0X2tpbGwoJmhkZXYtPmNtZF90YXNrKTsKKworCQlza2JfcXVldWVfcHVyZ2UoJmhk
+ZXYtPmNtZF9xKTsKKwkJc2tiX3F1ZXVlX3B1cmdlKCZoZGV2LT5yeF9xKTsKKworCQlpZiAoaGRl
+di0+Zmx1c2gpCisJCQloZGV2LT5mbHVzaChoZGV2KTsKKworCQlpZiAoaGRldi0+c2VudF9jbWQp
+IHsKKwkJCWtmcmVlX3NrYihoZGV2LT5zZW50X2NtZCk7CisJCQloZGV2LT5zZW50X2NtZCA9IE5V
+TEw7CisJCX0KKworCQloZGV2LT5jbG9zZShoZGV2KTsKKwkJaGRldi0+ZmxhZ3MgPSAwOworCQlO
+TEFfUFVUX1UxNihtc2csIEZMQUcsIEhDSV9ERVZfRE9XTik7CisJfQorCisJZ2VubG1zZ19lbmQo
+bXNnLCBoZHIpOworIGRvbmU6CisJaGNpX3JlcV91bmxvY2soaGRldik7CisJaGNpX2Rldl9wdXQo
+aGRldik7CisJaWYgKHJldCA8IDApCisJCXJldHVybiByZXQ7CisKKwlyZXR1cm4gZ2VubG1zZ191
+bmljYXN0KG1zZywgaW5mby0+c25kX3BpZCk7CisKKyBubGFfcHV0X2ZhaWx1cmU6CisgICAgICAg
+IGdlbmxtc2dfY2FuY2VsKG1zZywgaGRyKTsKKyAgICAgICAgcmV0dXJuIC1FTVNHU0laRTsKK30K
+Kworc3RhdGljIHN0cnVjdCBnZW5sX29wcyBibHVldG9vdGhfb3BzID0geworCQkuY21kID0gREVW
+VVAsCisJCS5wb2xpY3kgPSBibHVldG9vdGhfcG9saWN5LAorCQkuZG9pdCA9IGJsdWV0b290aF9k
+ZXZ1cCwKKwkJLmZsYWdzID0gR0VOTF9BRE1JTl9QRVJNLAorCQkuZHVtcGl0ID0gTlVMTCwKK307
+CisKKworLyogaW5pdGlhbGlzYXRpb24vZXhpdCBmdW5jdGlvbnMgKi8KK2ludCBfX2luaXQgYmx1
+ZXRvb3RoX25ldGxpbmtfaW5pdCh2b2lkKQoreworCWludCBlcnI7CisKKwllcnIgPSBnZW5sX3Jl
+Z2lzdGVyX2ZhbWlseSgmYmx1ZXRvb3RoX2ZhbSk7CisJaWYgKGVycikKKwkJcmV0dXJuIGVycjsK
+KworCWVyciA9IGdlbmxfcmVnaXN0ZXJfb3BzKCZibHVldG9vdGhfZmFtLCAmYmx1ZXRvb3RoX29w
+cyk7CisJaWYgKGVycikKKwkJZ290byBlcnJfb3V0OworCisJcmV0dXJuIDA7CisKK2Vycl9vdXQ6
+CisJZ2VubF91bnJlZ2lzdGVyX2ZhbWlseSgmYmx1ZXRvb3RoX2ZhbSk7CisJcmV0dXJuIGVycjsK
+K30KKwordm9pZCBibHVldG9vdGhfbmV0bGlua19jbGVhbnVwKHZvaWQpCit7CisJZ2VubF91bnJl
+Z2lzdGVyX2ZhbWlseSgmYmx1ZXRvb3RoX2ZhbSk7Cit9CmRpZmYgLS1naXQgYS9uZXQvYmx1ZXRv
+b3RoL25ldGxpbmsuaCBiL25ldC9ibHVldG9vdGgvbmV0bGluay5oCm5ldyBmaWxlIG1vZGUgMTAw
+NjQ0CmluZGV4IDAwMDAwMDAuLjA0ODRiYjQKLS0tIC9kZXYvbnVsbAorKysgYi9uZXQvYmx1ZXRv
+b3RoL25ldGxpbmsuaApAQCAtMCwwICsxLDI4IEBACisvKgorICogVGhpcyBpcyB0aGUgbmV0bGlu
+ay1iYXNlZCBibHVldG9vdGggaW50ZXJmYWNlLgorICoKKyAqIENvcHlyaWdodCAyMDA4IEFsb2sg
+QmFyc29kZSA8YWxvay5iYXJzb2RlQGF6aW5nby5jb20+CisgKi8KKyNpZm5kZWYgX19ORVRMSU5L
+X0gKKyNkZWZpbmUgX19ORVRMSU5LX0gKKworI2RlZmluZSBWRVJTSU9OIDEKKworZW51bSBibHVl
+dG9vdGhfYXR0ciB7CisJQVRUUl9VTlNQRUMsCisJREVWSUQsCisJRkxBRywKKwkvKiBBZGQgYXR0
+cmlidXRlcyBoZXJlICovCisJX19BVFRSX01BWCwKKwlBVFRSX01BWCAgPSAgX19BVFRSX01BWCAt
+IDEKK307CisKK2VudW0gYmx1ZXRvb3RoX2NtZHMgeworCUNNRF9VTlNQRUMsCisJREVWVVAsCisJ
+LyogQWRkIGNvbW1hbmQgaGVyZSAqLworCV9fQ01EX01BWCwKKwlDTURfTUFYICA9IF9fQ01EX01B
+WCAtIDEKK307CisKKyNlbmRpZiAvKiBfX05FVExJTktfSCAqLwotLSAKMS41LjYuMwoK
+------=_Part_9323_7471078.1232032430497--
