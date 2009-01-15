@@ -1,79 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1232061946.15331.1.camel@californication>
-References: <496895AB.4050902@nokia.com>
-	 <1231768413.23749.1.camel@californication>
-	 <35c90d960901120915g76235db9ra480cf3431d3025@mail.gmail.com>
-	 <1231873966.12234.2.camel@californication>
-	 <ac290f760901151113jfd2d3b2t8bce890dd186ecbd@mail.gmail.com>
-	 <1232061946.15331.1.camel@californication>
-Date: Thu, 15 Jan 2009 15:52:28 -0800
-Message-ID: <ac290f760901151552y2b176f0cjf44a29dabfa8e309@mail.gmail.com>
-Subject: Re: [RFC] Some kernel changes
-From: jaikumar Ganesh <jaikumarg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Nick Pelly <npelly@google.com>, Ville Tervo <ville.tervo@nokia.com>,
-	linux-bluetooth@vger.kernel.org, johan.hedberg@nokia.com
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH/RFC] SIMD optimizations for SBC encoder analysis filter
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Siarhei Siamashka <siarhei.siamashka@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <200901152134.02777.siarhei.siamashka@nokia.com>
+References: <200812311803.45279.siarhei.siamashka@nokia.com>
+	 <1231210146.13304.15.camel@californication>
+	 <200901091850.55032.siarhei.siamashka@nokia.com>
+	 <200901152134.02777.siarhei.siamashka@nokia.com>
+Content-Type: text/plain
+Date: Fri, 16 Jan 2009 00:29:12 +0100
+Message-Id: <1232062152.15331.2.camel@californication>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Siarhei,
 
-On Thu, Jan 15, 2009 at 3:25 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi,
->
->>         so I pushed another set of patches to the
->>         bluetooth-testing.git tree and
->>         it should include the full BT_SECURITY implemention,
->>         BT_DEFER_SETUP for
->>         RFCOMM and SCO rejection if no listen socket is present.
->>
->>         It currently only drops the connection is encryption is
->>         disabled when
->>         using BT_SECURITY_HIGH. That is only used for SAP anyway. For
->>         all other
->>         profiles we use BT_SECURITY_MEDIUM.
->>
->>     I updated our build with the patches and after picking up 6e26576c
->> (Pause RFCOMM TX when encryption drops) and fixes upto f32ef1836
->> (Enforce authentication before encryption) I see a couple of
->> problems::
->>
->>    a)   I see that in rfcomm/core.c in function rfcomm_security_cfm:
->> when the remote side has dropped the encryption for the role change,
->> we set the RFCOMM_SEC_PENDING bit but we don't set RFCOMM_AUTH_PENDING
->> as suggested in Ville's original patch and so when encryption is
->> re-established we dont get past the - test_and_clear_bit
->> (RFCOMM_AUTH_PENDING) check in the function.
->
-> why do you wanna set AUTH_PENDING again. That is not needed we only
-> wanna know once encryption comes back on. If no in time, then we just
-> disconnect the link. That simple.
->
->>    b) I also see that we are not clearing the timer and hence after
->> RFCOMM_AUTH_TIMEOUT period expires we bring down the RFCOMM connection
->> even though the encryption has been established.
->
-> Good catch. Fixed it.
+> > > > The attached patch contains what I would consider to be a final
+> > > > variant. MMX support is now complete. It works for both x86 and amd64,
+> > > > has runtime autodetection of MMX availability, supports 4 and 8
+> > > > subbands cases. I also ensured that only original MMX instructions are
+> > > > used (and no SSE or other later additions), so the code should work
+> > > > fine even on the old Pentium1 MMX. New MMX optimized functions produce
+> > > > bit identical results when compared with bluez-4.25 release.
+> > > >
+> > > > With this patch applied, new filtering functions are noticeably faster
+> > > > than than the old ones on x86 (so now they are both faster and have
+> > > > better quality). Assembly optimizations for the other platforms can be
+> > > > easily added too.
+> > >
+> > > can you re-base your patch against the latest tree and re-send the
+> > > patch.
+> >
+> > Yes, I will submit an updated SIMD optimizations patchset in a few days.
+> 
+> Updated patches are attached.
+> 
+> Performance improvement when testing with big buck bunny soundtrack varies
+> somewhere between 1.4x (4 subbands, MMX analysis filter, Intel Core2 CPU) and
+> 2x factor (8 subbands, NEON analysis filter, ARM Cortex-A8 CPU). But these
+> numbers are for default bitpool settings (32) and no joint stereo, this
+> configuration is quite sensitive to analysis filter performance.
+> 
+> SIMD optimized code provides exactly the same output as C version.
+> 
+> But even with this optimization done, there are still a lot more things
+> to improve. I'm going to improve input data permutation/endian
+> conversion/channels deinterleaving next. Also scalefactors processing
+> can be vectorized. Audio quality can be still improved by tweaking
+> constant tables.
 
-Cool.  Can you upload it to bluetooth-testing git ? I saw a related
-problem while looking at the timer issue and wanted to see if the fix
-takes care of it.
+patch has been applied. Thanks.
 
-The timer thats started in rfcomm_security_cfm (for the drop in
-encryption) does get cleared in rfcomm_process_dlcs
-but then we have some data to send.  So we send the RFCOMM PN packet
-just after encryption is re-established.
-This results in a new timer being started in rfcomm_process_dlcs and
-we don't get the UA packet to clear this timer and hence when
-the timer expires, the connection is dropped.
+Regards
 
-Thanks
-Jaikumar
+Marcel
 
-> Regards
->
-> Marcel
->
->
->
+
