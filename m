@@ -1,230 +1,261 @@
 Return-Path: <cyrus@holtmann.org>
 From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
-To: "ext Marcel Holtmann" <marcel@holtmann.org>
-Subject: Re: SBC big endian issues?
-Date: Fri, 16 Jan 2009 19:23:04 +0200
-Cc: ext Brad Midgley <bmidgley@gmail.com>, linux-bluetooth@vger.kernel.org
-References: <200901051015.20512.siarhei.siamashka@nokia.com> <200901071440.01872.siarhei.siamashka@nokia.com> <1231335837.5298.0.camel@californication>
-In-Reply-To: <1231335837.5298.0.camel@californication>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Performance optimizations for sbcenc utility
+Date: Fri, 16 Jan 2009 18:12:45 +0200
+Cc: "Christian Hoene" <hoene@uni-tuebingen.de>
 MIME-Version: 1.0
 Content-Type: Multipart/Mixed;
-  boundary="Boundary-00=_4JMcJPyvsUDmMbG"
-Message-Id: <200901161923.04676.siarhei.siamashka@nokia.com>
+  boundary="Boundary-00=_9HLcJIgPrNI4OeL"
+Message-Id: <200901161812.45754.siarhei.siamashka@nokia.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---Boundary-00=_4JMcJPyvsUDmMbG
+--Boundary-00=_9HLcJIgPrNI4OeL
 Content-Type: text/plain;
-  charset="utf-8"
+  charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-On Wednesday 07 January 2009 15:43:57 ext Marcel Holtmann wrote:
-> Hi Siarhei,
->
-> > > The messy part here is we let the caller specify the byte order of the
-> > > array. It would simplify a lot to standardize on host endian. I don't
-> > > remember what the reasoning was against this.
-> > >
-> > > > Let's suppose that we have the following two bytes in memory:
-> > > >
-> > > > 0x12 0x34
-> > > >
-> > > > This equals to 0x1234 for big endian systems or 0x3412 for little
-> > > > endian systems if you read data via int16_t * pointer.
-> > >
-> > > if sbc->endian is set to the same as the host endian, then this could
-> > > be done with a memcopy or skipped (zero copy).
-> > >
-> > > I believe sbc->endian is always set to little endian the way it works
-> > > now, meaning the array is storing data little endian regardless of the
-> > > architecture. The patch I wrote made a copy of the memory, swapping
-> > > bytes, if sbc->endian didn't match host endian. The way we use the
-> > > code, this swapping only happens on big endian machines.
-> >
-> > Well, having no other option to verify this big endian bug, I used this
-> > MIPS big endian QEMU image for testing:
-> > http://people.debian.org/~aurel32/qemu/mips/
-> >
-> > The current code is indeed broken on big endian systems. The attached
-> > patch makes it work correct. Of course this part needs heavy performance
-> > optimizations (as discussed above), but even just fixing it may be a good
-> > idea at the moment.
->
-> patch has been applied. Thanks.
+Hello all,
 
-Thanks, though seems like there are some problems.
+The attached patch improves performance of sbcenc utility. This is not very
+useful in general and does not improve the SBC codec itself. But when using
+sbcenc utility for benchmarking, an extra unneeded overhead skews the results
+a bit and this might be worth fixing.
 
-By default, SBC codec uses native byte order now (configured
-by 'sbc_set_defaults' function, which is called from 'sbc_init').
+Before patch:
 
-But SBC gstreamer elements ('gstsbcdec.c', 'gstsbcenc.c') specify
-endianness as little endian: "endianness = (int) LITTLE_ENDIAN, ".
-So now after the patch got applied, "sbcenc/sbcdec" utilites got fixed,
-but gstreamer elements may have problems on big endian systems
-instead. Another concern is about 'pcm_bluetooth.c'. It does not specifically
-configure endianness in any way, so SBC codec is used with the native byte
-order as well. And there the supported format is also specified as
-SND_PCM_FORMAT_S16_LE.
+real    0m14.984s
+user    0m12.981s
+sys     0m1.924s
 
-Looks like this was the case of double errors which were cancelling each other
-or misleading constant names. In any case, SBC has been always treating data
-by default as little endian before regardless of the host native byte order.
+After patch:
 
-So in order to get gstreamer and pcm_bluetooth working right again, the
-default configuration of SBC codec can be changed to SBC_LE (this way all the
-old clients which did not change the default configuration will continue to
-work just like before). A variant of patch with this kind of solution is
-attached.
-
-Alternatively, gstreamer elements and ALSA plugin could try to use native byte
-order (and this can be probably good for the performance as with the strictly
-little endian support for the data, big endian systems may actually have to do
-the conversion twice - first in the gstreamer in order to provide the data to
-the element in little endian format, and then in SBC codec itself to convert
-it back to native format to use it in number crunching). This variant of patch
-is also attached (but untested because I don't have a big endian system).
+real    0m12.279s
+user    0m11.865s
+sys     0m0.360s
 
 
-Some kind of fix needs to be used (and the attached patches are mutually
-exclusive), as apparently 4.26 release does not work right on big endian
-systems :(
+Christian, you fixed some bugs in sbcenc a bit earlier. Could you please
+also check if all your testcases also work fine with this new patch applied
+and it does not break anything?
 
-
+-- 
 Best regards,
 Siarhei Siamashka
 
---Boundary-00=_4JMcJPyvsUDmMbG
+--Boundary-00=_9HLcJIgPrNI4OeL
 Content-Type: text/x-diff;
-  charset="utf-8";
-  name="0001-Change-of-SBC-default-configutation-to-little-endian.patch"
+  charset="us-ascii";
+  name="0001-Performance-optimizations-for-sbcenc-utility.patch"
 Content-Transfer-Encoding: 8bit
 Content-Disposition: inline;
-	filename="0001-Change-of-SBC-default-configutation-to-little-endian.patch"
+	filename="0001-Performance-optimizations-for-sbcenc-utility.patch"
 
->From 4a4669b0e6cf75e4c36802b8e90b3c369804aaf0 Mon Sep 17 00:00:00 2001
+>From b6ffabd4f7755ed6c968ecec0c8a0931eb6d7a66 Mon Sep 17 00:00:00 2001
 From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
-Date: Fri, 16 Jan 2009 18:54:31 +0200
-Subject: [PATCH] Change of SBC default configutation to little endian
+Date: Fri, 16 Jan 2009 17:23:54 +0200
+Subject: [PATCH] Performance optimizations for sbcenc utility
 
-ALSA plugin and gstreamer elements assume little endian byte order
-for the audio data. The problem is that they also rely on the
-default SBC configuration to be "right", which is not what they
-expect after commit 8bbfdf782dd1633a1f78a26584ff81b858df4a61
+Read and write buffers sizes increased, memmove overhead eliminated.
+Nonportable cast from 'unsigned char *' to 'struct au_header *' is
+now also resolved as part of the changes.
 ---
- sbc/sbc.c |    6 ------
- 1 files changed, 0 insertions(+), 6 deletions(-)
+ sbc/sbcenc.c |  122 ++++++++++++++++++++++++----------------------------------
+ 1 files changed, 50 insertions(+), 72 deletions(-)
 
-diff --git a/sbc/sbc.c b/sbc/sbc.c
-index 0699ae0..4da130a 100644
---- a/sbc/sbc.c
-+++ b/sbc/sbc.c
-@@ -927,13 +927,7 @@ static void sbc_set_defaults(sbc_t *sbc, unsigned long flags)
- 	sbc->subbands = SBC_SB_8;
- 	sbc->blocks = SBC_BLK_16;
- 	sbc->bitpool = 32;
--#if __BYTE_ORDER == __LITTLE_ENDIAN
- 	sbc->endian = SBC_LE;
--#elif __BYTE_ORDER == __BIG_ENDIAN
--	sbc->endian = SBC_BE;
--#else
--#error "Unknown byte order"
--#endif
- }
+diff --git a/sbc/sbcenc.c b/sbc/sbcenc.c
+index 9cbfb87..388be2a 100644
+--- a/sbc/sbcenc.c
++++ b/sbc/sbcenc.c
+@@ -40,45 +40,15 @@
  
- int sbc_init(sbc_t *sbc, unsigned long flags)
+ static int verbose = 0;
+ 
+-static ssize_t __read(int fd, void *buf, size_t count)
+-{
+-	ssize_t len, pos = 0;
+-
+-	while (count > 0) {
+-		len = read(fd, buf + pos, count);
+-		if (len <= 0)
+-			return pos > len ? pos : len;
+-
+-		count -= len;
+-		pos   += len;
+-	}
+-
+-	return pos;
+-}
+-
+-static ssize_t __write(int fd, const void *buf, size_t count)
+-{
+-	ssize_t len, pos = 0;
+-
+-	while (count > 0) {
+-		len = write(fd, buf + pos, count);
+-		if (len <= 0)
+-			return len;
+-
+-		count -= len;
+-		pos   += len;
+-	}
+-
+-	return pos;
+-}
++#define BUF_SIZE 32768
++static unsigned char input[BUF_SIZE], output[BUF_SIZE + BUF_SIZE / 4];
+ 
+ static void encode(char *filename, int subbands, int bitpool, int joint,
+ 					int dualchannel, int snr, int blocks)
+ {
+-	struct au_header *au_hdr;
+-	unsigned char input[2048], output[2048];
++	struct au_header au_hdr;
+ 	sbc_t sbc;
+-	int fd, len, size, count, encoded, srate;
++	int fd, len, size, count, encoded, srate, codesize, nframes;
+ 
+ 	if (strcmp(filename, "-")) {
+ 		fd = open(filename, O_RDONLY);
+@@ -90,8 +60,8 @@ static void encode(char *filename, int subbands, int bitpool, int joint,
+ 	} else
+ 		fd = fileno(stdin);
+ 
+-	len = __read(fd, input, sizeof(input));
+-	if (len < sizeof(*au_hdr)) {
++	len = read(fd, &au_hdr, sizeof(au_hdr));
++	if (len < sizeof(au_hdr)) {
+ 		if (fd > fileno(stderr))
+ 			fprintf(stderr, "Can't read header from file %s: %s\n",
+ 						filename, strerror(errno));
+@@ -100,19 +70,17 @@ static void encode(char *filename, int subbands, int bitpool, int joint,
+ 		goto done;
+ 	}
+ 
+-	au_hdr = (struct au_header *) input;
+-
+-	if (au_hdr->magic != AU_MAGIC ||
+-			BE_INT(au_hdr->hdr_size) > 128 ||
+-			BE_INT(au_hdr->hdr_size) < 24 ||
+-			BE_INT(au_hdr->encoding) != AU_FMT_LIN16) {
++	if (au_hdr.magic != AU_MAGIC ||
++			BE_INT(au_hdr.hdr_size) > 128 ||
++			BE_INT(au_hdr.hdr_size) < 24 ||
++			BE_INT(au_hdr.encoding) != AU_FMT_LIN16) {
+ 		fprintf(stderr, "Not in Sun/NeXT audio S16_BE format\n");
+ 		goto done;
+ 	}
+ 
+ 	sbc_init(&sbc, 0L);
+ 
+-	switch (BE_INT(au_hdr->sample_rate)) {
++	switch (BE_INT(au_hdr.sample_rate)) {
+ 	case 16000:
+ 		sbc.frequency = SBC_FREQ_16000;
+ 		break;
+@@ -127,11 +95,11 @@ static void encode(char *filename, int subbands, int bitpool, int joint,
+ 		break;
+ 	}
+ 
+-	srate = BE_INT(au_hdr->sample_rate);
++	srate = BE_INT(au_hdr.sample_rate);
+ 
+ 	sbc.subbands = subbands == 4 ? SBC_SB_4 : SBC_SB_8;
+ 
+-	if (BE_INT(au_hdr->channels) == 1) {
++	if (BE_INT(au_hdr.channels) == 1) {
+ 		sbc.mode = SBC_MODE_MONO;
+ 		if (joint || dualchannel) {
+ 			fprintf(stderr, "Audio is mono but joint or "
+@@ -151,9 +119,9 @@ static void encode(char *filename, int subbands, int bitpool, int joint,
+ 	}
+ 
+ 	sbc.endian = SBC_BE;
+-	count = BE_INT(au_hdr->data_size);
+-	size = len - BE_INT(au_hdr->hdr_size);
+-	memmove(input, input + BE_INT(au_hdr->hdr_size), size);
++	count = BE_INT(au_hdr.data_size);
++	size = len - BE_INT(au_hdr.hdr_size);
++	memmove(input, input + BE_INT(au_hdr.hdr_size), size);
+ 
+ 	sbc.bitpool = bitpool;
+ 	sbc.allocation = snr ? SBC_AM_SNR : SBC_AM_LOUDNESS;
+@@ -172,37 +140,47 @@ static void encode(char *filename, int subbands, int bitpool, int joint,
+ 						"STEREO" : "JOINTSTEREO");
+ 	}
+ 
++	codesize = sbc_get_codesize(&sbc);
++	nframes = sizeof(input) / codesize;
+ 	while (1) {
+-		if (size < sizeof(input)) {
+-			len = __read(fd, input + size, sizeof(input) - size);
+-			if (len == 0 && size == 0)
+-				break;
+-
+-			if (len < 0) {
+-				perror("Can't read audio data");
++		unsigned char *inp, *outp;
++		/* read data for up to 'nframes' frames of input data */
++		size = read(fd, input, codesize * nframes);
++		if (size < 0) {
++			/* Something really bad happened */
++			perror("Can't read audio data");
++			break;
++		}
++		if (size < codesize) {
++			/* Not enough data for encoding even a single frame */
++			break;
++		}
++		/* encode all the data from the input buffer in a loop */
++		inp = input;
++		outp = output;
++		while (size >= codesize) {
++			len = sbc_encode(&sbc, inp, codesize,
++				outp, sizeof(output) - (outp - output),
++				&encoded);
++			if (len != codesize || encoded <= 0) {
++				fprintf(stderr,
++					"sbc_encode fail, len=%d, encoded=%d\n",
++					len, encoded);
+ 				break;
+ 			}
+-
+-			size += len;
++			size -= len;
++			inp += len;
++			outp += encoded;
+ 		}
+-
+-		len = sbc_encode(&sbc, input, size,
+-					output, sizeof(output), &encoded);
+-		if (len <= 0)
+-			break;
+-		if (len < size)
+-			memmove(input, input + len, size - len);
+-
+-		size -= len;
+-
+-		len = __write(fileno(stdout), output, encoded);
+-		if (len == 0)
+-			break;
+-
+-		if (len < 0 || len != encoded) {
++		len = write(fileno(stdout), output, outp - output);
++		if (len != outp - output) {
+ 			perror("Can't write SBC output");
+ 			break;
+ 		}
++		if (size >= codesize) {
++			/* sbc_encode failure has been detected earlier */
++			break;
++		}
+ 	}
+ 
+ 	sbc_finish(&sbc);
 -- 
 1.5.6.5
 
 
---Boundary-00=_4JMcJPyvsUDmMbG
-Content-Type: text/x-diff;
-  charset="utf-8";
-  name="0001-Use-advertise-native-byte-order-for-audio-in-gstream.patch"
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline;
-	filename="0001-Use-advertise-native-byte-order-for-audio-in-gstream.patch"
-
->From 1132592f98a919f22534657fef63a06880472293 Mon Sep 17 00:00:00 2001
-From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
-Date: Fri, 16 Jan 2009 19:15:34 +0200
-Subject: [PATCH] Use/advertise native byte order for audio in gstreamer and ALSA plugins
-
----
- audio/gstsbcdec.c     |    6 ++++++
- audio/gstsbcenc.c     |    6 ++++++
- audio/pcm_bluetooth.c |   12 ++++++++++++
- 3 files changed, 24 insertions(+), 0 deletions(-)
-
-diff --git a/audio/gstsbcdec.c b/audio/gstsbcdec.c
-index fedc129..35a3297 100644
---- a/audio/gstsbcdec.c
-+++ b/audio/gstsbcdec.c
-@@ -50,7 +50,13 @@ static GstStaticPadTemplate sbc_dec_src_factory =
- 		GST_STATIC_CAPS("audio/x-raw-int, "
- 				"rate = (int) { 16000, 32000, 44100, 48000 }, "
- 				"channels = (int) [ 1, 2 ], "
-+#if __BYTE_ORDER == __LITTLE_ENDIAN
- 				"endianness = (int) LITTLE_ENDIAN, "
-+#elif __BYTE_ORDER == __BIG_ENDIAN
-+				"endianness = (int) BIG_ENDIAN, "
-+#else
-+#error "Unknown byte order"
-+#endif				
- 				"signed = (boolean) true, "
- 				"width = (int) 16, "
- 				"depth = (int) 16"));
-diff --git a/audio/gstsbcenc.c b/audio/gstsbcenc.c
-index 3ecaacf..f083a9b 100644
---- a/audio/gstsbcenc.c
-+++ b/audio/gstsbcenc.c
-@@ -147,7 +147,13 @@ static GstStaticPadTemplate sbc_enc_sink_factory =
- 		GST_STATIC_CAPS("audio/x-raw-int, "
- 				"rate = (int) { 16000, 32000, 44100, 48000 }, "
- 				"channels = (int) [ 1, 2 ], "
-+#if __BYTE_ORDER == __LITTLE_ENDIAN
- 				"endianness = (int) LITTLE_ENDIAN, "
-+#elif __BYTE_ORDER == __BIG_ENDIAN
-+				"endianness = (int) BIG_ENDIAN, "
-+#else
-+#error "Unknown byte order"
-+#endif
- 				"signed = (boolean) true, "
- 				"width = (int) 16, "
- 				"depth = (int) 16"));
-diff --git a/audio/pcm_bluetooth.c b/audio/pcm_bluetooth.c
-index bf24206..43b648e 100644
---- a/audio/pcm_bluetooth.c
-+++ b/audio/pcm_bluetooth.c
-@@ -1182,7 +1182,13 @@ static int bluetooth_hsp_hw_constraint(snd_pcm_ioplug_t *io)
- 		SND_PCM_ACCESS_MMAP_INTERLEAVED
- 	};
- 	unsigned int format_list[] = {
-+#if __BYTE_ORDER == __LITTLE_ENDIAN
- 		SND_PCM_FORMAT_S16_LE
-+#elif __BYTE_ORDER == __BIG_ENDIAN
-+		SND_PCM_FORMAT_S16_BE
-+#else
-+#error "Unknown byte order"
-+#endif
- 	};
- 	int err;
- 
-@@ -1237,7 +1243,13 @@ static int bluetooth_a2dp_hw_constraint(snd_pcm_ioplug_t *io)
- 		SND_PCM_ACCESS_MMAP_INTERLEAVED
- 	};
- 	unsigned int format_list[] = {
-+#if __BYTE_ORDER == __LITTLE_ENDIAN
- 		SND_PCM_FORMAT_S16_LE
-+#elif __BYTE_ORDER == __BIG_ENDIAN
-+		SND_PCM_FORMAT_S16_BE
-+#else
-+#error "Unknown byte order"
-+#endif
- 	};
- 	unsigned int rate_list[4];
- 	unsigned int rate_count;
--- 
-1.5.6.5
-
-
---Boundary-00=_4JMcJPyvsUDmMbG--
+--Boundary-00=_9HLcJIgPrNI4OeL--
