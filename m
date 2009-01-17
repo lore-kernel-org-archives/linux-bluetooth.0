@@ -1,42 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
 From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
-To: "ext Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-Subject: Re: SBC big endian issues?
-Date: Sat, 17 Jan 2009 20:10:04 +0200
-Cc: "ext Marcel Holtmann" <marcel@holtmann.org>,
-        "ext Brad Midgley" <bmidgley@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-References: <200901051015.20512.siarhei.siamashka@nokia.com> <200901161923.04676.siarhei.siamashka@nokia.com> <2d5a2c100901161402t65173745xd6f83e90a2057ffb@mail.gmail.com>
-In-Reply-To: <2d5a2c100901161402t65173745xd6f83e90a2057ffb@mail.gmail.com>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Bluez coding style again
+Date: Sat, 17 Jan 2009 19:43:45 +0200
 MIME-Version: 1.0
 Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200901172010.05061.siarhei.siamashka@nokia.com>
+  charset="us-ascii"
+Message-Id: <200901171943.45370.siarhei.siamashka@nokia.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
-
-On Saturday 17 January 2009 00:02:09 ext Luiz Augusto von Dentz wrote:
-> Hi Siarhei,
->
-> It seems gstreamer does have G_BYTE_ORDER, so you probably don't need
-> those #ifdef. I also notice some unnecessary white spaces in the of a
-> line.
 
 Hi,
 
-I did not verify that patch thoroughly (I only checked that it compiles) and
-also seems like I somehow forgot to pass it through 'checkpatch.pl'. Thanks
-for a good catch.
+> commit 1fb5ffff0b704038a90e03860ecce63be2deb988
+> Author: Johan Hedberg <johan.hedberg@nokia.com>
+> Date:   Fri Jan 16 20:29:43 2009 +0200
+>
+>     Fix indentation to use only tabs
+>
+> --- a/sbc/sbc_tables.h
+> +++ b/sbc/sbc_tables.h
+> @@ -161,30 +161,30 @@ static const int32_t synmatrix8[16][8] = {
+>         ((FIXED_A) 1 << (sizeof(FIXED_T) * CHAR_BIT - 1)) + 0.5)
+>  #define F(x) F_PROTO4(x)
+>  static const FIXED_T _sbc_proto_fixed4[40] = {
+> -        F(0.00000000E+00),  F(5.36548976E-04),
+> +       F(0.00000000E+00),  F(5.36548976E-04),
+>         -F(1.49188357E-03),  F(2.73370904E-03),
+> -        F(3.83720193E-03),  F(3.89205149E-03),
+> -        F(1.86581691E-03),  F(3.06012286E-03),
+> +       F(3.83720193E-03),  F(3.89205149E-03),
+> +       F(1.86581691E-03),  F(3.06012286E-03),
 
-Regarding G_BYTE_ORDER, you are probably right.  I'm not very familiar with
-gstreamer yet, so somebody else could probably fix this stuff much faster
-than me.
+With this latest commit, the vertical alignment of elements in tables gets
+messed up and it becomes harder to see any kind of symmetry in the tables.
+If the spaces are strictly forbidden, I would probably prefer replacing them
+with '+' character.
 
-In any case, it probably makes sense to relay all the endian conversion
-related things to gstreamer and ALSA, and use only native byte order in SBC.
-This will simplify the code a bit and will make optimizing it easier.
+Anyway, with this requirement also in effect, it makes harder to use the
+standard 'checkpatch.pl' from linux distribution as you have to watch for
+a lot more stuff which can get through.
 
-I'm quite worried about big endian systems, but I have plans to buy a PS3 home
-in about a month timeframe unless something extraordinary happens  :)
+Adding --strict option to 'checkpatch.pl' only also reports something like:
+
+CHECK: multiple assignments should be avoided
+#623: FILE: sbc/sbc_primitives.c:381:
++       x[159] = x[31] = pcm[0 + 2];
+
+CHECK: architecture specific defines should be avoided
+#475: FILE: sbc/sbc_primitives_mmx.h:31:
++#if defined(__GNUC__) && (defined(__i386__) || defined(__amd64__)) && \
+
+
+I have learned the following extra bluez coding style requirements over the
+standard linux coding style up to now:
+1. Space is required for cast operation, ex. '(int) x'
+2. Indentation between '#' and 'define' is forbidden
+3. Any kind of leading spaces are forbidden
+
+Have I missed something else?
+
+Anyway, does it make sense to introduce a modified variant of 'checkpatch.pl'?
+Or probably somebody has done it already, but did not care to share with
+everyone else? :)
 
 
 Best regards,
