@@ -1,30 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Patching 2.6.24
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Krishnan R <r_krish@email.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20090115073034.99AEF1059C@ws1-3.us4.outblaze.com>
-References: <20090115073034.99AEF1059C@ws1-3.us4.outblaze.com>
-Content-Type: text/plain
-Date: Sun, 18 Jan 2009 16:20:40 +0100
-Message-Id: <1232292040.5095.18.camel@californication>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Reply-To: <hoene@uni-tuebingen.de>
+From: "Christian Hoene" <christian.hoene@gmx.net>
+To: "'Marcel Holtmann'" <marcel@holtmann.org>
+Cc: <linux-bluetooth@vger.kernel.org>
+References: <016701c97976$e75578d0$b6006a70$@de> <1232291106.5095.6.camel@californication>
+In-Reply-To: <1232291106.5095.6.camel@californication>
+Subject: RE: Questions on connecting BlueZ/SBC with Ekiga
+Date: Sun, 18 Jan 2009 16:19:41 +0100
+Message-ID: <017201c97980$32f7b880$98e72980$@hoene@gmx.net>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Krishnan,
+Hello Marcel,
 
-> Is it possible to pull in just the Bluetooth changes in kernel 2.6.27 to 2.6.24? Does it have any other dependencies? I am trying to use 2.6.24 with BlueZ 4.17. 
+> > Due to legal reason we must use the BlueZ and are not allowed to include
+SBC
+> > into Ekiga.
+> 
+> What kind of legal reasons are you talking about here. The SBC
+> implementation is released under LGPL. Worst case issue here is that you
+> actually build an independent library out of it and just link it
+> dynamically. We were planning to do so anyway, but currently that is not
+> really sufficient for us. It would just create a maintenance overhead.
 
-I have 2.6.24 down as release in January 2008. In Linus years this is an
-ancient kernel. Please just try to forward port any patches you have
-with 2.6.24 to 2.6.28 and use just a recent kernel. In the long-term
-this is the only way to keep you sane. Backporting changes to older
-kernels are always tricky. Sure it can be done, but nobody with a sane
-mind is doing it for free.
+The SBC is covered by patents owned by Frans and Philips. Philips has made a
+legal agreement with Bluetooth SIG allowing SBC to be used in any Bluetooth
+device. Any other usages require permission from Philips.
 
-Regards
+Last year, a Philips' lawyer called me asking me to license SBC if it is
+added to Ekiga. I told them that I do not have money and asked finding
+another solution. However, until now Philips did not made a decision on how
+to process on this issues. I am awaiting it. Luckily, I am not yet sued ;-)
 
-Marcel
+Greetings
 
-
+Christian
