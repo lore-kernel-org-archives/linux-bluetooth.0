@@ -1,78 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Bluez coding style again
+Subject: Re: Questions on connecting BlueZ/SBC with Ekiga
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Siarhei Siamashka <siarhei.siamashka@nokia.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <200901171943.45370.siarhei.siamashka@nokia.com>
-References: <200901171943.45370.siarhei.siamashka@nokia.com>
+To: Christian Hoene <hoene@uni-tuebingen.de>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <016701c97976$e75578d0$b6006a70$@de>
+References: <016701c97976$e75578d0$b6006a70$@de>
 Content-Type: text/plain
-Date: Sun, 18 Jan 2009 16:08:12 +0100
-Message-Id: <1232291292.5095.9.camel@californication>
+Date: Sun, 18 Jan 2009 16:05:06 +0100
+Message-Id: <1232291106.5095.6.camel@californication>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Siarhei,
+Hi Christian,
 
-> > commit 1fb5ffff0b704038a90e03860ecce63be2deb988
-> > Author: Johan Hedberg <johan.hedberg@nokia.com>
-> > Date:   Fri Jan 16 20:29:43 2009 +0200
-> >
-> >     Fix indentation to use only tabs
-> >
-> > --- a/sbc/sbc_tables.h
-> > +++ b/sbc/sbc_tables.h
-> > @@ -161,30 +161,30 @@ static const int32_t synmatrix8[16][8] = {
-> >         ((FIXED_A) 1 << (sizeof(FIXED_T) * CHAR_BIT - 1)) + 0.5)
-> >  #define F(x) F_PROTO4(x)
-> >  static const FIXED_T _sbc_proto_fixed4[40] = {
-> > -        F(0.00000000E+00),  F(5.36548976E-04),
-> > +       F(0.00000000E+00),  F(5.36548976E-04),
-> >         -F(1.49188357E-03),  F(2.73370904E-03),
-> > -        F(3.83720193E-03),  F(3.89205149E-03),
-> > -        F(1.86581691E-03),  F(3.06012286E-03),
-> > +       F(3.83720193E-03),  F(3.89205149E-03),
-> > +       F(1.86581691E-03),  F(3.06012286E-03),
+> I have a question on how to use A2DP and SBC for streaming of audio over the
+> Internet.
 > 
-> With this latest commit, the vertical alignment of elements in tables gets
-> messed up and it becomes harder to see any kind of symmetry in the tables.
-> If the spaces are strictly forbidden, I would probably prefer replacing them
-> with '+' character.
+> How would you implement an interface between Ekiga and BlueZ? The
+> requirements are
+> 1 SBC frames from Ekiga
+> 1.1 Shall be played via an A2DP device.
+> 1.2 Shall be played via the sound card of the PC.
 
-that would be fine with me.
+can you use GStreamer here since that includes the SBC encoder and
+decoder as elements. You can construct the pipeline as you like.
 
-> Anyway, with this requirement also in effect, it makes harder to use the
-> standard 'checkpatch.pl' from linux distribution as you have to watch for
-> a lot more stuff which can get through.
-> 
-> Adding --strict option to 'checkpatch.pl' only also reports something like:
-> 
-> CHECK: multiple assignments should be avoided
-> #623: FILE: sbc/sbc_primitives.c:381:
-> +       x[159] = x[31] = pcm[0 + 2];
-> 
-> CHECK: architecture specific defines should be avoided
-> #475: FILE: sbc/sbc_primitives_mmx.h:31:
-> +#if defined(__GNUC__) && (defined(__i386__) || defined(__amd64__)) && \
-> 
-> 
-> I have learned the following extra bluez coding style requirements over the
-> standard linux coding style up to now:
-> 1. Space is required for cast operation, ex. '(int) x'
-> 2. Indentation between '#' and 'define' is forbidden
-> 3. Any kind of leading spaces are forbidden
-> 
-> Have I missed something else?
-> 
-> Anyway, does it make sense to introduce a modified variant of 'checkpatch.pl'?
-> Or probably somebody has done it already, but did not care to share with
-> everyone else? :)
+Meaning that Ekiga would be a GStreamer source. Of course you would have
+to write that specific source element.
 
-Not sure about checkpatch.pl, but the BlueZ coding style is mainly
-enforced by Johan and me. In some cases you have to break, but that
-should only happen if there is no other choice. 99% of the time you just
-can simplify your code. However I happily admit that with codec work
-this might not always be true.
+> 2. SBC frame going to Ekiga
+> 2.1 Recorded from an A2DP device
+> 2.2 recorded by the PC's sound card.
+
+Having Ekiga as a GStreamer sink sounds like a good idea.
+
+> Due to legal reason we must use the BlueZ and are not allowed to include SBC
+> into Ekiga.
+
+What kind of legal reasons are you talking about here. The SBC
+implementation is released under LGPL. Worst case issue here is that you
+actually build an independent library out of it and just link it
+dynamically. We were planning to do so anyway, but currently that is not
+really sufficient for us. It would just create a maintenance overhead.
 
 Regards
 
