@@ -1,39 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Reply-To: <hoene@uni-tuebingen.de>
-From: "Christian Hoene" <christian.hoene@gmx.net>
-To: "'Marcel Holtmann'" <marcel@holtmann.org>
-Cc: <linux-bluetooth@vger.kernel.org>
-References: <016701c97976$e75578d0$b6006a70$@de> <1232291106.5095.6.camel@californication>
-In-Reply-To: <1232291106.5095.6.camel@californication>
-Subject: RE: Questions on connecting BlueZ/SBC with Ekiga
-Date: Sun, 18 Jan 2009 16:19:41 +0100
-Message-ID: <017201c97980$32f7b880$98e72980$@hoene@gmx.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+Subject: Re: [PATCH] Performance optimizations for sbcenc utility
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Siarhei Siamashka <siarhei.siamashka@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Christian Hoene <hoene@uni-tuebingen.de>
+In-Reply-To: <200901161812.45754.siarhei.siamashka@nokia.com>
+References: <200901161812.45754.siarhei.siamashka@nokia.com>
+Content-Type: text/plain
+Date: Sun, 18 Jan 2009 16:15:44 +0100
+Message-Id: <1232291744.5095.14.camel@californication>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Marcel,
+Hi Siarhei,
 
-> > Due to legal reason we must use the BlueZ and are not allowed to include
-SBC
-> > into Ekiga.
+> The attached patch improves performance of sbcenc utility. This is not very
+> useful in general and does not improve the SBC codec itself. But when using
+> sbcenc utility for benchmarking, an extra unneeded overhead skews the results
+> a bit and this might be worth fixing.
 > 
-> What kind of legal reasons are you talking about here. The SBC
-> implementation is released under LGPL. Worst case issue here is that you
-> actually build an independent library out of it and just link it
-> dynamically. We were planning to do so anyway, but currently that is not
-> really sufficient for us. It would just create a maintenance overhead.
+> Before patch:
+> 
+> real    0m14.984s
+> user    0m12.981s
+> sys     0m1.924s
+> 
+> After patch:
+> 
+> real    0m12.279s
+> user    0m11.865s
+> sys     0m0.360s
+> 
+> 
+> Christian, you fixed some bugs in sbcenc a bit earlier. Could you please
+> also check if all your testcases also work fine with this new patch applied
+> and it does not break anything?
 
-The SBC is covered by patents owned by Frans and Philips. Philips has made a
-legal agreement with Bluetooth SIG allowing SBC to be used in any Bluetooth
-device. Any other usages require permission from Philips.
+patch has been applied to make testing easier. Send fixes if it breaks
+something.
 
-Last year, a Philips' lawyer called me asking me to license SBC if it is
-added to Ekiga. I told them that I do not have money and asked finding
-another solution. However, until now Philips did not made a decision on how
-to process on this issues. I am awaiting it. Luckily, I am not yet sued ;-)
+Regards
 
-Greetings
+Marcel
 
-Christian
+
