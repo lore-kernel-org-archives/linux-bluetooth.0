@@ -1,33 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
 Subject: Re: Patching 2.6.24
 From: Marcel Holtmann <marcel@holtmann.org>
-To: =?UTF-8?Q?=E5=8D=9E=E7=A3=8A?= <mykofzone@gmail.com>
+To: Krishnan R <r_krish@email.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <a172fe730901151739x6c109b40o4e3b1c4803ef4728@mail.gmail.com>
+In-Reply-To: <20090115073034.99AEF1059C@ws1-3.us4.outblaze.com>
 References: <20090115073034.99AEF1059C@ws1-3.us4.outblaze.com>
-	 <a172fe730901151739x6c109b40o4e3b1c4803ef4728@mail.gmail.com>
 Content-Type: text/plain
-Date: Sun, 18 Jan 2009 16:22:45 +0100
-Message-Id: <1232292165.5095.20.camel@californication>
+Date: Sun, 18 Jan 2009 16:20:40 +0100
+Message-Id: <1232292040.5095.18.camel@californication>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Krishnan,
 
->    I meet a similar problem. Last time i try to porting bluetooth in
-> 2.6.27 to 2.6.18 (my EVB's kernel version), and found some kernel API
-> has been changed. So, i think it will take some time, then i suspend
-> this try.
+> Is it possible to pull in just the Bluetooth changes in kernel 2.6.27 to 2.6.24? Does it have any other dependencies? I am trying to use 2.6.24 with BlueZ 4.17. 
 
-that kernel is 2,5 years old. Come on guys, seriously, upgrade your
-kernels.
-
->   By the way, there's only the bluetooth patch for lastest kernel in
-> the BlueZ website. How can i download the old patches?
-
-I am not updating these any more. It is a fruitless job and nobody
-thanks nor pays enough money for it.
+I have 2.6.24 down as release in January 2008. In Linus years this is an
+ancient kernel. Please just try to forward port any patches you have
+with 2.6.24 to 2.6.28 and use just a recent kernel. In the long-term
+this is the only way to keep you sane. Backporting changes to older
+kernels are always tricky. Sure it can be done, but nobody with a sane
+mind is doing it for free.
 
 Regards
 
