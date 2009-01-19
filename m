@@ -1,119 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <664d43d60901190037x6662b8c6iae7d1e24f818a111@mail.gmail.com>
-Date: Mon, 19 Jan 2009 10:37:05 +0200
-From: event <event.riga@gmail.com>
-To: "Marcel Holtmann" <marcel@holtmann.org>
-Subject: Re: [PATCH] Gateway profile
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1232294828.5095.39.camel@californication>
+From: "Christian Hoene" <hoene@uni-tuebingen.de>
+To: "'Brad Midgley'" <bmidgley@gmail.com>,
+        "'Marcel Holtmann'" <marcel@holtmann.org>
+Cc: <linux-bluetooth@vger.kernel.org>
+References: <016701c97976$e75578d0$b6006a70$@de>	 <1232291106.5095.6.camel@californication>	 <1232294483.5095.34.camel@californication> <d89ddf300901181735i5d516dc4r45fc83634fe1d7c7@mail.gmail.com>
+In-Reply-To: <d89ddf300901181735i5d516dc4r45fc83634fe1d7c7@mail.gmail.com>
+Subject: RE: Questions on connecting BlueZ/SBC with Ekiga
+Date: Mon, 19 Jan 2009 06:17:14 +0100
+Message-ID: <019c01c979f5$340040b0$9c00c210$@de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-References: <664d43d60812151512y6631ebf2j9665e1473193077d@mail.gmail.com>
-	 <664d43d60812151514m6c225403i528453fcb6f08430@mail.gmail.com>
-	 <1229482133.10889.5.camel@violet>
-	 <664d43d60901160522o4d21bb03w45f1868c4b860245@mail.gmail.com>
-	 <1232294828.5095.39.camel@californication>
+Content-Type: text/plain;
+	charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, Jan 18, 2009 at 18:07, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi,
->
->> >> I've implemented gateway profile. I've tested basic things, like
->> >> place/cancel/answer call. Others are in development. Some could not be
->> >> tested as my carrier doesn't provide corresponding services (like
->> >> 3-way call, etc.) so any help welcome.
->> >
->> > thanks for the works, but can you please base the patch against the
->> > latest GIT tree. It is kinda hard to review things that might already
->> > have been implemented like sco_listen.
->> >
->> >  audio/audio-api.txt  |   94 +++++
->> >  audio/device.h       |    7
->> >  audio/gateway.c      |  938 +++++++++++++++++++++++++++++++++++++++++++++++++++
->> >  audio/gateway.h      |   11
->> >  audio/manager.c      |  124 ++++--
->> >  common/glib-helper.c |   85 +++-
->> >  common/glib-helper.h |    1
->> >  7 files changed, 1205 insertions(+), 55 deletions(-)
->> >
->> > So any changes to glib-helper.[ch] have to be in a separate patch and
->> > need to be discussed independent from the gateway implementation.
->> >
->> > Any audio-api.txt stuff should also go separately since that has to be
->> > discussed. Also we can't send PCM data over D-Bus. It just doesn't work
->> > like that. We do have the internal IPC for that and plugins for ALSA,
->> > GStreamer and PulseAudio that should be used.
->> >
->> > However the most important part is that you follow the coding style and
->> > that is the kernel coding style. You make it really hard for us to
->> > review the code like this and it can't be applied. I really want you to
->> > add support for the gateway role to BlueZ, but the overall code in the
->> > project needs to follow the same rules.
->> >
->> > So please fix these issues first and then we do a deep review of it.
->>
->> Here is reworked and improved patches as you suggested with IPC support.
->>
->> But I have some doubts and questions:
->> 1. to distinguish between headset and gateway I've added one more alsa
->> config option "role" which could be master (for gateway and probably
->> a2dp source) or slave (which is default and works for headset and a2dp
->> sink). I don't really like this approach so if you have any other idea
->> it would be great.
->
-> we should use the terms "headset", "gateway", "sink" and "source" as
-> these are used through the specs.
->
+Hello Brad,
 
-But current configuration contains "type" which is either voice or
-hifi. So should I set 4 mentioned above for type field? I mean this
-will break backward compatibility.
+> Can anyone comment on whether this is specific to the encoder/decoder?
+> Is the patent an inevitable part of the codec or limited to a specific
+> implementation?
 
->> 2. my cell phone closes SCO connection when it doesn't need one,
->> probably others act like this as well. SCO close results in
->> bluetooth_hsp_write returning an error. What would be the best way to
->> overcome this?
->
-> No idea what's the problem here. You should already get a notice of the
-> IPC that the channel is closed. On closed channels we have to discard
-> any kind of PCM data from the PC.
->
+It is part of the codec algorithm and thus part of any implementation.
 
-That is how it should work with current implementation but it would
-not be very nice for application developers as e.g. pause of the
-player on the phone will result in snd_pcm_read (or how is it named)
-returning an error. I've tested using pyalsaaudio which raises an
-exception in this case.
-If I would develop an application over such api I would say several bad words :)
+> 
+> > good to know since I was under the impression that SBC is royalty free
+> > in all cases and not only Bluetooth. You might wanna check if it says
+> > Bluetooth device or Bluetooth usage. Do they really bind it to devices
+> > or to the transport?
+> 
+> How is a computer with a qualified USB adapter different from any
+> other qualified bluetooth device? Does the software have to be
+> targeted for a specific portable computer as opposed to useful on any
+> computer?
 
->> 3. I've noticed that ipc interface duplicate dbus interface to some
->> extent. Why can't pcm_bluetooth work over dbus directly?
->
-> D-Bus can't handle massive amount of PCM data payload. Also the ALSA
-> plugins don't really like dealing with a D-Bus mainloop. Hence we do
-> have the IPC as an alternate way of dealing with audio. We don't like to
-> do it, but we have to.
->
+I am sorry to say what I do not have the contract between Philips and
+Bluetooth SIG. Thus, only the legal department of Philips can answer your
+question. I requested feedback from the legal department of Philips.
+However, I am still awaiting an answer. I will inform you as soon as I get
+it. 
+The SBC issues does not seem to have a high priority because the amount of
+money to make or loss is quite low.
 
-You can add one more DBus call which will create socket and send audio
-connection over it.
+Best regards,
 
->> 4. Aren't there any legal issues with implementing bluez? As I noticed
->> in the spec that all the rights belong to Bluetooth SIG so it does
->> look neither "free as in free beer" nor "free as in freedom" :)
->
-> BlueZ is a fully qualified host stack that complies with the SIG's
-> requirements. We do have to update the listing with a headset gateway
-> role at some point, but only once we have it fully working and actually
-> used in a product.
->
-> Regards
->
-> Marcel
->
->
->
-
-
-Vale,
-Leonid Movshovich
+ Christian
