@@ -1,61 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
-From: Nick Pelly <npelly@google.com>
+Message-ID: <49762FAC.8090007@dell.com>
+Date: Tue, 20 Jan 2009 14:10:20 -0600
+From: Mario Limonciello <mario_limonciello@dell.com>
+MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Cc: Nick Pelly <npelly@google.com>
-Subject: [PATCH] Update l2ping man page for recent changes to l2ping.
-Date: Tue, 20 Jan 2009 12:51:22 -0800
-Message-Id: <1232484682-7103-1-git-send-email-npelly@google.com>
+Subject: Re: Dell Wireless 360 Bluetooth HID devices not being remembered
+ over suspend/reboot
+References: <b3f4dcd00901161441n6e2d98e6l193bcc8372fd2bc8@mail.gmail.com> <1232291616.5095.13.camel@californication>
+In-Reply-To: <1232291616.5095.13.camel@californication>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="------------enigA3EA3C6EBAA021A8C82C502F"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- tools/l2ping.1 |   17 +++++++++++++----
- 1 files changed, 13 insertions(+), 4 deletions(-)
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enigA3EA3C6EBAA021A8C82C502F
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/tools/l2ping.1 b/tools/l2ping.1
-index 8f56fb5..4d09b05 100644
---- a/tools/l2ping.1
-+++ b/tools/l2ping.1
-@@ -11,12 +11,11 @@ l2ping \- Send L2CAP echo request and receive answer
- .IR count \|]
- .RB [\| \-t
- .IR timeout \|]
-+.RB [\| \-d
-+.IR delay \|]
- .RB [\| \-f \|]
- .RB [\| \-r \|]
--.I bd_addr
--
--.SH DESCRIPTION
--.LP
-+.RB [\| \-v \|]
- .I bd_addr
- 
- .SH DESCRIPTION
-@@ -49,6 +48,11 @@ Wait
- .I timeout
- seconds for the response.
- .TP
-+.BI \-d " delay"
-+Wait
-+.I delay
-+seconds between pings.
-+.TP
- .B \-f
- Kind of flood ping. Use with care! It reduces the delay time between packets
- to 0.
-@@ -56,6 +60,11 @@ to 0.
- .B \-r
- Reverse ping (gnip?). Send echo response instead of echo request.
- .TP
-+.B \-v
-+Verify response payload is identical to request payload. It is not required for
-+remote stacks to return the request payload, but most stacks do (including
-+Bluez).
-+.TP
- .I bd_addr
- The Bluetooth MAC address to be pinged in dotted hex notation like
- .B 01:02:03:ab:cd:ef
--- 
-1.6.0.1
+Hi Guys:
 
+Unfortunately I haven't been able to get ahold of the documentation for
+what is happening under the hood here.  If I do, i'll be glad to get
+some form of a patch together or try to get said documentation released.
+
+Regards
+
+Marcel Holtmann wrote:
+> Hi Matthew,
+>
+>  =20
+>> I know that this is a developers list, but I have dug pretty deeply
+>> here and got to the bottom of what the built-in USB bluetooth dongle
+>> is.  I have found that its CSR based.   Under Windows Vista my Apple
+>> keyboard and Logitech MX 900 work and are remembered across boots.
+>> From what I have heard, this device should just work.  System is a
+>> Dell Vostro 1510 with Intel Core2Duo running Ubuntu Intrepid Ibex,
+>> bluez 4.22.  I also have an Intel 3945 ABG PCI mini wireless card in
+>> it as well.
+>>
+>> I am willing to do the hacking to get this going - I used to submit
+>> patches to the Linux kernel and develop/patch network drivers for
+>> Frame Relay WAN, as well as making the 2.2x ehternet bridge accessible=
+
+>> via a virtual ethernet interface - my email address was
+>> grantma@anathoth.gen.nz.
+>>
+>> Should I be using the module flags for a straight CSR modem?  Is the
+>> kernel module btusb ths only place the bluez stack looks hard at the
+>> hardware?
+>>
+>> From what I have found looking at posts to the list, the CSR dongle,
+>> once it is set up properly - I don't mind running a CSR DFU firmware
+>> on it - it should just work.
+>>
+>> I am going to test software by using my old Logitech dongle in the MX
+>> 900 base station-charger.
+>>
+>> Getting the mouse going reliably and keyboard is going to help with my=
+
+>> frustrations with the small sized keys on the laptop keyboard when
+>> essay writing - currently  I am rebinding the OOo.org keys into an
+>> emacs type of keymap.
+>>
+>> lsusb and hciconfig -a output follow.  Is there anything else that may=
+
+>> be helpful?
+>>
+>> I gather that solving this will help out a lot of Ubuntu Dell laptop u=
+sers.
+>>    =20
+>
+> check with "hciconfig hci0 revision" and "bccmd buildname" (both as
+> root) if they have a special Dell firmware running on it. If not then
+> there can be still a Dell custom application running in the VM of the
+> Bluetooth chip.
+>
+> Best bet is to ask Mario from Dell if he can help us out here and maybe=
+
+> make HID/HCI switching persistent across reboots. If not then we might
+> have to write a bluetoothd plugin that does the job for us.
+>
+> Regards
+>
+> Marcel
+>
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetoo=
+th" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>  =20
+
+--=20
+Mario Limonciello
+*Dell | Linux Engineering*
+mario_limonciello@dell.com
+
+
+--------------enigA3EA3C6EBAA021A8C82C502F
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
+
+iEYEARECAAYFAkl2L6wACgkQ2CrZjkA73YvRNwCfVh7EVfJFHnSGa9L+xFmLUk2E
+TfcAoJSOoUdopfDeM34OBKZ4JVbEYQW9
+=xPLx
+-----END PGP SIGNATURE-----
+
+--------------enigA3EA3C6EBAA021A8C82C502F--
