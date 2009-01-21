@@ -1,87 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Bluez coding style again
+Subject: Re: [RFC] Some kernel changes
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Siarhei Siamashka <siarhei.siamashka@nokia.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <200901201849.00079.siarhei.siamashka@nokia.com>
-References: <200901171943.45370.siarhei.siamashka@nokia.com>
-	 <1232291292.5095.9.camel@californication>
-	 <200901201849.00079.siarhei.siamashka@nokia.com>
+To: jaikumar Ganesh <jaikumarg@gmail.com>
+Cc: Nick Pelly <npelly@google.com>,
+	Ville Tervo <ville.tervo@nokia.com>,
+	linux-bluetooth@vger.kernel.org, johan.hedberg@nokia.com
+In-Reply-To: <ac290f760901201628u7f1f4fc7xf6fe21de90bdc194@mail.gmail.com>
+References: <496895AB.4050902@nokia.com>
+	 <1231768413.23749.1.camel@californication>
+	 <35c90d960901120915g76235db9ra480cf3431d3025@mail.gmail.com>
+	 <1231873966.12234.2.camel@californication>
+	 <ac290f760901151113jfd2d3b2t8bce890dd186ecbd@mail.gmail.com>
+	 <1232061946.15331.1.camel@californication>
+	 <ac290f760901151552y2b176f0cjf44a29dabfa8e309@mail.gmail.com>
+	 <1232099244.27758.4.camel@californication>
+	 <ac290f760901201054r804f79dm5b03abf73e2e89cf@mail.gmail.com>
+	 <DD78C3E4-03E2-417F-99B9-7D67B311C643@holtmann.org>
+	 <ac290f760901201628u7f1f4fc7xf6fe21de90bdc194@mail.gmail.com>
 Content-Type: text/plain
-Date: Wed, 21 Jan 2009 12:21:22 +0100
-Message-Id: <1232536882.26470.3.camel@californication>
+Date: Wed, 21 Jan 2009 12:19:12 +0100
+Message-Id: <1232536752.26470.1.camel@californication>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Siarhei,
+Hi Jaikumar,
 
-> > > > --- a/sbc/sbc_tables.h
-> > > > +++ b/sbc/sbc_tables.h
-> > > > @@ -161,30 +161,30 @@ static const int32_t synmatrix8[16][8] = {
-> > > >         ((FIXED_A) 1 << (sizeof(FIXED_T) * CHAR_BIT - 1)) + 0.5)
-> > > >  #define F(x) F_PROTO4(x)
-> > > >  static const FIXED_T _sbc_proto_fixed4[40] = {
-> > > > -        F(0.00000000E+00),  F(5.36548976E-04),
-> > > > +       F(0.00000000E+00),  F(5.36548976E-04),
-> > > >         -F(1.49188357E-03),  F(2.73370904E-03),
-> > > > -        F(3.83720193E-03),  F(3.89205149E-03),
-> > > > -        F(1.86581691E-03),  F(3.06012286E-03),
-> > > > +       F(3.83720193E-03),  F(3.89205149E-03),
-> > > > +       F(1.86581691E-03),  F(3.06012286E-03),
-> > >
-> > > With this latest commit, the vertical alignment of elements in tables
-> > > gets messed up and it becomes harder to see any kind of symmetry in the
-> > > tables. If the spaces are strictly forbidden, I would probably prefer
-> > > replacing them with '+' character.
+> >>>>> why do you wanna set AUTH_PENDING again. That is not needed we only
+> >>>>> wanna know once encryption comes back on. If no in time, then we just
+> >>>>> disconnect the link. That simple.
+> >>>>>
+> >>>>>>  b) I also see that we are not clearing the timer and hence after
+> >>>>>> RFCOMM_AUTH_TIMEOUT period expires we bring down the RFCOMM connection
+> >>>>>> even though the encryption has been established.
+> >>>>>
+> >>>>> Good catch. Fixed it.
+> >>>>
+> >>>> Cool.  Can you upload it to bluetooth-testing git ? I saw a related
+> >>>> problem while looking at the timer issue and wanted to see if the fix
+> >>>> takes care of it.
+> >>>
+> >>> I am in the process in doing so, but there are other important things
+> >>> that need to be done first.
+> >>
+> >> Sorry to push you on this, is this patch been uploaded ?
 > >
-> > that would be fine with me.
+> > since a few days now. Check the bluetooth-testing.git and it is even rebased
+> > against 2.6.29-rc2.
 > >
-> > > Anyway, with this requirement also in effect, it makes harder to use the
-> > > standard 'checkpatch.pl' from linux distribution as you have to watch for
-> > > a lot more stuff which can get through.
-> > >
-> > > Adding --strict option to 'checkpatch.pl' only also reports something
-> > > like:
-> > >
-> > > CHECK: multiple assignments should be avoided
-> > > #623: FILE: sbc/sbc_primitives.c:381:
-> > > +       x[159] = x[31] = pcm[0 + 2];
-> > >
-> > > CHECK: architecture specific defines should be avoided
-> > > #475: FILE: sbc/sbc_primitives_mmx.h:31:
-> > > +#if defined(__GNUC__) && (defined(__i386__) || defined(__amd64__)) && \
-> > >
-> > >
-> > > I have learned the following extra bluez coding style requirements over
-> > > the standard linux coding style up to now:
-> > > 1. Space is required for cast operation, ex. '(int) x'
-> > > 2. Indentation between '#' and 'define' is forbidden
-> > > 3. Any kind of leading spaces are forbidden
-> > >
-> > > Have I missed something else?
-> > >
-> > > Anyway, does it make sense to introduce a modified variant of
-> > > 'checkpatch.pl'? Or probably somebody has done it already, but did not
-> > > care to share with everyone else? :)
-> >
-> > Not sure about checkpatch.pl, but the BlueZ coding style is mainly
-> > enforced by Johan and me. In some cases you have to break, but that
-> > should only happen if there is no other choice. 99% of the time you just
-> > can simplify your code. However I happily admit that with codec work
-> > this might not always be true.
+> I applied the patches and I see that we actually don't pause the
+> RFCOMM tx traffic because we don't check on
+> the RFCOMM_SEC_PENDING flag when sending the tx packets in rfcomm_process_dlcs.
+> I verified this using the "attest" command - we keep sending RFCOMM
+> traffic even though encryption is off.
 > 
-> OK, I see. Thanks for the explanation.
+> Please look at the patch attached.
 > 
-> Script 'checkpatch.pl' from the linux kernel is quite convenient because it
-> detects most of the coding style problems automatically and saves some
-> of the time when preparing a patch.
-> 
-> I'm just desperately trying to do everything in a right way, but still happen
-> to violate one rule or another occasionally :)
+> Also should we drop the "rx" packets too  when the encryption is dropped ?
 
-don't worry. Sometimes we have to bend the rules. The highest priority
-is readability and make patch management simple for us ;)
+can you get me a version with a proper commit message. Just the subject
+is not gonna be good enough.
 
 Regards
 
