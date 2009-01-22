@@ -5,15 +5,15 @@ To: "'Siarhei Siamashka'" <siarhei.siamashka@nokia.com>,
 References: <200901220111.29248.siarhei.siamashka@nokia.com>
 In-Reply-To: <200901220111.29248.siarhei.siamashka@nokia.com>
 Subject: RE: [PATCH] Audio quality improvement for 16-bit fixed point SBC encoder
-Date: Thu, 22 Jan 2009 12:58:57 +0100
-Message-ID: <004001c97c88$ce69da90$6b3d8fb0$@de>
+Date: Thu, 22 Jan 2009 11:05:53 +0100
+Message-ID: <003901c97c79$030fe470$092fad50$@de>
 MIME-Version: 1.0
 Content-Type: text/plain;
 	charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Siarhei,
+Hello all,
 
 > Hello all,
 > 
@@ -28,8 +28,7 @@ The PEAQ results for latest version and the latest plus your latest patch
 can be found
 http://net.cs.uni-tuebingen.de/html/nexgenvoip/ in latest and latest+patch.
 
-Congratulations, the encoder is perfect now. Sometimes even better than the
-reference!
+I need to write a diff webpage...
 
 Greetings
 
