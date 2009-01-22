@@ -1,73 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Bluez coding style again
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Siarhei Siamashka <siarhei.siamashka@nokia.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <200901221759.37087.siarhei.siamashka@nokia.com>
-References: <200901171943.45370.siarhei.siamashka@nokia.com>
-	 <200901201849.00079.siarhei.siamashka@nokia.com>
-	 <1232536882.26470.3.camel@californication>
-	 <200901221759.37087.siarhei.siamashka@nokia.com>
-Content-Type: text/plain
-Date: Fri, 23 Jan 2009 02:01:51 +0100
-Message-Id: <1232672511.10609.10.camel@californication>
-Mime-Version: 1.0
+Message-Id: <2C0A35D3-4DD9-4089-8061-F596A8A5A4B8@tiscali.it>
+From: Michele Noberasco <michele.noberasco@tiscali.it>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
+Mime-Version: 1.0 (Apple Message framework v930.3)
+Subject: [PATCH] BlueZ support for audio gateway role (HFP/HSP)
+Date: Thu, 22 Jan 2009 17:43:00 +0100
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Siarhei,
+Hello list,
 
-> > > > > > --- a/sbc/sbc_tables.h
-> > > > > > +++ b/sbc/sbc_tables.h
-> > > > > > @@ -161,30 +161,30 @@ static const int32_t synmatrix8[16][8] = {
-> > > > > >         ((FIXED_A) 1 << (sizeof(FIXED_T) * CHAR_BIT - 1)) + 0.5)
-> > > > > >  #define F(x) F_PROTO4(x)
-> > > > > >  static const FIXED_T _sbc_proto_fixed4[40] = {
-> > > > > > -        F(0.00000000E+00),  F(5.36548976E-04),
-> > > > > > +       F(0.00000000E+00),  F(5.36548976E-04),
-> > > > > >         -F(1.49188357E-03),  F(2.73370904E-03),
-> > > > > > -        F(3.83720193E-03),  F(3.89205149E-03),
-> > > > > > -        F(1.86581691E-03),  F(3.06012286E-03),
-> > > > > > +       F(3.83720193E-03),  F(3.89205149E-03),
-> > > > > > +       F(1.86581691E-03),  F(3.06012286E-03),
-> > > > >
-> > > > > With this latest commit, the vertical alignment of elements in tables
-> > > > > gets messed up and it becomes harder to see any kind of symmetry in
-> > > > > the tables. If the spaces are strictly forbidden, I would probably
-> > > > > prefer replacing them with '+' character.
-> > > >
-> > > > that would be fine with me.
-> 
-> Well, I tried that with the last patch (constants tweaks for audio quality
-> improvement), but 'checkpatch.pl' tool does not like it very much (it wants
-> a space between '+' operator and 'F').
-> 
-> [...]
-> 
-> > > I'm just desperately trying to do everything in a right way, but still
-> > > happen to violate one rule or another occasionally :)
-> >
-> > don't worry. Sometimes we have to bend the rules. The highest priority
-> > is readability and make patch management simple for us ;)
-> 
-> I just returned some spaces as they improve vertical alignment and
-> readability:
-> 
-> +	 F(2.73370904E-03 * C0),  F(5.36548976E-04 * C0),
-> +	-F(1.49188357E-03 * C1),  F(0.00000000E+00 * C1),
-> +	 F(3.83720193E-03 * C2),  F(1.09137620E-02 * C2),
-> +	 F(3.89205149E-03 * C3),  F(3.06012286E-03 * C3),
-> 
-> I hope this should be ok.
+some time ago my company tasked me to develop this feature, but  
+unfortunately they changed their mind before I could complete  
+development. I sought to finish it on my own, but my spare time is  
+dwindling lately.
 
-fine with me and let Johan know so he doesn't fix it ;)
+So I thought that someone might be interested to pick development up  
+where I left it off.
 
-I am still behind applying your patches, but I will get to it. Just
-mention that you really want it applied. Makes it easier for me to go
-through the patch logs.
- 
-Regards
+If anyone is interested, I'm willing to provide the source code of my  
+own work. I implemented it for HSP up to the actual creation of audio  
+channels (excluded). Mostly implemented and working is rfcomm  
+connection and event passing ("RING", ...).
 
-Marcel
+My modifications are made against bluez-3.36 (latest version of the  
+3.x branch), but I think it should be trivial to forward port them to  
+bluez 4 (if you have a look at audio/gateway.c you will notice there  
+is nothing in there), so I would provide a patch that applies against  
+that codebase.
 
+Best regards,
+Michele Noberasco
 
