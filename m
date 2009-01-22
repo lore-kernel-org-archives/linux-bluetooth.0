@@ -1,30 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <200901220111.29248.siarhei.siamashka@nokia.com>
+From: "Christian Hoene" <hoene@uni-tuebingen.de>
+To: "'Siarhei Siamashka'" <siarhei.siamashka@nokia.com>,
+	<linux-bluetooth@vger.kernel.org>
 References: <200901220111.29248.siarhei.siamashka@nokia.com>
-Date: Thu, 22 Jan 2009 10:36:36 -0300
-Message-ID: <2d5a2c100901220536v268134a5m65c7aa4062b39686@mail.gmail.com>
-Subject: Re: [PATCH] Audio quality improvement for 16-bit fixed point SBC
-	encoder
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Siarhei Siamashka <siarhei.siamashka@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <200901220111.29248.siarhei.siamashka@nokia.com>
+Subject: RE: [PATCH] Audio quality improvement for 16-bit fixed point SBC encoder
+Date: Thu, 22 Jan 2009 12:58:57 +0100
+Message-ID: <004001c97c88$ce69da90$6b3d8fb0$@de>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Siarhei,
+Hello Siarhei,
 
-> I decided to drop non-SIMD variant because it would require quite a bit of
-> work to update for better precision. Most of the CPU cores which are
-> relevant nowadays have support for some kind of SIMD extension anyway.
-> I will also do ARMv6 SIMD version of the analysis filter after all the high
-> level SBC optimizations are in place.
+> Hello all,
+> 
+> The attached patch quite noticeably minimizes rounding errors and improves
+> audio quality.
+> 
 
-Perhaps we can just disable it, since it is probably useful to
-maintain a version in C as a reference code just in case someone want
-to do its own optimizations in the future.
 
--- 
-Luiz Augusto von Dentz
-Engenheiro de Computação
+> It is very interesting to see what a more advanced PEAQ test will show.
+
+The PEAQ results for latest version and the latest plus your latest patch
+can be found
+http://net.cs.uni-tuebingen.de/html/nexgenvoip/ in latest and latest+patch.
+
+Congratulations, the encoder is perfect now. Sometimes even better than the
+reference!
+
+Greetings
+
+ Christian
+
