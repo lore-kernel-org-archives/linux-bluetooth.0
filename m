@@ -1,54 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <20090123154854.4tvftpuo004w8g8s@webmail.unina.it>
-Date: Fri, 23 Jan 2009 15:48:54 +0100
-From: ranaldo@unina.it
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] bluez-utils 3.36 hcid crashes if wrong script files in
-	network.conf
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
-	DelSp=Yes	format=flowed
+Cc: Kernel Janitors <kernel-janitors@vger.kernel.org>,
+	richard.genoud@gmail.com, linux-bluetooth@vger.kernel.org
+Message-Id: <BEC94463-F21B-4B9A-BB4F-248ECF9D8329@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Daniele Venzano <venza@brownhat.org>
+In-Reply-To: <20090123140946.GA31355@milesteg.arr>
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Mime-Version: 1.0 (Apple Message framework v930.3)
+Subject: Re: [PATCH] Fix unused variable warning in rfcomm
+Date: Fri, 23 Jan 2009 15:22:09 +0100
+References: <20090123140946.GA31355@milesteg.arr>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I'm sorry if this is not the right place to post this as the wiki and  
-sourceforge project seems to be outdated.
+Hi guys,
 
-On gentoo box a default network.conf file is installed from the  
-sources in /etc/bluetooth.
-The file itself has no problem but having avahi-autoipd as script,  
-while in other distributions this is unset, evidences a problem in the  
-function bnep_exec in network/common.c
-If the script does not exists or bnep_exec fails for other reasons,  
-hcid crashes for a very trivial mistake in the log error call.
+> Sorry, shouldn't have missed that.
+>
+> The following patch fixes a warning generated when compiling rfcomm.c
+> without CONFIG_BT_RFCOMM_DEBUG.
+> The warning was:
+> net/bluetooth/rfcomm/sock.c: In function 'rfcomm_sock_ioctl':
+> net/bluetooth/rfcomm/sock.c:795: warning: unused variable 'sk'
 
-Here a simple patch to fix this issue:
+this has been fixed upstream already. So why does this come up again?
 
---- network/common.c    2009-01-23 15:52:12.000000000 +0100
-+++ network/common.c    2009-01-23 15:45:47.000000000 +0100
-@@ -235,7 +235,7 @@
+Regards
 
-         if (!g_spawn_async(NULL, (char **) argv, NULL, flags,  
-bnep_setup, NULL,
-                                 &pid, NULL)) {
--               error("Unable to execute %s %s", *argv[0], *argv[1]);
-+               error("Unable to execute %s %s", argv[0], argv[1]);
-                 return -EINVAL;
-         }
-
-I know that 3.36 should be the last in the 3.* series, however as  
-there are a lot of distros using it, and as the same problem could  
-affect 4.* series too i preferred to report this upstream.
-
-The last thing, again about network.conf shipped file, the line:
-#Disable=Connection,Server
-should be
-#Disable=Connection;Server
-as who ignores the syntax of the conf file may not guess to use the  
-";" instead of "," .
-
-Best Regards
-
-      Nicola Ranaldo
-
+Marcel
 
