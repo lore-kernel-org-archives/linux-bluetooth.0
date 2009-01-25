@@ -1,25 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <497DC12D.2090005@suse.de>
-Date: Mon, 26 Jan 2009 14:57:01 +0100
-From: Tom Patzig <tpatzig@suse.de>
-Reply-To: tpatzig@suse.de
+Date: Sun, 25 Jan 2009 14:28:03 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: Inquiry w/ RSSI ?
+Message-ID: <20090125122803.GA6787@jh-x301>
+References: <108aa36c0901241906j284c53bwf755f95d0c45592e@mail.gmail.com>
 MIME-Version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: app doesn't recieve signal DeviceDisappeared
-References: <49696D00.9030604@gmail.com>	 <1232292554.5095.26.camel@californication> <49739C4F.10905@gmail.com>	 <4974D9E1.7070003@suse.de> <2d5a2c100901231411y10d4a5aay45e30eca619088ed@mail.gmail.com>
-In-Reply-To: <2d5a2c100901231411y10d4a5aay45e30eca619088ed@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <108aa36c0901241906j284c53bwf755f95d0c45592e@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
-> It should've been fixed now. Note that you only got those signals
-> while a discovery session is active (someone called
-> Adapter.StartDiscovery()).
->   
-Thanks a lot. Works great.
-Now i just need to wait for the next bluez release, to make use of it in
-KBlueLock :)
 
-Tom
+On Sun, Jan 25, 2009, Francis Bernard wrote:
+> I have checked "Host Controller Interface Functional Specification -
+> 7.7.33 Inquiry Result with RSSI Event" on the latest Bluetooth
+> Specification, and it made me think this could probably be possible,
+> but i have no knowledge about your implementation and if this could be
+> or is implemented.
+> 
+> I saw some adapted code for hcitool.c, at
+> http://pysportslive.googlecode.com/svn/trunk/pyrssi/bluessid.c, and I
+> was wondering if by making some adaptations at this level, i would
+> achieve my needs.
+
+bluetoothd already supports the RSSI information in its D-Bus API. You
+will get the information as a "RSSI" property within the DeviceFound
+signals. If you really don't want to use the D-Bus API you might want to
+take a look how bluetoothd handles this internally. A good place to
+start from is the hcid_dbus_inquiry_result function in the
+src/dbus-hci.c file and the inquiry_result_with_rssi function in the
+src/security.c file.
+
+Johan
