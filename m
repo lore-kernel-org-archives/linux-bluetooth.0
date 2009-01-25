@@ -1,36 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 25 Jan 2009 14:28:03 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: Inquiry w/ RSSI ?
-Message-ID: <20090125122803.GA6787@jh-x301>
-References: <108aa36c0901241906j284c53bwf755f95d0c45592e@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <108aa36c0901241906j284c53bwf755f95d0c45592e@mail.gmail.com>
+Date: Sun, 25 Jan 2009 03:06:52 +0000
+Message-ID: <108aa36c0901241906j284c53bwf755f95d0c45592e@mail.gmail.com>
+Subject: Inquiry w/ RSSI ?
+From: Francis Bernard <frantic.francis@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Francisco Bernardo <franxico@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hello,
 
-On Sun, Jan 25, 2009, Francis Bernard wrote:
-> I have checked "Host Controller Interface Functional Specification -
-> 7.7.33 Inquiry Result with RSSI Event" on the latest Bluetooth
-> Specification, and it made me think this could probably be possible,
-> but i have no knowledge about your implementation and if this could be
-> or is implemented.
-> 
-> I saw some adapted code for hcitool.c, at
-> http://pysportslive.googlecode.com/svn/trunk/pyrssi/bluessid.c, and I
-> was wondering if by making some adaptations at this level, i would
-> achieve my needs.
+i would like to know if is possible to get the rssi, linq quality or
+transmit power level values from remote devices that aren't connected.
 
-bluetoothd already supports the RSSI information in its D-Bus API. You
-will get the information as a "RSSI" property within the DeviceFound
-signals. If you really don't want to use the D-Bus API you might want to
-take a look how bluetoothd handles this internally. A good place to
-start from is the hcid_dbus_inquiry_result function in the
-src/dbus-hci.c file and the inquiry_result_with_rssi function in the
-src/security.c file.
+I know this may sound nonsense, but i'm looking for someway to get a
+proximity value of unknown devices ( that haven't paired or
+established a connection previously ) that only appear on the scan
+results. I tried out the hcitool, and inspite of discovering the
+exceptional tool it is, i haven't found what i need.
 
-Johan
+I have checked "Host Controller Interface Functional Specification -
+7.7.33 Inquiry Result with RSSI Event" on the latest Bluetooth
+Specification, and it made me think this could probably be possible,
+but i have no knowledge about your implementation and if this could be
+or is implemented.
+
+I saw some adapted code for hcitool.c, at
+http://pysportslive.googlecode.com/svn/trunk/pyrssi/bluessid.c, and I
+was wondering if by making some adaptations at this level, i would
+achieve my needs.
+
+Regards,
+
+Francisco Bernardo
