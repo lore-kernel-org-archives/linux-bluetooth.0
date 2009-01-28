@@ -1,28 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: bluez and rfcomm
+Subject: Re: wifi coexistence
 From: Marcel Holtmann <marcel@holtmann.org>
-To: David Thornton <david@villagepublishing.com.au>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <BF25BE8B-1DDF-4981-BFCB-6295A64F77B9@villagepublishing.com.au>
-References: <BF25BE8B-1DDF-4981-BFCB-6295A64F77B9@villagepublishing.com.au>
+To: Paulo Bustelo Codesido <pbustelo@ontouch.es>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <116E93DD-490C-4D73-A821-C3E9BD720152@ontouch.es>
+References: <116E93DD-490C-4D73-A821-C3E9BD720152@ontouch.es>
 Content-Type: text/plain
-Date: Wed, 28 Jan 2009 06:56:44 +0100
-Message-Id: <1233122204.18259.20.camel@violet>
+Date: Wed, 28 Jan 2009 06:55:51 +0100
+Message-Id: <1233122151.18259.19.camel@violet>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hi Paulo,
 
-> I was wondering if the /dev/rfcommX device nodes are handled directly  
-> by the kernel module (bluez) itself or by a userspace program?
+> Does anybody know why I have interferences between bluetooth and wifi  
+> (wifi stops) while using a AFH bluetooth device with blueZ?
+> 
+> Has anything to do with blueZ?
+> 
+> the bluetooth device is a WT11-E-HCI from Bluegiga.
+> 
+> How can I avoid it?
+> 
+> I was trying to put evrything but antenna into a aluminium box... But  
+> the problem is still there....
+> 
+> "hciconfig hci0 afhmode" returns enabled...
 
-they are handled direct by the kernel.
-
-> (its not possible for anything userspace to put something in /dev is  
-> it?)
-
-Not without kernel help. Even PTYs are done with kernel help.
+the AFH is limited in what it can do. It tries its best to do the right
+thing. You would have to manually block the channels your WiFi is
+submitting on. Check with hcitool afh.
 
 Regards
 
