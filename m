@@ -1,34 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] BlueZ support for audio gateway role (HFP/HSP)
+Subject: Re: Can we connected HFP and A2DP at the same time?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Michele Noberasco <michele.noberasco@tiscali.it>
-Cc: event <event.riga@gmail.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <A9056199-F858-4104-8B29-D2E55842306E@tiscali.it>
-References: <2C0A35D3-4DD9-4089-8061-F596A8A5A4B8@tiscali.it>
-	 <664d43d60901222334h4e1cb498hf8b3b01433e3ab92@mail.gmail.com>
-	 <A9056199-F858-4104-8B29-D2E55842306E@tiscali.it>
+To: =?UTF-8?Q?=E5=8D=9E=E7=A3=8A?= <mykofzone@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <a172fe730901222111i1837081apadbf9402d57868c2@mail.gmail.com>
+References: <a172fe730901222111i1837081apadbf9402d57868c2@mail.gmail.com>
 Content-Type: text/plain
-Date: Wed, 28 Jan 2009 06:54:15 +0100
-Message-Id: <1233122055.18259.17.camel@violet>
+Date: Wed, 28 Jan 2009 06:51:59 +0100
+Message-Id: <1233121919.18259.15.camel@violet>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michele,
+Hi,
 
-> > I'm doing the same function just now :).
-> > So please send your code and I will look there for something I've  
-> > missed.
-> 
-> Glad that my partial work might be of help.
-> Here it is...
+>      This is the case for the cellphone : suppose the user is
+> listening music via A2DP, then a call coming, the user can answer this
+> call via HFP (press answer key in the bluetooth headset). After the
+> call ending, the cellphone will continue to play music via A2DP.
+>     I test several headset on Moto A1200
+> (iTech/Jabra/SonyEricsson/Moto bluetooth headset). But not all the
+> headset can answer the call by pressing answer key. Only the
+> iTech/Jabra can pass this case.
+>     My question is : does the bluez protocol support connected HFP and
+> A2DP at the same time? Then how can i judge whether a headset support
+> this or not? Thanks.
 
-I like you two guys work together and send patches against BlueZ 4.x to
-add the headset roles. Please split the work in smaller patches so we
-can actually review it. Big chunks are always hard to chew and time
-consuming. The quicker either Johan, Luiz or me can go through the code
-the quicker we can merge it.
+in theory you can, but there are certain physical limits and I don't
+know of any headset that does support it. BlueZ would be just fine in
+doing so.
 
 Regards
 
