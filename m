@@ -1,46 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1233121919.18259.15.camel@violet>
-References: <a172fe730901222111i1837081apadbf9402d57868c2@mail.gmail.com>
-	 <1233121919.18259.15.camel@violet>
-Date: Wed, 28 Jan 2009 15:23:51 +0800
-Message-ID: <a172fe730901272323i7950cc46k3f9d9b94e4d8707f@mail.gmail.com>
-Subject: Re: Can we connected HFP and A2DP at the same time?
-From: =?GB2312?B?seXA2g==?= <mykofzone@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: Is it possible to completely turn off encryption
+From: Marcel Holtmann <marcel@holtmann.org>
+To: netdesign_98@yahoo.com
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <510518.84246.qm@web52608.mail.re2.yahoo.com>
+References: <510518.84246.qm@web52608.mail.re2.yahoo.com>
+Content-Type: text/plain
+Date: Wed, 28 Jan 2009 06:59:04 +0100
+Message-Id: <1233122344.18259.22.camel@violet>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
-   You are right. I make a mistake about HFP rfcomm channel num. Now,
-i can connected HFP/A2DP at the sametime. Thanks.
 
-Regards,
-LeiBian.
+> Is it possible to completely turn off the encryption (even if the remote device want it).
+>    hciconfig hcio noencrypt  -- seem to turn off our request of encryption
+>    But if the remote device request it, we seem to still go through with it.
+>  Situtation: when we search the BlackBerry's SDP server, they pop up and ask for pin. They seem to be very secure minded. 
+>    hciconfig hcio noencrypt
+>    sdptool browse --tree  <BDADDR> 
+>        will cause the BlackBerry 7290 to pop up the pairing screen (PIN).
+>    hciconfig hci1 feature  
+>        shown the dongle (BroadCom chip) support encryption (mandated feature?)
+>    There seem no way (e.g. hciconfig hci1 feature set) to fool the other side that we don't have encryption capabilities (not sure if it is "legal" as this might be an mandated feature).
 
-2009/1/28 Marcel Holtmann <marcel@holtmann.org>:
-> Hi,
->
->>      This is the case for the cellphone : suppose the user is
->> listening music via A2DP, then a call coming, the user can answer this
->> call via HFP (press answer key in the bluetooth headset). After the
->> call ending, the cellphone will continue to play music via A2DP.
->>     I test several headset on Moto A1200
->> (iTech/Jabra/SonyEricsson/Moto bluetooth headset). But not all the
->> headset can answer the call by pressing answer key. Only the
->> iTech/Jabra can pass this case.
->>     My question is : does the bluez protocol support connected HFP and
->> A2DP at the same time? Then how can i judge whether a headset support
->> this or not? Thanks.
->
-> in theory you can, but there are certain physical limits and I don't
-> know of any headset that does support it. BlueZ would be just fine in
-> doing so.
->
-> Regards
->
-> Marcel
->
->
->
+you are confusing authentication with encryption and with the security
+mode 3 that most RIM devices are using. Please read up in the Bluetooth
+specification what these terms mean and how they work together.
+
+Regards
+
+Marcel
+
+
