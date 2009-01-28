@@ -1,34 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Can we connected HFP and A2DP at the same time?
+Subject: Re: [PATCH] bluez-utils 3.36 hcid crashes if wrong script files in
+ network.conf
 From: Marcel Holtmann <marcel@holtmann.org>
-To: =?UTF-8?Q?=E5=8D=9E=E7=A3=8A?= <mykofzone@gmail.com>
+To: ranaldo@unina.it
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <a172fe730901222111i1837081apadbf9402d57868c2@mail.gmail.com>
-References: <a172fe730901222111i1837081apadbf9402d57868c2@mail.gmail.com>
+In-Reply-To: <20090123154854.4tvftpuo004w8g8s@webmail.unina.it>
+References: <20090123154854.4tvftpuo004w8g8s@webmail.unina.it>
 Content-Type: text/plain
-Date: Wed, 28 Jan 2009 06:51:59 +0100
-Message-Id: <1233121919.18259.15.camel@violet>
+Date: Wed, 28 Jan 2009 06:51:04 +0100
+Message-Id: <1233121864.18259.14.camel@violet>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
->      This is the case for the cellphone : suppose the user is
-> listening music via A2DP, then a call coming, the user can answer this
-> call via HFP (press answer key in the bluetooth headset). After the
-> call ending, the cellphone will continue to play music via A2DP.
->     I test several headset on Moto A1200
-> (iTech/Jabra/SonyEricsson/Moto bluetooth headset). But not all the
-> headset can answer the call by pressing answer key. Only the
-> iTech/Jabra can pass this case.
->     My question is : does the bluez protocol support connected HFP and
-> A2DP at the same time? Then how can i judge whether a headset support
-> this or not? Thanks.
+> I'm sorry if this is not the right place to post this as the wiki and  
+> sourceforge project seems to be outdated.
+> 
+> On gentoo box a default network.conf file is installed from the  
+> sources in /etc/bluetooth.
+> The file itself has no problem but having avahi-autoipd as script,  
+> while in other distributions this is unset, evidences a problem in the  
+> function bnep_exec in network/common.c
+> If the script does not exists or bnep_exec fails for other reasons,  
+> hcid crashes for a very trivial mistake in the log error call.
+> 
+> Here a simple patch to fix this issue:
+> 
+> --- network/common.c    2009-01-23 15:52:12.000000000 +0100
+> +++ network/common.c    2009-01-23 15:45:47.000000000 +0100
+> @@ -235,7 +235,7 @@
+> 
+>          if (!g_spawn_async(NULL, (char **) argv, NULL, flags,  
+> bnep_setup, NULL,
+>                                  &pid, NULL)) {
+> -               error("Unable to execute %s %s", *argv[0], *argv[1]);
+> +               error("Unable to execute %s %s", argv[0], argv[1]);
+>                  return -EINVAL;
+>          }
+> 
+> I know that 3.36 should be the last in the 3.* series, however as  
+> there are a lot of distros using it, and as the same problem could  
+> affect 4.* series too i preferred to report this upstream.
+> 
+> The last thing, again about network.conf shipped file, the line:
+> #Disable=Connection,Server
+> should be
+> #Disable=Connection;Server
+> as who ignores the syntax of the conf file may not guess to use the  
+> ";" instead of "," .
 
-in theory you can, but there are certain physical limits and I don't
-know of any headset that does support it. BlueZ would be just fine in
-doing so.
+most of that code should be gone in 4.x and we are not using it anymore.
+However instead of fixing the config file, we would have to fix the code
+to accept , as a separator.
 
 Regards
 
