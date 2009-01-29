@@ -1,35 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Cc: event <event.riga@gmail.com>,
- Marcel Holtmann <marcel@holtmann.org>
-Message-Id: <3907C41D-4BC0-4983-8789-4110168919D3@tiscali.it>
-From: Michele Noberasco <michele.noberasco@tiscali.it>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1233122055.18259.17.camel@violet>
-Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
-Mime-Version: 1.0 (Apple Message framework v930.3)
-Subject: Re: [PATCH] BlueZ support for audio gateway role (HFP/HSP)
-Date: Thu, 29 Jan 2009 09:34:40 +0100
-References: <2C0A35D3-4DD9-4089-8061-F596A8A5A4B8@tiscali.it> <664d43d60901222334h4e1cb498hf8b3b01433e3ab92@mail.gmail.com> <A9056199-F858-4104-8B29-D2E55842306E@tiscali.it> <1233122055.18259.17.camel@violet>
+Date: Thu, 29 Jan 2009 09:17:47 +0100
+From: "X-PELAGE.Patrick" <patrick.pelage@partners.mbda-systems.com>
+Subject: RE: csr_h4.c
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org
+Message-id: <7F2D9B7FC7AF6C47AA68F9CF2094BC7C0346AE3C@rpmsg03.ch.mbda.priv>
+MIME-version: 1.0
+Content-type: text/plain; charset=iso-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Il giorno 28/gen/09, alle ore 06:54, Marcel Holtmann ha scritto:
+Thanks!
 
-> Hi Michele,
-Hello Marcel
+I am reading and try to udestand the csr_h4.c source file.
+ =20
+1- What is the "varid" argument of "csr_read" and "csr_write"
+functions? is it the HCI packet type, identified in HCI UART TRANSPORT =
+LAYER?
+2- How to used the csr_h4.c file? that is to say, the main function, if =
+I want to send an HCI packet using H4?
+3- What is the meaning of "uin16_t command" in "do_command" function?=20
+4- What is the description and specification of the csr_read_h4() input =
+parameters? Same questions for csr_write_h4()? So if I have to send a =
+HCI frame, what I have to do with these functions, according their input =
+parameters?
 
-> I like you two guys work together and send patches against BlueZ 4.x  
-> to
-> add the headset roles. Please split the work in smaller patches so we
-> can actually review it. Big chunks are always hard to chew and time
-> consuming. The quicker either Johan, Luiz or me can go through the  
-> code
-> the quicker we can merge it.
-Sorry to disappoint you, but my patch is against BlueZ 3 and nowhere  
-near completion ;-)
-As I said, it is provided 'as is' since unfortunately I have to more  
-time to spend on it :-(
+King regards
 
-Leonid: was my code of any use to you?
+Patrick
 
-Regards,
-Michele Noberasco
+> -----Message d'origine-----
+> De : Marcel Holtmann [mailto:marcel@holtmann.org]=20
+> Envoy=E9 : jeudi 29 janvier 2009 09:12
+> =C0 : X-PELAGE.Patrick
+> Objet : Re: csr_h4.c
+>=20
+> Hi,
+>=20
+> >=20
+> > I am reading and try to udestand the csr_h4.c source file.
+> > =20
+> > 1- What is the "varid" argument of "csr_read" and "csr_write"
+> > functions? is it the HCI packet type, identified in HCI=20
+> UART TRANSPORT=20
+> > LAYER?
+> > 2- How to used the csr_h4.c file? that is to say, the main=20
+> function,=20
+> > if I want to send an HCI packet using H4?
+> > 3- What is the meaning of "uin16_t command" in "do_command"=20
+> function?
+>=20
+> use linux-bluetooth@vger.kernel.org for such questions.
+>=20
+> Regards
+>=20
+> Marcel
+>=20
+>=20
+>=20
