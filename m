@@ -1,52 +1,113 @@
 Return-Path: <cyrus@holtmann.org>
 From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
-To: "ext Marcel Holtmann" <marcel@holtmann.org>
-Subject: Re: [PATCH] Performance optimizations for input data processing in SBC encoder
-Date: Thu, 29 Jan 2009 03:27:53 +0200
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <200901272014.13387.siarhei.siamashka@nokia.com> <1233121613.18259.9.camel@violet>
-In-Reply-To: <1233121613.18259.9.camel@violet>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] SBC encoder scale factors calculation optimized with __builtin_clz
+Date: Thu, 29 Jan 2009 03:20:25 +0200
+References: <200901290310.03440.siarhei.siamashka@nokia.com>
+In-Reply-To: <200901290310.03440.siarhei.siamashka@nokia.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="utf-8"
-Message-Id: <200901290327.53997.siarhei.siamashka@nokia.com>
+Content-Type: Multipart/Mixed;
+  boundary="Boundary-00=_ZRQgJy9IGcySom4"
+Message-Id: <200901290320.25122.siarhei.siamashka@nokia.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wednesday 28 January 2009 07:46:53 ext Marcel Holtmann wrote:
-> Hi Siarhei,
->
-> > Here is a cleaned up version of the previous experimental patch:
-> > http://marc.info/?l=linux-bluetooth&m=123245036109697&w=2
-> >
-> > I changed it to be alignment and byte order neutral (input data is read
-> > one byte at a time). It's a bit slower than reading via int16_t *
-> > pointer, but avoids headache of worrying about the other problems. Endian
-> > conversion is still also kept (when reading one byte at a time, it does
-> > not affect performance anyway).
-> >
-> > The patch should be safe to apply.
->
-> your patch has been applied. Thanks.
+--Boundary-00=_ZRQgJy9IGcySom4
+Content-Type: text/plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Thanks.
+On Thursday 29 January 2009 03:10:03 ext Siarhei Siamashka wrote:
+> The attached patch contains optimization for scale factors calculation
+> which provides additional SBC encoder speedup.
 
-> > Benchmarks show consistent performance improvement ~30% for both x86
-> > and ARM Cortex-A8. It's even more than I measured before just because
-> > optimizations are cumulative and the effect of each individual change
-> > becomes
-> > more visible when the other parts also get faster (the previous
-> > benchmark was
-> > run before "-funroll-loops" optimization got committed).
->
-> Sounds great to me. Keep optimizing it :)
-
-Fortunately not so much is left to be optimized :)
-
-Joint stereo encoding performance still can be improved. Also a few other
-tweaks could be tried for 'sbc_pack_frame_internal'. After that, only
-implementing SIMD optimizations for various CPU cores (primarily ARM11)
-would be left to do.
-
+And MMX variant of this optimization can be implemented with something
+like this patch. It still needs to be tested on X86-64 systems though.
 
 Best regards,
 Siarhei Siamashka
+
+--Boundary-00=_ZRQgJy9IGcySom4
+Content-Type: text/x-diff;
+  charset="utf-8";
+  name="sbc-scalefactors-mmx.diff"
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline;
+	filename="sbc-scalefactors-mmx.diff"
+
+diff --git a/sbc/sbc_primitives_mmx.c b/sbc/sbc_primitives_mmx.c
+index 7db4af7..41c0241 100644
+--- a/sbc/sbc_primitives_mmx.c
++++ b/sbc/sbc_primitives_mmx.c
+@@ -275,6 +275,59 @@ static inline void sbc_analyze_4b_8s_mmx(int16_t *x, int32_t *out,
+ 	asm volatile ("emms\n");
+ }
+ 
++static void sbc_calc_scalefactors_mmx(
++	int32_t sb_sample_f[16][2][8],
++	uint32_t scale_factor[2][8],
++	int blocks, int channels, int subbands)
++{
++	static const SBC_ALIGNED int32_t consts[2] = {
++		1 << SCALE_OUT_BITS,
++		1 << SCALE_OUT_BITS,
++	};
++	int ch, sb;
++	intptr_t blk;
++	for (ch = 0; ch < channels; ch++) {
++		for (sb = 0; sb < subbands; sb += 2) {
++			blk = (blocks - 1) * (((char *) &sb_sample_f[1][0][0] -
++				(char *) &sb_sample_f[0][0][0]));
++			asm volatile (
++				"movq         (%4), %%mm0\n"
++			"1:\n"
++				"movq     (%1, %0), %%mm1\n"
++				"pxor        %%mm2, %%mm2\n"
++				"pcmpgtd     %%mm2, %%mm1\n"
++				"paddd    (%1, %0), %%mm1\n"
++				"pcmpgtd     %%mm1, %%mm2\n"
++				"pxor        %%mm2, %%mm1\n"
++
++				"por         %%mm1, %%mm0\n"
++
++				"sub            %2, %0\n"
++				"jns            1b\n"
++
++				"movd        %%mm0, %k0\n"
++				"psrlq         $32, %%mm0\n"
++				"bsrl          %k0, %k0\n"
++				"subl           %5, %k0\n"
++				"movl          %k0, (%3)\n"
++
++				"movd        %%mm0, %k0\n"
++				"bsrl          %k0, %k0\n"
++				"subl           %5, %k0\n"
++				"movl          %k0, 4(%3)\n"
++			: "+r" (blk)
++			: "r" (&sb_sample_f[0][ch][sb]),
++				"i" ((char *) &sb_sample_f[1][0][0] -
++					(char *) &sb_sample_f[0][0][0]),
++				"r" (&scale_factor[ch][sb]),
++				"r" (&consts),
++				"i" (SCALE_OUT_BITS)
++			: "memory");
++		}
++	}
++	asm volatile ("emms\n");
++}
++
+ static int check_mmx_support()
+ {
+ #ifdef __amd64__
+@@ -313,6 +366,8 @@ void sbc_init_primitives_mmx(struct sbc_encoder_state *state)
+ 	if (check_mmx_support()) {
+ 		state->sbc_analyze_4b_4s = sbc_analyze_4b_4s_mmx;
+ 		state->sbc_analyze_4b_8s = sbc_analyze_4b_8s_mmx;
++
++		state->sbc_calc_scalefactors = sbc_calc_scalefactors_mmx;
+ 	}
+ }
+ 
+
+--Boundary-00=_ZRQgJy9IGcySom4--
