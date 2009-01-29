@@ -1,44 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Christian Hoene" <hoene@uni-tuebingen.de>
-To: "'Marcel Holtmann'" <marcel@holtmann.org>,
-        "'Siarhei Siamashka'" <siarhei.siamashka@nokia.com>
-Cc: <linux-bluetooth@vger.kernel.org>
-References: <200901290310.03440.siarhei.siamashka@nokia.com>	 <200901290320.25122.siarhei.siamashka@nokia.com> <1233214137.2139.7.camel@violet>
-In-Reply-To: <1233214137.2139.7.camel@violet>
-Subject: RE: [PATCH] SBC encoder scale factors calculation optimized with __builtin_clz
-Date: Thu, 29 Jan 2009 10:07:48 +0100
-Message-ID: <018f01c981f1$0f06b8d0$2d142a70$@de>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+In-Reply-To: <3907C41D-4BC0-4983-8789-4110168919D3@tiscali.it>
+References: <2C0A35D3-4DD9-4089-8061-F596A8A5A4B8@tiscali.it>
+	 <664d43d60901222334h4e1cb498hf8b3b01433e3ab92@mail.gmail.com>
+	 <A9056199-F858-4104-8B29-D2E55842306E@tiscali.it>
+	 <1233122055.18259.17.camel@violet>
+	 <3907C41D-4BC0-4983-8789-4110168919D3@tiscali.it>
+Date: Thu, 29 Jan 2009 10:46:43 +0200
+Message-ID: <664d43d60901290046y66cf37f6u7bcd4cb4946a5f46@mail.gmail.com>
+Subject: Re: [PATCH] BlueZ support for audio gateway role (HFP/HSP)
+From: event <event.riga@gmail.com>
+To: Michele Noberasco <michele.noberasco@tiscali.it>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> Hi Siarhei,
-> 
-> > > The attached patch contains optimization for scale factors calculation
-> > > which provides additional SBC encoder speedup.
-> >
-> > And MMX variant of this optimization can be implemented with something
-> > like this patch. It still needs to be tested on X86-64 systems though.
-> 
-> I am holding off on this until I get confirmation that is does the right
-> thing. So tester, please test this patch.
+On Thu, Jan 29, 2009 at 10:34, Michele Noberasco
+<michele.noberasco@tiscali.it> wrote:
+> Il giorno 28/gen/09, alle ore 06:54, Marcel Holtmann ha scritto:
+>
+>> Hi Michele,
+>
+> Hello Marcel
+>
+>> I like you two guys work together and send patches against BlueZ 4.x to
+>> add the headset roles. Please split the work in smaller patches so we
+>> can actually review it. Big chunks are always hard to chew and time
+>> consuming. The quicker either Johan, Luiz or me can go through the code
+>> the quicker we can merge it.
+>
+> Sorry to disappoint you, but my patch is against BlueZ 3 and nowhere near
+> completion ;-)
+> As I said, it is provided 'as is' since unfortunately I have to more time to
+> spend on it :-(
+>
+> Leonid: was my code of any use to you?
+>
+> Regards,
+> Michele Noberasco
+>
+>
 
-Yes, Sir!
-I'll do it.
+Hello Michele,
 
-Regards,
- Christian
+Saying honestly - no :). I've already implemented the functionality
+found in your patch. But thank you anyhow.
 
-
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Vale,
+Leonid Movshovich
