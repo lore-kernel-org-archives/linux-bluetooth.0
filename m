@@ -1,46 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Christian Hoene" <hoene@uni-tuebingen.de>
-To: "'Marcel Holtmann'" <marcel@holtmann.org>,
-        "'Siarhei Siamashka'" <siarhei.siamashka@nokia.com>
-Cc: <linux-bluetooth@vger.kernel.org>
-References: <200901290310.03440.siarhei.siamashka@nokia.com> <1233214058.2139.6.camel@violet>
-In-Reply-To: <1233214058.2139.6.camel@violet>
-Subject: RE: [PATCH] SBC encoder scale factors calculation optimized with __builtin_clz
-Date: Thu, 29 Jan 2009 16:00:11 +0100
-Message-ID: <021801c98222$4a1726e0$de4574a0$@de>
+Date: Thu, 29 Jan 2009 11:51:15 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] SBC encoder scale factors calculation optimized with
+	__builtin_clz
+Message-ID: <20090129095115.GA17843@jh-x301>
+References: <200901290310.03440.siarhei.siamashka@nokia.com> <200901290320.25122.siarhei.siamashka@nokia.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <200901290320.25122.siarhei.siamashka@nokia.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> 
+Hi Siarhei,
+
+On Thu, Jan 29, 2009, Siarhei Siamashka wrote:
+> On Thursday 29 January 2009 03:10:03 ext Siarhei Siamashka wrote:
 > > The attached patch contains optimization for scale factors calculation
-which
-> > provides additional SBC encoder speedup.
-> >
-> > For non-gcc compilers, CLZ function is implemented with a very simple
-and
-> > slow straightforward code (but it is still faster than current git code
-even
-> > if used instead of __builtin_clz). Something better could be done like:
-> > http://groups.google.com/group/comp.sys.arm/msg/5ae56e3a95a2345e?hl=en
-> > But I'm not sure about license/copyright of the code at this link and
-> decided
-> > not to touch it. Anyway, I don't think that gcc implementation of
-> > __builtin_clz for the CPU cores which do not support CLZ instruction is
-any
-> > worse.
+> > which provides additional SBC encoder speedup.
 > 
-> personally I don't really care about non-gcc compilers. I think that
-> some of the BlueZ source might not even compile without gcc.
-> 
-> Anyway, patch has been applied. Thanks.
+> And MMX variant of this optimization can be implemented with something
+> like this patch. It still needs to be tested on X86-64 systems though.
 
-The testing results are not positive. It is better to revoke the patch.
-http://net.cs.uni-tuebingen.de/html/nexgenvoip/
-http://net.cs.uni-tuebingen.de/html/nexgenvoip/html/encoder.bluez.03.wav
+Seems to work fine on my Lenovo X301 (Core 2 Duo) with ubuntu intrepid
+amd64.
 
-
-Greetings
-
- Christian
+Johan
