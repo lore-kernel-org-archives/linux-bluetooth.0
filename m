@@ -1,50 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4983E6D3.6010409@gmail.com>
-Date: Sat, 31 Jan 2009 13:51:15 +0800
-From: Dave Young <hidave.darkstar@gmail.com>
+From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
+To: "ext Christian Hoene" <hoene@uni-tuebingen.de>
+Subject: Re: [PATCH] SBC encoder scale factors calculation optimized with __builtin_clz
+Date: Fri, 30 Jan 2009 19:05:51 +0200
+Cc: "'Marcel Holtmann'" <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+References: <200901290310.03440.siarhei.siamashka@nokia.com> <1233248495.2139.19.camel@violet> <002e01c982cb$f798fba0$e6caf2e0$@de>
+In-Reply-To: <002e01c982cb$f798fba0$e6caf2e0$@de>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- marcel@holtmann.org, davem@davemloft.net
-Subject: [PATCH] bluetooth: CONFIG_DEBUG_LOCK_ALLOC ifdefs remove
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200901301905.51624.siarhei.siamashka@nokia.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Friday 30 January 2009 13:14:47 ext Christian Hoene wrote:
+> > > > Thanks for finding the bug. A common things about these failed
+>
+> testcases
+>
+> > > > is that block size is not 16.
+> > > >
+> > > > Looks like this was not covered by my own regression tests, I'll try
+>
+> to do
+>
+> > > > something about this problem now.
+> > >
+> > > A fix is attached. I also extended my regression test script to cover
+>
+> such
+>
+> > > cases.
+> >
+> > patch has been applied. Thanks.
+>
+> The tests have passed all.
+> http://net.cs.uni-tuebingen.de/html/nexgenvoip/html/
+>
+> Regards,
+>
+>  Christian
 
-Due to lockdep changes the CONFIG_DEBUG_LOCK_ALLOC ifdef is not needed now, just remove it here.
+Thanks a lot for keeping an eye on bluez sbc implementation quality.
 
-The following commit fixed the !lockdep build warnings:
-
-commit e8f6fbf62de37cbc2e179176ac7010d5f4396b67
-Author: Ingo Molnar <mingo@elte.hu>
-Date:   Wed Nov 12 01:38:36 2008 +0000
-
-    lockdep: include/linux/lockdep.h - fix warning in net/bluetooth/af_bluetooth.c
-
-Signed-off-by: Dave Young <hidave.darkstar@gmail.com>
----
-net/bluetooth/af_bluetooth.c |    6 ------
-1 file changed, 6 deletions(-)
-
-diff -uprN a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
---- a/net/bluetooth/af_bluetooth.c	2009-01-31 13:38:45.000000000 +0800
-+++ b/net/bluetooth/af_bluetooth.c	2009-01-31 13:38:58.000000000 +0800
-@@ -48,7 +48,6 @@
- static struct net_proto_family *bt_proto[BT_MAX_PROTO];
- static DEFINE_RWLOCK(bt_proto_lock);
- 
--#ifdef CONFIG_DEBUG_LOCK_ALLOC
- static struct lock_class_key bt_lock_key[BT_MAX_PROTO];
- static const char *bt_key_strings[BT_MAX_PROTO] = {
- 	"sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP",
-@@ -86,11 +85,6 @@ static inline void bt_sock_reclassify_lo
- 			bt_slock_key_strings[proto], &bt_slock_key[proto],
- 				bt_key_strings[proto], &bt_lock_key[proto]);
- }
--#else
--static inline void bt_sock_reclassify_lock(struct socket *sock, int proto)
--{
--}
--#endif
- 
- int bt_sock_register(int proto, struct net_proto_family *ops)
- {
+-- 
+Best regards,
+Siarhei Siamashka
