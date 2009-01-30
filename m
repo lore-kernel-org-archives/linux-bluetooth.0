@@ -1,47 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Subject: How can i configure bluez to transmit Voice over PCM
-Date: Fri, 30 Jan 2009 11:39:28 +0100
-Message-ID: <49ED01FC03EE524BB7BB258E8F93BFF32F3DB5@bfl-exchange-1.BFL.local>
-From: "Matuschka, Sebastian" <Sebastian.Matuschka@gcd-solutions.de>
-To: <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <20090128112504.GA22536@localhost>
+References: <c2a31c480901272116y2bd70ed3yf1c02009c1ec0fd0@mail.gmail.com>
+	 <20090128082323.GA8865@jh-x301>
+	 <c2a31c480901280142n2cb0c2bbh9eb3a96075d21f21@mail.gmail.com>
+	 <20090128112504.GA22536@localhost>
+Date: Fri, 30 Jan 2009 15:27:45 +0530
+Message-ID: <c2a31c480901300157r42a9e8a6w3162b5080f9d634a@mail.gmail.com>
+Subject: Re: Disconnect eSCO link from Command line
+From: sreevani medhahal <sreevani.medhahal@gmail.com>
+To: Johan Hedberg <johan.hedberg@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Johan,
 
-i'm using bluez 3.36 on an embedded system with a CSR Chip connected.
-Communication via HCI over UART works well. I need to receive and send
-voice from/to a headset and therefore I want to send/get the voice as
-PCM to the CSR chip. The PCM pins of the CSR Chip are connected to the
-SSC pins of an avr32 microcontroller. The CSR chip is configured to use
-PCM as soon as the Host produces Clock, otherwise it tries to transmit
-voice per HCI which is too slow (only 115200 baudrate for a 8kHz PCM
-stream).
-In etc/bluetooth/audio.conf I have set SCORouting=PCM
-In etc/Bluetooth/asound.conf I have written the following:
-#####################
-pcm.headset {
-	type bluetooth
-}
-ctl.headset {
-	type bluetooth
-}
-#####################
-But bluez is still sending voice over HCI, which is ok because: How
-should it know where to transmit the PCM stream. I need a device but I
-am not sure what exactly is needed.
-Do I have to write a dummy soundcard driver which only sends and
-receives pcm over the ssc pins? I guess a pseudo UART device for SSC
-isn't enough because bluez needs an alsa device, correct?
+thanks for the kind update
+> On Wed, Jan 28, 2009, sreevani medhahal wrote:
+>> > On Wed, Jan 28, 2009, sreevani medhahal wrote:
+>> >>   After the headset has created the eSCO link. The Profile Tuning
+>> >> Suite asks for Closing the Audio Connection from AG. Is there any
+>> >> command line utiility to disable the eSCO link & not the service level
+>> >> connection(ACL).[The eSCO link is visible on giving hcitool con ]
+>> >
+>> > You can do that by calling the Stop D-Bus method call on the
+>> > org.bluez.Headset interface of the corresponding device object. You can
+>> > e.g. use the test/test-telephony python script for this:
+>> > ./test-telephony stop <remote address>
+>> >
+>> The above method does not close the eSCO link ,because the
+>> sco_connect_cb has reported connection timed out. but the hcitool con
+>> still lists the eSCO link.
+>> I have another query bluez4.2x is compatible with which linux kernel
+>> version. does it have any strict requirement that it works best only
+>> if the kernel version is >= 2.6.27 .
+>
+> You might want to try Marcel's bluetooth-testing tree. I think that
+> issue might be fixed by the following patch:
+> http://git.kernel.org/?p=linux/kernel/git/holtmann/bluetooth-testing.git;a=commitdiff;h=d7461bfbd48bb76a1126a4f05bb16e4bb0187d31
 
-For a quick and dirty solution: Is it possible to let bluez reduce the
-soundquality so it works over HCI any way?
-
-Are my settings correct or have I missed something?
-
-I know that version 3.36 is a bit old but it works perfectly for me.
-Thanks and Best Regards
-Sebastian
+i cannot use the above git tree as i am on ubuntu hardy with kernel
+2.6.24-19. Is there a repository of bluetooth kernel patches for
+version 2.6.24 . So that i can if any higher versions work for me...I
+am not allowed to use higher kernel versions due to other driver
+dependancy in 2.6.24.
+thanks & Regards,
+Sreevani M
