@@ -1,212 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Message-ID: <OFDB593D66.4F9C0904-ON65257514.0044834D-65257515.004C4F06@lntemsys.com>
-From: Dhinakaran K <Dhinakaran.K@Lntemsys.com>
-Date: Thu, 4 Dec 2008 19:29:30 +0530
-Content-Type: multipart/mixed; boundary="=_mixed 004C4F0565257515_="
-Subject: [Bluez-users] Setting up Bluetooth Audio (A2DP)
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-users>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Errors-To: bluez-users-bounces@lists.sourceforge.net
+Subject: Re: [PATCH] bluetooth: CONFIG_DEBUG_LOCK_ALLOC ifdefs remove
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Dave Young <hidave.darkstar@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	davem@davemloft.net
+In-Reply-To: <4983E6D3.6010409@gmail.com>
+References: <4983E6D3.6010409@gmail.com>
+Content-Type: text/plain
+Date: Sat, 31 Jan 2009 13:23:10 +0100
+Message-Id: <1233404590.4727.0.camel@californication>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
+List-ID: <linux-bluetooth.vger.kernel.org>
 
---=_mixed 004C4F0565257515_=
-Content-Type: multipart/alternative;
-	boundary="=_alternative 004C4F0565257515_="
+Hi Dave,
+
+> Due to lockdep changes the CONFIG_DEBUG_LOCK_ALLOC ifdef is not needed now, just remove it here.
+> 
+> The following commit fixed the !lockdep build warnings:
+> 
+> commit e8f6fbf62de37cbc2e179176ac7010d5f4396b67
+> Author: Ingo Molnar <mingo@elte.hu>
+> Date:   Wed Nov 12 01:38:36 2008 +0000
+> 
+>     lockdep: include/linux/lockdep.h - fix warning in net/bluetooth/af_bluetooth.c
+> 
+> Signed-off-by: Dave Young <hidave.darkstar@gmail.com>
+
+I push this one via my tree to Dave. Thanks.
+
+Regards
+
+Marcel
 
 
---=_alternative 004C4F0565257515_=
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="UTF-8"
-
-SGksDQogICAgICAgIEkgaW50ZW5kIHRvIHVzZSB0aGUgQTJEUCBwcm9maWxlIG9mIEJsdWVaLCBi
-eSBwbGF5aW5nIHNvbWUgbXVzaWMgDQpvdmVyIG15IGRlc2t0b3AoSGF2aW5nIEJyb2FkY29tIFVT
-QiBibHVldG9vdGggYWRhcHRvcikgYW5kIGxpc3RlcmluZyBpdCBvbiANCkJULWhlYWRzZXQuIA0K
-DQpTeXN0ZW0gRGV0YWlsczoNCkxpbnV4IEZsYXZvdXI6ICBGZWRvcmEgQ29yZSA0DQpMaW51eCBL
-ZXJuZWw6ICAgICAgICAgICAyLjYuMjYNCkJsdWVaIHZlcnNpb246ICA0LjE4DQpEQlVTIHZlcnNp
-b246ICAgMS4yLjQNCkdMSUIgdmVyc2lvbjogICAyLjE0DQpBTFNBIHZlcnNpb246ICAgMS4wMTMN
-Cg0KSENJRDoNCiAgICAgICAgV2hlbiBJIHN0YXJ0IGJsdWV0b290aCBzZXJ2aWNlLCBoY2lkIHRo
-cm93cyBlcnJvcjogVW5hYmxlIHRvIGdldCANCm9uIERCVVMgYW5kIGNvbnRpbnVlcyB0byBydW4u
-IEkgcHJvY2VlZCBmdXJ0aGVyIHRvIHBhaXIgd2l0aCBoZWFkc2V0LCANCndoZXJlaW4gaW4gZ2l2
-ZXMsIENhbid0IGNvbm5lY3Q6IElucHV0L091dHB1dCBlcnJvci4gQnV0IHN1cnByaXNpbmdseSBp
-dCANCmNhbiBjb25uZWN0IHdpdGggb3RoZXIgYmx1ZXRvb3RoIGRldmljZXMgbGlrZSBtb2JpbGUg
-cGhvbmVzLiBCZWhhdmlvdXIgaXMgDQphbGlrZSBpcnJlc3BlY3RpdmUgb2YgcGluLWhlbHBlcnMs
-Ymx1ZXBpbiBvciBibHVlei1waW4uDQpCbHVldG9vdGhkOg0KICAgICAgICAgWWVzLCBJIGtub3cg
-dGhhdCB2ZXJzaW9uIDQueHggcmVwbGFjZXMgaGNpZCB3aWh0IGJsdWV0b290aGQuIEkgDQplZGl0
-ZWQgdGhlIC9ldGMvaW5pLmQvYmx1ZXRvb3RoIHNjcmlwdCB0byBzcGF3biBibHVldG9vdGhkIGRh
-ZW1vbiwgaW5zdGVhZCANCm9mIGhjaWQgZGFlbW9uLiBFdmVuIEJsZXV0b290aGQgZGFlbW9uIHRo
-cm93cyBlcnJvcjogIFVuYWJsZSB0byBnZXQgb24gDQpEQlVTIGFuZCBleGl0cy4NCg0KSW0gYXR0
-YWNoaW5nIHRoZSBkZWJ1ZyBsb2cgaGVyZXdpdGguIEFueSBoZWxwIGluIHRoaXMgcmVnYXJkIGlz
-IGRlZXBseSANCmFwcHJlY2lhdGVkLg0KDQoNCg0KV2FybSBSZWdhcmRzDQotIGRoaW5ha2FyYW4g
-DQogDQpEaGluYWthcmFuayAgSyANClNvZnR3YXJlIEVuZ2luZWVyLCAgRW1TeVMgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICggOiAgKzkxIDgyMSAyNDAgDQo1NjM4IA0KTGFyc2VuIGFu
-ZCBUb3Vicm8gTGltaXRlZCwgTXlzb3JlIENhbXB1cyAgICAgICAgICAgKCA6ICArOTEgODIxIDI0
-MCA1NDg5DQpLSUFEQiBJbmR1c3RyaWFsIEFyZWEsIEhlYmJhbCAtIEhvb3RhZ2FsbGkgICAgICAg
-ICAgIMOKICAgIDogICs5MSA4MjEgDQoyNDAzNzUyIA0KTXlzb3JlIC0gNTcwIDAxOCAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIMWhICAgOiANCkRoaW5ha2FyYW4uS0BMbnRlbXN5
-cy5jb20NCkluZGlhICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICDDvSAgOiANCiBodHRwOi8vd3d3LkxudGVtc3lzLmNvbQ0KIA0K
-VGhpcyBtYWlsIGlzIGNsYXNzaWZpZWQgYXMgDQpMJlQgRW1TeVMgUHJvcHJpZXRhcnkgICAgICAg
-ICAgICAgICAgIEwmVCBFbVN5UyBJbnRlcm5hbCBVc2UgDQpMJlQgRW1TeVMgQ29uZmlkZW50aWFs
-ICAgICAgICAgICAgICAgICBMJlQgRW1TeVMgR2VuZXJhbCBCdXNpbmVzcyANCiANCiANCiANCg==
---=_alternative 004C4F0565257515_=
-Content-Transfer-Encoding: base64
-Content-Type: text/html; charset="UTF-8"
-
-DQo8YnI+PGZvbnQgc2l6ZT0yIGZhY2U9InNhbnMtc2VyaWYiPkhpLDwvZm9udD4NCjxicj48Zm9u
-dCBzaXplPTIgZmFjZT0ic2Fucy1zZXJpZiI+Jm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7IEkN
-CmludGVuZCB0byB1c2UgdGhlIEEyRFAgcHJvZmlsZSBvZiBCbHVlWiwgYnkgcGxheWluZyBzb21l
-IG11c2ljIG92ZXIgbXkNCmRlc2t0b3AoSGF2aW5nIEJyb2FkY29tIFVTQiBibHVldG9vdGggYWRh
-cHRvcikgYW5kIGxpc3RlcmluZyBpdCBvbiBCVC1oZWFkc2V0Lg0KPC9mb250Pg0KPGJyPg0KPGJy
-Pjxmb250IHNpemU9MiBmYWNlPSJzYW5zLXNlcmlmIj48Yj5TeXN0ZW0gRGV0YWlsczo8L2I+PC9m
-b250Pg0KPGJyPjxmb250IHNpemU9MiBmYWNlPSJzYW5zLXNlcmlmIj5MaW51eCBGbGF2b3VyOiAm
-bmJzcDsgJm5ic3A7ICZuYnNwOw0KJm5ic3A7RmVkb3JhIENvcmUgNDwvZm9udD4NCjxicj48Zm9u
-dCBzaXplPTIgZmFjZT0ic2Fucy1zZXJpZiI+TGludXggS2VybmVsOiAmbmJzcDsgJm5ic3A7ICZu
-YnNwOyAmbmJzcDsNCiZuYnNwOyAyLjYuMjY8L2ZvbnQ+DQo8YnI+PGZvbnQgc2l6ZT0yIGZhY2U9
-InNhbnMtc2VyaWYiPkJsdWVaIHZlcnNpb246ICZuYnNwOyAmbmJzcDsgJm5ic3A7DQombmJzcDs0
-LjE4PC9mb250Pg0KPGJyPjxmb250IHNpemU9MiBmYWNlPSJzYW5zLXNlcmlmIj5EQlVTIHZlcnNp
-b246ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOzEuMi40PC9mb250Pg0KPGJyPjxmb250IHNp
-emU9MiBmYWNlPSJzYW5zLXNlcmlmIj5HTElCIHZlcnNpb246ICZuYnNwOyAmbmJzcDsgJm5ic3A7
-ICZuYnNwOzIuMTQ8L2ZvbnQ+DQo8YnI+PGZvbnQgc2l6ZT0yIGZhY2U9InNhbnMtc2VyaWYiPkFM
-U0EgdmVyc2lvbjogJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7MS4wMTM8L2ZvbnQ+DQo8YnI+
-DQo8YnI+PGZvbnQgc2l6ZT0yIGZhY2U9InNhbnMtc2VyaWYiPjxiPkhDSUQ6PC9iPjwvZm9udD4N
-Cjxicj48Zm9udCBzaXplPTIgZmFjZT0ic2Fucy1zZXJpZiI+Jm5ic3A7ICZuYnNwOyAmbmJzcDsg
-Jm5ic3A7IFdoZW4NCkkgc3RhcnQgYmx1ZXRvb3RoIHNlcnZpY2UsIDxiPmhjaWQgPC9iPnRocm93
-cyBlcnJvcjogPGI+VW5hYmxlIHRvIGdldCBvbg0KREJVUyA8L2I+YW5kIGNvbnRpbnVlcyB0byBy
-dW4uIEkgcHJvY2VlZCBmdXJ0aGVyIHRvIHBhaXIgd2l0aCBoZWFkc2V0LA0Kd2hlcmVpbiBpbiBn
-aXZlcywgPGI+Q2FuJ3QgY29ubmVjdDogSW5wdXQvT3V0cHV0IGVycm9yLiA8L2I+QnV0IHN1cnBy
-aXNpbmdseQ0KaXQgY2FuIGNvbm5lY3Qgd2l0aCBvdGhlciBibHVldG9vdGggZGV2aWNlcyBsaWtl
-IG1vYmlsZSBwaG9uZXMuIEJlaGF2aW91cg0KaXMgYWxpa2UgaXJyZXNwZWN0aXZlIG9mIHBpbi1o
-ZWxwZXJzLGJsdWVwaW4gb3IgYmx1ZXotcGluLjwvZm9udD4NCjxicj48Zm9udCBzaXplPTIgZmFj
-ZT0ic2Fucy1zZXJpZiI+PGI+Qmx1ZXRvb3RoZDo8L2I+PC9mb250Pg0KPGJyPjxmb250IHNpemU9
-MiBmYWNlPSJzYW5zLXNlcmlmIj4mbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7WWVz
-LA0KSSBrbm93IHRoYXQgdmVyc2lvbiA0Lnh4IHJlcGxhY2VzIGhjaWQgd2lodCBibHVldG9vdGhk
-LiBJIGVkaXRlZCB0aGUgL2V0Yy9pbmkuZC9ibHVldG9vdGgNCnNjcmlwdCB0byBzcGF3biBibHVl
-dG9vdGhkIGRhZW1vbiwgaW5zdGVhZCBvZiBoY2lkIGRhZW1vbi4gRXZlbiBCbGV1dG9vdGhkDQpk
-YWVtb24gdGhyb3dzIGVycm9yOiAmbmJzcDs8Yj5VbmFibGUgdG8gZ2V0IG9uIERCVVM8L2I+IGFu
-ZCBleGl0cy48L2ZvbnQ+DQo8YnI+DQo8YnI+PGZvbnQgc2l6ZT0yIGZhY2U9InNhbnMtc2VyaWYi
-PkltIGF0dGFjaGluZyB0aGUgZGVidWcgbG9nIGhlcmV3aXRoLg0KQW55IGhlbHAgaW4gdGhpcyBy
-ZWdhcmQgaXMgZGVlcGx5IGFwcHJlY2lhdGVkLjwvZm9udD4NCjxicj48Zm9udCBzaXplPTIgZmFj
-ZT0ic2Fucy1zZXJpZiI+PGJyPg0KPC9mb250Pg0KPGJyPg0KPGJyPjxmb250IHNpemU9MiBmYWNl
-PSJBcmlhbCI+V2FybSBSZWdhcmRzPC9mb250Pg0KPGJyPjxmb250IHNpemU9MiBmYWNlPSJBcmlh
-bCBOYXJyb3ciPjxpPi0gZGhpbmFrYXJhbjwvaT4gPC9mb250Pg0KPGJyPjxmb250IHNpemU9MyBm
-YWNlPSJBcmlhbCI+Jm5ic3A7PC9mb250Pg0KPGJyPjxmb250IHNpemU9MSBmYWNlPSJBcmlhbCBO
-YXJyb3ciPkRoaW5ha2FyYW5rICZuYnNwO0sgPC9mb250Pg0KPGJyPjxmb250IHNpemU9MSBmYWNl
-PSJBcmlhbCBOYXJyb3ciPlNvZnR3YXJlIEVuZ2luZWVyLCAmbmJzcDtFbVN5UyAmbmJzcDsNCiZu
-YnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5i
-c3A7ICZuYnNwOyAmbmJzcDsNCiZuYnNwOyAmbmJzcDsgPC9mb250Pjxmb250IHNpemU9MiBmYWNl
-PSJBcmlhbCBOYXJyb3ciPiZuYnNwOyA8L2ZvbnQ+PGZvbnQgc2l6ZT0zIGZhY2U9IkFyaWFsIj4m
-bmJzcDs8L2ZvbnQ+PGZvbnQgc2l6ZT0yIGZhY2U9IldpbmdkaW5ncyI+KDwvZm9udD48Zm9udCBz
-aXplPTEgZmFjZT0iV2luZ2RpbmdzIDIiPg0KPC9mb250Pjxmb250IHNpemU9MSBmYWNlPSJBcmlh
-bCI+OjwvZm9udD48Zm9udCBzaXplPTEgZmFjZT0iQXJpYWwgTmFycm93Ij4NCiZuYnNwOys5MSA4
-MjEgMjQwIDU2MzggPC9mb250Pg0KPGJyPjxmb250IHNpemU9MSBmYWNlPSJBcmlhbCBOYXJyb3ci
-PkxhcnNlbiBhbmQgVG91YnJvIExpbWl0ZWQsIE15c29yZQ0KQ2FtcHVzICZuYnNwOyA8L2ZvbnQ+
-PGZvbnQgc2l6ZT0yIGZhY2U9IkFyaWFsIE5hcnJvdyI+Jm5ic3A7ICZuYnNwOyAmbmJzcDsNCiZu
-YnNwOyA8L2ZvbnQ+PGZvbnQgc2l6ZT0yIGZhY2U9IldpbmdkaW5ncyI+KDwvZm9udD48Zm9udCBz
-aXplPTEgZmFjZT0iV2luZ2RpbmdzIDIiPg0KPC9mb250Pjxmb250IHNpemU9MSBmYWNlPSJBcmlh
-bCI+OjwvZm9udD48Zm9udCBzaXplPTEgZmFjZT0iQXJpYWwgTmFycm93Ij4NCiZuYnNwOys5MSA4
-MjEgMjQwIDU0ODk8L2ZvbnQ+DQo8YnI+PGZvbnQgc2l6ZT0xIGZhY2U9IkFyaWFsIE5hcnJvdyI+
-S0lBREIgSW5kdXN0cmlhbCBBcmVhLCBIZWJiYWwgLSBIb290YWdhbGxpDQo8L2ZvbnQ+PGZvbnQg
-c2l6ZT0yIGZhY2U9IkFyaWFsIE5hcnJvdyI+Jm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZu
-YnNwOzwvZm9udD48Zm9udCBzaXplPTIgZmFjZT0iV2ViZGluZ3MiPg0Kw4o8L2ZvbnQ+PGZvbnQg
-c2l6ZT0yIGZhY2U9IkFyaWFsIE5hcnJvdyI+ICZuYnNwOyA8L2ZvbnQ+PGZvbnQgc2l6ZT0xIGZh
-Y2U9IkFyaWFsIE5hcnJvdyI+Jm5ic3A7PC9mb250Pjxmb250IHNpemU9MSBmYWNlPSJBcmlhbCI+
-Og0KPC9mb250Pjxmb250IHNpemU9MSBmYWNlPSJBcmlhbCBOYXJyb3ciPiZuYnNwOys5MSA4MjEg
-MjQwMzc1MiAmbmJzcDsgJm5ic3A7DQo8L2ZvbnQ+DQo8YnI+PGZvbnQgc2l6ZT0xIGZhY2U9IkFy
-aWFsIE5hcnJvdyI+TXlzb3JlIC0gNTcwIDAxOCAmbmJzcDs8L2ZvbnQ+PGZvbnQgc2l6ZT0yIGZh
-Y2U9IkFyaWFsIj4NCiZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZu
-YnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsNCiZuYnNwOyAmbmJzcDsgJm5ic3A7ICZu
-YnNwOyAmbmJzcDsgJm5ic3A7PC9mb250Pjxmb250IHNpemU9MiBmYWNlPSJXZWJkaW5ncyI+xaE8
-L2ZvbnQ+PGZvbnQgc2l6ZT0xIGZhY2U9IldlYmRpbmdzIj4NCjwvZm9udD48Zm9udCBzaXplPTEg
-ZmFjZT0iQXJpYWwgTmFycm93Ij4mbmJzcDsgOiAmbmJzcDtEaGluYWthcmFuLktATG50ZW1zeXMu
-Y29tPC9mb250Pg0KPGJyPjxmb250IHNpemU9MSBmYWNlPSJBcmlhbCBOYXJyb3ciPkluZGlhIDwv
-Zm9udD48Zm9udCBzaXplPTIgZmFjZT0iQXJpYWwgTmFycm93Ij4mbmJzcDsNCiZuYnNwOyAmbmJz
-cDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNw
-OyAmbmJzcDsNCiZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNw
-OyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsNCiZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNw
-OyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7IDwvZm9udD48Zm9udCBzaXplPTIg
-ZmFjZT0iV2ViZGluZ3MiPsO9PC9mb250Pjxmb250IHNpemU9MSBmYWNlPSJBcmlhbCI+DQo8L2Zv
-bnQ+PGZvbnQgc2l6ZT0yIGZhY2U9IkFyaWFsIE5hcnJvdyI+Jm5ic3A7IDogPC9mb250Pjxmb250
-IHNpemU9MSBmYWNlPSJBcmlhbCBOYXJyb3ciPiZuYnNwO2h0dHA6Ly93d3cuTG50ZW1zeXMuY29t
-PC9mb250Pg0KPGJyPjxmb250IHNpemU9Mz4mbmJzcDs8L2ZvbnQ+DQo8YnI+PGZvbnQgc2l6ZT0x
-IGZhY2U9IkFyaWFsIE5hcnJvdyI+VGhpcyBtYWlsIGlzIGNsYXNzaWZpZWQgYXMgPC9mb250Pg0K
-PGJyPjxmb250IHNpemU9MSBmYWNlPSJBcmlhbCBOYXJyb3ciPkwmYW1wO1QgRW1TeVMgUHJvcHJp
-ZXRhcnkgJm5ic3A7ICZuYnNwOw0KJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAm
-bmJzcDsgTCZhbXA7VCBFbVN5UyBJbnRlcm5hbCBVc2UgPC9mb250Pg0KPGJyPjxmb250IHNpemU9
-MSBmYWNlPSJBcmlhbCBOYXJyb3ciPkwmYW1wO1QgRW1TeVMgQ29uZmlkZW50aWFsICZuYnNwOw0K
-Jm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7IEwmYW1wO1Qg
-RW1TeVMgR2VuZXJhbA0KQnVzaW5lc3M8L2ZvbnQ+PGZvbnQgc2l6ZT0zPiA8L2ZvbnQ+DQo8YnI+
-PGZvbnQgc2l6ZT0zPiZuYnNwOzwvZm9udD4NCjxicj48Zm9udCBzaXplPTM+Jm5ic3A7PC9mb250
-Pg0KPGJyPjxmb250IHNpemU9Mz4mbmJzcDs8L2ZvbnQ+DQo=
---=_alternative 004C4F0565257515_=--
-
---=_mixed 004C4F0565257515_=
-Content-Type: text/plain; name="debug.txt"
-Content-Disposition: attachment; filename="debug.txt"
-Content-Transfer-Encoding: quoted-printable
-
-lsusb:
-	Bus 004 Device 005: ID 0a5c:2039 Broadcom Corp.
-
-/etc/ini.d/bluetooth start=20
-	Starting Bluetooth services:                               [  OK  ]
-tail -f /var/log/messages
-	Dec  4 10:09:07 localhost hcid[5179]: Bluetooth HCI daemon
-	Dec  4 10:09:07 localhost hcid[5179]: Unable to get on D-BUS
-	Dec  4 10:09:07 localhost sdpd[5182]: Bluetooth SDP daemon
-	Dec  4 10:09:07 localhost hcid[5179]: HCI dev 0 up
-	Dec  4 10:09:07 localhost hcid[5179]: Starting security manager 0
-
-hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:06:C9:90:02:1D ACL MTU: 1017:8 SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:384 acl:0 sco:0 events:17 errors:0
-        TX bytes:311 acl:0 sco:0 commands:17 errors:0
-        Features: 0xff 0xff 0x8d 0xfe 0x8f 0xf9 0x00 0x80
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'EMMYS0420 at localhost.localdomain (0)'
-        Class: 0x120104
-        Service Classes: Networking, Object Transfer
-        Device Class: Computer, Desktop workstation
-        HCI Ver: 2.0 (0x3) HCI Rev: 0x2000 LMP Ver: 2.0 (0x3) LMP Subver: 0=
-x410d
-        Manufacturer: Broadcom Corporation (15)
-hcitool scan
-Scanning ...
-        00:0D:FD:20:28:2F       Motorola S9
-hcitool cc 00:0D:FD:20:28:2F
-	Can't create connection: Input/output error=
-
---=_mixed 004C4F0565257515_=
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
--------------------------------------------------------------------------
-This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
-Build the coolest Linux based applications with Moblin SDK & win great prizes
-Grand prize is a trip for two to an Open Source event anywhere in the world
-http://moblin-contest.org/redirect.php?banner_id=100&url=/
---=_mixed 004C4F0565257515_=
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---=_mixed 004C4F0565257515_=--
