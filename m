@@ -1,52 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: bug in audio/pcm_bluetooth.c causing memory corruption
+Subject: Re: Disconnect eSCO link from Command line
 From: Marcel Holtmann <marcel@holtmann.org>
-To: David Mansfield <bluez@dm.cobite.com>
+To: sreevani medhahal <sreevani.medhahal@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1233089481.32572.15.camel@gandalf.cobite.com>
-References: <1233089481.32572.15.camel@gandalf.cobite.com>
+In-Reply-To: <c2a31c480901300418m39d18545m80d7203d6404c0ef@mail.gmail.com>
+References: <c2a31c480901272116y2bd70ed3yf1c02009c1ec0fd0@mail.gmail.com>
+	 <20090128082323.GA8865@jh-x301>
+	 <c2a31c480901280142n2cb0c2bbh9eb3a96075d21f21@mail.gmail.com>
+	 <20090128112504.GA22536@localhost>
+	 <c2a31c480901300157r42a9e8a6w3162b5080f9d634a@mail.gmail.com>
+	 <c2a31c480901300418m39d18545m80d7203d6404c0ef@mail.gmail.com>
 Content-Type: text/plain
-Date: Sun, 01 Feb 2009 17:59:44 +0100
-Message-Id: <1233507584.4809.11.camel@californication>
+Date: Sun, 01 Feb 2009 17:57:46 +0100
+Message-Id: <1233507467.4809.9.camel@californication>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hi Sreevani,
 
-> I've been debugging a problem using pulseaudio on top of an alsa
-> bluetooth device for a week or so and I've found the cause of the
-> problem (which manifests as a pulseaudio daemon segfault).
+> >>> >>   After the headset has created the eSCO link. The Profile Tuning
+> >>> >> Suite asks for Closing the Audio Connection from AG. Is there any
+> >>> >> command line utiility to disable the eSCO link & not the service level
+> >>> >> connection(ACL).[The eSCO link is visible on giving hcitool con ]
+> >>> >
+> >>> > You can do that by calling the Stop D-Bus method call on the
+> >>> > org.bluez.Headset interface of the corresponding device object. You can
+> >>> > e.g. use the test/test-telephony python script for this:
+> >>> > ./test-telephony stop <remote address>
+> >>> >
+> >>> The above method does not close the eSCO link ,because the
+> >>> sco_connect_cb has reported connection timed out. but the hcitool con
+> >>> still lists the eSCO link.
+> >>> I have another query bluez4.2x is compatible with which linux kernel
+> >>> version. does it have any strict requirement that it works best only
+> >>> if the kernel version is >= 2.6.27 .
+> >>
+> >> You might want to try Marcel's bluetooth-testing tree. I think that
+> >> issue might be fixed by the following patch:
+> >> http://git.kernel.org/?p=linux/kernel/git/holtmann/bluetooth-testing.git;a=commitdiff;h=d7461bfbd48bb76a1126a4f05bb16e4bb0187d31
+> >
+> > i cannot use the above git tree as i am on ubuntu hardy with kernel
+> > 2.6.24-19. Is there a repository of bluetooth kernel patches for
+> > version 2.6.24 . So that i can if any higher versions work for me...I
+> > am not allowed to use higher kernel versions due to other driver
+> > dependancy in 2.6.24.
 > 
-> The bug is an line audio/pcm_bluetooth.c:802:
-> 
-> 
->         if (pfds[1].revents & (POLLERR | POLLHUP | POLLNVAL))
->                 io->state = SND_PCM_STATE_DISCONNECTED;
-> 
->         revents[0] = (pfds[0].revents & ~POLLIN) | POLLOUT;
-> -->here revents[1] = (pfds[1].revents & ~POLLIN);
-> 
->         return 0;
-> 
-> The 'unsigned short *revents' argument is NOT an array of shorts, but in
-> fact a pointer to a single short.  The assignment to revents[1] trashes
-> memory.
-> 
-> My guess is that all the flags should be combined into revents[0] (or
-> *revents, as that would be more semantically correct), but I'm not
-> really sure what the exact fix should be.
-> 
-> See this post by Jaroslav Kysela on the method
-> snd_pcm_poll_descriptors_revents, which ultimately ends up in the above
-> code:
-> 
-> http://osdir.com/ml/linux.alsa.devel/2002-07/msg00258.html
+> one hack in the net/bluetooth/sco.c by disabling esco on AG ,passes
+> the PTS tests & the sco_connect does not report connection timed out ,
+> & now i can use the test-telephony stop to close the sco connection to
+> the headset.
 
-this is a real problem since it seem audicious seems to break if we not
-using revents[1]. So I have no clue what's the right fix is here. The
-problem seems to be more complex. Seems we need an ALSA expert to fix
-this for us.
+or you could just upgrade the kernel. We did fix the eSCO issues now and
+tests with PTS confirmed that.
 
 Regards
 
