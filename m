@@ -1,54 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: How can i configure bluez to transmit Voice over PCM
+Subject: Re: streaming via a2dpd and using soundcard simultaneously?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: "Matuschka, Sebastian" <Sebastian.Matuschka@gcd-solutions.de>
+To: Odysseus Flappington <deriziotis@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <49ED01FC03EE524BB7BB258E8F93BFF32F3DB5@bfl-exchange-1.BFL.local>
-References: <49ED01FC03EE524BB7BB258E8F93BFF32F3DB5@bfl-exchange-1.BFL.local>
+In-Reply-To: <5eee8c670902010554h67d099e8xe2ec1e196dbb62f4@mail.gmail.com>
+References: <5eee8c670902010554h67d099e8xe2ec1e196dbb62f4@mail.gmail.com>
 Content-Type: text/plain
-Date: Sun, 01 Feb 2009 17:52:05 +0100
-Message-Id: <1233507125.4809.2.camel@californication>
+Date: Sun, 01 Feb 2009 17:50:23 +0100
+Message-Id: <1233507023.4809.0.camel@californication>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+Hi Alex,
 
-> i'm using bluez 3.36 on an embedded system with a CSR Chip connected.
-> Communication via HCI over UART works well. I need to receive and send
-> voice from/to a headset and therefore I want to send/get the voice as
-> PCM to the CSR chip. The PCM pins of the CSR Chip are connected to the
-> SSC pins of an avr32 microcontroller. The CSR chip is configured to use
-> PCM as soon as the Host produces Clock, otherwise it tries to transmit
-> voice per HCI which is too slow (only 115200 baudrate for a 8kHz PCM
-> stream).
-> In etc/bluetooth/audio.conf I have set SCORouting=PCM
-> In etc/Bluetooth/asound.conf I have written the following:
-> #####################
-> pcm.headset {
-> 	type bluetooth
-> }
-> ctl.headset {
-> 	type bluetooth
-> }
-> #####################
-> But bluez is still sending voice over HCI, which is ok because: How
-> should it know where to transmit the PCM stream. I need a device but I
-> am not sure what exactly is needed.
-> Do I have to write a dummy soundcard driver which only sends and
-> receives pcm over the ssc pins? I guess a pseudo UART device for SSC
-> isn't enough because bluez needs an alsa device, correct?
-> 
-> For a quick and dirty solution: Is it possible to let bluez reduce the
-> soundquality so it works over HCI any way?
-> 
-> Are my settings correct or have I missed something?
+> Is it possible to stream all audio on my linux system to a set of
+> bluetooth speakers via a2dpd, while at the same time, having the same
+> audio coming out of the soundcard and through a pair of wired
+> speakers?
 
-I would really advise you to start using 4.27 instead of a previous
-major version that is not developed.
-
-Also when using PCM for SCO then you need to use the D-Bus API for
-headsets and not the ALSA plugin.
+we are not using a2dpd anymore. It is a plugin of bluetoothd now and
+when using a system like PulseAudio then it is possible.
 
 Regards
 
