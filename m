@@ -1,39 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: wifi coexistence II
+Subject: Re: [PATCH] SBC encoder scale factors calculation optimized with
+ __builtin_clz
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Paulo Bustelo Codesido <pbustelo@ontouch.es>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1709A787-A8E2-4D2A-BBDB-3C09301FCFC5@ontouch.es>
-References: <1709A787-A8E2-4D2A-BBDB-3C09301FCFC5@ontouch.es>
+To: Siarhei Siamashka <siarhei.siamashka@nokia.com>
+Cc: ext Christian Hoene <hoene@uni-tuebingen.de>,
+	linux-bluetooth@vger.kernel.org
+In-Reply-To: <200901301905.51624.siarhei.siamashka@nokia.com>
+References: <200901290310.03440.siarhei.siamashka@nokia.com>
+	 <1233248495.2139.19.camel@violet> <002e01c982cb$f798fba0$e6caf2e0$@de>
+	 <200901301905.51624.siarhei.siamashka@nokia.com>
 Content-Type: text/plain
-Date: Sun, 01 Feb 2009 17:54:57 +0100
-Message-Id: <1233507297.4809.5.camel@californication>
+Date: Sun, 01 Feb 2009 17:53:43 +0100
+Message-Id: <1233507223.4809.4.camel@californication>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Paulo,
+Hi Siarhei,
 
-> As far as I know with hcitool afh I can just read the afh map...
-> 
-> I'm checking with this command
-> 
-> Set AFH Host Channel Classification (0x03|0x003f)
-> 
-> running every second...
-> 
-> but it seems to have no efect...
-> my problem is during inquiring....
-> is afh working in inquire mode?
-> what more can I try?
+> > > > cases.
+> > >
+> > > patch has been applied. Thanks.
+> >
+> > The tests have passed all.
+> > http://net.cs.uni-tuebingen.de/html/nexgenvoip/html/
+> >
+>
+> Thanks a lot for keeping an eye on bluez sbc implementation quality.
 
-you have to write your own command that actually sets the AFH map. The
-hcitool only reads it.
+are all patches applied now or am I missing one?
 
-However during inquiry you have lost anyway. It is using a fixed
-frequency hopping.
-
-Regads
+Regards
 
 Marcel
 
