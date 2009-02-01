@@ -1,30 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Obexd 0.8 : pull failure
+Subject: Re: bug in audio/pcm_bluetooth.c causing memory corruption
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Thierry Pierret <tpi@qspin.be>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <e6fea9c20901270634k13bd0a67m872cc24e1ea21e42@mail.gmail.com>
-References: <e6fea9c20901270634k13bd0a67m872cc24e1ea21e42@mail.gmail.com>
+To: David Mansfield <bluez@dm.cobite.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1233089481.32572.15.camel@gandalf.cobite.com>
+References: <1233089481.32572.15.camel@gandalf.cobite.com>
 Content-Type: text/plain
-Date: Sun, 01 Feb 2009 18:00:49 +0100
-Message-Id: <1233507649.4809.12.camel@californication>
+Date: Sun, 01 Feb 2009 17:59:44 +0100
+Message-Id: <1233507584.4809.11.camel@californication>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Thierry,
+Hi David,
 
-> Any attempt to pull a business card using the OBEX protocol failed
-> with the following message :
+> I've been debugging a problem using pulseaudio on top of an alsa
+> bluetooth device for a week or so and I've found the cause of the
+> problem (which manifests as a pulseaudio daemon segfault).
 > 
-> bluetoothd[1844]: adapter_get_device(00:0E:ED:01:DB:67)
-> gw_obex_xfer_read(): Not found
+> The bug is an line audio/pcm_bluetooth.c:802:
 > 
-> What does it mean ? What could be wrong ?
 > 
-> Tested with BlueZ 4.26.
+>         if (pfds[1].revents & (POLLERR | POLLHUP | POLLNVAL))
+>                 io->state = SND_PCM_STATE_DISCONNECTED;
+> 
+>         revents[0] = (pfds[0].revents & ~POLLIN) | POLLOUT;
+> -->here revents[1] = (pfds[1].revents & ~POLLIN);
+> 
+>         return 0;
+> 
+> The 'unsigned short *revents' argument is NOT an array of shorts, but in
+> fact a pointer to a single short.  The assignment to revents[1] trashes
+> memory.
+> 
+> My guess is that all the flags should be combined into revents[0] (or
+> *revents, as that would be more semantically correct), but I'm not
+> really sure what the exact fix should be.
+> 
+> See this post by Jaroslav Kysela on the method
+> snd_pcm_poll_descriptors_revents, which ultimately ends up in the above
+> code:
+> 
+> http://osdir.com/ml/linux.alsa.devel/2002-07/msg00258.html
 
-we would need more details and log outputs to analyze this.
+this is a real problem since it seem audicious seems to break if we not
+using revents[1]. So I have no clue what's the right fix is here. The
+problem seems to be more complex. Seems we need an ALSA expert to fix
+this for us.
 
 Regards
 
