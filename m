@@ -1,64 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH V2] btsdio: fix tx error path
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Tomas Winkler <tomasw@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <1ba2fa240902020615w239753a5v6973e77ed59128c9@mail.gmail.com>
-References: <1223293223-21162-1-git-send-email-tomas.winkler@intel.com>
-	 <1223294503.11272.158.camel@violet.holtmann.net>
-	 <1ba2fa240902020615w239753a5v6973e77ed59128c9@mail.gmail.com>
+Subject: Re: bug in audio/pcm_bluetooth.c causing memory corruption
+From: David Mansfield <bluez@dm.cobite.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1233507584.4809.11.camel@californication>
+References: <1233089481.32572.15.camel@gandalf.cobite.com>
+	 <1233507584.4809.11.camel@californication>
 Content-Type: text/plain
-Date: Mon, 02 Feb 2009 16:29:51 +0100
-Message-Id: <1233588591.4668.23.camel@californication>
+Date: Mon, 02 Feb 2009 10:24:33 -0500
+Message-Id: <1233588273.3197.2.camel@gandalf.cobite.com>
 Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tomas,
-
-> >> This patch fixes accumulating of the header
-> >> in case packet was requeued in the error path.
-> >>
-> >> Signed-off-by: Tomas Winkler <tomas.winkler@intel.com>
-> >> Cc: Marcel Holtmann <marcel@holtmann.org>
-> >> ---
-> >>  drivers/bluetooth/btsdio.c |    1 +
-> >>  1 files changed, 1 insertions(+), 0 deletions(-)
-> >>
-> >> diff --git a/drivers/bluetooth/btsdio.c b/drivers/bluetooth/btsdio.c
-> >> index 58630cc..c422e89 100644
-> >> --- a/drivers/bluetooth/btsdio.c
-> >> +++ b/drivers/bluetooth/btsdio.c
-> >> @@ -91,6 +91,7 @@ static int btsdio_tx_packet(struct btsdio_data *data, struct sk_buff *skb)
-> >>
-> >>       err = sdio_writesb(data->func, REG_TDAT, skb->data, skb->len);
-> >>       if (err < 0) {
-> >> +             skb_pull(skb, 4);
-> >>               sdio_writeb(data->func, 0x01, REG_PC_WRT, NULL);
-> >>               return err;
-> >>       }
-> >
-> > thanks, but I already fixed that one manually in my tree :)
-> >
-> > Regards
-> >
-> > Marcel
+On Sun, 2009-02-01 at 17:59 +0100, Marcel Holtmann wrote:
+> Hi David,
 > 
-> Would you mind to queue it for 27 stable?  I'm always hitting this and
-> I guess I'm not only one.
-> http://marc.info/?l=linux-bluetooth&m=122513647106365&w=2
+> > I've been debugging a problem using pulseaudio on top of an alsa
+> > bluetooth device for a week or so and I've found the cause of the
+> > problem (which manifests as a pulseaudio daemon segfault).
+> > 
+> > The bug is an line audio/pcm_bluetooth.c:802:
+> > 
+> > 
+> >         if (pfds[1].revents & (POLLERR | POLLHUP | POLLNVAL))
+> >                 io->state = SND_PCM_STATE_DISCONNECTED;
+> > 
+> >         revents[0] = (pfds[0].revents & ~POLLIN) | POLLOUT;
+> > -->here revents[1] = (pfds[1].revents & ~POLLIN);
+> > 
+> >         return 0;
+> > 
+> > The 'unsigned short *revents' argument is NOT an array of shorts, but in
+> > fact a pointer to a single short.  The assignment to revents[1] trashes
+> > memory.
+> > 
+> > My guess is that all the flags should be combined into revents[0] (or
+> > *revents, as that would be more semantically correct), but I'm not
+> > really sure what the exact fix should be.
+> > 
+> > See this post by Jaroslav Kysela on the method
+> > snd_pcm_poll_descriptors_revents, which ultimately ends up in the above
+> > code:
+> > 
+> > http://osdir.com/ml/linux.alsa.devel/2002-07/msg00258.html
+> 
+> this is a real problem since it seem audicious seems to break if we not
+> using revents[1]. So I have no clue what's the right fix is here. The
+> problem seems to be more complex. Seems we need an ALSA expert to fix
+> this for us.
+> 
 
-since besides development hardware, nobody really has this issue and I
-think it doesn't really justify pushing this to -stable. However this is
-up to the -stable guys and you can just sent it to stable@kernel.org by
-yourself if you wanna have it included. Just point them to
+Well, I should think it's important to get confirmation first of what
+the correct semantics of the function are.  I looked at the docs and
+they're vague as hell.  Should I open a bug for this issue so we can
+track the issue?  It's DEFINITELY causing memory corruption and
+segmentation fault on x86_64 with pulseaudio via module-alsa-sink (on
+Fedora 10).
 
-http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=commitdiff_plain;h=7644d63d1348ec044ccd8f775fefe5eb7cbcac69
-
-and explain you reason for adding it to -stable.
-
-Regards
-
-Marcel
-
-
+Thanks,
+David
