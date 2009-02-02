@@ -1,52 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
+From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
+To: ext Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH] SBC encoder scale factors calculation optimized with __builtin_clz
+Date: Mon, 2 Feb 2009 13:11:00 +0200
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <200901290310.03440.siarhei.siamashka@nokia.com> <1233214058.2139.6.camel@violet>
+In-Reply-To: <1233214058.2139.6.camel@violet>
 MIME-Version: 1.0
-In-Reply-To: <1223294503.11272.158.camel@violet.holtmann.net>
-References: <1223293223-21162-1-git-send-email-tomas.winkler@intel.com>
-	 <1223294503.11272.158.camel@violet.holtmann.net>
-Date: Mon, 2 Feb 2009 16:15:51 +0200
-Message-ID: <1ba2fa240902020615w239753a5v6973e77ed59128c9@mail.gmail.com>
-Subject: Re: [PATCH V2] btsdio: fix tx error path
-From: Tomas Winkler <tomasw@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200902021311.00204.siarhei.siamashka@nokia.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Oct 6, 2008 at 2:01 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Tomas,
+On Thursday 29 January 2009 09:27:38 ext Marcel Holtmann wrote:
+> Hi Siarhei,
 >
->> This patch fixes accumulating of the header
->> in case packet was requeued in the error path.
->>
->> Signed-off-by: Tomas Winkler <tomas.winkler@intel.com>
->> Cc: Marcel Holtmann <marcel@holtmann.org>
->> ---
->>  drivers/bluetooth/btsdio.c |    1 +
->>  1 files changed, 1 insertions(+), 0 deletions(-)
->>
->> diff --git a/drivers/bluetooth/btsdio.c b/drivers/bluetooth/btsdio.c
->> index 58630cc..c422e89 100644
->> --- a/drivers/bluetooth/btsdio.c
->> +++ b/drivers/bluetooth/btsdio.c
->> @@ -91,6 +91,7 @@ static int btsdio_tx_packet(struct btsdio_data *data, struct sk_buff *skb)
->>
->>       err = sdio_writesb(data->func, REG_TDAT, skb->data, skb->len);
->>       if (err < 0) {
->> +             skb_pull(skb, 4);
->>               sdio_writeb(data->func, 0x01, REG_PC_WRT, NULL);
->>               return err;
->>       }
+> > The attached patch contains optimization for scale factors calculation
+> > which provides additional SBC encoder speedup.
+> >
+> > For non-gcc compilers, CLZ function is implemented with a very simple and
+> > slow straightforward code (but it is still faster than current git code
+> > even if used instead of __builtin_clz). Something better could be done
+> > like:
+> > http://groups.google.com/group/comp.sys.arm/msg/5ae56e3a95a2345e?hl=en
+> > But I'm not sure about license/copyright of the code at this link and
+> > decided not to touch it. Anyway, I don't think that gcc implementation of
+> > __builtin_clz for the CPU cores which do not support CLZ instruction is
+> > any worse.
 >
-> thanks, but I already fixed that one manually in my tree :)
->
-> Regards
->
-> Marcel
+> personally I don't really care about non-gcc compilers. I think that
+> some of the BlueZ source might not even compile without gcc.
 
-Would you mind to queue it for 27 stable?  I'm always hitting this and
-I guess I'm not only one.
-http://marc.info/?l=linux-bluetooth&m=122513647106365&w=2
+At least for the SBC codec, there is no harm in trying to keep it as portable
+as it is possible. Somebody might want to compile it with some other, better
+optimizing compiler and link with the rest of gcc compiled bluez. Or SBC
+processing can be offloaded to DSP (C55x port exists) with the rest of bluez
+stack running on main core.
 
-Thanks
-Tomas
+> Anyway, patch has been applied. Thanks.
+
+Thanks for applying it.
+
+-- 
+Best regards,
+Siarhei Siamashka
