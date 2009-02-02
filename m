@@ -1,61 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: bug in audio/pcm_bluetooth.c causing memory corruption
-From: David Mansfield <bluez@dm.cobite.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1233507584.4809.11.camel@californication>
-References: <1233089481.32572.15.camel@gandalf.cobite.com>
-	 <1233507584.4809.11.camel@californication>
+Subject: Re: [PATCH] SBC encoder scale factors calculation optimized with
+ __builtin_clz
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Siarhei Siamashka <siarhei.siamashka@nokia.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <200902021248.14496.siarhei.siamashka@nokia.com>
+References: <200901290310.03440.siarhei.siamashka@nokia.com>
+	 <200901301905.51624.siarhei.siamashka@nokia.com>
+	 <1233507223.4809.4.camel@californication>
+	 <200902021248.14496.siarhei.siamashka@nokia.com>
 Content-Type: text/plain
-Date: Mon, 02 Feb 2009 10:24:33 -0500
-Message-Id: <1233588273.3197.2.camel@gandalf.cobite.com>
+Date: Mon, 02 Feb 2009 16:20:56 +0100
+Message-Id: <1233588056.4668.16.camel@californication>
 Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, 2009-02-01 at 17:59 +0100, Marcel Holtmann wrote:
-> Hi David,
-> 
-> > I've been debugging a problem using pulseaudio on top of an alsa
-> > bluetooth device for a week or so and I've found the cause of the
-> > problem (which manifests as a pulseaudio daemon segfault).
-> > 
-> > The bug is an line audio/pcm_bluetooth.c:802:
-> > 
-> > 
-> >         if (pfds[1].revents & (POLLERR | POLLHUP | POLLNVAL))
-> >                 io->state = SND_PCM_STATE_DISCONNECTED;
-> > 
-> >         revents[0] = (pfds[0].revents & ~POLLIN) | POLLOUT;
-> > -->here revents[1] = (pfds[1].revents & ~POLLIN);
-> > 
-> >         return 0;
-> > 
-> > The 'unsigned short *revents' argument is NOT an array of shorts, but in
-> > fact a pointer to a single short.  The assignment to revents[1] trashes
-> > memory.
-> > 
-> > My guess is that all the flags should be combined into revents[0] (or
-> > *revents, as that would be more semantically correct), but I'm not
-> > really sure what the exact fix should be.
-> > 
-> > See this post by Jaroslav Kysela on the method
-> > snd_pcm_poll_descriptors_revents, which ultimately ends up in the above
-> > code:
-> > 
-> > http://osdir.com/ml/linux.alsa.devel/2002-07/msg00258.html
-> 
-> this is a real problem since it seem audicious seems to break if we not
-> using revents[1]. So I have no clue what's the right fix is here. The
-> problem seems to be more complex. Seems we need an ALSA expert to fix
-> this for us.
-> 
+Hi Siarhei,
 
-Well, I should think it's important to get confirmation first of what
-the correct semantics of the function are.  I looked at the docs and
-they're vague as hell.  Should I open a bug for this issue so we can
-track the issue?  It's DEFINITELY causing memory corruption and
-segmentation fault on x86_64 with pulseaudio via module-alsa-sink (on
-Fedora 10).
+> > > > > > cases.
+> > > > >
+> > > > > patch has been applied. Thanks.
+> > > >
+> > > > The tests have passed all.
+> > > > http://net.cs.uni-tuebingen.de/html/nexgenvoip/html/
+> > >
+> > > Thanks a lot for keeping an eye on bluez sbc implementation quality.
+> >
+> > are all patches applied now or am I missing one?
+> 
+> Yes, thanks, all the patches have been applied except for this one:
+> http://marc.info/?l=linux-bluetooth&m=123319235104928&w=2
+> 
+> It should work fine, but I'm still considering how to better optimize
+> processing of joint stereo, which might also require changing this code
+> a bit. For now it's more like a demonstration that scale factors processing 
+> can be SIMD optimized quite fine.
+> 
+> I will provide a more complete patch with optimizations for both scale factors
+> and joint stereo a bit later.
 
-Thanks,
-David
+please re-sent this one with a proper commit message and I apply it.
+Then you can start from there is you like. Or send me a complete new
+one.
+
+Regards
+
+Marcel
+
+
