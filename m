@@ -1,51 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] SBC encoder scale factors calculation optimized with
- __builtin_clz
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Siarhei Siamashka <siarhei.siamashka@nokia.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <200902021248.14496.siarhei.siamashka@nokia.com>
-References: <200901290310.03440.siarhei.siamashka@nokia.com>
-	 <200901301905.51624.siarhei.siamashka@nokia.com>
-	 <1233507223.4809.4.camel@californication>
-	 <200902021248.14496.siarhei.siamashka@nokia.com>
-Content-Type: text/plain
-Date: Mon, 02 Feb 2009 16:20:56 +0100
-Message-Id: <1233588056.4668.16.camel@californication>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <1223294503.11272.158.camel@violet.holtmann.net>
+References: <1223293223-21162-1-git-send-email-tomas.winkler@intel.com>
+	 <1223294503.11272.158.camel@violet.holtmann.net>
+Date: Mon, 2 Feb 2009 16:15:51 +0200
+Message-ID: <1ba2fa240902020615w239753a5v6973e77ed59128c9@mail.gmail.com>
+Subject: Re: [PATCH V2] btsdio: fix tx error path
+From: Tomas Winkler <tomasw@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Siarhei,
+On Mon, Oct 6, 2008 at 2:01 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Tomas,
+>
+>> This patch fixes accumulating of the header
+>> in case packet was requeued in the error path.
+>>
+>> Signed-off-by: Tomas Winkler <tomas.winkler@intel.com>
+>> Cc: Marcel Holtmann <marcel@holtmann.org>
+>> ---
+>>  drivers/bluetooth/btsdio.c |    1 +
+>>  1 files changed, 1 insertions(+), 0 deletions(-)
+>>
+>> diff --git a/drivers/bluetooth/btsdio.c b/drivers/bluetooth/btsdio.c
+>> index 58630cc..c422e89 100644
+>> --- a/drivers/bluetooth/btsdio.c
+>> +++ b/drivers/bluetooth/btsdio.c
+>> @@ -91,6 +91,7 @@ static int btsdio_tx_packet(struct btsdio_data *data, struct sk_buff *skb)
+>>
+>>       err = sdio_writesb(data->func, REG_TDAT, skb->data, skb->len);
+>>       if (err < 0) {
+>> +             skb_pull(skb, 4);
+>>               sdio_writeb(data->func, 0x01, REG_PC_WRT, NULL);
+>>               return err;
+>>       }
+>
+> thanks, but I already fixed that one manually in my tree :)
+>
+> Regards
+>
+> Marcel
 
-> > > > > > cases.
-> > > > >
-> > > > > patch has been applied. Thanks.
-> > > >
-> > > > The tests have passed all.
-> > > > http://net.cs.uni-tuebingen.de/html/nexgenvoip/html/
-> > >
-> > > Thanks a lot for keeping an eye on bluez sbc implementation quality.
-> >
-> > are all patches applied now or am I missing one?
-> 
-> Yes, thanks, all the patches have been applied except for this one:
-> http://marc.info/?l=linux-bluetooth&m=123319235104928&w=2
-> 
-> It should work fine, but I'm still considering how to better optimize
-> processing of joint stereo, which might also require changing this code
-> a bit. For now it's more like a demonstration that scale factors processing 
-> can be SIMD optimized quite fine.
-> 
-> I will provide a more complete patch with optimizations for both scale factors
-> and joint stereo a bit later.
+Would you mind to queue it for 27 stable?  I'm always hitting this and
+I guess I'm not only one.
+http://marc.info/?l=linux-bluetooth&m=122513647106365&w=2
 
-please re-sent this one with a proper commit message and I apply it.
-Then you can start from there is you like. Or send me a complete new
-one.
-
-Regards
-
-Marcel
-
-
+Thanks
+Tomas
