@@ -1,42 +1,145 @@
 Return-Path: <cyrus@holtmann.org>
-From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
-To: ext Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH] SBC encoder scale factors calculation optimized with __builtin_clz
-Date: Mon, 2 Feb 2009 12:48:14 +0200
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <200901290310.03440.siarhei.siamashka@nokia.com> <200901301905.51624.siarhei.siamashka@nokia.com> <1233507223.4809.4.camel@californication>
-In-Reply-To: <1233507223.4809.4.camel@californication>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200902021248.14496.siarhei.siamashka@nokia.com>
+Sender: marmelmaugav@gmail.com
+In-Reply-To: <1233507649.4809.12.camel@californication>
+References: <e6fea9c20901270634k13bd0a67m872cc24e1ea21e42@mail.gmail.com>
+	 <1233507649.4809.12.camel@californication>
+Date: Mon, 2 Feb 2009 11:08:00 +0100
+Message-ID: <e6fea9c20902020208m34199fcey8d7ed2fe6f17c365@mail.gmail.com>
+Subject: Re: Obexd 0.8 : pull failure
+From: Thierry Pierret <tpi@qspin.be>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: multipart/mixed; boundary=0016364587e8c9915f0461ecba6a
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sunday 01 February 2009 18:53:43 ext Marcel Holtmann wrote:
-> Hi Siarhei,
+--0016364587e8c9915f0461ecba6a
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+
+Hi Marcel,
+
+Here is the way I proceed :
+- start the bluetooth daemon (bluetoothd -nd &)
+- start a session D-bus and update the environment by exporting the
+DBUS variables
+- start the obex-client daemon (/usr/libexec/obex-client &)
+
+To pull a business card, I use a C application, i.e. translation of
+the python "pull-business-card" script (I did not succeed yet to
+cross-compile the dbus-python package for the iMX31 platform). I
+attached the source code as information.
+Herre is the full output of the application :
+
+$ puller 00:0E:ED:01:DB:67 /var/obex.pull.vcf
+Obex puller : session bus connected
+Obex puller : message created
+Obex puller : message sent
+Obex puller : disconnected
+
+At this time, the mobile (Nokia 6810) asks whether data from the
+target may be accepted. As soon as the mobile has accepted, the
+following error appears on the OBEX client side :
+
+bluetoothd[1773]: adapter_get_device(00:0E:ED:01:DB:67)
+gw_obex_xfer_read(): Not found
+
+Looking in the source code (client/session.c and openobex 1.3), one
+can note that an OBEX_RSP_NOT_FOUND (0x44) response has been received.
+
+Here is the point I'm blocked. I don't know in which direction
+investigate !? I don't know what additional info can be given !?
+
+Thanks in advance for your help.
+
+Regards.
+Thierry
+
+
+
+2009/2/1 Marcel Holtmann <marcel@holtmann.org>:
+> Hi Thierry,
 >
-> > > > > cases.
-> > > >
-> > > > patch has been applied. Thanks.
-> > >
-> > > The tests have passed all.
-> > > http://net.cs.uni-tuebingen.de/html/nexgenvoip/html/
-> >
-> > Thanks a lot for keeping an eye on bluez sbc implementation quality.
+>> Any attempt to pull a business card using the OBEX protocol failed
+>> with the following message :
+>>
+>> bluetoothd[1844]: adapter_get_device(00:0E:ED:01:DB:67)
+>> gw_obex_xfer_read(): Not found
+>>
+>> What does it mean ? What could be wrong ?
+>>
+>> Tested with BlueZ 4.26.
 >
-> are all patches applied now or am I missing one?
+> we would need more details and log outputs to analyze this.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
 
-Yes, thanks, all the patches have been applied except for this one:
-http://marc.info/?l=linux-bluetooth&m=123319235104928&w=2
+--0016364587e8c9915f0461ecba6a
+Content-Type: text/x-c; charset=US-ASCII; name="puller.c"
+Content-Disposition: attachment; filename="puller.c"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_fqoz422g0
 
-It should work fine, but I'm still considering how to better optimize
-processing of joint stereo, which might also require changing this code
-a bit. For now it's more like a demonstration that scale factors processing 
-can be SIMD optimized quite fine.
-
-I will provide a more complete patch with optimizations for both scale factors
-and joint stereo a bit later.
-
--- 
-Best regards,
-Siarhei Siamashka
+I2luY2x1ZGUgPHN0ZGlvLmg+CiNpbmNsdWRlIDxzdGRsaWIuaD4KI2luY2x1ZGUgPHN0cmluZy5o
+PgoKI2luY2x1ZGUgPGRidXMvZGJ1cy5oPgoKI2lmbmRlZiBUUlVFCiNkZWZpbmUgVFJVRSAweDAx
+CiNlbmRpZgoKLyogUHJpdmF0ZSBjYWxscyAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0gKi8Kc3RhdGljIHVzYWdlKEZJTEUgKiBzdHJlYW0sIGNoYXIgKiBj
+b21tYW5kKQp7CglmcHJpbnRmKHN0cmVhbSwgIlVzYWdlIDogJXMgPHJlbW90ZSBhZGRyZXNzPiA8
+ZmlsZV9uYW1lPlxuIiwgY29tbWFuZCk7Cn0KCnN0YXRpYyB2b2lkIGRpc3BsYXlfZXJyb3IoREJ1
+c0Vycm9yICpwZXJyLCBjb25zdCBjaGFyICogbWVzc2FnZSkKewoJCWlmIChkYnVzX2Vycm9yX2lz
+X3NldChwZXJyKSA9PSBUUlVFKSB7CgkJCWZwcmludGYoc3RkZXJyLCAiJXMgOiAlc1xuIixtZXNz
+YWdlLCBwZXJyLT5tZXNzYWdlKTsKCQkJZGJ1c19lcnJvcl9mcmVlKHBlcnIpOwoJCX0gZWxzZQoJ
+CQlmcHJpbnRmKHN0ZGVyciwgIiVzXG4iLCBtZXNzYWdlKTsKfQoKLyogVGhlIG1haW4gLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSAqLwppbnQgbWFp
+bihpbnQgYXJnYywgY2hhciAqYXJndltdKQp7CglEQnVzQ29ubmVjdGlvbiAqY29ubjsKCURCdXNF
+cnJvciBlcnI7CglEQnVzTWVzc2FnZSAqIG1zZywgKiByZXBseTsKCURCdXNNZXNzYWdlSXRlciBp
+dGVyLCBkaWN0LCBlbnRyeSwgdmFsdWU7CgljaGFyICogYWRkcmVzcywgKiBmaWxlOwogICAgaW50
+IHJldCA9IDA7CiAgICB1bnNpZ25lZCBpbnQgc2VyaWFsOwoKCWlmIChhcmdjICE9IDMpIHsKCQlm
+cHJpbnRmKHN0ZGVyciwgIkludmFsaWQgcGFyYW1ldGVycyBjb3VudCAhXG4iKTsKCQl1c2FnZShz
+dGRlcnIsIGFyZ3ZbMF0pOwoJCWV4aXQoRVhJVF9GQUlMVVJFKTsKCX0KCglhZGRyZXNzID0gYXJn
+dlsxXTsKCWZpbGUgPSBhcmd2WzJdOwoKCWRidXNfZXJyb3JfaW5pdCgmZXJyKTsKCiAgICAvKiBD
+b25uZWN0IHRoZSBzZXNzaW9uIGJ1cyAqLwoJY29ubiA9IGRidXNfYnVzX2dldChEQlVTX0JVU19T
+RVNTSU9OLCAmZXJyKTsKCWlmIChjb25uID09IE5VTEwpIHsKICAgICAgICBkaXNwbGF5X2Vycm9y
+KCZlcnIsICJDYW5ub3QgY29ubmVjdCBzZXNzaW9uIGJ1cyIpOwoJCWV4aXQoRVhJVF9GQUlMVVJF
+KTsKCX0KICAgIGVsc2UKICAgICAgICBwcmludGYoIk9iZXggcHVsbGVyIDogc2Vzc2lvbiBidXMg
+Y29ubmVjdGVkXG4iKTsKCgkvKiBDcmVhdGUgdGhlIG1lc3NhZ2UgdG8gYmUgc2VudCAqLwoJbXNn
+ID0gZGJ1c19tZXNzYWdlX25ld19tZXRob2RfY2FsbCgib3JnLm9wZW5vYmV4LmNsaWVudCIsICIv
+IiwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIm9yZy5vcGVub2JleC5D
+bGllbnQiLCAiUHVsbEJ1c2luZXNzQ2FyZCIpOwoJaWYgKCAhbXNnICkgewoJCWZwcmludGYoc3Rk
+ZXJyLCAiQ2Fubm90IGFsbG9jYXRlIGNhbGwgbWV0aG9kIFB1bGxCdXNpbmVzc0NhcmRcbiIpOwog
+ICAgICAgIGRidXNfY29ubmVjdGlvbl91bnJlZihjb25uKTsKCQlleGl0KEVYSVRfRkFJTFVSRSk7
+Cgl9CgoJZGJ1c19tZXNzYWdlX2l0ZXJfaW5pdF9hcHBlbmQobXNnLCAmaXRlcik7CgoJLyogQWRk
+IHRoZSBkZXN0aW5hdGlvbiBhcmd1bWVudCAqLwoJZGJ1c19tZXNzYWdlX2l0ZXJfb3Blbl9jb250
+YWluZXIoJml0ZXIsIERCVVNfVFlQRV9BUlJBWSwKCQkJREJVU19ESUNUX0VOVFJZX0JFR0lOX0NI
+QVJfQVNfU1RSSU5HCgkJCURCVVNfVFlQRV9TVFJJTkdfQVNfU1RSSU5HIERCVVNfVFlQRV9WQVJJ
+QU5UX0FTX1NUUklORwoJCQlEQlVTX0RJQ1RfRU5UUllfRU5EX0NIQVJfQVNfU1RSSU5HLCAmZGlj
+dCk7CglkYnVzX21lc3NhZ2VfaXRlcl9vcGVuX2NvbnRhaW5lcigmZGljdCwgREJVU19UWVBFX0RJ
+Q1RfRU5UUlksCgkJCQkJCQkJCSBOVUxMLCAmZW50cnkpOwoJY2hhciAqIGtleSA9ICJEZXN0aW5h
+dGlvbiI7CglkYnVzX21lc3NhZ2VfaXRlcl9hcHBlbmRfYmFzaWMoJmVudHJ5LCBEQlVTX1RZUEVf
+U1RSSU5HLCAma2V5KTsKCWNoYXIgc2lnWzJdID0geyBEQlVTX1RZUEVfU1RSSU5HLCAnXDAnIH07
+CglkYnVzX21lc3NhZ2VfaXRlcl9vcGVuX2NvbnRhaW5lcigmZW50cnksIERCVVNfVFlQRV9WQVJJ
+QU5ULCBzaWcsICZ2YWx1ZSk7CglkYnVzX21lc3NhZ2VfaXRlcl9hcHBlbmRfYmFzaWMoJnZhbHVl
+LCBEQlVTX1RZUEVfU1RSSU5HLCAmYWRkcmVzcyk7CglkYnVzX21lc3NhZ2VfaXRlcl9jbG9zZV9j
+b250YWluZXIoJmVudHJ5LCAmdmFsdWUpOwoJZGJ1c19tZXNzYWdlX2l0ZXJfY2xvc2VfY29udGFp
+bmVyKCZkaWN0LCAmZW50cnkpOwoJZGJ1c19tZXNzYWdlX2l0ZXJfY2xvc2VfY29udGFpbmVyKCZp
+dGVyLCAmZGljdCk7CgoJLyogQWRkIHRoZSBmaWxlIGFyZ3VtZW50ICovCglkYnVzX21lc3NhZ2Vf
+aXRlcl9hcHBlbmRfYmFzaWMoJml0ZXIsIERCVVNfVFlQRV9TVFJJTkcsICZmaWxlKTsKCiAgICBw
+cmludGYoIk9iZXggcHVsbGVyIDogbWVzc2FnZSBjcmVhdGVkXG4iKTsKCgkvKiBTZW5kIHRoZSBt
+ZXNzYWdlICovCglpZiAoICFkYnVzX2Nvbm5lY3Rpb25fc2VuZChjb25uLCBtc2csICZzZXJpYWwp
+ICkgewoJCWZwcmludGYoc3RkZXJyLCAiQ2Fubm90IHNlbmQgdGhlIG1lc3NhZ2UgKHNlcmlhbD0l
+dSlcbiIsIHNlcmlhbCk7CiAgICAgICAgZGJ1c19tZXNzYWdlX3VucmVmKG1zZyk7CiAgICAgICAg
+ZGJ1c19jb25uZWN0aW9uX3VucmVmKGNvbm4pOwoJCXJldCA9IEVYSVRfRkFJTFVSRTsKCX0KI2lm
+IDAKICAgIGlmICgocmVwbHkgPSBkYnVzX2Nvbm5lY3Rpb25fc2VuZF93aXRoX3JlcGx5X2FuZF9i
+bG9jayhjb25uLCBtc2csIDYwMDAwLCAmZXJyKSkgPT0gTlVMTCkgewogICAgICAgIGRpc3BsYXlf
+ZXJyb3IoJmVyciwgIkNhbm5vdCBzZW5kIHRoZSBtZXNzYWdlICEiKTsKICAgICAgICByZXQgPSBF
+WElUX0ZBSUxVUkU7CiAgICB9CiNlbmRpZgogICAgZWxzZQogICAgICAgIHByaW50ZigiT2JleCBw
+dWxsZXIgOiBtZXNzYWdlIHNlbnRcbiIpOwoKCWRidXNfbWVzc2FnZV91bnJlZihtc2cpOwoJZGJ1
+c19jb25uZWN0aW9uX2ZsdXNoKGNvbm4pOwoKCS8qIERpc2Nvbm5lY3QgKi8KCWRidXNfY29ubmVj
+dGlvbl91bnJlZihjb25uKTsKICAgIHByaW50ZigiT2JleCBwdWxsZXIgOiBkaXNjb25uZWN0ZWRc
+biIpOwoKCXJldHVybiByZXQ7Cn0K
+--0016364587e8c9915f0461ecba6a--
