@@ -1,53 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Mon, 2 Feb 2009 18:13:13 -0800
-Message-ID: <ac290f760902021813k7231971cx8fac6aea6fdd7569@mail.gmail.com>
-Subject: [PATCH] Bluetooth: When encryption is dropped, do not send RFCOMM tx
-	packets.
-From: jaikumar Ganesh <jaikumarg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=00151750db30a1d7810461fa3602
+Content-Type: text/plain;
+	charset="US-ASCII"
+Subject: RE: How can i configure bluez to transmit Voice over PCM
+Date: Tue, 3 Feb 2009 09:40:13 +0800
+Message-ID: <9F2B2656C8747B498D56A7B30FF5EB9FEC3FC2@CNMAIL13.cn.utstarcom.com>
+In-Reply-To: <49ED01FC03EE524BB7BB258E8F93BFF32F3E28@bfl-exchange-1.BFL.local>
+From: "Yao Ye" <yeyao@utstar.com>
+To: "Matuschka, Sebastian" <Sebastian.Matuschka@gcd-solutions.de>
+Cc: <linux-bluetooth@vger.kernel.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---00151750db30a1d7810461fa3602
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
 
-Hi Marcel,
-    The patch for pausing RFCOMM tx traffic during the grace period
-when the encryption is dropped (as a result of the role change) is
-attached.
+> Python is not really an option for our embedded system.
+> I got bluez 4.27 running and all I have tested worked.
+> But I have a problem with the pairing:
+> Since there is no passkey-agent any longer and I don't want to run
+python scripts I tried agent but it starts with an error message:
+ 
+test/agent.c seems to be outdated, just as you can see in function
+"static DBusHandlerResult agent_message(...)".
+It is impossible for us to porting python to embedded system, because
+python is too big, and dbus of python needed.
 
-Thanks
-Jaikumar
+import sys
+import dbus
+import dbus.service
+import dbus.mainloop.glib
 
---00151750db30a1d7810461fa3602
-Content-Type: application/octet-stream;
-	name="0001-Bluetooth-When-encryption-is-dropped-do-not-send-R.patch"
-Content-Disposition: attachment;
-	filename="0001-Bluetooth-When-encryption-is-dropped-do-not-send-R.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_fqpxr27j0
+Marcel has said: 
+Currently we only have Python scripts test/simple-agent.
+in the future we gonna have a full blown command line client for BlueZ.
 
-RnJvbSA0MjQ1NTY5OTkzNmZkMzA2NDA0NGMzZmU0NDNlNjZjZmVhNzkzZWUxIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBKYWlrdW1hciBHYW5lc2ggPGphaWt1bWFyQGdvb2dsZS5jb20+
-CkRhdGU6IE1vbiwgMiBGZWIgMjAwOSAxODowMzo1NyAtMDgwMApTdWJqZWN0OiBbUEFUQ0hdIEJs
-dWV0b290aDogV2hlbiBlbmNyeXB0aW9uIGlzIGRyb3BwZWQsIGRvIG5vdCBzZW5kIFJGQ09NTSB0
-eCBwYWNrZXRzLgoKRHVyaW5nIGEgcm9sZSBjaGFuZ2UsIHRoZSByZW1vdGUgc2lkZSBkcm9wcyB0
-aGUgZW5jcnlwdGlvbiBvZiB0aGUgUkZDT01NCmNvbm5lY3Rpb24uIFdlIGFsbG93IGEgZ3JhY2Ug
-cGVyaW9kIGZvciB0aGUgZW5jcnlwdGlvbiB0byBiZSByZWVzdGFibGlzaGVkLApiZWZvcmUgZHJv
-cHBpbmcgdGhlIGNvbm5lY3Rpb24uIER1cmluZyB0aGlzIGdyYWNlIHBlcmlvZCwgdGhlIFJGQ09N
-TV9TRUNfUEVORElORwpmbGFnIGlzIHNldC4gQ2hlY2sgdGhpcyBmbGFnIGJlZm9yZSBzZW5kaW5n
-IFJGQ09NTSB0eCBwYWNrZXRzLgoKU2lnbmVkLW9mZi1ieTogSmFpa3VtYXIgR2FuZXNoIDxqYWlr
-dW1hckBnb29nbGUuY29tPgotLS0KIG5ldC9ibHVldG9vdGgvcmZjb21tL2NvcmUuYyB8ICAgIDMg
-KysrCiAxIGZpbGVzIGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygrKSwgMCBkZWxldGlvbnMoLSkKCmRp
-ZmYgLS1naXQgYS9uZXQvYmx1ZXRvb3RoL3JmY29tbS9jb3JlLmMgYi9uZXQvYmx1ZXRvb3RoL3Jm
-Y29tbS9jb3JlLmMKaW5kZXggYWQwZTI1YS4uMzcxN2MyNSAxMDA2NDQKLS0tIGEvbmV0L2JsdWV0
-b290aC9yZmNvbW0vY29yZS5jCisrKyBiL25ldC9ibHVldG9vdGgvcmZjb21tL2NvcmUuYwpAQCAt
-MTc0OSw2ICsxNzQ5LDkgQEAgc3RhdGljIGlubGluZSB2b2lkIHJmY29tbV9wcm9jZXNzX2RsY3Mo
-c3RydWN0IHJmY29tbV9zZXNzaW9uICpzKQogCQkJY29udGludWU7CiAJCX0KIAorCQlpZiAodGVz
-dF9iaXQoUkZDT01NX1NFQ19QRU5ESU5HLCAmZC0+ZmxhZ3MpKQorCQkJY29udGludWU7CisKIAkJ
-aWYgKHRlc3RfYml0KFJGQ09NTV9UWF9USFJPVFRMRUQsICZzLT5mbGFncykpCiAJCQljb250aW51
-ZTsKIAotLSAKMS41LjQuNQoK
---00151750db30a1d7810461fa3602--
+so now bluez 4.28 can run well on embeded system,  but cann't run
+pairing.
+let us looking  forward to the update of test/agent.c.
