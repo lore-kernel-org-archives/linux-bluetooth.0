@@ -1,23 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Bnep networking with dbus on 4.*
+Subject: Re: [PATCH] hci_usb: Add support for OQO Model 01+
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Nicola Ranaldo <ranaldo@unina.it>
+To: Jamie Lentin <jm@lentin.co.uk>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <200902031603.03451.ranaldo@unina.it>
-References: <200902031603.03451.ranaldo@unina.it>
+In-Reply-To: <alpine.DEB.2.00.0902041341380.16577@localhost.localdomain>
+References: <alpine.DEB.2.00.0902041341380.16577@localhost.localdomain>
 Content-Type: text/plain
-Date: Wed, 04 Feb 2009 19:31:04 +0100
-Message-Id: <1233772264.12562.2.camel@californication>
+Date: Wed, 04 Feb 2009 19:30:22 +0100
+Message-Id: <1233772222.12562.1.camel@californication>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nicola,
+Hi Jamie,
 
-> Is it possible to establish bnep connection with dbus api 4.*?
-> I'm not able to find documentation on that.
+> Add USB device ID for OQO 01+'s internal USB bluetooth
 
-yes it is. See network-api.txt document from the bluez-4.x source.
+please proof that you really need this by sending in the content
+of /proc/bus/usb/devices. Normally Bluetooth devices get identified by
+its class descriptor.
+
+Also the hci_usb driver has been replaced by btusb. So please send
+patches against that kernel.
 
 Regards
 
