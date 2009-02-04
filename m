@@ -1,65 +1,252 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 4 Feb 2009 21:18:06 +0000 (GMT)
-From: Jamie Lentin <jm@lentin.co.uk>
-To: Marcel Holtmann <marcel@holtmann.org>
-cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] hci_usb: Add support for OQO Model 01+
-In-Reply-To: <1233772222.12562.1.camel@californication>
-Message-ID: <alpine.DEB.2.00.0902042117170.20425@localhost.localdomain>
-References: <alpine.DEB.2.00.0902041341380.16577@localhost.localdomain> <1233772222.12562.1.camel@californication>
+Date: Wed, 4 Feb 2009 13:54:22 +0100
+From: Vincent Untz <vuntz@gnome.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: Allow user to manually select a PIN
+Message-ID: <20090204125422.GX11389@vuntz.net>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
+Content-Type: multipart/mixed; boundary="mxv5cy4qt+RJ9ypb"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
+
+
+--mxv5cy4qt+RJ9ypb
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+
+(I'm not subscribed to the list, since I don't really follow the
+bluetooth stuff; so keeping me in cc will be appreciated ;-))
 
 Hi,
 
-> Hi Jamie,
->
->> Add USB device ID for OQO 01+'s internal USB bluetooth
->
-> please proof that you really need this by sending in the content
-> of /proc/bus/usb/devices. Normally Bluetooth devices get identified by
-> its class descriptor.
+A while ago, Bastien proposed some UI change to make it possible for
+users to manually select the PIN code used for pairing in the wizard:
+  http://thread.gmane.org/gmane.linux.bluez.kernel/717/focus=721
 
-So they do.  And it works fine without the patch.  How embarrasing. 
-Apologies, I should have re-checked this.  Ignore the patch.
+Here's a patch that implements this.
 
-For completeness' sake, here is the relevant chunk of 
-/proc/bus/usb/devices.
+At some point, I considered putting all this in a new page of the
+assistant, but I'm not a big fan of one more click. Also, I didn't put
+the "Force a random PIN code" option -- I wasn't sure it was that
+useful.
 
-T:  Bus=03 Lev=01 Prnt=01 Port=01 Cnt=02 Dev#=  3 Spd=12  MxCh= 0
-D:  Ver= 1.10 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=1557 ProdID=0003 Rev= 9.32
-C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=  0mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:* If#= 2 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
+Cheers,
 
-> Also the hci_usb driver has been replaced by btusb. So please send
-> patches against that kernel.
+Vincent
 
-Again, thanks.  Switched to using this module without problems.
+-- 
+Les gens heureux ne sont pas pressés.
 
-> Regards
->
-> Marcel
+--mxv5cy4qt+RJ9ypb
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment; filename="bluez-gnome-wizard-custom-pin.patch"
+
+Index: bluez-gnome-1.8/wizard/main.c
+===================================================================
+--- bluez-gnome-1.8.orig/wizard/main.c
++++ bluez-gnome-1.8/wizard/main.c
+@@ -27,6 +27,7 @@
+ 
+ #include <glib/gi18n.h>
+ #include <gtk/gtk.h>
++#include <gdk/gdkkeysyms.h>
+ 
+ #include <dbus/dbus-glib.h>
+ 
+@@ -47,6 +48,11 @@ static gchar *target_pincode = NULL;
+ static guint target_type = BLUETOOTH_TYPE_ANY;
+ static gboolean target_ssp = FALSE;
+ 
++/* NULL means automatic, anything else is a pincode specified by the user */
++static const gchar *user_pincode = NULL;
++static const gchar *last_fixed_pincode = "0000";
++
++static GtkWidget *window_assistant = NULL;
+ static GtkWidget *page_search = NULL;
+ static GtkWidget *page_setup = NULL;
+ static GtkWidget *page_summary = NULL;
+@@ -72,6 +78,9 @@ static gboolean pincode_callback(DBusGMe
+ 				target_type == BLUETOOTH_TYPE_HEADPHONE)
+ 		pincode = "0000";
+ 
++	if (user_pincode != NULL && strlen(user_pincode) == 4)
++		pincode = user_pincode;
++
+ 	text = g_strdup_printf(_("Please enter the following PIN code: %s"),
+ 								pincode);
+ 	gtk_label_set_markup(GTK_LABEL(label_passkey), text);
+@@ -337,6 +346,19 @@ static void create_type(GtkWidget *assis
+ }
+ #endif
+ 
++static void set_page_search_complete(void)
++{
++	int selected;
++	gboolean complete;
++
++	selected = gtk_tree_selection_count_selected_rows (search_selection);
++	complete = (selected != 0 &&
++			(user_pincode == NULL || strlen(user_pincode) == 4));
++
++	gtk_assistant_set_page_complete(GTK_ASSISTANT (window_assistant),
++					page_search, complete);
++}
++
+ static void select_callback(GtkTreeSelection *selection, gpointer user_data)
+ {
+ 	GtkAssistant *assistant = user_data;
+@@ -368,7 +390,7 @@ static void select_callback(GtkTreeSelec
+ 		target_type = type;
+ 	}
+ 
+-	gtk_assistant_set_page_complete(assistant, page_search, selected);
++	set_page_search_complete();
+ }
+ 
+ static gboolean device_filter(GtkTreeModel *model,
+@@ -381,6 +403,54 @@ static gboolean device_filter(GtkTreeMod
+ 	return (paired == TRUE) ? FALSE : TRUE;
+ }
+ 
++static gboolean entry_custom_event(GtkWidget *entry,
++					GdkEventKey *event, GtkWidget *box)
++{
++	if (event->length == 0)
++		return FALSE;
++
++	if ((event->keyval >= GDK_0 && event->keyval <= GDK_9) ||
++	    (event->keyval >= GDK_KP_0 && event->keyval <= GDK_KP_9))
++		return FALSE;
++
++	return TRUE;
++}
++
++static void entry_custom_changed(GtkWidget *entry, gpointer user_data)
++{
++	user_pincode = gtk_entry_get_text(GTK_ENTRY(entry));
++	set_page_search_complete();
++}
++
++static void toggle_set_sensitive(GtkWidget *button, GtkWidget *widget)
++{
++	gboolean active;
++
++	active = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button));
++	gtk_widget_set_sensitive(widget, active);
++}
++
++static void set_user_pincode(GtkWidget *button, const gchar *pincode)
++{
++	if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button)))
++		return;
++
++	if (pincode == NULL && user_pincode != NULL)
++		last_fixed_pincode = user_pincode;
++
++	user_pincode = pincode;
++	set_page_search_complete();
++}
++
++static void set_from_last_fixed_pincode(GtkWidget *button, gpointer user_data)
++{
++	if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button)))
++		return;
++
++	user_pincode = last_fixed_pincode;
++	set_page_search_complete();
++}
++
+ static void create_search(GtkWidget *assistant)
+ {
+ 	GtkWidget *vbox;
+@@ -389,6 +459,16 @@ static void create_search(GtkWidget *ass
+ 	GtkTreeModel *model;
+ 	GtkTreeModel *sorted;
+ 	GtkTreeSelection *selection;
++	GtkWidget *radio_auto;
++	GtkWidget *radio_fixed;
++	GtkWidget *align_fixed;
++	GtkWidget *vbox_fixed;
++	GtkWidget *radio_0000;
++	GtkWidget *radio_1111;
++	GtkWidget *radio_1234;
++	GtkWidget *hbox_custom;
++	GtkWidget *radio_custom;
++	GtkWidget *entry_custom;
+ 
+ 	vbox = create_vbox(assistant, GTK_ASSISTANT_PAGE_CONTENT,
+ 				_("Device search"),
+@@ -418,6 +498,62 @@ static void create_search(GtkWidget *ass
+ 
+ 	gtk_container_add(GTK_CONTAINER(scrolled), tree);
+ 
++	radio_auto = gtk_radio_button_new_with_mnemonic(NULL,
++					_("_Automatic PIN code selection"));
++	gtk_container_add(GTK_CONTAINER(vbox), radio_auto);
++
++	radio_fixed = gtk_radio_button_new_with_mnemonic_from_widget(GTK_RADIO_BUTTON(radio_auto), _("Use _fixed PIN code:"));
++	gtk_container_add(GTK_CONTAINER(vbox), radio_fixed);
++
++	align_fixed = gtk_alignment_new(0, 0, 1, 1);
++	gtk_alignment_set_padding(GTK_ALIGNMENT(align_fixed), 0, 0, 24, 0);
++	gtk_container_add(GTK_CONTAINER(vbox), align_fixed);
++	vbox_fixed = gtk_vbox_new(FALSE, 0);
++	gtk_container_add(GTK_CONTAINER(align_fixed), vbox_fixed);
++
++	radio_0000 = gtk_radio_button_new_with_label(NULL, _("'0000' (most headsets, mice and GPS devices)"));
++	gtk_container_add(GTK_CONTAINER(vbox_fixed), radio_0000);
++
++	radio_1111 = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(radio_0000), _("'1111'"));
++	gtk_container_add(GTK_CONTAINER(vbox_fixed), radio_1111);
++
++	radio_1234 = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(radio_0000), _("'1234'"));
++	gtk_container_add(GTK_CONTAINER(vbox_fixed), radio_1234);
++
++	hbox_custom = gtk_hbox_new(FALSE, 6);
++	radio_custom = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(radio_0000), _("Custom PIN code:"));
++	entry_custom = gtk_entry_new_with_max_length(4);
++	gtk_entry_set_width_chars(GTK_ENTRY(entry_custom), 4);
++        g_signal_connect (entry_custom, "key-press-event",
++			  G_CALLBACK (entry_custom_event), NULL);
++        g_signal_connect (entry_custom, "changed",
++			  G_CALLBACK (entry_custom_changed), NULL);
++	gtk_box_pack_start(GTK_BOX(hbox_custom), radio_custom,
++			FALSE, FALSE, 0);
++	gtk_box_pack_start(GTK_BOX(hbox_custom), entry_custom,
++			FALSE, FALSE, 0);
++	gtk_container_add(GTK_CONTAINER(vbox_fixed), hbox_custom);
++
++	toggle_set_sensitive(radio_fixed, vbox_fixed);
++	g_signal_connect(radio_fixed, "toggled",
++			G_CALLBACK(toggle_set_sensitive), vbox_fixed);
++	toggle_set_sensitive(radio_custom, entry_custom);
++	g_signal_connect(radio_custom, "toggled",
++			G_CALLBACK(toggle_set_sensitive), entry_custom);
++
++	g_signal_connect(radio_auto, "toggled",
++			G_CALLBACK(set_user_pincode), NULL);
++	g_signal_connect(radio_fixed, "toggled",
++			G_CALLBACK(set_from_last_fixed_pincode), NULL);
++	g_signal_connect(radio_0000, "toggled",
++			G_CALLBACK(set_user_pincode), "0000");
++	g_signal_connect(radio_1111, "toggled",
++			G_CALLBACK(set_user_pincode), "1111");
++	g_signal_connect(radio_1234, "toggled",
++			G_CALLBACK(set_user_pincode), "1234");
++        g_signal_connect_swapped (radio_custom, "toggled",
++			  G_CALLBACK (entry_custom_changed), entry_custom);
++
+ 	page_search = vbox;
+ }
+ 
+@@ -529,6 +665,7 @@ int main(int argc, char *argv[])
+ 	bluetooth_agent_setup(agent, AGENT_PATH);
+ 
+ 	window = create_wizard();
++	window_assistant = window;
+ 
+ 	bluetooth_instance_set_window(instance, GTK_WINDOW(window));
+ 
+
+--mxv5cy4qt+RJ9ypb--
