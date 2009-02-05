@@ -1,68 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <ac8af0be0902042106v2154e435o152f4064b25a8209@mail.gmail.com>
+In-Reply-To: <664d43d60901290046y66cf37f6u7bcd4cb4946a5f46@mail.gmail.com>
 References: <2C0A35D3-4DD9-4089-8061-F596A8A5A4B8@tiscali.it>
 	 <664d43d60901222334h4e1cb498hf8b3b01433e3ab92@mail.gmail.com>
 	 <A9056199-F858-4104-8B29-D2E55842306E@tiscali.it>
 	 <1233122055.18259.17.camel@violet>
 	 <3907C41D-4BC0-4983-8789-4110168919D3@tiscali.it>
 	 <664d43d60901290046y66cf37f6u7bcd4cb4946a5f46@mail.gmail.com>
-	 <ac8af0be0902042106v2154e435o152f4064b25a8209@mail.gmail.com>
-Date: Thu, 5 Feb 2009 09:22:44 +0200
-Message-ID: <664d43d60902042322l7663cbe4pf370a6ccd22cf551@mail.gmail.com>
+Date: Thu, 5 Feb 2009 13:06:32 +0800
+Message-ID: <ac8af0be0902042106v2154e435o152f4064b25a8209@mail.gmail.com>
 Subject: Re: [PATCH] BlueZ support for audio gateway role (HFP/HSP)
-From: event <event.riga@gmail.com>
-To: Zhao Forrest <forrest.zhao@gmail.com>
+From: Zhao Forrest <forrest.zhao@gmail.com>
+To: event <event.riga@gmail.com>
 Cc: Michele Noberasco <michele.noberasco@tiscali.it>,
 	BlueZ development <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Feb 5, 2009 at 07:06, Zhao Forrest <forrest.zhao@gmail.com> wrote:
-> On Thu, Jan 29, 2009 at 4:46 PM, event <event.riga@gmail.com> wrote:
->> On Thu, Jan 29, 2009 at 10:34, Michele Noberasco
->> <michele.noberasco@tiscali.it> wrote:
->>> Il giorno 28/gen/09, alle ore 06:54, Marcel Holtmann ha scritto:
->>>
->>>> Hi Michele,
->>>
->>> Hello Marcel
->>>
->>>> I like you two guys work together and send patches against BlueZ 4.x to
->>>> add the headset roles. Please split the work in smaller patches so we
->>>> can actually review it. Big chunks are always hard to chew and time
->>>> consuming. The quicker either Johan, Luiz or me can go through the code
->>>> the quicker we can merge it.
->>>
->>> Sorry to disappoint you, but my patch is against BlueZ 3 and nowhere near
->>> completion ;-)
->>> As I said, it is provided 'as is' since unfortunately I have to more time to
->>> spend on it :-(
->>>
->>> Leonid: was my code of any use to you?
->>>
->>> Regards,
->>> Michele Noberasco
->>>
->>>
+On Thu, Jan 29, 2009 at 4:46 PM, event <event.riga@gmail.com> wrote:
+> On Thu, Jan 29, 2009 at 10:34, Michele Noberasco
+> <michele.noberasco@tiscali.it> wrote:
+>> Il giorno 28/gen/09, alle ore 06:54, Marcel Holtmann ha scritto:
 >>
->> Hello Michele,
+>>> Hi Michele,
 >>
->> Saying honestly - no :). I've already implemented the functionality
->> found in your patch. But thank you anyhow.
+>> Hello Marcel
 >>
-> Event,
-> What's the current status of your patch? Is it still pending on main BlueZ
-> developer's review? If this is the case I think that you split the big
-> patch into
-> small pieces could make the code review process more smooth :)
+>>> I like you two guys work together and send patches against BlueZ 4.x to
+>>> add the headset roles. Please split the work in smaller patches so we
+>>> can actually review it. Big chunks are always hard to chew and time
+>>> consuming. The quicker either Johan, Luiz or me can go through the code
+>>> the quicker we can merge it.
+>>
+>> Sorry to disappoint you, but my patch is against BlueZ 3 and nowhere near
+>> completion ;-)
+>> As I said, it is provided 'as is' since unfortunately I have to more time to
+>> spend on it :-(
+>>
+>> Leonid: was my code of any use to you?
+>>
+>> Regards,
+>> Michele Noberasco
+>>
+>>
 >
-> Thanks,
-> Forrest
+> Hello Michele,
 >
-Hello Zhao,
+> Saying honestly - no :). I've already implemented the functionality
+> found in your patch. But thank you anyhow.
+>
+Event,
+What's the current status of your patch? Is it still pending on main BlueZ
+developer's review? If this is the case I think that you split the big
+patch into
+small pieces could make the code review process more smooth :)
 
-Unfortunately, I don't have time currently to work on this.
-
-Vale,
-Leonid Movshovich
+Thanks,
+Forrest
