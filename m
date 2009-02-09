@@ -1,84 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] tools: Fix memory leaks
-Date: Mon,  9 Feb 2009 01:15:29 -0200
-Message-Id: <1234149329-4536-1-git-send-email-gustavo@las.ic.unicamp.br>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <498F7C4E.4040305@xyzw.org>
+Date: Sun, 08 Feb 2009 16:43:58 -0800
+From: Brian Rogers <brian@xyzw.org>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: btusb compatibility issues
+References: <498EB082.7040708@xyzw.org> <1234113019.5355.18.camel@californication>
+In-Reply-To: <1234113019.5355.18.camel@californication>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some printfs was using as parameter functions that return dinamic
-allocated memory. Now, we free them!
+Marcel Holtmann wrote:
+> Don't try with bluetoothd at all. Make sure it is not running. Plug in
+> the dongle and start hcidump -X -V and then do hciconfig hci0 up. This
+> way I see what is going on.
+>   
+And then start bluetoothd at this point, right? (Assuming no obvious 
+errors have already occurred)
+> Also please run a kernel built from bluetooth-testing.git so I can
+> properly debug this. There is one change in it that affects the bulk
+> URBs and maybe these dongles just don't like it if we only submit them
+> when needed.
+>   
+I found bluetooth-testing.git last night after posting here, and merged 
+it into my kernel. Today I just tested it, and the problem is solved 
+here. So there's probably no reason to provide the dump anymore. Will 
+this fix be backported to 2.6.27 and 2.6.28?
 
-Signed-off-by: Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
----
- tools/hciconfig.c |   15 ++++++++++++---
- tools/hcitool.c   |    6 ++++--
- 2 files changed, 16 insertions(+), 5 deletions(-)
+(BTW, there's now a compile error in bluetooth-testing.git as of today)
+> Next step is to check on these devices ISOC interface. So I need the
+> content of /proc/bus/usb/devices for this dongle. And then you need to
+> try to mark them with BTUSB_BROKEN_ISOC.
+>   
+This dongle now functions better than my laptop's internal Bluetooth 
+device. I'll make sure to include this info and an hcidump log when I 
+start a thread for the issue I'm having with that.
 
-diff --git a/tools/hciconfig.c b/tools/hciconfig.c
-index 960f450..ca7394f 100644
---- a/tools/hciconfig.c
-+++ b/tools/hciconfig.c
-@@ -85,7 +85,10 @@ static void print_dev_list(int ctl, int flags)
- 
- static void print_pkt_type(struct hci_dev_info *di)
- {
--	printf("\tPacket type: %s\n", hci_ptypetostr(di->pkt_type));
-+	char *str;
-+	str = hci_ptypetostr(di->pkt_type);
-+	printf("\tPacket type: %s\n", str);
-+	bt_free(str);
- }
- 
- static void print_link_policy(struct hci_dev_info *di)
-@@ -95,7 +98,10 @@ static void print_link_policy(struct hci_dev_info *di)
- 
- static void print_link_mode(struct hci_dev_info *di)
- {
--	printf("\tLink mode: %s\n", hci_lmtostr(di->link_mode));
-+	char *str;
-+	str =  hci_lmtostr(di->link_mode);
-+	printf("\tLink mode: %s\n", str);
-+	bt_free(str);
- }
- 
- static void print_dev_features(struct hci_dev_info *di, int format)
-@@ -1586,10 +1592,13 @@ static void print_dev_hdr(struct hci_dev_info *di)
- static void print_dev_info(int ctl, struct hci_dev_info *di)
- {
- 	struct hci_dev_stats *st = &di->stat;
-+	char * str;
- 
- 	print_dev_hdr(di);
- 
--	printf("\t%s\n", hci_dflagstostr(di->flags) );
-+	str = hci_dflagstostr(di->flags);
-+	printf("\t%s\n", str);
-+	bt_free(str);
- 
- 	printf("\tRX bytes:%d acl:%d sco:%d events:%d errors:%d\n",
- 		st->byte_rx, st->acl_rx, st->sco_rx, st->evt_rx, st->err_rx);
-diff --git a/tools/hcitool.c b/tools/hcitool.c
-index e24bde9..f1cffb6 100644
---- a/tools/hcitool.c
-+++ b/tools/hcitool.c
-@@ -102,11 +102,13 @@ static int conn_list(int s, int dev_id, long arg)
- 
- 	for (i = 0; i < cl->conn_num; i++, ci++) {
- 		char addr[18];
-+		char * str;
- 		ba2str(&ci->bdaddr, addr);
-+		str = hci_lmtostr(ci->link_mode);
- 		printf("\t%s %s %s handle %d state %d lm %s\n",
- 			ci->out ? "<" : ">", type2str(ci->type),
--			addr, ci->handle, ci->state,
--			hci_lmtostr(ci->link_mode));
-+			addr, ci->handle, ci->state, str);
-+		bt_free(str);
- 	}
- 
- 	return 0;
--- 
-1.6.0.6
-
+Thanks!
