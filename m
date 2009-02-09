@@ -1,47 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <664d43d60902042322l7663cbe4pf370a6ccd22cf551@mail.gmail.com>
-References: <2C0A35D3-4DD9-4089-8061-F596A8A5A4B8@tiscali.it>
-	 <664d43d60901222334h4e1cb498hf8b3b01433e3ab92@mail.gmail.com>
-	 <A9056199-F858-4104-8B29-D2E55842306E@tiscali.it>
-	 <1233122055.18259.17.camel@violet>
-	 <3907C41D-4BC0-4983-8789-4110168919D3@tiscali.it>
-	 <664d43d60901290046y66cf37f6u7bcd4cb4946a5f46@mail.gmail.com>
-	 <ac8af0be0902042106v2154e435o152f4064b25a8209@mail.gmail.com>
-	 <664d43d60902042322l7663cbe4pf370a6ccd22cf551@mail.gmail.com>
-Date: Mon, 9 Feb 2009 13:38:10 +0800
-Message-ID: <ac8af0be0902082138u9d3eb63hae9c5739b198072b@mail.gmail.com>
-Subject: Re: [PATCH] BlueZ support for audio gateway role (HFP/HSP)
-From: Zhao Forrest <forrest.zhao@gmail.com>
-To: event <event.riga@gmail.com>
-Cc: Michele Noberasco <michele.noberasco@tiscali.it>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] tools: Fix memory leaks
+Date: Mon,  9 Feb 2009 01:15:29 -0200
+Message-Id: <1234149329-4536-1-git-send-email-gustavo@las.ic.unicamp.br>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
->>>>
->>>>
->>>
->>> Hello Michele,
->>>
->>> Saying honestly - no :). I've already implemented the functionality
->>> found in your patch. But thank you anyhow.
->>>
->> Event,
->> What's the current status of your patch? Is it still pending on main BlueZ
->> developer's review? If this is the case I think that you split the big
->> patch into
->> small pieces could make the code review process more smooth :)
->>
->> Thanks,
->> Forrest
->>
-> Hello Zhao,
->
-> Unfortunately, I don't have time currently to work on this.
-Do you mind if we pick up your patch and divide it into smaller pieces
-to try to push
-it into BlueZ upstream?
+Some printfs was using as parameter functions that return dinamic
+allocated memory. Now, we free them!
 
-Thanks,
-Forrest
+Signed-off-by: Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
+---
+ tools/hciconfig.c |   15 ++++++++++++---
+ tools/hcitool.c   |    6 ++++--
+ 2 files changed, 16 insertions(+), 5 deletions(-)
+
+diff --git a/tools/hciconfig.c b/tools/hciconfig.c
+index 960f450..ca7394f 100644
+--- a/tools/hciconfig.c
++++ b/tools/hciconfig.c
+@@ -85,7 +85,10 @@ static void print_dev_list(int ctl, int flags)
+ 
+ static void print_pkt_type(struct hci_dev_info *di)
+ {
+-	printf("\tPacket type: %s\n", hci_ptypetostr(di->pkt_type));
++	char *str;
++	str = hci_ptypetostr(di->pkt_type);
++	printf("\tPacket type: %s\n", str);
++	bt_free(str);
+ }
+ 
+ static void print_link_policy(struct hci_dev_info *di)
+@@ -95,7 +98,10 @@ static void print_link_policy(struct hci_dev_info *di)
+ 
+ static void print_link_mode(struct hci_dev_info *di)
+ {
+-	printf("\tLink mode: %s\n", hci_lmtostr(di->link_mode));
++	char *str;
++	str =  hci_lmtostr(di->link_mode);
++	printf("\tLink mode: %s\n", str);
++	bt_free(str);
+ }
+ 
+ static void print_dev_features(struct hci_dev_info *di, int format)
+@@ -1586,10 +1592,13 @@ static void print_dev_hdr(struct hci_dev_info *di)
+ static void print_dev_info(int ctl, struct hci_dev_info *di)
+ {
+ 	struct hci_dev_stats *st = &di->stat;
++	char * str;
+ 
+ 	print_dev_hdr(di);
+ 
+-	printf("\t%s\n", hci_dflagstostr(di->flags) );
++	str = hci_dflagstostr(di->flags);
++	printf("\t%s\n", str);
++	bt_free(str);
+ 
+ 	printf("\tRX bytes:%d acl:%d sco:%d events:%d errors:%d\n",
+ 		st->byte_rx, st->acl_rx, st->sco_rx, st->evt_rx, st->err_rx);
+diff --git a/tools/hcitool.c b/tools/hcitool.c
+index e24bde9..f1cffb6 100644
+--- a/tools/hcitool.c
++++ b/tools/hcitool.c
+@@ -102,11 +102,13 @@ static int conn_list(int s, int dev_id, long arg)
+ 
+ 	for (i = 0; i < cl->conn_num; i++, ci++) {
+ 		char addr[18];
++		char * str;
+ 		ba2str(&ci->bdaddr, addr);
++		str = hci_lmtostr(ci->link_mode);
+ 		printf("\t%s %s %s handle %d state %d lm %s\n",
+ 			ci->out ? "<" : ">", type2str(ci->type),
+-			addr, ci->handle, ci->state,
+-			hci_lmtostr(ci->link_mode));
++			addr, ci->handle, ci->state, str);
++		bt_free(str);
+ 	}
+ 
+ 	return 0;
+-- 
+1.6.0.6
+
