@@ -1,27 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Bluez as A2DP-SNK?
+Subject: Re: [PATCH] tools: Fix memory leaks
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Marcel Witte <wittemar@googlemail.com>
+To: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <498F6E1F.6080906@googlemail.com>
-References: <498F6E1F.6080906@googlemail.com>
+In-Reply-To: <1234149329-4536-1-git-send-email-gustavo@las.ic.unicamp.br>
+References: <1234149329-4536-1-git-send-email-gustavo@las.ic.unicamp.br>
 Content-Type: text/plain
-Date: Mon, 09 Feb 2009 13:32:24 +0100
-Message-Id: <1234182744.4705.8.camel@californication>
+Date: Mon, 09 Feb 2009 13:31:21 +0100
+Message-Id: <1234182681.4705.7.camel@californication>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Gustavo,
 
-> Is it possible to use bluez as A2DP-SNK? In the wiki it's just described
-> how to use it as SRC with ALSA, and while searching the web I just found
-> a thread on the bluez.devel-newsgroup from march 2005, saying that it is
-> not yet implemented. Is it now implemented? Would it be hard to implement?
+> Some printfs was using as parameter functions that return dinamic
+> allocated memory. Now, we free them!
+> 
+> Signed-off-by: Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
 
-it is not implemented, but feel free to work on an implementation for
-the A2DP sink. It should not be that hard since all the base work is
-already present.
+BlueZ doesn't use Signed-off-by for commit messages. That is kernel
+stuff.
+
+> @@ -1586,10 +1592,13 @@ static void print_dev_hdr(struct hci_dev_info *di)
+>  static void print_dev_info(int ctl, struct hci_dev_info *di)
+>  {
+>  	struct hci_dev_stats *st = &di->stat;
+> +	char * str;
+
+This needs to be "char *str;"
+
+Please fix it and re-sent the patch.
 
 Regards
 
