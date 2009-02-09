@@ -1,35 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Mon, 9 Feb 2009 19:51:15 +0800
-Message-ID: <a172fe730902090351m6245a9f8uc39c2776752bcd9f@mail.gmail.com>
-Subject: Turn off the bluetooth headset during audio playback via a2dp.
-From: =?GB2312?B?seXA2g==?= <mykofzone@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <ac8af0be0902082138u9d3eb63hae9c5739b198072b@mail.gmail.com>
+References: <2C0A35D3-4DD9-4089-8061-F596A8A5A4B8@tiscali.it>
+	 <664d43d60901222334h4e1cb498hf8b3b01433e3ab92@mail.gmail.com>
+	 <A9056199-F858-4104-8B29-D2E55842306E@tiscali.it>
+	 <1233122055.18259.17.camel@violet>
+	 <3907C41D-4BC0-4983-8789-4110168919D3@tiscali.it>
+	 <664d43d60901290046y66cf37f6u7bcd4cb4946a5f46@mail.gmail.com>
+	 <ac8af0be0902042106v2154e435o152f4064b25a8209@mail.gmail.com>
+	 <664d43d60902042322l7663cbe4pf370a6ccd22cf551@mail.gmail.com>
+	 <ac8af0be0902082138u9d3eb63hae9c5739b198072b@mail.gmail.com>
+Date: Mon, 9 Feb 2009 11:49:46 +0200
+Message-ID: <664d43d60902090149gf960fbfg99384adb3f26f0f9@mail.gmail.com>
+Subject: Re: [PATCH] BlueZ support for audio gateway role (HFP/HSP)
+From: event <event.riga@gmail.com>
+To: Zhao Forrest <forrest.zhao@gmail.com>
+Cc: Michele Noberasco <michele.noberasco@tiscali.it>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Mon, Feb 9, 2009 at 07:38, Zhao Forrest <forrest.zhao@gmail.com> wrote:
+>>>>>
+>>>>>
+>>>>
+>>>> Hello Michele,
+>>>>
+>>>> Saying honestly - no :). I've already implemented the functionality
+>>>> found in your patch. But thank you anyhow.
+>>>>
+>>> Event,
+>>> What's the current status of your patch? Is it still pending on main BlueZ
+>>> developer's review? If this is the case I think that you split the big
+>>> patch into
+>>> small pieces could make the code review process more smooth :)
+>>>
+>>> Thanks,
+>>> Forrest
+>>>
+>> Hello Zhao,
+>>
+>> Unfortunately, I don't have time currently to work on this.
+> Do you mind if we pick up your patch and divide it into smaller pieces
+> to try to push
+> it into BlueZ upstream?
+>
+> Thanks,
+> Forrest
+>
+Hello Forrest,
 
-     If a2dp channel was disconnected during the audio playback , i
-wanted to swtich the path to audiocard.
-But after a2dp channel disconnect , "aplay" or "helix" would be hold
-and can not exit normally. (I want to close the bluetooth device ,then
-open a new audiocard device.)
-How to fix this issue and is there other method to switch between
-bluetooth headset and audiocard dynamically during audio playback via
-a2dp?
-Thanks very much.
+Yes, I would be pleased if you'll take it :)
 
-My develop environment:
-   kernel : 2.6.18.8
-BlueZ : 3.26
-   BT HW : STLC2500
-   Headset : iTech
-   Alsa : 1.0.16
-	
-MMI : Qtopia 4.3.1
-Media engine : helix
-
-BR
-leibian
+Vale,
+Leonid Movshovich
