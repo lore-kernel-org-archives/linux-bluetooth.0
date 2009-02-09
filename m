@@ -1,36 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] tools: Fix memory leaks
+Subject: Re: Turn off the bluetooth headset during audio playback via a2dp.
 From: Marcel Holtmann <marcel@holtmann.org>
-To: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
+To: =?UTF-8?Q?=E5=8D=9E=E7=A3=8A?= <mykofzone@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1234149329-4536-1-git-send-email-gustavo@las.ic.unicamp.br>
-References: <1234149329-4536-1-git-send-email-gustavo@las.ic.unicamp.br>
+In-Reply-To: <a172fe730902090351m6245a9f8uc39c2776752bcd9f@mail.gmail.com>
+References: <a172fe730902090351m6245a9f8uc39c2776752bcd9f@mail.gmail.com>
 Content-Type: text/plain
-Date: Mon, 09 Feb 2009 13:31:21 +0100
-Message-Id: <1234182681.4705.7.camel@californication>
+Date: Mon, 09 Feb 2009 13:29:39 +0100
+Message-Id: <1234182579.4705.6.camel@californication>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi,
 
-> Some printfs was using as parameter functions that return dinamic
-> allocated memory. Now, we free them!
-> 
-> Signed-off-by: Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
+>      If a2dp channel was disconnected during the audio playback , i
+> wanted to swtich the path to audiocard.
+> But after a2dp channel disconnect , "aplay" or "helix" would be hold
+> and can not exit normally. (I want to close the bluetooth device ,then
+> open a new audiocard device.)
+> How to fix this issue and is there other method to switch between
+> bluetooth headset and audiocard dynamically during audio playback via
+> a2dp?
 
-BlueZ doesn't use Signed-off-by for commit messages. That is kernel
-stuff.
-
-> @@ -1586,10 +1592,13 @@ static void print_dev_hdr(struct hci_dev_info *di)
->  static void print_dev_info(int ctl, struct hci_dev_info *di)
->  {
->  	struct hci_dev_stats *st = &di->stat;
-> +	char * str;
-
-This needs to be "char *str;"
-
-Please fix it and re-sent the patch.
+you should use an audio server like PulseAudio for this. ALSA is not
+really designed for these use cases.
 
 Regards
 
