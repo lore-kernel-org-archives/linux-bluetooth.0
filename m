@@ -1,30 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: CVSD Audio Playing on PC
+Subject: Re: firmware for STLC2500
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Kartikey Parmar <kartikey2781@gmail.com>
+To: =?UTF-8?Q?=E5=8D=9E=E7=A3=8A?= <mykofzone@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <6887eb5d0902092205p7b31b48bud1c0c2d2abd272bd@mail.gmail.com>
-References: <6887eb5d0902092205p7b31b48bud1c0c2d2abd272bd@mail.gmail.com>
+In-Reply-To: <a172fe730902100146h5d86a08cw8530bce288a3ec6@mail.gmail.com>
+References: <a172fe730902100146h5d86a08cw8530bce288a3ec6@mail.gmail.com>
 Content-Type: text/plain
-Date: Tue, 10 Feb 2009 16:38:02 +0100
-Message-Id: <1234280282.12847.31.camel@californication>
+Date: Tue, 10 Feb 2009 16:36:27 +0100
+Message-Id: <1234280187.12847.29.camel@californication>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Kartikey,
+Hi,
 
-> I m working on a project which will receive CVSD quality audio signals
-> from Bluetooth Headset and stores in a read buffer.
-> Now after I receive those samples I want to play it on remote PC
-> connected to local network running under either Linux or windows.
-> I m little confused about CVSD to WAV / mp3 converter which is
-> supported on the remote end.
-> If there is any idea, kindly tell me.
+>      There are some firmware for STLC2500 (STLC2500 R4.2 12102005
+> 12:40:14 ZAV100012) chip in the packet named
+> bluez-firmware-1.2.tar.gz. And They are :
+>      STLC2500_R4_02_02_WLAN.ssf
+>      STLC2500_R4_02_04.ptc
+> Now, i want to check whether there's some update or not. But where can
+> i download the new fireware. I can't find them in st website. Can
+> someone tell me the url or something else? Thanks. Thanks.
 
-the CVSD codec is only used over the air. The host stack receive either
-PCM, aLaw or muLaw encodings. Mostly it is just plain PCM with 8 kHz
-with either 8-bit or 16-bit.
+the guys from ST never send me new hardware or new firmware. So I have
+no idea. You would have to ask ST.
 
 Regards
 
