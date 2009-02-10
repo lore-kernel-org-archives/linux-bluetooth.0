@@ -1,29 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Li, Zhigang" <zhigang.li@intel.com>
-To: Jelle de Jong <jelledejong@powercraft.nl>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Date: Wed, 11 Feb 2009 09:26:06 +0800
-Subject: RE: Bluetooth Optical Mouse BM083 and BM013
-Message-ID: <B94C62E7C2870743865418621F040C13069A3138@pdsmsx502.ccr.corp.intel.com>
-References: <4991878E.4010100@powercraft.nl>
-In-Reply-To: <4991878E.4010100@powercraft.nl>
-Content-Type: text/plain; charset="gb2312"
+Message-ID: <4991F1F9.9080800@dell.com>
+Date: Tue, 10 Feb 2009 15:30:33 -0600
+From: Mario Limonciello <mario_limonciello@dell.com>
 MIME-Version: 1.0
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: How to update SDP records
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="------------enig010F4020F4174E34836408D2"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-DQo+LS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj5Gcm9tOiBsaW51eC1ibHVldG9vdGgtb3du
-ZXJAdmdlci5rZXJuZWwub3JnDQo+W21haWx0bzpsaW51eC1ibHVldG9vdGgtb3duZXJAdmdlci5r
-ZXJuZWwub3JnXSBPbiBCZWhhbGYgT2YgSmVsbGUgZGUgSm9uZw0KPlNlbnQ6IDIwMDnE6jLUwjEw
-yNUgMjE6NTcNCj5UbzogQmx1ZVogZGV2ZWxvcG1lbnQNCj5TdWJqZWN0OiBCbHVldG9vdGggT3B0
-aWNhbCBNb3VzZSBCTTA4MyBhbmQgQk0wMTMNCj4NCj5UaGlzIG1lc3NhZ2UgY29udGFpbnMgdGhl
-IGZvbGxvd2luZyBhdHRhY2htZW50KHMpOg0KPkJsdWV0b290aCBPcHRpY2FsIE1vdXNlIEJNMDgz
-IGFuZCBCTTAxMy50YXIuZ3oNCj4NCj5IZWxsbyBldmVyeWJvZHksDQo+DQo+SSBib3VnaHQgdHdv
-IG5ldyBibHVldG9vdGggbW91c2VzIGZvciB0ZXN0aW5nIGFuZCBib3RoIGRvIG5vdCB3b3JrDQo+
-d2l0aCB0aGUgc2ltcGxlLWFnZW50LnB5IHNjcmlwdC4gV291bGQgc29tZWJvZHkgYmUgd2lsbGlu
-ZyB0byBmaXggdGhlDQogIFdoeSB5b3Ugd2FudCB1c2Ugc2ltcGxlLWFnZW50IHRvIG1ha2UgbW91
-c2Ugd29yaz8NCg0KPmNvbW1hbmQgbGluZSB0b29sIHRvIGNvbm5lY3QgbW91c2VzPyBJIGdvdCB0
-aGUgbG9ncyBhbmQgZGV2aWNlDQo+aW5mb3JtYXRpb24gYXR0YWNoZWQgaW4gdGhpcyBtYWlsLg0K
-ICANCg0KICBNYWtlIHRoZSBtb3VzZSBpbiBwYXJpbmcgc3RhdHVzLCBQZXJoYXBzIGp1c3QgcmVz
-dCBzb21lIGJ1dHRvbiBpbiBtb3VzZS4NCiAgSGlkZCAtLSBzZWFyY2ggDQogIA0KDQo+DQo+VGhh
-bmtzIGluIGFkdmFuY2UsDQo+DQo+QmVzdCByZWdhcmRzLA0KPg0KPkplbGxlDQo=
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enig010F4020F4174E34836408D2
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+Hi guys:
+
+I was looking at the Bluez 4.x API and don't see any way for requesting
+an updated set of SDP records for a device.  My Blackberry will not
+connect advertising that it can receive OBEX transfers at all (the File
+Transfer Agent isn't in SDP records).  This is because by default that
+mode is turned off on the device.  There is an option to turn it on
+momentarily to receive a file, but then it turns back off.
+
+Because of this, it's impossible to pair the device with the SDP record
+for File Transfer on it's list.  Is there somewhere in the API that I am
+missing that allows you to request an updated set of records for a device=
+?
+
+Regards
+--=20
+Mario Limonciello
+*Dell | Linux Engineering*
+mario_limonciello@dell.com
+
+
+--------------enig010F4020F4174E34836408D2
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
+
+iEYEARECAAYFAkmR8fkACgkQ2CrZjkA73Yv8NgCfeLKqCiWr1orugana+6qPsn96
+4pYAnijr5flxCPIxK3QltXBxEkJMHvve
+=Z5rL
+-----END PGP SIGNATURE-----
+
+--------------enig010F4020F4174E34836408D2--
