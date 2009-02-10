@@ -1,54 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4991F1F9.9080800@dell.com>
-Date: Tue, 10 Feb 2009 15:30:33 -0600
-From: Mario Limonciello <mario_limonciello@dell.com>
 MIME-Version: 1.0
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: How to update SDP records
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="------------enig010F4020F4174E34836408D2"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: gfpadovan@gmail.com
+In-Reply-To: <1234280592.12847.33.camel@californication>
+References: <1234223456-30790-1-git-send-email-gustavo@las.ic.unicamp.br>
+	 <1234280592.12847.33.camel@californication>
+Date: Tue, 10 Feb 2009 15:23:20 -0200
+Message-ID: <6b53b1990902100923l5f845d31sd414f08936a8b612@mail.gmail.com>
+Subject: Re: [PATCH] tools: Fix memory leaks
+From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enig010F4020F4174E34836408D2
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+On Tue, Feb 10, 2009 at 1:43 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
+> Hi Gustavo,
+>
+>> Some printfs was using as parameter functions that return dinamic
+>> allocated memory. Now, we free them!
+>
+> you patch has been applied, but I had to modify the commit message a lot
+> to turn it into a little bit more proper English :)
 
-Hi guys:
+Ok. My English is bad, sorry. ;-)
 
-I was looking at the Bluez 4.x API and don't see any way for requesting
-an updated set of SDP records for a device.  My Blackberry will not
-connect advertising that it can receive OBEX transfers at all (the File
-Transfer Agent isn't in SDP records).  This is because by default that
-mode is turned off on the device.  There is an option to turn it on
-momentarily to receive a file, but then it turns back off.
+>
+> Regards
+>
+> Marcel
+>
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
 
-Because of this, it's impossible to pair the device with the SDP record
-for File Transfer on it's list.  Is there somewhere in the API that I am
-missing that allows you to request an updated set of records for a device=
-?
 
-Regards
+
 --=20
-Mario Limonciello
-*Dell | Linux Engineering*
-mario_limonciello@dell.com
+----------------------------------------------
+Gustavo Fernando Padovan
+Engenharia de Computa=E7=E3o 2006
+Instituto de Computa=E7=E3o - UNICAMP
 
+gfpadovan@gmail.com
+gustavo@las.ic.unicamp.br
+-------------------------------------------
 
---------------enig010F4020F4174E34836408D2
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
-
-iEYEARECAAYFAkmR8fkACgkQ2CrZjkA73Yv8NgCfeLKqCiWr1orugana+6qPsn96
-4pYAnijr5flxCPIxK3QltXBxEkJMHvve
-=Z5rL
------END PGP SIGNATURE-----
-
---------------enig010F4020F4174E34836408D2--
+Seja Livre, use Software Livre
