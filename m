@@ -1,21 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Tue, 10 Feb 2009 16:02:20 +0530
-Message-ID: <c2a31c480902100232v56deddemc92aa954c38ef66f@mail.gmail.com>
-Subject: Regarding bluetooth-testing.git
-From: sreevani medhahal <sreevani.medhahal@gmail.com>
+Date: Tue, 10 Feb 2009 17:46:05 +0800
+Message-ID: <a172fe730902100146h5d86a08cw8530bce288a3ec6@mail.gmail.com>
+Subject: firmware for STLC2500
+From: =?GB2312?B?seXA2g==?= <mykofzone@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-hi,
+Hi All,
+     There are some firmware for STLC2500 (STLC2500 R4.2 12102005
+12:40:14 ZAV100012) chip in the packet named
+bluez-firmware-1.2.tar.gz. And They are :
+     STLC2500_R4_02_02_WLAN.ssf
+     STLC2500_R4_02_04.ptc
+Now, i want to check whether there's some update or not. But where can
+i download the new fireware. I can't find them in st website. Can
+someone tell me the url or something else? Thanks. Thanks.
 
- I would like to know if bluetooth-testing git repository has all the
-fixes for bluetooth modules, following kernel version 2.6.27 . ie., i
-want to know if i use linux kernel 2.6.27 & apply all the patches in
-bluetooth-testing git ,then will this kernel have all the fixes for
-all the  known issues(only  those issues whose patches were reviewed &
-acknowledged by Marcel).
-Thanks & Regards,
-Sreevani M
+Best Regard,
+LeiBian
