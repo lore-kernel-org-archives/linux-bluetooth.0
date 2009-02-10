@@ -1,30 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: firmware for STLC2500
+Subject: Re: Regarding bluetooth-testing.git
 From: Marcel Holtmann <marcel@holtmann.org>
-To: =?UTF-8?Q?=E5=8D=9E=E7=A3=8A?= <mykofzone@gmail.com>
+To: sreevani medhahal <sreevani.medhahal@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <a172fe730902100146h5d86a08cw8530bce288a3ec6@mail.gmail.com>
-References: <a172fe730902100146h5d86a08cw8530bce288a3ec6@mail.gmail.com>
+In-Reply-To: <c2a31c480902100232v56deddemc92aa954c38ef66f@mail.gmail.com>
+References: <c2a31c480902100232v56deddemc92aa954c38ef66f@mail.gmail.com>
 Content-Type: text/plain
-Date: Tue, 10 Feb 2009 16:36:27 +0100
-Message-Id: <1234280187.12847.29.camel@californication>
+Date: Tue, 10 Feb 2009 16:35:48 +0100
+Message-Id: <1234280148.12847.28.camel@californication>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Sreevani,
 
->      There are some firmware for STLC2500 (STLC2500 R4.2 12102005
-> 12:40:14 ZAV100012) chip in the packet named
-> bluez-firmware-1.2.tar.gz. And They are :
->      STLC2500_R4_02_02_WLAN.ssf
->      STLC2500_R4_02_04.ptc
-> Now, i want to check whether there's some update or not. But where can
-> i download the new fireware. I can't find them in st website. Can
-> someone tell me the url or something else? Thanks. Thanks.
+>  I would like to know if bluetooth-testing git repository has all the
+> fixes for bluetooth modules, following kernel version 2.6.27 . ie., i
+> want to know if i use linux kernel 2.6.27 & apply all the patches in
+> bluetooth-testing git ,then will this kernel have all the fixes for
+> all the  known issues(only  those issues whose patches were reviewed &
+> acknowledged by Marcel).
 
-the guys from ST never send me new hardware or new firmware. So I have
-no idea. You would have to ask ST.
+depends on what happened between 2.6.27 and 2.6.29-rc4. I would have to
+check, but I guess we had additional patches and all patches from
+bluetooth-testing.git depend on them. You need to backport the whole
+include/net/bluetooth, net/bluetooth and drivers/bluetooth at minimum.
+Maybe some extra generic kernel infrastructure if we depend on it.
 
 Regards
 
