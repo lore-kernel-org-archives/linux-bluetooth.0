@@ -1,49 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4992A900.8080406@powercraft.nl>
-Date: Wed, 11 Feb 2009 11:31:28 +0100
-From: Jelle de Jong <jelledejong@powercraft.nl>
+Message-ID: <4992A7A4.1010802@isc.cnr.it>
+Date: Wed, 11 Feb 2009 11:25:40 +0100
+From: GianPiero Puccioni <gianpiero.puccioni@isc.cnr.it>
 MIME-Version: 1.0
 To: "Li, Zhigang" <zhigang.li@intel.com>
-CC: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: Bluetooth Optical Mouse BM083 and BM013
-References: <4991878E.4010100@powercraft.nl> <B94C62E7C2870743865418621F040C13069A3138@pdsmsx502.ccr.corp.intel.com>
-In-Reply-To: <B94C62E7C2870743865418621F040C13069A3138@pdsmsx502.ccr.corp.intel.com>
-Content-Type: text/plain; charset=UTF-8
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Obex Push
+References: <49929929.5090206@isc.cnr.it> <B94C62E7C2870743865418621F040C13069A3431@pdsmsx502.ccr.corp.intel.com> <4992A467.2030504@isc.cnr.it> <B94C62E7C2870743865418621F040C13069A3435@pdsmsx502.ccr.corp.intel.com>
+In-Reply-To: <B94C62E7C2870743865418621F040C13069A3435@pdsmsx502.ccr.corp.intel.com>
+Content-Type: text/plain; charset=GB2312
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Li, Zhigang wrote:
->> This message contains the following attachment(s):
->> Bluetooth Optical Mouse BM083 and BM013.tar.gz
->>
->> Hello everybody,
->>
->> I bought two new bluetooth mouses for testing and both do not work
->> with the simple-agent.py script. Would somebody be willing to fix the
->   Why you want use simple-agent to make mouse work?
 
-I would like to be able to configure my system from the command line
-and documented all steps to get it running. This way I can also
-automate the process and provide better support. There are tons of
-reasons why to use the command line.
+.....
 
+>> I have seen it but I don't know python, in fact I forgot to say the program should be
+>>  a small command line C program, something like "opush  00:11:9F:4B:A1:D9 text.txt"
+>> as I have to use it in bash script.
+> ./send-files [target address] /home/text.txt
 > 
->> command line tool to connect mouses? I got the logs and device
->> information attached in this mail.
->   
-> 
->   Make the mouse in paring status, Perhaps just rest some button in mouse.
->   Hidd -- search 
+Unfortunately I cannot use it as I cannot compile obexd (my linux is a little outdated and
+my libglib is too old). That's why I was trying to write my own C prog as I used Bluez
+before for another project.
 
-Using hidd --search is depreciated and insecure, at leased this is
-tolled to in the past by some developers, so i am not using it. I am
-also using the latest git and the hidd tool is disabled for compiling
-by default.
-
->   
-> 
->> Thanks in advance,
->>
->> Best regards,
->>
->> Jelle
+GiP
+-- 
+GianPiero Puccioni               |Istituto dei Sistemi Complessi-CNR
+gianpiero.puccioni(AT)isc.cnr.it |Via Madonna del Piano, 10
+T:+39 0555226682 F:+39 0555226683|50019 Sesto F. (Firenze)
