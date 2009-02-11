@@ -1,95 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: Obex Push
+Message-ID: <4992A900.8080406@powercraft.nl>
+Date: Wed, 11 Feb 2009 11:31:28 +0100
+From: Jelle de Jong <jelledejong@powercraft.nl>
 MIME-Version: 1.0
-Message-ID: <OF20F4C0FF.7F353516-ONC125755A.0039E956-C125755A.003B51AF@aweurope.be>
-From: Thierry Pierret <extern.Thierry.Pierret@awtce.be>
-Date: Wed, 11 Feb 2009 11:47:54 +0100
-Content-Type: multipart/mixed; boundary="=_mixed 003B51ACC125755A_="
+To: "Li, Zhigang" <zhigang.li@intel.com>
+CC: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: Bluetooth Optical Mouse BM083 and BM013
+References: <4991878E.4010100@powercraft.nl> <B94C62E7C2870743865418621F040C13069A3138@pdsmsx502.ccr.corp.intel.com>
+In-Reply-To: <B94C62E7C2870743865418621F040C13069A3138@pdsmsx502.ccr.corp.intel.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---=_mixed 003B51ACC125755A_=
-Content-Type: text/plain; charset="US-ASCII"
+Li, Zhigang wrote:
+>> This message contains the following attachment(s):
+>> Bluetooth Optical Mouse BM083 and BM013.tar.gz
+>>
+>> Hello everybody,
+>>
+>> I bought two new bluetooth mouses for testing and both do not work
+>> with the simple-agent.py script. Would somebody be willing to fix the
+>   Why you want use simple-agent to make mouse work?
 
-I'm using obexd-0.8 on my iMX31 platform. Since I could not compile the 
-D-Bus Python binding, I could not use the test Python scripts. Hence I 
-create some small C programs to replace the send-file and the 
-pull-business-card scripts. Here is the package I created. I provide it 
-as-is.
+I would like to be able to configure my system from the command line
+and documented all steps to get it running. This way I can also
+automate the process and provide better support. There are tons of
+reasons why to use the command line.
 
+> 
+>> command line tool to connect mouses? I got the logs and device
+>> information attached in this mail.
+>   
+> 
+>   Make the mouse in paring status, Perhaps just rest some button in mouse.
+>   Hidd -- search 
 
+Using hidd --search is depreciated and insecure, at leased this is
+tolled to in the past by some developers, so i am not using it. I am
+also using the latest git and the hidd tool is disabled for compiling
+by default.
 
-2 programs available :
-
-   sender <00:11:22:33:44:55:66> <filename>
-   puller <00:11:22:33:44:55:66> <filename>
-
-The puller program could not be fully tested (cf. a former topic "Obexd 
-0.8 : pull failure").
-
-Hoping this helps.
-
-Regards.
-Thierry
---=_mixed 003B51ACC125755A_=
-Content-Type: application/octet-stream; name="obexops-1.0.tar.gz"
-Content-Disposition: attachment; filename="obexops-1.0.tar.gz"
-Content-Transfer-Encoding: base64
-
-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
-DDLI4IHwf56AHDUAUAAA
-
---=_mixed 003B51ACC125755A_=--
+>   
+> 
+>> Thanks in advance,
+>>
+>> Best regards,
+>>
+>> Jelle
