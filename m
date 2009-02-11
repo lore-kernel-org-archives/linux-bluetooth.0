@@ -1,32 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4992A7A4.1010802@isc.cnr.it>
-Date: Wed, 11 Feb 2009 11:25:40 +0100
-From: GianPiero Puccioni <gianpiero.puccioni@isc.cnr.it>
-MIME-Version: 1.0
-To: "Li, Zhigang" <zhigang.li@intel.com>
+From: "Li, Zhigang" <zhigang.li@intel.com>
+To: GianPiero Puccioni <gianpiero.puccioni@isc.cnr.it>
 CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Obex Push
-References: <49929929.5090206@isc.cnr.it> <B94C62E7C2870743865418621F040C13069A3431@pdsmsx502.ccr.corp.intel.com> <4992A467.2030504@isc.cnr.it> <B94C62E7C2870743865418621F040C13069A3435@pdsmsx502.ccr.corp.intel.com>
-In-Reply-To: <B94C62E7C2870743865418621F040C13069A3435@pdsmsx502.ccr.corp.intel.com>
-Content-Type: text/plain; charset=GB2312
+Date: Wed, 11 Feb 2009 18:14:40 +0800
+Subject: RE: Obex Push
+Message-ID: <B94C62E7C2870743865418621F040C13069A3435@pdsmsx502.ccr.corp.intel.com>
+References: <49929929.5090206@isc.cnr.it>
+ <B94C62E7C2870743865418621F040C13069A3431@pdsmsx502.ccr.corp.intel.com>
+ <4992A467.2030504@isc.cnr.it>
+In-Reply-To: <4992A467.2030504@isc.cnr.it>
+Content-Type: text/plain; charset="gb2312"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Li, Zhigang wrote:
-
-.....
-
->> I have seen it but I don't know python, in fact I forgot to say the program should be
->>  a small command line C program, something like "opush  00:11:9F:4B:A1:D9 text.txt"
->> as I have to use it in bash script.
-> ./send-files [target address] /home/text.txt
-> 
-Unfortunately I cannot use it as I cannot compile obexd (my linux is a little outdated and
-my libglib is too old). That's why I was trying to write my own C prog as I used Bluez
-before for another project.
-
-GiP
--- 
-GianPiero Puccioni               |Istituto dei Sistemi Complessi-CNR
-gianpiero.puccioni(AT)isc.cnr.it |Via Madonna del Piano, 10
-T:+39 0555226682 F:+39 0555226683|50019 Sesto F. (Firenze)
+DQo+LS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj5Gcm9tOiBHaWFuUGllcm8gUHVjY2lvbmkg
+W21haWx0bzpnaWFucGllcm8ucHVjY2lvbmlAaXNjLmNuci5pdF0NCj5TZW50OiAyMDA5xOoy1MIx
+McjVIDE4OjEyDQo+VG86IExpLCBaaGlnYW5nDQo+Q2M6IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtl
+cm5lbC5vcmcNCj5TdWJqZWN0OiBSZTogT2JleCBQdXNoDQo+DQo+TGksIFpoaWdhbmcgd3JvdGU6
+DQo+Pj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0gRnJvbTogbGludXgtYmx1ZXRvb3RoLW93
+bmVyQHZnZXIua2VybmVsLm9yZw0KPj4+IFttYWlsdG86bGludXgtYmx1ZXRvb3RoLW93bmVyQHZn
+ZXIua2VybmVsLm9yZ10gT24gQmVoYWxmIE9mIEdpYW5QaWVybw0KPlB1Y2Npb25pIFNlbnQ6DQo+
+Pj4gMjAwOcTqMtTCMTHI1SAxNzoyNCBUbzogbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9y
+ZyBTdWJqZWN0OiBPYmV4DQo+UHVzaA0KPj4+DQo+Pj4gSGksDQo+Pj4NCj4+PiBJIGFtIHRyeWlu
+ZyB0byB3cml0ZSBhIHNtYWxsIHByb2dyYW0gdG8gZG8gYW4gT2JleCBwdXNoIG9mIGEgdGV4dCBm
+aWxlIHRvDQo+YSBjZWxsDQo+Pj4gcGhvbmUgYnV0IEkgYW0gaGF2aW5nIHByb2JsZW1zIGZpbmRp
+bmcgaW5mbyBvbiBob3cgdG8gZG8gdGhpcyB1c2luZyB0aGUgQmx1ZXoNCj4+PiBsaWJyYXJ5LiBX
+aGVyZSBjYW4gSSBmaW5kIGEgbWFudWFsIG9yIGFuIGV4YW1wbGUgYWJvdXQgdGhpcz8NCj4+DQo+
+PiBJbiB0ZXN0IGZvbGRlciBvZiBvYmV4ZCB0aGVyZSB3YXMgYSB0ZXN0IHNjcmlwdDpzZW5kLWZp
+bGVzIEl0J3Mgb2sgdG8gc2VuZA0KPmZpbGUuDQo+Pg0KPkhpLA0KPg0KPkkgaGF2ZSBzZWVuIGl0
+IGJ1dCBJIGRvbid0IGtub3cgcHl0aG9uLCBpbiBmYWN0IEkgZm9yZ290IHRvIHNheSB0aGUgcHJv
+Z3JhbSBzaG91bGQNCj5iZSBhDQo+c21hbGwgY29tbWFuZCBsaW5lIEMgcHJvZ3JhbSwgc29tZXRo
+aW5nIGxpa2UgIm9wdXNoICAwMDoxMTo5Rjo0QjpBMTpEOQ0KPnRleHQudHh0IiBhcyBJIGhhdmUN
+Cj50byB1c2UgaXQgaW4gYmFzaCBzY3JpcHQuDQogICAgLi9zZW5kLWZpbGVzIFt0YXJnZXQgYWRk
+cmVzc10gL2hvbWUvdGV4dC50eHQNCg0KPlRoYW5rcw0KPkdpUA0KPi0tDQo+R2lhblBpZXJvIFB1
+Y2Npb25pICAgICAgICAgICAgICAgfElzdGl0dXRvIGRlaSBTaXN0ZW1pIENvbXBsZXNzaS1DTlIN
+Cj5naWFucGllcm8ucHVjY2lvbmkoQVQpaXNjLmNuci5pdCB8VmlhIE1hZG9ubmEgZGVsIFBpYW5v
+LCAxMA0KPlQ6KzM5IDA1NTUyMjY2ODIgRjorMzkgMDU1NTIyNjY4M3w1MDAxOSBTZXN0byBGLiAo
+RmlyZW56ZSkNCg==
