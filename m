@@ -1,55 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <200902112128.n1BLSCdw000376@imap1.linux-foundation.org>
-Subject: [patch 2/2] bluetooth: CONFIG_DEBUG_LOCK_ALLOC ifdefs remove
+Message-Id: <200902112128.n1BLSBnP000351@imap1.linux-foundation.org>
+Subject: [patch 1/2] bluetooth/bt3c: eliminate a sparse warning
 To: marcel@holtmann.org
 Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        akpm@linux-foundation.org, hidave.darkstar@gmail.com, mingo@elte.hu
+        akpm@linux-foundation.org, andre@bitwigglers.org,
+        hidave.darkstar@gmail.com
 From: akpm@linux-foundation.org
-Date: Wed, 11 Feb 2009 13:28:12 -0800
+Date: Wed, 11 Feb 2009 13:28:11 -0800
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Dave Young <hidave.darkstar@gmail.com>
+From: Andre Haupt <andre@bitwigglers.org>
 
-Due to lockdep changes the CONFIG_DEBUG_LOCK_ALLOC ifdef is not needed
-now, just remove it here.
+This eliminates a sparse warning that symbol 'stat' shadows an earlier one.
 
-The following commit fixed the !lockdep build warnings:
-
-commit e8f6fbf62de37cbc2e179176ac7010d5f4396b67
-Author: Ingo Molnar <mingo@elte.hu>
-Date:   Wed Nov 12 01:38:36 2008 +0000
-
-    lockdep: include/linux/lockdep.h - fix warning in net/bluetooth/af_bluetooth.c
-
-Signed-off-by: Dave Young <hidave.darkstar@gmail.com>
+Signed-off-by: Andre Haupt <andre@bitwigglers.org>
 Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Dave Young <hidave.darkstar@gmail.com>
 Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
 ---
 
- net/bluetooth/af_bluetooth.c |    6 ------
- 1 file changed, 6 deletions(-)
+ drivers/bluetooth/bt3c_cs.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff -puN net/bluetooth/af_bluetooth.c~bluetooth-config_debug_lock_alloc-ifdefs-remove net/bluetooth/af_bluetooth.c
---- a/net/bluetooth/af_bluetooth.c~bluetooth-config_debug_lock_alloc-ifdefs-remove
-+++ a/net/bluetooth/af_bluetooth.c
-@@ -48,7 +48,6 @@
- static struct net_proto_family *bt_proto[BT_MAX_PROTO];
- static DEFINE_RWLOCK(bt_proto_lock);
- 
--#ifdef CONFIG_DEBUG_LOCK_ALLOC
- static struct lock_class_key bt_lock_key[BT_MAX_PROTO];
- static const char *bt_key_strings[BT_MAX_PROTO] = {
- 	"sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP",
-@@ -86,11 +85,6 @@ static inline void bt_sock_reclassify_lo
- 			bt_slock_key_strings[proto], &bt_slock_key[proto],
- 				bt_key_strings[proto], &bt_lock_key[proto]);
- }
--#else
--static inline void bt_sock_reclassify_lock(struct socket *sock, int proto)
--{
--}
--#endif
- 
- int bt_sock_register(int proto, struct net_proto_family *ops)
- {
+diff -puN drivers/bluetooth/bt3c_cs.c~bluetooth-bt3c-eliminate-a-sparse-warning drivers/bluetooth/bt3c_cs.c
+--- a/drivers/bluetooth/bt3c_cs.c~bluetooth-bt3c-eliminate-a-sparse-warning
++++ a/drivers/bluetooth/bt3c_cs.c
+@@ -359,9 +359,9 @@ static irqreturn_t bt3c_interrupt(int ir
+ 			BT_ERR("Very strange (stat=0x%04x)", stat);
+ 		} else if ((stat & 0xff) != 0xff) {
+ 			if (stat & 0x0020) {
+-				int stat = bt3c_read(iobase, 0x7002) & 0x10;
++				int status = bt3c_read(iobase, 0x7002) & 0x10;
+ 				BT_INFO("%s: Antenna %s", info->hdev->name,
+-							stat ? "out" : "in");
++							status ? "out" : "in");
+ 			}
+ 			if (stat & 0x0001)
+ 				bt3c_receive(info);
 _
