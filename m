@@ -1,29 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 11 Feb 2009 16:52:21 +0000
-From: Matthew Garrett <mjg59@srcf.ucam.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Oliver Neukum <oliver@neukum.org>, linux-bluetooth@vger.kernel.org,
-	Pavel Machek <pavel@suse.cz>, linux-usb@vger.kernel.org,
-	Stefan Seyfried <seife@suse.de>,
-	linux-pm@lists.linux-foundation.org
-Subject: Re: [linux-pm] [rft]autosuspend for btusb
-Message-ID: <20090211165221.GB15838@srcf.ucam.org>
-References: <200808221520.19791.oliver@neukum.org> <200808221551.57225.oliver@neukum.org> <1219415470.7591.472.camel@violet.holtmann.net> <200808251243.47569.oliver@neukum.org> <72EBACB5-155E-4F42-9852-886AB6B10417@holtmann.org>
+Date: Wed, 11 Feb 2009 11:24:15 +0000 (GMT)
+To: GianPiero Puccioni <gianpiero.puccioni@isc.cnr.it>
+Cc: "Li\, Zhigang" <zhigang.li@intel.com>,
+	"linux-bluetooth\@vger\.kernel\.org"
+	<linux-bluetooth@vger.kernel.org>
+Subject: Re: Obex Push
+In-Reply-To: <4992A7A4.1010802@isc.cnr.it>
+References: <49929929.5090206@isc.cnr.it>
+ <B94C62E7C2870743865418621F040C13069A3431@pdsmsx502.ccr.corp.intel.com>
+ <4992A467.2030504@isc.cnr.it> <B94C62E7C2870743865418621F040C13069A3435@pdsmsx502.ccr.corp.intel.com>
+ <4992A7A4.1010802@isc.cnr.it>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <72EBACB5-155E-4F42-9852-886AB6B10417@holtmann.org>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Message-Id: <1234351455.708556.26913.nullmailer@galant.ukfsn.org>
+From: Iain Hibbert <plunky@rya-online.net>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Aug 25, 2008 at 01:51:30PM +0200, Marcel Holtmann wrote:
+On Wed, 11 Feb 2009, GianPiero Puccioni wrote:
 
-> Can you break out the USB anchor extensions and make sure they get  
-> merged into 2.6.28 in an early stage of the merge window. It really  
-> wanna get all of this stuff into the next kernel release. Finally we  
-> are getting somewhere with this driver and can kill the broken hci_usb.
+> Li, Zhigang wrote:
+>
+> .....
+>
+> >> I have seen it but I don't know python, in fact I forgot to say the program should be
+> >>  a small command line C program, something like "opush  00:11:9F:4B:A1:D9 text.txt"
+> >> as I have to use it in bash script.
+> > ./send-files [target address] /home/text.txt
+> >
+> Unfortunately I cannot use it as I cannot compile obexd (my linux is a little outdated and
+> my libglib is too old). That's why I was trying to write my own C prog as I used Bluez
+> before for another project.
 
-The anchor extensions have hit mainline, but there doesn't seem to have 
-been any progress on the btusb autosuspend front. Are there any plans 
-for this?
+you could use 'obexftp' or 'obexapp' either directly or as examples to do
+this, both use 'openobex' library. See
 
--- 
-Matthew Garrett | mjg59@srcf.ucam.org
+	http://openobex.triq.net/
+	http://www.geocities.com/m_evmenkin/
+
+(obexapp was written for FreeBSD and provides server capability also but
+perhaps it would be possible to adapt it to bluez..)
+
+iain
