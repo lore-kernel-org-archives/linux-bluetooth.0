@@ -1,40 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <200902112128.n1BLSBnP000351@imap1.linux-foundation.org>
-Subject: [patch 1/2] bluetooth/bt3c: eliminate a sparse warning
-To: marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        akpm@linux-foundation.org, andre@bitwigglers.org,
-        hidave.darkstar@gmail.com
-From: akpm@linux-foundation.org
-Date: Wed, 11 Feb 2009 13:28:11 -0800
+MIME-Version: 1.0
+Date: Wed, 11 Feb 2009 10:16:21 -0700
+Message-ID: <d89ddf300902110916r794a2d4bpab764a33b077ad91@mail.gmail.com>
+Subject: logitech and repeated keys
+From: Brad Midgley <bmidgley@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andre Haupt <andre@bitwigglers.org>
+Hi
 
-This eliminates a sparse warning that symbol 'stat' shadows an earlier one.
+I've been following major releases with ubuntu. On the last release, I
+found that the logitech mx5000 bluetooth keyboard I use has started
+repeating keys. It's especially bad after it's been idle and also if I
+start typing quickly. I'll disable key repeats in the keyboard control
+panel but that's not entirely satisfactory either.
 
-Signed-off-by: Andre Haupt <andre@bitwigglers.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Dave Young <hidave.darkstar@gmail.com>
-Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
----
+This wasn't happening before 8.10. I'm running 2.6.27-9-generic and bluez 4.12.
 
- drivers/bluetooth/bt3c_cs.c |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+The dump when I typed a quick "hello" (it came out "heeeeeeeello")
 
-diff -puN drivers/bluetooth/bt3c_cs.c~bluetooth-bt3c-eliminate-a-sparse-warning drivers/bluetooth/bt3c_cs.c
---- a/drivers/bluetooth/bt3c_cs.c~bluetooth-bt3c-eliminate-a-sparse-warning
-+++ a/drivers/bluetooth/bt3c_cs.c
-@@ -359,9 +359,9 @@ static irqreturn_t bt3c_interrupt(int ir
- 			BT_ERR("Very strange (stat=0x%04x)", stat);
- 		} else if ((stat & 0xff) != 0xff) {
- 			if (stat & 0x0020) {
--				int stat = bt3c_read(iobase, 0x7002) & 0x10;
-+				int status = bt3c_read(iobase, 0x7002) & 0x10;
- 				BT_INFO("%s: Antenna %s", info->hdev->name,
--							stat ? "out" : "in");
-+							status ? "out" : "in");
- 			}
- 			if (stat & 0x0001)
- 				bt3c_receive(info);
-_
+> HCI Event: Mode Change (0x14) plen 6
+    status 0x00 handle 42 mode 0x00 interval 0
+    Mode: Active
+> HCI Event: Mode Change (0x14) plen 6
+    status 0x00 handle 42 mode 0x02 interval 802
+    Mode: Sniff
+> HCI Event: Mode Change (0x14) plen 6
+    status 0x00 handle 45 mode 0x00 interval 0
+    Mode: Active
+> HCI Event: Mode Change (0x14) plen 6
+    status 0x00 handle 45 mode 0x02 interval 120
+    Mode: Sniff
+> ACL data: handle 42 flags 0x02 dlen 14
+    L2CAP(d): cid 0x0041 len 10 [psm 0]
+      0000: a1 01 00 00 0b 00 00 00  00 00                    ..........
+> ACL data: handle 42 flags 0x02 dlen 14
+    L2CAP(d): cid 0x0041 len 10 [psm 0]
+      0000: a1 01 00 00 0b 08 00 00  00 00                    ..........
+> ACL data: handle 42 flags 0x02 dlen 14
+    L2CAP(d): cid 0x0041 len 10 [psm 0]
+      0000: a1 01 00 00 08 00 00 00  00 00                    ..........
+> ACL data: handle 42 flags 0x02 dlen 14
+    L2CAP(d): cid 0x0041 len 10 [psm 0]
+      0000: a1 01 00 00 00 00 00 00  00 00                    ..........
+> ACL data: handle 42 flags 0x02 dlen 14
+    L2CAP(d): cid 0x0041 len 10 [psm 0]
+      0000: a1 01 00 00 0f 00 00 00  00 00                    ..........
+> ACL data: handle 42 flags 0x02 dlen 14
+    L2CAP(d): cid 0x0041 len 10 [psm 0]
+      0000: a1 01 00 00 00 00 00 00  00 00                    ..........
+> ACL data: handle 42 flags 0x02 dlen 14
+    L2CAP(d): cid 0x0041 len 10 [psm 0]
+      0000: a1 01 00 00 0f 00 00 00  00 00                    ..........
+> ACL data: handle 42 flags 0x02 dlen 14
+    L2CAP(d): cid 0x0041 len 10 [psm 0]
+      0000: a1 01 00 00 00 00 00 00  00 00                    ..........
+> ACL data: handle 42 flags 0x02 dlen 14
+    L2CAP(d): cid 0x0041 len 10 [psm 0]
+      0000: a1 01 00 00 12 00 00 00  00 00                    ..........
+> ACL data: handle 42 flags 0x02 dlen 14
+    L2CAP(d): cid 0x0041 len 10 [psm 0]
+      0000: a1 01 00 00 00 00 00 00  00 00                    ..........
+> HCI Event: Mode Change (0x14) plen 6
+    status 0x00 handle 42 mode 0x00 interval 0
+    Mode: Active
+> HCI Event: Mode Change (0x14) plen 6
+    status 0x00 handle 42 mode 0x02 interval 32
+    Mode: Sniff
+> HCI Event: Mode Change (0x14) plen 6
+    status 0x00 handle 42 mode 0x00 interval 0
+    Mode: Active
+> HCI Event: Mode Change (0x14) plen 6
+    status 0x00 handle 42 mode 0x02 interval 162
+    Mode: Sniff
+> HCI Event: Mode Change (0x14) plen 6
+    status 0x00 handle 42 mode 0x00 interval 0
+    Mode: Active
+> HCI Event: Mode Change (0x14) plen 6
+    status 0x00 handle 42 mode 0x02 interval 402
+    Mode: Sniff
+
+
+-- 
+Brad Midgley
