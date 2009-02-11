@@ -1,87 +1,116 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <499306B1.2060009@dell.com>
+Date: Wed, 11 Feb 2009 11:11:13 -0600
+From: Mario Limonciello <mario_limonciello@dell.com>
 MIME-Version: 1.0
-Date: Wed, 11 Feb 2009 10:16:21 -0700
-Message-ID: <d89ddf300902110916r794a2d4bpab764a33b077ad91@mail.gmail.com>
-Subject: logitech and repeated keys
-From: Brad Midgley <bmidgley@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: How to update SDP records
+References: <4991F1F9.9080800@dell.com> <1234371239.7293.15.camel@violet>
+In-Reply-To: <1234371239.7293.15.camel@violet>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="------------enig2966037D91A54CE9DA926EC6"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enig2966037D91A54CE9DA926EC6
+Content-Type: multipart/alternative;
+ boundary="------------070505030109060209090402"
 
-I've been following major releases with ubuntu. On the last release, I
-found that the logitech mx5000 bluetooth keyboard I use has started
-repeating keys. It's especially bad after it's been idle and also if I
-start typing quickly. I'll disable key repeats in the keyboard control
-panel but that's not entirely satisfactory either.
+This is a multi-part message in MIME format.
+--------------070505030109060209090402
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-This wasn't happening before 8.10. I'm running 2.6.27-9-generic and bluez 4.12.
+Hi Marcel:
 
-The dump when I typed a quick "hello" (it came out "heeeeeeeello")
+Marcel Holtmann wrote:
+> Hi Mario,
+>
+>  =20
+>
+> I think what you are looking for is the Device.DiscoverServices()
+> method. This one lets you trigger SDP.
+>
+> Regards
+>
+> Marcel
+>
+>
+>  =20
+Thanks, that sounds like it's the correct method.  I must have missed it
+because I was searching the API for the acronym "SDP".
 
-> HCI Event: Mode Change (0x14) plen 6
-    status 0x00 handle 42 mode 0x00 interval 0
-    Mode: Active
-> HCI Event: Mode Change (0x14) plen 6
-    status 0x00 handle 42 mode 0x02 interval 802
-    Mode: Sniff
-> HCI Event: Mode Change (0x14) plen 6
-    status 0x00 handle 45 mode 0x00 interval 0
-    Mode: Active
-> HCI Event: Mode Change (0x14) plen 6
-    status 0x00 handle 45 mode 0x02 interval 120
-    Mode: Sniff
-> ACL data: handle 42 flags 0x02 dlen 14
-    L2CAP(d): cid 0x0041 len 10 [psm 0]
-      0000: a1 01 00 00 0b 00 00 00  00 00                    ..........
-> ACL data: handle 42 flags 0x02 dlen 14
-    L2CAP(d): cid 0x0041 len 10 [psm 0]
-      0000: a1 01 00 00 0b 08 00 00  00 00                    ..........
-> ACL data: handle 42 flags 0x02 dlen 14
-    L2CAP(d): cid 0x0041 len 10 [psm 0]
-      0000: a1 01 00 00 08 00 00 00  00 00                    ..........
-> ACL data: handle 42 flags 0x02 dlen 14
-    L2CAP(d): cid 0x0041 len 10 [psm 0]
-      0000: a1 01 00 00 00 00 00 00  00 00                    ..........
-> ACL data: handle 42 flags 0x02 dlen 14
-    L2CAP(d): cid 0x0041 len 10 [psm 0]
-      0000: a1 01 00 00 0f 00 00 00  00 00                    ..........
-> ACL data: handle 42 flags 0x02 dlen 14
-    L2CAP(d): cid 0x0041 len 10 [psm 0]
-      0000: a1 01 00 00 00 00 00 00  00 00                    ..........
-> ACL data: handle 42 flags 0x02 dlen 14
-    L2CAP(d): cid 0x0041 len 10 [psm 0]
-      0000: a1 01 00 00 0f 00 00 00  00 00                    ..........
-> ACL data: handle 42 flags 0x02 dlen 14
-    L2CAP(d): cid 0x0041 len 10 [psm 0]
-      0000: a1 01 00 00 00 00 00 00  00 00                    ..........
-> ACL data: handle 42 flags 0x02 dlen 14
-    L2CAP(d): cid 0x0041 len 10 [psm 0]
-      0000: a1 01 00 00 12 00 00 00  00 00                    ..........
-> ACL data: handle 42 flags 0x02 dlen 14
-    L2CAP(d): cid 0x0041 len 10 [psm 0]
-      0000: a1 01 00 00 00 00 00 00  00 00                    ..........
-> HCI Event: Mode Change (0x14) plen 6
-    status 0x00 handle 42 mode 0x00 interval 0
-    Mode: Active
-> HCI Event: Mode Change (0x14) plen 6
-    status 0x00 handle 42 mode 0x02 interval 32
-    Mode: Sniff
-> HCI Event: Mode Change (0x14) plen 6
-    status 0x00 handle 42 mode 0x00 interval 0
-    Mode: Active
-> HCI Event: Mode Change (0x14) plen 6
-    status 0x00 handle 42 mode 0x02 interval 162
-    Mode: Sniff
-> HCI Event: Mode Change (0x14) plen 6
-    status 0x00 handle 42 mode 0x00 interval 0
-    Mode: Active
-> HCI Event: Mode Change (0x14) plen 6
-    status 0x00 handle 42 mode 0x02 interval 402
-    Mode: Sniff
+Regards
+
+--=20
+Mario Limonciello
+*Dell | Linux Engineering*
+mario_limonciello@dell.com
+
+--------------070505030109060209090402
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content=3D"text/html;charset=3DISO-8859-1" http-equiv=3D"Content-=
+Type">
+</head>
+<body bgcolor=3D"#ffffff" text=3D"#000000">
+Hi Marcel:<br>
+<br>
+Marcel Holtmann wrote:
+<blockquote cite=3D"mid:1234371239.7293.15.camel@violet" type=3D"cite">
+  <pre wrap=3D"">Hi Mario,
+
+  </pre>
+  <pre wrap=3D""><!---->
+I think what you are looking for is the Device.DiscoverServices()
+method. This one lets you trigger SDP.
+
+Regards
+
+Marcel
 
 
--- 
-Brad Midgley
+  </pre>
+</blockquote>
+Thanks, that sounds like it's the correct method.&nbsp; I must have misse=
+d
+it because I was searching the API for the acronym "SDP". <br>
+<br>
+Regards<br>
+<br>
+<div class=3D"moz-signature">-- <br>
+<title></title>
+<font face=3D"Helvetica, Arial, sans-serif" size=3D"-2"><font
+ color=3D"#999999">Mario Limonciello</font><br>
+<b><font color=3D"#ff0000">Dell</font> | <font color=3D"#666666">Linux
+Engineering</font></b><font color=3D"#666666"><br>
+</font><font color=3D"#666666"><a class=3D"moz-txt-link-abbreviated" href=
+=3D"mailto:mario_limonciello@dell.com">mario_limonciello@dell.com</a></fo=
+nt></font>
+</div>
+</body>
+</html>
+
+--------------070505030109060209090402--
+
+--------------enig2966037D91A54CE9DA926EC6
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
+
+iEYEARECAAYFAkmTBrEACgkQ2CrZjkA73YsCTgCfaM1gF23QYCpNKFggf7S0EWQM
+y1EAni6iD3tqS0tVKyEjFYT2Vi1ZZYE4
+=ue+s
+-----END PGP SIGNATURE-----
+
+--------------enig2966037D91A54CE9DA926EC6--
