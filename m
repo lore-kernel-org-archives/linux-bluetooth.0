@@ -1,35 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: How to update SDP records
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Mario Limonciello <mario_limonciello@dell.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <4991F1F9.9080800@dell.com>
-References: <4991F1F9.9080800@dell.com>
-Content-Type: text/plain
-Date: Wed, 11 Feb 2009 17:53:59 +0100
-Message-Id: <1234371239.7293.15.camel@violet>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 11 Feb 2009 16:52:21 +0000
+From: Matthew Garrett <mjg59@srcf.ucam.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Oliver Neukum <oliver@neukum.org>, linux-bluetooth@vger.kernel.org,
+	Pavel Machek <pavel@suse.cz>, linux-usb@vger.kernel.org,
+	Stefan Seyfried <seife@suse.de>,
+	linux-pm@lists.linux-foundation.org
+Subject: Re: [linux-pm] [rft]autosuspend for btusb
+Message-ID: <20090211165221.GB15838@srcf.ucam.org>
+References: <200808221520.19791.oliver@neukum.org> <200808221551.57225.oliver@neukum.org> <1219415470.7591.472.camel@violet.holtmann.net> <200808251243.47569.oliver@neukum.org> <72EBACB5-155E-4F42-9852-886AB6B10417@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <72EBACB5-155E-4F42-9852-886AB6B10417@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mario,
+On Mon, Aug 25, 2008 at 01:51:30PM +0200, Marcel Holtmann wrote:
 
-> I was looking at the Bluez 4.x API and don't see any way for requesting
-> an updated set of SDP records for a device.  My Blackberry will not
-> connect advertising that it can receive OBEX transfers at all (the File
-> Transfer Agent isn't in SDP records).  This is because by default that
-> mode is turned off on the device.  There is an option to turn it on
-> momentarily to receive a file, but then it turns back off.
-> 
-> Because of this, it's impossible to pair the device with the SDP record
-> for File Transfer on it's list.  Is there somewhere in the API that I am
-> missing that allows you to request an updated set of records for a device?
+> Can you break out the USB anchor extensions and make sure they get  
+> merged into 2.6.28 in an early stage of the merge window. It really  
+> wanna get all of this stuff into the next kernel release. Finally we  
+> are getting somewhere with this driver and can kill the broken hci_usb.
 
-I think what you are looking for is the Device.DiscoverServices()
-method. This one lets you trigger SDP.
+The anchor extensions have hit mainline, but there doesn't seem to have 
+been any progress on the btusb autosuspend front. Are there any plans 
+for this?
 
-Regards
-
-Marcel
-
-
+-- 
+Matthew Garrett | mjg59@srcf.ucam.org
