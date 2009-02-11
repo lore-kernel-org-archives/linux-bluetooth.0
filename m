@@ -1,32 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Li, Zhigang" <zhigang.li@intel.com>
-To: GianPiero Puccioni <gianpiero.puccioni@isc.cnr.it>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Wed, 11 Feb 2009 18:00:31 +0800
-Subject: RE: Obex Push
-Message-ID: <B94C62E7C2870743865418621F040C13069A3431@pdsmsx502.ccr.corp.intel.com>
-References: <49929929.5090206@isc.cnr.it>
-In-Reply-To: <49929929.5090206@isc.cnr.it>
-Content-Type: text/plain; charset="gb2312"
+Message-ID: <49929929.5090206@isc.cnr.it>
+Date: Wed, 11 Feb 2009 10:23:53 +0100
+From: GianPiero Puccioni <gianpiero.puccioni@isc.cnr.it>
 MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org
+Subject: Obex Push
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-DQo+LS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj5Gcm9tOiBsaW51eC1ibHVldG9vdGgtb3du
-ZXJAdmdlci5rZXJuZWwub3JnDQo+W21haWx0bzpsaW51eC1ibHVldG9vdGgtb3duZXJAdmdlci5r
-ZXJuZWwub3JnXSBPbiBCZWhhbGYgT2YgR2lhblBpZXJvDQo+UHVjY2lvbmkNCj5TZW50OiAyMDA5
-xOoy1MIxMcjVIDE3OjI0DQo+VG86IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNCj5T
-dWJqZWN0OiBPYmV4IFB1c2gNCj4NCj5IaSwNCj4NCj5JIGFtIHRyeWluZyB0byB3cml0ZSBhIHNt
-YWxsIHByb2dyYW0gdG8gZG8gYW4gT2JleCBwdXNoIG9mIGEgdGV4dCBmaWxlIHRvIGEgY2VsbA0K
-PnBob25lIGJ1dA0KPkkgYW0gaGF2aW5nIHByb2JsZW1zIGZpbmRpbmcgaW5mbyBvbiBob3cgdG8g
-ZG8gdGhpcyB1c2luZyB0aGUgQmx1ZXogbGlicmFyeS4NCj5XaGVyZSBjYW4gSQ0KPmZpbmQgYSBt
-YW51YWwgb3IgYW4gZXhhbXBsZSBhYm91dCB0aGlzPw0KDQpJbiB0ZXN0IGZvbGRlciBvZiBvYmV4
-ZCB0aGVyZSB3YXMgYSB0ZXN0IHNjcmlwdDpzZW5kLWZpbGVzDQpJdCdzIG9rIHRvIHNlbmQgZmls
-ZS4NCg0KPg0KPlRoYW5rcywNCj5HaWFuUGllcm8NCj4tLQ0KPkdpYW5QaWVybyBQdWNjaW9uaSAg
-ICAgICAgICAgICAgIHxJc3RpdHV0byBkZWkgU2lzdGVtaSBDb21wbGVzc2ktQ05SDQo+Z2lhbnBp
-ZXJvLnB1Y2Npb25pKEFUKWlzYy5jbnIuaXQgfFZpYSBNYWRvbm5hIGRlbCBQaWFubywgMTANCj5U
-OiszOSAwNTU1MjI2NjgyIEY6KzM5IDA1NTUyMjY2ODN8NTAwMTkgU2VzdG8gRi4gKEZpcmVuemUp
-IElUQUxZDQo+LS0NCj5UbyB1bnN1YnNjcmliZSBmcm9tIHRoaXMgbGlzdDogc2VuZCB0aGUgbGlu
-ZSAidW5zdWJzY3JpYmUgbGludXgtYmx1ZXRvb3RoIiBpbg0KPnRoZSBib2R5IG9mIGEgbWVzc2Fn
-ZSB0byBtYWpvcmRvbW9Admdlci5rZXJuZWwub3JnDQo+TW9yZSBtYWpvcmRvbW8gaW5mbyBhdCAg
-aHR0cDovL3ZnZXIua2VybmVsLm9yZy9tYWpvcmRvbW8taW5mby5odG1sDQo=
+Hi,
+
+I am trying to write a small program to do an Obex push of a text file to a cell phone but
+I am having problems finding info on how to do this using the Bluez library. Where can I
+find a manual or an example about this?
+
+Thanks,
+GianPiero
+-- 
+GianPiero Puccioni               |Istituto dei Sistemi Complessi-CNR
+gianpiero.puccioni(AT)isc.cnr.it |Via Madonna del Piano, 10
+T:+39 0555226682 F:+39 0555226683|50019 Sesto F. (Firenze) ITALY
