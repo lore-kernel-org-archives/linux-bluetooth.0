@@ -1,116 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <499306B1.2060009@dell.com>
-Date: Wed, 11 Feb 2009 11:11:13 -0600
-From: Mario Limonciello <mario_limonciello@dell.com>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: How to update SDP records
-References: <4991F1F9.9080800@dell.com> <1234371239.7293.15.camel@violet>
-In-Reply-To: <1234371239.7293.15.camel@violet>
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="------------enig2966037D91A54CE9DA926EC6"
+Subject: Re: [linux-pm] [rft]autosuspend for btusb
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Matthew Garrett <mjg59@srcf.ucam.org>
+Cc: Oliver Neukum <oliver@neukum.org>, linux-bluetooth@vger.kernel.org,
+	Pavel Machek <pavel@suse.cz>, linux-usb@vger.kernel.org,
+	Stefan Seyfried <seife@suse.de>,
+	linux-pm@lists.linux-foundation.org
+In-Reply-To: <20090211165221.GB15838@srcf.ucam.org>
+References: <200808221520.19791.oliver@neukum.org>
+	 <200808221551.57225.oliver@neukum.org>
+	 <1219415470.7591.472.camel@violet.holtmann.net>
+	 <200808251243.47569.oliver@neukum.org>
+	 <72EBACB5-155E-4F42-9852-886AB6B10417@holtmann.org>
+	 <20090211165221.GB15838@srcf.ucam.org>
+Content-Type: text/plain
+Date: Wed, 11 Feb 2009 17:55:28 +0100
+Message-Id: <1234371328.7293.16.camel@violet>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enig2966037D91A54CE9DA926EC6
-Content-Type: multipart/alternative;
- boundary="------------070505030109060209090402"
+Hi Matthew,
 
-This is a multi-part message in MIME format.
---------------070505030109060209090402
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+> > Can you break out the USB anchor extensions and make sure they get  
+> > merged into 2.6.28 in an early stage of the merge window. It really  
+> > wanna get all of this stuff into the next kernel release. Finally we  
+> > are getting somewhere with this driver and can kill the broken hci_usb.
+> 
+> The anchor extensions have hit mainline, but there doesn't seem to have 
+> been any progress on the btusb autosuspend front. Are there any plans 
+> for this?
 
-Hi Marcel:
-
-Marcel Holtmann wrote:
-> Hi Mario,
->
->  =20
->
-> I think what you are looking for is the Device.DiscoverServices()
-> method. This one lets you trigger SDP.
->
-> Regards
->
-> Marcel
->
->
->  =20
-Thanks, that sounds like it's the correct method.  I must have missed it
-because I was searching the API for the acronym "SDP".
-
-Regards
-
---=20
-Mario Limonciello
-*Dell | Linux Engineering*
-mario_limonciello@dell.com
-
---------------070505030109060209090402
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-  <meta content=3D"text/html;charset=3DISO-8859-1" http-equiv=3D"Content-=
-Type">
-</head>
-<body bgcolor=3D"#ffffff" text=3D"#000000">
-Hi Marcel:<br>
-<br>
-Marcel Holtmann wrote:
-<blockquote cite=3D"mid:1234371239.7293.15.camel@violet" type=3D"cite">
-  <pre wrap=3D"">Hi Mario,
-
-  </pre>
-  <pre wrap=3D""><!---->
-I think what you are looking for is the Device.DiscoverServices()
-method. This one lets you trigger SDP.
+not right now, but my bluetooth-testing.git tree has one change for the
+bulk URBs. It seems that some dongles really require them to be present
+and won't work otherwise.
 
 Regards
 
 Marcel
 
 
-  </pre>
-</blockquote>
-Thanks, that sounds like it's the correct method.&nbsp; I must have misse=
-d
-it because I was searching the API for the acronym "SDP". <br>
-<br>
-Regards<br>
-<br>
-<div class=3D"moz-signature">-- <br>
-<title></title>
-<font face=3D"Helvetica, Arial, sans-serif" size=3D"-2"><font
- color=3D"#999999">Mario Limonciello</font><br>
-<b><font color=3D"#ff0000">Dell</font> | <font color=3D"#666666">Linux
-Engineering</font></b><font color=3D"#666666"><br>
-</font><font color=3D"#666666"><a class=3D"moz-txt-link-abbreviated" href=
-=3D"mailto:mario_limonciello@dell.com">mario_limonciello@dell.com</a></fo=
-nt></font>
-</div>
-</body>
-</html>
-
---------------070505030109060209090402--
-
---------------enig2966037D91A54CE9DA926EC6
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
-
-iEYEARECAAYFAkmTBrEACgkQ2CrZjkA73YsCTgCfaM1gF23QYCpNKFggf7S0EWQM
-y1EAni6iD3tqS0tVKyEjFYT2Vi1ZZYE4
-=ue+s
------END PGP SIGNATURE-----
-
---------------enig2966037D91A54CE9DA926EC6--
