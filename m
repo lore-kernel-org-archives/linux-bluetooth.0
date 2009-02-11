@@ -1,23 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <49929929.5090206@isc.cnr.it>
-Date: Wed, 11 Feb 2009 10:23:53 +0100
-From: GianPiero Puccioni <gianpiero.puccioni@isc.cnr.it>
+From: "Li, Zhigang" <zhigang.li@intel.com>
+To: Jelle de Jong <jelledejong@powercraft.nl>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Date: Wed, 11 Feb 2009 09:26:06 +0800
+Subject: RE: Bluetooth Optical Mouse BM083 and BM013
+Message-ID: <B94C62E7C2870743865418621F040C13069A3138@pdsmsx502.ccr.corp.intel.com>
+References: <4991878E.4010100@powercraft.nl>
+In-Reply-To: <4991878E.4010100@powercraft.nl>
+Content-Type: text/plain; charset="gb2312"
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Obex Push
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-I am trying to write a small program to do an Obex push of a text file to a cell phone but
-I am having problems finding info on how to do this using the Bluez library. Where can I
-find a manual or an example about this?
-
-Thanks,
-GianPiero
--- 
-GianPiero Puccioni               |Istituto dei Sistemi Complessi-CNR
-gianpiero.puccioni(AT)isc.cnr.it |Via Madonna del Piano, 10
-T:+39 0555226682 F:+39 0555226683|50019 Sesto F. (Firenze) ITALY
+DQo+LS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj5Gcm9tOiBsaW51eC1ibHVldG9vdGgtb3du
+ZXJAdmdlci5rZXJuZWwub3JnDQo+W21haWx0bzpsaW51eC1ibHVldG9vdGgtb3duZXJAdmdlci5r
+ZXJuZWwub3JnXSBPbiBCZWhhbGYgT2YgSmVsbGUgZGUgSm9uZw0KPlNlbnQ6IDIwMDnE6jLUwjEw
+yNUgMjE6NTcNCj5UbzogQmx1ZVogZGV2ZWxvcG1lbnQNCj5TdWJqZWN0OiBCbHVldG9vdGggT3B0
+aWNhbCBNb3VzZSBCTTA4MyBhbmQgQk0wMTMNCj4NCj5UaGlzIG1lc3NhZ2UgY29udGFpbnMgdGhl
+IGZvbGxvd2luZyBhdHRhY2htZW50KHMpOg0KPkJsdWV0b290aCBPcHRpY2FsIE1vdXNlIEJNMDgz
+IGFuZCBCTTAxMy50YXIuZ3oNCj4NCj5IZWxsbyBldmVyeWJvZHksDQo+DQo+SSBib3VnaHQgdHdv
+IG5ldyBibHVldG9vdGggbW91c2VzIGZvciB0ZXN0aW5nIGFuZCBib3RoIGRvIG5vdCB3b3JrDQo+
+d2l0aCB0aGUgc2ltcGxlLWFnZW50LnB5IHNjcmlwdC4gV291bGQgc29tZWJvZHkgYmUgd2lsbGlu
+ZyB0byBmaXggdGhlDQogIFdoeSB5b3Ugd2FudCB1c2Ugc2ltcGxlLWFnZW50IHRvIG1ha2UgbW91
+c2Ugd29yaz8NCg0KPmNvbW1hbmQgbGluZSB0b29sIHRvIGNvbm5lY3QgbW91c2VzPyBJIGdvdCB0
+aGUgbG9ncyBhbmQgZGV2aWNlDQo+aW5mb3JtYXRpb24gYXR0YWNoZWQgaW4gdGhpcyBtYWlsLg0K
+ICANCg0KICBNYWtlIHRoZSBtb3VzZSBpbiBwYXJpbmcgc3RhdHVzLCBQZXJoYXBzIGp1c3QgcmVz
+dCBzb21lIGJ1dHRvbiBpbiBtb3VzZS4NCiAgSGlkZCAtLSBzZWFyY2ggDQogIA0KDQo+DQo+VGhh
+bmtzIGluIGFkdmFuY2UsDQo+DQo+QmVzdCByZWdhcmRzLA0KPg0KPkplbGxlDQo=
