@@ -1,29 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Thu, 12 Feb 2009 11:08:59 +0530
-Message-ID: <6887eb5d0902112138p1202d15fh95919493d0d93ea9@mail.gmail.com>
-Subject: Can't find link keys
-From: Kartikey Parmar <kartikey2781@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 11 Feb 2009 18:22:53 -0800
+From: Andrew Morton <akpm@linux-foundation.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        hidave.darkstar@gmail.com, mingo@elte.hu
+Subject: Re: [patch 2/2] bluetooth: CONFIG_DEBUG_LOCK_ALLOC ifdefs remove
+Message-Id: <20090211182253.1a5b9651.akpm@linux-foundation.org>
+In-Reply-To: <1234403558.7293.28.camel@violet>
+References: <200902112128.n1BLSCdw000376@imap1.linux-foundation.org>
+	<1234403558.7293.28.camel@violet>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
-I m using USB Bluetooth adapter to discover devices & connect to it.
-I can easily discover it using my test program
-But when I m going to connect it to rfcomm, it prompts me to enter PIN
-to accept connection.
-As I m entering PIN the connection fails as it don't find link key in
-/var/lib/bluetooth/
+On Thu, 12 Feb 2009 02:52:38 +0100 Marcel Holtmann <marcel@holtmann.org> wrote:
 
-So I m not able to pair my bluetooth enable Mobile / Headset with
-application running in PC.
-What is its remedie?
+> Hi Andrew,
+> 
+> > Due to lockdep changes the CONFIG_DEBUG_LOCK_ALLOC ifdef is not needed
+> > now, just remove it here.
+> > 
+> > The following commit fixed the !lockdep build warnings:
+> 
+> already part of my bluetooth-testing.git tree.
+> 
 
-Pls mail if somebody knows it solution.
+Well, I have no way of knowing this, because that tree is not
+in linux-next.
 
--- 
-Kartikey Parmar
-President AAECC
-09879095390 (M)
+Please get it added?
