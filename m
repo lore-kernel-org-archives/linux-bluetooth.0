@@ -1,36 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Can't find link keys
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Kartikey Parmar <kartikey2781@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <ac8af0be0902112311r2aa8f696ta847fc6647b4fbb4@mail.gmail.com>
+References: <ac8af0be0902112311r2aa8f696ta847fc6647b4fbb4@mail.gmail.com>
+Date: Thu, 12 Feb 2009 09:31:59 +0200
+Message-ID: <664d43d60902112331y3195d1d5t7d1fcb7e67eb413e@mail.gmail.com>
+Subject: Re: [PATCH 0/4] HFP Gateway profile
+From: event <event.riga@gmail.com>
+To: Zhao Forrest <forrest.zhao@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <6887eb5d0902112138p1202d15fh95919493d0d93ea9@mail.gmail.com>
-References: <6887eb5d0902112138p1202d15fh95919493d0d93ea9@mail.gmail.com>
-Content-Type: text/plain
-Date: Thu, 12 Feb 2009 08:54:07 +0100
-Message-Id: <1234425247.7293.35.camel@violet>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Kartikey,
+On Thu, Feb 12, 2009 at 09:11, Zhao Forrest <forrest.zhao@gmail.com> wrote:
+> Hi,
+> I picked up Leonid's patch for HFP Gateway profile and split it into
+> 4 smaller pieces. The main changes are:
+> 1 the coding style fix to align with BlueZ coding style
+> 2 fixed the obvious bugs in hf_io_cb();
+>
+> The patch set include the following 4 patches:
+> 1 add the D-Bus interface definition for HFP Audio gateway
+> 2 add the basic framework support for HFP Audio gateway
+> 3 the main part for HFP Audio gateway
+> 4  IPC integration part for HFP Audio gateway
+>
+> Leonid,
+> Since you're the original author of this patch you may know the best
+> of "HFP Audio gateway" patch. Let's work together to respond to the
+> review comments and push to patch into BlueZ upsteam :)
+>
+> Thanks,
+> Forrest
+>
+Hello Forrest,
 
-> I m using USB Bluetooth adapter to discover devices & connect to it.
-> I can easily discover it using my test program
-> But when I m going to connect it to rfcomm, it prompts me to enter PIN
-> to accept connection.
-> As I m entering PIN the connection fails as it don't find link key in
-> /var/lib/bluetooth/
-> 
-> So I m not able to pair my bluetooth enable Mobile / Headset with
-> application running in PC.
-> What is its remedie?
+I'll be glad to help you as much as I can.
 
-if you are using bluez-4.29 then you are hitting a bug that is fixed in
-the current tree. You just have to wait for bluez-4.30 then. Will be
-released at the end of the day or tomorrow.
-
-Regards
-
-Marcel
-
-
+Vale,
+Leonid Movshovich
