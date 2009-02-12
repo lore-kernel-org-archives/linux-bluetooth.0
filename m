@@ -1,8 +1,8 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Thu, 12 Feb 2009 15:15:52 +0800
-Message-ID: <ac8af0be0902112315m209a604ub497d748e8e3ec5d@mail.gmail.com>
-Subject: [PATCH 3/4] the main part for HFP Audio gateway
+Date: Thu, 12 Feb 2009 15:14:44 +0800
+Message-ID: <ac8af0be0902112314sdbe5be9yb050a518f8c8fb75@mail.gmail.com>
+Subject: [PATCH 2/4] add the basic framework support for HFP Audio gateway
 From: Zhao Forrest <forrest.zhao@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: event <event.riga@gmail.com>
@@ -10,1026 +10,361 @@ Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+diff --git a/audio/device.c b/audio/device.c
+index a5cfc88..38a9c11 100644
+--- a/audio/device.c
++++ b/audio/device.c
+@@ -52,6 +52,7 @@
+ #include "avdtp.h"
+ #include "control.h"
+ #include "headset.h"
++#include "gateway.h"
+ #include "sink.h"
+
+ #define CONTROL_CONNECT_TIMEOUT 2
+@@ -141,6 +142,9 @@ gboolean audio_device_is_connected(struct audio_device *dev,
+ 	else if (!strcmp(interface, AUDIO_HEADSET_INTERFACE) && dev->headset &&
+ 			headset_is_active(dev))
+ 		return TRUE;
++	else if (!strcmp(interface, AUDIO_GATEWAY_INTERFACE) && dev->gateway &&
++			gateway_is_connected(dev))
++		return TRUE;
+ 	else if (!strcmp(interface, AUDIO_CONTROL_INTERFACE) && dev->headset &&
+ 			control_is_active(dev))
+ 		return TRUE;
 diff --git a/audio/gateway.c b/audio/gateway.c
-index c140a0a..8d9d265 100644
+index edf38de..c140a0a 100644
 --- a/audio/gateway.c
 +++ b/audio/gateway.c
-@@ -28,6 +28,9 @@
+@@ -4,6 +4,7 @@
+  *
+  *  Copyright (C) 2006-2007  Nokia Corporation
+  *  Copyright (C) 2004-2009  Marcel Holtmann <marcel@holtmann.org>
++ *  Copyright (C) 2008-2009  Leonid Movshovich <event.riga@gmail.org>
+  *
+  *
+  *  This program is free software; you can redistribute it and/or modify
+@@ -27,8 +28,67 @@
  #endif
 
  #include <stdint.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <fcntl.h>
- #include <errno.h>
++#include <errno.h>
 
  #include <glib.h>
-@@ -35,9 +38,65 @@
- #include <gdbus.h>
+ #include <dbus/dbus.h>
++#include <gdbus.h>
 
- #include <bluetooth/bluetooth.h>
-+#include <bluetooth/hci.h>
-+#include <bluetooth/hci_lib.h>
-+#include <bluetooth/sco.h>
-+#include <bluetooth/sdp.h>
-+#include <bluetooth/sdp_lib.h>
-
-+#include "glib-helper.h"
- #include "device.h"
++#include <bluetooth/bluetooth.h>
++
++#include "device.h"
  #include "gateway.h"
-+#include "logging.h"
-+#include "error.h"
 +
-+#define RFCOMM_BUF_SIZE 256
-+/* not-more-then-16 defined by GSM + 1 for NULL + padding */
-+#define AG_INDICATOR_DESCR_SIZE 20
-+#define AG_CALLER_NUM_SIZE 64	/* size of number + type */
-+
-+/* commands */
-+#define AG_FEATURES "AT+BRSF=26\r"     /* = 0x7F = All features supported */
-+#define AG_INDICATORS_SUPP "AT+CIND=?\r"
-+#define AG_INDICATORS_VAL "AT+CIND?\r"
-+#define AG_INDICATORS_ENABLE "AT+CMER=3,0,0,1\r"
-+#define AG_HOLD_MPTY_SUPP "AT+CHLD=?\r"
-+#define AG_CALLER_IDENT_ENABLE "AT+CLIP=1\r"
-+#define AG_CARRIER_FORMAT "AT+COPS=3,0\r"
-+#define AG_EXTENDED_RESULT_CODE "AT+CMEE=1\r"
-+
-+#define AG_FEATURE_3WAY 0x1
-+#define AG_FEATURE_EXTENDED_RES_CODE 0x100
-+/* Hold and multipary AG features.
-+ * Comments below are copied from hands-free spec for reference */
-+/* Releases all held calls or sets User Determined User Busy (UDUB)
-+ * for a waiting call */
-+#define AG_CHLD_0 0x01
-+/* Releases all active calls (if any exist) and accepts the other
-+ * (held or waiting) call */
-+#define AG_CHLD_1 0x02
-+/* Releases specified active call only <x> */
-+#define AG_CHLD_1x 0x04
-+/* Places all active calls (if any exist) on hold and accepts the other
-+ * (held or waiting) call */
-+#define AG_CHLD_2 0x08
-+/* Request private consultation mode with specified call <x> (Place all
-+ * calls on hold EXCEPT the call <x>) */
-+#define AG_CHLD_2x 0x10
-+/* Adds a held call to the conversation */
-+#define AG_CHLD_3 0x20
-+/* Connects the two calls and disconnects the subscriber from both calls
-+ * (Explicit Call Transfer). Support for this value and its associated
-+ * functionality is optional for the HF. */
-+#define AG_CHLD_4 0x40
-+
-+#define OK_RESPONSE "\r\nOK\r\n"
-+#define ERROR_RESPONSE "\r\nERROR\r\n"
-+
-+struct indicator {
-+	gchar descr[AG_INDICATOR_DESCR_SIZE];
-+	gint value;
++struct gateway {
++	GIOChannel* rfcomm;
++	guint rfcomm_watch_id;
++	GIOChannel* sco;
++	GIOChannel* sco_server;
++	gateway_stream_cb_t sco_start_cb;
++	void* sco_start_cb_data;
++	DBusMessage* connect_message;
++	guint ag_features;
++	guint hold_multiparty_features;
++	GSList* indies;
++	gboolean is_dialing;
 +};
-
- struct gateway {
- 	GIOChannel* rfcomm;
-@@ -53,11 +112,902 @@ struct gateway {
- 	gboolean is_dialing;
- };
-
-+static gboolean rfcomm_ag_data_cb(GIOChannel * chan, GIOCondition cond,
-+					struct audio_device *device);
 +
-+int gateway_close(struct gateway *gw);
++static GDBusMethodTable gateway_methods[] = {
++	{NULL, NULL, NULL, NULL}
++};
 +
-+static void rfcomm_start_watch(struct audio_device *dev)
++static GDBusSignalTable gateway_signals[] = {
++	{NULL, NULL}
++};
++
++struct gateway *gateway_init(struct audio_device *dev)
 +{
-+	struct gateway *gw = dev->gateway;
-+
-+	gw->rfcomm_watch_id = g_io_add_watch(gw->rfcomm,
-+			G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
-+			(GIOFunc) rfcomm_ag_data_cb, dev);
-+}
-+
-+static void rfcomm_stop_watch(struct audio_device *dev)
-+{
-+	struct gateway *gw = dev->gateway;
-+
-+	g_source_remove(gw->rfcomm_watch_id);
-+}
-+
-+static gboolean io_channel_write_all(GIOChannel * io, gchar * data,
-+					gsize count)
-+{
-+	gsize written = 0;
-+	GIOStatus status;
-+
-+	while (count > 0) {
-+		status = g_io_channel_write_chars(io, data, count, &written,
-+						NULL);
-+		if (status != G_IO_STATUS_NORMAL)
-+			return FALSE;
-+
-+		data += written;
-+		count -= written;
-+	}
-+	return TRUE;
-+}
-+
-+/* it's worth to mention that data and response could be the same pointers */
-+static gboolean rfcomm_send_and_read(struct gateway *gw, gchar * data,
-+                                    gchar * response, gsize count)
-+{
-+	GIOChannel *rfcomm = gw->rfcomm;
-+
-+	if (!io_channel_write_all(rfcomm, data, count))
-+		return FALSE;
-+
-+	gsize read = 0;
-+	gboolean got_ok = FALSE;
-+	gboolean got_error = FALSE;
-+	gchar *resp_buf = response;
-+	gsize toread = RFCOMM_BUF_SIZE - 1;
-+	GIOStatus status;
-+	while (!(got_ok || got_error)) {
-+		status = g_io_channel_read_chars(rfcomm, resp_buf, toread,
-+						&read, NULL);
-+		if (status == G_IO_STATUS_NORMAL)
-+			resp_buf[read] = '\0';
-+		else {
-+			debug("rfcomm_send_and_read(): %m");
-+			return FALSE;
-+		}
-+		got_ok = NULL != strstr(resp_buf, OK_RESPONSE);
-+		got_error = NULL != strstr(resp_buf, ERROR_RESPONSE);
-+		resp_buf += read;
-+		toread -= read;
-+	}
-+	return TRUE;
-+}
-+
-+/* get <descr> from the names: (<descr>, (<values>)), (<descr>, (<values>))
-+ * ... */
-+GSList *parse_indicator_names(gchar * names, GSList * indies)
-+{
-+	gchar *current = names - 1;
-+	GSList *result = indies;
-+	gchar *next;
-+
-+	while (current != NULL) {
-+		current += 2;
-+		next = strstr(current, ",(");
-+		struct indicator *ind = g_slice_new(struct indicator);
-+		strncpy(ind->descr, current, 20);
-+		ind->descr[(gint) next - (gint) current] = '\0';
-+		result = g_slist_append(result, (gpointer) ind);
-+		current = strstr(next + 1, ",(");
-+	}
-+	return result;
-+}
-+
-+/* get values from <val0>,<val1>,... */
-+GSList *parse_indicator_values(gchar * values, GSList * indies)
-+{
-+	gint val;
-+	gchar *current = values - 1;
-+	GSList *runner = indies;
-+
-+	while (current != NULL) {
-+		current += 1;
-+		sscanf(current, "%d", &val);
-+		current = strchr(current, ',');
-+		struct indicator *ind = g_slist_nth_data(runner, 0);
-+		ind->value = val;
-+		runner = g_slist_next(runner);
-+	}
-+	return indies;
-+}
-+
-+/* get values from <val0>,<val1>,... */
-+static guint get_hold_mpty_features(gchar * features)
-+{
-+	guint result = 0;
-+
-+	if (strstr(features, "0") != NULL)
-+		result |= AG_CHLD_0;
-+
-+	if (strstr(features, "1") != NULL)
-+		result |= AG_CHLD_1;
-+
-+	if (strstr(features, "1x") != NULL)
-+		result |= AG_CHLD_1x;
-+
-+	if (strstr(features, "2") != NULL)
-+		result |= AG_CHLD_2;
-+
-+	if (strstr(features, "2x") != NULL)
-+		result |= AG_CHLD_2x;
-+
-+	if (strstr(features, "3") != NULL)
-+		result |= AG_CHLD_3;
-+
-+	if (strstr(features, "4") != NULL)
-+	        result |= AG_CHLD_4;
-+
-+	return result;
-+}
-+
-+static gboolean establish_service_level_conn(struct gateway *gw)
-+{
-+	gchar buf[RFCOMM_BUF_SIZE];
-+	gboolean res;
-+
-+	res = rfcomm_send_and_read(gw, AG_FEATURES, buf,
-+				sizeof(AG_FEATURES) - 1);
-+	if (!res || sscanf(buf, "\r\n+BRSF:%d", &gw->ag_features) != 1)
-+		return FALSE;
-+
-+	debug("features are 0x%X", gw->ag_features);
-+	res = rfcomm_send_and_read(gw, AG_INDICATORS_SUPP, buf,
-+				sizeof(AG_INDICATORS_SUPP) - 1);
-+	if (!res || !strstr(buf, "+CIND:"))
-+		return FALSE;
-+
-+	gw->indies = parse_indicator_names(strchr(buf, '('), NULL);
-+
-+	res = rfcomm_send_and_read(gw, AG_INDICATORS_VAL, buf,
-+		sizeof(AG_INDICATORS_VAL) - 1);
-+	if (!res || !strstr(buf, "+CIND:"))
-+		return FALSE;
-+
-+	gw->indies = parse_indicator_values(strchr(buf, ':') + 1, gw->indies);
-+
-+	res = rfcomm_send_and_read(gw, AG_INDICATORS_ENABLE, buf,
-+				sizeof(AG_INDICATORS_ENABLE) - 1);
-+	if (!res || !strstr(buf, "OK"))
-+		return FALSE;
-+
-+	if ((gw->ag_features & AG_FEATURE_3WAY) != 0) {
-+		res = rfcomm_send_and_read(gw, AG_HOLD_MPTY_SUPP, buf,
-+				sizeof(AG_HOLD_MPTY_SUPP) - 1);
-+		if (!res || !strstr(buf, "+CHLD:")) {
-+			g_slice_free1(RFCOMM_BUF_SIZE, buf);
-+			return FALSE;
-+		}
-+		gw->hold_multiparty_features = get_hold_mpty_features(
-+							strchr(buf, '('));
-+	} else
-+		gw->hold_multiparty_features = 0;
-+
-+	debug("Service layer connection successfully established!");
-+	rfcomm_send_and_read(gw, AG_CALLER_IDENT_ENABLE, buf,
-+			sizeof(AG_CALLER_IDENT_ENABLE) - 1);
-+	rfcomm_send_and_read(gw, AG_CARRIER_FORMAT, buf,
-+			sizeof(AG_CARRIER_FORMAT) - 1);
-+	if ((gw->ag_features & AG_FEATURE_EXTENDED_RES_CODE) != 0)
-+		rfcomm_send_and_read(gw, AG_EXTENDED_RESULT_CODE, buf,
-+			sizeof(AG_EXTENDED_RESULT_CODE) - 1);
-+
-+	return TRUE;
-+}
-+
-+static void process_ind_change(struct audio_device *dev, gchar * name,
-+							gint value)
-+{
-+	struct gateway *gw = dev->gateway;
-+
-+	if (strcmp(name, "call") == 0) {
-+		if (value > 0) {
-+			g_dbus_emit_signal(dev->conn, dev->path,
++	if (!g_dbus_register_interface(dev->conn, dev->path,
 +					AUDIO_GATEWAY_INTERFACE,
-+					"CallStart", DBUS_TYPE_INVALID);
-+			gw->is_dialing = FALSE;
-+		} else
-+			g_dbus_emit_signal(dev->conn, dev->path,
-+					AUDIO_GATEWAY_INTERFACE,
-+					"CallEnd", DBUS_TYPE_INVALID);
-+
-+	} else if (!strcmp(name, "callstatus") && gw->is_dialing) {
-+		if (value == 0) {
-+			g_dbus_emit_signal(dev->conn, dev->path,
-+					AUDIO_GATEWAY_INTERFACE,
-+					"CallCancelled",
-+					DBUS_TYPE_INVALID);
-+			gw->is_dialing = FALSE;
-+		} else
-+			gw->is_dialing = TRUE;
-+
-+	} else if (!strcmp(name, "callheld")) {
-+		/* FIXME: The following code is based on assumptions only.
-+		 * Has to be tested for interoperability
-+		 * I assume that callheld=2 would be sent when dial from HF
-+		 * failed in case of 3-way call
-+		 * Unfortunately this path is not covered by the HF spec so
-+		 * the code has to be tested for interop
-+		*/
-+		/* '2' means: all calls held, no active calls */
-+		if (value == 2) {
-+			if (gw->is_dialing) {
-+				g_dbus_emit_signal(dev->conn, dev->path,
-+					AUDIO_GATEWAY_INTERFACE,
-+					"CallCancelled",
-+					DBUS_TYPE_INVALID);
-+				gw->is_dialing = FALSE;
-+			}
-+		}
-+	} else
-+		g_dbus_emit_signal(dev->conn, dev->path,
-+				AUDIO_GATEWAY_INTERFACE, "StatusUpdate",
-+				DBUS_TYPE_STRING, name, DBUS_TYPE_INT32,
-+				value, DBUS_TYPE_INVALID);
-+
-+}
-+
-+static void process_ring(struct audio_device *device, GIOChannel * chan,
-+			gchar * buf)
-+{
-+	gchar number[AG_CALLER_NUM_SIZE];
-+	gchar *sep;
-+	guint read;
-+
-+	rfcomm_stop_watch(device);
-+	g_io_channel_read_chars(chan, buf, RFCOMM_BUF_SIZE - 1, &read, NULL);
-+	if (sscanf(buf, "\r\n+CLIP:%s\r\n", number) == 1) {
-+		sep = strchr(number, ',');
-+		sep[0] = '\0';
-+		/* FIXME:signal will be emitted on each RING+CLIP. That's bad */
-+		g_dbus_emit_signal(device->conn, device->path,
-+				AUDIO_GATEWAY_INTERFACE, "Ring",
-+				DBUS_TYPE_STRING, number,
-+				DBUS_TYPE_INVALID);
-+	} else
-+		info("rfcomm_ag_data_cb(): '%s' in place of +CLIP after RING",
-+					buf);
-+
-+	rfcomm_start_watch(device);
-+}
-+
-+static gboolean rfcomm_ag_data_cb(GIOChannel * chan, GIOCondition cond,
-+					struct audio_device *device)
-+{
-+	gchar buf[RFCOMM_BUF_SIZE];
-+	struct gateway *gw;
-+	guint read;
-+	/* some space for value */
-+	gchar indicator[AG_INDICATOR_DESCR_SIZE + 4];
-+	gint value;
-+	gchar *sep;
-+
-+	if (cond & G_IO_NVAL)
-+		return FALSE;
-+
-+	gw = device->gateway;
-+
-+	if (cond & (G_IO_ERR | G_IO_HUP))
-+		return FALSE;
-+
-+	if (G_IO_ERROR_NONE != g_io_channel_read_chars(chan, buf,
-+				sizeof(buf) - 1, &read, NULL))
-+		return TRUE;
-+	buf[read] = '\0';
-+
-+	if (sscanf(buf, "\r\n+CIEV:%s\r\n", indicator) == 1) {
-+		sep = strchr(indicator, ',');
-+		sep[0] = '\0';
-+		sep += 1;
-+		value = atoi(sep);
-+		process_ind_change(device, indicator, value);
-+	} else if (NULL != strstr(buf, "RING"))
-+		process_ring(device, chan, buf);
-+	else if (sscanf(buf, "\r\n+BVRA:%d\r\n", &value) == 1) {
-+		if (value == 0)
-+			g_dbus_emit_signal(device->conn, device->path,
-+					AUDIO_GATEWAY_INTERFACE,
-+					"VoiceRecognitionActive",
-+					DBUS_TYPE_INVALID);
-+		else
-+			g_dbus_emit_signal(device->conn, device->path,
-+					AUDIO_GATEWAY_INTERFACE,
-+					"VoiceRecognitionInactive",
-+					DBUS_TYPE_INVALID);
-+	} else if (sscanf(buf, "\r\n+VGS:%d\r\n", &value) == 1)
-+		g_dbus_emit_signal(device->conn, device->path,
-+				AUDIO_GATEWAY_INTERFACE, "SpeakerGain",
-+				DBUS_TYPE_INT32, value,
-+				DBUS_TYPE_INVALID);
-+	else if (sscanf(buf, "\r\n+VGM:%d\r\n", &value) == 1)
-+		g_dbus_emit_signal(device->conn, device->path,
-+				AUDIO_GATEWAY_INTERFACE, "MicGain",
-+				DBUS_TYPE_INT32, value,
-+				DBUS_TYPE_INVALID);
-+	else
-+		error("rfcomm_ag_data_cb(): read wrong data '%s'", buf);
-+
-+	return TRUE;
-+}
-+
-+static gboolean sco_io_cb(GIOChannel * chan, GIOCondition cond,
-+			struct audio_device *dev)
-+{
-+	struct gateway *gw = dev->gateway;
-+
-+	if (cond & G_IO_NVAL)
-+		return FALSE;
-+
-+	if (cond & (G_IO_ERR | G_IO_HUP)) {
-+		GIOChannel *chan = gw->sco;
-+		g_io_channel_unref(chan);
-+		g_io_channel_close(chan);
-+		gw->sco = NULL;
-+		return FALSE;
-+	}
-+
-+	return TRUE;
-+}
-+
-+static void sco_connect_cb(GIOChannel * chan, int err, const bdaddr_t * src,
-+				const bdaddr_t * dst, gpointer user_data)
-+{
-+	struct audio_device *dev = (struct audio_device *) user_data;
-+	struct gateway *gw = dev->gateway;
-+
-+	if (err < 0) {
-+		error("sco_connect_cb(): %s (%d)", strerror(-err), -err);
-+		/* not sure, but from other point of view,
-+		 * what is the reason to have headset which
-+		 * cannot play audio? */
-+		gateway_close(gw);
-+		return;
-+	}
-+
-+	gw->sco = chan;
-+	if (gw->sco_start_cb != NULL)
-+		gw->sco_start_cb(dev, gw->sco_start_cb_data);
-+
-+	/* why is this here? */
-+	fcntl(g_io_channel_unix_get_fd(chan), F_SETFL, 0);
-+	g_io_add_watch(gw->sco, G_IO_ERR | G_IO_HUP | G_IO_NVAL,
-+				(GIOFunc) sco_io_cb, dev);
-+}
-+
-+static void rfcomm_connect_cb(GIOChannel * chan, int err, const bdaddr_t * src,
-+				const bdaddr_t * dst, gpointer user_data)
-+{
-+	struct audio_device *dev = user_data;
-+	struct gateway *gw = dev->gateway;
-+	DBusMessage *conn_mes = gw->connect_message;
-+	gchar gw_addr[18];
-+
-+	if (err < 0) {
-+		error("connect(): %s (%d)", strerror(-err), -err);
-+		if (NULL != gw->sco_start_cb)
-+			gw->sco_start_cb(NULL, gw->sco_start_cb_data);
-+		return;
-+	}
-+
-+	ba2str(&dev->dst, gw_addr);
-+	/* Blocking mode should be default, but just in case: */
-+	GIOFlags flags = g_io_channel_get_flags(chan);
-+	flags &= ~G_IO_FLAG_NONBLOCK;
-+	flags &= G_IO_FLAG_MASK;
-+	g_io_channel_set_flags(chan, flags, NULL);
-+	g_io_channel_set_encoding(chan, NULL, NULL);
-+	g_io_channel_set_buffered(chan, FALSE);
-+	gw->rfcomm = chan;
-+	if (establish_service_level_conn(dev->gateway)) {
-+		GIOChannel *sco_server = bt_sco_listen(&dev->src, 0,
-+						sco_connect_cb, dev);
-+
-+		if (sco_server != NULL) {
-+			debug("%s: Connected to %s", dev->path, gw_addr);
-+			rfcomm_start_watch(dev);
-+			gw->sco_server = sco_server;
-+			if (conn_mes != NULL) {
-+				DBusMessage *reply =
-+				dbus_message_new_method_return(conn_mes);
-+				dbus_connection_send(dev->conn, reply, NULL);
-+				dbus_message_unref(reply);
-+				dbus_message_unref(conn_mes);
-+				gw->connect_message = NULL;
-+			}
-+
-+			g_dbus_emit_signal(dev->conn, dev->path,
-+					AUDIO_GATEWAY_INTERFACE,
-+					"Connected", DBUS_TYPE_UINT32,
-+					&gw->ag_features,
-+					DBUS_TYPE_INVALID);
-+			return;
-+		} else
-+			error("%s: Failed to setup SCO server socket",
-+						dev->path);
-+	} else
-+		error("%s: Failed to establish service layer connection to %s",
-+			dev->path, gw_addr);
-+
-+	if (NULL != gw->sco_start_cb)
-+		gw->sco_start_cb(NULL, gw->sco_start_cb_data);
-+
-+	gateway_close(gw);
-+}
-+
-+static void get_record_cb(sdp_list_t * recs, int err, gpointer user_data)
-+{
-+	struct audio_device *dev = user_data;
-+	DBusMessage *conn_mes = dev->gateway->connect_message;
-+	int ch = -1;
-+	sdp_list_t *protos, *classes = NULL;
-+	uuid_t uuid;
-+
-+	if (err < 0)
-+		error("Unable to get service record: %s (%d)", strerror(-err),
-+					-err);
-+	else if (!recs || !recs->data)
-+		error("No records found");
-+	else if (sdp_get_service_classes(recs->data, &classes) < 0)
-+		error("Unable to get service classes from record");
-+	else {
-+		memcpy(&uuid, classes->data, sizeof(uuid));
-+
-+		if (!sdp_uuid128_to_uuid(&uuid) || uuid.type != SDP_UUID16)
-+			error("Not a 16 bit UUID");
-+		else if (uuid.value.uuid16 != HANDSFREE_AGW_SVCLASS_ID)
-+			error("Service record didn't contain the HFP UUID");
-+		else if (!sdp_get_access_protos(recs->data, &protos)) {
-+			ch = sdp_get_proto_port(protos, RFCOMM_UUID);
-+			sdp_list_foreach(protos,
-+				(sdp_list_func_t) sdp_list_free, NULL);
-+			sdp_list_free(protos, NULL);
-+			if (ch == -1)
-+				error("Unable to extract RFCOMM channel"
-+						" from service record");
-+			else {
-+				err = bt_rfcomm_connect(&dev->src, &dev->dst,
-+						ch, rfcomm_connect_cb, dev);
-+				if (err < 0) {
-+					gchar* strerr = strerror(err);
-+					error("Unable to connect: %s (%s)",
-+						strerr, err);
-+					if (conn_mes)
-+						error_common_reply(dev->conn,
-+						conn_mes, ERROR_INTERFACE
-+						".ConnectionAttemptFailed",
-+						strerr);
-+
-+					gateway_close(dev->gateway);
-+				}
-+				sdp_list_free(classes, free);
-+				return;
-+			}
-+		}
-+	}
-+
-+	if (classes)
-+		sdp_list_free(classes, free);
-+
-+	if (recs && recs->data)
-+		sdp_record_free(recs->data);
-+
-+	if (conn_mes) {
-+		error_common_reply(dev->conn, conn_mes,
-+			ERROR_INTERFACE".NotSupported", "Not supported");
-+		dbus_message_unref(conn_mes);
-+		dev->gateway->connect_message = NULL;
-+	}
-+	gateway_stream_cb_t sco_cb = dev->gateway->sco_start_cb;
-+	if (sco_cb)
-+		sco_cb(NULL, dev->gateway->sco_start_cb_data);
-+
-+}
-+
-+static int get_records(struct audio_device *device)
-+{
-+	uuid_t uuid;
-+
-+	sdp_uuid16_create(&uuid, HANDSFREE_AGW_SVCLASS_ID);
-+	return bt_search_service(&device->src, &device->dst, &uuid,
-+				get_record_cb, device, NULL);
-+}
-+
-+static DBusMessage *ag_connect(DBusConnection * conn, DBusMessage * msg,
-+				void *data)
-+{
-+	struct audio_device *au_dev = (struct audio_device *) data;
-+	struct gateway *gw = au_dev->gateway;
-+
-+	if (gw->rfcomm)
-+		return g_dbus_create_error(msg, ERROR_INTERFACE
-+					".AlreadyConnected",
-+					"Already Connected");
-+
-+	gw->connect_message = dbus_message_ref(msg);
-+	if (get_records(au_dev) < 0) {
-+		dbus_message_unref(gw->connect_message);
-+		return g_dbus_create_error(msg, ERROR_INTERFACE
-+					".ConnectAttemptFailed",
-+					"Connect Attempt Failed");
-+	}
-+	return NULL;
-+}
-+
-+static DBusMessage *ag_disconnect(DBusConnection * conn, DBusMessage * msg,
-+					void *data)
-+{
-+	struct audio_device *device = data;
-+	struct gateway *gw = device->gateway;
-+	DBusMessage *reply = NULL;
-+	char gw_addr[18];
-+
-+	reply = dbus_message_new_method_return(msg);
-+	if (!reply)
++					gateway_methods, gateway_signals,
++					NULL, dev, NULL))
 +		return NULL;
 +
-+	if (!gw->rfcomm)
-+		return g_dbus_create_error(msg, ERROR_INTERFACE
-+						".NotConnected",
-+						"Device not Connected");
++	struct gateway *gw = g_new0(struct gateway, 1);
++	gw->indies = NULL;
++	gw->is_dialing = FALSE;
++	return gw;
 +
-+	gateway_close(gw);
-+	ba2str(&device->dst, gw_addr);
-+	debug("Disconnected from %s, %s", gw_addr, device->path);
-+
-+	return reply;
 +}
 +
-+static DBusMessage *ag_is_connected(DBusConnection * conn, DBusMessage * msg,
-+					void *data)
++gboolean gateway_is_connected(struct audio_device *dev)
 +{
-+	gboolean res = gateway_is_connected((struct audio_device *) data);
-+	DBusMessage *reply = dbus_message_new_method_return(msg);
-+
-+	if (reply)
-+		dbus_message_append_args(reply, DBUS_TYPE_BOOLEAN, &res,
-+					DBUS_TYPE_INVALID);
-+	return reply;
++	return (dev != NULL && dev->gateway != NULL
++		&& dev->gateway->rfcomm != NULL);
 +}
 +
-+static DBusMessage *process_ag_reponse(DBusMessage * msg, gchar * response)
++int gateway_connect_rfcomm(struct audio_device *dev, GIOChannel * io)
 +{
-+	DBusMessage *reply;
++	if (!io)
++		return -EINVAL;
 +
-+	if (strstr(response, OK_RESPONSE))
-+		reply = dbus_message_new_method_return(msg);
-+	else {
-+		/* FIXME: some code should be here to processes errors
-+		 *  in better fasion */
-+		debug("AG responded with '%s' to %s method call", response,
-+				dbus_message_get_member(msg));
-+		reply = dbus_message_new_error(msg, ERROR_INTERFACE
-+					".OperationFailed",
-+					"Operation failed.See log for details");
-+	}
-+	return reply;
-+}
++	dev->gateway->rfcomm = io;
 +
-+static DBusMessage *process_simple(DBusMessage * msg, struct audio_device *dev,
-+					gchar * data)
-+{
-+	struct gateway *gw = dev->gateway;
-+	gchar buf[RFCOMM_BUF_SIZE];
-+
-+	rfcomm_stop_watch(dev);
-+	rfcomm_send_and_read(gw, data, buf, strlen(data));
-+	rfcomm_start_watch(dev);
-+	return process_ag_reponse(msg, buf);
-+}
-+
-+#define AG_ANSWER "ATA\r"
-+
-+static DBusMessage *ag_answer(DBusConnection * conn, DBusMessage * msg,
-+				void *data)
-+{
-+	return process_simple(msg, (struct audio_device *) data, AG_ANSWER);
-+}
-+
-+#define AG_CANCEL_CUR "AT+CHUP\r"
-+
-+static DBusMessage *ag_cancel_cur(DBusConnection * conn, DBusMessage * msg,
-+				void *data)
-+{
-+	return process_simple(msg, (struct audio_device *) data, AG_CANCEL_CUR);
-+}
-+
-+/* according to GSM spec */
-+#define ALLOWED_NUMBER_SYMBOLS "1234567890*#+ABC"
-+#define AG_PLACE_CALL "ATD%s\r"
-+/* dialing from memory is not supported as headset spec doesn't define a way
-+ * to retreive phone memory entries.
-+ */
-+static DBusMessage *ag_call(DBusConnection * conn, DBusMessage * msg,
-+				void *data)
-+{
-+	struct audio_device *device = data;
-+	struct gateway *gw = device->gateway;
-+	gchar buf[RFCOMM_BUF_SIZE];
-+	gchar *number;
-+	gint atd_len;
-+
-+	dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &number,
-+				DBUS_TYPE_INVALID);
-+	if (strlen(number) != strspn(number, ALLOWED_NUMBER_SYMBOLS))
-+		return dbus_message_new_error(msg,
-+			ERROR_INTERFACE ".BadNumber",
-+			"Number contains characters which are not allowed");
-+
-+	atd_len = sprintf(buf, AG_PLACE_CALL, number);
-+	rfcomm_stop_watch(device);
-+	rfcomm_send_and_read(gw, buf, buf, atd_len);
-+	rfcomm_start_watch(device);
-+	return process_ag_reponse(msg, buf);
-+}
-+
-+#define AG_GET_CARRIER "AT+COPS?\r"
-+
-+static DBusMessage *ag_get_operator(DBusConnection * conn, DBusMessage * msg,
-+					void *data)
-+{
-+	struct audio_device *dev = (struct audio_device *) data;
-+	struct gateway *gw = dev->gateway;
-+	gchar buf[RFCOMM_BUF_SIZE];
-+	GIOChannel *rfcomm = gw->rfcomm;
-+	gsize read;
-+	gchar *result;
-+	DBusMessage *reply;
-+	GIOStatus status;
-+
-+	rfcomm_stop_watch(dev);
-+	io_channel_write_all(rfcomm, AG_GET_CARRIER, strlen(AG_GET_CARRIER));
-+
-+	status = g_io_channel_read_chars(rfcomm, buf, RFCOMM_BUF_SIZE - 1,
-+						&read, NULL);
-+	rfcomm_start_watch(dev);
-+	if (G_IO_STATUS_NORMAL == status) {
-+		buf[read] = '\0';
-+		if (strstr(buf, "+COPS")) {
-+			result = strrchr(buf, ',') + 1;
-+			reply = dbus_message_new_method_return(msg);
-+			dbus_message_append_args(reply, DBUS_TYPE_STRING,
-+						&result, DBUS_TYPE_INVALID);
-+		} else {
-+			info("ag_get_operator(): '+COPS' expected but"
-+				" '%s' received", buf);
-+			reply = dbus_message_new_error(msg, ERROR_INTERFACE
-+						".Failed",
-+						"Unexpected response from AG");
-+		}
-+	} else {
-+		error("ag_get_operator(): %m");
-+		reply = dbus_message_new_error(msg, ERROR_INTERFACE
-+					".ConnectionFailed",
-+					"Failed to receive response from AG");
-+	}
-+
-+	return reply;
-+}
-+
-+#define AG_VR_ACTIVATE "AT+BVRA=1\r"
-+static DBusMessage *ag_vr_activate(DBusConnection * conn, DBusMessage * msg,
-+					void *data)
-+{
-+	return process_simple(msg, (struct audio_device *) data,
-+					AG_VR_ACTIVATE);
-+}
-+
-+#define AG_VR_DEACTIVATE "AT+BVRA=0\r"
-+static DBusMessage *ag_vr_deactivate(DBusConnection * conn, DBusMessage * msg,
-+					void *data)
-+{
-+	return process_simple(msg, (struct audio_device *) data,
-+					AG_VR_DEACTIVATE);
-+}
-+
-+#define AG_REQUEST_NUMBER "AT+BINP=1\r"
-+static DBusMessage *ag_get_number_for_voice(DBusConnection * conn,
-+					DBusMessage * msg, void *data)
-+{
-+	struct audio_device *device = data;
-+	struct gateway *gw = device->gateway;
-+	gchar buf[RFCOMM_BUF_SIZE];
-+	gchar number[AG_CALLER_NUM_SIZE];
-+
-+	rfcomm_stop_watch(device);
-+	rfcomm_send_and_read(gw, AG_REQUEST_NUMBER, buf,
-+				strlen(AG_REQUEST_NUMBER));
-+	rfcomm_start_watch(device);
-+	if (sscanf(buf, "\r\n+BINP:%s\r\n", number) == 1) {
-+		DBusMessage *reply = dbus_message_new_method_return(msg);
-+		dbus_message_append_args(reply, DBUS_TYPE_STRING, number,
-+					DBUS_TYPE_INVALID);
-+		return reply;
-+	}
-+
-+	info("ag_get_number_for_voice(): AG returned '%s' in place of number",
-+					buf);
-+	return dbus_message_new_error(msg, ERROR_INTERFACE ".Failed",
-+					"AG didn't return a number");
-+}
-+
-+#define AG_SEND_DTMF "AT+VTS:%c\r"
-+static DBusMessage *ag_send_dtmf(DBusConnection * conn, DBusMessage * msg,
-+				void *data)
-+{
-+	struct audio_device *device = data;
-+	struct gateway *gw = device->gateway;
-+	gchar buf[RFCOMM_BUF_SIZE];
-+	gchar *number;
-+	gint com_len;
-+
-+	dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &number,
-+				DBUS_TYPE_INVALID);
-+	if (strlen(number) != strspn(number, ALLOWED_NUMBER_SYMBOLS))
-+		return dbus_message_new_error(msg,
-+			ERROR_INTERFACE ".BadNumber",
-+			"Number contains characters which are not allowed");
-+
-+	gboolean got_ok = TRUE;
-+	gint num_len = strlen(number);
-+	gint i = 0;
-+	rfcomm_stop_watch(device);
-+	while (i < num_len && got_ok) {
-+		com_len = sprintf(buf, AG_SEND_DTMF, number[i]);
-+		rfcomm_send_and_read(gw, buf, buf, com_len);
-+		got_ok = NULL != strstr(buf, OK_RESPONSE);
-+		i += 1;
-+	}
-+	rfcomm_start_watch(device);
-+	return process_ag_reponse(msg, buf);
-+}
-+
-+#define AG_SET_MIC_GAIN "AT+VGM:%d\r"
-+static DBusMessage *ag_send_mic_gain(DBusConnection * conn, DBusMessage * msg,
-+				void *data)
-+{
-+	gint value;
-+	gchar buf[RFCOMM_BUF_SIZE];
-+
-+	dbus_message_get_args(msg, NULL, DBUS_TYPE_INT32, &value,
-+				DBUS_TYPE_INVALID);
-+	sprintf(buf, AG_SET_MIC_GAIN, value);
-+	return process_simple(msg, (struct audio_device *) data, buf);
-+}
-+
-+#define AG_SET_SPEAKER_GAIN "AT+VGS:%d\r"
-+static DBusMessage *ag_send_speaker_gain(DBusConnection * conn,
-+				DBusMessage * msg, void *data)
-+{
-+	gint value;
-+	gchar buf[RFCOMM_BUF_SIZE];
-+
-+	dbus_message_get_args(msg, NULL, DBUS_TYPE_INT32, &value,
-+				DBUS_TYPE_INVALID);
-+	sprintf(buf, AG_SET_SPEAKER_GAIN, value);
-+	return process_simple(msg, (struct audio_device *) data, buf);
-+}
-+
-+#define AG_GET_SUBSCRIBER_NUMS "AT+CNUM\r"
-+#define CNUM_LEN 5             /* length of "+CNUM" string */
-+#define MAX_NUMBER_CNT 16
-+static DBusMessage *ag_get_subscriber_nums(DBusConnection * conn,
-+					DBusMessage * msg, void *data)
-+{
-+	struct audio_device *device = data;
-+	struct gateway *gw = device->gateway;
-+	gchar buf[RFCOMM_BUF_SIZE];
-+	gchar *cur_cnum;
-+	gchar numbers[MAX_NUMBER_CNT][AG_CALLER_NUM_SIZE];
-+	int number_cnt = 0;
-+
-+	rfcomm_stop_watch(device);
-+	rfcomm_send_and_read(gw, AG_GET_SUBSCRIBER_NUMS, buf,
-+			strlen(AG_GET_SUBSCRIBER_NUMS));
-+	rfcomm_start_watch(device);
-+	cur_cnum = strstr(buf, "+CNUM");
-+	while (NULL != cur_cnum && number_cnt < MAX_NUMBER_CNT) {
-+		sscanf(cur_cnum, "+CNUM:%s,", numbers[number_cnt]);
-+		number_cnt += 1;
-+		cur_cnum = strstr(cur_cnum + CNUM_LEN, "+CNUM");
-+	}
-+	DBusMessage *reply = dbus_message_new_method_return(msg);
-+	dbus_message_append_args(reply, DBUS_TYPE_ARRAY, DBUS_TYPE_STRING,
-+			&numbers, number_cnt, DBUS_TYPE_INVALID);
-+	return reply;
-+}
-+
-+static DBusMessage *ag_hold_all_but_this(DBusConnection * conn,
-+				DBusMessage * msg, void *data)
-+{
-+	return dbus_message_new_error(msg, ERROR_INTERFACE".NotImplemented",
-+					"Not implemented");
-+}
-+
-+static DBusMessage *ag_cancel_all(DBusConnection * conn, DBusMessage * msg,
-+				void *data)
-+{
-+	return dbus_message_new_error(msg, ERROR_INTERFACE".NotImplemented",
-+					"Not implemented");
-+}
-+
-+static DBusMessage *ag_cancel_spec(DBusConnection * conn, DBusMessage * msg,
-+					void *data)
-+{
-+	return dbus_message_new_error(msg, ERROR_INTERFACE".NotImplemented",
-+					"Not implemented");
-+}
-+
-+static DBusMessage *ag_rah_put_on_hold(DBusConnection * conn,
-DBusMessage * msg,
-+					void *data)
-+{
-+	return dbus_message_new_error(msg, ERROR_INTERFACE".NotImplemented",
-+					"Not implemented");
-+}
-+
-+static DBusMessage *ag_rah_answer_held_call(DBusConnection * conn,
-+					DBusMessage * msg, void *data)
-+{
-+	return dbus_message_new_error(msg, ERROR_INTERFACE".NotImplemented",
-+					"Not implemented");
-+}
-+
-+static DBusMessage *ag_rah_cancel_held_call(DBusConnection * conn,
-+					DBusMessage * msg, void *data)
-+{
-+	return dbus_message_new_error(msg, ERROR_INTERFACE".NotImplemented",
-+					"Not implemented");
-+}
-+
-+
- static GDBusMethodTable gateway_methods[] = {
-+	{"Connect", "", "", ag_connect, G_DBUS_METHOD_FLAG_ASYNC},
-+	{"Disconnect", "", "", ag_disconnect},
-+	{"IsConnected", "", "b", ag_is_connected},
-+	{"AnswerCall", "", "", ag_answer},
-+	{"CancelCurrentCall", "", "", ag_cancel_cur},
-+	{"Call", "s", "", ag_call},
-+	{"GetOperatorName", "", "s", ag_get_operator},
-+	{"VoiceRecognitionActvate", "", "", ag_vr_activate},
-+	{"VoiceRecognitionDeactvate", "", "", ag_vr_deactivate},
-+	{"GetNumberForLastVoiceTag", "", "s", ag_get_number_for_voice},
-+	{"SendDTMF", "s", "", ag_send_dtmf},
-+	{"SendMicrophoneGain", "y", "", ag_send_mic_gain},
-+	{"SendSpeakerGain", "y", "", ag_send_speaker_gain},
-+	{"GetSubscriberNumbers", "", "as", ag_get_subscriber_nums},
-+	{"RAHPutOnHold", "", "", ag_rah_put_on_hold},
-+	{"RAHAnswerHeldCall", "", "", ag_rah_answer_held_call},
-+	{"RAHCancelHeldCall", "", "", ag_rah_cancel_held_call},
-+	{"CancelCallFromNumber", "s", "", ag_cancel_spec},
-+	{"CancelAllCalls", "", "", ag_cancel_all},
-+	{"HoldAllButThis", "s", "", ag_hold_all_but_this},
- 	{NULL, NULL, NULL, NULL}
- };
-
- static GDBusSignalTable gateway_signals[] = {
-+	{"Connected", "u"},
-+	{"Disconnected", ""},
-+	{"Ring", "s"},
-+	{"StatusUpdate", "si"},
-+	{"CallCancelled", ""},
-+	{"CallStart", ""},
-+	{"CallEnd", ""},
-+	{"VoiceRecognitionActive", ""},
-+	{"VoiceRecognitionInactive", ""},
-+	{"MicrophoneGain", "y"},
-+	{"SpeakerGain", "y"},
-+	{"RAHCallOnHold", ""},
-+	{"NoCallsHeld", ""},
-+	{"HoldCalls", ""},
-+	{"AllCallsHeld", ""},
- 	{NULL, NULL}
- };
-
-@@ -92,3 +1042,37 @@ int gateway_connect_rfcomm(struct audio_device
-*dev, GIOChannel * io)
- 	return 0;
- }
-
-+static void indicator_slice_free(gpointer mem)
-+{
-+	g_slice_free(struct indicator, mem);
-+}
-+
-+int gateway_close(struct gateway *gw)
-+{
-+	GIOChannel *rfcomm = gw->rfcomm;
-+	GIOChannel *sco = gw->sco;
-+	GIOChannel *sco_server = gw->sco_server;
-+
-+	g_slist_foreach(gw->indies, (GFunc) indicator_slice_free, NULL);
-+	g_slist_free(gw->indies);
-+	if (rfcomm) {
-+		g_io_channel_close(rfcomm);
-+		g_io_channel_unref(rfcomm);
-+		gw->rfcomm = NULL;
-+	}
-+
-+	if (sco) {
-+		g_io_channel_close(sco);
-+		g_io_channel_unref(sco);
-+		gw->sco = NULL;
-+		gw->sco_start_cb = NULL;
-+		gw->sco_start_cb_data = NULL;
-+	}
-+
-+	if (sco_server) {
-+		g_io_channel_close(sco_server);
-+		g_io_channel_unref(sco_server);
-+		gw->sco_server = NULL;
-+	}
 +	return 0;
 +}
++
+diff --git a/audio/gateway.h b/audio/gateway.h
+index e93406b..225d3e2 100644
+--- a/audio/gateway.h
++++ b/audio/gateway.h
+@@ -27,8 +27,8 @@
+ #define DEFAULT_HSP_HS_CHANNEL 6
+ #define DEFAULT_HFP_HS_CHANNEL 7
+
+-int gateway_init(DBusConnection *conn, gboolean disable_hfp, gboolean sco_hci);
++typedef void (*gateway_stream_cb_t) (struct audio_device *dev, void
+*user_data);
++struct gateway *gateway_init(struct audio_device *device);
++gboolean gateway_is_connected(struct audio_device* dev);
++int gateway_connect_rfcomm(struct audio_device *dev, GIOChannel *chan);
+
+-void gateway_exit(void);
+-
+-gboolean gateway_is_enabled(uint16_t svc);
+diff --git a/audio/manager.c b/audio/manager.c
+index 1c7c46b..178de73 100644
+--- a/audio/manager.c
++++ b/audio/manager.c
+@@ -91,10 +91,10 @@ struct audio_adapter {
+ 	char	*path;
+ 	uint32_t hsp_ag_record_id;
+ 	uint32_t hfp_ag_record_id;
+-	uint32_t hsp_hs_record_id;
++	uint32_t hfp_hs_record_id;
+ 	GIOChannel *hsp_ag_server;
+ 	GIOChannel *hfp_ag_server;
+-	GIOChannel *hsp_hs_server;
++	GIOChannel *hfp_hs_server;
+ };
+
+ static int max_connected_headsets = 1;
+@@ -106,7 +106,7 @@ static GSList *devices = NULL;
+ static struct enabled_interfaces enabled = {
+ 	.hfp		= TRUE,
+ 	.headset	= TRUE,
+-	.gateway	= FALSE,
++	.gateway	= TRUE,
+ 	.sink		= TRUE,
+ 	.source		= FALSE,
+ 	.control	= TRUE,
+@@ -132,11 +132,11 @@ gboolean server_is_enabled(bdaddr_t *src, uint16_t svc)
+ 	case HEADSET_SVCLASS_ID:
+ 		return enabled.headset;
+ 	case HEADSET_AGW_SVCLASS_ID:
+-		return enabled.gateway;
++		return  FALSE;
+ 	case HANDSFREE_SVCLASS_ID:
+ 		return enabled.headset && enabled.hfp;
+ 	case HANDSFREE_AGW_SVCLASS_ID:
+-		return  FALSE;
++		return enabled.gateway;
+ 	case AUDIO_SINK_SVCLASS_ID:
+ 		return enabled.sink;
+ 	case AV_REMOTE_TARGET_SVCLASS_ID:
+@@ -192,6 +192,8 @@ static void handle_uuid(const char *uuidstr,
+struct audio_device *device)
+ 		break;
+ 	case HANDSFREE_AGW_SVCLASS_ID:
+ 		debug("Found Handsfree AG record");
++		if (device->gateway == NULL)
++			device->gateway = gateway_init(device);
+ 		break;
+ 	case AUDIO_SINK_SVCLASS_ID:
+ 		debug("Found Audio Sink");
+@@ -277,7 +279,7 @@ static sdp_record_t *hsp_ag_record(uint8_t ch)
+ 	return record;
+ }
+
+-static sdp_record_t *hsp_hs_record(uint8_t ch)
++static sdp_record_t *hfp_hs_record(uint8_t ch)
+ {
+ 	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
+ 	uuid_t root_uuid, svclass_uuid, ga_svclass_uuid;
+@@ -295,13 +297,13 @@ static sdp_record_t *hsp_hs_record(uint8_t ch)
+ 	root = sdp_list_append(0, &root_uuid);
+ 	sdp_set_browse_groups(record, root);
+
+-	sdp_uuid16_create(&svclass_uuid, HEADSET_SVCLASS_ID);
++	sdp_uuid16_create(&svclass_uuid, HANDSFREE_SVCLASS_ID);
+ 	svclass_id = sdp_list_append(0, &svclass_uuid);
+ 	sdp_uuid16_create(&ga_svclass_uuid, GENERIC_AUDIO_SVCLASS_ID);
+ 	svclass_id = sdp_list_append(svclass_id, &ga_svclass_uuid);
+ 	sdp_set_service_classes(record, svclass_id);
+
+-	sdp_uuid16_create(&profile.uuid, HEADSET_PROFILE_ID);
++	sdp_uuid16_create(&profile.uuid, HANDSFREE_PROFILE_ID);
+ 	profile.version = 0x0100;
+ 	pfseq = sdp_list_append(0, &profile);
+ 	sdp_set_profile_descs(record, pfseq);
+@@ -319,7 +321,7 @@ static sdp_record_t *hsp_hs_record(uint8_t ch)
+ 	aproto = sdp_list_append(0, apseq);
+ 	sdp_set_access_protos(record, aproto);
+
+-	sdp_set_info_attr(record, "Headset", 0, 0);
++	sdp_set_info_attr(record, "Hands-Free", 0, 0);
+
+ 	sdp_data_free(channel);
+ 	sdp_list_free(proto[0], 0);
+@@ -398,7 +400,7 @@ static sdp_record_t *hfp_ag_record(uint8_t ch,
+uint32_t feat)
+ 	return record;
+ }
+
+-static void auth_cb(DBusError *derr, void *user_data)
++static void headset_auth_cb(DBusError *derr, void *user_data)
+ {
+ 	struct audio_device *device = user_data;
+ 	const char *uuid;
+@@ -479,7 +481,7 @@ static void ag_io_cb(GIOChannel *chan, int err,
+const bdaddr_t *src,
+ 	headset_set_state(device, HEADSET_STATE_CONNECT_IN_PROGRESS);
+
+ 	err = btd_request_authorization(&device->src, &device->dst,
+-					server_uuid, auth_cb, device);
++					server_uuid, headset_auth_cb, device);
+ 	if (err < 0) {
+ 		debug("Authorization denied: %s", strerror(-err));
+ 		headset_set_state(device, HEADSET_STATE_DISCONNECTED);
+@@ -493,10 +495,61 @@ drop:
+ 	g_io_channel_unref(chan);
+ }
+
+-static void hs_io_cb(GIOChannel *chan, int err, const bdaddr_t *src,
++
++static void gateway_auth_cb(DBusError *derr, void *user_data)
++{
++	if (derr && dbus_error_is_set(derr))
++		error("Access denied: %s", derr->message);
++}
++
++static void hf_io_cb(GIOChannel *chan, int err, const bdaddr_t *src,
+ 		const bdaddr_t *dst, void *data)
+ {
+-	/*Stub*/
++	const char *server_uuid, *remote_uuid;
++	uint16_t svclass;
++	struct audio_device *device;
++
++	if (err < 0) {
++		error("accept: %s (%d)", strerror(-err), -err);
++		return;
++	}
++
++	server_uuid = HFP_HS_UUID;
++	remote_uuid = HFP_AG_UUID;
++	svclass = HANDSFREE_AGW_SVCLASS_ID;
++
++	device = manager_get_device(src, dst);
++	if (!device)
++		goto drop;
++
++	if (!device->gateway) {
++		btd_device_add_uuid(device->btd_dev, remote_uuid);
++		if (!device->gateway)
++			goto drop;
++	}
++
++	if (gateway_is_connected(device)) {
++		debug("Refusing new connection since one already exists");
++		goto drop;
++	}
++
++	if (gateway_connect_rfcomm(device, chan) < 0) {
++		error("Allocating new GIOChannel failed!");
++		goto drop;
++	}
++
++	err = btd_request_authorization(&device->src, &device->dst,
++				server_uuid, gateway_auth_cb, device);
++	if (err < 0) {
++		debug("Authorization denied!");
++		goto drop;
++	}
++
++	return;
++
++drop:
++	g_io_channel_close(chan);
++	g_io_channel_unref(chan);
+ 	return;
+ }
+
+@@ -609,26 +662,26 @@ static int gateway_server_init(struct
+audio_adapter *adapter)
+ 	if (master)
+ 		flags |= RFCOMM_LM_MASTER;
+
+-	adapter->hsp_hs_server = bt_rfcomm_listen(&adapter->src, chan, flags,
+-				hs_io_cb, adapter);
+-	if (!adapter->hsp_hs_server)
++	adapter->hfp_hs_server = bt_rfcomm_listen(&adapter->src, chan, flags,
++				hf_io_cb, adapter);
++	if (!adapter->hfp_hs_server)
+ 		return -1;
+
+-	record = hsp_hs_record(chan);
++	record = hfp_hs_record(chan);
+ 	if (!record) {
+ 		error("Unable to allocate new service record");
+ 		return -1;
+ 	}
+
+ 	if (add_record_to_server(&adapter->src, record) < 0) {
+-		error("Unable to register HSP HS service record");
++		error("Unable to register HFP HS service record");
+ 		sdp_record_free(record);
+-		g_io_channel_unref(adapter->hsp_hs_server);
+-		adapter->hsp_hs_server = NULL;
++		g_io_channel_unref(adapter->hfp_hs_server);
++		adapter->hfp_hs_server = NULL;
+ 		return -1;
+ 	}
+
+-	adapter->hsp_hs_record_id = record->handle;
++	adapter->hfp_hs_record_id = record->handle;
+
+ 	return 0;
+ }
+@@ -770,14 +823,14 @@ static void gateway_server_remove(struct
+btd_adapter *adapter)
+ 	if (!adp)
+ 		return;
+
+-	if (adp->hsp_hs_record_id) {
+-		remove_record_from_server(adp->hsp_hs_record_id);
+-		adp->hsp_hs_record_id = 0;
++	if (adp->hfp_hs_record_id) {
++		remove_record_from_server(adp->hfp_hs_record_id);
++		adp->hfp_hs_record_id = 0;
+ 	}
+
+-	if (adp->hsp_hs_server) {
+-		g_io_channel_unref(adp->hsp_hs_server);
+-		adp->hsp_hs_server = NULL;
++	if (adp->hfp_hs_server) {
++		g_io_channel_unref(adp->hfp_hs_server);
++		adp->hfp_hs_server = NULL;
+ 	}
+ }
+
+@@ -995,6 +1048,10 @@ struct audio_device *manager_find_device(const
+bdaddr_t *bda, const char *interf
+ 				&& !dev->headset)
+ 			continue;
+
++		if (interface && !strcmp(AUDIO_GATEWAY_INTERFACE, interface)
++				&& !dev->gateway)
++			continue;
++
+ 		if (interface && !strcmp(AUDIO_SINK_INTERFACE, interface)
+ 				&& !dev->sink)
+ 			continue;
