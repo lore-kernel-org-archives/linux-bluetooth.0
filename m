@@ -1,31 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [patch 1/2] bluetooth/bt3c: eliminate a sparse warning
-From: Marcel Holtmann <marcel@holtmann.org>
-To: akpm@linux-foundation.org
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	andre@bitwigglers.org, hidave.darkstar@gmail.com
-In-Reply-To: <200902112128.n1BLSBnP000351@imap1.linux-foundation.org>
-References: <200902112128.n1BLSBnP000351@imap1.linux-foundation.org>
-Content-Type: text/plain
-Date: Thu, 12 Feb 2009 02:52:12 +0100
-Message-Id: <1234403532.7293.27.camel@violet>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="US-ASCII"
+Subject: RE: Obex Push
+Date: Thu, 12 Feb 2009 09:24:35 +0800
+Message-ID: <9F2B2656C8747B498D56A7B30FF5EB9FF07D14@CNMAIL13.cn.utstarcom.com>
+In-Reply-To: <49929929.5090206@isc.cnr.it>
+From: "Yao Ye" <yeyao@utstar.com>
+To: "GianPiero Puccioni" <gianpiero.puccioni@isc.cnr.it>
+Cc: <linux-bluetooth@vger.kernel.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrew,
-
-> This eliminates a sparse warning that symbol 'stat' shadows an earlier one.
-> 
-> Signed-off-by: Andre Haupt <andre@bitwigglers.org>
-> Cc: Marcel Holtmann <marcel@holtmann.org>
-> Cc: Dave Young <hidave.darkstar@gmail.com>
-> Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
-
-already part of my bluetooth-testing.git tree.
-
-Regards
-
-Marcel
-
-
+you can try c samples on :
+openobex-1.4.tar.gz\apps\obex_test
