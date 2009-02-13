@@ -1,24 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
+Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
-Date: Fri, 13 Feb 2009 20:35:48 +0800
-Message-ID: <405896310902130435x5000819bwd61fac2207b13248@mail.gmail.com>
-Subject: Can bluez play sco and a2dp simutaneously?
-From: galaha s <galaha.a.s@gmail.com>
+From: "Krishnan R" <r_krish@email.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Date: Fri, 13 Feb 2009 17:02:21 +0530
+Subject: BlueZ 4.17 on Debian
+Message-Id: <20090213113221.633631BF28D@ws1-10.us4.outblaze.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, all
+Hi All,
 
- Scenario:
- A)embedded linux 2.4.36 platform, running bluez 3.36
- B)one bluetooth adapter(csr rom)
- C)two bluetooth peripherals, one is headset and another is a2dp earphone.
+I am seeing a weird problem. I installed BlueZ 4.17 on Debian(lenny RC2) running 2.6.27. Installation went through but bluez-gnome is not even discovering devices. When hcitool scan is used, it discovers devices but connection is not going through. Uninstalled BlueZ4.17, installed the defualt BlueZ(3.36) which comes with the debian release and it worked without any issues. I feel it's something to do with one of the dependent packages. Please let me know if you have any info on this.
 
- I wonder if it is possible to play sco to headset and a2dp to a2dp
- earphone simutaneously via bluez? BTW, I can play sco or a2dp well
- respectively.
+Regards,
+Krishnan
 
- regards,
- Galaha.S
+-- 
+Be Yourself @ mail.com!
+Choose From 200+ Email Addresses
+Get a Free Account at www.mail.com
+
