@@ -1,23 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
-From: "Krishnan R" <r_krish@email.com>
+Date: Fri, 13 Feb 2009 12:39:16 +0200
+Message-ID: <dfb262380902130239p279f3454g27f0054c3cd324d4@mail.gmail.com>
+Subject: minimum required for a2dp ?
+From: Ramagudi Naziir <naziirr@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Date: Fri, 13 Feb 2009 17:02:21 +0530
-Subject: BlueZ 4.17 on Debian
-Message-Id: <20090213113221.633631BF28D@ws1-10.us4.outblaze.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+hi all,
 
-I am seeing a weird problem. I installed BlueZ 4.17 on Debian(lenny RC2) running 2.6.27. Installation went through but bluez-gnome is not even discovering devices. When hcitool scan is used, it discovers devices but connection is not going through. Uninstalled BlueZ4.17, installed the defualt BlueZ(3.36) which comes with the debian release and it worked without any issues. I feel it's something to do with one of the dependent packages. Please let me know if you have any info on this.
+I am running bluez on an embedded system, and I want to play a2dp.
 
-Regards,
-Krishnan
+I've successfully used the dbus api to CreateDevice, and then to
+connect to the sink. seems fine (I could see from hcid debug messages
+that the stream was opened and is now in idle).
 
--- 
-Be Yourself @ mail.com!
-Choose From 200+ Email Addresses
-Get a Free Account at www.mail.com
+Now I just need to move the stream to streaming mode and start sending
+audio data.
 
+I see there is alsa plugins but i'm not sure i have alsa setup on my system.
+
+is there any other test util i can use just to start playing a2dp ? I
+really would like the minimum required just to send the audio packets
+and to be able to demo the a2dp...
+
+btw - i'm still using bluez 3.36, i must be able to demo on it, and
+cannot yet move to 4.x.
+
+thank you all for the help!
+naziir
