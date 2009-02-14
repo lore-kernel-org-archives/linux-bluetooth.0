@@ -1,27 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Sat, 14 Feb 2009 17:35:02 +0530
-Message-ID: <6887eb5d0902140405x11b91ad2o8471954cabc64d7c@mail.gmail.com>
-Subject: OBEX profile support
-From: Kartikey Parmar <kartikey2781@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Tomas Winkler <tomas.winkler@intel.com>
+To: stable@kernel.org,
+	marcel@holtmann.org
+Cc: linux-bluetooth@vger.kernel.org, Tomas Winkler <tomas.winkler@intel.com>
+Subject: [PATCH 2/2] Bluetooth: Fix TX error path in btsdio driver
+Date: Sat, 14 Feb 2009 13:02:06 +0200
+Message-Id: <1234609326-583-3-git-send-email-tomas.winkler@intel.com>
+In-Reply-To: <1234609326-583-2-git-send-email-tomas.winkler@intel.com>
+References: <1234609326-583-1-git-send-email-tomas.winkler@intel.com>
+ <1234609326-583-2-git-send-email-tomas.winkler@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-hi
+This patch fixes accumulating of the header in case packet was requeued
+in the error path.
 
-I want to support file transfer between two bluetooth devices (say
-mobile phone & desktop pc) in my application...
-Is there any utility bluez provides on which I can test first whether
-it is working or not! like
+Signed-off-by: Tomas Winkler <tomas.winkler@intel.com>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ drivers/bluetooth/btsdio.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-hcitool, sdptool etc...or I will have to work on some utility to
-implement OBEX???
-
-pls reply if somebody has done this...
-
+diff --git a/drivers/bluetooth/btsdio.c b/drivers/bluetooth/btsdio.c
+index cda6c7c..f2ada0c 100644
+--- a/drivers/bluetooth/btsdio.c
++++ b/drivers/bluetooth/btsdio.c
+@@ -91,6 +91,7 @@ static int btsdio_tx_packet(struct btsdio_data *data, struct sk_buff *skb)
+ 
+ 	err = sdio_writesb(data->func, REG_TDAT, skb->data, skb->len);
+ 	if (err < 0) {
++		skb_pull(skb, 4);
+ 		sdio_writeb(data->func, 0x01, REG_PC_WRT, NULL);
+ 		return err;
+ 	}
 -- 
-Kartikey Parmar
-President AAECC
-09879095390 (M)
+1.6.0.6
+
+---------------------------------------------------------------------
+Intel Israel (74) Limited
+
+This e-mail and any attachments may contain confidential material for
+the sole use of the intended recipient(s). Any review or distribution
+by others is strictly prohibited. If you are not the intended
+recipient, please contact the sender and delete all copies.
