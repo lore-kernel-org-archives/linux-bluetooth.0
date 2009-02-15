@@ -1,48 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <BAY114-DS2DC8ADEB0A7BCA5D29E62B1B70@phx.gbl>
-From: "shy" <shyboysby@hotmail.com>
-To: "'Kartikey Parmar'" <kartikey2781@gmail.com>,
-	<linux-bluetooth@vger.kernel.org>
-References: <6887eb5d0902140405x11b91ad2o8471954cabc64d7c@mail.gmail.com>
-Subject: RE: OBEX profile support
-Date: Mon, 16 Feb 2009 12:57:09 +0800
-MIME-Version: 1.0
-Content-Type: text/plain; charset="gb2312"
-In-Reply-To: <6887eb5d0902140405x11b91ad2o8471954cabc64d7c@mail.gmail.com>
+Subject: Re: Can get skype working with mono bluetooth earpiece, but not
+ stereo bluetooth headset
+From: "Ted T. Logan" <tedtheologian@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1234729942.6136.3.camel@home>
+References: <1234729942.6136.3.camel@home>
+Content-Type: text/plain
+Date: Sun, 15 Feb 2009 16:16:39 -0600
+Message-Id: <1234736199.8012.3.camel@home>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, Kartikey
-You can use obexftp to do your task. You can find obexftp in folder
-/obexftp/apps.
-Brs
-Shi Buyun 
+I also tried using profile voice, still no go:(
 
------Original Message-----
-From: linux-bluetooth-owner@vger.kernel.org
-[mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Kartikey Parmar
-Sent: 2009Äê2ÔÂ14ÈÕ 20:05
-To: linux-bluetooth@vger.kernel.org
-Subject: OBEX profile support
+pcm.bluetoothstereo {
+   type bluetooth
+     device 00:18:E4:0C:4D:17 #headset
+   profile "voice"
+}
 
-hi
 
-I want to support file transfer between two bluetooth devices (say mobile
-phone & desktop pc) in my application...
-Is there any utility bluez provides on which I can test first whether it is
-working or not! like
-
-hcitool, sdptool etc...or I will have to work on some utility to implement
-OBEX???
-
-pls reply if somebody has done this...
-
---
-Kartikey Parmar
-President AAECC
-09879095390 (M)
---
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-in the body of a message to majordomo@vger.kernel.org More majordomo info at
-http://vger.kernel.org/majordomo-info.html
+On Sun, 2009-02-15 at 14:32 -0600, Ted T. Logan wrote:
+> I have skype working fine with my mono bluetooth earpiece, moto 550, but
+> I can't get it working correctly with my iogear stereo headset.
+> 
+> I get audio, but the other person/skype test call cannot hear me.
+> However, I can hear myself echo when I talk.
+> 
+> pcm.bluetoothstereo {
+>    type bluetooth
+>      device 00:18:E4:0C:4D:17 #headset
+>    profile "auto"
+> }
+> 
+> 
+> I do notice I have to remove "profile" line to get it working at all
+> with skype.
+> 
+> Here's the entry for my WORKING h550
+> pcm.bluetoothh550 {
+>    type bluetooth
+>    device 00:1A:0E:08:03:90 # h550
+> }
+> 
+> 
+> in either case, I choose sound in/out in skype as the device mentioned.
+> 
+> fc10 machine
+> rpmq bluez
+> bluez-4.22-2.fc10.i386
+> bluez-libs-4.22-2.fc10.i386
+> bluez-cups-4.22-2.fc10.i386
+> bluez-gnome-1.8-11.fc10.i386
+> pybluez-0.15-2.fc10.i386
+> bluez-hcidump-1.42-2.fc10.i386
+> bluez-alsa-4.22-2.fc10.i386
+> bluez-libs-devel-4.22-2.fc10.i386
+> bluez-gstreamer-4.22-2.fc10.i386
+> 
+> 
 
