@@ -1,50 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Can get skype working with mono bluetooth earpiece, but not stereo
-  bluetooth headset
-From: "Ted T. Logan" <tedtheologian@gmail.com>
+From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain
-Date: Sun, 15 Feb 2009 14:32:22 -0600
-Message-Id: <1234729942.6136.3.camel@home>
-Mime-Version: 1.0
+Subject: [PATCH 6/6] Make expand_name a void function
+Date: Sun, 15 Feb 2009 16:47:26 -0300
+Message-Id: <1234727246-21064-6-git-send-email-gustavo@las.ic.unicamp.br>
+In-Reply-To: <1234727246-21064-5-git-send-email-gustavo@las.ic.unicamp.br>
+References: <1234727246-21064-1-git-send-email-gustavo@las.ic.unicamp.br>
+ <1234727246-21064-2-git-send-email-gustavo@las.ic.unicamp.br>
+ <1234727246-21064-3-git-send-email-gustavo@las.ic.unicamp.br>
+ <1234727246-21064-4-git-send-email-gustavo@las.ic.unicamp.br>
+ <1234727246-21064-5-git-send-email-gustavo@las.ic.unicamp.br>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I have skype working fine with my mono bluetooth earpiece, moto 550, but
-I can't get it working correctly with my iogear stereo headset.
+---
+ src/main.c |    5 ++---
+ 1 files changed, 2 insertions(+), 3 deletions(-)
 
-I get audio, but the other person/skype test call cannot hear me.
-However, I can hear myself echo when I talk.
-
-pcm.bluetoothstereo {
-   type bluetooth
-     device 00:18:E4:0C:4D:17 #headset
-   profile "auto"
-}
-
-
-I do notice I have to remove "profile" line to get it working at all
-with skype.
-
-Here's the entry for my WORKING h550
-pcm.bluetoothh550 {
-   type bluetooth
-   device 00:1A:0E:08:03:90 # h550
-}
-
-
-in either case, I choose sound in/out in skype as the device mentioned.
-
-fc10 machine
-rpmq bluez
-bluez-4.22-2.fc10.i386
-bluez-libs-4.22-2.fc10.i386
-bluez-cups-4.22-2.fc10.i386
-bluez-gnome-1.8-11.fc10.i386
-pybluez-0.15-2.fc10.i386
-bluez-hcidump-1.42-2.fc10.i386
-bluez-alsa-4.22-2.fc10.i386
-bluez-libs-devel-4.22-2.fc10.i386
-bluez-gstreamer-4.22-2.fc10.i386
-
+diff --git a/src/main.c b/src/main.c
+index c86ae96..5ca1b27 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -266,13 +266,13 @@ static void update_service_classes(const bdaddr_t *bdaddr, uint8_t value)
+  * Device name expansion
+  *   %d - device id
+  */
+-static char *expand_name(char *dst, int size, char *str, int dev_id)
++static void expand_name(char *dst, int size, char *str, int dev_id)
+ {
+ 	register int sp, np, olen;
+ 	char *opt, buf[10];
+ 
+ 	if (!str && !dst)
+-		return NULL;
++		return;
+ 
+ 	sp = np = 0;
+ 	while (np < size - 1 && str[sp]) {
+@@ -317,7 +317,6 @@ static char *expand_name(char *dst, int size, char *str, int dev_id)
+ 		}
+ 	}
+ 	dst[np] = '\0';
+-	return dst;
+ }
+ 
+ static gboolean child_exit(GIOChannel *io, GIOCondition cond, void *user_data)
+-- 
+1.6.0.6
 
