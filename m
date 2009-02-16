@@ -1,34 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Mon, 16 Feb 2009 15:42:42 -0800
-Message-ID: <35c90d960902161542j7d0826b7qbcbcb914fa706d15@mail.gmail.com>
-Subject: How to automatically initiate sniff mode
-From: Nick Pelly <npelly@google.com>
+Date: Mon, 16 Feb 2009 20:19:03 +0100
+Message-ID: <ed0880710902161119y583fa36cq68a9e30933596548@mail.gmail.com>
+Subject: What happened with bluez-gnome development?
+From: Tomasz Dominikowski <dominikowski@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi. This might not be the correct place to ask, but it is certainly
+related. Why hasn't at this point a bluez-gnome release been made? I
+ask this, because I desperately need to have the translations of
+bluez-gnome synchronized back from Launchpad to a new tarball. This is
+needed, because there is apparently no other way to update the
+translations in Ubuntu than to have an updated tarball with updated
+translations. The 1.8 tarball doesn't contain updated translations and
+Launchpad does not use the ones updated after the release so our
+(translators) hands are tied. This is beyond the point, because there
+hasn't been a sync for 3 months now, so it's rather overdue. Apart
+from the translations there have been a few healthy commits that would
+finally land in a released version. Can anyone please cut a
+bluez-gnome 1.9 tarball, with synchronized translations from
+Launchpad? Thank you in advance.
 
-We have come across a headset (HTC M200) that does not send out a
-sniff mode request when in idle. Our Bluez based stack also does not
-send a sniff mode request, so we sit in a higher power state that
-necessary. (20mA instead of 1mA).
+Regards,
+              Tomasz Dominikowski
 
-Some quick research suggests that we would need to send HCI Sniff Mode
-Command (OCF 0x03) to initiate sniff mode, and that this is not yet
-done in the Bluez code base. We do send the HCI Write Default Link
-Policy Settings Command but, as I understand, this is only applied to
-incoming sniff mode requests by the link manager and will not initiate
-an LMP sniff request.
-
-We compared to two non-bluez mobile stacks and found the other phones
-did automatically initiate an LMP sniff mode request.
-
-Is there a reason for Bluez not automatically sending HCI Sniff Mode
-Command, or is it just a case of no-one getting around to hitting the
-problem / implementing a fix? Or have I missed something simple?
-
-Cheers,
-Nick
+-- 
+Tomasz Dominikowski
+http://launchpad.net/~dominikowski
+"Brian, let us pray. Dear Lord... stay out of our way!"
