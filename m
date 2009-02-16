@@ -1,99 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <49999BDA.8010001@dell.com>
-Date: Mon, 16 Feb 2009 11:01:14 -0600
-From: Mario Limonciello <mario_limonciello@dell.com>
-MIME-Version: 1.0
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH] Show BlueZ gnome utilities in XFCE
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="------------enigE7BAE9E598AB4EB11B7E2CF3"
+From: =?utf-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: =?utf-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>
+Subject: [PATCH] sbc: provide implementation info as a readable string
+Date: Mon, 16 Feb 2009 15:59:51 +0200
+Message-Id: <1234792791-5797-1-git-send-email-marcandre.lureau@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enigE7BAE9E598AB4EB11B7E2CF3
-Content-Type: multipart/mixed;
- boundary="------------070805070908020608010001"
+This is mainly useful for logging and debugging.
+---
+ sbc/sbc.c                 |   14 ++++++++++++++
+ sbc/sbc.h                 |    1 +
+ sbc/sbc_primitives.c      |    1 +
+ sbc/sbc_primitives.h      |    1 +
+ sbc/sbc_primitives_mmx.c  |    1 +
+ sbc/sbc_primitives_neon.c |    1 +
+ 6 files changed, 19 insertions(+), 0 deletions(-)
 
-This is a multi-part message in MIME format.
---------------070805070908020608010001
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+diff --git a/sbc/sbc.c b/sbc/sbc.c
+index 29258d0..e2e7c61 100644
+--- a/sbc/sbc.c
++++ b/sbc/sbc.c
+@@ -1221,6 +1221,20 @@ uint16_t sbc_get_codesize(sbc_t *sbc)
+ 	return subbands * blocks * channels * 2;
+ }
+ 
++const char *sbc_get_implementation_info(sbc_t *sbc)
++{
++	struct sbc_priv *priv;
++
++	if (!sbc)
++		return NULL;
++
++	priv = sbc->priv;
++	if (!priv)
++		return NULL;
++
++	return priv->enc_state.implementation_info;
++}
++
+ int sbc_reinit(sbc_t *sbc, unsigned long flags)
+ {
+ 	struct sbc_priv *priv;
+diff --git a/sbc/sbc.h b/sbc/sbc.h
+index b0a1488..f9d506b 100644
+--- a/sbc/sbc.h
++++ b/sbc/sbc.h
+@@ -89,6 +89,7 @@ int sbc_encode(sbc_t *sbc, void *input, int input_len, void *output,
+ int sbc_get_frame_length(sbc_t *sbc);
+ int sbc_get_frame_duration(sbc_t *sbc);
+ uint16_t sbc_get_codesize(sbc_t *sbc);
++const char *sbc_get_implementation_info(sbc_t *sbc);
+ void sbc_finish(sbc_t *sbc);
+ 
+ #ifdef __cplusplus
+diff --git a/sbc/sbc_primitives.c b/sbc/sbc_primitives.c
+index 303f3fe..6b0be3f 100644
+--- a/sbc/sbc_primitives.c
++++ b/sbc/sbc_primitives.c
+@@ -456,6 +456,7 @@ void sbc_init_primitives(struct sbc_encoder_state *state)
+ 
+ 	/* Default implementation for scale factors calculation */
+ 	state->sbc_calc_scalefactors = sbc_calc_scalefactors;
++	state->implementation_info = "Generic C";
+ 
+ 	/* X86/AMD64 optimizations */
+ #ifdef SBC_BUILD_WITH_MMX_SUPPORT
+diff --git a/sbc/sbc_primitives.h b/sbc/sbc_primitives.h
+index 2708c82..3d01c11 100644
+--- a/sbc/sbc_primitives.h
++++ b/sbc/sbc_primitives.h
+@@ -62,6 +62,7 @@ struct sbc_encoder_state {
+ 	void (*sbc_calc_scalefactors)(int32_t sb_sample_f[16][2][8],
+ 			uint32_t scale_factor[2][8],
+ 			int blocks, int channels, int subbands);
++	const char *implementation_info;
+ };
+ 
+ /*
+diff --git a/sbc/sbc_primitives_mmx.c b/sbc/sbc_primitives_mmx.c
+index 1870a9b..08e9ca2 100644
+--- a/sbc/sbc_primitives_mmx.c
++++ b/sbc/sbc_primitives_mmx.c
+@@ -313,6 +313,7 @@ void sbc_init_primitives_mmx(struct sbc_encoder_state *state)
+ 	if (check_mmx_support()) {
+ 		state->sbc_analyze_4b_4s = sbc_analyze_4b_4s_mmx;
+ 		state->sbc_analyze_4b_8s = sbc_analyze_4b_8s_mmx;
++		state->implementation_info = "MMX";
+ 	}
+ }
+ 
+diff --git a/sbc/sbc_primitives_neon.c b/sbc/sbc_primitives_neon.c
+index d9c12f9..f1bc7b4 100644
+--- a/sbc/sbc_primitives_neon.c
++++ b/sbc/sbc_primitives_neon.c
+@@ -240,6 +240,7 @@ void sbc_init_primitives_neon(struct sbc_encoder_state *state)
+ {
+ 	state->sbc_analyze_4b_4s = sbc_analyze_4b_4s_neon;
+ 	state->sbc_analyze_4b_8s = sbc_analyze_4b_8s_neon;
++	state->implementation_info = "NEON";
+ }
+ 
+ #endif
+-- 
+1.6.1.224.gb56c
 
-Hi:
-
-This patch is forwarded from an Ubuntu bug tracker and Gnome bug
-tracker.  The original patch is by Joel Ebel from Google.  It enables
-the gnome tools to show up in XFCE.
-
-Thanks,
---=20
-Mario Limonciello
-*Dell | Linux Engineering*
-mario_limonciello@dell.com
-
---------------070805070908020608010001
-Content-Type: text/x-patch;
- name="08_XFCE.patch"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline;
- filename="08_XFCE.patch"
-
-diff -Nur -x '*.orig' -x '*~' bluez-gnome-1.8/analyzer/bluetooth-analyzer=
-=2Edesktop.in bluez-gnome-1.8.new/analyzer/bluetooth-analyzer.desktop.in
---- bluez-gnome-1.8/analyzer/bluetooth-analyzer.desktop.in	2009-02-04 14:=
-04:41.000000000 -0800
-+++ bluez-gnome-1.8.new/analyzer/bluetooth-analyzer.desktop.in	2009-02-04=
- 14:02:24.000000000 -0800
-@@ -8,5 +8,5 @@
- MimeType=3Dapplication/x-hcidump;application/x-btsnoop;application/x-pkt=
-log;
- Type=3DApplication
- Categories=3DSystem;Monitor;
--OnlyShowIn=3DGNOME;
-+OnlyShowIn=3DGNOME;XFCE;
- NoDisplay=3Dtrue
-diff -Nur -x '*.orig' -x '*~' bluez-gnome-1.8/applet/bluetooth-applet.des=
-ktop.in bluez-gnome-1.8.new/applet/bluetooth-applet.desktop.in
---- bluez-gnome-1.8/applet/bluetooth-applet.desktop.in	2008-08-29 08:32:5=
-3.000000000 -0700
-+++ bluez-gnome-1.8.new/applet/bluetooth-applet.desktop.in	2009-02-04 13:=
-55:31.000000000 -0800
-@@ -7,4 +7,4 @@
- Terminal=3Dfalse
- Type=3DApplication
- Categories=3D
--OnlyShowIn=3DGNOME;
-+OnlyShowIn=3DGNOME;XFCE;
-diff -Nur -x '*.orig' -x '*~' bluez-gnome-1.8/properties/bluetooth-proper=
-ties.desktop.in bluez-gnome-1.8.new/properties/bluetooth-properties.deskt=
-op.in
---- bluez-gnome-1.8/properties/bluetooth-properties.desktop.in	2008-09-13=
- 10:34:11.000000000 -0700
-+++ bluez-gnome-1.8.new/properties/bluetooth-properties.desktop.in	2009-0=
-2-04 14:02:56.000000000 -0800
-@@ -7,4 +7,4 @@
- Terminal=3Dfalse
- Type=3DApplication
- Categories=3DGTK;GNOME;Settings;HardwareSettings;
--OnlyShowIn=3DGNOME;
-+OnlyShowIn=3DGNOME;XFCE;
-
---------------070805070908020608010001--
-
---------------enigE7BAE9E598AB4EB11B7E2CF3
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
-
-iEYEARECAAYFAkmZm9oACgkQ2CrZjkA73YurygCePzsv+I2FzXgL4o4VOnivfDNy
-pO8AoIEsLbvEY2bWeufB6Akqx9oExK7z
-=QV9C
------END PGP SIGNATURE-----
-
---------------enigE7BAE9E598AB4EB11B7E2CF3--
