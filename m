@@ -1,108 +1,136 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?utf-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?utf-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>
-Subject: [PATCH] sbc: provide implementation info as a readable string
-Date: Mon, 16 Feb 2009 15:59:51 +0200
-Message-Id: <1234792791-5797-1-git-send-email-marcandre.lureau@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <BAY114-DS16A8C9E600F64096D25D4B1B70@phx.gbl>
+References: <6887eb5d0902140405x11b91ad2o8471954cabc64d7c@mail.gmail.com>
+	 <BAY114-DS2DC8ADEB0A7BCA5D29E62B1B70@phx.gbl>
+	 <6b53b1990902152203r4fa9e50ajcc5d050c2ee3b5b8@mail.gmail.com>
+	 <BAY114-DS16A8C9E600F64096D25D4B1B70@phx.gbl>
+Date: Mon, 16 Feb 2009 09:46:21 -0300
+Message-ID: <6b53b1990902160446s14960c17j32da4f778d623234@mail.gmail.com>
+Subject: Re: OBEX profile support
+From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
+To: shy <shyboysby@hotmail.com>
+Cc: Kartikey Parmar <kartikey2781@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=GB2312
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is mainly useful for logging and debugging.
----
- sbc/sbc.c                 |   14 ++++++++++++++
- sbc/sbc.h                 |    1 +
- sbc/sbc_primitives.c      |    1 +
- sbc/sbc_primitives.h      |    1 +
- sbc/sbc_primitives_mmx.c  |    1 +
- sbc/sbc_primitives_neon.c |    1 +
- 6 files changed, 19 insertions(+), 0 deletions(-)
+On Mon, Feb 16, 2009 at 3:24 AM, shy <shyboysby@hotmail.com> wrote:
+> Hi,
+> You need openobex compiled firstly, and then you could use obexftp to do
+> file transfer. Openobex and obexftp support bluetooth channel.
+> Brs
 
-diff --git a/sbc/sbc.c b/sbc/sbc.c
-index 29258d0..e2e7c61 100644
---- a/sbc/sbc.c
-+++ b/sbc/sbc.c
-@@ -1221,6 +1221,20 @@ uint16_t sbc_get_codesize(sbc_t *sbc)
- 	return subbands * blocks * channels * 2;
- }
- 
-+const char *sbc_get_implementation_info(sbc_t *sbc)
-+{
-+	struct sbc_priv *priv;
-+
-+	if (!sbc)
-+		return NULL;
-+
-+	priv = sbc->priv;
-+	if (!priv)
-+		return NULL;
-+
-+	return priv->enc_state.implementation_info;
-+}
-+
- int sbc_reinit(sbc_t *sbc, unsigned long flags)
- {
- 	struct sbc_priv *priv;
-diff --git a/sbc/sbc.h b/sbc/sbc.h
-index b0a1488..f9d506b 100644
---- a/sbc/sbc.h
-+++ b/sbc/sbc.h
-@@ -89,6 +89,7 @@ int sbc_encode(sbc_t *sbc, void *input, int input_len, void *output,
- int sbc_get_frame_length(sbc_t *sbc);
- int sbc_get_frame_duration(sbc_t *sbc);
- uint16_t sbc_get_codesize(sbc_t *sbc);
-+const char *sbc_get_implementation_info(sbc_t *sbc);
- void sbc_finish(sbc_t *sbc);
- 
- #ifdef __cplusplus
-diff --git a/sbc/sbc_primitives.c b/sbc/sbc_primitives.c
-index 303f3fe..6b0be3f 100644
---- a/sbc/sbc_primitives.c
-+++ b/sbc/sbc_primitives.c
-@@ -456,6 +456,7 @@ void sbc_init_primitives(struct sbc_encoder_state *state)
- 
- 	/* Default implementation for scale factors calculation */
- 	state->sbc_calc_scalefactors = sbc_calc_scalefactors;
-+	state->implementation_info = "Generic C";
- 
- 	/* X86/AMD64 optimizations */
- #ifdef SBC_BUILD_WITH_MMX_SUPPORT
-diff --git a/sbc/sbc_primitives.h b/sbc/sbc_primitives.h
-index 2708c82..3d01c11 100644
---- a/sbc/sbc_primitives.h
-+++ b/sbc/sbc_primitives.h
-@@ -62,6 +62,7 @@ struct sbc_encoder_state {
- 	void (*sbc_calc_scalefactors)(int32_t sb_sample_f[16][2][8],
- 			uint32_t scale_factor[2][8],
- 			int blocks, int channels, int subbands);
-+	const char *implementation_info;
- };
- 
- /*
-diff --git a/sbc/sbc_primitives_mmx.c b/sbc/sbc_primitives_mmx.c
-index 1870a9b..08e9ca2 100644
---- a/sbc/sbc_primitives_mmx.c
-+++ b/sbc/sbc_primitives_mmx.c
-@@ -313,6 +313,7 @@ void sbc_init_primitives_mmx(struct sbc_encoder_state *state)
- 	if (check_mmx_support()) {
- 		state->sbc_analyze_4b_4s = sbc_analyze_4b_4s_mmx;
- 		state->sbc_analyze_4b_8s = sbc_analyze_4b_8s_mmx;
-+		state->implementation_info = "MMX";
- 	}
- }
- 
-diff --git a/sbc/sbc_primitives_neon.c b/sbc/sbc_primitives_neon.c
-index d9c12f9..f1bc7b4 100644
---- a/sbc/sbc_primitives_neon.c
-+++ b/sbc/sbc_primitives_neon.c
-@@ -240,6 +240,7 @@ void sbc_init_primitives_neon(struct sbc_encoder_state *state)
- {
- 	state->sbc_analyze_4b_4s = sbc_analyze_4b_4s_neon;
- 	state->sbc_analyze_4b_8s = sbc_analyze_4b_8s_neon;
-+	state->implementation_info = "NEON";
- }
- 
- #endif
+I have openobex compiled, but obexftp fail to compile due to its bluetooth code.
+
+if gcc -DHAVE_CONFIG_H -I. -I. -I.. -I.. -I../includes    -g -O2 -W
+-Wundef -Wmissing-declarations -Wmissing-prototypes -Wall -MT
+obexftpd.o -MD -MP -MF ".deps/obexftpd.Tpo" -c -o obexftpd.o
+obexftpd.c; \
+        then mv -f ".deps/obexftpd.Tpo" ".deps/obexftpd.Po"; else rm
+-f ".deps/obexftpd.Tpo"; exit 1; fi
+obexftpd.c:81: error: expected '=', ',', ';', 'asm' or '__attribute__'
+before '*' token
+obexftpd.c: In function 'start_server':
+obexftpd.c:891: warning: implicit declaration of function
+'BtOBEX_ServerRegister'
+obexftpd.c:891: error: 'bt_src' undeclared (first use in this function)
+obexftpd.c:891: error: (Each undeclared identifier is reported only once
+obexftpd.c:891: error: for each function it appears in.)
+
+
+
+
+> Shi Buyun
+>
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org
+> [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Gustavo F.
+> Padovan
+> Sent: 2009年2月16日 14:04
+> To: shy
+> Cc: Kartikey Parmar; linux-bluetooth@vger.kernel.org
+> Subject: Re: OBEX profile support
+>
+> Hi,
+>
+> 2009/2/16 shy <shyboysby@hotmail.com>:
+>> Hi, Kartikey
+>> You can use obexftp to do your task. You can find obexftp in folder
+>> /obexftp/apps.
+>
+> I have the same doubt: how to transfer files. I find out obexftp, but does
+> it support BlueZ 4.x? Version 0.22 of obexftp not even compile with BlueZ 4.
+> x.
+> And what folder is that? Where can I find it?
+>
+>> Brs
+>> Shi Buyun
+>>
+>> -----Original Message-----
+>> From: linux-bluetooth-owner@vger.kernel.org
+>> [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Kartikey
+>> Parmar
+>> Sent: 2009年2月14日 20:05
+>> To: linux-bluetooth@vger.kernel.org
+>> Subject: OBEX profile support
+>>
+>> hi
+>>
+>> I want to support file transfer between two bluetooth devices (say
+>> mobile phone & desktop pc) in my application...
+>> Is there any utility bluez provides on which I can test first whether
+>> it is working or not! like
+>>
+>> hcitool, sdptool etc...or I will have to work on some utility to
+>> implement OBEX???
+>>
+>> pls reply if somebody has done this...
+>>
+>> --
+>> Kartikey Parmar
+>> President AAECC
+>> 09879095390 (M)
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+>> in the body of a message to majordomo@vger.kernel.org More majordomo
+>> info at http://vger.kernel.org/majordomo-info.html
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe
+>> linux-bluetooth" in the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>
+>
+>
+> --
+> Gustavo F. Padovan
+>
+> Computer Engineering Student
+> Institute of Computing - IC
+> University of Campinas - UNICAMP
+>
+> email: gustavo@las.ic.unicamp.br
+> gtalk: gfpadovan@gmail.com
+> mobile: +55 19 81030803
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> in the body of a message to majordomo@vger.kernel.org More majordomo info at
+> http://vger.kernel.org/majordomo-info.html
+>
+>
+
+
+
 -- 
-1.6.1.224.gb56c
+Gustavo F. Padovan
 
+Computer Engineering Student
+Institute of Computing - IC
+University of Campinas - UNICAMP
+
+email: gustavo@las.ic.unicamp.br
+gtalk: gfpadovan@gmail.com
+mobile: +55 19 81030803
