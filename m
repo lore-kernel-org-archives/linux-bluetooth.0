@@ -1,77 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <BAY114-DS2DC8ADEB0A7BCA5D29E62B1B70@phx.gbl>
-References: <6887eb5d0902140405x11b91ad2o8471954cabc64d7c@mail.gmail.com>
-	 <BAY114-DS2DC8ADEB0A7BCA5D29E62B1B70@phx.gbl>
-Date: Mon, 16 Feb 2009 03:03:30 -0300
-Message-ID: <6b53b1990902152203r4fa9e50ajcc5d050c2ee3b5b8@mail.gmail.com>
-Subject: Re: OBEX profile support
-From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
-To: shy <shyboysby@hotmail.com>
-Cc: Kartikey Parmar <kartikey2781@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=GB2312
+In-Reply-To: <6887eb5d0902152122s61dda703k5e316f64b2f1a639@mail.gmail.com>
+References: <6887eb5d0902152122s61dda703k5e316f64b2f1a639@mail.gmail.com>
+Date: Mon, 16 Feb 2009 14:03:02 +0800
+Message-ID: <a172fe730902152203r3b11aa75r9ff605e60b6cacab@mail.gmail.com>
+Subject: Re: Problem Installing bluez-utils-3.36.tar.gz & bluez-libs-3.36.tar.gz
+From: =?GB2312?B?seXA2g==?= <mykofzone@gmail.com>
+To: Kartikey Parmar <kartikey2781@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
+    The default path is '/usr/local/xxx' if you configing without any arguments.
 
-2009/2/16 shy <shyboysby@hotmail.com>:
-> Hi, Kartikey
-> You can use obexftp to do your task. You can find obexftp in folder
-> /obexftp/apps.
-
-I have the same doubt: how to transfer files. I find out obexftp, but
-does it support BlueZ 4.x? Version 0.22 of obexftp not even compile
-with BlueZ 4.x.
-And what folder is that? Where can I find it?
-
-> Brs
-> Shi Buyun
+2009/2/16 Kartikey Parmar <kartikey2781@gmail.com>:
+> Hi,
 >
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org
-> [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Kartikey Parmar
-> Sent: 2009Äê2ÔÂ14ÈÕ 20:05
-> To: linux-bluetooth@vger.kernel.org
-> Subject: OBEX profile support
+> I have downloaded bluez-utils-3.36.tar.gz & bluez-libs-3.36.tar.gz
+> from www.bluez.org
+> When I run ./configure it checks for all required utilities & its
+> versions, but when I run make && make install after becoming "su" on
+> Fedora 9, it shows that it is successfully installed in PC but I don't
+> find its folder in my PC, when I try to locate it is located only in
+> the
+> folder from which I run the ./configure, make && make install...
+> It doesn't create any folder in /usr/...
 >
-> hi
->
-> I want to support file transfer between two bluetooth devices (say mobile
-> phone & desktop pc) in my application...
-> Is there any utility bluez provides on which I can test first whether it is
-> working or not! like
->
-> hcitool, sdptool etc...or I will have to work on some utility to implement
-> OBEX???
->
-> pls reply if somebody has done this...
->
+> Pls suggest me wht to do for getting installed these on Fedora 9...
 > --
 > Kartikey Parmar
 > President AAECC
 > 09879095390 (M)
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in the body of a message to majordomo@vger.kernel.org More majordomo info at
-> http://vger.kernel.org/majordomo-info.html
->
-> --
 > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
 > the body of a message to majordomo@vger.kernel.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >
-
-
-
--- 
-Gustavo F. Padovan
-
-Computer Engineering Student
-Institute of Computing - IC
-University of Campinas - UNICAMP
-
-email: gustavo@las.ic.unicamp.br
-gtalk: gfpadovan@gmail.com
-mobile: +55 19 81030803
