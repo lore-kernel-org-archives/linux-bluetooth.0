@@ -1,28 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 17 Feb 2009 23:57:55 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] sbc: provide implementation info as a readable string
-Message-ID: <20090217215755.GA10933@jh-x301>
-References: <1234792791-5797-1-git-send-email-marcandre.lureau@gmail.com>
+From: marcandre.lureau@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Cc: =?utf-8?q?Marc-Andr=C3=A9=20Lureau?= <marc-andre.lureau@nokia.com>
+Subject: [PATCH] sbc: don't dereference sbc pointer if NULL
+Date: Tue, 17 Feb 2009 22:46:41 +0200
+Message-Id: <1234903601-7124-1-git-send-email-marcandre.lureau@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1234792791-5797-1-git-send-email-marcandre.lureau@gmail.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Feb 16, 2009, Marc-AndrÈ Lureau wrote:
-> This is mainly useful for logging and debugging.
-> ---
->  sbc/sbc.c                 |   14 ++++++++++++++
->  sbc/sbc.h                 |    1 +
->  sbc/sbc_primitives.c      |    1 +
->  sbc/sbc_primitives.h      |    1 +
->  sbc/sbc_primitives_mmx.c  |    1 +
->  sbc/sbc_primitives_neon.c |    1 +
->  6 files changed, 19 insertions(+), 0 deletions(-)
+From: Marc-Andr√© Lureau <marc-andre.lureau@nokia.com>
 
-Pushed upstream. Thanks.
+---
+ sbc/sbc.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-Johan
+diff --git a/sbc/sbc.c b/sbc/sbc.c
+index e2e7c61..a33ed57 100644
+--- a/sbc/sbc.c
++++ b/sbc/sbc.c
+@@ -985,7 +985,7 @@ int sbc_decode(sbc_t *sbc, void *input, int input_len, void *output,
+ 	char *ptr;
+ 	int i, ch, framelen, samples;
+ 
+-	if (!sbc && !input)
++	if (!sbc || !input)
+ 		return -EIO;
+ 
+ 	priv = sbc->priv;
+@@ -1053,7 +1053,7 @@ int sbc_encode(sbc_t *sbc, void *input, int input_len, void *output,
+ 			const uint8_t *pcm, int16_t X[2][SBC_X_BUFFER_SIZE],
+ 			int nsamples, int nchannels);
+ 
+-	if (!sbc && !input)
++	if (!sbc || !input)
+ 		return -EIO;
+ 
+ 	priv = sbc->priv;
+-- 
+1.6.1.224.gb56c
+
