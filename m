@@ -1,39 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?utf-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?utf-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>
-Subject: [PATCH] audio: make *_suspend() use bt_stop_stream_rsp
-Date: Tue, 17 Feb 2009 12:49:37 +0200
-Message-Id: <1234867777-24745-1-git-send-email-marcandre.lureau@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <OF066E85D2.BE4D0799-ONC125755C.002E8D45-C125755C.00306BFF@aweurope.be>
+References: <OF066E85D2.BE4D0799-ONC125755C.002E8D45-C125755C.00306BFF@aweurope.be>
+Date: Tue, 17 Feb 2009 16:31:56 +0800
+Message-ID: <ac8af0be0902170031l32c54051w19fdedf1a2aabf6d@mail.gmail.com>
+Subject: Re: [PATCH 0/4] HFP Gateway profile
+From: Zhao Forrest <forrest.zhao@gmail.com>
+To: Thierry Pierret <extern.Thierry.Pierret@awtce.be>
+Cc: linux-bluetooth@vger.kernel.org, event <event.riga@gmail.com>
+Content-Type: multipart/mixed; boundary=0016e644c2e2d5f7f40463192293
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- audio/unix.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+--0016e644c2e2d5f7f40463192293
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/audio/unix.c b/audio/unix.c
-index 294155a..7fc4387 100644
---- a/audio/unix.c
-+++ b/audio/unix.c
-@@ -352,7 +352,7 @@ static void headset_suspend_complete(struct audio_device *dev, void *user_data)
- {
- 	struct unix_client *client = user_data;
- 	char buf[BT_SUGGESTED_BUFFER_SIZE];
--	struct bt_start_stream_rsp *rsp = (void *) buf;
-+	struct bt_stop_stream_rsp *rsp = (void *) buf;
- 
- 	if (!dev)
- 		goto failed;
-@@ -613,7 +613,7 @@ static void a2dp_suspend_complete(struct avdtp *session,
- {
- 	struct unix_client *client = user_data;
- 	char buf[BT_SUGGESTED_BUFFER_SIZE];
--	struct bt_start_stream_rsp *rsp = (void *) buf;
-+	struct bt_stop_stream_rsp *rsp = (void *) buf;
- 	struct a2dp_data *a2dp = &client->d.a2dp;
- 
- 	if (err)
--- 
-1.6.1.224.gb56c
+> 1=B0/ No "Headset" service is exported.
+Yes, this patch only provides the support for "Handsfree", so no
+"Headset" service is exported.
 
+> 2=B0/ As soon as the mobile is paired and the "Handsfree" service is
+> connected, the mobiledirectly disconnects. I cannot see in the logs what'=
+s
+> wrong.
+>
+Please apply the attached patch against my posted patch set and try
+again. It works for me
+to connect with Nokia N95.
+
+Thanks,
+Forrest
+
+--0016e644c2e2d5f7f40463192293
+Content-Type: application/octet-stream; name="5.patch"
+Content-Disposition: attachment; filename="5.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_frabc77o3
+
+ZGlmZiAtLWdpdCBhL2F1ZGlvL2dhdGV3YXkuYyBiL2F1ZGlvL2dhdGV3YXkuYwppbmRleCA0Yjg2
+YzRlLi44OTVjNzcyIDEwMDY0NAotLS0gYS9hdWRpby9nYXRld2F5LmMKKysrIGIvYXVkaW8vZ2F0
+ZXdheS5jCkBAIC01NDMsNiArNTQzLDExIEBAIHN0YXRpYyB2b2lkIHJmY29tbV9jb25uZWN0X2Ni
+KEdJT0NoYW5uZWwgKiBjaGFuLCBpbnQgZXJyLCBjb25zdCBiZGFkZHJfdCAqIHNyYywKIAlnYXRl
+d2F5X2Nsb3NlKGd3KTsKIH0KIAordm9pZCBnYXRld2F5X3N0YXJ0X3NlcnZpY2Uoc3RydWN0IGF1
+ZGlvX2RldmljZSAqZGV2aWNlKQoreworCXJmY29tbV9jb25uZWN0X2NiKGRldmljZS0+Z2F0ZXdh
+eS0+cmZjb21tLCAwLCBOVUxMLCBOVUxMLCBkZXZpY2UpOworfQorCiBzdGF0aWMgdm9pZCBnZXRf
+cmVjb3JkX2NiKHNkcF9saXN0X3QgKiByZWNzLCBpbnQgZXJyLCBncG9pbnRlciB1c2VyX2RhdGEp
+CiB7CiAJc3RydWN0IGF1ZGlvX2RldmljZSAqZGV2ID0gdXNlcl9kYXRhOwpkaWZmIC0tZ2l0IGEv
+YXVkaW8vZ2F0ZXdheS5oIGIvYXVkaW8vZ2F0ZXdheS5oCmluZGV4IGYyMTc1NDQuLjM1NDZjZDQg
+MTAwNjQ0Ci0tLSBhL2F1ZGlvL2dhdGV3YXkuaAorKysgYi9hdWRpby9nYXRld2F5LmgKQEAgLTM4
+LDQgKzM4LDQgQEAgaW50IGdhdGV3YXlfY29uZmlnX3N0cmVhbShzdHJ1Y3QgYXVkaW9fZGV2aWNl
+ICpkZXYsIGdhdGV3YXlfc3RyZWFtX2NiX3QgY2IsCiBnYm9vbGVhbiBnYXRld2F5X2NhbmNlbF9z
+dHJlYW0oc3RydWN0IGF1ZGlvX2RldmljZSAqZGV2LCB1bnNpZ25lZCBpbnQgaWQpOwogaW50IGdh
+dGV3YXlfZ2V0X3Njb19mZChzdHJ1Y3QgYXVkaW9fZGV2aWNlICpkZXYpOwogdm9pZCBnYXRld2F5
+X3N1c3BlbmRfc3RyZWFtKHN0cnVjdCBhdWRpb19kZXZpY2UgKmRldik7Ci0KK3ZvaWQgZ2F0ZXdh
+eV9zdGFydF9zZXJ2aWNlKHN0cnVjdCBhdWRpb19kZXZpY2UgKmRldmljZSk7CmRpZmYgLS1naXQg
+YS9hdWRpby9tYW5hZ2VyLmMgYi9hdWRpby9tYW5hZ2VyLmMKaW5kZXggMTc4ZGU3My4uMzZkN2Y4
+NyAxMDA2NDQKLS0tIGEvYXVkaW8vbWFuYWdlci5jCisrKyBiL2F1ZGlvL21hbmFnZXIuYwpAQCAt
+NDk4LDggKzQ5OCwyMCBAQCBkcm9wOgogCiBzdGF0aWMgdm9pZCBnYXRld2F5X2F1dGhfY2IoREJ1
+c0Vycm9yICpkZXJyLCB2b2lkICp1c2VyX2RhdGEpCiB7CisJc3RydWN0IGF1ZGlvX2RldmljZSAq
+ZGV2aWNlID0gdXNlcl9kYXRhOworCiAJaWYgKGRlcnIgJiYgZGJ1c19lcnJvcl9pc19zZXQoZGVy
+cikpCiAJCWVycm9yKCJBY2Nlc3MgZGVuaWVkOiAlcyIsIGRlcnItPm1lc3NhZ2UpOworCWVsc2Ug
+eworCQljaGFyIGFnX2FkZHJlc3NbMThdOworCisJCWJhMnN0cigmZGV2aWNlLT5kc3QsIGFnX2Fk
+ZHJlc3MpOworCQlkZWJ1ZygiQWNjZXB0ZWQgQUcgY29ubmVjdGlvbiBmcm9tICVzIGZvciAlcyIs
+CisJCQlhZ19hZGRyZXNzLCBkZXZpY2UtPnBhdGgpOworCQlkZWJ1ZygiaW4gZ2F0ZXdheV9hdXRo
+X2NiLCBzcmMgaXMgJWQiLCBkZXZpY2UtPnNyYyk7CisKKwkJZ2F0ZXdheV9zdGFydF9zZXJ2aWNl
+KGRldmljZSk7CisJfQogfQogCiBzdGF0aWMgdm9pZCBoZl9pb19jYihHSU9DaGFubmVsICpjaGFu
+LCBpbnQgZXJyLCBjb25zdCBiZGFkZHJfdCAqc3JjLAo=
+--0016e644c2e2d5f7f40463192293--
