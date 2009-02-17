@@ -1,44 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <cc1649d10902162310o1400de66l24e542f931c16555@mail.gmail.com>
-References: <cc1649d10902162310o1400de66l24e542f931c16555@mail.gmail.com>
-Date: Tue, 17 Feb 2009 02:21:54 -0500
-Message-ID: <cc1649d10902162321w698ea7ecg8efcb7186eefe3ad@mail.gmail.com>
-Subject: Bluetooth RFCOMM speed under VMWare
-From: Vlad Skarzhevskyy <skarzhevskyy@gmail.com>
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <6887eb5d0902162058g57d5dedel7071bcbb845ddd78@mail.gmail.com>
+References: <6887eb5d0902160425g5f3155bbr65d1e5002e32d45a@mail.gmail.com>
+	 <9F2B2656C8747B498D56A7B30FF5EB9FF291F4@CNMAIL13.cn.utstarcom.com>
+	 <6887eb5d0902162058g57d5dedel7071bcbb845ddd78@mail.gmail.com>
+Date: Tue, 17 Feb 2009 10:29:31 +0530
+Message-ID: <6887eb5d0902162059r2ae49b2enf3f6a6f027be2235@mail.gmail.com>
+Subject: Fwd: openobex-1.4 installation related
+From: Kartikey Parmar <kartikey2781@gmail.com>
+To: Yao Ye <yeyao@utstar.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel
- I would like to get some clues to the problem of running BlueZ under
-VMWare or VMware-Fusion
+Thank u very much...
+It is successfully installed on Fedora 9
 
- I have tested many Bluetooth USB devices on nativity installed Linux
-systems and on guest under VMWare. The RFCOMM connection speed differs
-dramatically in VM guest.
- When on native Linux I have 600,000 bit/sec in VM guest  it would be
-20,000 bit/sec or less.
+hey can I use obexftp directly to browse my mobile via bluetooth?
 
-Devices I tired: USB TRUST BT-2210Tp, USB D-Link DBT-120, Microsoft
-Wireless Transceiver v 2.0, Toshiba Bluetooth V2.0 EDR USB Adapter
-PA3455U-1BT
+I tried one option: "obexftp -b -C Images -g Image0003.jpt" that give
+me:-> error Connect()
+Connection not available???
 
-Under host Win XP VMWare 6.5: I tired guest Ubuntu 8.10 32 bit, Fedora
-9 and 10 32and 64 bit, SUSE 11.1 32 bit
-Under host  OS X Leo VMware-Fusion 2.0.1:  I tired guest Fedora 10 32 bit
+Any idea?
 
-All with the same results! Connection speed is 20,000 bit/sec or less
-on Linux guest system .
+On Tue, Feb 17, 2009 at 6:44 AM, Yao Ye <yeyao@utstar.com> wrote:
+>
+>> After that when I attempt to install obexftp-0.22 - in its
+> configuration it shows an error
+>> like "openobex-config" not found, probably openobex is not
+> installed...
+>
+> you should use export PKG_CONFIG_PATH as below:
+>
+> obexftp-0.22:
+>        export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig;
+>        export PKG_CONFIG_LIBDIR=/usr/local/lib/pkgconfig;
+>        cd obexftp-0.22;
+>        ./configure --disable-perl --disable-python --disable-ruby
+> --disable-tcl
+>        make;
+>        make install;
+>
+> openobex-1.5:
+>        export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig;
+>        export PKG_CONFIG_LIBDIR=/usr/local/lib/pkgconfig;
+>        cd openobex-1.5;
+>        ./configure --disable-usb --enable-apps
+>        make;
+>        make install;
+>
+>
+>
 
-The most confusing is that when under Win XP host I tired Windows XP
-guest  with ms or widcomm stack I got the speed that is very
-comparable to native RFCOMM speed for the same device.
+--
+Kartikey Parmar
+R&D Software Engg
+Matrix Telecom Pvt Ltd
+Baroda, Gujarat (India)
+09879095390 (M)
 
 
-Vlad
-bluecove.org
 
-PS
-  I have not tired Linux as host operating system for another Linux.
+-- 
+Kartikey Parmar
+R&D Software Engg
+Matrix Telecom Pvt Ltd
+Baroda, Gujarat (India)
+09879095390 (M)
