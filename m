@@ -1,52 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <499C30C0.4090300@powercraft.nl>
-Date: Wed, 18 Feb 2009 17:01:04 +0100
-From: Jelle de Jong <jelledejong@powercraft.nl>
 MIME-Version: 1.0
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: totem-xine segfault when playing dvd with menu and bluez bluetooth
-References: <496F35E8.9060503@powercraft.nl> <497DC292.1090104@powercraft.nl>
-In-Reply-To: <497DC292.1090104@powercraft.nl>
-Content-Type: text/plain; charset=UTF-8
+Date: Wed, 18 Feb 2009 17:49:08 +0530
+Message-ID: <6887eb5d0902180419k7b6220fdx5a8c7abd71daa169@mail.gmail.com>
+Subject: obexftp apps related
+From: Kartikey Parmar <kartikey2781@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Jelle de Jong wrote:
-> Jelle de Jong wrote:
->> Hello everybody,
->>
->> I have been trying to track and report some for me serious issues, when
->> trying to play dvds using bluetooth speakers and headsets. I reported
->> the problem on debian.org and gdb backtraces are included:
->>
->> http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=511670
->>
->> bluez version: today build git version
->> (previous bluez version had the same problem)
->> http://filebin.ca/tpbgsp/bluez-utils_4.27git_i386.deb
->> http://filebin.ca/txmdsd/bluez-gnome_1.9git_i386.deb
->>
->> totem-xine --version
->>  GNOME totem 2.22.2
->>
->> Any ideas,
->>
->> Best regards,
->>
->> Jelle de Jong
-> 
-> Hello everybody,
-> 
-> I am popping up this email again, I would really like to see this
-> issue fixed, would somebody be willing to take a look at it?
-> 
+hi
 
-Somebody willing to have a look at the bug report, I am experiencing
-daily crashes of totem when using bluetooth headset and speakers. I
-also have some customers experiencing the same issue.
+I have installed bluez-4.30, openobex-1.4 and obexftp-0.22 on Fedora 9
 
-I would really appreciate a fix,
+When I run the test application by writing:
 
-Best regards,
+obexftp --bluetooth ----nopath --noconn --uuid none --put obexftp.c
 
-Jelle
+it starts executing and on my bluetooth enable mobile it prompts me to
+accept connection with computer.
+When I accept it, it prompts me to Enter Access Code...
+
+I tried with 0000, 1111 and lot more but evertime it shows an error
+"error: connect()" and "still trying to connect"...
+
+I have configured my hci device with command ./hciconfig -a hci0
+noauth and ./hciconfig -a hci0 noencrypt
+
+Still it prompts for access code on connection attemp...
+
+As per bluetooth core specification and OBEX protocol specification,
+authentication is optional parameter... so since I m not requesting
+authentication from my hci device which runs bluetooth adapter why
+access code is being prompted on my bluetooth enable mobile device?
+
+This happens when the software module attempt to connect with the
+remote device on RFCOMM...
+
+Is there any mistake in writing commands by me or there is a bug in
+either bluez-4.30, openobex-1.4 or obexftp-0.22?
+
+Kindly suggest me solution so i can continue.. with my development...
+
+Awaiting for reply..
+
+Thanks & Regards,
+-- 
+Kartikey Parmar
+R&D Software Engg
+Matrix Telecom Pvt Ltd
+Baroda, Gujarat (India)
+09879095390 (M)
