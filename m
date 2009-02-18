@@ -1,24 +1,20 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 18 Feb 2009 12:12:08 -0800 (PST)
-From: Ed Tsang <netdesign_98@yahoo.com>
-Reply-To: netdesign_98@yahoo.com
-Subject: Dynamicall control the maximum or default transmit power
-To: Bluettooth Linux <linux-bluetooth@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Message-ID: <22544.7073.qm@web52601.mail.re2.yahoo.com>
+Date: Wed, 18 Feb 2009 16:03:32 +0000
+Message-ID: <92aeef200902180803n1abd446cv15c3fec44bb51f26@mail.gmail.com>
+Subject: hciemu usage
+From: sushil <skdeka@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, I am looking at possibility of dynamically control the maximum or default transmit power.
-   Basically I would like to change the transmit power level during inquiry. So I could kind of dynamically control the physical range of devices that I see. In CSR's Bluecore chip, I think there are pskey that stored the maximum and default transmit power. And there seem to be bccmd psget 0x0017 to get the value.
-  Now my problem is I am using a class 1 dongle using Broadcom chipset. Is there a way to dynamically control the default or maximum transmit power e.g.
-   hcitool cmd 0x.. 0x.. ..... ?
+Hi,
+ Does anyone used /test/hciemu test application with USB-serial adapter?
+I tried running hciemu -n 00:02:5B:02:97:73 -d /dev/ttyUSB0 , the
+other end I am sending some hci commands but no response.
 
-   During the inquiry paging, does anyone know if they use default or maximum transmit power?
+Can someone help me giving some inputs.
 
-Thanks,
-Edwin
-
-
-      
+Regards,
+Sushil
