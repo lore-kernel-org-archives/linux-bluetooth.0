@@ -1,53 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Wed, 18 Feb 2009 17:49:08 +0530
-Message-ID: <6887eb5d0902180419k7b6220fdx5a8c7abd71daa169@mail.gmail.com>
-Subject: obexftp apps related
-From: Kartikey Parmar <kartikey2781@gmail.com>
+In-Reply-To: <ac8af0be0902170031l32c54051w19fdedf1a2aabf6d@mail.gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH 0/4] HFP Gateway profile
+MIME-Version: 1.0
+Message-ID: <OF0CE87466.E448C300-ONC1257561.00364325-C1257561.0037F61E@aweurope.be>
+From: Thierry Pierret <extern.Thierry.Pierret@awtce.be>
+Date: Wed, 18 Feb 2009 11:11:13 +0100
+Content-Type: text/plain; charset="US-ASCII"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-hi
+Many thanks for this.
 
-I have installed bluez-4.30, openobex-1.4 and obexftp-0.22 on Fedora 9
+But it did not work either (same behaviour).
+I only performed a quick test since currently I don't get the time to.
+Here is what I noticed that I did not notice before :
+New messages appear :
 
-When I run the test application by writing:
+        bluetoothd[1815]: headset_probe: path 
+/org/bluez/1815/hci0/dev_00_0E_ED_01_DA_55
+        bluetoothd[1815]: probe failed with driver input-headset for 
+device /org/bluez/1815/hci0/dev_00_0E_ED_01_DA_55
 
-obexftp --bluetooth ----nopath --noconn --uuid none --put obexftp.c
+And after a while (a few seconds after the test ends), other messages 
+appear :
 
-it starts executing and on my bluetooth enable mobile it prompts me to
-accept connection with computer.
-When I accept it, it prompts me to Enter Access Code...
+        bluetoothd[1815]: Agent replied with an error: 
+org.freedesktop.DBus.Error.NoReply, Did not receive a reply. Possible 
+causes include: the remote application did not send a reply, the message 
+bus security policy blocked the reply, the reply timeout expired, or the 
+network connection was broken.
+        bluetoothd[1815]: Access denied: Did not receive a reply. Possible 
+causes include: the remote application did not send a reply, the message 
+bus security policy blocked the reply, the reply timeout expired, or the 
+network connection was broken.
+And a "Cancel" message has been received by the Agent. I don't know if 
+this has an impact or if it is a consequence of the disconnection.
 
-I tried with 0000, 1111 and lot more but evertime it shows an error
-"error: connect()" and "still trying to connect"...
+I will dive into this issue in a few days.
+As I do not catch all the points in the way the HFP profile works, I'm 
+quite sure that I'm doing something wrong.
+Will keep you informed.
 
-I have configured my hci device with command ./hciconfig -a hci0
-noauth and ./hciconfig -a hci0 noencrypt
+Regards.
+Thierry
 
-Still it prompts for access code on connection attemp...
 
-As per bluetooth core specification and OBEX protocol specification,
-authentication is optional parameter... so since I m not requesting
-authentication from my hci device which runs bluetooth adapter why
-access code is being prompted on my bluetooth enable mobile device?
-
-This happens when the software module attempt to connect with the
-remote device on RFCOMM...
-
-Is there any mistake in writing commands by me or there is a bug in
-either bluez-4.30, openobex-1.4 or obexftp-0.22?
-
-Kindly suggest me solution so i can continue.. with my development...
-
-Awaiting for reply..
-
-Thanks & Regards,
--- 
-Kartikey Parmar
-R&D Software Engg
-Matrix Telecom Pvt Ltd
-Baroda, Gujarat (India)
-09879095390 (M)
