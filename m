@@ -1,27 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Thu, 19 Feb 2009 21:19:59 +0800
-Message-ID: <ac8af0be0902190519v150905c9iea04a86835750c5c@mail.gmail.com>
-Subject: [PATCH 0/4] HFP Gateway profile -- take 2
-From: Zhao Forrest <forrest.zhao@gmail.com>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Cc: event <event.riga@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: Qualifying AVCTP and AVDTP
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Krishnan R <r_krish@email.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20090219060851.88E6C326774@ws1-8.us4.outblaze.com>
+References: <20090219060851.88E6C326774@ws1-8.us4.outblaze.com>
+Content-Type: text/plain
+Date: Thu, 19 Feb 2009 07:35:33 +0100
+Message-Id: <1235025333.4640.1.camel@californication>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Krishnan,
 
-Compared with last version the change is:
-1 fix the bug that HFP AG can't initiate the service-level connection
-with HFP HF unit.
-2 rebase the patch set against the BlueZ master
+> How do we qualify AVCTP and AVDTP? Not all test cases of these protocols can be simulated through AVRCP and A2DP. Any hints on qualifying these two protocols? Do we have some stubs to do these?
 
-The patch set include the following 4 patches:
-1 add the D-Bus interface definition for HFP Audio gateway
-2 add the basic framework support for HFP Audio gateway
-3 the main part for HFP Audio gateway
-4  IPC integration part for HFP Audio gateway
+you have to write a program that tests the valid and invalid test cases
+of AVDTP and AVCTP. Then the HCI or air traces have to be captured and
+evaluated by a BQE to proof correct behavior.
 
-Thanks,
-Forrest
+Regards
+
+Marcel
+
+
