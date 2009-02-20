@@ -1,29 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Allow BT_SECURITY for L2CAP raw sockets
+Subject: Re: [PATCH] bluetooth: move back hci_conn_del_sysfs to
+ hci_conn_del avoid device destruct too early
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Johan Hedberg <johan.hedberg@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20090220132346.GA5255@jh-x301>
-References: <20090220132346.GA5255@jh-x301>
+To: Dave Young <hidave.darkstar@gmail.com>
+Cc: davem@davemloft.net, linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+In-Reply-To: <499EA5F6.2060206@gmail.com>
+References: <499EA5F6.2060206@gmail.com>
 Content-Type: text/plain
-Date: Fri, 20 Feb 2009 20:57:38 +0100
-Message-Id: <1235159858.24255.4.camel@californication>
+Date: Fri, 20 Feb 2009 20:48:59 +0100
+Message-Id: <1235159339.24255.3.camel@californication>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Dave,
 
-> Here's the patch to permit BT_SECURITY for L2CAP raw sockets. It allows
-> our BtIO code to be simpler since there's no need to do special L2CAP_LM
-> tricks when doing paring using L2CAP raw sockets. It seemed to work fine
-> in my tests (both SSP and legacy pairing) so if it's ok with you I'll
-> also push the corresponding patch for bluetoothd (which without this
-> patch would cause EINVAL when trying pairing on a newer kernel).
+> The following commit introduce a regression:
+> 
+> 	commit 7d0db0a373195385a2e0b19d1f5e4b186fdcffac
+> 	Author: Marcel Holtmann <marcel@holtmann.org>
+> 	Date:   Mon Jul 14 20:13:51 2008 +0200
+> 
+> 		[Bluetooth] Use a more unique bus name for connections
+> 
+> I get panic as following (by netconsole):
 
-I pushed a little bit different version of the patch that only
-explicitly allows SOCK_SEQPACKET and SOCK_RAW. In addition I did the
-same for the getsockopt() case :)
+can you please send a version against my bluetooth-testing.git tree.
 
 Regards
 
