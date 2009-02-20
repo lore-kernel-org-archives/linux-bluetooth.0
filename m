@@ -1,231 +1,412 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Fri, 20 Feb 2009 19:32:04 +0530
-Message-ID: <8b5debfa0902200602o58dfe669g2c4ef600460ef480@mail.gmail.com>
-Subject: [PATCH]Generic Netlink Interface
-From: alok barsode <alokbarsode@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=001636417f81fe695b04635a18e3
+Date: Fri, 20 Feb 2009 21:44:57 +0800
+Message-ID: <ac8af0be0902200544i4cd76595jfdd14d906951c80e@mail.gmail.com>
+Subject: [PATCH 4/4] IPC integration part for HFP Audio gateway -- take 2 --
+	resend
+From: Zhao Forrest <forrest.zhao@gmail.com>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---001636417f81fe695b04635a18e3
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+diff --git a/audio/gateway.c b/audio/gateway.c
+index 1aaabda..590e363 100644
+--- a/audio/gateway.c
++++ b/audio/gateway.c
+@@ -1096,3 +1096,82 @@ int gateway_close(struct gateway *gw)
+ 	}
+ 	return 0;
+ }
++
++/* These are functions to be called from unix.c for audio system
++ * ifaces (alsa, gstreamer, etc.) */
++gboolean gateway_request_stream(struct audio_device *dev,
++				gateway_stream_cb_t cb, void *user_data)
++{
++	struct gateway *gw = dev->gateway;
++	GError *err = NULL;
++	GIOChannel *io;
++
++	if (!gw->sco) {
++		if (!gw->rfcomm)
++			return FALSE;
++		gw->sco_start_cb = cb;
++		gw->sco_start_cb_data = user_data;
++		io = bt_io_connect(BT_IO_SCO, sco_connect_cb, dev, NULL, &err,
++				BT_IO_OPT_SOURCE_BDADDR, &dev->src,
++				BT_IO_OPT_DEST_BDADDR, &dev->dst,
++				BT_IO_OPT_INVALID);
++		if (!io) {
++			error("%s", err->message);
++			g_error_free(err);
++			return FALSE;
++		}
++	} else {
++		if (cb)
++			cb(dev, user_data);
++	}
++	return TRUE;
++}
++
++int gateway_config_stream(struct audio_device *dev, gateway_stream_cb_t sco_cb,
++				void *user_data)
++{
++	struct gateway *gw = dev->gateway;
++
++	if (!gw->rfcomm) {
++		gw->sco_start_cb = sco_cb;
++		gw->sco_start_cb_data = user_data;
++		return get_records(dev);
++	}
++
++	if (sco_cb)
++		sco_cb(dev, user_data);
++
++	return 0;
++}
++
++gboolean gateway_cancel_stream(struct audio_device *dev, unsigned int id)
++{
++	struct gateway *gw = dev->gateway;
++
++	gateway_close(gw);
++	return TRUE;
++}
++
++int gateway_get_sco_fd(struct audio_device *dev)
++{
++	GIOChannel* sco_chan = dev->gateway->sco;
++
++	if (!sco_chan)
++		return -1;
++
++	return g_io_channel_unix_get_fd(sco_chan);
++}
++
++void gateway_suspend_stream(struct audio_device *dev)
++{
++	struct gateway* gw = dev->gateway;
++
++	if (gw->sco) {
++		g_io_channel_close(gw->sco);
++		g_io_channel_unref(gw->sco);
++		gw->sco = NULL;
++		gw->sco_start_cb = NULL;
++		gw->sco_start_cb_data = NULL;
++	}
++}
++
+diff --git a/audio/gateway.h b/audio/gateway.h
+index 3a1c41c..2cbb6f2 100644
+--- a/audio/gateway.h
++++ b/audio/gateway.h
+@@ -32,3 +32,10 @@ struct gateway *gateway_init(struct audio_device *device);
+ gboolean gateway_is_connected(struct audio_device* dev);
+ int gateway_connect_rfcomm(struct audio_device *dev, GIOChannel *chan);
+ void gateway_start_service(struct audio_device *device);
++gboolean gateway_request_stream(struct audio_device *dev,
++			gateway_stream_cb_t cb, void *user_data);
++int gateway_config_stream(struct audio_device *dev, gateway_stream_cb_t cb,
++			void *user_data);
++gboolean gateway_cancel_stream(struct audio_device *dev, unsigned int id);
++int gateway_get_sco_fd(struct audio_device *dev);
++void gateway_suspend_stream(struct audio_device *dev);
+diff --git a/audio/ipc.h b/audio/ipc.h
+index ff35376..6424c3e 100644
+--- a/audio/ipc.h
++++ b/audio/ipc.h
+@@ -108,7 +108,13 @@ typedef struct {
+ #define BT_CAPABILITIES_ACCESS_MODE_WRITE	2
+ #define BT_CAPABILITIES_ACCESS_MODE_READWRITE	3
 
-Marcel,
++#define BT_CAPABILITIES_ROLE_SLAVE 0
++#define BT_CAPABILITIES_ROLE_MASTER 1
++
+ #define BT_FLAG_AUTOCONNECT	1
++/* choose between gateway/source (set bit) and
++ * headset/sink (clear bit aka default) */
++#define BT_FLAG_MASTER 0x2
 
-As per our last discussion, i am attaching a patch for the generic
-netlink interface.
-I am also attaching a test program (can be compiled with -lnl ) to
-test the interface.
+ struct bt_get_capabilities_req {
+ 	bt_audio_msg_header_t	h;
+@@ -164,8 +170,8 @@ struct bt_get_capabilities_req {
+ #define BT_PCM_FLAG_PCM_ROUTING			0x02
 
-I am using "flags" to bring up the device and returning "changed",
-which indicate the changed bits in the flags.
-right now the module only supports 'up', 'iscan' and 'pscan'.
-so i can issue a NEWHOST command with HCI_UP | HCI_PSCAN | HCI_ISCAN.
-I am not sure if this is the right approach.
-OR Do you want individual commands for operations ?
+ typedef struct {
+-	uint8_t transport;
+-	uint8_t type;
++	uint8_t transport; /* sco | a2dp */
++	uint8_t type; /* sbc | mpeg12 | mpeg24 | atrac */
+ 	uint8_t length;
+ 	uint8_t data[0];
+ } __attribute__ ((packed)) codec_capabilities_t;
+diff --git a/audio/pcm_bluetooth.c b/audio/pcm_bluetooth.c
+index 9bef89e..9c9e546 100644
+--- a/audio/pcm_bluetooth.c
++++ b/audio/pcm_bluetooth.c
+@@ -109,8 +109,10 @@ struct bluetooth_a2dp {
+ struct bluetooth_alsa_config {
+ 	char device[18];		/* Address of the remote Device */
+ 	int has_device;
+-	uint8_t transport;		/* Requested transport */
++	uint8_t transport;		/* SCO or A2DP */
+ 	int has_transport;
++	uint8_t role;		        /* Master (gateway|a2dp source) or Slave
+(headset|a2dp sink) */
++	int has_role;
+ 	uint16_t rate;
+ 	int has_rate;
+ 	uint8_t channel_mode;		/* A2DP only */
+@@ -1399,6 +1401,21 @@ static int bluetooth_parse_config(snd_config_t *conf,
+ 			}
+ 			continue;
+ 		}
++		if (strcmp(id, "role") == 0){
++			if (snd_config_get_string(n, &value) < 0) {
++				SNDERR("Invalid type for %s", id);
++				return -EINVAL;
++			}
++
++			if (strcmp(value, "master") == 0) {
++				bt_config->role = BT_CAPABILITIES_ROLE_MASTER;
++				bt_config->has_role = 1;
++			} else {
++				bt_config->role = BT_CAPABILITIES_ROLE_SLAVE;
++				bt_config->has_role = 1;
++			}
++			continue;
++		}
 
-Let me know what you think of this.
+ 		if (strcmp(id, "rate") == 0) {
+ 			if (snd_config_get_string(n, &value) < 0) {
+@@ -1645,6 +1662,9 @@ static int bluetooth_init(struct bluetooth_data
+*data, snd_pcm_stream_t stream,
 
-Cheers,
-Alok.
+ 	if (alsa_conf->autoconnect)
+ 		req->flags |= BT_FLAG_AUTOCONNECT;
++	if (alsa_conf->has_role && alsa_conf->role == BT_CAPABILITIES_ROLE_MASTER) {
++		req->flags |= BT_FLAG_MASTER;
++	}
+ 	strncpy(req->device, alsa_conf->device, 18);
+ 	if (alsa_conf->has_transport)
+ 		req->transport = alsa_conf->transport;
+diff --git a/audio/unix.c b/audio/unix.c
+index a39f180..9a576df 100644
+--- a/audio/unix.c
++++ b/audio/unix.c
+@@ -47,12 +47,14 @@
+ #include "a2dp.h"
+ #include "headset.h"
+ #include "sink.h"
++#include "gateway.h"
+ #include "unix.h"
+ #include "glib-helper.h"
 
---001636417f81fe695b04635a18e3
-Content-Type: text/x-diff; charset=US-ASCII;
-	name="0001-Adding-netlink-support-to-bluetooth.patch"
-Content-Disposition: attachment;
-	filename="0001-Adding-netlink-support-to-bluetooth.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_frc4nd0n0
+ typedef enum {
+ 	TYPE_NONE,
+ 	TYPE_HEADSET,
++	TYPE_GATEWAY,
+ 	TYPE_SINK,
+ 	TYPE_SOURCE
+ } service_type_t;
+@@ -194,6 +196,8 @@ static service_type_t select_service(struct
+audio_device *dev, const char *inter
+ 		return TYPE_SINK;
+ 	else if (!strcmp(interface, AUDIO_HEADSET_INTERFACE) && dev->headset)
+ 		return TYPE_HEADSET;
++	else if (!strcmp(interface, AUDIO_GATEWAY_INTERFACE) && dev->gateway)
++		return TYPE_GATEWAY;
 
-RnJvbSAxZTVjYjBiYmUyYzBiYmZmZTRlNGQ1M2U4NjNiYjg3ODM5NWEwMzY3IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBBbG9rIEJhcnNvZGUgPGFsb2tiYXJzb2RlQGdtYWlsLmNvbT4K
-RGF0ZTogV2VkLCAxOCBGZWIgMjAwOSAxOTo1NDoyMCArMDUzMApTdWJqZWN0OiBbUEFUQ0hdIEFk
-ZGluZyBuZXRsaW5rIHN1cHBvcnQgdG8gYmx1ZXRvb3RoLgogQWRkaW5nIGZpbGVzIG5ldGxpbmsu
-YyBhbmQgbmV0bGluay5oIHRvIG5ldC9ibHVldG9vdGggZm9yIG5ldGxpbmsgc3VwcG9ydC4KIEFk
-ZGluZyBzdXBwb3J0IGZvciBORVdIT1NULgogUmVkZWZpbmluZyBoY2lfcmVxX2xvY2sgdG8gdXNl
-IGRvd25fdHJ5bG9jawoKU2lnbmVkLW9mZi1ieTogQWxvayBCYXJzb2RlIDxhbG9rYmFyc29kZUBn
-bWFpbC5jb20+Ci0tLQogaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmggfCAgICA0ICst
-CiBuZXQvYmx1ZXRvb3RoL01ha2VmaWxlICAgICAgICAgICB8ICAgIDIgKy0KIG5ldC9ibHVldG9v
-dGgvaGNpX2NvcmUuYyAgICAgICAgIHwgICAzMSArKysrKysKIG5ldC9ibHVldG9vdGgvbmV0bGlu
-ay5jICAgICAgICAgIHwgIDIxMiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KwogbmV0L2JsdWV0b290aC9uZXRsaW5rLmggICAgICAgICAgfCAgIDMxICsrKysrKwogNSBmaWxl
-cyBjaGFuZ2VkLCAyNzggaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkKIGNyZWF0ZSBtb2Rl
-IDEwMDY0NCBuZXQvYmx1ZXRvb3RoL25ldGxpbmsuYwogY3JlYXRlIG1vZGUgMTAwNjQ0IG5ldC9i
-bHVldG9vdGgvbmV0bGluay5oCgpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2hj
-aV9jb3JlLmggYi9pbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuaAppbmRleCAwMWY5MzE2
-Li4wOTRjNWRkIDEwMDY0NAotLS0gYS9pbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuaAor
-KysgYi9pbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuaApAQCAtNjk1LDkgKzY5NSwxMSBA
-QCBzdHJ1Y3QgaGNpX3NlY19maWx0ZXIgewogI2RlZmluZSBIQ0lfUkVRX1BFTkQJICAxCiAjZGVm
-aW5lIEhDSV9SRVFfQ0FOQ0VMRUQgIDIKIAotI2RlZmluZSBoY2lfcmVxX2xvY2soZCkJCWRvd24o
-JmQtPnJlcV9sb2NrKQorI2RlZmluZSBoY2lfcmVxX2xvY2soZCkJCWRvd25fdHJ5bG9jaygmZC0+
-cmVxX2xvY2spCiAjZGVmaW5lIGhjaV9yZXFfdW5sb2NrKGQpCXVwKCZkLT5yZXFfbG9jaykKIAog
-dm9pZCBoY2lfcmVxX2NvbXBsZXRlKHN0cnVjdCBoY2lfZGV2ICpoZGV2LCBpbnQgcmVzdWx0KTsK
-IAorLyogRklYTUU6IFRoaXMgaXMgdGVtcG9yYXJpbHkgYWRkZWQgdG8gZXhwb3J0IF9faGNpX3Jl
-cXVlc3QgYW5kIGhjaV9pbml0X3JlcSAqLworaW50IGhjaV9oYW5kbGVfcmVxdWVzdChzdHJ1Y3Qg
-aGNpX2RldiAqaGRldiwgaW50IGV2ZW50LCB1bnNpZ25lZCBsb25nIG9wdCk7CiAjZW5kaWYgLyog
-X19IQ0lfQ09SRV9IICovCmRpZmYgLS1naXQgYS9uZXQvYmx1ZXRvb3RoL01ha2VmaWxlIGIvbmV0
-L2JsdWV0b290aC9NYWtlZmlsZQppbmRleCBkMWU0MzNmLi5mMDE0ZDQ4IDEwMDY0NAotLS0gYS9u
-ZXQvYmx1ZXRvb3RoL01ha2VmaWxlCisrKyBiL25ldC9ibHVldG9vdGgvTWFrZWZpbGUKQEAgLTEw
-LDQgKzEwLDQgQEAgb2JqLSQoQ09ORklHX0JUX0JORVApCSs9IGJuZXAvCiBvYmotJChDT05GSUdf
-QlRfQ01UUCkJKz0gY210cC8KIG9iai0kKENPTkZJR19CVF9ISURQKQkrPSBoaWRwLwogCi1ibHVl
-dG9vdGgtb2JqcyA6PSBhZl9ibHVldG9vdGgubyBoY2lfY29yZS5vIGhjaV9jb25uLm8gaGNpX2V2
-ZW50Lm8gaGNpX3NvY2subyBoY2lfc3lzZnMubyBsaWIubworYmx1ZXRvb3RoLW9ianMgOj0gYWZf
-Ymx1ZXRvb3RoLm8gaGNpX2NvcmUubyBoY2lfY29ubi5vIGhjaV9ldmVudC5vIGhjaV9zb2NrLm8g
-aGNpX3N5c2ZzLm8gbGliLm8gbmV0bGluay5vCmRpZmYgLS1naXQgYS9uZXQvYmx1ZXRvb3RoL2hj
-aV9jb3JlLmMgYi9uZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmMKaW5kZXggYmE3OGNjMS4uNWI4ZTg5
-MCAxMDA2NDQKLS0tIGEvbmV0L2JsdWV0b290aC9oY2lfY29yZS5jCisrKyBiL25ldC9ibHVldG9v
-dGgvaGNpX2NvcmUuYwpAQCAtMjkxLDYgKzI5MSwzNyBAQCBzdGF0aWMgdm9pZCBoY2lfbGlua3Bv
-bF9yZXEoc3RydWN0IGhjaV9kZXYgKmhkZXYsIHVuc2lnbmVkIGxvbmcgb3B0KQogCWhjaV9zZW5k
-X2NtZChoZGV2LCBIQ0lfT1BfV1JJVEVfREVGX0xJTktfUE9MSUNZLCAyLCAmcG9saWN5KTsKIH0K
-IAoraW50IGhjaV9oYW5kbGVfcmVxdWVzdChzdHJ1Y3QgaGNpX2RldiAqaGRldiwgaW50IGV2ZW50
-LCB1bnNpZ25lZCBsb25nIG9wdCkKK3sKKwlpbnQgZXJyID0gMDsKKworCWlmICghaGRldikKKwkJ
-cmV0dXJuIC1FTk9ERVY7CisKKwlzd2l0Y2ggKGV2ZW50KSB7CisJY2FzZSBIQ0lfREVWX1VQOgor
-CQllcnIgPSBfX2hjaV9yZXF1ZXN0KGhkZXYsIGhjaV9pbml0X3JlcSwgb3B0LAorCQkJCW1zZWNz
-X3RvX2ppZmZpZXMoSENJX0lOSVRfVElNRU9VVCkpOworCQlicmVhazsKKworCWNhc2UgSENJX0RF
-Vl9ET1dOOgorCQllcnIgPSBfX2hjaV9yZXF1ZXN0KGhkZXYsIGhjaV9yZXNldF9yZXEsIG9wdCwK
-KwkJCQkgICAgbXNlY3NfdG9famlmZmllcygyNTApKTsKKwkJYnJlYWs7CisKKwljYXNlIEhDSVNF
-VFNDQU46CisJCWVyciA9IGhjaV9yZXF1ZXN0KGhkZXYsIGhjaV9zY2FuX3JlcSwgb3B0LAorCQkJ
-CQltc2Vjc190b19qaWZmaWVzKEhDSV9JTklUX1RJTUVPVVQpKTsKKwkJYnJlYWs7CisKKwlkZWZh
-dWx0OgorCQllcnIgPSAtRUlOVkFMOworCQlicmVhazsKKwl9CisKKwlyZXR1cm4gZXJyOworfQor
-CiAvKiBHZXQgSENJIGRldmljZSBieSBpbmRleC4KICAqIERldmljZSBpcyBoZWxkIG9uIHJldHVy
-bi4gKi8KIHN0cnVjdCBoY2lfZGV2ICpoY2lfZGV2X2dldChpbnQgaW5kZXgpCmRpZmYgLS1naXQg
-YS9uZXQvYmx1ZXRvb3RoL25ldGxpbmsuYyBiL25ldC9ibHVldG9vdGgvbmV0bGluay5jCm5ldyBm
-aWxlIG1vZGUgMTAwNjQ0CmluZGV4IDAwMDAwMDAuLjk3YmUwYjYKLS0tIC9kZXYvbnVsbAorKysg
-Yi9uZXQvYmx1ZXRvb3RoL25ldGxpbmsuYwpAQCAtMCwwICsxLDIxMiBAQAorLyoKKyAqIFRoaXMg
-aXMgdGhlIG5ldGxpbmstYmFzZWQgYmx1ZXRvb3RoIGludGVyZmFjZS4KKyAqCisgKiBDb3B5cmln
-aHQgMjAwOCBBbG9rIEJhcnNvZGUgPGFsb2suYmFyc29kZUBhemluZ28uY29tPgorICovCisKKyNp
-bmNsdWRlIDxhc20vc3lzdGVtLmg+CisjaW5jbHVkZSA8YXNtL3VhY2Nlc3MuaD4KKyNpbmNsdWRl
-IDxhc20vdW5hbGlnbmVkLmg+CisKKyNpbmNsdWRlIDxuZXQvZ2VuZXRsaW5rLmg+CisjaW5jbHVk
-ZSA8bGludXgvbW9kdWxlLmg+CisjaW5jbHVkZSA8bGludXgva2VybmVsLmg+CisKKyNpbmNsdWRl
-IDxuZXQvYmx1ZXRvb3RoL2JsdWV0b290aC5oPgorI2luY2x1ZGUgPG5ldC9ibHVldG9vdGgvaGNp
-X2NvcmUuaD4KKworI2luY2x1ZGUgIm5ldGxpbmsuaCIKKworI2RlZmluZSBCTFVFVE9PVEhfR0VO
-TF9GQU1JTFlfTkFNRSAgICAgICAgICAgImJsdWV0b290aCIKKworLyogZmFtaWx5IGRlZmluaXRp
-b24gKi8KK3N0YXRpYyBzdHJ1Y3QgZ2VubF9mYW1pbHkgZmFtaWx5ID0geworCS5pZCA9IEdFTkxf
-SURfR0VORVJBVEUsCisJLmhkcnNpemUgPSAwLAorCS5uYW1lID0gQkxVRVRPT1RIX0dFTkxfRkFN
-SUxZX05BTUUsCisJLnZlcnNpb24gPSBWRVJTSU9OLAorCS5tYXhhdHRyID0gQVRUUl9NQVgKK307
-CisKK3N0YXRpYyBzdHJ1Y3QgbmxhX3BvbGljeSBwb2xpY3lbQVRUUl9NQVggKyAxXSA9IHsKKwlb
-SU5ERVhdCSAgPSB7IC50eXBlID0gTkxBX1UxNiB9LAorCVtUWVBFXQkgID0geyAudHlwZSA9IE5M
-QV9VMTYgfSwKKwlbRkxBR1NdICAgPSB7IC50eXBlID0gTkxBX1UzMiB9LAorCVtDSEFOR0VEXSA9
-IHsgLnR5cGUgPSBOTEFfVTMyIH0sCit9OworCitzdGF0aWMgaW50IGJsdWV0b290aF9uZXdob3N0
-KHN0cnVjdCBza19idWZmICpza2IsIHN0cnVjdCBnZW5sX2luZm8gKmluZm8pCit7CisJX191MTYg
-aW5kZXg7CisJdm9pZCAqaGRyOworCWludCByZXQ9MDsKKwl1bnNpZ25lZCBsb25nIGZsYWdzID0g
-MCwgY2hhbmdlZCA9IDA7CisJc3RydWN0IGhjaV9kZXYgKmhkZXY7CisJc3RydWN0IHNrX2J1ZmYg
-Km1zZzsKKworCWlmICghaW5mby0+YXR0cnNbSU5ERVhdKQorCQlyZXR1cm4gLUVJTlZBTDsKKwor
-CWluZGV4ID0gbmxhX2dldF91MTYoaW5mby0+YXR0cnNbSU5ERVhdKTsKKworCWlmICghKGhkZXYg
-PSBoY2lfZGV2X2dldChpbmRleCkpKQorCQlyZXR1cm4gLUVOT0RFVjsKKworCXByaW50aygiJXMg
-JXAiLCBoZGV2LT5uYW1lLCBoZGV2KTsKKworCWlmIChoY2lfcmVxX2xvY2soaGRldikpCisJCXJl
-dHVybiAtRUJVU1k7CisKKwltc2cgPSBubG1zZ19uZXcoTkxNU0dfR09PRFNJWkUsIEdGUF9LRVJO
-RUwpOworCWlmICghbXNnKSB7CisJCXJldCA9IC1FTk9CVUZTOworCQlnb3RvIGRvbmU7CisJfQor
-CisJaGRyID0gZ2VubG1zZ19wdXQobXNnLCBpbmZvLT5zbmRfcGlkLCBpbmZvLT5zbmRfc2VxLCAm
-ZmFtaWx5LCAwLCBORVdIT1NUKTsKKwlpZiAoaGRyID09IE5VTEwpeworCQlubG1zZ19mcmVlKG1z
-Zyk7CisJCXJldCA9ICAtRU5PQlVGUzsKKwkJZ290byBkb25lOworCX0KKworCU5MQV9QVVRfVTE2
-KG1zZywgSU5ERVgsIGluZGV4KTsKKworCWlmICghaW5mby0+YXR0cnNbRkxBR1NdKQorCQlnb3Rv
-IHByb2NlZWQ7CisKKwlmbGFncyA9IG5sYV9nZXRfdTE2KGluZm8tPmF0dHJzW0ZMQUdTXSk7CisK
-KwlpZiAoIXRlc3RfYml0KEhDSV9VUCwgJmZsYWdzKSAmJiB0ZXN0X2JpdChIQ0lfVVAsICZoZGV2
-LT5mbGFncykpCisJCWdvdG8gcHJvY2VlZDsKKworCWlmICghdGVzdF9iaXQoSENJX1VQLCAmZmxh
-Z3MpICYmICF0ZXN0X2JpdChIQ0lfVVAsICZoZGV2LT5mbGFncykpeworCQlyZXQgPSAtRUhPU1RE
-T1dOOworCQlnb3RvIGRvbmU7CisJfQorCisJaWYgKHRlc3RfYml0KEhDSV9VUCwgJmhkZXYtPmZs
-YWdzKSkgeworCQlyZXQgPSAtRUFMUkVBRFk7CisJCWdvdG8gZG9uZTsKKwl9CisKKwlpZiAodGVz
-dF9iaXQoSENJX1FVSVJLX1JBV19ERVZJQ0UsICZoZGV2LT5xdWlya3MpKQorCQlzZXRfYml0KEhD
-SV9SQVcsICZoZGV2LT5mbGFncyk7CisKKwlpZiAoaGRldi0+b3BlbihoZGV2KSkgeworCQlyZXQg
-PSAtRUlPOworCQlnb3RvIGRvbmU7CisJfQorCisJaWYgKCF0ZXN0X2JpdChIQ0lfUkFXLCAmaGRl
-di0+ZmxhZ3MpKSB7CisJCWF0b21pY19zZXQoJmhkZXYtPmNtZF9jbnQsIDEpOworCQlzZXRfYml0
-KEhDSV9JTklULCAmaGRldi0+ZmxhZ3MpOworCisJCXJldCA9IGhjaV9oYW5kbGVfcmVxdWVzdCho
-ZGV2LCBIQ0lfREVWX1VQLCAwKTsKKwkJY2xlYXJfYml0KEhDSV9JTklULCAmaGRldi0+ZmxhZ3Mp
-OworCX0KKworCWlmICghcmV0KSB7CisJCWhjaV9kZXZfaG9sZChoZGV2KTsKKwkJc2V0X2JpdChI
-Q0lfVVAsICZoZGV2LT5mbGFncyk7CisJCXNldF9iaXQoSENJX1VQLCAmY2hhbmdlZCk7CisJCWdv
-dG8gcHJvY2VlZDsKKwl9CisKKwkvKiBJbml0IGZhaWxlZCwgY2xlYW51cCAqLworCXRhc2tsZXRf
-a2lsbCgmaGRldi0+cnhfdGFzayk7CisJdGFza2xldF9raWxsKCZoZGV2LT50eF90YXNrKTsKKwl0
-YXNrbGV0X2tpbGwoJmhkZXYtPmNtZF90YXNrKTsKKworCXNrYl9xdWV1ZV9wdXJnZSgmaGRldi0+
-Y21kX3EpOworCXNrYl9xdWV1ZV9wdXJnZSgmaGRldi0+cnhfcSk7CisKKwlpZiAoaGRldi0+Zmx1
-c2gpCisJCWhkZXYtPmZsdXNoKGhkZXYpOworCisJaWYgKGhkZXYtPnNlbnRfY21kKSB7CisJCWtm
-cmVlX3NrYihoZGV2LT5zZW50X2NtZCk7CisJCWhkZXYtPnNlbnRfY21kID0gTlVMTDsKKwl9CisK
-KwloZGV2LT5jbG9zZShoZGV2KTsKKwloZGV2LT5mbGFncyA9IDA7CisJZ290byBkb25lOworCisg
-cHJvY2VlZDoKKwlpZiAodGVzdF9iaXQoSENJX1BTQ0FOLCAmZmxhZ3MpKSB7CisJCXJldCA9IGhj
-aV9oYW5kbGVfcmVxdWVzdChoZGV2LCBIQ0lTRVRTQ0FOLCBTQ0FOX1BBR0UpOworCQlpZiAoIXJl
-dCkKKwkJCXNldF9iaXQoSENJX1BTQ0FOLCAmY2hhbmdlZCk7CisJfQorCisJaWYgKHRlc3RfYml0
-KEhDSV9JU0NBTiwgJmZsYWdzKSkgeworCQlyZXQgPSBoY2lfaGFuZGxlX3JlcXVlc3QoaGRldiwg
-SENJU0VUU0NBTiwgU0NBTl9JTlFVSVJZKTsKKwkJaWYgKCFyZXQpCisJCQlzZXRfYml0KEhDSV9J
-U0NBTiwgJmNoYW5nZWQpOworCX0KKworCU5MQV9QVVRfVTMyKG1zZywgQ0hBTkdFRCwgY2hhbmdl
-ZCk7CisKKwlnZW5sbXNnX2VuZChtc2csIGhkcik7CisJZ290byBkb25lOworCisgbmxhX3B1dF9m
-YWlsdXJlOgorCWdlbmxtc2dfY2FuY2VsKG1zZywgaGRyKTsKKwlyZXQgPSAtRU1TR1NJWkU7Cisg
-ZG9uZToKKwloY2lfcmVxX3VubG9jayhoZGV2KTsKKwloY2lfZGV2X3B1dChoZGV2KTsKKworCWlm
-IChyZXQgPCAwKQorCQlyZXR1cm4gcmV0OworCisJcmV0dXJuIGdlbmxtc2dfdW5pY2FzdChtc2cs
-IGluZm8tPnNuZF9waWQpOworfQorCitzdGF0aWMgaW50IGJsdWV0b290aF9kZWxob3N0KHN0cnVj
-dCBza19idWZmICpza2IsIHN0cnVjdCBnZW5sX2luZm8gKmluZm8pCit7CisJcmV0dXJuIDA7Cit9
-CisKK3N0YXRpYyBzdHJ1Y3QgZ2VubF9vcHMgb3BzW10gPSB7CisJewkuY21kID0gTkVXSE9TVCwK
-KwkJLnBvbGljeSA9IHBvbGljeSwKKwkJLmRvaXQgPSBibHVldG9vdGhfbmV3aG9zdCwKKwkJLmZs
-YWdzID0gR0VOTF9BRE1JTl9QRVJNLAorCQkuZHVtcGl0ID0gTlVMTCwKKwl9LAorCXsJLmNtZCA9
-IERFTEhPU1QsCisJCS5wb2xpY3kgPSBwb2xpY3ksCisJCS5kb2l0ID0gYmx1ZXRvb3RoX2RlbGhv
-c3QsCisJCS5mbGFncyA9IEdFTkxfQURNSU5fUEVSTSwKKwkJLmR1bXBpdCA9IE5VTEwsCisJfSwK
-K307CisKKy8qIGluaXRpYWxpc2F0aW9uL2V4aXQgZnVuY3Rpb25zICovCitpbnQgX19pbml0IGJs
-dWV0b290aF9uZXRsaW5rX2luaXQodm9pZCkKK3sKKwlpbnQgZXJyLCBpOworCisJZXJyID0gZ2Vu
-bF9yZWdpc3Rlcl9mYW1pbHkoJmZhbWlseSk7CisJaWYgKGVycikKKwkJcmV0dXJuIGVycjsKKwor
-CWZvciAoaSA9IDA7IGkgPCBBUlJBWV9TSVpFKG9wcyk7IGkrKykgeworCQllcnIgPSBnZW5sX3Jl
-Z2lzdGVyX29wcygmZmFtaWx5LCAmb3BzW2ldKTsKKwkJaWYgKGVycikKKwkJCWdvdG8gZXJyX291
-dDsKKwl9CisKKwlyZXR1cm4gMDsKKworZXJyX291dDoKKwlnZW5sX3VucmVnaXN0ZXJfZmFtaWx5
-KCZmYW1pbHkpOworCXJldHVybiBlcnI7Cit9CisKK3ZvaWQgYmx1ZXRvb3RoX25ldGxpbmtfY2xl
-YW51cCh2b2lkKQoreworCWdlbmxfdW5yZWdpc3Rlcl9mYW1pbHkoJmZhbWlseSk7Cit9CmRpZmYg
-LS1naXQgYS9uZXQvYmx1ZXRvb3RoL25ldGxpbmsuaCBiL25ldC9ibHVldG9vdGgvbmV0bGluay5o
-Cm5ldyBmaWxlIG1vZGUgMTAwNjQ0CmluZGV4IDAwMDAwMDAuLmVhOTljNzkKLS0tIC9kZXYvbnVs
-bAorKysgYi9uZXQvYmx1ZXRvb3RoL25ldGxpbmsuaApAQCAtMCwwICsxLDMxIEBACisvKgorICog
-VGhpcyBpcyB0aGUgbmV0bGluay1iYXNlZCBibHVldG9vdGggaW50ZXJmYWNlLgorICoKKyAqIENv
-cHlyaWdodCAyMDA4IEFsb2sgQmFyc29kZSA8YWxvay5iYXJzb2RlQGF6aW5nby5jb20+CisgKi8K
-KyNpZm5kZWYgX19ORVRMSU5LX0gKKyNkZWZpbmUgX19ORVRMSU5LX0gKKworI2RlZmluZSBWRVJT
-SU9OIDB4MDEKKworZW51bSBibHVldG9vdGhfYXR0ciB7CisJQVRUUl9VTlNQRUMsCisJSU5ERVgs
-CisJVFlQRSwKKwlGTEFHUywKKwlDSEFOR0VELAorCS8qIEFkZCBhdHRyaWJ1dGVzIGhlcmUgKi8K
-KwlfX0FUVFJfTUFYLAorCUFUVFJfTUFYICA9ICBfX0FUVFJfTUFYIC0gMQorfTsKKworZW51bSBi
-bHVldG9vdGhfY21kcyB7CisJQ01EX1VOU1BFQywKKwlORVdIT1NULAorCURFTEhPU1QsCisJLyog
-QWRkIGNvbW1hbmQgaGVyZSAqLworCV9fQ01EX01BWCwKKwlDTURfTUFYICA9IF9fQ01EX01BWCAt
-IDEKK307CisKKyNlbmRpZiAvKiBfX05FVExJTktfSCAqLwotLSAKMS41LjYuMwoK
---001636417f81fe695b04635a18e3
-Content-Type: text/x-csrc; charset=US-ASCII; name="test-up.c"
-Content-Disposition: attachment; filename="test-up.c"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_frc4ndmv1
+ 	return TYPE_NONE;
+ }
+@@ -248,7 +252,7 @@ static void headset_discovery_complete(struct
+audio_device *dev, void *user_data
 
-I2luY2x1ZGUgPG5ldGxpbmsvbmV0bGluay5oPgojaW5jbHVkZSA8bmV0bGluay9nZW5sL2dlbmwu
-aD4KI2luY2x1ZGUgPG5ldGxpbmsvZ2VubC9jdHJsLmg+CiNpbmNsdWRlIDxuZXRsaW5rL21zZy5o
-PgojaW5jbHVkZSA8bmV0bGluay9hdHRyLmg+CiNpbmNsdWRlIDxzeXMvdHlwZXMuaD4KI2luY2x1
-ZGUgPHVuaXN0ZC5oPgojaW5jbHVkZSA8ZmNudGwuaD4KI2luY2x1ZGUgPGVycm5vLmg+CgojaW5j
-bHVkZSA8Ymx1ZXRvb3RoL2JsdWV0b290aC5oPgojaW5jbHVkZSA8Ymx1ZXRvb3RoL2hjaS5oPgoj
-aW5jbHVkZSA8Ymx1ZXRvb3RoL2hjaV9saWIuaD4KCiNkZWZpbmUgVkVSU0lPTiAweDAxCgplbnVt
-IGJsdWV0b290aF9hdHRyIHsKCUFUVFJfVU5TUEVDLAoJSU5ERVgsCglUWVBFLAoJRkxBR1MsCglD
-SEFOR0VELAoJLyogQWRkIGF0dHJpYnV0ZXMgaGVyZSAqLwoJX19BVFRSX01BWCwKCUFUVFJfTUFY
-ICA9ICBfX0FUVFJfTUFYIC0gMQp9OwoKZW51bSBibHVldG9vdGhfY21kcyB7CglDTURfVU5TUEVD
-LAoJTkVXSE9TVCwKCURFTEhPU1QsCgkvKiBBZGQgY29tbWFuZCBoZXJlICovCglfX0NNRF9NQVgs
-CglDTURfTUFYICA9IF9fQ01EX01BWCAtIDEKfTsKCnN0YXRpYyBpbmxpbmUgdm9pZCBzZXRfYml0
-KGludCBuciwgdm9pZCAqYWRkcikKewoJKigodWludDMyX3QgKikgYWRkciArIChuciA+PiA1KSkg
-fD0gKDEgPDwgKG5yICYgMzEpKTsKfQoKc3RhdGljIGlubGluZSBpbnQgdGVzdF9iaXQoaW50IG5y
-LCB2b2lkICphZGRyKQp7CglyZXR1cm4gKigodWludDMyX3QgKikgYWRkciArIChuciA+PiA1KSkg
-JiAoMSA8PCAobnIgJiAzMSkpOwp9CgpzdGF0aWMgc3RydWN0IG5sYV9wb2xpY3kgYmx1ZXRvb3Ro
-X3BvbGljeVtBVFRSX01BWCArIDFdID0gewoJW0lOREVYXQkgID0geyAudHlwZSA9IE5MQV9VMTYg
-fSwKCVtUWVBFXQkgID0geyAudHlwZSA9IE5MQV9VMTYgfSwKCVtGTEFHU10gICA9IHsgLnR5cGUg
-PSBOTEFfVTMyIH0sCglbQ0hBTkdFRF0gPSB7IC50eXBlID0gTkxBX1UzMiB9LAp9OwoKc3RhdGlj
-IGludCBwYXJzZV9jYihzdHJ1Y3QgbmxfbXNnICptc2csIHZvaWQgKmFyZykKewoJaW50IGVycixp
-PTA7CglzdHJ1Y3Qgbmxtc2doZHIgKm5saCA9IG5sbXNnX2hkcihtc2cpOwoJc3RydWN0IG5sYXR0
-ciAqYXR0cnNbQVRUUl9NQVgrMV07CgoJc3RydWN0IGdlbmxtc2doZHIgKmdoZHIgPSBubG1zZ19k
-YXRhKG5saCk7CgoJZXJyID0gZ2VubG1zZ19wYXJzZShubGgsIDAsIGF0dHJzLCBBVFRSX01BWCwg
-TlVMTCk7CglpZiAoZXJyIDwgMCkKCQlyZXR1cm4gLUVJTlZBTDsKCXByaW50ZigiXG5oZWxsb1xu
-Iik7Cglzd2l0Y2goZ2hkci0+Y21kKSB7CgljYXNlIE5FV0hPU1Q6CgkJICBpZighYXR0cnNbSU5E
-RVhdKSB7CgkJCXByaW50ZigiXG5ObyBpbmRleFxuIik7CgkJCXJldHVybiAtRUlOVkFMOwoJCX0K
-CQlpbnQgaW5kZXggPSBubGFfZ2V0X3UxNihhdHRyc1tJTkRFWF0pOwoJCXVpbnQzMl90IGNoYW5n
-ZWQgPSBubGFfZ2V0X3UxNihhdHRyc1tDSEFOR0VEXSk7CgkJaWYgKHRlc3RfYml0KEhDSV9VUCwg
-JmNoYW5nZWQpKQoJCXByaW50ZigiSGNpJWQgVVAgIGNoYW5nZWQgJWQiLCBpbmRleCwgY2hhbmdl
-ZCk7CgkJYnJlYWs7CglkZWZhdWx0OgoJCXByaW50ZigiXG5Vbmtub3duIGNvbW1hbmQiKTsKCQli
-cmVhazsKCX0KCglyZXR1cm4gMDsKfQoKaW50IG1haW4oKQp7CglzdHJ1Y3QgbmxfaGFuZGxlICpz
-b2NrOwoJc3RydWN0IG5sX21zZyAqbXNnOwoJaW50IGZhbWlseTsKCWludCBlcnI7Cgl1aW50MzJf
-dCBmbGFncyA9IDA7Cglzb2NrID0gbmxfaGFuZGxlX2FsbG9jKCk7CgoJZ2VubF9jb25uZWN0KHNv
-Y2spOwoKCWZhbWlseSA9IGdlbmxfY3RybF9yZXNvbHZlKHNvY2ssICJibHVldG9vdGgiKTsKCglt
-c2cgPSBubG1zZ19hbGxvYygpOwoKCWdlbmxtc2dfcHV0KG1zZywgTkxfQVVUT19QSUQsIE5MX0FV
-VE9fU0VRLCBmYW1pbHksIDAsCgkJCU5MTV9GX1JFUVVFU1QsIE5FV0hPU1QsIFZFUlNJT04pOwoK
-CW5sYV9wdXRfdTE2KG1zZywgSU5ERVgsIDApOwoKCXNldF9iaXQoSENJX1VQLCAmZmxhZ3MpOwoJ
-c2V0X2JpdChIQ0lfUFNDQU4sICZmbGFncyk7CgoJbmxhX3B1dF91MzIobXNnLCBGTEFHUywgZmxh
-Z3MpOwoJbmxfc2VuZF9hdXRvX2NvbXBsZXRlKHNvY2ssIG1zZyk7CgoJbmxtc2dfZnJlZShtc2cp
-OwoJbmxfc29ja2V0X21vZGlmeV9jYihzb2NrLCBOTF9DQl9WQUxJRCwgTkxfQ0JfQ1VTVE9NLCBw
-YXJzZV9jYiwgTlVMTCk7CgllcnIgPSBubF9yZWN2bXNnc19kZWZhdWx0KHNvY2spOwoKCXByaW50
-ZigiXG5lcnIgPSAlZFxuIiwgZXJyKTsKCglyZXR1cm4gMDsKfQoK
---001636417f81fe695b04635a18e3--
+ 	pcm = (void *) codec;
+ 	pcm->sampling_rate = 8000;
+-	if (headset_get_nrec(dev))
++	if (dev->headset && headset_get_nrec(dev))
+ 		pcm->flags |= BT_PCM_FLAG_NREC;
+ 	if (!headset_get_sco_hci(dev))
+ 		pcm->flags |= BT_PCM_FLAG_PCM_ROUTING;
+@@ -298,6 +302,34 @@ failed:
+ 	unix_ipc_error(client, BT_SET_CONFIGURATION, EIO);
+ }
+
++static void gateway_setup_complete(struct audio_device *dev, void *user_data)
++{
++	struct unix_client *client = user_data;
++	char buf[BT_SUGGESTED_BUFFER_SIZE];
++	struct bt_set_configuration_rsp *rsp = (void *) buf;
++
++	if (!dev) {
++		unix_ipc_error(client, BT_SET_CONFIGURATION, EIO);
++		return;
++	}
++
++	client->req_id = 0;
++
++	memset(buf, 0, sizeof(buf));
++
++	rsp->h.type = BT_RESPONSE;
++	rsp->h.name = BT_SET_CONFIGURATION;
++	rsp->h.length = sizeof(*rsp);
++
++	rsp->transport = BT_CAPABILITIES_TRANSPORT_SCO;
++	rsp->access_mode = client->access_mode;
++	rsp->link_mtu = 48;
++
++	client->data_fd = gateway_get_sco_fd(dev);
++
++	unix_ipc_sendmsg(client, &rsp->h);
++}
++
+ static void headset_resume_complete(struct audio_device *dev, void *user_data)
+ {
+ 	struct unix_client *client = user_data;
+@@ -350,6 +382,35 @@ failed:
+ 	unix_ipc_error(client, BT_START_STREAM, EIO);
+ }
+
++static void gateway_resume_complete(struct audio_device *dev, void *user_data)
++{
++	struct unix_client *client = user_data;
++	char buf[BT_SUGGESTED_BUFFER_SIZE];
++	struct bt_start_stream_rsp *rsp = (void *) buf;
++	struct bt_new_stream_ind *ind = (void *) buf;
++
++	memset(buf, 0, sizeof(buf));
++	rsp->h.type = BT_RESPONSE;
++	rsp->h.name = BT_START_STREAM;
++	rsp->h.length = sizeof(*rsp);
++
++	unix_ipc_sendmsg(client, &rsp->h);
++
++	memset(buf, 0, sizeof(buf));
++	ind->h.type = BT_INDICATION;
++	ind->h.name = BT_NEW_STREAM;
++	ind->h.length = sizeof(*ind);
++
++	unix_ipc_sendmsg(client, &ind->h);
++
++	client->data_fd = gateway_get_sco_fd(dev);
++	if (unix_sendmsg_fd(client->sock, client->data_fd) < 0) {
++		error("unix_sendmsg_fd: %s(%d)", strerror(errno), errno);
++		unix_ipc_error(client, BT_START_STREAM, EIO);
++	}
++	client->req_id = 0;
++}
++
+ static void headset_suspend_complete(struct audio_device *dev, void *user_data)
+ {
+ 	struct unix_client *client = user_data;
+@@ -669,6 +730,7 @@ static void start_discovery(struct audio_device
+*dev, struct unix_client *client
+ 		break;
+
+ 	case TYPE_HEADSET:
++	case TYPE_GATEWAY:
+ 		headset_discovery_complete(dev, client);
+ 		break;
+
+@@ -730,6 +792,13 @@ static void start_config(struct audio_device
+*dev, struct unix_client *client)
+ 					hs->lock, client);
+ 		client->cancel = headset_cancel_stream;
+ 		break;
++	case TYPE_GATEWAY:
++		if (gateway_config_stream(dev, gateway_setup_complete, client) >= 0) {
++			client->cancel = gateway_cancel_stream;
++			id = 1;
++		} else
++			id = 0;
++		break;
+
+ 	default:
+ 		error("No known services for device");
+@@ -787,6 +856,14 @@ static void start_resume(struct audio_device
+*dev, struct unix_client *client)
+ 		client->cancel = headset_cancel_stream;
+ 		break;
+
++	case TYPE_GATEWAY:
++		if (gateway_request_stream(dev, gateway_resume_complete, client))
++			id = 1;
++		else
++			id = 0;
++		client->cancel = gateway_cancel_stream;
++		break;
++
+ 	default:
+ 		error("No known services for device");
+ 		goto failed;
+@@ -839,6 +916,13 @@ static void start_suspend(struct audio_device
+*dev, struct unix_client *client)
+ 		client->cancel = headset_cancel_stream;
+ 		break;
+
++	case TYPE_GATEWAY:
++		gateway_suspend_stream(dev);
++		client->cancel = gateway_cancel_stream;
++		headset_suspend_complete(dev, client);
++		id = 1;
++		break;
++
+ 	default:
+ 		error("No known services for device");
+ 		goto failed;
+@@ -868,9 +952,12 @@ static void handle_getcapabilities_req(struct
+unix_client *client,
+ 		goto failed;
+ 	}
+
+-	if (req->transport == BT_CAPABILITIES_TRANSPORT_SCO)
+-		client->interface = g_strdup(AUDIO_HEADSET_INTERFACE);
+-	else if (req->transport == BT_CAPABILITIES_TRANSPORT_A2DP)
++	if (req->transport == BT_CAPABILITIES_TRANSPORT_SCO) {
++		if (req->flags & BT_FLAG_MASTER)
++			client->interface = g_strdup(AUDIO_GATEWAY_INTERFACE);
++		else
++			client->interface = g_strdup(AUDIO_HEADSET_INTERFACE);
++	} else if (req->transport == BT_CAPABILITIES_TRANSPORT_A2DP)
+ 		client->interface = g_strdup(AUDIO_SINK_INTERFACE);
+
+ 	if (!manager_find_device(&bdaddr, NULL, FALSE))
+@@ -899,20 +986,6 @@ failed:
+ 	unix_ipc_error(client, BT_GET_CAPABILITIES, EIO);
+ }
+
+-static int handle_sco_transport(struct unix_client *client,
+-				struct bt_set_configuration_req *req)
+-{
+-	if (!client->interface)
+-		client->interface = g_strdup(AUDIO_HEADSET_INTERFACE);
+-	else if (!g_str_equal(client->interface, AUDIO_HEADSET_INTERFACE))
+-		return -EIO;
+-
+-	debug("config sco - device = %s access_mode = %u", req->device,
+-			req->access_mode);
+-
+-	return 0;
+-}
+-
+ static int handle_a2dp_transport(struct unix_client *client,
+ 				struct bt_set_configuration_req *req)
+ {
+@@ -1007,13 +1080,7 @@ static void handle_setconfiguration_req(struct
+unix_client *client,
+
+ 	str2ba(req->device, &bdaddr);
+
+-	if (req->codec.transport == BT_CAPABILITIES_TRANSPORT_SCO) {
+-		err = handle_sco_transport(client, req);
+-		if (err < 0) {
+-			err = -err;
+-			goto failed;
+-		}
+-	} else if (req->codec.transport == BT_CAPABILITIES_TRANSPORT_A2DP) {
++	if (req->codec.transport == BT_CAPABILITIES_TRANSPORT_A2DP) {
+ 		err = handle_a2dp_transport(client, req);
+ 		if (err < 0) {
+ 			err = -err;
