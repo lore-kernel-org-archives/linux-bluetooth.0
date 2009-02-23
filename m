@@ -1,70 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 24 Feb 2009 11:14:14 -0500
-From: jayjwa <jayjwa@atr2.ath.cx>
-To: linux-bluetooth@vger.kernel.org
-Subject: BT headset stops working
-Message-ID: <alpine.LNX.2.00.0902230153190.8142@nge2.ngu.pk>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1235160469.24255.11.camel@californication>
+References: <8b5debfa0902200602o58dfe669g2c4ef600460ef480@mail.gmail.com>
+	 <1235160469.24255.11.camel@californication>
+Date: Mon, 23 Feb 2009 19:10:01 +0530
+Message-ID: <8b5debfa0902230540n4573363dtee4f3e9fbca64fe0@mail.gmail.com>
+Subject: Re: [PATCH]Generic Netlink Interface
+From: alok barsode <alokbarsode@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Marcel,
 
+On Sat, Feb 21, 2009 at 1:37 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Alok,
+>
+>> As per our last discussion, i am attaching a patch for the generic
+>> netlink interface.
+>> I am also attaching a test program (can be compiled with -lnl ) to
+>> test the interface.
+>>
+>> I am using "flags" to bring up the device and returning "changed",
+>> which indicate the changed bits in the flags.
+>> right now the module only supports 'up', 'iscan' and 'pscan'.
+>> so i can issue a NEWHOST command with HCI_UP | HCI_PSCAN | HCI_ISCAN.
+>> I am not sure if this is the right approach.
+>> OR Do you want individual commands for operations ?
+>
+> the first thing that we have to change the try_lock() change. We can't
+> do that. It has way to many implications on the code. So why do you
+> really need the try_lock() in this case. And if, then don't change
+> current locking code. Just create a new define for the the try_lock()
+> case.
 
-I upgraded from bluez-3.x to bluez-4.30 and found my headset no longer works.
+I was using try_lock to safeguard the code from being re-entrant.
+will create a new define in netlink.c.
 
-I figured out pairing:
+>
+> I am thinking about not exposing the ->flags directly and just creating
+> a new one for the netlink interface. For example for PSCAN and ISCAN I
+> like to have clear primitives that say connectable, discoverable etc.
+>
+> We did a lot of changes in the D-Bus API for 4.x during the last month
+> and the best way would be if the netlink API reflects these changes in a
+> more closer way. So it might be better to just have primitives that map
+> 1:1 the properties powered, connectable, discoverable etc.
 
-# simple-agent hci0 00:1A:45:01:F9:42
+sounds good.
 
-RequestPinCode (/org/bluez/18088/hci0/dev_00_1A_45_01_F9_42)
-Enter PIN Code: 0000
-Release
-New device (/org/bluez/18088/hci0/dev_00_1A_45_01_F9_42)
+>
+> We could actually just have PROPERTY primitive and then turn the
+> properties into parameters. Netlink should be fine with listing multiple
+> parameters in the same message.
 
+PROPERTY can be a nested primitive which holds the parameter <name:
+value> pair.
+so NEWHOST takes a list of parameter name:value pairs.
 
-but when playback should start, I see these familiar messages:
+did I understand you correctly?
 
-
-# sox -t mp3 sound_test.mp3 -t alsa pcm.bluetooth
-
-ALSA lib pcm_bluetooth.c:1563:(audioservice_expect) BT_START_STREAM failed : Success(0)
-ALSA lib pcm_bluetooth.c:1531:(audioservice_recv) Bogus message type 5 - name received from audio service
-sox soxio: Can't open output file `pcm.bluetooth': cannot prepare audio interface for use
-
-btusb_isoc_complete: hci0 corrupted SCO packet
-
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 0
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 0
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 0
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 0
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 0
-
-(many of these scrolling off the screen)
-
-It's the same headset that's always worked before (after patching the kernel 
-to put back the ripped out SCO functionality vs ESCO link patch):
-
-
-Requesting information ...
-         BD Address:  00:1A:45:01:F9:42
-         OUI Company: GN Netcom as (00-1A-45)
-         Device Name: Jabra BT135
-         LMP Version: 2.0 (0x3) LMP Subversion: 0xbfa
-         Manufacturer: Cambridge Silicon Radio (10)
-         Features: 0xfc 0xfe 0x0b 0x00 0x08 0x08 0x00 0x00
-                 <encryption> <slot offset> <timing accuracy> <role switch>
-                 <hold mode> <sniff mode> <RSSI> <channel quality> <SCO link>
-                 <HV2 packets> <HV3 packets> <u-law log> <A-law log> <CVSD>
-                 <paging scheme> <transparent SCO> <AFH cap. slave>
-                 <AFH cap. master>
-
-Pan doesn't appear to work either, but one problem at a time. Apologies if 
-this is the wrong list; I was under the impression this list was the successor 
-to the bluez-users list at Source Forge, as stated on www.bluez.org, but since 
-arriving here it appears to be bluetooth equal to the linux-kernel list 
-(development).
-
-
-
-
+Cheers,
+Alok.
