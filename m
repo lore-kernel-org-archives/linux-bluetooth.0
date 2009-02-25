@@ -1,41 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-From: evermind@tuxfamily.org
-To: linux-bluetooth@vger.kernel.org
-Cc: Frieder Buerzele <evermind@tuxfamily.org>
-Subject: [PATCH] Fix segfault: If the interface name is NULL the bluetoothd daemon will crash
-Date: Wed, 25 Feb 2009 12:56:51 +0100
-Message-Id: <1235563011-1432-1-git-send-email-evermind@tuxfamily.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <49A51DA0.8030003@cn.fujitsu.com>
+Date: Wed, 25 Feb 2009 18:29:52 +0800
+From: Wei Yongjun <yjwei@cn.fujitsu.com>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+CC: netdev@vger.kernel.org
+Subject: [PATCH] bluetooth: remove some pointless conditionals before kfree_skb()
+Content-Type: text/plain; charset=GB2312
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Frieder Buerzele <evermind@tuxfamily.org>
+Remove some pointless conditionals before kfree_skb().
 
+Signed-off-by: Wei Yongjun <yjwei@cn.fujitsu.com>
 ---
- gdbus/object.c |   11 ++++++-----
- 1 files changed, 6 insertions(+), 5 deletions(-)
+ net/bluetooth/cmtp/core.c |    3 +--
+ net/bluetooth/hci_core.c  |    3 +--
+ net/bluetooth/l2cap.c     |    3 +--
+ 3 files changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/gdbus/object.c b/gdbus/object.c
-index 0786aeb..d920eac 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -224,11 +224,12 @@ static struct interface_data *find_interface(GSList *interfaces,
- {
- 	GSList *list;
+diff --git a/net/bluetooth/cmtp/core.c b/net/bluetooth/cmtp/core.c
+index c9cac77..0073ec8 100644
+--- a/net/bluetooth/cmtp/core.c
++++ b/net/bluetooth/cmtp/core.c
+@@ -126,8 +126,7 @@ static inline void cmtp_add_msgpart(struct cmtp_session *session, int id, const
  
--	for (list = interfaces; list; list = list->next) {
--		struct interface_data *iface = list->data;
--		if (!strcmp(name, iface->name))
--			return iface;
--	}
-+	if (name)
-+		for (list = interfaces; list; list = list->next) {
-+			struct interface_data *iface = list->data;
-+			if (!strcmp(name, iface->name))
-+				return iface;
-+		}
+ 	session->reassembly[id] = nskb;
  
- 	return NULL;
+-	if (skb)
+-		kfree_skb(skb);
++	kfree_skb(skb);
  }
+ 
+ static inline int cmtp_recv_frame(struct cmtp_session *session, struct sk_buff *skb)
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index ba78cc1..cd06151 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1565,8 +1565,7 @@ static void hci_cmd_task(unsigned long arg)
+ 
+ 	/* Send queued commands */
+ 	if (atomic_read(&hdev->cmd_cnt) && (skb = skb_dequeue(&hdev->cmd_q))) {
+-		if (hdev->sent_cmd)
+-			kfree_skb(hdev->sent_cmd);
++		kfree_skb(hdev->sent_cmd);
+ 
+ 		if ((hdev->sent_cmd = skb_clone(skb, GFP_ATOMIC))) {
+ 			atomic_dec(&hdev->cmd_cnt);
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index b93748e..04057db 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -483,8 +483,7 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+ 
+ 	BT_DBG("hcon %p conn %p, err %d", hcon, conn, err);
+ 
+-	if (conn->rx_skb)
+-		kfree_skb(conn->rx_skb);
++	kfree_skb(conn->rx_skb);
+ 
+ 	/* Kill channels */
+ 	while ((sk = conn->chan_list.head)) {
 -- 
-1.5.6.3
-
+1.5.3.8
