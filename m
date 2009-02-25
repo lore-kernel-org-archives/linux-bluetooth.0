@@ -1,42 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Li, Zhigang" <zhigang.li@intel.com>
-To: Kartikey Parmar <kartikey2781@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Thu, 26 Feb 2009 09:26:16 +0800
-Subject: RE: Abt hcid.conf
-Message-ID: <B94C62E7C2870743865418621F040C1306A84646@pdsmsx502.ccr.corp.intel.com>
-References: <6887eb5d0902250749t784b97cahe8f24af7b335570a@mail.gmail.com>
-In-Reply-To: <6887eb5d0902250749t784b97cahe8f24af7b335570a@mail.gmail.com>
-Content-Type: text/plain; charset="gb2312"
-MIME-Version: 1.0
+Subject: Re: [PATCH] Bluetooth: i reaches pkts_to_be_removed + 1
+From: Marcel Holtmann <marcel@holtmann.org>
+To: David Sainty <david.sainty@dtsp.co.nz>
+Cc: Roel Kluin <roel.kluin@gmail.com>, linux-bluetooth@vger.kernel.org,
+	Andrew Morton <akpm@linux-foundation.org>
+In-Reply-To: <49A5CF77.6020306@dtsp.co.nz>
+References: <49A5BEEF.9080603@gmail.com>
+	 <1235601640.27004.5.camel@localhost.localdomain>
+	 <49A5CF77.6020306@dtsp.co.nz>
+Content-Type: text/plain
+Date: Thu, 26 Feb 2009 00:43:06 +0100
+Message-Id: <1235605386.27004.16.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgS2FydGlrZXksDQoNCj4tLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPkZyb206IGxpbnV4
-LWJsdWV0b290aC1vd25lckB2Z2VyLmtlcm5lbC5vcmcNCj5bbWFpbHRvOmxpbnV4LWJsdWV0b290
-aC1vd25lckB2Z2VyLmtlcm5lbC5vcmddIE9uIEJlaGFsZiBPZiBLYXJ0aWtleSBQYXJtYXINCj5T
-ZW50OiAyMDA5xOoy1MIyNcjVIDIzOjQ5DQo+VG86IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5l
-bC5vcmcNCj5TdWJqZWN0OiBBYnQgaGNpZC5jb25mDQo+DQo+aGkNCj5JIG0gbW9kaWZ5aW5nIGhj
-aWQuY29tIGx5aW5nIGluIC9ldGMvYmx1ZXRvb3RoIGZvciAic2VjdXJpdHkgbm9uZSINCj53aGlj
-aCBhcyBwZXIgaGNpZC5jb25mIGRpc2FibGVzIHNlY3VyaXR5IG1hbmFnZXIuDQo+U28gYWZ0ZXIg
-dGhhdCB3aGVuIEkgcmVib290IG15IGxpbnV4IGFuZCB0aGVuIHRyeSB0byBjb25uZWN0IHdpdGgN
-Cj5ibHVldG9vdGggaGVhZHNldCBCSC0yMDkgKE5va2lhKSBpdCBkb2Vzbid0IGNvbm5lY3QgdG8g
-aXQuDQo+RXJyb3IgaXMgIkNvbm5lY3Rpb24gcmVmdXNlZCIgd2hpY2ggaXMgYmVjYXVzZSBvZiBu
-byBsaW5ra2V5Lg0KPg0KPndoZW4gSSBkaXNhYmxlIHNlY3VyaXR5IG1hbmFnZXIgd2h5IGl0IGNo
-ZWNrcyBmb3Igc2VjdXJpdHk/Pz8NCj5FdmVuIEkgdHJpZWQgd2l0aCAic2VjdXJpdHkgYXV0byIg
-d2hpY2ggcmVhZHMgbG9jYWwgcGFzc2tleSB0aGF0IEkNCj5oYXZlIHNldCB0byAiMDAwMCIgYW5k
-IG15IEJILTIwOSBhbHNvIGhhdmUgZGVmYXVsdCBQSU4gIjAwMDAiLCBzdGlsbA0KPml0IHByb21w
-dHMgdG8gZW50ZXIgcGFzc2tleSBpbiBibHVldG9vdGggcGFpcmluZyAmIGNvbnRyb2wgd2l6YXJk
-Lg0KPg0KPlNvIEkgbSBjb25mdXNlZC4uLmV4YWN0bHkgaG93IGNhbiB3ZSBkaXNhYmxlIHNlY3Vy
-aXR5IG1hbmFnZXIgZm9yDQo+c2ltcGxlIGNvbm5lY3Rpb25zPw0KPkRvZXMgY2hhbmdlcyBpbiBo
-Y2lkLmNvbmYgbWFrZSBhbnkgaW1wYWN0Pw0KPkkgbSB1c2luZyBibHVlei00LjMwIG9uIEZlZG9y
-YSA5IChrZXJuZWwgMi42LjI1LTE0KQ0KICANCg0KQWxzbyB0aGVyZSBpcyBubyBoY2lkLmNvbmYg
-aW4gYmx1ZXotNC4zMCBzbyB5b3UgbmVlZCByZW1vdmUgdGhlIGJsdWV6My54IGNvbXBsZXRlIGlu
-IHlvdXIgRmM5IHRoZW4gaW5zdGFsbCB0aGUgYmx1ZXo0IGFnYWluLg0KDQo+DQo+cGxzIGhlbHAg
-bWUgdG8gc29sdmUgdGhpcy4uLg0KPg0KPi0tDQo+S2FydGlrZXkgUGFybWFyDQo+UiZEIFNvZnR3
-YXJlIEVuZ2cNCj5NYXRyaXggVGVsZWNvbSBQdnQgTHRkDQo+QmFyb2RhLCBHdWphcmF0IChJbmRp
-YSkNCj4wOTg3OTA5NTM5MCAoTSkNCj4tLQ0KPlRvIHVuc3Vic2NyaWJlIGZyb20gdGhpcyBsaXN0
-OiBzZW5kIHRoZSBsaW5lICJ1bnN1YnNjcmliZSBsaW51eC1ibHVldG9vdGgiIGluDQo+dGhlIGJv
-ZHkgb2YgYSBtZXNzYWdlIHRvIG1ham9yZG9tb0B2Z2VyLmtlcm5lbC5vcmcNCj5Nb3JlIG1ham9y
-ZG9tbyBpbmZvIGF0ICBodHRwOi8vdmdlci5rZXJuZWwub3JnL21ham9yZG9tby1pbmZvLmh0bWwN
-Cg==
+Hi David,
+
+> >> diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
+> >> index 894b2cb..177f34b 100644
+> >> --- a/drivers/bluetooth/hci_bcsp.c
+> >> +++ b/drivers/bluetooth/hci_bcsp.c
+> >> @@ -385,7 +385,7 @@ static void bcsp_pkt_cull(struct bcsp_struct *bcsp)
+> >>  
+> >>  	spin_unlock_irqrestore(&bcsp->unack.lock, flags);
+> >>  
+> >> -	if (i != pkts_to_be_removed)
+> >> +	if (i <= pkts_to_be_removed)
+> >>  		BT_ERR("Removed only %u out of %u pkts", i, pkts_to_be_removed);
+> >>  }
+> >>     
+> >
+> > patch looks good, but can you please fill in the commit message with a
+> > little bit more details and background.
+> >   
+> 
+> Isn't there something wrong with this?  The patched code looks like it 
+> will output apparently nonsensical messages like "Removed only 10 out of 
+> 10 pkts".
+
+yeah, that would make no real sense. I actually just thought about why
+we have that error message at all. We might should remove the message
+all together.
+
+Regards
+
+Marcel
+
+
