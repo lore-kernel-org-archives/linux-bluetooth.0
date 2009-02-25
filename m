@@ -1,54 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: btusb compatibility issues
+Subject: Re: Abt Kernel Patch
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Brian Rogers <brian@xyzw.org>
+To: Kartikey Parmar <kartikey2781@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <49A2A2D4.2020904@xyzw.org>
-References: <498EB082.7040708@xyzw.org>
-	 <1234113019.5355.18.camel@californication>  <498F7C4E.4040305@xyzw.org>
-	 <1234183143.4705.11.camel@californication>  <49A2A2D4.2020904@xyzw.org>
+In-Reply-To: <6887eb5d0902242007v66d3b1ecjd21df305414e263d@mail.gmail.com>
+References: <6887eb5d0902242007v66d3b1ecjd21df305414e263d@mail.gmail.com>
 Content-Type: text/plain
-Date: Wed, 25 Feb 2009 11:00:24 +0100
-Message-Id: <1235556025.24169.17.camel@localhost.localdomain>
+Date: Wed, 25 Feb 2009 10:53:27 +0100
+Message-Id: <1235555607.24169.14.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
+Hi Kartikey,
 
-> >>> Also please run a kernel built from bluetooth-testing.git so I can
-> >>> properly debug this. There is one change in it that affects the bulk
-> >>> URBs and maybe these dongles just don't like it if we only submit them
-> >>> when needed.
-> >> I found bluetooth-testing.git last night after posting here, and merged 
-> >> it into my kernel. Today I just tested it, and the problem is solved 
-> >> here. So there's probably no reason to provide the dump anymore. Will 
-> >> this fix be backported to 2.6.27 and 2.6.28?
-> >>     
-> >
-> > not likely since it is not clear what is causing it. There can be some
-> > other changes in the tree that could have broken and fixed it. Sometimes
-> > this is not Bluetooth related.
-> >   
-> 
-> Maybe this isn't the same as knowing what's causing it, but I'm pretty 
-> sure that 'Submit bulk URBs along with interrupt URBs' fixed it. I had 
-> done some bisecting in search of the problem and never found a point 
-> before it where btusb worked with the affected dongle. Rolling back to 
-> just before that commit reproduces the problem, and then stepping 
-> forward one fixes it again. I also tried starting with 2.6.27 and 
-> cherry-picking the changes that touch drivers/bluetooth/btusb.c. That 
-> also produced working Bluetooth as soon as that same commit was added.
-> 
-> Anyway, if it does not get backported to the official stable branches, I 
-> think some distros will still want to add it to their kernels. I'll try 
-> to get this into Ubuntu Jaunty's 2.6.28 kernel. So for the sake of me 
-> saying "this is the fix applied upstream", do you have an ETA on when 
-> this stuff will be merged into the kernel mainline?
+> I have downloaded patch-2.6.27-mh1.gz from www.bluez.org.
+> At present I m working on Fedora 9 Kernel 2.6.25
+> I want to apply this patch to my kernel. I don't fine any readme in
+> this patch file...
+> Pls guide me how to apply kernel patch file?
 
-I will be sending them for net-next inclusion during this week. Just
-have to apply one additional patch and verify that it is fixing a crash
-we saw lately.
+if you wanna apply a more recent patch against an old kernel, then you
+have to backport all its changes (and maybe dependencies). This is not a
+job the mailing list can really help you with.
+
+Why not just installing Fedora 10 which already comes with a 2.6.27 by
+default.
 
 Regards
 
