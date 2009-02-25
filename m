@@ -1,64 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <49A51DA0.8030003@cn.fujitsu.com>
-Date: Wed, 25 Feb 2009 18:29:52 +0800
+Message-ID: <49A518DD.6080509@cn.fujitsu.com>
+Date: Wed, 25 Feb 2009 18:09:33 +0800
 From: Wei Yongjun <yjwei@cn.fujitsu.com>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-CC: netdev@vger.kernel.org
-Subject: [PATCH] bluetooth: remove some pointless conditionals before kfree_skb()
+To: linux-bluetooth@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Wei Yongjun <yjwei@cn.fujitsu.com>
+Subject: [PATCH] bluetooth-drv: remove some pointless conditionals before
+ kfree_skb()
 Content-Type: text/plain; charset=GB2312
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Remove some pointless conditionals before kfree_skb().
 
 Signed-off-by: Wei Yongjun <yjwei@cn.fujitsu.com>
 ---
- net/bluetooth/cmtp/core.c |    3 +--
- net/bluetooth/hci_core.c  |    3 +--
- net/bluetooth/l2cap.c     |    3 +--
+ drivers/bluetooth/bfusb.c  |    3 +--
+ drivers/bluetooth/hci_h4.c |    3 +--
+ drivers/bluetooth/hci_ll.c |    3 +--
  3 files changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/net/bluetooth/cmtp/core.c b/net/bluetooth/cmtp/core.c
-index c9cac77..0073ec8 100644
---- a/net/bluetooth/cmtp/core.c
-+++ b/net/bluetooth/cmtp/core.c
-@@ -126,8 +126,7 @@ static inline void cmtp_add_msgpart(struct cmtp_session *session, int id, const
+diff --git a/drivers/bluetooth/bfusb.c b/drivers/bluetooth/bfusb.c
+index d3f14be..2a00707 100644
+--- a/drivers/bluetooth/bfusb.c
++++ b/drivers/bluetooth/bfusb.c
+@@ -257,8 +257,7 @@ static inline int bfusb_recv_block(struct bfusb_data *data, int hdr, unsigned ch
  
- 	session->reassembly[id] = nskb;
+ 	if (hdr & 0x10) {
+ 		BT_ERR("%s error in block", data->hdev->name);
+-		if (data->reassembly)
+-			kfree_skb(data->reassembly);
++		kfree_skb(data->reassembly);
+ 		data->reassembly = NULL;
+ 		return -EIO;
+ 	}
+diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
+index b0fafb0..c0ce813 100644
+--- a/drivers/bluetooth/hci_h4.c
++++ b/drivers/bluetooth/hci_h4.c
+@@ -102,8 +102,7 @@ static int h4_close(struct hci_uart *hu)
  
--	if (skb)
--		kfree_skb(skb);
-+	kfree_skb(skb);
- }
+ 	skb_queue_purge(&h4->txq);
  
- static inline int cmtp_recv_frame(struct cmtp_session *session, struct sk_buff *skb)
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index ba78cc1..cd06151 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1565,8 +1565,7 @@ static void hci_cmd_task(unsigned long arg)
+-	if (h4->rx_skb)
+-		kfree_skb(h4->rx_skb);
++	kfree_skb(h4->rx_skb);
  
- 	/* Send queued commands */
- 	if (atomic_read(&hdev->cmd_cnt) && (skb = skb_dequeue(&hdev->cmd_q))) {
--		if (hdev->sent_cmd)
--			kfree_skb(hdev->sent_cmd);
-+		kfree_skb(hdev->sent_cmd);
+ 	hu->priv = NULL;
+ 	kfree(h4);
+diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
+index b91d45a..5c65014 100644
+--- a/drivers/bluetooth/hci_ll.c
++++ b/drivers/bluetooth/hci_ll.c
+@@ -163,8 +163,7 @@ static int ll_close(struct hci_uart *hu)
+ 	skb_queue_purge(&ll->tx_wait_q);
+ 	skb_queue_purge(&ll->txq);
  
- 		if ((hdev->sent_cmd = skb_clone(skb, GFP_ATOMIC))) {
- 			atomic_dec(&hdev->cmd_cnt);
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index b93748e..04057db 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -483,8 +483,7 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+-	if (ll->rx_skb)
+-		kfree_skb(ll->rx_skb);
++	kfree_skb(ll->rx_skb);
  
- 	BT_DBG("hcon %p conn %p, err %d", hcon, conn, err);
+ 	hu->priv = NULL;
  
--	if (conn->rx_skb)
--		kfree_skb(conn->rx_skb);
-+	kfree_skb(conn->rx_skb);
- 
- 	/* Kill channels */
- 	while ((sk = conn->chan_list.head)) {
 -- 
 1.5.3.8
+
+
+
+
