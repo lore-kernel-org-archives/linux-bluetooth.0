@@ -1,77 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Li, Zhigang" <zhigang.li@intel.com>
+To: Kartikey Parmar <kartikey2781@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 26 Feb 2009 09:26:16 +0800
+Subject: RE: Abt hcid.conf
+Message-ID: <B94C62E7C2870743865418621F040C1306A84646@pdsmsx502.ccr.corp.intel.com>
+References: <6887eb5d0902250749t784b97cahe8f24af7b335570a@mail.gmail.com>
+In-Reply-To: <6887eb5d0902250749t784b97cahe8f24af7b335570a@mail.gmail.com>
+Content-Type: text/plain; charset="gb2312"
 MIME-Version: 1.0
-Date: Thu, 26 Feb 2009 10:54:24 +0530
-Message-ID: <6887eb5d0902252124s523126e3hffbc780000558b50@mail.gmail.com>
-Subject: Re: About hcid.conf
-From: Kartikey Parmar <kartikey2781@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-2022-JP
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Zhigang Li,
-
-Thank u very much for ur reply...
-
-I have removed bluez-3.x from Fedora 9, but when I m installing
-bluez-utils-3.36 & bluez-libs-3.36 it is installing it in
-/etc/bluetooth.
-Even the linkkeys are also stored in /etc/bluetooth/xx:xx:xx:xx:xx:xx/linkkeys
-
-should I remove that also???
-
-On 2/26/09, Li, Zhigang <zhigang.li@intel.com> wrote:
-> Hi Kartikey,
->
->
->  >-----Original Message-----
->  >From: linux-bluetooth-owner@vger.kernel.org
->  >[mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Kartikey Parmar
->  >Sent: 2009年2月25日 23:49
->  >To: linux-bluetooth@vger.kernel.org
->  >Subject: Abt hcid.conf
->  >
->  >hi
->  >I m modifying hcid.com lying in /etc/bluetooth for "security none"
->  >which as per hcid.conf disables security manager.
->  >So after that when I reboot my linux and then try to connect with
->  >bluetooth headset BH-209 (Nokia) it doesn't connect to it.
->  >Error is "Connection refused" which is because of no linkkey.
->  >
->  >when I disable security manager why it checks for security???
->  >Even I tried with "security auto" which reads local passkey that I
->  >have set to "0000" and my BH-209 also have default PIN "0000", still
->  >it prompts to enter passkey in bluetooth pairing & control wizard.
->  >
->  >So I m confused...exactly how can we disable security manager for
->  >simple connections?
->  >Does changes in hcid.conf make any impact?
->  >I m using bluez-4.30 on Fedora 9 (kernel 2.6.25-14)
->
->
->
->Also there is no hcid.conf in bluez-4.30 so you need remove the bluez3.x complete in your >Fc9 then install the bluez4 again.
->
->
->  >
->  >pls help me to solve this...
->  >
->  >--
->  >Kartikey Parmar
->  >R&D Software Engg
->  >Matrix Telecom Pvt Ltd
->  >Baroda, Gujarat (India)
->  >09879095390 (M)
->
-> >--
->  >To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->  >the body of a message to majordomo@vger.kernel.org
->  >More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-
--- 
-Kartikey Parmar
-R&D Software Engg
-Matrix Telecom Pvt Ltd
-Baroda, Gujarat (India)
-09879095390 (M)
+SGkgS2FydGlrZXksDQoNCj4tLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPkZyb206IGxpbnV4
+LWJsdWV0b290aC1vd25lckB2Z2VyLmtlcm5lbC5vcmcNCj5bbWFpbHRvOmxpbnV4LWJsdWV0b290
+aC1vd25lckB2Z2VyLmtlcm5lbC5vcmddIE9uIEJlaGFsZiBPZiBLYXJ0aWtleSBQYXJtYXINCj5T
+ZW50OiAyMDA5xOoy1MIyNcjVIDIzOjQ5DQo+VG86IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5l
+bC5vcmcNCj5TdWJqZWN0OiBBYnQgaGNpZC5jb25mDQo+DQo+aGkNCj5JIG0gbW9kaWZ5aW5nIGhj
+aWQuY29tIGx5aW5nIGluIC9ldGMvYmx1ZXRvb3RoIGZvciAic2VjdXJpdHkgbm9uZSINCj53aGlj
+aCBhcyBwZXIgaGNpZC5jb25mIGRpc2FibGVzIHNlY3VyaXR5IG1hbmFnZXIuDQo+U28gYWZ0ZXIg
+dGhhdCB3aGVuIEkgcmVib290IG15IGxpbnV4IGFuZCB0aGVuIHRyeSB0byBjb25uZWN0IHdpdGgN
+Cj5ibHVldG9vdGggaGVhZHNldCBCSC0yMDkgKE5va2lhKSBpdCBkb2Vzbid0IGNvbm5lY3QgdG8g
+aXQuDQo+RXJyb3IgaXMgIkNvbm5lY3Rpb24gcmVmdXNlZCIgd2hpY2ggaXMgYmVjYXVzZSBvZiBu
+byBsaW5ra2V5Lg0KPg0KPndoZW4gSSBkaXNhYmxlIHNlY3VyaXR5IG1hbmFnZXIgd2h5IGl0IGNo
+ZWNrcyBmb3Igc2VjdXJpdHk/Pz8NCj5FdmVuIEkgdHJpZWQgd2l0aCAic2VjdXJpdHkgYXV0byIg
+d2hpY2ggcmVhZHMgbG9jYWwgcGFzc2tleSB0aGF0IEkNCj5oYXZlIHNldCB0byAiMDAwMCIgYW5k
+IG15IEJILTIwOSBhbHNvIGhhdmUgZGVmYXVsdCBQSU4gIjAwMDAiLCBzdGlsbA0KPml0IHByb21w
+dHMgdG8gZW50ZXIgcGFzc2tleSBpbiBibHVldG9vdGggcGFpcmluZyAmIGNvbnRyb2wgd2l6YXJk
+Lg0KPg0KPlNvIEkgbSBjb25mdXNlZC4uLmV4YWN0bHkgaG93IGNhbiB3ZSBkaXNhYmxlIHNlY3Vy
+aXR5IG1hbmFnZXIgZm9yDQo+c2ltcGxlIGNvbm5lY3Rpb25zPw0KPkRvZXMgY2hhbmdlcyBpbiBo
+Y2lkLmNvbmYgbWFrZSBhbnkgaW1wYWN0Pw0KPkkgbSB1c2luZyBibHVlei00LjMwIG9uIEZlZG9y
+YSA5IChrZXJuZWwgMi42LjI1LTE0KQ0KICANCg0KQWxzbyB0aGVyZSBpcyBubyBoY2lkLmNvbmYg
+aW4gYmx1ZXotNC4zMCBzbyB5b3UgbmVlZCByZW1vdmUgdGhlIGJsdWV6My54IGNvbXBsZXRlIGlu
+IHlvdXIgRmM5IHRoZW4gaW5zdGFsbCB0aGUgYmx1ZXo0IGFnYWluLg0KDQo+DQo+cGxzIGhlbHAg
+bWUgdG8gc29sdmUgdGhpcy4uLg0KPg0KPi0tDQo+S2FydGlrZXkgUGFybWFyDQo+UiZEIFNvZnR3
+YXJlIEVuZ2cNCj5NYXRyaXggVGVsZWNvbSBQdnQgTHRkDQo+QmFyb2RhLCBHdWphcmF0IChJbmRp
+YSkNCj4wOTg3OTA5NTM5MCAoTSkNCj4tLQ0KPlRvIHVuc3Vic2NyaWJlIGZyb20gdGhpcyBsaXN0
+OiBzZW5kIHRoZSBsaW5lICJ1bnN1YnNjcmliZSBsaW51eC1ibHVldG9vdGgiIGluDQo+dGhlIGJv
+ZHkgb2YgYSBtZXNzYWdlIHRvIG1ham9yZG9tb0B2Z2VyLmtlcm5lbC5vcmcNCj5Nb3JlIG1ham9y
+ZG9tbyBpbmZvIGF0ICBodHRwOi8vdmdlci5rZXJuZWwub3JnL21ham9yZG9tby1pbmZvLmh0bWwN
+Cg==
