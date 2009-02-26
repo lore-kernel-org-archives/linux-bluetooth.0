@@ -1,33 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Thu, 26 Feb 2009 12:59:45 +0100
-Message-ID: <bc36f8ed0902260359t6a3fe2c0vc4baefd3c205cebf@mail.gmail.com>
-Subject: Performance considerations
-From: Mickael Chazaux <mickael.chazaux@gmail.com>
+Date: Thu, 26 Feb 2009 15:40:48 +0530
+Message-ID: <6887eb5d0902260210q100eca7bnfea66422ec61e58d@mail.gmail.com>
+Subject: Query: using obexftp application with no pin
+From: Kartikey Parmar <kartikey2781@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+hi
 
-I am programming with bluez in C, transfering data from a linux PC to a
-java application on a phone. All works fine. I have some performance
-questions.
+Is it possible to send file using obexFTP by just accepting the
+request to receive at the far end?
 
-When I use L2CAP sockets, I get an average of 10% better bitrate on a
-given pair PC/phone than with RFCOMM sockets. Also, changing the MTU
-of the L2CAP socket has an impact on bitrate. An MTU of 672 on some
-phones gives a average bitrate of 190kB/s, nearly 50% more than with
-an MTU of 256 bytes.
+Just like it is possible to send ringtone / .jpg file from 1 bluetooth
+enable mobile to another bluetooth enable mobile by just discovering
+it and sending the selected file to it.
+At the destination end user just needs to click on yes to accept data
+from remote device.
 
-Also, in noisy environements (with lots and lots of phones with
-bluetooth enabled), there is a great decrease in performance (
-an average of 50kB/s with a good phone).
+In that case pairing is not required, that means neither side it
+prompts to enter pin and on successful completion of the operation the
+received file will be there in Received Files folder on the
+destination bluetooth enable mobile phone.
 
-What bitrate values can you achieve? Can I expect an amelioration, for
-example on fine tuning the stack's parameters, to get the maximum
-bitrate possible?
+I have written an file transfer application using openObex and obexFTP
+functions which performs similar function.
 
-Regards,
-Mickael
+In my application I did prompt user for any type of PIN / passkey,
+still when my application attempts to connect with remote device it
+prompt to enter PIN on the remote device and on successful submission
+of PIN, bluez-gnome utility prompts me to enter PIN.
+
+If both PIN are matches, it creates bonding and then I can have file
+transfer between these two.
+
+Is it possible to disable this PIN request and connection without any
+PIN / linkkey? i.e. is it possible to exchange files withough bonding?
+
+I m using openObex-1.5, obexFTP-0.23 and bluez-4.30 on Fedora 9
+
+Awaiting for reply...
+
+-- 
+Kartikey Parmar
+R&D Software Engg
+Matrix Telecom Pvt Ltd
+Baroda, Gujarat (India)
+09879095390 (M)
