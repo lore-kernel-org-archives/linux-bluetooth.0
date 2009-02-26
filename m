@@ -1,51 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <49A6657C.6020109@access-company.com>
+Date: Thu, 26 Feb 2009 10:48:44 +0100
+From: Frederic Danis <frederic.danis@access-company.com>
 MIME-Version: 1.0
-Date: Thu, 26 Feb 2009 15:40:48 +0530
-Message-ID: <6887eb5d0902260210q100eca7bnfea66422ec61e58d@mail.gmail.com>
-Subject: Query: using obexftp application with no pin
-From: Kartikey Parmar <kartikey2781@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: BlueZ pairing failure and kernel 2.6.24 crash
+References: <49886819.2030401@access-company.com> <1233772466.12562.6.camel@californication> <498B0C6A.6000609@access-company.com>
+In-Reply-To: <498B0C6A.6000609@access-company.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-hi
+Hello Marcel,
+> Hello Marcel,
+>> Hi Frederic,
+>>
+>>> I am working with BlueZ 3.22, kernel 2.6.24 on ARM and found 2 
+>>> problems :
+>>>
+>>> -  I am not able to pair with some phones (Nokia N70 and 
+>>> sony-ericsson P800). After some investigations, I found that a "L2CAP 
+>>> information request packet" is sent just after the ACL connection. 
+>>> Both phones reply with "command rejected" error, then disconnect the 
+>>> ACL link before BlueZ is able to finish the pairing (see attached 
+>>> traces).
+>>>
+>>> - with some other phones (LG 990 Viewty and sony-ericsson T610), the 
+>>> kernel crashes after pairing initiated by the phone is completed.
+>>>
+>>> For the first problem I removed the send of the "L2CAP information 
+>>> request packet" in the kernel (see attached patch). This fixes both 
+>>> problems.
+>>>
+>>> I did not found any usage of the remote L2CAP information in kernel.
+>>> Is sending "L2CAP information request packet" mandatory for upper 
+>>> layer and/or qualification ?
+>>> Is my fix OK ?
+>>
+>> sending the L2CAP info is just fine. It should not cause any problems. I
+>> think it is the pairing code that does some weird things at the wrong
+>> time. Can you test with bluetooth-testing.git against bluez-4.28 to
+>> verify that this issue still exists.
+> 
+> I try multiple configuration to test these 2 problems :
+> 
+> - pairing out failure with P800 or N70 :
+>   - Ubuntu 8.04 + kernel 2.6.24.23 + BlueZ 3.26 => unable to pair (see 
+> Ubuntu804_Bluez326_traces.txt)
+>   - Ubuntu 8.04 + kernel 2.6.24.23 + BlueZ 4.28 => unable to pair (see 
+> Ubuntu804_Bluez428_traces.txt)
+>   - Ubuntu 8.10 + kernel 2.6.27.11 + BlueZ 4.12 => pairing OK (see 
+> Ubuntu810_Bluez412_traces.txt)
+> 
+>   To perform pairing I use :
+>   BlueZ 3.26 : dbus-send --system --type=method_call --print-reply 
+> --dest=org.bluez /org/bluez/hci1 org.bluez.Adapter.CreateBonding 
+> string:00:0A:D9:14:D0:85
+>   BlueZ 4.xx : bluez-4.xx/test/simple-agent hci0 00:0A:D9:14:D0:85
+> 
+> - kernel crash with LG 990 :
+>   - Ubuntu 8.04 + kernel 2.6.24.23 + BlueZ 3.26 => Ubuntu freeze (kernel 
+> crash)
+>   - Ubuntu 8.04 + kernel 2.6.24.23 + BlueZ 4.28 => Ubuntu freeze (kernel 
+> crash)
+>   - Ubuntu 8.10 + kernel 2.6.27.11 + BlueZ 4.12 => pairing OK
+> 
+> So, for me, it seems to be a problem in the kernel 2.6.24.
+> What is your opinion ?
+> 
+> Unfortunately, I am not able to change kernel version. Do you have any 
+> idea how to fix this, please ? Is my fix OK ?
+> 
+> Regards
+> 
+> Fred
+> 
+> 
 
-Is it possible to send file using obexFTP by just accepting the
-request to receive at the far end?
+Do you have any idea how to fix this, please ? Is my fix OK ?
+Is there any problem (interoperability, qualification, ...) to remove L2CAP info request ?
 
-Just like it is possible to send ringtone / .jpg file from 1 bluetooth
-enable mobile to another bluetooth enable mobile by just discovering
-it and sending the selected file to it.
-At the destination end user just needs to click on yes to accept data
-from remote device.
+Regards
 
-In that case pairing is not required, that means neither side it
-prompts to enter pin and on successful completion of the operation the
-received file will be there in Received Files folder on the
-destination bluetooth enable mobile phone.
-
-I have written an file transfer application using openObex and obexFTP
-functions which performs similar function.
-
-In my application I did prompt user for any type of PIN / passkey,
-still when my application attempts to connect with remote device it
-prompt to enter PIN on the remote device and on successful submission
-of PIN, bluez-gnome utility prompts me to enter PIN.
-
-If both PIN are matches, it creates bonding and then I can have file
-transfer between these two.
-
-Is it possible to disable this PIN request and connection without any
-PIN / linkkey? i.e. is it possible to exchange files withough bonding?
-
-I m using openObex-1.5, obexFTP-0.23 and bluez-4.30 on Fedora 9
-
-Awaiting for reply...
+Fred
 
 -- 
-Kartikey Parmar
-R&D Software Engg
-Matrix Telecom Pvt Ltd
-Baroda, Gujarat (India)
-09879095390 (M)
+-----------------------------------------------
+It is not by improving the oil lamp that one invents the electric bulb!
+-----------------------------------------------
+Danis Frederic                   Access Company
+Software engineer
+Mail : mailto:frederic.danis@access-company.com
+-----------------------------------------------
