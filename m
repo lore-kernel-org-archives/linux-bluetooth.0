@@ -1,42 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <20090227144517.qrsrnqmncw4woc4k@webmail.uniserve.com>
-Date: Fri, 27 Feb 2009 14:45:17 -0500
-From: zakharov@ca.inter.net
+From: Philipp Zabel <philipp.zabel@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Passkey in Bluez4.x
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
-	DelSp=Yes	format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: linux-pcmcia@lists.infradead.org, Dominik Brodowski <linux@dominikbrodowski.net>, Marcel Holtmann <marcel@holtmann.org>, Philipp Zabel <philipp.zabel@gmail.com>
+Subject: [PATCH] pcmcia: dtl1_cs: fix pcmcia_loop_config logic
+Date: Fri, 27 Feb 2009 17:54:08 +0100
+Message-Id: <1235753648-10045-1-git-send-email-philipp.zabel@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Good day (Marcel & Co),
+pcmcia_loop_config returns 0 on success.
 
-We did use bluez3.x with Ubuntu 8.04 along with chan_mobile from
-Asterisk add-on, and pairing was done using hcid.conf.
-We would like to move to bluez4.x - install fresh Ubunti 8.04 without
-bluez-utils and bluetooth-dev packages and then compile/install
-bluez4.31 (we are looking for impreved sound quality etc. and overall
-would like to be up to speed with your current development). If you
-don't mind to answer the following:
+Signed-off-by: Philipp Zabel <philipp.zabel@gmail.com>
+---
+ drivers/bluetooth/dtl1_cs.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-1) During Astrerisk add-ons compile chan-mobile portion is looking for
-bluez libraries - did it change (location, names, API etc.) since
-bluez3.x?
-2) Do you have confirmed statements that bluez4.x and chan-mobile do
-play nicely with each other?
-3) I am confused with regard to pairing in Bluez4.x - we need to be able
-to pair with cell phone in a server environment - no GUI whatsoever, so
-I am looking for cli based setup instructions - google didn't give me
-much in terms of roadmap. After installing bluez4.30 I was able to
-hcitool dev and hcitool scan, but when I tried to pair the phone, then
-phone didn't see any active devices. Do I miss something here? I saw
-somewhere in a mailing list your reply to similar question, but didn't
-get it - it was something to do with 'agent'. I did try trunk Ubuntu
-(9.04) with claimed bluez4.30, but my chan-mobile compile wouldn't pick
-up needed libraries. I would like to stay with Ubuntu 8.04 LTS and
-compile/install Bluez manually.
-
-Best regards,
-Alexander
-
+diff --git a/drivers/bluetooth/dtl1_cs.c b/drivers/bluetooth/dtl1_cs.c
+index 901bdd9..e0ee642 100644
+--- a/drivers/bluetooth/dtl1_cs.c
++++ b/drivers/bluetooth/dtl1_cs.c
+@@ -616,7 +616,7 @@ static int dtl1_config(struct pcmcia_device *link)
+ 
+ 	/* Look for a generic full-sized window */
+ 	link->io.NumPorts1 = 8;
+-	if (!pcmcia_loop_config(link, dtl1_confcheck, NULL))
++	if (pcmcia_loop_config(link, dtl1_confcheck, NULL))
+ 		goto failed;
+ 
+ 	i = pcmcia_request_irq(link, &link->irq);
+-- 
+1.5.6.5
