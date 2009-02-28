@@ -1,27 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Where can I find old bluetooth kernel patches?
+Subject: Re: [PATCH] Fix segfault: If the interface name is NULL the
+ bluetoothd daemon will crash
 From: Marcel Holtmann <marcel@holtmann.org>
-To: =?UTF-8?Q?hlidea=28=E6=B3=A8=E6=84=8F=E5=8A=9B=E9=9B=86=E4=B8=AD=29?=
-	<hlidea.gm@gmail.com>
+To: Frieder Buerzele <evermind@tuxfamily.org>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <c89fa46a0902260029p2ea12a8fte30f90d23964a311@mail.gmail.com>
-References: <c89fa46a0902260029p2ea12a8fte30f90d23964a311@mail.gmail.com>
+In-Reply-To: <1235638007-22946-2-git-send-email-evermind@tuxfamily.org>
+References: <1235638007-22946-1-git-send-email-evermind@tuxfamily.org>
+	 <1235638007-22946-2-git-send-email-evermind@tuxfamily.org>
 Content-Type: text/plain
-Date: Sat, 28 Feb 2009 22:47:07 +0100
-Message-Id: <1235857627.6074.41.camel@localhost.localdomain>
+Date: Sat, 28 Feb 2009 22:46:30 +0100
+Message-Id: <1235857590.6074.40.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chris,
+Hi Frieder,
 
-> For some reason, I need the old bluetooth kernel patches for kernel
-> 2.4.20. However, all the patches from
-> http://www.holtmann.org/linux/kernel are lost. Are there any other
-> places where I can find these patches? Or could somebody kindly supply
-> it for me? Thanks in advance.
+> diff --git a/gdbus/object.c b/gdbus/object.c
+> index 0786aeb..dde654b 100644
+> --- a/gdbus/object.c
+> +++ b/gdbus/object.c
+> @@ -224,6 +224,9 @@ static struct interface_data *find_interface(GSList *interfaces,
+>  {
+>  	GSList *list;
+>  
+> +	if (NULL == name)
+> +		return NULL;
+> +
+>  	for (list = interfaces; list; list = list->next) {
+>  		struct interface_data *iface = list->data;
+>  		if (!strcmp(name, iface->name))
 
-there is no active support for the 2.4 kernel series anymore.
+a similar patch has been applied to bluez, obexd and connmand. Thanks.
 
 Regards
 
