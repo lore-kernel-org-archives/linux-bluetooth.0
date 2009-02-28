@@ -1,60 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1235856937.6074.35.camel@localhost.localdomain>
-References: <1235753648-10045-1-git-send-email-philipp.zabel@gmail.com>
-	 <1235856937.6074.35.camel@localhost.localdomain>
-Date: Sat, 28 Feb 2009 23:16:51 +0100
-Message-ID: <74d0deb30902281416v5904957ew1ce029eaf81d5804@mail.gmail.com>
-Subject: Re: [PATCH] pcmcia: dtl1_cs: fix pcmcia_loop_config logic
-From: pHilipp Zabel <philipp.zabel@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org, linux-pcmcia@lists.infradead.org,
-	Dominik Brodowski <linux@dominikbrodowski.net>
-Content-Type: text/plain; charset=ISO-8859-1
+From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
+To: linux-bluetooth@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Subject: [PATCH] bluetooth: create macros for channels identifiers
+Date: Sat, 28 Feb 2009 19:04:24 -0300
+Message-Id: <1235858664-32201-1-git-send-email-gustavo@las.ic.unicamp.br>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Use macros instead of hardcoded numbers to get a code more readable.
 
-On Sat, Feb 28, 2009 at 10:35 PM, Marcel Holtmann <marcel@holtmann.org> wro=
-te:
-> Hi Philipp,
->
->> pcmcia_loop_config returns 0 on success.
->>
->> Signed-off-by: Philipp Zabel <philipp.zabel@gmail.com>
->> ---
->> =A0drivers/bluetooth/dtl1_cs.c | =A0 =A02 +-
->> =A01 files changed, 1 insertions(+), 1 deletions(-)
->>
->> diff --git a/drivers/bluetooth/dtl1_cs.c b/drivers/bluetooth/dtl1_cs.c
->> index 901bdd9..e0ee642 100644
->> --- a/drivers/bluetooth/dtl1_cs.c
->> +++ b/drivers/bluetooth/dtl1_cs.c
->> @@ -616,7 +616,7 @@ static int dtl1_config(struct pcmcia_device *link)
->>
->> =A0 =A0 =A0 /* Look for a generic full-sized window */
->> =A0 =A0 =A0 link->io.NumPorts1 =3D 8;
->> - =A0 =A0 if (!pcmcia_loop_config(link, dtl1_confcheck, NULL))
->> + =A0 =A0 if (pcmcia_loop_config(link, dtl1_confcheck, NULL))
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto failed;
->>
->> =A0 =A0 =A0 i =3D pcmcia_request_irq(link, &link->irq);
->
-> can you check the other Bluetooth PCMCIA drivers, too.
+Signed-off-by: Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
+---
+ include/net/bluetooth/l2cap.h |    6 ++++++
+ net/bluetooth/l2cap.c         |   18 +++++++++---------
+ 2 files changed, 15 insertions(+), 9 deletions(-)
 
-bluecard_cs doesn't use pcmcia_loop_config. bt3c_cs and btuart_cs both
-have something like
-	if (!pcmcia_loop_config(...))
-		goto found_port;
-instead, which looks fine.
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index f566aa1..ed4ba91 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -106,6 +106,12 @@ struct l2cap_conn_rsp {
+ 	__le16     status;
+ } __attribute__ ((packed));
+ 
++/* channel indentifier */
++#define L2CAP_CID_SIGNALING	0x0001
++#define L2CAP_CID_CONN_LESS	0x0002
++#define L2CAP_CID_DYN_START	0x0040
++#define L2CAP_CID_DYN_END	0xffff
++
+ /* connect result */
+ #define L2CAP_CR_SUCCESS    0x0000
+ #define L2CAP_CR_PEND       0x0001
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index ca4d3b4..ff1744e 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -161,9 +161,9 @@ static inline struct sock *l2cap_get_chan_by_ident(struct l2cap_chan_list *l, u8
+ 
+ static u16 l2cap_alloc_cid(struct l2cap_chan_list *l)
+ {
+-	u16 cid = 0x0040;
++	u16 cid = L2CAP_CID_DYN_START;
+ 
+-	for (; cid < 0xffff; cid++) {
++	for (; cid < L2CAP_CID_DYN_END; cid++) {
+ 		if(!__l2cap_get_chan_by_scid(l, cid))
+ 			return cid;
+ 	}
+@@ -215,13 +215,13 @@ static void __l2cap_chan_add(struct l2cap_conn *conn, struct sock *sk, struct so
+ 		l2cap_pi(sk)->scid = l2cap_alloc_cid(l);
+ 	} else if (sk->sk_type == SOCK_DGRAM) {
+ 		/* Connectionless socket */
+-		l2cap_pi(sk)->scid = 0x0002;
+-		l2cap_pi(sk)->dcid = 0x0002;
++		l2cap_pi(sk)->scid = L2CAP_CID_CONN_LESS;
++		l2cap_pi(sk)->dcid = L2CAP_CID_CONN_LESS;
+ 		l2cap_pi(sk)->omtu = L2CAP_DEFAULT_MTU;
+ 	} else {
+ 		/* Raw socket can send/recv signalling messages only */
+-		l2cap_pi(sk)->scid = 0x0001;
+-		l2cap_pi(sk)->dcid = 0x0001;
++		l2cap_pi(sk)->scid = L2CAP_CID_SIGNALING;
++		l2cap_pi(sk)->dcid = L2CAP_CID_SIGNALING;
+ 		l2cap_pi(sk)->omtu = L2CAP_DEFAULT_MTU;
+ 	}
+ 
+@@ -1598,7 +1598,7 @@ static struct sk_buff *l2cap_build_cmd(struct l2cap_conn *conn,
+ 
+ 	lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
+ 	lh->len = cpu_to_le16(L2CAP_CMD_HDR_SIZE + dlen);
+-	lh->cid = cpu_to_le16(0x0001);
++	lh->cid = cpu_to_le16(L2CAP_CID_SIGNALING);
+ 
+ 	cmd = (struct l2cap_cmd_hdr *) skb_put(skb, L2CAP_CMD_HDR_SIZE);
+ 	cmd->code  = code;
+@@ -2420,11 +2420,11 @@ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	BT_DBG("len %d, cid 0x%4.4x", len, cid);
+ 
+ 	switch (cid) {
+-	case 0x0001:
++	case L2CAP_CID_SIGNALING:
+ 		l2cap_sig_channel(conn, skb);
+ 		break;
+ 
+-	case 0x0002:
++	case L2CAP_CID_CONN_LESS:
+ 		psm = get_unaligned((__le16 *) skb->data);
+ 		skb_pull(skb, 2);
+ 		l2cap_conless_channel(conn, psm, skb);
+-- 
+1.6.0.6
 
-> One of the PCMCIA
-> subsystem changes might have screwed this up and affects more drivers
-> than expected.
-
-"pcmcia: use pcmcia_loop_config in bluetooth drivers"
-(ed58872aa33e16a0d5352080e47c65fa14e6ad1c)
-only touched bt3_cs, btuart_cs and dtl1_cs.
-
-regards
-Philipp
