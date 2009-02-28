@@ -1,61 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: AddCablePairedDevice (was Re: [PATCHes] Add sixpair)
-From: Bastien Nocera <hadess@hadess.net>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1235861062.6074.43.camel@localhost.localdomain>
-References: <1224083727.5268.3149.camel@cookie.hadess.net>
-	 <1224114777.28173.41.camel@californication>
-	 <1224116918.5268.3845.camel@cookie.hadess.net>
-	 <1235857725.7310.797.camel@cookie.hadess.net>
-	 <1235861062.6074.43.camel@localhost.localdomain>
-Content-Type: text/plain
-Date: Sat, 28 Feb 2009 23:47:54 +0000
-Message-Id: <1235864874.7310.919.camel@cookie.hadess.net>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <c362cb880902281532ia34c1f8r64e7a8fae8684a3a@mail.gmail.com>
+References: <c362cb880902281532ia34c1f8r64e7a8fae8684a3a@mail.gmail.com>
+Date: Sat, 28 Feb 2009 23:33:43 +0000
+Message-ID: <c362cb880902281533w260a358bo42bac372c65f1508@mail.gmail.com>
+Subject: Re: How to set up and use BlueZ/Bluetooth in Slackware
+From: Lee Jones <slothpuck@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, 2009-02-28 at 23:44 +0100, Marcel Holtmann wrote:
-> Hi Bastien,
->=20
-> > > We could solve the data loss, and update problem by having an interna=
-l,
-> > > root only, dbus method available for cable pairing of that sort. For
-> > > example, on org.bluez.Adapter:
-> > > void AddCablePairedDevice (string name,
-> > >                            string address,
-> > >                            unsigned int vendor_id,
-> > >                            unsigned int product_id,
-> > >                            string pnp_record);
-> > >=20
-> > > The function would just need to do all the storage work sixpair
-> > > currently does, and create the device internally similarly to
-> > > create_stored_device_from_profiles().
-> >=20
-> > Patch to do that attached.
-> >=20
-> > After setting the master bdaddr on the sixaxis using sixpair, I ran:
-> > dbus-send --system --type=3Dmethod_call --print-reply --dest=3D"org.blu=
-ez" /org/bluez/11043/hci0 org.bluez.Adapter.AddCablePairedDevice string:Foo=
-bar string:00:19:C1:61:D6:62 uint32:0x054c uint32:0x0268 string:36019209000=
-00A000100000900013503191124090004350D35061901000900113503190011090006350909=
-656E09006A0901000900093508350619112409010009000D350F350D3506190100090013350=
-31900110901002513576972656C65737320436F6E74726F6C6C65720901012513576972656C=
-65737320436F6E74726F6C6C6572090102251B536F6E7920436F6D707574657220456E74657=
-27461696E6D656E740902000901000902010901000902020800090203082109020428010902=
-052801090206359A35980822259405010904A101A102850175089501150026FF00810375019=
-513150025013500450105091901291381027501950D0600FF8103150026FF0005010901A100=
-75089504350046FF0009300931093209358102C005017508952709018102750895300901910=
-2750895300901B102C0A1028502750895300901B102C0A10285EE750895300901B102C0A102=
-85EF750895300901B102C0C0090207350835060904090901000902082800090209280109020=
-A280109020B09010009020C093E8009020D280009020E2800
-> >=20
-> > Which created the device in bluez. I'd leave it up to sixpair to remove
-> > the device from other adapters, and setting the device as trusted
-> > (though this didn't seem necessary for the pad to work).
->=20
-> can this be made a little bit more generic. For example Bluetooth 2.1
-> has the out-of-band (OOB) ways for Simple Pairing and if we can design
-> something generic here that would help a lot.
+On Sat, Feb 28, 2009 at 11:32 PM, Lee Jones <slothpuck@gmail.com> wrote:
+> Hello all,
+>
+> Here's what I am trying to do. Basically my aim is to use USB based
+> bluetooth adapters to share an internet connection from one PC to an
+> old Apple imac (G3). However, I'm not really having much success in
+> doing so.
+>
+> First of all let me mention what version of linux distro I'm using.
+> The computer(s) I am using all run slackware, slamd64 (64-bit version
+> of slackware) and slackintosh (a PPC version of slackware). From
+> memory, slackintosh is 12.1; slackware and slamd64 are on 12.2 .
+>
+> Unfortunatly although slackware already comes with a compiled version
+> of bluez which appears to be functioning I cannot really find any
+> information on how to set it all up. All the information to date I've
+> come across by googling suggests the following;
+>
+> * Refers to a different distro (e.g. ubuntu) so all the config/setup
+> details are different.
+> * The information is 3,4,5 or more years old and out of date.
+> * "Install KDE". :( .
+>
+> Ok so you might wonder why I don't just use wireless? Well, the idea
+> goes like this -- use wireless (which is already functioning on the PC
+> running slamd64) to get the internet connection (fully working, I'm
+> using it right now to type this message and email it!) and then use
+> bluetooth on the old imac G3 with slackintosh to share the PC's
+> internet connection. Ndiswrapper could never work on the G3 since it's
+> only for x86, not PPC, and none of my USB wireless adapters work
+> without ndiswrapper. Besides, on such an old (but usable) machine the
+> full speed of a wlan (wireless) USB would never be used.
+>
+> But bluetooth *does* seem to work on the G3, and for that matter -the
+> 64 bit (slamd64) system too! Only snag is .... is how to set it all
+> up.
+>
+> One bluetooth adapter (on the 64 bit system) is configured with MAC
+> address 00:11:67:45:45:45
+> The other (G3 imac) is configured with MAC address 00:11:67:18:18:18
+>
+> So far, I can get each adapter to scan one another, and they detect
+> one another ok. So "hcitool scan" on the system with MAC address
+> displays 00:11:67:18:18:18; the other 00:11:67:45:45:45  . But that's
+> as far as I can get!
+>
+> Now if I try hcitool hci0 up, and try to  l2ping one anothers'
+> bluetooth USB sticks, I always get the same message - "no route to
+> host". Trying something like "sdptool browse 00:11:67:45:45:45"
+> displays nothing, I have to hit CTRL-C to stop it.
+>
+> I understand that both USB bluetooth sticks need to "see" each other
+> but that's where I cannot find the information. Both of my USB
+> bluetooth sticks have green LEDs which flash on and off, which (I'm
+> guessing) means they're looking for one another but can't find one
+> another.
+>
+> Can anyone help on this?
+>
+> ljones
+>
 
-What does it need for SP to work?
+
+I should also add that I get exactly the same problems if I replace
+the G3 imac with a normal PC laptop, I have tried doing the same thing
+by replacing the G3 imac with an IBM T22 laptop, but I get the same
+problems.
+
+ljones
