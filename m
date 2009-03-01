@@ -1,54 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
+Subject: Re: Bluetooth radio =?ISO-8859-1?Q?doesn=B4t?= reply to inquiry
+ request
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Carles Cufi <carles.cufi@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <D97BBDAF-F830-4495-B1CC-B56C5C235E72@gmail.com>
-From: Carles Cufi <carles.cufi@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1235931668.6074.47.camel@localhost.localdomain>
-Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
-Mime-Version: 1.0 (Apple Message framework v930.3)
-Subject: =?ISO-8859-1?Q?Re:_Bluetooth_radio_doesn=B4t_reply_to_inquiry_re?=
- =?ISO-8859-1?Q?quest?=
-Date: Sun, 1 Mar 2009 19:55:06 +0100
-References: <aa4f458e0903010445j49d07c26j144210cb099540de@mail.gmail.com> <1235931668.6074.47.camel@localhost.localdomain>
+In-Reply-To: <aa4f458e0903010445j49d07c26j144210cb099540de@mail.gmail.com>
+References: <aa4f458e0903010445j49d07c26j144210cb099540de@mail.gmail.com>
+Content-Type: text/plain
+Date: Sun, 01 Mar 2009 19:21:08 +0100
+Message-Id: <1235931668.6074.47.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Charles,
 
-Thanks for your reply.
+> I am currently developing a custom application and while debugging it
+> I have stumbled upon a problem that seems to be
+> related to some internal kernel problem, and hence I am sharing it
+> with you to see if anyone has any advice at all about
+> how to approach it.
+> 
+> I have a setup running:
+> 
+> * Ubuntu 8.10
+> * Linux 2.6.27-11-generic #1 SMP
+> * BlueZ 4.12 (from pkgconfig)
+> * Gnome with the bluetooth daemon running
+> * A High-speed USB hub with 3 Toshiba Bluetooth 2.0 dongles
+> (PA3455U-1BTM) each with a CSR BlueCore-4 inside.
+> 
+> What the application does:
+> 
+> My custom application performs inquiries (using the hci2 Host
+> Controller) periodically with bound raw HCI sockets (i.e.
+> hci_send_cmd (dd, OGF_LINK_CTL, OCF_INQUIRY, INQUIRY_CP_SIZE, &cp);)
+> and then receiving the inquiry responses by polling
+> the device descriptor and parsing the events that come from the Host
+> Controller (len = read(dd, hci_buffer,
+> sizeof(hci_buffer)) and then headerptr = (hci_event_hdr *) (hci_buffer
+> + 1);). In the meantime, Host Controllers hci0
+> and hci1 send files over OBEX (using obexftp) to the devices discovered by hci2.
+> 
+> The problem:
+> 
+> The application runs fine for a while, inquiring and sending (or
+> trying to send) files over OBEX. But after a few
+> successful inquiries, the program stops after having sent an inquiry
+> request command and never receiving any response
+> for it (no command status and no inquiry result or inquiry complete events).
+> After that, the btusb subsystem seems to block completely, since I am
+> unable to contact
+> any of the HCs until I unload it and load it again (with rmmod and modprobe).
+> 
+> Logs attached:
+> 
+> hciconfig_dump: output of hciconfig -a
+> hciX_dump: output of sudo hcidump -i hciX -Vt
+> dmesg_dump: output of dmesg
+> 
+> Please note that to help me find out what was going on inside the
+> kernel I decided to recompile bluetooth.ko and
+> btusb.ko with the following flags enabled:
+> CONFIG_BT_HCIBTUSB_DEBUG
+> CONFIG_BT_HCI_CORE_DEBUG
+> CONFIG_BT_HCI_SOCK_DEBUG
+> 
+> What seems to be going on:
+> 
+> From the last few lines of dmesg:
+> 
+> [  324.011911] hci_send_frame: hci2 type 1 len 8
+> [  324.011913] hci_send_to_sock: hdev edfe7800 len 8
+> [  324.011921] btusb_send_frame: hci2
+> [  324.011939] hci_sock_recvmsg: sock ec9aa900, sk eda5ee00
+> [  324.256140] __set_isoc_interface: hci1 setting interface failed (110)
+> 
+> and the last few lines of hci2_dump:
+> 
+> 2009-02-27 13:23:49.377393 < HCI Command: Inquiry (0x01|0x0001) plen 5
+>    lap 0x9e8b33 len 16 num 0
+> 
+> The last inquiry request command seems to be being sent correctly
+> (btusb_send_frame: hci2) but just after that we see a
+> failure when calling __set_isoc_interface on hci1.
+> 
+> I do not currently have enough knowledge about the btusb subsystem to
+> find out what's happening, and so if someone has
+> any information about this, please let me know, it would be most useful.
 
->
-> why don't you use periodic inquiry instead and let the controller  
-> handle
-> the timing.
->
+why don't you use periodic inquiry instead and let the controller handle
+the timing.
 
-Because the specific bit I am working on is a C++ library capable of  
-doing (among other things) asynchronous discovery while avoiding any  
-intermediate caches (that's why I don't use the D-Bus interface or the  
-ioctl call) and I do not have control over the periodicity of the  
-inquiry nor know when it is going to be cancelled or started again.  
-The API requirements were to provide an fast, not cached inquiry that  
-can be started and cancelled at will by the application.
-Having examined the logs the amount of inquiry requests I am sending  
-is fairly low (every 30 seconds or so) and so I thought it wouldn't be  
-a problem for the HCI or USB layers to handle in terms of data volume.
+Also should try the bluetooth-testing.git tree since it contains an
+updated btusb.ko driver.
 
-> Also should try the bluetooth-testing.git tree since it contains an
-> updated btusb.ko driver.
+Regards
 
-I will try it and let you know about the results.
-Does this imply that it looks like a problem in the btusb driver? The  
-only other explanations that occurred me until now were:
+Marcel
 
-- The problem is in the hardware (USB hub or BlueCores): I discarded  
-this possibility because I took a different hub and 3 dongles  
-containing Broadcom modules and reproduced it immediately.
-- The problem could be the library sending commands directlly to the  
-HC and therefore conflicting with another source of commands  
-(bluetooth daemon or other): This seems unlikely given that the logs  
-show that on hci2 the only commands are the inquiry requests and  
-cancels being sent by the library.
 
-Thanks!
-
-Carles
