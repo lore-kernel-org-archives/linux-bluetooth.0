@@ -1,6 +1,6 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <49AAEF55.7060303@powercraft.nl>
-Date: Sun, 01 Mar 2009 21:25:57 +0100
+Message-ID: <49AAEEAE.6040709@powercraft.nl>
+Date: Sun, 01 Mar 2009 21:23:10 +0100
 From: Jelle de Jong <jelledejong@powercraft.nl>
 MIME-Version: 1.0
 To: Alon Bar-Lev <alon.barlev@gmail.com>
@@ -141,7 +141,6 @@ know its no command-line tool but its the best I can do for you.
 
 It's about the blueman tool:
 http://lists.debian.org/debian-mentors/2009/02/msg00277.html
-http://lists.debian.org/debian-mentors/2009/03/msg00004.html
 
 I provide the link to the archive, because I sent some mail to the
 thread. Maybe the bluez-gnome bluetooth-applet developers can read the
@@ -150,4 +149,3 @@ thread too and provide there opinion about the issues?
 Best regards,
 
 Jelle de Jong
-
