@@ -1,42 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1235857627.6074.41.camel@localhost.localdomain>
-References: <c89fa46a0902260029p2ea12a8fte30f90d23964a311@mail.gmail.com>
-	 <1235857627.6074.41.camel@localhost.localdomain>
-Date: Mon, 2 Mar 2009 14:33:03 +0800
-Message-ID: <c89fa46a0903012233t16c5c453qa98441b51d28ba15@mail.gmail.com>
-Subject: Re: Where can I find old bluetooth kernel patches?
-From: =?GB2312?B?aGxpZGVhKNei0uLBpryv1tAp?= <hlidea.gm@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: Bluetooth radio =?ISO-8859-1?Q?doesn=B4t?= reply to inquiry
+ request
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Carles Cufi <carles.cufi@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <D97BBDAF-F830-4495-B1CC-B56C5C235E72@gmail.com>
+References: <aa4f458e0903010445j49d07c26j144210cb099540de@mail.gmail.com>
+	 <1235931668.6074.47.camel@localhost.localdomain>
+	 <D97BBDAF-F830-4495-B1CC-B56C5C235E72@gmail.com>
+Content-Type: text/plain
+Date: Mon, 02 Mar 2009 00:55:58 +0100
+Message-Id: <1235951758.6074.49.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Carles,
 
-I suggest you keep the old patches on the Internet. These patches are
-valueable especially for some embedded linux system. You know, upgrade
-the kernel on embedded system is not easy, so I think you can just
-leave the old patches there without any support for them.
-Most people will benefit from these old patches.Thanks a lot.
+> > why don't you use periodic inquiry instead and let the controller  
+> > handle
+> > the timing.
+> >
+> 
+> Because the specific bit I am working on is a C++ library capable of  
+> doing (among other things) asynchronous discovery while avoiding any  
+> intermediate caches (that's why I don't use the D-Bus interface or the  
+> ioctl call) and I do not have control over the periodicity of the  
+> inquiry nor know when it is going to be cancelled or started again.  
+> The API requirements were to provide an fast, not cached inquiry that  
+> can be started and cancelled at will by the application.
+> Having examined the logs the amount of inquiry requests I am sending  
+> is fairly low (every 30 seconds or so) and so I thought it wouldn't be  
+> a problem for the HCI or USB layers to handle in terms of data volume.
 
-Br,
-Chris
+do me favor and read the Bluetooth specification, because periodic
+inquiry is a low-level HCI command.
 
-2009/3/1 Marcel Holtmann <marcel@holtmann.org>:
-> Hi Chris,
->
->> For some reason, I need the old bluetooth kernel patches for kernel
->> 2.4.20. However, all the patches from
->> http://www.holtmann.org/linux/kernel are lost. Are there any other
->> places where I can find these patches? Or could somebody kindly supply
->> it for me? Thanks in advance.
->
-> there is no active support for the 2.4 kernel series anymore.
->
-> Regards
->
-> Marcel
->
->
->
+> > Also should try the bluetooth-testing.git tree since it contains an
+> > updated btusb.ko driver.
+> 
+> I will try it and let you know about the results.
+> Does this imply that it looks like a problem in the btusb driver? The  
+> only other explanations that occurred me until now were:
+
+With btusb we were trying to send as less URBs as possible, but it could
+be that not having bulk URB running the chips behave funny. At least
+that is what we have seen with some hardware. So that could be an issue
+here. Nobody knows for sure.
+
+Regards
+
+Marcel
+
+
