@@ -1,133 +1,20 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Mon, 2 Mar 2009 17:29:56 +0800
-Message-ID: <ac8af0be0903020129g45728eb9o358539908330d5f5@mail.gmail.com>
-Subject: [PATCH 1/4] add the D-Bus interface definition for HFP Audio Gateway
-	-- take 3 -- resend
+Date: Mon, 2 Mar 2009 17:28:26 +0800
+Message-ID: <ac8af0be0903020128y66156981ydfd32168fd055e9f@mail.gmail.com>
+Subject: [PATCH 0/4] HFP Gateway profile -- take 2 -- resend
 From: Zhao Forrest <forrest.zhao@gmail.com>
 To: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-diff --git a/doc/audio-api.txt b/doc/audio-api.txt
-index a73ba20..eb53aed 100644
---- a/doc/audio-api.txt
-+++ b/doc/audio-api.txt
-@@ -195,3 +195,116 @@ properties	boolean Connected [readonly]
+Hi Marcel, Johan,
 
- 			Indicates if a stream is active to a A2DP sink on
- 			the remote device.
-+
-+
-+Gateway hierarchy
-+===================
-+
-+Service		org.bluez
-+Interface	org.bluez.HeadsetGateway
-+Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
-+
-+This interface is available for remote devices which can function in the Audio
-+Gateway role of the HFP profiles.
-+
-+Methods		void Connect()
-+
-+			Connect to the AG service on the remote device.
-+
-+		void Disconnect()
-+
-+			Disconnect from the AG service on the remote device
-+
-+		void AnswerCall()
-+
-+			It has to called only after Ring signal received.
-+
-+		void TerminateCall()
-+
-+			Terminate call which is running now. This has nothing
-+			with any 3-way situation incl. RaH. Just plain old PDH.
-+
-+		void Call(string number)
-+
-+			Dial a number 'number'. No number processing is done
-+			thus if AG would reject to dial it don't blame me :)
-+
-+		string GetOperatorName()
-+
-+			Find out the name of the currently selected network
-+			operator by AG.
-+
-+		void SendDTMF(string digits)
-+
-+			Will send each digit in the 'digits' sequentially. Would
-+			send nothing if there is non-dtmf digit.
-+
-+		string GetSubscriberNumber()
-+
-+			Get the voicecall subscriber number of AG
-+
-+		dict GetProperties()
-+
-+			Returns all properties for the interface. See the
-+			properties section for available properties.
-+
-+Signals		void Ring(string number)
-+
-+			Someone's calling from 'number'.
-+			Caller number is provided as received from AG.
-+
-+		void CallTerminated()
-+
-+			Call failed to set up. It means that we tried to call
-+			someone or someone tried to call us but call was not
-+			accepted.
-+
-+		void CallStarted()
-+
-+			Call set up successfully.
-+
-+		void CallEnded()
-+
-+			Call was started and now ended. In contrast with
-+			CallTerminated where call didn't started
-+
-+		PropertyChanged(string name, variant value)
-+
-+			This signal indicates a changed value of the given
-+			property.
-+
-+properties	boolean Connected [readonly]
-+
-+			Indicates if there is an active connection to the
-+			AG service on the remote device.
-+
-+		uint16 RegistrationStatus [readonly]
-+
-+			Service availability indicatior of AG, where:
-+			0 implies no service. No Home/Roam network available.
-+			1 implies presense of service. Home/Roam network
-+			  available.
-+
-+		uint16 SignalStrength [readonly]
-+
-+			Signal strength indicator of AG, the value ranges from
-+			0 to 5.
-+
-+		uint16 RoamingStatus [readonly]
-+
-+			Roaming status indicator of AG, where:
-+			0 means roaming is not active
-+			1 means a roaming is active
-+
-+		uint16 BatteryCharge [readonly]
-+
-+			Battery Charge indicator of AG, the value ranges from
-+			0 to 5.
-+
-+		uint16 SpeakerGain  [readonly]
-+
-+			The speaker gain when available.
-+
-+		uint16 MicrophoneGain  [readonly]
-+
-+			The speaker gain when available.
+Compared with last version, the main changes are:
+1 fix the bug in IPC part
+2 check the string length for sscanf()
+3 rebase the patch against git master
+
+Thanks,
+Forrest
