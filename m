@@ -1,44 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?utf-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] btusb: new device id needing BTUSB_WRONG_SCO_MTU quirk
-References: <87hc2c3x5g.fsf@nemi.mork.no>
-	<1236008354.742.1.camel@localhost.localdomain>
-Date: Tue, 03 Mar 2009 16:23:56 +0100
-In-Reply-To: <1236008354.742.1.camel@localhost.localdomain> (Marcel Holtmann's
-	message of "Mon, 02 Mar 2009 16:39:14 +0100")
-Message-ID: <87wsb67hpv.fsf@nemi.mork.no>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Date: Tue, 3 Mar 2009 12:45:09 +0530
+Message-ID: <6887eb5d0903022315t132a7484w9f5638830684999f@mail.gmail.com>
+Subject: Bluez installation on ARM-LINUX Tool Chain
+From: Kartikey Parmar <kartikey2781@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Marcel Holtmann <marcel-kz+m5ild9QBg9hUCZPvPmw@public.gmane.org> writes:
+Hi,
 
-> it does not make any sense. 
+I have developed an application that allow me to communicate with
+bluetooth headset.
+I want to run that application on ARM.
 
-I see.  And my testing todays confirms that.  Sorry for the first
-misplaced shot, and thanks for reviewing.
+For that I need to install Bluez stack and its supported utilities on
+embedded linux...
 
-> Can you just try to run the latest
-> bluetooth-testing.git tree kernel and see if that might have fixed this
-> issue.
+I don't know how to do it,....
 
-I tried it, and the problem was gone.
+Can somebody guide me the steps to install Bluez-4.31 on embedded
+linux / to compile with arm-linux toolchain?
 
-Only thing is:  I cannot reproduce the problem at all anymore.  Weird.
-Yesterday it was easily reproducible using the procedure mentioned.  
+Is it possible to install bluez-gnome-1.8 on embedded linux to get
+support for pairing or only bluez stack works???
 
-Which means that there must be a mitigating factor I haven't found.
-Could the presence of other BT devices make a difference?  The initial
-testing was done at work where there are a large number of active BT
-devices nearby, while today's testing has been done at home where there
-aren't so many.  That's the only difference I can come up with.
+Awaiting for reply.
 
-Well, I'm satisfied as long as the problem is gone.  Will do more proper
-testing and report back if it reappears.
-
-Thanks
-
-
-Bjørn
+--
+Kartikey Parmar
+R&D Software Engg
+Matrix Telecom Pvt Ltd
+Baroda, Gujarat (India)
+09879095390 (M)
