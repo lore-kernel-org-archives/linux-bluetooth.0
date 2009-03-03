@@ -1,30 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
+From: Nicola Ranaldo <ranaldo@unina.it>
+To: linux-bluetooth@vger.kernel.org
+Subject: Bnep, dhcp and other issues
+Date: Tue, 3 Mar 2009 17:35:17 +0100
 MIME-Version: 1.0
-In-Reply-To: <1235931668.6074.47.camel@localhost.localdomain>
-References: <aa4f458e0903010445j49d07c26j144210cb099540de@mail.gmail.com>
-	 <1235931668.6074.47.camel@localhost.localdomain>
-Date: Tue, 3 Mar 2009 17:38:22 +0100
-Message-ID: <aa4f458e0903030838t3ac47017r62aef6549e83f9e4@mail.gmail.com>
-Subject: =?ISO-8859-1?Q?Re=3A_Bluetooth_radio_doesn=B4t_reply_to_inquiry_reques?=
-	=?ISO-8859-1?Q?t?=
-From: Carles Cufi <carles.cufi@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200903031735.17328.ranaldo@unina.it>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi!
+When a bnep connection is established I have to delay the startup of dhcp on 
+the client side by about 5/10 seconds or I get a timeout without lease.
+This happens both on gentoo and on Openmoko freerunner (SHR/FSO).
 
-> Also should try the bluetooth-testing.git tree since it contains an
-> updated btusb.ko driver.
+On the last I have another problem and I do not know if it's related to the 
+first or is Angstrom dependent, when the bnep connection is established the 
+bnep interface goes up immediately, so the udev script ignores the interface 
+and does not configure it at all. 
 
-I tried bluetooth-testing.git, this time building the whole thing and
-not just btusb.ko and now everything seems to work fine. Any idea on
-what kernels are affected by the problem? Is it only 2.6.27, or may
-earlier (or older) kernels have the same issue too?
+Is this a known issue?
 
-Thanks in advance!
+Regards
 
-Regards,
-
-Carles
+	Nicola Ranaldo
