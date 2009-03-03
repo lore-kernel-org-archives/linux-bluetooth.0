@@ -1,105 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <49ADD4C8.8040705@trolltech.com>
-Date: Wed, 04 Mar 2009 11:09:28 +1000
-From: Bea Lam <bea.lam@trolltech.com>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Add "Class" property to org.bluez.Adapter
-Content-Type: multipart/mixed;
- boundary="------------030302050107000206080401"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 3 Mar 2009 17:43:31 -0500
+From: Chuck Ebbert <cebbert@redhat.com>
+To: marcel@holtmann.org
+Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Bluetooth oops from hci_conn_del, kernel 2.6.29-rc6
+Message-ID: <20090303174331.0c386a68@dhcp-100-2-144.bos.redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------030302050107000206080401
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+=46rom https://bugzilla.redhat.com/show_bug.cgi?id=3D488115
 
-Hi Marcel,
+general protection fault: 0000 [#1] SMP=20
+last sysfs file: /sys/devices/pci0000:00/0000:00:1d.3/usb9/9-1/9-1:1.0/blue=
+tooth/hci0/hci0:12/type
+CPU 1=20
+Modules linked in: netconsole configfs rfcomm btusb ipt_MASQUERADE iptable_=
+nat nf_nat bridge stp llc bnep sco l2cap bluetooth autofs4 nf_conntrack_net=
+bios_ns nf_conntrack_ftp ip6t_REJECT ip6t_ipv6header nf_conntrack_ipv6 ip6t=
+able_filter ip6_tables ipv6 p4_clockmod speedstep_lib freq_table xfs export=
+fs ext2 uinput dcdbas iTCO_wdt i2c_i801 firewire_ohci iTCO_vendor_support p=
+cspkr i2c_core i3000_edac serio_raw firewire_core edac_core tg3 crc_itu_t a=
+ta_generic pata_acpi [last unloaded: netconsole]
+Pid: 0, comm: swapper Tainted: G        W  2.6.29-0.148.rc6.fc11.x86_64 #1 =
+PowerEdge SC430             =20
+RIP: 0010:[<ffffffff812f1be0>]  [<ffffffff812f1be0>] skb_dequeue+0x38/0x70
+RSP: 0018:ffff88003eaa3d60  EFLAGS: 00010006
+RAX: 0000000000000282 RBX: ffff88003d413aa0 RCX: ffff88003ea94e28
+RDX: ffffffff81395bc8 RSI: ffff88003d413ab8 RDI: 0000000000000046
+RBP: ffff88003eaa3d80 R08: ffff88003eaa3c90 R09: 0000000000000001
+R10: ffff8800391461c0 R11: ffff8800386e17c8 R12: 6b6b6b6b6b6b6b6b
+R13: ffff88003d413a88 R14: ffff8800391461c0 R15: 0000000000000016
+FS:  0000000000000000(0000) GS:ffff88003ea7e708(0000) knlGS:0000000000000000
+CS:  0010 DS: 0018 ES: 0018 CR0: 000000008005003b
+CR2: 00000030366a3120 CR3: 0000000039cc9000 CR4: 00000000000006e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
+Process swapper (pid: 0, threadinfo ffff88003ea9c000, task ffff88003ea946a0)
+Stack:
+ ffff88003eaa3d70 ffff88003d413a88 ffff88003d4139f8 ffff880039146420
+ ffff88003eaa3da0 ffffffff812f25dd ffff88003d4139f8 ffff8800391461b0
+ ffff88003eaa3dd0 ffffffffa01c24e7 ffff88003eaa3dd0 ffff8800391461b0
+Call Trace:
+ <IRQ> <0> [<ffffffff812f25dd>] skb_queue_purge+0x23/0x2d
+ [<ffffffffa01c24e7>] hci_conn_del+0xde/0xe9 [bluetooth]
+ [<ffffffffa01c47ec>] hci_event_packet+0x1b61/0x1d0d [bluetooth]
+ [<ffffffff81395794>] ? _read_unlock+0x2b/0x2f
+ [<ffffffffa01c5624>] ? hci_send_to_sock+0x139/0x149 [bluetooth]
+ [<ffffffffa01c10e8>] hci_rx_task+0xa3/0x258 [bluetooth]
+ [<ffffffff81050acf>] ? tasklet_action+0x50/0xf8
+ [<ffffffff81050b0d>] tasklet_action+0x8e/0xf8
+ [<ffffffff810512be>] __do_softirq+0x94/0x176
+ [<ffffffff810127ac>] call_softirq+0x1c/0x30
+ [<ffffffff8101393e>] do_softirq+0x52/0xb9
+ [<ffffffff81050ee1>] irq_exit+0x53/0x90
+ [<ffffffff81013c57>] do_IRQ+0x12c/0x151
+ [<ffffffff81011e93>] ret_from_intr+0x0/0x2e
+ <EOI> <0> [<ffffffff8106eaf0>] ? trace_hardirqs_off+0xd/0xf
+ [<ffffffff81017ca5>] ? mwait_idle+0x99/0xcb
+ [<ffffffff8106fac7>] ? trace_hardirqs_on+0xd/0xf
+ [<ffffffff81017cae>] ? mwait_idle+0xa2/0xcb
+ [<ffffffff81017ca5>] ? mwait_idle+0x99/0xcb
+ [<ffffffff81398c7b>] ? atomic_notifier_call_chain+0xf/0x11
+ [<ffffffff8101025d>] ? enter_idle+0x27/0x29
+ [<ffffffff810102c7>] ? cpu_idle+0x68/0xb3
+ [<ffffffff8138f1c0>] ? start_secondary+0x199/0x19e
+Code: 0f 1f 44 00 00 48 8d 5f 18 49 89 fd 48 89 df e8 82 3f 0a 00 4d 8b 65 =
+00 4d 39 ec 75 05 45 31 e4 eb 2a 4d 85 e4 74 25 41 ff 4d 10 <49> 8b 0c 24 4=
+9 8b 54 24 08 49 c7 04 24 00 00 00 00 49 c7 44 24=20
+RIP  [<ffffffff812f1be0>] skb_dequeue+0x38/0x70
+ RSP <ffff88003eaa3d60>
 
-I mentioned on IRC a while back that a "Class" property for the Adapter
-interface might be useful. I've attached a patch to this effect. Please
-let me know if there are any issues.
 
-cheers,
+net/core/skbuff.c:skb_dequeue():1793:
+        result =3D __skb_dequeue(list);
 
-Bea
+static inline struct sk_buff *__skb_dequeue(struct sk_buff_head *list)
+{
+        struct sk_buff *skb =3D skb_peek(list);
+        if (skb)
+                __skb_unlink(skb, list);  <=3D=3D=3D oopses trying to deref=
+ skb
+        return skb;
+}
 
+skb_peek() returned skb =3D=3D 0x6b6b6b6b6b6b6b6b:
 
-
---------------030302050107000206080401
-Content-Type: text/x-patch;
- name="adapter-class-property.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="adapter-class-property.patch"
-
-diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-index eb973ec..1e03b4e 100644
---- a/doc/adapter-api.txt
-+++ b/doc/adapter-api.txt
-@@ -210,6 +210,10 @@ Properties	string Address [readonly]
- 			The Bluetooth friendly name. This value can be
- 			changed and a PropertyChanged signal will be emitted.
- 
-+		uint32 Class [readonly]
-+
-+			The Bluetooth class of device.
-+
- 		boolean Powered [readwrite]
- 
- 			Switch an adapter on or off. This will also set the
-diff --git a/src/adapter.c b/src/adapter.c
-index 52b58c4..c48ec68 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1192,6 +1192,7 @@ static DBusMessage *get_properties(DBusConnection *conn,
- 	DBusMessageIter iter;
- 	DBusMessageIter dict;
- 	char str[249], srcaddr[18];
-+	uint32_t class;
- 	gboolean value;
- 	char **devices;
- 	int i;
-@@ -1224,6 +1225,12 @@ static DBusMessage *get_properties(DBusConnection *conn,
- 
- 	dict_append_entry(&dict, "Name", DBUS_TYPE_STRING, &property);
- 
-+	/* Class */
-+	class = adapter->dev.class[0]
-+		| (adapter->dev.class[1] << 8)
-+		| (adapter->dev.class[2] << 16);
-+	dict_append_entry(&dict, "Class", DBUS_TYPE_UINT32, &class);
-+
- 	/* Powered */
- 	value = adapter->up ? TRUE : FALSE;
- 	dict_append_entry(&dict, "Powered", DBUS_TYPE_BOOLEAN, &value);
-@@ -2326,6 +2333,8 @@ int adapter_get_class(struct btd_adapter *adapter, uint8_t *cls)
- int adapter_set_class(struct btd_adapter *adapter, uint8_t *cls)
- {
- 	struct hci_dev *dev = &adapter->dev;
-+	int dd;
-+	uint32_t class;
- 
- 	if (memcmp(dev->class, cls, 3) == 0)
- 		return 0;
-@@ -2334,6 +2343,17 @@ int adapter_set_class(struct btd_adapter *adapter, uint8_t *cls)
- 
- 	write_local_class(&adapter->bdaddr, cls);
- 
-+	dd = hci_open_dev(adapter->dev_id);
-+	if (dd >= 0) {
-+		update_ext_inquiry_response(dd, dev);
-+		hci_close_dev(dd);
-+	}
-+
-+	class = cls[0] | (cls[1] << 8) | (cls[2] << 16);
-+
-+	emit_property_changed(connection, adapter->path, ADAPTER_INTERFACE,
-+				"Class", DBUS_TYPE_UINT32, &class);
-+
- 	return 0;
- }
- 
-
---------------030302050107000206080401--
+static inline struct sk_buff *skb_peek(struct sk_buff_head *list_)
+{
+        struct sk_buff *list =3D ((struct sk_buff *)list_)->next;
+        if (list =3D=3D (struct sk_buff *)list_)
+                list =3D NULL;
+        return list;
+}
