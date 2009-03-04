@@ -1,117 +1,132 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <49AF1BB6.7070104@trolltech.com>
-Date: Thu, 05 Mar 2009 10:24:22 +1000
-From: Bea Lam <bea.lam@trolltech.com>
-MIME-Version: 1.0
+Date: Wed, 4 Mar 2009 15:46:21 -0800
+From: Derek Chan <dwc+lkml@OCF.Berkeley.EDU>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Add "Class" property to org.bluez.Adapter
-References: <49ADD4C8.8040705@trolltech.com> <1236200642.6670.13.camel@localhost.localdomain>
-In-Reply-To: <1236200642.6670.13.camel@localhost.localdomain>
-Content-Type: multipart/mixed;
- boundary="------------010709050504030500000100"
+Cc: maxk@qualcomm.com, linux-bluetooth@vger.kernel.org
+Subject: Re: another "blacklist" device for hci_usb
+Message-ID: <20090304234621.GC3004@OCF.Berkeley.EDU>
+References: <20090226091707.GG9042@OCF.Berkeley.EDU> <1235857191.6074.39.camel@localhost.localdomain> <20090304075902.GB3004@OCF.Berkeley.EDU> <1236200455.6670.9.camel@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="MW5yreqqjyrRcusr"
+In-Reply-To: <1236200455.6670.9.camel@localhost.localdomain>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------010709050504030500000100
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
 
-Hi Marcel,
-> +       /* Class */
-> +       class = adapter->dev.class[0]
-> +               | (adapter->dev.class[1] << 8)
-> +               | (adapter->dev.class[2] << 16);
-> +       dict_append_entry(&dict, "Class", DBUS_TYPE_UINT32, &class);
-> +
->
-> This should more like this:
->
-> 	class = adapter->dev.class[0] |
-> 			adapter->dev.class[1] << 8 | ...
->   
-The revised patch is attached. The original format was based on similar
-code in security.c.
+--MW5yreqqjyrRcusr
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Thanks
+On Wed, Mar 04, 2009 at 10:00:55PM +0100, Marcel Holtmann wrote:
+> Hi Derek,
+> 
+> > >> I've got a USB bluetooth adapter that needed some of those handy module
+> > >> params to get SCO working.
+> > >>
+> > >> Bus 001 Device 004: ID 0a5c:2121 Broadcom Corp. BCM2210 Bluetooth
+> > 
+> > > send "hciconfig -a" before and after your patch. You have to prove to me
+> > > that you really need this patch.
+> > 
+> > Before: (2.6.26-1-686, no options for hci_usb)
+> > hci0:   Type: USB
+> >         BD Address: 00:50:B6:80:76:1A ACL MTU: 1017:8 SCO MTU: 64:0
+> >         UP RUNNING PSCAN 
+> >         RX bytes:939 acl:0 sco:0 events:23 errors:0
+> >         TX bytes:342 acl:0 sco:0 commands:23 errors:0
+> >         Features: 0xff 0xff 0x8d 0xfe 0x9b 0xf9 0x00 0x80
+> >         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+> >         Link policy: RSWITCH HOLD SNIFF PARK 
+> >         Link mode: SLAVE ACCEPT 
+> >         Name: 'server-0'
+> >         Class: 0x080100
+> >         Service Classes: Capturing
+> >         Device Class: Computer, Uncategorized
+> >         HCI Ver: 2.0 (0x3) HCI Rev: 0x4118 LMP Ver: 2.0 (0x3) LMP Subver: 0x430e
+> >         Manufacturer: Broadcom Corporation (15)
+> > 
+> > After: (2.6.26-1-686, options hci_usb reset=1 force_scofix=1)
+> > hci0:   Type: USB
+> >         BD Address: 00:50:B6:80:76:1A ACL MTU: 1017:8 SCO MTU: 64:8
+> >         UP RUNNING PSCAN 
+> >         RX bytes:1511 acl:0 sco:0 events:31 errors:0
+> >         TX bytes:366 acl:0 sco:0 commands:31 errors:0
+> >         Features: 0xff 0xff 0x8d 0xfe 0x9b 0xf9 0x00 0x80
+> >         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+> >         Link policy: RSWITCH HOLD SNIFF PARK 
+> >         Link mode: SLAVE ACCEPT 
+> >         Name: 'server-0'
+> >         Class: 0x080100
+> >         Service Classes: Capturing
+> >         Device Class: Computer, Uncategorized
+> >         HCI Ver: 2.0 (0x3) HCI Rev: 0x4118 LMP Ver: 2.0 (0x3) LMP Subver: 0x430e
+> >         Manufacturer: Broadcom Corporation (15)
+> > 
+> > > Also please post a patch against btusb.c since hci_usb.c has been
+> > > removed.
+> > 
+> > I didn't actually patch hci_usb.  Since the options were there, it was
+> > easier to use them.  As requested, I've gone back through gitweb to pull
+> > this file to patch.  See attached.
+> 
+> please post the content of /proc/bus/usb/devices for that dongle and
 
-Bea
+T:  Bus=04 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
+D:  Ver= 2.00 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0a5c ProdID=2121 Rev= 1.00
+S:  Manufacturer=Broadcom Corp
+S:  Product=BCM92045B3 ROM
+C:* #Ifs= 4 Cfg#= 1 Atr=a0 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:* If#= 1 Alt= 2 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
 
+> also please send patches against bluetooth-next-2.6 or net-next-2.6
+> trees.
 
+ - Derek
 
---------------010709050504030500000100
-Content-Type: text/x-patch;
- name="adapter-class-property.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="adapter-class-property.patch"
+-- 
+Be the change you want to see in the world
+        -- Mahatma Gandhi
 
-diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-index eb973ec..1e03b4e 100644
---- a/doc/adapter-api.txt
-+++ b/doc/adapter-api.txt
-@@ -210,6 +210,10 @@ Properties	string Address [readonly]
- 			The Bluetooth friendly name. This value can be
- 			changed and a PropertyChanged signal will be emitted.
+--MW5yreqqjyrRcusr
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="btusb2.patch"
+
+--- btusb.c.orig	2009-03-04 15:43:21.769731000 -0800
++++ btusb.c	2009-03-04 15:44:29.737532000 -0800
+@@ -96,6 +96,9 @@
+ 	{ USB_DEVICE(0x0a5c, 0x2039), .driver_info = BTUSB_WRONG_SCO_MTU },
+ 	{ USB_DEVICE(0x0a5c, 0x2101), .driver_info = BTUSB_WRONG_SCO_MTU },
  
-+		uint32 Class [readonly]
++	/* Broadcom BCM2210 */
++	{ USB_DEVICE(0x0a5c, 0x2121), .driver_info = BTUSB_WRONG_SCO_MTU },
 +
-+			The Bluetooth class of device.
-+
- 		boolean Powered [readwrite]
- 
- 			Switch an adapter on or off. This will also set the
-diff --git a/src/adapter.c b/src/adapter.c
-index 52b58c4..276253d 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1192,6 +1192,7 @@ static DBusMessage *get_properties(DBusConnection *conn,
- 	DBusMessageIter iter;
- 	DBusMessageIter dict;
- 	char str[249], srcaddr[18];
-+	uint32_t class;
- 	gboolean value;
- 	char **devices;
- 	int i;
-@@ -1224,6 +1225,12 @@ static DBusMessage *get_properties(DBusConnection *conn,
- 
- 	dict_append_entry(&dict, "Name", DBUS_TYPE_STRING, &property);
- 
-+	/* Class */
-+	class = adapter->dev.class[0] |
-+			adapter->dev.class[1] << 8 |
-+			adapter->dev.class[2] << 16;
-+	dict_append_entry(&dict, "Class", DBUS_TYPE_UINT32, &class);
-+
- 	/* Powered */
- 	value = adapter->up ? TRUE : FALSE;
- 	dict_append_entry(&dict, "Powered", DBUS_TYPE_BOOLEAN, &value);
-@@ -2326,6 +2333,8 @@ int adapter_get_class(struct btd_adapter *adapter, uint8_t *cls)
- int adapter_set_class(struct btd_adapter *adapter, uint8_t *cls)
- {
- 	struct hci_dev *dev = &adapter->dev;
-+	int dd;
-+	uint32_t class;
- 
- 	if (memcmp(dev->class, cls, 3) == 0)
- 		return 0;
-@@ -2334,6 +2343,17 @@ int adapter_set_class(struct btd_adapter *adapter, uint8_t *cls)
- 
- 	write_local_class(&adapter->bdaddr, cls);
- 
-+	dd = hci_open_dev(adapter->dev_id);
-+	if (dd >= 0) {
-+		update_ext_inquiry_response(dd, dev);
-+		hci_close_dev(dd);
-+	}
-+
-+	class = cls[0] | (cls[1] << 8) | (cls[2] << 16);
-+
-+	emit_property_changed(connection, adapter->path, ADAPTER_INTERFACE,
-+				"Class", DBUS_TYPE_UINT32, &class);
-+
- 	return 0;
- }
- 
+ 	/* IBM/Lenovo ThinkPad with Broadcom chip */
+ 	{ USB_DEVICE(0x0a5c, 0x201e), .driver_info = BTUSB_WRONG_SCO_MTU },
+ 	{ USB_DEVICE(0x0a5c, 0x2110), .driver_info = BTUSB_WRONG_SCO_MTU },
 
---------------010709050504030500000100--
+--MW5yreqqjyrRcusr--
