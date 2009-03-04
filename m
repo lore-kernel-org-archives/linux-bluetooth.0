@@ -1,146 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 3 Mar 2009 23:59:02 -0800
+From: Derek Chan <dwc+lkml@OCF.Berkeley.EDU>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: maxk@qualcomm.com, linux-bluetooth@vger.kernel.org
+Subject: Re: another "blacklist" device for hci_usb
+Message-ID: <20090304075902.GB3004@OCF.Berkeley.EDU>
+References: <20090226091707.GG9042@OCF.Berkeley.EDU> <1235857191.6074.39.camel@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="US-ASCII"
-Subject: obexd-0.8 get OBEX_HDR_NAME NULL
-Date: Wed, 4 Mar 2009 21:32:47 +0800
-Message-ID: <9F2B2656C8747B498D56A7B30FF5EB9FF9DAEF@CNMAIL13.cn.utstarcom.com>
-From: "Yao Ye" <yeyao@utstar.com>
-To: <linux-bluetooth@vger.kernel.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: multipart/mixed; boundary="3V7upXqbjpZ4EhLz"
+In-Reply-To: <1235857191.6074.39.camel@localhost.localdomain>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-hi, all :
 
-I'm using obexd-0.8 and openobex-1.5 on my pxa310 platform. 
-and I want to send files from a mobile phone to the platform.
+--3V7upXqbjpZ4EhLz
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-but, when i start receive-file agent, it exit quickly, and no files have
-been received !
-I found that: in obexd-0.8/src/obex.c, line 644, func: check_put, there
-is:
+On Sat, Feb 28, 2009 at 10:39:51PM +0100, Marcel Holtmann wrote:
+>> I've got a USB bluetooth adapter that needed some of those handy module
+>> params to get SCO working.
+>>
+>> Bus 001 Device 004: ID 0a5c:2121 Broadcom Corp. BCM2210 Bluetooth
 
-os->name = g_convert((const gchar *) hd.bs, hlen,
-        "UTF8", "UTF16BE", NULL, NULL, NULL);
-debug("OBEX_HDR_NAME: %s", os->name);
+> send "hciconfig -a" before and after your patch. You have to prove to me
+> that you really need this patch.
 
-on my platform, hlen is correct, but hd.bs is empty. so get os->name is
-NULL.
-then, in obexd-0.8/src/obex.c, line 688, it is failure, and returned.
+Before: (2.6.26-1-686, no options for hci_usb)
+hci0:   Type: USB
+        BD Address: 00:50:B6:80:76:1A ACL MTU: 1017:8 SCO MTU: 64:0
+        UP RUNNING PSCAN 
+        RX bytes:939 acl:0 sco:0 events:23 errors:0
+        TX bytes:342 acl:0 sco:0 commands:23 errors:0
+        Features: 0xff 0xff 0x8d 0xfe 0x9b 0xf9 0x00 0x80
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+        Link policy: RSWITCH HOLD SNIFF PARK 
+        Link mode: SLAVE ACCEPT 
+        Name: 'server-0'
+        Class: 0x080100
+        Service Classes: Capturing
+        Device Class: Computer, Uncategorized
+        HCI Ver: 2.0 (0x3) HCI Rev: 0x4118 LMP Ver: 2.0 (0x3) LMP Subver: 0x430e
+        Manufacturer: Broadcom Corporation (15)
 
-if (!os->name) {
-        OBEX_ObjectSetRsp(obj, OBEX_RSP_BAD_REQUEST,
-                OBEX_RSP_BAD_REQUEST);
-        g_free(os->type);
-        os->type = NULL;
-        return FALSE;
-}
+After: (2.6.26-1-686, options hci_usb reset=1 force_scofix=1)
+hci0:   Type: USB
+        BD Address: 00:50:B6:80:76:1A ACL MTU: 1017:8 SCO MTU: 64:8
+        UP RUNNING PSCAN 
+        RX bytes:1511 acl:0 sco:0 events:31 errors:0
+        TX bytes:366 acl:0 sco:0 commands:31 errors:0
+        Features: 0xff 0xff 0x8d 0xfe 0x9b 0xf9 0x00 0x80
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+        Link policy: RSWITCH HOLD SNIFF PARK 
+        Link mode: SLAVE ACCEPT 
+        Name: 'server-0'
+        Class: 0x080100
+        Service Classes: Capturing
+        Device Class: Computer, Uncategorized
+        HCI Ver: 2.0 (0x3) HCI Rev: 0x4118 LMP Ver: 2.0 (0x3) LMP Subver: 0x430e
+        Manufacturer: Broadcom Corporation (15)
 
-How to fix it ? why the hd.bs is empty ?
-Thanks in advance for any helps.
+> Also please post a patch against btusb.c since hci_usb.c has been
+> removed.
 
-Best regards
-yesir Yao.
+I didn't actually patch hci_usb.  Since the options were there, it was
+easier to use them.  As requested, I've gone back through gitweb to pull
+this file to patch.  See attached.
 
-The following is the loginfo:
-------------------------------------------------------------------------
-----------------------
-[root@Linux /bttest]#dbus-uuidgen > /var/lib/dbus/machine-id
-[root@Linux /bttest]#dbus-launch
-DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-Amu3d6czKe,guid=1a75898
-42235f1e5736d9643000000fd
-DBUS_SESSION_BUS_PID=913
-[root@Linux /bttest]#
-[root@Linux /bttest]#export
-DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-Amu3d6czKe,guid=1a75898
-42235f1e5736d9643000000fd
-[root@Linux /bttest]#
-[root@Linux /bttest]#export DBUS_SESSION_BUS_PID=913
-[root@Linux /bttest]#
-[root@Linux /bttest]#obexd --nodaemon --opp --ftp -d -a -r /bttest &
-[root@Linux /bttest]#
-obexd[914]: Enabling debug information
-obexd[914]: manager_init:
-obexd[914]: Loading plugins /lib/obex/plugins
-bluetoothd[892]: New attribute 0x0001
-bluetoothd[892]: New attribute 0x0004
-bluetoothd[892]: New attribute 0x0009
-bluetoothd[892]: New attribute 0x0100
-bluetoothd[892]: Text size 19 length 18: -->Object Push server<--
-bluetoothd[892]: New attribute 0x0303
-bluetoothd[892]: Adding record with handle 0x10007
-bluetoothd[892]: Record pattern UUID 00000003-0000-1000-8000-00805f9
-bluetoothd[892]: Record pattern UUID 00000008-0000-1000-8000-00805f9
-bluetoothd[892]: Record pattern UUID 00000100-0000-1000-8000-00805f9
-bluetoothd[892]: Record pattern UUID 00001002-0000-1000-8000-00805f9
-bluetoothd[892]: Record pattern UUID 00001105-0000-1000-8000-00805f9
-bluetoothd[892]: listener_id 2
-bluetoothd[892]: New attribute 0x0001
-bluetoothd[892]: New attribute 0x0004
-bluetoothd[892]: New attribute 0x0009
-bluetoothd[892]: New attribute 0x0100
-bluetoothd[892]: Text size 21 length 20: -->File Transfer server<--
-bluetoothd[892]: Adding record with handle 0x10008
-bluetoothd[892]: Record pattern UUID 00000003-0000-1000-8000-00805f9
-bluetoothd[892]: Record pattern UUID 00000008-0000-1000-8000-00805f9
-bluetoothd[892]: Record pattern UUID 00000100-0000-1000-8000-00805f9
-bluetoothd[892]: Record pattern UUID 00001002-0000-1000-8000-00805f9
-bluetoothd[892]: Record pattern UUID 00001106-0000-1000-8000-00805f9
-bluetoothd[892]: listener_id 3
-obexd[914]: Registered: Object Push server, handle: 0x10007, folder:
-/bttest
-obexd[914]: Registered: File Transfer server, handle: 0x10008, folder:
-/bttest
+ - Derek
 
-[root@Linux /bttest]ps
-  PID  Uid     VmSize Stat Command
 
-  836 root         92 S   telnetd -l /bin/sh
-  838 root        952 S   -sh
-  846 root        448 S < udevd -d
-  880 root        212 S   hciattach /dev/ttyS0 bcsp 921600 flow
-  886 messageb    844 S   dbus-daemon --system
-  892 root       2104 S   bluetoothd -d
-  898 root        764 S   agent 0000
-  913 root        788 S   /usr/bin/dbus-daemon --fork --print-pid 4
---print-add
-  914 root       1508 S   obexd --nodaemon --opp --ftp -d -a -r /bttest
-  972 root        800 R   ps
-[root@Linux /bttest]#
+-- 
+Be the change you want to see in the world
+        -- Mahatma Gandhi
 
-#####-----> receive-files is a dbus c agent, same as Python
-scripts(obexd-0.8/test/simple-agent)
+--3V7upXqbjpZ4EhLz
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="btusb.patch"
 
-[root@Linux /bttest]#./receive-files /bttest/1.wav &
+--- btusb.c.orig	2009-03-03 23:48:07.000000000 -0800
++++ btusb.c	2009-03-03 23:49:09.000000000 -0800
+@@ -101,6 +101,9 @@
+ 	{ USB_DEVICE(0x0a5c, 0x2039), .driver_info = BTUSB_RESET | BTUSB_WRONG_SCO_MTU },
+ 	{ USB_DEVICE(0x0a5c, 0x2101), .driver_info = BTUSB_RESET | BTUSB_WRONG_SCO_MTU },
+ 
++	/* Broadcom BCM2210 */
++	{ USB_DEVICE(0x0a5c, 0x2121), .driver_info = BTUSB_RESET | BTUSB_WRONG_SCO_MTU },
++
+ 	/* Broadcom BCM2046 */
+ 	{ USB_DEVICE(0x0a5c, 0x2146), .driver_info = BTUSB_RESET },
+ 	{ USB_DEVICE(0x0a5c, 0x2151), .driver_info = BTUSB_RESET },
 
-obex file path = /bttest/1.wav
-Obex receiver : session bus connected
-Obex sender : registered on bus as org.openobex
-obexd[914]: Agent registered
-register_agent OK!
-
-##### ---->   now, send files from mobile phone (MOTO E6) to platform
-
-bluetoothd[892]: adapter_get_device(00:1A:77:77:14:84)
-obexd[914]: New connection from: 00:1A:77:77:14:84, channel 9, fd 7
-obexd[914]: REQHINT(0x1), CONNECT(0x0), (null)(0x0)
-obexd[914]: REQ(0x2), CONNECT(0x0), (null)(0x0)
-obexd[914]: Version: 0x10. Flags: 0x00  OBEX packet length: 4000
-obexd[914]: Resizing stream chunks to 3800
-obexd[914]: REQDONE(0x3), CONNECT(0x0), (null)(0x0)
-obexd[914]: REQHINT(0x1), PUT(0x2), (null)(0x0)
-obexd[914]: REQCHECK(0xb), PUT(0x2), (null)(0x0)
-obexd[914]: OBEX_HDR_LENGTH: 1040429              <----  file length is
-right
-obexd[914]: OBEX_HDR_NAME: (null)                <----  file name is
-NULL  *************@@@
-obexd[914]: OBEX_HDR_TYPE:
-obexd[914]: REQDONE(0x3), PUT(0x2), (null)(0x0)
-TransferCompleted, success = 0, objpath=/transfer8
-obexd[914]: REQHINT(0x1), DISCONNECT(0x1), (null)(0x0)
-obexd[914]: REQ(0x2), DISCONNECT(0x1), (null)(0x0)
-obexd[914]: REQDONE(0x3), DISCONNECT(0x1), (null)(0x0)
-obexd[914]: HUP
-
-##### ---->   exit, and no files have been received ! 
-
+--3V7upXqbjpZ4EhLz--
