@@ -1,26 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: bluez kernel patch for 2.6.25
+Subject: Re: [PATCH] Add "Class" property to org.bluez.Adapter
 From: Marcel Holtmann <marcel@holtmann.org>
-To: =?UTF-8?Q?=E5=8D=9E=E7=A3=8A?= <mykofzone@gmail.com>
+To: Bea Lam <bea.lam@trolltech.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <a172fe730903031953r60e50248n5188455d98424e5c@mail.gmail.com>
-References: <a172fe730903031953r60e50248n5188455d98424e5c@mail.gmail.com>
+In-Reply-To: <49ADD4C8.8040705@trolltech.com>
+References: <49ADD4C8.8040705@trolltech.com>
 Content-Type: text/plain
-Date: Wed, 04 Mar 2009 22:05:38 +0100
-Message-Id: <1236200738.6670.14.camel@localhost.localdomain>
+Date: Wed, 04 Mar 2009 22:04:02 +0100
+Message-Id: <1236200642.6670.13.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Bea,
 
->     Is there a patch for 2.6.25? And I can't find it in the website. I
-> migrate the 2.6.27 bluez driver/protocol to 2.6.25, and apply the
-> 2.6.27-mh1 patch, but there's a error when connecting HSP. So, i want
-> to try it on 2.6.25. Thanks.
+> I mentioned on IRC a while back that a "Class" property for the Adapter
+> interface might be useful. I've attached a patch to this effect. Please
+> let me know if there are any issues.
 
-I would urge you to move to 2.6.28 or upcoming 2.6.29 kernel since the
-2.6.25 kernel is ancient.
++       /* Class */
++       class = adapter->dev.class[0]
++               | (adapter->dev.class[1] << 8)
++               | (adapter->dev.class[2] << 16);
++       dict_append_entry(&dict, "Class", DBUS_TYPE_UINT32, &class);
++
+
+This should more like this:
+
+	class = adapter->dev.class[0] |
+			adapter->dev.class[1] << 8 | ...
 
 Regards
 
