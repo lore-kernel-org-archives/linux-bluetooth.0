@@ -1,41 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <49AF1BB6.7070104@trolltech.com>
+Date: Thu, 05 Mar 2009 10:24:22 +1000
+From: Bea Lam <bea.lam@trolltech.com>
 MIME-Version: 1.0
-In-Reply-To: <1236200738.6670.14.camel@localhost.localdomain>
-References: <a172fe730903031953r60e50248n5188455d98424e5c@mail.gmail.com>
-	 <1236200738.6670.14.camel@localhost.localdomain>
-Date: Thu, 5 Mar 2009 12:32:48 +0800
-Message-ID: <a172fe730903042032q405554f5x924cf1b0d999a2e1@mail.gmail.com>
-Subject: Re: bluez kernel patch for 2.6.25
-From: =?GB2312?B?seXA2g==?= <mykofzone@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH] Add "Class" property to org.bluez.Adapter
+References: <49ADD4C8.8040705@trolltech.com> <1236200642.6670.13.camel@localhost.localdomain>
+In-Reply-To: <1236200642.6670.13.camel@localhost.localdomain>
+Content-Type: multipart/mixed;
+ boundary="------------010709050504030500000100"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-     I only charge the bluetooth in my team, and i can't let others
-migrate their drivers to 2.6.28 or 2.6.29 for me. So, i should proting
-the lastest bluez drivers and protocol to the current kernel(2.6.25).
-The bluetooth chipset is stlc2500c. I think the bluez in 2.6.27 is
-better than 2.6.25, but after porting them to 2.6.25, there's some
-error such as the listed in the last email. So, i would like to try
-2.6.25 first. Thus, is theare a kernel patch for 2.6.25? Thanks.
+This is a multi-part message in MIME format.
+--------------010709050504030500000100
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 
-2009/3/5 Marcel Holtmann <marcel@holtmann.org>:
-> Hi,
+Hi Marcel,
+> +       /* Class */
+> +       class = adapter->dev.class[0]
+> +               | (adapter->dev.class[1] << 8)
+> +               | (adapter->dev.class[2] << 16);
+> +       dict_append_entry(&dict, "Class", DBUS_TYPE_UINT32, &class);
+> +
 >
->> =A0 =A0 Is there a patch for 2.6.25? And I can't find it in the website.=
- I
->> migrate the 2.6.27 bluez driver/protocol to 2.6.25, and apply the
->> 2.6.27-mh1 patch, but there's a error when connecting HSP. So, i want
->> to try it on 2.6.25. Thanks.
+> This should more like this:
 >
-> I would urge you to move to 2.6.28 or upcoming 2.6.29 kernel since the
-> 2.6.25 kernel is ancient.
->
-> Regards
->
-> Marcel
->
->
->
+> 	class = adapter->dev.class[0] |
+> 			adapter->dev.class[1] << 8 | ...
+>   
+The revised patch is attached. The original format was based on similar
+code in security.c.
+
+Thanks
+
+Bea
+
+
+
+--------------010709050504030500000100
+Content-Type: text/x-patch;
+ name="adapter-class-property.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="adapter-class-property.patch"
+
+diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+index eb973ec..1e03b4e 100644
+--- a/doc/adapter-api.txt
++++ b/doc/adapter-api.txt
+@@ -210,6 +210,10 @@ Properties	string Address [readonly]
+ 			The Bluetooth friendly name. This value can be
+ 			changed and a PropertyChanged signal will be emitted.
+ 
++		uint32 Class [readonly]
++
++			The Bluetooth class of device.
++
+ 		boolean Powered [readwrite]
+ 
+ 			Switch an adapter on or off. This will also set the
+diff --git a/src/adapter.c b/src/adapter.c
+index 52b58c4..276253d 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1192,6 +1192,7 @@ static DBusMessage *get_properties(DBusConnection *conn,
+ 	DBusMessageIter iter;
+ 	DBusMessageIter dict;
+ 	char str[249], srcaddr[18];
++	uint32_t class;
+ 	gboolean value;
+ 	char **devices;
+ 	int i;
+@@ -1224,6 +1225,12 @@ static DBusMessage *get_properties(DBusConnection *conn,
+ 
+ 	dict_append_entry(&dict, "Name", DBUS_TYPE_STRING, &property);
+ 
++	/* Class */
++	class = adapter->dev.class[0] |
++			adapter->dev.class[1] << 8 |
++			adapter->dev.class[2] << 16;
++	dict_append_entry(&dict, "Class", DBUS_TYPE_UINT32, &class);
++
+ 	/* Powered */
+ 	value = adapter->up ? TRUE : FALSE;
+ 	dict_append_entry(&dict, "Powered", DBUS_TYPE_BOOLEAN, &value);
+@@ -2326,6 +2333,8 @@ int adapter_get_class(struct btd_adapter *adapter, uint8_t *cls)
+ int adapter_set_class(struct btd_adapter *adapter, uint8_t *cls)
+ {
+ 	struct hci_dev *dev = &adapter->dev;
++	int dd;
++	uint32_t class;
+ 
+ 	if (memcmp(dev->class, cls, 3) == 0)
+ 		return 0;
+@@ -2334,6 +2343,17 @@ int adapter_set_class(struct btd_adapter *adapter, uint8_t *cls)
+ 
+ 	write_local_class(&adapter->bdaddr, cls);
+ 
++	dd = hci_open_dev(adapter->dev_id);
++	if (dd >= 0) {
++		update_ext_inquiry_response(dd, dev);
++		hci_close_dev(dd);
++	}
++
++	class = cls[0] | (cls[1] << 8) | (cls[2] << 16);
++
++	emit_property_changed(connection, adapter->path, ADAPTER_INTERFACE,
++				"Class", DBUS_TYPE_UINT32, &class);
++
+ 	return 0;
+ }
+ 
+
+--------------010709050504030500000100--
