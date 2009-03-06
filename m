@@ -1,75 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Fri, 6 Mar 2009 16:59:43 -0800
-Message-ID: <35c90d960903061659x433122ddrf6fb38ec02a50d60@mail.gmail.com>
-Subject: [RFC] [PATCH] Do no process a stream as connected if AVDTP set
-	configuration failed
-From: Nick Pelly <npelly@google.com>
+Message-ID: <518882.38546.qm@web50211.mail.re2.yahoo.com>
+Date: Fri, 6 Mar 2009 13:06:50 -0800 (PST)
+From: Marco Castillo <mabcastillo@yahoo.com>
+Subject: How to choose a predefined Bluetooth device (hcix) in a connect call
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Right now, if set configuration fails then the
-sink.c:stream_setup_complete seems to consider the stream connected.
-So the DBus AudioSink.Connect() call returns without error. But the
-stream is not actually ready.
 
-I have a feeling we may want to do some more cleanup, but this patch
-does the trick for us.
+Dear list:
+I need to connect as a client to a bluetooth capable device acting as a server. The client device is a linux box running Fedora 10, that has multiple bluetooth usb dongles. I need to connect to the server device using RFCOMM. For that matter I create a socket as follows:
+s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
 
-It is easy to reproduce the problem with the HTC BH S100. If you
-quickly disconnect and then reconnect it will return AVDTP set
-configuration failed (presumably because it hasn't closed the SEP on
-its end yet), but Dbus does not return an error for Connect.
+Then, knowing the bluetooth mac address of the server (the dest variable), I made the following calls to connect to the server:
 
-The verbose hcid logs for this problem look like:
+addr.rc_family = AF_BLUETOOTH;
+addr.rc_channel = 1;
+str2ba(dest, & addr.rc_bdaddr ) ;
 
-  102        /system/bin/hcid   I  hcid[103]: avdtp_ref(0x145e8): ref=2
-  102        /system/bin/hcid   I  hcid[103]: Discovery complete
-  102        /system/bin/hcid   I  hcid[103]: a2dp_source_config:
-selected SEP 0x12100
-  102        /system/bin/hcid   I  hcid[103]: avdtp_ref(0x145e8): ref=3
-  102        /system/bin/hcid   I  hcid[103]: setup_ref(0x11930): ref=1
-  102        /system/bin/hcid   I  hcid[103]:
-avdtp_set_configuration(0x145e8): int_seid=1, acp_seid=1
-  102        /system/bin/hcid   I  hcid[103]: stream creation in progress
-  102        /system/bin/hcid   I  hcid[103]: session_cb
-  102        /system/bin/hcid   I  hcid[103]: SET_CONFIGURATION
-request rejected: Stream End Point in Use (19)
-  102        /system/bin/hcid   I  hcid[103]: Source 0x12100:
-Set_Configuration_Cfm
-  102        /system/bin/hcid   I  hcid[103]: setup_ref(0x11930): ref=2
-  102        /system/bin/hcid   I  hcid[103]: npelly 174
-stream_setup_complete session=0x145e8 sep=0x120d8 stream=0x14ec0
-err=0xbeea8aa4 user_data=0x13de8
-  102        /system/bin/hcid   I  hcid[103]: Stream successfully created
+status = connect (s, (struct sockaddr *) & addr , sizeof(addr ) ) ;
+
+At this moment, everything goes fine, and I can connect to the server. But now I need to connect concurrently to all the possible bluetooth devices available near the client. There is going to be a thread per client connected. For maximizing the client resources I will like to use all the bluetooth dongles that the linux box (the client) has. So in the above code I don't see where can I set the connection over a predefined bluetooth device (let's say I want to use dongle 2 in the system, or hci1 for example).
+So my questions are:
+1. Is there a way to create a RFCOMM connection over a predefined bluetooth device (hcix)? Or the connect primitive chooses the one available and I can keep making connections until there is no one available?
+2. The previous question takes me to another: how many simultaneous connections can be made over a single bluetooth device (hcix)?
+3. How is the relationship between the channel and the bluetooth device? Are there n channels per device?. The channel is the rc_channel member of the address structure.
+
+Thank you in advance for taking the time and read my question. Thanks in advance for any help provided.
+This is the first time I write to this list. Please let me know if this is the place for placing questions like the ones before. If not, I will appreciate any guidance.
+
+Regards
+
+Marco Castillo
 
 
-
->From 47866d9e0e9596b8682293f601d195ef390bfd87 Mon Sep 17 00:00:00 2001
-From: Nick Pelly <npelly@google.com>
-Date: Fri, 6 Mar 2009 16:53:04 -0800
-Subject: [PATCH] Do not process stream as connected if AVDTP set
-configuration failed.
-
----
- audio/sink.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
-
-diff --git a/audio/sink.c b/audio/sink.c
-index 44faacf..f204cb1 100644
---- a/audio/sink.c
-+++ b/audio/sink.c
-@@ -191,7 +191,7 @@ static void stream_setup_complete(struct avdtp
-*session, struct a2dp_sep *sep,
-
-        pending = sink->connect;
-
--       if (stream) {
-+       if (stream & !err) {
-                debug("Stream successfully created");
-
-                if (pending->msg) {
--- 
-1.5.5
+      
