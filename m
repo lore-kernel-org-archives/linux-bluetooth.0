@@ -1,37 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: bluez kernel patch for 2.6.25
-From: Marcel Holtmann <marcel@holtmann.org>
-To: =?UTF-8?Q?=E5=8D=9E=E7=A3=8A?= <mykofzone@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <a172fe730903042032q405554f5x924cf1b0d999a2e1@mail.gmail.com>
-References: <a172fe730903031953r60e50248n5188455d98424e5c@mail.gmail.com>
-	 <1236200738.6670.14.camel@localhost.localdomain>
-	 <a172fe730903042032q405554f5x924cf1b0d999a2e1@mail.gmail.com>
-Content-Type: text/plain
-Date: Fri, 06 Mar 2009 02:36:12 +0100
-Message-Id: <1236303372.30602.1.camel@localhost.localdomain>
+Subject: Broken SDP parsing?
+From: Bastien Nocera <hadess@hadess.net>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary="=-PpTfYHKP7ItvGLsw8VFi"
+Date: Fri, 06 Mar 2009 01:00:26 +0000
+Message-Id: <1236301226.3602.2314.camel@cookie.hadess.net>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
 
-we don't do top posting on the mailing list. Please respect this and
-follow proper mailing list behavior.
+--=-PpTfYHKP7ItvGLsw8VFi
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
->      I only charge the bluetooth in my team, and i can't let others
-> migrate their drivers to 2.6.28 or 2.6.29 for me. So, i should proting
-> the lastest bluez drivers and protocol to the current kernel(2.6.25).
-> The bluetooth chipset is stlc2500c. I think the bluez in 2.6.27 is
-> better than 2.6.25, but after porting them to 2.6.25, there's some
-> error such as the listed in the last email. So, i would like to try
-> 2.6.25 first. Thus, is theare a kernel patch for 2.6.25? Thanks.
+Heya,
 
-Sorry, but I don't see how anybody here can help you. If you wanna stick
-with an old kernel that is your choice.
+In bluez 3.x, I used to get something like that:
+	<attribute id="0x0300">
+ 		<text value="MFG:HP;MDL:Photosmart 380
+series_BT;CMD:PCL,DW-PCL,DESKJET,DYN;CLS:PRINTER;DES:385;" />
+	</attribute>
 
-Regards
+Now I get:
+<attribute id="0x0300">
+      <text value="" />
+</attribute>
 
-Marcel
+$ sdptool search --raw --bdaddr 00:0C:55:5E:07:E1 HCRP
+	Attribute 0x0300
+		Data 00 55 4d 46 47 3a 48 50 3b 4d 44 4c 3a 50 68 6f 74 6f 73 6d 61 72
+74 20 33 38 30 20 73 65 72 69 65 73 5f 42 54 3b 43 4d 44 3a 50 43 4c 2c
+44 57 2d 50 43 4c 2c 44 45 53 4b 4a 45 54 2c 44 59 4e 3b 43 4c 53 3a 50
+52 49 4e 54 45 52 3b 44 45 53 3a 33 38 35 3b 00
 
+With the attached patch:
+	<attribute id="0x0300">
+		<text value="&#00;UMFG:HP;MDL:Photosmart 380
+series_BT;CMD:PCL,DW-PCL,DESKJET,DYN;CLS:PRINTER;DES:385;" />
+	</attribute>
+
+The first 2 chars in the IEEE1284 ID are supposed to be the length of
+the string. This should enable me to make the CUPS backend's discovery
+work again.
+
+Cheers
+
+--=-PpTfYHKP7ItvGLsw8VFi
+Content-Disposition: attachment; filename="bluez-sdp-xml-with-nulls.patch"
+Content-Type: text/x-patch; name="bluez-sdp-xml-with-nulls.patch"; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+
+diff --git a/common/sdp-xml.c b/common/sdp-xml.c
+index 0403dcd..5f314b7 100644
+--- a/common/sdp-xml.c
++++ b/common/sdp-xml.c
+@@ -239,9 +239,7 @@ static void convert_raw_data_to_xml(sdp_data_t *value, int indent_level,
+ 		hex = 0;
+ 
+ 		for (i = 0; i < length; i++) {
+-			if (value->val.str[i] == '\0')
+-				break;
+-			if (!isprint(value->val.str[i])) {
++			if (!isprint(value->val.str[i]) && value->val.str[i] != '\0') {
+ 				hex = 1;
+ 				break;
+ 			}
+@@ -250,7 +248,8 @@ static void convert_raw_data_to_xml(sdp_data_t *value, int indent_level,
+ 			if ((value->val.str[i] == '<') ||
+ 					(value->val.str[i] == '>') ||
+ 					(value->val.str[i] == '"') ||
+-					(value->val.str[i] == '&'))
++					(value->val.str[i] == '&') ||
++					(value->val.str[i] == '\0'))
+ 				num_chars_to_escape++;
+ 		}
+ 
+@@ -304,7 +303,13 @@ static void convert_raw_data_to_xml(sdp_data_t *value, int indent_level,
+ 					strBuf[j++] = 'o';
+ 					strBuf[j++] = 't';
+ 				}
+-				else {
++				else if (value->val.str[i] == '\0') {
++					strBuf[j++] = '&';
++					strBuf[j++] = '#';
++					strBuf[j++] = '0';
++					strBuf[j++] = '0';
++					strBuf[j++] = ';';
++				} else {
+ 					strBuf[j++] = value->val.str[i];
+ 				}
+ 			}
+
+--=-PpTfYHKP7ItvGLsw8VFi--
 
