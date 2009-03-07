@@ -1,182 +1,122 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?utf-8?q?Erik=20Andr=C3=A9n?= <erik.andren@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?utf-8?q?Erik=20Andr=C3=A9n?= <erik.andren@gmail.com>
-Subject: [PATCH 2/2] Defer btaddconn and btdelconn workqueues until a device has actually connected
-Date: Sat,  7 Mar 2009 23:10:29 +0100
-Message-Id: <1236463829-19977-2-git-send-email-erik.andren@gmail.com>
-In-Reply-To: <1236463829-19977-1-git-send-email-erik.andren@gmail.com>
-References: <1>
- <1236463829-19977-1-git-send-email-erik.andren@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1235858664-32201-1-git-send-email-gustavo@las.ic.unicamp.br>
+References: <1235858664-32201-1-git-send-email-gustavo@las.ic.unicamp.br>
+Date: Sat, 7 Mar 2009 02:07:31 -0300
+Message-ID: <6b53b1990903062107q24b6c8a1w58325ee18a216653@mail.gmail.com>
+Subject: Re: [PATCH] bluetooth: create macros for channels identifiers
+From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
+To: linux-bluetooth@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Many distros always load the bluetooth module, even if no actual bluetooth device exists. This causes two workqueues: btaddconn and btdelconn to be
-spawned at init time, clogging up the process list without performing any actual work.
-This patch defers the workqueue creation until the first hci device has connected. Also, tear down the workqueues when the last device disconnects.
+What about that?
 
-Signed-off-by: Erik Andr√©n <erik.andren@gmail.com>
----
- include/net/bluetooth/hci_core.h |    4 +-
- net/bluetooth/hci_core.c         |   11 ++++++---
- net/bluetooth/hci_sysfs.c        |   44 +++++++++++++++++++++----------------
- 3 files changed, 34 insertions(+), 25 deletions(-)
+On Sat, Feb 28, 2009 at 7:04 PM, Gustavo F. Padovan
+<gustavo@las.ic.unicamp.br> wrote:
+> Use macros instead of hardcoded numbers to get a code more readable.
+>
+> Signed-off-by: Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
+> ---
+> †include/net/bluetooth/l2cap.h | † †6 ++++++
+> †net/bluetooth/l2cap.c † † † † | † 18 +++++++++---------
+> †2 files changed, 15 insertions(+), 9 deletions(-)
+>
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> index f566aa1..ed4ba91 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -106,6 +106,12 @@ struct l2cap_conn_rsp {
+> † † † †__le16 † † status;
+> †} __attribute__ ((packed));
+>
+> +/* channel indentifier */
+> +#define L2CAP_CID_SIGNALING † †0x0001
+> +#define L2CAP_CID_CONN_LESS † †0x0002
+> +#define L2CAP_CID_DYN_START † †0x0040
+> +#define L2CAP_CID_DYN_END † † †0xffff
+> +
+> †/* connect result */
+> †#define L2CAP_CR_SUCCESS † †0x0000
+> †#define L2CAP_CR_PEND † † † 0x0001
+> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> index ca4d3b4..ff1744e 100644
+> --- a/net/bluetooth/l2cap.c
+> +++ b/net/bluetooth/l2cap.c
+> @@ -161,9 +161,9 @@ static inline struct sock *l2cap_get_chan_by_ident(struct l2cap_chan_list *l, u8
+>
+> †static u16 l2cap_alloc_cid(struct l2cap_chan_list *l)
+> †{
+> - † † † u16 cid = 0x0040;
+> + † † † u16 cid = L2CAP_CID_DYN_START;
+>
+> - † † † for (; cid < 0xffff; cid++) {
+> + † † † for (; cid < L2CAP_CID_DYN_END; cid++) {
+> † † † † † † † †if(!__l2cap_get_chan_by_scid(l, cid))
+> † † † † † † † † † † † †return cid;
+> † † † †}
+> @@ -215,13 +215,13 @@ static void __l2cap_chan_add(struct l2cap_conn *conn, struct sock *sk, struct so
+> † † † † † † † †l2cap_pi(sk)->scid = l2cap_alloc_cid(l);
+> † † † †} else if (sk->sk_type == SOCK_DGRAM) {
+> † † † † † † † †/* Connectionless socket */
+> - † † † † † † † l2cap_pi(sk)->scid = 0x0002;
+> - † † † † † † † l2cap_pi(sk)->dcid = 0x0002;
+> + † † † † † † † l2cap_pi(sk)->scid = L2CAP_CID_CONN_LESS;
+> + † † † † † † † l2cap_pi(sk)->dcid = L2CAP_CID_CONN_LESS;
+> † † † † † † † †l2cap_pi(sk)->omtu = L2CAP_DEFAULT_MTU;
+> † † † †} else {
+> † † † † † † † †/* Raw socket can send/recv signalling messages only */
+> - † † † † † † † l2cap_pi(sk)->scid = 0x0001;
+> - † † † † † † † l2cap_pi(sk)->dcid = 0x0001;
+> + † † † † † † † l2cap_pi(sk)->scid = L2CAP_CID_SIGNALING;
+> + † † † † † † † l2cap_pi(sk)->dcid = L2CAP_CID_SIGNALING;
+> † † † † † † † †l2cap_pi(sk)->omtu = L2CAP_DEFAULT_MTU;
+> † † † †}
+>
+> @@ -1598,7 +1598,7 @@ static struct sk_buff *l2cap_build_cmd(struct l2cap_conn *conn,
+>
+> † † † †lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
+> † † † †lh->len = cpu_to_le16(L2CAP_CMD_HDR_SIZE + dlen);
+> - † † † lh->cid = cpu_to_le16(0x0001);
+> + † † † lh->cid = cpu_to_le16(L2CAP_CID_SIGNALING);
+>
+> † † † †cmd = (struct l2cap_cmd_hdr *) skb_put(skb, L2CAP_CMD_HDR_SIZE);
+> † † † †cmd->code †= code;
+> @@ -2420,11 +2420,11 @@ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
+> † † † †BT_DBG("len %d, cid 0x%4.4x", len, cid);
+>
+> † † † †switch (cid) {
+> - † † † case 0x0001:
+> + † † † case L2CAP_CID_SIGNALING:
+> † † † † † † † †l2cap_sig_channel(conn, skb);
+> † † † † † † † †break;
+>
+> - † † † case 0x0002:
+> + † † † case L2CAP_CID_CONN_LESS:
+> † † † † † † † †psm = get_unaligned((__le16 *) skb->data);
+> † † † † † † † †skb_pull(skb, 2);
+> † † † † † † † †l2cap_conless_channel(conn, psm, skb);
+> --
+> 1.6.0.6
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at †http://vger.kernel.org/majordomo-info.html
+> Please read the FAQ at †http://www.tux.org/lkml/
+>
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 01f9316..b3bc9fa 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -453,8 +453,8 @@ static inline int hci_recv_frame(struct sk_buff *skb)
- 
- int hci_recv_fragment(struct hci_dev *hdev, int type, void *data, int count);
- 
--int hci_register_sysfs(struct hci_dev *hdev);
--void hci_unregister_sysfs(struct hci_dev *hdev);
-+int hci_register_sysfs(struct hci_dev *hdev, bool e);
-+void hci_unregister_sysfs(struct hci_dev *hdev, bool e);
- void hci_conn_add_sysfs(struct hci_conn *conn);
- void hci_conn_del_sysfs(struct hci_conn *conn);
- 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 9c98f6e..c21753f 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -843,6 +843,7 @@ int hci_register_dev(struct hci_dev *hdev)
- {
- 	struct list_head *head = &hci_dev_list, *p;
- 	int i, err, id = 0;
-+	bool empty;
- 
- 	BT_DBG("%p name %s type %d owner %p", hdev, hdev->name, hdev->type, hdev->owner);
- 
-@@ -859,6 +860,8 @@ int hci_register_dev(struct hci_dev *hdev)
- 		id++;
- 	}
- 
-+	empty = list_empty(&hci_dev_list);
-+
- 	sprintf(hdev->name, "hci%d", id);
- 	hdev->id = id;
- 	list_add(&hdev->list, head);
-@@ -896,10 +899,9 @@ int hci_register_dev(struct hci_dev *hdev)
- 	memset(&hdev->stat, 0, sizeof(struct hci_dev_stats));
- 
- 	atomic_set(&hdev->promisc, 0);
--
- 	write_unlock_bh(&hci_dev_list_lock);
- 
--	err = hci_register_sysfs(hdev);
-+	err = hci_register_sysfs(hdev, empty);
- 	if (err < 0)
- 		return err;
- 
-@@ -913,13 +915,14 @@ EXPORT_SYMBOL(hci_register_dev);
- int hci_unregister_dev(struct hci_dev *hdev)
- {
- 	int i;
-+	bool empty;
- 
- 	BT_DBG("%p name %s type %d", hdev, hdev->name, hdev->type);
- 
- 	write_lock_bh(&hci_dev_list_lock);
- 	list_del(&hdev->list);
-+	empty = list_empty(&hci_dev_list);
- 	write_unlock_bh(&hci_dev_list_lock);
--
- 	hci_dev_do_close(hdev);
- 
- 	for (i = 0; i < 3; i++)
-@@ -927,7 +930,7 @@ int hci_unregister_dev(struct hci_dev *hdev)
- 
- 	hci_notify(hdev, HCI_DEV_UNREG);
- 
--	hci_unregister_sysfs(hdev);
-+	hci_unregister_sysfs(hdev, empty);
- 
- 	__hci_dev_put(hdev);
- 
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index 1a1f916..c7a48d9 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -404,7 +404,7 @@ static struct device_type bt_host = {
- 	.release = bt_host_release,
- };
- 
--int hci_register_sysfs(struct hci_dev *hdev)
-+int hci_register_sysfs(struct hci_dev *hdev, bool e)
- {
- 	struct device *dev = &hdev->dev;
- 	int err;
-@@ -423,42 +423,48 @@ int hci_register_sysfs(struct hci_dev *hdev)
- 	if (err < 0)
- 		return err;
- 
-+	/* Check if the hci device list only contains a single, new, entry.
-+	   If so, setup the workqueues */
-+	if (e) {
-+		btaddconn = create_singlethread_workqueue("btaddconn");
-+		if (!btaddconn) {
-+			device_del(&hdev->dev);
-+			return -ENOMEM;
-+		}
-+
-+		btdelconn = create_singlethread_workqueue("btdelconn");
-+		if (!btdelconn) {
-+			device_del(&hdev->dev);
-+			destroy_workqueue(btaddconn);
-+			return -ENOMEM;
-+		}
-+	}
- 	return 0;
- }
- 
--void hci_unregister_sysfs(struct hci_dev *hdev)
-+void hci_unregister_sysfs(struct hci_dev *hdev, bool e)
- {
- 	BT_DBG("%p name %s type %d", hdev, hdev->name, hdev->type);
- 
-+	/* Check if there's any hci entries left. If not then its safe
-+	   to tear down the workqueues */
-+	if (e) {
-+		destroy_workqueue(btaddconn);
-+		destroy_workqueue(btdelconn);
-+	}
- 	device_del(&hdev->dev);
- }
- 
- int __init bt_sysfs_init(void)
- {
--	btaddconn = create_singlethread_workqueue("btaddconn");
--	if (!btaddconn)
--		return -ENOMEM;
--
--	btdelconn = create_singlethread_workqueue("btdelconn");
--	if (!btdelconn) {
--		destroy_workqueue(btaddconn);
--		return -ENOMEM;
--	}
--
- 	bt_class = class_create(THIS_MODULE, "bluetooth");
--	if (IS_ERR(bt_class)) {
--		destroy_workqueue(btdelconn);
--		destroy_workqueue(btaddconn);
-+	if (IS_ERR(bt_class))
- 		return PTR_ERR(bt_class);
--	}
- 
- 	return 0;
- }
- 
- void bt_sysfs_cleanup(void)
- {
--	destroy_workqueue(btaddconn);
--	destroy_workqueue(btdelconn);
--
- 	class_destroy(bt_class);
- }
+
+
 -- 
-1.5.6.3
+Gustavo F. Padovan
 
+Computer Engineering Student
+Institute of Computing - IC
+University of Campinas - UNICAMP
+
+email: gustavo@las.ic.unicamp.br
+gtalk: gfpadovan@gmail.com
+mobile: +55 19 81030803
