@@ -1,122 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1235858664-32201-1-git-send-email-gustavo@las.ic.unicamp.br>
-References: <1235858664-32201-1-git-send-email-gustavo@las.ic.unicamp.br>
-Date: Sat, 7 Mar 2009 02:07:31 -0300
-Message-ID: <6b53b1990903062107q24b6c8a1w58325ee18a216653@mail.gmail.com>
-Subject: Re: [PATCH] bluetooth: create macros for channels identifiers
-From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
+Date: Fri, 6 Mar 2009 16:59:43 -0800
+Message-ID: <35c90d960903061659x433122ddrf6fb38ec02a50d60@mail.gmail.com>
+Subject: [RFC] [PATCH] Do no process a stream as connected if AVDTP set
+	configuration failed
+From: Nick Pelly <npelly@google.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-What about that?
+Right now, if set configuration fails then the
+sink.c:stream_setup_complete seems to consider the stream connected.
+So the DBus AudioSink.Connect() call returns without error. But the
+stream is not actually ready.
 
-On Sat, Feb 28, 2009 at 7:04 PM, Gustavo F. Padovan
-<gustavo@las.ic.unicamp.br> wrote:
-> Use macros instead of hardcoded numbers to get a code more readable.
->
-> Signed-off-by: Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
-> ---
->  include/net/bluetooth/l2cap.h |    6 ++++++
->  net/bluetooth/l2cap.c         |   18 +++++++++---------
->  2 files changed, 15 insertions(+), 9 deletions(-)
->
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index f566aa1..ed4ba91 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -106,6 +106,12 @@ struct l2cap_conn_rsp {
->        __le16     status;
->  } __attribute__ ((packed));
->
-> +/* channel indentifier */
-> +#define L2CAP_CID_SIGNALING    0x0001
-> +#define L2CAP_CID_CONN_LESS    0x0002
-> +#define L2CAP_CID_DYN_START    0x0040
-> +#define L2CAP_CID_DYN_END      0xffff
-> +
->  /* connect result */
->  #define L2CAP_CR_SUCCESS    0x0000
->  #define L2CAP_CR_PEND       0x0001
-> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-> index ca4d3b4..ff1744e 100644
-> --- a/net/bluetooth/l2cap.c
-> +++ b/net/bluetooth/l2cap.c
-> @@ -161,9 +161,9 @@ static inline struct sock *l2cap_get_chan_by_ident(struct l2cap_chan_list *l, u8
->
->  static u16 l2cap_alloc_cid(struct l2cap_chan_list *l)
->  {
-> -       u16 cid = 0x0040;
-> +       u16 cid = L2CAP_CID_DYN_START;
->
-> -       for (; cid < 0xffff; cid++) {
-> +       for (; cid < L2CAP_CID_DYN_END; cid++) {
->                if(!__l2cap_get_chan_by_scid(l, cid))
->                        return cid;
->        }
-> @@ -215,13 +215,13 @@ static void __l2cap_chan_add(struct l2cap_conn *conn, struct sock *sk, struct so
->                l2cap_pi(sk)->scid = l2cap_alloc_cid(l);
->        } else if (sk->sk_type == SOCK_DGRAM) {
->                /* Connectionless socket */
-> -               l2cap_pi(sk)->scid = 0x0002;
-> -               l2cap_pi(sk)->dcid = 0x0002;
-> +               l2cap_pi(sk)->scid = L2CAP_CID_CONN_LESS;
-> +               l2cap_pi(sk)->dcid = L2CAP_CID_CONN_LESS;
->                l2cap_pi(sk)->omtu = L2CAP_DEFAULT_MTU;
->        } else {
->                /* Raw socket can send/recv signalling messages only */
-> -               l2cap_pi(sk)->scid = 0x0001;
-> -               l2cap_pi(sk)->dcid = 0x0001;
-> +               l2cap_pi(sk)->scid = L2CAP_CID_SIGNALING;
-> +               l2cap_pi(sk)->dcid = L2CAP_CID_SIGNALING;
->                l2cap_pi(sk)->omtu = L2CAP_DEFAULT_MTU;
->        }
->
-> @@ -1598,7 +1598,7 @@ static struct sk_buff *l2cap_build_cmd(struct l2cap_conn *conn,
->
->        lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
->        lh->len = cpu_to_le16(L2CAP_CMD_HDR_SIZE + dlen);
-> -       lh->cid = cpu_to_le16(0x0001);
-> +       lh->cid = cpu_to_le16(L2CAP_CID_SIGNALING);
->
->        cmd = (struct l2cap_cmd_hdr *) skb_put(skb, L2CAP_CMD_HDR_SIZE);
->        cmd->code  = code;
-> @@ -2420,11 +2420,11 @@ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
->        BT_DBG("len %d, cid 0x%4.4x", len, cid);
->
->        switch (cid) {
-> -       case 0x0001:
-> +       case L2CAP_CID_SIGNALING:
->                l2cap_sig_channel(conn, skb);
->                break;
->
-> -       case 0x0002:
-> +       case L2CAP_CID_CONN_LESS:
->                psm = get_unaligned((__le16 *) skb->data);
->                skb_pull(skb, 2);
->                l2cap_conless_channel(conn, psm, skb);
-> --
-> 1.6.0.6
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
->
+I have a feeling we may want to do some more cleanup, but this patch
+does the trick for us.
+
+It is easy to reproduce the problem with the HTC BH S100. If you
+quickly disconnect and then reconnect it will return AVDTP set
+configuration failed (presumably because it hasn't closed the SEP on
+its end yet), but Dbus does not return an error for Connect.
+
+The verbose hcid logs for this problem look like:
+
+  102        /system/bin/hcid   I  hcid[103]: avdtp_ref(0x145e8): ref=2
+  102        /system/bin/hcid   I  hcid[103]: Discovery complete
+  102        /system/bin/hcid   I  hcid[103]: a2dp_source_config:
+selected SEP 0x12100
+  102        /system/bin/hcid   I  hcid[103]: avdtp_ref(0x145e8): ref=3
+  102        /system/bin/hcid   I  hcid[103]: setup_ref(0x11930): ref=1
+  102        /system/bin/hcid   I  hcid[103]:
+avdtp_set_configuration(0x145e8): int_seid=1, acp_seid=1
+  102        /system/bin/hcid   I  hcid[103]: stream creation in progress
+  102        /system/bin/hcid   I  hcid[103]: session_cb
+  102        /system/bin/hcid   I  hcid[103]: SET_CONFIGURATION
+request rejected: Stream End Point in Use (19)
+  102        /system/bin/hcid   I  hcid[103]: Source 0x12100:
+Set_Configuration_Cfm
+  102        /system/bin/hcid   I  hcid[103]: setup_ref(0x11930): ref=2
+  102        /system/bin/hcid   I  hcid[103]: npelly 174
+stream_setup_complete session=0x145e8 sep=0x120d8 stream=0x14ec0
+err=0xbeea8aa4 user_data=0x13de8
+  102        /system/bin/hcid   I  hcid[103]: Stream successfully created
 
 
 
+>From 47866d9e0e9596b8682293f601d195ef390bfd87 Mon Sep 17 00:00:00 2001
+From: Nick Pelly <npelly@google.com>
+Date: Fri, 6 Mar 2009 16:53:04 -0800
+Subject: [PATCH] Do not process stream as connected if AVDTP set
+configuration failed.
+
+---
+ audio/sink.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/audio/sink.c b/audio/sink.c
+index 44faacf..f204cb1 100644
+--- a/audio/sink.c
++++ b/audio/sink.c
+@@ -191,7 +191,7 @@ static void stream_setup_complete(struct avdtp
+*session, struct a2dp_sep *sep,
+
+        pending = sink->connect;
+
+-       if (stream) {
++       if (stream & !err) {
+                debug("Stream successfully created");
+
+                if (pending->msg) {
 -- 
-Gustavo F. Padovan
-
-Computer Engineering Student
-Institute of Computing - IC
-University of Campinas - UNICAMP
-
-email: gustavo@las.ic.unicamp.br
-gtalk: gfpadovan@gmail.com
-mobile: +55 19 81030803
+1.5.5
