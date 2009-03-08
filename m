@@ -1,42 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1236523586.16880.141.camel@cookie.hadess.net>
-References: <1236301226.3602.2314.camel@cookie.hadess.net>
-	 <1236523586.16880.141.camel@cookie.hadess.net>
-Date: Mon, 9 Mar 2009 10:08:11 -0300
-Message-ID: <2d5a2c100903090608kd4ffea6sd9b1746e2362bf2@mail.gmail.com>
-Subject: Re: Broken SDP parsing?
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Date: Sun, 8 Mar 2009 23:22:15 +0000
+From: James Le Cuirot <chewi@aura-online.co.uk>
+To: linux-bluetooth@vger.kernel.org
+Subject: PANU currently broken?
+Message-ID: <20090308232215.727f38fa@symphony>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+Hi,
 
-On Sun, Mar 8, 2009 at 11:46 AM, Bastien Nocera <hadess@hadess.net> wrote:
-> On Fri, 2009-03-06 at 01:00 +0000, Bastien Nocera wrote:
->> Heya,
->>
-> <snip>
->> The first 2 chars in the IEEE1284 ID are supposed to be the length of
->> the string. This should enable me to make the CUPS backend's discovery
->> work again.
->
-> This isn't quite enough it seems.
->
-> >From DiscoverDevices on org.bluez.Device:
->        <attribute id="0x0300">
->                <text value="" />
->        </attribute>
->
-It may happen that bluetoothd and sdptool doesn't really share the sdp
-xml parsing code. So perhaps we need to replicated your fix on
-bluetoothd too or just make bluetoothd to use what you have done for
-sdptool.
+I've managed to serve my phone with NAP successfully but using PANU in
+the other direction has not worked at all. No one I've spoken to has
+any answers so I've done some digging. I've been using Blueman a little
+but I worked out how to start the connection manually with dbus-send.
+The first error I encountered was this. It appears after a short delay.
 
+Error org.freedesktop.DBus.Error.NoReply: Did not receive a reply.
+Possible causes include: the remote application did not send a reply,
+the message bus security policy blocked the reply, the reply timeout
+expired, or the network connection was broken.
 
--- 
-Luiz Augusto von Dentz
-Engenheiro de Computação
+This seemed a little vague but after adding some debug messages to the
+source, I figured out what the problem was. The D-Bus method signature
+for org.bluez.Network.Connect says it's supposed to return a string. So
+do the API docs. So why does it return NULL? I don't know much about
+D-Bus but this doesn't seem right.
+
+According to the docs, it's supposed to return the name of the newly
+created interface such as bnep0. I outputted nc->dev to the log to
+check that's what it actually was. Close. It gave me bnep%d.
+
+In any case, I wasn't sure how to return a string to D-Bus so I got it
+to return null with g_dbus_create_reply(msg, DBUS_TYPE_INVALID). This
+fixed the error and the delay. Still no sign of bnep0 though.
+
+Looking through the rest of the source, it seemed to me that nc->dev is
+supposed to get changed from bnep%d to bnep0 at some point but this
+isn't happening and I can't even see any code that resembles this
+operation. If it's trying to do operations on an interface called
+bnep%d then no wonder it's not working.
+
+Having said that, I changed the setting in network.conf from bnep%d to
+bnep0 and while it definitely did pick this up, it still wouldn't work.
+I've seen "Connection refused (111)" a couple of times but I'm not sure
+where that's coming from exactly.
+
+Are my observations correct or am I missing something here? If I'm
+right, why is it in such a broken state? I wouldn't expect a release to
+have these kind of problems.
+
+Regards,
+James
