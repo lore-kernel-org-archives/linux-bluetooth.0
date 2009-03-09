@@ -2,13 +2,14 @@ Return-Path: <cyrus@holtmann.org>
 From: =?utf-8?q?Erik=20Andr=C3=A9n?= <erik.andren@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: =?utf-8?q?Erik=20Andr=C3=A9n?= <erik.andren@gmail.com>
-Subject: [PATCH 2/3] Checkpatch.pl: Fixup hci_core.c
-Date: Mon,  9 Mar 2009 20:55:28 +0100
-Message-Id: <1236628529-23819-3-git-send-email-erik.andren@gmail.com>
-In-Reply-To: <1236628529-23819-2-git-send-email-erik.andren@gmail.com>
+Subject: [PATCH 3/3] Checkpatch.pl: Fixup hci_event.c
+Date: Mon,  9 Mar 2009 20:55:29 +0100
+Message-Id: <1236628529-23819-4-git-send-email-erik.andren@gmail.com>
+In-Reply-To: <1236628529-23819-3-git-send-email-erik.andren@gmail.com>
 References: <1>
  <1236628529-23819-1-git-send-email-erik.andren@gmail.com>
  <1236628529-23819-2-git-send-email-erik.andren@gmail.com>
+ <1236628529-23819-3-git-send-email-erik.andren@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,14 +17,14 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Signed-off-by: Erik Andrén <erik.andren@gmail.com>
 ---
- net/bluetooth/hci_core.c |  102 ++++++++++++++++++++++++++++++---------------
- 1 files changed, 68 insertions(+), 34 deletions(-)
+ net/bluetooth/hci_event.c |  172 +++++++++++++++++++++++++++++----------------
+ 1 files changed, 111 insertions(+), 61 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index c21753f..b1a93c4 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -39,10 +39,10 @@
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 5553424..25f8fa4 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -36,10 +36,10 @@
  #include <linux/skbuff.h>
  #include <linux/interrupt.h>
  #include <linux/notifier.h>
@@ -35,297 +36,494 @@ index c21753f..b1a93c4 100644
  #include <asm/unaligned.h>
  
  #include <net/bluetooth/bluetooth.h>
-@@ -112,8 +112,11 @@ static void hci_req_cancel(struct hci_dev *hdev, int err)
+@@ -77,12 +77,14 @@ static void hci_cc_exit_periodic_inq(struct hci_dev *hdev, struct sk_buff *skb)
+ 	hci_conn_check_pending(hdev);
  }
  
- /* Execute request and wait for completion. */
--static int __hci_request(struct hci_dev *hdev, void (*req)(struct hci_dev *hdev, unsigned long opt),
--				unsigned long opt, __u32 timeout)
-+static int __hci_request(struct hci_dev *hdev,
-+			 void (*req)(struct hci_dev *hdev,
-+			 unsigned long opt),
-+			 unsigned long opt,
-+			 __u32 timeout)
+-static void hci_cc_remote_name_req_cancel(struct hci_dev *hdev, struct sk_buff *skb)
++static void hci_cc_remote_name_req_cancel(struct hci_dev *hdev,
++					  struct sk_buff *skb)
  {
- 	DECLARE_WAITQUEUE(wait, current);
- 	int err = 0;
-@@ -154,8 +157,11 @@ static int __hci_request(struct hci_dev *hdev, void (*req)(struct hci_dev *hdev,
- 	return err;
+ 	BT_DBG("%s", hdev->name);
  }
  
--static inline int hci_request(struct hci_dev *hdev, void (*req)(struct hci_dev *hdev, unsigned long opt),
--				unsigned long opt, __u32 timeout)
-+static inline int hci_request(struct hci_dev *hdev,
-+			      void (*req)(struct hci_dev *hdev,
-+			      unsigned long opt),
-+			      unsigned long opt,
-+			      __u32 timeout)
+-static void hci_cc_role_discovery(struct hci_dev *hdev, struct sk_buff *skb)
++static void hci_cc_role_discovery(struct hci_dev *hdev,
++				  struct sk_buff *skb)
  {
- 	int ret;
+ 	struct hci_rp_role_discovery *rp = (void *) skb->data;
+ 	struct hci_conn *conn;
+@@ -148,7 +150,8 @@ static void hci_cc_write_link_policy(struct hci_dev *hdev, struct sk_buff *skb)
+ 	hci_dev_unlock(hdev);
+ }
  
-@@ -330,7 +336,8 @@ static void inquiry_cache_flush(struct hci_dev *hdev)
+-static void hci_cc_read_def_link_policy(struct hci_dev *hdev, struct sk_buff *skb)
++static void hci_cc_read_def_link_policy(struct hci_dev *hdev,
++					struct sk_buff *skb)
+ {
+ 	struct hci_rp_read_def_link_policy *rp = (void *) skb->data;
+ 
+@@ -160,7 +163,8 @@ static void hci_cc_read_def_link_policy(struct hci_dev *hdev, struct sk_buff *sk
+ 	hdev->link_policy = __le16_to_cpu(rp->policy);
+ }
+ 
+-static void hci_cc_write_def_link_policy(struct hci_dev *hdev, struct sk_buff *skb)
++static void hci_cc_write_def_link_policy(struct hci_dev *hdev,
++					 struct sk_buff *skb)
+ {
+ 	__u8 status = *((__u8 *) skb->data);
+ 	void *sent;
+@@ -346,7 +350,8 @@ static void hci_cc_read_voice_setting(struct hci_dev *hdev, struct sk_buff *skb)
  	}
  }
  
--struct inquiry_entry *hci_inquiry_cache_lookup(struct hci_dev *hdev, bdaddr_t *bdaddr)
-+struct inquiry_entry *hci_inquiry_cache_lookup(struct hci_dev *hdev,
-+					       bdaddr_t *bdaddr)
+-static void hci_cc_write_voice_setting(struct hci_dev *hdev, struct sk_buff *skb)
++static void hci_cc_write_voice_setting(struct hci_dev *hdev,
++				       struct sk_buff *skb)
  {
- 	struct inquiry_cache *cache = &hdev->inq_cache;
- 	struct inquiry_entry *e;
-@@ -350,11 +357,13 @@ void hci_inquiry_cache_update(struct hci_dev *hdev, struct inquiry_data *data)
+ 	__u8 status = *((__u8 *) skb->data);
+ 	__u16 setting;
+@@ -433,7 +438,8 @@ static void hci_cc_read_local_version(struct hci_dev *hdev, struct sk_buff *skb)
+ 					hdev->hci_ver, hdev->hci_rev);
+ }
  
- 	BT_DBG("cache %p, %s", cache, batostr(&data->bdaddr));
- 
--	if (!(e = hci_inquiry_cache_lookup(hdev, &data->bdaddr))) {
-+	e = hci_inquiry_cache_lookup(hdev, &data->bdaddr);
-+	if (!e) {
- 		/* Entry not in the cache. Add new one. */
--		if (!(e = kzalloc(sizeof(struct inquiry_entry), GFP_ATOMIC)))
-+		e = kzalloc(sizeof(struct inquiry_entry), GFP_ATOMIC);
-+		if (!e)
- 			return;
--		e->next     = cache->list;
-+		e->next = cache->list;
- 		cache->list = e;
- 	}
- 
-@@ -414,7 +423,8 @@ int hci_inquiry(void __user *arg)
- 	if (copy_from_user(&ir, ptr, sizeof(ir)))
- 		return -EFAULT;
- 
--	if (!(hdev = hci_dev_get(ir.dev_id)))
-+	hdev = hci_dev_get(ir.dev_id);
-+	if (!hdev)
- 		return -ENODEV;
- 
- 	hci_dev_lock_bh(hdev);
-@@ -427,16 +437,22 @@ int hci_inquiry(void __user *arg)
- 	hci_dev_unlock_bh(hdev);
- 
- 	timeo = ir.length * msecs_to_jiffies(2000);
--	if (do_inquiry && (err = hci_request(hdev, hci_inq_req, (unsigned long)&ir, timeo)) < 0)
--		goto done;
- 
--	/* for unlimited number of responses we will use buffer with 255 entries */
-+	if (do_inquiry) {
-+		err = hci_request(hdev, hci_inq_req, (unsigned long)&ir, timeo);
-+		if (err < 0)
-+			goto done;
-+	}
-+
-+	/* for unlimited number of responses
-+	   we will use buffer with 255 entries */
- 	max_rsp = (ir.num_rsp == 0) ? 255 : ir.num_rsp;
- 
- 	/* cache_dump can't sleep. Therefore we allocate temp buffer and then
- 	 * copy it to the user space.
- 	 */
--	if (!(buf = kmalloc(sizeof(struct inquiry_info) * max_rsp, GFP_KERNEL))) {
-+	buf = kmalloc(sizeof(struct inquiry_info) * max_rsp, GFP_KERNEL);
-+	if (!buf) {
- 		err = -ENOMEM;
- 		goto done;
- 	}
-@@ -469,7 +485,8 @@ int hci_dev_open(__u16 dev)
- 	struct hci_dev *hdev;
- 	int ret = 0;
- 
--	if (!(hdev = hci_dev_get(dev)))
-+	hdev = hci_dev_get(dev)
-+	if (!hdev)
- 		return -ENODEV;
- 
- 	BT_DBG("%s %p", hdev->name, hdev);
-@@ -493,7 +510,7 @@ int hci_dev_open(__u16 dev)
- 		atomic_set(&hdev->cmd_cnt, 1);
- 		set_bit(HCI_INIT, &hdev->flags);
- 
--		//__hci_request(hdev, hci_reset_req, 0, HZ);
-+		/* __hci_request(hdev, hci_reset_req, 0, HZ); */
- 		ret = __hci_request(hdev, hci_init_req, 0,
- 					msecs_to_jiffies(HCI_INIT_TIMEOUT));
- 
-@@ -599,7 +616,8 @@ int hci_dev_close(__u16 dev)
- 	struct hci_dev *hdev;
- 	int err;
- 
--	if (!(hdev = hci_dev_get(dev)))
-+	hdev = hci_dev_get(dev);
-+	if (!hdev)
- 		return -ENODEV;
- 	err = hci_dev_do_close(hdev);
- 	hci_dev_put(hdev);
-@@ -611,7 +629,8 @@ int hci_dev_reset(__u16 dev)
- 	struct hci_dev *hdev;
- 	int ret = 0;
- 
--	if (!(hdev = hci_dev_get(dev)))
-+	hdev = hci_dev_get(dev);
-+	if (!hdev)
- 		return -ENODEV;
- 
- 	hci_req_lock(hdev);
-@@ -651,7 +670,8 @@ int hci_dev_reset_stat(__u16 dev)
- 	struct hci_dev *hdev;
- 	int ret = 0;
- 
--	if (!(hdev = hci_dev_get(dev)))
-+	hdev = hci_dev_get(dev);
-+	if (!hdev)
- 		return -ENODEV;
- 
- 	memset(&hdev->stat, 0, sizeof(struct hci_dev_stats));
-@@ -670,7 +690,8 @@ int hci_dev_cmd(unsigned int cmd, void __user *arg)
- 	if (copy_from_user(&dr, arg, sizeof(dr)))
- 		return -EFAULT;
- 
--	if (!(hdev = hci_dev_get(dr.dev_id)))
-+	hdev = hci_dev_get(dr.dev_id);
-+	if (!hdev)
- 		return -ENODEV;
- 
- 	switch (cmd) {
-@@ -751,7 +772,8 @@ int hci_get_dev_list(void __user *arg)
- 
- 	size = sizeof(*dl) + dev_num * sizeof(*dr);
- 
--	if (!(dl = kzalloc(size, GFP_KERNEL)))
-+	dl = kzalloc(size, GFP_KERNEL);
-+	if (!dl)
- 		return -ENOMEM;
- 
- 	dr = dl->dev_req;
-@@ -785,7 +807,8 @@ int hci_get_dev_info(void __user *arg)
- 	if (copy_from_user(&di, arg, sizeof(di)))
- 		return -EFAULT;
- 
--	if (!(hdev = hci_dev_get(di.dev_id)))
-+	hdev = hci_dev_get(di.dev_id);
-+	if (!hdev)
- 		return -ENODEV;
- 
- 	strcpy(di.name, hdev->name);
-@@ -845,7 +868,8 @@ int hci_register_dev(struct hci_dev *hdev)
- 	int i, err, id = 0;
- 	bool empty;
- 
--	BT_DBG("%p name %s type %d owner %p", hdev, hdev->name, hdev->type, hdev->owner);
-+	BT_DBG("%p name %s type %d owner %p", hdev, hdev->name,
-+	       hdev->type, hdev->owner);
- 
- 	if (!hdev->open || !hdev->close || !hdev->destruct)
- 		return -EINVAL;
-@@ -878,7 +902,7 @@ int hci_register_dev(struct hci_dev *hdev)
- 	hdev->sniff_max_interval = 800;
- 	hdev->sniff_min_interval = 80;
- 
--	tasklet_init(&hdev->cmd_task, hci_cmd_task,(unsigned long) hdev);
-+	tasklet_init(&hdev->cmd_task, hci_cmd_task, (unsigned long) hdev);
- 	tasklet_init(&hdev->rx_task, hci_rx_task, (unsigned long) hdev);
- 	tasklet_init(&hdev->tx_task, hci_tx_task, (unsigned long) hdev);
- 
-@@ -982,7 +1006,8 @@ int hci_recv_fragment(struct hci_dev *hdev, int type, void *data, int count)
- 			case HCI_ACLDATA_PKT:
- 				if (count >= HCI_ACL_HDR_SIZE) {
- 					struct hci_acl_hdr *h = data;
--					len = HCI_ACL_HDR_SIZE + __le16_to_cpu(h->dlen);
-+					len = HCI_ACL_HDR_SIZE +
-+							__le16_to_cpu(h->dlen);
- 				} else
- 					return -EILSEQ;
- 				break;
-@@ -1208,7 +1233,8 @@ int hci_send_acl(struct hci_conn *conn, struct sk_buff *skb, __u16 flags)
- 	bt_cb(skb)->pkt_type = HCI_ACLDATA_PKT;
- 	hci_add_acl_hdr(skb, conn->handle, flags | ACL_START);
- 
--	if (!(list = skb_shinfo(skb)->frag_list)) {
-+	list = skb_shinfo(skb)->frag_list);
-+	if (!list) {
- 		/* Non fragmented */
- 		BT_DBG("%s nonfrag skb %p len %d", hdev->name, skb, skb->len);
- 
-@@ -1274,7 +1300,8 @@ EXPORT_SYMBOL(hci_send_sco);
- /* ---- HCI TX task (outgoing data) ---- */
- 
- /* HCI Connection scheduler */
--static inline struct hci_conn *hci_low_sent(struct hci_dev *hdev, __u8 type, int *quote)
-+static inline struct hci_conn *hci_low_sent(struct hci_dev *hdev,
-+					    __u8 type, int *quote)
+-static void hci_cc_read_local_commands(struct hci_dev *hdev, struct sk_buff *skb)
++static void hci_cc_read_local_commands(struct hci_dev *hdev,
++				       struct sk_buff *skb)
  {
- 	struct hci_conn_hash *h = &hdev->conn_hash;
- 	struct hci_conn *conn = NULL;
-@@ -1342,7 +1369,8 @@ static inline void hci_sched_acl(struct hci_dev *hdev)
- 	if (!test_bit(HCI_RAW, &hdev->flags)) {
- 		/* ACL tx timeout must be longer than maximum
- 		 * link supervision timeout (40.9 seconds) */
--		if (!hdev->acl_cnt && time_after(jiffies, hdev->acl_last_tx + HZ * 45))
-+		if (!hdev->acl_cnt &&
-+			time_after(jiffies, hdev->acl_last_tx + HZ * 45))
- 			hci_acl_tx_to(hdev);
+ 	struct hci_rp_read_local_commands *rp = (void *) skb->data;
+ 
+@@ -445,7 +451,8 @@ static void hci_cc_read_local_commands(struct hci_dev *hdev, struct sk_buff *skb
+ 	memcpy(hdev->commands, rp->commands, sizeof(hdev->commands));
+ }
+ 
+-static void hci_cc_read_local_features(struct hci_dev *hdev, struct sk_buff *skb)
++static void hci_cc_read_local_features(struct hci_dev *hdev,
++				       struct sk_buff *skb)
+ {
+ 	struct hci_rp_read_local_features *rp = (void *) skb->data;
+ 
+@@ -613,11 +620,14 @@ static void hci_cs_add_sco(struct hci_dev *hdev, __u8 status)
+ 	hci_dev_lock(hdev);
+ 
+ 	acl = hci_conn_hash_lookup_handle(hdev, handle);
+-	if (acl && (sco = acl->link)) {
+-		sco->state = BT_CLOSED;
++	if (acl) {
++		sco = acl->link;
++		if (sco) {
++			sco->state = BT_CLOSED;
+ 
+-		hci_proto_connect_cfm(sco, status);
+-		hci_conn_del(sco);
++			hci_proto_connect_cfm(sco, status);
++			hci_conn_del(sco);
++		}
  	}
  
-@@ -1390,7 +1418,8 @@ static inline void hci_sched_esco(struct hci_dev *hdev)
+ 	hci_dev_unlock(hdev);
+@@ -758,11 +768,14 @@ static void hci_cs_setup_sync_conn(struct hci_dev *hdev, __u8 status)
+ 	hci_dev_lock(hdev);
  
+ 	acl = hci_conn_hash_lookup_handle(hdev, handle);
+-	if (acl && (sco = acl->link)) {
+-		sco->state = BT_CLOSED;
++	if (acl) {
++		sco = acl->link;
++		if (sco) {
++			sco->state = BT_CLOSED;
+ 
+-		hci_proto_connect_cfm(sco, status);
+-		hci_conn_del(sco);
++			hci_proto_connect_cfm(sco, status);
++			hci_conn_del(sco);
++		}
+ 	}
+ 
+ 	hci_dev_unlock(hdev);
+@@ -814,7 +827,8 @@ static void hci_cs_exit_sniff_mode(struct hci_dev *hdev, __u8 status)
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-static inline void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_inquiry_complete_evt(struct hci_dev *hdev,
++					    struct sk_buff *skb)
+ {
+ 	__u8 status = *((__u8 *) skb->data);
+ 
+@@ -827,7 +841,8 @@ static inline void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff
+ 	hci_conn_check_pending(hdev);
+ }
+ 
+-static inline void hci_inquiry_result_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_inquiry_result_evt(struct hci_dev *hdev,
++					  struct sk_buff *skb)
+ {
+ 	struct inquiry_data data;
+ 	struct inquiry_info *info = (void *) (skb->data + 1);
+@@ -856,7 +871,8 @@ static inline void hci_inquiry_result_evt(struct hci_dev *hdev, struct sk_buff *
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-static inline void hci_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_conn_complete_evt(struct hci_dev *hdev,
++					 struct sk_buff *skb)
+ {
+ 	struct hci_ev_conn_complete *ev = (void *) skb->data;
+ 	struct hci_conn *conn;
+@@ -932,7 +948,8 @@ unlock:
+ 	hci_conn_check_pending(hdev);
+ }
+ 
+-static inline void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_conn_request_evt(struct hci_dev *hdev,
++					struct sk_buff *skb)
+ {
+ 	struct hci_ev_conn_request *ev = (void *) skb->data;
+ 	int mask = hdev->link_mode;
+@@ -949,12 +966,15 @@ static inline void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *sk
+ 
+ 		hci_dev_lock(hdev);
+ 
+-		if ((ie = hci_inquiry_cache_lookup(hdev, &ev->bdaddr)))
++		ie = hci_inquiry_cache_lookup(hdev, &ev->bdaddr);
++		if (ie)
+ 			memcpy(ie->data.dev_class, ev->dev_class, 3);
+ 
+-		conn = hci_conn_hash_lookup_ba(hdev, ev->link_type, &ev->bdaddr);
++		conn = hci_conn_hash_lookup_ba(hdev,
++					       ev->link_type, &ev->bdaddr);
+ 		if (!conn) {
+-			if (!(conn = hci_conn_add(hdev, ev->link_type, &ev->bdaddr))) {
++			conn = hci_conn_add(hdev, ev->link_type, &ev->bdaddr)
++			if (!conn) {
+ 				BT_ERR("No memmory for new connection");
+ 				hci_dev_unlock(hdev);
+ 				return;
+@@ -1003,7 +1023,8 @@ static inline void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *sk
+ 	}
+ }
+ 
+-static inline void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_disconn_complete_evt(struct hci_dev *hdev,
++					    struct sk_buff *skb)
+ {
+ 	struct hci_ev_disconn_complete *ev = (void *) skb->data;
+ 	struct hci_conn *conn;
+@@ -1026,7 +1047,8 @@ static inline void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-static inline void hci_auth_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_auth_complete_evt(struct hci_dev *hdev,
++					 struct sk_buff *skb)
+ {
+ 	struct hci_ev_auth_complete *ev = (void *) skb->data;
+ 	struct hci_conn *conn;
+@@ -1075,14 +1097,16 @@ static inline void hci_auth_complete_evt(struct hci_dev *hdev, struct sk_buff *s
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-static inline void hci_remote_name_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_remote_name_evt(struct hci_dev *hdev,
++				       struct sk_buff *skb)
+ {
  	BT_DBG("%s", hdev->name);
  
--	while (hdev->sco_cnt && (conn = hci_low_sent(hdev, ESCO_LINK, &quote))) {
-+	while (hdev->sco_cnt &&
-+		      (conn = hci_low_sent(hdev, ESCO_LINK, &quote))) {
- 		while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
- 			BT_DBG("skb %p len %d", skb, skb->len);
- 			hci_send_frame(skb);
-@@ -1441,7 +1470,8 @@ static inline void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 	flags  = hci_flags(handle);
- 	handle = hci_handle(handle);
+ 	hci_conn_check_pending(hdev);
+ }
  
--	BT_DBG("%s len %d handle 0x%x flags 0x%x", hdev->name, skb->len, handle, flags);
-+	BT_DBG("%s len %d handle 0x%x flags 0x%x",
-+	       hdev->name, skb->len, handle, flags);
+-static inline void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_encrypt_change_evt(struct hci_dev *hdev,
++					  struct sk_buff *skb)
+ {
+ 	struct hci_ev_encrypt_change *ev = (void *) skb->data;
+ 	struct hci_conn *conn;
+@@ -1117,7 +1141,8 @@ static inline void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *
+ 	hci_dev_unlock(hdev);
+ }
  
- 	hdev->stat.acl_rx++;
+-static inline void hci_change_link_key_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_change_link_key_complete_evt(struct hci_dev *hdev,
++						    struct sk_buff *skb)
+ {
+ 	struct hci_ev_change_link_key_complete *ev = (void *) skb->data;
+ 	struct hci_conn *conn;
+@@ -1139,7 +1164,8 @@ static inline void hci_change_link_key_complete_evt(struct hci_dev *hdev, struct
+ 	hci_dev_unlock(hdev);
+ }
  
-@@ -1454,8 +1484,9 @@ static inline void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+-static inline void hci_remote_features_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_remote_features_evt(struct hci_dev *hdev,
++					   struct sk_buff *skb)
+ {
+ 	struct hci_ev_remote_features *ev = (void *) skb->data;
+ 	struct hci_conn *conn;
+@@ -1173,17 +1199,20 @@ static inline void hci_remote_features_evt(struct hci_dev *hdev, struct sk_buff
+ 	hci_dev_unlock(hdev);
+ }
  
- 		hci_conn_enter_active_mode(conn);
+-static inline void hci_remote_version_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_remote_version_evt(struct hci_dev *hdev,
++					  struct sk_buff *skb)
+ {
+ 	BT_DBG("%s", hdev->name);
+ }
  
-+		hp = hci_proto[HCI_PROTO_L2CAP];
- 		/* Send to upper protocol */
--		if ((hp = hci_proto[HCI_PROTO_L2CAP]) && hp->recv_acldata) {
-+		if (hp && hp->recv_acldata) {
- 			hp->recv_acldata(conn, skb, flags);
- 			return;
- 		}
-@@ -1490,7 +1521,8 @@ static inline void hci_scodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 		register struct hci_proto *hp;
+-static inline void hci_qos_setup_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_qos_setup_complete_evt(struct hci_dev *hdev,
++					      struct sk_buff *skb)
+ {
+ 	BT_DBG("%s", hdev->name);
+ }
  
- 		/* Send to upper protocol */
--		if ((hp = hci_proto[HCI_PROTO_SCO]) && hp->recv_scodata) {
-+		hp = hci_proto[HCI_PROTO_SCO];
-+		if (hp && hp->recv_scodata) {
- 			hp->recv_scodata(conn, skb);
- 			return;
- 		}
-@@ -1564,7 +1596,8 @@ static void hci_cmd_task(unsigned long arg)
- 
- 	BT_DBG("%s cmd %d", hdev->name, atomic_read(&hdev->cmd_cnt));
- 
--	if (!atomic_read(&hdev->cmd_cnt) && time_after(jiffies, hdev->cmd_last_tx + HZ)) {
-+	if (!atomic_read(&hdev->cmd_cnt) &&
-+		    time_after(jiffies, hdev->cmd_last_tx + HZ)) {
- 		BT_ERR("%s command tx timeout", hdev->name);
- 		atomic_set(&hdev->cmd_cnt, 1);
+-static inline void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_cmd_complete_evt(struct hci_dev *hdev,
++					struct sk_buff *skb)
+ {
+ 	struct hci_ev_cmd_complete *ev = (void *) skb->data;
+ 	__u16 opcode;
+@@ -1375,7 +1404,8 @@ static inline void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
  	}
-@@ -1573,7 +1606,8 @@ static void hci_cmd_task(unsigned long arg)
- 	if (atomic_read(&hdev->cmd_cnt) && (skb = skb_dequeue(&hdev->cmd_q))) {
- 		kfree_skb(hdev->sent_cmd);
+ }
  
--		if ((hdev->sent_cmd = skb_clone(skb, GFP_ATOMIC))) {
-+		hdev->sent_cmd = skb_clone(skb, GFP_ATOMIC);
-+		if (hdev->sent_cmd) {
- 			atomic_dec(&hdev->cmd_cnt);
- 			hci_send_frame(skb);
- 			hdev->cmd_last_tx = jiffies;
+-static inline void hci_role_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_role_change_evt(struct hci_dev *hdev,
++				       struct sk_buff *skb)
+ {
+ 	struct hci_ev_role_change *ev = (void *) skb->data;
+ 	struct hci_conn *conn;
+@@ -1401,7 +1431,8 @@ static inline void hci_role_change_evt(struct hci_dev *hdev, struct sk_buff *skb
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev,
++					 struct sk_buff *skb)
+ {
+ 	struct hci_ev_num_comp_pkts *ev = (void *) skb->data;
+ 	__le16 *ptr;
+@@ -1430,10 +1461,12 @@ static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *s
+ 			conn->sent -= count;
+ 
+ 			if (conn->type == ACL_LINK) {
+-				if ((hdev->acl_cnt += count) > hdev->acl_pkts)
++				hdev->acl_cnt += count;
++				if (hdev->acl_cnt > hdev->acl_pkts)
+ 					hdev->acl_cnt = hdev->acl_pkts;
+ 			} else {
+-				if ((hdev->sco_cnt += count) > hdev->sco_pkts)
++				hdev->sco_cnt += count;
++				if (hdev->sco_cnt > hdev->sco_pkts)
+ 					hdev->sco_cnt = hdev->sco_pkts;
+ 			}
+ 		}
+@@ -1444,7 +1477,8 @@ static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *s
+ 	tasklet_enable(&hdev->tx_task);
+ }
+ 
+-static inline void hci_mode_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_mode_change_evt(struct hci_dev *hdev,
++				       struct sk_buff *skb)
+ {
+ 	struct hci_ev_mode_change *ev = (void *) skb->data;
+ 	struct hci_conn *conn;
+@@ -1469,22 +1503,26 @@ static inline void hci_mode_change_evt(struct hci_dev *hdev, struct sk_buff *skb
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-static inline void hci_pin_code_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_pin_code_request_evt(struct hci_dev *hdev,
++					    struct sk_buff *skb)
+ {
+ 	BT_DBG("%s", hdev->name);
+ }
+ 
+-static inline void hci_link_key_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_link_key_request_evt(struct hci_dev *hdev,
++					    struct sk_buff *skb)
+ {
+ 	BT_DBG("%s", hdev->name);
+ }
+ 
+-static inline void hci_link_key_notify_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_link_key_notify_evt(struct hci_dev *hdev,
++					   struct sk_buff *skb)
+ {
+ 	BT_DBG("%s", hdev->name);
+ }
+ 
+-static inline void hci_clock_offset_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_clock_offset_evt(struct hci_dev *hdev,
++					struct sk_buff *skb)
+ {
+ 	struct hci_ev_clock_offset *ev = (void *) skb->data;
+ 	struct hci_conn *conn;
+@@ -1496,8 +1534,8 @@ static inline void hci_clock_offset_evt(struct hci_dev *hdev, struct sk_buff *sk
+ 	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->handle));
+ 	if (conn && !ev->status) {
+ 		struct inquiry_entry *ie;
+-
+-		if ((ie = hci_inquiry_cache_lookup(hdev, &conn->dst))) {
++		ie = hci_inquiry_cache_lookup(hdev, &conn->dst);
++		if (ie) {
+ 			ie->data.clock_offset = ev->clock_offset;
+ 			ie->timestamp = jiffies;
+ 		}
+@@ -1506,7 +1544,8 @@ static inline void hci_clock_offset_evt(struct hci_dev *hdev, struct sk_buff *sk
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-static inline void hci_pkt_type_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_pkt_type_change_evt(struct hci_dev *hdev,
++					   struct sk_buff *skb)
+ {
+ 	struct hci_ev_pkt_type_change *ev = (void *) skb->data;
+ 	struct hci_conn *conn;
+@@ -1522,7 +1561,8 @@ static inline void hci_pkt_type_change_evt(struct hci_dev *hdev, struct sk_buff
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-static inline void hci_pscan_rep_mode_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_pscan_rep_mode_evt(struct hci_dev *hdev,
++					  struct sk_buff *skb)
+ {
+ 	struct hci_ev_pscan_rep_mode *ev = (void *) skb->data;
+ 	struct inquiry_entry *ie;
+@@ -1531,7 +1571,8 @@ static inline void hci_pscan_rep_mode_evt(struct hci_dev *hdev, struct sk_buff *
+ 
+ 	hci_dev_lock(hdev);
+ 
+-	if ((ie = hci_inquiry_cache_lookup(hdev, &ev->bdaddr))) {
++	ie = hci_inquiry_cache_lookup(hdev, &ev->bdaddr);
++	if (ie) {
+ 		ie->data.pscan_rep_mode = ev->pscan_rep_mode;
+ 		ie->timestamp = jiffies;
+ 	}
+@@ -1539,7 +1580,8 @@ static inline void hci_pscan_rep_mode_evt(struct hci_dev *hdev, struct sk_buff *
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-static inline void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev,
++						    struct sk_buff *skb)
+ {
+ 	struct inquiry_data data;
+ 	int num_rsp = *((__u8 *) skb->data);
+@@ -1552,7 +1594,8 @@ static inline void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev, struct
+ 	hci_dev_lock(hdev);
+ 
+ 	if ((skb->len - 1) / num_rsp != sizeof(struct inquiry_info_with_rssi)) {
+-		struct inquiry_info_with_rssi_and_pscan_mode *info = (void *) (skb->data + 1);
++		struct inquiry_info_with_rssi_and_pscan_mode *info =
++				(void *) (skb->data + 1);
+ 
+ 		for (; num_rsp; num_rsp--) {
+ 			bacpy(&data.bdaddr, &info->bdaddr);
+@@ -1586,7 +1629,8 @@ static inline void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev, struct
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-static inline void hci_remote_ext_features_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_remote_ext_features_evt(struct hci_dev *hdev,
++					       struct sk_buff *skb)
+ {
+ 	struct hci_ev_remote_ext_features *ev = (void *) skb->data;
+ 	struct hci_conn *conn;
+@@ -1599,8 +1643,8 @@ static inline void hci_remote_ext_features_evt(struct hci_dev *hdev, struct sk_b
+ 	if (conn) {
+ 		if (!ev->status && ev->page == 0x01) {
+ 			struct inquiry_entry *ie;
+-
+-			if ((ie = hci_inquiry_cache_lookup(hdev, &conn->dst)))
++			ie = hci_inquiry_cache_lookup(hdev, &conn->dst);
++			if (ie)
+ 				ie->data.ssp_mode = (ev->features[0] & 0x01);
+ 
+ 			conn->ssp_mode = (ev->features[0] & 0x01);
+@@ -1625,7 +1669,8 @@ static inline void hci_remote_ext_features_evt(struct hci_dev *hdev, struct sk_b
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-static inline void hci_sync_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_sync_conn_complete_evt(struct hci_dev *hdev,
++					      struct sk_buff *skb)
+ {
+ 	struct hci_ev_sync_conn_complete *ev = (void *) skb->data;
+ 	struct hci_conn *conn;
+@@ -1669,12 +1714,14 @@ unlock:
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-static inline void hci_sync_conn_changed_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_sync_conn_changed_evt(struct hci_dev *hdev,
++					     struct sk_buff *skb)
+ {
+ 	BT_DBG("%s", hdev->name);
+ }
+ 
+-static inline void hci_sniff_subrate_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_sniff_subrate_evt(struct hci_dev *hdev,
++					 struct sk_buff *skb)
+ {
+ 	struct hci_ev_sniff_subrate *ev = (void *) skb->data;
+ 	struct hci_conn *conn;
+@@ -1684,13 +1731,12 @@ static inline void hci_sniff_subrate_evt(struct hci_dev *hdev, struct sk_buff *s
+ 	hci_dev_lock(hdev);
+ 
+ 	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->handle));
+-	if (conn) {
+-	}
+ 
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-static inline void hci_extended_inquiry_result_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_extended_inquiry_result_evt(struct hci_dev *hdev,
++						   struct sk_buff *skb)
+ {
+ 	struct inquiry_data data;
+ 	struct extended_inquiry_info *info = (void *) (skb->data + 1);
+@@ -1719,7 +1765,8 @@ static inline void hci_extended_inquiry_result_evt(struct hci_dev *hdev, struct
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-static inline void hci_io_capa_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_io_capa_request_evt(struct hci_dev *hdev,
++					   struct sk_buff *skb)
+ {
+ 	struct hci_ev_io_capa_request *ev = (void *) skb->data;
+ 	struct hci_conn *conn;
+@@ -1735,7 +1782,8 @@ static inline void hci_io_capa_request_evt(struct hci_dev *hdev, struct sk_buff
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-static inline void hci_simple_pair_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_simple_pair_complete_evt(struct hci_dev *hdev,
++						struct sk_buff *skb)
+ {
+ 	struct hci_ev_simple_pair_complete *ev = (void *) skb->data;
+ 	struct hci_conn *conn;
+@@ -1751,7 +1799,8 @@ static inline void hci_simple_pair_complete_evt(struct hci_dev *hdev, struct sk_
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-static inline void hci_remote_host_features_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void hci_remote_host_features_evt(struct hci_dev *hdev,
++						struct sk_buff *skb)
+ {
+ 	struct hci_ev_remote_host_features *ev = (void *) skb->data;
+ 	struct inquiry_entry *ie;
+@@ -1760,7 +1809,8 @@ static inline void hci_remote_host_features_evt(struct hci_dev *hdev, struct sk_
+ 
+ 	hci_dev_lock(hdev);
+ 
+-	if ((ie = hci_inquiry_cache_lookup(hdev, &ev->bdaddr)))
++	ie = hci_inquiry_cache_lookup(hdev, &ev->bdaddr);
++	if (ie)
+ 		ie->data.ssp_mode = (ev->features[0] & 0x01);
+ 
+ 	hci_dev_unlock(hdev);
 -- 
 1.5.6.3
 
