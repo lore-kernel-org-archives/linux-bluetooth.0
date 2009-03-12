@@ -1,27 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 12 Mar 2009 12:09:47 -0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bea Lam <bea.lam@trolltech.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Add "Class" property to org.bluez.Adapter
-Message-ID: <20090312150947.GA10037@jh-x301>
-References: <49ADD4C8.8040705@trolltech.com> <1236200642.6670.13.camel@localhost.localdomain> <49AF1BB6.7070104@trolltech.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <49AF1BB6.7070104@trolltech.com>
+In-Reply-To: <20090312111123.2763cd79@symphony>
+References: <20090308232215.727f38fa@symphony>
+	 <20090312111123.2763cd79@symphony>
+Date: Thu, 12 Mar 2009 11:23:40 -0300
+Message-ID: <2d5a2c100903120723m5ce4a0fcp59d5de8a09aa6242@mail.gmail.com>
+Subject: Re: PANU currently broken?
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: James Le Cuirot <chewi@aura-online.co.uk>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bea,
+Hi James,
 
-On Thu, Mar 05, 2009, Bea Lam wrote:
-> The revised patch is attached. The original format was based on
-> similar code in security.c.
+On Thu, Mar 12, 2009 at 8:11 AM, James Le Cuirot
+<chewi@aura-online.co.uk> wrote:
+> On Sun, 8 Mar 2009 23:22:15 +0000
+> James Le Cuirot <chewi@aura-online.co.uk> wrote:
+>
+>> I've managed to serve my phone with NAP successfully but using PANU in
+>> the other direction has not worked at all.
+>
+> I'm not necessarily asking for an immediate fix here but could someone
+> at least explain the situation? That might allow me to fix it myself.
 
-I can apply the patch but could you first create a proper version of it
-with git format-patch so that I don't have to start manipulating
-GIT_AUTHOR_NAME etc. myself. (I realize this isn't much work for myself
-either but it'd be good to get everyone submitting patches into this
-habit since otherwise the workload on our (me & Marcel) side starts
-accumulating pretty quickly.) Thanks.
+I have a fix for it, the problem was that we use
+g_io_channel_set_close_on_unref on BtIO code so we should maintain a
+reference if we want to maintain the socket open.
 
-Johan
+Try this patch and see if it helps:
+http://gitorious.org/projects/bluez/repos/vudentzs-clone/commits/adaf1c1d4f2c8764c3d5336759368a0e1dcb44c9
+
+ps: we are still reviewing the code so it may have some bug left.
+
+
+-- 
+Luiz Augusto von Dentz
+Engenheiro de Computação
