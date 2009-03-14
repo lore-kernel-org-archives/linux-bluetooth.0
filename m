@@ -1,36 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Re: Work-around for broken MS device
+Subject: Re: Bluetooth 2.1 Support
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1237397279.15346.1157.camel@cookie.hadess.net>
-References: <1236278908.3602.1896.camel@cookie.hadess.net>
-	 <1237397279.15346.1157.camel@cookie.hadess.net>
-Content-Type: text/plain; charset="UTF-8"
-Date: Sat, 14 Mar 2009 07:21:13 +0100
-Message-Id: <1237011673.24751.10.camel@localhost.localdomain>
+To: a16465 <a16465@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <eeb2d39e0903122118g29de27b0y9a90e11dc9aca631@mail.gmail.com>
+References: <eeb2d39e0903122118g29de27b0y9a90e11dc9aca631@mail.gmail.com>
+Content-Type: text/plain
+Date: Sat, 14 Mar 2009 07:18:42 +0100
+Message-Id: <1237011522.24751.8.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+Hi Ray,
 
- 
-> > As seen in https://bugzilla.redhat.com/show_bug.cgi?id=450081
-> > The Microsoft Wireless Notebook Presenter Mouse 8000 has its name in
-> > ISO-8859-1 instead of UTF-8, as required by the BT spec.
-> > 
-> > I've implemented a small work-around. This isn't very invasive, IMO, as
-> > we already do UTF-8 checks.
-> > 
-> > In my tests, this makes the mouse show up as:
-> > Microsoft® Wireless Notebook Presenter Mouse 8000
+> It seems that supporting Bluetooth 2.1 was already planned from
+> http://wiki.bluez.org/wiki/Meeting-2008-05-26.
 > 
-> Attached is patch in the proper format.
+> How about the status now? Is it in 4.x release? or there is a new plan for that?
 
-I see the need for this one, but just a failing UTF-8 check to assume we
-are using ISO-8859-1 is not good enough. Since the mouse has a DID
-record, can we tie this together with the VID and PID?
+the BlueZ 4.x series in conjunction with the latest next-2.6 kernels
+have full Simple Pairing support.
 
 Regards
 
