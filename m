@@ -1,28 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Adding version check for plugins.
+Subject: Re: [PATCH] Wacom Bluetooth mode-2 activation
 From: Marcel Holtmann <marcel@holtmann.org>
-To: alok barsode <alokbarsode@gmail.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-In-Reply-To: <8b5debfa0903170629j21187128gb2c785541ec65e40@mail.gmail.com>
-References: <8b5debfa0903170313n64fc1955l7afb2c3511981619@mail.gmail.com>
-	 <2d5a2c100903170622m666752e7s5b05d6b96b193952@mail.gmail.com>
-	 <8b5debfa0903170629j21187128gb2c785541ec65e40@mail.gmail.com>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1237334085.15346.99.camel@cookie.hadess.net>
+References: <1237334085.15346.99.camel@cookie.hadess.net>
 Content-Type: text/plain
-Date: Sat, 14 Mar 2009 07:14:39 +0100
-Message-Id: <1237011279.24751.4.camel@localhost.localdomain>
+Date: Sat, 14 Mar 2009 07:09:48 +0100
+Message-Id: <1237010988.24751.2.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alok,
+Hi Bastien,
 
-I did say something about top-posting, right? Never ever do that.
+> Patch is necessary to make the Wacom Bluetooth driver I posted to
+> linux-input work as expected. I've tested this successfully with my
+> tablet[1].
 
-> Thanks for spotting them, fixed.
-> Attaching the modified patch.
+this maybe sound like a nit-pick, but please add an extra empty line
+between the if-statement and the ioctl.
 
-Patch has been applied. Thanks.
++               write(sk, buf, sizeof(buf));
++       }
+        err = ioctl_connadd(req);
+
+The original code had one and so should have the new one with this extra
+quirk.
+
+Also can we please check at least the return value of write().
+
++               write(sk, buf, sizeof(buf));
+
+Check the return value and at minimum have an error message printed.
 
 Regards
 
