@@ -1,121 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Tue, 17 Mar 2009 15:43:47 +0530
-Message-ID: <8b5debfa0903170313n64fc1955l7afb2c3511981619@mail.gmail.com>
-Subject: [PATCH] Adding version check for plugins.
-From: alok barsode <alokbarsode@gmail.com>
-To: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
-Content-Type: multipart/mixed; boundary=0016363b91e89ce1e004654dd29c
+Subject: Re: RFC: Wacom Bluetooth HID driver, first pass
+From: Bastien Nocera <hadess@hadess.net>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-input <linux-input@vger.kernel.org>,
+        BlueZ development <linux-bluetooth@vger.kernel.org>,
+        mjg <mjg@redhat.com>, Peter Hutterer <peter.hutterer@redhat.com>,
+        zap@homelink.ru
+In-Reply-To: <1237213799.32264.10090.camel@cookie.hadess.net>
+References: <1236988799.32264.6310.camel@cookie.hadess.net>
+	 <1237200912.32264.9867.camel@cookie.hadess.net>
+	 <93531296-64B0-4D4B-A4A9-26F3D67DF579@holtmann.org>
+	 <1237213799.32264.10090.camel@cookie.hadess.net>
+Content-Type: text/plain
+Date: Mon, 16 Mar 2009 23:58:54 +0000
+Message-Id: <1237247934.32264.10670.camel@cookie.hadess.net>
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---0016363b91e89ce1e004654dd29c
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+On Mon, 2009-03-16 at 14:29 +0000, Bastien Nocera wrote:
+> On Mon, 2009-03-16 at 15:00 +0100, Marcel Holtmann wrote:
+<snip>
+> > > A couple of notes:
+> > > - the wheel action is reversed, it's a simple fix, done locally
+> > > - hidp and the Bluetooth sub-system says it can't probe the device  
+> > > with
+> > > error "-14" when hid-wacom.ko isn't already loaded
 
-Hi Marcel,
+Bluetooth: HIDP (Human Interface Emulation) ver 1.2 
+wacom 0005:056A:0081.0001: parse failed
+wacom: probe of 0005:056A:0081.0001 failed with error -14 
+wacom driver registered
 
-As per the discussion on IRC, I am attaching a version check patch for plugins.
+> > what was the reason for not forcing HID to load the generic driver?
+> 
+> What generic driver? If you're talking about the default Wacom driver,
+> it isn't an HID driver, and requires a USB device.
+> 
+> >  I  
+> > lost track on how HID is suppose to handle these. You could also  
+> > introduce a phony export like we do with L2CAP to ensure it is loaded  
+> > even if userspace isn't ready to handle this dependency.
+> 
+> Well, the problem is that the driver _does_ load, but I'm not certain
+> about the sequence of events between the Bluetooth sub-system, the
+> user-space enabling (see the linked patch to bluetoothd), and the HID
+> sub-system.
 
-Let me know if anything needs modifications.
+Turning the device off and on again works though. No idea what's
+happening.
 
-Cheers,
-Alok.
+> > > - I'm getting oopses in hci_conn_del() when the device goes away  
+> > > (eg. I
+> > > turn it off).
+> > 
+> > Try to run a net-next-2.6 or bluetooth-next-2.6 kernel. Kyle should  
+> > have merged these patches into the latest rawhide kernel.
+> 
+> I was hoping this would be fixed in the latest linus-2.6 tree, guess
+> not.
 
---0016363b91e89ce1e004654dd29c
-Content-Type: text/x-diff; charset=US-ASCII;
-	name="0001-Adding-version-check-for-plugins.patch"
-Content-Disposition: attachment;
-	filename="0001-Adding-version-check-for-plugins.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_fsef8x4e0
+No more crashes. Great stuff.
 
-RnJvbSBjYzhiMWRhMzcwMWJkZDI5MzYzZmVmNGNjNzk2ZGUzYWQ2OTQzYzZhIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBBbG9rIEJhcnNvZGUgPGFsb2tiYXJzb2RlQGdtYWlsLmNvbT4K
-RGF0ZTogVHVlLCAxNyBNYXIgMjAwOSAxNTozNjoxNCArMDUzMApTdWJqZWN0OiBbUEFUQ0hdIEFk
-ZGluZyB2ZXJzaW9uIGNoZWNrIGZvciBwbHVnaW5zLgoKLS0tCiBhdWRpby9tYWluLmMgICAgICB8
-ICAgIDIgKy0KIGlucHV0L21haW4uYyAgICAgIHwgICAgMiArLQogbmV0d29yay9tYWluLmMgICAg
-fCAgICAyICstCiBwbHVnaW5zL2VjaG8uYyAgICB8ICAgIDIgKy0KIHBsdWdpbnMvaGFsLmMgICAg
-IHwgICAgMiArLQogcGx1Z2lucy9uZXRsaW5rLmMgfCAgICAyICstCiBwbHVnaW5zL3NlcnZpY2Uu
-YyB8ICAgIDIgKy0KIHBsdWdpbnMvc3RvcmFnZS5jIHwgICAgMiArLQogc2VyaWFsL21haW4uYyAg
-ICAgfCAgICAyICstCiBzcmMvbWFpbi5jICAgICAgICB8ICAgIDIgKy0KIHNyYy9wbHVnaW4uYyAg
-ICAgIHwgICAgNSArKysrKwogc3JjL3BsdWdpbi5oICAgICAgfCAgICA1ICsrKy0tCiAxMiBmaWxl
-cyBjaGFuZ2VkLCAxOCBpbnNlcnRpb25zKCspLCAxMiBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQg
-YS9hdWRpby9tYWluLmMgYi9hdWRpby9tYWluLmMKaW5kZXggMTY3OGI1OC4uZjVlYjdkZCAxMDA2
-NDQKLS0tIGEvYXVkaW8vbWFpbi5jCisrKyBiL2F1ZGlvL21haW4uYwpAQCAtMTcxLDQgKzE3MSw0
-IEBAIHN0YXRpYyB2b2lkIGF1ZGlvX2V4aXQodm9pZCkKIAlkYnVzX2Nvbm5lY3Rpb25fdW5yZWYo
-Y29ubmVjdGlvbik7CiB9CiAKLUJMVUVUT09USF9QTFVHSU5fREVGSU5FKCJhdWRpbyIsIGF1ZGlv
-X2luaXQsIGF1ZGlvX2V4aXQpCitCTFVFVE9PVEhfUExVR0lOX0RFRklORSgiYXVkaW8iLCBWRVJT
-SU9OLCBhdWRpb19pbml0LCBhdWRpb19leGl0KQpkaWZmIC0tZ2l0IGEvaW5wdXQvbWFpbi5jIGIv
-aW5wdXQvbWFpbi5jCmluZGV4IDMxZTJlZjYuLjAxMGI3MzEgMTAwNjQ0Ci0tLSBhL2lucHV0L21h
-aW4uYworKysgYi9pbnB1dC9tYWluLmMKQEAgLTgyLDQgKzgyLDQgQEAgc3RhdGljIHZvaWQgaW5w
-dXRfZXhpdCh2b2lkKQogCWRidXNfY29ubmVjdGlvbl91bnJlZihjb25uZWN0aW9uKTsKIH0KIAot
-QkxVRVRPT1RIX1BMVUdJTl9ERUZJTkUoImlucHV0IiwgaW5wdXRfaW5pdCwgaW5wdXRfZXhpdCkK
-K0JMVUVUT09USF9QTFVHSU5fREVGSU5FKCJpbnB1dCIsIFZFUlNJT04sIGlucHV0X2luaXQsIGlu
-cHV0X2V4aXQpCmRpZmYgLS1naXQgYS9uZXR3b3JrL21haW4uYyBiL25ldHdvcmsvbWFpbi5jCmlu
-ZGV4IDQ3NDQxODUuLjVmOTZkNGIgMTAwNjQ0Ci0tLSBhL25ldHdvcmsvbWFpbi5jCisrKyBiL25l
-dHdvcmsvbWFpbi5jCkBAIC01NSw0ICs1NSw0IEBAIHN0YXRpYyB2b2lkIG5ldHdvcmtfZXhpdCh2
-b2lkKQogCWRidXNfY29ubmVjdGlvbl91bnJlZihjb25uZWN0aW9uKTsKIH0KIAotQkxVRVRPT1RI
-X1BMVUdJTl9ERUZJTkUoIm5ldHdvcmsiLCBuZXR3b3JrX2luaXQsIG5ldHdvcmtfZXhpdCkKK0JM
-VUVUT09USF9QTFVHSU5fREVGSU5FKCJuZXR3b3JrIiwgVkVSU0lPTiwgbmV0d29ya19pbml0LCBu
-ZXR3b3JrX2V4aXQpCmRpZmYgLS1naXQgYS9wbHVnaW5zL2VjaG8uYyBiL3BsdWdpbnMvZWNoby5j
-CmluZGV4IDM0ODZlZjEuLjgzMmJmOGIgMTAwNjQ0Ci0tLSBhL3BsdWdpbnMvZWNoby5jCisrKyBi
-L3BsdWdpbnMvZWNoby5jCkBAIC0xNjMsNCArMTYzLDQgQEAgc3RhdGljIHZvaWQgZWNob19leGl0
-KHZvaWQpCiAJYnRkX3VucmVnaXN0ZXJfYWRhcHRlcl9kcml2ZXIoJmVjaG9fc2VydmVyKTsKIH0K
-IAotQkxVRVRPT1RIX1BMVUdJTl9ERUZJTkUoImVjaG8iLCBlY2hvX2luaXQsIGVjaG9fZXhpdCkK
-K0JMVUVUT09USF9QTFVHSU5fREVGSU5FKCJlY2hvIiwgVkVSU0lPTiwgZWNob19pbml0LCBlY2hv
-X2V4aXQpCmRpZmYgLS1naXQgYS9wbHVnaW5zL2hhbC5jIGIvcGx1Z2lucy9oYWwuYwppbmRleCBm
-MDY2YTVhLi4yMTliNDZlIDEwMDY0NAotLS0gYS9wbHVnaW5zL2hhbC5jCisrKyBiL3BsdWdpbnMv
-aGFsLmMKQEAgLTE1OCw0ICsxNTgsNCBAQCBzdGF0aWMgdm9pZCBoYWxfZXhpdCh2b2lkKQogCWJ0
-ZF91bnJlZ2lzdGVyX2FkYXB0ZXJfZHJpdmVyKCZoYWxfZHJpdmVyKTsKIH0KIAotQkxVRVRPT1RI
-X1BMVUdJTl9ERUZJTkUoImhhbCIsIGhhbF9pbml0LCBoYWxfZXhpdCkKK0JMVUVUT09USF9QTFVH
-SU5fREVGSU5FKCJoYWwiLCBWRVJTSU9OLCBoYWxfaW5pdCwgaGFsX2V4aXQpCmRpZmYgLS1naXQg
-YS9wbHVnaW5zL25ldGxpbmsuYyBiL3BsdWdpbnMvbmV0bGluay5jCmluZGV4IDc4YTE4YWEuLmY3
-NzdjZjkgMTAwNjQ0Ci0tLSBhL3BsdWdpbnMvbmV0bGluay5jCisrKyBiL3BsdWdpbnMvbmV0bGlu
-ay5jCkBAIC0xMjMsNCArMTIzLDQgQEAgc3RhdGljIHZvaWQgbmV0bGlua19leGl0KHZvaWQpCiAJ
-bmxfaGFuZGxlX2Rlc3Ryb3koaGFuZGxlKTsKIH0KIAotQkxVRVRPT1RIX1BMVUdJTl9ERUZJTkUo
-Im5ldGxpbmsiLCBuZXRsaW5rX2luaXQsIG5ldGxpbmtfZXhpdCkKK0JMVUVUT09USF9QTFVHSU5f
-REVGSU5FKCJuZXRsaW5rIiwgVkVSU0lPTiwgbmV0bGlua19pbml0LCBuZXRsaW5rX2V4aXQpCmRp
-ZmYgLS1naXQgYS9wbHVnaW5zL3NlcnZpY2UuYyBiL3BsdWdpbnMvc2VydmljZS5jCmluZGV4IDRh
-ODcyMzQuLmI0ZDQwNWIgMTAwNjQ0Ci0tLSBhL3BsdWdpbnMvc2VydmljZS5jCisrKyBiL3BsdWdp
-bnMvc2VydmljZS5jCkBAIC04NTksNCArODU5LDQgQEAgc3RhdGljIHZvaWQgc2VydmljZV9leGl0
-KHZvaWQpCiAJZGJ1c19jb25uZWN0aW9uX3VucmVmKGNvbm5lY3Rpb24pOwogfQogCi1CTFVFVE9P
-VEhfUExVR0lOX0RFRklORSgic2VydmljZSIsIHNlcnZpY2VfaW5pdCwgc2VydmljZV9leGl0KQor
-QkxVRVRPT1RIX1BMVUdJTl9ERUZJTkUoInNlcnZpY2UiLCBWRVJTSU9OLCBzZXJ2aWNlX2luaXQs
-IHNlcnZpY2VfZXhpdCkKZGlmZiAtLWdpdCBhL3BsdWdpbnMvc3RvcmFnZS5jIGIvcGx1Z2lucy9z
-dG9yYWdlLmMKaW5kZXggNzMzYzQ3OS4uYzRkYmUxNiAxMDA2NDQKLS0tIGEvcGx1Z2lucy9zdG9y
-YWdlLmMKKysrIGIvcGx1Z2lucy9zdG9yYWdlLmMKQEAgLTM5LDQgKzM5LDQgQEAgc3RhdGljIHZv
-aWQgc3RvcmFnZV9leGl0KHZvaWQpCiB7CiB9CiAKLUJMVUVUT09USF9QTFVHSU5fREVGSU5FKCJz
-dG9yYWdlIiwgc3RvcmFnZV9pbml0LCBzdG9yYWdlX2V4aXQpCitCTFVFVE9PVEhfUExVR0lOX0RF
-RklORSgic3RvcmFnZSIsIFZFUlNJT04sIHN0b3JhZ2VfaW5pdCwgc3RvcmFnZV9leGl0KQpkaWZm
-IC0tZ2l0IGEvc2VyaWFsL21haW4uYyBiL3NlcmlhbC9tYWluLmMKaW5kZXggYmIyYTI4Yy4uNWRi
-Mzg5YyAxMDA2NDQKLS0tIGEvc2VyaWFsL21haW4uYworKysgYi9zZXJpYWwvbWFpbi5jCkBAIC01
-NSw0ICs1NSw0IEBAIHN0YXRpYyB2b2lkIHNlcmlhbF9leGl0KHZvaWQpCiAJZGJ1c19jb25uZWN0
-aW9uX3VucmVmKGNvbm5lY3Rpb24pOwogfQogCi1CTFVFVE9PVEhfUExVR0lOX0RFRklORSgic2Vy
-aWFsIiwgc2VyaWFsX2luaXQsIHNlcmlhbF9leGl0KQorQkxVRVRPT1RIX1BMVUdJTl9ERUZJTkUo
-InNlcmlhbCIsIFZFUlNJT04sIHNlcmlhbF9pbml0LCBzZXJpYWxfZXhpdCkKZGlmZiAtLWdpdCBh
-L3NyYy9tYWluLmMgYi9zcmMvbWFpbi5jCmluZGV4IDNjN2Q3MGIuLjUzMDM0NDQgMTAwNjQ0Ci0t
-LSBhL3NyYy9tYWluLmMKKysrIGIvc3JjL21haW4uYwpAQCAtNjk1LDcgKzY5NSw3IEBAIGludCBt
-YWluKGludCBhcmdjLCBjaGFyICphcmd2W10pCiAKIAl1bWFzaygwMDc3KTsKIAotCXN0YXJ0X2xv
-Z2dpbmcoImJsdWV0b290aGQiLCAiQmx1ZXRvb3RoIGRhZW1vbiIpOworCXN0YXJ0X2xvZ2dpbmco
-ImJsdWV0b290aGQiLCAiQmx1ZXRvb3RoIGRhZW1vbiAlcyIsIFZFUlNJT04pOwogCiAJbWVtc2V0
-KCZzYSwgMCwgc2l6ZW9mKHNhKSk7CiAJc2Euc2FfZmxhZ3MgPSBTQV9OT0NMRFNUT1A7CmRpZmYg
-LS1naXQgYS9zcmMvcGx1Z2luLmMgYi9zcmMvcGx1Z2luLmMKaW5kZXggNDU1OWM3Ny4uY2ViZWJm
-ZCAxMDA2NDQKLS0tIGEvc3JjL3BsdWdpbi5jCisrKyBiL3NyYy9wbHVnaW4uYwpAQCAtNTIsNiAr
-NTIsMTEgQEAgc3RhdGljIGdib29sZWFuIGFkZF9wbHVnaW4odm9pZCAqaGFuZGxlLCBzdHJ1Y3Qg
-Ymx1ZXRvb3RoX3BsdWdpbl9kZXNjICpkZXNjKQogCiAJaWYgKGRlc2MtPmluaXQgPT0gTlVMTCkK
-IAkJcmV0dXJuIEZBTFNFOworCQorCWlmIChnX3N0cl9lcXVhbChkZXNjLT52ZXJzaW9uLCBWRVJT
-SU9OKSA9PSBGQUxTRSkgeworCQlEQkcoInZlcnNpb24gbWlzbWF0Y2ggZm9yICVzIiwgZGVzYy0+
-bmFtZSk7CisJCXJldHVybiBGQUxTRTsKKwl9ICAgIAogCiAJcGx1Z2luID0gZ190cnlfbmV3MChz
-dHJ1Y3QgYmx1ZXRvb3RoX3BsdWdpbiwgMSk7CiAJaWYgKHBsdWdpbiA9PSBOVUxMKQpkaWZmIC0t
-Z2l0IGEvc3JjL3BsdWdpbi5oIGIvc3JjL3BsdWdpbi5oCmluZGV4IDMxYmNjZTguLjYyZDVmNzUg
-MTAwNjQ0Ci0tLSBhL3NyYy9wbHVnaW4uaAorKysgYi9zcmMvcGx1Z2luLmgKQEAgLTIzLDEzICsy
-MywxNCBAQAogCiBzdHJ1Y3QgYmx1ZXRvb3RoX3BsdWdpbl9kZXNjIHsKIAljb25zdCBjaGFyICpu
-YW1lOworCWNvbnN0IGNoYXIgKnZlcnNpb247CiAJaW50ICgqaW5pdCkgKHZvaWQpOwogCXZvaWQg
-KCpleGl0KSAodm9pZCk7CiB9OwogCi0jZGVmaW5lIEJMVUVUT09USF9QTFVHSU5fREVGSU5FKG5h
-bWUsaW5pdCxleGl0KSBcCisjZGVmaW5lIEJMVUVUT09USF9QTFVHSU5fREVGSU5FKG5hbWUsdmVy
-c2lvbixpbml0LGV4aXQpIFwKIAkJZXh0ZXJuIHN0cnVjdCBibHVldG9vdGhfcGx1Z2luX2Rlc2Mg
-Ymx1ZXRvb3RoX3BsdWdpbl9kZXNjIFwKIAkJCQlfX2F0dHJpYnV0ZV9fICgodmlzaWJpbGl0eSgi
-ZGVmYXVsdCIpKSk7IFwKIAkJc3RydWN0IGJsdWV0b290aF9wbHVnaW5fZGVzYyBibHVldG9vdGhf
-cGx1Z2luX2Rlc2MgPSB7IFwKLQkJCW5hbWUsIGluaXQsIGV4aXQgXAorCQkJbmFtZSwgdmVyc2lv
-biwgaW5pdCwgZXhpdCBcCiAJCX07Ci0tIAoxLjUuNi4zCgo=
---0016363b91e89ce1e004654dd29c--
+I sent a fixed up patch to the list earlier.
+
+Cheers
