@@ -1,51 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: RFC: Wacom Bluetooth HID driver, first pass
-From: Bastien Nocera <hadess@hadess.net>
-To: linux-input <linux-input@vger.kernel.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Cc: mjg <mjg@redhat.com>, Peter Hutterer <peter.hutterer@redhat.com>,
-	zap@homelink.ru
-In-Reply-To: <1236988799.32264.6310.camel@cookie.hadess.net>
-References: <1236988799.32264.6310.camel@cookie.hadess.net>
-Content-Type: text/plain
-Date: Mon, 16 Mar 2009 10:55:11 +0000
-Message-Id: <1237200912.32264.9867.camel@cookie.hadess.net>
-Mime-Version: 1.0
+Date: Sun, 15 Mar 2009 23:20:09 -0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Bea Lam <bea.lam@trolltech.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Add "Class" property to org.bluez.Adapter
+Message-ID: <20090316022009.GA30455@jh-x301>
+References: <49ADD4C8.8040705@trolltech.com> <1236200642.6670.13.camel@localhost.localdomain> <49AF1BB6.7070104@trolltech.com> <20090312150947.GA10037@jh-x301> <49BDADA8.4030909@trolltech.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <49BDADA8.4030909@trolltech.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 2009-03-13 at 23:59 +0000, Bastien Nocera wrote:
-> Heya,
-> 
-> This is a first pass at a driver for the Wacom Graphire Bluetooth
-> tablet, based on work by Andrew Zabolotny[1]. It's mildly tested (eg. it
-> works in my very few tests).
-> 
-> I was looking for guidance for the code itself, possibly making it
-> easier to merge in the input/tablet/wacom* drivers into it in the
-> future, as well as some explanations as to how I'm supposed to reset
-> tools, etc. so the user-space drivers (the X.org linuxwacom driver)
-> doesn't need special-casing for the device.
-> 
-> Note that it requires a user-space activation to switch to Mode 2, using
-> bluetoothd (as the Bluetooth HID doesn't support hid_output_raw_event).
-> Patch at:
-> http://cvs.fedoraproject.org/viewvc/rpms/bluez/devel/bluez-activate-wacom-mode2.patch?view=markup
+Hi Bea,
 
-A couple of notes:
-- the wheel action is reversed, it's a simple fix, done locally
-- hidp and the Bluetooth sub-system says it can't probe the device with
-error "-14" when hid-wacom.ko isn't already loaded
-- I'm getting oopses in hci_conn_del() when the device goes away (eg. I
-turn it off).
+On Mon, Mar 16, 2009, Bea Lam wrote:
+> Here's the formatted patch, without the unnecessary
+> update_ext_inquiry_response() call.
 
-I'd appreciate any help making this just a tad more stable.
+Thanks! The patch is now pushed upstream. Unfortunately you just missed
+the 4.33 release (Marcel already tagged it) so your patch will go into
+4.34.
 
-Any comments about the code itself?
-
-Cheers
-
-PS: Original mail at
-http://thread.gmane.org/gmane.linux.kernel.input/7078 for the Bluetooth
-hackers
-
+Johan
