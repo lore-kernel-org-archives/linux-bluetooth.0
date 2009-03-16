@@ -1,375 +1,385 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH] Wacom Graphire Bluetooth driver
-From: Bastien Nocera <hadess@hadess.net>
-To: linux-input <linux-input@vger.kernel.org>
-Cc: mjg <mjg@redhat.com>, Peter Hutterer <peter.hutterer@redhat.com>,
-	zap@homelink.ru,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1236988799.32264.6310.camel@cookie.hadess.net>
-References: <1236988799.32264.6310.camel@cookie.hadess.net>
-Content-Type: text/plain
-Date: Mon, 16 Mar 2009 23:55:55 +0000
-Message-Id: <1237247755.32264.10664.camel@cookie.hadess.net>
-Mime-Version: 1.0
+From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH] sbc: powerpc altivec optimizations for 4 subbands encoding
+Date: Mon, 16 Mar 2009 21:59:49 +0200
+MIME-Version: 1.0
+Content-Type: Multipart/Mixed;
+  boundary="Boundary-00=_1+qvJem6idPswm9"
+Message-Id: <200903162159.49487.siarhei.siamashka@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
->>From 3495e3be72d1df6132d5f5d978d2def3e4d57fc3 Mon Sep 17 00:00:00 2001
-From: Bastien Nocera <hadess@hadess.net>
-Date: Mon, 16 Mar 2009 23:36:54 +0000
-Subject: [PATCH] Wacom Graphire Bluetooth driver
+--Boundary-00=_1+qvJem6idPswm9
+Content-Type: text/plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Signed-off-by: Bastien Nocera <hadess@hadess.net>
+Hello,
 
-Based on the work by Andrew Zabolotny, an HID driver for the Bluetooth
-Wacom tablet. This is required as it uses a slightly different
-protocols from what's currently support by the drivers/input/wacom*
-driver, and those only support USB.
+On the last weekend I tried to get familiar with powerpc altivec assembly  and
+added some optimization for sbc encoder. Experimental patch is attached. It
+handles 4 subbands case only, so is not that much useful in practice. There
+are no problems supporting 8 subbands too, but I was just running out of
+time. The patch merges processing of 4 blocks into the single block of code.
+It's something that is also in my todo list for ARM NEON. But while this merge
+is mostly "nice to have" optimization for ARM, it is much more important for
+PowerPC because of a huge multiply-accumulate latency.
 
-A user-space patch is required to activate mode 2 of the Wacom tablet,
-as hidp does not support hid_output_raw_report.
----
- drivers/hid/Kconfig     |    7 ++
- drivers/hid/Makefile    |    1 +
- drivers/hid/hid-core.c  |    1 +
- drivers/hid/hid-ids.h   |    1 +
- drivers/hid/hid-wacom.c |  272 +++++++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 282 insertions(+), 0 deletions(-)
- create mode 100644 drivers/hid/hid-wacom.c
+And bluez a2dp seems to work fine on ppc64 linux (playstation3).
 
-diff --git a/drivers/hid/Kconfig b/drivers/hid/Kconfig
-index e85c8fe..f3244e3 100644
---- a/drivers/hid/Kconfig
-+++ b/drivers/hid/Kconfig
-@@ -261,6 +261,13 @@ config THRUSTMASTER_FF
- 	  Say Y here if you have a THRUSTMASTER FireStore Dual Power 2 or
- 	  a THRUSTMASTER Ferrari GT Rumble Force or Force Feedback Wheel.
- 
-+config HID_WACOM
-+	tristate "Wacom Bluetooth devices support" if EMBEDDED
-+	depends on BT_HIDP
-+	default !EMBEDDED
-+	---help---
-+	Support for Wacom Graphire Bluetooth tablet.
-+
- config ZEROPLUS_FF
- 	tristate "Zeroplus based game controller support"
- 	depends on USB_HID
-diff --git a/drivers/hid/Makefile b/drivers/hid/Makefile
-index fbd021f..410b302 100644
---- a/drivers/hid/Makefile
-+++ b/drivers/hid/Makefile
-@@ -41,6 +41,7 @@ obj-$(CONFIG_GREENASIA_FF)	+= hid-gaff.o
- obj-$(CONFIG_THRUSTMASTER_FF)	+= hid-tmff.o
- obj-$(CONFIG_HID_TOPSEED)	+= hid-topseed.o
- obj-$(CONFIG_ZEROPLUS_FF)	+= hid-zpff.o
-+obj-$(CONFIG_HID_WACOM)		+= hid-wacom.o
- 
- obj-$(CONFIG_USB_HID)		+= usbhid/
- obj-$(CONFIG_USB_MOUSE)		+= usbhid/
-diff --git a/drivers/hid/hid-core.c b/drivers/hid/hid-core.c
-index 1cc9674..d134f5d 100644
---- a/drivers/hid/hid-core.c
-+++ b/drivers/hid/hid-core.c
-@@ -1305,6 +1305,7 @@ static const struct hid_device_id hid_blacklist[] = {
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_THRUSTMASTER, 0xb651) },
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_THRUSTMASTER, 0xb654) },
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_TOPSEED, USB_DEVICE_ID_TOPSEED_CYBERLINK) },
-+	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_WACOM, USB_DEVICE_ID_WACOM_GRAPHIRE_BLUETOOTH) },
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_ZEROPLUS, 0x0005) },
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_ZEROPLUS, 0x0030) },
- 
-diff --git a/drivers/hid/hid-ids.h b/drivers/hid/hid-ids.h
-index 8851197..e8f96c2 100644
---- a/drivers/hid/hid-ids.h
-+++ b/drivers/hid/hid-ids.h
-@@ -400,6 +400,7 @@
- #define USB_DEVICE_ID_VERNIER_LCSPEC	0x0006
- 
- #define USB_VENDOR_ID_WACOM		0x056a
-+#define USB_DEVICE_ID_WACOM_GRAPHIRE_BLUETOOTH	0x81
- 
- #define USB_VENDOR_ID_WISEGROUP		0x0925
- #define USB_DEVICE_ID_1_PHIDGETSERVO_20	0x8101
-diff --git a/drivers/hid/hid-wacom.c b/drivers/hid/hid-wacom.c
-new file mode 100644
-index 0000000..8f9783f
---- /dev/null
-+++ b/drivers/hid/hid-wacom.c
-@@ -0,0 +1,272 @@
-+/*
-+ *  Bluetooth Wacom Tablet support
-+ *
-+ *  Copyright (c) 1999 Andreas Gal
-+ *  Copyright (c) 2000-2005 Vojtech Pavlik <vojtech@suse.cz>
-+ *  Copyright (c) 2005 Michael Haboustak <mike-@cinci.rr.com> for Concept2, Inc
-+ *  Copyright (c) 2006-2007 Jiri Kosina
-+ *  Copyright (c) 2007 Paul Walmsley
-+ *  Copyright (c) 2008 Jiri Slaby <jirislaby@gmail.com>
-+ *  Copyright (c) 2006 Andrew Zabolotny <zap@homelink.ru>
-+ *  Copyright (c) 2009 Bastien Nocera <hadess@hadess.net>
-+ */
-+
-+/*
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the Free
-+ * Software Foundation; either version 2 of the License, or (at your option)
-+ * any later version.
-+ */
-+
-+#include <linux/device.h>
-+#include <linux/hid.h>
-+#include <linux/module.h>
-+
-+#include "hid-ids.h"
-+
-+struct wacom_data {
-+	__u16 tool;
-+	unsigned char butstate;
-+};
-+
-+static int wacom_raw_event(struct hid_device *hdev, struct hid_report *report,
-+		u8 *raw_data, int size)
-+{
-+	struct wacom_data *wdata = hid_get_drvdata(hdev);
-+	struct hid_input *hidinput;
-+	struct input_dev *input;
-+	unsigned char *data = (unsigned char *) raw_data;
-+	int tool, x, y, rw, need_sync;
-+
-+	if (!(hdev->claimed & HID_CLAIMED_INPUT))
-+		return 0;
-+
-+	tool = 0;
-+	need_sync = 0;
-+	hidinput = list_entry(hdev->inputs.next, struct hid_input, list);
-+	input = hidinput->input;
-+
-+	/* Check if this is a tablet report */
-+	if (data[0] != 0x03)
-+		return 0;
-+
-+	/* Get X & Y positions */
-+	x = le16_to_cpu(*(__le16 *) &data[2]);
-+	y = le16_to_cpu(*(__le16 *) &data[4]);
-+
-+	/* Get current tool identifier */
-+	if (data[1] & 0x90) { /* If pen is in the in/active area */
-+		switch ((data[1] >> 5) & 3) {
-+		case 0:	/* Pen */
-+			tool = BTN_TOOL_PEN;
-+			break;
-+
-+		case 1: /* Rubber */
-+			tool = BTN_TOOL_RUBBER;
-+			break;
-+
-+		case 2: /* Mouse with wheel */
-+		case 3: /* Mouse without wheel */
-+			tool = BTN_TOOL_MOUSE;
-+			break;
-+		}
-+
-+		/* Reset tool if out of active tablet area */
-+		if (!(data[1] & 0x10))
-+			tool = 0;
-+	}
-+
-+	/* If tool changed, notify input subsystem */
-+	if (wdata->tool != tool) {
-+		if (wdata->tool) {
-+			/* Completely reset old tool state */
-+			if (wdata->tool == BTN_TOOL_MOUSE) {
-+				input_report_key(input, BTN_LEFT, 0);
-+				input_report_key(input, BTN_RIGHT, 0);
-+				input_report_key(input, BTN_MIDDLE, 0);
-+				input_report_abs(input, ABS_DISTANCE,
-+						input->absmax[ABS_DISTANCE]);
-+			} else {
-+				input_report_key(input, BTN_TOUCH, 0);
-+				input_report_key(input, BTN_STYLUS, 0);
-+				input_report_key(input, BTN_STYLUS2, 0);
-+				input_report_abs(input, ABS_PRESSURE, 0);
-+			}
-+			input_sync(input);
-+			input_report_key(input, wdata->tool, 0);
-+			input_sync(input);
-+		}
-+		wdata->tool = tool;
-+		if (tool) {
-+			input_report_key(input, tool, 1);
-+			need_sync = 1;
-+		}
-+	}
-+
-+	if (tool) {
-+		input_report_abs(input, ABS_X, x);
-+		input_report_abs(input, ABS_Y, y);
-+		need_sync = 1;
-+
-+		switch ((data[1] >> 5) & 3) {
-+		case 2: /* Mouse with wheel */
-+			input_report_key(input, BTN_MIDDLE, data[1] & 0x04);
-+			rw = (data[6] & 0x01) ? -1 :
-+				(data[6] & 0x02) ? 1 : 0;
-+			input_report_rel(input, REL_WHEEL, rw);
-+			/* fall through */
-+
-+		case 3: /* Mouse without wheel */
-+			input_report_key(input, BTN_LEFT, data[1] & 0x01);
-+			input_report_key(input, BTN_RIGHT, data[1] & 0x02);
-+			/* Compute distance between mouse and tablet */
-+			rw = 44 - (data[6] >> 2);
-+			if (rw < 0)
-+				rw = 0;
-+			else if (rw > 31)
-+				rw = 31;
-+			input_report_abs(input, ABS_DISTANCE, rw);
-+			break;
-+
-+		default:
-+			input_report_abs(input, ABS_PRESSURE,
-+					data[6] | (((__u16) (data[1] & 0x08)) << 5));
-+			input_report_key(input, BTN_TOUCH, data[1] & 0x01);
-+			input_report_key(input, BTN_STYLUS, data[1] & 0x02);
-+			input_report_key(input, BTN_STYLUS2, data[1] & 0x04);
-+			break;
-+		}
-+	}
-+
-+	if (need_sync) {
-+		input_sync(input);
-+		need_sync = 0;
-+	}
-+
-+	/* Report the state of the two buttons at the top of the tablet
-+	 * as two extra fingerpad keys (buttons 4 & 5). */
-+	rw = data[7] & 0x03;
-+	if (rw != wdata->butstate) {
-+		wdata->butstate = rw;
-+		input_report_key(input, BTN_0, rw & 0x02);
-+		input_report_key(input, BTN_1, rw & 0x01);
-+		need_sync = 1;
-+	}
-+
-+	if (need_sync) {
-+		input_event(input, EV_MSC, MSC_SERIAL, 0xf0);
-+		input_sync(input);
-+	}
-+
-+	return 1;
-+}
-+
-+static int wacom_probe(struct hid_device *hdev,
-+		const struct hid_device_id *id)
-+{
-+	struct hid_input *hidinput;
-+	struct input_dev *input;
-+	struct wacom_data *wdata;
-+	int ret;
-+
-+	wdata = kzalloc(sizeof(*wdata), GFP_KERNEL);
-+	if (wdata == NULL) {
-+		dev_err(&hdev->dev, "can't alloc wacom descriptor\n");
-+		return -ENOMEM;
-+	}
-+
-+	hid_set_drvdata(hdev, wdata);
-+
-+	ret = hid_parse(hdev);
-+	if (ret) {
-+		dev_err(&hdev->dev, "parse failed\n");
-+		goto err_free;
-+	}
-+
-+	ret = hid_hw_start(hdev, HID_CONNECT_DEFAULT);
-+	if (ret) {
-+		dev_err(&hdev->dev, "hw start failed\n");
-+		goto err_free;
-+	}
-+
-+	hidinput = list_entry(hdev->inputs.next, struct hid_input, list);
-+	input = hidinput->input;
-+
-+	/* Basics */
-+	input->evbit[0] |= BIT(EV_KEY) | BIT(EV_ABS) | BIT(EV_REL);
-+	input->absbit[0] |= BIT(ABS_X) | BIT(ABS_Y) |
-+		BIT(ABS_PRESSURE) | BIT(ABS_DISTANCE);
-+	input->relbit[0] |= BIT(REL_WHEEL);
-+	set_bit(BTN_TOOL_PEN, input->keybit);
-+	set_bit(BTN_TOUCH, input->keybit);
-+	set_bit(BTN_STYLUS, input->keybit);
-+	set_bit(BTN_STYLUS2, input->keybit);
-+	set_bit(BTN_LEFT, input->keybit);
-+	set_bit(BTN_RIGHT, input->keybit);
-+	set_bit(BTN_MIDDLE, input->keybit);
-+
-+	/* Pad */
-+	input->evbit[0] |= BIT(EV_MSC);
-+	input->mscbit[0] |= BIT(MSC_SERIAL);
-+
-+	/* Distance, rubber and mouse */
-+	input->absbit[0] |= BIT(ABS_DISTANCE);
-+	set_bit(BTN_TOOL_RUBBER, input->keybit);
-+	set_bit(BTN_TOOL_MOUSE, input->keybit);
-+
-+	input->absmax[ABS_PRESSURE] = 511;
-+	input->absmax[ABS_DISTANCE] = 32;
-+
-+	input->absmax[ABS_X] = 16704;
-+	input->absmax[ABS_Y] = 12064;
-+	input->absfuzz[ABS_X] = 4;
-+	input->absfuzz[ABS_Y] = 4;
-+
-+	return 0;
-+err_free:
-+	kfree(wdata);
-+	return ret;
-+}
-+
-+static void wacom_remove(struct hid_device *hdev)
-+{
-+	hid_hw_stop(hdev);
-+	kfree(hid_get_drvdata(hdev));
-+}
-+
-+static const struct hid_device_id wacom_devices[] = {
-+	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_WACOM, USB_DEVICE_ID_WACOM_GRAPHIRE_BLUETOOTH) },
-+
-+	{ }
-+};
-+MODULE_DEVICE_TABLE(hid, wacom_devices);
-+
-+static struct hid_driver wacom_driver = {
-+	.name = "wacom",
-+	.id_table = wacom_devices,
-+	.probe = wacom_probe,
-+	.remove = wacom_remove,
-+	.raw_event = wacom_raw_event,
-+};
-+
-+static int wacom_init(void)
-+{
-+	int ret;
-+
-+	ret = hid_register_driver(&wacom_driver);
-+	if (ret)
-+		printk(KERN_ERR "can't register wacom driver\n");
-+	printk(KERN_ERR "wacom driver registered\n");
-+	return ret;
-+}
-+
-+static void wacom_exit(void)
-+{
-+	hid_unregister_driver(&wacom_driver);
-+}
-+
-+module_init(wacom_init);
-+module_exit(wacom_exit);
-+MODULE_LICENSE("GPL");
-+
-+HID_COMPAT_LOAD_DRIVER(wacom);
+In order to activate altivec code, -maltivec option needs to be added to
+gcc compilation flags.
+
+Benchmark result:
+
+time ./sbcenc -s4 somefile.au > /dev/null
+
+before:
+real	0m13.999s
+user	0m13.468s
+sys	0m0.523s
+
+after:
+real	0m5.714s
+user	0m5.199s
+sys	0m0.519s
+
+3.2GHz CPU in playstation3 uses roughly 1.5% of cpu resources on sbc encoding
+without any optimizations. cpu usage is down to something like 0.6% after this
+optimization is applied.
+
 -- 
-1.6.2
+Best regards,
+Siarhei Siamashka
+
+--Boundary-00=_1+qvJem6idPswm9
+Content-Type: text/x-diff;
+  charset="us-ascii";
+  name="0004-sbc-powerpc-altivec-optimizations-for-4-subbands-en.patch"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline;
+	filename="0004-sbc-powerpc-altivec-optimizations-for-4-subbands-en.patch"
+
+=46rom a995acc428e2c02306ca69efa85d7f6e15529245 Mon Sep 17 00:00:00 2001
+=46rom: Siarhei Siamashka <siarhei.siamashka@nokia.com>
+Date: Mon, 16 Mar 2009 03:38:52 +0200
+Subject: [PATCH] sbc: powerpc altivec optimizations for 4 subbands encoding
+
+=2D--
+ sbc/Makefile.am              |    3 +-
+ sbc/sbc_primitives.c         |    6 +
+ sbc/sbc_primitives_altivec.c |  207 ++++++++++++++++++++++++++++++++++++++=
+++++
+ sbc/sbc_primitives_altivec.h |   40 ++++++++
+ 4 files changed, 255 insertions(+), 1 deletions(-)
+ create mode 100644 sbc/sbc_primitives_altivec.c
+ create mode 100644 sbc/sbc_primitives_altivec.h
+
+diff --git a/sbc/Makefile.am b/sbc/Makefile.am
+index f870164..75cc29b 100644
+=2D-- a/sbc/Makefile.am
++++ b/sbc/Makefile.am
+@@ -10,7 +10,8 @@ noinst_LTLIBRARIES =3D libsbc.la
+=20
+ libsbc_la_SOURCES =3D sbc.h sbc.c sbc_math.h sbc_tables.h \
+ 	sbc_primitives.h sbc_primitives_mmx.h sbc_primitives_neon.h \
+=2D	sbc_primitives.c sbc_primitives_mmx.c sbc_primitives_neon.c
++	sbc_primitives.c sbc_primitives_mmx.c sbc_primitives_neon.c \
++	sbc_primitives_altivec.h sbc_primitives_altivec.c
+=20
+ libsbc_la_CFLAGS =3D -finline-functions -fgcse-after-reload \
+ 				-funswitch-loops -funroll-loops
+diff --git a/sbc/sbc_primitives.c b/sbc/sbc_primitives.c
+index 2105280..209e2c3 100644
+=2D-- a/sbc/sbc_primitives.c
++++ b/sbc/sbc_primitives.c
+@@ -33,6 +33,7 @@
+ #include "sbc_primitives.h"
+ #include "sbc_primitives_mmx.h"
+ #include "sbc_primitives_neon.h"
++#include "sbc_primitives_altivec.h"
+=20
+ /*
+  * A reference C code of analysis filter with SIMD-friendly tables
+@@ -467,4 +468,9 @@ void sbc_init_primitives(struct sbc_encoder_state *stat=
+e)
+ #ifdef SBC_BUILD_WITH_NEON_SUPPORT
+ 	sbc_init_primitives_neon(state);
+ #endif
++
++	/* PPC Altivec optimizations */
++#ifdef SBC_BUILD_WITH_ALTIVEC_SUPPORT
++	sbc_init_primitives_altivec(state);
++#endif
+ }
+diff --git a/sbc/sbc_primitives_altivec.c b/sbc/sbc_primitives_altivec.c
+new file mode 100644
+index 0000000..537cd8a
+=2D-- /dev/null
++++ b/sbc/sbc_primitives_altivec.c
+@@ -0,0 +1,207 @@
++/*
++ *
++ *  Bluetooth low-complexity, subband codec (SBC) library
++ *
++ *  Copyright (C) 2004-2009  Marcel Holtmann <marcel@holtmann.org>
++ *  Copyright (C) 2004-2005  Henryk Ploetz <henryk@ploetzli.ch>
++ *  Copyright (C) 2005-2006  Brad Midgley <bmidgley@xmission.com>
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
+ USA
++ *
++ */
++
++#include <stdint.h>
++#include <limits.h>
++#include "sbc.h"
++#include "sbc_math.h"
++#include "sbc_tables.h"
++
++#include "sbc_primitives_altivec.h"
++
++#include <stdio.h>
++
++/*
++ * PPC Altivec optimizations
++ */
++
++#ifdef SBC_BUILD_WITH_ALTIVEC_SUPPORT
++
++/* Because of strict 16-byte alignment requirements for altivec, we need
++ * to add some zero padding to the beginning and end of the first part
++ * of the odd case coefficients table.
++ */
++static const FIXED_T SBC_ALIGNED analysis_consts_fixed4_altivec_odd[48 + 1=
+6] =3D {
++#define C0 1.3056875580
++#define C1 1.6772280856
++#define C2 1.0932568993
++#define C3 1.3056875580
++
++#define F(x) F_PROTO4(x)
++	0, 0,
++	0, 0,
++	 F(2.73370904E-03 * C0),  F(5.36548976E-04 * C0),
++	-F(1.49188357E-03 * C1),  F(0.00000000E+00 * C1),
++	 F(3.83720193E-03 * C2),  F(1.09137620E-02 * C2),
++	 F(3.89205149E-03 * C3),  F(3.06012286E-03 * C3),
++	 F(3.21939290E-02 * C0),  F(2.04385087E-02 * C0),
++	-F(2.88757392E-02 * C1),  F(0.00000000E+00 * C1),
++	 F(2.58767811E-02 * C2),  F(1.35593274E-01 * C2),
++	 F(6.13245186E-03 * C3),  F(7.76463494E-02 * C3),
++	 F(2.81828203E-01 * C0),  F(1.94987841E-01 * C0),
++	-F(2.46636662E-01 * C1),  F(0.00000000E+00 * C1),
++	 F(2.94315332E-01 * C2), -F(1.35593274E-01 * C2),
++	 F(2.81828203E-01 * C3), -F(1.94987841E-01 * C3),
++	 F(6.13245186E-03 * C0), -F(7.76463494E-02 * C0),
++	 F(2.88217274E-02 * C1),  F(0.00000000E+00 * C1),
++	 F(2.58767811E-02 * C2), -F(1.09137620E-02 * C2),
++	 F(3.21939290E-02 * C3), -F(2.04385087E-02 * C3),
++	 F(3.89205149E-03 * C0), -F(3.06012286E-03 * C0),
++	-F(1.86581691E-03 * C1),  F(0.00000000E+00 * C1),
++	 F(3.83720193E-03 * C2),  F(0.00000000E+00 * C2),
++	 F(2.73370904E-03 * C3), -F(5.36548976E-04 * C3),
++	0, 0,
++	0, 0,
++#undef F
++#define F(x) F_COS4(x)
++	/* swap halves */
++	 F(0.7071067812 / C2),  F(0.3826834324 / C3),
++	-F(0.7071067812 / C2), -F(0.9238795325 / C3),
++	-F(0.7071067812 / C2),  F(0.9238795325 / C3),
++	 F(0.7071067812 / C2), -F(0.3826834324 / C3),
++	 F(0.9238795325 / C0), -F(1.0000000000 / C1),
++	 F(0.3826834324 / C0), -F(1.0000000000 / C1),
++	-F(0.3826834324 / C0), -F(1.0000000000 / C1),
++	-F(0.9238795325 / C0), -F(1.0000000000 / C1),
++#undef F
++
++#undef C0
++#undef C1
++#undef C2
++#undef C3
++};
++
++static void sbc_analyze_4b_4s_altivec(int16_t *x, int32_t *out, int out_st=
+ride)
++{
++	static const SBC_ALIGNED int32_t round_c[4] =3D {
++		1 << (SBC_PROTO_FIXED4_SCALE - 1),
++		1 << (SBC_PROTO_FIXED4_SCALE - 1),
++		1 << (SBC_PROTO_FIXED4_SCALE - 1),
++		1 << (SBC_PROTO_FIXED4_SCALE - 1),
++	};
++	static const SBC_ALIGNED int8_t perm_c1[16] =3D {
++		0, 1, 4, 5, 0, 1, 4, 5, 0, 1, 4, 5, 0, 1, 4, 5,
++	};
++	static const SBC_ALIGNED int8_t perm_c2[16] =3D {
++		8, 9, 12, 13, 8, 9, 12, 13, 8, 9, 12, 13, 8, 9, 12, 13,
++	};
++	const int16_t *const_e =3D analysis_consts_fixed4_simd_even;
++	const int16_t *const_o =3D analysis_consts_fixed4_altivec_odd;
++	asm volatile (
++		"lvx      %%v17, 0, %[round_c]\n"
++
++		"lvx      %%v1,  0, %[in]\n"
++		"addi     %[in], %[in], 16\n"
++
++		"lvx      %%v2,  0, %[consts_e]\n"
++		"addi     %[consts_e], %[consts_e], 16\n"
++		"lvx      %%v12, 0, %[consts_o]\n"
++		"addi     %[consts_o], %[consts_o], 16\n"
++		"vmsumshm %%v0,  %%v1, %%v2,  %%v17\n"
++		"vmsumshm %%v10, %%v1, %%v12, %%v17\n"
++		"lvx      %%v1,  0, %[in]\n"
++		"addi     %[in], %[in], 16\n"
++		"vmsumshm %%v14, %%v1, %%v2,  %%v17\n"
++		"vmsumshm %%v17, %%v1, %%v12, %%v17\n"
++
++		".rept 4\n"
++			"lvx      %%v2,  0, %[consts_e]\n"
++			"addi     %[consts_e], %[consts_e], 16\n"
++			"lvx      %%v12, 0, %[consts_o]\n"
++			"addi     %[consts_o], %[consts_o], 16\n"
++			"vmsumshm %%v0,  %%v1, %%v2,  %%v0\n"
++			"vmsumshm %%v10, %%v1, %%v12, %%v10\n"
++			"lvx      %%v1,  0, %[in]\n"
++			"addi     %[in], %[in], 16\n"
++			"vmsumshm %%v14, %%v1, %%v2,  %%v14\n"
++			"vmsumshm %%v17, %%v1, %%v12, %%v17\n"
++		".endr\n"
++
++		"lvx      %%v12, 0, %[consts_o]\n"
++		"addi     %[consts_o], %[consts_o], 16\n"
++		"lvx      %%v3,  0, %[in]\n"
++		"vmsumshm %%v10, %%v1, %%v12, %%v10\n"
++		"vmsumshm %%v17, %%v3, %%v12, %%v17\n"
++
++		"lvx      %%v18, 0, %[perm_c1]\n"
++		"lvx      %%v19, 0, %[perm_c2]\n"
++		"vperm    %%v1,  %%v0,  %%v0,  %%v18\n"
++		"vperm    %%v2,  %%v0,  %%v0,  %%v19\n"
++		"vperm    %%v15, %%v14, %%v14, %%v18\n"
++		"vperm    %%v16, %%v14, %%v14, %%v19\n"
++		"vperm    %%v11, %%v10, %%v10, %%v18\n"
++		"vperm    %%v12, %%v10, %%v10, %%v19\n"
++		"vperm    %%v18, %%v17, %%v17, %%v18\n"
++		"vperm    %%v19, %%v17, %%v17, %%v19\n"
++
++		"vspltisw %%v0,  0\n"
++
++		"lvx      %%v13, 0, %[consts_o]\n"
++		"addi     %[consts_o], %[consts_o], 16\n"
++		"lvx      %%v3,  0, %[consts_e]\n"
++		"addi     %[consts_e], %[consts_e], 16\n"
++		"vmsumshm %%v17, %%v13, %%v18, %%v0\n"
++		"vmsumshm %%v14, %%v3,  %%v15, %%v0\n"
++		"vmsumshm %%v10, %%v13, %%v11, %%v0\n"
++		"vmsumshm %%v0,  %%v3,  %%v1,  %%v0\n"
++
++		"lvx      %%v13, %%v0, %[consts_o]\n"
++		"lvx      %%v3,  %%v0, %[consts_e]\n"
++		"vmsumshm %%v17, %%v13, %%v19, %%v17\n"
++		"vmsumshm %%v14, %%v3,  %%v16, %%v14\n"
++		"vmsumshm %%v10, %%v13, %%v12, %%v10\n"
++		"vmsumshm %%v0,  %%v3,  %%v2,  %%v0\n"
++
++		"add      %[consts_e], %[out], %[out_stride]\n"
++		"add      %[consts_e], %[consts_e], %[out_stride]\n"
++		"stvx     %%v17, 0, %[out]\n"
++		"stvx     %%v14, %[out_stride], %[out]\n"
++		"stvx     %%v10, 0, %[consts_e]\n"
++		"stvx     %%v0, %[out_stride], %[consts_e]\n"
++
++		:
++			[in]         "+b" (x),
++			[consts_e]   "+b" (const_e),
++			[consts_o]   "+b" (const_o),
++			[out]        "+b" (out)
++		:
++			[round_c]     "b" (round_c),
++			[out_stride]  "b" (out_stride * 4),
++			[perm_c1]     "b" (perm_c1),
++			[perm_c2]     "b" (perm_c2)
++		:
++			"memory", "v0", "v1", "v2", "v3", "v10", "v11", "v12",
++			"v13", "v14", "v15", "v16", "v17", "v18", "v19");
++}
++
++void sbc_init_primitives_altivec(struct sbc_encoder_state *state)
++{
++	if (SBC_PROTO_FIXED4_SCALE =3D=3D 16 && SBC_PROTO_FIXED8_SCALE =3D=3D 16)=
+ {
++		state->sbc_analyze_4b_4s =3D sbc_analyze_4b_4s_altivec;
++		state->implementation_info =3D "Altivec";
++	}
++}
++
++#endif
+diff --git a/sbc/sbc_primitives_altivec.h b/sbc/sbc_primitives_altivec.h
+new file mode 100644
+index 0000000..8b87c8e
+=2D-- /dev/null
++++ b/sbc/sbc_primitives_altivec.h
+@@ -0,0 +1,40 @@
++/*
++ *
++ *  Bluetooth low-complexity, subband codec (SBC) library
++ *
++ *  Copyright (C) 2004-2009  Marcel Holtmann <marcel@holtmann.org>
++ *  Copyright (C) 2004-2005  Henryk Ploetz <henryk@ploetzli.ch>
++ *  Copyright (C) 2005-2006  Brad Midgley <bmidgley@xmission.com>
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 =
+ USA
++ *
++ */
++
++#ifndef __SBC_PRIMITIVES_ALTIVEC_H
++#define __SBC_PRIMITIVES_ALTIVEC_H
++
++#include "sbc_primitives.h"
++
++#if defined(__GNUC__) && defined(__ALTIVEC__) && \
++		!defined(SBC_HIGH_PRECISION) && (SCALE_OUT_BITS =3D=3D 15)
++
++#define SBC_BUILD_WITH_ALTIVEC_SUPPORT
++
++void sbc_init_primitives_altivec(struct sbc_encoder_state *encoder_state);
++
++#endif
++
++#endif
+=2D-=20
+1.5.6.5
 
 
+--Boundary-00=_1+qvJem6idPswm9--
