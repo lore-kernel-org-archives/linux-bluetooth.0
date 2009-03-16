@@ -1,164 +1,97 @@
 Return-Path: <cyrus@holtmann.org>
-From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
-To: ext Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH] SBC encoder scale factors calculation optimized with __builtin_clz
-Date: Mon, 16 Mar 2009 21:32:26 +0200
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <200901290310.03440.siarhei.siamashka@nokia.com> <200902021248.14496.siarhei.siamashka@nokia.com> <1233588056.4668.16.camel@californication>
-In-Reply-To: <1233588056.4668.16.camel@californication>
-MIME-Version: 1.0
-Content-Type: Multipart/Mixed;
-  boundary="Boundary-00=_KlqvJb0V3Hw7RNE"
-Message-Id: <200903162132.26530.siarhei.siamashka@nokia.com>
+Subject: Re: RFC: Wacom Bluetooth HID driver, first pass
+From: Bastien Nocera <hadess@hadess.net>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-input <linux-input@vger.kernel.org>,
+        BlueZ development <linux-bluetooth@vger.kernel.org>,
+        mjg <mjg@redhat.com>, Peter Hutterer <peter.hutterer@redhat.com>,
+        zap@homelink.ru
+In-Reply-To: <93531296-64B0-4D4B-A4A9-26F3D67DF579@holtmann.org>
+References: <1236988799.32264.6310.camel@cookie.hadess.net>
+	 <1237200912.32264.9867.camel@cookie.hadess.net>
+	 <93531296-64B0-4D4B-A4A9-26F3D67DF579@holtmann.org>
+Content-Type: text/plain
+Date: Mon, 16 Mar 2009 14:29:59 +0000
+Message-Id: <1237213799.32264.10090.camel@cookie.hadess.net>
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---Boundary-00=_KlqvJb0V3Hw7RNE
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-On Monday 02 February 2009 17:20:56 ext Marcel Holtmann wrote:
-> Hi Siarhei,
->
-> > > > > > > cases.
-> > > > > >
-> > > > > > patch has been applied. Thanks.
-> > > > >
-> > > > > The tests have passed all.
-> > > > > http://net.cs.uni-tuebingen.de/html/nexgenvoip/html/
-> > > >
-> > > > Thanks a lot for keeping an eye on bluez sbc implementation quality.
-> > >
-> > > are all patches applied now or am I missing one?
+On Mon, 2009-03-16 at 15:00 +0100, Marcel Holtmann wrote:
+> Hi Bastien,
+> 
+> >> This is a first pass at a driver for the Wacom Graphire Bluetooth
+> >> tablet, based on work by Andrew Zabolotny[1]. It's mildly tested  
+> >> (eg. it
+> >> works in my very few tests).
+> >>
+> >> I was looking for guidance for the code itself, possibly making it
+> >> easier to merge in the input/tablet/wacom* drivers into it in the
+> >> future, as well as some explanations as to how I'm supposed to reset
+> >> tools, etc. so the user-space drivers (the X.org linuxwacom driver)
+> >> doesn't need special-casing for the device.
+> >>
+> >> Note that it requires a user-space activation to switch to Mode 2,  
+> >> using
+> >> bluetoothd (as the Bluetooth HID doesn't support  
+> >> hid_output_raw_event).
+> >> Patch at:
+> >> http://cvs.fedoraproject.org/viewvc/rpms/bluez/devel/bluez-activate-wacom-mode2.patch?view=markup
 > >
-> > Yes, thanks, all the patches have been applied except for this one:
-> > http://marc.info/?l=linux-bluetooth&m=123319235104928&w=2
+> > A couple of notes:
+> > - the wheel action is reversed, it's a simple fix, done locally
+> > - hidp and the Bluetooth sub-system says it can't probe the device  
+> > with
+> > error "-14" when hid-wacom.ko isn't already loaded
+> 
+> what was the reason for not forcing HID to load the generic driver?
+
+What generic driver? If you're talking about the default Wacom driver,
+it isn't an HID driver, and requires a USB device.
+
+>  I  
+> lost track on how HID is suppose to handle these. You could also  
+> introduce a phony export like we do with L2CAP to ensure it is loaded  
+> even if userspace isn't ready to handle this dependency.
+
+Well, the problem is that the driver _does_ load, but I'm not certain
+about the sequence of events between the Bluetooth sub-system, the
+user-space enabling (see the linked patch to bluetoothd), and the HID
+sub-system.
+
+> > - I'm getting oopses in hci_conn_del() when the device goes away  
+> > (eg. I
+> > turn it off).
+> 
+> Try to run a net-next-2.6 or bluetooth-next-2.6 kernel. Kyle should  
+> have merged these patches into the latest rawhide kernel.
+
+I was hoping this would be fixed in the latest linus-2.6 tree, guess
+not.
+
+> > I'd appreciate any help making this just a tad more stable.
 > >
-> > It should work fine, but I'm still considering how to better optimize
-> > processing of joint stereo, which might also require changing this code
-> > a bit. For now it's more like a demonstration that scale factors
-> > processing can be SIMD optimized quite fine.
-> >
-> > I will provide a more complete patch with optimizations for both scale
-> > factors and joint stereo a bit later.
->
-> please re-sent this one with a proper commit message and I apply it.
-> Then you can start from there is you like. Or send me a complete new
-> one.
+> > Any comments about the code itself?
+> 
+> The main parsing function looks highly complicated and could either  
+> use more comments or break into two.
 
-Done. Commit message added and patch attached.
+The parsing is adapted from the code Andrew wrote, so I don't have any
+great insights into it. Right it's in "it works well enough to do
+things" mode, clean-ups and bug fixes will probably follow when my
+machine stops crashing when using that driver :)
 
-time ./sbcenc tesfile.au > /dev/null
+> 	if ((wdata->tool = tool)) {
+> 		input_report_key(input, tool, 1);
+> 		need_sync = 1;
+> 	}
+> 
+> Don't do the assignment in the if clause test.
 
-before:
-real    0m6.404s
-user    0m6.152s
-sys     0m0.244s
+As I mentioned, copy/paste code this is.
 
-after:
-real    0m5.630s
-user    0m5.376s
-sys     0m0.248s
+>  Did you run  
+> checkpatch.pl on it?
 
--- 
-Best regards,
-Siarhei Siamashka
+Nope, I didn't, but will do.
 
---Boundary-00=_KlqvJb0V3Hw7RNE
-Content-Type: text/x-diff;
-  charset="iso-8859-1";
-  name="0002-sbc-MMX-optimization-for-scale-factors-calculation.patch"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline;
-	filename="0002-sbc-MMX-optimization-for-scale-factors-calculation.patch"
-
-=46rom 83bece7b4642dde20b76253b7d18228d6654fa70 Mon Sep 17 00:00:00 2001
-=46rom: Siarhei Siamashka <siarhei.siamashka@nokia.com>
-Date: Mon, 16 Mar 2009 21:10:32 +0200
-Subject: [PATCH] sbc: MMX optimization for scale factors calculation
-
-=2D--
- sbc/sbc_primitives_mmx.c |   54 ++++++++++++++++++++++++++++++++++++++++++=
-++++
- 1 files changed, 54 insertions(+), 0 deletions(-)
-
-diff --git a/sbc/sbc_primitives_mmx.c b/sbc/sbc_primitives_mmx.c
-index 08e9ca2..d8373b3 100644
-=2D-- a/sbc/sbc_primitives_mmx.c
-+++ b/sbc/sbc_primitives_mmx.c
-@@ -275,6 +275,59 @@ static inline void sbc_analyze_4b_8s_mmx(int16_t *x, i=
-nt32_t *out,
- 	asm volatile ("emms\n");
- }
-=20
-+static void sbc_calc_scalefactors_mmx(
-+	int32_t sb_sample_f[16][2][8],
-+	uint32_t scale_factor[2][8],
-+	int blocks, int channels, int subbands)
-+{
-+	static const SBC_ALIGNED int32_t consts[2] =3D {
-+		1 << SCALE_OUT_BITS,
-+		1 << SCALE_OUT_BITS,
-+	};
-+	int ch, sb;
-+	intptr_t blk;
-+	for (ch =3D 0; ch < channels; ch++) {
-+		for (sb =3D 0; sb < subbands; sb +=3D 2) {
-+			blk =3D (blocks - 1) * (((char *) &sb_sample_f[1][0][0] -
-+				(char *) &sb_sample_f[0][0][0]));
-+			asm volatile (
-+				"movq         (%4), %%mm0\n"
-+			"1:\n"
-+				"movq     (%1, %0), %%mm1\n"
-+				"pxor        %%mm2, %%mm2\n"
-+				"pcmpgtd     %%mm2, %%mm1\n"
-+				"paddd    (%1, %0), %%mm1\n"
-+				"pcmpgtd     %%mm1, %%mm2\n"
-+				"pxor        %%mm2, %%mm1\n"
-+
-+				"por         %%mm1, %%mm0\n"
-+
-+				"sub            %2, %0\n"
-+				"jns            1b\n"
-+
-+				"movd        %%mm0, %k0\n"
-+				"psrlq         $32, %%mm0\n"
-+				"bsrl          %k0, %k0\n"
-+				"subl           %5, %k0\n"
-+				"movl          %k0, (%3)\n"
-+
-+				"movd        %%mm0, %k0\n"
-+				"bsrl          %k0, %k0\n"
-+				"subl           %5, %k0\n"
-+				"movl          %k0, 4(%3)\n"
-+			: "+r" (blk)
-+			: "r" (&sb_sample_f[0][ch][sb]),
-+				"i" ((char *) &sb_sample_f[1][0][0] -
-+					(char *) &sb_sample_f[0][0][0]),
-+				"r" (&scale_factor[ch][sb]),
-+				"r" (&consts),
-+				"i" (SCALE_OUT_BITS)
-+			: "memory");
-+		}
-+	}
-+	asm volatile ("emms\n");
-+}
-+
- static int check_mmx_support(void)
- {
- #ifdef __amd64__
-@@ -313,6 +366,7 @@ void sbc_init_primitives_mmx(struct sbc_encoder_state *=
-state)
- 	if (check_mmx_support()) {
- 		state->sbc_analyze_4b_4s =3D sbc_analyze_4b_4s_mmx;
- 		state->sbc_analyze_4b_8s =3D sbc_analyze_4b_8s_mmx;
-+		state->sbc_calc_scalefactors =3D sbc_calc_scalefactors_mmx;
- 		state->implementation_info =3D "MMX";
- 	}
- }
-=2D-=20
-1.5.6.5
-
-
---Boundary-00=_KlqvJb0V3Hw7RNE--
+Cheers
