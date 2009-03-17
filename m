@@ -1,74 +1,146 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH] Wacom Bluetooth mode-2 activation
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="=-oVTmZxlq0NDXlQtAlJZU"
-Date: Tue, 17 Mar 2009 23:54:45 +0000
-Message-Id: <1237334085.15346.99.camel@cookie.hadess.net>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <2d5a2c100903170622m666752e7s5b05d6b96b193952@mail.gmail.com>
+References: <8b5debfa0903170313n64fc1955l7afb2c3511981619@mail.gmail.com>
+	 <2d5a2c100903170622m666752e7s5b05d6b96b193952@mail.gmail.com>
+Date: Tue, 17 Mar 2009 18:59:06 +0530
+Message-ID: <8b5debfa0903170629j21187128gb2c785541ec65e40@mail.gmail.com>
+Subject: Re: [PATCH] Adding version check for plugins.
+From: alok barsode <alokbarsode@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
+Content-Type: multipart/mixed; boundary=0016e649c0a6274ecd0465508d20
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+--0016e649c0a6274ecd0465508d20
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
---=-oVTmZxlq0NDXlQtAlJZU
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Luiz,
 
-Heya,
-
-Patch is necessary to make the Wacom Bluetooth driver I posted to
-linux-input work as expected. I've tested this successfully with my
-tablet[1].
-
-Cheers
-
-[1]: For Marcel, if you want a funky new device, look for CTE-630BT:
-http://www.wacom-europe.com/index2.asp?pid=163&lang=en
-http://www.wacom-shop.net/cgi-bin/wacom.storefront/49c0379700eeee24273f4ddcef2606ba/Product/View/CTE&2D630BT3
-
---=-oVTmZxlq0NDXlQtAlJZU
-Content-Disposition: attachment; filename="0001-Add-Mode-2-activation-for-the-Wacom-BT-tablet.patch"
-Content-Type: text/x-patch; name="0001-Add-Mode-2-activation-for-the-Wacom-BT-tablet.patch"; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-
->From 7446ea0afdbdb602261c3d43efc4f29bac47cc4b Mon Sep 17 00:00:00 2001
-From: Bastien Nocera <hadess@hadess.net>
-Date: Tue, 17 Mar 2009 23:44:44 +0000
-Subject: [PATCH] Add Mode-2 activation for the Wacom BT tablet
-
-Otherwise the device shows up as a simple mouse, and extended
-events aren't being pushed to the kernel.
----
- input/device.c |   13 +++++++++++++
- 1 files changed, 13 insertions(+), 0 deletions(-)
-
-diff --git a/input/device.c b/input/device.c
-index 0090bd4..8d65148 100644
---- a/input/device.c
-+++ b/input/device.c
-@@ -658,6 +658,19 @@ static int hidp_add_connection(const struct input_device *idev,
- 		err = write(sk, buf, sizeof(buf));
- 	}
- 
-+	if (req->vendor == 0x056a && req->product == 0x81) {
-+		unsigned char buf[3];
-+		int sk = g_io_channel_unix_get_fd(iconn->ctrl_io);
-+
-+		buf[0] = 0x53; /* HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_FEATURE */
-+		buf[1] = 0x03; buf[2] = 0x00;
-+		write(sk, buf, sizeof(buf));
-+
-+		buf[0] = 0x71; /* HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_FEATURE */
-+		/* 0x06 - high reporting speed, 0x05 - low speed */
-+		buf[1] = 0x06; buf[2] = 0x00;
-+		write(sk, buf, sizeof(buf));
-+	}
- 	err = ioctl_connadd(req);
- 
- cleanup:
--- 
-1.6.2
+Thanks for spotting them, fixed.
+Attaching the modified patch.
 
 
---=-oVTmZxlq0NDXlQtAlJZU--
+On Tue, Mar 17, 2009 at 6:52 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Alok,
+>
+> 2009/3/17 alok barsode <alokbarsode@gmail.com>:
+>> Hi Marcel,
+>>
+>> As per the discussion on IRC, I am attaching a version check patch for p=
+lugins.
+>>
+>> Let me know if anything needs modifications.
+>>
+>> Cheers,
+>> Alok.
+>>
+>
+> There are some trailing spaces around if (g_str_equal(desc->version,
+> VERSION) =3D=3D FALSE), could you please fix them.
+>
+> --
+> Luiz Augusto von Dentz
+> Engenheiro de Computa=E7=E3o
+>
 
+--0016e649c0a6274ecd0465508d20
+Content-Type: text/x-diff; charset=US-ASCII;
+	name="0001-Adding-version-check-for-plugins.patch"
+Content-Disposition: attachment;
+	filename="0001-Adding-version-check-for-plugins.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_fseme8510
+
+RnJvbSAxYjA5MTM0NTI5MTkxZDlmODFhNGI3ZjE5NTRhYTdhOWIyZGJjYTg3IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBBbG9rIEJhcnNvZGUgPGFsb2tiYXJzb2RlQGdtYWlsLmNvbT4K
+RGF0ZTogVHVlLCAxNyBNYXIgMjAwOSAxODo1NjoyMSArMDUzMApTdWJqZWN0OiBbUEFUQ0hdIEFk
+ZGluZyB2ZXJzaW9uIGNoZWNrIGZvciBwbHVnaW5zLgoKLS0tCiBhdWRpby9tYWluLmMgICAgICB8
+ICAgIDIgKy0KIGlucHV0L21haW4uYyAgICAgIHwgICAgMiArLQogbmV0d29yay9tYWluLmMgICAg
+fCAgICAyICstCiBwbHVnaW5zL2VjaG8uYyAgICB8ICAgIDIgKy0KIHBsdWdpbnMvaGFsLmMgICAg
+IHwgICAgMiArLQogcGx1Z2lucy9uZXRsaW5rLmMgfCAgICAyICstCiBwbHVnaW5zL3NlcnZpY2Uu
+YyB8ICAgIDIgKy0KIHBsdWdpbnMvc3RvcmFnZS5jIHwgICAgMiArLQogc2VyaWFsL21haW4uYyAg
+ICAgfCAgICAyICstCiBzcmMvbWFpbi5jICAgICAgICB8ICAgIDIgKy0KIHNyYy9wbHVnaW4uYyAg
+ICAgIHwgICAgNSArKysrKwogc3JjL3BsdWdpbi5oICAgICAgfCAgICA1ICsrKy0tCiAxMiBmaWxl
+cyBjaGFuZ2VkLCAxOCBpbnNlcnRpb25zKCspLCAxMiBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQg
+YS9hdWRpby9tYWluLmMgYi9hdWRpby9tYWluLmMKaW5kZXggMTY3OGI1OC4uZjVlYjdkZCAxMDA2
+NDQKLS0tIGEvYXVkaW8vbWFpbi5jCisrKyBiL2F1ZGlvL21haW4uYwpAQCAtMTcxLDQgKzE3MSw0
+IEBAIHN0YXRpYyB2b2lkIGF1ZGlvX2V4aXQodm9pZCkKIAlkYnVzX2Nvbm5lY3Rpb25fdW5yZWYo
+Y29ubmVjdGlvbik7CiB9CiAKLUJMVUVUT09USF9QTFVHSU5fREVGSU5FKCJhdWRpbyIsIGF1ZGlv
+X2luaXQsIGF1ZGlvX2V4aXQpCitCTFVFVE9PVEhfUExVR0lOX0RFRklORSgiYXVkaW8iLCBWRVJT
+SU9OLCBhdWRpb19pbml0LCBhdWRpb19leGl0KQpkaWZmIC0tZ2l0IGEvaW5wdXQvbWFpbi5jIGIv
+aW5wdXQvbWFpbi5jCmluZGV4IDMxZTJlZjYuLjAxMGI3MzEgMTAwNjQ0Ci0tLSBhL2lucHV0L21h
+aW4uYworKysgYi9pbnB1dC9tYWluLmMKQEAgLTgyLDQgKzgyLDQgQEAgc3RhdGljIHZvaWQgaW5w
+dXRfZXhpdCh2b2lkKQogCWRidXNfY29ubmVjdGlvbl91bnJlZihjb25uZWN0aW9uKTsKIH0KIAot
+QkxVRVRPT1RIX1BMVUdJTl9ERUZJTkUoImlucHV0IiwgaW5wdXRfaW5pdCwgaW5wdXRfZXhpdCkK
+K0JMVUVUT09USF9QTFVHSU5fREVGSU5FKCJpbnB1dCIsIFZFUlNJT04sIGlucHV0X2luaXQsIGlu
+cHV0X2V4aXQpCmRpZmYgLS1naXQgYS9uZXR3b3JrL21haW4uYyBiL25ldHdvcmsvbWFpbi5jCmlu
+ZGV4IDQ3NDQxODUuLjVmOTZkNGIgMTAwNjQ0Ci0tLSBhL25ldHdvcmsvbWFpbi5jCisrKyBiL25l
+dHdvcmsvbWFpbi5jCkBAIC01NSw0ICs1NSw0IEBAIHN0YXRpYyB2b2lkIG5ldHdvcmtfZXhpdCh2
+b2lkKQogCWRidXNfY29ubmVjdGlvbl91bnJlZihjb25uZWN0aW9uKTsKIH0KIAotQkxVRVRPT1RI
+X1BMVUdJTl9ERUZJTkUoIm5ldHdvcmsiLCBuZXR3b3JrX2luaXQsIG5ldHdvcmtfZXhpdCkKK0JM
+VUVUT09USF9QTFVHSU5fREVGSU5FKCJuZXR3b3JrIiwgVkVSU0lPTiwgbmV0d29ya19pbml0LCBu
+ZXR3b3JrX2V4aXQpCmRpZmYgLS1naXQgYS9wbHVnaW5zL2VjaG8uYyBiL3BsdWdpbnMvZWNoby5j
+CmluZGV4IDM0ODZlZjEuLjgzMmJmOGIgMTAwNjQ0Ci0tLSBhL3BsdWdpbnMvZWNoby5jCisrKyBi
+L3BsdWdpbnMvZWNoby5jCkBAIC0xNjMsNCArMTYzLDQgQEAgc3RhdGljIHZvaWQgZWNob19leGl0
+KHZvaWQpCiAJYnRkX3VucmVnaXN0ZXJfYWRhcHRlcl9kcml2ZXIoJmVjaG9fc2VydmVyKTsKIH0K
+IAotQkxVRVRPT1RIX1BMVUdJTl9ERUZJTkUoImVjaG8iLCBlY2hvX2luaXQsIGVjaG9fZXhpdCkK
+K0JMVUVUT09USF9QTFVHSU5fREVGSU5FKCJlY2hvIiwgVkVSU0lPTiwgZWNob19pbml0LCBlY2hv
+X2V4aXQpCmRpZmYgLS1naXQgYS9wbHVnaW5zL2hhbC5jIGIvcGx1Z2lucy9oYWwuYwppbmRleCBm
+MDY2YTVhLi4yMTliNDZlIDEwMDY0NAotLS0gYS9wbHVnaW5zL2hhbC5jCisrKyBiL3BsdWdpbnMv
+aGFsLmMKQEAgLTE1OCw0ICsxNTgsNCBAQCBzdGF0aWMgdm9pZCBoYWxfZXhpdCh2b2lkKQogCWJ0
+ZF91bnJlZ2lzdGVyX2FkYXB0ZXJfZHJpdmVyKCZoYWxfZHJpdmVyKTsKIH0KIAotQkxVRVRPT1RI
+X1BMVUdJTl9ERUZJTkUoImhhbCIsIGhhbF9pbml0LCBoYWxfZXhpdCkKK0JMVUVUT09USF9QTFVH
+SU5fREVGSU5FKCJoYWwiLCBWRVJTSU9OLCBoYWxfaW5pdCwgaGFsX2V4aXQpCmRpZmYgLS1naXQg
+YS9wbHVnaW5zL25ldGxpbmsuYyBiL3BsdWdpbnMvbmV0bGluay5jCmluZGV4IDc4YTE4YWEuLmY3
+NzdjZjkgMTAwNjQ0Ci0tLSBhL3BsdWdpbnMvbmV0bGluay5jCisrKyBiL3BsdWdpbnMvbmV0bGlu
+ay5jCkBAIC0xMjMsNCArMTIzLDQgQEAgc3RhdGljIHZvaWQgbmV0bGlua19leGl0KHZvaWQpCiAJ
+bmxfaGFuZGxlX2Rlc3Ryb3koaGFuZGxlKTsKIH0KIAotQkxVRVRPT1RIX1BMVUdJTl9ERUZJTkUo
+Im5ldGxpbmsiLCBuZXRsaW5rX2luaXQsIG5ldGxpbmtfZXhpdCkKK0JMVUVUT09USF9QTFVHSU5f
+REVGSU5FKCJuZXRsaW5rIiwgVkVSU0lPTiwgbmV0bGlua19pbml0LCBuZXRsaW5rX2V4aXQpCmRp
+ZmYgLS1naXQgYS9wbHVnaW5zL3NlcnZpY2UuYyBiL3BsdWdpbnMvc2VydmljZS5jCmluZGV4IDRh
+ODcyMzQuLmI0ZDQwNWIgMTAwNjQ0Ci0tLSBhL3BsdWdpbnMvc2VydmljZS5jCisrKyBiL3BsdWdp
+bnMvc2VydmljZS5jCkBAIC04NTksNCArODU5LDQgQEAgc3RhdGljIHZvaWQgc2VydmljZV9leGl0
+KHZvaWQpCiAJZGJ1c19jb25uZWN0aW9uX3VucmVmKGNvbm5lY3Rpb24pOwogfQogCi1CTFVFVE9P
+VEhfUExVR0lOX0RFRklORSgic2VydmljZSIsIHNlcnZpY2VfaW5pdCwgc2VydmljZV9leGl0KQor
+QkxVRVRPT1RIX1BMVUdJTl9ERUZJTkUoInNlcnZpY2UiLCBWRVJTSU9OLCBzZXJ2aWNlX2luaXQs
+IHNlcnZpY2VfZXhpdCkKZGlmZiAtLWdpdCBhL3BsdWdpbnMvc3RvcmFnZS5jIGIvcGx1Z2lucy9z
+dG9yYWdlLmMKaW5kZXggNzMzYzQ3OS4uYzRkYmUxNiAxMDA2NDQKLS0tIGEvcGx1Z2lucy9zdG9y
+YWdlLmMKKysrIGIvcGx1Z2lucy9zdG9yYWdlLmMKQEAgLTM5LDQgKzM5LDQgQEAgc3RhdGljIHZv
+aWQgc3RvcmFnZV9leGl0KHZvaWQpCiB7CiB9CiAKLUJMVUVUT09USF9QTFVHSU5fREVGSU5FKCJz
+dG9yYWdlIiwgc3RvcmFnZV9pbml0LCBzdG9yYWdlX2V4aXQpCitCTFVFVE9PVEhfUExVR0lOX0RF
+RklORSgic3RvcmFnZSIsIFZFUlNJT04sIHN0b3JhZ2VfaW5pdCwgc3RvcmFnZV9leGl0KQpkaWZm
+IC0tZ2l0IGEvc2VyaWFsL21haW4uYyBiL3NlcmlhbC9tYWluLmMKaW5kZXggYmIyYTI4Yy4uNWRi
+Mzg5YyAxMDA2NDQKLS0tIGEvc2VyaWFsL21haW4uYworKysgYi9zZXJpYWwvbWFpbi5jCkBAIC01
+NSw0ICs1NSw0IEBAIHN0YXRpYyB2b2lkIHNlcmlhbF9leGl0KHZvaWQpCiAJZGJ1c19jb25uZWN0
+aW9uX3VucmVmKGNvbm5lY3Rpb24pOwogfQogCi1CTFVFVE9PVEhfUExVR0lOX0RFRklORSgic2Vy
+aWFsIiwgc2VyaWFsX2luaXQsIHNlcmlhbF9leGl0KQorQkxVRVRPT1RIX1BMVUdJTl9ERUZJTkUo
+InNlcmlhbCIsIFZFUlNJT04sIHNlcmlhbF9pbml0LCBzZXJpYWxfZXhpdCkKZGlmZiAtLWdpdCBh
+L3NyYy9tYWluLmMgYi9zcmMvbWFpbi5jCmluZGV4IDNjN2Q3MGIuLjUzMDM0NDQgMTAwNjQ0Ci0t
+LSBhL3NyYy9tYWluLmMKKysrIGIvc3JjL21haW4uYwpAQCAtNjk1LDcgKzY5NSw3IEBAIGludCBt
+YWluKGludCBhcmdjLCBjaGFyICphcmd2W10pCiAKIAl1bWFzaygwMDc3KTsKIAotCXN0YXJ0X2xv
+Z2dpbmcoImJsdWV0b290aGQiLCAiQmx1ZXRvb3RoIGRhZW1vbiIpOworCXN0YXJ0X2xvZ2dpbmco
+ImJsdWV0b290aGQiLCAiQmx1ZXRvb3RoIGRhZW1vbiAlcyIsIFZFUlNJT04pOwogCiAJbWVtc2V0
+KCZzYSwgMCwgc2l6ZW9mKHNhKSk7CiAJc2Euc2FfZmxhZ3MgPSBTQV9OT0NMRFNUT1A7CmRpZmYg
+LS1naXQgYS9zcmMvcGx1Z2luLmMgYi9zcmMvcGx1Z2luLmMKaW5kZXggNDU1OWM3Ny4uMDUxYzMz
+YyAxMDA2NDQKLS0tIGEvc3JjL3BsdWdpbi5jCisrKyBiL3NyYy9wbHVnaW4uYwpAQCAtNTMsNiAr
+NTMsMTEgQEAgc3RhdGljIGdib29sZWFuIGFkZF9wbHVnaW4odm9pZCAqaGFuZGxlLCBzdHJ1Y3Qg
+Ymx1ZXRvb3RoX3BsdWdpbl9kZXNjICpkZXNjKQogCWlmIChkZXNjLT5pbml0ID09IE5VTEwpCiAJ
+CXJldHVybiBGQUxTRTsKIAorCWlmIChnX3N0cl9lcXVhbChkZXNjLT52ZXJzaW9uLCBWRVJTSU9O
+KSA9PSBGQUxTRSkgeworCQlEQkcoInZlcnNpb24gbWlzbWF0Y2ggZm9yICVzIiwgZGVzYy0+bmFt
+ZSk7CisJCXJldHVybiBGQUxTRTsKKwl9CisKIAlwbHVnaW4gPSBnX3RyeV9uZXcwKHN0cnVjdCBi
+bHVldG9vdGhfcGx1Z2luLCAxKTsKIAlpZiAocGx1Z2luID09IE5VTEwpCiAJCXJldHVybiBGQUxT
+RTsKZGlmZiAtLWdpdCBhL3NyYy9wbHVnaW4uaCBiL3NyYy9wbHVnaW4uaAppbmRleCAzMWJjY2U4
+Li42MmQ1Zjc1IDEwMDY0NAotLS0gYS9zcmMvcGx1Z2luLmgKKysrIGIvc3JjL3BsdWdpbi5oCkBA
+IC0yMywxMyArMjMsMTQgQEAKIAogc3RydWN0IGJsdWV0b290aF9wbHVnaW5fZGVzYyB7CiAJY29u
+c3QgY2hhciAqbmFtZTsKKwljb25zdCBjaGFyICp2ZXJzaW9uOwogCWludCAoKmluaXQpICh2b2lk
+KTsKIAl2b2lkICgqZXhpdCkgKHZvaWQpOwogfTsKIAotI2RlZmluZSBCTFVFVE9PVEhfUExVR0lO
+X0RFRklORShuYW1lLGluaXQsZXhpdCkgXAorI2RlZmluZSBCTFVFVE9PVEhfUExVR0lOX0RFRklO
+RShuYW1lLHZlcnNpb24saW5pdCxleGl0KSBcCiAJCWV4dGVybiBzdHJ1Y3QgYmx1ZXRvb3RoX3Bs
+dWdpbl9kZXNjIGJsdWV0b290aF9wbHVnaW5fZGVzYyBcCiAJCQkJX19hdHRyaWJ1dGVfXyAoKHZp
+c2liaWxpdHkoImRlZmF1bHQiKSkpOyBcCiAJCXN0cnVjdCBibHVldG9vdGhfcGx1Z2luX2Rlc2Mg
+Ymx1ZXRvb3RoX3BsdWdpbl9kZXNjID0geyBcCi0JCQluYW1lLCBpbml0LCBleGl0IFwKKwkJCW5h
+bWUsIHZlcnNpb24sIGluaXQsIGV4aXQgXAogCQl9OwotLSAKMS41LjYuMwoK
+--0016e649c0a6274ecd0465508d20--
