@@ -1,69 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <463DDAC5-0E5C-4BD4-B167-F7590A01EADC@gmail.com>
-From: Carles Cufi <carles.cufi@gmail.com>
-To: Ilya Rubtsov <lusyaru@gmail.com>
-In-Reply-To: <49C15CC3.3010409@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed; delsp=yes
-Mime-Version: 1.0 (Apple Message framework v930.3)
-Subject: Re: Set Tmin and Tmax for inquiry?
-Date: Thu, 19 Mar 2009 00:26:28 +0100
-References: <49C10E12.3030708@gmail.com> <49C15CC3.3010409@gmail.com>
+Date: Thu, 19 Mar 2009 00:28:38 +0300
+From: Andrew Zabolotny <zap@homelink.ru>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-input <linux-input@vger.kernel.org>, mjg <mjg@redhat.com>,
+	Peter Hutterer <peter.hutterer@redhat.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Wacom Graphire Bluetooth driver (updated with a few
+ fixes)
+Message-ID: <20090319002838.5b0132b4@zap.home.lan>
+In-Reply-To: <1237335112.15346.118.camel@cookie.hadess.net>
+References: <1236988799.32264.6310.camel@cookie.hadess.net>
+	<1237247755.32264.10664.camel@cookie.hadess.net>
+	<1237335112.15346.118.camel@cookie.hadess.net>
+Mime-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/wXkGfS_7xauNadimz8KgS9j";
+ protocol="application/pgp-signature"; micalg=PGP-SHA1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ilya,
+--Sig_/wXkGfS_7xauNadimz8KgS9j
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-The hcitool application uses the HCI library function hci_send_req()  
-to send a periodic inquiry request to the controller. The max and min  
-periods are hardcoded to 16 and 10 respectively, and there is no user  
-option to change those. In the case of your python script I can't tell  
-you for sure because I haven't looked at the code of the python BlueZ  
-bindings, but if the API call it presents to you has no Tmin and Tmax  
-that means it's hardcoded there too. The bluetoothd (formerly called  
-hcid) has absolutely nothing to do with the hcitool since this tool  
-bypasses it completely. For python, you should look at the code for  
-the bindings and find out how the API implementation handles your call.
+=46rom Wed, 18 Mar 2009 00:11:52 +0000
+Bastien Nocera <hadess@hadess.net> wrote:
 
---
-Carles
+> Based on the work by Andrew Zabolotny, an HID driver for the Bluetooth
+> Wacom tablet.
+Great to see my old work was finally useful :) I tried in the past to
+contact the bluetooth stack author to submit my patch, but got no answer
+and gave up.
 
-On Mar 18, 2009, at 9:42 PM, Ilya Rubtsov wrote:
+Also I like the fact that you have dropped my wicked out-of-active-area
+pseudo-buttons support. Such kind of things should be implemented, if
+needed, in the x11 driver (but the driver would need a way to report
+out-of-active area stylus presses).
 
-> Oops. Mistake. Right is: 'max 24 min 16 lap 0x9e8b33 len 8 num  
-> 0' (StartDiscovery) and 'max 16 min 10 lap 0x9e8b33 len 8 num  
-> 0' (hcitool)
->
-> Ilya Rubtsov пишет:
->
->> Hi
->>
->> I'm developing an application for bluecasting. So period of  
->> periodic inquire is important for me.
->> AFAIK, inquire process takes 10.24 seconds (Bluetooth 2.0). But if  
->> I use StartDiscovery method in python script, then I see this in  
->> hcidump:
->>
->> < HCI Command: Periodic Inquiry Mode (0x01|0x0003) plen 9
->>  max 24 min 16 lap 0x9e8b33 len 8 num 0
->>
->> and I get "Inquiry Complete" event every ~24-30 second. But if I  
->> use 'hcitool spinq', then I see:
->>
->> < HCI Command: Periodic Inquiry Mode (0x01|0x0003) plen 9
->>  max 24 min 16 lap 0x9e8b33 len 8 num 0
->>
->> and "Inquiry Complete" event takes place every ~13-15 seconds. And  
->> in both cases all remote devices is being founded, so I don't see  
->> any reason for longer inquiring. AFAIK HCID internally sets Tmin  
->> and Tmax parameters, but is there any way to affect to its  
->> 'decision'?
->>
->> P.S. Excuse me for my English :(
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux- 
-> bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+What's that "mode 2 patch" you're talking about? Should it be applied
+to hidd, and is it available somewhere?
 
+--=20
+Andrew
+
+--Sig_/wXkGfS_7xauNadimz8KgS9j
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Disposition: attachment; filename=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.10 (GNU/Linux)
+
+iEYEARECAAYFAknBZ4YACgkQ6/fZ6v/j5fcFNACfXq44FCNOdIrU5hy4dpLBp8vT
+vQMAniXm9nzAZiacX1B1llYSOwuluVf8
+=e6Ur
+-----END PGP SIGNATURE-----
+
+--Sig_/wXkGfS_7xauNadimz8KgS9j--
