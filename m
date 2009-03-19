@@ -1,45 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <49C2E3E7.30503@gmail.com>
-Date: Fri, 20 Mar 2009 03:31:35 +0300
-From: Ilya Rubtsov <lusyaru@gmail.com>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Exit from software scheduled periodic inquiry on program termination
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <116A4F08-BE16-4AAE-BFFB-5EDAD2C387B6@gmail.com>
+From: Carles Cufi <carles.cufi@gmail.com>
+To: Ilya Rubtsov <lusyaru@gmail.com>
+In-Reply-To: <49C18674.80801@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed; delsp=yes
+Mime-Version: 1.0 (Apple Message framework v930.3)
+Subject: Re: Set Tmin and Tmax for inquiry?
+Date: Thu, 19 Mar 2009 15:07:44 +0100
+References: <49C10E12.3030708@gmail.com> <49C15CC3.3010409@gmail.com> <463DDAC5-0E5C-4BD4-B167-F7590A01EADC@gmail.com> <49C18674.80801@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
+Hi Ilya,
 
-I need fast and frequent inquiry, so I set DiscoverSchedulerInterval=1 
-in /etc/bluetooth/main.conf. Software scheduler works fine. But I have 
-problems when I interrupt my program by Ctrl-C. Scheduler doesn't see 
-that program was terminated and continues to send Inquiry command every 
-11 seconds (in my case), but when I used normal periodic inquiry 
-(hardware scheduled) chip automatically exited inquiry mode on program 
-termination. So now if I rerun my program and try use adapter I catch 
-execution 'Adapter is not ready'.
+The fact of name resolution being optional has always been a subject  
+of debate. Recently the D-Bus APIs also removed the call for discovery  
+without name resolving. If you want pure inquiry (or periodic inquiry)  
+without names, you can always use the C APIs, which will allow you to  
+do whatever you want with the radio.
 
-There is one more problem. If program was terminated and scheduled 
-inquiry continues then the Manager.ListAdapters method returns 
-duplicated list of adapters:
-dbus.Array([dbus.ObjectPath('/org/bluez/7868/hci0'), 
-dbus.ObjectPath('/org/bluez/7868/hci1'), 
-dbus.ObjectPath('/org/bluez/7868/hci0'), 
-dbus.ObjectPath('/org/bluez/7868/hci1')], signature=dbus.Signature('o'))
+--
+Carles
 
-Then I unplug one dongle and get:
-dbus.Array([dbus.ObjectPath('/org/bluez/7868/hci0'), 
-dbus.ObjectPath('/org/bluez/7868/hci0')], signature=dbus.Signature('o'))
+On Mar 19, 2009, at 12:40 AM, Ilya Rubtsov wrote:
 
-Then plug that dongle again and get:
-dbus.Array([dbus.ObjectPath('/org/bluez/7868/hci0'), 
-dbus.ObjectPath('/org/bluez/7868/hci0'), 
-dbus.ObjectPath('/org/bluez/7868/hci1')], signature=dbus.Signature('o'))
+> Thanks for reply. I have talk to Vudentz at #blues and now know that  
+> both sets of Tmin and Tmax are hardcoded. He also said me that I can  
+> use software scheduler, so I do.
+> Also he said that API's interval is longer (min 16, max 24) because  
+> there is name resolution feature.
+> So, I wonder - why this feature is not optional? I think not all  
+> application need name resolution. Another idea (Vudentz's idea) is  
+> to hardcode min 10 to API - if chip is smart it will able to end  
+> work earlier.
+>
+>
+> Carles Cufi пишет:
+>> Hi Ilya,
+>>
+>> The hcitool application uses the HCI library function  
+>> hci_send_req() to send a periodic inquiry request to the  
+>> controller. The max and min periods are hardcoded to 16 and 10  
+>> respectively, and there is no user option to change those. In the  
+>> case of your python script I can't tell you for sure because I  
+>> haven't looked at the code of the python BlueZ bindings, but if the  
+>> API call it presents to you has no Tmin and Tmax that means it's  
+>> hardcoded there too. The bluetoothd (formerly called hcid) has  
+>> absolutely nothing to do with the hcitool since this tool bypasses  
+>> it completely. For python, you should look at the code for the  
+>> bindings and find out how the API implementation handles your call.
+>>
+>> -- 
+>> Carles
+>>
+>> On Mar 18, 2009, at 9:42 PM, Ilya Rubtsov wrote:
+>>
+>>> Oops. Mistake. Right is: 'max 24 min 16 lap 0x9e8b33 len 8 num  
+>>> 0' (StartDiscovery) and 'max 16 min 10 lap 0x9e8b33 len 8 num  
+>>> 0' (hcitool)
+>>>
+>>> Ilya Rubtsov пишет:
+>>>
+>>>> Hi
+>>>>
+>>>> I'm developing an application for bluecasting. So period of  
+>>>> periodic inquire is important for me.
+>>>> AFAIK, inquire process takes 10.24 seconds (Bluetooth 2.0). But  
+>>>> if I use StartDiscovery method in python script, then I see this  
+>>>> in hcidump:
+>>>>
+>>>> < HCI Command: Periodic Inquiry Mode (0x01|0x0003) plen 9
+>>>> max 24 min 16 lap 0x9e8b33 len 8 num 0
+>>>>
+>>>> and I get "Inquiry Complete" event every ~24-30 second. But if I  
+>>>> use 'hcitool spinq', then I see:
+>>>>
+>>>> < HCI Command: Periodic Inquiry Mode (0x01|0x0003) plen 9
+>>>> max 24 min 16 lap 0x9e8b33 len 8 num 0
+>>>>
+>>>> and "Inquiry Complete" event takes place every ~13-15 seconds.  
+>>>> And in both cases all remote devices is being founded, so I don't  
+>>>> see any reason for longer inquiring. AFAIK HCID internally sets  
+>>>> Tmin and Tmax parameters, but is there any way to affect to its  
+>>>> 'decision'?
+>>>>
+>>>> P.S. Excuse me for my English :(
+>>>
+>>> -- 
+>>> To unsubscribe from this list: send the line "unsubscribe linux- 
+>>> bluetooth" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux- 
+> bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-I asked Vudentz at #bluez about it and he gave me patch - 
-http://fpaste.org/paste/6518 . I used it. Now list is not duplicated - 
-one bug fixed. But DefaultAdapter() now causes exception 'No such 
-adapter' - +1 bug :)
-
-Any ideas?
