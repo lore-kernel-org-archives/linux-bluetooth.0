@@ -1,77 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH] Fix another sdp-xml bug
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="=-V2b8f34wuhJGsSybnr9J"
-Date: Tue, 24 Mar 2009 11:55:09 +0000
-Message-Id: <1237895709.14805.722.camel@cookie.hadess.net>
-Mime-Version: 1.0
+To: linux-bluetooth@vger.kernel.org
+From: Zygo Blaxell <zygo.blaxell@xandros.com>
+Date: Mon, 23 Mar 2009 14:39:59 -0400
+Subject: [PATCH] Prevent discovery failure if the adapter is already in periodic inquiry mode
+Message-Id: <E1LlpPd-000847-0b@dactyl.ottawa.xandros.ca>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+If an adapter is put into periodic inquiry mode from outside of
+bluetoothd, bluetoothd will get errors when it tries to enter periodic
+inquiry mode itself.  This error prevents bluetoothd from creating a
+discovery session in the btd_adapter data structure, which in turn
+prevents bluetoothd from clearing the list of devices for which it has
+emitted dbus signals.  This causes discovery sessions initiated over
+dbus to fail to detect many devices (specifically, any devices that
+were previously detected by bluetoothd before the dbus client called
+StartDiscovery, and that are still in range).
 
---=-V2b8f34wuhJGsSybnr9J
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-
-Spotted by Luiz, another invalid memory access when trying to read past
-the end of a string that's not nul-terminated.
-
-strndup to the rescue.
-
-Cheers
-
---=-V2b8f34wuhJGsSybnr9J
-Content-Disposition: attachment; filename="0001-Fix-invalid-memory-access-when-dealing-with-URLs.patch"
-Content-Type: text/x-patch; name="0001-Fix-invalid-memory-access-when-dealing-with-URLs.patch"; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-
->From 48ca11b62344c1af17e16ddec0fad727042a4b03 Mon Sep 17 00:00:00 2001
-From: Bastien Nocera <hadess@hadess.net>
-Date: Tue, 24 Mar 2009 11:46:18 +0000
-Subject: [PATCH] Fix invalid memory access when dealing with URLs
-
-Just like strings attributes, URLs might not be NUL-terminated.
-Make sure we don't read past the end of the allocated memory when
-copying them.
+This patch creates a discovery session object in the btd_adapter structure
+even if the request to initiate periodic inquiry fails.  This in turn
+enables the existing discovery session handling machinery to properly
+manage the list of devices found in the current discovery session.
 ---
- common/sdp-xml.c |    9 ++++++++-
- 1 files changed, 8 insertions(+), 1 deletions(-)
+ src/adapter.c |    8 ++++----
+ 1 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/common/sdp-xml.c b/common/sdp-xml.c
-index 608de76..0460f35 100644
---- a/common/sdp-xml.c
-+++ b/common/sdp-xml.c
-@@ -25,6 +25,7 @@
- #include <config.h>
- #endif
+diff --git a/src/adapter.c b/src/adapter.c
+index 52b58c4..de68958 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1127,7 +1127,7 @@ static DBusMessage *adapter_start_discovery(DBusConnection *conn,
+ 	struct session_req *req;
+ 	struct btd_adapter *adapter = data;
+ 	const char *sender = dbus_message_get_sender(msg);
+-	int err;
++	int err = 0;
  
-+#define _GNU_SOURCE
- #include <stdio.h>
- #include <errno.h>
- #include <ctype.h>
-@@ -323,11 +324,17 @@ static void convert_raw_data_to_xml(sdp_data_t *value, int indent_level,
- 	case SDP_URL_STR8:
- 	case SDP_URL_STR16:
- 	case SDP_URL_STR32:
-+	{
-+		char *strBuf;
+ 	if (!adapter->up)
+ 		return adapter_not_ready(msg);
+@@ -1146,15 +1146,15 @@ static DBusMessage *adapter_start_discovery(DBusConnection *conn,
+ 	else
+ 		err = start_periodic_inquiry(adapter);
+ 
+-	if (err < 0)
+-		return failed_strerror(msg, -err);
+-
+ done:
+ 	req = create_session(adapter, conn, msg, 0,
+ 				session_owner_exit);
+ 
+ 	adapter->disc_sessions = g_slist_append(adapter->disc_sessions, req);
+ 
++	if (err < 0)
++		return failed_strerror(msg, -err);
 +
- 		appender(data, indent);
- 		appender(data, "<url value=\"");
--		appender(data, value->val.str);
-+		strBuf = strndup(value->val.str, value->unitSize);
-+		appender(data, strBuf);
-+		free(strBuf);
- 		appender(data, "\" />\n");
- 		break;
-+	}
+ 	return dbus_message_new_method_return(msg);
+ }
  
- 	case SDP_SEQ8:
- 	case SDP_SEQ16:
 -- 
-1.6.0.6
-
-
---=-V2b8f34wuhJGsSybnr9J--
+1.6.2
 
