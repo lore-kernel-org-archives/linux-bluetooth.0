@@ -1,41 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Wacom Bluetooth mode-2 activation
+Subject: Re: [PATCH] Re: Work-around for broken MS device
 From: Bastien Nocera <hadess@hadess.net>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1237010988.24751.2.camel@localhost.localdomain>
-References: <1237334085.15346.99.camel@cookie.hadess.net>
-	 <1237010988.24751.2.camel@localhost.localdomain>
-Content-Type: text/plain
-Date: Mon, 23 Mar 2009 14:09:10 +0000
-Message-Id: <1237817350.19118.1255.camel@cookie.hadess.net>
+In-Reply-To: <1237011673.24751.10.camel@localhost.localdomain>
+References: <1236278908.3602.1896.camel@cookie.hadess.net>
+	 <1237397279.15346.1157.camel@cookie.hadess.net>
+	 <1237011673.24751.10.camel@localhost.localdomain>
+Content-Type: text/plain; charset="ISO-8859-1"
+Date: Mon, 23 Mar 2009 13:59:02 +0000
+Message-Id: <1237816742.19118.1234.camel@cookie.hadess.net>
 Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, 2009-03-14 at 07:09 +0100, Marcel Holtmann wrote:
+On Sat, 2009-03-14 at 07:21 +0100, Marcel Holtmann wrote:
 > Hi Bastien,
 > 
-> > Patch is necessary to make the Wacom Bluetooth driver I posted to
-> > linux-input work as expected. I've tested this successfully with my
-> > tablet[1].
+>  
+> > > As seen in https://bugzilla.redhat.com/show_bug.cgi?id=450081
+> > > The Microsoft Wireless Notebook Presenter Mouse 8000 has its name in
+> > > ISO-8859-1 instead of UTF-8, as required by the BT spec.
+> > > 
+> > > I've implemented a small work-around. This isn't very invasive, IMO, as
+> > > we already do UTF-8 checks.
+> > > 
+> > > In my tests, this makes the mouse show up as:
+> > > Microsoft® Wireless Notebook Presenter Mouse 8000
+> > 
+> > Attached is patch in the proper format.
 > 
-> this maybe sound like a nit-pick, but please add an extra empty line
-> between the if-statement and the ioctl.
-> 
-> +               write(sk, buf, sizeof(buf));
-> +       }
->         err = ioctl_connadd(req);
-> 
-> The original code had one and so should have the new one with this extra
-> quirk.
+> I see the need for this one, but just a failing UTF-8 check to assume we
+> are using ISO-8859-1 is not good enough. Since the mouse has a DID
+> record, can we tie this together with the VID and PID?
 
-OK.
+In those kind of cases, we can only guess what the encoding would be, we
+can't detect those encodings reliably. Given that we fallback to the old
+behaviour when the device, and that ISO-8859-X corresponds 1-1 with
+UTF-8 for the ASCII characters, I don't think it's such a stretch to
+think that American companies (who'd be using ISO-8859-1) would be the
+worst offenders for this sort of mistake.
 
-> Also can we please check at least the return value of write().
-> 
-> +               write(sk, buf, sizeof(buf));
-> 
-> Check the return value and at minimum have an error message printed.
-
-The writes actually fail, from what I've seen, but it works... I'll try
-to get some details about what fails.
+I don't think special casing only this device would be a good idea. As I
+mentioned, I reproduced the bug by making my computer, running BlueZ,
+adopt that name.
