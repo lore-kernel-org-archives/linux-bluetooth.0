@@ -1,34 +1,22 @@
 Return-Path: <cyrus@holtmann.org>
-From: Nick Pelly <npelly@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Nick Pelly <npelly@google.com>
-Subject: [PATCH] Bluetooth: Fallback from eSCO to SCO on error code 0x1f (unspecified error).
-Date: Tue, 24 Mar 2009 09:20:25 -0700
-Message-Id: <1237911625-20893-1-git-send-email-npelly@google.com>
+Date: Tue, 24 Mar 2009 14:30:24 +0200
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Remove loads of code and use GString
+Message-ID: <20090324123024.GA22166@localhost>
+References: <1237896406.14805.736.camel@cookie.hadess.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1237896406.14805.736.camel@cookie.hadess.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Kyocera ED-8800 headset returns this error code when eSCO is attempted.
+Hi Bastien,
 
-Signed-off-by: Nick Pelly <npelly@google.com>
----
- net/bluetooth/hci_event.c |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
+On Tue, Mar 24, 2009, Bastien Nocera wrote:
+> Much easier than a home-made function.
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 5553424..42cb717 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1646,7 +1646,8 @@ static inline void hci_sync_conn_complete_evt(struct hci_dev *hdev, struct sk_bu
- 		conn->type = SCO_LINK;
- 	}
- 
--	if (conn->out && ev->status == 0x1c && conn->attempt < 2) {
-+	if (conn->out && (ev->status == 0x1c || ev->status == 0x1f) &&
-+			conn->attempt < 2) {
- 		conn->pkt_type = (hdev->esco_type & SCO_ESCO_MASK) |
- 					(hdev->esco_type & EDR_ESCO_MASK);
- 		hci_setup_sync(conn, conn->link->handle);
--- 
-1.5.5
+Thanks. This one has also been pushed upstream.
 
+Johan
