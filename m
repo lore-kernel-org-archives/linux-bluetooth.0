@@ -1,23 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 24 Mar 2009 14:23:54 +0200
+Date: Tue, 24 Mar 2009 14:12:42 +0200
 From: Johan Hedberg <johan.hedberg@nokia.com>
 To: Bastien Nocera <hadess@hadess.net>
 Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Subject: Re: [PATCH] Fix another sdp-xml bug
-Message-ID: <20090324122354.GA20929@localhost>
-References: <1237895709.14805.722.camel@cookie.hadess.net> <1237896204.14805.731.camel@cookie.hadess.net>
+Message-ID: <20090324121242.GA20589@localhost>
+References: <1237895709.14805.722.camel@cookie.hadess.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1237896204.14805.731.camel@cookie.hadess.net>
+In-Reply-To: <1237895709.14805.722.camel@cookie.hadess.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Bastien,
 
 On Tue, Mar 24, 2009, Bastien Nocera wrote:
-> Never mind, previous patch was off by one. Corrected patch attached.
+> Spotted by Luiz, another invalid memory access when trying to read past
+> the end of a string that's not nul-terminated.
+> 
+> strndup to the rescue.
 
-I already pushed the first one and fixed this issue myself in a second
-commit.
+Thanks! Pushed upstream.
 
 Johan
