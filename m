@@ -1,117 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH] Remove loads of code and use GString
+Subject: Re: [PATCH] Fix another sdp-xml bug
 From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="=-LQoxLfTCMAh9UH22RLCz"
-Date: Tue, 24 Mar 2009 12:06:46 +0000
-Message-Id: <1237896406.14805.736.camel@cookie.hadess.net>
+In-Reply-To: <1237895709.14805.722.camel@cookie.hadess.net>
+References: <1237895709.14805.722.camel@cookie.hadess.net>
+Content-Type: multipart/mixed; boundary="=-hj1rjUeJTnsEIIXM7bJr"
+Date: Tue, 24 Mar 2009 12:03:24 +0000
+Message-Id: <1237896204.14805.731.camel@cookie.hadess.net>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
---=-LQoxLfTCMAh9UH22RLCz
+--=-hj1rjUeJTnsEIIXM7bJr
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
-Much easier than a home-made function.
+On Tue, 2009-03-24 at 11:55 +0000, Bastien Nocera wrote:
+> Spotted by Luiz, another invalid memory access when trying to read past
+> the end of a string that's not nul-terminated.
+> 
+> strndup to the rescue.
 
-Cheers
+Never mind, previous patch was off by one. Corrected patch attached.
 
---=-LQoxLfTCMAh9UH22RLCz
-Content-Disposition: attachment; filename="0001-Remove-append_and_grow-code-and-just-use-GString.patch"
-Content-Type: text/x-patch; name="0001-Remove-append_and_grow-code-and-just-use-GString.patch"; charset="ISO-8859-1"
+--=-hj1rjUeJTnsEIIXM7bJr
+Content-Disposition: attachment; filename="0001-Fix-invalid-memory-access-when-dealing-with-URLs.patch"
+Content-Type: text/x-patch; name="0001-Fix-invalid-memory-access-when-dealing-with-URLs.patch"; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
 
->From 04c74b471bb2d6505206b31d87931c8a2c79373a Mon Sep 17 00:00:00 2001
+>From 0606404a81cc73e7a1ee90da9641a6a87c8f6f43 Mon Sep 17 00:00:00 2001
 From: Bastien Nocera <hadess@hadess.net>
-Date: Tue, 24 Mar 2009 12:04:32 +0000
-Subject: [PATCH] Remove "append_and_grow" code and just use GString
+Date: Tue, 24 Mar 2009 11:46:18 +0000
+Subject: [PATCH] Fix invalid memory access when dealing with URLs
 
-Less code for us to maintain.
+Just like strings attributes, URLs might not be NUL-terminated.
+Make sure we don't read past the end of the allocated memory when
+copying them.
 ---
- src/device.c |   52 ++++++++--------------------------------------------
- 1 files changed, 8 insertions(+), 44 deletions(-)
+ common/sdp-xml.c |    9 ++++++++-
+ 1 files changed, 8 insertions(+), 1 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index 48ac512..3734c29 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -987,41 +987,6 @@ static void iter_append_record(DBusMessageIter *dict, uint32_t handle,
- 	dbus_message_iter_close_container(dict, &entry);
- }
+diff --git a/common/sdp-xml.c b/common/sdp-xml.c
+index 608de76..18473d0 100644
+--- a/common/sdp-xml.c
++++ b/common/sdp-xml.c
+@@ -25,6 +25,7 @@
+ #include <config.h>
+ #endif
  
--static void append_and_grow_string(void *data, const char *str)
--{
--	sdp_buf_t *buff = data;
--	int len;
--
--	len = strlen(str);
--
--	if (!buff->data) {
--		buff->data = malloc(DEFAULT_XML_BUF_SIZE);
--		if (!buff->data)
--			return;
--		buff->buf_size = DEFAULT_XML_BUF_SIZE;
--	}
--
--	/* Grow string */
--	while (buff->buf_size < (buff->data_size + len + 1)) {
--		void *tmp;
--		uint32_t new_size;
--
--		/* Grow buffer by a factor of 2 */
--		new_size = (buff->buf_size << 1);
--
--		tmp = realloc(buff->data, new_size);
--		if (!tmp)
--			return;
--
--		buff->data = tmp;
--		buff->buf_size = new_size;
--	}
--
--	/* Include the NULL character */
--	memcpy(buff->data + buff->data_size, str, len + 1);
--	buff->data_size += len;
--}
--
- static void discover_services_reply(struct browse_req *req, int err,
- 							sdp_list_t *recs)
- {
-@@ -1056,21 +1021,20 @@ static void discover_services_reply(struct browse_req *req, int err,
- 
- 	for (seq = recs; seq; seq = seq->next) {
- 		sdp_record_t *rec = (sdp_record_t *) seq->data;
--		sdp_buf_t result;
-+		GString *result;
- 
- 		if (!rec)
- 			break;
- 
--		memset(&result, 0, sizeof(sdp_buf_t));
-+		result = g_string_new(NULL);
- 
--		convert_sdp_record_to_xml(rec, &result,
--				append_and_grow_string);
-+		convert_sdp_record_to_xml(rec, result,
-+				(void *) g_string_append);
- 
--		if (result.data) {
--			const char *val = (char *) result.data;
--			iter_append_record(&dict, rec->handle, val);
--			free(result.data);
--		}
-+		if (result->len)
-+			iter_append_record(&dict, rec->handle, result->str);
++#define _GNU_SOURCE
+ #include <stdio.h>
+ #include <errno.h>
+ #include <ctype.h>
+@@ -323,11 +324,17 @@ static void convert_raw_data_to_xml(sdp_data_t *value, int indent_level,
+ 	case SDP_URL_STR8:
+ 	case SDP_URL_STR16:
+ 	case SDP_URL_STR32:
++	{
++		char *strBuf;
 +
-+		g_string_free(result, TRUE);
- 	}
+ 		appender(data, indent);
+ 		appender(data, "<url value=\"");
+-		appender(data, value->val.str);
++		strBuf = strndup(value->val.str, value->unitSize - 1);
++		appender(data, strBuf);
++		free(strBuf);
+ 		appender(data, "\" />\n");
+ 		break;
++	}
  
- 	dbus_message_iter_close_container(&iter, &dict);
+ 	case SDP_SEQ8:
+ 	case SDP_SEQ16:
 -- 
 1.6.0.6
 
 
---=-LQoxLfTCMAh9UH22RLCz--
+--=-hj1rjUeJTnsEIIXM7bJr--
 
