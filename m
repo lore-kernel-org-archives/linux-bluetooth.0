@@ -1,35 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Fix another sdp-xml bug
+Subject: [PATCH] Fix another sdp-xml bug
 From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1237895709.14805.722.camel@cookie.hadess.net>
-References: <1237895709.14805.722.camel@cookie.hadess.net>
-Content-Type: multipart/mixed; boundary="=-hj1rjUeJTnsEIIXM7bJr"
-Date: Tue, 24 Mar 2009 12:03:24 +0000
-Message-Id: <1237896204.14805.731.camel@cookie.hadess.net>
+Content-Type: multipart/mixed; boundary="=-V2b8f34wuhJGsSybnr9J"
+Date: Tue, 24 Mar 2009 11:55:09 +0000
+Message-Id: <1237895709.14805.722.camel@cookie.hadess.net>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
---=-hj1rjUeJTnsEIIXM7bJr
+--=-V2b8f34wuhJGsSybnr9J
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
-On Tue, 2009-03-24 at 11:55 +0000, Bastien Nocera wrote:
-> Spotted by Luiz, another invalid memory access when trying to read past
-> the end of a string that's not nul-terminated.
-> 
-> strndup to the rescue.
+Spotted by Luiz, another invalid memory access when trying to read past
+the end of a string that's not nul-terminated.
 
-Never mind, previous patch was off by one. Corrected patch attached.
+strndup to the rescue.
 
---=-hj1rjUeJTnsEIIXM7bJr
+Cheers
+
+--=-V2b8f34wuhJGsSybnr9J
 Content-Disposition: attachment; filename="0001-Fix-invalid-memory-access-when-dealing-with-URLs.patch"
 Content-Type: text/x-patch; name="0001-Fix-invalid-memory-access-when-dealing-with-URLs.patch"; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
 
->From 0606404a81cc73e7a1ee90da9641a6a87c8f6f43 Mon Sep 17 00:00:00 2001
+>From 48ca11b62344c1af17e16ddec0fad727042a4b03 Mon Sep 17 00:00:00 2001
 From: Bastien Nocera <hadess@hadess.net>
 Date: Tue, 24 Mar 2009 11:46:18 +0000
 Subject: [PATCH] Fix invalid memory access when dealing with URLs
@@ -42,7 +39,7 @@ copying them.
  1 files changed, 8 insertions(+), 1 deletions(-)
 
 diff --git a/common/sdp-xml.c b/common/sdp-xml.c
-index 608de76..18473d0 100644
+index 608de76..0460f35 100644
 --- a/common/sdp-xml.c
 +++ b/common/sdp-xml.c
 @@ -25,6 +25,7 @@
@@ -63,7 +60,7 @@ index 608de76..18473d0 100644
  		appender(data, indent);
  		appender(data, "<url value=\"");
 -		appender(data, value->val.str);
-+		strBuf = strndup(value->val.str, value->unitSize - 1);
++		strBuf = strndup(value->val.str, value->unitSize);
 +		appender(data, strBuf);
 +		free(strBuf);
  		appender(data, "\" />\n");
@@ -76,5 +73,5 @@ index 608de76..18473d0 100644
 1.6.0.6
 
 
---=-hj1rjUeJTnsEIIXM7bJr--
+--=-V2b8f34wuhJGsSybnr9J--
 
