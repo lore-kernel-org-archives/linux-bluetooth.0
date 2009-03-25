@@ -1,65 +1,415 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gene Heskett <gene.heskett@verizon.net>
-To: linux-bluetooth@vger.kernel.org
-Subject: Newbie, can't find device
-Date: Wed, 25 Mar 2009 20:37:02 -0400
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
-Message-id: <200903252037.03024.gene.heskett@verizon.net>
+MIME-Version: 1.0
+Date: Wed, 25 Mar 2009 15:57:55 +0800
+Message-ID: <ac8af0be0903250057u6a909abajb899ff36d2a40ad0@mail.gmail.com>
+Subject: [PATCH 4/4] IPC integration part for HFP Audio gateway -- take 4
+From: Zhao Forrest <forrest.zhao@gmail.com>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Greetings;
+diff --git a/audio/gateway.c b/audio/gateway.c
+index 94ce1b7..92aaca4 100644
+--- a/audio/gateway.c
++++ b/audio/gateway.c
+@@ -1126,3 +1126,80 @@ int gateway_close(struct audio_device *device)
+ 				"Connected", DBUS_TYPE_BOOLEAN, &value);
+ 	return 0;
+ }
++
++/* These are functions to be called from unix.c for audio system
++ * ifaces (alsa, gstreamer, etc.) */
++gboolean gateway_request_stream(struct audio_device *dev,
++				gateway_stream_cb_t cb, void *user_data)
++{
++	struct gateway *gw = dev->gateway;
++	GError *err = NULL;
++	GIOChannel *io;
++
++	if (!gw->sco) {
++		if (!gw->rfcomm)
++			return FALSE;
++		gw->sco_start_cb = cb;
++		gw->sco_start_cb_data = user_data;
++		io = bt_io_connect(BT_IO_SCO, sco_connect_cb, dev, NULL, &err,
++				BT_IO_OPT_SOURCE_BDADDR, &dev->src,
++				BT_IO_OPT_DEST_BDADDR, &dev->dst,
++				BT_IO_OPT_INVALID);
++		if (!io) {
++			error("%s", err->message);
++			g_error_free(err);
++			return FALSE;
++		}
++	} else {
++		if (cb)
++			cb(dev, user_data);
++	}
++	return TRUE;
++}
++
++int gateway_config_stream(struct audio_device *dev, gateway_stream_cb_t sco_cb,
++				void *user_data)
++{
++	struct gateway *gw = dev->gateway;
++
++	if (!gw->rfcomm) {
++		gw->sco_start_cb = sco_cb;
++		gw->sco_start_cb_data = user_data;
++		return get_records(dev);
++	}
++
++	if (sco_cb)
++		sco_cb(dev, user_data);
++
++	return 0;
++}
++
++gboolean gateway_cancel_stream(struct audio_device *dev, unsigned int id)
++{
++	gateway_close(dev);
++	return TRUE;
++}
++
++int gateway_get_sco_fd(struct audio_device *dev)
++{
++	GIOChannel *sco_chan = dev->gateway->sco;
++
++	if (!sco_chan)
++		return -1;
++
++	return g_io_channel_unix_get_fd(sco_chan);
++}
++
++void gateway_suspend_stream(struct audio_device *dev)
++{
++	struct gateway *gw = dev->gateway;
++
++	if (gw->sco) {
++		g_io_channel_close(gw->sco);
++		g_io_channel_unref(gw->sco);
++		gw->sco = NULL;
++		gw->sco_start_cb = NULL;
++		gw->sco_start_cb_data = NULL;
++	}
++}
++
+diff --git a/audio/gateway.h b/audio/gateway.h
+index 78eef87..7acad46 100644
+--- a/audio/gateway.h
++++ b/audio/gateway.h
+@@ -32,3 +32,10 @@ struct gateway *gateway_init(struct audio_device *device);
+ gboolean gateway_is_connected(struct audio_device *dev);
+ int gateway_connect_rfcomm(struct audio_device *dev, GIOChannel *chan);
+ void gateway_start_service(struct audio_device *device);
++gboolean gateway_request_stream(struct audio_device *dev,
++			gateway_stream_cb_t cb, void *user_data);
++int gateway_config_stream(struct audio_device *dev, gateway_stream_cb_t cb,
++			void *user_data);
++gboolean gateway_cancel_stream(struct audio_device *dev, unsigned int id);
++int gateway_get_sco_fd(struct audio_device *dev);
++void gateway_suspend_stream(struct audio_device *dev);
+diff --git a/audio/ipc.h b/audio/ipc.h
+index ff35376..9dd5455 100644
+--- a/audio/ipc.h
++++ b/audio/ipc.h
+@@ -108,7 +108,13 @@ typedef struct {
+ #define BT_CAPABILITIES_ACCESS_MODE_WRITE	2
+ #define BT_CAPABILITIES_ACCESS_MODE_READWRITE	3
 
-gnubie to bluetooth that is.  I bought some dongles to replace a cable that is 
-just long enough to present EMP surge problems between this box and a 
-bluetooth kit installed to replace the connector in an RS-232 pack for a 
-legacy computer, an old TRS-80 Color Computer 3 that has all the goodies in it 
-that 20 some years of development can give.
++#define BT_CAPABILITIES_ROLE_SLAVE 0
++#define BT_CAPABILITIES_ROLE_MASTER 1
++
+ #define BT_FLAG_AUTOCONNECT	1
++/* choose between gateway/source (set bit) and
++ * headset/sink (clear bit aka default) */
++#define BT_FLAG_MASTER 0x2
 
-I get this from demsg:
-[    8.884948] Bluetooth: Core ver 2.14
-[    8.885051] Bluetooth: HCI device and connection manager initialized
-[    8.885054] Bluetooth: HCI socket layer initialized
-[    9.112240] Bluetooth: Generic Bluetooth USB driver ver 0.4
-[   21.015636] Bluetooth: L2CAP ver 2.11
-[   21.015639] Bluetooth: L2CAP socket layer initialized
-[   21.165128] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-[   21.165131] Bluetooth: BNEP filters: protocol multicast
-[   21.245887] Bluetooth: SCO (Voice Link) ver 0.6
-[   21.245890] Bluetooth: SCO socket layer initialized
-[   22.084606] Bluetooth: RFCOMM socket layer initialized
-[   22.084616] Bluetooth: RFCOMM TTY layer initialized
-[   22.084618] Bluetooth: RFCOMM ver 1.10
+ struct bt_get_capabilities_req {
+ 	bt_audio_msg_header_t	h;
+@@ -164,8 +170,8 @@ struct bt_get_capabilities_req {
+ #define BT_PCM_FLAG_PCM_ROUTING			0x02
 
-But no new devices are being created by udev.
+ typedef struct {
+-	uint8_t transport;
+-	uint8_t type;
++	uint8_t transport; /* sco | a2dp */
++	uint8_t type; /* sbc | mpeg12 | mpeg24 | atrac */
+ 	uint8_t length;
+ 	uint8_t data[0];
+ } __attribute__ ((packed)) codec_capabilities_t;
+@@ -206,6 +212,7 @@ struct bt_set_configuration_req {
+ 	bt_audio_msg_header_t	h;
+ 	char			device[18];	/* Address of the remote Device */
+ 	uint8_t			access_mode;	/* Requested access mode */
++	uint8_t			flags;		/* Requested flags */
+ 	codec_capabilities_t	codec;		/* Requested codec */
+ } __attribute__ ((packed));
 
-hciconfig -a:
-hci0:   Type: USB
-        BD Address: 11:11:11:11:11:11 ACL MTU: 672:3 SCO MTU: 48:1
-        UP RUNNING PSCAN ISCAN
-        RX bytes:1104 acl:0 sco:0 events:45 errors:0
-        TX bytes:445 acl:0 sco:0 commands:45 errors:0
-        Features: 0xff 0x3e 0x85 0x38 0x18 0x18 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'coyote.coyote.den-0'
-        Class: 0x4a2100
-        Service Classes: Networking, Capturing, Telephony
-        Device Class: Computer, Uncategorized
-        HCI Ver: 2.0 (0x3) HCI Rev: 0x1f4 LMP Ver: 2.0 (0x3) LMP Subver: 0x1f4
-        Manufacturer: CONWISE Technology Corporation Ltd (66)
+diff --git a/audio/pcm_bluetooth.c b/audio/pcm_bluetooth.c
+index 9c4f9c4..41a2e57 100644
+--- a/audio/pcm_bluetooth.c
++++ b/audio/pcm_bluetooth.c
+@@ -109,8 +109,10 @@ struct bluetooth_a2dp {
+ struct bluetooth_alsa_config {
+ 	char device[18];		/* Address of the remote Device */
+ 	int has_device;
+-	uint8_t transport;		/* Requested transport */
++	uint8_t transport;		/* SCO or A2DP */
+ 	int has_transport;
++	uint8_t role;		        /* Master (gateway|a2dp source) or Slave
+(headset|a2dp sink) */
++	int has_role;
+ 	uint16_t rate;
+ 	int has_rate;
+ 	uint8_t channel_mode;		/* A2DP only */
+@@ -429,6 +431,7 @@ static int bluetooth_hsp_hw_params(snd_pcm_ioplug_t *io,
+ 					snd_pcm_hw_params_t *params)
+ {
+ 	struct bluetooth_data *data = io->private_data;
++	struct bluetooth_alsa_config *alsa_conf = &data->alsa_config;
+ 	char buf[BT_SUGGESTED_BUFFER_SIZE];
+ 	struct bt_set_configuration_req *req = (void *) buf;
+ 	struct bt_set_configuration_rsp *rsp = (void *) buf;
+@@ -448,6 +451,9 @@ static int bluetooth_hsp_hw_params(snd_pcm_ioplug_t *io,
+ 	req->access_mode = (io->stream == SND_PCM_STREAM_PLAYBACK ?
+ 			BT_CAPABILITIES_ACCESS_MODE_WRITE :
+ 			BT_CAPABILITIES_ACCESS_MODE_READ);
++	if (alsa_conf->has_role &&
++		alsa_conf->role == BT_CAPABILITIES_ROLE_MASTER)
++		req->flags |= BT_FLAG_MASTER;
 
-Where do I go from here.  What I need to do is run a session of minicom to it 
-but minicom cannot find the device either.
+ 	req->h.length += req->codec.length - sizeof(req->codec);
+ 	err = audioservice_send(data->server.fd, &req->h);
+@@ -1399,6 +1405,21 @@ static int bluetooth_parse_config(snd_config_t *conf,
+ 			}
+ 			continue;
+ 		}
++		if (strcmp(id, "role") == 0){
++			if (snd_config_get_string(n, &value) < 0) {
++				SNDERR("Invalid type for %s", id);
++				return -EINVAL;
++			}
++
++			if (strcmp(value, "master") == 0) {
++				bt_config->role = BT_CAPABILITIES_ROLE_MASTER;
++				bt_config->has_role = 1;
++			} else {
++				bt_config->role = BT_CAPABILITIES_ROLE_SLAVE;
++				bt_config->has_role = 1;
++			}
++			continue;
++		}
 
--- 
-Cheers, Gene
-"There are four boxes to be used in defense of liberty:
- soap, ballot, jury, and ammo. Please use in that order."
--Ed Howdershelt (Author)
-If a group of _N persons implements a COBOL compiler, there will be _N-1
-passes.  Someone in the group has to be the manager.
-		-- T. Cheatham
+ 		if (strcmp(id, "rate") == 0) {
+ 			if (snd_config_get_string(n, &value) < 0) {
+@@ -1652,6 +1673,9 @@ static int bluetooth_init(struct bluetooth_data
+*data, snd_pcm_stream_t stream,
 
+ 	if (alsa_conf->autoconnect)
+ 		req->flags |= BT_FLAG_AUTOCONNECT;
++	if (alsa_conf->has_role && alsa_conf->role == BT_CAPABILITIES_ROLE_MASTER) {
++		req->flags |= BT_FLAG_MASTER;
++	}
+ 	strncpy(req->device, alsa_conf->device, 18);
+ 	if (alsa_conf->has_transport)
+ 		req->transport = alsa_conf->transport;
+diff --git a/audio/unix.c b/audio/unix.c
+index 1487395..74804ef 100644
+--- a/audio/unix.c
++++ b/audio/unix.c
+@@ -47,12 +47,14 @@
+ #include "a2dp.h"
+ #include "headset.h"
+ #include "sink.h"
++#include "gateway.h"
+ #include "unix.h"
+ #include "glib-helper.h"
+
+ typedef enum {
+ 	TYPE_NONE,
+ 	TYPE_HEADSET,
++	TYPE_GATEWAY,
+ 	TYPE_SINK,
+ 	TYPE_SOURCE
+ } service_type_t;
+@@ -198,6 +200,8 @@ static service_type_t select_service(struct
+audio_device *dev, const char *inter
+ 		return TYPE_SINK;
+ 	else if (!strcmp(interface, AUDIO_HEADSET_INTERFACE) && dev->headset)
+ 		return TYPE_HEADSET;
++	else if (!strcmp(interface, AUDIO_GATEWAY_INTERFACE) && dev->gateway)
++		return TYPE_GATEWAY;
+
+ 	return TYPE_NONE;
+ }
+@@ -252,7 +256,7 @@ static void headset_discovery_complete(struct
+audio_device *dev, void *user_data
+
+ 	pcm = (void *) codec;
+ 	pcm->sampling_rate = 8000;
+-	if (headset_get_nrec(dev))
++	if (dev->headset && headset_get_nrec(dev))
+ 		pcm->flags |= BT_PCM_FLAG_NREC;
+ 	if (!headset_get_sco_hci(dev))
+ 		pcm->flags |= BT_PCM_FLAG_PCM_ROUTING;
+@@ -302,6 +306,34 @@ failed:
+ 	unix_ipc_error(client, BT_SET_CONFIGURATION, EIO);
+ }
+
++static void gateway_setup_complete(struct audio_device *dev, void *user_data)
++{
++	struct unix_client *client = user_data;
++	char buf[BT_SUGGESTED_BUFFER_SIZE];
++	struct bt_set_configuration_rsp *rsp = (void *) buf;
++
++	if (!dev) {
++		unix_ipc_error(client, BT_SET_CONFIGURATION, EIO);
++		return;
++	}
++
++	client->req_id = 0;
++
++	memset(buf, 0, sizeof(buf));
++
++	rsp->h.type = BT_RESPONSE;
++	rsp->h.name = BT_SET_CONFIGURATION;
++	rsp->h.length = sizeof(*rsp);
++
++	rsp->transport = BT_CAPABILITIES_TRANSPORT_SCO;
++	rsp->access_mode = client->access_mode;
++	rsp->link_mtu = 48;
++
++	client->data_fd = gateway_get_sco_fd(dev);
++
++	unix_ipc_sendmsg(client, &rsp->h);
++}
++
+ static void headset_resume_complete(struct audio_device *dev, void *user_data)
+ {
+ 	struct unix_client *client = user_data;
+@@ -358,6 +390,35 @@ failed:
+ 	unix_ipc_error(client, BT_START_STREAM, EIO);
+ }
+
++static void gateway_resume_complete(struct audio_device *dev, void *user_data)
++{
++	struct unix_client *client = user_data;
++	char buf[BT_SUGGESTED_BUFFER_SIZE];
++	struct bt_start_stream_rsp *rsp = (void *) buf;
++	struct bt_new_stream_ind *ind = (void *) buf;
++
++	memset(buf, 0, sizeof(buf));
++	rsp->h.type = BT_RESPONSE;
++	rsp->h.name = BT_START_STREAM;
++	rsp->h.length = sizeof(*rsp);
++
++	unix_ipc_sendmsg(client, &rsp->h);
++
++	memset(buf, 0, sizeof(buf));
++	ind->h.type = BT_INDICATION;
++	ind->h.name = BT_NEW_STREAM;
++	ind->h.length = sizeof(*ind);
++
++	unix_ipc_sendmsg(client, &ind->h);
++
++	client->data_fd = gateway_get_sco_fd(dev);
++	if (unix_sendmsg_fd(client->sock, client->data_fd) < 0) {
++		error("unix_sendmsg_fd: %s(%d)", strerror(errno), errno);
++		unix_ipc_error(client, BT_START_STREAM, EIO);
++	}
++	client->req_id = 0;
++}
++
+ static void headset_suspend_complete(struct audio_device *dev, void *user_data)
+ {
+ 	struct unix_client *client = user_data;
+@@ -684,6 +745,7 @@ static void start_discovery(struct audio_device
+*dev, struct unix_client *client
+ 		break;
+
+ 	case TYPE_HEADSET:
++	case TYPE_GATEWAY:
+ 		headset_discovery_complete(dev, client);
+ 		break;
+
+@@ -745,6 +807,13 @@ static void start_config(struct audio_device
+*dev, struct unix_client *client)
+ 					hs->lock, client);
+ 		client->cancel = headset_cancel_stream;
+ 		break;
++	case TYPE_GATEWAY:
++		if (gateway_config_stream(dev, gateway_setup_complete, client) >= 0) {
++			client->cancel = gateway_cancel_stream;
++			id = 1;
++		} else
++			id = 0;
++		break;
+
+ 	default:
+ 		error("No known services for device");
+@@ -802,6 +871,14 @@ static void start_resume(struct audio_device
+*dev, struct unix_client *client)
+ 		client->cancel = headset_cancel_stream;
+ 		break;
+
++	case TYPE_GATEWAY:
++		if (gateway_request_stream(dev, gateway_resume_complete, client))
++			id = 1;
++		else
++			id = 0;
++		client->cancel = gateway_cancel_stream;
++		break;
++
+ 	default:
+ 		error("No known services for device");
+ 		goto failed;
+@@ -857,6 +934,13 @@ static void start_suspend(struct audio_device
+*dev, struct unix_client *client)
+ 		client->cancel = headset_cancel_stream;
+ 		break;
+
++	case TYPE_GATEWAY:
++		gateway_suspend_stream(dev);
++		client->cancel = gateway_cancel_stream;
++		headset_suspend_complete(dev, client);
++		id = 1;
++		break;
++
+ 	default:
+ 		error("No known services for device");
+ 		goto failed;
+@@ -886,9 +970,12 @@ static void handle_getcapabilities_req(struct
+unix_client *client,
+ 		goto failed;
+ 	}
+
+-	if (req->transport == BT_CAPABILITIES_TRANSPORT_SCO)
+-		client->interface = g_strdup(AUDIO_HEADSET_INTERFACE);
+-	else if (req->transport == BT_CAPABILITIES_TRANSPORT_A2DP)
++	if (req->transport == BT_CAPABILITIES_TRANSPORT_SCO) {
++		if (req->flags & BT_FLAG_MASTER)
++			client->interface = g_strdup(AUDIO_GATEWAY_INTERFACE);
++		else
++			client->interface = g_strdup(AUDIO_HEADSET_INTERFACE);
++	} else if (req->transport == BT_CAPABILITIES_TRANSPORT_A2DP)
+ 		client->interface = g_strdup(AUDIO_SINK_INTERFACE);
+
+ 	if (!manager_find_device(&bdaddr, NULL, FALSE))
+@@ -920,9 +1007,13 @@ failed:
+ static int handle_sco_transport(struct unix_client *client,
+ 				struct bt_set_configuration_req *req)
+ {
+-	if (!client->interface)
+-		client->interface = g_strdup(AUDIO_HEADSET_INTERFACE);
+-	else if (!g_str_equal(client->interface, AUDIO_HEADSET_INTERFACE))
++	if (!client->interface) {
++		if (req->flags & BT_FLAG_MASTER)
++			client->interface = g_strdup(AUDIO_GATEWAY_INTERFACE);
++		else
++			client->interface = g_strdup(AUDIO_HEADSET_INTERFACE);
++	} else if (!g_str_equal(client->interface, AUDIO_HEADSET_INTERFACE) &&
++			!g_str_equal(client->interface, AUDIO_GATEWAY_INTERFACE))
+ 		return -EIO;
+
+ 	debug("config sco - device = %s access_mode = %u", req->device,
