@@ -1,47 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1AC1DAF1C9BC4D43B8C325EB2FE302DC@freqonedev>
-From: "David Stockwell" <dstockwell@frequency-one.com>
-To: "Gene Heskett" <gene.heskett@verizon.net>,
-	<linux-bluetooth@vger.kernel.org>
-References: <200903252037.03024.gene.heskett@verizon.net>
+Date: Thu, 26 Mar 2009 06:59:36 -0400
+From: jayjwa <jayjwa@atr2.ath.cx>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
 Subject: Re: Newbie, can't find device
-Date: Thu, 26 Mar 2009 06:36:07 -0500
+In-Reply-To: <200903252037.03024.gene.heskett@verizon.net>
+Message-ID: <alpine.LNX.2.00.0903260643010.22668@nge2.ngu.pk>
+References: <200903252037.03024.gene.heskett@verizon.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
-	format=flowed	reply-type=original
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello...
 
------ Original Message ----- 
-From: "Gene Heskett" <gene.heskett@verizon.net>
-To: <linux-bluetooth@vger.kernel.org>
-Sent: Wednesday, March 25, 2009 7:37 PM
-Subject: Newbie, can't find device
+On Wed, 25 Mar 2009, Gene Heskett wrote:
 
-
-> Greetings;
+> gnubie to bluetooth that is.  I bought some dongles to replace a cable that is
+> just long enough to present EMP surge problems between this box and a
+> bluetooth kit installed to replace the connector in an RS-232 pack for a
+> legacy computer, an old TRS-80 Color Computer 3 that has all the goodies in it
+> that 20 some years of development can give.
 >
-
-Core v2.14?  Very, very old.  I think we are on version 4.33, which has 
-been completely re-architected on a DBus foundation. With DBus, the 
-"devices" are created as object paths that handle defined messages via 
-DBus.
-
-What sort of box are you running on?  Which kernel version?  Which 
-distro?  I get a little concerned (and somewhat nostalgic/nauseous) when 
-I see a "Trash-80" cited (I think you are wanting to use Bluetooth to 
-talk to it).
-
-Just my two cents and worth about that much.
-
-DS
-
 > I get this from demsg:
 > [    8.884948] Bluetooth: Core ver 2.14
-> [    8.885051] Bluetooth: HCI device and connection manager 
-> initialized
+> [    8.885051] Bluetooth: HCI device and connection manager initialized
 > [    8.885054] Bluetooth: HCI socket layer initialized
 > [    9.112240] Bluetooth: Generic Bluetooth USB driver ver 0.4
 > [   21.015636] Bluetooth: L2CAP ver 2.11
@@ -70,27 +51,67 @@ DS
 >        Class: 0x4a2100
 >        Service Classes: Networking, Capturing, Telephony
 >        Device Class: Computer, Uncategorized
->        HCI Ver: 2.0 (0x3) HCI Rev: 0x1f4 LMP Ver: 2.0 (0x3) LMP 
-> Subver: 0x1f4
+>        HCI Ver: 2.0 (0x3) HCI Rev: 0x1f4 LMP Ver: 2.0 (0x3) LMP Subver: 0x1f4
 >        Manufacturer: CONWISE Technology Corporation Ltd (66)
 >
-> Where do I go from here.  What I need to do is run a session of 
-> minicom to it
+> Where do I go from here.  What I need to do is run a session of minicom to it
 > but minicom cannot find the device either.
->
-> -- 
-> Cheers, Gene
-> "There are four boxes to be used in defense of liberty:
-> soap, ballot, jury, and ammo. Please use in that order."
-> -Ed Howdershelt (Author)
-> If a group of _N persons implements a COBOL compiler, there will be 
-> _N-1
-> passes.  Someone in the group has to be the manager.
-> -- T. Cheatham
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe 
-> linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html 
+
+
+I don't use udev, but maybe you can adapt this to your setup. I think you need 
+an rfcomm device. udev may create the devices when they are actually opened. 
+They list in /proc/devices on my system, major number 216, minors 0 and 1.
+
+crw-rw-rw- 1 root root 216, 0 2009-02-22 23:01 /dev/rfcomm0
+crw-rw-rw- 1 root root 216, 1 2007-12-16 07:29 /dev/rfcomm1
+
+
+Using bluez-3.36 -
+
+Scan for your device -
+
+# hcitool scan
+
+# passkey-agent --default (PIN) (address of your device) &
+# auth-agent &
+
+Find the channel the thing you want is on -
+
+# sdptool browse 00:1C:62:19:B1:6A
+
+
+...
+
+Service Name: Bluetooth Modem
+Service RecHandle: 0x10006
+Service Class ID List:
+   "Dialup Networking" (0x1103)
+Protocol Descriptor List:
+   "L2CAP" (0x0100)
+   "RFCOMM" (0x0003)
+     Channel: 8
+Language Base Attr List:
+   code_ISO639: 0x656e
+   encoding:    0x6a
+   base_offset: 0x100
+Profile Descriptor List:
+   "Dialup Networking" (0x1103)
+     Version: 0x0100
+
+
+Bind the rfcomm device to the btaddress and channel, here an example with a 
+btmodem at 00:1C:62:19:B1:6A channel 8 -
+
+# rfcomm bind 0 00:1C:62:19:B1:6A 8
+
+Means bind to rfcomm0 the address 00:1C:62:19:B1:6A at ch. 8.
+
+
+Now give /dev/rfcomm0 to Minicom, etc. I find Kermit (ckermit, 
+http://www.columbia.edu/kermit/ckermit.html) more usable. When you're done, 
+unbind it -
+
+# rfcomm release 0
+
+
 
