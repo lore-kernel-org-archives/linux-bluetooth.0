@@ -1,42 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Thu, 26 Mar 2009 16:50:01 -0700
-Message-ID: <35c90d960903261650s7d4031a4v764682e2d7ea953c@mail.gmail.com>
-Subject: [PATCH] Null pointer check on cb in finalize_resume()
+Date: Thu, 26 Mar 2009 16:49:27 -0700
+Message-ID: <35c90d960903261649r1562267ep9f3ebbd46a8dccad@mail.gmail.com>
+Subject: [PATCH] Null pointer check in avctp_unref()
 From: Nick Pelly <npelly@google.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=000e0cd0ed764cc6f604660e4634
+Content-Type: multipart/mixed; boundary=000e0cd1460648288304660e44c2
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---000e0cd0ed764cc6f604660e4634
+--000e0cd1460648288304660e44c2
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 
 
 
---000e0cd0ed764cc6f604660e4634
+--000e0cd1460648288304660e44c2
 Content-Type: text/x-patch; charset=US-ASCII;
-	name="0002-Null-pointer-check-on-cb-in-finalize_resume.patch"
+	name="0001-Null-pointer-check-in-avctp_unref.patch"
 Content-Disposition: attachment;
-	filename="0002-Null-pointer-check-on-cb-in-finalize_resume.patch"
+	filename="0001-Null-pointer-check-in-avctp_unref.patch"
 Content-Transfer-Encoding: base64
-X-Attachment-Id: f_fss3jl05
+X-Attachment-Id: f_fss3hrn6
 
-RnJvbSA4ZjVmODAzZjE3YmRlMTg5ZmM5NmE3MTU0OThhOTg3NTZhZTlmZjJiIE1vbiBTZXAgMTcg
+RnJvbSAzOTAyZTlkMmU5ZjBhNTk4MzI1NmZjOWU5Mzc0OTNmZDc2NTU5MDk5IE1vbiBTZXAgMTcg
 MDA6MDA6MDAgMjAwMQpGcm9tOiBOaWNrIFBlbGx5IDxucGVsbHlAZ29vZ2xlLmNvbT4KRGF0ZTog
-VGh1LCAyNiBNYXIgMjAwOSAxNToyMjozMiAtMDcwMApTdWJqZWN0OiBbUEFUQ0hdIE51bGwgcG9p
-bnRlciBjaGVjayBvbiBjYiBpbiBmaW5hbGl6ZV9yZXN1bWUoKS4KCkZpeCBhIG51bGwgcG9pbnRl
-ciBjcmFzaCB0aGF0IG9jY3VyZWQgd2hlbiByZXN1bWluZyBBMkRQIHN0cmVhbWluZyBhZnRlciBt
-YWtpbmcKYW4gb3V0Z29pbmcgY2FsbC4KClRoaXMgcGF0Y2ggaGFzIG5vdCBiZWVuIHZlcmlmaWVk
-IGluIEJsdWV6IDQueC4KLS0tCiBhdWRpby9hMmRwLmMgfCAgICAyICstCiAxIGZpbGVzIGNoYW5n
-ZWQsIDEgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9hdWRpby9h
-MmRwLmMgYi9hdWRpby9hMmRwLmMKaW5kZXggNzQ2MWYxNy4uNWZkNmJlNCAxMDA2NDQKLS0tIGEv
-YXVkaW8vYTJkcC5jCisrKyBiL2F1ZGlvL2EyZHAuYwpAQCAtMTgzLDcgKzE4Myw3IEBAIHN0YXRp
-YyBnYm9vbGVhbiBmaW5hbGl6ZV9yZXN1bWUoc3RydWN0IGEyZHBfc2V0dXAgKnMpCiAJZm9yIChs
-ID0gcy0+Y2I7IGwgIT0gTlVMTDsgbCA9IGwtPm5leHQpIHsKIAkJc3RydWN0IGEyZHBfc2V0dXBf
-Y2IgKmNiID0gbC0+ZGF0YTsKIAotCQlpZiAoY2ItPnJlc3VtZV9jYikgeworCQlpZiAoY2IgJiYg
-Y2ItPnJlc3VtZV9jYikgewogCQkJY2ItPnJlc3VtZV9jYihzLT5zZXNzaW9uLCBzLT5lcnIsIGNi
-LT51c2VyX2RhdGEpOwogCQkJY2ItPnJlc3VtZV9jYiA9IE5VTEw7CiAJCQlzZXR1cF91bnJlZihz
-KTsKLS0gCjEuNS41Cgo=
---000e0cd0ed764cc6f604660e4634--
+VGh1LCAyNiBNYXIgMjAwOSAxNTowOToxOSAtMDcwMApTdWJqZWN0OiBbUEFUQ0hdIE51bGwgcG9p
+bnRlciBjaGVjayBpbiBhdmN0cF91bnJlZigpLgoKVGhpcyBmaXhlZCBjcmFzaGVycyBpbiAzLjM2
+LiBOb3QgdmVyaWZpZWQgaW4gNC54LgotLS0KIGF1ZGlvL2NvbnRyb2wuYyB8ICAgIDIgKy0KIDEg
+ZmlsZXMgY2hhbmdlZCwgMSBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdp
+dCBhL2F1ZGlvL2NvbnRyb2wuYyBiL2F1ZGlvL2NvbnRyb2wuYwppbmRleCAyOWFjMjA0Li41ZGZj
+ZmMyIDEwMDY0NAotLS0gYS9hdWRpby9jb250cm9sLmMKKysrIGIvYXVkaW8vY29udHJvbC5jCkBA
+IC00MzUsNyArNDM1LDcgQEAgc3RhdGljIHZvaWQgYXZjdHBfdW5yZWYoc3RydWN0IGF2Y3RwICpz
+ZXNzaW9uKQogCWlmIChzZXNzaW9uLT5pb19pZCkKIAkJZ19zb3VyY2VfcmVtb3ZlKHNlc3Npb24t
+PmlvX2lkKTsKIAotCWlmIChzZXNzaW9uLT5kZXYpCisJaWYgKHNlc3Npb24tPmRldiAmJiBzZXNz
+aW9uLT5kZXYtPmNvbnRyb2wpCiAJCXNlc3Npb24tPmRldi0+Y29udHJvbC0+c2Vzc2lvbiA9IE5V
+TEw7CiAKIAlpZiAoc2Vzc2lvbi0+dWlucHV0ID49IDApIHsKLS0gCjEuNS41Cgo=
+--000e0cd1460648288304660e44c2--
