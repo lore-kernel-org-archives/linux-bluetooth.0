@@ -1,31 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] AVDTP Qualification: Fix error handling for AVDTP set
- configuration command
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Nick Pelly <npelly@google.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <35c90d960903261651i46cb32c6qc061f7f718e3d669@mail.gmail.com>
-References: <35c90d960903261651i46cb32c6qc061f7f718e3d669@mail.gmail.com>
-Content-Type: text/plain
-Date: Thu, 26 Mar 2009 00:01:36 +0100
-Message-Id: <1238022096.8206.1.camel@localhost.localdomain>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Date: Thu, 26 Mar 2009 16:52:32 -0700
+Message-ID: <35c90d960903261652o55c4b7a5xaef8176757a77043@mail.gmail.com>
+Subject: [PATCH] AVDTP Qualification: Fix error code for AVDTP get capability
+	with wrong length
+From: Nick Pelly <npelly@google.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=000e0cd13a2a4eb6b704660e4fdf
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nick,
-
-> +
-> +               if ((cap->category == AVDTP_MEDIA_TRANSPORT) &&
-> (cap->length != 0)) {
-> +                       err = AVDTP_BAD_MEDIA_TRANSPORT_FORMAT;
-> +                       goto failed;
-
-no need to put brackets around cap->cat == ... check etc. The comparison
-takes precedence over &&. Please fix and re-send the patch.
-
-Regards
-
-Marcel
+--000e0cd13a2a4eb6b704660e4fdf
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 
 
+
+--000e0cd13a2a4eb6b704660e4fdf
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0006-AVDTP-Qualification-Fix-error-code-for-AVDTP-get-ca.patch"
+Content-Disposition: attachment;
+	filename="0006-AVDTP-Qualification-Fix-error-code-for-AVDTP-get-ca.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_fss3mn2q
+
+RnJvbSAxYWM5ZmJjYmVlNWIyODkyMzc0YTE5ODBjOGIxMDQ2ZjVlNmViNGJhIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBOaWNrIFBlbGx5IDxucGVsbHlAZ29vZ2xlLmNvbT4KRGF0ZTog
+VGh1LCAyNiBNYXIgMjAwOSAxNjoyNToxNSAtMDcwMApTdWJqZWN0OiBbUEFUQ0hdIEFWRFRQIFF1
+YWxpZmljYXRpb246IEZpeCBlcnJvciBjb2RlIGZvciBBVkRUUCBnZXQgY2FwYWJpbGl0eSB3aXRo
+IHdyb25nIGxlbmd0aC4KCi0tLQogYXVkaW8vYXZkdHAuYyB8ICAgIDQgKystLQogMSBmaWxlcyBj
+aGFuZ2VkLCAyIGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvYXVk
+aW8vYXZkdHAuYyBiL2F1ZGlvL2F2ZHRwLmMKaW5kZXggOGUzOGNjZC4uYzExMGMyZCAxMDA2NDQK
+LS0tIGEvYXVkaW8vYXZkdHAuYworKysgYi9hdWRpby9hdmR0cC5jCkBAIC0xMTU0LDggKzExNTQs
+OCBAQCBzdGF0aWMgZ2Jvb2xlYW4gYXZkdHBfZ2V0Y2FwX2NtZChzdHJ1Y3QgYXZkdHAgKnNlc3Np
+b24sIHVpbnQ4X3QgdHJhbnNhY3Rpb24sCiAJdWludDhfdCBlcnIsIGJ1ZlsxMDI0XSwgKnB0ciA9
+IGJ1ZjsKIAogCWlmIChzaXplIDwgc2l6ZW9mKHN0cnVjdCBzZWlkX3JlcSkpIHsKLQkJZXJyb3Io
+IlRvbyBzaG9ydCBnZXRjYXAgcmVxdWVzdCIpOwotCQlyZXR1cm4gRkFMU0U7CisJCWVyciA9IEFW
+RFRQX0JBRF9MRU5HVEg7CisJCWdvdG8gZmFpbGVkOwogCX0KIAogCXNlcCA9IGZpbmRfbG9jYWxf
+c2VwX2J5X3NlaWQoc2Vzc2lvbi0+c2VydmVyLCByZXEtPmFjcF9zZWlkKTsKLS0gCjEuNS41Cgo=
+--000e0cd13a2a4eb6b704660e4fdf--
