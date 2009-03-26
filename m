@@ -1,42 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 26 Mar 2009 22:28:24 +0530 (IST)
-From: pavan_savoy@indiatimes.com
-To: <linux-bluetooth@vger.kernel.org>
-Message-ID: <895461867.5591238086704517.JavaMail.root@mbv7.indiatimes.com>
-Subject: a2dp connection of HT820 vs. BT620s
+Date: Thu, 26 Mar 2009 16:54:04 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix removing of dlc timer with DEFER_SETUP
+Message-ID: <20090326145404.GA14177@jh-x301>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/mixed; boundary="ew6BAiZeqk4r7MaW"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+
+--ew6BAiZeqk4r7MaW
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
 Hi,
 
-I am using android [bluez-3.36] and using a2dp over it. I observe that I get a lot of audio gaps, when I connect to headset "Jabra BT620s".
+There seems to be a missing call to rfcomm_dlc_clear_timer when accepting
+RFCOMM connections for a socket with DEFER_SETUP. This is easily noticable with
+several headsets by them getting disconnected after about 20 seconds even
+though the connection from them has been properly accepted on the userspace
+side by bluetoothd.
 
-However when I connect to "Motorola HT820", everything seems fine, audio streaming is good.
-I have the hcidump, when the Jabra was connected, and it kind of reads the same in terms of frequency, Stereo, block size as when connected to Motorola headset
+I'm not 100% sure of the correctness of this patch regarding the placement of
+this rfcomm_dlc_clear_timer call but it seems to do the trick. What also makes
+me a little uncertain is that the issue is not reproducable with some headsets
+so there must be *some* code path for accepting connections that does work.
+With most dual-profile headsets or those that do more advanced SDP stuff during
+the connection setup this is fairly easily reproducable though.
 
-What could be the problem ? Any inputs would help.
+So, any comments about the patch are welcome.
 
-Thanks,
-Pavan
+Johan
 
-< ACL data: handle 1 flags 0x02 dlen 18
-    L2CAP(d): cid 0x0078 len 14 [psm 25]
-      AVDTP(s): Set config cmd: transaction 3
-        ACP SEID 1 - INT SEID 1
-        Media Transport
-        Media Codec - SBC
-          44.1kHz 
-          JointStereo 
-          16 Blocks
-          8 Subbands
-          Loudness 
-          Bitpool Range 2-50
+--ew6BAiZeqk4r7MaW
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment; filename="0001-Bluetooth-Fix-removing-of-dlc-timer-with-DEFER_SETU.patch"
+
+>From d60c77fd23b4f5043351829c6f0213f5230360d6 Mon Sep 17 00:00:00 2001
+From: Johan Hedberg <johan.hedberg@nokia.com>
+Date: Thu, 26 Mar 2009 16:41:56 +0200
+Subject: [PATCH] Bluetooth: Fix removing of dlc timer with DEFER_SETUP
+
+There's a missing call to rfcomm_dlc_clear_timer in the case that DEFER_SETUP
+is used and so the connection gets disconnected after the timeout even if it
+was successfully accepted previously.
+
+This patch adds a call to rfcomm_dlc_clear_timer to rfcomm_dlc_accept which
+will get called when the user accepts the connection by calling read() on the
+socket.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
+---
+ net/bluetooth/rfcomm/core.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
+
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index 1d0fb0f..374536e 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -1194,6 +1194,8 @@ void rfcomm_dlc_accept(struct rfcomm_dlc *d)
+ 
+ 	rfcomm_send_ua(d->session, d->dlci);
+ 
++	rfcomm_dlc_clear_timer(d);
++
+ 	rfcomm_dlc_lock(d);
+ 	d->state = BT_CONNECTED;
+ 	d->state_change(d, 0);
+-- 
+1.6.0.4
 
 
-
-
---
-Exclusive spy camera shots of the Tata Nano only on ZigWheels.com 
-http://www.zigwheels.com/tata-nano/
+--ew6BAiZeqk4r7MaW--
