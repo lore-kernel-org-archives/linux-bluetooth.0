@@ -1,33 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Supporting more than 7 Connections
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Klaus Teller <klaus.teller@gmx.net>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20090327204841.234650@gmx.net>
-References: <20090327174505.23080@gmx.net>
-	 <1238051121.8206.6.camel@localhost.localdomain>
-	 <20090327204841.234650@gmx.net>
-Content-Type: text/plain
-Date: Fri, 27 Mar 2009 21:00:49 -0700
-Message-Id: <1238212849.8206.20.camel@localhost.localdomain>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <20090327204954.GA2306@jh-x301>
+References: <35c90d960903271323w6f206741ya366a11464461235@mail.gmail.com>
+	<20090327204820.GA2222@jh-x301> <20090327204954.GA2306@jh-x301>
+Date: Fri, 27 Mar 2009 14:13:57 -0700
+Message-ID: <35c90d960903271413v45025dbexd6967cac51c1b10d@mail.gmail.com>
+Subject: Re: [PATCH] AVDTP Qualification: Use GENERAL_REJECT instead of REJECT
+	for unknown command.
+From: Nick Pelly <npelly@google.com>
+To: Nick Pelly <npelly@google.com>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Klaus,
+On Fri, Mar 27, 2009 at 1:49 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> On Fri, Mar 27, 2009, Johan Hedberg wrote:
+>> > From: Nick Pelly <npelly@google.com>
+>> > Date: Fri, 27 Mar 2009 12:57:45 -0700
+>> > Subject: [PATCH 1/2] AVCTP qualification: Handle more error codes.
+>>
+>> This one has been pushed upstream. Thanks.
+>
+> Sorry, that was supposed to refer to the other patch. The general reject one
+> doesn't look right. There's no message type of 0x01 according to AVDTP 1.2. The
+> way I interpret it is that general reject should use the normal reject message
+> type.
 
-> I've inquired with Aircable and it appears their Bluetooth Chip can handle 7 active connections and 128 parked connections. The comment at  http://osdir.com/ml/linux.bluez.devel/2003-07/msg00110.html also suggests that the CSR chip is capable of handling more than 7 connections overall.
-> 
-> So, what effort would be involved in making supervisory unpark-parks in BlueZ possible?
+Here is the information we received from a partner for this patch:
 
-Aircable is not building their own chips. So I highly doubt that any
-chip manufacturer bothered to test park with 128 slaves. I think these
-guys mixing specification values with real life values. However be my
-guest to prove me wrong, but keep in mind that park state will be
-eventually be deprecated since nobody is using it.
+TP-SIG-SMG-BI-28-C
 
-Regards
+Test Condition
+Fields of AVDTP_CMD:
+- Transaction_label = TransactionLowerTester = Any value
+- Packet_type = 00 (single packet)
+- Reserved = 00
+- Message_type = 00 (command)
+- Signal_Id = 0x3F (Undefined signal id)
 
-Marcel
+Pass verdict
+The lower tester receives the AVDTP signaling message with the fields:
+Transaction_label = TransactionLowerTester
+Packet_type = 00 (single packet)
+Message type = 01 (general reject)
+Bits 6 and 7 of Octet 1 are both set to ‘0’
+Other 6 bits = Set to the invalid signal identifier being rejected (0x3F)
 
 
+However I can't find this same information in the current version of
+the AVDTP test specification. Maybe it was from an older version of
+the test spec? I couldn't work out where on bluetooth.org to get older
+versions of test specs so I cannot confirm this.
+
+In any case, we were told this change is recommended by the BQE, but
+not required. So probably fine to skip this one.
+
+Nick
