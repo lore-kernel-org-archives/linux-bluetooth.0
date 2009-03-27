@@ -1,54 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 28 Mar 2009 02:10:06 +0530 (IST)
-From: pavan_savoy@indiatimes.com
-To: Nick Pelly <npelly@google.com>
-Cc: linux-bluetooth@vger.kernel.org
-Message-ID: <1831784371.90681238186406345.JavaMail.root@mbv7.indiatimes.com>
-In-Reply-To: <35c90d960903261839q500b755cuc75c40e96e973225@mail.gmail.com>
-Subject: Re: a2dp connection of HT820 vs. BT620s
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Date: Fri, 27 Mar 2009 13:25:30 -0700
+Message-ID: <35c90d960903271325w73cc028gd532312afb5ea9c2@mail.gmail.com>
+Subject: [PATCH] AVCTP qualification: Handle more error codes.
+From: Nick Pelly <npelly@google.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=000e0cd291ba9656d404661f89c1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hey Nick,
+--000e0cd291ba9656d404661f89c1
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 
-I did post this on the android-group as well, I mentioned I get a "write blocked for ** msecs" when audio gap occurs.
+Just these two for today.
 
-Also, I tested Jabra with ubuntu's 3.16 bluez, it sounds funny [something to do with frequency, I suppose..], 
-but no audio gap, basically same output as in Motorola head-set.
-
-Also please elaborate on what part of Android plug-in do you suspect ? I would want to take a look into it.
-
-regards,
-Pavan
-
-
------ Original Message -----
-From: Nick Pelly <npelly@google.com>
-To: pavan savoy <pavan_savoy@indiatimes.com>
-Cc: linux-bluetooth@vger.kernel.org
-Sent: Fri, 27 Mar 2009 07:09:11 +0530 (IST)
-Subject: Re: a2dp connection of HT820 vs. BT620s
-
-On 3/26/09, pavan_savoy@indiatimes.com <pavan_savoy@indiatimes.com> wrote:
-> Hi,
->
->  I am using android [bluez-3.36] and using a2dp over it. I observe that I get a lot of audio gaps, when I connect to headset "Jabra BT620s".
->
->  However when I connect to "Motorola HT820", everything seems fine, audio streaming is good.
->  I have the hcidump, when the Jabra was connected, and it kind of reads the same in terms of frequency, Stereo, block size as when connected to Motorola headset
->
->  What could be the problem ? Any inputs would help.
-
-While I suspect this issue is specific to the Android a2dp audio
-plugin, I would also be interested in hearing if the pulseaudio or
-alsa plugin's have issues with Jabra headsets as Pavan describes.
+We have a stack more null-pointer-check patches, but I need to spend
+some time next week with these to see if they are still applicable in
+bluez 4.
 
 Nick
 
+--000e0cd291ba9656d404661f89c1
+Content-Type: application/octet-stream;
+	name="0002-AVDTP-Qualification-Use-GENERAL_REJECT-instead-of-R.patch"
+Content-Disposition: attachment;
+	filename="0002-AVDTP-Qualification-Use-GENERAL_REJECT-instead-of-R.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_fstbovcl0
 
-
---
-Exclusive spy camera shots of the Tata Nano only on ZigWheels.com 
-http://www.zigwheels.com/tata-nano/
+RnJvbSBiOGI5NmQ5YTZiMTBkZTAxZWJiYzk4YmVmMzU0M2ZmNDZiZmVlZTliIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBOaWNrIFBlbGx5IDxucGVsbHlAZ29vZ2xlLmNvbT4KRGF0ZTog
+RnJpLCAyNyBNYXIgMjAwOSAxMzowMzoyOCAtMDcwMApTdWJqZWN0OiBbUEFUQ0ggMi8yXSBBVkRU
+UCBRdWFsaWZpY2F0aW9uOiBVc2UgR0VORVJBTF9SRUpFQ1QgaW5zdGVhZCBvZiBSRUpFQ1QgZm9y
+IHVua25vd24gY29tbWFuZC4KCkJhc2VkIG9uIHJlY29tbWVuZGF0aW9uIG9mIEJRRS4KLS0tCiBh
+dWRpby9hdmR0cC5jIHwgICAgNSArKystLQogMSBmaWxlcyBjaGFuZ2VkLCAzIGluc2VydGlvbnMo
+KyksIDIgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvYXVkaW8vYXZkdHAuYyBiL2F1ZGlvL2F2
+ZHRwLmMKaW5kZXggZWM4NTQyNi4uODk4ZTlmZSAxMDA2NDQKLS0tIGEvYXVkaW8vYXZkdHAuYwor
+KysgYi9hdWRpby9hdmR0cC5jCkBAIC03Nyw2ICs3Nyw3IEBACiAjZGVmaW5lIEFWRFRQX1BLVF9U
+WVBFX0VORAkJCTB4MDMKIAogI2RlZmluZSBBVkRUUF9NU0dfVFlQRV9DT01NQU5ECQkJMHgwMAor
+I2RlZmluZSBBVkRUUF9NU0dfVFlQRV9HRU5FUkFMX1JFSkVDVAkJMHgwMQogI2RlZmluZSBBVkRU
+UF9NU0dfVFlQRV9BQ0NFUFQJCQkweDAyCiAjZGVmaW5lIEFWRFRQX01TR19UWVBFX1JFSkVDVAkJ
+CTB4MDMKIApAQCAtMTExNyw4ICsxMTE4LDggQEAgc3RhdGljIEdTTGlzdCAqY2Fwc190b19saXN0
+KHVpbnQ4X3QgKmRhdGEsIGludCBzaXplLAogc3RhdGljIGdib29sZWFuIGF2ZHRwX3Vua25vd25f
+Y21kKHN0cnVjdCBhdmR0cCAqc2Vzc2lvbiwgdWludDhfdCB0cmFuc2FjdGlvbiwKIAkJCQkJCQl2
+b2lkICpidWYsIGludCBzaXplKQogewotCXJldHVybiBhdmR0cF9zZW5kKHNlc3Npb24sIHRyYW5z
+YWN0aW9uLCBBVkRUUF9NU0dfVFlQRV9SRUpFQ1QsCi0JCQkJCQkJCTAsIE5VTEwsIDApOworCXJl
+dHVybiBhdmR0cF9zZW5kKHNlc3Npb24sIHRyYW5zYWN0aW9uLCBBVkRUUF9NU0dfVFlQRV9HRU5F
+UkFMX1JFSkVDVCwKKwkJCQlzZXNzaW9uLT5pbi5zaWduYWxfaWQsIE5VTEwsIDApOwogfQogCiBz
+dGF0aWMgZ2Jvb2xlYW4gYXZkdHBfZGlzY292ZXJfY21kKHN0cnVjdCBhdmR0cCAqc2Vzc2lvbiwg
+dWludDhfdCB0cmFuc2FjdGlvbiwKLS0gCjEuNi4xLjMKCg==
+--000e0cd291ba9656d404661f89c1--
