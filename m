@@ -1,32 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 27 Mar 2009 11:49:21 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Nick Pelly <npelly@google.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Null pointer check on cb in finalize_resume()
+Message-ID: <20090327094921.GA2711@jh-x301>
+References: <35c90d960903261650s7d4031a4v764682e2d7ea953c@mail.gmail.com>
 MIME-Version: 1.0
-Date: Fri, 27 Mar 2009 13:37:11 +0200
-Message-ID: <48c8efd40903270437r76b65cecv83624d74cc8fef4@mail.gmail.com>
-Subject: Has www.holtmann.org moved to another url?
-From: Giorgos Papanikas <castonjofff@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <35c90d960903261650s7d4031a4v764682e2d7ea953c@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello to all,
+Hi Nick,
 
-I'm new to this mailing list and to bluetooth stuff, generally.
+Thanks for the patches. All of them, except for this one, seemed fine.
 
-I must program an usb bluetooth adapter to send AT commands to a
-bluetooth module (BR-SC30A of BlueRadios) and receive its replies. I
-have setup a successful communication using two of these modules (one
-on the PC side) which are programmed to use their SPP profile, but now
-I have to replace the module at the PC side with the usb adapter. If I
-'ve understood it right, I have to bind the RFCOMM usb device to the
-BR-SC30A and then send AT commands in a way similar to the code of
-attest.c. Am I right? Does anyone have any advice for me?
+On Thu, Mar 26, 2009, Nick Pelly wrote:
+> From: Nick Pelly <npelly@google.com>
+> Date: Thu, 26 Mar 2009 15:22:32 -0700
+> Subject: [PATCH] Null pointer check on cb in finalize_resume().
+> 
+> Fix a null pointer crash that occured when resuming A2DP streaming after
+> making an outgoing call.
 
-Trying to figure out how I can implement this using Bluez libraries,
-I've found MANY links to various pages of www.holtmann.org.But it
-seems to be down. Is it temporary? Has it moved to another url? Or is
-anywhere its pages saved? I'm asking because I found the name of this
-site's owner in MANY replies of this list.
+This looks like it's covering up for another bug where we've added a NULL
+element into the list. I went through the current code and there are two places
+where elements are added to the list. Both of these places use g_new0 which
+will never return NULL (the default GLib behavior or to call abort() in the
+case of an allocation failure) so most likely this added NULL check is
+unnecessary with the current code base (but of course doesn't really hurt
+either).
 
-Thank you very much,
-Giorgos
+Johan
