@@ -1,60 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
+From: Lamarque Vieira Souza <lamarque@gmail.com>
+To: marcel@holtmann.org
+Subject: [PATCH] Fix for Acer  Bluetooth Optical Rechargeable Mouse
+Date: Sat, 28 Mar 2009 19:45:49 -0300
+Cc: linux-bluetooth@vger.kernel.org
 MIME-Version: 1.0
-Date: Sun, 29 Mar 2009 03:28:18 -0700
-Message-ID: <7337540c0903290328o57d99321h638315cdf79c8e52@mail.gmail.com>
-Subject: Flood of "urb ... submission failed" with bluetooth headset
-From: Ludovico Cavedon <ludovico.cavedon@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-Id: <200903281945.49625.lamarque@gmail.com>
+Content-Type: text/plain;
+  charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This patch fix a problem with Acer Bluetooth Optical Rechargeable Mouse where 
+the cursor gets stuck at screen's upper-left corner. Even the touchpad of my 
+notebook (Acer Ferrari 4005) cannot move the cursor when the bluetooth mouse 
+is turned on. Using an input session instead of hid session solves this 
+problem although the cursor moves a little sluggishly with the bluetooth 
+mouse. It moves correctly using the touchpad. I do not know if there is a 
+better implementation or a quirk for this problem, if it exists let me know.
 
-When I try to play some audio on the my bluetooth headset, my syslog
-is flooded with messages like
+Signed-off-by: Lamarque V. Souza <lamarque@gmail.com>
+---
 
-btusb_send_frame: hci0 urb ffff8800624bd800 submission failed
-
-The command I tried are:
-
-  aplay -D plug:headset /usr/share/sounds/card_shuffle.wav
-->The headset activates, but I do not hear the audio and the syslog
-keep being flooded until I kill aplay
-
- mplayer -ao alsa:device=headset /usr/share/sounds/card_shuffle.wav
-->works with low quality, but the syslog still gets flooded for the
-duration of the wav file
-
-Linux distribution: Ubuntu jaunty beta
-
-$ uname -a
-Linux cavedon-laptop 2.6.28-11-generic #38-Ubuntu SMP Fri Mar 27
-10:01:17 UTC 2009 x86_64 GNU/Linux
-
-Bluez: 4.32
-
-My bluetooth device:
-hci0: Type: USB
- BD Address: 00:1A:6B:BB:82:5D ACL MTU: 1017:8 SCO MTU: 64:8
- UP RUNNING PSCAN
- RX bytes:168363 acl:40 sco:3262 events:97 errors:2
- TX bytes:162252 acl:42 sco:7210 commands:57 errors:586
- Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
- Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
- Link policy: RSWITCH HOLD SNIFF PARK
- Link mode: SLAVE ACCEPT
- Name: 'cavedon-laptop-0'
- Class: 0x0a010c
- Service Classes: Networking, Capturing
- Device Class: Computer, Laptop
- HCI Ver: 2.0 (0x3) HCI Rev: 0x2129 LMP Ver: 2.0 (0x3) LMP Subver: 0x41cf
- Manufacturer: Broadcom Corporation (15)
-
-Dmesg: http://launchpadlibrarian.net/24477639/BootDmesg.txt
-Other info about my system:
-https://bugs.edge.launchpad.net/ubuntu/+source/linux/+bug/350839/comments/1
-
-
-Thank you in advance,
-Ludovico
+--- linux-2.6.29/net/bluetooth/hidp/core.c	2009-03-28 16:55:43.023380377 -0300
++++ linux-2.6.29-lvs/net/bluetooth/hidp/core.c	2009-03-28 19:22:14.896228520 
+-0300
+@@ -832,7 +832,10 @@ int hidp_add_connection(struct hidp_conn
+ 	session->flags   = req->flags & (1 << HIDP_BLUETOOTH_VENDOR_ID);
+ 	session->idle_to = req->idle_to;
+ 
+-	if (req->rd_size > 0) {
++	/* Lamarque: Acer  Bluetooth Optical Rechargeable Mouse (0458:0058) does not 
+work properly with hid session. */
++	if (req->rd_size > 0 && (
++	    req->vendor  != 0x0458 ||
++	    req->product != 0x0058)) {
+ 		err = hidp_setup_hid(session, req);
+ 		if (err && err != -ENODEV)
+ 			goto err_skb;
