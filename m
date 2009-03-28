@@ -2,45 +2,96 @@ Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
 To: linux-bluetooth@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
-Subject: [PATCH 2/4] Bluetooth: remove unnecessary atribution to err var
-Date: Sat, 28 Mar 2009 14:47:27 -0300
-Message-Id: <1238262449-3321-3-git-send-email-gustavo@las.ic.unicamp.br>
-In-Reply-To: <1238262449-3321-2-git-send-email-gustavo@las.ic.unicamp.br>
+Subject: [PATCH 1/4] Bluetooth: create macros for channels identifiers
+Date: Sat, 28 Mar 2009 14:47:26 -0300
+Message-Id: <1238262449-3321-2-git-send-email-gustavo@las.ic.unicamp.br>
+In-Reply-To: <1238262449-3321-1-git-send-email-gustavo@las.ic.unicamp.br>
 References: <1238262449-3321-1-git-send-email-gustavo@las.ic.unicamp.br>
- <1238262449-3321-2-git-send-email-gustavo@las.ic.unicamp.br>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The init value of err is not used until it is set to -ENOMEM. So we
-initialize it directly to -ENOMEM
+Use macros instead of hardcoded numbers to get a code more readable.
 
 Signed-off-by: Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
 ---
- net/bluetooth/l2cap.c |    4 +---
- 1 files changed, 1 insertions(+), 3 deletions(-)
+ include/net/bluetooth/l2cap.h |    6 ++++++
+ net/bluetooth/l2cap.c         |   18 +++++++++---------
+ 2 files changed, 15 insertions(+), 9 deletions(-)
 
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index f566aa1..ed4ba91 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -106,6 +106,12 @@ struct l2cap_conn_rsp {
+ 	__le16     status;
+ } __attribute__ ((packed));
+ 
++/* channel indentifier */
++#define L2CAP_CID_SIGNALING	0x0001
++#define L2CAP_CID_CONN_LESS	0x0002
++#define L2CAP_CID_DYN_START	0x0040
++#define L2CAP_CID_DYN_END	0xffff
++
+ /* connect result */
+ #define L2CAP_CR_SUCCESS    0x0000
+ #define L2CAP_CR_PEND       0x0001
 diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index ff1744e..85926f5 100644
+index ca4d3b4..ff1744e 100644
 --- a/net/bluetooth/l2cap.c
 +++ b/net/bluetooth/l2cap.c
-@@ -844,7 +844,7 @@ static int l2cap_do_connect(struct sock *sk)
- 	struct hci_conn *hcon;
- 	struct hci_dev *hdev;
- 	__u8 auth_type;
--	int err = 0;
-+	int err = -ENOMEM;
+@@ -161,9 +161,9 @@ static inline struct sock *l2cap_get_chan_by_ident(struct l2cap_chan_list *l, u8
  
- 	BT_DBG("%s -> %s psm 0x%2.2x", batostr(src), batostr(dst),
- 							l2cap_pi(sk)->psm);
-@@ -854,8 +854,6 @@ static int l2cap_do_connect(struct sock *sk)
+ static u16 l2cap_alloc_cid(struct l2cap_chan_list *l)
+ {
+-	u16 cid = 0x0040;
++	u16 cid = L2CAP_CID_DYN_START;
  
- 	hci_dev_lock_bh(hdev);
+-	for (; cid < 0xffff; cid++) {
++	for (; cid < L2CAP_CID_DYN_END; cid++) {
+ 		if(!__l2cap_get_chan_by_scid(l, cid))
+ 			return cid;
+ 	}
+@@ -215,13 +215,13 @@ static void __l2cap_chan_add(struct l2cap_conn *conn, struct sock *sk, struct so
+ 		l2cap_pi(sk)->scid = l2cap_alloc_cid(l);
+ 	} else if (sk->sk_type == SOCK_DGRAM) {
+ 		/* Connectionless socket */
+-		l2cap_pi(sk)->scid = 0x0002;
+-		l2cap_pi(sk)->dcid = 0x0002;
++		l2cap_pi(sk)->scid = L2CAP_CID_CONN_LESS;
++		l2cap_pi(sk)->dcid = L2CAP_CID_CONN_LESS;
+ 		l2cap_pi(sk)->omtu = L2CAP_DEFAULT_MTU;
+ 	} else {
+ 		/* Raw socket can send/recv signalling messages only */
+-		l2cap_pi(sk)->scid = 0x0001;
+-		l2cap_pi(sk)->dcid = 0x0001;
++		l2cap_pi(sk)->scid = L2CAP_CID_SIGNALING;
++		l2cap_pi(sk)->dcid = L2CAP_CID_SIGNALING;
+ 		l2cap_pi(sk)->omtu = L2CAP_DEFAULT_MTU;
+ 	}
  
--	err = -ENOMEM;
--
- 	if (sk->sk_type == SOCK_RAW) {
- 		switch (l2cap_pi(sk)->sec_level) {
- 		case BT_SECURITY_HIGH:
+@@ -1598,7 +1598,7 @@ static struct sk_buff *l2cap_build_cmd(struct l2cap_conn *conn,
+ 
+ 	lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
+ 	lh->len = cpu_to_le16(L2CAP_CMD_HDR_SIZE + dlen);
+-	lh->cid = cpu_to_le16(0x0001);
++	lh->cid = cpu_to_le16(L2CAP_CID_SIGNALING);
+ 
+ 	cmd = (struct l2cap_cmd_hdr *) skb_put(skb, L2CAP_CMD_HDR_SIZE);
+ 	cmd->code  = code;
+@@ -2420,11 +2420,11 @@ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	BT_DBG("len %d, cid 0x%4.4x", len, cid);
+ 
+ 	switch (cid) {
+-	case 0x0001:
++	case L2CAP_CID_SIGNALING:
+ 		l2cap_sig_channel(conn, skb);
+ 		break;
+ 
+-	case 0x0002:
++	case L2CAP_CID_CONN_LESS:
+ 		psm = get_unaligned((__le16 *) skb->data);
+ 		skb_pull(skb, 2);
+ 		l2cap_conless_channel(conn, psm, skb);
 -- 
 1.6.0.6
 
