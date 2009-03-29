@@ -1,58 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 29 Mar 2009 23:31:46 -0400
-From: jayjwa <jayjwa@atr2.ath.cx>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: Flood of "urb ... submission failed" with bluetooth headset
-In-Reply-To: <7337540c0903290328o57d99321h638315cdf79c8e52@mail.gmail.com>
-Message-ID: <alpine.LNX.2.00.0903292156230.32436@nge2.ngu.pk>
-References: <7337540c0903290328o57d99321h638315cdf79c8e52@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Date: Sun, 29 Mar 2009 03:28:18 -0700
+Message-ID: <7337540c0903290328o57d99321h638315cdf79c8e52@mail.gmail.com>
+Subject: Flood of "urb ... submission failed" with bluetooth headset
+From: Ludovico Cavedon <ludovico.cavedon@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi,
+
+When I try to play some audio on the my bluetooth headset, my syslog
+is flooded with messages like
+
+btusb_send_frame: hci0 urb ffff8800624bd800 submission failed
+
+The command I tried are:
+
+  aplay -D plug:headset /usr/share/sounds/card_shuffle.wav
+->The headset activates, but I do not hear the audio and the syslog
+keep being flooded until I kill aplay
+
+ mplayer -ao alsa:device=headset /usr/share/sounds/card_shuffle.wav
+->works with low quality, but the syslog still gets flooded for the
+duration of the wav file
+
+Linux distribution: Ubuntu jaunty beta
+
+$ uname -a
+Linux cavedon-laptop 2.6.28-11-generic #38-Ubuntu SMP Fri Mar 27
+10:01:17 UTC 2009 x86_64 GNU/Linux
+
+Bluez: 4.32
+
+My bluetooth device:
+hci0: Type: USB
+ BD Address: 00:1A:6B:BB:82:5D ACL MTU: 1017:8 SCO MTU: 64:8
+ UP RUNNING PSCAN
+ RX bytes:168363 acl:40 sco:3262 events:97 errors:2
+ TX bytes:162252 acl:42 sco:7210 commands:57 errors:586
+ Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
+ Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+ Link policy: RSWITCH HOLD SNIFF PARK
+ Link mode: SLAVE ACCEPT
+ Name: 'cavedon-laptop-0'
+ Class: 0x0a010c
+ Service Classes: Networking, Capturing
+ Device Class: Computer, Laptop
+ HCI Ver: 2.0 (0x3) HCI Rev: 0x2129 LMP Ver: 2.0 (0x3) LMP Subver: 0x41cf
+ Manufacturer: Broadcom Corporation (15)
+
+Dmesg: http://launchpadlibrarian.net/24477639/BootDmesg.txt
+Other info about my system:
+https://bugs.edge.launchpad.net/ubuntu/+source/linux/+bug/350839/comments/1
 
 
-On Sun, 29 Mar 2009, Ludovico Cavedon wrote:
-
-> When I try to play some audio on the my bluetooth headset, my syslog
-> is flooded with messages like
->
-> btusb_send_frame: hci0 urb ffff8800624bd800 submission failed
->
-> The command I tried are:
->
->  aplay -D plug:headset /usr/share/sounds/card_shuffle.wav
-> ->The headset activates, but I do not hear the audio and the syslog
-> keep being flooded until I kill aplay
->
-> mplayer -ao alsa:device=headset /usr/share/sounds/card_shuffle.wav
-> ->works with low quality, but the syslog still gets flooded for the
-> duration of the wav file
->
-> Linux distribution: Ubuntu jaunty beta
-
-
-Same thing happen here, too:
-
-btusb_send_frame: hci0 urb d093f200 submission failed
-btusb_send_frame: hci0 urb d093f400 submission failed
-btusb_send_frame: hci0 urb d093fa00 submission failed
-...
-btusb_send_frame: hci0 urb d093fc00 submission failed
-btusb_send_frame: hci0 urb d093fe00 submission failed
-btusb_send_frame: hci0 urb d7271e00 submission failed
-btusb_send_frame: hci0 urb d7271400 submission failed
-
-Seems to be related to the new btusb kernel module, because it didn't used to 
-happen with hci_usb kmod. Since the address keeps changing, syslog 
-rate-limiting can't remove them as dups . Maybe one out of the flurry of 
-patches we see on this list will address this soon.
-
-
-If you use rsyslog, *I think* this line, placed near the top of rsyslog.conf 
-file will keep them out of the log at least:
-
-:msg, contains, "hci0 urb"      ~
-
-
+Thank you in advance,
+Ludovico
