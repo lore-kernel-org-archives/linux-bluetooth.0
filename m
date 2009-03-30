@@ -1,149 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 30 Mar 2009 01:03:39 -0400
+Date: Sun, 29 Mar 2009 23:31:46 -0400
 From: jayjwa <jayjwa@atr2.ath.cx>
 To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: Newbie, can't find device
-In-Reply-To: <200903262205.52669.gene.heskett@verizon.net>
-Message-ID: <alpine.LNX.2.00.0903292339240.32436@nge2.ngu.pk>
-References: <200903252037.03024.gene.heskett@verizon.net> <200903261157.28413.gene.heskett@verizon.net> <alpine.LNX.2.00.0903262001290.27577@nge2.ngu.pk> <200903262205.52669.gene.heskett@verizon.net>
+Subject: Re: Flood of "urb ... submission failed" with bluetooth headset
+In-Reply-To: <7337540c0903290328o57d99321h638315cdf79c8e52@mail.gmail.com>
+Message-ID: <alpine.LNX.2.00.0903292156230.32436@nge2.ngu.pk>
+References: <7337540c0903290328o57d99321h638315cdf79c8e52@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
-On Thu, 26 Mar 2009, Gene Heskett wrote:
 
->> The dongle on the kubuntu box isn't ready/supported/working. You should see
->> it by scanning, and I've never had to do a manual 'hciconfig hci0 up' at
->> any time. If it's a USB congle, does it show with 'lsusb'? When you plug it
->> in, what kernel messages do you get? Are the bluez/dbus/usb systems all
->> complete on that box?
->>
-> UNK at this point.  I'll ssh into it and find out:
-> gene@goat:~$ lsusb
-> Bus 002 Device 004: ID 0e5e:6622  That is the devices make:prod ID
+On Sun, 29 Mar 2009, Ludovico Cavedon wrote:
+
+> When I try to play some audio on the my bluetooth headset, my syslog
+> is flooded with messages like
 >
-> gene@goat:~$ sudo lsusb -v| grep -A75 'Bus 002 Device 004:'
-> Bus 002 Device 004: ID 0e5e:6622
-> Device Descriptor:
->  bLength                18
->  bDescriptorType         1
->  bcdUSB               1.10
->  bDeviceClass          224 Wireless
->  bDeviceSubClass         1 Radio Frequency
->  bDeviceProtocol         1 Bluetooth
->  bMaxPacketSize0        16
->  idVendor           0x0e5e
->  idProduct          0x6622
->  bcdDevice            1.34
->  iManufacturer           0
->  iProduct                0
->  iSerial                 0
->  bNumConfigurations      1
->  Configuration Descriptor:
->    bLength                 9
->    bDescriptorType         2
->    wTotalLength          108
->    bNumInterfaces          2
->    bConfigurationValue     1
->    iConfiguration          0
->    bmAttributes         0x80
->      (Bus Powered)
->    MaxPower              100mA
->    Interface Descriptor:
->      bLength                 9
->      bDescriptorType         4
->      bInterfaceNumber        0
->      bAlternateSetting       0
->      bNumEndpoints           3
->      bInterfaceClass       224 Wireless
->      bInterfaceSubClass      1 Radio Frequency
->      bInterfaceProtocol      1 Bluetooth
->      iInterface              0
->      Endpoint Descriptor:
->        bLength                 7
->        bDescriptorType         5
->        bEndpointAddress     0x81  EP 1 IN
->        bmAttributes            3
->          Transfer Type            Interrupt
->          Synch Type               None
->          Usage Type               Data
->        wMaxPacketSize     0x0010  1x 16 bytes
->        bInterval               1
->      Endpoint Descriptor:
->        bLength                 7
->        bDescriptorType         5
->        bEndpointAddress     0x82  EP 2 IN
->        bmAttributes            2
->          Transfer Type            Bulk
->          Synch Type               None
->          Usage Type               Data
->        wMaxPacketSize     0x0040  1x 64 bytes
->        bInterval               0
->      Endpoint Descriptor:
->        bLength                 7
->        bDescriptorType         5
->        bEndpointAddress     0x02  EP 2 OUT
->        bmAttributes            2
->          Transfer Type            Bulk
->          Synch Type               None
->          Usage Type               Data
->        wMaxPacketSize     0x0040  1x 64 bytes
->        bInterval               0
->    Interface Descriptor:
->      bLength                 9
->      bDescriptorType         4
->      bInterfaceNumber        1
->      bAlternateSetting       0
->      bNumEndpoints           2
->      bInterfaceClass       224 Wireless
->      bInterfaceSubClass      1 Radio Frequency
->      bInterfaceProtocol      1 Bluetooth
->      iInterface              0
-> cannot read device status, Connection timed out (110)
-> can't get device qualifier: Connection timed out
-> can't get debug descriptor: Connection timed out
-> cannot read device status, Connection timed out (110)
-
-That's not good. The command should complete normally. You seem to be missing 
-about half the data mine displays for this type of device. I'm no USB device 
-expert, but I'd guess the root of the problem is the bluetooth adapter itself.
-
-My listing starts like this:
-
-Bus 004 Device 002: ID 050d:0121 Belkin Components F5D5050 100Mbps Ethernet
-Device Descriptor:
-   bLength                18
-   bDescriptorType         1
-   bcdUSB               2.00
-   bDeviceClass          224 Wireless
-   bDeviceSubClass         1 Radio Frequency
-   bDeviceProtocol         1 Bluetooth
-   bMaxPacketSize0        64
-   idVendor           0x050d Belkin Components
-   idProduct          0x0121 F5D5050 100Mbps Ethernet
-   bcdDevice            1.00
-   iManufacturer           1 Broadcom Corp
-   iProduct                2 BELKIN BLUETOOTH USB ADAPTER CL. 1
-   iSerial                 0
-   bNumConfigurations      1
+> btusb_send_frame: hci0 urb ffff8800624bd800 submission failed
+>
+> The command I tried are:
+>
+>  aplay -D plug:headset /usr/share/sounds/card_shuffle.wav
+> ->The headset activates, but I do not hear the audio and the syslog
+> keep being flooded until I kill aplay
+>
+> mplayer -ao alsa:device=headset /usr/share/sounds/card_shuffle.wav
+> ->works with low quality, but the syslog still gets flooded for the
+> duration of the wav file
+>
+> Linux distribution: Ubuntu jaunty beta
 
 
-and ends with:
+Same thing happen here, too:
 
-     Interface Descriptor:
-       bLength                 9
-       bDescriptorType         4
-       bInterfaceNumber        3
-       bAlternateSetting       0
-       bNumEndpoints           0
-       bInterfaceClass       254 Application Specific Interface
-       bInterfaceSubClass      1 Device Firmware Update
-       bInterfaceProtocol      0
-       iInterface              0
-       ** UNRECOGNIZED:  07 21 05 88 13 40 00
-Device Status:     0x0000
-   (Bus Powered)
+btusb_send_frame: hci0 urb d093f200 submission failed
+btusb_send_frame: hci0 urb d093f400 submission failed
+btusb_send_frame: hci0 urb d093fa00 submission failed
+...
+btusb_send_frame: hci0 urb d093fc00 submission failed
+btusb_send_frame: hci0 urb d093fe00 submission failed
+btusb_send_frame: hci0 urb d7271e00 submission failed
+btusb_send_frame: hci0 urb d7271400 submission failed
+
+Seems to be related to the new btusb kernel module, because it didn't used to 
+happen with hci_usb kmod. Since the address keeps changing, syslog 
+rate-limiting can't remove them as dups . Maybe one out of the flurry of 
+patches we see on this list will address this soon.
+
+
+If you use rsyslog, *I think* this line, placed near the top of rsyslog.conf 
+file will keep them out of the log at least:
+
+:msg, contains, "hci0 urb"      ~
 
 
