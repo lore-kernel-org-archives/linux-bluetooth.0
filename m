@@ -1,30 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Tue, 31 Mar 2009 13:45:36 +0800
-Message-ID: <a172fe730903302245k1bb2209ag371e07d4a0cbbb80@mail.gmail.com>
-Subject: eSCO or SCO link?
-From: =?GB2312?B?seXA2g==?= <mykofzone@gmail.com>
+Date: Mon, 30 Mar 2009 12:54:09 +0530
+Message-ID: <6887eb5d0903300024m11c46c14w36ab195567453989@mail.gmail.com>
+Subject: Cross compiling bluez for ARM
+From: Kartikey Parmar <kartikey2781@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
- I have a stlc2500c which is a Bluetooth 1.2 chip. When debuging
-function 'hci_connect', i found the hci link type of the arguments was
-SCO_LINK, because i enabled 'lmp_esco_capable' in my kernel, it call
-'hci_setup_sync' to setup eSCO link.
-struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t
-*dst, __u8 auth_type)
-{
-        .....
-	if (lmp_esco_capable(hdev))
-	{
-		hci_setup_sync(sco, acl->handle);
-	}			
-	else
-	{
-		hci_add_sco(sco, acl->handle);
-	}
-		
-}
+Hi
+
+I have ronelix-arm-linux-4.3.3 toolchain installed on Suse 10.3
+I am configuring bluez-4.30 by writing:
+-----------------------------
+./configure --host=arm-linux --prefix=PREFIX CC=arm-linux-gcc
+CPP=arm-linux-cpp AR=arm-linux-ar STRIP=arm-linux-strip
+LD=arm-linux-ld --disable-test
+----------------------------
+it successfully configures. but when I run "make" it shows error that
+could not read libglib-2.0.so - unrecognized symbols in "src" folder
+of bluez-4.30
+
+can someone guide me how to overcome this problem?
+if there is another method to cross compile bluez protocol stack for
+arm pls guid me thorugh.
+
+awaiting for reply...
+Regards,
+
+-- 
+Kartikey Parmar
+R&D Software Engg
+Matrix Telecom Pvt Ltd
+Baroda, Gujarat (India)
+09879095390 (M)
