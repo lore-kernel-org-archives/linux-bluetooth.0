@@ -1,28 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <49D1FE96.1090200@binarywings.net>
-Date: Tue, 31 Mar 2009 13:29:26 +0200
-From: Florian Philipp <lists@binarywings.net>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: PAN with bluez-utils-3
-Content-Type: text/plain; charset=ISO-8859-15
+In-Reply-To: <alpine.LNX.2.00.0903292156230.32436@nge2.ngu.pk>
+References: <7337540c0903290328o57d99321h638315cdf79c8e52@mail.gmail.com>
+	 <alpine.LNX.2.00.0903292156230.32436@nge2.ngu.pk>
+Date: Tue, 31 Mar 2009 07:47:13 +0000
+Message-ID: <7337540c0903310047u110a000ai980d1e83c90a0f72@mail.gmail.com>
+Subject: Re: Flood of "urb ... submission failed" with bluetooth headset
+From: Ludovico Cavedon <ludovico.cavedon@gmail.com>
+To: jayjwa <jayjwa@atr2.ath.cx>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi list!
+On Mon, Mar 30, 2009 at 3:31 AM, jayjwa <jayjwa@atr2.ath.cx> wrote:
+> On Sun, 29 Mar 2009, Ludovico Cavedon wrote:
+>
+>> When I try to play some audio on the my bluetooth headset, my syslog
+>> is flooded with messages like
+>>
+>> btusb_send_frame: hci0 urb ffff8800624bd800 submission failed
+>>
+>
+> Same thing happen here, too:
+>
+> btusb_send_frame: hci0 urb d093f200 submission failed
+> btusb_send_frame: hci0 urb d093f400 submission failed
+> btusb_send_frame: hci0 urb d093fa00 submission failed
+> ...
+> btusb_send_frame: hci0 urb d093fc00 submission failed
+> btusb_send_frame: hci0 urb d093fe00 submission failed
+> btusb_send_frame: hci0 urb d7271e00 submission failed
+> btusb_send_frame: hci0 urb d7271400 submission failed
+>
+> Seems to be related to the new btusb kernel module, because it didn't used
+> to happen with hci_usb kmod. Since the address keeps changing, syslog
+> rate-limiting can't remove them as dups . Maybe one out of the flurry of
+> patches we see on this list will address this soon.
+>
 
-I used to have a working private area network (pan) over bluetooth.
-However, since the update to bluez-utils-3.36, it doesn't work anymore.
+Actually I noticed I only get a burst of ~350 at the beginning of the
+connection, all with the same number, then no more.
 
-I especially want to get rid of the old daemons because, as I understand
-it, they are deprecated. However, I just can't find satisfying
-documentation on the new structure and config files.
+Is it normal?
 
-I don't want to go into detail on what exactly doesn't work at the
-moment because I really just guessed how I had to configure everything.
-
-So my question is: Does anyone have a working set of configuration files
-for newer bluez-utils? Preferably something related to the roles GN or  NAP.
-
-Thanks in advance!
-Florian Philipp
+Thanks,
+Ludovico
