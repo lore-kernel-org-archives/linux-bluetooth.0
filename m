@@ -1,28 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Wacom Graphire Bluetooth driver
-From: Bastien Nocera <hadess@hadess.net>
-To: linux-input <linux-input@vger.kernel.org>
-Cc: mjg <mjg@redhat.com>, Peter Hutterer <peter.hutterer@redhat.com>,
-	zap@homelink.ru,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1237247755.32264.10664.camel@cookie.hadess.net>
-References: <1236988799.32264.6310.camel@cookie.hadess.net>
-	 <1237247755.32264.10664.camel@cookie.hadess.net>
-Content-Type: text/plain
-Date: Tue, 31 Mar 2009 23:35:36 +0100
-Message-Id: <1238538936.3545.1453.camel@cookie.hadess.net>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <49D1FE96.1090200@binarywings.net>
+References: <49D1FE96.1090200@binarywings.net>
+Date: Tue, 31 Mar 2009 10:44:33 -0300
+Message-ID: <2d5a2c100903310644od9cbf69ma2c28c83b7e51@mail.gmail.com>
+Subject: Re: PAN with bluez-utils-3
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Florian Philipp <lists@binarywings.net>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 2009-03-16 at 23:55 +0000, Bastien Nocera wrote:
-> >From 3495e3be72d1df6132d5f5d978d2def3e4d57fc3 Mon Sep 17 00:00:00 2001
-> From: Bastien Nocera <hadess@hadess.net>
-> Date: Mon, 16 Mar 2009 23:36:54 +0000
-> Subject: [PATCH] Wacom Graphire Bluetooth driver
+Hi Florian,
 
-Any news on the patch? Matthew kindly added it to the Fedora 11 kernel:
-http://cvs.fedoraproject.org/viewvc/rpms/kernel/F-11/linux-2.6-input-wacom-bluetooth.patch?view=log
+On Tue, Mar 31, 2009 at 8:29 AM, Florian Philipp <lists@binarywings.net> wrote:
+> So my question is: Does anyone have a working set of configuration files
+> for newer bluez-utils? Preferably something related to the roles GN or  NAP.
 
-Cheers
+Check the documentation under doc/network-api.txt, it should be very
+simple to detect if the remote device supports PAN it will export
+org.bluez.Network on its dbus object. Now if your application doesn't
+support introspection you can detect it by using the UUIDs property
+exported in the very same dbus object I had mentioned.
 
+For actually connecting to the device you will only need to call
+org.bluez.Network.Connect({"panu","gn","nap"...}) , you can tell
+bluetoothd to run a script of your choice when the connection is
+activated by editing network.conf. Note that some daemons like
+NetworkManager and connman should not require any script.
+
+To act like a server you don't need to do anything for panu, for gn we
+normally create a bridge called pan0 where all client are added, nap
+is especial because of the routing stuff so you/your system need to
+configure a bridge properly and make network.conf to use it (by
+default this should be pan1).
+
+Now if you got any problem you could please provide a more detailed
+info of it, if it is a bug we will be happy to fix it.
+
+Thanks,
+
+-- 
+Luiz Augusto von Dentz
+Engenheiro de Computação
