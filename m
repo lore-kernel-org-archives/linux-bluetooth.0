@@ -1,34 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] Fix memset of sco_opt
-Date: Tue, 31 Mar 2009 23:30:45 -0300
-Message-Id: <1238553045-23938-3-git-send-email-gustavo@las.ic.unicamp.br>
-In-Reply-To: <1238553045-23938-2-git-send-email-gustavo@las.ic.unicamp.br>
+Subject: [PATCH 2/3] Fix null dereference in gdbus/watch.c
+Date: Tue, 31 Mar 2009 23:30:44 -0300
+Message-Id: <1238553045-23938-2-git-send-email-gustavo@las.ic.unicamp.br>
+In-Reply-To: <1238553045-23938-1-git-send-email-gustavo@las.ic.unicamp.br>
 References: <1238553045-23938-1-git-send-email-gustavo@las.ic.unicamp.br>
- <1238553045-23938-2-git-send-email-gustavo@las.ic.unicamp.br>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Now len has the correct value: sizeof(sco_opt)
+If name or data->name is null we have a null dereference. Not name and
+data->name.
 ---
- common/btio.c |    2 +-
+ gdbus/watch.c |    2 +-
  1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/common/btio.c b/common/btio.c
-index 9ff407f..030feda 100644
---- a/common/btio.c
-+++ b/common/btio.c
-@@ -573,8 +573,8 @@ static gboolean sco_set(int sock, uint16_t mtu, GError **err)
- 	if (!mtu)
- 		return TRUE;
+diff --git a/gdbus/watch.c b/gdbus/watch.c
+index 38bf3d7..607803c 100644
+--- a/gdbus/watch.c
++++ b/gdbus/watch.c
+@@ -62,7 +62,7 @@ static struct name_data *name_data_find(DBusConnection *connection,
+ 			current != NULL; current = current->next) {
+ 		struct name_data *data = current->data;
  
--	memset(&sco_opt, 0, len);
- 	len = sizeof(sco_opt);
-+	memset(&sco_opt, 0, len);
- 	if (getsockopt(sock, SOL_SCO, SCO_OPTIONS, &sco_opt, &len) < 0) {
- 		ERROR_FAILED(err, "getsockopt(SCO_OPTIONS)", errno);
- 		return FALSE;
+-		if (name == NULL && data->name == NULL) {
++		if (name == NULL || data->name == NULL) {
+ 			if (connection == data->connection)
+ 				return data;
+ 		} else {
 -- 
 1.6.0.6
 
