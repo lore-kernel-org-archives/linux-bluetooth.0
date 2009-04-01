@@ -1,21 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <49D30FD8.9020506@binarywings.net>
+Date: Wed, 01 Apr 2009 08:55:20 +0200
+From: Florian Philipp <lists@binarywings.net>
 MIME-Version: 1.0
-Date: Wed, 1 Apr 2009 16:05:54 +0200
-Message-ID: <bb7250380904010705k2bd15e55t750b1ae34e480f35@mail.gmail.com>
-Subject: DeviceFound-Signal without name?
-From: Marcel <wittemar@googlemail.com>
 To: linux-bluetooth@vger.kernel.org
+Subject: Re: PAN with bluez-utils-3
+References: <49D1FE96.1090200@binarywings.net> <2d5a2c100903310644od9cbf69ma2c28c83b7e51@mail.gmail.com>
+In-Reply-To: <2d5a2c100903310644od9cbf69ma2c28c83b7e51@mail.gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Luiz Augusto von Dentz schrieb:
+> Hi Florian,
+> 
+> On Tue, Mar 31, 2009 at 8:29 AM, Florian Philipp <lists@binarywings.net> wrote:
+>> So my question is: Does anyone have a working set of configuration files
+>> for newer bluez-utils? Preferably something related to the roles GN or  NAP.
+> 
+[...]
+> To act like a server you don't need to do anything for panu, for gn we
+> normally create a bridge called pan0 where all client are added, nap
+> is especial because of the routing stuff so you/your system need to
+> configure a bridge properly and make network.conf to use it (by
+> default this should be pan1).
+> 
+> Now if you got any problem you could please provide a more detailed
+> info of it, if it is a bug we will be happy to fix it.
+> 
+> Thanks,
+> 
 
-why does the DeviceFound-Signal from the D-Bus-API does not contain a
-name of the device until I have connected to the device one time oder
-until "hcitool scan" found the device? Is there a possibility to
-configure bluetoothd to put the name every time in this signal? Or is
-there a simple way to ask for the name through the D-Bus-API if it is
-missing? I'm using bluez 4.33
+Thanks for your answer! I don't think it's bug but merely lack of
+understanding on my part. Therefore I'll go into detail now:
 
-Greets
+Here I have a Gentoo system which shall act as the GN. Its hcid.conf
+looks like this:"
+options {
+	autoinit yes;
+	security auto;
+	pairing multi;
+	passkey "123456";
+}
+device {
+ 	name "BlueZ (%d) at %h";
+	class 0x020100;
+	iscan enable; pscan enable;
+	lm master;
+	lp rswitch,hold,sniff,park;
+}
+"
+
+Its network.conf would then look like this (?):"
+[General]
+
+[PANU Role]
+Autostart=false
+
+[GN Role]
+Interface=blue0
+Autostart=true
+
+[NAP Role]
+Autostart=false
+"
+
+The init-script executes the following command:
+/usr/sbin/hcid -s -f /etc/bluetooth/hcid.conf
+
+What's wrong with this? When I test it with Windows clients, they fiind
+the device but it doesn't appear to have PAN functionality.
+
+P.S.: Sorry Luiz if I accidentally sent the reply directly to you at first.
