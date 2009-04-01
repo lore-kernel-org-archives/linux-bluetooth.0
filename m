@@ -1,74 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <49D30FD8.9020506@binarywings.net>
-Date: Wed, 01 Apr 2009 08:55:20 +0200
-From: Florian Philipp <lists@binarywings.net>
+Date: Wed, 1 Apr 2009 08:56:35 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 3/3] Fix memset of sco_opt
+Message-ID: <20090401055635.GC17550@jh-x301>
+References: <1238553045-23938-1-git-send-email-gustavo@las.ic.unicamp.br> <1238553045-23938-2-git-send-email-gustavo@las.ic.unicamp.br> <1238553045-23938-3-git-send-email-gustavo@las.ic.unicamp.br>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: PAN with bluez-utils-3
-References: <49D1FE96.1090200@binarywings.net> <2d5a2c100903310644od9cbf69ma2c28c83b7e51@mail.gmail.com>
-In-Reply-To: <2d5a2c100903310644od9cbf69ma2c28c83b7e51@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1238553045-23938-3-git-send-email-gustavo@las.ic.unicamp.br>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Luiz Augusto von Dentz schrieb:
-> Hi Florian,
+Hi,
+
+On Tue, Mar 31, 2009, Gustavo F. Padovan wrote:
+> Now len has the correct value: sizeof(sco_opt)
+> ---
+>  common/btio.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 > 
-> On Tue, Mar 31, 2009 at 8:29 AM, Florian Philipp <lists@binarywings.net> wrote:
->> So my question is: Does anyone have a working set of configuration files
->> for newer bluez-utils? Preferably something related to the roles GN or  NAP.
-> 
-[...]
-> To act like a server you don't need to do anything for panu, for gn we
-> normally create a bridge called pan0 where all client are added, nap
-> is especial because of the routing stuff so you/your system need to
-> configure a bridge properly and make network.conf to use it (by
-> default this should be pan1).
-> 
-> Now if you got any problem you could please provide a more detailed
-> info of it, if it is a bug we will be happy to fix it.
-> 
-> Thanks,
-> 
+> diff --git a/common/btio.c b/common/btio.c
+> index 9ff407f..030feda 100644
+> --- a/common/btio.c
+> +++ b/common/btio.c
+> @@ -573,8 +573,8 @@ static gboolean sco_set(int sock, uint16_t mtu, GError **err)
+>  	if (!mtu)
+>  		return TRUE;
+>  
+> -	memset(&sco_opt, 0, len);
+>  	len = sizeof(sco_opt);
+> +	memset(&sco_opt, 0, len);
+>  	if (getsockopt(sock, SOL_SCO, SCO_OPTIONS, &sco_opt, &len) < 0) {
+>  		ERROR_FAILED(err, "getsockopt(SCO_OPTIONS)", errno);
+>  		return FALSE;
 
-Thanks for your answer! I don't think it's bug but merely lack of
-understanding on my part. Therefore I'll go into detail now:
+Nice catch! This one has also been pushed upstream. It's strange though that we
+haven't noticed any uninitialized variable compiler warnings because of it
+earlier.
 
-Here I have a Gentoo system which shall act as the GN. Its hcid.conf
-looks like this:"
-options {
-	autoinit yes;
-	security auto;
-	pairing multi;
-	passkey "123456";
-}
-device {
- 	name "BlueZ (%d) at %h";
-	class 0x020100;
-	iscan enable; pscan enable;
-	lm master;
-	lp rswitch,hold,sniff,park;
-}
-"
-
-Its network.conf would then look like this (?):"
-[General]
-
-[PANU Role]
-Autostart=false
-
-[GN Role]
-Interface=blue0
-Autostart=true
-
-[NAP Role]
-Autostart=false
-"
-
-The init-script executes the following command:
-/usr/sbin/hcid -s -f /etc/bluetooth/hcid.conf
-
-What's wrong with this? When I test it with Windows clients, they fiind
-the device but it doesn't appear to have PAN functionality.
-
-P.S.: Sorry Luiz if I accidentally sent the reply directly to you at first.
+Johan
