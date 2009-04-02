@@ -1,71 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <49D511C2.5040304@web.de>
-Date: Thu, 02 Apr 2009 21:28:02 +0200
-From: Eiko Oltmanns <eiko.oltmanns@web.de>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: problem with reading from rfcomm socket
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+In-Reply-To: <49D45501.8030606@binarywings.net>
+References: <49D1FE96.1090200@binarywings.net>
+	 <2d5a2c100903310644od9cbf69ma2c28c83b7e51@mail.gmail.com>
+	 <49D30FD8.9020506@binarywings.net> <49D45501.8030606@binarywings.net>
+Date: Thu, 2 Apr 2009 14:28:29 -0300
+Message-ID: <2d5a2c100904021028g78376debke885916eba13cf93@mail.gmail.com>
+Subject: Re: PAN with bluez-utils-3
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Florian Philipp <lists@binarywings.net>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
+Hi Florian
+
+On Thu, Apr 2, 2009 at 3:02 AM, Florian Philipp <lists@binarywings.net> wrote:
+> Florian Philipp schrieb:
+>> Thanks for your answer! I don't think it's bug but merely lack of
+>> understanding on my part. Therefore I'll go into detail now:
+>>
+>> Here I have a Gentoo system which shall act as the GN. Its hcid.conf
+>> looks like this:"
+>> options {
+>> а а а autoinit yes;
+>> а а а security auto;
+>> а а а pairing multi;
+>> а а а passkey "123456";
+>> }
+>> device {
+>> а а а name "BlueZ (%d) at %h";
+>> а а а class 0x020100;
+>> а а а iscan enable; pscan enable;
+>> а а а lm master;
+>> а а а lp rswitch,hold,sniff,park;
+>> }
+>> "
+>>
+>> Its network.conf would then look like this (?):"
+>> [General]
+>>
+>> [PANU Role]
+>> Autostart=false
+>>
+>> [GN Role]
+>> Interface=blue0
+>> Autostart=true
+>>
+>> [NAP Role]
+>> Autostart=false
+>> "
+>>
+>> The init-script executes the following command:
+>> /usr/sbin/hcid -s -f /etc/bluetooth/hcid.conf
+>>
+>> What's wrong with this? When I test it with Windows clients, they fiind
+>> the device but it doesn't appear to have PAN functionality.
+>>
+>
+> I'd also be happy about a response like 'It should work'. Then I could
+> start searching for unlogical explanations.
+
+It looks like you have been using BlueZ 3.x series which is way too
+old for me to take a look. Check with 4.x if it helps.
 
 
-I have a problem, with reading from rfcomm sockets. I wrote a little client application, that connects to an other device and just prints all received data. I want to receive data as soon as it is sent from the remove device. The problem is, that the read function blocks, until 4k of data are sent on the remote side, although the number of requested bytes passed to read is much lower. Then read starts to read out the received data. When all data has been read, the next call again blocks until the next 4 kb are available.
-
-Distribution: Debian, "Lenny"
-Kernelversion: 2.6.26-13
-Bluez-libs: 3.36-1
-Bluez-utils: 3.36-3
-
-
-Here is the minimal code, which reproduces my problem:
-
-
-int main(int argc, char **argv)
-{
-	int sock = hci_open_dev( devId );
-
-	if ( sock < 0 ) return -1;
-
-	int rfcommSocket = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
-	if ( rfcommSocket < 0 ) return -1;
-
-	struct sockaddr_rc addr;
-	addr.rc_family = AF_BLUETOOTH;
-	addr.rc_channel = channel;
-	str2ba("00:09:DD:50:72:0F", &addr.rc_bdaddr );
-	
-	// connect to server
-	int status = connect(rfcommSocket, (struct sockaddr *)&addr, sizeof(addr));
-
-	if (  status < 0 ) rerurn - 1;
-
-	int bytes = write(rfcommSocket,"Test",4);	/* works as expected. Data is received immediately by the remote device */
-
-	if ( bytes != 4 ) return - 1; //tested only for 4 for simplicity
-
-	while (1) 
-	{
-		unsigned char buf[10];		/* the buf size seems to have no influence on my problem */
-		memset( buf, 0, sizeof(buf));
-		int bytes = read(rfcommSocket, buf, sizeof(buf)-1); /* blocks until 4k of data are available */
-
-		if ( bytes > 0 )
-			cout << buf;
-		if ( bytes < 0 )
-		{
-			return -1;
-		}
-
-	}
-	
-
-	return 0;
-}
-
-Greetings,
-Eiko
-
-
+-- 
+Luiz Augusto von Dentz
+Engenheiro de Computaчуo
