@@ -1,26 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 3 Apr 2009 23:12:07 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Forrest <forrest.zhao@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/4] add the D-Bus interface definition for HFP Audio
-	gateway -- take4 -- rebased
-Message-ID: <20090403201207.GA8156@jh-x301>
-References: <1238730552-3765-1-git-send-email-forrest.zhao@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1238730552-3765-1-git-send-email-forrest.zhao@gmail.com>
+Date: Fri, 3 Apr 2009 17:50:02 +0530
+Message-ID: <6887eb5d0904030520r6f611678o2eefb59cec5641c5@mail.gmail.com>
+Subject: PIN helper in Bluez-4.30
+From: Kartikey Parmar <kartikey2781@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Forrest,
+Hi,
 
-The first three patches have been pushed upstream with some minor modifications
-(compilation warning fixes and disabling the new feature by default). However,
-the fourth one which binds it all to the IPC needs some rethinking. Right now
-it'd break backwards compatibility for the IPC which we'd like to avoid since
-we juts did that for 4.34. Also, there are some added terms like master and
-slave (used for HFP/A2DP roles) which should be renamed to something more
-intuitive (assuming they need to be in the IPC at all).
+Is there any program / utility in the Bluez-4.30 which will take 4
+digit PIN and generates linkkey to pair remoter bluetooth device?
 
-Johan
+I want to port Bluez-4.30 on ARM so I will not have support other than
+arm-linux-gcc...
+I think installing / cross compiling bluez-gnome-1.8 for ARM platform
+will consume lot of memory on the embedded device?
+
+I m little confuse to solve this issue...
+Can somebody guide me? I will be thankful to him/her.
+Awaiting for reply.
+
+-- 
+Kartikey Parmar
+R&D Software Engg
+Matrix Telecom Pvt Ltd
+Baroda, Gujarat (India)
+09879095390 (M)
