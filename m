@@ -1,139 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: Forrest <forrest.zhao@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Forrest <forrest.zhao@gmail.com>
-Subject: [PATCH 1/4] add the D-Bus interface definition for HFP Audio gateway -- take4 -- rebased
-Date: Fri,  3 Apr 2009 11:49:12 +0800
-Message-Id: <1238730552-3765-1-git-send-email-forrest.zhao@gmail.com>
+From: Gene Heskett <gene.heskett@verizon.net>
+To: jayjwa <jayjwa@atr2.ath.cx>
+Subject: Re: Newbie, can't find device
+Date: Thu, 02 Apr 2009 23:20:42 -0400
+Cc: "linux-bluetooth" <linux-bluetooth@vger.kernel.org>
+References: <200903252037.03024.gene.heskett@verizon.net>
+ <200903300928.02545.gene.heskett@verizon.net>
+ <alpine.LNX.2.00.0903312308510.7564@nge2.ngu.pk>
+In-reply-to: <alpine.LNX.2.00.0903312308510.7564@nge2.ngu.pk>
+MIME-version: 1.0
+Content-type: text/plain; charset=iso-8859-1
+Message-id: <200904022320.42302.gene.heskett@verizon.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/audio-api.txt |  114 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 114 insertions(+), 0 deletions(-)
+On Tuesday 31 March 2009, jayjwa wrote:
+>
+>That depends on what you want to do exactly. You should be able to follow
+> the commands from my first post, to bind an rfcomm device (assuming you're
+> trying to connect to something like a bluetooth modem, since you mentioned
+> Minicom). You should be able to view the services available on the remote
+> system now:
+>
+>
+>sdptool browse <address>
 
-diff --git a/doc/audio-api.txt b/doc/audio-api.txt
-index 7e8492d..7eea7ca 100644
---- a/doc/audio-api.txt
-+++ b/doc/audio-api.txt
-@@ -289,3 +289,117 @@ properties	string State [readonly]
- 
- 			Indicates if a stream is active to a A2DP sink on
- 			the remote device.
-+
-+
-+Gateway hierarchy
-+===================
-+
-+Service		org.bluez
-+Interface	org.bluez.HeadsetGateway
-+Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
-+
-+This interface is available for remote devices which can function in the Audio
-+Gateway role of the HFP profiles.
-+
-+Methods		void Connect()
-+
-+			Connect to the AG service on the remote device.
-+
-+		void Disconnect()
-+
-+			Disconnect from the AG service on the remote device
-+
-+		void AnswerCall()
-+
-+			It has to called only after Ring signal received.
-+
-+		void TerminateCall()
-+
-+			Terminate call which is running or reject an incoming
-+			call. This has nothing with any 3-way situation incl.
-+			RaH. Just plain old PDH.
-+
-+		void Call(string number)
-+
-+			Dial a number 'number'. No number processing is done
-+			thus if AG would reject to dial it don't blame me :)
-+
-+		string GetOperatorName()
-+
-+			Find out the name of the currently selected network
-+			operator by AG.
-+
-+		void SendDTMF(string digits)
-+
-+			Will send each digit in the 'digits' sequentially. Would
-+			send nothing if there is non-dtmf digit.
-+
-+		string GetSubscriberNumber()
-+
-+			Get the voicecall subscriber number of AG
-+
-+		dict GetProperties()
-+
-+			Returns all properties for the interface. See the
-+			properties section for available properties.
-+
-+Signals		void Ring(string number)
-+
-+			Someone's calling from 'number'.
-+			Caller number is provided as received from AG.
-+
-+		void CallTerminated()
-+
-+			Call failed to set up. It means that we tried to call
-+			someone or someone tried to call us but call was not
-+			accepted.
-+
-+		void CallStarted()
-+
-+			Call set up successfully.
-+
-+		void CallEnded()
-+
-+			Call was started and now ended. In contrast with
-+			CallTerminated where call didn't started
-+
-+		PropertyChanged(string name, variant value)
-+
-+			This signal indicates a changed value of the given
-+			property.
-+
-+properties	boolean Connected [readonly]
-+
-+			Indicates if there is an active connection to the
-+			AG service on the remote device.
-+
-+		uint16 RegistrationStatus [readonly]
-+
-+			Service availability indicatior of AG, where:
-+			0 implies no service. No Home/Roam network available.
-+			1 implies presense of service. Home/Roam network
-+			  available.
-+
-+		uint16 SignalStrength [readonly]
-+
-+			Signal strength indicator of AG, the value ranges from
-+			0 to 5.
-+
-+		uint16 RoamingStatus [readonly]
-+
-+			Roaming status indicator of AG, where:
-+			0 means roaming is not active
-+			1 means a roaming is active
-+
-+		uint16 BatteryCharge [readonly]
-+
-+			Battery Charge indicator of AG, the value ranges from
-+			0 to 5.
-+
-+		uint16 SpeakerGain  [readonly]
-+
-+			The speaker gain when available.
-+
-+		uint16 MicrophoneGain  [readonly]
-+
-+			The speaker gain when available.
+sdptool browse local returns a lot of stuff that means little to me until I 
+'learn the lingo'
+
+Specifying anything but 'local' times out eventually.
+
+>Find the one you want, and note the channel it's on. You can then use
+> rfcomm, which should make your /dev/rfcomm0 device that's giving access to
+> the remote device at the specified channel. See 'rfcomm --help' for rfcomm
+> commands (it doesn't have a "--help" parameter, but doing that will cause
+> the same output as if it did.)
+>
+I have made some small progress in that there are some hcitool commands that 
+do not return the error screen.  For instance:
+[root@coyote blueman-1.02]# hcitool dev
+Devices:
+        hci0    11:11:11:11:11:11
+
+This after using "rfcomm bind HCI0 11:11:11:11:11:11 1" and then doing a 
+listen on channel 1 through 30, but I have NDI how many channels are actually 
+allocated in the rules for bt devices.
+
+The other end is running a program that outputs the string "CoCo3 at 
+coyote.den" through that device at 9600 baud about 2x/second till I kill it.  
+Nothing is heard by hci0 here.
+
+So walk me through setting this up from scratch on the linux end, to connect 
+to a bt device on the other and about 20 feet away, that if its beacon is 
+running, and I have no clue how to ascertain that, with an 'eb101' string and 
+I presume its bdaddr in addition to the string I'm sending.  That end is set 
+for 9600 baud, and I've not stumbled over how to set this end for that speed 
+yet, so take that into consideration please.
+
+Thank you very much.
+
 -- 
-1.5.4.5
+Cheers, Gene
+"There are four boxes to be used in defense of liberty:
+ soap, ballot, jury, and ammo. Please use in that order."
+-Ed Howdershelt (Author)
+Break into jail and claim police brutality.
 
