@@ -1,31 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Fri, 3 Apr 2009 17:50:02 +0530
-Message-ID: <6887eb5d0904030520r6f611678o2eefb59cec5641c5@mail.gmail.com>
-Subject: PIN helper in Bluez-4.30
-From: Kartikey Parmar <kartikey2781@gmail.com>
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20090402132145.GA25111@localhost>
+References: <ac8af0be0904020225s8eb1971k5d1f623540df3fd@mail.gmail.com>
+	 <20090402132145.GA25111@localhost>
+Date: Fri, 3 Apr 2009 11:54:08 +0800
+Message-ID: <ac8af0be0904022054lc14fa6ap57f029125dd83868@mail.gmail.com>
+Subject: Re: [PATCH 2/4] add the basic framework support for HFP Audio gateway
+	-- take 4 -- resend
+From: Zhao Forrest <forrest.zhao@gmail.com>
+To: Johan Hedberg <johan.hedberg@nokia.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+> This second patch doesn't apply. I get the following when giving it to
+> git am:
+>
+> Applying add the basic framework support for HFP Audio gateway -- take 4 -- resend
+> fatal: corrupt patch at line 127
+> Patch failed at 0001.
+>
+> Could you please fix it? We're going to try to get the patches merged for the
+> next release.
 
-Is there any program / utility in the Bluez-4.30 which will take 4
-digit PIN and generates linkkey to pair remoter bluetooth device?
+I have fixed it and resent the patch set. Thank you for helping review and
+merge the patch.
 
-I want to port Bluez-4.30 on ARM so I will not have support other than
-arm-linux-gcc...
-I think installing / cross compiling bluez-gnome-1.8 for ARM platform
-will consume lot of memory on the embedded device?
-
-I m little confuse to solve this issue...
-Can somebody guide me? I will be thankful to him/her.
-Awaiting for reply.
-
--- 
-Kartikey Parmar
-R&D Software Engg
-Matrix Telecom Pvt Ltd
-Baroda, Gujarat (India)
-09879095390 (M)
+Thanks,
+Forrest
