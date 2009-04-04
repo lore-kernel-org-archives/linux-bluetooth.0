@@ -1,63 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gene Heskett <gene.heskett@verizon.net>
-To: linux-bluetooth@vger.kernel.org
-Subject: The link I had working quit.  Help
-Date: Sat, 04 Apr 2009 16:36:25 -0400
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
-Message-id: <200904041636.25409.gene.heskett@verizon.net>
+Date: Sat, 4 Apr 2009 12:54:25 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Kartikey Parmar <kartikey2781@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: bluez PIN generation in non-gui based application
+Message-ID: <20090404095425.GA14455@jh-x301>
+References: <6887eb5d0904032108k73484ee9p7b872bf0c492f0ed@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <6887eb5d0904032108k73484ee9p7b872bf0c492f0ed@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Greetings all;
+Hi,
 
-I had minicom working fine till I reset the passkey on both devices, and now 
-minicom says there is no /dev/rfcomm0 when there really is.
+On Sat, Apr 04, 2009, Kartikey Parmar wrote:
+> While cross compiling bluez-gnome-1.8, I found that it is dependent on
+> GTK+ and GTK+ is dependent on ATK, PANGO, CAIRO.
+> Is it possible to run bluez-gnome-1.8 application on simple linux that
+> doesn't support GUI? or is there any other application available which
+> can be used to generate linkkey from fixed PIN given?
 
-The init script I use here now reads:
-----------------------------------
-#!/bin/bash
-echo attempting to get bt link to the coco3
-hcitool -i hci0 11:11:11:11:11:11 key 4391
-rfcomm release hci0
-rfcomm -i 11:11:11:11:11:11 bind hci0 00:0c:84:00:86:F8
-echo this should show the cocos address
-rfcomm -i 11:11:11:11:11:11 show hci0
-------------------------------------
-and returns:
-[root@coyote sysconfig]# connect2coco3
+You could e.g. make a minor modification to test/simple-agent to make it return
+a fixed PIN in the RequestPinCode callback. Alternatively you try to update
+test/agent.c to work with the new Agent interface.
 
-attempting to get bt link to the coco3
-this should show the cocos address
-rfcomm0: 11:11:11:11:11:11 -> 00:0C:84:00:86:F8 channel 1 clean
-
-But minicom now says /dev/rfcomm0 doesn't exist, or after a couple of minutes:
--------------------------------
-[root@coyote system.d]# minicom
-minicom: cannot open /dev/rfcomm0: Host is down
------------------------------
-
-but it does exist:
-[root@coyote sysconfig]# ls -l /dev/rfc*
-crw------- 1 root root 216, 0 2009-04-04 16:20 /dev/rfcomm0
-
-I am assuming that 'key' here is equal to 'passkey' on the other device.
-Is that assumption wrong?
-
-I'm also assuming that a short powerdown for the eb101 device at the other end 
-will restore it to link mode after I quit the comm proggy on that machine, 
-which probably puts the eb101 into the command mode with a +++ pause ATH.  I 
-can train that program not to do that I think.
-
-So, which end do I beat on here?, I'm getting lost in the forest, too many 
-trees.
-
-Thank you all.
-
--- 
-Cheers, Gene
-"There are four boxes to be used in defense of liberty:
- soap, ballot, jury, and ammo. Please use in that order."
--Ed Howdershelt (Author)
-Please state the nature of the technical emergency
-
+Johan
