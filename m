@@ -1,79 +1,413 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <49D8E48A.2060807@pook.es>
-Date: Sun, 05 Apr 2009 19:04:10 +0200
+Message-ID: <49D8A346.1010505@pook.es>
+Date: Sun, 05 Apr 2009 14:25:42 +0200
 From: Stuart Pook <linux-bluetooth4@pook.es>
 MIME-Version: 1.0
 To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: bluez 4.34 + Linksys USBBT100 + hcitool scan -> core dump
-References: <49D89DCD.7090808@pook.es>
-In-Reply-To: <49D89DCD.7090808@pook.es>
+Subject: Belkin F8T017 Adapter requires hciconfig hci0 down/up with bluez
+ 4.34
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-here I am replying to myself
+hello
 
-On 05/04/09 14:02, Stuart Pook wrote:
-> I tried it again with bluez 4.34 and now a simple 
-> "hcitool scan" makes bluetoothd core dump.
+Why does my Belkin F8T017 (v2.1 + EDR) Bluetooth Adapter require a hciconfig hci0 down followed by a hciconfig hci0 up before it wants to work?
 
-I have just noticed that I've been getting kernel errors with all this plugging and unplugging of Bluetooth adapters.
+When I plug my Belkin F8T017 Bluetooth Adapter in bluetoothd (bluez 4.34) says
 
-The first one happened after I sent my email so it perhaps not the cause of the bluetoothd core dumps. All the other kernel errors have the same message ('hci0:6' can not be created).
+bluetoothd[10690]: HCI dev 0 registered
+bluetoothd[10690]: child 10760 forked
+bluetoothd[10690]: child 10760 exited
+bluetoothd[10690]: HCI dev 0 up
+bluetoothd[10690]: Starting security manager 0
+bluetoothd[10690]: Can't read class of adapter on /org/bluez/10690/hci0: Unknown error 4294967291 (-5)
+bluetoothd[10690]: Getting name failed with status 0x0c
+bluetoothd[10690]: Can't read class of device on hci0: Input/output error (5)
 
-Apr  5 12:14:39 kooka kernel: [1171487.385852] ------------[ cut here ]------------
-Apr  5 12:14:39 kooka kernel: [1171487.385855] WARNING: at fs/sysfs/dir.c:462 sysfs_add_one+0x27/0x2f()
-Apr  5 12:14:39 kooka kernel: [1171487.385857] sysfs: duplicate filename 'hci0:6' can not be created
-Apr  5 12:14:39 kooka kernel: [1171487.385858] Modules linked in: battery hfs hfsplus udf crc_itu_t usblp snd_seq_dummy snd_seq_oss snd_seq_midi snd_seq_midi_event snd_seq rfcomm nls_iso8859_1 sco l2cap tun binfmt_misc kvm_intel kvm bridge stp ip6t_LOG nf_conntrack_ipv6 ipt_REJECT xt_limit nf_conntrack_ipv4 nf_defrag_ipv4 xt_state nf_conntrack xt_comment ts_bm xt_string xt_length xt_tcpudp xt_physdev ipt_LOG ip6table_filter ip6_tables iptable_filter ip_tables x_tables ipv6 ext4 jbd2 crc16 nls_utf8 nls_cp437 vfat fat isofs nls_base zlib_inflate sha256_generic aes_i586 aes_generic cbc dm_crypt coretemp it87 hwmon_vid hid_dell hid_pl hid_cypress hid_zpff hid_gyration hid_bright hid_sony hid_samsung hid_microsoft hid_tmff hid_monterey hid_ezkey hid_apple hid_a4tech hid_logitech ff_memless snd_hda_intel snd_usb_audio hid_cherry snd_usb_lib i2c_i801 snd_mixer_oss hid_sunplus snd_rawmidi evdev serio_raw pcspkr i2c_core snd_pcm iTCO_wdt hid_petalynx snd_seq_device snd_timer hid_belki
-n parport_pc usbhid snd_page_alloc snd_hwdep snd soundcore hid_chicony btusb bluetooth hid intel_agp agpgart button parport usb_storage ext3 jbd mbcache dm_mirror dm_region_hash dm_log dm_snapshot dm_mod ide_cd_mod cdrom sd_mod crc_t10dif ide_gd_mod ata_generic ide_pci_generic ahci uhci_hcd pdc202xx_new jmicron r8169 mii libata ide_core scsi_mod ehci_hcd usbcore thermal processor fan thermal_sys
-Apr  5 12:14:39 kooka kernel: [1171487.385961] Pid: 1738, comm: btaddconn Tainted: G        W  2.6.28-1-686 #1
-Apr  5 12:14:39 kooka kernel: [1171487.385963] Call Trace:
-Apr  5 12:14:39 kooka kernel: [1171487.385967]  [<c0126d7a>] warn_slowpath+0x5a/0x79
-Apr  5 12:14:39 kooka kernel: [1171487.385970]  [<c011de3f>] enqueue_entity+0x6b/0x112
-Apr  5 12:14:39 kooka kernel: [1171487.385974]  [<c01f8c0e>] idr_get_empty_slot+0x145/0x202
-Apr  5 12:14:39 kooka kernel: [1171487.385976]  [<c01f8d9f>] ida_get_new_above+0xd4/0x178
-Apr  5 12:14:39 kooka kernel: [1171487.385980]  [<c01953d6>] find_inode+0x1b/0x56
-Apr  5 12:14:39 kooka kernel: [1171487.385982]  [<c01c25c4>] sysfs_ilookup_test+0x0/0xd
-Apr  5 12:14:39 kooka kernel: [1171487.385985]  [<c01954d5>] ifind+0x3a/0x73
-Apr  5 12:14:39 kooka kernel: [1171487.385987]  [<c01c2777>] sysfs_find_dirent+0x13/0x23
-Apr  5 12:14:39 kooka kernel: [1171487.385990]  [<c01c28f3>] sysfs_add_one+0x27/0x2f
-Apr  5 12:14:39 kooka kernel: [1171487.385992]  [<c01c2d73>] create_dir+0x3c/0x6c
-Apr  5 12:14:39 kooka kernel: [1171487.386010]  [<f90f9585>] add_conn+0x0/0x2f [bluetooth]
-Apr  5 12:14:39 kooka kernel: [1171487.386013]  [<c01c2dcc>] sysfs_create_dir+0x29/0x3b
-Apr  5 12:14:39 kooka kernel: [1171487.386016]  [<c01f95b2>] kobject_get+0xf/0x13
-Apr  5 12:14:39 kooka kernel: [1171487.386019]  [<c01f96c4>] kobject_add_internal+0xb6/0x14f
-Apr  5 12:14:39 kooka kernel: [1171487.386033]  [<f90f9585>] add_conn+0x0/0x2f [bluetooth]
-Apr  5 12:14:39 kooka kernel: [1171487.386035]  [<c01f986e>] kobject_add+0x44/0x47
-Apr  5 12:14:39 kooka kernel: [1171487.386038]  [<c0259d54>] device_add+0x7b/0x455
-Apr  5 12:14:39 kooka kernel: [1171487.386041]  [<c01f860c>] __next_cpu+0x12/0x21
-Apr  5 12:14:39 kooka kernel: [1171487.386054]  [<f90f9585>] add_conn+0x0/0x2f [bluetooth]
-Apr  5 12:14:39 kooka kernel: [1171487.386068]  [<f90f959c>] add_conn+0x17/0x2f [bluetooth]
-Apr  5 12:14:39 kooka kernel: [1171487.386071]  [<c0133f6b>] run_workqueue+0x89/0x10e
-Apr  5 12:14:39 kooka kernel: [1171487.386073]  [<c01340a6>] worker_thread+0xb6/0xc2
-Apr  5 12:14:39 kooka kernel: [1171487.386077]  [<c0136cce>] autoremove_wake_function+0x0/0x2d
-Apr  5 12:14:39 kooka kernel: [1171487.386079]  [<c0133ff0>] worker_thread+0x0/0xc2
-Apr  5 12:14:39 kooka kernel: [1171487.386081]  [<c0136a0f>] kthread+0x38/0x5d
-Apr  5 12:14:39 kooka kernel: [1171487.386084]  [<c01369d7>] kthread+0x0/0x5d
-Apr  5 12:14:39 kooka kernel: [1171487.386087]  [<c0104773>] kernel_thread_helper+0x7/0x10
-Apr  5 12:14:39 kooka kernel: [1171487.386089] ---[ end trace 1bc6cd22ec210d33 ]---
-Apr  5 12:14:39 kooka kernel: [1171487.386091] kobject_add_internal failed for hci0:6 with -EEXIST, don't try to register things with the same name in the same directory.
-Apr  5 12:14:39 kooka kernel: [1171487.386094] Pid: 1738, comm: btaddconn Tainted: G        W  2.6.28-1-686 #1
-Apr  5 12:14:39 kooka kernel: [1171487.386096] Call Trace:
-Apr  5 12:14:39 kooka kernel: [1171487.386098]  [<c01f974d>] kobject_add_internal+0x13f/0x14f
-Apr  5 12:14:39 kooka kernel: [1171487.386112]  [<f90f9585>] add_conn+0x0/0x2f [bluetooth]
-Apr  5 12:14:39 kooka kernel: [1171487.386115]  [<c01f986e>] kobject_add+0x44/0x47
-Apr  5 12:14:39 kooka kernel: [1171487.386117]  [<c0259d54>] device_add+0x7b/0x455
-Apr  5 12:14:39 kooka kernel: [1171487.386130]  [<c01f860c>] __next_cpu+0x12/0x21
-Apr  5 12:14:39 kooka kernel: [1171487.386142]  [<f90f9585>] add_conn+0x0/0x2f [bluetooth]
-Apr  5 12:14:39 kooka kernel: [1171487.386154]  [<f90f959c>] add_conn+0x17/0x2f [bluetooth]
-Apr  5 12:14:39 kooka kernel: [1171487.386157]  [<c0133f6b>] run_workqueue+0x89/0x10e
-Apr  5 12:14:39 kooka kernel: [1171487.386159]  [<c01340a6>] worker_thread+0xb6/0xc2
-Apr  5 12:14:39 kooka kernel: [1171487.386162]  [<c0136cce>] autoremove_wake_function+0x0/0x2d
-Apr  5 12:14:39 kooka kernel: [1171487.386165]  [<c0133ff0>] worker_thread+0x0/0xc2
-Apr  5 12:14:39 kooka kernel: [1171487.386167]  [<c0136a0f>] kthread+0x38/0x5d
-Apr  5 12:14:39 kooka kernel: [1171487.386170]  [<c01369d7>] kthread+0x0/0x5d
-Apr  5 12:14:39 kooka kernel: [1171487.386172]  [<c0104773>] kernel_thread_helper+0x7/0x10
-Apr  5 12:14:39 kooka kernel: [1171487.386174] add_conn: Failed to register connection device
+and nothing works.
+
+:; hcitool scan
+Scanning ...
+Inquiry failed: Connection timed out
+
+If I do, hciconfig hci0 down, I see
+
+bluetoothd[10690]: HCI dev 0 down
+bluetoothd[10690]: Adapter /org/bluez/10690/hci0 has been disabled
+bluetoothd[10690]: Stopping security manager 0
+
+A following "hciconfig hci0 up", is able to correctly configure the adapter:
+
+bluetoothd[10690]: HCI dev 0 up
+bluetoothd[10690]: Starting security manager 0
+bluetoothd[10690]: register_interface: path /org/bluez/10690/hci0
+bluetoothd[10690]: Registered interface org.bluez.Service on path /org/bluez/10690/hci0
+bluetoothd[10690]: headset_server_probe: path /org/bluez/10690/hci0
+bluetoothd[10690]: Adding record with handle 0x10000
+bluetoothd[10690]: Record pattern UUID 00000003-0000-1000-8000-00805f9
+bluetoothd[10690]: Record pattern UUID 00000100-0000-1000-8000-00805f9
+bluetoothd[10690]: Record pattern UUID 00001002-0000-1000-8000-00805f9
+bluetoothd[10690]: Record pattern UUID 00001108-0000-1000-8000-00805f9
+bluetoothd[10690]: Record pattern UUID 00001112-0000-1000-8000-00805f9
+bluetoothd[10690]: Record pattern UUID 00001203-0000-1000-8000-00805f9
+bluetoothd[10690]: Adding record with handle 0x10001
+bluetoothd[10690]: Record pattern UUID 00000003-0000-1000-8000-00805f9
+bluetoothd[10690]: Record pattern UUID 00000100-0000-1000-8000-00805f9
+bluetoothd[10690]: Record pattern UUID 00001002-0000-1000-8000-00805f9
+bluetoothd[10690]: Record pattern UUID 0000111e-0000-1000-8000-00805f9
+bluetoothd[10690]: Record pattern UUID 0000111f-0000-1000-8000-00805f9
+bluetoothd[10690]: Record pattern UUID 00001203-0000-1000-8000-00805f9
+bluetoothd[10690]: a2dp_server_probe: path /org/bluez/10690/hci0
+bluetoothd[10690]: SEP 0xb8ed54e0 registered: type:0 codec:0 seid:1
+bluetoothd[10690]: Adding record with handle 0x10002
+bluetoothd[10690]: Record pattern UUID 00000019-0000-1000-8000-00805f9
+bluetoothd[10690]: Record pattern UUID 00000100-0000-1000-8000-00805f9
+bluetoothd[10690]: Record pattern UUID 00001002-0000-1000-8000-00805f9
+bluetoothd[10690]: Record pattern UUID 0000110a-0000-1000-8000-00805f9
+bluetoothd[10690]: Record pattern UUID 0000110d-0000-1000-8000-00805f9
+bluetoothd[10690]: avrcp_server_probe: path /org/bluez/10690/hci0
+bluetoothd[10690]: Adding record with handle 0x10003
+bluetoothd[10690]: Record pattern UUID 00000017-0000-1000-8000-00805f9
+bluetoothd[10690]: Record pattern UUID 00000100-0000-1000-8000-00805f9
+bluetoothd[10690]: Record pattern UUID 00001002-0000-1000-8000-00805f9
+bluetoothd[10690]: Record pattern UUID 0000110c-0000-1000-8000-00805f9
+bluetoothd[10690]: Record pattern UUID 0000110e-0000-1000-8000-00805f9
+bluetoothd[10690]: Adding record with handle 0x10004
+bluetoothd[10690]: Record pattern UUID 00000017-0000-1000-8000-00805f9
+bluetoothd[10690]: Record pattern UUID 00000100-0000-1000-8000-00805f9
+bluetoothd[10690]: Record pattern UUID 00001002-0000-1000-8000-00805f9
+bluetoothd[10690]: Record pattern UUID 0000110e-0000-1000-8000-00805f9
+bluetoothd[10690]: Creating device /org/bluez/10690/hci0/dev_00_1A_45_2F_49_98
+bluetoothd[10690]: Probe drivers for /org/bluez/10690/hci0/dev_00_1A_45_2F_49_98
+bluetoothd[10690]: adapter_get_device(00:1A:45:2F:49:98)
+bluetoothd[10690]: Registered interface org.bluez.Audio on path /org/bluez/10690/hci0/dev_00_1A_45_2F_49_98
+bluetoothd[10690]: Found Headset record
+bluetoothd[10690]: Discovered Headset service on RFCOMM channel 2
+bluetoothd[10690]: Registered interface org.bluez.Headset on path /org/bluez/10690/hci0/dev_00_1A_45_2F_49_98
+bluetoothd[10690]: Found Handsfree record
+bluetoothd[10690]: Discovered Handsfree service on RFCOMM channel 1
+bluetoothd[10690]: Creating device /org/bluez/10690/hci0/dev_00_17_E5_0C_EA_70
+bluetoothd[10690]: Probe drivers for /org/bluez/10690/hci0/dev_00_17_E5_0C_EA_70
+bluetoothd[10690]: adapter_get_device(00:17:E5:0C:EA:70)
+bluetoothd[10690]: Registered interface org.bluez.Audio on path /org/bluez/10690/hci0/dev_00_17_E5_0C_EA_70
+bluetoothd[10690]: audio handle_uuid: server not enabled for 00001112-0000-1000-8000-00805f9b34fb (0x1112)
+bluetoothd[10690]: audio handle_uuid: server not enabled for 0000111f-0000-1000-8000-00805f9b34fb (0x111f)
+bluetoothd[10690]: Found AV Target
+bluetoothd[10690]: Registered interface org.bluez.Control on path /org/bluez/10690/hci0/dev_00_17_E5_0C_EA_70
+bluetoothd[10690]: Found AV Target
+bluetoothd[10690]: Changing service classes to 0x480104
+bluetoothd[10690]: Adapter /org/bluez/10690/hci0 has been enabled
+bluetoothd[10690]: Computer is classified as desktop
+bluetoothd[10690]: Current device class is 0x480104
+bluetoothd[10690]: Setting 0x000104 for major/minor device class
+bluetoothd[10690]: Changing major/minor class to 0x480104
+
+Now hcitool scan works fine
+
+:; hcitool scan
+Scanning ...
+	00:03:C9:D4:34:E9	n/a
+	00:1D:F6:A5:A8:08	Ln in thesky
+
+
+This not a new problem. I have had this problem ever since I bought my F8T017 in October 2008. http://marc.info/?l=linux-bluetooth&m=122333510701175&w=2
+
+: root; lsusb -vd 050d:0017
+
+Bus 001 Device 041: ID 050d:0017 Belkin Components 
+Device Descriptor:
+  bLength                18
+  bDescriptorType         1
+  bcdUSB               2.00
+  bDeviceClass          224 Wireless
+  bDeviceSubClass         1 Radio Frequency
+  bDeviceProtocol         1 Bluetooth
+  bMaxPacketSize0        64
+  idVendor           0x050d Belkin Components
+  idProduct          0x0017 
+  bcdDevice            2.91
+  iManufacturer           1 Broadcom Corp
+  iProduct                2 BLUETOOTH USB +EDR ADAPTER Class 1 v2.1 UHE
+  iSerial                 3 000A3A8494D9
+  bNumConfigurations      1
+  Configuration Descriptor:
+    bLength                 9
+    bDescriptorType         2
+    wTotalLength          216
+    bNumInterfaces          4
+    bConfigurationValue     1
+    iConfiguration          0 
+    bmAttributes         0xa0
+      (Bus Powered)
+      Remote Wakeup
+    MaxPower                2mA
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        0
+      bAlternateSetting       0
+      bNumEndpoints           3
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x81  EP 1 IN
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0010  1x 16 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x82  EP 2 IN
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x02  EP 2 OUT
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       0
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0000  1x 0 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0000  1x 0 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       1
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0009  1x 9 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0009  1x 9 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       2
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0011  1x 17 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0011  1x 17 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       3
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0020  1x 32 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0020  1x 32 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       4
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       5
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        2
+      bAlternateSetting       0
+      bNumEndpoints           2
+      bInterfaceClass       255 Vendor Specific Class
+      bInterfaceSubClass    255 Vendor Specific Subclass
+      bInterfaceProtocol    255 Vendor Specific Protocol
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x84  EP 4 IN
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0020  1x 32 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x04  EP 4 OUT
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0020  1x 32 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        3
+      bAlternateSetting       0
+      bNumEndpoints           0
+      bInterfaceClass       254 Application Specific Interface
+      bInterfaceSubClass      1 Device Firmware Update
+      bInterfaceProtocol      0 
+      iInterface              0 
+      ** UNRECOGNIZED:  07 21 07 88 13 40 00
+Device Status:     0x0000
+  (Bus Powered)
+
+: root; uname -a
+Linux kooka 2.6.28-1-686 #1 SMP Mon Feb 23 03:13:24 UTC 2009 i686 GNU/Linux
 
 -- 
 If the From address bounces, please see http://www.pook.it/.
