@@ -1,67 +1,222 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 6 Apr 2009 18:14:44 -0400
+From: Zygo Blaxell <zblaxell@dactyl.hungrycats.org>
+To: Gene Heskett <gene.heskett@verizon.net>
+Cc: jayjwa <jayjwa@atr2.ath.cx>, linux-bluetooth@vger.kernel.org
+Subject: Re: The link I had working quit.  Help
+Message-ID: <20090406221444.GA25011@dactyl.hungrycats.org>
+References: <200904041636.25409.gene.heskett@verizon.net> <200904051759.31968.gene.heskett@verizon.net> <alpine.LNX.2.00.0904060246560.29837@nge2.ngu.pk> <200904061457.02511.gene.heskett@verizon.net>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Subject: headset - sco times out after 1 minute
-Date: Mon, 6 Apr 2009 18:26:49 -0500
-Message-ID: <79DD16001F75DB4EB7DE37CDD687BB2001AA78BE@dalamsexb02.AMERICAS.ROOT.PRI>
-From: "Brock Denson" <Brock.Denson@csr.com>
-To: <linux-bluetooth@vger.kernel.org>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="EeQfGwPcQSOJBaQU"
+In-Reply-To: <200904061457.02511.gene.heskett@verizon.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-All,
-I am having some trouble with SCO.  I can connect to a headset and start
-SCO, but after about 1 minute the SCO stops, but remains connected.
 
-Disclaimers:
-I know very little about Dbus or the inner workings of Bluetooth.
+--EeQfGwPcQSOJBaQU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Some hopefully useful information:
-BlueZ versions tried 4.30 and 4.34 with ./configure as per README,
-latest version from git using bootstrap-configure
-Linux Distribution Fedora Core 10
-Kernel version 2.6.27.21-170.2.56.fc10.i686
+On Mon, Apr 06, 2009 at 02:57:02PM -0400, Gene Heskett wrote:
+> The device on the other end is sending a continuous string of
+> Coco3 at coyote.den
+> at about 3x/second
 
-Steps to recreate:
-1.  Attach USB Bluetooth device
-2.  Download pskeys
-	Bccmd psload -r pskeys.psr
-3.  Get default adapter
-	Dbus-send --system --print-reply --type=method_call
---dest=org.bluez / org.bluez.Manager.DefaultAdapter
-4.  Create a device
-	Dbus-send --system --print-reply --type=method_call
---dest=org.bluez /org/bluez/2030/hci0 org.bluez.Adapter.CreateDevice
-string:"11:11:11:11:11:11"
-5.  Connect to device
-	Dbus-send --system --print-reply --type=method_call
---dest=org.bluez /org/bluez/2030/hci0/dev_11_11_11_11_11_11
-org.bluez.Headset.Connect
-6.  Start SCO
-	Dbus-send --system --print-reply --type=method_call
---dest=org.bluez /org/bluez/2030/hci0/dev_11_11_11_11_11_11
-org.bluez.Headset.Play
+Do you seriously have a Coco3 wired up to Bluetooth?  How?  Presumably not
+with a native stack...some kind of dongle?
 
-The final dbus-send command returns an error after about 30
-(suspiciously close to DEFAULT_DEFER_TIMEOUT in common/btio.c:48)
-seconds of org.freedesktop.DBus.Error.NoReply and the SCO stops about 30
-seconds later.  I have looked around a good bit, but have had trouble
-finding documentation on the bluez 4.x branch.
-The error from bluetoothd -n -d indicates a G_IO_ERR at the time the SCO
-stops (~1 minute) from connect_cb() in common/btio.c:124 which then
-calls sco_connect_cb() in audio/headset.c:544 
-I do not see any errors in the kernel log, and have tried to capture the
-dbus traffic with dbus-monitor (which is also a bit short on docs as
-well) with little luck.  I have tried things like:
-Dbus-monitor --system
-Dbus-monitor --system "type='method_call'"
-Dbus-monitor --system "type='method_call',interface='org.bluez.Headset'"
+If you do have a Coco3 with a native Bluetooth stack...I want one.  ;)
+The native Bluetooth stack, that is...I already have a Coco3 or two.
 
-I would love to figure that out as well, by the way.
+> And it has an led that when connected, will blink on and off at 2 second=
+=20
+> intervals, but is not.  When it worked, it did blick correctly.
+>=20
+> So traffic IS flowing, I just can't get the device to show it to me,  or =
+get=20
+> picocom or minicom to even find /dev/rfcomm0
+>=20
+> [root@coyote bin]# cat /dev/rfcomm0
+> cat: /dev/rfcomm0: Host is down
+> [root@coyote bin]# minicom
+> minicom: cannot open /dev/rfcomm0: Host is down
 
-I would appreciate any help here,
+Looks like it's bound to the wrong remote address, or the remote device
+isn't listening for connections.
 
-Brock Denson | Sr. Applications Engineer | m. 972 900-6806 | o. 214
-540-3838 
+> Your comment about=20
+> >Another idea is try to re-pair the devices. Are you running the
+> > passkey-agent and auth-agent?
+>=20
+> Is another clue, but neither of those exist on this system.  What package=
+ are=20
+> they part of?
 
+There is an agent written in Python named simple-agent in the Bluez
+sources, under 'test'.  It's probably the closest thing to a simple
+command-line utility.
+
+> I do have the bluetooth-wizard, which on its device display screen shows =
+blank=20
+> space where the device list should be.
+
+Do you have any other Bluetooth devices to test with?  It would be
+one thing if you can't see the specific device you're looking for,
+but something else entirely if you can't see any devices *at all*.
+
+> >> echo "hciconfig -a hci0 putkey 0000"
+> >> hciconfig -a hci0 putkey 0000
+> >> --------which returns:
+> >> Can't find link key for 0000 on hci0
+> >> ^C
+
+You probably don't want to be using hciconfig or hcitool.  Use the DBus API
+to talk to bluetoothd instead.
+
+On Mon, Apr 06, 2009 at 02:57:02PM -0400, Gene Heskett wrote:
+> On Monday 06 April 2009, jayjwa wrote:
+> >On Sun, 5 Apr 2009, Gene Heskett wrote:
+> >> Where are the bluetooth guru's?  Or, where can I find the RFC documents
+> >> that describe how all this is supposed to work?
+
+http://wiki.bluez.org/ has some HOWTOs that are somewhat out of
+date but still useful as a starting point.  Bluez API documents
+are in the bluez sources under doc/.  The Bluetooth specs are under
+http://www.bluetooth.com/Bluetooth/Technology/Building/Specifications/,
+but they're probably useless unless you want very high-level architectural
+information, or you know exactly what technical detail you're looking for.
+
+> >If they're on the bt list, then they are silent. They never answer me th=
+ere;
+> > I asked about getting bt headsets going under 4.x, and only one person
+> > remarked he thought he saw kernel messages. I'm assuming then that no-o=
+ne
+> > uses headsets under 4.x. From the other questions on the list, no-one u=
+ses
+> > anything successfully under 4.x, unless you count /usr/bin/patch. Really
+> > I'm thinking of unsubscribing.
+
+FWIW, I've gotten several bluetooth headsets to work under 3.36 and most
+of 4.x for 20 < x < 34, using the A2DP profile and the bluez-alsa plugin
+and the instructions at http://wiki.bluez.org/wiki/HOWTO/AudioDevices
+which cover audio devices.
+
+"My device doesn't work" questions on the mailing list often come down
+to two common cases: either a) you will eventually get it to work by
+following the wiki or reading the mailing list archives, so you don't
+need an answer from a guru, or b) you won't get it to work because someone
+(possibly you) has to write a patch, but the gurus are patiently waiting
+for you to provide enough information to get started on one.
+
+You may find it worthwhile to read the mailing list archives to see
+what people have included in their postings that *do* get answers,
+and see if you can supply something similar.
+
+> It doesn't seem to be all that helpful, you and I believe one other perso=
+n has=20
+> replied, always by personal email rather than the list.  That is not what=
+=20
+> keeping an archive of a list is all about.=20
+
+I agree here.  If you get a private but helpful reply, please forward
+it back to the list so that others can benefit from it.  If you are
+providing a helpful reply, post it to the list so that people can find
+it later.  ;-)
+
+> BTW, where is that list archive?
+
+vger.kernel.org mailing lists are widely distributed
+and there are a number of public archives for them.  One is at
+http://marc.info/?l=3Dlinux-bluetooth&w=3D1
+
+I note that the link on www.bluez.org points to an error message on gmane.o=
+rg.
+
+> >> What I want to  do, and was doing, is to run a system shell on the bt
+> >> device on the other end, and minicom or picocom  to /dev/rfcomm0 as a
+> >> remote terminal on that system.
+
+=2E..but if the system is a Coco3, how is it doing Bluetooth?  I have
+visions of a UART HCI Bluetooth dongle connected to the Coco3 and expected
+to work as a RS-232 port...
+
+> >When you get it going good, write the Howto. I'd like to read it ;)
+>=20
+> Chuckle, So would I, like to read it that is! :)
+[...]
+> I went to google and looked up 'bluetoogh pairing' and got this:
+> http://www.bluetomorrow.com/content/section/180/284/
+> but no real howto.  And I did chase down quite a few other links, mostly =
+for=20
+> pairing with mobile phones or headsets, nothing on using them as a wirele=
+ss=20
+> rs232 circuit.  Which is what I want of course.
+
+Here's a shot at a howto for a serial device.  This is kind of ugly,
+and it occasionally uses brute force rather than the proper Bluetooth-
+or BlueZ-compliant approach; however, I've managed to force quite a
+few devices to work with procedures like this before I knew what I
+was doing.  ;-)
+
+Get the bluez source tarball so you have the 'test' directory.  In that
+directly, you'll find 'simple-agent'.
+
+Make sure the remote device is pairable (can't help you with that--the
+procedure is specific to each remote device, and if the device isn't
+pairable, no amount of trying from the bluez side will work).  Note that
+some devices (especially things like mice and headsets) will allow only
+one connection attempt after they're powered on, and whatever connects to
+them has to pair with them on the first try--so if you mistype the PIN,
+you might have to power the device back off and on again before you retry.
+
+Run 'simple-agent hci0 <remote-device-bdaddr>'.  You should be prompted
+for a PIN on both devices.  Use the same one.  ;-)
+
+Run 'sdptool browse <remote-device-bdaddr>' (this will probably get me
+flamed by others on this list ;).  This might give you a list of services
+exported by the device.  It might not, in which case you probably want
+to use the org.bluez.Device.DiscoverServices DBus API call, which will
+give you a blob of XML you can decode with your handy-dandy copy of the
+Bluetooth assigned numbers.  If sdptool works, you should get a list of
+serial profile descriptions like this one:
+
+	Service Name: Dialup Networking
+	Service RecHandle: 0x10000
+	Service Class ID List:
+	  "Dialup Networking" (0x1103)
+	  "Generic Networking" (0x1201)
+	Protocol Descriptor List:
+	  "L2CAP" (0x0100)
+	  "RFCOMM" (0x0003)
+	    Channel: 1
+	Profile Descriptor List:
+	  "Dialup Networking" (0x1103)
+	    Version: 0x0100
+
+The interesting parts are "Service Name" and "Channel".  There may be
+multiple records, each with its own channel.
+
+Run 'rfcomm bind /dev/rfcomm0 <remote-device-bdaddr> N' where N is the
+channel number.  If you don't have success with 'sdptool browse,' you can
+simply try channel numbers from 1 up to 15 or so.
+
+Use a terminal program to see what you've connected to on rfcomm0.
+Repeat with different channel numbers until you find what you're
+looking for.
+
+--EeQfGwPcQSOJBaQU
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+Content-Disposition: inline
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEUEARECAAYFAknaftQACgkQ8Fft35/PfrDGTgCeMxzgidqtLGl49lMeg3G6seSV
+Lk4AmK1yYPIxInb0RcT/dPj4C4PGnek=
+=f+pO
+-----END PGP SIGNATURE-----
+
+--EeQfGwPcQSOJBaQU--
