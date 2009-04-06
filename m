@@ -1,25 +1,19 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 6 Apr 2009 22:34:43 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Eiko Oltmanns <eiko.oltmanns@web.de>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: problem with reading from rfcomm socket
-Message-ID: <20090406193443.GA969@jh-x301>
-References: <49D511C2.5040304@web.de> <49DA5249.30008@web.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <49DA5249.30008@web.de>
+Date: Tue, 7 Apr 2009 00:42:23 +0530
+Message-ID: <d4d7098f0904061212g186a16a1qda938d297559748a@mail.gmail.com>
+Subject: Ref : HFP Gateway profile
+From: Rajan Batra <rajan.batra@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Eiko,
+Adding :
+         i get error :
+  rf_comm_ag_data_cb(): buf is too long
 
-On Mon, Apr 06, 2009, Eiko Oltmanns wrote:
-> I think my code should be correct, isn't it? Is there maybe an option in the
-> kernel config, that could cause such a behaviour of the socket?
+as shown in last few lines of log.
 
-Take a look at existing examples in the bluez source, e.g. tools/rctest.c.
-You're missing a call to bind after the call to socket and before the call to
-connect.
-
-Joah
+thanks.
+-rajan
