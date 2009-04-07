@@ -1,88 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH] Fix inconsistencies in the build system
-From: Tiziano =?ISO-8859-1?Q?M=FCller?= <dev-zero@gentoo.org>
-Reply-To: dev-zero@gentoo.org
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-VG57EokuqmWnwH6LOE7I"
-Date: Tue, 07 Apr 2009 09:39:06 +0200
-Message-Id: <1239089946.7320.17.camel@localhost>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+Date: Tue, 7 Apr 2009 09:37:37 +0200
+Message-ID: <8db1092f0904070037q426fd8dcx4aa48c70e40b5d6c@mail.gmail.com>
+Subject: [2.6.29-git12] BUG: scheduling while atomic: swapper/0/0x10000100
+From: Maciej Rutecki <maciej.rutecki@gmail.com>
+To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+	linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Bug happens when try connect with my phone via kbluetooth (kde
+application for bluetooth):
 
---=-VG57EokuqmWnwH6LOE7I
-Content-Type: multipart/mixed; boundary="=-pI5qvqOLq0FnAgzvZfOJ"
+[  114.896824] BUG: scheduling while atomic: swapper/0/0x10000100
+[  114.896831] Modules linked in: i915 drm i2c_algo_bit i2c_core
+rfcomm l2cap vboxnetflt vboxdrv xt_tcpudp xt_limit xt_state
+iptable_nat nf_nat nf_conntrack_ipv4 nf_conntrack nf_defrag_ipv4
+iptable_filter ip_tables x_tables aes_i586 aes_generic cbc dm_crypt
+dm_snapshot dm_mirror dm_region_hash dm_log dm_mod hp_wmi fuse sbp2
+loop btusb bluetooth snd_hda_codec_si3054 snd_hda_codec_analog
+snd_hda_intel snd_hda_codec arc4 snd_pcm_oss snd_mixer_oss snd_pcm ecb
+snd_seq_dummy snd_seq_oss snd_seq_midi iwl3945 snd_rawmidi iwlcore
+snd_seq_midi_event rfkill firmware_class snd_seq mac80211 snd_timer
+snd_seq_device led_class pcmcia b44 ssb lib80211 uhci_hcd ehci_hcd
+intel_agp psmouse snd ohci1394 mii cfg80211 usbcore agpgart
+yenta_socket rsrc_nonstatic pcmcia_core serio_raw soundcore
+snd_page_alloc rtc_cmos rtc_core rtc_lib battery fan ieee1394 ac
+button sg evdev
+[  114.896984]
+[  114.896990] Pid: 0, comm: swapper Not tainted (2.6.29-git12 #1) HP
+Compaq nx6310 (EY501ES#AKD)
+[  114.896998] EIP: 0060:[<c029c711>] EFLAGS: 00000246 CPU: 1
+[  114.897008] EIP is at acpi_idle_enter_simple+0x151/0x1be
+[  114.897014] EAX: c04f31c0 EBX: f7073450 ECX: 00000000 EDX: 01716000
+[  114.897036] ESI: 00f706bb EDI: 00f7113c EBP: f7067f6c ESP: f7067f4c
+[  114.897042]  DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068
+[  114.897048] CR0: 8005003b CR2: b7fb1000 CR3: 004f7000 CR4: 000006d0
+[  114.897054] DR0: 00000000 DR1: 00000000 DR2: 00000000 DR3: 00000000
+[  114.897059] DR6: ffff0ff0 DR7: 00000400
+[  114.897064] Call Trace:
+[  114.897074]  [<c0310156>] ? menu_select+0x36/0xf0
+[  114.897083]  [<c030f3bf>] cpuidle_idle_call+0x6f/0xd0
+[  114.897091]  [<c0101f15>] cpu_idle+0x55/0x90
+[  114.897099]  [<c0395d38>] start_secondary+0x18d/0x205
+[  114.897107]  [<c0395d38>] ? start_secondary+0x18d/0x205
 
+dmesg:
+http://unixy.pl/maciek/download/kernel/2.6.29-git12/2/dmesg-2.6.29-git12.txt
 
---=-pI5qvqOLq0FnAgzvZfOJ
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+config:
+http://unixy.pl/maciek/download/kernel/2.6.29-git12/config-2.6.29-git12.txt
 
-Hi
-
-There are some minor inconsistencies in the build system:
-a) If --disable-{alsa,gstreamer} are given on configure LIBSBC doesn't
-get built. Even though SBC_CFLAGS and SBC_LIBS get substituted in the
-Makefile and therefore libsbc.la ends up in the link-list for libipc
-which then fails.
-b) ipctest needs libipc and libsbc but gets built unconditionally in
-audio/Makefile.am.
-
-The attached patch fixes that.
-
-Cheers,
-Tiziano
-
-
---=-pI5qvqOLq0FnAgzvZfOJ
-Content-Disposition: attachment; filename="4.34-conditional_libsbc.patch"
-Content-Transfer-Encoding: base64
-Content-Type: text/x-patch; name="4.34-conditional_libsbc.patch"; charset="UTF-8"
-
-VGhlIGNvbmZpZ3VyZSBzdHVmZiBpcyBhIGluY29uc2VxdWVudDoNCi0gZXZlbiBpZiBuZWl0aGVy
-IGFsc2Egbm9yIGdzdHJlYW1lciBzdXBwb3J0IGlzIGVuYWJsZWQsIFNCQ19MSUJTIGdldHMgc3Vi
-c3RpdHV0ZWQgYnkgbGlic2JjLmxhDQogIHdoaWNoIGRvZXNuJ3QgZ2V0IGJ1aWxkIHdpdGhvdXQg
-YWxzYSBvciBnc3RyZWFtZXIuIE1ha2luZyB0aGlzIGNvbmRpdGlvbmFsIGhlbHBzLg0KLSBpcGN0
-ZXN0IG5lZWRzIGJvdGggbGliaXBjLmxhIGFuZCBsaWJzYmMubGEgYW5kIGZhaWxzIGlmIFNCQ19M
-SUJTL1NCQ19DRkxBR1MgYXJlIGVtcHR5LA0KICBtYWtpbmcgdGhlIGJ1aWxkIGNvbmRpdGlvbmFs
-IGhlbHBzIGFnYWluLg0KLS0tIGFjaW5jbHVkZS5tNC5vcmlnCTIwMDktMDQtMDYgMTY6MjY6MTQu
-NTcwNzgwMjQxICswMjAwDQorKysgYWNpbmNsdWRlLm00CTIwMDktMDQtMDYgMTY6MjY6NTkuNTQw
-Nzc5MTQ4ICswMjAwDQpAQCAtMzMwLDggKzMzMCwxMCBAQA0KIAlBQ19TVUJTVChbR0RCVVNfQ0ZM
-QUdTXSwgWyctSSQodG9wX3NyY2RpcikvZ2RidXMnXSkNCiAJQUNfU1VCU1QoW0dEQlVTX0xJQlNd
-LCBbJyQodG9wX2J1aWxkZGlyKS9nZGJ1cy9saWJnZGJ1cy5sYSddKQ0KIA0KLQlBQ19TVUJTVChb
-U0JDX0NGTEFHU10sIFsnLUkkKHRvcF9zcmNkaXIpL3NiYyddKQ0KLQlBQ19TVUJTVChbU0JDX0xJ
-QlNdLCBbJyQodG9wX2J1aWxkZGlyKS9zYmMvbGlic2JjLmxhJ10pDQorCWlmICh0ZXN0ICIke2Fs
-c2FfZW5hYmxlfSIgPSAieWVzIiB8fCB0ZXN0ICIke2dzdHJlYW1lcl9lbmFibGV9IiA9ICJ5ZXMi
-KTsgdGhlbg0KKwkJQUNfU1VCU1QoW1NCQ19DRkxBR1NdLCBbJy1JJCh0b3Bfc3JjZGlyKS9zYmMn
-XSkNCisJCUFDX1NVQlNUKFtTQkNfTElCU10sIFsnJCh0b3BfYnVpbGRkaXIpL3NiYy9saWJzYmMu
-bGEnXSkNCisJZmkNCiANCiAJQU1fQ09ORElUSU9OQUwoU05ERklMRSwgdGVzdCAiJHtzbmRmaWxl
-X2VuYWJsZX0iID0gInllcyIgJiYgdGVzdCAiJHtzbmRmaWxlX2ZvdW5kfSIgPSAieWVzIikNCiAJ
-QU1fQ09ORElUSU9OQUwoTkVUTElOSywgdGVzdCAiJHtuZXRsaW5rX2VuYWJsZX0iID0gInllcyIg
-JiYgdGVzdCAiJHtuZXRsaW5rX2ZvdW5kfSIgPSAieWVzIikNCi0tLSBhdWRpby9NYWtlZmlsZS5h
-bS5vcmlnCTIwMDktMDQtMDYgMTY6NDc6MjEuMjQwNjgxMjcyICswMjAwDQorKysgYXVkaW8vTWFr
-ZWZpbGUuYW0JMjAwOS0wNC0wNiAxNzo0MjoyNy4yNDA1OTc3MTUgKzAyMDANCkBAIC02MCwxMCAr
-NjAsMTYgQEANCiANCiBsaWJpcGNfbGFfU09VUkNFUyA9IGlwYy5oIGlwYy5jDQogDQoraWYgQVVE
-SU9QTFVHSU4NCitpZiBTQkMNCisNCiBub2luc3RfUFJPR1JBTVMgPSBpcGN0ZXN0DQogDQogaXBj
-dGVzdF9MREFERD0gbGliaXBjLmxhIEBTQkNfTElCU0AgQEdMSUJfTElCU0ANCiANCitlbmRpZg0K
-K2VuZGlmDQorDQogQU1fQ0ZMQUdTID0gLWZ2aXNpYmlsaXR5PWhpZGRlbiBAU0JDX0NGTEFHU0Ag
-XA0KIAkJQEJMVUVaX0NGTEFHU0AgQERCVVNfQ0ZMQUdTQCBAR0xJQl9DRkxBR1NAIEBHREJVU19D
-RkxBR1NADQogDQo=
-
-
---=-pI5qvqOLq0FnAgzvZfOJ--
-
---=-VG57EokuqmWnwH6LOE7I
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Dies ist ein digital signierter Nachrichtenteil
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.11 (GNU/Linux)
-
-iEYEABECAAYFAknbAxoACgkQGwVqY66cHjA+NQCfXDfEAaWCIko6bvkNywhfL4Q5
-2/sAn1QrdZ2kIR2Aey1UWRSjjRxbRkIW
-=01q4
------END PGP SIGNATURE-----
-
---=-VG57EokuqmWnwH6LOE7I--
-
+-- 
+Maciej Rutecki
+http://www.maciek.unixy.pl
