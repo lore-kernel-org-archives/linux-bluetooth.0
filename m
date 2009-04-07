@@ -1,62 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH] Use cups-config instead of hardcoded location
+Subject: [PATCH] Fix inconsistencies in the build system
 From: Tiziano =?ISO-8859-1?Q?M=FCller?= <dev-zero@gentoo.org>
 Reply-To: dev-zero@gentoo.org
 To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-rmasu/tnx6VdfM+OaB1Z"
-Date: Tue, 07 Apr 2009 10:59:59 +0200
-Message-Id: <1239094799.19235.2.camel@localhost>
+Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-VG57EokuqmWnwH6LOE7I"
+Date: Tue, 07 Apr 2009 09:39:06 +0200
+Message-Id: <1239089946.7320.17.camel@localhost>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
---=-rmasu/tnx6VdfM+OaB1Z
-Content-Type: multipart/mixed; boundary="=-GGQRmNICGmIjtaIJ9QF4"
+--=-VG57EokuqmWnwH6LOE7I
+Content-Type: multipart/mixed; boundary="=-pI5qvqOLq0FnAgzvZfOJ"
 
 
---=-GGQRmNICGmIjtaIJ9QF4
+--=-pI5qvqOLq0FnAgzvZfOJ
 Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
 
-Hi there
+Hi
 
-This patch has been sitting in our cvs repo for ages:
-Use cups-config instead of hardcoded cups-location.
+There are some minor inconsistencies in the build system:
+a) If --disable-{alsa,gstreamer} are given on configure LIBSBC doesn't
+get built. Even though SBC_CFLAGS and SBC_LIBS get substituted in the
+Makefile and therefore libsbc.la ends up in the link-list for libipc
+which then fails.
+b) ipctest needs libipc and libsbc but gets built unconditionally in
+audio/Makefile.am.
 
-Thanks,
+The attached patch fixes that.
+
+Cheers,
 Tiziano
 
 
---=-GGQRmNICGmIjtaIJ9QF4
-Content-Disposition: attachment; filename="cups-location.patch"
+--=-pI5qvqOLq0FnAgzvZfOJ
+Content-Disposition: attachment; filename="4.34-conditional_libsbc.patch"
 Content-Transfer-Encoding: base64
-Content-Type: text/x-patch; name="cups-location.patch"; charset="UTF-8"
+Content-Type: text/x-patch; name="4.34-conditional_libsbc.patch"; charset="UTF-8"
 
-PyBjdXBzLy5kZXBzDQo/IGN1cHMvTWFrZWZpbGUNCj8gY3Vwcy9NYWtlZmlsZS5pbg0KSW5kZXg6
-IGN1cHMvTWFrZWZpbGUuYW0NCj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0NClJDUyBmaWxlOiAvY3Zzcm9vdC9ibHVlei91
-dGlscy9jdXBzL01ha2VmaWxlLmFtLHYNCnJldHJpZXZpbmcgcmV2aXNpb24gMS45DQpkaWZmIC11
-IC1yMS45IE1ha2VmaWxlLmFtDQotLS0gY3Vwcy9NYWtlZmlsZS5hbQkyMCBBdWcgMjAwNiAwMjoy
-MTowMyAtMDAwMAkxLjkNCisrKyBjdXBzL01ha2VmaWxlLmFtCTEgSnVuIDIwMDcgMTU6NDc6MTQg
-LTAwMDANCkBAIC0xLDYgKzEsNiBAQA0KIA0KIGlmIENVUFMNCi1jdXBzZGlyID0gJChsaWJkaXIp
-L2N1cHMvYmFja2VuZA0KK2N1cHNkaXIgPSBgY3Vwcy1jb25maWcgLS1zZXJ2ZXJiaW5gL2JhY2tl
-bmQNCiANCiBjdXBzX1BST0dSQU1TID0gYmx1ZXRvb3RoDQogZWxzZQ0K
+VGhlIGNvbmZpZ3VyZSBzdHVmZiBpcyBhIGluY29uc2VxdWVudDoNCi0gZXZlbiBpZiBuZWl0aGVy
+IGFsc2Egbm9yIGdzdHJlYW1lciBzdXBwb3J0IGlzIGVuYWJsZWQsIFNCQ19MSUJTIGdldHMgc3Vi
+c3RpdHV0ZWQgYnkgbGlic2JjLmxhDQogIHdoaWNoIGRvZXNuJ3QgZ2V0IGJ1aWxkIHdpdGhvdXQg
+YWxzYSBvciBnc3RyZWFtZXIuIE1ha2luZyB0aGlzIGNvbmRpdGlvbmFsIGhlbHBzLg0KLSBpcGN0
+ZXN0IG5lZWRzIGJvdGggbGliaXBjLmxhIGFuZCBsaWJzYmMubGEgYW5kIGZhaWxzIGlmIFNCQ19M
+SUJTL1NCQ19DRkxBR1MgYXJlIGVtcHR5LA0KICBtYWtpbmcgdGhlIGJ1aWxkIGNvbmRpdGlvbmFs
+IGhlbHBzIGFnYWluLg0KLS0tIGFjaW5jbHVkZS5tNC5vcmlnCTIwMDktMDQtMDYgMTY6MjY6MTQu
+NTcwNzgwMjQxICswMjAwDQorKysgYWNpbmNsdWRlLm00CTIwMDktMDQtMDYgMTY6MjY6NTkuNTQw
+Nzc5MTQ4ICswMjAwDQpAQCAtMzMwLDggKzMzMCwxMCBAQA0KIAlBQ19TVUJTVChbR0RCVVNfQ0ZM
+QUdTXSwgWyctSSQodG9wX3NyY2RpcikvZ2RidXMnXSkNCiAJQUNfU1VCU1QoW0dEQlVTX0xJQlNd
+LCBbJyQodG9wX2J1aWxkZGlyKS9nZGJ1cy9saWJnZGJ1cy5sYSddKQ0KIA0KLQlBQ19TVUJTVChb
+U0JDX0NGTEFHU10sIFsnLUkkKHRvcF9zcmNkaXIpL3NiYyddKQ0KLQlBQ19TVUJTVChbU0JDX0xJ
+QlNdLCBbJyQodG9wX2J1aWxkZGlyKS9zYmMvbGlic2JjLmxhJ10pDQorCWlmICh0ZXN0ICIke2Fs
+c2FfZW5hYmxlfSIgPSAieWVzIiB8fCB0ZXN0ICIke2dzdHJlYW1lcl9lbmFibGV9IiA9ICJ5ZXMi
+KTsgdGhlbg0KKwkJQUNfU1VCU1QoW1NCQ19DRkxBR1NdLCBbJy1JJCh0b3Bfc3JjZGlyKS9zYmMn
+XSkNCisJCUFDX1NVQlNUKFtTQkNfTElCU10sIFsnJCh0b3BfYnVpbGRkaXIpL3NiYy9saWJzYmMu
+bGEnXSkNCisJZmkNCiANCiAJQU1fQ09ORElUSU9OQUwoU05ERklMRSwgdGVzdCAiJHtzbmRmaWxl
+X2VuYWJsZX0iID0gInllcyIgJiYgdGVzdCAiJHtzbmRmaWxlX2ZvdW5kfSIgPSAieWVzIikNCiAJ
+QU1fQ09ORElUSU9OQUwoTkVUTElOSywgdGVzdCAiJHtuZXRsaW5rX2VuYWJsZX0iID0gInllcyIg
+JiYgdGVzdCAiJHtuZXRsaW5rX2ZvdW5kfSIgPSAieWVzIikNCi0tLSBhdWRpby9NYWtlZmlsZS5h
+bS5vcmlnCTIwMDktMDQtMDYgMTY6NDc6MjEuMjQwNjgxMjcyICswMjAwDQorKysgYXVkaW8vTWFr
+ZWZpbGUuYW0JMjAwOS0wNC0wNiAxNzo0MjoyNy4yNDA1OTc3MTUgKzAyMDANCkBAIC02MCwxMCAr
+NjAsMTYgQEANCiANCiBsaWJpcGNfbGFfU09VUkNFUyA9IGlwYy5oIGlwYy5jDQogDQoraWYgQVVE
+SU9QTFVHSU4NCitpZiBTQkMNCisNCiBub2luc3RfUFJPR1JBTVMgPSBpcGN0ZXN0DQogDQogaXBj
+dGVzdF9MREFERD0gbGliaXBjLmxhIEBTQkNfTElCU0AgQEdMSUJfTElCU0ANCiANCitlbmRpZg0K
+K2VuZGlmDQorDQogQU1fQ0ZMQUdTID0gLWZ2aXNpYmlsaXR5PWhpZGRlbiBAU0JDX0NGTEFHU0Ag
+XA0KIAkJQEJMVUVaX0NGTEFHU0AgQERCVVNfQ0ZMQUdTQCBAR0xJQl9DRkxBR1NAIEBHREJVU19D
+RkxBR1NADQogDQo=
 
 
---=-GGQRmNICGmIjtaIJ9QF4--
+--=-pI5qvqOLq0FnAgzvZfOJ--
 
---=-rmasu/tnx6VdfM+OaB1Z
+--=-VG57EokuqmWnwH6LOE7I
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: Dies ist ein digital signierter Nachrichtenteil
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2.0.11 (GNU/Linux)
 
-iEYEABECAAYFAknbFg8ACgkQGwVqY66cHjATQwCbBQ3kFVXDc0lLSJH4PC303TWB
-v5wAn1YlCCSD5ZenVwZiXyIs38J29pTk
-=9mq4
+iEYEABECAAYFAknbAxoACgkQGwVqY66cHjA+NQCfXDfEAaWCIko6bvkNywhfL4Q5
+2/sAn1QrdZ2kIR2Aey1UWRSjjRxbRkIW
+=01q4
 -----END PGP SIGNATURE-----
 
---=-rmasu/tnx6VdfM+OaB1Z--
+--=-VG57EokuqmWnwH6LOE7I--
 
