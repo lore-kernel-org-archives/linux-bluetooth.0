@@ -1,24 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Xu, Martin" <martin.xu@intel.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"Liu, Bing Wei" <bing.wei.liu@intel.com>,
-	"Gao, Bin" <bin.gao@intel.com>,
-	"Yin, Kangkai" <kangkai.yin@intel.com>
-Date: Wed, 8 Apr 2009 11:02:44 +0800
-Subject: RE: patch to fix a2dp issue
-Message-ID: <9F0C1DB20AFA954FA1DA05309350433D5B19E457@pdsmsx503.ccr.corp.intel.com>
-References: <1238730552-3765-1-git-send-email-forrest.zhao@gmail.com>
- <20090403201207.GA8156@jh-x301>
- <ac8af0be0904031748u4b109e11kb78a1db3d50ead71@mail.gmail.com>
- <9F0C1DB20AFA954FA1DA05309350433D5B0B91CC@pdsmsx503.ccr.corp.intel.com>
- <20090407061728.GA9223@jh-x301>
-In-Reply-To: <20090407061728.GA9223@jh-x301>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Subject: Re: The link I had working quit.  Help
+From: Bastien Nocera <hadess@hadess.net>
+To: Zygo Blaxell <zblaxell@feedme.hungrycats.org>
+Cc: Gene Heskett <gene.heskett@verizon.net>,
+	Zygo Blaxell <zblaxell@dactyl.vpn7.hungrycats.org>,
+	jayjwa <jayjwa@atr2.ath.cx>, linux-bluetooth@vger.kernel.org
+In-Reply-To: <20090407200201.GA18671@hungrycats.org>
+References: <200904041636.25409.gene.heskett@verizon.net>
+	 <200904061457.02511.gene.heskett@verizon.net>
+	 <20090406221444.GA25011@dactyl.hungrycats.org>
+	 <200904071454.54317.gene.heskett@verizon.net>
+	 <20090407200201.GA18671@hungrycats.org>
+Content-Type: text/plain
+Date: Wed, 08 Apr 2009 00:05:18 +0100
+Message-Id: <1239145518.20817.915.camel@cookie.hadess.net>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Thanks for your response.
-But we can not always leave the a2dp feature as broken. I used the latest aplay application which is from alsa project(alsa-utils) to test the a2dp feature. That shows the application part, at least ALSA part is not fixed.
-In my opinions, if the effort is not big, can we fix it at bluez alsa plugin? At least, it is the alsa plugin and it should comply with the interface although the interface keeps changing.:)
+On Tue, 2009-04-07 at 16:02 -0400, Zygo Blaxell wrote:
+> 
+> On Tue, Apr 07, 2009 at 02:54:54PM -0400, Gene Heskett wrote:
+> > But nothing seems to enable the pairing, and everytime I do that
+> that far in 
+> > the 'bluetooth-wizard' and it sees the eb101, it tells me to enter
+> an 
+> > apparently randomly derived 4 digit pin number, but the wizard gives
+> me no 
+> > place to enter it. Nor is there a 'proceed' button, and in 5 seconds
+> or so it 
+> > clears that screen and reports pairing failed.
+> 
+> bluez-gnome (where your bluetooth-wizard comes from?) has a really
+> stupid
+> UI design.  If bluetooth-wizard thinks you *can* enter a PIN into your
+> device, it will *require* you to enter a random one.  This idea
+> doesn't
+> work so well on devices that don't have keyboards or that have fixed
+> PINs,
+> and bluetooth-wizard knows only about broad categories of devices and
+> a
+> handful of exceptions.  The opposite problem occurs on devices where
+> bluez-gnome thinks it knows a fixed-PIN device's PIN, but it actually
+> doesn't.
+> 
+> Also, bluez-gnome's discovery page won't show you discoverable devices
+> that
+> are already known, so it can't tell you if a known device is in range.
+> 'hcitool scan' will tell you about all devices in range, but it causes
+> some
+> problems for bluetoothd if both are running at the same time.
+> 
+> If you can, use simple-agent instead of bluetooth-wizard.
+
+Or you can use gnome-bluetooth which has those problems fixed.
+
