@@ -1,207 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Patch - Use an alert box when actions aren't supported
-From: Ken VanDine <ken.vandine@canonical.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary="=-YBclrVNWwZG58P0p+Wu0"
-Date: Tue, 07 Apr 2009 09:08:09 -0400
-Message-Id: <1239109689.18555.7.camel@trabajo>
+Subject: Re: [PATCH] Use cups-config instead of hardcoded location
+From: Bastien Nocera <hadess@hadess.net>
+To: dev-zero@gentoo.org
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1239094799.19235.2.camel@localhost>
+References: <1239094799.19235.2.camel@localhost>
+Content-Type: text/plain; charset="ISO-8859-1"
+Date: Tue, 07 Apr 2009 11:25:48 +0100
+Message-Id: <1239099948.20817.15.camel@cookie.hadess.net>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Tue, 2009-04-07 at 10:59 +0200, Tiziano Müller wrote:
+> Hi there
+> 
+> This patch has been sitting in our cvs repo for ages:
+> Use cups-config instead of hardcoded cups-location.
 
---=-YBclrVNWwZG58P0p+Wu0
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-
-The attached patch checks if the notification daemon supports actions,
-and if it doesn't display an unfocused alert box instead.
-
-For more information:
-https://wiki.ubuntu.com/NotificationDevelopmentGuidelines
-
-And the downstream bug report:
-https://bugs.launchpad.net/ubuntu/+source/bluez-gnome/+bug/337219
-
-
-Thanks,
--- 
-Ken VanDine
-Ubuntu - Linux for human beings | www.ubuntu.com
-
---=-YBclrVNWwZG58P0p+Wu0
-Content-Disposition: attachment; filename="11_bluez-notifications.patch"
-Content-Type: text/x-patch; name="11_bluez-notifications.patch"; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-
-=== modified file 'applet/agent.c'
---- old/applet/agent.c	2008-10-30 18:07:50 +0000
-+++ new/applet/agent.c	2009-03-27 14:45:19 +0000
-@@ -258,7 +258,10 @@
- 	gtk_window_set_title(GTK_WINDOW(dialog), _("Authentication request"));
- 	gtk_window_set_resizable(GTK_WINDOW(dialog), FALSE);
- 	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
--	gtk_window_set_keep_above(GTK_WINDOW(dialog), TRUE);
-+        if (supports_actions ())
-+          gtk_window_set_keep_above(GTK_WINDOW(dialog), TRUE);
-+        else
-+          gtk_window_set_focus_on_map(GTK_WINDOW(dialog), FALSE);
- 	gtk_window_set_urgency_hint(GTK_WINDOW(dialog), TRUE);
- 	gtk_dialog_set_has_separator(GTK_DIALOG(dialog), FALSE);
- 	input->dialog = dialog;
-@@ -530,13 +533,18 @@
- 	gtk_window_present(GTK_WINDOW(input->dialog));
- }
- 
--static void notification_closed(GObject *object, gpointer user_data)
-+static void present_notification_dialogs ()
- {
- 	g_list_foreach(input_list, show_dialog, NULL);
- 
- 	disable_blinking();
- }
- 
-+static void notification_closed (GObject *object, gpointer user_data)
-+{
-+  present_notification_dialogs ();
-+}
-+
- #ifndef DBUS_TYPE_G_DICTIONARY
- #define DBUS_TYPE_G_DICTIONARY \
- 	(dbus_g_type_get_map("GHashTable", G_TYPE_STRING, G_TYPE_VALUE))
-@@ -587,9 +595,12 @@
- 
- 	g_free(name);
- 
--	show_notification(_("Bluetooth device"),
--					line, _("Enter PIN code"), 0,
--					G_CALLBACK(notification_closed));
-+        if (supports_actions ())
-+          show_notification(_("Bluetooth device"),
-+                            line, _("Enter PIN code"), 0,
-+                            G_CALLBACK(notification_closed));
-+        else
-+          present_notification_dialogs ();
- 
- 	g_free(line);
- 
-@@ -634,9 +645,12 @@
- 
- 	g_free(name);
- 
--	show_notification(_("Bluetooth device"),
--					line, _("Enter passkey"), 0,
--					G_CALLBACK(notification_closed));
-+        if (supports_actions ())
-+          show_notification(_("Bluetooth device"),
-+                            line, _("Enter passkey"), 0,
-+                            G_CALLBACK(notification_closed));
-+        else
-+          present_notification_dialogs ();
- 
- 	g_free(line);
- 
-@@ -684,9 +698,12 @@
- 
- 	g_free(name);
- 
--	show_notification(_("Bluetooth device"),
--					line, _("Enter passkey"), 0,
--					G_CALLBACK(notification_closed));
-+        if (supports_actions ())
-+          show_notification(_("Bluetooth device"),
-+                            line, _("Enter passkey"), 0,
-+                            G_CALLBACK(notification_closed));
-+        else
-+          present_notification_dialogs ();
- 
- 	g_free(line);
- 
-@@ -733,9 +750,12 @@
- 
- 	g_free(name);
- 
--	show_notification(_("Bluetooth device"),
--					line, _("Confirm passkey"), 0,
--					G_CALLBACK(notification_closed));
-+        if (supports_actions ())
-+          show_notification(_("Bluetooth device"),
-+                            line, _("Confirm passkey"), 0,
-+                            G_CALLBACK(notification_closed));
-+        else
-+          present_notification_dialogs ();
- 
- 	g_free(line);
- 
-@@ -778,9 +798,12 @@
- 
- 	g_free(name);
- 
--	show_notification(_("Bluetooth device"),
--					line, _("Check authorization"), 0,
--					G_CALLBACK(notification_closed));
-+        if (supports_actions ())
-+          show_notification(_("Bluetooth device"),
-+                            line, _("Check authorization"), 0,
-+                            G_CALLBACK(notification_closed));
-+        else
-+          present_notification_dialogs ();
- 
- 	g_free(line);
- 
-
-=== modified file 'applet/notify.c'
---- old/applet/notify.c	2008-10-30 18:07:50 +0000
-+++ new/applet/notify.c	2009-03-27 14:42:17 +0000
-@@ -38,6 +38,35 @@
- {
- }
- 
-+gboolean
-+supports_actions ()
-+{
-+  static gboolean supports_actions = FALSE;
-+  static gboolean have_checked = FALSE;
-+
-+  if (!have_checked) {
-+    GList *caps = NULL;
-+    GList *c;
-+
-+    have_checked = TRUE;
-+
-+    caps = notify_get_server_caps ();
-+    if (caps != NULL) {
-+      for (c = caps; c != NULL; c = c->next) {
-+        if (strcmp ((char*)c->data, "actions") == 0) {
-+          supports_actions = TRUE;
-+          break;
-+        }
-+      }
-+
-+      g_list_foreach (caps, (GFunc)g_free, NULL);
-+      g_list_free (caps);
-+    }
-+  }
-+
-+  return supports_actions;
-+}
-+
- void show_notification(const gchar *summary, const gchar *message,
- 			const gchar *action, gint timeout, GCallback handler)
- {
-
-=== modified file 'applet/notify.h'
---- old/applet/notify.h	2008-10-30 18:07:50 +0000
-+++ new/applet/notify.h	2009-03-27 14:42:47 +0000
-@@ -25,6 +25,7 @@
- GtkStatusIcon *init_notification(void);
- void cleanup_notification(void);
- 
-+gboolean supports_actions();
- void show_notification(const gchar *summary, const gchar *message,
- 			const gchar *action, gint timeout, GCallback handler);
- void close_notification(void);
-
-
---=-YBclrVNWwZG58P0p+Wu0--
+This check should be done in configure.ac, along with a default if
+cups-config isn't available. Otherwise we'll end up with stuff
+in /backend and warnings during the build.
 
