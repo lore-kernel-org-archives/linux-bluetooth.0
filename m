@@ -1,38 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-From: Nicola Ranaldo <ranaldo@unina.it>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: Re: Status of serial proxy
-Date: Wed, 8 Apr 2009 09:46:31 +0200
-Cc: linux-bluetooth@vger.kernel.org
-References: <20090405130856.w9g2f6pa804kg84g@webmail.unina.it> <2d5a2c100904060738n1e1e450bnf63aab1b52960c15@mail.gmail.com>
-In-Reply-To: <2d5a2c100904060738n1e1e450bnf63aab1b52960c15@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200904080946.32235.ranaldo@unina.it>
+From: Gene Heskett <gene.heskett@verizon.net>
+To: Bastien Nocera <hadess@hadess.net>
+Subject: Re: The link I had working quit.  Help
+Date: Wed, 08 Apr 2009 00:26:13 -0400
+Cc: Zygo Blaxell <zblaxell@feedme.hungrycats.org>,
+	Zygo Blaxell <zblaxell@dactyl.vpn7.hungrycats.org>,
+	jayjwa <jayjwa@atr2.ath.cx>, linux-bluetooth@vger.kernel.org
+References: <200904041636.25409.gene.heskett@verizon.net>
+ <20090407200201.GA18671@hungrycats.org>
+ <1239145518.20817.915.camel@cookie.hadess.net>
+In-reply-to: <1239145518.20817.915.camel@cookie.hadess.net>
+MIME-version: 1.0
+Content-type: text/plain; charset=iso-8859-15
+Message-id: <200904080026.13738.gene.heskett@verizon.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Monday 06 April 2009 16:38:41 Luiz Augusto von Dentz wrote:
-> Hi Nicola,
+On Tuesday 07 April 2009, Bastien Nocera wrote:
+>On Tue, 2009-04-07 at 16:02 -0400, Zygo Blaxell wrote:
+>> On Tue, Apr 07, 2009 at 02:54:54PM -0400, Gene Heskett wrote:
+>> > But nothing seems to enable the pairing, and everytime I do that
+>>
+>> that far in
+>>
+>> > the 'bluetooth-wizard' and it sees the eb101, it tells me to enter
+>>
+>> an
+>>
+>> > apparently randomly derived 4 digit pin number, but the wizard gives
+>>
+>> me no
+>>
+>> > place to enter it. Nor is there a 'proceed' button, and in 5 seconds
+>>
+>> or so it
+>>
+>> > clears that screen and reports pairing failed.
+>>
+>> bluez-gnome (where your bluetooth-wizard comes from?) has a really
+>> stupid
+>> UI design.  If bluetooth-wizard thinks you *can* enter a PIN into your
+>> device, it will *require* you to enter a random one.  This idea
+>> doesn't
+>> work so well on devices that don't have keyboards or that have fixed
+>> PINs,
+>> and bluetooth-wizard knows only about broad categories of devices and
+>> a
+>> handful of exceptions.  The opposite problem occurs on devices where
+>> bluez-gnome thinks it knows a fixed-PIN device's PIN, but it actually
+>> doesn't.
+>>
+>> Also, bluez-gnome's discovery page won't show you discoverable devices
+>> that
+>> are already known, so it can't tell you if a known device is in range.
+>> 'hcitool scan' will tell you about all devices in range, but it causes
+>> some
+>> problems for bluetoothd if both are running at the same time.
+>>
+>> If you can, use simple-agent instead of bluetooth-wizard.
 >
-> I've fixed the problem of channel 0 some time ago, so either wait for
-> 4.35 release or use the current HEAD.
+>Or you can use gnome-bluetooth which has those problems fixed.
 
-Hi Luiz,
-using HEAD I was able to share the internal GPS of my openmoko freerunner to 
-other devices, thanks!
+But, the F10 rpm has no executables in it, a long list of .png's and .mo's and 
+some docs, but nothing in it goes in /bin, /sbin, /usr/bin or /usr/sbin.  Its 
+all eye candy & no cattle.  I have it and its deps installed, so what is the 
+cli incantation that is supposed to run it?
 
-As I suppose no applications are currently using Serial Proxies interfaces 
-with bluez api 4.* (unless some older version of bluez did not had the channel 
-0 issue), it may not impact doing other few modifications, some parameters 
-used in dbus functions are string and stringlist while I guess they should be 
-object and object arrays. And last, I'd like to see a signal on the 
-SerialProxy interface or ProxyManager interface to trap when a serial proxy is 
-Enabled, to have may GUI apps be notified when a proxy is enabled by other 
-applications.
+Thanks.
 
-Regards
-
-    Nicola
+-- 
+Cheers, Gene
+"There are four boxes to be used in defense of liberty:
+ soap, ballot, jury, and ammo. Please use in that order."
+-Ed Howdershelt (Author)
+It's hard to keep your shirt on when you're getting something off your chest.
 
