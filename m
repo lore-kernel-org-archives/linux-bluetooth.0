@@ -1,63 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 8 Apr 2009 15:30:08 -0400
-From: Zygo Blaxell <zblaxell@feedme.hungrycats.org>
-To: Gene Heskett <gene.heskett@verizon.net>
-Cc: Zygo Blaxell <zblaxell@feedme.hungrycats.org>,
-	Bastien Nocera <hadess@hadess.net>,
+From: Gene Heskett <gene.heskett@verizon.net>
+To: Zygo Blaxell <zblaxell@feedme.hungrycats.org>
+Subject: Re: The link I had working quit.  Help
+Date: Wed, 08 Apr 2009 15:03:20 -0400
+Cc: Bastien Nocera <hadess@hadess.net>,
 	Zygo Blaxell <zblaxell@dactyl.vpn7.hungrycats.org>,
 	jayjwa <jayjwa@atr2.ath.cx>, linux-bluetooth@vger.kernel.org
-Subject: Re: The link I had working quit.  Help
-Message-ID: <20090408193008.GE18671@hungrycats.org>
-References: <200904041636.25409.gene.heskett@verizon.net> <200904081106.11442.gene.heskett@verizon.net> <20090408161729.GD18671@hungrycats.org> <200904081450.37424.gene.heskett@verizon.net>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="8vCeF2GUdMpe9ZbK"
-In-Reply-To: <200904081450.37424.gene.heskett@verizon.net>
+References: <200904041636.25409.gene.heskett@verizon.net>
+ <200904081106.11442.gene.heskett@verizon.net>
+ <20090408161729.GD18671@hungrycats.org>
+In-reply-to: <20090408161729.GD18671@hungrycats.org>
+MIME-version: 1.0
+Content-type: text/plain; charset=iso-8859-15
+Message-id: <200904081503.20419.gene.heskett@verizon.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Wednesday 08 April 2009, Zygo Blaxell wrote:
+>
+>If you run 'screen /dev/rfcomm0' it will open a window on /dev/rfcomm0.
+>For a real serial port you may need something like
+>'screen /dev/ttyS0 9600 cs8 -parenb'.
 
---8vCeF2GUdMpe9ZbK
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This works in  place of minicom for the wired port above if I give the screen 
+a linefeed it returns the shell string
+ "{t2|04}/DD/NITROS9/6309L2/MODULES/SCF:"
 
-On Wed, Apr 08, 2009 at 02:50:37PM -0400, Gene Heskett wrote:
-> >gnome-bluetooth is a fork of bluez-gnome.  You'd probably have to build =
-it
-> > out of svn at svn://svn.gnome.org/svn/gnome-bluetooth unless someone's
-> > making binary packages somewhere.
-> >
-> I see.  Since I've built and installed bluezx-4.34, am I new enough?
+And otherwise appears to work except it thinks the mouse is keys on the 
+keyboard, rolling the wheel to scroll back up just gets me garbage on the 
+shell's command line.
 
-bluez is the user-space part of the bluetooth stack.  gnome-bluetooth is th=
-e UI.
+but 'screen /dev/rfcomm0 9600 -parenb' exits in 5 seconds or so.
 
-> Got it, cu doesn't know the port(s) I named with the -p option.  And the=
-=20
-> manpage doesn't seem to describe that part either. :(
+Thanks all.
 
-	cu -l /dev/ttyS0 -s 9600
+-- 
+Cheers, Gene
+"There are four boxes to be used in defense of liberty:
+ soap, ballot, jury, and ammo. Please use in that order."
+-Ed Howdershelt (Author)
+Sysadmins busy fighting SPAM.
 
-or for rfcomm most likely just
-
-	cu -l /dev/rfcomm0
-
-though with a real RS-232 port on the remote device I don't
-know if you have to match baud rates or not.
-
-
---8vCeF2GUdMpe9ZbK
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-Content-Disposition: inline
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-
-iEYEARECAAYFAknc+0AACgkQgfmLGlazG5zOXQCgsF97UB8apHIfoLJqjjDIzOmA
-5fwAoOuV4jyJBQPPz2wWKyVb7hQatPdj
-=Wh+W
------END PGP SIGNATURE-----
-
---8vCeF2GUdMpe9ZbK--
