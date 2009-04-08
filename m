@@ -1,29 +1,147 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 8 Apr 2009 15:28:12 +0300
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: Forrest Zhao <forrest.zhao@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 4/4] IPC integration part for HFP Audio gateway -- take5
-Message-ID: <20090408122812.GA8827@localhost>
-References: <1239180415-29327-1-git-send-email-forrest.zhao@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1239180415-29327-1-git-send-email-forrest.zhao@gmail.com>
+In-Reply-To: <d3e5a0a00904080250sfe9a4f7g272190cd3c5db2d1@mail.gmail.com>
+References: <d3e5a0a00903310636rccf9a98v2c9f4233c981e92@mail.gmail.com>
+	 <d4d7098f0904080134q2629d0a3lf5c3fa059dbf3945@mail.gmail.com>
+	 <d3e5a0a00904080250sfe9a4f7g272190cd3c5db2d1@mail.gmail.com>
+Date: Wed, 8 Apr 2009 15:29:57 +0530
+Message-ID: <d3e5a0a00904080259w3ac1666i919e78e4e4117b2c@mail.gmail.com>
+Subject: Re: SCO Support over USB
+From: Vivek Agarwal <vivek.mailinglists@gmail.com>
+To: Rajan Batra <rajan.batra@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Forrest,
+Also i just wanted to confirm, with 2.6.29 and Bluez 4.33 you were
+able to successfully record and play parallely since that would be
+required by me to make and calls.
 
-On Wed, Apr 08, 2009, Forrest Zhao wrote:
-> From: Forrest Zhao <forrest.zhao@gmail.com>
-> 
-> ---
->  audio/gateway.c |   77 +++++++++++++++++++++++++++++++++++++
->  audio/gateway.h |    7 +++
->  audio/unix.c    |  115 +++++++++++++++++++++++++++++++++++++++++++++++++++---
->  3 files changed, 192 insertions(+), 7 deletions(-)
+Thanks
+Vivek
 
-Thanks! The patch has now been pushed upstream with some minor coding
-style fixes.
-
-Johan
+On Wed, Apr 8, 2009 at 3:20 PM, Vivek Agarwal
+<vivek.mailinglists@gmail.com> wrote:
+> Rajan,
+> First of all thanks for replying,
+> I had initially tried using 2.6.22 kernel with the Bluez 4.32.
+> I was having problem in connecting to the device since i could not find
+> any utility similar to passkey(for providing the key to the device) and
+> utilities to connect to the device.
+> Since i am using an embedded device, i wanted to use command line
+> utilities to pair the device.
+> Can u through some light on how have you used the 4.33 stack to
+> connect to the headset.
+>
+> Thanks
+> Vivek
+>
+> On Wed, Apr 8, 2009 at 2:04 PM, Rajan Batra <rajan.batra@gmail.com> wrote:
+>> Hi,
+>>  i had this same problem before. then when i used 2.6.29 kernel
+>> i could do aplay and arecord. i used bluez 4.33.
+>>
+>> hope this helps.
+>>
+>>
+>>
+>> On Tue, Mar 31, 2009 at 7:06 PM, Vivek Agarwal
+>> <vivek.mailinglists@gmail.com> wrote:
+>>> Dear all,
+>>>
+>>> I want to use my bluetooth headset with my embedded platform using a
+>>> bluetooth USB dongle.
+>>> The main application is to be able to use it with a SIP application
+>>> running on the embedded Platform..
+>>>
+>>> I am facing problems making to work.. I will try to explain the
+>>> scenario in the mail below please help me where i am going wrong..
+>>>
+>>> First about the embedded platfrom, it is iMX31 based iMX31ADS
+>>> evaluation board running 2.6.24 kernel.
+>>>
+>>> Step 1) I tried to compile the bluez-3.36 and enabled the hci_usb
+>>> kernel module and checked using
+>>> aplay if i am able to hear sound.
+>>> I was not succcessful.
+>>>
+>>> Step 2) I tried putting the 2.6.27 bluetooth related changes into the
+>>> 2.6.24 kernel and see if there changes make it work..
+>>>
+>>> I made all the bluetooth related files similar to the 2.6.27 kernel
+>>> bluetooth files except hci_sysfs.c which i kept intact.
+>>>
+>>> Once i made these changes i was able to record and play individually
+>>> but get the following problems
+>>>        a) the get the following kernel messages when i try to play a .wav
+>>> file using aplay..
+>>>
+>>>                hci_scodata_packet: hci0 SCO packet for unknown connection handle 5633
+>>>                hci_scodata_packet: hci0 SCO packet for unknown connection handle 9985
+>>>                hci_scodata_packet: hci0 SCO packet for unknown connection handle 49664
+>>>                hci_scodata_packet: hci0 SCO packet for unknown connection handle 181
+>>>                hci_scodata_packet: hci0 SCO packet for unknown connection handle 11264
+>>>                hci_scodata_packet: hci0 SCO packet for unknown connection handle 32769
+>>>                hci_scodata_packet: hci0 SCO packet for unknown connection handle 49153
+>>>
+>>>        b) i am not able to do an echo test using the following method. The
+>>> dont hear any echo.
+>>>                arecord -D bt_audio -f S16_LE | aplay -D bt_audio -f S16_LE
+>>>        if the run the hcid in debug mode below are the debug messages..
+>>>
+>>>                hcid[1776]: Accepted new client connection on unix socket (fd=21)
+>>>                        hcid[1776]: Audio API: received BT_GETCAPABILITIES_REQ
+>>>                        hcid[1776]: Audio API: sending BT_GETCAPABILITIES_RSP
+>>>                        hcid[1776]: Audio API: received BT_SETCONFIGURATION_REQ
+>>>                        hcid[1776]: config sco - device = 00:0C:78:72:7E:13 access_mode = 1
+>>>                        hcid[1776]: /org/bluez/audio/device2: Connecting to
+>>> 00:0C:78:72:7E:13 channel 2
+>>>                        hcid[1776]: State changed /org/bluez/audio/device2:
+>>> HEADSET_STATE_DISCONNECTED -> HEADSET_STATE_CONNECT_IN_PROGRESS
+>>>                        hcid[1776]: Accepted new client connection on unix socket (fd=23)
+>>>                        hcid[1776]: Audio API: received BT_GETCAPABILITIES_REQ
+>>>                        hcid[1776]: Audio API: sending BT_GETCAPABILITIES_RSP
+>>>                        hcid[1776]: link_key_request (sba=00:80:98:98:71:10, dba=00:0C:78:72:7E:13)
+>>>                        hcid[1776]: kernel auth requirements = 0x00
+>>>                        hcid[1776]: stored link key type = 0x00
+>>>                        hcid[1776]: /org/bluez/audio/device2: Connected to 00:0C:78:72:7E:13
+>>>                        hcid[1776]: State changed /org/bluez/audio/device2:
+>>> HEADSET_STATE_CONNECT_IN_PROGRESS -> HEADSET_STATE_CONNECTED
+>>>                        hcid[1776]: State changed /org/bluez/audio/device2:
+>>> HEADSET_STATE_CONNECTED -> HEADSET_STATE_PLAY_IN_PROGRESS
+>>>                        hcid[1776]: SCO socket opened for headset /org/bluez/audio/device2
+>>>                        hcid[1776]: SCO fd=24
+>>>                        hcid[1776]: Audio API: sending BT_SETCONFIGURATION_RSP
+>>>                        hcid[1776]: State changed /org/bluez/audio/device2:
+>>> HEADSET_STATE_PLAY_IN_PROGRESS -> HEADSET_STATE_PLAYING
+>>>                        hcid[1776]: Audio API: received BT_STREAMSTART_REQ
+>>>                        hcid[1776]: Audio API: sending BT_STREAMSTART_RSP
+>>>                        hcid[1776]: Audio API: sending BT_STREAMFD_IND
+>>>                        hcid[1776]: Audio API: received BT_SETCONFIGURATION_REQ
+>>>                        hcid[1776]: config sco - device = 00:0C:78:72:7E:13 access_mode = 2
+>>>                        hcid[1776]: Audio API: sending BT_SETCONFIGURATION_RSP
+>>>                        hcid[1776]: Audio API: received BT_STREAMSTART_REQ
+>>>                        hcid[1776]: Audio API: sending BT_STREAMSTART_RSP
+>>>                        hcid[1776]: Audio API: sending BT_STREAMFD_IND
+>>>                        hcid[1776]: Unix client disconnected (fd=23)
+>>>                        hcid[1776]: Unix client disconnected (fd=21)
+>>>                        hcid[1776]: State changed /org/bluez/audio/device2:
+>>> HEADSET_STATE_PLAYING -> HEADSET_STATE_CONNECTED
+>>>                        hcid[1776]: State changed /org/bluez/audio/device2:
+>>> HEADSET_STATE_CONNECTED -> HEADSET_STATE_DISCONNECTED
+>>>
+>>> Please help me resolve the 2 problems i am facing and do let me know
+>>> if any one has tried connecting a bluetooth headset AT-BT220 to the
+>>> system.
+>>>
+>>> Thanks
+>>> Vivek
+>>> L&T EmSyS.
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>>
+>>
+>
