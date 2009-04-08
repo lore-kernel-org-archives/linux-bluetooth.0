@@ -2,22 +2,29 @@ Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
 In-Reply-To: <d3e5a0a00903310636rccf9a98v2c9f4233c981e92@mail.gmail.com>
 References: <d3e5a0a00903310636rccf9a98v2c9f4233c981e92@mail.gmail.com>
-Date: Wed, 8 Apr 2009 14:04:05 +0530
-Message-ID: <d4d7098f0904080134q2629d0a3lf5c3fa059dbf3945@mail.gmail.com>
+Date: Wed, 8 Apr 2009 13:35:41 +0530
+Message-ID: <d3e5a0a00904080105l52e62128q98dc68079c8e6b4a@mail.gmail.com>
 Subject: Re: SCO Support over USB
-From: Rajan Batra <rajan.batra@gmail.com>
-To: Vivek Agarwal <vivek.mailinglists@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+From: Vivek Agarwal <vivek.mailinglists@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-  i had this same problem before. then when i used 2.6.29 kernel
-i could do aplay and arecord. i used bluez 4.33.
+Dear All,
 
-hope this helps.
+I want to be able to use a bluetooth headset for making Call with my
+SIP enabled application in embedded platfrom running on iMX31
+platfrom.
 
+Can someone tell me if the echo test "arecord -D bt_audio -f S16_LE |
+aplay -D bt_audio -f S16_LE"
+works for you and if yes what are the configuration you are working on..
+
+Please help me..
+
+Thanks
+Vivek
 
 
 On Tue, Mar 31, 2009 at 7:06 PM, Vivek Agarwal
@@ -48,61 +55,61 @@ On Tue, Mar 31, 2009 at 7:06 PM, Vivek Agarwal
 >
 > Once i made these changes i was able to record and play individually
 > but get the following problems
-> Â  Â  Â  Â a) the get the following kernel messages when i try to play a .wav
+>        a) the get the following kernel messages when i try to play a .wav
 > file using aplay..
 >
-> Â  Â  Â  Â  Â  Â  Â  Â hci_scodata_packet: hci0 SCO packet for unknown connection handle 5633
-> Â  Â  Â  Â  Â  Â  Â  Â hci_scodata_packet: hci0 SCO packet for unknown connection handle 9985
-> Â  Â  Â  Â  Â  Â  Â  Â hci_scodata_packet: hci0 SCO packet for unknown connection handle 49664
-> Â  Â  Â  Â  Â  Â  Â  Â hci_scodata_packet: hci0 SCO packet for unknown connection handle 181
-> Â  Â  Â  Â  Â  Â  Â  Â hci_scodata_packet: hci0 SCO packet for unknown connection handle 11264
-> Â  Â  Â  Â  Â  Â  Â  Â hci_scodata_packet: hci0 SCO packet for unknown connection handle 32769
-> Â  Â  Â  Â  Â  Â  Â  Â hci_scodata_packet: hci0 SCO packet for unknown connection handle 49153
+>                hci_scodata_packet: hci0 SCO packet for unknown connection handle 5633
+>                hci_scodata_packet: hci0 SCO packet for unknown connection handle 9985
+>                hci_scodata_packet: hci0 SCO packet for unknown connection handle 49664
+>                hci_scodata_packet: hci0 SCO packet for unknown connection handle 181
+>                hci_scodata_packet: hci0 SCO packet for unknown connection handle 11264
+>                hci_scodata_packet: hci0 SCO packet for unknown connection handle 32769
+>                hci_scodata_packet: hci0 SCO packet for unknown connection handle 49153
 >
-> Â  Â  Â  Â b) i am not able to do an echo test using the following method. The
+>        b) i am not able to do an echo test using the following method. The
 > dont hear any echo.
-> Â  Â  Â  Â  Â  Â  Â  Â arecord -D bt_audio -f S16_LE | aplay -D bt_audio -f S16_LE
-> Â  Â  Â  Â if the run the hcid in debug mode below are the debug messages..
+>                arecord -D bt_audio -f S16_LE | aplay -D bt_audio -f S16_LE
+>        if the run the hcid in debug mode below are the debug messages..
 >
-> Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: Accepted new client connection on unix socket (fd=21)
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: Audio API: received BT_GETCAPABILITIES_REQ
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: Audio API: sending BT_GETCAPABILITIES_RSP
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: Audio API: received BT_SETCONFIGURATION_REQ
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: config sco - device = 00:0C:78:72:7E:13 access_mode = 1
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: /org/bluez/audio/device2: Connecting to
+>                hcid[1776]: Accepted new client connection on unix socket (fd=21)
+>                        hcid[1776]: Audio API: received BT_GETCAPABILITIES_REQ
+>                        hcid[1776]: Audio API: sending BT_GETCAPABILITIES_RSP
+>                        hcid[1776]: Audio API: received BT_SETCONFIGURATION_REQ
+>                        hcid[1776]: config sco - device = 00:0C:78:72:7E:13 access_mode = 1
+>                        hcid[1776]: /org/bluez/audio/device2: Connecting to
 > 00:0C:78:72:7E:13 channel 2
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: State changed /org/bluez/audio/device2:
+>                        hcid[1776]: State changed /org/bluez/audio/device2:
 > HEADSET_STATE_DISCONNECTED -> HEADSET_STATE_CONNECT_IN_PROGRESS
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: Accepted new client connection on unix socket (fd=23)
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: Audio API: received BT_GETCAPABILITIES_REQ
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: Audio API: sending BT_GETCAPABILITIES_RSP
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: link_key_request (sba=00:80:98:98:71:10, dba=00:0C:78:72:7E:13)
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: kernel auth requirements = 0x00
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: stored link key type = 0x00
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: /org/bluez/audio/device2: Connected to 00:0C:78:72:7E:13
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: State changed /org/bluez/audio/device2:
+>                        hcid[1776]: Accepted new client connection on unix socket (fd=23)
+>                        hcid[1776]: Audio API: received BT_GETCAPABILITIES_REQ
+>                        hcid[1776]: Audio API: sending BT_GETCAPABILITIES_RSP
+>                        hcid[1776]: link_key_request (sba=00:80:98:98:71:10, dba=00:0C:78:72:7E:13)
+>                        hcid[1776]: kernel auth requirements = 0x00
+>                        hcid[1776]: stored link key type = 0x00
+>                        hcid[1776]: /org/bluez/audio/device2: Connected to 00:0C:78:72:7E:13
+>                        hcid[1776]: State changed /org/bluez/audio/device2:
 > HEADSET_STATE_CONNECT_IN_PROGRESS -> HEADSET_STATE_CONNECTED
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: State changed /org/bluez/audio/device2:
+>                        hcid[1776]: State changed /org/bluez/audio/device2:
 > HEADSET_STATE_CONNECTED -> HEADSET_STATE_PLAY_IN_PROGRESS
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: SCO socket opened for headset /org/bluez/audio/device2
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: SCO fd=24
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: Audio API: sending BT_SETCONFIGURATION_RSP
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: State changed /org/bluez/audio/device2:
+>                        hcid[1776]: SCO socket opened for headset /org/bluez/audio/device2
+>                        hcid[1776]: SCO fd=24
+>                        hcid[1776]: Audio API: sending BT_SETCONFIGURATION_RSP
+>                        hcid[1776]: State changed /org/bluez/audio/device2:
 > HEADSET_STATE_PLAY_IN_PROGRESS -> HEADSET_STATE_PLAYING
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: Audio API: received BT_STREAMSTART_REQ
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: Audio API: sending BT_STREAMSTART_RSP
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: Audio API: sending BT_STREAMFD_IND
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: Audio API: received BT_SETCONFIGURATION_REQ
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: config sco - device = 00:0C:78:72:7E:13 access_mode = 2
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: Audio API: sending BT_SETCONFIGURATION_RSP
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: Audio API: received BT_STREAMSTART_REQ
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: Audio API: sending BT_STREAMSTART_RSP
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: Audio API: sending BT_STREAMFD_IND
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: Unix client disconnected (fd=23)
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: Unix client disconnected (fd=21)
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: State changed /org/bluez/audio/device2:
+>                        hcid[1776]: Audio API: received BT_STREAMSTART_REQ
+>                        hcid[1776]: Audio API: sending BT_STREAMSTART_RSP
+>                        hcid[1776]: Audio API: sending BT_STREAMFD_IND
+>                        hcid[1776]: Audio API: received BT_SETCONFIGURATION_REQ
+>                        hcid[1776]: config sco - device = 00:0C:78:72:7E:13 access_mode = 2
+>                        hcid[1776]: Audio API: sending BT_SETCONFIGURATION_RSP
+>                        hcid[1776]: Audio API: received BT_STREAMSTART_REQ
+>                        hcid[1776]: Audio API: sending BT_STREAMSTART_RSP
+>                        hcid[1776]: Audio API: sending BT_STREAMFD_IND
+>                        hcid[1776]: Unix client disconnected (fd=23)
+>                        hcid[1776]: Unix client disconnected (fd=21)
+>                        hcid[1776]: State changed /org/bluez/audio/device2:
 > HEADSET_STATE_PLAYING -> HEADSET_STATE_CONNECTED
-> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â hcid[1776]: State changed /org/bluez/audio/device2:
+>                        hcid[1776]: State changed /org/bluez/audio/device2:
 > HEADSET_STATE_CONNECTED -> HEADSET_STATE_DISCONNECTED
 >
 > Please help me resolve the 2 problems i am facing and do let me know
@@ -112,8 +119,4 @@ On Tue, Mar 31, 2009 at 7:06 PM, Vivek Agarwal
 > Thanks
 > Vivek
 > L&T EmSyS.
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at Â http://vger.kernel.org/majordomo-info.html
 >
