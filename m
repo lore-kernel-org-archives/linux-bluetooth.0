@@ -1,77 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gene Heskett <gene.heskett@verizon.net>
-To: Zygo Blaxell <zblaxell@faye.furryterror.org>
-Subject: Re: The link I had working quit.  Help
-Date: Thu, 09 Apr 2009 14:28:33 -0400
-Cc: Zygo Blaxell <zblaxell@feedme.hungrycats.org>,
-	Bastien Nocera <hadess@hadess.net>,
-	Zygo Blaxell <zblaxell@dactyl.vpn7.hungrycats.org>,
-	jayjwa <jayjwa@atr2.ath.cx>, linux-bluetooth@vger.kernel.org
-References: <200904041636.25409.gene.heskett@verizon.net>
- <200904082240.11543.gene.heskett@verizon.net>
- <20090409145506.GB22527@faye.furryterror.org>
-In-reply-to: <20090409145506.GB22527@faye.furryterror.org>
-MIME-version: 1.0
-Content-type: text/plain; charset=iso-8859-15
-Message-id: <200904091428.33629.gene.heskett@verizon.net>
+MIME-Version: 1.0
+In-Reply-To: <20090408122812.GA8827@localhost>
+References: <1239180415-29327-1-git-send-email-forrest.zhao@gmail.com>
+	 <20090408122812.GA8827@localhost>
+Date: Thu, 9 Apr 2009 22:44:01 +0530
+Message-ID: <d4d7098f0904091014v74bf03d2ne33245e86fc1599d@mail.gmail.com>
+Subject: Re: [PATCH 4/4] IPC integration part for HFP Audio gateway -- take5
+From: Rajan Batra <rajan.batra@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Forrest Zhao <forrest.zhao@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thursday 09 April 2009, Zygo Blaxell wrote:
->On Wed, Apr 08, 2009 at 10:40:11PM -0400, Gene Heskett wrote:
->> Anyway the a7 eb101 responses are as follows:
+Hello,
+   i used today's git bluez head code for headset gateway. i am able
+to dial the number. receive the call.
+but the voice stream is not starting. i have connected headphone to my
+bluez linux host.
+i am not able to hear or pass my voice to  other side.
+
+do i have to do some setting in PA ?.  or any extra settings.
+
+i do following steps :
+
+1)   dbus-send --system --type=method_call --print-reply
+--dest=org.bluez /org/bluez/32112/hci0/dev_00_24_04_46_4E_FA
+org.bluez.HeadsetGateway.Connect
+
+
+2)  dbus-send --system --type=method_call --print-reply
+--dest=org.bluez /org/bluez/32112/hci0/dev_00_24_04_46_4E_FA
+org.bluez.HeadsetGateway.Call string:<number>
+
+i changed macro in gateway.c
+     #define AG_PLACE_CALL "ATD%s\r"
+to
+     #define AG_PLACE_CALL "ATD%s;\r"
+
+ without semicolon, phone wasnt dialing the number.
+
+
+-thanks and regards,
+-rajan batra
+
+
+
+
+On Wed, Apr 8, 2009 at 5:58 PM, Johan Hedberg <johan.hedberg@nokia.com> wrote:
+> Hi Forrest,
+>
+> On Wed, Apr 08, 2009, Forrest Zhao wrote:
+>> From: Forrest Zhao <forrest.zhao@gmail.com>
 >>
->> get address local returns the correct bdaddr of that device.
->> get address remote	err 4
->> get connectable		on
+>> ---
+>>  audio/gateway.c |   77 +++++++++++++++++++++++++++++++++++++
+>>  audio/gateway.h |    7 +++
+>>  audio/unix.c    |  115 +++++++++++++++++++++++++++++++++++++++++++++++++++---
+>>  3 files changed, 192 insertions(+), 7 deletions(-)
 >
->connectable is good...
+> Thanks! The patch has now been pushed upstream with some minor coding
+> style fixes.
 >
->> get ecbonding		responder
->> get ecconnection	auto
->> get encryption		on
->> get esschar		+
->> get flow		hardware  (this changed to none after I did an 'rst factory'
->> get linktimeout		0
->> get name local		eb101
->> get name remote		err 4
->> get parity		none
->> get security		off
+> Johan
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >
->security off is interesting, given encryption is on...you might want
->to try the other three combinations of those flags.
->
->> get sleep		off
->> get sniff		on
->> get status		false
->> get trustedlist		empty return
->
->Now that's a problem.  You should have the address of the USB dongle here
->if you've paired with it.  That suggests that pairing maybe isn't working
->on the eb101?  Or maybe you have to use 'set trustedlist'?
->
->> get txpower		10
->> get visible		11:11:11:11:11:11
->>
->> And finally, a 'con 11:11:11:11:11:11' munches along for several seconds
->> before returning an 'err 14'
->
->That makes sense...you haven't set up a serial port service on the Linux
->machine for the eb101 to connect to.
->
->> Did anyone take a look at that tarball I sent yet?
->
->Not yet, although from eyeballing quickly it looks like bluetoothd has
->done service discovery and picked up service records.  I'll decode it
->the next time I have the tarball, the Bluetooth spec, and some time all
->together in one place.
-
-Thank you very much Zygo.
-
--- 
-Cheers, Gene
-"There are four boxes to be used in defense of liberty:
- soap, ballot, jury, and ammo. Please use in that order."
--Ed Howdershelt (Author)
-The reader this message encounters not failing to understand is cursed.
-
