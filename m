@@ -1,64 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <ac8af0be0904091937w32a4cf47p97a439e46eae59b6@mail.gmail.com>
-References: <1239180415-29327-1-git-send-email-forrest.zhao@gmail.com>
-	 <20090408122812.GA8827@localhost>
-	 <d4d7098f0904091014v74bf03d2ne33245e86fc1599d@mail.gmail.com>
-	 <ac8af0be0904091937w32a4cf47p97a439e46eae59b6@mail.gmail.com>
-Date: Fri, 10 Apr 2009 11:14:32 +0530
-Message-ID: <d4d7098f0904092244j2bc49cf5r58d96c4fc46b88b0@mail.gmail.com>
-Subject: Re: [PATCH 4/4] IPC integration part for HFP Audio gateway -- take5
-From: Rajan Batra <rajan.batra@gmail.com>
-To: Zhao Forrest <forrest.zhao@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 9 Apr 2009 21:20:28 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+To: Maciej Rutecki <maciej.rutecki@gmail.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Thomas
+ Gleixner <tglx@linutronix.de>, linux-bluetooth@vger.kernel.org,
+        marcel@holtmann.org
+Subject: Re: [2.6.29-git12] BUG: scheduling while atomic:
+ swapper/0/0x10000100
+Message-Id: <20090409212028.7b2aa88c.akpm@linux-foundation.org>
+In-Reply-To: <8db1092f0904070037q426fd8dcx4aa48c70e40b5d6c@mail.gmail.com>
+References: <8db1092f0904070037q426fd8dcx4aa48c70e40b5d6c@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+On Tue, 7 Apr 2009 09:37:37 +0200 Maciej Rutecki <maciej.rutecki@gmail.com> wrote:
 
-     what am i missing to establish voice connection ?
-why ALSA is not able to stream voice from Phone to my bluez headphone ?
-is there some settings ?
+> Bug happens when try connect with my phone via kbluetooth (kde
+> application for bluetooth):
 
-thanks.
-Rajan
+Did this get fixed?
 
+> [  114.896824] BUG: scheduling while atomic: swapper/0/0x10000100
 
-On Fri, Apr 10, 2009 at 8:07 AM, Zhao Forrest <forrest.zhao@gmail.com> wrote:
-> On Fri, Apr 10, 2009 at 1:14 AM, Rajan Batra <rajan.batra@gmail.com> wrote:
->> Hello,
->>   i used today's git bluez head code for headset gateway. i am able
->> to dial the number. receive the call.
->> but the voice stream is not starting. i have connected headphone to my
->> bluez linux host.
->> i am not able to hear or pass my voice to  other side.
->>
->> do i have to do some setting in PA ?.  or any extra settings.
-> Did you use the latest version of PA?
->
->>
->> i do following steps :
->>
->> 1)   dbus-send --system --type=method_call --print-reply
->> --dest=org.bluez /org/bluez/32112/hci0/dev_00_24_04_46_4E_FA
->> org.bluez.HeadsetGateway.Connect
->>
->>
->> 2)  dbus-send --system --type=method_call --print-reply
->> --dest=org.bluez /org/bluez/32112/hci0/dev_00_24_04_46_4E_FA
->> org.bluez.HeadsetGateway.Call string:<number>
->>
->> i changed macro in gateway.c
->>     #define AG_PLACE_CALL "ATD%s\r"
->> to
->>     #define AG_PLACE_CALL "ATD%s;\r"
->>
->>  without semicolon, phone wasnt dialing the number.
->>
-> According to HFP spec there should not be semicolon, this might be an
-> interoperability issue.
->
-> Thanks,
-> Forrest
->
+PREEMPT_ACTIVE=true
+softirq_count=1
+
+weird.
+
+> [  114.896831] Modules linked in: i915 drm i2c_algo_bit i2c_core
+> rfcomm l2cap vboxnetflt vboxdrv xt_tcpudp xt_limit xt_state
+> iptable_nat nf_nat nf_conntrack_ipv4 nf_conntrack nf_defrag_ipv4
+> iptable_filter ip_tables x_tables aes_i586 aes_generic cbc dm_crypt
+> dm_snapshot dm_mirror dm_region_hash dm_log dm_mod hp_wmi fuse sbp2
+> loop btusb bluetooth snd_hda_codec_si3054 snd_hda_codec_analog
+> snd_hda_intel snd_hda_codec arc4 snd_pcm_oss snd_mixer_oss snd_pcm ecb
+> snd_seq_dummy snd_seq_oss snd_seq_midi iwl3945 snd_rawmidi iwlcore
+> snd_seq_midi_event rfkill firmware_class snd_seq mac80211 snd_timer
+> snd_seq_device led_class pcmcia b44 ssb lib80211 uhci_hcd ehci_hcd
+> intel_agp psmouse snd ohci1394 mii cfg80211 usbcore agpgart
+> yenta_socket rsrc_nonstatic pcmcia_core serio_raw soundcore
+> snd_page_alloc rtc_cmos rtc_core rtc_lib battery fan ieee1394 ac
+> button sg evdev
+> [  114.896984]
+> [  114.896990] Pid: 0, comm: swapper Not tainted (2.6.29-git12 #1) HP
+> Compaq nx6310 (EY501ES#AKD)
+> [  114.896998] EIP: 0060:[<c029c711>] EFLAGS: 00000246 CPU: 1
+> [  114.897008] EIP is at acpi_idle_enter_simple+0x151/0x1be
+> [  114.897014] EAX: c04f31c0 EBX: f7073450 ECX: 00000000 EDX: 01716000
+> [  114.897036] ESI: 00f706bb EDI: 00f7113c EBP: f7067f6c ESP: f7067f4c
+> [  114.897042]  DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068
+> [  114.897048] CR0: 8005003b CR2: b7fb1000 CR3: 004f7000 CR4: 000006d0
+> [  114.897054] DR0: 00000000 DR1: 00000000 DR2: 00000000 DR3: 00000000
+> [  114.897059] DR6: ffff0ff0 DR7: 00000400
+> [  114.897064] Call Trace:
+> [  114.897074]  [<c0310156>] ? menu_select+0x36/0xf0
+> [  114.897083]  [<c030f3bf>] cpuidle_idle_call+0x6f/0xd0
+> [  114.897091]  [<c0101f15>] cpu_idle+0x55/0x90
+> [  114.897099]  [<c0395d38>] start_secondary+0x18d/0x205
+> [  114.897107]  [<c0395d38>] ? start_secondary+0x18d/0x205
+> 
+> dmesg:
+> http://unixy.pl/maciek/download/kernel/2.6.29-git12/2/dmesg-2.6.29-git12.txt
+> 
+> config:
+> http://unixy.pl/maciek/download/kernel/2.6.29-git12/config-2.6.29-git12.txt
+> 
