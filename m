@@ -1,116 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20090409212028.7b2aa88c.akpm@linux-foundation.org>
-References: <8db1092f0904070037q426fd8dcx4aa48c70e40b5d6c@mail.gmail.com>
-	 <20090409212028.7b2aa88c.akpm@linux-foundation.org>
-Date: Fri, 10 Apr 2009 12:40:26 +0200
-Message-ID: <8db1092f0904100340g7b7eb310y805e8680a32e3ac8@mail.gmail.com>
-Subject: Re: [2.6.29-git12] BUG: scheduling while atomic: swapper/0/0x10000100
-From: Maciej Rutecki <maciej.rutecki@gmail.com>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
-	linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+In-Reply-To: <ac8af0be0904091937w32a4cf47p97a439e46eae59b6@mail.gmail.com>
+References: <1239180415-29327-1-git-send-email-forrest.zhao@gmail.com>
+	 <20090408122812.GA8827@localhost>
+	 <d4d7098f0904091014v74bf03d2ne33245e86fc1599d@mail.gmail.com>
+	 <ac8af0be0904091937w32a4cf47p97a439e46eae59b6@mail.gmail.com>
+Date: Fri, 10 Apr 2009 11:30:14 +0530
+Message-ID: <d4d7098f0904092300t300bce4bw59c78c73247eea3e@mail.gmail.com>
+Subject: Re: [PATCH 4/4] IPC integration part for HFP Audio gateway -- take5
+From: Rajan Batra <rajan.batra@gmail.com>
+To: Zhao Forrest <forrest.zhao@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-2009/4/10 Andrew Morton <akpm@linux-foundation.org>
+> Did you use the latest version of PA?
+    when  i restart my machine. pulseaudio daemon is by default
+running. i havent done any setting to use PA for bluez nor loaded any
+bluetooth modules in PA.
 
-> Did this get fixed?
+so this means i am not using PA for bluez rite ?  so  i guess all
+should go to ALSA
 
-On 2.6.30-rc1-git3 still the same:
-[  162.541793] BUG: scheduling while atomic: swapper/0/0x10000100
-[  162.541801] Modules linked in: i915 drm i2c_algo_bit i2c_core
-rfcomm l2cap xt_tcpudp xt_limit xt_state iptable_filter
-nf_conntrack_ipv4 nf_conntrack nf_defrag_ipv4 ip_tables x_tables
-aes_i586 aes_generic cbc dm_crypt dm_snapshot dm_mirror dm_region_hash
-dm_log dm_mod hp_wmi rfkill fuse sbp2 loop btusb bluetooth
-snd_hda_codec_si3054 snd_hda_codec_analog snd_hda_intel snd_hda_codec
-snd_pcm_oss snd_mixer_oss snd_pcm snd_seq_dummy snd_seq_oss
-snd_seq_midi snd_rawmidi snd_seq_midi_event snd_seq pcmcia snd_timer
-snd_seq_device uhci_hcd psmouse ohci1394 ehci_hcd b44 ssb intel_agp
-snd yenta_socket rsrc_nonstatic pcmcia_core serio_raw ieee1394 usbcore
-mii agpgart rtc_cmos rtc_core rtc_lib fan battery soundcore
-snd_page_alloc button ac sg evdev
-[  162.541945]
-[  162.541952] Pid: 0, comm: swapper Not tainted (2.6.30-rc1-git3 #1)
-HP Compaq nx6310 (EY501ES#AKD)
-[  162.541960] EIP: 0060:[<c029f0e1>] EFLAGS: 00000246 CPU: 1
-[  162.541973] EIP is at acpi_idle_enter_simple+0x15d/0x188
-[  162.541979] EAX: c04f31c0 EBX: 0000099b ECX: 00000000 EDX: 01716000
-[  162.541986] ESI: 00000000 EDI: f7071450 EBP: f7067f6c ESP: f7067f4c
-[  162.541992]  DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068
-[  162.541999] CR0: 8005003b CR2: 0819d008 CR3: 2d828000 CR4: 000006d0
-[  162.542006] DR0: 00000000 DR1: 00000000 DR2: 00000000 DR3: 00000000
-[  162.542012] DR6: ffff0ff0 DR7: 00000400
-[  162.542017] Call Trace:
-[  162.542030]  [<c0310f6f>] cpuidle_idle_call+0x6f/0xd0
-[  162.542039]  [<c0101f15>] cpu_idle+0x55/0x90
-[  162.542048]  [<c0397ac8>] start_secondary+0x18d/0x205
-[  162.542057]  [<c0395d38>] ? get_cpu_cap+0x9a/0xc2
-[  175.336796] BUG: scheduling while atomic: swapper/0/0x10000100
-[  175.336805] Modules linked in: i915 drm i2c_algo_bit i2c_core
-rfcomm l2cap xt_tcpudp xt_limit xt_state iptable_filter
-nf_conntrack_ipv4 nf_conntrack nf_defrag_ipv4 ip_tables x_tables
-aes_i586 aes_generic cbc dm_crypt dm_snapshot dm_mirror dm_region_hash
-dm_log dm_mod hp_wmi rfkill fuse sbp2 loop btusb bluetooth
-snd_hda_codec_si3054 snd_hda_codec_analog snd_hda_intel snd_hda_codec
-snd_pcm_oss snd_mixer_oss snd_pcm snd_seq_dummy snd_seq_oss
-snd_seq_midi snd_rawmidi snd_seq_midi_event snd_seq pcmcia snd_timer
-snd_seq_device uhci_hcd psmouse ohci1394 ehci_hcd b44 ssb intel_agp
-snd yenta_socket rsrc_nonstatic pcmcia_core serio_raw ieee1394 usbcore
-mii agpgart rtc_cmos rtc_core rtc_lib fan battery soundcore
-snd_page_alloc button ac sg evdev
-[  175.336948]
-[  175.336956] Pid: 0, comm: swapper Not tainted (2.6.30-rc1-git3 #1)
-HP Compaq nx6310 (EY501ES#AKD)
-[  175.336964] EIP: 0060:[<c029f0e1>] EFLAGS: 00000246 CPU: 1
-[  175.336977] EIP is at acpi_idle_enter_simple+0x15d/0x188
-[  175.336984] EAX: c04f31c0 EBX: 00016912 ECX: 00000000 EDX: 01716000
-[  175.336990] ESI: 00000000 EDI: f7071450 EBP: f7067f6c ESP: f7067f4c
-[  175.336997]  DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068
-[  175.337003] CR0: 8005003b CR2: b7f79000 CR3: 2e75d000 CR4: 000006d0
-[  175.337010] DR0: 00000000 DR1: 00000000 DR2: 00000000 DR3: 00000000
-[  175.337016] DR6: ffff0ff0 DR7: 00000400
-[  175.337021] Call Trace:
-[  175.337033]  [<c0310f6f>] cpuidle_idle_call+0x6f/0xd0
-[  175.337042]  [<c0101f15>] cpu_idle+0x55/0x90
-[  175.337052]  [<c0397ac8>] start_secondary+0x18d/0x205
-[  175.337060]  [<c0395d38>] ? get_cpu_cap+0x9a/0xc2
-[  193.254798] BUG: scheduling while atomic: swapper/0/0x10000100
-[  193.254806] Modules linked in: i915 drm i2c_algo_bit i2c_core
-rfcomm l2cap xt_tcpudp xt_limit xt_state iptable_filter
-nf_conntrack_ipv4 nf_conntrack nf_defrag_ipv4 ip_tables x_tables
-aes_i586 aes_generic cbc dm_crypt dm_snapshot dm_mirror dm_region_hash
-dm_log dm_mod hp_wmi rfkill fuse sbp2 loop btusb bluetooth
-snd_hda_codec_si3054 snd_hda_codec_analog snd_hda_intel snd_hda_codec
-snd_pcm_oss snd_mixer_oss snd_pcm snd_seq_dummy snd_seq_oss
-snd_seq_midi snd_rawmidi snd_seq_midi_event snd_seq pcmcia snd_timer
-snd_seq_device uhci_hcd psmouse ohci1394 ehci_hcd b44 ssb intel_agp
-snd yenta_socket rsrc_nonstatic pcmcia_core serio_raw ieee1394 usbcore
-mii agpgart rtc_cmos rtc_core rtc_lib fan battery soundcore
-snd_page_alloc button ac sg evdev
-[  193.254949]
-[  193.254957] Pid: 0, comm: swapper Not tainted (2.6.30-rc1-git3 #1)
-HP Compaq nx6310 (EY501ES#AKD)
-[  193.254965] EIP: 0060:[<c029f0e1>] EFLAGS: 00000246 CPU: 1
-[  193.254978] EIP is at acpi_idle_enter_simple+0x15d/0x188
-[  193.254984] EAX: c04f31c0 EBX: 000017a8 ECX: 00000000 EDX: 01716000
-[  193.254991] ESI: 00000000 EDI: f7071450 EBP: f7067f6c ESP: f7067f4c
-[  193.254997]  DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068
-[  193.255004] CR0: 8005003b CR2: b7f79000 CR3: 2e75d000 CR4: 000006d0
-[  193.255010] DR0: 00000000 DR1: 00000000 DR2: 00000000 DR3: 00000000
-[  193.255016] DR6: ffff0ff0 DR7: 00000400
-[  193.255021] Call Trace:
-[  193.255034]  [<c0310f6f>] cpuidle_idle_call+0x6f/0xd0
-[  193.255043]  [<c0101f15>] cpu_idle+0x55/0x90
-[  193.255052]  [<c0397ac8>] start_secondary+0x18d/0x205
-[  193.255061]  [<c0395d38>] ? get_cpu_cap+0x9a/0xc2
-[  242.048045] hci_cmd_task: hci0 command tx timeout
-[  246.048973] hci_cmd_task: hci0 command tx timeout
+thanks.
+-rajan
 
 
-Regards
 
---
-Maciej Rutecki
-http://www.maciek.unixy.pl
+On Fri, Apr 10, 2009 at 8:07 AM, Zhao Forrest <forrest.zhao@gmail.com> wrote:
+> On Fri, Apr 10, 2009 at 1:14 AM, Rajan Batra <rajan.batra@gmail.com> wrote:
+>> Hello,
+>>   i used today's git bluez head code for headset gateway. i am able
+>> to dial the number. receive the call.
+>> but the voice stream is not starting. i have connected headphone to my
+>> bluez linux host.
+>> i am not able to hear or pass my voice to  other side.
+>>
+>> do i have to do some setting in PA ?.  or any extra settings.
+> Did you use the latest version of PA?
+>
+>>
+>> i do following steps :
+>>
+>> 1)   dbus-send --system --type=method_call --print-reply
+>> --dest=org.bluez /org/bluez/32112/hci0/dev_00_24_04_46_4E_FA
+>> org.bluez.HeadsetGateway.Connect
+>>
+>>
+>> 2)  dbus-send --system --type=method_call --print-reply
+>> --dest=org.bluez /org/bluez/32112/hci0/dev_00_24_04_46_4E_FA
+>> org.bluez.HeadsetGateway.Call string:<number>
+>>
+>> i changed macro in gateway.c
+>>     #define AG_PLACE_CALL "ATD%s\r"
+>> to
+>>     #define AG_PLACE_CALL "ATD%s;\r"
+>>
+>>  without semicolon, phone wasnt dialing the number.
+>>
+> According to HFP spec there should not be semicolon, this might be an
+> interoperability issue.
+>
+> Thanks,
+> Forrest
+>
