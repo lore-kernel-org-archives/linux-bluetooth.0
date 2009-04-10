@@ -7,8 +7,8 @@ References: <8db1092f0904070037q426fd8dcx4aa48c70e40b5d6c@mail.gmail.com>
 	 <alpine.LFD.2.00.0904101329170.21577@localhost.localdomain>
 	 <8db1092f0904100747w297a0daas9ebd05486d06e706@mail.gmail.com>
 	 <alpine.LFD.2.00.0904101819070.21577@localhost.localdomain>
-Date: Fri, 10 Apr 2009 18:57:02 +0200
-Message-ID: <8db1092f0904100957v26083888hd326411d4ca801ce@mail.gmail.com>
+Date: Fri, 10 Apr 2009 18:52:55 +0200
+Message-ID: <8db1092f0904100952x64048907gea6bbaf25488de26@mail.gmail.com>
 Subject: Re: [2.6.29-git12] BUG: scheduling while atomic: swapper/0/0x10000100
 From: Maciej Rutecki <maciej.rutecki@gmail.com>
 To: Thomas Gleixner <tglx@linutronix.de>
