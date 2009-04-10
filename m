@@ -1,63 +1,116 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 10 Apr 2009 13:41:34 +0200 (CEST)
-From: Thomas Gleixner <tglx@linutronix.de>
-To: Maciej Rutecki <maciej.rutecki@gmail.com>
-cc: Andrew Morton <akpm@linux-foundation.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Subject: Re: [2.6.29-git12] BUG: scheduling while atomic:
- swapper/0/0x10000100
-In-Reply-To: <8db1092f0904100340g7b7eb310y805e8680a32e3ac8@mail.gmail.com>
-Message-ID: <alpine.LFD.2.00.0904101329170.21577@localhost.localdomain>
-References: <8db1092f0904070037q426fd8dcx4aa48c70e40b5d6c@mail.gmail.com>  <20090409212028.7b2aa88c.akpm@linux-foundation.org> <8db1092f0904100340g7b7eb310y805e8680a32e3ac8@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+In-Reply-To: <20090409212028.7b2aa88c.akpm@linux-foundation.org>
+References: <8db1092f0904070037q426fd8dcx4aa48c70e40b5d6c@mail.gmail.com>
+	 <20090409212028.7b2aa88c.akpm@linux-foundation.org>
+Date: Fri, 10 Apr 2009 12:40:26 +0200
+Message-ID: <8db1092f0904100340g7b7eb310y805e8680a32e3ac8@mail.gmail.com>
+Subject: Re: [2.6.29-git12] BUG: scheduling while atomic: swapper/0/0x10000100
+From: Maciej Rutecki <maciej.rutecki@gmail.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+	linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 10 Apr 2009, Maciej Rutecki wrote:
+2009/4/10 Andrew Morton <akpm@linux-foundation.org>
 
-> 2009/4/10 Andrew Morton <akpm@linux-foundation.org>
-> 
-> > Did this get fixed?
-> 
-> On 2.6.30-rc1-git3 still the same:
-> [  162.541793] BUG: scheduling while atomic: swapper/0/0x10000100
+> Did this get fixed?
 
-Yikes.	
+On 2.6.30-rc1-git3 still the same:
+[  162.541793] BUG: scheduling while atomic: swapper/0/0x10000100
+[  162.541801] Modules linked in: i915 drm i2c_algo_bit i2c_core
+rfcomm l2cap xt_tcpudp xt_limit xt_state iptable_filter
+nf_conntrack_ipv4 nf_conntrack nf_defrag_ipv4 ip_tables x_tables
+aes_i586 aes_generic cbc dm_crypt dm_snapshot dm_mirror dm_region_hash
+dm_log dm_mod hp_wmi rfkill fuse sbp2 loop btusb bluetooth
+snd_hda_codec_si3054 snd_hda_codec_analog snd_hda_intel snd_hda_codec
+snd_pcm_oss snd_mixer_oss snd_pcm snd_seq_dummy snd_seq_oss
+snd_seq_midi snd_rawmidi snd_seq_midi_event snd_seq pcmcia snd_timer
+snd_seq_device uhci_hcd psmouse ohci1394 ehci_hcd b44 ssb intel_agp
+snd yenta_socket rsrc_nonstatic pcmcia_core serio_raw ieee1394 usbcore
+mii agpgart rtc_cmos rtc_core rtc_lib fan battery soundcore
+snd_page_alloc button ac sg evdev
+[  162.541945]
+[  162.541952] Pid: 0, comm: swapper Not tainted (2.6.30-rc1-git3 #1)
+HP Compaq nx6310 (EY501ES#AKD)
+[  162.541960] EIP: 0060:[<c029f0e1>] EFLAGS: 00000246 CPU: 1
+[  162.541973] EIP is at acpi_idle_enter_simple+0x15d/0x188
+[  162.541979] EAX: c04f31c0 EBX: 0000099b ECX: 00000000 EDX: 01716000
+[  162.541986] ESI: 00000000 EDI: f7071450 EBP: f7067f6c ESP: f7067f4c
+[  162.541992]  DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068
+[  162.541999] CR0: 8005003b CR2: 0819d008 CR3: 2d828000 CR4: 000006d0
+[  162.542006] DR0: 00000000 DR1: 00000000 DR2: 00000000 DR3: 00000000
+[  162.542012] DR6: ffff0ff0 DR7: 00000400
+[  162.542017] Call Trace:
+[  162.542030]  [<c0310f6f>] cpuidle_idle_call+0x6f/0xd0
+[  162.542039]  [<c0101f15>] cpu_idle+0x55/0x90
+[  162.542048]  [<c0397ac8>] start_secondary+0x18d/0x205
+[  162.542057]  [<c0395d38>] ? get_cpu_cap+0x9a/0xc2
+[  175.336796] BUG: scheduling while atomic: swapper/0/0x10000100
+[  175.336805] Modules linked in: i915 drm i2c_algo_bit i2c_core
+rfcomm l2cap xt_tcpudp xt_limit xt_state iptable_filter
+nf_conntrack_ipv4 nf_conntrack nf_defrag_ipv4 ip_tables x_tables
+aes_i586 aes_generic cbc dm_crypt dm_snapshot dm_mirror dm_region_hash
+dm_log dm_mod hp_wmi rfkill fuse sbp2 loop btusb bluetooth
+snd_hda_codec_si3054 snd_hda_codec_analog snd_hda_intel snd_hda_codec
+snd_pcm_oss snd_mixer_oss snd_pcm snd_seq_dummy snd_seq_oss
+snd_seq_midi snd_rawmidi snd_seq_midi_event snd_seq pcmcia snd_timer
+snd_seq_device uhci_hcd psmouse ohci1394 ehci_hcd b44 ssb intel_agp
+snd yenta_socket rsrc_nonstatic pcmcia_core serio_raw ieee1394 usbcore
+mii agpgart rtc_cmos rtc_core rtc_lib fan battery soundcore
+snd_page_alloc button ac sg evdev
+[  175.336948]
+[  175.336956] Pid: 0, comm: swapper Not tainted (2.6.30-rc1-git3 #1)
+HP Compaq nx6310 (EY501ES#AKD)
+[  175.336964] EIP: 0060:[<c029f0e1>] EFLAGS: 00000246 CPU: 1
+[  175.336977] EIP is at acpi_idle_enter_simple+0x15d/0x188
+[  175.336984] EAX: c04f31c0 EBX: 00016912 ECX: 00000000 EDX: 01716000
+[  175.336990] ESI: 00000000 EDI: f7071450 EBP: f7067f6c ESP: f7067f4c
+[  175.336997]  DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068
+[  175.337003] CR0: 8005003b CR2: b7f79000 CR3: 2e75d000 CR4: 000006d0
+[  175.337010] DR0: 00000000 DR1: 00000000 DR2: 00000000 DR3: 00000000
+[  175.337016] DR6: ffff0ff0 DR7: 00000400
+[  175.337021] Call Trace:
+[  175.337033]  [<c0310f6f>] cpuidle_idle_call+0x6f/0xd0
+[  175.337042]  [<c0101f15>] cpu_idle+0x55/0x90
+[  175.337052]  [<c0397ac8>] start_secondary+0x18d/0x205
+[  175.337060]  [<c0395d38>] ? get_cpu_cap+0x9a/0xc2
+[  193.254798] BUG: scheduling while atomic: swapper/0/0x10000100
+[  193.254806] Modules linked in: i915 drm i2c_algo_bit i2c_core
+rfcomm l2cap xt_tcpudp xt_limit xt_state iptable_filter
+nf_conntrack_ipv4 nf_conntrack nf_defrag_ipv4 ip_tables x_tables
+aes_i586 aes_generic cbc dm_crypt dm_snapshot dm_mirror dm_region_hash
+dm_log dm_mod hp_wmi rfkill fuse sbp2 loop btusb bluetooth
+snd_hda_codec_si3054 snd_hda_codec_analog snd_hda_intel snd_hda_codec
+snd_pcm_oss snd_mixer_oss snd_pcm snd_seq_dummy snd_seq_oss
+snd_seq_midi snd_rawmidi snd_seq_midi_event snd_seq pcmcia snd_timer
+snd_seq_device uhci_hcd psmouse ohci1394 ehci_hcd b44 ssb intel_agp
+snd yenta_socket rsrc_nonstatic pcmcia_core serio_raw ieee1394 usbcore
+mii agpgart rtc_cmos rtc_core rtc_lib fan battery soundcore
+snd_page_alloc button ac sg evdev
+[  193.254949]
+[  193.254957] Pid: 0, comm: swapper Not tainted (2.6.30-rc1-git3 #1)
+HP Compaq nx6310 (EY501ES#AKD)
+[  193.254965] EIP: 0060:[<c029f0e1>] EFLAGS: 00000246 CPU: 1
+[  193.254978] EIP is at acpi_idle_enter_simple+0x15d/0x188
+[  193.254984] EAX: c04f31c0 EBX: 000017a8 ECX: 00000000 EDX: 01716000
+[  193.254991] ESI: 00000000 EDI: f7071450 EBP: f7067f6c ESP: f7067f4c
+[  193.254997]  DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068
+[  193.255004] CR0: 8005003b CR2: b7f79000 CR3: 2e75d000 CR4: 000006d0
+[  193.255010] DR0: 00000000 DR1: 00000000 DR2: 00000000 DR3: 00000000
+[  193.255016] DR6: ffff0ff0 DR7: 00000400
+[  193.255021] Call Trace:
+[  193.255034]  [<c0310f6f>] cpuidle_idle_call+0x6f/0xd0
+[  193.255043]  [<c0101f15>] cpu_idle+0x55/0x90
+[  193.255052]  [<c0397ac8>] start_secondary+0x18d/0x205
+[  193.255061]  [<c0395d38>] ? get_cpu_cap+0x9a/0xc2
+[  242.048045] hci_cmd_task: hci0 command tx timeout
+[  246.048973] hci_cmd_task: hci0 command tx timeout
 
-0x10000100
-       ^----- softirq count leaked.
 
-We have a check for that in do_softirq, but none in do_IRQ. Can you
-please apply the patch below and test whether it triggers ?
+Regards
 
-Thanks,
-
-	tglx
----
-diff --git a/arch/x86/kernel/irq.c b/arch/x86/kernel/irq.c
-index c3fe010..d164396 100644
---- a/arch/x86/kernel/irq.c
-+++ b/arch/x86/kernel/irq.c
-@@ -206,6 +206,7 @@ unsigned int __irq_entry do_IRQ(struct pt_regs *regs)
- 	/* high bit used in ret_from_ code  */
- 	unsigned vector = ~regs->orig_ax;
- 	unsigned irq;
-+	int prev_count = preempt_count();
- 
- 	exit_idle();
- 	irq_enter();
-@@ -225,6 +226,13 @@ unsigned int __irq_entry do_IRQ(struct pt_regs *regs)
- 
- 	irq_exit();
- 
-+	if (unlikely(prev_count != preempt_count())) {
-+		printk(KERN_ERR "huh, entered interrupt %d"
-+		       "with preempt_count %08x, exited with %08x?\n", irq,
-+		       prev_count, preempt_count());
-+		preempt_count() = prev_count;
-+	}
-+
- 	set_irq_regs(old_regs);
- 	return 1;
- }
+--
+Maciej Rutecki
+http://www.maciek.unixy.pl
