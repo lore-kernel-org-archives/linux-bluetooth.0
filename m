@@ -1,149 +1,133 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Mon, 20 Apr 2009 20:49:36 +0530
-Message-ID: <8b5debfa0904200819sbcb6b08q5f33782381dcb229@mail.gmail.com>
-Subject: [PATCH] Adding priority check for plugins.
-From: alok barsode <alokbarsode@gmail.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: multipart/mixed; boundary=001636458996e687b90467fe0e8c
+Subject: Re: [2.6.29-git12] BUG: scheduling while atomic:
+ swapper/0/0x10000100
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Dave Young <hidave.darkstar@gmail.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>,
+	Maciej Rutecki <maciej.rutecki@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	linux-bluetooth@vger.kernel.org
+In-Reply-To: <a8e1da0904180604k8108bc5hf95705c42d80fcf9@mail.gmail.com>
+References: <8db1092f0904070037q426fd8dcx4aa48c70e40b5d6c@mail.gmail.com>
+	 <20090409212028.7b2aa88c.akpm@linux-foundation.org>
+	 <8db1092f0904100340g7b7eb310y805e8680a32e3ac8@mail.gmail.com>
+	 <alpine.LFD.2.00.0904101329170.21577@localhost.localdomain>
+	 <8db1092f0904100747w297a0daas9ebd05486d06e706@mail.gmail.com>
+	 <alpine.LFD.2.00.0904101819070.21577@localhost.localdomain>
+	 <8db1092f0904100952x64048907gea6bbaf25488de26@mail.gmail.com>
+	 <alpine.LFD.2.00.0904101854250.21577@localhost.localdomain>
+	 <8db1092f0904101057x56000b73w9de3227b2a3a9abb@mail.gmail.com>
+	 <alpine.LFD.2.00.0904102019220.21577@localhost.localdomain>
+	 <a8e1da0904180604k8108bc5hf95705c42d80fcf9@mail.gmail.com>
+Content-Type: text/plain
+Date: Sat, 11 Apr 2009 21:52:44 +0200
+Message-Id: <1239479565.8206.25.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---001636458996e687b90467fe0e8c
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Hi Dave,
 
-Hi Marcel,
+> > On Fri, 10 Apr 2009, Maciej Rutecki wrote:
+> >> 2009/4/10 Thomas Gleixner <tglx@linutronix.de>:
+> >>
+> >> [...]
+> >> > Please upload trace.bz2 file to some place.
+> >>
+> >> http://unixy.pl/maciek/download/kernel/2.6.30-rc1-git3/laptop/trace-2.6.30-rc1-git3.bz2
+> >
+> > Ok. That gives us the necessary information:
+> >
+> >  <idle>-0       1d... 76597263us : do_softirq <-irq_exit
+> >  <idle>-0       1d... 76597263us : __do_softirq <-do_softirq
+> >  <idle>-0       1..s. 76597264us : tasklet_action <-__do_softirq
+> >  <idle>-0       1..s. 76597265us : hci_rx_task <-tasklet_action
+> >  <idle>-0       1..s. 76597266us : _read_lock <-hci_rx_task
+> >  <idle>-0       1..s. 76597267us : skb_dequeue <-hci_rx_task
+> >  <idle>-0       1..s. 76597268us : _spin_lock_irqsave <-skb_dequeue
+> >  <idle>-0       1d.s. 76597269us : _spin_unlock_irqrestore <-skb_dequeue
+> >  <idle>-0       1..s. 76597270us : hci_send_to_sock <-hci_rx_task
+> >  <idle>-0       1..s. 76597270us+: _read_lock <-hci_send_to_sock
+> >  <idle>-0       1..s. 76597272us : skb_clone <-hci_send_to_sock
+> >  <idle>-0       1..s. 76597273us : kmem_cache_alloc <-skb_clone
+> >  <idle>-0       1..s. 76597274us : __skb_clone <-skb_clone
+> >  <idle>-0       1..s. 76597275us : __copy_skb_header <-__skb_clone
+> >  <idle>-0       1..s. 76597276us : skb_push <-hci_send_to_sock
+> >  <idle>-0       1..s. 76597277us : sock_queue_rcv_skb <-hci_send_to_sock
+> >  <idle>-0       1..s. 76597278us : sk_filter <-sock_queue_rcv_skb
+> >  <idle>-0       1..s. 76597279us : security_sock_rcv_skb <-sk_filter
+> >  <idle>-0       1..s. 76597280us : cap_socket_sock_rcv_skb <-security_sock_rcv_skb
+> >  <idle>-0       1..s. 76597280us : local_bh_disable <-sk_filter
+> >  <idle>-0       1..s. 76597281us : local_bh_enable <-sk_filter
+> >  <idle>-0       1..s. 76597282us : skb_queue_tail <-sock_queue_rcv_skb
+> >  <idle>-0       1..s. 76597283us : _spin_lock_irqsave <-skb_queue_tail
+> >  <idle>-0       1d.s. 76597284us : _spin_unlock_irqrestore <-skb_queue_tail
+> >  <idle>-0       1..s. 76597285us : sock_def_readable <-sock_queue_rcv_skb
+> >  <idle>-0       1..s. 76597286us : _read_lock <-sock_def_readable
+> >  <idle>-0       1..s. 76597286us : __wake_up_sync_key <-sock_def_readable
+> >  <idle>-0       1..s. 76597287us : _spin_lock_irqsave <-__wake_up_sync_key
+> >  <idle>-0       1d.s. 76597288us : __wake_up_common <-__wake_up_sync_key
+> >  <idle>-0       1d.s. 76597289us : pollwake <-__wake_up_common
+> >  <idle>-0       1d.s. 76597290us : default_wake_function <-pollwake
+> >  <idle>-0       1d.s. 76597290us : try_to_wake_up <-default_wake_function
+> >  <idle>-0       1d.s. 76597292us : update_shares <-try_to_wake_up
+> >  <idle>-0       1d.s. 76597293us : walk_tg_tree <-update_shares
+> >  <idle>-0       1d.s. 76597294us : tg_nop <-walk_tg_tree
+> >  <idle>-0       1d.s. 76597294us : tg_nop <-walk_tg_tree
+> >  <idle>-0       1d.s. 76597295us : tg_shares_up <-walk_tg_tree
+> >  <idle>-0       1d.s. 76597297us : tg_nop <-walk_tg_tree
+> >  <idle>-0       1d.s. 76597297us : tg_shares_up <-walk_tg_tree
+> >  <idle>-0       1d.s. 76597298us : tg_nop <-walk_tg_tree
+> >  <idle>-0       1d.s. 76597299us : tg_shares_up <-walk_tg_tree
+> >  <idle>-0       1d.s. 76597300us : tg_nop <-walk_tg_tree
+> >  <idle>-0       1d.s. 76597301us : tg_shares_up <-walk_tg_tree
+> >  <idle>-0       1d.s. 76597302us : tg_nop <-walk_tg_tree
+> >  <idle>-0       1d.s. 76597303us : tg_shares_up <-walk_tg_tree
+> >  <idle>-0       1d.s. 76597304us : tg_shares_up <-walk_tg_tree
+> >  <idle>-0       1d.s. 76597305us+: task_rq_lock <-try_to_wake_up
+> >  <idle>-0       1d.s. 76597314us : _spin_lock <-task_rq_lock
+> >  <idle>-0       1d.s. 76597315us : select_task_rq_fair <-try_to_wake_up
+> >  <idle>-0       1d.s. 76597316us : activate_task <-try_to_wake_up
+> >  <idle>-0       1d.s. 76597317us : enqueue_task_fair <-activate_task
+> >  <idle>-0       1d.s. 76597317us : enqueue_entity <-enqueue_task_fair
+> >  <idle>-0       1d.s. 76597318us : update_curr <-enqueue_entity
+> >  <idle>-0       1d.s. 76597319us : place_entity <-enqueue_entity
+> >  <idle>-0       1d.s. 76597320us : enqueue_entity <-enqueue_task_fair
+> >  <idle>-0       1d.s. 76597321us : update_curr <-enqueue_entity
+> >  <idle>-0       1d.s. 76597321us : place_entity <-enqueue_entity
+> >  <idle>-0       1d.s. 76597322us : check_preempt_curr_idle <-try_to_wake_up
+> >  <idle>-0       1d.s. 76597323us : resched_task <-check_preempt_curr_idle
+> >  <idle>-0       1dNs. 76597324us : _spin_unlock_irqrestore <-try_to_wake_up
+> >  <idle>-0       1dNs. 76597325us+: _spin_unlock_irqrestore <-__wake_up_sync_key
+> >  <idle>-0       1.Ns. 76597326us : hci_event_packet <-hci_rx_task
+> >  <idle>-0       1.Ns. 76597327us : skb_pull <-hci_event_packet
+> >  <idle>-0       1.Ns. 76597328us : _spin_lock <-hci_event_packet
+> >  <idle>-0       1.Ns. 76597330us : del_timer <-hci_event_packet
+> >  <idle>-0       1.Ns. 76597331us : hci_conn_add_sysfs <-hci_event_packet
+> >  <idle>-0       1.Ns. 76597332us+: dev_set_name <-hci_conn_add_sysfs
+> 
+> Marcel, this is caused by hci conn id changes, originally the conn id
+> is like "acl:xx:xx:xx:xx:xx:xx", then it was changed to
+> "hdev_name:connection_handle", yes use the handle looks better, but it
+> need to be done in the event handling function.
+> 
+> What do you think about change back to original way plus hdev_name?
+> like:  "hdev_name:xx:xx:xx:xx:xx:xx"
 
-Adding priority field for plugins.
-Let me know if anything needs modifications.
+that is actually a bad idea since in theory we can have more than one
+SCO connection in the end. So we should use the handle. Also with the
+upcoming High Speed or Low Energy stuff we need to differentiate by the
+handle since more and more connections are possible.
 
-Cheers,
-Alok.
+We should fix the real problem here and to proper reference counting for
+the kobject with kref here. This code might need bigger fixing since
+when it was creating for 2.4, the driver model was not present.
 
---001636458996e687b90467fe0e8c
-Content-Type: text/x-diff; charset=US-ASCII;
-	name="0001-Add-priority-field-to-plugin-descriptor-definition-a.patch"
-Content-Disposition: attachment;
-	filename="0001-Add-priority-field-to-plugin-descriptor-definition-a.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_ftrbbk3u0
+Feel free to propose something. I am open for ideas.
 
-RnJvbSBkZTAyZDQ5ZGI4NWI3Y2FiNDlmYjkyMGQyMWRhM2MxMTA5MjUwNTEwIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBBbG9rIEJhcnNvZGUgPGFsb2suYmFyc29kZUBhemluZ28uY29t
-PgpEYXRlOiBNb24sIDIwIEFwciAyMDA5IDIwOjQwOjEwICswNTMwClN1YmplY3Q6IFtQQVRDSF0g
-QWRkIHByaW9yaXR5IGZpZWxkIHRvIHBsdWdpbiBkZXNjcmlwdG9yIGRlZmluaXRpb24gYW5kCiBs
-b2FkIHBsdWdpbnMgaW4gcHJpb3JpdHkgb3JkZXIuCgotLS0KIGF1ZGlvL21haW4uYyAgICAgIHwg
-ICAgMiArLQogaW5wdXQvbWFpbi5jICAgICAgfCAgICAyICstCiBuZXR3b3JrL21haW4uYyAgICB8
-ICAgIDIgKy0KIHBsdWdpbnMvZWNoby5jICAgIHwgICAgMiArLQogcGx1Z2lucy9oYWwuYyAgICAg
-fCAgICAyICstCiBwbHVnaW5zL25ldGxpbmsuYyB8ICAgIDIgKy0KIHBsdWdpbnMvc2VydmljZS5j
-IHwgICAgMiArLQogcGx1Z2lucy9zdG9yYWdlLmMgfCAgICAyICstCiBzZXJpYWwvbWFpbi5jICAg
-ICB8ICAgIDIgKy0KIHNyYy9wbHVnaW4uYyAgICAgIHwgICAyOSArKysrKysrKysrKysrKysrKysr
-KysrLS0tLS0tLQogc3JjL3BsdWdpbi5oICAgICAgfCAgICA4ICsrKysrKy0tCiAxMSBmaWxlcyBj
-aGFuZ2VkLCAzNyBpbnNlcnRpb25zKCspLCAxOCBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9h
-dWRpby9tYWluLmMgYi9hdWRpby9tYWluLmMKaW5kZXggNTY1YzgzYi4uYzQ4MWI2OSAxMDA2NDQK
-LS0tIGEvYXVkaW8vbWFpbi5jCisrKyBiL2F1ZGlvL21haW4uYwpAQCAtMTc2LDQgKzE3Niw0IEBA
-IHN0YXRpYyB2b2lkIGF1ZGlvX2V4aXQodm9pZCkKIAlkYnVzX2Nvbm5lY3Rpb25fdW5yZWYoY29u
-bmVjdGlvbik7CiB9CiAKLUJMVUVUT09USF9QTFVHSU5fREVGSU5FKCJhdWRpbyIsIFZFUlNJT04s
-IGF1ZGlvX2luaXQsIGF1ZGlvX2V4aXQpCitCTFVFVE9PVEhfUExVR0lOX0RFRklORSgiYXVkaW8i
-LCBWRVJTSU9OLCBQTFVHSU5fUFJJT1JJVFlfREVGQVVMVCwgYXVkaW9faW5pdCwgYXVkaW9fZXhp
-dCkKZGlmZiAtLWdpdCBhL2lucHV0L21haW4uYyBiL2lucHV0L21haW4uYwppbmRleCAwMTBiNzMx
-Li41MWRlZDQzIDEwMDY0NAotLS0gYS9pbnB1dC9tYWluLmMKKysrIGIvaW5wdXQvbWFpbi5jCkBA
-IC04Miw0ICs4Miw0IEBAIHN0YXRpYyB2b2lkIGlucHV0X2V4aXQodm9pZCkKIAlkYnVzX2Nvbm5l
-Y3Rpb25fdW5yZWYoY29ubmVjdGlvbik7CiB9CiAKLUJMVUVUT09USF9QTFVHSU5fREVGSU5FKCJp
-bnB1dCIsIFZFUlNJT04sIGlucHV0X2luaXQsIGlucHV0X2V4aXQpCitCTFVFVE9PVEhfUExVR0lO
-X0RFRklORSgiaW5wdXQiLCBWRVJTSU9OLCBQTFVHSU5fUFJJT1JJVFlfREVGQVVMVCwgaW5wdXRf
-aW5pdCwgaW5wdXRfZXhpdCkKZGlmZiAtLWdpdCBhL25ldHdvcmsvbWFpbi5jIGIvbmV0d29yay9t
-YWluLmMKaW5kZXggNWY5NmQ0Yi4uNTA3NGY0ZSAxMDA2NDQKLS0tIGEvbmV0d29yay9tYWluLmMK
-KysrIGIvbmV0d29yay9tYWluLmMKQEAgLTU1LDQgKzU1LDQgQEAgc3RhdGljIHZvaWQgbmV0d29y
-a19leGl0KHZvaWQpCiAJZGJ1c19jb25uZWN0aW9uX3VucmVmKGNvbm5lY3Rpb24pOwogfQogCi1C
-TFVFVE9PVEhfUExVR0lOX0RFRklORSgibmV0d29yayIsIFZFUlNJT04sIG5ldHdvcmtfaW5pdCwg
-bmV0d29ya19leGl0KQorQkxVRVRPT1RIX1BMVUdJTl9ERUZJTkUoIm5ldHdvcmsiLCBWRVJTSU9O
-LCBQTFVHSU5fUFJJT1JJVFlfREVGQVVMVCwgbmV0d29ya19pbml0LCBuZXR3b3JrX2V4aXQpCmRp
-ZmYgLS1naXQgYS9wbHVnaW5zL2VjaG8uYyBiL3BsdWdpbnMvZWNoby5jCmluZGV4IDgzMmJmOGIu
-LjZmOTE4ZTggMTAwNjQ0Ci0tLSBhL3BsdWdpbnMvZWNoby5jCisrKyBiL3BsdWdpbnMvZWNoby5j
-CkBAIC0xNjMsNCArMTYzLDQgQEAgc3RhdGljIHZvaWQgZWNob19leGl0KHZvaWQpCiAJYnRkX3Vu
-cmVnaXN0ZXJfYWRhcHRlcl9kcml2ZXIoJmVjaG9fc2VydmVyKTsKIH0KIAotQkxVRVRPT1RIX1BM
-VUdJTl9ERUZJTkUoImVjaG8iLCBWRVJTSU9OLCBlY2hvX2luaXQsIGVjaG9fZXhpdCkKK0JMVUVU
-T09USF9QTFVHSU5fREVGSU5FKCJlY2hvIiwgVkVSU0lPTiwgUExVR0lOX1BSSU9SSVRZX0RFRkFV
-TFQsIGVjaG9faW5pdCwgZWNob19leGl0KQpkaWZmIC0tZ2l0IGEvcGx1Z2lucy9oYWwuYyBiL3Bs
-dWdpbnMvaGFsLmMKaW5kZXggMjE5YjQ2ZS4uZjJkMzA4MyAxMDA2NDQKLS0tIGEvcGx1Z2lucy9o
-YWwuYworKysgYi9wbHVnaW5zL2hhbC5jCkBAIC0xNTgsNCArMTU4LDQgQEAgc3RhdGljIHZvaWQg
-aGFsX2V4aXQodm9pZCkKIAlidGRfdW5yZWdpc3Rlcl9hZGFwdGVyX2RyaXZlcigmaGFsX2RyaXZl
-cik7CiB9CiAKLUJMVUVUT09USF9QTFVHSU5fREVGSU5FKCJoYWwiLCBWRVJTSU9OLCBoYWxfaW5p
-dCwgaGFsX2V4aXQpCitCTFVFVE9PVEhfUExVR0lOX0RFRklORSgiaGFsIiwgVkVSU0lPTiwgUExV
-R0lOX1BSSU9SSVRZX0RFRkFVTFQsIGhhbF9pbml0LCBoYWxfZXhpdCkKZGlmZiAtLWdpdCBhL3Bs
-dWdpbnMvbmV0bGluay5jIGIvcGx1Z2lucy9uZXRsaW5rLmMKaW5kZXggZjc3N2NmOS4uYzUwZGQ3
-NyAxMDA2NDQKLS0tIGEvcGx1Z2lucy9uZXRsaW5rLmMKKysrIGIvcGx1Z2lucy9uZXRsaW5rLmMK
-QEAgLTEyMyw0ICsxMjMsNCBAQCBzdGF0aWMgdm9pZCBuZXRsaW5rX2V4aXQodm9pZCkKIAlubF9o
-YW5kbGVfZGVzdHJveShoYW5kbGUpOwogfQogCi1CTFVFVE9PVEhfUExVR0lOX0RFRklORSgibmV0
-bGluayIsIFZFUlNJT04sIG5ldGxpbmtfaW5pdCwgbmV0bGlua19leGl0KQorQkxVRVRPT1RIX1BM
-VUdJTl9ERUZJTkUoIm5ldGxpbmsiLCBWRVJTSU9OLCBQTFVHSU5fUFJJT1JJVFlfREVGQVVMVCwg
-bmV0bGlua19pbml0LCBuZXRsaW5rX2V4aXQpCmRpZmYgLS1naXQgYS9wbHVnaW5zL3NlcnZpY2Uu
-YyBiL3BsdWdpbnMvc2VydmljZS5jCmluZGV4IGIyOGM5YzEuLjViY2E2MjUgMTAwNjQ0Ci0tLSBh
-L3BsdWdpbnMvc2VydmljZS5jCisrKyBiL3BsdWdpbnMvc2VydmljZS5jCkBAIC04NTksNCArODU5
-LDQgQEAgc3RhdGljIHZvaWQgc2VydmljZV9leGl0KHZvaWQpCiAJZGJ1c19jb25uZWN0aW9uX3Vu
-cmVmKGNvbm5lY3Rpb24pOwogfQogCi1CTFVFVE9PVEhfUExVR0lOX0RFRklORSgic2VydmljZSIs
-IFZFUlNJT04sIHNlcnZpY2VfaW5pdCwgc2VydmljZV9leGl0KQorQkxVRVRPT1RIX1BMVUdJTl9E
-RUZJTkUoInNlcnZpY2UiLCBWRVJTSU9OLCBQTFVHSU5fUFJJT1JJVFlfREVGQVVMVCwgc2Vydmlj
-ZV9pbml0LCBzZXJ2aWNlX2V4aXQpCmRpZmYgLS1naXQgYS9wbHVnaW5zL3N0b3JhZ2UuYyBiL3Bs
-dWdpbnMvc3RvcmFnZS5jCmluZGV4IGM0ZGJlMTYuLjNlNzliOGEgMTAwNjQ0Ci0tLSBhL3BsdWdp
-bnMvc3RvcmFnZS5jCisrKyBiL3BsdWdpbnMvc3RvcmFnZS5jCkBAIC0zOSw0ICszOSw0IEBAIHN0
-YXRpYyB2b2lkIHN0b3JhZ2VfZXhpdCh2b2lkKQogewogfQogCi1CTFVFVE9PVEhfUExVR0lOX0RF
-RklORSgic3RvcmFnZSIsIFZFUlNJT04sIHN0b3JhZ2VfaW5pdCwgc3RvcmFnZV9leGl0KQorQkxV
-RVRPT1RIX1BMVUdJTl9ERUZJTkUoInN0b3JhZ2UiLCBWRVJTSU9OLCBQTFVHSU5fUFJJT1JJVFlf
-REVGQVVMVCwgc3RvcmFnZV9pbml0LCBzdG9yYWdlX2V4aXQpCmRpZmYgLS1naXQgYS9zZXJpYWwv
-bWFpbi5jIGIvc2VyaWFsL21haW4uYwppbmRleCA1ZGIzODljLi41MDljYzM4IDEwMDY0NAotLS0g
-YS9zZXJpYWwvbWFpbi5jCisrKyBiL3NlcmlhbC9tYWluLmMKQEAgLTU1LDQgKzU1LDQgQEAgc3Rh
-dGljIHZvaWQgc2VyaWFsX2V4aXQodm9pZCkKIAlkYnVzX2Nvbm5lY3Rpb25fdW5yZWYoY29ubmVj
-dGlvbik7CiB9CiAKLUJMVUVUT09USF9QTFVHSU5fREVGSU5FKCJzZXJpYWwiLCBWRVJTSU9OLCBz
-ZXJpYWxfaW5pdCwgc2VyaWFsX2V4aXQpCitCTFVFVE9PVEhfUExVR0lOX0RFRklORSgic2VyaWFs
-IiwgVkVSU0lPTiwgUExVR0lOX1BSSU9SSVRZX0RFRkFVTFQsIHNlcmlhbF9pbml0LCBzZXJpYWxf
-ZXhpdCkKZGlmZiAtLWdpdCBhL3NyYy9wbHVnaW4uYyBiL3NyYy9wbHVnaW4uYwppbmRleCAwNTFj
-MzNjLi5hMTdhN2VhIDEwMDY0NAotLS0gYS9zcmMvcGx1Z2luLmMKKysrIGIvc3JjL3BsdWdpbi5j
-CkBAIC00Myw5ICs0MywxOCBAQCBzdGF0aWMgR1NMaXN0ICpwbHVnaW5zID0gTlVMTDsKIAogc3Ry
-dWN0IGJsdWV0b290aF9wbHVnaW4gewogCXZvaWQgKmhhbmRsZTsKKwlnYm9vbGVhbiBhY3RpdmU7
-CiAJc3RydWN0IGJsdWV0b290aF9wbHVnaW5fZGVzYyAqZGVzYzsKIH07CiAKK3N0YXRpYyBnaW50
-IGNvbXBhcmVfcHJpb3JpdHkoZ2NvbnN0cG9pbnRlciBhLCBnY29uc3Rwb2ludGVyIGIpCit7CisJ
-Y29uc3Qgc3RydWN0IGJsdWV0b290aF9wbHVnaW4gKnBsdWdpbjEgPSBhOworCWNvbnN0IHN0cnVj
-dCBibHVldG9vdGhfcGx1Z2luICpwbHVnaW4yID0gYjsKKworCXJldHVybiBwbHVnaW4yLT5kZXNj
-LT5wcmlvcml0eSAtIHBsdWdpbjEtPmRlc2MtPnByaW9yaXR5OworfQorCiBzdGF0aWMgZ2Jvb2xl
-YW4gYWRkX3BsdWdpbih2b2lkICpoYW5kbGUsIHN0cnVjdCBibHVldG9vdGhfcGx1Z2luX2Rlc2Mg
-KmRlc2MpCiB7CiAJc3RydWN0IGJsdWV0b290aF9wbHVnaW4gKnBsdWdpbjsKQEAgLTYzLDE0ICs3
-MiwxMCBAQCBzdGF0aWMgZ2Jvb2xlYW4gYWRkX3BsdWdpbih2b2lkICpoYW5kbGUsIHN0cnVjdCBi
-bHVldG9vdGhfcGx1Z2luX2Rlc2MgKmRlc2MpCiAJCXJldHVybiBGQUxTRTsKIAogCXBsdWdpbi0+
-aGFuZGxlID0gaGFuZGxlOworCXBsdWdpbi0+YWN0aXZlID0gRkFMU0U7CiAJcGx1Z2luLT5kZXNj
-ID0gZGVzYzsKIAotCWlmIChkZXNjLT5pbml0KCkgPCAwKSB7Ci0JCWdfZnJlZShwbHVnaW4pOwot
-CQlyZXR1cm4gRkFMU0U7Ci0JfQotCi0JcGx1Z2lucyA9IGdfc2xpc3RfYXBwZW5kKHBsdWdpbnMs
-IHBsdWdpbik7CisJcGx1Z2lucyA9IGdfc2xpc3RfaW5zZXJ0X3NvcnRlZChwbHVnaW5zLCBwbHVn
-aW4sIGNvbXBhcmVfcHJpb3JpdHkpOwogCiAJcmV0dXJuIFRSVUU7CiB9CkBAIC05OCw2ICsxMDMs
-NyBAQCBzdGF0aWMgZ2Jvb2xlYW4gaXNfZGlzYWJsZWQoY29uc3QgY2hhciAqbmFtZSwgY2hhciAq
-Kmxpc3QpCiAKIGdib29sZWFuIHBsdWdpbl9pbml0KEdLZXlGaWxlICpjb25maWcpCiB7CisJR1NM
-aXN0ICpsaXN0OwogCUdEaXIgKmRpcjsKIAljb25zdCBnY2hhciAqZmlsZTsKIAlnY2hhciAqKmRp
-c2FibGVkOwpAQCAtMTcxLDYgKzE3NywxNSBAQCBnYm9vbGVhbiBwbHVnaW5faW5pdChHS2V5Rmls
-ZSAqY29uZmlnKQogCiAJZ19zdHJmcmVldihkaXNhYmxlZCk7CiAKKwlmb3IgKGxpc3QgPSBwbHVn
-aW5zOyBsaXN0OyBsaXN0ID0gbGlzdC0+bmV4dCkgeworCQlzdHJ1Y3QgYmx1ZXRvb3RoX3BsdWdp
-biAqcGx1Z2luID0gbGlzdC0+ZGF0YTsKKworCQlpZiAocGx1Z2luLT5kZXNjLT5pbml0KCkgPCAw
-KQorCQkJY29udGludWU7CisKKwkJcGx1Z2luLT5hY3RpdmUgPSBUUlVFOworCX0KKwogCXJldHVy
-biBUUlVFOwogfQogCkBAIC0xODMsNyArMTk4LDcgQEAgdm9pZCBwbHVnaW5fY2xlYW51cCh2b2lk
-KQogCWZvciAobGlzdCA9IHBsdWdpbnM7IGxpc3Q7IGxpc3QgPSBsaXN0LT5uZXh0KSB7CiAJCXN0
-cnVjdCBibHVldG9vdGhfcGx1Z2luICpwbHVnaW4gPSBsaXN0LT5kYXRhOwogCi0JCWlmIChwbHVn
-aW4tPmRlc2MtPmV4aXQpCisJCWlmIChwbHVnaW4tPmFjdGl2ZSA9PSBUUlVFICYmIHBsdWdpbi0+
-ZGVzYy0+ZXhpdCkKIAkJCXBsdWdpbi0+ZGVzYy0+ZXhpdCgpOwogCiAJCWRsY2xvc2UocGx1Z2lu
-LT5oYW5kbGUpOwpkaWZmIC0tZ2l0IGEvc3JjL3BsdWdpbi5oIGIvc3JjL3BsdWdpbi5oCmluZGV4
-IDYyZDVmNzUuLjJjZDUwZjcgMTAwNjQ0Ci0tLSBhL3NyYy9wbHVnaW4uaAorKysgYi9zcmMvcGx1
-Z2luLmgKQEAgLTIwLDE3ICsyMCwyMSBAQAogICogIEZvdW5kYXRpb24sIEluYy4sIDUxIEZyYW5r
-bGluIFN0LCBGaWZ0aCBGbG9vciwgQm9zdG9uLCBNQSAgMDIxMTAtMTMwMSAgVVNBCiAgKgogICov
-CisjZGVmaW5lIFBMVUdJTl9QUklPUklUWV9MT1cgICAgICAtMTAwCisjZGVmaW5lIFBMVUdJTl9Q
-UklPUklUWV9ERUZBVUxUICAgICAwCisjZGVmaW5lIFBMVUdJTl9QUklPUklUWV9ISUdIICAgICAg
-MTAwCiAKIHN0cnVjdCBibHVldG9vdGhfcGx1Z2luX2Rlc2MgewogCWNvbnN0IGNoYXIgKm5hbWU7
-CiAJY29uc3QgY2hhciAqdmVyc2lvbjsKKwlpbnQgcHJpb3JpdHk7CiAJaW50ICgqaW5pdCkgKHZv
-aWQpOwogCXZvaWQgKCpleGl0KSAodm9pZCk7CiB9OwogCi0jZGVmaW5lIEJMVUVUT09USF9QTFVH
-SU5fREVGSU5FKG5hbWUsdmVyc2lvbixpbml0LGV4aXQpIFwKKyNkZWZpbmUgQkxVRVRPT1RIX1BM
-VUdJTl9ERUZJTkUobmFtZSx2ZXJzaW9uLCBwcmlvcml0eSwgaW5pdCxleGl0KSBcCiAJCWV4dGVy
-biBzdHJ1Y3QgYmx1ZXRvb3RoX3BsdWdpbl9kZXNjIGJsdWV0b290aF9wbHVnaW5fZGVzYyBcCiAJ
-CQkJX19hdHRyaWJ1dGVfXyAoKHZpc2liaWxpdHkoImRlZmF1bHQiKSkpOyBcCiAJCXN0cnVjdCBi
-bHVldG9vdGhfcGx1Z2luX2Rlc2MgYmx1ZXRvb3RoX3BsdWdpbl9kZXNjID0geyBcCi0JCQluYW1l
-LCB2ZXJzaW9uLCBpbml0LCBleGl0IFwKKwkJCW5hbWUsIHZlcnNpb24sIHByaW9yaXR5LCBpbml0
-LCBleGl0IFwKIAkJfTsKLS0gCjEuNS42LjMKCg==
---001636458996e687b90467fe0e8c--
+Regards
+
+Marcel
+
+
