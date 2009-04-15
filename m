@@ -1,51 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Xu, Martin" <martin.xu@intel.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: "connman@moblin.org" <connman@moblin.org>,
-	"Liu, Bing Wei" <bing.wei.liu@intel.com>,
-	"Gao, Bin" <bin.gao@intel.com>,
-	"Yin, Kangkai" <kangkai.yin@intel.com>
-Date: Thu, 16 Apr 2009 16:49:10 +0800
-Subject: CreatDevice signal should be emitted at function
- create_stored_device_from_profiles() in src/adapter.c
-Message-ID: <9F0C1DB20AFA954FA1DA05309350433D5B2E7CEF@pdsmsx503.ccr.corp.intel.com>
-References: <49D1FE96.1090200@binarywings.net>
-	 <2d5a2c100903310644od9cbf69ma2c28c83b7e51@mail.gmail.com>
-	 <49D30FD8.9020506@binarywings.net> <49D45501.8030606@binarywings.net>
- <2d5a2c100904021028g78376debke885916eba13cf93@mail.gmail.com>
- <49E5F2BE.1040808@binarywings.net>
-In-Reply-To: <49E5F2BE.1040808@binarywings.net>
-Content-Type: text/plain; charset="us-ascii"
+Message-ID: <49E5F2BE.1040808@binarywings.net>
+Date: Wed, 15 Apr 2009 16:44:14 +0200
+From: Florian Philipp <lists@binarywings.net>
 MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: PAN with bluez-utils-3
+References: <49D1FE96.1090200@binarywings.net>	 <2d5a2c100903310644od9cbf69ma2c28c83b7e51@mail.gmail.com>	 <49D30FD8.9020506@binarywings.net> <49D45501.8030606@binarywings.net> <2d5a2c100904021028g78376debke885916eba13cf93@mail.gmail.com>
+In-Reply-To: <2d5a2c100904021028g78376debke885916eba13cf93@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi:
-I found that at bluez CreatDevice signal is not emitted at function create_stored_device_from_profile() in src/adapter.c. 
-That leads to system can not got the CreatDevice singal when the deivce is created though storage. The usage case is that, when I unplug the bluethooth usb dongle and then plug in again. System can not get the CreatDevice signal. So ConnMan can not handle the CreatDevice signal. 
-I have created patch to bluez to fix the issue. Please review, any comments are welcome.
-diff --git a/src/adapter.c b/src/adapter.c
-index 44a93b1..c096375 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1867,6 +1867,7 @@ static void create_stored_device_from_profiles(char *key, char *value,
- 	struct btd_device *device;
- 	bdaddr_t dst;
- 	char srcaddr[18], dstaddr[18];
-+	const char *path;
- 
- 	ba2str(&adapter->bdaddr, srcaddr);
- 
-@@ -1877,6 +1878,12 @@ static void create_stored_device_from_profiles(char *key, char *value,
- 	device = device_create(connection, adapter, key);
- 	if (!device)
- 		return;
-+
-+	path = device_get_path(device);
-+	g_dbus_emit_signal(connection, adapter->path,
-+				ADAPTER_INTERFACE, "DeviceCreated",
-+				DBUS_TYPE_OBJECT_PATH, &path,
-+				DBUS_TYPE_INVALID);
- 
- 	device_set_temporary(device, FALSE);
- 	adapter->devices = g_slist_append(adapter->devices, device);
+Luiz Augusto von Dentz schrieb:
+> Hi Florian
+> 
+> On Thu, Apr 2, 2009 at 3:02 AM, Florian Philipp <lists@binarywings.net> wrote:
+>> Florian Philipp schrieb:
+>>> Thanks for your answer! I don't think it's bug but merely lack of
+>>> understanding on my part. Therefore I'll go into detail now:
+>>>
+>>> Here I have a Gentoo system which shall act as the GN. Its hcid.conf
+>>> looks like this:"
+>>> options {
+>>>       autoinit yes;
+>>>       security auto;
+>>>       pairing multi;
+>>>       passkey "123456";
+>>> }
+>>> device {
+>>>       name "BlueZ (%d) at %h";
+>>>       class 0x020100;
+>>>       iscan enable; pscan enable;
+>>>       lm master;
+>>>       lp rswitch,hold,sniff,park;
+>>> }
+>>> "
+>>>
+>>> Its network.conf would then look like this (?):"
+>>> [General]
+>>>
+>>> [PANU Role]
+>>> Autostart=false
+>>>
+>>> [GN Role]
+>>> Interface=blue0
+>>> Autostart=true
+>>>
+>>> [NAP Role]
+>>> Autostart=false
+>>> "
+>>>
+>>> The init-script executes the following command:
+>>> /usr/sbin/hcid -s -f /etc/bluetooth/hcid.conf
+>>>
+>>> What's wrong with this? When I test it with Windows clients, they fiind
+>>> the device but it doesn't appear to have PAN functionality.
+>>>
+>> I'd also be happy about a response like 'It should work'. Then I could
+>> start searching for unlogical explanations.
+> 
+> It looks like you have been using BlueZ 3.x series which is way too
+> old for me to take a look. Check with 4.x if it helps.
+> 
+> 
+
+This thread is a bit old, I know. I just wanted to say: Nevermind.
+
+It seems that the new versions don't support my use case as good as the
+2.x-series did (no default pin without a graphical interface or a
+self-made helper program, for one thing). Besides, there is - at least
+for me - a big lack of documentation on how things should be configured.
+
+In any case, upgrading to 3.x and to an even higher degree 4.x caused
+too much work for a thing that used to just work.
+
+Therefore I decided to go back to 2.25 and they there for the near future.
