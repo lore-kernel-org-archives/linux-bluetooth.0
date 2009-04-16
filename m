@@ -1,64 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <49E7B7B4.3010009@d-meeus.be>
-Date: Fri, 17 Apr 2009 00:56:52 +0200
-From: =?UTF-8?B?RG9taW5pcXVlIE1lZcO5cw==?= <dominique@d-meeus.be>
 MIME-Version: 1.0
-To: Linux-Bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: btusb/Bluez incompatibility with D-Link DBT 122 dongle
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <9F0C1DB20AFA954FA1DA05309350433D5B2E7CEF@pdsmsx503.ccr.corp.intel.com>
+References: <49D1FE96.1090200@binarywings.net>
+	 <2d5a2c100903310644od9cbf69ma2c28c83b7e51@mail.gmail.com>
+	 <49D30FD8.9020506@binarywings.net> <49D45501.8030606@binarywings.net>
+	 <2d5a2c100904021028g78376debke885916eba13cf93@mail.gmail.com>
+	 <49E5F2BE.1040808@binarywings.net>
+	 <9F0C1DB20AFA954FA1DA05309350433D5B2E7CEF@pdsmsx503.ccr.corp.intel.com>
+Date: Thu, 16 Apr 2009 10:31:50 -0300
+Message-ID: <2d5a2c100904160631o30384806td1b5750669466fce@mail.gmail.com>
+Subject: Re: [connman] CreatDevice signal should be emitted at function
+	create_stored_device_from_profiles() in src/adapter.c
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: connman@moblin.org
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"Yin, Kangkai" <kangkai.yin@intel.com>,
+	"Liu, Bing Wei" <bing.wei.liu@intel.com>,
+	"Gao, Bin" <bin.gao@intel.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-My dongle works to a certain extent with btusb alone.
-lsusb | grep Bluetooth: Bus 003 Device 002: ID 2001:f111 D-Link Corp. 
-[hex] DBT-122 Bluetooth adapter
-uname -a: Linux library 2.6.28-11-generic #41-Ubuntu SMP Wed Apr 8 
-04:38:53 UTC 2009 i686 GNU/Linux
-dpkg -l | grep bluez: ...bluez        4.35-0ubuntu1...
-lsmod | grep btusb: btusb        19608  2
-sudo /etc/init.d/bluetooth stop: * Stopping bluetooth        [ OK ]
-sudo hciconfig hci0 up
-hciconfig -a
-hci0:    Type: USB
-    BD Address: 00:13:46:00:55:A0 ACL MTU: 377:10 SCO MTU: 16:0
-    UP RUNNING
-    RX bytes:1015 acl:0 sco:0 events:30 errors:0
-    TX bytes:632 acl:0 sco:0 commands:36 errors:0
-    Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-    Link policy:
-    Link mode: SLAVE ACCEPT
-    Name: 'Broadcom BCM2035'
-    Class: 0x000000
-    Service Classes: Unspecified
-    Device Class: Miscellaneous,
-    HCI Ver: 1.2 (0x2) HCI Rev: 0x0 LMP Ver: 1.2 (0x2) LMP Subver: 0x309
-    Manufacturer: Broadcom Corporation (15)
-hcitool scan: Scanning ...    00:13:70:0E:8A:77    Nokia 6021
+Hi,
 
-So with btusb alone, my dongle is recognised and sees my phone. (I could 
-also ask for more details about my phone or successfully l2ping it, et 
-cetera.)
-But if I want to pair with my phone to actually DO something (like using 
-Wammu) I need more Bluez software. Wammu expects me to do:
-sudo /etc/init.d/bluetooth start:  * Starting bluetooth        [ OK ]
+On Thu, Apr 16, 2009 at 5:49 AM, Xu, Martin <martin.xu@intel.com> wrote:
+> Hi:
+> I found that at bluez CreatDevice signal is not emitted at function create_stored_device_from_profile() in src/adapter.c.
+> That leads to system can not got the CreatDevice singal when the deivce is created though storage. The usage case is that, when I unplug the bluethooth usb dongle and then plug in again. System can not get the CreatDevice signal. So ConnMan can not handle the CreatDevice signal.
 
-But with this, nothing works any more
-hciconfig -a
-hci0:    Type: USB
-    BD Address: 00:13:46:00:55:A0 ACL MTU: 377:10 SCO MTU: 16:0
-    UP RUNNING
-    RX bytes:1802 acl:0 sco:0 events:55 errors:0
-    TX bytes:1219 acl:0 sco:0 commands:57 errors:0
-    Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-    Link policy:
-    Link mode: SLAVE ACCEPT
-Can't read local name on hci0: Connection timed out (110)
+IMO the correct way of doing it is to via AdapterAdded signal and then
+GetProperties, which in most cases is what you really should do to
+discover all devices. If you make stored devices to emit signals you
+will probably just slow down the boot.
 
-And no more scan or l2ping. Wammu cannot connect either.
-(The D-Link DBT-122 works perfectly with Bluez 3.26 under Ubuntu 8.04)
-Is this bug (regression) peculiar to Ubuntu 8.10 and 9.04 or an upstream 
-Bluez bug ?
 -- 
-Amicalement, Dominique
+Luiz Augusto von Dentz
+Engenheiro de Computação
