@@ -1,25 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] add more features mask options to l2test
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1240171801-16432-1-git-send-email-gustavo@las.ic.unicamp.br>
-References: <1240171801-16432-1-git-send-email-gustavo@las.ic.unicamp.br>
-Content-Type: text/plain
-Date: Sun, 19 Apr 2009 22:23:48 +0200
-Message-Id: <1240172628.11795.81.camel@violet>
-Mime-Version: 1.0
+From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] add more features mask options to l2test
+Date: Sun, 19 Apr 2009 17:10:01 -0300
+Message-Id: <1240171801-16432-1-git-send-email-gustavo@las.ic.unicamp.br>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Add Enhanced Retransmission mode, Streaming mode and FCS Option.
+---
+ test/l2test.c |    6 ++++++
+ 1 files changed, 6 insertions(+), 0 deletions(-)
 
-> Add Enhanced Retransmission mode, Streaming mode and FCS Option.
-
-patch has been applied. Thanks.
-
-Regards
-
-Marcel
-
+diff --git a/test/l2test.c b/test/l2test.c
+index 57e0931..6276036 100644
+--- a/test/l2test.c
++++ b/test/l2test.c
+@@ -908,6 +908,12 @@ static void info_request(char *svr)
+ 			printf("  Retransmission mode\n");
+ 		if (mask & 0x04)
+ 			printf("  Bi-directional QoS\n");
++		if (mask & 0x08)
++			printf("  Enhanced Retransmission mode\n");
++		if (mask & 0x10)
++			printf("  Streaming mode\n");
++		if (mask & 0x20)
++			printf("  FCS Option\n");
+ 		break;
+ 	case 0x0001:
+ 		printf("Extended feature mask is not supported\n");
+-- 
+1.6.0.6
 
