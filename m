@@ -1,68 +1,110 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Xu, Martin" <martin.xu@intel.com>
-To: "connman@moblin.org" <connman@moblin.org>
-Date: Mon, 20 Apr 2009 08:57:53 +0800
-Message-ID: <9F0C1DB20AFA954FA1DA05309350433D5F20971B@pdsmsx503.ccr.corp.intel.com>
-References: <49D1FE96.1090200@binarywings.net>
-	<2d5a2c100903310644od9cbf69ma2c28c83b7e51@mail.gmail.com>
-	<49D30FD8.9020506@binarywings.net> <49D45501.8030606@binarywings.net>
-	<2d5a2c100904021028g78376debke885916eba13cf93@mail.gmail.com>
-	<49E5F2BE.1040808@binarywings.net>
-	<9F0C1DB20AFA954FA1DA05309350433D5B2E7CEF@pdsmsx503.ccr.corp.intel.com>
-	<2d5a2c100904160631o30384806td1b5750669466fce@mail.gmail.com>
-	<9F0C1DB20AFA954FA1DA05309350433D5B2E7F5F@pdsmsx503.ccr.corp.intel.com>
-	<9F0C1DB20AFA954FA1DA05309350433D5B2E8031@pdsmsx503.ccr.corp.intel.com>
-	<2d5a2c100904170546l5062da8xb8e17e3ffc55b455@mail.gmail.com>
-In-Reply-To: <2d5a2c100904170546l5062da8xb8e17e3ffc55b455@mail.gmail.com>
+Message-ID: <49EBA01F.1040402@pook.es>
+Date: Mon, 20 Apr 2009 00:05:19 +0200
+From: Stuart Pook <linux-bluetooth4@pook.es>
 MIME-Version: 1.0
-Cc: "Yin, Kangkai" <kangkai.yin@intel.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"Liu, Bing Wei" <bing.wei.liu@intel.com>, "Gao, Bin" <bin.gao@intel.com>
-Subject: Re: [connman] CreatDevice signal should be emitted at
-	function	create_stored_device_from_profiles() in src/adapter.c
-Reply-To: connman@moblin.org
-List-Unsubscribe: <https://lists.moblin.org/mailman/options/connman>,
-	<mailto:connman-request@moblin.org?subject=unsubscribe>
-List-Archive: <http://lists.moblin.org/pipermail/connman>
-List-Post: <mailto:connman@moblin.org>
-List-Help: <mailto:connman-request@moblin.org?subject=help>
-List-Subscribe: <https://lists.moblin.org/mailman/listinfo/connman>,
-	<mailto:connman-request@moblin.org?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Sender: connman-bounces@moblin.org
-Errors-To: connman-bounces@moblin.org
+To: Johan Hedberg <johan.hedberg@gmail.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: bluez git + Linksys USBBT100 + 2.6.30-rc2 -> Segmentation fault
+References: <49D89DCD.7090808@pook.es> <49D8E48A.2060807@pook.es> <20090405172212.GB6612@jh-x301> <49EB7950.4000802@pook.es> <20090419200528.GA18068@jh-x301> <49EB93C2.3090702@pook.es> <20090419213837.GA6514@jh-x301>
+In-Reply-To: <20090419213837.GA6514@jh-x301>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-VGhhbmtzIGZvciB5b3VyIGZlZWRiYWNrLg0KSSB3aWxsIHRyeSByZWxlYXNlIDQuMzYgd2hlbmNl
-IHlvdSByZWxlYXNlIGl0Lg0KSWYgaXQgZG9lcyB3b3JrLCB0aGVuIHdlIG5lZWQgbm90IGNoYW5n
-ZSBhbnl0aGluZyBhdCBjb21tb24gc2lkZS4gDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0t
-DQpGcm9tOiBjb25ubWFuLWJvdW5jZXNAbW9ibGluLm9yZyBbbWFpbHRvOmNvbm5tYW4tYm91bmNl
-c0Btb2JsaW4ub3JnXSBPbiBCZWhhbGYgT2YgTHVpeiBBdWd1c3RvIHZvbiBEZW50eg0KU2VudDog
-MjAwOeW5tDTmnIgxN+aXpSAyMDo0Nw0KVG86IGNvbm5tYW5AbW9ibGluLm9yZw0KQ2M6IFlpbiwg
-S2FuZ2thaTsgbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZzsgTGl1LCBCaW5nIFdlaTsg
-R2FvLCBCaW4NClN1YmplY3Q6IFJlOiBbY29ubm1hbl0gQ3JlYXREZXZpY2Ugc2lnbmFsIHNob3Vs
-ZCBiZSBlbWl0dGVkIGF0IGZ1bmN0aW9uIGNyZWF0ZV9zdG9yZWRfZGV2aWNlX2Zyb21fcHJvZmls
-ZXMoKSBpbiBzcmMvYWRhcHRlci5jDQoNCkhpLA0KDQpPbiBUaHUsIEFwciAxNiwgMjAwOSBhdCAx
-MDo0NyBQTSwgWHUsIE1hcnRpbiA8bWFydGluLnh1QGludGVsLmNvbT4gd3JvdGU6DQo+Pkkga25v
-dyB0aGUgd2F5IHlvdSBtZW50aW9uZWQsIGJ1dCB0aGlzIHdheSBoYXMgc29tZSBpc3N1ZS4gWW91
-IGtub3cgdGhlcmUgaXMgPmEgdGltZSBpbnRlcnZhbCBiZXR3ZWVuIEFkYXB0ZXJBZGRlZCBhbmQg
-RGV2aWNlQ3JlYXRlZC4NCj4gSSBmb3VuZCB0aGF0IHRoZSB0aW1lIGludGVydmFsIG9uIG15IG1h
-Y2hpbmUgaXMgYWJvdXQgMjMwIG1pbGxpc2Vjb25kcy4gVGhlIHRpbWUgaXMgZW5vdWdoIHRvIHNj
-aGVkdWxlIG91dCB0byBvdGhlciBwcm9jZXNzIHRvIGhhbmRsZSB0aGUgQWRhcHRlckFkZGVkIHNp
-Z25hbC4NCg0KVGhlcmUgaXMgYSBmaXggZm9yIHRoaXMgcmFjZSBjb25kaXRpb24gYWxyZWFkeSBv
-biBnaXQsIHJlbGVhc2UgNC4zNg0Kd2lsbCBiZSBzaGlwcGVkIHdpdGggaXQuIEFkYXB0ZXJBZGRl
-ZCBpcyBub3cgZW1pdHRlZCB3aGVuIGFkYXB0ZXINCnByb3BlcnRpZXMgYXJlICJyZWFkeSIsIHRo
-ZSBwcm9ibGVtIHdhcyB0aGF0IHdlIG5lZWQgdGhlIGFkYXB0ZXINCmFkZHJlc3MgZm9yIGFjY2Vz
-c2luZyB0aGUgc3RvcmFnZSBidXQgdGhhdCBpcyBvbmx5IGF2YWlsYWJsZSB3aGVuDQpyZWNlaXZp
-bmcgREVWVVAgZXZlbnQgYnV0IHdlIHdlcmUgYWN0dWFsbHkgZW1pdHRpbmcgQWRhcHRlckFkZGVk
-DQpiZWZvcmUgd2hlbiBoYW5kbGluZyBERVZSRUcgZXZlbnQuIFRoZSBpbnRlcnZhbCB5b3UgbWVu
-dGlvbmVkIGlzDQpwcm9iYWJseSB0aGUgaW50ZXJ2YWwgYmV0d2VlbiBERVZSRUcgYW5kIERFVlVQ
-LCB3aXRoIHRoZSBmaXggaXQNCnNob3VsZG4ndCBoYXBwZW4gYW55bW9yZSBzaW5jZSBBZGFwdGVy
-QWRkZWQgd2lsbCBvbmx5IGJlIHRyaWdnZXJlZCBieQ0KdGhlIHZlcnkgZmlyc3QgREVWVVAgdG8g
-dGhhdCBkZXZpY2UuDQoNCi0tIA0KTHVpeiBBdWd1c3RvIHZvbiBEZW50eg0KRW5nZW5oZWlybyBk
-ZSBDb21wdXRhw6fDo28NCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fDQpjb25ubWFuIG1haWxpbmcgbGlzdA0KY29ubm1hbkBtb2JsaW4ub3JnDQpodHRwczov
-L2xpc3RzLm1vYmxpbi5vcmcvbWFpbG1hbi9saXN0aW5mby9jb25ubWFuDQpfX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpjb25ubWFuIG1haWxpbmcgbGlzdApj
-b25ubWFuQG1vYmxpbi5vcmcKaHR0cHM6Ly9saXN0cy5tb2JsaW4ub3JnL21haWxtYW4vbGlzdGlu
-Zm8vY29ubm1hbg==
+hi Johan
+
+On 19/04/09 23:38, Johan Hedberg wrote:
+> On Sun, Apr 19, 2009, Stuart Pook wrote:
+>> I did get one error that I had never seen before "Refusing headset":
+> 
+> That comes if a headset is trying to connect to you and there's already 
+> max_connected_headsets headsets connected
+
+I don't that that is the case. I only have 2 headsets and the other has never been
+connected to the PC. Weird.
+
+>> bluetoothd[32401]: Unix client disconnected (fd=13)
+>> bluetoothd[32401]: Unable to get service record: Connection timed out 
+>> (110)
+>> Segmentation fault
+> 
+> Could you please run bluetoothd through valgrind to get a proper 
+> backtrace.
+
+bluetoothd doesn't seg fault very often now but I'll leave a loop running aplay 
+and bluetoothd from git overnight.
+
+:; ok=0;total=0; while sleep 15; do if aplay -vv -D JX10 /home/stuart/ws/music_test/Rebecca_Pidgeon-You_Got_Me-8000-mono.wav; then ok=$(($ok + 1)); fi; total=$(($total + 1)); echo ok=$ok total=$total; done
+
+> Once we have the valgrind 
+> trace I'd also be interested in seeing the output of hcidump for the 
+> "Connection timed out" situation.
+
+You mean when bluetoothd says "Unable to get service record: Connection timed out (110)"?
+
+I get "aplay: pcm_write:1442: write error: Input/output error" a lot more often
+but bluetoothd doesn't say anything special.
+
+bluetoothd[1851]: State changed /org/bluez/1851/hci0/dev_00_1A_45_2F_49_98: HEADSET_STATE_CONNECTED -> HEADSET_STATE_DISCONNECTED
+bluetoothd[1851]: Accepted new client connection on unix socket (fd=13)
+bluetoothd[1851]: Audio API: BT_REQUEST <- BT_GET_CAPABILITIES
+bluetoothd[1851]: Audio API: BT_RESPONSE -> BT_GET_CAPABILITIES
+bluetoothd[1851]: Audio API: BT_REQUEST <- BT_OPEN
+bluetoothd[1851]: open sco - object=ANY source=ANY destination=00:1A:45:2F:49:98 lock=write
+bluetoothd[1851]: Audio API: BT_RESPONSE -> BT_OPEN
+bluetoothd[1851]: Audio API: BT_REQUEST <- BT_SET_CONFIGURATION
+bluetoothd[1851]: State changed /org/bluez/1851/hci0/dev_00_1A_45_2F_49_98: HEADSET_STATE_DISCONNECTED -> HEADSET_STATE_CONNECT_IN_PROGRESS
+bluetoothd[1851]: adapter_get_device(00:1A:45:2F:49:98)
+bluetoothd[1851]: Discovered Handsfree service on RFCOMM channel 1
+bluetoothd[1851]: /org/bluez/1851/hci0/dev_00_1A_45_2F_49_98: Connecting to 00:1A:45:2F:49:98 channel 1
+bluetoothd[1851]: link_key_request (sba=00:0C:41:E1:FF:30, dba=00:1A:45:2F:49:98)
+bluetoothd[1851]: kernel auth requirements = 0x00
+bluetoothd[1851]: stored link key type = 0x00
+bluetoothd[1851]: /org/bluez/1851/hci0/dev_00_1A_45_2F_49_98: Connected to 00:1A:45:2F:49:98
+bluetoothd[1851]: Received AT+BRSF=27
+bluetoothd[1851]: HFP HF features: "EC and/or NR function" "Call waiting and 3-way calling" "Voice recognition activation" "Remote volume control" 
+bluetoothd[1851]: Received AT+CIND=?
+bluetoothd[1851]: Received AT+CIND?
+bluetoothd[1851]: Received AT+CMER=3, 0, 0, 1
+bluetoothd[1851]: Event reporting (CMER): mode=3, ind=1
+bluetoothd[1851]: HFP Service Level Connection established
+bluetoothd[1851]: telephony-dummy: device 0x4b90d40 connected
+bluetoothd[1851]: State changed /org/bluez/1851/hci0/dev_00_1A_45_2F_49_98: HEADSET_STATE_CONNECT_IN_PROGRESS -> HEADSET_STATE_CONNECTED
+bluetoothd[1851]: Audio API: BT_RESPONSE -> BT_SET_CONFIGURATION
+bluetoothd[1851]: Audio API: BT_REQUEST <- BT_START_STREAM
+bluetoothd[1851]: State changed /org/bluez/1851/hci0/dev_00_1A_45_2F_49_98: HEADSET_STATE_CONNECTED -> HEADSET_STATE_PLAY_IN_PROGRESS
+bluetoothd[1851]: Received AT+VGS=00
+bluetoothd[1851]: SCO socket opened for headset /org/bluez/1851/hci0/dev_00_1A_45_2F_49_98
+bluetoothd[1851]: SCO fd=20
+bluetoothd[1851]: Audio API: BT_RESPONSE -> BT_START_STREAM
+bluetoothd[1851]: Audio API: BT_INDICATION -> BT_NEW_STREAM
+bluetoothd[1851]: State changed /org/bluez/1851/hci0/dev_00_1A_45_2F_49_98: HEADSET_STATE_PLAY_IN_PROGRESS -> HEADSET_STATE_PLAYING
+bluetoothd[1851]: Unix client disconnected (fd=13)
+bluetoothd[1851]: State changed /org/bluez/1851/hci0/dev_00_1A_45_2F_49_98: HEADSET_STATE_PLAYING -> HEADSET_STATE_CONNECTED
+bluetoothd[1851]: No matching connection found for handle 41
+bluetoothd[1851]: telephony-dummy: device 0x4b90d40 disconnected
+bluetoothd[1851]: State changed /org/bluez/1851/hci0/dev_00_1A_45_2F_49_98: HEADSET_STATE_CONNECTED -> HEADSET_STATE_DISCONNECTED
+
+
+>> In fact I get the "Too short (1 bytes) IPC packet from bluetoothd" error
+>> even from bluetoothd 4.36.
+> If this isn't caused by a bug the only possible reason I can think of as 
+> a cause for it is a mismatch between the alsa plugin and bluetoothd 
+> versions.
+
+I have installed bluetoothd and the alsa plugin together so that shouldn't happen.
+When I switch from bluez 4.3x to bluez 4.19 (for example) I seem to switch both the plug
+and the daemon together.
+
+> Btw, you might want to consider trying out pulseaudio 0.9.15. It's 
+> worked pretty flawlessly for me with bluez 4.34 and later versions 
+
+I only use my headset to do VoIP and I use twinkle to do VoIP (SIP). Twinkle
+only understands alsa and OSS. I don't have to use twinkle I suppose.
+
+thanks
+Stuart
+
+-- 
+If the From address bounces, please see http://www.pook.it/.
