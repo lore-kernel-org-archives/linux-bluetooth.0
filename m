@@ -1,21 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
-To: linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Subject: [PATCH 0/4] Bluetooth: l2cap clean ups
-Date: Mon, 20 Apr 2009 01:31:04 -0300
-Message-Id: <1240201868-1396-1-git-send-email-gustavo@las.ic.unicamp.br>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: "Xu, Martin" <martin.xu@intel.com>
+To: "connman@moblin.org" <connman@moblin.org>
+Date: Mon, 20 Apr 2009 08:57:53 +0800
+Message-ID: <9F0C1DB20AFA954FA1DA05309350433D5F20971B@pdsmsx503.ccr.corp.intel.com>
+References: <49D1FE96.1090200@binarywings.net>
+	<2d5a2c100903310644od9cbf69ma2c28c83b7e51@mail.gmail.com>
+	<49D30FD8.9020506@binarywings.net> <49D45501.8030606@binarywings.net>
+	<2d5a2c100904021028g78376debke885916eba13cf93@mail.gmail.com>
+	<49E5F2BE.1040808@binarywings.net>
+	<9F0C1DB20AFA954FA1DA05309350433D5B2E7CEF@pdsmsx503.ccr.corp.intel.com>
+	<2d5a2c100904160631o30384806td1b5750669466fce@mail.gmail.com>
+	<9F0C1DB20AFA954FA1DA05309350433D5B2E7F5F@pdsmsx503.ccr.corp.intel.com>
+	<9F0C1DB20AFA954FA1DA05309350433D5B2E8031@pdsmsx503.ccr.corp.intel.com>
+	<2d5a2c100904170546l5062da8xb8e17e3ffc55b455@mail.gmail.com>
+In-Reply-To: <2d5a2c100904170546l5062da8xb8e17e3ffc55b455@mail.gmail.com>
+MIME-Version: 1.0
+Cc: "Yin, Kangkai" <kangkai.yin@intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"Liu, Bing Wei" <bing.wei.liu@intel.com>, "Gao, Bin" <bin.gao@intel.com>
+Subject: Re: [connman] CreatDevice signal should be emitted at
+	function	create_stored_device_from_profiles() in src/adapter.c
+Reply-To: connman@moblin.org
+List-Unsubscribe: <https://lists.moblin.org/mailman/options/connman>,
+	<mailto:connman-request@moblin.org?subject=unsubscribe>
+List-Archive: <http://lists.moblin.org/pipermail/connman>
+List-Post: <mailto:connman@moblin.org>
+List-Help: <mailto:connman-request@moblin.org?subject=help>
+List-Subscribe: <https://lists.moblin.org/mailman/listinfo/connman>,
+	<mailto:connman-request@moblin.org?subject=subscribe>
+Content-Type: text/plain; charset="utf-8"
+Sender: connman-bounces@moblin.org
+Errors-To: connman-bounces@moblin.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-These patches are result of my hackings to l2cap.
-First and third just create macros to do not show some number in
-code. Also facilite the hacking because we don't need to go to spec
-to figure out what that numbers shows. The first patch is a resend.
-The last patch is the result of run l2cap files against checkpatch.pl
-
-Regards
-
-
+VGhhbmtzIGZvciB5b3VyIGZlZWRiYWNrLg0KSSB3aWxsIHRyeSByZWxlYXNlIDQuMzYgd2hlbmNl
+IHlvdSByZWxlYXNlIGl0Lg0KSWYgaXQgZG9lcyB3b3JrLCB0aGVuIHdlIG5lZWQgbm90IGNoYW5n
+ZSBhbnl0aGluZyBhdCBjb21tb24gc2lkZS4gDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0t
+DQpGcm9tOiBjb25ubWFuLWJvdW5jZXNAbW9ibGluLm9yZyBbbWFpbHRvOmNvbm5tYW4tYm91bmNl
+c0Btb2JsaW4ub3JnXSBPbiBCZWhhbGYgT2YgTHVpeiBBdWd1c3RvIHZvbiBEZW50eg0KU2VudDog
+MjAwOeW5tDTmnIgxN+aXpSAyMDo0Nw0KVG86IGNvbm5tYW5AbW9ibGluLm9yZw0KQ2M6IFlpbiwg
+S2FuZ2thaTsgbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZzsgTGl1LCBCaW5nIFdlaTsg
+R2FvLCBCaW4NClN1YmplY3Q6IFJlOiBbY29ubm1hbl0gQ3JlYXREZXZpY2Ugc2lnbmFsIHNob3Vs
+ZCBiZSBlbWl0dGVkIGF0IGZ1bmN0aW9uIGNyZWF0ZV9zdG9yZWRfZGV2aWNlX2Zyb21fcHJvZmls
+ZXMoKSBpbiBzcmMvYWRhcHRlci5jDQoNCkhpLA0KDQpPbiBUaHUsIEFwciAxNiwgMjAwOSBhdCAx
+MDo0NyBQTSwgWHUsIE1hcnRpbiA8bWFydGluLnh1QGludGVsLmNvbT4gd3JvdGU6DQo+Pkkga25v
+dyB0aGUgd2F5IHlvdSBtZW50aW9uZWQsIGJ1dCB0aGlzIHdheSBoYXMgc29tZSBpc3N1ZS4gWW91
+IGtub3cgdGhlcmUgaXMgPmEgdGltZSBpbnRlcnZhbCBiZXR3ZWVuIEFkYXB0ZXJBZGRlZCBhbmQg
+RGV2aWNlQ3JlYXRlZC4NCj4gSSBmb3VuZCB0aGF0IHRoZSB0aW1lIGludGVydmFsIG9uIG15IG1h
+Y2hpbmUgaXMgYWJvdXQgMjMwIG1pbGxpc2Vjb25kcy4gVGhlIHRpbWUgaXMgZW5vdWdoIHRvIHNj
+aGVkdWxlIG91dCB0byBvdGhlciBwcm9jZXNzIHRvIGhhbmRsZSB0aGUgQWRhcHRlckFkZGVkIHNp
+Z25hbC4NCg0KVGhlcmUgaXMgYSBmaXggZm9yIHRoaXMgcmFjZSBjb25kaXRpb24gYWxyZWFkeSBv
+biBnaXQsIHJlbGVhc2UgNC4zNg0Kd2lsbCBiZSBzaGlwcGVkIHdpdGggaXQuIEFkYXB0ZXJBZGRl
+ZCBpcyBub3cgZW1pdHRlZCB3aGVuIGFkYXB0ZXINCnByb3BlcnRpZXMgYXJlICJyZWFkeSIsIHRo
+ZSBwcm9ibGVtIHdhcyB0aGF0IHdlIG5lZWQgdGhlIGFkYXB0ZXINCmFkZHJlc3MgZm9yIGFjY2Vz
+c2luZyB0aGUgc3RvcmFnZSBidXQgdGhhdCBpcyBvbmx5IGF2YWlsYWJsZSB3aGVuDQpyZWNlaXZp
+bmcgREVWVVAgZXZlbnQgYnV0IHdlIHdlcmUgYWN0dWFsbHkgZW1pdHRpbmcgQWRhcHRlckFkZGVk
+DQpiZWZvcmUgd2hlbiBoYW5kbGluZyBERVZSRUcgZXZlbnQuIFRoZSBpbnRlcnZhbCB5b3UgbWVu
+dGlvbmVkIGlzDQpwcm9iYWJseSB0aGUgaW50ZXJ2YWwgYmV0d2VlbiBERVZSRUcgYW5kIERFVlVQ
+LCB3aXRoIHRoZSBmaXggaXQNCnNob3VsZG4ndCBoYXBwZW4gYW55bW9yZSBzaW5jZSBBZGFwdGVy
+QWRkZWQgd2lsbCBvbmx5IGJlIHRyaWdnZXJlZCBieQ0KdGhlIHZlcnkgZmlyc3QgREVWVVAgdG8g
+dGhhdCBkZXZpY2UuDQoNCi0tIA0KTHVpeiBBdWd1c3RvIHZvbiBEZW50eg0KRW5nZW5oZWlybyBk
+ZSBDb21wdXRhw6fDo28NCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fDQpjb25ubWFuIG1haWxpbmcgbGlzdA0KY29ubm1hbkBtb2JsaW4ub3JnDQpodHRwczov
+L2xpc3RzLm1vYmxpbi5vcmcvbWFpbG1hbi9saXN0aW5mby9jb25ubWFuDQpfX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpjb25ubWFuIG1haWxpbmcgbGlzdApj
+b25ubWFuQG1vYmxpbi5vcmcKaHR0cHM6Ly9saXN0cy5tb2JsaW4ub3JnL21haWxtYW4vbGlzdGlu
+Zm8vY29ubm1hbg==
