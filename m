@@ -1,40 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <6edf6b480904201827n5049a614se097643adeba9932@mail.gmail.com>
-References: <6edf6b480904201827n5049a614se097643adeba9932@mail.gmail.com>
-Date: Mon, 20 Apr 2009 23:50:26 -0300
-Message-ID: <2d5a2c100904201950s3d8b2b84p2ddb4e89ac5bfe50@mail.gmail.com>
-Subject: Re: dbus of c program for adapter get/set properties
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: yesir yao <yesiryao@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Date: Tue, 21 Apr 2009 09:27:01 +0800
+Message-ID: <6edf6b480904201827n5049a614se097643adeba9932@mail.gmail.com>
+Subject: dbus of c program for adapter get/set properties
+From: yesir yao <yesiryao@gmail.com>
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
+hi, all:
 
-On Mon, Apr 20, 2009 at 10:27 PM, yesir yao <yesiryao@gmail.com> wrote:
-> hi, all:
->
-> I need to use dbus api to control my bluetooth adapter in my C program.
-> After I had read doc/adapter-api.txt and writed the codes, It can't work
+I need to use dbus api to control my bluetooth adapter in my C program.
+After I had read doc/adapter-api.txt and writed the codes, It can't work.
 
-The answer is very simple, you are using fixed/hardcoded object path
-(/org/bluez/hci0) that is causing the problem. We made sure it won't
-work by adding the pid to the path so no one will have a change to
-hardcode an adapter path and the code still work after bluetoothd has
-restarted, the correct way of doing this is via '/' path (the only
-fixed path bluetoothd has) which implements org.bluez.Manager (see
-doc/manager-api.txt).
+my question is:
+what is the different between:
+dbus_connection_send_with_reply_and_block
+and
+dbus_connection_send_with_reply ?
 
-About the G_DBUS_METHOD_FLAG_ASYNC are really not for clients,
-although they hint the behavior of the daemon the client should know
-better whether to block or not.
+in src/adapter.c, I found two methods defined:
+static GDBusMethodTable adapter_methods[] = {
+{ "GetProperties", "",	"a{sv}",  get_properties  },
+{ "SetProperty", "sv", "",   set_property,
+	G_DBUS_METHOD_FLAG_ASYNC },
 
-ps: check this http://smcv.pseudorandom.co.uk/2008/11/nonblocking/
+For Methods dict GetProperties(), we should use
+dbus_connection_send_with_reply_and_block ?
+For Methods void SetProperty(..), we should use
+dbus_connection_send_with_reply ?
+is it right or not? (because of the flag: G_DBUS_METHOD_FLAG_ASYNC ?
 
+===================================
+static LRESULT OnAdapterSetDiscov()
+{
+	DBusConnection *conn;
+	DBusMessage *dmsg, *reply;
+	DBusError err;
+	int bOn = TRUE;
+	const char *PropName = "Discoverable";
 
--- 
-Luiz Augusto von Dentz
-Engenheiro de Computação
+	conn = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
+	if (!conn) {
+		print("Can't get on session bus");
+		exit(1);
+	}
+
+	dmsg = dbus_message_new_method_call("org.bluez", "/org/bluez/hci0",
+					"org.bluez.Adapter", "SetProperty");
+	if (!dmsg) {
+		print("Can't allocate new method call");
+		return -1;
+	}
+
+	dbus_message_append_args(dmsg, DBUS_TYPE_STRING, &PropName,
+					DBUS_TYPE_BOOLEAN, &bOn,
+					DBUS_TYPE_INVALID);
+#if 1
+// can't SetProperty of Discoverable
+	if (dbus_connection_send_with_reply(conn, dmsg, NULL, -1) == FALSE) {
+		print("D-Bus send failed");
+		return (LRESULT)0;
+	}
+
+#else
+// print error: Method "SetProperty" with signature "sb" on interface
+" org.bluez.Adapter" doesn't exist
+
+	dbus_error_init(&err);
+	reply = dbus_connection_send_with_reply_and_block(conn, dmsg, -1, &err);	
+	if (!reply) {
+		if (dbus_error_is_set(&err)) {
+			print("%s", err.message);
+			dbus_error_free(&err);
+		}
+		return (LRESULT)0;
+	}
+#endif
+
+	dbus_message_unref(dmsg);
+	dbus_message_unref(reply);
+	dbus_connection_flush(conn);
+
+	return (LRESULT)0;
+}
