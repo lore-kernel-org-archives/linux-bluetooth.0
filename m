@@ -1,107 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: John Frankish <j-frankish@slb.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Sun, 26 Apr 2009 11:54:24 +0200
-Subject: FW: Upgrade bluez-4.17 to 4.36 - headset no longer works
-Message-ID: <6AC5A55546F64545AE996F8200E3AC4EFCA329@NL0105EXC01V01.eur.slb.com>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+Date: Sat, 25 Apr 2009 20:05:20 -0300
+Message-ID: <6b53b1990904251605s75ad3478v987d3fc47e2bc318@mail.gmail.com>
+Subject: GSoC 2009: L2CAP Enhanced Retransmission mode
+From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-No feedback? Something basic must be wrong if a bt headset won't work...
+Hi all,
 
------Original Message-----
-From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of John Frankish
-Sent: 19 April, 2009 09:13
-To: linux-bluetooth@vger.kernel.org
-Subject: Upgrade bluez-4.17 to 4.36 - headset no longer works
+I'm a accepted student for GSoC 2009 to work with BlueZ. I'm a
+Computer Engineer student at University of Campinas (Brazil).
 
-Hi,
+In my project I'm going to implement the L2CAP Enhanced Retransmission
+mode. That mode will permit retransmission of corrupted or lost
+packets improving bluetooth experience on Linux. My mentors are Luiz
+Augusto “Vudentz” von Dentz and Marcel Holtmann.
 
-I recently upgraded from bluez-4.17 to bluez-4.36 and now my se hbh-610 headset no longer works.
+That's my hack for the next four months, and if you wanna see what I'm
+doing look at my git repo[1] and/or read my blog[2]. Also I'll send
+reports of my work to this list approximately twice a month.
 
-Any pointers would be gratefully received.
+Finally, I wanna thanks all the BlueZ devs for accept me on GSoC, I'm
+very glad to work with BlueZ. And I wanna congratulate the other
+students accepted on BlueZ. =)
 
-Thanks, John
-------------
+Regards.
 
-This ~/.asoundrc used to work:
 
-Quote
-pcm.bluetooth {
-type bluetooth
-device "00:12:EE:A6:1D:F4"
-profile "auto"
-}
+[1] http://www.las.ic.unicamp.br/~gustavo/git/
+[2] http://padovan.org/
 
-ctl.bluetooth {
-type bluetooth
-}
-Unquote
 
-..with the following:
-$ aplay -Dbluetooth -f S16_LE /usr/local/share/sounds/alsa/Noise.wav
+-- 
+Gustavo F. Padovan
 
-..but with bluez-4.36, there is no sound and "bluetoothd -n" reports:
+Computer Engineering Student
+Institute of Computing - IC
+University of Campinas - Unicamp
 
-bluetoothd[7621]: link_key_request (sba=00:21:86:E4:4D:67, dba=00:12:EE:A6:1D:F4)
-bluetoothd[7621]: Badly formated or unrecognized command: AT*SEAUDIO=4,4014
-bluetoothd[7621]: Badly formated or unrecognized command: AT+CSCS="UTF-8"
-bluetoothd[7621]: Badly formated or unrecognized command: AT*SEAM="HBH-610",13
-bluetoothd[7621]: Badly formated or unrecognized command: AT+CLAN?
-
-I tried the .asoundrc suggested in /etc/alsa/bluetooth.conf:
-
-Quote
-pcm.rawbluetooth {
-        @args [ 00:12:EE:A6:1D:F4 ]
-        @args.00:12:EE:A6:1D:F4 {
-                type string
-        }
-        type bluetooth
-        device "00:12:EE:A6:1D:F4"
-}
-
-pcm.bluetooth {
-        @args [ 00:12:EE:A6:1D:F4 ]
-        @args.00:12:EE:A6:1D:F4 {
-                type string
-        }
-        type plug
-        slave {
-                pcm {
-                        type bluetooth
-                        device "00:12:EE:A6:1D:F4"
-                }
-        }
-}
-UnQuote
-
-..but I got:
-
-$ aplay -Dplug:bluetooth -f S16_LE /usr/local/share/sounds/alsa/Noise.wav
-
-Playing WAVE '/usr/local/share/sounds/alsa/Noise.wav' : Signed 16 bit Little Endian, Rate 48000 Hz, Mono
-ALSA lib pcm_bluetooth.c:1607:(audioservice_expect) BT_START_STREAM failed : Success(0)
-ALSA lib pcm_bluetooth.c:1566:(audioservice_recv) Too short (1 bytes) IPC packet from bluetoothd
-aplay: set_params:1015: Unable to install hw params:
-ACCESS:  RW_INTERLEAVED
-FORMAT:  S16_LE
-SUBFORMAT:  STD
-SAMPLE_BITS: 16
-FRAME_BITS: 16
-CHANNELS: 1
-RATE: 48000
-PERIOD_TIME: 125000
-PERIOD_SIZE: 6000
-PERIOD_BYTES: 12000
-PERIODS: 4
-BUFFER_TIME: 500000
-BUFFER_SIZE: 24000
-BUFFER_BYTES: 48000
-TICK_TIME: 0
---
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+email: gustavo@las.ic.unicamp.br
+irc: padovan at freenode.net
+mobile: +55 19 81030803
