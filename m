@@ -1,94 +1,149 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <49F577D6.6090607@nokia.com>
-Date: Mon, 27 Apr 2009 12:16:06 +0300
-From: Roger Quadros <ext-roger.quadros@nokia.com>
+Message-ID: <121966.41193.qm@web95401.mail.in2.yahoo.com>
+References: <6AC5A55546F64545AE996F8200E3AC4EFCA329@NL0105EXC01V01.eur.slb.com>
+Date: Sun, 26 Apr 2009 22:07:07 +0530 (IST)
+From: balaji palaniswami <balaji_palaniswami@yahoo.com>
+Subject: Re: Upgrade bluez-4.17 to 4.36 - headset no longer works
+To: John Frankish <j-frankish@slb.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <6AC5A55546F64545AE996F8200E3AC4EFCA329@NL0105EXC01V01.eur.slb.com>
 MIME-Version: 1.0
-To: ext Roger Quadros <ext-roger.quadros@nokia.com>
-CC: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] bluetooth: hci_sysfs: Ensure sysfs add/del is pre-empt
- safe
-References: <49F05193.7070609@nokia.com> <1240486951.15894.5.camel@localhost.localdomain> <49F0561E.3030206@nokia.com>
-In-Reply-To: <49F0561E.3030206@nokia.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=utf-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ext Roger Quadros wrote:
-> Marcel Holtmann wrote:
->> Hi Roger,
->>
->>> Subject: [PATCH] bluetooth: hci_sysfs: Ensure sysfs add/del is 
->>> pre-empt safe
->>>
->>> Uses different work_struct variables for add_conn() and del_conn(). Uses
->>> single work queue instead of two for adding and deleting connections.
->>>
->>> It eliminates the following error on a pre-emptible kernel.
->>
->> patch looks good to me. Can you just please replace the work queue name
->> with "bluetooth" instead if "btworkq". Looks more saner to me.
->>
->> Regards
->>
->> Marcel
->>
->>
->> -- 
->> To unsubscribe from this list: send the line "unsubscribe 
->> linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> Hi Marcel,
-> 
->   I've renamed "btworkq" to "bluetooth" as per your suggestion.
-> Patch is below.
-> 
-> cheers!
-> -roger
-> 
-> From: Roger Quadros <ext-roger.quadros@nokia.com>
-> Date: Thu, 23 Apr 2009 14:05:19 +0300
-> Subject: [PATCH v2] bluetooth: hci_sysfs: Ensure sysfs add/del is 
-> pre-empt safe
-> 
-> Uses different work_struct variables for add_conn() and del_conn(). Uses
-> single work queue instead of two for adding and deleting connections.
-> 
-> It eliminates the following error on a pre-emptible kernel.
-> 
-> [  204.358032] Unable to handle kernel NULL pointer dereference at
-> virtual address 0000000c
-> [  204.370697] pgd = c0004000
-> [  204.373443] [0000000c] *pgd=00000000
-> [  204.378601] Internal error: Oops: 17 [#1] PREEMPT
-> [  204.383361] Modules linked in: vfat fat rfcomm sco l2cap sd_mod
-> scsi_mod iphb pvr2d drm omaplfb ps
-> [  204.438537] CPU: 0    Not tainted  (2.6.28-maemo2 #1)
-> [  204.443664] PC is at klist_put+0x2c/0xb4
-> [  204.447601] LR is at klist_put+0x18/0xb4
-> [  204.451568] pc : [<c0270f08>]    lr : [<c0270ef4>]    psr: a0000113
-> [  204.451568] sp : cf1b3f10  ip : cf1b3f10  fp : cf1b3f2c
-> [  204.463104] r10: 00000000  r9 : 00000000  r8 : bf08029c
-> [  204.468353] r7 : c7869200  r6 : cfbe2690  r5 : c78692c8  r4 :
-> 00000001
-> [  204.474945] r3 : 00000001  r2 : cf1b2000  r1 : 00000001  r0 :
-> 00000000
-> [  204.481506] Flags: NzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM
-> Segment kernel
-> [  204.488861] Control: 10c5387d  Table: 887fc018  DAC: 00000017
-> [  204.494628] Process btdelconn (pid: 515, stack limit = 0xcf1b22e0)
-> 
-> Signed-off-by: Roger Quadros <ext-roger.quadros@nokia.com>
-> ---
->  include/net/bluetooth/hci_core.h |    3 ++-
->  net/bluetooth/hci_sysfs.c        |   37 
-> ++++++++++++++++---------------------
->  2 files changed, 18 insertions(+), 22 deletions(-)
-> 
 
-hi Marcel,
+Hi John ,
 
-  What is the fate of this patch?
+I got same problem when updated to 4.36.
+I got error 
+ALSA lib pcm_bluetooth.c:(audioservice_expect) .....
+ALSA lib pcm_bluetooth..c:(audioservice_recv) Bogus message ....
 
-regards,
--roger
+I could not remember exact error message.but it is similar your message.
+
+In bluetooth daemon log ,
+i got BT REQUEST < BT GET CAPABILTIES 
+Invalid message length 
+
+In code , i checked message header length is zero.hence it terminated client socket.
+Then i assumed that problem is with alsa , so i reinstalled bluez-* packages and rebooted.
+
+i tried aplay to play a song it started , immediately i aplay pcm write error mesage.so i concluded that its problem with aplay . i tried rythem music box in Ubuntu 8.10 .Finally , I heard song in Motorola 850 Headset.
+
+ Thanks,
+ Balaji.P
+
+
+
+----- Original Message ----
+From: John Frankish <j-frankish@slb.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Sent: Sunday, 26 April, 2009 3:24:24 PM
+Subject: FW: Upgrade bluez-4.17 to 4.36 - headset no longer works
+
+No feedback? Something basic must be wrong if a bt headset won't work...
+
+-----Original Message-----
+From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of John Frankish
+Sent: 19 April, 2009 09:13
+To: linux-bluetooth@vger.kernel.org
+Subject: Upgrade bluez-4.17 to 4.36 - headset no longer works
+
+Hi,
+
+I recently upgraded from bluez-4.17 to bluez-4.36 and now my se hbh-610 headset no longer works.
+
+Any pointers would be gratefully received.
+
+Thanks, John
+------------
+
+This ~/.asoundrc used to work:
+
+Quote
+pcm.bluetooth {
+type bluetooth
+device "00:12:EE:A6:1D:F4"
+profile "auto"
+}
+
+ctl.bluetooth {
+type bluetooth
+}
+Unquote
+
+..with the following:
+$ aplay -Dbluetooth -f S16_LE /usr/local/share/sounds/alsa/Noise.wav
+
+..but with bluez-4.36, there is no sound and "bluetoothd -n" reports:
+
+bluetoothd[7621]: link_key_request (sba=00:21:86:E4:4D:67, dba=00:12:EE:A6:1D:F4)
+bluetoothd[7621]: Badly formated or unrecognized command: AT*SEAUDIO=4,4014
+bluetoothd[7621]: Badly formated or unrecognized command: AT+CSCS="UTF-8"
+bluetoothd[7621]: Badly formated or unrecognized command: AT*SEAM="HBH-610",13
+bluetoothd[7621]: Badly formated or unrecognized command: AT+CLAN?
+
+I tried the .asoundrc suggested in /etc/alsa/bluetooth.conf:
+
+Quote
+pcm.rawbluetooth {
+        @args [ 00:12:EE:A6:1D:F4 ]
+        @args.00:12:EE:A6:1D:F4 {
+                type string
+        }
+        type bluetooth
+        device "00:12:EE:A6:1D:F4"
+}
+
+pcm.bluetooth {
+        @args [ 00:12:EE:A6:1D:F4 ]
+        @args.00:12:EE:A6:1D:F4 {
+                type string
+        }
+        type plug
+        slave {
+                pcm {
+                        type bluetooth
+                        device "00:12:EE:A6:1D:F4"
+                }
+        }
+}
+UnQuote
+
+..but I got:
+
+$ aplay -Dplug:bluetooth -f S16_LE /usr/local/share/sounds/alsa/Noise.wav
+
+Playing WAVE '/usr/local/share/sounds/alsa/Noise.wav' : Signed 16 bit Little Endian, Rate 48000 Hz, Mono
+ALSA lib pcm_bluetooth.c:1607:(audioservice_expect) BT_START_STREAM failed : Success(0)
+ALSA lib pcm_bluetooth.c:1566:(audioservice_recv) Too short (1 bytes) IPC packet from bluetoothd
+aplay: set_params:1015: Unable to install hw params:
+ACCESS:  RW_INTERLEAVED
+FORMAT:  S16_LE
+SUBFORMAT:  STD
+SAMPLE_BITS: 16
+FRAME_BITS: 16
+CHANNELS: 1
+RATE: 48000
+PERIOD_TIME: 125000
+PERIOD_SIZE: 6000
+PERIOD_BYTES: 12000
+PERIODS: 4
+BUFFER_TIME: 500000
+BUFFER_SIZE: 24000
+BUFFER_BYTES: 48000
+TICK_TIME: 0
+--
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+--
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+      Own a website.Get an unlimited package.Pay next to nothing.*Go to http://in.business.yahoo.com/
+
