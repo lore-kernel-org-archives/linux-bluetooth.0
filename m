@@ -1,101 +1,97 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <49F57811.8010906@nokia.com>
+Date: Mon, 27 Apr 2009 12:17:05 +0300
+From: Roger Quadros <ext-roger.quadros@nokia.com>
 MIME-Version: 1.0
-Date: Mon, 27 Apr 2009 16:12:26 +0530
-Message-ID: <c2a31c480904270342l70fa8293q37b2faa4c5a8a2e8@mail.gmail.com>
-Subject: Motorola HT820 + Skype + bluez-4.17 + kernel 2.6.27
-From: sreevani medhahal <sreevani.medhahal@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=001636457d9e98483e0468870036
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] bluetooth: hci_sysfs: Ensure sysfs add/del is pre-empt
+ safe
+References: <49F05193.7070609@nokia.com> <1240486951.15894.5.camel@localhost.localdomain> <49F0561E.3030206@nokia.com> <49F577D6.6090607@nokia.com>
+In-Reply-To: <49F577D6.6090607@nokia.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---001636457d9e98483e0468870036
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Roger Quadros wrote:
+> ext Roger Quadros wrote:
+>> Marcel Holtmann wrote:
+>>> Hi Roger,
+>>>
+>>>> Subject: [PATCH] bluetooth: hci_sysfs: Ensure sysfs add/del is 
+>>>> pre-empt safe
+>>>>
+>>>> Uses different work_struct variables for add_conn() and del_conn(). 
+>>>> Uses
+>>>> single work queue instead of two for adding and deleting connections.
+>>>>
+>>>> It eliminates the following error on a pre-emptible kernel.
+>>>
+>>> patch looks good to me. Can you just please replace the work queue name
+>>> with "bluetooth" instead if "btworkq". Looks more saner to me.
+>>>
+>>> Regards
+>>>
+>>> Marcel
+>>>
+>>>
+>>> -- 
+>>> To unsubscribe from this list: send the line "unsubscribe 
+>>> linux-bluetooth" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>> Hi Marcel,
+>>
+>>   I've renamed "btworkq" to "bluetooth" as per your suggestion.
+>> Patch is below.
+>>
+>> cheers!
+>> -roger
+>>
+>> From: Roger Quadros <ext-roger.quadros@nokia.com>
+>> Date: Thu, 23 Apr 2009 14:05:19 +0300
+>> Subject: [PATCH v2] bluetooth: hci_sysfs: Ensure sysfs add/del is 
+>> pre-empt safe
+>>
+>> Uses different work_struct variables for add_conn() and del_conn(). Uses
+>> single work queue instead of two for adding and deleting connections.
+>>
+>> It eliminates the following error on a pre-emptible kernel.
+>>
+>> [  204.358032] Unable to handle kernel NULL pointer dereference at
+>> virtual address 0000000c
+>> [  204.370697] pgd = c0004000
+>> [  204.373443] [0000000c] *pgd=00000000
+>> [  204.378601] Internal error: Oops: 17 [#1] PREEMPT
+>> [  204.383361] Modules linked in: vfat fat rfcomm sco l2cap sd_mod
+>> scsi_mod iphb pvr2d drm omaplfb ps
+>> [  204.438537] CPU: 0    Not tainted  (2.6.28-maemo2 #1)
+>> [  204.443664] PC is at klist_put+0x2c/0xb4
+>> [  204.447601] LR is at klist_put+0x18/0xb4
+>> [  204.451568] pc : [<c0270f08>]    lr : [<c0270ef4>]    psr: a0000113
+>> [  204.451568] sp : cf1b3f10  ip : cf1b3f10  fp : cf1b3f2c
+>> [  204.463104] r10: 00000000  r9 : 00000000  r8 : bf08029c
+>> [  204.468353] r7 : c7869200  r6 : cfbe2690  r5 : c78692c8  r4 :
+>> 00000001
+>> [  204.474945] r3 : 00000001  r2 : cf1b2000  r1 : 00000001  r0 :
+>> 00000000
+>> [  204.481506] Flags: NzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM
+>> Segment kernel
+>> [  204.488861] Control: 10c5387d  Table: 887fc018  DAC: 00000017
+>> [  204.494628] Process btdelconn (pid: 515, stack limit = 0xcf1b22e0)
+>>
+>> Signed-off-by: Roger Quadros <ext-roger.quadros@nokia.com>
+>> ---
+>>  include/net/bluetooth/hci_core.h |    3 ++-
+>>  net/bluetooth/hci_sysfs.c        |   37 
+>> ++++++++++++++++---------------------
+>>  2 files changed, 18 insertions(+), 22 deletions(-)
+>>
+> 
 
-Hi,
-   I have seen the below strange scenerio when the other end of Skype
-Call performs the disconnect of the Call. This can be reproduced in
-the skype test call also.
-Headsets used Motorola HT820 & Jabra 620s.
-Once the skype call is started SCO link is established[hcitool con
-shows :SCO link is pre & continues to exist Until call completes. But
-at the end of the call the result of <hcitool con> shows that eSCO
-link is existing. I am using a CSR dongle which is eSCO capable. Once
-the above happens subsequent calls fail with "Problem with audio
-capture".
+hi Marcel,
 
-The above might be because skype wants to play the Hangup.wav file &
-tries to establish another sco link. From the hcidump,it seems that
-before the Disconnect Complete is received ,another SCO link setup is
-requested(to Play the CallHangup.wav).
+  What is the fate of this patch?
 
-The above happens with SCO capable headsets,but does'nt happen with
-eSCO capable Headsets with bluez-4.17 & kernel 2.6.27. Hcidump is also
-attached.
-
-I am not able to use BlueZ 4.37,as audio is not heard in the headset
-during Skype Call[hcitool con says SCO link is present]
-
-Regards,
-Sreevani
-
---001636457d9e98483e0468870036
-Content-Type: text/plain; charset=US-ASCII; name="hcidump.txt"
-Content-Disposition: attachment; filename="hcidump.txt"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_fu11dcg30
-
-SENJIHNuaWZmZXIgLSBCbHVldG9vdGggcGFja2V0IGFuYWx5emVyIHZlciAxLjQyCmRldmljZTog
-aGNpMCBzbmFwX2xlbjogMTAyOCBmaWx0ZXI6IDB4ZmZmZmZmZmYKICAgIDAwMTA6IGMzIDAwIDVl
-IDAxIDU2IDAxIGJlIDAwICAwMyAwMSBhOCAwMCBmMSBmZiAxMyAwMCAgLi5eLlYuLi4uLi4uLi4u
-LgogICAgMDAyMDogYmMgZmYgNjAgZmYgN2MgZmYgZGYgZmUgIDVlIGZmIDE2IGZmIGUwIGZlIDJl
-IGZmICAuLmAufC4uLl4uLi4uLi4uCjwgU0NPIGRhdGE6IGhhbmRsZSA1MSBmbGFncyAweDAwIGRs
-ZW4gNDgKICAgIDAwMDA6IGRjIGZlIGYwIGZlIGZmIGZlIDE4IGZmICA3YyBmZiBhNCBmZiA0ZiAw
-MCA1YyAwMCAgLi4uLi4uLi58Li4uTy5cLgogICAgMDAxMDogN2MgMDAgM2YgMDEgNzMgMDEgN2Eg
-MDEgIGYyIDAxIGU1IDAxIDkyIDAxIDU5IDAxICB8Lj8ucy56Li4uLi4uLlkuCiAgICAwMDIwOiAx
-MCAwMSBmMyAwMCA2YyAwMCBiMiBmZiAgODggZmYgM2EgZmYgYTUgZmUgOTIgZmUgIC4uLi5sLi4u
-Li46Li4uLi4KPiBIQ0kgRXZlbnQ6IENvbW1hbmQgU3RhdHVzICgweDBmKSBwbGVuIDQKICAgIFNl
-dHVwIFN5bmNocm9ub3VzIENvbm5lY3Rpb24gKDB4MDF8MHgwMDI4KSBzdGF0dXMgMHgwMCBuY21k
-IDEKPCBIQ0kgQ29tbWFuZDogRGlzY29ubmVjdCAoMHgwMXwweDAwMDYpIHBsZW4gMwogICAgaGFu
-ZGxlIDUxIHJlYXNvbiAweDEzCiAgICBSZWFzb246IFJlbW90ZSBVc2VyIFRlcm1pbmF0ZWQgQ29u
-bmVjdGlvbgo+IFNDTyBkYXRhOiBoYW5kbGUgNTEgZmxhZ3MgMHgwMCBkbGVuIDQ4CiAgICAwMDAw
-OiBhMiBmZiBmMCBmZiA1MiAwMCA0MyAwMCAgNTYgMDAgOTUgMDAgMjYgMDAgZjYgZmYgIC4uLi5S
-LkMuVi4uLiYuLi4KICAgIDAwMTA6IGRkIGZmIGNlIGZmIGYyIGZmIGUyIGZmICBlMiBmZiBlMiBm
-ZiBlMiBmZiBlMiBmZiAgLi4uLi4uLi4uLi4uLi4uLgogICAgMDAyMDogZTIgZmYgZTIgZmYgZTIg
-ZmYgZTIgZmYgIGUyIGZmIGUyIGZmIGYyIGZmIGYzIGZmICAuLi4uLi4uLi4uLi4uLi4uCj4gU0NP
-IGRhdGE6IGhhbmRsZSA1MSBmbGFncyAweDAwIGRsZW4gNDgKICAgIDAwMDA6IGYxIGZmIGVkIGZm
-IGE0IGZmIDcyIGZmICBiNCBmZiAzNyAwMCA3NyAwMCA5ZCAwMCAgLi4uLi4uci4uLjcudy4uLgog
-ICAgMDAxMDogYmYgMDAgN2EgMDAgMjcgMDAgZWYgZmYgIDE3IDAwIDVjIDAwIDQ0IDAwIDBiIDAw
-ICAuLnouJy4uLi4uXC5ELi4uCiAgICAwMDIwOiBjOSBmZiBjYSBmZiBjZiBmZiA5ZCBmZiAgYmEg
-ZmYgYzMgZmYgYjEgZmYgZDUgZmYgIC4uLi4uLi4uLi4uLi4uLi4KPiBIQ0kgRXZlbnQ6IFN5bmNo
-cm9ub3VzIENvbm5lY3QgQ29tcGxldGUgKDB4MmMpIHBsZW4gMTcKICAgIHN0YXR1cyAweDBhIGhh
-bmRsZSA0NiBiZGFkZHIgMDA6MTM6MTc6NzI6MDE6QTYgdHlwZSBTQ08KICAgIEVycm9yOiBTeW5j
-aHJvbm91cyBDb25uZWN0aW9uIHRvIGEgRGV2aWNlIEV4Y2VlZGVkCjoKOgo6Cj4gU0NPIGRhdGE6
-IGhhbmRsZSA1MSBmbGFncyAweDAwIGRsZW4gNDgKICAgIDAwMDA6IDc2IGZmIDc2IGZmIDc2IGZm
-IDc2IGZmICA3NiBmZiA3NiBmZiA3NiBmZiA3NiBmZiAgdi52LnYudi52LnYudi52LgogICAgMDAx
-MDogNmYgZmYgNjggZmYgNWUgZmYgOWIgZmYgIGNkIGZmIGFjIGZmIGQwIGZmIDQ5IDAwICBvLmgu
-Xi4uLi4uLi4uLkkuCiAgICAwMDIwOiA1NiAwMCA0ZiAwMCA0ZiAwMCA0ZiAwMCAgNGYgMDAgNGYg
-MDAgNGYgMDAgNGYgMDAgIFYuTy5PLk8uTy5PLk8uTy4KPiBIQ0kgRXZlbnQ6IERpc2Nvbm4gQ29t
-cGxldGUgKDB4MDUpIHBsZW4gNAogICAgc3RhdHVzIDB4MDAgaGFuZGxlIDUxIHJlYXNvbiAweDE2
-CiAgICBSZWFzb246IENvbm5lY3Rpb24gVGVybWluYXRlZCBieSBMb2NhbCBIb3N0Cj4gU0NPIGRh
-dGE6IGhhbmRsZSA1MSBmbGFncyAweDAwIGRsZW4gNDgKICAgIDAwMDA6IDRmIDAwIDRmIDAwIDRm
-IDAwIDRmIDAwICA0ZiAwMCA0ZiAwMCA0ZiAwMCA0ZiAwMCAgTy5PLk8uTy5PLk8uTy5PLgogICAg
-MDAxMDogNGYgMDAgNGYgMDAgNGYgMDAgNGYgMDAgIDRmIDAwIDRmIDAwIDRmIDAwIDRmIDAwICBP
-Lk8uTy5PLk8uTy5PLk8uCiAgICAwMDIwOiA0ZiAwMCA0ZiAwMCA0ZiAwMCA0ZiAwMCAgNGYgMDAg
-NGYgMDAgNGYgMDAgNGYgMDAgIE8uTy5PLk8uTy5PLk8uTy4KPiBTQ08gZGF0YTogaGFuZGxlIDUx
-IGZsYWdzIDB4MDAgZGxlbiA0OAogICAgMDAwMDogNGYgMDAgNGYgMDAgNGYgMDAgNGYgMDAgIDRm
-IDAwIDRmIDAwIDRmIDAwIDRmIDAwICBPLk8uTy5PLk8uTy5PLk8uCiAgICAwMDEwOiA0ZiAwMCA0
-ZiAwMCA3NiBmZiA3NiBmZiAgNzYgZmYgNzYgZmYgNzYgZmYgNzYgZmYgIE8uTy52LnYudi52LnYu
-di4KICAgIDAwMjA6IDc2IGZmIDc2IGZmIDc2IGZmIDc2IGZmICA3NiBmZiA3NiBmZiA3NiBmZiA3
-NiBmZiAgdi52LnYudi52LnYudi52Lgo+IFNDTyBkYXRhOiBoYW5kbGUgNTEgZmxhZ3MgMHgwMCBk
-bGVuIDQ4CiAgICAwMDAwOiA3NiBmZiA3NiBmZiA3NiBmZiA3NiBmZiAgNzYgZmYgNzYgZmYgNzYg
-ZmYgNzYgZmYgIHYudi52LnYudi52LnYudi4KICAgIDAwMTA6IDc2IGZmIDc2IGZmIDc2IGZmIDc2
-IGZmICA3NiBmZiA3NiBmZiA3NiBmZiA3NiBmZiAgdi52LnYudi52LnYudi52LgogICAgMDAyMDog
-NzYgZmYgNzYgZmYgNzYgZmYgNzYgZmYgIDc2IGZmIDc2IGZmIDc2IGZmIDc2IGZmICB2LnYudi52
-LnYudi52LnYuCjwgSENJIENvbW1hbmQ6IERpc2Nvbm5lY3QgKDB4MDF8MHgwMDA2KSBwbGVuIDMK
-ICAgIGhhbmRsZSAwIHJlYXNvbiAweDEzCiAgICBSZWFzb246IFJlbW90ZSBVc2VyIFRlcm1pbmF0
-ZWQgQ29ubmVjdGlvbgo+IEhDSSBFdmVudDogQ29tbWFuZCBTdGF0dXMgKDB4MGYpIHBsZW4gNAog
-ICAgRGlzY29ubmVjdCAoMHgwMXwweDAwMDYpIHN0YXR1cyAweDAyIG5jbWQgMQogICAgRXJyb3I6
-IFVua25vd24gQ29ubmVjdGlvbiBJZGVudGlmaWVyCg==
---001636457d9e98483e0468870036--
+regards,
+-roger
