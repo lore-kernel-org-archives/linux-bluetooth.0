@@ -1,46 +1,128 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Mon, 27 Apr 2009 23:23:34 -0300
-Message-ID: <aa32413d0904271923r6ef9170ek250a39df4af534f3@mail.gmail.com>
-Subject: GSoC09 - A2DP Sink role
-From: =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@gmail.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Alok Barsode <alokbarsode@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org, Alok Barsode <alok.barsode@gmail.com>
+Subject: [PATCH 8/8] Exporting init_known_adapters from hciops plugin.
+Date: Mon, 27 Apr 2009 19:45:45 +0530
+Message-Id: <1240841745-11006-8-git-send-email-alok.barsode@gmail.com>
+In-Reply-To: <1240841745-11006-1-git-send-email-alok.barsode@gmail.com>
+References: <1240841745-11006-1-git-send-email-alok.barsode@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello everybody!
+---
+ plugins/hciops.c |   16 ++++++++--------
+ src/adapter.c    |    8 ++++++++
+ src/adapter.h    |    2 ++
+ src/main.c       |    2 ++
+ 4 files changed, 20 insertions(+), 8 deletions(-)
 
-I think some of you might remember me from last year. My name is João
-Paulo and I made the PulseAudio plugin for bluetooth audio under the
-GSoC08 program. I'm glad of have been accepted for this year's SoC and
-would like to thank all of you for trusting on my work on more time.
-This year I'm going to implement the sink role on bluetoothd, what
-means to be able to receive an audio stream from a device or another
-pc (this sink / source name convention can be very confusing
-sometimes). It's also part of the project to implement some clients so
-we can provide the working feature to end users and also test the
-implementation. I plan to start with PulseAudio and alsa clients, but
-would be good to have a gstreamer client too, as a matter of
-completion. I'm going to be mentored by Vudentz, like last year. Right
-now I'm re-reading the specs related to the project and also having a
-look over a book Vudentz have recomended me [1].
-
-I just moved to a new house and still without internet connection, so
-I'm not very online lately (hope to solve this issue ASAP), but as
-soon as I have a connection I'll be hanging on #bluez. My nick on
-freenode is jprvita and I'm on GMT-3. Besides that you can contact me
-through email or jabber on jprvita@gmail.com. I'll be posting status
-updates to this list and will write about the project on my weblog [2]
-too. By now I've published the proposal there, if someone is
-interested.
-
-[1] "RTP - Audio and Video for the Internet" by Colin Perkins
-[2] http://jprvita.wordpress.com/
-
---
-João Paulo Rechi Vita
-MSc Computer Science Student
-Computer Engineer
-IC / Unicamp
-http://jprvita.wordpress.com/
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index 5845443..d43efbd 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -54,6 +54,7 @@
+ #include "manager.h"
+ #include "storage.h"
+ 
++static int sock;
+ static int child_pipe[2];
+ 
+ static gboolean child_exit(GIOChannel *io, GIOCondition cond, void *user_data)
+@@ -273,8 +274,8 @@ void device_event(int event, int dev_id)
+ 		break;
+ 	}
+ }
+-
+-static int init_all_devices(int ctl)
++ /* Initialize already connected devices */
++static int init_all_devices(void)
+ {
+ 	struct hci_dev_list_req *dl;
+ 	struct hci_dev_req *dr;
+@@ -290,7 +291,7 @@ static int init_all_devices(int ctl)
+ 	dl->dev_num = HCI_MAX_DEV;
+ 	dr = dl->dev_req;
+ 
+-	if (ioctl(ctl, HCIGETDEVLIST, (void *) dl) < 0) {
++	if (ioctl(sock, HCIGETDEVLIST, (void *) dl) < 0) {
+ 		info("Can't get device list: %s (%d)",
+ 							strerror(errno), errno);
+ 		return errno;
+@@ -360,7 +361,6 @@ static int hciops_setup(void)
+ 	struct sockaddr_hci addr;
+ 	struct hci_filter flt;
+ 	GIOChannel *ctl_io, *child_io;;
+-	int sock;
+ 
+ 	if (pipe(child_pipe) < 0) {
+ 		error("pipe(): %s (%d)", strerror(errno), errno);
+@@ -409,8 +409,7 @@ static int hciops_setup(void)
+ 
+ 	g_io_channel_unref(ctl_io);
+ 
+-	/* Initialize already connected devices */
+-	return init_all_devices(sock);
++	return 0;
+ }
+ 
+ static void hciops_cleanup(void)
+@@ -418,8 +417,9 @@ static void hciops_cleanup(void)
+ }
+ 
+ static struct btd_adapter_ops hci_ops = {
+-	.setup	 = hciops_setup,
+-	.cleanup = hciops_cleanup,
++	.setup		     = hciops_setup,
++	.cleanup	     = hciops_cleanup,
++	.init_known_adapters = init_all_devices,
+ };
+ 
+ static int hciops_init(void)
+diff --git a/src/adapter.c b/src/adapter.c
+index db86228..5bc6dab 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2934,6 +2934,14 @@ void btd_adapter_cleanup_ops()
+ 	adapter_ops->cleanup();
+ }
+ 
++int init_known_adapters()
++{
++	if (!adapter_ops)
++		return -1;
++
++	return adapter_ops->init_known_adapters();
++}
++
+ static void agent_auth_cb(struct agent *agent, DBusError *derr,
+ 							void *user_data)
+ {
+diff --git a/src/adapter.h b/src/adapter.h
+index b195c3c..35cbc8f 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -151,7 +151,9 @@ gboolean adapter_powering_down(struct btd_adapter *adapter);
+ struct btd_adapter_ops {
+ 	int (*setup) ();
+ 	void (*cleanup) ();
++	int (*init_known_adapters)();
+ };
+ 
+ int btd_register_adapter_ops(struct btd_adapter_ops *btd_adapter_ops);
+ void btd_adapter_cleanup_ops();
++int init_known_adapters();
+diff --git a/src/main.c b/src/main.c
+index a5a728c..346dc0c 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -411,6 +411,8 @@ int main(int argc, char *argv[])
+ 
+ 	event_loop = g_main_loop_new(NULL, FALSE);
+ 
++	init_known_adapters();
++
+ 	starting = FALSE;
+ 
+ 	manager_startup_complete();
+-- 
+1.5.6.3
