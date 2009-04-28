@@ -1,106 +1,174 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bing Zhao <bzhao@marvell.com>
-To: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Tue, 28 Apr 2009 18:02:43 -0700
-Subject: BUG: sleeping function called from invalid context at
- mm/slub.c:1595 --- "hcitool cc" or "l2ping"
-Message-ID: <477F20668A386D41ADCC57781B1F704301E3F5C7F5@SC-VEXCH1.marvell.com>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: gfpadovan@gmail.com
+In-Reply-To: <1240937363.997.47.camel@localhost.localdomain>
+References: <6b53b1990904251605s75ad3478v987d3fc47e2bc318@mail.gmail.com>
+	 <1240929768.3441.5866.camel@localhost.localdomain>
+	 <1240933237.997.37.camel@localhost.localdomain>
+	 <1240936070.3441.5901.camel@localhost.localdomain>
+	 <1240937363.997.47.camel@localhost.localdomain>
+Date: Tue, 28 Apr 2009 16:14:19 -0300
+Message-ID: <6b53b1990904281214y304fd3dav6ca79e7905e7c5d5@mail.gmail.com>
+Subject: Re: GSoC 2009: L2CAP Enhanced Retransmission mode
+From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
+To: ngh@isomerica.net
+Cc: linux-bluetooth@vger.kernel.org, Barry Reinhold <bbr@lampreynetworks.com>,
+	Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Nathan,
 
-I'm getting this error whenever I use "hcitool cc" or "l2ping xx:xx:xx:xx:xx:xx"  command.
+Your work will be very useful on My GSoC. We can work together on
+implementing ERTM. I was just starting to study how to do mode
+negotiaton. I'll stop it and go look through your code to understand
+it and start coding something.
 
-Kernel: version 2.6.30-rc3 from bluetooth-testing tree
-HCI Tool: version 3.20
-Laptop: Lenovo X61s
+I think we need a TO DO list of ERTM stuff with the things that left
+to implement and the this Marcel suggested. First I think that we need
+do changes suggested by Marcel to push the to upstream. After we can
+concentrate on the issues left to implement. I'm planning to start
+this tonight.
+
+First I need to study your code, then we can discuss it more. I need
+to learn many things about l2cap and ERTM yet =3D).
+
+Are you around #bluez on freenode?
+
+Regards.
+
+On Tue, Apr 28, 2009 at 1:49 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
+> Hi Nathan,
+>
+>> > > =A0 Because our initial target is interoperability against a specifi=
+c set
+>> > > of medical devices from outside vendors, my work thus far has been
+>> > > targeted against these devices. =A0Enhanced L2CAP is fairly complex,=
+ and
+>> > > has multiple parts to it. =A0To get the first round of compatibility
+>> > > going, I've taken such paths as limiting the local TX window to 1
+>> > > outstanding SDU.
+>> > > =A0 Currently, the code is at a state where it successfully negotiat=
+es
+>> > > between enhanced/streaming/basic modes, opens a connection, and begi=
+ns
+>> > > sending data. =A0Much of the work I've done thus far has been splitt=
+ing
+>> > > out the send/receive paths for the separate modes. =A0There have bee=
+n no
+>> > > significant changes in and code path, and no need to make any major
+>> > > changes to the existing data structures. =A0Major points left to imp=
+lement
+>> > > include:
+>> > >
+>> > > =A0 * =A0Support for a TX windows > 1
+>> > > =A0 =A0 =A0On both send and receive, the code limits itself to only =
+one
+>> > > outstanding l2cap SDU at a time. =A0I have added a send and receive =
+queue
+>> > > of skbuffs to a socket to support this, however this is unimplemente=
+d,
+>> > > and quite possibly duplicates code elsewhere in the kernel.
+>> >
+>> > in the end the ERTM mode should behave like SOCK_STREAM (like what
+>> > RFCOMM does at the moment). The Basic mode will stay as SOCK_SEQPACKET
+>> > and this way we require one mode or the other.
+>> >
+>> > For testing purpose of course just setting the value in the existing
+>> > SOCK_SEQPACKET should be enough. And also that SOCK_SEQPACKET could ru=
+n
+>> > with ETRM without any downside is an option anyway.
+>>
+>> Some of the devices I test against force Basic mode for SDP and ERTM for
+>> HDP. =A0In my testing while using the kernel negotiation procedure, both
+>> sdptool and our HDP implementation work transparently, using Basic and
+>> ERTM modes respectively.
+>
+> that is fine. So our SDP client/server uses SOCK_SEQPACKET and then for
+> HDP you just use SOCK_STREAM. Sounds totally sane to me.
+>
+> The default mode for SOCK_SEQPACKET should be basic mode and for
+> SOCK_STREAM is is ERTM. Additionally you can use setsockopt() with
+> L2CAP_OPTIONS to change the mode requirement.
+>
+>> My vision was to add an ioctl() to allow an application to specify that
+>> it requires a specific mode. =A0This was due to my understanding of the
+>> recvmsg() man page:
+>>
+>> =A0 =A0 =A0 =A0The =A0msg_flags =A0field =A0in the msghdr is set on retu=
+rn of
+>> =A0 =A0 =A0 =A0recvmsg(). =A0It can contain several flags:
+>>
+>> =A0 =A0 =A0 =A0MSG_EOR
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 indicates end-of-record; the data returned c=
+ompleted a
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 record (generally used with sockets of type
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 SOCK_SEQPACKET).
+>>
+>> The MCAP/HDP profiles require this metadata to function properly. =A0Can
+>> we tack MSG_EOR onto a SOCK_STREAM socket? =A0If so, this would be simpl=
+er
+>> than requiring an ioctl.
+>
+> As I said, the mode setting part is already there. And using an ioctl()
+> for these is wrong. You use setsockopt() for these kind of things.
+>
+> And I think you can add an MSG_EOR on a stream socket. Not sure that it
+> really is needed. Sounds to me like a messed up detail in the MCAP
+> specification that would work anyway without extra flags. Have to read
+> the spec. at some point.
+>
+>> > > =A0 Currently, the code is branched off bluetooth-testing from last =
+week.
+>> > > The tree is available via:
+>> > >
+>> > > =A0 =A0 =A0git clone git://staticfree.info/git/el2cap
+>> > >
+>> > > I'd like to thank my friend Steve from the MIT Mobile Experience Lab=
+ for
+>> > > graciously hosting the code. =A0My latest work is in the "retransmis=
+sion"
+>> > > branch. =A0Due to the increase in code size, I've split the files up=
+ into
+>> > > an l2cap sub-directory under net/bluetooth. =A0I've not yet cloned
+>> > > Gustavo's repository, but I should be able to rebase the code off th=
+at
+>> > > as necessary.
+>> > > =A0 If there are any comments on style or implementation, I'd be hap=
+py to
+>> > > address them in the code. =A0Hopefully, this can be used as base for
+>> > > Gustavo's SOC work so we can focus upon complete implementation of t=
+he
+>> > > Enhanced L2CAP specification and interoperability with other devices=
+.
+>> >
+>> > The split into l2cap.c and queue.c and move to a separate directory
+>> > looks totally useless to me. I know that l2cap.c is big, but there is =
+no
+>> > real separation. You would have to convince why this makes sense.
+>>
+>> Just trying to keep things manageable. =A0Currently, I'm not using any o=
+f
+>> the code in queue.c anyway, so I'm tempted to just drop it.
+>
+> Just drop it for now. We can change the layout later if it is really
+> needed. Currently it is just confusing.
+>
+> Regards
+>
+> Marcel
+>
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+>
 
 
-Did anyone see this already?
 
-Thanks,
-
-Bing
-
-===========================================
-# hcitool cc 00:1c:c1:e3:ce:cf
-BUG: sleeping function called from invalid context at mm/slub.c:1595
-in_atomic(): 1, irqs_disabled(): 0, pid: 0, name: swapper
-Pid: 0, comm: swapper Not tainted 2.6.30-rc3 #2
-Call Trace:
- [<c0511f9c>] ? kvasprintf+0x28/0x44
- [<c048ea14>] ? __kmalloc+0xa3/0x168
- [<c0511f9c>] ? kvasprintf+0x28/0x44
- [<c050bf60>] ? kobject_set_name_vargs+0x1e/0x4c
- [<c0582dca>] ? dev_set_name+0x1a/0x1c
- [<f89b9b20>] ? hci_conn_add_sysfs+0x48/0x94 [bluetooth]
- [<f89b70a1>] ? hci_event_packet+0x1e9/0x1b7c [bluetooth]
- [<c049e912>] ? pollwake+0x33/0x39
- [<c041ecee>] ? __wake_up_common+0x2e/0x58
- [<c041ff78>] ? __wake_up_sync_key+0x33/0x49
- [<c05c00f3>] ? sock_def_readable+0x34/0x5e
- [<c05bf48e>] ? sock_queue_rcv_skb+0xaa/0xb1
- [<f89b8d48>] ? hci_send_to_sock+0xd1/0x117 [bluetooth]
- [<f89b3f76>] ? hci_rx_task+0x6b/0x1d9 [bluetooth]
- [<f7d2d3fa>] ? rh_timer_func+0x0/0x5 [usbcore]
- [<c04328c2>] ? run_timer_softirq+0x120/0x189
- [<c063ca45>] ? _spin_lock_irq+0x12/0x15
- [<c043291c>] ? run_timer_softirq+0x17a/0x189
- [<c042f5ee>] ? tasklet_action+0x5b/0xa7
- [<c042f3a5>] ? __do_softirq+0x98/0x13e
- [<c042f30d>] ? __do_softirq+0x0/0x13e
- <IRQ>  [<c042f2e0>] ? irq_exit+0x26/0x53
- [<c040431e>] ? do_IRQ+0x65/0x76
- [<c0403589>] ? common_interrupt+0x29/0x30
- [<c0555efe>] ? acpi_idle_enter_simple+0x130/0x166
- [<c0555c13>] ? acpi_idle_enter_bm+0xcf/0x28a
- [<c05b0682>] ? cpuidle_idle_call+0x5c/0x92
- [<c040217e>] ? cpu_idle+0x46/0x5f
- [<c07c57c2>] ? start_kernel+0x2c7/0x2ca
-------------[ cut here ]------------
-WARNING: at kernel/workqueue.c:371 flush_cpu_workqueue+0x23/0x70()
-Hardware name: 766634U
-Modules linked in: cpufreq_ondemand acpi_cpufreq loop dm_multipath snd_hda_codec_analog snd_hda_intel snd_hda_codec snd_hwdep snd_seq_dummy snd_seq_oss snd_seq_midi_event snd_seq snd_seq_device snd_pcm_oss snd_mixer_oss snd_pcm crc_itu_t pcspkr snd_timer thinkpad_acpi snd ac battery btusb button iTCO_wdt iTCO_vendor_support soundcore bluetooth i2c_i801 rfkill i2c_core e1000e snd_page_alloc hwmon ata_piix dm_snapshot dm_zero dm_mirror dm_region_hash dm_log dm_mod ahci libata sd_mod scsi_mod ext3 jbd mbcache uhci_hcd ohci_hcd ehci_hcd usbcore [last unloaded: scsi_wait_scan]
-Pid: 1100, comm: bluetooth Not tainted 2.6.30-rc3 #2
-Call Trace:
- [<c042ae6d>] ? warn_slowpath+0x60/0x9f
- [<c042ae94>] ? warn_slowpath+0x87/0x9f
- [<c041ecee>] ? __wake_up_common+0x2e/0x58
- [<c0420819>] ? update_curr+0xbc/0xf5
- [<c0420800>] ? update_curr+0xa3/0xf5
- [<c04279e6>] ? dequeue_task_fair+0xd8/0xe5
- [<c0401d44>] ? __switch_to+0xde/0x164
- [<c0424ffc>] ? finish_task_switch+0x40/0xc4
- [<c04382ff>] ? flush_cpu_workqueue+0x23/0x70
- [<c04387ed>] ? flush_workqueue+0x3c/0x59
- [<f89b9674>] ? add_conn+0x10/0x2e [bluetooth]
- [<c0438af9>] ? worker_thread+0x12b/0x1b4
- [<f89b9664>] ? add_conn+0x0/0x2e [bluetooth]
- [<c043b008>] ? autoremove_wake_function+0x0/0x2d
- [<c04389ce>] ? worker_thread+0x0/0x1b4
- [<c043af45>] ? kthread+0x42/0x69
- [<c043af03>] ? kthread+0x0/0x69
- [<c0403977>] ? kernel_thread_helper+0x7/0x10
----[ end trace 4622b3ef7b8b6111 ]---
-
-# hciconfig -a
-hci0:	Type: USB
-	BD Address: 00:1C:26:E6:2F:41 ACL MTU: 1017:8 SCO MTU: 64:8
-	UP RUNNING 
-	RX bytes:348 acl:0 sco:0 events:11 errors:0
-	TX bytes:38 acl:0 sco:0 commands:11 errors:0
-	Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
-	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
-	Link policy: 
-	Link mode: SLAVE ACCEPT 
-	Name: 'IBM Callisto'
-	Class: 0x000000
-	Service Classes: Unspecified
-	Device Class: Miscellaneous, 
-	HCI Ver: 2.0 (0x3) HCI Rev: 0x212b LMP Ver: 2.0 (0x3) LMP Subver: 0x41d3
-	Manufacturer: Broadcom Corporation (15)
-
+--=20
+Gustavo F. Padovan
+http://padovan.org
