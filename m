@@ -1,41 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-From: ngh@isomerica.net
-To: linux-bluetooth@vger.kernel.org
-Cc: Nathan Holstein <nathan@lampreynetworks.com>
-Subject: [PATCH] *** SUBJECT HERE ***
-Date: Wed, 29 Apr 2009 21:42:23 -0400
-Message-Id: <1241055744-12140-1-git-send-email-ngh@isomerica.net>
+Subject: RE: BUG: sleeping function called from invalid context at
+ mm/slub.c:1595 --- "hcitool cc" or "l2ping"
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Bing Zhao <bzhao@marvell.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <477F20668A386D41ADCC57781B1F704301E3F5CA53@SC-VEXCH1.marvell.com>
+References: <477F20668A386D41ADCC57781B1F704301E3F5C7F5@SC-VEXCH1.marvell.com>
+	 <1240966565.997.65.camel@localhost.localdomain>
+	 <477F20668A386D41ADCC57781B1F704301E3F5C7FC@SC-VEXCH1.marvell.com>
+	 <1241014841.997.69.camel@localhost.localdomain>
+	 <477F20668A386D41ADCC57781B1F704301E3F5CA53@SC-VEXCH1.marvell.com>
+Content-Type: text/plain
+Date: Wed, 29 Apr 2009 15:38:36 -0700
+Message-Id: <1241044716.3389.7.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Nathan Holstein <nathan@lampreynetworks.com>
+Hi Bing,
 
-This is a revamping of the previous patches that I submited.  I started from
-scratch, rebase all the changes onto the latest bluetooth-testing (2.6.30-rc3).
-While applying the changes, I attempted to clean up the code and apply the
-input from Marcel and Gustavo.
+> > > > > I'm getting this error whenever I use "hcitool cc" or "l2ping
+> > xx:xx:xx:xx:xx:xx"
+> > > > command.
+> > > > >
+> > > > > Kernel: version 2.6.30-rc3 from bluetooth-testing tree
+> > > > > HCI Tool: version 3.20
+> > > > > Laptop: Lenovo X61s
+> > > >
+> > > > can you rebase the bluetooth-testing.git tree from a few hours ago and
+> > > > test again.
+> > >
+> > > "git log" shows the last commit was ad4751fcada51292bb2967748667b582281647d0.
+> > > Bluetooth: Fix errors and warnings in L2CAP reported by checkpatch.pl
+> > >
+> > > Is it the latest one?
+> >
+> > yes, that one is the latest. What happens if you revert:
+> >
+> > commit d97ebf3798fb5745953230e049011f5b20b7c6d9
+> > Author: Roger Quadros <ext-roger.quadros@nokia.com>
+> > Date:   Thu Apr 23 14:50:54 2009 +0300
+> >
+> >     Bluetooth: Ensure that HCI sysfs add/del is preempt safe
+> >
+> > Does this one introduces your problem?
+> >
+> > What is your kernel config and hardware you are running this one? Seems
+> > not everybody is seeing this one.
+> >
+> Reverting d97ebf3798fb5745953230e049011f5b20b7c6d9 doesn't help.
+> 
+> Today I got a chance to test it with some old tags.
+> 
+> Tags:
+> v2.6.29:                no issue
+> v2.6.30-rc1:    no issue
+> v2.6.30-rc2:    BUG: sleeping function called from invalid context at mm/slub.c:1595
+> v2.6.30-rc3:    BUG: sleeping function called from invalid context at mm/slub.c:1595
+> 
+> It happens on my laptops, Lenovo X61s and Fujitsu Lifebook A6110, with both v2.6.30-rc2 and v2.6.30-rc3.
+> 
+> 
+> The followings are from my Lifebook A6110,
+> with blutooth-test git tag: v2.6.30-rc2 (commit 0882e8dd).
 
-Unfortunately, I did not get a chance to test this for regressions vs. the
-previous version of the code.  I did remove the code which segmented outgoing
-PDUs: it wouldn't have worked with the current tx window=1, and would have
-produced memory leaks.
+so I really think this is a kernel issue and not a Bluetooth issue. Can
+clone Linus' tree from today. All the important Bluetooth fixes for
+2.6.30 went in today.
 
-The code is available from git://staticfree.info/git/el2cap on branch "ertm".
+I did double check the flush_workqueue() and as far as I can tell we can
+sleep in that context. So for some reason we are in the wrong context. I
+really don't know why.
 
-Nathan Holstein (9):
-  Add #defines and data structures for enhanced L2CAP
-  Add support for sending enhanced L2CAP data
-  Add support for sending L2CAP S-frames.
-  Append RFC option when configuring an L2CAP socket.
-  Add support for parsing enhanced L2CAP configuration options.
-  Add support for receiving data over an enhanced L2CAP channel
-  Check the FCS of a received L2CAP packet.
-  Reassemble segmented L2CAP PDUs upon reception
-  Add support for negotiating new L2CAP options after a failed
-    configuration
+Regards
 
- include/net/bluetooth/bluetooth.h |    3 +-
- include/net/bluetooth/l2cap.h     |  124 +++++++-
- net/bluetooth/l2cap.c             |  607 ++++++++++++++++++++++++++++++++++---
- 3 files changed, 673 insertions(+), 61 deletions(-)
+Marcel
+
 
