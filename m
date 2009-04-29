@@ -1,52 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: RE: BUG: sleeping function called from invalid context at
- mm/slub.c:1595 --- "hcitool cc" or "l2ping"
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Bing Zhao <bzhao@marvell.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <477F20668A386D41ADCC57781B1F704301E3F5C7FC@SC-VEXCH1.marvell.com>
-References: <477F20668A386D41ADCC57781B1F704301E3F5C7F5@SC-VEXCH1.marvell.com>
-	 <1240966565.997.65.camel@localhost.localdomain>
-	 <477F20668A386D41ADCC57781B1F704301E3F5C7FC@SC-VEXCH1.marvell.com>
-Content-Type: text/plain
-Date: Wed, 29 Apr 2009 07:20:41 -0700
-Message-Id: <1241014841.997.69.camel@localhost.localdomain>
-Mime-Version: 1.0
+From: John Frankish <j-frankish@slb.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Wed, 29 Apr 2009 15:57:03 +0200
+Subject: RE: FW: Upgrade bluez-4.17 to 4.36 - headset no longer works
+Message-ID: <6AC5A55546F64545AE996F8200E3AC4EFCAB6E@NL0105EXC01V01.eur.slb.com>
+References: <6AC5A55546F64545AE996F8200E3AC4EFCA329@NL0105EXC01V01.eur.slb.com>
+ <2d5a2c100904260730v3598634boaee9ff24eb7bf45b@mail.gmail.com>
+In-Reply-To: <2d5a2c100904260730v3598634boaee9ff24eb7bf45b@mail.gmail.com>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bing,
 
-> > > I'm getting this error whenever I use "hcitool cc" or "l2ping xx:xx:xx:xx:xx:xx"
-> > command.
-> > >
-> > > Kernel: version 2.6.30-rc3 from bluetooth-testing tree
-> > > HCI Tool: version 3.20
-> > > Laptop: Lenovo X61s
-> > 
-> > can you rebase the bluetooth-testing.git tree from a few hours ago and
-> > test again.
-> 
-> "git log" shows the last commit was ad4751fcada51292bb2967748667b582281647d0.
-> Bluetooth: Fix errors and warnings in L2CAP reported by checkpatch.pl
-> 
-> Is it the latest one?
+-----Original Message-----
+From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+Sent: 26 April, 2009 18:30
+To: John Frankish
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: FW: Upgrade bluez-4.17 to 4.36 - headset no longer works
 
-yes, that one is the latest. What happens if you revert:
+Hi,
 
-commit d97ebf3798fb5745953230e049011f5b20b7c6d9
-Author: Roger Quadros <ext-roger.quadros@nokia.com>
-Date:   Thu Apr 23 14:50:54 2009 +0300
+On Sun, Apr 26, 2009 at 6:54 AM, John Frankish <j-frankish@slb.com> wrote:
 
-    Bluetooth: Ensure that HCI sysfs add/del is preempt safe
+> Playing WAVE '/usr/local/share/sounds/alsa/Noise.wav' : Signed 16 bit Little Endian, Rate 48000 Hz, Mono
+> ALSA lib pcm_bluetooth.c:1607:(audioservice_expect) BT_START_STREAM failed : Success(0)
+> ALSA lib pcm_bluetooth.c:1566:(audioservice_recv) Too short (1 bytes) IPC packet from bluetoothd
 
-Does this one introduces your problem?
+This normally indicates a mismatch version of ipc, iirc any failing
+code will be EIO. You should make sure both audio plugin and alsa
+plugin are compiled and installed with the same ipc.h, in the future
+we can probably add a version check for ipc to really indicate what is
+the real problem.
 
-What is your kernel config and hardware you are running this one? Seems
-not everybody is seeing this one.
+--
+Luiz Augusto von Dentz
+Engenheiro de Computação
 
-Regards
+------
+Thanks for the reply, but I'm not sure I fully understand...
 
-Marcel
-
-
+If the audio plugin and the alsa plugin are compiled at the same time, why wouldn't they use the same version of ipc.h ??
