@@ -1,21 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: ngh@isomerica.net
-To: linux-bluetooth@vger.kernel.org
-Subject: Revamped Enhanced Retransmission mode L2CAP support
-Date: Thu, 30 Apr 2009 17:16:37 -0400
-Message-Id: <1241126207-19996-1-git-send-email-ngh@isomerica.net>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 30 Apr 2009 20:58:57 +0200 (CEST)
+From: Jiri Kosina <jkosina@suse.cz>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Marc Pignat <Marc.Pignat@hevs.ch>,
+	Roger Quadros <ext-roger.quadros@nokia.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [BUG] 2.6.30-rc4 hid bluetooth not working
+In-Reply-To: <1241103783.3389.35.camel@localhost.localdomain>
+Message-ID: <alpine.LNX.2.00.0904302056270.5012@wotan.suse.de>
+References: <49F9C1AD020000BF00029086@mailgw2.hevs.ch>  <alpine.LRH.2.00.0904301556310.2050@twin.jikos.cz> <1241103783.3389.35.camel@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Thu, 30 Apr 2009, Marcel Holtmann wrote:
 
-This is a reworking of the previous patchset I submitted.  This includes fixes
-from Marcel's comments.
+> > > My bluetooth keyboard is not working any more in rc4, but was 
+> > > working in rc3. Here is the dmesg output, triggered by the first key 
+> > > press on the keyboard, fortunately, this is 100% reproductible (once 
+> > > per boot).
+> > Does reverting f3784d834c7 fix the problem?
+> we have seen a similar report where reverting f3784d834c7 didn't fix it. 
+> And I don't see anything wrong with that patch. Did something important 
+> got changed in the work queue code that I am missing?
 
- include/net/bluetooth/bluetooth.h |    3 
- include/net/bluetooth/l2cap.h     |  101 +++++-
- net/bluetooth/l2cap.c             |  628 ++++++++++++++++++++++++++++++++++----
- 3 files changed, 665 insertions(+), 67 deletions(-)
+Calling flush() from work->func() is not safe. That's what the WARN_ON() 
+in flush_cpu_workqueue() is there for, right?
 
-
-
-    --Nathan
+-- 
+Jiri Kosina
+SUSE Labs
