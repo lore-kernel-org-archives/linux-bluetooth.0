@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: ngh@isomerica.net
 To: linux-bluetooth@vger.kernel.org
 Cc: Nathan Holstein <nathan@lampreynetworks.com>
-Subject: [PATCH 08/10] Reassemble segmented L2CAP PDUs upon reception
-Date: Thu, 30 Apr 2009 17:16:45 -0400
-Message-Id: <1241126207-19996-9-git-send-email-ngh@isomerica.net>
+Subject: [PATCH 07/10] Check the FCS of a received L2CAP packet.
+Date: Thu, 30 Apr 2009 17:16:44 -0400
+Message-Id: <1241126207-19996-8-git-send-email-ngh@isomerica.net>
 In-Reply-To: <1241126207-19996-1-git-send-email-ngh@isomerica.net>
 References: <1241126207-19996-1-git-send-email-ngh@isomerica.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,71 +12,56 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Nathan Holstein <nathan@lampreynetworks.com>
 
-When configured in Enhanced Retransmission of Streaming modes, data sent over
-L2CAP can be broken up into multiple L2CAP SDUs.  This patch adds support for
-reassembling these packets upon reception.
+When in Enhanced Retransmission or Streaming modes, L2CAP supports an optional
+16 bit CRC to validate a packet.  This patch checks incoming SDUs for a correct
+FCS.
 
 Signed-off-by: Nathan Holstein <nathan@lampreynetworks.com>
 ---
- include/net/bluetooth/l2cap.h |    3 ++
- net/bluetooth/l2cap.c         |   53 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 56 insertions(+), 0 deletions(-)
+ net/bluetooth/l2cap.c |   46 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 45 insertions(+), 1 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 85fc21b..44e6e92 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -316,6 +316,9 @@ struct l2cap_pinfo {
- 	__u16		monitor_timeout;
- 	__u16		max_pdu_size;
- 
-+	__u16		sdu_next;
-+	__u16		sdu_len;
-+
- 	__le16		sport;
- 
-         struct sk_buff		*tx_buf;
 diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index ad96ce7..228f7f0 100644
+index b2c8dd7..ad96ce7 100644
 --- a/net/bluetooth/l2cap.c
 +++ b/net/bluetooth/l2cap.c
-@@ -2591,6 +2591,43 @@ static int l2cap_check_fcs(struct l2cap_pinfo *pi, struct l2cap_hdr *lh, struct
- 	return 0;
+@@ -53,7 +53,7 @@
+ 
+ #define VERSION "2.13"
+ 
+-static u32 l2cap_feat_mask = L2CAP_FEAT_FIXED_CHAN;
++static u32 l2cap_feat_mask = L2CAP_FEAT_FIXED_CHAN | L2CAP_FEAT_FCS;
+ static u8 l2cap_fixed_chan[8] = { 0x02, };
+ 
+ static const struct proto_ops l2cap_sock_ops;
+@@ -2563,6 +2563,34 @@ static inline void l2cap_sig_channel(struct l2cap_conn *conn, struct sk_buff *sk
+ 	kfree_skb(skb);
  }
  
-+static int l2cap_check_sar(struct l2cap_pinfo *pi, u16 control, struct sk_buff *skb)
++static int l2cap_check_fcs(struct l2cap_pinfo *pi, struct l2cap_hdr *lh, struct sk_buff *skb)
 +{
-+	u16 mask = control & L2CAP_CONTROL_SAR_MASK;
++	u16 our_fcs = 0;
++	u16 rcv_fcs;
 +
-+	switch (mask)
++	if (lh->len != skb->len)
++		return -1;
++
++	if (pi->fcs)
 +	{
-+	case L2CAP_SAR_UNSEGMENTED:
-+		if (pi->sdu_next != 0)
++		if (lh->len < 4)
 +			return -1;
-+		break;
 +
-+	case L2CAP_SAR_SDU_START:
-+		if (pi->sdu_next != 0 || skb->len < 2)
-+			return -1;
-+		pi->sdu_next = 1;
-+		pi->sdu_len = get_unaligned((__le16 *) skb->data);
-+		skb_pull(skb, 2);
-+		break;
++		/* Remove the FCS bytes from data */
++		skb->len -= 2;
++		rcv_fcs = get_unaligned((__le16 *) skb->data + skb->len);
++		/* Include the header in the FCS */
++		our_fcs = crc16(0, skb->data - 4, skb->len);
 +
-+	case L2CAP_SAR_SDU_CONTINUE:
-+		if (pi->sdu_next >= pi->sdu_len)
-+			return -1;
-+		++pi->sdu_next;
-+		break;
-+
-+	case L2CAP_SAR_SDU_END:
-+		/* TODO:
-+		 * How do we correctly signal MSG_EOR? */
-+		if (pi->sdu_next != pi->sdu_len)
-+			return -1;
-+		pi->sdu_next = pi->sdu_len = 0;
-+		break;
++		if (our_fcs != rcv_fcs)
++			return 0;
 +	}
++	else if (lh->len < 2)
++		return -1;
 +
 +	return 0;
 +}
@@ -84,35 +69,35 @@ index ad96ce7..228f7f0 100644
  static inline int l2cap_data_channel_i_frame(struct sock *sk, u16 rx_control, struct sk_buff *skb)
  {
  	struct l2cap_pinfo *pi = l2cap_pi(sk);
-@@ -2610,6 +2647,17 @@ static inline int l2cap_data_channel_i_frame(struct sock *sk, u16 rx_control, st
- 	L2CAP_SEQ_NUM_INC(pi->req_seq);
- 	tx_control = pi->req_seq << L2CAP_CONTROL_REQSEQ_SHIFT;
+@@ -2620,6 +2648,19 @@ static inline int l2cap_data_channel_enhanced(struct sock *sk, struct l2cap_hdr
  
-+	/* TODO:
-+	 * l2cap_check_sar() call side effects!  After calling this function,
-+	 * we can't reject the SDU without possibly screwing up reassembly.
-+	 * We need to ensure the sequence number is correct, and that we can
-+	 * queue the skb before calling l2cap_check_sar(). */
-+	if (l2cap_check_sar(pi, rx_control, skb)) {
-+		tx_control |= L2CAP_SUPER_REJECT;
-+		err = -1;
-+		goto respond;
+ 	BT_DBG("sk %p skb %p", sk, skb);
+ 
++	if (l2cap_check_fcs(pi, lh, skb))
++	{
++		BT_DBG("failed fcs");
++		control = pi->req_seq | L2CAP_CONTROL_TYPE_MASK |
++				L2CAP_SUPER_REJECT;
++		if (!l2cap_send_sframe(pi, control))
++		{
++			/* TODO:
++			 * set an error state, disconnect */
++		}
++		return -1;
 +	}
 +
- 	if ((err = sock_queue_rcv_skb(sk, skb))) {
- 		tx_control |= L2CAP_SUPER_RCV_NOT_READY;
- 		goto respond;
-@@ -2690,6 +2738,11 @@ static int l2cap_data_channel_streaming(struct sock *sk, struct l2cap_hdr *lh, s
  	control = get_unaligned((__le16 *) skb->data);
  	skb_pull(skb, 2);
  
-+	/* Todo:
-+	 * is this the proper behavior? */
-+	if (l2cap_is_I_frame(control) && l2cap_check_sar(pi, control, skb))
+@@ -2643,6 +2684,9 @@ static int l2cap_data_channel_streaming(struct sock *sk, struct l2cap_hdr *lh, s
+ 	struct l2cap_pinfo *pi = l2cap_pi(sk);
+ 	u16 control;
+ 
++	if (l2cap_check_fcs(pi, lh, skb))
 +		return -1;
 +
- 	if (!sock_queue_rcv_skb(sk, skb))
- 		return -1;
+ 	control = get_unaligned((__le16 *) skb->data);
+ 	skb_pull(skb, 2);
  
 -- 
 1.6.0.6
