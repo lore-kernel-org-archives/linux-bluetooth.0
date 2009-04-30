@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: ngh@isomerica.net
 To: linux-bluetooth@vger.kernel.org
 Cc: Nathan Holstein <nathan@lampreynetworks.com>
-Subject: [PATCH 09/10] Add support for negotiating new L2CAP options after a failed configuration
-Date: Thu, 30 Apr 2009 17:16:46 -0400
-Message-Id: <1241126207-19996-10-git-send-email-ngh@isomerica.net>
+Subject: [PATCH 08/10] Reassemble segmented L2CAP PDUs upon reception
+Date: Thu, 30 Apr 2009 17:16:45 -0400
+Message-Id: <1241126207-19996-9-git-send-email-ngh@isomerica.net>
 In-Reply-To: <1241126207-19996-1-git-send-email-ngh@isomerica.net>
 References: <1241126207-19996-1-git-send-email-ngh@isomerica.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,152 +12,108 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Nathan Holstein <nathan@lampreynetworks.com>
 
-When negotiating the configuration of an L2CAP socket, the remote may reject
-the initial configuration that was sent.  This patch adds allows selecting
-differing configuration values.
+When configured in Enhanced Retransmission of Streaming modes, data sent over
+L2CAP can be broken up into multiple L2CAP SDUs.  This patch adds support for
+reassembling these packets upon reception.
 
 Signed-off-by: Nathan Holstein <nathan@lampreynetworks.com>
 ---
- net/bluetooth/l2cap.c |  106 ++++++++++++++++++++++++++++++++++++++++++++----
- 1 files changed, 97 insertions(+), 9 deletions(-)
+ include/net/bluetooth/l2cap.h |    3 ++
+ net/bluetooth/l2cap.c         |   53 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 56 insertions(+), 0 deletions(-)
 
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 85fc21b..44e6e92 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -316,6 +316,9 @@ struct l2cap_pinfo {
+ 	__u16		monitor_timeout;
+ 	__u16		max_pdu_size;
+ 
++	__u16		sdu_next;
++	__u16		sdu_len;
++
+ 	__le16		sport;
+ 
+         struct sk_buff		*tx_buf;
 diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 228f7f0..b7c2e94 100644
+index ad96ce7..228f7f0 100644
 --- a/net/bluetooth/l2cap.c
 +++ b/net/bluetooth/l2cap.c
-@@ -2012,6 +2012,70 @@ static int l2cap_parse_conf_req(struct sock *sk, void *data)
- 	return ptr - data;
+@@ -2591,6 +2591,43 @@ static int l2cap_check_fcs(struct l2cap_pinfo *pi, struct l2cap_hdr *lh, struct
+ 	return 0;
  }
  
-+static inline int l2cap_parse_conf_rsp(struct sock *sk, void *rsp, int len, void *_req, u16 *result)
++static int l2cap_check_sar(struct l2cap_pinfo *pi, u16 control, struct sk_buff *skb)
 +{
-+	struct l2cap_pinfo *pi = l2cap_pi(sk);
-+	struct l2cap_conf_req *req = _req;
-+	void *ptr = req->data;
-+	int type, hint, olen;
-+	unsigned long val;
-+	struct l2cap_conf_rfc rfc;
++	u16 mask = control & L2CAP_CONTROL_SAR_MASK;
 +
-+	BT_DBG("sk %p, rsp %p, len %d, req %p", sk, rsp, len, _req);
++	switch (mask)
++	{
++	case L2CAP_SAR_UNSEGMENTED:
++		if (pi->sdu_next != 0)
++			return -1;
++		break;
 +
-+	while (len >= L2CAP_CONF_OPT_SIZE) {
-+		len -= l2cap_get_conf_opt(&rsp, &type, &olen, &val);
++	case L2CAP_SAR_SDU_START:
++		if (pi->sdu_next != 0 || skb->len < 2)
++			return -1;
++		pi->sdu_next = 1;
++		pi->sdu_len = get_unaligned((__le16 *) skb->data);
++		skb_pull(skb, 2);
++		break;
 +
-+		hint  = type & L2CAP_CONF_HINT;
-+		type &= 0x7f;
++	case L2CAP_SAR_SDU_CONTINUE:
++		if (pi->sdu_next >= pi->sdu_len)
++			return -1;
++		++pi->sdu_next;
++		break;
 +
-+		switch (type) {
-+		case L2CAP_CONF_MTU:
-+			if (val < L2CAP_DEFAULT_MIN_MTU)
-+			{
-+				*result = L2CAP_CONF_UNACCEPT;
-+				pi->omtu = L2CAP_DEFAULT_MIN_MTU;
-+			}
-+			else
-+				pi->omtu = val;
-+			l2cap_add_conf_opt(&ptr, L2CAP_CONF_MTU, 2, pi->omtu);
-+			break;
-+
-+		case L2CAP_CONF_FLUSH_TO:
-+			pi->flush_to = val;
-+			l2cap_add_conf_opt(&ptr, L2CAP_CONF_FLUSH_TO, 2,
-+						pi->flush_to);
-+			break;
-+
-+		case L2CAP_CONF_QOS:
-+			break;
-+
-+		case L2CAP_CONF_RFC:
-+			/* Currently, the code does not support negotiating to
-+			 * use a different mode than was initially created. This
-+			 * can be used for switching between ERTM/Streaming, and
-+			 * will be useful for implementing MCAP/HDP on top of
-+			 * eL2CAP. */
-+			*result = L2CAP_CONF_UNACCEPT;
-+			if (pi->mode == L2CAP_MODE_BASIC)
-+				pi->fcs = 0;
-+			l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC,
-+						sizeof(rfc), (unsigned long) &rfc);
-+			break;
-+
-+		case L2CAP_CONF_FCS:
-+			pi->fcs = val;
-+			l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1, pi->fcs);
-+		}
++	case L2CAP_SAR_SDU_END:
++		/* TODO:
++		 * How do we correctly signal MSG_EOR? */
++		if (pi->sdu_next != pi->sdu_len)
++			return -1;
++		pi->sdu_next = pi->sdu_len = 0;
++		break;
 +	}
 +
-+	req->dcid   = cpu_to_le16(pi->dcid);
-+	req->flags  = cpu_to_le16(0x0000);
-+
-+	BT_DBG("ptr %p, req->data %p", ptr, req->data);
-+	return ptr - _req;
++	return 0;
 +}
 +
- static int l2cap_build_conf_rsp(struct sock *sk, void *data, u16 result, u16 flags)
+ static inline int l2cap_data_channel_i_frame(struct sock *sk, u16 rx_control, struct sk_buff *skb)
  {
- 	struct l2cap_conf_rsp *rsp = data;
-@@ -2233,6 +2297,15 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 	if (sk->sk_state == BT_DISCONN)
- 		goto unlock;
+ 	struct l2cap_pinfo *pi = l2cap_pi(sk);
+@@ -2610,6 +2647,17 @@ static inline int l2cap_data_channel_i_frame(struct sock *sk, u16 rx_control, st
+ 	L2CAP_SEQ_NUM_INC(pi->req_seq);
+ 	tx_control = pi->req_seq << L2CAP_CONTROL_REQSEQ_SHIFT;
  
-+	/* Reject if connected and in eL2CAP mode. */
-+	if (sk->sk_state == BT_CONNECTED && l2cap_pi(sk)->mode != L2CAP_MODE_BASIC)
-+	{
-+		l2cap_send_cmd(conn, cmd->ident, L2CAP_CONF_RSP,
-+				l2cap_build_conf_rsp(sk, rsp,
-+					L2CAP_CONF_REJECT, flags), rsp);
-+		goto unlock;
++	/* TODO:
++	 * l2cap_check_sar() call side effects!  After calling this function,
++	 * we can't reject the SDU without possibly screwing up reassembly.
++	 * We need to ensure the sequence number is correct, and that we can
++	 * queue the skb before calling l2cap_check_sar(). */
++	if (l2cap_check_sar(pi, rx_control, skb)) {
++		tx_control |= L2CAP_SUPER_REJECT;
++		err = -1;
++		goto respond;
 +	}
 +
- 	/* Reject if config buffer is too small. */
- 	len = cmd_len - sizeof(*req);
- 	if (l2cap_pi(sk)->conf_len + len > sizeof(l2cap_pi(sk)->conf_req)) {
-@@ -2301,21 +2374,36 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 	if (!sk)
- 		return 0;
+ 	if ((err = sock_queue_rcv_skb(sk, skb))) {
+ 		tx_control |= L2CAP_SUPER_RCV_NOT_READY;
+ 		goto respond;
+@@ -2690,6 +2738,11 @@ static int l2cap_data_channel_streaming(struct sock *sk, struct l2cap_hdr *lh, s
+ 	control = get_unaligned((__le16 *) skb->data);
+ 	skb_pull(skb, 2);
  
-+	/* Reject if connected and in eL2CAP mode. */
-+	if (sk->sk_state == BT_CONNECTED && l2cap_pi(sk)->mode != L2CAP_MODE_BASIC)
-+	{
-+		l2cap_send_cmd(conn, cmd->ident, L2CAP_CONF_RSP,
-+				l2cap_build_conf_rsp(sk, rsp,
-+					L2CAP_CONF_REJECT, flags), rsp);
-+		goto done;
-+	}
++	/* Todo:
++	 * is this the proper behavior? */
++	if (l2cap_is_I_frame(control) && l2cap_check_sar(pi, control, skb))
++		return -1;
 +
- 	switch (result) {
- 	case L2CAP_CONF_SUCCESS:
- 		break;
+ 	if (!sock_queue_rcv_skb(sk, skb))
+ 		return -1;
  
- 	case L2CAP_CONF_UNACCEPT:
- 		if (++l2cap_pi(sk)->conf_retry < L2CAP_CONF_MAX_RETRIES) {
--			char req[128];
--			/* It does not make sense to adjust L2CAP parameters
--			 * that are currently defined in the spec. We simply
--			 * resend config request that we sent earlier. It is
--			 * stupid, but it helps qualification testing which
--			 * expects at least some response from us. */
--			l2cap_send_cmd(conn, l2cap_get_ident(conn), L2CAP_CONF_REQ,
--						l2cap_build_conf_req(sk, req), req);
--			goto done;
-+			int len = cmd->len - sizeof(*rsp);
-+			char req[64];
-+
-+			/* throw out any old conf requests we stored */
-+			result = L2CAP_CONF_SUCCESS;
-+			len = l2cap_parse_conf_rsp(sk, rsp->data, len, req,
-+					&result);
-+
-+			BT_DBG("len %d", len);
-+			l2cap_send_cmd(conn, l2cap_get_ident(conn),
-+						L2CAP_CONF_REQ, len, req);
-+			if (result == L2CAP_CONF_SUCCESS)
-+				break;
-+			else
-+				goto done;
- 		}
- 
- 	default:
 -- 
 1.6.0.6
 
