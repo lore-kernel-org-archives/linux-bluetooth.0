@@ -1,49 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <49FB0A07.2020200@gmail.com>
-Date: Fri, 01 May 2009 18:41:11 +0400
-From: Ilya Rubtsov <lusyaru@gmail.com>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: DeviceFound and DeviceDisappeared signals
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-Id: <49FA604C020000BF000290B6@mailgw2.hevs.ch>
+Date: Fri, 01 May 2009 02:37:00 +0200
+From: "Marc Pignat" <Marc.Pignat@hevs.ch>
+To: <marcel@holtmann.org>,<jkosina@suse.cz>
+Cc: <ext-roger.quadros@nokia.com>,<linux-bluetooth@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [BUG] 2.6.30-rc4 hid bluetooth not working
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi! I have some troubles with using DeviceFound and DeviceDisappeared 
-signals. I use simple test script: http://pastebin.com/m45de7894 . There 
-are two cases: if I use software inquire scheduler and if I use hardware 
-one.
+Subject: bluetooth: Fix serialization when adding/deleting connections in =
+hci_sysfs
 
-Hardware scheduler. Bluetooth module in phone is on and I run script:
----
-ilya@ilya-laptop:~/blue$ python fodis.py
-Fri May  1 16:36:44 2009 Signal: DeviceFound 00:16:B8:53:5F:17
----
-And no more signals. Then I wait 2 mins, turn off Bluetooth in phone and 
-wait 2 more mins, but no one signal is emitted.
-I don't know if DeviceFound signal should be emitted on every inquire, 
-maybe not. But I'm sure DeviceDisappeared signal should be emitted at 
-least once :)
+add_conn and del_conn should be serialized, but flush_workqueue can't be =
+used
+by the worker thread on it's own queue, so use flush_work to serialize =
+add_conn
+and del_conn against each other.
 
-
-Software scheduler ("DiscoverSchedulerInterval = 1" at main.conf). 
-Bluetooth module in phone is on and I run script:
----
-ilya@ilya-laptop:~/blue$ python fodis.py
-Fri May  1 16:43:52 2009 Signal: DeviceFound 00:16:B8:53:5F:17
-Fri May  1 16:44:11 2009 Signal: DeviceDisappeared 00:16:B8:53:5F:17
-Fri May  1 16:44:14 2009 Signal: DeviceFound 00:16:B8:53:5F:17
-Fri May  1 16:44:34 2009 Signal: DeviceDisappeared 00:16:B8:53:5F:17
-Fri May  1 16:44:37 2009 Signal: DeviceFound 00:16:B8:53:5F:17
-Fri May  1 16:44:57 2009 Signal: DeviceDisappeared 00:16:B8:53:5F:17
-Fri May  1 16:45:00 2009 Signal: DeviceFound 00:16:B8:53:5F:17
-Fri May  1 16:45:20 2009 Signal: DeviceDisappeared 00:16:B8:53:5F:17
-Fri May  1 16:45:23 2009 Signal: DeviceFound 00:16:B8:53:5F:17
-### At this moment I turn off Bluetooth in phone
-Fri May  1 16:45:43 2009 Signal: DeviceDisappeared 00:16:B8:53:5F:17
+Signed-off-by: Marc Pignat <marc.pignat@hevs.ch>
 ---
 
-So, both signals was emitted on every inquiry. I think this is wrong 
-behavior. Am I right?
-And DeviceDisappeared was emitted once after remote device was actually 
-turned off. That's good :)
+patch against 2.6.30-rc4.
+
+
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index b7c5108..42695e3 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -89,8 +89,8 @@ static void add_conn(struct work_struct *work)
+ {
+ 	struct hci_conn *conn =3D container_of(work, struct hci_conn, =
+work_add);
+=20
+-	/* ensure previous add/del is complete */
+-	flush_workqueue(bluetooth);
++	/* ensure previous del is complete */
++	flush_work(&conn->work_del);
+=20
+ 	if (device_add(&conn->dev) < 0) {
+ 		BT_ERR("Failed to register connection device");
+@@ -134,8 +134,8 @@ static void del_conn(struct work_struct *work)
+ 	struct hci_conn *conn =3D container_of(work, struct hci_conn, =
+work_del);
+ 	struct hci_dev *hdev =3D conn->hdev;
+=20
+-	/* ensure previous add/del is complete */
+-	flush_workqueue(bluetooth);
++	/* ensure previous add is complete */
++	flush_work(&conn->work_add);
+=20
+ 	while (1) {
+ 		struct device *dev;
