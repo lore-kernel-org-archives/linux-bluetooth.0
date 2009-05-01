@@ -1,31 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 2 May 2009 00:20:22 +0200 (CEST)
-From: Jiri Kosina <jkosina@suse.cz>
-To: Marc Pignat <Marc.Pignat@hevs.ch>
-Cc: marcel@holtmann.org, ext-roger.quadros@nokia.com,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [BUG] 2.6.30-rc4 hid bluetooth not working
-In-Reply-To: <49FA604C020000BF000290B6@mailgw2.hevs.ch>
-Message-ID: <alpine.LNX.2.00.0905020019360.22532@wotan.suse.de>
-References: <49FA604C020000BF000290B6@mailgw2.hevs.ch>
+Date: Fri, 1 May 2009 22:27:34 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Thomas Gillespie <tjg35@cam.ac.uk>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: A2DP headset
+Message-ID: <20090501192734.GA2966@jh-x301>
+References: <1241201091.12079.4.camel@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1241201091.12079.4.camel@localhost.localdomain>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 1 May 2009, Marc Pignat wrote:
+Hi Thomas,
 
-> Subject: bluetooth: Fix serialization when adding/deleting connections in hci_sysfs
-> 
-> add_conn and del_conn should be serialized, but flush_workqueue can't be used
-> by the worker thread on it's own queue, so use flush_work to serialize add_conn
-> and del_conn against each other.
-> 
-> Signed-off-by: Marc Pignat <marc.pignat@hevs.ch>
+On Fri, May 01, 2009, Thomas Gillespie wrote:
+> I'm trying to connect my A2DP headset to my computer. It works fine in
+> HSP/HFP mode, but when i try to connect to the audio sink via dbus it
+> won't connect. I get 
+> "bluetoothd[1618]: No matching ACP and INT SEPs found"
+> in my /var/log/messages file. What does this mean? 
 
-Acked-by: Jiri Kosina <jkosina@suse.cz>
+A2DP has a concept of Stream End Points (SEPs). To create an audio stream
+you need to hook up an Audio Source SEP on one device (in your case your
+computer) to an Audio Sink SEP on another device (your headset). That
+message you got means that bluetoothd didn't find an Audio Sink SEP in the
+headset that would match in it's properties (codec, etc) an available
+Audio Source SEP on your computer.
 
-FWIW.
+Why this all is happening is another matter though. Have you done any
+special changes to /etc/bluetooth/audio.conf? Could you enable bluetoothd
+debug messages (-d switch) and give us the complete log when trying to
+connect A2DP to the headset. The output of hcidump -XV when connecting
+A2DP might also provide some useful information.
 
--- 
-Jiri Kosina
-SUSE Labs
+Johan
