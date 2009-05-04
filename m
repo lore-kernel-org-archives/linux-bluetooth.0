@@ -1,74 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: alokbarsode@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.com, Alok Barsode <alok.barsode@azingo.com>
-Subject: [PATCH 1/3] Do not exit if adapter_ops setup fails.
-Date: Mon,  4 May 2009 20:38:12 +0530
-Message-Id: <1241449694-17135-1-git-send-email-alok.barsode@azingo.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <49FE9FED.5070909@nokia.com>
+Date: Mon, 04 May 2009 10:57:33 +0300
+From: Roger Quadros <ext-roger.quadros@nokia.com>
+MIME-Version: 1.0
+To: ext Marcel Holtmann <marcel@holtmann.org>
+CC: Marc Pignat <Marc.Pignat@hevs.ch>, justinmattock@gmail.com,
+        hidave.darkstar@gmail.com, jkosina@suse.cz,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [BUG] 2.6.30-rc4 hid bluetooth not working
+References: <49FDCC85020000BF000290ED@mailgw2.hevs.ch> <1241381821.2785.2.camel@localhost.localdomain>
+In-Reply-To: <1241381821.2785.2.camel@localhost.localdomain>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Alok Barsode <alok.barsode@azingo.com>
+ext Marcel Holtmann wrote:
+> Hi Marc,
+> 
+> you really need to fix your mailer. You keep breaking the threading all
+> the time and that is clearly your fault.
+> 
+>>> thanks for testing.
+>>> Marc, Roger, can you test this and confirm that it works for you and
+>>> doesn't have any other side effects. Then I prepare it work upstream
+>>> inclusion.
+>> Tested and working!
+> 
+> great. So I queue this up for 2.6.30 inclusion.
+> 
+>> Exercise left for 2.6.31: use the system wide wq ;)
+> 
+> Actually no, the private workqueue is used on purpose. No need to bother
+> keventd for a regular task.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
 
----
- src/adapter.c |   15 ++++++++++-----
- src/main.c    |    5 +----
- 2 files changed, 11 insertions(+), 9 deletions(-)
+Hi Marcel,
 
-diff --git a/src/adapter.c b/src/adapter.c
-index df85f6b..7ac361b 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -406,9 +406,11 @@ static int set_mode(struct btd_adapter *adapter, uint8_t new_mode)
- 	scan_enable = mode2scan(new_mode);
- 
- 	if (!adapter->up && scan_enable != SCAN_DISABLED) {
--		err = adapter_ops->start(adapter->dev_id);
--		if (err < 0)
--			return err;
-+		if (adapter_ops) {
-+			err = adapter_ops->start(adapter->dev_id);
-+			if (err < 0)
-+				return err;
-+		}
- 	}
- 
- 	dd = hci_open_dev(adapter->dev_id);
-@@ -3095,13 +3097,16 @@ int btd_register_adapter_ops(struct btd_adapter_ops *btd_adapter_ops)
- 
- void btd_adapter_cleanup_ops()
- {
--	adapter_ops->cleanup();
-+	if (adapter_ops)
-+		adapter_ops->cleanup();
- }
- 
- int adapter_ops_setup()
- {
--	if (!adapter_ops)
-+	if (!adapter_ops) {
-+		error("Unable to initialize adapter operations");
- 		return -EINVAL;
-+	}
- 
- 	return adapter_ops->setup();
- }
-diff --git a/src/main.c b/src/main.c
-index 884257f..8dd2cee 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -412,10 +412,7 @@ int main(int argc, char *argv[])
- 
- 	event_loop = g_main_loop_new(NULL, FALSE);
- 
--	if (adapter_ops_setup() < 0) {
--		error("adapter_ops_setup failed");
--		exit(1);
--	}
-+	adapter_ops_setup();
- 
- 	starting = FALSE;
- 
--- 
-1.5.6.3
+Yes it works for me too. Thanks.
 
+regards,
+-roger
