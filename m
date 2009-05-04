@@ -2,87 +2,73 @@ Return-Path: <cyrus@holtmann.org>
 From: alokbarsode@gmail.com
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.com, Alok Barsode <alok.barsode@azingo.com>
-Subject: [PATCH 2/3] Code cleanup in adapter.c.
-Date: Mon,  4 May 2009 20:38:13 +0530
-Message-Id: <1241449694-17135-2-git-send-email-alok.barsode@azingo.com>
-In-Reply-To: <1241449694-17135-1-git-send-email-alok.barsode@azingo.com>
-References: <1241449694-17135-1-git-send-email-alok.barsode@azingo.com>
+Subject: [PATCH 1/3] Do not exit if adapter_ops setup fails.
+Date: Mon,  4 May 2009 20:38:12 +0530
+Message-Id: <1241449694-17135-1-git-send-email-alok.barsode@azingo.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Alok Barsode <alok.barsode@azingo.com>
 
-Not passing device descriptor to adater_up.
 ---
- src/adapter.c |   17 +++++++++++++----
- 1 files changed, 13 insertions(+), 4 deletions(-)
+ src/adapter.c |   15 ++++++++++-----
+ src/main.c    |    5 +----
+ 2 files changed, 11 insertions(+), 9 deletions(-)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index 7ac361b..2135795 100644
+index df85f6b..7ac361b 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -2001,11 +2001,12 @@ static int get_pairable_timeout(const char *src)
- 	return main_opts.pairto;
- }
+@@ -406,9 +406,11 @@ static int set_mode(struct btd_adapter *adapter, uint8_t new_mode)
+ 	scan_enable = mode2scan(new_mode);
  
--static int adapter_up(struct btd_adapter *adapter, int dd)
-+static int adapter_up(struct btd_adapter *adapter)
- {
- 	char mode[14], srcaddr[18];
- 	uint8_t scan_mode;
- 	gboolean powered, dev_down = FALSE;
-+	int dd;
- 
- 	ba2str(&adapter->bdaddr, srcaddr);
- 
-@@ -2048,7 +2049,7 @@ static int adapter_up(struct btd_adapter *adapter, int dd)
- 		else
- 			write_device_mode(&adapter->bdaddr, mode);
- 
--		return adapter_up(adapter, dd);
-+		return adapter_up(adapter);
- 	} else if (!g_str_equal(mode, "connectable") &&
- 			adapter->discov_timeout == 0) {
- 		/* Set discoverable only if timeout is 0 */
-@@ -2058,10 +2059,16 @@ static int adapter_up(struct btd_adapter *adapter, int dd)
+ 	if (!adapter->up && scan_enable != SCAN_DISABLED) {
+-		err = adapter_ops->start(adapter->dev_id);
+-		if (err < 0)
+-			return err;
++		if (adapter_ops) {
++			err = adapter_ops->start(adapter->dev_id);
++			if (err < 0)
++				return err;
++		}
  	}
  
- proceed:
-+	dd = hci_open_dev(adapter->dev_id);
-+
-+	if (dd < 0)
-+		return -EIO;
-+
- 	if (dev_down == FALSE)
- 		hci_send_cmd(dd, OGF_HOST_CTL, OCF_WRITE_SCAN_ENABLE,
- 				1, &scan_mode);
+ 	dd = hci_open_dev(adapter->dev_id);
+@@ -3095,13 +3097,16 @@ int btd_register_adapter_ops(struct btd_adapter_ops *btd_adapter_ops)
  
-+
- 	if (adapter->initialized == FALSE) {
- 		load_drivers(adapter);
- 		load_devices(adapter);
-@@ -2086,6 +2093,8 @@ proceed:
- 					ADAPTER_INTERFACE, "Powered",
- 					DBUS_TYPE_BOOLEAN, &powered);
- 
-+	hci_close_dev(dd);
-+
- 	return 0;
+ void btd_adapter_cleanup_ops()
+ {
+-	adapter_ops->cleanup();
++	if (adapter_ops)
++		adapter_ops->cleanup();
  }
  
-@@ -2199,10 +2208,10 @@ setup:
- 	adapter->state &= ~STD_INQUIRY;
+ int adapter_ops_setup()
+ {
+-	if (!adapter_ops)
++	if (!adapter_ops) {
++		error("Unable to initialize adapter operations");
+ 		return -EINVAL;
++	}
  
- 	adapter_setup(adapter, dd);
--	err = adapter_up(adapter, dd);
--
- 	hci_close_dev(dd);
+ 	return adapter_ops->setup();
+ }
+diff --git a/src/main.c b/src/main.c
+index 884257f..8dd2cee 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -412,10 +412,7 @@ int main(int argc, char *argv[])
  
-+	err = adapter_up(adapter);
-+
- 	info("Adapter %s has been enabled", adapter->path);
+ 	event_loop = g_main_loop_new(NULL, FALSE);
  
- 	return err;
+-	if (adapter_ops_setup() < 0) {
+-		error("adapter_ops_setup failed");
+-		exit(1);
+-	}
++	adapter_ops_setup();
+ 
+ 	starting = FALSE;
+ 
 -- 
 1.5.6.3
 
