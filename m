@@ -1,86 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: alokbarsode@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.com, Alok Barsode <alok.barsode@azingo.com>
-Subject: [PATCH 1/2] Code cleanup in adapter.c.
-Date: Tue,  5 May 2009 18:55:02 +0530
-Message-Id: <1241529903-6001-1-git-send-email-alok.barsode@azingo.com>
+From: "Xu, Martin" <martin.xu@intel.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: "Liu, Bing Wei" <bing.wei.liu@intel.com>
+Date: Tue, 5 May 2009 16:06:42 +0800
+Subject: RE: kernel carsh using Bluez on Netbook platform  
+Message-ID: <9F0C1DB20AFA954FA1DA05309350433D5F913D94@pdsmsx503.ccr.corp.intel.com>
+References: <ef67228d0905031346q740aa88es5203a64a151de2e@mail.gmail.com>
+ <1241399835.2899.0.camel@localhost.localdomain>
+ <9F0C1DB20AFA954FA1DA05309350433D5F913D45@pdsmsx503.ccr.corp.intel.com>
+In-Reply-To: <9F0C1DB20AFA954FA1DA05309350433D5F913D45@pdsmsx503.ccr.corp.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Alok Barsode <alok.barsode@azingo.com>
+>On netbook platform( Eeepc 901; "Aspire One + Omiz Bluetooth dongle"), when using >bluez, such as paring, l2ping and rfcomm, kernel crashes easily.
+>I am using kernel 2.6.29. 
 
-Not passing device descriptor to adater_up.
----
- src/adapter.c |   17 +++++++++++++----
- 1 files changed, 13 insertions(+), 4 deletions(-)
+>I caught the crash messag:
+>BUG: spinlock bad magic on CPU#0, swapper/0
+>Bug: unable to handle kernel paging request at 00646733
 
-diff --git a/src/adapter.c b/src/adapter.c
-index d9914e2..9a7ad85 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1999,11 +1999,12 @@ static int get_pairable_timeout(const char *src)
- 	return main_opts.pairto;
- }
- 
--static int adapter_up(struct btd_adapter *adapter, int dd)
-+static int adapter_up(struct btd_adapter *adapter)
- {
- 	char mode[14], srcaddr[18];
- 	uint8_t scan_mode;
- 	gboolean powered, dev_down = FALSE;
-+	int dd;
- 
- 	ba2str(&adapter->bdaddr, srcaddr);
- 
-@@ -2046,7 +2047,7 @@ static int adapter_up(struct btd_adapter *adapter, int dd)
- 		else
- 			write_device_mode(&adapter->bdaddr, mode);
- 
--		return adapter_up(adapter, dd);
-+		return adapter_up(adapter);
- 	} else if (!g_str_equal(mode, "connectable") &&
- 			adapter->discov_timeout == 0) {
- 		/* Set discoverable only if timeout is 0 */
-@@ -2056,10 +2057,16 @@ static int adapter_up(struct btd_adapter *adapter, int dd)
- 	}
- 
- proceed:
-+	dd = hci_open_dev(adapter->dev_id);
-+
-+	if (dd < 0)
-+		return -EIO;
-+
- 	if (dev_down == FALSE)
- 		hci_send_cmd(dd, OGF_HOST_CTL, OCF_WRITE_SCAN_ENABLE,
- 				1, &scan_mode);
- 
-+
- 	if (adapter->initialized == FALSE) {
- 		load_drivers(adapter);
- 		load_devices(adapter);
-@@ -2084,6 +2091,8 @@ proceed:
- 					ADAPTER_INTERFACE, "Powered",
- 					DBUS_TYPE_BOOLEAN, &powered);
- 
-+	hci_close_dev(dd);
-+
- 	return 0;
- }
- 
-@@ -2197,10 +2206,10 @@ setup:
- 	adapter->state &= ~STD_INQUIRY;
- 
- 	adapter_setup(adapter, dd);
--	err = adapter_up(adapter, dd);
+I have done some research on the issue and found that at 
+hci_event.c: hci_disconn_complete_evt()
+After 
+hci_conn_del_sysfs(conn)
+The contents of conn maybe modified 
+Such as 
+conn->idle_timer
+conn->disc_timer
+and
+conn->list
+that leads to crash of kernel when run hci_conn_del(conn)
+
+I worked a patch to run hci_conn_del_sysfs after hci_conn_del and find that the issue can be fixed. Some one can tell me whether the patch is ok, and the root cause of the issue. Thanks! :) 
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index f91ba69..1999ac1 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1009,10 +1009,9 @@ static inline void hci_disconn_complete_evt(struct
+hci_dev *hdev, struct sk_buff
+        if (conn) {
+                conn->state = BT_CLOSED;
+
+-               hci_conn_del_sysfs(conn);
 -
- 	hci_close_dev(dd);
- 
-+	err = adapter_up(adapter);
-+
- 	info("Adapter %s has been enabled", adapter->path);
- 
- 	return err;
--- 
-1.5.6.3
+                hci_proto_disconn_ind(conn, ev->reason);
+                hci_conn_del(conn);
++               hci_conn_del_sysfs(conn);
+        }
 
+        hci_dev_unlock(hdev);
