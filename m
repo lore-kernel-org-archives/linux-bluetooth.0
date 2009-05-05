@@ -1,119 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bing Zhao <bzhao@marvell.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Tue, 5 May 2009 11:45:54 -0700
-Subject: RE: BUG: sleeping function called from invalid context at
- mm/slub.c:1595 --- "hcitool cc" or "l2ping"
-Message-ID: <477F20668A386D41ADCC57781B1F704301E6294CCF@SC-VEXCH1.marvell.com>
-References: <477F20668A386D41ADCC57781B1F704301E3F5C7F5@SC-VEXCH1.marvell.com>
-	 <1240966565.997.65.camel@localhost.localdomain>
-	 <477F20668A386D41ADCC57781B1F704301E3F5C7FC@SC-VEXCH1.marvell.com>
-	 <1241014841.997.69.camel@localhost.localdomain>
-	 <477F20668A386D41ADCC57781B1F704301E3F5CA53@SC-VEXCH1.marvell.com>
-	 <1241044716.3389.7.camel@localhost.localdomain>
-	 <477F20668A386D41ADCC57781B1F704301E4183334@SC-VEXCH1.marvell.com>
- <1241070186.3389.29.camel@localhost.localdomain>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Subject: RE: kernel carsh using Bluez on Netbook platform
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Xu, Martin" <martin.xu@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"Liu, Bing Wei" <bing.wei.liu@intel.com>
+In-Reply-To: <1241538231.2987.1.camel@localhost.localdomain>
+References: <ef67228d0905031346q740aa88es5203a64a151de2e@mail.gmail.com>
+	 <1241399835.2899.0.camel@localhost.localdomain>
+	 <9F0C1DB20AFA954FA1DA05309350433D5F913D45@pdsmsx503.ccr.corp.intel.com>
+	 <9F0C1DB20AFA954FA1DA05309350433D5F913D94@pdsmsx503.ccr.corp.intel.com>
+	 <1241538231.2987.1.camel@localhost.localdomain>
+Content-Type: text/plain
+Date: Tue, 05 May 2009 09:08:47 -0700
+Message-Id: <1241539727.2987.12.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> >
-> > > > > > > > > I'm getting this error whenever I use "hcitool cc" or "l2=
-ping
-> > > > > > xx:xx:xx:xx:xx:xx"
-> > > > > > > > command.
-> > > > > > > > >
-> > > > > > > > > Kernel: version 2.6.30-rc3 from bluetooth-testing tree
-> > > > > > > > > HCI Tool: version 3.20
-> > > > > > > > > Laptop: Lenovo X61s
-> > > > > > > >
-> > > > > > > > can you rebase the bluetooth-testing.git tree from a few ho=
-urs ago and
-> > > > > > > > test again.
-> > > > > > >
-> > > > > > > "git log" shows the last commit was ad4751fcada51292bb2967748=
-667b582281647d0.
-> > > > > > > Bluetooth: Fix errors and warnings in L2CAP reported by check=
-patch.pl
-> > > > > > >
-> > > > > > > Is it the latest one?
-> > > > > >
-> > > > > > yes, that one is the latest. What happens if you revert:
-> > > > > >
-> > > > > > commit d97ebf3798fb5745953230e049011f5b20b7c6d9
-> > > > > > Author: Roger Quadros <ext-roger.quadros@nokia.com>
-> > > > > > Date:   Thu Apr 23 14:50:54 2009 +0300
-> > > > > >
-> > > > > >     Bluetooth: Ensure that HCI sysfs add/del is preempt safe
-> > > > > >
-> > > > > > Does this one introduces your problem?
-> > > > > >
-> > > > > > What is your kernel config and hardware you are running this on=
-e? Seems
-> > > > > > not everybody is seeing this one.
-> > > > > >
-> > > > > Reverting d97ebf3798fb5745953230e049011f5b20b7c6d9 doesn't help.
-> > > > >
-> > > > > Today I got a chance to test it with some old tags.
-> > > > >
-> > > > > Tags:
-> > > > > v2.6.29:                no issue
-> > > > > v2.6.30-rc1:    no issue
-> > > > > v2.6.30-rc2:    BUG: sleeping function called from invalid contex=
-t at mm/slub.c:1595
-> > > > > v2.6.30-rc3:    BUG: sleeping function called from invalid contex=
-t at mm/slub.c:1595
-> > > > >
-> > > > > It happens on my laptops, Lenovo X61s and Fujitsu Lifebook A6110,=
- with both v2.6.30-rc2 and
-> > > > v2.6.30-rc3.
-> > > > >
-> > > > >
-> > > > > The followings are from my Lifebook A6110,
-> > > > > with blutooth-test git tag: v2.6.30-rc2 (commit 0882e8dd).
-> > > >
-> > > > so I really think this is a kernel issue and not a Bluetooth issue.=
- Can
-> > > > clone Linus' tree from today. All the important Bluetooth fixes for
-> > > > 2.6.30 went in today.
-> > > >
-> > > > I did double check the flush_workqueue() and as far as I can tell w=
-e can
-> > > > sleep in that context. So for some reason we are in the wrong conte=
-xt. I
-> > > > really don't know why.
-> > >
-> > > OK. I'll clone Linus's tree and give it a try when I get a chance.
-> >
-> > I re-based bluetooth-testing.git against 2.6.30-rc4 and that is as
-> > recent as it gets right now.
-> >
-> > Regards
-> >
-> > Marcel
-> >
->=20
-> Hi Marcel,
->=20
-> Just tested the latest 2.6.30-rc4 code from bluetooth-testing.git
-> and Linus's linux-2.6.git
->=20
-> This error still occurs in both git trees when I do an "hcitool cc" or l2=
-ping:
->=20
-> BUG: sleeping function called from invalid context at mm/slub.c:1595
->=20
+Hi Martin,
 
-Hi Marvel,
+> > >On netbook platform( Eeepc 901; "Aspire One + Omiz Bluetooth dongle"), when using >bluez, such as paring, l2ping and rfcomm, kernel crashes easily.
+> > >I am using kernel 2.6.29. 
+> > 
+> > >I caught the crash messag:
+> > >BUG: spinlock bad magic on CPU#0, swapper/0
+> > >Bug: unable to handle kernel paging request at 00646733
+> > 
+> > I have done some research on the issue and found that at 
+> > hci_event.c: hci_disconn_complete_evt()
+> > After 
+> > hci_conn_del_sysfs(conn)
+> > The contents of conn maybe modified 
+> > Such as 
+> > conn->idle_timer
+> > conn->disc_timer
+> > and
+> > conn->list
+> > that leads to crash of kernel when run hci_conn_del(conn)
+> > 
+> > I worked a patch to run hci_conn_del_sysfs after hci_conn_del and find that the issue can be fixed. Some one can tell me whether the patch is ok, and the root cause of the issue. Thanks! :) 
+> > 
+> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > index f91ba69..1999ac1 100644
+> > --- a/net/bluetooth/hci_event.c
+> > +++ b/net/bluetooth/hci_event.c
+> > @@ -1009,10 +1009,9 @@ static inline void hci_disconn_complete_evt(struct
+> > hci_dev *hdev, struct sk_buff
+> >         if (conn) {
+> >                 conn->state = BT_CLOSED;
+> > 
+> > -               hci_conn_del_sysfs(conn);
+> > -
+> >                 hci_proto_disconn_ind(conn, ev->reason);
+> >                 hci_conn_del(conn);
+> > +               hci_conn_del_sysfs(conn);
+> >         }
+> > 
+> >         hci_dev_unlock(hdev);
+> 
+> can you verify that a bluetooth-testing.git kernel would still procude
+> this NULL pointer dereference. It looks a little bit different, but I
+> think that actually got fixed now.
 
-The patch you sent to Davide yesterday, actually fixed my problem as well.
+I just double-checked the kernel patches and since you are still running
+a 2.6.29 kernel you might be missing this patch:
 
-Thanks a lot for the nice job.
+Bluetooth: Move hci_conn_del_sysfs() back to avoid device destruct too early
 
-Bing
+@@ -287,6 +287,8 @@ int hci_conn_del(struct hci_conn *conn)
+ 
+ 	skb_queue_purge(&conn->data_q);
+ 
++	hci_conn_del_sysfs(conn);
++
+ 	return 0;
+ }
+ 
+@@ -560,8 +562,6 @@ void hci_conn_hash_flush(struct hci_dev *hdev)
+ 
+ 		c->state = BT_CLOSED;
+ 
+-		hci_conn_del_sysfs(c);
+-
+ 		hci_proto_disconn_cfm(c, 0x16);
+ 		hci_conn_del(c);
+ 	}
+
+The code got a lot of changes when adding Simple Pairing support and
+thus you might need a special patch if you wanna keep using 2.6.29. I
+would still advise you to check with bluetooth-testing.git first and if
+that works, then just backport all of the Bluetooth patches. The Fedora
+kernel contains two patches for the backport already and the missing
+ones can be added easily on top of it.
+
+Regards
+
+Marcel
 
 
-
-Best regards,
-Bing
