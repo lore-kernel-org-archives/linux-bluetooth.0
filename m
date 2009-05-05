@@ -1,20 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Xu, Martin" <martin.xu@intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Wed, 6 May 2009 10:36:22 +0800
-Subject: RE: kernel carsh using Bluez on Netbook platform
-Message-ID: <9F0C1DB20AFA954FA1DA05309350433D5F985B83@pdsmsx503.ccr.corp.intel.com>
-References: <ef67228d0905031346q740aa88es5203a64a151de2e@mail.gmail.com>
-	 <1241399835.2899.0.camel@localhost.localdomain>
-	 <9F0C1DB20AFA954FA1DA05309350433D5F913D45@pdsmsx503.ccr.corp.intel.com>
-	 <9F0C1DB20AFA954FA1DA05309350433D5F913D94@pdsmsx503.ccr.corp.intel.com>
-	 <1241538231.2987.1.camel@localhost.localdomain>
- <1241539727.2987.12.camel@localhost.localdomain>
-In-Reply-To: <1241539727.2987.12.camel@localhost.localdomain>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Subject: RE: BUG: sleeping function called from invalid context at
+ mm/slub.c:1595 --- "hcitool cc" or "l2ping"
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Bing Zhao <bzhao@marvell.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <477F20668A386D41ADCC57781B1F704301E6294CCF@SC-VEXCH1.marvell.com>
+References: <477F20668A386D41ADCC57781B1F704301E3F5C7F5@SC-VEXCH1.marvell.com>
+	 <1240966565.997.65.camel@localhost.localdomain>
+	 <477F20668A386D41ADCC57781B1F704301E3F5C7FC@SC-VEXCH1.marvell.com>
+	 <1241014841.997.69.camel@localhost.localdomain>
+	 <477F20668A386D41ADCC57781B1F704301E3F5CA53@SC-VEXCH1.marvell.com>
+	 <1241044716.3389.7.camel@localhost.localdomain>
+	 <477F20668A386D41ADCC57781B1F704301E4183334@SC-VEXCH1.marvell.com>
+	 <1241070186.3389.29.camel@localhost.localdomain>
+	 <477F20668A386D41ADCC57781B1F704301E6294CCF@SC-VEXCH1.marvell.com>
+Content-Type: text/plain
+Date: Tue, 05 May 2009 12:14:29 -0700
+Message-Id: <1241550869.2987.24.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Marcel:
-Thank you very much, that really helpful!
+Hi Bing,
+
+> > > > > > > > > > I'm getting this error whenever I use "hcitool cc" or "l2ping
+> > > > > > > xx:xx:xx:xx:xx:xx"
+> > > > > > > > > command.
+> > > > > > > > > >
+> > > > > > > > > > Kernel: version 2.6.30-rc3 from bluetooth-testing tree
+> > > > > > > > > > HCI Tool: version 3.20
+> > > > > > > > > > Laptop: Lenovo X61s
+> > > > > > > > >
+> > > > > > > > > can you rebase the bluetooth-testing.git tree from a few hours ago and
+> > > > > > > > > test again.
+> > > > > > > >
+> > > > > > > > "git log" shows the last commit was ad4751fcada51292bb2967748667b582281647d0.
+> > > > > > > > Bluetooth: Fix errors and warnings in L2CAP reported by checkpatch.pl
+> > > > > > > >
+> > > > > > > > Is it the latest one?
+> > > > > > >
+> > > > > > > yes, that one is the latest. What happens if you revert:
+> > > > > > >
+> > > > > > > commit d97ebf3798fb5745953230e049011f5b20b7c6d9
+> > > > > > > Author: Roger Quadros <ext-roger.quadros@nokia.com>
+> > > > > > > Date:   Thu Apr 23 14:50:54 2009 +0300
+> > > > > > >
+> > > > > > >     Bluetooth: Ensure that HCI sysfs add/del is preempt safe
+> > > > > > >
+> > > > > > > Does this one introduces your problem?
+> > > > > > >
+> > > > > > > What is your kernel config and hardware you are running this one? Seems
+> > > > > > > not everybody is seeing this one.
+> > > > > > >
+> > > > > > Reverting d97ebf3798fb5745953230e049011f5b20b7c6d9 doesn't help.
+> > > > > >
+> > > > > > Today I got a chance to test it with some old tags.
+> > > > > >
+> > > > > > Tags:
+> > > > > > v2.6.29:                no issue
+> > > > > > v2.6.30-rc1:    no issue
+> > > > > > v2.6.30-rc2:    BUG: sleeping function called from invalid context at mm/slub.c:1595
+> > > > > > v2.6.30-rc3:    BUG: sleeping function called from invalid context at mm/slub.c:1595
+> > > > > >
+> > > > > > It happens on my laptops, Lenovo X61s and Fujitsu Lifebook A6110, with both v2.6.30-rc2 and
+> > > > > v2.6.30-rc3.
+> > > > > >
+> > > > > >
+> > > > > > The followings are from my Lifebook A6110,
+> > > > > > with blutooth-test git tag: v2.6.30-rc2 (commit 0882e8dd).
+> > > > >
+> > > > > so I really think this is a kernel issue and not a Bluetooth issue. Can
+> > > > > clone Linus' tree from today. All the important Bluetooth fixes for
+> > > > > 2.6.30 went in today.
+> > > > >
+> > > > > I did double check the flush_workqueue() and as far as I can tell we can
+> > > > > sleep in that context. So for some reason we are in the wrong context. I
+> > > > > really don't know why.
+> > > >
+> > > > OK. I'll clone Linus's tree and give it a try when I get a chance.
+> > >
+> > > I re-based bluetooth-testing.git against 2.6.30-rc4 and that is as
+> > > recent as it gets right now.
+> > >
+> > > Regards
+> > >
+> > > Marcel
+> > >
+> > 
+> > Hi Marcel,
+> > 
+> > Just tested the latest 2.6.30-rc4 code from bluetooth-testing.git
+> > and Linus's linux-2.6.git
+> > 
+> > This error still occurs in both git trees when I do an "hcitool cc" or l2ping:
+> > 
+> > BUG: sleeping function called from invalid context at mm/slub.c:1595
+>
+> The patch you sent to Davide yesterday, actually fixed my problem as well.
+
+good to know that this fixes your issue, too. Will queue this up from
+upstream inclusion.
+
+Regards
+
+Marcel
+
+
