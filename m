@@ -1,73 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-From: Hugo Mildenberger <Hugo.Mildenberger@namir.de>
-To: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: BT git version triggers BUG: scheduling while atomic: swapper/0/0x10000100
-Date: Tue, 5 May 2009 08:29:25 +0200
+Subject: Re: BT git version triggers BUG: scheduling while atomic:
+ swapper/0/0x10000100
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Hugo Mildenberger <Hugo.Mildenberger@namir.de>
 Cc: linux-bluetooth@vger.kernel.org
-References: <200905050301.37528.Hugo.Mildenberger@namir.de> <200905050323.42101.Hugo.Mildenberger@namir.de> <1241488613.3319.3.camel@localhost.localdomain>
-In-Reply-To: <1241488613.3319.3.camel@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="utf-8"
-Message-Id: <200905050829.26036.Hugo.Mildenberger@namir.de>
+In-Reply-To: <200905050323.42101.Hugo.Mildenberger@namir.de>
+References: <200905050301.37528.Hugo.Mildenberger@namir.de>
+	 <1241485973.3319.1.camel@localhost.localdomain>
+	 <200905050323.42101.Hugo.Mildenberger@namir.de>
+Content-Type: multipart/mixed; boundary="=-tn73CkV+R47GdOHsg4ga"
+Date: Mon, 04 May 2009 18:56:53 -0700
+Message-Id: <1241488613.3319.3.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Marcel,
 
-> > > > When I tried to get a mobile phone connected to asterisk via
-> > > > bluetooth, the current git version of the linux bluetooth stack
-> > > > triggers a kernel bug:
-> > > >
-> > > > 	BUG: scheduling while atomic: swapper/0/0x10000100
-> > > >
-> > > > This is triggered the moment when asterisk tries to pair the phone
-> > > > and leaves at least the BT subsystem in an unusable state.
+--=-tn73CkV+R47GdOHsg4ga
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+
+Hi Hugo,
+
+> > > When I tried to get a mobile phone connected to asterisk via bluetooth,
+> > > the current git version of the linux bluetooth stack triggers a kernel
+> > > bug:
 > > >
-> > > are you running Linus' tree or bluetooth-testing.git? If your are not
-> > > running bluetooth-testing.git, then please try that one since it
-> > > includes a fix for it.
+> > > 	BUG: scheduling while atomic: swapper/0/0x10000100
+> > >
+> > > This is triggered the moment when asterisk tries to pair the phone and
+> > > leaves at least the BT subsystem in an unusable state.
 > >
-> > I'm running bluetooth-testing.git and pulled that tree just an hour ago.
+> > are you running Linus' tree or bluetooth-testing.git? If your are not
+> > running bluetooth-testing.git, then please try that one since it
+> > includes a fix for it.
 >
-> does the attached patch fixes your issue?
->
-> Regards
->
-> Marcel
+> I'm running bluetooth-testing.git and pulled that tree just an hour ago.
 
-you are really fast ... and your patch actually fixed the problem. Thank you 
-very much!
+does the attached patch fixes your issue?
 
-Rests to mention a problem which could again be linked to the bluetooth stack, 
-but also to the CSR dongle (which is blacklisted in btusb.c: 0x0a12:0001), to 
-Asterisk's "chan_mobile" module or even to the Nokia 6280 V6.43 firmware. 
-Should I better start another thread here?
+Regards
+
+Marcel
 
 
-[Outbound GSM call via Asterisk and BT-adapter, wait until the other side 
-hangs up]
+--=-tn73CkV+R47GdOHsg4ga
+Content-Disposition: attachment; filename="patch"
+Content-Type: text/x-patch; name="patch"; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 46
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 46
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 46
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 46
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 47
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 47
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 47
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index 582d887..a05d45e 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -88,10 +88,13 @@ static struct device_type bt_link = {
+ static void add_conn(struct work_struct *work)
+ {
+ 	struct hci_conn *conn = container_of(work, struct hci_conn, work_add);
++	struct hci_dev *hdev = conn->hdev;
+ 
+ 	/* ensure previous del is complete */
+ 	flush_work(&conn->work_del);
+ 
++	dev_set_name(&conn->dev, "%s:%d", hdev->name, conn->handle);
++
+ 	if (device_add(&conn->dev) < 0) {
+ 		BT_ERR("Failed to register connection device");
+ 		return;
+@@ -154,12 +157,8 @@ void hci_conn_init_sysfs(struct hci_conn *conn)
+ 
+ void hci_conn_add_sysfs(struct hci_conn *conn)
+ {
+-	struct hci_dev *hdev = conn->hdev;
+-
+ 	BT_DBG("conn %p", conn);
+ 
+-	dev_set_name(&conn->dev, "%s:%d", hdev->name, conn->handle);
+-
+ 	queue_work(bt_workq, &conn->work_add);
+ }
+ 
 
-[Outbound GSM call via Asterisk and BT-adapter, hang up the IP phone up before 
-the other side does so]
+--=-tn73CkV+R47GdOHsg4ga--
 
-btusb_isoc_complete: hci0 corrupted SCO packet
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 0
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 0
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 0
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 0
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 0
-
-[And Asterisk says: - Bluetooth Device Nokia has disconnected, reason (104)]
-
-
-Best Regards
-
-Hugo
