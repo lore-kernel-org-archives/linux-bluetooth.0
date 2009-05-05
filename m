@@ -1,95 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jaikumar Ganesh <jaikumar@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jaikumar Ganesh <jaikumar@google.com>
-Subject: [PATCH] Emit device_found when RSSI changes.
-Date: Mon,  4 May 2009 23:32:39 -0700
-Message-Id: <1241505159-12795-1-git-send-email-jaikumar@google.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Hugo Mildenberger <Hugo.Mildenberger@namir.de>
+To: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: BT git version triggers BUG: scheduling while atomic: swapper/0/0x10000100
+Date: Tue, 5 May 2009 08:29:25 +0200
+Cc: linux-bluetooth@vger.kernel.org
+References: <200905050301.37528.Hugo.Mildenberger@namir.de> <200905050323.42101.Hugo.Mildenberger@namir.de> <1241488613.3319.3.camel@localhost.localdomain>
+In-Reply-To: <1241488613.3319.3.camel@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200905050829.26036.Hugo.Mildenberger@namir.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When the RSSI of the remote device changes, emit
-device found. Currently, we were not sending
-emit_device_found signal, when the RSSI of already
-found devices gets updated.
+Hello Marcel,
 
-Signed-off-by: Jaikumar Ganesh <jaikumar@google.com>
----
- src/adapter.c  |   24 +++++++++---------------
- src/dbus-hci.c |   10 ++++++++--
- 2 files changed, 17 insertions(+), 17 deletions(-)
+> > > > When I tried to get a mobile phone connected to asterisk via
+> > > > bluetooth, the current git version of the linux bluetooth stack
+> > > > triggers a kernel bug:
+> > > >
+> > > > 	BUG: scheduling while atomic: swapper/0/0x10000100
+> > > >
+> > > > This is triggered the moment when asterisk tries to pair the phone
+> > > > and leaves at least the BT subsystem in an unusable state.
+> > >
+> > > are you running Linus' tree or bluetooth-testing.git? If your are not
+> > > running bluetooth-testing.git, then please try that one since it
+> > > includes a fix for it.
+> >
+> > I'm running bluetooth-testing.git and pulled that tree just an hour ago.
+>
+> does the attached patch fixes your issue?
+>
+> Regards
+>
+> Marcel
 
-diff --git a/src/adapter.c b/src/adapter.c
-index d9914e2..1ec076d 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2639,6 +2639,15 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
- 	g_free(alias);
- }
- 
-+void adapter_update_found_devices_for_rssi(struct btd_adapter *adapter,
-+				struct remote_dev_info *dev, int8_t rssi)
-+{
-+	dev->rssi = rssi;
-+	adapter->found_devices = g_slist_sort(adapter->found_devices,
-+						(GCompareFunc) dev_rssi_cmp);
-+	adapter_emit_device_found(adapter, dev);
-+}
-+
- void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
- 				int8_t rssi, uint32_t class, const char *name,
- 				const char *alias, gboolean legacy,
-@@ -2650,13 +2659,6 @@ void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
- 	bacpy(&match.bdaddr, bdaddr);
- 	match.name_status = NAME_ANY;
- 
--	dev = adapter_search_found_devices(adapter, &match);
--	if (dev) {
--		if (rssi == dev->rssi)
--			return;
--		goto done;
--	}
--
- 	dev = g_new0(struct remote_dev_info, 1);
- 
- 	bacpy(&dev->bdaddr, bdaddr);
-@@ -2669,14 +2671,6 @@ void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
- 	dev->name_status = name_status;
- 
- 	adapter->found_devices = g_slist_prepend(adapter->found_devices, dev);
--
--done:
--	dev->rssi = rssi;
--
--	adapter->found_devices = g_slist_sort(adapter->found_devices,
--						(GCompareFunc) dev_rssi_cmp);
--
--	adapter_emit_device_found(adapter, dev);
- }
- 
- int adapter_remove_found_device(struct btd_adapter *adapter, bdaddr_t *bdaddr)
-diff --git a/src/dbus-hci.c b/src/dbus-hci.c
-index 932682a..d7df415 100644
---- a/src/dbus-hci.c
-+++ b/src/dbus-hci.c
-@@ -668,9 +668,15 @@ void hcid_dbus_inquiry_result(bdaddr_t *local, bdaddr_t *peer, uint32_t class,
- 	memset(&match, 0, sizeof(struct remote_dev_info));
- 	bacpy(&match.bdaddr, peer);
- 	match.name_status = NAME_SENT;
--	/* if found: don't send the name again */
-+	/* 
-+	 * if found and rssi has changed, emit device_found
-+	 * if found: don't send the name again.
-+	 */
- 	dev = adapter_search_found_devices(adapter, &match);
--	if (dev)
-+	if (dev && dev->rssi != rssi) {
-+		adapter_update_found_devices_for_rssi(adapter, dev, rssi);
-+		return;
-+	} else if (dev)
- 		return;
- 
- 	/* the inquiry result can be triggered by NON D-Bus client */
--- 
-1.5.4.3
+you are really fast ... and your patch actually fixed the problem. Thank you 
+very much!
 
+Rests to mention a problem which could again be linked to the bluetooth stack, 
+but also to the CSR dongle (which is blacklisted in btusb.c: 0x0a12:0001), to 
+Asterisk's "chan_mobile" module or even to the Nokia 6280 V6.43 firmware. 
+Should I better start another thread here?
+
+
+[Outbound GSM call via Asterisk and BT-adapter, wait until the other side 
+hangs up]
+
+hci_scodata_packet: hci0 SCO packet for unknown connection handle 46
+hci_scodata_packet: hci0 SCO packet for unknown connection handle 46
+hci_scodata_packet: hci0 SCO packet for unknown connection handle 46
+hci_scodata_packet: hci0 SCO packet for unknown connection handle 46
+hci_scodata_packet: hci0 SCO packet for unknown connection handle 47
+hci_scodata_packet: hci0 SCO packet for unknown connection handle 47
+hci_scodata_packet: hci0 SCO packet for unknown connection handle 47
+
+[Outbound GSM call via Asterisk and BT-adapter, hang up the IP phone up before 
+the other side does so]
+
+btusb_isoc_complete: hci0 corrupted SCO packet
+hci_scodata_packet: hci0 SCO packet for unknown connection handle 0
+hci_scodata_packet: hci0 SCO packet for unknown connection handle 0
+hci_scodata_packet: hci0 SCO packet for unknown connection handle 0
+hci_scodata_packet: hci0 SCO packet for unknown connection handle 0
+hci_scodata_packet: hci0 SCO packet for unknown connection handle 0
+
+[And Asterisk says: - Bluetooth Device Nokia has disconnected, reason (104)]
+
+
+Best Regards
+
+Hugo
