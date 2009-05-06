@@ -1,107 +1,110 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1241488563.3319.2.camel@localhost.localdomain>
-References: <2da21fe50905031022o73481d88tdaecb88491cfcfd2@mail.gmail.com>
-	<1241381725.2785.0.camel@localhost.localdomain> <2da21fe50905041506m2d9fc879l715e34f1a2027046@mail.gmail.com>
-	<1241488563.3319.2.camel@localhost.localdomain>
-From: Davide Pesavento <davidepesa@gmail.com>
-Date: Wed, 6 May 2009 18:33:59 +0200
-Message-ID: <2da21fe50905060933y587fbd79m2bfa4ec8ad53a2fa@mail.gmail.com>
-Subject: Re: [regression] connecting a bluetooth mouse triggers multiple BUGs
-	and warnings
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Date: Wed, 6 May 2009 11:54:41 -0300
+Message-ID: <5d223510905060754p70b53725u52963a0b41c82788@mail.gmail.com>
+Subject: HSP and HFP no sound
+From: Rafael Seste <rseste@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi
 
-On Tue, May 5, 2009 at 03:56, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Davide,
->
->> the NULL pointer dereference and the warnings are indeed fixed in
->> bluetooth-testing, and the mouse works. Thanks!
->> However the following issue remains:
->>
->> [ =C2=A0110.012125] BUG: sleeping function called from invalid context a=
-t
->> mm/slub.c:1595
->> [ =C2=A0110.012135] in_atomic(): 1, irqs_disabled(): 0, pid: 0, name:
->> swapper
->> [ =C2=A0110.012141] 2 locks held by swapper/0:
->> [ =C2=A0110.012145] =C2=A0#0: =C2=A0(hci_task_lock){++.-.+}, at: [<fffff=
-fffa01f822f>]
->> hci_rx_task+0x2f/0x2d0 [bluetooth]
->> [ =C2=A0110.012173] =C2=A0#1: =C2=A0(&hdev->lock){+.-.+.}, at: [<fffffff=
-fa01fb9e2>]
->> hci_event_packet+0x72/0x25c0 [bluetooth]
->> [ =C2=A0110.012198] Pid: 0, comm: swapper Tainted: G =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0W
->> 2.6.30-rc4-g953cdaa #1
->> [ =C2=A0110.012203] Call Trace:
->> [ =C2=A0110.012207] =C2=A0<IRQ> =C2=A0[<ffffffff8023eabd>] __might_sleep=
-+0x14d/0x170
->> [ =C2=A0110.012228] =C2=A0[<ffffffff802cfbe1>] __kmalloc+0x111/0x170
->> [ =C2=A0110.012239] =C2=A0[<ffffffff803c2094>] kvasprintf+0x64/0xb0
->> [ =C2=A0110.012248] =C2=A0[<ffffffff803b7a5b>] kobject_set_name_vargs+0x=
-3b/0xa0
->> [ =C2=A0110.012257] =C2=A0[<ffffffff80465326>] dev_set_name+0x76/0xa0
->> [ =C2=A0110.012273] =C2=A0[<ffffffffa01fb9e2>] ? hci_event_packet+0x72/0=
-x25c0
->> [bluetooth]
->> [ =C2=A0110.012289] =C2=A0[<ffffffffa01ffc1d>] hci_conn_add_sysfs+0x3d/0=
-x70
->> [bluetooth]
->> [ =C2=A0110.012303] =C2=A0[<ffffffffa01fba2c>] hci_event_packet+0xbc/0x2=
-5c0
->> [bluetooth]
->> [ =C2=A0110.012312] =C2=A0[<ffffffff80516eb0>] ? sock_def_readable+0x80/=
-0xa0
->> [ =C2=A0110.012328] =C2=A0[<ffffffffa01fee0c>] ? hci_send_to_sock+0xfc/0=
-x1c0
->> [bluetooth]
->> [ =C2=A0110.012343] =C2=A0[<ffffffff80516eb0>] ? sock_def_readable+0x80/=
-0xa0
->> [ =C2=A0110.012347] =C2=A0[<ffffffff805e88c5>] ? _read_unlock+0x75/0x80
->> [ =C2=A0110.012354] =C2=A0[<ffffffffa01fee0c>] ? hci_send_to_sock+0xfc/0=
-x1c0
->> [bluetooth]
->> [ =C2=A0110.012360] =C2=A0[<ffffffffa01f8403>] hci_rx_task+0x203/0x2d0
->> [bluetooth]
->> [ =C2=A0110.012365] =C2=A0[<ffffffff80250ab5>] tasklet_action+0xb5/0x160
->> [ =C2=A0110.012369] =C2=A0[<ffffffff8025116c>] __do_softirq+0x9c/0x150
->> [ =C2=A0110.012372] =C2=A0[<ffffffff805e850f>] ? _spin_unlock+0x3f/0x80
->> [ =C2=A0110.012376] =C2=A0[<ffffffff8020cbbc>] call_softirq+0x1c/0x30
->> [ =C2=A0110.012380] =C2=A0[<ffffffff8020f01d>] do_softirq+0x8d/0xe0
->> [ =C2=A0110.012383] =C2=A0[<ffffffff80250df5>] irq_exit+0xc5/0xe0
->> [ =C2=A0110.012386] =C2=A0[<ffffffff8020e71d>] do_IRQ+0x9d/0x120
->> [ =C2=A0110.012389] =C2=A0[<ffffffff8020c3d3>] ret_from_intr+0x0/0xf
->> [ =C2=A0110.012391] =C2=A0<EOI> =C2=A0[<ffffffff80431832>] ? acpi_idle_e=
-nter_bm+0x264/0x2a6
->> [ =C2=A0110.012399] =C2=A0[<ffffffff80431828>] ? acpi_idle_enter_bm+0x25=
-a/0x2a6
->> [ =C2=A0110.012403] =C2=A0[<ffffffff804f50d5>] ? cpuidle_idle_call+0xc5/=
-0x130
->> [ =C2=A0110.012407] =C2=A0[<ffffffff8020a4b4>] ? cpu_idle+0xc4/0x130
->> [ =C2=A0110.012411] =C2=A0[<ffffffff805d2268>] ? rest_init+0x88/0xb0
->> [ =C2=A0110.012416] =C2=A0[<ffffffff807e2fbd>] ? start_kernel+0x3b5/0x41=
-2
->> [ =C2=A0110.012420] =C2=A0[<ffffffff807e2281>] ? x86_64_start_reservatio=
-ns+0x91/0xb5
->> [ =C2=A0110.012424] =C2=A0[<ffffffff807e2394>] ? x86_64_start_kernel+0xe=
-f/0x11b
->> [ =C2=A0110.320835] Bluetooth: HIDP (Human Interface Emulation) ver 1.2
->> [ =C2=A0110.349150] input: Mighty Mouse as
->> /devices/pci0000:00/0000:00:1d.3/usb5/5-1/5-1:1.0/bluetooth/hci0/hci0:46=
-/input10
->> [ =C2=A0110.351343] apple 0005:05AC:030C.0004: input: BLUETOOTH HID v2.0=
-0
->> Mouse [Mighty Mouse] on 00:17:F2:AB:8D:45
->
-> try the attached patch. It should fix this.
->
+I'm trying to make bluetooth work in a embedded hw its an arm. I'm
+using HSP and HFP.
+I can scan, pair, make and receive calls but I can hear no sound in
+both directions.
 
-Yes, the patch fixes the BUG. Thanks a lot!
+I'm posting some information:
 
-Regards,
-Davide
+root@debian:/var/log# uname -a
+Linux debian 2.6.22.18 #3 Tue May 5 15:51:47 BRT 2009 armv5tejl GNU/Linux
+
+root@debian:/var/log# apt-cache policy bluez
+bluez:
+  Installed: 4.32-0ubuntu4
+  Candidate: 4.32-0ubuntu4
+  Version table:
+ *** 4.32-0ubuntu4 0
+        500 http://ports.ubuntu.com jaunty/main Packages
+        100 /var/lib/dpkg/status
+
+root@debian:/var/log# vi syslog
+May  6 09:34:53 debian kernel: usb 1-1: new full speed USB device
+using ehci_marvell and address 3
+May  6 09:34:53 debian kernel: usb 1-1: configuration #1 chosen from 1 choice
+May  6 09:34:53 debian bluetoothd[1235]: HCI dev 0 registered
+May  6 09:34:54 debian bluetoothd[1235]: HCI dev 0 up
+May  6 09:34:54 debian bluetoothd[1235]: Starting security manager 0
+May  6 09:34:54 debian bluetoothd[1235]: rfcomm_bind: Address already
+in use (98)
+May  6 09:34:54 debian bluetoothd[1235]: audio-headset: Operation not
+permitted (1)
+May  6 09:34:54 debian bluetoothd[1235]: l2cap_bind: Address already in use (98)
+May  6 09:34:54 debian bluetoothd[1235]: audio-a2dp: Operation not permitted (1)
+May  6 09:34:54 debian bluetoothd[1235]: Registered interface
+org.bluez.SerialProxyManager on path /org/bluez/1235/hci0
+May  6 09:34:54 debian bluetoothd[1235]: Registered interface
+org.bluez.Service on path /org/bluez/1235/hci0
+May  6 09:34:54 debian bluetoothd[1235]: Registered interface
+org.bluez.Control on path /org/bluez/1235/hci0/dev_00_1D_FD_E4_42_FF
+May  6 09:34:54 debian bluetoothd[1235]: Registered interface
+org.bluez.Serial on path /org/bluez/1235/hci0/dev_00_1D_FD_E4_42_FF
+May  6 09:34:54 debian bluetoothd[1235]: probe failed with driver
+input-headset for device /org/bluez/1235/hci0/dev_00_1D_FD_E4_42_FF
+May  6 09:34:54 debian bluetoothd[1235]: Registered interface
+org.bluez.Control on path /org/bluez/1235/hci0/dev_00_21_FB_B4_45_07
+May  6 09:34:54 debian bluetoothd[1235]: Registered interface
+org.bluez.Serial on path /org/bluez/1235/hci0/dev_00_21_FB_B4_45_07
+May  6 09:34:54 debian bluetoothd[1235]: probe failed with driver
+input-headset for device /org/bluez/1235/hci0/dev_00_21_FB_B4_45_07
+May  6 09:34:54 debian bluetoothd[1235]: Adapter /org/bluez/1235/hci0
+has been enabled
+May  6 09:34:54 debian bluetoothd[1235]: Failed to access HAL
+
+root@debian:/var/log# hciconfig -a
+hci0:   Type: USB
+        BD Address: 00:19:5D:0F:53:07 ACL MTU: 672:3 SCO MTU: 48:1
+        UP RUNNING PSCAN
+        RX bytes:4082 acl:51 sco:0 events:157 errors:0
+        TX bytes:1715 acl:52 sco:0 commands:72 errors:0
+        Features: 0xff 0x3e 0x85 0x30 0x18 0x18 0x00 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+        Name: 'Sheeva'
+        Class: 0x480204
+        Service Classes: Capturing, Telephony
+        Device Class: Phone, Cellular
+        HCI Ver: 1.2 (0x2) HCI Rev: 0x1f4 LMP Ver: 1.2 (0x2) LMP Subver: 0x1f4
+        Manufacturer: Integrated System Solution Corp. (57)
+
+
+root@debian:/var/log# hciconfig hci0 voice
+hci0:   Type: USB
+        BD Address: 00:19:5D:0F:53:07 ACL MTU: 672:3 SCO MTU: 48:1
+        Voice setting: 0x0060 (Default Condition)
+        Input Coding: Linear
+        Input Data Format: 2's complement
+        Input Sample Size: 16 bit
+        # of bits padding at MSB: 0
+
+root@debian:/var/log# bluetoothd -dn
+bluetoothd[1535]: Bluetooth daemon
+bluetoothd[1535]: Enabling debug information
+bluetoothd[1535]: parsing main.conf
+bluetoothd[1535]: discovto=0
+bluetoothd[1535]: pairto=0
+bluetoothd[1535]: pageto=8192
+bluetoothd[1535]: name=Sheeva
+bluetoothd[1535]: class=0x100204
+bluetoothd[1535]: inqmode=0
+bluetoothd[1535]: Key file does not have key 'DeviceID'
+bluetoothd[1535]: Unable to get on D-Bus
+
+
+
+-- 
+Rafael S. Seste
+Eng Computação - Unicamp
