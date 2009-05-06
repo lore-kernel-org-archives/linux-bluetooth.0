@@ -1,40 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 6 May 2009 12:42:22 +0300
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: alokbarsode@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        Alok Barsode <alok.barsode@azingo.com>
+Subject: Re: [PATCH 2/2] Adding stop() functionality to hciops plugin.
+Message-ID: <20090506094222.GA3215@localhost>
+References: <1241599077-26438-1-git-send-email-alok.barsode@azingo.com> <1241599077-26438-2-git-send-email-alok.barsode@azingo.com>
 MIME-Version: 1.0
-In-Reply-To: <20090506093049.GA31559@localhost>
-References: <1241601540-6540-1-git-send-email-forrest.zhao@intel.com>
-	 <20090506093049.GA31559@localhost>
-Date: Wed, 6 May 2009 20:28:17 +0800
-Message-ID: <ac8af0be0905060528o6777bdc5l87399646d5471b2e@mail.gmail.com>
-Subject: Re: [PATCH] in headset_init(), it's possible that hs->hfp_handle is
-	not set, so we should not check hs->hfp_handle in headset_connect_cb()
-From: Zhao Forrest <forrest.zhao@gmail.com>
-To: Johan Hedberg <johan.hedberg@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1241599077-26438-2-git-send-email-alok.barsode@azingo.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
->
-> I don't see how that's a bug. hs->hfp_active should be true only when we
-> are connected to HFP. server_is_enabled(src, HANDSFREE_SVCLASS_ID) is
-> supposed to return true if HFP support is enabled in general. These are
-> two separate things (we could be connected to HSP even though HFP support
-> is enabled if the headset only supports HSP, i.e. hs->hfp_handle == 0 in
-> this case).
->
-Let me describe how the bug is triggered by the following steps in our
-lab:
-1 at HFP AW side bluetoothd is started, and headset_init() is called.
-However btd_device_get_record() returns NULL, so hs->hfp_handle is
-NULL.
-2 at HFP HF unit side bluetoothd is started, and initiated connection to HFP AW
-3 HFP AW accepts the connection, and headset_connect_cb() is called.
-At this time hs->hfp_handle is NULL, so hs->hfp_active is set to
-FALSE.
+Hi Alok,
 
-This way the bug is triggered: a real HFP connection is initiated by HFP HF
-unit, but hs->hfp_active is set to FALSE by HFP AW. It seems that this patch
-is not a real fix, could you share the ideas of fixing this bug?
+On Wed, May 06, 2009, alokbarsode@gmail.com wrote:
+> From: Alok Barsode <alok.barsode@azingo.com>
+> 
+> ---
+>  plugins/hciops.c |   24 ++++++++++++++++++++++++
+>  src/adapter.c    |   23 ++++++++++-------------
+>  src/adapter.h    |    1 +
+>  3 files changed, 35 insertions(+), 13 deletions(-)
 
-Thanks,
-Forrest
+Both patches are now pushed upstream. There was one compilation issue
+which I had to fix though:
+adapter.c: In function adapter_remove:
+adapter.c:2477: error: label done defined but not used
+
+Johan
