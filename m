@@ -1,44 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <369400.87206.qm@web95405.mail.in2.yahoo.com>
-References: <5d223510905060754p70b53725u52963a0b41c82788@mail.gmail.com>  <363123.87568.qm@web95416.mail.in2.yahoo.com> <5d223510905070559q320fed9do34252e99473e1acf@mail.gmail.com>
-Date: Thu, 7 May 2009 18:51:56 +0530 (IST)
-From: balaji palaniswami <balaji_palaniswami@yahoo.com>
-Subject: Re: HSP and HFP no sound
-To: Rafael Seste <rseste@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <5d223510905070559q320fed9do34252e99473e1acf@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
-List-ID: <linux-bluetooth.vger.kernel.org>
-
-
-Hello Rafael ,
-
-Thanks for your output.
-Now i am trying to upgrade bluez stack from 4.12 defualt to 4.38 top of tree.
-
-OS :Ubuntu 8.10
-Bluetooth dongle :Broadcom
-Head set :Jabra B160
-Skype version :2.0.0.72
-
-I just upgraded from  Bluez 4.12 to 4.38 .In 4.38 bluez , i am able to pair the dongle with headset
-but i have no luck to hear test call from skype.I captured hcidump and looked into that
-it terminated with Disconnection after pairing.Once i started the skype there is no l2cap connection establishment.but it is working fine in 4.17. I will post dump for your analysis.
-
-Can you share your experience regarding this? 
-
-Thanks,
-Balaji.P
-
-
------ Original Message ----
+In-Reply-To: <363123.87568.qm@web95416.mail.in2.yahoo.com>
+References: <5d223510905060754p70b53725u52963a0b41c82788@mail.gmail.com>
+	 <363123.87568.qm@web95416.mail.in2.yahoo.com>
+Date: Thu, 7 May 2009 09:59:34 -0300
+Message-ID: <5d223510905070559q320fed9do34252e99473e1acf@mail.gmail.com>
+Subject: Re: HSP and HFP no sound
 From: Rafael Seste <rseste@gmail.com>
 To: balaji palaniswami <balaji_palaniswami@yahoo.com>
 Cc: linux-bluetooth@vger.kernel.org
-Sent: Thursday, 7 May, 2009 6:29:34 PM
-Subject: Re: HSP and HFP no sound
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
+List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Balaji,
 
@@ -328,72 +301,72 @@ On Wed, May 6, 2009 at 11:48 PM, balaji palaniswami
 >
 > root@debian:/var/log# apt-cache policy bluez
 > bluez:
->  Installed: 4.32-0ubuntu4
->  Candidate: 4.32-0ubuntu4
->  Version table:
+>  Installed: 4.32-0ubuntu4
+>  Candidate: 4.32-0ubuntu4
+>  Version table:
 > *** 4.32-0ubuntu4 0
->        500 http://ports.ubuntu.com jaunty/main Packages
->        100 /var/lib/dpkg/status
+>        500 http://ports.ubuntu.com jaunty/main Packages
+>        100 /var/lib/dpkg/status
 >
 > root@debian:/var/log# vi syslog
-> May  6 09:34:53 debian kernel: usb 1-1: new full speed USB device
+> May  6 09:34:53 debian kernel: usb 1-1: new full speed USB device
 > using ehci_marvell and address 3
-> May  6 09:34:53 debian kernel: usb 1-1: configuration #1 chosen from 1 choice
-> May  6 09:34:53 debian bluetoothd[1235]: HCI dev 0 registered
-> May  6 09:34:54 debian bluetoothd[1235]: HCI dev 0 up
-> May  6 09:34:54 debian bluetoothd[1235]: Starting security manager 0
-> May  6 09:34:54 debian bluetoothd[1235]: rfcomm_bind: Address already
+> May  6 09:34:53 debian kernel: usb 1-1: configuration #1 chosen from 1 choice
+> May  6 09:34:53 debian bluetoothd[1235]: HCI dev 0 registered
+> May  6 09:34:54 debian bluetoothd[1235]: HCI dev 0 up
+> May  6 09:34:54 debian bluetoothd[1235]: Starting security manager 0
+> May  6 09:34:54 debian bluetoothd[1235]: rfcomm_bind: Address already
 > in use (98)
-> May  6 09:34:54 debian bluetoothd[1235]: audio-headset: Operation not
+> May  6 09:34:54 debian bluetoothd[1235]: audio-headset: Operation not
 > permitted (1)
-> May  6 09:34:54 debian bluetoothd[1235]: l2cap_bind: Address already in use (98)
-> May  6 09:34:54 debian bluetoothd[1235]: audio-a2dp: Operation not permitted (1)
-> May  6 09:34:54 debian bluetoothd[1235]: Registered interface
+> May  6 09:34:54 debian bluetoothd[1235]: l2cap_bind: Address already in use (98)
+> May  6 09:34:54 debian bluetoothd[1235]: audio-a2dp: Operation not permitted (1)
+> May  6 09:34:54 debian bluetoothd[1235]: Registered interface
 > org.bluez.SerialProxyManager on path /org/bluez/1235/hci0
-> May  6 09:34:54 debian bluetoothd[1235]: Registered interface
+> May  6 09:34:54 debian bluetoothd[1235]: Registered interface
 > org.bluez.Service on path /org/bluez/1235/hci0
-> May  6 09:34:54 debian bluetoothd[1235]: Registered interface
+> May  6 09:34:54 debian bluetoothd[1235]: Registered interface
 > org.bluez.Control on path /org/bluez/1235/hci0/dev_00_1D_FD_E4_42_FF
-> May  6 09:34:54 debian bluetoothd[1235]: Registered interface
+> May  6 09:34:54 debian bluetoothd[1235]: Registered interface
 > org.bluez.Serial on path /org/bluez/1235/hci0/dev_00_1D_FD_E4_42_FF
-> May  6 09:34:54 debian bluetoothd[1235]: probe failed with driver
+> May  6 09:34:54 debian bluetoothd[1235]: probe failed with driver
 > input-headset for device /org/bluez/1235/hci0/dev_00_1D_FD_E4_42_FF
-> May  6 09:34:54 debian bluetoothd[1235]: Registered interface
+> May  6 09:34:54 debian bluetoothd[1235]: Registered interface
 > org.bluez.Control on path /org/bluez/1235/hci0/dev_00_21_FB_B4_45_07
-> May  6 09:34:54 debian bluetoothd[1235]: Registered interface
+> May  6 09:34:54 debian bluetoothd[1235]: Registered interface
 > org.bluez.Serial on path /org/bluez/1235/hci0/dev_00_21_FB_B4_45_07
-> May  6 09:34:54 debian bluetoothd[1235]: probe failed with driver
+> May  6 09:34:54 debian bluetoothd[1235]: probe failed with driver
 > input-headset for device /org/bluez/1235/hci0/dev_00_21_FB_B4_45_07
-> May  6 09:34:54 debian bluetoothd[1235]: Adapter /org/bluez/1235/hci0
+> May  6 09:34:54 debian bluetoothd[1235]: Adapter /org/bluez/1235/hci0
 > has been enabled
-> May  6 09:34:54 debian bluetoothd[1235]: Failed to access HAL
+> May  6 09:34:54 debian bluetoothd[1235]: Failed to access HAL
 >
 > root@debian:/var/log# hciconfig -a
-> hci0:   Type: USB
->        BD Address: 00:19:5D:0F:53:07 ACL MTU: 672:3 SCO MTU: 48:1
->        UP RUNNING PSCAN
->        RX bytes:4082 acl:51 sco:0 events:157 errors:0
->        TX bytes:1715 acl:52 sco:0 commands:72 errors:0
->        Features: 0xff 0x3e 0x85 0x30 0x18 0x18 0x00 0x00
->        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->        Link policy: RSWITCH HOLD SNIFF PARK
->        Link mode: SLAVE ACCEPT
->        Name: 'Sheeva'
->        Class: 0x480204
->        Service Classes: Capturing, Telephony
->        Device Class: Phone, Cellular
->        HCI Ver: 1.2 (0x2) HCI Rev: 0x1f4 LMP Ver: 1.2 (0x2) LMP Subver: 0x1f4
->        Manufacturer: Integrated System Solution Corp. (57)
+> hci0:   Type: USB
+>        BD Address: 00:19:5D:0F:53:07 ACL MTU: 672:3 SCO MTU: 48:1
+>        UP RUNNING PSCAN
+>        RX bytes:4082 acl:51 sco:0 events:157 errors:0
+>        TX bytes:1715 acl:52 sco:0 commands:72 errors:0
+>        Features: 0xff 0x3e 0x85 0x30 0x18 0x18 0x00 0x00
+>        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>        Link policy: RSWITCH HOLD SNIFF PARK
+>        Link mode: SLAVE ACCEPT
+>        Name: 'Sheeva'
+>        Class: 0x480204
+>        Service Classes: Capturing, Telephony
+>        Device Class: Phone, Cellular
+>        HCI Ver: 1.2 (0x2) HCI Rev: 0x1f4 LMP Ver: 1.2 (0x2) LMP Subver: 0x1f4
+>        Manufacturer: Integrated System Solution Corp. (57)
 >
 >
 > root@debian:/var/log# hciconfig hci0 voice
-> hci0:   Type: USB
->        BD Address: 00:19:5D:0F:53:07 ACL MTU: 672:3 SCO MTU: 48:1
->        Voice setting: 0x0060 (Default Condition)
->        Input Coding: Linear
->        Input Data Format: 2's complement
->        Input Sample Size: 16 bit
->        # of bits padding at MSB: 0
+> hci0:   Type: USB
+>        BD Address: 00:19:5D:0F:53:07 ACL MTU: 672:3 SCO MTU: 48:1
+>        Voice setting: 0x0060 (Default Condition)
+>        Input Coding: Linear
+>        Input Data Format: 2's complement
+>        Input Sample Size: 16 bit
+>        # of bits padding at MSB: 0
 >
 > root@debian:/var/log# bluetoothd -dn
 > bluetoothd[1535]: Bluetooth daemon
@@ -416,16 +389,16 @@ On Wed, May 6, 2009 at 11:48 PM, balaji palaniswami
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
 > the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >
 >
 >
->      Cricket on your mind? Visit the ultimate cricket website. Enter http://beta.cricket.yahoo.com
+>      Cricket on your mind? Visit the ultimate cricket website. Enter http://beta.cricket.yahoo.com
 >
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
 > the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >
 
 
@@ -433,8 +406,3 @@ On Wed, May 6, 2009 at 11:48 PM, balaji palaniswami
 -- 
 Rafael S. Seste
 Eng Computação - Unicamp
-
-
-
-      Cricket on your mind? Visit the ultimate cricket website. Enter http://beta.cricket.yahoo.com
-
