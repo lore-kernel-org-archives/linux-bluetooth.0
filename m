@@ -3,8 +3,8 @@ MIME-Version: 1.0
 Content-Type: text/plain;
 	charset="us-ascii"
 Subject: RE: bluez 4.x questions, SCO stops
-Date: Thu, 7 May 2009 18:59:07 -0500
-Message-ID: <79DD16001F75DB4EB7DE37CDD687BB2001B723C4@dalamsexb02.AMERICAS.ROOT.PRI>
+Date: Thu, 7 May 2009 17:00:49 -0500
+Message-ID: <79DD16001F75DB4EB7DE37CDD687BB2001B723AC@dalamsexb02.AMERICAS.ROOT.PRI>
 In-Reply-To: <20090507212508.GA23276@jh-x301>
 References: <79DD16001F75DB4EB7DE37CDD687BB2001B7238D@dalamsexb02.AMERICAS.ROOT.PRI> <20090507212508.GA23276@jh-x301>
 From: "Brock Denson" <Brock.Denson@csr.com>
@@ -12,6 +12,14 @@ To: "Johan Hedberg" <johan.hedberg@gmail.com>
 Cc: <linux-bluetooth@vger.kernel.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
+
+Hi Johan,
+Changing kernels would be very difficult for me now.  Would this be in
+reference to 'Fix SCO state handling for incoming connections' commit
+from Marcel Holtmann on 15 Jan 2009?  I can relatively easily put in
+this change.
+
+Brock
 
 -----Original Message-----
 From: Johan Hedberg [mailto:johan.hedberg@gmail.com] 
@@ -48,9 +56,6 @@ bluetooth-testing). Those should have the issue fixed.
 
 Johan
 
-[mbd] So I went back and took the changes from Marcel's commit
-c89b6e6bda... and this appears to fix the problem I was seeing.  Thanks
-a lot for your help.
 
  To report this email as spam click
 https://www.mailcontrol.com/sr/rAh+GXBN20nTndxI!oX7UsdpzMR7Bo2KTOUX18r2s
