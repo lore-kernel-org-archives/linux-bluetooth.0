@@ -1,17 +1,20 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A024529.90104@gmail.com>
-Date: Thu, 07 May 2009 06:19:21 +0400
+Message-ID: <4A02429C.8010201@gmail.com>
+Date: Thu, 07 May 2009 06:08:28 +0400
 From: Ilya Rubtsov <lusyaru@gmail.com>
 MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Add DisableNameResolving option to main.conf
-References: <4A02429C.8010201@gmail.com>
-In-Reply-To: <4A02429C.8010201@gmail.com>
+Subject: [PATCH] Add DisableNameResolving option to main.conf
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Sorry, there was mistake :(
+Hi!
+
+This patch adds new option to main.conf - DisableNameResolving. If 
+DisableNameResolving=true then we don't ask remote devices for their 
+names after inquiry. Default value is false. That's all :)
+
 
 
 diff --git a/src/adapter.c b/src/adapter.c
@@ -106,7 +109,7 @@ index 08bef4a..5358db1 100644
  
      main_opts.link_policy = HCI_LP_RSWITCH | HCI_LP_SNIFF |
 diff --git a/src/main.conf b/src/main.conf
-index c736e49..75a8b04 100644
+index c736e49..7dad783 100644
 --- a/src/main.conf
 +++ b/src/main.conf
 @@ -46,3 +46,7 @@ RememberPowered = true
@@ -118,4 +121,4 @@ could in
 +# Disable name resolving after inquiry. Set it to 'true' if you don't 
 need remote
 +# devices name and want shorter discovery cycle
-+DisableNameResolving = false
++DisableNameRevolving = false
