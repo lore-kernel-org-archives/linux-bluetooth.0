@@ -1,124 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A02429C.8010201@gmail.com>
-Date: Thu, 07 May 2009 06:08:28 +0400
-From: Ilya Rubtsov <lusyaru@gmail.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Add DisableNameResolving option to main.conf
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <ac8af0be0905060528o6777bdc5l87399646d5471b2e@mail.gmail.com>
+References: <1241601540-6540-1-git-send-email-forrest.zhao@intel.com>
+	 <20090506093049.GA31559@localhost>
+	 <ac8af0be0905060528o6777bdc5l87399646d5471b2e@mail.gmail.com>
+Date: Thu, 7 May 2009 10:03:06 +0800
+Message-ID: <ac8af0be0905061903o17a9ca4bj81269fac884c782@mail.gmail.com>
+Subject: Re: [PATCH] in headset_init(), it's possible that hs->hfp_handle is
+	not set, so we should not check hs->hfp_handle in headset_connect_cb()
+From: Zhao Forrest <forrest.zhao@gmail.com>
+To: Johan Hedberg <johan.hedberg@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
+>>
+>> I don't see how that's a bug. hs->hfp_active should be true only when we
+>> are connected to HFP. server_is_enabled(src, HANDSFREE_SVCLASS_ID) is
+>> supposed to return true if HFP support is enabled in general. These are
+>> two separate things (we could be connected to HSP even though HFP support
+>> is enabled if the headset only supports HSP, i.e. hs->hfp_handle == 0 in
+>> this case).
+>>
+> Let me describe how the bug is triggered by the following steps in our
+> lab:
+> 1 at HFP AW side bluetoothd is started, and headset_init() is called.
+> However btd_device_get_record() returns NULL, so hs->hfp_handle is
+> NULL.
+> 2 at HFP HF unit side bluetoothd is started, and initiated connection to HFP AW
+> 3 HFP AW accepts the connection, and headset_connect_cb() is called.
+> At this time hs->hfp_handle is NULL, so hs->hfp_active is set to
+> FALSE.
+>
+> This way the bug is triggered: a real HFP connection is initiated by HFP HF
+> unit, but hs->hfp_active is set to FALSE by HFP AW. It seems that this patch
+> is not a real fix, could you share the ideas of fixing this bug?
+>
+Johan,
 
-This patch adds new option to main.conf - DisableNameResolving. If 
-DisableNameResolving=true then we don't ask remote devices for their 
-names after inquiry. Default value is false. That's all :)
+After cleaning /var/lib/bluetooth/* and doing pairing from scratch,
+this bug can't be reproduced. It seems that a messed-up SDP database
+triggered the issue.
 
-
-
-diff --git a/src/adapter.c b/src/adapter.c
-index 500f82f..02c6d9e 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1076,7 +1076,7 @@ static int start_inquiry(struct btd_adapter *adapter)
- 
-     hci_close_dev(dd);
- 
--    adapter->state |= RESOLVE_NAME;
-+    adapter->state |= main_opts.disable_nameres;
- 
-     return 0;
- }
-@@ -1126,7 +1126,7 @@ static int start_periodic_inquiry(struct 
-btd_adapter *adapter)
- 
-     hci_close_dev(dd);
- 
--    adapter->state |= RESOLVE_NAME;
-+    adapter->state |= main_opts.disable_nameres;
- 
-     return 0;
- }
-@@ -2446,7 +2446,7 @@ struct btd_adapter *adapter_create(DBusConnection 
-*conn, int id,
-     }
- 
-     adapter->dev_id = id;
--    adapter->state |= RESOLVE_NAME;
-+    adapter->state |= main_opts.disable_nameres;
-     adapter->path = g_strdup(path);
-     adapter->already_up = devup;
- 
-diff --git a/src/dbus-hci.c b/src/dbus-hci.c
-index e52b4f6..014360b 100644
---- a/src/dbus-hci.c
-+++ b/src/dbus-hci.c
-@@ -458,7 +458,7 @@ void hcid_dbus_inquiry_start(bdaddr_t *local)
-     /* Disable name resolution for non D-Bus clients */
-     if (!adapter_has_discov_sessions(adapter)) {
-         state = adapter_get_state(adapter);
--        state &= ~RESOLVE_NAME;
-+        state &= ~main_opts.disable_nameres;
-         adapter_set_state(adapter, state);
-     }
- }
-@@ -687,7 +687,7 @@ void hcid_dbus_inquiry_result(bdaddr_t *local, 
-bdaddr_t *peer, uint32_t class,
-     }
- 
-     /* the inquiry result can be triggered by NON D-Bus client */
--    if (adapter_get_state(adapter) & RESOLVE_NAME)
-+    if (adapter_get_state(adapter) & main_opts.disable_nameres)
-         name_status = NAME_REQUIRED;
-     else
-         name_status = NAME_NOT_REQUIRED;
-diff --git a/src/hcid.h b/src/hcid.h
-index ae356d3..efefa6c 100644
---- a/src/hcid.h
-+++ b/src/hcid.h
-@@ -59,6 +59,7 @@ struct main_opts {
-     uint16_t    link_policy;
-     gboolean    remember_powered;
-     gboolean    reverse_sdp;
-+    int        disable_nameres;
- 
-     uint8_t        scan;
-     uint8_t        mode;
-diff --git a/src/main.c b/src/main.c
-index 08bef4a..5358db1 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -187,6 +187,18 @@ static void parse_config(GKeyFile *config)
-     } else
-         main_opts.reverse_sdp = boolean;
- 
-+    boolean = g_key_file_get_boolean(config, "General",
-+                        "DisableNameResolving", &err);
-+    if (err) {
-+        debug("%s", err->message);
-+        g_clear_error(&err);
-+    } else {       
-+        if (boolean)
-+            main_opts.disable_nameres = 0x00;
-+        else
-+            main_opts.disable_nameres = 0x10;
-+    }
-+
-     main_opts.link_mode = HCI_LM_ACCEPT;
- 
-     main_opts.link_policy = HCI_LP_RSWITCH | HCI_LP_SNIFF |
-diff --git a/src/main.conf b/src/main.conf
-index c736e49..7dad783 100644
---- a/src/main.conf
-+++ b/src/main.conf
-@@ -46,3 +46,7 @@ RememberPowered = true
- # doesn't like us doing reverse SDP for some test cases (though there 
-could in
- # theory be other useful purposes for this too). Defaults to true.
- ReverseServiceDiscovery = true
-+
-+# Disable name resolving after inquiry. Set it to 'true' if you don't 
-need remote
-+# devices name and want shorter discovery cycle
-+DisableNameRevolving = false
+Thanks,
+Forrest
