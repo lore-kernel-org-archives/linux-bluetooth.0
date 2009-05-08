@@ -1,24 +1,396 @@
 Return-Path: <cyrus@holtmann.org>
+From: Oliver Neukum <oliver@neukum.org>
+To: Peter Zijlstra <peterz@infradead.org>
 Subject: Re: btusb auto suspend
-From: Peter Zijlstra <peterz@infradead.org>
-To: Oliver Neukum <oliver@neukum.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,  linux-usb@vger.kernel.org
-In-Reply-To: <200905082230.12929.oliver@neukum.org>
-References: <1241433271.7620.4748.camel@twins>
-	 <200905082223.16014.oliver@neukum.org> <1241814372.6404.54.camel@laptop>
-	 <200905082230.12929.oliver@neukum.org>
-Content-Type: text/plain
-Date: Fri, 08 May 2009 22:49:21 +0200
-Message-Id: <1241815761.6404.80.camel@laptop>
-Mime-Version: 1.0
+Date: Fri, 8 May 2009 22:30:12 +0200
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ linux-bluetooth@vger.kernel.org,
+ linux-usb@vger.kernel.org
+References: <1241433271.7620.4748.camel@twins> <200905082223.16014.oliver@neukum.org> <1241814372.6404.54.camel@laptop>
+In-Reply-To: <1241814372.6404.54.camel@laptop>
+MIME-Version: 1.0
+Content-Type: Multipart/Mixed;
+  boundary="Boundary-00=_UZJBKw8fkuTzfHN"
+Message-Id: <200905082230.12929.oliver@neukum.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 2009-05-08 at 22:30 +0200, Oliver Neukum wrote:
-> Am Freitag, 8. Mai 2009 22:26:12 schrieb Peter Zijlstra:
-> > > Peter, are you willing to test?
-> >
-> > Sure, I have two laptops with integrated bluetooth to test on.
-> 
-> This will probably crash.
+--Boundary-00=_UZJBKw8fkuTzfHN
+Content-Type: text/plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Well then we'll have to like debug it ;-)
+Am Freitag, 8. Mai 2009 22:26:12 schrieb Peter Zijlstra:
+> > Peter, are you willing to test?
+>
+> Sure, I have two laptops with integrated bluetooth to test on.
+
+This will probably crash.
+
+	Regards
+		Oliver
+
+
+--Boundary-00=_UZJBKw8fkuTzfHN
+Content-Type: text/x-patch;
+  charset="UTF-8";
+  name="btusb_full_20090508_1.diff"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename="btusb_full_20090508_1.diff"
+
+commit add1c9528961b74f98b85f43594d4e1a277d95d2
+Author: Oliver Neukum <oneukum@linux-d698.(none)>
+Date:   Fri May 8 22:13:40 2009 +0200
+
+    port of full autosuspend for btusb to this rc
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index e70c57e..ab0c5cf 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -35,7 +35,7 @@
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+ 
+-#define VERSION "0.5"
++#define VERSION "0.6"
+ 
+ static int ignore_dga;
+ static int ignore_csr;
+@@ -145,6 +145,7 @@ static struct usb_device_id blacklist_table[] = {
+ #define BTUSB_INTR_RUNNING	0
+ #define BTUSB_BULK_RUNNING	1
+ #define BTUSB_ISOC_RUNNING	2
++#define BTUSB_SUSPENDING	3
+ 
+ struct btusb_data {
+ 	struct hci_dev       *hdev;
+@@ -157,11 +158,15 @@ struct btusb_data {
+ 	unsigned long flags;
+ 
+ 	struct work_struct work;
++	struct work_struct waker;
+ 
+ 	struct usb_anchor tx_anchor;
+ 	struct usb_anchor intr_anchor;
+ 	struct usb_anchor bulk_anchor;
+ 	struct usb_anchor isoc_anchor;
++	struct usb_anchor deferred;
++	int tx_in_flight;
++	spinlock_t txlock;
+ 
+ 	struct usb_endpoint_descriptor *intr_ep;
+ 	struct usb_endpoint_descriptor *bulk_tx_ep;
+@@ -174,8 +179,24 @@ struct btusb_data {
+ 	unsigned int sco_num;
+ 	int isoc_altsetting;
+ 	int suspend_count;
++	int did_iso_resume:1;
+ };
+ 
++static int inc_tx(struct btusb_data *data)
++{
++	unsigned long flags;
++	int rv;
++
++	spin_lock_irqsave(&data->txlock, flags);
++	rv = test_bit(BTUSB_SUSPENDING, &data->flags);
++	if (!rv)
++		data->tx_in_flight++;
++	spin_unlock_irqrestore(&data->txlock, flags);
++
++	return rv;
++}
++
++
+ static void btusb_intr_complete(struct urb *urb)
+ {
+ 	struct hci_dev *hdev = urb->context;
+@@ -202,6 +223,7 @@ static void btusb_intr_complete(struct urb *urb)
+ 	if (!test_bit(BTUSB_INTR_RUNNING, &data->flags))
+ 		return;
+ 
++	usb_mark_last_busy(data->udev);
+ 	usb_anchor_urb(urb, &data->intr_anchor);
+ 
+ 	err = usb_submit_urb(urb, GFP_ATOMIC);
+@@ -327,6 +349,7 @@ static int btusb_submit_bulk_urb(struct hci_dev *hdev, gfp_t mem_flags)
+ 
+ 	urb->transfer_flags |= URB_FREE_BUFFER;
+ 
++	usb_mark_last_busy(data->udev);
+ 	usb_anchor_urb(urb, &data->bulk_anchor);
+ 
+ 	err = usb_submit_urb(urb, mem_flags);
+@@ -465,6 +488,33 @@ static void btusb_tx_complete(struct urb *urb)
+ {
+ 	struct sk_buff *skb = urb->context;
+ 	struct hci_dev *hdev = (struct hci_dev *) skb->dev;
++	struct btusb_data *data = hdev->driver_data;
++
++	BT_DBG("%s urb %p status %d count %d", hdev->name,
++					urb, urb->status, urb->actual_length);
++
++	if (!test_bit(HCI_RUNNING, &hdev->flags))
++		goto done;
++
++	if (!urb->status)
++		hdev->stat.byte_tx += urb->transfer_buffer_length;
++	else
++		hdev->stat.err_tx++;
++
++done:
++	spin_lock(&data->txlock);
++	data->tx_in_flight--;
++	spin_unlock(&data->txlock);
++
++	kfree(urb->setup_packet);
++
++	kfree_skb(skb);
++}
++
++static void btusb_isoc_tx_complete(struct urb *urb)
++{
++	struct sk_buff *skb = urb->context;
++	struct hci_dev *hdev = (struct hci_dev *) skb->dev;
+ 
+ 	BT_DBG("%s urb %p status %d count %d", hdev->name,
+ 					urb, urb->status, urb->actual_length);
+@@ -490,11 +540,16 @@ static int btusb_open(struct hci_dev *hdev)
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
++	err = usb_autopm_get_interface(data->intf);
++	if (err < 0)
++		return err;
++	data->intf->needs_remote_wakeup = 1;
++
+ 	if (test_and_set_bit(HCI_RUNNING, &hdev->flags))
+-		return 0;
++		goto out;
+ 
+ 	if (test_and_set_bit(BTUSB_INTR_RUNNING, &data->flags))
+-		return 0;
++		goto out;
+ 
+ 	err = btusb_submit_intr_urb(hdev, GFP_KERNEL);
+ 	if (err < 0)
+@@ -509,17 +564,28 @@ static int btusb_open(struct hci_dev *hdev)
+ 	set_bit(BTUSB_BULK_RUNNING, &data->flags);
+ 	btusb_submit_bulk_urb(hdev, GFP_KERNEL);
+ 
++out:
++	usb_autopm_put_interface(data->intf);
+ 	return 0;
+ 
+ failed:
+ 	clear_bit(BTUSB_INTR_RUNNING, &data->flags);
+ 	clear_bit(HCI_RUNNING, &hdev->flags);
++	usb_autopm_put_interface(data->intf);
+ 	return err;
+ }
+ 
++static void btusb_stop_traffic(struct btusb_data *data)
++{
++	usb_kill_anchored_urbs(&data->intr_anchor);
++	usb_kill_anchored_urbs(&data->bulk_anchor);
++	usb_kill_anchored_urbs(&data->isoc_anchor);
++}
++
+ static int btusb_close(struct hci_dev *hdev)
+ {
+ 	struct btusb_data *data = hdev->driver_data;
++	int err;
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
+@@ -529,13 +595,15 @@ static int btusb_close(struct hci_dev *hdev)
+ 	cancel_work_sync(&data->work);
+ 
+ 	clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+-	usb_kill_anchored_urbs(&data->isoc_anchor);
+-
+ 	clear_bit(BTUSB_BULK_RUNNING, &data->flags);
+-	usb_kill_anchored_urbs(&data->bulk_anchor);
+-
+ 	clear_bit(BTUSB_INTR_RUNNING, &data->flags);
+-	usb_kill_anchored_urbs(&data->intr_anchor);
++
++	btusb_stop_traffic(data);
++	err = usb_autopm_get_interface(data->intf);
++	if (!err) {
++		data->intf->needs_remote_wakeup = 0;
++		usb_autopm_put_interface(data->intf);
++	}
+ 
+ 	return 0;
+ }
+@@ -622,7 +690,7 @@ static int btusb_send_frame(struct sk_buff *skb)
+ 		urb->dev      = data->udev;
+ 		urb->pipe     = pipe;
+ 		urb->context  = skb;
+-		urb->complete = btusb_tx_complete;
++		urb->complete = btusb_isoc_tx_complete;
+ 		urb->interval = data->isoc_tx_ep->bInterval;
+ 
+ 		urb->transfer_flags  = URB_ISO_ASAP;
+@@ -633,12 +701,19 @@ static int btusb_send_frame(struct sk_buff *skb)
+ 				le16_to_cpu(data->isoc_tx_ep->wMaxPacketSize));
+ 
+ 		hdev->stat.sco_tx++;
+-		break;
++		goto skip_waking;
+ 
+ 	default:
+ 		return -EILSEQ;
+ 	}
+ 
++	err = inc_tx(data);
++	if (err) {
++		usb_anchor_urb(urb, &data->deferred);
++		schedule_work(&data->waker);
++		goto out;
++	}
++skip_waking:
+ 	usb_anchor_urb(urb, &data->tx_anchor);
+ 
+ 	err = usb_submit_urb(urb, GFP_ATOMIC);
+@@ -650,6 +725,7 @@ static int btusb_send_frame(struct sk_buff *skb)
+ 
+ 	usb_free_urb(urb);
+ 
++out:
+ 	return err;
+ }
+ 
+@@ -721,8 +797,19 @@ static void btusb_work(struct work_struct *work)
+ {
+ 	struct btusb_data *data = container_of(work, struct btusb_data, work);
+ 	struct hci_dev *hdev = data->hdev;
++	int err;
+ 
+ 	if (hdev->conn_hash.sco_num > 0) {
++		if (!data->did_iso_resume) {
++			err = usb_autopm_get_interface(data->isoc);
++			if (!err) {
++				data->did_iso_resume = 1;
++			} else {
++				clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
++				usb_kill_anchored_urbs(&data->isoc_anchor);
++				return;
++			}
++		}
+ 		if (data->isoc_altsetting != 2) {
+ 			clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+ 			usb_kill_anchored_urbs(&data->isoc_anchor);
+@@ -742,9 +829,23 @@ static void btusb_work(struct work_struct *work)
+ 		usb_kill_anchored_urbs(&data->isoc_anchor);
+ 
+ 		__set_isoc_interface(hdev, 0);
++		if (data->did_iso_resume) {
++			data->did_iso_resume = 0;
++			usb_autopm_put_interface(data->isoc);
++		}
+ 	}
+ }
+ 
++static void btusb_waker(struct work_struct *work)
++{
++	struct btusb_data *data = container_of(work, struct btusb_data, work);
++	int err;
++
++	err = usb_autopm_get_interface(data->intf);
++	if (!err)
++		usb_autopm_put_interface(data->intf);
++}
++
+ static int btusb_probe(struct usb_interface *intf,
+ 				const struct usb_device_id *id)
+ {
+@@ -814,11 +915,14 @@ static int btusb_probe(struct usb_interface *intf,
+ 	spin_lock_init(&data->lock);
+ 
+ 	INIT_WORK(&data->work, btusb_work);
++	INIT_WORK(&data->waker, btusb_waker);
++	spin_lock_init(&data->txlock);
+ 
+ 	init_usb_anchor(&data->tx_anchor);
+ 	init_usb_anchor(&data->intr_anchor);
+ 	init_usb_anchor(&data->bulk_anchor);
+ 	init_usb_anchor(&data->isoc_anchor);
++	init_usb_anchor(&data->deferred);
+ 
+ 	hdev = hci_alloc_dev();
+ 	if (!hdev) {
+@@ -946,23 +1050,43 @@ static void btusb_disconnect(struct usb_interface *intf)
+ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
+ {
+ 	struct btusb_data *data = usb_get_intfdata(intf);
++	struct hci_dev *hdev = data->hdev;
+ 
+ 	BT_DBG("intf %p", intf);
+ 
+ 	if (data->suspend_count++)
+ 		return 0;
+ 
++	spin_lock_irq(&data->txlock);
++	if (!(interface_to_usbdev(intf)->auto_pm && data->tx_in_flight)) {
++		set_bit(BTUSB_SUSPENDING, &hdev->flags);
++		spin_unlock_irq(&data->txlock);
++	} else {
++		spin_unlock_irq(&data->txlock);
++		return -EBUSY;
++	}
++
+ 	cancel_work_sync(&data->work);
+ 
++	btusb_stop_traffic(data);
+ 	usb_kill_anchored_urbs(&data->tx_anchor);
+ 
+-	usb_kill_anchored_urbs(&data->isoc_anchor);
+-	usb_kill_anchored_urbs(&data->bulk_anchor);
+-	usb_kill_anchored_urbs(&data->intr_anchor);
+-
+ 	return 0;
+ }
+ 
++static void play_deferred(struct btusb_data *data)
++{
++	struct urb *urb;
++	int err;
++
++	while ((urb = usb_get_from_anchor(&data->deferred))) {
++		err = usb_submit_urb(urb, GFP_ATOMIC);
++		if (err < 0)
++			break;
++	}
++	usb_scuttle_anchored_urbs(&data->deferred);
++}
++
+ static int btusb_resume(struct usb_interface *intf)
+ {
+ 	struct btusb_data *data = usb_get_intfdata(intf);
+@@ -1001,6 +1125,12 @@ static int btusb_resume(struct usb_interface *intf)
+ 			btusb_submit_isoc_urb(hdev, GFP_NOIO);
+ 	}
+ 
++	spin_lock_irq(&data->txlock);
++	play_deferred(data);
++	set_bit(BTUSB_SUSPENDING, &hdev->flags);
++	spin_unlock_irq(&data->txlock);
++	schedule_work(&data->work);
++
+ 	return 0;
+ }
+ 
+@@ -1011,6 +1141,7 @@ static struct usb_driver btusb_driver = {
+ 	.suspend	= btusb_suspend,
+ 	.resume		= btusb_resume,
+ 	.id_table	= btusb_table,
++	.supports_autosuspend = 1,
+ };
+ 
+ static int __init btusb_init(void)
+
+--Boundary-00=_UZJBKw8fkuTzfHN--
