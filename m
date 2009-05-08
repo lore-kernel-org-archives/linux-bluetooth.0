@@ -1,55 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 9 May 2009 02:49:02 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Security mode 3 pairing acceptor broken with current
-	bluetooth-testing
-Message-ID: <20090508234902.GA6615@jh-x301>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: Re: bluetooth: module_refcount is not decreased when connection
+ times out
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Bing Zhao <bzhao@marvell.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <477F20668A386D41ADCC57781B1F704301E62956E5@SC-VEXCH1.marvell.com>
+References: <477F20668A386D41ADCC57781B1F704301E62956E5@SC-VEXCH1.marvell.com>
+Content-Type: multipart/mixed; boundary="=-B6ApV2hNFH1KyHDMPQOO"
+Date: Fri, 08 May 2009 16:27:19 -0700
+Message-Id: <1241825239.4903.71.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
 
-I'm getting the following with latest bluetooth-testing kernel when
-accepting a connection when either device is in security mode 3:
+--=-B6ApV2hNFH1KyHDMPQOO
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-$ hcidump -V -r secmode3-acp.dump
-HCI sniffer - Bluetooth packet analyzer ver 1.42
-btsnoop version: 1 datalink type: 1002
-> HCI Event: Connect Request (0x04) plen 10
-    bdaddr 00:24:7D:XX:XX:XX class 0x5a020c type ACL
-< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
-    bdaddr 00:24:7D:XX:XX:XX role 0x00
-    Role: Master
-> HCI Event: Command Status (0x0f) plen 4
-    Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
-> HCI Event: Role Change (0x12) plen 8
-    status 0x00 bdaddr 00:24:7D:XX:XX:XX role 0x00
-    Role: Master
-> HCI Event: Link Key Request (0x17) plen 6
-    bdaddr 00:24:7D:XX:XX:XX
-< HCI Command: Link Key Request Negative Reply (0x01|0x000c) plen 6
-    bdaddr 00:24:7D:XX:XX:XX
-> HCI Event: Command Complete (0x0e) plen 10
-    Link Key Request Negative Reply (0x01|0x000c) ncmd 1
-    status 0x00 bdaddr 00:24:7D:XX:XX:XX
-> HCI Event: PIN Code Request (0x16) plen 6
-    bdaddr 00:24:7D:XX:XX:XX
-< HCI Command: Create Connection Cancel (0x01|0x0008) plen 6
-    bdaddr 00:24:7D:XX:XX:XX
-> HCI Event: Command Complete (0x0e) plen 10
-    Create Connection Cancel (0x01|0x0008) ncmd 1
-    status 0x00 bdaddr 00:24:7D:XX:XX:XX
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x02 handle 12 bdaddr 00:24:7D:XX:XX:XX type ACL encrypt 0x00
-    Error: Unknown Connection Identifier
+Hi Bing,
 
-As you see, the kernel is sending "Create Connection Cancel" for this acceptor
-use case even though it's a connection initiator command. It comes immediately
-after the PIN code request when bluetoothd is waiting for the UI to respond.
-I'll try to find some time to investigate this during the weekend but decided
-to also post it here in case you know a simple fix for it.
+> The module refcount is increased by hci_dev_hold() call in hci_conn_add() in hci_conn.c, and it is decreased by hci_dev_put() call in "del_conn" (hci_sysfs.c).
+> 
+> In case connection timeout happens, hci_dev_put() is never called.
 
-Johan
+can you test the attached patch for quickly. It should fix it.
+
+Regards
+
+Marcel
+
+
+--=-B6ApV2hNFH1KyHDMPQOO
+Content-Disposition: attachment; filename="patch-fix-hci-dev-refcount"
+Content-Type: text/x-patch; name="patch-fix-hci-dev-refcount"; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 61309b2..85a1c6b 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -292,6 +292,8 @@ int hci_conn_del(struct hci_conn *conn)
+ 
+ 	hci_conn_del_sysfs(conn);
+ 
++	hci_dev_put(hdev);
++
+ 	return 0;
+ }
+ 
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index a05d45e..cd84cd4 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -99,6 +99,8 @@ static void add_conn(struct work_struct *work)
+ 		BT_ERR("Failed to register connection device");
+ 		return;
+ 	}
++
++	hci_dev_hold(hdev);
+ }
+ 
+ /*
+@@ -120,7 +122,7 @@ static void del_conn(struct work_struct *work)
+ 	flush_work(&conn->work_add);
+ 
+ 	if (!device_is_registered(&conn->dev))
+-		return;
++		goto done;
+ 
+ 	while (1) {
+ 		struct device *dev;
+@@ -134,6 +136,8 @@ static void del_conn(struct work_struct *work)
+ 
+ 	device_del(&conn->dev);
+ 	put_device(&conn->dev);
++
++done:
+ 	hci_dev_put(hdev);
+ }
+ 
+
+--=-B6ApV2hNFH1KyHDMPQOO--
+
