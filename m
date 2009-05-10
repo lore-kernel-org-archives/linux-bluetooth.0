@@ -1,21 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Oliver Neukum <oliver@neukum.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
- linux-bluetooth@vger.kernel.org
-Subject: question on use of flags in btusb
-Date: Sun, 10 May 2009 10:38:37 +0200
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200905101038.38169.oliver@neukum.org>
+From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] Add .gitignore for bluez-hcidump
+Date: Sun, 10 May 2009 02:32:01 -0300
+Message-Id: <1241933521-28211-2-git-send-email-gustavo@las.ic.unicamp.br>
+In-Reply-To: <1241933521-28211-1-git-send-email-gustavo@las.ic.unicamp.br>
+References: <1241933521-28211-1-git-send-email-gustavo@las.ic.unicamp.br>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+this file avoids dirty things on git status
+---
+ .gitignore |   28 ++++++++++++++++++++++++++++
+ 1 files changed, 28 insertions(+), 0 deletions(-)
+ create mode 100644 .gitignore
 
-btusb still has the BTUSB_INTR_RUNNING and BTUSB_BULK_RUNNING flags.
-This seems to collide with the need to keep interrupt and bulk running.
-Is this just legacy, a plan for future extensions or am I misunderstanding 
-things?
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..76bcb61
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,28 @@
++*.o
++*.a
++*.lo
++*.la
++*.so
++.deps
++.libs
++Makefile
++Makefile.in
++aclocal.m4
++config.guess
++config.h
++config.h.in
++config.log
++config.status
++config.sub
++configure
++depcomp
++install-sh
++libtool
++ltmain.sh
++missing
++stamp-h1
++autom4te.cache
++
++src/bpasniff
++src/csrsniff
++src/hcidump
+-- 
+1.6.0.6
 
-	Regards
-		Oliver
