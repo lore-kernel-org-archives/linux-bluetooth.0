@@ -1,28 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <bd5c312b0905120537g3cfad35bi14d993229eb18de5@mail.gmail.com>
-References: <bd5c312b0905120537g3cfad35bi14d993229eb18de5@mail.gmail.com>
-Date: Tue, 12 May 2009 14:42:38 +0200
-Message-ID: <bd5c312b0905120542i72b52122re3b4c33380c7c566@mail.gmail.com>
-Subject: Device is not discoverable while it is doing an inquiry
-From: =?ISO-8859-1?Q?Jos=E9_Ignacio_Gisbert_Sanus?= <jogissa@gmail.com>
+From: alokbarsode@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: marcel@holtmann.org, Alok Barsode <alok.barsode@azingo.com>
+Subject: [PATCH 7/7] Code cleanup in set_mode.
+Date: Tue, 12 May 2009 17:56:56 +0530
+Message-Id: <1242131216-4081-7-git-send-email-alok.barsode@azingo.com>
+In-Reply-To: <1242131216-4081-6-git-send-email-alok.barsode@azingo.com>
+References: <1242131216-4081-1-git-send-email-alok.barsode@azingo.com>
+ <1242131216-4081-2-git-send-email-alok.barsode@azingo.com>
+ <1242131216-4081-3-git-send-email-alok.barsode@azingo.com>
+ <1242131216-4081-4-git-send-email-alok.barsode@azingo.com>
+ <1242131216-4081-5-git-send-email-alok.barsode@azingo.com>
+ <1242131216-4081-6-git-send-email-alok.barsode@azingo.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all, I have been searching for this problem but till now I have not
-found any good solution.
-I am using bluez-libs and bluez-utils 3.2, and I have an USB dongle
-connected to my PC (Suse 11.0).
-If I do not do anything, dongle is discoverable by any way, but while
-it is doing an inquiry, it becomes invisible. After inquiry process it
-becomes discoverable again.
-I have set hciconfig piscan, and inside
-/var/lib/bluetooth/XX:XX:XX:XX/config I have mode discoverable and
-discovto 0, so I do not know if what I want is feasible or not :-S
+From: Alok Barsode <alok.barsode@azingo.com>
 
-I hope you can help me.
+---
+ src/adapter.c |   45 ++++++++++++++-------------------------------
+ 1 files changed, 14 insertions(+), 31 deletions(-)
 
-Best regards,
-jogi
+diff --git a/src/adapter.c b/src/adapter.c
+index 87ecaff..c1a81b4 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -328,38 +328,18 @@ static void adapter_set_discov_timeout(struct btd_adapter *adapter,
+ 							adapter);
+ }
+ 
+-static uint8_t mode2scan(uint8_t mode)
+-{
+-	switch (mode) {
+-	case MODE_OFF:
+-		return SCAN_DISABLED;
+-	case MODE_CONNECTABLE:
+-		return SCAN_PAGE;
+-	case MODE_DISCOVERABLE:
+-	case MODE_LIMITED:
+-		return (SCAN_PAGE | SCAN_INQUIRY);
+-	default:
+-		error("Invalid mode given to mode2scan: %u", mode);
+-		return SCAN_PAGE;
+-	}
+-}
+-
+ static int set_mode(struct btd_adapter *adapter, uint8_t new_mode)
+ {
+-	uint8_t scan_enable;
+-	uint8_t current_scan = adapter->scan_mode;
+ 	int err;
+ 	const char *modestr;
+ 
+-	scan_enable = mode2scan(new_mode);
+-
+-	if (!adapter->up && scan_enable != SCAN_DISABLED) {
++	if (!adapter->up && new_mode != MODE_OFF) {
+ 		err = adapter_ops->set_powered(adapter->dev_id, TRUE);
+ 		if (err < 0)
+ 			return err;
+ 	}
+ 
+-	if (adapter->up && scan_enable == SCAN_DISABLED) {
++	if (adapter->up && new_mode == MODE_OFF) {
+ 		err = adapter_ops->set_powered(adapter->dev_id, FALSE);
+ 		if (err < 0)
+ 			return err;
+@@ -369,17 +349,20 @@ static int set_mode(struct btd_adapter *adapter, uint8_t new_mode)
+ 		goto done;
+ 	}
+ 
+-	if (current_scan != scan_enable) {
+-		if (scan_enable == SCAN_PAGE)
+-			err = adapter_ops->set_connectable(adapter->dev_id);
+-		else
+-			err = adapter_ops->set_discoverable(adapter->dev_id);
++	if (new_mode == adapter->mode)
++		return 0;
+ 
+-		if (err < 0)
+-			return err;
+-	} else if ((scan_enable & SCAN_INQUIRY) &&
+-						(new_mode != adapter->mode)) {
++	if (new_mode == MODE_CONNECTABLE)
++		err = adapter_ops->set_connectable(adapter->dev_id);
++	else
++		err = adapter_ops->set_discoverable(adapter->dev_id);
++
++	if (err < 0)
++		return err;
++
++	if (new_mode > MODE_CONNECTABLE) {
+ 		adapter_remove_discov_timeout(adapter);
++
+ 		if (adapter->discov_timeout)
+ 			adapter_set_discov_timeout(adapter,
+ 						adapter->discov_timeout);
+-- 
+1.5.6.3
