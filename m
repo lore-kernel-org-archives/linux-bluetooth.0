@@ -2,89 +2,162 @@ Return-Path: <cyrus@holtmann.org>
 From: alokbarsode@gmail.com
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org, Alok Barsode <alok.barsode@azingo.com>
-Subject: [PATCH 5/7] Modifying load_connections method.
-Date: Tue, 12 May 2009 17:56:54 +0530
-Message-Id: <1242131216-4081-5-git-send-email-alok.barsode@azingo.com>
-In-Reply-To: <1242131216-4081-4-git-send-email-alok.barsode@azingo.com>
+Subject: [PATCH 4/7] Adding set_discoverable method to hciops.
+Date: Tue, 12 May 2009 17:56:53 +0530
+Message-Id: <1242131216-4081-4-git-send-email-alok.barsode@azingo.com>
+In-Reply-To: <1242131216-4081-3-git-send-email-alok.barsode@azingo.com>
 References: <1242131216-4081-1-git-send-email-alok.barsode@azingo.com>
  <1242131216-4081-2-git-send-email-alok.barsode@azingo.com>
  <1242131216-4081-3-git-send-email-alok.barsode@azingo.com>
- <1242131216-4081-4-git-send-email-alok.barsode@azingo.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Alok Barsode <alok.barsode@azingo.com>
 
 ---
- src/adapter.c |   19 ++++++++++---------
- 1 files changed, 10 insertions(+), 9 deletions(-)
+ plugins/hciops.c |   18 ++++++++++++++++++
+ src/adapter.c    |   46 +++++++++++++++++++---------------------------
+ src/adapter.h    |    1 +
+ 3 files changed, 38 insertions(+), 27 deletions(-)
 
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index 9fdb20d..40de042 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -498,6 +498,23 @@ static int hciops_connectable(int index)
+ 	return 0;
+ }
+ 
++static int hciops_discoverable(int index)
++{
++	int dd;
++	uint8_t mode = (SCAN_PAGE | SCAN_INQUIRY);
++
++	dd = hci_open_dev(index);
++	if (dd < 0)
++		return -EIO;
++
++	hci_send_cmd(dd, OGF_HOST_CTL, OCF_WRITE_SCAN_ENABLE,
++					1, &mode);
++
++	hci_close_dev(dd);
++
++	return 0;
++}
++
+ static struct btd_adapter_ops hci_ops = {
+ 	.setup = hciops_setup,
+ 	.cleanup = hciops_cleanup,
+@@ -505,6 +522,7 @@ static struct btd_adapter_ops hci_ops = {
+ 	.stop = hciops_stop,
+ 	.set_powered = hciops_powered,
+ 	.set_connectable = hciops_connectable,
++	.set_discoverable = hciops_discoverable,
+ };
+ 
+ static int hciops_init(void)
 diff --git a/src/adapter.c b/src/adapter.c
-index cd18412..73e6d80 100644
+index 121694d..cd18412 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -1935,11 +1935,15 @@ static void load_drivers(struct btd_adapter *adapter)
+@@ -409,24 +409,13 @@ static int set_mode(struct btd_adapter *adapter, uint8_t new_mode)
  	}
- }
  
--static void load_connections(struct btd_adapter *adapter, int dd)
-+static void load_connections(struct btd_adapter *adapter)
- {
- 	struct hci_conn_list_req *cl = NULL;
- 	struct hci_conn_info *ci;
--	int i;
-+	int i, dd;
+ 	if (current_scan != scan_enable) {
+-		if (scan_enable == SCAN_PAGE) {
++		if (scan_enable == SCAN_PAGE)
+ 			err = adapter_ops->set_connectable(adapter->dev_id);
+-			if (err < 0)
+-				return err;
+-		} else {
+-			dd = hci_open_dev(adapter->dev_id);
+-			if (dd < 0)
+-				return -EIO;
+-
+-			err = hci_send_cmd(dd, OGF_HOST_CTL, OCF_WRITE_SCAN_ENABLE,
+-					1, &scan_enable);
+-			if (err < 0) {
+-				hci_close_dev(dd);
+-				return err;
+-			}
+-
+-			hci_close_dev(dd);
+-		}
++		else
++			err = adapter_ops->set_discoverable(adapter->dev_id);
 +
-+	dd = hci_open_dev(adapter->dev_id);
-+	if (dd < 0)
-+		return;
- 
- 	cl = g_malloc0(10 * sizeof(*ci) + sizeof(*cl));
- 
-@@ -1949,6 +1953,7 @@ static void load_connections(struct btd_adapter *adapter, int dd)
- 
- 	if (ioctl(dd, HCIGETCONNLIST, cl) != 0) {
- 		g_free(cl);
-+		hci_close_dev(dd);
- 		return;
- 	}
- 
-@@ -1963,6 +1968,7 @@ static void load_connections(struct btd_adapter *adapter, int dd)
- 	}
- 
- 	g_free(cl);
-+	hci_close_dev(dd);
- }
- 
- static int get_discoverable_timeout(const char *src)
-@@ -1990,7 +1996,7 @@ static int adapter_up(struct btd_adapter *adapter)
++		if (err < 0)
++			return err;
+ 	} else if ((scan_enable & SCAN_INQUIRY) &&
+ 						(new_mode != adapter->mode)) {
+ 		adapter_remove_discov_timeout(adapter);
+@@ -2001,7 +1990,7 @@ static int adapter_up(struct btd_adapter *adapter)
  	char mode[14], srcaddr[18];
  	uint8_t scan_mode;
  	gboolean powered, dev_down = FALSE;
--	int dd, err;
-+	int err;
+-	int dd;
++	int dd, err;
  
  	ba2str(&adapter->bdaddr, srcaddr);
  
-@@ -2055,19 +2061,14 @@ proceed:
+@@ -2054,19 +2043,22 @@ static int adapter_up(struct btd_adapter *adapter)
+ 	}
+ 
+ proceed:
+-	dd = hci_open_dev(adapter->dev_id);
+-
+-	if (dd < 0)
+-		return -EIO;
++	if (scan_mode == SCAN_PAGE)
++		err = adapter_ops->set_connectable(adapter->dev_id);
++	else
++		err = adapter_ops->set_discoverable(adapter->dev_id);
+ 
+-	if (dev_down == FALSE)
+-		hci_send_cmd(dd, OGF_HOST_CTL, OCF_WRITE_SCAN_ENABLE,
+-				1, &scan_mode);
++	if (err < 0)
++		return err;
+ 
+ 	if (adapter->initialized == FALSE) {
  		load_drivers(adapter);
  		load_devices(adapter);
  
--		dd = hci_open_dev(adapter->dev_id);
--		if (dd < 0)
--			return -EIO;
--
++		dd = hci_open_dev(adapter->dev_id);
++		if (dd < 0)
++			return -EIO;
++
  		/* retrieve the active connections: address the scenario where
  		 * the are active connections before the daemon've started */
--		load_connections(adapter, dd);
-+		load_connections(adapter);
- 
+ 		load_connections(adapter, dd);
+@@ -2074,6 +2066,8 @@ proceed:
  		adapter->initialized = TRUE;
  
  		manager_add_adapter(adapter->path);
- 
--		hci_close_dev(dd);
++
++		hci_close_dev(dd);
  	}
  
  	if (adapter->svc_cache)
+@@ -2088,8 +2082,6 @@ proceed:
+ 					ADAPTER_INTERFACE, "Powered",
+ 					DBUS_TYPE_BOOLEAN, &powered);
+ 
+-	hci_close_dev(dd);
+-
+ 	return 0;
+ }
+ 
+diff --git a/src/adapter.h b/src/adapter.h
+index 0bfad8a..bfd2826 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -154,6 +154,7 @@ struct btd_adapter_ops {
+ 	int (*stop) (int index);
+ 	int (*set_powered) (int index, gboolean powered);
+ 	int (*set_connectable) (int index);
++	int (*set_discoverable) (int index);
+ };
+ 
+ int btd_register_adapter_ops(struct btd_adapter_ops *btd_adapter_ops);
 -- 
 1.5.6.3
