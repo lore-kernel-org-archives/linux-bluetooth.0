@@ -1,25 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1242182634.27899.2.camel@localhost.localdomain>
-References: <1242181798-24059-1-git-send-email-forrest.zhao@intel.com>
-	 <1242182634.27899.2.camel@localhost.localdomain>
-Date: Wed, 13 May 2009 10:51:36 +0800
-Message-ID: <ac8af0be0905121951t1842bc55p6ddbbf2382aa6bad@mail.gmail.com>
 Subject: Re: [PATCH] add support for HFP plugin for oFono
-From: Zhao Forrest <forrest.zhao@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Forrest Zhao <forrest.zhao@intel.com>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Forrest Zhao <forrest.zhao@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, forrest.zhao@gmail.com
+In-Reply-To: <1242181798-24059-1-git-send-email-forrest.zhao@intel.com>
+References: <1242181798-24059-1-git-send-email-forrest.zhao@intel.com>
+Content-Type: text/plain
+Date: Tue, 12 May 2009 19:43:54 -0700
+Message-Id: <1242182634.27899.2.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
->
-> please call the file telephony-ofono.c since the oFono writing if you
-> use it withing written text references. Filenames and variables should
-> write if ofono.
-OK. A revised patch will be sent out soon.
+Hi Forrest,
 
-> Once merged you are responsible for making sure the compilation always
-> works. I am only testing the dummy code during release engineering.
-Yes, I'll take this responsibility.
+> The attached the patch implement the HFP plugin for oFono(ofono.org).
+> Your comments are welcome.
 
-Forrest
+please call the file telephony-ofono.c since the oFono writing if you
+use it withing written text references. Filenames and variables should
+write if ofono.
+
+Once merged you are responsible for making sure the compilation always
+works. I am only testing the dummy code during release engineering.
+
+Regards
+
+Marcel
+
+
