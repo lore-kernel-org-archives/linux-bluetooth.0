@@ -2,11 +2,16 @@ Return-Path: <cyrus@holtmann.org>
 From: Forrest Zhao <forrest.zhao@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Forrest Zhao <forrest.zhao@intel.com>
-Subject: [PATCH] add support for HFP plugin for oFono(ofono.org)
-Date: Wed, 13 May 2009 15:20:58 +0800
-Message-Id: <1242199258-10136-1-git-send-email-forrest.zhao@intel.com>
+Subject: [PATCH] add support for HFP plugin for oFono(ofono.org) - resend
+Date: Wed, 13 May 2009 15:11:27 +0800
+Message-Id: <1242198687-9770-1-git-send-email-forrest.zhao@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
+
+Compared with last version, the changes are:
+1 rename telephony-oFono to telephony-ofono
+2 move definition of send_method_call() higher up
+3 remove answer_reply() and its reference
 
 ---
  audio/Makefile.am       |    3 +-
