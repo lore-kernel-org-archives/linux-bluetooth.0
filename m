@@ -1,37 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 14 May 2009 18:49:14 -0500
+Date: Thu, 14 May 2009 17:29:52 -0500
 From: travis+ml-bluetooth@subspacefield.org
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: how to connect devices with bluetoothd
-Message-ID: <20090514234914.GW4918@subspacefield.org>
-References: <20090514222952.GV4918@subspacefield.org>
+Subject: how to connect devices with bluetoothd
+Message-ID: <20090514222952.GV4918@subspacefield.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="25rOlkxR6a4U87uN"
-In-Reply-To: <20090514222952.GV4918@subspacefield.org>
+	protocol="application/pgp-signature"; boundary="7PAM/4G1BR2SfWzg"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
---25rOlkxR6a4U87uN
+--7PAM/4G1BR2SfWzg
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 14, 2009 at 05:29:52PM -0500, travis+ml-bluetooth@subspacefield=
-=2Eorg wrote:
-> I used to use hidd --connect to pair my keyboard/mouse with the
-> computer, but that no longer works.
+Hi folks,
 
-Actually, I just got it to work once.
+I thought I posted this but maybe not.
 
-I ran hcitool scan to get the MAC (?) addresses, then ran hidd --connect MA=
-C.
+Apologies if you got this already.
 
-However, after reboot, they were no longer recognized by the computer
-and hcitool scan gave an error saying the Inquiry timed out.
+I just upgraded to the latest Mythbuntu, which comes with bluetoothd
+instead of the old daemons.
 
-Is there any trick I'm missing?
+I used to use hidd --connect to pair my keyboard/mouse with the
+computer, but that no longer works.
+
+Is there a new way to pair devices to the controller?
+
+I verified via lsusb that I can see the bluetooth dongle, I just can't
+seem to get the keyboard/mouse to connect using the old technique
+(power cycle mouse, hidd --connect while pressing pairing button,
+etc.)
 --=20
 Obama Nation | My emails do not have attachments; it's a digital signature
 that your mail program doesn't understand. | http://www.subpacefield.org/~t=
@@ -39,26 +41,26 @@ ravis/=20
 If you are a spammer, please email john@subspacefield.org to get blackliste=
 d.
 
---25rOlkxR6a4U87uN
+--7PAM/4G1BR2SfWzg
 Content-Type: application/pgp-signature
 Content-Disposition: inline
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.9 (OpenBSD)
 
-iQIcBAEBAgAGBQJKDK36AAoJEGQVZZEDJt9Hw1kP/iKHDatS34gMK6QKYudCQKYW
-XJAXtGrJiIu5AyS19mi1HB6nQ7m72+SkMTwztWF3HFV2TIfRZ1TTAA95bcjZnWR6
-2YS9BbpshjBpfGWZzCxHBf0etlcKZUUZ76R29tTXfEV0Dbq1+V9lQVr0GhLS3oYb
-eUbMucGlbXdtsfaEhhCn0PTchU4WEAg4b3EXH+k1wQQ61WKbrPoJTjD9bc0b9Ved
-UcOO6cpS4VZ5nGCgrLK1tcGxef1VP0W9pugHRURk/kQLMf7f7Ta6E/fldiU0CSt+
-Dvjm0Jf036PxVB6WOkV8hBKbuJGttcztJAugDGqup+97yoHzp6Pewx6JGGtBUV8O
-gwv5dBshFUO3vTcLwlzrpFmFZ5RwNMVwpvFQ1wU4D8sQ6FAS8PoKcAOLdQH/YpOV
-QyfvXJLtF6ukwQFwPvDEew0ter8tlywZTmbV2wxds81wK+D1q3P7Xp6Y8bFMOa+C
-0u4OTUlkTqAqqq1ycB6iUyU8Zj4pdARUodVzJ5pecnUriuJYbfKV8ig+CPhl8pTo
-h//Ix520ircyq6iIw3KEwx5R80/dPIc5wNn/VC0mCfw30Tx36mp+xNja36SfC0s1
-wMC3u3tpMyOj6BjJzU2niHpp3xpAduAi462ExjbAkIEpSqVKSEAKntTZNd/iOg9s
-rIljMg3dEHEuVRf7tfl6
-=L6us
+iQIcBAEBAgAGBQJKDJtgAAoJEGQVZZEDJt9Hh+EP/ikqeiKio+CUzC9bvjButC+D
+1Dk0ps3U5R7Y3yzWsYSSZvCBQD5Bg7JQMIH+xfTeLrhXkoL2phyBNpDdv93V0zrD
+2RS4e3pCC+v+tjBowtwHZRCwYwlcExC/uUtHi96GR74lMAz+2/Oggzcd1pM1FVpV
+V+IC2KqI/fBCS8TmF7rc/168byOc0sta5ceG/6sZhko1Hz430Kx3jR2KhA+VbUUZ
+lalmUzKpQ0tp67QFnTbX+s5CNLHWNGgXl8tMJwCMG4EFuy1snWw6H5YrysK+9p8h
+wgsyIpgGLjQgbOPc35wBEWoVpF3p5Kspmaq9wW+P31B53AlBuhc2p654sbk3Xend
+v+FsB/Ciz++FdRvPXbLtpfKwuH1fSEetbv6/UcDCCRi5m0zNaD5sFifNSoj2kCRw
+FXYtX6ynJJFwoqqEORSdIAYB/Q8qb0v/GutMdkRVvxht9m5M+lE2WFeLRqVsCUl1
+vcuScg6KrtlqEEFN1RmGL5+BMdqlbjfg+VxdgK4hNLSTov7bfatrUbJQkp24mxwz
+d2Bso6EUhXJg2rXhFkg/JPeFoFJ11Vwb/D4ap/Oo+HPQoi6Fu6t67EDKm6yoCW4t
+3RmBZjt1iWteWcRrJ872BpIAz8K4UZpkqSgcs+QlPCGX7ZCASqeUhSiyDGvobHKb
+D5x+DwUu6fONO2JjX1KY
+=xGCh
 -----END PGP SIGNATURE-----
 
---25rOlkxR6a4U87uN--
+--7PAM/4G1BR2SfWzg--
