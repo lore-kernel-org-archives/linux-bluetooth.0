@@ -1,31 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 3/3] Update manpage for hid2hci tool from previous
- patches
+Subject: Re: [PATCH 1/3] Add support for command line arguments on hid2hci
+ tool
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Mario Limonciello <mario_limonciello@dell.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <4A0DC542.80206@dell.com>
-References: <4A0DC542.80206@dell.com>
+In-Reply-To: <4A0DC533.8080900@dell.com>
+References: <4A0DC533.8080900@dell.com>
 Content-Type: text/plain
-Date: Fri, 15 May 2009 13:12:00 -0700
-Message-Id: <1242418320.3446.21.camel@localhost.localdomain>
+Date: Fri, 15 May 2009 13:11:18 -0700
+Message-Id: <1242418278.3446.20.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Mario,
 
-> This brings the manpage up to the current supported options of hid2hci
-> from the previous set of patches submitted.
+> This means that hid2hci won't have to run
+>  on every bootup for every machine with bluetooth installed.  It instead
+> gets ran on demand if a
+>  product that is called out from the dbus rules file contains the
+> correct attributes and/or VID/PID.
 > 
+>  It also makes it easier for users to manually test new VID/PID
+> combinations that may or may not
+>  be yet supported by bluez.
 > ---
->  tools/hid2hci.8 |   18 ++++++++++++------
->  1 files changed, 12 insertions(+), 6 deletions(-)
+>  scripts/Makefile.am       |   12 ++-
+>  scripts/bluetooth.default |    3 -
+>  scripts/bluetooth.init    |    7 --
+>  scripts/hid2hci.rules     |   38 ++++++++++
+>  tools/hid2hci.c           |  179
+> +++++++++++++++++++-------------------------
+>  5 files changed, 124 insertions(+), 115 deletions(-)
+>  create mode 100644 scripts/hid2hci.rules
 > 
-> Patch is attached to prevent Exchange mangling.
+> Attaching patch as Exchange would mangle otherwise.
 
-you got combine hid2hci.c and hid2hci.8 changes in one patch if you
-like. Not a hard requirement though :)
+please restrict the commit message to 70-72 chars per line.
+
+And please do the following changes:
+
+s/radiomode/mode/ since it is not about the radio part here.
+
+s/hidproxy/csr/ if you wanna expose this then call it what it is.
+
+And go over the coding style once more since there are some cases where
+it breaks.
+
+Also please split Makefile/rules changes from the actual code changes. I
+want two patches here. One that fixes the code and another one that
+takes care of the udev integration.
+
+Other than that, looks pretty good.
 
 Regards
 
