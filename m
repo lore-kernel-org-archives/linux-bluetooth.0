@@ -1,33 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 17 May 2009 01:54:06 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: alokbarsode@gmail.com, linux-bluetooth@vger.kernel.org,
-	marcel@holtmann.org, Alok Barsode <alok.barsode@azingo.com>
-Subject: Re: [PATCH 2/7] Adding set_powered method to hciops plugin.
-Message-ID: <20090516225406.GA19041@jh-x301>
-References: <1242131216-4081-1-git-send-email-alok.barsode@azingo.com> <1242131216-4081-2-git-send-email-alok.barsode@azingo.com> <20090515182256.GA18375@jh-x301>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <20090515182256.GA18375@jh-x301>
+In-Reply-To: <1242210030.8227.29.camel@optenet-laptop-unai>
+References: <1242210030.8227.29.camel@optenet-laptop-unai>
+Date: Sat, 16 May 2009 13:34:04 -0300
+Message-ID: <2d5a2c100905160934o7141dd22s4bac3ace6588050d@mail.gmail.com>
+Subject: Re: [PATCH] Allow to handle SDP records bigger than 512 bytes
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Unai Uribarri <unaiur@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alok,
+Hi Unai,
 
-On Fri, May 15, 2009, Johan Hedberg wrote:
-> I'm going through your patches now and I found at least one issue:
-> 
-> > +	hci_send_cmd(dd, OGF_HOST_CTL, OCF_WRITE_SCAN_ENABLE,
-> > +					1, SCAN_DISABLED);
-> 
-> This looks wrong. The last parameter should a pointer and not an integer.
+On Wed, May 13, 2009 at 7:20 AM, Unai Uribarri <unaiur@gmail.com> wrote:
+> sdp_append_to_pdu statically allocates a buffer of 512 bytes. This patch calculates
+> the amount of memory needed and allocates dynamically using malloc.
+>
+>
 
-There's another issue with this patch as well:
-adapter.c: In function ‘set_mode’:
-adapter.c:403: error: ‘dd’ may be used uninitialized in this function
+Could you please test the following patch with the devices that was
+triggering the crash:
 
-I'd have fixed both issues for you (since they are rather trivial) but
-then your third patch doesn't apply cleanly anymore. So please fix these
-issues, check that no patch causes any compilation warning or error, and
-resend them. Thanks.
+http://gitorious.org/~vudentz/bluez/vudentzs-clone/commit/d3939bfff2f1c32f36b295d2c5173b11af686833
 
-Johan
+It is a very similar solution, though there are a lot of more places
+addressed by it.
+
+-- 
+Luiz Augusto von Dentz
+Engenheiro de Computa��o
