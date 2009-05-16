@@ -1,31 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Fix dmesg errors about hid2hci not claiming interface
- before usage.
+Subject: Re: [PATCH 3/3] Launch hid2hci from udev rules dynamically.
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Mario Limonciello <mario_limonciello@dell.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <4A0DFB63.8060006@dell.com>
-References: <4A0DFB63.8060006@dell.com>
+In-Reply-To: <4A0DE7F0.3090803@dell.com>
+References: <4A0DE7F0.3090803@dell.com>
 Content-Type: text/plain
-Date: Sat, 16 May 2009 06:38:44 -0700
-Message-Id: <1242481124.3446.36.camel@localhost.localdomain>
+Date: Sat, 16 May 2009 06:37:00 -0700
+Message-Id: <1242481020.3446.35.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Mario,
 
-> These errors were caused from trying to detach the kernel driver from
->  the interface, which was unnecessary.  A simple usb_claim_interface
->  is all that is necessary.  It is however, important to ensure the
->  interface claim is successful.
+> Rather than launching hid2hci upon every boot even when the user
+>  doesn't have hardware that needs it installed, launch it from
+>  a set of udev rules that matches the hardware by attributes.
 > 
 > ---
->  tools/hid2hci.c |   12 ++++--------
->  1 files changed, 4 insertions(+), 8 deletions(-)
+>  scripts/Makefile.am       |    9 ++++++++-
+>  scripts/bluetooth.default |    3 ---
+>  scripts/bluetooth.init    |    7 -------
+>  scripts/hid2hci.rules     |   38 ++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 46 insertions(+), 11 deletions(-)
+>  create mode 100644 scripts/hid2hci.rules
 
-patch has been applied. Again, please line-break your commit messages
-properly.
+I had to redo the whole thing, but should be working :)
 
 Regards
 
