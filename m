@@ -2,35 +2,34 @@ Return-Path: <cyrus@holtmann.org>
 From: alokbarsode@gmail.com
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org, Alok Barsode <alok.barsode@azingo.com>
-Subject: [PATCH 4/7] Adding set_discoverable method to hciops.
-Date: Mon, 18 May 2009 15:19:10 +0530
-Message-Id: <1242640153-23420-4-git-send-email-alok.barsode@azingo.com>
-In-Reply-To: <1242640153-23420-3-git-send-email-alok.barsode@azingo.com>
+Subject: [PATCH 3/7] Adding set_connectable method to hciops plugin.
+Date: Mon, 18 May 2009 15:19:09 +0530
+Message-Id: <1242640153-23420-3-git-send-email-alok.barsode@azingo.com>
+In-Reply-To: <1242640153-23420-2-git-send-email-alok.barsode@azingo.com>
 References: <1242640153-23420-1-git-send-email-alok.barsode@azingo.com>
  <1242640153-23420-2-git-send-email-alok.barsode@azingo.com>
- <1242640153-23420-3-git-send-email-alok.barsode@azingo.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Alok Barsode <alok.barsode@azingo.com>
 
 ---
  plugins/hciops.c |   18 ++++++++++++++++++
- src/adapter.c    |   46 +++++++++++++++++++---------------------------
+ src/adapter.c    |   42 +++++++++++++++++++++---------------------
  src/adapter.h    |    1 +
- 3 files changed, 38 insertions(+), 27 deletions(-)
+ 3 files changed, 40 insertions(+), 21 deletions(-)
 
 diff --git a/plugins/hciops.c b/plugins/hciops.c
-index 15084e4..184ed9c 100644
+index 1e54c09..15084e4 100644
 --- a/plugins/hciops.c
 +++ b/plugins/hciops.c
-@@ -499,6 +499,23 @@ static int hciops_connectable(int index)
- 	return 0;
+@@ -482,12 +482,30 @@ static int hciops_powered(int index, gboolean powered)
+ 	return hciops_stop(index);
  }
  
-+static int hciops_discoverable(int index)
++static int hciops_connectable(int index)
 +{
 +	int dd;
-+	uint8_t mode = (SCAN_PAGE | SCAN_INQUIRY);
++	uint8_t mode = SCAN_PAGE;
 +
 +	dd = hci_open_dev(index);
 +	if (dd < 0)
@@ -47,115 +46,95 @@ index 15084e4..184ed9c 100644
  static struct btd_adapter_ops hci_ops = {
  	.setup = hciops_setup,
  	.cleanup = hciops_cleanup,
-@@ -506,6 +523,7 @@ static struct btd_adapter_ops hci_ops = {
+ 	.start = hciops_start,
  	.stop = hciops_stop,
  	.set_powered = hciops_powered,
- 	.set_connectable = hciops_connectable,
-+	.set_discoverable = hciops_discoverable,
++	.set_connectable = hciops_connectable,
  };
  
  static int hciops_init(void)
 diff --git a/src/adapter.c b/src/adapter.c
-index 121694d..cd18412 100644
+index 5b3b0aa..121694d 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -409,24 +409,13 @@ static int set_mode(struct btd_adapter *adapter, uint8_t new_mode)
- 	}
- 
- 	if (current_scan != scan_enable) {
--		if (scan_enable == SCAN_PAGE) {
-+		if (scan_enable == SCAN_PAGE)
- 			err = adapter_ops->set_connectable(adapter->dev_id);
--			if (err < 0)
--				return err;
--		} else {
--			dd = hci_open_dev(adapter->dev_id);
--			if (dd < 0)
--				return -EIO;
--
--			err = hci_send_cmd(dd, OGF_HOST_CTL, OCF_WRITE_SCAN_ENABLE,
--					1, &scan_enable);
--			if (err < 0) {
--				hci_close_dev(dd);
--				return err;
--			}
--
--			hci_close_dev(dd);
--		}
-+		else
-+			err = adapter_ops->set_discoverable(adapter->dev_id);
-+
-+		if (err < 0)
-+			return err;
- 	} else if ((scan_enable & SCAN_INQUIRY) &&
- 						(new_mode != adapter->mode)) {
- 		adapter_remove_discov_timeout(adapter);
-@@ -2001,7 +1990,7 @@ static int adapter_up(struct btd_adapter *adapter)
- 	char mode[14], srcaddr[18];
- 	uint8_t scan_mode;
- 	gboolean powered, dev_down = FALSE;
+@@ -343,23 +343,10 @@ static void adapter_remove_discov_timeout(struct btd_adapter *adapter)
+ static gboolean discov_timeout_handler(gpointer user_data)
+ {
+ 	struct btd_adapter *adapter = user_data;
 -	int dd;
-+	int dd, err;
+-	uint8_t scan_enable;
+-	uint16_t dev_id = adapter->dev_id;
  
- 	ba2str(&adapter->bdaddr, srcaddr);
+ 	adapter->discov_timeout_id = 0;
  
-@@ -2054,19 +2043,22 @@ static int adapter_up(struct btd_adapter *adapter)
+-	dd = hci_open_dev(dev_id);
+-	if (dd < 0) {
+-		error("HCI device open failed: hci%d", dev_id);
+-		return FALSE;
+-	}
+-
+-	scan_enable = adapter->scan_mode & ~SCAN_INQUIRY;
+-
+-	hci_send_cmd(dd, OGF_HOST_CTL, OCF_WRITE_SCAN_ENABLE,
+-					1, &scan_enable);
+-	hci_close_dev(dd);
++	adapter_ops->set_connectable(adapter->dev_id);
+ 
+ 	return FALSE;
+ }
+@@ -421,16 +408,24 @@ static int set_mode(struct btd_adapter *adapter, uint8_t new_mode)
+ 		goto done;
  	}
  
- proceed:
 -	dd = hci_open_dev(adapter->dev_id);
--
 -	if (dd < 0)
 -		return -EIO;
-+	if (scan_mode == SCAN_PAGE)
-+		err = adapter_ops->set_connectable(adapter->dev_id);
-+	else
-+		err = adapter_ops->set_discoverable(adapter->dev_id);
- 
--	if (dev_down == FALSE)
--		hci_send_cmd(dd, OGF_HOST_CTL, OCF_WRITE_SCAN_ENABLE,
--				1, &scan_mode);
-+	if (err < 0)
-+		return err;
- 
- 	if (adapter->initialized == FALSE) {
- 		load_drivers(adapter);
- 		load_devices(adapter);
- 
+-
+ 	if (current_scan != scan_enable) {
+-		err = hci_send_cmd(dd, OGF_HOST_CTL, OCF_WRITE_SCAN_ENABLE,
++		if (scan_enable == SCAN_PAGE) {
++			err = adapter_ops->set_connectable(adapter->dev_id);
++			if (err < 0)
++				return err;
++		} else {
++			dd = hci_open_dev(adapter->dev_id);
++			if (dd < 0)
++				return -EIO;
++
++			err = hci_send_cmd(dd, OGF_HOST_CTL, OCF_WRITE_SCAN_ENABLE,
+ 					1, &scan_enable);
+-		if (err < 0) {
++			if (err < 0) {
++				hci_close_dev(dd);
++				return err;
++			}
++
+ 			hci_close_dev(dd);
+-			return err;
+ 		}
+ 	} else if ((scan_enable & SCAN_INQUIRY) &&
+ 						(new_mode != adapter->mode)) {
+@@ -438,6 +433,11 @@ static int set_mode(struct btd_adapter *adapter, uint8_t new_mode)
+ 		if (adapter->discov_timeout)
+ 			adapter_set_discov_timeout(adapter,
+ 						adapter->discov_timeout);
++
 +		dd = hci_open_dev(adapter->dev_id);
 +		if (dd < 0)
 +			return -EIO;
 +
- 		/* retrieve the active connections: address the scenario where
- 		 * the are active connections before the daemon've started */
- 		load_connections(adapter, dd);
-@@ -2074,6 +2066,8 @@ proceed:
- 		adapter->initialized = TRUE;
- 
- 		manager_add_adapter(adapter->path);
-+
-+		hci_close_dev(dd);
- 	}
- 
- 	if (adapter->svc_cache)
-@@ -2088,8 +2082,6 @@ proceed:
- 					ADAPTER_INTERFACE, "Powered",
- 					DBUS_TYPE_BOOLEAN, &powered);
- 
--	hci_close_dev(dd);
--
- 	return 0;
- }
- 
+ 		if (new_mode == MODE_LIMITED)
+ 			set_limited_discoverable(dd, adapter->dev.class,
+ 									TRUE);
 diff --git a/src/adapter.h b/src/adapter.h
-index 0bfad8a..bfd2826 100644
+index 5c292fb..0bfad8a 100644
 --- a/src/adapter.h
 +++ b/src/adapter.h
-@@ -154,6 +154,7 @@ struct btd_adapter_ops {
+@@ -153,6 +153,7 @@ struct btd_adapter_ops {
+ 	int (*start) (int index);
  	int (*stop) (int index);
  	int (*set_powered) (int index, gboolean powered);
- 	int (*set_connectable) (int index);
-+	int (*set_discoverable) (int index);
++	int (*set_connectable) (int index);
  };
  
  int btd_register_adapter_ops(struct btd_adapter_ops *btd_adapter_ops);
