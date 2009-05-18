@@ -2,8 +2,8 @@ Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
 To: linux-bluetooth@vger.kernel.org
 Subject: [PATCH] Bluetooth: add support to configure ERTM and Streaming mode, take 2
-Date: Mon, 18 May 2009 04:32:45 -0300
-Message-Id: <1242631965-28774-1-git-send-email-gustavo@las.ic.unicamp.br>
+Date: Mon, 18 May 2009 04:06:01 -0300
+Message-Id: <1242630361-21448-1-git-send-email-gustavo@las.ic.unicamp.br>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -16,8 +16,8 @@ that we sent, if not, the channel is disconnected.
 Signed-off-by: Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
 ---
  include/net/bluetooth/l2cap.h |   22 +++-
- net/bluetooth/l2cap.c         |  265 +++++++++++++++++++++++++++++++++++------
- 2 files changed, 248 insertions(+), 39 deletions(-)
+ net/bluetooth/l2cap.c         |  262 +++++++++++++++++++++++++++++++++++------
+ 2 files changed, 245 insertions(+), 39 deletions(-)
 
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
 index 06b072f..2d28d8f 100644
@@ -79,19 +79,18 @@ index 06b072f..2d28d8f 100644
  void l2cap_load(void);
  
 diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 82feeb7..0bd4aaa 100644
+index 82feeb7..40452c3 100644
 --- a/net/bluetooth/l2cap.c
 +++ b/net/bluetooth/l2cap.c
-@@ -719,6 +719,8 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
+@@ -719,6 +719,7 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
  		pi->omtu = l2cap_pi(parent)->omtu;
  		pi->mode = l2cap_pi(parent)->mode;
  		pi->fcs  = l2cap_pi(parent)->fcs;
-+		pi->conf_state =
-+		    l2cap_pi(parent)->conf_state & L2CAP_CONF_STATE2_DEVICE;
++		pi->conf_state = l2cap_pi(parent)->conf_state & L2CAP_CONF_STATE2_DEVICE;
  		pi->sec_level = l2cap_pi(parent)->sec_level;
  		pi->role_switch = l2cap_pi(parent)->role_switch;
  		pi->force_reliable = l2cap_pi(parent)->force_reliable;
-@@ -965,6 +967,7 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
+@@ -965,6 +966,7 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
  	case L2CAP_MODE_BASIC:
  		break;
  	case L2CAP_MODE_ERTM:
@@ -99,7 +98,7 @@ index 82feeb7..0bd4aaa 100644
  		if (enable_ertm)
  			break;
  		/* fall through */
-@@ -1028,6 +1031,7 @@ static int l2cap_sock_listen(struct socket *sock, int backlog)
+@@ -1028,6 +1030,7 @@ static int l2cap_sock_listen(struct socket *sock, int backlog)
  	case L2CAP_MODE_BASIC:
  		break;
  	case L2CAP_MODE_ERTM:
@@ -107,7 +106,7 @@ index 82feeb7..0bd4aaa 100644
  		if (enable_ertm)
  			break;
  		/* fall through */
-@@ -1297,6 +1301,9 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname, char __us
+@@ -1297,6 +1300,9 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname, char __us
  		l2cap_pi(sk)->imtu = opts.imtu;
  		l2cap_pi(sk)->omtu = opts.omtu;
  		l2cap_pi(sk)->mode = opts.mode;
@@ -117,7 +116,7 @@ index 82feeb7..0bd4aaa 100644
  		break;
  
  	case L2CAP_LM:
-@@ -1738,7 +1745,30 @@ static void l2cap_add_conf_opt(void **ptr, u8 type, u8 len, unsigned long val)
+@@ -1738,7 +1744,30 @@ static void l2cap_add_conf_opt(void **ptr, u8 type, u8 len, unsigned long val)
  	*ptr += L2CAP_CONF_OPT_SIZE + len;
  }
  
@@ -126,19 +125,19 @@ index 82feeb7..0bd4aaa 100644
 +{
 +	switch (mode) {
 +	case L2CAP_MODE_ERTM:
-+		return L2CAP_FEAT_ERTM & feat_mask;
++			return L2CAP_FEAT_ERTM & feat_mask;
 +	case L2CAP_MODE_STREAMING:
-+		return  L2CAP_FEAT_STREAMING & feat_mask;
++			return  L2CAP_FEAT_STREAMING & feat_mask;
 +	default:
-+		return  0x00;
++			return  0x00;
 +	}
 +}
 +
 +static inline __u8 l2cap_select_mode(__u16 local_feat_mask, __u16 remote_feat_mask, __u8 mode)
 +{
 +	if (l2cap_mode_supported(mode, local_feat_mask) &&
-+		(mode == L2CAP_MODE_STREAMING || mode == L2CAP_MODE_ERTM))
-+		return mode;
++			(mode == L2CAP_MODE_STREAMING || mode == L2CAP_MODE_ERTM))
++			return mode;
 +	else if (local_feat_mask & remote_feat_mask & L2CAP_FEAT_ERTM)
 +		return L2CAP_MODE_ERTM;
 +	else
@@ -149,30 +148,28 @@ index 82feeb7..0bd4aaa 100644
  {
  	struct l2cap_pinfo *pi = l2cap_pi(sk);
  	struct l2cap_conf_req *req = data;
-@@ -1747,6 +1777,22 @@ static int l2cap_build_conf_req(struct sock *sk, void *data)
+@@ -1747,6 +1776,20 @@ static int l2cap_build_conf_req(struct sock *sk, void *data)
  
  	BT_DBG("sk %p", sk);
  
 +	if (pi->num_conf_req == 0 && pi->num_conf_rsp == 0) {
 +		if (pi->conf_state & L2CAP_CONF_STATE2_DEVICE) {
-+			if (!l2cap_mode_supported(pi->mode, conn->feat_mask)
-+				|| !l2cap_mode_supported(pi->mode,
-+				    l2cap_feat_mask)) {
++			if (!l2cap_mode_supported(pi->mode, conn->feat_mask) ||
++					!l2cap_mode_supported(pi->mode, l2cap_feat_mask)) {
 +				struct l2cap_disconn_req req;
 +				req.dcid = cpu_to_le16(pi->dcid);
 +				req.scid = cpu_to_le16(pi->scid);
 +				l2cap_send_cmd(conn, l2cap_get_ident(conn),
-+					L2CAP_DISCONN_REQ, sizeof(req), &req);
++						L2CAP_DISCONN_REQ, sizeof(req), &req);
 +			}
 +		} else
-+			pi->mode = l2cap_select_mode(l2cap_feat_mask,
-+				conn->feat_mask, rfc.mode);
++			pi->mode = l2cap_select_mode(l2cap_feat_mask, conn->feat_mask, rfc.mode);
 +	}
 +
  	switch (pi->mode) {
  	case L2CAP_MODE_BASIC:
  		if (pi->imtu != L2CAP_DEFAULT_MTU)
-@@ -1755,16 +1801,25 @@ static int l2cap_build_conf_req(struct sock *sk, void *data)
+@@ -1755,16 +1798,25 @@ static int l2cap_build_conf_req(struct sock *sk, void *data)
  
  	case L2CAP_MODE_ERTM:
  		rfc.mode            = L2CAP_MODE_ERTM;
@@ -203,7 +200,7 @@ index 82feeb7..0bd4aaa 100644
  
  	/* FIXME: Need actual value of the flush timeout */
  	//if (flush_to != L2CAP_DEFAULT_FLUSH_TO)
-@@ -1776,7 +1831,7 @@ static int l2cap_build_conf_req(struct sock *sk, void *data)
+@@ -1776,7 +1828,7 @@ static int l2cap_build_conf_req(struct sock *sk, void *data)
  	return ptr - data;
  }
  
@@ -212,16 +209,16 @@ index 82feeb7..0bd4aaa 100644
  {
  	struct l2cap_pinfo *pi = l2cap_pi(sk);
  	struct l2cap_conf_rsp *rsp = data;
-@@ -1824,28 +1879,74 @@ static int l2cap_parse_conf_req(struct sock *sk, void *data)
+@@ -1824,28 +1876,74 @@ static int l2cap_parse_conf_req(struct sock *sk, void *data)
  		}
  	}
  
 +	if (pi->num_conf_rsp == 0 && pi->num_conf_req == 0) {
 +		if (pi->conf_state & L2CAP_CONF_STATE2_DEVICE) {
-+			if (!l2cap_mode_supported(pi->mode, conn->feat_mask)
-+				|| !l2cap_mode_supported(pi->mode,
-+				    l2cap_feat_mask))
++			if (!l2cap_mode_supported(pi->mode, conn->feat_mask) ||
++					!l2cap_mode_supported(pi->mode, l2cap_feat_mask)) {
 +				*disconnect = 1;
++			}
 +		} else
 +			pi->mode = l2cap_select_mode(l2cap_feat_mask,
 +					conn->feat_mask, rfc.mode);
@@ -235,7 +232,7 @@ index 82feeb7..0bd4aaa 100644
 +			*disconnect = 1;
 +		else
 +			l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC,
-+				sizeof(rfc), (unsigned long) &rfc);
++					sizeof(rfc), (unsigned long) &rfc);
 +	}
 +
 +
@@ -300,7 +297,7 @@ index 82feeb7..0bd4aaa 100644
  	}
  
  	rsp->scid   = cpu_to_le16(pi->dcid);
-@@ -1855,6 +1956,72 @@ static int l2cap_parse_conf_req(struct sock *sk, void *data)
+@@ -1855,6 +1953,72 @@ static int l2cap_parse_conf_req(struct sock *sk, void *data)
  	return ptr - data;
  }
  
@@ -339,7 +336,7 @@ index 82feeb7..0bd4aaa 100644
 +				memcpy(&rfc, (void *) val, olen);
 +
 +			if ((rfc.mode != pi->mode) &&
-+				(pi->conf_state & L2CAP_CONF_STATE2_DEVICE))
++					(pi->conf_state & L2CAP_CONF_STATE2_DEVICE))
 +				*disconnect = 1;
 +
 +			pi->mode = rfc.mode;
@@ -352,13 +349,13 @@ index 82feeb7..0bd4aaa 100644
 +
 +		switch (rfc.mode) {
 +		case L2CAP_MODE_ERTM:
-+			pi->remote_tx_win   = rfc.txwin_size;
++			pi->remote_tx_win	= rfc.txwin_size;
 +			pi->retrans_timeout = rfc.retrans_timeout;
 +			pi->monitor_timeout = rfc.monitor_timeout;
-+			pi->max_pdu_size    = le16_to_cpu(rfc.max_pdu_size);
++			pi->max_pdu_size	= le16_to_cpu(rfc.max_pdu_size);
 +			break;
 +		case L2CAP_MODE_STREAMING:
-+			pi->max_pdu_size    = le16_to_cpu(rfc.max_pdu_size);
++			pi->max_pdu_size	= le16_to_cpu(rfc.max_pdu_size);
 +			break;
 +		}
 +	}
@@ -373,7 +370,7 @@ index 82feeb7..0bd4aaa 100644
  static int l2cap_build_conf_rsp(struct sock *sk, void *data, u16 result, u16 flags)
  {
  	struct l2cap_conf_rsp *rsp = data;
-@@ -2040,7 +2207,8 @@ static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hd
+@@ -2040,7 +2204,8 @@ static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hd
  		l2cap_pi(sk)->conf_state &= ~L2CAP_CONF_CONNECT_PEND;
  
  		l2cap_send_cmd(conn, l2cap_get_ident(conn), L2CAP_CONF_REQ,
@@ -383,7 +380,7 @@ index 82feeb7..0bd4aaa 100644
  		break;
  
  	case L2CAP_CR_PEND:
-@@ -2062,7 +2230,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+@@ -2062,7 +2227,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
  	u16 dcid, flags;
  	u8 rsp[64];
  	struct sock *sk;
@@ -392,7 +389,7 @@ index 82feeb7..0bd4aaa 100644
  
  	dcid  = __le16_to_cpu(req->dcid);
  	flags = __le16_to_cpu(req->flags);
-@@ -2098,11 +2266,21 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+@@ -2098,11 +2263,21 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
  	}
  
  	/* Complete config. */
@@ -416,7 +413,7 @@ index 82feeb7..0bd4aaa 100644
  
  	/* Reset config buffer. */
  	l2cap_pi(sk)->conf_len = 0;
-@@ -2119,7 +2297,9 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+@@ -2119,7 +2294,9 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
  	if (!(l2cap_pi(sk)->conf_state & L2CAP_CONF_REQ_SENT)) {
  		u8 buf[64];
  		l2cap_send_cmd(conn, l2cap_get_ident(conn), L2CAP_CONF_REQ,
@@ -427,7 +424,7 @@ index 82feeb7..0bd4aaa 100644
  	}
  
  unlock:
-@@ -2132,6 +2312,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+@@ -2132,6 +2309,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
  	struct l2cap_conf_rsp *rsp = (struct l2cap_conf_rsp *)data;
  	u16 scid, flags, result;
  	struct sock *sk;
@@ -435,7 +432,7 @@ index 82feeb7..0bd4aaa 100644
  
  	scid   = __le16_to_cpu(rsp->scid);
  	flags  = __le16_to_cpu(rsp->flags);
-@@ -2149,16 +2330,30 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+@@ -2149,16 +2327,30 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
  		break;
  
  	case L2CAP_CONF_UNACCEPT:
@@ -462,7 +459,7 @@ index 82feeb7..0bd4aaa 100644
 +				req.dcid = cpu_to_le16(l2cap_pi(sk)->dcid);
 +				req.scid = cpu_to_le16(l2cap_pi(sk)->scid);
 +				l2cap_send_cmd(conn, l2cap_get_ident(conn),
-+					L2CAP_DISCONN_REQ, sizeof(req), &req);
++						L2CAP_DISCONN_REQ, sizeof(req), &req);
 +				goto done;
 +			}
 +
