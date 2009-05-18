@@ -1,38 +1,156 @@
 Return-Path: <cyrus@holtmann.org>
-From: alokbarsode@gmail.com
+Message-ID: <4A110DBA.1060704@xyzw.org>
+Date: Mon, 18 May 2009 00:26:50 -0700
+From: Brian Rogers <brian@xyzw.org>
+MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, Alok Barsode <alok.barsode@azingo.com>
-Subject: [PATCH 1/7] Using hci_send_cmd instead of hci_send_req to set scan mode.
-Date: Mon, 18 May 2009 15:19:07 +0530
-Message-Id: <1242640153-23420-1-git-send-email-alok.barsode@azingo.com>
+Subject: Mouse connection times out in sniff mode
+Content-Type: multipart/mixed;
+ boundary="------------080509040302050902040300"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Alok Barsode <alok.barsode@azingo.com>
+This is a multi-part message in MIME format.
+--------------080509040302050902040300
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 
----
- src/adapter.c |   10 ++--------
- 1 files changed, 2 insertions(+), 8 deletions(-)
+Hi all,
 
-diff --git a/src/adapter.c b/src/adapter.c
-index a54078c..2efdbc8 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -416,14 +416,8 @@ static int set_mode(struct btd_adapter *adapter, uint8_t new_mode)
- 		return -EIO;
- 
- 	if (adapter->up && scan_enable == SCAN_DISABLED) {
--		struct hci_request rq = {
--			.ogf = OGF_HOST_CTL,
--			.ocf = OCF_WRITE_SCAN_ENABLE,
--			.cparam = &scan_enable,
--			.clen = sizeof(scan_enable),
--		};
--
--		hci_send_req(dd, &rq, HCI_REQ_TIMEOUT);
-+		hci_send_cmd(dd, OGF_HOST_CTL, OCF_WRITE_SCAN_ENABLE,
-+					1, &scan_enable);
- 		hci_close_dev(dd);
- 
- 		err = adapter_ops->stop(adapter->dev_id);
--- 
-1.5.6.3
+I have a problem where my mouse occasionally disconnects after brief 
+inactivity.
+
+Using hcidump, I can see it dropping to sniff mode during the 
+inactivity. Then, if the problem occurs, no activity is logged when I 
+move or click the mouse until it gets disconnected due to a timeout. 
+Once the timeout occurs, the mouse is able to reconnect.
+
+Other times the mouse comes out of sniff mode just fine. The frequency 
+of this problem occurring seems rather random. Sometimes I can't 
+reproduce it, and other times it happens constantly. I've also done a 
+bit of testing with two other Bluetooth dongles, and the problem seems 
+to occur only with my laptop's internal Bluetooth device.
+
+I've been able to work around the timeout problem by disabling sniff 
+mode. I've been using the following command:
+sudo hciconfig hci0 lp hold,park lm master
+
+Also, this problem is exposing a secondary issue. When the connection 
+times out in the scenario described above, the mouse is not removed from 
+HAL. So I see many many copies of the mouse piling up in 
+gnome-device-manager and 'xinput list'. If I switch the mouse off 
+myself, the mouse (or at least the most recent copy) is properly removed 
+once the timeout occurs. I think being in sniff mode when the timeout 
+happens is what makes the difference.
+
+My configuration:
+
+Bus 002 Device 002: ID 0a5c:2101 Broadcom Corp. A-Link BlueUsbA2 Bluetooth
+Linux master branch with bluetooth-testing branch merged in.
+BlueZ 4.39
+
+A log of the timeout happening a couple times is attached.
+
+Brian
+
+
+--------------080509040302050902040300
+Content-Type: application/x-bzip;
+ name="hcidump.log.bz2"
+Content-Transfer-Encoding: base64
+Content-Disposition: inline;
+ filename="hcidump.log.bz2"
+
+QlpoOTFBWSZTWVy2VHsBQGz/gF0UABJ/+3//v+//ir/v//RgHV577dzq92D7noAAAUoulYko
+Ab6HVsCuAMz2tvYSaTY2YRrSQFIaoMEbDVTWmKzMiIkKkpSWGiqfqJ5GTTFPSYA0EMEYAACM
+0CaYAINMhAaFKqD0jTBAANAGhpphBiANAAZNEmqeoAANDTTQAADIAAAAAAhKiEg0UzSDNR6n
+qabUBoGhoNPUAAAAATVJJqZNEE9U80TJ6mg1NqBoZGgG1GhoAGjQaBSkiBNEZBMEyTE9IxJ5
+I0yGTTIeo2RBkaNNPJBVOaSR5K1ioFoKVMY+fb2mbvb87avL6JWyAXdq1rVrVuzGR6QYcD1Z
+/OZ8J6TrwjdCmipwdu5HfnXW+PNuTRyjHKxHLZZc0353OTXLbRNmzVTlRytTdn+RKpp00+YS
+gCdkCDhMsMgGCwpGmaWhRpdC7wFAVMzO4SfrVWmm4AWt26cH7J5unsY9F45DpeWHwACeaB9y
+RH3YF0ANIlPkg0qDtgGlTmYOzWnwYqb5BNsKtYjbIm2VIVzIGgaBCkpX1XXnAcwC9I3wOOF9
+/KT34hPfhW+DMSrxYMwFqLtr/EhyzQROy1yEkrkywFj/v+h+UGD/RazTarSQAHEvMnofoJRs
+Lz2AA+MCARMrIQDBSDCHYUGvFM8Tf6em+9xbaum/XyRJRfFL9PLU1sSSK+eolR20AunPzfJz
+9/zft/H0vlzvzZm3ck3r0F7U1f7tnsfybjZYi9b7Gm1+85mz9jJqxFkZZJhXabvLrtk6XXL8
+16uWr2S7C7bcGF1/lpdUAvJei0b9XWEMqUUo4jVGmHcsGIdlNJ4WO0E1GVdASdJBJH6rjQ2r
+Xe021EuNUmNsb0x5kQz2+r/BY+skUlFjDvALFyFBRBHnQMQKIeJeUpHYRx4rbrtxjRdbD5Y3
+O1RR32uDwZOsnJLWSJBBYggEsxBGTFxDukZiJ6o1mbWlwueXPcHTnd4G+nocJkxBLEuUXLFX
+IREAEliWEdhxBbpCAhIEhkRlQ4FvXvAINxa78EFK+hjva5TzeeNIFLYLgnZeECgnSI5CbcI+
+LRwRcTeF70xR8hwb0SRw1RQhEIohXUCEWyz7cVTyt87w8Bxt+BI7Io7TuwLGxGzHYrejw09A
+EuEFlFtkgEaBSyt4zzNp89gdHWXCIS6ildbicw8OTaLc761eHKbiKG22KJ4CxGdsOdHu86Od
+B6SByudZJRWpxWra6hWt1BKCGvXzezxm/bvkE3yxEnfojSwKxw5bHkb1W+RuuVesEbtnvI3e
+2lypfW6TZybUQjzEzuaG87OpApDV8+OhbnVzOPTp8c10v3xHm2a1zw7pPWRrBzjAQuREQ55m
+e3l6bQ3m1xgLttHFxZZrw5NxU9tyQvbdyItoF9qNCOGwxjnt4jQOPem3Dd73egg/Ys8NzW9z
+6w8KCGsd5Gy76cawDp2uQfPjFzhZdZyMgmfHWcdGVrROmHBzHs5vgHAwWFHlHm9m+d6lP72w
+SDdDSNBC3M4XhGhtt7GTsOEn2QkET6q1vp5XHng4KK4iQjwE+lOVMAobLjm9o16pDGDQoAkl
+htISRR2hIQx4e2BryGbb3bidjgiwdSChhO6jbpm4kAQQSSTyE5BTSnelJcIOuw/ZUEutP4V3
+zx2OIEXLcD8ScUR3xtqxO8FucS+OO+ShofDq5dgiQQAYQSCUA65Vp92MTgOLYwbSr2GhFZ7V
+oteH3h9WTSk6nr5kMknkadS2LoABEUFeOHpxm6bEFB1264xUcTi21u93pBEkwQpcOqQzaBx7
+GJs8TeFGL16Sc3eLLnTy1rVa2PU+uTsLdt91Ws+zXuzfdXmgfb9aU5gvD7cZNn87jZ7IiXdQ
+g7hFi68YMKHXONxtDpDujtXlbdNx3bITB3r1ZBTbZDEM1UTI01VTUYBiRGWEGWBCIFKUCgGI
+VSkESalFoCkSkSlEkwrEwjBlKyliVlGEr0hMBx1zoe0UF5ODrzatYquLHG3BmRJdGD8eSkFu
+wSTlEJJ3SlFDJtE2CEE/IRgEA9MyklCdPjAwLwcenIklDl/ltb3d8k32buJgfPmktvXpPrEe
+frgE5hySQARLQlVEVTEiB5QEhXKWFDYZHCYzhyZKgmQGIOW4gnD+OXGuTMS4g+d8xYuonsTC
+dyg9qt69tCPHDmuqtX9XOazCm0C+TBcheGwfNRYBF0yPyEARSVYVSXiCYKIJKQBcqJc9+OO2
+cT8oP54PxzOfQpnJ6vX78Q899YtA12Hy72qjmp145HCBxKA/WpohmAZFiAQSAPjIS+XNhyoc
+8+CD3jvGoz806xzupcPbXy50DauwYTzz5u/p3HuX2RVapuEZcBmHwBizDPeuLVj1r3j5jw+Y
+pYj0Hs8wYzvXzT5r4h7aDrdkGAaMFAloY3ka1j3e3QvlRk65Ijnfeg6GyCXAYCDF4x1NzvJa
+snc817pt62L1nJhh8YszAST7nfnIgdj58yz+tZ+SzADfEcA99MLebvUzzlZqtBg2vnQ9cxi1
+XuAzcicW3YANiNjGDOBbhU7eWYC1t9xOLacANfuPLj3swYbtrnF7iTzzuWHls2YGHZeNsI4S
+xLhY7mOKKU9nXNgqU6B2PJc3ddt2uOrKPE8jo/E4Xnbmq7Hiqmc7V6+el4L1cU28fq9GZ6Nb
+eMP293bXbdigLLpzeXnRvZkqouFHC67bp3+bQ9O/mzs7OmeXkN/T12V2ydw8No7Oeq/hcS7v
+FvHgjreF5PDgbWdEoA93k4XoTT4V+Op31LRD3B0656PHUj42eXfWLs1ws3zW6c2Sed37tqi8
+eKIWJZ4PFuniez8T6wVVSBgYGaCjKwZNPmuDpvNaT9DndzW1tcQyTKXkf67isFdt0fxv43Oq
+d8nILo5LTzNmqkFwacFTZzOJ0lVxlpt4xXfKr632uDmuJlIF7efV4PjdG7mcGlf2fu3dF52F
+f9XUc4+C3g+52SbnccbhSbxveJYuy38jL5fU5OLdjuP775m9XCn1OK7TLtdrRx3O1xcm6PnK
+qp+CrLLvsejr6ut4XCell0iVTL97Cr4GcM8opFwFvUIt91rKt7C+bt0r3/h0t/j+d2b9q2sQ
+AFf8v9z9ufoeXYMPo8fpzHroMw1nXcq3bXDAbQrUYuFjm5q45hxgBm1tA81vmqbNsatmeZxr
+SpQnrWwwARR12NaOdmLctBIWq0d4evHjszAbLZtEWmo5dUuI57uyUzRN+U9F3VzRc+szBmJc
+gCUqdI9Id4gTkcoLGuerheN7qn8M+4qeJ9CVOtltF4Ul2Bd3cEIxSDBmlnaC7EgkEgglVZOi
+zQSXLLoXiMXjSSl3m/A9lReXjlXvs1Dc8uu9oki6IJJISYu+xDklFyzOXun9tAMGavp3aY98
++TBJJBMb777t1KU+lpX1hUpkM8rSchvVdHLWa0gFrWta77ZHjnQ94LJclPoVPk4yeuOMlOPr
+dy3uD2VIL8RYu+77mWd/Hv38Mzhvvw71zLoXS9fadXo0djdQIUCFAhQL6KrlA3hARuwaAYNu
+ZmscCNUiwxqs3ffPnxIe+KlNvHZ461l37yNe3nu7AtVEsicmwZkFnNMVoUhMUFRRJyDSg8jI
+quaDo1dezq63Hjeq6JyW2WSdjOEmNyuuo49Tr7mneY8CXuVToEqnZbGqx9LaKAD56iaJiQVV
+IKP188HrjlPXn7Nv2MwwVVPt/X7Wb1KqfbY8DycnuBC7sNrQem1strSwvR7NzMXw5DemZJiA
+XPFzMUBaylOWSsxUwxmTGEebCT2ZSI2sotCLbChoVJgQoRoEaUKRFKBHqsMMCAbjCtKKGsJN
+YlXQYBvktDz7Lst/xmVUF+dRm4gXrwgU2GEHp0axTEsxIMhXAFU661zy/XUgsI3rrmoTFjLK
+oiwzByORNLIIbar3M6tM1Tuwm5W6KJjMFSmRg0U21WyqW00yyFY0BpiWNBSmU5UHBjIiaEEz
+wsYUZhR4BgjVspohttZpVjULVLTUagn81jFlgLLGSiLGPhRkUiySZYTJkljJVjDIW5VVMhZO
+to589XfybtWpv00vhZBXpIUFBYwAlAAY7zCqGIWIYgsbTAc1PNzyhQ0Q1cxlQiyqBa1RaHFb
+LJTiNMsGaUKLrdEaTdtJu2hstitQ7GVGzCzKmGSMHTVSC+ZHLRuwxYubD7tkdlXnoOROkAem
+TePqqB0oLvmlAMYwAoDWNnQkQR0cqAg6DipKDoSvLjlw+7IewD5TPURiBIiWMrrzfNuiV8Qq
+U2tq7bUunLq45uDtUKHiYV0jrRQUz0RMccWa6jsNW/GWrJZaU4vPwvSjtRxcXG0lCUGe7uzz
+sh4JAOKgpDQYJGl+fLxIFIU8bDRnizEjScTwOCbra0mitQ6YCFjPVkrfa7P3ddg4F1U8l2ed
+HTt7eSWsjTNYLWtAbGR0UlS99rgzQnUDgxumtnq8CduiL3CvHQTtAUBQcyaaVpaB0d1bEPJx
+cc1c2YLG8Ih19XXKhcvUkDqSamIqUgkNs0lBWhrRZ5VVVNx22jmDFFJZz038epgblDxZ8nXl
+7M0dZ+3GgOImNRjBMRBp0xLpN5s+Z5e/wPV6XMYwxz2O947tuQ3Rl4nBsubmzGb6ptjI4pim
+hmKppqIrFtEG1VRonVBMzAKAPIe+/A/qQEAdH0T8n1dlvwWH1215LJcH5BX4hYsRxfXUgtmy
++KkC4raFosubmlqyywyxvVz0jjUgv1H6lhiw51CLjpbFll4TzZR+j86NvMj3epGe32pX9P2A
+vfxCkzaV6JX469DzZRQvmeOoRettb2E44/2sHf9B4eFQk+i/UQuEKU9fFFc8oHxUyvt3gcXf
+Ugv1OFKC5WBeOjDWQHO9L6Ucm8uEx+PzNCps9HOpBbN6VN2njqQX73/baKC/bfa05KiLlUIt
+PsY1OulpgeQzqjNmMwjCsvMyJy7Wi8r+BlQi81SAHhR7MJjgxxVIyNTMREkzVVEMyjQw/oHP
+eQcBUiPsnYEwHD8kEyniOBMJVVVRFAKAPwqiAPve55/ePgamqdaJKQkgogiIkpZth1tr6OeP
+dr0gHvjUhf6X1rs98mSc3SVeZ/QTgckKL+VwsK+v8w7LB5Gh8sNjb7oV+VQS/usqvW5dnZbO
+Nmx1EaXuqQXiFSnee841qx9T1ulLxyHirwujreS4B7cU+3tEgUcWeO7gDgqIIimnZ485c+fl
+zBRBwPxHhfwvoXMy+NE+FCD/p3CngiEoqAgiBppKoQgqZoor3Hw44ooaO3oAPnB6hO4faUvc
+Hu/R7DFizDDpVAsaWZhmYJ0FYI8qiY+NMFMhEC/NAXg1wbXwQusuTsW9jO944d+LMZMTMUpI
+O2F2yYgJ4zmg46IoIPsituGM9HNVzqmOQYrJMpqMOdszMpxZatajJ9FSC2O3mzkK8wtAlOUX
+ioXB93Fetgqk3EReBNXsvkl2d9e2wbnoVOT3OFS+6V+h7Qj7UlDQQwIx4cjpJC80GpjsXQrT
+NKCXDe429luxZaK50nWMdWR2HLpOzCvjuJ6ro4wu+vjZ3nU3TvTBy3+0h6m/VbXW+OV0Xihb
+tOcasS05tq0vgOUrpJKT5WcPcxynfV9PludgHaWhKp7FXU0lg41d/HHyXuk9fDk8njNj/06M
+NFe+4o6u0e+NieZb14uYVvWpLa4YeOF29N/e7PPSBSi0DTM0iswg0FMlfLy4m9G1EH0id6vW
+e8oBxyB2qQ0kyntnPJB87JLwcTSpTZhHE/DVmqJbGCbcG7dzvULiRRZTg7Js2pxqYHqrKyVF
+PKcHusUimJZfGGbT8rz+d3Qu8yvaq4IkXUPELtvvtP6R1vq7r4bZiydluNyto8hkrBlwvMe1
+4neR9/+dx5S3vvOk8I8LGvLeWk277xLjLWUM9F5UKLip2wvZek5zwRVJq0rhv6pMWN2GACww
+ZWKrCeNLFVtKxJslirYAWVj6uNbBXGr2HF3niqu49Zt4SoLfk88K7bpWbxdBXIXQuUK4FezL
+vRspMBjKQSx5XE+DYW9ksxfnNNW/Fcu7QrhOCoym+lKk5QttqnyS5jcMryDlovo6Kp6uIVU5
+FVY3o5XP5L1L/5eV8QfmfADCvhYVzoO6+l975Lovpj2vrMfC6gXkr0MpMZbbCxip8pz4tPqv
+LXBuRC8Eek8l6aez4rxUvV8Cn2BiqnSqM92O90qQXbLpLhPqEqnJvV7DroBYymTGhWGR7yZd
+uFePOdp0tPNbNztblIW9LCdD10rodDD02847XG9/oLcnClKnrrYOdeVy2nyVh0q8CWzQmUyS
+ws86zVQi0Ta2sRoL+0LhOqro42z1W/FdDixd688qC4NGxMk42QsS2V2qLFYxtMmwt6kF0cy2
+aWr6JOdvaW94rdbnnOBje3b8KkFsjeVXRVIX4I5KjokdcOxWTFbupNuCWz4XROt0swrmcrqv
+FeFdFv3JpYWWB1O5yLRLe3YUOXjq4u1fZV3Hc+BseRcKnTW/qS7K8LmmC9uyQ7I8QlU5vzP0
+06nTR4XjTzKqtfDdsLdjbudfL46SpXO4vS5mHCyeMNr0ds+L9L8uMxmMyqPuDj1hAGGIYEf/
+i7kinChILlsqPYA=
+--------------080509040302050902040300--
