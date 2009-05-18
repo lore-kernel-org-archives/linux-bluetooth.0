@@ -1,90 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Mon, 18 May 2009 12:21:06 +0200
-Message-ID: <bb7250380905180321v1f154d11xbb2ca3b60b10cf81@mail.gmail.com>
-Subject: Using alsa-lib for headsets: Invalid argument
-From: Marcel <wittemar@googlemail.com>
+From: alokbarsode@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=0016364c7441f56971046a2d265a
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: marcel@holtmann.org, Alok Barsode <alok.barsode@azingo.com>
+Subject: [PATCH 7/7] Code cleanup in set_mode.
+Date: Mon, 18 May 2009 15:19:13 +0530
+Message-Id: <1242640153-23420-7-git-send-email-alok.barsode@azingo.com>
+In-Reply-To: <1242640153-23420-6-git-send-email-alok.barsode@azingo.com>
+References: <1242640153-23420-1-git-send-email-alok.barsode@azingo.com>
+ <1242640153-23420-2-git-send-email-alok.barsode@azingo.com>
+ <1242640153-23420-3-git-send-email-alok.barsode@azingo.com>
+ <1242640153-23420-4-git-send-email-alok.barsode@azingo.com>
+ <1242640153-23420-5-git-send-email-alok.barsode@azingo.com>
+ <1242640153-23420-6-git-send-email-alok.barsode@azingo.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---0016364c7441f56971046a2d265a
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+From: Alok Barsode <alok.barsode@azingo.com>
 
-Hi,
+---
+ src/adapter.c |   45 ++++++++++++++-------------------------------
+ 1 files changed, 14 insertions(+), 31 deletions(-)
 
-I'm trying to use bluez and alsa to play sound through a headset (HSP/A2DP)
-
-I have the following .asoundrc:
-
-pcm.bluetoothraw {
-  type bluetooth
-  profile auto
-}
-
-pcm.bluetooth {
-    type plug
-    slave {
-        pcm bluetoothraw
-    }
-}
-
-If I use the attached method I get an "Error applying the params to
-PCM device bluetooth : Invalid argument". Has anybody an idea why?
-
-Greets,
-Marcel
-
---0016364c7441f56971046a2d265a
-Content-Type: text/x-csrc; charset=US-ASCII; name="bluez-alsa.c"
-Content-Disposition: attachment; filename="bluez-alsa.c"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_fuv0yu5g0
-
-c25kX3BjbV90KiBhbHNhaGFuZGxlOwpzbmRfcGNtX2h3X3BhcmFtc190KiBhbHNhcGFyYW1zOwoK
-I2RlZmluZSBSQVRFIDQ0MTAwIC8vU2FtcGxlIHJhdGUKI2RlZmluZSBQRVJJT0RTIDIgIC8vTnVt
-YmVyIG9mIHBlcmlvZHMKI2RlZmluZSBQRVJJT0RTSVpFIDgxOTIgLy9QZXJpb2RzaXplIChieXRl
-cykKI2RlZmluZSBBTFNBX0RFVklDRSAiYmx1ZXRvb3RoIgoKaW50IGF1ZGlvX29wZW5fcGNtKCkg
-ewogICAgcHJpbnRmKCJvcGVuaW5nIHRoZSBQQ00gZGV2aWNlICVzXG4iLCBBTFNBX0RFVklDRSk7
-CiAgICBpZiAoc25kX3BjbV9vcGVuKCZhbHNhaGFuZGxlLCBBTFNBX0RFVklDRSwgU05EX1BDTV9T
-VFJFQU1fUExBWUJBQ0ssIDApIDwgMCkgewogICAgICAgIHByaW50ZigiRXJyb3Igb3BlbmluZyBQ
-Q00gZGV2aWNlICVzXG4iLCBBTFNBX0RFVklDRSk7CiAgICAgICAgcmV0dXJuIC0xOwogICAgfQog
-ICAgcHJpbnRmKCJjb25maWd1cmluZyB0aGUgUENNIGRldmljZSAlc1xuIiwgQUxTQV9ERVZJQ0Up
-OwogICAgc25kX3BjbV9od19wYXJhbXNfYWxsb2NhKCZhbHNhcGFyYW1zKTsKICAgIGlmIChzbmRf
-cGNtX2h3X3BhcmFtc19hbnkoYWxzYWhhbmRsZSwgYWxzYXBhcmFtcykgPCAwKSB7CiAgICAgICAg
-cHJpbnRmKCJFcnJvciBjb25maWd1cmluZyBQQ00gZGV2aWNlICVzXG4iLCBBTFNBX0RFVklDRSk7
-CiAgICAgICAgcmV0dXJuIC0xOwogICAgfQogICAgaWYgKHNuZF9wY21faHdfcGFyYW1zX3NldF9h
-Y2Nlc3MoYWxzYWhhbmRsZSwgYWxzYXBhcmFtcywgU05EX1BDTV9BQ0NFU1NfUldfSU5URVJMRUFW
-RUQpIDwgMCkgewogICAgICAgIHByaW50ZigiRXJyb3Igc2V0dGluZyB0aGUgYWNjZXNzIGZvciBQ
-Q00gZGV2aWNlICVzXG4iLCBBTFNBX0RFVklDRSk7CiAgICAgICAgcmV0dXJuIC0xOwogICAgfQog
-ICAgaWYgKHNuZF9wY21faHdfcGFyYW1zX3NldF9mb3JtYXQoYWxzYWhhbmRsZSwgYWxzYXBhcmFt
-cywgU05EX1BDTV9GT1JNQVRfUzE2X0xFKSA8IDApIHsKICAgICAgICBwcmludGYoIkVycm9yIHNl
-dHRpbmcgdGhlIGZvcm1hdCBmb3IgUENNIGRldmljZSAlc1xuIiwgQUxTQV9ERVZJQ0UpOwogICAg
-ICAgIHJldHVybiAtMTsKICAgIH0KICAgIGludCBleGFjdF9yYXRlID0gUkFURTsKICAgIGlmIChz
-bmRfcGNtX2h3X3BhcmFtc19zZXRfcmF0ZV9uZWFyKGFsc2FoYW5kbGUsIGFsc2FwYXJhbXMsICZl
-eGFjdF9yYXRlLCAwKSA8IDApIHsKICAgICAgICBwcmludGYoIkVycm9yIHNldHRpbmcgdGhlIHJh
-dGUgZm9yIFBDTSBkZXZpY2UgJXNcbiIsIEFMU0FfREVWSUNFKTsKICAgICAgICByZXR1cm4gLTE7
-CiAgICB9CiAgICBpZiAoUkFURSAhPSBleGFjdF9yYXRlKSB7CiAgICAgICAgcHJpbnRmKCJUaGUg
-cmF0ZSAlZCBIeiBpcyBub3Qgc3VwcG9ydGVkIGJ5IHlvdXIgaGFyZHdhcmUsIHVzaW5nICVkIEh6
-IGluc3RlYWQuXG4iLCBSQVRFLCBleGFjdF9yYXRlKTsKICAgIH0KICAgIGlmIChzbmRfcGNtX2h3
-X3BhcmFtc19zZXRfY2hhbm5lbHMoYWxzYWhhbmRsZSwgYWxzYXBhcmFtcywgMikgPCAwKSB7CiAg
-ICAgICAgcHJpbnRmKCJFcnJvciBzZXR0aW5nIHRoZSBjaGFubmVscyBmb3IgUENNIGRldmljZSAl
-c1xuIiwgQUxTQV9ERVZJQ0UpOwogICAgICAgIHJldHVybiAtMTsKICAgIH0KICAgIGlmIChzbmRf
-cGNtX2h3X3BhcmFtc19zZXRfcGVyaW9kcyhhbHNhaGFuZGxlLCBhbHNhcGFyYW1zLCBQRVJJT0RT
-LCAwKSA8IDApIHsKICAgICAgICBwcmludGYoIkVycm9yIHNldHRpbmcgdGhlIHBlcmlvZHMgZm9y
-IFBDTSBkZXZpY2UgJXNcbiIsIEFMU0FfREVWSUNFKTsKICAgICAgICByZXR1cm4gLTE7CiAgICB9
-CiAgICBzbmRfcGNtX3VmcmFtZXNfdCBidWZmZXJzaXplID0gKFBFUklPRFNJWkUgKiBQRVJJT0RT
-KSA+PiAyOwogICAgaWYgKHNuZF9wY21faHdfcGFyYW1zX3NldF9idWZmZXJfc2l6ZV9uZWFyKGFs
-c2FoYW5kbGUsIGFsc2FwYXJhbXMsICZidWZmZXJzaXplKSA8IDApIHsKICAgICAgICBwcmludGYo
-IkVycm9yIHNldHRpbmcgdGhlIGJ1ZmZlcnNpemUgZm9yIFBDTSBkZXZpY2UgJXNcbiIsIEFMU0Ff
-REVWSUNFKTsKICAgICAgICByZXR1cm4gLTE7CiAgICB9CiAgICBpZiAoYnVmZmVyc2l6ZSAhPSAo
-KFBFUklPRFNJWkUgKiBQRVJJT0RTKSA+PiAyKSkgewogICAgICAgIHByaW50ZigiVGhlIGJ1ZmZl
-cnNpemUgJWQgaXMgbm90IHN1cHBvcnRlZCBieSB5b3VyIGhhcmR3YXJlLCB1c2luZyAlZCBpbnN0
-ZWFkLlxuIiwgKFBFUklPRFNJWkUgKiBQRVJJT0RTKSA+PiAyLCBidWZmZXJzaXplKTsKICAgIH0K
-ICAgIGludCByZXQgPSBzbmRfcGNtX2h3X3BhcmFtcyhhbHNhaGFuZGxlLCBhbHNhcGFyYW1zKTsK
-ICAgIGlmIChyZXQgPCAwKSB7CiAgICAgICAgcHJpbnRmKCJFcnJvciBhcHBseWluZyB0aGUgcGFy
-YW1zIHRvIFBDTSBkZXZpY2UgJXMgOiAlc1xuIiwgQUxTQV9ERVZJQ0UsIHNuZF9zdHJlcnJvcihy
-ZXQpKTsKICAgICAgICByZXR1cm4gLTE7CiAgICB9CiAgICByZXR1cm4gMDsKfQ==
---0016364c7441f56971046a2d265a--
+diff --git a/src/adapter.c b/src/adapter.c
+index 87ecaff..c1a81b4 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -328,38 +328,18 @@ static void adapter_set_discov_timeout(struct btd_adapter *adapter,
+ 							adapter);
+ }
+ 
+-static uint8_t mode2scan(uint8_t mode)
+-{
+-	switch (mode) {
+-	case MODE_OFF:
+-		return SCAN_DISABLED;
+-	case MODE_CONNECTABLE:
+-		return SCAN_PAGE;
+-	case MODE_DISCOVERABLE:
+-	case MODE_LIMITED:
+-		return (SCAN_PAGE | SCAN_INQUIRY);
+-	default:
+-		error("Invalid mode given to mode2scan: %u", mode);
+-		return SCAN_PAGE;
+-	}
+-}
+-
+ static int set_mode(struct btd_adapter *adapter, uint8_t new_mode)
+ {
+-	uint8_t scan_enable;
+-	uint8_t current_scan = adapter->scan_mode;
+ 	int err;
+ 	const char *modestr;
+ 
+-	scan_enable = mode2scan(new_mode);
+-
+-	if (!adapter->up && scan_enable != SCAN_DISABLED) {
++	if (!adapter->up && new_mode != MODE_OFF) {
+ 		err = adapter_ops->set_powered(adapter->dev_id, TRUE);
+ 		if (err < 0)
+ 			return err;
+ 	}
+ 
+-	if (adapter->up && scan_enable == SCAN_DISABLED) {
++	if (adapter->up && new_mode == MODE_OFF) {
+ 		err = adapter_ops->set_powered(adapter->dev_id, FALSE);
+ 		if (err < 0)
+ 			return err;
+@@ -369,17 +349,20 @@ static int set_mode(struct btd_adapter *adapter, uint8_t new_mode)
+ 		goto done;
+ 	}
+ 
+-	if (current_scan != scan_enable) {
+-		if (scan_enable == SCAN_PAGE)
+-			err = adapter_ops->set_connectable(adapter->dev_id);
+-		else
+-			err = adapter_ops->set_discoverable(adapter->dev_id);
++	if (new_mode == adapter->mode)
++		return 0;
+ 
+-		if (err < 0)
+-			return err;
+-	} else if ((scan_enable & SCAN_INQUIRY) &&
+-						(new_mode != adapter->mode)) {
++	if (new_mode == MODE_CONNECTABLE)
++		err = adapter_ops->set_connectable(adapter->dev_id);
++	else
++		err = adapter_ops->set_discoverable(adapter->dev_id);
++
++	if (err < 0)
++		return err;
++
++	if (new_mode > MODE_CONNECTABLE) {
+ 		adapter_remove_discov_timeout(adapter);
++
+ 		if (adapter->discov_timeout)
+ 			adapter_set_discov_timeout(adapter,
+ 						adapter->discov_timeout);
+-- 
+1.5.6.3
