@@ -1,179 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Mon, 18 May 2009 20:20:09 +0530
-Message-ID: <8b5debfa0905180750o2cf8656ct326c6cc17a7e9817@mail.gmail.com>
-Subject: [PATCH] Adding start_inquiry to hciops plugin.
-From: alok barsode <alokbarsode@gmail.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Content-Type: multipart/mixed; boundary=000e0cd5d0542dfe49046a30e939
+From: alokbarsode@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org, Alok Barsode <alok.barsode@azingo.com>
+Subject: [PATCH 7/7] Code cleanup in set_mode.
+Date: Mon, 18 May 2009 17:07:49 +0530
+Message-Id: <1242646669-2831-1-git-send-email-alok.barsode@azingo.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---000e0cd5d0542dfe49046a30e939
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+From: Alok Barsode <alok.barsode@azingo.com>
 
-Hi Marcel,
+---
+ src/adapter.c |   45 ++++++++++++++-------------------------------
+ 1 files changed, 14 insertions(+), 31 deletions(-)
 
-Attaching a patch which adds start_inquiry functionality to the hciops plugin.
-I have made the following changes :
-
-* use hci_send_cmd instead of hci_send_req.
-* move the cmd_status callback from dbus-hci.c to adapter.c and call
-it adapter_start_inquiry_cb().
-* hardcode the callback instead of passing a function pointer.
-
-If you are OK with this framework, i can start working on the periodic
-inquiry functionality.
-
-Let me know what you think.
-
-Cheers,
-Alok.
-
---000e0cd5d0542dfe49046a30e939
-Content-Type: text/x-diff; charset=US-ASCII;
-	name="0001-Adding-start_inquiry-functionality-to-hciops-plugin.patch"
-Content-Disposition: attachment;
-	filename="0001-Adding-start_inquiry-functionality-to-hciops-plugin.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_fuvaia3b0
-
-RnJvbSA2Mjc2ZDU4OWIwMWIyNGU4NTc3Yjc3OWZhMTI0ODA0ZTBkMTBiNmQ1IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBBbG9rIEJhcnNvZGUgPGFsb2suYmFyc29kZUBhemluZ28uY29t
-PgpEYXRlOiBNb24sIDE4IE1heSAyMDA5IDE5OjU5OjQwICswNTMwClN1YmplY3Q6IFtQQVRDSF0g
-QWRkaW5nIHN0YXJ0X2lucXVpcnkgZnVuY3Rpb25hbGl0eSB0byBoY2lvcHMgcGx1Z2luLgoKLS0t
-CiBsaWIvaGNpLmMgICAgICAgIHwgICAgMiArLQogcGx1Z2lucy9oY2lvcHMuYyB8ICAgMjQgKysr
-KysrKysrKysrKysrCiBzcmMvYWRhcHRlci5jICAgIHwgICA4NSArKysrKysrKysrKysrKysrKysr
-KysrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KIHNyYy9hZGFwdGVyLmggICAgfCAg
-ICAzICstCiBzcmMvZGJ1cy1oY2kuYyAgIHwgICAyOSAtLS0tLS0tLS0tLS0tLS0tLS0KIHNyYy9k
-YnVzLWhjaS5oICAgfCAgICAxIC0KIHNyYy9zZWN1cml0eS5jICAgfCAgICAyICstCiA3IGZpbGVz
-IGNoYW5nZWQsIDcyIGluc2VydGlvbnMoKyksIDc0IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBh
-L2xpYi9oY2kuYyBiL2xpYi9oY2kuYwppbmRleCA2ZDI1YThiLi4yOWJhMzE5IDEwMDY0NAotLS0g
-YS9saWIvaGNpLmMKKysrIGIvbGliL2hjaS5jCkBAIC05ODEsNyArOTgxLDcgQEAgaW50IGhjaV9z
-ZW5kX2NtZChpbnQgZGQsIHVpbnQxNl90IG9nZiwgdWludDE2X3Qgb2NmLCB1aW50OF90IHBsZW4s
-IHZvaWQgKnBhcmFtKQogCXdoaWxlICh3cml0ZXYoZGQsIGl2LCBpdm4pIDwgMCkgewogCQlpZiAo
-ZXJybm8gPT0gRUFHQUlOIHx8IGVycm5vID09IEVJTlRSKQogCQkJY29udGludWU7Ci0JCXJldHVy
-biAtMTsKKwkJcmV0dXJuIC1lcnJubzsKIAl9CiAJcmV0dXJuIDA7CiB9CmRpZmYgLS1naXQgYS9w
-bHVnaW5zL2hjaW9wcy5jIGIvcGx1Z2lucy9oY2lvcHMuYwppbmRleCA4ZjllZTA2Li4yMzk1OTZi
-IDEwMDY0NAotLS0gYS9wbHVnaW5zL2hjaW9wcy5jCisrKyBiL3BsdWdpbnMvaGNpb3BzLmMKQEAg
-LTU2MSw2ICs1NjEsMjkgQEAgZG9uZToKIAlyZXR1cm4gZXJyOwogfQogCitzdGF0aWMgaW50IGhj
-aW9wc19zdGFydF9pbnF1aXJ5KGludCBpbmRleCkKK3sKKwlpbnF1aXJ5X2NwIGNwOworCXVpbnQ4
-X3QgbGFwWzNdID0geyAweDMzLCAweDhiLCAweDllIH07CisJaW50IGRkLCBlcnIgPSAwOworCisJ
-ZGQgPSBoY2lfb3Blbl9kZXYoaW5kZXgpOworCWlmIChkZCA8IDApCisJCXJldHVybiBkZDsKKwor
-CW1lbXNldCgmY3AsIDAsIHNpemVvZihjcCkpOworCW1lbWNweSgmY3AubGFwLCBsYXAsIDMpOwor
-CWNwLmxlbmd0aCA9IDB4MDg7CisJY3AubnVtX3JzcCA9IDB4MDA7CisKKwllcnIgPSBoY2lfc2Vu
-ZF9jbWQoZGQsIE9HRl9MSU5LX0NUTCwgT0NGX0lOUVVJUlksCisJCQkJCUlOUVVJUllfQ1BfU0la
-RSwgJmNwKTsKKworCWhjaV9jbG9zZV9kZXYoZGQpOworCisJcmV0dXJuIGVycjsKK30KKwogc3Rh
-dGljIHN0cnVjdCBidGRfYWRhcHRlcl9vcHMgaGNpX29wcyA9IHsKIAkuc2V0dXAgPSBoY2lvcHNf
-c2V0dXAsCiAJLmNsZWFudXAgPSBoY2lvcHNfY2xlYW51cCwKQEAgLTU3MCw2ICs1OTMsNyBAQCBz
-dGF0aWMgc3RydWN0IGJ0ZF9hZGFwdGVyX29wcyBoY2lfb3BzID0gewogCS5zZXRfY29ubmVjdGFi
-bGUgPSBoY2lvcHNfY29ubmVjdGFibGUsCiAJLnNldF9kaXNjb3ZlcmFibGUgPSBoY2lvcHNfZGlz
-Y292ZXJhYmxlLAogCS5zZXRfbGltaXRlZF9kaXNjb3ZlcmFibGUgPSBoY2lvcHNfc2V0X2xpbWl0
-ZWRfZGlzY292ZXJhYmxlLAorCS5zdGFydF9pbnF1aXJ5ID0gaGNpb3BzX3N0YXJ0X2lucXVpcnks
-CiB9OwogCiBzdGF0aWMgaW50IGhjaW9wc19pbml0KHZvaWQpCmRpZmYgLS1naXQgYS9zcmMvYWRh
-cHRlci5jIGIvc3JjL2FkYXB0ZXIuYwppbmRleCAxYzRiZWM1Li4xMjAwZWNkIDEwMDY0NAotLS0g
-YS9zcmMvYWRhcHRlci5jCisrKyBiL3NyYy9hZGFwdGVyLmMKQEAgLTk0NSw1NSArOTQ1LDU4IEBA
-IHN0cnVjdCBidGRfZGV2aWNlICphZGFwdGVyX2dldF9kZXZpY2UoREJ1c0Nvbm5lY3Rpb24gKmNv
-bm4sCiAJcmV0dXJuIGFkYXB0ZXJfY3JlYXRlX2RldmljZShjb25uLCBhZGFwdGVyLCBhZGRyZXNz
-KTsKIH0KIAotc3RhdGljIGludCBzdGFydF9pbnF1aXJ5KHN0cnVjdCBidGRfYWRhcHRlciAqYWRh
-cHRlcikKK3ZvaWQgYWRhcHRlcl9zdGFydF9pbnF1aXJ5X2NiKGJkYWRkcl90ICpsb2NhbCwgdWlu
-dDhfdCBzdGF0dXMpCiB7Ci0JaW5xdWlyeV9jcCBjcDsKLQlldnRfY21kX3N0YXR1cyBycDsKLQlz
-dHJ1Y3QgaGNpX3JlcXVlc3QgcnE7Ci0JdWludDhfdCBsYXBbM10gPSB7IDB4MzMsIDB4OGIsIDB4
-OWUgfTsKLQlpbnQgZGQsIGVycjsKLQotCXBlbmRpbmdfcmVtb3RlX25hbWVfY2FuY2VsKGFkYXB0
-ZXIpOwotCi0JZGQgPSBoY2lfb3Blbl9kZXYoYWRhcHRlci0+ZGV2X2lkKTsKLQlpZiAoZGQgPCAw
-KQotCQlyZXR1cm4gZGQ7Ci0KLQltZW1zZXQoJmNwLCAwLCBzaXplb2YoY3ApKTsKLQltZW1jcHko
-JmNwLmxhcCwgbGFwLCAzKTsKLQljcC5sZW5ndGggPSAweDA4OwotCWNwLm51bV9yc3AgPSAweDAw
-OwotCi0JbWVtc2V0KCZycSwgMCwgc2l6ZW9mKHJxKSk7Ci0JcnEub2dmID0gT0dGX0xJTktfQ1RM
-OwotCXJxLm9jZiA9IE9DRl9JTlFVSVJZOwotCXJxLmNwYXJhbSA9ICZjcDsKLQlycS5jbGVuID0g
-SU5RVUlSWV9DUF9TSVpFOwotCXJxLnJwYXJhbSA9ICZycDsKLQlycS5ybGVuID0gRVZUX0NNRF9T
-VEFUVVNfU0laRTsKLQlycS5ldmVudCA9IEVWVF9DTURfU1RBVFVTOworCXN0cnVjdCBidGRfYWRh
-cHRlciAqYWRhcHRlcjsKKwlpbnQgc3RhdGU7CiAKLQlpZiAoaGNpX3NlbmRfcmVxKGRkLCAmcnEs
-IEhDSV9SRVFfVElNRU9VVCkgPCAwKSB7Ci0JCWVyciA9IC1lcnJubzsKLQkJZXJyb3IoIlVuYWJs
-ZSB0byBzdGFydCBpbnF1aXJ5OiAlcyAoJWQpIiwKLQkJCQkJCXN0cmVycm9yKGVycm5vKSwgZXJy
-bm8pOwotCQloY2lfY2xvc2VfZGV2KGRkKTsKLQkJcmV0dXJuIGVycjsKKwlpZiAoc3RhdHVzKSB7
-CisJCWVycm9yKCJIQ0lfSW5xdWlyeSBjb21tYW5kIGZhaWxlZCB3aXRoIHN0YXR1cyAweCUwMngi
-LAorCQkJc3RhdHVzKTsKKwkJcmV0dXJuOwogCX0KIAotCWlmIChycC5zdGF0dXMpIHsKLQkJZXJy
-b3IoIkhDSV9JbnF1aXJ5IGNvbW1hbmQgZmFpbGVkIHdpdGggc3RhdHVzIDB4JTAyeCIsCi0JCQly
-cC5zdGF0dXMpOwotCQloY2lfY2xvc2VfZGV2KGRkKTsKLQkJcmV0dXJuIC1idF9lcnJvcihycC5z
-dGF0dXMpOworCWFkYXB0ZXIgPSBtYW5hZ2VyX2ZpbmRfYWRhcHRlcihsb2NhbCk7CisJaWYgKCFh
-ZGFwdGVyKSB7CisJCWVycm9yKCJVbmFibGUgdG8gZmluZCBtYXRjaGluZyBhZGFwdGVyIik7CisJ
-CXJldHVybjsKIAl9CiAKLQloY2lfY2xvc2VfZGV2KGRkKTsKKwlzdGF0ZSA9IGFkYXB0ZXJfZ2V0
-X3N0YXRlKGFkYXB0ZXIpOworCXN0YXRlIHw9IFNURF9JTlFVSVJZOworCWFkYXB0ZXJfc2V0X3N0
-YXRlKGFkYXB0ZXIsIHN0YXRlKTsKKwkvKgorCSAqIENhbmNlbCBwZW5kaW5nIHJlbW90ZSBuYW1l
-IHJlcXVlc3QgYW5kIGNsZWFuIHRoZSBkZXZpY2UgbGlzdAorCSAqIHdoZW4gaW5xdWlyeSBpcyBz
-dXBwb3J0ZWQgaW4gcGVyaW9kaWMgaW5xdWlyeSBpZGxlIHN0YXRlLgorCSAqLworCWlmIChhZGFw
-dGVyX2dldF9zdGF0ZShhZGFwdGVyKSAmIFBFUklPRElDX0lOUVVJUlkpCisJCXBlbmRpbmdfcmVt
-b3RlX25hbWVfY2FuY2VsKGFkYXB0ZXIpOworCisJLyogRGlzYWJsZSBuYW1lIHJlc29sdXRpb24g
-Zm9yIG5vbiBELUJ1cyBjbGllbnRzICovCisJaWYgKCFhZGFwdGVyX2hhc19kaXNjb3Zfc2Vzc2lv
-bnMoYWRhcHRlcikpIHsKKwkJc3RhdGUgPSBhZGFwdGVyX2dldF9zdGF0ZShhZGFwdGVyKTsKKwkJ
-c3RhdGUgJj0gflJFU09MVkVfTkFNRTsKKwkJYWRhcHRlcl9zZXRfc3RhdGUoYWRhcHRlciwgc3Rh
-dGUpOworCX0KIAogCWlmIChtYWluX29wdHMubmFtZV9yZXNvbHYpCiAJCWFkYXB0ZXItPnN0YXRl
-IHw9IFJFU09MVkVfTkFNRTsKIAotCXJldHVybiAwOworfQorCitzdGF0aWMgaW50IGFkYXB0ZXJf
-c3RhcnRfaW5xdWlyeShzdHJ1Y3QgYnRkX2FkYXB0ZXIgKmFkYXB0ZXIpCit7CisJaW50IGVycjsK
-KworCXBlbmRpbmdfcmVtb3RlX25hbWVfY2FuY2VsKGFkYXB0ZXIpOworCisJZXJyID0gYWRhcHRl
-cl9vcHMtPnN0YXJ0X2lucXVpcnkoYWRhcHRlci0+ZGV2X2lkKTsKKworCWlmIChlcnIgPCAwKQor
-CQllcnJvcigiVW5hYmxlIHRvIHN0YXJ0IGlucXVpcnk6ICVzICglZCkiLAorCQkJCQkJc3RyZXJy
-b3IoLWVyciksIC1lcnIpOworCisJcmV0dXJuIGVycjsKIH0KIAogc3RhdGljIGludCBzdGFydF9w
-ZXJpb2RpY19pbnF1aXJ5KHN0cnVjdCBidGRfYWRhcHRlciAqYWRhcHRlcikKQEAgLTEwNjgsNyAr
-MTA3MSw3IEBAIHN0YXRpYyBEQnVzTWVzc2FnZSAqYWRhcHRlcl9zdGFydF9kaXNjb3ZlcnkoREJ1
-c0Nvbm5lY3Rpb24gKmNvbm4sCiAJCWdvdG8gZG9uZTsKIAogCWlmIChtYWluX29wdHMuZGlzY292
-X2ludGVydmFsKQotCQllcnIgPSBzdGFydF9pbnF1aXJ5KGFkYXB0ZXIpOworCQllcnIgPSBhZGFw
-dGVyX3N0YXJ0X2lucXVpcnkoYWRhcHRlcik7CiAJZWxzZQogCQllcnIgPSBzdGFydF9wZXJpb2Rp
-Y19pbnF1aXJ5KGFkYXB0ZXIpOwogCkBAIC0yNDQzLDcgKzI0NDYsNyBAQCB2b2lkIGFkYXB0ZXJf
-c2V0X3N0YXRlKHN0cnVjdCBidGRfYWRhcHRlciAqYWRhcHRlciwgaW50IHN0YXRlKQogCWVsc2Ug
-aWYgKGFkYXB0ZXItPmRpc2Nfc2Vzc2lvbnMgJiYgbWFpbl9vcHRzLmRpc2Nvdl9pbnRlcnZhbCkK
-IAkJYWRhcHRlci0+c2NoZWR1bGVyX2lkID0gZ190aW1lb3V0X2FkZF9zZWNvbmRzKAogCQkJCQkJ
-bWFpbl9vcHRzLmRpc2Nvdl9pbnRlcnZhbCwKLQkJCQkJCShHU291cmNlRnVuYykgc3RhcnRfaW5x
-dWlyeSwKKwkJCQkJCShHU291cmNlRnVuYykgYWRhcHRlcl9zdGFydF9pbnF1aXJ5LAogCQkJCQkJ
-YWRhcHRlcik7CiAKIAkvKiBTZW5kIG91dCBvZiByYW5nZSAqLwpkaWZmIC0tZ2l0IGEvc3JjL2Fk
-YXB0ZXIuaCBiL3NyYy9hZGFwdGVyLmgKaW5kZXggYTk0ZWRjNi4uZDNhZTAwZiAxMDA2NDQKLS0t
-IGEvc3JjL2FkYXB0ZXIuaAorKysgYi9zcmMvYWRhcHRlci5oCkBAIC0xNDUsNyArMTQ1LDcgQEAg
-Y29uc3QgY2hhciAqYnRkX2FkYXB0ZXJfYW55X3JlcXVlc3RfcGF0aCh2b2lkKTsKIHZvaWQgYnRk
-X2FkYXB0ZXJfYW55X3JlbGVhc2VfcGF0aCh2b2lkKTsKIGdib29sZWFuIGFkYXB0ZXJfaXNfcGFp
-cmFibGUoc3RydWN0IGJ0ZF9hZGFwdGVyICphZGFwdGVyKTsKIGdib29sZWFuIGFkYXB0ZXJfcG93
-ZXJpbmdfZG93bihzdHJ1Y3QgYnRkX2FkYXB0ZXIgKmFkYXB0ZXIpOwotCit2b2lkIGFkYXB0ZXJf
-c3RhcnRfaW5xdWlyeV9jYihiZGFkZHJfdCAqbG9jYWwsIHVpbnQ4X3Qgc3RhdHVzKTsKIAogc3Ry
-dWN0IGJ0ZF9hZGFwdGVyX29wcyB7CiAJaW50ICgqc2V0dXApICh2b2lkKTsKQEAgLTE1Nyw2ICsx
-NTcsNyBAQCBzdHJ1Y3QgYnRkX2FkYXB0ZXJfb3BzIHsKIAlpbnQgKCpzZXRfZGlzY292ZXJhYmxl
-KSAoaW50IGluZGV4KTsKIAlpbnQgKCpzZXRfbGltaXRlZF9kaXNjb3ZlcmFibGUpIChpbnQgaW5k
-ZXgsIGNvbnN0IHVpbnQ4X3QgKmNscywKIAkJCQkJCWdib29sZWFuIGxpbWl0ZWQpOworCWludCAo
-KnN0YXJ0X2lucXVpcnkpIChpbnQgaW5kZXgpOwogfTsKIAogaW50IGJ0ZF9yZWdpc3Rlcl9hZGFw
-dGVyX29wcyhzdHJ1Y3QgYnRkX2FkYXB0ZXJfb3BzICpidGRfYWRhcHRlcl9vcHMpOwpkaWZmIC0t
-Z2l0IGEvc3JjL2RidXMtaGNpLmMgYi9zcmMvZGJ1cy1oY2kuYwppbmRleCA2NWFjMTJiLi43MGZi
-YmM2IDEwMDY0NAotLS0gYS9zcmMvZGJ1cy1oY2kuYworKysgYi9zcmMvZGJ1cy1oY2kuYwpAQCAt
-NDM0LDM1ICs0MzQsNiBAQCB2b2lkIGhjaWRfZGJ1c19zaW1wbGVfcGFpcmluZ19jb21wbGV0ZShi
-ZGFkZHJfdCAqbG9jYWwsIGJkYWRkcl90ICpwZWVyLAogCWRldmljZV9zaW1wbGVfcGFpcmluZ19j
-b21wbGV0ZShkZXZpY2UsIHN0YXR1cyk7CiB9CiAKLXZvaWQgaGNpZF9kYnVzX2lucXVpcnlfc3Rh
-cnQoYmRhZGRyX3QgKmxvY2FsKQotewotCXN0cnVjdCBidGRfYWRhcHRlciAqYWRhcHRlcjsKLQlp
-bnQgc3RhdGU7Ci0KLQlhZGFwdGVyID0gbWFuYWdlcl9maW5kX2FkYXB0ZXIobG9jYWwpOwotCWlm
-ICghYWRhcHRlcikgewotCQllcnJvcigiVW5hYmxlIHRvIGZpbmQgbWF0Y2hpbmcgYWRhcHRlciIp
-OwotCQlyZXR1cm47Ci0JfQotCi0Jc3RhdGUgPSBhZGFwdGVyX2dldF9zdGF0ZShhZGFwdGVyKTsK
-LQlzdGF0ZSB8PSBTVERfSU5RVUlSWTsKLQlhZGFwdGVyX3NldF9zdGF0ZShhZGFwdGVyLCBzdGF0
-ZSk7Ci0JLyoKLQkgKiBDYW5jZWwgcGVuZGluZyByZW1vdGUgbmFtZSByZXF1ZXN0IGFuZCBjbGVh
-biB0aGUgZGV2aWNlIGxpc3QKLQkgKiB3aGVuIGlucXVpcnkgaXMgc3VwcG9ydGVkIGluIHBlcmlv
-ZGljIGlucXVpcnkgaWRsZSBzdGF0ZS4KLQkgKi8KLQlpZiAoYWRhcHRlcl9nZXRfc3RhdGUoYWRh
-cHRlcikgJiBQRVJJT0RJQ19JTlFVSVJZKQotCQlwZW5kaW5nX3JlbW90ZV9uYW1lX2NhbmNlbChh
-ZGFwdGVyKTsKLQotCS8qIERpc2FibGUgbmFtZSByZXNvbHV0aW9uIGZvciBub24gRC1CdXMgY2xp
-ZW50cyAqLwotCWlmICghYWRhcHRlcl9oYXNfZGlzY292X3Nlc3Npb25zKGFkYXB0ZXIpKSB7Ci0J
-CXN0YXRlID0gYWRhcHRlcl9nZXRfc3RhdGUoYWRhcHRlcik7Ci0JCXN0YXRlICY9IH5SRVNPTFZF
-X05BTUU7Ci0JCWFkYXB0ZXJfc2V0X3N0YXRlKGFkYXB0ZXIsIHN0YXRlKTsKLQl9Ci19Ci0KIHN0
-YXRpYyBpbnQgZm91bmRfZGV2aWNlX3JlcV9uYW1lKHN0cnVjdCBidGRfYWRhcHRlciAqYWRhcHRl
-cikKIHsKIAlzdHJ1Y3QgaGNpX3JlcXVlc3QgcnE7CmRpZmYgLS1naXQgYS9zcmMvZGJ1cy1oY2ku
-aCBiL3NyYy9kYnVzLWhjaS5oCmluZGV4IDFjYjEwZjMuLjZkZDlhYjEgMTAwNjQ0Ci0tLSBhL3Ny
-Yy9kYnVzLWhjaS5oCisrKyBiL3NyYy9kYnVzLWhjaS5oCkBAIC0yNCw3ICsyNCw2IEBACiAKIGlu
-dCBoY2lkX2RidXNfcmVxdWVzdF9waW4oaW50IGRldiwgYmRhZGRyX3QgKnNiYSwgc3RydWN0IGhj
-aV9jb25uX2luZm8gKmNpKTsKIAotdm9pZCBoY2lkX2RidXNfaW5xdWlyeV9zdGFydChiZGFkZHJf
-dCAqbG9jYWwpOwogdm9pZCBoY2lkX2RidXNfaW5xdWlyeV9jb21wbGV0ZShiZGFkZHJfdCAqbG9j
-YWwpOwogdm9pZCBoY2lkX2RidXNfcGVyaW9kaWNfaW5xdWlyeV9zdGFydChiZGFkZHJfdCAqbG9j
-YWwsIHVpbnQ4X3Qgc3RhdHVzKTsKIHZvaWQgaGNpZF9kYnVzX3BlcmlvZGljX2lucXVpcnlfZXhp
-dChiZGFkZHJfdCAqbG9jYWwsIHVpbnQ4X3Qgc3RhdHVzKTsKZGlmZiAtLWdpdCBhL3NyYy9zZWN1
-cml0eS5jIGIvc3JjL3NlY3VyaXR5LmMKaW5kZXggYTYxZDc1Zi4uNzkyYTk0YyAxMDA2NDQKLS0t
-IGEvc3JjL3NlY3VyaXR5LmMKKysrIGIvc3JjL3NlY3VyaXR5LmMKQEAgLTU1MCw3ICs1NTAsNyBA
-QCBzdGF0aWMgaW5saW5lIHZvaWQgY21kX3N0YXR1cyhpbnQgZGV2LCBiZGFkZHJfdCAqc2JhLCB2
-b2lkICpwdHIpCiAJCXJldHVybjsKIAogCWlmIChvcGNvZGUgPT0gY21kX29wY29kZV9wYWNrKE9H
-Rl9MSU5LX0NUTCwgT0NGX0lOUVVJUlkpKQotCQloY2lkX2RidXNfaW5xdWlyeV9zdGFydChzYmEp
-OworCQlhZGFwdGVyX3N0YXJ0X2lucXVpcnlfY2Ioc2JhLCBldnQtPnN0YXR1cyk7CiB9CiAKIHN0
-YXRpYyBpbmxpbmUgdm9pZCBjbWRfY29tcGxldGUoaW50IGRldiwgYmRhZGRyX3QgKnNiYSwgdm9p
-ZCAqcHRyKQotLSAKMS41LjYuMwoK
---000e0cd5d0542dfe49046a30e939--
+diff --git a/src/adapter.c b/src/adapter.c
+index ebbd02e..7795e8d 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -328,38 +328,18 @@ static void adapter_set_discov_timeout(struct btd_adapter *adapter,
+ 							adapter);
+ }
+ 
+-static uint8_t mode2scan(uint8_t mode)
+-{
+-	switch (mode) {
+-	case MODE_OFF:
+-		return SCAN_DISABLED;
+-	case MODE_CONNECTABLE:
+-		return SCAN_PAGE;
+-	case MODE_DISCOVERABLE:
+-	case MODE_LIMITED:
+-		return (SCAN_PAGE | SCAN_INQUIRY);
+-	default:
+-		error("Invalid mode given to mode2scan: %u", mode);
+-		return SCAN_PAGE;
+-	}
+-}
+-
+ static int set_mode(struct btd_adapter *adapter, uint8_t new_mode)
+ {
+-	uint8_t scan_enable;
+-	uint8_t current_scan = adapter->scan_mode;
+ 	int err;
+ 	const char *modestr;
+ 
+-	scan_enable = mode2scan(new_mode);
+-
+-	if (!adapter->up && scan_enable != SCAN_DISABLED) {
++	if (!adapter->up && new_mode != MODE_OFF) {
+ 		err = adapter_ops->set_powered(adapter->dev_id, TRUE);
+ 		if (err < 0)
+ 			return err;
+ 	}
+ 
+-	if (adapter->up && scan_enable == SCAN_DISABLED) {
++	if (adapter->up && new_mode == MODE_OFF) {
+ 		err = adapter_ops->set_powered(adapter->dev_id, FALSE);
+ 		if (err < 0)
+ 			return err;
+@@ -369,17 +349,20 @@ static int set_mode(struct btd_adapter *adapter, uint8_t new_mode)
+ 		goto done;
+ 	}
+ 
+-	if (current_scan != scan_enable) {
+-		if (scan_enable == SCAN_PAGE)
+-			err = adapter_ops->set_connectable(adapter->dev_id);
+-		else
+-			err = adapter_ops->set_discoverable(adapter->dev_id);
++	if (new_mode == adapter->mode)
++		return 0;
+ 
+-		if (err < 0)
+-			return err;
+-	} else if ((scan_enable & SCAN_INQUIRY) &&
+-						(new_mode != adapter->mode)) {
++	if (new_mode == MODE_CONNECTABLE)
++		err = adapter_ops->set_connectable(adapter->dev_id);
++	else
++		err = adapter_ops->set_discoverable(adapter->dev_id);
++
++	if (err < 0)
++		return err;
++
++	if (new_mode > MODE_CONNECTABLE) {
+ 		adapter_remove_discov_timeout(adapter);
++
+ 		if (adapter->discov_timeout)
+ 			adapter_set_discov_timeout(adapter,
+ 						adapter->discov_timeout);
+-- 
+1.5.6.3
