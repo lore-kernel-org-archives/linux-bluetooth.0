@@ -1,156 +1,481 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A110DBA.1060704@xyzw.org>
-Date: Mon, 18 May 2009 00:26:50 -0700
-From: Brian Rogers <brian@xyzw.org>
-MIME-Version: 1.0
+From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
 To: linux-bluetooth@vger.kernel.org
-Subject: Mouse connection times out in sniff mode
-Content-Type: multipart/mixed;
- boundary="------------080509040302050902040300"
+Subject: [PATCH] Bluetooth: add support to configure ERTM and Streaming mode, take 2
+Date: Mon, 18 May 2009 04:32:45 -0300
+Message-Id: <1242631965-28774-1-git-send-email-gustavo@las.ic.unicamp.br>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------080509040302050902040300
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Add code to config_req and config_rsp to configure ERTM and Streaming
+mode. If the remote devices specifies ERTM or Streaming Mode, we propose
+the same mode received. Otherwise we propose ERTM or Basic Mode.
+And if we are a state 2 device the remote should propose the same mode
+that we sent, if not, the channel is disconnected.
 
-Hi all,
+Signed-off-by: Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
+---
+ include/net/bluetooth/l2cap.h |   22 +++-
+ net/bluetooth/l2cap.c         |  265 +++++++++++++++++++++++++++++++++++------
+ 2 files changed, 248 insertions(+), 39 deletions(-)
 
-I have a problem where my mouse occasionally disconnects after brief 
-inactivity.
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 06b072f..2d28d8f 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -27,8 +27,9 @@
+ 
+ /* L2CAP defaults */
+ #define L2CAP_DEFAULT_MTU		672
++#define L2CAP_DEFAULT_MIN_MTU		48
+ #define L2CAP_DEFAULT_FLUSH_TO		0xffff
+-#define L2CAP_DEFAULT_RX_WINDOW		1
++#define L2CAP_DEFAULT_TX_WINDOW		1
+ #define L2CAP_DEFAULT_MAX_RECEIVE	1
+ #define L2CAP_DEFAULT_RETRANS_TO	300    /* 300 milliseconds */
+ #define L2CAP_DEFAULT_MONITOR_TO	1000   /* 1 second */
+@@ -272,6 +273,9 @@ struct l2cap_pinfo {
+ 	__u16		omtu;
+ 	__u16		flush_to;
+ 	__u8		mode;
++	__u8		num_conf_req;
++	__u8		num_conf_rsp;
++
+ 	__u8		fcs;
+ 	__u8		sec_level;
+ 	__u8		role_switch;
+@@ -280,10 +284,15 @@ struct l2cap_pinfo {
+ 	__u8		conf_req[64];
+ 	__u8		conf_len;
+ 	__u8		conf_state;
+-	__u8		conf_retry;
+ 
+ 	__u8		ident;
+ 
++	__u8		remote_tx_win;
++	__u8		remote_max_tx;
++	__u16		retrans_timeout;
++	__u16		monitor_timeout;
++	__u16		max_pdu_size;
++
+ 	__le16		sport;
+ 
+ 	struct l2cap_conn	*conn;
+@@ -294,9 +303,14 @@ struct l2cap_pinfo {
+ #define L2CAP_CONF_REQ_SENT	0x01
+ #define L2CAP_CONF_INPUT_DONE	0x02
+ #define L2CAP_CONF_OUTPUT_DONE	0x04
+-#define L2CAP_CONF_CONNECT_PEND	0x80
++#define L2CAP_CONF_MTU_DONE    0x04
++#define L2CAP_CONF_MODE_DONE   0x10
++#define L2CAP_CONF_CONNECT_PEND	0x20
++#define L2CAP_CONF_STATE2_DEVICE 0x80
++
++#define L2CAP_CONF_MAX_CONF_REQ 2
++#define L2CAP_CONF_MAX_CONF_RSP 2
+ 
+-#define L2CAP_CONF_MAX_RETRIES	2
+ 
+ void l2cap_load(void);
+ 
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index 82feeb7..0bd4aaa 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -719,6 +719,8 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
+ 		pi->omtu = l2cap_pi(parent)->omtu;
+ 		pi->mode = l2cap_pi(parent)->mode;
+ 		pi->fcs  = l2cap_pi(parent)->fcs;
++		pi->conf_state =
++		    l2cap_pi(parent)->conf_state & L2CAP_CONF_STATE2_DEVICE;
+ 		pi->sec_level = l2cap_pi(parent)->sec_level;
+ 		pi->role_switch = l2cap_pi(parent)->role_switch;
+ 		pi->force_reliable = l2cap_pi(parent)->force_reliable;
+@@ -965,6 +967,7 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
+ 	case L2CAP_MODE_BASIC:
+ 		break;
+ 	case L2CAP_MODE_ERTM:
++	case L2CAP_MODE_STREAMING:
+ 		if (enable_ertm)
+ 			break;
+ 		/* fall through */
+@@ -1028,6 +1031,7 @@ static int l2cap_sock_listen(struct socket *sock, int backlog)
+ 	case L2CAP_MODE_BASIC:
+ 		break;
+ 	case L2CAP_MODE_ERTM:
++	case L2CAP_MODE_STREAMING:
+ 		if (enable_ertm)
+ 			break;
+ 		/* fall through */
+@@ -1297,6 +1301,9 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname, char __us
+ 		l2cap_pi(sk)->imtu = opts.imtu;
+ 		l2cap_pi(sk)->omtu = opts.omtu;
+ 		l2cap_pi(sk)->mode = opts.mode;
++		if (l2cap_pi(sk)->mode == L2CAP_MODE_ERTM ||
++				l2cap_pi(sk)->mode == L2CAP_MODE_STREAMING)
++			l2cap_pi(sk)->conf_state |= L2CAP_CONF_STATE2_DEVICE;
+ 		break;
+ 
+ 	case L2CAP_LM:
+@@ -1738,7 +1745,30 @@ static void l2cap_add_conf_opt(void **ptr, u8 type, u8 len, unsigned long val)
+ 	*ptr += L2CAP_CONF_OPT_SIZE + len;
+ }
+ 
+-static int l2cap_build_conf_req(struct sock *sk, void *data)
++static int l2cap_mode_supported(__u8 mode, __u32 feat_mask)
++{
++	switch (mode) {
++	case L2CAP_MODE_ERTM:
++		return L2CAP_FEAT_ERTM & feat_mask;
++	case L2CAP_MODE_STREAMING:
++		return  L2CAP_FEAT_STREAMING & feat_mask;
++	default:
++		return  0x00;
++	}
++}
++
++static inline __u8 l2cap_select_mode(__u16 local_feat_mask, __u16 remote_feat_mask, __u8 mode)
++{
++	if (l2cap_mode_supported(mode, local_feat_mask) &&
++		(mode == L2CAP_MODE_STREAMING || mode == L2CAP_MODE_ERTM))
++		return mode;
++	else if (local_feat_mask & remote_feat_mask & L2CAP_FEAT_ERTM)
++		return L2CAP_MODE_ERTM;
++	else
++		return L2CAP_MODE_BASIC;
++}
++
++static int l2cap_build_conf_req(struct sock *sk, struct l2cap_conn *conn, void *data)
+ {
+ 	struct l2cap_pinfo *pi = l2cap_pi(sk);
+ 	struct l2cap_conf_req *req = data;
+@@ -1747,6 +1777,22 @@ static int l2cap_build_conf_req(struct sock *sk, void *data)
+ 
+ 	BT_DBG("sk %p", sk);
+ 
++	if (pi->num_conf_req == 0 && pi->num_conf_rsp == 0) {
++		if (pi->conf_state & L2CAP_CONF_STATE2_DEVICE) {
++			if (!l2cap_mode_supported(pi->mode, conn->feat_mask)
++				|| !l2cap_mode_supported(pi->mode,
++				    l2cap_feat_mask)) {
++				struct l2cap_disconn_req req;
++				req.dcid = cpu_to_le16(pi->dcid);
++				req.scid = cpu_to_le16(pi->scid);
++				l2cap_send_cmd(conn, l2cap_get_ident(conn),
++					L2CAP_DISCONN_REQ, sizeof(req), &req);
++			}
++		} else
++			pi->mode = l2cap_select_mode(l2cap_feat_mask,
++				conn->feat_mask, rfc.mode);
++	}
++
+ 	switch (pi->mode) {
+ 	case L2CAP_MODE_BASIC:
+ 		if (pi->imtu != L2CAP_DEFAULT_MTU)
+@@ -1755,16 +1801,25 @@ static int l2cap_build_conf_req(struct sock *sk, void *data)
+ 
+ 	case L2CAP_MODE_ERTM:
+ 		rfc.mode            = L2CAP_MODE_ERTM;
+-		rfc.txwin_size      = L2CAP_DEFAULT_RX_WINDOW;
++		rfc.txwin_size      = L2CAP_DEFAULT_TX_WINDOW;
+ 		rfc.max_transmit    = L2CAP_DEFAULT_MAX_RECEIVE;
+-		rfc.retrans_timeout = cpu_to_le16(L2CAP_DEFAULT_RETRANS_TO);
+-		rfc.monitor_timeout = cpu_to_le16(L2CAP_DEFAULT_MONITOR_TO);
++		rfc.retrans_timeout = 0;
++		rfc.monitor_timeout = 0;
+ 		rfc.max_pdu_size    = cpu_to_le16(L2CAP_DEFAULT_MAX_RX_APDU);
++		break;
+ 
+-		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC,
+-					sizeof(rfc), (unsigned long) &rfc);
++	case L2CAP_MODE_STREAMING:
++		rfc.mode            = L2CAP_MODE_STREAMING;
++		rfc.txwin_size      = 0;
++		rfc.max_transmit    = 0;
++		rfc.retrans_timeout = 0;
++		rfc.monitor_timeout = 0;
++		rfc.max_pdu_size    = cpu_to_le16(L2CAP_DEFAULT_MAX_RX_APDU);
+ 		break;
+ 	}
++	if (rfc.mode)
++		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
++				(unsigned long) &rfc);
+ 
+ 	/* FIXME: Need actual value of the flush timeout */
+ 	//if (flush_to != L2CAP_DEFAULT_FLUSH_TO)
+@@ -1776,7 +1831,7 @@ static int l2cap_build_conf_req(struct sock *sk, void *data)
+ 	return ptr - data;
+ }
+ 
+-static int l2cap_parse_conf_req(struct sock *sk, void *data)
++static int l2cap_parse_conf_req(struct sock *sk, struct l2cap_conn *conn, void *data, int *disconnect)
+ {
+ 	struct l2cap_pinfo *pi = l2cap_pi(sk);
+ 	struct l2cap_conf_rsp *rsp = data;
+@@ -1824,28 +1879,74 @@ static int l2cap_parse_conf_req(struct sock *sk, void *data)
+ 		}
+ 	}
+ 
++	if (pi->num_conf_rsp == 0 && pi->num_conf_req == 0) {
++		if (pi->conf_state & L2CAP_CONF_STATE2_DEVICE) {
++			if (!l2cap_mode_supported(pi->mode, conn->feat_mask)
++				|| !l2cap_mode_supported(pi->mode,
++				    l2cap_feat_mask))
++				*disconnect = 1;
++		} else
++			pi->mode = l2cap_select_mode(l2cap_feat_mask,
++					conn->feat_mask, rfc.mode);
++	}
++
++	if (pi->mode != rfc.mode) {
++		result = L2CAP_CONF_UNACCEPT;
++		rfc.mode = pi->mode;
++
++		if (pi->num_conf_rsp == 1)
++			*disconnect = 1;
++		else
++			l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC,
++				sizeof(rfc), (unsigned long) &rfc);
++	}
++
++
+ 	if (result == L2CAP_CONF_SUCCESS) {
+ 		/* Configure output options and let the other side know
+ 		 * which ones we don't like. */
+ 
+-		if (rfc.mode == L2CAP_MODE_BASIC) {
+-			if (mtu < pi->omtu)
+-				result = L2CAP_CONF_UNACCEPT;
+-			else {
+-				pi->omtu = mtu;
+-				pi->conf_state |= L2CAP_CONF_OUTPUT_DONE;
+-			}
++		if (mtu < L2CAP_DEFAULT_MIN_MTU)
++			result = L2CAP_CONF_UNACCEPT;
++		else {
++			pi->omtu = mtu;
++			pi->conf_state |= L2CAP_CONF_MTU_DONE;
++		}
++		l2cap_add_conf_opt(&ptr, L2CAP_CONF_MTU, 2, pi->omtu);
+ 
+-			l2cap_add_conf_opt(&ptr, L2CAP_CONF_MTU, 2, pi->omtu);
+-		} else {
++		switch (rfc.mode) {
++		case L2CAP_MODE_BASIC:
++			pi->fcs = 0;
++			pi->conf_state |= L2CAP_CONF_MODE_DONE;
++			break;
++
++		case L2CAP_MODE_ERTM:
++			pi->remote_tx_win = rfc.txwin_size;
++			pi->remote_max_tx = rfc.max_transmit;
++			pi->max_pdu_size = rfc.max_pdu_size;
++
++			rfc.retrans_timeout = L2CAP_DEFAULT_RETRANS_TO;
++			rfc.monitor_timeout = L2CAP_DEFAULT_MONITOR_TO;
++
++			pi->conf_state |= L2CAP_CONF_MODE_DONE;
++			break;
++
++		case L2CAP_MODE_STREAMING:
++			pi->remote_tx_win = rfc.txwin_size;
++			pi->max_pdu_size = rfc.max_pdu_size;
++
++			pi->conf_state |= L2CAP_CONF_MODE_DONE;
++			break;
++
++		default:
+ 			result = L2CAP_CONF_UNACCEPT;
+ 
+ 			memset(&rfc, 0, sizeof(rfc));
+-			rfc.mode = L2CAP_MODE_BASIC;
+-
+-			l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC,
+-					sizeof(rfc), (unsigned long) &rfc);
++			rfc.mode = pi->mode;
+ 		}
++
++		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC,
++				sizeof(rfc), (unsigned long) &rfc);
+ 	}
+ 
+ 	rsp->scid   = cpu_to_le16(pi->dcid);
+@@ -1855,6 +1956,72 @@ static int l2cap_parse_conf_req(struct sock *sk, void *data)
+ 	return ptr - data;
+ }
+ 
++static int l2cap_parse_conf_rsp(struct sock *sk, void *rsp, int len, void *data, u16 *result, int *disconnect)
++{
++	struct l2cap_pinfo *pi = l2cap_pi(sk);
++	struct l2cap_conf_req *req = data;
++	void *ptr = req->data;
++	int type, olen;
++	unsigned long val;
++	struct l2cap_conf_rfc rfc;
++
++	BT_DBG("sk %p, rsp %p, len %d, req %p", sk, rsp, len, data);
++
++	while (len >= L2CAP_CONF_OPT_SIZE) {
++		len -= l2cap_get_conf_opt(&rsp, &type, &olen, &val);
++
++		switch (type) {
++		case L2CAP_CONF_MTU:
++			if (val < L2CAP_DEFAULT_MIN_MTU) {
++				*result = L2CAP_CONF_UNACCEPT;
++				pi->omtu = L2CAP_DEFAULT_MIN_MTU;
++			} else
++				pi->omtu = val;
++			l2cap_add_conf_opt(&ptr, L2CAP_CONF_MTU, 2, pi->omtu);
++			break;
++
++		case L2CAP_CONF_FLUSH_TO:
++			pi->flush_to = val;
++			l2cap_add_conf_opt(&ptr, L2CAP_CONF_FLUSH_TO, 2,
++						pi->flush_to);
++			break;
++
++		case L2CAP_CONF_RFC:
++			if (olen == sizeof(rfc))
++				memcpy(&rfc, (void *) val, olen);
++
++			if ((rfc.mode != pi->mode) &&
++				(pi->conf_state & L2CAP_CONF_STATE2_DEVICE))
++				*disconnect = 1;
++
++			pi->mode = rfc.mode;
++			pi->fcs = 0;
++			break;
++		}
++	}
++
++	if (*result == L2CAP_CONF_SUCCESS) {
++
++		switch (rfc.mode) {
++		case L2CAP_MODE_ERTM:
++			pi->remote_tx_win   = rfc.txwin_size;
++			pi->retrans_timeout = rfc.retrans_timeout;
++			pi->monitor_timeout = rfc.monitor_timeout;
++			pi->max_pdu_size    = le16_to_cpu(rfc.max_pdu_size);
++			break;
++		case L2CAP_MODE_STREAMING:
++			pi->max_pdu_size    = le16_to_cpu(rfc.max_pdu_size);
++			break;
++		}
++	}
++
++	req->dcid   = cpu_to_le16(pi->dcid);
++	req->flags  = cpu_to_le16(0x0000);
++
++	return ptr - data;
++}
++
++
+ static int l2cap_build_conf_rsp(struct sock *sk, void *data, u16 result, u16 flags)
+ {
+ 	struct l2cap_conf_rsp *rsp = data;
+@@ -2040,7 +2207,8 @@ static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hd
+ 		l2cap_pi(sk)->conf_state &= ~L2CAP_CONF_CONNECT_PEND;
+ 
+ 		l2cap_send_cmd(conn, l2cap_get_ident(conn), L2CAP_CONF_REQ,
+-					l2cap_build_conf_req(sk, req), req);
++					l2cap_build_conf_req(sk, conn, req), req);
++		l2cap_pi(sk)->num_conf_req++;
+ 		break;
+ 
+ 	case L2CAP_CR_PEND:
+@@ -2062,7 +2230,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 	u16 dcid, flags;
+ 	u8 rsp[64];
+ 	struct sock *sk;
+-	int len;
++	int len, disconn = 0;
+ 
+ 	dcid  = __le16_to_cpu(req->dcid);
+ 	flags = __le16_to_cpu(req->flags);
+@@ -2098,11 +2266,21 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 	}
+ 
+ 	/* Complete config. */
+-	len = l2cap_parse_conf_req(sk, rsp);
++	len = l2cap_parse_conf_req(sk, conn, rsp, &disconn);
+ 	if (len < 0)
+ 		goto unlock;
+ 
+-	l2cap_send_cmd(conn, cmd->ident, L2CAP_CONF_RSP, len, rsp);
++	if (disconn) {
++		struct l2cap_disconn_req req;
++		req.dcid = cpu_to_le16(l2cap_pi(sk)->dcid);
++		req.scid = cpu_to_le16(l2cap_pi(sk)->scid);
++		l2cap_send_cmd(conn, l2cap_get_ident(conn),
++				L2CAP_DISCONN_REQ, sizeof(req), &req);
++		goto unlock;
++	} else {
++		l2cap_send_cmd(conn, cmd->ident, L2CAP_CONF_RSP, len, rsp);
++		l2cap_pi(sk)->num_conf_rsp++;
++	}
+ 
+ 	/* Reset config buffer. */
+ 	l2cap_pi(sk)->conf_len = 0;
+@@ -2119,7 +2297,9 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 	if (!(l2cap_pi(sk)->conf_state & L2CAP_CONF_REQ_SENT)) {
+ 		u8 buf[64];
+ 		l2cap_send_cmd(conn, l2cap_get_ident(conn), L2CAP_CONF_REQ,
+-					l2cap_build_conf_req(sk, buf), buf);
++					l2cap_build_conf_req(sk, conn, buf), buf);
++		l2cap_pi(sk)->num_conf_req++;
++
+ 	}
+ 
+ unlock:
+@@ -2132,6 +2312,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 	struct l2cap_conf_rsp *rsp = (struct l2cap_conf_rsp *)data;
+ 	u16 scid, flags, result;
+ 	struct sock *sk;
++	int disconn = 0;
+ 
+ 	scid   = __le16_to_cpu(rsp->scid);
+ 	flags  = __le16_to_cpu(rsp->flags);
+@@ -2149,16 +2330,30 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 		break;
+ 
+ 	case L2CAP_CONF_UNACCEPT:
+-		if (++l2cap_pi(sk)->conf_retry < L2CAP_CONF_MAX_RETRIES) {
+-			char req[128];
+-			/* It does not make sense to adjust L2CAP parameters
+-			 * that are currently defined in the spec. We simply
+-			 * resend config request that we sent earlier. It is
+-			 * stupid, but it helps qualification testing which
+-			 * expects at least some response from us. */
+-			l2cap_send_cmd(conn, l2cap_get_ident(conn), L2CAP_CONF_REQ,
+-						l2cap_build_conf_req(sk, req), req);
+-			goto done;
++		if (l2cap_pi(sk)->num_conf_rsp <= L2CAP_CONF_MAX_CONF_RSP) {
++			int len = cmd->len - sizeof(*rsp);
++			char req[64];
++
++			/* throw out any old conf requests we stored */
++			result = L2CAP_CONF_SUCCESS;
++			len = l2cap_parse_conf_rsp(sk, rsp->data, len, req,
++					&result, &disconn);
++			if (disconn) {
++				struct l2cap_disconn_req req;
++				req.dcid = cpu_to_le16(l2cap_pi(sk)->dcid);
++				req.scid = cpu_to_le16(l2cap_pi(sk)->scid);
++				l2cap_send_cmd(conn, l2cap_get_ident(conn),
++					L2CAP_DISCONN_REQ, sizeof(req), &req);
++				goto done;
++			}
++
++			l2cap_send_cmd(conn, l2cap_get_ident(conn),
++						L2CAP_CONF_REQ, len, req);
++			l2cap_pi(sk)->num_conf_req++;
++			if (result == L2CAP_CONF_SUCCESS)
++				break;
++			else
++				goto done;
+ 		}
+ 
+ 	default:
+-- 
+1.6.0.6
 
-Using hcidump, I can see it dropping to sniff mode during the 
-inactivity. Then, if the problem occurs, no activity is logged when I 
-move or click the mouse until it gets disconnected due to a timeout. 
-Once the timeout occurs, the mouse is able to reconnect.
-
-Other times the mouse comes out of sniff mode just fine. The frequency 
-of this problem occurring seems rather random. Sometimes I can't 
-reproduce it, and other times it happens constantly. I've also done a 
-bit of testing with two other Bluetooth dongles, and the problem seems 
-to occur only with my laptop's internal Bluetooth device.
-
-I've been able to work around the timeout problem by disabling sniff 
-mode. I've been using the following command:
-sudo hciconfig hci0 lp hold,park lm master
-
-Also, this problem is exposing a secondary issue. When the connection 
-times out in the scenario described above, the mouse is not removed from 
-HAL. So I see many many copies of the mouse piling up in 
-gnome-device-manager and 'xinput list'. If I switch the mouse off 
-myself, the mouse (or at least the most recent copy) is properly removed 
-once the timeout occurs. I think being in sniff mode when the timeout 
-happens is what makes the difference.
-
-My configuration:
-
-Bus 002 Device 002: ID 0a5c:2101 Broadcom Corp. A-Link BlueUsbA2 Bluetooth
-Linux master branch with bluetooth-testing branch merged in.
-BlueZ 4.39
-
-A log of the timeout happening a couple times is attached.
-
-Brian
-
-
---------------080509040302050902040300
-Content-Type: application/x-bzip;
- name="hcidump.log.bz2"
-Content-Transfer-Encoding: base64
-Content-Disposition: inline;
- filename="hcidump.log.bz2"
-
-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
-i7kinChILlsqPYA=
---------------080509040302050902040300--
