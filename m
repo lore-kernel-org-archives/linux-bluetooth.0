@@ -1,36 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Wed, 20 May 2009 17:49:38 -0300
-Message-ID: <5d223510905201349w416f50cal520dde1281f90bc7@mail.gmail.com>
-Subject: bluez 4.x, SCO socket - connection reset by peer
-From: Rafael Seste <rseste@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: bluetooth pairing issue in kernel 2.6.30-rc5
+From: Marcel Holtmann <marcel@holtmann.org>
+To: balaji palaniswami <balaji_palaniswami@yahoo.com>
+Cc: lan zhu <zhu.lan.cn@gmail.com>, linux-bluetooth@vger.kernel.org
+In-Reply-To: <504288.41529.qm@web95402.mail.in2.yahoo.com>
+References: <113d36d80905192336i337964a9hcbaa5ccb729434b6@mail.gmail.com>
+	 <113d36d80905192341q4aa2463dyd0b1ed107792cff0@mail.gmail.com>
+	 <113d36d80905192344p3caf4c3dm3ebe1a5c00eda3f9@mail.gmail.com>
+	 <1242805691.3147.19.camel@localhost.localdomain>
+	 <504288.41529.qm@web95402.mail.in2.yahoo.com>
+Content-Type: text/plain
+Date: Wed, 20 May 2009 12:56:41 -0700
+Message-Id: <1242849401.3147.27.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-I trying to use asterisk (with chan_mobile) to connect with my mobile phone.
-When there is a incoming/outgoing call, this module creates a
-sco_socket to send/receive audio packets.
+this mailing list does NOT tolerate top-posting. If you keep doing it, I
+will just ignore your emails.
 
-socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_SCO)
+> I upgraded kernel 2.6.30-rc5 which includes below fixes 
+> 
+> 
+> Marcel Holtmann (4):
+>       Bluetooth: Move dev_set_name() to a context that can sleep
+>       Bluetooth: Fix wrong module refcount when connection setup fails
+>       Bluetooth: Don't use hci_acl_connect_cancel() for incoming connections
+>       Bluetooth: Don't trigger disconnect timeout for security mode 3 pairing
+> i am using bluez 4.32 .After that i tried a2dp connection with automatic key option which is failed.
+> because Error : Authentication failure is thrown by another end. Is this problem with remote bluetooth dongle ? 
+> Do i need to upgrade bluez to latest version?
 
-when this socket is ready...it can write data once, after that when it
-tries to read an error is returned:
+Please test 2.6.30-rc6 as I asked you to. And also use bluez-4.40 and
+see if it works there.
 
-sco_read() error 104
+Regards
 
-104 means - connection reset by peer
+Marcel
 
-after this i got error 107 - not connect.
 
-Some one knows why is the reason of this error 104???
-
-kernel 2.6.22.18
-bluez 4.32
-
-tks
--- 
-Rafael S. Seste
