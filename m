@@ -1,54 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] Add .gitignore for bluez-hcidump
-Date: Thu, 21 May 2009 02:06:02 -0300
-Message-Id: <1242882363-410-2-git-send-email-gustavo@las.ic.unicamp.br>
-In-Reply-To: <1242882363-410-1-git-send-email-gustavo@las.ic.unicamp.br>
-References: <1242882363-410-1-git-send-email-gustavo@las.ic.unicamp.br>
+Subject: [PATCH 1/3] Add case for Enhanced Retransmission and Streaming modes
+Date: Thu, 21 May 2009 02:06:01 -0300
+Message-Id: <1242882363-410-1-git-send-email-gustavo@las.ic.unicamp.br>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-this file avoids dirty things on git status
+Just add return values on mode2str for the new modes on L2CAP
 ---
- .gitignore |   28 ++++++++++++++++++++++++++++
- 1 files changed, 28 insertions(+), 0 deletions(-)
- create mode 100644 .gitignore
+ parser/l2cap.c |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
 
-diff --git a/.gitignore b/.gitignore
-new file mode 100644
-index 0000000..76bcb61
---- /dev/null
-+++ b/.gitignore
-@@ -0,0 +1,28 @@
-+*.o
-+*.a
-+*.lo
-+*.la
-+*.so
-+.deps
-+.libs
-+Makefile
-+Makefile.in
-+aclocal.m4
-+config.guess
-+config.h
-+config.h.in
-+config.log
-+config.status
-+config.sub
-+configure
-+depcomp
-+install-sh
-+libtool
-+ltmain.sh
-+missing
-+stamp-h1
-+autom4te.cache
-+
-+src/bpasniff
-+src/csrsniff
-+src/hcidump
+diff --git a/parser/l2cap.c b/parser/l2cap.c
+index a906f42..4ab4123 100644
+--- a/parser/l2cap.c
++++ b/parser/l2cap.c
+@@ -306,6 +306,10 @@ static char *mode2str(uint8_t mode)
+ 		return "Retransmission";
+ 	case 0x02:
+ 		return "Flow control";
++	case 0x03:
++		return "Enhanced Retransmission";
++	case 0x04:
++		return "Streaming";
+ 	default:
+ 		return "Reserved";
+ 	}
 -- 
 1.6.0.6
 
