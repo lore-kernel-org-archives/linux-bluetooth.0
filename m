@@ -1,240 +1,371 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alexander Holler <holler@ahsoftware.de>
+From: alokbarsode@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Cc: Alexander Holler <holler@ahsoftware.de>
-Subject: [PATCH 1/1] BTWinLinkKeyExport - Tool to export link-keys stored by the WIDCOMM stack
-Date: Fri, 22 May 2009 15:38:41 +0200
-Message-Id: <1242999521-8303-1-git-send-email-holler@ahsoftware.de>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: marcel@holtmann.org, Alok Barsode <alok.barsode@azingo.com>
+Subject: [PATCH 2/2] Adding stop_discovery functionality to hciops plugin.
+Date: Fri, 22 May 2009 16:54:13 +0530
+Message-Id: <1242991453-17427-2-git-send-email-alok.barsode@azingo.com>
+In-Reply-To: <1242991453-17427-1-git-send-email-alok.barsode@azingo.com>
+References: <1242991453-17427-1-git-send-email-alok.barsode@azingo.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I've used this for dualboot-systems because I didn't want to
-pair the devices every time I've switched systems.
+From: Alok Barsode <alok.barsode@azingo.com>
 
-Currently it exports the keys using the old bluez format with files
-named 'link_key' and 'linkkeys'. To use it with newer versions of bluez
-it has either to be modified or someone has to write an import.
 ---
- tools/windows/BTWinLinkKeyExport.cpp |  210 ++++++++++++++++++++++++++++++++++
- 1 files changed, 210 insertions(+), 0 deletions(-)
- create mode 100644 tools/windows/BTWinLinkKeyExport.cpp
+ plugins/hciops.c |   60 +++++++++++++++++++++
+ src/adapter.c    |   37 +++++++------
+ src/adapter.h    |    1 +
+ src/dbus-hci.c   |  153 ------------------------------------------------------
+ src/dbus-hci.h   |    6 --
+ 5 files changed, 82 insertions(+), 175 deletions(-)
 
-diff --git a/tools/windows/BTWinLinkKeyExport.cpp b/tools/windows/BTWinLinkKeyExport.cpp
-new file mode 100644
-index 0000000..deadabe
---- /dev/null
-+++ b/tools/windows/BTWinLinkKeyExport.cpp
-@@ -0,0 +1,210 @@
-+//
-+// BTWinLinkKeyExport.cpp
-+//
-+// Exports bluetooth-link-keys stored by the WIDCOMM stack for use with
-+// Dual- or Multi-booting systems.
-+//
-+// Written 2004 by Alexander Holler.
-+//
-+// This source is free in every aspect. You can use, modify, distribute
-+// or sell it at your wish. You can even replace my name with yours if
-+// that would earn you some credits you otherwise wouldn't get.
-+//
-+// No warrantys are given. This software might destroy your hardware,
-+// software or datas.
-+//
-+// This software uses functions like sscanf() and such bad things,
-+// feel free to make it safe up to point your security-officer wants it.
-+//
-+// To compile it I've used the free Borland Compiler, but it should work using
-+// any compiler. For bcc I've used the following few lines:
-+//
-+// path=%path%;d:\Programme\Borland\Bcc55\bin
-+// bcc32 -O2 -DNDEBUG -c BTWinLinkKeyExport.cpp
-+// bcc32 -O2 -DNDEBUG BTWinLinkKeyExport.obj
-+//
-+// (WIDCOMM is a registered trademark of WIDCOMM Inc. and
-+// Borland is a trademark of Borland Software Corporation)
-+//
-+
-+#include <stdio.h>
-+#include <string.h>
-+#include <time.h>
-+#include <string>
-+
-+#include <windows.h>
-+#include <wincrypt.h>
-+
-+typedef unsigned char uint8_t;
-+
-+#pragma pack(1)
-+
-+typedef struct {
-+  uint8_t b[6];
-+} bdaddr_t;
-+
-+#pragma pack(4)
-+
-+struct link_key {
-+  bdaddr_t sba; // Dongle address
-+  bdaddr_t dba; // external Device address
-+  uint8_t key[16];
-+  uint8_t type;
-+  time_t  time;
-+};
-+
-+#pragma pack()
-+
-+static char* local_device;
-+
-+static void displayLastError(void)
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index c4c084e..bcf7e6a 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -616,6 +616,65 @@ done:
+ 	return err;
+ }
+ 
++static int remote_name_cancel(int dd, bdaddr_t *dba)
 +{
-+  LPVOID lpMsgBuf;
-+  DWORD msgid=GetLastError();
-+  if (!FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-+    FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-+    NULL, msgid, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-+    (LPTSTR) &lpMsgBuf, 0, NULL ))
-+    return;
-+  fprintf(stderr, "Error %u: %s\n", msgid, lpMsgBuf);
-+  LocalFree( lpMsgBuf );
++	int err = 0;
++	remote_name_req_cancel_cp cp;
++
++	memset(&cp, 0, sizeof(cp));
++
++	bacpy(&cp.bdaddr, dba);
++
++	err = hci_send_cmd(dd, OGF_LINK_CTL, OCF_REMOTE_NAME_REQ_CANCEL,
++					REMOTE_NAME_REQ_CANCEL_CP_SIZE, &cp);
++
++	if (err < 0)
++		err = -errno;
++
++	return err;
 +}
 +
-+static int exportKey(const char* regkeyname, HCRYPTPROV& hProv, FILE* file,
-+  FILE* file2)
++static int hciops_stop_discovery(int index)
 +{
-+  // This function tries to read the registry entry linkkey, decrypts it and
-+  // writes an entry to the link-key-file for linux
-+  std::string s=std::string("SOFTWARE\\Widcomm\\BTConfig\\Devices\\") +
-+    regkeyname;
-+  HKEY rKey=NULL;
-+  long rc=RegOpenKeyEx(HKEY_LOCAL_MACHINE, s.c_str(), 0, KEY_READ, &rKey);
-+  if(rc!=ERROR_SUCCESS) {
-+    LPVOID lpMsgBuf;
-+    if(!FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-+      FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-+      NULL, rc, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &lpMsgBuf,
-+      0, NULL ))
-+      return 0;
-+    fprintf(stderr, "Error %u: %s\n", rc, lpMsgBuf);
-+    LocalFree( lpMsgBuf );
-+    return 1;
-+  }
-+  BYTE keybuf[1024]; // I'm lazy, fixed size
-+  DWORD keybuflen=sizeof(keybuf);
-+  DWORD type;
-+  rc=RegQueryValueEx(rKey, "LinkKey", NULL, &type, keybuf, &keybuflen);
-+  RegCloseKey(rKey);
-+  if(rc!=ERROR_SUCCESS)
-+    return 0; // No error, just no link key
-+  // If anyone wants to implement boundary checks for keybuf,
-+  // he has my permissions. ;)
-+  DWORD dwDataLen=*((DWORD*)(keybuf+4));
-+  unsigned char *importkey=keybuf+8;
-+  HCRYPTKEY hKey = NULL;
-+  if(!CryptImportKey(hProv, importkey, dwDataLen, 0, 0, &hKey)) {
-+    displayLastError();
-+    return 2;
-+  }
-+  unsigned char* realkey=importkey+dwDataLen+4;
-+  DWORD dwDataLen2=*((DWORD*)(realkey-4));
-+  BYTE* newkey=(BYTE*)malloc(dwDataLen2);
-+  memcpy(newkey, realkey, dwDataLen2);
-+  if(!CryptDecrypt(hKey, 0, 1, 0, newkey, &dwDataLen2 )) {
-+    displayLastError();
-+    CryptDestroyKey(hKey);
-+    return 3;
-+  }
-+  CryptDestroyKey(hKey);
-+  struct link_key lkey;
-+  memset(&lkey, 0, sizeof(lkey));
-+  unsigned adr[6];
-+  if(sscanf(regkeyname, "%x:%x:%x:%x:%x:%x", &adr[0], &adr[1], &adr[2],
-+    &adr[3],&adr[4], &adr[5])!= 6)
-+    return 4;
-+  for(int i=0; i<6; i++)
-+    lkey.dba.b[5-i]=adr[i];
-+  if(sscanf(local_device, "%x:%x:%x:%x:%x:%x", &adr[0], &adr[1], &adr[2],
-+    &adr[3],&adr[4], &adr[5])!= 6)
-+    return 5;
-+  for(int i=0; i<6; i++)
-+    lkey.sba.b[5-i]=adr[i];
-+  for(int i=0; i<16; i++)
-+    lkey.key[i]=newkey[dwDataLen2-1-i];
-+  lkey.time=time(NULL); // We are faking as this is not needed for operation
-+  lkey.type=0; // I don't know the types, but my devices are all having 0
-+  if(fwrite(&lkey, sizeof(lkey), 1, file)!=1)
-+    return 6;
-+  for(int i=0; i<17; i++)
-+    // I haven't checked if bluez treads them case insensitiv, so we are
-+    // exporting them like they were originally found in bluez (uppercase)
-+    fprintf(file2, "%c", toupper(regkeyname[i]));
-+  fprintf(file2, " ");
-+  for(int i=0; i<16; i++)
-+    fprintf(file2, "%02X", lkey.key[i]);
-+  fprintf(file2, " 0%c", 0x0a);
-+  printf("Link key for %s exported.\n", regkeyname);
-+  return 0;
++	struct btd_adapter *adapter;
++	struct remote_dev_info *dev, match;
++	int dd, err = 0;
++	int state;
++
++	dd = hci_open_dev(index);
++	if (dd < 0)
++		return -ENODEV;
++
++	adapter = manager_find_adapter_by_id(index);
++	/*
++	 * If there is a pending read remote name request means
++	 * that the inquiry complete event was already received
++	 */
++	memset(&match, 0, sizeof(struct remote_dev_info));
++	bacpy(&match.bdaddr, BDADDR_ANY);
++	match.name_status = NAME_REQUESTED;
++
++	dev = adapter_search_found_devices(adapter, &match);
++	if (dev)
++		err = remote_name_cancel(dd, &dev->bdaddr);
++	else {
++		state = adapter_get_state(adapter);
++		if (state & STD_INQUIRY)
++			err = hci_send_cmd(dd, OGF_LINK_CTL, OCF_INQUIRY_CANCEL,
++					0, 0);
++		else
++			err = hci_send_cmd(dd, OGF_LINK_CTL, OCF_EXIT_PERIODIC_INQUIRY,
++					0, 0);
++	}
++
++	hci_close_dev(dd);
++
++	if (err < 0)
++		err = -errno;
++
++	return err;
 +}
 +
-+static void showHelp(void)
-+{
-+  printf("\nBTLinkKeyExport V1.0\nWritten 2004 Alexander Holler\n"
-+      "Free in every aspect. See the source for details.\n\n");
-+  printf("  Usage: BTLinkKeyExport localDeviceMAC\n");
-+  printf("  Where localDeviceMAC is in the form xx:xx:xx:xx:xx:xx\n");
-+}
+ static struct btd_adapter_ops hci_ops = {
+ 	.setup = hciops_setup,
+ 	.cleanup = hciops_cleanup,
+@@ -626,6 +685,7 @@ static struct btd_adapter_ops hci_ops = {
+ 	.set_discoverable = hciops_discoverable,
+ 	.set_limited_discoverable = hciops_set_limited_discoverable,
+ 	.start_discovery = hciops_start_discovery,
++	.stop_discovery = hciops_stop_discovery,
+ };
+ 
+ static int hciops_init(void)
+diff --git a/src/adapter.c b/src/adapter.c
+index 1a9dd76..fcda99f 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -553,12 +553,10 @@ static void session_remove(struct session_req *req)
+ 		g_slist_free(adapter->oor_devices);
+ 		adapter->oor_devices = NULL;
+ 
+-		if (adapter->state & STD_INQUIRY)
+-			cancel_discovery(adapter);
+-		else if (adapter->scheduler_id)
++		if (adapter->scheduler_id)
+ 			g_source_remove(adapter->scheduler_id);
+-		else
+-			cancel_periodic_discovery(adapter);
 +
-+int main(int argc, char **argv)
-+{
-+  if(argc!=2) {
-+    showHelp();
-+    return 1;
-+  }
-+  if(strlen(argv[1])!=17) {
-+    showHelp();
-+    return 2;
-+  }
-+  local_device=argv[1];
-+  FILE* file=fopen("link_key", "wb");
-+  if(!file) {
-+    fprintf(stderr, "Unable to open file 'link_key' for writing!\n");
-+    return 3;
-+  }
-+  FILE* file2=fopen("linkkeys", "wb");
-+  if(!file2) {
-+    fprintf(stderr, "Unable to open file 'linkkeys' for writing!\n");
-+    return 3;
-+  }
-+  const char* provider="Microsoft Base Cryptographic Provider v1.0";
-+  const char* container="Widcomm Bluetooth Key Container Name";
-+  HCRYPTPROV hProv = NULL;
-+  if(!CryptAcquireContext(&hProv, container, provider, 1 /* dwProviderType */,
-+    0x20 /* dwFlags */ )) {
-+    displayLastError();
-+    fclose(file);
-+    return 4;
-+  }
-+  HKEY rKey;
-+  RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Widcomm\\BTConfig\\Devices", 0,
-+    KEY_READ, &rKey);
-+  int ret=0;
-+  for(unsigned i=0; ; i++) {
-+    char rkeyname[255];
-+    DWORD rkeynamelen=sizeof(rkeyname);
-+    FILETIME ftLastWriteTime;
-+    int rc=RegEnumKeyEx(rKey, i, rkeyname, &rkeynamelen, NULL, NULL, NULL,
-+      &ftLastWriteTime);
-+    if(rc!=ERROR_SUCCESS)
-+      break;
-+    ret=exportKey(rkeyname, hProv, file, file2);
-+    if(ret) {
-+      ret+=4;
-+      break; // An error occured
-+    }
-+  }
-+  RegCloseKey(rKey);
-+  CryptReleaseContext(hProv, 0);
-+  fclose(file);
-+  return ret;
-+}
++		adapter_ops->stop_discovery(adapter->dev_id);
+ 	}
+ }
+ 
+@@ -2030,18 +2028,31 @@ setup:
+ 	hci_send_cmd(dd, OGF_LINK_POLICY, OCF_READ_DEFAULT_LINK_POLICY,
+ 								0, NULL);
+ 
++ 	hci_close_dev(dd);
++
+ 	if (hci_test_bit(HCI_INQUIRY, &di.flags)) {
+ 		debug("inquiry_cancel at adapter startup");
+-		inquiry_cancel(dd, HCI_REQ_TIMEOUT);
++		adapter->state |= STD_INQUIRY;
+ 	} else if (!adapter->initialized && adapter->already_up) {
+ 		debug("periodic_inquiry_exit at adapter startup");
+-		periodic_inquiry_exit(dd, HCI_REQ_TIMEOUT);
++		adapter->state |= PERIODIC_INQUIRY;
+ 	}
+ 
++	adapter_ops->stop_discovery(adapter->dev_id);
++
+ 	adapter->state &= ~STD_INQUIRY;
++	adapter->state &= ~PERIODIC_INQUIRY;
++	
++	dd = hci_open_dev(adapter->dev_id);
++	if (dd < 0) {
++		err = -errno;
++		error("Can't open adapter %s: %s (%d)",
++					adapter->path, strerror(errno), errno);
++		return err;
++	}
+ 
+ 	adapter_setup(adapter, dd);
+-	hci_close_dev(dd);
++ 	hci_close_dev(dd);
+ 
+ 	err = adapter_up(adapter);
+ 
+@@ -2066,16 +2077,10 @@ static void reply_pending_requests(struct btd_adapter *adapter)
+ 						HCI_OE_USER_ENDED_CONNECTION);
+ 	}
+ 
+-	if (adapter->state & STD_INQUIRY) {
++	if (adapter->state & STD_INQUIRY || adapter->state & PERIODIC_INQUIRY) {
+ 		/* Cancel inquiry initiated by D-Bus client */
+ 		if (adapter->disc_sessions)
+-			cancel_discovery(adapter);
+-	}
+-
+-	if (adapter->state & PERIODIC_INQUIRY) {
+-		/* Stop periodic inquiry initiated by D-Bus client */
+-		if (adapter->disc_sessions)
+-			cancel_periodic_discovery(adapter);
++			adapter_ops->stop_discovery(adapter->dev_id);
+ 	}
+ }
+ 
+diff --git a/src/adapter.h b/src/adapter.h
+index 516b4ac..1312596 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -158,6 +158,7 @@ struct btd_adapter_ops {
+ 	int (*set_limited_discoverable) (int index, const uint8_t *cls,
+ 						gboolean limited);
+ 	int (*start_discovery) (int index);
++	int (*stop_discovery) (int index);
+ };
+ 
+ int btd_register_adapter_ops(struct btd_adapter_ops *btd_adapter_ops);
+diff --git a/src/dbus-hci.c b/src/dbus-hci.c
+index 65ac12b..27dc77c 100644
+--- a/src/dbus-hci.c
++++ b/src/dbus-hci.c
+@@ -1221,159 +1221,6 @@ int hcid_dbus_set_io_cap(bdaddr_t *local, bdaddr_t *remote,
+ 	return 0;
+ }
+ 
+-int inquiry_cancel(int dd, int to)
+-{
+-	struct hci_request rq;
+-	uint8_t status;
+-
+-	memset(&rq, 0, sizeof(rq));
+-	rq.ogf    = OGF_LINK_CTL;
+-	rq.ocf    = OCF_INQUIRY_CANCEL;
+-	rq.rparam = &status;
+-	rq.rlen   = sizeof(status);
+-	rq.event = EVT_CMD_COMPLETE;
+-
+-	if (hci_send_req(dd, &rq, to) < 0)
+-		return -1;
+-
+-	if (status) {
+-		errno = bt_error(status);
+-		return -1;
+-	}
+-
+-	return 0;
+-}
+-
+-static int remote_name_cancel(int dd, bdaddr_t *dba, int to)
+-{
+-	remote_name_req_cancel_cp cp;
+-	struct hci_request rq;
+-	uint8_t status;
+-
+-	memset(&rq, 0, sizeof(rq));
+-	memset(&cp, 0, sizeof(cp));
+-
+-	bacpy(&cp.bdaddr, dba);
+-
+-	rq.ogf    = OGF_LINK_CTL;
+-	rq.ocf    = OCF_REMOTE_NAME_REQ_CANCEL;
+-	rq.cparam = &cp;
+-	rq.clen   = REMOTE_NAME_REQ_CANCEL_CP_SIZE;
+-	rq.rparam = &status;
+-	rq.rlen = sizeof(status);
+-	rq.event = EVT_CMD_COMPLETE;
+-
+-	if (hci_send_req(dd, &rq, to) < 0)
+-		return -1;
+-
+-	if (status) {
+-		errno = bt_error(status);
+-		return -1;
+-	}
+-
+-	return 0;
+-}
+-
+-int cancel_discovery(struct btd_adapter *adapter)
+-{
+-	struct remote_dev_info *dev, match;
+-	int dd, err = 0;
+-	uint16_t dev_id = adapter_get_dev_id(adapter);
+-
+-	dd = hci_open_dev(dev_id);
+-	if (dd < 0)
+-		return -ENODEV;
+-
+-	/*
+-	 * If there is a pending read remote name request means
+-	 * that the inquiry complete event was already received
+-	 */
+-	memset(&match, 0, sizeof(struct remote_dev_info));
+-	bacpy(&match.bdaddr, BDADDR_ANY);
+-	match.name_status = NAME_REQUESTED;
+-
+-	dev = adapter_search_found_devices(adapter, &match);
+-	if (dev) {
+-		if (remote_name_cancel(dd, &dev->bdaddr,
+-							HCI_REQ_TIMEOUT) < 0) {
+-			err = -errno;
+-			error("Read remote name cancel failed: %s, (%d)",
+-						strerror(errno), errno);
+-		}
+-	} else {
+-		if (inquiry_cancel(dd, HCI_REQ_TIMEOUT) < 0) {
+-			err = -errno;
+-			error("Inquiry cancel failed:%s (%d)",
+-						strerror(errno), errno);
+-		}
+-	}
+-
+-	hci_close_dev(dd);
+-
+-	return err;
+-}
+-
+-int periodic_inquiry_exit(int dd, int to)
+-{
+-	struct hci_request rq;
+-	uint8_t status;
+-
+-	memset(&rq, 0, sizeof(rq));
+-	rq.ogf    = OGF_LINK_CTL;
+-	rq.ocf    = OCF_EXIT_PERIODIC_INQUIRY;
+-	rq.rparam = &status;
+-	rq.rlen   = sizeof(status);
+-	rq.event = EVT_CMD_COMPLETE;
+-
+-	if (hci_send_req(dd, &rq, to) < 0)
+-		return -1;
+-
+-	if (status) {
+-		errno = status;
+-		return -1;
+-	}
+-
+-	return 0;
+-}
+-
+-int cancel_periodic_discovery(struct btd_adapter *adapter)
+-{
+-	struct remote_dev_info *dev, match;
+-	int dd, err = 0;
+-	uint16_t dev_id = adapter_get_dev_id(adapter);
+-
+-	dd = hci_open_dev(dev_id);
+-	if (dd < 0)
+-		return -ENODEV;
+-
+-	/* find the pending remote name request */
+-	memset(&match, 0, sizeof(struct remote_dev_info));
+-	bacpy(&match.bdaddr, BDADDR_ANY);
+-	match.name_status = NAME_REQUESTED;
+-
+-	dev = adapter_search_found_devices(adapter, &match);
+-	if (dev) {
+-		if (remote_name_cancel(dd, &dev->bdaddr,
+-						HCI_REQ_TIMEOUT) < 0) {
+-			err = -errno;
+-			error("Read remote name cancel failed: %s, (%d)",
+-						strerror(errno), errno);
+-		}
+-	}
+-
+-	/* ovewrite err if necessary: stop periodic inquiry has higher
+-	 * priority */
+-	if (periodic_inquiry_exit(dd, HCI_REQ_TIMEOUT) < 0) {
+-		err = -errno;
+-		error("Periodic Inquiry exit failed:%s (%d)",
+-						strerror(errno), errno);
+-	}
+-
+-	hci_close_dev(dd);
+-
+-	return err;
+-}
+-
+ /* Most of the functions in this module require easy access to a connection so
+  * we keep it global here and provide these access functions the other (few)
+  * modules that require access to it */
+diff --git a/src/dbus-hci.h b/src/dbus-hci.h
+index 1cb10f3..ec9ac97 100644
+--- a/src/dbus-hci.h
++++ b/src/dbus-hci.h
+@@ -52,15 +52,9 @@ int hcid_dbus_link_key_notify(bdaddr_t *local, bdaddr_t *peer,
+ 
+ DBusMessage *new_authentication_return(DBusMessage *msg, uint8_t status);
+ 
+-int cancel_discovery(struct btd_adapter *adapter);
+-int cancel_periodic_discovery(struct btd_adapter *adapter);
+-
+ int set_service_classes(int dd, const uint8_t *cls, uint8_t value);
+ int set_major_and_minor_class(int dd, const uint8_t *cls,
+ 						uint8_t major, uint8_t minor);
+-int inquiry_cancel(int dd, int to);
+-int periodic_inquiry_exit(int dd, int to);
+-
+ const char *class_to_icon(uint32_t class);
+ 
+ void set_dbus_connection(DBusConnection *conn);
 -- 
-1.6.0.4
-
+1.5.6.3
