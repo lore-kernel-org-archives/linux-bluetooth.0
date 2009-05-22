@@ -1,46 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 23 May 2009 14:40:30 +0200
-From: Filippo Giunchedi <filippo@esaurito.net>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] bluez-gnome: remove unused
-	gtk_status_icon_new/g_object_unref
-Message-ID: <20090523124030.GA14304@esaurito.net>
+Message-ID: <4A17122A.3030302@ahsoftware.de>
+Date: Fri, 22 May 2009 22:59:22 +0200
+From: Alexander Holler <holler@ahsoftware.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/1] BTWinLinkKeyExport - Tool to export link-keys stored
+ 	by the WIDCOMM stack
+References: <1242999521-8303-1-git-send-email-holler@ahsoftware.de> <2d5a2c100905221226y5d318219lc2ebe76ae306e91d@mail.gmail.com>
+In-Reply-To: <2d5a2c100905221226y5d318219lc2ebe76ae306e91d@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-with the patch below I am able to fix
-http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=529026
-I'm not sure if creating a new empty status icon is of any use e.g. in GNOME
-systray.
+Hi lUiz,
 
----
- applet/notify.c |    3 ---
- 1 files changed, 0 insertions(+), 3 deletions(-)
+Luiz Augusto von Dentz schrieb:
 
-diff --git a/applet/notify.c b/applet/notify.c
-index 02a912a..7daac1a 100644
---- a/applet/notify.c
-+++ b/applet/notify.c
-@@ -92,9 +92,6 @@ GtkStatusIcon *init_notification(void)
- {
- 	notify_init("bluetooth-manager");
- 
--	statusicon = gtk_status_icon_new();
--	g_object_unref(statusicon);
--
- 	statusicon = gtk_status_icon_new_from_icon_name("bluetooth");
- 
- 	//gtk_status_icon_set_tooltip(statusicon, _("Bluetooth Manager"));
--- 
-1.6.3.1
+> Im afraid this is not really useful anymore, at least not if you
+> expect to things like the new gnome-bluetooth to work since bluetoothd
+> needs the sdp records the device export in order to probe the driver
+> which takes care of profiles. In other words profiles won't just work
+> because you got the linkkey. Despite this I don't think such thing
+> belongs to BlueZ codebase, nobody will be going to maintain a windows
+> c++ source code.
 
+I don't care. I just wanted to post that thing, if someone else is 
+interested. I've asked some years ago, and nobody really answered, so it 
+rested somewhere in my source-directories, seldom used (just) by me and 
+got forgotten. Now it has at least found a place in the mailing-list 
+here and I have a clear conscience having it (finally) published.
 
-filippo
---
-Filippo Giunchedi - http://esaurito.net - 0x6B79D401
+Kind regards,
 
-Man was made at the end of the week's work when God was tired.
--- Mark Twain
+Alexander Holler
+
