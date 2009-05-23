@@ -1,19 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 24 May 2009 12:38:02 +0200
-From: Artem Makhutov <artem@makhutov.org>
+Date: Sat, 23 May 2009 14:40:30 +0200
+From: Filippo Giunchedi <filippo@esaurito.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: Patches for 2.6.29 for up-to-date bluetooth drivers
-Message-ID: <20090524103802.GV6984@titan.makhutov-it.de>
+Subject: [PATCH] bluez-gnome: remove unused
+	gtk_status_icon_new/g_object_unref
+Message-ID: <20090523124030.GA14304@esaurito.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi,
+with the patch below I am able to fix
+http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=529026
+I'm not sure if creating a new empty status icon is of any use e.g. in GNOME
+systray.
 
-I would like to use the newest bluez drivers without upgrading my kernel to 2.6.30-rcX.
+---
+ applet/notify.c |    3 ---
+ 1 files changed, 0 insertions(+), 3 deletions(-)
 
-Are there some pathes availible that I can apply to kernel 2.6.29?
-Are the sources of the bluez modules availible somewhere, so I can build the modules outside of the kernel?
+diff --git a/applet/notify.c b/applet/notify.c
+index 02a912a..7daac1a 100644
+--- a/applet/notify.c
++++ b/applet/notify.c
+@@ -92,9 +92,6 @@ GtkStatusIcon *init_notification(void)
+ {
+ 	notify_init("bluetooth-manager");
+ 
+-	statusicon = gtk_status_icon_new();
+-	g_object_unref(statusicon);
+-
+ 	statusicon = gtk_status_icon_new_from_icon_name("bluetooth");
+ 
+ 	//gtk_status_icon_set_tooltip(statusicon, _("Bluetooth Manager"));
+-- 
+1.6.3.1
 
-Thanks, Artem
+
+filippo
+--
+Filippo Giunchedi - http://esaurito.net - 0x6B79D401
+
+Man was made at the end of the week's work when God was tired.
+-- Mark Twain
