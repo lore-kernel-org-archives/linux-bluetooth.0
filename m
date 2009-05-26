@@ -1,177 +1,201 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4A1BA619.4040401@hartkopp.net>
+Date: Tue, 26 May 2009 10:19:37 +0200
+From: Oliver Hartkopp <oliver@hartkopp.net>
 MIME-Version: 1.0
-In-Reply-To: <5d223510905221139i26a6ef40ie10d7e95dc765b88@mail.gmail.com>
-References: <5d223510905201349w416f50cal520dde1281f90bc7@mail.gmail.com>
-	 <1242853150.3147.32.camel@localhost.localdomain>
-	 <5d223510905210710s21f5a433r50ae5ca610ccff4@mail.gmail.com>
-	 <200905221914.48170.Hugo.Mildenberger@namir.de>
-	 <5d223510905221139i26a6ef40ie10d7e95dc765b88@mail.gmail.com>
-Date: Tue, 26 May 2009 16:03:43 -0300
-Message-ID: <5d223510905261203p786e2212ja083c20305b82908@mail.gmail.com>
-Subject: Re: bluez 4.x, SCO socket - connection reset by peer
-From: Rafael Seste <rseste@gmail.com>
-To: Hugo Mildenberger <Hugo.Mildenberger@namir.de>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=windows-1252
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: possible recursive locking in 2.6.30-rc6
+References: <4A1A9D1D.2050301@hartkopp.net> <4A1AF7B0.4020701@hartkopp.net>
+In-Reply-To: <4A1AF7B0.4020701@hartkopp.net>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+I did not bisect the problem in detail but as an additional hint:
 
-On Fri, May 22, 2009 at 3:39 PM, Rafael Seste <rseste@gmail.com> wrote:
-> On Fri, May 22, 2009 at 2:14 PM, Hugo Mildenberger
-> <Hugo.Mildenberger@namir.de> wrote:
->> Am Donnerstag, 21. Mai 2009 schrieb Rafael Seste:
->>> Marcel
->>>
->>> On Wed, May 20, 2009 at 5:59 PM, Marcel Holtmann <marcel@holtmann.org> =
-wrote:
->>> > Hi Rafael,
->>> >
->>> >> I trying to use asterisk (with chan_mobile) to connect with my mobil=
-e phone.
->>> >> When there is a incoming/outgoing call, this module creates a
->>> >> sco_socket to send/receive audio packets.
->>> >>
->>> >> socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_SCO)
->>> >>
->>> >> when this socket is ready...it can write data once, after that when =
-it
->>> >> tries to read an error is returned:
->>> >>
->>> >> sco_read() error 104
->>> >>
->>> >> 104 means - connection reset by peer
->>> >>
->>> >> after this i got error 107 - not connect.
->>> >>
->>> >> Some one knows why is the reason of this error 104???
->>> >>
->>> >> kernel 2.6.22.18
->>> >> bluez 4.32
->>> >
->>> > I don't know, but your kernel is ancient. Please re-test with 2.6.30-=
-rc6
->>> > and bluez-4.40 to see if this error still persists.
->>> >
->>> > Regards
->>> >
->>> > Marcel
->>> >
->>> >
->>> >
->>>
->>> I have a setup:
->>> kernel 2.6.9-78.ELsmp #1 SMP Fri Jul 25 00:04:28 EDT 2008 i686 i686
->>> i386 GNU/Linux
->>> and bluez 2.10-3
->>>
->>> and it works fine.
->>>
->>> The difference is the arch that now I changed to an ARM and i can't
->>> install this old kernel.
->>>
->>
->> I can confirm this behaviour on x86 with a CSR Adapter (0a12:0001),
->> a Nokia 6280 V6.43, linux-2.6.30-rc6-00159-ga15ae93 and bluez-4.40.
->>
->> Until today, I thought it might be related to the interaction between
->> the Nokia firmware and Asterisk, but if Rafael says 2.6.9-78/bluez-2.10.=
-3
->> would be working?
->>
->> https://issues.asterisk.org/view.php?id=3D15075 now has a patch which at
->> least cures the symptoms.
->>
->> I do also see some kernel errors via dmesg:
->>
->> btusb_isoc_complete: hci0 corrupted SCO packet
->> hci_scodata_packet: hci0 SCO packet for unknown connection handle 0
->> hci_scodata_packet: hci0 SCO packet for unknown connection handle 0
->> hci_scodata_packet: hci0 SCO packet for unknown connection handle 0
->> hci_scodata_packet: hci0 SCO packet for unknown connection handle 0
->> hci_scodata_packet: hci0 SCO packet for unknown connection handle 0
->> btusb_isoc_complete: hci0 corrupted SCO packet
->> hci_scodata_packet: hci0 SCO packet for unknown connection handle 46
->> hci_scodata_packet: hci0 SCO packet for unknown connection handle 0
->> [...]
->>
->>
->>
->>
->
-> I forgot to tell one important detail. I'm trying to install this
-> stuffs in a SoC. It is a ARM
-> root@debian:~# uname -a
-> Linux debian 2.6.22.18 #1 Thu Mar 19 14:46:22 IST 2009 armv5tejl GNU/Linu=
-x
-> The kernel that I'm using has a lot of patchs to work in this architectur=
-e.
->
-> Today I reproduce the same setup in a PC (i386):
-> root@ubuntu:/var/log# uname -a
-> Linux ubuntu 2.6.22.18 #4 SMP Fri May 22 09:29:09 BRT 2009 i686 GNU/Linux
-> bluez 4.32 from apt-get and asterisk 1.6.1.0
->
-> and it works....
-> Maybe this is an architecture incompatibility..
->
-> Investigating the logs from the ARM, I found that the error
-> "connection reset by peer" occurs after I hang up.
-> So, asterisk writes once in the socket ( I can see the SCO package
-> going out in hcidump), then it tries to read from the sco socket but
-> there is no data available. It sleeps until some data arrives. The
-> only information that arrives is when I hang up so it returns the
-> error.
->
-> On hcidump output I can see only one sco package from asterisk to
-> mobile phone, and no SCO package from mobile to the asterisk.
->
-> Could it be some connection configuration problem??
-> What kernel drivers/modules are necessary??? I enable the bluetooth
-> ones in networking-->bluetooth subsystem support!!
->
->
->
->
->
->
-> --
-> Rafael S. Seste
-> Eng Computa=E7=E3o - Unicamp
->
+2.6.29.4 is working properly.
 
-I installed the new kernel 2.6.30-rc6 and bluez 4.40
-Now I can hear =93audio noise=94 only, it is not intelligible.
-The syslog is flooded by this message:
+2.6.30-rc3 also had some (different) problems that already might have been fixed:
 
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 63231
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 235
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 52224
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 210
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 79
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 27646
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 204
-btusb_isoc_complete: hci0 corrupted SCO packet
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 153
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 9727
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 47616
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 159
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 35584
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 190
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 65520
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 90
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 39679
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 65492
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 63487
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 0
-btusb_isoc_complete: hci0 corrupted SCO packet
+[  116.146378] PPP generic driver version 2.4.2
+[  118.808167] 2 locks held by swapper/0:
+[  118.808172]  #0:  (hci_task_lock){++.-.+}, at: [<f87f3cc0>]
+hci_rx_task+0x16/0x1f8 [bluetooth]
+[  118.808208]  #1:  (&hdev->lock){+.-.+.}, at: [<f87f577c>]
+hci_event_packet+0x13c/0x2168 [bluetooth]
+[  118.808242] Pid: 0, comm: swapper Not tainted 2.6.30-rc3 #1
+[  118.808248] Call Trace:
+[  118.808263]  [<c013f72d>] ? __debug_show_held_locks+0x1e/0x20
+[  118.808275]  [<c011efb1>] __might_sleep+0xce/0xd3
+[  118.808286]  [<c0174987>] __kmalloc+0x83/0x128
+[  118.808297]  [<c021e6f0>] ? kvasprintf+0x28/0x45
+[  118.808307]  [<c021e6f0>] kvasprintf+0x28/0x45
+[  118.808321]  [<c02188e4>] kobject_set_name_vargs+0x21/0x50
+[  118.808333]  [<c0295733>] dev_set_name+0x14/0x16
+[  118.808355]  [<f87f88a7>] hci_conn_add_sysfs+0x48/0xac [bluetooth]
+[  118.808379]  [<f87f57d8>] hci_event_packet+0x198/0x2168 [bluetooth]
+[  118.808391]  [<c011e990>] ? default_wake_function+0xb/0xd
+[  118.808400]  [<c013fa43>] ? mark_lock+0x1e/0x1f4
+[  118.808410]  [<c013fc5c>] ? mark_held_locks+0x43/0x5b
+[  118.808423]  [<c03d8337>] ? _spin_unlock_irqrestore+0x36/0x3c
+[  118.808433]  [<c033efc6>] ? sock_def_readable+0x64/0x6c
+[  118.808459]  [<f87f827b>] ? hci_send_to_sock+0x127/0x130 [bluetooth]
+[  118.808472]  [<c03d82b0>] ? _read_unlock+0x1d/0x20
+[  118.808494]  [<f87f827b>] ? hci_send_to_sock+0x127/0x130 [bluetooth]
+[  118.808517]  [<f87f3d48>] hci_rx_task+0x9e/0x1f8 [bluetooth]
+[  118.808529]  [<c01270a6>] tasklet_action+0x6b/0xb2
+[  118.808539]  [<c0127422>] __do_softirq+0x93/0x145
+[  118.808549]  [<c01274ff>] do_softirq+0x2b/0x43
+[  118.808559]  [<c0127603>] irq_exit+0x35/0x63
+[  118.808569]  [<c0104439>] do_IRQ+0x6d/0x83
+[  118.808579]  [<c01030ae>] common_interrupt+0x2e/0x34
+[  118.808590]  [<c013007b>] ? call_usermodehelper_exec+0x6b/0xcd
+[  118.808603]  [<c026cda4>] ? acpi_idle_enter_bm+0x23a/0x271
+[  118.808614]  [<c032fc2f>] cpuidle_idle_call+0x60/0x91
+[  118.808623]  [<c0101d3a>] cpu_idle+0x49/0x63
+[  118.808633]  [<c03c5c33>] rest_init+0x53/0x55
+[  118.808644]  [<c0562725>] start_kernel+0x261/0x266
+[  118.808655]  [<c0562037>] __init_begin+0x37/0x3c
+[  118.808669] 2 locks held by swapper/0:
+[  118.808673]  #0:  (hci_task_lock){++.-.+}, at: [<f87f3cc0>]
+hci_rx_task+0x16/0x1f8 [bluetooth]
+[  118.808707]  #1:  (&hdev->lock){+.-.+.}, at: [<f87f577c>]
+hci_event_packet+0x13c/0x2168 [bluetooth]
+[  118.808736] Modules linked in: ppp_generic slhc i915 drm i2c_algo_bit
+binfmt_misc vcan rfcomm l2cap snd_hda_codec_idt arc4 ecb cryptomgr aead
+snd_hda_intel snd_hda_codec pcompress crypto_blkcipher snd_pcm_oss crypto_hash
+crypto_algapi snd_mixer_oss snd_pcm snd_seq_oss b43 snd_seq_midi snd_rawmidi
+pcmcia mac80211 snd_seq_midi_event snd_seq snd_timer snd_seq_device cfg80211
+snd yenta_socket rsrc_nonstatic snd_page_alloc btusb pcmcia_core ssb i2c_i801
+bluetooth dell_laptop backlight rfkill dcdbas
+[  118.808856]
+[  118.808863] Pid: 0, comm: swapper Not tainted (2.6.30-rc3 #1) Latitude D830
 
-In hcidump output there are a lot of packets with different lengths
-and connection handler (ARM).
-The output from the pc that works (x86), all packets have the same
-handler and the same length.
+[  118.808871] EIP: 0060:[<c026cda4>] EFLAGS: 00000202 CPU: 0
+[  118.808880] EIP is at acpi_idle_enter_bm+0x23a/0x271
+[  118.808887] EAX: c055df88 EBX: 0000290d ECX: a982255e EDX: 00000004
+[  118.808894] ESI: 00000000 EDI: f70cbcdc EBP: c055dfac ESP: c055df88
+[  118.808901]  DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068
+[  118.808908] CR0: 8005003b CR2: 08064a50 CR3: 005b0000 CR4: 000006d0
+[  118.808916] DR0: 00000000 DR1: 00000000 DR2: 00000000 DR3: 00000000
+[  118.808922] DR6: ffff0ff0 DR7: 00000400
+[  118.808927] Call Trace:
+[  118.808936]  [<c032fc2f>] cpuidle_idle_call+0x60/0x91
+[  118.808946]  [<c0101d3a>] cpu_idle+0x49/0x63
+[  118.808955]  [<c03c5c33>] rest_init+0x53/0x55
+[  118.808965]  [<c0562725>] start_kernel+0x261/0x266
+[  118.808975]  [<c0562037>] __init_begin+0x37/0x3c
 
-Anybody knows why this is happening?
+Oliver Hartkopp wrote:
+> Oliver Hartkopp wrote:
+>> Hi all,
+>>
+> 
+> This is another trace after having a successful connection and after
+> terminating this connection after 40 secs with the latest 2.6.30-rc7.
+> 
+> When the kernel config is needed please give me a note.
+> 
+> Tnx,
+> Oliver
+> 
+> 
+> [   52.331965] PPP generic driver version 2.4.2
+> [   57.917179] PPP BSD Compression module registered
+> [   57.964543] PPP Deflate Compression module registered
+> [   97.634897]
+> [   97.634901] =============================================
+> [   97.638773] [ INFO: possible recursive locking detected ]
+> [   97.638773] 2.6.30-rc7 #23
+> [   97.638773] ---------------------------------------------
+> [   97.638773] bluetooth/2505 is trying to acquire lock:
+> [   97.669944]  (bluetooth){+.+.+.}, at: [<c0130c14>] flush_work+0x28/0xb0
+> [   97.669944]
+> [   97.669944] but task is already holding lock:
+> [   97.669944]  (bluetooth){+.+.+.}, at: [<c0130424>] worker_thread+0x149/0x25e
+> [   97.669944]
+> [   97.669944] other info that might help us debug this:
+> [   97.669944] 2 locks held by bluetooth/2505:
+> [   97.669944]  #0:  (bluetooth){+.+.+.}, at: [<c0130424>]
+> worker_thread+0x149/0x25e
+> [   97.669944]  #1:  (&conn->work_del){+.+...}, at: [<c0130424>]
+> worker_thread+0x149/0x25e
+> [   97.669944]
+> [   97.669944] stack backtrace:
+> [   97.669944] Pid: 2505, comm: bluetooth Not tainted 2.6.30-rc7 #23
+> [   97.669944] Call Trace:
+> [   97.669944]  [<c03d5ab1>] ? printk+0xf/0x11
+> [   97.669944]  [<c0140d9a>] __lock_acquire+0x7ce/0xb1b
+> [   97.669944]  [<c0141177>] lock_acquire+0x90/0xad
+> [   97.669944]  [<c0130c14>] ? flush_work+0x28/0xb0
+> [   97.669944]  [<c0130c2e>] flush_work+0x42/0xb0
+> [   97.669944]  [<c0130c14>] ? flush_work+0x28/0xb0
+> [   97.669944]  [<f87f8966>] del_conn+0x1c/0x84 [bluetooth]
+> [   97.669944]  [<c0130469>] worker_thread+0x18e/0x25e
+> [   97.669944]  [<c0130424>] ? worker_thread+0x149/0x25e
+> [   97.669944]  [<f87f894a>] ? del_conn+0x0/0x84 [bluetooth]
+> [   97.669944]  [<c0133843>] ? autoremove_wake_function+0x0/0x33
+> [   97.669944]  [<c01302db>] ? worker_thread+0x0/0x25e
+> [   97.669944]  [<c013355a>] kthread+0x45/0x6b
+> [   97.669944]  [<c0133515>] ? kthread+0x0/0x6b
+> [   97.669944]  [<c01034a7>] kernel_thread_helper+0x7/0x10
+> 
+> 
+>> i'm sometimes working with BT DUN with a Nokia 6210 Navigator.
+>>
+>> Last weekend anything must gone wrong, so my mobile was not able to create a
+>> ppp link with DUN this morning. After updating the driver and BT-chip firmware
+>> of my Dell 830 laptop and several pairing attempts i was able to kick it to
+>> work again ... :-]
+>>
+>> And i needed to move the channel from '5' to '3' in /etc/bluetooth/rfcomm.conf
+>> - i assume the Nokia Windows Software re-configured this in the process of
+>> re-installing their SW when updating the Windows drivers ... don't know.
+>>
+>> In the meantime (when the paring or anything else was broken) i discovered
+>> this kernel message about a locking issue.
+>>
+>> Is this a known problem?
+>>
+>> Regards,
+>> Oliver
+>>
+>> ps. Please CC me as i did not subcribe the list. Tnx
+>>
+>> =============================================
+>> [ INFO: possible recursive locking detected ]
+>> 2.6.30-rc6-02911-gbb803cf #16
+>> ---------------------------------------------
+>> bluetooth/2518 is trying to acquire lock:
+>>  (bluetooth){+.+.+.}, at: [<c0130c14>] flush_work+0x28/0xb0
+>>
+>> but task is already holding lock:
+>>  (bluetooth){+.+.+.}, at: [<c0130424>] worker_thread+0x149/0x25e
+>>
+>> other info that might help us debug this:
+>> 2 locks held by bluetooth/2518:
+>>  #0:  (bluetooth){+.+.+.}, at: [<c0130424>] worker_thread+0x149/0x25e
+>>  #1:  (&conn->work_del){+.+...}, at: [<c0130424>] worker_thread+0x149/0x25e
+>>
+>> stack backtrace:
+>> Pid: 2518, comm: bluetooth Not tainted 2.6.30-rc6-02911-gbb803cf #16
+>> Call Trace:
+>>  [<c03d64d9>] ? printk+0xf/0x11
+>>  [<c0140d96>] __lock_acquire+0x7ce/0xb1b
+>>  [<c0141173>] lock_acquire+0x90/0xad
+>>  [<c0130c14>] ? flush_work+0x28/0xb0
+>>  [<c0130c2e>] flush_work+0x42/0xb0
+>>  [<c0130c14>] ? flush_work+0x28/0xb0
+>>  [<f8b84966>] del_conn+0x1c/0x84 [bluetooth]
+>>  [<c0130469>] worker_thread+0x18e/0x25e
+>>  [<c0130424>] ? worker_thread+0x149/0x25e
+>>  [<f8b8494a>] ? del_conn+0x0/0x84 [bluetooth]
+>>  [<c0133843>] ? autoremove_wake_function+0x0/0x33
+>>  [<c01302db>] ? worker_thread+0x0/0x25e
+>>  [<c013355a>] kthread+0x45/0x6b
+>>  [<c0133515>] ? kthread+0x0/0x6b
+>>  [<c01034a7>] kernel_thread_helper+0x7/0x10
+>>
+> 
+> 
 
---=20
-Rafael S. Seste
