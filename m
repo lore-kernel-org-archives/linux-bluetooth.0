@@ -1,107 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1243410155.20399.27.camel@localhost.localdomain>
+Subject: Re: possible recursive locking in 2.6.30-rc6
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Dave Young <hidave.darkstar@gmail.com>
+Cc: Oliver Hartkopp <oliver@hartkopp.net>,
+	linux-bluetooth@vger.kernel.org
+In-Reply-To: <a8e1da0905261813i3577af33g101336259a51c03c@mail.gmail.com>
 References: <4A1A9D1D.2050301@hartkopp.net> <4A1AF7B0.4020701@hartkopp.net>
 	 <4A1BA619.4040401@hartkopp.net>
 	 <a8e1da0905261813i3577af33g101336259a51c03c@mail.gmail.com>
-	 <1243410155.20399.27.camel@localhost.localdomain>
-Date: Wed, 27 May 2009 19:11:42 +0800
-Message-ID: <a8e1da0905270411p44f5aac2l572bd744f20244ca@mail.gmail.com>
-Subject: Re: possible recursive locking in 2.6.30-rc6
-From: Dave Young <hidave.darkstar@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Oliver Hartkopp <oliver@hartkopp.net>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=000e0cd20ddc7b7213046ae2e8a8
+Content-Type: text/plain
+Date: Wed, 27 May 2009 09:42:35 +0200
+Message-Id: <1243410155.20399.27.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---000e0cd20ddc7b7213046ae2e8a8
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Hi Dave,
 
-On Wed, May 27, 2009 at 3:42 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Dave,
->
->> Could you try the attached patch and report your result?
->
-> please create patches with git-format-patch, because otherwise I have to
-> do extra work to apply them.
->
+> Could you try the attached patch and report your result?
 
-Sorry about the inconvenience, actually I created the patch by quilt.
+please create patches with git-format-patch, because otherwise I have to
+do extra work to apply them.
 
-I just use git to monitor the latest kernel changes,  but do not use
-it to create patches, I usually use a script of mine to create patch
-manually.
-
-Could you check the attached v2 patch? If it does not fit for
-applying, I can start studying use git :)
-
-> Regards
->
-> Marcel
->
->
->
-
-
-
--- 
 Regards
-dave
 
---000e0cd20ddc7b7213046ae2e8a8
-Content-Type: application/octet-stream;
-	name="bluetooth_flush_work_remove_v2.patch"
-Content-Disposition: attachment;
-	filename="bluetooth_flush_work_remove_v2.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_fv7xqeca0
+Marcel
 
-TG9ja2RlcCB3YXJuaW5nIHJlcG9ydGVkIGJ5IE9saXZlciBIYXJ0a29wcCA8b2xpdmVyQGhhcnRr
-b3BwLm5ldD4gCgo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0K
-WyBJTkZPOiBwb3NzaWJsZSByZWN1cnNpdmUgbG9ja2luZyBkZXRlY3RlZCBdCjIuNi4zMC1yYzYt
-MDI5MTEtZ2JiODAzY2YgIzE2Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLQpibHVldG9vdGgvMjUxOCBpcyB0cnlpbmcgdG8gYWNxdWlyZSBsb2NrOgogKGJsdWV0
-b290aCl7Ky4rLisufSwgYXQ6IFs8YzAxMzBjMTQ+XSBmbHVzaF93b3JrKzB4MjgvMHhiMAoKYnV0
-IHRhc2sgaXMgYWxyZWFkeSBob2xkaW5nIGxvY2s6CiAoYmx1ZXRvb3RoKXsrLisuKy59LCBhdDog
-WzxjMDEzMDQyND5dIHdvcmtlcl90aHJlYWQrMHgxNDkvMHgyNWUKCm90aGVyIGluZm8gdGhhdCBt
-aWdodCBoZWxwIHVzIGRlYnVnIHRoaXM6CjIgbG9ja3MgaGVsZCBieSBibHVldG9vdGgvMjUxODoK
-ICMwOiAgKGJsdWV0b290aCl7Ky4rLisufSwgYXQ6IFs8YzAxMzA0MjQ+XSB3b3JrZXJfdGhyZWFk
-KzB4MTQ5LzB4MjVlCiAjMTogICgmY29ubi0+d29ya19kZWwpeysuKy4uLn0sIGF0OiBbPGMwMTMw
-NDI0Pl0gd29ya2VyX3RocmVhZCsweDE0OS8weDI1ZQoKc3RhY2sgYmFja3RyYWNlOgpQaWQ6IDI1
-MTgsIGNvbW06IGJsdWV0b290aCBOb3QgdGFpbnRlZCAyLjYuMzAtcmM2LTAyOTExLWdiYjgwM2Nm
-ICMxNgpDYWxsIFRyYWNlOgogWzxjMDNkNjRkOT5dID8gcHJpbnRrKzB4Zi8weDExCiBbPGMwMTQw
-ZDk2Pl0gX19sb2NrX2FjcXVpcmUrMHg3Y2UvMHhiMWIKIFs8YzAxNDExNzM+XSBsb2NrX2FjcXVp
-cmUrMHg5MC8weGFkCiBbPGMwMTMwYzE0Pl0gPyBmbHVzaF93b3JrKzB4MjgvMHhiMAogWzxjMDEz
-MGMyZT5dIGZsdXNoX3dvcmsrMHg0Mi8weGIwCiBbPGMwMTMwYzE0Pl0gPyBmbHVzaF93b3JrKzB4
-MjgvMHhiMAogWzxmOGI4NDk2Nj5dIGRlbF9jb25uKzB4MWMvMHg4NCBbYmx1ZXRvb3RoXQogWzxj
-MDEzMDQ2OT5dIHdvcmtlcl90aHJlYWQrMHgxOGUvMHgyNWUKIFs8YzAxMzA0MjQ+XSA/IHdvcmtl
-cl90aHJlYWQrMHgxNDkvMHgyNWUKIFs8ZjhiODQ5NGE+XSA/IGRlbF9jb25uKzB4MC8weDg0IFti
-bHVldG9vdGhdCiBbPGMwMTMzODQzPl0gPyBhdXRvcmVtb3ZlX3dha2VfZnVuY3Rpb24rMHgwLzB4
-MzMKIFs8YzAxMzAyZGI+XSA/IHdvcmtlcl90aHJlYWQrMHgwLzB4MjVlCiBbPGMwMTMzNTVhPl0g
-a3RocmVhZCsweDQ1LzB4NmIKIFs8YzAxMzM1MTU+XSA/IGt0aHJlYWQrMHgwLzB4NmIKIFs8YzAx
-MDM0YTc+XSBrZXJuZWxfdGhyZWFkX2hlbHBlcisweDcvMHgxMAoKYmx1ZXRvb3RoZCBpcyBhIHNp
-bmdsZSB0aHJlYWQgd29ya3F1ZXVlLCBzbyB3b3JrIGZ1bmN0aW9ucyB3aWxsIGV4ZWN1dGUgaW4g
-b3JkZXIuCgpKdXN0IHJlbW92ZSB0aGUgZmx1c2hfd29yayBoYW5kbGluZyBpbiBoY2lfc3lzZnMu
-YwoKU2lnbmVkLW9mZi1ieTogRGF2ZSBZb3VuZyA8aGlkYXZlLmRhcmtzdGFyQGdtYWlsLmNvbT4K
-UmVwb3J0ZWQtYnk6IE9saXZlciBIYXJ0a29wcCA8b2xpdmVyQGhhcnRrb3BwLm5ldD4KVGVzdGVk
-LWJ5OiBPbGl2ZXIgSGFydGtvcHAgPG9saXZlckBoYXJ0a29wcC5uZXQ+Ci0tLQpuZXQvYmx1ZXRv
-b3RoL2hjaV9zeXNmcy5jIHwgICAgNiAtLS0tLS0KMSBmaWxlIGNoYW5nZWQsIDYgZGVsZXRpb25z
-KC0pCgpkaWZmIC11cnBOIGEvbmV0L2JsdWV0b290aC9oY2lfc3lzZnMuYyBiL25ldC9ibHVldG9v
-dGgvaGNpX3N5c2ZzLmMKLS0tIGEvbmV0L2JsdWV0b290aC9oY2lfc3lzZnMuYwkyMDA5LTA1LTI3
-IDE5OjAwOjEyLjAwMDAwMDAwMCArMDgwMAorKysgYi9uZXQvYmx1ZXRvb3RoL2hjaV9zeXNmcy5j
-CTIwMDktMDUtMjcgMTk6MDA6MjUuMDAwMDAwMDAwICswODAwCkBAIC05MCw5ICs5MCw2IEBAIHN0
-YXRpYyB2b2lkIGFkZF9jb25uKHN0cnVjdCB3b3JrX3N0cnVjdCAKIAlzdHJ1Y3QgaGNpX2Nvbm4g
-KmNvbm4gPSBjb250YWluZXJfb2Yod29yaywgc3RydWN0IGhjaV9jb25uLCB3b3JrX2FkZCk7CiAJ
-c3RydWN0IGhjaV9kZXYgKmhkZXYgPSBjb25uLT5oZGV2OwogCi0JLyogZW5zdXJlIHByZXZpb3Vz
-IGRlbCBpcyBjb21wbGV0ZSAqLwotCWZsdXNoX3dvcmsoJmNvbm4tPndvcmtfZGVsKTsKLQogCWRl
-dl9zZXRfbmFtZSgmY29ubi0+ZGV2LCAiJXM6JWQiLCBoZGV2LT5uYW1lLCBjb25uLT5oYW5kbGUp
-OwogCiAJaWYgKGRldmljZV9hZGQoJmNvbm4tPmRldikgPCAwKSB7CkBAIC0xMTgsOSArMTE1LDYg
-QEAgc3RhdGljIHZvaWQgZGVsX2Nvbm4oc3RydWN0IHdvcmtfc3RydWN0IAogCXN0cnVjdCBoY2lf
-Y29ubiAqY29ubiA9IGNvbnRhaW5lcl9vZih3b3JrLCBzdHJ1Y3QgaGNpX2Nvbm4sIHdvcmtfZGVs
-KTsKIAlzdHJ1Y3QgaGNpX2RldiAqaGRldiA9IGNvbm4tPmhkZXY7CiAKLQkvKiBlbnN1cmUgcHJl
-dmlvdXMgYWRkIGlzIGNvbXBsZXRlICovCi0JZmx1c2hfd29yaygmY29ubi0+d29ya19hZGQpOwot
-CiAJaWYgKCFkZXZpY2VfaXNfcmVnaXN0ZXJlZCgmY29ubi0+ZGV2KSkKIAkJcmV0dXJuOwogCg==
---000e0cd20ddc7b7213046ae2e8a8--
+
