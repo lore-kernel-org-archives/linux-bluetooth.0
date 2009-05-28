@@ -1,67 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <5d223510905281012j75808257t60d9fc095575016@mail.gmail.com>
-References: <25e5cce0905271909q747731acj4be42694772e67f8@mail.gmail.com>
-	 <5d223510905281012j75808257t60d9fc095575016@mail.gmail.com>
-Date: Thu, 28 May 2009 17:55:24 -0500
-Message-ID: <25e5cce0905281555q6e2b85a3hf901aae4bd14bda1@mail.gmail.com>
-Subject: Re: Can't play sound on bluetooth headset
-From: Diego Garcia <diegogarciamendoza@gmail.com>
-To: Rafael Seste <rseste@gmail.com>
+Subject: Re: Wacom Graphire Bluetooth HID driver - help needed
+From: Bastien Nocera <hadess@hadess.net>
+To: =?UTF-8?Q?Przemys=C5=82aw?= Firszt <przemo@firszt.eu>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <1243543413.21667.23.camel@pldmachine>
+References: <1243543413.21667.23.camel@pldmachine>
+Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 28 May 2009 23:29:09 +0100
+Message-Id: <1243549749.21144.816.camel@cookie.hadess.net>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Thanks for your response, i did it but it don't work. Actually i saw
-that wiki and did the .asoundrc part but missed that part u mentioned.
+On Thu, 2009-05-28 at 21:43 +0100, PrzemysÅ‚aw Firszt wrote:
+> Hi,
+> I'm working on Wacom Graphire bluetooth tablet driver.
 
-Anyways it still don't work. And tried with headphones service and A2DP.
+I already posted patches to linux-input and linux-bluetooth with support
+for that, and it's merged into Fedora 11.
 
-Maybe there is another workaround?
+Check that code, and let me know whether you have any comments on the
+code.
 
-On Thu, May 28, 2009 at 12:12 PM, Rafael Seste <rseste@gmail.com> wrote:
-> Hi Diego,
->
-> On Wed, May 27, 2009 at 11:09 PM, Diego Garcia
-> <diegogarciamendoza@gmail.com> wrote:
->> Hi,
->>
->> I'm using ubuntu 9.04 and my headset is Motorola S9.
->>
->> I connected my BT antenna and it didn't recognized as headset so i
->> installed blueman and upgraded bluez.
->>
->> Now it recognize it correctly, so i tried to configure the ALSA Driver
->> on Audacious for selecting bluetooth but that option doesn't appear.
->>
->> Anyone can give any advice about this?
->
-> this howto from bluez wiki should help you.
->
-> "if you can't see the audio device form there, you can force the
-> bluetooth output by modifying your audacious property file"
->
-> ~/.config/audacious/config. Modify the "pcm_device" value by
-> "pcm_device=bluetooth"
->
-> http://wiki.bluez.org/wiki/HOWTO/AudioDevices
->
->>
->> Regards,
->> Diego García Mendoza
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->
->
-> --
-> Rafael S. Seste
->
+Cheers
 
 
-
--- 
-Diego García Mendoza
