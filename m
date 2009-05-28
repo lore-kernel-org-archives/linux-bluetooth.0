@@ -1,27 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Wacom Graphire Bluetooth HID driver - help needed
-From: Bastien Nocera <hadess@hadess.net>
-To: =?UTF-8?Q?Przemys=C5=82aw?= Firszt <przemo@firszt.eu>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1243543413.21667.23.camel@pldmachine>
-References: <1243543413.21667.23.camel@pldmachine>
-Content-Type: text/plain; charset="UTF-8"
-Date: Thu, 28 May 2009 23:29:09 +0100
-Message-Id: <1243549749.21144.816.camel@cookie.hadess.net>
+Subject: Wacom Graphire Bluetooth HID driver - help needed
+From: =?UTF-8?Q?Przemys=C5=82aw?= Firszt <przemo@firszt.eu>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain
+Date: Thu, 28 May 2009 21:43:33 +0100
+Message-Id: <1243543413.21667.23.camel@pldmachine>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2009-05-28 at 21:43 +0100, Przemysław Firszt wrote:
-> Hi,
-> I'm working on Wacom Graphire bluetooth tablet driver.
+Hi,
+I'm working on Wacom Graphire bluetooth tablet driver. It's a HID driver
+and it's almost ready to be released, but I still have some problems.
+The main one is that the tablet works in mouse mode and I need to send a
+control message to switch to tablet mode. Currently I'm using an ugly
+hack in /net/bluetooth/hidp/core.c - hidp_add_connection:
 
-I already posted patches to linux-input and linux-bluetooth with support
-for that, and it's merged into Fedora 11.
 
-Check that code, and let me know whether you have any comments on the
-code.
+        rep_data [0] = 0x03; rep_data [1] = 0x00;
+        hidp_send_ctrl_message(session,
+                       HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_FEATURE,
+rep_data, 2);
+        /* 0x06 - high reporting speed, 0x05 - low speed */
+        rep_data [0] = 0x05; rep_data [1] = 0x00;
+       hidp_send_ctrl_message(session,
+                       HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_FEATURE,
+rep_data, 2);
 
-Cheers
+That hack is based on wacom graphire bluetooth driver created by Andrew
+Zabolotny, that driver has never neen mainstreamed, beacause of some
+philosophy issues (as far as I understand it)
 
+Any ideas how I can send the control message from HID driver level? Is
+it possible?
+--
+Przemo Firszt
+
+
+ 
+ 
 
