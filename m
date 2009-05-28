@@ -1,60 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 27 May 2009 23:50:45 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-To: linux-usb@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	Michael Buesch <mb@bu3sch.de>
-Cc: bugzilla-daemon@bugzilla.kernel.org,
-	bugme-daemon@bugzilla.kernel.org, Alex Dubov <oakad@yahoo.com>
-Subject: Re: [Bugme-new] [Bug 13320] New: ohci_hcd: unable to attach device
- - device descriptor read/64, error -62
-Message-Id: <20090527235045.7c78d688.akpm@linux-foundation.org>
-In-Reply-To: <bug-13320-10286@http.bugzilla.kernel.org/>
-References: <bug-13320-10286@http.bugzilla.kernel.org/>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Date: Wed, 27 May 2009 21:09:18 -0500
+Message-ID: <25e5cce0905271909q747731acj4be42694772e67f8@mail.gmail.com>
+Subject: Can't play sound on bluetooth headset
+From: Diego Garcia <diegogarciamendoza@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi,
 
-(switched to email.  Please respond via emailed reply-to-all, not via the
-bugzilla web interface).
+I'm using ubuntu 9.04 and my headset is Motorola S9.
 
-On Sat, 16 May 2009 09:51:39 GMT bugzilla-daemon@bugzilla.kernel.org wrote:
+I connected my BT antenna and it didn't recognized as headset so i
+installed blueman and upgraded bluez.
 
-> http://bugzilla.kernel.org/show_bug.cgi?id=13320
-> 
->            Summary: ohci_hcd: unable to attach device - device descriptor
->                     read/64, error -62
->            Product: Drivers
->            Version: 2.5
->     Kernel Version: 2.6.29
->           Platform: All
->         OS/Version: Linux
->               Tree: Mainline
->             Status: NEW
->           Severity: high
->           Priority: P1
->          Component: USB
->         AssignedTo: greg@kroah.com
->         ReportedBy: oakad@yahoo.com
->         Regression: Yes
-> 
-> 
-> Created an attachment (id=21373)
->  --> (http://bugzilla.kernel.org/attachment.cgi?id=21373)
-> dmesg dump of the problem
-> 
-> Device in question - built-in USB bluetooth controller.
-> 
-> Used to work flawlessly in older kernel.
-> 
-> Stopped working when Sonics Silicon backplane driver was merged (ohci_hcd
-> refused to work when ssb.ko was loaded before it or at all).
-> 
-> The problem was fixed at some point.
-> 
-> In 2.6.29 it comes back.
+Now it recognize it correctly, so i tried to configure the ALSA Driver
+on Audacious for selecting bluetooth but that option doesn't appear.
 
-I'm not sure who to toss this at, so I cc'ed everyone I ever met.
+Anyone can give any advice about this?
 
-Do you know which kernel version we regressed in?  I guess 2.6.8 was OK?
+Regards,
+Diego García Mendoza
