@@ -1,142 +1,237 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <535619.95725.qm@web95401.mail.in2.yahoo.com>
-References: <25e5cce0905271909q747731acj4be42694772e67f8@mail.gmail.com>
-	 <5d223510905281012j75808257t60d9fc095575016@mail.gmail.com>
-	 <25e5cce0905281555q6e2b85a3hf901aae4bd14bda1@mail.gmail.com>
-	 <535619.95725.qm@web95401.mail.in2.yahoo.com>
-Date: Fri, 29 May 2009 07:50:57 -0500
-Message-ID: <25e5cce0905290550mcb34cb3x9acd66e584314043@mail.gmail.com>
-Subject: Re: Can't play sound on bluetooth headset
-From: Diego Garcia <diegogarciamendoza@gmail.com>
-To: balaji palaniswami <balaji_palaniswami@yahoo.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: alokbarsode@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Cc: Alok Barsode <alok.barsode@azingo.com>
+Subject: [PATCH 1/1] Adding start_discovery functionality to hciops plugin.
+Date: Fri, 29 May 2009 18:14:40 +0530
+Message-Id: <1243601080-27314-1-git-send-email-alok.barsode@azingo.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Ok, thanks for helping.
+From: Alok Barsode <alok.barsode@azingo.com>
 
-Don't work, in step 3
-/system/gstreamer/0.10/default/musicaudiosink
-this path don't exist. Maybe there is a problem.
+---
+ plugins/hciops.c |   40 +++++++++++++++++++
+ src/adapter.c    |  115 ++++++------------------------------------------------
+ src/adapter.h    |    2 +
+ 3 files changed, 54 insertions(+), 103 deletions(-)
 
-And yes, i'm using ubuntu 9.04 with latest blueman and bluez.
-
-On Fri, May 29, 2009 at 12:46 AM, balaji palaniswami
-<balaji_palaniswami@yahoo.com> wrote:
->
->
->
->
->
-> ----- Original Message ----
-> From: Diego Garcia <diegogarciamendoza@gmail.com>
-> To: Rafael Seste <rseste@gmail.com>
-> Cc: linux-bluetooth@vger.kernel.org
-> Sent: Friday, 29 May, 2009 4:25:24 AM
-> Subject: Re: Can't play sound on bluetooth headset
->
-> Thanks for your response, i did it but it don't work. Actually i saw
-> that wiki and did the .asoundrc part but missed that part u mentioned.
->
-> Anyways it still don't work. And tried with headphones service and A2DP.
->
-> Maybe there is another workaround?
->
-> On Thu, May 28, 2009 at 12:12 PM, Rafael Seste <rseste@gmail.com> wrote:
->> Hi Diego,
->>
->> On Wed, May 27, 2009 at 11:09 PM, Diego Garcia
->> <diegogarciamendoza@gmail.com> wrote:
->>> Hi,
->>>
->>> I'm using ubuntu 9.04 and my headset is Motorola S9.
->>>
->>> I connected my BT antenna and it didn't recognized as headset so i
->>> installed blueman and upgraded bluez.
->>>
->>> Now it recognize it correctly, so i tried to configure the ALSA Driver
->>> on Audacious for selecting bluetooth but that option doesn't appear.
->>>
->>> Anyone can give any advice about this?
->>
->> this howto from bluez wiki should help you.
->>
->> "if you can't see the audio device form there, you can force the
->> bluetooth output by modifying your audacious property file"
->>
->> ~/.config/audacious/config. Modify the "pcm_device" value by
->> "pcm_device=bluetooth"
->>
->> http://wiki.bluez.org/wiki/HOWTO/AudioDevices
->>
->>>
->>> Regards,
->>> Diego García Mendoza
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>>
->>
->>
->> --
->> Rafael S. Seste
->>
->
->
->
-> --
-> Diego García Mendoza
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
-> Hello Diego ,
->
-> I dont know configurations related audacious but following steps would work in rhythm player
-> I have assumed that you are having Ubuntu 9.04 , latest blueman and bluez.
->
-> Please try out following steps to make a2dp work.
-> 1. pair headset and connect a2dp service.
-> 2. add .asoundrc in your HOME directory
->
-> pcm.bluetooth {
-> type bluetooth
-> device XX:XX:XX:XX:XX:XX
-> profile "auto"
-> }
-> pcm.bluetoothraw {
-> type bluetooth
-> }
-> pcm.bluetooth {
-> type plug
-> slave {
-> pcm bluetoothraw
-> }
-> }
->
-> replace XX by BT_ADDR of MOTO S9
->
-> 3. gconftool -t string -s /system/gstreamer/0.10/default/musicaudiosink "alsasink buffer-time=6000000 latency-time=1000000 device=bluetoothraw"
->
-> 4. restart bluetooth service  or do reboot (optional)
->
-> Please try it out and let me know any further issues.
->
-> Thanks,
-> Balaji
->
->
->
->      Cricket on your mind? Visit the ultimate cricket website. Enter http://beta.cricket.yahoo.com
->
->
-
-
-
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index 8f9ee06..898b77b 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -561,6 +561,45 @@ done:
+ 	return err;
+ }
+ 
++static int hciops_start_discovery(int index, gboolean periodic)
++{
++	inquiry_cp inq_cp;
++	periodic_inquiry_cp cp;
++	uint8_t lap[3] = { 0x33, 0x8b, 0x9e };
++	int dd, err = 0;
++
++	dd = hci_open_dev(index);
++	if (dd < 0)
++		return -EIO;
++
++	if (periodic) {
++		memset(&cp, 0, sizeof(cp));
++		memcpy(&cp.lap, lap, 3);
++		cp.max_period = htobs(24);
++		cp.min_period = htobs(16);
++		cp.length  = 0x08;
++		cp.num_rsp = 0x00;
++
++		err = hci_send_cmd(dd, OGF_LINK_CTL, OCF_PERIODIC_INQUIRY,
++					PERIODIC_INQUIRY_CP_SIZE, &cp);
++	} else {
++		memset(&inq_cp, 0, sizeof(inq_cp));
++		memcpy(&inq_cp.lap, lap, 3);
++		inq_cp.length = 0x08;
++		inq_cp.num_rsp = 0x00;
++
++		err = hci_send_cmd(dd, OGF_LINK_CTL, OCF_INQUIRY,
++					INQUIRY_CP_SIZE, &inq_cp);
++	}
++
++	if (err < 0)
++		err = -errno;
++
++	hci_close_dev(dd);
++
++	return err;
++}
++
+ static struct btd_adapter_ops hci_ops = {
+ 	.setup = hciops_setup,
+ 	.cleanup = hciops_cleanup,
+@@ -570,6 +609,7 @@ static struct btd_adapter_ops hci_ops = {
+ 	.set_connectable = hciops_connectable,
+ 	.set_discoverable = hciops_discoverable,
+ 	.set_limited_discoverable = hciops_set_limited_discoverable,
++	.start_discovery = hciops_start_discovery,
+ };
+ 
+ static int hciops_init(void)
+diff --git a/src/adapter.c b/src/adapter.c
+index 25ec33a..3db5ba6 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -945,106 +945,16 @@ struct btd_device *adapter_get_device(DBusConnection *conn,
+ 	return adapter_create_device(conn, adapter, address);
+ }
+ 
+-static int start_inquiry(struct btd_adapter *adapter)
++static int adapter_start_inquiry(struct btd_adapter *adapter)
+ {
+-	inquiry_cp cp;
+-	evt_cmd_status rp;
+-	struct hci_request rq;
+-	uint8_t lap[3] = { 0x33, 0x8b, 0x9e };
+-	int dd, err;
+-
+-	pending_remote_name_cancel(adapter);
+-
+-	dd = hci_open_dev(adapter->dev_id);
+-	if (dd < 0)
+-		return dd;
+-
+-	memset(&cp, 0, sizeof(cp));
+-	memcpy(&cp.lap, lap, 3);
+-	cp.length = 0x08;
+-	cp.num_rsp = 0x00;
+-
+-	memset(&rq, 0, sizeof(rq));
+-	rq.ogf = OGF_LINK_CTL;
+-	rq.ocf = OCF_INQUIRY;
+-	rq.cparam = &cp;
+-	rq.clen = INQUIRY_CP_SIZE;
+-	rq.rparam = &rp;
+-	rq.rlen = EVT_CMD_STATUS_SIZE;
+-	rq.event = EVT_CMD_STATUS;
+-
+-	if (hci_send_req(dd, &rq, HCI_REQ_TIMEOUT) < 0) {
+-		err = -errno;
+-		error("Unable to start inquiry: %s (%d)",
+-						strerror(errno), errno);
+-		hci_close_dev(dd);
+-		return err;
+-	}
+-
+-	if (rp.status) {
+-		error("HCI_Inquiry command failed with status 0x%02x",
+-			rp.status);
+-		hci_close_dev(dd);
+-		return -bt_error(rp.status);
+-	}
+-
+-	hci_close_dev(dd);
+-
+-	if (main_opts.name_resolv)
+-		adapter->state |= RESOLVE_NAME;
+-
+-	return 0;
+-}
+-
+-static int start_periodic_inquiry(struct btd_adapter *adapter)
+-{
+-	periodic_inquiry_cp cp;
+-	struct hci_request rq;
+-	uint8_t lap[3] = { 0x33, 0x8b, 0x9e };
+-	uint8_t status;
+-	int dd, err;
+-
+-	dd = hci_open_dev(adapter->dev_id);
+-	if (dd < 0)
+-		return dd;
+-
+-	memset(&cp, 0, sizeof(cp));
+-	memcpy(&cp.lap, lap, 3);
+-	cp.max_period = htobs(24);
+-	cp.min_period = htobs(16);
+-	cp.length  = 0x08;
+-	cp.num_rsp = 0x00;
+-
+-	memset(&rq, 0, sizeof(rq));
+-	rq.ogf    = OGF_LINK_CTL;
+-	rq.ocf    = OCF_PERIODIC_INQUIRY;
+-	rq.cparam = &cp;
+-	rq.clen   = PERIODIC_INQUIRY_CP_SIZE;
+-	rq.rparam = &status;
+-	rq.rlen   = sizeof(status);
+-	rq.event  = EVT_CMD_COMPLETE;
+-
+-	if (hci_send_req(dd, &rq, HCI_REQ_TIMEOUT) < 0) {
+-		err = -errno;
+-		error("Unable to start periodic inquiry: %s (%d)",
+-						strerror(errno), errno);
+-		hci_close_dev(dd);
+-		return err;
+-	}
+-
+-	if (status) {
+-		error("HCI_Periodic_Inquiry_Mode failed with status 0x%02x",
+-				status);
+-		hci_close_dev(dd);
+-		return -bt_error(status);
+-	}
++	gboolean periodic = TRUE;
+ 
+-	hci_close_dev(dd);
++	if (main_opts.discov_interval)
++		periodic = FALSE;
+ 
+-	if (main_opts.name_resolv)
+-		adapter->state |= RESOLVE_NAME;
++	pending_remote_name_cancel(adapter);
+ 
+-	return 0;
++	return adapter_ops->start_discovery(adapter->dev_id, periodic);
+ }
+ 
+ static DBusMessage *adapter_start_discovery(DBusConnection *conn,
+@@ -1067,12 +977,11 @@ static DBusMessage *adapter_start_discovery(DBusConnection *conn,
+ 	if (adapter->disc_sessions)
+ 		goto done;
+ 
+-	if (main_opts.discov_interval)
+-		err = start_inquiry(adapter);
+-	else
+-		err = start_periodic_inquiry(adapter);
++	if (main_opts.name_resolv)
++		adapter->state |= RESOLVE_NAME;
+ 
+-	if (err < 0)
++	err = adapter_start_inquiry(adapter);
++ 	if (err < 0)
+ 		return failed_strerror(msg, -err);
+ 
+ done:
+@@ -2441,8 +2350,8 @@ void adapter_set_state(struct btd_adapter *adapter, int state)
+ 	else if (adapter->disc_sessions && main_opts.discov_interval)
+ 		adapter->scheduler_id = g_timeout_add_seconds(
+ 						main_opts.discov_interval,
+-						(GSourceFunc) start_inquiry,
+-						adapter);
++						(GSourceFunc) adapter_start_inquiry,
++						(gpointer) adapter);
+ 
+ 	/* Send out of range */
+ 	if (!discov_active)
+diff --git a/src/adapter.h b/src/adapter.h
+index a94edc6..42ee0e1 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -157,6 +157,8 @@ struct btd_adapter_ops {
+ 	int (*set_discoverable) (int index);
+ 	int (*set_limited_discoverable) (int index, const uint8_t *cls,
+ 						gboolean limited);
++	int (*start_discovery) (int index, gboolean periodic);
++	int (*stop_discovery) (int index, gboolean periodic);
+ };
+ 
+ int btd_register_adapter_ops(struct btd_adapter_ops *btd_adapter_ops);
 -- 
-Diego García Mendoza
+1.5.6.3
+
