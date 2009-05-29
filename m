@@ -1,25 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 29 May 2009 14:04:50 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
+MIME-Version: 1.0
+Date: Fri, 29 May 2009 17:28:36 -0300
+Message-ID: <5d223510905291328o2dfea714hb39254f00dc3822d@mail.gmail.com>
+Subject: Howto enable dynamic debug
+From: Rafael Seste <rseste@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [Bugme-new] [Bug 13400] New: Incoming Bluetooth Audio - SCO
- packet - wrong format
-Message-Id: <20090529140450.90a39fb5.akpm@linux-foundation.org>
-In-Reply-To: <bug-13400-10286@http.bugzilla.kernel.org/>
-References: <bug-13400-10286@http.bugzilla.kernel.org/>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 28 May 2009 17:47:29 GMT
-bugzilla-daemon@bugzilla.kernel.org wrote:
+Hi all,
 
-> http://bugzilla.kernel.org/show_bug.cgi?id=13400
+I'm trying to enable the bluetooth dynamic debug.
+I compiled the kernel with the dynamic_debug enable. I mounted the debugfs:
 
-fyi, this is the twentieth open bug assigned to
-drivers_bluetooth@kernel-bugs.osdl.org.
+mount -t debugfs debugfs /sys/kernel/debug
 
-Here's a long URL ;)
+In the file /sys/kernel/debug/dynamic_debug/control there isn't any
+bluetooth module (sco, bluetooth, rfcomm....). I trying to debug sco
+module but nothing happens.
 
-http://bugzilla.kernel.org/buglist.cgi?query_format=advanced&short_desc_type=allwordssubstr&short_desc=&long_desc_type=substring&long_desc=&cf_kernel_version_type=allwordssubstr&cf_kernel_version=&bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&emailassigned_to1=1&emailtype1=substring&email1=drivers_bluetooth%40kernel-bugs.osdl.org&emailassigned_to2=1&emailreporter2=1&emailcc2=1&emailtype2=substring&email2=&bugidtype=include&bug_id=&chfieldfrom=&chfieldto=Now&chfieldvalue=&cmdtype=doit&order=Reuse+same+sort+as+last+time&field0-0-0=noop&type0-0-0=noop&value0-0-0=
+The command below only works if the module is in control file?
+echo -n 'module sco +p' > /sys/kernel/debug/dynamic_debug/control
+
+what am I doing wrong??
+kernel 2.6.30-rc6
+
+Where msg will be printed? syslog, message?
+
+
+-- 
+Rafael S. Seste
+Eng Computação - Unicamp
