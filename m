@@ -2,18 +2,15 @@ Return-Path: <cyrus@holtmann.org>
 From: Bing Zhao <bzhao@marvell.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bing Zhao <bzhao@marvell.com>
-Subject: [PATCH 3/4 v2] bluetooth: Add debugfs support to btmrvl driver
-Date: Fri, 29 May 2009 16:43:09 -0700
-Message-Id: <1243640590-31666-3-git-send-email-bzhao@marvell.com>
-In-Reply-To: <1243640590-31666-1-git-send-email-bzhao@marvell.com>
-References: <1243640590-31666-1-git-send-email-bzhao@marvell.com>
+Subject: [PATCH 1/4 v2] bluetooth: add btmrvl driver to support Marvell bluetooth devices
+Date: Fri, 29 May 2009 16:43:07 -0700
+Message-Id: <1243640590-31666-1-git-send-email-bzhao@marvell.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-/debug/btmrvl/config/
-/debug/btmrvl/status/
-
-See Documentation/btmrvl.txt for details.
+This driver provides basic definitions and library functions to
+support Marvell Bluetooth enabled devices, such as 88W8688 WLAN/BT
+combo chip.
 
 This patch incorporates a lot of comments given by
 Nicolas Pitre <nico@marvell.com>. Many thanks to Nicolas Pitre.
@@ -21,47 +18,202 @@ Nicolas Pitre <nico@marvell.com>. Many thanks to Nicolas Pitre.
 Signed-off-by: Rahul Tank <rahult@marvell.com>
 Signed-off-by: Bing Zhao <bzhao@marvell.com>
 ---
- drivers/bluetooth/Kconfig          |    1 +
- drivers/bluetooth/Makefile         |    2 +-
- drivers/bluetooth/btmrvl_debugfs.c |  445 ++++++++++++++++++++++++++++++++++++
- drivers/bluetooth/btmrvl_drv.h     |    8 +
- drivers/bluetooth/btmrvl_main.c    |    8 +
- 5 files changed, 463 insertions(+), 1 deletions(-)
- create mode 100644 drivers/bluetooth/btmrvl_debugfs.c
+ drivers/bluetooth/Kconfig       |   12 +
+ drivers/bluetooth/Makefile      |    3 +
+ drivers/bluetooth/btmrvl_drv.h  |  138 ++++++++
+ drivers/bluetooth/btmrvl_main.c |  711 +++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 864 insertions(+), 0 deletions(-)
+ create mode 100644 drivers/bluetooth/btmrvl_drv.h
+ create mode 100644 drivers/bluetooth/btmrvl_main.c
 
 diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index 8c89bd4..5f04014 100644
+index 1164837..b049a79 100644
 --- a/drivers/bluetooth/Kconfig
 +++ b/drivers/bluetooth/Kconfig
-@@ -173,6 +173,7 @@ config BT_HCIVHCI
- config BT_MRVL
- 	tristate "Marvell Bluetooth driver support"
- 	select FW_LOADER
-+	select DEBUG_FS
- 	help
- 	  The core driver to support Marvell Bluetooth devices.
+@@ -170,5 +170,17 @@ config BT_HCIVHCI
+ 	  Say Y here to compile support for virtual HCI devices into the
+ 	  kernel or say M to compile it as module (hci_vhci).
+ 
++config BT_MRVL
++	tristate "Marvell Bluetooth driver support"
++	select FW_LOADER
++	help
++	  The core driver to support Marvell Bluetooth devices.
++
++	  This driver is required if you want to support
++	  Marvell Bluetooth devices, such as 8688.
++
++	  Say Y here to compile Marvell Bluetooth driver
++	  into the kernel or say M to compile it as module.
++
+ endmenu
  
 diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
-index 2dc12e7..75f70e0 100644
+index 16930f9..3eff123 100644
 --- a/drivers/bluetooth/Makefile
 +++ b/drivers/bluetooth/Makefile
-@@ -15,7 +15,7 @@ obj-$(CONFIG_BT_HCIBTUART)	+= btuart_cs.o
+@@ -15,6 +15,9 @@ obj-$(CONFIG_BT_HCIBTUART)	+= btuart_cs.o
  obj-$(CONFIG_BT_HCIBTUSB)	+= btusb.o
  obj-$(CONFIG_BT_HCIBTSDIO)	+= btsdio.o
  
--btmrvl-objs			:= btmrvl_main.o
-+btmrvl-objs			:= btmrvl_main.o btmrvl_debugfs.o
- obj-$(CONFIG_BT_MRVL)		+= btmrvl.o
- obj-$(CONFIG_BT_MRVL_SDIO)	+= btmrvl_sdio.o
- 
-diff --git a/drivers/bluetooth/btmrvl_debugfs.c b/drivers/bluetooth/btmrvl_debugfs.c
++btmrvl-objs			:= btmrvl_main.o
++obj-$(CONFIG_BT_MRVL)		+= btmrvl.o
++
+ hci_uart-y				:= hci_ldisc.o
+ hci_uart-$(CONFIG_BT_HCIUART_H4)	+= hci_h4.o
+ hci_uart-$(CONFIG_BT_HCIUART_BCSP)	+= hci_bcsp.o
+diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
 new file mode 100644
-index 0000000..06b1238
+index 0000000..06ea9ed
 --- /dev/null
-+++ b/drivers/bluetooth/btmrvl_debugfs.c
-@@ -0,0 +1,445 @@
++++ b/drivers/bluetooth/btmrvl_drv.h
+@@ -0,0 +1,138 @@
++/*
++ * Marvell Bluetooth driver: global definitions & declarations
++ *
++ * Copyright (C) 2009, Marvell International Ltd.
++ *
++ * This software file (the "File") is distributed by Marvell International
++ * Ltd. under the terms of the GNU General Public License Version 2, June 1991
++ * (the "License").  You may use, redistribute and/or modify this File in
++ * accordance with the terms and conditions of the License, a copy of which
++ * is available by writing to the Free Software Foundation, Inc.,
++ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA or on the
++ * worldwide web at http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt.
++ *
++ *
++ * THE FILE IS DISTRIBUTED AS-IS, WITHOUT WARRANTY OF ANY KIND, AND THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE
++ * ARE EXPRESSLY DISCLAIMED.  The License provides additional details about
++ * this warranty disclaimer.
++ *
++ */
++
++#ifndef _BTMRVL_DRV_H_
++#define _BTMRVL_DRV_H_
++
++#include <linux/kthread.h>
++#include <linux/bitops.h>
++#include <net/bluetooth/bluetooth.h>
++
++#define BTM_HEADER_LEN			4
++#define BTM_DEV_NAME_LEN		32
++#define BTM_UPLD_SIZE			2312
++
++/* Time to wait until Host Sleep state change in millisecond */
++#define WAIT_UNTIL_HS_STATE_CHANGED	5000
++/* Time to wait for command response in millisecond */
++#define WAIT_UNTIL_CMD_RESP		5000
++
++struct btm_thread {
++	struct task_struct *task;
++	wait_queue_head_t wait_q;
++	void *priv;
++};
++
++struct btm_device {
++	char name[BTM_DEV_NAME_LEN];
++	void *card;
++	struct hci_dev *hcidev;
++
++	u8 tx_dnld_rdy;
++
++	u8 psmode;
++	u8 pscmd;
++	u8 hsmode;
++	u8 hscmd;
++
++	/* Low byte is gap, high byte is GPIO */
++	u16 gpio_gap;
++
++	u8 hscfgcmd;
++	u8 sendcmdflag;
++};
++
++struct btm_adapter {
++	u32 int_count;
++	struct sk_buff_head tx_queue;
++	u8 psmode;
++	u8 ps_state;
++	u8 hs_state;
++	u8 wakeup_tries;
++	wait_queue_head_t cmd_wait_q;
++	u8 cmd_complete;
++};
++
++struct btm_private {
++	struct btm_device btm_dev;
++	struct btm_adapter *adapter;
++	struct btm_thread main_thread;
++	int (*hw_host_to_card) (struct btm_private *priv,
++				u8 *payload, u16 nb);
++	int (*hw_wakeup_firmware) (struct btm_private *priv);
++	spinlock_t driver_lock;		/* spinlock used by driver */
++};
++
++#define MRVL_VENDOR_PKT			0xFE
++
++/* Bluetooth commands  */
++#define BT_CMD_AUTO_SLEEP_MODE		0x23
++#define BT_CMD_HOST_SLEEP_CONFIG	0x59
++#define BT_CMD_HOST_SLEEP_ENABLE	0x5A
++#define BT_CMD_MODULE_CFG_REQ		0x5B
++
++/* Sub-commands: Module Bringup/Shutdown Request */
++#define MODULE_BRINGUP_REQ		0xF1
++#define MODULE_SHUTDOWN_REQ		0xF2
++
++#define BT_EVENT_POWER_STATE		0x20
++
++/* Bluetooth Power States */
++#define BT_PS_ENABLE			0x02
++#define BT_PS_DISABLE			0x03
++#define BT_PS_SLEEP			0x01
++
++#define OGF				0x3F
++
++/* Host Sleep states */
++#define HS_ACTIVATED			0x01
++#define HS_DEACTIVATED			0x00
++
++/* Power Save modes */
++#define PS_SLEEP			0x01
++#define PS_AWAKE			0x00
++
++struct btm_cmd {
++	__le16 ocf_ogf;
++	u8 length;
++	u8 data[4];
++} __attribute__ ((packed));
++
++struct btm_event {
++	u8 ec;		/* event counter */
++	u8 length;
++	u8 data[4];
++} __attribute__ ((packed));
++
++/* Prototype of global function */
++
++struct btm_private *btm_add_card(void *card);
++int btm_remove_card(struct btm_private *priv);
++
++void btm_interrupt(struct btm_private *priv);
++
++void btm_check_evtpkt(struct btm_private *priv, struct sk_buff *skb);
++int btm_process_event(struct btm_private *priv, struct sk_buff *skb);
++
++int btm_send_module_cfg_cmd(struct btm_private *priv, int subcmd);
++int btm_prepare_command(struct btm_private *priv);
++
++#endif /* _BTMRVL_DRV_H_ */
+diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
+new file mode 100644
+index 0000000..da7c21d
+--- /dev/null
++++ b/drivers/bluetooth/btmrvl_main.c
+@@ -0,0 +1,711 @@
 +/**
-+ * Marvell Bluetooth driver: debugfs related functions
++ * Marvell Bluetooth driver
 + *
 + * Copyright (C) 2009, Marvell International Ltd.
 + *
@@ -80,481 +232,697 @@ index 0000000..06b1238
 + * this warranty disclaimer.
 + **/
 +
-+#include <linux/debugfs.h>
-+
 +#include <net/bluetooth/bluetooth.h>
 +#include <net/bluetooth/hci_core.h>
 +
 +#include "btmrvl_drv.h"
 +
-+struct btm_debugfs_data {
-+	struct dentry *root_dir, *config_dir, *status_dir;
++#define VERSION "1.0"
 +
-+	/* config */
-+	struct dentry *drvdbg;
-+	struct dentry *psmode;
-+	struct dentry *pscmd;
-+	struct dentry *hsmode;
-+	struct dentry *hscmd;
-+	struct dentry *gpiogap;
-+	struct dentry *hscfgcmd;
-+
-+	/* status */
-+	struct dentry *curpsmode;
-+	struct dentry *hsstate;
-+	struct dentry *psstate;
-+	struct dentry *txdnldready;
-+};
-+
-+static int btm_open_generic(struct inode *inode, struct file *file)
++/*
++ * This function is called by interface specific interrupt handler.
++ * It updates Power Save & Host Sleep states, and wakes up the main
++ * thread.
++ */
++void btm_interrupt(struct btm_private *priv)
 +{
-+	file->private_data = inode->i_private;
++	BT_DBG("Enter");
++
++	priv->adapter->ps_state = PS_AWAKE;
++
++	priv->adapter->wakeup_tries = 0;
++
++	priv->adapter->int_count++;
++
++	wake_up_interruptible(&priv->main_thread.wait_q);
++
++	BT_DBG("Leave");
++}
++EXPORT_SYMBOL_GPL(btm_interrupt);
++
++void btm_check_evtpkt(struct btm_private *priv, struct sk_buff *skb)
++{
++	struct hci_event_hdr *hdr = (struct hci_event_hdr *)skb->data;
++	struct hci_ev_cmd_complete *ec;
++	u16 opcode, ocf;
++
++	BT_DBG("Enter");
++
++	if (hdr->evt == HCI_EV_CMD_COMPLETE) {
++		ec = (struct hci_ev_cmd_complete *)(skb->data +
++						    HCI_EVENT_HDR_SIZE);
++		opcode = __le16_to_cpu(ec->opcode);
++		ocf = hci_opcode_ocf(opcode);
++		if ((ocf == BT_CMD_MODULE_CFG_REQ) &&
++		    (priv->btm_dev.sendcmdflag)) {
++			priv->btm_dev.sendcmdflag = false;
++			priv->adapter->cmd_complete = true;
++			wake_up_interruptible(&priv->adapter->cmd_wait_q);
++		}
++	}
++
++	BT_DBG("Leave");
++}
++EXPORT_SYMBOL_GPL(btm_check_evtpkt);
++
++int btm_process_event(struct btm_private *priv, struct sk_buff *skb)
++{
++	struct btm_adapter *adapter = priv->adapter;
++	u8 ret = 0;
++	struct btm_event *event;
++
++	BT_DBG("Enter");
++
++	event = (struct btm_event *) skb->data;
++	if (event->ec != 0xff) {
++		BT_DBG("Not Marvell Event=%x", event->ec);
++		ret = -EINVAL;
++		goto exit;
++	}
++
++	switch (event->data[0]) {
++	case BT_CMD_AUTO_SLEEP_MODE:
++		if (!event->data[2]) {
++			if (event->data[1] == BT_PS_ENABLE)
++				adapter->psmode = 1;
++			else
++				adapter->psmode = 0;
++			BT_DBG("PS Mode:%s",
++				(adapter->psmode) ? "Enable" : "Disable");
++		} else {
++			BT_DBG("PS Mode command failed");
++		}
++		break;
++
++	case BT_CMD_HOST_SLEEP_CONFIG:
++		if (!event->data[3])
++			BT_DBG("gpio=%x, gap=%x", event->data[1],
++				event->data[2]);
++		else
++			BT_DBG("HSCFG command failed");
++		break;
++
++	case BT_CMD_HOST_SLEEP_ENABLE:
++		if (!event->data[1]) {
++			adapter->hs_state = HS_ACTIVATED;
++			if (adapter->psmode)
++				adapter->ps_state = PS_SLEEP;
++			wake_up_interruptible(&adapter->cmd_wait_q);
++			BT_DBG("HS ACTIVATED!");
++		} else {
++			BT_DBG("HS Enable failed");
++		}
++		break;
++
++	case BT_CMD_MODULE_CFG_REQ:
++		if ((priv->btm_dev.sendcmdflag) &&
++			(event->data[1] == MODULE_BRINGUP_REQ)) {
++			BT_DBG("EVENT:%s", (event->data[2]) ?
++				"Bring-up failed" : "Bring-up succeed");
++		} else if ((priv->btm_dev.sendcmdflag) &&
++			(event->data[1] == MODULE_SHUTDOWN_REQ)) {
++			BT_DBG("EVENT:%s", (event->data[2]) ?
++				"Shutdown failed" : "Shutdown succeed");
++		} else {
++			BT_DBG("BT_CMD_MODULE_CFG_REQ resp for APP");
++			ret = -EINVAL;
++		}
++		break;
++
++	case BT_EVENT_POWER_STATE:
++		if (event->data[1] == BT_PS_SLEEP)
++			adapter->ps_state = PS_SLEEP;
++		BT_DBG("EVENT:%s",
++			(adapter->ps_state) ? "PS_SLEEP" : "PS_AWAKE");
++		break;
++
++	default:
++		BT_DBG("Unknown Event=%d", event->data[0]);
++		ret = -EINVAL;
++		break;
++	}
++
++exit:
++	if (!ret)
++		kfree_skb(skb);
++
++	BT_DBG("Leave");
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(btm_process_event);
++
++int btm_send_module_cfg_cmd(struct btm_private *priv, int subcmd)
++{
++	struct sk_buff *skb = NULL;
++	u8 ret = 0;
++	struct btm_cmd *cmd;
++
++	BT_DBG("Enter");
++
++	skb = bt_skb_alloc(sizeof(*cmd), GFP_ATOMIC);
++	if (skb == NULL) {
++		BT_ERR("No free skb");
++		ret = -ENOMEM;
++		goto exit;
++	}
++
++	cmd = (struct btm_cmd *) skb->tail;
++	cmd->ocf_ogf = cpu_to_le16((OGF << 10) | BT_CMD_MODULE_CFG_REQ);
++	cmd->length = 1;
++	cmd->data[0] = subcmd;
++
++	bt_cb(skb)->pkt_type = MRVL_VENDOR_PKT;
++
++	skb_put(skb, sizeof(*cmd));
++	skb->dev = (void *)priv->btm_dev.hcidev;
++	skb_queue_head(&priv->adapter->tx_queue, skb);
++
++	priv->btm_dev.sendcmdflag = true;
++
++	priv->adapter->cmd_complete = false;
++
++	BT_DBG("Queue module cfg Command");
++
++	wake_up_interruptible(&priv->main_thread.wait_q);
++
++	if (!wait_event_interruptible_timeout(
++			priv->adapter->cmd_wait_q,
++			priv->adapter->cmd_complete,
++			msecs_to_jiffies(WAIT_UNTIL_CMD_RESP))) {
++		ret = -ETIMEDOUT;
++		BT_ERR("module_cfg_cmd(%x): timeout: %d",
++			subcmd, priv->btm_dev.sendcmdflag);
++	}
++
++	BT_DBG("module cfg Command done");
++
++exit:
++	BT_DBG("Leave");
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(btm_send_module_cfg_cmd);
++
++static int btm_enable_hs(struct btm_private *priv)
++{
++	struct sk_buff *skb = NULL;
++	u8 ret = 0;
++	struct btm_cmd *cmd;
++
++	BT_DBG("Enter");
++
++	skb = bt_skb_alloc(sizeof(*cmd), GFP_ATOMIC);
++	if (skb == NULL) {
++		BT_ERR("No free skb");
++		ret = -ENOMEM;
++		goto exit;
++	}
++
++	cmd = (struct btm_cmd *) skb->tail;
++	cmd->ocf_ogf = cpu_to_le16((OGF << 10) | BT_CMD_HOST_SLEEP_ENABLE);
++	cmd->length = 0;
++
++	bt_cb(skb)->pkt_type = MRVL_VENDOR_PKT;
++
++	skb_put(skb, sizeof(*cmd));
++	skb->dev = (void *)priv->btm_dev.hcidev;
++	skb_queue_head(&priv->adapter->tx_queue, skb);
++
++	BT_DBG("Queue hs enable Command");
++
++	wake_up_interruptible(&priv->main_thread.wait_q);
++
++	if (!wait_event_interruptible_timeout(
++			priv->adapter->cmd_wait_q,
++			priv->adapter->hs_state,
++			msecs_to_jiffies(WAIT_UNTIL_HS_STATE_CHANGED))) {
++		ret = -ETIMEDOUT;
++		BT_ERR("btm_enable_hs: timeout: %d, %d,%d",
++			priv->adapter->hs_state,
++			priv->adapter->ps_state,
++			priv->adapter->wakeup_tries);
++	}
++
++exit:
++	BT_DBG("Leave");
++
++	return ret;
++}
++
++int btm_prepare_command(struct btm_private *priv)
++{
++	struct sk_buff *skb = NULL;
++	u8 ret = 0;
++	struct btm_cmd *cmd;
++
++	BT_DBG("Enter");
++
++	if (priv->btm_dev.hscfgcmd) {
++		priv->btm_dev.hscfgcmd = 0;
++
++		skb = bt_skb_alloc(sizeof(*cmd), GFP_ATOMIC);
++		if (skb == NULL) {
++			BT_ERR("No free skb");
++			ret = -ENOMEM;
++			goto exit;
++		}
++
++		cmd = (struct btm_cmd *) skb->tail;
++		cmd->ocf_ogf = cpu_to_le16((OGF << 10) |
++						BT_CMD_HOST_SLEEP_CONFIG);
++		cmd->length = 2;
++		cmd->data[0] = (priv->btm_dev.gpio_gap & 0xff00) >> 8;
++		cmd->data[1] = (u8) (priv->btm_dev.gpio_gap & 0x00ff);
++
++		bt_cb(skb)->pkt_type = MRVL_VENDOR_PKT;
++
++		skb_put(skb, sizeof(*cmd));
++		skb->dev = (void *)priv->btm_dev.hcidev;
++		skb_queue_head(&priv->adapter->tx_queue, skb);
++
++		BT_DBG("Queue HSCFG Command, gpio=0x%x, gap=0x%x",
++		       cmd->data[0], cmd->data[1]);
++	}
++
++	if (priv->btm_dev.pscmd) {
++		priv->btm_dev.pscmd = 0;
++
++		skb = bt_skb_alloc(sizeof(*cmd), GFP_ATOMIC);
++		if (skb == NULL) {
++			BT_ERR("No free skb");
++			ret = -ENOMEM;
++			goto exit;
++		}
++
++		cmd = (struct btm_cmd *) skb->tail;
++		cmd->ocf_ogf = cpu_to_le16((OGF << 10) |
++						BT_CMD_AUTO_SLEEP_MODE);
++		cmd->length = 1;
++
++		if (priv->btm_dev.psmode)
++			cmd->data[0] = BT_PS_ENABLE;
++		else
++			cmd->data[0] = BT_PS_DISABLE;
++
++		bt_cb(skb)->pkt_type = MRVL_VENDOR_PKT;
++
++		skb_put(skb, sizeof(*cmd));
++		skb->dev = (void *)priv->btm_dev.hcidev;
++		skb_queue_head(&priv->adapter->tx_queue, skb);
++
++		BT_DBG("Queue PSMODE Command:%d", cmd->data[0]);
++	}
++
++	if (priv->btm_dev.hscmd) {
++		priv->btm_dev.hscmd = 0;
++
++		if (priv->btm_dev.hsmode) {
++			ret = btm_enable_hs(priv);
++		} else {
++			ret = priv->hw_wakeup_firmware(priv);
++			priv->adapter->hs_state = HS_DEACTIVATED;
++		}
++	}
++
++exit:
++	BT_DBG("Leave");
++
++	return ret;
++}
++
++static int btm_tx_pkt(struct btm_private *priv, struct sk_buff *skb)
++{
++	u8 ret = 0;
++
++	BT_DBG("Enter");
++
++	if (!skb || !skb->data) {
++		BT_DBG("Leave");
++		return -EINVAL;
++	}
++
++	if (!skb->len || ((skb->len + BTM_HEADER_LEN) > BTM_UPLD_SIZE)) {
++		BT_ERR("Tx Error: Bad skb length %d : %d",
++			skb->len, BTM_UPLD_SIZE);
++		BT_DBG("Leave");
++		return -EINVAL;
++	}
++
++	if (skb_headroom(skb) < BTM_HEADER_LEN) {
++		struct sk_buff *tmp = skb;
++
++		skb = skb_realloc_headroom(skb, BTM_HEADER_LEN);
++		if (!skb) {
++			BT_ERR("Tx Error: realloc_headroom failed %d",
++				BTM_HEADER_LEN);
++			skb = tmp;
++			BT_DBG("Leave");
++			return -EINVAL;
++		}
++
++		kfree_skb(tmp);
++	}
++
++	skb_push(skb, BTM_HEADER_LEN);
++
++	/* header type: byte[3]
++	 * HCI_COMMAND = 1, ACL_DATA = 2, SCO_DATA = 3, 0xFE = Vendor
++	 * header length: byte[2][1][0]
++	 */
++
++	skb->data[0] = (skb->len & 0x0000ff);
++	skb->data[1] = (skb->len & 0x00ff00) >> 8;
++	skb->data[2] = (skb->len & 0xff0000) >> 16;
++	skb->data[3] = bt_cb(skb)->pkt_type;
++
++	if (priv->hw_host_to_card)
++		ret = priv->hw_host_to_card(priv, skb->data, skb->len);
++
++	BT_DBG("Leave");
++
++	return ret;
++}
++
++static void btm_init_adapter(struct btm_private *priv)
++{
++	BT_DBG("Enter");
++
++	skb_queue_head_init(&priv->adapter->tx_queue);
++
++	priv->adapter->ps_state = PS_AWAKE;
++
++	init_waitqueue_head(&priv->adapter->cmd_wait_q);
++
++	BT_DBG("Leave");
++}
++
++static void btm_free_adapter(struct btm_private *priv)
++{
++	BT_DBG("Enter");
++
++	skb_queue_purge(&priv->adapter->tx_queue);
++
++	kfree(priv->adapter);
++
++	priv->adapter = NULL;
++
++	BT_DBG("Leave");
++}
++
++static int
++btm_ioctl(struct hci_dev *hdev, unsigned int cmd, unsigned long arg)
++{
++	BT_DBG("Enter");
++
++	BT_DBG("Leave");
++
++	return -ENOIOCTLCMD;
++}
++
++static void btm_destruct(struct hci_dev *hdev)
++{
++	BT_DBG("Enter");
++
++	BT_DBG("Leave");
++}
++
++static int btm_send_frame(struct sk_buff *skb)
++{
++	struct hci_dev *hdev = (struct hci_dev *)skb->dev;
++	struct btm_private *priv = NULL;
++
++	BT_DBG("Enter: type=%d, len=%d", skb->pkt_type, skb->len);
++
++	if (!hdev || !hdev->driver_data) {
++		BT_ERR("Frame for unknown HCI device");
++		BT_DBG("Leave");
++		return -ENODEV;
++	}
++
++	priv = (struct btm_private *)hdev->driver_data;
++	if (!test_bit(HCI_RUNNING, &hdev->flags)) {
++		BT_ERR("Failed testing HCI_RUNING, flags=%lx", hdev->flags);
++		print_hex_dump_bytes("data: ", DUMP_PREFIX_OFFSET,
++					skb->data, skb->len);
++		BT_DBG("Leave");
++		return -EBUSY;
++	}
++
++	switch (bt_cb(skb)->pkt_type) {
++	case HCI_COMMAND_PKT:
++		hdev->stat.cmd_tx++;
++		break;
++
++	case HCI_ACLDATA_PKT:
++		hdev->stat.acl_tx++;
++		break;
++
++	case HCI_SCODATA_PKT:
++		hdev->stat.sco_tx++;
++		break;
++	}
++
++	skb_queue_tail(&priv->adapter->tx_queue, skb);
++
++	wake_up_interruptible(&priv->main_thread.wait_q);
++
++	BT_DBG("Leave");
++
 +	return 0;
 +}
 +
-+static ssize_t btm_hscfgcmd_write(struct file *file,
-+					const char __user *ubuf,
-+					size_t count,
-+					loff_t *ppos)
++static int btm_flush(struct hci_dev *hdev)
 +{
-+	struct btm_private *priv = (struct btm_private *) file->private_data;
++	struct btm_private *priv = (struct btm_private *)hdev->driver_data;
 +
-+	long result, ret;
-+	char buf[16];
++	BT_DBG("Enter");
 +
-+	memset(buf, 0, sizeof(buf));
++	skb_queue_purge(&priv->adapter->tx_queue);
 +
-+	if (copy_from_user(&buf, ubuf,
-+				min_t(size_t, sizeof(buf) - 1, count)))
-+		return -EFAULT;
++	BT_DBG("Leave");
 +
-+	ret = strict_strtol(buf, 10, &result);
++	return 0;
++}
 +
-+	priv->btm_dev.hscfgcmd = result;
++static int btm_close(struct hci_dev *hdev)
++{
++	struct btm_private *priv = (struct btm_private *)hdev->driver_data;
 +
-+	if (priv->btm_dev.hscfgcmd) {
-+		btm_prepare_command(priv);
-+		wake_up_interruptible(&priv->main_thread.wait_q);
++	BT_DBG("Enter");
++
++	if (!test_and_clear_bit(HCI_RUNNING, &hdev->flags)) {
++		BT_DBG("Leave");
++		return 0;
 +	}
 +
-+	return count;
++	skb_queue_purge(&priv->adapter->tx_queue);
++
++	BT_DBG("Leave");
++
++	return 0;
 +}
 +
-+static ssize_t btm_hscfgcmd_read(struct file *file, char __user * userbuf,
-+				    size_t count, loff_t *ppos)
++static int btm_open(struct hci_dev *hdev)
 +{
-+	struct btm_private *priv = (struct btm_private *) file->private_data;
-+	int ret;
-+	char buf[16];
++	BT_DBG("Enter");
 +
-+	ret = snprintf(buf, sizeof(buf) - 1, "%d\n", priv->btm_dev.hscfgcmd);
++	set_bit(HCI_RUNNING, &hdev->flags);
 +
-+	return simple_read_from_buffer(userbuf, count, ppos, buf, ret);
++	BT_DBG("Leave");
++
++	return 0;
 +}
 +
-+static const struct file_operations btm_hscfgcmd_fops = {
-+	.read = btm_hscfgcmd_read,
-+	.write = btm_hscfgcmd_write,
-+	.open = btm_open_generic,
-+};
-+
-+static ssize_t btm_psmode_write(struct file *file, const char __user *ubuf,
-+				   size_t count, loff_t *ppos)
++/*
++ * This function handles the event generated by firmware, rx data
++ * received from firmware, and tx data sent from kernel.
++ */
++static int btm_service_main_thread(void *data)
 +{
-+	struct btm_private *priv = (struct btm_private *) file->private_data;
-+	long result, ret;
-+	char buf[16];
++	struct btm_thread *thread = data;
++	struct btm_private *priv = thread->priv;
++	struct btm_adapter *adapter = priv->adapter;
++	wait_queue_t wait;
++	struct sk_buff *skb;
++	ulong flags;
 +
-+	memset(buf, 0, sizeof(buf));
++	BT_DBG("Enter");
 +
-+	if (copy_from_user(&buf, ubuf,
-+				min_t(size_t, sizeof(buf) - 1, count)))
-+		return -EFAULT;
++	init_waitqueue_entry(&wait, current);
 +
-+	ret = strict_strtol(buf, 10, &result);
++	current->flags |= PF_NOFREEZE;
 +
-+	priv->btm_dev.psmode = result;
++	for (;;) {
++		add_wait_queue(&thread->wait_q, &wait);
 +
-+	return count;
-+}
++		set_current_state(TASK_INTERRUPTIBLE);
 +
-+static ssize_t btm_psmode_read(struct file *file, char __user * userbuf,
-+				  size_t count, loff_t *ppos)
-+{
-+	struct btm_private *priv = (struct btm_private *) file->private_data;
-+	int ret;
-+	char buf[16];
++		if (adapter->wakeup_tries ||
++		    ((!adapter->int_count) &&
++		     (!priv->btm_dev.tx_dnld_rdy ||
++		      skb_queue_empty(&adapter->tx_queue)))) {
++			BT_DBG("main_thread is sleeping...");
++			schedule();
++		}
 +
-+	ret = snprintf(buf, sizeof(buf) - 1, "%d\n", priv->btm_dev.psmode);
++		set_current_state(TASK_RUNNING);
 +
-+	return simple_read_from_buffer(userbuf, count, ppos, buf, ret);
-+}
++		remove_wait_queue(&thread->wait_q, &wait);
 +
-+static const struct file_operations btm_psmode_fops = {
-+	.read = btm_psmode_read,
-+	.write = btm_psmode_write,
-+	.open = btm_open_generic,
-+};
++		BT_DBG("main_thread woke up");
 +
-+static ssize_t btm_pscmd_write(struct file *file, const char __user *ubuf,
-+				  size_t count, loff_t *ppos)
-+{
-+	struct btm_private *priv = (struct btm_private *) file->private_data;
-+	long result, ret;
-+	char buf[16];
++		if (kthread_should_stop()) {
++			BT_DBG("main_thread: break from main thread");
++			break;
++		}
 +
-+	memset(buf, 0, sizeof(buf));
++		spin_lock_irqsave(&priv->driver_lock, flags);
++		if (adapter->int_count) {
++			adapter->int_count = 0;
++		} else if ((adapter->ps_state == PS_SLEEP) &&
++			   !skb_queue_empty(&adapter->tx_queue)) {
++			spin_unlock_irqrestore(&priv->driver_lock, flags);
++			adapter->wakeup_tries++;
++			priv->hw_wakeup_firmware(priv);
++			continue;
++		}
++		spin_unlock_irqrestore(&priv->driver_lock, flags);
 +
-+	if (copy_from_user(&buf, ubuf,
-+				min_t(size_t, sizeof(buf) - 1, count)))
-+		return -EFAULT;
++		if (adapter->ps_state == PS_SLEEP)
++			continue;
 +
-+	ret = strict_strtol(buf, 10, &result);
++		if (!priv->btm_dev.tx_dnld_rdy)
++			continue;
 +
-+	priv->btm_dev.pscmd = result;
++		skb = skb_dequeue(&adapter->tx_queue);
++		if (skb) {
++			if (btm_tx_pkt(priv, skb))
++				priv->btm_dev.hcidev->stat.err_tx++;
++			else
++				priv->btm_dev.hcidev->stat.byte_tx += skb->len;
 +
-+	if (priv->btm_dev.pscmd) {
-+		btm_prepare_command(priv);
-+		wake_up_interruptible(&priv->main_thread.wait_q);
++			kfree_skb(skb);
++		}
 +	}
 +
-+	return count;
++	BT_DBG("Leave");
 +
++	return 0;
 +}
 +
-+static ssize_t btm_pscmd_read(struct file *file, char __user * userbuf,
-+				 size_t count, loff_t *ppos)
++struct btm_private *btm_add_card(void *card)
 +{
-+	struct btm_private *priv = (struct btm_private *) file->private_data;
++	struct hci_dev *hdev = NULL;
++	struct btm_private *priv = NULL;
 +	int ret;
-+	char buf[16];
 +
-+	ret = snprintf(buf, sizeof(buf) - 1, "%d\n", priv->btm_dev.pscmd);
++	BT_DBG("Enter");
 +
-+	return simple_read_from_buffer(userbuf, count, ppos, buf, ret);
-+}
-+
-+static const struct file_operations btm_pscmd_fops = {
-+	.read = btm_pscmd_read,
-+	.write = btm_pscmd_write,
-+	.open = btm_open_generic,
-+};
-+
-+static ssize_t btm_gpiogap_write(struct file *file, const char __user *ubuf,
-+				    size_t count, loff_t *ppos)
-+{
-+	struct btm_private *priv = (struct btm_private *) file->private_data;
-+	long result, ret;
-+	char buf[16];
-+
-+	memset(buf, 0, sizeof(buf));
-+
-+	if (copy_from_user(&buf, ubuf,
-+				min_t(size_t, sizeof(buf) - 1, count)))
-+		return -EFAULT;
-+
-+	ret = strict_strtol(buf, 16, &result);
-+
-+	priv->btm_dev.gpio_gap = result;
-+
-+	return count;
-+}
-+
-+static ssize_t btm_gpiogap_read(struct file *file, char __user * userbuf,
-+				   size_t count, loff_t *ppos)
-+{
-+	struct btm_private *priv = (struct btm_private *) file->private_data;
-+	int ret;
-+	char buf[16];
-+
-+	ret = snprintf(buf, sizeof(buf) - 1, "0x%x\n", priv->btm_dev.gpio_gap);
-+
-+	return simple_read_from_buffer(userbuf, count, ppos, buf, ret);
-+}
-+
-+static const struct file_operations btm_gpiogap_fops = {
-+	.read = btm_gpiogap_read,
-+	.write = btm_gpiogap_write,
-+	.open = btm_open_generic,
-+};
-+
-+static ssize_t btm_hscmd_write(struct file *file, const char __user *ubuf,
-+				  size_t count, loff_t *ppos)
-+{
-+	struct btm_private *priv = (struct btm_private *) file->private_data;
-+	long result, ret;
-+	char buf[16];
-+
-+	memset(buf, 0, sizeof(buf));
-+
-+	if (copy_from_user(&buf, ubuf,
-+				min_t(size_t, sizeof(buf) - 1, count)))
-+		return -EFAULT;
-+
-+	ret = strict_strtol(buf, 10, &result);
-+
-+	priv->btm_dev.hscmd = result;
-+	if (priv->btm_dev.hscmd) {
-+		btm_prepare_command(priv);
-+		wake_up_interruptible(&priv->main_thread.wait_q);
++	priv = kzalloc(sizeof(*priv), GFP_KERNEL);
++	if (!priv) {
++		BT_ERR("Can not allocate priv");
++		goto err_priv;
 +	}
 +
-+	return count;
-+}
-+
-+static ssize_t btm_hscmd_read(struct file *file, char __user * userbuf,
-+				 size_t count, loff_t *ppos)
-+{
-+	struct btm_private *priv = (struct btm_private *) file->private_data;
-+	int ret;
-+	char buf[16];
-+
-+	ret = snprintf(buf, sizeof(buf) - 1, "%d\n", priv->btm_dev.hscmd);
-+
-+	return simple_read_from_buffer(userbuf, count, ppos, buf, ret);
-+}
-+
-+static const struct file_operations btm_hscmd_fops = {
-+	.read = btm_hscmd_read,
-+	.write = btm_hscmd_write,
-+	.open = btm_open_generic,
-+};
-+
-+static ssize_t btm_hsmode_write(struct file *file, const char __user *ubuf,
-+				   size_t count, loff_t *ppos)
-+{
-+	struct btm_private *priv = (struct btm_private *) file->private_data;
-+	long result, ret;
-+	char buf[16];
-+
-+	memset(buf, 0, sizeof(buf));
-+
-+	if (copy_from_user(&buf, ubuf,
-+				min_t(size_t, sizeof(buf) - 1, count)))
-+		return -EFAULT;
-+
-+	ret = strict_strtol(buf, 10, &result);
-+
-+	priv->btm_dev.hsmode = result;
-+
-+	return count;
-+}
-+
-+static ssize_t btm_hsmode_read(struct file *file, char __user * userbuf,
-+				  size_t count, loff_t *ppos)
-+{
-+	struct btm_private *priv = (struct btm_private *) file->private_data;
-+	int ret;
-+	char buf[16];
-+
-+	ret = snprintf(buf, sizeof(buf) - 1, "%d\n", priv->btm_dev.hsmode);
-+
-+	return simple_read_from_buffer(userbuf, count, ppos, buf, ret);
-+}
-+
-+static const struct file_operations btm_hsmode_fops = {
-+	.read = btm_hsmode_read,
-+	.write = btm_hsmode_write,
-+	.open = btm_open_generic,
-+};
-+
-+static ssize_t btm_curpsmode_read(struct file *file, char __user * userbuf,
-+				     size_t count, loff_t *ppos)
-+{
-+	struct btm_private *priv = (struct btm_private *) file->private_data;
-+	int ret;
-+	char buf[16];
-+
-+	ret = snprintf(buf, sizeof(buf) - 1, "%d\n", priv->adapter->psmode);
-+
-+	return simple_read_from_buffer(userbuf, count, ppos, buf, ret);
-+}
-+
-+static const struct file_operations btm_curpsmode_fops = {
-+	.read = btm_curpsmode_read,
-+	.open = btm_open_generic,
-+};
-+
-+static ssize_t btm_psstate_read(struct file *file, char __user * userbuf,
-+				   size_t count, loff_t *ppos)
-+{
-+	struct btm_private *priv = (struct btm_private *) file->private_data;
-+	int ret;
-+	char buf[16];
-+
-+	ret = snprintf(buf, sizeof(buf) - 1, "%d\n", priv->adapter->ps_state);
-+
-+	return simple_read_from_buffer(userbuf, count, ppos, buf, ret);
-+}
-+
-+static const struct file_operations btm_psstate_fops = {
-+	.read = btm_psstate_read,
-+	.open = btm_open_generic,
-+};
-+
-+static ssize_t btm_hsstate_read(struct file *file, char __user * userbuf,
-+				   size_t count, loff_t *ppos)
-+{
-+	struct btm_private *priv = (struct btm_private *) file->private_data;
-+	int ret;
-+	char buf[16];
-+
-+	ret = snprintf(buf, sizeof(buf) - 1, "%d\n", priv->adapter->hs_state);
-+
-+	return simple_read_from_buffer(userbuf, count, ppos, buf, ret);
-+}
-+
-+static const struct file_operations btm_hsstate_fops = {
-+	.read = btm_hsstate_read,
-+	.open = btm_open_generic,
-+};
-+
-+static ssize_t btm_txdnldready_read(struct file *file, char __user * userbuf,
-+				       size_t count, loff_t *ppos)
-+{
-+	struct btm_private *priv = (struct btm_private *) file->private_data;
-+	int ret;
-+	char buf[16];
-+
-+	ret = snprintf(buf, sizeof(buf) - 1, "%d\n",
-+			priv->btm_dev.tx_dnld_rdy);
-+
-+	return simple_read_from_buffer(userbuf, count, ppos, buf, ret);
-+}
-+
-+static const struct file_operations btm_txdnldready_fops = {
-+	.read = btm_txdnldready_read,
-+	.open = btm_open_generic,
-+};
-+
-+void btm_debugfs_init(struct hci_dev *hdev)
-+{
-+	struct btm_private *priv = (struct btm_private *) hdev->driver_data;
-+	struct btm_debugfs_data *dbg;
-+
-+	dbg = kzalloc(sizeof(*dbg), GFP_KERNEL);
-+	priv->debugfs_data = dbg;
-+
-+	if (!dbg) {
-+		BT_ERR("Can not allocate memory for btm_debugfs_data.");
-+		return;
++	priv->adapter = kzalloc(sizeof(*priv->adapter), GFP_KERNEL);
++	if (!priv->adapter) {
++		BT_ERR("Allocate buffer for btm_adapter failed!");
++		goto err_adapter;
 +	}
 +
-+	dbg->root_dir = debugfs_create_dir("btmrvl", NULL);
++	btm_init_adapter(priv);
 +
-+	dbg->config_dir = debugfs_create_dir("config", dbg->root_dir);
++	hdev = hci_alloc_dev();
++	if (!hdev) {
++		BT_ERR("Can not allocate HCI device");
++		goto err_hdev;
++	}
 +
-+	dbg->psmode = debugfs_create_file("psmode", 0644, dbg->config_dir,
-+					  hdev->driver_data,
-+					  &btm_psmode_fops);
-+	dbg->pscmd =
-+	    debugfs_create_file("pscmd", 0644, dbg->config_dir,
-+				hdev->driver_data, &btm_pscmd_fops);
-+	dbg->gpiogap =
-+	    debugfs_create_file("gpiogap", 0644, dbg->config_dir,
-+				hdev->driver_data, &btm_gpiogap_fops);
-+	dbg->hsmode =
-+	    debugfs_create_file("hsmode", 0644, dbg->config_dir,
-+				hdev->driver_data, &btm_hsmode_fops);
-+	dbg->hscmd =
-+	    debugfs_create_file("hscmd", 0644, dbg->config_dir,
-+				hdev->driver_data, &btm_hscmd_fops);
-+	dbg->hscfgcmd =
-+	    debugfs_create_file("hscfgcmd", 0644, dbg->config_dir,
-+				hdev->driver_data, &btm_hscfgcmd_fops);
++	BT_DBG("Starting kthread...");
++	priv->main_thread.priv = priv;
++	spin_lock_init(&priv->driver_lock);
 +
-+	dbg->status_dir = debugfs_create_dir("status", dbg->root_dir);
-+	dbg->curpsmode = debugfs_create_file("curpsmode", 0444,
-+						dbg->status_dir,
-+						hdev->driver_data,
-+						&btm_curpsmode_fops);
-+	dbg->psstate =
-+	    debugfs_create_file("psstate", 0444, dbg->status_dir,
-+				hdev->driver_data, &btm_psstate_fops);
-+	dbg->hsstate =
-+	    debugfs_create_file("hsstate", 0444, dbg->status_dir,
-+				hdev->driver_data, &btm_hsstate_fops);
-+	dbg->txdnldready =
-+	    debugfs_create_file("txdnldready", 0444, dbg->status_dir,
-+				hdev->driver_data, &btm_txdnldready_fops);
++	init_waitqueue_head(&priv->main_thread.wait_q);
++	priv->main_thread.task = kthread_run(btm_service_main_thread,
++		&priv->main_thread, "btm_main_service");
++
++	priv->btm_dev.hcidev = hdev;
++	priv->btm_dev.card = card;
++
++	hdev->driver_data = priv;
++
++	priv->btm_dev.tx_dnld_rdy = true;
++
++	hdev->type = HCI_SDIO;
++	hdev->open = btm_open;
++	hdev->close = btm_close;
++	hdev->flush = btm_flush;
++	hdev->send = btm_send_frame;
++	hdev->destruct = btm_destruct;
++	hdev->ioctl = btm_ioctl;
++	hdev->owner = THIS_MODULE;
++
++	ret = hci_register_dev(hdev);
++	if (ret < 0) {
++		BT_ERR("Can not register HCI device");
++		goto err_hci_register_dev;
++	}
++
++	BT_DBG("Leave");
++	return priv;
++
++err_hci_register_dev:
++	/* Stop the thread servicing the interrupts */
++	kthread_stop(priv->main_thread.task);
++
++	hci_free_dev(hdev);
++
++err_hdev:
++	btm_free_adapter(priv);
++
++err_adapter:
++	kfree(priv);
++
++err_priv:
++	BT_DBG("Leave");
++
++	return NULL;
 +}
++EXPORT_SYMBOL_GPL(btm_add_card);
 +
-+void btm_debugfs_remove(struct hci_dev *hdev)
++int btm_remove_card(struct btm_private *priv)
 +{
-+	struct btm_private *priv = (struct btm_private *) hdev->driver_data;
-+	struct btm_debugfs_data *dbg = priv->debugfs_data;
++	struct hci_dev *hdev;
 +
-+	if (!dbg)
-+		return;
++	BT_DBG("Enter");
 +
-+	debugfs_remove(dbg->psmode);
-+	debugfs_remove(dbg->pscmd);
-+	debugfs_remove(dbg->gpiogap);
-+	debugfs_remove(dbg->hsmode);
-+	debugfs_remove(dbg->hscmd);
-+	debugfs_remove(dbg->hscfgcmd);
-+	debugfs_remove(dbg->config_dir);
++	hdev = priv->btm_dev.hcidev;
 +
-+	debugfs_remove(dbg->curpsmode);
-+	debugfs_remove(dbg->psstate);
-+	debugfs_remove(dbg->hsstate);
-+	debugfs_remove(dbg->txdnldready);
-+	debugfs_remove(dbg->status_dir);
++	wake_up_interruptible(&priv->adapter->cmd_wait_q);
 +
-+	debugfs_remove(dbg->root_dir);
++	kthread_stop(priv->main_thread.task);
 +
-+	kfree(dbg);
++	hci_unregister_dev(hdev);
++
++	hci_free_dev(hdev);
++
++	priv->btm_dev.hcidev = NULL;
++
++	btm_free_adapter(priv);
++
++	kfree(priv);
++
++	BT_DBG("Leave");
++
++	return 0;
 +}
-diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
-index 06ea9ed..f5d1175 100644
---- a/drivers/bluetooth/btmrvl_drv.h
-+++ b/drivers/bluetooth/btmrvl_drv.h
-@@ -79,6 +79,9 @@ struct btm_private {
- 				u8 *payload, u16 nb);
- 	int (*hw_wakeup_firmware) (struct btm_private *priv);
- 	spinlock_t driver_lock;		/* spinlock used by driver */
-+#ifdef CONFIG_DEBUG_FS
-+	void *debugfs_data;
-+#endif
- };
- 
- #define MRVL_VENDOR_PKT			0xFE
-@@ -135,4 +138,9 @@ int btm_process_event(struct btm_private *priv, struct sk_buff *skb);
- int btm_send_module_cfg_cmd(struct btm_private *priv, int subcmd);
- int btm_prepare_command(struct btm_private *priv);
- 
-+#ifdef CONFIG_DEBUG_FS
-+void btm_debugfs_init(struct hci_dev *hdev);
-+void btm_debugfs_remove(struct hci_dev *hdev);
-+#endif
++EXPORT_SYMBOL_GPL(btm_remove_card);
 +
- #endif /* _BTMRVL_DRV_H_ */
-diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
-index da7c21d..d6cf9f1 100644
---- a/drivers/bluetooth/btmrvl_main.c
-+++ b/drivers/bluetooth/btmrvl_main.c
-@@ -655,6 +655,10 @@ struct btm_private *btm_add_card(void *card)
- 		goto err_hci_register_dev;
- 	}
- 
-+#ifdef CONFIG_DEBUG_FS
-+	btm_debugfs_init(hdev);
-+#endif
-+
- 	BT_DBG("Leave");
- 	return priv;
- 
-@@ -689,6 +693,10 @@ int btm_remove_card(struct btm_private *priv)
- 
- 	kthread_stop(priv->main_thread.task);
- 
-+#ifdef CONFIG_DEBUG_FS
-+	btm_debugfs_remove(hdev);
-+#endif
-+
- 	hci_unregister_dev(hdev);
- 
- 	hci_free_dev(hdev);
++MODULE_AUTHOR("Marvell International Ltd.");
++MODULE_DESCRIPTION("Marvell Bluetooth Driver v" VERSION);
++MODULE_VERSION(VERSION);
++MODULE_LICENSE("GPL v2");
 -- 
 1.5.3.6
 
