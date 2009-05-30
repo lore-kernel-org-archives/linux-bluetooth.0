@@ -1,40 +1,169 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 1/4 v2] bluetooth: add btmrvl driver to support Marvell
- bluetooth devices
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Bing Zhao <bzhao@marvell.com>
+Message-ID: <339718.27731.qm@web95411.mail.in2.yahoo.com>
+References: <25e5cce0905271909q747731acj4be42694772e67f8@mail.gmail.com>  <5d223510905281012j75808257t60d9fc095575016@mail.gmail.com>  <25e5cce0905281555q6e2b85a3hf901aae4bd14bda1@mail.gmail.com>  <535619.95725.qm@web95401.mail.in2.yahoo.com> <25e5cce0905290550mcb34cb3x9acd66e584314043@mail.gmail.com>
+Date: Sat, 30 May 2009 09:28:27 +0530 (IST)
+From: balaji palaniswami <balaji_palaniswami@yahoo.com>
+Subject: Re: Can't play sound on bluetooth headset
+To: Diego Garcia <diegogarciamendoza@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1243640590-31666-1-git-send-email-bzhao@marvell.com>
-References: <1243640590-31666-1-git-send-email-bzhao@marvell.com>
-Content-Type: text/plain
-Date: Sat, 30 May 2009 09:09:20 +0200
-Message-Id: <1243667360.3523.28.camel@localhost.localdomain>
-Mime-Version: 1.0
+In-Reply-To: <25e5cce0905290550mcb34cb3x9acd66e584314043@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bing,
 
-> This driver provides basic definitions and library functions to
-> support Marvell Bluetooth enabled devices, such as 88W8688 WLAN/BT
-> combo chip.
 
-we still have to talk about the handling of vendor commands. Handling
-these inside the driver is a bad idea. We can just let the core forward
-them to you if you are interested. I have to think about it a little
-bit.
 
-> +struct btm_thread {
-> +	struct task_struct *task;
-> +	wait_queue_head_t wait_q;
-> +	void *priv;
-> +};
 
-Please prefix everything with btmrvl_* for cleaner namespace. Especially
-for the exported symbol it is important that you have a clean namespace.
 
-Regards
+----- Original Message ----
+From: Diego Garcia <diegogarciamendoza@gmail.com>
+To: balaji palaniswami <balaji_palaniswami@yahoo.com>
+Cc: linux-bluetooth@vger.kernel.org
+Sent: Friday, 29 May, 2009 6:20:57 PM
+Subject: Re: Can't play sound on bluetooth headset
 
-Marcel
+Ok, thanks for helping.
 
+Don't work, in step 3
+/system/gstreamer/0.10/default/musicaudiosink
+this path don't exist. Maybe there is a problem.
+
+And yes, i'm using ubuntu 9.04 with latest blueman and bluez.
+
+On Fri, May 29, 2009 at 12:46 AM, balaji palaniswami
+<balaji_palaniswami@yahoo.com> wrote:
+>
+>
+>
+>
+>
+> ----- Original Message ----
+> From: Diego Garcia <diegogarciamendoza@gmail.com>
+> To: Rafael Seste <rseste@gmail.com>
+> Cc: linux-bluetooth@vger.kernel.org
+> Sent: Friday, 29 May, 2009 4:25:24 AM
+> Subject: Re: Can't play sound on bluetooth headset
+>
+> Thanks for your response, i did it but it don't work. Actually i saw
+> that wiki and did the .asoundrc part but missed that part u mentioned.
+>
+> Anyways it still don't work. And tried with headphones service and A2DP.
+>
+> Maybe there is another workaround?
+>
+> On Thu, May 28, 2009 at 12:12 PM, Rafael Seste <rseste@gmail.com> wrote:
+>> Hi Diego,
+>>
+>> On Wed, May 27, 2009 at 11:09 PM, Diego Garcia
+>> <diegogarciamendoza@gmail.com> wrote:
+>>> Hi,
+>>>
+>>> I'm using ubuntu 9.04 and my headset is Motorola S9.
+>>>
+>>> I connected my BT antenna and it didn't recognized as headset so i
+>>> installed blueman and upgraded bluez.
+>>>
+>>> Now it recognize it correctly, so i tried to configure the ALSA Driver
+>>> on Audacious for selecting bluetooth but that option doesn't appear.
+>>>
+>>> Anyone can give any advice about this?
+>>
+>> this howto from bluez wiki should help you.
+>>
+>> "if you can't see the audio device form there, you can force the
+>> bluetooth output by modifying your audacious property file"
+>>
+>> ~/.config/audacious/config. Modify the "pcm_device" value by
+>> "pcm_device=bluetooth"
+>>
+>> http://wiki.bluez.org/wiki/HOWTO/AudioDevices
+>>
+>>>
+>>> Regards,
+>>> Diego García Mendoza
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>>
+>>
+>>
+>> --
+>> Rafael S. Seste
+>>
+>
+>
+>
+> --
+> Diego García Mendoza
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+> Hello Diego ,
+>
+> I dont know configurations related audacious but following steps would work in rhythm player
+> I have assumed that you are having Ubuntu 9.04 , latest blueman and bluez.
+>
+> Please try out following steps to make a2dp work.
+> 1. pair headset and connect a2dp service.
+> 2. add .asoundrc in your HOME directory
+>
+> pcm.bluetooth {
+> type bluetooth
+> device XX:XX:XX:XX:XX:XX
+> profile "auto"
+> }
+> pcm.bluetoothraw {
+> type bluetooth
+> }
+> pcm.bluetooth {
+> type plug
+> slave {
+> pcm bluetoothraw
+> }
+> }
+>
+> replace XX by BT_ADDR of MOTO S9
+>
+> 3. gconftool -t string -s /system/gstreamer/0..10/default/musicaudiosink "alsasink buffer-time=6000000 latency-time=1000000 device=bluetoothraw"
+>
+> 4. restart bluetooth service  or do reboot (optional)
+>
+> Please try it out and let me know any further issues.
+>
+> Thanks,
+> Balaji
+>
+>
+>
+>      Cricket on your mind? Visit the ultimate cricket website. Enter http://beta.cricket.yahoo.com
+>
+>
+
+
+
+-- 
+Diego García Mendoza
+--
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+Hi Diego ,
+
+Please check bluez-gstreamer is installed on your ubuntu .If not , please try it.
+If you apply the gconftool command , you can verify that setting through gconf-editor and look into corresponding path.
+
+Thanks,
+Balaji.P
+
+
+
+      Cricket on your mind? Visit the ultimate cricket website. Enter http://beta.cricket.yahoo.com
 
