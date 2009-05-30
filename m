@@ -1,39 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 1 Apr 2009 08:52:44 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
+Subject: Re: [PATCH 1/4 v2] bluetooth: add btmrvl driver to support Marvell
+ bluetooth devices
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Bing Zhao <bzhao@marvell.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] Fix null dereference in src/main.c
-Message-ID: <20090401055244.GA17550@jh-x301>
-References: <1238553045-23938-1-git-send-email-gustavo@las.ic.unicamp.br>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1238553045-23938-1-git-send-email-gustavo@las.ic.unicamp.br>
+In-Reply-To: <1243640590-31666-1-git-send-email-bzhao@marvell.com>
+References: <1243640590-31666-1-git-send-email-bzhao@marvell.com>
+Content-Type: text/plain
+Date: Sat, 30 May 2009 09:09:20 +0200
+Message-Id: <1243667360.3523.28.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Bing,
 
-On Tue, Mar 31, 2009, Gustavo F. Padovan wrote:
-> str could be null when dst isn't null
-> ---
->  src/main.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-> 
-> diff --git a/src/main.c b/src/main.c
-> index 2d24d07..3ad9048 100644
-> --- a/src/main.c
-> +++ b/src/main.c
-> @@ -266,7 +266,7 @@ static char *expand_name(char *dst, int size, char *str, int dev_id)
->  	register int sp, np, olen;
->  	char *opt, buf[10];
->  
-> -	if (!str && !dst)
-> +	if (!str || !dst)
->  		return NULL;
->  
->  	sp = np = 0;
+> This driver provides basic definitions and library functions to
+> support Marvell Bluetooth enabled devices, such as 88W8688 WLAN/BT
+> combo chip.
 
-The patch has been pushed upstream. Thanks.
+we still have to talk about the handling of vendor commands. Handling
+these inside the driver is a bad idea. We can just let the core forward
+them to you if you are interested. I have to think about it a little
+bit.
 
-Johan
+> +struct btm_thread {
+> +	struct task_struct *task;
+> +	wait_queue_head_t wait_q;
+> +	void *priv;
+> +};
+
+Please prefix everything with btmrvl_* for cleaner namespace. Especially
+for the exported symbol it is important that you have a clean namespace.
+
+Regards
+
+Marcel
+
+
