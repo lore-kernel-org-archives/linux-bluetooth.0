@@ -1,8 +1,8 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Mon, 1 Jun 2009 14:03:01 -0700
-Message-ID: <d4029b2f0906011403u5f09b71ds79a5aaafe4538791@mail.gmail.com>
-Subject: no reply from my cellphone to AT commands
+Date: Mon, 1 Jun 2009 13:47:36 -0700
+Message-ID: <d4029b2f0906011347u62d97d6bj2f5b8037c7eeec7b@mail.gmail.com>
+Subject: SMS using bluetooth
 From: BlueZ Newbie <blueznewbie@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
@@ -11,22 +11,16 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-I connected my cell phone Samsung Blackjack to my PC on Linux (Fedora
-10) using bluez stack.
+I am a bluetooth programming newbie. I am using the bluez stack.
 
-The steps I am following are:
-1. rfcomm connect 0 xx:xx:xx:.. 4
-    I used channel 4 because my SDP (service discovery using sdptool)
-("sdptool search SP") shows serial port profile to be available on
-channel 4.
-2. rfcomm succeeds in connecting
-3. Then, I launch cutecom or minicom serial terminal using
-/dev/rfcomm0. cutecom connects to my cell phone.
-4. I send AT commands and my cell phone "blinks" in acknowledgment.
+My objective is to send a message from my PC (with a USB dongle) to my
+cellphone. My cellphone should receive the message as though its an
+SMS message. Is this possible to do? If so, please tell me how. I am
+able to connect to my cell phone on Linux via RFCOMM.
 
-But, no response from the cell phone. I verified that RFCOMM TTY is
-configured on my system.
+Please note that I do not want to use AT commands to instruct my cell
+phone to send an SMS to another cell phone. Instead, I want to send an
+SMS to my own cell phone over bluetooth.
 
-Any hints?
-
-Thanks
+Thanks,
+Kumar (alias Bluetooth-Newbie)
