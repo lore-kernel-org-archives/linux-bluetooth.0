@@ -1,56 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bing Zhao <bzhao@marvell.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Tue, 2 Jun 2009 12:05:20 -0700
-Subject: RE: [PATCH 1/4 v2] bluetooth: add btmrvl driver to support Marvell
- bluetooth devices
-Message-ID: <477F20668A386D41ADCC57781B1F704301E90677EA@SC-VEXCH1.marvell.com>
-References: <1243640590-31666-1-git-send-email-bzhao@marvell.com>
- <1243667360.3523.28.camel@localhost.localdomain>
-In-Reply-To: <1243667360.3523.28.camel@localhost.localdomain>
-Content-Type: text/plain; charset="iso-8859-1"
+Message-ID: <4A251CA6.5090205@gdatech.co.in>
+Date: Tue, 02 Jun 2009 18:05:50 +0530
+From: Benjamin Vasanthakumar J <j.benjamin@gdatech.co.in>
 MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org
+Subject: Bluetooth Headset not working with Linux2.6.28 ubuntu Intrepid
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Dear All,
 
-Thanks for reviewing our patches.
+I have a Bluetooth headset that support HSP. I am trying to make it work 
+on the Ubuntu linux Intrepid version.
+I am facing issue of the BT headset stops working after few seconds but 
+after that btsco application hangs and even
+after killing the application I could see that lot of SCO packets 
+activity(confirmed using hcidump utility).
 
-> Hi Bing,
->=20
-> > This driver provides basic definitions and library functions to
-> > support Marvell Bluetooth enabled devices, such as 88W8688 WLAN/BT
-> > combo chip.
->=20
-> we still have to talk about the handling of vendor commands. Handling
-> these inside the driver is a bad idea. We can just let the core forward
-> them to you if you are interested. I have to think about it a little
-> bit.
+*Bluez version available on the ubuntu is 4.12*
 
-I don't know how the vendor specific commands can be handled outside of btm=
-rvl.ko driver.
-Please share with me once you have any idea on the handling of the vendor c=
-ommands.
-=20
-> > +struct btm_thread {
-> > +	struct task_struct *task;
-> > +	wait_queue_head_t wait_q;
-> > +	void *priv;
-> > +};
->=20
-> Please prefix everything with btmrvl_* for cleaner namespace. Especially
-> for the exported symbol it is important that you have a clean namespace.
+_*Steps followed:*_
+i) installed all the required bluetooth packages available for the 
+Intrepid linux
+ii) install bluetooth alsa driver
+insmod snd-bt-sco.ko
 
-I've made this change. Do you want me to resend the new patch now, or wait =
-a while for more feedbacks?
+snd-bt-sco we are got from the Bluetooth alsa site as follows:
 
->=20
-> Regards
->=20
-> Marcel
->=20
+http://bluetooth-alsa.sourceforge.net/build.html
 
-Thanks,
+cvs -d:pserver:anonymous@sbc.cvs.sourceforge.net:/cvsroot/btsco login 
+cvs -d:pserver:anonymous@sbc.cvs.sourceforge.net:/cvsroot/btsco co btsco
 
-Bing
+When tried to compile with the 2.6.28 kernel it returned driver.h is depreceated, we removed the header file entry
+in the sourcecode and commented two or three lines which had snd-assert api which is not available in the linux-2.6.28 alsa.
+
+*I would like to know where I can get the latest version of the snd-bt-sco driver.*
+
+iii) connect to the audio headset using the
+btsco -v <BTADDR>
+
+iv) after performing the above we could see a soundcard entry in the
+/proc/asound/cards
+
+v) aplay -D btheadset -f s16_le /usr/share/sounds/login.wav
+
+After the v) step we could here a sound and after few seconds the audio 
+cuts off.
+
+Please advice how to troubleshoot and fix this issue.
+
+Thanks & Regards,
+Benjamin
