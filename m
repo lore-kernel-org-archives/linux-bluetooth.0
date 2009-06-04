@@ -1,116 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A27DFBE.407@redhat.com>
-Date: Thu, 04 Jun 2009 16:52:46 +0200
-From: Petr Lautrbach <plautrba@redhat.com>
-MIME-Version: 1.0
+From: =?utf-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?= <jprvita@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Add on demand functionality to bluetooth init script
-Content-Type: multipart/mixed;
- boundary="------------010504080602070004020904"
+Cc: =?utf-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?= <jprvita@gmail.com>
+Subject: [PATCH] Fix some error messages in A2DP Source functions.
+Date: Thu,  4 Jun 2009 11:36:54 -0300
+Message-Id: <1244126214-15714-1-git-send-email-jprvita@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------010504080602070004020904
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Make the messages text refer to correct function that lead to the error.
+---
+ audio/a2dp.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-Hi.
-
-This patch adds on demand functionality for bluetooth service based on udev events.
-It's adapted from Fedora [1].
-
-Idea is that bluetoothd doesn't need to be running unless the user actually has a bluetooth device.
-
-
-[1] https://bugzilla.redhat.com/show_bug.cgi?id=484345
-
-Cheers,
-
-Petr
+diff --git a/audio/a2dp.c b/audio/a2dp.c
+index 0d2c78d..2c4d047 100644
+--- a/audio/a2dp.c
++++ b/audio/a2dp.c
+@@ -1448,7 +1448,7 @@ unsigned int a2dp_source_resume(struct avdtp *session, struct a2dp_sep *sep,
+ 			g_idle_add((GSourceFunc) finalize_resume, setup);
+ 		break;
+ 	default:
+-		error("SEP in bad state");
++		error("SEP in bad state for resume");
+ 		goto failed;
+ 	}
+ 
+@@ -1499,7 +1499,7 @@ unsigned int a2dp_source_suspend(struct avdtp *session, struct a2dp_sep *sep,
+ 		}
+ 		break;
+ 	default:
+-		error("SEP in bad state for resume");
++		error("SEP in bad state for suspend");
+ 		goto failed;
+ 	}
+ 
 -- 
-Petr Lautrbach, Red Hat, Inc.
+1.6.0.4
 
---------------010504080602070004020904
-Content-Type: text/plain;
- name="bluetooth-ondemand-service-based-on-udev.patch"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="bluetooth-ondemand-service-based-on-udev.patch"
-
-RnJvbSA5NmMyNTdlNzJhNmEyYWI1ZWYxMzI1Zjk4NDk4ODE3ZTA3MDk2MDBlIE1vbiBTZXAg
-MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBQZXRyIExhdXRyYmFjaCA8cGxhdXRyYmFAcmVkaGF0
-LmNvbT4KRGF0ZTogVGh1LCA0IEp1biAyMDA5IDE1OjA5OjUyICswMjAwClN1YmplY3Q6IFtQ
-QVRDSF0gYmx1ZXRvb3RoIG9uZGVtYW5kIHNlcnZpY2UgYmFzZWQgb24gdWRldgoKLS0tCiBh
-Y2luY2x1ZGUubTQgICAgICAgICAgICAgICAgICAgICB8ICAgIDYgKysrKysrCiBzY3JpcHRz
-L01ha2VmaWxlLmFtICAgICAgICAgICAgICB8ICAgMTAgKysrKysrKysrLQogc2NyaXB0cy9i
-bHVldG9vdGgtb25kZW1hbmQucnVsZXMgfCAgICAzICsrKwogc2NyaXB0cy9ibHVldG9vdGgu
-aW5pdCAgICAgICAgICAgfCAgIDI0ICsrKysrKysrKysrKysrKysrKysrKystLQogNCBmaWxl
-cyBjaGFuZ2VkLCA0MCBpbnNlcnRpb25zKCspLCAzIGRlbGV0aW9ucygtKQogY3JlYXRlIG1v
-ZGUgMTAwNjQ0IHNjcmlwdHMvYmx1ZXRvb3RoLW9uZGVtYW5kLnJ1bGVzCgpkaWZmIC0tZ2l0
-IGEvYWNpbmNsdWRlLm00IGIvYWNpbmNsdWRlLm00CmluZGV4IGViN2NkZWIuLjQwODIxMTAg
-MTAwNjQ0Ci0tLSBhL2FjaW5jbHVkZS5tNAorKysgYi9hY2luY2x1ZGUubTQKQEAgLTE5OSw2
-ICsxOTksNyBAQCBBQ19ERUZVTihbQUNfQVJHX0JMVUVaXSwgWwogCWNvbmZpZ2ZpbGVzX2Vu
-YWJsZT15ZXMKIAlpbml0c2NyaXB0c19lbmFibGU9bm8KIAlwY21jaWFydWxlc19lbmFibGU9
-bm8KKwlvbmRlbWFuZF9lbmFibGU9bm8KIAl0ZWxlcGhvbnlfZHJpdmVyPWR1bW15CiAKIAlB
-Q19BUkdfRU5BQkxFKGZvcnRpZnksIEFDX0hFTFBfU1RSSU5HKFstLWRpc2FibGUtZm9ydGlm
-eV0sIFtkaXNhYmxlIGNvbXBpbGUgdGltZSBidWZmZXIgY2hlY2tzXSksIFsKQEAgLTI5Nyw2
-ICsyOTgsMTAgQEAgQUNfREVGVU4oW0FDX0FSR19CTFVFWl0sIFsKIAkJcGNtY2lhcnVsZXNf
-ZW5hYmxlPSR7ZW5hYmxldmFsfQogCV0pCiAKKwlBQ19BUkdfRU5BQkxFKG9uZGVtYW5kLCBB
-Q19IRUxQX1NUUklORyhbLS1lbmFibGUtb25kZW1hbmRdLCBbaW5zdGFsbCBPTkRFTUFORCB1
-ZGV2IHJ1bGVzXSksIFsKKwkJb25kZW1hbmRfZW5hYmxlPSR7ZW5hYmxldmFsfQorCV0pCisK
-IAlBQ19BUkdfRU5BQkxFKGRlYnVnLCBBQ19IRUxQX1NUUklORyhbLS1lbmFibGUtZGVidWdd
-LCBbZW5hYmxlIGNvbXBpbGluZyB3aXRoIGRlYnVnZ2luZyBpbmZvcm1hdGlvbl0pLCBbCiAJ
-CWRlYnVnX2VuYWJsZT0ke2VuYWJsZXZhbH0KIAldKQpAQCAtMzU3LDQgKzM2Miw1IEBAIEFD
-X0RFRlVOKFtBQ19BUkdfQkxVRVpdLCBbCiAJQU1fQ09ORElUSU9OQUwoQ09ORklHRklMRVMs
-IHRlc3QgIiR7Y29uZmlnZmlsZXNfZW5hYmxlfSIgPSAieWVzIikKIAlBTV9DT05ESVRJT05B
-TChJTklUU0NSSVBUUywgdGVzdCAiJHtpbml0c2NyaXB0c19lbmFibGV9IiA9ICJ5ZXMiKQog
-CUFNX0NPTkRJVElPTkFMKFBDTUNJQVJVTEVTLCB0ZXN0ICIke3BjbWNpYXJ1bGVzX2VuYWJs
-ZX0iID0gInllcyIpCisJQU1fQ09ORElUSU9OQUwoT05ERU1BTkQsIHRlc3QgIiR7b25kZW1h
-bmRfZW5hYmxlfSIgPSAieWVzIikKIF0pCmRpZmYgLS1naXQgYS9zY3JpcHRzL01ha2VmaWxl
-LmFtIGIvc2NyaXB0cy9NYWtlZmlsZS5hbQppbmRleCA0OTRhOWMyLi40OTE0NjEyIDEwMDY0
-NAotLS0gYS9zY3JpcHRzL01ha2VmaWxlLmFtCisrKyBiL3NjcmlwdHMvTWFrZWZpbGUuYW0K
-QEAgLTExLDYgKzExLDEwIEBAIGVuZGlmCiBpZiBQQ01DSUFSVUxFUwogcnVsZXNfREFUQSAr
-PSBibHVldG9vdGgtc2VyaWFsLnJ1bGVzCiBlbmRpZgorCitpZiBPTkRFTUFORAorcnVsZXNf
-REFUQSArPSBibHVldG9vdGgtb25kZW1hbmQucnVsZXMKK2VuZGlmCiBlbmRpZgogCiBpZiBQ
-Q01DSUFSVUxFUwpAQCAtMjAsNyArMjQsOCBAQCB1ZGV2X1NDUklQVFMgPSBibHVldG9vdGhf
-c2VyaWFsCiBlbmRpZgogCiBFWFRSQV9ESVNUID0gYmx1ZXRvb3RoLmluaXQgYmx1ZXRvb3Ro
-LmRlZmF1bHQgYmx1ZXRvb3RoLWhpZDJoY2kucnVsZXMgXAotCQkJCWJsdWV0b290aC1zZXJp
-YWwucnVsZXMgYmx1ZXRvb3RoX3NlcmlhbAorCQkJCWJsdWV0b290aC1zZXJpYWwucnVsZXMg
-Ymx1ZXRvb3RoX3NlcmlhbCBcCisJCQkJYmx1ZXRvb3RoLW9uZGVtYW5kLnJ1bGVzCiAKIE1B
-SU5UQUlORVJDTEVBTkZJTEVTID0gTWFrZWZpbGUuaW4KIApAQCAtMzAsNiArMzUsOSBAQCBp
-bnN0YWxsLWRhdGEtbG9jYWw6CiAJJChta2luc3RhbGxkaXJzKSAkKERFU1RESVIpJChzeXNj
-b25mZGlyKS9kZWZhdWx0CiAJWyAtZiAkKERFU1RESVIpJChzeXNjb25mZGlyKS9kZWZhdWx0
-L2JsdWV0b290aCBdIHx8IFwKIAkJJChJTlNUQUxMX0RBVEEpICQoc3JjZGlyKS9ibHVldG9v
-dGguZGVmYXVsdCAkKERFU1RESVIpJChzeXNjb25mZGlyKS9kZWZhdWx0L2JsdWV0b290aAor
-aWYgT05ERU1BTkQKKwllY2hvICJEQUVNT05fT05ERU1BTkQ9dHJ1ZSIgPj4gJChERVNURElS
-KSQoc3lzY29uZmRpcikvZGVmYXVsdC9ibHVldG9vdGgKK2VuZGlmCiAKIHVuaW5zdGFsbC1s
-b2NhbDoKIAlAcm0gLWYgJChERVNURElSKSQoc3lzY29uZmRpcikvaW5pdC5kL2JsdWV0b290
-aApkaWZmIC0tZ2l0IGEvc2NyaXB0cy9ibHVldG9vdGgtb25kZW1hbmQucnVsZXMgYi9zY3Jp
-cHRzL2JsdWV0b290aC1vbmRlbWFuZC5ydWxlcwpuZXcgZmlsZSBtb2RlIDEwMDY0NAppbmRl
-eCAwMDAwMDAwLi42MTQ2OTM1Ci0tLSAvZGV2L251bGwKKysrIGIvc2NyaXB0cy9ibHVldG9v
-dGgtb25kZW1hbmQucnVsZXMKQEAgLTAsMCArMSwzIEBACisjYmx1ZXRvb3RoIG9uIGRlbWFu
-ZCBydWxlcworU1VCU1lTVEVNPT0iYmx1ZXRvb3RoIiwgQUNUSU9OPT0iYWRkIiwgUlVOKz0i
-L2V0Yy9pbml0LmQvYmx1ZXRvb3RoIGNvbmRzdGFydCIKK1NVQlNZU1RFTT09ImJsdWV0b290
-aCIsIEFDVElPTj09InJlbW92ZSIsIFJVTis9Ii9ldGMvaW5pdC5kL2JsdWV0b290aCBjb25k
-c3RvcCIKZGlmZiAtLWdpdCBhL3NjcmlwdHMvYmx1ZXRvb3RoLmluaXQgYi9zY3JpcHRzL2Js
-dWV0b290aC5pbml0CmluZGV4IDNlYThhODkuLmI5YTE0NTQgMTAwNjQ0Ci0tLSBhL3Njcmlw
-dHMvYmx1ZXRvb3RoLmluaXQKKysrIGIvc2NyaXB0cy9ibHVldG9vdGguaW5pdApAQCAtMTcs
-MjEgKzE3LDQxIEBAIERBRU1PTl9FTkFCTEU9dHJ1ZQogCiBbIC1lIC9ldGMvZGVmYXVsdC9i
-bHVldG9vdGggXSAmJiAuIC9ldGMvZGVmYXVsdC9ibHVldG9vdGgKIAoraGFzX2J0X2Rldmlj
-ZXMoKQoreworCSNMb29rIGZvciBCbHVldG9vdGggYWRhcHRlcnM6CisJdWRldmFkbSBpbmZv
-IC0tZXhwb3J0LWRiIHwgZ3JlcCAtcSAtZSAnL2RldmljZXMvLiovYmx1ZXRvb3RoLy4qJwor
-CisJcmV0dXJuICQ/Cit9CisKIGNhc2UgIiQxIiBpbgogICBzdGFydCkKIAllY2hvIC1uICJT
-dGFydGluZyAkREVTQzoiCiAJaWYgJERBRU1PTl9FTkFCTEUgJiYgWyAteCAiJERBRU1PTl9F
-WEVDIiBdOyB0aGVuCi0JCSREQUVNT05fRVhFQwotCQllY2hvIC1uICIgJERBRU1PTl9OQU1F
-IgorCQlpZiBbIC16ICREQUVNT05fT05ERU1BTkQgXSB8fCBoYXNfYnRfZGV2aWNlczsgdGhl
-bgorCQkJJERBRU1PTl9FWEVDCisJCQllY2hvIC1uICIgJERBRU1PTl9OQU1FIgorCQlmaQog
-CWZpCiAJZWNobyAiLiIKIAk7OworICBjb25kc3RhcnQpCisJaWYgWyAtbiAkREFFTU9OX09O
-REVNQU5EIF07IHRoZW4KKwkJL2V0Yy9pbml0LmQvJE5BTUUgc3RhcnQKKwlmaQorCTs7CiAg
-IHN0b3ApCiAJZWNobyAtbiAiU3RvcHBpbmcgJERFU0M6IgogCWtpbGxhbGwgJERBRU1PTl9O
-QU1FID4gL2Rldi9udWxsIDI+JjEgfHwgdHJ1ZQogCWVjaG8gLW4gIiAkREFFTU9OX05BTUUi
-CiAJZWNobyAiLiIKIAk7OworICBjb25kc3RvcCkKKwlpZiBbIC1uICREQUVNT05fT05ERU1B
-TkQgXTsgdGhlbgorCQloYXNfYnRfZGV2aWNlcyB8fCAvZXRjL2luaXQuZC8kTkFNRSBzdG9w
-CisJZmkKKwk7OwogICAqKQogCU49L2V0Yy9pbml0LmQvJE5BTUUKIAllY2hvICJVc2FnZTog
-JE4ge3N0YXJ0fHN0b3B9IiA+JjIKLS0gCjEuNi4wLjYKCg==
---------------010504080602070004020904--
