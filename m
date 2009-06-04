@@ -1,35 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Add sixaxis cable-pairing plugin
-From: Bastien Nocera <hadess@hadess.net>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1244139239.23850.1.camel@localhost.localdomain>
-References: <1244107722.30768.837.camel@cookie.hadess.net>
-	 <1244139239.23850.1.camel@localhost.localdomain>
-Content-Type: text/plain
-Date: Fri, 05 Jun 2009 11:42:40 +0100
-Message-Id: <1244198560.30768.2403.camel@cookie.hadess.net>
-Mime-Version: 1.0
+Date: Thu, 4 Jun 2009 23:22:16 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Zygo Blaxell <zygo.blaxell@xandros.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Remove some dead files that are no longer distributed
+Message-ID: <20090604202216.GB16595@jh-x301>
+References: <1244145939-32456-1-git-send-email-zygo.blaxell@xandros.com> <1244145939-32456-2-git-send-email-zygo.blaxell@xandros.com> <1244145939-32456-3-git-send-email-zygo.blaxell@xandros.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1244145939-32456-3-git-send-email-zygo.blaxell@xandros.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2009-06-04 at 20:13 +0200, Marcel Holtmann wrote:
-> Hi Bastien,
-> 
-> > Works for me, comments welcome.
-> > 
-> > It uses gudev. See http://blog.fubar.dk/?p=106
-> 
-> no way. Please use just plain libudev and spare use the GObject
-> overhead. I have used libudev before and it is just fine. Not that I
-> have actually looked at your patch at all.
+Hi Zygo,
 
-GObject overhead? Did you intend on building sixaxis support into a 5
-year old phone that it would actually matter?
+On Thu, Jun 04, 2009, Zygo Blaxell wrote:
+> ---
+>  audio/module-bluetooth-sink.c |   39 -------
+>  doc/node-api.txt              |   28 -----
+>  src/hcid.conf                 |   57 ----------
+>  src/hcid.conf.5               |  227 -----------------------------------------
+>  4 files changed, 0 insertions(+), 351 deletions(-)
+>  delete mode 100644 audio/module-bluetooth-sink.c
+>  delete mode 100644 doc/node-api.txt
+>  delete mode 100644 src/hcid.conf
+>  delete mode 100644 src/hcid.conf.5
 
-Anyway, that'll go way down my list of things to do, along with porting
-the rest of the apps to libusb1, which I guess will be a problem as
-well.
+I'll wait Marcel to comment on this one since I suspect he might want at
+least node-api.txt to stay around even though it's not part of the "dist".
 
-gudev lives in udev-extras, and udev-extras will most likely be merged
-into udev itself. And it saves me from reinventing the wheel, and doing
-my own mainloop integration (etc.).
+Johan
