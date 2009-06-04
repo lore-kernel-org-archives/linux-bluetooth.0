@@ -2,38 +2,70 @@ Return-Path: <cyrus@holtmann.org>
 From: =?utf-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?= <jprvita@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: =?utf-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?= <jprvita@gmail.com>
-Subject: [PATCH 5/6] Create a2dp_sink_resume().
-Date: Thu,  4 Jun 2009 16:09:55 -0300
-Message-Id: <1244142596-8076-5-git-send-email-jprvita@gmail.com>
-In-Reply-To: <1244142596-8076-4-git-send-email-jprvita@gmail.com>
+Subject: [PATCH 4/6] Create a2dp_sink_config().
+Date: Thu,  4 Jun 2009 16:09:54 -0300
+Message-Id: <1244142596-8076-4-git-send-email-jprvita@gmail.com>
+In-Reply-To: <1244142596-8076-3-git-send-email-jprvita@gmail.com>
 References: <1244142596-8076-1-git-send-email-jprvita@gmail.com>
  <1244142596-8076-2-git-send-email-jprvita@gmail.com>
  <1244142596-8076-3-git-send-email-jprvita@gmail.com>
- <1244142596-8076-4-git-send-email-jprvita@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- audio/a2dp.c |   59 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- audio/a2dp.h |    2 +
- 2 files changed, 61 insertions(+), 0 deletions(-)
+ audio/a2dp.c |  118 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ audio/a2dp.h |    3 +
+ 2 files changed, 121 insertions(+), 0 deletions(-)
 
 diff --git a/audio/a2dp.c b/audio/a2dp.c
-index dc4f699..1c05f21 100644
+index 605dfed..dc4f699 100644
 --- a/audio/a2dp.c
 +++ b/audio/a2dp.c
-@@ -1752,6 +1752,65 @@ failed:
- 	return 0;
+@@ -1634,6 +1634,124 @@ struct a2dp_sep *a2dp_sink_get(struct avdtp *session,
+ 	return NULL;
  }
  
-+unsigned int a2dp_sink_resume(struct avdtp *session, struct a2dp_sep *sep,
-+				a2dp_stream_cb_t cb, void *user_data)
++unsigned int a2dp_sink_config(struct avdtp *session, struct a2dp_sep *sep,
++				a2dp_config_cb_t cb, GSList *caps,
++				void *user_data)
 +{
 +	struct a2dp_setup_cb *cb_data;
++	GSList *l;
++	struct a2dp_server *server;
 +	struct a2dp_setup *setup;
++	struct a2dp_sep *tmp;
++	struct avdtp_local_sep *lsep;
++	struct avdtp_remote_sep *rsep;
++	struct avdtp_service_capability *cap;
++	struct avdtp_media_codec_capability *codec_cap = NULL;
++	int posix_err;
++	bdaddr_t src;
++
++	avdtp_get_peers(session, &src, NULL);
++	server = find_server(servers, &src);
++	if (!server)
++		return 0;
++
++	for (l = caps; l != NULL; l = l->next) {
++		cap = l->data;
++
++		if (cap->category != AVDTP_MEDIA_CODEC)
++			continue;
++
++		codec_cap = (void *) cap->data;
++		break;
++	}
++
++	if (!codec_cap)
++		return 0;
++
++	if (sep->codec != codec_cap->media_codec_type)
++		return 0;
++
++	debug("a2dp_sink_config: selected SEP %p", sep->sep);
 +
 +	cb_data = g_new0(struct a2dp_setup_cb, 1);
-+	cb_data->resume_cb = cb;
++	cb_data->config_cb = cb;
 +	cb_data->user_data = user_data;
 +	cb_data->id = ++cb_id;
 +
@@ -49,31 +81,57 @@ index dc4f699..1c05f21 100644
 +	setup->cb = g_slist_append(setup->cb, cb_data);
 +	setup->sep = sep;
 +	setup->stream = sep->stream;
++	setup->client_caps = caps;
 +
 +	switch (avdtp_sep_get_state(sep->sep)) {
 +	case AVDTP_STATE_IDLE:
-+		goto failed;
-+		break;
-+	case AVDTP_STATE_OPEN:
-+		if (avdtp_start(session, sep->stream) < 0) {
-+			error("avdtp_start failed");
++		for (l = server->sinks; l != NULL; l = l->next) {
++			tmp = l->data;
++
++			if (avdtp_has_stream(session, tmp->stream))
++				break;
++		}
++
++		if (l != NULL) {
++			setup->reconfigure = TRUE;
++			if (avdtp_close(session, tmp->stream) < 0) {
++				error("avdtp_close failed");
++				goto failed;
++			}
++			break;
++		}
++
++		if (avdtp_get_seps(session, AVDTP_SEP_TYPE_SOURCE,
++				codec_cap->media_type,
++				codec_cap->media_codec_type,
++				&lsep, &rsep) < 0) {
++			error("No matching ACP and INT SEPs found");
++			goto failed;
++		}
++
++		posix_err = avdtp_set_configuration(session, rsep, lsep,
++							caps, &setup->stream);
++		if (posix_err < 0) {
++			error("avdtp_set_configuration: %s",
++				strerror(-posix_err));
 +			goto failed;
 +		}
 +		break;
++	case AVDTP_STATE_OPEN:
 +	case AVDTP_STATE_STREAMING:
-+		if (!sep->suspending && sep->suspend_timer) {
-+			g_source_remove(sep->suspend_timer);
-+			sep->suspend_timer = 0;
-+			avdtp_unref(sep->session);
-+			sep->session = NULL;
++		if (avdtp_stream_has_capabilities(setup->stream, caps)) {
++			debug("Configuration match: resuming");
++			g_idle_add((GSourceFunc) finalize_config, setup);
++		} else if (!setup->reconfigure) {
++			setup->reconfigure = TRUE;
++			if (avdtp_close(session, sep->stream) < 0) {
++				error("avdtp_close failed");
++				goto failed;
++			}
 +		}
-+		if (sep->suspending)
-+			setup->start = TRUE;
-+		else
-+			g_idle_add((GSourceFunc) finalize_resume, setup);
 +		break;
 +	default:
-+		error("SEP in bad state for resume");
++		error("SEP in bad state for requesting a new stream");
 +		goto failed;
 +	}
 +
@@ -89,15 +147,16 @@ index dc4f699..1c05f21 100644
  {
  	if (sep->locked)
 diff --git a/audio/a2dp.h b/audio/a2dp.h
-index 3be38a7..db378da 100644
+index f0a61e3..3be38a7 100644
 --- a/audio/a2dp.h
 +++ b/audio/a2dp.h
-@@ -148,6 +148,8 @@ struct a2dp_sep *a2dp_sink_get(struct avdtp *session,
- unsigned int a2dp_sink_config(struct avdtp *session, struct a2dp_sep *sep,
- 				a2dp_config_cb_t cb, GSList *caps,
- 				void *user_data);
-+unsigned int a2dp_sink_resume(struct avdtp *session, struct a2dp_sep *sep,
-+				a2dp_stream_cb_t cb, void *user_data);
+@@ -145,6 +145,9 @@ gboolean a2dp_source_cancel(struct audio_device *dev, unsigned int id);
+ 
+ struct a2dp_sep *a2dp_sink_get(struct avdtp *session,
+ 				struct avdtp_remote_sep *sep);
++unsigned int a2dp_sink_config(struct avdtp *session, struct a2dp_sep *sep,
++				a2dp_config_cb_t cb, GSList *caps,
++				void *user_data);
  gboolean a2dp_sink_cancel(struct audio_device *dev, unsigned int id);
  
  gboolean a2dp_sep_lock(struct a2dp_sep *sep, struct avdtp *session);
