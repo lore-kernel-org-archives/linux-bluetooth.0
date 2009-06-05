@@ -1,47 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A2A6021.1070408@wowway.com>
-Date: Sat, 06 Jun 2009 07:25:05 -0500
-From: "John R." <johnr@wowway.com>
+Date: Fri, 5 Jun 2009 18:53:07 +0200
+From: Stefan Seyfried <seife@suse.de>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	Petr Lautrbach <plautrba@redhat.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Add on demand functionality to bluetooth init script
+Message-ID: <20090605165307.GC13177@suse.de>
+References: <4A27DFBE.407@redhat.com> <20090605153852.GA29262@jh-x301> <1244216906.23850.70.camel@localhost.localdomain> <20090605164200.GB13177@suse.de>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: aplay: pcm_write:1269: write error: Input/output error
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20090605164200.GB13177@suse.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-bluez: 4.39
-kernel: 2.6.29.2
+On Fri, Jun 05, 2009 at 06:42:00PM +0200, Stefan Seyfried wrote:
+>   [ -x /dev/shm/bluetooth-adapter-present ] && \
 
-When attempting to play a wav file I get a short blip of sound but it 
-errors out and stops every time:
+"test -e" of course
 
-aplay -D bluetooth ross.wav
-Playing WAVE 'ross.wav' : Unsigned 8 bit, Rate 11025 Hz, Mono
-aplay: pcm_write:1269: write error: Input/output error
+> 	/etc/init.d/bluetooth start
 
-If I try and play a stereo 44100 Hz file there is no blip of sound just 
-the same error.
+Regards,
 
-Any suggestions on where to look?   I have used AudioDevices Wiki page 
-for configuration.
+	Stefan
+-- 
+Stefan Seyfried
+R&D Team Mobile Devices            |              "Any ideas, John?"
+SUSE LINUX Products GmbH, Nürnberg | "Well, surrounding them's out." 
 
-asoundrc:
-
-pcm.bluetoothraw {
-   type bluetooth
-   device XX:XX:XX:XX:XX:XX
-   profile auto
-}
-
-pcm.bluetooth {
-   type plug
-   slave {
-        pcm bluetoothraw
-   }
-}
-
-
-
-Thanks,
-
-John
+This footer brought to you by insane German lawmakers:
+SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG Nürnberg)
