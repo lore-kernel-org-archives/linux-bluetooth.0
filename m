@@ -1,28 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 5 Jun 2009 18:38:52 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Petr Lautrbach <plautrba@redhat.com>
+Subject: Re: Bluetooth Headset not working with Linux2.6.28 ubuntu Intrepid
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Benjamin Vasanthakumar J <j.benjamin@gdatech.co.in>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Add on demand functionality to bluetooth init script
-Message-ID: <20090605153852.GA29262@jh-x301>
-References: <4A27DFBE.407@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4A27DFBE.407@redhat.com>
+In-Reply-To: <4A293628.3090105@gdatech.co.in>
+References: <4A251CA6.5090205@gdatech.co.in>
+	 <4A293628.3090105@gdatech.co.in>
+Content-Type: text/plain
+Date: Fri, 05 Jun 2009 17:21:36 +0200
+Message-Id: <1244215296.23850.65.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Petr,
+Hi Benjamin,
 
-On Thu, Jun 04, 2009, Petr Lautrbach wrote:
-> This patch adds on demand functionality for bluetooth service based on
-> udev events.  It's adapted from Fedora [1].
->
-> Idea is that bluetoothd doesn't need to be running unless the user
-> actually has a bluetooth device.
+no top posting on the mailing list. This is a requirement and not a
+recommendation.
 
-The patch looks good to me (though my udev knowledge is rather limited).
-However, I'd like to get a second opinion from Marcel before pushing
-upstream.
+> Can anyone tell whether snd-bt-sco driver and the btsco application are 
+> still supported in the Linux 2.6.28 and Bluez latest versions?
 
-Johan
+They haven't been supported for over 3 years. And most likely will not
+work or crash your system.
+
+> Which are the required ALSA driver for the Bluetooth audio to work?
+
+The bluetoothd comes with plugins for ALSA and GStreamer and PulseAudio
+has a native plugin, too.
+
+Regards
+
+Marcel
+
+
