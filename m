@@ -1,79 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A293628.3090105@gdatech.co.in>
-Date: Fri, 05 Jun 2009 20:43:44 +0530
-From: Benjamin Vasanthakumar J <j.benjamin@gdatech.co.in>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: Bluetooth Headset not working with Linux2.6.28 ubuntu Intrepid
-References: <4A251CA6.5090205@gdatech.co.in>
-In-Reply-To: <4A251CA6.5090205@gdatech.co.in>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCH] Add sixaxis cable-pairing plugin
+From: Bastien Nocera <hadess@hadess.net>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1244213775.23850.57.camel@localhost.localdomain>
+References: <1244107722.30768.837.camel@cookie.hadess.net>
+	 <1244139239.23850.1.camel@localhost.localdomain>
+	 <1244198560.30768.2403.camel@cookie.hadess.net>
+	 <1244207191.23850.12.camel@localhost.localdomain>
+	 <1244209974.30768.2600.camel@cookie.hadess.net>
+	 <1244211333.23850.46.camel@localhost.localdomain>
+	 <1244213300.30768.2668.camel@cookie.hadess.net>
+	 <1244213775.23850.57.camel@localhost.localdomain>
+Content-Type: text/plain
+Date: Fri, 05 Jun 2009 16:06:17 +0100
+Message-Id: <1244214377.30768.2690.camel@cookie.hadess.net>
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dear All,
+On Fri, 2009-06-05 at 16:56 +0200, Marcel Holtmann wrote:
+> 
+> > > On that point, you haven't merged the Socket fix upstream
+> > 
+> > It's not upstreamable, see the RH bugzilla. It depends on a kernel
+> patch
+> > that can't go upstream.
+> 
+> Which bug is it.
 
-Can anyone tell whether snd-bt-sco driver and the btsco application are 
-still supported in the Linux 2.6.28 and Bluez latest versions?
+It's listed in the spec file, in the same directory you found that
+patch:
+https://bugzilla.redhat.com/show_bug.cgi?id=498756
 
-Which are the required ALSA driver for the Bluetooth audio to work?
+>  What is missing and why haven't I seen that kernel
+> patch at least send to the mailing list for review.
 
-Thanks & Regards,
-Benjamin
-
-Benjamin Vasanthakumar J wrote:
-> Dear All,
->
-> I have a Bluetooth headset that support HSP. I am trying to make it 
-> work on the Ubuntu linux Intrepid version.
-> I am facing issue of the BT headset stops working after few seconds 
-> but after that btsco application hangs and even
-> after killing the application I could see that lot of SCO packets 
-> activity(confirmed using hcidump utility).
->
-> *Bluez version available on the ubuntu is 4.12*
->
-> _*Steps followed:*_
-> i) installed all the required bluetooth packages available for the 
-> Intrepid linux
-> ii) install bluetooth alsa driver
-> insmod snd-bt-sco.ko
->
-> snd-bt-sco we are got from the Bluetooth alsa site as follows:
->
-> http://bluetooth-alsa.sourceforge.net/build.html
->
-> cvs -d:pserver:anonymous@sbc.cvs.sourceforge.net:/cvsroot/btsco login 
-> cvs -d:pserver:anonymous@sbc.cvs.sourceforge.net:/cvsroot/btsco co btsco
->
-> When tried to compile with the 2.6.28 kernel it returned driver.h is 
-> depreceated, we removed the header file entry
-> in the sourcecode and commented two or three lines which had 
-> snd-assert api which is not available in the linux-2.6.28 alsa.
->
-> *I would like to know where I can get the latest version of the 
-> snd-bt-sco driver.*
->
-> iii) connect to the audio headset using the
-> btsco -v <BTADDR>
->
-> iv) after performing the above we could see a soundcard entry in the
-> /proc/asound/cards
->
-> v) aplay -D btheadset -f s16_le /usr/share/sounds/login.wav
->
-> After the v) step we could here a sound and after few seconds the 
-> audio cuts off.
->
-> Please advice how to troubleshoot and fix this issue.
->
-> Thanks & Regards,
-> Benjamin
-> -- 
-> To unsubscribe from this list: send the line "unsubscribe 
-> linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
-
+It's a patch to serial core, not Bluetooth, and there's a 3-year old
+discussion on LKML, amongst other things.
