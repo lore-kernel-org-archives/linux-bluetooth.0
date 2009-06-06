@@ -1,18 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A2AFECC.10004@wowway.com>
-Date: Sat, 06 Jun 2009 18:42:04 -0500
-From: "John R." <johnr@wowway.com>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Resolved: aplay: pcm_write:1269: write error: Input/output error
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [PATCH] update test/agent.c API usage
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Filippo Giunchedi <filippo@esaurito.net>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20090606203416.GA27173@esaurito.net>
+References: <20090606203416.GA27173@esaurito.net>
+Content-Type: text/plain
+Date: Sun, 07 Jun 2009 01:18:52 +0200
+Message-Id: <1244330332.23850.77.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I upgraded to more recent bluez (4.40 compiled direct from tar ball) as 
-well  as upgraded to more recent dbus.  One or both of these resolved 
-this issue.
+Hi Filippo,
 
-Thanks for bluez things are sounding great!
+> as per subject:
+> 
+> * switch from Request to RequestPin/RequestPasskey
+> * change argument check in Release
+> * add Authorize method
 
-John
+please use proper coding style. From the email I can see already that
+spaces and tabs are mixed up at least in one place.
+
+Regards
+
+Marcel
+
+
