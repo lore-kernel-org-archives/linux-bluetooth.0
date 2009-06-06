@@ -1,30 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] update test/agent.c API usage
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Filippo Giunchedi <filippo@esaurito.net>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20090606203416.GA27173@esaurito.net>
-References: <20090606203416.GA27173@esaurito.net>
-Content-Type: text/plain
-Date: Sun, 07 Jun 2009 01:18:52 +0200
-Message-Id: <1244330332.23850.77.camel@localhost.localdomain>
-Mime-Version: 1.0
+Date: Sat, 6 Jun 2009 22:56:35 +0200
+From: Filippo Giunchedi <filippo@esaurito.net>
+To: "linux-bluetooth@vger.kernel..." <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH] honour commandline --device in test/agent.c
+Message-ID: <20090606205635.GA27558@esaurito.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Filippo,
+Hi,
+as per subject, make --device in test/agent.c actually work
 
-> as per subject:
-> 
-> * switch from Request to RequestPin/RequestPasskey
-> * change argument check in Release
-> * add Authorize method
+thanks,
+filippo
+---
+ test/agent.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-please use proper coding style. From the email I can see already that
-spaces and tabs are mixed up at least in one place.
-
-Regards
-
-Marcel
-
-
+diff --git a/test/agent.c b/test/agent.c
+index b256f52..7cd4b6e 100644
+--- a/test/agent.c
++++ b/test/agent.c
+@@ -283,7 +283,7 @@ static char *get_device(const char *device)
+ {
+ 	char *path;
+ 
+-	path = strdup("/org/bluez/hci0");
++	path = strdup(device);
+ 
+ 	return path;
+ }
+-- 
+1.6.3.1
