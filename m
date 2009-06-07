@@ -1,33 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] make test/agent.c use new API
+Subject: Re: How could bluez start A2DP stream directly without other
+ commands  while PTS.
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Filippo Giunchedi <filippo@esaurito.net>
+To: =?UTF-8?Q?=EB=B0=95=EC=B0=AC=EC=97=B4?= <chanyeol.park@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20090607081101.GA30589@esaurito.net>
-References: <1244330332.23850.77.camel@localhost.localdomain>
-	 <20090607081101.GA30589@esaurito.net>
+In-Reply-To: <434c4b6e0906062053na041ddj6ae690c5f08f750@mail.gmail.com>
+References: <434c4b6e0906062053na041ddj6ae690c5f08f750@mail.gmail.com>
 Content-Type: text/plain
-Date: Sun, 07 Jun 2009 10:42:30 +0200
-Message-Id: <1244364150.23850.80.camel@localhost.localdomain>
+Date: Sun, 07 Jun 2009 10:39:46 +0200
+Message-Id: <1244363986.23850.79.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Filippo,
+Hi Chanyeol,
 
-> I've fixed the space vs tab usage, sorry.
-> I'm not sure how to handle this case:
+> If possible, could you explain how to start a2dp stream directly
+> without other commands such as Get_capability, Set_configuration..
+> because it is necessary when a2dp stream connection was already made
+> by peer(sink).
 > 
-> -	if (dbus_message_is_method_call(msg, "org.bluez.Agent", "Request"))
-> +	if (dbus_message_is_method_call(msg, "org.bluez.Agent", "RequestPinCode") ||
-> +			dbus_message_is_method_call(msg, "org.bluez.Agent",
-> +								"RequestPasskey"))
+> In case of PTS test(TP/SET/BV-06-I), I couldn't pass the test case.
+> There is no action after bluez receive DISCOVER cmd from PTS....
 > 
-> with proper indentation but not going over 80 columns, that's what I came up
-> with, hope that's ok.
+> I uses PTS 3.2.16
+> 
+> If you need futher information, please let me know it.
 
-it is not, because you need to split them into two functions anyway. One
-returns a string, the other a uint32. Please read agent-api.txt.
+just start audio playback as you would always do. PTS should be able to
+handle that properly and BlueZ does for sure. Otherwise that is a bug,
+but I have never encountered any problems running A2DP PTS against
+BlueZ.
 
 Regards
 
