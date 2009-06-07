@@ -1,23 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Apple Bluetooth devices: Battery level?
+Subject: Re: Wacom Graphire Bluetooth HID driver - help needed
 From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Cc: linux-input <linux-input@vger.kernel.org>
-Content-Type: text/plain
-Date: Sun, 07 Jun 2009 15:17:16 +0100
-Message-Id: <1244384236.30768.5690.camel@cookie.hadess.net>
+To: =?UTF-8?Q?Przemys=C5=82aw?= Firszt <przemo@firszt.eu>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1243588429.4951.22.camel@pldmachine>
+References: <1243543413.21667.23.camel@pldmachine>
+	 <1243549749.21144.816.camel@cookie.hadess.net>
+	 <1243588429.4951.22.camel@pldmachine>
+Content-Type: text/plain; charset="UTF-8"
+Date: Sun, 07 Jun 2009 13:25:49 +0100
+Message-Id: <1244377549.30768.5467.camel@cookie.hadess.net>
 Mime-Version: 1.0
-Sender: linux-input-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Heya,
+On Fri, 2009-05-29 at 10:13 +0100, Przemysław Firszt wrote:
+> Dnia 2009-05-28, czw o godzinie 23:29 +0100, Bastien Nocera pisze:
+> > On Thu, 2009-05-28 at 21:43 +0100, Przemysław Firszt wrote:
+> > > Hi,
+> > > I'm working on Wacom Graphire bluetooth tablet driver.
+> > 
+> > I already posted patches to linux-input and linux-bluetooth with support
+> > for that, and it's merged into Fedora 11.
+> > 
+> > Check that code, and let me know whether you have any comments on the
+> > code.
+> 
+> I'm trying completly different way (redefining the device report and
+> mapping), but the problems (mode 2 and turning tablet twice to get it
+> working) are similar.
 
-I just got an Apple Bluetooth Mighty Mouse, and was wondering whether
-anyone had information on how to get the battery level from the device
-(the keyboard apparently also allows that):
-http://support.apple.com/kb/TA27118?viewlocale=en_US
+The second problem seems to be fixed by recent kernels for me.
 
-Anyone with an idea? An unparsed HID event? Does it need "poking"?
+>  Did you get any reply that this patch is going to
+> be included in mainstream?
 
-Cheers
+I believe it was supposed to be merged by now. Jiri?
+
+> Do you know what was the reason of that error -14 ? (see here for the
+> details: http://marc.info/?l=linux-bluetooth&m=123724912027050&w=2 )
+> I still have that problem...
+
+Don't know. I guess having the device mode 2 setup in the kernel would
+avoid this sort of problems.
+
+> I've to check your bluetoothd patch - do you know if it's going to be
+> included or the developers are waiting for required changes in kernel? 
+> I hope that it could sort out the ugly hack in hidp.
+
+The bluetoothd patch works around the missing hid write support in the
+Bluetooth hid stack. It could be moved to the kernel if the HID
+Bluetooth support grew that ability.
 
