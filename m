@@ -1,34 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A2CFD04.7020606@suse.de>
-Date: Mon, 08 Jun 2009 13:59:00 +0200
-From: Stefan Seyfried <seife@suse.de>
+Message-ID: <4A2CF696.8020702@redhat.com>
+Date: Mon, 08 Jun 2009 13:31:34 +0200
+From: Petr Lautrbach <plautrba@redhat.com>
 MIME-Version: 1.0
-To: Petr Lautrbach <plautrba@redhat.com>
-Cc: linux-bluetooth@vger.kernel.org
+To: Stefan Seyfried <seife@suse.de>
+CC: linux-bluetooth@vger.kernel.org
 Subject: Re: [PATCH] Add on demand functionality to bluetooth init script
-References: <4A27DFBE.407@redhat.com> <20090605145144.GB7296@suse.de> <4A2CF696.8020702@redhat.com>
-In-Reply-To: <4A2CF696.8020702@redhat.com>
-Content-Type: text/plain; charset=ISO-8859-1
+References: <4A27DFBE.407@redhat.com> <20090605145144.GB7296@suse.de>
+In-Reply-To: <20090605145144.GB7296@suse.de>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Petr Lautrbach wrote:
+On 06/05/2009 04:51 PM, Stefan Seyfried wrote:
+> On Thu, Jun 04, 2009 at 04:52:46PM +0200, Petr Lautrbach wrote:
+>> Hi.
+>>
+>> This patch adds on demand functionality for bluetooth service based on udev events.
+>> It's adapted from Fedora [1].
+>
+> JFTR: I'd appreciate if this (or something similar) was added. I have a similar hack in
+> the openSUSE package (though not as elaborate as this one), and for consistency across
+> distributions, having a solution upstream is preferred.	
+>
+>> Idea is that bluetoothd doesn't need to be running unless the user actually has a bluetooth device.
+>
+> Just out of interest: how did you solve the "udev event for bluetooth adapter
+> fires before dbus is started" probem?
+>
 
-> but there is running boot (changing runlevel) process, so sometime after starting dbus is started
-> bluetooth again, this time successfully
+"udev event for bluetooth adapter fires before dbus is started" can happend in these cases:
 
-Triggered by what? A init script that is always enabled? Is it checking if
-there is an adapter present? If not, it's unconditionally always starting
-bluetoothd (and thus the ondemand functionality is not strictly needed ;)
+boot process or changing runlevel:
+udev is started, dbus is not started yet and somebody inserts bluetooth device ->
+udev calls "/etc/init.d/bluetooth start" which fails
 
-Best regards,
+but there is running boot (changing runlevel) process, so sometime after starting dbus is started
+bluetooth again, this time successfully
 
-	Stefan
 
+running system without dbus:
+bluetoothd will not run even without this feature
+
+
+Regards,
+
+Petr
 -- 
-Stefan Seyfried
-R&D Team Mobile Devices            |              "Any ideas, John?"
-SUSE LINUX Products GmbH, Nürnberg | "Well, surrounding them's out."
-
-This footer brought to you by insane German lawmakers:
-SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG Nürnberg)
+Petr Lautrbach, Red Hat, Inc.
