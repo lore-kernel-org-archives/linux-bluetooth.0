@@ -1,38 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 8 Jun 2009 15:33:34 +0200 (CEST)
-From: Jiri Kosina <jkosina@suse.cz>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-input <linux-input@vger.kernel.org>
-Subject: Re: Apple Bluetooth devices: Battery level?
-In-Reply-To: <1244384236.30768.5690.camel@cookie.hadess.net>
-Message-ID: <alpine.LRH.2.00.0906081530330.31685@twin.jikos.cz>
-References: <1244384236.30768.5690.camel@cookie.hadess.net>
+Message-ID: <4A2D0142.8070100@redhat.com>
+Date: Mon, 08 Jun 2009 14:17:06 +0200
+From: Petr Lautrbach <plautrba@redhat.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+To: Stefan Seyfried <seife@suse.de>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Add on demand functionality to bluetooth init script
+References: <4A27DFBE.407@redhat.com> <20090605145144.GB7296@suse.de> <4A2CF696.8020702@redhat.com> <4A2CFD04.7020606@suse.de>
+In-Reply-To: <4A2CFD04.7020606@suse.de>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, 7 Jun 2009, Bastien Nocera wrote:
+On 06/08/2009 01:59 PM, Stefan Seyfried wrote:
+> Petr Lautrbach wrote:
+>
+>> but there is running boot (changing runlevel) process, so sometime after starting dbus is started
+>> bluetooth again, this time successfully
+>
+> Triggered by what? A init script that is always enabled? Is it checking if
+> there is an adapter present? If not, it's unconditionally always starting
+> bluetoothd (and thus the ondemand functionality is not strictly needed ;)
+>
 
-> I just got an Apple Bluetooth Mighty Mouse, and was wondering whether 
-> anyone had information on how to get the battery level from the device 
-> (the keyboard apparently also allows that): 
-> http://support.apple.com/kb/TA27118?viewlocale=en_US
-> 
-> Anyone with an idea? An unparsed HID event? Does it need "poking"?
+triggered by this code:
 
-If the mouse is standard-compliant, it should be sending the battery level 
-strength in usage 0x20 of device controls page (0x06).
++has_bt_devices()
++{
++	#Look for Bluetooth adapters:
++	udevadm info --export-db | grep -q -e '/devices/.*/bluetooth/.*'
++
++	return $?
++}
++
+  case "$1" in
+    start)
+  	echo -n "Starting $DESC:"
+  	if $DAEMON_ENABLE && [ -x "$DAEMON_EXEC" ]; then
+-		$DAEMON_EXEC
+-		echo -n " $DAEMON_NAME"
++		if [ -z $DAEMON_ONDEMAND ] || has_bt_devices; then
++			$DAEMON_EXEC
++			echo -n " $DAEMON_NAME"
++		fi
 
-Could you please obtain HID debug dump (CONFIG_HID_DEBUG + modprobe hid 
-module with 'debug=2') and look at this usage both in the report 
-descriptor itself, and also check whether it is present in the received 
-reports?
 
-Thanks,
+It starts if $DAEMON_ONDEMAND is not set or if there are some bluetooth adapters.
+In case that $DAEMON_ONDEMAND is set and has_bt_devices() has returned non-zero, it won't start.
 
+Petr
 -- 
-Jiri Kosina
-SUSE Labs
-
+Petr Lautrbach, Red Hat, Inc.
