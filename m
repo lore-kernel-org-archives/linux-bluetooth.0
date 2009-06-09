@@ -1,33 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alexander Beregalov <a.beregalov@gmail.com>
-To: marcel@holtmann.org,
-	linux-next@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org, Alexander Beregalov <a.beregalov@gmail.com>
-Subject: [PATCH] Bluetooth: depends on RFKILL
-Date: Tue,  9 Jun 2009 19:07:40 +0400
-Message-Id: <1244560060-28112-1-git-send-email-a.beregalov@gmail.com>
+Message-ID: <C8BAD89E00F6479FBCA47D5EB8A39A98@freqonedev>
+From: "David Stockwell" <dstockwell@frequency-one.com>
+To: <linux-bluetooth@vger.kernel.org>
+Subject: Problems building lexer.c in rfcomm
+Date: Tue, 9 Jun 2009 09:30:22 -0500
+MIME-Version: 1.0
+Content-Type: text/plain;
+	format=flowed;
+	charset="iso-8859-1";
+	reply-type=original
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since commit "Bluetooth: Add native RFKILL soft-switch support for all
-devices" (611b30f74b5) bluetooth depends on RFKILL.
+I am working in audio/control.c, and cannot "make" bluez 4.40 (plus my 
+changes, all in audio/control.c).
 
-Signed-off-by: Alexander Beregalov <a.beregalov@gmail.com>
----
- net/bluetooth/Kconfig |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+The make is failing when building rfcomm/lexer.c:
 
-diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
-index 7725da9..85ec71d 100644
---- a/net/bluetooth/Kconfig
-+++ b/net/bluetooth/Kconfig
-@@ -3,7 +3,7 @@
- #
- 
- menuconfig BT
--	depends on NET && !S390
-+	depends on NET && RFKILL && !S390
- 	tristate "Bluetooth subsystem support"
- 	help
- 	  Bluetooth is low-cost, low-power, short-range wireless technology.
--- 
-1.6.3.1
+cc1: warnings being treated as errors
+lexer.c: In function 'yy_get_next_buffer'
+lexer.c:1095: error: comparison between signed and unsigned
+
+Has anyone else seen this error?  How did you deal with it or work 
+around it?
+
+I am developing on an AMD64-based box running the Mandriva 2009 based on 
+2.6.27.21.
+
+David Stockwell 
+
