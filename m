@@ -1,39 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 1/4 v3] bluetooth: add btmrvl driver to support Marvell
- bluetooth devices
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Bing Zhao <bzhao@marvell.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1243978178-3403-1-git-send-email-bzhao@marvell.com>
-References: <1243978178-3403-1-git-send-email-bzhao@marvell.com>
-Content-Type: text/plain
-Date: Tue, 09 Jun 2009 17:20:07 +0200
-Message-Id: <1244560807.3068.12.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Alexander Beregalov <a.beregalov@gmail.com>
+To: marcel@holtmann.org,
+	linux-next@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org, Alexander Beregalov <a.beregalov@gmail.com>
+Subject: [PATCH] Bluetooth: depends on RFKILL
+Date: Tue,  9 Jun 2009 19:07:40 +0400
+Message-Id: <1244560060-28112-1-git-send-email-a.beregalov@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bing,
+Since commit "Bluetooth: Add native RFKILL soft-switch support for all
+devices" (611b30f74b5) bluetooth depends on RFKILL.
 
-> This driver provides basic definitions and library functions to
-> support Marvell Bluetooth enabled devices, such as 88W8688 WLAN/BT
-> combo chip.
+Signed-off-by: Alexander Beregalov <a.beregalov@gmail.com>
+---
+ net/bluetooth/Kconfig |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-so I created a bluetooth-mrvl-2.6 tree with your patches and already a
-major collection of cleanup patches.
-
-The biggest problem right now is that your driver spits out casting
-warnings like crazy. This is not acceptable. So please send me a patch
-to fix these based on bluetooth-mrvl-2.6.
-
-I did fix the firmware non-sense you had in there, but I haven't had
-time to test it with real hardware. So please do so.
-
-Also I am considering to just remove all this Enter/Leave debug
-non-sense since it makes the code really hard to read.
-
-Regards
-
-Marcel
-
-
+diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+index 7725da9..85ec71d 100644
+--- a/net/bluetooth/Kconfig
++++ b/net/bluetooth/Kconfig
+@@ -3,7 +3,7 @@
+ #
+ 
+ menuconfig BT
+-	depends on NET && !S390
++	depends on NET && RFKILL && !S390
+ 	tristate "Bluetooth subsystem support"
+ 	help
+ 	  Bluetooth is low-cost, low-power, short-range wireless technology.
+-- 
+1.6.3.1
