@@ -1,62 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bing Zhao <bzhao@marvell.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Tue, 9 Jun 2009 16:39:23 -0700
-Subject: RE: [PATCH 1/4 v3] bluetooth: add btmrvl driver to support Marvell
- bluetooth devices
-Message-ID: <477F20668A386D41ADCC57781B1F704301EDD86A59@SC-VEXCH1.marvell.com>
-References: <1243978178-3403-1-git-send-email-bzhao@marvell.com>
- <1244560807.3068.12.camel@localhost.localdomain>
-In-Reply-To: <1244560807.3068.12.camel@localhost.localdomain>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
+Subject: Re: Apple Bluetooth devices: Battery level?
+From: Bastien Nocera <hadess@hadess.net>
+To: Jiri Kosina <jkosina@suse.cz>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-input <linux-input@vger.kernel.org>
+In-Reply-To: <alpine.LRH.2.00.0906081530330.31685@twin.jikos.cz>
+References: <1244384236.30768.5690.camel@cookie.hadess.net>
+	 <alpine.LRH.2.00.0906081530330.31685@twin.jikos.cz>
+Content-Type: text/plain
+Date: Wed, 10 Jun 2009 00:22:18 +0100
+Message-Id: <1244589738.5973.1954.camel@cookie.hadess.net>
+Mime-Version: 1.0
+Sender: linux-input-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+On Mon, 2009-06-08 at 15:33 +0200, Jiri Kosina wrote:
+> On Sun, 7 Jun 2009, Bastien Nocera wrote:
+> 
+> > I just got an Apple Bluetooth Mighty Mouse, and was wondering whether 
+> > anyone had information on how to get the battery level from the device 
+> > (the keyboard apparently also allows that): 
+> > http://support.apple.com/kb/TA27118?viewlocale=en_US
+> > 
+> > Anyone with an idea? An unparsed HID event? Does it need "poking"?
+> 
+> If the mouse is standard-compliant, it should be sending the battery level 
+> strength in usage 0x20 of device controls page (0x06).
+> 
+> Could you please obtain HID debug dump (CONFIG_HID_DEBUG + modprobe hid 
+> module with 'debug=2')
 
-> -----Original Message-----
-> From: Marcel Holtmann [mailto:marcel@holtmann.org]
-> Sent: Tuesday, June 09, 2009 8:20 AM
-> To: Bing Zhao
-> Cc: linux-bluetooth@vger.kernel.org
-> Subject: Re: [PATCH 1/4 v3] bluetooth: add btmrvl driver to support Marve=
-ll bluetooth devices
->=20
-> Hi Bing,
->=20
-> > This driver provides basic definitions and library functions to
-> > support Marvell Bluetooth enabled devices, such as 88W8688 WLAN/BT
-> > combo chip.
->=20
-> so I created a bluetooth-mrvl-2.6 tree with your patches and already a
-> major collection of cleanup patches.
+I found that for pretty much all the input problems, I'd need to do
+something like that. Problem is:
+- enabling CONFIG_HID_DEBUG requires rebuilding the kernel
+- most distributions build hid into the kernel
 
-Thanks for the cleanups.
+Wouldn't there be a way to enable the debug at run-time without
+impacting too much on performance or binary size?
 
-> The biggest problem right now is that your driver spits out casting
-> warnings like crazy. This is not acceptable. So please send me a patch
-> to fix these based on bluetooth-mrvl-2.6.
+>  and look at this usage both in the report 
+> descriptor itself, and also check whether it is present in the received 
+> reports?
 
-Could you please let me know how to catch these casting warnings? I'm using=
- GCC 4.3.2 with sparse on x86 laptop (Fedora 8) but I couldn't get the warn=
-ings.
+I'll look at it when I get an occasion to rebuild a kernel (which
+thankfully isn't very often these days).
 
-> I did fix the firmware non-sense you had in there, but I haven't had
-> time to test it with real hardware. So please do so.
+Cheers
 
-Thanks for the fix and it works well.
-
-> Also I am considering to just remove all this Enter/Leave debug
-> non-sense since it makes the code really hard to read.
-
-I can remove those Enter/Leave debug, if you prefer.
-
-> Regards
->=20
-> Marcel
->=20
-
-Thanks,
-
-Bing
