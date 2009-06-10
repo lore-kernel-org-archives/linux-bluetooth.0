@@ -4,34 +4,39 @@ From: Bastien Nocera <hadess@hadess.net>
 To: Jiri Kosina <jkosina@suse.cz>
 Cc: linux-bluetooth@vger.kernel.org,
 	linux-input <linux-input@vger.kernel.org>
-In-Reply-To: <alpine.LNX.2.00.0906101023460.7457@wotan.suse.de>
+In-Reply-To: <alpine.LRH.2.00.0906081530330.31685@twin.jikos.cz>
 References: <1244384236.30768.5690.camel@cookie.hadess.net>
 	 <alpine.LRH.2.00.0906081530330.31685@twin.jikos.cz>
-	 <1244589738.5973.1954.camel@cookie.hadess.net>
-	 <alpine.LNX.2.00.0906101023460.7457@wotan.suse.de>
 Content-Type: text/plain
-Date: Wed, 10 Jun 2009 15:25:43 +0100
-Message-Id: <1244643943.2690.76.camel@cookie.hadess.net>
+Date: Wed, 10 Jun 2009 15:06:09 +0100
+Message-Id: <1244642769.2690.51.camel@cookie.hadess.net>
 Mime-Version: 1.0
 Sender: linux-input-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2009-06-10 at 10:25 +0200, Jiri Kosina wrote:
-> On Wed, 10 Jun 2009, Bastien Nocera wrote:
-<snip>
-> > - enabling CONFIG_HID_DEBUG requires rebuilding the kernel
+On Mon, 2009-06-08 at 15:33 +0200, Jiri Kosina wrote:
+> On Sun, 7 Jun 2009, Bastien Nocera wrote:
 > 
-> CONFIG_HID_DEBUG has 'default y' for quite some time, but the defconfigs 
-> haven't unfortunately been updated yet.
+> > I just got an Apple Bluetooth Mighty Mouse, and was wondering whether 
+> > anyone had information on how to get the battery level from the device 
+> > (the keyboard apparently also allows that): 
+> > http://support.apple.com/kb/TA27118?viewlocale=en_US
+> > 
+> > Anyone with an idea? An unparsed HID event? Does it need "poking"?
 > 
-> > - most distributions build hid into the kernel
+> If the mouse is standard-compliant, it should be sending the battery level 
+> strength in usage 0x20 of device controls page (0x06).
 > 
-> hid.debug=2 on the kernel commandline option does the trick.
+> Could you please obtain HID debug dump (CONFIG_HID_DEBUG + modprobe hid 
+> module with 'debug=2') and look at this usage both in the report 
+> descriptor itself, and also check whether it is present in the received 
+> reports?
 
-Or "echo 2 > /sys/modules/hid/parameters/debug" at run-time.
+This is the debug output:
+http://pastebin.com/m256a4187
 
-Seems CONFIG_HID_DEBUG is enabled by default in the builds I use as
-well, so I'll quit complaining about that :)
+Doesn't look very useful, and I have no idea what the 00ff.00c0 part
+does.
 
 Cheers
 
