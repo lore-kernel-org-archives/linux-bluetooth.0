@@ -1,42 +1,347 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Apple Bluetooth devices: Battery level?
-From: Bastien Nocera <hadess@hadess.net>
-To: Jiri Kosina <jkosina@suse.cz>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-input <linux-input@vger.kernel.org>
-In-Reply-To: <alpine.LRH.2.00.0906081530330.31685@twin.jikos.cz>
-References: <1244384236.30768.5690.camel@cookie.hadess.net>
-	 <alpine.LRH.2.00.0906081530330.31685@twin.jikos.cz>
-Content-Type: text/plain
-Date: Wed, 10 Jun 2009 15:06:09 +0100
-Message-Id: <1244642769.2690.51.camel@cookie.hadess.net>
-Mime-Version: 1.0
-Sender: linux-input-owner@vger.kernel.org
+From: alokbarsode@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Cc: Alok Barsode <alok.barsode@azingo.com>
+Subject: [PATCH 2/2] Adding stop_discovery to hciops.
+Date: Wed, 10 Jun 2009 17:50:52 +0530
+Message-Id: <1244636452-22901-1-git-send-email-alok.barsode@azingo.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 2009-06-08 at 15:33 +0200, Jiri Kosina wrote:
-> On Sun, 7 Jun 2009, Bastien Nocera wrote:
-> 
-> > I just got an Apple Bluetooth Mighty Mouse, and was wondering whether 
-> > anyone had information on how to get the battery level from the device 
-> > (the keyboard apparently also allows that): 
-> > http://support.apple.com/kb/TA27118?viewlocale=en_US
-> > 
-> > Anyone with an idea? An unparsed HID event? Does it need "poking"?
-> 
-> If the mouse is standard-compliant, it should be sending the battery level 
-> strength in usage 0x20 of device controls page (0x06).
-> 
-> Could you please obtain HID debug dump (CONFIG_HID_DEBUG + modprobe hid 
-> module with 'debug=2') and look at this usage both in the report 
-> descriptor itself, and also check whether it is present in the received 
-> reports?
+From: Alok Barsode <alok.barsode@azingo.com>
 
-This is the debug output:
-http://pastebin.com/m256a4187
+---
+ plugins/hciops.c |   27 ++++++++++
+ src/adapter.c    |   42 +++++----------
+ src/adapter.h    |    1 +
+ src/dbus-hci.c   |  153 ------------------------------------------------------
+ src/dbus-hci.h   |    5 --
+ 5 files changed, 42 insertions(+), 186 deletions(-)
 
-Doesn't look very useful, and I have no idea what the 00ff.00c0 part
-does.
-
-Cheers
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index d337b75..dae79b3 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -602,6 +602,32 @@ static int hciops_start_discovery(int index, gboolean periodic)
+ 	return err;
+ }
+ 
++static int hciops_stop_discovery(int index)
++{
++	struct hci_dev_info di;
++	int dd, err = 0;
++
++	if (hci_devinfo(index, &di) < 0)
++		return -errno;
++
++	dd = hci_open_dev(index);
++	if (dd < 0)
++		return -EIO;
++
++	if (hci_test_bit(HCI_INQUIRY, &di.flags))
++		err = hci_send_cmd(dd, OGF_LINK_CTL, OCF_INQUIRY_CANCEL,
++				0, 0);
++	else
++		err = hci_send_cmd(dd, OGF_LINK_CTL, OCF_EXIT_PERIODIC_INQUIRY,
++				0, 0);
++	if (err < 0)
++		err = -errno;
++
++	hci_close_dev(dd);
++
++	return err;
++}
++
+ static struct btd_adapter_ops hci_ops = {
+ 	.setup = hciops_setup,
+ 	.cleanup = hciops_cleanup,
+@@ -612,6 +638,7 @@ static struct btd_adapter_ops hci_ops = {
+ 	.set_discoverable = hciops_discoverable,
+ 	.set_limited_discoverable = hciops_set_limited_discoverable,
+ 	.start_discovery = hciops_start_discovery,
++	.stop_discovery = hciops_stop_discovery,
+ };
+ 
+ static int hciops_init(void)
+diff --git a/src/adapter.c b/src/adapter.c
+index 98c80da..8d277ba 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -551,20 +551,17 @@ static void session_remove(struct session_req *req)
+ 
+ 		debug("Stopping discovery");
+ 
+-		g_slist_foreach(adapter->found_devices, (GFunc) dev_info_free,
+-				NULL);
+-		g_slist_free(adapter->found_devices);
+-		adapter->found_devices = NULL;
++		pending_remote_name_cancel(adapter);
++
++		clear_found_devices_list(adapter);
+ 
+ 		g_slist_free(adapter->oor_devices);
+ 		adapter->oor_devices = NULL;
+ 
+-		if (adapter->state & STD_INQUIRY)
+-			cancel_discovery(adapter);
+-		else if (adapter->scheduler_id)
++		if (adapter->scheduler_id)
+ 			g_source_remove(adapter->scheduler_id);
+-		else
+-			cancel_periodic_discovery(adapter);
++
++		adapter_ops->stop_discovery(adapter->dev_id);
+ 	}
+ }
+ 
+@@ -1015,7 +1012,7 @@ static DBusMessage *adapter_stop_discovery(DBusConnection *conn,
+ 				"Invalid discovery session");
+ 
+ 	session_unref(req);
+-
++	info("Stopping discovery");
+ 	return dbus_message_new_method_return(msg);
+ }
+ 
+@@ -2048,19 +2045,14 @@ setup:
+ 	hci_send_cmd(dd, OGF_LINK_POLICY, OCF_READ_DEFAULT_LINK_POLICY,
+ 								0, NULL);
+ 
+-	if (hci_test_bit(HCI_INQUIRY, &di.flags)) {
+-		debug("inquiry_cancel at adapter startup");
+-		inquiry_cancel(dd, HCI_REQ_TIMEOUT);
+-	} else if (!adapter->initialized && adapter->already_up) {
+-		debug("periodic_inquiry_exit at adapter startup");
+-		periodic_inquiry_exit(dd, HCI_REQ_TIMEOUT);
+-	}
+-
+-	adapter->state &= ~STD_INQUIRY;
+-
+ 	adapter_setup(adapter, dd);
+ 	hci_close_dev(dd);
+ 
++	if (!adapter->initialized && adapter->already_up) {
++		debug("Stopping Inquiry at adapter startup");
++		adapter_ops->stop_discovery(adapter->dev_id);
++	}
++
+ 	err = adapter_up(adapter);
+ 
+ 	info("Adapter %s has been enabled", adapter->path);
+@@ -2084,16 +2076,10 @@ static void reply_pending_requests(struct btd_adapter *adapter)
+ 						HCI_OE_USER_ENDED_CONNECTION);
+ 	}
+ 
+-	if (adapter->state & STD_INQUIRY) {
++	if (adapter->state & STD_INQUIRY || adapter->state & PERIODIC_INQUIRY) {
+ 		/* Cancel inquiry initiated by D-Bus client */
+ 		if (adapter->disc_sessions)
+-			cancel_discovery(adapter);
+-	}
+-
+-	if (adapter->state & PERIODIC_INQUIRY) {
+-		/* Stop periodic inquiry initiated by D-Bus client */
+-		if (adapter->disc_sessions)
+-			cancel_periodic_discovery(adapter);
++			adapter_ops->stop_discovery(adapter->dev_id);
+ 	}
+ }
+ 
+diff --git a/src/adapter.h b/src/adapter.h
+index 5fb4741..2356743 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -161,6 +161,7 @@ struct btd_adapter_ops {
+ 	int (*set_limited_discoverable) (int index, const uint8_t *cls,
+ 						gboolean limited);
+ 	int (*start_discovery) (int index, gboolean periodic);
++	int (*stop_discovery) (int index);
+ };
+ 
+ int btd_register_adapter_ops(struct btd_adapter_ops *btd_adapter_ops);
+diff --git a/src/dbus-hci.c b/src/dbus-hci.c
+index 089fd2e..8718465 100644
+--- a/src/dbus-hci.c
++++ b/src/dbus-hci.c
+@@ -1219,159 +1219,6 @@ int hcid_dbus_set_io_cap(bdaddr_t *local, bdaddr_t *remote,
+ 	return 0;
+ }
+ 
+-int inquiry_cancel(int dd, int to)
+-{
+-	struct hci_request rq;
+-	uint8_t status;
+-
+-	memset(&rq, 0, sizeof(rq));
+-	rq.ogf    = OGF_LINK_CTL;
+-	rq.ocf    = OCF_INQUIRY_CANCEL;
+-	rq.rparam = &status;
+-	rq.rlen   = sizeof(status);
+-	rq.event = EVT_CMD_COMPLETE;
+-
+-	if (hci_send_req(dd, &rq, to) < 0)
+-		return -1;
+-
+-	if (status) {
+-		errno = bt_error(status);
+-		return -1;
+-	}
+-
+-	return 0;
+-}
+-
+-static int remote_name_cancel(int dd, bdaddr_t *dba, int to)
+-{
+-	remote_name_req_cancel_cp cp;
+-	struct hci_request rq;
+-	uint8_t status;
+-
+-	memset(&rq, 0, sizeof(rq));
+-	memset(&cp, 0, sizeof(cp));
+-
+-	bacpy(&cp.bdaddr, dba);
+-
+-	rq.ogf    = OGF_LINK_CTL;
+-	rq.ocf    = OCF_REMOTE_NAME_REQ_CANCEL;
+-	rq.cparam = &cp;
+-	rq.clen   = REMOTE_NAME_REQ_CANCEL_CP_SIZE;
+-	rq.rparam = &status;
+-	rq.rlen = sizeof(status);
+-	rq.event = EVT_CMD_COMPLETE;
+-
+-	if (hci_send_req(dd, &rq, to) < 0)
+-		return -1;
+-
+-	if (status) {
+-		errno = bt_error(status);
+-		return -1;
+-	}
+-
+-	return 0;
+-}
+-
+-int cancel_discovery(struct btd_adapter *adapter)
+-{
+-	struct remote_dev_info *dev, match;
+-	int dd, err = 0;
+-	uint16_t dev_id = adapter_get_dev_id(adapter);
+-
+-	dd = hci_open_dev(dev_id);
+-	if (dd < 0)
+-		return -ENODEV;
+-
+-	/*
+-	 * If there is a pending read remote name request means
+-	 * that the inquiry complete event was already received
+-	 */
+-	memset(&match, 0, sizeof(struct remote_dev_info));
+-	bacpy(&match.bdaddr, BDADDR_ANY);
+-	match.name_status = NAME_REQUESTED;
+-
+-	dev = adapter_search_found_devices(adapter, &match);
+-	if (dev) {
+-		if (remote_name_cancel(dd, &dev->bdaddr,
+-							HCI_REQ_TIMEOUT) < 0) {
+-			err = -errno;
+-			error("Read remote name cancel failed: %s, (%d)",
+-						strerror(errno), errno);
+-		}
+-	} else {
+-		if (inquiry_cancel(dd, HCI_REQ_TIMEOUT) < 0) {
+-			err = -errno;
+-			error("Inquiry cancel failed:%s (%d)",
+-						strerror(errno), errno);
+-		}
+-	}
+-
+-	hci_close_dev(dd);
+-
+-	return err;
+-}
+-
+-int periodic_inquiry_exit(int dd, int to)
+-{
+-	struct hci_request rq;
+-	uint8_t status;
+-
+-	memset(&rq, 0, sizeof(rq));
+-	rq.ogf    = OGF_LINK_CTL;
+-	rq.ocf    = OCF_EXIT_PERIODIC_INQUIRY;
+-	rq.rparam = &status;
+-	rq.rlen   = sizeof(status);
+-	rq.event = EVT_CMD_COMPLETE;
+-
+-	if (hci_send_req(dd, &rq, to) < 0)
+-		return -1;
+-
+-	if (status) {
+-		errno = status;
+-		return -1;
+-	}
+-
+-	return 0;
+-}
+-
+-int cancel_periodic_discovery(struct btd_adapter *adapter)
+-{
+-	struct remote_dev_info *dev, match;
+-	int dd, err = 0;
+-	uint16_t dev_id = adapter_get_dev_id(adapter);
+-
+-	dd = hci_open_dev(dev_id);
+-	if (dd < 0)
+-		return -ENODEV;
+-
+-	/* find the pending remote name request */
+-	memset(&match, 0, sizeof(struct remote_dev_info));
+-	bacpy(&match.bdaddr, BDADDR_ANY);
+-	match.name_status = NAME_REQUESTED;
+-
+-	dev = adapter_search_found_devices(adapter, &match);
+-	if (dev) {
+-		if (remote_name_cancel(dd, &dev->bdaddr,
+-						HCI_REQ_TIMEOUT) < 0) {
+-			err = -errno;
+-			error("Read remote name cancel failed: %s, (%d)",
+-						strerror(errno), errno);
+-		}
+-	}
+-
+-	/* ovewrite err if necessary: stop periodic inquiry has higher
+-	 * priority */
+-	if (periodic_inquiry_exit(dd, HCI_REQ_TIMEOUT) < 0) {
+-		err = -errno;
+-		error("Periodic Inquiry exit failed:%s (%d)",
+-						strerror(errno), errno);
+-	}
+-
+-	hci_close_dev(dd);
+-
+-	return err;
+-}
+-
+ /* Most of the functions in this module require easy access to a connection so
+  * we keep it global here and provide these access functions the other (few)
+  * modules that require access to it */
+diff --git a/src/dbus-hci.h b/src/dbus-hci.h
+index 1cb10f3..d46ccf8 100644
+--- a/src/dbus-hci.h
++++ b/src/dbus-hci.h
+@@ -52,14 +52,9 @@ int hcid_dbus_link_key_notify(bdaddr_t *local, bdaddr_t *peer,
+ 
+ DBusMessage *new_authentication_return(DBusMessage *msg, uint8_t status);
+ 
+-int cancel_discovery(struct btd_adapter *adapter);
+-int cancel_periodic_discovery(struct btd_adapter *adapter);
+-
+ int set_service_classes(int dd, const uint8_t *cls, uint8_t value);
+ int set_major_and_minor_class(int dd, const uint8_t *cls,
+ 						uint8_t major, uint8_t minor);
+-int inquiry_cancel(int dd, int to);
+-int periodic_inquiry_exit(int dd, int to);
+ 
+ const char *class_to_icon(uint32_t class);
+ 
+-- 
+1.5.6.3
 
