@@ -1,37 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 10 Jun 2009 19:19:17 +0100 (BST)
-To: Bastien Nocera <hadess@hadess.net>
+Subject: Re: Apple Bluetooth devices: Battery level?
+From: Bastien Nocera <hadess@hadess.net>
+To: Jiri Kosina <jkosina@suse.cz>
 Cc: linux-bluetooth@vger.kernel.org,
 	linux-input <linux-input@vger.kernel.org>
-Subject: Re: Apple Bluetooth devices: Battery level?
-In-Reply-To: <1244642769.2690.51.camel@cookie.hadess.net>
-References: <1244384236.30768.5690.camel@cookie.hadess.net>  <alpine.LRH.2.00.0906081530330.31685@twin.jikos.cz> <1244642769.2690.51.camel@cookie.hadess.net>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Message-Id: <1244657957.425041.1259.nullmailer@galant.ukfsn.org>
-From: Iain Hibbert <plunky@rya-online.net>
+In-Reply-To: <alpine.LNX.2.00.0906101023460.7457@wotan.suse.de>
+References: <1244384236.30768.5690.camel@cookie.hadess.net>
+	 <alpine.LRH.2.00.0906081530330.31685@twin.jikos.cz>
+	 <1244589738.5973.1954.camel@cookie.hadess.net>
+	 <alpine.LNX.2.00.0906101023460.7457@wotan.suse.de>
+Content-Type: text/plain
+Date: Wed, 10 Jun 2009 15:25:43 +0100
+Message-Id: <1244643943.2690.76.camel@cookie.hadess.net>
+Mime-Version: 1.0
 Sender: linux-input-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 10 Jun 2009, Bastien Nocera wrote:
+On Wed, 2009-06-10 at 10:25 +0200, Jiri Kosina wrote:
+> On Wed, 10 Jun 2009, Bastien Nocera wrote:
+<snip>
+> > - enabling CONFIG_HID_DEBUG requires rebuilding the kernel
+> 
+> CONFIG_HID_DEBUG has 'default y' for quite some time, but the defconfigs 
+> haven't unfortunately been updated yet.
+> 
+> > - most distributions build hid into the kernel
+> 
+> hid.debug=2 on the kernel commandline option does the trick.
 
-> Doesn't look very useful, and I have no idea what the 00ff.00c0 part
-> does.
+Or "echo 2 > /sys/modules/hid/parameters/debug" at run-time.
 
-I found this:
+Seems CONFIG_HID_DEBUG is enabled by default in the builds I use as
+well, so I'll quit complaining about that :)
 
-http://www.opensource.apple.com/source/IOHIDFamily/IOHIDFamily-258.1/IOHIDFamily/AppleHIDUsageTables.h
+Cheers
 
-which labels it as "Reserved MouseData" and it seems to be related to the
-capacitance detectors. Run "hcidump -X" and place your fingers on the
-mouse top without actually clicking then move the mouse slightly. You will
-see 0x00 (no touching), 0x01 (left finger), 0x02 (right finger) and 0x03
-(both fingers). I didn't see any other values.
-
-I think the battery strength is found by polling with the feature report
-id#71 but I don't know how you do that, libusb might be able to do it?
-
-as I mentioned before, you will also get an input report id#42 sent before
-the mouse dies (but that is not listed in the HID descriptor)
-
-iain
