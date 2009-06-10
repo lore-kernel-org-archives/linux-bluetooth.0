@@ -1,41 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Apple Bluetooth devices: Battery level?
-From: Bastien Nocera <hadess@hadess.net>
-To: Dmitriy Geels <dmitriy.geels@gmail.com>
+Date: Wed, 10 Jun 2009 10:25:17 +0200 (CEST)
+From: Jiri Kosina <jkosina@suse.cz>
+To: Bastien Nocera <hadess@hadess.net>
 Cc: linux-bluetooth@vger.kernel.org,
 	linux-input <linux-input@vger.kernel.org>
-In-Reply-To: <78f5d6bf0906100014r5b7f5c14p4544ef13442c8f0b@mail.gmail.com>
-References: <1244384236.30768.5690.camel@cookie.hadess.net>
-	 <alpine.LRH.2.00.0906081530330.31685@twin.jikos.cz>
-	 <1244589738.5973.1954.camel@cookie.hadess.net>
-	 <78f5d6bf0906100014r5b7f5c14p4544ef13442c8f0b@mail.gmail.com>
-Content-Type: text/plain
-Date: Wed, 10 Jun 2009 09:25:24 +0100
-Message-Id: <1244622324.5973.2499.camel@cookie.hadess.net>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: Apple Bluetooth devices: Battery level?
+In-Reply-To: <1244589738.5973.1954.camel@cookie.hadess.net>
+Message-ID: <alpine.LNX.2.00.0906101023460.7457@wotan.suse.de>
+References: <1244384236.30768.5690.camel@cookie.hadess.net>  <alpine.LRH.2.00.0906081530330.31685@twin.jikos.cz> <1244589738.5973.1954.camel@cookie.hadess.net>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Sender: linux-input-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2009-06-10 at 11:14 +0400, Dmitriy Geels wrote:
-> Hi!
-> 
-> Kernel rebuilding is pretty easy, for ubuntu/debian it would be:
-<snip>
+On Wed, 10 Jun 2009, Bastien Nocera wrote:
 
-FWIW, I contributed drivers to those two lists, so I do know how to
-build my own kernels...
+> > > I just got an Apple Bluetooth Mighty Mouse, and was wondering whether 
+> > > anyone had information on how to get the battery level from the device 
+> > > (the keyboard apparently also allows that): 
+> > > http://support.apple.com/kb/TA27118?viewlocale=en_US
+> > > Anyone with an idea? An unparsed HID event? Does it need "poking"?
+> > If the mouse is standard-compliant, it should be sending the battery level 
+> > strength in usage 0x20 of device controls page (0x06).
+> > Could you please obtain HID debug dump (CONFIG_HID_DEBUG + modprobe hid 
+> > module with 'debug=2')
+> I found that for pretty much all the input problems, I'd need to do
+> something like that. Problem is:
+> - enabling CONFIG_HID_DEBUG requires rebuilding the kernel
 
-> 2009/6/10 Bastien Nocera <hadess@hadess.net>:
-> > I found that for pretty much all the input problems, I'd need to do
-> > something like that. Problem is:
-> > - enabling CONFIG_HID_DEBUG requires rebuilding the kernel
-> > - most distributions build hid into the kernel
-> >
-> > Wouldn't there be a way to enable the debug at run-time without
-> > impacting too much on performance or binary size?
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-input" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
+CONFIG_HID_DEBUG has 'default y' for quite some time, but the defconfigs 
+haven't unfortunately been updated yet.
 
+> - most distributions build hid into the kernel
+
+hid.debug=2 on the kernel commandline option does the trick.
+
+> Wouldn't there be a way to enable the debug at run-time without 
+> impacting too much on performance or binary size?
+
+Absolutely. I have a migration of all this stuff to debugfs on my TODO 
+list.
+
+Thanks,
+
+-- 
+Jiri Kosina
+SUSE Labs
