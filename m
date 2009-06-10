@@ -1,41 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1244589738.5973.1954.camel@cookie.hadess.net>
-References: <1244384236.30768.5690.camel@cookie.hadess.net>
-	<alpine.LRH.2.00.0906081530330.31685@twin.jikos.cz> <1244589738.5973.1954.camel@cookie.hadess.net>
-From: Dmitriy Geels <dmitriy.geels@gmail.com>
-Date: Wed, 10 Jun 2009 11:14:57 +0400
-Message-ID: <78f5d6bf0906100014r5b7f5c14p4544ef13442c8f0b@mail.gmail.com>
-Subject: Re: Apple Bluetooth devices: Battery level?
-To: Bastien Nocera <hadess@hadess.net>
-Cc: Jiri Kosina <jkosina@suse.cz>, linux-bluetooth@vger.kernel.org,
-	linux-input <linux-input@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-input-owner@vger.kernel.org
+Subject: RE: [PATCH 1/4 v3] bluetooth: add btmrvl driver to support Marvell
+ bluetooth devices
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Bing Zhao <bzhao@marvell.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <477F20668A386D41ADCC57781B1F704301EDD86A59@SC-VEXCH1.marvell.com>
+References: <1243978178-3403-1-git-send-email-bzhao@marvell.com>
+	 <1244560807.3068.12.camel@localhost.localdomain>
+	 <477F20668A386D41ADCC57781B1F704301EDD86A59@SC-VEXCH1.marvell.com>
+Content-Type: text/plain
+Date: Wed, 10 Jun 2009 09:07:23 +0200
+Message-Id: <1244617643.3068.26.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
+Hi Bing,
 
-Kernel rebuilding is pretty easy, for ubuntu/debian it would be:
-- sudo apt-get install linux-source build-essential
-- tar xf /usr/src/linux-source*
-- cd linux-source-`uname -r`
-- cp /boot/config-`uname -r` .config
-- make menuconfig (find and enable HID_DEBUG)
-- make bzImage modules deb-pkg
-Then after some time you will get deb package, which you need to
-install and then run:
-- sudo update-initramfs -c -k 'new kernel version'
-- sudo update-grub
+> > > This driver provides basic definitions and library functions to
+> > > support Marvell Bluetooth enabled devices, such as 88W8688 WLAN/BT
+> > > combo chip.
+> > 
+> > so I created a bluetooth-mrvl-2.6 tree with your patches and already a
+> > major collection of cleanup patches.
+> 
+> Thanks for the cleanups.
+> 
+> > The biggest problem right now is that your driver spits out casting
+> > warnings like crazy. This is not acceptable. So please send me a patch
+> > to fix these based on bluetooth-mrvl-2.6.
+> 
+> Could you please let me know how to catch these casting warnings? I'm using GCC 4.3.2 with sparse on x86 laptop (Fedora 8) but I couldn't get the warnings.
 
-Then you can reboot into new kernel and use "echo 2 >
-/sys/modules/hid/parameters/debug" instead of debug module parameter.
+let me guess, you are running a 32-bit kernel. Just run a 64-bit kernel
+and you will see them. I am using Fedora 10.
 
-2009/6/10 Bastien Nocera <hadess@hadess.net>:
-> I found that for pretty much all the input problems, I'd need to do
-> something like that. Problem is:
-> - enabling CONFIG_HID_DEBUG requires rebuilding the kernel
-> - most distributions build hid into the kernel
->
-> Wouldn't there be a way to enable the debug at run-time without
-> impacting too much on performance or binary size?
+I also have to compile this at least on one big endian machine. Will use
+my Quad G5 once I get home.
+
+> > I did fix the firmware non-sense you had in there, but I haven't had
+> > time to test it with real hardware. So please do so.
+> 
+> Thanks for the fix and it works well.
+
+Good. I wasn't sure I did this right. Stupid driver_data is unsigned
+long and that requires casting :(
+
+> > Also I am considering to just remove all this Enter/Leave debug
+> > non-sense since it makes the code really hard to read.
+> 
+> I can remove those Enter/Leave debug, if you prefer.
+
+Tell me what you need them for. I don't mind having the Enter part with
+BT_DBG since we are using that anyway to print debug information about
+the parameters we give to a function, but the Leave part is cluttering
+the code. Can you just follow the style the other drivers are using.
+
+And again, after that you are not done since the whole driver needs more
+cleanups. That is just in a shape I consider merging it upstream so we
+can start fixing it there. I still consider it a little bit too
+complicated for what is really needed to drive your hardware.
+
+Regards
+
+Marcel
+
+
