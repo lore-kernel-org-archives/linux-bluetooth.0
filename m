@@ -2,48 +2,62 @@ Return-Path: <cyrus@holtmann.org>
 From: alokbarsode@gmail.com
 To: linux-bluetooth@vger.kernel.org
 Cc: Alok Barsode <alok.barsode@azingo.com>
-Subject: [PATCH 2/2] Adding stop_discovery to hciops.
-Date: Wed, 10 Jun 2009 17:50:52 +0530
-Message-Id: <1244636452-22901-1-git-send-email-alok.barsode@azingo.com>
+Subject: [PATCH 1/2] Adding start_discovery to hciops plugin.
+Date: Wed, 10 Jun 2009 17:50:41 +0530
+Message-Id: <1244636441-22878-1-git-send-email-alok.barsode@azingo.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Alok Barsode <alok.barsode@azingo.com>
 
 ---
- plugins/hciops.c |   27 ++++++++++
- src/adapter.c    |   42 +++++----------
- src/adapter.h    |    1 +
- src/dbus-hci.c   |  153 ------------------------------------------------------
- src/dbus-hci.h   |    5 --
- 5 files changed, 42 insertions(+), 186 deletions(-)
+ plugins/hciops.c |   42 +++++++++++++++++
+ src/adapter.c    |  133 +++++++++---------------------------------------------
+ src/adapter.h    |    3 +-
+ src/dbus-hci.c   |    5 ++-
+ 4 files changed, 69 insertions(+), 114 deletions(-)
 
 diff --git a/plugins/hciops.c b/plugins/hciops.c
-index d337b75..dae79b3 100644
+index 8f9ee06..d337b75 100644
 --- a/plugins/hciops.c
 +++ b/plugins/hciops.c
-@@ -602,6 +602,32 @@ static int hciops_start_discovery(int index, gboolean periodic)
+@@ -561,6 +561,47 @@ done:
  	return err;
  }
  
-+static int hciops_stop_discovery(int index)
++static int hciops_start_discovery(int index, gboolean periodic)
 +{
-+	struct hci_dev_info di;
++	uint8_t lap[3] = { 0x33, 0x8b, 0x9e };
 +	int dd, err = 0;
-+
-+	if (hci_devinfo(index, &di) < 0)
-+		return -errno;
 +
 +	dd = hci_open_dev(index);
 +	if (dd < 0)
 +		return -EIO;
 +
-+	if (hci_test_bit(HCI_INQUIRY, &di.flags))
-+		err = hci_send_cmd(dd, OGF_LINK_CTL, OCF_INQUIRY_CANCEL,
-+				0, 0);
-+	else
-+		err = hci_send_cmd(dd, OGF_LINK_CTL, OCF_EXIT_PERIODIC_INQUIRY,
-+				0, 0);
++	if (periodic) {
++		periodic_inquiry_cp cp;
++
++		memset(&cp, 0, sizeof(cp));
++		memcpy(&cp.lap, lap, 3);
++		cp.max_period = htobs(24);
++		cp.min_period = htobs(16);
++		cp.length  = 0x08;
++		cp.num_rsp = 0x00;
++
++		err = hci_send_cmd(dd, OGF_LINK_CTL, OCF_PERIODIC_INQUIRY,
++					PERIODIC_INQUIRY_CP_SIZE, &cp);
++	} else {
++		inquiry_cp inq_cp;
++
++		memset(&inq_cp, 0, sizeof(inq_cp));
++		memcpy(&inq_cp.lap, lap, 3);
++		inq_cp.length = 0x08;
++		inq_cp.num_rsp = 0x00;
++
++		err = hci_send_cmd(dd, OGF_LINK_CTL, OCF_INQUIRY,
++					INQUIRY_CP_SIZE, &inq_cp);
++	}
++
 +	if (err < 0)
 +		err = -errno;
 +
@@ -55,293 +69,237 @@ index d337b75..dae79b3 100644
  static struct btd_adapter_ops hci_ops = {
  	.setup = hciops_setup,
  	.cleanup = hciops_cleanup,
-@@ -612,6 +638,7 @@ static struct btd_adapter_ops hci_ops = {
+@@ -570,6 +611,7 @@ static struct btd_adapter_ops hci_ops = {
+ 	.set_connectable = hciops_connectable,
  	.set_discoverable = hciops_discoverable,
  	.set_limited_discoverable = hciops_set_limited_discoverable,
- 	.start_discovery = hciops_start_discovery,
-+	.stop_discovery = hciops_stop_discovery,
++	.start_discovery = hciops_start_discovery,
  };
  
  static int hciops_init(void)
 diff --git a/src/adapter.c b/src/adapter.c
-index 98c80da..8d277ba 100644
+index a45765d..98c80da 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -551,20 +551,17 @@ static void session_remove(struct session_req *req)
+@@ -214,6 +214,16 @@ static void dev_info_free(struct remote_dev_info *dev)
+ 	g_free(dev);
+ }
  
- 		debug("Stopping discovery");
- 
--		g_slist_foreach(adapter->found_devices, (GFunc) dev_info_free,
--				NULL);
--		g_slist_free(adapter->found_devices);
--		adapter->found_devices = NULL;
-+		pending_remote_name_cancel(adapter);
++void clear_found_devices_list(struct btd_adapter *adapter)
++{
++	if (!adapter->found_devices)
++		return;
 +
-+		clear_found_devices_list(adapter);
- 
- 		g_slist_free(adapter->oor_devices);
- 		adapter->oor_devices = NULL;
- 
--		if (adapter->state & STD_INQUIRY)
--			cancel_discovery(adapter);
--		else if (adapter->scheduler_id)
-+		if (adapter->scheduler_id)
- 			g_source_remove(adapter->scheduler_id);
--		else
--			cancel_periodic_discovery(adapter);
++	g_slist_foreach(adapter->found_devices, (GFunc) dev_info_free, NULL);
++	g_slist_free(adapter->found_devices);
++	adapter->found_devices = NULL;
++}
 +
-+		adapter_ops->stop_discovery(adapter->dev_id);
+ int pending_remote_name_cancel(struct btd_adapter *adapter)
+ {
+ 	struct remote_dev_info *dev, match;
+@@ -243,11 +253,6 @@ int pending_remote_name_cancel(struct btd_adapter *adapter)
+ 						strerror(errno), errno);
  	}
- }
  
-@@ -1015,7 +1012,7 @@ static DBusMessage *adapter_stop_discovery(DBusConnection *conn,
- 				"Invalid discovery session");
- 
- 	session_unref(req);
+-	/* free discovered devices list */
+-	g_slist_foreach(adapter->found_devices, (GFunc) dev_info_free, NULL);
+-	g_slist_free(adapter->found_devices);
+-	adapter->found_devices = NULL;
 -
-+	info("Stopping discovery");
- 	return dbus_message_new_method_return(msg);
- }
- 
-@@ -2048,19 +2045,14 @@ setup:
- 	hci_send_cmd(dd, OGF_LINK_POLICY, OCF_READ_DEFAULT_LINK_POLICY,
- 								0, NULL);
- 
--	if (hci_test_bit(HCI_INQUIRY, &di.flags)) {
--		debug("inquiry_cancel at adapter startup");
--		inquiry_cancel(dd, HCI_REQ_TIMEOUT);
--	} else if (!adapter->initialized && adapter->already_up) {
--		debug("periodic_inquiry_exit at adapter startup");
--		periodic_inquiry_exit(dd, HCI_REQ_TIMEOUT);
--	}
--
--	adapter->state &= ~STD_INQUIRY;
--
- 	adapter_setup(adapter, dd);
  	hci_close_dev(dd);
  
-+	if (!adapter->initialized && adapter->already_up) {
-+		debug("Stopping Inquiry at adapter startup");
-+		adapter_ops->stop_discovery(adapter->dev_id);
-+	}
-+
- 	err = adapter_up(adapter);
- 
- 	info("Adapter %s has been enabled", adapter->path);
-@@ -2084,16 +2076,10 @@ static void reply_pending_requests(struct btd_adapter *adapter)
- 						HCI_OE_USER_ENDED_CONNECTION);
- 	}
- 
--	if (adapter->state & STD_INQUIRY) {
-+	if (adapter->state & STD_INQUIRY || adapter->state & PERIODIC_INQUIRY) {
- 		/* Cancel inquiry initiated by D-Bus client */
- 		if (adapter->disc_sessions)
--			cancel_discovery(adapter);
--	}
--
--	if (adapter->state & PERIODIC_INQUIRY) {
--		/* Stop periodic inquiry initiated by D-Bus client */
--		if (adapter->disc_sessions)
--			cancel_periodic_discovery(adapter);
-+			adapter_ops->stop_discovery(adapter->dev_id);
- 	}
+ 	return err;
+@@ -946,106 +951,16 @@ struct btd_device *adapter_get_device(DBusConnection *conn,
+ 	return adapter_create_device(conn, adapter, address);
  }
  
+-static int start_inquiry(struct btd_adapter *adapter)
++static int adapter_start_inquiry(struct btd_adapter *adapter)
+ {
+-	inquiry_cp cp;
+-	evt_cmd_status rp;
+-	struct hci_request rq;
+-	uint8_t lap[3] = { 0x33, 0x8b, 0x9e };
+-	int dd, err;
+-
+-	pending_remote_name_cancel(adapter);
+-
+-	dd = hci_open_dev(adapter->dev_id);
+-	if (dd < 0)
+-		return dd;
+-
+-	memset(&cp, 0, sizeof(cp));
+-	memcpy(&cp.lap, lap, 3);
+-	cp.length = 0x08;
+-	cp.num_rsp = 0x00;
+-
+-	memset(&rq, 0, sizeof(rq));
+-	rq.ogf = OGF_LINK_CTL;
+-	rq.ocf = OCF_INQUIRY;
+-	rq.cparam = &cp;
+-	rq.clen = INQUIRY_CP_SIZE;
+-	rq.rparam = &rp;
+-	rq.rlen = EVT_CMD_STATUS_SIZE;
+-	rq.event = EVT_CMD_STATUS;
+-
+-	if (hci_send_req(dd, &rq, HCI_REQ_TIMEOUT) < 0) {
+-		err = -errno;
+-		error("Unable to start inquiry: %s (%d)",
+-						strerror(errno), errno);
+-		hci_close_dev(dd);
+-		return err;
+-	}
+-
+-	if (rp.status) {
+-		error("HCI_Inquiry command failed with status 0x%02x",
+-			rp.status);
+-		hci_close_dev(dd);
+-		return -bt_error(rp.status);
+-	}
+-
+-	hci_close_dev(dd);
+-
+-	if (main_opts.name_resolv)
+-		adapter->state |= RESOLVE_NAME;
++	gboolean periodic = TRUE;
+ 
+-	return 0;
+-}
+-
+-static int start_periodic_inquiry(struct btd_adapter *adapter)
+-{
+-	periodic_inquiry_cp cp;
+-	struct hci_request rq;
+-	uint8_t lap[3] = { 0x33, 0x8b, 0x9e };
+-	uint8_t status;
+-	int dd, err;
+-
+-	dd = hci_open_dev(adapter->dev_id);
+-	if (dd < 0)
+-		return dd;
+-
+-	memset(&cp, 0, sizeof(cp));
+-	memcpy(&cp.lap, lap, 3);
+-	cp.max_period = htobs(24);
+-	cp.min_period = htobs(16);
+-	cp.length  = 0x08;
+-	cp.num_rsp = 0x00;
+-
+-	memset(&rq, 0, sizeof(rq));
+-	rq.ogf    = OGF_LINK_CTL;
+-	rq.ocf    = OCF_PERIODIC_INQUIRY;
+-	rq.cparam = &cp;
+-	rq.clen   = PERIODIC_INQUIRY_CP_SIZE;
+-	rq.rparam = &status;
+-	rq.rlen   = sizeof(status);
+-	rq.event  = EVT_CMD_COMPLETE;
+-
+-	if (hci_send_req(dd, &rq, HCI_REQ_TIMEOUT) < 0) {
+-		err = -errno;
+-		error("Unable to start periodic inquiry: %s (%d)",
+-						strerror(errno), errno);
+-		hci_close_dev(dd);
+-		return err;
+-	}
+-
+-	if (status) {
+-		error("HCI_Periodic_Inquiry_Mode failed with status 0x%02x",
+-				status);
+-		hci_close_dev(dd);
+-		return -bt_error(status);
+-	}
+-
+-	hci_close_dev(dd);
++	if (main_opts.discov_interval)
++		periodic = FALSE;
+ 
+-	if (main_opts.name_resolv)
+-		adapter->state |= RESOLVE_NAME;
++	pending_remote_name_cancel(adapter);
+ 
+-	return 0;
++	return adapter_ops->start_discovery(adapter->dev_id, periodic);
+ }
+ 
+ static DBusMessage *adapter_start_discovery(DBusConnection *conn,
+@@ -1068,11 +983,10 @@ static DBusMessage *adapter_start_discovery(DBusConnection *conn,
+ 	if (adapter->disc_sessions)
+ 		goto done;
+ 
+-	if (main_opts.discov_interval)
+-		err = start_inquiry(adapter);
+-	else
+-		err = start_periodic_inquiry(adapter);
++	if (main_opts.name_resolv)
++		adapter->state |= RESOLVE_NAME;
+ 
++	err = adapter_start_inquiry(adapter);
+ 	if (err < 0)
+ 		return failed_strerror(msg, -err);
+ 
+@@ -2215,12 +2129,7 @@ int adapter_stop(struct btd_adapter *adapter)
+ 		adapter->disc_sessions = NULL;
+ 	}
+ 
+-	if (adapter->found_devices) {
+-		g_slist_foreach(adapter->found_devices,
+-				(GFunc) dev_info_free, NULL);
+-		g_slist_free(adapter->found_devices);
+-		adapter->found_devices = NULL;
+-	}
++	clear_found_devices_list(adapter);
+ 
+ 	if (adapter->oor_devices) {
+ 		g_slist_foreach(adapter->oor_devices, (GFunc) free, NULL);
+@@ -2468,7 +2377,7 @@ void adapter_set_state(struct btd_adapter *adapter, int state)
+ 	else if (adapter->disc_sessions && main_opts.discov_interval)
+ 		adapter->scheduler_id = g_timeout_add_seconds(
+ 						main_opts.discov_interval,
+-						(GSourceFunc) start_inquiry,
++						(GSourceFunc) adapter_start_inquiry,
+ 						adapter);
+ 
+ 	/* Send out of range */
 diff --git a/src/adapter.h b/src/adapter.h
-index 5fb4741..2356743 100644
+index 31eaea6..5fb4741 100644
 --- a/src/adapter.h
 +++ b/src/adapter.h
-@@ -161,6 +161,7 @@ struct btd_adapter_ops {
+@@ -95,7 +95,7 @@ struct btd_device *adapter_create_device(DBusConnection *conn,
+ 
+ int pending_remote_name_cancel(struct btd_adapter *adapter);
+ 
+-void remove_pending_device(struct btd_adapter *adapter);
++void clear_found_devices_list(struct btd_adapter *adapter);
+ 
+ struct btd_adapter *adapter_create(DBusConnection *conn, int id,
+ 				gboolean devup);
+@@ -160,6 +160,7 @@ struct btd_adapter_ops {
+ 	int (*set_discoverable) (int index);
  	int (*set_limited_discoverable) (int index, const uint8_t *cls,
  						gboolean limited);
- 	int (*start_discovery) (int index, gboolean periodic);
-+	int (*stop_discovery) (int index);
++	int (*start_discovery) (int index, gboolean periodic);
  };
  
  int btd_register_adapter_ops(struct btd_adapter_ops *btd_adapter_ops);
 diff --git a/src/dbus-hci.c b/src/dbus-hci.c
-index 089fd2e..8718465 100644
+index 37143cf..089fd2e 100644
 --- a/src/dbus-hci.c
 +++ b/src/dbus-hci.c
-@@ -1219,159 +1219,6 @@ int hcid_dbus_set_io_cap(bdaddr_t *local, bdaddr_t *remote,
- 	return 0;
- }
+@@ -452,9 +452,12 @@ void hcid_dbus_inquiry_start(bdaddr_t *local)
+ 	 * Cancel pending remote name request and clean the device list
+ 	 * when inquiry is supported in periodic inquiry idle state.
+ 	 */
+-	if (adapter_get_state(adapter) & PERIODIC_INQUIRY)
++	if (adapter_get_state(adapter) & PERIODIC_INQUIRY) {
+ 		pending_remote_name_cancel(adapter);
  
--int inquiry_cancel(int dd, int to)
--{
--	struct hci_request rq;
--	uint8_t status;
--
--	memset(&rq, 0, sizeof(rq));
--	rq.ogf    = OGF_LINK_CTL;
--	rq.ocf    = OCF_INQUIRY_CANCEL;
--	rq.rparam = &status;
--	rq.rlen   = sizeof(status);
--	rq.event = EVT_CMD_COMPLETE;
--
--	if (hci_send_req(dd, &rq, to) < 0)
--		return -1;
--
--	if (status) {
--		errno = bt_error(status);
--		return -1;
--	}
--
--	return 0;
--}
--
--static int remote_name_cancel(int dd, bdaddr_t *dba, int to)
--{
--	remote_name_req_cancel_cp cp;
--	struct hci_request rq;
--	uint8_t status;
--
--	memset(&rq, 0, sizeof(rq));
--	memset(&cp, 0, sizeof(cp));
--
--	bacpy(&cp.bdaddr, dba);
--
--	rq.ogf    = OGF_LINK_CTL;
--	rq.ocf    = OCF_REMOTE_NAME_REQ_CANCEL;
--	rq.cparam = &cp;
--	rq.clen   = REMOTE_NAME_REQ_CANCEL_CP_SIZE;
--	rq.rparam = &status;
--	rq.rlen = sizeof(status);
--	rq.event = EVT_CMD_COMPLETE;
--
--	if (hci_send_req(dd, &rq, to) < 0)
--		return -1;
--
--	if (status) {
--		errno = bt_error(status);
--		return -1;
--	}
--
--	return 0;
--}
--
--int cancel_discovery(struct btd_adapter *adapter)
--{
--	struct remote_dev_info *dev, match;
--	int dd, err = 0;
--	uint16_t dev_id = adapter_get_dev_id(adapter);
--
--	dd = hci_open_dev(dev_id);
--	if (dd < 0)
--		return -ENODEV;
--
--	/*
--	 * If there is a pending read remote name request means
--	 * that the inquiry complete event was already received
--	 */
--	memset(&match, 0, sizeof(struct remote_dev_info));
--	bacpy(&match.bdaddr, BDADDR_ANY);
--	match.name_status = NAME_REQUESTED;
--
--	dev = adapter_search_found_devices(adapter, &match);
--	if (dev) {
--		if (remote_name_cancel(dd, &dev->bdaddr,
--							HCI_REQ_TIMEOUT) < 0) {
--			err = -errno;
--			error("Read remote name cancel failed: %s, (%d)",
--						strerror(errno), errno);
--		}
--	} else {
--		if (inquiry_cancel(dd, HCI_REQ_TIMEOUT) < 0) {
--			err = -errno;
--			error("Inquiry cancel failed:%s (%d)",
--						strerror(errno), errno);
--		}
--	}
--
--	hci_close_dev(dd);
--
--	return err;
--}
--
--int periodic_inquiry_exit(int dd, int to)
--{
--	struct hci_request rq;
--	uint8_t status;
--
--	memset(&rq, 0, sizeof(rq));
--	rq.ogf    = OGF_LINK_CTL;
--	rq.ocf    = OCF_EXIT_PERIODIC_INQUIRY;
--	rq.rparam = &status;
--	rq.rlen   = sizeof(status);
--	rq.event = EVT_CMD_COMPLETE;
--
--	if (hci_send_req(dd, &rq, to) < 0)
--		return -1;
--
--	if (status) {
--		errno = status;
--		return -1;
--	}
--
--	return 0;
--}
--
--int cancel_periodic_discovery(struct btd_adapter *adapter)
--{
--	struct remote_dev_info *dev, match;
--	int dd, err = 0;
--	uint16_t dev_id = adapter_get_dev_id(adapter);
--
--	dd = hci_open_dev(dev_id);
--	if (dd < 0)
--		return -ENODEV;
--
--	/* find the pending remote name request */
--	memset(&match, 0, sizeof(struct remote_dev_info));
--	bacpy(&match.bdaddr, BDADDR_ANY);
--	match.name_status = NAME_REQUESTED;
--
--	dev = adapter_search_found_devices(adapter, &match);
--	if (dev) {
--		if (remote_name_cancel(dd, &dev->bdaddr,
--						HCI_REQ_TIMEOUT) < 0) {
--			err = -errno;
--			error("Read remote name cancel failed: %s, (%d)",
--						strerror(errno), errno);
--		}
--	}
--
--	/* ovewrite err if necessary: stop periodic inquiry has higher
--	 * priority */
--	if (periodic_inquiry_exit(dd, HCI_REQ_TIMEOUT) < 0) {
--		err = -errno;
--		error("Periodic Inquiry exit failed:%s (%d)",
--						strerror(errno), errno);
--	}
--
--	hci_close_dev(dd);
--
--	return err;
--}
--
- /* Most of the functions in this module require easy access to a connection so
-  * we keep it global here and provide these access functions the other (few)
-  * modules that require access to it */
-diff --git a/src/dbus-hci.h b/src/dbus-hci.h
-index 1cb10f3..d46ccf8 100644
---- a/src/dbus-hci.h
-+++ b/src/dbus-hci.h
-@@ -52,14 +52,9 @@ int hcid_dbus_link_key_notify(bdaddr_t *local, bdaddr_t *peer,
- 
- DBusMessage *new_authentication_return(DBusMessage *msg, uint8_t status);
- 
--int cancel_discovery(struct btd_adapter *adapter);
--int cancel_periodic_discovery(struct btd_adapter *adapter);
--
- int set_service_classes(int dd, const uint8_t *cls, uint8_t value);
- int set_major_and_minor_class(int dd, const uint8_t *cls,
- 						uint8_t major, uint8_t minor);
--int inquiry_cancel(int dd, int to);
--int periodic_inquiry_exit(int dd, int to);
- 
- const char *class_to_icon(uint32_t class);
- 
++		clear_found_devices_list(adapter);
++	}
++
+ 	/* Disable name resolution for non D-Bus clients */
+ 	if (!adapter_has_discov_sessions(adapter)) {
+ 		state = adapter_get_state(adapter);
 -- 
 1.5.6.3
 
