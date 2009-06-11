@@ -1,252 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH] Add udev mode to bluetoothd
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="=-e/t0MQ9BPYYm40QeduPw"
-Date: Thu, 11 Jun 2009 18:38:15 +0100
-Message-Id: <1244741895.11069.1319.camel@cookie.hadess.net>
-Mime-Version: 1.0
+Date: Thu, 11 Jun 2009 14:38:30 +0700
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: alokbarsode@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	Alok Barsode <alok.barsode@azingo.com>
+Subject: Re: [PATCH 2/2] Adding stop_discovery to hciops.
+Message-ID: <20090611073830.GB23159@jh-x301>
+References: <1244636452-22901-1-git-send-email-alok.barsode@azingo.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1244636452-22901-1-git-send-email-alok.barsode@azingo.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Alok,
 
---=-e/t0MQ9BPYYm40QeduPw
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+On Wed, Jun 10, 2009, alokbarsode@gmail.com wrote:
+> From: Alok Barsode <alok.barsode@azingo.com>
+> 
+> ---
+>  plugins/hciops.c |   27 ++++++++++
+>  src/adapter.c    |   42 +++++----------
+>  src/adapter.h    |    1 +
+>  src/dbus-hci.c   |  153 ------------------------------------------------------
+>  src/dbus-hci.h   |    5 --
+>  5 files changed, 42 insertions(+), 186 deletions(-)
 
-As discussed on IRC.
+This one is also pushed upstream. Thanks.
 
-Still needed:
-- patch to wait for the bus to startup in udev mode
-- udev rules
-- unleash for testing
-
-Cheers
-
---=-e/t0MQ9BPYYm40QeduPw
-Content-Disposition: attachment; filename="0001-Add-udev-mode-to-bluetoothd.patch"
-Content-Type: text/x-patch; name="0001-Add-udev-mode-to-bluetoothd.patch"; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-
->From 3e9257b31efcffbb8583f99770604b40a04410b2 Mon Sep 17 00:00:00 2001
-From: Bastien Nocera <hadess@hadess.net>
-Date: Thu, 11 Jun 2009 18:33:35 +0100
-Subject: [PATCH] Add udev mode to bluetoothd
-
-Add --udev option to bluetoothd, to allow it to be started on-demand
-from udev.
-
-When a new adapter appears, udev would launch bluetoothd --udev.
-
-To avoid problems with udev, bluetoothd --udev would only return
-an error exit code if it wasn't already running and a real error
-occurred.
-
-When no more Bluetooth adapter are present on the system, bluetoothd
-will exit after a 30 second timeout.
----
- src/dbus-common.c |   18 +++++++++++----
- src/hcid.h        |    3 ++
- src/main.c        |   63 +++++++++++++++++++++++++++++++++++++++++++++++++---
- src/manager.c     |    6 +++++
- 4 files changed, 81 insertions(+), 9 deletions(-)
-
-diff --git a/src/dbus-common.c b/src/dbus-common.c
-index b596909..d06d8e5 100644
---- a/src/dbus-common.c
-+++ b/src/dbus-common.c
-@@ -165,19 +165,27 @@ void hcid_dbus_exit(void)
- int hcid_dbus_init(void)
- {
- 	DBusConnection *conn;
-+	DBusError err;
- 
--	conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, BLUEZ_NAME, NULL);
--	if (!conn)
--		return -1;
-+	dbus_error_init(&err);
-+
-+	conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, BLUEZ_NAME, &err);
-+	if (!conn) {
-+		if (error != NULL && dbus_error_is_set(&err)) {
-+			dbus_error_free(&err);
-+			return -EIO;
-+		}
-+		return -EALREADY;
-+	}
- 
- 	if (g_dbus_set_disconnect_function(conn, disconnect_callback,
- 							NULL, NULL) == FALSE) {
- 		dbus_connection_unref(conn);
--		return -1;
-+		return -EIO;
- 	}
- 
- 	if (!manager_init(conn, "/"))
--		return -1;
-+		return -EIO;
- 
- 	set_dbus_connection(conn);
- 
-diff --git a/src/hcid.h b/src/hcid.h
-index 4fbbef1..605dc06 100644
---- a/src/hcid.h
-+++ b/src/hcid.h
-@@ -85,6 +85,9 @@ void hci_req_queue_remove(int dev_id, bdaddr_t *dba);
- void start_security_manager(int hdev);
- void stop_security_manager(int hdev);
- 
-+void btd_start_exit_timer(void);
-+void btd_stop_exit_timer(void);
-+
- void set_pin_length(bdaddr_t *sba, int length);
- 
- gboolean plugin_init(GKeyFile *config);
-diff --git a/src/main.c b/src/main.c
-index 0467fe1..8c2b475 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -27,6 +27,7 @@
- #include <config.h>
- #endif
- 
-+#include <errno.h>
- #include <stdio.h>
- #include <unistd.h>
- #include <stdlib.h>
-@@ -55,6 +56,8 @@
- #include "agent.h"
- #include "manager.h"
- 
-+#define LAST_ADAPTER_EXIT_TIMEOUT 30
-+
- struct main_opts main_opts;
- 
- static GKeyFile *load_config(const char *file)
-@@ -331,6 +334,37 @@ static void sig_debug(int sig)
- 
- static gboolean option_detach = TRUE;
- static gboolean option_debug = FALSE;
-+static gboolean option_udev = FALSE;
-+
-+static guint last_adapter_timeout = 0;
-+
-+static gboolean exit_timeout(gpointer data)
-+{
-+	g_main_loop_quit(event_loop);
-+	last_adapter_timeout = 0;
-+	return FALSE;
-+}
-+
-+void btd_start_exit_timer(void)
-+{
-+	if (option_udev == FALSE)
-+		return;
-+
-+	if (last_adapter_timeout > 0)
-+		g_source_remove(last_adapter_timeout);
-+
-+	last_adapter_timeout = g_timeout_add_seconds(LAST_ADAPTER_EXIT_TIMEOUT,
-+						exit_timeout, NULL);
-+}
-+
-+void btd_stop_exit_timer(void)
-+{
-+	if (last_adapter_timeout == 0)
-+		return;
-+
-+	g_source_remove(last_adapter_timeout);
-+	last_adapter_timeout = 0;
-+}
- 
- static GOptionEntry options[] = {
- 	{ "nodaemon", 'n', G_OPTION_FLAG_REVERSE,
-@@ -338,6 +372,8 @@ static GOptionEntry options[] = {
- 				"Don't run as daemon in background" },
- 	{ "debug", 'd', 0, G_OPTION_ARG_NONE, &option_debug,
- 				"Enable debug information output" },
-+	{ "udev", 'u', 0, G_OPTION_ARG_NONE, &option_udev,
-+				"Run from udev mode of operation" },
- 	{ NULL },
- };
- 
-@@ -363,9 +399,21 @@ int main(int argc, char *argv[])
- 		exit(1);
- 	}
- 
-+	if (option_udev == TRUE) {
-+		int err;
-+
-+		option_detach = TRUE;
-+		err = hcid_dbus_init();
-+		if (err < 0) {
-+			if (err == -EALREADY)
-+				exit(0);
-+			exit(1);
-+		}
-+	}
-+
- 	g_option_context_free(context);
- 
--	if (option_detach == TRUE) {
-+	if (option_detach == TRUE && option_udev == FALSE) {
- 		if (daemon(0, 0)) {
- 			perror("Can't start daemon");
- 			exit(1);
-@@ -399,9 +447,16 @@ int main(int argc, char *argv[])
- 
- 	agent_init();
- 
--	if (hcid_dbus_init() < 0) {
--		error("Unable to get on D-Bus");
--		exit(1);
-+	if (option_udev == FALSE) {
-+		if (hcid_dbus_init() < 0) {
-+			error("Unable to get on D-Bus");
-+			exit(1);
-+		}
-+	} else {
-+		if (daemon(0, 0)) {
-+			perror("Can't start daemon");
-+			exit(1);
-+		}
- 	}
- 
- 	start_sdp_server(mtu, main_opts.deviceid, SDP_SERVER_COMPAT);
-diff --git a/src/manager.c b/src/manager.c
-index db6d251..ab69e4e 100644
---- a/src/manager.c
-+++ b/src/manager.c
-@@ -43,6 +43,7 @@
- 
- #include <gdbus.h>
- 
-+#include "hcid.h"
- #include "dbus-common.h"
- #include "logging.h"
- #include "adapter.h"
-@@ -312,6 +313,9 @@ static void manager_remove_adapter(struct btd_adapter *adapter)
- 			DBUS_TYPE_INVALID);
- 
- 	adapter_remove(adapter);
-+
-+	if (adapters == NULL)
-+		btd_start_exit_timer();
- }
- 
- void manager_cleanup(DBusConnection *conn, const char *path)
-@@ -421,6 +425,8 @@ void manager_add_adapter(const char *path)
- 			DBUS_TYPE_INVALID);
- 
- 	manager_update_adapters();
-+
-+	btd_stop_exit_timer();
- }
- 
- int manager_register_adapter(int id, gboolean devup)
--- 
-1.6.2.2
-
-
---=-e/t0MQ9BPYYm40QeduPw--
-
+Johan
