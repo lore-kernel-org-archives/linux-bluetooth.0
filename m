@@ -1,30 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 11 Jun 2009 14:37:31 +0700
+Date: Thu, 11 Jun 2009 14:26:55 +0700
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: alokbarsode@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	Alok Barsode <alok.barsode@azingo.com>
-Subject: Re: [PATCH 1/2] Adding start_discovery to hciops plugin.
-Message-ID: <20090611073731.GA23159@jh-x301>
-References: <1244636441-22878-1-git-send-email-alok.barsode@azingo.com>
+To: Forrest Zhao <forrest.zhao@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, forrest.zhao@gmail.com
+Subject: Re: [PATCH] add support for PBAP integration with EDS
+Message-ID: <20090611072655.GA20058@jh-x301>
+References: <1244621622-6487-1-git-send-email-forrest.zhao@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1244636441-22878-1-git-send-email-alok.barsode@azingo.com>
+In-Reply-To: <1244621622-6487-1-git-send-email-forrest.zhao@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alok,
+Hi Forrest,
 
-On Wed, Jun 10, 2009, alokbarsode@gmail.com wrote:
-> From: Alok Barsode <alok.barsode@azingo.com>
-> 
+On Wed, Jun 10, 2009, Forrest Zhao wrote:
 > ---
->  plugins/hciops.c |   42 +++++++++++++++++
->  src/adapter.c    |  133 +++++++++---------------------------------------------
->  src/adapter.h    |    3 +-
->  src/dbus-hci.c   |    5 ++-
->  4 files changed, 69 insertions(+), 114 deletions(-)
+>  plugins/ebook.c  |  344 ++++++++++++++++++++++++++++++++++++++++++++++++++++--
+>  test/pbap-client |    1 +
+>  2 files changed, 334 insertions(+), 11 deletions(-)
 
-Pushed upstream. Thanks.
+The patch has now been pushed with a few minor changes:
+
+> +#define DEFAULT_COUNT	65535
+
+Space instead of tab since there's no special indentation needed for the
+value.
+
+> +			gint32 i;
+> +			const char *attrib_name = e_vcard_attribute_get_name(
+> +						(EVCardAttribute *)l->data);
+> +
+> +			for (i = 0; i <= 28; i++) {
+
+No need to have a specialized gint32 variable type here. Just use int.
+
+> +			gint32 i;
+> +			const char *attrib_name = e_vcard_attribute_get_name(
+> +						(EVCardAttribute *)l->data);
+> +			for (i = 0; i <= 28; i++) {
+
+Same here.
+
+About the vcard generation. Would it make sense to make some common helper
+module for it so other contact backends woldn't need to duplicate all of
+it?
 
 Johan
