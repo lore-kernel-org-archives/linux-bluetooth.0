@@ -1,38 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 12 Jun 2009 15:25:10 +0200 (CEST)
-From: Jiri Kosina <jkosina@suse.cz>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Bastien Nocera <hadess@hadess.net>,
-	linux-bluetooth@vger.kernel.org,
-	linux-input <linux-input@vger.kernel.org>
-Subject: Re: Apple Bluetooth devices: Battery level?
-In-Reply-To: <1244617386.3068.22.camel@localhost.localdomain>
-Message-ID: <alpine.LNX.2.00.0906121521490.7457@wotan.suse.de>
-References: <1244384236.30768.5690.camel@cookie.hadess.net>  <alpine.LRH.2.00.0906081530330.31685@twin.jikos.cz>  <1244589738.5973.1954.camel@cookie.hadess.net> <1244617386.3068.22.camel@localhost.localdomain>
+Date: Fri, 12 Jun 2009 09:46:05 +0100 (BST)
+To: Nick Pelly <npelly@google.com>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	davem@davemloft.net
+Subject: Re: Expected behavior of shutdown() in multi-threaded socket
+ programming
+In-Reply-To: <35c90d960906111724w4794b40aw1c51d64586ecaeb6@mail.gmail.com>
+References: <35c90d960905191429x1c3b6104qca2a672d50f0364c@mail.gmail.com> <35c90d960906111724w4794b40aw1c51d64586ecaeb6@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII
+Message-Id: <1244796365.448636.603.nullmailer@galant.ukfsn.org>
+From: Iain Hibbert <plunky@rya-online.net>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 10 Jun 2009, Marcel Holtmann wrote:
+On Thu, 11 Jun 2009, Nick Pelly wrote:
 
-> there is no real downside in having this all times available since you
-> have to store that binary record somewhere anyway during runtime. We
-> should fix that and put it into debugfs, but nobody bothered so far
-> sending a patch for it. 
+> Any comments on this one? I would like to correct the behavior of
+> shutdown() on AF_BLUETOOTH sockets, but I have been advised by Marcel
+> Holtmann that we need to agree on the correct behavior first.
+>
+> How should shutdown() behave when other threads are blocked on the same socket?
 
-JFYI, I have just pushed super-preliminary version of the code that moves 
-the whole HID-device debugging (report descriptor and report/event 
-dumping) into debugfs. It's 'debugfs' branch of my HID tree, for those who 
-are interested.
-Please bear in mind that this is more or less a snapshot of the current 
-code (which is working, though), not production quality yet. Hopefully 
-they will get properly polished for 2.6.31.
+IMHO consistency should apply.
 
-I will post the patches as a followup to this mail, if anyone is 
-interested.
+The opengroup specification for shutdown() says
 
-Comments and patches welcome, as usual.
+  "The shutdown() function shall cause all or part of a full-duplex
+  connection on the socket associated with the file descriptor socket to
+  be shut down."
 
--- 
-Jiri Kosina
-SUSE Labs
+and while that does not really cover the case when the socket is blocked
+in accept(), if all the other socket types abort the block then that is
+what the PF_BLUETOOTH sockets should do too.
+
+The opengroup specification for accept() suggests EINVAL would be returned
+if the socket was not accepting connections and arguably that is the case
+after a shutdown(), though ECONNABORTED could be used too (your program
+displays ECONNABORTED on NetBSD for instance)
+
+> I also have similar results for other blocking syscalls such as
+> connect(), read(), write(), poll() etc, but the test program is not as
+> simple.
+
+They should all handle the shutdown().
+
+iain
