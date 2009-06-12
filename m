@@ -1,41 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A320683.7000103@suse.de>
-Date: Fri, 12 Jun 2009 09:40:51 +0200
-From: Stefan Seyfried <seife@suse.de>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Add udev mode to bluetoothd
-References: <1244741895.11069.1319.camel@cookie.hadess.net> <1244742638.27363.51.camel@violet>
-In-Reply-To: <1244742638.27363.51.camel@violet>
-Content-Type: text/plain; charset=ISO-8859-15
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <35c90d960905191429x1c3b6104qca2a672d50f0364c@mail.gmail.com>
+References: <35c90d960905191429x1c3b6104qca2a672d50f0364c@mail.gmail.com>
+From: Nick Pelly <npelly@google.com>
+Date: Thu, 11 Jun 2009 17:24:21 -0700
+Message-ID: <35c90d960906111724w4794b40aw1c51d64586ecaeb6@mail.gmail.com>
+Subject: Re: Expected behavior of shutdown() in multi-threaded socket
+	programming
+To: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	davem@davemloft.net
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Marcel Holtmann wrote:
-> Hi Bastien,
-> 
->> As discussed on IRC.
->>
->> Still needed:
->> - patch to wait for the bus to startup in udev mode
+Any comments on this one? I would like to correct the behavior of
+shutdown() on AF_BLUETOOTH sockets, but I have been advised by Marcel
+Holtmann that we need to agree on the correct behavior first.
 
-Should we really do that? (What if the bus never appears?, how long should we
-wait?)
-The alternative (not overwhelmingly nice, I admit) would be to record
-somewhere in the system that bluetoothd tried to start but could not due to
-the missing bus and then start it "manually" by an init script that is
-guaranteed to run after DBus is started.
+How should shutdown() behave when other threads are blocked on the same socket?
 
-I had patches for waiting for the bus long time ago and can dig them out if
-wanted.
+More detail in the original mail below.
 
-Best regards,
+Thanks,
+Nick
 
-	Stefan
--- 
-Stefan Seyfried
-R&D Team Mobile Devices            |              "Any ideas, John?"
-SUSE LINUX Products GmbH, Nürnberg | "Well, surrounding them's out."
-
-This footer brought to you by insane German lawmakers:
-SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG Nürnberg)
+On Tue, May 19, 2009 at 2:29 PM, Nick Pelly<npelly@google.com> wrote:
+> Hi,
+>
+> I am interested in the expected behavior of shutdown() on a socket
+> that is also blocked on connect(), accept(), read(), write(), poll()
+> or select() in another thread.
+>
+> For example:
+>
+> THREAD 1
+> fd = socket()
+> listen(fd)
+> bind(fd)
+> accept(fd)  <--- blocks
+>
+> THREAD 2
+> shutdown(fd)  <--- what is meant to happen to accept() in thread 1?
+>
+> If thread 2 is run after thread 1, what should happen to the blocked
+> accept() call when shutdown() is called in thread 2?
+>
+>
+> My observations are that
+> TCP sockets: accept() immediately returns with errno EINVAL
+> unix domain sockets: accept() immediately returns with return errno EINVAL
+> RFCOMM sockets: accept() continues to block
+> L2CAP sockets: accept() continues to block
+>
+> I tested on 2.6.18, 2.6.28 and 2.6.29 and results were the same.
+>
+> Included is a sample program sock_shutdown_test.c that can easily
+> exhibit this behavior. For example
+> sock_shutdown_test unix accept_shutdown  # accept() returns
+> sock_shutdown_test tcp accept_shutdown   # accept() returns
+> sock_shutdown_test rfcomm accept_shutdown   # accept() blocks forever
+> sock_shutdown_test l2cap accept_shutdown   # accept() blocks forever
+>
+> I also have similar results for other blocking syscalls such as
+> connect(), read(), write(), poll() etc, but the test program is not as
+> simple.
+>
+> So my question is: What is the correct behavior for sockets here?
+>
+>
+> It is desirable for Android that shutdown() to force other threads
+> blocked on that socket to return. In fact, if they don't it makes
+> multi-threaded socket programming very hard since there is no other
+> simple way to abort a blocked I/O operation. We have to resort to
+> using poll() in combination with a selfpipe that we can write a byte
+> to in order to abort the poll(). But this is quite inefficient as it
+> triples the number of fd's needed for every socket not to mention the
+> 4k buffer space needed in the kernel for the selfpipe. A global
+> selfpipe per process is an improvement but it is quite messy getting
+> this correct without race conditions.
+>
+>
+> Input as to the correct behavior is appreciated,
+> Nick
+>
