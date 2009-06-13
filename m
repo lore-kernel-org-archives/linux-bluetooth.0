@@ -1,67 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 13 Jun 2009 14:16:15 +0100 (BST)
-To: Jiri Kosina <jkosina@suse.cz>
-Cc: Bastien Nocera <hadess@hadess.net>,
-	linux-bluetooth@vger.kernel.org,
-	linux-input <linux-input@vger.kernel.org>
-Subject: Re: Apple Bluetooth devices: Battery level?
-In-Reply-To: <alpine.LNX.2.00.0906121529210.7457@wotan.suse.de>
-References: <1244384236.30768.5690.camel@cookie.hadess.net>  <alpine.LRH.2.00.0906081530330.31685@twin.jikos.cz> <1244642769.2690.51.camel@cookie.hadess.net> <alpine.LNX.2.00.0906121529210.7457@wotan.suse.de>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Message-Id: <1244898975.477818.1961.nullmailer@galant.ukfsn.org>
-From: Iain Hibbert <plunky@rya-online.net>
+Date: Sat, 13 Jun 2009 21:13:00 +0900
+Message-ID: <434c4b6e0906130513r74959ee2u3bf8c2892a961c66@mail.gmail.com>
+Subject: Re-configuration Issue about A2DP
+From: "Chanyeol,Park" <chanyeol.park@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 12 Jun 2009, Jiri Kosina wrote:
+Hello
 
-> It doesn't seem to be sending the battery level in a standard-compliant
-> way, at least according to these reports.
+Have you experience A2DP connection lost or corruption, when a user
+changes A2DP configuration between mono and stereo, or between 44.1khz
+48khz
 
-but I wonder what is the standard-compliant way?
+Though I check bluez receives Close Cfm from headset , and Bluez sends
+set_configuration to stereo headset. However Bluez get an error”
+"Stream End Point in Use( 19). -.-;
 
-> Could you also please post the report descriptor data? They should appear
-> in a hid debugging mode once the mouse is connected.
+I couldn’t understand why this error occurs.
 
-Sorry, I posted a parsed version of the report descriptor previously
-though I failed to cross post:
+I guess you know this situation very well.. ^^
 
-Collection page=Generic_Desktop usage=Mouse
-  Input id=2 size=1 count=1 page=Button usage=Button_1 Variable, logical range 0..1
-  Input id=2 size=1 count=1 page=Button usage=Button_2 Variable, logical range 0..1
-  Input id=2 size=1 count=1 page=Button usage=Button_3 Variable, logical range 0..1
-  Input id=2 size=1 count=1 page=Button usage=Button_4 Variable, logical range 0..1
-  Input id=2 size=4 count=1 page=0x0000 usage=0x0000 Const Variable, logical range 0..1
-Collection page=Generic_Desktop usage=Pointer
-  Input id=2 size=8 count=1 page=Generic_Desktop usage=X Variable Relative, logical range -127..127
-  Input id=2 size=8 count=1 page=Generic_Desktop usage=Y Variable Relative, logical range -127..127
-  Input id=2 size=8 count=1 page=Consumer usage=AC_Pan Variable Relative, logical range -127..127
-  Input id=2 size=8 count=1 page=Generic_Desktop usage=Wheel Variable Relative, logical range -127..127
-End collection
-  Input id=2 size=8 count=1 page=0x00ff usage=0x00c0 Variable, logical range -127..127
-Feature id=71 size=8 count=1 page=Device_Controls usage=Battery_Strength Variable NoPref Volatile, logical range 0..100
-End collection
+If possible, could you explain that scenario or give me other information?
 
-As you can see, there is a Feature report relating to the Battery
-Strength, but I do not know what to do with that. I suppose that it is to
-be polled in order to return a percentage value..
 
-> Does 00ff.00c0 usage change it's value if you put different batteries into
-> the mouse?
-
-The mighty mouse has a single hard shell and detects the difference
-between left click and right click by a capacitance detector underneath
-the finger positions. This usage contains bits indicating where the mouse
-is being touched though I guess it is just for testing as the OS does not
-really need to know (it generates normal button clicks).
-
-There is one more data point that may be interesting. The mighty mouse
-(and an old Apple keyboard I have) spits out an input report that is not
-mentioned in the descriptor with id=48 just before the battery fails. I
-captured it once and it contained a single byte with value 0x01. I have no
-idea what that report is for but as I use NiMH batteries which maintain
-voltage until very near the end, it could be a charge level warning.
-
-regards,
-iain
+Thank you~
