@@ -1,37 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <434c4b6e0906130513r74959ee2u3bf8c2892a961c66@mail.gmail.com>
-References: <434c4b6e0906130513r74959ee2u3bf8c2892a961c66@mail.gmail.com>
-Date: Sat, 13 Jun 2009 17:23:15 -0300
-Message-ID: <2d5a2c100906131323m158007ecgd7f4a738a5ed660@mail.gmail.com>
-Subject: Re: Re-configuration Issue about A2DP
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "Chanyeol,Park" <chanyeol.park@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=windows-1252
+Subject: Re: [PATCH] Add udev mode to bluetoothd
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: Stefan Seyfried <seife@suse.de>, linux-bluetooth@vger.kernel.org
+In-Reply-To: <1244829538.11069.2800.camel@cookie.hadess.net>
+References: <1244741895.11069.1319.camel@cookie.hadess.net>
+	 <1244742638.27363.51.camel@violet>  <4A320683.7000103@suse.de>
+	 <1244796020.3280.13.camel@snoogens.fab.redhat.com>
+	 <1244820498.5536.7.camel@violet>
+	 <1244829538.11069.2800.camel@cookie.hadess.net>
+Content-Type: text/plain
+Date: Sat, 13 Jun 2009 21:51:35 +0200
+Message-Id: <1244922695.1852.8.camel@violet>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Bastien,
 
-On Sat, Jun 13, 2009 at 9:13 AM, Chanyeol,Park<chanyeol.park@gmail.com> wrote:
-> Hello
->
-> Have you experience A2DP connection lost or corruption, when a user
-> changes A2DP configuration between mono and stereo, or between 44.1khz
-> 48khz
->
-> Though I check bluez receives Close Cfm from headset , and Bluez sends
-> set_configuration to stereo headset. However Bluez get an error”
-> "Stream End Point in Use( 19). -.-;
+> > > Under normal conditions, we'd exit(1) if started and the bus isn't
+> > > available, and udev would pick that up, marking our job as failed, and
+> > > relaunching us later in the boot process, under coldplug.
+> > > 
+> > > Marcel didn't like the idea though.
+> > 
+> > so how does udev handle this exactly. We try bluetoothd and it fails,
+> > then it tries again later? What time exactly? How often? Does this
+> > affect the fast-boot effort?
+> 
+> It will try to start up bluetooth as soon as it sees the device on
+> startup. bluetoothd will fail to start, as D-Bus isn't started, with an
+> exit code of 1.
+> 
+> udev notes the failure, and saves the rules to /dev/.udev/*.
+> 
+> The initscripts carry on, filesystems are mounted rw, D-Bus is started,
+> then a udev "coldplug" is started (still part of the initscripts), and
+> bluetoothd is started as expected.
+> 
+> I built some test packages yesterday, and Petr tested those, and it
+> seems to work as expected.
+> 
+> If you fancy trying out on an F-12 system (the SRPM can be re-used on
+> F-11, just remove the libgudev-devel BuildRequires line):
+> http://koji.fedoraproject.org/koji/buildinfo?buildID=105952
+> 
+> So as far as I'm concerned, the only thing missing is getting the rules
+> into bluez.
+> 
+> Marcel, do you want the udev rules installed by default? The cost would
+> be an attempted run at bluetoothd on each adapter insertion, but it
+> would still work as expected if bluetoothd was started from an
+> initscript.
 
-Ive got the same problem with some headsets, basically they only
-unlock the end point after some time. Not sure if adding an interval
-for reconfiguring would help since that seems to depend on the
-headset, anyway please provide the output of hcidump and bluetoothd so
-we can investigate what could be done in this case.
+I have no problem triggering bluetoothd from udev every time we add a
+new adapter. And unless we try it, we never know. I am a little bit
+concerned about the boot time implications of this.
+
+Send me a patch with the rules installation and lets make it default. We
+see how far we get. I do hate init scripts anyway and if they get too
+complex it costs us actually more time at boot than just starting the
+daemon.
+
+Regards
+
+Marcel
 
 
--- 
-Luiz Augusto von Dentz
-Engenheiro de Computação
