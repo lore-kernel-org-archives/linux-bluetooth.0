@@ -1,66 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Add udev mode to bluetoothd
+Subject: Re: False negative checking for SSP support
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: Stefan Seyfried <seife@suse.de>, linux-bluetooth@vger.kernel.org
-In-Reply-To: <1244829538.11069.2800.camel@cookie.hadess.net>
-References: <1244741895.11069.1319.camel@cookie.hadess.net>
-	 <1244742638.27363.51.camel@violet>  <4A320683.7000103@suse.de>
-	 <1244796020.3280.13.camel@snoogens.fab.redhat.com>
-	 <1244820498.5536.7.camel@violet>
-	 <1244829538.11069.2800.camel@cookie.hadess.net>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Bastien Nocera <hadess@hadess.net>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <20090613194310.GA27600@jh-x301>
+References: <1244919968.11069.4360.camel@localhost.localdomain>
+	 <20090613194310.GA27600@jh-x301>
 Content-Type: text/plain
-Date: Sat, 13 Jun 2009 21:51:35 +0200
-Message-Id: <1244922695.1852.8.camel@violet>
+Date: Sat, 13 Jun 2009 21:47:41 +0200
+Message-Id: <1244922461.1852.5.camel@violet>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+Hi Johan,
 
-> > > Under normal conditions, we'd exit(1) if started and the bus isn't
-> > > available, and udev would pick that up, marking our job as failed, and
-> > > relaunching us later in the boot process, under coldplug.
-> > > 
-> > > Marcel didn't like the idea though.
+> > I'm slowly adding SSP 2.1 support to gnome-bluetooth. For that, I got a
+> > laptop running Fedora 11, with a Bluetooth 2.1 dongle, in addition to
+> > the one in the machine I'm trying to pair from.
 > > 
-> > so how does udev handle this exactly. We try bluetoothd and it fails,
-> > then it tries again later? What time exactly? How often? Does this
-> > affect the fast-boot effort?
+> > Is there any reason why the other machine shows up as not supporting
+> > SSP, when it actually does?
 > 
-> It will try to start up bluetooth as soon as it sees the device on
-> startup. bluetoothd will fail to start, as D-Bus isn't started, with an
-> exit code of 1.
+> Do both of the machines support 2.1? The LegacyPairing property tells you
+> whether SSP is likely to be triggered or not when you try to pair. It
+> doesn't tell you whether other device supports SSP or not e.g. if your
+> local adapter is pre-2.1 (but if your local adapter is 2.1 capable the
+> property should be a good indicator of SSP support).
 > 
-> udev notes the failure, and saves the rules to /dev/.udev/*.
-> 
-> The initscripts carry on, filesystems are mounted rw, D-Bus is started,
-> then a udev "coldplug" is started (still part of the initscripts), and
-> bluetoothd is started as expected.
-> 
-> I built some test packages yesterday, and Petr tested those, and it
-> seems to work as expected.
-> 
-> If you fancy trying out on an F-12 system (the SRPM can be re-used on
-> F-11, just remove the libgudev-devel BuildRequires line):
-> http://koji.fedoraproject.org/koji/buildinfo?buildID=105952
-> 
-> So as far as I'm concerned, the only thing missing is getting the rules
-> into bluez.
-> 
-> Marcel, do you want the udev rules installed by default? The cost would
-> be an attempted run at bluetoothd on each adapter insertion, but it
-> would still work as expected if bluetoothd was started from an
-> initscript.
+> In theory it is possible to get a false positive for LegacyPairing if the
+> other device is 2.1 but for some reason has extended inquiry response
+> disabled (iirc the spec mandates EIR if SSP is enabled). However, if both
+> sides have bluez and 2.1 HW then both EIR and SSP should automatically be
+> get enabled by bluetoothd. If that's not happening we may have a bug
+> somewhere (which I haven't seen with any of my 2.1 adapters).
 
-I have no problem triggering bluetoothd from udev every time we add a
-new adapter. And unless we try it, we never know. I am a little bit
-concerned about the boot time implications of this.
-
-Send me a patch with the rules installation and lets make it default. We
-see how far we get. I do hate init scripts anyway and if they get too
-complex it costs us actually more time at boot than just starting the
-daemon.
+it is actually the other way around. You can only use EIR if you enable
+SSP. However you can have SSP without EIR.
 
 Regards
 
