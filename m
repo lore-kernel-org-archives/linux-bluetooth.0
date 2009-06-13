@@ -1,50 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
 Subject: Re: False negative checking for SSP support
 From: Bastien Nocera <hadess@hadess.net>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <20090613194310.GA27600@jh-x301>
+In-Reply-To: <1244921813.1852.2.camel@violet>
 References: <1244919968.11069.4360.camel@localhost.localdomain>
-	 <20090613194310.GA27600@jh-x301>
+	 <1244921813.1852.2.camel@violet>
 Content-Type: text/plain
-Date: Sun, 14 Jun 2009 00:21:55 +0100
-Message-Id: <1244935315.11069.4629.camel@localhost.localdomain>
+Date: Sat, 13 Jun 2009 20:45:55 +0100
+Message-Id: <1244922355.11069.4410.camel@localhost.localdomain>
 Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, 2009-06-13 at 22:43 +0300, Johan Hedberg wrote:
+On Sat, 2009-06-13 at 21:36 +0200, Marcel Holtmann wrote:
 > Hi Bastien,
 > 
-> On Sat, Jun 13, 2009, Bastien Nocera wrote:
 > > I'm slowly adding SSP 2.1 support to gnome-bluetooth. For that, I got a
 > > laptop running Fedora 11, with a Bluetooth 2.1 dongle, in addition to
 > > the one in the machine I'm trying to pair from.
 > > 
 > > Is there any reason why the other machine shows up as not supporting
 > > SSP, when it actually does?
+> > 
+> > We already handle that case in the wizard, but it would be nicer if it
+> > did detect it.
 > 
-> Do both of the machines support 2.1? The LegacyPairing property tells you
-> whether SSP is likely to be triggered or not when you try to pair. It
-> doesn't tell you whether other device supports SSP or not e.g. if your
-> local adapter is pre-2.1 (but if your local adapter is 2.1 capable the
-> property should be a good indicator of SSP support).
-> 
-> In theory it is possible to get a false positive for LegacyPairing if the
-> other device is 2.1 but for some reason has extended inquiry response
-> disabled (iirc the spec mandates EIR if SSP is enabled). However, if both
-> sides have bluez and 2.1 HW then both EIR and SSP should automatically be
-> get enabled by bluetoothd. If that's not happening we may have a bug
-> somewhere (which I haven't seen with any of my 2.1 adapters).
+> it could be an older kernel or some other detail. Did you check with
+> hciconfig hci0 sspmode that it is enabled on both sides? You can
+> manually disable it (actually bluetoothd has to manually enable it).
 
-Both machines were running F-11, with the same kernel and versions of
-bluez, and the same Belkin BT 2.1 adapter that has SSP working with
-another 2.1 device.
+SSP pairing works, between both machines, so I don't think that's the
+problem (though the device creation never seems to finish).
 
-The problem seems to have been fixed by me upgrading to bluez 4.40.
-Either that or my tests weren't properly done.
+> We might also have a bug in LegacyPairing property. Could be that it is
+> not working correctly. Can you post dumps and further details.
 
-In any cases, I'll know for next time.
+It correctly detects a headset as being SSP. What kind of dumps do you
+want? Just a dump on the computer that's initiating the pairing, from
+the discovery process?
+
+I'll update my bluez first on both machines, and test again.
 
 Cheers
-
