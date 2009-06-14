@@ -1,44 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: False negative checking for SSP support
-From: Bastien Nocera <hadess@hadess.net>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1244921813.1852.2.camel@violet>
-References: <1244919968.11069.4360.camel@localhost.localdomain>
-	 <1244921813.1852.2.camel@violet>
-Content-Type: text/plain
-Date: Sat, 13 Jun 2009 20:45:55 +0100
-Message-Id: <1244922355.11069.4410.camel@localhost.localdomain>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <2d5a2c100906131323m158007ecgd7f4a738a5ed660@mail.gmail.com>
+References: <434c4b6e0906130513r74959ee2u3bf8c2892a961c66@mail.gmail.com>
+	 <2d5a2c100906131323m158007ecgd7f4a738a5ed660@mail.gmail.com>
+Date: Sun, 14 Jun 2009 13:58:06 +0900
+Message-ID: <434c4b6e0906132158o1cfc8190xe53dc9532582e33f@mail.gmail.com>
+Subject: Re: Re-configuration Issue about A2DP
+From: "Chanyeol,Park" <chanyeol.park@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, 2009-06-13 at 21:36 +0200, Marcel Holtmann wrote:
-> Hi Bastien,
-> 
-> > I'm slowly adding SSP 2.1 support to gnome-bluetooth. For that, I got a
-> > laptop running Fedora 11, with a Bluetooth 2.1 dongle, in addition to
-> > the one in the machine I'm trying to pair from.
-> > 
-> > Is there any reason why the other machine shows up as not supporting
-> > SSP, when it actually does?
-> > 
-> > We already handle that case in the wizard, but it would be nicer if it
-> > did detect it.
-> 
-> it could be an older kernel or some other detail. Did you check with
-> hciconfig hci0 sspmode that it is enabled on both sides? You can
-> manually disable it (actually bluetoothd has to manually enable it).
+Before sending that log(this is my home..-.-),
+I provide an additional information
+ because I want to check what I asked is exactly what you saw ^^.
 
-SSP pairing works, between both machines, so I don't think that's the
-problem (though the device creation never seems to finish).
+In a2dp_source_config() , it checks avdtp_stream_has_capabilities().
+Below cae, I saw avdtp_close():(1385 line) and set
+setup-reconfiguration is TRUE;
+and I saw bluez receive Close_cfm. and after that a2dp_reconfigure()
+was called...
 
-> We might also have a bug in LegacyPairing property. Could be that it is
-> not working correctly. Can you post dumps and further details.
+However... It doesn't work well...-.-;
 
-It correctly detects a headset as being SSP. What kind of dumps do you
-want? Just a dump on the computer that's initiating the pairing, from
-the discovery process?
+Did you mean to add RECONFIGURE_TIMEOUT more than 500 ms...?
 
-I'll update my bluez first on both machines, and test again.
 
-Cheers
+After doing that, I would send the more log..
+
+
+
+
+2009/6/14 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
+> Hi,
+>
+> On Sat, Jun 13, 2009 at 9:13 AM, Chanyeol,Park<chanyeol.park@gmail.com> wrote:
+>> Hello
+>>
+>> Have you experience A2DP connection lost or corruption, when a user
+>> changes A2DP configuration between mono and stereo, or between 44.1khz
+>> 48khz
+>>
+>> Though I check bluez receives Close Cfm from headset , and Bluez sends
+>> set_configuration to stereo headset. However Bluez get an error”
+>> "Stream End Point in Use( 19). -.-;
+>
+> Ive got the same problem with some headsets, basically they only
+> unlock the end point after some time. Not sure if adding an interval
+> for reconfiguring would help since that seems to depend on the
+> headset, anyway please provide the output of hcidump and bluetoothd so
+> we can investigate what could be done in this case.
+>
+>
+> --
+> Luiz Augusto von Dentz
+> Engenheiro de Computação
+>
