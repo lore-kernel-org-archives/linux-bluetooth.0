@@ -1,34 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: John Frankish <j-frankish@slb.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 15 Jun 2009 11:48:33 +0200
-Subject: bluetooth, dbus and bluetooth headsets
-Message-ID: <6AC5A55546F64545AE996F8200E3AC4E069AA3A5@NL0105EXC01V01.eur.slb.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Subject: Re: [PATCH] Remove hid2hci from bluez
+From: Bastien Nocera <hadess@hadess.net>
+To: Simon Kenyon <simon@koala.ie>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <4A360453.1090501@koala.ie>
+References: <6BE8CE7840AC9F459EF5A0693CA2744D5DB52E@ausx3mpc138.aus.amer.dell.com>
+	 <4A360453.1090501@koala.ie>
+Content-Type: text/plain
+Date: Mon, 15 Jun 2009 11:03:52 +0100
+Message-Id: <1245060232.11069.6736.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I've been trying to get a bt headset to work again with bluez for some time now, so I'd appreciate any help available on this - about the last time it worked was circa bluez-4.17 - I used:
+On Mon, 2009-06-15 at 09:20 +0100, Simon Kenyon wrote:
+> Mario_Limonciello@Dell.com wrote:
+> > Hi:
+> >
+> > Since hid2hci has been accepted into udev-extras, I'd like to remove it
+> > from bluez source.  Attached is a patch.
+> >
+> > Regards
+> >   
+> am i correct in thinking that this is a fedora package?
 
-Dbus-1.2.1
-Dbus-glib-0.76
-Bluez-gnome-1.8
-Alsa-1.0.17
+No.
 
-If I use more recent versions of bluez - I've tried all the way to bluez-4.41 - I can get other bt devices to work as long as I use /etc/dbus-1/system.d/bluetooth.conf from circa bluez-4.17, but I cannot get a bt headset to work.
+> what about all the other distributions out there?
 
-I saw in this list that a more recent version of dbus might help getting a bt headset to work again, so I tried:
+N/A.
 
-Dbus-1.2.14
-Dbus-glib-0.80
-
-..but then bluez-gnome does not find any devices to pair with, even if "hcitool scan" does find available devices. "simple-agent" does not seem to work up to bluez-4.41, so I cannot try to pair with the bt headset by that method either.
-
-1. Are there prescribed versions of dbus, dbus-glib, alsa, etc that are required in order for a bt headset to work?
-
-2. Why do I need to use an old /etc/dbus-1/system.d/bluetooth.conf for bluetoothd to start?
-
-3. Is "simple-agent" supposed to work (I've seen various posts about required patches for dbus, etc)?
-
-Thanks, John
