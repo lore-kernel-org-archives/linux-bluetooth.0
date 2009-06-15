@@ -1,56 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1244796365.448636.603.nullmailer@galant.ukfsn.org>
-References: <35c90d960905191429x1c3b6104qca2a672d50f0364c@mail.gmail.com>
-	<35c90d960906111724w4794b40aw1c51d64586ecaeb6@mail.gmail.com>
-	<1244796365.448636.603.nullmailer@galant.ukfsn.org>
-From: Nick Pelly <npelly@google.com>
-Date: Mon, 15 Jun 2009 14:20:43 -0700
-Message-ID: <35c90d960906151420l1805b5f6j78d4a8172874104e@mail.gmail.com>
-Subject: Re: Expected behavior of shutdown() in multi-threaded socket
-	programming
-To: Iain Hibbert <plunky@rya-online.net>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        davem@davemloft.net, Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH] Remove hid2hci from bluez
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: Mario Limonciello <mario_limonciello@dell.com>,
+	linux-bluetooth@vger.kernel.org
+In-Reply-To: <1245076109.11069.7011.camel@localhost.localdomain>
+References: <6BE8CE7840AC9F459EF5A0693CA2744D5DB52E@ausx3mpc138.aus.amer.dell.com>
+	 <1245022400.11069.6101.camel@localhost.localdomain>
+	 <4A365725.5070503@dell.com>
+	 <1245076109.11069.7011.camel@localhost.localdomain>
+Content-Type: text/plain
+Date: Mon, 15 Jun 2009 21:08:24 +0200
+Message-Id: <1245092904.15367.16.camel@violet>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Jun 12, 2009 at 1:46 AM, Iain Hibbert<plunky@rya-online.net> wrote:
-> On Thu, 11 Jun 2009, Nick Pelly wrote:
->
->> Any comments on this one? I would like to correct the behavior of
->> shutdown() on AF_BLUETOOTH sockets, but I have been advised by Marcel
->> Holtmann that we need to agree on the correct behavior first.
->>
->> How should shutdown() behave when other threads are blocked on the same =
-socket?
->
-> IMHO consistency should apply.
->
-> The opengroup specification for shutdown() says
->
-> =A0"The shutdown() function shall cause all or part of a full-duplex
-> =A0connection on the socket associated with the file descriptor socket to
-> =A0be shut down."
->
-> and while that does not really cover the case when the socket is blocked
-> in accept(), if all the other socket types abort the block then that is
-> what the PF_BLUETOOTH sockets should do too.
->
-> The opengroup specification for accept() suggests EINVAL would be returne=
-d
-> if the socket was not accepting connections and arguably that is the case
-> after a shutdown(), though ECONNABORTED could be used too (your program
-> displays ECONNABORTED on NetBSD for instance)
->
->> I also have similar results for other blocking syscalls such as
->> connect(), read(), write(), poll() etc, but the test program is not as
->> simple.
->
-> They should all handle the shutdown().
+Hi Bastien,
 
-Sounds good to me.
+> > > I really wonder how good an idea that is, given that, ultimately, we'd
+> > > want to remove hid2hci from everything, and handle the switching from
+> > > within bluetoothd.
+> > >   
+> > This is a conflicting goal with the on-demand stuff I feel.  You can't
+> > have the on-demand stuff and this working if the BT radio is only
+> > exposed after the device switches modes.
+> 
+> Why? Instead of calling hid2hci, it would launch bluetoothd --udev, like
+> the other rules. Problem solved.
+> 
+> > > If we had specs for the devices (or at least rev-eng'ed specs), we'd
+> > > need to do link keys management, and switching the devices to hci mode
+> > > from within the same codebase.
+> > >   
+> > I agree here, but I don't see the docs showing up anytime soon.
+> > > So I'd rather hid2hci didn't go into udev-extras, and stayed in bluez
+> > > until a better solution comes along.
+> > >   
+> > Why?  What's it's benefit living in the bluez tree?  By moving to
+> > udev-extras, it now lives in /lib/udev and will work even if the /usr
+> > gets mounted on NFS late.
+> 
+> If that's the only benefit, then, frankly, who cares.
+> 
+> The main point is that people with an interested in Bluetooth will need
+> to go and fetch the code, and ask for patches to be committed.
+> 
+> We're losing direct commit access to the code, and gaining something
+> that could have been achieved in the distro package.
 
-Thanks for the input.
+that is non-sense. Kay is quick with pulling/merging patches and we
+could get commit access if we really wanted to. I just don't bother
+since it works good enough for me.
 
-Nick
+Regards
+
+Marcel
+
+
