@@ -1,31 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 16 Jun 2009 21:21:39 +0200
-From: Artem Makhutov <artem@makhutov.org>
-To: John Frankish <j-frankish@slb.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Passkey-Agent for bluez 4.xx
-Message-ID: <20090616192137.GB10684@titan.makhutov-it.de>
-References: <20090513154809.GK6984@titan.makhutov-it.de> <d89ddf300905132146t31b860ddtb43e3371f094f79b@mail.gmail.com> <6AC5A55546F64545AE996F8200E3AC4E06A01AA4@NL0105EXC01V01.eur.slb.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <6AC5A55546F64545AE996F8200E3AC4E06A01AA4@NL0105EXC01V01.eur.slb.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: Apple Bluetooth devices: Battery level?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Jiri Kosina <jkosina@suse.cz>
+Cc: Iain Hibbert <plunky@rya-online.net>,
+	Bastien Nocera <hadess@hadess.net>,
+	linux-bluetooth@vger.kernel.org,
+	linux-input <linux-input@vger.kernel.org>
+In-Reply-To: <alpine.LNX.2.00.0906161156470.7457@wotan.suse.de>
+References: <1244384236.30768.5690.camel@cookie.hadess.net>
+	 <alpine.LRH.2.00.0906081530330.31685@twin.jikos.cz>
+	 <1244642769.2690.51.camel@cookie.hadess.net>
+	 <alpine.LNX.2.00.0906121529210.7457@wotan.suse.de>
+	 <1244898975.477818.1961.nullmailer@galant.ukfsn.org>
+	 <alpine.LNX.2.00.0906161156470.7457@wotan.suse.de>
+Content-Type: text/plain
+Date: Tue, 16 Jun 2009 15:37:08 +0200
+Message-Id: <1245159428.15367.22.camel@violet>
+Mime-Version: 1.0
+Sender: linux-input-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Jiri,
 
-> [...]
-> I tried out the modified simple-agent:
+> > Sorry, I posted a parsed version of the report descriptor previously
+> > though I failed to cross post:
+> > 
+> > Collection page=Generic_Desktop usage=Mouse
+> >   Input id=2 size=1 count=1 page=Button usage=Button_1 Variable, logical range 0..1
+> >   Input id=2 size=1 count=1 page=Button usage=Button_2 Variable, logical range 0..1
+> >   Input id=2 size=1 count=1 page=Button usage=Button_3 Variable, logical range 0..1
+> >   Input id=2 size=1 count=1 page=Button usage=Button_4 Variable, logical range 0..1
+> >   Input id=2 size=4 count=1 page=0x0000 usage=0x0000 Const Variable, logical range 0..1
+> > Collection page=Generic_Desktop usage=Pointer
+> >   Input id=2 size=8 count=1 page=Generic_Desktop usage=X Variable Relative, logical range -127..127
+> >   Input id=2 size=8 count=1 page=Generic_Desktop usage=Y Variable Relative, logical range -127..127
+> >   Input id=2 size=8 count=1 page=Consumer usage=AC_Pan Variable Relative, logical range -127..127
+> >   Input id=2 size=8 count=1 page=Generic_Desktop usage=Wheel Variable Relative, logical range -127..127
+> > End collection
+> >   Input id=2 size=8 count=1 page=0x00ff usage=0x00c0 Variable, logical range -127..127
+> > Feature id=71 size=8 count=1 page=Device_Controls usage=Battery_Strength Variable NoPref Volatile, logical range 0..100
+> > End collection
+> > As you can see, there is a Feature report relating to the Battery 
+> > Strength, but I do not know what to do with that. I suppose that it is 
+> > to be polled in order to return a percentage value..
 > 
-> $ sudo passkey-agent_mod
-> Agent registered
-> [in separate terminal]
-> # bluetoothd -dn
-> ...
-> bluetoothd[10350]: Agent registered for hci0 at :1.7:/test/agent
-> 
-> ..but what next - do I specify the bt address of the device I would like to pair with PIN 5555, or?
+> Yes, it has to be polled. But at least the initial value should be 
+> retrieved during the very initialization of the device -- both USB and 
+> Bluetooth implementations this in usbhid_init_reports()/hidp_start() -- 
+> they query INPUT and FEATURE reports during device initialization.
 
-You should issue the pairing from your mobile phone. I don't know how to start pairing from the console.
+since the descriptors are the same, can we not do this inside the HID
+core with a specific quirk setting. And maybe even a timer that polls it
+every 30 minutes or so.
 
-Regards, Artem
+Regards
+
+Marcel
+
+
