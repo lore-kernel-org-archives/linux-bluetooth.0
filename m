@@ -1,29 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <6AC5A55546F64545AE996F8200E3AC4E06A01AA4@NL0105EXC01V01.eur.slb.com>
+From: John Frankish <j-frankish@slb.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Wed, 17 Jun 2009 06:14:46 +0200
+Subject: RE: Passkey-Agent for bluez 4.xx
+Message-ID: <6AC5A55546F64545AE996F8200E3AC4E06A01D43@NL0105EXC01V01.eur.slb.com>
 References: <20090513154809.GK6984@titan.makhutov-it.de>
-	 <d89ddf300905132146t31b860ddtb43e3371f094f79b@mail.gmail.com>
-	 <6AC5A55546F64545AE996F8200E3AC4E06A01AA4@NL0105EXC01V01.eur.slb.com>
-Date: Wed, 17 Jun 2009 00:27:49 -0600
-Message-ID: <d89ddf300906162327p20cce116r7f98be97ef4d4808@mail.gmail.com>
-Subject: Re: Passkey-Agent for bluez 4.xx
-From: Brad Midgley <bmidgley@gmail.com>
-To: John Frankish <j-frankish@slb.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+ <d89ddf300905132146t31b860ddtb43e3371f094f79b@mail.gmail.com>
+ <6AC5A55546F64545AE996F8200E3AC4E06A01AA4@NL0105EXC01V01.eur.slb.com>
+ <20090616192137.GB10684@titan.makhutov-it.de>
+In-Reply-To: <20090616192137.GB10684@titan.makhutov-it.de>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-John,
 
+-----Original Message-----
+From: Artem Makhutov [mailto:artem@makhutov.org]
+Sent: 16 June, 2009 23:22
+To: John Frankish
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Passkey-Agent for bluez 4.xx
+
+Hi,
+
+> [...]
+> I tried out the modified simple-agent:
+>
+> $ sudo passkey-agent_mod
+> Agent registered
+> [in separate terminal]
+> # bluetoothd -dn
+> ...
+> bluetoothd[10350]: Agent registered for hci0 at :1.7:/test/agent
+>
 > ..but what next - do I specify the bt address of the device I would like to pair with PIN 5555, or?
 
-make your laptop discoverable and connect to it from the other device.
-That was the purpose of this script, to set the pin for incoming
-connections.
+You should issue the pairing from your mobile phone. I don't know how to start pairing from the console.
 
-To make it discoverable, use the kde or gnome applet for bluetooth or
-have a look at bluez-4.26/test/test-discovery for a headless machine.
+Regards, Artem
+---------------
+Thanks - I was afraid you were going to say that...
 
--- 
-Brad Midgley
+For some reason, my laptop does not appear to be discoverable from my mobile phone (even though everything seems to be set correctly in /etc/bluetooth/main.conf) - is there a trick to this?
+
+Regards, John
