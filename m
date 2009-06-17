@@ -1,37 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A38DEE1.2080707@koala.ie>
-Date: Wed, 17 Jun 2009 13:17:37 +0100
-From: Simon Kenyon <simon@koala.ie>
 MIME-Version: 1.0
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Passkey-Agent for bluez 4.xx
-References: <20090513154809.GK6984@titan.makhutov-it.de> <d89ddf300905132146t31b860ddtb43e3371f094f79b@mail.gmail.com> <6AC5A55546F64545AE996F8200E3AC4E06A01AA4@NL0105EXC01V01.eur.slb.com> <200906161530.45295.gayleard@eircom.net> <20090617073831.GA9544@jh-x301>
-In-Reply-To: <20090617073831.GA9544@jh-x301>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Date: Wed, 17 Jun 2009 15:03:44 +0300
+Message-ID: <508e92ca0906170503y360613b2n42d9454fefb6815e@mail.gmail.com>
+Subject: Double SSP paring error or feature?
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Johan Hedberg wrote:
-> Most of the times I've heard people requesting this feature it has turned
-> out that they didn't understand what pairing is and what role the PIN
-> plays in it. The purpose of pairing is to create a common link key between
-> two devices. The link key can also be reused in later connections to avoid
-> pairing again. The purpose of the pin is to act as a one-time input in
-> this pairing process to create the common link key. It is the link key
-> that you want permanently stored so you don't need to repair when
-> connecting later, and bluez already does this for you.
->
-> So, the value of having a fixed PIN somewhere in the system is in most
-> cases rather low since pairing is an infrequent event after which the
-> generated link key is used to establish secure connections between the
-> devices. Having a fixed PIN has also the security implication that anyone
-> who knows your address can create a pairing with you without any knowledge
-> of the local user. However, bluez doesn't want to define or enforce rules
-> for where the PIN comes from. Instead, bluez externalizes the whole
-> process using the agent concept so you are free to have whatever kind of
-> mechanism you want (e.g. reading the PIN from the filesystem) for replying
-> to PIN requests.
->   
-maybe it is because the documentation is a little, how can i put it, light
---
-simon
+Hi,
+
+We have error with SSP paring. Originally we could not connect some
+devices and the problem was reproduced on my PC with 2 USB Bluetooth
+adapters.
+
+bluez asks user paring confirmation 2 times.
+
+Test:
+
+hci1:	Type: USB
+	BD Address: 00:02:72:16:4E:D5 ACL MTU: 1021:8 SCO MTU: 64:1
+	UP RUNNING PSCAN
+	RX bytes:12122 acl:78 sco:0 events:449 errors:0
+	TX bytes:22547 acl:82 sco:0 commands:294 errors:0
+
+hci2:	Type: USB
+	BD Address: 00:02:72:16:19:39 ACL MTU: 1021:8 SCO MTU: 64:1
+	UP RUNNING PSCAN
+	RX bytes:12593 acl:82 sco:0 events:475 errors:0
+	TX bytes:28404 acl:78 sco:0 commands:329 errors:0
+
+
+hci1:
+sudo ./l2test -i hci1 -r -E -S   # server
+
+hci2:
+sudo ./l2test -i hci2 -n 00:02:72:16:4E:D5 -b 10 -N 1 -E -S -s   # client
+
+ ./simple-agent hci1
+Agent registered
+RequestConfirmation (/org/bluez/6255/hci1/dev_00_02_72_16_19_39, 533464)
+Confirm passkey (yes/no): yes
+RequestConfirmation (/org/bluez/6255/hci1/dev_00_02_72_16_19_39, 152200)
+Confirm passkey (yes/no): yes
+
+
+./simple-agent hci2
+Agent registered
+RequestConfirmation (/org/bluez/6255/hci2/dev_00_02_72_16_4E_D5, 533464)
+Confirm passkey (yes/no): yes
+RequestConfirmation (/org/bluez/6255/hci2/dev_00_02_72_16_4E_D5, 152200)
+Confirm passkey (yes/no): yes
+
+For the single connection passkey is asked 2 times.
+
+The reason looks to be because bluetoothd does not store link keys
+since ioctl  HCIGETAUTHINFO returns 0.
+Kernel in function hci_get_auth_info returns "conn->auth_type" which
+is 0 at this stage. As I understood
+"auth_type" initialized later when "l2cap_connect_req" comes in
+"l2cap_check_security".
+
+What is the best way to solv this? In kernel or in user-space? Is it an error?
+
+Regards,
+Andrei
