@@ -1,41 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 17 Jun 2009 19:34:29 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Vikram Kandukuri <Vikram.Kandukuri@Atheros.com>
-Cc: Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>,
-	"marcel@holtmann.org" <marcel@holtmann.org>,
+From: Vikram Kandukuri <Vikram.Kandukuri@Atheros.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>, Jothikumar Mothilal
+	<Jothikumar.Mothilal@Atheros.com>
+CC: "marcel@holtmann.org" <marcel@holtmann.org>,
 	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: HSP Ring command
-Message-ID: <20090617163429.GA14295@jh-x301>
-References: <44EE5C37ADC36343B0625A05DD408C485068E39C2B@CHEXMB-01.global.atheros.com> <20090617154529.GA12943@jh-x301> <44EE5C37ADC36343B0625A05DD408C485068E39C75@CHEXMB-01.global.atheros.com>
+Date: Wed, 17 Jun 2009 21:35:15 +0530
+Subject: RE: HSP Ring command
+Message-ID: <44EE5C37ADC36343B0625A05DD408C485068E39C75@CHEXMB-01.global.atheros.com>
+References: <44EE5C37ADC36343B0625A05DD408C485068E39C2B@CHEXMB-01.global.atheros.com>
+ <20090617154529.GA12943@jh-x301>
+In-Reply-To: <20090617154529.GA12943@jh-x301>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <44EE5C37ADC36343B0625A05DD408C485068E39C75@CHEXMB-01.global.atheros.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Johan,
+Do we have any VOIP application like SKYPE which has implemented D-Bus meth=
+ods for incoming/outgoing/call hold indications?
 
-Please don't use top posting on this list. The flow of quoted emails gets
-messed up when inline and top posting are mixed.
+If we do not use *RING* indication for inband ring from HSP 1.2 I wonder wh=
+y BQB tests for HSP still have a test case where we have to send AT+RING co=
+mmand when we place a call.
 
-On Wed, Jun 17, 2009, Vikram Kandukuri wrote:
-> Do we have any VOIP application like SKYPE which has implemented D-Bus
-> methods for incoming/outgoing/call hold indications?
+Thanks
+Vikram.k
 
-AFAIK no.
+-----Original Message-----
+From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@v=
+ger.kernel.org] On Behalf Of Johan Hedberg
+Sent: Wednesday, June 17, 2009 9:15 PM
+To: Jothikumar Mothilal
+Cc: marcel@holtmann.org; linux-bluetooth@vger.kernel.org
+Subject: Re: HSP Ring command
 
-> If we do not use *RING* indication for inband ring from HSP 1.2 I wonder
-> why BQB tests for HSP still have a test case where we have to send
-> AT+RING command when we place a call.
+Hi Jothi,
 
-I'm not sure what you're referring to here. I've never heard of an AT+RING
-AT command. Also the HSP spec has no mention of such a thing and actually
-the AG is never sending AT commands to the headset but only responses to
-AT commands or unsolicited result codes like the RING indication.
+On Wed, Jun 17, 2009, Jothikumar Mothilal wrote:
+> I am running HSP profile test cases with PTS tool.
+> I am using Ubuntu 9.04 with Bluez 4.32.
+>
+> For all HSP test cases, PTS is expecting RING command from IUT.
+> From our analysis, headset_send(hs, "\r\nRING\r\n"); " in
+> audio/headset.c is not getting initiated.
+> I am thinking, RING command is suppose to send by dbus as we register
+> the call backs. But dbus is not triggering the RING command.
+> Is this expected behavior in BlueZ?
 
-If you were talking about the RING indication and not an AT command, then
-it should depend on what kind of PICS values you have selected. It is
-possible to disable the RING requirement for the AG role completely with
-HSP 1.2.
+There is the IndicateCall D-Bus method in the org.bluez.Headset interface
+which you can use (see doc/audio-api.txt for more info). However for
+proper telephony integration you'll need to use a telephony driver (see
+audio/telephony-*.c) so that the call indication occurs because of a real
+call event of your telephony subsystem.
+
+By default bluez compiles in the dummy telephony driver which provides a
+simple D-Bus interface to drive it. There's also a python test script for
+it in test/test-telephony which you can use to simulate telephony events.
+E.g. "test-telephony incoming 1234" would simulate an incoming call from
+the number "1234" and should cause the RING to be sent for HSP
+connections.
+
+Also note that starting with version 4.33 bluez uses HSP version 1.2 which
+does *not* use the RING indication when the AG has been configured to use
+inband-ringtone (for out-of-band ringing it's still used). However 4.32
+(which you have) still has HSP 1.1 where the RING indication will always
+be sent.
 
 Johan
+--
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" =
+in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
