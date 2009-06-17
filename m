@@ -1,57 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-From: John Frankish <j-frankish@slb.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Thu, 18 Jun 2009 08:43:30 +0200
-Subject: RE: bluetooth, dbus and bluetooth headsets
-Message-ID: <6AC5A55546F64545AE996F8200E3AC4E06A506A2@NL0105EXC01V01.eur.slb.com>
-References: <6AC5A55546F64545AE996F8200E3AC4E069AA3A5@NL0105EXC01V01.eur.slb.com>
-In-Reply-To: <6AC5A55546F64545AE996F8200E3AC4E069AA3A5@NL0105EXC01V01.eur.slb.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Subject: omnibook module loads but still can't use bluetooth device
+From: Renato Budinich <rennabh@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain
+Date: Wed, 17 Jun 2009 23:29:54 +0200
+Message-Id: <1245274194.3925.13.camel@renato-laptop>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hello, I hope this is the correct place to ask, otherwise please kindly
+point me to a more appropriate place.
+I have a Toshiba Satellite A200 with Phoenix Bios and thus can have
+bluetooth only thanks to the omnibook module. I am running Ubuntu Jaunty
+9.04; all was working fine till I built my own 2.6.30 kernel (needed
+some drivers). I recompiled the omnibook module (btw, had to apply this
+patch
+http://sourceforge.net/tracker/index.php?func=detail&aid=2794118&group_id=174260&atid=868542 to make it compile )
+Now the module seams to load correctly, bluetooth appears turned on but
+i still get no devices from hcitool. Here are some ouputs
 
------Original Message-----
-From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of John Frankish
-Sent: 15 June, 2009 13:49
-To: linux-bluetooth@vger.kernel.org
-Subject: bluetooth, dbus and bluetooth headsets
 
-I've been trying to get a bt headset to work again with bluez for some time now, so I'd appreciate any help available on this - about the last time it worked was circa bluez-4.17 - I used:
 
-Dbus-1.2.1
-Dbus-glib-0.76
-Bluez-gnome-1.8
-Alsa-1.0.17
+renato@renato-laptop:/proc/omnibook$ cat dmi
+BIOS Vendor:   TOSHIBA
+BIOS Version:  V1.70
+BIOS Release:  09/27/2007
+System Vendor: TOSHIBA
+Product Name:  Satellite A200
+Version:       PSAE6E-05W032IT
+Serial Number: X7386950K
+Board Vendor:  TOSHIBA
+Board Name:    1.00
 
-If I use more recent versions of bluez - I've tried all the way to bluez-4.41 - I can get other bt devices to work as long as I use /etc/dbus-1/system.d/bluetooth.conf from circa bluez-4.17, but I cannot get a bt headset to work.
+renato@renato-laptop:/proc/omnibook$ cat bluetooth 
+Bluetooth adapter is present and enabled.
 
-I saw in this list that a more recent version of dbus might help getting a bt headset to work again, so I tried:
+renato@renato-laptop:/proc/omnibook$ sudo hcitool dev
+Devices:
 
-Dbus-1.2.14
-Dbus-glib-0.80
+renato@renato-laptop:/proc/omnibook$ sudo hcitool scan
+Device is not available: No such device
 
-..but then bluez-gnome does not find any devices to pair with, even if "hcitool scan" does find available devices. "simple-agent" does not seem to work up to bluez-4.41, so I cannot try to pair with the bt headset by that method either.
+renato@renato-laptop:/proc/omnibook$ lsusb
+Bus 006 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+Bus 007 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+Bus 005 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+Bus 003 Device 002: ID 0930:0508 Toshiba Corp. Integrated Bluetooth HCI
+Bus 003 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+Bus 002 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 001 Device 002: ID 04f2:b008 Chicony Electronics Co., Ltd 
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 004 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
 
-1. Are there prescribed versions of dbus, dbus-glib, alsa, etc that are required in order for a bt headset to work?
+renato@renato-laptop:/proc/omnibook$ sudo lshw -C communication
+  *-usb UNCLAIMED         
+       description: Bluetooth wireless interface
+       product: Integrated Bluetooth HCI
+       vendor: Toshiba Corp.
+       physical id: 2
+       bus info: usb@3:2
+       version: 19.15
+       capabilities: bluetooth usb-2.00
+       configuration: speed=12.0MB/s
 
-2. Why do I need to use an old /etc/dbus-1/system.d/bluetooth.conf for bluetoothd to start?
-
-3. Is "simple-agent" supposed to work (I've seen various posts about required patches for dbus, etc)?
-
-Thanks, John
---
-To answer my own post for the benefit of anybody that might be struggling with this:
-
-The trick was to run bluetooth-wizard from bluez-gnome as root, it then works with the /etc/dbus-1/system.d/bluetooth.conf from bluez-4.41, pairs with my bt headset and aplay/arecord produce the expected result.
-
-The headset works with:
-
-bluez-4.41
-bluez-gnome-1.8
-dbus-1.2.14
-dbus-glib-0.80
-alsa-1.0.20
-kernel-2.6.29.2
+could the above "UNCLAIMED" be part of the problem?
+thank you
+Renato
 
