@@ -1,72 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
+From: John Frankish <j-frankish@slb.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 18 Jun 2009 15:44:45 +0200
+Subject: RE: Recommended asoundrc for bluetooth headset
+Message-ID: <6AC5A55546F64545AE996F8200E3AC4E06A50ABC@NL0105EXC01V01.eur.slb.com>
+References: <6AC5A55546F64545AE996F8200E3AC4E06A506A3@NL0105EXC01V01.eur.slb.com>
+ <353624.65161.qm@web95411.mail.in2.yahoo.com>
+In-Reply-To: <353624.65161.qm@web95411.mail.in2.yahoo.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Date: Thu, 18 Jun 2009 15:04:43 -0300
-Message-ID: <e0ab60670906181104m3a0a95cdk13d3d4596ed6676@mail.gmail.com>
-Subject: Unable to play music on mobile phone over bluetooth
-From: Douglas Lopes Pereira <douglaslopespereira@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi guys,
-
-I'm facing some problems while playing music on my N95 phone over a
-bluetooth conection and trying to record it with arecord.
-
-Here is what I'm doing:
-
-- I have bluez 4.41 installed on my 2.6.30 system.
-- My bluetooth dongle is recognized as (hciconfig -a):
-  hci0:   Type: USB
-        BD Address: 00:10:60:30:1A:2D ACL MTU: 384:8 SCO MTU: 64:8
-        UP RUNNING PSCAN
-        RX bytes:10886 acl:31 sco:0 events:395 errors:0
-        TX bytes:1961 acl:26 sco:0 commands:139 errors:0
-        Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'debian-0'
-        Class: 0x4a0204
-        Service Classes: Networking, Capturing, Telephony
-        Device Class: Phone, Cellular
-        HCI Ver: 2.0 (0x3) HCI Rev: 0x7a6 LMP Ver: 2.0 (0x3) LMP Subver: 0x7a6
-        Manufacturer: Cambridge Silicon Radio (10)
-
-- I started the simple-agent:
-   Agent registered
-
-- I started a conection on my phone to my bluetooth device, inserted
-the PIN and it seems to work:
-  RequestPinCode (/org/bluez/2471/hci0/dev_00_
-1F_5D_3A_01_2D)
-
-- On the cellphone a parenthesis involving the bluetooth simbol means
-a conection established.
-  In this case, the parenthesis are shown, then they desapear, they
-are shown again for a few seconds and desapear :(
-
-- Last configuration is to add following lines to ~/.asoundrc
-
-pcm.bluetooth {
-   type bluetooth
-   device "00:1F:5D:3A:01:2D"
-   profile "auto"
-}
-
-- When I start arecord (arecord -D bluetooth) this is what I get:
-
-ALSA lib pcm_bluetooth.c:1607:(audioservice_expect)
-BT_GET_CAPABILITIES failed : Input/output error(5)
-arecord: main:590: audio open error: Input/output error
-
-- By the way, if I start playing music on my phone, it uses the main
-speaker, and no audio is sent via bluetooth (I checked with hcidump)
-
-- I tryed with 2 different dondles and 2 different mobile phones.
-
-Does anyone has a clue? Can anybody help me and point what I am doing wrong?
-
-Thanks in advance.
-Douglas
+DQotLS0tLSBPcmlnaW5hbCBNZXNzYWdlIC0tLS0NCkZyb206IEpvaG4gRnJhbmtpc2ggPGotZnJh
+bmtpc2hAc2xiLmNvbT4NClRvOiAibGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZyIgPGxp
+bnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmc+DQpTZW50OiBUaHVyc2RheSwgMTggSnVuZSwg
+MjAwOSAxMjoxMTo1MyBQTQ0KU3ViamVjdDogUmVjb21tZW5kZWQgYXNvdW5kcmMgZm9yIGJsdWV0
+b290aCBoZWFkc2V0DQoNCklzIHRoZXJlIGEgcmVjb21tZW5kZWQgLmFzb3VuZHJjIGZvciB1c2Ug
+d2l0aCBhIGJ0IGhlYWRzZXQ/IEkndmUgc2VlbiBhdCBsZWFzdCB0aHJlZSB2ZXJzaW9ucyBhbmQg
+d291bGQgYmUgaW50ZXJlc3RlZCB0byBrbm93IHdoaWNoIGlzIHRoZSAiY29ycmVjdCIgb25lOg0K
+DQotLS0tLS0NCnBjbS5ibHVldG9vdGggew0KdHlwZSBibHVldG9vdGgNCmRldmljZSAiMDA6MTI6
+RUU6QTY6MUQ6RjQiDQpwcm9maWxlICJhdXRvIg0KfQ0KDQpjdGwuYmx1ZXRvb3RoIHsNCnR5cGUg
+Ymx1ZXRvb3RoDQp9DQotLS0tLQ0KcGNtLnJhd2JsdWV0b290aCB7DQogICB0eXBlIGJsdWV0b290
+aA0KICAgZGV2aWNlIDAwOjEyOkVFOkE2OjFEOkY0DQp9DQoNCnBjbS5ibHVldG9vdGggew0KICAg
+dHlwZSBwbHVnDQogICBzbGF2ZSB7DQogICAgICBwY20gew0KICAgICAgICAgdHlwZSBibHVldG9v
+dGgNCiAgICAgIH0NCiAgIH0NCn0NCi0tLS0tDQpwY20uYmx1ZXRvb3RocmF3IHsNCiAgIHR5cGUg
+Ymx1ZXRvb3RoDQogICBkZXZpY2UgMDA6MTI6RUU6QTY6MUQ6RjQNCiAgIHByb2ZpbGUgYXV0bw0K
+fQ0KDQpwY20uYmx1ZXRvb3RoIHsNCiAgIHR5cGUgcGx1Zw0KICAgc2xhdmUgew0KICAgICAgICBw
+Y20gYmx1ZXRvb3RocmF3DQogICB9DQp9DQotLS0tLQ0KLS0NCkpvaG4sDQpUaGlyZCAgYXNvdW5k
+cmMgaXMgcmlnaHQgb25lLCB0aGlzIGFzb3VuZHJjIGlzIHdvcmtpbmcgZm9yIG1lIHVwdG8gYmx1
+ZXogNC4zMi4NCkkgYW0gdXBncmFkaW5nIGtlcm5lbCB0byAyLjYucmM4LCBibHVleiA0LjQxICBh
+bmQgb3RoZXIgZGVwbmVkZW5jaWVzIHdoYXRldmVyIHlvdSBtZW50aW9uZWQuDQp0aGVuIGkgd2ls
+bCB1cGRhdGUgeW91IHJlc3VsdCBvZiBhMmRwICwgaGVhZHNldCBwcm9maWxlLklubWVhbndoaWxl
+IHBsZWFzZSB0cnkgM3JkIGFzb3VuZHJjICxsZXQgbWUga25vdyB5b3VyIHJlc3VsdC4NCg0KVGhh
+bmtzLA0KQmFsYWppLlANCi0tLS0NCg0KVXNpbmcgZmlyc3QgYXNvdW5kcmMNCg0KJCBhcGxheSAt
+RGJsdWV0b290aCAtdiAvdXNyL2xvY2FsL3NoYXJlL3NvdW5kcy9hbHNhL05vaXNlLndhdg0KY29y
+cmVjdCBzb3VuZC4NCg0KJCBhcGxheSAtRHBsdWc6Ymx1ZXRvb3RoIC12IC91c3IvbG9jYWwvc2hh
+cmUvc291bmRzL2Fsc2EvTm9pc2Uud2F2DQppbmNvcnJlY3Qgc291bmQuDQoNClVzaW5nIHRoaXJk
+IGFzb3VuZHJjDQoNCiQgYXBsYXkgLURibHVldG9vdGggLXYgL3Vzci9sb2NhbC9zaGFyZS9zb3Vu
+ZHMvYWxzYS9Ob2lzZS53YXYNCmluY29ycmVjdCBzb3VuZC4NCg0KJCBhcGxheSAtRHBsdWc6Ymx1
+ZXRvb3RoIC12IC91c3IvbG9jYWwvc2hhcmUvc291bmRzL2Fsc2EvTm9pc2Uud2F2DQpjb3JyZWN0
+IHNvdW5kLg0KDQpVc2luZyBmaXJzdCBvciB0aGlyZCBhc291bmRyYw0KDQokIGFyZWNvcmQgLUQg
+Ymx1ZXRvb3RoIC1mIFMxNl9MRSB8IGFwbGF5IC1EIGJsdWV0b290aCAtZiBTMTZfTEUNCkNvcnJl
+Y3Qgc291bmQNCg0KLi5hbmQgaWYgSSBjb3VsZCByZW1lbWJlciB0aGUgYXBsYXkgY29tbWFuZCBz
+d2l0Y2ggdG8gcGxheSBhbiBtcDMsIEkgd291bGQgaGF2ZSB0cmllZCB0aGF0Li4uDQo=
