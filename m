@@ -1,63 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-From: John Frankish <j-frankish@slb.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Thu, 18 Jun 2009 13:59:21 +0200
-Subject: RE: bluetooth, dbus and bluetooth headsets
-Message-ID: <6AC5A55546F64545AE996F8200E3AC4E06A509BD@NL0105EXC01V01.eur.slb.com>
-References: <6AC5A55546F64545AE996F8200E3AC4E069AA3A5@NL0105EXC01V01.eur.slb.com>
- <6AC5A55546F64545AE996F8200E3AC4E06A506A2@NL0105EXC01V01.eur.slb.com>
- <733296.28621.qm@web95406.mail.in2.yahoo.com>
-In-Reply-To: <733296.28621.qm@web95406.mail.in2.yahoo.com>
-Content-Type: text/plain; charset="utf-8"
+Message-ID: <733296.28621.qm@web95406.mail.in2.yahoo.com>
+References: <6AC5A55546F64545AE996F8200E3AC4E069AA3A5@NL0105EXC01V01.eur.slb.com> <6AC5A55546F64545AE996F8200E3AC4E06A506A2@NL0105EXC01V01.eur.slb.com>
+Date: Thu, 18 Jun 2009 16:39:05 +0530 (IST)
+From: Balaji Palaniswami <balaji_palaniswami@yahoo.com>
+Subject: Re: bluetooth, dbus and bluetooth headsets
+To: John Frankish <j-frankish@slb.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <6AC5A55546F64545AE996F8200E3AC4E06A506A2@NL0105EXC01V01.eur.slb.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-DQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogbGludXgtYmx1ZXRvb3RoLW93bmVy
-QHZnZXIua2VybmVsLm9yZyBbbWFpbHRvOmxpbnV4LWJsdWV0b290aC1vd25lckB2Z2VyLmtlcm5l
-bC5vcmddIE9uIEJlaGFsZiBPZiBKb2huIEZyYW5raXNoDQpTZW50OiAxNSBKdW5lLCAyMDA5IDEz
-OjQ5DQpUbzogbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZw0KU3ViamVjdDogYmx1ZXRv
-b3RoLCBkYnVzIGFuZCBibHVldG9vdGggaGVhZHNldHMNCg0KSSd2ZSBiZWVuIHRyeWluZyB0byBn
-ZXQgYSBidCBoZWFkc2V0IHRvIHdvcmsgYWdhaW4gd2l0aCBibHVleiBmb3Igc29tZSB0aW1lIG5v
-dywgc28gSSdkIGFwcHJlY2lhdGUgYW55IGhlbHAgYXZhaWxhYmxlIG9uIHRoaXMgLSBhYm91dCB0
-aGUgbGFzdCB0aW1lIGl0IHdvcmtlZCB3YXMgY2lyY2EgYmx1ZXotNC4xNyAtIEkgdXNlZDoNCg0K
-RGJ1cy0xLjIuMQ0KRGJ1cy1nbGliLTAuNzYNCkJsdWV6LWdub21lLTEuOA0KQWxzYS0xLjAuMTcN
-Cg0KSWYgSSB1c2UgbW9yZSByZWNlbnQgdmVyc2lvbnMgb2YgYmx1ZXogLSBJJ3ZlIHRyaWVkIGFs
-bCB0aGUgd2F5IHRvIGJsdWV6LTQuNDEgLSBJIGNhbiBnZXQgb3RoZXIgYnQgZGV2aWNlcyB0byB3
-b3JrIGFzIGxvbmcgYXMgSSB1c2UgL2V0Yy9kYnVzLTEvc3lzdGVtLmQvYmx1ZXRvb3RoLmNvbmYg
-ZnJvbSBjaXJjYSBibHVlei00LjE3LCBidXQgSSBjYW5ub3QgZ2V0IGEgYnQgaGVhZHNldCB0byB3
-b3JrLg0KDQpJIHNhdyBpbiB0aGlzIGxpc3QgdGhhdCBhIG1vcmUgcmVjZW50IHZlcnNpb24gb2Yg
-ZGJ1cyBtaWdodCBoZWxwIGdldHRpbmcgYSBidCBoZWFkc2V0IHRvIHdvcmsgYWdhaW4sIHNvIEkg
-dHJpZWQ6DQoNCkRidXMtMS4yLjE0DQpEYnVzLWdsaWItMC44MA0KDQouLmJ1dCB0aGVuIGJsdWV6
-LWdub21lIGRvZXMgbm90IGZpbmQgYW55IGRldmljZXMgdG8gcGFpciB3aXRoLCBldmVuIGlmICJo
-Y2l0b29sIHNjYW4iIGRvZXMgZmluZCBhdmFpbGFibGUgZGV2aWNlcy4gInNpbXBsZS1hZ2VudCIg
-ZG9lcyBub3Qgc2VlbSB0byB3b3JrIHVwIHRvIGJsdWV6LTQuNDEsIHNvIEkgY2Fubm90IHRyeSB0
-byBwYWlyIHdpdGggdGhlIGJ0IGhlYWRzZXQgYnkgdGhhdCBtZXRob2QgZWl0aGVyLg0KDQoxLiBB
-cmUgdGhlcmUgcHJlc2NyaWJlZCB2ZXJzaW9ucyBvZiBkYnVzLCBkYnVzLWdsaWIsIGFsc2EsIGV0
-YyB0aGF0IGFyZSByZXF1aXJlZCBpbiBvcmRlciBmb3IgYSBidCBoZWFkc2V0IHRvIHdvcms/DQoN
-CjIuIFdoeSBkbyBJIG5lZWQgdG8gdXNlIGFuIG9sZCAvZXRjL2RidXMtMS9zeXN0ZW0uZC9ibHVl
-dG9vdGguY29uZiBmb3IgYmx1ZXRvb3RoZCB0byBzdGFydD8NCg0KMy4gSXMgInNpbXBsZS1hZ2Vu
-dCIgc3VwcG9zZWQgdG8gd29yayAoSSd2ZSBzZWVuIHZhcmlvdXMgcG9zdHMgYWJvdXQgcmVxdWly
-ZWQgcGF0Y2hlcyBmb3IgZGJ1cywgZXRjKT8NCg0KVGhhbmtzLCBKb2huDQotLQ0KVG8gYW5zd2Vy
-IG15IG93biBwb3N0IGZvciB0aGUgYmVuZWZpdCBvZiBhbnlib2R5IHRoYXQgbWlnaHQgYmUgc3Ry
-dWdnbGluZyB3aXRoIHRoaXM6DQoNClRoZSB0cmljayB3YXMgdG8gcnVuIGJsdWV0b290aC13aXph
-cmQgZnJvbSBibHVlei1nbm9tZSBhcyByb290LCBpdCB0aGVuIHdvcmtzIHdpdGggdGhlIC9ldGMv
-ZGJ1cy0xL3N5c3RlbS5kL2JsdWV0b290aC5jb25mIGZyb20gYmx1ZXotNC40MSwgcGFpcnMgd2l0
-aCBteSBidCBoZWFkc2V0IGFuZCBhcGxheS9hcmVjb3JkIHByb2R1Y2UgdGhlIGV4cGVjdGVkIHJl
-c3VsdC4NCg0KVGhlIGhlYWRzZXQgd29ya3Mgd2l0aDoNCg0KYmx1ZXotNC40MQ0KYmx1ZXotZ25v
-bWUtMS44DQpkYnVzLTEuMi4xNA0KZGJ1cy1nbGliLTAuODANCmFsc2EtMS4wLjIwDQprZXJuZWwt
-Mi42LjI5LjINCg0KSm9obiAsDQoNCkkgdXBncmFkZWQga2VybmVsIHRvIDIuNi4zMC5yYzggLCBi
-bHVlei00LjQxLCBkYnVzIDEuMi4xNCAgZnJvbSBVYnVudHUgOS4wNCAuSSBoYXZlIHZlcmlmaWVk
-IGJsdWV6LWdub21lIGlzIDEuOCxkYnVzLWdsaWItODAgZGVmYXVsdC5Gb3IgYWxzYSAsd2hhdCBk
-byBpIG5lZWQgaW5zdGFsbCA/IEkgZm91bmQgdGhhdCB0aGVyZSBhcmUgbG90IG9mIHBhY2thZ2Vz
-IGluIEFMU0EgbWFpbiBwYWdlIHN1Y2ggYXMgZHJpdmVyICxsaWJyYXJ5ICwgdXRsaWxpdHkgLHBs
-dWdpbiBmaXJtd2FyZSAsdG9vbHMuIEFmdGVyIGluc3RhbGxhdGlvbiAgb25lIG9mIGFsc2EgcGFj
-a2FnZSwgaSBhbSBub3QgYWJsZSB0byBsb2dpbiBhZ2Fpbi5QbGVhc2Ugc2hhcmUgeW91ciBpbnN0
-YWxsYXRpb24gcHJvY2VkdXJlLg0KDQpUaGFua3MsDQpCYWxhamkuUA0KLS0tLS0tLS0NCkZvciBt
-ZSwgbG9naWNhbGx5IHlvdSB3b3VsZCBvbmx5IG5lZWQgbGliYWxzYSBhbmQgYW4gYXBwcm9wcmlh
-dGUgLmFzb3VuZHJjIC0gaG93ZXZlciwgdGhpcyBkb2VzIG5vdCBzZWVtIHRvIGJlIHRoZSBjYXNl
-IGFuZCBpdCBhcHBlYXJzIHRoYXQgYWxzYS1saWJzLCBhbHNhLXV0aWxzIGFuZCBhbHNhLWRyaXZl
-cnMgYXJlIHJlcXVpcmVkIGFuZCBhIHNvdW5kIGNhcmQgbmVlZHMgdG8gYmUgc2V0IHVwIGFuZCB3
-b3JraW5nIG9uIHlvdXIgbWFjaGluZSBiZWZvcmUgdGhpbmdzIHdpbGwgd29yayB3aXRoIGEgYmx1
-ZXRvb3RoIGhlYWRzZXQuDQoNCkkgY291bGQgYmUgY29tcGxldGVseSB3cm9uZyBpbiB0aGUgYWJv
-dmUsIGJ1dCB0aGF0J3MgaG93IEkgZ290IHRoaW5ncyB3b3JraW5nLi4uDQoNCkpvaG4NCg==
+
+
+
+
+
+----- Original Message ----
+From: John Frankish <j-frankish@slb.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Sent: Thursday, 18 June, 2009 12:13:30 PM
+Subject: RE: bluetooth, dbus and bluetooth headsets
+
+
+-----Original Message-----
+From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of John Frankish
+Sent: 15 June, 2009 13:49
+To: linux-bluetooth@vger.kernel.org
+Subject: bluetooth, dbus and bluetooth headsets
+
+I've been trying to get a bt headset to work again with bluez for some time now, so I'd appreciate any help available on this - about the last time it worked was circa bluez-4.17 - I used:
+
+Dbus-1.2.1
+Dbus-glib-0.76
+Bluez-gnome-1.8
+Alsa-1.0.17
+
+If I use more recent versions of bluez - I've tried all the way to bluez-4.41 - I can get other bt devices to work as long as I use /etc/dbus-1/system.d/bluetooth.conf from circa bluez-4.17, but I cannot get a bt headset to work.
+
+I saw in this list that a more recent version of dbus might help getting a bt headset to work again, so I tried:
+
+Dbus-1.2.14
+Dbus-glib-0.80
+
+..but then bluez-gnome does not find any devices to pair with, even if "hcitool scan" does find available devices. "simple-agent" does not seem to work up to bluez-4.41, so I cannot try to pair with the bt headset by that method either.
+
+1. Are there prescribed versions of dbus, dbus-glib, alsa, etc that are required in order for a bt headset to work?
+
+2. Why do I need to use an old /etc/dbus-1/system.d/bluetooth.conf for bluetoothd to start?
+
+3. Is "simple-agent" supposed to work (I've seen various posts about required patches for dbus, etc)?
+
+Thanks, John
+--
+To answer my own post for the benefit of anybody that might be struggling with this:
+
+The trick was to run bluetooth-wizard from bluez-gnome as root, it then works with the /etc/dbus-1/system.d/bluetooth.conf from bluez-4.41, pairs with my bt headset and aplay/arecord produce the expected result.
+
+The headset works with:
+
+bluez-4.41
+bluez-gnome-1.8
+dbus-1.2.14
+dbus-glib-0.80
+alsa-1.0.20
+kernel-2.6.29.2
+
+John ,
+
+I upgraded kernel to 2.6.30.rc8 , bluez-4.41, dbus 1.2.14  from Ubuntu 9.04 .I have verified bluez-gnome is 1.8,dbus-glib-80 default.For alsa ,what do i need install ? I found that there are lot of packages in ALSA main page such as driver ,library , utlility ,plugin firmware ,tools. After installation  one of alsa package, i am not able to login again.Please share your installation procedure.
+
+Thanks,
+Balaji.P
+
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+      ICC World Twenty20 England &#39;09 exclusively on YAHOO! CRICKET http://cricket.yahoo.com
+
