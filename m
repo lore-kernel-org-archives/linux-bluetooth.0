@@ -1,94 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Dan A. Dickey" <dan.dickey@savvis.net>
-To: linux-bluetooth@vger.kernel.org
-Subject: Need help with debugging a bluetooth mouse (trackball)
-Date: Thu, 18 Jun 2009 14:16:20 -0500
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200906181416.20421.dan.dickey@savvis.net>
+Date: Thu, 18 Jun 2009 15:04:43 -0300
+Message-ID: <e0ab60670906181104m3a0a95cdk13d3d4596ed6676@mail.gmail.com>
+Subject: Unable to play music on mobile phone over bluetooth
+From: Douglas Lopes Pereira <douglaslopespereira@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I have a Kensington SlimBlade Trackball mouse that I'm trying to get working again.
-It has worked in the past.
+Hi guys,
 
-Currently, I'm running 2.6.30 and bluez-4.41.
+I'm facing some problems while playing music on my N95 phone over a
+bluetooth conection and trying to record it with arecord.
 
-My adaptor shows up just fine:
-# hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:19:15:60:19:6A ACL MTU: 1017:8 SCO MTU: 64:8
-        UP RUNNING PSCAN
-        RX bytes:7286 acl:81 sco:0 events:231 errors:0
-        TX bytes:2610 acl:98 sco:0 commands:99 errors:0
-        Features: 0xff 0xff 0x8d 0xfe 0x9b 0xf9 0x00 0x80
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'fizban-0'
-        Class: 0x4a0104
-        Service Classes: Networking, Capturing, Telephony
-        Device Class: Computer, Desktop workstation
-        HCI Ver: 2.0 (0x3) HCI Rev: 0x414e LMP Ver: 2.0 (0x3) LMP Subver: 0x430e
-        Manufacturer: Broadcom Corporation (15)
+Here is what I'm doing:
 
+- I have bluez 4.41 installed on my 2.6.30 system.
+- My bluetooth dongle is recognized as (hciconfig -a):
+  hci0:   Type: USB
+        BD Address: 00:10:60:30:1A:2D ACL MTU: 384:8 SCO MTU: 64:8
+        UP RUNNING PSCAN
+        RX bytes:10886 acl:31 sco:0 events:395 errors:0
+        TX bytes:1961 acl:26 sco:0 commands:139 errors:0
+        Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+        Name: 'debian-0'
+        Class: 0x4a0204
+        Service Classes: Networking, Capturing, Telephony
+        Device Class: Phone, Cellular
+        HCI Ver: 2.0 (0x3) HCI Rev: 0x7a6 LMP Ver: 2.0 (0x3) LMP Subver: 0x7a6
+        Manufacturer: Cambridge Silicon Radio (10)
 
-And when I move the mouse (roll the ball) - I get the following from a 'bluetoothd -n -d':
-bluetoothd[4179]: adapter_get_device(00:02:76:03:A8:51)
-bluetoothd[4179]: adapter_create_device(00:02:76:03:A8:51)
-bluetoothd[4179]: Creating device /org/bluez/4179/hci0/dev_00_02_76_03_A8_51
-bluetoothd[4179]: btd_device_ref(0x7f8d4e403d20): ref=1
-bluetoothd[4179]: Incoming connection on PSM 17
+- I started the simple-agent:
+   Agent registered
 
-'hcitool con' shows:
-# hcitool con
-Connections:
-        > ACL 00:02:76:03:A8:51 handle 11 state 1 lm MASTER
+- I started a conection on my phone to my bluetooth device, inserted
+the PIN and it seems to work:
+  RequestPinCode (/org/bluez/2471/hci0/dev_00_
+1F_5D_3A_01_2D)
 
-'list-bluetooth-devices' shows:
-# list-bluetooth-devices
-[ /org/bluez/4179/hci0 ]
-    Name = fizban-0
-    Powered = 1
-    Devices = dev_00_02_76_03_A8_51
-    DiscoverableTimeout = 0
-    PairableTimeout = 0
-    Discoverable = 0
-    Address = 00:19:15:60:19:6A
-    Discovering = 0
-    Pairable = 1
-    Class = 4849924
-    [ /org/bluez/4179/hci0/dev_00_02_76_03_A8_51 ]
-        Name = Kensington SlimBlade Trackball Mouse
-        Paired = 0
-        Adapter = /org/bluez/4179/hci0
-        Alias = Kensington SlimBlade Trackball Mouse
-        Connected = 1
-        UUIDs =
-        Address = 00:02:76:03:A8:51
-        Class = 0x002580
-        Trusted = 0
-        Icon = input-mouse
+- On the cellphone a parenthesis involving the bluetooth simbol means
+a conection established.
+  In this case, the parenthesis are shown, then they desapear, they
+are shown again for a few seconds and desapear :(
 
-One of the things that looks suspicious above is that it shows 'Paired = 0'.
-When I run simple-agent, I just get:# simple-agent              
-Agent registered                     
-Authorize (/org/bluez/2468/hci0/dev_00_02_76_03_A8_51, 00001124-0000-1000-8000-00805f9b34fb)
+- Last configuration is to add following lines to ~/.asoundrc
 
+pcm.bluetooth {
+   type bluetooth
+   device "00:1F:5D:3A:01:2D"
+   profile "auto"
+}
 
-So... any help to figure out this problem would be much appreciated.
-Let me know what I can try... I'm a developer so I can handle rebuilding whatever.
+- When I start arecord (arecord -D bluetooth) this is what I get:
 
-One thing I'm curious about is where can I see the ID_VENDOR and ID_MODEL
-that get passed between udev and the hid2hci rules?  Since this is a kensingon
-mouse, I presume it doesn't match one of the entries in there...
-	-Dan
+ALSA lib pcm_bluetooth.c:1607:(audioservice_expect)
+BT_GET_CAPABILITIES failed : Input/output error(5)
+arecord: main:590: audio open error: Input/output error
 
--- 
-Dan A. Dickey | Senior Software Engineer
+- By the way, if I start playing music on my phone, it uses the main
+speaker, and no audio is sent via bluetooth (I checked with hcidump)
 
-Savvis
-10900 Hampshire Ave. S., Bloomington, MN  55438
-Office: 952.852.4803 | Fax: 952.852.4951
-E-mail: dan.dickey@savvis.net
+- I tryed with 2 different dondles and 2 different mobile phones.
+
+Does anyone has a clue? Can anybody help me and point what I am doing wrong?
+
+Thanks in advance.
+Douglas
