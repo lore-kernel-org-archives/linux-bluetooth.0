@@ -1,105 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: John Frankish <j-frankish@slb.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Sat, 20 Jun 2009 07:47:08 +0200
-Subject: RE: Audio failures on bluetooth headset
-Message-ID: <6AC5A55546F64545AE996F8200E3AC4E06A50F46@NL0105EXC01V01.eur.slb.com>
-References: <e0ab60670906190801w42d91318h6ce0e178832f8e71@mail.gmail.com>
-In-Reply-To: <e0ab60670906190801w42d91318h6ce0e178832f8e71@mail.gmail.com>
-Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
+In-Reply-To: <2d5a2c100906190639i545e7666k2938966f79be74c3@mail.gmail.com>
+References: <e5fc24930906181903u62c28da2s7f942611661663b4@mail.gmail.com>
+	 <2d5a2c100906190639i545e7666k2938966f79be74c3@mail.gmail.com>
+Date: Fri, 19 Jun 2009 18:52:48 -0500
+Message-ID: <e5fc24930906191652w4082a382pb1e68ad4e57f4c56@mail.gmail.com>
+Subject: Re: On A2DP frame transmissions
+From: Jun <yanjunrockets@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi,
+
+Thank you very much for the info, Luiz. I'd like to improve channel
+utilization by maximizing data payload of each base band transmission.
+I guess a L2cap frame for a2dp is often shorter than a based band
+frame such as DH5, unless there is explicit coordination between App
+and baseband. I'd like to figure out if such coordination is existing,
+doable, and its potential gain. Any comments or suggestions are
+welcome.
+
+Following the code you sent me, here is my guess of the flow (please
+correct me if I'm wrong):
+user space: (SBC encoder?) -> avdtp_send -> try_send -> send ->
+kernel: (socket lib?) -> l2cap_do_send -> hci_send_acl -> skb_queue_tail
+It seems that avdtp and l2cap have simple headers and re-grouping
+frames looks like doable.
+I couldn't find what's the caller of avdtp_send and l2cap_do_send, so
+please let me know if I've missed anything.
+
+Best,
+
+Jun
 
 
------Original Message-----
-From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Douglas Lopes Pereira
-Sent: 19 June, 2009 19:02
-To: linux-bluetooth@vger.kernel.org
-Subject: Audio failures on bluetooth headset
+On Fri, Jun 19, 2009 at 8:39 AM, Luiz Augusto von
+Dentz<luiz.dentz@gmail.com> wrote:
+> Hi,
+>
+> On Thu, Jun 18, 2009 at 11:03 PM, Jun<yanjunrockets@gmail.com> wrote:
+>> Hi All,
+>>
+>> I'm new to BlueZ and I'd like to dynamically schedule A2DP frame
+>> transmissions for a project. I did some research on BlueZ and so far I
+>> feel hcidump and l2cap.c are most related. Due to the large code base,
+>> could anyone please give me more directions on what to further look
+>> at?
+>>
+>
+> The protocol used by a2dp is avdtp which is currently implemented in
+> userspace, you can start by looking here: addressed removed to get through the filter
+>
+> I you could disclose what this project is about this would help us
+> giving you directions.
+>
+> --
+> Luiz Augusto von Dentz
+> Engenheiro de Computação
+>
 
-Hi guys,
 
-Here I am to share my problems again. Please, read if you have time.
 
-I have bluez 4.41 installed on my 2.6.30 system and I´m trying to play
-a .wav file using aplay on my bluetooth headset but the sound I hear
-on the headset has failures, noises. Also, I'm trying to record my
-voice on the same headset, but the result is terrible.
-
-Following are the steps I'm taking:
-
-- My bluetooth dongle is recognized as (hciconfig -a):
-  hci0:   Type: USB
-        BD Address: 00:10:60:30:1A:2D ACL MTU: 384:8 SCO MTU: 64:8
-        UP RUNNING PSCAN
-        RX bytes:10886 acl:31 sco:0 events:395 errors:0
-        TX bytes:1961 acl:26 sco:0 commands:139 errors:0
-        Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'debian-0'
-        Class: 0x4a0204
-        Service Classes: Networking, Capturing, Telephony
-        Device Class: Phone, Cellular
-        HCI Ver: 2.0 (0x3) HCI Rev: 0x7a6 LMP Ver: 2.0 (0x3) LMP Subver: 0x7a6
-        Manufacturer: Cambridge Silicon Radio (10)
-
-- I started the simple-agent:
-   Agent registered
-
-- Then I create the device using:
-  dbus-send --system --type=method_call --print-reply --dest=org.bluez
-/org/bluez/2705/hci0 org.bluez.Adapter.CreateDevice
-string:00:08:1B:05:0A:0F
-
-- Next step is to connect the headset:
-  dbus-send --system --type=method_call --print-reply --dest=org.bluez
-/org/bluez/2705/hci0/dev_00_08_1B_05_0A_0F org.bluez.Headset.Connect
-
-- Now I need to configure ~/.asoundrc with my bluetooth device:
-
-pcm.bluetooth {
-   type bluetooth
-   device "00:08:1B:05:0A:0F"
-   profile "auto"
-}
-
-> Did you try the .asoundrc example in /etc/alsa?
-
-- At this point I have my setup ready to play and record audio (at
-least I should have). Then I start aplay:
-  aplay -D bluetooth -f S16_LE myaudio.wav
-
-> Did you try aplay -D plug:bluetooth -f S16_LE myaudio.wav?
-
-  It works, but the audio I hear has a lot of noise and choppiness. I
-read on bluez wiki that choppiness is expected, but is this the
-scenario where it should happen?
-
-- I also tryied arecord -D bluetooth -f S16_LE result.wav
-  I was unable to understand the audio from result.wav. Hundreds of
-following messages were found on syslog:
-
-Jun 19 13:03:16 debian kernel: hci_scodata_packet: hci0 SCO packet for
-unknown connection handle 39169
-Jun 19 13:03:16 debian kernel: hci_scodata_packet: hci0 SCO packet for
-unknown connection handle 144
-Jun 19 13:03:16 debian kernel: hci_scodata_packet: hci0 SCO packet for
-unknown connection handle 89
-Jun 19 13:03:16 debian kernel: hci_scodata_packet: hci0 SCO packet for
-unknown connection handle 5888
-Jun 19 13:03:17 debian kernel: hci_scodata_packet: hci0 SCO packet for
-unknown connection handle 32513
-Jun 19 13:03:17 debian kernel: hci_scodata_packet: hci0 SCO packet for
-unknown connection handle 19969
-Jun 19 13:03:17 debian kernel: hci_scodata_packet: hci0 SCO packet for
-unknown connection handle 65025
-
-Am I doing something wrong? Can anybody point me a way to fix this problem?
-Thanks in advance.
-Douglas
+-- 
 --
-
+Mailto: yanjunrockets@gmail.com
