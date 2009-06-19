@@ -1,36 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <e5fc24930906181903u62c28da2s7f942611661663b4@mail.gmail.com>
-References: <e5fc24930906181903u62c28da2s7f942611661663b4@mail.gmail.com>
-Date: Fri, 19 Jun 2009 10:39:58 -0300
-Message-ID: <2d5a2c100906190639i545e7666k2938966f79be74c3@mail.gmail.com>
-Subject: Re: On A2DP frame transmissions
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Jun <yanjunrockets@gmail.com>
+Date: Fri, 19 Jun 2009 16:01:38 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Forrest Zhao <forrest.zhao@intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH] fix the bug introduced by commit "re-use the
+	sco_server initiated by audio plugin"
+Message-ID: <20090619130138.GA14451@jh-x301>
+References: <1245389422-22318-1-git-send-email-forrest.zhao@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1245389422-22318-1-git-send-email-forrest.zhao@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Forrest,
 
-On Thu, Jun 18, 2009 at 11:03 PM, Jun<yanjunrockets@gmail.com> wrote:
-> Hi All,
->
-> I'm new to BlueZ and I'd like to dynamically schedule A2DP frame
-> transmissions for a project. I did some research on BlueZ and so far I
-> feel hcidump and l2cap.c are most related. Due to the large code base,
-> could anyone please give me more directions on what to further look
-> at?
->
+On Fri, Jun 19, 2009, Forrest Zhao wrote:
+> @@ -1079,9 +1079,6 @@ int gateway_connect_sco(struct audio_device *dev, GIOChannel *io)
+>  {
+>  	struct gateway *gw = dev->gateway;
+>  
+> -	if (gw->sco)
+> -		return -EISCONN;
+> -
+>  	gw->sco = g_io_channel_ref(io);
 
-The protocol used by a2dp is avdtp which is currently implemented in
-userspace, you can start by looking here:
-http://git.kernel.org/?p=bluetooth/bluez.git;a=blob;f=audio/avdtp.c;h=ed84b2178fc953c373669ecef842a7c6e6f9a343;hb=HEAD
+This part looks wrong. If gw->sco is non-NULL you'd be causing a memory
+leak. Why do you think that returning -EISCONN is wrong here?
 
-I you could disclose what this project is about this would help us
-giving you directions.
-
--- 
-Luiz Augusto von Dentz
-Engenheiro de Computação
+Johan
