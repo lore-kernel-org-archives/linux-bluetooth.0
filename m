@@ -1,32 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: omnibook module loads but still can't use bluetooth device
-From: Renato Budinich <rennabh@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <200906190033.15149.aklists@mixdown.ca>
-References: <1245274194.3925.13.camel@renato-laptop>
-	 <200906190033.15149.aklists@mixdown.ca>
+Subject: Re: [PATCH] Bluetooth: Kill session whenever VIRTUAL_CABLE_UNPLUG
+ is passed.
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Vikram Kandukuri <vkandukuri@atheros.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20090620061927.GC9947@atheros-laptop>
+References: <20090620061927.GC9947@atheros-laptop>
 Content-Type: text/plain
-Date: Fri, 19 Jun 2009 14:46:56 +0200
-Message-Id: <1245415616.3788.4.camel@renato-laptop>
+Date: Fri, 19 Jun 2009 11:36:02 +0200
+Message-Id: <1245404162.15367.44.camel@violet>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 2009-06-19 at 00:33 -0400, Andrew Kohlsmith (Mailing List
-Account) wrote:
-> On my Toshiba U300, I had to specify ectype=14 when I load the omnibook module 
-> or I don't find any BT device at all.  I don't think that's your problem, 
-> though.
+Hi Vikram,
 
-yes i tried with different ectypes and 12 seems to give best results for
-me
-
-> Now the 'btusb' module gets loaded, and that is what seems to bring up the HCI 
-> device for me.  Perhaps that's what is missing on your system?
+> Whenever the remote device sends VIRTUAL CABLE UNPLUG, the device should
+> be disconnected.
 > 
-Yes definitely it's missing! Do you know which option does it correspond
-to in the kernel configuration? I'll search for it and compile it in
-these days and then report back
+> Signed-off-by: Jothikumar Mothilal <jothikumar.mothilal@atheros.com>
+> ---
+>  net/bluetooth/hidp/core.c |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
+> 
+> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+> index b186768..a9f7afb 100644
+> --- a/net/bluetooth/hidp/core.c
+> +++ b/net/bluetooth/hidp/core.c
+> @@ -374,6 +374,7 @@ static void hidp_process_hid_control(struct hidp_session *session,
+>  
+>  		/* Kill session thread */
+>  		atomic_inc(&session->terminate);
+> +		hidp_schedule(session);
+>  	}
+>  }
 
-Renato
+the patch is correct, but the commit message could be a little bit more
+verbose. It should explain why this fixes it.
+
+Regards
+
+Marcel
+
 
