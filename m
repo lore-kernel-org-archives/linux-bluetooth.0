@@ -1,28 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 19 Jun 2009 16:53:37 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Douglas Lopes Pereira <douglaslopespereira@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Unable to play music on mobile phone over bluetooth
-Message-ID: <20090619135337.GA16901@jh-x301>
-References: <e0ab60670906181104m3a0a95cdk13d3d4596ed6676@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <e0ab60670906181104m3a0a95cdk13d3d4596ed6676@mail.gmail.com>
+In-Reply-To: <e5fc24930906181903u62c28da2s7f942611661663b4@mail.gmail.com>
+References: <e5fc24930906181903u62c28da2s7f942611661663b4@mail.gmail.com>
+Date: Fri, 19 Jun 2009 10:39:58 -0300
+Message-ID: <2d5a2c100906190639i545e7666k2938966f79be74c3@mail.gmail.com>
+Subject: Re: On A2DP frame transmissions
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Jun <yanjunrockets@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Thu, Jun 18, 2009, Douglas Lopes Pereira wrote:
-> I'm facing some problems while playing music on my N95 phone over a
-> bluetooth conection and trying to record it with arecord.
-<snip>
-> Does anyone has a clue? Can anybody help me and point what I am doing wrong?
+On Thu, Jun 18, 2009 at 11:03 PM, Jun<yanjunrockets@gmail.com> wrote:
+> Hi All,
+>
+> I'm new to BlueZ and I'd like to dynamically schedule A2DP frame
+> transmissions for a project. I did some research on BlueZ and so far I
+> feel hcidump and l2cap.c are most related. Due to the large code base,
+> could anyone please give me more directions on what to further look
+> at?
+>
 
-I don't think you're doing anything wrong but just something that's not
-supported by bluez yet. However, A2DP Sink role is being implemented in
-Google SoC this year so if you're patient your use case might become
-possible soon.
+The protocol used by a2dp is avdtp which is currently implemented in
+userspace, you can start by looking here:
+http://git.kernel.org/?p=bluetooth/bluez.git;a=blob;f=audio/avdtp.c;h=ed84b2178fc953c373669ecef842a7c6e6f9a343;hb=HEAD
 
-Johan
+I you could disclose what this project is about this would help us
+giving you directions.
+
+-- 
+Luiz Augusto von Dentz
+Engenheiro de Computação
