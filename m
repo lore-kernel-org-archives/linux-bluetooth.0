@@ -1,23 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: omnibook module loads but still can't use bluetooth device
-From: Renato Budinich <rennabh@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <200906190033.15149.aklists@mixdown.ca>
-References: <1245274194.3925.13.camel@renato-laptop>
-	 <200906190033.15149.aklists@mixdown.ca>
-Content-Type: text/plain
-Date: Sat, 20 Jun 2009 00:44:19 +0200
-Message-Id: <1245451459.5266.1.camel@renato-laptop>
-Mime-Version: 1.0
+Date: Fri, 19 Jun 2009 23:07:06 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: =?iso-8859-1?Q?Jo=E3o?= Paulo Rechi Vita <jprvita@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fix small typo
+Message-ID: <20090619200706.GA30225@jh-x301>
+References: <1245438529-16211-1-git-send-email-jprvita@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1245438529-16211-1-git-send-email-jprvita@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi,
 
-> Now the 'btusb' module gets loaded, and that is what seems to bring up the HCI 
-> device for me.  Perhaps that's what is missing on your system?
+On Fri, Jun 19, 2009, João Paulo Rechi Vita wrote:
+> --- a/audio/manager.c
+> +++ b/audio/manager.c
+> @@ -136,7 +136,7 @@ gboolean server_is_enabled(bdaddr_t *src, uint16_t svc)
+>  	case HEADSET_SVCLASS_ID:
+>  		return enabled.headset;
+>  	case HEADSET_AGW_SVCLASS_ID:
+> -		return  FALSE;
+> +		return FALSE;
+>  	case HANDSFREE_SVCLASS_ID:
+>  		return enabled.headset && enabled.hfp;
+>  	case HANDSFREE_AGW_SVCLASS_ID:
 
-Yepee! Recompiling the kernel with btusb as module did the trick. Thank
-you for the insight
+Pushed upstream. Thanks.
 
-Renat
-
+Johan
