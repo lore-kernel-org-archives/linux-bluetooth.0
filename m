@@ -1,34 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 19 Jun 2009 18:38:49 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Forrest Zhao <forrest.zhao@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] fix the bug introduced by commit "re-use the
-	sco_server initiated by audio plugin"
-Message-ID: <20090619153849.GA22180@jh-x301>
-References: <1245389422-22318-1-git-send-email-forrest.zhao@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1245389422-22318-1-git-send-email-forrest.zhao@intel.com>
+Date: Fri, 19 Jun 2009 12:01:36 -0300
+Message-ID: <e0ab60670906190801w42d91318h6ce0e178832f8e71@mail.gmail.com>
+Subject: Audio failures on bluetooth headset
+From: Douglas Lopes Pereira <douglaslopespereira@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Forrest,
+Hi guys,
 
-On Fri, Jun 19, 2009, Forrest Zhao wrote:
-> --- a/audio/main.c
-> +++ b/audio/main.c
-> @@ -93,6 +93,10 @@ static void sco_server_cb(GIOChannel *chan, GError *err, gpointer data)
->  	device = manager_find_device(NULL, &src, &dst, AUDIO_HEADSET_INTERFACE,
->  					FALSE);
->  	if (!device)
-> +		device = manager_find_device(NULL, &src, &dst,
-> +						AUDIO_GATEWAY_INTERFACE, FALSE);
-> +
-> +	if (!device)
->  		goto drop;
+Here I am to share my problems again. Please, read if you have time.
 
-I went ahead and commited this second part of your patch since it looks
-correct and is good too have in before the next release (due out today).
+I have bluez 4.41 installed on my 2.6.30 system and I´m trying to play
+a .wav file using aplay on my bluetooth headset but the sound I hear
+on the headset has failures, noises. Also, I'm trying to record my
+voice on the same headset, but the result is terrible.
 
-Johan
+Following are the steps I'm taking:
+
+- My bluetooth dongle is recognized as (hciconfig -a):
+  hci0:   Type: USB
+        BD Address: 00:10:60:30:1A:2D ACL MTU: 384:8 SCO MTU: 64:8
+        UP RUNNING PSCAN
+        RX bytes:10886 acl:31 sco:0 events:395 errors:0
+        TX bytes:1961 acl:26 sco:0 commands:139 errors:0
+        Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+        Name: 'debian-0'
+        Class: 0x4a0204
+        Service Classes: Networking, Capturing, Telephony
+        Device Class: Phone, Cellular
+        HCI Ver: 2.0 (0x3) HCI Rev: 0x7a6 LMP Ver: 2.0 (0x3) LMP Subver: 0x7a6
+        Manufacturer: Cambridge Silicon Radio (10)
+
+- I started the simple-agent:
+   Agent registered
+
+- Then I create the device using:
+  dbus-send --system --type=method_call --print-reply --dest=org.bluez
+/org/bluez/2705/hci0 org.bluez.Adapter.CreateDevice
+string:00:08:1B:05:0A:0F
+
+- Next step is to connect the headset:
+  dbus-send --system --type=method_call --print-reply --dest=org.bluez
+/org/bluez/2705/hci0/dev_00_08_1B_05_0A_0F org.bluez.Headset.Connect
+
+- Now I need to configure ~/.asoundrc with my bluetooth device:
+
+pcm.bluetooth {
+   type bluetooth
+   device "00:08:1B:05:0A:0F"
+   profile "auto"
+}
+
+- At this point I have my setup ready to play and record audio (at
+least I should have). Then I start aplay:
+  aplay -D bluetooth -f S16_LE myaudio.wav
+  It works, but the audio I hear has a lot of noise and choppiness. I
+read on bluez wiki that choppiness is expected, but is this the
+scenario where it should happen?
+
+- I also tryied arecord -D bluetooth -f S16_LE result.wav
+  I was unable to understand the audio from result.wav. Hundreds of
+following messages were found on syslog:
+
+Jun 19 13:03:16 debian kernel: hci_scodata_packet: hci0 SCO packet for
+unknown connection handle 39169
+Jun 19 13:03:16 debian kernel: hci_scodata_packet: hci0 SCO packet for
+unknown connection handle 144
+Jun 19 13:03:16 debian kernel: hci_scodata_packet: hci0 SCO packet for
+unknown connection handle 89
+Jun 19 13:03:16 debian kernel: hci_scodata_packet: hci0 SCO packet for
+unknown connection handle 5888
+Jun 19 13:03:17 debian kernel: hci_scodata_packet: hci0 SCO packet for
+unknown connection handle 32513
+Jun 19 13:03:17 debian kernel: hci_scodata_packet: hci0 SCO packet for
+unknown connection handle 19969
+Jun 19 13:03:17 debian kernel: hci_scodata_packet: hci0 SCO packet for
+unknown connection handle 65025
+
+Am I doing something wrong? Can anybody point me a way to fix this problem?
+Thanks in advance.
+Douglas
