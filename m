@@ -1,67 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH] Add udev rules to start bluetooth on-demand
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="=-ITZYQgMKetPMPRCVGEfQ"
-Date: Sun, 21 Jun 2009 14:39:06 +0100
-Message-Id: <1245591547.26486.7101.camel@localhost.localdomain>
-Mime-Version: 1.0
+From: John Frankish <j-frankish@slb.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Sat, 20 Jun 2009 07:47:08 +0200
+Subject: RE: Audio failures on bluetooth headset
+Message-ID: <6AC5A55546F64545AE996F8200E3AC4E06A50F46@NL0105EXC01V01.eur.slb.com>
+References: <e0ab60670906190801w42d91318h6ce0e178832f8e71@mail.gmail.com>
+In-Reply-To: <e0ab60670906190801w42d91318h6ce0e178832f8e71@mail.gmail.com>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
---=-ITZYQgMKetPMPRCVGEfQ
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
 
-As discussed in previous mails.
+-----Original Message-----
+From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Douglas Lopes Pereira
+Sent: 19 June, 2009 19:02
+To: linux-bluetooth@vger.kernel.org
+Subject: Audio failures on bluetooth headset
 
-Cheers
+Hi guys,
 
---=-ITZYQgMKetPMPRCVGEfQ
-Content-Disposition: attachment; filename="0001-Add-udev-rules-to-start-bluetooth-on-demand.patch"
-Content-Type: text/x-patch; name="0001-Add-udev-rules-to-start-bluetooth-on-demand.patch"; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
+Here I am to share my problems again. Please, read if you have time.
 
->From 830639ae0f3421a9d7c7366854925e32001771b5 Mon Sep 17 00:00:00 2001
-From: Bastien Nocera <hadess@hadess.net>
-Date: Sun, 21 Jun 2009 14:37:32 +0100
-Subject: [PATCH] Add udev rules to start bluetooth on-demand
+I have bluez 4.41 installed on my 2.6.30 system and I´m trying to play
+a .wav file using aplay on my bluetooth headset but the sound I hear
+on the headset has failures, noises. Also, I'm trying to record my
+voice on the same headset, but the result is terrible.
 
-Those rules call bluetoothd --udev when a new dongle is inserted.
----
- scripts/96-bluez.rules |    5 +++++
- scripts/Makefile.am    |    2 ++
- 2 files changed, 7 insertions(+), 0 deletions(-)
- create mode 100644 scripts/96-bluez.rules
+Following are the steps I'm taking:
 
-diff --git a/scripts/96-bluez.rules b/scripts/96-bluez.rules
-new file mode 100644
-index 0000000..f3034b5
---- /dev/null
-+++ b/scripts/96-bluez.rules
-@@ -0,0 +1,5 @@
-+# Run helper every time a Bluetooth device appears
-+# On remove actions, bluetoothd should go away by itself
-+
-+ACTION=="add", SUBSYSTEM=="bluetooth",		RUN+="/usr/sbin/bluetoothd --udev"
-+
-diff --git a/scripts/Makefile.am b/scripts/Makefile.am
-index 494a9c2..d87295d 100644
---- a/scripts/Makefile.am
-+++ b/scripts/Makefile.am
-@@ -11,6 +11,8 @@ endif
- if PCMCIARULES
- rules_DATA += bluetooth-serial.rules
- endif
-+
-+rules_DATA += 96-bluez.rules
- endif
- 
- if PCMCIARULES
--- 
-1.6.2.2
+- My bluetooth dongle is recognized as (hciconfig -a):
+  hci0:   Type: USB
+        BD Address: 00:10:60:30:1A:2D ACL MTU: 384:8 SCO MTU: 64:8
+        UP RUNNING PSCAN
+        RX bytes:10886 acl:31 sco:0 events:395 errors:0
+        TX bytes:1961 acl:26 sco:0 commands:139 errors:0
+        Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+        Name: 'debian-0'
+        Class: 0x4a0204
+        Service Classes: Networking, Capturing, Telephony
+        Device Class: Phone, Cellular
+        HCI Ver: 2.0 (0x3) HCI Rev: 0x7a6 LMP Ver: 2.0 (0x3) LMP Subver: 0x7a6
+        Manufacturer: Cambridge Silicon Radio (10)
 
+- I started the simple-agent:
+   Agent registered
 
---=-ITZYQgMKetPMPRCVGEfQ--
+- Then I create the device using:
+  dbus-send --system --type=method_call --print-reply --dest=org.bluez
+/org/bluez/2705/hci0 org.bluez.Adapter.CreateDevice
+string:00:08:1B:05:0A:0F
+
+- Next step is to connect the headset:
+  dbus-send --system --type=method_call --print-reply --dest=org.bluez
+/org/bluez/2705/hci0/dev_00_08_1B_05_0A_0F org.bluez.Headset.Connect
+
+- Now I need to configure ~/.asoundrc with my bluetooth device:
+
+pcm.bluetooth {
+   type bluetooth
+   device "00:08:1B:05:0A:0F"
+   profile "auto"
+}
+
+> Did you try the .asoundrc example in /etc/alsa?
+
+- At this point I have my setup ready to play and record audio (at
+least I should have). Then I start aplay:
+  aplay -D bluetooth -f S16_LE myaudio.wav
+
+> Did you try aplay -D plug:bluetooth -f S16_LE myaudio.wav?
+
+  It works, but the audio I hear has a lot of noise and choppiness. I
+read on bluez wiki that choppiness is expected, but is this the
+scenario where it should happen?
+
+- I also tryied arecord -D bluetooth -f S16_LE result.wav
+  I was unable to understand the audio from result.wav. Hundreds of
+following messages were found on syslog:
+
+Jun 19 13:03:16 debian kernel: hci_scodata_packet: hci0 SCO packet for
+unknown connection handle 39169
+Jun 19 13:03:16 debian kernel: hci_scodata_packet: hci0 SCO packet for
+unknown connection handle 144
+Jun 19 13:03:16 debian kernel: hci_scodata_packet: hci0 SCO packet for
+unknown connection handle 89
+Jun 19 13:03:16 debian kernel: hci_scodata_packet: hci0 SCO packet for
+unknown connection handle 5888
+Jun 19 13:03:17 debian kernel: hci_scodata_packet: hci0 SCO packet for
+unknown connection handle 32513
+Jun 19 13:03:17 debian kernel: hci_scodata_packet: hci0 SCO packet for
+unknown connection handle 19969
+Jun 19 13:03:17 debian kernel: hci_scodata_packet: hci0 SCO packet for
+unknown connection handle 65025
+
+Am I doing something wrong? Can anybody point me a way to fix this problem?
+Thanks in advance.
+Douglas
+--
 
