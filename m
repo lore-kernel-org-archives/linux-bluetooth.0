@@ -1,54 +1,498 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1245595707.15367.66.camel@violet>
-References: <2d5a2c100906090617m167d3815pae998d06bdbd6646@mail.gmail.com>
-	 <2d5a2c100906210708x1816e5d9hb9a80c82d76da6dd@mail.gmail.com>
-	 <1245595707.15367.66.camel@violet>
-Date: Sun, 21 Jun 2009 13:30:15 -0300
-Message-ID: <2d5a2c100906210930q394fcf77hcd2bf39c26ae74f8@mail.gmail.com>
-Subject: Re: regression introduced on v2.6.30-rc1
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Filippo Giunchedi <filippo@esaurito.net>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/3] use CONFIGDIR and STORAGEDIR in src/hcid.conf.5
+Date: Sun, 21 Jun 2009 17:01:24 +0200
+Message-Id: <1245596485-11771-2-git-send-email-filippo@esaurito.net>
+In-Reply-To: <1245596485-11771-1-git-send-email-filippo@esaurito.net>
+References: <1245596485-11771-1-git-send-email-filippo@esaurito.net>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+---
+ configure.ac       |    1 +
+ src/hcid.conf.5    |  227 ----------------------------------------------------
+ src/hcid.conf.5.in |  227 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 228 insertions(+), 227 deletions(-)
+ delete mode 100644 src/hcid.conf.5
+ create mode 100644 src/hcid.conf.5.in
 
-On Sun, Jun 21, 2009 at 11:48 AM, Marcel Holtmann<marcel@holtmann.org> wrot=
-e:
-> Hi Luiz,
->
-> so does this fixes it:
->
-> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-> index 374536e..266c3b7 100644
-> --- a/net/bluetooth/rfcomm/core.c
-> +++ b/net/bluetooth/rfcomm/core.c
-> @@ -1772,8 +1772,7 @@ static inline void rfcomm_process_dlcs(struct
-> rfcomm_sessi
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rfcomm_dlc_clear_timer(d);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (!d->out)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rfcomm_sen=
-d_dm(s, d->dlci);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 d->state =
-=3D BT_CLOSED;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 d->state =3D BT_CLOSED;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0__rfcomm_dlc_close(d, ECON=
-NREFUSED);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0continue;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
->
+diff --git a/configure.ac b/configure.ac
+index e355833..382ff97 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -65,4 +65,5 @@ AC_OUTPUT([
+ 	doc/version.xml
+ 	bluez.pc
+ 	src/bluetoothd.8
++	src/hcid.conf.5
+ ])
+diff --git a/src/hcid.conf.5 b/src/hcid.conf.5
+deleted file mode 100644
+index cb5bcfa..0000000
+--- a/src/hcid.conf.5
++++ /dev/null
+@@ -1,227 +0,0 @@
+-.TH "HCID.CONF" "5" "March 2004" "hcid.conf - HCI daemon" "System management commands"
+-.SH "NAME"
+-/etc/bluetooth/hcid.conf \- Configuration file for the hcid Bluetooth HCI daemon
+-
+-.SH "DESCRIPTION"
+-/etc/bluetooth/hcid.conf contains all the options needed by the Bluetooth Host Controller Interface daemon.
+-
+-It consists of sections and parameters. A section begins with
+-the name of the section followed by optional specifiers and the
+-parameters inside curly brackets. Sections contain parameters of
+-the form:
+-.TP 
+-\fIname\fP \fIvalue1\fP, \fIvalue2\fP ... ;
+-
+-.PP 
+-Any character after a hash ('#') character is ignored until newline.
+-Whitespace is also ignored.
+-
+-
+-The valid section names for
+-.B hcid.conf
+-are, at the moment:
+-
+-.TP 
+-.B options
+-contains generic options for hcid and the pairing policy.
+-.TP 
+-.B device
+-contains lower\-level options for the hci devices connected to the computer.
+-.SH "OPTIONS SECTION"
+-The following parameters may be present in an option section:
+-
+-
+-.TP 
+-\fBautoinit\fP  yes|no
+-
+-Automatically initialize newly connected devices. The default is \fIno\fP.
+-
+-
+-.TP 
+-\fBpairing\fP  none|multi|once
+-
+-\fInone\fP means that pairing is disabled. \fImulti\fP allows pairing
+-with already paired devices. \fIonce\fP allows pairing once and denies
+-successive attempts. The default hcid configuration is shipped with \fBmulti\fP
+-enabled
+-
+-.TP 
+-\fBoffmode\fP  noscan|devdown
+-
+-\fInoscan\fP means that page and inquiry scans are disabled when you call
+-SetMode("off"). \fIdevdown\fP sets the adapter into down state (same what
+-\fIhciconfig hci0 down\fP does).
+-
+-.TP
+-\fBdeviceid\fP	<vendor>:<product>:<version>
+-
+-This option allows to specify the vendor and product information of the
+-Bluetooth device ID service record.
+-
+-.TP
+-\fBpasskey\fP "\fIpin\fP"
+-
+-The default PIN for incoming connections if \fBsecurity\fP has been
+-set to \fIauto\fP.
+-
+-.TP 
+-\fBsecurity\fP  none|auto|user
+-
+-\fInone\fP means the security manager is disabled. \fIauto\fP uses
+-local PIN, by default from pin_code, for incoming
+-connections. \fIuser\fP always asks the user for a PIN.
+-
+-.SH "DEVICE SECTION"
+-Parameters within a device section with no specifier, the default
+-device section, will be applied to all devices and device sections
+-where these are unspecified. The following optional device specifiers
+-are supported:
+-
+-.TP 
+-\fInn\fP\fB:\fP\fInn\fP\fB:\fP\fInn\fP\fB:\fP\fInn\fP\fB:\fP\fInn\fP\fB:\fP\fInn\fP
+-
+-Parameters specified within this section will be applied to the device
+-with this \fIdevice bluetooth address\fP. All other parameters are applied from
+-the default section.
+-
+-.TP 
+-\fBhci\fIn\fP
+-
+-Parameters specified within this section will be applied to the device
+-with this \fIdevice interface\fP, unless that device is matched by a
+-\fIdevice address\fP section. All other parameters are applied from
+-the default section.
+-
+-
+-.PP 
+-\fBNote\fP: Most of the options supported in the \fBdevice\fP section are described to some extent in the bluetooth specification version 1.2 Vol2, Part E section 6. Please refer to it for technical details.
+-
+-.PP 
+-The following parameters may be present in a device section:
+-
+-.TP 
+-\fBname\fP  "\fIname\fP"
+-
+-The device name. \fI%d\fP inserts the device id. \fI%h\fP inserts
+-the host name.
+-
+-
+-.TP 
+-\fBclass\fP  0x\fISSDDdd\fP (three bytes)
+-
+-The Bluetooth Device Class is described in the Bluetooth Specification section 1.2 ("Assigned Numbers \- Bluetooth Baseband").
+-
+-The default shipped with hcid is 0x000100 which simply stands for "Computer".
+-
+-The Bluetooth device class is a high\-level description of the bluetooth device, composed of three bytes: the "Major Service Class" (byte "SS" above), the "Major Device Class" (byte "DD" above) and the "Minor Device Class" (byte "dd" above). These classes describe the high\-level capabilities of the device, such as "Networking Device", "Computer", etc. This information is often used by clients who are looking for a certain type of service around them.
+-
+-Where it becomes tricky is that another type of mechanism for service discovery exists: "SDP", as in "Service Discovery Protocol".
+-
+-In practice, most Bluetooth clients scan their surroundings in two successive steps: they first look for all bluetooth devices around them and find out their "class". You can do this on Linux with the \fBhcitool scan\fP command. Then, they use SDP in order to check if a device in a given class offers the type of service that they want.
+-
+-This means that the hcid.conf "class" parameter needs to be set up properly if particular services are running on the host, such as "PAN", or "OBEX Obect Push", etc: in general a device looking for a service such as "Network Access Point" will only scan for this service on devices containing "Networking" in their major service class.
+-
+-
+-.IP 
+-Major service class byte allocation (from LSB to MSB):
+-
+-Bit 1:	Positioning (Location identification)
+-
+-Bit 2:  Networking (LAN, Ad hoc, ...)
+-
+-Bit 3:  Rendering (Printing, Speaker, ...)
+-
+-Bit 4:  Capturing (Scanner, Microphone, ...)
+-
+-Bit 5:  Object Transfer (v\-Inbox, v\-Folder, ...)
+-
+-Bit 6:  Audio (Speaker, Microphone, Headset service, ...)
+-
+-Bit 7:  Telephony (Cordless telephony, Modem, Headset service, ...)
+-
+-Bit 8:  Information (WEB\-server, WAP\-server, ...)
+-
+-.IP 
+-Example: class 0x02hhhh : the device offers networking service
+-
+-
+-.IP 
+-Major device class allocation:
+-
+-0x00: Miscellaneous
+-
+-0x01: Computer (desktop,notebook, PDA, organizers, .... )
+-
+-0x02: Phone (cellular, cordless, payphone, modem, ...)
+-
+-0x03: LAN /Network Access point
+-
+-0x04: Audio/Video (headset,speaker,stereo, video display, vcr.....
+-
+-0x05: Peripheral (mouse, joystick, keyboards, ..... )
+-
+-0x06: Imaging (printing, scanner, camera, display, ...)
+-
+-Other values are not defined (refer to the Bluetooth specification for more details
+-
+-.IP 
+-Minor device class allocation: the meaning of this byte depends on the major class allocation, please refer to the Bluetooth specifications for more details).
+-
+-.IP 
+-.B Example:
+-if PAND runs on your server, you need to set up at least \fBclass 0x020100\fP, which stands for "Service Class: Networking" and "Device Class: Computer, Uncategorized".
+-
+-
+-.TP 
+-\fBiscan\fP  enable|disable
+-.TP 
+-\fBpscan\fP  enable|disable
+-
+-Bluetooth devices discover and connect to each other through the use of two special Bluetooth channels, the Inquiry and Page channels (described in the Bluetooth Spec Volume 1, Part A, Section 3.3.3, page 35). These two options enable the channels on the bluetooth device.
+-
+-\fBiscan enable\fP: makes the bluetooth device "discoverable" by enabling it to answer "inquiries" from other nearby bluetooth devices.
+-
+-\fBpscan enable\fP: makes the bluetooth device "connectable to" by enabling the use of the "page scan" channel.
+-
+-.TP 
+-\fBlm\fP  none|accept,master
+-
+-\fInone\fP means no specific policy. \fIaccept\fP means always accept
+-incoming connections. \fImaster\fP means become master on incoming
+-connections and deny role switch on outgoing connections.
+-
+-.TP 
+-\fBlp\fP  none|rswitch,hold,sniff,park
+-
+-\fInone\fP means no specific policy. \fIrswitch\fP means allow role
+-switch. \fIhold\fP means allow hold mode. \fIsniff\fP means allow
+-sniff mode. \fIpark\fP means allow park mode. Several options can be
+-combined.
+-
+-This option determines the various operational modes that are allowed for this device when it participates to a piconet. Normally  hold and sniff should be enabled for standard operations.
+-
+-hold: this mode is related to synchronous communications (SCO voice channel for example).
+-
+-sniff: when in this mode, a device is only present on the piconet during determined slots of time, allowing it to do other things when it is "absent", for example to scan for other bluetooth devices.
+-
+-park:  this is a mode where the device is put on standby on the piconet, for power\-saving purposes for example.
+-
+-rswitch: this is a mode that enables role\-switch (master <\-> slave) between two devices in a piconet. It is not clear whether this needs to be enabled in order to make the "lm master" setting work properly or not.
+-
+-.TP 
+-\fBpageto\fP  \fIn\fP
+-
+-Page Timeout measured in number of baseband slots. Interval length = N * 0.625 msec (1 baseband slot)
+-
+-.TP 
+-\fBdiscovto\fP  \fIn\fP
+-
+-The time in seconds that the device will stay in discoverable mode. 0 disables this feature and forces the device to be always discoverable.
+-
+-.SH "FILES"
+-.TP 
+-.I /etc/bluetooth/hcid.conf
+-Default location of the global configuration file.
+-
+-.SH "AUTHOR"
+-This manual page was written by Edouard Lafargue, Fredrik Noring, Maxim Krasnyansky and Marcel Holtmann.
+diff --git a/src/hcid.conf.5.in b/src/hcid.conf.5.in
+new file mode 100644
+index 0000000..b4fd0b6
+--- /dev/null
++++ b/src/hcid.conf.5.in
+@@ -0,0 +1,227 @@
++.TH "HCID.CONF" "5" "March 2004" "hcid.conf - HCI daemon" "System management commands"
++.SH "NAME"
++@CONFIGDIR@/hcid.conf \- Configuration file for the hcid Bluetooth HCI daemon
++
++.SH "DESCRIPTION"
++@CONFIGDIR@/hcid.conf contains all the options needed by the Bluetooth Host Controller Interface daemon.
++
++It consists of sections and parameters. A section begins with
++the name of the section followed by optional specifiers and the
++parameters inside curly brackets. Sections contain parameters of
++the form:
++.TP 
++\fIname\fP \fIvalue1\fP, \fIvalue2\fP ... ;
++
++.PP 
++Any character after a hash ('#') character is ignored until newline.
++Whitespace is also ignored.
++
++
++The valid section names for
++.B hcid.conf
++are, at the moment:
++
++.TP 
++.B options
++contains generic options for hcid and the pairing policy.
++.TP 
++.B device
++contains lower\-level options for the hci devices connected to the computer.
++.SH "OPTIONS SECTION"
++The following parameters may be present in an option section:
++
++
++.TP 
++\fBautoinit\fP  yes|no
++
++Automatically initialize newly connected devices. The default is \fIno\fP.
++
++
++.TP 
++\fBpairing\fP  none|multi|once
++
++\fInone\fP means that pairing is disabled. \fImulti\fP allows pairing
++with already paired devices. \fIonce\fP allows pairing once and denies
++successive attempts. The default hcid configuration is shipped with \fBmulti\fP
++enabled
++
++.TP 
++\fBoffmode\fP  noscan|devdown
++
++\fInoscan\fP means that page and inquiry scans are disabled when you call
++SetMode("off"). \fIdevdown\fP sets the adapter into down state (same what
++\fIhciconfig hci0 down\fP does).
++
++.TP
++\fBdeviceid\fP	<vendor>:<product>:<version>
++
++This option allows to specify the vendor and product information of the
++Bluetooth device ID service record.
++
++.TP
++\fBpasskey\fP "\fIpin\fP"
++
++The default PIN for incoming connections if \fBsecurity\fP has been
++set to \fIauto\fP.
++
++.TP 
++\fBsecurity\fP  none|auto|user
++
++\fInone\fP means the security manager is disabled. \fIauto\fP uses
++local PIN, by default from pin_code, for incoming
++connections. \fIuser\fP always asks the user for a PIN.
++
++.SH "DEVICE SECTION"
++Parameters within a device section with no specifier, the default
++device section, will be applied to all devices and device sections
++where these are unspecified. The following optional device specifiers
++are supported:
++
++.TP 
++\fInn\fP\fB:\fP\fInn\fP\fB:\fP\fInn\fP\fB:\fP\fInn\fP\fB:\fP\fInn\fP\fB:\fP\fInn\fP
++
++Parameters specified within this section will be applied to the device
++with this \fIdevice bluetooth address\fP. All other parameters are applied from
++the default section.
++
++.TP 
++\fBhci\fIn\fP
++
++Parameters specified within this section will be applied to the device
++with this \fIdevice interface\fP, unless that device is matched by a
++\fIdevice address\fP section. All other parameters are applied from
++the default section.
++
++
++.PP 
++\fBNote\fP: Most of the options supported in the \fBdevice\fP section are described to some extent in the bluetooth specification version 1.2 Vol2, Part E section 6. Please refer to it for technical details.
++
++.PP 
++The following parameters may be present in a device section:
++
++.TP 
++\fBname\fP  "\fIname\fP"
++
++The device name. \fI%d\fP inserts the device id. \fI%h\fP inserts
++the host name.
++
++
++.TP 
++\fBclass\fP  0x\fISSDDdd\fP (three bytes)
++
++The Bluetooth Device Class is described in the Bluetooth Specification section 1.2 ("Assigned Numbers \- Bluetooth Baseband").
++
++The default shipped with hcid is 0x000100 which simply stands for "Computer".
++
++The Bluetooth device class is a high\-level description of the bluetooth device, composed of three bytes: the "Major Service Class" (byte "SS" above), the "Major Device Class" (byte "DD" above) and the "Minor Device Class" (byte "dd" above). These classes describe the high\-level capabilities of the device, such as "Networking Device", "Computer", etc. This information is often used by clients who are looking for a certain type of service around them.
++
++Where it becomes tricky is that another type of mechanism for service discovery exists: "SDP", as in "Service Discovery Protocol".
++
++In practice, most Bluetooth clients scan their surroundings in two successive steps: they first look for all bluetooth devices around them and find out their "class". You can do this on Linux with the \fBhcitool scan\fP command. Then, they use SDP in order to check if a device in a given class offers the type of service that they want.
++
++This means that the hcid.conf "class" parameter needs to be set up properly if particular services are running on the host, such as "PAN", or "OBEX Obect Push", etc: in general a device looking for a service such as "Network Access Point" will only scan for this service on devices containing "Networking" in their major service class.
++
++
++.IP 
++Major service class byte allocation (from LSB to MSB):
++
++Bit 1:	Positioning (Location identification)
++
++Bit 2:  Networking (LAN, Ad hoc, ...)
++
++Bit 3:  Rendering (Printing, Speaker, ...)
++
++Bit 4:  Capturing (Scanner, Microphone, ...)
++
++Bit 5:  Object Transfer (v\-Inbox, v\-Folder, ...)
++
++Bit 6:  Audio (Speaker, Microphone, Headset service, ...)
++
++Bit 7:  Telephony (Cordless telephony, Modem, Headset service, ...)
++
++Bit 8:  Information (WEB\-server, WAP\-server, ...)
++
++.IP 
++Example: class 0x02hhhh : the device offers networking service
++
++
++.IP 
++Major device class allocation:
++
++0x00: Miscellaneous
++
++0x01: Computer (desktop,notebook, PDA, organizers, .... )
++
++0x02: Phone (cellular, cordless, payphone, modem, ...)
++
++0x03: LAN /Network Access point
++
++0x04: Audio/Video (headset,speaker,stereo, video display, vcr.....
++
++0x05: Peripheral (mouse, joystick, keyboards, ..... )
++
++0x06: Imaging (printing, scanner, camera, display, ...)
++
++Other values are not defined (refer to the Bluetooth specification for more details
++
++.IP 
++Minor device class allocation: the meaning of this byte depends on the major class allocation, please refer to the Bluetooth specifications for more details).
++
++.IP 
++.B Example:
++if PAND runs on your server, you need to set up at least \fBclass 0x020100\fP, which stands for "Service Class: Networking" and "Device Class: Computer, Uncategorized".
++
++
++.TP 
++\fBiscan\fP  enable|disable
++.TP 
++\fBpscan\fP  enable|disable
++
++Bluetooth devices discover and connect to each other through the use of two special Bluetooth channels, the Inquiry and Page channels (described in the Bluetooth Spec Volume 1, Part A, Section 3.3.3, page 35). These two options enable the channels on the bluetooth device.
++
++\fBiscan enable\fP: makes the bluetooth device "discoverable" by enabling it to answer "inquiries" from other nearby bluetooth devices.
++
++\fBpscan enable\fP: makes the bluetooth device "connectable to" by enabling the use of the "page scan" channel.
++
++.TP 
++\fBlm\fP  none|accept,master
++
++\fInone\fP means no specific policy. \fIaccept\fP means always accept
++incoming connections. \fImaster\fP means become master on incoming
++connections and deny role switch on outgoing connections.
++
++.TP 
++\fBlp\fP  none|rswitch,hold,sniff,park
++
++\fInone\fP means no specific policy. \fIrswitch\fP means allow role
++switch. \fIhold\fP means allow hold mode. \fIsniff\fP means allow
++sniff mode. \fIpark\fP means allow park mode. Several options can be
++combined.
++
++This option determines the various operational modes that are allowed for this device when it participates to a piconet. Normally  hold and sniff should be enabled for standard operations.
++
++hold: this mode is related to synchronous communications (SCO voice channel for example).
++
++sniff: when in this mode, a device is only present on the piconet during determined slots of time, allowing it to do other things when it is "absent", for example to scan for other bluetooth devices.
++
++park:  this is a mode where the device is put on standby on the piconet, for power\-saving purposes for example.
++
++rswitch: this is a mode that enables role\-switch (master <\-> slave) between two devices in a piconet. It is not clear whether this needs to be enabled in order to make the "lm master" setting work properly or not.
++
++.TP 
++\fBpageto\fP  \fIn\fP
++
++Page Timeout measured in number of baseband slots. Interval length = N * 0.625 msec (1 baseband slot)
++
++.TP 
++\fBdiscovto\fP  \fIn\fP
++
++The time in seconds that the device will stay in discoverable mode. 0 disables this feature and forces the device to be always discoverable.
++
++.SH "FILES"
++.TP 
++.I @CONFIGDIR@/hcid.conf
++Default location of the global configuration file.
++
++.SH "AUTHOR"
++This manual page was written by Edouard Lafargue, Fredrik Noring, Maxim Krasnyansky and Marcel Holtmann.
+-- 
+1.6.3.1
 
-Not really, rfcomm_dlc is being closed and freed properly, BT_CONNECT2
-or BT_CLOSED doesn't make much difference to __rfcomm_dlc_close as
-they both trigger default case. As I said the code works fine with
-stacks that cope with DM response, when it doesn't you have to
-manually trigger rfcomm_session_put to take care of the reference
-created on rfcomm_accept_connection.
-
-
---=20
-Luiz Augusto von Dentz
-Engenheiro de Computa=E7=E3o
