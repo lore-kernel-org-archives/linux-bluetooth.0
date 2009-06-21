@@ -1,36 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A3E3927.7080802@googlemail.com>
-Date: Sun, 21 Jun 2009 15:44:07 +0200
-From: Tamer Higazi <th982a@googlemail.com>
-MIME-Version: 1.0
+Subject: [PATCH] Add udev rules to start bluetooth on-demand
+From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: failed to start bluetooth deamon, unable to get on dbus.....
-Content-Type: text/plain; charset=UTF-8
+Content-Type: multipart/mixed; boundary="=-ITZYQgMKetPMPRCVGEfQ"
+Date: Sun, 21 Jun 2009 14:39:06 +0100
+Message-Id: <1245591547.26486.7101.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi people!
-I tried to start the bluetooth deamon and I get the message:
 
-tux tamer # /usr/sbin/bluetoothd -nd
-bluetoothd[26851]: Bluetooth daemon 4.41
-bluetoothd[26851]: Enabling debug information
-bluetoothd[26851]: parsing main.conf
-bluetoothd[26851]: discovto=0
-bluetoothd[26851]: pairto=0
-bluetoothd[26851]: pageto=8192
-bluetoothd[26851]: name=%h-%d
-bluetoothd[26851]: class=0x000100
-bluetoothd[26851]: discov_interval=0
-bluetoothd[26851]: Key file does not have key 'DeviceID'
-bluetoothd[26851]: Unable to get on D-Bus
+--=-ITZYQgMKetPMPRCVGEfQ
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+
+As discussed in previous mails.
+
+Cheers
+
+--=-ITZYQgMKetPMPRCVGEfQ
+Content-Disposition: attachment; filename="0001-Add-udev-rules-to-start-bluetooth-on-demand.patch"
+Content-Type: text/x-patch; name="0001-Add-udev-rules-to-start-bluetooth-on-demand.patch"; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+
+>From 830639ae0f3421a9d7c7366854925e32001771b5 Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Sun, 21 Jun 2009 14:37:32 +0100
+Subject: [PATCH] Add udev rules to start bluetooth on-demand
+
+Those rules call bluetoothd --udev when a new dongle is inserted.
+---
+ scripts/96-bluez.rules |    5 +++++
+ scripts/Makefile.am    |    2 ++
+ 2 files changed, 7 insertions(+), 0 deletions(-)
+ create mode 100644 scripts/96-bluez.rules
+
+diff --git a/scripts/96-bluez.rules b/scripts/96-bluez.rules
+new file mode 100644
+index 0000000..f3034b5
+--- /dev/null
++++ b/scripts/96-bluez.rules
+@@ -0,0 +1,5 @@
++# Run helper every time a Bluetooth device appears
++# On remove actions, bluetoothd should go away by itself
++
++ACTION=="add", SUBSYSTEM=="bluetooth",		RUN+="/usr/sbin/bluetoothd --udev"
++
+diff --git a/scripts/Makefile.am b/scripts/Makefile.am
+index 494a9c2..d87295d 100644
+--- a/scripts/Makefile.am
++++ b/scripts/Makefile.am
+@@ -11,6 +11,8 @@ endif
+ if PCMCIARULES
+ rules_DATA += bluetooth-serial.rules
+ endif
++
++rules_DATA += 96-bluez.rules
+ endif
+ 
+ if PCMCIARULES
+-- 
+1.6.2.2
 
 
+--=-ITZYQgMKetPMPRCVGEfQ--
 
-What did I make wrong?
-
-For any help I would thank you kindly.
-
-
-
-Tamer
