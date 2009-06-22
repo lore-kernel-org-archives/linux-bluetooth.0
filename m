@@ -2,40 +2,29 @@ Return-Path: <cyrus@holtmann.org>
 From: alokbarsode@gmail.com
 To: linux-bluetooth@vger.kernel.org
 Cc: Alok Barsode <alok.barsode@azingo.com>
-Subject: [PATCH 2/2] Adding inquiry_complete method to handle inquiry complete event.
-Date: Mon, 22 Jun 2009 20:27:37 +0530
-Message-Id: <1245682657-28668-2-git-send-email-alok.barsode@azingo.com>
-In-Reply-To: <1245682657-28668-1-git-send-email-alok.barsode@azingo.com>
-References: <1245682657-28668-1-git-send-email-alok.barsode@azingo.com>
+Subject: [PATCH 1/2] Adding start_inquiry method to handle inquiry start event.
+Date: Mon, 22 Jun 2009 20:27:36 +0530
+Message-Id: <1245682657-28668-1-git-send-email-alok.barsode@azingo.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Alok Barsode <alok.barsode@azingo.com>
 
 ---
- src/dbus-hci.c |   67 +--------------------------------------------------
- src/dbus-hci.h |    3 +-
- src/security.c |   73 +++++++++++++++++++++++++++++++++++++++++++++++--------
- 3 files changed, 64 insertions(+), 79 deletions(-)
+ src/dbus-hci.c |   52 ----------------------------------------------------
+ src/dbus-hci.h |    3 ---
+ src/security.c |   54 +++++++++++++++++++++++++++++++++++++++++++++++++-----
+ 3 files changed, 49 insertions(+), 60 deletions(-)
 
 diff --git a/src/dbus-hci.c b/src/dbus-hci.c
-index ad7204f..61c65a8 100644
+index 8718465..ad7204f 100644
 --- a/src/dbus-hci.c
 +++ b/src/dbus-hci.c
-@@ -434,7 +434,7 @@ void hcid_dbus_simple_pairing_complete(bdaddr_t *local, bdaddr_t *peer,
+@@ -434,38 +434,6 @@ void hcid_dbus_simple_pairing_complete(bdaddr_t *local, bdaddr_t *peer,
  	device_simple_pairing_complete(device, status);
  }
  
--static int found_device_req_name(struct btd_adapter *adapter)
-+int found_device_req_name(struct btd_adapter *adapter)
- {
- 	struct hci_request rq;
- 	evt_cmd_status rp;
-@@ -502,71 +502,6 @@ static int found_device_req_name(struct btd_adapter *adapter)
- 	return 0;
- }
- 
--void hcid_dbus_inquiry_complete(bdaddr_t *local)
+-void hcid_dbus_inquiry_start(bdaddr_t *local)
 -{
 -	struct btd_adapter *adapter;
 -	int state;
@@ -46,39 +35,35 @@ index ad7204f..61c65a8 100644
 -		return;
 -	}
 -
--	/*
--	 * The following scenarios can happen:
--	 * 1. standard inquiry: always send discovery completed signal
--	 * 2. standard inquiry + name resolving: send discovery completed
--	 *    after name resolving
--	 * 3. periodic inquiry: skip discovery completed signal
--	 * 4. periodic inquiry + standard inquiry: always send discovery
--	 *    completed signal
--	 *
--	 * Keep in mind that non D-Bus requests can arrive.
--	 */
--	if (found_device_req_name(adapter) == 0)
--		return;
--
 -	state = adapter_get_state(adapter);
--
+-	state |= STD_INQUIRY;
+-	adapter_set_state(adapter, state);
 -	/*
--	 * workaround to identify situation when there is no devices around
--	 * but periodic inquiry is active.
+-	 * Cancel pending remote name request and clean the device list
+-	 * when inquiry is supported in periodic inquiry idle state.
 -	 */
--	if (!(state & STD_INQUIRY) && !(state & PERIODIC_INQUIRY)) {
--		state |= PERIODIC_INQUIRY;
--		adapter_set_state(adapter, state);
+-	if (adapter_get_state(adapter) & PERIODIC_INQUIRY) {
+-		pending_remote_name_cancel(adapter);
+-
+-		clear_found_devices_list(adapter);
 -	}
 -
--	/* reset the discover type to be able to handle D-Bus and non D-Bus
--	 * requests */
--	state &= ~STD_INQUIRY;
--	state &= ~PERIODIC_INQUIRY;
--	adapter_set_state(adapter, state);
+-	/* Disable name resolution for non D-Bus clients */
+-	if (!adapter_has_discov_sessions(adapter)) {
+-		state = adapter_get_state(adapter);
+-		state &= ~RESOLVE_NAME;
+-		adapter_set_state(adapter, state);
+-	}
 -}
 -
--void hcid_dbus_periodic_inquiry_exit(bdaddr_t *local, uint8_t status)
+ static int found_device_req_name(struct btd_adapter *adapter)
+ {
+ 	struct hci_request rq;
+@@ -577,26 +545,6 @@ void hcid_dbus_inquiry_complete(bdaddr_t *local)
+ 	adapter_set_state(adapter, state);
+ }
+ 
+-void hcid_dbus_periodic_inquiry_start(bdaddr_t *local, uint8_t status)
 -{
 -	struct btd_adapter *adapter;
 -	int state;
@@ -93,39 +78,46 @@ index ad7204f..61c65a8 100644
 -		return;
 -	}
 -
--	/* reset the discover type to be able to handle D-Bus and non D-Bus
--	 * requests */
 -	state = adapter_get_state(adapter);
--	state &= ~PERIODIC_INQUIRY;
+-	state |= PERIODIC_INQUIRY;
 -	adapter_set_state(adapter, state);
 -}
 -
- static char *extract_eir_name(uint8_t *data, uint8_t *type)
+ void hcid_dbus_periodic_inquiry_exit(bdaddr_t *local, uint8_t status)
  {
- 	if (!data || !type)
+ 	struct btd_adapter *adapter;
 diff --git a/src/dbus-hci.h b/src/dbus-hci.h
-index 0c809f6..fb1daba 100644
+index d46ccf8..0c809f6 100644
 --- a/src/dbus-hci.h
 +++ b/src/dbus-hci.h
-@@ -23,8 +23,7 @@
+@@ -23,10 +23,7 @@
   */
  
  int hcid_dbus_request_pin(int dev, bdaddr_t *sba, struct hci_conn_info *ci);
--void hcid_dbus_inquiry_complete(bdaddr_t *local);
--void hcid_dbus_periodic_inquiry_exit(bdaddr_t *local, uint8_t status);
-+int found_device_req_name(struct btd_adapter *adapter);
+-
+-void hcid_dbus_inquiry_start(bdaddr_t *local);
+ void hcid_dbus_inquiry_complete(bdaddr_t *local);
+-void hcid_dbus_periodic_inquiry_start(bdaddr_t *local, uint8_t status);
+ void hcid_dbus_periodic_inquiry_exit(bdaddr_t *local, uint8_t status);
  void hcid_dbus_inquiry_result(bdaddr_t *local, bdaddr_t *peer, uint32_t class, int8_t rssi, uint8_t *data);
  void hcid_dbus_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t class);
- void hcid_dbus_remote_name(bdaddr_t *local, bdaddr_t *peer, uint8_t status, char *name);
 diff --git a/src/security.c b/src/security.c
-index d0a4236..a483400 100644
+index a61d75f..d0a4236 100644
 --- a/src/security.c
 +++ b/src/security.c
-@@ -588,6 +588,62 @@ static void start_inquiry(bdaddr_t *local, uint8_t status, gboolean periodic)
- 	}
+@@ -53,6 +53,7 @@
+ #include "adapter.h"
+ #include "dbus-hci.h"
+ #include "storage.h"
++#include "manager.h"
+ 
+ typedef enum {
+ 	REQ_PENDING,
+@@ -541,16 +542,59 @@ reject:
+ 	hci_send_cmd(dev, OGF_LINK_CTL, OCF_PIN_CODE_NEG_REPLY, 6, dba);
  }
  
-+static void inquiry_complete(bdaddr_t *local, uint8_t status, gboolean periodic)
++static void start_inquiry(bdaddr_t *local, uint8_t status, gboolean periodic)
 +{
 +	struct btd_adapter *adapter;
 +	int state;
@@ -142,101 +134,58 @@ index d0a4236..a483400 100644
 +		return;
 +	}
 +
-+	/*
-+	 * The following scenarios can happen:
-+	 * 1. standard inquiry: always send discovery completed signal
-+	 * 2. standard inquiry + name resolving: send discovery completed
-+	 *    after name resolving
-+	 * 3. periodic inquiry: skip discovery completed signal
-+	 * 4. periodic inquiry + standard inquiry: always send discovery
-+	 *    completed signal
-+	 *
-+	 * Keep in mind that non D-Bus requests can arrive.
-+	 */
-+	if (periodic) {
-+		state = adapter_get_state(adapter);
-+		state &= ~PERIODIC_INQUIRY;
-+		adapter_set_state(adapter, state);
-+		return;
-+	}
-+
-+	if (found_device_req_name(adapter) == 0)
-+		return;
-+
 +	state = adapter_get_state(adapter);
-+	/*
-+	 * workaround to identify situation when there is no devices around
-+	 * but periodic inquiry is active.
-+	 */
-+	if (!(state & STD_INQUIRY) && !(state & PERIODIC_INQUIRY)) {
++
++	if (periodic) {
 +		state |= PERIODIC_INQUIRY;
 +		adapter_set_state(adapter, state);
 +		return;
 +	}
 +
-+	/* reset the discover type to be able to handle D-Bus and non D-Bus
-+	 * requests */
-+	state &= ~STD_INQUIRY;
-+	state &= ~PERIODIC_INQUIRY;
++	state |= STD_INQUIRY;
 +	adapter_set_state(adapter, state);
++
++	/*
++	 * Cancel pending remote name request and clean the device list
++	 * when inquiry is supported in periodic inquiry idle state.
++	 */
++	if (adapter_get_state(adapter) & PERIODIC_INQUIRY) {
++		pending_remote_name_cancel(adapter);
++
++		clear_found_devices_list(adapter);
++	}
++
++	/* Disable name resolution for non D-Bus clients */
++	if (!adapter_has_discov_sessions(adapter)) {
++		state = adapter_get_state(adapter);
++		state &= ~RESOLVE_NAME;
++		adapter_set_state(adapter, state);
++	}
 +}
 +
  static inline void cmd_status(int dev, bdaddr_t *sba, void *ptr)
  {
  	evt_cmd_status *evt = ptr;
-@@ -601,19 +657,17 @@ static inline void cmd_complete(int dev, bdaddr_t *sba, void *ptr)
- {
- 	evt_cmd_complete *evt = ptr;
  	uint16_t opcode = btohs(evt->opcode);
--	uint8_t status;
-+	uint8_t status = *((uint8_t *) ptr + EVT_CMD_COMPLETE_SIZE);
  
- 	switch (opcode) {
- 	case cmd_opcode_pack(OGF_LINK_CTL, OCF_PERIODIC_INQUIRY):
--		status = *((uint8_t *) ptr + EVT_CMD_COMPLETE_SIZE);
- 		start_inquiry(sba, status, TRUE);
- 		break;
- 	case cmd_opcode_pack(OGF_LINK_CTL, OCF_EXIT_PERIODIC_INQUIRY):
--		status = *((uint8_t *) ptr + EVT_CMD_COMPLETE_SIZE);
--		hcid_dbus_periodic_inquiry_exit(sba, status);
-+		inquiry_complete(sba, status, TRUE);
- 		break;
- 	case cmd_opcode_pack(OGF_LINK_CTL, OCF_INQUIRY_CANCEL):
--		hcid_dbus_inquiry_complete(sba);
-+		inquiry_complete(sba, status, FALSE);
- 		break;
- 	case cmd_opcode_pack(OGF_HOST_CTL, OCF_CHANGE_LOCAL_NAME):
- 		hcid_dbus_setname_complete(sba);
-@@ -667,11 +721,6 @@ static inline void remote_version_information(int dev, bdaddr_t *sba, void *ptr)
- 				evt->lmp_ver, btohs(evt->lmp_subver));
+-	if (evt->status)
+-		return;
+-
+ 	if (opcode == cmd_opcode_pack(OGF_LINK_CTL, OCF_INQUIRY))
+-		hcid_dbus_inquiry_start(sba);
++		start_inquiry(sba, evt->status, FALSE);
  }
  
--static inline void inquiry_complete(int dev, bdaddr_t *sba, void *ptr)
--{
--	hcid_dbus_inquiry_complete(sba);
--}
--
- static inline void inquiry_result(int dev, bdaddr_t *sba, int plen, void *ptr)
- {
- 	uint8_t num = *(uint8_t *) ptr++;
-@@ -875,6 +924,7 @@ static gboolean io_security_event(GIOChannel *chan, GIOCondition cond, gpointer
- 	size_t len;
- 	hci_event_hdr *eh;
- 	GIOError err;
-+	evt_cmd_status *evt;
- 
- 	if (cond & (G_IO_NVAL | G_IO_HUP | G_IO_ERR)) {
- 		delete_channel(chan);
-@@ -925,7 +975,8 @@ static gboolean io_security_event(GIOChannel *chan, GIOCondition cond, gpointer
+ static inline void cmd_complete(int dev, bdaddr_t *sba, void *ptr)
+@@ -562,7 +606,7 @@ static inline void cmd_complete(int dev, bdaddr_t *sba, void *ptr)
+ 	switch (opcode) {
+ 	case cmd_opcode_pack(OGF_LINK_CTL, OCF_PERIODIC_INQUIRY):
+ 		status = *((uint8_t *) ptr + EVT_CMD_COMPLETE_SIZE);
+-		hcid_dbus_periodic_inquiry_start(sba, status);
++		start_inquiry(sba, status, TRUE);
  		break;
- 
- 	case EVT_INQUIRY_COMPLETE:
--		inquiry_complete(dev, &di->bdaddr, ptr);
-+		evt = (evt_cmd_status *)ptr;
-+		inquiry_complete(&di->bdaddr, evt->status, FALSE);
- 		break;
- 
- 	case EVT_INQUIRY_RESULT:
+ 	case cmd_opcode_pack(OGF_LINK_CTL, OCF_EXIT_PERIODIC_INQUIRY):
+ 		status = *((uint8_t *) ptr + EVT_CMD_COMPLETE_SIZE);
 -- 
 1.5.6.3
 
