@@ -1,6 +1,6 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <2d5a2c100906221449y6e37cb19x1bc27085bac318f4@mail.gmail.com>
+In-Reply-To: <1245611096.15367.76.camel@violet>
 References: <2d5a2c100906090617m167d3815pae998d06bdbd6646@mail.gmail.com>
 	 <2d5a2c100906210708x1816e5d9hb9a80c82d76da6dd@mail.gmail.com>
 	 <1245595707.15367.66.camel@violet>
@@ -8,117 +8,148 @@ References: <2d5a2c100906090617m167d3815pae998d06bdbd6646@mail.gmail.com>
 	 <1245603529.15367.68.camel@violet>
 	 <2d5a2c100906211047n31b9d4dajac290601c184380b@mail.gmail.com>
 	 <1245611096.15367.76.camel@violet>
-	 <2d5a2c100906221449y6e37cb19x1bc27085bac318f4@mail.gmail.com>
-Date: Mon, 22 Jun 2009 20:08:24 -0300
-Message-ID: <2d5a2c100906221608v5e3e3d8aydf66b13826ad88fa@mail.gmail.com>
+Date: Mon, 22 Jun 2009 18:49:53 -0300
+Message-ID: <2d5a2c100906221449y6e37cb19x1bc27085bac318f4@mail.gmail.com>
 Subject: Re: regression introduced on v2.6.30-rc1
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=00163646d6dcc91715046cf7f3e4
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---00163646d6dcc91715046cf7f3e4
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+Hi Marcel,
 
-Proper git format-patch
+On Sun, Jun 21, 2009 at 4:04 PM, Marcel Holtmann<marcel@holtmann.org> wrote:
+> stupid specification. It is just bloody stupid that we have to cleanup
+> someone else's stuff that we haven't initiated in the first place :(
+>
+> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+> index 374536e..864c3c4 100644
+> --- a/net/bluetooth/rfcomm/core.c
+> +++ b/net/bluetooth/rfcomm/core.c
+> @@ -466,6 +466,11 @@ static int __rfcomm_dlc_close(struct rfcomm_dlc *d, int err)
+>
+> а а а а а а а аskb_queue_purge(&d->tx_queue);
+> а а а а а а а аrfcomm_dlc_unlink(d);
+> +
+> + а а а а а а а /* Specification demands to cleanup after remote
+> + а а а а а а а а* initiated session when closing last DLC */
+> + а а а а а а а if (list_empty(&s->dlcs))
+> + а а а а а а а а а а а rfcomm_session_put(s);
+> а а а а}
 
---=20
+
+As your patch seems to trigger DISC 0 in both sides when the remote
+stack cope with DM I would suggest introducing a timer_list to
+rfcomm_session so we can give some time to remote stack to take down
+dlci 0 clean it up otherwise.
+
+
+@@ -244,6 +246,33 @@ static inline int rfcomm_check_security(struct
+rfcomm_dlc *d)
+ 								auth_type);
+ }
+
++static void rfcomm_session_timeout(unsigned long arg)
++{
++	struct rfcomm_session *s = (void *) arg;
++
++	BT_DBG("session %p state %ld", s, s->state);
++
++	set_bit(RFCOMM_TIMED_OUT, &s->flags);
++	rfcomm_session_put(s);
++	rfcomm_schedule(RFCOMM_SCHED_TIMEO);
++}
++
++static void rfcomm_session_set_timer(struct rfcomm_session *s, long timeout)
++{
++	BT_DBG("session %p state %ld timeout %ld", s, s->state, timeout);
++
++	if (!mod_timer(&s->timer, jiffies + timeout))
++		rfcomm_session_hold(s);
++}
++
++static void rfcomm_session_clear_timer(struct rfcomm_session *s)
++{
++	BT_DBG("session %p state %ld", s, s->state);
++
++	if (timer_pending(&s->timer) && del_timer(&s->timer))
++		rfcomm_session_put(s);
++}
++
+ /* ---- RFCOMM DLCs ---- */
+ static void rfcomm_dlc_timeout(unsigned long arg)
+ {
+@@ -320,6 +349,7 @@ static void rfcomm_dlc_link(struct rfcomm_session
+*s, struct rfcomm_dlc *d)
+
+ 	rfcomm_session_hold(s);
+
++	rfcomm_session_clear_timer(s);
+ 	rfcomm_dlc_hold(d);
+ 	list_add(&d->list, &s->dlcs);
+ 	d->session = s;
+@@ -335,6 +365,9 @@ static void rfcomm_dlc_unlink(struct rfcomm_dlc *d)
+ 	d->session = NULL;
+ 	rfcomm_dlc_put(d);
+
++	if (list_empty(&s->dlcs))
++		rfcomm_session_set_timer(s, RFCOMM_DISC_TIMEOUT);
++
+ 	rfcomm_session_put(s);
+ }
+
+@@ -454,6 +487,7 @@ static int __rfcomm_dlc_close(struct rfcomm_dlc *d, int err)
+ 			rfcomm_schedule(RFCOMM_SCHED_AUTH);
+ 			break;
+ 		}
++
+ 		/* Fall through */
+
+ 	default:
+@@ -567,6 +601,8 @@ static struct rfcomm_session
+*rfcomm_session_add(struct socket *sock, int state)
+
+ 	BT_DBG("session %p sock %p", s, sock);
+
++	setup_timer(&s->timer, rfcomm_session_timeout, (unsigned long)s);
++
+ 	INIT_LIST_HEAD(&s->dlcs);
+ 	s->state = state;
+ 	s->sock  = sock;
+@@ -639,6 +675,7 @@ static void rfcomm_session_close(struct
+rfcomm_session *s, int err)
+ 		__rfcomm_dlc_close(d, err);
+ 	}
+
++	rfcomm_session_clear_timer(s);
+ 	rfcomm_session_put(s);
+ }
+
+@@ -1774,6 +1811,7 @@ static inline void rfcomm_process_dlcs(struct
+rfcomm_session *s)
+ 				rfcomm_send_dm(s, d->dlci);
+ 			else
+ 				d->state = BT_CLOSED;
++
+ 			__rfcomm_dlc_close(d, ECONNREFUSED);
+ 			continue;
+ 		}
+@@ -1879,6 +1917,11 @@ static inline void rfcomm_process_sessions(void)
+ 		struct rfcomm_session *s;
+ 		s = list_entry(p, struct rfcomm_session, list);
+
++		if (test_bit(RFCOMM_TIMED_OUT, &s->flags)) {
++			rfcomm_session_put(s);
++			continue;
++		}
++
+ 		if (s->state == BT_LISTEN) {
+ 			rfcomm_accept_connection(s);
+ 			continue;
+
+
+-- 
 Luiz Augusto von Dentz
-Engenheiro de Computa=E7=E3o
-
---00163646d6dcc91715046cf7f3e4
-Content-Type: text/x-diff; charset=US-ASCII;
-	name="0001-bluetooth-Fix-rejected-connection-to-not-disconnect-.patch"
-Content-Disposition: attachment;
-	filename="0001-bluetooth-Fix-rejected-connection-to-not-disconnect-.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_fw9ssjam1
-
-RnJvbSBiMjFkYmE0ZGI3NDdmYzFhMjMyOWVkYmQyMTY1NjdkZTIwOTM2ZmM2IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IDxsdWl6LmRlbnR6QG9w
-ZW5ib3NzYS5vcmc+CkRhdGU6IE1vbiwgMjIgSnVuIDIwMDkgMjA6MDY6MDQgLTAzMDAKU3ViamVj
-dDogW1BBVENIXSBibHVldG9vdGg6IEZpeCByZWplY3RlZCBjb25uZWN0aW9uIHRvIG5vdCBkaXNj
-b25uZWN0IEFDTC4KCldoZW4gdXNpbmcgREVGRVJfU0VUVVAgb24gYSBSRkNPTU0gc29ja2V0IGEg
-U0FCTSBmcmFtZSB0cmlnZ2VycwphdXRob3JpemF0aW9uIHdoaWNoIHdoZW4gcmVqZWN0ZWQgc2Vu
-ZCBhIERNIGFzIHJlc3BvbnNlLiBUaGlzIGlzIGZpbmUKYWNjb3VyZGluZyB0byB0aGUgUkZDT01N
-IHNwZWM6CgoidGhlIHJlc3BvbmRpbmcgaW1wbGVtZW50YXRpb24gbWF5IHJlcGxhY2UgdGhlICJw
-cm9wZXIiIHJlc3BvbnNlIG9uCnRoZSBNdWx0aXBsZXhlciBDb250cm9sIGNoYW5uZWwgd2l0aCBh
-IERNIGZyYW1lLCBzZW50IG9uIHRoZSByZWZlcmVuY2VkCkRMQ0kgdG8gaW5kaWNhdGUgdGhhdCB0
-aGUgRExDSSBpcyBub3Qgb3BlbiwgYW5kIHRoYXQgdGhlIHJlc3BvbmRlciB3b3VsZApub3QgZ3Jh
-bnQgYSByZXF1ZXN0IHRvIG9wZW4gaXQgbGF0ZXIgZWl0aGVyLiIKCkJ1dCBzb21lIHN0YWNrcyBk
-b2Vzbid0IHNlZW1zIHRvIGNvcGUgd2l0aCB0aGlzIGxlYXZpbmcgRExDSSAwIG9wZW4gYWZ0ZXIK
-cmVjZWl2aW5nIERNIGZyYW1lLgoKVG8gZml4IGl0IHByb3Blcmx5IGEgdGltZXIgd2FzIGludHJv
-ZHVjZWQgdG8gcmZjb21tX3Nlc3Npb24gd2hpY2ggaXMgdXNlZAp0byBzZXQgYSB0aW1lb3V0IHdo
-ZW4gdGhlIGxhc3QgYWN0aXZlIERMQyBvZiBhIHNlc3Npb24gaXMgdW5saW5rZWQsIHRoaXMKd2ls
-bCBnaXZlIHRoZSByZW1vdGUgc3RhY2sgc29tZSB0aW1lIHRvIHJlcGx5IHdpdGggYSBwcm9wZXIg
-RElTQyBmcmFtZSBvbgpETENJIDAgYXZvaWRpbmcgYm90aCBzaWRlcyBzZW5kaW5nIERJU0MgdG8g
-ZWFjaCBvdGhlciBvbiBzdGFja3MgdGhhdApmb2xsb3cgdGhlIHNwZWNpZmljYXRpb24gYW5kIHRh
-a2luZyBjYXJlIG9mIHRob3NlIHdobyBkb24ndCBieSB0YWtpbmcKZG93biBETENJIDAuCgpTaWdu
-ZWQtb2ZmLWJ5OiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IDxsdWl6LmRlbnR6QG9wZW5ib3NzYS5v
-cmc+Ci0tLQogaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL3JmY29tbS5oIHwgICAxMyArKysrKystLS0t
-LQogbmV0L2JsdWV0b290aC9yZmNvbW0vY29yZS5jICAgIHwgICA0MSArKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrCiAyIGZpbGVzIGNoYW5nZWQsIDQ4IGluc2VydGlvbnMo
-KyksIDYgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL3Jm
-Y29tbS5oIGIvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL3JmY29tbS5oCmluZGV4IDgwMDcyNjEuLjcy
-YjkyYzUgMTAwNjQ0Ci0tLSBhL2luY2x1ZGUvbmV0L2JsdWV0b290aC9yZmNvbW0uaAorKysgYi9p
-bmNsdWRlL25ldC9ibHVldG9vdGgvcmZjb21tLmgKQEAgLTE1MiwxMiArMTUyLDEzIEBAIHN0cnVj
-dCByZmNvbW1fbXNjIHsKIC8qIC0tLS0gQ29yZSBzdHJ1Y3R1cmVzLCBmbGFncyBldGMgLS0tLSAq
-LwogCiBzdHJ1Y3QgcmZjb21tX3Nlc3Npb24gewotCXN0cnVjdCBsaXN0X2hlYWQgbGlzdDsKLQlz
-dHJ1Y3Qgc29ja2V0ICAgKnNvY2s7Ci0JdW5zaWduZWQgbG9uZyAgICBzdGF0ZTsKLQl1bnNpZ25l
-ZCBsb25nICAgIGZsYWdzOwotCWF0b21pY190ICAgICAgICAgcmVmY250OwotCWludCAgICAgICAg
-ICAgICAgaW5pdGlhdG9yOworCXN0cnVjdCBsaXN0X2hlYWQgICAgICBsaXN0OworCXN0cnVjdCBz
-b2NrZXQgICAgICAgICAqc29jazsKKwlzdHJ1Y3QgdGltZXJfbGlzdCAgICAgdGltZXI7CisJdW5z
-aWduZWQgbG9uZyAgICAgICAgIHN0YXRlOworCXVuc2lnbmVkIGxvbmcgICAgICAgICBmbGFnczsK
-KwlhdG9taWNfdCAgICAgICAgICAgICAgcmVmY250OworCWludCAgICAgICAgICAgICAgICAgICBp
-bml0aWF0b3I7CiAKIAkvKiBEZWZhdWx0IERMQyBwYXJhbWV0ZXJzICovCiAJaW50ICAgIGNmYzsK
-ZGlmZiAtLWdpdCBhL25ldC9ibHVldG9vdGgvcmZjb21tL2NvcmUuYyBiL25ldC9ibHVldG9vdGgv
-cmZjb21tL2NvcmUuYwppbmRleCAzNzQ1MzZlLi43ZmEyOTQ5IDEwMDY0NAotLS0gYS9uZXQvYmx1
-ZXRvb3RoL3JmY29tbS9jb3JlLmMKKysrIGIvbmV0L2JsdWV0b290aC9yZmNvbW0vY29yZS5jCkBA
-IC0yNDQsNiArMjQ0LDMzIEBAIHN0YXRpYyBpbmxpbmUgaW50IHJmY29tbV9jaGVja19zZWN1cml0
-eShzdHJ1Y3QgcmZjb21tX2RsYyAqZCkKIAkJCQkJCQkJYXV0aF90eXBlKTsKIH0KIAorc3RhdGlj
-IHZvaWQgcmZjb21tX3Nlc3Npb25fdGltZW91dCh1bnNpZ25lZCBsb25nIGFyZykKK3sKKwlzdHJ1
-Y3QgcmZjb21tX3Nlc3Npb24gKnMgPSAodm9pZCAqKSBhcmc7CisKKwlCVF9EQkcoInNlc3Npb24g
-JXAgc3RhdGUgJWxkIiwgcywgcy0+c3RhdGUpOworCisJc2V0X2JpdChSRkNPTU1fVElNRURfT1VU
-LCAmcy0+ZmxhZ3MpOworCXJmY29tbV9zZXNzaW9uX3B1dChzKTsKKwlyZmNvbW1fc2NoZWR1bGUo
-UkZDT01NX1NDSEVEX1RJTUVPKTsKK30KKworc3RhdGljIHZvaWQgcmZjb21tX3Nlc3Npb25fc2V0
-X3RpbWVyKHN0cnVjdCByZmNvbW1fc2Vzc2lvbiAqcywgbG9uZyB0aW1lb3V0KQoreworCUJUX0RC
-Rygic2Vzc2lvbiAlcCBzdGF0ZSAlbGQgdGltZW91dCAlbGQiLCBzLCBzLT5zdGF0ZSwgdGltZW91
-dCk7CisKKwlpZiAoIW1vZF90aW1lcigmcy0+dGltZXIsIGppZmZpZXMgKyB0aW1lb3V0KSkKKwkJ
-cmZjb21tX3Nlc3Npb25faG9sZChzKTsKK30KKworc3RhdGljIHZvaWQgcmZjb21tX3Nlc3Npb25f
-Y2xlYXJfdGltZXIoc3RydWN0IHJmY29tbV9zZXNzaW9uICpzKQoreworCUJUX0RCRygic2Vzc2lv
-biAlcCBzdGF0ZSAlbGQiLCBzLCBzLT5zdGF0ZSk7CisKKwlpZiAodGltZXJfcGVuZGluZygmcy0+
-dGltZXIpICYmIGRlbF90aW1lcigmcy0+dGltZXIpKQorCQlyZmNvbW1fc2Vzc2lvbl9wdXQocyk7
-Cit9CisKIC8qIC0tLS0gUkZDT01NIERMQ3MgLS0tLSAqLwogc3RhdGljIHZvaWQgcmZjb21tX2Rs
-Y190aW1lb3V0KHVuc2lnbmVkIGxvbmcgYXJnKQogewpAQCAtMzIwLDYgKzM0Nyw3IEBAIHN0YXRp
-YyB2b2lkIHJmY29tbV9kbGNfbGluayhzdHJ1Y3QgcmZjb21tX3Nlc3Npb24gKnMsIHN0cnVjdCBy
-ZmNvbW1fZGxjICpkKQogCiAJcmZjb21tX3Nlc3Npb25faG9sZChzKTsKIAorCXJmY29tbV9zZXNz
-aW9uX2NsZWFyX3RpbWVyKHMpOwogCXJmY29tbV9kbGNfaG9sZChkKTsKIAlsaXN0X2FkZCgmZC0+
-bGlzdCwgJnMtPmRsY3MpOwogCWQtPnNlc3Npb24gPSBzOwpAQCAtMzM1LDYgKzM2Myw5IEBAIHN0
-YXRpYyB2b2lkIHJmY29tbV9kbGNfdW5saW5rKHN0cnVjdCByZmNvbW1fZGxjICpkKQogCWQtPnNl
-c3Npb24gPSBOVUxMOwogCXJmY29tbV9kbGNfcHV0KGQpOwogCisJaWYgKGxpc3RfZW1wdHkoJnMt
-PmRsY3MpKQorCQlyZmNvbW1fc2Vzc2lvbl9zZXRfdGltZXIocywgUkZDT01NX0RJU0NfVElNRU9V
-VCk7CisKIAlyZmNvbW1fc2Vzc2lvbl9wdXQocyk7CiB9CiAKQEAgLTQ1NCw2ICs0ODUsNyBAQCBz
-dGF0aWMgaW50IF9fcmZjb21tX2RsY19jbG9zZShzdHJ1Y3QgcmZjb21tX2RsYyAqZCwgaW50IGVy
-cikKIAkJCXJmY29tbV9zY2hlZHVsZShSRkNPTU1fU0NIRURfQVVUSCk7CiAJCQlicmVhazsKIAkJ
-fQorCiAJCS8qIEZhbGwgdGhyb3VnaCAqLwogCiAJZGVmYXVsdDoKQEAgLTU2Nyw2ICs1OTksOCBA
-QCBzdGF0aWMgc3RydWN0IHJmY29tbV9zZXNzaW9uICpyZmNvbW1fc2Vzc2lvbl9hZGQoc3RydWN0
-IHNvY2tldCAqc29jaywgaW50IHN0YXRlKQogCiAJQlRfREJHKCJzZXNzaW9uICVwIHNvY2sgJXAi
-LCBzLCBzb2NrKTsKIAorCXNldHVwX3RpbWVyKCZzLT50aW1lciwgcmZjb21tX3Nlc3Npb25fdGlt
-ZW91dCwgKHVuc2lnbmVkIGxvbmcpcyk7CisKIAlJTklUX0xJU1RfSEVBRCgmcy0+ZGxjcyk7CiAJ
-cy0+c3RhdGUgPSBzdGF0ZTsKIAlzLT5zb2NrICA9IHNvY2s7CkBAIC02MzksNiArNjczLDcgQEAg
-c3RhdGljIHZvaWQgcmZjb21tX3Nlc3Npb25fY2xvc2Uoc3RydWN0IHJmY29tbV9zZXNzaW9uICpz
-LCBpbnQgZXJyKQogCQlfX3JmY29tbV9kbGNfY2xvc2UoZCwgZXJyKTsKIAl9CiAKKwlyZmNvbW1f
-c2Vzc2lvbl9jbGVhcl90aW1lcihzKTsKIAlyZmNvbW1fc2Vzc2lvbl9wdXQocyk7CiB9CiAKQEAg
-LTE3NzQsNiArMTgwOSw3IEBAIHN0YXRpYyBpbmxpbmUgdm9pZCByZmNvbW1fcHJvY2Vzc19kbGNz
-KHN0cnVjdCByZmNvbW1fc2Vzc2lvbiAqcykKIAkJCQlyZmNvbW1fc2VuZF9kbShzLCBkLT5kbGNp
-KTsKIAkJCWVsc2UKIAkJCQlkLT5zdGF0ZSA9IEJUX0NMT1NFRDsKKwogCQkJX19yZmNvbW1fZGxj
-X2Nsb3NlKGQsIEVDT05OUkVGVVNFRCk7CiAJCQljb250aW51ZTsKIAkJfQpAQCAtMTg3OSw2ICsx
-OTE1LDExIEBAIHN0YXRpYyBpbmxpbmUgdm9pZCByZmNvbW1fcHJvY2Vzc19zZXNzaW9ucyh2b2lk
-KQogCQlzdHJ1Y3QgcmZjb21tX3Nlc3Npb24gKnM7CiAJCXMgPSBsaXN0X2VudHJ5KHAsIHN0cnVj
-dCByZmNvbW1fc2Vzc2lvbiwgbGlzdCk7CiAKKwkJaWYgKHRlc3RfYml0KFJGQ09NTV9USU1FRF9P
-VVQsICZzLT5mbGFncykpIHsKKwkJCXJmY29tbV9zZXNzaW9uX3B1dChzKTsKKwkJCWNvbnRpbnVl
-OworCQl9CisKIAkJaWYgKHMtPnN0YXRlID09IEJUX0xJU1RFTikgewogCQkJcmZjb21tX2FjY2Vw
-dF9jb25uZWN0aW9uKHMpOwogCQkJY29udGludWU7Ci0tIAoxLjYuMy4xCgo=
---00163646d6dcc91715046cf7f3e4--
+Engenheiro de Computaчуo
