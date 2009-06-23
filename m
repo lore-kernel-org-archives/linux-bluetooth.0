@@ -1,46 +1,123 @@
 Return-Path: <cyrus@holtmann.org>
-From: John Frankish <j-frankish@slb.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Wed, 24 Jun 2009 07:23:17 +0200
-Subject: Mixed Results Playing mp3
-Message-ID: <6AC5A55546F64545AE996F8200E3AC4E06B17B90@NL0105EXC01V01.eur.slb.com>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <2d5a2c100906231113p23a7249u13de2ecd2a0d5482@mail.gmail.com>
+References: <2d5a2c100906090617m167d3815pae998d06bdbd6646@mail.gmail.com>
+	 <1245603529.15367.68.camel@violet>
+	 <2d5a2c100906211047n31b9d4dajac290601c184380b@mail.gmail.com>
+	 <1245611096.15367.76.camel@violet>
+	 <2d5a2c100906221449y6e37cb19x1bc27085bac318f4@mail.gmail.com>
+	 <2d5a2c100906221608v5e3e3d8aydf66b13826ad88fa@mail.gmail.com>
+	 <2d5a2c100906230651m679ccfat5bf4bfb20c130955@mail.gmail.com>
+	 <1245768036.15367.78.camel@violet> <20090623200401.6c7e5ea6@stoetzler>
+	 <2d5a2c100906231113p23a7249u13de2ecd2a0d5482@mail.gmail.com>
+Date: Tue, 23 Jun 2009 15:56:23 -0300
+Message-ID: <2d5a2c100906231156w72a0e69dqfa6c197bfb1d5674@mail.gmail.com>
+Subject: Re: regression introduced on v2.6.30-rc1
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Stefan Seyfried <seife@suse.de>
+Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
+Content-Type: multipart/mixed; boundary=0016364ee4e60a1703046d088c75
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I've been trying various tools to play mp3 files to a Bluetooth headset whilst I decide whether to buy some a2dp headphones . Using the following and the .asoundrc at the bottom of the post:
+--0016364ee4e60a1703046d088c75
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-bluez-4.41
-dbus-1.2.14
-dbus-glib-0.80
-alsa-1.0.20
-kernel-2.6.29.2
+Lastest version which now triggers DISC 0 instead of
+rfcomm_session_put and introduce RFCOMM_IDLE_TIMEOUT (2 sec), there is
+also a fix to use test_and_clear_bit instead of just test_bit since
+now the session would not go away until the remote stack reply with
+UA.
 
-I get the following results:
 
-1. mplayer-gtk1 (svn 29308): plays without problems
+--=20
+Luiz Augusto von Dentz
+Engenheiro de Computa=E7=E3o
 
-2. xmms-1.2.11: no error messages, but produces "noise" and "clicks" (the bluez wiki mentions "issues" with xmms).
+--0016364ee4e60a1703046d088c75
+Content-Type: text/x-diff; charset=US-ASCII;
+	name="0001-bluetooth-Fix-rejected-connection-not-disconnecting-.patch"
+Content-Disposition: attachment;
+	filename="0001-bluetooth-Fix-rejected-connection-not-disconnecting-.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_fwaz86ky1
 
-3. aplay-1.0.20: Is it possible to play mp3 with aplay, if so, what command is required?
-
-4. mpg123-1.8.1: "mpg123 -v -a plug:bluetooth file.mp3", "mpg123 -v -a bluetooth file.mp3", no error messages, but produces "noise" and "clicks"
-
-I don't see why xmms and mpg123 wouldn't work and there are no error messages or pointers from "bluetoothd -dn" - does anybody have any ideas?
-
------------
-pcm.rawbluetooth {
-   type bluetooth
-   device 00:12:EE:A6:1D:F4
-}
-
-pcm.bluetooth {
-   type plug
-   slave {
-      pcm {
-         type bluetooth
-         device 00:12:EE:A6:1D:F4
-      }
-   }
-}
+RnJvbSAyYjM5ZjZlNTEwZTgyNDE2ZWM3YTBhZDNjN2VlNWQzZWQ0MWI2ODZhIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IDxsdWl6LmRlbnR6QG9w
+ZW5ib3NzYS5vcmc+CkRhdGU6IFR1ZSwgMjMgSnVuIDIwMDkgMTU6NTQ6MDEgLTAzMDAKU3ViamVj
+dDogW1BBVENIXSBibHVldG9vdGg6IEZpeCByZWplY3RlZCBjb25uZWN0aW9uIG5vdCBkaXNjb25u
+ZWN0aW5nIEFDTC4KCldoZW4gdXNpbmcgREVGRVJfU0VUVVAgb24gYSBSRkNPTU0gc29ja2V0IGEg
+U0FCTSBmcmFtZSB0cmlnZ2VycwphdXRob3JpemF0aW9uIHdoaWNoIHdoZW4gcmVqZWN0ZWQgc2Vu
+ZCBhIERNIGFzIHJlc3BvbnNlLiBUaGlzIGlzIGZpbmUKYWNjb3VyZGluZyB0byB0aGUgUkZDT01N
+IHNwZWM6CgoidGhlIHJlc3BvbmRpbmcgaW1wbGVtZW50YXRpb24gbWF5IHJlcGxhY2UgdGhlICJw
+cm9wZXIiIHJlc3BvbnNlIG9uCnRoZSBNdWx0aXBsZXhlciBDb250cm9sIGNoYW5uZWwgd2l0aCBh
+IERNIGZyYW1lLCBzZW50IG9uIHRoZSByZWZlcmVuY2VkCkRMQ0kgdG8gaW5kaWNhdGUgdGhhdCB0
+aGUgRExDSSBpcyBub3Qgb3BlbiwgYW5kIHRoYXQgdGhlIHJlc3BvbmRlciB3b3VsZApub3QgZ3Jh
+bnQgYSByZXF1ZXN0IHRvIG9wZW4gaXQgbGF0ZXIgZWl0aGVyLiIKCkJ1dCBzb21lIHN0YWNrcyBk
+b2Vzbid0IHNlZW1zIHRvIGNvcGUgd2l0aCB0aGlzIGxlYXZpbmcgRExDSSAwIG9wZW4gYWZ0ZXIK
+cmVjZWl2aW5nIERNIGZyYW1lLgoKVG8gZml4IGl0IHByb3Blcmx5IGEgdGltZXIgd2FzIGludHJv
+ZHVjZWQgdG8gcmZjb21tX3Nlc3Npb24gd2hpY2ggaXMgdXNlZAp0byBzZXQgYSB0aW1lb3V0IHdo
+ZW4gdGhlIGxhc3QgYWN0aXZlIERMQyBvZiBhIHNlc3Npb24gaXMgdW5saW5rZWQsIHRoaXMKd2ls
+bCBnaXZlIHRoZSByZW1vdGUgc3RhY2sgc29tZSB0aW1lIHRvIHJlcGx5IHdpdGggYSBwcm9wZXIg
+RElTQyBmcmFtZSBvbgpETENJIDAgYXZvaWRpbmcgYm90aCBzaWRlcyBzZW5kaW5nIERJU0MgdG8g
+ZWFjaCBvdGhlciBvbiBzdGFja3MgdGhhdApmb2xsb3cgdGhlIHNwZWNpZmljYXRpb24gYW5kIHRh
+a2luZyBjYXJlIG9mIHRob3NlIHdobyBkb24ndCBieSB0YWtpbmcKZG93biBETENJIDAuCgpTaWdu
+ZWQtb2ZmLWJ5OiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IDxsdWl6LmRlbnR6QG9wZW5ib3NzYS5v
+cmc+Ci0tLQogaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL3JmY29tbS5oIHwgICAgMiArKwogbmV0L2Js
+dWV0b290aC9yZmNvbW0vY29yZS5jICAgIHwgICA0MCArKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrCiAyIGZpbGVzIGNoYW5nZWQsIDQyIGluc2VydGlvbnMoKyksIDAgZGVs
+ZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL3JmY29tbS5oIGIv
+aW5jbHVkZS9uZXQvYmx1ZXRvb3RoL3JmY29tbS5oCmluZGV4IDgwMDcyNjEuLmQ1NTJiYTIgMTAw
+NjQ0Ci0tLSBhL2luY2x1ZGUvbmV0L2JsdWV0b290aC9yZmNvbW0uaAorKysgYi9pbmNsdWRlL25l
+dC9ibHVldG9vdGgvcmZjb21tLmgKQEAgLTI5LDYgKzI5LDcgQEAKICNkZWZpbmUgUkZDT01NX0NP
+Tk5fVElNRU9VVCAoSFogKiAzMCkKICNkZWZpbmUgUkZDT01NX0RJU0NfVElNRU9VVCAoSFogKiAy
+MCkKICNkZWZpbmUgUkZDT01NX0FVVEhfVElNRU9VVCAoSFogKiAyNSkKKyNkZWZpbmUgUkZDT01N
+X0lETEVfVElNRU9VVCAoSFogKiAyKQogCiAjZGVmaW5lIFJGQ09NTV9ERUZBVUxUX01UVQkxMjcK
+ICNkZWZpbmUgUkZDT01NX0RFRkFVTFRfQ1JFRElUUwk3CkBAIC0xNTQsNiArMTU1LDcgQEAgc3Ry
+dWN0IHJmY29tbV9tc2Mgewogc3RydWN0IHJmY29tbV9zZXNzaW9uIHsKIAlzdHJ1Y3QgbGlzdF9o
+ZWFkIGxpc3Q7CiAJc3RydWN0IHNvY2tldCAgICpzb2NrOworCXN0cnVjdCB0aW1lcl9saXN0IHRp
+bWVyOwogCXVuc2lnbmVkIGxvbmcgICAgc3RhdGU7CiAJdW5zaWduZWQgbG9uZyAgICBmbGFnczsK
+IAlhdG9taWNfdCAgICAgICAgIHJlZmNudDsKZGlmZiAtLWdpdCBhL25ldC9ibHVldG9vdGgvcmZj
+b21tL2NvcmUuYyBiL25ldC9ibHVldG9vdGgvcmZjb21tL2NvcmUuYwppbmRleCAzNzQ1MzZlLi40
+YzQ1MDk0IDEwMDY0NAotLS0gYS9uZXQvYmx1ZXRvb3RoL3JmY29tbS9jb3JlLmMKKysrIGIvbmV0
+L2JsdWV0b290aC9yZmNvbW0vY29yZS5jCkBAIC0yNDQsNiArMjQ0LDMzIEBAIHN0YXRpYyBpbmxp
+bmUgaW50IHJmY29tbV9jaGVja19zZWN1cml0eShzdHJ1Y3QgcmZjb21tX2RsYyAqZCkKIAkJCQkJ
+CQkJYXV0aF90eXBlKTsKIH0KIAorc3RhdGljIHZvaWQgcmZjb21tX3Nlc3Npb25fdGltZW91dCh1
+bnNpZ25lZCBsb25nIGFyZykKK3sKKwlzdHJ1Y3QgcmZjb21tX3Nlc3Npb24gKnMgPSAodm9pZCAq
+KSBhcmc7CisKKwlCVF9EQkcoInNlc3Npb24gJXAgc3RhdGUgJWxkIiwgcywgcy0+c3RhdGUpOwor
+CisJc2V0X2JpdChSRkNPTU1fVElNRURfT1VULCAmcy0+ZmxhZ3MpOworCXJmY29tbV9zZXNzaW9u
+X3B1dChzKTsKKwlyZmNvbW1fc2NoZWR1bGUoUkZDT01NX1NDSEVEX1RJTUVPKTsKK30KKworc3Rh
+dGljIHZvaWQgcmZjb21tX3Nlc3Npb25fc2V0X3RpbWVyKHN0cnVjdCByZmNvbW1fc2Vzc2lvbiAq
+cywgbG9uZyB0aW1lb3V0KQoreworCUJUX0RCRygic2Vzc2lvbiAlcCBzdGF0ZSAlbGQgdGltZW91
+dCAlbGQiLCBzLCBzLT5zdGF0ZSwgdGltZW91dCk7CisKKwlpZiAoIW1vZF90aW1lcigmcy0+dGlt
+ZXIsIGppZmZpZXMgKyB0aW1lb3V0KSkKKwkJcmZjb21tX3Nlc3Npb25faG9sZChzKTsKK30KKwor
+c3RhdGljIHZvaWQgcmZjb21tX3Nlc3Npb25fY2xlYXJfdGltZXIoc3RydWN0IHJmY29tbV9zZXNz
+aW9uICpzKQoreworCUJUX0RCRygic2Vzc2lvbiAlcCBzdGF0ZSAlbGQiLCBzLCBzLT5zdGF0ZSk7
+CisKKwlpZiAodGltZXJfcGVuZGluZygmcy0+dGltZXIpICYmIGRlbF90aW1lcigmcy0+dGltZXIp
+KQorCQlyZmNvbW1fc2Vzc2lvbl9wdXQocyk7Cit9CisKIC8qIC0tLS0gUkZDT01NIERMQ3MgLS0t
+LSAqLwogc3RhdGljIHZvaWQgcmZjb21tX2RsY190aW1lb3V0KHVuc2lnbmVkIGxvbmcgYXJnKQog
+ewpAQCAtMzIwLDYgKzM0Nyw3IEBAIHN0YXRpYyB2b2lkIHJmY29tbV9kbGNfbGluayhzdHJ1Y3Qg
+cmZjb21tX3Nlc3Npb24gKnMsIHN0cnVjdCByZmNvbW1fZGxjICpkKQogCiAJcmZjb21tX3Nlc3Np
+b25faG9sZChzKTsKIAorCXJmY29tbV9zZXNzaW9uX2NsZWFyX3RpbWVyKHMpOwogCXJmY29tbV9k
+bGNfaG9sZChkKTsKIAlsaXN0X2FkZCgmZC0+bGlzdCwgJnMtPmRsY3MpOwogCWQtPnNlc3Npb24g
+PSBzOwpAQCAtMzM1LDYgKzM2Myw5IEBAIHN0YXRpYyB2b2lkIHJmY29tbV9kbGNfdW5saW5rKHN0
+cnVjdCByZmNvbW1fZGxjICpkKQogCWQtPnNlc3Npb24gPSBOVUxMOwogCXJmY29tbV9kbGNfcHV0
+KGQpOwogCisJaWYgKGxpc3RfZW1wdHkoJnMtPmRsY3MpKQorCQlyZmNvbW1fc2Vzc2lvbl9zZXRf
+dGltZXIocywgUkZDT01NX0lETEVfVElNRU9VVCk7CisKIAlyZmNvbW1fc2Vzc2lvbl9wdXQocyk7
+CiB9CiAKQEAgLTU2Nyw2ICs1OTgsOCBAQCBzdGF0aWMgc3RydWN0IHJmY29tbV9zZXNzaW9uICpy
+ZmNvbW1fc2Vzc2lvbl9hZGQoc3RydWN0IHNvY2tldCAqc29jaywgaW50IHN0YXRlKQogCiAJQlRf
+REJHKCJzZXNzaW9uICVwIHNvY2sgJXAiLCBzLCBzb2NrKTsKIAorCXNldHVwX3RpbWVyKCZzLT50
+aW1lciwgcmZjb21tX3Nlc3Npb25fdGltZW91dCwgKHVuc2lnbmVkIGxvbmcpcyk7CisKIAlJTklU
+X0xJU1RfSEVBRCgmcy0+ZGxjcyk7CiAJcy0+c3RhdGUgPSBzdGF0ZTsKIAlzLT5zb2NrICA9IHNv
+Y2s7CkBAIC02MzksNiArNjcyLDcgQEAgc3RhdGljIHZvaWQgcmZjb21tX3Nlc3Npb25fY2xvc2Uo
+c3RydWN0IHJmY29tbV9zZXNzaW9uICpzLCBpbnQgZXJyKQogCQlfX3JmY29tbV9kbGNfY2xvc2Uo
+ZCwgZXJyKTsKIAl9CiAKKwlyZmNvbW1fc2Vzc2lvbl9jbGVhcl90aW1lcihzKTsKIAlyZmNvbW1f
+c2Vzc2lvbl9wdXQocyk7CiB9CiAKQEAgLTE4NzksNiArMTkxMywxMiBAQCBzdGF0aWMgaW5saW5l
+IHZvaWQgcmZjb21tX3Byb2Nlc3Nfc2Vzc2lvbnModm9pZCkKIAkJc3RydWN0IHJmY29tbV9zZXNz
+aW9uICpzOwogCQlzID0gbGlzdF9lbnRyeShwLCBzdHJ1Y3QgcmZjb21tX3Nlc3Npb24sIGxpc3Qp
+OwogCisJCWlmICh0ZXN0X2FuZF9jbGVhcl9iaXQoUkZDT01NX1RJTUVEX09VVCwgJnMtPmZsYWdz
+KSkgeworCQkJcy0+c3RhdGUgPSBCVF9ESVNDT05OOworCQkJcmZjb21tX3NlbmRfZGlzYyhzLCAw
+KTsKKwkJCWNvbnRpbnVlOworCQl9CisKIAkJaWYgKHMtPnN0YXRlID09IEJUX0xJU1RFTikgewog
+CQkJcmZjb21tX2FjY2VwdF9jb25uZWN0aW9uKHMpOwogCQkJY29udGludWU7Ci0tIAoxLjYuMy4x
+Cgo=
+--0016364ee4e60a1703046d088c75--
