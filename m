@@ -1,47 +1,127 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1245768036.15367.78.camel@violet>
-References: <2d5a2c100906090617m167d3815pae998d06bdbd6646@mail.gmail.com>
-	 <1245595707.15367.66.camel@violet>
-	 <2d5a2c100906210930q394fcf77hcd2bf39c26ae74f8@mail.gmail.com>
-	 <1245603529.15367.68.camel@violet>
-	 <2d5a2c100906211047n31b9d4dajac290601c184380b@mail.gmail.com>
-	 <1245611096.15367.76.camel@violet>
-	 <2d5a2c100906221449y6e37cb19x1bc27085bac318f4@mail.gmail.com>
-	 <2d5a2c100906221608v5e3e3d8aydf66b13826ad88fa@mail.gmail.com>
-	 <2d5a2c100906230651m679ccfat5bf4bfb20c130955@mail.gmail.com>
-	 <1245768036.15367.78.camel@violet>
-Date: Tue, 23 Jun 2009 12:01:09 -0300
-Message-ID: <2d5a2c100906230801q6bd68397y34b5aa138fee5fe2@mail.gmail.com>
-Subject: Re: regression introduced on v2.6.30-rc1
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: alokbarsode@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Cc: Alok Barsode <alok.barsode@azingo.com>
+Subject: [PATCH 2/3] Adding resolve name functionality to hciops plugin.
+Date: Tue, 23 Jun 2009 20:20:20 +0530
+Message-Id: <1245768621-22895-2-git-send-email-alok.barsode@azingo.com>
+In-Reply-To: <1245768621-22895-1-git-send-email-alok.barsode@azingo.com>
+References: <1245768621-22895-1-git-send-email-alok.barsode@azingo.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Alok Barsode <alok.barsode@azingo.com>
 
-On Tue, Jun 23, 2009 at 11:40 AM, Marcel Holtmann<marcel@holtmann.org> wrot=
-e:
-> what about just triggering the timer and then sending DISC for DLCI 0. I
-> don't see a big benefit for this reference counting overhead.
->
-> When we send the DISC, we will receive UA and thus get the required
-> rfcomm_session_put() that then leads to the ACL disconnect.
+---
+ plugins/hciops.c |   24 ++++++++++++++++++++++++
+ src/adapter.c    |   19 ++-----------------
+ src/adapter.h    |    1 +
+ 3 files changed, 27 insertions(+), 17 deletions(-)
 
-Hmm, that seems to work too and is what we are doing in case of
-receiving a DM, but there is a chance that the remote stack doesn't
-respond the DISC in that case we can also use the session timer to
-timeout. Anyway I don't think such broken stack exist, although we do
-set timeout when sending DISC to a specific DLCI, so lets leave this
-for latter when he actually have a real offender which doesn't respond
-with UA.
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index dae79b3..9a873fd 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -628,6 +628,29 @@ static int hciops_stop_discovery(int index)
+ 	return err;
+ }
+ 
++static int hciops_resolve_name(int index, bdaddr_t *bdaddr)
++{
++	remote_name_req_cp cp;
++	int dd, err = 0;
++
++	dd = hci_open_dev(index);
++	if (dd < 0)
++		return -EIO;
++
++	memset(&cp, 0, sizeof(cp));
++	bacpy(&cp.bdaddr, bdaddr);
++	cp.pscan_rep_mode = 0x02;
++
++	err = hci_send_cmd(dd, OGF_LINK_CTL, OCF_REMOTE_NAME_REQ,
++					REMOTE_NAME_REQ_CP_SIZE, &cp);
++	if (err < 0)
++		err = -errno;
++
++	hci_close_dev(dd);
++
++	return err;
++}
++
+ static struct btd_adapter_ops hci_ops = {
+ 	.setup = hciops_setup,
+ 	.cleanup = hciops_cleanup,
+@@ -639,6 +662,7 @@ static struct btd_adapter_ops hci_ops = {
+ 	.set_limited_discoverable = hciops_set_limited_discoverable,
+ 	.start_discovery = hciops_start_discovery,
+ 	.stop_discovery = hciops_stop_discovery,
++	.resolve_name = hciops_resolve_name,
+ };
+ 
+ static int hciops_init(void)
+diff --git a/src/adapter.c b/src/adapter.c
+index 9a913ac..cd5c1d0 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -260,9 +260,8 @@ int pending_remote_name_cancel(struct btd_adapter *adapter)
+ 
+ int adapter_resolve_names(struct btd_adapter *adapter)
+ {
+-	remote_name_req_cp cp;
+ 	struct remote_dev_info *dev, match;
+-	int dd, err;
++	int err;
+ 
+ 	memset(&match, 0, sizeof(struct remote_dev_info));
+ 	bacpy(&match.bdaddr, BDADDR_ANY);
+@@ -272,21 +271,12 @@ int adapter_resolve_names(struct btd_adapter *adapter)
+ 	if (!dev)
+ 		return -ENODATA;
+ 
+-	dd = hci_open_dev(adapter->dev_id);
+-	if (dd < 0)
+-		return -errno;
+-
+ 	/* send at least one request or return failed if the list is empty */
+ 	do {
+ 		/* flag to indicate the current remote name requested */
+ 		dev->name_status = NAME_REQUESTED;
+ 
+-		memset(&cp, 0, sizeof(cp));
+-		bacpy(&cp.bdaddr, &dev->bdaddr);
+-		cp.pscan_rep_mode = 0x02;
+-
+-		err = hci_send_cmd(dd, OGF_LINK_CTL, OCF_REMOTE_NAME_REQ,
+-						REMOTE_NAME_REQ_CP_SIZE, &cp);
++		err = adapter_ops->resolve_name(adapter->dev_id, &dev->bdaddr);
+ 
+ 		if (!err)
+ 			break;
+@@ -302,11 +292,6 @@ int adapter_resolve_names(struct btd_adapter *adapter)
+ 		dev = adapter_search_found_devices(adapter, &match);
+ 	} while (dev);
+ 
+-	hci_close_dev(dd);
+-
+-	if (err < 0)
+-		err = errno;
+-
+ 	return err;
+ }
+ 
+diff --git a/src/adapter.h b/src/adapter.h
+index fca34eb..e087bb0 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -164,6 +164,7 @@ struct btd_adapter_ops {
+ 						gboolean limited);
+ 	int (*start_discovery) (int index, gboolean periodic);
+ 	int (*stop_discovery) (int index);
++	int (*resolve_name) (int index, bdaddr_t *bdaddr);
+ };
+ 
+ int btd_register_adapter_ops(struct btd_adapter_ops *btd_adapter_ops);
+-- 
+1.5.6.3
 
-Moving ahead, what about the timeout, 20 seconds seems too much
-doesn't it? Are you fine with the places where I clear the timer?
-
-
---=20
-Luiz Augusto von Dentz
-Engenheiro de Computa=E7=E3o
