@@ -2,121 +2,193 @@ Return-Path: <cyrus@holtmann.org>
 From: alokbarsode@gmail.com
 To: linux-bluetooth@vger.kernel.org
 Cc: Alok Barsode <alok.barsode@azingo.com>
-Subject: [PATCH 3/3] Adding cancel_resolve_name functionality to hciops plugin.
-Date: Tue, 23 Jun 2009 20:20:21 +0530
-Message-Id: <1245768621-22895-3-git-send-email-alok.barsode@azingo.com>
-In-Reply-To: <1245768621-22895-2-git-send-email-alok.barsode@azingo.com>
-References: <1245768621-22895-1-git-send-email-alok.barsode@azingo.com>
- <1245768621-22895-2-git-send-email-alok.barsode@azingo.com>
+Subject: [PATCH 1/3] Renaming found_device_req_name to adapter_resolve_names
+Date: Tue, 23 Jun 2009 20:20:19 +0530
+Message-Id: <1245768621-22895-1-git-send-email-alok.barsode@azingo.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Alok Barsode <alok.barsode@azingo.com>
 
 ---
- plugins/hciops.c |   23 +++++++++++++++++++++++
- src/adapter.c    |   25 ++++++-------------------
- src/adapter.h    |    1 +
- 3 files changed, 30 insertions(+), 19 deletions(-)
+ src/adapter.c  |   52 ++++++++++++++++++++++++++++++++++++++++
+ src/adapter.h  |    2 +
+ src/dbus-hci.c |   72 +------------------------------------------------------
+ 3 files changed, 56 insertions(+), 70 deletions(-)
 
-diff --git a/plugins/hciops.c b/plugins/hciops.c
-index 9a873fd..7e34b12 100644
---- a/plugins/hciops.c
-+++ b/plugins/hciops.c
-@@ -651,6 +651,28 @@ static int hciops_resolve_name(int index, bdaddr_t *bdaddr)
+diff --git a/src/adapter.c b/src/adapter.c
+index 8d277ba..9a913ac 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -258,6 +258,58 @@ int pending_remote_name_cancel(struct btd_adapter *adapter)
  	return err;
  }
  
-+static int hciops_cancel_resolve_name(int index, bdaddr_t *bdaddr)
++int adapter_resolve_names(struct btd_adapter *adapter)
 +{
-+	remote_name_req_cancel_cp cp;
-+	int dd, err = 0;
++	remote_name_req_cp cp;
++	struct remote_dev_info *dev, match;
++	int dd, err;
 +
-+	dd = hci_open_dev(index);
++	memset(&match, 0, sizeof(struct remote_dev_info));
++	bacpy(&match.bdaddr, BDADDR_ANY);
++	match.name_status = NAME_REQUIRED;
++
++	dev = adapter_search_found_devices(adapter, &match);
++	if (!dev)
++		return -ENODATA;
++
++	dd = hci_open_dev(adapter->dev_id);
 +	if (dd < 0)
-+		return -EIO;
++		return -errno;
 +
-+	memset(&cp, 0, sizeof(cp));
-+	bacpy(&cp.bdaddr, bdaddr);
++	/* send at least one request or return failed if the list is empty */
++	do {
++		/* flag to indicate the current remote name requested */
++		dev->name_status = NAME_REQUESTED;
 +
-+	err = hci_send_cmd(dd, OGF_LINK_CTL, OCF_REMOTE_NAME_REQ_CANCEL,
-+					REMOTE_NAME_REQ_CANCEL_CP_SIZE, &cp);
-+	if (err < 0)
-+		err = -errno;
++		memset(&cp, 0, sizeof(cp));
++		bacpy(&cp.bdaddr, &dev->bdaddr);
++		cp.pscan_rep_mode = 0x02;
++
++		err = hci_send_cmd(dd, OGF_LINK_CTL, OCF_REMOTE_NAME_REQ,
++						REMOTE_NAME_REQ_CP_SIZE, &cp);
++
++		if (!err)
++			break;
++
++		error("Unable to send HCI remote name req: %s (%d)",
++						strerror(errno), errno);
++
++		/* if failed, request the next element */
++		/* remove the element from the list */
++		adapter_remove_found_device(adapter, &dev->bdaddr);
++
++		/* get the next element */
++		dev = adapter_search_found_devices(adapter, &match);
++	} while (dev);
 +
 +	hci_close_dev(dd);
++
++	if (err < 0)
++		err = errno;
 +
 +	return err;
 +}
 +
- static struct btd_adapter_ops hci_ops = {
- 	.setup = hciops_setup,
- 	.cleanup = hciops_cleanup,
-@@ -663,6 +685,7 @@ static struct btd_adapter_ops hci_ops = {
- 	.start_discovery = hciops_start_discovery,
- 	.stop_discovery = hciops_stop_discovery,
- 	.resolve_name = hciops_resolve_name,
-+	.cancel_resolve_name = hciops_cancel_resolve_name,
- };
- 
- static int hciops_init(void)
-diff --git a/src/adapter.c b/src/adapter.c
-index cd5c1d0..e9bd1d8 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -227,34 +227,21 @@ void clear_found_devices_list(struct btd_adapter *adapter)
- int pending_remote_name_cancel(struct btd_adapter *adapter)
+ static const char *mode2str(uint8_t mode)
  {
- 	struct remote_dev_info *dev, match;
--	GSList *l;
--	int dd, err = 0;
-+	int err = 0;
+ 	switch(mode) {
+diff --git a/src/adapter.h b/src/adapter.h
+index 2356743..fca34eb 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -95,6 +95,8 @@ struct btd_device *adapter_create_device(DBusConnection *conn,
  
- 	/* find the pending remote name request */
- 	memset(&match, 0, sizeof(struct remote_dev_info));
- 	bacpy(&match.bdaddr, BDADDR_ANY);
- 	match.name_status = NAME_REQUESTED;
+ int pending_remote_name_cancel(struct btd_adapter *adapter);
  
--	l = g_slist_find_custom(adapter->found_devices, &match,
--			(GCompareFunc) found_device_cmp);
--	if (!l) /* no pending request */
--		return 0;
++int adapter_resolve_names(struct btd_adapter *adapter);
++
+ void clear_found_devices_list(struct btd_adapter *adapter);
+ 
+ struct btd_adapter *adapter_create(DBusConnection *conn, int id,
+diff --git a/src/dbus-hci.c b/src/dbus-hci.c
+index 8718465..ca391c5 100644
+--- a/src/dbus-hci.c
++++ b/src/dbus-hci.c
+@@ -466,74 +466,6 @@ void hcid_dbus_inquiry_start(bdaddr_t *local)
+ 	}
+ }
+ 
+-static int found_device_req_name(struct btd_adapter *adapter)
+-{
+-	struct hci_request rq;
+-	evt_cmd_status rp;
+-	remote_name_req_cp cp;
+-	struct remote_dev_info *dev, match;
+-	int dd, req_sent = 0;
+-	uint16_t dev_id = adapter_get_dev_id(adapter);
 -
--	dd = hci_open_dev(adapter->dev_id);
+-	memset(&match, 0, sizeof(struct remote_dev_info));
+-	bacpy(&match.bdaddr, BDADDR_ANY);
+-	match.name_status = NAME_REQUIRED;
+-
+-	dev = adapter_search_found_devices(adapter, &match);
+-	if (!dev)
+-		return -ENODATA;
+-
+-	dd = hci_open_dev(dev_id);
 -	if (dd < 0)
--		return -ENODEV;
+-		return -errno;
 -
--	dev = l->data;
-+	dev = adapter_search_found_devices(adapter, &match);
-+	if (!dev) /* no pending request */
-+		return -ENODATA;
- 
--	if (hci_read_remote_name_cancel(dd, &dev->bdaddr,
--					HCI_REQ_TIMEOUT) < 0) {
--		err = -errno;
-+	err = adapter_ops->cancel_resolve_name(adapter->dev_id, &dev->bdaddr);
-+	if (err < 0)
- 		error("Remote name cancel failed: %s(%d)",
- 						strerror(errno), errno);
--	}
+-	memset(&rq, 0, sizeof(rq));
+-	rq.ogf    = OGF_LINK_CTL;
+-	rq.ocf    = OCF_REMOTE_NAME_REQ;
+-	rq.cparam = &cp;
+-	rq.clen   = REMOTE_NAME_REQ_CP_SIZE;
+-	rq.rparam = &rp;
+-	rq.rlen   = EVT_CMD_STATUS_SIZE;
+-	rq.event  = EVT_CMD_STATUS;
+-
+-	/* send at least one request or return failed if the list is empty */
+-	do {
+-		/* flag to indicate the current remote name requested */
+-		dev->name_status = NAME_REQUESTED;
+-
+-		memset(&rp, 0, sizeof(rp));
+-		memset(&cp, 0, sizeof(cp));
+-		bacpy(&cp.bdaddr, &dev->bdaddr);
+-		cp.pscan_rep_mode = 0x02;
+-
+-		if (hci_send_req(dd, &rq, HCI_REQ_TIMEOUT) < 0)
+-			error("Unable to send HCI remote name req: %s (%d)",
+-						strerror(errno), errno);
+-
+-		if (!rp.status) {
+-			req_sent = 1;
+-			break;
+-		}
+-
+-		error("Remote name request failed with status 0x%02x",
+-								rp.status);
+-
+-		/* if failed, request the next element */
+-		/* remove the element from the list */
+-		adapter_remove_found_device(adapter, &dev->bdaddr);
+-
+-		/* get the next element */
+-		dev = adapter_search_found_devices(adapter, &match);
+-	} while (dev);
 -
 -	hci_close_dev(dd);
 -
- 	return err;
- }
+-	if (!req_sent)
+-		return -ENODATA;
+-
+-	return 0;
+-}
+-
+ void hcid_dbus_inquiry_complete(bdaddr_t *local)
+ {
+ 	struct btd_adapter *adapter;
+@@ -556,7 +488,7 @@ void hcid_dbus_inquiry_complete(bdaddr_t *local)
+ 	 *
+ 	 * Keep in mind that non D-Bus requests can arrive.
+ 	 */
+-	if (found_device_req_name(adapter) == 0)
++	if (adapter_resolve_names(adapter) == 0)
+ 		return;
  
-diff --git a/src/adapter.h b/src/adapter.h
-index e087bb0..f631576 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -165,6 +165,7 @@ struct btd_adapter_ops {
- 	int (*start_discovery) (int index, gboolean periodic);
- 	int (*stop_discovery) (int index);
- 	int (*resolve_name) (int index, bdaddr_t *bdaddr);
-+	int (*cancel_resolve_name) (int index, bdaddr_t *bdaddr);
- };
+ 	state = adapter_get_state(adapter);
+@@ -791,7 +723,7 @@ proceed:
+ 	adapter_remove_found_device(adapter, peer);
  
- int btd_register_adapter_ops(struct btd_adapter_ops *btd_adapter_ops);
+ 	/* check if there is more devices to request names */
+-	if (found_device_req_name(adapter) == 0)
++	if (adapter_resolve_names(adapter) == 0)
+ 		return;
+ 
+ 	state = adapter_get_state(adapter);
 -- 
 1.5.6.3
 
