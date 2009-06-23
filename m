@@ -1,194 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: alokbarsode@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Alok Barsode <alok.barsode@azingo.com>
-Subject: [PATCH 1/3] Renaming found_device_req_name to adapter_resolve_names
-Date: Tue, 23 Jun 2009 20:20:19 +0530
-Message-Id: <1245768621-22895-1-git-send-email-alok.barsode@azingo.com>
+Subject: Re: regression introduced on v2.6.30-rc1
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <2d5a2c100906230651m679ccfat5bf4bfb20c130955@mail.gmail.com>
+References: <2d5a2c100906090617m167d3815pae998d06bdbd6646@mail.gmail.com>
+	 <2d5a2c100906210708x1816e5d9hb9a80c82d76da6dd@mail.gmail.com>
+	 <1245595707.15367.66.camel@violet>
+	 <2d5a2c100906210930q394fcf77hcd2bf39c26ae74f8@mail.gmail.com>
+	 <1245603529.15367.68.camel@violet>
+	 <2d5a2c100906211047n31b9d4dajac290601c184380b@mail.gmail.com>
+	 <1245611096.15367.76.camel@violet>
+	 <2d5a2c100906221449y6e37cb19x1bc27085bac318f4@mail.gmail.com>
+	 <2d5a2c100906221608v5e3e3d8aydf66b13826ad88fa@mail.gmail.com>
+	 <2d5a2c100906230651m679ccfat5bf4bfb20c130955@mail.gmail.com>
+Content-Type: text/plain
+Date: Tue, 23 Jun 2009 16:40:36 +0200
+Message-Id: <1245768036.15367.78.camel@violet>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Alok Barsode <alok.barsode@azingo.com>
+Hi Luiz,
 
----
- src/adapter.c  |   52 ++++++++++++++++++++++++++++++++++++++++
- src/adapter.h  |    2 +
- src/dbus-hci.c |   72 +------------------------------------------------------
- 3 files changed, 56 insertions(+), 70 deletions(-)
+> Cleanup version, which include code style fixing suggested by Johan on irc.
+> 
+> There are 2 other things that comes to my mind that need discussing:
+> 
+>  - 20 sec timeout is perhaps too big
+>  - clear the timer on rfcomm_session_close is perhaps not save then we
+> can move it to rfcomm_session_del
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 8d277ba..9a913ac 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -258,6 +258,58 @@ int pending_remote_name_cancel(struct btd_adapter *adapter)
- 	return err;
- }
- 
-+int adapter_resolve_names(struct btd_adapter *adapter)
-+{
-+	remote_name_req_cp cp;
-+	struct remote_dev_info *dev, match;
-+	int dd, err;
-+
-+	memset(&match, 0, sizeof(struct remote_dev_info));
-+	bacpy(&match.bdaddr, BDADDR_ANY);
-+	match.name_status = NAME_REQUIRED;
-+
-+	dev = adapter_search_found_devices(adapter, &match);
-+	if (!dev)
-+		return -ENODATA;
-+
-+	dd = hci_open_dev(adapter->dev_id);
-+	if (dd < 0)
-+		return -errno;
-+
-+	/* send at least one request or return failed if the list is empty */
-+	do {
-+		/* flag to indicate the current remote name requested */
-+		dev->name_status = NAME_REQUESTED;
-+
-+		memset(&cp, 0, sizeof(cp));
-+		bacpy(&cp.bdaddr, &dev->bdaddr);
-+		cp.pscan_rep_mode = 0x02;
-+
-+		err = hci_send_cmd(dd, OGF_LINK_CTL, OCF_REMOTE_NAME_REQ,
-+						REMOTE_NAME_REQ_CP_SIZE, &cp);
-+
-+		if (!err)
-+			break;
-+
-+		error("Unable to send HCI remote name req: %s (%d)",
-+						strerror(errno), errno);
-+
-+		/* if failed, request the next element */
-+		/* remove the element from the list */
-+		adapter_remove_found_device(adapter, &dev->bdaddr);
-+
-+		/* get the next element */
-+		dev = adapter_search_found_devices(adapter, &match);
-+	} while (dev);
-+
-+	hci_close_dev(dd);
-+
-+	if (err < 0)
-+		err = errno;
-+
-+	return err;
-+}
-+
- static const char *mode2str(uint8_t mode)
- {
- 	switch(mode) {
-diff --git a/src/adapter.h b/src/adapter.h
-index 2356743..fca34eb 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -95,6 +95,8 @@ struct btd_device *adapter_create_device(DBusConnection *conn,
- 
- int pending_remote_name_cancel(struct btd_adapter *adapter);
- 
-+int adapter_resolve_names(struct btd_adapter *adapter);
-+
- void clear_found_devices_list(struct btd_adapter *adapter);
- 
- struct btd_adapter *adapter_create(DBusConnection *conn, int id,
-diff --git a/src/dbus-hci.c b/src/dbus-hci.c
-index 8718465..ca391c5 100644
---- a/src/dbus-hci.c
-+++ b/src/dbus-hci.c
-@@ -466,74 +466,6 @@ void hcid_dbus_inquiry_start(bdaddr_t *local)
- 	}
- }
- 
--static int found_device_req_name(struct btd_adapter *adapter)
--{
--	struct hci_request rq;
--	evt_cmd_status rp;
--	remote_name_req_cp cp;
--	struct remote_dev_info *dev, match;
--	int dd, req_sent = 0;
--	uint16_t dev_id = adapter_get_dev_id(adapter);
--
--	memset(&match, 0, sizeof(struct remote_dev_info));
--	bacpy(&match.bdaddr, BDADDR_ANY);
--	match.name_status = NAME_REQUIRED;
--
--	dev = adapter_search_found_devices(adapter, &match);
--	if (!dev)
--		return -ENODATA;
--
--	dd = hci_open_dev(dev_id);
--	if (dd < 0)
--		return -errno;
--
--	memset(&rq, 0, sizeof(rq));
--	rq.ogf    = OGF_LINK_CTL;
--	rq.ocf    = OCF_REMOTE_NAME_REQ;
--	rq.cparam = &cp;
--	rq.clen   = REMOTE_NAME_REQ_CP_SIZE;
--	rq.rparam = &rp;
--	rq.rlen   = EVT_CMD_STATUS_SIZE;
--	rq.event  = EVT_CMD_STATUS;
--
--	/* send at least one request or return failed if the list is empty */
--	do {
--		/* flag to indicate the current remote name requested */
--		dev->name_status = NAME_REQUESTED;
--
--		memset(&rp, 0, sizeof(rp));
--		memset(&cp, 0, sizeof(cp));
--		bacpy(&cp.bdaddr, &dev->bdaddr);
--		cp.pscan_rep_mode = 0x02;
--
--		if (hci_send_req(dd, &rq, HCI_REQ_TIMEOUT) < 0)
--			error("Unable to send HCI remote name req: %s (%d)",
--						strerror(errno), errno);
--
--		if (!rp.status) {
--			req_sent = 1;
--			break;
--		}
--
--		error("Remote name request failed with status 0x%02x",
--								rp.status);
--
--		/* if failed, request the next element */
--		/* remove the element from the list */
--		adapter_remove_found_device(adapter, &dev->bdaddr);
--
--		/* get the next element */
--		dev = adapter_search_found_devices(adapter, &match);
--	} while (dev);
--
--	hci_close_dev(dd);
--
--	if (!req_sent)
--		return -ENODATA;
--
--	return 0;
--}
--
- void hcid_dbus_inquiry_complete(bdaddr_t *local)
- {
- 	struct btd_adapter *adapter;
-@@ -556,7 +488,7 @@ void hcid_dbus_inquiry_complete(bdaddr_t *local)
- 	 *
- 	 * Keep in mind that non D-Bus requests can arrive.
- 	 */
--	if (found_device_req_name(adapter) == 0)
-+	if (adapter_resolve_names(adapter) == 0)
- 		return;
- 
- 	state = adapter_get_state(adapter);
-@@ -791,7 +723,7 @@ proceed:
- 	adapter_remove_found_device(adapter, peer);
- 
- 	/* check if there is more devices to request names */
--	if (found_device_req_name(adapter) == 0)
-+	if (adapter_resolve_names(adapter) == 0)
- 		return;
- 
- 	state = adapter_get_state(adapter);
--- 
-1.5.6.3
+what about just triggering the timer and then sending DISC for DLCI 0. I
+don't see a big benefit for this reference counting overhead.
+
+When we send the DISC, we will receive UA and thus get the required
+rfcomm_session_put() that then leads to the ACL disconnect.
+
+Regards
+
+Marcel
+
 
