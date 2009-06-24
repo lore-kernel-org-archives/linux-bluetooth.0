@@ -1,47 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-From: Rodolpho Atoji <rodolpho.atoji@gmail.com>
-Date: Wed, 24 Jun 2009 19:49:17 -0300
-Message-ID: <40b986310906241549q5d6e354dw372aeb488cdbd8ed@mail.gmail.com>
-Subject: SDP_RETRY_IF_BUSY and timeout of service search process
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: Wacom Graphire Bluetooth HID driver - big lag
+From: Bastien Nocera <hadess@hadess.net>
+To: =?UTF-8?Q?Przemys=C5=82aw?= Firszt <przemo@firszt.eu>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1245876583.3880.56.camel@pldmachine>
+References: <1243543413.21667.23.camel@pldmachine>
+	 <1243549749.21144.816.camel@cookie.hadess.net>
+	 <1243588429.4951.22.camel@pldmachine>
+	 <1244377549.30768.5467.camel@cookie.hadess.net>
+	 <1244390002.23850.105.camel@localhost.localdomain>
+	 <1245876583.3880.56.camel@pldmachine>
+Content-Type: text/plain; charset="UTF-8"
+Date: Wed, 24 Jun 2009 21:55:03 +0100
+Message-Id: <1245876903.26486.17714.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+On Wed, 2009-06-24 at 21:49 +0100, Przemysław Firszt wrote:
+> Hi Bastien,
+> I'm testing wacom bluetooth driver and there are 2 problems. One of them
+> is that I have to switch on tablet twice to get it working. Next problem
+> is that the lag is huge and I had to switch to "low speed" in bluez
+> patch (see here for the details:
+> http://cvs.fedoraproject.org/viewvc/rpms/bluez/devel/bluez-activate-wacom-mode2.patch?revision=1.1&view=markup)
+> 
+> I'm using:
+> -patched bluez-4.42
+> -the latest kernel 2.6.30-08503-g4e8a237-dirty
+> -PLD Th 3.0 distro on NC4200 HP laptop
+> 
+> I'm downloading Fedora LiveCD to check if these problems are
+> distro-related, but I had similar issues before, so I'm not expecting
+> any change.
+> 
+> Any ides what can I test/change to get rid of those problems?
 
-I'm using bluez-3.32 and I would like to know the timeout
-for the service search process, with or without using
-SDP_RETRY_IF_BUSY.
+No idea, those are the same problems I was encountering when testing it,
+though using the kernel to do the mode2 switching might fix the first
+problem.
 
-Reading the code, it's possible to see that the function
-sdp_send_req_w4_resp() is used for all the search functions.
+No idea about the lag though...
 
-So, without using SDP_RETRY_IF_BUSY the timeout
-should be the sum of timeouts of sdp_send_req() and
-sdp_read_rsp().
-
-The timeout of sdp_send_req() is the timeout of send(),
-which is SO_SNDTIMEO. The timeout of sdp_read_rsp()
-is SDP_RESPONSE_TIMEOUT, so the timeout of
-the service search process without retries should be
-SO_SNDTIMEO + SDP_RESPONSE_TIMEOUT, am I
-right?
-
-Regarding to the "busy" state of the device, what is
-it, exactly?
-
-As shown on (sdp.c:4095):
-
-do {
-...
-} while (errno == EBUSY && (flags & SDP_RETRY_IF_BUSY));
-
-When SDP_RETRY_IF_BUSY is used, the timeout of
-service search process can be indefinitely extended
-above the timeout calculated?
-
-Thanks in advance and best regards,
-
-Rodolpho
