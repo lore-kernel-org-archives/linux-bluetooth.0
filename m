@@ -1,76 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH] Less errors from the cups backend
+Subject: Re: [PATCH] Add udev rules to start bluetooth on-demand
 From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="=-eGord0x594wYaEjbkPbc"
-Date: Wed, 24 Jun 2009 18:03:46 +0100
-Message-Id: <1245863027.26486.17241.camel@localhost.localdomain>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1245862000.15367.146.camel@violet>
+References: <1245591547.26486.7101.camel@localhost.localdomain>
+	 <1245592251.15367.64.camel@violet>
+	 <1245593152.26486.7156.camel@localhost.localdomain>
+	 <1245593413.15367.65.camel@violet>
+	 <1245843329.26486.16565.camel@localhost.localdomain>
+	 <1245861818.15367.145.camel@violet>
+	 <1245861900.26486.17200.camel@localhost.localdomain>
+	 <1245862000.15367.146.camel@violet>
+Content-Type: text/plain
+Date: Wed, 24 Jun 2009 17:52:56 +0100
+Message-Id: <1245862376.26486.17217.camel@localhost.localdomain>
 Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Wed, 2009-06-24 at 18:46 +0200, Marcel Holtmann wrote:
+> Hi Bastien,
+> 
+> > > > > > > > As discussed in previous mails.
+> > > > > > > 
+> > > > > > > please name it bluetooth.rules. The daemon is also called bluetoothd and
+> > > > > > > not bluezd.
+> > > > > > > 
+> > > > > > > Also you need to have the EXTRA_DIST part in it since _DATA doesn't get
+> > > > > > > added to the distribution automatically. For all this changes, you have
+> > > > > > > to check with make distcheck.
+> > > > > > 
+> > > > > > Fixed version attached
+> > > > > 
+> > > > > we might need to put this into ifndef INITSCRIPTS since it makes no
+> > > > > sense to install the init script and the udev rule at the same time.
+> > > > 
+> > > > Revised patch attached
+> > > 
+> > > +
+> > > +if INISCRIPTS
+> > > +else
+> > > +rules_DATA += bluetooth.rules
+> > >  endif
+> > 
+> > ifndef isn't an automake construct.
+> > 
+> 
+> then if !INITSCRIPTS should do it. However I was more asking about the
+> spelling mistake. You forgot a T ;)
 
---=-eGord0x594wYaEjbkPbc
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-
-Avoids filling up /var/log/messages, as seen in:
-https://bugzilla.redhat.com/show_bug.cgi?id=507572
-
-Cheers
-
---=-eGord0x594wYaEjbkPbc
-Content-Disposition: attachment; filename="0001-Less-errors-from-the-cups-backend.patch"
-Content-Type: text/x-patch; name="0001-Less-errors-from-the-cups-backend.patch"; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-
->From c260d9aa469347bc11c6b61944bf130deb6a2e04 Mon Sep 17 00:00:00 2001
-From: Bastien Nocera <hadess@hadess.net>
-Date: Wed, 24 Jun 2009 18:01:27 +0100
-Subject: [PATCH] Less errors from the cups backend
-
-Don't error out when either D-Bus isn't available,
-bluetoothd isn't running, or there's no adapters.
----
- cups/main.c |    9 +++++----
- 1 files changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/cups/main.c b/cups/main.c
-index 6dcc622..2fbfe7e 100644
---- a/cups/main.c
-+++ b/cups/main.c
-@@ -536,15 +536,15 @@ static gboolean list_printers(void)
- 
- 	conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
- 	if (conn == NULL)
--		return FALSE;
-+		return TRUE;
- 
- 	dbus_error_init(&error);
- 	hcid_exists = dbus_bus_name_has_owner(conn, "org.bluez", &error);
- 	if (&error != NULL && dbus_error_is_set(&error))
--		return FALSE;
-+		return TRUE;
- 
- 	if (!hcid_exists)
--		return FALSE;
-+		return TRUE;
- 
- 	/* Get the default adapter */
- 	message = dbus_message_new_method_call("org.bluez", "/",
-@@ -562,7 +562,8 @@ static gboolean list_printers(void)
- 
- 	if (&error != NULL && dbus_error_is_set(&error)) {
- 		dbus_connection_unref(conn);
--		return FALSE;
-+		/* No adapter */
-+		return TRUE;
- 	}
- 
- 	dbus_message_iter_init(reply, &reply_iter);
--- 
-1.6.2.2
-
-
---=-eGord0x594wYaEjbkPbc--
-
+Well, that's embarrassing...
