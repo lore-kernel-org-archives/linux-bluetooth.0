@@ -1,58 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: SSP KeyboardOnly crasher
+Subject: SSP KeyboardOnly crasher
 From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1245868533.26486.17432.camel@localhost.localdomain>
-References: <1245868533.26486.17432.camel@localhost.localdomain>
 Content-Type: text/plain
-Date: Wed, 24 Jun 2009 19:39:30 +0100
-Message-Id: <1245868770.26486.17442.camel@localhost.localdomain>
+Date: Wed, 24 Jun 2009 19:35:33 +0100
+Message-Id: <1245868533.26486.17432.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2009-06-24 at 19:35 +0100, Bastien Nocera wrote:
-> Heya,
-> 
-> Got bluetoothd to crash.
-> 
-> Machine 1, bluez 4.37 from Fedora 11, running simple-agent with
-> KeyboardOnly as the capability, Belkin BT 2.1 dongle.
-> 
-> Machine 2, running bluez from git master, running gnome-bluetooth
-> master, same Belkin dongle.
-> 
-> Run bluetooth-wizard on Machine 2 and attempt pairing against Machine 1.
-> When the passkey prompt appears on Machine 1, enter some junk.
-> 
-> The pairing on Machine 2 will timeout, and bluetoothd crash.
+Heya,
 
-And under valgrind:
-vex amd64->IR: unhandled instruction bytes: 0x43 0x61 0x6E 0x63 0x65 0x6C
-==26202== valgrind: Unrecognised instruction at address 0x13dfa8.
-==26202== Your program just tried to execute an instruction that Valgrind
-==26202== did not recognise.  There are two possible reasons for this.
-==26202== 1. Your program has a bug and erroneously jumped to a non-code
-==26202==    location.  If you are running Memcheck and you just saw a
-==26202==    warning about a bad jump, it's probably your program's fault.
-==26202== 2. The instruction is legitimate but Valgrind doesn't handle it,
-==26202==    i.e. it's Valgrind's fault.  If you think this is the case or
-==26202==    you are not sure, please let us know and we'll try to fix it.
-==26202== Either way, Valgrind will now raise a SIGILL signal which will
-==26202== probably kill your program.
-==26202== 
-==26202== Process terminating with default action of signal 4 (SIGILL): dumping core
-==26202==  Illegal opcode at address 0x13DFA8
-==26202==    at 0x13DFA8: (within /home/hadess/Projects/Cvs/bluez/src/.libs/lt-bluetoothd)
-==26202==    by 0x11EEF2: agent_free (agent.c:168)
-==26202==    by 0x11F06A: agent_destroy (agent.c:215)
-==26202==    by 0x12AAA9: bonding_request_free (device.c:1665)
-==26202==    by 0x12B0A9: bonding_connect_cb (device.c:1829)
-==26202==    by 0x13390B: connect_cb (btio.c:163)
-==26202==    by 0x52B4AFD: g_main_context_dispatch (in /lib64/libglib-2.0.so.0.2000.3)
-==26202==    by 0x52B81D7: (within /lib64/libglib-2.0.so.0.2000.3)
-==26202==    by 0x52B8634: g_main_loop_run (in /lib64/libglib-2.0.so.0.2000.3)
-==26202==    by 0x114CF2: main (main.c:482)
+Got bluetoothd to crash.
 
-Cheers
+Machine 1, bluez 4.37 from Fedora 11, running simple-agent with
+KeyboardOnly as the capability, Belkin BT 2.1 dongle.
+
+Machine 2, running bluez from git master, running gnome-bluetooth
+master, same Belkin dongle.
+
+Run bluetooth-wizard on Machine 2 and attempt pairing against Machine 1.
+When the passkey prompt appears on Machine 1, enter some junk.
+
+The pairing on Machine 2 will timeout, and bluetoothd crash.
+Program terminated with signal 4, Illegal instruction.
+#0  0x00007f4b07bb0fa8 in ?? () from /home/hadess/Projects/Cvs/bluez/src/.libs/lt-bluetoothd
+(gdb) bt
+#0  0x00007f4b07bb0fa8 in ?? () from /home/hadess/Projects/Cvs/bluez/src/.libs/lt-bluetoothd
+#1  0x00007f4b07b9e98d in passkey_cb (agent=0x7f4b092b8110, err=0x7fff0fbbada0, passkey=153909344, data=0x7fff0fbbada0) at device.c:2079
+#2  0x00007f4b07b91ef3 in agent_free (agent=0x7f4b092b8110) at agent.c:168
+#3  0x00007f4b07b9206b in agent_destroy (agent=0x7f4b092b8110, exited=0) at agent.c:215
+#4  0x00007f4b07b9daaa in bonding_request_free (bonding=0x7f4b092b4260) at device.c:1665
+#5  0x00007f4b07b9e0aa in bonding_connect_cb (io=0x7f4b092c7c60, err=0x7f4b092d27a0, user_data=0x7f4b092cfcc0) at device.c:1829
+#6  0x00007f4b07ba690c in connect_cb (io=0x7f4b092c7c60, cond=28, user_data=0x7f4b092b5b70) at btio.c:163
+#7  0x00007f4b0705eafe in g_main_dispatch (context=<value optimized out>) at gmain.c:1814
+#8  IA__g_main_context_dispatch (context=<value optimized out>) at gmain.c:2367
+#9  0x00007f4b070621d8 in g_main_context_iterate (context=0x7f4b092b8680, block=<value optimized out>, dispatch=<value optimized out>, self=<value optimized out>) at gmain.c:2445
+#10 0x00007f4b07062635 in IA__g_main_loop_run (loop=0x7f4b092bf520) at gmain.c:2653
+#11 0x00007f4b07b87cf3 in main (argc=1, argv=0x7fff0fbbb288) at main.c:482
+(gdb) frame 1
+#1  0x00007f4b07b9e98d in passkey_cb (agent=0x7f4b092b8110, err=0x7fff0fbbada0, passkey=153909344, data=0x7fff0fbbada0) at device.c:2079
+2079		((agent_passkey_cb) auth->cb)(agent, err, passkey, device);
+
+Ideas?
+
 
