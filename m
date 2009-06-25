@@ -1,75 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Vikram Kandukuri
-	<Vikram.Kandukuri@Atheros.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Thu, 25 Jun 2009 12:56:38 +0530
-Subject: RE: [PATCH] Bluetooth: Kill session whenever VIRTUAL_CABLE_UNPLUG
- is passed.
-Message-ID: <44EE5C37ADC36343B0625A05DD408C485068E3A5CF@CHEXMB-01.global.atheros.com>
-References: <20090620061927.GC9947@atheros-laptop>
- <1245404162.15367.44.camel@violet>
-In-Reply-To: <1245404162.15367.44.camel@violet>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+In-Reply-To: <113d36d80906242033p134edf27t12bda1d0359c4134@mail.gmail.com>
+References: <113d36d80906242033p134edf27t12bda1d0359c4134@mail.gmail.com>
+Date: Thu, 25 Jun 2009 14:26:09 +0800
+Message-ID: <113d36d80906242326g3f2ce8e3h6c779aa01d776b04@mail.gmail.com>
+Subject: question on A2DP sink suspend/resume
+From: lan zhu <zhu.lan.cn@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+If we want to create SCO link when A2DP is in streaming state, we
+shall suspend A2DP first and then establish SCO link. Conversely, we
+shall resume A2DP link when we drop SCO link. The entire description
+can be found in the Simultaneous use of HFP, A2DP, and AVRCP Profiles
+Whitepaper on bluetooth org web site.
+(https://www.bluetooth.org/Technical/Specifications/whitepapers.htm).
+
+My question is,  I found there is no such sink_suspend or sink_resume
+method in D-BUS API while these functions are all implemented in Bluez
+audio module. I would like to know why don't put them to D-BUS API?
+If we need to call these functions we have to expand the D-BUS API.
+
+One more question is, is there a formal way to test SCO/A2DP
+simultaneous case? we can't find a proper headset to test it because
+those headsets are all well implemented with the simultaneous logic,
+so there is no way to enter ourselves' code that handle this logic.
+Can we test it by configurating some test tool such as PTS?
 
 
------Original Message-----
-From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@v=
-ger.kernel.org] On Behalf Of Marcel Holtmann
-Sent: Friday, June 19, 2009 3:06 PM
-To: Vikram Kandukuri
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Kill session whenever VIRTUAL_CABLE_UNPLUG =
-is passed.
-
-Hi Vikram,
-
-> Whenever the remote device sends VIRTUAL CABLE UNPLUG, the device should
-> be disconnected.
->
-> Signed-off-by: Jothikumar Mothilal <jothikumar.mothilal@atheros.com>
-> ---
->  net/bluetooth/hidp/core.c |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
->
-> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-> index b186768..a9f7afb 100644
-> --- a/net/bluetooth/hidp/core.c
-> +++ b/net/bluetooth/hidp/core.c
-> @@ -374,6 +374,7 @@ static void hidp_process_hid_control(struct hidp_sess=
-ion *session,
->
->               /* Kill session thread */
->               atomic_inc(&session->terminate);
-> +             hidp_schedule(session);
->       }
->  }
-
-the patch is correct, but the commit message could be a little bit more
-verbose. It should explain why this fixes it.
-
-Regards
-
-Marcel
-
-
-Hi Marcel,
-We were facing this issue while running HID BQB test cases.
-
-There is a test case in PTS tool; PTS will send the VIRTUAL_CABLE_UNPLUG co=
-mmand to IUT. IUT should disconnect the channel and kill the session when i=
-t receives VIRTUAL_CABLE_UNPLUG command.
-VIRTUAL_CABLE_UNPLUG is parsed by hidp.ko but it is not scheduled to do so =
-(There is no schedule code). So I have added hidp_schedule to kill the sess=
-ion.
-
-I feel following description gives more information.
-
-Bluetooth: Scheduled to kill the session whenever VIRTUAL_CABLE_UNPLUG is r=
-eceived by IUT.
-
-Thanks,
-Jothi
+ Thanks,
+ Zhu Lan
