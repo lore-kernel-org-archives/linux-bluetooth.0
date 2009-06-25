@@ -1,34 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <113d36d80906242033p134edf27t12bda1d0359c4134@mail.gmail.com>
-References: <113d36d80906242033p134edf27t12bda1d0359c4134@mail.gmail.com>
-Date: Thu, 25 Jun 2009 14:26:09 +0800
-Message-ID: <113d36d80906242326g3f2ce8e3h6c779aa01d776b04@mail.gmail.com>
-Subject: question on A2DP sink suspend/resume
-From: lan zhu <zhu.lan.cn@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: SDP_RETRY_IF_BUSY and timeout of service search process
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Rodolpho Atoji <rodolpho.atoji@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <40b986310906241549q5d6e354dw372aeb488cdbd8ed@mail.gmail.com>
+References: <40b986310906241549q5d6e354dw372aeb488cdbd8ed@mail.gmail.com>
+Content-Type: text/plain
+Date: Thu, 25 Jun 2009 05:46:06 +0200
+Message-Id: <1245901566.15367.151.camel@violet>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If we want to create SCO link when A2DP is in streaming state, we
-shall suspend A2DP first and then establish SCO link. Conversely, we
-shall resume A2DP link when we drop SCO link. The entire description
-can be found in the Simultaneous use of HFP, A2DP, and AVRCP Profiles
-Whitepaper on bluetooth org web site.
-(https://www.bluetooth.org/Technical/Specifications/whitepapers.htm).
+Hi Rodolpho,
 
-My question is,  I found there is no such sink_suspend or sink_resume
-method in D-BUS API while these functions are all implemented in Bluez
-audio module. I would like to know why don't put them to D-BUS API?
-If we need to call these functions we have to expand the D-BUS API.
+> I'm using bluez-3.32 and I would like to know the timeout
+> for the service search process, with or without using
+> SDP_RETRY_IF_BUSY.
 
-One more question is, is there a formal way to test SCO/A2DP
-simultaneous case? we can't find a proper headset to test it because
-those headsets are all well implemented with the simultaneous logic,
-so there is no way to enter ourselves' code that handle this logic.
-Can we test it by configurating some test tool such as PTS?
+I can stop you right here. Our current release is 4.42 and the 3.x
+series is fully in maintenance mode.
+
+Regards
+
+Marcel
 
 
- Thanks,
- Zhu Lan
