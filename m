@@ -1,38 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Michal Sojka <sojkam1@fel.cvut.cz>
+From: John Frankish <j-frankish@slb.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Fri, 26 Jun 2009 15:18:25 +0200
 Subject: RE: Headset doesn't work at all (ALSA)
-To: linux-bluetooth@vger.kernel.org
-Date: Fri, 26 Jun 2009 18:30:30 +0200
-References: <200906261122.39383.sojkam1@fel.cvut.cz> <6AC5A55546F64545AE996F8200E3AC4E06B667D1@NL0105EXC01V01.eur.slb.com>
+Message-ID: <6AC5A55546F64545AE996F8200E3AC4E06B667D1@NL0105EXC01V01.eur.slb.com>
+References: <200906261122.39383.sojkam1@fel.cvut.cz>
+In-Reply-To: <200906261122.39383.sojkam1@fel.cvut.cz>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Message-Id: <20090626163059.8D44B15C025@imap.feld.cvut.cz>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-John Frankish wrote:
-> Then I tried:
-> 
->>$ aplay -D bluetooth  'rec.wav'
->>Playing WAVE 'rec.wav' : Signed 16 bit Little Endian, Rate 44100 Hz, Mono
->>aplay: pcm_write:1528: write error: Connection timed out
-> 
->>> does aplay -D plug:bluetooth  rec.wav help?
 
-No, it doesn't help. The corresponding bluetoothd output is:
+-----Original Message-----
+From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Michal Sojka
+Sent: 26 June, 2009 13:23
+To: linux-bluetooth@vger.kernel.org
+Subject: Headset doesn't work at all (ALSA)
 
-Jun 26 18:28:50 resox bluetoothd[14098]: Accepted new client connection on unix socket (fd=22)
-Jun 26 18:28:50 resox bluetoothd[14098]: Audio API: BT_REQUEST <- BT_GET_CAPABILITIES
-Jun 26 18:28:50 resox bluetoothd[14098]: Audio API: BT_RESPONSE -> BT_GET_CAPABILITIES
-Jun 26 18:28:50 resox bluetoothd[14098]: Audio API: BT_REQUEST <- BT_OPEN
-Jun 26 18:28:50 resox bluetoothd[14098]: open sco - object=ANY source=ANY destination=00:07:A4:87:E2:EE lock=write
-Jun 26 18:28:50 resox bluetoothd[14098]: Audio API: BT_RESPONSE -> BT_OPEN
-Jun 26 18:28:50 resox bluetoothd[14098]: Audio API: BT_REQUEST <- BT_SET_CONFIGURATION
-Jun 26 18:28:50 resox bluetoothd[14098]: Audio API: BT_RESPONSE -> BT_SET_CONFIGURATION
-Jun 26 18:28:50 resox bluetoothd[14098]: Audio API: BT_REQUEST <- BT_START_STREAM
-Jun 26 18:28:50 resox bluetoothd[14098]: socket(SEQPACKET, SCO): Too many open files (24)
-Jun 26 18:28:50 resox bluetoothd[14098]: start_resume: resume failed
-Jun 26 18:28:50 resox bluetoothd[14098]: Audio API: BT_ERROR -> BT_START_STREAM
-Jun 26 18:28:50 resox bluetoothd[14098]: Unix client disconnected (fd=22)
-Jun 26 18:28:50 resox bluetoothd[14098]: client_free(0xb9649ea8)
+Hi,
 
+I cannot make my BT headset (Motorola HS820) work. I use Debian
+with 2.6.30 kernel and the following versions of packages:
+
+ii  bluez                                  4.42-1                                 Bluetooth tools and daemons
+ii  bluez-alsa                             4.42-1                                 Bluetooth ALSA support
+
+I've followed http://wiki.bluez.org/wiki/HOWTO/AudioDevices without success.
+I have the following in .asoundrc:
+
+>$ cat .asoundrc
+>pcm.bluetoothraw {
+>   type bluetooth
+>   device 00:07:A4:87:E2:EE
+>}
+>pcm.bluetooth {
+>    type plug
+>    slave {
+>        pcm bluetoothraw
+>    }
+>}
+
+Then I tried:
+
+>$ aplay -D bluetooth  'rec.wav'
+>Playing WAVE 'rec.wav' : Signed 16 bit Little Endian, Rate 44100 Hz, Mono
+>aplay: pcm_write:1528: write error: Connection timed out
+
+>> does aplay -D plug:bluetooth  rec.wav help?
+
+[snip]
