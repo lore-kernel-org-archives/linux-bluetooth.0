@@ -1,52 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: John Frankish <j-frankish@slb.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Fri, 26 Jun 2009 15:18:25 +0200
-Subject: RE: Headset doesn't work at all (ALSA)
-Message-ID: <6AC5A55546F64545AE996F8200E3AC4E06B667D1@NL0105EXC01V01.eur.slb.com>
-References: <200906261122.39383.sojkam1@fel.cvut.cz>
-In-Reply-To: <200906261122.39383.sojkam1@fel.cvut.cz>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Subject: Re: [PATCH] Add support for registration of a PBAP service using
+ sdptool
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: Nick Pelly <npelly@google.com>, linux-bluetooth@vger.kernel.org,
+	Jiafa Liu <pbx376@motorola.com>
+In-Reply-To: <1246005794.4017.26.camel@snoogens.fab.redhat.com>
+References: <1245976084-8936-1-git-send-email-npelly@google.com>
+	 <1245999714.12994.103.camel@localhost.localdomain>
+	 <1246005794.4017.26.camel@snoogens.fab.redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 26 Jun 2009 11:42:04 +0200
+Message-Id: <1246009324.12994.107.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Bastien,
 
------Original Message-----
-From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Michal Sojka
-Sent: 26 June, 2009 13:23
-To: linux-bluetooth@vger.kernel.org
-Subject: Headset doesn't work at all (ALSA)
+> > > From: Jiafa Liu <pbx376@motorola.com>
+> > > 
+> > > ---
+> > >  tools/sdptool.c |   81 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+> > >  1 files changed, 80 insertions(+), 1 deletions(-)
+> > 
+> > argh :(
+> > 
+> > gcc -DHAVE_CONFIG_H -I. -I.. -I../common   -I../include   -Wall -O2 -D_FORTIFY_SOURCE=2 -Werror -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -Wdeclaration-after-statement -Wmissing-declarations -Wredundant-decls -Wcast-align -D_FORTIFY_SOURCE=2 -fPIC -g -O0 -MT sdptool.o -MD -MP -MF .deps/sdptool.Tpo -c -o sdptool.o sdptool.c
+> > cc1: warnings being treated as errors
+> > sdptool.c: In function ‘add_pbap’:
+> > sdptool.c:1873: error: comparison between signed and unsigned integer expressions
+> > 
+> > Can we at least try to compile it with ./bootstrap-configure and all our
+> > warnings enabled.
+> > 
+> > I fixed it now, but come on that is not too much to ask.
+> 
+> You'd be right if it wasn't bogus, and GCC being anal...
 
-Hi,
+you might look at it that way, but it is important from a security point
+of view. For a lot of cases it sounds stupid, but this warning is good
+for finding potential integer overflows because of different sign.
 
-I cannot make my BT headset (Motorola HS820) work. I use Debian
-with 2.6.30 kernel and the following versions of packages:
+Regards
 
-ii  bluez                                  4.42-1                                 Bluetooth tools and daemons
-ii  bluez-alsa                             4.42-1                                 Bluetooth ALSA support
+Marcel
 
-I've followed http://wiki.bluez.org/wiki/HOWTO/AudioDevices without success.
-I have the following in .asoundrc:
 
->$ cat .asoundrc
->pcm.bluetoothraw {
->   type bluetooth
->   device 00:07:A4:87:E2:EE
->}
->pcm.bluetooth {
->    type plug
->    slave {
->        pcm bluetoothraw
->    }
->}
-
-Then I tried:
-
->$ aplay -D bluetooth  'rec.wav'
->Playing WAVE 'rec.wav' : Signed 16 bit Little Endian, Rate 44100 Hz, Mono
->aplay: pcm_write:1528: write error: Connection timed out
-
->> does aplay -D plug:bluetooth  rec.wav help?
-
-[snip]
