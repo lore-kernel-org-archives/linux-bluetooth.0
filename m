@@ -1,38 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Add support for registration of a PBAP service using
- sdptool
-From: Bastien Nocera <hadess@hadess.net>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Nick Pelly <npelly@google.com>, linux-bluetooth@vger.kernel.org,
-        Jiafa Liu <pbx376@motorola.com>
-In-Reply-To: <1245999714.12994.103.camel@localhost.localdomain>
-References: <1245976084-8936-1-git-send-email-npelly@google.com>
-	 <1245999714.12994.103.camel@localhost.localdomain>
-Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 26 Jun 2009 09:43:14 +0100
-Message-Id: <1246005794.4017.26.camel@snoogens.fab.redhat.com>
+Subject: Re: SDP_RETRY_IF_BUSY and timeout of service search process
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Rodolpho Atoji <rodolpho.atoji@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <40b986310906250823n3ec9cff9s2ba3f881c6ccfc0e@mail.gmail.com>
+References: <40b986310906241549q5d6e354dw372aeb488cdbd8ed@mail.gmail.com>
+	 <1245901566.15367.151.camel@violet>
+	 <40b986310906250815n79358f70ic786d05b06030f86@mail.gmail.com>
+	 <1245943061.12994.89.camel@localhost.localdomain>
+	 <40b986310906250823n3ec9cff9s2ba3f881c6ccfc0e@mail.gmail.com>
+Content-Type: text/plain
+Date: Fri, 26 Jun 2009 09:04:42 +0200
+Message-Id: <1245999882.12994.105.camel@localhost.localdomain>
 Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 2009-06-26 at 09:01 +0200, Marcel Holtmann wrote:
-> Ni Nick,
-> 
-> > From: Jiafa Liu <pbx376@motorola.com>
-> > 
-> > ---
-> >  tools/sdptool.c |   81 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
-> >  1 files changed, 80 insertions(+), 1 deletions(-)
-> 
-> argh :(
-> 
-> gcc -DHAVE_CONFIG_H -I. -I.. -I../common   -I../include   -Wall -O2 -D_FORTIFY_SOURCE=2 -Werror -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -Wdeclaration-after-statement -Wmissing-declarations -Wredundant-decls -Wcast-align -D_FORTIFY_SOURCE=2 -fPIC -g -O0 -MT sdptool.o -MD -MP -MF .deps/sdptool.Tpo -c -o sdptool.o sdptool.c
-> cc1: warnings being treated as errors
-> sdptool.c: In function ‘add_pbap’:
-> sdptool.c:1873: error: comparison between signed and unsigned integer expressions
-> 
-> Can we at least try to compile it with ./bootstrap-configure and all our
-> warnings enabled.
-> 
-> I fixed it now, but come on that is not too much to ask.
+Hi Rodolpho,
 
-You'd be right if it wasn't bogus, and GCC being anal...
+> >> I'm using bluez-4.42 and I would like to know the timeout
+> >> for the service search process, with or without using
+> >> SDP_RETRY_IF_BUSY.
+> >
+> > and where do we actually use that flag inside bluetoothd? If we do that
+> > is a bug and it needs to be changed to use SDP async API.
+> 
+> In fact I use a library which is linked to bluez.
+> 
+> This library does the service search just like sdptool does
+> in do_search() (sdp.c:3616).
+> 
+> Is this deprecated and shouldn't be used, then?
+
+it is not deprecated, but it shouldn't be used. However feel free to fix
+it, but as I mentioned we are not even using it. The SDP async API is
+what I would recommend.
+
+Regards
+
+Marcel
+
+
