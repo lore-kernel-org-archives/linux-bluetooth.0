@@ -1,30 +1,21 @@
 Return-Path: <cyrus@holtmann.org>
-From: Filippo Giunchedi <filippo@esaurito.net>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/4] add CONFIGDIR and STORAGEDIR as AC_SUBST
-Date: Sat, 27 Jun 2009 17:01:37 +0200
-Message-Id: <1246114900-14482-1-git-send-email-filippo@esaurito.net>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1246098187.12994.126.camel@localhost.localdomain>
+References: <1246083026.30856.8.camel@localhost> <1246091096.12994.123.camel@localhost.localdomain>
+	<bd5b16740906270220w76e1b568l3cc0ab2c02e29e9c@mail.gmail.com>
+	<1246098187.12994.126.camel@localhost.localdomain>
+From: Ohad Ben-Cohen <ohad@bencohen.org>
+Date: Sat, 27 Jun 2009 14:13:01 +0300
+Message-ID: <bd5b16740906270413u6b7889ffn66f2e056b1dcb2de@mail.gmail.com>
+Subject: Re: [PATCH] Fix short commands limit
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- acinclude.m4 |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+On Sat, Jun 27, 2009 at 1:23 PM, Marcel Holtmann<marcel@holtmann.org> wrote:
+> we are not doing a new BlueZ 3.x release. That software is outdated.
 
-diff --git a/acinclude.m4 b/acinclude.m4
-index eb7cdeb..e8626ff 100644
---- a/acinclude.m4
-+++ b/acinclude.m4
-@@ -107,6 +107,9 @@ AC_DEFUN([AC_INIT_BLUEZ], [
- 				[Directory for the configuration files])
- 	AC_DEFINE_UNQUOTED(STORAGEDIR, "${storagedir}",
- 				[Directory for the storage files])
-+
-+	AC_SUBST(CONFIGDIR, "${configdir}")
-+	AC_SUBST(STORAGEDIR, "${storagedir}")
- ])
- 
- AC_DEFUN([AC_PATH_DBUS], [
--- 
-1.6.3.1
+ok, thanks a lot.
 
+Ohad.
