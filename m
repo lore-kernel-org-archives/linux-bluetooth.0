@@ -1,29 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
 From: Filippo Giunchedi <filippo@esaurito.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/4] test/agent.c: honour commandline --device
-Date: Sun, 28 Jun 2009 20:27:36 +0200
-Message-Id: <1246213659-24559-1-git-send-email-filippo@esaurito.net>
+Subject: [PATCH 5/4] ignore newly generated manpages
+Date: Sat, 27 Jun 2009 17:05:45 +0200
+Message-Id: <1246115145-14891-1-git-send-email-filippo@esaurito.net>
+In-Reply-To: <1246114900-14482-1-git-send-email-filippo@esaurito.net>
+References: <1246114900-14482-1-git-send-email-filippo@esaurito.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- test/agent.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ .gitignore |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
 
-diff --git a/test/agent.c b/test/agent.c
-index b256f52..7cd4b6e 100644
---- a/test/agent.c
-+++ b/test/agent.c
-@@ -283,7 +283,7 @@ static char *get_device(const char *device)
- {
- 	char *path;
- 
--	path = strdup("/org/bluez/hci0");
-+	path = strdup(device);
- 
- 	return path;
- }
+diff --git a/.gitignore b/.gitignore
+index fdbebcb..324b053 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -83,3 +83,5 @@ doc/*.sgml
+ doc/version.xml
+ doc/xml
+ doc/html
++src/bluetoothd.8
++src/hcid.conf.5
 -- 
 1.6.3.1
 
