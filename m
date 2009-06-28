@@ -1,189 +1,109 @@
 Return-Path: <cyrus@holtmann.org>
 From: Filippo Giunchedi <filippo@esaurito.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/4] test/agent.c: update dbus API usage
-Date: Sun, 28 Jun 2009 20:27:37 +0200
-Message-Id: <1246213659-24559-2-git-send-email-filippo@esaurito.net>
+Subject: [PATCH 4/4] test/agent.c: pairing via CreatePairedDevice
+Date: Sun, 28 Jun 2009 20:27:39 +0200
+Message-Id: <1246213659-24559-4-git-send-email-filippo@esaurito.net>
 In-Reply-To: <1246213659-24559-1-git-send-email-filippo@esaurito.net>
 References: <1246213659-24559-1-git-send-email-filippo@esaurito.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch implements and updates some parts of dbus API missing from
-test/agent.c, namely Authorize, RequestPinCode and RequestPasskey.
+Introduce mandatory target argument for remote address
 ---
- test/agent.c |  111 ++++++++++++++++++++++++++++++++++++++++++++++++++-------
- 1 files changed, 97 insertions(+), 14 deletions(-)
+ test/agent.c |   46 +++++++++++++++++++++++++++++++++++++++++++---
+ 1 files changed, 43 insertions(+), 3 deletions(-)
 
 diff --git a/test/agent.c b/test/agent.c
-index 7cd4b6e..4796e90 100644
+index 30af926..7f7bfe4 100644
 --- a/test/agent.c
 +++ b/test/agent.c
-@@ -70,20 +70,18 @@ static DBusHandlerResult agent_filter(DBusConnection *conn,
- 	return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
- }
+@@ -276,6 +276,39 @@ static const DBusObjectPathVTable agent_table = {
+ 	.message_function = agent_message,
+ };
  
--static DBusHandlerResult request_message(DBusConnection *conn,
-+static DBusHandlerResult request_pincode_message(DBusConnection *conn,
- 						DBusMessage *msg, void *data)
- {
- 	DBusMessage *reply;
--	const char *path, *address;
--	dbus_bool_t numeric;
-+	const char *path;
- 
- 	if (!passkey)
- 		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
- 
- 	if (!dbus_message_get_args(msg, NULL,
--			DBUS_TYPE_STRING, &path, DBUS_TYPE_STRING, &address,
--			DBUS_TYPE_BOOLEAN, &numeric, DBUS_TYPE_INVALID)) {
--		fprintf(stderr, "Invalid arguments for passkey Request method");
-+			DBUS_TYPE_OBJECT_PATH, &path, DBUS_TYPE_INVALID)) {
-+		fprintf(stderr, "Invalid arguments for RequestPinCode method");
- 		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
- 	}
- 
-@@ -99,7 +97,7 @@ static DBusHandlerResult request_message(DBusConnection *conn,
- 		return DBUS_HANDLER_RESULT_NEED_MEMORY;
- 	}
- 
--	printf("Passkey request for device %s\n", address);
-+	printf("Pincode request for device %s\n", path);
- 
- 	dbus_message_append_args(reply, DBUS_TYPE_STRING, &passkey,
- 					DBUS_TYPE_INVALID);
-@@ -114,20 +112,63 @@ send:
- 	return DBUS_HANDLER_RESULT_HANDLED;
- }
- 
--static DBusHandlerResult cancel_message(DBusConnection *conn,
-+static DBusHandlerResult request_passkey_message(DBusConnection *conn,
- 						DBusMessage *msg, void *data)
- {
- 	DBusMessage *reply;
--	const char *path, *address;
-+	const char *path;
-+	unsigned int int_passkey;
++static int create_paired_device(DBusConnection *conn, const char *device_path,
++						const char *agent_path,
++						const char *capabilities, const char *target)
++{
++	dbus_bool_t success;
++	DBusMessage *msg;
 +
-+	if (!passkey)
-+		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-+
- 
- 	if (!dbus_message_get_args(msg, NULL,
--			DBUS_TYPE_STRING, &path, DBUS_TYPE_STRING, &address,
--							DBUS_TYPE_INVALID)) {
-+			DBUS_TYPE_OBJECT_PATH, &path, DBUS_TYPE_INVALID)) {
-+		fprintf(stderr, "Invalid arguments for RequestPasskey method");
-+		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
++	msg = dbus_message_new_method_call("org.bluez", device_path,
++					"org.bluez.Adapter", "CreatePairedDevice");
++	if (!msg) {
++		fprintf(stderr, "Can't allocate new method call\n");
++		return -1;
 +	}
 +
-+	if (do_reject) {
-+		reply = dbus_message_new_error(msg,
-+					"org.bluez.Error.Rejected", "");
-+		goto send;
++	dbus_message_append_args(msg, DBUS_TYPE_STRING, &target,
++					DBUS_TYPE_OBJECT_PATH, &agent_path,
++					DBUS_TYPE_STRING, &capabilities,
++							DBUS_TYPE_INVALID);
++
++	success = dbus_connection_send(conn, msg, NULL);
++
++	dbus_message_unref(msg);
++
++	if (!success) {
++		fprintf(stderr, "Not enough memory for message send\n");
++		return -1;
 +	}
-+
-+	reply = dbus_message_new_method_return(msg);
-+	if (!reply) {
-+		fprintf(stderr, "Can't create reply message\n");
-+		return DBUS_HANDLER_RESULT_NEED_MEMORY;
-+	}
-+
-+	printf("Passkey request for device %s\n", path);
-+
-+	int_passkey = strtoul(passkey, NULL, 10);
-+
-+	dbus_message_append_args(reply, DBUS_TYPE_UINT32, &int_passkey,
-+					DBUS_TYPE_INVALID);
-+
-+send:
-+	dbus_connection_send(conn, reply, NULL);
 +
 +	dbus_connection_flush(conn);
 +
-+	dbus_message_unref(reply);
-+
-+	return DBUS_HANDLER_RESULT_HANDLED;
++	return 0;
 +}
 +
-+static DBusHandlerResult cancel_message(DBusConnection *conn,
-+						DBusMessage *msg, void *data)
-+{
-+	DBusMessage *reply;
-+
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_INVALID)) {
- 		fprintf(stderr, "Invalid arguments for passkey Confirm method");
- 		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+ static char *get_device(const char *device)
+ {
+ 	char *path;
+@@ -290,7 +323,7 @@ static void usage(void)
+ 	printf("Bluetooth agent ver %s\n\n", VERSION);
+ 
+ 	printf("Usage:\n"
+-		"\tagent [--device interface] [--path agent-path] <passkey>\n"
++		"\tagent [--device interface] [--path agent-path] <passkey> <target_device>\n"
+ 		"\n");
+ }
+ 
+@@ -309,7 +342,7 @@ int main(int argc, char *argv[])
+ 	struct sigaction sa;
+ 	DBusConnection *conn;
+ 	char match_string[128], default_path[128], *device_id = NULL;
+-	char *device_path = NULL, *agent_path = NULL;
++	char *device_path = NULL, *agent_path = NULL, *target = NULL;
+ 	int opt;
+ 
+ 	snprintf(default_path, sizeof(default_path),
+@@ -345,13 +378,15 @@ int main(int argc, char *argv[])
+ 	argv += optind;
+ 	optind = 0;
+ 
+-	if (argc < 1) {
++	if (argc < 2) {
+ 		usage();
+ 		exit(1);
  	}
  
--	printf("Request canceled for device %s\n", address);
-+	printf("Request canceled\n");
+ 	passkey = strdup(argv[0]);
  
- 	reply = dbus_message_new_method_return(msg);
- 	if (!reply) {
-@@ -174,11 +215,50 @@ static DBusHandlerResult release_message(DBusConnection *conn,
- 	return DBUS_HANDLER_RESULT_HANDLED;
- }
- 
-+static DBusHandlerResult authorize_message(DBusConnection *conn,
-+						DBusMessage *msg, void *data)
-+{
-+	DBusMessage *reply;
-+	const char *path, *uuid;
++	target = strdup(argv[1]);
 +
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
-+			DBUS_TYPE_STRING, &uuid, DBUS_TYPE_INVALID)) {
-+		fprintf(stderr, "Invalid arguments for Authorize method");
-+		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+ 	if (!agent_path)
+ 		agent_path = strdup(default_path);
+ 
+@@ -370,6 +405,11 @@ int main(int argc, char *argv[])
+ 		return -1;
+ 	}
+ 
++	if (create_paired_device(conn, device_path, agent_path, capabilities, target) < 0) {
++		dbus_connection_unref(conn);
++		exit(1);
 +	}
 +
-+	if (do_reject) {
-+		reply = dbus_message_new_error(msg,
-+					"org.bluez.Error.Rejected", "");
-+		goto send;
-+	}
-+
-+	reply = dbus_message_new_method_return(msg);
-+	if (!reply) {
-+		fprintf(stderr, "Can't create reply message\n");
-+		return DBUS_HANDLER_RESULT_NEED_MEMORY;
-+	}
-+
-+	printf("Authorizing request for %s\n", path);
-+
-+send:
-+	dbus_connection_send(conn, reply, NULL);
-+
-+	dbus_connection_flush(conn);
-+
-+	dbus_message_unref(reply);
-+
-+	return DBUS_HANDLER_RESULT_HANDLED;
-+}
-+
- static DBusHandlerResult agent_message(DBusConnection *conn,
- 						DBusMessage *msg, void *data)
- {
--	if (dbus_message_is_method_call(msg, "org.bluez.Agent", "Request"))
--		return request_message(conn, msg, data);
-+	if (dbus_message_is_method_call(msg, "org.bluez.Agent", "RequestPinCode"))
-+		return request_pincode_message(conn, msg, data);
-+
-+	if (dbus_message_is_method_call(msg, "org.bluez.Agent", "RequestPasskey"))
-+		return request_passkey_message(conn, msg, data);
- 
- 	if (dbus_message_is_method_call(msg, "org.bluez.Agent", "Cancel"))
- 		return cancel_message(conn, msg, data);
-@@ -186,6 +266,9 @@ static DBusHandlerResult agent_message(DBusConnection *conn,
- 	if (dbus_message_is_method_call(msg, "org.bluez.Agent", "Release"))
- 		return release_message(conn, msg, data);
- 
-+	if (dbus_message_is_method_call(msg, "org.bluez.Agent", "Authorize"))
-+		return authorize_message(conn, msg, data);
-+
- 	return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
- }
+ 	if (!dbus_connection_add_filter(conn, agent_filter, NULL, NULL))
+ 		fprintf(stderr, "Can't add signal filter");
  
 -- 
 1.6.3.1
