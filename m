@@ -1,71 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Add udev rules to start bluetooth on-demand
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1246287780.2856.3236.camel@localhost.localdomain>
-References: <1245591547.26486.7101.camel@localhost.localdomain>
-	 <1245592251.15367.64.camel@violet>
-	 <1245593152.26486.7156.camel@localhost.localdomain>
-	 <1245593413.15367.65.camel@violet>
-	 <1245843329.26486.16565.camel@localhost.localdomain>
-	 <1245861818.15367.145.camel@violet>
-	 <1245861900.26486.17200.camel@localhost.localdomain>
-	 <1245862000.15367.146.camel@violet>
-	 <1245862376.26486.17217.camel@localhost.localdomain>
-	 <1246098460.12994.128.camel@localhost.localdomain>
-	 <1246287780.2856.3236.camel@localhost.localdomain>
-Content-Type: text/plain
-Date: Tue, 30 Jun 2009 03:07:15 +0200
-Message-Id: <1246324035.12994.136.camel@localhost.localdomain>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <434c4b6e0906290635u35d050afkf1397dd50c970eb3@mail.gmail.com>
+References: <434c4b6e0906290635u35d050afkf1397dd50c970eb3@mail.gmail.com>
+Date: Mon, 29 Jun 2009 13:36:33 -0300
+Message-ID: <2d5a2c100906290936j1fc0b614vcf8239707b2a6927@mail.gmail.com>
+Subject: Re: Have you ever experienced A2DP trouble with Sony Ericsson HS980
+	,970 ?
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "Chanyeol,Park" <chanyeol.park@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+Hi,
 
-> > > > > > > > > > > As discussed in previous mails.
-> > > > > > > > > > 
-> > > > > > > > > > please name it bluetooth.rules. The daemon is also called bluetoothd and
-> > > > > > > > > > not bluezd.
-> > > > > > > > > > 
-> > > > > > > > > > Also you need to have the EXTRA_DIST part in it since _DATA doesn't get
-> > > > > > > > > > added to the distribution automatically. For all this changes, you have
-> > > > > > > > > > to check with make distcheck.
-> > > > > > > > > 
-> > > > > > > > > Fixed version attached
-> > > > > > > > 
-> > > > > > > > we might need to put this into ifndef INITSCRIPTS since it makes no
-> > > > > > > > sense to install the init script and the udev rule at the same time.
-> > > > > > > 
-> > > > > > > Revised patch attached
-> > > > > > 
-> > > > > > +
-> > > > > > +if INISCRIPTS
-> > > > > > +else
-> > > > > > +rules_DATA += bluetooth.rules
-> > > > > >  endif
-> > > > > 
-> > > > > ifndef isn't an automake construct.
-> > > > > 
-> > > > 
-> > > > then if !INITSCRIPTS should do it. However I was more asking about the
-> > > > spelling mistake. You forgot a T ;)
-> > > 
-> > > Well, that's embarrassing...
-> > 
-> > are you sending a new patch :)
-> 
-> Thought you'd fix the typo, and commit.
+On Mon, Jun 29, 2009 at 10:35 AM, Chanyeol,Park<chanyeol.park@gmail.com> wrote:
+> Hi
+>
+> Have you ever experienced A2DP trouble with Sony Ericsson HS980 ,970 ?
+>
+> It takes more time to A2DP setup such as DISCOVER,GET_CAP,SET_CONF…
+> including SDP than other devices.
+> Their packet is so small and their respond is so late..-.-;
+>
+> In my case, after I connect its HFP service, their respond is abnormal.
+>
+> If you know about this problem, could you give a tip or explain this.?
 
-not if you wanna keep your author name on the patch.
+Not really, but you can try sending us the hcidump and bluetoothd logs
+so we can take a look. If the device takes too long to respond we may
+timeout which could cause us to send ABORT, but without the logs this
+just a guess.
 
-Also does if !INITSCRIPTS not work?
-
-And why does your patch now has two statements for rules_DATA?
-
-Regards
-
-Marcel
-
-
+-- 
+Luiz Augusto von Dentz
+Engenheiro de Computação
