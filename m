@@ -1,32 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: Scheduled to kill the session whenever
- VIRTUAL_CABLE_UNPLUG is received by IUT
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Vikram Kandukuri <vkandukuri@atheros.com>
+Date: Tue, 30 Jun 2009 16:34:39 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Filippo Giunchedi <filippo@esaurito.net>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20090701060948.GA7505@atheros-laptop>
-References: <20090701060948.GA7505@atheros-laptop>
-Content-Type: text/plain
-Date: Tue, 30 Jun 2009 06:58:34 -0700
-Message-Id: <1246370314.12994.141.camel@localhost.localdomain>
-Mime-Version: 1.0
+Subject: Re: [PATCH 3/4] test/agent.c: register object path only
+Message-ID: <20090630133439.GA27640@jh-x301>
+References: <1246213659-24559-1-git-send-email-filippo@esaurito.net> <1246213659-24559-3-git-send-email-filippo@esaurito.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1246213659-24559-3-git-send-email-filippo@esaurito.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vikram,
+Hi,
 
-> Subject: [PATCH] Bluetooth: Scheduled to kill the session whenever VIRTUAL_CABLE_UNPLUG is received by IUT
-> 
-> There is a test case in PTS tool; PTS will send the VIRTUAL_CABLE_UNPLUG
-> command to IUT. IUT should disconnect the channel and kill the session
-> when it receives VIRTUAL_CABLE_UNPLUG command. VIRTUAL_CABLE_UNPLUG
-> is parsed by hidp.ko but it is not scheduled to do so (There is no
-> schedule code). So I have added hidp_schedule to kill the session.
+On Sun, Jun 28, 2009, Filippo Giunchedi wrote:
+> remove unused register_agent and unregister_agent, will be handled by
+> CreatePairedDevice
 
-patch has been added to all three trees. Thanks.
+I don't think we want to remove the RegisterAgent and UnregisterAgent
+feature. It is needed when you want the agent to passively wait for
+incoming pairing request. E.g. the simple-agent script supports it too
+when you run it without arguments.
 
-Regards
+So could you please redo the patches so that the Register/UnregisterAgent
+support remains. Thanks.
 
-Marcel
-
-
+Johan
