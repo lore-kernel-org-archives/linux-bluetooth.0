@@ -1,148 +1,133 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [SOLUTION] Works in 2.6.26, broken in 2.6.27 & 2.6.28 [WAS:
- Re: bnep module in 2.6.27 fails to provide bnep0 device]
-From: Mck <mick@semb.wever.org>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1230995170.10252.7.camel@localhost>
-References: <1230983567.6118.25.camel@localhost>
-	 <1230995170.10252.7.camel@localhost>
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-Vr45FuMFvLdgqYHZwSWT"
-Date: Sun, 28 Jun 2009 20:40:47 +0200
-Message-Id: <1246214448.20464.26.camel@localhost.localdomain>
-Mime-Version: 1.0
-To: unlisted-recipients:; (no To-header on input)
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <2d5a2c100906250614k798239b9v901166c2382a6b1c@mail.gmail.com>
+References: <2d5a2c100906090617m167d3815pae998d06bdbd6646@mail.gmail.com>
+	 <1245611096.15367.76.camel@violet>
+	 <2d5a2c100906221449y6e37cb19x1bc27085bac318f4@mail.gmail.com>
+	 <2d5a2c100906221608v5e3e3d8aydf66b13826ad88fa@mail.gmail.com>
+	 <2d5a2c100906230651m679ccfat5bf4bfb20c130955@mail.gmail.com>
+	 <1245768036.15367.78.camel@violet> <20090623200401.6c7e5ea6@stoetzler>
+	 <2d5a2c100906231113p23a7249u13de2ecd2a0d5482@mail.gmail.com>
+	 <2d5a2c100906231156w72a0e69dqfa6c197bfb1d5674@mail.gmail.com>
+	 <2d5a2c100906250614k798239b9v901166c2382a6b1c@mail.gmail.com>
+Date: Tue, 30 Jun 2009 17:18:35 -0300
+Message-ID: <2d5a2c100906301318o1103e3fdna8f9ef48de2eed82@mail.gmail.com>
+Subject: Re: regression introduced on v2.6.30-rc1
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Stefan Seyfried <seife@suse.de>
+Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
+Content-Type: multipart/mixed; boundary=0016364ee4e6e26ba5046d9682e5
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
---=-Vr45FuMFvLdgqYHZwSWT
-Content-Type: text/plain
+--0016364ee4e6e26ba5046d9682e5
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 
-> > I'm using the following combination on gentoo:
-> >=20
-> >  linux-2.6.27 (64-bit)
-> >  bluez-libs-3.36
-> >  bluez-utils-3.36
->=20
-> The problem exists the same after an upgrade to kernel-2.6.28
->=20
-> Downgrading to 2.6.26 everything works well.
-> The same environment is being used so the userspace seems not at
-> fault.
+Another update now fixing oopses by calling rfcomm_clear_session_timer
+on rfcomm_session_del.
 
-Ok, 6 months down the track i lose my phone and buy a new Sony Ericsson
-C901. I get the same behaviour but have found by luck a work around.
-
-If i "Browse files on device..." (using gnome's bluetooth-applet) and
-connect to my phone (creating a obex connection) then run
-pand -c <bdaddr>
-
-everything works fine, and it played well with NetworkManager.
+On Thu, Jun 25, 2009 at 10:14 AM, Luiz Augusto von
+Dentz<luiz.dentz@gmail.com> wrote:
+> Patch now against updated bluetooth-testing
+>
+> --
+> Luiz Augusto von Dentz
+> Engenheiro de Computa=E7=E3o
+>
 
 
-The successful system log looked like:
-
-> Jun 25 15:30:31 [pand] Connecting to 00:25:E7:0D:5E:6D
-> Jun 25 15:30:32 [pand] bnep0 connected
-> Jun 25 15:30:32 [NetworkManager] <info>  (bnep0): driver 'btusb' does not=
- support carrier detection.__You must switch to it manually._
-> Jun 25 15:30:32 [NetworkManager] <info>  (bnep0): new Ethernet device (dr=
-iver: 'btusb')_
-> Jun 25 15:30:32 [NetworkManager] <info>  (bnep0): exported as /org/freede=
-sktop/Hal/devices/net_00_03_7a_dc_47_18_
-> Jun 25 15:30:37 [NetworkManager] <info>  (bnep0): device state change: 1 =
--> 2_
-> Jun 25 15:30:37 [NetworkManager] <info>  (bnep0): bringing up device._
-> Jun 25 15:30:37 [NetworkManager] <info>  (bnep0): preparing device._
-> Jun 25 15:30:37 [NetworkManager] <info>  (bnep0): deactivating device (re=
-ason: 2)._
-> Jun 25 15:30:37 [NetworkManager] <info>  (bnep0): device state change: 2 =
--> 3_
-> Jun 25 15:30:37 [nm-system-settings] Added default wired connection 'Auto=
- bnep0' for /org/freedesktop/Hal/devices/net_00_03_7a_dc_47_18
-> Jun 25 15:30:37 [NetworkManager] <info>  Activation (bnep0) starting conn=
-ection 'Auto bnep0'_
-> Jun 25 15:30:37 [NetworkManager] <info>  (bnep0): device state change: 3 =
--> 4_
-> Jun 25 15:30:37 [NetworkManager] <info>  Activation (bnep0) Stage 1 of 5 =
-(Device Prepare) scheduled..._
-> Jun 25 15:30:37 [NetworkManager] <info>  Activation (bnep0) Stage 1 of 5 =
-(Device Prepare) started..._
-> Jun 25 15:30:37 [NetworkManager] <info>  Activation (bnep0) Stage 2 of 5 =
-(Device Configure) scheduled..._
-> Jun 25 15:30:37 [NetworkManager] <info>  Activation (bnep0) Stage 1 of 5 =
-(Device Prepare) complete._
-> Jun 25 15:30:37 [NetworkManager] <info>  Activation (bnep0) Stage 2 of 5 =
-(Device Configure) starting..._
-> Jun 25 15:30:37 [NetworkManager] <info>  (bnep0): device state change: 4 =
--> 5_
-> Jun 25 15:30:37 [NetworkManager] <info>  Activation (bnep0) Stage 2 of 5 =
-(Device Configure) successful._
-> Jun 25 15:30:37 [NetworkManager] <info>  Activation (bnep0) Stage 3 of 5 =
-(IP Configure Start) scheduled._
-> Jun 25 15:30:37 [NetworkManager] <info>  Activation (bnep0) Stage 2 of 5 =
-(Device Configure) complete._
-> Jun 25 15:30:37 [NetworkManager] <info>  Activation (bnep0) Stage 3 of 5 =
-(IP Configure Start) started..._
-> Jun 25 15:30:37 [NetworkManager] <info>  (bnep0): device state change: 5 =
--> 7_
-> Jun 25 15:30:37 [NetworkManager] <info>  Activation (bnep0) Beginning DHC=
-P transaction._
-> Jun 25 15:30:37 [NetworkManager] <info>  dhcpcd started with pid 20383_
-> Jun 25 15:30:37 [NetworkManager] <info>  Activation (bnep0) Stage 3 of 5 =
-(IP Configure Start) complete._
-> Jun 25 15:30:37 [dhcpcd] bnep0: dhcpcd 4.0.13 starting
-> Jun 25 15:30:37 [NetworkManager] <info>  DHCP: device bnep0 state changed=
- normal exit -> preinit_
-> Jun 25 15:30:37 [dhcpcd] bnep0: broadcasting for a lease
-> Jun 25 15:30:37 [dhcpcd] bnep0: offered ... from 10.252.177.241
-> Jun 25 15:30:37 [dhcpcd] bnep0: acknowledged ... from 10.252.177.241
-> Jun 25 15:30:37 [dhcpcd] bnep0: checking ... is available on attached net=
-works
-> Jun 25 15:30:42 [dhcpcd] bnep0: leased ... for 300 seconds
-> Jun 25 15:30:42 [NetworkManager] <info>  DHCP: device bnep0 state changed=
- preinit -> bound_
-> Jun 25 15:30:42 [NetworkManager] <info>  Activation (bnep0) Stage 4 of 5 =
-(IP Configure Get) scheduled..._
-> Jun 25 15:30:42 [NetworkManager] <info>  Activation (bnep0) Stage 4 of 5 =
-(IP Configure Get) started..._
-> Jun 25 15:30:42 [NetworkManager] <info>    address ..._
-> Jun 25 15:30:42 [NetworkManager] <info>    prefix 29 (255.255.255.248)_
-> Jun 25 15:30:42 [NetworkManager] <info>    gateway 10.252.177.243_
-> Jun 25 15:30:42 [NetworkManager] <info>    nameserver '212.169.123.67'_
-> Jun 25 15:30:42 [NetworkManager] <info>    nameserver '212.45.188.254'_
-> Jun 25 15:30:42 [NetworkManager] <info>  Activation (bnep0) Stage 5 of 5 =
-(IP Configure Commit) scheduled..._
-> Jun 25 15:30:42 [NetworkManager] <info>  Activation (bnep0) Stage 4 of 5 =
-(IP Configure Get) complete._
-> Jun 25 15:30:42 [NetworkManager] <info>  Activation (bnep0) Stage 5 of 5 =
-(IP Configure Commit) started..._
-> Jun 25 15:30:43 [NetworkManager] <info>  (bnep0): device state change: 7 =
--> 8_
-> Jun 25 15:30:43 [NetworkManager] <info>  Policy set 'Auto bnep0' (bnep0) =
-as default for routing and DNS._
-> Jun 25 15:30:43 [NetworkManager] <info>  Activation (bnep0) successful, d=
-evice activated._
-> Jun 25 15:30:43 [NetworkManager] <info>  Activation (bnep0) Stage 5 of 5 =
-(IP Configure Commit) complete._
-
-~mck
 
 --=20
-"Some husbands are living proof that a woman can take a joke."=20
-| semb.wever.org | sesat.no | finn.no |
+Luiz Augusto von Dentz
+Engenheiro de Computa=E7=E3o
 
---=-Vr45FuMFvLdgqYHZwSWT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
+--0016364ee4e6e26ba5046d9682e5
+Content-Type: text/x-diff; charset=US-ASCII;
+	name="0001-bluetooth-Fix-rejected-connection-not-disconnecting-.patch"
+Content-Disposition: attachment;
+	filename="0001-bluetooth-Fix-rejected-connection-not-disconnecting-.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_fwl28uc41
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.12 (GNU/Linux)
-
-iEYEABECAAYFAkpHuS8ACgkQkdPrePiuutOcsACeIbLetShHVVNZyVfFjMayzUEt
-DK8AoMT0KMgoYMnL2Cw+s1FM5C4i/kXm
-=iooi
------END PGP SIGNATURE-----
-
---=-Vr45FuMFvLdgqYHZwSWT--
+RnJvbSA2MDk5MTRhYThiYTJjOWM5YTJhNzQwMDRlMWNmNjQwY2E2ZmUwNGJiIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IDxsdWl6LmRlbnR6QG9w
+ZW5ib3NzYS5vcmc+CkRhdGU6IE1vbiwgMjkgSnVuIDIwMDkgMTU6MDk6NTQgLTAzMDAKU3ViamVj
+dDogW1BBVENIXSBibHVldG9vdGg6IEZpeCByZWplY3RlZCBjb25uZWN0aW9uIG5vdCBkaXNjb25u
+ZWN0aW5nIEFDTC4KCldoZW4gdXNpbmcgREVGRVJfU0VUVVAgb24gYSBSRkNPTU0gc29ja2V0IGEg
+U0FCTSBmcmFtZSB0cmlnZ2VycwphdXRob3JpemF0aW9uIHdoaWNoIHdoZW4gcmVqZWN0ZWQgc2Vu
+ZCBhIERNIGFzIHJlc3BvbnNlLiBUaGlzIGlzIGZpbmUKYWNjb3VyZGluZyB0byB0aGUgUkZDT01N
+IHNwZWM6CgoidGhlIHJlc3BvbmRpbmcgaW1wbGVtZW50YXRpb24gbWF5IHJlcGxhY2UgdGhlICJw
+cm9wZXIiIHJlc3BvbnNlIG9uCnRoZSBNdWx0aXBsZXhlciBDb250cm9sIGNoYW5uZWwgd2l0aCBh
+IERNIGZyYW1lLCBzZW50IG9uIHRoZSByZWZlcmVuY2VkCkRMQ0kgdG8gaW5kaWNhdGUgdGhhdCB0
+aGUgRExDSSBpcyBub3Qgb3BlbiwgYW5kIHRoYXQgdGhlIHJlc3BvbmRlciB3b3VsZApub3QgZ3Jh
+bnQgYSByZXF1ZXN0IHRvIG9wZW4gaXQgbGF0ZXIgZWl0aGVyLiIKCkJ1dCBzb21lIHN0YWNrcyBk
+b2Vzbid0IHNlZW1zIHRvIGNvcGUgd2l0aCB0aGlzIGxlYXZpbmcgRExDSSAwIG9wZW4gYWZ0ZXIK
+cmVjZWl2aW5nIERNIGZyYW1lLgoKVG8gZml4IGl0IHByb3Blcmx5IGEgdGltZXIgd2FzIGludHJv
+ZHVjZWQgdG8gcmZjb21tX3Nlc3Npb24gd2hpY2ggaXMgdXNlZAp0byBzZXQgYSB0aW1lb3V0IHdo
+ZW4gdGhlIGxhc3QgYWN0aXZlIERMQyBvZiBhIHNlc3Npb24gaXMgdW5saW5rZWQsIHRoaXMKd2ls
+bCBnaXZlIHRoZSByZW1vdGUgc3RhY2sgc29tZSB0aW1lIHRvIHJlcGx5IHdpdGggYSBwcm9wZXIg
+RElTQyBmcmFtZSBvbgpETENJIDAgYXZvaWRpbmcgYm90aCBzaWRlcyBzZW5kaW5nIERJU0MgdG8g
+ZWFjaCBvdGhlciBvbiBzdGFja3MgdGhhdApmb2xsb3cgdGhlIHNwZWNpZmljYXRpb24gYW5kIHRh
+a2luZyBjYXJlIG9mIHRob3NlIHdobyBkb24ndCBieSB0YWtpbmcKZG93biBETENJIDAuCgpTaWdu
+ZWQtb2ZmLWJ5OiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IDxsdWl6LmRlbnR6QG9wZW5ib3NzYS5v
+cmc+Ci0tLQogaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL3JmY29tbS5oIHwgICAgMiArCiBuZXQvYmx1
+ZXRvb3RoL3JmY29tbS9jb3JlLmMgICAgfCAgIDQxICsrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysKIDIgZmlsZXMgY2hhbmdlZCwgNDMgaW5zZXJ0aW9ucygrKSwgMCBkZWxl
+dGlvbnMoLSkKCmRpZmYgLS1naXQgYS9pbmNsdWRlL25ldC9ibHVldG9vdGgvcmZjb21tLmggYi9p
+bmNsdWRlL25ldC9ibHVldG9vdGgvcmZjb21tLmgKaW5kZXggODAwNzI2MS4uZDU1MmJhMiAxMDA2
+NDQKLS0tIGEvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL3JmY29tbS5oCisrKyBiL2luY2x1ZGUvbmV0
+L2JsdWV0b290aC9yZmNvbW0uaApAQCAtMjksNiArMjksNyBAQAogI2RlZmluZSBSRkNPTU1fQ09O
+Tl9USU1FT1VUIChIWiAqIDMwKQogI2RlZmluZSBSRkNPTU1fRElTQ19USU1FT1VUIChIWiAqIDIw
+KQogI2RlZmluZSBSRkNPTU1fQVVUSF9USU1FT1VUIChIWiAqIDI1KQorI2RlZmluZSBSRkNPTU1f
+SURMRV9USU1FT1VUIChIWiAqIDIpCiAKICNkZWZpbmUgUkZDT01NX0RFRkFVTFRfTVRVCTEyNwog
+I2RlZmluZSBSRkNPTU1fREVGQVVMVF9DUkVESVRTCTcKQEAgLTE1NCw2ICsxNTUsNyBAQCBzdHJ1
+Y3QgcmZjb21tX21zYyB7CiBzdHJ1Y3QgcmZjb21tX3Nlc3Npb24gewogCXN0cnVjdCBsaXN0X2hl
+YWQgbGlzdDsKIAlzdHJ1Y3Qgc29ja2V0ICAgKnNvY2s7CisJc3RydWN0IHRpbWVyX2xpc3QgdGlt
+ZXI7CiAJdW5zaWduZWQgbG9uZyAgICBzdGF0ZTsKIAl1bnNpZ25lZCBsb25nICAgIGZsYWdzOwog
+CWF0b21pY190ICAgICAgICAgcmVmY250OwpkaWZmIC0tZ2l0IGEvbmV0L2JsdWV0b290aC9yZmNv
+bW0vY29yZS5jIGIvbmV0L2JsdWV0b290aC9yZmNvbW0vY29yZS5jCmluZGV4IGU1MDU2NmUuLjAz
+OTgwMmMgMTAwNjQ0Ci0tLSBhL25ldC9ibHVldG9vdGgvcmZjb21tL2NvcmUuYworKysgYi9uZXQv
+Ymx1ZXRvb3RoL3JmY29tbS9jb3JlLmMKQEAgLTI0NCw2ICsyNDQsMzMgQEAgc3RhdGljIGlubGlu
+ZSBpbnQgcmZjb21tX2NoZWNrX3NlY3VyaXR5KHN0cnVjdCByZmNvbW1fZGxjICpkKQogCQkJCQkJ
+CQlhdXRoX3R5cGUpOwogfQogCitzdGF0aWMgdm9pZCByZmNvbW1fc2Vzc2lvbl90aW1lb3V0KHVu
+c2lnbmVkIGxvbmcgYXJnKQoreworCXN0cnVjdCByZmNvbW1fc2Vzc2lvbiAqcyA9ICh2b2lkICop
+IGFyZzsKKworCUJUX0RCRygic2Vzc2lvbiAlcCBzdGF0ZSAlbGQiLCBzLCBzLT5zdGF0ZSk7CisK
+KwlzZXRfYml0KFJGQ09NTV9USU1FRF9PVVQsICZzLT5mbGFncyk7CisJcmZjb21tX3Nlc3Npb25f
+cHV0KHMpOworCXJmY29tbV9zY2hlZHVsZShSRkNPTU1fU0NIRURfVElNRU8pOworfQorCitzdGF0
+aWMgdm9pZCByZmNvbW1fc2Vzc2lvbl9zZXRfdGltZXIoc3RydWN0IHJmY29tbV9zZXNzaW9uICpz
+LCBsb25nIHRpbWVvdXQpCit7CisJQlRfREJHKCJzZXNzaW9uICVwIHN0YXRlICVsZCB0aW1lb3V0
+ICVsZCIsIHMsIHMtPnN0YXRlLCB0aW1lb3V0KTsKKworCWlmICghbW9kX3RpbWVyKCZzLT50aW1l
+ciwgamlmZmllcyArIHRpbWVvdXQpKQorCQlyZmNvbW1fc2Vzc2lvbl9ob2xkKHMpOworfQorCitz
+dGF0aWMgdm9pZCByZmNvbW1fc2Vzc2lvbl9jbGVhcl90aW1lcihzdHJ1Y3QgcmZjb21tX3Nlc3Np
+b24gKnMpCit7CisJQlRfREJHKCJzZXNzaW9uICVwIHN0YXRlICVsZCIsIHMsIHMtPnN0YXRlKTsK
+KworCWlmICh0aW1lcl9wZW5kaW5nKCZzLT50aW1lcikgJiYgZGVsX3RpbWVyKCZzLT50aW1lcikp
+CisJCXJmY29tbV9zZXNzaW9uX3B1dChzKTsKK30KKwogLyogLS0tLSBSRkNPTU0gRExDcyAtLS0t
+ICovCiBzdGF0aWMgdm9pZCByZmNvbW1fZGxjX3RpbWVvdXQodW5zaWduZWQgbG9uZyBhcmcpCiB7
+CkBAIC0zMjAsNiArMzQ3LDcgQEAgc3RhdGljIHZvaWQgcmZjb21tX2RsY19saW5rKHN0cnVjdCBy
+ZmNvbW1fc2Vzc2lvbiAqcywgc3RydWN0IHJmY29tbV9kbGMgKmQpCiAKIAlyZmNvbW1fc2Vzc2lv
+bl9ob2xkKHMpOwogCisJcmZjb21tX3Nlc3Npb25fY2xlYXJfdGltZXIocyk7CiAJcmZjb21tX2Rs
+Y19ob2xkKGQpOwogCWxpc3RfYWRkKCZkLT5saXN0LCAmcy0+ZGxjcyk7CiAJZC0+c2Vzc2lvbiA9
+IHM7CkBAIC0zMzUsNiArMzYzLDkgQEAgc3RhdGljIHZvaWQgcmZjb21tX2RsY191bmxpbmsoc3Ry
+dWN0IHJmY29tbV9kbGMgKmQpCiAJZC0+c2Vzc2lvbiA9IE5VTEw7CiAJcmZjb21tX2RsY19wdXQo
+ZCk7CiAKKwlpZiAobGlzdF9lbXB0eSgmcy0+ZGxjcykpCisJCXJmY29tbV9zZXNzaW9uX3NldF90
+aW1lcihzLCBSRkNPTU1fSURMRV9USU1FT1VUKTsKKwogCXJmY29tbV9zZXNzaW9uX3B1dChzKTsK
+IH0KIApAQCAtNTY3LDYgKzU5OCw4IEBAIHN0YXRpYyBzdHJ1Y3QgcmZjb21tX3Nlc3Npb24gKnJm
+Y29tbV9zZXNzaW9uX2FkZChzdHJ1Y3Qgc29ja2V0ICpzb2NrLCBpbnQgc3RhdGUpCiAKIAlCVF9E
+QkcoInNlc3Npb24gJXAgc29jayAlcCIsIHMsIHNvY2spOwogCisJc2V0dXBfdGltZXIoJnMtPnRp
+bWVyLCByZmNvbW1fc2Vzc2lvbl90aW1lb3V0LCAodW5zaWduZWQgbG9uZylzKTsKKwogCUlOSVRf
+TElTVF9IRUFEKCZzLT5kbGNzKTsKIAlzLT5zdGF0ZSA9IHN0YXRlOwogCXMtPnNvY2sgID0gc29j
+azsKQEAgLTU5OCw2ICs2MzEsNyBAQCBzdGF0aWMgdm9pZCByZmNvbW1fc2Vzc2lvbl9kZWwoc3Ry
+dWN0IHJmY29tbV9zZXNzaW9uICpzKQogCWlmIChzdGF0ZSA9PSBCVF9DT05ORUNURUQpCiAJCXJm
+Y29tbV9zZW5kX2Rpc2MocywgMCk7CiAKKwlyZmNvbW1fc2Vzc2lvbl9jbGVhcl90aW1lcihzKTsK
+IAlzb2NrX3JlbGVhc2Uocy0+c29jayk7CiAJa2ZyZWUocyk7CiAKQEAgLTYzOSw2ICs2NzMsNyBA
+QCBzdGF0aWMgdm9pZCByZmNvbW1fc2Vzc2lvbl9jbG9zZShzdHJ1Y3QgcmZjb21tX3Nlc3Npb24g
+KnMsIGludCBlcnIpCiAJCV9fcmZjb21tX2RsY19jbG9zZShkLCBlcnIpOwogCX0KIAorCXJmY29t
+bV9zZXNzaW9uX2NsZWFyX3RpbWVyKHMpOwogCXJmY29tbV9zZXNzaW9uX3B1dChzKTsKIH0KIApA
+QCAtMTg3OSw2ICsxOTE0LDEyIEBAIHN0YXRpYyBpbmxpbmUgdm9pZCByZmNvbW1fcHJvY2Vzc19z
+ZXNzaW9ucyh2b2lkKQogCQlzdHJ1Y3QgcmZjb21tX3Nlc3Npb24gKnM7CiAJCXMgPSBsaXN0X2Vu
+dHJ5KHAsIHN0cnVjdCByZmNvbW1fc2Vzc2lvbiwgbGlzdCk7CiAKKwkJaWYgKHRlc3RfYW5kX2Ns
+ZWFyX2JpdChSRkNPTU1fVElNRURfT1VULCAmcy0+ZmxhZ3MpKSB7CisJCQlzLT5zdGF0ZSA9IEJU
+X0RJU0NPTk47CisJCQlyZmNvbW1fc2VuZF9kaXNjKHMsIDApOworCQkJY29udGludWU7CisJCX0K
+KwogCQlpZiAocy0+c3RhdGUgPT0gQlRfTElTVEVOKSB7CiAJCQlyZmNvbW1fYWNjZXB0X2Nvbm5l
+Y3Rpb24ocyk7CiAJCQljb250aW51ZTsKLS0gCjEuNi4zLjEKCg==
+--0016364ee4e6e26ba5046d9682e5--
