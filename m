@@ -1,90 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 30 Jun 2009 17:48:28 +0200
 From: Filippo Giunchedi <filippo@esaurito.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] test/agent.c: get_device select default device
-Date: Tue, 30 Jun 2009 17:52:49 +0200
-Message-Id: <1246377169-14306-1-git-send-email-filippo@esaurito.net>
+Subject: Re: [PATCH 3/3] test/agent.c: pairing via CreatePairedDevice
+Message-ID: <20090630154828.GD10475@esaurito.net>
+References: <20090630133439.GA27640@jh-x301>
+ <1246375008-8282-3-git-send-email-filippo@esaurito.net>
+ <20090630153910.GA5428@jh-x301>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20090630153910.GA5428@jh-x301>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-mimick simple-agent, i.e. search for default device
----
- test/agent.c |   53 +++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 files changed, 49 insertions(+), 4 deletions(-)
+[JFTR I'm subscribed to linux-bluetooth, no need to CC]
 
-diff --git a/test/agent.c b/test/agent.c
-index b256f52..e8584f3 100644
---- a/test/agent.c
-+++ b/test/agent.c
-@@ -279,11 +279,56 @@ static int unregister_agent(DBusConnection *conn, const char *device_path,
- 	return 0;
- }
- 
--static char *get_device(const char *device)
-+static char *get_device(DBusConnection *conn, const char *device)
- {
--	char *path;
-+	DBusMessage *msg, *reply;
-+	DBusError err;
-+	const char *tmppath;
-+	char *path, *default_path = "/org/bluez/hci0";
-+
-+	if (device) {
-+		path = strdup(device);
-+		return path;
-+	}
-+
-+	msg = dbus_message_new_method_call("org.bluez", "/",
-+					"org.bluez.Manager", "DefaultAdapter");
-+
-+	if (!msg) {
-+		fprintf(stderr, "Can't allocate new method call\n");
-+		return default_path;
-+	}
-+
-+	dbus_error_init(&err);
-+
-+	reply = dbus_connection_send_with_reply_and_block(conn, msg, -1, &err);
-+
-+	dbus_message_unref(msg);
-+
-+	if (!reply) {
-+		fprintf(stderr, "Can't get default adapter, using default adapter\n");
-+		if (dbus_error_is_set(&err)) {
-+			fprintf(stderr, "%s\n", err.message);
-+			dbus_error_free(&err);
-+		}
-+		return default_path;
-+	}
-+
-+	if (!dbus_message_get_args(reply, &err,
-+			DBUS_TYPE_OBJECT_PATH, &tmppath, DBUS_TYPE_INVALID)) {
-+		fprintf(stderr, "Can't get reply arguments, using default adapter\n");
-+		if (dbus_error_is_set(&err)) {
-+			fprintf(stderr, "%s\n", err.message);
-+			dbus_error_free(&err);
-+		}
-+		return default_path;
-+	}
- 
--	path = strdup("/org/bluez/hci0");
-+	path = strdup(tmppath);
-+
-+	dbus_message_unref(reply);
-+
-+	dbus_connection_flush(conn);
- 
- 	return path;
- }
-@@ -365,7 +410,7 @@ int main(int argc, char *argv[])
- 	}
- 
- 	if (!device_path)
--		device_path = get_device(device_id);
-+		device_path = get_device(conn, device_id);
- 
- 	if (register_agent(conn, device_path, agent_path, capabilities) < 0) {
- 		dbus_connection_unref(conn);
+On Tue, Jun 30, 2009 at 06:39:10PM +0300, Johan Hedberg wrote:
+> Thanks for the updated patches. There are still some issues however:
+> 
+> $ test/agent 1234
+> Can't register agent
+> Method "RegisterAgent" with signature "os" on interface "org.bluez.Adapter" doesn't exist
+> 
+> whereas running test/simple-agent (without arguments) works fine. Or am I
+> giving the wrong arguments to test/agent in order to run it in passive
+> mode?
+
+You are right, I thought I had sent the patch for calling DefaultDevice and that
+went unnoticed but it seems I didn't send it, sending now.
+
+> Also, the RequestPasskey agent method is only used if we are a Bluetooth
+> 2.1 keyboard, so it's not particularly useful for the typical environment
+> that BlueZ gets run in. To get at least the most common Bluetooth 2.1
+> Secure Simple Pairing cases covered at least the RequestConfirmation and
+> DisplayPasskey callbacks should be supported. Also, once these do become
+> supported the PIN code command line parameter should probably be set as
+> optional since you won't be asked for a PIN code when doing SSP.
+
+Indeed, I'll try to update agent.c to better match simple-agent behaviour in the
+future
+
+filippo
 -- 
-1.6.3.3
+Filippo Giunchedi - http://esaurito.net - 0x6B79D401
 
+UNIX is simple, but it just takes a genius to understand the simplicity.
+-- Dennis Ritchie
