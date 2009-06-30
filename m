@@ -1,133 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 30 Jun 2009 20:03:32 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] test/agent.c: pairing via CreatePairedDevice
+Message-ID: <20090630170332.GA9971@jh-x301>
+References: <1246379557-16538-1-git-send-email-filippo@esaurito.net> <1246379557-16538-2-git-send-email-filippo@esaurito.net>
 MIME-Version: 1.0
-In-Reply-To: <2d5a2c100906250614k798239b9v901166c2382a6b1c@mail.gmail.com>
-References: <2d5a2c100906090617m167d3815pae998d06bdbd6646@mail.gmail.com>
-	 <1245611096.15367.76.camel@violet>
-	 <2d5a2c100906221449y6e37cb19x1bc27085bac318f4@mail.gmail.com>
-	 <2d5a2c100906221608v5e3e3d8aydf66b13826ad88fa@mail.gmail.com>
-	 <2d5a2c100906230651m679ccfat5bf4bfb20c130955@mail.gmail.com>
-	 <1245768036.15367.78.camel@violet> <20090623200401.6c7e5ea6@stoetzler>
-	 <2d5a2c100906231113p23a7249u13de2ecd2a0d5482@mail.gmail.com>
-	 <2d5a2c100906231156w72a0e69dqfa6c197bfb1d5674@mail.gmail.com>
-	 <2d5a2c100906250614k798239b9v901166c2382a6b1c@mail.gmail.com>
-Date: Tue, 30 Jun 2009 17:18:35 -0300
-Message-ID: <2d5a2c100906301318o1103e3fdna8f9ef48de2eed82@mail.gmail.com>
-Subject: Re: regression introduced on v2.6.30-rc1
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Stefan Seyfried <seife@suse.de>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
-Content-Type: multipart/mixed; boundary=0016364ee4e6e26ba5046d9682e5
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1246379557-16538-2-git-send-email-filippo@esaurito.net>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---0016364ee4e6e26ba5046d9682e5
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+Hi Filippo,
 
-Another update now fixing oopses by calling rfcomm_clear_session_timer
-on rfcomm_session_del.
+(alread went through this on IRC but replying here too so that there's a
+trace in the list archives)
 
-On Thu, Jun 25, 2009 at 10:14 AM, Luiz Augusto von
-Dentz<luiz.dentz@gmail.com> wrote:
-> Patch now against updated bluetooth-testing
->
-> --
-> Luiz Augusto von Dentz
-> Engenheiro de Computa=E7=E3o
->
+On Tue, Jun 30, 2009, Filippo Giunchedi wrote:
+> introduce optional argument target for remote address, if passed pairing
+> will be called
+> ---
+>  test/agent.c |   60 +++++++++++++++++++++++++++++++++++++++++++++++++++------
+>  1 files changed, 53 insertions(+), 7 deletions(-)
 
+All three patches are now pushed upstream.
 
+Things that'd need fixing next:
 
---=20
-Luiz Augusto von Dentz
-Engenheiro de Computa=E7=E3o
+- Use "adapter" when referring to local adapters and "device" when
+  referring to remote devices
 
---0016364ee4e6e26ba5046d9682e5
-Content-Type: text/x-diff; charset=US-ASCII;
-	name="0001-bluetooth-Fix-rejected-connection-not-disconnecting-.patch"
-Content-Disposition: attachment;
-	filename="0001-bluetooth-Fix-rejected-connection-not-disconnecting-.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_fwl28uc41
+- Related to the previous item, why does the help text say "--device
+  interface"? Isn't it used for an adapter path? (i.e. it should say
+  "--adapter path")
 
-RnJvbSA2MDk5MTRhYThiYTJjOWM5YTJhNzQwMDRlMWNmNjQwY2E2ZmUwNGJiIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IDxsdWl6LmRlbnR6QG9w
-ZW5ib3NzYS5vcmc+CkRhdGU6IE1vbiwgMjkgSnVuIDIwMDkgMTU6MDk6NTQgLTAzMDAKU3ViamVj
-dDogW1BBVENIXSBibHVldG9vdGg6IEZpeCByZWplY3RlZCBjb25uZWN0aW9uIG5vdCBkaXNjb25u
-ZWN0aW5nIEFDTC4KCldoZW4gdXNpbmcgREVGRVJfU0VUVVAgb24gYSBSRkNPTU0gc29ja2V0IGEg
-U0FCTSBmcmFtZSB0cmlnZ2VycwphdXRob3JpemF0aW9uIHdoaWNoIHdoZW4gcmVqZWN0ZWQgc2Vu
-ZCBhIERNIGFzIHJlc3BvbnNlLiBUaGlzIGlzIGZpbmUKYWNjb3VyZGluZyB0byB0aGUgUkZDT01N
-IHNwZWM6CgoidGhlIHJlc3BvbmRpbmcgaW1wbGVtZW50YXRpb24gbWF5IHJlcGxhY2UgdGhlICJw
-cm9wZXIiIHJlc3BvbnNlIG9uCnRoZSBNdWx0aXBsZXhlciBDb250cm9sIGNoYW5uZWwgd2l0aCBh
-IERNIGZyYW1lLCBzZW50IG9uIHRoZSByZWZlcmVuY2VkCkRMQ0kgdG8gaW5kaWNhdGUgdGhhdCB0
-aGUgRExDSSBpcyBub3Qgb3BlbiwgYW5kIHRoYXQgdGhlIHJlc3BvbmRlciB3b3VsZApub3QgZ3Jh
-bnQgYSByZXF1ZXN0IHRvIG9wZW4gaXQgbGF0ZXIgZWl0aGVyLiIKCkJ1dCBzb21lIHN0YWNrcyBk
-b2Vzbid0IHNlZW1zIHRvIGNvcGUgd2l0aCB0aGlzIGxlYXZpbmcgRExDSSAwIG9wZW4gYWZ0ZXIK
-cmVjZWl2aW5nIERNIGZyYW1lLgoKVG8gZml4IGl0IHByb3Blcmx5IGEgdGltZXIgd2FzIGludHJv
-ZHVjZWQgdG8gcmZjb21tX3Nlc3Npb24gd2hpY2ggaXMgdXNlZAp0byBzZXQgYSB0aW1lb3V0IHdo
-ZW4gdGhlIGxhc3QgYWN0aXZlIERMQyBvZiBhIHNlc3Npb24gaXMgdW5saW5rZWQsIHRoaXMKd2ls
-bCBnaXZlIHRoZSByZW1vdGUgc3RhY2sgc29tZSB0aW1lIHRvIHJlcGx5IHdpdGggYSBwcm9wZXIg
-RElTQyBmcmFtZSBvbgpETENJIDAgYXZvaWRpbmcgYm90aCBzaWRlcyBzZW5kaW5nIERJU0MgdG8g
-ZWFjaCBvdGhlciBvbiBzdGFja3MgdGhhdApmb2xsb3cgdGhlIHNwZWNpZmljYXRpb24gYW5kIHRh
-a2luZyBjYXJlIG9mIHRob3NlIHdobyBkb24ndCBieSB0YWtpbmcKZG93biBETENJIDAuCgpTaWdu
-ZWQtb2ZmLWJ5OiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IDxsdWl6LmRlbnR6QG9wZW5ib3NzYS5v
-cmc+Ci0tLQogaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL3JmY29tbS5oIHwgICAgMiArCiBuZXQvYmx1
-ZXRvb3RoL3JmY29tbS9jb3JlLmMgICAgfCAgIDQxICsrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysKIDIgZmlsZXMgY2hhbmdlZCwgNDMgaW5zZXJ0aW9ucygrKSwgMCBkZWxl
-dGlvbnMoLSkKCmRpZmYgLS1naXQgYS9pbmNsdWRlL25ldC9ibHVldG9vdGgvcmZjb21tLmggYi9p
-bmNsdWRlL25ldC9ibHVldG9vdGgvcmZjb21tLmgKaW5kZXggODAwNzI2MS4uZDU1MmJhMiAxMDA2
-NDQKLS0tIGEvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL3JmY29tbS5oCisrKyBiL2luY2x1ZGUvbmV0
-L2JsdWV0b290aC9yZmNvbW0uaApAQCAtMjksNiArMjksNyBAQAogI2RlZmluZSBSRkNPTU1fQ09O
-Tl9USU1FT1VUIChIWiAqIDMwKQogI2RlZmluZSBSRkNPTU1fRElTQ19USU1FT1VUIChIWiAqIDIw
-KQogI2RlZmluZSBSRkNPTU1fQVVUSF9USU1FT1VUIChIWiAqIDI1KQorI2RlZmluZSBSRkNPTU1f
-SURMRV9USU1FT1VUIChIWiAqIDIpCiAKICNkZWZpbmUgUkZDT01NX0RFRkFVTFRfTVRVCTEyNwog
-I2RlZmluZSBSRkNPTU1fREVGQVVMVF9DUkVESVRTCTcKQEAgLTE1NCw2ICsxNTUsNyBAQCBzdHJ1
-Y3QgcmZjb21tX21zYyB7CiBzdHJ1Y3QgcmZjb21tX3Nlc3Npb24gewogCXN0cnVjdCBsaXN0X2hl
-YWQgbGlzdDsKIAlzdHJ1Y3Qgc29ja2V0ICAgKnNvY2s7CisJc3RydWN0IHRpbWVyX2xpc3QgdGlt
-ZXI7CiAJdW5zaWduZWQgbG9uZyAgICBzdGF0ZTsKIAl1bnNpZ25lZCBsb25nICAgIGZsYWdzOwog
-CWF0b21pY190ICAgICAgICAgcmVmY250OwpkaWZmIC0tZ2l0IGEvbmV0L2JsdWV0b290aC9yZmNv
-bW0vY29yZS5jIGIvbmV0L2JsdWV0b290aC9yZmNvbW0vY29yZS5jCmluZGV4IGU1MDU2NmUuLjAz
-OTgwMmMgMTAwNjQ0Ci0tLSBhL25ldC9ibHVldG9vdGgvcmZjb21tL2NvcmUuYworKysgYi9uZXQv
-Ymx1ZXRvb3RoL3JmY29tbS9jb3JlLmMKQEAgLTI0NCw2ICsyNDQsMzMgQEAgc3RhdGljIGlubGlu
-ZSBpbnQgcmZjb21tX2NoZWNrX3NlY3VyaXR5KHN0cnVjdCByZmNvbW1fZGxjICpkKQogCQkJCQkJ
-CQlhdXRoX3R5cGUpOwogfQogCitzdGF0aWMgdm9pZCByZmNvbW1fc2Vzc2lvbl90aW1lb3V0KHVu
-c2lnbmVkIGxvbmcgYXJnKQoreworCXN0cnVjdCByZmNvbW1fc2Vzc2lvbiAqcyA9ICh2b2lkICop
-IGFyZzsKKworCUJUX0RCRygic2Vzc2lvbiAlcCBzdGF0ZSAlbGQiLCBzLCBzLT5zdGF0ZSk7CisK
-KwlzZXRfYml0KFJGQ09NTV9USU1FRF9PVVQsICZzLT5mbGFncyk7CisJcmZjb21tX3Nlc3Npb25f
-cHV0KHMpOworCXJmY29tbV9zY2hlZHVsZShSRkNPTU1fU0NIRURfVElNRU8pOworfQorCitzdGF0
-aWMgdm9pZCByZmNvbW1fc2Vzc2lvbl9zZXRfdGltZXIoc3RydWN0IHJmY29tbV9zZXNzaW9uICpz
-LCBsb25nIHRpbWVvdXQpCit7CisJQlRfREJHKCJzZXNzaW9uICVwIHN0YXRlICVsZCB0aW1lb3V0
-ICVsZCIsIHMsIHMtPnN0YXRlLCB0aW1lb3V0KTsKKworCWlmICghbW9kX3RpbWVyKCZzLT50aW1l
-ciwgamlmZmllcyArIHRpbWVvdXQpKQorCQlyZmNvbW1fc2Vzc2lvbl9ob2xkKHMpOworfQorCitz
-dGF0aWMgdm9pZCByZmNvbW1fc2Vzc2lvbl9jbGVhcl90aW1lcihzdHJ1Y3QgcmZjb21tX3Nlc3Np
-b24gKnMpCit7CisJQlRfREJHKCJzZXNzaW9uICVwIHN0YXRlICVsZCIsIHMsIHMtPnN0YXRlKTsK
-KworCWlmICh0aW1lcl9wZW5kaW5nKCZzLT50aW1lcikgJiYgZGVsX3RpbWVyKCZzLT50aW1lcikp
-CisJCXJmY29tbV9zZXNzaW9uX3B1dChzKTsKK30KKwogLyogLS0tLSBSRkNPTU0gRExDcyAtLS0t
-ICovCiBzdGF0aWMgdm9pZCByZmNvbW1fZGxjX3RpbWVvdXQodW5zaWduZWQgbG9uZyBhcmcpCiB7
-CkBAIC0zMjAsNiArMzQ3LDcgQEAgc3RhdGljIHZvaWQgcmZjb21tX2RsY19saW5rKHN0cnVjdCBy
-ZmNvbW1fc2Vzc2lvbiAqcywgc3RydWN0IHJmY29tbV9kbGMgKmQpCiAKIAlyZmNvbW1fc2Vzc2lv
-bl9ob2xkKHMpOwogCisJcmZjb21tX3Nlc3Npb25fY2xlYXJfdGltZXIocyk7CiAJcmZjb21tX2Rs
-Y19ob2xkKGQpOwogCWxpc3RfYWRkKCZkLT5saXN0LCAmcy0+ZGxjcyk7CiAJZC0+c2Vzc2lvbiA9
-IHM7CkBAIC0zMzUsNiArMzYzLDkgQEAgc3RhdGljIHZvaWQgcmZjb21tX2RsY191bmxpbmsoc3Ry
-dWN0IHJmY29tbV9kbGMgKmQpCiAJZC0+c2Vzc2lvbiA9IE5VTEw7CiAJcmZjb21tX2RsY19wdXQo
-ZCk7CiAKKwlpZiAobGlzdF9lbXB0eSgmcy0+ZGxjcykpCisJCXJmY29tbV9zZXNzaW9uX3NldF90
-aW1lcihzLCBSRkNPTU1fSURMRV9USU1FT1VUKTsKKwogCXJmY29tbV9zZXNzaW9uX3B1dChzKTsK
-IH0KIApAQCAtNTY3LDYgKzU5OCw4IEBAIHN0YXRpYyBzdHJ1Y3QgcmZjb21tX3Nlc3Npb24gKnJm
-Y29tbV9zZXNzaW9uX2FkZChzdHJ1Y3Qgc29ja2V0ICpzb2NrLCBpbnQgc3RhdGUpCiAKIAlCVF9E
-QkcoInNlc3Npb24gJXAgc29jayAlcCIsIHMsIHNvY2spOwogCisJc2V0dXBfdGltZXIoJnMtPnRp
-bWVyLCByZmNvbW1fc2Vzc2lvbl90aW1lb3V0LCAodW5zaWduZWQgbG9uZylzKTsKKwogCUlOSVRf
-TElTVF9IRUFEKCZzLT5kbGNzKTsKIAlzLT5zdGF0ZSA9IHN0YXRlOwogCXMtPnNvY2sgID0gc29j
-azsKQEAgLTU5OCw2ICs2MzEsNyBAQCBzdGF0aWMgdm9pZCByZmNvbW1fc2Vzc2lvbl9kZWwoc3Ry
-dWN0IHJmY29tbV9zZXNzaW9uICpzKQogCWlmIChzdGF0ZSA9PSBCVF9DT05ORUNURUQpCiAJCXJm
-Y29tbV9zZW5kX2Rpc2MocywgMCk7CiAKKwlyZmNvbW1fc2Vzc2lvbl9jbGVhcl90aW1lcihzKTsK
-IAlzb2NrX3JlbGVhc2Uocy0+c29jayk7CiAJa2ZyZWUocyk7CiAKQEAgLTYzOSw2ICs2NzMsNyBA
-QCBzdGF0aWMgdm9pZCByZmNvbW1fc2Vzc2lvbl9jbG9zZShzdHJ1Y3QgcmZjb21tX3Nlc3Npb24g
-KnMsIGludCBlcnIpCiAJCV9fcmZjb21tX2RsY19jbG9zZShkLCBlcnIpOwogCX0KIAorCXJmY29t
-bV9zZXNzaW9uX2NsZWFyX3RpbWVyKHMpOwogCXJmY29tbV9zZXNzaW9uX3B1dChzKTsKIH0KIApA
-QCAtMTg3OSw2ICsxOTE0LDEyIEBAIHN0YXRpYyBpbmxpbmUgdm9pZCByZmNvbW1fcHJvY2Vzc19z
-ZXNzaW9ucyh2b2lkKQogCQlzdHJ1Y3QgcmZjb21tX3Nlc3Npb24gKnM7CiAJCXMgPSBsaXN0X2Vu
-dHJ5KHAsIHN0cnVjdCByZmNvbW1fc2Vzc2lvbiwgbGlzdCk7CiAKKwkJaWYgKHRlc3RfYW5kX2Ns
-ZWFyX2JpdChSRkNPTU1fVElNRURfT1VULCAmcy0+ZmxhZ3MpKSB7CisJCQlzLT5zdGF0ZSA9IEJU
-X0RJU0NPTk47CisJCQlyZmNvbW1fc2VuZF9kaXNjKHMsIDApOworCQkJY29udGludWU7CisJCX0K
-KwogCQlpZiAocy0+c3RhdGUgPT0gQlRfTElTVEVOKSB7CiAJCQlyZmNvbW1fYWNjZXB0X2Nvbm5l
-Y3Rpb24ocyk7CiAJCQljb250aW51ZTsKLS0gCjEuNi4zLjEKCg==
---0016364ee4e6e26ba5046d9682e5--
+- Implement the missing SSP callbacks
+
+Johan
