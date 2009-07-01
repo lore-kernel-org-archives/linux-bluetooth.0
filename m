@@ -1,50 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 2 Jul 2009 14:31:59 +0530
+Date: Wed, 1 Jul 2009 11:39:58 +0530
 From: Vikram Kandukuri <vkandukuri@atheros.com>
-To: <marcel@holtmann.org>
+To: <marcel@haltmann.org>
 CC: <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH] Bluetooth: Improve the throughput by increasing the frame
-	size
-Message-ID: <20090702090147.GA9790@atheros-laptop>
+Subject: [PATCH] Bluetooth: Scheduled to kill the session whenever
+	VIRTUAL_CABLE_UNPLUG is received by IUT
+Message-ID: <20090701060948.GA7505@atheros-laptop>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Subject: [PATCH] Bluetooth: Improve the throughput by increasing the frame size
+Subject: [PATCH] Bluetooth: Scheduled to kill the session whenever VIRTUAL_CABLE_UNPLUG is received by IUT
 
-This patch increases the receive buffer size to HCI_MAX_FRAME_SIZE
-which improves the Rx throughput considerably.
+There is a test case in PTS tool; PTS will send the VIRTUAL_CABLE_UNPLUG
+command to IUT. IUT should disconnect the channel and kill the session
+when it receives VIRTUAL_CABLE_UNPLUG command. VIRTUAL_CABLE_UNPLUG
+is parsed by hidp.ko but it is not scheduled to do so (There is no
+schedule code). So I have added hidp_schedule to kill the session.
 
-Tested against BRM/Atheros/CSR USB Dongles with PAN profile using
-iperf and chariot. This gave significant (around 40%) increase
-in performance (increased from 0.8 to 1.5 Mb/s in Sheld room)
-
-Signed-off-by: Vikram Kandukuri <vikram.kandukuri@atheros.com>
+Signed-off-by: Jothikumar Mothilal <jothikumar.mothilal@atheros.com>
 ---
- drivers/bluetooth/btusb.c |    4 +---
- 1 files changed, 1 insertions(+), 3 deletions(-)
+ net/bluetooth/hidp/core.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index e70c57e..124db8c 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -301,7 +301,7 @@ static int btusb_submit_bulk_urb(struct hci_dev *hdev, gfp_t mem_flags)
- 	struct urb *urb;
- 	unsigned char *buf;
- 	unsigned int pipe;
--	int err, size;
-+	int err, size = HCI_MAX_FRAME_SIZE;
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index b186768..a9f7afb 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -374,6 +374,7 @@ static void hidp_process_hid_control(struct hidp_session *session,
  
- 	BT_DBG("%s", hdev->name);
+ 		/* Kill session thread */
+ 		atomic_inc(&session->terminate);
++		hidp_schedule(session);
+ 	}
+ }
  
-@@ -312,8 +312,6 @@ static int btusb_submit_bulk_urb(struct hci_dev *hdev, gfp_t mem_flags)
- 	if (!urb)
- 		return -ENOMEM;
- 
--	size = le16_to_cpu(data->bulk_rx_ep->wMaxPacketSize);
--
- 	buf = kmalloc(size, mem_flags);
- 	if (!buf) {
- 		usb_free_urb(urb);
 -- 
 1.6.0.4
+
