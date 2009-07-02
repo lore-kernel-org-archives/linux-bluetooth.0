@@ -1,98 +1,157 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Thu, 2 Jul 2009 16:57:27 +0300
-Message-ID: <508e92ca0907020657o561effbeg1911f8f84af27f37@mail.gmail.com>
-Subject: [PATCH] SSP double paring fix: init auth_type with
-	HCI_AT_GENERAL_BONDING
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+From: Filippo Giunchedi <filippo@esaurito.net>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: [PATCH 4/5] test/agent.c: find given adapter or use default
+Date: Thu,  2 Jul 2009 11:14:27 +0200
+Message-Id: <1246526068-13364-4-git-send-email-filippo@esaurito.net>
+In-Reply-To: <1246526068-13364-1-git-send-email-filippo@esaurito.net>
+References: <1246526068-13364-1-git-send-email-filippo@esaurito.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-I have a simple patch which fixes issues with SSP mentioned below.
-
+modify get_adapter_path to use FindAdapter or use DefaultAdapter if none
+is given
 ---
- net/bluetooth/hci_conn.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+ test/agent.c |   84 +++++++++++++++++++++++++++++++++++++++++++++++----------
+ 1 files changed, 69 insertions(+), 15 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index fa47d5d..d863bda 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -211,6 +211,7 @@ struct hci_conn *hci_conn_add(struct hci_dev
-*hdev, int type, bdaddr_t *dst)
- 	conn->type  = type;
- 	conn->mode  = HCI_CM_ACTIVE;
- 	conn->state = BT_OPEN;
-+	conn->auth_type = HCI_AT_GENERAL_BONDING;
-
- 	conn->power_save = 1;
- 	conn->disc_timeout = HCI_DISCONN_TIMEOUT;
+diff --git a/test/agent.c b/test/agent.c
+index 390b3d8..b625b88 100644
+--- a/test/agent.c
++++ b/test/agent.c
+@@ -406,26 +406,79 @@ static int create_paired_device(DBusConnection *conn, const char *adapter_path,
+ 	return 0;
+ }
+ 
+-static char *get_adapter_path(DBusConnection *conn, const char *adapter)
++static char *get_default_adapter_path(DBusConnection *conn)
+ {
+ 	DBusMessage *msg, *reply;
+ 	DBusError err;
+-	const char *tmppath;
+-	char *path, *default_path = "/org/bluez/hci0";
++	const char *reply_path;
++	char *path;
++
++	msg = dbus_message_new_method_call("org.bluez", "/",
++					"org.bluez.Manager", "DefaultAdapter");
++
++	if (!msg) {
++		fprintf(stderr, "Can't allocate new method call\n");
++		return NULL;
++	}
++
++	dbus_error_init(&err);
++
++	reply = dbus_connection_send_with_reply_and_block(conn, msg, -1, &err);
+ 
+-	if (adapter) {
+-		path = strdup(adapter);
+-		return path;
++	dbus_message_unref(msg);
++
++	if (!reply) {
++		fprintf(stderr,
++			"Can't get default adapter\n");
++		if (dbus_error_is_set(&err)) {
++			fprintf(stderr, "%s\n", err.message);
++			dbus_error_free(&err);
++		}
++		return NULL;
+ 	}
+ 
++	if (!dbus_message_get_args(reply, &err,
++					DBUS_TYPE_OBJECT_PATH, &reply_path,
++					DBUS_TYPE_INVALID)) {
++		fprintf(stderr,
++			"Can't get reply arguments\n");
++		if (dbus_error_is_set(&err)) {
++			fprintf(stderr, "%s\n", err.message);
++			dbus_error_free(&err);
++		}
++		return NULL;
++	}
++
++	path = strdup(reply_path);
++
++	dbus_message_unref(reply);
++
++	dbus_connection_flush(conn);
++
++	return path;
++}
++
++static char *get_adapter_path(DBusConnection *conn, const char *adapter)
++{
++	DBusMessage *msg, *reply;
++	DBusError err;
++	const char *reply_path;
++	char *path;
++
++	if (!adapter)
++		return get_default_adapter_path(conn);
++
+ 	msg = dbus_message_new_method_call("org.bluez", "/",
+-					"org.bluez.Manager", "DefaultAdapter");
++					"org.bluez.Manager", "FindAdapter");
+ 
+ 	if (!msg) {
+ 		fprintf(stderr, "Can't allocate new method call\n");
+-		return default_path;
++		return NULL;
+ 	}
+ 
++	dbus_message_append_args(msg, DBUS_TYPE_STRING, &adapter,
++					DBUS_TYPE_INVALID);
++
+ 	dbus_error_init(&err);
+ 
+ 	reply = dbus_connection_send_with_reply_and_block(conn, msg, -1, &err);
+@@ -434,27 +487,27 @@ static char *get_adapter_path(DBusConnection *conn, const char *adapter)
+ 
+ 	if (!reply) {
+ 		fprintf(stderr,
+-			"Can't get default adapter, using default adapter\n");
++			"Can't find adapter %s\n", adapter);
+ 		if (dbus_error_is_set(&err)) {
+ 			fprintf(stderr, "%s\n", err.message);
+ 			dbus_error_free(&err);
+ 		}
+-		return default_path;
++		return NULL;
+ 	}
+ 
+ 	if (!dbus_message_get_args(reply, &err,
+-					DBUS_TYPE_OBJECT_PATH, &tmppath,
++					DBUS_TYPE_OBJECT_PATH, &reply_path,
+ 					DBUS_TYPE_INVALID)) {
+ 		fprintf(stderr,
+-			"Can't get reply arguments, using default adapter\n");
++			"Can't get reply arguments\n");
+ 		if (dbus_error_is_set(&err)) {
+ 			fprintf(stderr, "%s\n", err.message);
+ 			dbus_error_free(&err);
+ 		}
+-		return default_path;
++		return NULL;
+ 	}
+ 
+-	path = strdup(tmppath);
++	path = strdup(reply_path);
+ 
+ 	dbus_message_unref(reply);
+ 
+@@ -542,8 +595,9 @@ int main(int argc, char *argv[])
+ 		exit(1);
+ 	}
+ 
++	adapter_path = get_adapter_path(conn, adapter_id);
+ 	if (!adapter_path)
+-		adapter_path = get_adapter_path(conn, adapter_id);
++		exit(1);
+ 
+ 	if (target) {
+ 		if (create_paired_device(conn, adapter_path, agent_path,
 -- 
-1.6.0.4
+1.6.3.3
 
-Regards,
-Andrei
-
-On Wed, Jun 17, 2009 at 3:03 PM, Andrei
-Emeltchenko<andrei.emeltchenko.news@gmail.com> wrote:
-> Hi,
->
-> We have error with SSP paring. Originally we could not connect some
-> devices and the problem was reproduced on my PC with 2 USB Bluetooth
-> adapters.
->
-> bluez asks user paring confirmation 2 times.
->
-> Test:
->
-> hci1:   Type: USB
->        BD Address: 00:02:72:16:4E:D5 ACL MTU: 1021:8 SCO MTU: 64:1
->        UP RUNNING PSCAN
->        RX bytes:12122 acl:78 sco:0 events:449 errors:0
->        TX bytes:22547 acl:82 sco:0 commands:294 errors:0
->
-> hci2:   Type: USB
->        BD Address: 00:02:72:16:19:39 ACL MTU: 1021:8 SCO MTU: 64:1
->        UP RUNNING PSCAN
->        RX bytes:12593 acl:82 sco:0 events:475 errors:0
->        TX bytes:28404 acl:78 sco:0 commands:329 errors:0
->
->
-> hci1:
-> sudo ./l2test -i hci1 -r -E -S   # server
->
-> hci2:
-> sudo ./l2test -i hci2 -n 00:02:72:16:4E:D5 -b 10 -N 1 -E -S -s   # client
->
->  ./simple-agent hci1
-> Agent registered
-> RequestConfirmation (/org/bluez/6255/hci1/dev_00_02_72_16_19_39, 533464)
-> Confirm passkey (yes/no): yes
-> RequestConfirmation (/org/bluez/6255/hci1/dev_00_02_72_16_19_39, 152200)
-> Confirm passkey (yes/no): yes
->
->
-> ./simple-agent hci2
-> Agent registered
-> RequestConfirmation (/org/bluez/6255/hci2/dev_00_02_72_16_4E_D5, 533464)
-> Confirm passkey (yes/no): yes
-> RequestConfirmation (/org/bluez/6255/hci2/dev_00_02_72_16_4E_D5, 152200)
-> Confirm passkey (yes/no): yes
->
-> For the single connection passkey is asked 2 times.
->
-> The reason looks to be because bluetoothd does not store link keys
-> since ioctl  HCIGETAUTHINFO returns 0.
-> Kernel in function hci_get_auth_info returns "conn->auth_type" which
-> is 0 at this stage. As I understood
-> "auth_type" initialized later when "l2cap_connect_req" comes in
-> "l2cap_check_security".
->
-> What is the best way to solv this? In kernel or in user-space? Is it an error?
->
-> Regards,
-> Andrei
->
