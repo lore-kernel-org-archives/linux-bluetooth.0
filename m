@@ -1,157 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
 From: Filippo Giunchedi <filippo@esaurito.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/5] test/agent.c: find given adapter or use default
-Date: Thu,  2 Jul 2009 11:14:27 +0200
-Message-Id: <1246526068-13364-4-git-send-email-filippo@esaurito.net>
+Subject: [PATCH 5/5] test/agent.c: rename "target device" into device
+Date: Thu,  2 Jul 2009 11:14:28 +0200
+Message-Id: <1246526068-13364-5-git-send-email-filippo@esaurito.net>
 In-Reply-To: <1246526068-13364-1-git-send-email-filippo@esaurito.net>
 References: <1246526068-13364-1-git-send-email-filippo@esaurito.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-modify get_adapter_path to use FindAdapter or use DefaultAdapter if none
-is given
 ---
- test/agent.c |   84 +++++++++++++++++++++++++++++++++++++++++++++++----------
- 1 files changed, 69 insertions(+), 15 deletions(-)
+ test/agent.c |   16 ++++++++--------
+ 1 files changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/test/agent.c b/test/agent.c
-index 390b3d8..b625b88 100644
+index b625b88..4c12ea3 100644
 --- a/test/agent.c
 +++ b/test/agent.c
-@@ -406,26 +406,79 @@ static int create_paired_device(DBusConnection *conn, const char *adapter_path,
- 	return 0;
+@@ -374,7 +374,7 @@ static int unregister_agent(DBusConnection *conn, const char *adapter_path,
+ static int create_paired_device(DBusConnection *conn, const char *adapter_path,
+ 						const char *agent_path,
+ 						const char *capabilities,
+-						const char *target)
++						const char *device)
+ {
+ 	dbus_bool_t success;
+ 	DBusMessage *msg;
+@@ -387,7 +387,7 @@ static int create_paired_device(DBusConnection *conn, const char *adapter_path,
+ 		return -1;
+ 	}
+ 
+-	dbus_message_append_args(msg, DBUS_TYPE_STRING, &target,
++	dbus_message_append_args(msg, DBUS_TYPE_STRING, &device,
+ 					DBUS_TYPE_OBJECT_PATH, &agent_path,
+ 					DBUS_TYPE_STRING, &capabilities,
+ 					DBUS_TYPE_INVALID);
+@@ -521,7 +521,7 @@ static void usage(void)
+ 	printf("Bluetooth agent ver %s\n\n", VERSION);
+ 
+ 	printf("Usage:\n"
+-		"\tagent [--adapter adapter-path] [--path agent-path] <passkey> [<target_device>]\n"
++		"\tagent [--adapter adapter-path] [--path agent-path] <passkey> [<device>]\n"
+ 		"\n");
  }
  
--static char *get_adapter_path(DBusConnection *conn, const char *adapter)
-+static char *get_default_adapter_path(DBusConnection *conn)
- {
- 	DBusMessage *msg, *reply;
- 	DBusError err;
--	const char *tmppath;
--	char *path, *default_path = "/org/bluez/hci0";
-+	const char *reply_path;
-+	char *path;
-+
-+	msg = dbus_message_new_method_call("org.bluez", "/",
-+					"org.bluez.Manager", "DefaultAdapter");
-+
-+	if (!msg) {
-+		fprintf(stderr, "Can't allocate new method call\n");
-+		return NULL;
-+	}
-+
-+	dbus_error_init(&err);
-+
-+	reply = dbus_connection_send_with_reply_and_block(conn, msg, -1, &err);
+@@ -540,7 +540,7 @@ int main(int argc, char *argv[])
+ 	struct sigaction sa;
+ 	DBusConnection *conn;
+ 	char match_string[128], default_path[128], *adapter_id = NULL;
+-	char *adapter_path = NULL, *agent_path = NULL, *target = NULL;
++	char *adapter_path = NULL, *agent_path = NULL, *device = NULL;
+ 	int opt;
  
--	if (adapter) {
--		path = strdup(adapter);
--		return path;
-+	dbus_message_unref(msg);
-+
-+	if (!reply) {
-+		fprintf(stderr,
-+			"Can't get default adapter\n");
-+		if (dbus_error_is_set(&err)) {
-+			fprintf(stderr, "%s\n", err.message);
-+			dbus_error_free(&err);
-+		}
-+		return NULL;
- 	}
+ 	snprintf(default_path, sizeof(default_path),
+@@ -584,7 +584,7 @@ int main(int argc, char *argv[])
+ 	passkey = strdup(argv[0]);
  
-+	if (!dbus_message_get_args(reply, &err,
-+					DBUS_TYPE_OBJECT_PATH, &reply_path,
-+					DBUS_TYPE_INVALID)) {
-+		fprintf(stderr,
-+			"Can't get reply arguments\n");
-+		if (dbus_error_is_set(&err)) {
-+			fprintf(stderr, "%s\n", err.message);
-+			dbus_error_free(&err);
-+		}
-+		return NULL;
-+	}
-+
-+	path = strdup(reply_path);
-+
-+	dbus_message_unref(reply);
-+
-+	dbus_connection_flush(conn);
-+
-+	return path;
-+}
-+
-+static char *get_adapter_path(DBusConnection *conn, const char *adapter)
-+{
-+	DBusMessage *msg, *reply;
-+	DBusError err;
-+	const char *reply_path;
-+	char *path;
-+
-+	if (!adapter)
-+		return get_default_adapter_path(conn);
-+
- 	msg = dbus_message_new_method_call("org.bluez", "/",
--					"org.bluez.Manager", "DefaultAdapter");
-+					"org.bluez.Manager", "FindAdapter");
+ 	if (argc > 1)
+-		target = strdup(argv[1]);
++		device = strdup(argv[1]);
  
- 	if (!msg) {
- 		fprintf(stderr, "Can't allocate new method call\n");
--		return default_path;
-+		return NULL;
- 	}
- 
-+	dbus_message_append_args(msg, DBUS_TYPE_STRING, &adapter,
-+					DBUS_TYPE_INVALID);
-+
- 	dbus_error_init(&err);
- 
- 	reply = dbus_connection_send_with_reply_and_block(conn, msg, -1, &err);
-@@ -434,27 +487,27 @@ static char *get_adapter_path(DBusConnection *conn, const char *adapter)
- 
- 	if (!reply) {
- 		fprintf(stderr,
--			"Can't get default adapter, using default adapter\n");
-+			"Can't find adapter %s\n", adapter);
- 		if (dbus_error_is_set(&err)) {
- 			fprintf(stderr, "%s\n", err.message);
- 			dbus_error_free(&err);
- 		}
--		return default_path;
-+		return NULL;
- 	}
- 
- 	if (!dbus_message_get_args(reply, &err,
--					DBUS_TYPE_OBJECT_PATH, &tmppath,
-+					DBUS_TYPE_OBJECT_PATH, &reply_path,
- 					DBUS_TYPE_INVALID)) {
- 		fprintf(stderr,
--			"Can't get reply arguments, using default adapter\n");
-+			"Can't get reply arguments\n");
- 		if (dbus_error_is_set(&err)) {
- 			fprintf(stderr, "%s\n", err.message);
- 			dbus_error_free(&err);
- 		}
--		return default_path;
-+		return NULL;
- 	}
- 
--	path = strdup(tmppath);
-+	path = strdup(reply_path);
- 
- 	dbus_message_unref(reply);
- 
-@@ -542,8 +595,9 @@ int main(int argc, char *argv[])
- 		exit(1);
- 	}
- 
-+	adapter_path = get_adapter_path(conn, adapter_id);
+ 	if (!agent_path)
+ 		agent_path = strdup(default_path);
+@@ -599,9 +599,9 @@ int main(int argc, char *argv[])
  	if (!adapter_path)
--		adapter_path = get_adapter_path(conn, adapter_id);
-+		exit(1);
+ 		exit(1);
  
- 	if (target) {
+-	if (target) {
++	if (device) {
  		if (create_paired_device(conn, adapter_path, agent_path,
+-						capabilities, target) < 0) {
++						capabilities, device) < 0) {
+ 			dbus_connection_unref(conn);
+ 			exit(1);
+ 		}
+@@ -633,7 +633,7 @@ int main(int argc, char *argv[])
+ 			break;
+ 	}
+ 
+-	if (!__io_terminated && !target)
++	if (!__io_terminated && !device)
+ 		unregister_agent(conn, adapter_path, agent_path);
+ 
+ 	free(adapter_path);
 -- 
 1.6.3.3
 
