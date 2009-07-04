@@ -1,24 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: John Frankish <j-frankish@slb.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Sun, 5 Jul 2009 12:24:34 +0200
-Subject: udev rule bluetooth.rules
-Message-ID: <6AC5A55546F64545AE996F8200E3AC4E06CCC1A4@NL0105EXC01V01.eur.slb.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Subject: Re: [PATCH] Bluetooth: add support to configure ERTM and Streaming
+ mode
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1246730784-30052-1-git-send-email-gustavo@las.ic.unicamp.br>
+References: <1246730784-30052-1-git-send-email-gustavo@las.ic.unicamp.br>
+Content-Type: text/plain
+Date: Sat, 04 Jul 2009 11:47:49 -0700
+Message-Id: <1246733269.12994.212.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Ref bluez-4.43 /etc/udev/bluetooth.rules:
+Hi Gustavo,
 
-# Run helper every time a Bluetooth device appears
-# On remove actions, bluetoothd should go away by itself
-ACTION=="add", SUBSYSTEM=="bluetooth", RUN+="/usr/sbin/bluetoothd --udev"
+> Add code to config_req and config_rsp to configure ERTM and Streaming
+> mode. If the remote devices specifies ERTM or Streaming Mode, we propose
+> the same mode received. Otherwise we propose ERTM or Basic Mode.
+> And if we are a state 2 device the remote should propose the same mode
+> that we sent, if not, the channel is disconnected.
 
-Shouldn't this be of the format /etc/udev/rules.d/xx-bluetooth.rules so that it starts in the correct order - i.e. after dbus?
+this patch has been applied to bluetooth-testing.git now. Thanks.
 
-Is it possible to have a udev rule check that dbus is running before executing?
+Regards
 
-Regards, John
+Marcel
 
 
