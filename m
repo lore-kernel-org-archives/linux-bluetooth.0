@@ -1,23 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] remove _FORTIFY_SOURCE=2 from default CFLAGS
+Subject: Re: [PATCH] Fix build with "--as-needed"
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Filippo Giunchedi <filippo@esaurito.net>
+To: Stefan Seyfried <seife@suse.de>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1246695245-27280-1-git-send-email-filippo@esaurito.net>
-References: <1246695245-27280-1-git-send-email-filippo@esaurito.net>
+In-Reply-To: <20090704095003.24945e77@stoetzler>
+References: <20090704095003.24945e77@stoetzler>
 Content-Type: text/plain
-Date: Sat, 04 Jul 2009 09:14:55 -0700
-Message-Id: <1246724095.12994.210.camel@localhost.localdomain>
+Date: Sat, 04 Jul 2009 09:14:06 -0700
+Message-Id: <1246724046.12994.209.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Filippo,
+Hi Seife,
 
-> otherwise --disable-fortify has no effect and the default is
-> --enable-fortify anyway
+> This patch got submitted by an openSUSE contributor, I'm passing it
+> along so that I have one less patch to carry in my package ;)
+> 
+> From bbb75fa766fe4d03098884f608b5d5d49757b1d1 Mon Sep 17 00:00:00 2001
+> From: Stefan Seyfried <seife@suse.de>
+> Date: Fri, 3 Jul 2009 23:48:22 +0200
+> Subject: [PATCH] Fix build with "--as-needed"
 
-patch has been applied. Thanks.
+patch has been applied, but next time, please give me proper patch where
+the commit message is clean when using git am.
 
 Regards
 
