@@ -1,34 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 4 Jul 2009 15:03:32 +0100 (BST)
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: BlueZ devel list <linux-bluetooth@vger.kernel.org>
-Subject: Re: Feature request: boolean properties to auto reconnect list of
- MAC's at daemon start up
-In-Reply-To: <2d5a2c100907040637s73791batd85327f31cb4f1ee@mail.gmail.com>
-References: <4A4F39E8.4020908@powercraft.nl>  <20090704135747.05efc95c@stoetzler> <2d5a2c100907040637s73791batd85327f31cb4f1ee@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Message-Id: <1246716212.336777.600.nullmailer@galant.ukfsn.org>
-From: Iain Hibbert <plunky@rya-online.net>
+In-Reply-To: <20090704135747.05efc95c@stoetzler>
+References: <4A4F39E8.4020908@powercraft.nl>
+	 <20090704135747.05efc95c@stoetzler>
+Date: Sat, 4 Jul 2009 10:37:39 -0300
+Message-ID: <2d5a2c100907040637s73791batd85327f31cb4f1ee@mail.gmail.com>
+Subject: Re: Feature request: boolean properties to auto reconnect list of
+	MAC's at daemon start up
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Stefan Seyfried <seife@suse.de>
+Cc: BlueZ devel list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, 4 Jul 2009, Luiz Augusto von Dentz wrote:
+Hi,
 
-> > IIUC that's just how bluetooth input devices work: they do connect to
-> > the host - not the other way round. So it is really a problem that
-> > cannot be solved on bluez' side.
+On Sat, Jul 4, 2009 at 8:57 AM, Stefan Seyfried<seife@suse.de> wrote:
+> On Sat, 04 Jul 2009 13:15:52 +0200
+> Jelle de Jong <jelledejong@powercraft.nl> wrote:
 >
-> Yep, most hid devices will just refuse the connection if the 'virtual
-> cable plug' was already stabilised, in general this is also a bad idea
-> for any connection attempt during the startup as we have no guarantee
-> that the connection will complete.
+>> Use-case: I have a lot of systems with successful connected bluetooth
+>> keyboards. The boot-up of these systems are around 5 seconds with full
+>> GUI. But the devices is not usable yet, because when you press a key
+>> it first start connection... this takes almost the same time as the
+>> complete boot-up and it forces an extra key press of the user every
+>> time they start the system. Maybe some org.bluez.Input interface
+>> thing?
+>
+> IIUC that's just how bluetooth input devices work: they do connect to
+> the host - not the other way round. So it is really a problem that
+> cannot be solved on bluez' side.
 
-see HIDNormallyConnectable attribute in the HID spec (7.11.13)
+Yep, most hid devices will just refuse the connection if the 'virtual
+cable plug' was already stabilised, in general this is also a bad idea
+for any connection attempt during the startup as we have no guarantee
+that the connection will complete.
 
-I certainly find with my Apple bluetooth keyboard and mouse that the host
-OS (not using BlueZ btw) can connect to them at boot without my
-intervention.
-
-iain
-
+-- 
+Luiz Augusto von Dentz
+Engenheiro de Computação
