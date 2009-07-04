@@ -1,27 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: add support to configure ERTM and Streaming
- mode
+Subject: Re: [PATCH] Bluetooth: Improve the throughput by increasing the
+ frame size
 From: Marcel Holtmann <marcel@holtmann.org>
-To: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
+To: Vikram Kandukuri <vkandukuri@atheros.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1246730784-30052-1-git-send-email-gustavo@las.ic.unicamp.br>
-References: <1246730784-30052-1-git-send-email-gustavo@las.ic.unicamp.br>
+In-Reply-To: <20090702090147.GA9790@atheros-laptop>
+References: <20090702090147.GA9790@atheros-laptop>
 Content-Type: text/plain
-Date: Sat, 04 Jul 2009 11:47:49 -0700
-Message-Id: <1246733269.12994.212.camel@localhost.localdomain>
+Date: Sat, 04 Jul 2009 11:43:02 -0700
+Message-Id: <1246732982.12994.211.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Vikram,
 
-> Add code to config_req and config_rsp to configure ERTM and Streaming
-> mode. If the remote devices specifies ERTM or Streaming Mode, we propose
-> the same mode received. Otherwise we propose ERTM or Basic Mode.
-> And if we are a state 2 device the remote should propose the same mode
-> that we sent, if not, the channel is disconnected.
+> Subject: [PATCH] Bluetooth: Improve the throughput by increasing the frame size
+> 
+> This patch increases the receive buffer size to HCI_MAX_FRAME_SIZE
+> which improves the Rx throughput considerably.
+> 
+> Tested against BRM/Atheros/CSR USB Dongles with PAN profile using
+> iperf and chariot. This gave significant (around 40%) increase
+> in performance (increased from 0.8 to 1.5 Mb/s in Sheld room)
 
-this patch has been applied to bluetooth-testing.git now. Thanks.
+patch has been applied. Thanks.
 
 Regards
 
