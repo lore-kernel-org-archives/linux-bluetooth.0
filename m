@@ -1,38 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: John Frankish <j-frankish@slb.com>
-To: Stefan Seyfried <seife@suse.de>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Sun, 5 Jul 2009 15:30:34 +0200
-Subject: RE: udev rule bluetooth.rules
-Message-ID: <6AC5A55546F64545AE996F8200E3AC4E06CCC380@NL0105EXC01V01.eur.slb.com>
+Date: Sun, 5 Jul 2009 13:32:59 +0200
+From: Stefan Seyfried <seife@suse.de>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: udev rule bluetooth.rules
+Message-ID: <20090705133259.1bb7bad7@stoetzler>
+In-Reply-To: <6AC5A55546F64545AE996F8200E3AC4E06CCC1A4@NL0105EXC01V01.eur.slb.com>
 References: <6AC5A55546F64545AE996F8200E3AC4E06CCC1A4@NL0105EXC01V01.eur.slb.com>
- <20090705133259.1bb7bad7@stoetzler>
-In-Reply-To: <20090705133259.1bb7bad7@stoetzler>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-DQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBsaW51eC1ibHVldG9vdGgtb3du
-ZXJAdmdlci5rZXJuZWwub3JnIFttYWlsdG86bGludXgtYmx1ZXRvb3RoLW93bmVyQHZnZXIua2Vy
-bmVsLm9yZ10gT24gQmVoYWxmIE9mIFN0ZWZhbiBTZXlmcmllZA0KU2VudDogMDUgSnVseSwgMjAw
-OSAxNTozMw0KVG86IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNClN1YmplY3Q6IFJl
-OiB1ZGV2IHJ1bGUgYmx1ZXRvb3RoLnJ1bGVzDQoNCk9uIFN1biwgNSBKdWwgMjAwOSAxMjoyNDoz
-NCArMDIwMA0KSm9obiBGcmFua2lzaCA8ai1mcmFua2lzaEBzbGIuY29tPiB3cm90ZToNCg0KPiBS
-ZWYgYmx1ZXotNC40MyAvZXRjL3VkZXYvYmx1ZXRvb3RoLnJ1bGVzOg0KPg0KPiAjIFJ1biBoZWxw
-ZXIgZXZlcnkgdGltZSBhIEJsdWV0b290aCBkZXZpY2UgYXBwZWFycw0KPiAjIE9uIHJlbW92ZSBh
-Y3Rpb25zLCBibHVldG9vdGhkIHNob3VsZCBnbyBhd2F5IGJ5IGl0c2VsZg0KPiBBQ1RJT049PSJh
-ZGQiLCBTVUJTWVNURU09PSJibHVldG9vdGgiLCBSVU4rPSIvdXNyL3NiaW4vYmx1ZXRvb3RoZA0K
-PiAtLXVkZXYiDQo+DQo+IFNob3VsZG4ndCB0aGlzIGJlIG9mIHRoZSBmb3JtYXQgL2V0Yy91ZGV2
-L3J1bGVzLmQveHgtYmx1ZXRvb3RoLnJ1bGVzDQo+IHNvIHRoYXQgaXQgc3RhcnRzIGluIHRoZSBj
-b3JyZWN0IG9yZGVyIC0gaS5lLiBhZnRlciBkYnVzPw0KDQpUaGF0J3MgdGFrZW4gY2FyZSBvZiAt
-IGlmIGRidXMgaXMgbm90IGF2YWlsYWJsZSwgYmx1ZXRvb3RoZCB3aWxsIGV4aXQNCndpdGggcmV0
-dXJuIGNvZGUgMS4gdWRldiB3aWxsIG5vdGljZSB0aGF0IGFuZCBsYXRlciBzdGFydCBpdCBhZ2Fp
-biBpbg0KdGhlIGNvbGRwbHVnIHJ1bi4NCi0tDQpUaGFua3MgLSBJJ2QgYmVlbiBwbGF5aW5nIGFy
-b3VuZCB3aXRoIHRoaXMgYXMgL2V0Yy91ZGV2L3J1bGVzLmQvODUtYmx1ZXRvb3RoLnJ1bGVzIGJ1
-dCBoYWRuJ3QgZ290IGFyb3VuZCB0byB0cnlpbmcgd2l0aG91dCBkYnVzIHN0YXJ0ZWQgLSBpdCB3
-b3JrcyBmb3IgbWUgd2l0aCBkYnVzIHN0YXJ0ZWQuDQoNCkl0IHdvdWxkIGJlIG5pY2UgaWYgIi0t
-cHJlZml4PS91c3IvbG9jYWwiIHdlcmUgcGFzc2VkIHRvIGJsdWV0b290aC5ydWxlcyB0byBnaXZl
-Og0KDQpBQ1RJT049PSJhZGQiLCBTVUJTWVNURU09PSJibHVldG9vdGgiLCBSVU4rPSIvdXNyL2xv
-Y2FsL3NiaW4vYmx1ZXRvb3RoZA0KDQouLndvdWxkIGhhdmUgc2F2ZWQgbWUgMzBtaW5zIG9yIHNv
-IGFueXdheSA6KQ0K
+On Sun, 5 Jul 2009 12:24:34 +0200
+John Frankish <j-frankish@slb.com> wrote:
+
+> Ref bluez-4.43 /etc/udev/bluetooth.rules:
+> 
+> # Run helper every time a Bluetooth device appears
+> # On remove actions, bluetoothd should go away by itself
+> ACTION=="add", SUBSYSTEM=="bluetooth", RUN+="/usr/sbin/bluetoothd
+> --udev"
+> 
+> Shouldn't this be of the format /etc/udev/rules.d/xx-bluetooth.rules
+> so that it starts in the correct order - i.e. after dbus?
+
+That's taken care of - if dbus is not available, bluetoothd will exit
+with return code 1. udev will notice that and later start it again in
+the coldplug run.
+-- 
+Stefan Seyfried
+R&D Preload Department             |              "Any ideas, John?"
+SUSE LINUX Products GmbH, Nürnberg | "Well, surrounding them's out."
+
+This footer brought to you by insane German lawmakers:
+SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG Nürnberg)
