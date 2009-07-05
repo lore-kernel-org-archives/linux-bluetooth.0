@@ -1,42 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A511DD5.5050001@heisenbug.com>
-Date: Sun, 05 Jul 2009 22:40:37 +0100
-From: Matthew Booth <matthew@heisenbug.com>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Unexplained start of audio glitches on F11
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: udev rule bluetooth.rules
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: John Frankish <j-frankish@slb.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1246813882.2156.0.camel@snoogens.fab.redhat.com>
+References: <6AC5A55546F64545AE996F8200E3AC4E06CCC1A4@NL0105EXC01V01.eur.slb.com>
+	 <1246811096.12994.213.camel@localhost.localdomain>
+	 <1246813882.2156.0.camel@snoogens.fab.redhat.com>
+Content-Type: text/plain
+Date: Sun, 05 Jul 2009 10:12:59 -0700
+Message-Id: <1246813979.12994.220.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I bought a new bluetooth stereo headset last week. After I discovered 
-creating /etc/bluetooth/audio.conf with:
+Hi Bastien,
 
-[Headset]
-HFP=true
+> > > Ref bluez-4.43 /etc/udev/bluetooth.rules:
+> > > 
+> > > # Run helper every time a Bluetooth device appears
+> > > # On remove actions, bluetoothd should go away by itself
+> > > ACTION=="add", SUBSYSTEM=="bluetooth", RUN+="/usr/sbin/bluetoothd --udev"
+> > > 
+> > > Shouldn't this be of the format /etc/udev/rules.d/xx-bluetooth.rules so that it starts in the correct order - i.e. after dbus?
+> > > 
+> > > Is it possible to have a udev rule check that dbus is running before executing?
+> > 
+> > you are right. I should have fixed this. Just forgot about it. What
+> > number prefix do we want for Bluetooth.
+> 
+> You don't need the prefix. D-Bus isn't started through udev...
 
-I was able to put the headset into A2DP mode and the sound quality was 
-excellent. It stayed this way for 2 days. However, I have now started 
-getting audio stutters every few seconds, and my logs are full of:
+we don't need it, but we should be nice and add it anyway. I pushed a
+fix for that. BlueZ being the only project not following conventions
+here is a bad idea.
 
-l2cap_recv_acldata: Unexpected continuation frame (len 0)
+Regards
 
-The appearance of these message appears to be strongly correlated with 
-audio skips. The headset continues to operate perfectly when connected 
-to my mobile phone. Its battery is fully charged. I experience the 
-glitches with direct line of sight to my laptop at a distance of < 2 feet.
+Marcel
 
-Google shows up a number of hits on the above error message, but they're 
-related to poor signal strength, which I think I've ruled out.
 
-I'm using pulseaudio, which is running at realtime priority. For good 
-measure I have also tried the bluetooth daemon both with and without 
-realtime priority. This doesn't appear to be related. Does anybody have 
-any more voodoo tricks?
-
-Thanks,
-
-Matt
-
-P.S. I haven't managed to find any documentation for audio.conf 
-anywhere. Is there any?
