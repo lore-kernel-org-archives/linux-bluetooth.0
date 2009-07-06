@@ -1,40 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
 From: John Frankish <j-frankish@slb.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 6 Jul 2009 08:48:27 +0200
+Date: Mon, 6 Jul 2009 08:52:07 +0200
 Subject: RE: udev rule bluetooth.rules
-Message-ID: <6AC5A55546F64545AE996F8200E3AC4E06CCC77E@NL0105EXC01V01.eur.slb.com>
+Message-ID: <6AC5A55546F64545AE996F8200E3AC4E06CCC77F@NL0105EXC01V01.eur.slb.com>
 References: <6AC5A55546F64545AE996F8200E3AC4E06CCC1A4@NL0105EXC01V01.eur.slb.com>
- <20090705133259.1bb7bad7@stoetzler>
- <6AC5A55546F64545AE996F8200E3AC4E06CCC380@NL0105EXC01V01.eur.slb.com>
-In-Reply-To: <6AC5A55546F64545AE996F8200E3AC4E06CCC380@NL0105EXC01V01.eur.slb.com>
-Content-Type: text/plain; charset="utf-8"
+	 <1246811096.12994.213.camel@localhost.localdomain>
+	 <1246813882.2156.0.camel@snoogens.fab.redhat.com>
+ <1246813979.12994.220.camel@localhost.localdomain>
+In-Reply-To: <1246813979.12994.220.camel@localhost.localdomain>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-DQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogbGludXgtYmx1ZXRvb3RoLW93bmVy
-QHZnZXIua2VybmVsLm9yZyBbbWFpbHRvOmxpbnV4LWJsdWV0b290aC1vd25lckB2Z2VyLmtlcm5l
-bC5vcmddIE9uIEJlaGFsZiBPZiBTdGVmYW4gU2V5ZnJpZWQNClNlbnQ6IDA1IEp1bHksIDIwMDkg
-MTU6MzMNClRvOiBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQpTdWJqZWN0OiBSZTog
-dWRldiBydWxlIGJsdWV0b290aC5ydWxlcw0KDQpPbiBTdW4sIDUgSnVsIDIwMDkgMTI6MjQ6MzQg
-KzAyMDANCkpvaG4gRnJhbmtpc2ggPGotZnJhbmtpc2hAc2xiLmNvbT4gd3JvdGU6DQoNCj4gUmVm
-IGJsdWV6LTQuNDMgL2V0Yy91ZGV2L2JsdWV0b290aC5ydWxlczoNCj4NCj4gIyBSdW4gaGVscGVy
-IGV2ZXJ5IHRpbWUgYSBCbHVldG9vdGggZGV2aWNlIGFwcGVhcnMNCj4gIyBPbiByZW1vdmUgYWN0
-aW9ucywgYmx1ZXRvb3RoZCBzaG91bGQgZ28gYXdheSBieSBpdHNlbGYNCj4gQUNUSU9OPT0iYWRk
-IiwgU1VCU1lTVEVNPT0iYmx1ZXRvb3RoIiwgUlVOKz0iL3Vzci9zYmluL2JsdWV0b290aGQNCj4g
-LS11ZGV2Ig0KPg0KPiBTaG91bGRuJ3QgdGhpcyBiZSBvZiB0aGUgZm9ybWF0IC9ldGMvdWRldi9y
-dWxlcy5kL3h4LWJsdWV0b290aC5ydWxlcw0KPiBzbyB0aGF0IGl0IHN0YXJ0cyBpbiB0aGUgY29y
-cmVjdCBvcmRlciAtIGkuZS4gYWZ0ZXIgZGJ1cz8NCg0KVGhhdCdzIHRha2VuIGNhcmUgb2YgLSBp
-ZiBkYnVzIGlzIG5vdCBhdmFpbGFibGUsIGJsdWV0b290aGQgd2lsbCBleGl0DQp3aXRoIHJldHVy
-biBjb2RlIDEuIHVkZXYgd2lsbCBub3RpY2UgdGhhdCBhbmQgbGF0ZXIgc3RhcnQgaXQgYWdhaW4g
-aW4NCnRoZSBjb2xkcGx1ZyBydW4uDQoNCj4gaWYgZGJ1cyBpcyBub3Qgc3RhcnRlZCwgSSBuZWVk
-IHRvIGRvIHRoaXM6DQo+ICMgdWRldnRyaWdnZXIgLS1zdWJzeXN0ZW0tbWF0Y2g9Ymx1ZXRvb3Ro
-DQo+IGlzIHRoaXMgaXMgd2hhdCB3YXMgbWVhbnQgYnkgImNvbGRwbHVnIHJ1biI/DQotLQ0KVGhh
-bmtzIC0gSSdkIGJlZW4gcGxheWluZyBhcm91bmQgd2l0aCB0aGlzIGFzIC9ldGMvdWRldi9ydWxl
-cy5kLzg1LWJsdWV0b290aC5ydWxlcyBidXQgaGFkbid0IGdvdCBhcm91bmQgdG8gdHJ5aW5nIHdp
-dGhvdXQgZGJ1cyBzdGFydGVkIC0gaXQgd29ya3MgZm9yIG1lIHdpdGggZGJ1cyBzdGFydGVkLg0K
-DQpJdCB3b3VsZCBiZSBuaWNlIGlmICItLXByZWZpeD0vdXNyL2xvY2FsIiB3ZXJlIHBhc3NlZCB0
-byBibHVldG9vdGgucnVsZXMgdG8gZ2l2ZToNCg0KQUNUSU9OPT0iYWRkIiwgU1VCU1lTVEVNPT0i
-Ymx1ZXRvb3RoIiwgUlVOKz0iL3Vzci9sb2NhbC9zYmluL2JsdWV0b290aGQNCg0KLi53b3VsZCBo
-YXZlIHNhdmVkIG1lIDMwbWlucyBvciBzbyBhbnl3YXkgOikNCg0KDQo=
+
+> > > Ref bluez-4.43 /etc/udev/bluetooth.rules:
+> > >
+> > > # Run helper every time a Bluetooth device appears
+> > > # On remove actions, bluetoothd should go away by itself
+> > > ACTION=="add", SUBSYSTEM=="bluetooth", RUN+="/usr/sbin/bluetoothd --udev"
+> > >
+> > > Shouldn't this be of the format /etc/udev/rules.d/xx-bluetooth.rules so that it starts in the correct order - i.e. after dbus?
+> > >
+> > > Is it possible to have a udev rule check that dbus is running before executing?
+> >
+> > you are right. I should have fixed this. Just forgot about it. What
+> > number prefix do we want for Bluetooth.
+>
+> You don't need the prefix. D-Bus isn't started through udev...
+
+we don't need it, but we should be nice and add it anyway. I pushed a
+fix for that. BlueZ being the only project not following conventions
+here is a bad idea.
+
+> Using /etc/udev/rules.d/97-bluetooth with bluez-4.43 does indeed load all required
+> modules and start bluetoothd as soon as I use the hardware switch to enable Bluetooth
+>
+> Thanks, John
+
+
