@@ -1,73 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
+From: John Frankish <j-frankish@slb.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 6 Jul 2009 08:48:27 +0200
+Subject: RE: udev rule bluetooth.rules
+Message-ID: <6AC5A55546F64545AE996F8200E3AC4E06CCC77E@NL0105EXC01V01.eur.slb.com>
+References: <6AC5A55546F64545AE996F8200E3AC4E06CCC1A4@NL0105EXC01V01.eur.slb.com>
+ <20090705133259.1bb7bad7@stoetzler>
+ <6AC5A55546F64545AE996F8200E3AC4E06CCC380@NL0105EXC01V01.eur.slb.com>
+In-Reply-To: <6AC5A55546F64545AE996F8200E3AC4E06CCC380@NL0105EXC01V01.eur.slb.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20090625082913.GA25902@jh-x301>
-References: <113d36d80906242033p134edf27t12bda1d0359c4134@mail.gmail.com>
-	 <113d36d80906242326g3f2ce8e3h6c779aa01d776b04@mail.gmail.com>
-	 <20090625082913.GA25902@jh-x301>
-Date: Mon, 6 Jul 2009 19:11:18 +0800
-Message-ID: <113d36d80907060411r72ab6ecbme3c006e4ce2b03a6@mail.gmail.com>
-Subject: Re: question on A2DP sink suspend/resume
-From: Lan Zhu <zhu.lan.cn@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
-
-2009/6/25 Johan Hedberg <johan.hedberg@gmail.com>:
-> Hi,
->
-> On Thu, Jun 25, 2009, lan zhu wrote:
->> My question is,  I found there is no such sink_suspend or sink_resume
->> method in D-BUS API while these functions are all implemented in Bluez
->> audio module. I would like to know why don't put them to D-BUS API?
->> If we need to call these functions we have to expand the D-BUS API.
->
-> You're forgetting the other control point to audio which is the UNIX
-> socket that alsa, gstreamer, pulseaudio, etc connect to to request audio
-> streams. The main purpose of the audio related D-Bus interfaces is to
-> control and monitor the profile-level connections but not the stream
-> states.
->
-> If you have an active audio stream (either SCO connection or A2DP stream
-> in streaming state) you also need some application providing data to the
-> stream (and consuming data from the stream in the SCO case). This is why
-> there's no control for it in the D-Bus interface. E.g. pulseaudio is able
-> to handle the switch from HFP/HSP to A2DP and back quite smoothly using
-> just the UNIX socket IPC messages. If you want to investigate how the
-> logic in the code goes with respect to this you can start by looking at
-> audio/unix.c.
->
-> If you have a good use case for not using the UNIX socket for controlling
-> the stream states we can naturally consider adding that to the D-Bus
-> interface, but right now I get the impression that you might simply not
-> have been aware that the principal control point for active audio streams
-> is the UNIX socket that audio clients can connect to.
->
->> One more question is, is there a formal way to test SCO/A2DP
->> simultaneous case? we can't find a proper headset to test it because
->> those headsets are all well implemented with the simultaneous logic,
->> so there is no way to enter ourselves' code that handle this logic.
->> Can we test it by configurating some test tool such as PTS?
->
-> I'm not aware of any formal way and the PTS (afaik) doesn't have any
-> support for multi-profile testing.
->
-> Johan
->
-
-Thanks for your response. In Google android platform, AudioFlinger
-calls the functions in liba2dp for streaming related functions. If we
-suspend A2DP Sink in AaudioFlinger when handling SCO routing, it will
-be a easy way to implement the A2DP/SCO interaction except for one
-violation of the simultaneous whitepaper, that is, the sequence of
-halting A2DP streaming and creating SCO.  In the whitepaper the
-sequence is defined as (1) halt A2DP stream (2) create SCO, but
-because AudioFlinger only gets notification after SCO created
-successfully, it has to create SCO at first and then halt A2DP stream.
-Could you let me know if this sequence is acceptable? Will it bring
-any issue in any unexpected cases?
-
-Thanks,
-Zhu Lan
+DQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogbGludXgtYmx1ZXRvb3RoLW93bmVy
+QHZnZXIua2VybmVsLm9yZyBbbWFpbHRvOmxpbnV4LWJsdWV0b290aC1vd25lckB2Z2VyLmtlcm5l
+bC5vcmddIE9uIEJlaGFsZiBPZiBTdGVmYW4gU2V5ZnJpZWQNClNlbnQ6IDA1IEp1bHksIDIwMDkg
+MTU6MzMNClRvOiBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQpTdWJqZWN0OiBSZTog
+dWRldiBydWxlIGJsdWV0b290aC5ydWxlcw0KDQpPbiBTdW4sIDUgSnVsIDIwMDkgMTI6MjQ6MzQg
+KzAyMDANCkpvaG4gRnJhbmtpc2ggPGotZnJhbmtpc2hAc2xiLmNvbT4gd3JvdGU6DQoNCj4gUmVm
+IGJsdWV6LTQuNDMgL2V0Yy91ZGV2L2JsdWV0b290aC5ydWxlczoNCj4NCj4gIyBSdW4gaGVscGVy
+IGV2ZXJ5IHRpbWUgYSBCbHVldG9vdGggZGV2aWNlIGFwcGVhcnMNCj4gIyBPbiByZW1vdmUgYWN0
+aW9ucywgYmx1ZXRvb3RoZCBzaG91bGQgZ28gYXdheSBieSBpdHNlbGYNCj4gQUNUSU9OPT0iYWRk
+IiwgU1VCU1lTVEVNPT0iYmx1ZXRvb3RoIiwgUlVOKz0iL3Vzci9zYmluL2JsdWV0b290aGQNCj4g
+LS11ZGV2Ig0KPg0KPiBTaG91bGRuJ3QgdGhpcyBiZSBvZiB0aGUgZm9ybWF0IC9ldGMvdWRldi9y
+dWxlcy5kL3h4LWJsdWV0b290aC5ydWxlcw0KPiBzbyB0aGF0IGl0IHN0YXJ0cyBpbiB0aGUgY29y
+cmVjdCBvcmRlciAtIGkuZS4gYWZ0ZXIgZGJ1cz8NCg0KVGhhdCdzIHRha2VuIGNhcmUgb2YgLSBp
+ZiBkYnVzIGlzIG5vdCBhdmFpbGFibGUsIGJsdWV0b290aGQgd2lsbCBleGl0DQp3aXRoIHJldHVy
+biBjb2RlIDEuIHVkZXYgd2lsbCBub3RpY2UgdGhhdCBhbmQgbGF0ZXIgc3RhcnQgaXQgYWdhaW4g
+aW4NCnRoZSBjb2xkcGx1ZyBydW4uDQoNCj4gaWYgZGJ1cyBpcyBub3Qgc3RhcnRlZCwgSSBuZWVk
+IHRvIGRvIHRoaXM6DQo+ICMgdWRldnRyaWdnZXIgLS1zdWJzeXN0ZW0tbWF0Y2g9Ymx1ZXRvb3Ro
+DQo+IGlzIHRoaXMgaXMgd2hhdCB3YXMgbWVhbnQgYnkgImNvbGRwbHVnIHJ1biI/DQotLQ0KVGhh
+bmtzIC0gSSdkIGJlZW4gcGxheWluZyBhcm91bmQgd2l0aCB0aGlzIGFzIC9ldGMvdWRldi9ydWxl
+cy5kLzg1LWJsdWV0b290aC5ydWxlcyBidXQgaGFkbid0IGdvdCBhcm91bmQgdG8gdHJ5aW5nIHdp
+dGhvdXQgZGJ1cyBzdGFydGVkIC0gaXQgd29ya3MgZm9yIG1lIHdpdGggZGJ1cyBzdGFydGVkLg0K
+DQpJdCB3b3VsZCBiZSBuaWNlIGlmICItLXByZWZpeD0vdXNyL2xvY2FsIiB3ZXJlIHBhc3NlZCB0
+byBibHVldG9vdGgucnVsZXMgdG8gZ2l2ZToNCg0KQUNUSU9OPT0iYWRkIiwgU1VCU1lTVEVNPT0i
+Ymx1ZXRvb3RoIiwgUlVOKz0iL3Vzci9sb2NhbC9zYmluL2JsdWV0b290aGQNCg0KLi53b3VsZCBo
+YXZlIHNhdmVkIG1lIDMwbWlucyBvciBzbyBhbnl3YXkgOikNCg0KDQo=
