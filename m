@@ -1,51 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: RE: udev rule bluetooth.rules
-From: Marcel Holtmann <marcel@holtmann.org>
-To: John Frankish <j-frankish@slb.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <6AC5A55546F64545AE996F8200E3AC4E06CCC77E@NL0105EXC01V01.eur.slb.com>
-References: <6AC5A55546F64545AE996F8200E3AC4E06CCC1A4@NL0105EXC01V01.eur.slb.com>
-	 <20090705133259.1bb7bad7@stoetzler>
-	 <6AC5A55546F64545AE996F8200E3AC4E06CCC380@NL0105EXC01V01.eur.slb.com>
-	 <6AC5A55546F64545AE996F8200E3AC4E06CCC77E@NL0105EXC01V01.eur.slb.com>
-Content-Type: text/plain
-Date: Mon, 06 Jul 2009 10:31:36 -0700
-Message-Id: <1246901496.12994.232.camel@localhost.localdomain>
-Mime-Version: 1.0
+From: Filippo Giunchedi <filippo@esaurito.net>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/3] test/hciemu.c: verbose usage message
+Date: Mon,  6 Jul 2009 18:05:03 +0200
+Message-Id: <1246896305-26018-1-git-send-email-filippo@esaurito.net>
+In-Reply-To: <1246890054-13479-2-git-send-email-filippo@esaurito.net>
+References: <1246890054-13479-2-git-send-email-filippo@esaurito.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+---
+ test/hciemu.c |    8 +++++++-
+ 1 files changed, 7 insertions(+), 1 deletions(-)
 
-> > Ref bluez-4.43 /etc/udev/bluetooth.rules:
-> >
-> > # Run helper every time a Bluetooth device appears
-> > # On remove actions, bluetoothd should go away by itself
-> > ACTION=="add", SUBSYSTEM=="bluetooth", RUN+="/usr/sbin/bluetoothd
-> > --udev"
-> >
-> > Shouldn't this be of the format /etc/udev/rules.d/xx-bluetooth.rules
-> > so that it starts in the correct order - i.e. after dbus?
-> 
-> That's taken care of - if dbus is not available, bluetoothd will exit
-> with return code 1. udev will notice that and later start it again in
-> the coldplug run.
-> 
-> > if dbus is not started, I need to do this:
-> > # udevtrigger --subsystem-match=bluetooth
-> > is this is what was meant by "coldplug run"?
-> --
-> Thanks - I'd been playing around with this as /etc/udev/rules.d/85-bluetooth.rules but hadn't got around to trying without dbus started - it works for me with dbus started.
-> 
-> It would be nice if "--prefix=/usr/local" were passed to bluetooth.rules to give:
-> 
-> ACTION=="add", SUBSYSTEM=="bluetooth", RUN+="/usr/local/sbin/bluetoothd
-
-I fixed that now and we generate bluetooth.rules with the correct
-prefix.
-
-Regards
-
-Marcel
-
+diff --git a/test/hciemu.c b/test/hciemu.c
+index 9f651bc..68fabb0 100644
+--- a/test/hciemu.c
++++ b/test/hciemu.c
+@@ -1172,7 +1172,13 @@ static void usage(void)
+ {
+ 	printf("hciemu - HCI emulator ver %s\n", VERSION);
+ 	printf("Usage: \n");
+-	printf("\thciemu [-n] local_address\n");
++	printf("\thciemu [options] local_address\n"
++		"Options:\n"
++		"\t[-d device] use specified device\n"
++		"\t[-b bdaddr] emulate specified address\n"
++		"\t[-s file] create snoop file\n"
++		"\t[-n] do not detach\n"
++		"\t[-h] help, you are looking at it\n");
+ }
+ 
+ static struct option main_options[] = {
+-- 
+1.6.3.3
 
