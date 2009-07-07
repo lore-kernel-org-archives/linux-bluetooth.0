@@ -1,53 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Bluez Certification
+Subject: Re: Does anybody know conn->power_save variable in hci_conn.c?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Balaji Palaniswami <balaji_palaniswami@yahoo.com>
+To: Chan-Yeol Park <chanyeol.park@samsung.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <454943.43647.qm@web95403.mail.in2.yahoo.com>
-References: <454943.43647.qm@web95403.mail.in2.yahoo.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 07 Jul 2009 10:40:04 -0700
-Message-Id: <1246988404.3384.13.camel@localhost.localdomain>
+In-Reply-To: <002e01c9fedc$f5fcb790$e1f626b0$%park@samsung.com>
+References: <002e01c9fedc$f5fcb790$e1f626b0$%park@samsung.com>
+Content-Type: text/plain
+Date: Tue, 07 Jul 2009 10:36:49 -0700
+Message-Id: <1246988209.3384.10.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Balaji,
+Hi Chan-Yeol,
 
-> I had a couple of questions related to the BQB qualification
-> of the Bluez stack and was wondering if someone could help with the same
->  
-> The BQB certification is of two types – profile and host.
-> Basically we are trying to get the BQB profile qualification for a BT
-> dongle.
->  
-> There are a number of companies that have done the BQB host
-> side certification for the Bluez stack. Ideally we would like to leverage the
-> BT host certification done by the other companies for the host side and simply do a profile cert for our device.
->  
-> The questions I have are the following:
-> Is 1) Is it possible to reuse a certification done by someone
-> else? Has this been done before? ( The Helsinki developer meeting minutes from
-> 2008 seem to suggest this has been done before)
+> /*bluetooth kernel hci_conn.c */
+> 382 void hci_conn_enter_active_mode(struct hci_conn *conn)
+> 383 {
+> 384         struct hci_dev *hdev = conn->hdev;
+> 385
+> 386         BT_DBG("conn %p mode %d", conn, conn->mode);
+> 387
+> 388         if (test_bit(HCI_RAW, &hdev->flags))
+> 389                 return;
+> 390
+> 391         if (conn->mode != HCI_CM_SNIFF || !conn->power_save)
+> 392                 goto timer;
+> 393 
+> 394         if (!test_and_set_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend)) {
+> 395                 struct hci_cp_exit_sniff_mode cp;
+> 396                 cp.handle = __cpu_to_le16(conn->handle);
+> 397                 hci_send_cmd(hdev, OGF_LINK_POLICY,
+> 398                                 OCF_EXIT_SNIFF_MODE, sizeof(cp), &cp);
+> 399         }
+> 400
+> 401 timer:
+> 402         if (hdev->idle_timeout > 0)
+> 403                 mod_timer(&conn->idle_timer,
+> 404                         jiffies + msecs_to_jiffies(hdev->idle_timeout));
+> 405 }
+> 406 
+> 
+> If possible, could you explain why this code checks !conn->power_save var.? 
+> 
+> Without this , if  conn->mode==HCI_CM_SNIFF , we simply exit sniff
+> mode,"OCF_EXIT_SNIFF_MODE".
+> 
+> As far as I understood, whenever conn->mode is HCI_CM_SNIFF conn->power_save
+> is 0.
+> The reason is that  hci_mode_change_evt() set conn->power_save as "0" when
+> conn->mode !=HCI_CM_ACTIVE.
+> 
+> Consequently we don't need to check that variable.
 
-yes, it is possible if kernel version and source code are matching. And
-if the BlueZ source code is matching.
-
-> 2) If it is possible then what is the procedure for the
-> same? 
-
-Just do it. The Bluetooth SIG has a procedure for it. It is a little bit
-confusing, but should still work.
-
-> 3) Is there a particular BQ ID that has been made
-> available for other people to use?
-
-There are few, but it always depends on 1) and it if matches.
-
-> 4) Have any devices been qualified for Bluetooth 2.1 with
-> Bluez?
-
-Yes. Not sure if all of them are listed yet.
+we do need that variable, because otherwise devices like HID which do
+active sniff mode management fall over if we always try to exit sniff
+mode only for a few bytes.
 
 Regards
 
