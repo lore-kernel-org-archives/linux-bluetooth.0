@@ -1,375 +1,393 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 7 Jul 2009 15:19:14 +0200
-From: Vladimir Botka <vbotka@gmail.com>
+From: alokbarsode@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Cc: Benjamin Vasanthakumar J <j.benjamin@gdatech.co.in>
-Subject: Re: Bluetooth Headset connection issue with PulseAudio
-Message-ID: <20090707151914.37bc10c3@vlado.suse.cz>
-In-Reply-To: <4A531A0C.1060600@gdatech.co.in>
-References: <4A4E0494.5060006@gdatech.co.in>
-	<20090703162508.3dd214b4@vlado.suse.cz>
-	<4A521DF9.8010901@gdatech.co.in>
-	<20090707111147.5241cbde@vlado.suse.cz>
-	<4A531A0C.1060600@gdatech.co.in>
-Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="MP_/t.2rn3KILq3PV3+h_aX/o6B"
+Cc: Alok Barsode <alok.barsode@azingo.com>
+Subject: [PATCH 1/1] Fixing bluetoothd to avoid passing device descriptor
+Date: Tue,  7 Jul 2009 16:32:57 +0530
+Message-Id: <1246964577-25157-1-git-send-email-alok.barsode@azingo.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---MP_/t.2rn3KILq3PV3+h_aX/o6B
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+From: Alok Barsode <alok.barsode@azingo.com>
 
-On Tue, 07 Jul 2009 15:19:00 +0530
-Benjamin Vasanthakumar J <j.benjamin@gdatech.co.in> wrote:
+---
+ plugins/hal.c  |    4 +-
+ src/adapter.c  |  131 ++++++++++++++++++++++++++++++++++++++++++--------------
+ src/adapter.h  |    5 ++-
+ src/dbus-hci.c |   45 +------------------
+ src/dbus-hci.h |    4 --
+ 5 files changed, 107 insertions(+), 82 deletions(-)
 
-> Dear Vladimir Botka,
-> >>>> Hi All,
-> >>>> I am trying to connect my bluetooth headset to my Linux box using
-> >>>> Pulse Audio. I am able to successfully run the pactl sink command
-> >>>> but when I look at the debug log I could see the headset is
-> >>>> connecting and disconnects immediately due to an error returning
-> >>>> unknown connection handle in the SCO packet.
-> >>>>
-> >>>> My test configurations:
-> >>>> Linux Kernel version : 2.6.30
-> >>>> Bluez version : 4.32
-> >>>> Pulse audio version:  0.9.14
-> >>>> Linux Distro: Ubuntu Jaunty 9.04
-> >>>>
-> >>>> My BT Dongle: Gigabyte BTD02
-> >>>> HCI Ver: 1.2 (0x2) HCI Rev: 0x639 LMP Ver: 1.2 (0x2) LMP Subver:
-> >>>> 0x639 Manufacturer: Cambridge Silicon Radio (10)
-> >>>>
-> >>>> Pulse audio, pactl sink command output is as below:
-> >>>> btaudio~$ sudo pactl load-module module-alsa-sink
-> >>>> device=btheadsetsudo: unable to resolve host btaudio
-> >>>> 15
-> >>>>
-> >>>> I am getting the following error in the kernel message:
-> >>>> hci_scodata_packet: hci0 SCO packet for unknown connection handle
-> >>>> 45
-> >>>>
-> >>>> Please find the log of "bluetoothd -nd":
-> >>>> bluetoothd[4127]: Unix client disconnected (fd=13)
-> >>>> bluetoothd[4127]: State changed 
-> >>>> /org/bluez/4127/hci0/dev_AE_2D_CC_AA_BB_14: HEADSET_STATE_PLAYING
-> >>>> -> HEADSET_STATE_CONNECTED
-> >>>> bluetoothd[4127]: No matching connection found for handle 45
-> >>>> bluetoothd[4127]: telephony-dummy: device 0x2064d398 disconnected
-> >>>> bluetoothd[4127]: State changed 
-> >>>> /org/bluez/4127/hci0/dev_AE_2D_CC_AA_BB_14:
-> >>>> HEADSET_STATE_CONNECTED -> HEADSET_STATE_DISCONNECTED
-> >>>>
-> >>>> My asoundrc file:
-> >>>> btaudio:~$ more .asoundrc
-> >>>> pcm.btheadset {
-> >>>> type bluetooth
-> >>>> device AE:2D:CC:AA:BB:14
-> >>>> profile "auto"
-> >>>> }
-> >>>>
-> >>>> Anyone has come across this similar issue? Any suggestions.
-> >>>>         
-> >>> There are 2 kinds of bluetooth modules in pulseaudio. The 1st one
-> >>> sends the audio via alsa-bluetooth and the the 2nd one are the
-> >>> native pulseaudio bluetooth modules. None of them are working
-> >>> AFAIK.
-> >>>
-> >>> But, there is the possibility to use the bluetooth headphones and
-> >>> be able to use the pulseaudio. Use the following .asoundrc
-> >>>
-> >>> # cat ~/.asoundrc
-> >>>        pcm.!default {
-> >>>                type pulse
-> >>>        }
-> >>>        ctl.!default {
-> >>>                type pulse
-> >>>        }
-> >>>        pcm.btheadset {
-> >>>                type bluetooth
-> >>>                device "00:13:17:72:CD:FF"
-> >>>        }
-> >>>
-> >>> Thus all default alsa output is redirected to the pulseaudio and
-> >>> the bluetooth headphones can be used with the applications which
-> >>> allow to select specific device (btheadset in this case). You can
-> >>> find more details here [1]. 
-> >>>   
-> >>>       
-> >> Thanks for your reply and the details on the asoundrc file.
-> >> We could hear only some sound at regular intervals. There is no
-> >> Music heared.
-> >>
-> >> Is there anything to do the version interoperability?
-> >>
-> >> My test configurations:
-> >> Linux Kernel version : 2.6.30
-> >> Bluez version : 4.32
-> >> Pulse audio version:  0.9.14
-> >> Linux Distro: Ubuntu Jaunty 9.04
-> >>
-> >> Does the following error cause the issue that I am facing? 
-> >> bluetoothd[3977]: audio handle_uuid: server not enabled for
-> >> 0000111e-0000-1000-8000-00805f9b34fb (0x111e)
-> >>
-> >>     
-> >
-> > Yes. This could be a problem. The described solution was tested on
-> > openSUSE 11.1 with the following versions.
-> >
-> > Linux Kernel version : 2.6.27
-> > Bluez version : 4.42
-> > Pulse audio version:  0.9.14
-> >
-> > But in this case the module which actually sends the sound to the
-> > bluetooth headset is bluez-alsa-4.42-67.1 .
-> >
-> > Have fun,
-> >   
-> Thanks for your reply.
-> 
-> Do you have any idea what does the following message indicates, Any
-> idea?
-> 
-> *bluetoothd[3977]: audio handle_uuid: server not enabled for
-> 0000111e-0000-1000-8000-00805f9b34fb (0x111e)*
-> 
-> Anything I need to enable before testing audio. Can you share your
-> audio.conf file?
-> 
-> ...
-> bluetoothd[9663]: audio.conf: Key file does not have key 'AutoConnect'
-> bluetoothd[9663]: audio.conf: Key file does not have key
-> ...
-> HEADSET_STATE_PLAY_IN_PROGRESS -> HEADSET_STATE_PLAYING
-> bluetoothd[9663]: Unix client disconnected (fd=18)
-> bluetoothd[9663]: State changed 
-> /org/bluez/9663/hci0/dev_AE_2D_CC_AA_BB_14: HEADSET_STATE_PLAYING -> 
-> HEADSET_STATE_CONNECTED
-> bluetoothd[9663]: client_free(0x204a2270)
-> *bluetoothd[9663]: No matching connection found for handle 45*
-> bluetoothd[9663]: telephony-dummy: device 0x204ba490 disconnected
-> bluetoothd[9663]: State changed 
-> /org/bluez/9663/hci0/dev_AE_2D_CC_AA_BB_14: HEADSET_STATE_CONNECTED
-> -> HEADSET_STATE_DISCONNECTED
-
-There is no audio.conf in my /etc tree. The
-bluez-audio is configured here /etc/alsa/bluetooth.conf (attached).
-Tarball /etc/bluetooth is attached too. But, telephony-dummy is a2dp
-device ? Try with other a2dp (stereo) headphone. Maybe [1] can tell
-more. And try a simple "aplay -D bths foo.wav" for testing (where bths
-is your entry in ~/.aosundrc.
-
-[1] http://wiki.bluez.org/wiki/HOWTO/AudioDevices
-
-Have fun,
+diff --git a/plugins/hal.c b/plugins/hal.c
+index 5b7e4b2..6815f28 100644
+--- a/plugins/hal.c
++++ b/plugins/hal.c
+@@ -90,9 +90,9 @@ static void formfactor_reply(DBusPendingCall *call, void *user_data)
+ 	/* Computer major class */
+ 	debug("Setting 0x%06x for major/minor device class", (1 << 8) | minor);
+ 
+-	set_major_and_minor_class(dd, cls, 0x01, minor);
+-
+ 	hci_close_dev(dd);
++
++	set_major_and_minor_class(adapter, 0x01, minor);
+ }
+ 
+ static DBusConnection *connection;
+diff --git a/src/adapter.c b/src/adapter.c
+index 3fd0a9b..3d4769f 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -224,6 +224,73 @@ void clear_found_devices_list(struct btd_adapter *adapter)
+ 	adapter->found_devices = NULL;
+ }
+ 
++static int set_service_classes(struct btd_adapter *adapter, uint8_t value)
++{
++	struct hci_dev *dev = &adapter->dev;
++	const uint8_t *cls = dev->class;
++	uint32_t dev_class;
++	int dd, err;
++
++	if (cls[2] == value)
++		return 0; /* Already set */
++
++	dd = hci_open_dev(adapter->dev_id);
++	if (dd < 0) {
++		err = -errno;
++		error("Can't open device hci%d: %s (%d)",
++				adapter->dev_id, strerror(errno), errno);
++		return err;
++	}
++
++	dev_class = (value << 16) | (cls[1] << 8) | cls[0];
++
++	debug("Changing service classes to 0x%06x", dev_class);
++
++	if (hci_write_class_of_dev(dd, dev_class, HCI_REQ_TIMEOUT) < 0) {
++		err = -errno;
++		error("Can't write class of device: %s (%d)",
++						strerror(errno), errno);
++		hci_close_dev(dd);
++		return err;
++	}
++
++	hci_close_dev(dd);
++
++	return 0;
++}
++
++int set_major_and_minor_class(struct btd_adapter *adapter, uint8_t major, uint8_t minor)
++{
++	struct hci_dev *dev = &adapter->dev;
++	const uint8_t *cls = dev->class;
++	uint32_t dev_class;
++	int dd, err;
++
++	dd = hci_open_dev(adapter->dev_id);
++	if (dd < 0) {
++		err = -errno;
++		error("Can't open device hci%d: %s (%d)",
++				adapter->dev_id, strerror(errno), errno);
++		return err;
++	}
++
++	dev_class = (cls[2] << 16) | ((cls[1] & 0x20) << 8) |
++						((major & 0xdf) << 8) | minor;
++
++	debug("Changing major/minor class to 0x%06x", dev_class);
++
++	if (hci_write_class_of_dev(dd, dev_class, HCI_REQ_TIMEOUT) < 0) {
++		int err = -errno;
++		error("Can't write class of device: %s (%d)",
++						strerror(errno), errno);
++		hci_close_dev(dd);
++		return err;
++	}
++
++	hci_close_dev(dd);
++	return 0;
++}
++
+ int pending_remote_name_cancel(struct btd_adapter *adapter)
+ {
+ 	struct remote_dev_info *dev, match;
+@@ -744,15 +811,21 @@ static DBusMessage *set_pairable_timeout(DBusConnection *conn,
+ 	return dbus_message_new_method_return(msg);
+ }
+ 
+-static void update_ext_inquiry_response(int dd, struct hci_dev *dev)
++static void update_ext_inquiry_response(struct btd_adapter *adapter)
+ {
+ 	uint8_t fec = 0, data[240];
++	struct hci_dev *dev = &adapter->dev;
++	int dd;
+ 
+ 	if (!(dev->features[6] & LMP_EXT_INQ))
+ 		return;
+ 
+ 	memset(data, 0, sizeof(data));
+ 
++	dd = hci_open_dev(adapter->dev_id);
++	if (dd < 0)
++		return;
++
+ 	if (dev->ssp_mode > 0)
+ 		create_ext_inquiry_response((char *) dev->name, data);
+ 
+@@ -760,12 +833,13 @@ static void update_ext_inquiry_response(int dd, struct hci_dev *dev)
+ 						HCI_REQ_TIMEOUT) < 0)
+ 		error("Can't write extended inquiry response: %s (%d)",
+ 						strerror(errno), errno);
++
++	hci_close_dev(dd);
+ }
+ 
+ void adapter_name_changed(struct btd_adapter *adapter, const char *name)
+ {
+ 	struct hci_dev *dev = &adapter->dev;
+-	int dd;
+ 
+ 	if (strncmp(name, (char *) dev->name, MAX_NAME_LENGTH) == 0)
+ 		return;
+@@ -774,11 +848,7 @@ void adapter_name_changed(struct btd_adapter *adapter, const char *name)
+ 
+ 	strncpy((char *) dev->name, name, MAX_NAME_LENGTH);
+ 
+-	dd = hci_open_dev(adapter->dev_id);
+-	if (dd >= 0) {
+-		update_ext_inquiry_response(dd, dev);
+-		hci_close_dev(dd);
+-	}
++	update_ext_inquiry_response(adapter);
+ 
+ 	emit_property_changed(connection, adapter->path, ADAPTER_INTERFACE,
+ 				"Name", DBUS_TYPE_STRING, &name);
+@@ -812,10 +882,10 @@ static int adapter_set_name(struct btd_adapter *adapter, const char *name)
+ 		return err;
+ 	}
+ 
+-	update_ext_inquiry_response(dd, dev);
+-
+ 	hci_close_dev(dd);
+ 
++	update_ext_inquiry_response(adapter);
++
+ 	return 0;
+ }
+ 
+@@ -1664,14 +1734,22 @@ static int adapter_read_bdaddr(uint16_t dev_id, bdaddr_t *bdaddr)
+ 	return 0;
+ }
+ 
+-static int adapter_setup(struct btd_adapter *adapter, int dd)
++static int adapter_setup(struct btd_adapter *adapter)
+ {
+ 	struct hci_dev *dev = &adapter->dev;
+ 	uint8_t events[8] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0x1f, 0x00, 0x00 };
+ 	uint8_t inqmode;
+-	int err;
++	int err , dd;
+ 	char name[MAX_NAME_LENGTH + 1];
+ 
++	dd = hci_open_dev(adapter->dev_id);
++	if (dd < 0) {
++		err = -errno;
++		error("Can't open device hci%d: %s (%d)",
++					adapter->dev_id, strerror(errno), errno);
++		return err;
++	}
++
+ 	if (dev->lmp_ver > 1) {
+ 		if (dev->features[5] & LMP_SNIFF_SUBR)
+ 			events[5] |= 0x20;
+@@ -1710,11 +1788,11 @@ static int adapter_setup(struct btd_adapter *adapter, int dd)
+ 		hci_write_local_name(dd, name, HCI_REQ_TIMEOUT);
+ 	}
+ 
+-	update_ext_inquiry_response(dd, dev);
++	update_ext_inquiry_response(adapter);
+ 
+ 	inqmode = get_inquiry_mode(dev);
+ 	if (inqmode < 1)
+-		return 0;
++		goto done;
+ 
+ 	if (hci_write_inquiry_mode(dd, inqmode, HCI_REQ_TIMEOUT) < 0) {
+ 		err = -errno;
+@@ -1724,6 +1802,8 @@ static int adapter_setup(struct btd_adapter *adapter, int dd)
+ 		return err;
+ 	}
+ 
++done:
++	hci_close_dev(dd);
+ 	return 0;
+ }
+ 
+@@ -2068,10 +2148,10 @@ int adapter_start(struct btd_adapter *adapter)
+ setup:
+ 	hci_send_cmd(dd, OGF_LINK_POLICY, OCF_READ_DEFAULT_LINK_POLICY,
+ 								0, NULL);
+-
+-	adapter_setup(adapter, dd);
+ 	hci_close_dev(dd);
+ 
++	adapter_setup(adapter);
++
+ 	if (!adapter->initialized && adapter->already_up) {
+ 		debug("Stopping Inquiry at adapter startup");
+ 		adapter_ops->stop_discovery(adapter->dev_id);
+@@ -2182,7 +2262,6 @@ int adapter_stop(struct btd_adapter *adapter)
+ int adapter_update(struct btd_adapter *adapter, uint8_t new_svc)
+ {
+ 	struct hci_dev *dev = &adapter->dev;
+-	int dd;
+ 	uint8_t svclass;
+ 
+ 	if (dev->ignore)
+@@ -2198,20 +2277,10 @@ int adapter_update(struct btd_adapter *adapter, uint8_t new_svc)
+ 	else
+ 		svclass = adapter->svc_cache;
+ 
+-	dd = hci_open_dev(adapter->dev_id);
+-	if (dd < 0) {
+-		int err = -errno;
+-		error("Can't open adapter %s: %s (%d)",
+-					adapter->path, strerror(errno), errno);
+-		return err;
+-	}
+-
+ 	if (svclass)
+-		set_service_classes(dd, adapter->dev.class, svclass);
+-
+-	update_ext_inquiry_response(dd, dev);
++		set_service_classes(adapter, svclass);
+ 
+-	hci_close_dev(dd);
++	update_ext_inquiry_response(adapter);
+ 
+ 	return 0;
+ }
+@@ -2248,15 +2317,13 @@ int adapter_set_class(struct btd_adapter *adapter, uint8_t *cls)
+ 	return 0;
+ }
+ 
+-int adapter_update_ssp_mode(struct btd_adapter *adapter, int dd, uint8_t mode)
++int adapter_update_ssp_mode(struct btd_adapter *adapter, uint8_t mode)
+ {
+ 	struct hci_dev *dev = &adapter->dev;
+ 
+ 	dev->ssp_mode = mode;
+ 
+-	update_ext_inquiry_response(dd, dev);
+-
+-	hci_close_dev(dd);
++	update_ext_inquiry_response(adapter);
+ 
+ 	return 0;
+ }
+diff --git a/src/adapter.h b/src/adapter.h
+index ff599da..b4a3989 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -81,7 +81,7 @@ int adapter_get_class(struct btd_adapter *adapter, uint8_t *cls);
+ 
+ int adapter_set_class(struct btd_adapter *adapter, uint8_t *cls);
+ 
+-int adapter_update_ssp_mode(struct btd_adapter *adapter, int dd, uint8_t mode);
++int adapter_update_ssp_mode(struct btd_adapter *adapter, uint8_t mode);
+ 
+ struct btd_device *adapter_get_device(DBusConnection *conn,
+ 				struct btd_adapter *adapter, const char *address);
+@@ -131,6 +131,9 @@ gboolean adapter_has_discov_sessions(struct btd_adapter *adapter);
+ 
+ struct btd_adapter *btd_adapter_ref(struct btd_adapter *adapter);
+ void btd_adapter_unref(struct btd_adapter *adapter);
++int set_major_and_minor_class(struct btd_adapter *adapter,
++						uint8_t major, uint8_t minor);
++
+ 
+ struct btd_adapter_driver {
+ 	const char *name;
+diff --git a/src/dbus-hci.c b/src/dbus-hci.c
+index bd5200f..1e6ec43 100644
+--- a/src/dbus-hci.c
++++ b/src/dbus-hci.c
+@@ -725,47 +725,6 @@ void hcid_dbus_disconn_complete(bdaddr_t *local, uint8_t status,
+ 	adapter_remove_connection(adapter, device, handle);
+ }
+ 
+-int set_service_classes(int dd, const uint8_t *cls, uint8_t value)
+-{
+-	uint32_t dev_class;
+-
+-	if (cls[2] == value)
+-		return 0; /* Already set */
+-
+-	dev_class = (value << 16) | (cls[1] << 8) | cls[0];
+-
+-	debug("Changing service classes to 0x%06x", dev_class);
+-
+-	if (hci_write_class_of_dev(dd, dev_class, HCI_REQ_TIMEOUT) < 0) {
+-		int err = -errno;
+-		error("Can't write class of device: %s (%d)",
+-						strerror(errno), errno);
+-		return err;
+-	}
+-
+-	return 0;
+-}
+-
+-int set_major_and_minor_class(int dd, const uint8_t *cls,
+-						uint8_t major, uint8_t minor)
+-{
+-	uint32_t dev_class;
+-
+-	dev_class = (cls[2] << 16) | ((cls[1] & 0x20) << 8) |
+-						((major & 0xdf) << 8) | minor;
+-
+-	debug("Changing major/minor class to 0x%06x", dev_class);
+-
+-	if (hci_write_class_of_dev(dd, dev_class, HCI_REQ_TIMEOUT) < 0) {
+-		int err = -errno;
+-		error("Can't write class of device: %s (%d)",
+-						strerror(errno), errno);
+-		return err;
+-	}
+-
+-	return 0;
+-}
+-
+ /* Section reserved to device HCI callbacks */
+ 
+ void hcid_dbus_setname_complete(bdaddr_t *local)
+@@ -930,9 +889,9 @@ void hcid_dbus_write_simple_pairing_mode_complete(bdaddr_t *local)
+ 		return;
+ 	}
+ 
+-	adapter_update_ssp_mode(adapter, dd, mode);
+-
+ 	hci_close_dev(dd);
++
++	adapter_update_ssp_mode(adapter, mode);
+ }
+ 
+ int hcid_dbus_get_io_cap(bdaddr_t *local, bdaddr_t *remote,
+diff --git a/src/dbus-hci.h b/src/dbus-hci.h
+index ff8961a..d6d9a11 100644
+--- a/src/dbus-hci.h
++++ b/src/dbus-hci.h
+@@ -47,10 +47,6 @@ int hcid_dbus_link_key_notify(bdaddr_t *local, bdaddr_t *peer,
+ 
+ DBusMessage *new_authentication_return(DBusMessage *msg, uint8_t status);
+ 
+-int set_service_classes(int dd, const uint8_t *cls, uint8_t value);
+-int set_major_and_minor_class(int dd, const uint8_t *cls,
+-						uint8_t major, uint8_t minor);
+-
+ const char *class_to_icon(uint32_t class);
+ 
+ void set_dbus_connection(DBusConnection *conn);
 -- 
-	-vlado
-	Vladimir Botka
+1.5.6.3
 
-
---MP_/t.2rn3KILq3PV3+h_aX/o6B
-Content-Type: application/octet-stream; name=bluetooth.conf
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename=bluetooth.conf
-
-IyBQbGVhc2Ugbm90ZSB0aGF0IHRoaXMgQUxTQSBjb25maWd1cmF0aW9uIGZpbGUgZnJhZ21lbnQg
-bmVlZHMgYmUgZW5hYmxlZCBpbgojIC9ldGMvYXNvdW5kLmNvbmYgb3IgYSBzaW1pbGFyIGNvbmZp
-Z3VyYXRpb24gZmlsZSB3aXRoIGRpcmVjdGl2ZXMgc2ltaWxhciB0bwojIHRoZSBmb2xsb3dpbmc6
-CiMKI0Bob29rcyBbCiMJewojCQlmdW5jIGxvYWQKIwkJZmlsZXMgWwojCQkJIi9ldGMvYWxzYS9i
-bHVldG9vdGguY29uZiIKIwkJXQojCQllcnJvcnMgZmFsc2UKIwl9CiNdCgpwY20ucmF3Ymx1ZXRv
-b3RoIHsKCUBhcmdzIFsgQUREUkVTUyBdCglAYXJncy5BRERSRVNTIHsKCQl0eXBlIHN0cmluZwoJ
-fQoJdHlwZSBibHVldG9vdGgKCWRldmljZSAkQUREUkVTUwp9CgpwY20uYmx1ZXRvb3RoIHsKCUBh
-cmdzIFsgQUREUkVTUyBdCglAYXJncy5BRERSRVNTIHsKCQl0eXBlIHN0cmluZwoJfQoJdHlwZSBw
-bHVnCglzbGF2ZSB7CgkJcGNtIHsKCQkJdHlwZSBibHVldG9vdGgKCQkJZGV2aWNlICRBRERSRVNT
-CgkJfQoJfQp9Cg==
-
---MP_/t.2rn3KILq3PV3+h_aX/o6B
-Content-Type: application/x-tar; name=etc-bluetooth.tar
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename=etc-bluetooth.tar
-
-ZXRjL2JsdWV0b290aC8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAwMDA3NTUAMDAwMDAw
-MAAwMDAwMDAwADAwMDAwMDAwMDAwADExMjIxMTUyMzA2ADAxMjMyNQAgNQAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB1c3RhciAgAHJvb3QAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAcm9vdAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABl
-dGMvYmx1ZXRvb3RoL21haW4uY29uZgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDAwMDY0NAAwMDAwMDAw
-ADAwMDAwMDAAMDAwMDAwMDM1NzUAMTEyMTc0NzUxMzUAMDE0MTQ3ACAwAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHVzdGFyICAAcm9vdAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAByb290AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFtH
-ZW5lcmFsXQoKIyBMaXN0IG9mIHBsdWdpbnMgdGhhdCBzaG91bGQgbm90IGJlIGxvYWRlZCBvbiBi
-bHVldG9vdGhkIHN0YXJ0dXAKI0Rpc2FibGVQbHVnaW5zID0gbmV0d29yayxpbnB1dAoKIyBEZWZh
-dWx0IGFkYXBlciBuYW1lCiMgJWggLSBzdWJzdGl0dXRlZCBmb3IgaG9zdG5hbWUKIyAlZCAtIHN1
-YnN0aXR1dGVkIGZvciBhZGFwdGVyIGlkCk5hbWUgPSAlaC0lZAoKIyBEZWZhdWx0IGRldmljZSBj
-bGFzcy4gT25seSB0aGUgbWFqb3IgYW5kIG1pbm9yIGRldmljZSBjbGFzcyBiaXRzIGFyZQojIGNv
-bnNpZGVyZWQuCkNsYXNzID0gMHgwMDAxMDAKCiMgSG93IGxvbmcgdG8gc3RheSBpbiBkaXNjb3Zl
-cmFibGUgbW9kZSBiZWZvcmUgZ29pbmcgYmFjayB0byBub24tZGlzY292ZXJhYmxlCiMgVGhlIHZh
-bHVlIGlzIGluIHNlY29uZHMuIERlZmF1bHQgaXMgMTgwLCBpLmUuIDMgbWludXRlcy4KIyAwID0g
-ZGlzYWJsZSB0aW1lciwgaS5lLiBzdGF5IGRpc2NvdmVyYWJsZSBmb3JldmVyCkRpc2NvdmVyYWJs
-ZVRpbWVvdXQgPSAwCgojIEhvdyBsb25nIHRvIHN0YXkgaW4gcGFpcmFibGUgbW9kZSBiZWZvcmUg
-Z29pbmcgYmFjayB0byBub24tZGlzY292ZXJhYmxlCiMgVGhlIHZhbHVlIGlzIGluIHNlY29uZHMu
-IERlZmF1bHQgaXMgMC4KIyAwID0gZGlzYWJsZSB0aW1lciwgaS5lLiBzdGF5IHBhaXJhYmxlIGZv
-cmV2ZXIKUGFpcmFibGVUaW1lb3V0ID0gMAoKIyBVc2Ugc29tZSBvdGhlciBwYWdlIHRpbWVvdXQg
-dGhhbiB0aGUgY29udHJvbGxlciBkZWZhdWx0IG9uZQojIHdoaWNoIGlzIDE2Mzg0ICgxMCBzZWNv
-bmRzKS4KUGFnZVRpbWVvdXQgPSA4MTkyCgojIERpc2NvdmVyIHNjaGVkdWxlciBpbnRlcnZhbCB1
-c2VkIGluIEFkYXB0ZXIuRGlzY292ZXJEZXZpY2VzCiMgVGhlIHZhbHVlIGlzIGluIHNlY29uZHMu
-IERlZmF1bHRzIGlzIDAgdG8gdXNlIGNvbnRyb2xsZXIgc2NoZWR1bGVyLgpEaXNjb3ZlclNjaGVk
-dWxlckludGVydmFsID0gMAoKIyBXaGF0IHZhbHVlIHNob3VsZCBiZSBhc3N1bWVkIGZvciB0aGUg
-YWRhcHRlciBQb3dlcmVkIHByb3BlcnR5IHdoZW4KIyBTZXRQcm9wZXJ0eShQb3dlcmVkLCAuLi4p
-IGhhc24ndCBiZWVuIGNhbGxlZCB5ZXQuIERlZmF1bHRzIHRvIHRydWUKSW5pdGlhbGx5UG93ZXJl
-ZCA9IHRydWUKCiMgUmVtZW1iZXIgdGhlIHByZXZpb3VzbHkgc3RvcmVkIFBvd2VyZWQgc3RhdGUg
-d2hlbiBpbml0aWFsaXppbmcgYWRhcHRlcnMKUmVtZW1iZXJQb3dlcmVkID0gdHJ1ZQoKIyBVc2Ug
-dmVuZG9yLCBwcm9kdWN0IGFuZCB2ZXJzaW9uIGluZm9ybWF0aW9uIGZvciBESUQgcHJvZmlsZSBz
-dXBwb3J0LgojIFRoZSB2YWx1ZXMgYXJlIHNlcGFyYXRlZCBieSAiOiIgYW5kIFZJRCwgUElEIGFu
-ZCB2ZXJzaW9uLgojRGV2aWNlSUQgPSAxMjM0OjU2Nzg6YWJjZAoKIyBEbyByZXZlcnNlIHNlcnZp
-Y2UgZGlzY292ZXJ5IGZvciBwcmV2aW91c2x5IHVua25vd24gZGV2aWNlcyB0aGF0IGNvbm5lY3Qg
-dG8KIyB1cy4gVGhpcyBvcHRpb24gaXMgcmVhbGx5IG9ubHkgbmVlZGVkIGZvciBxdWFsaWZpY2F0
-aW9uIHNpbmNlIHRoZSBCSVRFIHRlc3RlcgojIGRvZXNuJ3QgbGlrZSB1cyBkb2luZyByZXZlcnNl
-IFNEUCBmb3Igc29tZSB0ZXN0IGNhc2VzICh0aG91Z2ggdGhlcmUgY291bGQgaW4KIyB0aGVvcnkg
-YmUgb3RoZXIgdXNlZnVsIHB1cnBvc2VzIGZvciB0aGlzIHRvbykuIERlZmF1bHRzIHRvIHRydWUu
-ClJldmVyc2VTZXJ2aWNlRGlzY292ZXJ5ID0gdHJ1ZQoKIyBFbmFibGUgbmFtZSByZXNvbHZpbmcg
-YWZ0ZXIgaW5xdWlyeS4gU2V0IGl0IHRvICdmYWxzZScgaWYgeW91IGRvbid0IG5lZWQKIyByZW1v
-dGUgZGV2aWNlcyBuYW1lIGFuZCB3YW50IHNob3J0ZXIgZGlzY292ZXJ5IGN5Y2xlLiBEZWZhdWx0
-cyB0byAndHJ1ZScuCk5hbWVSZXNvbHZpbmcgPSB0cnVlCgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZXRjL2Js
-dWV0b290aC9yZmNvbW0uY29uZgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAwMDA2NDQAMDAwMDAwMAAwMDAw
-MDAwADAwMDAwMDAwNDUxADExMjE3NDc1MTQwADAxNDQ3MAAgMAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB1c3RhciAgAHJvb3QAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAcm9vdAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjCiMgUkZD
-T01NIGNvbmZpZ3VyYXRpb24gZmlsZS4KIwoKI3JmY29tbTAgewojCSMgQXV0b21hdGljYWxseSBi
-aW5kIHRoZSBkZXZpY2UgYXQgc3RhcnR1cAojCWJpbmQgbm87CiMKIwkjIEJsdWV0b290aCBhZGRy
-ZXNzIG9mIHRoZSBkZXZpY2UKIwlkZXZpY2UgMTE6MjI6MzM6NDQ6NTU6NjY7CiMKIwkjIFJGQ09N
-TSBjaGFubmVsIGZvciB0aGUgY29ubmVjdGlvbgojCWNoYW5uZWwJMTsKIwojCSMgRGVzY3JpcHRp
-b24gb2YgdGhlIGNvbm5lY3Rpb24KIwljb21tZW50ICJFeGFtcGxlIEJsdWV0b290aCBkZXZpY2Ui
-OwojfQoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGV0Yy9ibHVl
-dG9vdGgvcGFuLwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwMDAwNzU1ADAwMDAwMDAAMDAwMDAw
-MAAwMDAwMDAwMDAwMAAxMTE3MzY2NjQzMwAwMTMxMjQAIDUAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAdXN0YXIgIAByb290AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAHJvb3QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZXRjL2JsdWV0
-b290aC9wYW4vZGV2LXVwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAwMDA3NTUAMDAwMDAwMAAwMDAwMDAw
-ADAwMDAwMDAwMTUyADExMTczNjY2NDMzADAxNDI1MAAgMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAB1c3RhciAgAHJvb3QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAcm9vdAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjIS9iaW4vc2gK
-ZWNobyAxID4gL3Byb2Mvc3lzL25ldC9pcHY0L2lwX2ZvcndhcmQKaWZ1cCBibmVwMAojIHNsZWVw
-IDIKIyAvZXRjL2luaXQuZC9kaGNwMy1zZXJ2ZXIgcmVzdGFydAoKAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGV0Yy9ibHVldG9v
-dGgvbmV0d29yay5jb25mAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwMDAwNjQ0ADAwMDAwMDAAMDAwMDAwMAAw
-MDAwMDAwMDAyMQAxMTE3MzY2MzExNAAwMTQ2NzAAIDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAdXN0YXIgIAByb290AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AHJvb3QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIyBJbnRlcmZhY2U9
-cGFuMAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==
-
---MP_/t.2rn3KILq3PV3+h_aX/o6B--
