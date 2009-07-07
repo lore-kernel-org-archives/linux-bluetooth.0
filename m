@@ -1,13 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] make sure that PKG_CONFIG macros are defined
+Subject: Re: [PATCH] fix UDEV_DATADIR fallback if pkg-config fails
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Stefan Seyfried <seife@suse.de>
 Cc: BlueZ devel list <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <20090707102807.3f64f886@stoetzler>
-References: <20090707102807.3f64f886@stoetzler>
+In-Reply-To: <20090707095710.4ab1e03c@stoetzler>
+References: <20090707095710.4ab1e03c@stoetzler>
 Content-Type: text/plain
-Date: Tue, 07 Jul 2009 10:21:02 -0700
-Message-Id: <1246987262.3384.3.camel@localhost.localdomain>
+Date: Tue, 07 Jul 2009 10:18:44 -0700
+Message-Id: <1246987124.3384.2.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -15,24 +15,30 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 Hi Stefan,
 
 > ---
->  configure.ac |    2 ++
->  1 files changed, 2 insertions(+), 0 deletions(-)
+>  acinclude.m4 |    4 +++-
+>  1 files changed, 3 insertions(+), 1 deletions(-)
 > 
-> diff --git a/configure.ac b/configure.ac
-> index 8124c01..a08c972 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -8,6 +8,8 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+> diff --git a/acinclude.m4 b/acinclude.m4
+> index 48728e8..2018169 100644
+> --- a/acinclude.m4
+> +++ b/acinclude.m4
+> @@ -111,9 +111,11 @@ AC_DEFUN([AC_INIT_BLUEZ], [
+>  	AC_SUBST(CONFIGDIR, "${configdir}")
+>  	AC_SUBST(STORAGEDIR, "${storagedir}")
 >  
->  AM_MAINTAINER_MODE
->  
-> +PKG_PROG_PKG_CONFIG
-> +
->  AC_INIT_BLUEZ
->  
->  COMPILER_FLAGS
+> -	UDEV_DATADIR="`$PKG_CONFIG --variable=udevdir udev`/rules.d"
+> +	UDEV_DATADIR="`$PKG_CONFIG --variable=udevdir udev`"
+>  	if (test -z "${UDEV_DATADIR}"); then
+>  		UDEV_DATADIR="${sysconfdir}/udev/rules.d"
+> +	else
+> +		UDEV_DATADIR="${UDEV_DATADIR}/rules.d"
+>  	fi
+>  	AC_SUBST(UDEV_DATADIR)
+>  ])
 
-patch has been applied. Thanks.
+brown paper bag is one me :(
+
+Patch has been applied. Thanks.
 
 Regards
 
