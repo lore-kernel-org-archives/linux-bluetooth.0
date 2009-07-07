@@ -1,90 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 08 Jul 2009 10:36:09 +0900
-From: Chan-Yeol Park <chanyeol.park@samsung.com>
-Subject: RE: Does anybody know conn->power_save variable in hci_conn.c?
-In-reply-to: <1246988209.3384.10.camel@localhost.localdomain>
-To: 'Marcel Holtmann' <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Message-id: <004001c9ff6c$7838f7c0$68aae740$%park@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
-References: <002e01c9fedc$f5fcb790$e1f626b0$%park@samsung.com>
- <1246988209.3384.10.camel@localhost.localdomain>
+Subject: Re: [PATCH] Fix build with ./configure-bootstrap
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Stefan Seyfried <seife@suse.de>
+Cc: BlueZ devel list <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <20090707233939.5969cf7e@stoetzler>
+References: <20090707091325.38dec13a@stoetzler>
+	 <1246987312.3384.4.camel@localhost.localdomain>
+	 <20090707233939.5969cf7e@stoetzler>
+Content-Type: text/plain; charset="UTF-8"
+Date: Tue, 07 Jul 2009 15:54:08 -0700
+Message-Id: <1247007248.3384.24.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Stefan,
 
->> /*bluetooth kernel hci_conn.c */
->> 382 void hci_conn_enter_active_mode(struct hci_conn *conn)
->> 383 {
->> 384         struct hci_dev *hdev = conn->hdev;
->> 385
->> 386         BT_DBG("conn %p mode %d", conn, conn->mode);
->> 387
->> 388         if (test_bit(HCI_RAW, &hdev->flags))
->> 389                 return;
->> 390
->> 391         if (conn->mode != HCI_CM_SNIFF || !conn->power_save)
->> 392                 goto timer;
->> 393 
->> 394         if (!test_and_set_bit(HCI_CONN_MODE_CHANGE_PEND,
-&conn->pend)) {
->> 395                 struct hci_cp_exit_sniff_mode cp;
->> 396                 cp.handle = __cpu_to_le16(conn->handle);
->> 397                 hci_send_cmd(hdev, OGF_LINK_POLICY,
->> 398                                 OCF_EXIT_SNIFF_MODE, sizeof(cp),
-&cp);
->> 399         }
->> 400
->> 401 timer:
->> 402         if (hdev->idle_timeout > 0)
->> 403                 mod_timer(&conn->idle_timer,
->> 404                         jiffies +
-msecs_to_jiffies(hdev->idle_timeout));
->> 405 }
->> 406 
->> 
->> If possible, could you explain why this code checks !conn->power_save
-var.? 
->> 
->> Without this , if  conn->mode==HCI_CM_SNIFF , we simply exit sniff
->> mode,"OCF_EXIT_SNIFF_MODE".
->> 
->> As far as I understood, whenever conn->mode is HCI_CM_SNIFF
-conn->power_save
->> is 0.
->> The reason is that  hci_mode_change_evt() set conn->power_save as "0"
-when
->> conn->mode !=HCI_CM_ACTIVE.
->> 
->> Consequently we don't need to check that variable.
->
->we do need that variable, because otherwise devices like HID which do
->active sniff mode management fall over if we always try to exit sniff
->mode only for a few bytes.
+> > > hciops.c: In function ‘hciops_exit’:
+> > > hciops.c:728: error: call to function ‘btd_adapter_cleanup_ops’
+> > >               without a real prototype
+> > > ---
+> > >  plugins/hciops.c |    2 +-
+> > >  1 files changed, 1 insertions(+), 1 deletions(-)
+> > > 
+> > > diff --git a/plugins/hciops.c b/plugins/hciops.c
+> > > index 659f754..6baed76 100644
+> > > --- a/plugins/hciops.c
+> > > +++ b/plugins/hciops.c
+> > > @@ -725,7 +725,7 @@ static int hciops_init(void)
+> > >  }
+> > >  static void hciops_exit(void)
+> > >  {
+> > > -	btd_adapter_cleanup_ops(&hci_ops);
+> > > +	btd_adapter_cleanup_ops();
+> > >  }
+> > >  
+> > >  BLUETOOTH_PLUGIN_DEFINE(hciops, VERSION,
+> > 
+> > the subject is not matching the patch and I have no idea what is going
+> > on here. I leave this to Johan or Alok to look at.
+> 
+> The build fails, because of this warning:
+> 
+> make[3]: Entering directory `/local/seife/src/git-repos/bluez-git/plugins'
+>   CC     libbuiltin_la-service.lo
+>   CC     libbuiltin_la-hciops.lo
+> cc1: warnings being treated as errors
+> hciops.c: In function ‘hciops_exit’:
+> hciops.c:728: error: call to function ‘btd_adapter_cleanup_ops’ without a real prototype
+> ../src/adapter.h:174: note: ‘btd_adapter_cleanup_ops’ was declared here
+> 
+> The hci_ops are not used by btd_adapter_cleanup_ops (it takes no
+> parameter), so I guessed that the above would be a valid fix.
+> 
+> It is certainly a good idea to have this reviewed by someone who
+> actually knows the code (I don't ;)
 
-In case of HID, active sniff mode could be no problem 
-because its data rate is light compared to other profile.
+we fixed it now with bluez-4.45 release, but your patch was actually
+wrong. The problems with the prototype with no argument list. Bad C
+programming and bad that it slipped through our review.
 
-But other case such as Sony Ericsson HBH-DS970,980 A2DP profile , it could
-be problem.
-As you may already know, 
-they request sniff mode while HFP so their connection is too late...
-It made AVDTP signal so slow..
-
-Without conn->power_save variable check procedure, I found Sony Headset
-works well! because they exit sniff mode 
-Consequently, I think conn->power_save variable procedure should be removed
-except only HID case.
-
-If you think this is totally Sony headset problem, could you explain that?
-
-Please comment my idea. 
- 
 Regards
-Chanyeol
 
-
+Marcel
 
 
