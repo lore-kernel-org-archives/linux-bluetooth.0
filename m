@@ -1,30 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Nick Pelly <npelly@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Nick Pelly <npelly@google.com>
-Subject: [PATCH] Add chipset id for brf6350.
-Date: Wed,  8 Jul 2009 16:51:35 -0700
-Message-Id: <1247097095-17136-1-git-send-email-npelly@google.com>
+MIME-Version: 1.0
+In-Reply-To: <44EE5C37ADC36343B0625A05DD408C485068EDD151@CHEXMB-01.global.atheros.com>
+References: <44EE5C37ADC36343B0625A05DD408C485068EDD151@CHEXMB-01.global.atheros.com>
+Date: Wed, 8 Jul 2009 16:43:10 -0300
+Message-ID: <2d5a2c100907081243n27574598k143d2d568018492b@mail.gmail.com>
+Subject: Re: A2DP issue with latest BlueZ in Ubuntu 9.04
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Jothikumar Mothilal <Jothikumar.Mothilal@atheros.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- tools/hciattach_tialt.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+Hi,
 
-diff --git a/tools/hciattach_tialt.c b/tools/hciattach_tialt.c
-index 72633ad..dcd3de4 100644
---- a/tools/hciattach_tialt.c
-+++ b/tools/hciattach_tialt.c
-@@ -245,7 +245,7 @@ int texasalt_init(int fd, int speed, struct termios *ti)
- 			"brf6100",
- 			"brf6150",
- 			"brf6300",
--			"unknown",
-+			"brf6350",
- 			"unknown",
- 			"wl1271"
- 		};
+On Wed, Jul 8, 2009 at 11:32 AM, Jothikumar
+Mothilal<Jothikumar.Mothilal@atheros.com> wrote:
+> I have upgraded the BlueZ version 4.44 in the same setup by manual compile.
+> A2DP not working...and found following line in bluetoothd daemon output
+>
+> "bluetoothd[17495]: Invalid seid 0"
+
+First check if you are installing alsa plugin correctly then run
+bluetoothd with -dn so we can check what is going wrong on.
+
 -- 
-1.6.3.1
-
+Luiz Augusto von Dentz
+Engenheiro de Computação
