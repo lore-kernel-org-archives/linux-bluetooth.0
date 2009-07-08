@@ -1,68 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: RE: udev rule bluetooth.rules
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: John Frankish <j-frankish@slb.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1246970189.2035.2.camel@snoogens.fab.redhat.com>
-References: <6AC5A55546F64545AE996F8200E3AC4E06CCC1A4@NL0105EXC01V01.eur.slb.com>
-	 <20090705133259.1bb7bad7@stoetzler>
-	 <6AC5A55546F64545AE996F8200E3AC4E06CCC380@NL0105EXC01V01.eur.slb.com>
-	 <6AC5A55546F64545AE996F8200E3AC4E06CCC77E@NL0105EXC01V01.eur.slb.com>
-	 <1246901496.12994.232.camel@localhost.localdomain>
-	 <1246970189.2035.2.camel@snoogens.fab.redhat.com>
-Content-Type: text/plain
-Date: Wed, 08 Jul 2009 11:26:10 -0700
-Message-Id: <1247077570.9709.0.camel@localhost.localdomain>
-Mime-Version: 1.0
+From: alokbarsode@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Cc: Alok Barsode <alok.barsode@azingo.com>
+Subject: [PATCH 2/2] Adding read_name to hciops plugin.
+Date: Wed,  8 Jul 2009 21:31:29 +0530
+Message-Id: <1247068889-7116-2-git-send-email-alok.barsode@azingo.com>
+In-Reply-To: <1247068889-7116-1-git-send-email-alok.barsode@azingo.com>
+References: <1247068889-7116-1-git-send-email-alok.barsode@azingo.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+From: Alok Barsode <alok.barsode@azingo.com>
 
-> > > > Ref bluez-4.43 /etc/udev/bluetooth.rules:
-> > > >
-> > > > # Run helper every time a Bluetooth device appears
-> > > > # On remove actions, bluetoothd should go away by itself
-> > > > ACTION=="add", SUBSYSTEM=="bluetooth", RUN+="/usr/sbin/bluetoothd
-> > > > --udev"
-> > > >
-> > > > Shouldn't this be of the format /etc/udev/rules.d/xx-bluetooth.rules
-> > > > so that it starts in the correct order - i.e. after dbus?
-> > > 
-> > > That's taken care of - if dbus is not available, bluetoothd will exit
-> > > with return code 1. udev will notice that and later start it again in
-> > > the coldplug run.
-> > > 
-> > > > if dbus is not started, I need to do this:
-> > > > # udevtrigger --subsystem-match=bluetooth
-> > > > is this is what was meant by "coldplug run"?
-> > > --
-> > > Thanks - I'd been playing around with this as /etc/udev/rules.d/85-bluetooth.rules but hadn't got around to trying without dbus started - it works for me with dbus started.
-> > > 
-> > > It would be nice if "--prefix=/usr/local" were passed to bluetooth.rules to give:
-> > > 
-> > > ACTION=="add", SUBSYSTEM=="bluetooth", RUN+="/usr/local/sbin/bluetoothd
-> > 
-> > I fixed that now and we generate bluetooth.rules with the correct
-> > prefix.
-> 
-> The UDEV_DATADIR code is broken:
-> 
-> 
-> 114         UDEV_DATADIR="`$PKG_CONFIG --variable=udevdir udev`/rules.d"
-> 115         if (test -z "${UDEV_DATADIR}"); then
-> 116                 UDEV_DATADIR="${sysconfdir}/udev/rules.d"
-> 117         fi
-> 
-> UDEV_DATADIR will never be empty, because it will contain at least
-> "/rules.d".
+---
+ plugins/hciops.c |   19 +++++++++++++++++++
+ src/adapter.c    |   13 +++----------
+ src/adapter.h    |    1 +
+ 3 files changed, 23 insertions(+), 10 deletions(-)
 
-fixed with bluez-4.45 release. Thanks for reminding me about a
-brown-paper-bag ;)
-
-Regards
-
-Marcel
-
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index 858a346..7a6ff42 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -704,6 +704,24 @@ static int hciops_change_name(int index, const char *name)
+ 	return err;
+ }
+ 
++static int hciops_read_name(int index)
++{
++	int dd, err = 0;
++
++	dd = hci_open_dev(index);
++	if (dd < 0)
++		return -EIO;
++
++	err = hci_send_cmd(dd, OGF_HOST_CTL, OCF_READ_LOCAL_NAME, 0, 0);
++
++	if (err < 0)
++		err = -errno;
++
++	hci_close_dev(dd);
++
++	return err;
++}
++
+ static int hciops_cancel_resolve_name(int index, bdaddr_t *bdaddr)
+ {
+ 	remote_name_req_cancel_cp cp;
+@@ -740,6 +758,7 @@ static struct btd_adapter_ops hci_ops = {
+ 	.resolve_name = hciops_resolve_name,
+ 	.cancel_resolve_name = hciops_cancel_resolve_name,
+ 	.change_name = hciops_change_name,
++	.read_name = hciops_read_name,
+ };
+ 
+ static int hciops_init(void)
+diff --git a/src/adapter.c b/src/adapter.c
+index 9569f2a..37f4495 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -877,7 +877,7 @@ void adapter_update_local_name(bdaddr_t *bdaddr, uint8_t status, void *ptr)
+ void adapter_setname_complete(bdaddr_t *local, uint8_t status)
+ {
+ 	struct btd_adapter *adapter;
+-	int dd, err;
++	int err;
+ 
+ 	if (status)
+ 		return;
+@@ -888,18 +888,11 @@ void adapter_setname_complete(bdaddr_t *local, uint8_t status)
+ 		return;
+ 	}
+ 
+-	dd = hci_open_dev(adapter->dev_id);
+-	if (dd < 0) {
+-		error("HCI device open failed: hci%d", adapter->dev_id);
+-		return;
+-	}
+-
+-	err = hci_send_cmd(dd, OGF_HOST_CTL, OCF_READ_LOCAL_NAME, 0, 0);
++	err = adapter_ops->read_name(adapter->dev_id);
+ 	if (err < 0)
+ 		error("Sending getting name command failed: %s (%d)",
+ 						strerror(errno), errno);
+ 
+-	hci_close_dev(dd);
+ }
+ 
+ static DBusMessage *set_name(DBusConnection *conn, DBusMessage *msg,
+@@ -2132,7 +2125,7 @@ int adapter_start(struct btd_adapter *adapter)
+ 		return err;
+ 	}
+ 
+-	hci_send_cmd(dd, OGF_HOST_CTL, OCF_READ_LOCAL_NAME, 0, 0);
++	adapter_ops->read_name(adapter->dev_id);
+ 
+ 	if (!(features[6] & LMP_SIMPLE_PAIR))
+ 		goto setup;
+diff --git a/src/adapter.h b/src/adapter.h
+index eb513fb..65dafef 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -174,6 +174,7 @@ struct btd_adapter_ops {
+ 	int (*resolve_name) (int index, bdaddr_t *bdaddr);
+ 	int (*cancel_resolve_name) (int index, bdaddr_t *bdaddr);
+ 	int (*change_name) (int index, const char *name);
++	int (*read_name) (int index);
+ };
+ 
+ int btd_register_adapter_ops(struct btd_adapter_ops *btd_adapter_ops);
+-- 
+1.5.6.3
 
