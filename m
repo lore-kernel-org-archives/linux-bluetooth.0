@@ -1,24 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 09 Jul 2009 11:14:38 +0900
-From: Chan-Yeol Park <chanyeol.park@samsung.com>
-Subject: Could I ask you about Bluetooth 3.0 +HS with BlueZ ?
-To: 'Marcel Holtmann' <marcel@holtmann.org>
+Subject: Re: [PATCH] Add chipset id for brf6350.
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Nick Pelly <npelly@google.com>
 Cc: linux-bluetooth@vger.kernel.org
-Message-id: <000001ca003b$03063790$0912a6b0$%park@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+In-Reply-To: <1247097095-17136-1-git-send-email-npelly@google.com>
+References: <1247097095-17136-1-git-send-email-npelly@google.com>
+Content-Type: text/plain
+Date: Wed, 08 Jul 2009 18:26:24 -0700
+Message-Id: <1247102784.9709.17.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Nick,
 
-Recently Bluetooth SIG has announced "Bluetooth 3.0 + HS which include
-WiFi."
+> ---
+>  tools/hciattach_tialt.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
-As far as I know, there is AMP(Alternate Mac/Phy) Layer on the L2CAP Layer..
+patch has been applied. Thanks.
 
-So I think we should develop additional layer for the newly made spec.
+Regards
 
-Related to this issue, comments would be appreciated.
+Marcel
 
-Regards 
-Chanyeol
+
