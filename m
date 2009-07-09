@@ -1,56 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Thu, 9 Jul 2009 14:08:28 +0530
-Subject: RE: A2DP issue with latest BlueZ in Ubuntu 9.04
-Message-ID: <44EE5C37ADC36343B0625A05DD408C485068EDD268@CHEXMB-01.global.atheros.com>
-References: <44EE5C37ADC36343B0625A05DD408C485068EDD151@CHEXMB-01.global.atheros.com>
- <20090709070808.GA11972@jh-x301>
-In-Reply-To: <20090709070808.GA11972@jh-x301>
-Content-Type: text/plain; charset="us-ascii"
+Message-ID: <4A55A39F.50307@powercraft.nl>
+Date: Thu, 09 Jul 2009 10:00:31 +0200
+From: Jelle de Jong <jelledejong@powercraft.nl>
 MIME-Version: 1.0
+To: Iain Hibbert <plunky@rya-online.net>
+CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	BlueZ devel list <linux-bluetooth@vger.kernel.org>
+Subject: Re: Feature request: boolean properties to auto reconnect list of
+  MAC's at daemon start up
+References: <4A4F39E8.4020908@powercraft.nl>  <20090704135747.05efc95c@stoetzler> <2d5a2c100907040637s73791batd85327f31cb4f1ee@mail.gmail.com> <1246716212.336777.600.nullmailer@galant.ukfsn.org>
+In-Reply-To: <1246716212.336777.600.nullmailer@galant.ukfsn.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Iain Hibbert schreef:
+> On Sat, 4 Jul 2009, Luiz Augusto von Dentz wrote:
+> 
+>>> IIUC that's just how bluetooth input devices work: they do connect to
+>>> the host - not the other way round. So it is really a problem that
+>>> cannot be solved on bluez' side.
+>> Yep, most hid devices will just refuse the connection if the 'virtual
+>> cable plug' was already stabilised, in general this is also a bad idea
+>> for any connection attempt during the startup as we have no guarantee
+>> that the connection will complete.
+> 
+> see HIDNormallyConnectable attribute in the HID spec (7.11.13)
+> 
+> I certainly find with my Apple bluetooth keyboard and mouse that the host
+> OS (not using BlueZ btw) can connect to them at boot without my
+> intervention.
+> 
+> iain
 
+Thanks you for providing this information it helps to see that apple
+does provide this behavior for usability to its users. Would a developer
+be willing to investigate this feature and place this on his/her to do list?
 
------Original Message-----
-From: Johan Hedberg [mailto:johan.hedberg@gmail.com]
-Sent: 09 July 2009 12:38
-To: Jothikumar Mothilal
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: A2DP issue with latest BlueZ in Ubuntu 9.04
+Thanks in advance,
 
-Hi Jothi,
-
-On Wed, Jul 08, 2009, Jothikumar Mothilal wrote:
-> I am able to hear songs properly using mplayer.
->
-> I have upgraded the BlueZ version 4.44 in the same setup by manual compile.
-> A2DP not working...and found following line in bluetoothd daemon output
->
-> "bluetoothd[17495]: Invalid seid 0"
->
-> Pairing is ok. Mplayer throws an error message.
->
-> I am not able to track what is the issue.
-> Any once faces such issue? Let me know how to fix this issue.
-
-The "Invalid seid" message is coming from audio/unix.c. The value is
-indeed invalid (since in the hcidump your headset reports to have SEID 1
-and 6 and bluetoothd configures a stream to SEID 1) and it is being sent
-by the UNIX socket client (i.e. your alsa player) to bluetoothd.
-
-The reason why your player is sending invalid data to bluetoothd could be
-that you're using an old version of the bluetooth alsa plugin with a new
-version of bluez. To fix this make sure that you don't have any old
-libasound_module_pcm_bluetooth.so lying around in /usr/lib/alsa-lib or
-/usr/local/lib/alsa-lib and install the new version there instead.
-
-Johan
-
-Hi,
-I installed latest alsa library and tried. Same behavior found.
-
--- Jothi
+Jelle
