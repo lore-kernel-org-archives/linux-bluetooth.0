@@ -1,355 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-From: alokbarsode@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Alok Barsode <alok.barsode@azingo.com>
-Subject: [PATCH 1/2] Adding set_name to hciops plugin.
-Date: Fri, 10 Jul 2009 15:16:00 +0530
-Message-Id: <1247219161-7917-1-git-send-email-alok.barsode@azingo.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <35c90d960907061155t7349cc90p2e58a09a310b8926@mail.gmail.com>
+References: <35c90d960905191820g4e3ee434hfd0060815540a4e0@mail.gmail.com>
+	<1242787757.3147.13.camel@localhost.localdomain> <35c90d960905201457i508c678fqeb696cce32ae63be@mail.gmail.com>
+	<35c90d960907061155t7349cc90p2e58a09a310b8926@mail.gmail.com>
+From: Nick Pelly <npelly@google.com>
+Date: Thu, 9 Jul 2009 12:37:49 -0700
+Message-ID: <35c90d960907091237o72228b0v57ad2556d77f4857@mail.gmail.com>
+Subject: Re: bug? kernel does not send HCI Create Connection Cancel Command on
+	shutdown() or close() of a connecting rfcomm socket
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=001636427084d87b6a046e4afe5a
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Alok Barsode <alok.barsode@azingo.com>
+--001636427084d87b6a046e4afe5a
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
----
- plugins/hciops.c |   23 ++++++++++++
- src/adapter.c    |  105 ++++++++++++++++++++++++++++--------------------------
- src/adapter.h    |    5 ++-
- src/dbus-hci.c   |   47 ------------------------
- src/dbus-hci.h   |    1 -
- src/security.c   |    6 +++-
- 6 files changed, 86 insertions(+), 101 deletions(-)
+For the RFCOMM issue.
 
-diff --git a/plugins/hciops.c b/plugins/hciops.c
-index 659f754..7f63a49 100644
---- a/plugins/hciops.c
-+++ b/plugins/hciops.c
-@@ -682,6 +682,28 @@ static int hciops_resolve_name(int index, bdaddr_t *bdaddr)
- 	return err;
- }
- 
-+static int hciops_set_name(int index, const char *name)
-+{
-+	change_local_name_cp cp;
-+	int dd, err = 0;
-+
-+	dd = hci_open_dev(index);
-+	if (dd < 0)
-+		return -EIO;
-+
-+	memset(&cp, 0, sizeof(cp));
-+	strncpy((char *) cp.name, name, sizeof(cp.name));
-+
-+	err = hci_send_cmd(dd, OGF_HOST_CTL, OCF_CHANGE_LOCAL_NAME,
-+					CHANGE_LOCAL_NAME_CP_SIZE, &cp);
-+	if (err < 0)
-+		err = -errno;
-+
-+	hci_close_dev(dd);
-+
-+	return err;
-+}
-+
- static int hciops_cancel_resolve_name(int index, bdaddr_t *bdaddr)
- {
- 	remote_name_req_cancel_cp cp;
-@@ -717,6 +739,7 @@ static struct btd_adapter_ops hci_ops = {
- 	.stop_discovery = hciops_stop_discovery,
- 	.resolve_name = hciops_resolve_name,
- 	.cancel_resolve_name = hciops_cancel_resolve_name,
-+	.set_name = hciops_set_name,
- };
- 
- static int hciops_init(void)
-diff --git a/src/adapter.c b/src/adapter.c
-index 289f1f3..4b94ed8 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -838,76 +838,93 @@ static void update_ext_inquiry_response(struct btd_adapter *adapter)
- 	hci_close_dev(dd);
- }
- 
--void adapter_name_changed(struct btd_adapter *adapter, const char *name)
-+void adapter_update_local_name(bdaddr_t *bdaddr, uint8_t status, void *ptr)
- {
--	struct hci_dev *dev = &adapter->dev;
-+	read_local_name_rp rp;
-+	struct hci_dev *dev;
-+	struct btd_adapter *adapter;
-+	gchar *name;
- 
--	if (strncmp(name, (char *) dev->name, MAX_NAME_LENGTH) == 0)
-+	if (status)
-+		return;
-+
-+	adapter = manager_find_adapter(bdaddr);
-+	if (!adapter) {
-+		error("Unable to find matching adapter");
- 		return;
-+	}
- 
--	write_local_name(&adapter->bdaddr, (char *) name);
-+	dev = &adapter->dev;
- 
--	strncpy((char *) dev->name, name, MAX_NAME_LENGTH);
-+	memcpy(&rp, ptr, MAX_NAME_LENGTH);
-+	if (strncmp((char *) rp.name, (char *) dev->name, MAX_NAME_LENGTH) == 0)
-+		return;
-+
-+	strncpy((char *) dev->name, (char *) rp.name, MAX_NAME_LENGTH);
-+
-+	write_local_name(bdaddr, (char *) dev->name);
- 
- 	update_ext_inquiry_response(adapter);
- 
--	emit_property_changed(connection, adapter->path, ADAPTER_INTERFACE,
-+	name = g_strdup((char *) dev->name);
-+
-+	if (connection)
-+		emit_property_changed(connection, adapter->path, ADAPTER_INTERFACE,
- 				"Name", DBUS_TYPE_STRING, &name);
-+	g_free(name);
- }
- 
--static int adapter_set_name(struct btd_adapter *adapter, const char *name)
-+void adapter_setname_complete(bdaddr_t *local, uint8_t status)
- {
--	struct hci_dev *dev = &adapter->dev;
-+	struct btd_adapter *adapter;
- 	int dd, err;
- 
--	write_local_name(&adapter->bdaddr, (char *) name);
--
--	strncpy((char *) dev->name, name, MAX_NAME_LENGTH);
-+	if (status)
-+		return;
- 
--	if (!adapter->up)
--		return 0;
-+	adapter = manager_find_adapter(local);
-+	if (!adapter) {
-+		error("No matching adapter found");
-+		return;
-+	}
- 
- 	dd = hci_open_dev(adapter->dev_id);
- 	if (dd < 0) {
--		err = -errno;
--		error("Can't open device hci%d: %s (%d)",
--				adapter->dev_id, strerror(errno), errno);
--		return err;
-+		error("HCI device open failed: hci%d", adapter->dev_id);
-+		return;
- 	}
- 
--	if (hci_write_local_name(dd, name, HCI_REQ_TIMEOUT) < 0) {
--		err = -errno;
--		error("Can't write name for hci%d: %s (%d)",
--				adapter->dev_id, strerror(errno), errno);
--		hci_close_dev(dd);
--		return err;
--	}
-+	err = hci_send_cmd(dd, OGF_HOST_CTL, OCF_READ_LOCAL_NAME, 0, 0);
-+	if (err < 0)
-+		error("Sending getting name command failed: %s (%d)",
-+						strerror(errno), errno);
- 
- 	hci_close_dev(dd);
--
--	update_ext_inquiry_response(adapter);
--
--	return 0;
- }
- 
- static DBusMessage *set_name(DBusConnection *conn, DBusMessage *msg,
- 					const char *name, void *data)
- {
- 	struct btd_adapter *adapter = data;
--	int ecode;
-+	struct hci_dev *dev = &adapter->dev;
-+	int err;
- 
- 	if (!g_utf8_validate(name, -1, NULL)) {
- 		error("Name change failed: supplied name isn't valid UTF-8");
- 		return invalid_args(msg);
- 	}
- 
--	ecode = adapter_set_name(adapter, name);
--	if (ecode < 0)
--		return failed_strerror(msg, -ecode);
-+	if (strncmp(name, (char *) dev->name, MAX_NAME_LENGTH) == 0)
-+		goto done;
- 
--	emit_property_changed(conn, adapter->path, ADAPTER_INTERFACE,
--				"Name", DBUS_TYPE_STRING, &name);
-+	if (!adapter->up)
-+		return failed_strerror(msg, -EHOSTDOWN);
- 
-+	err = adapter_ops->set_name(adapter->dev_id, name);
-+	if (err < 0)
-+		return failed_strerror(msg, err);
-+
-+done:
- 	return dbus_message_new_method_return(msg);
- }
- 
-@@ -1784,12 +1801,8 @@ static int adapter_setup(struct btd_adapter *adapter)
- 						sizeof(events), events);
- 	}
- 
--	if (read_local_name(&adapter->bdaddr, name) == 0) {
--		memcpy(dev->name, name, MAX_NAME_LENGTH);
--		hci_write_local_name(dd, name, HCI_REQ_TIMEOUT);
--	}
--
--	update_ext_inquiry_response(adapter);
-+	if (read_local_name(&adapter->bdaddr, name) == 0)
-+		adapter_ops->set_name(adapter->dev_id, name);
- 
- 	inqmode = get_inquiry_mode(dev);
- 	if (inqmode < 1)
-@@ -2058,7 +2071,6 @@ int adapter_start(struct btd_adapter *adapter)
- 	struct hci_version ver;
- 	uint8_t features[8];
- 	int dd, err;
--	char name[MAX_NAME_LENGTH + 1];
- 
- 	if (hci_devinfo(adapter->dev_id, &di) < 0)
- 		return -errno;
-@@ -2120,16 +2132,7 @@ int adapter_start(struct btd_adapter *adapter)
- 		return err;
- 	}
- 
--	if (hci_read_local_name(dd, sizeof(name), name,
--						HCI_REQ_TIMEOUT) < 0) {
--		err = -errno;
--		error("Can't read local name on %s: %s (%d)",
--					adapter->path, strerror(errno), errno);
--		hci_close_dev(dd);
--		return err;
--	}
--
--	memcpy(dev->name, name, MAX_NAME_LENGTH);
-+	hci_send_cmd(dd, OGF_HOST_CTL, OCF_READ_LOCAL_NAME, 0, 0);
- 
- 	if (!(features[6] & LMP_SIMPLE_PAIR))
- 		goto setup;
-diff --git a/src/adapter.h b/src/adapter.h
-index 183af05..9845ac7 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -121,7 +121,9 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
- 				struct remote_dev_info *dev);
- void adapter_update_oor_devices(struct btd_adapter *adapter);
- void adapter_mode_changed(struct btd_adapter *adapter, uint8_t scan_mode);
--void adapter_name_changed(struct btd_adapter *adapter, const char *name);
-+void adapter_setname_complete(bdaddr_t *local, uint8_t status);
-+void adapter_update_local_name(bdaddr_t *bdaddr, uint8_t status, void *ptr);
-+
- struct agent *adapter_get_agent(struct btd_adapter *adapter);
- void adapter_add_connection(struct btd_adapter *adapter,
- 				struct btd_device *device, uint16_t handle);
-@@ -171,6 +173,7 @@ struct btd_adapter_ops {
- 	int (*stop_discovery) (int index);
- 	int (*resolve_name) (int index, bdaddr_t *bdaddr);
- 	int (*cancel_resolve_name) (int index, bdaddr_t *bdaddr);
-+	int (*set_name) (int index, const char *name);
- };
- 
- int btd_register_adapter_ops(struct btd_adapter_ops *btd_adapter_ops);
-diff --git a/src/dbus-hci.c b/src/dbus-hci.c
-index 1e6ec43..221c185 100644
---- a/src/dbus-hci.c
-+++ b/src/dbus-hci.c
-@@ -727,53 +727,6 @@ void hcid_dbus_disconn_complete(bdaddr_t *local, uint8_t status,
- 
- /* Section reserved to device HCI callbacks */
- 
--void hcid_dbus_setname_complete(bdaddr_t *local)
--{
--	struct btd_adapter *adapter;
--	int id, dd = -1;
--	read_local_name_rp rp;
--	struct hci_request rq;
--	const char *pname = (char *) rp.name;
--	char name[MAX_NAME_LENGTH + 1];
--
--	adapter = manager_find_adapter(local);
--	if (!adapter) {
--		error("No matching adapter found");
--		return;
--	}
--
--	id = adapter_get_dev_id(adapter);
--	dd = hci_open_dev(id);
--	if (dd < 0) {
--		error("HCI device open failed: hci%d", id);
--		memset(&rp, 0, sizeof(rp));
--	} else {
--		memset(&rq, 0, sizeof(rq));
--		rq.ogf    = OGF_HOST_CTL;
--		rq.ocf    = OCF_READ_LOCAL_NAME;
--		rq.rparam = &rp;
--		rq.rlen   = READ_LOCAL_NAME_RP_SIZE;
--		rq.event  = EVT_CMD_COMPLETE;
--
--		if (hci_send_req(dd, &rq, HCI_REQ_TIMEOUT) < 0) {
--			error("Sending getting name command failed: %s (%d)",
--						strerror(errno), errno);
--			rp.name[0] = '\0';
--		} else if (rp.status) {
--			error("Getting name failed with status 0x%02x",
--					rp.status);
--			rp.name[0] = '\0';
--		}
--		hci_close_dev(dd);
--	}
--
--	strncpy(name, pname, sizeof(name) - 1);
--	name[MAX_NAME_LENGTH] = '\0';
--	pname = name;
--
--	adapter_name_changed(adapter, pname);
--}
--
- void hcid_dbus_setscan_enable_complete(bdaddr_t *local)
- {
- 	struct btd_adapter *adapter;
-diff --git a/src/dbus-hci.h b/src/dbus-hci.h
-index d6d9a11..382e59e 100644
---- a/src/dbus-hci.h
-+++ b/src/dbus-hci.h
-@@ -30,7 +30,6 @@ void hcid_dbus_conn_complete(bdaddr_t *local, uint8_t status, uint16_t handle, b
- void hcid_dbus_disconn_complete(bdaddr_t *local, uint8_t status, uint16_t handle, uint8_t reason);
- void hcid_dbus_bonding_process_complete(bdaddr_t *local, bdaddr_t *peer, uint8_t status);
- void hcid_dbus_simple_pairing_complete(bdaddr_t *local, bdaddr_t *peer, uint8_t status);
--void hcid_dbus_setname_complete(bdaddr_t *local);
- void hcid_dbus_setscan_enable_complete(bdaddr_t *local);
- void hcid_dbus_write_class_complete(bdaddr_t *local);
- void hcid_dbus_write_simple_pairing_mode_complete(bdaddr_t *local);
-diff --git a/src/security.c b/src/security.c
-index 905cf61..646921b 100644
---- a/src/security.c
-+++ b/src/security.c
-@@ -677,7 +677,7 @@ static inline void cmd_complete(int dev, bdaddr_t *sba, void *ptr)
- 		inquiry_complete(sba, status, FALSE);
- 		break;
- 	case cmd_opcode_pack(OGF_HOST_CTL, OCF_CHANGE_LOCAL_NAME):
--		hcid_dbus_setname_complete(sba);
-+		adapter_setname_complete(sba, status);
- 		break;
- 	case cmd_opcode_pack(OGF_HOST_CTL, OCF_WRITE_SCAN_ENABLE):
- 		hcid_dbus_setscan_enable_complete(sba);
-@@ -688,6 +688,10 @@ static inline void cmd_complete(int dev, bdaddr_t *sba, void *ptr)
- 	case cmd_opcode_pack(OGF_HOST_CTL, OCF_WRITE_SIMPLE_PAIRING_MODE):
- 		hcid_dbus_write_simple_pairing_mode_complete(sba);
- 		break;
-+	case cmd_opcode_pack(OGF_HOST_CTL, OCF_READ_LOCAL_NAME):
-+		ptr += sizeof(evt_cmd_complete);
-+		adapter_update_local_name(sba, status, ptr);
-+		break;
- 	};
- }
- 
--- 
-1.5.6.3
+This is the log when shutdown() is called on the rfcomm socket while
+the ACL link is connecting:
 
+[=A0 132.856414] rfcomm:rfcomm_sock_shutdown: sock c5cb3a20, sk c63fca00
+[=A0 132.856933] rfcomm:__rfcomm_sock_close: sk c63fca00 state 5 socket c5c=
+b3a20
+[=A0 132.857788] rfcomm:__rfcomm_dlc_close: dlc c61ea240 state 7 dlci 38
+err 0 session c63d4ba0
+[=A0 132.858612] rfcomm:rfcomm_send_disc: c63d4ba0 dlci 38
+[=A0 132.859069] rfcomm:rfcomm_send_frame: session c63d4ba0 len 4
+[=A0 132.859893] l2cap:l2cap_sock_sendmsg: sock c5cb38c0, sk c63fc800
+[=A0 132.860351] rfcomm:rfcomm_dlc_set_timer: dlc c61ea240 state 8 timeout =
+2000
+[  133.863739] rfcomm:rfcomm_sock_release: sock c5cb3a20, sk c63fca00
+[  133.864257] rfcomm:rfcomm_sock_shutdown: sock c5cb3a20, sk c63fca00
+[  133.865081] rfcomm:rfcomm_sock_kill: sk c63fca00 state 5 refcnt 2
+[  133.865539] rfcomm:rfcomm_sock_destruct: sk c63fca00 dlc c61ea240
+
+
+
+I'm surprised to see d->state for the rfcomm_dlc is BT_CONFIG at
+__rfcomm_dlc_close(), but looking at __rfcomm_dlc_open() this appears
+to be intentional.
+
+We do not hit __l2cap_sock_close()
+
+We attempt a graceful rfcomm disconnected by sending the dlci
+disconnected frame - but this does not make sense - since there is no
+rfcomm connection yet.
+
+
+Assuming that d->state =3D=3D BT_CONFIG during this phase is correct, then
+the attached patch will fix this issue.
+
+However - I don't know the rfcomm state machine - so this patch may
+having side effects. Requesting comments.
+
+Nick
+
+--001636427084d87b6a046e4afe5a
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-Bluetooth-Do-not-attempt-to-send-dlci-disconnect-whe.patch"
+Content-Disposition: attachment;
+	filename="0001-Bluetooth-Do-not-attempt-to-send-dlci-disconnect-whe.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_fwxveqc20
+
+RnJvbSBkOTBhMGNkN2EwMjE5ODA4ZTgxODNlYjc0Zjc2YTYxZDA0M2FiNGMyIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBOaWNrIFBlbGx5IDxucGVsbHlAZ29vZ2xlLmNvbT4KRGF0ZTog
+VGh1LCA5IEp1bCAyMDA5IDEyOjIzOjQ0IC0wNzAwClN1YmplY3Q6IFtQQVRDSF0gQmx1ZXRvb3Ro
+OiBEbyBub3QgYXR0ZW1wdCB0byBzZW5kIGRsY2kgZGlzY29ubmVjdCB3aGVuIGluIEJUX0NPTkZJ
+Ry4KClRoaXMgZml4ZXMgYSBidWcgd2hlcmUgc2h1dGRvd24oKSBhbmQgY2xvc2UoKSBvbiBhIHJm
+Y29tbSBzb2NrZXQgZHVyaW5nIEFDTApjb25uZWN0aW9uIHdvdWxkIG5vdCBjYXVzZSBIQ0kgQ3Jl
+YXRlIENvbm5lY3Rpb24gQ2FuY2VsLgoKU2lnbmVkLW9mZi1ieTogTmljayBQZWxseSA8bnBlbGx5
+QGdvb2dsZS5jb20+Ci0tLQogbmV0L2JsdWV0b290aC9yZmNvbW0vY29yZS5jIHwgICAgMSAtCiAx
+IGZpbGVzIGNoYW5nZWQsIDAgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbnMoLSkKCmRpZmYgLS1n
+aXQgYS9uZXQvYmx1ZXRvb3RoL3JmY29tbS9jb3JlLmMgYi9uZXQvYmx1ZXRvb3RoL3JmY29tbS9j
+b3JlLmMKaW5kZXggMWQwZmIwZi4uYzEwOWEzYSAxMDA2NDQKLS0tIGEvbmV0L2JsdWV0b290aC9y
+ZmNvbW0vY29yZS5jCisrKyBiL25ldC9ibHVldG9vdGgvcmZjb21tL2NvcmUuYwpAQCAtNDI4LDcg
+KzQyOCw2IEBAIHN0YXRpYyBpbnQgX19yZmNvbW1fZGxjX2Nsb3NlKHN0cnVjdCByZmNvbW1fZGxj
+ICpkLCBpbnQgZXJyKQogCiAJc3dpdGNoIChkLT5zdGF0ZSkgewogCWNhc2UgQlRfQ09OTkVDVDoK
+LQljYXNlIEJUX0NPTkZJRzoKIAkJaWYgKHRlc3RfYW5kX2NsZWFyX2JpdChSRkNPTU1fREVGRVJf
+U0VUVVAsICZkLT5mbGFncykpIHsKIAkJCXNldF9iaXQoUkZDT01NX0FVVEhfUkVKRUNULCAmZC0+
+ZmxhZ3MpOwogCQkJcmZjb21tX3NjaGVkdWxlKFJGQ09NTV9TQ0hFRF9BVVRIKTsKLS0gCjEuNi4z
+LjEKCg==
+--001636427084d87b6a046e4afe5a--
