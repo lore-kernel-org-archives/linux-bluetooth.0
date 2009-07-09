@@ -1,88 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4A56013D.70004@gdatech.co.in>
+Date: Thu, 09 Jul 2009 20:09:57 +0530
+From: Benjamin Vasanthakumar J <j.benjamin@gdatech.co.in>
 MIME-Version: 1.0
-In-Reply-To: <35c90d960907061155t7349cc90p2e58a09a310b8926@mail.gmail.com>
-References: <35c90d960905191820g4e3ee434hfd0060815540a4e0@mail.gmail.com>
-	<1242787757.3147.13.camel@localhost.localdomain> <35c90d960905201457i508c678fqeb696cce32ae63be@mail.gmail.com>
-	<35c90d960907061155t7349cc90p2e58a09a310b8926@mail.gmail.com>
-From: Nick Pelly <npelly@google.com>
-Date: Thu, 9 Jul 2009 12:37:49 -0700
-Message-ID: <35c90d960907091237o72228b0v57ad2556d77f4857@mail.gmail.com>
-Subject: Re: bug? kernel does not send HCI Create Connection Cancel Command on
-	shutdown() or close() of a connecting rfcomm socket
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=001636427084d87b6a046e4afe5a
+To: balaji_palaniswami@yahoo.com
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Recommended asoundrc for bluetooth headset
+References: <6AC5A55546F64545AE996F8200E3AC4E06A506A3@NL0105EXC01V01.eur.slb.com>	<353624.65161.qm@web95411.mail.in2.yahoo.com> <6AC5A55546F64545AE996F8200E3AC4E06A50ABC@NL0105EXC01V01.eur.slb.com>
+In-Reply-To: <6AC5A55546F64545AE996F8200E3AC4E06A50ABC@NL0105EXC01V01.eur.slb.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---001636427084d87b6a046e4afe5a
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+Dear Balaji,
+> ----- Original Message ----
+> From: John Frankish <j-frankish@slb.com>
+> To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+> Sent: Thursday, 18 June, 2009 12:11:53 PM
+> Subject: Recommended asoundrc for bluetooth headset
+>
+> Is there a recommended .asoundrc for use with a bt headset? I've seen at least three versions and would be interested to know which is the "correct" one:
+>
+> ------
+> pcm.bluetooth {
+> type bluetooth
+> device "00:12:EE:A6:1D:F4"
+> profile "auto"
+> }
+>
+> ctl.bluetooth {
+> type bluetooth
+> }
+> -----
+> pcm.rawbluetooth {
+>    type bluetooth
+>    device 00:12:EE:A6:1D:F4
+> }
+>
+> pcm.bluetooth {
+>    type plug
+>    slave {
+>       pcm {
+>          type bluetooth
+>       }
+>    }
+> }
+> -----
+> pcm.bluetoothraw {
+>    type bluetooth
+>    device 00:12:EE:A6:1D:F4
+>    profile auto
+> }
+>
+> pcm.bluetooth {
+>    type plug
+>    slave {
+>         pcm bluetoothraw
+>    }
+> }
+> -----
+> --
+> John,
+> Third  asoundrc is right one, this asoundrc is working for me upto bluez 4.32.
+> I am upgrading kernel to 2.6.rc8, bluez 4.41  and other depnedencies whatever you mentioned.
+> then i will update you result of a2dp , headset profile.Inmeanwhile please try 3rd asoundrc ,let me know your result.
+>
+> Thanks,
+> Balaji.P
+> ----
+>
+> Using first asoundrc
+>
+> $ aplay -Dbluetooth -v /usr/local/share/sounds/alsa/Noise.wav
+> correct sound.
+>
+> $ aplay -Dplug:bluetooth -v /usr/local/share/sounds/alsa/Noise.wav
+> incorrect sound.
+>
+> Using third asoundrc
+>
+> $ aplay -Dbluetooth -v /usr/local/share/sounds/alsa/Noise.wav
+> incorrect sound.
+>
+> $ aplay -Dplug:bluetooth -v /usr/local/share/sounds/alsa/Noise.wav
+> correct sound.
+>
+> Using first or third asoundrc
+>
+> $ arecord -D bluetooth -f S16_LE | aplay -D bluetooth -f S16_LE
+> Correct sound
+>
+> ..and if I could remember the aplay command switch to play an mp3, I would have tried that...
+Apart from .asoundrc file what are the other configuration files that 
+need to be taken care if we need to try mono and stereo headset.(HSP and 
+A2DP)
+What is the significance of the audio.conf file in the /etc/bluetooth? 
+Whether this is required for the Bluetooth headset proper audio routing?
+If you are using the audio.conf for the A2DP/HSP can you share what 
+additional configurations you have made.
 
-For the RFCOMM issue.
+Also can you please share your experience with the 4.41+ on your side 
+with the Bluetooth headset Mono or stereo.
 
-This is the log when shutdown() is called on the rfcomm socket while
-the ACL link is connecting:
-
-[=A0 132.856414] rfcomm:rfcomm_sock_shutdown: sock c5cb3a20, sk c63fca00
-[=A0 132.856933] rfcomm:__rfcomm_sock_close: sk c63fca00 state 5 socket c5c=
-b3a20
-[=A0 132.857788] rfcomm:__rfcomm_dlc_close: dlc c61ea240 state 7 dlci 38
-err 0 session c63d4ba0
-[=A0 132.858612] rfcomm:rfcomm_send_disc: c63d4ba0 dlci 38
-[=A0 132.859069] rfcomm:rfcomm_send_frame: session c63d4ba0 len 4
-[=A0 132.859893] l2cap:l2cap_sock_sendmsg: sock c5cb38c0, sk c63fc800
-[=A0 132.860351] rfcomm:rfcomm_dlc_set_timer: dlc c61ea240 state 8 timeout =
-2000
-[  133.863739] rfcomm:rfcomm_sock_release: sock c5cb3a20, sk c63fca00
-[  133.864257] rfcomm:rfcomm_sock_shutdown: sock c5cb3a20, sk c63fca00
-[  133.865081] rfcomm:rfcomm_sock_kill: sk c63fca00 state 5 refcnt 2
-[  133.865539] rfcomm:rfcomm_sock_destruct: sk c63fca00 dlc c61ea240
-
-
-
-I'm surprised to see d->state for the rfcomm_dlc is BT_CONFIG at
-__rfcomm_dlc_close(), but looking at __rfcomm_dlc_open() this appears
-to be intentional.
-
-We do not hit __l2cap_sock_close()
-
-We attempt a graceful rfcomm disconnected by sending the dlci
-disconnected frame - but this does not make sense - since there is no
-rfcomm connection yet.
-
-
-Assuming that d->state =3D=3D BT_CONFIG during this phase is correct, then
-the attached patch will fix this issue.
-
-However - I don't know the rfcomm state machine - so this patch may
-having side effects. Requesting comments.
-
-Nick
-
---001636427084d87b6a046e4afe5a
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Bluetooth-Do-not-attempt-to-send-dlci-disconnect-whe.patch"
-Content-Disposition: attachment;
-	filename="0001-Bluetooth-Do-not-attempt-to-send-dlci-disconnect-whe.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_fwxveqc20
-
-RnJvbSBkOTBhMGNkN2EwMjE5ODA4ZTgxODNlYjc0Zjc2YTYxZDA0M2FiNGMyIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBOaWNrIFBlbGx5IDxucGVsbHlAZ29vZ2xlLmNvbT4KRGF0ZTog
-VGh1LCA5IEp1bCAyMDA5IDEyOjIzOjQ0IC0wNzAwClN1YmplY3Q6IFtQQVRDSF0gQmx1ZXRvb3Ro
-OiBEbyBub3QgYXR0ZW1wdCB0byBzZW5kIGRsY2kgZGlzY29ubmVjdCB3aGVuIGluIEJUX0NPTkZJ
-Ry4KClRoaXMgZml4ZXMgYSBidWcgd2hlcmUgc2h1dGRvd24oKSBhbmQgY2xvc2UoKSBvbiBhIHJm
-Y29tbSBzb2NrZXQgZHVyaW5nIEFDTApjb25uZWN0aW9uIHdvdWxkIG5vdCBjYXVzZSBIQ0kgQ3Jl
-YXRlIENvbm5lY3Rpb24gQ2FuY2VsLgoKU2lnbmVkLW9mZi1ieTogTmljayBQZWxseSA8bnBlbGx5
-QGdvb2dsZS5jb20+Ci0tLQogbmV0L2JsdWV0b290aC9yZmNvbW0vY29yZS5jIHwgICAgMSAtCiAx
-IGZpbGVzIGNoYW5nZWQsIDAgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbnMoLSkKCmRpZmYgLS1n
-aXQgYS9uZXQvYmx1ZXRvb3RoL3JmY29tbS9jb3JlLmMgYi9uZXQvYmx1ZXRvb3RoL3JmY29tbS9j
-b3JlLmMKaW5kZXggMWQwZmIwZi4uYzEwOWEzYSAxMDA2NDQKLS0tIGEvbmV0L2JsdWV0b290aC9y
-ZmNvbW0vY29yZS5jCisrKyBiL25ldC9ibHVldG9vdGgvcmZjb21tL2NvcmUuYwpAQCAtNDI4LDcg
-KzQyOCw2IEBAIHN0YXRpYyBpbnQgX19yZmNvbW1fZGxjX2Nsb3NlKHN0cnVjdCByZmNvbW1fZGxj
-ICpkLCBpbnQgZXJyKQogCiAJc3dpdGNoIChkLT5zdGF0ZSkgewogCWNhc2UgQlRfQ09OTkVDVDoK
-LQljYXNlIEJUX0NPTkZJRzoKIAkJaWYgKHRlc3RfYW5kX2NsZWFyX2JpdChSRkNPTU1fREVGRVJf
-U0VUVVAsICZkLT5mbGFncykpIHsKIAkJCXNldF9iaXQoUkZDT01NX0FVVEhfUkVKRUNULCAmZC0+
-ZmxhZ3MpOwogCQkJcmZjb21tX3NjaGVkdWxlKFJGQ09NTV9TQ0hFRF9BVVRIKTsKLS0gCjEuNi4z
-LjEKCg==
---001636427084d87b6a046e4afe5a--
+Thanks & Regards,
+Benjamin
