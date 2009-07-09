@@ -1,42 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A55A39F.50307@powercraft.nl>
-Date: Thu, 09 Jul 2009 10:00:31 +0200
-From: Jelle de Jong <jelledejong@powercraft.nl>
+From: John Frankish <j-frankish@slb.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 9 Jul 2009 09:15:12 +0200
+Subject: RE: Mixed Results Playing mp3
+Message-ID: <6AC5A55546F64545AE996F8200E3AC4E06D866D4@NL0105EXC01V01.eur.slb.com>
+References: <6AC5A55546F64545AE996F8200E3AC4E06B17B90@NL0105EXC01V01.eur.slb.com>
+ <4A42056D.90600@wowway.com>
+ <6AC5A55546F64545AE996F8200E3AC4E06B1802D@NL0105EXC01V01.eur.slb.com>
+ <4A42C1F2.9040808@wowway.com>
+ <6AC5A55546F64545AE996F8200E3AC4E06B65D57@NL0105EXC01V01.eur.slb.com>
+In-Reply-To: <6AC5A55546F64545AE996F8200E3AC4E06B65D57@NL0105EXC01V01.eur.slb.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-To: Iain Hibbert <plunky@rya-online.net>
-CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	BlueZ devel list <linux-bluetooth@vger.kernel.org>
-Subject: Re: Feature request: boolean properties to auto reconnect list of
-  MAC's at daemon start up
-References: <4A4F39E8.4020908@powercraft.nl>  <20090704135747.05efc95c@stoetzler> <2d5a2c100907040637s73791batd85327f31cb4f1ee@mail.gmail.com> <1246716212.336777.600.nullmailer@galant.ukfsn.org>
-In-Reply-To: <1246716212.336777.600.nullmailer@galant.ukfsn.org>
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Iain Hibbert schreef:
-> On Sat, 4 Jul 2009, Luiz Augusto von Dentz wrote:
-> 
->>> IIUC that's just how bluetooth input devices work: they do connect to
->>> the host - not the other way round. So it is really a problem that
->>> cannot be solved on bluez' side.
->> Yep, most hid devices will just refuse the connection if the 'virtual
->> cable plug' was already stabilised, in general this is also a bad idea
->> for any connection attempt during the startup as we have no guarantee
->> that the connection will complete.
-> 
-> see HIDNormallyConnectable attribute in the HID spec (7.11.13)
-> 
-> I certainly find with my Apple bluetooth keyboard and mouse that the host
-> OS (not using BlueZ btw) can connect to them at boot without my
-> intervention.
-> 
-> iain
 
-Thanks you for providing this information it helps to see that apple
-does provide this behavior for usability to its users. Would a developer
-be willing to investigate this feature and place this on his/her to do list?
 
-Thanks in advance,
+-----Original Message-----
+From: John R. [mailto:johnr@wowway.com]
+Sent: 25 June, 2009 04:17
+To: John Frankish
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Mixed Results Playing mp3
 
-Jelle
+John Frankish wrote:
+
+> Does your mpg123 support alsa?
+>
+>> yes, it plays mp3 without problems via the machine's sound card
+
+It could be that mpg123 is using OSS and not ALSA directly.  Make sure
+ALSA is being used.
+
+> Thanks - I used "-o alsa" to verify alsa was being used, the result is the same.
+
+This could also be totally unrelated.
+
+John
+--
+Any ideas about this? I'm using the latest versions of bluez, dbus, alsa, mpg123, etc- there must be some reason why mplayer will play mp3 over Bluetooth and mpg123 will not.
+
+Are there any tests I can run to try and narrow down the problem?
+
+Thanks, John
+
+
