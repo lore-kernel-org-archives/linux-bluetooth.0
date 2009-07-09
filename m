@@ -1,41 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 9 Jul 2009 10:08:08 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: A2DP issue with latest BlueZ in Ubuntu 9.04
-Message-ID: <20090709070808.GA11972@jh-x301>
+From: Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 9 Jul 2009 12:10:41 +0530
+Subject: RE: A2DP issue with latest BlueZ in Ubuntu 9.04
+Message-ID: <44EE5C37ADC36343B0625A05DD408C485068EDD22D@CHEXMB-01.global.atheros.com>
 References: <44EE5C37ADC36343B0625A05DD408C485068EDD151@CHEXMB-01.global.atheros.com>
+ <2d5a2c100907081243n27574598k143d2d568018492b@mail.gmail.com>
+In-Reply-To: <2d5a2c100907081243n27574598k143d2d568018492b@mail.gmail.com>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <44EE5C37ADC36343B0625A05DD408C485068EDD151@CHEXMB-01.global.atheros.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jothi,
 
-On Wed, Jul 08, 2009, Jothikumar Mothilal wrote:
-> I am able to hear songs properly using mplayer.
-> 
+
+-----Original Message-----
+From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+Sent: 09 July 2009 01:13
+To: Jothikumar Mothilal
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: A2DP issue with latest BlueZ in Ubuntu 9.04
+
+Hi,
+
+On Wed, Jul 8, 2009 at 11:32 AM, Jothikumar
+Mothilal<Jothikumar.Mothilal@atheros.com> wrote:
 > I have upgraded the BlueZ version 4.44 in the same setup by manual compile.
 > A2DP not working...and found following line in bluetoothd daemon output
-> 
+>
 > "bluetoothd[17495]: Invalid seid 0"
-> 
-> Pairing is ok. Mplayer throws an error message.
-> 
-> I am not able to track what is the issue.
-> Any once faces such issue? Let me know how to fix this issue.
 
-The "Invalid seid" message is coming from audio/unix.c. The value is
-indeed invalid (since in the hcidump your headset reports to have SEID 1
-and 6 and bluetoothd configures a stream to SEID 1) and it is being sent
-by the UNIX socket client (i.e. your alsa player) to bluetoothd.
+First check if you are installing alsa plugin correctly then run
+bluetoothd with -dn so we can check what is going wrong on.
 
-The reason why your player is sending invalid data to bluetoothd could be
-that you're using an old version of the bluetooth alsa plugin with a new
-version of bluez. To fix this make sure that you don't have any old
-libasound_module_pcm_bluetooth.so lying around in /usr/lib/alsa-lib or
-/usr/local/lib/alsa-lib and install the new version there instead.
+--
+Luiz Augusto von Dentz
+Engenheiro de Computação
 
-Johan
+
+Hi,
+I have already installed alsa-utils, Bluez-alsa and gstreamer0.10-alsa.
+Same setup works on Bluez 4.32. I am facing problem only in BlueZ 4.44.
+I am wondering what else I am missing for BlueZ 4.44
+
+Thanks,
+Jothi
