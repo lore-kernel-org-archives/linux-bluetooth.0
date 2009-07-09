@@ -1,106 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A56013D.70004@gdatech.co.in>
-Date: Thu, 09 Jul 2009 20:09:57 +0530
-From: Benjamin Vasanthakumar J <j.benjamin@gdatech.co.in>
-MIME-Version: 1.0
-To: balaji_palaniswami@yahoo.com
+From: Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Recommended asoundrc for bluetooth headset
-References: <6AC5A55546F64545AE996F8200E3AC4E06A506A3@NL0105EXC01V01.eur.slb.com>	<353624.65161.qm@web95411.mail.in2.yahoo.com> <6AC5A55546F64545AE996F8200E3AC4E06A50ABC@NL0105EXC01V01.eur.slb.com>
-In-Reply-To: <6AC5A55546F64545AE996F8200E3AC4E06A50ABC@NL0105EXC01V01.eur.slb.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Date: Thu, 9 Jul 2009 14:08:28 +0530
+Subject: RE: A2DP issue with latest BlueZ in Ubuntu 9.04
+Message-ID: <44EE5C37ADC36343B0625A05DD408C485068EDD268@CHEXMB-01.global.atheros.com>
+References: <44EE5C37ADC36343B0625A05DD408C485068EDD151@CHEXMB-01.global.atheros.com>
+ <20090709070808.GA11972@jh-x301>
+In-Reply-To: <20090709070808.GA11972@jh-x301>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dear Balaji,
-> ----- Original Message ----
-> From: John Frankish <j-frankish@slb.com>
-> To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-> Sent: Thursday, 18 June, 2009 12:11:53 PM
-> Subject: Recommended asoundrc for bluetooth headset
->
-> Is there a recommended .asoundrc for use with a bt headset? I've seen at least three versions and would be interested to know which is the "correct" one:
->
-> ------
-> pcm.bluetooth {
-> type bluetooth
-> device "00:12:EE:A6:1D:F4"
-> profile "auto"
-> }
->
-> ctl.bluetooth {
-> type bluetooth
-> }
-> -----
-> pcm.rawbluetooth {
->    type bluetooth
->    device 00:12:EE:A6:1D:F4
-> }
->
-> pcm.bluetooth {
->    type plug
->    slave {
->       pcm {
->          type bluetooth
->       }
->    }
-> }
-> -----
-> pcm.bluetoothraw {
->    type bluetooth
->    device 00:12:EE:A6:1D:F4
->    profile auto
-> }
->
-> pcm.bluetooth {
->    type plug
->    slave {
->         pcm bluetoothraw
->    }
-> }
-> -----
-> --
-> John,
-> Third  asoundrc is right one, this asoundrc is working for me upto bluez 4.32.
-> I am upgrading kernel to 2.6.rc8, bluez 4.41  and other depnedencies whatever you mentioned.
-> then i will update you result of a2dp , headset profile.Inmeanwhile please try 3rd asoundrc ,let me know your result.
->
-> Thanks,
-> Balaji.P
-> ----
->
-> Using first asoundrc
->
-> $ aplay -Dbluetooth -v /usr/local/share/sounds/alsa/Noise.wav
-> correct sound.
->
-> $ aplay -Dplug:bluetooth -v /usr/local/share/sounds/alsa/Noise.wav
-> incorrect sound.
->
-> Using third asoundrc
->
-> $ aplay -Dbluetooth -v /usr/local/share/sounds/alsa/Noise.wav
-> incorrect sound.
->
-> $ aplay -Dplug:bluetooth -v /usr/local/share/sounds/alsa/Noise.wav
-> correct sound.
->
-> Using first or third asoundrc
->
-> $ arecord -D bluetooth -f S16_LE | aplay -D bluetooth -f S16_LE
-> Correct sound
->
-> ..and if I could remember the aplay command switch to play an mp3, I would have tried that...
-Apart from .asoundrc file what are the other configuration files that 
-need to be taken care if we need to try mono and stereo headset.(HSP and 
-A2DP)
-What is the significance of the audio.conf file in the /etc/bluetooth? 
-Whether this is required for the Bluetooth headset proper audio routing?
-If you are using the audio.conf for the A2DP/HSP can you share what 
-additional configurations you have made.
 
-Also can you please share your experience with the 4.41+ on your side 
-with the Bluetooth headset Mono or stereo.
 
-Thanks & Regards,
-Benjamin
+-----Original Message-----
+From: Johan Hedberg [mailto:johan.hedberg@gmail.com]
+Sent: 09 July 2009 12:38
+To: Jothikumar Mothilal
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: A2DP issue with latest BlueZ in Ubuntu 9.04
+
+Hi Jothi,
+
+On Wed, Jul 08, 2009, Jothikumar Mothilal wrote:
+> I am able to hear songs properly using mplayer.
+>
+> I have upgraded the BlueZ version 4.44 in the same setup by manual compile.
+> A2DP not working...and found following line in bluetoothd daemon output
+>
+> "bluetoothd[17495]: Invalid seid 0"
+>
+> Pairing is ok. Mplayer throws an error message.
+>
+> I am not able to track what is the issue.
+> Any once faces such issue? Let me know how to fix this issue.
+
+The "Invalid seid" message is coming from audio/unix.c. The value is
+indeed invalid (since in the hcidump your headset reports to have SEID 1
+and 6 and bluetoothd configures a stream to SEID 1) and it is being sent
+by the UNIX socket client (i.e. your alsa player) to bluetoothd.
+
+The reason why your player is sending invalid data to bluetoothd could be
+that you're using an old version of the bluetooth alsa plugin with a new
+version of bluez. To fix this make sure that you don't have any old
+libasound_module_pcm_bluetooth.so lying around in /usr/lib/alsa-lib or
+/usr/local/lib/alsa-lib and install the new version there instead.
+
+Johan
+
+Hi,
+I installed latest alsa library and tried. Same behavior found.
+
+-- Jothi
