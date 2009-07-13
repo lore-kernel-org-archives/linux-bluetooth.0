@@ -1,52 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bing Zhao <bzhao@marvell.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 13 Jul 2009 11:06:06 -0700
-Subject: RE: [PATCH] Bluetooth: Fix incorrect alignment in Marvell
- BT-over-SDIO driver
-Message-ID: <477F20668A386D41ADCC57781B1F704306CCBCD429@SC-VEXCH1.marvell.com>
-References: <1247078654-8666-1-git-send-email-bzhao@marvell.com>
- <1247079256.9709.2.camel@localhost.localdomain>
-In-Reply-To: <1247079256.9709.2.camel@localhost.localdomain>
-Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
+Date: Mon, 13 Jul 2009 10:04:04 -0700
+Message-ID: <8c237ea80907131004o6fd32ad3ia33e6acc5a952679@mail.gmail.com>
+Subject: Simplest Host-To-Host Network Config?
+From: Hibiki Kanzaki <hibikikanzaki@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+I am trying to configure the most basic point-to-point
+Bluetooth IP network.  I have two computers with the
+same model of USB Bluetooth (2.0, EDR, etc) dongle
+attached to them.  I am running Ubuntu Jaunty on both
+computers.  I do not have GUI (desktop) applications
+installed on them.  Ubuntu Jaunty comes with bluez
+4.32.  All I want is the most simple possible
+configuration... the minimal amount of configuration
+necessary to be able to have applications one the
+computers interact using TCP/UDP/IP via Linux network
+devices.  I do not care about forwarding packets to
+other hosts, or about encryption or authentication,
+etc; I am trying to start with the equivalent of
+connecting two ethernet cards.
 
-This patch fixed the alignment issue and the compilation warnings on 64-bit=
- system.
-I also tested some basic commands (scan, l2ping, etc.) on my 64-bit HP lapt=
-op and they seem working fine.
+When I connect the Bluetooth dongle, I get a
+"pan0" linux network device on which I can perform
+commands like "ip link set ...", "ip addr add ...",
+etc.  They all succeed and I can ping the local
+device address.  Each computer can do this local
+interaction with the pan0 network device.  I can
+also do "hcitool scan" to see the remote Bluetooth
+devices, and I can do "hcitool info", "l2ping", etc.
+The device advertises "PAN", "GN", etc, services,
+so I do not think it is a limitation of devices.
 
-Should you have any other commands for testing/verification, or items for c=
-leanup please let me know.
+So on each side I can see and interact with the
+local pan0 network device, and I can use the
+"hciconfig" and "hcitool" to get some degree of
+interaction between the two computers.  But if I
+configure the pan0 devices as I would a regular
+network device, including adding ARP entries which
+have the layer2 address of the remote pan0, I cannot
+seem to get the IP layer of the Linux kernel to
+actually talk to the remote Bluetooth device using
+the Linux kernel network facilities.  If I run
+"hcidump", I do not see anything happening if I try
+to ping the remote Bluetooth interface.
 
-Thanks much for your help.
-
-Bing
-
-> -----Original Message-----
-> From: Marcel Holtmann [mailto:marcel@holtmann.org]
-> Sent: Wednesday, July 08, 2009 11:54 AM
-> To: Bing Zhao
-> Cc: linux-bluetooth@vger.kernel.org
-> Subject: Re: [PATCH] Bluetooth: Fix incorrect alignment in Marvell BT-ove=
-r-SDIO driver
->=20
-> Hi Bing,
->=20
-> > The driver uses "u32" for alignment check and calculation which
-> > works only on 32-bit system. It will crash the 64-bit system.
-> > Replace "u32" with "unsigned long" to fix this issue.
->=20
-> I pushed that patch into the bluetooth-mrvl-2.6 tree now.
->=20
-> However I am pretty sure that are better "Linux" ways on handling the
-> alignment for the SKBs.
->=20
-> Regards
->=20
-> Marcel
->=20
+Am I missing something simple?  I am not having any
+luck finding how to do what seems like it should be
+trivial... plugin a Bluetooth dongle on each side
+and be able to send IP packets from one to the other
+using the Linux network devices.  I am clueless
+about the details of Bluetooth protocols.  If I
+cannot get the networking working this way, I would
+be willing to have the devices connected to each
+other as a serial port, and then just run ppp over
+that, although I have no idea how to do that, since
+I have never tried or looked into it.
