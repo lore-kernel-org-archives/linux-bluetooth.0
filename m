@@ -1,28 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Witte <wittemar@googlemail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: How does BlueZ work?
-Date: Tue, 14 Jul 2009 00:49:04 +0200
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200907140049.04920.wittemar@googlemail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <35c90d960907130846v2320de88pd6f34b8aabfdbb9e@mail.gmail.com>
+References: <35c90d960905191820g4e3ee434hfd0060815540a4e0@mail.gmail.com>
+	 <1242787757.3147.13.camel@localhost.localdomain>
+	 <35c90d960905201457i508c678fqeb696cce32ae63be@mail.gmail.com>
+	 <35c90d960907061155t7349cc90p2e58a09a310b8926@mail.gmail.com>
+	 <35c90d960907091237o72228b0v57ad2556d77f4857@mail.gmail.com>
+	 <35c90d960907130846v2320de88pd6f34b8aabfdbb9e@mail.gmail.com>
+Date: Mon, 13 Jul 2009 18:27:51 -0300
+Message-ID: <2d5a2c100907131427x18f26f82g405a781cd8670b88@mail.gmail.com>
+Subject: Re: bug? kernel does not send HCI Create Connection Cancel Command on
+	shutdown() or close() of a connecting rfcomm socket
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Nick Pelly <npelly@google.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Nick,
 
-at the moment I'm writing my dissertation for B.Sc. A big part contains using 
-bluetooth in Linux. As I understand the layer-architecture of bluetooth all 
-layers up to the HCI are implemented in the firmware of the bluetooth-device. 
-The kernel-module for the device forwards the hci-commands from the 
-applications to the device, this application is the bluetoothd. In bluetoothd 
-the profiles as A2DP are implemented. But how does bluetoothd communicate with 
-the module? Is there any device-file in /dev ? Or is there another system for 
-hci?
+On Mon, Jul 13, 2009 at 12:46 PM, Nick Pelly<npelly@google.com> wrote:
+> Any comments on this patch?
+>
+> It works for me, but my understanding of the RFCOMM state machine is naiv=
+e.
+>
 
-I hope you can help me, so I don't need to read in the source-code of 
-bluetoothd ;)
+iirc BT_CONFIG(PN frame) means the DLC is being configured than we got
+into connecting phase (BT_CONNECT) and send SABM frame. Only when
+receiving UA frame DLC is consider connected (BT_CONNECTED), so your
+patch seems good by assuming that we don't need to send a DISC for a
+DLC not connected. But there is still a good use for it to cancel the
+DLC connection attempt, so perhaps a better alternative would be to
+use a much shorter timeout in those cases.
 
-Greets,
-Marcel Witte
+
+--=20
+Luiz Augusto von Dentz
+Engenheiro de Computa=E7=E3o
