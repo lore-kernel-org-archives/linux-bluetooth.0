@@ -1,22 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: RE: bluetooth-wizard pin fixed at 0000 which is unable to pair
- with headset with other pins
-From: Bastien Nocera <hadess@hadess.net>
-To: "Wan, Shuang" <shuang.wan@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <E2263E4A5B2284449EEBD0AAB751098402CD1DBE29@PDSMSX501.ccr.corp.intel.com>
+From: "Wan, Shuang" <shuang.wan@intel.com>
+To: Bastien Nocera <hadess@hadess.net>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 13 Jul 2009 20:14:21 +0800
+Subject: RE: bluetooth-wizard pin fixed at 0000 which is unable to pair with
+ headset with other pins
+Message-ID: <E2263E4A5B2284449EEBD0AAB751098402CD1DBE29@PDSMSX501.ccr.corp.intel.com>
 References: <E2263E4A5B2284449EEBD0AAB751098402CD17452D@PDSMSX501.ccr.corp.intel.com>
-	 <1247482085.5460.7.camel@snoogens.fab.redhat.com>
-	 <E2263E4A5B2284449EEBD0AAB751098402CD1DBE29@PDSMSX501.ccr.corp.intel.com>
-Content-Type: text/plain
-Date: Mon, 13 Jul 2009 14:01:49 +0100
-Message-Id: <1247490109.5460.10.camel@snoogens.fab.redhat.com>
-Mime-Version: 1.0
+ <1247482085.5460.7.camel@snoogens.fab.redhat.com>
+In-Reply-To: <1247482085.5460.7.camel@snoogens.fab.redhat.com>
+Content-Type: text/plain; charset="gb2312"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 2009-07-13 at 20:14 +0800, Wan, Shuang wrote:
-> Great! I will try using bluez-gnome git tree.
-
-Not bluez-gnome, gnome-bluetooth, as available in the GNOME git repo.
-
+R3JlYXQhIEkgd2lsbCB0cnkgdXNpbmcgYmx1ZXotZ25vbWUgZ2l0IHRyZWUuDQoNClRoYW5rcyEN
+CldhbiBTaHVhbmcNCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IEJhc3RpZW4g
+Tm9jZXJhIFttYWlsdG86aGFkZXNzQGhhZGVzcy5uZXRdIA0KU2VudDogMjAwOcTqN9TCMTPI1SAx
+ODo0OA0KVG86IFdhbiwgU2h1YW5nDQpDYzogbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9y
+Zw0KU3ViamVjdDogUmU6IGJsdWV0b290aC13aXphcmQgcGluIGZpeGVkIGF0IDAwMDAgd2hpY2gg
+aXMgdW5hYmxlIHRvIHBhaXIgd2l0aCBoZWFkc2V0IHdpdGggb3RoZXIgcGlucw0KDQpPbiBNb24s
+IDIwMDktMDctMTMgYXQgMDk6NDAgKzA4MDAsIFdhbiwgU2h1YW5nIHdyb3RlOg0KPiBIaSwNCj4g
+DQo+IEp1c3QgYXR0ZW1wdCB0byBwYWlyIHdpdGggYSBmaXhlZCBwaW4gZGV2aWNlIHVzaW5nIGJs
+dWV0b290aC13aXphcmQNCj4gdGhhdCBkb2Vzbid0IGhhdmUgMDAwMCBhcyBpdHMgcGluLi5JIGhh
+dmUgYSBHZWFyNC1CbGFja2JveCBNaW5pICh3aGljaA0KPiBpcyBhIGhlYWRzZXQvYTJkcCBkZXZp
+Y2UpIHdoaWNoIGhhcyBhIGZpeGVkIHBpbiBvZiAxMjM0LiBXaGVuIEkgdHJ5IHRvDQo+IHBhaXIg
+dGhlIGRldmljZSBpdCBmYWlscyBhZnRlciBhdHRlbXB0aW5nIHRvIHVzZSAwMDAwLCB3aXRoIG5v
+DQo+IG9wcG9ydHVuaXR5IHRvIGVudGVyIGFueSBvdGhlciBwaW4uDQoNClRoaXMgaXMgZml4ZWQg
+aW4gZ25vbWUtYmx1ZXRvb3RoLg0KDQpDaGVlcnMNCg0K
