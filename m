@@ -1,17 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?utf-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?= <jprvita@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com
-Subject: A2DP Sink implementation
-Date: Mon, 13 Jul 2009 12:28:49 -0300
-Message-Id: <1247498933-30609-1-git-send-email-jprvita@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Subject: RE: bluetooth-wizard pin fixed at 0000 which is unable to pair
+ with headset with other pins
+From: Bastien Nocera <hadess@hadess.net>
+To: Mario_Limonciello@Dell.com
+Cc: shuang.wan@intel.com, linux-bluetooth@vger.kernel.org
+In-Reply-To: <6BE8CE7840AC9F459EF5A0693CA2744D6EC54F@ausx3mpc138.aus.amer.dell.com>
+References: <E2263E4A5B2284449EEBD0AAB751098402CD17452D@PDSMSX501.ccr.corp.intel.com>
+	 <1247482085.5460.7.camel@snoogens.fab.redhat.com>
+	 <E2263E4A5B2284449EEBD0AAB751098402CD1DBE29@PDSMSX501.ccr.corp.intel.com>
+	 <1247490109.5460.10.camel@snoogens.fab.redhat.com>
+	 <6BE8CE7840AC9F459EF5A0693CA2744D6EC54F@ausx3mpc138.aus.amer.dell.com>
+Content-Type: text/plain
+Date: Mon, 13 Jul 2009 15:39:17 +0100
+Message-Id: <1247495957.5460.13.camel@snoogens.fab.redhat.com>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Mon, 2009-07-13 at 09:34 -0500, Mario_Limonciello@Dell.com wrote:
+> > Not bluez-gnome, gnome-bluetooth, as available in the GNOME git repo.
+> 
+> If there is not going to be any more development happening against the
+> bluez-gnome git tree, can it be formally killed with some indication
+> that people should work on development with gnome-bluetooth and/or
+> blueman then?
 
-The following serie of patches implements the necessary code for the A2DP Sink
-in bluetoothd. It needs kernel version 2.6.30+ to work. The sink is disabled by
-default, since there is no client to handle the incoming stream yet. To enable
-it, just add an "Enable=Source" line to /etc/bluetooth/audio.conf.
+I believe Marcel wants to keep it to play around with the UI, for new
+features.
+
