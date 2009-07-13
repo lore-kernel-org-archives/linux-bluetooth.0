@@ -3,33 +3,1064 @@ From: =?utf-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?= <jprvita@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com,
 	=?utf-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?= <jprvita@gmail.com>
-Subject: [PATCH 3/4] Create one SBC Sink when registering A2DP server.
-Date: Mon, 13 Jul 2009 12:28:52 -0300
-Message-Id: <1247498933-30609-4-git-send-email-jprvita@gmail.com>
-In-Reply-To: <1247498933-30609-3-git-send-email-jprvita@gmail.com>
+Subject: [PATCH 2/4] Create A2DP Source interface.
+Date: Mon, 13 Jul 2009 12:28:51 -0300
+Message-Id: <1247498933-30609-3-git-send-email-jprvita@gmail.com>
+In-Reply-To: <1247498933-30609-2-git-send-email-jprvita@gmail.com>
 References: <1247498933-30609-1-git-send-email-jprvita@gmail.com>
  <1247498933-30609-2-git-send-email-jprvita@gmail.com>
- <1247498933-30609-3-git-send-email-jprvita@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- audio/a2dp.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ audio/Makefile.am |    3 +-
+ audio/a2dp.c      |    7 +-
+ audio/avdtp.c     |    3 +
+ audio/device.c    |    4 +
+ audio/manager.c   |    5 +
+ audio/source.c    |  870 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ audio/source.h    |   50 +++
+ 7 files changed, 939 insertions(+), 3 deletions(-)
+ create mode 100644 audio/source.c
+ create mode 100644 audio/source.h
 
+diff --git a/audio/Makefile.am b/audio/Makefile.am
+index cbdad9f..31736b4 100644
+--- a/audio/Makefile.am
++++ b/audio/Makefile.am
+@@ -9,7 +9,8 @@ plugin_LTLIBRARIES = audio.la
+ audio_la_SOURCES = main.c \
+ 	ipc.h ipc.c unix.h unix.c manager.h manager.c telephony.h \
+ 	device.h device.c headset.h headset.c gateway.h gateway.c \
+-	avdtp.h avdtp.c a2dp.h a2dp.c sink.h sink.c control.h control.c
++	avdtp.h avdtp.c a2dp.h a2dp.c sink.h sink.c source.h source.c \
++	control.h control.c
+ 
+ nodist_audio_la_SOURCES = $(BUILT_SOURCES)
+ 
 diff --git a/audio/a2dp.c b/audio/a2dp.c
-index 87b2077..7b5632d 100644
+index 7d14865..87b2077 100644
 --- a/audio/a2dp.c
 +++ b/audio/a2dp.c
-@@ -1076,7 +1076,7 @@ static struct a2dp_server *find_server(GSList *list, const bdaddr_t *src)
+@@ -503,8 +503,11 @@ static void setconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
  
- int a2dp_register(DBusConnection *conn, const bdaddr_t *src, GKeyFile *config)
- {
--	int sbc_srcs = 1, sbc_sinks = 0;
-+	int sbc_srcs = 1, sbc_sinks = 1;
- 	int mpeg12_srcs = 0, mpeg12_sinks = 0;
- 	gboolean source = TRUE, sink = TRUE;
- 	char *str;
+ 	dev = a2dp_get_dev(session);
+ 
+-	/* Notify sink.c of the new stream */
+-	sink_new_stream(dev, session, setup->stream);
++	/* Notify D-Bus interface of the new stream */
++	if (a2dp_sep->type == AVDTP_SEP_TYPE_SOURCE)
++		sink_new_stream(dev, session, setup->stream);
++	else
++		source_new_stream(dev, session, setup->stream);
+ 
+ 	ret = avdtp_open(session, stream);
+ 	if (ret < 0) {
+diff --git a/audio/avdtp.c b/audio/avdtp.c
+index ed84b21..8046dda 100644
+--- a/audio/avdtp.c
++++ b/audio/avdtp.c
+@@ -52,6 +52,7 @@
+ #include "glib-helper.h"
+ #include "btio.h"
+ #include "sink.h"
++#include "source.h"
+ 
+ #include <bluetooth/l2cap.h>
+ 
+@@ -631,6 +632,8 @@ static gboolean disconnect_timeout(gpointer user_data)
+ 
+ 	if (dev && dev->sink && stream_setup)
+ 		sink_setup_stream(dev->sink, session);
++	else if (dev && dev->source && stream_setup)
++		source_setup_stream(dev->source, session);
+ 	else
+ 		connection_lost(session, ETIMEDOUT);
+ 
+diff --git a/audio/device.c b/audio/device.c
+index ea66f4a..8568954 100644
+--- a/audio/device.c
++++ b/audio/device.c
+@@ -58,6 +58,7 @@
+ #include "headset.h"
+ #include "gateway.h"
+ #include "sink.h"
++#include "source.h"
+ 
+ #define AUDIO_INTERFACE "org.bluez.Audio"
+ 
+@@ -651,6 +652,9 @@ void audio_device_unregister(struct audio_device *device)
+ 	if (device->sink)
+ 		sink_unregister(device);
+ 
++	if (device->source)
++		source_unregister(device);
++
+ 	if (device->control)
+ 		control_unregister(device);
+ 
+diff --git a/audio/manager.c b/audio/manager.c
+index f137d1b..00e9158 100644
+--- a/audio/manager.c
++++ b/audio/manager.c
+@@ -65,6 +65,7 @@
+ #include "headset.h"
+ #include "gateway.h"
+ #include "sink.h"
++#include "source.h"
+ #include "control.h"
+ #include "manager.h"
+ #include "sdpd.h"
+@@ -142,6 +143,8 @@ gboolean server_is_enabled(bdaddr_t *src, uint16_t svc)
+ 		return enabled.gateway;
+ 	case AUDIO_SINK_SVCLASS_ID:
+ 		return enabled.sink;
++	case AUDIO_SOURCE_SVCLASS_ID:
++		return enabled.source;
+ 	case AV_REMOTE_TARGET_SVCLASS_ID:
+ 	case AV_REMOTE_SVCLASS_ID:
+ 		return enabled.control;
+@@ -205,6 +208,8 @@ static void handle_uuid(const char *uuidstr, struct audio_device *device)
+ 		break;
+ 	case AUDIO_SOURCE_SVCLASS_ID:
+ 		debug("Found Audio Source");
++		if (device->source == NULL)
++			device->source = source_init(device);
+ 		break;
+ 	case AV_REMOTE_SVCLASS_ID:
+ 	case AV_REMOTE_TARGET_SVCLASS_ID:
+diff --git a/audio/source.c b/audio/source.c
+new file mode 100644
+index 0000000..9b9655c
+--- /dev/null
++++ b/audio/source.c
+@@ -0,0 +1,870 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2006-2007  Nokia Corporation
++ *  Copyright (C) 2004-2009  Marcel Holtmann <marcel@holtmann.org>
++ *  Copyright (C) 2009  Joao Paulo Rechi Vita
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdint.h>
++#include <errno.h>
++
++#include <bluetooth/bluetooth.h>
++#include <bluetooth/sdp.h>
++
++#include <glib.h>
++#include <dbus/dbus.h>
++#include <gdbus.h>
++
++#include "logging.h"
++
++#include "device.h"
++#include "avdtp.h"
++#include "a2dp.h"
++#include "error.h"
++#include "source.h"
++#include "dbus-common.h"
++#include "../src/adapter.h"
++#include "../src/device.h"
++
++#define STREAM_SETUP_RETRY_TIMER 2
++
++struct pending_request {
++	DBusConnection *conn;
++	DBusMessage *msg;
++	unsigned int id;
++};
++
++struct source {
++	struct audio_device *dev;
++	struct avdtp *session;
++	struct avdtp_stream *stream;
++	unsigned int cb_id;
++	guint dc_id;
++	guint retry_id;
++	avdtp_session_state_t session_state;
++	avdtp_state_t stream_state;
++	source_state_t state;
++	struct pending_request *connect;
++	struct pending_request *disconnect;
++	DBusConnection *conn;
++};
++
++struct source_state_callback {
++	source_state_cb cb;
++	void *user_data;
++	unsigned int id;
++};
++
++static GSList *source_callbacks = NULL;
++
++static unsigned int avdtp_callback_id = 0;
++
++static const char *state2str(source_state_t state)
++{
++	switch (state) {
++	case SOURCE_STATE_DISCONNECTED:
++		return "disconnected";
++	case SOURCE_STATE_CONNECTING:
++		return "connecting";
++	case SOURCE_STATE_CONNECTED:
++		return "connected";
++	case SOURCE_STATE_PLAYING:
++		return "playing";
++	default:
++		error("Invalid source state %d", state);
++		return NULL;
++	}
++}
++
++static void source_set_state(struct audio_device *dev, source_state_t new_state)
++{
++	struct source *source = dev->source;
++	const char *state_str;
++	source_state_t old_state = source->state;
++	GSList *l;
++
++	source->state = new_state;
++
++	state_str = state2str(new_state);
++	if (state_str)
++		emit_property_changed(dev->conn, dev->path,
++					AUDIO_SOURCE_INTERFACE, "State",
++					DBUS_TYPE_STRING, &state_str);
++
++	for (l = source_callbacks; l != NULL; l = l->next) {
++		struct source_state_callback *cb = l->data;
++		cb->cb(dev, old_state, new_state, cb->user_data);
++	}
++}
++
++static void avdtp_state_callback(struct audio_device *dev,
++					struct avdtp *session,
++					avdtp_session_state_t old_state,
++					avdtp_session_state_t new_state,
++					void *user_data)
++{
++	struct source *source = dev->source;
++
++	if (source == NULL)
++		return;
++
++	switch (new_state) {
++	case AVDTP_SESSION_STATE_DISCONNECTED:
++		if (source->state != SOURCE_STATE_CONNECTING) {
++			gboolean value = FALSE;
++			g_dbus_emit_signal(dev->conn, dev->path,
++					AUDIO_SOURCE_INTERFACE, "Disconnected",
++					DBUS_TYPE_INVALID);
++			emit_property_changed(dev->conn, dev->path,
++					AUDIO_SOURCE_INTERFACE, "Connected",
++					DBUS_TYPE_BOOLEAN, &value);
++			if (source->dc_id) {
++				device_remove_disconnect_watch(dev->btd_dev,
++								source->dc_id);
++				source->dc_id = 0;
++			}
++		}
++		source_set_state(dev, SOURCE_STATE_DISCONNECTED);
++		break;
++	case AVDTP_SESSION_STATE_CONNECTING:
++		source_set_state(dev, SOURCE_STATE_CONNECTING);
++		break;
++	case AVDTP_SESSION_STATE_CONNECTED:
++		break;
++	}
++
++	source->session_state = new_state;
++}
++
++static void pending_request_free(struct audio_device *dev,
++					struct pending_request *pending)
++{
++	if (pending->conn)
++		dbus_connection_unref(pending->conn);
++	if (pending->msg)
++		dbus_message_unref(pending->msg);
++	if (pending->id)
++		a2dp_cancel(dev, pending->id);
++
++	g_free(pending);
++}
++
++static void disconnect_cb(struct btd_device *btd_dev, gboolean removal,
++				void *user_data)
++{
++	struct audio_device *device = user_data;
++	struct source *source = device->source;
++
++	debug("Source: disconnect %s", device->path);
++
++	avdtp_close(source->session, source->stream);
++}
++
++static void stream_state_changed(struct avdtp_stream *stream,
++					avdtp_state_t old_state,
++					avdtp_state_t new_state,
++					struct avdtp_error *err,
++					void *user_data)
++{
++	struct audio_device *dev = user_data;
++	struct source *source = dev->source;
++	gboolean value;
++
++	if (err)
++		return;
++
++	switch (new_state) {
++	case AVDTP_STATE_IDLE:
++		if (source->disconnect) {
++			DBusMessage *reply;
++			struct pending_request *p;
++
++			p = source->disconnect;
++			source->disconnect = NULL;
++
++			reply = dbus_message_new_method_return(p->msg);
++			g_dbus_send_message(p->conn, reply);
++			pending_request_free(dev, p);
++		}
++
++		if (source->dc_id) {
++			device_remove_disconnect_watch(dev->btd_dev,
++							source->dc_id);
++			source->dc_id = 0;
++		}
++
++		if (source->session) {
++			avdtp_unref(source->session);
++			source->session = NULL;
++		}
++		source->stream = NULL;
++		source->cb_id = 0;
++		break;
++	case AVDTP_STATE_OPEN:
++		if (old_state == AVDTP_STATE_CONFIGURED &&
++				source->state == SOURCE_STATE_CONNECTING) {
++			value = TRUE;
++			g_dbus_emit_signal(dev->conn, dev->path,
++						AUDIO_SOURCE_INTERFACE,
++						"Connected",
++						DBUS_TYPE_INVALID);
++			emit_property_changed(dev->conn, dev->path,
++						AUDIO_SOURCE_INTERFACE,
++						"Connected",
++						DBUS_TYPE_BOOLEAN, &value);
++			source->dc_id = device_add_disconnect_watch(dev->btd_dev,
++								disconnect_cb,
++								dev, NULL);
++		} else if (old_state == AVDTP_STATE_STREAMING) {
++			value = FALSE;
++			g_dbus_emit_signal(dev->conn, dev->path,
++						AUDIO_SOURCE_INTERFACE,
++						"Stopped",
++						DBUS_TYPE_INVALID);
++			emit_property_changed(dev->conn, dev->path,
++						AUDIO_SOURCE_INTERFACE,
++						"Playing",
++						DBUS_TYPE_BOOLEAN, &value);
++		}
++		source_set_state(dev, SOURCE_STATE_CONNECTED);
++		break;
++	case AVDTP_STATE_STREAMING:
++		value = TRUE;
++		g_dbus_emit_signal(dev->conn, dev->path, AUDIO_SOURCE_INTERFACE,
++					"Playing", DBUS_TYPE_INVALID);
++		emit_property_changed(dev->conn, dev->path,
++					AUDIO_SOURCE_INTERFACE, "Playing",
++					DBUS_TYPE_BOOLEAN, &value);
++		source_set_state(dev, SOURCE_STATE_PLAYING);
++		break;
++	case AVDTP_STATE_CONFIGURED:
++	case AVDTP_STATE_CLOSING:
++	case AVDTP_STATE_ABORTING:
++	default:
++		break;
++	}
++
++	source->stream_state = new_state;
++}
++
++static DBusHandlerResult error_failed(DBusConnection *conn,
++					DBusMessage *msg, const char * desc)
++{
++	return error_common_reply(conn, msg, ERROR_INTERFACE ".Failed", desc);
++}
++
++static gboolean stream_setup_retry(gpointer user_data)
++{
++	struct source *source = user_data;
++	struct pending_request *pending = source->connect;
++
++	source->retry_id = 0;
++
++	if (source->stream_state >= AVDTP_STATE_OPEN) {
++		debug("Stream successfully created, after XCASE connect:connect");
++		if (pending->msg) {
++			DBusMessage *reply;
++			reply = dbus_message_new_method_return(pending->msg);
++			g_dbus_send_message(pending->conn, reply);
++		}
++	} else {
++		debug("Stream setup failed, after XCASE connect:connect");
++		if (pending->msg)
++			error_failed(pending->conn, pending->msg, "Stream setup failed");
++	}
++
++	source->connect = NULL;
++	pending_request_free(source->dev, pending);
++
++	return FALSE;
++}
++
++static void stream_setup_complete(struct avdtp *session, struct a2dp_sep *sep,
++					struct avdtp_stream *stream,
++					struct avdtp_error *err, void *user_data)
++{
++	struct source *source = user_data;
++	struct pending_request *pending;
++
++	pending = source->connect;
++
++	pending->id = 0;
++
++	if (stream) {
++		debug("Stream successfully created");
++
++		if (pending->msg) {
++			DBusMessage *reply;
++			reply = dbus_message_new_method_return(pending->msg);
++			g_dbus_send_message(pending->conn, reply);
++		}
++
++		source->connect = NULL;
++		pending_request_free(source->dev, pending);
++
++		return;
++	}
++
++	avdtp_unref(source->session);
++	source->session = NULL;
++	if (avdtp_error_type(err) == AVDTP_ERROR_ERRNO
++			&& avdtp_error_posix_errno(err) != EHOSTDOWN) {
++		debug("connect:connect XCASE detected");
++		source->retry_id = g_timeout_add_seconds(STREAM_SETUP_RETRY_TIMER,
++							stream_setup_retry,
++							source);
++	} else {
++		if (pending->msg)
++			error_failed(pending->conn, pending->msg, "Stream setup failed");
++		source->connect = NULL;
++		pending_request_free(source->dev, pending);
++		debug("Stream setup failed : %s", avdtp_strerror(err));
++	}
++}
++
++static uint8_t default_bitpool(uint8_t freq, uint8_t mode)
++{
++	switch (freq) {
++	case SBC_SAMPLING_FREQ_16000:
++	case SBC_SAMPLING_FREQ_32000:
++		return 53;
++	case SBC_SAMPLING_FREQ_44100:
++		switch (mode) {
++		case SBC_CHANNEL_MODE_MONO:
++		case SBC_CHANNEL_MODE_DUAL_CHANNEL:
++			return 31;
++		case SBC_CHANNEL_MODE_STEREO:
++		case SBC_CHANNEL_MODE_JOINT_STEREO:
++			return 53;
++		default:
++			error("Invalid channel mode %u", mode);
++			return 53;
++		}
++	case SBC_SAMPLING_FREQ_48000:
++		switch (mode) {
++		case SBC_CHANNEL_MODE_MONO:
++		case SBC_CHANNEL_MODE_DUAL_CHANNEL:
++			return 29;
++		case SBC_CHANNEL_MODE_STEREO:
++		case SBC_CHANNEL_MODE_JOINT_STEREO:
++			return 51;
++		default:
++			error("Invalid channel mode %u", mode);
++			return 51;
++		}
++	default:
++		error("Invalid sampling freq %u", freq);
++		return 53;
++	}
++}
++
++static gboolean select_sbc_params(struct sbc_codec_cap *cap,
++					struct sbc_codec_cap *supported)
++{
++	unsigned int max_bitpool, min_bitpool;
++
++	memset(cap, 0, sizeof(struct sbc_codec_cap));
++
++	cap->cap.media_type = AVDTP_MEDIA_TYPE_AUDIO;
++	cap->cap.media_codec_type = A2DP_CODEC_SBC;
++
++	if (supported->frequency & SBC_SAMPLING_FREQ_44100)
++		cap->frequency = SBC_SAMPLING_FREQ_44100;
++	else if (supported->frequency & SBC_SAMPLING_FREQ_48000)
++		cap->frequency = SBC_SAMPLING_FREQ_48000;
++	else if (supported->frequency & SBC_SAMPLING_FREQ_32000)
++		cap->frequency = SBC_SAMPLING_FREQ_32000;
++	else if (supported->frequency & SBC_SAMPLING_FREQ_16000)
++		cap->frequency = SBC_SAMPLING_FREQ_16000;
++	else {
++		error("No supported frequencies");
++		return FALSE;
++	}
++
++	if (supported->channel_mode & SBC_CHANNEL_MODE_JOINT_STEREO)
++		cap->channel_mode = SBC_CHANNEL_MODE_JOINT_STEREO;
++	else if (supported->channel_mode & SBC_CHANNEL_MODE_STEREO)
++		cap->channel_mode = SBC_CHANNEL_MODE_STEREO;
++	else if (supported->channel_mode & SBC_CHANNEL_MODE_DUAL_CHANNEL)
++		cap->channel_mode = SBC_CHANNEL_MODE_DUAL_CHANNEL;
++	else if (supported->channel_mode & SBC_CHANNEL_MODE_MONO)
++		cap->channel_mode = SBC_CHANNEL_MODE_MONO;
++	else {
++		error("No supported channel modes");
++		return FALSE;
++	}
++
++	if (supported->block_length & SBC_BLOCK_LENGTH_16)
++		cap->block_length = SBC_BLOCK_LENGTH_16;
++	else if (supported->block_length & SBC_BLOCK_LENGTH_12)
++		cap->block_length = SBC_BLOCK_LENGTH_12;
++	else if (supported->block_length & SBC_BLOCK_LENGTH_8)
++		cap->block_length = SBC_BLOCK_LENGTH_8;
++	else if (supported->block_length & SBC_BLOCK_LENGTH_4)
++		cap->block_length = SBC_BLOCK_LENGTH_4;
++	else {
++		error("No supported block lengths");
++		return FALSE;
++	}
++
++	if (supported->subbands & SBC_SUBBANDS_8)
++		cap->subbands = SBC_SUBBANDS_8;
++	else if (supported->subbands & SBC_SUBBANDS_4)
++		cap->subbands = SBC_SUBBANDS_4;
++	else {
++		error("No supported subbands");
++		return FALSE;
++	}
++
++	if (supported->allocation_method & SBC_ALLOCATION_LOUDNESS)
++		cap->allocation_method = SBC_ALLOCATION_LOUDNESS;
++	else if (supported->allocation_method & SBC_ALLOCATION_SNR)
++		cap->allocation_method = SBC_ALLOCATION_SNR;
++
++	min_bitpool = MAX(MIN_BITPOOL, supported->min_bitpool);
++	max_bitpool = MIN(default_bitpool(cap->frequency, cap->channel_mode),
++							supported->max_bitpool);
++
++	cap->min_bitpool = min_bitpool;
++	cap->max_bitpool = max_bitpool;
++
++	return TRUE;
++}
++
++static gboolean select_capabilities(struct avdtp *session,
++					struct avdtp_remote_sep *rsep,
++					GSList **caps)
++{
++	struct avdtp_service_capability *media_transport, *media_codec;
++	struct sbc_codec_cap sbc_cap;
++
++	media_codec = avdtp_get_codec(rsep);
++	if (!media_codec)
++		return FALSE;
++
++	select_sbc_params(&sbc_cap, (struct sbc_codec_cap *) media_codec->data);
++
++	media_transport = avdtp_service_cap_new(AVDTP_MEDIA_TRANSPORT,
++						NULL, 0);
++
++	*caps = g_slist_append(*caps, media_transport);
++
++	media_codec = avdtp_service_cap_new(AVDTP_MEDIA_CODEC, &sbc_cap,
++						sizeof(sbc_cap));
++
++	*caps = g_slist_append(*caps, media_codec);
++
++
++	return TRUE;
++}
++
++static void discovery_complete(struct avdtp *session, GSList *seps, struct avdtp_error *err,
++				void *user_data)
++{
++	struct source *source = user_data;
++	struct pending_request *pending;
++	struct avdtp_local_sep *lsep;
++	struct avdtp_remote_sep *rsep;
++	struct a2dp_sep *sep;
++	GSList *caps = NULL;
++	int id;
++
++	pending = source->connect;
++
++	if (err) {
++		avdtp_unref(source->session);
++		source->session = NULL;
++		if (avdtp_error_type(err) == AVDTP_ERROR_ERRNO
++				&& avdtp_error_posix_errno(err) != EHOSTDOWN) {
++			debug("connect:connect XCASE detected");
++			source->retry_id =
++				g_timeout_add_seconds(STREAM_SETUP_RETRY_TIMER,
++							stream_setup_retry,
++							source);
++		} else
++			goto failed;
++		return;
++	}
++
++	debug("Discovery complete");
++
++	if (avdtp_get_seps(session, AVDTP_SEP_TYPE_SOURCE, AVDTP_MEDIA_TYPE_AUDIO,
++				A2DP_CODEC_SBC, &lsep, &rsep) < 0) {
++		error("No matching ACP and INT SEPs found");
++		goto failed;
++	}
++
++	if (!select_capabilities(session, rsep, &caps)) {
++		error("Unable to select remote SEP capabilities");
++		goto failed;
++	}
++
++	sep = a2dp_get(session, rsep);
++	if (!sep) {
++		error("Unable to get a local sink SEP");
++		goto failed;
++	}
++
++	id = a2dp_config(source->session, sep, stream_setup_complete, caps,
++				source);
++	if (id == 0)
++		goto failed;
++
++	pending->id = id;
++	return;
++
++failed:
++	if (pending->msg)
++		error_failed(pending->conn, pending->msg, "Stream setup failed");
++	pending_request_free(source->dev, pending);
++	source->connect = NULL;
++	avdtp_unref(source->session);
++	source->session = NULL;
++}
++
++gboolean source_setup_stream(struct source *source, struct avdtp *session)
++{
++	if (source->connect || source->disconnect)
++		return FALSE;
++
++	if (session && !source->session)
++		source->session = avdtp_ref(session);
++
++	if (!source->session)
++		return FALSE;
++
++	avdtp_set_auto_disconnect(source->session, FALSE);
++
++	if (avdtp_discover(source->session, discovery_complete, source) < 0)
++		return FALSE;
++
++	source->connect = g_new0(struct pending_request, 1);
++
++	return TRUE;
++}
++
++static DBusMessage *source_connect(DBusConnection *conn,
++				DBusMessage *msg, void *data)
++{
++	struct audio_device *dev = data;
++	struct source *source = dev->source;
++	struct pending_request *pending;
++
++	if (!source->session)
++		source->session = avdtp_get(&dev->src, &dev->dst);
++
++	if (!source->session)
++		return g_dbus_create_error(msg, ERROR_INTERFACE ".Failed",
++						"Unable to get a session");
++
++	if (source->connect || source->disconnect)
++		return g_dbus_create_error(msg, ERROR_INTERFACE ".Failed",
++						"%s", strerror(EBUSY));
++
++	if (source->stream_state >= AVDTP_STATE_OPEN)
++		return g_dbus_create_error(msg, ERROR_INTERFACE
++						".AlreadyConnected",
++						"Device Already Connected");
++
++	if (!source_setup_stream(source, NULL))
++		return g_dbus_create_error(msg, ERROR_INTERFACE ".Failed",
++						"Failed to create a stream");
++
++	dev->auto_connect = FALSE;
++
++	pending = source->connect;
++
++	pending->conn = dbus_connection_ref(conn);
++	pending->msg = dbus_message_ref(msg);
++
++	debug("stream creation in progress");
++
++	return NULL;
++}
++
++static DBusMessage *source_disconnect(DBusConnection *conn,
++					DBusMessage *msg, void *data)
++{
++	struct audio_device *device = data;
++	struct source *source = device->source;
++	struct pending_request *pending;
++	int err;
++
++	if (!source->session)
++		return g_dbus_create_error(msg, ERROR_INTERFACE
++						".NotConnected",
++						"Device not Connected");
++
++	if (source->connect || source->disconnect)
++		return g_dbus_create_error(msg, ERROR_INTERFACE ".Failed",
++						"%s", strerror(EBUSY));
++
++	if (source->stream_state < AVDTP_STATE_OPEN) {
++		DBusMessage *reply = dbus_message_new_method_return(msg);
++		if (!reply)
++			return NULL;
++		avdtp_unref(source->session);
++		source->session = NULL;
++		return reply;
++	}
++
++	err = avdtp_close(source->session, source->stream);
++	if (err < 0)
++		return g_dbus_create_error(msg, ERROR_INTERFACE ".Failed",
++						"%s", strerror(-err));
++
++	pending = g_new0(struct pending_request, 1);
++	pending->conn = dbus_connection_ref(conn);
++	pending->msg = dbus_message_ref(msg);
++	source->disconnect = pending;
++
++	return NULL;
++}
++
++static DBusMessage *source_is_connected(DBusConnection *conn,
++					DBusMessage *msg,
++					void *data)
++{
++	struct audio_device *device = data;
++	struct source *source = device->source;
++	DBusMessage *reply;
++	dbus_bool_t connected;
++
++	reply = dbus_message_new_method_return(msg);
++	if (!reply)
++		return NULL;
++
++	connected = (source->stream_state >= AVDTP_STATE_CONFIGURED);
++
++	dbus_message_append_args(reply, DBUS_TYPE_BOOLEAN, &connected,
++					DBUS_TYPE_INVALID);
++
++	return reply;
++}
++
++static DBusMessage *source_get_properties(DBusConnection *conn,
++					DBusMessage *msg, void *data)
++{
++	struct audio_device *device = data;
++	struct source *source = device->source;
++	DBusMessage *reply;
++	DBusMessageIter iter;
++	DBusMessageIter dict;
++	const char *state;
++	gboolean value;
++
++	reply = dbus_message_new_method_return(msg);
++	if (!reply)
++		return NULL;
++
++	dbus_message_iter_init_append(reply, &iter);
++
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
++
++	/* Playing */
++	value = (source->stream_state == AVDTP_STATE_STREAMING);
++	dict_append_entry(&dict, "Playing", DBUS_TYPE_BOOLEAN, &value);
++
++	/* Connected */
++	value = (source->stream_state >= AVDTP_STATE_CONFIGURED);
++	dict_append_entry(&dict, "Connected", DBUS_TYPE_BOOLEAN, &value);
++
++	/* State */
++	state = state2str(source->state);
++	if (state)
++		dict_append_entry(&dict, "State", DBUS_TYPE_STRING, &state);
++
++	dbus_message_iter_close_container(&iter, &dict);
++
++	return reply;
++}
++
++static GDBusMethodTable source_methods[] = {
++	{ "Connect",		"",	"",	source_connect,
++						G_DBUS_METHOD_FLAG_ASYNC },
++	{ "Disconnect",		"",	"",	source_disconnect,
++						G_DBUS_METHOD_FLAG_ASYNC },
++	{ "IsConnected",	"",	"b",	source_is_connected,
++						G_DBUS_METHOD_FLAG_DEPRECATED },
++	{ "GetProperties",	"",	"a{sv}",source_get_properties },
++	{ NULL, NULL, NULL, NULL }
++};
++
++static GDBusSignalTable source_signals[] = {
++	{ "Connected",			"",	G_DBUS_SIGNAL_FLAG_DEPRECATED },
++	{ "Disconnected",		"",	G_DBUS_SIGNAL_FLAG_DEPRECATED },
++	{ "Playing",			"",	G_DBUS_SIGNAL_FLAG_DEPRECATED },
++	{ "Stopped",			"",	G_DBUS_SIGNAL_FLAG_DEPRECATED },
++	{ "PropertyChanged",		"sv"	},
++	{ NULL, NULL }
++};
++
++static void source_free(struct audio_device *dev)
++{
++	struct source *source = dev->source;
++
++	if (source->cb_id)
++		avdtp_stream_remove_cb(source->session, source->stream,
++					source->cb_id);
++
++	if (source->dc_id)
++		device_remove_disconnect_watch(dev->btd_dev, source->dc_id);
++
++	if (source->session)
++		avdtp_unref(source->session);
++
++	if (source->connect)
++		pending_request_free(dev, source->connect);
++
++	if (source->disconnect)
++		pending_request_free(dev, source->disconnect);
++
++	if (source->retry_id)
++		g_source_remove(source->retry_id);
++
++	g_free(source);
++	dev->source = NULL;
++}
++
++static void path_unregister(void *data)
++{
++	struct audio_device *dev = data;
++
++	debug("Unregistered interface %s on path %s",
++		AUDIO_SOURCE_INTERFACE, dev->path);
++
++	source_free(dev);
++}
++
++void source_unregister(struct audio_device *dev)
++{
++	g_dbus_unregister_interface(dev->conn, dev->path,
++		AUDIO_SOURCE_INTERFACE);
++}
++
++struct source *source_init(struct audio_device *dev)
++{
++	struct source *source;
++
++	if (!g_dbus_register_interface(dev->conn, dev->path,
++					AUDIO_SOURCE_INTERFACE,
++					source_methods, source_signals, NULL,
++					dev, path_unregister))
++		return NULL;
++
++	debug("Registered interface %s on path %s",
++		AUDIO_SOURCE_INTERFACE, dev->path);
++
++	if (avdtp_callback_id == 0)
++		avdtp_callback_id = avdtp_add_state_cb(avdtp_state_callback,
++									NULL);
++
++	source = g_new0(struct source, 1);
++
++	source->dev = dev;
++
++	return source;
++}
++
++gboolean source_is_active(struct audio_device *dev)
++{
++	struct source *source = dev->source;
++
++	if (source->session)
++		return TRUE;
++
++	return FALSE;
++}
++
++avdtp_state_t source_get_state(struct audio_device *dev)
++{
++	struct source *source = dev->source;
++
++	return source->stream_state;
++}
++
++gboolean source_new_stream(struct audio_device *dev, struct avdtp *session,
++				struct avdtp_stream *stream)
++{
++	struct source *source = dev->source;
++
++	if (source->stream)
++		return FALSE;
++
++	if (!source->session)
++		source->session = avdtp_ref(session);
++
++	source->stream = stream;
++
++	source->cb_id = avdtp_stream_add_cb(session, stream,
++						stream_state_changed, dev);
++
++	return TRUE;
++}
++
++gboolean source_shutdown(struct source *source)
++{
++	if (!source->stream)
++		return FALSE;
++
++	if (avdtp_close(source->session, source->stream) < 0)
++		return FALSE;
++
++	return TRUE;
++}
++
++unsigned int source_add_state_cb(source_state_cb cb, void *user_data)
++{
++	struct source_state_callback *state_cb;
++	static unsigned int id = 0;
++
++	state_cb = g_new(struct source_state_callback, 1);
++	state_cb->cb = cb;
++	state_cb->user_data = user_data;
++	state_cb->id = ++id;
++
++	source_callbacks = g_slist_append(source_callbacks, state_cb);
++
++	return state_cb->id;
++}
++
++gboolean source_remove_state_cb(unsigned int id)
++{
++	GSList *l;
++
++	for (l = source_callbacks; l != NULL; l = l->next) {
++		struct source_state_callback *cb = l->data;
++		if (cb && cb->id == id) {
++			source_callbacks = g_slist_remove(source_callbacks, cb);
++			g_free(cb);
++			return TRUE;
++		}
++	}
++
++	return FALSE;
++}
+diff --git a/audio/source.h b/audio/source.h
+new file mode 100644
+index 0000000..8250814
+--- /dev/null
++++ b/audio/source.h
+@@ -0,0 +1,50 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2006-2007  Nokia Corporation
++ *  Copyright (C) 2004-2009  Marcel Holtmann <marcel@holtmann.org>
++ *  Copyright (C) 2009  Joao Paulo Rechi Vita
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#define AUDIO_SOURCE_INTERFACE "org.bluez.AudioSource"
++
++typedef enum {
++	SOURCE_STATE_DISCONNECTED,
++	SOURCE_STATE_CONNECTING,
++	SOURCE_STATE_CONNECTED,
++	SOURCE_STATE_PLAYING,
++} source_state_t;
++
++typedef void (*source_state_cb) (struct audio_device *dev,
++				source_state_t old_state,
++				source_state_t new_state,
++				void *user_data);
++
++unsigned int source_add_state_cb(source_state_cb cb, void *user_data);
++gboolean source_remove_state_cb(unsigned int id);
++
++struct source *source_init(struct audio_device *dev);
++void source_unregister(struct audio_device *dev);
++gboolean source_is_active(struct audio_device *dev);
++avdtp_state_t source_get_state(struct audio_device *dev);
++gboolean source_new_stream(struct audio_device *dev, struct avdtp *session,
++				struct avdtp_stream *stream);
++gboolean source_setup_stream(struct source *source, struct avdtp *session);
++gboolean source_shutdown(struct source *source);
 -- 
 1.6.0.4
 
