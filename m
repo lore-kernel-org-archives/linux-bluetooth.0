@@ -1,24 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-From: John Frankish <j-frankish@slb.com>
+From: "Wan, Shuang" <shuang.wan@intel.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 13 Jul 2009 06:00:43 +0200
-Subject: RE: bluetooth-wizard pin fixed at 0000 which is unable to pair with
+Date: Mon, 13 Jul 2009 09:40:17 +0800
+Subject: bluetooth-wizard pin fixed at 0000 which is unable to pair with
  headset with other pins
-Message-ID: <6AC5A55546F64545AE996F8200E3AC4E06E31569@NL0105EXC01V01.eur.slb.com>
-References: <E2263E4A5B2284449EEBD0AAB751098402CD17452D@PDSMSX501.ccr.corp.intel.com>
-In-Reply-To: <E2263E4A5B2284449EEBD0AAB751098402CD17452D@PDSMSX501.ccr.corp.intel.com>
+Message-ID: <E2263E4A5B2284449EEBD0AAB751098402CD17452D@PDSMSX501.ccr.corp.intel.com>
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
-
-
-
------Original Message-----
-From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Wan, Shuang
-Sent: 13 July, 2009 05:40
-To: linux-bluetooth@vger.kernel.org
-Subject: bluetooth-wizard pin fixed at 0000 which is unable to pair with headset with other pins
 
 Hi,
 
@@ -42,5 +32,3 @@ Anyone has come across this similar issue? Any suggestions?
 Thanks!
 Wan Shuang
 
---
-Does it work with simple-agent?
