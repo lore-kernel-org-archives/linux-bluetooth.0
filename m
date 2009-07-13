@@ -1,60 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A5B5D89.8020205@dell.com>
-Date: Mon, 13 Jul 2009 11:15:05 -0500
-From: Mario Limonciello <mario_limonciello@dell.com>
 MIME-Version: 1.0
-To: Bastien Nocera <hadess@hadess.net>
-CC: marcel@holtmann.org, artem@makhutov.org, linux-bluetooth@vger.kernel.org
-Subject: Re: bluetoothd not starting at boot with udev
-References: <20090711161051.GM10684@titan.makhutov-it.de>	 <1247337640.9709.96.camel@localhost.localdomain>	 <6BE8CE7840AC9F459EF5A0693CA2744D6BAFB1@ausx3mpc138.aus.amer.dell.com> <1247418647.5460.3.camel@snoogens.fab.redhat.com>
-In-Reply-To: <1247418647.5460.3.camel@snoogens.fab.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="------------enigC7B4E6C79EA1947E6A5EBC81"
+In-Reply-To: <35c90d960907091237o72228b0v57ad2556d77f4857@mail.gmail.com>
+References: <35c90d960905191820g4e3ee434hfd0060815540a4e0@mail.gmail.com>
+	<1242787757.3147.13.camel@localhost.localdomain> <35c90d960905201457i508c678fqeb696cce32ae63be@mail.gmail.com>
+	<35c90d960907061155t7349cc90p2e58a09a310b8926@mail.gmail.com>
+	<35c90d960907091237o72228b0v57ad2556d77f4857@mail.gmail.com>
+From: Nick Pelly <npelly@google.com>
+Date: Mon, 13 Jul 2009 08:46:13 -0700
+Message-ID: <35c90d960907130846v2320de88pd6f34b8aabfdbb9e@mail.gmail.com>
+Subject: Re: bug? kernel does not send HCI Create Connection Cancel Command on
+	shutdown() or close() of a connecting rfcomm socket
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enigC7B4E6C79EA1947E6A5EBC81
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-
-Hi Bastien:
-
-Bastien Nocera wrote:
-> On Sat, 2009-07-11 at 18:26 -0500, Mario_Limonciello@Dell.com wrote:
->  =20
+On Thu, Jul 9, 2009 at 12:37 PM, Nick Pelly<npelly@google.com> wrote:
+> For the RFCOMM issue.
 >
-> Your udev scripts are missing a call to "udevadm trigger --retry-failed=
-"
+> This is the log when shutdown() is called on the rfcomm socket while
+> the ACL link is connecting:
 >
-> Cheers
->  =20
-Currently in the Ubuntu udev init script there is a call to 'udevadm
-trigger' (without any arguments).  Without any arguments it appears the
-default is "--type=3Ddevices".  When I add --type=3Dfailed (--retry-faile=
-d
-is deprecated), the system fails to boot up to X.  If I return it back
-to it's old state and add a second call right afterward of
-"--type=3Dfailed", there is no difference in behavior.  bluetoothd still
-fails to spawn by the udev rule.
---=20
-Mario Limonciello
-*Dell | Linux Engineering*
-mario_limonciello@dell.com
+> [  132.856414] rfcomm:rfcomm_sock_shutdown: sock c5cb3a20, sk c63fca00
+> [  132.856933] rfcomm:__rfcomm_sock_close: sk c63fca00 state 5 socket c5cb3a20
+> [  132.857788] rfcomm:__rfcomm_dlc_close: dlc c61ea240 state 7 dlci 38
+> err 0 session c63d4ba0
+> [  132.858612] rfcomm:rfcomm_send_disc: c63d4ba0 dlci 38
+> [  132.859069] rfcomm:rfcomm_send_frame: session c63d4ba0 len 4
+> [  132.859893] l2cap:l2cap_sock_sendmsg: sock c5cb38c0, sk c63fc800
+> [  132.860351] rfcomm:rfcomm_dlc_set_timer: dlc c61ea240 state 8 timeout 2000
+> [  133.863739] rfcomm:rfcomm_sock_release: sock c5cb3a20, sk c63fca00
+> [  133.864257] rfcomm:rfcomm_sock_shutdown: sock c5cb3a20, sk c63fca00
+> [  133.865081] rfcomm:rfcomm_sock_kill: sk c63fca00 state 5 refcnt 2
+> [  133.865539] rfcomm:rfcomm_sock_destruct: sk c63fca00 dlc c61ea240
+>
+>
+>
+> I'm surprised to see d->state for the rfcomm_dlc is BT_CONFIG at
+> __rfcomm_dlc_close(), but looking at __rfcomm_dlc_open() this appears
+> to be intentional.
+>
+> We do not hit __l2cap_sock_close()
+>
+> We attempt a graceful rfcomm disconnected by sending the dlci
+> disconnected frame - but this does not make sense - since there is no
+> rfcomm connection yet.
+>
+>
+> Assuming that d->state == BT_CONFIG during this phase is correct, then
+> the attached patch will fix this issue.
+>
+> However - I don't know the rfcomm state machine - so this patch may
+> having side effects. Requesting comments.
 
+Any comments on this patch?
 
---------------enigC7B4E6C79EA1947E6A5EBC81
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+It works for me, but my understanding of the RFCOMM state machine is naive.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
-
-iEYEARECAAYFAkpbXZIACgkQ2CrZjkA73YsBWQCgismDFiu78TZwlW7vGx7HvPwz
-AfIAn2mtd1fPGK+SKsS76xwJMPwgXdTh
-=Dgvt
------END PGP SIGNATURE-----
-
---------------enigC7B4E6C79EA1947E6A5EBC81--
+Nick
