@@ -1,57 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Wan, Shuang" <shuang.wan@intel.com>
-To: John Frankish <j-frankish@slb.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 13 Jul 2009 20:12:40 +0800
-Subject: RE: bluetooth-wizard pin fixed at 0000 which is unable to pair with
- headset with other pins
-Message-ID: <E2263E4A5B2284449EEBD0AAB751098402CD1DBE28@PDSMSX501.ccr.corp.intel.com>
+Subject: Re: bluetooth-wizard pin fixed at 0000 which is unable to pair
+ with headset with other pins
+From: Bastien Nocera <hadess@hadess.net>
+To: "Wan, Shuang" <shuang.wan@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <E2263E4A5B2284449EEBD0AAB751098402CD17452D@PDSMSX501.ccr.corp.intel.com>
 References: <E2263E4A5B2284449EEBD0AAB751098402CD17452D@PDSMSX501.ccr.corp.intel.com>
- <6AC5A55546F64545AE996F8200E3AC4E06E31569@NL0105EXC01V01.eur.slb.com>
-In-Reply-To: <6AC5A55546F64545AE996F8200E3AC4E06E31569@NL0105EXC01V01.eur.slb.com>
-Content-Type: text/plain; charset="gb2312"
-MIME-Version: 1.0
+Content-Type: text/plain
+Date: Mon, 13 Jul 2009 11:48:05 +0100
+Message-Id: <1247482085.5460.7.camel@snoogens.fab.redhat.com>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgSm9obiwNCg0KCVRoYW5rcyBmb3IgeW91ciByZXBseS4gQWN0dWFsbHkgaXQncyBhIGJ1ZyBy
-ZXBvcnRlZCB0byBtb2JsaW4yIGJ1Z3ppbGxhOg0KaHR0cDovL2J1Z3ppbGxhLm1vYmxpbi5vcmcv
-c2hvd19idWcuY2dpP2lkPTM3MDQNClRvIHJlcHJvZHVjZSB0aGF0LCBJIG1vZGlmaWVkIHRoZSBz
-b3VyY2UgdG8gYmVsbG93Og0KICAgICAgICAvKiBNb3N0IGhlYWRzZXRzIGFyZSB1c2luZyAwMDAw
-IGFzIHBpbmNvZGUgKi8NCiAgICAgICAgaWYgKHRhcmdldF90eXBlID09IEJMVUVUT09USF9UWVBF
-X0hFQURTRVQgfHwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdGFyZ2V0X3R5cGUg
-PT0gQkxVRVRPT1RIX1RZUEVfSEVBRFBIT05FKQ0KICAgICAgICAgICAgICAgIC8vcGluY29kZSA9
-ICIwMDAwIjsNCiAgICAgICAgICAgICAgICBwaW5jb2RlID0gIjEyMzQiOw0KLi4uLi4NCkFuZCBw
-YWlyaW5nIHdpdGggdGhlIGZpeGVkIHBpbiBjb2RlIDAwMDAgaGVhZHNldCwgZmluYWxseSBtZXQg
-dGhlIHNpbWlsYXIgcHJvYmxlbS4NCg0KUmVnYXJkcw0KU2h1YW5nDQoNCg0KLS0tLS1PcmlnaW5h
-bCBNZXNzYWdlLS0tLS0NCkZyb206IGxpbnV4LWJsdWV0b290aC1vd25lckB2Z2VyLmtlcm5lbC5v
-cmcgW21haWx0bzpsaW51eC1ibHVldG9vdGgtb3duZXJAdmdlci5rZXJuZWwub3JnXSBPbiBCZWhh
-bGYgT2YgSm9obiBGcmFua2lzaA0KU2VudDogMjAwOcTqN9TCMTPI1SAxMjowMQ0KVG86IGxpbnV4
-LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNClN1YmplY3Q6IFJFOiBibHVldG9vdGgtd2l6YXJk
-IHBpbiBmaXhlZCBhdCAwMDAwIHdoaWNoIGlzIHVuYWJsZSB0byBwYWlyIHdpdGggaGVhZHNldCB3
-aXRoIG90aGVyIHBpbnMNCg0KDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBs
-aW51eC1ibHVldG9vdGgtb3duZXJAdmdlci5rZXJuZWwub3JnIFttYWlsdG86bGludXgtYmx1ZXRv
-b3RoLW93bmVyQHZnZXIua2VybmVsLm9yZ10gT24gQmVoYWxmIE9mIFdhbiwgU2h1YW5nDQpTZW50
-OiAxMyBKdWx5LCAyMDA5IDA1OjQwDQpUbzogbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9y
-Zw0KU3ViamVjdDogYmx1ZXRvb3RoLXdpemFyZCBwaW4gZml4ZWQgYXQgMDAwMCB3aGljaCBpcyB1
-bmFibGUgdG8gcGFpciB3aXRoIGhlYWRzZXQgd2l0aCBvdGhlciBwaW5zDQoNCkhpLA0KDQpKdXN0
-IGF0dGVtcHQgdG8gcGFpciB3aXRoIGEgZml4ZWQgcGluIGRldmljZSB1c2luZyBibHVldG9vdGgt
-d2l6YXJkIHRoYXQgZG9lc24ndCBoYXZlIDAwMDAgYXMgaXRzIHBpbi4uSSBoYXZlIGEgR2VhcjQt
-QmxhY2tib3ggTWluaSAod2hpY2ggaXMgYSBoZWFkc2V0L2EyZHAgZGV2aWNlKSB3aGljaCBoYXMg
-YSBmaXhlZCBwaW4gb2YgMTIzNC4gV2hlbiBJIHRyeSB0byBwYWlyIHRoZSBkZXZpY2UgaXQgZmFp
-bHMgYWZ0ZXIgYXR0ZW1wdGluZyB0byB1c2UgMDAwMCwgd2l0aCBubyBvcHBvcnR1bml0eSB0byBl
-bnRlciBhbnkgb3RoZXIgcGluLg0KDQpJdCBtaWdodCBiZSBjYXVzZWQgYnkgdGhlIGhhcmQgY29k
-ZSBpbiBibHVlei1nbm9tZSwgc2VlIGJsdWV6LWdub21lLTEuOCBzb3VyY2UgY29kZSB3aXphcmQv
-bWFpbi5jDQpzdGF0aWMgZ2Jvb2xlYW4gcGluY29kZV9jYWxsYmFjayhEQnVzR01ldGhvZEludm9j
-YXRpb24gKmNvbnRleHQsDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-REJ1c0dQcm94eSAqZGV2aWNlLCBncG9pbnRlciB1c2VyX2RhdGEpDQp7DQouLi4uLi4uLi4uLi4u
-Lg0KDQogICAgICAgIC8qIE1vc3QgaGVhZHNldHMgYXJlIHVzaW5nIDAwMDAgYXMgcGluY29kZSAq
-Lw0KICAgICAgICBpZiAodGFyZ2V0X3R5cGUgPT0gQkxVRVRPT1RIX1RZUEVfSEVBRFNFVCB8fA0K
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0YXJnZXRfdHlwZSA9PSBCTFVFVE9PVEhf
-VFlQRV9IRUFEUEhPTkUpDQogICAgICAgICAgICAgICAgcGluY29kZSA9ICIwMDAwIjsNCi4uLi4u
-Li4uLi4uDQp9DQoNCkFueW9uZSBoYXMgY29tZSBhY3Jvc3MgdGhpcyBzaW1pbGFyIGlzc3VlPyBB
-bnkgc3VnZ2VzdGlvbnM/DQoNClRoYW5rcyENCldhbiBTaHVhbmcNCg0KLS0NCkRvZXMgaXQgd29y
-ayB3aXRoIHNpbXBsZS1hZ2VudD8NCi0tDQpUbyB1bnN1YnNjcmliZSBmcm9tIHRoaXMgbGlzdDog
-c2VuZCB0aGUgbGluZSAidW5zdWJzY3JpYmUgbGludXgtYmx1ZXRvb3RoIiBpbg0KdGhlIGJvZHkg
-b2YgYSBtZXNzYWdlIHRvIG1ham9yZG9tb0B2Z2VyLmtlcm5lbC5vcmcNCk1vcmUgbWFqb3Jkb21v
-IGluZm8gYXQgIGh0dHA6Ly92Z2VyLmtlcm5lbC5vcmcvbWFqb3Jkb21vLWluZm8uaHRtbA0K
+On Mon, 2009-07-13 at 09:40 +0800, Wan, Shuang wrote:
+> Hi,
+> 
+> Just attempt to pair with a fixed pin device using bluetooth-wizard
+> that doesn't have 0000 as its pin..I have a Gear4-Blackbox Mini (which
+> is a headset/a2dp device) which has a fixed pin of 1234. When I try to
+> pair the device it fails after attempting to use 0000, with no
+> opportunity to enter any other pin.
+
+This is fixed in gnome-bluetooth.
+
+Cheers
+
