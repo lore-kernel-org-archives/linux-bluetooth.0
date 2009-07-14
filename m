@@ -1,58 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: bluetoothd not starting at boot with udev
-From: Bastien Nocera <hadess@hadess.net>
-To: Mario Limonciello <mario_limonciello@dell.com>
-Cc: artem@makhutov.org, linux-bluetooth@vger.kernel.org
-In-Reply-To: <4A5BBE4D.1010406@dell.com>
-References: <20090711161051.GM10684@titan.makhutov-it.de>
-	 <1247337640.9709.96.camel@localhost.localdomain>
-	 <6BE8CE7840AC9F459EF5A0693CA2744D6BAFB1@ausx3mpc138.aus.amer.dell.com>
-	 <1247418647.5460.3.camel@snoogens.fab.redhat.com>
-	 <4A5B5D89.8020205@dell.com>  <4A5BBE4D.1010406@dell.com>
-Content-Type: text/plain
-Date: Tue, 14 Jul 2009 05:30:01 +0100
-Message-Id: <1247545801.5460.19.camel@snoogens.fab.redhat.com>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Bing Zhao <bzhao@marvell.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 13 Jul 2009 21:20:42 -0700
+Subject: RE: [PATCH] Bluetooth: Fix incorrect alignment in Marvell
+ BT-over-SDIO driver
+Message-ID: <477F20668A386D41ADCC57781B1F704306CCBCD5DB@SC-VEXCH1.marvell.com>
+References: <1247078654-8666-1-git-send-email-bzhao@marvell.com>
+	 <1247079256.9709.2.camel@localhost.localdomain>
+	 <477F20668A386D41ADCC57781B1F704306CCBCD429@SC-VEXCH1.marvell.com>
+ <1247538404.4549.15.camel@violet>
+In-Reply-To: <1247538404.4549.15.camel@violet>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 2009-07-13 at 18:07 -0500, Mario Limonciello wrote:
-> Hi Bastien:
-> 
-> Mario Limonciello wrote:
-> > Hi Bastien:
+Hi Marcel,
+
+> -----Original Message-----
+> From: Marcel Holtmann [mailto:marcel@holtmann.org]
+> Sent: Monday, July 13, 2009 7:27 PM
+> To: Bing Zhao
+> Cc: linux-bluetooth@vger.kernel.org
+> Subject: RE: [PATCH] Bluetooth: Fix incorrect alignment in Marvell BT-ove=
+r-SDIO driver
+>=20
+> Hi Bing,
+>=20
+> not top-posting please. This is an open source mailing list. We do
+> things the right way.
+
+Sorry about that.
+
+> > This patch fixed the alignment issue and the compilation warnings on 64=
+-bit system.
+> > I also tested some basic commands (scan, l2ping, etc.) on my 64-bit HP =
+laptop and they seem working
+> fine.
 > >
-> > Bastien Nocera wrote:
-> >   
-> > Currently in the Ubuntu udev init script there is a call to 'udevadm
-> > trigger' (without any arguments).  Without any arguments it appears the
-> > default is "--type=devices".  When I add --type=failed (--retry-failed
-> > is deprecated), the system fails to boot up to X.  If I return it back
-> > to it's old state and add a second call right afterward of
-> > "--type=failed", there is no difference in behavior.  bluetoothd still
-> > fails to spawn by the udev rule.
-> >   
-> I'm actually suspecting that this is caused by dbus daemon not being
-> spawned early enough for bluetoothd to have access to.
+> > Should you have any other commands for testing/verification, or items f=
+or cleanup please let me
+> know.
+>=20
+> I pushed bluetooth-mrvl-2.6 into bluetooth-next-2.6 to see if any build
+> fallouts come up.
 
-Which is why you need to retry the failed rules later on.
+Thanks! I'll clone bluetooth-next-2.6 tree for testing and future changes.
 
->   I've come to
-> this conclusion by putting a shell wrapper around bluetoothd and
-> capturing exit code status to see that it does get spawned at startup
-> but immediately exits.  I put a pgrep at the same time to check for
-> dbus, and didn't see it running.
-> 
-> How are you ensuring that dbus is running by the time that udev starts
-> processing rules in Fedora then?
-> 
-> For now the only solution I can come up with is to maintain an init
-> script that runs "udevadm trigger --subsystem-match=bluetooth".  Since
-> multiple invocations of bluetoothd --udev won't harm the system, it's
-> not that horrible of a workaround, but still ideally would like to lose
-> the init script altogether.
+Bing
 
-You need to call with the --retry-failed, after the basics of the system
-have been brought up. This means starting up D-Bus, mounting network
-filesystems, etc.
-
+> Regards
+>=20
+> Marcel
+>=20
