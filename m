@@ -1,89 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A5CAD92.3000607@dell.com>
-Date: Tue, 14 Jul 2009 11:08:50 -0500
-From: Mario Limonciello <mario_limonciello@dell.com>
+From: "Wan, Shuang" <shuang.wan@intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Bastien Nocera <hadess@hadess.net>
+CC: "Mario_Limonciello@Dell.com" <Mario_Limonciello@Dell.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Tue, 14 Jul 2009 17:17:50 +0800
+Subject: RE: bluetooth-wizard pin fixed at 0000 which is unable to pair with
+ headset with other pins
+Message-ID: <E2263E4A5B2284449EEBD0AAB751098402CD1DC4CA@PDSMSX501.ccr.corp.intel.com>
+References: <E2263E4A5B2284449EEBD0AAB751098402CD17452D@PDSMSX501.ccr.corp.intel.com>
+	 <1247482085.5460.7.camel@snoogens.fab.redhat.com>
+	 <E2263E4A5B2284449EEBD0AAB751098402CD1DBE29@PDSMSX501.ccr.corp.intel.com>
+	 <1247490109.5460.10.camel@snoogens.fab.redhat.com>
+	 <6BE8CE7840AC9F459EF5A0693CA2744D6EC54F@ausx3mpc138.aus.amer.dell.com>
+	 <1247495957.5460.13.camel@snoogens.fab.redhat.com>
+ <1247538197.4549.13.camel@violet>
+In-Reply-To: <1247538197.4549.13.camel@violet>
+Content-Type: text/plain; charset="gb2312"
 MIME-Version: 1.0
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: bluetoothd not starting at boot with udev
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="------------enig78711B74F870BC623A7C8663"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enig78711B74F870BC623A7C8663
-Content-Type: multipart/mixed;
- boundary="------------080903080207000708000108"
-
-This is a multi-part message in MIME format.
---------------080903080207000708000108
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-
-Hi Bastien
-
-Bastien Nocera wrote:
-> On Mon, 2009-07-13 at 18:07 -0500, Mario Limonciello wrote:
->  =20
->
-> Which is why you need to retry the failed rules later on.
->  =20
-OK, good to know that my suspicions were correct.
->  =20
->
-> You need to call with the --retry-failed, after the basics of the syste=
-m
-> have been brought up. This means starting up D-Bus, mounting network
-> filesystems, etc.
->  =20
-Unfortunately, this makes no difference.  It appears that the previous
-invocation of the rules is not registering as a failure.  If I remove my
-extra trigger call on the bluetooth subsystem and run:
-
-$ udevadm trigger --type=3Dfailed --verbose --dry-run
-(or --retry-failed, they follow the same code path)
-
-No devices are printed, and nothing happens.
-
-Regards
-
---=20
-Mario Limonciello
-*Dell | Linux Engineering*
-mario_limonciello@dell.com
-
---=20
-Mario Limonciello
-*Dell | Linux Engineering*
-mario_limonciello@dell.com
-
---------------080903080207000708000108
-Content-Type: application/pgp-signature;
- name="signature.asc"
-Content-Transfer-Encoding: base64
-Content-Disposition: inline;
- filename="signature.asc"
-
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjEuNC45IChH
-TlUvTGludXgpCkNvbW1lbnQ6IFVzaW5nIEdudVBHIHdpdGggTW96aWxsYSAtIGh0dHA6Ly9l
-bmlnbWFpbC5tb3pkZXYub3JnCgppRVlFQVJFQ0FBWUZBa3BjcldnQUNna1EyQ3JaamtBNzNZ
-dVJtd0NlUHN1dlpMcUpmVGowUTQzZ0VMdUREZU1MClhuUUFuMEVGUHZnYStSelF6NmthNWxr
-RmpGaFdwZDJpCj01OHJ4Ci0tLS0tRU5EIFBHUCBTSUdOQVRVUkUtLS0tLQoK
---------------080903080207000708000108--
-
---------------enig78711B74F870BC623A7C8663
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
-
-iEYEARECAAYFAkpcrZIACgkQ2CrZjkA73Yuj9wCeMcQQsB4fvfip+H3HVXMYHTYw
-DBwAn3tGoNCISA/2T6e/W+nEPRspKIf4
-=xbPL
------END PGP SIGNATURE-----
-
---------------enig78711B74F870BC623A7C8663--
+SGkgTWFyY2VsLA0KDQoJU28gdGhlIGdub21lLWJsdWV0b290aCB3aWxsIGJlIHJlY29tbWVuZGVk
+IFVJIGZvciBibHVlej8gQW5kIGJsdWV6LWdub21lIHdpbGwgYmUgbm8gbG9uZ2VyIG1haW50YWlu
+ZWQgYnV0IHN0aWxsIGxpdmUgaW4gdGhlIGJsdWV6Lm9yZz8NCg0KVGhhbmtzIQ0KU2h1YW5nDQoN
+Ci0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBNYXJjZWwgSG9sdG1hbm4gW21haWx0
+bzptYXJjZWxAaG9sdG1hbm4ub3JnXSANClNlbnQ6IDIwMDnE6jfUwjE0yNUgMTA6MjMNClRvOiBC
+YXN0aWVuIE5vY2VyYQ0KQ2M6IE1hcmlvX0xpbW9uY2llbGxvQERlbGwuY29tOyBXYW4sIFNodWFu
+ZzsgbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZw0KU3ViamVjdDogUkU6IGJsdWV0b290
+aC13aXphcmQgcGluIGZpeGVkIGF0IDAwMDAgd2hpY2ggaXMgdW5hYmxlIHRvIHBhaXIgd2l0aCBo
+ZWFkc2V0IHdpdGggb3RoZXIgcGlucw0KDQpIaSBCYXN0aWVuLA0KDQo+ID4gPiBOb3QgYmx1ZXot
+Z25vbWUsIGdub21lLWJsdWV0b290aCwgYXMgYXZhaWxhYmxlIGluIHRoZSBHTk9NRSBnaXQgcmVw
+by4NCj4gPiANCj4gPiBJZiB0aGVyZSBpcyBub3QgZ29pbmcgdG8gYmUgYW55IG1vcmUgZGV2ZWxv
+cG1lbnQgaGFwcGVuaW5nIGFnYWluc3QgdGhlDQo+ID4gYmx1ZXotZ25vbWUgZ2l0IHRyZWUsIGNh
+biBpdCBiZSBmb3JtYWxseSBraWxsZWQgd2l0aCBzb21lIGluZGljYXRpb24NCj4gPiB0aGF0IHBl
+b3BsZSBzaG91bGQgd29yayBvbiBkZXZlbG9wbWVudCB3aXRoIGdub21lLWJsdWV0b290aCBhbmQv
+b3INCj4gPiBibHVlbWFuIHRoZW4/DQo+IA0KPiBJIGJlbGlldmUgTWFyY2VsIHdhbnRzIHRvIGtl
+ZXAgaXQgdG8gcGxheSBhcm91bmQgd2l0aCB0aGUgVUksIGZvciBuZXcNCj4gZmVhdHVyZXMuDQoN
+CmNvcnJlY3QuIEFuZCBJIGFtIG5vdCBraWxsaW5nIGEgdHJlZSBqdXN0IGZvciB0aGUgZnVuIG9m
+IGl0LiBJdCBpcyBhDQpnb29kIGhpc3RvcnkgbGVzc29uIGFuZCBnb29kIHRvIGhhdmUgdGhlIGNv
+ZGUgYXJvdW5kLg0KDQpXZSBjYW4gdXBkYXRlIHd3dy5ibHVlei5vcmcuIEkgaW52aXRlIGFueWJv
+ZHkgdG8gaGF2ZSBhbiBhY2NvdW50IHRoZXJlLg0KDQpSZWdhcmRzDQoNCk1hcmNlbA0KDQoNCg==
