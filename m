@@ -1,31 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <ea2906620907140856r718f5f76k59a461dfc9dd666c@mail.gmail.com>
-References: <ea2906620907140856r718f5f76k59a461dfc9dd666c@mail.gmail.com>
-Date: Wed, 15 Jul 2009 11:55:52 +0100
-Message-ID: <ea2906620907150355k23a2dd8cl26f7d916f775e6e3@mail.gmail.com>
-Subject: Fwd: Super fast audio with alsa
-From: Daniel Castro <castromd@tcd.ie>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <2d5a2c100907131427x18f26f82g405a781cd8670b88@mail.gmail.com>
+References: <35c90d960905191820g4e3ee434hfd0060815540a4e0@mail.gmail.com>
+	<1242787757.3147.13.camel@localhost.localdomain> <35c90d960905201457i508c678fqeb696cce32ae63be@mail.gmail.com>
+	<35c90d960907061155t7349cc90p2e58a09a310b8926@mail.gmail.com>
+	<35c90d960907091237o72228b0v57ad2556d77f4857@mail.gmail.com>
+	<35c90d960907130846v2320de88pd6f34b8aabfdbb9e@mail.gmail.com>
+	<2d5a2c100907131427x18f26f82g405a781cd8670b88@mail.gmail.com>
+From: Nick Pelly <npelly@google.com>
+Date: Tue, 14 Jul 2009 09:15:15 -0700
+Message-ID: <35c90d960907140915u71f20473x83b25579c4117a2d@mail.gmail.com>
+Subject: Re: bug? kernel does not send HCI Create Connection Cancel Command on
+	shutdown() or close() of a connecting rfcomm socket
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=0016364c791ffb73a3046eacc31f
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+--0016364c791ffb73a3046eacc31f
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 
-Very new to this bluetooth audio stuff and I hope this is a good place to ask.
+On Mon, Jul 13, 2009 at 2:27 PM, Luiz Augusto von
+Dentz<luiz.dentz@gmail.com> wrote:
+> Hi Nick,
+>
+> On Mon, Jul 13, 2009 at 12:46 PM, Nick Pelly<npelly@google.com> wrote:
+>> Any comments on this patch?
+>>
+>> It works for me, but my understanding of the RFCOMM state machine is naive.
+>>
+>
+> iirc BT_CONFIG(PN frame) means the DLC is being configured than we got
+> into connecting phase (BT_CONNECT) and send SABM frame. Only when
+> receiving UA frame DLC is consider connected (BT_CONNECTED), so your
+> patch seems good by assuming that we don't need to send a DISC for a
+> DLC not connected. But there is still a good use for it to cancel the
+> DLC connection attempt, so perhaps a better alternative would be to
+> use a much shorter timeout in those cases.
 
-I have a Motorola S9 headset, and I followed the instructions in
-http://wiki.bluez.org/wiki/HOWTO/AudioDevices to configure it to
-listen music with Audacious.
-I also have blueman installed which makes it very easy to pair and connect.
+Thanks for the advice.
 
-It kinda' works, but most of the times the audio goes super fast, it
-goes through the whole song in seconds, and CPU usage gets very high.
-When it works, if I leave it then it keeps working, but as soon as I
-start doing stuff like next song, play/pause it get messy again.
+I have prepared a new patch which uses a very short timeout (10ms) on
+the DLC disconnect when in BT_CONFIG. I have tested this patch and it
+also resolves the issue. Patch attached.
 
-Not sure it makes sense?
-Can someone help? Need more info? Can you point me in the right direction?
+Nick
 
-Thanks!
+--0016364c791ffb73a3046eacc31f
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-Bluetooth-Use-a-very-short-timeout-for-dlci-disconne.patch"
+Content-Disposition: attachment;
+	filename="0001-Bluetooth-Use-a-very-short-timeout-for-dlci-disconne.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_fx4tq21h0
+
+RnJvbSA4MGJjMDdlOTcwM2U0MzAzZjA0YzI2MTU4YjA5NmJjYmQwMGZkNjY1IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBOaWNrIFBlbGx5IDxucGVsbHlAZ29vZ2xlLmNvbT4KRGF0ZTog
+VHVlLCAxNCBKdWwgMjAwOSAwNzo1Nzo1NCAtMDcwMApTdWJqZWN0OiBbUEFUQ0hdIEJsdWV0b290
+aDogVXNlIGEgdmVyeSBzaG9ydCB0aW1lb3V0IGZvciBkbGNpIGRpc2Nvbm5lY3Qgd2hlbiBpbiBC
+VF9DT05GSUcuCgpUaGlzIGZpeGVzIGEgYnVnIHdoZXJlIHNodXRkb3duKCkgYW5kIGNsb3NlKCkg
+b24gYSByZmNvbW0gc29ja2V0IGR1cmluZyBBQ0wKY29ubmVjdGlvbiB3b3VsZCBub3QgY2F1c2Ug
+SENJIENyZWF0ZSBDb25uZWN0aW9uIENhbmNlbC4KClNpZ25lZC1vZmYtYnk6IE5pY2sgUGVsbHkg
+PG5wZWxseUBnb29nbGUuY29tPgotLS0KIGluY2x1ZGUvbmV0L2JsdWV0b290aC9yZmNvbW0uaCB8
+ICAgIDcgKysrKy0tLQogbmV0L2JsdWV0b290aC9yZmNvbW0vY29yZS5jICAgIHwgICAxMCArKysr
+KysrLS0tCiAyIGZpbGVzIGNoYW5nZWQsIDExIGluc2VydGlvbnMoKyksIDYgZGVsZXRpb25zKC0p
+CgpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL3JmY29tbS5oIGIvaW5jbHVkZS9u
+ZXQvYmx1ZXRvb3RoL3JmY29tbS5oCmluZGV4IDgwMDcyNjEuLmVlYjNmZmEgMTAwNjQ0Ci0tLSBh
+L2luY2x1ZGUvbmV0L2JsdWV0b290aC9yZmNvbW0uaAorKysgYi9pbmNsdWRlL25ldC9ibHVldG9v
+dGgvcmZjb21tLmgKQEAgLTI2LDkgKzI2LDEwIEBACiAKICNkZWZpbmUgUkZDT01NX1BTTSAzCiAK
+LSNkZWZpbmUgUkZDT01NX0NPTk5fVElNRU9VVCAoSFogKiAzMCkKLSNkZWZpbmUgUkZDT01NX0RJ
+U0NfVElNRU9VVCAoSFogKiAyMCkKLSNkZWZpbmUgUkZDT01NX0FVVEhfVElNRU9VVCAoSFogKiAy
+NSkKKyNkZWZpbmUgUkZDT01NX0NPTk5fVElNRU9VVCAJCShIWiAqIDMwKQorI2RlZmluZSBSRkNP
+TU1fRElTQ19USU1FT1VUIAkJKEhaICogMjApCisjZGVmaW5lIFJGQ09NTV9BVVRIX1RJTUVPVVQg
+CQkoSFogKiAyNSkKKyNkZWZpbmUgUkZDT01NX0NPTkZJR19ESVNDX1RJTUVPVVQgCShIWiAvIDEw
+MCkKIAogI2RlZmluZSBSRkNPTU1fREVGQVVMVF9NVFUJMTI3CiAjZGVmaW5lIFJGQ09NTV9ERUZB
+VUxUX0NSRURJVFMJNwpkaWZmIC0tZ2l0IGEvbmV0L2JsdWV0b290aC9yZmNvbW0vY29yZS5jIGIv
+bmV0L2JsdWV0b290aC9yZmNvbW0vY29yZS5jCmluZGV4IDFkMGZiMGYuLjQ3NmQ4NTYgMTAwNjQ0
+Ci0tLSBhL25ldC9ibHVldG9vdGgvcmZjb21tL2NvcmUuYworKysgYi9uZXQvYmx1ZXRvb3RoL3Jm
+Y29tbS9jb3JlLmMKQEAgLTQxOSw2ICs0MTksNyBAQCBpbnQgcmZjb21tX2RsY19vcGVuKHN0cnVj
+dCByZmNvbW1fZGxjICpkLCBiZGFkZHJfdCAqc3JjLCBiZGFkZHJfdCAqZHN0LCB1OCBjaGFubgog
+CiBzdGF0aWMgaW50IF9fcmZjb21tX2RsY19jbG9zZShzdHJ1Y3QgcmZjb21tX2RsYyAqZCwgaW50
+IGVycikKIHsKKwlsb25nIHRpbWVvdXQgPSBSRkNPTU1fRElTQ19USU1FT1VUOwogCXN0cnVjdCBy
+ZmNvbW1fc2Vzc2lvbiAqcyA9IGQtPnNlc3Npb247CiAJaWYgKCFzKQogCQlyZXR1cm4gMDsKQEAg
+LTQyNyw4ICs0MjgsMTEgQEAgc3RhdGljIGludCBfX3JmY29tbV9kbGNfY2xvc2Uoc3RydWN0IHJm
+Y29tbV9kbGMgKmQsIGludCBlcnIpCiAJCQlkLCBkLT5zdGF0ZSwgZC0+ZGxjaSwgZXJyLCBzKTsK
+IAogCXN3aXRjaCAoZC0+c3RhdGUpIHsKLQljYXNlIEJUX0NPTk5FQ1Q6CiAJY2FzZSBCVF9DT05G
+SUc6CisJCXRpbWVvdXQgPSBSRkNPTU1fQ09ORklHX0RJU0NfVElNRU9VVDsKKwkJLyogRmFsbC10
+aHJvdWdoICovCisKKwljYXNlIEJUX0NPTk5FQ1Q6CiAJCWlmICh0ZXN0X2FuZF9jbGVhcl9iaXQo
+UkZDT01NX0RFRkVSX1NFVFVQLCAmZC0+ZmxhZ3MpKSB7CiAJCQlzZXRfYml0KFJGQ09NTV9BVVRI
+X1JFSkVDVCwgJmQtPmZsYWdzKTsKIAkJCXJmY29tbV9zY2hlZHVsZShSRkNPTU1fU0NIRURfQVVU
+SCk7CkBAIC00NDAsMTAgKzQ0NCwxMCBAQCBzdGF0aWMgaW50IF9fcmZjb21tX2RsY19jbG9zZShz
+dHJ1Y3QgcmZjb21tX2RsYyAqZCwgaW50IGVycikKIAkJZC0+c3RhdGUgPSBCVF9ESVNDT05OOwog
+CQlpZiAoc2tiX3F1ZXVlX2VtcHR5KCZkLT50eF9xdWV1ZSkpIHsKIAkJCXJmY29tbV9zZW5kX2Rp
+c2MocywgZC0+ZGxjaSk7Ci0JCQlyZmNvbW1fZGxjX3NldF90aW1lcihkLCBSRkNPTU1fRElTQ19U
+SU1FT1VUKTsKKwkJCXJmY29tbV9kbGNfc2V0X3RpbWVyKGQsIHRpbWVvdXQpOwogCQl9IGVsc2Ug
+ewogCQkJcmZjb21tX3F1ZXVlX2Rpc2MoZCk7Ci0JCQlyZmNvbW1fZGxjX3NldF90aW1lcihkLCBS
+RkNPTU1fRElTQ19USU1FT1VUICogMik7CisJCQlyZmNvbW1fZGxjX3NldF90aW1lcihkLCB0aW1l
+b3V0ICogMik7CiAJCX0KIAkJYnJlYWs7CiAKLS0gCjEuNi4zLjEKCg==
+--0016364c791ffb73a3046eacc31f--
