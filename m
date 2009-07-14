@@ -1,43 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Wan, Shuang" <shuang.wan@intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Bastien Nocera <hadess@hadess.net>
-CC: "Mario_Limonciello@Dell.com" <Mario_Limonciello@Dell.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Tue, 14 Jul 2009 17:17:50 +0800
-Subject: RE: bluetooth-wizard pin fixed at 0000 which is unable to pair with
- headset with other pins
-Message-ID: <E2263E4A5B2284449EEBD0AAB751098402CD1DC4CA@PDSMSX501.ccr.corp.intel.com>
-References: <E2263E4A5B2284449EEBD0AAB751098402CD17452D@PDSMSX501.ccr.corp.intel.com>
-	 <1247482085.5460.7.camel@snoogens.fab.redhat.com>
-	 <E2263E4A5B2284449EEBD0AAB751098402CD1DBE29@PDSMSX501.ccr.corp.intel.com>
-	 <1247490109.5460.10.camel@snoogens.fab.redhat.com>
-	 <6BE8CE7840AC9F459EF5A0693CA2744D6EC54F@ausx3mpc138.aus.amer.dell.com>
-	 <1247495957.5460.13.camel@snoogens.fab.redhat.com>
- <1247538197.4549.13.camel@violet>
-In-Reply-To: <1247538197.4549.13.camel@violet>
-Content-Type: text/plain; charset="gb2312"
-MIME-Version: 1.0
+Subject: Re: bluetoothd not starting at boot with udev
+From: Bastien Nocera <hadess@hadess.net>
+To: Mario Limonciello <mario_limonciello@dell.com>
+Cc: artem@makhutov.org, linux-bluetooth@vger.kernel.org
+In-Reply-To: <4A5BBE4D.1010406@dell.com>
+References: <20090711161051.GM10684@titan.makhutov-it.de>
+	 <1247337640.9709.96.camel@localhost.localdomain>
+	 <6BE8CE7840AC9F459EF5A0693CA2744D6BAFB1@ausx3mpc138.aus.amer.dell.com>
+	 <1247418647.5460.3.camel@snoogens.fab.redhat.com>
+	 <4A5B5D89.8020205@dell.com>  <4A5BBE4D.1010406@dell.com>
+Content-Type: text/plain
+Date: Tue, 14 Jul 2009 05:30:01 +0100
+Message-Id: <1247545801.5460.19.camel@snoogens.fab.redhat.com>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTWFyY2VsLA0KDQoJU28gdGhlIGdub21lLWJsdWV0b290aCB3aWxsIGJlIHJlY29tbWVuZGVk
-IFVJIGZvciBibHVlej8gQW5kIGJsdWV6LWdub21lIHdpbGwgYmUgbm8gbG9uZ2VyIG1haW50YWlu
-ZWQgYnV0IHN0aWxsIGxpdmUgaW4gdGhlIGJsdWV6Lm9yZz8NCg0KVGhhbmtzIQ0KU2h1YW5nDQoN
-Ci0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBNYXJjZWwgSG9sdG1hbm4gW21haWx0
-bzptYXJjZWxAaG9sdG1hbm4ub3JnXSANClNlbnQ6IDIwMDnE6jfUwjE0yNUgMTA6MjMNClRvOiBC
-YXN0aWVuIE5vY2VyYQ0KQ2M6IE1hcmlvX0xpbW9uY2llbGxvQERlbGwuY29tOyBXYW4sIFNodWFu
-ZzsgbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZw0KU3ViamVjdDogUkU6IGJsdWV0b290
-aC13aXphcmQgcGluIGZpeGVkIGF0IDAwMDAgd2hpY2ggaXMgdW5hYmxlIHRvIHBhaXIgd2l0aCBo
-ZWFkc2V0IHdpdGggb3RoZXIgcGlucw0KDQpIaSBCYXN0aWVuLA0KDQo+ID4gPiBOb3QgYmx1ZXot
-Z25vbWUsIGdub21lLWJsdWV0b290aCwgYXMgYXZhaWxhYmxlIGluIHRoZSBHTk9NRSBnaXQgcmVw
-by4NCj4gPiANCj4gPiBJZiB0aGVyZSBpcyBub3QgZ29pbmcgdG8gYmUgYW55IG1vcmUgZGV2ZWxv
-cG1lbnQgaGFwcGVuaW5nIGFnYWluc3QgdGhlDQo+ID4gYmx1ZXotZ25vbWUgZ2l0IHRyZWUsIGNh
-biBpdCBiZSBmb3JtYWxseSBraWxsZWQgd2l0aCBzb21lIGluZGljYXRpb24NCj4gPiB0aGF0IHBl
-b3BsZSBzaG91bGQgd29yayBvbiBkZXZlbG9wbWVudCB3aXRoIGdub21lLWJsdWV0b290aCBhbmQv
-b3INCj4gPiBibHVlbWFuIHRoZW4/DQo+IA0KPiBJIGJlbGlldmUgTWFyY2VsIHdhbnRzIHRvIGtl
-ZXAgaXQgdG8gcGxheSBhcm91bmQgd2l0aCB0aGUgVUksIGZvciBuZXcNCj4gZmVhdHVyZXMuDQoN
-CmNvcnJlY3QuIEFuZCBJIGFtIG5vdCBraWxsaW5nIGEgdHJlZSBqdXN0IGZvciB0aGUgZnVuIG9m
-IGl0LiBJdCBpcyBhDQpnb29kIGhpc3RvcnkgbGVzc29uIGFuZCBnb29kIHRvIGhhdmUgdGhlIGNv
-ZGUgYXJvdW5kLg0KDQpXZSBjYW4gdXBkYXRlIHd3dy5ibHVlei5vcmcuIEkgaW52aXRlIGFueWJv
-ZHkgdG8gaGF2ZSBhbiBhY2NvdW50IHRoZXJlLg0KDQpSZWdhcmRzDQoNCk1hcmNlbA0KDQoNCg==
+On Mon, 2009-07-13 at 18:07 -0500, Mario Limonciello wrote:
+> Hi Bastien:
+> 
+> Mario Limonciello wrote:
+> > Hi Bastien:
+> >
+> > Bastien Nocera wrote:
+> >   
+> > Currently in the Ubuntu udev init script there is a call to 'udevadm
+> > trigger' (without any arguments).  Without any arguments it appears the
+> > default is "--type=devices".  When I add --type=failed (--retry-failed
+> > is deprecated), the system fails to boot up to X.  If I return it back
+> > to it's old state and add a second call right afterward of
+> > "--type=failed", there is no difference in behavior.  bluetoothd still
+> > fails to spawn by the udev rule.
+> >   
+> I'm actually suspecting that this is caused by dbus daemon not being
+> spawned early enough for bluetoothd to have access to.
+
+Which is why you need to retry the failed rules later on.
+
+>   I've come to
+> this conclusion by putting a shell wrapper around bluetoothd and
+> capturing exit code status to see that it does get spawned at startup
+> but immediately exits.  I put a pgrep at the same time to check for
+> dbus, and didn't see it running.
+> 
+> How are you ensuring that dbus is running by the time that udev starts
+> processing rules in Fedora then?
+> 
+> For now the only solution I can come up with is to maintain an init
+> script that runs "udevadm trigger --subsystem-match=bluetooth".  Since
+> multiple invocations of bluetoothd --udev won't harm the system, it's
+> not that horrible of a workaround, but still ideally would like to lose
+> the init script altogether.
+
+You need to call with the --retry-failed, after the basics of the system
+have been brought up. This means starting up D-Bus, mounting network
+filesystems, etc.
+
