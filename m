@@ -1,101 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4A5CAD92.3000607@dell.com>
+Date: Tue, 14 Jul 2009 11:08:50 -0500
+From: Mario Limonciello <mario_limonciello@dell.com>
 MIME-Version: 1.0
-In-Reply-To: <2d5a2c100907131427x18f26f82g405a781cd8670b88@mail.gmail.com>
-References: <35c90d960905191820g4e3ee434hfd0060815540a4e0@mail.gmail.com>
-	<1242787757.3147.13.camel@localhost.localdomain> <35c90d960905201457i508c678fqeb696cce32ae63be@mail.gmail.com>
-	<35c90d960907061155t7349cc90p2e58a09a310b8926@mail.gmail.com>
-	<35c90d960907091237o72228b0v57ad2556d77f4857@mail.gmail.com>
-	<35c90d960907130846v2320de88pd6f34b8aabfdbb9e@mail.gmail.com>
-	<2d5a2c100907131427x18f26f82g405a781cd8670b88@mail.gmail.com>
-From: Nick Pelly <npelly@google.com>
-Date: Tue, 14 Jul 2009 09:15:15 -0700
-Message-ID: <35c90d960907140915u71f20473x83b25579c4117a2d@mail.gmail.com>
-Subject: Re: bug? kernel does not send HCI Create Connection Cancel Command on
-	shutdown() or close() of a connecting rfcomm socket
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=0016364c791ffb73a3046eacc31f
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: bluetoothd not starting at boot with udev
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="------------enig78711B74F870BC623A7C8663"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---0016364c791ffb73a3046eacc31f
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enig78711B74F870BC623A7C8663
+Content-Type: multipart/mixed;
+ boundary="------------080903080207000708000108"
+
+This is a multi-part message in MIME format.
+--------------080903080207000708000108
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 13, 2009 at 2:27 PM, Luiz Augusto von
-Dentz<luiz.dentz@gmail.com> wrote:
-> Hi Nick,
+Hi Bastien
+
+Bastien Nocera wrote:
+> On Mon, 2009-07-13 at 18:07 -0500, Mario Limonciello wrote:
+>  =20
 >
-> On Mon, Jul 13, 2009 at 12:46 PM, Nick Pelly<npelly@google.com> wrote:
->> Any comments on this patch?
->>
->> It works for me, but my understanding of the RFCOMM state machine is naive.
->>
+> Which is why you need to retry the failed rules later on.
+>  =20
+OK, good to know that my suspicions were correct.
+>  =20
 >
-> iirc BT_CONFIG(PN frame) means the DLC is being configured than we got
-> into connecting phase (BT_CONNECT) and send SABM frame. Only when
-> receiving UA frame DLC is consider connected (BT_CONNECTED), so your
-> patch seems good by assuming that we don't need to send a DISC for a
-> DLC not connected. But there is still a good use for it to cancel the
-> DLC connection attempt, so perhaps a better alternative would be to
-> use a much shorter timeout in those cases.
+> You need to call with the --retry-failed, after the basics of the syste=
+m
+> have been brought up. This means starting up D-Bus, mounting network
+> filesystems, etc.
+>  =20
+Unfortunately, this makes no difference.  It appears that the previous
+invocation of the rules is not registering as a failure.  If I remove my
+extra trigger call on the bluetooth subsystem and run:
 
-Thanks for the advice.
+$ udevadm trigger --type=3Dfailed --verbose --dry-run
+(or --retry-failed, they follow the same code path)
 
-I have prepared a new patch which uses a very short timeout (10ms) on
-the DLC disconnect when in BT_CONFIG. I have tested this patch and it
-also resolves the issue. Patch attached.
+No devices are printed, and nothing happens.
 
-Nick
+Regards
 
---0016364c791ffb73a3046eacc31f
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Bluetooth-Use-a-very-short-timeout-for-dlci-disconne.patch"
-Content-Disposition: attachment;
-	filename="0001-Bluetooth-Use-a-very-short-timeout-for-dlci-disconne.patch"
+--=20
+Mario Limonciello
+*Dell | Linux Engineering*
+mario_limonciello@dell.com
+
+--=20
+Mario Limonciello
+*Dell | Linux Engineering*
+mario_limonciello@dell.com
+
+--------------080903080207000708000108
+Content-Type: application/pgp-signature;
+ name="signature.asc"
 Content-Transfer-Encoding: base64
-X-Attachment-Id: f_fx4tq21h0
+Content-Disposition: inline;
+ filename="signature.asc"
 
-RnJvbSA4MGJjMDdlOTcwM2U0MzAzZjA0YzI2MTU4YjA5NmJjYmQwMGZkNjY1IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBOaWNrIFBlbGx5IDxucGVsbHlAZ29vZ2xlLmNvbT4KRGF0ZTog
-VHVlLCAxNCBKdWwgMjAwOSAwNzo1Nzo1NCAtMDcwMApTdWJqZWN0OiBbUEFUQ0hdIEJsdWV0b290
-aDogVXNlIGEgdmVyeSBzaG9ydCB0aW1lb3V0IGZvciBkbGNpIGRpc2Nvbm5lY3Qgd2hlbiBpbiBC
-VF9DT05GSUcuCgpUaGlzIGZpeGVzIGEgYnVnIHdoZXJlIHNodXRkb3duKCkgYW5kIGNsb3NlKCkg
-b24gYSByZmNvbW0gc29ja2V0IGR1cmluZyBBQ0wKY29ubmVjdGlvbiB3b3VsZCBub3QgY2F1c2Ug
-SENJIENyZWF0ZSBDb25uZWN0aW9uIENhbmNlbC4KClNpZ25lZC1vZmYtYnk6IE5pY2sgUGVsbHkg
-PG5wZWxseUBnb29nbGUuY29tPgotLS0KIGluY2x1ZGUvbmV0L2JsdWV0b290aC9yZmNvbW0uaCB8
-ICAgIDcgKysrKy0tLQogbmV0L2JsdWV0b290aC9yZmNvbW0vY29yZS5jICAgIHwgICAxMCArKysr
-KysrLS0tCiAyIGZpbGVzIGNoYW5nZWQsIDExIGluc2VydGlvbnMoKyksIDYgZGVsZXRpb25zKC0p
-CgpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL3JmY29tbS5oIGIvaW5jbHVkZS9u
-ZXQvYmx1ZXRvb3RoL3JmY29tbS5oCmluZGV4IDgwMDcyNjEuLmVlYjNmZmEgMTAwNjQ0Ci0tLSBh
-L2luY2x1ZGUvbmV0L2JsdWV0b290aC9yZmNvbW0uaAorKysgYi9pbmNsdWRlL25ldC9ibHVldG9v
-dGgvcmZjb21tLmgKQEAgLTI2LDkgKzI2LDEwIEBACiAKICNkZWZpbmUgUkZDT01NX1BTTSAzCiAK
-LSNkZWZpbmUgUkZDT01NX0NPTk5fVElNRU9VVCAoSFogKiAzMCkKLSNkZWZpbmUgUkZDT01NX0RJ
-U0NfVElNRU9VVCAoSFogKiAyMCkKLSNkZWZpbmUgUkZDT01NX0FVVEhfVElNRU9VVCAoSFogKiAy
-NSkKKyNkZWZpbmUgUkZDT01NX0NPTk5fVElNRU9VVCAJCShIWiAqIDMwKQorI2RlZmluZSBSRkNP
-TU1fRElTQ19USU1FT1VUIAkJKEhaICogMjApCisjZGVmaW5lIFJGQ09NTV9BVVRIX1RJTUVPVVQg
-CQkoSFogKiAyNSkKKyNkZWZpbmUgUkZDT01NX0NPTkZJR19ESVNDX1RJTUVPVVQgCShIWiAvIDEw
-MCkKIAogI2RlZmluZSBSRkNPTU1fREVGQVVMVF9NVFUJMTI3CiAjZGVmaW5lIFJGQ09NTV9ERUZB
-VUxUX0NSRURJVFMJNwpkaWZmIC0tZ2l0IGEvbmV0L2JsdWV0b290aC9yZmNvbW0vY29yZS5jIGIv
-bmV0L2JsdWV0b290aC9yZmNvbW0vY29yZS5jCmluZGV4IDFkMGZiMGYuLjQ3NmQ4NTYgMTAwNjQ0
-Ci0tLSBhL25ldC9ibHVldG9vdGgvcmZjb21tL2NvcmUuYworKysgYi9uZXQvYmx1ZXRvb3RoL3Jm
-Y29tbS9jb3JlLmMKQEAgLTQxOSw2ICs0MTksNyBAQCBpbnQgcmZjb21tX2RsY19vcGVuKHN0cnVj
-dCByZmNvbW1fZGxjICpkLCBiZGFkZHJfdCAqc3JjLCBiZGFkZHJfdCAqZHN0LCB1OCBjaGFubgog
-CiBzdGF0aWMgaW50IF9fcmZjb21tX2RsY19jbG9zZShzdHJ1Y3QgcmZjb21tX2RsYyAqZCwgaW50
-IGVycikKIHsKKwlsb25nIHRpbWVvdXQgPSBSRkNPTU1fRElTQ19USU1FT1VUOwogCXN0cnVjdCBy
-ZmNvbW1fc2Vzc2lvbiAqcyA9IGQtPnNlc3Npb247CiAJaWYgKCFzKQogCQlyZXR1cm4gMDsKQEAg
-LTQyNyw4ICs0MjgsMTEgQEAgc3RhdGljIGludCBfX3JmY29tbV9kbGNfY2xvc2Uoc3RydWN0IHJm
-Y29tbV9kbGMgKmQsIGludCBlcnIpCiAJCQlkLCBkLT5zdGF0ZSwgZC0+ZGxjaSwgZXJyLCBzKTsK
-IAogCXN3aXRjaCAoZC0+c3RhdGUpIHsKLQljYXNlIEJUX0NPTk5FQ1Q6CiAJY2FzZSBCVF9DT05G
-SUc6CisJCXRpbWVvdXQgPSBSRkNPTU1fQ09ORklHX0RJU0NfVElNRU9VVDsKKwkJLyogRmFsbC10
-aHJvdWdoICovCisKKwljYXNlIEJUX0NPTk5FQ1Q6CiAJCWlmICh0ZXN0X2FuZF9jbGVhcl9iaXQo
-UkZDT01NX0RFRkVSX1NFVFVQLCAmZC0+ZmxhZ3MpKSB7CiAJCQlzZXRfYml0KFJGQ09NTV9BVVRI
-X1JFSkVDVCwgJmQtPmZsYWdzKTsKIAkJCXJmY29tbV9zY2hlZHVsZShSRkNPTU1fU0NIRURfQVVU
-SCk7CkBAIC00NDAsMTAgKzQ0NCwxMCBAQCBzdGF0aWMgaW50IF9fcmZjb21tX2RsY19jbG9zZShz
-dHJ1Y3QgcmZjb21tX2RsYyAqZCwgaW50IGVycikKIAkJZC0+c3RhdGUgPSBCVF9ESVNDT05OOwog
-CQlpZiAoc2tiX3F1ZXVlX2VtcHR5KCZkLT50eF9xdWV1ZSkpIHsKIAkJCXJmY29tbV9zZW5kX2Rp
-c2MocywgZC0+ZGxjaSk7Ci0JCQlyZmNvbW1fZGxjX3NldF90aW1lcihkLCBSRkNPTU1fRElTQ19U
-SU1FT1VUKTsKKwkJCXJmY29tbV9kbGNfc2V0X3RpbWVyKGQsIHRpbWVvdXQpOwogCQl9IGVsc2Ug
-ewogCQkJcmZjb21tX3F1ZXVlX2Rpc2MoZCk7Ci0JCQlyZmNvbW1fZGxjX3NldF90aW1lcihkLCBS
-RkNPTU1fRElTQ19USU1FT1VUICogMik7CisJCQlyZmNvbW1fZGxjX3NldF90aW1lcihkLCB0aW1l
-b3V0ICogMik7CiAJCX0KIAkJYnJlYWs7CiAKLS0gCjEuNi4zLjEKCg==
---0016364c791ffb73a3046eacc31f--
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjEuNC45IChH
+TlUvTGludXgpCkNvbW1lbnQ6IFVzaW5nIEdudVBHIHdpdGggTW96aWxsYSAtIGh0dHA6Ly9l
+bmlnbWFpbC5tb3pkZXYub3JnCgppRVlFQVJFQ0FBWUZBa3BjcldnQUNna1EyQ3JaamtBNzNZ
+dVJtd0NlUHN1dlpMcUpmVGowUTQzZ0VMdUREZU1MClhuUUFuMEVGUHZnYStSelF6NmthNWxr
+RmpGaFdwZDJpCj01OHJ4Ci0tLS0tRU5EIFBHUCBTSUdOQVRVUkUtLS0tLQoK
+--------------080903080207000708000108--
+
+--------------enig78711B74F870BC623A7C8663
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
+
+iEYEARECAAYFAkpcrZIACgkQ2CrZjkA73Yuj9wCeMcQQsB4fvfip+H3HVXMYHTYw
+DBwAn3tGoNCISA/2T6e/W+nEPRspKIf4
+=xbPL
+-----END PGP SIGNATURE-----
+
+--------------enig78711B74F870BC623A7C8663--
