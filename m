@@ -1,61 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Wed, 15 Jul 2009 08:51:57 -0700
-Message-ID: <8c237ea80907150851s23a9d317h7766d7b4b9784880@mail.gmail.com>
-Subject: Simplest PAN Config?
-From: Hibiki Kanzaki <hibikikanzaki@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: Is it possible that user change a stream path between Speaker
+ and Bluetooth like normal phone?
+From: Bastien Nocera <hadess@hadess.net>
+To: Chan-Yeol Park <chanyeol.park@samsung.com>
+Cc: "'Luiz Augusto von Dentz'" <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+In-Reply-To: <002301ca055b$69c4fa00$3d4eee00$%park@samsung.com>
+References: <200812301246.25781.siarhei.siamashka@nokia.com>
+	 <200901051027.57446.siarhei.siamashka@nokia.com>
+	 <2d5a2c100901050453w403ee755u61549a52b6514b65@mail.gmail.com>
+	 <002301ca055b$69c4fa00$3d4eee00$%park@samsung.com>
+Content-Type: text/plain
+Date: Wed, 15 Jul 2009 16:27:45 +0100
+Message-Id: <1247671665.8139.1318.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-am trying to configure the most basic point-to-point
-Bluetooth IP network.  I have two computers with the
-same model of USB Bluetooth (2.0, EDR, etc) dongle
-attached to them.  I am running Ubuntu Jaunty on both
-computers.  I do not have GUI (desktop) applications
-installed on them.  Ubuntu Jaunty comes with bluez
-4.32.  All I want is the most simple possible
-configuration... the minimal amount of configuration
-necessary to be able to have applications one the
-computers interact using TCP/UDP/IP via Linux network
-devices.  I do not care about forwarding packets to
-other hosts, or about encryption or authentication,
-etc; I am trying to start with the equivalent of
-connecting two ethernet cards.
+On Wed, 2009-07-15 at 23:49 +0900, Chan-Yeol Park wrote:
+> Hi,
+> 
+> If you know or possible,
+> Could you explain me how to change stream path between Speaker or Bluetooth
+> with BlueZ gstreamer plug-in like normal phone?
+> 
+> In my case, I could see it works well with a gstreamer output-selector
+> element except some case.
 
-When I connect the Bluetooth dongle, I get a
-"pan0" linux network device on which I can perform
-commands like "ip link set ...", "ip addr add ...",
-etc.  They all succeed and I can ping the local
-device address.  Each computer can do this local
-interaction with the pan0 network device.  I can
-also do "hcitool scan" to see the remote Bluetooth
-devices, and I can do "hcitool info", "l2ping", etc.
-The device advertises "PAN", "GN", etc, services,
-so I do not think it is a limitation of devices.
+Use PulseAudio's Bluetooth module, that's what it's made for.
 
-So on each side I can see and interact with the
-local pan0 network device, and I can use the
-"hciconfig" and "hcitool" to get some degree of
-interaction between the two computers.  But if I
-configure the pan0 devices as I would a regular
-network device, including adding ARP entries which
-have the layer2 address of the remote pan0, I cannot
-seem to get the IP layer of the Linux kernel to
-actually talk to the remote Bluetooth device using
-the Linux kernel network facilities.  If I run
-"hcidump", I do not see anything happening if I try
-to ping the remote Bluetooth interface.
-
-Am I missing something simple?  I am not having any
-luck finding how to do what seems like it should be
-trivial... plugin a Bluetooth dongle on each side
-and be able to send IP packets from one to the other
-using the Linux network devices.  I am clueless
-about the details of Bluetooth protocols.  If I
-cannot get the networking working this way, I would
-be willing to have the devices connected to each
-other as a serial port, and then just run ppp over
-that, although I have no idea how to do that, since
-I have never tried or looked into it.
