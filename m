@@ -1,145 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Forrest Zhao <forrest.zhao@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: forrest.zhao@gmail.com, Forrest Zhao <forrest.zhao@intel.com>
-Subject: [PATCH] add serial proxy configuration support
-Date: Thu, 16 Jul 2009 13:56:37 +0800
-Message-Id: <1247723797-3719-1-git-send-email-forrest.zhao@intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <35c90d960907140915u71f20473x83b25579c4117a2d@mail.gmail.com>
+References: <35c90d960905191820g4e3ee434hfd0060815540a4e0@mail.gmail.com>
+	<1242787757.3147.13.camel@localhost.localdomain> <35c90d960905201457i508c678fqeb696cce32ae63be@mail.gmail.com>
+	<35c90d960907061155t7349cc90p2e58a09a310b8926@mail.gmail.com>
+	<35c90d960907091237o72228b0v57ad2556d77f4857@mail.gmail.com>
+	<35c90d960907130846v2320de88pd6f34b8aabfdbb9e@mail.gmail.com>
+	<2d5a2c100907131427x18f26f82g405a781cd8670b88@mail.gmail.com>
+	<35c90d960907140915u71f20473x83b25579c4117a2d@mail.gmail.com>
+From: Nick Pelly <npelly@google.com>
+Date: Wed, 15 Jul 2009 15:11:23 -0700
+Message-ID: <35c90d960907151511u3a49f1d3obea010371a031cd2@mail.gmail.com>
+Subject: Re: bug? kernel does not send HCI Create Connection Cancel Command on
+	shutdown() or close() of a connecting rfcomm socket
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- serial/Makefile.am |    8 +++++
- serial/proxy.c     |   86 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 94 insertions(+), 0 deletions(-)
+On Tue, Jul 14, 2009 at 9:15 AM, Nick Pelly<npelly@google.com> wrote:
+> On Mon, Jul 13, 2009 at 2:27 PM, Luiz Augusto von
+> Dentz<luiz.dentz@gmail.com> wrote:
+>> Hi Nick,
+>>
+>> On Mon, Jul 13, 2009 at 12:46 PM, Nick Pelly<npelly@google.com> wrote:
+>>> Any comments on this patch?
+>>>
+>>> It works for me, but my understanding of the RFCOMM state machine is naive.
+>>>
+>>
+>> iirc BT_CONFIG(PN frame) means the DLC is being configured than we got
+>> into connecting phase (BT_CONNECT) and send SABM frame. Only when
+>> receiving UA frame DLC is consider connected (BT_CONNECTED), so your
+>> patch seems good by assuming that we don't need to send a DISC for a
+>> DLC not connected. But there is still a good use for it to cancel the
+>> DLC connection attempt, so perhaps a better alternative would be to
+>> use a much shorter timeout in those cases.
+>
+> Thanks for the advice.
+>
+> I have prepared a new patch which uses a very short timeout (10ms) on
+> the DLC disconnect when in BT_CONFIG. I have tested this patch and it
+> also resolves the issue. Patch attached.
 
-diff --git a/serial/Makefile.am b/serial/Makefile.am
-index 4fa455f..f2b5a69 100644
---- a/serial/Makefile.am
-+++ b/serial/Makefile.am
-@@ -1,5 +1,11 @@
- 
- if SERIALPLUGIN
-+if CONFIGFILES
-+confdir = $(sysconfdir)/bluetooth
-+
-+conf_DATA = serial.conf
-+endif
-+
- plugindir = $(libdir)/bluetooth/plugins
- 
- plugin_LTLIBRARIES = serial.la
-@@ -19,4 +25,6 @@ AM_CFLAGS = -fvisibility=hidden \
- 
- INCLUDES = -I$(top_srcdir)/common -I$(top_srcdir)/src
- 
-+EXTRA_DIST = serial.conf
-+
- MAINTAINERCLEANFILES = Makefile.in
-diff --git a/serial/proxy.c b/serial/proxy.c
-index 8c8a4b8..0ed159d 100644
---- a/serial/proxy.c
-+++ b/serial/proxy.c
-@@ -1210,6 +1210,90 @@ static struct serial_adapter *find_adapter(GSList *list,
- 	return NULL;
- }
- 
-+static void serial_proxy_init(struct serial_adapter *adapter)
-+{
-+	GKeyFile *config;
-+	GError *err = NULL;
-+	const char *file = CONFIGDIR "/serial.conf";
-+	char *uuid_str = NULL, *address = NULL;
-+	uuid_t uuid;
-+	proxy_type_t type;
-+	char path[MAX_PATH_LENGTH + 1];
-+	const char *ppath = path;
-+	int ret;
-+
-+	config = g_key_file_new();
-+
-+	if (!g_key_file_load_from_file(config, file, 0, &err)) {
-+		error("Parsing %s failed: %s", file, err->message);
-+		g_error_free(err);
-+		g_key_file_free(config);
-+		return;
-+	}
-+
-+	uuid_str = g_key_file_get_string(config, "Serial Proxy", "UUID", &err);
-+	if (err) {
-+		debug("%s: %s", file, err->message);
-+		g_error_free(err);
-+		g_key_file_free(config);
-+		return;
-+	}
-+
-+	address = g_key_file_get_string(config, "Serial Proxy", "Address",
-+								&err);
-+	if (err) {
-+		debug("%s: %s", file, err->message);
-+		g_error_free(err);
-+		g_key_file_free(config);
-+		g_free(uuid_str);
-+		return;
-+	}
-+
-+	g_key_file_free(config);
-+
-+	bt_string2uuid(&uuid, uuid_str);
-+	type = addr2type(address);
-+
-+	if (g_slist_find_custom(adapter->proxies, address, proxy_addrcmp)) {
-+		debug("Proxy already exists.");
-+		g_free(uuid_str);
-+		g_free(address);
-+		return;
-+	}
-+	switch (type) {
-+	case UNIX_SOCKET_PROXY:
-+		ret = proxy_socket_register(adapter, uuid_str, address,
-+						path, sizeof(path), TRUE);
-+		break;
-+	case TTY_PROXY:
-+		ret = proxy_tty_register(adapter, uuid_str, address,
-+					NULL, path, sizeof(path), TRUE);
-+		break;
-+	case TCP_SOCKET_PROXY:
-+		ret = proxy_tcp_register(adapter, uuid_str, address,
-+					path, sizeof(path), TRUE);
-+		break;
-+	default:
-+		ret = -1;
-+	}
-+
-+	g_free(uuid_str);
-+	g_free(address);
-+
-+	if (ret < 0) {
-+		error("proxy register failed.");
-+		return;
-+	}
-+
-+	g_dbus_emit_signal(adapter->conn,
-+			adapter_get_path(adapter->btd_adapter),
-+			SERIAL_MANAGER_INTERFACE, "ProxyCreated",
-+			DBUS_TYPE_STRING, &ppath,
-+			DBUS_TYPE_INVALID);
-+
-+	return;
-+}
-+
- int proxy_register(DBusConnection *conn, struct btd_adapter *btd_adapter)
- {
- 	struct serial_adapter *adapter;
-@@ -1241,6 +1325,8 @@ int proxy_register(DBusConnection *conn, struct btd_adapter *btd_adapter)
- 	debug("Registered interface %s on path %s",
- 		SERIAL_MANAGER_INTERFACE, path);
- 
-+	serial_proxy_init(adapter);
-+
- 	return 0;
- }
- 
--- 
-1.5.4.5
+ping
 
+I will be offline for 2 weeks from tomorrow, so if there is further
+testing or patches you would like me to try then I won't be able to
+help after tomorrow.
+
+Nick
