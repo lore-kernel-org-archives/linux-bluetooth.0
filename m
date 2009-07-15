@@ -1,56 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 15 Jul 2009 23:49:10 +0900
-From: Chan-Yeol Park <chanyeol.park@samsung.com>
-Subject: Is it possible that user change a stream path between Speaker and
- Bluetooth like normal phone?
-In-reply-to: <2d5a2c100901050453w403ee755u61549a52b6514b65@mail.gmail.com>
-To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20090715124452.68d53e4e@symphony>
+References: <ea2906620907140856r718f5f76k59a461dfc9dd666c@mail.gmail.com>
+	 <ea2906620907150355k23a2dd8cl26f7d916f775e6e3@mail.gmail.com>
+	 <20090715120613.15f4f1ec@symphony>
+	 <ea2906620907150416k43589f23m27cf8bbe49caa02a@mail.gmail.com>
+	 <20090715124452.68d53e4e@symphony>
+Date: Wed, 15 Jul 2009 12:56:33 +0100
+Message-ID: <ea2906620907150456q61aa8c7ah449d175d8bca5592@mail.gmail.com>
+Subject: Re: Super fast audio with alsa
+From: Daniel Castro <castromd@tcd.ie>
+To: James Le Cuirot <chewi@aura-online.co.uk>
 Cc: linux-bluetooth@vger.kernel.org
-Message-id: <002301ca055b$69c4fa00$3d4eee00$%park@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=US-ASCII
-References: <200812301246.25781.siarhei.siamashka@nokia.com>
- <200901051027.57446.siarhei.siamashka@nokia.com>
- <2d5a2c100901050453w403ee755u61549a52b6514b65@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+2009/7/15 James Le Cuirot <chewi@aura-online.co.uk>:
+> On Wed, 15 Jul 2009 12:16:51 +0100
+> Daniel Castro <castromd@tcd.ie> wrote:
+>
+>> 2009/7/15 James Le Cuirot <chewi@aura-online.co.uk>:
+>> > I have the Motorola S9 and it works with ALSA for me but I'm not
+>> > sure if I ever tried it through Audacious. Did you try it via a
+>> > plug device or did you use the device directly?
+>>
+>> not sure how to answer your question.
+>>
+>> so i created the ~/.asoundrc file with:
+>> pcm.S9bluetoothraw {
+>>    type bluetooth
+>>    device 00:0D:FD:23:1A:DE
+>> }
+>> pcm.S9bluetooth {
+>>     type plug
+>>     slave {
+>>         pcm S9bluetoothraw
+>>     }
+>> }
+>>
+>> and then from audacious I tell it to use ALSA Output plugin for it's
+>> audio system and set S9bluetooth as the audio device.
+>
+> That is what I meant. Should work. I'm no expert so I can't suggest
+me either :(
+> much more than trying something other than Audacious but I'm guessing
+> you have already.
+yes i have... pretty much same thing happens...
 
-If you know or possible,
-Could you explain me how to change stream path between Speaker or Bluetooth
-with BlueZ gstreamer plug-in like normal phone?
+I just tried:
+~$ sudo alsa reload
 
-In my case, I could see it works well with a gstreamer output-selector
-element except some case.
-
-1. User listens to Bluetooth Stereo Audio.
-2. Switch off the headset when stream position is about 5 second from the
-start of the song.
-3. Gstreamer Plug-in gst_avdtp_sink_render() we could see
-g_io_channel_write()works well even though headset is already off.
-4. When stream position is about 9 second, g_io_channel_write() function is
-blocked....-.-;
-5. When it is 14 second , g_io_chhanel_write() returns with timeout error.
-
-It's problem that at 14 second , gstreamer could not do anything even if
-they know the error...
-
-Related to this scenario , Do you have a good idea?
-
-As a matter of fact, I try to avoid blocking , I change g_io_channel_write()
-as non-blocking call.
-Because Non blocking call makes the situation to the gstreamer like normal
-condition. So we can change it easily as usual.
-
-But the side effects occurs that music stream is mixed..when wireless
-communication doesn't work well-.-;
+hit play in audacious and it's working... maybe this is a workaround
+or maybe it was just coincidence... i'll monitor and see.
+>
+> James
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
 
 
 
-Regards.
-Chanyeol
+-- 
+________________________
 
-
-
-
+Daniel Castro, M.Sc.
++353 083-318-2058
+dancasmo@gmail.com
+castromd@tcd.ie
+________________________
