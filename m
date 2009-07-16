@@ -3,23 +3,33 @@ From: Forrest Zhao <forrest.zhao@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: forrest.zhao@gmail.com, Forrest Zhao <forrest.zhao@intel.com>
 Subject: [PATCH] add serial proxy configuration support
-Date: Thu, 16 Jul 2009 14:16:01 +0800
-Message-Id: <1247724961-4049-1-git-send-email-forrest.zhao@intel.com>
+Date: Thu, 16 Jul 2009 13:56:37 +0800
+Message-Id: <1247723797-3719-1-git-send-email-forrest.zhao@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- serial/Makefile.am |    2 +
+ serial/Makefile.am |    8 +++++
  serial/proxy.c     |   86 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- serial/serial.conf |    9 +++++
- 3 files changed, 97 insertions(+), 0 deletions(-)
- create mode 100644 serial/serial.conf
+ 2 files changed, 94 insertions(+), 0 deletions(-)
 
 diff --git a/serial/Makefile.am b/serial/Makefile.am
-index 4fa455f..c88a980 100644
+index 4fa455f..f2b5a69 100644
 --- a/serial/Makefile.am
 +++ b/serial/Makefile.am
-@@ -19,4 +19,6 @@ AM_CFLAGS = -fvisibility=hidden \
+@@ -1,5 +1,11 @@
+ 
+ if SERIALPLUGIN
++if CONFIGFILES
++confdir = $(sysconfdir)/bluetooth
++
++conf_DATA = serial.conf
++endif
++
+ plugindir = $(libdir)/bluetooth/plugins
+ 
+ plugin_LTLIBRARIES = serial.la
+@@ -19,4 +25,6 @@ AM_CFLAGS = -fvisibility=hidden \
  
  INCLUDES = -I$(top_srcdir)/common -I$(top_srcdir)/src
  
@@ -130,21 +140,6 @@ index 8c8a4b8..0ed159d 100644
  	return 0;
  }
  
-diff --git a/serial/serial.conf b/serial/serial.conf
-new file mode 100644
-index 0000000..656de89
---- /dev/null
-+++ b/serial/serial.conf
-@@ -0,0 +1,9 @@
-+# Configuration file for serial
-+
-+[Serial Proxy]
-+
-+# UUID for serial proxy service
-+#UUID=00001103-0000-1000-8000-00805F9B34FB
-+
-+# Address for device node
-+#Address=/dev/ttyx
 -- 
 1.5.4.5
 
