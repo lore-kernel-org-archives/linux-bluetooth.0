@@ -1,90 +1,153 @@
 Return-Path: <cyrus@holtmann.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Subject: [PATCH] Fix for Acer  Bluetooth Optical Rechargeable Mouse
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-From: Lamarque Vieira Souza <lamarque@gmail.com>
-Date: Fri, 17 Jul 2009 03:01:43 -0300
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200907170301.43807.lamarque@gmail.com>
+From: Forrest Zhao <forrest.zhao@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: forrest.zhao@gmail.com, Forrest Zhao <forrest.zhao@intel.com>
+Subject: [PATCH] add support for multiple serial proxies configuration
+Date: Fri, 17 Jul 2009 13:48:51 +0800
+Message-Id: <1247809731-3396-1-git-send-email-forrest.zhao@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-	This patch works around one problem with my Acer Bluetooth Optical 
-Rechargeable Mouse where the cursor gets stuck at screen's upper-left corner. 
-Even my notebook's touchpad is not able to move cursor when the bluetooth 
-mouse is connected to my Acer Ferrari 4005 notebook. Using input session 
-instead of hid session solves this problem although the cursor still moves a 
-little sluggishly with the bluetooth mouse, cursor moves correctly using the 
-touchpad. My bluetooth mouse used to work well (no sluggish) until kernel 
-2.6.21, since then the problems are getting worse with each kernel release (it 
-got sluggish in 2.6.22 and this this upper-left corner problem appeared in 
-2.6.28 or 2.6.27).
-
-Signed-off-by: Lamarque V. Souza <lamarque@gmail.com>
 ---
+ serial/Makefile.am |    2 +
+ serial/proxy.c     |   89 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ serial/serial.conf |    9 +++++
+ 3 files changed, 100 insertions(+), 0 deletions(-)
+ create mode 100644 serial/serial.conf
 
-diff -Nru --show-c-function linux-2.6.30.1-orig/net/bluetooth/hidp/core.c 
-linux-2.6.30.1-lvs/net/bluetooth/hidp/core.c
---- linux-2.6.30.1-orig/net/bluetooth/hidp/core.c	2009-07-16 
-23:53:04.697925121 -0300
-+++ linux-2.6.30.1-lvs/net/bluetooth/hidp/core.c	2009-07-17 02:35:03.969927384 
--0300
-@@ -73,6 +73,43 @@ static unsigned char hidp_keycode[256] =
+diff --git a/serial/Makefile.am b/serial/Makefile.am
+index 4fa455f..c88a980 100644
+--- a/serial/Makefile.am
++++ b/serial/Makefile.am
+@@ -19,4 +19,6 @@ AM_CFLAGS = -fvisibility=hidden \
  
- static unsigned char hidp_mkeyspat[] = { 0x01, 0x01, 0x01, 0x01, 0x01, 0x01 
-};
+ INCLUDES = -I$(top_srcdir)/common -I$(top_srcdir)/src
  
-+/* HIDP device quirks */
-+enum {
-+	HIDP_QUIRK_USE_INPUT_SESSION
-+};
++EXTRA_DIST = serial.conf
 +
-+struct quirk_id {
-+	__u16 vendor;
-+	__u16 product;
-+	unsigned long quirks;
-+};
-+
-+static const struct quirk_id hidp_quirks[] = {
-+	{
-+		/* Lamarque: Acer Bluetooth Optical Rechargeable Mouse
-+		 * does not work properly with hid session since 2.6.27. */
-+		.vendor = 0x0458,
-+		.product = 0x0058,
-+		.quirks = 1 << HIDP_QUIRK_USE_INPUT_SESSION
-+	},
-+
-+	{ /* end: all zeroes */ }
-+};
-+
-+static int quirk_test_bit(__u16 vendor, __u16 product, int quirk)
+ MAINTAINERCLEANFILES = Makefile.in
+diff --git a/serial/proxy.c b/serial/proxy.c
+index 8c8a4b8..7962256 100644
+--- a/serial/proxy.c
++++ b/serial/proxy.c
+@@ -1210,6 +1210,93 @@ static struct serial_adapter *find_adapter(GSList *list,
+ 	return NULL;
+ }
+ 
++static void serial_proxy_init(struct serial_adapter *adapter)
 +{
-+	const struct quirk_id *q = &hidp_quirks[0];
++	GKeyFile *config;
++	GError *err = NULL;
++	const char *file = CONFIGDIR "/serial.conf";
++	char **uuid_list, **address_list;
++	int i;
 +
-+	while (q->vendor != vendor && q->product != product &&
-+	       q->vendor && q->product)
-+		q++;
++	config = g_key_file_new();
 +
-+	if (q->vendor == vendor && q->product == product)
-+		return test_bit(quirk, &q->quirks);
++	if (!g_key_file_load_from_file(config, file, 0, &err)) {
++		error("Parsing %s failed: %s", file, err->message);
++		g_error_free(err);
++		g_key_file_free(config);
++		return;
++	}
 +
-+	return 0;
++	uuid_list = g_key_file_get_string_list(config, "Proxy",	"UUID",
++							NULL, &err);
++	if (err) {
++		debug("%s: %s", file, err->message);
++		g_error_free(err);
++		g_key_file_free(config);
++		return;
++	}
++
++	address_list = g_key_file_get_string_list(config, "Proxy", "Address",
++							NULL, &err);
++	if (err) {
++		debug("%s: %s", file, err->message);
++		g_error_free(err);
++		g_key_file_free(config);
++		g_strfreev(uuid_list);
++		return;
++	}
++
++	for (i = 0; uuid_list[i] != NULL && address_list[i] != NULL; i++) {
++		char *uuid_str = uuid_list[i], *address = address_list[i];
++		uuid_t uuid;
++		proxy_type_t type;
++		char path[MAX_PATH_LENGTH + 1];
++		const char *ppath = path;
++		int ret;
++
++		bt_string2uuid(&uuid, uuid_str);
++		type = addr2type(address);
++
++		if (g_slist_find_custom(adapter->proxies, address,
++							proxy_addrcmp)) {
++			debug("Proxy already exists.");
++			continue;
++		}
++		switch (type) {
++		case UNIX_SOCKET_PROXY:
++			ret = proxy_socket_register(adapter, uuid_str, address,
++						path, sizeof(path), TRUE);
++			break;
++		case TTY_PROXY:
++			ret = proxy_tty_register(adapter, uuid_str, address,
++						NULL, path, sizeof(path), TRUE);
++			break;
++		case TCP_SOCKET_PROXY:
++			ret = proxy_tcp_register(adapter, uuid_str, address,
++						path, sizeof(path), TRUE);
++			break;
++		default:
++			ret = -1;
++		}
++
++		if (ret < 0) {
++			error("proxy register failed.");
++			continue;
++		}
++
++		g_dbus_emit_signal(adapter->conn,
++				adapter_get_path(adapter->btd_adapter),
++				SERIAL_MANAGER_INTERFACE, "ProxyCreated",
++				DBUS_TYPE_STRING, &ppath,
++				DBUS_TYPE_INVALID);
++	}
++
++	g_strfreev(uuid_list);
++	g_strfreev(address_list);
++	g_key_file_free(config);
++	return;
 +}
 +
- static struct hidp_session *__hidp_get_session(bdaddr_t *bdaddr)
+ int proxy_register(DBusConnection *conn, struct btd_adapter *btd_adapter)
  {
- 	struct hidp_session *session;
-@@ -832,7 +869,9 @@ int hidp_add_connection(struct hidp_conn
- 	session->flags   = req->flags & (1 << HIDP_BLUETOOTH_VENDOR_ID);
- 	session->idle_to = req->idle_to;
+ 	struct serial_adapter *adapter;
+@@ -1241,6 +1328,8 @@ int proxy_register(DBusConnection *conn, struct btd_adapter *btd_adapter)
+ 	debug("Registered interface %s on path %s",
+ 		SERIAL_MANAGER_INTERFACE, path);
  
--	if (req->rd_size > 0) {
-+	if (req->rd_size > 0 &&
-+	    !quirk_test_bit(req->vendor, req->product,
-+			   HIDP_QUIRK_USE_INPUT_SESSION)) {
- 		err = hidp_setup_hid(session, req);
- 		if (err && err != -ENODEV)
- 			goto err_skb;
++	serial_proxy_init(adapter);
++
+ 	return 0;
+ }
+ 
+diff --git a/serial/serial.conf b/serial/serial.conf
+new file mode 100644
+index 0000000..c4e3b9f
+--- /dev/null
++++ b/serial/serial.conf
+@@ -0,0 +1,9 @@
++# Configuration file for serial
++
++[Proxy]
++
++# UUID for serial proxy service
++#UUID=00001103-0000-1000-8000-00805F9B34FB
++
++# Address for device node
++#Address=/dev/ttyx
+-- 
+1.5.4.5
 
