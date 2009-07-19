@@ -1,62 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 19 Jul 2009 19:57:37 +0200
-From: martin f krafft <madduck@madduck.net>
-To: linux bluetooth mailinglist <linux-bluetooth@vger.kernel.org>
-Subject: Re: How to replace DUN with bluez 4?
-Message-ID: <20090719175737.GA9278@piper.oerlikon.madduck.net>
-References: <20090718055411.GA21651@piper.oerlikon.madduck.net>
- <2d5a2c100907191036o7c48c405r32f0292a9168cb92@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-ripemd160;
-	protocol="application/pgp-signature"; boundary="ikeVEW9yuYc//A+q"
-In-Reply-To: <2d5a2c100907191036o7c48c405r32f0292a9168cb92@mail.gmail.com>
+In-Reply-To: <20090718055411.GA21651@piper.oerlikon.madduck.net>
+References: <20090718055411.GA21651@piper.oerlikon.madduck.net>
+Date: Sun, 19 Jul 2009 14:36:22 -0300
+Message-ID: <2d5a2c100907191036o7c48c405r32f0292a9168cb92@mail.gmail.com>
+Subject: Re: How to replace DUN with bluez 4?
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux bluetooth mailinglist <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi,
 
---ikeVEW9yuYc//A+q
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Sat, Jul 18, 2009 at 2:54 AM, martin f krafft<madduck@madduck.net> wrote:
+> Hi list,
+>
+> I've searched the web, but short of
+> http://wiki.bluez.org/HOWTO/SerialConnections (the wiki is broken
+> currently btw), I could not find any information how one is supposed
+> to provide a dial-up means (for a Palm Tungsten) via bluetooth with
+> bluez 4. The wiki page shows me how to use the dbus services, but
+> not how to link that with pppd or integrate it properly with
+> a system.
 
-also sprach Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2009.07.19.1936 =
-+0200]:
-> You can make use of Serial interface by calling
-> Serial.Connect(''dun"), this will return you a bonded port to use,
-> it is up to you to use pppd or whatever you prefer to connect,
-> note that the port will not be stored permanently.
+You can make use of Serial interface by calling
+Serial.Connect(''dun"), this will return you a bonded port to use, it
+is up to you to use pppd or whatever you prefer to connect, note that
+the port will not be stored permanently.  There are some plans to
+integrate it with NetworkManager and connman, but there are some parts
+missing like possible integrating it properly with the wizard and
+store permanently.
 
-So you are saying that it should not be too hard to write a little
-programme that got the port and which fires off pppd on connect?
-
-> There are some plans to integrate it with NetworkManager and
-> connman, but there are some parts missing like possible
-> integrating it properly with the wizard and store permanently.
-
-Is there any non-"wizard" and non-GUI support planned? I really
-appreciated how dund just ran as a daemon.
-
---=20
-martin | http://madduck.net/ | http://two.sentenc.es/
-=20
-"the only thing that sustains one through life is the consciousness of
- the immense inferiority of everybody else, and this is a feeling that
- I have always cultivated."
-                                                        -- oscar wilde
-=20
-spamtraps: madduck.bogus@madduck.net
-
---ikeVEW9yuYc//A+q
-Content-Type: application/pgp-signature; name="digital_signature_gpg.asc"
-Content-Description: Digital signature (see http://martin-krafft.net/gpg/)
-Content-Disposition: inline
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-
-iEYEAREDAAYFAkpjXo0ACgkQIgvIgzMMSnVpLACeJKVKNvqznXcDzsDwNKLrCoHi
-5HwAn23QSEQySnQzc419zT+JMJbRYOXA
-=dILg
------END PGP SIGNATURE-----
-
---ikeVEW9yuYc//A+q--
+-- 
+Luiz Augusto von Dentz
+Engenheiro de Computação
