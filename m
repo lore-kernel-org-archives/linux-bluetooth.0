@@ -1,74 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vincenzo Ampolo <vincenzo.ampolo@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Bluetooth honeypot - hci socket that reads package problem -
-Date: Mon, 20 Jul 2009 09:38:32 +0200
-Cc: Stefano Zanero <zanero@elet.polimi.it>
-MIME-Version: 1.0
-Content-Type: multipart/signed;
-  boundary="nextPart1992165.7sPh4d1qg4";
-  protocol="application/pgp-signature";
-  micalg=pgp-sha1
-Message-Id: <200907200938.35808.vincenzo.ampolo@gmail.com>
+Subject: Re: btusb_send_frame: hci0 urb ede00a50 submission failed
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Justin Mattock <justinmattock@gmail.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	linux-bluetooth@vger.kernel.org
+In-Reply-To: <dd18b0c30907192045t3078451ao9af4c1751d9efe91@mail.gmail.com>
+References: <dd18b0c30907192045t3078451ao9af4c1751d9efe91@mail.gmail.com>
+Content-Type: text/plain
+Date: Mon, 20 Jul 2009 09:15:20 +0200
+Message-Id: <1248074120.4549.89.camel@violet>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---nextPart1992165.7sPh4d1qg4
-Content-Type: text/plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Hi Justin,
 
-Hi,
+> Not sure whats happening here,
+> this morning using s2ram worked like a charm,
+> now at the end of the day this thing takes a good minute to
+> wakeup. As for the blueooth finally got it working, but
+> now I'm seeing this in dmesg:
+> 
+> 
+> [  708.630722] Restarting tasks ... done.
+> [  708.910090] usb 5-1: USB disconnect, address 3
+> [  708.910262] btusb_send_frame: hci0 urb ede00a50 submission failed
+> [  709.330776] [drm] Loading R500 Microcode
+> 
+> Maybe suspend works better when cooler, but in anycase
+> the bluetooth works perfectly recovers from s2ram, scrollball
+> works as well(all with SELinux running too).
 
-=46or my thesis, i'm trying to write a bluez based honeypot.
-The basic concept is to listen at the hci level and perform actions. (switc=
-h=20
-on sockets in rfcomm or l2cap channels or addresses to audit the data)
+what kernel version? Is this a plain vanilla kernel.org kernel or a
+distro kernel?
 
-I started studying the hcidump code and the hci socket. The main problem i'=
-m=20
-having is that the hci socket which is created in this way
+Regards
 
-	sk =3D socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
+Marcel
 
-does not "pop" the package from the bluez stack, it just reads but the pack=
-age=20
-will continue to be processed by the stack. So if there is an attempt for a=
-=20
-connection it will find a closed socket. Is there a way to "pop" the packag=
-e=20
-from the stack, so i can read the destination channel or address of the=20
-package and turn on a socket on that specified channel or address and then=
-=20
-"push" again the package into the stack?
 
-If it's not possible, the only way to set my bluetooth honeypot up is to op=
-en=20
-a socket for each rfcomm and l2cap channel and address and wait for data to=
-=20
-audit.
-
-Thanks. =20
-=2D-=20
-Vincenzo Ampolo
-http://goshawknest.wordpress.com/
-http://vincenzo-ampolo.net
-
-GnuPG Key:=20
-http://keyserver.ubuntu.com:11371/pks/lookup?op=3Dget&search=3D0x9BF47CA71E=
-506DE9
-
---nextPart1992165.7sPh4d1qg4
-Content-Type: application/pgp-signature; name=signature.asc 
-Content-Description: This is a digitally signed message part.
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-
-iEYEABECAAYFAkpkHvkACgkQm/R8px5QbeklBgCgiZDNYCcqbUdmXCQNPbXafcxH
-eM8An0o1B9quhfnEBjONfQs3GMPYkFJC
-=L2j9
------END PGP SIGNATURE-----
-
---nextPart1992165.7sPh4d1qg4--
