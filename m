@@ -1,6 +1,6 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A652C88.3040000@gmail.com>
-Date: Mon, 20 Jul 2009 19:48:40 -0700
+Message-ID: <4A64A0B4.6010507@gmail.com>
+Date: Mon, 20 Jul 2009 09:52:04 -0700
 From: "Justin P. Mattock" <justinmattock@gmail.com>
 MIME-Version: 1.0
 To: Mario Limonciello <mario_limonciello@dell.com>
@@ -45,16 +45,19 @@ Mario Limonciello wrote:
 >
 > later on, during an init script or similar.
 >    
-Don't mean to be latent on the response.
-Anyways I tried adding
+yeah,  the:
 
-udevadm trigger --subsystem-match=bluetooth
+ACTION=="add", SUBSYSTEM=="bluetooth", RUN+="/usr/sbin/bluetoothd --udev"
+option gave no response after rebooting numerous times, until commenting out
+ACTION, and SUBSYSTEM, and just using RUN+=
+The init script has /sbin/udevadm trigger and /sbin/udevadm settle
+after /sbin/udevd --daemon is called.
+And from what I see that might be whats happening,
+udevadm needs to be told about the subsystem call.
 
-to init.d/udev but the system fails hard(livecd to recover),
-but adding the same entry to another init script after udev
-has done its job results in a successful activation.
-
-So I think it's safe to safe this is the same issue ubuntu was having.
+I'll go ahead and try your solution and see if it reads the susbsystem
+option without having to change the *.rules
 
 Justin P. Mattock
+
 
