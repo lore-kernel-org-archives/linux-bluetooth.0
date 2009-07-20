@@ -1,76 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A641F9A.7000408@gmail.com>
-Date: Mon, 20 Jul 2009 00:41:14 -0700
-From: "Justin P. Mattock" <justinmattock@gmail.com>
+From: Vincenzo Ampolo <vincenzo.ampolo@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Bluetooth honeypot - hci socket that reads package problem -
+Date: Mon, 20 Jul 2009 09:38:32 +0200
+Cc: Stefano Zanero <zanero@elet.polimi.it>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth@vger.kernel.org, Kay Sievers <kay.sievers@vrfy.org>
-Subject: Re: bluetooth works with udev-145 but had some weired issues with
- it
-References: <dd18b0c30907192036r477c9637x450562df605294e8@mail.gmail.com> <1248074063.4549.88.camel@violet>
-In-Reply-To: <1248074063.4549.88.camel@violet>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: multipart/signed;
+  boundary="nextPart1992165.7sPh4d1qg4";
+  protocol="application/pgp-signature";
+  micalg=pgp-sha1
+Message-Id: <200907200938.35808.vincenzo.ampolo@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Marcel Holtmann wrote:
-> Hi Justin,
->
->    
->> For some reason in rules.d
->> for the permission setting:
->>
->> #ACTION=="add", SUBSYSTEM=="bluetooth", RUN+="/usr/sbin/bluetoothd --udev"
->> to
->> RUN+="/usr/sbin/bluetoothd --udev"
->> gets this working for me.
->> prior to this, udev just would not activate
->> bluetoothd
->> Anyways thought it would be good to let people know.
->>      
->
-> this is pretty much strange. What kernel version are you using?
->
-> Kay, do you have any idea why such a simple rule would not work?
->
-> Regards
->
-> Marcel
->
->
->
->    
-kernel is the latest git from linus pulled a day ago.
-The system itself is a home brewed LFS.
+--nextPart1992165.7sPh4d1qg4
+Content-Type: text/plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-As for the simple rule, this one has me confused as well.
-unless I did something wrong while compiling bluez/udev
-(missed a switch) or something is missing in the system itself
-to not read ADD or SUBSYSTEM.
-Looking at the init script for udev I cant see how it could cause
-udev to not read that specific rule unless:
+Hi,
 
-  cat /etc/rc.d/init.d/udev
-(this is taken towards the bottom)
+=46or my thesis, i'm trying to write a bluez based honeypot.
+The basic concept is to listen at the hci level and perform actions. (switc=
+h=20
+on sockets in rfcomm or l2cap channels or addresses to audit the data)
 
-                /sbin/udevd --daemon
+I started studying the hcidump code and the hci socket. The main problem i'=
+m=20
+having is that the hci socket which is created in this way
 
-                 # Now traverse /sys in order to "coldplug" devices that 
-have
-                 # already been discovered
-                 /sbin/udevadm trigger
+	sk =3D socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
 
-                 # Now wait for udevd to process the uevents we triggered
-                 /sbin/udevadm settle
-                 evaluate_retval
+does not "pop" the package from the bluez stack, it just reads but the pack=
+age=20
+will continue to be processed by the stack. So if there is an attempt for a=
+=20
+connection it will find a closed socket. Is there a way to "pop" the packag=
+e=20
+from the stack, so i can read the destination channel or address of the=20
+package and turn on a socket on that specified channel or address and then=
+=20
+"push" again the package into the stack?
 
+If it's not possible, the only way to set my bluetooth honeypot up is to op=
+en=20
+a socket for each rfcomm and l2cap channel and address and wait for data to=
+=20
+audit.
 
-  udevadm might have created confusion.
-Also keep in mind the system is not running hal.
-(not sure how depended bluez/udev is with hal)
-This one has me stumped.
+Thanks. =20
+=2D-=20
+Vincenzo Ampolo
+http://goshawknest.wordpress.com/
+http://vincenzo-ampolo.net
 
-but besides that confusion  everything seems to be handling pretty good
-(nice work on the bluetooth bluez!!)
-I like how the scrollball for the mouse survives suspend.
+GnuPG Key:=20
+http://keyserver.ubuntu.com:11371/pks/lookup?op=3Dget&search=3D0x9BF47CA71E=
+506DE9
 
-Justin P. Mattock
+--nextPart1992165.7sPh4d1qg4
+Content-Type: application/pgp-signature; name=signature.asc 
+Content-Description: This is a digitally signed message part.
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEABECAAYFAkpkHvkACgkQm/R8px5QbeklBgCgiZDNYCcqbUdmXCQNPbXafcxH
+eM8An0o1B9quhfnEBjONfQs3GMPYkFJC
+=L2j9
+-----END PGP SIGNATURE-----
+
+--nextPart1992165.7sPh4d1qg4--
