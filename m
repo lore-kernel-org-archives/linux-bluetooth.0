@@ -1,38 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: btusb_send_frame: hci0 urb ede00a50 submission failed
+Subject: Re: bluetooth works with udev-145 but had some weired issues with
+ it
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Justin Mattock <justinmattock@gmail.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	linux-bluetooth@vger.kernel.org
-In-Reply-To: <dd18b0c30907192045t3078451ao9af4c1751d9efe91@mail.gmail.com>
-References: <dd18b0c30907192045t3078451ao9af4c1751d9efe91@mail.gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, Kay Sievers <kay.sievers@vrfy.org>
+In-Reply-To: <dd18b0c30907192036r477c9637x450562df605294e8@mail.gmail.com>
+References: <dd18b0c30907192036r477c9637x450562df605294e8@mail.gmail.com>
 Content-Type: text/plain
-Date: Mon, 20 Jul 2009 09:15:20 +0200
-Message-Id: <1248074120.4549.89.camel@violet>
+Date: Mon, 20 Jul 2009 09:14:23 +0200
+Message-Id: <1248074063.4549.88.camel@violet>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Justin,
 
-> Not sure whats happening here,
-> this morning using s2ram worked like a charm,
-> now at the end of the day this thing takes a good minute to
-> wakeup. As for the blueooth finally got it working, but
-> now I'm seeing this in dmesg:
+> For some reason in rules.d
+> for the permission setting:
 > 
-> 
-> [  708.630722] Restarting tasks ... done.
-> [  708.910090] usb 5-1: USB disconnect, address 3
-> [  708.910262] btusb_send_frame: hci0 urb ede00a50 submission failed
-> [  709.330776] [drm] Loading R500 Microcode
-> 
-> Maybe suspend works better when cooler, but in anycase
-> the bluetooth works perfectly recovers from s2ram, scrollball
-> works as well(all with SELinux running too).
+> #ACTION=="add", SUBSYSTEM=="bluetooth", RUN+="/usr/sbin/bluetoothd --udev"
+> to
+> RUN+="/usr/sbin/bluetoothd --udev"
+> gets this working for me.
+> prior to this, udev just would not activate
+> bluetoothd
+> Anyways thought it would be good to let people know.
 
-what kernel version? Is this a plain vanilla kernel.org kernel or a
-distro kernel?
+this is pretty much strange. What kernel version are you using?
+
+Kay, do you have any idea why such a simple rule would not work?
 
 Regards
 
