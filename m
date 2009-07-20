@@ -1,90 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A6424D8.3040306@xyzw.org>
-Date: Mon, 20 Jul 2009 01:03:36 -0700
-From: Brian Rogers <brian@xyzw.org>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Wait for child devices to go away before deleting a connection
-Content-Type: multipart/mixed;
- boundary="------------000302000806010701090207"
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1248074120.4549.89.camel@violet>
+References: <dd18b0c30907192045t3078451ao9af4c1751d9efe91@mail.gmail.com>
+	 <1248074120.4549.89.camel@violet>
+Date: Mon, 20 Jul 2009 00:46:30 -0700
+Message-ID: <dd18b0c30907200046m70ac61e9wd0464c5f44e7c28@mail.gmail.com>
+Subject: Re: btusb_send_frame: hci0 urb ede00a50 submission failed
+From: Justin Mattock <justinmattock@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------000302000806010701090207
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+On Mon, Jul 20, 2009 at 12:15 AM, Marcel Holtmann<marcel@holtmann.org> wrot=
+e:
+> Hi Justin,
+>
+>> Not sure whats happening here,
+>> this morning using s2ram worked like a charm,
+>> now at the end of the day this thing takes a good minute to
+>> wakeup. As for the blueooth finally got it working, but
+>> now I'm seeing this in dmesg:
+>>
+>>
+>> [ =A0708.630722] Restarting tasks ... done.
+>> [ =A0708.910090] usb 5-1: USB disconnect, address 3
+>> [ =A0708.910262] btusb_send_frame: hci0 urb ede00a50 submission failed
+>> [ =A0709.330776] [drm] Loading R500 Microcode
+>>
+>> Maybe suspend works better when cooler, but in anycase
+>> the bluetooth works perfectly recovers from s2ram, scrollball
+>> works as well(all with SELinux running too).
+>
+> what kernel version? Is this a plain vanilla kernel.org kernel or a
+> distro kernel?
+>
+> Regards
+>
+> Marcel
+>
+>
+>
 
-This patch fixes the device removal order when a connection is closed, 
-which allows HAL to see the remove event and prevents a bunch of 
-duplicate devices from piling up and eventually hitting the limit for 
-the for input devices in X.
+latest git
+here's a cut from dmesg:
 
-Posting for discussion since I used a polling loop (with a sleep) to 
-wait for child devices to go away. I assume it'd be preferable to wait 
-in a more proper way. In that case, before I start, is this the right 
-place to be waiting?
+[13176.287859] PM: Syncing filesystems ... done.
+[13176.291783] Freezing user space processes ... (elapsed 0.00 seconds) don=
+e.
+[13176.292142] Freezing remaining freezable tasks ... (elapsed 0.00
+seconds) done.
+[13176.292275] Suspending console(s) (use no_console_suspend to debug)
+[13176.294725] btusb_bulk_complete: hci0 urb f6ac6a50 failed to resubmit (1=
+)
+[13176.295720] btusb_bulk_complete: hci0 urb f6ac66e0 failed to resubmit (1=
+)
+[13176.296719] btusb_intr_complete: hci0 urb f6ac6420 failed to resubmit (1=
+)
+[13176.470263] sd 2:0:1:0: [sda] Synchronizing SCSI cache
+[13176.697678] sd 2:0:1:0: [sda] Stopping disk
+[13177.600230] ath9k 0000:03:00.0: PCI INT A disabled
 
+then s2ram again:
 
---------------000302000806010701090207
-Content-Type: text/x-patch;
- name="0001-Bluetooth-Wait-for-child-devices-to-go-away-before-d.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename*0="0001-Bluetooth-Wait-for-child-devices-to-go-away-before-d.pa";
- filename*1="tch"
+[13182.139058] wlan0: associate with AP 00:1e:2a:00:67:f0
+[13182.141361] wlan0: RX ReassocResp from 00:1e:2a:00:67:f0
+(capab=3D0x431 status=3D0 aid=3D2)
+[13182.141364] wlan0: associated
+[13182.150158] usb 5-1: USB disconnect, address 7
+[13182.150332] btusb_send_frame: hci0 urb f1f2c420 submission failed
+[13182.561534] [drm] Loading R500 Microcode
+[13182.561598] [drm] Num pipes: 1
 
->From 2779df84b73363d309fad933b6fb00e1276e8ff7 Mon Sep 17 00:00:00 2001
-From: Brian Rogers <brian@xyzw.org>
-Date: Sun, 19 Jul 2009 03:43:24 -0700
-Subject: [PATCH 1/2] Bluetooth: Wait for child devices to go away before deleting a connection.
-
----
- net/bluetooth/hci_sysfs.c |   15 ++++++---------
- 1 files changed, 6 insertions(+), 9 deletions(-)
-
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index 95f7a7a..ebb0d15 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -100,14 +100,9 @@ static void add_conn(struct work_struct *work)
- 	hci_dev_hold(hdev);
- }
- 
--/*
-- * The rfcomm tty device will possibly retain even when conn
-- * is down, and sysfs doesn't support move zombie device,
-- * so we should move the device before conn device is destroyed.
-- */
--static int __match_tty(struct device *dev, void *data)
-+static int __match_any(struct device *dev, void *data)
- {
--	return !strncmp(dev_name(dev), "rfcomm", 6);
-+	return 1;
- }
- 
- static void del_conn(struct work_struct *work)
-@@ -118,14 +113,16 @@ static void del_conn(struct work_struct *work)
- 	if (!device_is_registered(&conn->dev))
- 		return;
- 
-+	/* wait for child devices to go away first */
- 	while (1) {
- 		struct device *dev;
- 
--		dev = device_find_child(&conn->dev, NULL, __match_tty);
-+		dev = device_find_child(&conn->dev, NULL, __match_any);
- 		if (!dev)
- 			break;
--		device_move(dev, NULL, DPM_ORDER_DEV_LAST);
- 		put_device(dev);
-+
-+		msleep(100);
- 	}
- 
- 	device_del(&conn->dev);
--- 
-1.6.3.3
+Not sure what this is, but from here the mouse is functioning
+as it should.
 
 
---------------000302000806010701090207--
+--=20
+Justin P. Mattock
