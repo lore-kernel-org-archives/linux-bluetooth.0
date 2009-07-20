@@ -1,80 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1248074120.4549.89.camel@violet>
-References: <dd18b0c30907192045t3078451ao9af4c1751d9efe91@mail.gmail.com>
-	 <1248074120.4549.89.camel@violet>
-Date: Mon, 20 Jul 2009 00:46:30 -0700
-Message-ID: <dd18b0c30907200046m70ac61e9wd0464c5f44e7c28@mail.gmail.com>
-Subject: Re: btusb_send_frame: hci0 urb ede00a50 submission failed
-From: Justin Mattock <justinmattock@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: Bluetooth honeypot - hci socket that reads package problem -
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Vincenzo Ampolo <vincenzo.ampolo@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Stefano Zanero <zanero@elet.polimi.it>
+In-Reply-To: <200907200938.35808.vincenzo.ampolo@gmail.com>
+References: <200907200938.35808.vincenzo.ampolo@gmail.com>
+Content-Type: text/plain
+Date: Mon, 20 Jul 2009 09:45:28 +0200
+Message-Id: <1248075928.4549.91.camel@violet>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jul 20, 2009 at 12:15 AM, Marcel Holtmann<marcel@holtmann.org> wrot=
-e:
-> Hi Justin,
->
->> Not sure whats happening here,
->> this morning using s2ram worked like a charm,
->> now at the end of the day this thing takes a good minute to
->> wakeup. As for the blueooth finally got it working, but
->> now I'm seeing this in dmesg:
->>
->>
->> [ =A0708.630722] Restarting tasks ... done.
->> [ =A0708.910090] usb 5-1: USB disconnect, address 3
->> [ =A0708.910262] btusb_send_frame: hci0 urb ede00a50 submission failed
->> [ =A0709.330776] [drm] Loading R500 Microcode
->>
->> Maybe suspend works better when cooler, but in anycase
->> the bluetooth works perfectly recovers from s2ram, scrollball
->> works as well(all with SELinux running too).
->
-> what kernel version? Is this a plain vanilla kernel.org kernel or a
-> distro kernel?
->
-> Regards
->
-> Marcel
->
->
->
+Hi Vincenzo,
 
-latest git
-here's a cut from dmesg:
+> For my thesis, i'm trying to write a bluez based honeypot.
+> The basic concept is to listen at the hci level and perform actions. (switch 
+> on sockets in rfcomm or l2cap channels or addresses to audit the data)
+> 
+> I started studying the hcidump code and the hci socket. The main problem i'm 
+> having is that the hci socket which is created in this way
+> 
+> 	sk = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
+> 
+> does not "pop" the package from the bluez stack, it just reads but the package 
+> will continue to be processed by the stack. So if there is an attempt for a 
+> connection it will find a closed socket. Is there a way to "pop" the package 
+> from the stack, so i can read the destination channel or address of the 
+> package and turn on a socket on that specified channel or address and then 
+> "push" again the package into the stack?
+> 
+> If it's not possible, the only way to set my bluetooth honeypot up is to open 
+> a socket for each rfcomm and l2cap channel and address and wait for data to 
+> audit.
 
-[13176.287859] PM: Syncing filesystems ... done.
-[13176.291783] Freezing user space processes ... (elapsed 0.00 seconds) don=
-e.
-[13176.292142] Freezing remaining freezable tasks ... (elapsed 0.00
-seconds) done.
-[13176.292275] Suspending console(s) (use no_console_suspend to debug)
-[13176.294725] btusb_bulk_complete: hci0 urb f6ac6a50 failed to resubmit (1=
-)
-[13176.295720] btusb_bulk_complete: hci0 urb f6ac66e0 failed to resubmit (1=
-)
-[13176.296719] btusb_intr_complete: hci0 urb f6ac6420 failed to resubmit (1=
-)
-[13176.470263] sd 2:0:1:0: [sda] Synchronizing SCSI cache
-[13176.697678] sd 2:0:1:0: [sda] Stopping disk
-[13177.600230] ath9k 0000:03:00.0: PCI INT A disabled
+what you are planning is to write a whole Bluetooth stack in userspace,
+but wanna have the kernel do the hardware abstraction :)
 
-then s2ram again:
+You need to set the device into RAW mode. Otherwise the kernel will keep
+processing the HCI packets.
 
-[13182.139058] wlan0: associate with AP 00:1e:2a:00:67:f0
-[13182.141361] wlan0: RX ReassocResp from 00:1e:2a:00:67:f0
-(capab=3D0x431 status=3D0 aid=3D2)
-[13182.141364] wlan0: associated
-[13182.150158] usb 5-1: USB disconnect, address 7
-[13182.150332] btusb_send_frame: hci0 urb f1f2c420 submission failed
-[13182.561534] [drm] Loading R500 Microcode
-[13182.561598] [drm] Num pipes: 1
+Regards
 
-Not sure what this is, but from here the mouse is functioning
-as it should.
+Marcel
 
 
---=20
-Justin P. Mattock
