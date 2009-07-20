@@ -1,48 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Bluetooth honeypot - hci socket that reads package problem -
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Vincenzo Ampolo <vincenzo.ampolo@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Stefano Zanero <zanero@elet.polimi.it>
-In-Reply-To: <200907200938.35808.vincenzo.ampolo@gmail.com>
-References: <200907200938.35808.vincenzo.ampolo@gmail.com>
-Content-Type: text/plain
-Date: Mon, 20 Jul 2009 09:45:28 +0200
-Message-Id: <1248075928.4549.91.camel@violet>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <4A641F9A.7000408@gmail.com>
+Date: Mon, 20 Jul 2009 00:41:14 -0700
+From: "Justin P. Mattock" <justinmattock@gmail.com>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org, Kay Sievers <kay.sievers@vrfy.org>
+Subject: Re: bluetooth works with udev-145 but had some weired issues with
+ it
+References: <dd18b0c30907192036r477c9637x450562df605294e8@mail.gmail.com> <1248074063.4549.88.camel@violet>
+In-Reply-To: <1248074063.4549.88.camel@violet>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vincenzo,
+Marcel Holtmann wrote:
+> Hi Justin,
+>
+>    
+>> For some reason in rules.d
+>> for the permission setting:
+>>
+>> #ACTION=="add", SUBSYSTEM=="bluetooth", RUN+="/usr/sbin/bluetoothd --udev"
+>> to
+>> RUN+="/usr/sbin/bluetoothd --udev"
+>> gets this working for me.
+>> prior to this, udev just would not activate
+>> bluetoothd
+>> Anyways thought it would be good to let people know.
+>>      
+>
+> this is pretty much strange. What kernel version are you using?
+>
+> Kay, do you have any idea why such a simple rule would not work?
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+>    
+kernel is the latest git from linus pulled a day ago.
+The system itself is a home brewed LFS.
 
-> For my thesis, i'm trying to write a bluez based honeypot.
-> The basic concept is to listen at the hci level and perform actions. (switch 
-> on sockets in rfcomm or l2cap channels or addresses to audit the data)
-> 
-> I started studying the hcidump code and the hci socket. The main problem i'm 
-> having is that the hci socket which is created in this way
-> 
-> 	sk = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
-> 
-> does not "pop" the package from the bluez stack, it just reads but the package 
-> will continue to be processed by the stack. So if there is an attempt for a 
-> connection it will find a closed socket. Is there a way to "pop" the package 
-> from the stack, so i can read the destination channel or address of the 
-> package and turn on a socket on that specified channel or address and then 
-> "push" again the package into the stack?
-> 
-> If it's not possible, the only way to set my bluetooth honeypot up is to open 
-> a socket for each rfcomm and l2cap channel and address and wait for data to 
-> audit.
+As for the simple rule, this one has me confused as well.
+unless I did something wrong while compiling bluez/udev
+(missed a switch) or something is missing in the system itself
+to not read ADD or SUBSYSTEM.
+Looking at the init script for udev I cant see how it could cause
+udev to not read that specific rule unless:
 
-what you are planning is to write a whole Bluetooth stack in userspace,
-but wanna have the kernel do the hardware abstraction :)
+  cat /etc/rc.d/init.d/udev
+(this is taken towards the bottom)
 
-You need to set the device into RAW mode. Otherwise the kernel will keep
-processing the HCI packets.
+                /sbin/udevd --daemon
 
-Regards
+                 # Now traverse /sys in order to "coldplug" devices that 
+have
+                 # already been discovered
+                 /sbin/udevadm trigger
 
-Marcel
+                 # Now wait for udevd to process the uevents we triggered
+                 /sbin/udevadm settle
+                 evaluate_retval
 
 
+  udevadm might have created confusion.
+Also keep in mind the system is not running hal.
+(not sure how depended bluez/udev is with hal)
+This one has me stumped.
+
+but besides that confusion  everything seems to be handling pretty good
+(nice work on the bluetooth bluez!!)
+I like how the scrollball for the mouse survives suspend.
+
+Justin P. Mattock
