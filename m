@@ -1,67 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A64254F.5080504@xyzw.org>
-Date: Mon, 20 Jul 2009 01:05:35 -0700
+Message-ID: <4A6424D8.3040306@xyzw.org>
+Date: Mon, 20 Jul 2009 01:03:36 -0700
 From: Brian Rogers <brian@xyzw.org>
 MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Disconnect hidraw device when an input device is disconnected
+Subject: [PATCH] Wait for child devices to go away before deleting a connection
 Content-Type: multipart/mixed;
- boundary="------------050502080300090508070405"
+ boundary="------------000302000806010701090207"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 This is a multi-part message in MIME format.
---------------050502080300090508070405
+--------------000302000806010701090207
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 
+This patch fixes the device removal order when a connection is closed, 
+which allows HAL to see the remove event and prevents a bunch of 
+duplicate devices from piling up and eventually hitting the limit for 
+the for input devices in X.
+
+Posting for discussion since I used a polling loop (with a sleep) to 
+wait for child devices to go away. I assume it'd be preferable to wait 
+in a more proper way. In that case, before I start, is this the right 
+place to be waiting?
 
 
---------------050502080300090508070405
+--------------000302000806010701090207
 Content-Type: text/x-patch;
- name="0002-Bluetooth-Disconnect-hidraw-device-when-an-input-dev.patch"
+ name="0001-Bluetooth-Wait-for-child-devices-to-go-away-before-d.patch"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline;
- filename*0="0002-Bluetooth-Disconnect-hidraw-device-when-an-input-dev.pa";
+ filename*0="0001-Bluetooth-Wait-for-child-devices-to-go-away-before-d.pa";
  filename*1="tch"
 
->From 487bccfd500d161dadf7b92be1ca2f8cca2b7781 Mon Sep 17 00:00:00 2001
+>From 2779df84b73363d309fad933b6fb00e1276e8ff7 Mon Sep 17 00:00:00 2001
 From: Brian Rogers <brian@xyzw.org>
-Date: Sun, 19 Jul 2009 18:23:21 -0700
-Subject: [PATCH 2/2] Bluetooth: Disconnect hidraw device when an input device is disconnected
+Date: Sun, 19 Jul 2009 03:43:24 -0700
+Subject: [PATCH 1/2] Bluetooth: Wait for child devices to go away before deleting a connection.
 
-hidraw didn't exist when Bluetooth code was adapted to use the HID subsystem.
-Now that it does exist, hidp is responsible for disconnecting it. Without
-doing this, old hidraw devices stick around forever.
-
-Signed-off-by: Brian Rogers <brian@xyzw.org>
 ---
- net/bluetooth/hidp/core.c |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+ net/bluetooth/hci_sysfs.c |   15 ++++++---------
+ 1 files changed, 6 insertions(+), 9 deletions(-)
 
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index a9f7afb..5def2db 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -40,6 +40,7 @@
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index 95f7a7a..ebb0d15 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -100,14 +100,9 @@ static void add_conn(struct work_struct *work)
+ 	hci_dev_hold(hdev);
+ }
  
- #include <linux/input.h>
- #include <linux/hid.h>
-+#include <linux/hidraw.h>
+-/*
+- * The rfcomm tty device will possibly retain even when conn
+- * is down, and sysfs doesn't support move zombie device,
+- * so we should move the device before conn device is destroyed.
+- */
+-static int __match_tty(struct device *dev, void *data)
++static int __match_any(struct device *dev, void *data)
+ {
+-	return !strncmp(dev_name(dev), "rfcomm", 6);
++	return 1;
+ }
  
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-@@ -574,6 +575,8 @@ static int hidp_session(void *arg)
- 	if (session->hid) {
- 		if (session->hid->claimed & HID_CLAIMED_INPUT)
- 			hidinput_disconnect(session->hid);
-+		if (session->hid->claimed & HID_CONNECT_HIDRAW)
-+			hidraw_disconnect(session->hid);
- 		hid_destroy_device(session->hid);
+ static void del_conn(struct work_struct *work)
+@@ -118,14 +113,16 @@ static void del_conn(struct work_struct *work)
+ 	if (!device_is_registered(&conn->dev))
+ 		return;
+ 
++	/* wait for child devices to go away first */
+ 	while (1) {
+ 		struct device *dev;
+ 
+-		dev = device_find_child(&conn->dev, NULL, __match_tty);
++		dev = device_find_child(&conn->dev, NULL, __match_any);
+ 		if (!dev)
+ 			break;
+-		device_move(dev, NULL, DPM_ORDER_DEV_LAST);
+ 		put_device(dev);
++
++		msleep(100);
  	}
  
+ 	device_del(&conn->dev);
 -- 
 1.6.3.3
 
 
---------------050502080300090508070405--
+--------------000302000806010701090207--
