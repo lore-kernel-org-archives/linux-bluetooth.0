@@ -1,57 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Disconnect hidraw device when an input device is
- disconnected
+Subject: Re: [PATCH] Wait for child devices to go away before deleting a
+ connection
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Brian Rogers <brian@xyzw.org>
-Cc: linux-bluetooth@vger.kernel.org, Jiri Kosina <jkosina@suse.cz>
-In-Reply-To: <4A64254F.5080504@xyzw.org>
-References: <4A64254F.5080504@xyzw.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Kay Sievers <kay.sievers@vrfy.org>,
+	David Woodhouse <dwmw2@infradead.org>
+In-Reply-To: <4A6424D8.3040306@xyzw.org>
+References: <4A6424D8.3040306@xyzw.org>
 Content-Type: text/plain
-Date: Mon, 20 Jul 2009 10:13:41 +0200
-Message-Id: <1248077621.4549.99.camel@violet>
+Date: Mon, 20 Jul 2009 10:10:30 +0200
+Message-Id: <1248077430.4549.97.camel@violet>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Brian,
 
-> hidraw didn't exist when Bluetooth code was adapted to use the HID
-> subsystem.
-> Now that it does exist, hidp is responsible for disconnecting it.
-> Without
-> doing this, old hidraw devices stick around forever.
+> This patch fixes the device removal order when a connection is closed, 
+> which allows HAL to see the remove event and prevents a bunch of 
+> duplicate devices from piling up and eventually hitting the limit for 
+> the for input devices in X.
 > 
-> Signed-off-by: Brian Rogers <brian@xyzw.org>
-> ---
->  net/bluetooth/hidp/core.c |    3 +++
->  1 files changed, 3 insertions(+), 0 deletions(-)
-> 
-> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-> index a9f7afb..5def2db 100644
-> --- a/net/bluetooth/hidp/core.c
-> +++ b/net/bluetooth/hidp/core.c
-> @@ -40,6 +40,7 @@
->  
->  #include <linux/input.h>
->  #include <linux/hid.h>
-> +#include <linux/hidraw.h>
->  
->  #include <net/bluetooth/bluetooth.h>
->  #include <net/bluetooth/hci_core.h>
-> @@ -574,6 +575,8 @@ static int hidp_session(void *arg)
->         if (session->hid) {
->                 if (session->hid->claimed & HID_CLAIMED_INPUT)
->                         hidinput_disconnect(session->hid);
-> +               if (session->hid->claimed & HID_CONNECT_HIDRAW)
-> +                       hidraw_disconnect(session->hid);
->                 hid_destroy_device(session->hid);
->         }
+> Posting for discussion since I used a polling loop (with a sleep) to 
+> wait for child devices to go away. I assume it'd be preferable to wait 
+> in a more proper way. In that case, before I start, is this the right 
+> place to be waiting?
 
-patch looks good. However I don't understand why the HID core can't do
-that for us. This seems wrong for both cases.
+since this is executed in a workqueue, you could easily sleep here
+without any problems. However why do you need to sleep at all. The
+device_move should sleep until the device is moved away, doesn't it?
 
-Jiri, why does the HID core register input device and HIDRAW device for
-us, but not disconnect it?
+Kay, David, wouldn't be pinning of the parent device here be enough to
+get this done in a clean way?
 
 Regards
 
