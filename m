@@ -1,41 +1,18 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 1 Jul 2009 11:39:58 +0530
-From: Vikram Kandukuri <vkandukuri@atheros.com>
-To: <marcel@haltmann.org>
-CC: <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH] Bluetooth: Scheduled to kill the session whenever
-	VIRTUAL_CABLE_UNPLUG is received by IUT
-Message-ID: <20090701060948.GA7505@atheros-laptop>
+Message-ID: <87E59FD9271E47DBA9A1F241EAAAD63D@freqonedev>
+From: "David Stockwell" <dstockwell@frequency-one.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Cc: "Marcel Holtmann" <marcel@holtmann.org>
+Subject: MINOR: libgdbus embedded in bluez does not agree with libgdbus
+Date: Mon, 20 Jul 2009 19:26:26 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-bluetooth-owner@vger.kernel.org
-List-ID: <linux-bluetooth.vger.kernel.org>
+Content-Type: text/plain;
+	format=flowed;
+	charset="iso-8859-1";
+	reply-type=original
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Subject: [PATCH] Bluetooth: Scheduled to kill the session whenever VIRTUAL_CABLE_UNPLUG is received by IUT
+Specifically, the function g_dbus_cleanup_connection is missing for the 
+Bluez version.  Is this by design???
 
-There is a test case in PTS tool; PTS will send the VIRTUAL_CABLE_UNPLUG
-command to IUT. IUT should disconnect the channel and kill the session
-when it receives VIRTUAL_CABLE_UNPLUG command. VIRTUAL_CABLE_UNPLUG
-is parsed by hidp.ko but it is not scheduled to do so (There is no
-schedule code). So I have added hidp_schedule to kill the session.
-
-Signed-off-by: Jothikumar Mothilal <jothikumar.mothilal@atheros.com>
----
- net/bluetooth/hidp/core.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
-
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index b186768..a9f7afb 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -374,6 +374,7 @@ static void hidp_process_hid_control(struct hidp_session *session,
- 
- 		/* Kill session thread */
- 		atomic_inc(&session->terminate);
-+		hidp_schedule(session);
- 	}
- }
- 
--- 
-1.6.0.4
-
+David Stockwell 
