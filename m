@@ -1,58 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: bluetooth SPP link to Nokia phone
-From: Henry Gomersall <whg21@cam.ac.uk>
-Reply-To: heng@cantab.net
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain
-Date: Tue, 21 Jul 2009 10:45:40 +0100
-Message-Id: <1248169540.7048.52.camel@whg21-laptop>
-Mime-Version: 1.0
+Message-ID: <4A652C88.3040000@gmail.com>
+Date: Mon, 20 Jul 2009 19:48:40 -0700
+From: "Justin P. Mattock" <justinmattock@gmail.com>
+MIME-Version: 1.0
+To: Mario Limonciello <mario_limonciello@dell.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: bluetooth works with udev-145 but had some weired issues with
+ it
+References: <dd18b0c30907192036r477c9637x450562df605294e8@mail.gmail.com> <4A648DDF.7060303@dell.com>
+In-Reply-To: <4A648DDF.7060303@dell.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I've been attempting to do some hacking on the Bluez stack. The starting
-point was to initiate an SPP link to my Nokia 6300 mobile phone. I can
-establish the link, but when I attempt to send characters to it (through
-several different methods), the phone will announce it is disconnecting.
-The python I use is at the bottom of this email.
+Mario Limonciello wrote:
+> Hi Justin:
+>
+> Justin Mattock wrote:
+>    
+>> For some reason in rules.d
+>> for the permission setting:
+>>
+>> #ACTION=="add", SUBSYSTEM=="bluetooth", RUN+="/usr/sbin/bluetoothd --udev"
+>> to
+>> RUN+="/usr/sbin/bluetoothd --udev"
+>> gets this working for me.
+>> prior to this, udev just would not activate
+>> bluetoothd
+>> Anyways thought it would be good to let people know.
+>>
+>>
+>>      
+> I'm wondering if you are seeing something similar that was happening on
+> Ubuntu when getting bluez-4.45 added in where the daemon failed to start
+> upon bootup but works fine later (eg if you hotplug the device).
+>
+> It turned out that dbus wasn't up and running at the time udev triggered
+> all devices early in the boot.
+>
+> The easiest solution was to run:
+>
+>      udevadm trigger --subsystem-match=bluetooth
+>
+>
+> later on, during an init script or similar.
+>    
+Don't mean to be latent on the response.
+Anyways I tried adding
 
-I have already set up a serial connection using a UART to bluetooth
-module (a module based on the LMX9830) in conjunction with a
-USB->serial->UART piece of hardware. In this configuration, I can
-initiate a connection to the phone and write and receive bytes from it
-no problem.
+udevadm trigger --subsystem-match=bluetooth
 
-My questions are as follows:
+to init.d/udev but the system fails hard(livecd to recover),
+but adding the same entry to another init script after udev
+has done its job results in a successful activation.
 
-1) Am I missing something important with how I am using the Bluez stack?
-2) Is this a known issue or is it a previous known issue? I am still
-using the version of Bluez that comes with shipped with Ubuntu 9.04
-which is 4.39.
-3) Are there any caveats with how devices implement the serial port
-profile?
+So I think it's safe to safe this is the same issue ubuntu was having.
 
-I'm keen to sort this problem out and would appreciate any assistance.
-
-Many thanks,
-
-Henry Gomersall
-
-The code used:
-
-import dbus
-
-bus = dbus.SystemBus();
-manager = dbus.Interface(bus.get_object('org.bluez', '/'),
-'org.bluez.Manager')
-obj = bus.get_object('org.bluez', manager.DefaultAdapter())
-adapter = dbus.Interface(obj, 'org.bluez.Adapter')
-
-phone = dbus.Interface(bus.get_object('org.bluez',
-adapter.ListDevices()[0]), 'org.bluez.Device')
-
-phone_serial = dbus.Interface(phone, 'org.bluez.Serial')
-phone_serial.Connect('spp')
-
-At this stage, I have the device /dev/rfcomm0, but I cannot write data
-to it without breaking the link.
+Justin P. Mattock
 
