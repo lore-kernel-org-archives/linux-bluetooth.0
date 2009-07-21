@@ -1,252 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Forrest Zhao <forrest.zhao@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: forrest.zhao@gmail.com, Forrest Zhao <forrest.zhao@intel.com>
-Subject: [PATCH] add support for multi serial proxy configuration
-Date: Wed, 22 Jul 2009 15:58:20 +0800
-Message-Id: <1248249500-27681-1-git-send-email-forrest.zhao@intel.com>
+MIME-Version: 1.0
+In-Reply-To: <6256373e$7df40b29$569f21c8$@com>
+References: <6256373e$7df40b29$569f21c8$@com>
+Date: Tue, 21 Jul 2009 15:02:04 -0300
+Message-ID: <2d5a2c100907211102v4228012h2bc226cceb12abc3@mail.gmail.com>
+Subject: Re: sdp update record
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: josem@robleshermoso.com
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- serial/Makefile.am |    2 +
- serial/proxy.c     |  151 ++++++++++++++++++++++++++++++++++++++++------------
- serial/serial.conf |   10 ++++
- 3 files changed, 128 insertions(+), 35 deletions(-)
- create mode 100644 serial/serial.conf
+Hi,
 
-diff --git a/serial/Makefile.am b/serial/Makefile.am
-index 4fa455f..c88a980 100644
---- a/serial/Makefile.am
-+++ b/serial/Makefile.am
-@@ -19,4 +19,6 @@ AM_CFLAGS = -fvisibility=hidden \
- 
- INCLUDES = -I$(top_srcdir)/common -I$(top_srcdir)/src
- 
-+EXTRA_DIST = serial.conf
-+
- MAINTAINERCLEANFILES = Makefile.in
-diff --git a/serial/proxy.c b/serial/proxy.c
-index 8c8a4b8..eb81564 100644
---- a/serial/proxy.c
-+++ b/serial/proxy.c
-@@ -962,70 +962,83 @@ static int proxy_pathcmp(gconstpointer proxy, gconstpointer p)
- 	return strcmp(prx->path, path);
- }
- 
--static DBusMessage *create_proxy(DBusConnection *conn,
--				DBusMessage *msg, void *data)
-+static int register_proxy(struct serial_adapter *adapter, const char *uuid_str,
-+				const char *address, char *path)
- {
--	struct serial_adapter *adapter = data;
--	char path[MAX_PATH_LENGTH + 1];
--	const char *pattern, *address, *ppath = path;
--	char *uuid_str;
- 	proxy_type_t type;
--	uuid_t uuid;
- 	int ret;
- 
--	if (!dbus_message_get_args(msg, NULL,
--				DBUS_TYPE_STRING, &pattern,
--				DBUS_TYPE_STRING, &address,
--				DBUS_TYPE_INVALID))
--		return NULL;
--
--	uuid_str = bt_name2string(pattern);
--	if (!uuid_str)
--		return invalid_arguments(msg, "Invalid UUID");
--
--	bt_string2uuid(&uuid, uuid_str);
--
- 	type = addr2type(address);
--	if (type == UNKNOWN_PROXY_TYPE) {
--		g_free(uuid_str);
--		return invalid_arguments(msg, "Invalid address");
--	}
-+	if (type == UNKNOWN_PROXY_TYPE)
-+		return -EINVAL;
- 
- 	/* Only one proxy per address(TTY or unix socket) is allowed */
--	if (g_slist_find_custom(adapter->proxies, address, proxy_addrcmp)) {
--		g_free(uuid_str);
--		return g_dbus_create_error(msg, ERROR_INTERFACE ".AlreadyExist",
--						"Proxy already exists");
--	}
-+	if (g_slist_find_custom(adapter->proxies, address, proxy_addrcmp))
-+		return -EALREADY;
- 
- 	switch (type) {
- 	case UNIX_SOCKET_PROXY:
- 		ret = proxy_socket_register(adapter, uuid_str, address,
--						path, sizeof(path), TRUE);
-+					path, MAX_PATH_LENGTH + 1, TRUE);
- 		break;
- 	case TTY_PROXY:
- 		ret = proxy_tty_register(adapter, uuid_str, address,
--				NULL, path, sizeof(path), TRUE);
-+				NULL, path, MAX_PATH_LENGTH + 1, TRUE);
- 		break;
- 	case TCP_SOCKET_PROXY:
- 		ret = proxy_tcp_register(adapter, uuid_str, address,
--					path, sizeof(path), TRUE);
-+					path, MAX_PATH_LENGTH + 1, TRUE);
- 		break;
- 	default:
- 		ret = -1;
- 	}
- 
--	g_free(uuid_str);
--
- 	if (ret < 0)
--		return failed(msg, "Create object path failed");
-+		return -EIO;
- 
- 	g_dbus_emit_signal(adapter->conn,
- 			adapter_get_path(adapter->btd_adapter),
- 			SERIAL_MANAGER_INTERFACE, "ProxyCreated",
--			DBUS_TYPE_STRING, &ppath,
-+			DBUS_TYPE_STRING, &path,
- 			DBUS_TYPE_INVALID);
- 
-+	return 0;
-+}
-+
-+static DBusMessage *create_proxy(DBusConnection *conn,
-+				DBusMessage *msg, void *data)
-+{
-+	struct serial_adapter *adapter = data;
-+	char path[MAX_PATH_LENGTH + 1];
-+	const char *pattern, *address;
-+	char *uuid_str, *ppath = path;
-+	uuid_t uuid;
-+	int ret;
-+
-+	if (!dbus_message_get_args(msg, NULL,
-+				DBUS_TYPE_STRING, &pattern,
-+				DBUS_TYPE_STRING, &address,
-+				DBUS_TYPE_INVALID))
-+		return NULL;
-+
-+	uuid_str = bt_name2string(pattern);
-+	if (!uuid_str)
-+		return invalid_arguments(msg, "Invalid UUID");
-+
-+	bt_string2uuid(&uuid, uuid_str);
-+
-+	ret = register_proxy(adapter, uuid_str, address, ppath);
-+	g_free(uuid_str);
-+
-+	if (ret == -EINVAL) {
-+		return invalid_arguments(msg, "Invalid address");
-+	} else if (ret == -EALREADY) {
-+		return g_dbus_create_error(msg, ERROR_INTERFACE ".AlreadyExist",
-+						"Proxy already exists");
-+	} else if (ret == -EIO) {
-+		return failed(msg, "Create object path failed");
-+	}
-+
- 	return g_dbus_create_reply(msg, DBUS_TYPE_STRING, &ppath,
- 					DBUS_TYPE_INVALID);
- }
-@@ -1210,6 +1223,73 @@ static struct serial_adapter *find_adapter(GSList *list,
- 	return NULL;
- }
- 
-+static void serial_proxy_init(struct serial_adapter *adapter)
-+{
-+	GKeyFile *config;
-+	GError *err = NULL;
-+	const char *file = CONFIGDIR "/serial.conf";
-+	char **group_list;
-+	int i;
-+
-+	config = g_key_file_new();
-+
-+	if (!g_key_file_load_from_file(config, file, 0, &err)) {
-+		error("Parsing %s failed: %s", file, err->message);
-+		g_error_free(err);
-+		g_key_file_free(config);
-+		return;
-+	}
-+
-+	group_list = g_key_file_get_groups(config, NULL);
-+
-+	for (i = 0; group_list[i] != NULL; i++) {
-+		char *group_str = group_list[i], *uuid_str, *address;
-+		uuid_t uuid;
-+		char path[MAX_PATH_LENGTH + 1];
-+		char *ppath = path;
-+		int ret;
-+
-+		/* string length of "Proxy" is 5 */
-+		if (strlen(group_str) < 5 || strncmp(group_str, "Proxy", 5))
-+			continue;
-+
-+		uuid_str = g_key_file_get_string(config, group_str, "UUID",
-+							&err);
-+		if (err) {
-+			debug("%s: %s", file, err->message);
-+			g_error_free(err);
-+			g_key_file_free(config);
-+			return;
-+		}
-+		address = g_key_file_get_string(config, group_str, "Address",
-+							&err);
-+		if (err) {
-+			debug("%s: %s", file, err->message);
-+			g_error_free(err);
-+			g_key_file_free(config);
-+			g_free(uuid_str);
-+			return;
-+		}
-+
-+		bt_string2uuid(&uuid, uuid_str);
-+
-+		ret = register_proxy(adapter, uuid_str, address, ppath);
-+		if (ret == -EINVAL)
-+			error("Invalid address.");
-+		else if (ret == -EALREADY)
-+			debug("Proxy already exists.");
-+		else if (ret == -EIO)
-+			error("proxy register failed.");
-+
-+		g_free(uuid_str);
-+		g_free(address);
-+	}
-+
-+	g_strfreev(group_list);
-+	g_key_file_free(config);
-+	return;
-+}
-+
- int proxy_register(DBusConnection *conn, struct btd_adapter *btd_adapter)
- {
- 	struct serial_adapter *adapter;
-@@ -1241,6 +1321,7 @@ int proxy_register(DBusConnection *conn, struct btd_adapter *btd_adapter)
- 	debug("Registered interface %s on path %s",
- 		SERIAL_MANAGER_INTERFACE, path);
- 
-+	serial_proxy_init(adapter);
- 	return 0;
- }
- 
-diff --git a/serial/serial.conf b/serial/serial.conf
-new file mode 100644
-index 0000000..982dcdd
---- /dev/null
-+++ b/serial/serial.conf
-@@ -0,0 +1,10 @@
-+# Configuration file for serial
-+
-+# There could be multiple proxy sections, the format is [Proxy <user chosen name>]
-+[Proxy DUN]
-+
-+# UUID for DUN proxy service
-+#UUID=00001103-0000-1000-8000-00805F9B34FB
-+
-+# Address for device node
-+#Address=/dev/ttyx
+On Mon, Jul 20, 2009 at 5:46 AM,
+josem@robleshermoso.com<josem@robleshermoso.com> wrote:
+> Hi everyone
+>
+> Working with BlueZ 4.46, bluetoothd process makes an segfault when an
+> "update sdp record" request is processed. Running with valgrind memcheck
+> I checked that when an "search attr" request arrives after the "update sdp
+> record",
+>  this record handle not exists because this memory has been freed in the
+> "update sdp record" stage. The code block when "update spd record" is made
+>
+
+Thanks for reporting this, a patch has been pushed upstream to solve this:
+
+http://git.kernel.org/?p=bluetooth/bluez.git;a=commitdiff;h=8c677a559dbaa7c9b53fea05f91081c05244ec1f
+
+Note that nrec should reuse the memory from orec thus the assert.
+
 -- 
-1.5.4.5
-
+Luiz Augusto von Dentz
+Engenheiro de Computação
