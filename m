@@ -1,51 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 21 Jul 2009 13:02:39 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
+Subject: bluetooth SPP link to Nokia phone
+From: Henry Gomersall <whg21@cam.ac.uk>
+Reply-To: heng@cantab.net
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: bluetooth SPP link to Nokia phone
-Message-ID: <20090721100239.GA19048@jh-x301>
-References: <1248169540.7048.52.camel@whg21-laptop>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1248169540.7048.52.camel@whg21-laptop>
+Content-Type: text/plain
+Date: Tue, 21 Jul 2009 10:45:40 +0100
+Message-Id: <1248169540.7048.52.camel@whg21-laptop>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Henry,
+I've been attempting to do some hacking on the Bluez stack. The starting
+point was to initiate an SPP link to my Nokia 6300 mobile phone. I can
+establish the link, but when I attempt to send characters to it (through
+several different methods), the phone will announce it is disconnecting.
+The python I use is at the bottom of this email.
 
-On Tue, Jul 21, 2009, Henry Gomersall wrote:
-> import dbus
-> 
-> bus = dbus.SystemBus();
-> manager = dbus.Interface(bus.get_object('org.bluez', '/'),
-> 'org.bluez.Manager')
-> obj = bus.get_object('org.bluez', manager.DefaultAdapter())
-> adapter = dbus.Interface(obj, 'org.bluez.Adapter')
-> 
-> phone = dbus.Interface(bus.get_object('org.bluez',
-> adapter.ListDevices()[0]), 'org.bluez.Device')
-> 
-> phone_serial = dbus.Interface(phone, 'org.bluez.Serial')
-> phone_serial.Connect('spp')
+I have already set up a serial connection using a UART to bluetooth
+module (a module based on the LMX9830) in conjunction with a
+USB->serial->UART piece of hardware. In this configuration, I can
+initiate a connection to the phone and write and receive bytes from it
+no problem.
 
-That looks fine to me, though you might want to use FindDevice with the
-address of your phone in case you at some point configure more than one
-device.
+My questions are as follows:
 
-> At this stage, I have the device /dev/rfcomm0, but I cannot write data
-> to it without breaking the link.
+1) Am I missing something important with how I am using the Bluez stack?
+2) Is this a known issue or is it a previous known issue? I am still
+using the version of Bluez that comes with shipped with Ubuntu 9.04
+which is 4.39.
+3) Are there any caveats with how devices implement the serial port
+profile?
 
-Do you open the device node and try to write to it from the same python
-script that you created the connection with? At the very least the process
-that calls Serial.Connect() needs to stay alive for the duration of the
-connection. This is because bluetoothd will track the D-Bus client and
-automatically disconnect if the client disconnects (e.g. when your script
-exits).
+I'm keen to sort this problem out and would appreciate any assistance.
 
-Another potential issue that comes to mind is that the protocol you're
-supposed to speak to the phone could be binary in which case you'll need
-to set the tty into raw mode before doing anything with it (in C you'd use
-cfmakeraw and tcsetattr for that and python probably provides something
-similar).
+Many thanks,
 
-Johan
+Henry Gomersall
+
+The code used:
+
+import dbus
+
+bus = dbus.SystemBus();
+manager = dbus.Interface(bus.get_object('org.bluez', '/'),
+'org.bluez.Manager')
+obj = bus.get_object('org.bluez', manager.DefaultAdapter())
+adapter = dbus.Interface(obj, 'org.bluez.Adapter')
+
+phone = dbus.Interface(bus.get_object('org.bluez',
+adapter.ListDevices()[0]), 'org.bluez.Device')
+
+phone_serial = dbus.Interface(phone, 'org.bluez.Serial')
+phone_serial.Connect('spp')
+
+At this stage, I have the device /dev/rfcomm0, but I cannot write data
+to it without breaking the link.
+
