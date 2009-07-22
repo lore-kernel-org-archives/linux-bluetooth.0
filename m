@@ -1,39 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: bluetooth SPP link to Nokia phone
-From: Henry Gomersall <whg21@cam.ac.uk>
-Reply-To: heng@cantab.net
-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1248177100.5156.14.camel@whg21-laptop>
-References: <1248169540.7048.52.camel@whg21-laptop>
-	 <20090721100239.GA19048@jh-x301>  <1248177100.5156.14.camel@whg21-laptop>
+Subject: Re: [PATCH 1/3] Bluetooth: Add initial support for ERTM packets
+ transfers
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1248254976-12090-2-git-send-email-gustavo@las.ic.unicamp.br>
+References: <1248254976-12090-1-git-send-email-gustavo@las.ic.unicamp.br>
+	 <1248254976-12090-2-git-send-email-gustavo@las.ic.unicamp.br>
 Content-Type: text/plain
-Date: Wed, 22 Jul 2009 12:14:57 +0100
-Message-Id: <1248261297.5156.23.camel@whg21-laptop>
+Date: Wed, 22 Jul 2009 11:51:36 +0200
+Message-Id: <1248256296.28545.124.camel@violet>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 2009-07-21 at 12:51 +0100, Henry Gomersall wrote:
-> I've tried doing the same thing using the rfcomm program. This allows
-> me
-> to set up a stable connection using:
-> rfcomm connect /dev/rfcomm0 'XX:XX:XX:XX:XX:XX'
+Hi Gustavo,
 
-I've done a little more investigation.
+> This patch adds support for ERTM transfers, without retransmission, with
+> txWindow up to 63 and with acknowledgement of packets received.  Now the
+> packets are queued before call l2cap_do_send(), so packets couldn't be
+> sent at the time we call l2cap_sock_sendmsg(). They will be sent in
+> an asynchronous way on later calls of l2cap_ertm_send().  Besides if an
+> error occurs on calling l2cap_do_send() we disconnect the channel.
 
-(please correct me if I am wrong) The rfcomm app speaks directly to the
-kernel bluetooth interface. It works fine.
+we have to fix the basic comments I gave you on IRC. Then send 2/3 first
+and then we go trough this one again.
 
-The sample test-serial program works through the dbus interface to the
-bluetooth daemon and has exactly the same problem as my test program -
-namely the serial link is dropped as soon as I attempt to write data to
-it.
+Regards
 
-The problem I have is the large overhead to understanding the source
-tree, with the wiki being pretty out of date. I'm keen to sort this
-problem.
+Marcel
 
-Cheers,
-
-Henry
 
