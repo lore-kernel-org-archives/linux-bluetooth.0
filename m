@@ -3,16 +3,16 @@ From: Forrest Zhao <forrest.zhao@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: forrest.zhao@gmail.com, Forrest Zhao <forrest.zhao@intel.com>
 Subject: [PATCH] add support for multi serial proxy configuration
-Date: Wed, 22 Jul 2009 16:37:41 +0800
-Message-Id: <1248251861-28621-1-git-send-email-forrest.zhao@intel.com>
+Date: Wed, 22 Jul 2009 15:58:20 +0800
+Message-Id: <1248249500-27681-1-git-send-email-forrest.zhao@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
  serial/Makefile.am |    2 +
- serial/proxy.c     |  155 ++++++++++++++++++++++++++++++++++++++++------------
- serial/serial.conf |   10 +++
- 3 files changed, 132 insertions(+), 35 deletions(-)
+ serial/proxy.c     |  151 ++++++++++++++++++++++++++++++++++++++++------------
+ serial/serial.conf |   10 ++++
+ 3 files changed, 128 insertions(+), 35 deletions(-)
  create mode 100644 serial/serial.conf
 
 diff --git a/serial/Makefile.am b/serial/Makefile.am
@@ -27,10 +27,10 @@ index 4fa455f..c88a980 100644
 +
  MAINTAINERCLEANFILES = Makefile.in
 diff --git a/serial/proxy.c b/serial/proxy.c
-index 8c8a4b8..7f65513 100644
+index 8c8a4b8..eb81564 100644
 --- a/serial/proxy.c
 +++ b/serial/proxy.c
-@@ -962,70 +962,85 @@ static int proxy_pathcmp(gconstpointer proxy, gconstpointer p)
+@@ -962,70 +962,83 @@ static int proxy_pathcmp(gconstpointer proxy, gconstpointer p)
  	return strcmp(prx->path, path);
  }
  
@@ -137,21 +137,19 @@ index 8c8a4b8..7f65513 100644
 +	ret = register_proxy(adapter, uuid_str, address, ppath);
 +	g_free(uuid_str);
 +
-+	if (ret == -EINVAL)
++	if (ret == -EINVAL) {
 +		return invalid_arguments(msg, "Invalid address");
-+	else if (ret == -EALREADY)
++	} else if (ret == -EALREADY) {
 +		return g_dbus_create_error(msg, ERROR_INTERFACE ".AlreadyExist",
 +						"Proxy already exists");
-+	else if (ret == -EIO)
++	} else if (ret == -EIO) {
 +		return failed(msg, "Create object path failed");
-+	else if (ret < 0)
-+		return g_dbus_create_error(msg, ERROR_INTERFACE "Failed",
-+				"Proxy creation failed (%s)", strerror(-ret));
++	}
 +
  	return g_dbus_create_reply(msg, DBUS_TYPE_STRING, &ppath,
  					DBUS_TYPE_INVALID);
  }
-@@ -1210,6 +1225,75 @@ static struct serial_adapter *find_adapter(GSList *list,
+@@ -1210,6 +1223,73 @@ static struct serial_adapter *find_adapter(GSList *list,
  	return NULL;
  }
  
@@ -211,9 +209,7 @@ index 8c8a4b8..7f65513 100644
 +		else if (ret == -EALREADY)
 +			debug("Proxy already exists.");
 +		else if (ret == -EIO)
-+			error("Proxy register failed.");
-+		else if (ret < 0)
-+			error("Proxy creation failed (%s)", strerror(-ret));
++			error("proxy register failed.");
 +
 +		g_free(uuid_str);
 +		g_free(address);
@@ -227,7 +223,7 @@ index 8c8a4b8..7f65513 100644
  int proxy_register(DBusConnection *conn, struct btd_adapter *btd_adapter)
  {
  	struct serial_adapter *adapter;
-@@ -1241,6 +1325,7 @@ int proxy_register(DBusConnection *conn, struct btd_adapter *btd_adapter)
+@@ -1241,6 +1321,7 @@ int proxy_register(DBusConnection *conn, struct btd_adapter *btd_adapter)
  	debug("Registered interface %s on path %s",
  		SERIAL_MANAGER_INTERFACE, path);
  
