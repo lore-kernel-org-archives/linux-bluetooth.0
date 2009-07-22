@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Forrest Zhao <forrest.zhao@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: forrest.zhao@gmail.com, Forrest Zhao <forrest.zhao@intel.com>
-Subject: [PATCH] add support for multi serial proxy configuration
-Date: Wed, 22 Jul 2009 17:20:40 +0800
-Message-Id: <1248254440-29598-1-git-send-email-forrest.zhao@intel.com>
+Subject: [PATCH] support the multi serial proxy configuration
+Date: Wed, 22 Jul 2009 17:01:49 +0800
+Message-Id: <1248253309-29196-1-git-send-email-forrest.zhao@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -27,7 +27,7 @@ index 4fa455f..c88a980 100644
 +
  MAINTAINERCLEANFILES = Makefile.in
 diff --git a/serial/proxy.c b/serial/proxy.c
-index 8c8a4b8..50ffee3 100644
+index 8c8a4b8..cdeb071 100644
 --- a/serial/proxy.c
 +++ b/serial/proxy.c
 @@ -962,70 +962,86 @@ static int proxy_pathcmp(gconstpointer proxy, gconstpointer p)
@@ -37,7 +37,7 @@ index 8c8a4b8..50ffee3 100644
 -static DBusMessage *create_proxy(DBusConnection *conn,
 -				DBusMessage *msg, void *data)
 +static int register_proxy(struct serial_adapter *adapter, const char *uuid_str,
-+				const char *address, char *path, size_t length)
++				const char *address, char *path, uint8_t length)
  {
 -	struct serial_adapter *adapter = data;
 -	char path[MAX_PATH_LENGTH + 1];
@@ -135,7 +135,7 @@ index 8c8a4b8..50ffee3 100644
 +	bt_string2uuid(&uuid, uuid_str);
 +
 +	ret = register_proxy(adapter, uuid_str, address, ppath,
-+						sizeof(path));
++						MAX_PATH_LENGTH + 1);
 +	g_free(uuid_str);
 +
 +	if (ret == -EINVAL)
@@ -207,7 +207,7 @@ index 8c8a4b8..50ffee3 100644
 +		bt_string2uuid(&uuid, uuid_str);
 +
 +		ret = register_proxy(adapter, uuid_str, address, ppath,
-+							sizeof(path));
++						MAX_PATH_LENGTH + 1);
 +		if (ret == -EINVAL)
 +			error("Invalid address.");
 +		else if (ret == -EALREADY)
