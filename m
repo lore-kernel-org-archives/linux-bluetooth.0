@@ -1,363 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
-From: Forrest Zhao <forrest.zhao@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: forrest.zhao@gmail.com, Forrest Zhao <forrest.zhao@intel.com>
-Subject: [PATCH] add support for multiple serial proxies configuration
-Date: Fri, 24 Jul 2009 11:18:20 +0800
-Message-Id: <1248405500-3197-1-git-send-email-forrest.zhao@intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Lamarque Vieira Souza <lamarque@gmail.com>
+To: Anthony Waters <awaters1@gmail.com>
+Subject: Re: [PATCH] Fix for Acer Bluetooth Optical Rechargeable Mouse
+Date: Thu, 23 Jul 2009 20:59:33 -0300
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+ linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ marcel@holtmann.org
+References: <200907170301.43807.lamarque@gmail.com> <200907231921.31121.lamarque@gmail.com> <2a91b6e50907231605t2b805a7avfbd313a96280af29@mail.gmail.com>
+In-Reply-To: <2a91b6e50907231605t2b805a7avfbd313a96280af29@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <200907232059.33760.lamarque@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- serial/Makefile.am |    2 +
- serial/proxy.c     |  230 +++++++++++++++++++++++++++++++++++++++-------------
- serial/serial.conf |   10 +++
- 3 files changed, 184 insertions(+), 58 deletions(-)
- create mode 100644 serial/serial.conf
+Em Quinta-feira 23 Julho 2009, Anthony Waters escreveu:
+> The patch in the bug report[1] just undoes the part of the commit that
+> causes the stutter/sluggishness with my mouse so it isn't really a fix
 
-diff --git a/serial/Makefile.am b/serial/Makefile.am
-index 4fa455f..c88a980 100644
---- a/serial/Makefile.am
-+++ b/serial/Makefile.am
-@@ -19,4 +19,6 @@ AM_CFLAGS = -fvisibility=hidden \
- 
- INCLUDES = -I$(top_srcdir)/common -I$(top_srcdir)/src
- 
-+EXTRA_DIST = serial.conf
-+
- MAINTAINERCLEANFILES = Makefile.in
-diff --git a/serial/proxy.c b/serial/proxy.c
-index 8c8a4b8..5965a47 100644
---- a/serial/proxy.c
-+++ b/serial/proxy.c
-@@ -511,29 +511,27 @@ drop:
- 	g_io_channel_shutdown(chan, TRUE, NULL);
- }
- 
--static DBusMessage *proxy_enable(DBusConnection *conn,
--				DBusMessage *msg, void *data)
-+static int enable_proxy(struct serial_proxy *prx)
- {
--	struct serial_proxy *prx = data;
- 	sdp_record_t *record;
--	GError *err = NULL;
--	DBusMessage *reply;
-+	GError *gerr = NULL;
-+	int err;
- 
- 	if (prx->io)
--		return failed(msg, "Already enabled");
-+		return -EALREADY;
- 
- 	/* Listen */
- 	prx->io = bt_io_listen(BT_IO_RFCOMM, NULL, confirm_event_cb, prx,
--				NULL, &err,
-+				NULL, &gerr,
- 				BT_IO_OPT_SOURCE_BDADDR, &prx->src,
- 				BT_IO_OPT_INVALID);
- 	if (!prx->io)
- 		goto failed;
- 
--	bt_io_get(prx->io, BT_IO_RFCOMM, &err,
-+	bt_io_get(prx->io, BT_IO_RFCOMM, &gerr,
- 			BT_IO_OPT_CHANNEL, &prx->channel,
- 			BT_IO_OPT_INVALID);
--	if (err) {
-+	if (gerr) {
- 		g_io_channel_unref(prx->io);
- 		prx->io = NULL;
- 		goto failed;
-@@ -546,24 +544,42 @@ static DBusMessage *proxy_enable(DBusConnection *conn,
- 	record = proxy_record_new(prx->uuid128, prx->channel);
- 	if (!record) {
- 		g_io_channel_unref(prx->io);
--		return failed(msg, "Unable to allocate new service record");
-+		return -ENOMEM;
- 	}
- 
--	if (add_record_to_server(&prx->src, record) < 0) {
-+	err = add_record_to_server(&prx->src, record);
-+	if (err < 0) {
- 		sdp_record_free(record);
- 		g_io_channel_unref(prx->io);
--		return failed(msg, "Service registration failed");
-+		return err;
- 	}
- 
- 	prx->record_id = record->handle;
- 
--	return dbus_message_new_method_return(msg);
-+	return 0;
- 
- failed:
--	error("%s", err->message);
--	reply = failed(msg, err->message);
--	g_error_free(err);
--	return reply;
-+	error("%s", gerr->message);
-+	g_error_free(gerr);
-+	return -EIO;
-+
-+}
-+static DBusMessage *proxy_enable(DBusConnection *conn,
-+				DBusMessage *msg, void *data)
-+{
-+	struct serial_proxy *prx = data;
-+	int err;
-+
-+	err = enable_proxy(prx);
-+	if (err == -EALREADY)
-+		return failed(msg, "Already enabled");
-+	else if (err == -ENOMEM)
-+		return failed(msg, "Unable to allocate new service record");
-+	else if (err < 0)
-+		return g_dbus_create_error(msg, ERROR_INTERFACE "Failed",
-+				"Proxy enable failed (%s)",  strerror(-err));
-+
-+	return dbus_message_new_method_return(msg);
- }
- 
- static DBusMessage *proxy_disable(DBusConnection *conn,
-@@ -962,70 +978,84 @@ static int proxy_pathcmp(gconstpointer proxy, gconstpointer p)
- 	return strcmp(prx->path, path);
- }
- 
--static DBusMessage *create_proxy(DBusConnection *conn,
--				DBusMessage *msg, void *data)
-+static int register_proxy(struct serial_adapter *adapter, const char *uuid_str,
-+				const char *address, char *path, size_t length)
- {
--	struct serial_adapter *adapter = data;
--	char path[MAX_PATH_LENGTH + 1];
--	const char *pattern, *address, *ppath = path;
--	char *uuid_str;
- 	proxy_type_t type;
--	uuid_t uuid;
--	int ret;
--
--	if (!dbus_message_get_args(msg, NULL,
--				DBUS_TYPE_STRING, &pattern,
--				DBUS_TYPE_STRING, &address,
--				DBUS_TYPE_INVALID))
--		return NULL;
--
--	uuid_str = bt_name2string(pattern);
--	if (!uuid_str)
--		return invalid_arguments(msg, "Invalid UUID");
--
--	bt_string2uuid(&uuid, uuid_str);
-+	int err;
- 
- 	type = addr2type(address);
--	if (type == UNKNOWN_PROXY_TYPE) {
--		g_free(uuid_str);
--		return invalid_arguments(msg, "Invalid address");
--	}
-+	if (type == UNKNOWN_PROXY_TYPE)
-+		return -EINVAL;
- 
- 	/* Only one proxy per address(TTY or unix socket) is allowed */
--	if (g_slist_find_custom(adapter->proxies, address, proxy_addrcmp)) {
--		g_free(uuid_str);
--		return g_dbus_create_error(msg, ERROR_INTERFACE ".AlreadyExist",
--						"Proxy already exists");
--	}
-+	if (g_slist_find_custom(adapter->proxies, address, proxy_addrcmp))
-+		return -EALREADY;
- 
- 	switch (type) {
- 	case UNIX_SOCKET_PROXY:
--		ret = proxy_socket_register(adapter, uuid_str, address,
--						path, sizeof(path), TRUE);
-+		err = proxy_socket_register(adapter, uuid_str, address,
-+						path, length, TRUE);
- 		break;
- 	case TTY_PROXY:
--		ret = proxy_tty_register(adapter, uuid_str, address,
--				NULL, path, sizeof(path), TRUE);
-+		err = proxy_tty_register(adapter, uuid_str, address,
-+					NULL, path, length, TRUE);
- 		break;
- 	case TCP_SOCKET_PROXY:
--		ret = proxy_tcp_register(adapter, uuid_str, address,
--					path, sizeof(path), TRUE);
-+		err = proxy_tcp_register(adapter, uuid_str, address,
-+						path, length, TRUE);
- 		break;
- 	default:
--		ret = -1;
-+		err = -EINVAL;
- 	}
- 
--	g_free(uuid_str);
--
--	if (ret < 0)
--		return failed(msg, "Create object path failed");
-+	if (err < 0)
-+		return err;
- 
- 	g_dbus_emit_signal(adapter->conn,
- 			adapter_get_path(adapter->btd_adapter),
- 			SERIAL_MANAGER_INTERFACE, "ProxyCreated",
--			DBUS_TYPE_STRING, &ppath,
-+			DBUS_TYPE_STRING, &path,
- 			DBUS_TYPE_INVALID);
- 
-+	return 0;
-+}
-+
-+static DBusMessage *create_proxy(DBusConnection *conn,
-+				DBusMessage *msg, void *data)
-+{
-+	struct serial_adapter *adapter = data;
-+	char path[MAX_PATH_LENGTH + 1];
-+	const char *pattern, *address;
-+	char *uuid_str, *ppath = path;
-+	uuid_t uuid;
-+	int err;
-+
-+	if (!dbus_message_get_args(msg, NULL,
-+				DBUS_TYPE_STRING, &pattern,
-+				DBUS_TYPE_STRING, &address,
-+				DBUS_TYPE_INVALID))
-+		return NULL;
-+
-+	uuid_str = bt_name2string(pattern);
-+	if (!uuid_str)
-+		return invalid_arguments(msg, "Invalid UUID");
-+
-+	bt_string2uuid(&uuid, uuid_str);
-+
-+	err = register_proxy(adapter, uuid_str, address, ppath,
-+						sizeof(path));
-+	g_free(uuid_str);
-+
-+	if (err == -EINVAL)
-+		return invalid_arguments(msg, "Invalid address");
-+	else if (err == -EALREADY)
-+		return g_dbus_create_error(msg, ERROR_INTERFACE ".AlreadyExist",
-+						"Proxy already exists");
-+	else if (err < 0)
-+		return g_dbus_create_error(msg, ERROR_INTERFACE "Failed",
-+				"Proxy creation failed (%s)", strerror(-err));
-+
- 	return g_dbus_create_reply(msg, DBUS_TYPE_STRING, &ppath,
- 					DBUS_TYPE_INVALID);
- }
-@@ -1210,6 +1240,89 @@ static struct serial_adapter *find_adapter(GSList *list,
- 	return NULL;
- }
- 
-+static void serial_proxy_init(struct serial_adapter *adapter)
-+{
-+	GKeyFile *config;
-+	GError *gerr = NULL;
-+	const char *file = CONFIGDIR "/serial.conf";
-+	char **group_list;
-+	int i;
-+
-+	config = g_key_file_new();
-+
-+	if (!g_key_file_load_from_file(config, file, 0, &gerr)) {
-+		error("Parsing %s failed: %s", file, gerr->message);
-+		g_error_free(gerr);
-+		g_key_file_free(config);
-+		return;
-+	}
-+
-+	group_list = g_key_file_get_groups(config, NULL);
-+
-+	for (i = 0; group_list[i] != NULL; i++) {
-+		char *group_str = group_list[i], *uuid_str, *address;
-+		uuid_t uuid;
-+		char path[MAX_PATH_LENGTH + 1];
-+		char *ppath = path;
-+		int err;
-+		GSList *l;
-+		struct serial_proxy *prx;
-+
-+		/* string length of "Proxy" is 5 */
-+		if (strlen(group_str) < 5 || strncmp(group_str, "Proxy", 5))
-+			continue;
-+
-+		uuid_str = g_key_file_get_string(config, group_str, "UUID",
-+							&gerr);
-+		if (gerr) {
-+			debug("%s: %s", file, gerr->message);
-+			g_error_free(gerr);
-+			g_key_file_free(config);
-+			return;
-+		}
-+		address = g_key_file_get_string(config, group_str, "Address",
-+							&gerr);
-+		if (gerr) {
-+			debug("%s: %s", file, gerr->message);
-+			g_error_free(gerr);
-+			g_key_file_free(config);
-+			g_free(uuid_str);
-+			return;
-+		}
-+
-+		bt_string2uuid(&uuid, uuid_str);
-+
-+		err = register_proxy(adapter, uuid_str, address, ppath,
-+							sizeof(path));
-+		if (err == -EINVAL)
-+			error("Invalid address.");
-+		else if (err == -EALREADY)
-+			debug("Proxy already exists.");
-+		else if (err < 0)
-+			error("Proxy creation failed (%s)", strerror(-err));
-+		else {
-+			l = g_slist_find_custom(adapter->proxies, ppath,
-+							proxy_pathcmp);
-+			if (!l)
-+				error("Can't find proxy.");
-+			else {
-+				prx = l->data;
-+				err = enable_proxy(prx);
-+				if (err < 0)
-+					error("Proxy enable failed (%s)",
-+							 strerror(-err));
-+			}
-+		}
-+
-+		g_free(uuid_str);
-+		g_free(address);
-+	}
-+
-+	g_strfreev(group_list);
-+	g_key_file_free(config);
-+	return;
-+}
-+
- int proxy_register(DBusConnection *conn, struct btd_adapter *btd_adapter)
- {
- 	struct serial_adapter *adapter;
-@@ -1241,6 +1354,7 @@ int proxy_register(DBusConnection *conn, struct btd_adapter *btd_adapter)
- 	debug("Registered interface %s on path %s",
- 		SERIAL_MANAGER_INTERFACE, path);
- 
-+	serial_proxy_init(adapter);
- 	return 0;
- }
- 
-diff --git a/serial/serial.conf b/serial/serial.conf
-new file mode 100644
-index 0000000..982dcdd
---- /dev/null
-+++ b/serial/serial.conf
-@@ -0,0 +1,10 @@
-+# Configuration file for serial
-+
-+# There could be multiple proxy sections, the format is [Proxy <user chosen name>]
-+[Proxy DUN]
-+
-+# UUID for DUN proxy service
-+#UUID=00001103-0000-1000-8000-00805F9B34FB
-+
-+# Address for device node
-+#Address=/dev/ttyx
+	Actually I have changed your patch to add a quirk for my bluetooth controller 
+(0a5c:200a), so it only undoes the change for this particular bluetooth 
+controller. The default link policy settings mentioned in commit "[Bluetooth] 
+Make use of the default link policy settings" does not work properly with this 
+mouse even in Windows. In Windows the mouse is slow to react even today, 
+increasing acceleration in mouse settings helped but then the touchpad becomes 
+to sensitive, the mouse had always worked better in Linux than in Windows 
+until kernel 2.6.21. In 2.6.22 the input-to-hid change happened in hci_usb 
+module and the mouse started to behave like in Windows. In 2.6.27 the stutter 
+problem was introduced, in 2.6.29 hci_usb module was removed and only btusb 
+was available, but with hid+btusb+2.6.2[89] the cursor gets stucked at upper-
+left corner, with hid+hci_usb+2.6.28 there is only the stutter problem. 
+Finally, after two years trying to find the causes of those problems it is 
+working well again, better than in Windows, so please add those two patches to 
+the kernel. I even got to the point to undo the input-to-hid change from 
+kernels 2.6.22 until 2.6.26 and port the modified 2.6.26 bluetooth subsystem 
+to kernels 2.6.2[789] until I find a better solution, which seems to be those 
+two patches.
+
+> [1] http://bugzilla.kernel.org/show_bug.cgi?id=13314
+>
+> On Thu, Jul 23, 2009 at 6:21 PM, Lamarque Vieira
+>
+> Souza<lamarque@gmail.com> wrote:
+> > Em Quinta-feira 23 Julho 2009, Andrew Morton escreveu:
+> >> On Thu, 23 Jul 2009 19:00:58 -0300
+> >>
+> >> Lamarque Vieira Souza <lamarque@gmail.com> wrote:
+> >> > Em Quinta-feira 23 Julho 2009, Andrew Morton escreveu:
+> >> > > On Thu, 23 Jul 2009 18:30:57 -0300
+> >> > >
+> >> > > Lamarque Vieira Souza <lamarque@gmail.com> wrote:
+> >> > > > Em Quinta-feira 23 Julho 2009, Andrew Morton escreveu:
+> >> > > > > On Fri, 17 Jul 2009 03:01:43 -0300
+> >> > > > >
+> >> > > > > Lamarque Vieira Souza <lamarque@gmail.com> wrote:
+> >> > > > > >     This patch works around one problem with my Acer Bluetooth
+> >> > > > > > Optical Rechargeable Mouse where the cursor gets stuck at
+> >> > > > > > screen's upper-left corner. Even my notebook's touchpad is not
+> >> > > > > > able to move cursor when the bluetooth mouse is connected to
+> >> > > > > > my Acer Ferrari 4005 notebook. Using input session instead of
+> >> > > > > > hid session solves this problem although the cursor still
+> >> > > > > > moves a little sluggishly with the bluetooth mouse, cursor
+> >> > > > > > moves correctly using the touchpad. My bluetooth mouse used to
+> >> > > > > > work well (no sluggish) until kernel 2.6.21, since then the
+> >> > > > > > problems are getting worse with each kernel release (it got
+> >> > > > > > sluggish in 2.6.22 and this this upper-left corner problem
+> >> > > > > > appeared in 2.6.28 or 2.6.27).
+> >> > > >
+> >> > > >         By the way, I have found that bug
+> >> > > > http://bugzilla.kernel.org/show_bug.cgi?id=13314 is the cause of
+> >> > > > the sluggish in my mouse.
+> >> > >
+> >> > > (cc's added)
+> >> > >
+> >> > > OK, thanks.  Did you test Anthony's patch on your system?
+> >> >
+> >> >     Yes,  I did.
+> >>
+> >> Did it fix the bug?
+> >
+> >        It fixed one of the two problems I had with this mouse.
+> >
+> >> If so, does that mean that you think we should merge Anthony's patch
+> >> instead of yours?
+> >
+> >        I need both patches for my mouse to work properly. My patch fix
+> > the problem of cursor stucked at upper-left corner. Anthony's fix the
+> > cursor being sluggish (stutter). They are two different problems.
+> >
+> >> > > Also, you've determined that
+> >> > > http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=c
+> >> > >omm it;h =e4e8e37c42bdaaefcb84eeaef0dc1bc3f696f8f6 caused the problem
+> >> > > on your machine and that reverting it fixes things up.
+> >> > >
+> >> > > I'm all confused.
+> >
+> > --
+> > Lamarque V. Souza
+> > http://www.geographicguide.com/brazil.htm
+> > Linux User #57137 - http://counter.li.org/
+
+
 -- 
-1.5.4.5
-
+Lamarque V. Souza
+http://www.geographicguide.com/brazil.htm
+Linux User #57137 - http://counter.li.org/
