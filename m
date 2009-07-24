@@ -1,78 +1,150 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1346165.1248430092866.JavaMail.root@safetgram>
-Date: Fri, 24 Jul 2009 20:08:15 +1000
-From: John Freeman <johnf@optimation.com.au>
+Date: Fri, 24 Jul 2009 10:37:53 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Forrest Zhao <forrest.zhao@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, forrest.zhao@gmail.com
+Subject: Re: [PATCH] add support for multiple serial proxies configuration
+Message-ID: <20090724073753.GA18981@jh-x301>
+References: <1248405500-3197-1-git-send-email-forrest.zhao@intel.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Intermittent "Address already in use" error
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1248405500-3197-1-git-send-email-forrest.zhao@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I am developing an application that is similar to a Hands-free service
-written in python.
+Hi Forrest,
 
- From time to time, I encounter an "Address already in use" error when
-attempting to bind a socket to a particular local adapter.  The python
-code looks like:
+On Fri, Jul 24, 2009, Forrest Zhao wrote:
+> ---
+>  serial/Makefile.am |    2 +
+>  serial/proxy.c     |  230 +++++++++++++++++++++++++++++++++++++++-------------
+>  serial/serial.conf |   10 +++
+>  3 files changed, 184 insertions(+), 58 deletions(-)
+>  create mode 100644 serial/serial.conf
 
-    Listener = BluetoothSocket(SCO)
-    Listener.bind((addr1, ))
-    Listener.listen(1)
+I finally pushed this upstream but still had to make quite a lot of
+changes.
 
-strace shows this as:
+> +		return g_dbus_create_error(msg, ERROR_INTERFACE "Failed",
+> +				"Proxy enable failed (%s)",  strerror(-err));
 
-    3328  socket(PF_BLUETOOTH, SOCK_SEQPACKET, 2)               = 5
-    3328  bind(5, {sa_family=AF_BLUETOOTH, 
-sa_data="\xa2\xc7\x07\x83\x15\x00\x13\xad\x76\x2d\xf4\xf2\x42\x09"...}, 8) = 0
-    3328  listen(5, 1)                                          = 0
+Two spaces before strerror.
 
-Subsequently, in a separate python thread (is this significant?), I issue:
+>  	g_dbus_emit_signal(adapter->conn,
+>  			adapter_get_path(adapter->btd_adapter),
+>  			SERIAL_MANAGER_INTERFACE, "ProxyCreated",
+> -			DBUS_TYPE_STRING, &ppath,
+> +			DBUS_TYPE_STRING, &path,
+>  			DBUS_TYPE_INVALID);
 
-    sock, whence = Listener.accept()
+These could be indented at least with one more tab.
 
-strace shows this as:
+> +static DBusMessage *create_proxy(DBusConnection *conn,
+> +				DBusMessage *msg, void *data)
+> +{
+> +	struct serial_adapter *adapter = data;
+> +	char path[MAX_PATH_LENGTH + 1];
+> +	const char *pattern, *address;
+> +	char *uuid_str, *ppath = path;
+> +	uuid_t uuid;
 
-    3343  accept(5,  <unfinished ...>
-    ...
-    3343  accept(5,  <unfinished ...>
-    ...
-    3343  <... accept resumed> {sa_family=AF_BLUETOOTH, 
-sa_data="\x4e\xe4\xec\xfd\x1d\x00\xb4\x3b\x82\x04\x20\x04\xbb\xb7"...}, [8]) = 10
+The uuid variable is never used in this function except for getting set
+once by the following:
 
-After many send() and recv() calls on the socket, it is closed.
+> +	bt_string2uuid(&uuid, uuid_str);
 
-Sometimes, the accept-recv-send-close cycle is repeated a number of times.
+> +static void serial_proxy_init(struct serial_adapter *adapter)
+> +{
+> +	GKeyFile *config;
+> +	GError *gerr = NULL;
+> +	const char *file = CONFIGDIR "/serial.conf";
+> +	char **group_list;
+> +	int i;
+> +
+> +	config = g_key_file_new();
+> +
+> +	if (!g_key_file_load_from_file(config, file, 0, &gerr)) {
+> +		error("Parsing %s failed: %s", file, gerr->message);
+> +		g_error_free(gerr);
+> +		g_key_file_free(config);
+> +		return;
+> +	}
+> +
+> +	group_list = g_key_file_get_groups(config, NULL);
+> +
+> +	for (i = 0; group_list[i] != NULL; i++) {
+> +		char *group_str = group_list[i], *uuid_str, *address;
+> +		uuid_t uuid;
 
-At the conclusion of the program the Listener socket is always closed.
-Because, initially, it looked like the problem was related to not
-closing this socket, I added logging so that I could be absolutely
-sure it had been closed.
+Same with this uuid variable.
 
-Now that you understand what the program does, we can get down to
-explaining the problem.
+> +		/* string length of "Proxy" is 5 */
+> +		if (strlen(group_str) < 5 || strncmp(group_str, "Proxy", 5))
+> +			continue;
 
-I can run the program muliple times with no error, but occasionally
-the
+Hmm, I actually forgot to change this one, but isn't just the strncmp call
+enough here (i.e. no need for strlen)?
 
-    Listener.bind((addr1, ))
+> +		uuid_str = g_key_file_get_string(config, group_str, "UUID",
+> +							&gerr);
+> +		if (gerr) {
+> +			debug("%s: %s", file, gerr->message);
+> +			g_error_free(gerr);
+> +			g_key_file_free(config);
+> +			return;
+> +		}
+> +		address = g_key_file_get_string(config, group_str, "Address",
+> +							&gerr);
+> +		if (gerr) {
 
-raises a Bluetooth error (98, 'Address already in use')
+There should be an empty line before address = ...
 
-When this happens, I find that there is a file /sys/class/bluetooth/sco
-that contains:
+> +				if (err < 0)
+> +					error("Proxy enable failed (%s)",
+> +							 strerror(-err));
 
-    A2:C7:07:83:15:00 00:00:00:00:00:00 4
+Mixing tabs and spaces for indentation.
 
-When we don't experience this problem, this file doesn't exist or is empty.
+> +	g_strfreev(group_list);
+> +	g_key_file_free(config);
+> +	return;
+> +}
 
-The contents of the file correspond to the bind() call, but I would
-expect this to be cleaned-up on a close() of the listener.  Usually it
-is, but sometimes not.  There are no obvious correlations with external
-events as far as I can tell.
+Redundant return statement at the end of void function.
 
-The problem persists as long as /sys/class/bluetooth/sco is non-empty,
-and I have not discovered any way to continue other than to reboot,
-which causes the file to disappear.
+> diff --git a/serial/serial.conf b/serial/serial.conf
+> new file mode 100644
+> index 0000000..982dcdd
+> --- /dev/null
+> +++ b/serial/serial.conf
+> @@ -0,0 +1,10 @@
+> +# Configuration file for serial
+> +
+> +# There could be multiple proxy sections, the format is [Proxy <user chosen name>]
+> +[Proxy DUN]
+> +
+> +# UUID for DUN proxy service
+> +#UUID=00001103-0000-1000-8000-00805F9B34FB
+> +
+> +# Address for device node
+> +#Address=/dev/ttyx
 
-Any pointers on where to look next would be greatly appreciated.
+I think the [Proxy DUN] should also be commented out along with the other
+lines.
+
+Even after these changes there are still the following issues that need
+fixing:
+
+1. After creating a proxy through serial.conf the first time bluetoothd
+stores some info about it in /var/lib/bluetooth/.../proxy. The next time
+bluetoothd starts it fails to register (or at least I don't see the local
+service record anymore)
+
+2. The UUID in the service record should be reduced to 16 or 32 bit format
+if it is derived from the Bluetooth base UUID.
+
+3. The Name attribute for the records should (if we are going to keep them
+generic) "Serial Proxy" instead of the current (imho confusing) "Port
+Proxy Entity".
+
+Johan
