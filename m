@@ -1,21 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <148617.74822.qm@web36206.mail.mud.yahoo.com>
-Date: Fri, 24 Jul 2009 18:09:36 -0700 (PDT)
-From: Mohit Gupta <mohitmg@yahoo.com>
-Subject: Bluez 4.x PIXIT for GAP,RFCOMM,SDP,L2CAP
-To: linux-bluetooth@vger.kernel.org
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=US-ASCII
+Subject: Is sdio bluecore-06 supported by linux built-in driver?
+Date: Fri, 24 Jul 2009 13:49:09 -0400
+Message-ID: <C01FCF206F5D8D4C89B210408D7DB39C12ED2E@mail2.oerlikon.ca>
+From: "Weng, Wending" <WWeng@rheinmetall.ca>
+To: <linux-bluetooth@vger.kernel.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
 Hi,
-   Wondering where can I find PIXIT for Bluez 4.41 protocol layers.
 
+	I have a sdio(bluecore-06) module, linux detects it and is registered as a bt device. However, when I tried to bring it up with hciconfig hci0 up, I got connection timeout.
+Is sdio(bluecore-06) supported by linux built-in driver? Thanks in advance.
 
-Regards,
-  Mohit
-
-
-      
+Wending
