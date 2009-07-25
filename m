@@ -1,41 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: tty_register_device NULL pointer dereference in 2.6.31-rc4
+Subject: Re: "org.bluez.Adapter" doesn't exist
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Alan Cox <alan@lxorguk.ukuu.org.uk>
-Cc: Oliver Hartkopp <oliver@hartkopp.net>,
-	Linux Netdev List <netdev@vger.kernel.org>,
+To: Bastien Nocera <hadess@hadess.net>
+Cc: David Stockwell <dstockwell@frequency-one.com>,
+	Doug Moeller <dmoeller@autonetmobile.com>,
 	linux-bluetooth@vger.kernel.org
-In-Reply-To: <20090725115011.7ddf8d00@lxorguk.ukuu.org.uk>
-References: <4A6AD807.6060706@hartkopp.net>
-	 <20090725115011.7ddf8d00@lxorguk.ukuu.org.uk>
+In-Reply-To: <1248504750.23466.6981.camel@localhost.localdomain>
+References: <1248254976-12090-1-git-send-email-gustavo@las.ic.unicamp.br>
+	 <1248254976-12090-2-git-send-email-gustavo@las.ic.unicamp.br>
+	 <1248256296.28545.124.camel@violet> <4A6A59F6.5000102@autonetmobile.com>
+	 <630BE65F03C54798A34D8F9364A9C25D@freqonedev>
+	 <1248504750.23466.6981.camel@localhost.localdomain>
 Content-Type: text/plain
-Date: Sat, 25 Jul 2009 13:07:33 +0200
-Message-Id: <1248520053.28545.156.camel@violet>
+Date: Sat, 25 Jul 2009 13:05:40 +0200
+Message-Id: <1248519940.28545.155.camel@violet>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alan,
+Hi Bastien,
 
-> > this morning i got a NULL pointer dereference in tty_register_device() that
-> > looked similar to the one, i posted here on 03-jun-2009:
+> > > # dbus-send --system --type=method_call --print-reply --dest=org.bluez 
+> > > /org/bluez/hci0 org.bluez.Adapter.GetMode
+> > > Error org.freedesktop.DBus.Error.UnknownMethod: Method "GetMode" with 
+> > > signature "" on interface "org.bluez.Adapter" doesn't exist
+> > >
+> > >
+> > > Bluetoothd output
+> > >
+> > >
+> > > # bluetoothd -dn
+> > > bluetoothd[18625]: Bluetooth daemon 4.38
 > > 
-> > http://marc.info/?l=linux-bluetooth&m=124404919324542&w=2
-> > 
-> > As the boot sequence stopped after this point, i was only able to take a
-> > picture of it - see attached jpg.
-> > 
-> > I was able to shut down the system gracefully by pressing the power button.
-> > 
-> > The problem emerges really seldom.
-> > 
-> > Any idea?
+> > First thing I would look at is catching up with the current version of 
+> > the BT daemon, which is now 4.46 (BlueZ is a work in progress).
 > 
-> tty_register_device appears to have been called with a NULL pointer. Not
-> sure why however.
+> BlueZ is as much a work in progress as any other piece of software. It's
+> supposed to be stable, and isn't the cause of the problems anyway.
+> 
+> The object path is wrong. Try using D-Feet to see the object paths.
+> (hint: it should read /org/bluez/$(pidof bluetoothd)/hci0)
 
-if that is the pointer for the struct device, then that used to be fine
-in the past. Not all RFCOMM device have a parent when they are created.
+and if people start hard coding it, I will put a random number in it and
+obfuscate it completely ;)
 
 Regards
 
