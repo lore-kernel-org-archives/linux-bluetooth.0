@@ -1,167 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A6D8BA3.3030601@hartkopp.net>
-Date: Mon, 27 Jul 2009 13:12:35 +0200
-From: Oliver Hartkopp <oliver@hartkopp.net>
+Date: Mon, 27 Jul 2009 12:30:29 +0200
+From: Wolfram Sang <w.sang@pengutronix.de>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: pHilipp Zabel <philipp.zabel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] pcmcia: dtl1_cs: fix pcmcia_loop_config logic
+Message-ID: <20090727103029.GD3671@pengutronix.de>
+References: <1235753648-10045-1-git-send-email-philipp.zabel@gmail.com> <74d0deb30902271435u1d2ac128ob09896a86abbff64@mail.gmail.com> <4A6D7A47.8050001@pengutronix.de> <1248689611.28545.196.camel@violet>
 MIME-Version: 1.0
-To: Dave Young <hidave.darkstar@gmail.com>
-CC: Alan Cox <alan@lxorguk.ukuu.org.uk>,
- Marcel Holtmann <marcel@holtmann.org>,
- Linux Netdev List <netdev@vger.kernel.org>,
- linux-bluetooth@vger.kernel.org
-Subject: Re: tty_register_device NULL pointer dereference in 2.6.31-rc4
-References: <4A6AD807.6060706@hartkopp.net> <20090725115011.7ddf8d00@lxorguk.ukuu.org.uk> <1248520053.28545.156.camel@violet> <20090725131046.0f076f37@lxorguk.ukuu.org.uk> <20090727095904.GA5442@darkstar>
-In-Reply-To: <20090727095904.GA5442@darkstar>
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="DiL7RhKs8rK9YGuF"
+In-Reply-To: <1248689611.28545.196.camel@violet>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dave Young wrote:
-> On Sat, Jul 25, 2009 at 01:10:46PM +0100, Alan Cox wrote:
->>>> tty_register_device appears to have been called with a NULL pointer. Not
->>>> sure why however.
->>> if that is the pointer for the struct device, then that used to be fine
->>> in the past. Not all RFCOMM device have a parent when they are created.
->> The tty layer doesn't care about the struct device really. Nothing there
->> has changed. The NULL passed appears to be the driver argument.
-> 
-> Agree with you, because in rfcomm_init, rfcomm thread run before tty initilized, the following patch may fix the problem.
-> oliver, could you verify it it fix your problem?
 
-Hi Dave,
-
-i get this problem really seldom on my Laptop and i did not manage to get a
-reproducible Oops of that problem.
-
-Anyway the code you are pointing to seems to have a problem and your added
-error handling looks good to me - even if i don't know if the initializations
-can be reordered in that way.
-
-I'll try your patch, but it could take a *long* time to prove it right ;-)
-
-Maybe Marcel and Alan can better prove it to be correct by code review.
-
-Many thanks,
-Oliver
+--DiL7RhKs8rK9YGuF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
 
-> ---
-> 
-> rfcomm tty may be used before rfcomm_tty_driver initilized,
-> 
-> reporting in:
-> http://marc.info/?l=linux-bluetooth&m=124404919324542&w=2
-> 
-> make 3 changes:
-> 1. remove #ifdef in rfcomm/core.c,
-> make it blank function when rfcomm tty not selected in rfcomm.h
-> 
-> 2. tune the rfcomm_init error patch to ensure
-> tty driver initilized before any usage.
-> 
-> 3. remove __exit for rfcomm_cleanup_sockets
-> because above change need call it in a __init function. 
-> 
-> 
-> CC: Alan Cox <alan@lxorguk.ukuu.org.uk>
-> Reported-by: Oliver Hartkopp <oliver@hartkopp.net>
-> Signed-off-by: Dave Young <hidave.darkstar@gmail.com>
-> --
-> include/net/bluetooth/rfcomm.h |   13 ++++++++++++-
-> net/bluetooth/rfcomm/core.c    |   31 +++++++++++++++++++++----------
-> net/bluetooth/rfcomm/sock.c    |    2 +-
-> 3 files changed, 34 insertions(+), 12 deletions(-)
-> 
-> --- linux-2.6.orig/include/net/bluetooth/rfcomm.h	2009-04-09 16:23:03.000000000 +0800
-> +++ linux-2.6/include/net/bluetooth/rfcomm.h	2009-07-27 17:14:43.000000000 +0800
-> @@ -355,7 +355,18 @@ struct rfcomm_dev_list_req {
->  };
->  
->  int  rfcomm_dev_ioctl(struct sock *sk, unsigned int cmd, void __user *arg);
-> +
-> +#ifdef CONFIG_BT_RFCOMM_TTY
->  int  rfcomm_init_ttys(void);
->  void rfcomm_cleanup_ttys(void);
-> -
-> +#else
-> +static inline int rfcomm_init_ttys(void)
-> +{
-> +	return 0;
-> +}
-> +static inline int rfcomm_cleanup_ttys(void)
-> +{
-> +	return 0;
-> +}
-> +#endif
->  #endif /* __RFCOMM_H */
-> --- linux-2.6.orig/net/bluetooth/rfcomm/core.c	2009-06-16 17:39:32.000000000 +0800
-> +++ linux-2.6/net/bluetooth/rfcomm/core.c	2009-07-27 17:24:27.000000000 +0800
-> @@ -2080,28 +2080,41 @@ static CLASS_ATTR(rfcomm_dlc, S_IRUGO, r
->  /* ---- Initialization ---- */
->  static int __init rfcomm_init(void)
->  {
-> +	int ret;
-> +
->  	l2cap_load();
->  
-> +	ret = rfcomm_init_sockets();
-> +	if (ret)
-> +		goto out_sock;
-> +
-> +	ret = rfcomm_init_ttys();
-> +	if (ret)
-> +		goto out_tty;
-> +
->  	hci_register_cb(&rfcomm_cb);
->  
->  	rfcomm_thread = kthread_run(rfcomm_run, NULL, "krfcommd");
->  	if (IS_ERR(rfcomm_thread)) {
-> -		hci_unregister_cb(&rfcomm_cb);
-> -		return PTR_ERR(rfcomm_thread);
-> +		ret = PTR_ERR(rfcomm_thread);
-> +		goto out_thread;
->  	}
->  
->  	if (class_create_file(bt_class, &class_attr_rfcomm_dlc) < 0)
->  		BT_ERR("Failed to create RFCOMM info file");
->  
-> -	rfcomm_init_sockets();
-> -
-> -#ifdef CONFIG_BT_RFCOMM_TTY
-> -	rfcomm_init_ttys();
-> -#endif
-> -
->  	BT_INFO("RFCOMM ver %s", VERSION);
->  
->  	return 0;
-> +
-> +out_thread:
-> +	hci_unregister_cb(&rfcomm_cb);
-> +out_tty:
-> +	rfcomm_cleanup_ttys();
-> +out_sock:
-> +	rfcomm_cleanup_sockets();
-> +
-> +	return ret;
->  }
->  
->  static void __exit rfcomm_exit(void)
-> @@ -2112,9 +2125,7 @@ static void __exit rfcomm_exit(void)
->  
->  	kthread_stop(rfcomm_thread);
->  
-> -#ifdef CONFIG_BT_RFCOMM_TTY
->  	rfcomm_cleanup_ttys();
-> -#endif
->  
->  	rfcomm_cleanup_sockets();
->  }
-> --- linux-2.6.orig/net/bluetooth/rfcomm/sock.c	2009-04-09 16:23:04.000000000 +0800
-> +++ linux-2.6/net/bluetooth/rfcomm/sock.c	2009-07-27 17:39:43.000000000 +0800
-> @@ -1132,7 +1132,7 @@ error:
->  	return err;
->  }
->  
-> -void __exit rfcomm_cleanup_sockets(void)
-> +void rfcomm_cleanup_sockets(void)
->  {
->  	class_remove_file(bt_class, &class_attr_rfcomm);
->  
+> > > On Fri, Feb 27, 2009 at 5:54 PM, Philipp Zabel <philipp.zabel-Re5JQEe=
+Qqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> > >> pcmcia_loop_config returns 0 on success.
+> > >>
+> > >> Signed-off-by: Philipp Zabel <philipp.zabel-Re5JQEeQqe8AvxtiuMwx3w@p=
+ublic.gmane.org>
+> > >> ---
+> > >>  drivers/bluetooth/dtl1_cs.c |    2 +-
+> > >>  1 files changed, 1 insertions(+), 1 deletions(-)
+> > >>
+> > >> diff --git a/drivers/bluetooth/dtl1_cs.c b/drivers/bluetooth/dtl1_cs=
+=2Ec
+> > >> index 901bdd9..e0ee642 100644
+> > >> --- a/drivers/bluetooth/dtl1_cs.c
+> > >> +++ b/drivers/bluetooth/dtl1_cs.c
+> > >> @@ -616,7 +616,7 @@ static int dtl1_config(struct pcmcia_device *lin=
+k)
+> > >>
+> > >>        /* Look for a generic full-sized window */
+> > >>        link->io.NumPorts1 =3D 8;
+> > >> -       if (!pcmcia_loop_config(link, dtl1_confcheck, NULL))
+> > >> +       if (pcmcia_loop_config(link, dtl1_confcheck, NULL))
+> > >>                goto failed;
+> > >>
+> > >>        i =3D pcmcia_request_irq(link, &link->irq);
+> > >> --
+> > >> 1.5.6.5
+> > >=20
+> > > with this change my Nokia DTL-1 CF card gets detected, but the
+> > > interface stays down.
+> >=20
+> > I am reviewing patches which came through the pcmcia-list since the las=
+t=20
+> > upstream commit last year.
+> >=20
+> > IMHO the above patch could be queued, even though there seem to be furt=
+her=20
+> > issues with the driver. What do you think?
+> >=20
+> > So, for the above patch:
+> >=20
+> > Acked-by: Wolfram Sang <w.sang@pengutronix.de>
+>=20
+> can we change it into if (pcmcia_loop_config(...) < 0) to it perfectly
+> clear here.
+
+Yup, I'd like that better, too.
+
+Regards,
+
+   Wolfram
+
+--=20
+Pengutronix e.K.                           | Wolfram Sang                |
+Industrial Linux Solutions                 | http://www.pengutronix.de/  |
+
+--DiL7RhKs8rK9YGuF
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+Content-Disposition: inline
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAkptgcUACgkQD27XaX1/VRtCRgCgugRq5VC3pXW2w02E9LGkPL+W
+H+sAoJ3OL/s36PoYoKJyyLa3IX9rAiEa
+=wGwe
+-----END PGP SIGNATURE-----
+
+--DiL7RhKs8rK9YGuF--
