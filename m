@@ -1,31 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Gnome applet failing with current BlueZ?
-From: Bastien Nocera <hadess@hadess.net>
-To: David Sainty <david.sainty@dtsp.co.nz>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <4A6E3161.7010105@dtsp.co.nz>
-References: <4A6E3161.7010105@dtsp.co.nz>
-Content-Type: text/plain
-Date: Tue, 28 Jul 2009 01:53:20 +0100
-Message-Id: <1248742400.23466.11069.camel@localhost.localdomain>
-Mime-Version: 1.0
+Message-ID: <4A6E3161.7010105@dtsp.co.nz>
+Date: Tue, 28 Jul 2009 10:59:45 +1200
+From: David Sainty <david.sainty@dtsp.co.nz>
+MIME-Version: 1.0
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Gnome applet failing with current BlueZ?
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 2009-07-28 at 10:59 +1200, David Sainty wrote:
-> Hi all,
-> 
-> Using BlueZ 4.46 and Gnome Bluetooth 2.27.8, the applet icon fails to 
-> appear.  If I pull the USB adapter out and in the icon appears, but with 
-> a little red cross, and it isn't very functional.
+Hi all,
 
-Is bluetoothd running?
-<snip>
+Using BlueZ 4.46 and Gnome Bluetooth 2.27.8, the applet icon fails to 
+appear.  If I pull the USB adapter out and in the icon appears, but with 
+a little red cross, and it isn't very functional.
 
-> I'm not sure when this stopped working, having got suitably confused 
-> over whether to use bluez-gnome or gnome-bluetooth I've ended up using 
-> neither for some time :)  bluez-gnome doesn't work either though.
+Running the applet with -d (debug) I see nothing.  Doing the USB adapter 
+out-in as well, I see:
 
-I'm not sure what confusion there should be. Use gnome-bluetooth.
+Agent registration failed: Rejected send message, 2 matched rules; 
+type="method_call", sender=":1.12" (uid=1000 pid=1473 
+comm="bluetooth-applet -d ") interface="org.bluez.Adapter" 
+member="RegisterAgent" error name="(unset)" requested_reply=0 
+destination="org.bluez" (uid=0 pid=1100 comm="bluetoothd "))
 
+I'm not sure when this stopped working, having got suitably confused 
+over whether to use bluez-gnome or gnome-bluetooth I've ended up using 
+neither for some time :)  bluez-gnome doesn't work either though.
+
+It looks dbus related, but that's a black art to me...
+
+Cheers,
+
+Dave
 
