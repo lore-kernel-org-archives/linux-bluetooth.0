@@ -1,149 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 27 Jul 2009 17:59:05 +0800
-From: Dave Young <hidave.darkstar@gmail.com>
-To: Alan Cox <alan@lxorguk.ukuu.org.uk>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Oliver Hartkopp <oliver@hartkopp.net>,
-	Linux Netdev List <netdev@vger.kernel.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: tty_register_device NULL pointer dereference in 2.6.31-rc4
-Message-ID: <20090727095904.GA5442@darkstar>
-References: <4A6AD807.6060706@hartkopp.net> <20090725115011.7ddf8d00@lxorguk.ukuu.org.uk> <1248520053.28545.156.camel@violet> <20090725131046.0f076f37@lxorguk.ukuu.org.uk>
+Message-ID: <4A6D7A47.8050001@pengutronix.de>
+Date: Mon, 27 Jul 2009 11:58:31 +0200
+From: Wolfram Sang <w.sang@pengutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20090725131046.0f076f37@lxorguk.ukuu.org.uk>
+To: pHilipp Zabel
+	<philipp.zabel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+CC: linux-bluetooth@vger.kernel.org,
+	Marcel Holtmann <marcel-kz+m5ild9QBg9hUCZPvPmw@public.gmane.org>
+Subject: Re: [PATCH] pcmcia: dtl1_cs: fix pcmcia_loop_config logic
+References: <1235753648-10045-1-git-send-email-philipp.zabel@gmail.com> <74d0deb30902271435u1d2ac128ob09896a86abbff64@mail.gmail.com>
+In-Reply-To: <74d0deb30902271435u1d2ac128ob09896a86abbff64@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, Jul 25, 2009 at 01:10:46PM +0100, Alan Cox wrote:
-> > > tty_register_device appears to have been called with a NULL pointer. Not
-> > > sure why however.
-> > 
-> > if that is the pointer for the struct device, then that used to be fine
-> > in the past. Not all RFCOMM device have a parent when they are created.
+Hi,
+
+pHilipp Zabel wrote:
+> Hi,
 > 
-> The tty layer doesn't care about the struct device really. Nothing there
-> has changed. The NULL passed appears to be the driver argument.
+> On Fri, Feb 27, 2009 at 5:54 PM, Philipp Zabel <philipp.zabel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>> pcmcia_loop_config returns 0 on success.
+>>
+>> Signed-off-by: Philipp Zabel <philipp.zabel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>> ---
+>>  drivers/bluetooth/dtl1_cs.c |    2 +-
+>>  1 files changed, 1 insertions(+), 1 deletions(-)
+>>
+>> diff --git a/drivers/bluetooth/dtl1_cs.c b/drivers/bluetooth/dtl1_cs.c
+>> index 901bdd9..e0ee642 100644
+>> --- a/drivers/bluetooth/dtl1_cs.c
+>> +++ b/drivers/bluetooth/dtl1_cs.c
+>> @@ -616,7 +616,7 @@ static int dtl1_config(struct pcmcia_device *link)
+>>
+>>        /* Look for a generic full-sized window */
+>>        link->io.NumPorts1 = 8;
+>> -       if (!pcmcia_loop_config(link, dtl1_confcheck, NULL))
+>> +       if (pcmcia_loop_config(link, dtl1_confcheck, NULL))
+>>                goto failed;
+>>
+>>        i = pcmcia_request_irq(link, &link->irq);
+>> --
+>> 1.5.6.5
+> 
+> with this change my Nokia DTL-1 CF card gets detected, but the
+> interface stays down.
 
-Agree with you, because in rfcomm_init, rfcomm thread run before tty initilized, the following patch may fix the problem. oliver, could you verify it it fix your problem?
----
+I am reviewing patches which came through the pcmcia-list since the last 
+upstream commit last year.
 
-rfcomm tty may be used before rfcomm_tty_driver initilized,
+IMHO the above patch could be queued, even though there seem to be further 
+issues with the driver. What do you think?
 
-reporting in:
-http://marc.info/?l=linux-bluetooth&m=124404919324542&w=2
+So, for the above patch:
 
-make 3 changes:
-1. remove #ifdef in rfcomm/core.c,
-make it blank function when rfcomm tty not selected in rfcomm.h
+Acked-by: Wolfram Sang <w.sang@pengutronix.de>
 
-2. tune the rfcomm_init error patch to ensure
-tty driver initilized before any usage.
+Regards,
 
-3. remove __exit for rfcomm_cleanup_sockets
-because above change need call it in a __init function. 
+    Wolfram
 
-
-CC: Alan Cox <alan@lxorguk.ukuu.org.uk>
-Reported-by: Oliver Hartkopp <oliver@hartkopp.net>
-Signed-off-by: Dave Young <hidave.darkstar@gmail.com>
---
-include/net/bluetooth/rfcomm.h |   13 ++++++++++++-
-net/bluetooth/rfcomm/core.c    |   31 +++++++++++++++++++++----------
-net/bluetooth/rfcomm/sock.c    |    2 +-
-3 files changed, 34 insertions(+), 12 deletions(-)
-
---- linux-2.6.orig/include/net/bluetooth/rfcomm.h	2009-04-09 16:23:03.000000000 +0800
-+++ linux-2.6/include/net/bluetooth/rfcomm.h	2009-07-27 17:14:43.000000000 +0800
-@@ -355,7 +355,18 @@ struct rfcomm_dev_list_req {
- };
- 
- int  rfcomm_dev_ioctl(struct sock *sk, unsigned int cmd, void __user *arg);
-+
-+#ifdef CONFIG_BT_RFCOMM_TTY
- int  rfcomm_init_ttys(void);
- void rfcomm_cleanup_ttys(void);
--
-+#else
-+static inline int rfcomm_init_ttys(void)
-+{
-+	return 0;
-+}
-+static inline int rfcomm_cleanup_ttys(void)
-+{
-+	return 0;
-+}
-+#endif
- #endif /* __RFCOMM_H */
---- linux-2.6.orig/net/bluetooth/rfcomm/core.c	2009-06-16 17:39:32.000000000 +0800
-+++ linux-2.6/net/bluetooth/rfcomm/core.c	2009-07-27 17:24:27.000000000 +0800
-@@ -2080,28 +2080,41 @@ static CLASS_ATTR(rfcomm_dlc, S_IRUGO, r
- /* ---- Initialization ---- */
- static int __init rfcomm_init(void)
- {
-+	int ret;
-+
- 	l2cap_load();
- 
-+	ret = rfcomm_init_sockets();
-+	if (ret)
-+		goto out_sock;
-+
-+	ret = rfcomm_init_ttys();
-+	if (ret)
-+		goto out_tty;
-+
- 	hci_register_cb(&rfcomm_cb);
- 
- 	rfcomm_thread = kthread_run(rfcomm_run, NULL, "krfcommd");
- 	if (IS_ERR(rfcomm_thread)) {
--		hci_unregister_cb(&rfcomm_cb);
--		return PTR_ERR(rfcomm_thread);
-+		ret = PTR_ERR(rfcomm_thread);
-+		goto out_thread;
- 	}
- 
- 	if (class_create_file(bt_class, &class_attr_rfcomm_dlc) < 0)
- 		BT_ERR("Failed to create RFCOMM info file");
- 
--	rfcomm_init_sockets();
--
--#ifdef CONFIG_BT_RFCOMM_TTY
--	rfcomm_init_ttys();
--#endif
--
- 	BT_INFO("RFCOMM ver %s", VERSION);
- 
- 	return 0;
-+
-+out_thread:
-+	hci_unregister_cb(&rfcomm_cb);
-+out_tty:
-+	rfcomm_cleanup_ttys();
-+out_sock:
-+	rfcomm_cleanup_sockets();
-+
-+	return ret;
- }
- 
- static void __exit rfcomm_exit(void)
-@@ -2112,9 +2125,7 @@ static void __exit rfcomm_exit(void)
- 
- 	kthread_stop(rfcomm_thread);
- 
--#ifdef CONFIG_BT_RFCOMM_TTY
- 	rfcomm_cleanup_ttys();
--#endif
- 
- 	rfcomm_cleanup_sockets();
- }
---- linux-2.6.orig/net/bluetooth/rfcomm/sock.c	2009-04-09 16:23:04.000000000 +0800
-+++ linux-2.6/net/bluetooth/rfcomm/sock.c	2009-07-27 17:39:43.000000000 +0800
-@@ -1132,7 +1132,7 @@ error:
- 	return err;
- }
- 
--void __exit rfcomm_cleanup_sockets(void)
-+void rfcomm_cleanup_sockets(void)
- {
- 	class_remove_file(bt_class, &class_attr_rfcomm);
- 
+-- 
+Pengutronix e.K.                           | Wolfram Sang                |
+Industrial Linux Solutions                 | http://www.pengutronix.de/  |
