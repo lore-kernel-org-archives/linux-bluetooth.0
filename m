@@ -1,36 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A6E3161.7010105@dtsp.co.nz>
-Date: Tue, 28 Jul 2009 10:59:45 +1200
-From: David Sainty <david.sainty@dtsp.co.nz>
+Date: Mon, 27 Jul 2009 22:07:36 +0800
+From: Dave Young <hidave.darkstar@gmail.com>
+To: Oliver Hartkopp <oliver@hartkopp.net>
+Cc: Alan Cox <alan@lxorguk.ukuu.org.uk>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Linux Netdev List <netdev@vger.kernel.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: tty_register_device NULL pointer dereference in 2.6.31-rc4
+Message-ID: <20090727140736.GA1864@darkstar>
+References: <4A6AD807.6060706@hartkopp.net> <20090725115011.7ddf8d00@lxorguk.ukuu.org.uk> <1248520053.28545.156.camel@violet> <20090725131046.0f076f37@lxorguk.ukuu.org.uk> <20090727095904.GA5442@darkstar> <4A6D8BA3.3030601@hartkopp.net> <4A6D91D7.6030204@hartkopp.net>
 MIME-Version: 1.0
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Gnome applet failing with current BlueZ?
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4A6D91D7.6030204@hartkopp.net>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+On Mon, Jul 27, 2009 at 01:39:03PM +0200, Oliver Hartkopp wrote:
+> Oliver Hartkopp wrote:
+> > Dave Young wrote:
+> >> On Sat, Jul 25, 2009 at 01:10:46PM +0100, Alan Cox wrote:
+> >>>>> tty_register_device appears to have been called with a NULL pointer. Not
+> >>>>> sure why however.
+> >>>> if that is the pointer for the struct device, then that used to be fine
+> >>>> in the past. Not all RFCOMM device have a parent when they are created.
+> >>> The tty layer doesn't care about the struct device really. Nothing there
+> >>> has changed. The NULL passed appears to be the driver argument.
+> >> Agree with you, because in rfcomm_init, rfcomm thread run before tty initilized, the following patch may fix the problem.
+> >> oliver, could you verify it it fix your problem?
+> > 
+> > Hi Dave,
+> > 
+> > i get this problem really seldom on my Laptop and i did not manage to get a
+> > reproducible Oops of that problem.
+> > 
+> > Anyway the code you are pointing to seems to have a problem and your added
+> > error handling looks good to me - even if i don't know if the initializations
+> > can be reordered in that way.
+> > 
+> > I'll try your patch, but it could take a *long* time to prove it right ;-)
+> > 
+> 
+> Just FYI:
+> 
+> Your patch compiled, the system booted without problems and nothing is broken
+> so far. I checked the BT, WLAN and BT dial-up with success. So it looks good
+> to me.
 
-Using BlueZ 4.46 and Gnome Bluetooth 2.27.8, the applet icon fails to 
-appear.  If I pull the USB adapter out and in the icon appears, but with 
-a little red cross, and it isn't very functional.
+Thanks for the testing. Marcel, could you take a look? 
 
-Running the applet with -d (debug) I see nothing.  Doing the USB adapter 
-out-in as well, I see:
-
-Agent registration failed: Rejected send message, 2 matched rules; 
-type="method_call", sender=":1.12" (uid=1000 pid=1473 
-comm="bluetooth-applet -d ") interface="org.bluez.Adapter" 
-member="RegisterAgent" error name="(unset)" requested_reply=0 
-destination="org.bluez" (uid=0 pid=1100 comm="bluetoothd "))
-
-I'm not sure when this stopped working, having got suitably confused 
-over whether to use bluez-gnome or gnome-bluetooth I've ended up using 
-neither for some time :)  bluez-gnome doesn't work either though.
-
-It looks dbus related, but that's a black art to me...
-
-Cheers,
-
-Dave
-
+> 
+> Regards,
+> Oliver
