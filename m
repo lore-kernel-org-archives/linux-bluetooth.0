@@ -1,51 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Wed, 29 Jul 2009 09:42:25 -0300
-Message-ID: <5d223510907290542oe6fc98fr3c0e0844cdbd3ac5@mail.gmail.com>
-Subject: Obex with no X
-From: Rafael Seste <rseste@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH] Add rfkill plugin
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1248811940.23466.12248.camel@localhost.localdomain>
+References: <1248798884.23466.12024.camel@localhost.localdomain>
+	 <1248811593.28545.227.camel@violet>
+	 <1248811940.23466.12248.camel@localhost.localdomain>
+Content-Type: text/plain
+Date: Tue, 28 Jul 2009 22:21:42 +0200
+Message-Id: <1248812502.28545.229.camel@violet>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Bastien,
 
-I'm trying to use obex to retrieve the contacts from my mobile using PBAP.
-In the test folder I'm only able to run obex-test and it retrieves all
-contacts from my mobile. But I would like to use the python scripts
-and they aren't working.
-I'm running it with bluez 4.42 and kernel 2.6.30 without the X
-installed, I installed libopenobex from ubuntu repo.
+> > > The plugin allows us to restore the previous power state on
+> > > adapters when the killswitch on them has been unblocked.
+> > > 
+> > > Otherwise we end up with the adapter disabled when coming back from a
+> > > soft killswitch.
+> > 
+> > I think that having this as a plugin is overkill. I would just integrate
+> > this as src/rfkill.c. Especially since it has no dependencies.
+> 
+> It would mean it's harder to change its behaviour. Surely, it would make
+> more sense for this to be a plugin than for HCI operations to be.
 
-When I ran pbab-client the output was:
+the HCI operation are becoming/are a plugin, because we wanna switch to
+netlink in the long term. However to do this, we need to separate them
+first.
 
-dbus.exceptions.DBusException:
-org.freedesktop.DBus.Error.Spawn.ExecFailed: dbus-launch failed to
-autolaunch D-Bus session: Autolaunch error: X11 initialization failed.
+> Given that you don't use an object system with typing, it's probably one
+> or 2 function calls off. To me, it makes sense to have parts of the core
+> as plugins if it means that the core is leaner because of it.
 
-Googling  I found that SeesionDbus() need the X installed. So I
-changed to SystemDbus(). I don't know if this is right.
-After the output was:
+Okay. Since we have built-in plugins, it makes no big difference.
 
-dbus.exceptions.DBusException:
-org.freedesktop.DBus.Error.Spawn.FileInvalid: Cannot do system-bus
-activation with no user
+Regards
 
-So I added to the file /usr/share/dbus-1/system-services/obex-client.service
-"User=root"
-
-and the error changed again
-
-dbus.exceptions.DBusException:
-org.freedesktop.DBus.Error.Spawn.FailedToSetup: Failed to setup
-environment correctly
+Marcel
 
 
-Is it possible to run obex with dbus with the X installed?
-If so, what am I doing wrong? or what is missing?
-
-thanks in advance
-
--- 
-Rafael S. Seste
