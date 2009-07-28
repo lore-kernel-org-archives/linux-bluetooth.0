@@ -1,65 +1,323 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A6F2A12.8020201@gmail.com>
-Date: Tue, 28 Jul 2009 18:40:50 +0200
-From: Karl Beldan <karl.beldan@gmail.com>
-MIME-Version: 1.0
-To: marcel@holtmann.org
-CC: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix typo in stats for hci_uart
-Content-Type: multipart/mixed;
- boundary="------------000206040907040503070603"
+Subject: [PATCH] Add rfkill plugin
+From: Bastien Nocera <hadess@hadess.net>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="=-d7Siv6G0bW8XDo5G0spV"
+Date: Tue, 28 Jul 2009 17:34:44 +0100
+Message-Id: <1248798884.23466.12024.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------000206040907040503070603
-Content-Type: text/plain; charset=UTF-8
+
+--=-d7Siv6G0bW8XDo5G0spV
+Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
-s/stat.cmd_tx++/stat.sco_tx++ for HCI_SCODATA_PKT
+The plugin allows us to restore the previous power state on
+adapters when the killswitch on them has been unblocked.
 
-Signed-off-by: Karl Beldan <karl.beldan@mobile-devices.fr>
+Otherwise we end up with the adapter disabled when coming back from a
+soft killswitch.
+
+Cheers
+
+--=-d7Siv6G0bW8XDo5G0spV
+Content-Disposition: attachment; filename="0001-Add-rfkill-plugin.patch"
+Content-Type: text/x-patch; name="0001-Add-rfkill-plugin.patch"; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+
+>From bf8b7c07542bd7acb4f9f98ba2165475f0ad9d65 Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Tue, 28 Jul 2009 17:25:34 +0100
+Subject: [PATCH] Add rfkill plugin
+
+The plugin allows us to restore the previous power state on
+adapters when the killswitch on them has been unblocked.
 ---
- drivers/bluetooth/hci_ldisc.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ plugins/Makefile.am |    3 +
+ plugins/rfkill.c    |  199 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/adapter.c       |   23 ++++--
+ src/adapter.h       |    1 +
+ 4 files changed, 219 insertions(+), 7 deletions(-)
+ create mode 100644 plugins/rfkill.c
 
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 4895f0e..a08b207 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -101,7 +101,7 @@ static inline void hci_uart_tx_complete(struct hci_uart *hu, int pkt_type)
- 		break;
+diff --git a/plugins/Makefile.am b/plugins/Makefile.am
+index 9d9f970..9ba8180 100644
+--- a/plugins/Makefile.am
++++ b/plugins/Makefile.am
+@@ -15,6 +15,9 @@ endif
+ builtin_modules += hciops
+ builtin_sources += hciops.c
  
- 	case HCI_SCODATA_PKT:
--		hdev->stat.cmd_tx++;
-+		hdev->stat.sco_tx++;
- 		break;
- 	}
++builtin_modules += rfkill
++builtin_sources += rfkill.c
++
+ if NETLINK
+ plugin_LTLIBRARIES += netlink.la
+ netlink_la_LIBADD = @NETLINK_LIBS@
+diff --git a/plugins/rfkill.c b/plugins/rfkill.c
+new file mode 100644
+index 0000000..fad8b47
+--- /dev/null
++++ b/plugins/rfkill.c
+@@ -0,0 +1,199 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2009  Bastien Nocera <hadess@hadess.net>
++ *  Copyright (C) 2007-2009  Intel Corporation. All rights reserved.
++ *
++ * Author:
++ * Bastien Nocera <bnocera@redhat.com>, based on code by
++ * Johannes Berg <johannes@sipsolutions.net>
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdio.h>
++#include <errno.h>
++#include <fcntl.h>
++#include <unistd.h>
++#include <stdlib.h>
++
++#include <glib.h>
++
++#include <dbus/dbus.h>
++#include <bluetooth/bluetooth.h>
++#include <bluetooth/sdp.h>
++
++#include "hcid.h"
++#include "plugin.h"
++#include "logging.h"
++
++#include "manager.h"
++#include "adapter.h"
++#include "device.h"
++
++enum rfkill_type {
++	RFKILL_TYPE_ALL = 0,
++	RFKILL_TYPE_WLAN,
++	RFKILL_TYPE_BLUETOOTH,
++	RFKILL_TYPE_UWB,
++	RFKILL_TYPE_WIMAX,
++	RFKILL_TYPE_WWAN,
++};
++
++enum rfkill_operation {
++	RFKILL_OP_ADD = 0,
++	RFKILL_OP_DEL,
++	RFKILL_OP_CHANGE,
++	RFKILL_OP_CHANGE_ALL,
++};
++
++struct rfkill_event {
++	uint32_t idx;
++	uint8_t  type;
++	uint8_t  op;
++	uint8_t  soft;
++	uint8_t  hard;
++};
++
++static char *get_name(__u32 idx)
++{
++	char *filename, *name, *pos;
++
++	filename = g_strdup_printf("/sys/class/rfkill/rfkill%u/name", idx);
++	if (g_file_get_contents(filename, &name, NULL, NULL) == FALSE) {
++		g_free(filename);
++		return NULL;
++	}
++
++	g_free(filename);
++
++	pos = strchr(name, '\n');
++	if (pos)
++		*pos = '\0';
++
++	return name;
++}
++
++static gboolean rfkill_event(GIOChannel *chan,
++				GIOCondition cond, gpointer data)
++{
++	unsigned char buf[32];
++	struct rfkill_event *event = (void *) buf;
++	char *sysname;
++	gboolean blocked;
++	gsize len;
++	GIOError err;
++
++	if (cond & (G_IO_NVAL | G_IO_HUP | G_IO_ERR))
++		return FALSE;
++
++	memset(buf, 0, sizeof(buf));
++
++	err = g_io_channel_read(chan, (gchar *) buf, sizeof(buf), &len);
++	if (err) {
++		if (err == G_IO_ERROR_AGAIN)
++			return TRUE;
++		return FALSE;
++	}
++
++	if (len != sizeof(struct rfkill_event))
++		return TRUE;
++
++	debug("idx %u type %u op %u soft %u hard %u",
++					event->idx, event->type, event->op,
++						event->soft, event->hard);
++
++	blocked = (event->soft || event->hard) ? TRUE : FALSE;
++	/* We already disable devices correctly when rfkilled */
++	if (blocked)
++		return TRUE;
++
++	sysname = get_name(event->idx);
++	if (sysname == NULL)
++		return TRUE;
++	if (g_str_has_prefix(sysname, "hci") == FALSE) {
++		debug("Ignoring unblocked killswitch '%s'", sysname);
++		g_free(sysname);
++		return TRUE;
++	}
++
++	switch (event->type) {
++	case RFKILL_TYPE_ALL:
++	case RFKILL_TYPE_BLUETOOTH: {
++		struct btd_adapter *adapter;
++		int id;
++
++		id = atoi(sysname + strlen("hci"));
++		adapter = manager_find_adapter_by_id(id);
++		if (adapter)
++			adapter_set_powered(adapter, TRUE);
++		break;
++		}
++	default:
++		break;
++	}
++
++	g_free(sysname);
++
++	return TRUE;
++}
++
++static GIOChannel *channel = NULL;
++
++static int rfkill_init(void)
++{
++	int fd;
++
++	debug("Init rfkill plugin");
++
++	if (main_opts.remember_powered == FALSE)
++		return 0;
++
++	fd = open("/dev/rfkill", O_RDWR);
++	if (fd < 0) {
++		debug("No rfkill support in the kernel");
++		return -EIO;
++	}
++
++	channel = g_io_channel_unix_new(fd);
++	g_io_channel_set_close_on_unref(channel, TRUE);
++
++	g_io_add_watch(channel, G_IO_IN | G_IO_NVAL | G_IO_HUP | G_IO_ERR,
++							rfkill_event, NULL);
++
++	return 0;
++}
++
++static void rfkill_exit(void)
++{
++	debug("Cleanup rfkill plugin");
++
++	if (channel == NULL)
++		return;
++
++	g_io_channel_shutdown(channel, TRUE, NULL);
++	g_io_channel_unref(channel);
++
++	channel = NULL;
++}
++
++BLUETOOTH_PLUGIN_DEFINE(rfkill, VERSION,
++			BLUETOOTH_PLUGIN_PRIORITY_DEFAULT, rfkill_init, rfkill_exit)
+diff --git a/src/adapter.c b/src/adapter.c
+index 06640e7..06c3018 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -483,21 +483,30 @@ done:
+ 	return 0;
  }
+ 
+-static DBusMessage *set_powered(DBusConnection *conn, DBusMessage *msg,
+-				gboolean powered, void *data)
++int adapter_set_powered(struct btd_adapter *adapter, gboolean powered)
+ {
+-	struct btd_adapter *adapter = data;
+ 	uint8_t mode;
+-	int err;
+ 
+ 	mode = powered ? get_mode(&adapter->bdaddr, "on") : MODE_OFF;
+ 
+ 	if (mode == adapter->mode)
+-		return dbus_message_new_method_return(msg);
++		return -EALREADY;
+ 
+-	err = set_mode(adapter, mode);
+-	if (err < 0)
++	return set_mode(adapter, mode);
++}
++
++static DBusMessage *set_powered(DBusConnection *conn, DBusMessage *msg,
++				gboolean powered, void *data)
++{
++	struct btd_adapter *adapter = data;
++	int err;
++
++	err = adapter_set_powered(adapter, powered);
++	if (err < 0) {
++		if (err == -EALREADY)
++			return dbus_message_new_method_return(msg);
+ 		return failed_strerror(msg, -err);
++	}
+ 
+ 	return dbus_message_new_method_return(msg);
+ }
+diff --git a/src/adapter.h b/src/adapter.h
+index d34fb80..fa02d5d 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -110,6 +110,7 @@ void adapter_get_address(struct btd_adapter *adapter, bdaddr_t *bdaddr);
+ void adapter_set_state(struct btd_adapter *adapter, int state);
+ int adapter_get_state(struct btd_adapter *adapter);
+ gboolean adapter_is_ready(struct btd_adapter *adapter);
++int adapter_set_powered(struct btd_adapter *adapter, gboolean powered);
+ struct remote_dev_info *adapter_search_found_devices(struct btd_adapter *adapter,
+ 						struct remote_dev_info *match);
+ void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
 -- 
-1.6.3.2.306.g4f4fa
+1.6.2.5
 
 
---------------000206040907040503070603
-Content-Type: text/plain;
- name="0001-Bluetooth-Fix-typo-in-stats-for-hci_uart.patch"
-Content-Transfer-Encoding: base64
-Content-Disposition: inline;
- filename="0001-Bluetooth-Fix-typo-in-stats-for-hci_uart.patch"
+--=-d7Siv6G0bW8XDo5G0spV--
 
-RnJvbSAyYjc4OWFhOTgzZDVlMjcwMTFjNWZkMmFlNDQ0YjQ5NWFkOWE5YjgxIE1vbiBTZXAg
-MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBLYXJsIEJlbGRhbiA8a2FybC5iZWxkYW5AZ21haWwu
-Y29tPgpEYXRlOiBUdWUsIDI4IEp1bCAyMDA5IDE4OjAzOjEyICswMjAwClN1YmplY3Q6IFtQ
-QVRDSF0gQmx1ZXRvb3RoOiBGaXggdHlwbyBpbiBzdGF0cyBmb3IgaGNpX3VhcnQKCnMvc3Rh
-dC5jbWRfdHgrKy9zdGF0LnNjb190eCsrIGZvciBIQ0lfU0NPREFUQV9QS1QKClNpZ25lZC1v
-ZmYtYnk6IEthcmwgQmVsZGFuIDxrYXJsLmJlbGRhbkBtb2JpbGUtZGV2aWNlcy5mcj4KLS0t
-CiBkcml2ZXJzL2JsdWV0b290aC9oY2lfbGRpc2MuYyB8ICAgIDIgKy0KIDEgZmlsZXMgY2hh
-bmdlZCwgMSBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2Ry
-aXZlcnMvYmx1ZXRvb3RoL2hjaV9sZGlzYy5jIGIvZHJpdmVycy9ibHVldG9vdGgvaGNpX2xk
-aXNjLmMKaW5kZXggNDg5NWYwZS4uYTA4YjIwNyAxMDA2NDQKLS0tIGEvZHJpdmVycy9ibHVl
-dG9vdGgvaGNpX2xkaXNjLmMKKysrIGIvZHJpdmVycy9ibHVldG9vdGgvaGNpX2xkaXNjLmMK
-QEAgLTEwMSw3ICsxMDEsNyBAQCBzdGF0aWMgaW5saW5lIHZvaWQgaGNpX3VhcnRfdHhfY29t
-cGxldGUoc3RydWN0IGhjaV91YXJ0ICpodSwgaW50IHBrdF90eXBlKQogCQlicmVhazsKIAog
-CWNhc2UgSENJX1NDT0RBVEFfUEtUOgotCQloZGV2LT5zdGF0LmNtZF90eCsrOworCQloZGV2
-LT5zdGF0LnNjb190eCsrOwogCQlicmVhazsKIAl9CiB9Ci0tIAoxLjYuMy4yLjMwNi5nNGY0
-ZmEKCg==
---------------000206040907040503070603--
