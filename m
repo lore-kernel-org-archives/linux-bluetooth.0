@@ -1,57 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <30761901.1248770182239.JavaMail.root@safetgram>
-Date: Tue, 28 Jul 2009 18:36:30 +1000
-From: John Freeman <johnf@optimation.com.au>
+Message-ID: <4A6E8CB7.7060304@dtsp.co.nz>
+Date: Tue, 28 Jul 2009 17:29:27 +1200
+From: David Sainty <david.sainty@dtsp.co.nz>
 MIME-Version: 1.0
-To: Brad Midgley <bmidgley@gmail.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: Intermittent "Address already in use" error
-References: <1346165.1248430092866.JavaMail.root@safetgram> <5111969.1248454126654.JavaMail.root@safetgram>
-In-Reply-To: <5111969.1248454126654.JavaMail.root@safetgram>
+To: Bastien Nocera <hadess@hadess.net>
+CC: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: Gnome applet failing with current BlueZ?
+References: <4A6E3161.7010105@dtsp.co.nz>	 <1248742400.23466.11069.camel@localhost.localdomain>	 <4A6E523E.6000802@dtsp.co.nz> <1248744238.23466.11103.camel@localhost.localdomain> <4A6E5B7F.4000109@dtsp.co.nz> <4A6E7FD8.5090908@dtsp.co.nz>
+In-Reply-To: <4A6E7FD8.5090908@dtsp.co.nz>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Brad Midgley wrote:
-> John,
-> 
->> From time to time, I encounter an "Address already in use" error when
->> attempting to bind a socket to a particular local adapter.  The python
->> code looks like:
->>
->>   Listener = BluetoothSocket(SCO)
->>   Listener.bind((addr1, ))
->>   Listener.listen(1)
-> 
-> Is the error appearing when you want to rebind a short time after it
-> was used? Maybe you need to setsockopt SO_REUSEADDR just like you
-> would if you wanted to quickly rebind a tcp serversocket.
+David Sainty wrote:
+> I've tried rolling back BlueZ as far back as 4.26, and gnome-bluetooth 
+> back to 2.27.6, but no change.  I guess the problem is related to some 
+> other update - maybe something to do with fallout from the dbus 
+> "permissive" security issue (I'm using dbus-1.2.4.2permissive at the 
+> moment).
+>
+> I guess I'll need to track it down myself...  Any helpful advice on 
+> where I should look is most welcome though :)
 
-Brad,
-
-Thanks for the suggestion.  At first sight, that seemed like a possible cause. 
-However, further testing shows that I can make another attempt a few seconds 
-(limited by the speed of my fingers) after the socket has been closed, and that 
-it is usually successful.
-
-When it fails, /sys/class/bluetooth/sco contains:
-
-    A2:C7:07:83:15:00 00:00:00:00:00:00 4
-
-where "A2:C7:07:83:15:00" matches addr1 in the code above.  Normally, content 
-appears in /sys/class/bluetooth/sco at the point of bind(), is modified slightly 
-by listen(), then disappears on close of the Listener socket.
-
-Once it gets into this state, all further attempts to bind fail with "Address 
-already in use" ... until I reboot.
-
-I haven't been able to pin down the exact circumstances that trigger the problem 
-other than that it seems more likely to occur following a program run that fails 
-with an unhandled exception.  That is, it seems like things aren't cleaned-up 
-correctly sometimes. Unfortunately, I can't make it happen at will.
-
-Any more ideas?
-
-John.
-
+Damn!  bluetooth-applet has magically started working after reinstalling 
+2.27.8 and 4.26 (and various restarts of, E.g. dbus, hald).  That's just 
+mysterious.  Well... never mind.
 
