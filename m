@@ -1,28 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A6E7FD8.5090908@dtsp.co.nz>
-Date: Tue, 28 Jul 2009 16:34:32 +1200
-From: David Sainty <david.sainty@dtsp.co.nz>
 MIME-Version: 1.0
-To: Bastien Nocera <hadess@hadess.net>
-CC: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: Gnome applet failing with current BlueZ?
-References: <4A6E3161.7010105@dtsp.co.nz>	 <1248742400.23466.11069.camel@localhost.localdomain>	 <4A6E523E.6000802@dtsp.co.nz> <1248744238.23466.11103.camel@localhost.localdomain> <4A6E5B7F.4000109@dtsp.co.nz>
-In-Reply-To: <4A6E5B7F.4000109@dtsp.co.nz>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <4A6E5D19.2070408@dtsp.co.nz>
+References: <9e4733910907271847w4a10b658x571148965788b5cf@mail.gmail.com>
+	 <4A6E5D19.2070408@dtsp.co.nz>
+Date: Mon, 27 Jul 2009 23:18:53 -0400
+Message-ID: <9e4733910907272018h29171b9atc858b6600f96861c@mail.gmail.com>
+Subject: Re: Possible bluez sensor net application
+From: Jon Smirl <jonsmirl@gmail.com>
+To: David Sainty <david.sainty@dtsp.co.nz>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Bastien Nocera wrote:
+On Mon, Jul 27, 2009 at 10:06 PM, David Sainty<david.sainty@dtsp.co.nz> wrote:
+> Jon Smirl wrote:
+>>
+>> I need to get data from about 200 sensors in to a central Linux system
+>> wirelessly. I'm attracted to using Bluetooth for this since I can buy
+>> the radios so cheaply.
+>>
+>> Power is not a problem in the sensor nodes. The sensors have a basic
+>> microcontroller in them. I can add a HCI Bluetooth chip (BC4-ROM).
+>> Alternatively I can look at something like a BC4+flash module.
+>>
+>> Or is Bluetooth totally unsuited to this application
 >
->> Looks like D-Bus is refusing the connection, which version of bluez are
->> you using?
+> Maybe check out ZigBee?
 
-I've tried rolling back BlueZ as far back as 4.26, and gnome-bluetooth 
-back to 2.27.6, but no change.  I guess the problem is related to some 
-other update - maybe something to do with fallout from the dbus 
-"permissive" security issue (I'm using dbus-1.2.4.2permissive at the 
-moment).
+Implementing Zigbee is more expensive than Bluetooth. ZigBee is also
+in a a somewhat chaotic state, the standard is nowhere near as mature
+as Bluetooth. ZigBee is also GPL in compatible with it's current
+licensing scheme.
 
-I guess I'll need to track it down myself...  Any helpful advice on 
-where I should look is most welcome though :)
+That said, ZigBee is my second choice. I'd probably ignore ZigBee and
+use 6lowpan instead.
 
+>
+>
+
+
+
+-- 
+Jon Smirl
+jonsmirl@gmail.com
