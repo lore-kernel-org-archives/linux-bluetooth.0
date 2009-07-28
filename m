@@ -1,43 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <5eee8c670907280453i76f4957fvcca9c3954576580d@mail.gmail.com>
-References: <5eee8c670907280453i76f4957fvcca9c3954576580d@mail.gmail.com>
-From: Alexander H Deriziotis <deriziotis@gmail.com>
-Date: Tue, 28 Jul 2009 12:55:17 +0100
-Message-ID: <5eee8c670907280455ube96c5aka5a9a97149034a71@mail.gmail.com>
-Subject: non-blocking hci_inquiry()
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: Renaming hci interfaces with udev
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andrej Rosano <andrejro@gmail.com>
+Cc: Bastien Nocera <hadess@hadess.net>, linux-bluetooth@vger.kernel.org
+In-Reply-To: <20090728120507.GB3292@stjenka>
+References: <20090728083755.GA3292@stjenka>
+	 <1248780878.23466.11714.camel@localhost.localdomain>
+	 <20090728120507.GB3292@stjenka>
+Content-Type: text/plain
+Date: Tue, 28 Jul 2009 14:22:27 +0200
+Message-Id: <1248783747.28545.225.camel@violet>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Andrej,
 
-I've been playing with the linux wiimote daemon called Cwiid, and
-noticed that while it's waiting for a connection from a wiimote, it's
-blocking the bluetooth adapter from doing anything else.
+> > > I would like to change the default name of bluetooth interfaces (hci0, hci1, ...)
+> > > using udev rules.
+> > 
+> > Could I ask why you want to do that?
+> 
+> I have more than one bt dongle connected to the box and I would like to assign always
+> the same bluetooth name (the one set with hciconfig hciX name ...), ex:
+> 
+> the one with BD_ADDR=xx:yy:zz:00:00:01  ->  foo
+> the one with BD_ADDR=xx:yy:zz:00:00:02  ->  bar
+> ...
+> 
+> 
+> If one could use the udev persistent rules like with ethernet interfaces:
+> 
+> ACTION=="add", KERNEL=="hci*", ATTR{address}=="xx:yy:zz:00:00:01", NAME="hci0"
+> ACTION=="add", KERNEL=="hci*", ATTR{address}=="xx:yy:zz:00:00:02", NAME="hci1"
+> ...
+> 
+> and then set the appropriate bluetooth name:
+> 
+> hciconfig hci0 name foo
+> hciconfig hci1 name bar
+> ...
+> 
+> Currently I am using a script to do that.
 
-Searching around and looking at the code, I can see it's calling
-hci_inquiry() in a loop which is blocking the device.
+and actually bluetoothd is doing that for you no matter what the device
+name is. You just have to set the name once using the D-Bus interface.
 
-Does a non-blocking hci_inquiry() function exist? If not, could I get
-some help on how to go about writing one?
+Regards
 
-Looking around, someone mentions that it might be the ioctl() function
-called within hci_inquiry() which is causing the blocking, could it be
-something as trivial as playing with that?
-
-from lib/hci.c:
-
-int hci_inquiry(int dev_id, int len, int nrsp, const uint8_t *lap,
-inquiry_info **ii, long flags)
-{
-[snip]
-        ret = ioctl(dd, HCIINQUIRY, (unsigned long) buf);
-        if (ret < 0)
-                goto free;
+Marcel
 
 
-Many thanks,
-
-Alex
