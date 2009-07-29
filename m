@@ -1,42 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Add rfkill plugin
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1248880408.28327.906.camel@localhost.localdomain>
-References: <1248798884.23466.12024.camel@localhost.localdomain>
-	 <1248880408.28327.906.camel@localhost.localdomain>
-Content-Type: text/plain
-Date: Wed, 29 Jul 2009 21:49:27 +0200
-Message-Id: <1248896967.28545.236.camel@violet>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <2d5a2c100907291046v5f9ba227oe8e113c667c7ab29@mail.gmail.com>
+References: <5d223510907290542oe6fc98fr3c0e0844cdbd3ac5@mail.gmail.com>
+	 <2d5a2c100907291046v5f9ba227oe8e113c667c7ab29@mail.gmail.com>
+Date: Wed, 29 Jul 2009 16:28:57 -0300
+Message-ID: <5d223510907291228u11ad1b94xbb132d1e60a028ae@mail.gmail.com>
+Subject: Re: Obex with no X
+From: Rafael Seste <rseste@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+On Wed, Jul 29, 2009 at 2:46 PM, Luiz Augusto von
+Dentz<luiz.dentz@gmail.com> wrote:
+> Hi,
+>
+> On Wed, Jul 29, 2009 at 9:42 AM, Rafael Seste<rseste@gmail.com> wrote:
+>> Hi all,
+>>
+>> I'm trying to use obex to retrieve the contacts from my mobile using PBAP.
+>> In the test folder I'm only able to run obex-test and it retrieves all
+>> contacts from my mobile. But I would like to use the python scripts
+>> and they aren't working.
+>> I'm running it with bluez 4.42 and kernel 2.6.30 without the X
+>> installed, I installed libopenobex from ubuntu repo.
+>>
+>> When I ran pbab-client the output was:
+>>
+>> dbus.exceptions.DBusException:
+>> org.freedesktop.DBus.Error.Spawn.ExecFailed: dbus-launch failed to
+>> autolaunch D-Bus session: Autolaunch error: X11 initialization failed.
+>
+> I don't think buses really depend on X, what happen is that normally a
+> session bus created by login. Please take a look at man page of
+> dbus-launch the section AUTOMATIC LAUNCHING seems to tell about the
+> relation of X and --autolaunch.
 
-> > The plugin allows us to restore the previous power state on
-> > adapters when the killswitch on them has been unblocked.
-> > 
-> > Otherwise we end up with the adapter disabled when coming back from a
-> > soft killswitch.
-> 
-> Just a note that __u32 causes failures with newer GCCs (not sure why),
-> using uint32_t instead fixes the problem.
-> 
-> I'll send another patch when this one gets committed.
+I read the man page and found that the environment variable
+DBUS_SESSION_BUS_ADDRESS is not exported.
+I exported it with the same value from ~/.dbus/session-bus/ but it
+still does not work. I got this error
 
-I didn't commit this patch, because it should be part of bluetoothd and
-not a plugin and as I mentioned before honor the RememberPowered setting
-for system where other entities control that.
+dbus.exceptions.DBusException: org.freedesktop.DBus.Error.NoServer:
+Failed to connect to socket /tmp/dbus-EtKMcBkowv: Connection refused
 
-However I did push a RFKILL skeleton that that all the lifting except
-bringing the adapter up. Hijacking the set_powered D-Bus command is the
-wrong approach. We need a properly exported adapter_up() function for
-this.
+>
+> OTOH it shouldn't be difficult to have obexd on system bus so you
+> wouldn't have to bother creating an session exclusively for obexd.
 
-Regards
+Could you help me with that? I don't know much about dbus.
 
-Marcel
+I changed to system bus and got an error;
+Cannot do system-bus activation with no user
 
+>
+> Regards,
+>
+> --
+> Luiz Augusto von Dentz
+> Engenheiro de Computação
+>
 
+Regards,
+
+-- 
+Rafael S. Seste
