@@ -1,41 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 30 Jul 2009 00:44:12 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Bastien Nocera <hadess@hadess.net>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Add rfkill plugin
-Message-ID: <20090729214412.GA24031@jh-x301>
-References: <1248798884.23466.12024.camel@localhost.localdomain> <1248880408.28327.906.camel@localhost.localdomain> <1248896967.28545.236.camel@violet> <1248898544.28327.1539.camel@localhost.localdomain> <1248899010.28545.241.camel@violet>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1248899010.28545.241.camel@violet>
+Subject: Re: [PATCH] Wait for child devices to go away before deleting a
+ connection
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Brian Rogers <brian@xyzw.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Kay Sievers <kay.sievers@vrfy.org>,
+	David Woodhouse <dwmw2@infradead.org>
+In-Reply-To: <4A6864DE.5010501@xyzw.org>
+References: <4A6424D8.3040306@xyzw.org> <1248077430.4549.97.camel@violet>
+	 <4A6864DE.5010501@xyzw.org>
+Content-Type: text/plain
+Date: Wed, 29 Jul 2009 23:12:44 +0200
+Message-Id: <1248901964.28545.242.camel@violet>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Brian,
 
-On Wed, Jul 29, 2009, Marcel Holtmann wrote:
-> > >  Hijacking the set_powered D-Bus command is the
-> > > wrong approach. We need a properly exported adapter_up() function for
-> > > this.
-> > 
-> > I believe I tried exporting adapter_up() but it didn't work.
+> >> This patch fixes the device removal order when a connection is closed, 
+> >> which allows HAL to see the remove event and prevents a bunch of 
+> >> duplicate devices from piling up and eventually hitting the limit for 
+> >> the for input devices in X.
+> >>
+> >> Posting for discussion since I used a polling loop (with a sleep) to 
+> >> wait for child devices to go away. I assume it'd be preferable to wait 
+> >> in a more proper way. In that case, before I start, is this the right 
+> >> place to be waiting?
+> >>     
+> >
+> > since this is executed in a workqueue, you could easily sleep here
+> > without any problems. However why do you need to sleep at all. The
+> > device_move should sleep until the device is moved away, doesn't it?
+> >   
 > 
-> Johan, Luiz, any reason why this would not work. What needs to be done
-> to bring up the adapter. Besides calling the ioctl() directly which we
-> don't wanna do anymore.
+> The moves do complete before the connection is removed, but it seems bad 
+> to me to just move the child devices away rather than letting them close 
+> down and be removed directly from the original location where they were 
+> created. HAL thinks so, too: it still doesn't catch the input device 
+> removal if they are moved away before they are deleted.
+> 
+> > Kay, David, wouldn't be pinning of the parent device here be enough to
+> > get this done in a clean way?
+> >   
+> 
+> If there's a way that the connection can be pinned until the child 
+> devices go away, that definitely sounds cleaner to me.
 
-adapter_up() is more of a callback that's responsible for doing the
-necessary initializations *after* adapter has just gone up, so it's not
-the right function to call when you want to bring it up (i.e. call the
-ioctl). I believe all code paths for bringing the adapter up call set_mode
-in src/adapter.c which in turn calls adapter_ops->set_powered (which calls
-the ioctl in the case of hciops).
+so I pushed some patches to bluetooth-testing tree that should fix this
+problem. They are not fully tested by me. Please test and report back
+the results.
 
-So having a btd_adapter_set_powered exported to plugins (which is what
-Bastien's patch seems to do) makes sense to me in this case. I might
-actually need something similar for maemo in order to handle our offline
-mode better (maemo specific plugin to catch the MCE offline mode signal
-and then call btd_adapter_set_powered).
+Regards
 
-Johan
+Marcel
+
+
