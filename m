@@ -1,42 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <19071709.1248945485270.JavaMail.root@safetgram>
-Date: Thu, 30 Jul 2009 19:17:59 +1000
-From: John Freeman <johnf@optimation.com.au>
 MIME-Version: 1.0
-To: Brad Midgley <bmidgley@gmail.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: Intermittent "Address already in use" error
-References: <1346165.1248430092866.JavaMail.root@safetgram>	 <5111969.1248454126654.JavaMail.root@safetgram>	 <30761901.1248770182239.JavaMail.root@safetgram> <27042187.1248802358830.JavaMail.root@safetgram>
-In-Reply-To: <27042187.1248802358830.JavaMail.root@safetgram>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <4A705604.3040807@hartkopp.net>
+References: <4A6AD807.6060706@hartkopp.net>
+	 <20090725115011.7ddf8d00@lxorguk.ukuu.org.uk>
+	 <1248520053.28545.156.camel@violet>
+	 <20090725131046.0f076f37@lxorguk.ukuu.org.uk>
+	 <20090727095904.GA5442@darkstar> <4A6D8BA3.3030601@hartkopp.net>
+	 <4A6D91D7.6030204@hartkopp.net> <20090727140736.GA1864@darkstar>
+	 <4A705604.3040807@hartkopp.net>
+Date: Thu, 30 Jul 2009 17:15:21 +0800
+Message-ID: <a8e1da0907300215q3934da47g3676648e3b247af8@mail.gmail.com>
+Subject: Re: tty_register_device NULL pointer dereference in 2.6.31-rc4
+From: Dave Young <hidave.darkstar@gmail.com>
+To: Oliver Hartkopp <oliver@hartkopp.net>
+Cc: Alan Cox <alan@lxorguk.ukuu.org.uk>, Marcel Holtmann <marcel@holtmann.org>,
+	Linux Netdev List <netdev@vger.kernel.org>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Brad Midgley wrote:
->> Once it gets into this state, all further attempts to bind fail with
->> "Address already in use" ... until I reboot.
-> 
-> if you're using kernel modules, you might be able to unload/reload a
-> bluetooth related kernel module to restore it. This would also help
-> narrowing down the cause.
+On Wed, Jul 29, 2009 at 10:00 PM, Oliver Hartkopp<oliver@hartkopp.net> wrote:
+> Dave Young wrote:
+>> On Mon, Jul 27, 2009 at 01:39:03PM +0200, Oliver Hartkopp wrote:
+>>> Oliver Hartkopp wrote:
+>>>> Dave Young wrote:
+>>>>> On Sat, Jul 25, 2009 at 01:10:46PM +0100, Alan Cox wrote:
+>>>>>>>> tty_register_device appears to have been called with a NULL pointer. Not
+>>>>>>>> sure why however.
+>>>>>>> if that is the pointer for the struct device, then that used to be fine
+>>>>>>> in the past. Not all RFCOMM device have a parent when they are created.
+>>>>>> The tty layer doesn't care about the struct device really. Nothing there
+>>>>>> has changed. The NULL passed appears to be the driver argument.
+>>>>> Agree with you, because in rfcomm_init, rfcomm thread run before tty initilized, the following patch may fix the problem.
+>>>>> oliver, could you verify it it fix your problem?
+>>>> Hi Dave,
+>>>>
+>>>> i get this problem really seldom on my Laptop and i did not manage to get a
+>>>> reproducible Oops of that problem.
+>>>>
+>>>> Anyway the code you are pointing to seems to have a problem and your added
+>>>> error handling looks good to me - even if i don't know if the initializations
+>>>> can be reordered in that way.
+>>>>
+>>>> I'll try your patch, but it could take a *long* time to prove it right ;-)
+>>>>
+>>> Just FYI:
+>>>
+>>> Your patch compiled, the system booted without problems and nothing is broken
+>>> so far. I checked the BT, WLAN and BT dial-up with success. So it looks good
+>>> to me.
+>>
+>> Thanks for the testing. Marcel, could you take a look?
+>
+> Hi Dave,
+>
+> i got it again - even with your patch (that's why it's 2.6.31-rc4-dirty in the
+> attached screenshot).
 
-The bad news is that I can't unload the sco or bluetooth modules when the 
-problem occurs because they are allegedly "in use".
+Weird, the oops occurs between sock init and tty init routines. Could
+you tell your bluez version and your configuration?
 
-The good news is that I have found a combination of circumstances that makes the 
-problem hard-on rather than intermittent.  As a result, I have discovered some 
-additional symptoms.  In addition to the /sys/class/bluetooth/sco file that is 
-not cleaned-up, there is also a /sys/class/bluetooth/rfcomm file with contents 
-that correspond to a listen() on a RFCOMM socket.  There is also a leftover SDP 
-entry arising from advertise_service() even after stop_advertising() has been 
-called.
-
- From what I know of sysfs (learned during the past 24 hours), these entries are 
-controlled by reference counts, so it looks like the counts are getting screwed 
-somewhere.
-
-Can anyone suggest where I should start looking?
-
-John.
-
-
+-- 
+Regards
+dave
