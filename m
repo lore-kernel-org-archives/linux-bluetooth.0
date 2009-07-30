@@ -1,67 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 30 Jul 2009 14:27:33 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-To: linux-acpi@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Cc: bugzilla-daemon@bugzilla.kernel.org,
-	bugme-daemon@bugzilla.kernel.org, pi3mm3@gmail.com,
-	"John W. Linville" <linville@tuxdriver.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Henrique de Moraes Holschuh <hmh@hmh.eng.br>
-Subject: Re: [Bugme-new] [Bug 13879] New: Bluetooth stops working after s3
- suspend/resume
-Message-Id: <20090730142733.b05a95ed.akpm@linux-foundation.org>
-In-Reply-To: <bug-13879-10286@http.bugzilla.kernel.org/>
-References: <bug-13879-10286@http.bugzilla.kernel.org/>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 30 Jul 2009 13:23:21 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Bastien Nocera <hadess@hadess.net>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	David.Weinehall@nokia.com
+Subject: Re: [PATCH] Add rfkill plugin
+Message-ID: <20090730102321.GB6082@jh-x301>
+References: <1248798884.23466.12024.camel@localhost.localdomain> <1248880408.28327.906.camel@localhost.localdomain> <1248896967.28545.236.camel@violet> <1248898544.28327.1539.camel@localhost.localdomain> <1248899010.28545.241.camel@violet> <20090729214412.GA24031@jh-x301> <1248921041.28545.248.camel@violet>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1248921041.28545.248.camel@violet>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Marcel,
 
-(switched to email.  Please respond via emailed reply-to-all, not via the
-bugzilla web interface).
+On Thu, Jul 30, 2009, Marcel Holtmann wrote:
+> > So having a btd_adapter_set_powered exported to plugins (which is what
+> > Bastien's patch seems to do) makes sense to me in this case. I might
+> > actually need something similar for maemo in order to handle our offline
+> > mode better (maemo specific plugin to catch the MCE offline mode signal
+> > and then call btd_adapter_set_powered).
+> 
+> then I leave this with you to export that function correctly. It should
+> be a separate patch anyway.
 
-(added lots of cc's)
+Ok. Maybe Bastien can split this out from his original patch? Note that
+the function should probably have the btd_ prefix since the idea has been
+that only functions like that get exported to plugins (not sure if it's
+actually enforced yet though).
 
-On Thu, 30 Jul 2009 15:30:31 GMT
-bugzilla-daemon@bugzilla.kernel.org wrote:
+> I would disagree with the MCE offline handling as a plugin. First off
+> all, why is it not integrated into RFKILL. Second off all, it could just
+> use RFKILL or RememberPowered=false and change Powered by itself. The
+> listening to offline signal is the wrong design.
 
-> http://bugzilla.kernel.org/show_bug.cgi?id=13879
-> 
->            Summary: Bluetooth stops working after s3 suspend/resume
->            Product: Drivers
->            Version: 2.5
->     Kernel Version: 2.6.30-gentoo-r1
->           Platform: All
->         OS/Version: Linux
->               Tree: Mainline
->             Status: NEW
->           Severity: normal
->           Priority: P1
->          Component: Bluetooth
->         AssignedTo: drivers_bluetooth@kernel-bugs.osdl.org
->         ReportedBy: pi3mm3@gmail.com
->                 CC: acpi_platform-drivers@kernel-bugs.osdl.org
->         Regression: No
-> 
-> 
-> Created an attachment (id=22540)
->  --> (http://bugzilla.kernel.org/attachment.cgi?id=22540)
-> dmesg output
-> 
-> Distribution: Gentoo 2008.0 64bit
-> Hardware Environment: notebook Toshiba Portege M750
-> Software Environment: desktop with gnome-2.24.3, udev-141 and dbus-1.2.3
-> Problem Description: After an S3 cycle the hci0 device disappears.
-> 
-> The only way I found to wake it up is:
-> 1) patch drivers/platform/x86/toshiba_acpi.c module with the Experimental
-> Toshiba Acpi Driver
-> (http://memebeam.org/free-software/toshiba_acpi/toshiba_acpi-dev_toshiba_test5-linux_2.6.29.patch)
-> 2) run as root "toshset -bluetooth on" (http://schwieters.org/toshset/).
-> 
+You're probably right, however this is what I have to live with in the
+current maemo version. I've added David to CC so he can comment on the
+possibility of replacing MCE offline/normal mode signals with rfkill in
+the future.
 
-hm, what's all that stuff in
-http://memebeam.org/free-software/toshiba_acpi/ and who wrote it and
-should we be merging it into mainline?
-
+Johan
