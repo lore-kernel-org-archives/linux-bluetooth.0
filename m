@@ -1,27 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 30 Jul 2009 23:24:39 +0100
+From: Matthew Garrett <mjg59@srcf.ucam.org>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-acpi@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	bugzilla-daemon@bugzilla.kernel.org,
+	bugme-daemon@bugzilla.kernel.org, pi3mm3@gmail.com,
+	"John W. Linville" <linville@tuxdriver.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Henrique de Moraes Holschuh <hmh@hmh.eng.br>
+Subject: Re: [Bugme-new] [Bug 13879] New: Bluetooth stops working after s3
+	suspend/resume
+Message-ID: <20090730222439.GA25462@srcf.ucam.org>
+References: <bug-13879-10286@http.bugzilla.kernel.org/> <20090730142733.b05a95ed.akpm@linux-foundation.org>
 MIME-Version: 1.0
-In-Reply-To: <19071709.1248945485270.JavaMail.root@safetgram>
-References: <1346165.1248430092866.JavaMail.root@safetgram>
-	 <5111969.1248454126654.JavaMail.root@safetgram>
-	 <30761901.1248770182239.JavaMail.root@safetgram>
-	 <27042187.1248802358830.JavaMail.root@safetgram>
-	 <19071709.1248945485270.JavaMail.root@safetgram>
-Date: Thu, 30 Jul 2009 17:23:20 -0600
-Message-ID: <d89ddf300907301623i4e3a3190s1b82d0b3e31f14bb@mail.gmail.com>
-Subject: Re: Intermittent "Address already in use" error
-From: Brad Midgley <bmidgley@gmail.com>
-To: John Freeman <johnf@optimation.com.au>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20090730142733.b05a95ed.akpm@linux-foundation.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-John,
+On Thu, Jul 30, 2009 at 02:27:33PM -0700, Andrew Morton wrote:
 
-> Can anyone suggest where I should start looking?
+> hm, what's all that stuff in
+> http://memebeam.org/free-software/toshiba_acpi/ and who wrote it and
+> should we be merging it into mainline?
 
-Are you using a recent kernel and bluez? Do you have example code that
-will cause the problem? Even better if it is in script like python.
+Still waiting for someone to just do the right thing and add rfkill 
+support to the Toshiba driver. I'm actually considering a complete 
+rewrite - the existing code's grown kind of organically, and support for 
+modern kernel features has been rather bolted onto the side.
 
 -- 
-Brad Midgley
+Matthew Garrett | mjg59@srcf.ucam.org
