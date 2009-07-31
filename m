@@ -1,68 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 31 Jul 2009 17:39:50 +0800
-From: Dave Young <hidave.darkstar@gmail.com>
-To: Oliver Hartkopp <oliver@hartkopp.net>
-Cc: Alan Cox <alan@lxorguk.ukuu.org.uk>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Linux Netdev List <netdev@vger.kernel.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: tty_register_device NULL pointer dereference in 2.6.31-rc4
-Message-ID: <20090731093949.GA4867@darkstar>
-References: <20090725115011.7ddf8d00@lxorguk.ukuu.org.uk> <1248520053.28545.156.camel@violet> <20090725131046.0f076f37@lxorguk.ukuu.org.uk> <20090727095904.GA5442@darkstar> <4A6D8BA3.3030601@hartkopp.net> <4A6D91D7.6030204@hartkopp.net> <20090727140736.GA1864@darkstar> <4A705604.3040807@hartkopp.net> <a8e1da0907300215q3934da47g3676648e3b247af8@mail.gmail.com> <4A717083.5090101@hartkopp.net>
+Message-ID: <8006552.1249022191976.JavaMail.root@safetgram>
+Date: Fri, 31 Jul 2009 16:36:27 +1000
+From: John Freeman <johnf@optimation.com.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4A717083.5090101@hartkopp.net>
+To: Brad Midgley <bmidgley@gmail.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: Intermittent "Address already in use" error
+References: <1346165.1248430092866.JavaMail.root@safetgram>	 <5111969.1248454126654.JavaMail.root@safetgram>	 <30761901.1248770182239.JavaMail.root@safetgram>	 <27042187.1248802358830.JavaMail.root@safetgram>	 <19071709.1248945485270.JavaMail.root@safetgram> <2648525.1248996255356.JavaMail.root@safetgram> <33459247.1249002454978.JavaMail.root@safetgram>
+In-Reply-To: <33459247.1249002454978.JavaMail.root@safetgram>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Jul 30, 2009 at 12:05:55PM +0200, Oliver Hartkopp wrote:
-> Dave Young wrote:
-> > On Wed, Jul 29, 2009 at 10:00 PM, Oliver Hartkopp<oliver@hartkopp.net> wrote:
-> >> Hi Dave,
-> >>
-> >> i got it again - even with your patch (that's why it's 2.6.31-rc4-dirty in the
-> >> attached screenshot).
-> > 
-> > Weird, the oops occurs between sock init and tty init routines. Could
-> > you tell your bluez version and your configuration?
-> > 
+John Freeman wrote:
+> Brad Midgley wrote:
+>>> Can anyone suggest where I should start looking?
+>> Are you using a recent kernel and bluez?
 > 
-> No problem:
+> Very recent:
+> Kernel  2.6.29.5-84.fc10.i686
+> bluez-4.30-2.fc10.i386
+> 
+>  > Do you have example code that
+>  > will cause the problem? Even better if it is in script like python.
 
-Thanks.
+[Red face mode]
+Now I know the superficial cause of the problem.  The program ran hcidump:
+subprocess.Popen(['hcidump', '-i', adapterId, '-w', fname])
+in order to gather info on some other problems.  Under some circumstances it 
+didn't clean up the process before terminating.
 
-It's still reasonable, after rfcomm sock layer initialized, userspace do sock ioctl callback but tty layer was not initilized yet at this time.
+Killing the hcidump cleaned up the files in /sys/class/bluetooth and I no longer 
+get the error.
 
-Could you confirm it by applying following debug patch on top of my previous patch? if you get more oops with it then above reason will be right.
+If anyone can explain why, I'd be very interested.
 
---- linux-2.6.orig/net/bluetooth/rfcomm/core.c	2009-07-31 17:14:07.000000000 +0800
-+++ linux-2.6/net/bluetooth/rfcomm/core.c	2009-07-31 17:30:39.000000000 +0800
-@@ -36,6 +36,7 @@
- #include <linux/net.h>
- #include <linux/mutex.h>
- #include <linux/kthread.h>
-+#include <linux/nmi.h>
- 
- #include <net/sock.h>
- #include <asm/uaccess.h>
-@@ -2080,7 +2081,7 @@ static CLASS_ATTR(rfcomm_dlc, S_IRUGO, r
- /* ---- Initialization ---- */
- static int __init rfcomm_init(void)
- {
--	int ret;
-+	int ret, i;
- 
- 	l2cap_load();
- 
-@@ -2088,6 +2089,12 @@ static int __init rfcomm_init(void)
- 	if (ret)
- 		goto out_sock;
- 
-+	/* delay 5 seconds to trigger the tty bug */
-+	for (i = 0; i < 50; i++) {
-+		touch_nmi_watchdog();
-+		mdelay(100);
-+	}
-+
- 	ret = rfcomm_init_ttys();
- 	if (ret)
- 		goto out_tty;
