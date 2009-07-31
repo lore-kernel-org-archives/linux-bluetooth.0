@@ -1,126 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, gustavo@padovan.org
-Subject: [PATCH 3/4] Bluetooth: Initial support for retransmission of packets with REJ frames
-Date: Fri, 31 Jul 2009 19:53:43 -0300
-Message-Id: <1249080824-6780-3-git-send-email-gustavo@las.ic.unicamp.br>
-In-Reply-To: <1249080824-6780-2-git-send-email-gustavo@las.ic.unicamp.br>
-References: <1249080824-6780-1-git-send-email-gustavo@las.ic.unicamp.br>
- <1249080824-6780-2-git-send-email-gustavo@las.ic.unicamp.br>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <4A72D373.7080802@hartkopp.net>
+Date: Fri, 31 Jul 2009 13:20:19 +0200
+From: Oliver Hartkopp <oliver@hartkopp.net>
+MIME-Version: 1.0
+To: Dave Young <hidave.darkstar@gmail.com>
+CC: Alan Cox <alan@lxorguk.ukuu.org.uk>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Linux Netdev List <netdev@vger.kernel.org>,
+ linux-bluetooth@vger.kernel.org
+Subject: Re: tty_register_device NULL pointer dereference in 2.6.31-rc4
+References: <20090725115011.7ddf8d00@lxorguk.ukuu.org.uk>	 <20090725131046.0f076f37@lxorguk.ukuu.org.uk>	 <20090727095904.GA5442@darkstar> <4A6D8BA3.3030601@hartkopp.net>	 <4A6D91D7.6030204@hartkopp.net> <20090727140736.GA1864@darkstar>	 <4A705604.3040807@hartkopp.net>	 <a8e1da0907300215q3934da47g3676648e3b247af8@mail.gmail.com>	 <4A717083.5090101@hartkopp.net> <20090731093949.GA4867@darkstar> <a8e1da0907310310h483cedeeg433947d51345246c@mail.gmail.com>
+In-Reply-To: <a8e1da0907310310h483cedeeg433947d51345246c@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When receiving an I-frame with unexpected txSeq, receiver side start the
-recovery procedure by sending a REJ S-frame to the transmitter side. So
-the transmitter can re-send the lost I-frame.
-This patch just adds a basic support for retransmission, it doesn't
-mean that ERTM now has full support to packet retransmission.
+Dave Young wrote:
+> On Fri, Jul 31, 2009 at 5:39 PM, Dave Young<hidave.darkstar@gmail.com> wrote:
+>> On Thu, Jul 30, 2009 at 12:05:55PM +0200, Oliver Hartkopp wrote:
+>>> Dave Young wrote:
+>>>> On Wed, Jul 29, 2009 at 10:00 PM, Oliver Hartkopp<oliver@hartkopp.net> wrote:
+>>>>> Hi Dave,
+>>>>>
+>>>>> i got it again - even with your patch (that's why it's 2.6.31-rc4-dirty in the
+>>>>> attached screenshot).
+>>>> Weird, the oops occurs between sock init and tty init routines. Could
+>>>> you tell your bluez version and your configuration?
+>>>>
+>>> No problem:
+>> Thanks.
+>>
+>> It's still reasonable, after rfcomm sock layer initialized, userspace do sock ioctl callback but tty layer was not initilized yet at this time.
+>>
+>> Could you confirm it by applying following debug patch on top of my previous patch? if you get more oops with it then above reason will be right.
+>>
+>> --- linux-2.6.orig/net/bluetooth/rfcomm/core.c  2009-07-31 17:14:07.000000000 +0800
+>> +++ linux-2.6/net/bluetooth/rfcomm/core.c       2009-07-31 17:30:39.000000000 +0800
+>> @@ -36,6 +36,7 @@
+>>  #include <linux/net.h>
+>>  #include <linux/mutex.h>
+>>  #include <linux/kthread.h>
+>> +#include <linux/nmi.h>
+>>
+>>  #include <net/sock.h>
+>>  #include <asm/uaccess.h>
+>> @@ -2080,7 +2081,7 @@ static CLASS_ATTR(rfcomm_dlc, S_IRUGO, r
+>>  /* ---- Initialization ---- */
+>>  static int __init rfcomm_init(void)
+>>  {
+>> -       int ret;
+>> +       int ret, i;
+>>
+>>        l2cap_load();
+>>
+>> @@ -2088,6 +2089,12 @@ static int __init rfcomm_init(void)
+>>        if (ret)
+>>                goto out_sock;
+>>
+>> +       /* delay 5 seconds to trigger the tty bug */
+>> +       for (i = 0; i < 50; i++) {
+>> +               touch_nmi_watchdog();
+>> +               mdelay(100);
+> 
+> Hi, for this case, msleep is better, you can just replace the above
+> two lines with msleep(100)
+> 
 
-Signed-off-by: Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
----
- include/net/bluetooth/l2cap.h |    1 +
- net/bluetooth/l2cap.c         |   57 +++++++++++++++++++++++++++++++----------
- 2 files changed, 44 insertions(+), 14 deletions(-)
+Hi Dave,
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 9189328..c54b72a 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -352,6 +352,7 @@ struct l2cap_pinfo {
- #define L2CAP_CONF_MAX_CONF_RSP 2
- 
- #define L2CAP_CONN_SAR_SDU         0x01
-+#define L2CAP_CONN_UNDER_REJ       0x02
- 
- static inline int l2cap_tx_window_full(struct sock *sk)
- {
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 16c448d..918cc15 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -2956,22 +2956,36 @@ static inline int l2cap_data_channel_iframe(struct sock *sk, u16 rx_control, str
- 
- 	BT_DBG("sk %p rx_control 0x%4.4x len %d", sk, rx_control, skb->len);
- 
--	if (tx_seq != pi->expected_tx_seq)
--		return -EINVAL;
-+	if (tx_seq == pi->expected_tx_seq) {
-+		if (pi->conn_state & L2CAP_CONN_UNDER_REJ)
-+			pi->conn_state &= ~L2CAP_CONN_UNDER_REJ;
- 
--	err = l2cap_sar_reassembly_sdu(sk, skb, rx_control, tx_seq);
--	if (err < 0)
--		return err;
-+		err = l2cap_sar_reassembly_sdu(sk, skb, rx_control, tx_seq);
-+		if (err < 0)
-+			return err;
-+
-+		pi->expected_tx_seq = (pi->expected_tx_seq + 1) % 64;
-+		pi->num_to_ack = (pi->num_to_ack + 1) % L2CAP_DEFAULT_NUM_TO_ACK;
-+		if (pi->num_to_ack == L2CAP_DEFAULT_NUM_TO_ACK - 1) {
-+			tx_control |= L2CAP_SUPER_RCV_READY;
-+			tx_control |= pi->expected_tx_seq << L2CAP_CTRL_REQSEQ_SHIFT;
-+			goto send;
-+		}
-+	} else {
-+		/* Unexpected txSeq. Send a REJ S-frame */
-+		kfree_skb(skb);
-+		if (!(pi->conn_state & L2CAP_CONN_UNDER_REJ)) {
-+			tx_control |= L2CAP_SUPER_REJECT;
-+			tx_control |= pi->expected_tx_seq << L2CAP_CTRL_REQSEQ_SHIFT;
-+			pi->conn_state |= L2CAP_CONN_UNDER_REJ;
- 
--	pi->expected_tx_seq = (pi->expected_tx_seq + 1) % 64;
--	pi->num_to_ack = (pi->num_to_ack + 1) % L2CAP_DEFAULT_NUM_TO_ACK;
--	if (pi->num_to_ack == L2CAP_DEFAULT_NUM_TO_ACK - 1) {
--		tx_control |= L2CAP_CTRL_FRAME_TYPE;
--		tx_control |= L2CAP_SUPER_RCV_READY;
--		tx_control |= pi->expected_tx_seq << L2CAP_CTRL_REQSEQ_SHIFT;
--		err = l2cap_send_sframe(pi, tx_control);
-+			goto send;
-+		}
- 	}
--	return err;
-+	return 0;
-+
-+send:
-+	return l2cap_send_sframe(pi, tx_control);
- }
- 
- static inline int l2cap_data_channel_sframe(struct sock *sk, u16 rx_control, struct sk_buff *skb)
-@@ -2987,8 +3001,18 @@ static inline int l2cap_data_channel_sframe(struct sock *sk, u16 rx_control, str
- 		l2cap_ertm_send(sk);
- 		break;
- 
--	case L2CAP_SUPER_RCV_NOT_READY:
- 	case L2CAP_SUPER_REJECT:
-+		pi->expected_ack_seq = __get_reqseq(rx_control);
-+		l2cap_drop_acked_frames(sk);
-+
-+		sk->sk_send_head = TX_QUEUE(sk)->next;
-+		pi->next_tx_seq = pi->expected_ack_seq;
-+
-+		l2cap_ertm_send(sk);
-+
-+		break;
-+
-+	case L2CAP_SUPER_RCV_NOT_READY:
- 	case L2CAP_SUPER_SELECT_REJECT:
- 		break;
- 	}
-@@ -3035,6 +3059,11 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
- 		if (__is_sar_start(control))
- 			len -= 2;
- 
-+		/*
-+		 * We can just drop the corrupted I-frame here.
-+		 * Receiver will miss it and start proper recovery
-+		 * procedures and ask retransmission.
-+		 */
- 		if (len > L2CAP_DEFAULT_MAX_PDU_SIZE)
- 			goto drop;
- 
--- 
-1.6.3.3
+applied this patch and replaced mdelay(100) with msleep(100).
 
+I got two crashes and three proper boots.
+
+The crashes look like the formerly posted screenshots.
+When it boots properly i can see the delay in the boot process.
+
+Does this help?
+
+Regards,
+Oliver
