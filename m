@@ -1,117 +1,167 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, gustavo@padovan.org
-Subject: [PATCH 1/7] Bluetooth: Create l2cap_send_disconn_req()
-Date: Mon,  3 Aug 2009 02:41:27 -0300
-Message-Id: <1249278093-725-1-git-send-email-gustavo@las.ic.unicamp.br>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Sat, 1 Aug 2009 17:32:07 +0800
+From: Dave Young <hidave.darkstar@gmail.com>
+To: Oliver Hartkopp <oliver@hartkopp.net>
+Cc: Alan Cox <alan@lxorguk.ukuu.org.uk>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Linux Netdev List <netdev@vger.kernel.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: tty_register_device NULL pointer dereference in 2.6.31-rc4
+Message-ID: <20090801093207.GA2873@darkstar>
+References: <4A6D91D7.6030204@hartkopp.net> <20090727140736.GA1864@darkstar> <4A705604.3040807@hartkopp.net> <a8e1da0907300215q3934da47g3676648e3b247af8@mail.gmail.com> <4A717083.5090101@hartkopp.net> <20090731093949.GA4867@darkstar> <a8e1da0907310310h483cedeeg433947d51345246c@mail.gmail.com> <4A72D373.7080802@hartkopp.net> <20090801031705.GA2817@darkstar> <4A740918.1040504@hartkopp.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4A740918.1040504@hartkopp.net>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The code for sending a disconnect request was repetead several times on
-L2CAP.
+On Sat, Aug 01, 2009 at 11:21:28AM +0200, Oliver Hartkopp wrote:
+> 
+> > --- linux-2.6.orig/include/net/bluetooth/rfcomm.h	2009-08-01 10:53:18.000000000 +0800
+> > +++ linux-2.6/include/net/bluetooth/rfcomm.h	2009-08-01 10:55:29.000000000 +0800
+> > @@ -355,7 +355,18 @@ struct rfcomm_dev_list_req {
+> >  };
+> >  
+> >  int  rfcomm_dev_ioctl(struct sock *sk, unsigned int cmd, void __user *arg);
+> > +
+> > +#ifdef CONFIG_BT_RFCOMM_TTY
+> >  int  rfcomm_init_ttys(void);
+> >  void rfcomm_cleanup_ttys(void);
+> > -
+> > +#else
+> > +static inline int rfcomm_init_ttys(void)
+> > +{
+> > +	return 0;
+> > +}
+> > +static inline int rfcomm_cleanup_ttys(void)
+> > +{
+> > +	return 0;
+> > +}
+> > +#endif
+> 
+> Just a minor thing:
+> 
+> Does rfcomm_cleanup_ttys() return 'int' or is it 'void' ?
 
-Signed-off-by: Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
+Yes it should be void. Thanks for pointing out, here update the patch:
 ---
- net/bluetooth/l2cap.c |   47 +++++++++++++++++------------------------------
- 1 files changed, 17 insertions(+), 30 deletions(-)
 
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index af0fbf9..18b3c62 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -366,6 +366,17 @@ static void l2cap_do_start(struct sock *sk)
+rfcomm tty may be used before rfcomm_tty_driver initilized,
+The problem is that now socket layer init before tty layer, if userspace
+program do socket callback right here then oops will happen.
+
+reporting in:
+http://marc.info/?l=linux-bluetooth&m=124404919324542&w=2
+
+make 3 changes:
+1. remove #ifdef in rfcomm/core.c,
+make it blank function when rfcomm tty not selected in rfcomm.h
+
+2. tune the rfcomm_init error patch to ensure
+tty driver initilized before rfcomm socket usage.
+
+3. remove __exit for rfcomm_cleanup_sockets
+because above change need call it in a __init function. 
+
+
+CC: Alan Cox <alan@lxorguk.ukuu.org.uk>
+Reported-by: Oliver Hartkopp <oliver@hartkopp.net>
+Signed-off-by: Dave Young <hidave.darkstar@gmail.com>
+--
+include/net/bluetooth/rfcomm.h |   12 +++++++++++-
+net/bluetooth/rfcomm/core.c    |   29 ++++++++++++++++++++---------
+net/bluetooth/rfcomm/sock.c    |    2 +-
+3 files changed, 32 insertions(+), 11 deletions(-)
+
+--- linux-2.6.orig/include/net/bluetooth/rfcomm.h	2009-08-01 13:56:53.000000000 +0800
++++ linux-2.6/include/net/bluetooth/rfcomm.h	2009-08-01 17:24:59.000000000 +0800
+@@ -355,7 +355,17 @@ struct rfcomm_dev_list_req {
+ };
+ 
+ int  rfcomm_dev_ioctl(struct sock *sk, unsigned int cmd, void __user *arg);
++
++#ifdef CONFIG_BT_RFCOMM_TTY
+ int  rfcomm_init_ttys(void);
+ void rfcomm_cleanup_ttys(void);
+-
++#else
++static inline int rfcomm_init_ttys(void)
++{
++	return 0;
++}
++static inline void rfcomm_cleanup_ttys(void)
++{
++}
++#endif
+ #endif /* __RFCOMM_H */
+--- linux-2.6.orig/net/bluetooth/rfcomm/core.c	2009-08-01 13:56:53.000000000 +0800
++++ linux-2.6/net/bluetooth/rfcomm/core.c	2009-08-01 13:57:18.000000000 +0800
+@@ -2080,28 +2080,41 @@ static CLASS_ATTR(rfcomm_dlc, S_IRUGO, r
+ /* ---- Initialization ---- */
+ static int __init rfcomm_init(void)
+ {
++	int ret;
++
+ 	l2cap_load();
+ 
+ 	hci_register_cb(&rfcomm_cb);
+ 
+ 	rfcomm_thread = kthread_run(rfcomm_run, NULL, "krfcommd");
+ 	if (IS_ERR(rfcomm_thread)) {
+-		hci_unregister_cb(&rfcomm_cb);
+-		return PTR_ERR(rfcomm_thread);
++		ret = PTR_ERR(rfcomm_thread);
++		goto out_thread;
  	}
+ 
+ 	if (class_create_file(bt_class, &class_attr_rfcomm_dlc) < 0)
+ 		BT_ERR("Failed to create RFCOMM info file");
+ 
+-	rfcomm_init_sockets();
+-
+-#ifdef CONFIG_BT_RFCOMM_TTY
+-	rfcomm_init_ttys();
+-#endif
++	ret = rfcomm_init_ttys();
++	if (ret)
++		goto out_tty;
++
++	ret = rfcomm_init_sockets();
++	if (ret)
++		goto out_sock;
+ 
+ 	BT_INFO("RFCOMM ver %s", VERSION);
+ 
+ 	return 0;
++
++out_sock:
++	rfcomm_cleanup_ttys();
++out_tty:
++	kthread_stop(rfcomm_thread);
++out_thread:
++	hci_unregister_cb(&rfcomm_cb);
++
++	return ret;
  }
  
-+static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct sock *sk)
-+{
-+	struct l2cap_disconn_req req;
-+
-+	req.dcid = cpu_to_le16(l2cap_pi(sk)->dcid);
-+	req.scid = cpu_to_le16(l2cap_pi(sk)->scid);
-+	l2cap_send_cmd(conn, l2cap_get_ident(conn),
-+			L2CAP_DISCONN_REQ, sizeof(req), &req);
-+	return;
-+}
-+
- /* ---- L2CAP connections ---- */
- static void l2cap_conn_start(struct l2cap_conn *conn)
+ static void __exit rfcomm_exit(void)
+@@ -2112,9 +2125,7 @@ static void __exit rfcomm_exit(void)
+ 
+ 	kthread_stop(rfcomm_thread);
+ 
+-#ifdef CONFIG_BT_RFCOMM_TTY
+ 	rfcomm_cleanup_ttys();
+-#endif
+ 
+ 	rfcomm_cleanup_sockets();
+ }
+--- linux-2.6.orig/net/bluetooth/rfcomm/sock.c	2009-08-01 13:56:53.000000000 +0800
++++ linux-2.6/net/bluetooth/rfcomm/sock.c	2009-08-01 13:57:18.000000000 +0800
+@@ -1132,7 +1132,7 @@ error:
+ 	return err;
+ }
+ 
+-void __exit rfcomm_cleanup_sockets(void)
++void rfcomm_cleanup_sockets(void)
  {
-@@ -650,15 +661,10 @@ static void __l2cap_sock_close(struct sock *sk, int reason)
- 	case BT_CONFIG:
- 		if (sk->sk_type == SOCK_SEQPACKET) {
- 			struct l2cap_conn *conn = l2cap_pi(sk)->conn;
--			struct l2cap_disconn_req req;
+ 	class_remove_file(bt_class, &class_attr_rfcomm);
  
- 			sk->sk_state = BT_DISCONN;
- 			l2cap_sock_set_timer(sk, sk->sk_sndtimeo);
--
--			req.dcid = cpu_to_le16(l2cap_pi(sk)->dcid);
--			req.scid = cpu_to_le16(l2cap_pi(sk)->scid);
--			l2cap_send_cmd(conn, l2cap_get_ident(conn),
--					L2CAP_DISCONN_REQ, sizeof(req), &req);
-+			l2cap_send_disconn_req(conn, sk);
- 		} else
- 			l2cap_chan_del(sk, reason);
- 		break;
-@@ -1786,13 +1792,8 @@ static int l2cap_build_conf_req(struct sock *sk, void *data)
- 	case L2CAP_MODE_STREAMING:
- 	case L2CAP_MODE_ERTM:
- 		pi->conf_state |= L2CAP_CONF_STATE2_DEVICE;
--		if (!l2cap_mode_supported(pi->mode, pi->conn->feat_mask)) {
--			struct l2cap_disconn_req req;
--			req.dcid = cpu_to_le16(pi->dcid);
--			req.scid = cpu_to_le16(pi->scid);
--			l2cap_send_cmd(pi->conn, l2cap_get_ident(pi->conn),
--					L2CAP_DISCONN_REQ, sizeof(req), &req);
--		}
-+		if (!l2cap_mode_supported(pi->mode, pi->conn->feat_mask))
-+			l2cap_send_disconn_req(pi->conn, sk);
- 		break;
- 	default:
- 		pi->mode = l2cap_select_mode(rfc.mode, pi->conn->feat_mask);
-@@ -2286,11 +2287,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 	/* Complete config. */
- 	len = l2cap_parse_conf_req(sk, rsp);
- 	if (len < 0) {
--		struct l2cap_disconn_req req;
--		req.dcid = cpu_to_le16(l2cap_pi(sk)->dcid);
--		req.scid = cpu_to_le16(l2cap_pi(sk)->scid);
--		l2cap_send_cmd(conn, l2cap_get_ident(conn),
--					L2CAP_DISCONN_REQ, sizeof(req), &req);
-+		l2cap_send_disconn_req(conn, sk);
- 		goto unlock;
- 	}
- 
-@@ -2352,11 +2349,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 			len = l2cap_parse_conf_rsp(sk, rsp->data,
- 							len, req, &result);
- 			if (len < 0) {
--				struct l2cap_disconn_req req;
--				req.dcid = cpu_to_le16(l2cap_pi(sk)->dcid);
--				req.scid = cpu_to_le16(l2cap_pi(sk)->scid);
--				l2cap_send_cmd(conn, l2cap_get_ident(conn),
--					L2CAP_DISCONN_REQ, sizeof(req), &req);
-+				l2cap_send_disconn_req(conn, sk);
- 				goto done;
- 			}
- 
-@@ -2372,13 +2365,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 		sk->sk_state = BT_DISCONN;
- 		sk->sk_err = ECONNRESET;
- 		l2cap_sock_set_timer(sk, HZ * 5);
--		{
--			struct l2cap_disconn_req req;
--			req.dcid = cpu_to_le16(l2cap_pi(sk)->dcid);
--			req.scid = cpu_to_le16(l2cap_pi(sk)->scid);
--			l2cap_send_cmd(conn, l2cap_get_ident(conn),
--					L2CAP_DISCONN_REQ, sizeof(req), &req);
--		}
-+		l2cap_send_disconn_req(conn, sk);
- 		goto done;
- 	}
- 
--- 
-1.6.3.3
-
