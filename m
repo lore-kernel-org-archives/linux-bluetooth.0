@@ -1,6 +1,6 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A740918.1040504@hartkopp.net>
-Date: Sat, 01 Aug 2009 11:21:28 +0200
+Message-ID: <4A7407AC.1010204@hartkopp.net>
+Date: Sat, 01 Aug 2009 11:15:24 +0200
 From: Oliver Hartkopp <oliver@hartkopp.net>
 MIME-Version: 1.0
 To: Dave Young <hidave.darkstar@gmail.com>
@@ -14,7 +14,64 @@ In-Reply-To: <20090801031705.GA2817@darkstar>
 Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Dave Young wrote:
+> On Fri, Jul 31, 2009 at 01:20:19PM +0200, Oliver Hartkopp wrote:
 
+>> applied this patch and replaced mdelay(100) with msleep(100).
+>>
+>> I got two crashes and three proper boots.
+>>
+>> The crashes look like the formerly posted screenshots.
+>> When it boots properly i can see the delay in the boot process.
+>>
+>> Does this help?
+> 
+> Yes, I think so.
+> 
+> Please unapply the before two patch, try the following v2 patch instead.
+> Changes from v1: fixes 'goto' path again, make tty init before sock init.
+
+Hi Dave,
+
+i did a 'git reset --hard' to get back to vanilla 2.6.31-rc4 .
+
+Applied the v2 patch and booted five times without any problems.
+
+I'll keep you informed if anything changes ;-)
+
+Thanks,
+Oliver
+
+
+> ---
+> 
+> rfcomm tty may be used before rfcomm_tty_driver initilized,
+> The problem is that now socket layer init before tty layer, if userspace
+> program do socket callback right here then oops will happen.
+> 
+> reporting in:
+> http://marc.info/?l=linux-bluetooth&m=124404919324542&w=2
+> 
+> make 3 changes:
+> 1. remove #ifdef in rfcomm/core.c,
+> make it blank function when rfcomm tty not selected in rfcomm.h
+> 
+> 2. tune the rfcomm_init error patch to ensure
+> tty driver initilized before rfcomm socket usage.
+> 
+> 3. remove __exit for rfcomm_cleanup_sockets
+> because above change need call it in a __init function. 
+> 
+> 
+> CC: Alan Cox <alan@lxorguk.ukuu.org.uk>
+> Reported-by: Oliver Hartkopp <oliver@hartkopp.net>
+> Signed-off-by: Dave Young <hidave.darkstar@gmail.com>
+> --
+> include/net/bluetooth/rfcomm.h |   13 ++++++++++++-
+> net/bluetooth/rfcomm/core.c    |   29 ++++++++++++++++++++---------
+> net/bluetooth/rfcomm/sock.c    |    2 +-
+> 3 files changed, 33 insertions(+), 11 deletions(-)
+> 
 > --- linux-2.6.orig/include/net/bluetooth/rfcomm.h	2009-08-01 10:53:18.000000000 +0800
 > +++ linux-2.6/include/net/bluetooth/rfcomm.h	2009-08-01 10:55:29.000000000 +0800
 > @@ -355,7 +355,18 @@ struct rfcomm_dev_list_req {
@@ -36,10 +93,76 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 > +	return 0;
 > +}
 > +#endif
-
-Just a minor thing:
-
-Does rfcomm_cleanup_ttys() return 'int' or is it 'void' ?
-
-Regards,
-Oliver
+>  #endif /* __RFCOMM_H */
+> --- linux-2.6.orig/net/bluetooth/rfcomm/core.c	2009-08-01 10:53:18.000000000 +0800
+> +++ linux-2.6/net/bluetooth/rfcomm/core.c	2009-08-01 11:03:24.000000000 +0800
+> @@ -2080,28 +2080,41 @@ static CLASS_ATTR(rfcomm_dlc, S_IRUGO, r
+>  /* ---- Initialization ---- */
+>  static int __init rfcomm_init(void)
+>  {
+> +	int ret;
+> +
+>  	l2cap_load();
+>  
+>  	hci_register_cb(&rfcomm_cb);
+>  
+>  	rfcomm_thread = kthread_run(rfcomm_run, NULL, "krfcommd");
+>  	if (IS_ERR(rfcomm_thread)) {
+> -		hci_unregister_cb(&rfcomm_cb);
+> -		return PTR_ERR(rfcomm_thread);
+> +		ret = PTR_ERR(rfcomm_thread);
+> +		goto out_thread;
+>  	}
+>  
+>  	if (class_create_file(bt_class, &class_attr_rfcomm_dlc) < 0)
+>  		BT_ERR("Failed to create RFCOMM info file");
+>  
+> -	rfcomm_init_sockets();
+> -
+> -#ifdef CONFIG_BT_RFCOMM_TTY
+> -	rfcomm_init_ttys();
+> -#endif
+> +	ret = rfcomm_init_ttys();
+> +	if (ret)
+> +		goto out_tty;
+> +
+> +	ret = rfcomm_init_sockets();
+> +	if (ret)
+> +		goto out_sock;
+>  
+>  	BT_INFO("RFCOMM ver %s", VERSION);
+>  
+>  	return 0;
+> +
+> +out_sock:
+> +	rfcomm_cleanup_ttys();
+> +out_tty:
+> +	kthread_stop(rfcomm_thread);
+> +out_thread:
+> +	hci_unregister_cb(&rfcomm_cb);
+> +
+> +	return ret;
+>  }
+>  
+>  static void __exit rfcomm_exit(void)
+> @@ -2112,9 +2125,7 @@ static void __exit rfcomm_exit(void)
+>  
+>  	kthread_stop(rfcomm_thread);
+>  
+> -#ifdef CONFIG_BT_RFCOMM_TTY
+>  	rfcomm_cleanup_ttys();
+> -#endif
+>  
+>  	rfcomm_cleanup_sockets();
+>  }
+> --- linux-2.6.orig/net/bluetooth/rfcomm/sock.c	2009-08-01 10:53:18.000000000 +0800
+> +++ linux-2.6/net/bluetooth/rfcomm/sock.c	2009-08-01 10:55:29.000000000 +0800
+> @@ -1132,7 +1132,7 @@ error:
+>  	return err;
+>  }
+>  
+> -void __exit rfcomm_cleanup_sockets(void)
+> +void rfcomm_cleanup_sockets(void)
+>  {
+>  	class_remove_file(bt_class, &class_attr_rfcomm);
+>  
