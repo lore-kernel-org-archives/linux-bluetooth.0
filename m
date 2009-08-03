@@ -1,179 +1,263 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A76D215.1060300@hartkopp.net>
-Date: Mon, 03 Aug 2009 14:03:33 +0200
-From: Oliver Hartkopp <oliver@hartkopp.net>
-MIME-Version: 1.0
-To: Dave Young <hidave.darkstar@gmail.com>
-CC: Alan Cox <alan@lxorguk.ukuu.org.uk>,
- Marcel Holtmann <marcel@holtmann.org>,
- Linux Netdev List <netdev@vger.kernel.org>,
- linux-bluetooth@vger.kernel.org
-Subject: Re: tty_register_device NULL pointer dereference in 2.6.31-rc4
-References: <4A6D91D7.6030204@hartkopp.net> <20090727140736.GA1864@darkstar> <4A705604.3040807@hartkopp.net> <a8e1da0907300215q3934da47g3676648e3b247af8@mail.gmail.com> <4A717083.5090101@hartkopp.net> <20090731093949.GA4867@darkstar> <a8e1da0907310310h483cedeeg433947d51345246c@mail.gmail.com> <4A72D373.7080802@hartkopp.net> <20090801031705.GA2817@darkstar> <4A740918.1040504@hartkopp.net> <20090801093207.GA2873@darkstar>
-In-Reply-To: <20090801093207.GA2873@darkstar>
-Content-Type: text/plain; charset=us-ascii
+From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org, gustavo@padovan.org
+Subject: [PATCH 7/7] Bluetooth: Add support to FCS Option on L2CAP
+Date: Mon,  3 Aug 2009 02:41:33 -0300
+Message-Id: <1249278093-725-7-git-send-email-gustavo@las.ic.unicamp.br>
+In-Reply-To: <1249278093-725-6-git-send-email-gustavo@las.ic.unicamp.br>
+References: <1249278093-725-1-git-send-email-gustavo@las.ic.unicamp.br>
+ <1249278093-725-2-git-send-email-gustavo@las.ic.unicamp.br>
+ <1249278093-725-3-git-send-email-gustavo@las.ic.unicamp.br>
+ <1249278093-725-4-git-send-email-gustavo@las.ic.unicamp.br>
+ <1249278093-725-5-git-send-email-gustavo@las.ic.unicamp.br>
+ <1249278093-725-6-git-send-email-gustavo@las.ic.unicamp.br>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dave Young wrote:
-> On Sat, Aug 01, 2009 at 11:21:28AM +0200, Oliver Hartkopp wrote:
->>> --- linux-2.6.orig/include/net/bluetooth/rfcomm.h	2009-08-01 10:53:18.000000000 +0800
->>> +++ linux-2.6/include/net/bluetooth/rfcomm.h	2009-08-01 10:55:29.000000000 +0800
->>> @@ -355,7 +355,18 @@ struct rfcomm_dev_list_req {
->>>  };
->>>  
->>>  int  rfcomm_dev_ioctl(struct sock *sk, unsigned int cmd, void __user *arg);
->>> +
->>> +#ifdef CONFIG_BT_RFCOMM_TTY
->>>  int  rfcomm_init_ttys(void);
->>>  void rfcomm_cleanup_ttys(void);
->>> -
->>> +#else
->>> +static inline int rfcomm_init_ttys(void)
->>> +{
->>> +	return 0;
->>> +}
->>> +static inline int rfcomm_cleanup_ttys(void)
->>> +{
->>> +	return 0;
->>> +}
->>> +#endif
->> Just a minor thing:
->>
->> Does rfcomm_cleanup_ttys() return 'int' or is it 'void' ?
-> 
-> Yes it should be void. Thanks for pointing out, here update the patch:
+Implement crc16 check for L2CAP packets. FCS is used by Streaming Mode
+and Enhanced Retransmission Mode and is a extra check for the packet
+content.
+Linux will always use FCS when both sides support it.
 
-Hi Dave,
+Initially based on a patch from Nathan Holstein <nathan@lampreynetworks.com>
 
-the latest approach seems to fit.
+Signed-off-by: Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
+---
+ net/bluetooth/l2cap.c |   77 +++++++++++++++++++++++++++++++++++++++++++-----
+ 1 files changed, 69 insertions(+), 8 deletions(-)
 
-I booted about 25+ times without any problems.
-Even the upgrade from Debian Lenny to Squeeze did not cause any probs with
-bluetooth.
-
-Tested-by: Oliver Hartkopp <oliver@hartkopp.net>
-
-Thanks!
-
-> ---
-> 
-> rfcomm tty may be used before rfcomm_tty_driver initilized,
-> The problem is that now socket layer init before tty layer, if userspace
-> program do socket callback right here then oops will happen.
-> 
-> reporting in:
-> http://marc.info/?l=linux-bluetooth&m=124404919324542&w=2
-> 
-> make 3 changes:
-> 1. remove #ifdef in rfcomm/core.c,
-> make it blank function when rfcomm tty not selected in rfcomm.h
-> 
-> 2. tune the rfcomm_init error patch to ensure
-> tty driver initilized before rfcomm socket usage.
-> 
-> 3. remove __exit for rfcomm_cleanup_sockets
-> because above change need call it in a __init function. 
-> 
-> 
-> CC: Alan Cox <alan@lxorguk.ukuu.org.uk>
-> Reported-by: Oliver Hartkopp <oliver@hartkopp.net>
-> Signed-off-by: Dave Young <hidave.darkstar@gmail.com>
-> --
-> include/net/bluetooth/rfcomm.h |   12 +++++++++++-
-> net/bluetooth/rfcomm/core.c    |   29 ++++++++++++++++++++---------
-> net/bluetooth/rfcomm/sock.c    |    2 +-
-> 3 files changed, 32 insertions(+), 11 deletions(-)
-> 
-> --- linux-2.6.orig/include/net/bluetooth/rfcomm.h	2009-08-01 13:56:53.000000000 +0800
-> +++ linux-2.6/include/net/bluetooth/rfcomm.h	2009-08-01 17:24:59.000000000 +0800
-> @@ -355,7 +355,17 @@ struct rfcomm_dev_list_req {
->  };
->  
->  int  rfcomm_dev_ioctl(struct sock *sk, unsigned int cmd, void __user *arg);
-> +
-> +#ifdef CONFIG_BT_RFCOMM_TTY
->  int  rfcomm_init_ttys(void);
->  void rfcomm_cleanup_ttys(void);
-> -
-> +#else
-> +static inline int rfcomm_init_ttys(void)
-> +{
-> +	return 0;
-> +}
-> +static inline void rfcomm_cleanup_ttys(void)
-> +{
-> +}
-> +#endif
->  #endif /* __RFCOMM_H */
-> --- linux-2.6.orig/net/bluetooth/rfcomm/core.c	2009-08-01 13:56:53.000000000 +0800
-> +++ linux-2.6/net/bluetooth/rfcomm/core.c	2009-08-01 13:57:18.000000000 +0800
-> @@ -2080,28 +2080,41 @@ static CLASS_ATTR(rfcomm_dlc, S_IRUGO, r
->  /* ---- Initialization ---- */
->  static int __init rfcomm_init(void)
->  {
-> +	int ret;
-> +
->  	l2cap_load();
->  
->  	hci_register_cb(&rfcomm_cb);
->  
->  	rfcomm_thread = kthread_run(rfcomm_run, NULL, "krfcommd");
->  	if (IS_ERR(rfcomm_thread)) {
-> -		hci_unregister_cb(&rfcomm_cb);
-> -		return PTR_ERR(rfcomm_thread);
-> +		ret = PTR_ERR(rfcomm_thread);
-> +		goto out_thread;
->  	}
->  
->  	if (class_create_file(bt_class, &class_attr_rfcomm_dlc) < 0)
->  		BT_ERR("Failed to create RFCOMM info file");
->  
-> -	rfcomm_init_sockets();
-> -
-> -#ifdef CONFIG_BT_RFCOMM_TTY
-> -	rfcomm_init_ttys();
-> -#endif
-> +	ret = rfcomm_init_ttys();
-> +	if (ret)
-> +		goto out_tty;
-> +
-> +	ret = rfcomm_init_sockets();
-> +	if (ret)
-> +		goto out_sock;
->  
->  	BT_INFO("RFCOMM ver %s", VERSION);
->  
->  	return 0;
-> +
-> +out_sock:
-> +	rfcomm_cleanup_ttys();
-> +out_tty:
-> +	kthread_stop(rfcomm_thread);
-> +out_thread:
-> +	hci_unregister_cb(&rfcomm_cb);
-> +
-> +	return ret;
->  }
->  
->  static void __exit rfcomm_exit(void)
-> @@ -2112,9 +2125,7 @@ static void __exit rfcomm_exit(void)
->  
->  	kthread_stop(rfcomm_thread);
->  
-> -#ifdef CONFIG_BT_RFCOMM_TTY
->  	rfcomm_cleanup_ttys();
-> -#endif
->  
->  	rfcomm_cleanup_sockets();
->  }
-> --- linux-2.6.orig/net/bluetooth/rfcomm/sock.c	2009-08-01 13:56:53.000000000 +0800
-> +++ linux-2.6/net/bluetooth/rfcomm/sock.c	2009-08-01 13:57:18.000000000 +0800
-> @@ -1132,7 +1132,7 @@ error:
->  	return err;
->  }
->  
-> -void __exit rfcomm_cleanup_sockets(void)
-> +void rfcomm_cleanup_sockets(void)
->  {
->  	class_remove_file(bt_class, &class_attr_rfcomm);
->  
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index 5969f7a..de06837 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -41,6 +41,7 @@
+ #include <linux/list.h>
+ #include <linux/device.h>
+ #include <linux/uaccess.h>
++#include <linux/crc16.h>
+ #include <net/sock.h>
+ 
+ #include <asm/system.h>
+@@ -338,11 +339,14 @@ static inline int l2cap_send_sframe(struct l2cap_pinfo *pi, u16 control)
+ 	struct sk_buff *skb;
+ 	struct l2cap_hdr *lh;
+ 	struct l2cap_conn *conn = pi->conn;
+-	int count;
++	int count, hlen = L2CAP_HDR_SIZE + 2;
++
++	if (pi->fcs == L2CAP_FCS_CRC16)
++		hlen += 2;
+ 
+ 	BT_DBG("pi %p, control 0x%2.2x", pi, control);
+ 
+-	count = min_t(unsigned int, conn->mtu, L2CAP_HDR_SIZE + 2);
++	count = min_t(unsigned int, conn->mtu, hlen);
+ 	control |= L2CAP_CTRL_FRAME_TYPE;
+ 
+ 	skb = bt_skb_alloc(count, GFP_ATOMIC);
+@@ -350,10 +354,15 @@ static inline int l2cap_send_sframe(struct l2cap_pinfo *pi, u16 control)
+ 		return -ENOMEM;
+ 
+ 	lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
+-	lh->len = cpu_to_le16(2);
++	lh->len = cpu_to_le16(hlen - L2CAP_HDR_SIZE);
+ 	lh->cid = cpu_to_le16(pi->dcid);
+ 	put_unaligned_le16(control, skb_put(skb, 2));
+ 
++	if (pi->fcs == L2CAP_FCS_CRC16) {
++		u16 fcs = crc16(0, (u8 *)lh, count - 2);
++		put_unaligned_le16(fcs, skb_put(skb, 2));
++	}
++
+ 	return hci_send_acl(pi->conn->hcon, skb, 0);
+ }
+ 
+@@ -756,7 +765,7 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
+ 		pi->imtu = L2CAP_DEFAULT_MTU;
+ 		pi->omtu = 0;
+ 		pi->mode = L2CAP_MODE_BASIC;
+-		pi->fcs  = L2CAP_FCS_CRC16;
++		pi->fcs  = L2CAP_FCS_NONE;
+ 		pi->sec_level = BT_SECURITY_LOW;
+ 		pi->role_switch = 0;
+ 		pi->force_reliable = 0;
+@@ -1249,7 +1258,7 @@ static int l2cap_streaming_send(struct sock *sk)
+ {
+ 	struct sk_buff *skb, *tx_skb;
+ 	struct l2cap_pinfo *pi = l2cap_pi(sk);
+-	u16 *control;
++	u16 *control, *fcs;
+ 	int err;
+ 
+ 	while ((skb = sk->sk_send_head)) {
+@@ -1259,6 +1268,11 @@ static int l2cap_streaming_send(struct sock *sk)
+ 		*control |= cpu_to_le16(
+ 				pi->next_tx_seq << L2CAP_CTRL_TXSEQ_SHIFT);
+ 
++		if (l2cap_pi(sk)->fcs == L2CAP_FCS_CRC16) {
++			fcs = (u16 *)(skb->data + skb->len - 2);
++			*fcs = crc16(0, (u8 *)skb->data, skb->len - 2);
++		}
++
+ 		err = l2cap_do_send(sk, tx_skb);
+ 		if (err < 0) {
+ 			l2cap_send_disconn_req(pi->conn, sk);
+@@ -1282,7 +1296,7 @@ static int l2cap_ertm_send(struct sock *sk)
+ {
+ 	struct sk_buff *skb, *tx_skb;
+ 	struct l2cap_pinfo *pi = l2cap_pi(sk);
+-	u16 *control;
++	u16 *control, *fcs;
+ 	int err;
+ 
+ 	if (pi->conn_state & L2CAP_CONN_WAIT_ACK)
+@@ -1304,6 +1318,11 @@ static int l2cap_ertm_send(struct sock *sk)
+ 				(pi->req_seq << L2CAP_CTRL_REQSEQ_SHIFT)
+ 				| (pi->next_tx_seq << L2CAP_CTRL_TXSEQ_SHIFT));
+ 
++		if (l2cap_pi(sk)->fcs == L2CAP_FCS_CRC16) {
++			fcs = (u16 *)(skb->data + skb->len - 2);
++			*fcs = crc16(0, (u8 *)skb->data, skb->len - 2);
++		}
++
+ 		err = l2cap_do_send(sk, tx_skb);
+ 		if (err < 0) {
+ 			l2cap_send_disconn_req(pi->conn, sk);
+@@ -1428,6 +1447,9 @@ static struct sk_buff *l2cap_create_iframe_pdu(struct sock *sk, struct msghdr *m
+ 	if (sdulen)
+ 		hlen += 2;
+ 
++	if (l2cap_pi(sk)->fcs == L2CAP_FCS_CRC16)
++		hlen += 2;
++
+ 	count = min_t(unsigned int, (conn->mtu - hlen), len);
+ 	skb = bt_skb_send_alloc(sk, count + hlen,
+ 			msg->msg_flags & MSG_DONTWAIT, &err);
+@@ -1448,6 +1470,9 @@ static struct sk_buff *l2cap_create_iframe_pdu(struct sock *sk, struct msghdr *m
+ 		return ERR_PTR(err);
+ 	}
+ 
++	if (l2cap_pi(sk)->fcs == L2CAP_FCS_CRC16)
++		put_unaligned_le16(0, skb_put(skb, 2));
++
+ 	bt_cb(skb)->retries = 0;
+ 	return skb;
+ }
+@@ -2270,11 +2295,12 @@ done:
+ 
+ 		switch (rfc.mode) {
+ 		case L2CAP_MODE_BASIC:
+-			pi->fcs = L2CAP_FCS_NONE;
+ 			pi->conf_state |= L2CAP_CONF_MODE_DONE;
+ 			break;
+ 
+ 		case L2CAP_MODE_ERTM:
++			if (pi->conn->feat_mask & L2CAP_FEAT_FCS)
++				pi->fcs = L2CAP_FCS_CRC16;
+ 			pi->remote_tx_win = rfc.txwin_size;
+ 			pi->remote_max_tx = rfc.max_transmit;
+ 			pi->max_pdu_size = rfc.max_pdu_size;
+@@ -2286,6 +2312,8 @@ done:
+ 			break;
+ 
+ 		case L2CAP_MODE_STREAMING:
++			if (pi->conn->feat_mask & L2CAP_FEAT_FCS)
++				pi->fcs = L2CAP_FCS_CRC16;
+ 			pi->remote_tx_win = rfc.txwin_size;
+ 			pi->max_pdu_size = rfc.max_pdu_size;
+ 
+@@ -2362,12 +2390,16 @@ static int l2cap_parse_conf_rsp(struct sock *sk, void *rsp, int len, void *data,
+ 	if (*result == L2CAP_CONF_SUCCESS) {
+ 		switch (rfc.mode) {
+ 		case L2CAP_MODE_ERTM:
++			if (pi->conn->feat_mask & L2CAP_FEAT_FCS)
++				pi->fcs = L2CAP_FCS_CRC16;
+ 			pi->remote_tx_win   = rfc.txwin_size;
+ 			pi->retrans_timeout = rfc.retrans_timeout;
+ 			pi->monitor_timeout = rfc.monitor_timeout;
+ 			pi->max_pdu_size    = le16_to_cpu(rfc.max_pdu_size);
+ 			break;
+ 		case L2CAP_MODE_STREAMING:
++			if (pi->conn->feat_mask & L2CAP_FEAT_FCS)
++				pi->fcs = L2CAP_FCS_CRC16;
+ 			pi->max_pdu_size    = le16_to_cpu(rfc.max_pdu_size);
+ 			break;
+ 		}
+@@ -2810,7 +2842,8 @@ static inline int l2cap_information_req(struct l2cap_conn *conn, struct l2cap_cm
+ 		rsp->type   = cpu_to_le16(L2CAP_IT_FEAT_MASK);
+ 		rsp->result = cpu_to_le16(L2CAP_IR_SUCCESS);
+ 		if (enable_ertm)
+-			feat_mask |= L2CAP_FEAT_ERTM | L2CAP_FEAT_STREAMING;
++			feat_mask |= L2CAP_FEAT_ERTM | L2CAP_FEAT_STREAMING
++				 | L2CAP_FEAT_FCS;
+ 		put_unaligned(cpu_to_le32(feat_mask), (__le32 *) rsp->data);
+ 		l2cap_send_cmd(conn, cmd->ident,
+ 					L2CAP_INFO_RSP, sizeof(buf), buf);
+@@ -2862,6 +2895,7 @@ static inline int l2cap_information_rsp(struct l2cap_conn *conn, struct l2cap_cm
+ 
+ 			l2cap_conn_start(conn);
+ 		}
++
+ 	} else if (type == L2CAP_IT_FIXED_CHAN) {
+ 		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_DONE;
+ 		conn->info_ident = 0;
+@@ -2961,6 +2995,21 @@ static inline void l2cap_sig_channel(struct l2cap_conn *conn, struct sk_buff *sk
+ 
+ 	kfree_skb(skb);
+ }
++static int l2cap_check_fcs(struct l2cap_pinfo *pi,  struct sk_buff *skb)
++{
++	u16 our_fcs, rcv_fcs;
++	int hdr_size = L2CAP_HDR_SIZE + 2;
++
++	if (pi->fcs == L2CAP_FCS_CRC16) {
++		skb_trim(skb, skb->len - 2);
++		rcv_fcs = get_unaligned_le16(skb->data + skb->len);
++		our_fcs = crc16(0, skb->data - hdr_size, skb->len + hdr_size);
++
++		if (our_fcs != rcv_fcs)
++			return -EINVAL;
++	}
++	return 0;
++}
+ 
+ static int l2cap_sar_reassembly_sdu(struct sock *sk, struct sk_buff *skb, u16 control, u8 txseq)
+ {
+@@ -3170,6 +3219,9 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+ 		if (__is_sar_start(control))
+ 			len -= 2;
+ 
++		if (pi->fcs == L2CAP_FCS_CRC16)
++			len -= 2;
++
+ 		/*
+ 		 * We can just drop the corrupted I-frame here.
+ 		 * Receiver will miss it and start proper recovery
+@@ -3178,6 +3230,9 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+ 		if (len > L2CAP_DEFAULT_MAX_PDU_SIZE)
+ 			goto drop;
+ 
++		if (l2cap_check_fcs(pi, skb))
++			goto drop;
++
+ 		if (__is_iframe(control))
+ 			err = l2cap_data_channel_iframe(sk, control, skb);
+ 		else
+@@ -3195,9 +3250,15 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+ 		if (__is_sar_start(control))
+ 			len -= 2;
+ 
++		if (pi->fcs == L2CAP_FCS_CRC16)
++			len -= 2;
++
+ 		if (len > L2CAP_DEFAULT_MAX_PDU_SIZE || __is_sframe(control))
+ 			goto drop;
+ 
++		if (l2cap_check_fcs(pi, skb))
++			goto drop;
++
+ 		tx_seq = __get_txseq(control);
+ 
+ 		if (pi->expected_tx_seq == tx_seq)
+-- 
+1.6.3.3
