@@ -1,29 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 4 Aug 2009 07:49:28 +0200
-From: Artem Makhutov <artem@makhutov.org>
-To: Andreas Volz <lists@brachttal.net>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Adressbook with bluez?
-Message-ID: <20090804054928.GC26953@titan.makhutov-it.de>
-References: <20090803202404.5d62b6a4@frodo.mittelerde>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20090803202404.5d62b6a4@frodo.mittelerde>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 03 Aug 2009 21:11:36 -0700 (PDT)
+Message-Id: <20090803.211136.00343745.davem@davemloft.net>
+To: marcel@holtmann.org
+Cc: hidave.darkstar@gmail.com, oliver@hartkopp.net,
+ alan@lxorguk.ukuu.org.uk, netdev@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH]bluetooth: rfcomm_init bug fix
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20090803.191916.75688176.davem@davemloft.net>
+References: <20090803.132924.151782729.davem@davemloft.net>
+	<1249343666.3094.12.camel@localhost.localdomain>
+	<20090803.191916.75688176.davem@davemloft.net>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+From: David Miller <davem@davemloft.net>
+Date: Mon, 03 Aug 2009 19:19:16 -0700 (PDT)
 
-n Mon, Aug 03, 2009 at 08:24:04PM +0200, Andreas Volz wrote:
-> Hello,
+> From: Marcel Holtmann <marcel@holtmann.org>
+> Date: Mon, 03 Aug 2009 16:54:26 -0700
 > 
-> I like to read out the address book of my bluetooth phone with bluez. I
-> didn't find any info about this.
+>> do you mind at least waiting for an ACK from my side. I haven't even
+>> looked at the final patch.
 > 
-> Is this possible?
-> 
-> If not, what is missing in the implementation to get it working?
+> Sure, I haven't pushed it out yet, so now's your chance :)
 
-You need to send special AT-Commands over the rfcomm like to the phone.
-
-Regards, Artem
+Grumble, I accidently pushed my net-2.6 queue out before you
+had a chance to reply, sorry :-(
