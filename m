@@ -1,44 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH]bluetooth: rfcomm_init bug fix
-From: Marcel Holtmann <marcel@holtmann.org>
-To: David Miller <davem@davemloft.net>
-Cc: hidave.darkstar@gmail.com, oliver@hartkopp.net,
-	alan@lxorguk.ukuu.org.uk, netdev@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20090803.211136.00343745.davem@davemloft.net>
-References: <20090803.132924.151782729.davem@davemloft.net>
-	 <1249343666.3094.12.camel@localhost.localdomain>
-	 <20090803.191916.75688176.davem@davemloft.net>
-	 <20090803.211136.00343745.davem@davemloft.net>
-Content-Type: text/plain
-Date: Tue, 04 Aug 2009 10:01:46 -0700
-Message-Id: <1249405306.3094.18.camel@localhost.localdomain>
+Date: Tue, 4 Aug 2009 18:32:08 +0200
+From: Andreas Volz <lists@brachttal.net>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: Adressbook with bluez?
+Message-ID: <20090804183208.31a857c4@frodo.mittelerde>
+In-Reply-To: <20090804054928.GC26953@titan.makhutov-it.de>
+References: <20090803202404.5d62b6a4@frodo.mittelerde>
+	<20090804054928.GC26953@titan.makhutov-it.de>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dave,
+Am Tue, 4 Aug 2009 07:49:28 +0200 schrieb Artem Makhutov:
 
-> >> do you mind at least waiting for an ACK from my side. I haven't even
-> >> looked at the final patch.
-> > 
-> > Sure, I haven't pushed it out yet, so now's your chance :)
+> Hello,
 > 
-> Grumble, I accidently pushed my net-2.6 queue out before you
-> had a chance to reply, sorry :-(
+> n Mon, Aug 03, 2009 at 08:24:04PM +0200, Andreas Volz wrote:
+> > Hello,
+> > 
+> > I like to read out the address book of my bluetooth phone with
+> > bluez. I didn't find any info about this.
+> > 
+> > Is this possible?
+> > 
+> > If not, what is missing in the implementation to get it working?
+> 
+> You need to send special AT-Commands over the rfcomm like to the
+> phone.
 
-not a big deal. Just have to send a cleanup patch. The patch itself is
-fine, but from a style perspective it is different than everything else
-in the Bluetooth subsystem and I would have liked to fix that before
-pushing it. I wait with that for 2.6.32 since it is not important.
+Thanks for your fast answer?
 
-The other Dave, please send patches to linux-bluetooth only and lets
-follow the normal path to get them merged into Linus' tree. Skipping
-bluetooth-2.6 is not an option. You have to use the same process than
-everybody else.
+How should I do this practically? Could I use minicom? Could I simply
+open /dev/rfcomm0 and read and write on it?
 
-Regards
+What commands should I send?
 
-Marcel
+Are there some more docs/examples about this or could you give me more
+information?
 
-
+regards
+Andreas
