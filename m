@@ -1,64 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH]bluetooth: rfcomm_init bug fix
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Dave Young <hidave.darkstar@gmail.com>
-Cc: David Miller <davem@davemloft.net>, oliver@hartkopp.net,
-	alan@lxorguk.ukuu.org.uk, netdev@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <a8e1da0908042216u16037395k96cce0746baa504e@mail.gmail.com>
-References: <20090803.132924.151782729.davem@davemloft.net>
-	 <1249343666.3094.12.camel@localhost.localdomain>
-	 <20090803.191916.75688176.davem@davemloft.net>
-	 <20090803.211136.00343745.davem@davemloft.net>
-	 <1249405306.3094.18.camel@localhost.localdomain>
-	 <a8e1da0908042216u16037395k96cce0746baa504e@mail.gmail.com>
-Content-Type: text/plain
-Date: Wed, 05 Aug 2009 08:35:55 -0700
-Message-Id: <1249486555.3094.38.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <4A795CEB.1000808@gmail.com>
+Date: Wed, 05 Aug 2009 12:20:27 +0200
+From: Karl Beldan <karl.beldan@gmail.com>
+MIME-Version: 1.0
+To: marcel@holtmann.org
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix typo in stats for hci_uart
+References: <4A6F2A12.8020201@gmail.com>
+In-Reply-To: <4A6F2A12.8020201@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dave,
+Hi Marcel,
 
-> >> >> do you mind at least waiting for an ACK from my side. I haven't even
-> >> >> looked at the final patch.
-> >> >
-> >> > Sure, I haven't pushed it out yet, so now's your chance :)
-> >>
-> >> Grumble, I accidently pushed my net-2.6 queue out before you
-> >> had a chance to reply, sorry :-(
-> >
-> > not a big deal. Just have to send a cleanup patch. The patch itself is
-> > fine, but from a style perspective it is different than everything else
-> > in the Bluetooth subsystem and I would have liked to fix that before
-> > pushing it. I wait with that for 2.6.32 since it is not important.
+Are you considering applying this trivial one ?
+
+
+Karl Beldan wrote:
+> s/stat.cmd_tx++/stat.sco_tx++ for HCI_SCODATA_PKT
 > 
-> Marcel, could you publish the bluetooth subsystem coding style
-> somewhere? People including me are confused about it. I remembered I
-> asked it from you, but it is still not very clear for me.
-
-it is kernel coding style like everything else, but some variable naming
-should be consistent. And that is nothing that is published, that is
-something that has been done since Max wrote it. Check the rest of the
-code.
-
-> > The other Dave, please send patches to linux-bluetooth only and lets
-> > follow the normal path to get them merged into Linus' tree. Skipping
-> > bluetooth-2.6 is not an option. You have to use the same process than
-> > everybody else.
+> Signed-off-by: Karl Beldan <karl.beldan@mobile-devices.fr>
+> ---
+>  drivers/bluetooth/hci_ldisc.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 > 
-> Why linux-bluetooth only? IMHO there could be more people to comment
-> and review  if I send patches to both lkml and subsystem mailing list.
-
-Lets me make this perfectly clear here. Bluetooth patches are sent to
-the linux-bluetooth mailing list. There is no need to send them to
-netdev and/or LKML at the same time. Stop this cross-posting. They don't
-get more review there anyway. I take care of sending them for net-2.6
-inclusion if I feel that they are appropriate.
-
-Regards
-
-Marcel
-
-
+> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+> index 4895f0e..a08b207 100644
+> --- a/drivers/bluetooth/hci_ldisc.c
+> +++ b/drivers/bluetooth/hci_ldisc.c
+> @@ -101,7 +101,7 @@ static inline void hci_uart_tx_complete(struct hci_uart *hu, int pkt_type)
+>  		break;
+>  
+>  	case HCI_SCODATA_PKT:
+> -		hdev->stat.cmd_tx++;
+> +		hdev->stat.sco_tx++;
+>  		break;
+>  	}
+>  }
+> 
