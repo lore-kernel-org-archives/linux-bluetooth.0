@@ -1,92 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-From: alokbarsode@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Alok Barsode <alok.barsode@azingo.com>
-Subject: [PATCH] Fix Class of Device initialization.
-Date: Wed,  5 Aug 2009 21:05:03 +0530
-Message-Id: <1249486503-18208-1-git-send-email-alok.barsode@azingo.com>
+Subject: Re: [PATCH]bluetooth: rfcomm_init bug fix
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Dave Young <hidave.darkstar@gmail.com>
+Cc: David Miller <davem@davemloft.net>, oliver@hartkopp.net,
+	alan@lxorguk.ukuu.org.uk, netdev@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <a8e1da0908042216u16037395k96cce0746baa504e@mail.gmail.com>
+References: <20090803.132924.151782729.davem@davemloft.net>
+	 <1249343666.3094.12.camel@localhost.localdomain>
+	 <20090803.191916.75688176.davem@davemloft.net>
+	 <20090803.211136.00343745.davem@davemloft.net>
+	 <1249405306.3094.18.camel@localhost.localdomain>
+	 <a8e1da0908042216u16037395k96cce0746baa504e@mail.gmail.com>
+Content-Type: text/plain
+Date: Wed, 05 Aug 2009 08:35:55 -0700
+Message-Id: <1249486555.3094.38.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Alok Barsode <alok.barsode@azingo.com>
+Hi Dave,
 
----
- plugins/hciops.c |   19 -------------------
- src/adapter.c    |   21 +++++++++++++++++++++
- 2 files changed, 21 insertions(+), 19 deletions(-)
+> >> >> do you mind at least waiting for an ACK from my side. I haven't even
+> >> >> looked at the final patch.
+> >> >
+> >> > Sure, I haven't pushed it out yet, so now's your chance :)
+> >>
+> >> Grumble, I accidently pushed my net-2.6 queue out before you
+> >> had a chance to reply, sorry :-(
+> >
+> > not a big deal. Just have to send a cleanup patch. The patch itself is
+> > fine, but from a style perspective it is different than everything else
+> > in the Bluetooth subsystem and I would have liked to fix that before
+> > pushing it. I wait with that for 2.6.32 since it is not important.
+> 
+> Marcel, could you publish the bluetooth subsystem coding style
+> somewhere? People including me are confused about it. I remembered I
+> asked it from you, but it is still not very clear for me.
 
-diff --git a/plugins/hciops.c b/plugins/hciops.c
-index 2b43737..6f96dda 100644
---- a/plugins/hciops.c
-+++ b/plugins/hciops.c
-@@ -103,25 +103,6 @@ static void configure_device(int index)
- 		return;
- 	}
- 
--	/* Set device class */
--	if ((main_opts.flags & (1 << HCID_SET_CLASS))) {
--		write_class_of_dev_cp cp;
--		uint8_t cls[3];
--
--		if (read_local_class(&di.bdaddr, cls) < 0) {
--			uint32_t class = htobl(main_opts.class);
--			memcpy(cp.dev_class, &class, 3);
--		} else {
--			if (!(main_opts.scan & SCAN_INQUIRY))
--				cls[1] &= 0xdf; /* Clear discoverable bit */
--			cls[2] = get_service_classes(&di.bdaddr);
--			memcpy(cp.dev_class, cls, 3);
--		}
--
--		hci_send_cmd(dd, OGF_HOST_CTL, OCF_WRITE_CLASS_OF_DEV,
--					WRITE_CLASS_OF_DEV_CP_SIZE, &cp);
--	}
--
- 	/* Set page timeout */
- 	if ((main_opts.flags & (1 << HCID_SET_PAGETO))) {
- 		write_page_timeout_cp cp;
-diff --git a/src/adapter.c b/src/adapter.c
-index bf69fcc..873b1bd 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1756,6 +1756,8 @@ static int adapter_setup(struct btd_adapter *adapter, const char *mode)
- 	uint8_t inqmode;
- 	int err , dd;
- 	char name[MAX_NAME_LENGTH + 1];
-+	uint8_t cls[3];
-+	uint32_t class;
- 
- 	dd = hci_open_dev(adapter->dev_id);
- 	if (dd < 0) {
-@@ -1815,9 +1817,28 @@ static int adapter_setup(struct btd_adapter *adapter, const char *mode)
- 							adapter->dev_id);
- 
- 	adapter_ops->set_name(adapter->dev_id, name);
-+
- 	if (g_str_equal(mode, "off"))
- 		strncpy((char *) adapter->dev.name, name, MAX_NAME_LENGTH);
- 
-+	/* Set device class */
-+	if (read_local_class(&adapter->bdaddr, cls) < 0) {
-+		class = htobl(main_opts.class);
-+		memcpy(cls, &class, 3);
-+	}
-+
-+	cls[2] = adapter->svc_cache;
-+
-+	class = (cls[2] << 16 | cls[1] << 8 | cls[0]);
-+
-+	if (hci_write_class_of_dev(dd, class, HCI_REQ_TIMEOUT) < 0) {
-+		err = -errno;
-+		error("Can't write class of device: %s (%d)",
-+						strerror(errno), errno);
-+		hci_close_dev(dd);
-+		return err;
-+	}
-+
- done:
- 	hci_close_dev(dd);
- 	return 0;
--- 
-1.5.6.3
+it is kernel coding style like everything else, but some variable naming
+should be consistent. And that is nothing that is published, that is
+something that has been done since Max wrote it. Check the rest of the
+code.
+
+> > The other Dave, please send patches to linux-bluetooth only and lets
+> > follow the normal path to get them merged into Linus' tree. Skipping
+> > bluetooth-2.6 is not an option. You have to use the same process than
+> > everybody else.
+> 
+> Why linux-bluetooth only? IMHO there could be more people to comment
+> and review  if I send patches to both lkml and subsystem mailing list.
+
+Lets me make this perfectly clear here. Bluetooth patches are sent to
+the linux-bluetooth mailing list. There is no need to send them to
+netdev and/or LKML at the same time. Stop this cross-posting. They don't
+get more review there anyway. I take care of sending them for net-2.6
+inclusion if I feel that they are appropriate.
+
+Regards
+
+Marcel
+
 
