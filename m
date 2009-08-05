@@ -1,20 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Subject: losing HCI connection over USB
-Date: Thu, 6 Aug 2009 00:32:42 -0700
-Message-ID: <236BF8CF9C36804E939BC8FEB21AEA1D175988@pdxemail.kittelson.com>
-From: "Ian Cameron" <icameron@kittelson.com>
-To: <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH]bluetooth: rfcomm_init bug fix
+From: Marcel Holtmann <marcel@holtmann.org>
+To: David Miller <davem@davemloft.net>
+Cc: hidave.darkstar@gmail.com, oliver@hartkopp.net,
+	alan@lxorguk.ukuu.org.uk, netdev@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20090805.093124.170466311.davem@davemloft.net>
+References: <1249405306.3094.18.camel@localhost.localdomain>
+	 <a8e1da0908042216u16037395k96cce0746baa504e@mail.gmail.com>
+	 <1249486555.3094.38.camel@localhost.localdomain>
+	 <20090805.093124.170466311.davem@davemloft.net>
+Content-Type: text/plain
+Date: Wed, 05 Aug 2009 10:03:33 -0700
+Message-Id: <1249491813.3094.99.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This happens with btusb or hci_usb module. I am using a USB dongle on an extender cable (about 3m long) and have tried on several different computers.  When I start using hcidump –V (lots of traffic) I start having radios drop out, but sometimes they drop with just hcitool commands.  lsusb lists the Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode) but hcitool dev does not list the device after it loses connection and hciconfig hci0 up gives errors such as Can’t init device hci0: Function not implemented (38).  If I try a hcitool command I get Invalid device: Network is down.  Dmesg has some errors, I think the relevant ones are:
+Hi Dave,
 
-hub 4-0:1.0: port 1 disabled by hub (EMI?), re-enabling
-btusb_intr_complete: hci0 urb f539e700 failed to resubmit (19)
-btusb_intr_complete: hci0 corrupted event packet
+> > Lets me make this perfectly clear here. Bluetooth patches are sent to
+> > the linux-bluetooth mailing list. There is no need to send them to
+> > netdev and/or LKML at the same time. Stop this cross-posting. They don't
+> > get more review there anyway. I take care of sending them for net-2.6
+> > inclusion if I feel that they are appropriate.
+> 
+> Some of that isn't true, I was reading over his patches as he
+> posted them.  So cross-posting to netdev is absolutely not a
+> waste of time IMHO.
 
-It only happens on USB extension cables... they are new USB 2.0 cables and only 10 feet long so I wonder what is going on or who to ask for help.  Does Bluez handle possible errors with sending commands and receiving events over a USB extension cable that may introduce some data loss, latency(?) or corruption between the host and controller?  It seems to drop out when there is a corrupted event packet.  Thank you for your time.
--Ian
+this is great and netdev might make sense from time to time, but for
+sure posting them to LKML is just noise. To be honest, if you wanna read
+Bluetooth patches before they are acked by me, you could subscribe to
+linux-bluetooth.
+
+Regards
+
+Marcel
+
+
