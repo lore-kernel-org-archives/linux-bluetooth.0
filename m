@@ -1,110 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 6 Aug 2009 15:44:48 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-To: "Lamarque V. Souza" <lamarque@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Subject: bluetooth-fix-for-acer-bluetooth-optical-rechargeable-mouse.patch
-Message-Id: <20090806154448.119b9e82.akpm@linux-foundation.org>
+Date: Thu, 6 Aug 2009 23:41:12 +0200
+From: Andreas Volz <lists@brachttal.net>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: Adressbook with bluez?
+Message-ID: <20090806234112.74b4677c@frodo.mittelerde>
+In-Reply-To: <5d223510908061344h7662962cqa197b9eefa40458a@mail.gmail.com>
+References: <20090803202404.5d62b6a4@frodo.mittelerde>
+	<20090804054928.GC26953@titan.makhutov-it.de>
+	<1249585049.27046.7.camel@delphi>
+	<20090806223746.53e8f28d@frodo.mittelerde>
+	<5d223510908061344h7662962cqa197b9eefa40458a@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Am Thu, 6 Aug 2009 17:44:22 -0300 schrieb Rafael Seste:
 
-So I'm still sitting on this patch because it fixes a real problem,
-only it fixes it in the wrong way.
+Hello Rafael,
 
-I will continue to sit on the patch (potentially for years) as a
-reminder that the underlying issue remains unfixed.
+Yes, this is what I need!
 
+Does someone know a lib to parse vcards? Or has anyone wrote some C++
+classes for it? Only to save me some stupid double work. On the first
+look the data looks easy, but if I look deeper into the vcard spec than
+I get a headache... :-)
 
-Someone please save me from this!
+regards
+Andreas
 
-
-From: Lamarque Vieira Souza <lamarque@gmail.com>
-
-Work around one problem with my Acer Bluetooth Optical Rechargeable Mouse
-where the cursor gets stuck at screen's upper-left corner.
-
-Even my notebook's touchpad is not able to move cursor when the bluetooth
-mouse is connected to my Acer Ferrari 4005 notebook.
-
-Using input session instead of hid session solves this problem although
-the cursor still moves a little sluggishly with the bluetooth mouse,
-cursor moves correctly using the touchpad.
-
-My bluetooth mouse used to work well (no sluggish) until kernel 2.6.21,
-since then the problems are getting worse with each kernel release (it got
-sluggish in 2.6.22 and this this upper-left corner problem appeared in
-2.6.28 or 2.6.27).
-
-The patch adds a general quirk handling framework to the HIDP core and
-then uses this framework to implement a quirk for this device.
-
-[akpm@linux-foundation.org: use ARRAY_SIZE()-based search]
-Signed-off-by: Lamarque V. Souza <lamarque@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Dave Young <hidave.darkstar@gmail.com>
-Cc: Jiri Kosina <jkosina@suse.cz>
-Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
----
-
- net/bluetooth/hidp/core.c |   39 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 38 insertions(+), 1 deletion(-)
-
-diff -puN net/bluetooth/hidp/core.c~bluetooth-fix-for-acer-bluetooth-optical-rechargeable-mouse net/bluetooth/hidp/core.c
---- a/net/bluetooth/hidp/core.c~bluetooth-fix-for-acer-bluetooth-optical-rechargeable-mouse
-+++ a/net/bluetooth/hidp/core.c
-@@ -73,6 +73,41 @@ static unsigned char hidp_keycode[256] =
- 
- static unsigned char hidp_mkeyspat[] = { 0x01, 0x01, 0x01, 0x01, 0x01, 0x01 };
- 
-+/* HIDP device quirks */
-+enum {
-+	HIDP_QUIRK_USE_INPUT_SESSION
-+};
-+
-+struct quirk_id {
-+	__u16 vendor;
-+	__u16 product;
-+	unsigned long quirks;
-+};
-+
-+static const struct quirk_id hidp_quirks[] = {
-+	{
-+		/* Lamarque: Acer Bluetooth Optical Rechargeable Mouse
-+		 * does not work properly with hid session since 2.6.27. */
-+		.vendor = 0x0458,
-+		.product = 0x0058,
-+		.quirks = 1 << HIDP_QUIRK_USE_INPUT_SESSION
-+	},
-+};
-+
-+static int quirk_test_bit(__u16 vendor, __u16 product, int quirk)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(hidp_quirks); i++) {
-+		const struct quirk_id *q = hidp_quirks + i;
-+
-+		if (q->vendor == vendor && q->product == product)
-+			return test_bit(quirk, &q->quirks);
-+	}
-+
-+	return 0;
-+}
-+
- static struct hidp_session *__hidp_get_session(bdaddr_t *bdaddr)
- {
- 	struct hidp_session *session;
-@@ -833,7 +868,9 @@ int hidp_add_connection(struct hidp_conn
- 	session->flags   = req->flags & (1 << HIDP_BLUETOOTH_VENDOR_ID);
- 	session->idle_to = req->idle_to;
- 
--	if (req->rd_size > 0) {
-+	if (req->rd_size > 0 &&
-+	    !quirk_test_bit(req->vendor, req->product,
-+			   HIDP_QUIRK_USE_INPUT_SESSION)) {
- 		err = hidp_setup_hid(session, req);
- 		if (err && err != -ENODEV)
- 			goto err_skb;
-_
+> You can find the bluez version of PBAP in the obex packet.
+> 
+> http://www.bluez.org/obexd-015/
+> 
+> 
+> 
+> On Thu, Aug 6, 2009 at 5:37 PM, Andreas Volz<lists@brachttal.net>
+> wrote:
+> > Am Thu, 06 Aug 2009 20:57:29 +0200 schrieb Per Thomas Jahr:
+> >
+> >> On Tue, 2009-08-04 at 07:49 +0200, Artem Makhutov wrote:
+> >> > > If not, what is missing in the implementation to get it
+> >> > > working?
+> >> >
+> >> > You need to send special AT-Commands over the rfcomm like to the
+> >> > phone.
+> >>
+> >> I guess also the Bluetooth profiles PBAP and PAB can be used for
+> >> this? Have no idea if bluez supports those profiles yet (some
+> >> googling indicates that they are being worked on).
+> >>
+> >> See:
+> >> http://en.wikipedia.org/wiki/Bluetooth_profile#Phone_Book_Access_Profile_.28PBAP.2C_PBA.29
+> >
+> > I found this:
+> >
+> > http://gitorious.org/bluez-sap/bluez-sap/commit/e5fb1b8e7c900f6d9f9aebab0f77a20dbfec3121
+> >
+> > Does someone know more about this. (I wrote also an E-Mail to the
+> > commiter).
+> >
+> > regards
+> > Andreas
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe
+> > linux-bluetooth" in the body of a message to
+> > majordomo@vger.kernel.org More majordomo info at
+> >  http://vger.kernel.org/majordomo-info.html
+> >
+> 
+> 
+> 
+> -- 
+> Rafael S. Seste
+> --
+> To unsubscribe from this list: send the line "unsubscribe
+> linux-bluetooth" in the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
