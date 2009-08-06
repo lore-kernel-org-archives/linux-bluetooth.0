@@ -1,37 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Modify PBAP SDP record.
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Jaikumar Ganesh <jaikumar@google.com>
-Cc: linux-bluetooth@vger.kernel.org, Zhu Lan <mtcb47@motorola.com>
-In-Reply-To: <1249588984-9043-1-git-send-email-jaikumar@google.com>
-References: <1249588984-9043-1-git-send-email-jaikumar@google.com>
-Content-Type: text/plain
-Date: Thu, 06 Aug 2009 13:09:41 -0700
-Message-Id: <1249589381.21101.22.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 6 Aug 2009 22:05:18 +0200 (CEST)
+From: Julia Lawall <julia@diku.dk>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: [PATCH 2/3] drivers/bluetooth: Add kmalloc NULL tests
+Message-ID: <Pine.LNX.4.64.0908062204290.19100@ask.diku.dk>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaikumar,
+From: Julia Lawall <julia@diku.dk>
 
-> Fix to pass PTS case TC_SDAS_BV_03_I(since PTS3.2 update2).
-> The code tried to append the UINT type value to the supported
-> respositories.  However, the wrong function sdp_seq_alloc()
-> was used. This function adds 2 redundant bytes (SDP_SEQ8 as
-> 0x35, seq) ahead of 0x08, so that latest PTS IOPT will fail.
-> According to spec, PBAP attributes should report 0x08 0x01
-> or 0x08 0x03 right after 0x0314. The correct function to use
-> is sdp_data_alloc(), with clean 0x08 0x01 appended as
-> SDP_ATTR_SUPPORTED_REPOSITORIES.
-> ---
->  tools/sdptool.c |    9 ++-------
->  1 files changed, 2 insertions(+), 7 deletions(-)
+Check that the result of kmalloc is not NULL before dereferencing it.
+The patch also replaces kmalloc + memset by kzalloc.
 
-can I get a version of this patch that applies cleanly when using git am
-please.
+The semantic match that finds this problem is as follows:
+(http://coccinelle.lip6.fr/)
 
-Regards
+// <smpl>
+@@
+expression *x;
+identifier f;
+constant char *C;
+@@
 
-Marcel
+x = \(kmalloc\|kcalloc\|kzalloc\)(...);
+... when != x == NULL
+    when != x != NULL
+    when != (x || ...)
+(
+kfree(x)
+|
+f(...,C,...,x,...)
+|
+*f(...,x,...)
+|
+*x->f
+)
+// </smpl>
 
+Signed-off-by: Julia Lawall <julia@diku.dk>
 
+---
+ drivers/bluetooth/btmrvl_sdio.c     |    5 +++--
+ 1 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+index 1cfa8b4..5b33b85 100644
+--- a/drivers/bluetooth/btmrvl_sdio.c
++++ b/drivers/bluetooth/btmrvl_sdio.c
+@@ -777,10 +777,11 @@ static int btmrvl_sdio_host_to_card(struct btmrvl_private *priv,
+ 	buf = payload;
+ 	if ((unsigned long) payload & (BTSDIO_DMA_ALIGN - 1)) {
+ 		tmpbufsz = ALIGN_SZ(nb, BTSDIO_DMA_ALIGN);
+-		tmpbuf = kmalloc(tmpbufsz, GFP_KERNEL);
+-		memset(tmpbuf, 0, tmpbufsz);
++		tmpbuf = kzalloc(tmpbufsz, GFP_KERNEL);
++		if (!tmpbuf)
++			return -ENOMEM;
+ 		buf = (u8 *) ALIGN_ADDR(tmpbuf, BTSDIO_DMA_ALIGN);
+ 		memcpy(buf, payload, nb);
+ 	}
