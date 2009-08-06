@@ -1,27 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A7B28D7.8040902@gmail.com>
-Date: Thu, 06 Aug 2009 21:02:47 +0200
-From: sancane <sancane@gmail.com>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: MCAP implementation in BlueZ
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: Adressbook with bluez?
+From: Per Thomas Jahr <perja@extern.uio.no>
+To: Artem Makhutov <artem@makhutov.org>
+Cc: Andreas Volz <lists@brachttal.net>, linux-bluetooth@vger.kernel.org
+In-Reply-To: <20090804054928.GC26953@titan.makhutov-it.de>
+References: <20090803202404.5d62b6a4@frodo.mittelerde>
+	 <20090804054928.GC26953@titan.makhutov-it.de>
+Content-Type: text/plain
+Date: Thu, 06 Aug 2009 20:57:29 +0200
+Message-Id: <1249585049.27046.7.camel@delphi>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
-I have seen that BlueZ has begun to incorporate enhanced retransmission
-mode support to L2CAP. This is a happy new because i work with medical
-devices that have begun to incorporate health device profile (HDP) in
-bluetooth communications. I would like to use that devices in linux and
-i saw that MCAP is not included in the bluetooth linux stack so i was
-thinking in develop it for BlueZ.
-I've studying the possibility of integrate it as kernel module like
-rfcomm does but  i have some doubts about that approximation. I think
-that it is not the best place for it and i believe that is better
-develop MCAP in user space.
+On Tue, 2009-08-04 at 07:49 +0200, Artem Makhutov wrote:
+> > If not, what is missing in the implementation to get it working?
+> 
+> You need to send special AT-Commands over the rfcomm like to the phone.
 
-Can anybody give some feedback before to start to implement this
-functionality? advices and recommendations are welcome.
+I guess also the Bluetooth profiles PBAP and PAB can be used for this?
+Have no idea if bluez supports those profiles yet (some googling
+indicates that they are being worked on).
 
-kind regards!
+See:
+http://en.wikipedia.org/wiki/Bluetooth_profile#Phone_Book_Access_Profile_.28PBAP.2C_PBA.29
+
+
+Regards
+--
+Per Thomas Jahr
+
