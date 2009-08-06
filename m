@@ -1,80 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 6 Aug 2009 23:41:12 +0200
-From: Andreas Volz <lists@brachttal.net>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: Adressbook with bluez?
-Message-ID: <20090806234112.74b4677c@frodo.mittelerde>
-In-Reply-To: <5d223510908061344h7662962cqa197b9eefa40458a@mail.gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20090806225726.28631666@frodo.mittelerde>
 References: <20090803202404.5d62b6a4@frodo.mittelerde>
-	<20090804054928.GC26953@titan.makhutov-it.de>
-	<1249585049.27046.7.camel@delphi>
-	<20090806223746.53e8f28d@frodo.mittelerde>
-	<5d223510908061344h7662962cqa197b9eefa40458a@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+	 <20090804054928.GC26953@titan.makhutov-it.de>
+	 <20090804183208.31a857c4@frodo.mittelerde>
+	 <20090806100546.GA20689@titan.makhutov-it.de>
+	 <20090806225726.28631666@frodo.mittelerde>
+Date: Thu, 6 Aug 2009 18:20:47 -0300
+Message-ID: <5d223510908061420w6562f704r76027ba8ae670321@mail.gmail.com>
+Subject: Re: Adressbook with bluez?
+From: Rafael Seste <rseste@gmail.com>
+To: Andreas Volz <lists@brachttal.net>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am Thu, 6 Aug 2009 17:44:22 -0300 schrieb Rafael Seste:
-
-Hello Rafael,
-
-Yes, this is what I need!
-
-Does someone know a lib to parse vcards? Or has anyone wrote some C++
-classes for it? Only to save me some stupid double work. On the first
-look the data looks easy, but if I look deeper into the vcard spec than
-I get a headache... :-)
-
-regards
-Andreas
-
-> You can find the bluez version of PBAP in the obex packet.
-> 
-> http://www.bluez.org/obexd-015/
-> 
-> 
-> 
-> On Thu, Aug 6, 2009 at 5:37 PM, Andreas Volz<lists@brachttal.net>
-> wrote:
-> > Am Thu, 06 Aug 2009 20:57:29 +0200 schrieb Per Thomas Jahr:
-> >
-> >> On Tue, 2009-08-04 at 07:49 +0200, Artem Makhutov wrote:
-> >> > > If not, what is missing in the implementation to get it
-> >> > > working?
-> >> >
-> >> > You need to send special AT-Commands over the rfcomm like to the
-> >> > phone.
-> >>
-> >> I guess also the Bluetooth profiles PBAP and PAB can be used for
-> >> this? Have no idea if bluez supports those profiles yet (some
-> >> googling indicates that they are being worked on).
-> >>
-> >> See:
-> >> http://en.wikipedia.org/wiki/Bluetooth_profile#Phone_Book_Access_Profile_.28PBAP.2C_PBA.29
-> >
-> > I found this:
-> >
-> > http://gitorious.org/bluez-sap/bluez-sap/commit/e5fb1b8e7c900f6d9f9aebab0f77a20dbfec3121
-> >
-> > Does someone know more about this. (I wrote also an E-Mail to the
-> > commiter).
-> >
-> > regards
-> > Andreas
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe
-> > linux-bluetooth" in the body of a message to
-> > majordomo@vger.kernel.org More majordomo info at
-> > Â http://vger.kernel.org/majordomo-info.html
-> >
-> 
-> 
-> 
-> -- 
-> Rafael S. Seste
+On Thu, Aug 6, 2009 at 5:57 PM, Andreas Volz<lists@brachttal.net> wrote:
+>
+> I found some docs about Nokia (fitting for me) AT commands:
+>
+> http://www.activexperts.com/xmstoolkit/atcommands/nokia/
+>
+> I see that it's also possible to do stuff (e.g. initiate a call) that
+> works also with HFP. I assume this is better to do with a defined
+> protocol, not? (e.g. with HFP for Linux[1]).
+>
+> regards
+> Andreas
+>
+> [1] http://nohands.sourceforge.net
+>
 > --
-> To unsubscribe from this list: send the line "unsubscribe
-> linux-bluetooth" in the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+
+
+This python scripts returns the first five contacts from the default
+phonebook using handsfree profile it works for my nokia phone.
+
+#!/usr/bin/python
+import bluetooth
+
+sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+conn = sock.connect((<bluetooth device address>, <HF port>))
+
+sock.send("AT+CPBR=1,5\r")
+print sock.recv(1024)
+print sock.recv(1024)
+print sock.recv(1024)
+print sock.recv(1024)
+print sock.recv(1024)
+print sock.recv(1024)
+
+sock.close()
+
+
+-- 
+Rafael S. Seste
