@@ -1,52 +1,20 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 6 Aug 2009 12:05:46 +0200
-From: Artem Makhutov <artem@makhutov.org>
-To: Andreas Volz <lists@brachttal.net>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Adressbook with bluez?
-Message-ID: <20090806100546.GA20689@titan.makhutov-it.de>
-References: <20090803202404.5d62b6a4@frodo.mittelerde> <20090804054928.GC26953@titan.makhutov-it.de> <20090804183208.31a857c4@frodo.mittelerde>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20090804183208.31a857c4@frodo.mittelerde>
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Subject: losing HCI connection over USB
+Date: Thu, 6 Aug 2009 00:32:42 -0700
+Message-ID: <236BF8CF9C36804E939BC8FEB21AEA1D175988@pdxemail.kittelson.com>
+From: "Ian Cameron" <icameron@kittelson.com>
+To: <linux-bluetooth@vger.kernel.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This happens with btusb or hci_usb module. I am using a USB dongle on an extender cable (about 3m long) and have tried on several different computers.  When I start using hcidump –V (lots of traffic) I start having radios drop out, but sometimes they drop with just hcitool commands.  lsusb lists the Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode) but hcitool dev does not list the device after it loses connection and hciconfig hci0 up gives errors such as Can’t init device hci0: Function not implemented (38).  If I try a hcitool command I get Invalid device: Network is down.  Dmesg has some errors, I think the relevant ones are:
 
-On Tue, Aug 04, 2009 at 06:32:08PM +0200, Andreas Volz wrote:
-> Am Tue, 4 Aug 2009 07:49:28 +0200 schrieb Artem Makhutov:
-> 
-> > Hello,
-> > 
-> > n Mon, Aug 03, 2009 at 08:24:04PM +0200, Andreas Volz wrote:
-> > > Hello,
-> > > 
-> > > I like to read out the address book of my bluetooth phone with
-> > > bluez. I didn't find any info about this.
-> > > 
-> > > Is this possible?
-> > > 
-> > > If not, what is missing in the implementation to get it working?
-> > 
-> > You need to send special AT-Commands over the rfcomm like to the
-> > phone.
-> 
-> Thanks for your fast answer?
-> 
-> How should I do this practically? Could I use minicom? Could I simply
-> open /dev/rfcomm0 and read and write on it?
+hub 4-0:1.0: port 1 disabled by hub (EMI?), re-enabling
+btusb_intr_complete: hci0 urb f539e700 failed to resubmit (19)
+btusb_intr_complete: hci0 corrupted event packet
 
-Yes, you can do it this way.
-
-> What commands should I send?
-> 
-> Are there some more docs/examples about this or could you give me more
-> information?
-
-I don't know the commands, but you should be able to find them in the internet.
-Just search for AT Command Refernece.
-
-The commands are also different between the vendors. Each vendor has custom AT Commands.
-
-Regards, Artem
+It only happens on USB extension cables... they are new USB 2.0 cables and only 10 feet long so I wonder what is going on or who to ask for help.  Does Bluez handle possible errors with sending commands and receiving events over a USB extension cable that may introduce some data loss, latency(?) or corruption between the host and controller?  It seems to drop out when there is a corrupted event packet.  Thank you for your time.
+-Ian
