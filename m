@@ -1,69 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 6 Aug 2009 22:57:26 +0200
-From: Andreas Volz <lists@brachttal.net>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: Adressbook with bluez?
-Message-ID: <20090806225726.28631666@frodo.mittelerde>
-In-Reply-To: <20090806100546.GA20689@titan.makhutov-it.de>
+MIME-Version: 1.0
+In-Reply-To: <20090806223746.53e8f28d@frodo.mittelerde>
 References: <20090803202404.5d62b6a4@frodo.mittelerde>
-	<20090804054928.GC26953@titan.makhutov-it.de>
-	<20090804183208.31a857c4@frodo.mittelerde>
-	<20090806100546.GA20689@titan.makhutov-it.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+	 <20090804054928.GC26953@titan.makhutov-it.de>
+	 <1249585049.27046.7.camel@delphi>
+	 <20090806223746.53e8f28d@frodo.mittelerde>
+Date: Thu, 6 Aug 2009 17:44:22 -0300
+Message-ID: <5d223510908061344h7662962cqa197b9eefa40458a@mail.gmail.com>
+Subject: Re: Adressbook with bluez?
+From: Rafael Seste <rseste@gmail.com>
+To: Andreas Volz <lists@brachttal.net>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am Thu, 6 Aug 2009 12:05:46 +0200 schrieb Artem Makhutov:
+You can find the bluez version of PBAP in the obex packet.
 
-> Hi,
-> 
-> On Tue, Aug 04, 2009 at 06:32:08PM +0200, Andreas Volz wrote:
-> > Am Tue, 4 Aug 2009 07:49:28 +0200 schrieb Artem Makhutov:
-> > 
-> > > Hello,
-> > > 
-> > > n Mon, Aug 03, 2009 at 08:24:04PM +0200, Andreas Volz wrote:
-> > > > Hello,
-> > > > 
-> > > > I like to read out the address book of my bluetooth phone with
-> > > > bluez. I didn't find any info about this.
-> > > > 
-> > > > Is this possible?
-> > > > 
-> > > > If not, what is missing in the implementation to get it working?
-> > > 
-> > > You need to send special AT-Commands over the rfcomm like to the
-> > > phone.
-> > 
-> > Thanks for your fast answer?
-> > 
-> > How should I do this practically? Could I use minicom? Could I
-> > simply open /dev/rfcomm0 and read and write on it?
-> 
-> Yes, you can do it this way.
-> 
-> > What commands should I send?
-> > 
-> > Are there some more docs/examples about this or could you give me
-> > more information?
-> 
-> I don't know the commands, but you should be able to find them in the
-> internet. Just search for AT Command Refernece.
-> 
-> The commands are also different between the vendors. Each vendor has
-> custom AT Commands.
+http://www.bluez.org/obexd-015/
 
-I found some docs about Nokia (fitting for me) AT commands:
 
-http://www.activexperts.com/xmstoolkit/atcommands/nokia/
 
-I see that it's also possible to do stuff (e.g. initiate a call) that
-works also with HFP. I assume this is better to do with a defined
-protocol, not? (e.g. with HFP for Linux[1]).
+On Thu, Aug 6, 2009 at 5:37 PM, Andreas Volz<lists@brachttal.net> wrote:
+> Am Thu, 06 Aug 2009 20:57:29 +0200 schrieb Per Thomas Jahr:
+>
+>> On Tue, 2009-08-04 at 07:49 +0200, Artem Makhutov wrote:
+>> > > If not, what is missing in the implementation to get it working?
+>> >
+>> > You need to send special AT-Commands over the rfcomm like to the
+>> > phone.
+>>
+>> I guess also the Bluetooth profiles PBAP and PAB can be used for this?
+>> Have no idea if bluez supports those profiles yet (some googling
+>> indicates that they are being worked on).
+>>
+>> See:
+>> http://en.wikipedia.org/wiki/Bluetooth_profile#Phone_Book_Access_Profile_.28PBAP.2C_PBA.29
+>
+> I found this:
+>
+> http://gitorious.org/bluez-sap/bluez-sap/commit/e5fb1b8e7c900f6d9f9aebab0f77a20dbfec3121
+>
+> Does someone know more about this. (I wrote also an E-Mail to the
+> commiter).
+>
+> regards
+> Andreas
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
 
-regards
-Andreas
 
-[1] http://nohands.sourceforge.net
 
+-- 
+Rafael S. Seste
