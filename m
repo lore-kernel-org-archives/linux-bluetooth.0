@@ -1,29 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: losing HCI connection over USB
+Subject: Re: MCAP implementation in BlueZ
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Ian Cameron <icameron@kittelson.com>
+To: sancane <sancane@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <236BF8CF9C36804E939BC8FEB21AEA1D175988@pdxemail.kittelson.com>
-References: <236BF8CF9C36804E939BC8FEB21AEA1D175988@pdxemail.kittelson.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Thu, 06 Aug 2009 13:13:04 -0700
-Message-Id: <1249589584.21101.26.camel@localhost.localdomain>
+In-Reply-To: <4A7B28D7.8040902@gmail.com>
+References: <4A7B28D7.8040902@gmail.com>
+Content-Type: text/plain
+Date: Thu, 06 Aug 2009 13:12:24 -0700
+Message-Id: <1249589544.21101.25.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ian,
+Hi,
 
-> This happens with btusb or hci_usb module. I am using a USB dongle on an extender cable (about 3m long) and have tried on several different computers.  When I start using hcidump –V (lots of traffic) I start having radios drop out, but sometimes they drop with just hcitool commands.  lsusb lists the Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode) but hcitool dev does not list the device after it loses connection and hciconfig hci0 up gives errors such as Can’t init device hci0: Function not implemented (38).  If I try a hcitool command I get Invalid device: Network is down.  Dmesg has some errors, I think the relevant ones are:
-> 
-> hub 4-0:1.0: port 1 disabled by hub (EMI?), re-enabling
-> btusb_intr_complete: hci0 urb f539e700 failed to resubmit (19)
-> btusb_intr_complete: hci0 corrupted event packet
-> 
-> It only happens on USB extension cables... they are new USB 2.0 cables and only 10 feet long so I wonder what is going on or who to ask for help.  Does Bluez handle possible errors with sending commands and receiving events over a USB extension cable that may introduce some data loss, latency(?) or corruption between the host and controller?  It seems to drop out when there is a corrupted event packet.  Thank you for your time.
+> I have seen that BlueZ has begun to incorporate enhanced retransmission
+> mode support to L2CAP. This is a happy new because i work with medical
+> devices that have begun to incorporate health device profile (HDP) in
+> bluetooth communications. I would like to use that devices in linux and
+> i saw that MCAP is not included in the bluetooth linux stack so i was
+> thinking in develop it for BlueZ.
+> I've studying the possibility of integrate it as kernel module like
+> rfcomm does but  i have some doubts about that approximation. I think
+> that it is not the best place for it and i believe that is better
+> develop MCAP in user space.
 
-this question might be better asked on the USB mailing list. It is not a
-real Bluetooth problem.
+you wanna do that in userspace (like we did with AVDTP). The kernel
+option would be only required if it interacts with another kernel
+subsystem which I highly doubt.
+
+Currently it is not 100% clear what will be the best implementation of
+HDP, but there are two choices. First one would be a bluetoothd plugin
+or second would be similar to what obexd is doing. The real question
+here is if it runs more in the user session or as a system daemon.
 
 Regards
 
