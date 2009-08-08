@@ -2,244 +2,123 @@ Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org, gustavo@padovan.org
-Subject: [PATCH 4/5] Bluetooth: Add support for Retransmission and Monitor Timers
-Date: Sat,  8 Aug 2009 17:03:11 -0300
-Message-Id: <1249761792-21148-4-git-send-email-gustavo@las.ic.unicamp.br>
-In-Reply-To: <1249761792-21148-3-git-send-email-gustavo@las.ic.unicamp.br>
+Subject: [PATCH 3/5] Bluetooth: Initial support for retransmission of packets with REJ frames
+Date: Sat,  8 Aug 2009 17:03:10 -0300
+Message-Id: <1249761792-21148-3-git-send-email-gustavo@las.ic.unicamp.br>
+In-Reply-To: <1249761792-21148-2-git-send-email-gustavo@las.ic.unicamp.br>
 References: <1249761792-21148-1-git-send-email-gustavo@las.ic.unicamp.br>
  <1249761792-21148-2-git-send-email-gustavo@las.ic.unicamp.br>
- <1249761792-21148-3-git-send-email-gustavo@las.ic.unicamp.br>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-L2CAP uses rentransmission and monitor timers to inquiry the other side
-about unacked I-frames. After send each I-frame we (re)start the
-retransmission timer, if it expires, we start a monitor timer that send a
-S-frame with P bit set and wait for S-frame with F bit set.
-If monitor timer expires, it try again, at a maximum of
-L2CAP_DEFAULT_MAX_TX.
+When receiving an I-frame with unexpected txSeq, receiver side start the
+recovery procedure by sending a REJ S-frame to the transmitter side. So
+the transmitter can re-send the lost I-frame.
+This patch just adds a basic support for retransmission, it doesn't
+mean that ERTM now has full support to packet retransmission.
 
 Signed-off-by: Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
 ---
- include/net/bluetooth/bluetooth.h |    1 +
- include/net/bluetooth/l2cap.h     |   15 ++++++-
- net/bluetooth/l2cap.c             |   80 +++++++++++++++++++++++++++++++++++--
- 3 files changed, 89 insertions(+), 7 deletions(-)
+ include/net/bluetooth/l2cap.h |    1 +
+ net/bluetooth/l2cap.c         |   57 +++++++++++++++++++++++++++++++----------
+ 2 files changed, 44 insertions(+), 14 deletions(-)
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 65a5cf8..b8b9a84 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -139,6 +139,7 @@ struct bt_skb_cb {
- 	__u8 pkt_type;
- 	__u8 incoming;
- 	__u8 tx_seq;
-+	__u8 retries;
- };
- #define bt_cb(skb) ((struct bt_skb_cb *)((skb)->cb))
- 
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index a1d8ec4..33aea42 100644
+index 0afde8d..a1d8ec4 100644
 --- a/include/net/bluetooth/l2cap.h
 +++ b/include/net/bluetooth/l2cap.h
-@@ -31,9 +31,9 @@
- #define L2CAP_DEFAULT_FLUSH_TO		0xffff
- #define L2CAP_DEFAULT_TX_WINDOW		63
- #define L2CAP_DEFAULT_NUM_TO_ACK        (L2CAP_DEFAULT_TX_WINDOW/5)
--#define L2CAP_DEFAULT_MAX_RECEIVE	1
--#define L2CAP_DEFAULT_RETRANS_TO	300    /* 300 milliseconds */
--#define L2CAP_DEFAULT_MONITOR_TO	1000   /* 1 second */
-+#define L2CAP_DEFAULT_MAX_TX		3
-+#define L2CAP_DEFAULT_RETRANS_TO	1000    /* 1 second */
-+#define L2CAP_DEFAULT_MONITOR_TO	12000   /* 12 seconds */
- #define L2CAP_DEFAULT_MAX_PDU_SIZE	672
- 
- #define L2CAP_CONN_TIMEOUT	(40000) /* 40 seconds */
-@@ -318,6 +318,7 @@ struct l2cap_pinfo {
- 	__u8		req_seq;
- 	__u8		expected_tx_seq;
- 	__u8		unacked_frames;
-+	__u8		retry_count;
- 	__u8		num_to_ack;
- 	__u16		sdu_len;
- 	__u16		partial_sdu_len;
-@@ -333,6 +334,8 @@ struct l2cap_pinfo {
- 
- 	__le16		sport;
- 
-+	struct timer_list	retrans_timer;
-+	struct timer_list	monitor_timer;
- 	struct sk_buff_head	tx_queue;
- 	struct l2cap_conn	*conn;
- 	struct sock		*next_c;
-@@ -352,6 +355,12 @@ struct l2cap_pinfo {
+@@ -351,6 +351,7 @@ struct l2cap_pinfo {
+ #define L2CAP_CONF_MAX_CONF_RSP 2
  
  #define L2CAP_CONN_SAR_SDU         0x01
- #define L2CAP_CONN_UNDER_REJ       0x02
-+#define L2CAP_CONN_WAIT_ACK        0x04
-+
-+#define __mod_retrans_timer() mod_timer(&l2cap_pi(sk)->retrans_timer, \
-+		jiffies +  msecs_to_jiffies(L2CAP_DEFAULT_RETRANS_TO));
-+#define __mod_monitor_timer() mod_timer(&l2cap_pi(sk)->monitor_timer, \
-+		jiffies + msecs_to_jiffies(L2CAP_DEFAULT_MONITOR_TO));
++#define L2CAP_CONN_UNDER_REJ       0x02
  
  static inline int l2cap_tx_window_full(struct sock *sk)
  {
 diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index c7dec70..f04beba 100644
+index d9bb45c..c7dec70 100644
 --- a/net/bluetooth/l2cap.c
 +++ b/net/bluetooth/l2cap.c
-@@ -1178,6 +1178,37 @@ static int l2cap_sock_getname(struct socket *sock, struct sockaddr *addr, int *l
- 	return 0;
- }
+@@ -2952,22 +2952,36 @@ static inline int l2cap_data_channel_iframe(struct sock *sk, u16 rx_control, str
  
-+static void l2cap_monitor_timeout(unsigned long arg)
-+{
-+	struct sock *sk = (void *) arg;
-+	u16 control;
-+
-+	if (l2cap_pi(sk)->retry_count >= l2cap_pi(sk)->remote_max_tx) {
-+		l2cap_send_disconn_req(l2cap_pi(sk)->conn, sk);
-+		return;
-+	}
-+
-+	l2cap_pi(sk)->retry_count++;
-+	__mod_monitor_timer();
-+
-+	control = L2CAP_CTRL_POLL;
-+	l2cap_send_sframe(l2cap_pi(sk), control);
-+}
-+
-+static void l2cap_retrans_timeout(unsigned long arg)
-+{
-+	struct sock *sk = (void *) arg;
-+	u16 control;
-+
-+	l2cap_pi(sk)->retry_count = 1;
-+	__mod_monitor_timer();
-+
-+	l2cap_pi(sk)->conn_state |= L2CAP_CONN_WAIT_ACK;
-+
-+	control = L2CAP_CTRL_POLL;
-+	l2cap_send_sframe(l2cap_pi(sk), control);
-+}
-+
- static void l2cap_drop_acked_frames(struct sock *sk)
- {
- 	struct sk_buff *skb;
-@@ -1192,6 +1223,9 @@ static void l2cap_drop_acked_frames(struct sock *sk)
- 		l2cap_pi(sk)->unacked_frames--;
- 	}
+ 	BT_DBG("sk %p rx_control 0x%4.4x len %d", sk, rx_control, skb->len);
  
-+	if (!l2cap_pi(sk)->unacked_frames)
-+		del_timer(&l2cap_pi(sk)->retrans_timer);
+-	if (tx_seq != pi->expected_tx_seq)
+-		return -EINVAL;
++	if (tx_seq == pi->expected_tx_seq) {
++		if (pi->conn_state & L2CAP_CONN_UNDER_REJ)
++			pi->conn_state &= ~L2CAP_CONN_UNDER_REJ;
+ 
+-	err = l2cap_sar_reassembly_sdu(sk, skb, rx_control, tx_seq);
+-	if (err < 0)
+-		return err;
++		err = l2cap_sar_reassembly_sdu(sk, skb, rx_control, tx_seq);
++		if (err < 0)
++			return err;
 +
- 	return;
- }
- 
-@@ -1217,9 +1251,20 @@ static int l2cap_ertm_send(struct sock *sk)
- 	u16 *control;
- 	int err;
- 
-+	if (pi->conn_state & L2CAP_CONN_WAIT_ACK)
-+		return 0;
-+
- 	while ((skb = sk->sk_send_head) && (!l2cap_tx_window_full(sk))) {
- 		tx_skb = skb_clone(skb, GFP_ATOMIC);
- 
-+		if (pi->remote_max_tx &&
-+				bt_cb(skb)->retries == pi->remote_max_tx) {
-+			l2cap_send_disconn_req(pi->conn, sk);
-+			break;
++		pi->expected_tx_seq = (pi->expected_tx_seq + 1) % 64;
++		pi->num_to_ack = (pi->num_to_ack + 1) % L2CAP_DEFAULT_NUM_TO_ACK;
++		if (pi->num_to_ack == L2CAP_DEFAULT_NUM_TO_ACK - 1) {
++			tx_control |= L2CAP_SUPER_RCV_READY;
++			tx_control |= pi->expected_tx_seq << L2CAP_CTRL_REQSEQ_SHIFT;
++			goto send;
 +		}
-+
-+		bt_cb(skb)->retries++;
-+
- 		control = (u16 *)(skb->data + L2CAP_HDR_SIZE);
- 		*control |= cpu_to_le16(
- 				(pi->req_seq << L2CAP_CTRL_REQSEQ_SHIFT)
-@@ -1230,6 +1275,7 @@ static int l2cap_ertm_send(struct sock *sk)
- 			l2cap_send_disconn_req(pi->conn, sk);
- 			return err;
- 		}
-+		__mod_retrans_timer();
++	} else {
++		/* Unexpected txSeq. Send a REJ S-frame */
++		kfree_skb(skb);
++		if (!(pi->conn_state & L2CAP_CONN_UNDER_REJ)) {
++			tx_control |= L2CAP_SUPER_REJECT;
++			tx_control |= pi->expected_tx_seq << L2CAP_CTRL_REQSEQ_SHIFT;
++			pi->conn_state |= L2CAP_CONN_UNDER_REJ;
  
- 		bt_cb(skb)->tx_seq = pi->next_tx_seq;
- 		pi->next_tx_seq = (pi->next_tx_seq + 1) % 64;
-@@ -1366,6 +1412,8 @@ static struct sk_buff *l2cap_create_ertm_pdu(struct sock *sk, struct msghdr *msg
- 		kfree_skb(skb);
- 		return ERR_PTR(err);
+-	pi->expected_tx_seq = (pi->expected_tx_seq + 1) % 64;
+-	pi->num_to_ack = (pi->num_to_ack + 1) % L2CAP_DEFAULT_NUM_TO_ACK;
+-	if (pi->num_to_ack == L2CAP_DEFAULT_NUM_TO_ACK - 1) {
+-		tx_control |= L2CAP_CTRL_FRAME_TYPE;
+-		tx_control |= L2CAP_SUPER_RCV_READY;
+-		tx_control |= pi->expected_tx_seq << L2CAP_CTRL_REQSEQ_SHIFT;
+-		err = l2cap_send_sframe(pi, tx_control);
++			goto send;
++		}
  	}
+-	return err;
++	return 0;
 +
-+	bt_cb(skb)->retries = 0;
- 	return skb;
++send:
++	return l2cap_send_sframe(pi, tx_control);
  }
  
-@@ -2059,7 +2107,7 @@ done:
- 	case L2CAP_MODE_ERTM:
- 		rfc.mode            = L2CAP_MODE_ERTM;
- 		rfc.txwin_size      = L2CAP_DEFAULT_TX_WINDOW;
--		rfc.max_transmit    = L2CAP_DEFAULT_MAX_RECEIVE;
-+		rfc.max_transmit    = L2CAP_DEFAULT_MAX_TX;
- 		rfc.retrans_timeout = 0;
- 		rfc.monitor_timeout = 0;
- 		rfc.max_pdu_size    = cpu_to_le16(L2CAP_DEFAULT_MAX_PDU_SIZE);
-@@ -2554,6 +2602,12 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 		l2cap_pi(sk)->next_tx_seq = 0;
- 		l2cap_pi(sk)->expected_ack_seq = 0;
- 		l2cap_pi(sk)->unacked_frames = 0;
-+
-+		setup_timer(&l2cap_pi(sk)->retrans_timer,
-+				l2cap_retrans_timeout, (unsigned long) sk);
-+		setup_timer(&l2cap_pi(sk)->monitor_timer,
-+				l2cap_monitor_timeout, (unsigned long) sk);
-+
- 		__skb_queue_head_init(TX_QUEUE(sk));
- 		l2cap_chan_ready(sk);
- 		goto unlock;
-@@ -2663,6 +2717,8 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn, struct l2cap_cmd
- 	sk->sk_shutdown = SHUTDOWN_MASK;
- 
- 	skb_queue_purge(TX_QUEUE(sk));
-+	del_timer(&l2cap_pi(sk)->retrans_timer);
-+	del_timer(&l2cap_pi(sk)->monitor_timer);
- 
- 	l2cap_chan_del(sk, ECONNRESET);
- 	bh_unlock_sock(sk);
-@@ -2687,6 +2743,8 @@ static inline int l2cap_disconnect_rsp(struct l2cap_conn *conn, struct l2cap_cmd
- 		return 0;
- 
- 	skb_queue_purge(TX_QUEUE(sk));
-+	del_timer(&l2cap_pi(sk)->retrans_timer);
-+	del_timer(&l2cap_pi(sk)->monitor_timer);
- 
- 	l2cap_chan_del(sk, 0);
- 	bh_unlock_sock(sk);
-@@ -2992,9 +3050,23 @@ static inline int l2cap_data_channel_sframe(struct sock *sk, u16 rx_control, str
- 
- 	switch (rx_control & L2CAP_CTRL_SUPERVISE) {
- 	case L2CAP_SUPER_RCV_READY:
--		pi->expected_ack_seq = __get_reqseq(rx_control);
--		l2cap_drop_acked_frames(sk);
--		l2cap_ertm_send(sk);
-+		if (rx_control & L2CAP_CTRL_POLL) {
-+			u16 control = L2CAP_CTRL_FINAL;
-+			l2cap_send_sframe(l2cap_pi(sk), control);
-+		} else if (rx_control & L2CAP_CTRL_FINAL) {
-+			if (pi->conn_state & L2CAP_CONN_WAIT_ACK)
-+				break;
-+
-+			pi->conn_state &= !L2CAP_CONN_WAIT_ACK;
-+			del_timer(&pi->monitor_timer);
-+
-+			if (pi->unacked_frames > 0)
-+				__mod_retrans_timer();
-+		} else {
-+			pi->expected_ack_seq = __get_reqseq(rx_control);
-+			l2cap_drop_acked_frames(sk);
-+			l2cap_ertm_send(sk);
-+		}
+ static inline int l2cap_data_channel_sframe(struct sock *sk, u16 rx_control, struct sk_buff *skb)
+@@ -2983,8 +2997,18 @@ static inline int l2cap_data_channel_sframe(struct sock *sk, u16 rx_control, str
+ 		l2cap_ertm_send(sk);
  		break;
  
+-	case L2CAP_SUPER_RCV_NOT_READY:
  	case L2CAP_SUPER_REJECT:
++		pi->expected_ack_seq = __get_reqseq(rx_control);
++		l2cap_drop_acked_frames(sk);
++
++		sk->sk_send_head = TX_QUEUE(sk)->next;
++		pi->next_tx_seq = pi->expected_ack_seq;
++
++		l2cap_ertm_send(sk);
++
++		break;
++
++	case L2CAP_SUPER_RCV_NOT_READY:
+ 	case L2CAP_SUPER_SELECT_REJECT:
+ 		break;
+ 	}
+@@ -3031,6 +3055,11 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+ 		if (__is_sar_start(control))
+ 			len -= 2;
+ 
++		/*
++		 * We can just drop the corrupted I-frame here.
++		 * Receiver will miss it and start proper recovery
++		 * procedures and ask retransmission.
++		 */
+ 		if (len > L2CAP_DEFAULT_MAX_PDU_SIZE)
+ 			goto drop;
+ 
 -- 
 1.6.3.3
