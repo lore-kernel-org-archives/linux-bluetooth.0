@@ -1,50 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
+From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
+To: linux-bluetooth@vger.kernel.org
+Cc: gustavo@padovan.org
+Subject: [PATCH 2/2] l2test: Add support to set the FCS value
+Date: Sun,  9 Aug 2009 07:05:58 -0300
+Message-Id: <1249812358-30344-2-git-send-email-gustavo@las.ic.unicamp.br>
 In-Reply-To: <1249812358-30344-1-git-send-email-gustavo@las.ic.unicamp.br>
 References: <1249812358-30344-1-git-send-email-gustavo@las.ic.unicamp.br>
-Date: Sun, 9 Aug 2009 07:15:24 -0300
-Message-ID: <6b53b1990908090315q1a144740ka06749541497a56c@mail.gmail.com>
-Subject: Re: [PATCH 1/2] Add fcs to l2cap_options
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, Aug 9, 2009 at 7:05 AM, Gustavo F.
-Padovan<gustavo@las.ic.unicamp.br> wrote:
-> Enable set of the FCS Option on userland. Need a kernel with support to
-> FCS.
-> ---
->  include/l2cap.h |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
->
-> diff --git a/include/l2cap.h b/include/l2cap.h
-> index 8bede46..23a4820 100644
-> --- a/include/l2cap.h
-> +++ b/include/l2cap.h
-> @@ -51,6 +51,7 @@ struct l2cap_options {
->        uint16_t        imtu;
->        uint16_t        flush_to;
->        uint8_t         mode;
-> +       uint8_t         fcs;
->  };
->
->  #define L2CAP_CONNINFO 0x02
-> --
-> 1.6.3.3
+Passing the -f option we can set the value for FCS (a crc16 check for
+l2cap packets).
+---
+ test/l2test.c |   14 +++++++++++++-
+ 1 files changed, 13 insertions(+), 1 deletions(-)
 
-
-These two patches can't be applied now, they need the FCS support in
-kernel side. I sent them to here just for one that wanna test the
-kernel side patch.
-
-
->
->
-
-
-
+diff --git a/test/l2test.c b/test/l2test.c
+index 6ba50c3..a503f26 100644
+--- a/test/l2test.c
++++ b/test/l2test.c
+@@ -70,6 +70,9 @@ static unsigned char *buf;
+ static int imtu = 672;
+ static int omtu = 0;
+ 
++/* Default FCS option */
++static int fcs = 0x01;
++
+ /* Default data size */
+ static long data_size = -1;
+ static long buffer_size = 2048;
+@@ -220,6 +223,8 @@ static int do_connect(char *svr)
+ 	if (rfcmode > 0)
+ 		opts.mode = rfcmode;
+ 
++	opts.fcs = fcs;
++
+ 	if (setsockopt(sk, SOL_L2CAP, L2CAP_OPTIONS, &opts, sizeof(opts)) < 0) {
+ 		syslog(LOG_ERR, "Can't set L2CAP options: %s (%d)",
+ 							strerror(errno), errno);
+@@ -380,6 +385,8 @@ static void do_listen(void (*handler)(int sk))
+ 	if (rfcmode > 0)
+ 		opts.mode = rfcmode;
+ 
++	opts.fcs = fcs;
++
+ 	if (setsockopt(sk, SOL_L2CAP, L2CAP_OPTIONS, &opts, sizeof(opts)) < 0) {
+ 		syslog(LOG_ERR, "Can't set L2CAP options: %s (%d)",
+ 							strerror(errno), errno);
+@@ -1029,6 +1036,7 @@ static void usage(void)
+ 	printf("Options:\n"
+ 		"\t[-b bytes] [-i device] [-P psm]\n"
+ 		"\t[-I imtu] [-O omtu]\n"
++		"\t[-f fcs] use CRC16 check (default = 1)\n"
+ 		"\t[-L seconds] enable SO_LINGER\n"
+ 		"\t[-F seconds] enable deferred setup\n"
+ 		"\t[-B filename] use data packets from file\n"
+@@ -1052,7 +1060,7 @@ int main(int argc, char *argv[])
+ 
+ 	bacpy(&bdaddr, BDADDR_ANY);
+ 
+-	while ((opt=getopt(argc,argv,"rdscuwmnxyzpb:i:P:I:O:B:N:L:F:C:D:X:RGAESMT")) != EOF) {
++	while ((opt=getopt(argc,argv,"rdscuwmnxyzpb:f:i:P:I:O:B:N:L:F:C:D:X:RGAESMT")) != EOF) {
+ 		switch(opt) {
+ 		case 'r':
+ 			mode = RECV;
+@@ -1113,6 +1121,10 @@ int main(int argc, char *argv[])
+ 			data_size = atoi(optarg);
+ 			break;
+ 
++		case 'f':
++			fcs = atoi(optarg);
++			break;
++
+ 		case 'i':
+ 			if (!strncasecmp(optarg, "hci", 3))
+ 				hci_devba(atoi(optarg + 3), &bdaddr);
 -- 
-Gustavo F. Padovan
-http://padovan.org
+1.6.3.3
+
