@@ -1,117 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: PATCHES: Device discovery of the "bluetooth" CUPS backend does
- not work
-From: Bastien Nocera <hadess@hadess.net>
-To: Till Kamppeter <till.kamppeter@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, Tim Waugh <twaugh@redhat.com>
-In-Reply-To: <4A816300.7050906@gmail.com>
-References: <4A8080DC.2010204@gmail.com>
-	 <1249986829.2022.17.camel@localhost.localdomain>
-	 <4A8153D9.4020008@gmail.com>
-	 <1249990438.2022.23.camel@localhost.localdomain>
-	 <4A816300.7050906@gmail.com>
-Content-Type: multipart/mixed; boundary="=-tQIF5QIQ9CTlhVYXw3cI"
-Date: Tue, 11 Aug 2009 14:12:56 +0100
-Message-Id: <1249996376.2022.25.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1249706140.30166.17.camel@localhost.localdomain>
+References: <113d36d80908071126j521df37aked5fec76df09006c@mail.gmail.com>
+	 <1249670135.30166.14.camel@localhost.localdomain>
+	 <113d36d80908072104m777fdf95q9db99ffb863744dc@mail.gmail.com>
+	 <1249706140.30166.17.camel@localhost.localdomain>
+Date: Tue, 11 Aug 2009 21:00:15 +0800
+Message-ID: <113d36d80908110600y1232945br2bdb10de24f62bff@mail.gmail.com>
+Subject: Re: sco connection issue for BlueZ 4.x on kernel 2.6.29
+From: Lan Zhu <zhu.lan.cn@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Marcel,
 
---=-tQIF5QIQ9CTlhVYXw3cI
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+2009/8/8 Marcel Holtmann <marcel@holtmann.org>:
+> Hi,
+>
+>> >> Can not accept incoming SCO connection. Kernel version 2.6.29. Kernel
+>> >> log is as below. Is this a kernel bug? Is there any fix already for
+>> >> this?
+>> >>
+>> >> <6>[ =A0158.339691] sco_connect_ind: hdev hci0, bdaddr CA:D3:10:55:0C=
+:00
+>> >> =A0 =A0 -------// receive incoming sco
+>> >> <6>[ =A0158.518554] sco_connect_cfm: hcon cf18ee00 bdaddr CA:D3:10:55=
+:0C:00 status
+>> >> <6>[ =A0158.721160] sco_connect_cfm: hcon cf149c00 bdaddr CA:D3:10:55=
+:0C:00 status
+>> >> <6>[ =A0158.728851] sco_conn_add: hcon cf149c00 conn cc772640
+>> >> <6>[ =A0158.734313] sco_conn_ready: conn cc772640
+>> >> -----------// handle sco connection complete
+>> >> <6>[ =A0158.738800] sco_sock_init: sk cf18c400
+>> >> -----------// start handle sco socket
+>> >> <6>[ =A0158.742858] __sco_chan_add: conn cc772640
+>> >> <6>[ =A0159.693023] sco_sock_accept: sk ccfdf400 timeo 0
+>> >> <6>[ =A0159.708038] sco_sock_accept: new socket cf18c400
+>> >> <6>[ =A0159.713073] sco_sock_getsockopt: sk cf18c400
+>> >> <6>[ =A0159.717834] sco_sock_getsockopt_old: sk cf18c400
+>> >> <6>[ =A0159.722839] sco_sock_getsockopt_old: mtu 180
+>> >> <6>[ =A0159.727661] sco_sock_getname: sock ce9d80a0, sk cf18c400
+>> >> <6>[ =A0159.733398] sco_sock_getname: sock ce9d80a0, sk cf18c400
+>> >> <6>[ =A0159.739166] sco_sock_release: sock ce9d80a0, sk cf18c400
+>> >> -----------// don't know why it call sco_sock_release
+>> >> <6>[ =A0159.745025] sco_sock_clear_timer: sock cf18c400 state 1
+>> >> <6>[ =A0159.750671] sco_sock_close: sk cf18c400 state 1 conn cc772640=
+ socket ce9d8
+>> >> <6>[ =A0159.758453] sco_chan_del: sk cf18c400, conn cc772640, err 104
+>> >> <6>[ =A0159.764770] sco_sock_kill: sk cf18c400 state 9
+>> >> <6>[ =A0159.769592] sco_sock_destruct: sk cf18c400
+>> >> ------------// destruct sco socket, and disconnect SCO connection
+>> >> <6>[ =A0159.782745] l2cap_disconn_ind: hcon cf149c00
+>> >> <6>[ =A0159.787384] hci_acl_disconn: cf149c00
+>> >> <6>[ =A0159.950805] hci_disconn_complete_evt: hci0 status 0
+>> >> <6>[ =A0159.956207] l2cap_disconn_cfm: hcon cf149c00 reason 22
+>> >> <6>[ =A0159.961730] sco_disconn_cfm: hcon cf149c00 reason 22
+>> >> -------------// sco disconnected
+>> >> <6>[ =A0159.967102] sco_conn_del: hcon cf149c00 conn cc772640, err 10=
+3
+>> >> <6>[ =A0162.130523] hci_disconn_complete_evt: hci0 status 0
+>> >> <6>[ =A0162.136291] l2cap_disconn_cfm: hcon cf18ee00 reason 19
+>> >> <6>[ =A0162.149871] sco_disconn_cfm: hcon cf18ee00 reason 19
+>> >> <4>[ =A0165.382141] done EDISCO CTRL ENABLE
+>> >> <7>[ =A0165.386077] sholes-panel: =A0edisco_ctrl_enable_te
+>> >
+>> > what kind of program are you using?
+>> >
+>>
+>> This issue was found when testing HFP on android platform with a
+>> Bluetooth carkit which is not support eSCO. At first android tries to
+>> establish eSCO with carkit, carkit response with error that eSCO is
+>> not supported. Then carkit send SCO connect request to android
+>> automatically, android accepted this connection but disconnect it
+>> immediately.
+>
+> I think we fixed all of these. Try a 2.6.31-rc5 kernel. Also you would
+> need to include the output of hcidump -X -V.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
 
-On Tue, 2009-08-11 at 14:24 +0200, Till Kamppeter wrote:
-<snip>
-> Could you put them in? Then I do not need to download the git only to 
-> format two simple one-point-only-changed patches. Thanks.
+I think there is a bug in the function sco_sock_getsockopt_old() in sco.c.
 
-Patches attached.
+I changed the code like below and then test sco again, incoming sco
+connection can be created successfully now.
 
-> >> Do you have a bug/feature request tracking system?
-> > 
-> > There isn't one.
-> 
-> As vluez seems to be a part of the kernel project, does the kernel even 
-> not have a bug tracking system?
+@@ -719,7 +715,10 @@ static int sco_sock_getsockopt_old(struct socket *sock=
+, int
+                break;
+        }
 
-BlueZ's kernel bits probably use the kernel bug tracker. For the
-user-space bits, send mails here[1].
-
-Cheers
-
-[1]: Note that I've been barking up that tree for a while...
-
---=-tQIF5QIQ9CTlhVYXw3cI
-Content-Disposition: attachment; filename="0001-Allow-lp-CUPS-to-talk-to-bluetoothd.patch"
-Content-Type: text/x-patch; name="0001-Allow-lp-CUPS-to-talk-to-bluetoothd.patch"; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-
->From b2d24735492e6a71f3441720940ac55c33fa0838 Mon Sep 17 00:00:00 2001
-From: Till Kamppeter <till.kamppeter@gmail.com>
-Date: Tue, 11 Aug 2009 14:04:05 +0100
-Subject: [PATCH 1/2] Allow lp (CUPS) to talk to bluetoothd
-
-CUPS runs its backend helpers as the "lp" user, so we should
-allow CUPS to talk to bluetoothd to enumerate printers.
----
- src/bluetooth.conf |    6 ++++++
- 1 files changed, 6 insertions(+), 0 deletions(-)
-
-diff --git a/src/bluetooth.conf b/src/bluetooth.conf
-index c047623..315009c 100644
---- a/src/bluetooth.conf
-+++ b/src/bluetooth.conf
-@@ -17,6 +17,12 @@
-     <allow send_destination="org.bluez"/>
-   </policy>
- 
-+  <!-- allow users of lp group (printing subsystem) to 
-+       communicate with bluetoothd -->
-+  <policy group="lp">
-+    <allow send_destination="org.bluez"/>
-+  </policy>
-+
-   <policy context="default">
-     <deny send_destination="org.bluez"/>
-   </policy>
--- 
-1.6.2.5
-
-
---=-tQIF5QIQ9CTlhVYXw3cI
-Content-Disposition: attachment; filename="0002-Mark-Bluetooth-printers-as-being-local.patch"
-Content-Type: text/x-patch; name="0002-Mark-Bluetooth-printers-as-being-local.patch"; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-
->From d96004d65132a7934308ded8010c5f819013157a Mon Sep 17 00:00:00 2001
-From: Till Kamppeter <till.kamppeter@gmail.com>
-Date: Tue, 11 Aug 2009 14:06:59 +0100
-Subject: [PATCH 2/2] Mark Bluetooth printers as being local
-
-For discovery purposes. Also add a better label for the printer,
-and append "(Bluetooth") to the "unique" name.
----
- cups/main.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
-
-diff --git a/cups/main.c b/cups/main.c
-index ba9864f..bb15c9c 100644
---- a/cups/main.c
-+++ b/cups/main.c
-@@ -226,7 +226,7 @@ static void print_printer_details(const char *name, const char *bdaddr, const ch
- 		 bdaddr[9], bdaddr[10],
- 		 bdaddr[12], bdaddr[13],
- 		 bdaddr[15], bdaddr[16]);
--	printf("network %s \"Unknown\" \"%s (Bluetooth)\"", uri, escaped);
-+	printf("direct %s \"%s\" \"%s (Bluetooth)\"", uri, escaped, escaped);
- 	if (id != NULL)
- 		printf(" \"%s\"\n", id);
- 	else
--- 
-1.6.2.5
+-       release_sock(sk);
++    if (err !=3D 0) {
++           release_sock(sk);
++    }
+        return err;
 
 
---=-tQIF5QIQ9CTlhVYXw3cI--
-
+Thanks,
+Zhu Lan
