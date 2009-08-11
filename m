@@ -1,102 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A82B32E.3020903@gmail.com>
-Date: Wed, 12 Aug 2009 15:18:54 +0300
-From: "y.dmitry@gmail.com" <y.dmitry@gmail.com>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: NAP/GN with bluez-4
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-Id: <200908120918.n7C9Ihvn025042@home.pavel.comp>
+From: Paul Fertser <fercerpav@gmail.com>
+Date: Tue, 11 Aug 2009 10:19:13 +0400
+Subject: [PATCH] network-api: improve documentation
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1250028267.30166.28.camel@localhost.localdomain>
+References: <1250028267.30166.28.camel@localhost.localdomain>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
+Information about ways of specifying UUIDs and about disconnect conditions.
 
-Can't setup NAP-server with bluez-4 (versions 4.39, 4.47). Remote device
-can't discover any services. But when i trying to run  'simple-service'
-script from sources, i can see a "Serial Port" service on remote device.
-Service disappears when script canceled. As I understand at this point,
-all ok with connectivity and access rights.
+---
+ doc/network-api.txt |    8 ++++++++
+ 1 files changed, 8 insertions(+), 0 deletions(-)
 
-I mean linux box must became an Access Point for phone, netbook, etc.
-
-Logs:
-...
-bluetoothd[9949]: Loading builtin plugins
-bluetoothd[9949]: Loading service plugin
-bluetoothd[9949]: Loading hciops plugin
-bluetoothd[9949]: Loading hal plugin
-bluetoothd[9949]: Loading storage plugin
-bluetoothd[9949]: Loading plugins /usr/lib/bluetooth/plugins
-bluetoothd[9949]: Loading network plugin
-bluetoothd[9949]: Loading serial plugin
-...
-bluetoothd[9949]: network_server_probe: path /org/bluez/9949/hci0
-bluetoothd[9949]: Adding record with handle 0x10002
-bluetoothd[9949]: Record pattern UUID 0000000f-0000-1000-8000-00805f9
-bluetoothd[9949]: Record pattern UUID 00000100-0000-1000-8000-00805f9
-bluetoothd[9949]: Record pattern UUID 00001002-0000-1000-8000-00805f9
-bluetoothd[9949]: Record pattern UUID 00001116-0000-1000-8000-00805f9
-bluetoothd[9949]: Changing service classes to 0x020104
-bluetoothd[9949]: register_server_record: got record id 0x10002
-bluetoothd[9949]: Registered interface org.bluez.NetworkRouter on path
-/org/bluez/9949/hci0
-h /org/bluez/9949/any
-bluetoothd[9949]: Registered interface org.bluez.Service on path
-/org/bluez/9949/any
-bluetoothd[9949]: /etc/bluetooth/network.conf: Key file does not have
-key 'Disable'
-bluetoothd[9949]: Config options: InterfacePrefix=bnep0,
-PANU_Script=(null), GN_Script=(null), NAP_Script=(null),
-GN_Interface=pan1, NAP_Interface=pan2, Security=false
-bluetoothd[9949]: bridge pan1 created
-...
-bluetoothd[9949]: network_server_probe: path /org/bluez/9949/hci0
-bluetoothd[9949]: Adding record with handle 0x10002
-bluetoothd[9949]: Record pattern UUID 0000000f-0000-1000-8000-00805f9
-bluetoothd[9949]: Record pattern UUID 00000100-0000-1000-8000-00805f9
-bluetoothd[9949]: Record pattern UUID 00001002-0000-1000-8000-00805f9
-bluetoothd[9949]: Record pattern UUID 00001116-0000-1000-8000-00805f9
-bluetoothd[9949]: Changing service classes to 0x020104
-bluetoothd[9949]: register_server_record: got record id 0x10002
-bluetoothd[9949]: Registered interface org.bluez.NetworkRouter on path
-/org/bluez/9949/hci0
-
-from dmesg:
-[169632.490256] Bluetooth: Core ver 2.15
-[169632.490308] Bluetooth: HCI device and connection manager initialized
-[169632.490310] Bluetooth: HCI socket layer initialized
-[169632.535120] Bluetooth: Generic Bluetooth USB driver ver 0.5
-[170196.227526] Bluetooth: L2CAP ver 2.13
-[170196.227529] Bluetooth: L2CAP socket layer initialized
-[170196.262160] Bluetooth: SCO (Voice Link) ver 0.6
-[170196.262163] Bluetooth: SCO socket layer initialized
-[170196.290501] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-[170196.290505] Bluetooth: BNEP filters: protocol multicast
-[170196.440134] Bluetooth: RFCOMM socket layer initialized
-[170196.440142] Bluetooth: RFCOMM TTY layer initialized
-[170196.440145] Bluetooth: RFCOMM ver 1.11
-
-
-# ifconfig -a|grep 'pan|bnep'
-pan0      Link encap:Ethernet  HWaddr 3a:cb:41:e4:19:97
-
-(pan0 iface not disappears when bluetoothd stops. But it's ok when i set
-pan1 in config)
-
-
-I can see both NAP/GN records with 'sdptool browse local'. After
-'simple-service' script new record appears.
-I dumped some bt traffic with 'hcidump' and saw a "serial port" record
-transmission. It seems, that somewhy bluez completely ignores any
-builtin records about network services.
-
-I tried several userland tools (blueman, bluez-gnome) with no success.
-bluez-gnome has no support for local services. blueman has such broken
-support.
-
-I tried to play a little with python and dbus (few 'simple-service'
-script modifications). No success here too.
-
-Am I missed something?
-
-
+diff --git a/doc/network-api.txt b/doc/network-api.txt
+index 7271193..ae2be4f 100644
+--- a/doc/network-api.txt
++++ b/doc/network-api.txt
+@@ -17,6 +17,14 @@ Methods		string Connect(string uuid)
+ 			device name. Examples of the device name are bnep0,
+ 			bnep1 etc.
+ 
++			uuid can be either one of "gn", "panu" or "nap" (case
++			insensitive) or a traditional string representation of
++			UUID or a hexadecimal number.
++
++			The connection will be closed and network device
++			released either upon calling Disconnect() or when
++			the client disappears from the message bus.
++
+ 			Possible errors: org.bluez.Error.AlreadyConnected
+ 					 org.bluez.Error.ConnectionAttemptFailed
+ 
+-- 
+1.6.0.6
