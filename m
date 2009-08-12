@@ -1,37 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <4a221c10908120710y1ad31540ib5b16f27d2af4751@mail.gmail.com>
-References: <4A82B32E.3020903@gmail.com>
-	 <2d5a2c100908120559h1a3ed5acn26b8a07ab41cd95@mail.gmail.com>
-	 <4a221c10908120710y1ad31540ib5b16f27d2af4751@mail.gmail.com>
-Date: Thu, 13 Aug 2009 14:10:45 -0300
-Message-ID: <2d5a2c100908131010r7b077b49i4c495d864cae6667@mail.gmail.com>
-Subject: Re: NAP/GN with bluez-4
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "Dmitry A. Yanko" <y.dmitry@gmail.com>
+Subject: Re: non-blocking hci_inquiry()
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Alexander H Deriziotis <deriziotis@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <5eee8c670908121537j500e2883t30e726c10bb7ffef@mail.gmail.com>
+References: <5eee8c670907280453i76f4957fvcca9c3954576580d@mail.gmail.com>
+	 <5eee8c670907280455ube96c5aka5a9a97149034a71@mail.gmail.com>
+	 <1248784304.28545.226.camel@violet>
+	 <5eee8c670908121537j500e2883t30e726c10bb7ffef@mail.gmail.com>
+Content-Type: text/plain
+Date: Wed, 12 Aug 2009 15:40:21 -0700
+Message-Id: <1250116821.30166.75.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-HI,
+Hi Alex,
 
-On Wed, Aug 12, 2009 at 11:10 AM, Dmitry A. Yanko<y.dmitry@gmail.com> wrote:
-> router = dbus.Interface(bus.get_object("org.bluez", manager.DefaultAdapter()),
->                "org.bluez.NetworkRouter")
-> ...
-> print router.dbus_interface
-> props = router.GetProperties()
-> for pname in props.keys():
->        print pname,props[pname]
-> ...
+> > use the D-Bus interface for non-blocking inquiry.
+> 
+> I'm following the GLib with C example in the following doc:
+> http://wiki.bluez.org/wiki/HOWTO/DiscoveringDevices and having
+> problems running the example code.
+> 
+> It compiles perfectly fine, however, when I run it, it gives me the
+> following error:
+> 
+> jackflap@genesis:~/Desktop/cwiid-0.6.00/new_test$ ./bluetooth
+> Failed to discover devices: Method "DiscoverDevices" with signature ""
+> on interface "org.bluez.Adapter" doesn't exist
+> 
+> I'm getting the impression that it's the following line in the code
+> that isn't working:
+> 
+>         obj = dbus_g_proxy_new_for_name(bus, "org.bluez",
+> "/org/bluez/hci0", "org.bluez.Adapter");
+> 
+> I'm certain my bluetooth adapter is recognized and is configured as hci0.
 
-What does the command sdptool browse local gives to you? About the
-pan2 you should create it yourself, as I explained before we don't
-handle the routing/dhcp which is required for NAP, this can be the
-problem here but in the other hand there is probably a bug since
-enabled is set to true.
+looks like you are not using the 4.x API. That one works differently.
 
--- 
-Luiz Augusto von Dentz
-Engenheiro de Computação
+Regards
+
+Marcel
+
+
