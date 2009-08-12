@@ -1,38 +1,107 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <200908120918.n7C9Ihvn025042@home.pavel.comp>
-From: Paul Fertser <fercerpav@gmail.com>
-Date: Tue, 11 Aug 2009 10:19:13 +0400
-Subject: [PATCH] network-api: improve documentation
-To: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: sco connection issue for BlueZ 4.x on kernel 2.6.29
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Lan Zhu <zhu.lan.cn@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1250028267.30166.28.camel@localhost.localdomain>
-References: <1250028267.30166.28.camel@localhost.localdomain>
+In-Reply-To: <113d36d80908112024o98f836aybfdd0cb104720ba3@mail.gmail.com>
+References: <113d36d80908071126j521df37aked5fec76df09006c@mail.gmail.com>
+	 <1249670135.30166.14.camel@localhost.localdomain>
+	 <113d36d80908072104m777fdf95q9db99ffb863744dc@mail.gmail.com>
+	 <1249706140.30166.17.camel@localhost.localdomain>
+	 <113d36d80908110600y1232945br2bdb10de24f62bff@mail.gmail.com>
+	 <1250028527.30166.30.camel@localhost.localdomain>
+	 <113d36d80908112024o98f836aybfdd0cb104720ba3@mail.gmail.com>
+Content-Type: text/plain
+Date: Tue, 11 Aug 2009 21:09:49 -0700
+Message-Id: <1250050189.30166.49.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Information about ways of specifying UUIDs and about disconnect conditions.
+Hi,
 
----
- doc/network-api.txt |    8 ++++++++
- 1 files changed, 8 insertions(+), 0 deletions(-)
+> >> >> >> Can not accept incoming SCO connection. Kernel version 2.6.29. Kernel
+> >> >> >> log is as below. Is this a kernel bug? Is there any fix already for
+> >> >> >> this?
+> >> >> >>
+> >> >> >> <6>[  158.339691] sco_connect_ind: hdev hci0, bdaddr CA:D3:10:55:0C:00
+> >> >> >>     -------// receive incoming sco
+> >> >> >> <6>[  158.518554] sco_connect_cfm: hcon cf18ee00 bdaddr CA:D3:10:55:0C:00 status
+> >> >> >> <6>[  158.721160] sco_connect_cfm: hcon cf149c00 bdaddr CA:D3:10:55:0C:00 status
+> >> >> >> <6>[  158.728851] sco_conn_add: hcon cf149c00 conn cc772640
+> >> >> >> <6>[  158.734313] sco_conn_ready: conn cc772640
+> >> >> >> -----------// handle sco connection complete
+> >> >> >> <6>[  158.738800] sco_sock_init: sk cf18c400
+> >> >> >> -----------// start handle sco socket
+> >> >> >> <6>[  158.742858] __sco_chan_add: conn cc772640
+> >> >> >> <6>[  159.693023] sco_sock_accept: sk ccfdf400 timeo 0
+> >> >> >> <6>[  159.708038] sco_sock_accept: new socket cf18c400
+> >> >> >> <6>[  159.713073] sco_sock_getsockopt: sk cf18c400
+> >> >> >> <6>[  159.717834] sco_sock_getsockopt_old: sk cf18c400
+> >> >> >> <6>[  159.722839] sco_sock_getsockopt_old: mtu 180
+> >> >> >> <6>[  159.727661] sco_sock_getname: sock ce9d80a0, sk cf18c400
+> >> >> >> <6>[  159.733398] sco_sock_getname: sock ce9d80a0, sk cf18c400
+> >> >> >> <6>[  159.739166] sco_sock_release: sock ce9d80a0, sk cf18c400
+> >> >> >> -----------// don't know why it call sco_sock_release
+> >> >> >> <6>[  159.745025] sco_sock_clear_timer: sock cf18c400 state 1
+> >> >> >> <6>[  159.750671] sco_sock_close: sk cf18c400 state 1 conn cc772640 socket ce9d8
+> >> >> >> <6>[  159.758453] sco_chan_del: sk cf18c400, conn cc772640, err 104
+> >> >> >> <6>[  159.764770] sco_sock_kill: sk cf18c400 state 9
+> >> >> >> <6>[  159.769592] sco_sock_destruct: sk cf18c400
+> >> >> >> ------------// destruct sco socket, and disconnect SCO connection
+> >> >> >> <6>[  159.782745] l2cap_disconn_ind: hcon cf149c00
+> >> >> >> <6>[  159.787384] hci_acl_disconn: cf149c00
+> >> >> >> <6>[  159.950805] hci_disconn_complete_evt: hci0 status 0
+> >> >> >> <6>[  159.956207] l2cap_disconn_cfm: hcon cf149c00 reason 22
+> >> >> >> <6>[  159.961730] sco_disconn_cfm: hcon cf149c00 reason 22
+> >> >> >> -------------// sco disconnected
+> >> >> >> <6>[  159.967102] sco_conn_del: hcon cf149c00 conn cc772640, err 103
+> >> >> >> <6>[  162.130523] hci_disconn_complete_evt: hci0 status 0
+> >> >> >> <6>[  162.136291] l2cap_disconn_cfm: hcon cf18ee00 reason 19
+> >> >> >> <6>[  162.149871] sco_disconn_cfm: hcon cf18ee00 reason 19
+> >> >> >> <4>[  165.382141] done EDISCO CTRL ENABLE
+> >> >> >> <7>[  165.386077] sholes-panel:  edisco_ctrl_enable_te
+> >> >> >
+> >> >> > what kind of program are you using?
+> >> >> >
+> >> >>
+> >> >> This issue was found when testing HFP on android platform with a
+> >> >> Bluetooth carkit which is not support eSCO. At first android tries to
+> >> >> establish eSCO with carkit, carkit response with error that eSCO is
+> >> >> not supported. Then carkit send SCO connect request to android
+> >> >> automatically, android accepted this connection but disconnect it
+> >> >> immediately.
+> >> >
+> >> > I think we fixed all of these. Try a 2.6.31-rc5 kernel. Also you would
+> >> > need to include the output of hcidump -X -V.
+> >>
+> >> I think there is a bug in the function sco_sock_getsockopt_old() in sco.c.
+> >>
+> >> I changed the code like below and then test sco again, incoming sco
+> >> connection can be created successfully now.
+> >>
+> >> @@ -719,7 +715,10 @@ static int sco_sock_getsockopt_old(struct socket *sock, int
+> >>                 break;
+> >>         }
+> >>
+> >> -       release_sock(sk);
+> >> +    if (err != 0) {
+> >> +           release_sock(sk);
+> >> +    }
+> >>         return err;
+> >
+> > that is not it for sure. The release_sock() is the unlock function and
+> > your patch create a locking imbalance.
+>
+> This issue is fixed by Johan's commit of "Don't enable the SCO server
+> socket when not necessary"
+> (http://git.kernel.org/?p=bluetooth/bluez.git;a=commit;h=cd6678404659a1bf6449b5b1d48b17883d895aef)
 
-diff --git a/doc/network-api.txt b/doc/network-api.txt
-index 7271193..ae2be4f 100644
---- a/doc/network-api.txt
-+++ b/doc/network-api.txt
-@@ -17,6 +17,14 @@ Methods		string Connect(string uuid)
- 			device name. Examples of the device name are bnep0,
- 			bnep1 etc.
- 
-+			uuid can be either one of "gn", "panu" or "nap" (case
-+			insensitive) or a traditional string representation of
-+			UUID or a hexadecimal number.
-+
-+			The connection will be closed and network device
-+			released either upon calling Disconnect() or when
-+			the client disappears from the message bus.
-+
- 			Possible errors: org.bluez.Error.AlreadyConnected
- 					 org.bluez.Error.ConnectionAttemptFailed
- 
--- 
-1.6.0.6
+so if Android would finally start using upstream BlueZ and not ship
+their own stuff, we could have avoided this non-sense.
+
+Regards
+
+Marcel
+
+
