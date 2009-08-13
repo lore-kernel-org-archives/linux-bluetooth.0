@@ -1,32 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Fri, 14 Aug 2009 01:07:44 -0600
-Message-ID: <d89ddf300908140007h767dd390r639955e1d004e2be@mail.gmail.com>
-Subject: access point networking without X
-From: Brad Midgley <bmidgley@gmail.com>
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <4a221c10908120710y1ad31540ib5b16f27d2af4751@mail.gmail.com>
+References: <4A82B32E.3020903@gmail.com>
+	 <2d5a2c100908120559h1a3ed5acn26b8a07ab41cd95@mail.gmail.com>
+	 <4a221c10908120710y1ad31540ib5b16f27d2af4751@mail.gmail.com>
+Date: Thu, 13 Aug 2009 14:10:45 -0300
+Message-ID: <2d5a2c100908131010r7b077b49i4c495d864cae6667@mail.gmail.com>
+Subject: Re: NAP/GN with bluez-4
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "Dmitry A. Yanko" <y.dmitry@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hey
+HI,
 
-I've got some python scripts for driving access point services
-(dun/pan) under bluez4. The idea is to cover machines like gumstix or
-beagleboard that run without a ui and can't do the gnome/kde bluetooth
-controllers.
+On Wed, Aug 12, 2009 at 11:10 AM, Dmitry A. Yanko<y.dmitry@gmail.com> wrote:
+> router = dbus.Interface(bus.get_object("org.bluez", manager.DefaultAdapter()),
+>                "org.bluez.NetworkRouter")
+> ...
+> print router.dbus_interface
+> props = router.GetProperties()
+> for pname in props.keys():
+>        print pname,props[pname]
+> ...
 
-Is anyone interested in me pulling these things together and housing
-them in a standalone project? I was thinking we could move toward a C
-implementation once things have settled down in the python prototype.
-(Python is not always a great requirement to put on embedded hosts).
-If anyone else has built similar helpers, we should collect those
-together.
-
-I'd like to be able to extend this beyond simple access point and be
-able to do audio and voip sort of services as well. These little
-machines are quite capable these days and wouldn't have much trouble
-keeping up.
+What does the command sdptool browse local gives to you? About the
+pan2 you should create it yourself, as I explained before we don't
+handle the routing/dhcp which is required for NAP, this can be the
+problem here but in the other hand there is probably a bug since
+enabled is set to true.
 
 -- 
-Brad Midgley
+Luiz Augusto von Dentz
+Engenheiro de Computação
