@@ -1,29 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20090814161939.43f64dea@stoetzler>
-References: <d89ddf300908140007h767dd390r639955e1d004e2be@mail.gmail.com>
-	 <20090814161939.43f64dea@stoetzler>
-Date: Sat, 15 Aug 2009 11:36:15 -0600
-Message-ID: <d89ddf300908151036j48e02e37t46df3f5552bf1e79@mail.gmail.com>
+Date: Fri, 14 Aug 2009 16:19:39 +0200
+From: Stefan Seyfried <stefan.seyfried@googlemail.com>
+To: linux-bluetooth@vger.kernel.org
 Subject: Re: access point networking without X
-From: Brad Midgley <bmidgley@gmail.com>
-To: Stefan Seyfried <stefan.seyfried@googlemail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <20090814161939.43f64dea@stoetzler>
+In-Reply-To: <d89ddf300908140007h767dd390r639955e1d004e2be@mail.gmail.com>
+References: <d89ddf300908140007h767dd390r639955e1d004e2be@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hey
+On Fri, 14 Aug 2009 01:07:44 -0600
+Brad Midgley <bmidgley@gmail.com> wrote:
 
-> I am definitely interested in BlueZ console tools (not only) for
-> embedded systems. It can also be beneficial for debugging (even though
-> most of that can be done with the bluez-supplied test scripts).
+> Hey
+> 
+> I've got some python scripts for driving access point services
+> (dun/pan) under bluez4. The idea is to cover machines like gumstix or
+> beagleboard that run without a ui and can't do the gnome/kde bluetooth
+> controllers.
+> 
+> Is anyone interested in me pulling these things together and housing
+> them in a standalone project? I was thinking we could move toward a C
+> implementation once things have settled down in the python prototype.
+> (Python is not always a great requirement to put on embedded hosts).
+> If anyone else has built similar helpers, we should collect those
+> together.
 
-I've put together some of the docs and the script I've been using for
-PAN. I need to verify there wasn't any other magic that I needed to
-make PAN work.
+I am definitely interested in BlueZ console tools (not only) for
+embedded systems. It can also be beneficial for debugging (even though
+most of that can be done with the bluez-supplied test scripts).
 
-http://github.com/bmidgley/greenz/
+> I'd like to be able to extend this beyond simple access point and be
+> able to do audio and voip sort of services as well. These little
+> machines are quite capable these days and wouldn't have much trouble
+> keeping up.
 
+Would be cool, and I would be willing to help (where possible with my
+rather limited knowledge ;-)
 -- 
-Brad Midgley
+R&D Preload Department             |              "Any ideas, John?"
+SUSE LINUX Products GmbH, Nürnberg | "Well, surrounding them's out."
+
+This footer brought to you by insane German lawmakers:
+SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG Nürnberg)
