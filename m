@@ -1,32 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <2d5a2c100908131010r7b077b49i4c495d864cae6667@mail.gmail.com>
-References: <4A82B32E.3020903@gmail.com>
-	 <2d5a2c100908120559h1a3ed5acn26b8a07ab41cd95@mail.gmail.com>
-	 <4a221c10908120710y1ad31540ib5b16f27d2af4751@mail.gmail.com>
-	 <2d5a2c100908131010r7b077b49i4c495d864cae6667@mail.gmail.com>
-Date: Fri, 14 Aug 2009 13:52:44 +0300
-Message-ID: <4a221c10908140352x4e017608t587ad61388cd83cb@mail.gmail.com>
-Subject: Re: NAP/GN with bluez-4
-From: "Dmitry A. Yanko" <y.dmitry@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Date: Fri, 14 Aug 2009 01:07:44 -0600
+Message-ID: <d89ddf300908140007h767dd390r639955e1d004e2be@mail.gmail.com>
+Subject: access point networking without X
+From: Brad Midgley <bmidgley@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Aug 13, 2009 at 8:10 PM, Luiz Augusto von
-Dentz<luiz.dentz@gmail.com> wrote:
-> What does the command sdptool browse local gives to you? About the
-> pan2 you should create it yourself, as I explained before we don't
-> handle the routing/dhcp which is required for NAP, this can be the
-> problem here but in the other hand there is probably a bug since
-> enabled is set to true.
-Look 'local.txt' file here: http://www.cross-road.org.ua/bttests/
-hcidump output also available (with 'simple-service' script started,
-when remote device can see 1 service, and without, when no services
-shown at all). And also dump from windows box (NAP enabled), for
-comparison.
+Hey
+
+I've got some python scripts for driving access point services
+(dun/pan) under bluez4. The idea is to cover machines like gumstix or
+beagleboard that run without a ui and can't do the gnome/kde bluetooth
+controllers.
+
+Is anyone interested in me pulling these things together and housing
+them in a standalone project? I was thinking we could move toward a C
+implementation once things have settled down in the python prototype.
+(Python is not always a great requirement to put on embedded hosts).
+If anyone else has built similar helpers, we should collect those
+together.
+
+I'd like to be able to extend this beyond simple access point and be
+able to do audio and voip sort of services as well. These little
+machines are quite capable these days and wouldn't have much trouble
+keeping up.
 
 -- 
-#include <regards.h>
+Brad Midgley
