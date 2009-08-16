@@ -1,26 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vikram Kandukuri <Vikram.Kandukuri@Atheros.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 17 Aug 2009 11:52:55 +0530
-Subject: Query about not implemented features in Bluez x.yy version
-Message-ID: <44EE5C37ADC36343B0625A05DD408C48506899D283@CHEXMB-01.global.atheros.com>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+In-Reply-To: <20090816221025.GA26272@jh-x301>
+References: <1250390653-476-1-git-send-email-jprvita@gmail.com>
+	 <20090816143858.GA4896@jh-x301> <20090816221025.GA26272@jh-x301>
+Date: Sun, 16 Aug 2009 20:00:05 -0300
+Message-ID: <aa32413d0908161600w4a46fb3egfa3929771db5864e@mail.gmail.com>
+Subject: Re: [PATCH] Add support for the source interface to audio IPC.
+From: =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@gmail.com>
+To: Johan Hedberg <johan.hedberg@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+2009/8/16 Johan Hedberg <johan.hedberg@nokia.com>:
+> Hi,
+>
+> On Sun, Aug 16, 2009, Johan Hedberg wrote:
+>> There are a few issues with this patch:
+>
+> I went ahead and fixed the issues myself so we can proceed with the 4.48
+> release. The patches are now pushed upstream.
+>
+> Johan
+>
 
-I have question about finding out what core features are not implemented in any given version of BlueZ.
-By core features, I mean mandatory and optional PICS in L2CAP,GAP,RFCOMM,SDP,SPP sections.
+Sorry for the late reply, didn't check email after very early in the
+morning today (GMT-3) because of Mom's birthday.
 
-For example, how to know what features are implemented and not implemented in BlueZ 4.32  and/or 4.46 ?
+Thanks for the review and the fixes!
 
-In general , how to know which features are implented or not in version X.YY of BlueZ? Will there
-be any consolidated release notes document or browsing source code is the only method to judge this?
-
-
-Regards,
-Vikram
-
-
+-- 
+João Paulo Rechi Vita
+MSc Computer Science Student
+Computer Engineer
+IC / Unicamp
+http://jprvita.wordpress.com/
