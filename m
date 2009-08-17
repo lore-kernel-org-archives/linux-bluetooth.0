@@ -1,76 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: hid2hci not switching to hci mode
-From: Aaron Seibert <aaron@awseibert.net>
-Reply-To: aaron@awseibert.net
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-AOjZRCblGpLr0DFFX0ME"
-Date: Mon, 17 Aug 2009 10:17:34 -0400
-Message-Id: <1250518654.2813.458.camel@localhost.localdomain>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <44EE5C37ADC36343B0625A05DD408C48506899D283@CHEXMB-01.global.atheros.com>
+References: <44EE5C37ADC36343B0625A05DD408C48506899D283@CHEXMB-01.global.atheros.com>
+Date: Mon, 17 Aug 2009 11:01:27 -0300
+Message-ID: <2d5a2c100908170701j7d6f9645o42f89d5ce208f8fa@mail.gmail.com>
+Subject: Re: Query about not implemented features in Bluez x.yy version
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Vikram Kandukuri <Vikram.Kandukuri@atheros.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi,
 
---=-AOjZRCblGpLr0DFFX0ME
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+On Mon, Aug 17, 2009 at 3:22 AM, Vikram
+Kandukuri<Vikram.Kandukuri@atheros.com> wrote:
+> Hi All,
+>
+> I have question about finding out what core features are not implemented in any given version of BlueZ.
+> By core features, I mean mandatory and optional PICS in L2CAP,GAP,RFCOMM,SDP,SPP sections.
+>
+> For example, how to know what features are implemented and not implemented in BlueZ 4.32  and/or 4.46 ?
+>
+> In general , how to know which features are implented or not in version X.YY of BlueZ? Will there
+> be any consolidated release notes document or browsing source code is the only method to judge this?
 
-Tried forcing hci mode through 2 seperate methods.
+If you want a per release note than there is the Changelog, now if you
+are talking about qualification that depends on kernel version too. We
+support most of the common profiles distributed in plugins:
 
-[root@scannell ~]# cat /etc/sysconfig/bluetooth=20
-# Enable this to use hid2hci to switch a Bluetooth device in USB HID mode
-# to HCI mode for Bluetooth operation.
-HID2HCI_ENABLE=3Dtrue
+audio - avdtp, avctp, avrcp, a2dp, hsp and hfp
+input - hid
+network - pan
+serial - spp and dun
 
-# Enable this to switch capable devices back to HID mode on Bluetooth shutd=
-own
-#HID2HCI_UNDO=3Dtrue
+They all can be disabled so you can customize your solution, also some
+profiles like a2dp, hsp/hfp and pan(NAP) depend on other subsystems to
+work properly and qualify, e.g. our a2dp implementation doesn't stream
+any audio but you can use pulseaudio, gstreamer element or alsa plugin
+to do that for you.
 
-
-And also hid2hci:
-
-[root@scannell ~]# lsusb | grep Logitech
-Bus 001 Device 028: ID 046d:c70a Logitech, Inc. MX5000 Cordless Desktop
-Bus 001 Device 027: ID 046d:c70e Logitech, Inc. MX1000 Bluetooth Laser Mous=
-e
-Bus 001 Device 026: ID 046d:0b02 Logitech, Inc. BT Mini-Receiver (HID proxy
-mode)
-
-[root@scannell ~]# hid2hci -v 046d -p 0b02 -m logitech
-Attempting to switch device 046d:0b02 to HCI mode was successful
-
-However, the device does not actually go into HCI mode:
-
-[root@scannell ~]# lsusb | grep Logitech
-Bus 001 Device 028: ID 046d:c70a Logitech, Inc. MX5000 Cordless Desktop
-Bus 001 Device 027: ID 046d:c70e Logitech, Inc. MX1000 Bluetooth Laser Mous=
-e
-Bus 001 Device 026: ID 046d:0b02 Logitech, Inc. BT Mini-Receiver (HID proxy
-mode)
-
-I tried running through gdb, this is the output:
-
-(gdb) run -v 046d -p 0b02 -m logitech
-Starting program: /usr/sbin/hid2hci -v 046d -p 0b02 -m logitech
-Attempting to switch device 046d:0b02 to HCI mode was successful
-
-Program exited with code 02.
-(gdb) thread apply all bt
-(gdb) bt
-No stack.
-(gdb)
-
---=-AOjZRCblGpLr0DFFX0ME
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-
-iEYEABECAAYFAkqJZn4ACgkQraqtxQYlOUYeAgCfVLr6zOT+rkPiJmWxrDveITkf
-BJ8Amwesmaf8a6XSVvAtFiKQ0iU8B3dQ
-=vJRO
------END PGP SIGNATURE-----
-
---=-AOjZRCblGpLr0DFFX0ME--
-
+-- 
+Luiz Augusto von Dentz
+Engenheiro de Computação
