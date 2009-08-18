@@ -1,43 +1,151 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 18 Aug 2009 16:33:41 +0200
-From: Stefan Seyfried <stefan.seyfried@googlemail.com>
-To: BlueZ devel list <linux-bluetooth@vger.kernel.org>
-Subject: bluetoothd does not autostart on boot
-Message-ID: <20090818163341.60dc3fe1@stoetzler>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Date: Tue, 18 Aug 2009 13:56:33 +0100 (BST)
+To: linux-bluetooth@vger.kernel.org
+Subject: hcidump 1.42 crash on malformed OBEX packet
+MIME-Version: 1.0
+Content-Type: MULTIPART/MIXED; BOUNDARY="0-206873959-1250597872=:19220"
+Message-Id: <1250600195.114157.21433.nullmailer@galant.ukfsn.org>
+From: Iain Hibbert <plunky@rya-online.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
+
+--0-206873959-1250597872=:19220
+Content-Type: TEXT/PLAIN; CHARSET=US-ASCII
+Content-ID: <alpine.NEB.2.00.0908181318291.19220@localhost.>
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+Content-ID: <alpine.NEB.2.00.0908181318290.19220@localhost.>
+
 Hi,
 
-now with the fancy udev autostart, we have everything in place to get
-rid of the init script.
+I had a report of hcidump (v1.42) crashing when parsing a file and have
+verified that it does so here, the dump file with personal information
+edited out is attached.
 
-However, it does not work.
+The situation is that a (Siemens S68 I think it was) phone when sending a
+vCard uses an OBEX packet containing the Put opcode but it does not send
+any length information, eg from the raw dump:
 
-See e.g. https://bugzilla.novell.com/show_bug.cgi?id=527856
-Kay told me that in his opinion, udev is doing everything correctly and
-that using it to fix boot dependencies is not an option.
+> 02 2E 20 0A 00	ACL handle 002e (start, no frag) len 000a
+    06 00 41 00		L2CAP len 0006 cid 0041
+       1B FF 03 01	RFCOMM dlci 6 type UIH pf 1 len 1 credit 1
+          02		OBEX opcode 02 = Put
+       93 		RFCOMM fcs 93
 
-So I'm going to pack up a simple bluetooth init script that does
-nothing but 
+and hcidump crashes because it reads past the end of the packet and the
+arithmetic in obex_dump() routine eventually causes an improper memory
+access after some looping.
 
-	udevadm trigger --subsystem-match=bluetooth
+The Object PUSH apparently does even work but perhaps that is because the
+server assumed a length of zero. (I didn't look into that - server was
+obexapp using openobex to handle the OBEX details and running on NetBSD)
 
-And, as Kay has found out, fedora does the same:
-http://cvs.fedora.redhat.com/viewvc/devel/bluez/bluetooth.init?view=markup&sortby=date
+The simplest fix is below but there seem to be other places where the
+frame length is not checked before reading data that could be invalid
+(perhaps they would not cause loops though).
 
-So the question is: how should we handle this upstream? Or should every
-distribution roll her own solution?
+With this fix, the packet not understood is just not displayed, is that
+the correct thing to do?  The resulting dump seems to have several of
+those but I don't know the OBEX protocol..
 
-Best regards,
+btw while I'm here, is there a reason why the hcidump program is not
+included with the bluez distributions?
 
-	Stefan
--- 
-Stefan Seyfried
-R&D Preload Department             |              "Any ideas, John?"
-SUSE LINUX Products GmbH, Nürnberg | "Well, surrounding them's out."
+regards,
+iain
 
-This footer brought to you by insane German lawmakers:
-SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG Nürnberg)
+- --- parser/obex.c.orig	2007-02-18 03:39:02.000000000 +0000
++++ parser/obex.c
+@@ -236,7 +236,7 @@ void obex_dump(int level, struct frame *
+
+ 	frm = add_frame(frm);
+
+- -	while (frm->len > 0) {
++	while (frm->len >= 3) {
+ 		opcode = get_u8(frm);
+ 		length = get_u16(frm);
+ 		status = opcode & 0x7f;
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (NetBSD)
+
+iQEcBAEBAgAGBQJKiqUBAAoJEPFJxoMWDXVDsPoIAL8NrtSHb2bEaKUH/t2KjSVq
+qMHf0hPnus1BKlG/yKMkiX5kXfp2QJNJmYHdINXVqMiAXAQS9pq2X5LfDQxUEwfX
+L1GWD1XrvOkLVEu5CX/uQRVXSrxMlv0ZNWIRc1voZOHLPp/d2nORXj4fvXA+/TuS
+2G7EzutgZN4uqsdexT0eavAaetjUSZtlLhxa7/X/AFL+etflRgB/BM7G9LIhknxB
+KShY3FoFPm2b4AeBfGnB9Z4Gn7og1L6b8gWoVyZlpSm2+yrR7RsD9p2X2ibjjoCj
+hwsd1UlWZwNDDacobSUra27whjv9iezEt6/zeuhl4BJFmKlZtZVxdyWsNUd4Oc0=
+=rRb8
+-----END PGP SIGNATURE-----
+--0-206873959-1250597872=:19220
+Content-Type: APPLICATION/OCTET-STREAM; NAME=dump
+Content-Transfer-Encoding: BASE64
+Content-ID: <alpine.NEB.2.00.0908181317520.19220@localhost.>
+Content-Description: dump of vCard push will crash hcidump
+Content-Disposition: ATTACHMENT; FILENAME=dump
+
+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
+uwQFBAAuABM=
+
+--0-206873959-1250597872=:19220--
+
+
