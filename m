@@ -1,40 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Weng, Wending" <WWeng@rheinmetall.ca>
-To: "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>
-Date: Wed, 19 Aug 2009 09:19:23 -0400
-Subject: patch for hci_bcsp.c(2.6.31.-rc1)
-Message-ID: <54B31811B83D744D90BF0289EB447D460C1A5044@MAIL-MB1.oerlikon.ca>
-Content-Type: text/plain; charset=US-ASCII
+Message-ID: <4A8BF5AB.2040206@inbd.com.br>
+Date: Wed, 19 Aug 2009 09:52:59 -0300
+From: Andre Thiago Souza <andre.souza@inbd.com.br>
 MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org
+Subject: Cross compile bluez 4.47
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
->From 69596948eb2172080bb950d99dc90678ead08305 Mon Sep 17 00:00:00 2001
-From: root <root@SBC_PC_3.localdomain>
-Date: Wed, 19 Aug 2009 08:59:56 -0400
-Subject: [PATCH] The routine bcsp_pkt_cull doesn't ack the packets properly
-if multiple packets are queued. The counter i must increase before
-doing comparison.
+Hi, i'm trying to cross compile the bluez 4.47 on ARM platform and i 
+have some problems.
+To configure i set the following comand and all works fine:
+$ ./configure --prefix=/usr/bt/ --host=arm-linux CC=arm-linux-gcc 
+CPP=arm-linux-cpp AR=arm-linux-ar STRIP=arm-linux-strip 
+RANLIB=arm-linux-ranlib LD=arm-linux-ld
 
-Signed-off-by: Wending Weng <wweng@rheinmetall.ca>
 
----
- drivers/bluetooth/hci_bcsp.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+But when i try to make the library:
+$ make && make install
 
-diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
-index 894b2cb..cd30f39 100644
---- a/drivers/bluetooth/hci_bcsp.c
-+++ b/drivers/bluetooth/hci_bcsp.c
-@@ -373,7 +373,7 @@ static void bcsp_pkt_cull(struct bcsp_struct *bcsp)
+i got the following error:
 
-        i = 0;
-        skb_queue_walk_safe(&bcsp->unack, skb, tmp) {
--               if (i++ >= pkts_to_be_removed)
-+               if (++i >= pkts_to_be_removed)
-                        break;
-
-                __skb_unlink(skb, &bcsp->unack);
---
-1.5.2.1
-
+make[2]: Entering directory `/usr/bluez-4.47/common'
+  CCLD   test_textfile
+/usr/local/arm/3.4.1/lib/gcc/arm-linux/3.4.1/../../../../arm-linux/lib/libc_nonshared.a(elf-init.oS)(.text+0x44): 
+In function `__libc_csu_init':
+: undefined reference to `__init_array_end'
+/usr/local/arm/3.4.1/lib/gcc/arm-linux/3.4.1/../../../../arm-linux/lib/libc_nonshared.a(elf-init.oS)(.text+0x48): 
+In function `__libc_csu_init':
+: undefined reference to `__init_array_start'
+/usr/local/arm/3.4.1/lib/gcc/arm-linux/3.4.1/../../../../arm-linux/lib/libc_nonshared.a(elf-init.oS)(.text+0x8c): 
+In function `__libc_csu_fini':
+: undefined reference to `__fini_array_end'
+/usr/local/arm/3.4.1/lib/gcc/arm-linux/3.4.1/../../../../arm-linux/lib/libc_nonshared.a(elf-init.oS)(.text+0x90): 
+In function `__libc_csu_fini':
+: undefined reference to `__fini_array_start'
+collect2: ld returned 1 exit status
+make[2]: *** [test_textfile] Error 1
+make[2]: Leaving directory `/usr/bluez-4.47/common'
+make[1]: *** [all-recursive] Error 1
+make[1]: Leaving directory `/usr/bluez-4.47'
+make: *** [all] Error 2
