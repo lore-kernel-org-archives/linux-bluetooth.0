@@ -1,126 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Weng, Wending" <WWeng@rheinmetall.ca>
+To: "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>
+Date: Wed, 19 Aug 2009 09:19:23 -0400
+Subject: patch for hci_bcsp.c(2.6.31.-rc1)
+Message-ID: <54B31811B83D744D90BF0289EB447D460C1A5044@MAIL-MB1.oerlikon.ca>
+Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
-Date: Wed, 19 Aug 2009 18:10:41 +0200
-Message-ID: <a70b8cd30908190910p35910657m28fe09905717d60@mail.gmail.com>
-Subject: PATCH for input/fakehid.c to fix PS3 remote unpairing
-From: "Ruslan N. Marchenko" <rufferson@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-Here is the patch to correctly handle PS3 remote unpairing and manual
-turning off.
+>From 69596948eb2172080bb950d99dc90678ead08305 Mon Sep 17 00:00:00 2001
+From: root <root@SBC_PC_3.localdomain>
+Date: Wed, 19 Aug 2009 08:59:56 -0400
+Subject: [PATCH] The routine bcsp_pkt_cull doesn't ack the packets properly
+if multiple packets are queued. The counter i must increase before
+doing comparison.
 
---- bluez-4.47/input/fakehid.c	2009-04-23 03:40:04.000000000 +0200
-+++ bluez-4.47-my/input/fakehid.c	2009-08-19 18:02:53.000000000 +0200
-@@ -208,18 +208,49 @@
- 						lastmask & 0xff, lastkey);
- 	return -1;
- }
-+static gboolean ps3remote_sendkey(int uinput, unsigned int key,
-+				  unsigned int value)
-+{
-+	struct uinput_event event;
-+	memset(&event, 0, sizeof(event));
-+	gettimeofday(&event.time, NULL);
-+	event.type = EV_KEY;
-+	event.code = key;
-+	event.value = value;
-+	if (write(uinput, &event, sizeof(event)) != sizeof(event)) {
-+		error("Error writing to uinput device");
-+		return FALSE;
-+	}
+Signed-off-by: Wending Weng <wweng@rheinmetall.ca>
 
-+	memset(&event, 0, sizeof(event));
-+	gettimeofday(&event.time, NULL);
-+	event.type = EV_SYN;
-+	event.code = SYN_REPORT;
-+	if (write(uinput, &event, sizeof(event)) != sizeof(event)) {
-+		error("Error writing to uinput device");
-+		return FALSE;
-+	}
-+	return TRUE;
-+}
- static gboolean ps3remote_event(GIOChannel *chan, GIOCondition cond,
- 				gpointer data)
- {
-+	static unsigned int lastkey = 0;
-+	static unsigned int lastval = 0;
- 	struct fake_input *fake = data;
--	struct uinput_event event;
- 	unsigned int key, value = 0;
- 	gsize size;
- 	char buff[50];
+---
+ drivers/bluetooth/hci_bcsp.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
--	if (cond & G_IO_NVAL)
--		return FALSE;
-+	if (cond & G_IO_NVAL) {
-+		if(lastkey == KEY_HOMEPAGE && lastval == 1) {
-+			DBG("ps3remote_event: Remote turned off");
-+			goto failed;
-+		} else {
-+			DBG("ps3remote_event: Remote unpaired [%u:%u]", lastkey, lastval);
-+			goto failed;
-+		}
-+	}
+diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
+index 894b2cb..cd30f39 100644
+--- a/drivers/bluetooth/hci_bcsp.c
++++ b/drivers/bluetooth/hci_bcsp.c
+@@ -373,7 +373,7 @@ static void bcsp_pkt_cull(struct bcsp_struct *bcsp)
 
- 	if (cond & (G_IO_HUP | G_IO_ERR)) {
- 		error("Hangup or error on rfcomm server socket");
-@@ -240,26 +271,18 @@
- 		goto failed;
- 	} else if (key == KEY_MAX)
- 		return TRUE;
--
--	memset(&event, 0, sizeof(event));
--	gettimeofday(&event.time, NULL);
--	event.type = EV_KEY;
--	event.code = key;
--	event.value = value;
--	if (write(fake->uinput, &event, sizeof(event)) != sizeof(event)) {
--		error("Error writing to uinput device");
--		goto failed;
--	}
--
--	memset(&event, 0, sizeof(event));
--	gettimeofday(&event.time, NULL);
--	event.type = EV_SYN;
--	event.code = SYN_REPORT;
--	if (write(fake->uinput, &event, sizeof(event)) != sizeof(event)) {
--		error("Error writing to uinput device");
-+	/* Delaying key till release, assuming possible turn-off */
-+	if(key == KEY_HOMEPAGE) {
-+		if(value == 0 && lastkey == KEY_HOMEPAGE && lastval == 1) {
-+			ps3remote_sendkey(fake->uinput, key, 1);
-+			ps3remote_sendkey(fake->uinput, key, 0);
-+		} else
-+			DBG("ps3remote_event: Delayed: %u:%u (%u:%u)", key, value,
-lastkey, lastval);
-+	} else if(!ps3remote_sendkey(fake->uinput, key, value))
- 		goto failed;
--	}
--
-+	lastkey = key;
-+	lastval = value;
-+	DBG("ps3remote_event: %u:%u", key, value);
- 	return TRUE;
+        i = 0;
+        skb_queue_walk_safe(&bcsp->unack, skb, tmp) {
+-               if (i++ >= pkts_to_be_removed)
++               if (++i >= pkts_to_be_removed)
+                        break;
 
- failed:
-@@ -267,7 +290,7 @@
- 	close(fake->uinput);
- 	fake->uinput = -1;
- 	g_io_channel_unref(fake->io);
--
-+	DBG("ps3remote_event: input device removed.");
- 	return FALSE;
- }
+                __skb_unlink(skb, &bcsp->unack);
+--
+1.5.2.1
 
-I'm also thinking on implementing keymapping through input.conf
-configuration section. Will it be accepted or not worth trying?
-
--- 
-----
-Looking forward to reading yours.
- RUFF-RIPE DI76-GANDI RUFF-6BONE
-     Ruslan N. Marchenko
