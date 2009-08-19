@@ -1,185 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1250564030-13684-8-git-send-email-gustavo@las.ic.unicamp.br>
-References: <1250564030-13684-1-git-send-email-gustavo@las.ic.unicamp.br>
-	 <1250564030-13684-2-git-send-email-gustavo@las.ic.unicamp.br>
-	 <1250564030-13684-3-git-send-email-gustavo@las.ic.unicamp.br>
-	 <1250564030-13684-4-git-send-email-gustavo@las.ic.unicamp.br>
-	 <1250564030-13684-5-git-send-email-gustavo@las.ic.unicamp.br>
-	 <1250564030-13684-6-git-send-email-gustavo@las.ic.unicamp.br>
-	 <1250564030-13684-7-git-send-email-gustavo@las.ic.unicamp.br>
-	 <1250564030-13684-8-git-send-email-gustavo@las.ic.unicamp.br>
-Date: Thu, 20 Aug 2009 01:21:16 -0300
-Message-ID: <6b53b1990908192121w1932eeb4o86f0fa7e00daeaa0@mail.gmail.com>
-Subject: Re: [PATCH 8/8] Bluetooth: Group code for sending an I-frame.
-From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <4A8BF5AB.2040206@inbd.com.br>
+References: <4A8BF5AB.2040206@inbd.com.br>
+Date: Wed, 19 Aug 2009 19:10:04 -0300
+Message-ID: <2d5a2c100908191510g727eb701v71abcdf596ee2f1e@mail.gmail.com>
+Subject: Re: Cross compile bluez 4.47
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andre Thiago Souza <andre.souza@inbd.com.br>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Aug 17, 2009 at 11:53 PM, Gustavo F.
-Padovan<gustavo@las.ic.unicamp.br> wrote:
-> Remove duplicated code for ERTM and Streming mode.
+Hi Andre,
+
+On Wed, Aug 19, 2009 at 9:52 AM, Andre Thiago
+Souza<andre.souza@inbd.com.br> wrote:
+> Hi, i'm trying to cross compile the bluez 4.47 on ARM platform and i have
+> some problems.
+> To configure i set the following comand and all works fine:
+> $ ./configure --prefix=/usr/bt/ --host=arm-linux CC=arm-linux-gcc
+> CPP=arm-linux-cpp AR=arm-linux-ar STRIP=arm-linux-strip
+> RANLIB=arm-linux-ranlib LD=arm-linux-ld
 >
-> Signed-off-by: Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
-> ---
-> аnet/bluetooth/l2cap.c | а 74 ++++++++++++++++--------------------------------
-> а1 files changed, 25 insertions(+), 49 deletions(-)
+>
+> But when i try to make the library:
+> $ make && make install
+>
+> i got the following error:
+>
+> make[2]: Entering directory `/usr/bluez-4.47/common'
+> аCCLD а test_textfile
+> /usr/local/arm/3.4.1/lib/gcc/arm-linux/3.4.1/../../../../arm-linux/lib/libc_nonshared.a(elf-init.oS)(.text+0x44):
+> In function `__libc_csu_init':
+> : undefined reference to `__init_array_end'
+> /usr/local/arm/3.4.1/lib/gcc/arm-linux/3.4.1/../../../../arm-linux/lib/libc_nonshared.a(elf-init.oS)(.text+0x48):
+> In function `__libc_csu_init':
+> : undefined reference to `__init_array_start'
+> /usr/local/arm/3.4.1/lib/gcc/arm-linux/3.4.1/../../../../arm-linux/lib/libc_nonshared.a(elf-init.oS)(.text+0x8c):
+> In function `__libc_csu_fini':
+> : undefined reference to `__fini_array_end'
+> /usr/local/arm/3.4.1/lib/gcc/arm-linux/3.4.1/../../../../arm-linux/lib/libc_nonshared.a(elf-init.oS)(.text+0x90):
+> In function `__libc_csu_fini':
+> : undefined reference to `__fini_array_start'
+> collect2: ld returned 1 exit status
+> make[2]: *** [test_textfile] Error 1
+> make[2]: Leaving directory `/usr/bluez-4.47/common'
+> make[1]: *** [all-recursive] Error 1
+> make[1]: Leaving directory `/usr/bluez-4.47'
+> make: *** [all] Error 2
 
 
-This one is broken. Ignore it. :-(
-
->
-> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-> index 60c612c..3c63ba7 100644
-> --- a/net/bluetooth/l2cap.c
-> +++ b/net/bluetooth/l2cap.c
-> @@ -1241,37 +1241,38 @@ static void l2cap_drop_acked_frames(struct sock *sk)
-> аstatic inline int l2cap_do_send(struct sock *sk, struct sk_buff *skb)
-> а{
-> а а а аstruct l2cap_pinfo *pi = l2cap_pi(sk);
-> + а а а struct sk_buff *tx_skb;
-> + а а а u16 control, fcs;
-> а а а аint err;
->
-> а а а аBT_DBG("sk %p, skb %p len %d", sk, skb, skb->len);
->
-> - а а а err = hci_send_acl(pi->conn->hcon, skb, 0);
-> + а а а tx_skb = skb_clone(skb, GFP_ATOMIC);
-> +
-> + а а а control = get_unaligned_le16(tx_skb->data + L2CAP_HDR_SIZE);
-> + а а а control |= pi->next_tx_seq << L2CAP_CTRL_TXSEQ_SHIFT;
-> + а а а put_unaligned_le16(control, tx_skb->data + L2CAP_HDR_SIZE);
-> +
-> + а а а if (l2cap_pi(sk)->fcs == L2CAP_FCS_CRC16) {
-> + а а а а а а а fcs = crc16(0, (u8 *)tx_skb->data, tx_skb->len - 2);
-> + а а а а а а а put_unaligned_le16(fcs, tx_skb->data + tx_skb->len - 2);
-> + а а а }
-> +
-> + а а а err = hci_send_acl(pi->conn->hcon, tx_skb, 0);
-> а а а аif (err < 0)
-> - а а а а а а а kfree_skb(skb);
-> + а а а а а а а kfree_skb(tx_skb);
->
-> а а а аreturn err;
-> а}
->
-> аstatic int l2cap_streaming_send(struct sock *sk)
-> а{
-> - а а а struct sk_buff *skb, *tx_skb;
-> + а а а struct sk_buff *skb;
-> а а а аstruct l2cap_pinfo *pi = l2cap_pi(sk);
-> - а а а u16 control, fcs;
-> а а а аint err;
->
-> а а а аwhile ((skb = sk->sk_send_head)) {
-> - а а а а а а а tx_skb = skb_clone(skb, GFP_ATOMIC);
-> -
-> - а а а а а а а control = get_unaligned_le16(tx_skb->data + L2CAP_HDR_SIZE);
-> - а а а а а а а control |= pi->next_tx_seq << L2CAP_CTRL_TXSEQ_SHIFT;
-> - а а а а а а а put_unaligned_le16(control, tx_skb->data + L2CAP_HDR_SIZE);
-> -
-> - а а а а а а а if (l2cap_pi(sk)->fcs == L2CAP_FCS_CRC16) {
-> - а а а а а а а а а а а fcs = crc16(0, (u8 *)tx_skb->data, tx_skb->len - 2);
-> - а а а а а а а а а а а put_unaligned_le16(fcs, tx_skb->data + tx_skb->len - 2);
-> - а а а а а а а }
-> -
-> - а а а а а а а err = l2cap_do_send(sk, tx_skb);
-> + а а а а а а а err = l2cap_do_send(sk, skb);
-> а а а а а а а аif (err < 0) {
-> а а а а а а а а а а а аl2cap_send_disconn_req(pi->conn, sk);
-> а а а а а а а а а а а аreturn err;
-> @@ -1293,8 +1294,7 @@ static int l2cap_streaming_send(struct sock *sk)
-> аstatic int l2cap_retransmit_frame(struct sock *sk, u8 tx_seq)
-> а{
-> а а а аstruct l2cap_pinfo *pi = l2cap_pi(sk);
-> - а а а struct sk_buff *skb, *tx_skb;
-> - а а а u16 control, fcs;
-> + а а а struct sk_buff *skb;
-> а а а аint err;
->
-> а а а аskb = skb_peek(TX_QUEUE(sk));
-> @@ -1312,23 +1312,13 @@ static int l2cap_retransmit_frame(struct sock *sk, u8 tx_seq)
-> а а а а а а а а а а а аbreak;
-> а а а а а а а а}
->
-> - а а а а а а а tx_skb = skb_clone(skb, GFP_ATOMIC);
-> - а а а а а а а bt_cb(skb)->retries++;
-> - а а а а а а а control = get_unaligned_le16(tx_skb->data + L2CAP_HDR_SIZE);
-> - а а а а а а а control |= (pi->req_seq << L2CAP_CTRL_REQSEQ_SHIFT)
-> - а а а а а а а а а а а а а а а | (tx_seq << L2CAP_CTRL_TXSEQ_SHIFT);
-> - а а а а а а а put_unaligned_le16(control, tx_skb->data + L2CAP_HDR_SIZE);
-> -
-> - а а а а а а а if (l2cap_pi(sk)->fcs == L2CAP_FCS_CRC16) {
-> - а а а а а а а а а а а fcs = crc16(0, (u8 *)tx_skb->data, tx_skb->len - 2);
-> - а а а а а а а а а а а put_unaligned_le16(fcs, tx_skb->data + tx_skb->len - 2);
-> - а а а а а а а }
-> -
-> - а а а а а а а err = l2cap_do_send(sk, tx_skb);
-> + а а а а а а а err = l2cap_do_send(sk, skb);
-> а а а а а а а аif (err < 0) {
-> а а а а а а а а а а а аl2cap_send_disconn_req(pi->conn, sk);
-> а а а а а а а а а а а аreturn err;
-> а а а а а а а а}
-> + а а а а а а а bt_cb(skb)->retries++;
-> +
-> а а а а а а а аbreak;
-> а а а а} while(1);
-> а а а аreturn 0;
-> @@ -1336,41 +1326,27 @@ static int l2cap_retransmit_frame(struct sock *sk, u8 tx_seq)
->
-> аstatic int l2cap_ertm_send(struct sock *sk)
-> а{
-> - а а а struct sk_buff *skb, *tx_skb;
-> + а а а struct sk_buff *skb;
-> а а а аstruct l2cap_pinfo *pi = l2cap_pi(sk);
-> - а а а u16 control, fcs;
-> а а а аint err;
->
-> а а а аif (pi->conn_state & L2CAP_CONN_WAIT_ACK)
-> а а а а а а а аreturn 0;
->
-> а а а аwhile ((skb = sk->sk_send_head) && (!l2cap_tx_window_full(sk))) {
-> - а а а а а а а tx_skb = skb_clone(skb, GFP_ATOMIC);
-> -
-> а а а а а а а аif (pi->remote_max_tx &&
-> а а а а а а а а а а а а а а а аbt_cb(skb)->retries == pi->remote_max_tx) {
-> а а а а а а а а а а а аl2cap_send_disconn_req(pi->conn, sk);
-> а а а а а а а а а а а аbreak;
-> а а а а а а а а}
->
-> - а а а а а а а bt_cb(skb)->retries++;
-> -
-> - а а а а а а а control = get_unaligned_le16(tx_skb->data + L2CAP_HDR_SIZE);
-> - а а а а а а а control |= (pi->req_seq << L2CAP_CTRL_REQSEQ_SHIFT)
-> - а а а а а а а а а а а а а а а | (pi->next_tx_seq << L2CAP_CTRL_TXSEQ_SHIFT);
-> - а а а а а а а put_unaligned_le16(control, tx_skb->data + L2CAP_HDR_SIZE);
-> -
-> -
-> - а а а а а а а if (l2cap_pi(sk)->fcs == L2CAP_FCS_CRC16) {
-> - а а а а а а а а а а а fcs = crc16(0, (u8 *)skb->data, tx_skb->len - 2);
-> - а а а а а а а а а а а put_unaligned_le16(fcs, skb->data + tx_skb->len - 2);
-> - а а а а а а а }
-> -
-> - а а а а а а а err = l2cap_do_send(sk, tx_skb);
-> + а а а а а а а err = l2cap_do_send(sk, skb);
-> а а а а а а а аif (err < 0) {
-> а а а а а а а а а а а аl2cap_send_disconn_req(pi->conn, sk);
-> а а а а а а а а а а а аreturn err;
-> а а а а а а а а}
-> +
-> + а а а а а а а bt_cb(skb)->retries++;
-> а а а а а а а а__mod_retrans_timer();
->
-> а а а а а а а аbt_cb(skb)->tx_seq = pi->next_tx_seq;
-> --
-> 1.6.3.3
->
->
-
+It doesn't look like this is our problem, never really tried to cross
+compile that way you did (normally I use boostrap-configure on
+scratchbox and that just work) but it seems your chaintool is not
+right. If you don't like the idea of having to install scratchbox you
+can try mamona on a chroot:  http://dev.openbossa.org/trac/mamona/
 
 
 -- 
-Gustavo F. Padovan
-http://padovan.org
+Luiz Augusto von Dentz
+Engenheiro de Computaчуo
