@@ -1,44 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A8BF5AB.2040206@inbd.com.br>
-Date: Wed, 19 Aug 2009 09:52:59 -0300
-From: Andre Thiago Souza <andre.souza@inbd.com.br>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Cross compile bluez 4.47
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Date: Wed, 19 Aug 2009 08:44:46 +0200
+From: Stefan Seyfried <stefan.seyfried@googlemail.com>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: BlueZ devel list <linux-bluetooth@vger.kernel.org>
+Subject: Re: bluetoothd does not autostart on boot
+Message-ID: <20090819084446.41bc0578@stoetzler>
+In-Reply-To: <1250630036.12900.109.camel@localhost.localdomain>
+References: <20090818163341.60dc3fe1@stoetzler>
+	<1250630036.12900.109.camel@localhost.localdomain>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, i'm trying to cross compile the bluez 4.47 on ARM platform and i 
-have some problems.
-To configure i set the following comand and all works fine:
-$ ./configure --prefix=/usr/bt/ --host=arm-linux CC=arm-linux-gcc 
-CPP=arm-linux-cpp AR=arm-linux-ar STRIP=arm-linux-strip 
-RANLIB=arm-linux-ranlib LD=arm-linux-ld
+On Tue, 18 Aug 2009 22:13:56 +0100
+Bastien Nocera <hadess@hadess.net> wrote:
 
+> On Tue, 2009-08-18 at 16:33 +0200, Stefan Seyfried wrote:
 
-But when i try to make the library:
-$ make && make install
+> > So the question is: how should we handle this upstream? Or should
+> > every distribution roll her own solution?
 
-i got the following error:
+This question still remains.
 
-make[2]: Entering directory `/usr/bluez-4.47/common'
-  CCLD   test_textfile
-/usr/local/arm/3.4.1/lib/gcc/arm-linux/3.4.1/../../../../arm-linux/lib/libc_nonshared.a(elf-init.oS)(.text+0x44): 
-In function `__libc_csu_init':
-: undefined reference to `__init_array_end'
-/usr/local/arm/3.4.1/lib/gcc/arm-linux/3.4.1/../../../../arm-linux/lib/libc_nonshared.a(elf-init.oS)(.text+0x48): 
-In function `__libc_csu_init':
-: undefined reference to `__init_array_start'
-/usr/local/arm/3.4.1/lib/gcc/arm-linux/3.4.1/../../../../arm-linux/lib/libc_nonshared.a(elf-init.oS)(.text+0x8c): 
-In function `__libc_csu_fini':
-: undefined reference to `__fini_array_end'
-/usr/local/arm/3.4.1/lib/gcc/arm-linux/3.4.1/../../../../arm-linux/lib/libc_nonshared.a(elf-init.oS)(.text+0x90): 
-In function `__libc_csu_fini':
-: undefined reference to `__fini_array_start'
-collect2: ld returned 1 exit status
-make[2]: *** [test_textfile] Error 1
-make[2]: Leaving directory `/usr/bluez-4.47/common'
-make[1]: *** [all-recursive] Error 1
-make[1]: Leaving directory `/usr/bluez-4.47'
-make: *** [all] Error 2
+> We do the same because what Kay told me would work doesn't actually
+> work. Having already spent a huge amount of time trying to make this
+> work, I had no option but to add the same work-around as Ubuntu.
+> 
+> FWIW, I already had a conversation with Kay through Harald Hoyer,
+> where Kay tried to deny that he ever told me that it would work (or
+> rather, that it would work, but that we should do it another way in
+> the future).
+> 
+> You can discuss that with him.
+
+I'm not trying to play the blame game here (sorry if I made that
+impression), I'm just trying to:
+
+a) keep "my" package as close to Marcel's upstream as possible
+b) make it work for everyone, even for those who install from source.
+
+Since udev does not really do what we expected it to do, shouldn't we
+add that very simple init script back to the tarballs?
+(I expect it to do no harm, it will not even measurably impact the
+"fast boot" efforts).
+
+Best regards,
+
+	Stefan
+-- 
+Stefan Seyfried
+R&D Preload Department             |              "Any ideas, John?"
+SUSE LINUX Products GmbH, Nürnberg | "Well, surrounding them's out."
+
+This footer brought to you by insane German lawmakers:
+SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG Nürnberg)
