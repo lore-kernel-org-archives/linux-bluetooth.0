@@ -1,338 +1,185 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <1250564030-13684-8-git-send-email-gustavo@las.ic.unicamp.br>
+References: <1250564030-13684-1-git-send-email-gustavo@las.ic.unicamp.br>
+	 <1250564030-13684-2-git-send-email-gustavo@las.ic.unicamp.br>
+	 <1250564030-13684-3-git-send-email-gustavo@las.ic.unicamp.br>
+	 <1250564030-13684-4-git-send-email-gustavo@las.ic.unicamp.br>
+	 <1250564030-13684-5-git-send-email-gustavo@las.ic.unicamp.br>
+	 <1250564030-13684-6-git-send-email-gustavo@las.ic.unicamp.br>
+	 <1250564030-13684-7-git-send-email-gustavo@las.ic.unicamp.br>
+	 <1250564030-13684-8-git-send-email-gustavo@las.ic.unicamp.br>
+Date: Thu, 20 Aug 2009 01:21:16 -0300
+Message-ID: <6b53b1990908192121w1932eeb4o86f0fa7e00daeaa0@mail.gmail.com>
+Subject: Re: [PATCH 8/8] Bluetooth: Group code for sending an I-frame.
 From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, gustavo@padovan.org
-Subject: [PATCH 2/8] Bluetooth: Add support for Segmentation and Reassembly of SDUs
-Date: Thu, 20 Aug 2009 22:25:58 -0300
-Message-Id: <1250817964-11533-2-git-send-email-gustavo@las.ic.unicamp.br>
-In-Reply-To: <1250817964-11533-1-git-send-email-gustavo@las.ic.unicamp.br>
-References: <1250817964-11533-1-git-send-email-gustavo@las.ic.unicamp.br>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ERTM should use Segmentation and Reassembly to break down a SDU in many
-PDUs on sending data to the other side.
-On sending packets we queue all 'segments' until end of segmentation and
-just the add them to the queue for sending.
-On receiving we create a new skb with the SDU reassembled.
+On Mon, Aug 17, 2009 at 11:53 PM, Gustavo F.
+Padovan<gustavo@las.ic.unicamp.br> wrote:
+> Remove duplicated code for ERTM and Streming mode.
+>
+> Signed-off-by: Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
+> ---
+>  net/bluetooth/l2cap.c |   74 ++++++++++++++++--------------------------------
+>  1 files changed, 25 insertions(+), 49 deletions(-)
 
-Initially based on a patch from Nathan Holstein <nathan@lampreynetworks.com>
 
-Signed-off-by: Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
----
- include/net/bluetooth/l2cap.h |    9 ++-
- net/bluetooth/l2cap.c         |  170 +++++++++++++++++++++++++++++++++++++----
- 2 files changed, 162 insertions(+), 17 deletions(-)
+This one is broken. Ignore it. :-(
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 9bbfbe7..0afde8d 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -34,7 +34,7 @@
- #define L2CAP_DEFAULT_MAX_RECEIVE	1
- #define L2CAP_DEFAULT_RETRANS_TO	300    /* 300 milliseconds */
- #define L2CAP_DEFAULT_MONITOR_TO	1000   /* 1 second */
--#define L2CAP_DEFAULT_MAX_RX_APDU	0xfff7
-+#define L2CAP_DEFAULT_MAX_PDU_SIZE	672
- 
- #define L2CAP_CONN_TIMEOUT	(40000) /* 40 seconds */
- #define L2CAP_INFO_TIMEOUT	(4000)  /*  4 seconds */
-@@ -311,6 +311,7 @@ struct l2cap_pinfo {
- 	__u8		conf_req[64];
- 	__u8		conf_len;
- 	__u8		conf_state;
-+	__u8		conn_state;
- 
- 	__u8		next_tx_seq;
- 	__u8		expected_ack_seq;
-@@ -318,6 +319,9 @@ struct l2cap_pinfo {
- 	__u8		expected_tx_seq;
- 	__u8		unacked_frames;
- 	__u8		num_to_ack;
-+	__u16		sdu_len;
-+	__u16		partial_sdu_len;
-+	struct sk_buff	*sdu;
- 
- 	__u8		ident;
- 
-@@ -346,6 +350,8 @@ struct l2cap_pinfo {
- #define L2CAP_CONF_MAX_CONF_REQ 2
- #define L2CAP_CONF_MAX_CONF_RSP 2
- 
-+#define L2CAP_CONN_SAR_SDU         0x01
-+
- static inline int l2cap_tx_window_full(struct sock *sk)
- {
- 	struct l2cap_pinfo *pi = l2cap_pi(sk);
-@@ -363,6 +369,7 @@ static inline int l2cap_tx_window_full(struct sock *sk)
- #define __get_reqseq(ctrl) ((ctrl) & L2CAP_CTRL_REQSEQ) >> 8
- #define __is_iframe(ctrl) !((ctrl) & L2CAP_CTRL_FRAME_TYPE)
- #define __is_sframe(ctrl) (ctrl) & L2CAP_CTRL_FRAME_TYPE
-+#define __is_sar_start(ctrl) ((ctrl) & L2CAP_CTRL_SAR) == L2CAP_SDU_START
- 
- void l2cap_load(void);
- 
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 45b8697..167e025 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -1334,7 +1334,7 @@ static struct sk_buff *l2cap_create_basic_pdu(struct sock *sk, struct msghdr *ms
- 	return skb;
- }
- 
--static struct sk_buff *l2cap_create_ertm_pdu(struct sock *sk, struct msghdr *msg, size_t len, u16 control)
-+static struct sk_buff *l2cap_create_ertm_pdu(struct sock *sk, struct msghdr *msg, size_t len, u16 control, u16 sdulen)
- {
- 	struct l2cap_conn *conn = l2cap_pi(sk)->conn;
- 	struct sk_buff *skb;
-@@ -1343,6 +1343,9 @@ static struct sk_buff *l2cap_create_ertm_pdu(struct sock *sk, struct msghdr *msg
- 
- 	BT_DBG("sk %p len %d", sk, (int)len);
- 
-+	if (sdulen)
-+		hlen += 2;
-+
- 	count = min_t(unsigned int, (conn->mtu - hlen), len);
- 	skb = bt_skb_send_alloc(sk, count + hlen,
- 			msg->msg_flags & MSG_DONTWAIT, &err);
-@@ -1354,6 +1357,8 @@ static struct sk_buff *l2cap_create_ertm_pdu(struct sock *sk, struct msghdr *msg
- 	lh->cid = cpu_to_le16(l2cap_pi(sk)->dcid);
- 	lh->len = cpu_to_le16(len + (hlen - L2CAP_HDR_SIZE));
- 	put_unaligned_le16(control, skb_put(skb, 2));
-+	if (sdulen)
-+		put_unaligned_le16(sdulen, skb_put(skb, 2));
- 
- 	err = l2cap_skbuff_fromiovec(sk, msg, len, count, skb);
- 	if (unlikely(err < 0)) {
-@@ -1363,6 +1368,54 @@ static struct sk_buff *l2cap_create_ertm_pdu(struct sock *sk, struct msghdr *msg
- 	return skb;
- }
- 
-+static inline int l2cap_sar_segment_sdu(struct sock *sk, struct msghdr *msg, size_t len)
-+{
-+	struct l2cap_pinfo *pi = l2cap_pi(sk);
-+	struct sk_buff *skb;
-+	struct sk_buff_head sar_queue;
-+	u16 control;
-+	size_t size = 0;
-+
-+	__skb_queue_head_init(&sar_queue);
-+	control = L2CAP_SDU_START;
-+	skb = l2cap_create_ertm_pdu(sk, msg, pi->max_pdu_size, control, len);
-+	if (IS_ERR(skb))
-+		return PTR_ERR(skb);
-+
-+	__skb_queue_tail(&sar_queue, skb);
-+	len -= pi->max_pdu_size;
-+	size +=pi->max_pdu_size;
-+	control = 0;
-+
-+	while (len > 0) {
-+		size_t buflen;
-+
-+		if (len > pi->max_pdu_size) {
-+			control |= L2CAP_SDU_CONTINUE;
-+			buflen = pi->max_pdu_size;
-+		} else {
-+			control |= L2CAP_SDU_END;
-+			buflen = len;
-+		}
-+
-+		skb = l2cap_create_ertm_pdu(sk, msg, buflen, control, 0);
-+		if (IS_ERR(skb)) {
-+			skb_queue_purge(&sar_queue);
-+			return PTR_ERR(skb);
-+		}
-+
-+		__skb_queue_tail(&sar_queue, skb);
-+		len -= buflen;
-+		size += buflen;
-+		control = 0;
-+	}
-+	skb_queue_splice_tail(&sar_queue, TX_QUEUE(sk));
-+	if (sk->sk_send_head == NULL)
-+		sk->sk_send_head = sar_queue.next;
-+
-+	return size;
-+}
-+
- static int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock, struct msghdr *msg, size_t len)
- {
- 	struct sock *sk = sock->sk;
-@@ -1415,21 +1468,22 @@ static int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock, struct ms
- 
- 	case L2CAP_MODE_ERTM:
- 		/* Entire SDU fits into one PDU */
--		if (len <= pi->omtu) {
-+		if (len <= pi->max_pdu_size) {
- 			control = L2CAP_SDU_UNSEGMENTED;
--			skb = l2cap_create_ertm_pdu(sk, msg, len, control);
-+			skb = l2cap_create_ertm_pdu(sk, msg, len, control, 0);
- 			if (IS_ERR(skb)) {
- 				err = PTR_ERR(skb);
- 				goto done;
- 			}
-+			__skb_queue_tail(TX_QUEUE(sk), skb);
-+			if (sk->sk_send_head == NULL)
-+				sk->sk_send_head = skb;
- 		} else {
--			/* FIXME: Segmentation will be added later */
--			err = -EINVAL;
--			goto done;
-+		/* Segment SDU into multiples PDUs */
-+			err = l2cap_sar_segment_sdu(sk, msg, len);
-+			if (err < 0)
-+				goto done;
- 		}
--		__skb_queue_tail(TX_QUEUE(sk), skb);
--		if (sk->sk_send_head == NULL)
--			sk->sk_send_head = skb;
- 
- 		err = l2cap_ertm_send(sk);
- 		if (!err)
-@@ -2007,7 +2061,7 @@ done:
- 		rfc.max_transmit    = L2CAP_DEFAULT_MAX_RECEIVE;
- 		rfc.retrans_timeout = 0;
- 		rfc.monitor_timeout = 0;
--		rfc.max_pdu_size    = cpu_to_le16(L2CAP_DEFAULT_MAX_RX_APDU);
-+		rfc.max_pdu_size    = cpu_to_le16(L2CAP_DEFAULT_MAX_PDU_SIZE);
- 
- 		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC,
- 					sizeof(rfc), (unsigned long) &rfc);
-@@ -2019,7 +2073,7 @@ done:
- 		rfc.max_transmit    = 0;
- 		rfc.retrans_timeout = 0;
- 		rfc.monitor_timeout = 0;
--		rfc.max_pdu_size    = cpu_to_le16(L2CAP_DEFAULT_MAX_RX_APDU);
-+		rfc.max_pdu_size    = cpu_to_le16(L2CAP_DEFAULT_MAX_PDU_SIZE);
- 
- 		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC,
- 					sizeof(rfc), (unsigned long) &rfc);
-@@ -2808,6 +2862,86 @@ static inline void l2cap_sig_channel(struct l2cap_conn *conn, struct sk_buff *sk
- 	kfree_skb(skb);
- }
- 
-+static int l2cap_sar_reassembly_sdu(struct sock *sk, struct sk_buff *skb, u16 control)
-+{
-+	struct l2cap_pinfo *pi = l2cap_pi(sk);
-+	struct sk_buff *_skb;
-+	int err = -EINVAL;
-+
-+	switch (control & L2CAP_CTRL_SAR) {
-+	case L2CAP_SDU_UNSEGMENTED:
-+		if (pi->conn_state & L2CAP_CONN_SAR_SDU) {
-+			kfree_skb(pi->sdu);
-+			break;
-+		}
-+
-+		err = sock_queue_rcv_skb(sk, skb);
-+		if (!err)
-+			return 0;
-+
-+		break;
-+
-+	case L2CAP_SDU_START:
-+		if (pi->conn_state & L2CAP_CONN_SAR_SDU) {
-+			kfree_skb(pi->sdu);
-+			break;
-+		}
-+
-+		pi->sdu_len = get_unaligned_le16(skb->data);
-+		skb_pull(skb, 2);
-+
-+		pi->sdu = bt_skb_alloc(pi->sdu_len, GFP_ATOMIC);
-+		if (!pi->sdu) {
-+			err = -ENOMEM;
-+			break;
-+		}
-+
-+		memcpy(skb_put(pi->sdu, skb->len), skb->data, skb->len);
-+
-+		pi->conn_state |= L2CAP_CONN_SAR_SDU;
-+		pi->partial_sdu_len = skb->len;
-+		err = 0;
-+		break;
-+
-+	case L2CAP_SDU_CONTINUE:
-+		if (!(pi->conn_state & L2CAP_CONN_SAR_SDU))
-+			break;
-+
-+		memcpy(skb_put(pi->sdu, skb->len), skb->data, skb->len);
-+
-+		pi->partial_sdu_len += skb->len;
-+		if (pi->partial_sdu_len > pi->sdu_len)
-+			kfree_skb(pi->sdu);
-+		else
-+			err = 0;
-+
-+		break;
-+
-+	case L2CAP_SDU_END:
-+		if (!(pi->conn_state & L2CAP_CONN_SAR_SDU))
-+			break;
-+
-+		memcpy(skb_put(pi->sdu, skb->len), skb->data, skb->len);
-+
-+		pi->conn_state &= ~L2CAP_CONN_SAR_SDU;
-+		pi->partial_sdu_len += skb->len;
-+
-+		if (pi->partial_sdu_len == pi->sdu_len) {
-+			_skb = skb_clone(pi->sdu, GFP_ATOMIC);
-+			err = sock_queue_rcv_skb(sk, _skb);
-+			if (err < 0)
-+				kfree_skb(_skb);
-+		}
-+		kfree_skb(pi->sdu);
-+		err = 0;
-+
-+		break;
-+	}
-+
-+	kfree_skb(skb);
-+	return err;
-+}
-+
- static inline int l2cap_data_channel_iframe(struct sock *sk, u16 rx_control, struct sk_buff *skb)
- {
- 	struct l2cap_pinfo *pi = l2cap_pi(sk);
-@@ -2820,11 +2954,11 @@ static inline int l2cap_data_channel_iframe(struct sock *sk, u16 rx_control, str
- 	if (tx_seq != pi->expected_tx_seq)
- 		return -EINVAL;
- 
--	pi->expected_tx_seq = (pi->expected_tx_seq + 1) % 64;
--	err = sock_queue_rcv_skb(sk, skb);
--	if (err)
-+	err = l2cap_sar_reassembly_sdu(sk, skb, rx_control);
-+	if (err < 0)
- 		return err;
- 
-+	pi->expected_tx_seq = (pi->expected_tx_seq + 1) % 64;
- 	pi->num_to_ack = (pi->num_to_ack + 1) % L2CAP_DEFAULT_NUM_TO_ACK;
- 	if (pi->num_to_ack == L2CAP_DEFAULT_NUM_TO_ACK - 1) {
- 		tx_control |= L2CAP_CTRL_FRAME_TYPE;
-@@ -2860,7 +2994,7 @@ static inline int l2cap_data_channel_sframe(struct sock *sk, u16 rx_control, str
- static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk_buff *skb)
- {
- 	struct sock *sk;
--	u16 control;
-+	u16 control, len;
- 	int err;
- 
- 	sk = l2cap_get_chan_by_scid(&conn->chan_list, cid);
-@@ -2891,8 +3025,12 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
- 	case L2CAP_MODE_ERTM:
- 		control = get_unaligned_le16(skb->data);
- 		skb_pull(skb, 2);
-+		len = skb->len;
- 
--		if (l2cap_pi(sk)->imtu < skb->len)
-+		if (__is_sar_start(control))
-+			len -= 2;
-+
-+		if (len > L2CAP_DEFAULT_MAX_PDU_SIZE)
- 			goto drop;
- 
- 		if (__is_iframe(control))
+>
+> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> index 60c612c..3c63ba7 100644
+> --- a/net/bluetooth/l2cap.c
+> +++ b/net/bluetooth/l2cap.c
+> @@ -1241,37 +1241,38 @@ static void l2cap_drop_acked_frames(struct sock *sk)
+>  static inline int l2cap_do_send(struct sock *sk, struct sk_buff *skb)
+>  {
+>        struct l2cap_pinfo *pi = l2cap_pi(sk);
+> +       struct sk_buff *tx_skb;
+> +       u16 control, fcs;
+>        int err;
+>
+>        BT_DBG("sk %p, skb %p len %d", sk, skb, skb->len);
+>
+> -       err = hci_send_acl(pi->conn->hcon, skb, 0);
+> +       tx_skb = skb_clone(skb, GFP_ATOMIC);
+> +
+> +       control = get_unaligned_le16(tx_skb->data + L2CAP_HDR_SIZE);
+> +       control |= pi->next_tx_seq << L2CAP_CTRL_TXSEQ_SHIFT;
+> +       put_unaligned_le16(control, tx_skb->data + L2CAP_HDR_SIZE);
+> +
+> +       if (l2cap_pi(sk)->fcs == L2CAP_FCS_CRC16) {
+> +               fcs = crc16(0, (u8 *)tx_skb->data, tx_skb->len - 2);
+> +               put_unaligned_le16(fcs, tx_skb->data + tx_skb->len - 2);
+> +       }
+> +
+> +       err = hci_send_acl(pi->conn->hcon, tx_skb, 0);
+>        if (err < 0)
+> -               kfree_skb(skb);
+> +               kfree_skb(tx_skb);
+>
+>        return err;
+>  }
+>
+>  static int l2cap_streaming_send(struct sock *sk)
+>  {
+> -       struct sk_buff *skb, *tx_skb;
+> +       struct sk_buff *skb;
+>        struct l2cap_pinfo *pi = l2cap_pi(sk);
+> -       u16 control, fcs;
+>        int err;
+>
+>        while ((skb = sk->sk_send_head)) {
+> -               tx_skb = skb_clone(skb, GFP_ATOMIC);
+> -
+> -               control = get_unaligned_le16(tx_skb->data + L2CAP_HDR_SIZE);
+> -               control |= pi->next_tx_seq << L2CAP_CTRL_TXSEQ_SHIFT;
+> -               put_unaligned_le16(control, tx_skb->data + L2CAP_HDR_SIZE);
+> -
+> -               if (l2cap_pi(sk)->fcs == L2CAP_FCS_CRC16) {
+> -                       fcs = crc16(0, (u8 *)tx_skb->data, tx_skb->len - 2);
+> -                       put_unaligned_le16(fcs, tx_skb->data + tx_skb->len - 2);
+> -               }
+> -
+> -               err = l2cap_do_send(sk, tx_skb);
+> +               err = l2cap_do_send(sk, skb);
+>                if (err < 0) {
+>                        l2cap_send_disconn_req(pi->conn, sk);
+>                        return err;
+> @@ -1293,8 +1294,7 @@ static int l2cap_streaming_send(struct sock *sk)
+>  static int l2cap_retransmit_frame(struct sock *sk, u8 tx_seq)
+>  {
+>        struct l2cap_pinfo *pi = l2cap_pi(sk);
+> -       struct sk_buff *skb, *tx_skb;
+> -       u16 control, fcs;
+> +       struct sk_buff *skb;
+>        int err;
+>
+>        skb = skb_peek(TX_QUEUE(sk));
+> @@ -1312,23 +1312,13 @@ static int l2cap_retransmit_frame(struct sock *sk, u8 tx_seq)
+>                        break;
+>                }
+>
+> -               tx_skb = skb_clone(skb, GFP_ATOMIC);
+> -               bt_cb(skb)->retries++;
+> -               control = get_unaligned_le16(tx_skb->data + L2CAP_HDR_SIZE);
+> -               control |= (pi->req_seq << L2CAP_CTRL_REQSEQ_SHIFT)
+> -                               | (tx_seq << L2CAP_CTRL_TXSEQ_SHIFT);
+> -               put_unaligned_le16(control, tx_skb->data + L2CAP_HDR_SIZE);
+> -
+> -               if (l2cap_pi(sk)->fcs == L2CAP_FCS_CRC16) {
+> -                       fcs = crc16(0, (u8 *)tx_skb->data, tx_skb->len - 2);
+> -                       put_unaligned_le16(fcs, tx_skb->data + tx_skb->len - 2);
+> -               }
+> -
+> -               err = l2cap_do_send(sk, tx_skb);
+> +               err = l2cap_do_send(sk, skb);
+>                if (err < 0) {
+>                        l2cap_send_disconn_req(pi->conn, sk);
+>                        return err;
+>                }
+> +               bt_cb(skb)->retries++;
+> +
+>                break;
+>        } while(1);
+>        return 0;
+> @@ -1336,41 +1326,27 @@ static int l2cap_retransmit_frame(struct sock *sk, u8 tx_seq)
+>
+>  static int l2cap_ertm_send(struct sock *sk)
+>  {
+> -       struct sk_buff *skb, *tx_skb;
+> +       struct sk_buff *skb;
+>        struct l2cap_pinfo *pi = l2cap_pi(sk);
+> -       u16 control, fcs;
+>        int err;
+>
+>        if (pi->conn_state & L2CAP_CONN_WAIT_ACK)
+>                return 0;
+>
+>        while ((skb = sk->sk_send_head) && (!l2cap_tx_window_full(sk))) {
+> -               tx_skb = skb_clone(skb, GFP_ATOMIC);
+> -
+>                if (pi->remote_max_tx &&
+>                                bt_cb(skb)->retries == pi->remote_max_tx) {
+>                        l2cap_send_disconn_req(pi->conn, sk);
+>                        break;
+>                }
+>
+> -               bt_cb(skb)->retries++;
+> -
+> -               control = get_unaligned_le16(tx_skb->data + L2CAP_HDR_SIZE);
+> -               control |= (pi->req_seq << L2CAP_CTRL_REQSEQ_SHIFT)
+> -                               | (pi->next_tx_seq << L2CAP_CTRL_TXSEQ_SHIFT);
+> -               put_unaligned_le16(control, tx_skb->data + L2CAP_HDR_SIZE);
+> -
+> -
+> -               if (l2cap_pi(sk)->fcs == L2CAP_FCS_CRC16) {
+> -                       fcs = crc16(0, (u8 *)skb->data, tx_skb->len - 2);
+> -                       put_unaligned_le16(fcs, skb->data + tx_skb->len - 2);
+> -               }
+> -
+> -               err = l2cap_do_send(sk, tx_skb);
+> +               err = l2cap_do_send(sk, skb);
+>                if (err < 0) {
+>                        l2cap_send_disconn_req(pi->conn, sk);
+>                        return err;
+>                }
+> +
+> +               bt_cb(skb)->retries++;
+>                __mod_retrans_timer();
+>
+>                bt_cb(skb)->tx_seq = pi->next_tx_seq;
+> --
+> 1.6.3.3
+>
+>
+
+
+
 -- 
-1.6.3.3
-
+Gustavo F. Padovan
+http://padovan.org
