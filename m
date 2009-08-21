@@ -1,66 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <508DFE744C1A4696B3D22CA7ED563C35@TSESUO>
-From: "Abraham J. Velez \(EndoraSoft\)" <ajvelez@endorasoft.es>
-To: <linux-bluetooth@vger.kernel.org>
-Subject: Question about the connect Function and BlueZ.
-Date: Sat, 22 Aug 2009 18:51:13 +0200
 MIME-Version: 1.0
-Content-Type: text/plain;
-	format=flowed;
-	charset="iso-8859-1";
-	reply-type=original
+Date: Fri, 21 Aug 2009 12:29:48 +0530
+Message-ID: <df5e18bd0908202359m76f97dfemfc3b77afda8b516c@mail.gmail.com>
+Subject: Testing bluetooth device: Virtual HCI device
+From: Neeraj kushwaha <kushneeraj@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi All,
 
-Well, we have a problem in the Linux platfform with BlueZ. The problem is 
-easy to explain:
+I have started to learn BT and to see how it works. I want to test
+bluetooth from Virtual HCI device.
 
-We open a connexion (with bluetooth) with connect function (we use socket). 
-Every connexion make in his own thread. This connexions are with Obex Push 
-profile. This works without problems.
+I did following steps but still could not get through.
 
-For the purposes of our applications, we need to cut this connection before 
-the terminal (reduced the time of the ask in the terminal: the user confirm 
-the sending). The call to connect function is blocking (because we need to 
-know if the user of the terminal can not connect errno==ECONNREFUSED).
+# modprove hci_vhci
+Kernel: Bluetooth: Virtual HCI driver ver 1.2
+
+# ls -l /dev/vhci
+crw-rw---- 1 root root 10,58 2009-08-21 11:22 /dev/vhci
+
+# hciemu localhost:10
+# hciemu localhost:11
+
+# hciconfig hci0 up
+# hciconfig hci1 up
+
+# hciconfig -a
+hci0:   Type: VIRTUAL
+       BD Address: 7F:00:00:01:00:0A ACL MTU: 192:8 SCO MTU: 0:0
+       UP RUNNING
+       RX bytes:0 acl:0 sco:0 events:35 errors:0
+       TX bytes:681 acl:0 sco:0 commands:35 errors:0
+       Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
+       Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+       Link policy:
+       Link mode: SLAVE ACCEPT
+       Name: 'BlueZ (0)'
+       Class: 0x4a0100
+       Service Classes: Networking, Capturing, Telephony
+       Device Class: Computer, Uncategorized
+       HCI Ver: 2.0 (0x3) HCI Rev: 0x0 LMP Ver: 2.0 (0x3) LMP Subver: 0x0
+       Manufacturer: Qualcomm (29)
+
+hci1:   Type: VIRTUAL
+       BD Address: 7F:00:00:01:00:0B ACL MTU: 192:8 SCO MTU: 0:0
+       UP RUNNING
+       RX bytes:0 acl:0 sco:0 events:34 errors:0
+       TX bytes:680 acl:0 sco:0 commands:34 errors:0
+       Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
+       Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+       Link policy:
+       Link mode: SLAVE ACCEPT
+       Name: 'BlueZ (1)'
+       Class: 0x4a0100
+       Service Classes: Networking, Capturing, Telephony
+       Device Class: Computer, Uncategorized
+       HCI Ver: 2.0 (0x3) HCI Rev: 0x0 LMP Ver: 2.0 (0x3) LMP Subver: 0x0
+       Manufacturer: Qualcomm (29)
+
+# l2ping 7F:00:00:01:00:0B
+Can't connect: Connection refused
 
 
--------------------------------------------------------------------------------------------------------------------------------------------------------------
-fcntl(func->handlesocket, F_SETFL, fcntl(func->handlesocket, F_GETFL,0) & 
-~O_NONBLOCK);
-func->refused = false;
-error = connect(func->handlesocket, (struct sockaddr *)&rem_addr, 
-sizeof(rem_addr));
-if(error<0)
-  {
-    if(errno==ECONNREFUSED) func->refused = true;
-    func->SetEvent(DIOLNXBTFSMEVENT_DISCONNECTING);
-    break;
-  }
-------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-The problem is: How cancel this block connexion make with connect function?
-
-If we call to this code (in other thread) the connect function waits to 
-timeout of the terminal...
-
--------------------------------------------------------------------------------------------------------------------------------------------------------------
-fcntl(handlesocket, F_SETFL, fcntl(handlesocket, F_GETFL,0) & ~O_NONBLOCK);
-shutdown(handlesocket,SHUT_RDWR);
-close(handlesocket);
-handlesocket = -1;
--------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-The same code in Microsoft Windows Stack of Bluetooth "cancel" the connect 
-function...
-
-Any idea?
-
-Thanks in advanced for your time ....
-
-Best Regards,
-Abraham. 
+Pl. tell me how to get it working, as this would help to get starton BT.
 
 
+Thanks & Regards,
+Neeraj
