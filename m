@@ -1,73 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Fri, 21 Aug 2009 12:29:48 +0530
-Message-ID: <df5e18bd0908202359m76f97dfemfc3b77afda8b516c@mail.gmail.com>
-Subject: Testing bluetooth device: Virtual HCI device
-From: Neeraj kushwaha <kushneeraj@gmail.com>
+From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Cc: marcel@holtmann.org, gustavo@padovan.org
+Subject: [PATCH 8/8] Bluetooth: Full support to receive SREJ frames
+Date: Thu, 20 Aug 2009 22:26:04 -0300
+Message-Id: <1250817964-11533-8-git-send-email-gustavo@las.ic.unicamp.br>
+In-Reply-To: <1250817964-11533-7-git-send-email-gustavo@las.ic.unicamp.br>
+References: <1250817964-11533-1-git-send-email-gustavo@las.ic.unicamp.br>
+ <1250817964-11533-2-git-send-email-gustavo@las.ic.unicamp.br>
+ <1250817964-11533-3-git-send-email-gustavo@las.ic.unicamp.br>
+ <1250817964-11533-4-git-send-email-gustavo@las.ic.unicamp.br>
+ <1250817964-11533-5-git-send-email-gustavo@las.ic.unicamp.br>
+ <1250817964-11533-6-git-send-email-gustavo@las.ic.unicamp.br>
+ <1250817964-11533-7-git-send-email-gustavo@las.ic.unicamp.br>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+Support receive of SREJ frames as specified by the state table.
 
-I have started to learn BT and to see how it works. I want to test
-bluetooth from Virtual HCI device.
+Signed-off-by: Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
+---
+ include/net/bluetooth/l2cap.h |    3 +++
+ net/bluetooth/l2cap.c         |   30 +++++++++++++++++++++++++++++-
+ 2 files changed, 32 insertions(+), 1 deletions(-)
 
-I did following steps but still could not get through.
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 9f2126a..7ca614a 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -328,6 +328,7 @@ struct l2cap_pinfo {
+ 	__u8		expected_tx_seq;
+ 	__u8		buffer_seq;
+ 	__u8		buffer_seq_srej;
++	__u8		srej_save_reqseq;
+ 	__u8		unacked_frames;
+ 	__u8		retry_count;
+ 	__u8		num_to_ack;
+@@ -370,6 +371,8 @@ struct l2cap_pinfo {
+ #define L2CAP_CONN_SAR_SDU         0x01
+ #define L2CAP_CONN_SREJ_SENT       0x02
+ #define L2CAP_CONN_WAIT_F          0x04
++#define L2CAP_CONN_SREJ_ACT        0x08
++#define L2CAP_CONN_SEND_PBIT       0x10
+ 
+ #define __mod_retrans_timer() mod_timer(&l2cap_pi(sk)->retrans_timer, \
+ 		jiffies +  msecs_to_jiffies(L2CAP_DEFAULT_RETRANS_TO));
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index fbe71ec..505c12f 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -3241,6 +3241,10 @@ static void l2cap_send_srejframe(struct sock *sk, u8 tx_seq)
+ 	while (tx_seq != pi->expected_tx_seq) {
+ 		control = L2CAP_SUPER_SELECT_REJECT;
+ 		control |= pi->expected_tx_seq << L2CAP_CTRL_REQSEQ_SHIFT;
++		if (pi->conn_state & L2CAP_CONN_SEND_PBIT) {
++			control |= L2CAP_CTRL_POLL;
++			pi->conn_state &= ~L2CAP_CONN_SEND_PBIT;
++		}
+ 		l2cap_send_sframe(pi, control);
+ 
+ 		new = kzalloc(sizeof(struct srej_list), GFP_ATOMIC);
+@@ -3300,6 +3304,8 @@ static inline int l2cap_data_channel_iframe(struct sock *sk, u16 rx_control, str
+ 		__skb_queue_head_init(SREJ_QUEUE(sk));
+ 		l2cap_add_to_srej_queue(sk, skb, tx_seq, sar);
+ 
++		pi->conn_state |= L2CAP_CONN_SEND_PBIT;
++
+ 		l2cap_send_srejframe(sk, tx_seq);
+ 	}
+ 	return 0;
+@@ -3370,7 +3376,29 @@ static inline int l2cap_data_channel_sframe(struct sock *sk, u16 rx_control, str
+ 		break;
+ 
+ 	case L2CAP_SUPER_SELECT_REJECT:
+-		l2cap_retransmit_frame(sk, tx_seq);
++		if (rx_control & L2CAP_CTRL_POLL) {
++			l2cap_retransmit_frame(sk, tx_seq);
++			pi->expected_ack_seq = tx_seq;
++			l2cap_drop_acked_frames(sk);
++			l2cap_ertm_send(sk);
++			if (pi->conn_state & L2CAP_CONN_WAIT_F) {
++				pi->srej_save_reqseq = tx_seq;
++				pi->conn_state |= L2CAP_CONN_SREJ_ACT;
++			}
++		} else if (rx_control & L2CAP_CTRL_FINAL) {
++			if ((pi->conn_state & L2CAP_CONN_SREJ_ACT) &&
++					pi->srej_save_reqseq == tx_seq)
++				pi->srej_save_reqseq &= ~L2CAP_CONN_SREJ_ACT;
++			else
++				l2cap_retransmit_frame(sk, tx_seq);
++		}
++		else {
++			l2cap_retransmit_frame(sk, tx_seq);
++			if (pi->conn_state & L2CAP_CONN_WAIT_F) {
++				pi->srej_save_reqseq = tx_seq;
++				pi->conn_state |= L2CAP_CONN_SREJ_ACT;
++			}
++		}
+ 		break;
+ 
+ 	case L2CAP_SUPER_RCV_NOT_READY:
+-- 
+1.6.3.3
 
-# modprove hci_vhci
-Kernel: Bluetooth: Virtual HCI driver ver 1.2
-
-# ls -l /dev/vhci
-crw-rw---- 1 root root 10,58 2009-08-21 11:22 /dev/vhci
-
-# hciemu localhost:10
-# hciemu localhost:11
-
-# hciconfig hci0 up
-# hciconfig hci1 up
-
-# hciconfig -a
-hci0:   Type: VIRTUAL
-       BD Address: 7F:00:00:01:00:0A ACL MTU: 192:8 SCO MTU: 0:0
-       UP RUNNING
-       RX bytes:0 acl:0 sco:0 events:35 errors:0
-       TX bytes:681 acl:0 sco:0 commands:35 errors:0
-       Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
-       Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-       Link policy:
-       Link mode: SLAVE ACCEPT
-       Name: 'BlueZ (0)'
-       Class: 0x4a0100
-       Service Classes: Networking, Capturing, Telephony
-       Device Class: Computer, Uncategorized
-       HCI Ver: 2.0 (0x3) HCI Rev: 0x0 LMP Ver: 2.0 (0x3) LMP Subver: 0x0
-       Manufacturer: Qualcomm (29)
-
-hci1:   Type: VIRTUAL
-       BD Address: 7F:00:00:01:00:0B ACL MTU: 192:8 SCO MTU: 0:0
-       UP RUNNING
-       RX bytes:0 acl:0 sco:0 events:34 errors:0
-       TX bytes:680 acl:0 sco:0 commands:34 errors:0
-       Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
-       Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-       Link policy:
-       Link mode: SLAVE ACCEPT
-       Name: 'BlueZ (1)'
-       Class: 0x4a0100
-       Service Classes: Networking, Capturing, Telephony
-       Device Class: Computer, Uncategorized
-       HCI Ver: 2.0 (0x3) HCI Rev: 0x0 LMP Ver: 2.0 (0x3) LMP Subver: 0x0
-       Manufacturer: Qualcomm (29)
-
-# l2ping 7F:00:00:01:00:0B
-Can't connect: Connection refused
-
-
-
-Pl. tell me how to get it working, as this would help to get starton BT.
-
-
-Thanks & Regards,
-Neeraj
