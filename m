@@ -1,45 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: patch for hci_bcsp.c(2.6.31.-rc1)
+Subject: Re: PATCH for input/fakehid.c to fix PS3 remote unpairing
 From: Marcel Holtmann <marcel@holtmann.org>
-To: "Weng, Wending" <WWeng@rheinmetall.ca>
-Cc: "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <54B31811B83D744D90BF0289EB447D460C1A5044@MAIL-MB1.oerlikon.ca>
-References: <54B31811B83D744D90BF0289EB447D460C1A5044@MAIL-MB1.oerlikon.ca>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: "Ruslan N. Marchenko" <rufferson@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+In-Reply-To: <1250698578.11521.0.camel@localhost.localdomain>
+References: <a70b8cd30908190910p35910657m28fe09905717d60@mail.gmail.com>
+	 <1250698578.11521.0.camel@localhost.localdomain>
 Content-Type: text/plain
-Date: Sat, 22 Aug 2009 13:05:38 -0700
-Message-Id: <1250971538.2950.26.camel@localhost.localdomain>
+Date: Sat, 22 Aug 2009 13:03:38 -0700
+Message-Id: <1250971418.2950.24.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Wending,
+Hi Bastien,
 
-> From 69596948eb2172080bb950d99dc90678ead08305 Mon Sep 17 00:00:00 2001
-> From: root <root@SBC_PC_3.localdomain>
-> Date: Wed, 19 Aug 2009 08:59:56 -0400
-> Subject: [PATCH] The routine bcsp_pkt_cull doesn't ack the packets properly
-> if multiple packets are queued. The counter i must increase before
-> doing comparison.
+> > Here is the patch to correctly handle PS3 remote unpairing and manual
+> > turning off.
 > 
-> Signed-off-by: Wending Weng <wweng@rheinmetall.ca>
+> How do you test this?
 > 
-> ---
->  drivers/bluetooth/hci_bcsp.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+> <snip>
 > 
-> diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
-> index 894b2cb..cd30f39 100644
-> --- a/drivers/bluetooth/hci_bcsp.c
-> +++ b/drivers/bluetooth/hci_bcsp.c
-> @@ -373,7 +373,7 @@ static void bcsp_pkt_cull(struct bcsp_struct *bcsp)
+> > I'm also thinking on implementing keymapping through input.conf
+> > configuration section. Will it be accepted or not worth trying?
 > 
->         i = 0;
->         skb_queue_walk_safe(&bcsp->unack, skb, tmp) {
-> -               if (i++ >= pkts_to_be_removed)
-> +               if (++i >= pkts_to_be_removed)
->                         break;
+> You should handle this in the input user-space, or in X itself, rather
+> than in bluez.
 
-wouldn't be if (i++ > pkts_to_be_removed) the better way to test this?
+I am not sure about that. The PS3 remote has pretty clear keys and we
+should just assign them to default key values. If anyone wants to do
+something different with them, then they can use X support for
+keymapping. In reality, I believe nobody will.
 
 Regards
 
