@@ -1,33 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20090824164421.407bcdf2@stoetzler>
-References: <20090824151514.6eb4f1f6@stoetzler>
-	 <2d5a2c100908240652l179a6ad3mc6195db710ae069a@mail.gmail.com>
-	 <20090824164421.407bcdf2@stoetzler>
-Date: Mon, 24 Aug 2009 11:50:57 -0300
-Message-ID: <2d5a2c100908240750l964bfbak646b8bfd7669d899@mail.gmail.com>
-Subject: Re: bluez-4.49 does not build for me.
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Stefan Seyfried <stefan.seyfried@googlemail.com>
+Date: Mon, 24 Aug 2009 16:44:21 +0200
+From: Stefan Seyfried <stefan.seyfried@googlemail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: BlueZ devel list <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: bluez-4.49 does not build for me.
+Message-ID: <20090824164421.407bcdf2@stoetzler>
+In-Reply-To: <2d5a2c100908240652l179a6ad3mc6195db710ae069a@mail.gmail.com>
+References: <20090824151514.6eb4f1f6@stoetzler>
+	<2d5a2c100908240652l179a6ad3mc6195db710ae069a@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
+On Mon, 24 Aug 2009 10:52:18 -0300
+Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
 
-On Mon, Aug 24, 2009 at 11:44 AM, Stefan
-Seyfried<stefan.seyfried@googlemail.com> wrote:
-> You are cheating! ;) bootstrap-configure is not in the tarball. With a
-> git checkout, you are also missing the missing files ;)
->
-> Have fun,
->
->        seife
+> Hi,
+> 
+> On Mon, Aug 24, 2009 at 10:15 AM, Stefan
+> Seyfried<stefan.seyfried@googlemail.com> wrote:
+> > In file included from lib/sdp.c:50:
+> > lib/sdp_lib.h:31:33: error: bluetooth/bluetooth.h: No such file or
+> > directory lib/sdp_lib.h:32:27: error: bluetooth/hci.h: No such file
+> > or directory make[1]: *** [lib/sdp.lo] Error 1
+> > make: *** [all] Error 2
+> >
+> 
+> Strange I just compiled it using ./boostrap-configure 
 
-Yep, apparently we will need 4.50 soon :D
+You are cheating! ;) bootstrap-configure is not in the tarball. With a
+git checkout, you are also missing the missing files ;)
 
+Have fun,
 
+	seife
 -- 
-Luiz Augusto von Dentz
-Engenheiro de Computação
+Stefan Seyfried
+R&D Preload Department             |              "Any ideas, John?"
+SUSE LINUX Products GmbH, NÃ¼rnberg | "Well, surrounding them's out."
+
+This footer brought to you by insane German lawmakers:
+SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG NÃ¼rnberg)
