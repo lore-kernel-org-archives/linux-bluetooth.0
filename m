@@ -1,63 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Weng, Wending" <WWeng@rheinmetall.ca>
-To: 'Marcel Holtmann' <marcel@holtmann.org>
-CC: "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 24 Aug 2009 14:33:33 -0400
-Subject: RE: patch for hci_bcsp.c(2.6.31.-rc1)
-Message-ID: <54B31811B83D744D90BF0289EB447D460C1A5046@MAIL-MB1.oerlikon.ca>
-In-Reply-To: <1251134366.2950.54.camel@localhost.localdomain>
-Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
+Date: Mon, 24 Aug 2009 15:26:42 -0300
+Message-ID: <2d5a2c100908241126k6cf31de0s282c0f360b6948ec@mail.gmail.com>
+Subject: sniff mode
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi,
 
->Not following? I am saying replace >=3D with >. Would that work too?
->Otherwise please send a patch with a more detailed commit message.
->
->Regards
->
->Marcel
+It is just me or hci_conn_enter_active_mode will never do what its
+name suggests. This check will always succeed:
 
-        replace >=3D with > will not work. Below is the new patch.
+	if (conn->mode != HCI_CM_SNIFF || !conn->power_save)
+		goto timer;
 
-From: root <root@SBC_PC_3.localdomain>
-Date: Mon, 24 Aug 2009 14:06:18 -0400
-Subject: [PATCH] The routine bcsp_pkt_cull displays the false error message
-"Removed only %u out of %u pkts" when multiple to be acked packets are queu=
-ed.
-As if (i++ >=3D pkts_to_be_removed)
-        break;
-   will breaks the loop and increase the counter i when i=3D=3Dpkts_to_be_r=
-emoved,
-   the loop ends up with i=3Dpkts_to_be_removed+1. The following line:
-   if (i !=3D pkts_to_be_removed) {
-        BT_ERR("Removed only %u out of %u pkts", i, pkts_to_be_removed);
-   }
-   will display the false message.
-The counter i must not increase on the same line.
----
- drivers/bluetooth/hci_bcsp.c |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
+But in hci_mode_change_evt whatever mode different than HCI_CM_ACTIVE
+reset power_save to zero:
 
-diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
-index 894b2cb..40aec0f 100644
---- a/drivers/bluetooth/hci_bcsp.c
-+++ b/drivers/bluetooth/hci_bcsp.c
-@@ -373,8 +373,9 @@ static void bcsp_pkt_cull(struct bcsp_struct *bcsp)
 
-        i =3D 0;
-        skb_queue_walk_safe(&bcsp->unack, skb, tmp) {
--               if (i++ >=3D pkts_to_be_removed)
-+               if (i >=3D pkts_to_be_removed)
-                        break;
-+               i++;
+		if (!test_and_clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend)) {
+			if (conn->mode == HCI_CM_ACTIVE)
+				conn->power_save = 1;
+			else
+				conn->power_save = 0;
+		}
 
-                __skb_unlink(skb, &bcsp->unack);
-                kfree_skb(skb);
---
-1.5.2.1
+So it seems that if mode is SNIFF power_save is 0, so this check will
+only fail if mode is in fact HCI_CM_ACTIVE, and then latter on we got
+this:
 
-Regards
 
-Wending
+	if (!test_and_set_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend)) {
+		struct hci_cp_exit_sniff_mode cp;
+		cp.handle = cpu_to_le16(conn->handle);
+		hci_send_cmd(hdev, HCI_OP_EXIT_SNIFF_MODE, sizeof(cp), &cp);
+	}
+
+I was expecting that only when mode is HCI_CM_SNIFF it would send
+HCI_OP_EXIT_SNIFF_MODE, or Im missing something?
+
+
+-- 
+Luiz Augusto von Dentz
+Engenheiro de Computação
