@@ -1,52 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Oliver Neukum <oliver@neukum.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: btusb autosuspend and circular lock dep
-Date: Mon, 24 Aug 2009 14:29:47 +0200
-Cc: linux-bluetooth@vger.kernel.org,
- linux-usb@vger.kernel.org,
- Sarah Sharp <sarah.a.sharp@linux.intel.com>,
- Arjan Van De Ven <arjan@linux.intel.com>,
- saharabeara@gmail.com
-References: <20090615175435.GA4772@gamba.jf.intel.com> <200908241149.34224.oliver@neukum.org> <1251108975.2950.37.camel@localhost.localdomain>
-In-Reply-To: <1251108975.2950.37.camel@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-15"
-Message-Id: <200908241429.49498.oliver@neukum.org>
+From: =?ISO-8859-1?Q?Nicol=F2_Chieffo?= <nicolo.chieffo@gmail.com>
+Date: Mon, 24 Aug 2009 13:13:05 +0200
+Message-ID: <98391a7b0908240413u371c4392r2c9f92ee85a97081@mail.gmail.com>
+Subject: can't pair cellphone
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-QW0gTW9udGFnLCAyNC4gQXVndXN0IDIwMDkgMTI6MTY6MTUgc2NocmllYiBNYXJjZWwgSG9sdG1h
-bm46Cj4gPiArc2tpcF93YWtpbmc6Cj4gPiCgoKCgoKB1c2JfYW5jaG9yX3VyYih1cmIsICZkYXRh
-LT50eF9hbmNob3IpOwo+ID4goAo+ID4goKCgoKCgZXJyID0gdXNiX3N1Ym1pdF91cmIodXJiLCBH
-RlBfQVRPTUlDKTsKPiA+IEBAIC02NDYsMTAgKzcyMywxMyBAQCBzdGF0aWMgaW50IGJ0dXNiX3Nl
-bmRfZnJhbWUoc3RydWN0IHNrX2J1ZmYgKnNrYikKPiA+IKCgoKCgoKCgoKCgoKCgQlRfRVJSKCIl
-cyB1cmIgJXAgc3VibWlzc2lvbiBmYWlsZWQiLCBoZGV2LT5uYW1lLCB1cmIpOwo+ID4goKCgoKCg
-oKCgoKCgoKBrZnJlZSh1cmItPnNldHVwX3BhY2tldCk7Cj4gPiCgoKCgoKCgoKCgoKCgoHVzYl91
-bmFuY2hvcl91cmIodXJiKTsKPiA+ICugoKCgoH0gZWxzZSB7Cj4gPiAroKCgoKCgoKCgoKCgoHVz
-Yl9tYXJrX2xhc3RfYnVzeShkYXRhLT51ZGV2KTsKPiA+IKCgoKCgoH0KPiA+IKAKPiA+IKCgoKCg
-oHVzYl9mcmVlX3VyYih1cmIpOwo+ID4goAo+ID4gK291dDoKPiA+IKCgoKCgoHJldHVybiBlcnI7
-Cj4gPiCgfQo+Cj4gUGxlYXNlIGNhbGwgdGhlIGxhYmVscyBzaW1wbHkgc2tpcCBhbmQgZG9uZS4K
-CkluIHRoaXMgcGFydGljdWxhciBjYXNlIHNraXBfd2FraW5nIHNlZW1zIHRvIGJlIGNsZWFyZXIg
-YmVjYXVzZSBpdAp0ZWxscyB5b3UgcmlnaHQgYXdheSB3aGF0IGlzIHNraXBwZWQuCgo+ID4gQEAg
-LTcyMSw4ICs4MDEsMTkgQEAgc3RhdGljIHZvaWQgYnR1c2Jfd29yayhzdHJ1Y3Qgd29ya19zdHJ1
-Y3QgKndvcmspCj4gPiCgewo+ID4goKCgoKCgc3RydWN0IGJ0dXNiX2RhdGEgKmRhdGEgPSBjb250
-YWluZXJfb2Yod29yaywgc3RydWN0IGJ0dXNiX2RhdGEsCj4gPiB3b3JrKTsgc3RydWN0IGhjaV9k
-ZXYgKmhkZXYgPSBkYXRhLT5oZGV2Owo+ID4gK6CgoKCgaW50IGVycjsKPiA+IKAKPiA+IKCgoKCg
-oGlmIChoZGV2LT5jb25uX2hhc2guc2NvX251bSA+IDApIHsKPiA+ICugoKCgoKCgoKCgoKCgaWYg
-KCFkYXRhLT5kaWRfaXNvX3Jlc3VtZSkgewo+ID4gK6CgoKCgoKCgoKCgoKCgoKCgoKCgoGVyciA9
-IHVzYl9hdXRvcG1fZ2V0X2ludGVyZmFjZShkYXRhLT5pc29jKTsKPiA+ICugoKCgoKCgoKCgoKCg
-oKCgoKCgoKBpZiAoIWVycikgewo+ID4gK6CgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgZGF0
-YS0+ZGlkX2lzb19yZXN1bWUgPSAxOwo+ID4gK6CgoKCgoKCgoKCgoKCgoKCgoKCgoH0gZWxzZSB7
-Cj4gPiAroKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKBjbGVhcl9iaXQoQlRVU0JfSVNPQ19S
-VU5OSU5HLAo+ID4gJmRhdGEtPmZsYWdzKTsKPiA+ICugoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCg
-oKCgoHVzYl9raWxsX2FuY2hvcmVkX3VyYnMoJmRhdGEtPmlzb2NfYW5jaG9yKTsKPiA+ICugoKCg
-oKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoHJldHVybjsKPiA+ICugoKCgoKCgoKCgoKCgoKCgoKCg
-oKB9Cj4KPiBIYXZpbmcgdGhpcyBhcyBsaWtlIHRoaXMgaXMgc2ltcGxlciB0byByZWFkOgo+Cj4g
-oKCgoKCgoKCgoKCgoKCgoGlmIChlcnIgPCAwKSB7Cj4goKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCg
-Y2xlYXJfYml0KEJUVVNCX0lTT0NfUlVOTklORywgJmRhdGEtPmZsYWdzKTsKPiCgoKCgoKCgoKCg
-oKCgoKCgoKCgoKCgoKB1c2Jfa2lsbF9hbmNob3JlZF91cmJzKCZkYXRhLT5pc29jX2FuY2hvcik7
-Cj4goKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgcmV0dXJuOwo+IKCgoKCgoKCgoKCgoKCgoKB9Cj4K
-PiCgoKCgoKCgoKCgoKCgoKCgZGF0YS0+ZGlkX2lzb19yZXN1bWUgPSAxOwoKRG8geW91IGdlbmVy
-YWxseSBwcmVmZXIgdGhlICJlbHNlIiBicmFuY2ggaW1wbGljaXQ/CgpUaGUgcmVzdCBpcyBkb25l
-LgoKCVJlZ2FyZHMKCQlPbGl2ZXIKCg==
+Hello, I've just subscribed to this mailing list because I have a
+problem with my bluetooth phone in ubuntu 9.10
+
+I'm trying to pair my phone, but I'm not able to do it.
+First of all I tried using the gnome-bluetooth applet, but I failed,
+so I started to use the hcitool command in this way
+
+sudo hcitool cc xx:xx:xx:xx:xx:xx
+sudo hcitool auth xx:xx:xx:xx:xx:xx
+
+the first command passes, while the second returns this message:
+HCI authentication request failed: Input/output error
+
+This is the system log:
+Aug 24 13:05:40 yelo3-laptop bluetoothd[4458]: link_key_request
+(sba=xx:xx:xx:xx:xx:xx, dba=xx:xx:xx:xx:xx:xx)
+Aug 24 13:05:40 yelo3-laptop bluetoothd[4458]: pin_code_request
+(sba=xx:xx:xx:xx:xx:xx, dba=xx:xx:xx:xx:xx:xx)
+Aug 24 13:05:49 yelo3-laptop NetworkManager:
+bluez_manager_bdaddr_removed_cb: BT device xx:xx:xx:xx:xx:xx removed
