@@ -1,54 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: bluez-4.49 does not build for me.
-From: Valmantas =?UTF-8?Q?Palik=C5=A1a?= <walmis@gmail.com>
-Cc: BlueZ devel list <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <2d5a2c100908240652l179a6ad3mc6195db710ae069a@mail.gmail.com>
-References: <20090824151514.6eb4f1f6@stoetzler>
-	 <2d5a2c100908240652l179a6ad3mc6195db710ae069a@mail.gmail.com>
-Content-Type: text/plain
-Date: Mon, 24 Aug 2009 17:27:08 +0300
-Message-Id: <1251124029.19970.1.camel@walmis-desktop>
-Mime-Version: 1.0
-To: unlisted-recipients:; (no To-header on input)
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: "Weng, Wending" <WWeng@rheinmetall.ca>
+To: 'Marcel Holtmann' <marcel@holtmann.org>
+CC: "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 24 Aug 2009 10:03:28 -0400
+Subject: RE: patch for hci_bcsp.c(2.6.31.-rc1)
+Message-ID: <54B31811B83D744D90BF0289EB447D460C1A5045@MAIL-MB1.oerlikon.ca>
+In-Reply-To: <1250971538.2950.26.camel@localhost.localdomain>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Here's my errors:
+Hi Marcel,
 
-make[1]: *** No rule to make target `tools/bccmd.8', needed by `all-am'.
-Stop.
-make: *** [all] Error 2
+        If I keep "if (i++ >=3D pkts_to_be_removed)", the loop will end up =
+with
+        i=3D2 if pkts_to_be_removed=3D=3D1 and the second test skb_queue_wa=
+lk_safe is true,
 
-same with hid2hci.
+        it will cause error message later on:
 
-On Mon, 2009-08-24 at 10:52 -0300, Luiz Augusto von Dentz wrote:
-> Hi,
-> 
-> On Mon, Aug 24, 2009 at 10:15 AM, Stefan
-> Seyfried<stefan.seyfried@googlemail.com> wrote:
-> > In file included from lib/sdp.c:50:
-> > lib/sdp_lib.h:31:33: error: bluetooth/bluetooth.h: No such file or directory
-> > lib/sdp_lib.h:32:27: error: bluetooth/hci.h: No such file or directory
-> > make[1]: *** [lib/sdp.lo] Error 1
-> > make: *** [all] Error 2
-> >
-> 
-> Strange I just compiled it using ./boostrap-configure but I did have
-> it installed so
-> it is maybe the case where include/ were not being include when
-> compiling lib, so
-> it only works when one already have those files installed.
-> 
-> > [...]
-> > rm -rf src/.libs src/_libs
-> > rm -rf test/.libs test/_libs
-> > rm -rf tools/.libs tools/_libs
-> > gcc -Wall -O2 -D_FORTIFY_SOURCE=2 -fPIC  -pie  lib/bluetooth.c   -o lib/bluetooth
-> > /usr/lib64/gcc/x86_64-suse-linux/4.4/../../../../lib64/Scrt1.o: In function `_start':
-> > /usr/src/packages/BUILD/glibc-2.10.1/csu/../sysdeps/x86_64/elf/start.S:99: undefined reference to `main'
-> > collect2: ld returned 1 exit status
-> > make: *** [lib/bluetooth] Error 1
-> 
-> No idea!
-> 
+        if (i !=3D pkts_to_be_removed) {
+                BT_ERR("Removed only %u out of %u pkts", i, pkts_to_be_remo=
+ved);
+        }
 
+        I think we should add another line for i++.
+
+Regards
+
+Wending Weng
+
+-----Original Message-----
+From: linux-bluetooth-owner@vger.kernel.org
+[mailto:linux-bluetooth-owner@vger.kernel.org]On Behalf Of Marcel
+Holtmann
+Sent: August 22, 2009 4:06 PM
+To: Weng, Wending
+Cc: 'linux-bluetooth@vger.kernel.org'
+Subject: Re: patch for hci_bcsp.c(2.6.31.-rc1)
+
+
+Hi Wending,
+
+> From 69596948eb2172080bb950d99dc90678ead08305 Mon Sep 17 00:00:00 2001
+> From: root <root@SBC_PC_3.localdomain>
+> Date: Wed, 19 Aug 2009 08:59:56 -0400
+> Subject: [PATCH] The routine bcsp_pkt_cull doesn't ack the packets proper=
+ly
+> if multiple packets are queued. The counter i must increase before
+> doing comparison.
+>
+> Signed-off-by: Wending Weng <wweng@rheinmetall.ca>
+>
+> ---
+>  drivers/bluetooth/hci_bcsp.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+>
+> diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
+> index 894b2cb..cd30f39 100644
+> --- a/drivers/bluetooth/hci_bcsp.c
+> +++ b/drivers/bluetooth/hci_bcsp.c
+> @@ -373,7 +373,7 @@ static void bcsp_pkt_cull(struct bcsp_struct *bcsp)
+>
+>         i =3D 0;
+>         skb_queue_walk_safe(&bcsp->unack, skb, tmp) {
+> -               if (i++ >=3D pkts_to_be_removed)
+> +               if (++i >=3D pkts_to_be_removed)
+>                         break;
+
+wouldn't be if (i++ > pkts_to_be_removed) the better way to test this?
+
+Regards
+
+Marcel
+
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" =
+in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
