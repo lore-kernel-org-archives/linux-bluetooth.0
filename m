@@ -1,57 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: sniff mode
+Subject: RE: patch for hci_bcsp.c(2.6.31.-rc1)
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <2d5a2c100908241126k6cf31de0s282c0f360b6948ec@mail.gmail.com>
-References: <2d5a2c100908241126k6cf31de0s282c0f360b6948ec@mail.gmail.com>
+To: "Weng, Wending" <WWeng@rheinmetall.ca>
+Cc: "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <54B31811B83D744D90BF0289EB447D460C1A5046@MAIL-MB1.oerlikon.ca>
+References: <54B31811B83D744D90BF0289EB447D460C1A5046@MAIL-MB1.oerlikon.ca>
 Content-Type: text/plain
-Date: Mon, 24 Aug 2009 11:40:57 -0700
-Message-Id: <1251139257.2950.60.camel@localhost.localdomain>
+Date: Mon, 24 Aug 2009 11:37:47 -0700
+Message-Id: <1251139067.2950.57.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Wending,
 
-> It is just me or hci_conn_enter_active_mode will never do what its
-> name suggests. This check will always succeed:
+>         replace >= with > will not work. Below is the new patch.
 > 
-> 	if (conn->mode != HCI_CM_SNIFF || !conn->power_save)
-> 		goto timer;
+> From: root <root@SBC_PC_3.localdomain>
+> Date: Mon, 24 Aug 2009 14:06:18 -0400
+> Subject: [PATCH] The routine bcsp_pkt_cull displays the false error message
+> "Removed only %u out of %u pkts" when multiple to be acked packets are queued.
+> As if (i++ >= pkts_to_be_removed)
+>         break;
+>    will breaks the loop and increase the counter i when i==pkts_to_be_removed,
+>    the loop ends up with i=pkts_to_be_removed+1. The following line:
+>    if (i != pkts_to_be_removed) {
+>         BT_ERR("Removed only %u out of %u pkts", i, pkts_to_be_removed);
+>    }
+>    will display the false message.
+> The counter i must not increase on the same line.
+> ---
+>  drivers/bluetooth/hci_bcsp.c |    3 ++-
+>  1 files changed, 2 insertions(+), 1 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
+> index 894b2cb..40aec0f 100644
+> --- a/drivers/bluetooth/hci_bcsp.c
+> +++ b/drivers/bluetooth/hci_bcsp.c
+> @@ -373,8 +373,9 @@ static void bcsp_pkt_cull(struct bcsp_struct *bcsp)
+> 
+>         i = 0;
+>         skb_queue_walk_safe(&bcsp->unack, skb, tmp) {
+> -               if (i++ >= pkts_to_be_removed)
+> +               if (i >= pkts_to_be_removed)
+>                         break;
+> +               i++;
+> 
+>                 __skb_unlink(skb, &bcsp->unack);
+>                 kfree_skb(skb);
 
-so conn->power_save is used to disable automatic sniff mode for incoming
-connections. Mainly HID since they manager it by themselves.
-
-> But in hci_mode_change_evt whatever mode different than HCI_CM_ACTIVE
-> reset power_save to zero:
-> 
-> 
-> 		if (!test_and_clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend)) {
-> 			if (conn->mode == HCI_CM_ACTIVE)
-> 				conn->power_save = 1;
-> 			else
-> 				conn->power_save = 0;
-> 		}
-
-And again, we are not setting the sniff mode. We disable automatic sniff
-mode feature.
-
-> So it seems that if mode is SNIFF power_save is 0, so this check will
-> only fail if mode is in fact HCI_CM_ACTIVE, and then latter on we got
-> this:
-> 
-> 
-> 	if (!test_and_set_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend)) {
-> 		struct hci_cp_exit_sniff_mode cp;
-> 		cp.handle = cpu_to_le16(conn->handle);
-> 		hci_send_cmd(hdev, HCI_OP_EXIT_SNIFF_MODE, sizeof(cp), &cp);
-> 	}
-> 
-> I was expecting that only when mode is HCI_CM_SNIFF it would send
-> HCI_OP_EXIT_SNIFF_MODE, or Im missing something?
-
-This reads as if NO mode change is pending, then exit from sniff mode.
+looks good, but I need a patch that applies with bluetooth-testing.git
+tree. And please create it with git format-patch.
 
 Regards
 
