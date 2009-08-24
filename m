@@ -1,463 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 24 Aug 2009 14:58:38 -0700
-From: Sarah Sharp <sarah.a.sharp@linux.intel.com>
-To: Oliver Neukum <oliver@neukum.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
-	linux-usb@vger.kernel.org, Arjan Van De Ven <arjan@linux.intel.com>,
-	saharabeara@gmail.com
-Subject: Re: btusb autosuspend and circular lock dep
-Message-ID: <20090824215838.GA9991@gamba.jf.intel.com>
-References: <20090615175435.GA4772@gamba.jf.intel.com> <200908242326.01149.oliver@neukum.org> <1251149817.2950.72.camel@localhost.localdomain> <200908242344.59861.oliver@neukum.org>
+Message-ID: <872DF646A74B4E20906515DDCDC555C1@TSESUO>
+From: "Abraham J. Velez \(EndoraSoft\)" <ajvelez@endorasoft.es>
+To: <linux-bluetooth@vger.kernel.org>
+Subject: Fw: Fw: Question about the connect Function and BlueZ.
+Date: Mon, 24 Aug 2009 23:42:31 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <200908242344.59861.oliver@neukum.org>
+Content-Type: text/plain;
+	format=flowed;
+	charset="iso-8859-1";
+	reply-type=response
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Oliver,
+Hi David,
 
-I just tested this patch (against 2.6.31-rc7) on my X200s laptop, and it
-works fine with the Broadcom USB bluetooth device with VID:PID
-0a5c:2145.  I tested transmitting audio to a bluetooth headset, so the
-isoc transfers to work fine.  ISTR you were concerned about them.
+Problem Solved!!!
 
-I'm still testing on my T61 (Broadcom 0a5c:2110).  The autosuspend patch
-seems to work fine, but I'm getting a circular lock dependency warning.
-I'm recompiling a vanilla 2.6.31-rc7 to see if the lock warning is still
-there.
+Part of solution is with getsockopt() to obtain the errno correct and the 
+other part is the select  funcion with a control of errors.
 
-Sarah Sharp
+ Thanks for your help.
+Your reference of getsockopt() help us to solve the question.
 
-On Mon, Aug 24, 2009 at 11:44:59PM +0200, Oliver Neukum wrote:
-> This patch adds support of USB autosuspend to the btusb driver
+ Bests Regards,
+Abraham.
+
+
+
+> ----- Original Message ----- 
+> From: "David Sainty" <david.sainty@dtsp.co.nz>
+> To: "Abraham J. Velez (EndoraSoft)" <ajvelez@endorasoft.es>
+> Cc: <linux-bluetooth@vger.kernel.org>
+> Sent: Monday, August 24, 2009 11:19 PM
+> Subject: Re: Fw: Question about the connect Function and BlueZ.
+>
+>
+>> Abraham J. Velez (EndoraSoft) wrote:
+>>> Hi,
+>>>
+>>> The errno works but if the socket is NON-Blocking always is 115
+>>> (EINPROGRESS).
+>>>
+>>> We need to know if the user has cancel the connexion or the connexion
+>>> has broken by timeout.
+>>>
+>>
+>> Did you read what I sent?  Especially the references to using poll() and
+>> getsockopt()?
+>>
+>> It sounds like your problem is solved by getting the final error code
+>> from connect() non-blocking?  And that's how you do it.
+>>
+>>>>
+>>>> Does this not work?  From connect(2):
+>>>>
+>>>>       EINPROGRESS
+>>>>              The  socket  is  non-blocking  and the connection cannot
+>>>> be com-
+>>>>              pleted immediately.  It is possible to select(2) or
+>>>> poll(2)  for
+>>>>              completion  by selecting the socket for writing. After
+>>>> select(2)
+>>>>              indicates writability, use getsockopt(2) to  read  the
+>>>> SO_ERROR
+>>>>              option  at  level SOL_SOCKET to determine whether
+>>>> connect() com-
+>>>>              pleted  successfully  (SO_ERROR  is  zero)   or
+>>>> unsuccessfully
+>>>>              (SO_ERROR  is one of the usual error codes listed here,
+>>>> explain-
+>>>>              ing the reason for the failure).
+>>>>
+>>>>
+>>
+>>
+>
+>
+> --------------------------------------------------------------------------------
+>
+>
+>
+> No virus found in this incoming message.
+> Checked by AVG - www.avg.com
+> Version: 8.5.392 / Virus Database: 270.13.65/2323 - Release Date: 08/24/09 
+> 06:05:00
 > 
-> If the device doesn't support remote wakeup, simple support based
-> on up/down is provided. If the device supports remote wakeup,
-> additional support for autosuspend while the interface is up is provided.
-> This is done by queueing URBs in an anchor structure and waking the
-> device up from a work queue on sending. Reception triggers remote
-> wakeup.
-> The last busy facility of the USB autosuspend code is used and
-> to close a race between autosuspend and transmission a counter
-> of ongoing transmissions is maintained.
-> #ifdefs for CONFIG_PM are added as necessary.
-> 
-> Signed-off-by: Oliver Neukum <oliver@neukum.org>
-> 
-> --
-> 
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -35,7 +35,7 @@
->  #include <net/bluetooth/bluetooth.h>
->  #include <net/bluetooth/hci_core.h>
->  
-> -#define VERSION "0.5"
-> +#define VERSION "0.6"
->  
->  static int ignore_dga;
->  static int ignore_csr;
-> @@ -145,6 +145,7 @@ static struct usb_device_id blacklist_table[] = {
->  #define BTUSB_INTR_RUNNING	0
->  #define BTUSB_BULK_RUNNING	1
->  #define BTUSB_ISOC_RUNNING	2
-> +#define BTUSB_SUSPENDING	3
->  
->  struct btusb_data {
->  	struct hci_dev       *hdev;
-> @@ -157,11 +158,15 @@ struct btusb_data {
->  	unsigned long flags;
->  
->  	struct work_struct work;
-> +	struct work_struct waker;
->  
->  	struct usb_anchor tx_anchor;
->  	struct usb_anchor intr_anchor;
->  	struct usb_anchor bulk_anchor;
->  	struct usb_anchor isoc_anchor;
-> +	struct usb_anchor deferred;
-> +	int tx_in_flight;
-> +	spinlock_t txlock;
->  
->  	struct usb_endpoint_descriptor *intr_ep;
->  	struct usb_endpoint_descriptor *bulk_tx_ep;
-> @@ -174,8 +179,23 @@ struct btusb_data {
->  	unsigned int sco_num;
->  	int isoc_altsetting;
->  	int suspend_count;
-> +	int did_iso_resume:1;
->  };
->  
-> +static int inc_tx(struct btusb_data *data)
-> +{
-> +	unsigned long flags;
-> +	int rv;
-> +
-> +	spin_lock_irqsave(&data->txlock, flags);
-> +	rv = test_bit(BTUSB_SUSPENDING, &data->flags);
-> +	if (!rv)
-> +		data->tx_in_flight++;
-> +	spin_unlock_irqrestore(&data->txlock, flags);
-> +
-> +	return rv;
-> +}
-> +
->  static void btusb_intr_complete(struct urb *urb)
->  {
->  	struct hci_dev *hdev = urb->context;
-> @@ -202,6 +222,7 @@ static void btusb_intr_complete(struct urb *urb)
->  	if (!test_bit(BTUSB_INTR_RUNNING, &data->flags))
->  		return;
->  
-> +	usb_mark_last_busy(data->udev);
->  	usb_anchor_urb(urb, &data->intr_anchor);
->  
->  	err = usb_submit_urb(urb, GFP_ATOMIC);
-> @@ -327,6 +348,7 @@ static int btusb_submit_bulk_urb(struct hci_dev *hdev, gfp_t mem_flags)
->  
->  	urb->transfer_flags |= URB_FREE_BUFFER;
->  
-> +	usb_mark_last_busy(data->udev);
->  	usb_anchor_urb(urb, &data->bulk_anchor);
->  
->  	err = usb_submit_urb(urb, mem_flags);
-> @@ -465,6 +487,33 @@ static void btusb_tx_complete(struct urb *urb)
->  {
->  	struct sk_buff *skb = urb->context;
->  	struct hci_dev *hdev = (struct hci_dev *) skb->dev;
-> +	struct btusb_data *data = hdev->driver_data;
-> +
-> +	BT_DBG("%s urb %p status %d count %d", hdev->name,
-> +					urb, urb->status, urb->actual_length);
-> +
-> +	if (!test_bit(HCI_RUNNING, &hdev->flags))
-> +		goto done;
-> +
-> +	if (!urb->status)
-> +		hdev->stat.byte_tx += urb->transfer_buffer_length;
-> +	else
-> +		hdev->stat.err_tx++;
-> +
-> +done:
-> +	spin_lock(&data->txlock);
-> +	data->tx_in_flight--;
-> +	spin_unlock(&data->txlock);
-> +
-> +	kfree(urb->setup_packet);
-> +
-> +	kfree_skb(skb);
-> +}
-> +
-> +static void btusb_isoc_tx_complete(struct urb *urb)
-> +{
-> +	struct sk_buff *skb = urb->context;
-> +	struct hci_dev *hdev = (struct hci_dev *) skb->dev;
->  
->  	BT_DBG("%s urb %p status %d count %d", hdev->name,
->  					urb, urb->status, urb->actual_length);
-> @@ -490,11 +539,17 @@ static int btusb_open(struct hci_dev *hdev)
->  
->  	BT_DBG("%s", hdev->name);
->  
-> +	err = usb_autopm_get_interface(data->intf);
-> +	if (err < 0)
-> +		return err;
-> +
-> +	data->intf->needs_remote_wakeup = 1;
-> +
->  	if (test_and_set_bit(HCI_RUNNING, &hdev->flags))
-> -		return 0;
-> +		goto done;
->  
->  	if (test_and_set_bit(BTUSB_INTR_RUNNING, &data->flags))
-> -		return 0;
-> +		goto done;
->  
->  	err = btusb_submit_intr_urb(hdev, GFP_KERNEL);
->  	if (err < 0)
-> @@ -509,17 +564,28 @@ static int btusb_open(struct hci_dev *hdev)
->  	set_bit(BTUSB_BULK_RUNNING, &data->flags);
->  	btusb_submit_bulk_urb(hdev, GFP_KERNEL);
->  
-> +done:
-> +	usb_autopm_put_interface(data->intf);
->  	return 0;
->  
->  failed:
->  	clear_bit(BTUSB_INTR_RUNNING, &data->flags);
->  	clear_bit(HCI_RUNNING, &hdev->flags);
-> +	usb_autopm_put_interface(data->intf);
->  	return err;
->  }
->  
-> +static void btusb_stop_traffic(struct btusb_data *data)
-> +{
-> +	usb_kill_anchored_urbs(&data->intr_anchor);
-> +	usb_kill_anchored_urbs(&data->bulk_anchor);
-> +	usb_kill_anchored_urbs(&data->isoc_anchor);
-> +}
-> +
->  static int btusb_close(struct hci_dev *hdev)
->  {
->  	struct btusb_data *data = hdev->driver_data;
-> +	int err;
->  
->  	BT_DBG("%s", hdev->name);
->  
-> @@ -529,13 +595,16 @@ static int btusb_close(struct hci_dev *hdev)
->  	cancel_work_sync(&data->work);
->  
->  	clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
-> -	usb_kill_anchored_urbs(&data->isoc_anchor);
-> -
->  	clear_bit(BTUSB_BULK_RUNNING, &data->flags);
-> -	usb_kill_anchored_urbs(&data->bulk_anchor);
-> -
->  	clear_bit(BTUSB_INTR_RUNNING, &data->flags);
-> -	usb_kill_anchored_urbs(&data->intr_anchor);
-> +
-> +	btusb_stop_traffic(data);
-> +	err = usb_autopm_get_interface(data->intf);
-> +	if (err < 0)
-> +		return 0;
-> +
-> +	data->intf->needs_remote_wakeup = 0;
-> +	usb_autopm_put_interface(data->intf);
->  
->  	return 0;
->  }
-> @@ -622,7 +691,7 @@ static int btusb_send_frame(struct sk_buff *skb)
->  		urb->dev      = data->udev;
->  		urb->pipe     = pipe;
->  		urb->context  = skb;
-> -		urb->complete = btusb_tx_complete;
-> +		urb->complete = btusb_isoc_tx_complete;
->  		urb->interval = data->isoc_tx_ep->bInterval;
->  
->  		urb->transfer_flags  = URB_ISO_ASAP;
-> @@ -633,12 +702,21 @@ static int btusb_send_frame(struct sk_buff *skb)
->  				le16_to_cpu(data->isoc_tx_ep->wMaxPacketSize));
->  
->  		hdev->stat.sco_tx++;
-> -		break;
-> +		goto skip_waking;
->  
->  	default:
->  		return -EILSEQ;
->  	}
->  
-> +	err = inc_tx(data);
-> +	if (err) {
-> +		usb_anchor_urb(urb, &data->deferred);
-> +		schedule_work(&data->waker);
-> +		err = 0;
-> +		goto done;
-> +	}
-> +
-> +skip_waking:
->  	usb_anchor_urb(urb, &data->tx_anchor);
->  
->  	err = usb_submit_urb(urb, GFP_ATOMIC);
-> @@ -646,10 +724,13 @@ static int btusb_send_frame(struct sk_buff *skb)
->  		BT_ERR("%s urb %p submission failed", hdev->name, urb);
->  		kfree(urb->setup_packet);
->  		usb_unanchor_urb(urb);
-> +	} else {
-> +		usb_mark_last_busy(data->udev);
->  	}
->  
->  	usb_free_urb(urb);
->  
-> +done:
->  	return err;
->  }
->  
-> @@ -721,8 +802,19 @@ static void btusb_work(struct work_struct *work)
->  {
->  	struct btusb_data *data = container_of(work, struct btusb_data, work);
->  	struct hci_dev *hdev = data->hdev;
-> +	int err;
->  
->  	if (hdev->conn_hash.sco_num > 0) {
-> +		if (!data->did_iso_resume) {
-> +			err = usb_autopm_get_interface(data->isoc);
-> +			if (err < 0) {
-> +				clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
-> +				usb_kill_anchored_urbs(&data->isoc_anchor);
-> +				return;
-> +			}
-> +
-> +			data->did_iso_resume = 1;
-> +		}
->  		if (data->isoc_altsetting != 2) {
->  			clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
->  			usb_kill_anchored_urbs(&data->isoc_anchor);
-> @@ -742,9 +834,25 @@ static void btusb_work(struct work_struct *work)
->  		usb_kill_anchored_urbs(&data->isoc_anchor);
->  
->  		__set_isoc_interface(hdev, 0);
-> +		if (data->did_iso_resume) {
-> +			data->did_iso_resume = 0;
-> +			usb_autopm_put_interface(data->isoc);
-> +		}
->  	}
->  }
->  
-> +static void btusb_waker(struct work_struct *work)
-> +{
-> +	struct btusb_data *data = container_of(work, struct btusb_data, waker);
-> +	int err;
-> +
-> +	err = usb_autopm_get_interface(data->intf);
-> +	if (err < 0)
-> +		return;
-> +
-> +	usb_autopm_put_interface(data->intf);
-> +}
-> +
->  static int btusb_probe(struct usb_interface *intf,
->  				const struct usb_device_id *id)
->  {
-> @@ -814,11 +922,14 @@ static int btusb_probe(struct usb_interface *intf,
->  	spin_lock_init(&data->lock);
->  
->  	INIT_WORK(&data->work, btusb_work);
-> +	INIT_WORK(&data->waker, btusb_waker);
-> +	spin_lock_init(&data->txlock);
->  
->  	init_usb_anchor(&data->tx_anchor);
->  	init_usb_anchor(&data->intr_anchor);
->  	init_usb_anchor(&data->bulk_anchor);
->  	init_usb_anchor(&data->isoc_anchor);
-> +	init_usb_anchor(&data->deferred);
->  
->  	hdev = hci_alloc_dev();
->  	if (!hdev) {
-> @@ -943,6 +1054,7 @@ static void btusb_disconnect(struct usb_interface *intf)
->  	hci_free_dev(hdev);
->  }
->  
-> +#ifdef CONFIG_PM
->  static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
->  {
->  	struct btusb_data *data = usb_get_intfdata(intf);
-> @@ -952,22 +1064,44 @@ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
->  	if (data->suspend_count++)
->  		return 0;
->  
-> +	spin_lock_irq(&data->txlock);
-> +	if (!(interface_to_usbdev(intf)->auto_pm && data->tx_in_flight)) {
-> +		set_bit(BTUSB_SUSPENDING, &data->flags);
-> +		spin_unlock_irq(&data->txlock);
-> +	} else {
-> +		spin_unlock_irq(&data->txlock);
-> +		data->suspend_count--;
-> +		return -EBUSY;
-> +	}
-> +
->  	cancel_work_sync(&data->work);
->  
-> +	btusb_stop_traffic(data);
->  	usb_kill_anchored_urbs(&data->tx_anchor);
->  
-> -	usb_kill_anchored_urbs(&data->isoc_anchor);
-> -	usb_kill_anchored_urbs(&data->bulk_anchor);
-> -	usb_kill_anchored_urbs(&data->intr_anchor);
-> -
->  	return 0;
->  }
->  
-> +static void play_deferred(struct btusb_data *data)
-> +{
-> +	struct urb *urb;
-> +	int err;
-> +
-> +	while ((urb = usb_get_from_anchor(&data->deferred))) {
-> +		err = usb_submit_urb(urb, GFP_ATOMIC);
-> +		if (err < 0)
-> +			break;
-> +
-> +		data->tx_in_flight++;	
-> +	}
-> +	usb_scuttle_anchored_urbs(&data->deferred);
-> +}
-> +
->  static int btusb_resume(struct usb_interface *intf)
->  {
->  	struct btusb_data *data = usb_get_intfdata(intf);
->  	struct hci_dev *hdev = data->hdev;
-> -	int err;
-> +	int err = 0;
->  
->  	BT_DBG("intf %p", intf);
->  
-> @@ -975,13 +1109,13 @@ static int btusb_resume(struct usb_interface *intf)
->  		return 0;
->  
->  	if (!test_bit(HCI_RUNNING, &hdev->flags))
-> -		return 0;
-> +		goto done;
->  
->  	if (test_bit(BTUSB_INTR_RUNNING, &data->flags)) {
->  		err = btusb_submit_intr_urb(hdev, GFP_NOIO);
->  		if (err < 0) {
->  			clear_bit(BTUSB_INTR_RUNNING, &data->flags);
-> -			return err;
-> +			goto failed;
->  		}
->  	}
->  
-> @@ -989,9 +1123,10 @@ static int btusb_resume(struct usb_interface *intf)
->  		err = btusb_submit_bulk_urb(hdev, GFP_NOIO);
->  		if (err < 0) {
->  			clear_bit(BTUSB_BULK_RUNNING, &data->flags);
-> -			return err;
-> -		} else
-> -			btusb_submit_bulk_urb(hdev, GFP_NOIO);
-> +			goto failed;
-> +		}
-> +
-> +		btusb_submit_bulk_urb(hdev, GFP_NOIO);
->  	}
->  
->  	if (test_bit(BTUSB_ISOC_RUNNING, &data->flags)) {
-> @@ -1001,16 +1136,35 @@ static int btusb_resume(struct usb_interface *intf)
->  			btusb_submit_isoc_urb(hdev, GFP_NOIO);
->  	}
->  
-> +	spin_lock_irq(&data->txlock);
-> +	play_deferred(data);
-> +	clear_bit(BTUSB_SUSPENDING, &data->flags);
-> +	spin_unlock_irq(&data->txlock);
-> +	schedule_work(&data->work);
-> +
->  	return 0;
-> +
-> +failed:
-> +	usb_scuttle_anchored_urbs(&data->deferred);
-> +done:
-> +	spin_lock_irq(&data->txlock);
-> +	clear_bit(BTUSB_SUSPENDING, &data->flags);
-> +	spin_unlock_irq(&data->txlock);
-> +
-> +	return err;
->  }
-> +#endif
->  
->  static struct usb_driver btusb_driver = {
->  	.name		= "btusb",
->  	.probe		= btusb_probe,
->  	.disconnect	= btusb_disconnect,
-> +#ifdef CONFIG_PM
->  	.suspend	= btusb_suspend,
->  	.resume		= btusb_resume,
-> +#endif
->  	.id_table	= btusb_table,
-> +	.supports_autosuspend = 1,
->  };
->  
->  static int __init btusb_init(void)
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-usb" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
