@@ -1,67 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Weng, Wending" <WWeng@rheinmetall.ca>
-To: 'Marcel Holtmann' <marcel@holtmann.org>
-CC: "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 24 Aug 2009 16:19:54 -0400
-Subject: RE: patch for hci_bcsp.c(bluetooth-testing)
-Message-ID: <54B31811B83D744D90BF0289EB447D460C1A5047@MAIL-MB1.oerlikon.ca>
-In-Reply-To: <1251139067.2950.57.camel@localhost.localdomain>
-Content-Type: text/plain; charset=US-ASCII
-MIME-Version: 1.0
+Subject: Re: bluez-4.49 does not build for me.
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Valmantas =?UTF-8?Q?Palik=C5=A1a?= <walmis@gmail.com>
+Cc: BlueZ devel list <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1251124029.19970.1.camel@walmis-desktop>
+References: <20090824151514.6eb4f1f6@stoetzler>
+	 <2d5a2c100908240652l179a6ad3mc6195db710ae069a@mail.gmail.com>
+	 <1251124029.19970.1.camel@walmis-desktop>
+Content-Type: text/plain
+Date: Mon, 24 Aug 2009 13:06:29 -0700
+Message-Id: <1251144389.2950.65.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Valmantas,
 
->Hi Wending,
+> Here's my errors:
+> 
+> make[1]: *** No rule to make target `tools/bccmd.8', needed by `all-am'.
+> Stop.
+> make: *** [all] Error 2
+> 
+> same with hid2hci.
 
->looks good, but I need a patch that applies with bluetooth-testing.git
->tree. And please create it with git format-patch.
->
->Regards
->
->Marcel
+there were some more. All of them should be fixed now. The automake
+dist_man_MANS target doesn't work with conditionals.
 
-Below is the patch created with bluetooth-testing.git tree, let me know if it's not done properly, I'm not very experienced with open source.
+Regards
 
->From 5c6e77cb6ea3ba6fa5c777d151c480451602bfc8 Mon Sep 17 00:00:00 2001
-From: root <root@SBC_PC_3.localdomain>
-Date: Mon, 24 Aug 2009 16:05:17 -0400
-Subject: [PATCH] The routine bcsp_pkt_cull displays the false error message
-"Removed only %u out of %u pkts" when multiple to be acked packets are queued.
-As if (i++ >= pkts_to_be_removed)
-        break;
-   will break the loop and increase the counter i when i==pkts_to_be_removed,
-   the loop ends up with i=pkts_to_be_removed+1. The following line:
-   if (i != pkts_to_be_removed) {
-        BT_ERR("Removed only %u out of %u pkts", i, pkts_to_be_removed);
-   }
-   will display the false message.
-The counter i must not increase on the same line.
+Marcel
 
-signed-off-by: Wending Weng wweng@rheinmetall.ca
----
- drivers/bluetooth/hci_bcsp.c |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
 
-diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
-index 894b2cb..40aec0f 100644
---- a/drivers/bluetooth/hci_bcsp.c
-+++ b/drivers/bluetooth/hci_bcsp.c
-@@ -373,8 +373,9 @@ static void bcsp_pkt_cull(struct bcsp_struct *bcsp)
-
-        i = 0;
-        skb_queue_walk_safe(&bcsp->unack, skb, tmp) {
--               if (i++ >= pkts_to_be_removed)
-+               if (i >= pkts_to_be_removed)
-                        break;
-+               i++;
-
-                __skb_unlink(skb, &bcsp->unack);
-                kfree_skb(skb);
---
-1.5.2.1
-
-regards
-
-Wending
