@@ -1,37 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1251142428.2950.61.camel@localhost.localdomain>
-References: <2d5a2c100908241126k6cf31de0s282c0f360b6948ec@mail.gmail.com>
-	 <1251139257.2950.60.camel@localhost.localdomain>
-	 <2d5a2c100908241226y978afd2n44d69b7d27677c13@mail.gmail.com>
-	 <1251142428.2950.61.camel@localhost.localdomain>
-Date: Mon, 24 Aug 2009 17:58:22 -0300
-Message-ID: <2d5a2c100908241358m26c615aao1a384d9d954bf713@mail.gmail.com>
-Subject: Re: sniff mode
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: RE: patch for hci_bcsp.c(bluetooth-testing)
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Weng, Wending" <WWeng@rheinmetall.ca>
+Cc: "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <54B31811B83D744D90BF0289EB447D460C1A5047@MAIL-MB1.oerlikon.ca>
+References: <54B31811B83D744D90BF0289EB447D460C1A5047@MAIL-MB1.oerlikon.ca>
+Content-Type: text/plain
+Date: Mon, 24 Aug 2009 13:34:07 -0700
+Message-Id: <1251146047.2950.66.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Wending,
 
-On Mon, Aug 24, 2009 at 4:33 PM, Marcel Holtmann<marcel@holtmann.org> wrote=
-:
->> It really seems the opposite, like we were disabling the automatic
->> active mode since this make us to always hit goto timer; while in
->> sniff mode. Perhaps this is meant for when remote device has been
->> controlling modes, which sound strange to me since hci_mode_change_evt
->> is called even when the we actively change the mode, right?
->> (hci_conn_idle does that)
+> >looks good, but I need a patch that applies with bluetooth-testing.git
+> >tree. And please create it with git format-patch.
+> >
 >
-> I am not following.
+> Below is the patch created with bluetooth-testing.git tree, let me know if it's not done properly, I'm not very experienced with open source.
 
-Perhaps it is just me, but I don't see any attempt to detect which
-part has initiated the connection, so regardless of who has been the
-initiator, on any mode change different than active we will reset the
-power_save to 0 which will prevent any attempt to leave sniff mode.
+your mailer is fully broken. It messes up tabes and whitespaces :(
 
---=20
-Luiz Augusto von Dentz
-Engenheiro de Computa=E7=E3o
+It did fix it manually now, but next time it is up to you.
+
+Regards
+
+Marcel
+
+
