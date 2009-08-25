@@ -1,27 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] fix missing call to closedir
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Vladimir Botka <vbotka@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20090825174625.49cbf150@vlado.suse.cz>
-References: <20090825174625.49cbf150@vlado.suse.cz>
-Content-Type: text/plain
-Date: Tue, 25 Aug 2009 23:50:59 -0700
-Message-Id: <1251269459.2950.93.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <a70b8cd30908241406s50bd1b35o8cfc64609bcfbf63@mail.gmail.com>
+References: <a70b8cd30908190910p35910657m28fe09905717d60@mail.gmail.com>
+	 <1250698578.11521.0.camel@localhost.localdomain>
+	 <1250971418.2950.24.camel@localhost.localdomain>
+	 <a70b8cd30908241406s50bd1b35o8cfc64609bcfbf63@mail.gmail.com>
+Date: Tue, 25 Aug 2009 22:39:57 +0200
+Message-ID: <a70b8cd30908251339h1bf0bdefye7ac669fafd57f51@mail.gmail.com>
+Subject: Re: PATCH for input/fakehid.c to fix PS3 remote unpairing
+From: "Ruslan N. Marchenko" <rufferson@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Bastien Nocera <hadess@hadess.net>, Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vladimir,
+Ehm... Have I missed something? Should I post it immediately in commit
+form? I just want it to be reviewed before actual commit %\
 
-> ---
->  compat/dun.c |    4 +++-
->  1 files changed, 3 insertions(+), 1 deletions(-)
+2009/8/24, Ruslan N. Marchenko <rufferson@gmail.com>:
+> Hi all,
+>
+>  Here is next patch version, now it implements powersaving via implicit
+>  unpairing.
 
-patch has been applied. Thanks.
-
-Regards
-
-Marcel
-
-
+-- 
+----
+Looking forward to reading yours.
+ RUFF-RIPE DI76-GANDI RUFF-6BONE
+     Ruslan N. Marchenko
