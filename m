@@ -1,30 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 25 Aug 2009 18:15:15 +0100 (BST)
+To: Mateus Interciso <mateus@ouvi.com.br>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Question on simple RFCOMM server
+In-Reply-To: <4A93F2C6.4030708@ouvi.com.br>
+References: <4A93D887.8060007@ouvi.com.br> <1251207686.259635.1938.nullmailer@galant.ukfsn.org> <4A93F2C6.4030708@ouvi.com.br>
 MIME-Version: 1.0
-In-Reply-To: <a70b8cd30908241406s50bd1b35o8cfc64609bcfbf63@mail.gmail.com>
-References: <a70b8cd30908190910p35910657m28fe09905717d60@mail.gmail.com>
-	 <1250698578.11521.0.camel@localhost.localdomain>
-	 <1250971418.2950.24.camel@localhost.localdomain>
-	 <a70b8cd30908241406s50bd1b35o8cfc64609bcfbf63@mail.gmail.com>
-Date: Tue, 25 Aug 2009 22:39:57 +0200
-Message-ID: <a70b8cd30908251339h1bf0bdefye7ac669fafd57f51@mail.gmail.com>
-Subject: Re: PATCH for input/fakehid.c to fix PS3 remote unpairing
-From: "Ruslan N. Marchenko" <rufferson@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Bastien Nocera <hadess@hadess.net>, Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Message-Id: <1251220515.564598.718.nullmailer@galant.ukfsn.org>
+From: Iain Hibbert <plunky@rya-online.net>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Ehm... Have I missed something? Should I post it immediately in commit
-form? I just want it to be reviewed before actual commit %\
+On Tue, 25 Aug 2009, Mateus Interciso wrote:
 
-2009/8/24, Ruslan N. Marchenko <rufferson@gmail.com>:
-> Hi all,
->
->  Here is next patch version, now it implements powersaving via implicit
->  unpairing.
+> Or is there any configuration that can make a normal user change the default
+> link mode?
 
--- 
-----
-Looking forward to reading yours.
- RUFF-RIPE DI76-GANDI RUFF-6BONE
-     Ruslan N. Marchenko
+yes - do
+
+	int opt = RFCOMM_LM_MASTER;
+	setsockopt(listend, SOL_RFCOMM, RFCOMM_LM, &opt, sizeof(opt));
+
+before listen()
+
+iain
+
+
