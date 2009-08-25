@@ -1,16 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 25 Aug 2009 14:41:26 +0100 (BST)
+Date: Tue, 25 Aug 2009 14:31:57 +0200 (CEST)
+From: Peter Wippich <pewi@gw-instruments.de>
 To: Mateus Interciso <mateus@ouvi.com.br>
-Cc: linux-bluetooth@vger.kernel.org
+cc: linux-bluetooth@vger.kernel.org
 Subject: Re: Question on simple RFCOMM server
 In-Reply-To: <4A93D887.8060007@ouvi.com.br>
+Message-ID: <Pine.LNX.4.63.0908251427570.3317@redbean.intranet.gw-instruments.de>
 References: <4A93D887.8060007@ouvi.com.br>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII
-Message-Id: <1251207686.259635.1938.nullmailer@galant.ukfsn.org>
-From: Iain Hibbert <plunky@rya-online.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
+
+
+Hi Mateus,
+
+I don't think the problem is with your code but has something to do with 
+the Bluetooth Master / Slave mode. By default for the RFCOMM connection 
+opened by the remote device your server is a Bluetooth Slave. And as a 
+slave you can not handle more than 2 connections at once. To allow more 
+connections you need your server to do a role switch after connection 
+setup. Than it will act as a master and can handle up to seven 
+connections. 
+
+Ciao, 
+
+Peter
 
 On Tue, 25 Aug 2009, Mateus Interciso wrote:
 
@@ -19,17 +34,103 @@ On Tue, 25 Aug 2009, Mateus Interciso wrote:
 > server, and while the TCP server works perfeclty, the RFCOMM works only with 2
 > connected clients at the same time, and I'm failling to see the problem, can
 > someone help me?
+> 
+> Here's the code:
+> 
+> (The commented part if the TCP part)
+> 
+> #include <stdio.h>
+> #include <stdlib.h>
+> #include <unistd.h>
+> #include <string.h>
+> #include <errno.h>
+> #include <sys/types.h>
+> #include <sys/socket.h>
+> #include <netinet/in.h>
+> #include <arpa/inet.h>
+> #include <sys/wait.h>
+> #include <bluetooth/bluetooth.h>
+> #include <bluetooth/rfcomm.h>
+> 
+> #define MYPORT 10
+> #define BACKLOG 31
+> #define MAX_SIZE 80
+> 
+> int main(int argc, char *argv[])
+> {
+>   int listenfd, connfd;
+>   pid_t childpid;
+>   socklen_t clilen;
+>   struct sockaddr_rc cliaddr, servaddr;
+>   char buf[MAX_SIZE];
+>   int i =0;
+> 
+>   //listenfd = socket(AF_INET, SOCK_STREAM, 0);
+>   listenfd = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+>   if(listenfd < 0)
+>   {
+>     perror("socket");
+>     exit(errno);
+>   }
+> 
+>   bzero(&servaddr, sizeof(servaddr));
+>   servaddr.rc_family = AF_BLUETOOTH;
+>   servaddr.rc_bdaddr = *BDADDR_ANY;
+>   servaddr.rc_channel = (uint8_t)MYPORT;
+>   /*
+>   servaddr.sin_family = AF_INET;
+>   servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+>   servaddr.sin_port = htons(MYPORT);
+>   */
+>   if(bind(listenfd,(struct sockaddr*)&servaddr, sizeof(servaddr)) < 0)
+>   {
+>     perror("bind");
+>     exit(errno);
+>   }
+> 
+>   if(listen(listenfd,BACKLOG) < 0)
+>   {
+>     perror("listen");
+>     exit(errno);
+>   }
+> 
+>   while(1)
+>   {
+>     clilen = sizeof(cliaddr);
+>     if((connfd = accept(listenfd, (struct sockaddr*)&cliaddr, &clilen)) 
+> < 0)
+>     {
+>       perror("accept");
+>       exit(errno);
+>     }
+>     if((childpid = fork()) == 0)
+>     {
+>       i = 0;
+>       close(listenfd);
+>       fprintf(stderr,"[DEBUG] Got connection\n");
+>       memset(buf,'\0',sizeof(buf));
+>       //echo server
+>       if(read(connfd, buf, MAX_SIZE) < 0) perror("read");
+>       else
+>         if(send(connfd, buf, strlen(buf), 0) < 0) perror("send");
+>       exit(0);
+>     }
+>     close(connfd);
+>   }
+>   return 0;
+> }
+> 
+> 
+> Thanks.
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
 
-You didn't post what the 'failure' was but for RFCOMM you can only have
-one connection on a server channel (each RFCOMM channel corresponds to
-an emulated serial port).
 
-since a TCP connection is defined by the address and port at each end, the
-Bluetooth equivalent is more likely to be a a L2CAP connection to a given
-PSM which can support up to ~64k channels (though as the Peter Wippich
-notes, the number of devices the radio can maintain connections with is
-limited)
-
-iain
-
+|       Peter Wippich                   Voice: +49 30 46776411          |
+|       G&W Instruments GmbH            fax:   +49 30 46776419          |
+|       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
+|       D-13355 Berlin  / Germany                                       |
 
