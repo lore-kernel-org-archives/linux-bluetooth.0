@@ -1,46 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 25 Aug 2009 13:47:02 +0200
-From: Vladimir Botka <vbotka@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: David Binderman <dcb314@hotmail.com>
-Subject: [PATCH] fix missing call to closedir
-Message-ID: <20090825134702.51ab0f8a@vlado.suse.cz>
+Date: Tue, 25 Aug 2009 10:57:11 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org, linux-next@vger.kernel.org, LKML
+ <linux-kernel@vger.kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
+ netdev@vger.kernel.org
+Subject: Re: Fw: Build failure on linux-next master branch
+Message-Id: <20090825105711.b9d85e89.sfr@canb.auug.org.au>
+In-Reply-To: <1251157115.2950.85.camel@localhost.localdomain>
+References: <20090825093707.13bf8c49.sfr@canb.auug.org.au>
+	<1251157115.2950.85.camel@localhost.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA1";
+ boundary="Signature=_Tue__25_Aug_2009_10_57_11_+1000_KwZTcKVfDjr623ED"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
->From 29e477a29519c4a232ba02b6878beeeaa6d57da6 Mon Sep 17 00:00:00 2001
-From: Vladimir Botka <vlado@dolby.suse.cz>
-Date: Tue, 25 Aug 2009 13:23:29 +0200
-Subject: [PATCH] fix missing call to closedir
+--Signature=_Tue__25_Aug_2009_10_57_11_+1000_KwZTcKVfDjr623ED
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
----
- compat/dun.c |    4 +++-
- 1 files changed, 3 insertions(+), 1 deletions(-)
+Hi Marcel,
 
-diff --git a/compat/dun.c b/compat/dun.c
-index c74e5ee..7140bac 100644
---- a/compat/dun.c
-+++ b/compat/dun.c
-@@ -106,8 +106,10 @@ static int uses_rfcomm(char *path, char *dev)
- 		int  len = readlink(de->d_name, link, sizeof(link));
- 		if (len > 0) {
- 			link[len] = 0;
--			if (strstr(link, dev))
-+			if (strstr(link, dev)) {
-+				closedir(dir);
- 				return 1;
-+			}
- 		}
- 	}
- 
--- 
-1.6.0.2
+On Mon, 24 Aug 2009 16:38:35 -0700 Marcel Holtmann <marcel@holtmann.org> wr=
+ote:
+>
+> just pushed a fix from Randy to bluetooth-next-2.6 tree. The
+> CONFIG_L2CAP was missing a select CRC16.
 
+Thanks.
 
+--=20
 Cheers,
--- 
-	-vlado
-	Vladimir Botka
+Stephen Rothwell                    sfr@canb.auug.org.au
+http://www.canb.auug.org.au/~sfr/
 
+--Signature=_Tue__25_Aug_2009_10_57_11_+1000_KwZTcKVfDjr623ED
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAkqTNucACgkQjjKRsyhoI8y+PQCfQKsHY2vAnRMLyZNfY8d1qOE/
+ZgcAn10sj6wuhACXwyIctocxkjFSAJ/G
+=xdXg
+-----END PGP SIGNATURE-----
+
+--Signature=_Tue__25_Aug_2009_10_57_11_+1000_KwZTcKVfDjr623ED--
