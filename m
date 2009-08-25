@@ -1,104 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4A93D887.8060007@ouvi.com.br>
-Date: Tue, 25 Aug 2009 09:26:47 -0300
-From: Mateus Interciso <mateus@ouvi.com.br>
 MIME-Version: 1.0
+Date: Tue, 25 Aug 2009 14:16:57 +0200
+Message-ID: <a70b8cd30908250516r60256f48q7d363886af31004@mail.gmail.com>
+Subject: After EXTRA_DIST commit man files are not following --prefix
+From: "Ruslan N. Marchenko" <rufferson@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Question on simple RFCOMM server
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello, I have a very simple RFCOMM server that I adapted from an 
-extremely simple TCP echo server I've made for learning TCP, it's a 
-simple fork() server, and while the TCP server works perfeclty, the 
-RFCOMM works only with 2 connected clients at the same time, and I'm 
-failling to see the problem, can someone help me?
+Hi,
 
-Here's the code:
+After
+commit 8ddf2e8466abf785d7ffa3da44cf7ce8791c6297
+Author: Marcel Holtmann <marcel@holtmann.org>
+Date:   Mon Aug 24 14:56:11 2009 -0700
 
-(The commented part if the TCP part)
+    All manual pages need a special EXTRA_DIST statement
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/wait.h>
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/rfcomm.h>
+man pages are not following --prefix
+I'm doing
+./bootstrap-configure --prefix=/opt/bluez --disable-audio
+and then
+make install
+which results into
+...
+ /usr/bin/install -c -m 644 'lib/hidp.h' '/opt/bluez/include/bluetooth/hidp.h'
+test -z "/usr/share/man/man1" || /bin/mkdir -p "/usr/share/man/man1"
+ /usr/bin/install -c -m 644 'rfcomm/rfcomm.1' '/usr/share/man/man1/rfcomm.1'
+/usr/bin/install: cannot create regular file
+`/usr/share/man/man1/rfcomm.1': Permission denied
+ /usr/bin/install -c -m 644 'tools/hcitool.1' '/usr/share/man/man1/hcitool.1'
+/usr/bin/install: cannot create regular file
+`/usr/share/man/man1/hcitool.1': Permission denied
+ /usr/bin/install -c -m 644 'tools/sdptool.1' '/usr/share/man/man1/sdptool.1'
+/usr/bin/install: cannot create regular file
+`/usr/share/man/man1/sdptool.1': Permission denied
+ /usr/bin/install -c -m 644 'tools/ciptool.1' '/usr/share/man/man1/ciptool.1'
+/usr/bin/install: cannot create regular file
+`/usr/share/man/man1/ciptool.1': Permission denied
+ /usr/bin/install -c -m 644 'test/rctest.1' '/usr/share/man/man1/rctest.1'
+/usr/bin/install: cannot create regular file
+`/usr/share/man/man1/rctest.1': Permission denied
+ /usr/bin/install -c -m 644 'test/hciemu.1' '/usr/share/man/man1/hciemu.1'
+/usr/bin/install: cannot create regular file
+`/usr/share/man/man1/hciemu.1': Permission denied
+ /usr/bin/install -c -m 644 'compat/hidd.1' '/usr/share/man/man1/hidd.1'
+/usr/bin/install: cannot create regular file
+`/usr/share/man/man1/hidd.1': Permission denied
+ /usr/bin/install -c -m 644 'compat/pand.1' '/usr/share/man/man1/pand.1'
+/usr/bin/install: cannot create regular file
+`/usr/share/man/man1/pand.1': Permission denied
+ /usr/bin/install -c -m 644 'compat/dund.1' '/usr/share/man/man1/dund.1'
+/usr/bin/install: cannot create regular file
+`/usr/share/man/man1/dund.1': Permission denied
+make[1]: *** [install-man1] Error 1
+make: *** [install-am] Error 2
 
-#define MYPORT 10
-#define BACKLOG 31
-#define MAX_SIZE 80
+I.e. i have specific directory in /opt/bluez and compiling bluez not
+from root. But man files are tending to be installed to system prefix.
 
-int main(int argc, char *argv[])
-{
-   int listenfd, connfd;
-   pid_t childpid;
-   socklen_t clilen;
-   struct sockaddr_rc cliaddr, servaddr;
-   char buf[MAX_SIZE];
-   int i =0;
-
-   //listenfd = socket(AF_INET, SOCK_STREAM, 0);
-   listenfd = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
-   if(listenfd < 0)
-   {
-     perror("socket");
-     exit(errno);
-   }
-
-   bzero(&servaddr, sizeof(servaddr));
-   servaddr.rc_family = AF_BLUETOOTH;
-   servaddr.rc_bdaddr = *BDADDR_ANY;
-   servaddr.rc_channel = (uint8_t)MYPORT;
-   /*
-   servaddr.sin_family = AF_INET;
-   servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-   servaddr.sin_port = htons(MYPORT);
-   */
-   if(bind(listenfd,(struct sockaddr*)&servaddr, sizeof(servaddr)) < 0)
-   {
-     perror("bind");
-     exit(errno);
-   }
-
-   if(listen(listenfd,BACKLOG) < 0)
-   {
-     perror("listen");
-     exit(errno);
-   }
-
-   while(1)
-   {
-     clilen = sizeof(cliaddr);
-     if((connfd = accept(listenfd, (struct sockaddr*)&cliaddr, &clilen)) 
-< 0)
-     {
-       perror("accept");
-       exit(errno);
-     }
-     if((childpid = fork()) == 0)
-     {
-       i = 0;
-       close(listenfd);
-       fprintf(stderr,"[DEBUG] Got connection\n");
-       memset(buf,'\0',sizeof(buf));
-       //echo server
-       if(read(connfd, buf, MAX_SIZE) < 0) perror("read");
-       else
-         if(send(connfd, buf, strlen(buf), 0) < 0) perror("send");
-       exit(0);
-     }
-     close(connfd);
-   }
-   return 0;
-}
-
-
-Thanks.
+-- 
+----
+Looking forward to reading yours.
+ RUFF-RIPE DI76-GANDI RUFF-6BONE
+     Ruslan N. Marchenko
