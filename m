@@ -1,30 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] fix missing call to closedir
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Vladimir Botka <vbotka@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	David Binderman <dcb314@hotmail.com>
-In-Reply-To: <20090825134702.51ab0f8a@vlado.suse.cz>
-References: <20090825134702.51ab0f8a@vlado.suse.cz>
-Content-Type: text/plain
-Date: Tue, 25 Aug 2009 07:42:27 -0700
-Message-Id: <1251211347.2950.87.camel@localhost.localdomain>
-Mime-Version: 1.0
+Message-ID: <4A93F2C6.4030708@ouvi.com.br>
+Date: Tue, 25 Aug 2009 11:18:46 -0300
+From: Mateus Interciso <mateus@ouvi.com.br>
+MIME-Version: 1.0
+To: Iain Hibbert <plunky@rya-online.net>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: Question on simple RFCOMM server
+References: <4A93D887.8060007@ouvi.com.br> <1251207686.259635.1938.nullmailer@galant.ukfsn.org>
+In-Reply-To: <1251207686.259635.1938.nullmailer@galant.ukfsn.org>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vladimir,
+Thank you, however the Peter solution (setting via ioctl) worked 
+perfectly, and it fit's with what I need, since all the clients are 
+already implemented via RFCOMM, I'll leave it like this for now, the 
+only issue is having to run it as root for setting the link mode, but I 
+can bypass this by using hciconfig before running the main server.
+Or is there any configuration that can make a normal user change the 
+default link mode?
 
-> From 29e477a29519c4a232ba02b6878beeeaa6d57da6 Mon Sep 17 00:00:00 2001
-> From: Vladimir Botka <vlado@dolby.suse.cz>
-> Date: Tue, 25 Aug 2009 13:23:29 +0200
-> Subject: [PATCH] fix missing call to closedir
+Thanks all once again.
 
-please fix your .gitconfig so we have real email addresses as author and
-not some ones with machine names in it.
-
-Regards
-
-Marcel
-
-
+Iain Hibbert wrote:
+> On Tue, 25 Aug 2009, Mateus Interciso wrote:
+> 
+>> Hello, I have a very simple RFCOMM server that I adapted from an extremely
+>> simple TCP echo server I've made for learning TCP, it's a simple fork()
+>> server, and while the TCP server works perfeclty, the RFCOMM works only with 2
+>> connected clients at the same time, and I'm failling to see the problem, can
+>> someone help me?
+> 
+> You didn't post what the 'failure' was but for RFCOMM you can only have
+> one connection on a server channel (each RFCOMM channel corresponds to
+> an emulated serial port).
+> 
+> since a TCP connection is defined by the address and port at each end, the
+> Bluetooth equivalent is more likely to be a a L2CAP connection to a given
+> PSM which can support up to ~64k channels (though as the Peter Wippich
+> notes, the number of devices the radio can maintain connections with is
+> limited)
+> 
+> iain
+> 
+> 
+> 
