@@ -1,26 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <639511.66794.qm@web94914.mail.in2.yahoo.com>
-Date: Wed, 26 Aug 2009 17:06:24 +0530 (IST)
-From: Pavan Savoy <pavan_savoy@yahoo.co.in>
-Subject: shared hci transport
-To: linux-bluetooth@vger.kernel.org
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Date: Wed, 26 Aug 2009 16:43:23 +0530
+Message-ID: <d4d7098f0908260413t25dcc0a9n7a5e8b4fd465d908@mail.gmail.com>
+Subject: Ref : Bluez with WinMobile based phone
+From: Rajan Batra <rajan.batra@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-A lot of recent BT chips intefaced by UART also tend to have another radio [mostly FM] on the same chip sharing the transport interface i.e the UART. [bcm4325 for example has bt, fm and wlan].
+Hello.
 
-I just wanted to know, from the user-space the hci0 socket interface allows me to concurrently use the uart from several applications, but
-is there a way in kernel to do the same ?
+   i am not able to make winmobile based phone work with bluez (as headset).
+i could trigger a call from bluez (send dbus commands) with Express
+Music nokia phone and Samsung U900.
 
-[say hci_h4 is also used by the fm core to understand some vendor specific commands ?]
-or in an usb case - the fm has int endpoint for control data of fm [+ hci-event/cmd packets] and bulk for rds[+ acl] [assuming the audio data path - is isolated from all these ...]
+ i used ASUS WinMobile based phone but could not get it connected.
+Samsung BlackJack, phone got connected but getProperties is not working.
 
-regards,
-Pavan
+ before sending out logs, i want to know if there is any know issues
+with winmobile based phone ?
 
-
-
-      See the Web&#39;s breaking stories, chosen by people like you. Check out Yahoo! Buzz. http://in.buzz.yahoo.com/
-
+thanks.
+-Rajan
