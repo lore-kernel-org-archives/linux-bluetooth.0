@@ -1,36 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: PATCHES: Device discovery of the "bluetooth" CUPS backend does
- not work
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Till Kamppeter <till.kamppeter@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mario Limonciello <superm1@ubuntu.com>
-In-Reply-To: <4A95891A.20402@gmail.com>
-References: <4A957819.7040808@gmail.com>
-	 <1251310460.2950.98.camel@localhost.localdomain> <4A95891A.20402@gmail.com>
-Content-Type: text/plain
-Date: Wed, 26 Aug 2009 19:35:37 -0700
-Message-Id: <1251340537.2950.105.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <4A95C949.6080707@am.sony.com>
+Date: Wed, 26 Aug 2009 16:46:17 -0700
+From: Geoff Levand <geoffrey.levand@am.sony.com>
+MIME-Version: 1.0
+To: "Ruslan N. Marchenko" <rufferson@gmail.com>
+CC: linux-bluetooth@vger.kernel.org, Bastien Nocera <hadess@hadess.net>,
+        Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: PATCH for input/fakehid.c to fix PS3 remote unpairing
+References: <a70b8cd30908190910p35910657m28fe09905717d60@mail.gmail.com>	 <1250698578.11521.0.camel@localhost.localdomain>	 <1250971418.2950.24.camel@localhost.localdomain>	 <a70b8cd30908241406s50bd1b35o8cfc64609bcfbf63@mail.gmail.com> <a70b8cd30908251339h1bf0bdefye7ac669fafd57f51@mail.gmail.com>
+In-Reply-To: <a70b8cd30908251339h1bf0bdefye7ac669fafd57f51@mail.gmail.com>
+Content-Type: text/plain; charset="ISO-8859-1"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Till,
+On 08/25/2009 01:39 PM, Ruslan N. Marchenko wrote:
+> Ehm... Have I missed something? Should I post it immediately in commit
+> form? I just want it to be reviewed before actual commit %\
 
-please stop top posting. This is a proper open source mailing list and
-we do proper inline quoting.
+If you just want a review, put 'RFC' into the subject
+line of your mail, maybe something like this:
+'[RFC] Fix PS3 remote unpairing'.
 
-> Thank you for the quick answer.
-> 
-> Patch in GIT format attached.
-
-So you have time to write a lengthy email with an explanation what is
-going on, but the commit message is empty. Please fix the commit message
-since that is where it should be. Especially since you wrote it already
-anyway.
-
-Regards
-
-Marcel
-
-
+-Geoff
