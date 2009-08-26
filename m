@@ -1,42 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: can we increase the send buffer size of rfcomm socket?
+Subject: Re: shared hci transport
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Lan Zhu <zhu.lan.cn@gmail.com>
+To: Pavan Savoy <pavan_savoy@yahoo.co.in>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <113d36d80908260307g59eead24v9311d612c8541ad0@mail.gmail.com>
-References: <113d36d80908260307g59eead24v9311d612c8541ad0@mail.gmail.com>
+In-Reply-To: <639511.66794.qm@web94914.mail.in2.yahoo.com>
+References: <639511.66794.qm@web94914.mail.in2.yahoo.com>
 Content-Type: text/plain
-Date: Wed, 26 Aug 2009 11:04:07 -0700
-Message-Id: <1251309847.2950.96.camel@localhost.localdomain>
+Date: Wed, 26 Aug 2009 11:03:04 -0700
+Message-Id: <1251309784.2950.95.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Zhu,
+Hi Pavan,
 
-> We tried to write a 64k data to rfcomm socket, but it will break
-> before sending all of the data out. The problem is in function
-> rfcomm_sock_sendmsg() in net/bluetooth/rfcomm/sock.c, it breaks after
-> calling sock_alloc_send_skb().
+> A lot of recent BT chips intefaced by UART also tend to have another radio [mostly FM] on the same chip sharing the transport interface i.e the UART. [bcm4325 for example has bt, fm and wlan].
 > 
-> static int rfcomm_sock_sendmsg(...)
-> {
->    ...
-> 		skb = sock_alloc_send_skb(sk, size + RFCOMM_SKB_RESERVE,
-> 				msg->msg_flags & MSG_DONTWAIT, &err);
-> 		if (!skb)
-> 			break;
->    ...
-> }
+> I just wanted to know, from the user-space the hci0 socket interface allows me to concurrently use the uart from several applications, but
+> is there a way in kernel to do the same ?
 > 
-> Looks the send buffer is not adequate. Then I increased the send
-> buffer size in function rfcomm_sock_alloc(),  build kernel and try
-> again, this time the sendmsg can complete sending all the data.
-> 
-> Can we use the setsockopt() method to change the socket's send/receive
-> buffer size, just like the usual  tcp/ip socket?
+> [say hci_h4 is also used by the fm core to understand some vendor specific commands ?]
+> or in an usb case - the fm has int endpoint for control data of fm [+ hci-event/cmd packets] and bulk for rds[+ acl] [assuming the audio data path - is isolated from all these ...]
 
-yes we can. Send a patch for it and I am going to review it.
+this all depends on the actual transports. I would need the
+specifications to tell you more on the right way to deal with it.
 
 Regards
 
