@@ -1,32 +1,157 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: shared hci transport
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Pavan Savoy <pavan_savoy@yahoo.co.in>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <639511.66794.qm@web94914.mail.in2.yahoo.com>
-References: <639511.66794.qm@web94914.mail.in2.yahoo.com>
-Content-Type: text/plain
-Date: Wed, 26 Aug 2009 11:03:04 -0700
-Message-Id: <1251309784.2950.95.camel@localhost.localdomain>
-Mime-Version: 1.0
+Message-ID: <4A957819.7040808@gmail.com>
+Date: Wed, 26 Aug 2009 19:59:53 +0200
+From: Till Kamppeter <till.kamppeter@gmail.com>
+MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org
+CC: Mario Limonciello <superm1@ubuntu.com>
+Subject: PATCHES: Device discovery of the "bluetooth" CUPS backend does not
+ work
+Content-Type: multipart/mixed;
+ boundary="------------000902090205010505020808"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Pavan,
+This is a multi-part message in MIME format.
+--------------000902090205010505020808
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-> A lot of recent BT chips intefaced by UART also tend to have another radio [mostly FM] on the same chip sharing the transport interface i.e the UART. [bcm4325 for example has bt, fm and wlan].
-> 
-> I just wanted to know, from the user-space the hci0 socket interface allows me to concurrently use the uart from several applications, but
-> is there a way in kernel to do the same ?
-> 
-> [say hci_h4 is also used by the fm core to understand some vendor specific commands ?]
-> or in an usb case - the fm has int endpoint for control data of fm [+ hci-event/cmd packets] and bulk for rds[+ acl] [assuming the audio data path - is isolated from all these ...]
+Hi,
 
-this all depends on the actual transports. I would need the
-specifications to tell you more on the right way to deal with it.
+I am using Bluez 4.48 in Ubuntu Karmic. First thank you for applying my 
+patches. The bluetooth backend works perfectly now with CUPS 1.3.x and 
+older. On the new CUPS 1.4.x a new problem appeared: The new CUPS does 
+device discovery only for a given time frame requested by the client 
+(printer setup tool, "lpinfo" command). CUPS's default for 
+CUPS-1.3.x-ish requests without timeout specification seems to be 10 
+seconds. CUPS startys all backends at once in the beginning (in 
+parallel) and kills every backend which remains running at the end of 
+the timeout. It accepts output from the backends whenever it occurs not 
+only when the backend finishes, so a backend can search for printers 
+infinitely long if it outputs every found device immediately. Then all 
+printers found during CUPS' timeout are taken into account.
 
-Regards
+The bluetooth backend o 4.48 asks the Bluetooth daemon for printers and 
+collects results for 10 seconds and after that it output them. This 
+takes a total of 10.5 sec and so CUPS kills the backend right before it 
+answers (at least with the 10-second default timeout), resulting in 
+Bluetooth printers never being discovered by CUPS.
 
-Marcel
+I have fixed this now with the attached patch, by making each new 
+printer added to the list being output immediately. Note that the list 
+structure cannot be removed from cups/main.c as otherwise we would get 
+duplicate listings.
+
+Can you please apply this patch to Bluez so that Bluez gets ready for 
+the new CUPS 1.4.x generation? Thanks.
+
+    Till
+
+http://www.openprinting.org/
 
 
+
+--------------000902090205010505020808
+Content-Type: text/x-patch;
+ name="10_bluetooth-cups-backend-report-printers-immediately.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename*0="10_bluetooth-cups-backend-report-printers-immediately.patch"
+
+diff -Nur -x '*.orig' -x '*~' bluez-4.48/cups/main.c bluez-4.48.new/cups/main.c
+--- bluez-4.48/cups/main.c	2009-08-16 20:43:34.000000000 +0200
++++ bluez-4.48.new/cups/main.c	2009-08-26 19:05:31.000000000 +0200
+@@ -185,6 +185,27 @@
+ 	return id;
+ }
+ 
++static void print_printer_details(const char *name, const char *bdaddr, const char *id)
++{
++	char *uri, *escaped;
++
++	escaped = g_strdelimit(g_strdup(name), "\"", '\'');
++	uri = g_strdup_printf("bluetooth://%c%c%c%c%c%c%c%c%c%c%c%c",
++		 bdaddr[0], bdaddr[1],
++		 bdaddr[3], bdaddr[4],
++		 bdaddr[6], bdaddr[7],
++		 bdaddr[9], bdaddr[10],
++		 bdaddr[12], bdaddr[13],
++		 bdaddr[15], bdaddr[16]);
++	printf("direct %s \"%s\" \"%s (Bluetooth)\"", uri, escaped, escaped);
++	if (id != NULL)
++		printf(" \"%s\"\n", id);
++	else
++		printf("\n");
++	g_free(escaped);
++	g_free(uri);
++}
++
+ static void add_device_to_list(const char *name, const char *bdaddr, const char *id)
+ {
+ 	struct cups_device *device;
+@@ -212,27 +233,7 @@
+ 	device->id = g_strdup(id);
+ 
+ 	device_list = g_slist_prepend(device_list, device);
+-}
+-
+-static void print_printer_details(const char *name, const char *bdaddr, const char *id)
+-{
+-	char *uri, *escaped;
+-
+-	escaped = g_strdelimit(g_strdup(name), "\"", '\'');
+-	uri = g_strdup_printf("bluetooth://%c%c%c%c%c%c%c%c%c%c%c%c",
+-		 bdaddr[0], bdaddr[1],
+-		 bdaddr[3], bdaddr[4],
+-		 bdaddr[6], bdaddr[7],
+-		 bdaddr[9], bdaddr[10],
+-		 bdaddr[12], bdaddr[13],
+-		 bdaddr[15], bdaddr[16]);
+-	printf("direct %s \"%s\" \"%s (Bluetooth)\"", uri, escaped, escaped);
+-	if (id != NULL)
+-		printf(" \"%s\"\n", id);
+-	else
+-		printf("\n");
+-	g_free(escaped);
+-	g_free(uri);
++	print_printer_details(device->name, device->bdaddr, device->id);
+ }
+ 
+ static gboolean parse_device_properties(DBusMessageIter *reply_iter, char **name, char **bdaddr)
+@@ -384,23 +385,6 @@
+ 
+ static void discovery_completed(void)
+ {
+-	GSList *l;
+-
+-	for (l = device_list; l != NULL; l = l->next) {
+-		struct cups_device *device = (struct cups_device *) l->data;
+-
+-		if (device->name == NULL)
+-			device->name = g_strdelimit(g_strdup(device->bdaddr), ":", '-');
+-		/* Give another try to getting an ID for the device */
+-		if (device->id == NULL)
+-			remote_device_found(NULL, device->bdaddr, device->name);
+-		print_printer_details(device->name, device->bdaddr, device->id);
+-		g_free(device->name);
+-		g_free(device->bdaddr);
+-		g_free(device->id);
+-		g_free(device);
+-	}
+-
+ 	g_slist_free(device_list);
+ 	device_list = NULL;
+ 
+@@ -638,6 +622,9 @@
+ 	/* Make sure status messages are not buffered */
+ 	setbuf(stderr, NULL);
+ 
++	/* Make sure output is not buffered */
++	setbuf(stdout, NULL);
++
+ 	/* Ignore SIGPIPE signals */
+ #ifdef HAVE_SIGSET
+ 	sigset(SIGPIPE, SIG_IGN);
+
+--------------000902090205010505020808--
