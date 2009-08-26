@@ -1,47 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: sniff mode
+Subject: Re: can we increase the send buffer size of rfcomm socket?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Ville Tervo <ville.tervo@nokia.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <4A94E282.6010302@nokia.com>
-References: <2d5a2c100908241126k6cf31de0s282c0f360b6948ec@mail.gmail.com>
-	 <1251139257.2950.60.camel@localhost.localdomain>
-	 <2d5a2c100908241226y978afd2n44d69b7d27677c13@mail.gmail.com>
-	 <1251142428.2950.61.camel@localhost.localdomain>
-	 <4A94E282.6010302@nokia.com>
+To: Lan Zhu <zhu.lan.cn@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <113d36d80908260307g59eead24v9311d612c8541ad0@mail.gmail.com>
+References: <113d36d80908260307g59eead24v9311d612c8541ad0@mail.gmail.com>
 Content-Type: text/plain
-Date: Wed, 26 Aug 2009 11:04:51 -0700
-Message-Id: <1251309891.2950.97.camel@localhost.localdomain>
+Date: Wed, 26 Aug 2009 11:04:07 -0700
+Message-Id: <1251309847.2950.96.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ville,
+Hi Zhu,
 
-> >>>> It is just me or hci_conn_enter_active_mode will never do what its
-> >>>> name suggests. This check will always succeed:
-> >>>>
-> >>>>       if (conn->mode != HCI_CM_SNIFF || !conn->power_save)
-> >>>>               goto timer;
-> >>> so conn->power_save is used to disable automatic sniff mode for incoming
-> >>> connections. Mainly HID since they manager it by themselves.
-> >> Hmm, but this seems to be done for any device regardless of its type.
-> >> So for example we start sending/receiving data to a headset it will
-> >> triggers hci_conn_enter_active_mode which I thought would exit sniff
-> >> mode, right? (yep, I have seem some headset that doesn't leave sniff
-> >> mode by their own).
-> > 
-> > I said this before. We need a socket option for L2CAP and RFCOMM that
-> > can trigger leaving sniff mode even if the remote device initiated the
-> > connection.
-> > 
+> We tried to write a 64k data to rfcomm socket, but it will break
+> before sending all of the data out. The problem is in function
+> rfcomm_sock_sendmsg() in net/bluetooth/rfcomm/sock.c, it breaks after
+> calling sock_alloc_send_skb().
 > 
-> I guess I need to take this on my TODO list. Or is some one already 
-> working on this?
+> static int rfcomm_sock_sendmsg(...)
+> {
+>    ...
+> 		skb = sock_alloc_send_skb(sk, size + RFCOMM_SKB_RESERVE,
+> 				msg->msg_flags & MSG_DONTWAIT, &err);
+> 		if (!skb)
+> 			break;
+>    ...
+> }
+> 
+> Looks the send buffer is not adequate. Then I increased the send
+> buffer size in function rfcomm_sock_alloc(),  build kernel and try
+> again, this time the sendmsg can complete sending all the data.
+> 
+> Can we use the setsockopt() method to change the socket's send/receive
+> buffer size, just like the usual  tcp/ip socket?
 
-go ahead. I am not working on it and I don't know of anybody else who
-has plans for it.
+yes we can. Send a patch for it and I am going to review it.
 
 Regards
 
