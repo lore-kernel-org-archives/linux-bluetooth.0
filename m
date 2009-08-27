@@ -1,85 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <8e7043060908271916w76adc10fh8fdc088802d3a1f9@mail.gmail.com>
-References: <8e7043060908262058x5fb20f24wf995a82a575abe1d@mail.gmail.com>
-	 <1251401131.2950.118.camel@localhost.localdomain>
-	 <8e7043060908271916w76adc10fh8fdc088802d3a1f9@mail.gmail.com>
-Date: Fri, 28 Aug 2009 10:31:26 +0800
-Message-ID: <8e7043060908271931n6fe29a62o840df9b8f3badf74@mail.gmail.com>
-Subject: Re: build system defect
-From: Ted Feng <artisdom@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: can we increase the send buffer size of rfcomm socket?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Lan Zhu <zhu.lan.cn@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <113d36d80908270833q4eb7b4eg8d512fdd34e6ca83@mail.gmail.com>
+References: <113d36d80908260307g59eead24v9311d612c8541ad0@mail.gmail.com>
+	 <1251309847.2950.96.camel@localhost.localdomain>
+	 <113d36d80908270833q4eb7b4eg8d512fdd34e6ca83@mail.gmail.com>
+Content-Type: text/plain
+Date: Thu, 27 Aug 2009 12:30:14 -0700
+Message-Id: <1251401414.2950.122.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Sorry for the delay.
+Hi Zhu,
 
->2009/8/27 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
-> is it a clean checkout?
+> >> We tried to write a 64k data to rfcomm socket, but it will break
+> >> before sending all of the data out. The problem is in function
+> >> rfcomm_sock_sendmsg() in net/bluetooth/rfcomm/sock.c, it breaks after
+> >> calling sock_alloc_send_skb().
+> >>
+> >> static int rfcomm_sock_sendmsg(...)
+> >> {
+> >>    ...
+> >>               skb = sock_alloc_send_skb(sk, size + RFCOMM_SKB_RESERVE,
+> >>                               msg->msg_flags & MSG_DONTWAIT, &err);
+> >>               if (!skb)
+> >>                       break;
+> >>    ...
+> >> }
+> >>
+> >> Looks the send buffer is not adequate. Then I increased the send
+> >> buffer size in function rfcomm_sock_alloc(),  build kernel and try
+> >> again, this time the sendmsg can complete sending all the data.
+> >>
+> >> Can we use the setsockopt() method to change the socket's send/receive
+> >> buffer size, just like the usual  tcp/ip socket?
+> >
+> > yes we can. Send a patch for it and I am going to review it.
+> >
+> > Regards
+> >
+> > Marcel
+> >
+> >
+> >
+> 
+> Today I changed the send buffer size but found kernel become very
+> unstable. It usually crash during sending rfcomm data. Do you know
+> what's the reason?
+> 
+> Below is what I changed in net/bluetooth/rfcomm/sock.c.
+> 
+> in function rfcomm_sock_alloc(),
+> 
+> change sk->sndbuf
+> from
+> sk->sk_sndbuf = RFCOMM_MAX_CREDITS * RFCOMM_DEFAULT_MTU * 10
+> to
+> sk->sk_sndbuf = RFCOMM_MAX_CREDITS * RFCOMM_DEFAULT_MTU * 20
 
-I use the tarball release bluez-4.50.tar.gz, If that counts.
+which kernel is this? There have been some fixes in the network stack
+for this. Also I need oopses to see what might happen here.
 
-> Perhaps build is broken when compiling outside the source tree,
+Regards
 
-Pretty much, I think.
+Marcel
 
 
->2009/8/28 Marcel Holtmann <marcel@holtmann.org>:
-> I have not seen this problem, but I there might be still problems here.
-
-Just build outside the source tree. The error will show up.
-
-> Can you give us details on your distro etc. I would have to fix this.
-
-$ lsb_release -a
-No LSB modules are available.
-Distributor ID: Ubuntu
-Description:    Ubuntu 9.04
-Release:        9.04
-Codename:       jaunty
-
-$ uname -r
-2.6.28-14-generic
-
-To reproduce the error, here is the step:
-
-$ wget http://www.kernel.org/pub/linux/bluetooth/bluez-4.50.tar.gz
-$ tar xvf bluez-4.50.tar.gz
-$ mkdir bluez-build
-$ cd bluez-build
-$ ../bluez-4.50/configure --prefix=/usr --sysconfdir=/etc
---localstatedir=/var --enable-debug -enable-test --enable-gstreamer
---enable-alsa --enable-usb --enable-netlink --enable-tools
---enable-bccmd --enable-pcmcia --enable-hid2hci --enable-dfutool
---enable-hidd --enable-pand --enable-dund --enable-cups
---enable-udevrules --enable-configfiles
-...
-checking for SNDFILE... yes
-configure: creating ./config.status
-config.status: creating Makefile
-config.status: creating scripts/bluetooth.rules
-config.status: creating doc/version.xml
-config.status: creating src/bluetoothd.8
-config.status: creating bluez.pc
-config.status: creating config.h
-config.status: executing depfiles commands
-config.status: executing libtool commands
-$ make
-make --no-print-directory all-am
- CC     audio/audio_libasound_module_pcm_bluetooth_la-pcm_bluetooth.lo
- CC     audio/audio_libasound_module_pcm_bluetooth_la-ipc.lo
- CC     sbc/sbc_libsbc_la-sbc.lo
- CC     sbc/sbc_libsbc_la-sbc_primitives.lo
- CC     sbc/sbc_libsbc_la-sbc_primitives_mmx.lo
- CC     sbc/sbc_libsbc_la-sbc_primitives_neon.lo
-...
- CCLD   tools/bccmd
- CC     tools/hid2hci.o
- CCLD   tools/hid2hci
- CC     test/hciemu.o
- CCLD   test/hciemu
- GEN    scripts/97-bluetooth.rules
- GEN    scripts/97-bluetooth-hid2hci.rules
-cp: cannot stat `scripts/bluetooth-hid2hci.rules': No such file or directory
-make[1]: *** [scripts/97-bluetooth-hid2hci.rules] Error 1
