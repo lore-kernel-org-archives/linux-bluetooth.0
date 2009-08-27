@@ -1,68 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: can we increase the send buffer size of rfcomm socket?
+Subject: Re: shared hci transport
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Lan Zhu <zhu.lan.cn@gmail.com>
+To: Pavan Savoy <pavan_savoy@yahoo.co.in>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <113d36d80908270833q4eb7b4eg8d512fdd34e6ca83@mail.gmail.com>
-References: <113d36d80908260307g59eead24v9311d612c8541ad0@mail.gmail.com>
-	 <1251309847.2950.96.camel@localhost.localdomain>
-	 <113d36d80908270833q4eb7b4eg8d512fdd34e6ca83@mail.gmail.com>
+In-Reply-To: <302064.78581.qm@web94908.mail.in2.yahoo.com>
+References: <639511.66794.qm@web94914.mail.in2.yahoo.com>
+	 <1251309784.2950.95.camel@localhost.localdomain>
+	 <302064.78581.qm@web94908.mail.in2.yahoo.com>
 Content-Type: text/plain
-Date: Thu, 27 Aug 2009 12:30:14 -0700
-Message-Id: <1251401414.2950.122.camel@localhost.localdomain>
+Date: Thu, 27 Aug 2009 12:29:08 -0700
+Message-Id: <1251401348.2950.121.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Zhu,
+Hi Pavan,
 
-> >> We tried to write a 64k data to rfcomm socket, but it will break
-> >> before sending all of the data out. The problem is in function
-> >> rfcomm_sock_sendmsg() in net/bluetooth/rfcomm/sock.c, it breaks after
-> >> calling sock_alloc_send_skb().
-> >>
-> >> static int rfcomm_sock_sendmsg(...)
-> >> {
-> >>    ...
-> >>               skb = sock_alloc_send_skb(sk, size + RFCOMM_SKB_RESERVE,
-> >>                               msg->msg_flags & MSG_DONTWAIT, &err);
-> >>               if (!skb)
-> >>                       break;
-> >>    ...
-> >> }
-> >>
-> >> Looks the send buffer is not adequate. Then I increased the send
-> >> buffer size in function rfcomm_sock_alloc(),  build kernel and try
-> >> again, this time the sendmsg can complete sending all the data.
-> >>
-> >> Can we use the setsockopt() method to change the socket's send/receive
-> >> buffer size, just like the usual  tcp/ip socket?
-> >
-> > yes we can. Send a patch for it and I am going to review it.
-> >
-> > Regards
-> >
-> > Marcel
-> >
-> >
-> >
-> 
-> Today I changed the send buffer size but found kernel become very
-> unstable. It usually crash during sending rfcomm data. Do you know
-> what's the reason?
-> 
-> Below is what I changed in net/bluetooth/rfcomm/sock.c.
-> 
-> in function rfcomm_sock_alloc(),
-> 
-> change sk->sndbuf
-> from
-> sk->sk_sndbuf = RFCOMM_MAX_CREDITS * RFCOMM_DEFAULT_MTU * 10
-> to
-> sk->sk_sndbuf = RFCOMM_MAX_CREDITS * RFCOMM_DEFAULT_MTU * 20
+please don't do top-posting on this mailing list. We want proper inline
+quoting.
 
-which kernel is this? There have been some fixes in the network stack
-for this. Also I need oopses to see what might happen here.
+> sure.
+> the bcm4325 has uart transport for BT [so I can make use of hci_h4, say by hciattach - like bcm2035].
+> The FM core understands hci-vendor specific command.
+> 
+> for example, I send HCI_VS opcode=0x20 to set the power of Rx to On.[The power on sequence also involves download of a firmware which is nothing but a file with ~10/20 hci-vendor specific commands with different opcodes].
+> opcode 0x0a (say) to set the frequency and similarly in opcode 0x1d [audio enable] I give an data arguement 0x01 or 0x02 to say to FM Rx to put out audio on either it's analog lines or digital [i2s] lines..
+> 
+> Currently my fm stack, application is making use of hci_open_dev, send_cmd kind of hci lib calls to send commands.
+> 
+> Now what should be my approach to send in same sort of commands from the kernel space ?
+
+For the firmware loading part, we have to change this whole driver model
+and add an init stage that allows configuration etc.
+
+I am not sold on the whole in-kernel approach for FM yet. We need to
+talk more about it. Especially since vendor commands and messing with
+the flow control is tricky.
 
 Regards
 
