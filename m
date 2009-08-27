@@ -1,127 +1,159 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4A9652D4.10807@gmail.com>
+Date: Thu, 27 Aug 2009 11:33:08 +0200
+From: Till Kamppeter <till.kamppeter@gmail.com>
 MIME-Version: 1.0
-Date: Thu, 27 Aug 2009 18:24:06 +0300
-Message-ID: <eb7933e20908270824w2dc3ae2x8257d20d307ce6fd@mail.gmail.com>
-Subject: [PATCH] AVDTP start/stop handling during disconnection
-From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+CC: Marcel Holtmann <marcel@holtmann.org>,
+	Mario Limonciello <superm1@ubuntu.com>
+Subject: [PATCH] Make discovery mode of bluetooth CUPS backend work with CUPS
+ 1.4.0
+References: <4A957819.7040808@gmail.com>	 <1251310460.2950.98.camel@localhost.localdomain> <4A95891A.20402@gmail.com> <1251340537.2950.105.camel@localhost.localdomain>
+In-Reply-To: <1251340537.2950.105.camel@localhost.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-A suggested patch for rejecting AVDTP CLOSE and START requests when a
-CLOSE request has been initiated. The check is done by testing the
-close_int flag in the avdtp_stream struct. The flag is reset when
-receiving a timeout or rejection from the remote.
+The new CUPS 1.4.x does device discovery only for a given time frame
+requested by the client (printer setup tool, "lpinfo" command). CUPS's
+default for CUPS-1.3.x-ish requests without timeout specification
+seems to be 10 seconds. CUPS starts all backends at once in the
+beginning (in parallel) and kills every backend which remains running
+at the end of the timeout. It accepts output from the backends
+whenever it occurs not only when the backend finishes, so a backend
+can search for printers infinitely long if it outputs every found
+device immediately. Then all printers found during CUPS' timeout are
+taken into account.
 
-Changes in unix.c were made to call avdtp_unref() in case an AVDTP
-session was marked by avdtp_ref(), but no SEP was found. This could
-happen if START is called on a session being disconnected.
+The bluetooth backend of 4.48 asks the Bluetooth daemon for printers
+and collects results for 10 seconds and after that it outputs
+them. This takes a total of 10.5 sec and so CUPS kills the backend
+right before it answers (at least with the 10-second default timeout),
+resulting in Bluetooth printers never being discovered by CUPS.
 
-We found that these changes help to improve behavior both in case the
-audio streaming application tries to start the stream during a
-disconnection procedure, and if avdtp_close() is called twice.
+This change fixes it by making each new printer added to the list
+being output immediately. Note that the list structure cannot be
+removed from cups/main.c as otherwise we would get duplicate
+listings. Also important is the addition of unbuffered output on
+stdout.
+---
+  ChangeLog   |    2 +
+  cups/main.c |   63 
++++++++++++++++++++++++-----------------------------------
+  2 files changed, 27 insertions(+), 38 deletions(-)
 
-Br,
-Daniel Örstadius
+diff --git a/ChangeLog b/ChangeLog
+index d06f494..6c170f6 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,5 @@
++ver 4.51:
++	Make discovery mode of bluetooth CUPS backend work with CUPS 1.4.0.
+  ver 4.50:
+  	Fix issue with missing manual pages in distribution.
+  	Fix issue with the configuration and state directories.
+diff --git a/cups/main.c b/cups/main.c
+index da757b0..1bbc78c 100644
+--- a/cups/main.c
++++ b/cups/main.c
+@@ -185,6 +185,27 @@ static char *device_get_ieee1284_id(const char 
+*adapter, const char *device)
+  	return id;
+  }
 
-------------------------
-
- audio/avdtp.c |   19 +++++++++++++++++--
- audio/unix.c  |   11 ++++++++++-
- 2 files changed, 27 insertions(+), 3 deletions(-)
-
-diff --git a/audio/avdtp.c b/audio/avdtp.c
-index 8046dda..839f035 100644
---- a/audio/avdtp.c
-+++ b/audio/avdtp.c
-@@ -2223,9 +2223,12 @@ static gboolean request_timeout(gpointer user_data)
- 		break;
- 	case AVDTP_CLOSE:
- 		error("Close request timed out");
--		if (lsep && lsep->cfm && lsep->cfm->close)
-+		if (lsep && lsep->cfm && lsep->cfm->close) {
- 			lsep->cfm->close(session, lsep, stream, &err,
- 						lsep->user_data);
-+			if (stream)
-+				stream->close_int = FALSE;
-+		}
- 		break;
- 	case AVDTP_SET_CONFIGURATION:
- 		error("SetConfiguration request timed out");
-@@ -2675,9 +2678,11 @@ static gboolean avdtp_parse_rej(struct avdtp *session,
- 			return FALSE;
- 		error("CLOSE request rejected: %s (%d)",
- 				avdtp_strerror(&err), err.err.error_code);
--		if (sep && sep->cfm && sep->cfm->close)
-+		if (sep && sep->cfm && sep->cfm->close) {
- 			sep->cfm->close(session, sep, stream, &err,
- 					sep->user_data);
-+			stream->close_int = FALSE;
-+		}
- 		return TRUE;
- 	case AVDTP_ABORT:
- 		if (!stream_rej_to_err(buf, size, &err, &acp_seid))
-@@ -3138,6 +3143,11 @@ int avdtp_start(struct avdtp *session, struct
-avdtp_stream *stream)
- 	if (stream->lsep->state != AVDTP_STATE_OPEN)
- 		return -EINVAL;
-
-+	if (stream->close_int == TRUE) {
-+		error("avdtp_start: rejecting start since close is initiated");
-+		return -EINVAL;
-+	}
++static void print_printer_details(const char *name, const char *bdaddr, 
+const char *id)
++{
++	char *uri, *escaped;
 +
- 	memset(&req, 0, sizeof(req));
- 	req.first_seid.seid = stream->rseid;
-
-@@ -3156,6 +3166,11 @@ int avdtp_close(struct avdtp *session, struct
-avdtp_stream *stream)
- 	if (stream->lsep->state < AVDTP_STATE_OPEN)
- 		return -EINVAL;
-
-+	if (stream->close_int == TRUE) {
-+		error("avdtp_close: rejecting close since it is already inititated");
-+		return -EINVAL;
-+	}
++	escaped = g_strdelimit(g_strdup(name), "\"", '\'');
++	uri = g_strdup_printf("bluetooth://%c%c%c%c%c%c%c%c%c%c%c%c",
++		 bdaddr[0], bdaddr[1],
++		 bdaddr[3], bdaddr[4],
++		 bdaddr[6], bdaddr[7],
++		 bdaddr[9], bdaddr[10],
++		 bdaddr[12], bdaddr[13],
++		 bdaddr[15], bdaddr[16]);
++	printf("direct %s \"%s\" \"%s (Bluetooth)\"", uri, escaped, escaped);
++	if (id != NULL)
++		printf(" \"%s\"\n", id);
++	else
++		printf("\n");
++	g_free(escaped);
++	g_free(uri);
++}
 +
- 	memset(&req, 0, sizeof(req));
- 	req.acp_seid = stream->rseid;
+  static void add_device_to_list(const char *name, const char *bdaddr, 
+const char *id)
+  {
+  	struct cups_device *device;
+@@ -212,27 +233,7 @@ static void add_device_to_list(const char *name, 
+const char *bdaddr, const char
+  	device->id = g_strdup(id);
 
-diff --git a/audio/unix.c b/audio/unix.c
-index 0829630..61cc369 100644
---- a/audio/unix.c
-+++ b/audio/unix.c
-@@ -1051,14 +1051,17 @@ static void start_resume(struct audio_device
-*dev, struct unix_client *client)
- 	struct a2dp_data *a2dp;
- 	struct headset_data *hs;
- 	unsigned int id;
-+	gboolean ref_session = FALSE;
+  	device_list = g_slist_prepend(device_list, device);
+-}
+-
+-static void print_printer_details(const char *name, const char *bdaddr, 
+const char *id)
+-{
+-	char *uri, *escaped;
+-
+-	escaped = g_strdelimit(g_strdup(name), "\"", '\'');
+-	uri = g_strdup_printf("bluetooth://%c%c%c%c%c%c%c%c%c%c%c%c",
+-		 bdaddr[0], bdaddr[1],
+-		 bdaddr[3], bdaddr[4],
+-		 bdaddr[6], bdaddr[7],
+-		 bdaddr[9], bdaddr[10],
+-		 bdaddr[12], bdaddr[13],
+-		 bdaddr[15], bdaddr[16]);
+-	printf("direct %s \"%s\" \"%s (Bluetooth)\"", uri, escaped, escaped);
+-	if (id != NULL)
+-		printf(" \"%s\"\n", id);
+-	else
+-		printf("\n");
+-	g_free(escaped);
+-	g_free(uri);
++	print_printer_details(device->name, device->bdaddr, device->id);
+  }
 
- 	switch (client->type) {
- 	case TYPE_SINK:
- 	case TYPE_SOURCE:
- 		a2dp = &client->d.a2dp;
+  static gboolean parse_device_properties(DBusMessageIter *reply_iter, 
+char **name, char **bdaddr)
+@@ -384,23 +385,6 @@ static void remote_device_found(const char 
+*adapter, const char *bdaddr, const c
 
--		if (!a2dp->session)
-+		if (!a2dp->session) {
- 			a2dp->session = avdtp_get(&dev->src, &dev->dst);
-+			ref_session = TRUE;
-+		}			
+  static void discovery_completed(void)
+  {
+-	GSList *l;
+-
+-	for (l = device_list; l != NULL; l = l->next) {
+-		struct cups_device *device = (struct cups_device *) l->data;
+-
+-		if (device->name == NULL)
+-			device->name = g_strdelimit(g_strdup(device->bdaddr), ":", '-');
+-		/* Give another try to getting an ID for the device */
+-		if (device->id == NULL)
+-			remote_device_found(NULL, device->bdaddr, device->name);
+-		print_printer_details(device->name, device->bdaddr, device->id);
+-		g_free(device->name);
+-		g_free(device->bdaddr);
+-		g_free(device->id);
+-		g_free(device);
+-	}
+-
+  	g_slist_free(device_list);
+  	device_list = NULL;
 
- 		if (!a2dp->session) {
- 			error("Unable to get a session");
-@@ -1067,6 +1070,12 @@ static void start_resume(struct audio_device
-*dev, struct unix_client *client)
+@@ -638,6 +622,9 @@ int main(int argc, char *argv[])
+  	/* Make sure status messages are not buffered */
+  	setbuf(stderr, NULL);
 
- 		if (!a2dp->sep) {
- 			error("seid not opened");
++	/* Make sure output is not buffered */
++	setbuf(stdout, NULL);
 +
-+			if (ref_session) {
-+				avdtp_unref(a2dp->session);
-+				a2dp->session = NULL;
-+			}
-+
- 			goto failed;
- 		}
+  	/* Ignore SIGPIPE signals */
+  #ifdef HAVE_SIGSET
+  	sigset(SIGPIPE, SIG_IGN);
+-- 
+1.6.3.3
+
