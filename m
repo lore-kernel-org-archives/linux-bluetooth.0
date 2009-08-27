@@ -1,68 +1,127 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1251309847.2950.96.camel@localhost.localdomain>
-References: <113d36d80908260307g59eead24v9311d612c8541ad0@mail.gmail.com>
-	 <1251309847.2950.96.camel@localhost.localdomain>
-Date: Thu, 27 Aug 2009 23:33:47 +0800
-Message-ID: <113d36d80908270833q4eb7b4eg8d512fdd34e6ca83@mail.gmail.com>
-Subject: Re: can we increase the send buffer size of rfcomm socket?
-From: Lan Zhu <zhu.lan.cn@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 27 Aug 2009 18:24:06 +0300
+Message-ID: <eb7933e20908270824w2dc3ae2x8257d20d307ce6fd@mail.gmail.com>
+Subject: [PATCH] AVDTP start/stop handling during disconnection
+From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+A suggested patch for rejecting AVDTP CLOSE and START requests when a
+CLOSE request has been initiated. The check is done by testing the
+close_int flag in the avdtp_stream struct. The flag is reset when
+receiving a timeout or rejection from the remote.
 
-2009/8/27 Marcel Holtmann <marcel@holtmann.org>:
-> Hi Zhu,
->
->> We tried to write a 64k data to rfcomm socket, but it will break
->> before sending all of the data out. The problem is in function
->> rfcomm_sock_sendmsg() in net/bluetooth/rfcomm/sock.c, it breaks after
->> calling sock_alloc_send_skb().
->>
->> static int rfcomm_sock_sendmsg(...)
->> {
->> =A0 =A0...
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 skb =3D sock_alloc_send_skb(sk, size + RFCOM=
-M_SKB_RESERVE,
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 msg->msg_fla=
-gs & MSG_DONTWAIT, &err);
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (!skb)
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
->> =A0 =A0...
->> }
->>
->> Looks the send buffer is not adequate. Then I increased the send
->> buffer size in function rfcomm_sock_alloc(), =A0build kernel and try
->> again, this time the sendmsg can complete sending all the data.
->>
->> Can we use the setsockopt() method to change the socket's send/receive
->> buffer size, just like the usual =A0tcp/ip socket?
->
-> yes we can. Send a patch for it and I am going to review it.
->
-> Regards
->
-> Marcel
->
->
->
+Changes in unix.c were made to call avdtp_unref() in case an AVDTP
+session was marked by avdtp_ref(), but no SEP was found. This could
+happen if START is called on a session being disconnected.
 
-Today I changed the send buffer size but found kernel become very
-unstable. It usually crash during sending rfcomm data. Do you know
-what's the reason?
+We found that these changes help to improve behavior both in case the
+audio streaming application tries to start the stream during a
+disconnection procedure, and if avdtp_close() is called twice.
 
-Below is what I changed in net/bluetooth/rfcomm/sock.c.
+Br,
+Daniel Örstadius
 
-in function rfcomm_sock_alloc(),
+------------------------
 
-change sk->sndbuf
-from
-sk->sk_sndbuf =3D RFCOMM_MAX_CREDITS * RFCOMM_DEFAULT_MTU * 10
-to
-sk->sk_sndbuf =3D RFCOMM_MAX_CREDITS * RFCOMM_DEFAULT_MTU * 20
+ audio/avdtp.c |   19 +++++++++++++++++--
+ audio/unix.c  |   11 ++++++++++-
+ 2 files changed, 27 insertions(+), 3 deletions(-)
 
-Thanks,
-Zhu Lan
+diff --git a/audio/avdtp.c b/audio/avdtp.c
+index 8046dda..839f035 100644
+--- a/audio/avdtp.c
++++ b/audio/avdtp.c
+@@ -2223,9 +2223,12 @@ static gboolean request_timeout(gpointer user_data)
+ 		break;
+ 	case AVDTP_CLOSE:
+ 		error("Close request timed out");
+-		if (lsep && lsep->cfm && lsep->cfm->close)
++		if (lsep && lsep->cfm && lsep->cfm->close) {
+ 			lsep->cfm->close(session, lsep, stream, &err,
+ 						lsep->user_data);
++			if (stream)
++				stream->close_int = FALSE;
++		}
+ 		break;
+ 	case AVDTP_SET_CONFIGURATION:
+ 		error("SetConfiguration request timed out");
+@@ -2675,9 +2678,11 @@ static gboolean avdtp_parse_rej(struct avdtp *session,
+ 			return FALSE;
+ 		error("CLOSE request rejected: %s (%d)",
+ 				avdtp_strerror(&err), err.err.error_code);
+-		if (sep && sep->cfm && sep->cfm->close)
++		if (sep && sep->cfm && sep->cfm->close) {
+ 			sep->cfm->close(session, sep, stream, &err,
+ 					sep->user_data);
++			stream->close_int = FALSE;
++		}
+ 		return TRUE;
+ 	case AVDTP_ABORT:
+ 		if (!stream_rej_to_err(buf, size, &err, &acp_seid))
+@@ -3138,6 +3143,11 @@ int avdtp_start(struct avdtp *session, struct
+avdtp_stream *stream)
+ 	if (stream->lsep->state != AVDTP_STATE_OPEN)
+ 		return -EINVAL;
+
++	if (stream->close_int == TRUE) {
++		error("avdtp_start: rejecting start since close is initiated");
++		return -EINVAL;
++	}
++
+ 	memset(&req, 0, sizeof(req));
+ 	req.first_seid.seid = stream->rseid;
+
+@@ -3156,6 +3166,11 @@ int avdtp_close(struct avdtp *session, struct
+avdtp_stream *stream)
+ 	if (stream->lsep->state < AVDTP_STATE_OPEN)
+ 		return -EINVAL;
+
++	if (stream->close_int == TRUE) {
++		error("avdtp_close: rejecting close since it is already inititated");
++		return -EINVAL;
++	}
++
+ 	memset(&req, 0, sizeof(req));
+ 	req.acp_seid = stream->rseid;
+
+diff --git a/audio/unix.c b/audio/unix.c
+index 0829630..61cc369 100644
+--- a/audio/unix.c
++++ b/audio/unix.c
+@@ -1051,14 +1051,17 @@ static void start_resume(struct audio_device
+*dev, struct unix_client *client)
+ 	struct a2dp_data *a2dp;
+ 	struct headset_data *hs;
+ 	unsigned int id;
++	gboolean ref_session = FALSE;
+
+ 	switch (client->type) {
+ 	case TYPE_SINK:
+ 	case TYPE_SOURCE:
+ 		a2dp = &client->d.a2dp;
+
+-		if (!a2dp->session)
++		if (!a2dp->session) {
+ 			a2dp->session = avdtp_get(&dev->src, &dev->dst);
++			ref_session = TRUE;
++		}			
+
+ 		if (!a2dp->session) {
+ 			error("Unable to get a session");
+@@ -1067,6 +1070,12 @@ static void start_resume(struct audio_device
+*dev, struct unix_client *client)
+
+ 		if (!a2dp->sep) {
+ 			error("seid not opened");
++
++			if (ref_session) {
++				avdtp_unref(a2dp->session);
++				a2dp->session = NULL;
++			}
++
+ 			goto failed;
+ 		}
