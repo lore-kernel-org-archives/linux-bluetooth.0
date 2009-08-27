@@ -1,61 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: build system defect
+Subject: Re: [PATCH] Make discovery mode of bluetooth CUPS backend work
+ with CUPS 1.4.0
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Ted Feng <artisdom@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <8e7043060908262058x5fb20f24wf995a82a575abe1d@mail.gmail.com>
-References: <8e7043060908262058x5fb20f24wf995a82a575abe1d@mail.gmail.com>
+To: Till Kamppeter <till.kamppeter@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mario Limonciello <superm1@ubuntu.com>
+In-Reply-To: <4A9652D4.10807@gmail.com>
+References: <4A957819.7040808@gmail.com>
+	 <1251310460.2950.98.camel@localhost.localdomain> <4A95891A.20402@gmail.com>
+	 <1251340537.2950.105.camel@localhost.localdomain>
+	 <4A9652D4.10807@gmail.com>
 Content-Type: text/plain
-Date: Thu, 27 Aug 2009 12:25:31 -0700
-Message-Id: <1251401131.2950.118.camel@localhost.localdomain>
+Date: Thu, 27 Aug 2009 12:21:27 -0700
+Message-Id: <1251400887.2950.114.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ted,
+Hi Till,
 
-> I met a problem while making.
+> The new CUPS 1.4.x does device discovery only for a given time frame
+> requested by the client (printer setup tool, "lpinfo" command). CUPS's
+> default for CUPS-1.3.x-ish requests without timeout specification
+> seems to be 10 seconds. CUPS starts all backends at once in the
+> beginning (in parallel) and kills every backend which remains running
+> at the end of the timeout. It accepts output from the backends
+> whenever it occurs not only when the backend finishes, so a backend
+> can search for printers infinitely long if it outputs every found
+> device immediately. Then all printers found during CUPS' timeout are
+> taken into account.
 > 
-> Since I like to put all stuff generating from build elsewhere,
-> I do all the configure, make action in a different directory.
+> The bluetooth backend of 4.48 asks the Bluetooth daemon for printers
+> and collects results for 10 seconds and after that it outputs
+> them. This takes a total of 10.5 sec and so CUPS kills the backend
+> right before it answers (at least with the 10-second default timeout),
+> resulting in Bluetooth printers never being discovered by CUPS.
 > 
-> $ ls
-> bluez-4.50/  bluez-build/
-> $ cd bluez-build
-> $ ../bluez-4.50/configure --prefix=/usr --sysconfdir=/etc
-> --localstatedir=/var --enable-debug -enable-test --enable-gstreamer
-> --enable-alsa --enable-usb --enable-netlink --enable-tools
-> --enable-bccmd --enable-pcmcia --enable-hid2hci --enable-dfutool
-> --enable-hidd --enable-pand --enable-dund --enable-cups
-> --enable-udevrules --enable-configfiles
-> ...
-> configure: creating ./config.status
-> config.status: creating Makefile
-> config.status: creating scripts/bluetooth.rules
-> config.status: creating doc/version.xml
-> config.status: creating src/bluetoothd.8
-> config.status: creating bluez.pc
-> config.status: creating config.h
-> config.status: executing depfiles commands
-> config.status: executing libtool commands
-> 
-> $ make
-> make --no-print-directory all-am
->   CC     audio/audio_libasound_module_pcm_bluetooth_la-pcm_bluetooth.lo
->   CC     audio/audio_libasound_module_pcm_bluetooth_la-ipc.lo
->  ...
->   CCLD   test/hciemu
->   GEN    scripts/97-bluetooth.rules
->   GEN    scripts/97-bluetooth-hid2hci.rules
-> cp: cannot stat `scripts/bluetooth-hid2hci.rules': No such file or directory
-> make[1]: *** [scripts/97-bluetooth-hid2hci.rules] Error 1
-> make: *** [all] Error 2
-> 
-> The error seems just a small path problem.
-> Should I claim this a bug, or I have to live with it?
+> This change fixes it by making each new printer added to the list
+> being output immediately. Note that the list structure cannot be
+> removed from cups/main.c as otherwise we would get duplicate
+> listings. Also important is the addition of unbuffered output on
+> stdout.
+> ---
+>   ChangeLog   |    2 +
+>   cups/main.c |   63 
+> +++++++++++++++++++++++-----------------------------------
+>   2 files changed, 27 insertions(+), 38 deletions(-)
 
-I have not seen this problem, but I there might be still problems here.
-Can you give us details on your distro etc. I would have to fix this.
+I can't use git am to apply this patch. Someone has to fix this for me.
 
 Regards
 
