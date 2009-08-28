@@ -1,54 +1,138 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <377658.93129.qm@web94901.mail.in2.yahoo.com>
-References: <639511.66794.qm@web94914.mail.in2.yahoo.com>  <1251309784.2950.95.camel@localhost.localdomain>  <302064.78581.qm@web94908.mail.in2.yahoo.com> <1251401348.2950.121.camel@localhost.localdomain>
-Date: Fri, 28 Aug 2009 10:57:59 +0530 (IST)
-From: Pavan Savoy <pavan_savoy@yahoo.co.in>
-Subject: Re: shared hci transport
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1251401348.2950.121.camel@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1251400887.2950.114.camel@localhost.localdomain>
+References: <4A957819.7040808@gmail.com>
+	 <1251310460.2950.98.camel@localhost.localdomain>
+	 <4A95891A.20402@gmail.com>
+	 <1251340537.2950.105.camel@localhost.localdomain>
+	 <4A9652D4.10807@gmail.com>
+	 <1251400887.2950.114.camel@localhost.localdomain>
+Date: Thu, 27 Aug 2009 21:40:13 -0500
+Message-ID: <76715d500908271940m23acd1dag70113fc4057a87c9@mail.gmail.com>
+Subject: Re: [PATCH] Make discovery mode of bluetooth CUPS backend work with
+	CUPS 1.4.0
+From: Mario Limonciello <superm1@ubuntu.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=0016e64098b2861db604722a9aa4
+To: unlisted-recipients:; (no To-header on input)
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
------ Original Message ----=0AFrom: Marcel Holtmann <marcel@holtmann.org>=
-=0ATo: Pavan Savoy <pavan_savoy@yahoo.co.in>=0ACc: linux-bluetooth@vger.ker=
-nel.org=0ASent: Friday, 28 August, 2009 12:59:08 AM=0ASubject: Re: shared h=
-ci transport=0A=0AHi Pavan,=0A=0Aplease don't do top-posting on this mailin=
-g list. We want proper inline=0Aquoting.=0A=0A> sure.=0A> the bcm4325 has u=
-art transport for BT [so I can make use of hci_h4, say by hciattach - like =
-bcm2035].=0A> The FM core understands hci-vendor specific command.=0A> =0A>=
- for example, I send HCI_VS opcode=3D0x20 to set the power of Rx to On.[The=
- power on sequence also involves download of a firmware which is nothing bu=
-t a file with ~10/20 hci-vendor specific commands with different opcodes].=
-=0A> opcode 0x0a (say) to set the frequency and similarly in opcode 0x1d [a=
-udio enable] I give an data arguement 0x01 or 0x02 to say to FM Rx to put o=
-ut audio on either it's analog lines or digital [i2s] lines..=0A> =0A> Curr=
-ently my fm stack, application is making use of hci_open_dev, send_cmd kind=
- of hci lib calls to send commands.=0A> =0A> Now what should be my approach=
- to send in same sort of commands from the kernel space ?=0A=0A>For the fir=
-mware loading part, we have to change this whole driver model=0A>and add an=
- init stage that allows configuration etc.=0A=0A>I am not sold on the whole=
- in-kernel approach for FM yet. We need to=0A>talk more about it. Especiall=
-y since vendor commands and messing with=0A>the flow control is tricky.=0A=
-=0A>Regards=0A=0A>Marcel=0A=0AYes -- Sorry for top posting [unfortunately t=
-his dumb mail editor doesn't give me much of choice]=0AIn any case,=0A=0AI =
-was thinking more in terms of hci_device and hci_driver kind of a model, wh=
-ere in there can be a hci_device for a transport [say HCI-UART] and multipl=
-e hci_driver(s) for 1 such hci_device -- these hci_drivers get registered t=
-o a main/single hci_device.=0A=0Ahci_device {=0Aopen,send_frame, notify, fl=
-ush, close=0A}=0A=0Aand the new hci_driver {=0Apre/post_open,  -- can be us=
-ed for a f/w download=0Apre/post_send, -- can be used to packetize/depacket=
-ize=0Apre/post_notify, -- events can be categorised to HCI [cmd complete] s=
-ort of events or processed locally and not be notified to hci-user space la=
-yer..=0Apre/post_flush and =0Apre/post_close=0A}=0A=0AIt would be same as u=
-sing line discipline driver over uart. Every HCI transfer send or recieve c=
-an have a pre/post function of an already registered "hci_driver" which nee=
-ds to called.=0A=0AWe would kind of make use for plenty of other purpose al=
-so, since the transports are being shared for all sort of devices nowadays =
-[gps+bt on uart/usb, fm+bt on uart].=0A=0A=0A=0A--=0ATo unsubscribe from th=
-is list: send the line "unsubscribe linux-bluetooth" in=0Athe body of a mes=
-sage to majordomo@vger.kernel.org=0AMore majordomo info at  http://vger.ker=
-nel.org/majordomo-info.html=0A=0A=0A=0A      Love Cricket? Check out live s=
-cores, photos, video highlights and more. Click here http://cricket.yahoo.c=
-om
+--0016e64098b2861db604722a9aa4
+Content-Type: text/plain; charset=ISO-8859-1
+
+Hi Marcel:
+
+On Thu, Aug 27, 2009 at 14:21, Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> I can't use git am to apply this patch. Someone has to fix this for me.
+>
+> Regards
+>
+> Marcel
+>
+>
+It looks like Till's email client is just beating it up.  Applies for
+me with "git am" and the attached patch fine, but the inline is
+corrupt.
+
+
+--
+Mario Limonciello
+superm1@gmail.com
+Sent from Austin, TX, United States
+
+--0016e64098b2861db604722a9aa4
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-Make-discovery-mode-of-bluetooth-CUPS-backend-work-w.patch"
+Content-Disposition: attachment;
+	filename="0001-Make-discovery-mode-of-bluetooth-CUPS-backend-work-w.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_fywbg1i50
+
+RnJvbSBmZGY3Yjc1ZjVmYzhhOTcyNmRiNjc1NmJjZGRmZjZhYTc0YjQyYmEwIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBUaWxsIEthbXBwZXRlciA8dGlsbC5rYW1wcGV0ZXJAZ21haWwu
+Y29tPgpEYXRlOiBUaHUsIDI3IEF1ZyAyMDA5IDA5OjA3OjQ5ICswMjAwClN1YmplY3Q6IFtQQVRD
+SF0gTWFrZSBkaXNjb3ZlcnkgbW9kZSBvZiBibHVldG9vdGggQ1VQUyBiYWNrZW5kIHdvcmsgd2l0
+aCBDVVBTIDEuNC4wCgpUaGUgbmV3IENVUFMgMS40LnggZG9lcyBkZXZpY2UgZGlzY292ZXJ5IG9u
+bHkgZm9yIGEgZ2l2ZW4gdGltZSBmcmFtZQpyZXF1ZXN0ZWQgYnkgdGhlIGNsaWVudCAocHJpbnRl
+ciBzZXR1cCB0b29sLCAibHBpbmZvIiBjb21tYW5kKS4gQ1VQUydzCmRlZmF1bHQgZm9yIENVUFMt
+MS4zLngtaXNoIHJlcXVlc3RzIHdpdGhvdXQgdGltZW91dCBzcGVjaWZpY2F0aW9uCnNlZW1zIHRv
+IGJlIDEwIHNlY29uZHMuIENVUFMgc3RhcnRzIGFsbCBiYWNrZW5kcyBhdCBvbmNlIGluIHRoZQpi
+ZWdpbm5pbmcgKGluIHBhcmFsbGVsKSBhbmQga2lsbHMgZXZlcnkgYmFja2VuZCB3aGljaCByZW1h
+aW5zIHJ1bm5pbmcKYXQgdGhlIGVuZCBvZiB0aGUgdGltZW91dC4gSXQgYWNjZXB0cyBvdXRwdXQg
+ZnJvbSB0aGUgYmFja2VuZHMKd2hlbmV2ZXIgaXQgb2NjdXJzIG5vdCBvbmx5IHdoZW4gdGhlIGJh
+Y2tlbmQgZmluaXNoZXMsIHNvIGEgYmFja2VuZApjYW4gc2VhcmNoIGZvciBwcmludGVycyBpbmZp
+bml0ZWx5IGxvbmcgaWYgaXQgb3V0cHV0cyBldmVyeSBmb3VuZApkZXZpY2UgaW1tZWRpYXRlbHku
+IFRoZW4gYWxsIHByaW50ZXJzIGZvdW5kIGR1cmluZyBDVVBTJyB0aW1lb3V0IGFyZQp0YWtlbiBp
+bnRvIGFjY291bnQuCgpUaGUgYmx1ZXRvb3RoIGJhY2tlbmQgb2YgNC40OCBhc2tzIHRoZSBCbHVl
+dG9vdGggZGFlbW9uIGZvciBwcmludGVycwphbmQgY29sbGVjdHMgcmVzdWx0cyBmb3IgMTAgc2Vj
+b25kcyBhbmQgYWZ0ZXIgdGhhdCBpdCBvdXRwdXRzCnRoZW0uIFRoaXMgdGFrZXMgYSB0b3RhbCBv
+ZiAxMC41IHNlYyBhbmQgc28gQ1VQUyBraWxscyB0aGUgYmFja2VuZApyaWdodCBiZWZvcmUgaXQg
+YW5zd2VycyAoYXQgbGVhc3Qgd2l0aCB0aGUgMTAtc2Vjb25kIGRlZmF1bHQgdGltZW91dCksCnJl
+c3VsdGluZyBpbiBCbHVldG9vdGggcHJpbnRlcnMgbmV2ZXIgYmVpbmcgZGlzY292ZXJlZCBieSBD
+VVBTLgoKVGhpcyBjaGFuZ2UgZml4ZXMgaXQgYnkgbWFraW5nIGVhY2ggbmV3IHByaW50ZXIgYWRk
+ZWQgdG8gdGhlIGxpc3QKYmVpbmcgb3V0cHV0IGltbWVkaWF0ZWx5LiBOb3RlIHRoYXQgdGhlIGxp
+c3Qgc3RydWN0dXJlIGNhbm5vdCBiZQpyZW1vdmVkIGZyb20gY3Vwcy9tYWluLmMgYXMgb3RoZXJ3
+aXNlIHdlIHdvdWxkIGdldCBkdXBsaWNhdGUKbGlzdGluZ3MuIEFsc28gaW1wb3J0YW50IGlzIHRo
+ZSBhZGRpdGlvbiBvZiB1bmJ1ZmZlcmVkIG91dHB1dCBvbgpzdGRvdXQuCi0tLQogQ2hhbmdlTG9n
+ICAgfCAgICAyICsKIGN1cHMvbWFpbi5jIHwgICA2MyArKysrKysrKysrKysrKysrKysrKysrKy0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCiAyIGZpbGVzIGNoYW5nZWQsIDI3IGlu
+c2VydGlvbnMoKyksIDM4IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL0NoYW5nZUxvZyBiL0No
+YW5nZUxvZwppbmRleCBkMDZmNDk0Li42YzE3MGY2IDEwMDY0NAotLS0gYS9DaGFuZ2VMb2cKKysr
+IGIvQ2hhbmdlTG9nCkBAIC0xLDMgKzEsNSBAQAordmVyIDQuNTE6CisJTWFrZSBkaXNjb3Zlcnkg
+bW9kZSBvZiBibHVldG9vdGggQ1VQUyBiYWNrZW5kIHdvcmsgd2l0aCBDVVBTIDEuNC4wLgogdmVy
+IDQuNTA6CiAJRml4IGlzc3VlIHdpdGggbWlzc2luZyBtYW51YWwgcGFnZXMgaW4gZGlzdHJpYnV0
+aW9uLgogCUZpeCBpc3N1ZSB3aXRoIHRoZSBjb25maWd1cmF0aW9uIGFuZCBzdGF0ZSBkaXJlY3Rv
+cmllcy4KZGlmZiAtLWdpdCBhL2N1cHMvbWFpbi5jIGIvY3Vwcy9tYWluLmMKaW5kZXggZGE3NTdi
+MC4uMWJiYzc4YyAxMDA2NDQKLS0tIGEvY3Vwcy9tYWluLmMKKysrIGIvY3Vwcy9tYWluLmMKQEAg
+LTE4NSw2ICsxODUsMjcgQEAgc3RhdGljIGNoYXIgKmRldmljZV9nZXRfaWVlZTEyODRfaWQoY29u
+c3QgY2hhciAqYWRhcHRlciwgY29uc3QgY2hhciAqZGV2aWNlKQogCXJldHVybiBpZDsKIH0KIAor
+c3RhdGljIHZvaWQgcHJpbnRfcHJpbnRlcl9kZXRhaWxzKGNvbnN0IGNoYXIgKm5hbWUsIGNvbnN0
+IGNoYXIgKmJkYWRkciwgY29uc3QgY2hhciAqaWQpCit7CisJY2hhciAqdXJpLCAqZXNjYXBlZDsK
+KworCWVzY2FwZWQgPSBnX3N0cmRlbGltaXQoZ19zdHJkdXAobmFtZSksICJcIiIsICdcJycpOwor
+CXVyaSA9IGdfc3RyZHVwX3ByaW50ZigiYmx1ZXRvb3RoOi8vJWMlYyVjJWMlYyVjJWMlYyVjJWMl
+YyVjIiwKKwkJIGJkYWRkclswXSwgYmRhZGRyWzFdLAorCQkgYmRhZGRyWzNdLCBiZGFkZHJbNF0s
+CisJCSBiZGFkZHJbNl0sIGJkYWRkcls3XSwKKwkJIGJkYWRkcls5XSwgYmRhZGRyWzEwXSwKKwkJ
+IGJkYWRkclsxMl0sIGJkYWRkclsxM10sCisJCSBiZGFkZHJbMTVdLCBiZGFkZHJbMTZdKTsKKwlw
+cmludGYoImRpcmVjdCAlcyBcIiVzXCIgXCIlcyAoQmx1ZXRvb3RoKVwiIiwgdXJpLCBlc2NhcGVk
+LCBlc2NhcGVkKTsKKwlpZiAoaWQgIT0gTlVMTCkKKwkJcHJpbnRmKCIgXCIlc1wiXG4iLCBpZCk7
+CisJZWxzZQorCQlwcmludGYoIlxuIik7CisJZ19mcmVlKGVzY2FwZWQpOworCWdfZnJlZSh1cmkp
+OworfQorCiBzdGF0aWMgdm9pZCBhZGRfZGV2aWNlX3RvX2xpc3QoY29uc3QgY2hhciAqbmFtZSwg
+Y29uc3QgY2hhciAqYmRhZGRyLCBjb25zdCBjaGFyICppZCkKIHsKIAlzdHJ1Y3QgY3Vwc19kZXZp
+Y2UgKmRldmljZTsKQEAgLTIxMiwyNyArMjMzLDcgQEAgc3RhdGljIHZvaWQgYWRkX2RldmljZV90
+b19saXN0KGNvbnN0IGNoYXIgKm5hbWUsIGNvbnN0IGNoYXIgKmJkYWRkciwgY29uc3QgY2hhcgog
+CWRldmljZS0+aWQgPSBnX3N0cmR1cChpZCk7CiAKIAlkZXZpY2VfbGlzdCA9IGdfc2xpc3RfcHJl
+cGVuZChkZXZpY2VfbGlzdCwgZGV2aWNlKTsKLX0KLQotc3RhdGljIHZvaWQgcHJpbnRfcHJpbnRl
+cl9kZXRhaWxzKGNvbnN0IGNoYXIgKm5hbWUsIGNvbnN0IGNoYXIgKmJkYWRkciwgY29uc3QgY2hh
+ciAqaWQpCi17Ci0JY2hhciAqdXJpLCAqZXNjYXBlZDsKLQotCWVzY2FwZWQgPSBnX3N0cmRlbGlt
+aXQoZ19zdHJkdXAobmFtZSksICJcIiIsICdcJycpOwotCXVyaSA9IGdfc3RyZHVwX3ByaW50Zigi
+Ymx1ZXRvb3RoOi8vJWMlYyVjJWMlYyVjJWMlYyVjJWMlYyVjIiwKLQkJIGJkYWRkclswXSwgYmRh
+ZGRyWzFdLAotCQkgYmRhZGRyWzNdLCBiZGFkZHJbNF0sCi0JCSBiZGFkZHJbNl0sIGJkYWRkcls3
+XSwKLQkJIGJkYWRkcls5XSwgYmRhZGRyWzEwXSwKLQkJIGJkYWRkclsxMl0sIGJkYWRkclsxM10s
+Ci0JCSBiZGFkZHJbMTVdLCBiZGFkZHJbMTZdKTsKLQlwcmludGYoImRpcmVjdCAlcyBcIiVzXCIg
+XCIlcyAoQmx1ZXRvb3RoKVwiIiwgdXJpLCBlc2NhcGVkLCBlc2NhcGVkKTsKLQlpZiAoaWQgIT0g
+TlVMTCkKLQkJcHJpbnRmKCIgXCIlc1wiXG4iLCBpZCk7Ci0JZWxzZQotCQlwcmludGYoIlxuIik7
+Ci0JZ19mcmVlKGVzY2FwZWQpOwotCWdfZnJlZSh1cmkpOworCXByaW50X3ByaW50ZXJfZGV0YWls
+cyhkZXZpY2UtPm5hbWUsIGRldmljZS0+YmRhZGRyLCBkZXZpY2UtPmlkKTsKIH0KIAogc3RhdGlj
+IGdib29sZWFuIHBhcnNlX2RldmljZV9wcm9wZXJ0aWVzKERCdXNNZXNzYWdlSXRlciAqcmVwbHlf
+aXRlciwgY2hhciAqKm5hbWUsIGNoYXIgKipiZGFkZHIpCkBAIC0zODQsMjMgKzM4NSw2IEBAIHN0
+YXRpYyB2b2lkIHJlbW90ZV9kZXZpY2VfZm91bmQoY29uc3QgY2hhciAqYWRhcHRlciwgY29uc3Qg
+Y2hhciAqYmRhZGRyLCBjb25zdCBjCiAKIHN0YXRpYyB2b2lkIGRpc2NvdmVyeV9jb21wbGV0ZWQo
+dm9pZCkKIHsKLQlHU0xpc3QgKmw7Ci0KLQlmb3IgKGwgPSBkZXZpY2VfbGlzdDsgbCAhPSBOVUxM
+OyBsID0gbC0+bmV4dCkgewotCQlzdHJ1Y3QgY3Vwc19kZXZpY2UgKmRldmljZSA9IChzdHJ1Y3Qg
+Y3Vwc19kZXZpY2UgKikgbC0+ZGF0YTsKLQotCQlpZiAoZGV2aWNlLT5uYW1lID09IE5VTEwpCi0J
+CQlkZXZpY2UtPm5hbWUgPSBnX3N0cmRlbGltaXQoZ19zdHJkdXAoZGV2aWNlLT5iZGFkZHIpLCAi
+OiIsICctJyk7Ci0JCS8qIEdpdmUgYW5vdGhlciB0cnkgdG8gZ2V0dGluZyBhbiBJRCBmb3IgdGhl
+IGRldmljZSAqLwotCQlpZiAoZGV2aWNlLT5pZCA9PSBOVUxMKQotCQkJcmVtb3RlX2RldmljZV9m
+b3VuZChOVUxMLCBkZXZpY2UtPmJkYWRkciwgZGV2aWNlLT5uYW1lKTsKLQkJcHJpbnRfcHJpbnRl
+cl9kZXRhaWxzKGRldmljZS0+bmFtZSwgZGV2aWNlLT5iZGFkZHIsIGRldmljZS0+aWQpOwotCQln
+X2ZyZWUoZGV2aWNlLT5uYW1lKTsKLQkJZ19mcmVlKGRldmljZS0+YmRhZGRyKTsKLQkJZ19mcmVl
+KGRldmljZS0+aWQpOwotCQlnX2ZyZWUoZGV2aWNlKTsKLQl9Ci0KIAlnX3NsaXN0X2ZyZWUoZGV2
+aWNlX2xpc3QpOwogCWRldmljZV9saXN0ID0gTlVMTDsKIApAQCAtNjM4LDYgKzYyMiw5IEBAIGlu
+dCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pCiAJLyogTWFrZSBzdXJlIHN0YXR1cyBtZXNz
+YWdlcyBhcmUgbm90IGJ1ZmZlcmVkICovCiAJc2V0YnVmKHN0ZGVyciwgTlVMTCk7CiAKKwkvKiBN
+YWtlIHN1cmUgb3V0cHV0IGlzIG5vdCBidWZmZXJlZCAqLworCXNldGJ1ZihzdGRvdXQsIE5VTEwp
+OworCiAJLyogSWdub3JlIFNJR1BJUEUgc2lnbmFscyAqLwogI2lmZGVmIEhBVkVfU0lHU0VUCiAJ
+c2lnc2V0KFNJR1BJUEUsIFNJR19JR04pOwotLSAKMS42LjMuMwoK
+--0016e64098b2861db604722a9aa4--
