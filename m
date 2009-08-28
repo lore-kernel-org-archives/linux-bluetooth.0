@@ -1,93 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1251401414.2950.122.camel@localhost.localdomain>
-References: <113d36d80908260307g59eead24v9311d612c8541ad0@mail.gmail.com>
-	 <1251309847.2950.96.camel@localhost.localdomain>
-	 <113d36d80908270833q4eb7b4eg8d512fdd34e6ca83@mail.gmail.com>
-	 <1251401414.2950.122.camel@localhost.localdomain>
-Date: Fri, 28 Aug 2009 17:34:31 +0800
-Message-ID: <113d36d80908280234m34473a05n45654ab37a484ed0@mail.gmail.com>
-Subject: Re: can we increase the send buffer size of rfcomm socket?
-From: Lan Zhu <zhu.lan.cn@gmail.com>
+Message-ID: <377658.93129.qm@web94901.mail.in2.yahoo.com>
+References: <639511.66794.qm@web94914.mail.in2.yahoo.com>  <1251309784.2950.95.camel@localhost.localdomain>  <302064.78581.qm@web94908.mail.in2.yahoo.com> <1251401348.2950.121.camel@localhost.localdomain>
+Date: Fri, 28 Aug 2009 10:57:59 +0530 (IST)
+From: Pavan Savoy <pavan_savoy@yahoo.co.in>
+Subject: Re: shared hci transport
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <1251401348.2950.121.camel@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-
-2009/8/28 Marcel Holtmann <marcel@holtmann.org>:
-> Hi Zhu,
->
->> >> We tried to write a 64k data to rfcomm socket, but it will break
->> >> before sending all of the data out. The problem is in function
->> >> rfcomm_sock_sendmsg() in net/bluetooth/rfcomm/sock.c, it breaks after
->> >> calling sock_alloc_send_skb().
->> >>
->> >> static int rfcomm_sock_sendmsg(...)
->> >> {
->> >> =A0 =A0...
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 skb =3D sock_alloc_send_skb(sk, size + RF=
-COMM_SKB_RESERVE,
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 msg->msg_=
-flags & MSG_DONTWAIT, &err);
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (!skb)
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
->> >> =A0 =A0...
->> >> }
->> >>
->> >> Looks the send buffer is not adequate. Then I increased the send
->> >> buffer size in function rfcomm_sock_alloc(), =A0build kernel and try
->> >> again, this time the sendmsg can complete sending all the data.
->> >>
->> >> Can we use the setsockopt() method to change the socket's send/receiv=
-e
->> >> buffer size, just like the usual =A0tcp/ip socket?
->> >
->> > yes we can. Send a patch for it and I am going to review it.
->> >
->> > Regards
->> >
->> > Marcel
->> >
->> >
->> >
->>
->> Today I changed the send buffer size but found kernel become very
->> unstable. It usually crash during sending rfcomm data. Do you know
->> what's the reason?
->>
->> Below is what I changed in net/bluetooth/rfcomm/sock.c.
->>
->> in function rfcomm_sock_alloc(),
->>
->> change sk->sndbuf
->> from
->> sk->sk_sndbuf =3D RFCOMM_MAX_CREDITS * RFCOMM_DEFAULT_MTU * 10
->> to
->> sk->sk_sndbuf =3D RFCOMM_MAX_CREDITS * RFCOMM_DEFAULT_MTU * 20
->
-> which kernel is this? There have been some fixes in the network stack
-> for this. Also I need oopses to see what might happen here.
->
-> Regards
->
-> Marcel
->
->
->
-
-Yes, it's our kernel's problem. We used another version and it worked
-fine. Here the change in rfcomm_sock_alloc() is only for testing. What
-I'm doing now is adding a case for RFCOMM_SNDBUF in the function
-rfcomm_sock_setsockopt_old(), as below.
-
-	case RFCOMM_SNDBUF:
-		sk->sk_sndbuf =3D opt;
-		break;
-
-I'm thinking to add a limitation for a maximum buffer size, but don't
-know what maximum size is appropriate here. Do you have any idea?
-
-Thanks,
-Zhu Lan
+----- Original Message ----=0AFrom: Marcel Holtmann <marcel@holtmann.org>=
+=0ATo: Pavan Savoy <pavan_savoy@yahoo.co.in>=0ACc: linux-bluetooth@vger.ker=
+nel.org=0ASent: Friday, 28 August, 2009 12:59:08 AM=0ASubject: Re: shared h=
+ci transport=0A=0AHi Pavan,=0A=0Aplease don't do top-posting on this mailin=
+g list. We want proper inline=0Aquoting.=0A=0A> sure.=0A> the bcm4325 has u=
+art transport for BT [so I can make use of hci_h4, say by hciattach - like =
+bcm2035].=0A> The FM core understands hci-vendor specific command.=0A> =0A>=
+ for example, I send HCI_VS opcode=3D0x20 to set the power of Rx to On.[The=
+ power on sequence also involves download of a firmware which is nothing bu=
+t a file with ~10/20 hci-vendor specific commands with different opcodes].=
+=0A> opcode 0x0a (say) to set the frequency and similarly in opcode 0x1d [a=
+udio enable] I give an data arguement 0x01 or 0x02 to say to FM Rx to put o=
+ut audio on either it's analog lines or digital [i2s] lines..=0A> =0A> Curr=
+ently my fm stack, application is making use of hci_open_dev, send_cmd kind=
+ of hci lib calls to send commands.=0A> =0A> Now what should be my approach=
+ to send in same sort of commands from the kernel space ?=0A=0A>For the fir=
+mware loading part, we have to change this whole driver model=0A>and add an=
+ init stage that allows configuration etc.=0A=0A>I am not sold on the whole=
+ in-kernel approach for FM yet. We need to=0A>talk more about it. Especiall=
+y since vendor commands and messing with=0A>the flow control is tricky.=0A=
+=0A>Regards=0A=0A>Marcel=0A=0AYes -- Sorry for top posting [unfortunately t=
+his dumb mail editor doesn't give me much of choice]=0AIn any case,=0A=0AI =
+was thinking more in terms of hci_device and hci_driver kind of a model, wh=
+ere in there can be a hci_device for a transport [say HCI-UART] and multipl=
+e hci_driver(s) for 1 such hci_device -- these hci_drivers get registered t=
+o a main/single hci_device.=0A=0Ahci_device {=0Aopen,send_frame, notify, fl=
+ush, close=0A}=0A=0Aand the new hci_driver {=0Apre/post_open,  -- can be us=
+ed for a f/w download=0Apre/post_send, -- can be used to packetize/depacket=
+ize=0Apre/post_notify, -- events can be categorised to HCI [cmd complete] s=
+ort of events or processed locally and not be notified to hci-user space la=
+yer..=0Apre/post_flush and =0Apre/post_close=0A}=0A=0AIt would be same as u=
+sing line discipline driver over uart. Every HCI transfer send or recieve c=
+an have a pre/post function of an already registered "hci_driver" which nee=
+ds to called.=0A=0AWe would kind of make use for plenty of other purpose al=
+so, since the transports are being shared for all sort of devices nowadays =
+[gps+bt on uart/usb, fm+bt on uart].=0A=0A=0A=0A--=0ATo unsubscribe from th=
+is list: send the line "unsubscribe linux-bluetooth" in=0Athe body of a mes=
+sage to majordomo@vger.kernel.org=0AMore majordomo info at  http://vger.ker=
+nel.org/majordomo-info.html=0A=0A=0A=0A      Love Cricket? Check out live s=
+cores, photos, video highlights and more. Click here http://cricket.yahoo.c=
+om
