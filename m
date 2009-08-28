@@ -1,164 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Sender: superm1@gmail.com
-In-Reply-To: <1251400887.2950.114.camel@localhost.localdomain>
-References: <4A957819.7040808@gmail.com>
-	 <1251310460.2950.98.camel@localhost.localdomain>
-	 <4A95891A.20402@gmail.com>
-	 <1251340537.2950.105.camel@localhost.localdomain>
-	 <4A9652D4.10807@gmail.com>
-	 <1251400887.2950.114.camel@localhost.localdomain>
-Date: Thu, 27 Aug 2009 21:39:23 -0500
-Message-ID: <76715d500908271939g63713a87s9f1718fc22a5041@mail.gmail.com>
-Subject: Re: [PATCH] Make discovery mode of bluetooth CUPS backend work with
-	CUPS 1.4.0
-From: Mario Limonciello <superm1@ubuntu.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Till Kamppeter <till.kamppeter@gmail.com>, linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=001636c597c38d51be04722a9776
+In-Reply-To: <8e7043060908271916w76adc10fh8fdc088802d3a1f9@mail.gmail.com>
+References: <8e7043060908262058x5fb20f24wf995a82a575abe1d@mail.gmail.com>
+	 <1251401131.2950.118.camel@localhost.localdomain>
+	 <8e7043060908271916w76adc10fh8fdc088802d3a1f9@mail.gmail.com>
+Date: Fri, 28 Aug 2009 10:31:26 +0800
+Message-ID: <8e7043060908271931n6fe29a62o840df9b8f3badf74@mail.gmail.com>
+Subject: Re: build system defect
+From: Ted Feng <artisdom@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---001636c597c38d51be04722a9776
-Content-Type: multipart/alternative; boundary=001636c597c38d51b604722a9774
+Sorry for the delay.
 
---001636c597c38d51b604722a9774
-Content-Type: text/plain; charset=ISO-8859-1
+>2009/8/27 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
+> is it a clean checkout?
 
-Hi Marcel:
+I use the tarball release bluez-4.50.tar.gz, If that counts.
 
-On Thu, Aug 27, 2009 at 14:21, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Perhaps build is broken when compiling outside the source tree,
 
->
-> I can't use git am to apply this patch. Someone has to fix this for me.
->
-> Regards
->
-> Marcel
->
-It looks like Till's email client is just beating it up.  Applies for me
-with "git am" and the attached patch fine, but the inline is corrupt.
+Pretty much, I think.
 
 
+>2009/8/28 Marcel Holtmann <marcel@holtmann.org>:
+> I have not seen this problem, but I there might be still problems here.
 
--- 
-Mario Limonciello
-superm1@gmail.com
-Sent from Austin, TX, United States
+Just build outside the source tree. The error will show up.
 
---001636c597c38d51b604722a9774
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+> Can you give us details on your distro etc. I would have to fix this.
 
-Hi Marcel:<br><br><div class=3D"gmail_quote">On Thu, Aug 27, 2009 at 14:21,=
- Marcel Holtmann <span dir=3D"ltr">&lt;<a href=3D"mailto:marcel@holtmann.or=
-g">marcel@holtmann.org</a>&gt;</span> wrote:<br><blockquote class=3D"gmail_=
-quote" style=3D"border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt =
-0pt 0.8ex; padding-left: 1ex;">
-<br>I can&#39;t use git am to apply this patch. Someone has to fix this for=
- me.<br>
-<br>
-Regards<br>
-<font color=3D"#888888"><br>
-Marcel<br>
-</font></blockquote><div>It looks like Till&#39;s email client is just beat=
-ing it up.=A0 Applies for me with &quot;git am&quot; and the attached patch=
- fine, but the inline is corrupt.<br></div></div><br><br clear=3D"all"><br>
--- <br>Mario Limonciello<br><a href=3D"mailto:superm1@gmail.com">superm1@gm=
-ail.com</a><br>Sent from Austin, TX, United States
+$ lsb_release -a
+No LSB modules are available.
+Distributor ID: Ubuntu
+Description:    Ubuntu 9.04
+Release:        9.04
+Codename:       jaunty
 
---001636c597c38d51b604722a9774--
+$ uname -r
+2.6.28-14-generic
 
---001636c597c38d51be04722a9776
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Make-discovery-mode-of-bluetooth-CUPS-backend-work-w.patch"
-Content-Disposition: attachment;
-	filename="0001-Make-discovery-mode-of-bluetooth-CUPS-backend-work-w.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_fywbep5i0
+To reproduce the error, here is the step:
 
-RnJvbSBmZGY3Yjc1ZjVmYzhhOTcyNmRiNjc1NmJjZGRmZjZhYTc0YjQyYmEwIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBUaWxsIEthbXBwZXRlciA8dGlsbC5rYW1wcGV0ZXJAZ21haWwu
-Y29tPgpEYXRlOiBUaHUsIDI3IEF1ZyAyMDA5IDA5OjA3OjQ5ICswMjAwClN1YmplY3Q6IFtQQVRD
-SF0gTWFrZSBkaXNjb3ZlcnkgbW9kZSBvZiBibHVldG9vdGggQ1VQUyBiYWNrZW5kIHdvcmsgd2l0
-aCBDVVBTIDEuNC4wCgpUaGUgbmV3IENVUFMgMS40LnggZG9lcyBkZXZpY2UgZGlzY292ZXJ5IG9u
-bHkgZm9yIGEgZ2l2ZW4gdGltZSBmcmFtZQpyZXF1ZXN0ZWQgYnkgdGhlIGNsaWVudCAocHJpbnRl
-ciBzZXR1cCB0b29sLCAibHBpbmZvIiBjb21tYW5kKS4gQ1VQUydzCmRlZmF1bHQgZm9yIENVUFMt
-MS4zLngtaXNoIHJlcXVlc3RzIHdpdGhvdXQgdGltZW91dCBzcGVjaWZpY2F0aW9uCnNlZW1zIHRv
-IGJlIDEwIHNlY29uZHMuIENVUFMgc3RhcnRzIGFsbCBiYWNrZW5kcyBhdCBvbmNlIGluIHRoZQpi
-ZWdpbm5pbmcgKGluIHBhcmFsbGVsKSBhbmQga2lsbHMgZXZlcnkgYmFja2VuZCB3aGljaCByZW1h
-aW5zIHJ1bm5pbmcKYXQgdGhlIGVuZCBvZiB0aGUgdGltZW91dC4gSXQgYWNjZXB0cyBvdXRwdXQg
-ZnJvbSB0aGUgYmFja2VuZHMKd2hlbmV2ZXIgaXQgb2NjdXJzIG5vdCBvbmx5IHdoZW4gdGhlIGJh
-Y2tlbmQgZmluaXNoZXMsIHNvIGEgYmFja2VuZApjYW4gc2VhcmNoIGZvciBwcmludGVycyBpbmZp
-bml0ZWx5IGxvbmcgaWYgaXQgb3V0cHV0cyBldmVyeSBmb3VuZApkZXZpY2UgaW1tZWRpYXRlbHku
-IFRoZW4gYWxsIHByaW50ZXJzIGZvdW5kIGR1cmluZyBDVVBTJyB0aW1lb3V0IGFyZQp0YWtlbiBp
-bnRvIGFjY291bnQuCgpUaGUgYmx1ZXRvb3RoIGJhY2tlbmQgb2YgNC40OCBhc2tzIHRoZSBCbHVl
-dG9vdGggZGFlbW9uIGZvciBwcmludGVycwphbmQgY29sbGVjdHMgcmVzdWx0cyBmb3IgMTAgc2Vj
-b25kcyBhbmQgYWZ0ZXIgdGhhdCBpdCBvdXRwdXRzCnRoZW0uIFRoaXMgdGFrZXMgYSB0b3RhbCBv
-ZiAxMC41IHNlYyBhbmQgc28gQ1VQUyBraWxscyB0aGUgYmFja2VuZApyaWdodCBiZWZvcmUgaXQg
-YW5zd2VycyAoYXQgbGVhc3Qgd2l0aCB0aGUgMTAtc2Vjb25kIGRlZmF1bHQgdGltZW91dCksCnJl
-c3VsdGluZyBpbiBCbHVldG9vdGggcHJpbnRlcnMgbmV2ZXIgYmVpbmcgZGlzY292ZXJlZCBieSBD
-VVBTLgoKVGhpcyBjaGFuZ2UgZml4ZXMgaXQgYnkgbWFraW5nIGVhY2ggbmV3IHByaW50ZXIgYWRk
-ZWQgdG8gdGhlIGxpc3QKYmVpbmcgb3V0cHV0IGltbWVkaWF0ZWx5LiBOb3RlIHRoYXQgdGhlIGxp
-c3Qgc3RydWN0dXJlIGNhbm5vdCBiZQpyZW1vdmVkIGZyb20gY3Vwcy9tYWluLmMgYXMgb3RoZXJ3
-aXNlIHdlIHdvdWxkIGdldCBkdXBsaWNhdGUKbGlzdGluZ3MuIEFsc28gaW1wb3J0YW50IGlzIHRo
-ZSBhZGRpdGlvbiBvZiB1bmJ1ZmZlcmVkIG91dHB1dCBvbgpzdGRvdXQuCi0tLQogQ2hhbmdlTG9n
-ICAgfCAgICAyICsKIGN1cHMvbWFpbi5jIHwgICA2MyArKysrKysrKysrKysrKysrKysrKysrKy0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCiAyIGZpbGVzIGNoYW5nZWQsIDI3IGlu
-c2VydGlvbnMoKyksIDM4IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL0NoYW5nZUxvZyBiL0No
-YW5nZUxvZwppbmRleCBkMDZmNDk0Li42YzE3MGY2IDEwMDY0NAotLS0gYS9DaGFuZ2VMb2cKKysr
-IGIvQ2hhbmdlTG9nCkBAIC0xLDMgKzEsNSBAQAordmVyIDQuNTE6CisJTWFrZSBkaXNjb3Zlcnkg
-bW9kZSBvZiBibHVldG9vdGggQ1VQUyBiYWNrZW5kIHdvcmsgd2l0aCBDVVBTIDEuNC4wLgogdmVy
-IDQuNTA6CiAJRml4IGlzc3VlIHdpdGggbWlzc2luZyBtYW51YWwgcGFnZXMgaW4gZGlzdHJpYnV0
-aW9uLgogCUZpeCBpc3N1ZSB3aXRoIHRoZSBjb25maWd1cmF0aW9uIGFuZCBzdGF0ZSBkaXJlY3Rv
-cmllcy4KZGlmZiAtLWdpdCBhL2N1cHMvbWFpbi5jIGIvY3Vwcy9tYWluLmMKaW5kZXggZGE3NTdi
-MC4uMWJiYzc4YyAxMDA2NDQKLS0tIGEvY3Vwcy9tYWluLmMKKysrIGIvY3Vwcy9tYWluLmMKQEAg
-LTE4NSw2ICsxODUsMjcgQEAgc3RhdGljIGNoYXIgKmRldmljZV9nZXRfaWVlZTEyODRfaWQoY29u
-c3QgY2hhciAqYWRhcHRlciwgY29uc3QgY2hhciAqZGV2aWNlKQogCXJldHVybiBpZDsKIH0KIAor
-c3RhdGljIHZvaWQgcHJpbnRfcHJpbnRlcl9kZXRhaWxzKGNvbnN0IGNoYXIgKm5hbWUsIGNvbnN0
-IGNoYXIgKmJkYWRkciwgY29uc3QgY2hhciAqaWQpCit7CisJY2hhciAqdXJpLCAqZXNjYXBlZDsK
-KworCWVzY2FwZWQgPSBnX3N0cmRlbGltaXQoZ19zdHJkdXAobmFtZSksICJcIiIsICdcJycpOwor
-CXVyaSA9IGdfc3RyZHVwX3ByaW50ZigiYmx1ZXRvb3RoOi8vJWMlYyVjJWMlYyVjJWMlYyVjJWMl
-YyVjIiwKKwkJIGJkYWRkclswXSwgYmRhZGRyWzFdLAorCQkgYmRhZGRyWzNdLCBiZGFkZHJbNF0s
-CisJCSBiZGFkZHJbNl0sIGJkYWRkcls3XSwKKwkJIGJkYWRkcls5XSwgYmRhZGRyWzEwXSwKKwkJ
-IGJkYWRkclsxMl0sIGJkYWRkclsxM10sCisJCSBiZGFkZHJbMTVdLCBiZGFkZHJbMTZdKTsKKwlw
-cmludGYoImRpcmVjdCAlcyBcIiVzXCIgXCIlcyAoQmx1ZXRvb3RoKVwiIiwgdXJpLCBlc2NhcGVk
-LCBlc2NhcGVkKTsKKwlpZiAoaWQgIT0gTlVMTCkKKwkJcHJpbnRmKCIgXCIlc1wiXG4iLCBpZCk7
-CisJZWxzZQorCQlwcmludGYoIlxuIik7CisJZ19mcmVlKGVzY2FwZWQpOworCWdfZnJlZSh1cmkp
-OworfQorCiBzdGF0aWMgdm9pZCBhZGRfZGV2aWNlX3RvX2xpc3QoY29uc3QgY2hhciAqbmFtZSwg
-Y29uc3QgY2hhciAqYmRhZGRyLCBjb25zdCBjaGFyICppZCkKIHsKIAlzdHJ1Y3QgY3Vwc19kZXZp
-Y2UgKmRldmljZTsKQEAgLTIxMiwyNyArMjMzLDcgQEAgc3RhdGljIHZvaWQgYWRkX2RldmljZV90
-b19saXN0KGNvbnN0IGNoYXIgKm5hbWUsIGNvbnN0IGNoYXIgKmJkYWRkciwgY29uc3QgY2hhcgog
-CWRldmljZS0+aWQgPSBnX3N0cmR1cChpZCk7CiAKIAlkZXZpY2VfbGlzdCA9IGdfc2xpc3RfcHJl
-cGVuZChkZXZpY2VfbGlzdCwgZGV2aWNlKTsKLX0KLQotc3RhdGljIHZvaWQgcHJpbnRfcHJpbnRl
-cl9kZXRhaWxzKGNvbnN0IGNoYXIgKm5hbWUsIGNvbnN0IGNoYXIgKmJkYWRkciwgY29uc3QgY2hh
-ciAqaWQpCi17Ci0JY2hhciAqdXJpLCAqZXNjYXBlZDsKLQotCWVzY2FwZWQgPSBnX3N0cmRlbGlt
-aXQoZ19zdHJkdXAobmFtZSksICJcIiIsICdcJycpOwotCXVyaSA9IGdfc3RyZHVwX3ByaW50Zigi
-Ymx1ZXRvb3RoOi8vJWMlYyVjJWMlYyVjJWMlYyVjJWMlYyVjIiwKLQkJIGJkYWRkclswXSwgYmRh
-ZGRyWzFdLAotCQkgYmRhZGRyWzNdLCBiZGFkZHJbNF0sCi0JCSBiZGFkZHJbNl0sIGJkYWRkcls3
-XSwKLQkJIGJkYWRkcls5XSwgYmRhZGRyWzEwXSwKLQkJIGJkYWRkclsxMl0sIGJkYWRkclsxM10s
-Ci0JCSBiZGFkZHJbMTVdLCBiZGFkZHJbMTZdKTsKLQlwcmludGYoImRpcmVjdCAlcyBcIiVzXCIg
-XCIlcyAoQmx1ZXRvb3RoKVwiIiwgdXJpLCBlc2NhcGVkLCBlc2NhcGVkKTsKLQlpZiAoaWQgIT0g
-TlVMTCkKLQkJcHJpbnRmKCIgXCIlc1wiXG4iLCBpZCk7Ci0JZWxzZQotCQlwcmludGYoIlxuIik7
-Ci0JZ19mcmVlKGVzY2FwZWQpOwotCWdfZnJlZSh1cmkpOworCXByaW50X3ByaW50ZXJfZGV0YWls
-cyhkZXZpY2UtPm5hbWUsIGRldmljZS0+YmRhZGRyLCBkZXZpY2UtPmlkKTsKIH0KIAogc3RhdGlj
-IGdib29sZWFuIHBhcnNlX2RldmljZV9wcm9wZXJ0aWVzKERCdXNNZXNzYWdlSXRlciAqcmVwbHlf
-aXRlciwgY2hhciAqKm5hbWUsIGNoYXIgKipiZGFkZHIpCkBAIC0zODQsMjMgKzM4NSw2IEBAIHN0
-YXRpYyB2b2lkIHJlbW90ZV9kZXZpY2VfZm91bmQoY29uc3QgY2hhciAqYWRhcHRlciwgY29uc3Qg
-Y2hhciAqYmRhZGRyLCBjb25zdCBjCiAKIHN0YXRpYyB2b2lkIGRpc2NvdmVyeV9jb21wbGV0ZWQo
-dm9pZCkKIHsKLQlHU0xpc3QgKmw7Ci0KLQlmb3IgKGwgPSBkZXZpY2VfbGlzdDsgbCAhPSBOVUxM
-OyBsID0gbC0+bmV4dCkgewotCQlzdHJ1Y3QgY3Vwc19kZXZpY2UgKmRldmljZSA9IChzdHJ1Y3Qg
-Y3Vwc19kZXZpY2UgKikgbC0+ZGF0YTsKLQotCQlpZiAoZGV2aWNlLT5uYW1lID09IE5VTEwpCi0J
-CQlkZXZpY2UtPm5hbWUgPSBnX3N0cmRlbGltaXQoZ19zdHJkdXAoZGV2aWNlLT5iZGFkZHIpLCAi
-OiIsICctJyk7Ci0JCS8qIEdpdmUgYW5vdGhlciB0cnkgdG8gZ2V0dGluZyBhbiBJRCBmb3IgdGhl
-IGRldmljZSAqLwotCQlpZiAoZGV2aWNlLT5pZCA9PSBOVUxMKQotCQkJcmVtb3RlX2RldmljZV9m
-b3VuZChOVUxMLCBkZXZpY2UtPmJkYWRkciwgZGV2aWNlLT5uYW1lKTsKLQkJcHJpbnRfcHJpbnRl
-cl9kZXRhaWxzKGRldmljZS0+bmFtZSwgZGV2aWNlLT5iZGFkZHIsIGRldmljZS0+aWQpOwotCQln
-X2ZyZWUoZGV2aWNlLT5uYW1lKTsKLQkJZ19mcmVlKGRldmljZS0+YmRhZGRyKTsKLQkJZ19mcmVl
-KGRldmljZS0+aWQpOwotCQlnX2ZyZWUoZGV2aWNlKTsKLQl9Ci0KIAlnX3NsaXN0X2ZyZWUoZGV2
-aWNlX2xpc3QpOwogCWRldmljZV9saXN0ID0gTlVMTDsKIApAQCAtNjM4LDYgKzYyMiw5IEBAIGlu
-dCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pCiAJLyogTWFrZSBzdXJlIHN0YXR1cyBtZXNz
-YWdlcyBhcmUgbm90IGJ1ZmZlcmVkICovCiAJc2V0YnVmKHN0ZGVyciwgTlVMTCk7CiAKKwkvKiBN
-YWtlIHN1cmUgb3V0cHV0IGlzIG5vdCBidWZmZXJlZCAqLworCXNldGJ1ZihzdGRvdXQsIE5VTEwp
-OworCiAJLyogSWdub3JlIFNJR1BJUEUgc2lnbmFscyAqLwogI2lmZGVmIEhBVkVfU0lHU0VUCiAJ
-c2lnc2V0KFNJR1BJUEUsIFNJR19JR04pOwotLSAKMS42LjMuMwoK
---001636c597c38d51be04722a9776--
+$ wget http://www.kernel.org/pub/linux/bluetooth/bluez-4.50.tar.gz
+$ tar xvf bluez-4.50.tar.gz
+$ mkdir bluez-build
+$ cd bluez-build
+$ ../bluez-4.50/configure --prefix=/usr --sysconfdir=/etc
+--localstatedir=/var --enable-debug -enable-test --enable-gstreamer
+--enable-alsa --enable-usb --enable-netlink --enable-tools
+--enable-bccmd --enable-pcmcia --enable-hid2hci --enable-dfutool
+--enable-hidd --enable-pand --enable-dund --enable-cups
+--enable-udevrules --enable-configfiles
+...
+checking for SNDFILE... yes
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating scripts/bluetooth.rules
+config.status: creating doc/version.xml
+config.status: creating src/bluetoothd.8
+config.status: creating bluez.pc
+config.status: creating config.h
+config.status: executing depfiles commands
+config.status: executing libtool commands
+$ make
+make --no-print-directory all-am
+ CC     audio/audio_libasound_module_pcm_bluetooth_la-pcm_bluetooth.lo
+ CC     audio/audio_libasound_module_pcm_bluetooth_la-ipc.lo
+ CC     sbc/sbc_libsbc_la-sbc.lo
+ CC     sbc/sbc_libsbc_la-sbc_primitives.lo
+ CC     sbc/sbc_libsbc_la-sbc_primitives_mmx.lo
+ CC     sbc/sbc_libsbc_la-sbc_primitives_neon.lo
+...
+ CCLD   tools/bccmd
+ CC     tools/hid2hci.o
+ CCLD   tools/hid2hci
+ CC     test/hciemu.o
+ CCLD   test/hciemu
+ GEN    scripts/97-bluetooth.rules
+ GEN    scripts/97-bluetooth-hid2hci.rules
+cp: cannot stat `scripts/bluetooth-hid2hci.rules': No such file or directory
+make[1]: *** [scripts/97-bluetooth-hid2hci.rules] Error 1
