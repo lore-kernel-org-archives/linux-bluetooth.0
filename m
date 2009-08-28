@@ -1,5 +1,6 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
+Sender: superm1@gmail.com
 In-Reply-To: <1251400887.2950.114.camel@localhost.localdomain>
 References: <4A957819.7040808@gmail.com>
 	 <1251310460.2950.98.camel@localhost.localdomain>
@@ -7,23 +8,26 @@ References: <4A957819.7040808@gmail.com>
 	 <1251340537.2950.105.camel@localhost.localdomain>
 	 <4A9652D4.10807@gmail.com>
 	 <1251400887.2950.114.camel@localhost.localdomain>
-Date: Thu, 27 Aug 2009 21:40:13 -0500
-Message-ID: <76715d500908271940m23acd1dag70113fc4057a87c9@mail.gmail.com>
+Date: Thu, 27 Aug 2009 21:39:23 -0500
+Message-ID: <76715d500908271939g63713a87s9f1718fc22a5041@mail.gmail.com>
 Subject: Re: [PATCH] Make discovery mode of bluetooth CUPS backend work with
 	CUPS 1.4.0
 From: Mario Limonciello <superm1@ubuntu.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=0016e64098b2861db604722a9aa4
-To: unlisted-recipients:; (no To-header on input)
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Till Kamppeter <till.kamppeter@gmail.com>, linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=001636c597c38d51be04722a9776
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---0016e64098b2861db604722a9aa4
+--001636c597c38d51be04722a9776
+Content-Type: multipart/alternative; boundary=001636c597c38d51b604722a9774
+
+--001636c597c38d51b604722a9774
 Content-Type: text/plain; charset=ISO-8859-1
 
 Hi Marcel:
 
 On Thu, Aug 27, 2009 at 14:21, Marcel Holtmann <marcel@holtmann.org> wrote:
+
 >
 > I can't use git am to apply this patch. Someone has to fix this for me.
 >
@@ -31,24 +35,46 @@ On Thu, Aug 27, 2009 at 14:21, Marcel Holtmann <marcel@holtmann.org> wrote:
 >
 > Marcel
 >
->
-It looks like Till's email client is just beating it up.  Applies for
-me with "git am" and the attached patch fine, but the inline is
-corrupt.
+It looks like Till's email client is just beating it up.  Applies for me
+with "git am" and the attached patch fine, but the inline is corrupt.
 
 
---
+
+-- 
 Mario Limonciello
 superm1@gmail.com
 Sent from Austin, TX, United States
 
---0016e64098b2861db604722a9aa4
+--001636c597c38d51b604722a9774
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+Hi Marcel:<br><br><div class=3D"gmail_quote">On Thu, Aug 27, 2009 at 14:21,=
+ Marcel Holtmann <span dir=3D"ltr">&lt;<a href=3D"mailto:marcel@holtmann.or=
+g">marcel@holtmann.org</a>&gt;</span> wrote:<br><blockquote class=3D"gmail_=
+quote" style=3D"border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt =
+0pt 0.8ex; padding-left: 1ex;">
+<br>I can&#39;t use git am to apply this patch. Someone has to fix this for=
+ me.<br>
+<br>
+Regards<br>
+<font color=3D"#888888"><br>
+Marcel<br>
+</font></blockquote><div>It looks like Till&#39;s email client is just beat=
+ing it up.=A0 Applies for me with &quot;git am&quot; and the attached patch=
+ fine, but the inline is corrupt.<br></div></div><br><br clear=3D"all"><br>
+-- <br>Mario Limonciello<br><a href=3D"mailto:superm1@gmail.com">superm1@gm=
+ail.com</a><br>Sent from Austin, TX, United States
+
+--001636c597c38d51b604722a9774--
+
+--001636c597c38d51be04722a9776
 Content-Type: text/x-patch; charset=US-ASCII;
 	name="0001-Make-discovery-mode-of-bluetooth-CUPS-backend-work-w.patch"
 Content-Disposition: attachment;
 	filename="0001-Make-discovery-mode-of-bluetooth-CUPS-backend-work-w.patch"
 Content-Transfer-Encoding: base64
-X-Attachment-Id: f_fywbg1i50
+X-Attachment-Id: f_fywbep5i0
 
 RnJvbSBmZGY3Yjc1ZjVmYzhhOTcyNmRiNjc1NmJjZGRmZjZhYTc0YjQyYmEwIE1vbiBTZXAgMTcg
 MDA6MDA6MDAgMjAwMQpGcm9tOiBUaWxsIEthbXBwZXRlciA8dGlsbC5rYW1wcGV0ZXJAZ21haWwu
@@ -135,4 +161,4 @@ YWdlcyBhcmUgbm90IGJ1ZmZlcmVkICovCiAJc2V0YnVmKHN0ZGVyciwgTlVMTCk7CiAKKwkvKiBN
 YWtlIHN1cmUgb3V0cHV0IGlzIG5vdCBidWZmZXJlZCAqLworCXNldGJ1ZihzdGRvdXQsIE5VTEwp
 OworCiAJLyogSWdub3JlIFNJR1BJUEUgc2lnbmFscyAqLwogI2lmZGVmIEhBVkVfU0lHU0VUCiAJ
 c2lnc2V0KFNJR1BJUEUsIFNJR19JR04pOwotLSAKMS42LjMuMwoK
---0016e64098b2861db604722a9aa4--
+--001636c597c38d51be04722a9776--
