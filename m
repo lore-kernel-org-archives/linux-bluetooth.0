@@ -1,29 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <2da21fe50908281604q64556b0byac38deec59be154d@mail.gmail.com>
-References: <2da21fe50908281604q64556b0byac38deec59be154d@mail.gmail.com>
-Date: Sat, 29 Aug 2009 07:37:05 +0200
-Message-ID: <a70b8cd30908282237u3d584d0dnc690f517f43bc2b3@mail.gmail.com>
-Subject: Re: [regression] bluetooth mouse not working on 2.6.31-rc8
-From: "Ruslan N. Marchenko" <rufferson@gmail.com>
-To: Davide Pesavento <davidepesa@gmail.com>
+Subject: Re: Set ACL packettypes
+From: Marcel Holtmann <marcel@holtmann.org>
+To: boehmler@htwg-konstanz.de
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <1251363015.4a9648c731895@webmail.htwg-konstanz.de>
+References: <1251363015.4a9648c731895@webmail.htwg-konstanz.de>
+Content-Type: text/plain
+Date: Fri, 28 Aug 2009 21:34:01 -0700
+Message-Id: <1251520441.2950.133.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Davide,
-2009/8/29, Davide Pesavento <davidepesa@gmail.com>:
->  The adapter itself seems to work: it's able to scan and find the
->  mouse, kdebluetooth4 even reports it's connected to it, but the kernel
->  doesn't print the usual message announcing a new input device and the
->  pointer on the screen remains motionless.
->
-Do you have uinput module loaded? Is /proc/bus/input/devices listing
-the mouse while it is connected?
+Hi Eric,
 
--- 
-----
-Looking forward to reading yours.
- RUFF-RIPE DI76-GANDI RUFF-6BONE
-     Ruslan N. Marchenko
+> I'm doing some measurements about bluetooth latency and throughput. And I
+> especially want to know the differences between the ACL packettypes.
+> 
+> I tried to set the packettype to exactly one type via hciconfig on both dongles
+> but there are barely differences in the results. Marcel already told me that
+> the Link-Manager is optimizing the connection by itself and chooses the
+> packettype.
+> 
+> When looking at the hcidump in Wireshark both sides send the command 'Create
+> Connection' with the capability to only send/receive the configured packettype.
+> So who exactly is ignoring this configuration?
+> Is there a way to convince the LMP to use only the requested packettypes or is
+> there any workaround?
+
+it depends on the hardware, but most likely not. The host stack has no
+real idea what is the best packet type anyway. So the link manager must
+optimize it since it has access to the baseband. Also DM1 is always
+allowed anyway.
+
+Regards
+
+Marcel
+
+
