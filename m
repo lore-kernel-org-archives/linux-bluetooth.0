@@ -1,94 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20090901070204.GA27211@jh-x301>
-References: <eb7933e20908270824w2dc3ae2x8257d20d307ce6fd@mail.gmail.com>
-	 <2d5a2c100908271008v67bb1b86xa5ad5ef6e95ba49a@mail.gmail.com>
-	 <20090901070204.GA27211@jh-x301>
-Date: Tue, 1 Sep 2009 14:09:01 +0300
-Message-ID: <eb7933e20909010409x4b85fa1bt162e52ecce028310@mail.gmail.com>
-Subject: Re: [PATCH] AVDTP start/stop handling during disconnection
-From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+Date: Tue, 1 Sep 2009 10:02:04 +0300
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Daniel =?iso-8859-1?Q?=D6rstadius?= <daniel.orstadius@gmail.com>,
 	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH] AVDTP start/stop handling during disconnection
+Message-ID: <20090901070204.GA27211@jh-x301>
+References: <eb7933e20908270824w2dc3ae2x8257d20d307ce6fd@mail.gmail.com> <2d5a2c100908271008v67bb1b86xa5ad5ef6e95ba49a@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <2d5a2c100908271008v67bb1b86xa5ad5ef6e95ba49a@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Sep 1, 2009 at 10:02 AM, Johan Hedberg<johan.hedberg@nokia.com> wrote:
+Hi Daniel & Luiz,
 
-> So Daniel, could you split out the first part of your patch and resend it?
+On Thu, Aug 27, 2009, Luiz Augusto von Dentz wrote:
+> On Thu, Aug 27, 2009 at 12:24 PM, Daniel
+> Örstadius<daniel.orstadius@gmail.com> wrote:
+> > A suggested patch for rejecting AVDTP CLOSE and START requests when a
+> > CLOSE request has been initiated. The check is done by testing the
+> > close_int flag in the avdtp_stream struct. The flag is reset when
+> > receiving a timeout or rejection from the remote.
+> >
+> > Changes in unix.c were made to call avdtp_unref() in case an AVDTP
+> > session was marked by avdtp_ref(), but no SEP was found. This could
+> > happen if START is called on a session being disconnected.
+> >
+> > We found that these changes help to improve behavior both in case the
+> > audio streaming application tries to start the stream during a
+> > disconnection procedure, and if avdtp_close() is called twice.
+> 
+> It probably works better if you place it on avdtp struct so it works
+> even if we don't have a stream configured,
 
+But a stream can't be in OPEN state if it hasn't been configured (i.e. we
+have a stream struct for it). So this part of the patch looks good to me.
 
->From 627850090c93152b8faa3e4a724df24dbc556d4e Mon Sep 17 00:00:00 2001
-From: Daniel Orstadius <daniel.orstadius@gmail.com>
-Date: Tue, 1 Sep 2009 13:55:44 +0300
-Subject: [PATCH] Reject AVDTP START/STOP when disconnecting
+> I also prefer closing instead of close_int.
 
----
- audio/avdtp.c |   19 +++++++++++++++++--
- 1 files changed, 17 insertions(+), 2 deletions(-)
+That would have a different meaning though. To me closing means we're
+closing but doesn't say anything about who initiated the close. close_int
+otoh tells us that we initiated the close. Also, since this variable
+already exists and is needed I think reusing it is fine.
 
-diff --git a/audio/avdtp.c b/audio/avdtp.c
-index 8046dda..839f035 100644
---- a/audio/avdtp.c
-+++ b/audio/avdtp.c
-@@ -2223,9 +2223,12 @@ static gboolean request_timeout(gpointer user_data)
- 		break;
- 	case AVDTP_CLOSE:
- 		error("Close request timed out");
--		if (lsep && lsep->cfm && lsep->cfm->close)
-+		if (lsep && lsep->cfm && lsep->cfm->close) {
- 			lsep->cfm->close(session, lsep, stream, &err,
- 						lsep->user_data);
-+			if (stream)
-+				stream->close_int = FALSE;
-+		}
- 		break;
- 	case AVDTP_SET_CONFIGURATION:
- 		error("SetConfiguration request timed out");
-@@ -2675,9 +2678,11 @@ static gboolean avdtp_parse_rej(struct avdtp *session,
- 			return FALSE;
- 		error("CLOSE request rejected: %s (%d)",
- 				avdtp_strerror(&err), err.err.error_code);
--		if (sep && sep->cfm && sep->cfm->close)
-+		if (sep && sep->cfm && sep->cfm->close) {
- 			sep->cfm->close(session, sep, stream, &err,
- 					sep->user_data);
-+			stream->close_int = FALSE;
-+		}
- 		return TRUE;
- 	case AVDTP_ABORT:
- 		if (!stream_rej_to_err(buf, size, &err, &acp_seid))
-@@ -3138,6 +3143,11 @@ int avdtp_start(struct avdtp *session, struct
-avdtp_stream *stream)
- 	if (stream->lsep->state != AVDTP_STATE_OPEN)
- 		return -EINVAL;
+So Daniel, could you split out the first part of your patch and resend it?
+Thanks.
 
-+	if (stream->close_int == TRUE) {
-+		error("avdtp_start: rejecting start since close is initiated");
-+		return -EINVAL;
-+	}
-+
- 	memset(&req, 0, sizeof(req));
- 	req.first_seid.seid = stream->rseid;
-
-@@ -3156,6 +3166,11 @@ int avdtp_close(struct avdtp *session, struct
-avdtp_stream *stream)
- 	if (stream->lsep->state < AVDTP_STATE_OPEN)
- 		return -EINVAL;
-
-+	if (stream->close_int == TRUE) {
-+		error("avdtp_close: rejecting close since it is already inititated");
-+		return -EINVAL;
-+	}
-+
- 	memset(&req, 0, sizeof(req));
- 	req.acp_seid = stream->rseid;
-
--- 
-1.6.0.4
-
-
-Thanks for the feedback.
-
-/Daniel
+Johan
