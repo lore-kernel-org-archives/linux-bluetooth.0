@@ -1,45 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Make discovery mode of bluetooth CUPS backend work
- with CUPS 1.4.0
-From: Bastien Nocera <hadess@hadess.net>
-To: Till Kamppeter <till.kamppeter@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,  Mario Limonciello <superm1@ubuntu.com>
-In-Reply-To: <4A9652D4.10807@gmail.com>
-References: <4A957819.7040808@gmail.com>
-	 <1251310460.2950.98.camel@localhost.localdomain> <4A95891A.20402@gmail.com>
-	 <1251340537.2950.105.camel@localhost.localdomain>
-	 <4A9652D4.10807@gmail.com>
-Content-Type: text/plain
-Date: Tue, 01 Sep 2009 17:13:14 +0100
-Message-Id: <1251821594.3326.91.camel@localhost.localdomain>
-Mime-Version: 1.0
+From: =?iso-8859-2?Q?RISK=D3?= Gergely <gergely@risko.hu>
+To: linux-bluetooth@vger.kernel.org
+Cc: Context Devel mailing list <context-devel@projects.maemo.org>
+Subject: [PATCH] bluez git HEAD doesn't put introspection methods into the introspection output
+Date: Tue, 01 Sep 2009 17:10:08 +0300
+Message-ID: <87eiqq3ge7.fsf@bubble.risko.hu>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-=-="
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2009-08-27 at 11:33 +0200, Till Kamppeter wrote:
-> The new CUPS 1.4.x does device discovery only for a given time frame
-> requested by the client (printer setup tool, "lpinfo" command). CUPS's
-> default for CUPS-1.3.x-ish requests without timeout specification
-> seems to be 10 seconds. CUPS starts all backends at once in the
-> beginning (in parallel) and kills every backend which remains running
-> at the end of the timeout. It accepts output from the backends
-> whenever it occurs not only when the backend finishes, so a backend
-> can search for printers infinitely long if it outputs every found
-> device immediately. Then all printers found during CUPS' timeout are
-> taken into account.
-> 
-> The bluetooth backend of 4.48 asks the Bluetooth daemon for printers
-> and collects results for 10 seconds and after that it outputs
-> them. This takes a total of 10.5 sec and so CUPS kills the backend
-> right before it answers (at least with the 10-second default timeout),
-> resulting in Bluetooth printers never being discovered by CUPS.
-> 
-> This change fixes it by making each new printer added to the list
-> being output immediately. Note that the list structure cannot be
-> removed from cups/main.c as otherwise we would get duplicate
-> listings. Also important is the addition of unbuffered output on
-> stdout.
+--=-=-=
 
-Looks fine to me, although I'd have the stdout unbuffered change in a
-separate patch instead.
+Hi,
 
-Cheers
+I have the following problem:
+4252@17:04 errge@lisa:~$ qdbus --system org.bluez
+/
+Cannot introspect object / at org.bluez:
+org.freedesktop.DBus.Error.UnknownInterface (Interface 'org.freedesktop.DBus.Introspectable' was not found)
+
+This is caused by the fact that:
+  - QtDBus is buggy as hell, :)
+  - BlueZ doesn't include introspection API in the introspection output.
+
+Either of the causes got solved, the whole issue is solved.  After
+checking the code of QtDBus I decided to go with the second.  See the
+attached patch.  After applying it everything works fine:
+4252@17:04 errge@lisa:~$ qdbus --system org.bluez
+/
+/org
+/org/bluez
+/org/bluez/9746
+/org/bluez/9746/any
+/org/bluez/9746/hci0
+/org/bluez/test
+
+If you need clarification or have comments about any of these, please
+don't hesitate to reply!
+
+Thanks in advance,
+Gergely
+
+
+--=-=-=
+Content-Type: text/x-diff
+Content-Disposition: inline; filename=bluez-introspection.diff
+
+diff --git a/gdbus/object.c b/gdbus/object.c
+index 3186921..8091a95 100644
+--- a/gdbus/object.c
++++ b/gdbus/object.c
+@@ -156,6 +156,11 @@ static void generate_introspection_xml(DBusConnection *conn,
+ 	gstr = g_string_new(DBUS_INTROSPECT_1_0_XML_DOCTYPE_DECL_NODE);
+ 
+ 	g_string_append_printf(gstr, "<node name=\"%s\">\n", path);
++	g_string_append_printf(gstr, "\t<interface name=\"org.freedesktop.DBus.Introspectable\">\n");
++	g_string_append_printf(gstr, "\t\t<method name=\"Introspect\">\n");
++	g_string_append_printf(gstr, "\t\t\t<arg name=\"xml_data\" type=\"s\" direction=\"out\"/>\n");
++	g_string_append_printf(gstr, "\t\t</method>\n");
++	g_string_append_printf(gstr, "\t</interface>\n");
+ 
+ 	for (list = data->interfaces; list; list = list->next) {
+ 		struct interface_data *iface = list->data;
+
+--=-=-=--
