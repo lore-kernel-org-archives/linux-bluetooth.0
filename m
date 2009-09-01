@@ -1,67 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?iso-8859-2?Q?RISK=D3?= Gergely <gergely@risko.hu>
-To: linux-bluetooth@vger.kernel.org
-Cc: Context Devel mailing list <context-devel@projects.maemo.org>
-Subject: [PATCH] bluez git HEAD doesn't put introspection methods into the introspection output
-Date: Tue, 01 Sep 2009 17:10:08 +0300
-Message-ID: <87eiqq3ge7.fsf@bubble.risko.hu>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-=-="
+In-Reply-To: <20090901070204.GA27211@jh-x301>
+References: <eb7933e20908270824w2dc3ae2x8257d20d307ce6fd@mail.gmail.com>
+	 <2d5a2c100908271008v67bb1b86xa5ad5ef6e95ba49a@mail.gmail.com>
+	 <20090901070204.GA27211@jh-x301>
+Date: Tue, 1 Sep 2009 14:09:01 +0300
+Message-ID: <eb7933e20909010409x4b85fa1bt162e52ecce028310@mail.gmail.com>
+Subject: Re: [PATCH] AVDTP start/stop handling during disconnection
+From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---=-=-=
+On Tue, Sep 1, 2009 at 10:02 AM, Johan Hedberg<johan.hedberg@nokia.com> wrote:
 
-Hi,
-
-I have the following problem:
-4252@17:04 errge@lisa:~$ qdbus --system org.bluez
-/
-Cannot introspect object / at org.bluez:
-org.freedesktop.DBus.Error.UnknownInterface (Interface 'org.freedesktop.DBus.Introspectable' was not found)
-
-This is caused by the fact that:
-  - QtDBus is buggy as hell, :)
-  - BlueZ doesn't include introspection API in the introspection output.
-
-Either of the causes got solved, the whole issue is solved.  After
-checking the code of QtDBus I decided to go with the second.  See the
-attached patch.  After applying it everything works fine:
-4252@17:04 errge@lisa:~$ qdbus --system org.bluez
-/
-/org
-/org/bluez
-/org/bluez/9746
-/org/bluez/9746/any
-/org/bluez/9746/hci0
-/org/bluez/test
-
-If you need clarification or have comments about any of these, please
-don't hesitate to reply!
-
-Thanks in advance,
-Gergely
+> So Daniel, could you split out the first part of your patch and resend it?
 
 
---=-=-=
-Content-Type: text/x-diff
-Content-Disposition: inline; filename=bluez-introspection.diff
+>From 627850090c93152b8faa3e4a724df24dbc556d4e Mon Sep 17 00:00:00 2001
+From: Daniel Orstadius <daniel.orstadius@gmail.com>
+Date: Tue, 1 Sep 2009 13:55:44 +0300
+Subject: [PATCH] Reject AVDTP START/STOP when disconnecting
 
-diff --git a/gdbus/object.c b/gdbus/object.c
-index 3186921..8091a95 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -156,6 +156,11 @@ static void generate_introspection_xml(DBusConnection *conn,
- 	gstr = g_string_new(DBUS_INTROSPECT_1_0_XML_DOCTYPE_DECL_NODE);
- 
- 	g_string_append_printf(gstr, "<node name=\"%s\">\n", path);
-+	g_string_append_printf(gstr, "\t<interface name=\"org.freedesktop.DBus.Introspectable\">\n");
-+	g_string_append_printf(gstr, "\t\t<method name=\"Introspect\">\n");
-+	g_string_append_printf(gstr, "\t\t\t<arg name=\"xml_data\" type=\"s\" direction=\"out\"/>\n");
-+	g_string_append_printf(gstr, "\t\t</method>\n");
-+	g_string_append_printf(gstr, "\t</interface>\n");
- 
- 	for (list = data->interfaces; list; list = list->next) {
- 		struct interface_data *iface = list->data;
+---
+ audio/avdtp.c |   19 +++++++++++++++++--
+ 1 files changed, 17 insertions(+), 2 deletions(-)
 
---=-=-=--
+diff --git a/audio/avdtp.c b/audio/avdtp.c
+index 8046dda..839f035 100644
+--- a/audio/avdtp.c
++++ b/audio/avdtp.c
+@@ -2223,9 +2223,12 @@ static gboolean request_timeout(gpointer user_data)
+ 		break;
+ 	case AVDTP_CLOSE:
+ 		error("Close request timed out");
+-		if (lsep && lsep->cfm && lsep->cfm->close)
++		if (lsep && lsep->cfm && lsep->cfm->close) {
+ 			lsep->cfm->close(session, lsep, stream, &err,
+ 						lsep->user_data);
++			if (stream)
++				stream->close_int = FALSE;
++		}
+ 		break;
+ 	case AVDTP_SET_CONFIGURATION:
+ 		error("SetConfiguration request timed out");
+@@ -2675,9 +2678,11 @@ static gboolean avdtp_parse_rej(struct avdtp *session,
+ 			return FALSE;
+ 		error("CLOSE request rejected: %s (%d)",
+ 				avdtp_strerror(&err), err.err.error_code);
+-		if (sep && sep->cfm && sep->cfm->close)
++		if (sep && sep->cfm && sep->cfm->close) {
+ 			sep->cfm->close(session, sep, stream, &err,
+ 					sep->user_data);
++			stream->close_int = FALSE;
++		}
+ 		return TRUE;
+ 	case AVDTP_ABORT:
+ 		if (!stream_rej_to_err(buf, size, &err, &acp_seid))
+@@ -3138,6 +3143,11 @@ int avdtp_start(struct avdtp *session, struct
+avdtp_stream *stream)
+ 	if (stream->lsep->state != AVDTP_STATE_OPEN)
+ 		return -EINVAL;
+
++	if (stream->close_int == TRUE) {
++		error("avdtp_start: rejecting start since close is initiated");
++		return -EINVAL;
++	}
++
+ 	memset(&req, 0, sizeof(req));
+ 	req.first_seid.seid = stream->rseid;
+
+@@ -3156,6 +3166,11 @@ int avdtp_close(struct avdtp *session, struct
+avdtp_stream *stream)
+ 	if (stream->lsep->state < AVDTP_STATE_OPEN)
+ 		return -EINVAL;
+
++	if (stream->close_int == TRUE) {
++		error("avdtp_close: rejecting close since it is already inititated");
++		return -EINVAL;
++	}
++
+ 	memset(&req, 0, sizeof(req));
+ 	req.acp_seid = stream->rseid;
+
+-- 
+1.6.0.4
+
+
+Thanks for the feedback.
+
+/Daniel
