@@ -1,67 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset="iso-8859-1"
-Date: Wed, 02 Sep 2009 20:11:54 +0200
-From: "Peter Kornatowski" <pkorn@gmx.net>
-In-Reply-To: <1251902279.3326.1413.camel@localhost.localdomain>
-Message-ID: <20090902181154.125080@gmx.net>
-MIME-Version: 1.0
-References: <20090902115213.61720@gmx.net>
- <1251902279.3326.1413.camel@localhost.localdomain>
-Subject: Re: error in setting speakergain in own application
+From: =?iso-8859-2?Q?RISK=D3?= Gergely <gergely@risko.hu>
 To: linux-bluetooth@vger.kernel.org
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Context Devel mailing list <context-devel@projects.maemo.org>
+Subject: Re: [PATCH] Add introspection interface to the output of  introspection calls.
+References: <87eiqq3ge7.fsf@bubble.risko.hu> <87k50hoee1.fsf@bubble.risko.hu>
+	<2d5a2c100909020746t63bcd89bj1b25d053a6f4f9ca@mail.gmail.com>
+Date: Wed, 02 Sep 2009 20:48:19 +0300
+In-Reply-To: <2d5a2c100909020746t63bcd89bj1b25d053a6f4f9ca@mail.gmail.com>
+	(Luiz Augusto von Dentz's message of "Wed, 2 Sep 2009 11:46:15 -0300")
+Message-ID: <87pra9nspo.fsf@bubble.risko.hu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-2
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
--------- Original-Nachricht --------
-> Datum: Wed, 02 Sep 2009 15:37:59 +0100
-> Von: Bastien Nocera <hadess@hadess.net>
-> An: Peter Kornatowski <pkorn@gmx.net>
-> CC: linux-bluetooth@vger.kernel.org
-> Betreff: Re: error in setting speakergain in own application
+Hi,
 
-> On Wed, 2009-09-02 at 13:52 +0200, Peter Kornatowski wrote:
-> > Hi,
-> > 
-> > I have a linux application where i do some stuff with bluez (4.50) over
-> dbus. I have 3 headsets with which I test (Jabra BT530, Sora B-Speech,
-> official PS3-BT headset) and on all I get the same behaviour/error.
-> > 
-> > I would like to set the speakergain of a headset from my linux-app. I
-> tried two methods:
-> > 
-> > a) call the method "SetProperty":
-> > 
-> > GValue value;
-> > value.g_type = 0; // also tried: value = { 0 };
-> > guint16 ugain = (guint16)gain; // also tried: guint ugain = (guint)gain;
-> > g_value_init(&value, G_TYPE_UINT);
-> > g_value_set_uint(&value, ugain);
-> > dbus_g_proxy_call(proxy, "SetProperty", &error, G_TYPE_STRING,
-> >   "SpeakerGain", G_TYPE_VALUE, &value, G_TYPE_INVALID, G_TYPE_INVALID);
-> 
-> This would work (and you don't need to use a GValue, the call will take
-> care of marshalling the value to the proper type:
-> dbus_g_proxy_call(proxy, "SetProperty", &error, G_TYPE_STRING,
->   "SpeakerGain", G_TYPE_UINT, ugain, G_TYPE_INVALID, G_TYPE_INVALID);
+On Wed, 2 Sep 2009 11:46:15 -0300, Luiz Augusto von Dentz <luiz.dentz@gmail.com> writes:
 
-Thanks for the idea, but now I get the following error:
-Method "SetProperty" with signature "su" on interface "org.bluez.Headset" doesn't exist
+> Hi,
+>
+> On Wed, Sep 2, 2009 at 7:00 AM, RISKÓ Gergely<gergely@risko.hu> wrote:
+>>
+>> ---
+>>  gdbus/object.c |    5 +++++
+>>  1 files changed, 5 insertions(+), 0 deletions(-)
+>>
+>> diff --git a/gdbus/object.c b/gdbus/object.c
+>> index 3186921..8091a95 100644
+>> --- a/gdbus/object.c
+>> +++ b/gdbus/object.c
+>> @@ -156,6 +156,11 @@ static void generate_introspection_xml(DBusConnection *conn,
+>>        gstr = g_string_new(DBUS_INTROSPECT_1_0_XML_DOCTYPE_DECL_NODE);
+>>
+>>        g_string_append_printf(gstr, "<node name=\"%s\">\n", path);
+>> +       g_string_append_printf(gstr, "\t<interface name=\"org.freedesktop.DBus.Introspectable\">\n");
+>> +       g_string_append_printf(gstr, "\t\t<method name=\"Introspect\">\n");
+>> +       g_string_append_printf(gstr, "\t\t\t<arg name=\"xml_data\" type=\"s\" direction=\"out\"/>\n");
+>> +       g_string_append_printf(gstr, "\t\t</method>\n");
+>> +       g_string_append_printf(gstr, "\t</interface>\n");
+>>
+>>        for (list = data->interfaces; list; list = list->next) {
+>>                struct interface_data *iface = list->data;
+>
+> Im afraid this is on purpose, we don't export the introspectable
+> interface because it is implicit you can only have the introspection
+> data if the object export it so it is meaningless to export it again
+> on the .xml. You can check with d-feet that most services does this in
+> the same way.
 
-So the value is not set to the proper type, it still remains "u".
-Do you have any other ideas?
+Thanks for your reply, I appreciate it, however I don't agree after I
+checked.  Probably some time ago this was the custom, but apparently it
+changed.
 
-Greetings, Peter
+About the other services on my home system:
+22975@20:39 risko@bubble:~$ qdbus --system | grep -v '^:'
+ org.freedesktop.Avahi
+ org.freedesktop.Hal
+ org.bluez
+ org.freedesktop.ConsoleKit
+org.freedesktop.DBus
 
-> 
-> > g_value_unset(&value);
-> 
-> Cheers
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
--- 
-Neu: GMX Doppel-FLAT mit Internet-Flatrate + Telefon-Flatrate
-für nur 19,99 Euro/mtl.!* http://portal.gmx.net/de/go/dsl02
+22978@20:42 risko@bubble:~$ for i in `qdbus --system | grep -v '^:'` ; do QDBUS_DEBUG=1 qdbus --system $i 2>&1| grep -q '<interface.*Introspectable' || echo $i; done
+org.bluez
+
+So Avahi, Hal, ConsoleKit and even DBus itself exposes the introspection
+API in the introspection API, the only exception is BlueZ.
+
+And this issue is causing problems for QDBus users everywhere, not just
+for me: https://bugs.launchpad.net/ubuntu/+source/bluez/+bug/371299
+
+The guy who handled the bug report even thought that BlueZ doesn't
+support introspection because of this.
+
+I still think that this is bad, because all of the other common services
+behave the other way around and it is incompatible with some silly
+implementations (QtDBus which I know of, probably others).
+
+If there is any other research I can do, please say so, happy to help,
+Gergely
