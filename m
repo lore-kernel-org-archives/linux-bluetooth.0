@@ -1,41 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?iso-8859-2?Q?RISK=D3?= Gergely <gergely@risko.hu>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Add introspection interface to the output of introspection calls.
-References: <87eiqq3ge7.fsf@bubble.risko.hu>
-Date: Wed, 02 Sep 2009 13:00:06 +0300
-In-Reply-To: <87eiqq3ge7.fsf@bubble.risko.hu> (=?iso-8859-2?Q?=22RISK=D3?=
- Gergely"'s message of
-	"Tue, 01 Sep 2009 17:10:08 +0300")
-Message-ID: <87k50hoee1.fsf@bubble.risko.hu>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: Re: [PATCH] SSP double paring fix: init auth_type with
+ HCI_AT_GENERAL_BONDING
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <508e92ca0907020657o561effbeg1911f8f84af27f37@mail.gmail.com>
+References: <508e92ca0907020657o561effbeg1911f8f84af27f37@mail.gmail.com>
+Content-Type: text/plain
+Date: Wed, 02 Sep 2009 02:50:04 -0700
+Message-Id: <1251885004.1266.57.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Andrei,
 
----
- gdbus/object.c |    5 +++++
- 1 files changed, 5 insertions(+), 0 deletions(-)
+> I have a simple patch which fixes issues with SSP mentioned below.
+> 
+> ---
+>  net/bluetooth/hci_conn.c |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index fa47d5d..d863bda 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -211,6 +211,7 @@ struct hci_conn *hci_conn_add(struct hci_dev
+> *hdev, int type, bdaddr_t *dst)
+>  	conn->type  = type;
+>  	conn->mode  = HCI_CM_ACTIVE;
+>  	conn->state = BT_OPEN;
+> +	conn->auth_type = HCI_AT_GENERAL_BONDING;
+> 
+>  	conn->power_save = 1;
+>  	conn->disc_timeout = HCI_DISCONN_TIMEOUT;
 
-diff --git a/gdbus/object.c b/gdbus/object.c
-index 3186921..8091a95 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -156,6 +156,11 @@ static void generate_introspection_xml(DBusConnection *conn,
- 	gstr = g_string_new(DBUS_INTROSPECT_1_0_XML_DOCTYPE_DECL_NODE);
- 
- 	g_string_append_printf(gstr, "<node name=\"%s\">\n", path);
-+	g_string_append_printf(gstr, "\t<interface name=\"org.freedesktop.DBus.Introspectable\">\n");
-+	g_string_append_printf(gstr, "\t\t<method name=\"Introspect\">\n");
-+	g_string_append_printf(gstr, "\t\t\t<arg name=\"xml_data\" type=\"s\" direction=\"out\"/>\n");
-+	g_string_append_printf(gstr, "\t\t</method>\n");
-+	g_string_append_printf(gstr, "\t</interface>\n");
- 
- 	for (list = data->interfaces; list; list = list->next) {
- 		struct interface_data *iface = list->data;
--- 
-1.6.0.4
+I need a proper patch create with git format-patch that contains a
+detailed commit message.
 
-Sorry about the previous patch, now I have used git format-patch instead
-of attaching the diff by hand.
+Regards
+
+Marcel
+
+
