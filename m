@@ -1,49 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <87k50hoee1.fsf@bubble.risko.hu>
-References: <87eiqq3ge7.fsf@bubble.risko.hu> <87k50hoee1.fsf@bubble.risko.hu>
-Date: Wed, 2 Sep 2009 11:46:15 -0300
-Message-ID: <2d5a2c100909020746t63bcd89bj1b25d053a6f4f9ca@mail.gmail.com>
-Subject: Re: [PATCH] Add introspection interface to the output of
-	introspection calls.
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: =?ISO-8859-1?Q?RISK=D3_Gergely?= <gergely@risko.hu>
+Subject: Re: error in setting speakergain in own application
+From: Bastien Nocera <hadess@hadess.net>
+To: Peter Kornatowski <pkorn@gmx.net>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <20090902115213.61720@gmx.net>
+References: <20090902115213.61720@gmx.net>
+Content-Type: text/plain
+Date: Wed, 02 Sep 2009 15:37:59 +0100
+Message-Id: <1251902279.3326.1413.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Wed, 2009-09-02 at 13:52 +0200, Peter Kornatowski wrote:
+> Hi,
+> 
+> I have a linux application where i do some stuff with bluez (4.50) over dbus. I have 3 headsets with which I test (Jabra BT530, Sora B-Speech, official PS3-BT headset) and on all I get the same behaviour/error.
+> 
+> I would like to set the speakergain of a headset from my linux-app. I tried two methods:
+> 
+> a) call the method "SetProperty":
+> 
+> GValue value;
+> value.g_type = 0; // also tried: value = { 0 };
+> guint16 ugain = (guint16)gain; // also tried: guint ugain = (guint)gain;
+> g_value_init(&value, G_TYPE_UINT);
+> g_value_set_uint(&value, ugain);
+> dbus_g_proxy_call(proxy, "SetProperty", &error, G_TYPE_STRING,
+>   "SpeakerGain", G_TYPE_VALUE, &value, G_TYPE_INVALID, G_TYPE_INVALID);
 
-On Wed, Sep 2, 2009 at 7:00 AM, RISKÓ Gergely<gergely@risko.hu> wrote:
->
-> ---
->  gdbus/object.c |    5 +++++
->  1 files changed, 5 insertions(+), 0 deletions(-)
->
-> diff --git a/gdbus/object.c b/gdbus/object.c
-> index 3186921..8091a95 100644
-> --- a/gdbus/object.c
-> +++ b/gdbus/object.c
-> @@ -156,6 +156,11 @@ static void generate_introspection_xml(DBusConnection *conn,
->        gstr = g_string_new(DBUS_INTROSPECT_1_0_XML_DOCTYPE_DECL_NODE);
->
->        g_string_append_printf(gstr, "<node name=\"%s\">\n", path);
-> +       g_string_append_printf(gstr, "\t<interface name=\"org.freedesktop.DBus.Introspectable\">\n");
-> +       g_string_append_printf(gstr, "\t\t<method name=\"Introspect\">\n");
-> +       g_string_append_printf(gstr, "\t\t\t<arg name=\"xml_data\" type=\"s\" direction=\"out\"/>\n");
-> +       g_string_append_printf(gstr, "\t\t</method>\n");
-> +       g_string_append_printf(gstr, "\t</interface>\n");
->
->        for (list = data->interfaces; list; list = list->next) {
->                struct interface_data *iface = list->data;
+This would work (and you don't need to use a GValue, the call will take
+care of marshalling the value to the proper type:
+dbus_g_proxy_call(proxy, "SetProperty", &error, G_TYPE_STRING,
+  "SpeakerGain", G_TYPE_UINT, ugain, G_TYPE_INVALID, G_TYPE_INVALID);
 
-Im afraid this is on purpose, we don't export the introspectable
-interface because it is implicit you can only have the introspection
-data if the object export it so it is meaningless to export it again
-on the .xml. You can check with d-feet that most services does this in
-the same way.
+> g_value_unset(&value);
 
--- 
-Luiz Augusto von Dentz
-Engenheiro de Computação
+Cheers
+
