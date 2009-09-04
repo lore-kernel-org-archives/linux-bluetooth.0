@@ -1,34 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4AA13234.5060909@charter.net>
-Date: Fri, 04 Sep 2009 11:28:52 -0400
-From: Peter Hurley <phurley@charter.net>
+Subject: hci device configuration and 4.51 build problems
+From: pgodin <pgodin@rheinmetall.ca>
+To: <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain
+Date: Fri, 4 Sep 2009 10:34:09 -0400
+Message-ID: <1252074849.9913.5.camel@p11619>
 MIME-Version: 1.0
-To: Johan Hedberg <johan.hedberg@nokia.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: [4.48] SDP Discovery not reset on error
-References: <4AA08357.7050903@charter.net> <20090904063104.GA23278@jh-x301>
-In-Reply-To: <20090904063104.GA23278@jh-x301>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Johan Hedberg wrote:
-> Hi Peter,
->
->   
-> You might want to take a hcidump output of the second connect failure,
-> i.e. run "hcidump -XV" as root while trying to connect. It would also be
-> interesting to know if this is reproducable with later BlueZ versions like
-> 4.52. I tried to do a few quick tests with it but was unable to reproduce
-> the issue.
->
-> Johan
->
->   
-Thanks, Johan. It hadn't occurred to me that the host controller might 
-be in the inconsistent state in this situation.  I'll work on that.
+Good day,
 
-I hadn't moved to 4.52 yet because I'm still trying to track down what I 
-think is a race condition in avdtp.
+I need some help trying to figure out how to properly configure a usb
+bluetooth dongle at startup.
+I have successfully cross-compiled bluez 4.50 for an arm processor
+using the 2.6.22 kernel on a custom filesystem . It starts using the
+udev rules provided (note that the usb device is always plugged in). I
+need the hci0 device to be up and to allow piscan mode using no
+timeout, no security and no authentification. Is it possible for the
+bluetoothd daemon to configure the device when it starts? I could not
+find any documentation on this matter. Only the main.conf file which
+states that setting DiscoverableTimeout to 0 should make the device
+discoverable forever.
+I can provide extended commands output if needed.
 
-~Peter
+
+Also, I have downloaded the latest version of bluez 4.51. The release
+note states that the build has now been fixed. I tried and I am not
+able to compile it. It seems that the --disable-audio argument to the
+configure script is ignored. When running make all, it tries to
+compile the audio plugin and can't because it needs alsa librairies.
+If someone need further information just let me know. I think this can
+be easily reproduced on any setup.
+
+Thank you in advance
+
