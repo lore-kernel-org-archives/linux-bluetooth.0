@@ -1,30 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 4 Sep 2009 18:56:12 +0300
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Peter Hurley <phurley@charter.net>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: [4.48] SDP Discovery not reset on error
+Message-ID: <20090904155536.GA5889@jh-x301>
+References: <4AA08357.7050903@charter.net> <20090904063104.GA23278@jh-x301> <4AA13234.5060909@charter.net>
 MIME-Version: 1.0
-Date: Fri, 4 Sep 2009 13:42:46 -0300
-Message-ID: <5d223510909040942u7ee2ae0ds96e1321b1fab24b9@mail.gmail.com>
-Subject: choppy audio on ARM
-From: Rafael Seste <rseste@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4AA13234.5060909@charter.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Peter,
 
-A couple of months ago I sent a email about a problem with the
-bluetooth audio on a ARM platform. I have a choppy audio on the
-incoming stream. I still didn't solve this problem but I found a setup
-that this problem doesn't happens.
+On Fri, Sep 04, 2009, Peter Hurley wrote:
+> I hadn't moved to 4.52 yet because I'm still trying to track down what I
+> think is a race condition in avdtp.
 
-My ARM device has only one USB port, so I always connect the BT dongle
-in this port. Last week I bought a USB hub and plug it into the usb
-and the BT dongle in the hub. Miraculously this problem disappeared. I
-removed the hub and tried again and the problem returns.
+Actually that should be an even more important reason to move to 4.52
+since there's at least one AVDTP race condition fix there.
 
-Does anybody has any clue why the USB hub "fixed" this choppy audio???
-Does it use a different USB drivers?
-
-tks in advance
-
--- 
-Rafael S. Seste
+Johan
