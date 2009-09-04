@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: hci device configuration and 4.51 build problems
-From: pgodin <pgodin@rheinmetall.ca>
-To: <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain
-Date: Fri, 4 Sep 2009 10:34:09 -0400
-Message-ID: <1252074849.9913.5.camel@p11619>
 MIME-Version: 1.0
+Date: Fri, 4 Sep 2009 09:58:42 -0400
+Message-ID: <e72c2e480909040658k53f543cbx3dc39025d589a070@mail.gmail.com>
+Subject: hci configuration and 4.51 build problems
+From: Philippe Godin <godp1301@gmail.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -21,7 +21,7 @@ timeout, no security and no authentification. Is it possible for the
 bluetoothd daemon to configure the device when it starts? I could not
 find any documentation on this matter. Only the main.conf file which
 states that setting DiscoverableTimeout to 0 should make the device
-discoverable forever.
+discoverable forever which doesn't work obviously.
 I can provide extended commands output if needed.
 
 
@@ -34,4 +34,3 @@ If someone need further information just let me know. I think this can
 be easily reproduced on any setup.
 
 Thank you in advance
-
