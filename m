@@ -1,28 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"marcel@holtmann.org" <marcel@holtmann.org>
-Date: Mon, 7 Sep 2009 22:30:12 +0530
-Subject: HFP - A2DP in BlueZ
-Message-ID: <44EE5C37ADC36343B0625A05DD408C48506920BA83@CHEXMB-01.global.atheros.com>
+Message-ID: <215809.85886.qm@web94914.mail.in2.yahoo.com>
 References: <177499.67132.qm@web94915.mail.in2.yahoo.com>
- <215809.85886.qm@web94914.mail.in2.yahoo.com>
-In-Reply-To: <215809.85886.qm@web94914.mail.in2.yahoo.com>
-Content-Type: text/plain; charset="us-ascii"
+Date: Mon, 7 Sep 2009 15:26:28 +0530 (IST)
+From: Pavan Savoy <pavan_savoy@yahoo.co.in>
+Subject: Re: promisc mode and broadcast BT sockets
+To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <177499.67132.qm@web94915.mail.in2.yahoo.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel and all,
-I was able to test HFP/A2DP independently.
-Is BlueZ supports multi profiles?
-For example, like A2DP with HFP - When you listen song, if you get a Skype =
-call,
-Stop audio streaming and attend the call and start streaming once the call =
-is disconnected.
+Got it. [not top posting this time around....]
 
-Is this feature available in BlueZ? If so from what version of BlueZ?
-Is some one tried and succeeded with any headset/PC dongle combination.
-Please update.
+----- Original Message ----
+> From: Pavan Savoy <pavan_savoy@yahoo.co.in>
+> To: linux-bluetooth@vger.kernel.org
+> Sent: Friday, 4 September, 2009 5:59:25 PM
+> Subject: promisc mode and broadcast BT sockets
+> 
+> Hi,
+> 
+> I remember that eth0 had some flags which sets the raw sockets into promisc 
+> mode, so that we can receive the sockets on the interface even if we are not the 
+> intended host.
+> does something like this exist for BT sockets ?
+> 
+> If a user-space process is creating the socket, I understand that the process 
+> which does _create, _bind would get the events which it is supposed to, but how 
+> ?
+> 
+> example: I run hcitool scan, and a remote pairing request comes in, would the 
+> hcitool process also have access to the pairing request ?
+> 
+> if YES- then good - my work is done,
+> but if NO -- How do I make it to ? + How do I make it receive if the socket is 
+> created and does in-kernel socket calls [the hacked up way of get_fs/set_fs of 
+> KERNEL_DS].
+> 
+> 
+> Thanks in advance.
+> 
+> 
+>       Love Cricket? Check out live scores, photos, video highlights and more. 
+> Click here http://cricket.yahoo.com
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Thanks,
-Jothi
+
+It does seem that adding all ptypes and all events filter in kernel ['ala hcidump in user-mode] I am able to catch in the events and do get my recvmsg called - unfortunately kernel panicked [may not be a BT issue et. all - just may be i am poor at pointers].
+
+I just want to know, how do I safely implement _send and _recv HCI socket functions in my kernel module ?
+
+regards,
+Pavan
+
+
+
+      Love Cricket? Check out live scores, photos, video highlights and more. Click here http://cricket.yahoo.com
+
