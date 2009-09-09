@@ -1,23 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 9 Sep 2009 20:55:51 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Peter Hurley <phurley@charter.net>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 1/1] Fixed duplicate attempt from device to connect
+	'signalling' channel
+Message-ID: <20090909175551.GA24276@jh-x301>
+References: <20090908222839.GA25653@jh-x301> <1252517135-7753-1-git-send-email-phurley@charter.net>
 MIME-Version: 1.0
-Date: Thu, 10 Sep 2009 06:16:44 +0300
-Message-ID: <5078d8af0909092016g7ba97265yc725537e04a709d5@mail.gmail.com>
-Subject: Source device selection for org.bluez.client.SendFiles
-From: Timothy Madden <terminatorul@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1252517135-7753-1-git-send-email-phurley@charter.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I noticed method SendFiles in org.bluez.client was ignoring the given
-source in the device dictionary passed as argument.
+Hi Peter,
 
-I had to modify the send_files() function in obexd-0.17/client/main.c
-and replace the NULL parameter it was passing on to session_create
-with the given source from the dictionary. Than I could select the
-source device when calling SendFiles from python. Should I send in a
-patch ?
+On Wed, Sep 09, 2009, Peter Hurley wrote:
+> A device may attempt to initiate a duplicate avdtp channel while
+> a host-initiated channel connection is still pending. This
+> situation is referred to as 'XCASE connect:connect' in sink.c and
+> source.c. This fix rejects the device-initiated connection in this
+> circumstance.
+> ---
+>  audio/avdtp.c |   12 ++++++++++++
+>  1 files changed, 12 insertions(+), 0 deletions(-)
 
+Thanks a lot! The patch has been pushed upstream (with a few more very
+minor coding style changes).
 
-Thank you,
-Timothy Madden
+Johan
