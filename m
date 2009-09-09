@@ -1,27 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <508e92ca0909030255g3dfd825dy5062458c7a5cafcb@mail.gmail.com>
-References: <508e92ca0907020657o561effbeg1911f8f84af27f37@mail.gmail.com>
-	 <1251885004.1266.57.camel@localhost.localdomain>
-	 <508e92ca0909030255g3dfd825dy5062458c7a5cafcb@mail.gmail.com>
-Date: Wed, 9 Sep 2009 10:43:56 +0300
-Message-ID: <508e92ca0909090043j365d050cg2715c95fa73cc9b0@mail.gmail.com>
-Subject: Re: [PATCH] SSP double paring fix: init auth_type with
-	HCI_AT_GENERAL_BONDING
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
+Date: Wed, 9 Sep 2009 12:42:52 +0530
+Message-ID: <6887eb5d0909090012w14525861v8e9aed7e86b63b25@mail.gmail.com>
+Subject: ARM Bluez run error
+From: Kartikey Parmar <kartikey2781@gmail.com>
+To: Linux_Arm <linux-arm@lists.arm.linux.org.uk>,
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Dear friends,
 
->> I need a proper patch create with git format-patch that contains a
->> detailed commit message.
->
-> Please check patch attached.
+I have installed linux kernel 2.6.30 and bluez 4.30 on my board.
 
-Have you had time to check the patch?
+I have attached USB Bluetooth adapter with board and trying to get
+adapter id using hci_get_route(NULL) function call.
 
-Regards,
-Andrei
+When it executes my test program it give me error that "No such device".
+
+If I compile same application to execute on my PC, it executes perfectly.
+
+On the board I have copied only libbluetooth.so.2
+
+What will be its remedie?
+
+-- 
+Kartikey Parmar
+R&D Software Engg
+Matrix Telecom Pvt Ltd
+Baroda, Gujarat (India)
+09879095390 (M)
