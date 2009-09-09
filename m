@@ -1,29 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <a70b8cd30908280742k6cdcaa2l3a267661fe1da17d@mail.gmail.com>
-References: <a70b8cd30908280742k6cdcaa2l3a267661fe1da17d@mail.gmail.com>
-Date: Wed, 9 Sep 2009 11:06:11 +0200
-Message-ID: <a70b8cd30909090206h6a851168o8fafff96073bb75d@mail.gmail.com>
-Subject: Re: [PATCH] PS3Remote unpairing and power-saving
-From: "Ruslan N. Marchenko" <rufferson@gmail.com>
-To: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <508e92ca0909030255g3dfd825dy5062458c7a5cafcb@mail.gmail.com>
+References: <508e92ca0907020657o561effbeg1911f8f84af27f37@mail.gmail.com>
+	 <1251885004.1266.57.camel@localhost.localdomain>
+	 <508e92ca0909030255g3dfd825dy5062458c7a5cafcb@mail.gmail.com>
+Date: Wed, 9 Sep 2009 10:43:56 +0300
+Message-ID: <508e92ca0909090043j365d050cg2715c95fa73cc9b0@mail.gmail.com>
+Subject: Re: [PATCH] SSP double paring fix: init auth_type with
+	HCI_AT_GENERAL_BONDING
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Marcel et all,
+Hi Marcel,
 
-2009/8/28, Ruslan N. Marchenko <rufferson@gmail.com>:
-> PS3 BD Remote driver in fakehid is not able to detect remote unpairing, thus
->  not handling it properly.
->  Also it keeps permanent BT link with remote controller, which drains batteries.
+>> I need a proper patch create with git format-patch that contains a
+>> detailed commit message.
 >
+> Please check patch attached.
 
-Will you accept this patch to the mainstream? Because I have further
-ideas and want to know if I should send next patches based on my
-current tree or to send all the diffs again from trunk.
+Have you had time to check the patch?
 
-Thanks and regards.
-
-----
-Looking forward to reading yours.
-     Ruslan N. Marchenko
+Regards,
+Andrei
