@@ -1,35 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20090908222839.GA25653@jh-x301>
-References: <4AA6C556.9050804@charter.net> <20090908222839.GA25653@jh-x301>
-Date: Wed, 9 Sep 2009 09:32:36 -0300
-Message-ID: <2d5a2c100909090532o3475a23fs3a0e3c10d78713af@mail.gmail.com>
-Subject: Re: Fix for audio stream XCASE connect:connect failures
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Peter Hurley <phurley@charter.net>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <a70b8cd30908280742k6cdcaa2l3a267661fe1da17d@mail.gmail.com>
+References: <a70b8cd30908280742k6cdcaa2l3a267661fe1da17d@mail.gmail.com>
+Date: Wed, 9 Sep 2009 11:06:11 +0200
+Message-ID: <a70b8cd30909090206h6a851168o8fafff96073bb75d@mail.gmail.com>
+Subject: Re: [PATCH] PS3Remote unpairing and power-saving
+From: "Ruslan N. Marchenko" <rufferson@gmail.com>
+To: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
 Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hello Marcel et all,
 
-On Tue, Sep 8, 2009 at 7:28 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> - Use /* .. */ for comments instead of //
-> - Make sure your lines are max 80 columns (e.g. shorten the debug message
->  or split it into two lines if necessary)
-> - commit it to your own tree with a descriptive commit message and prepare
->  a patch using "git format-patch". This way it's easy for me to apply it
->  using "git am" and e.g. the author field gets correctly preserved.
+2009/8/28, Ruslan N. Marchenko <rufferson@gmail.com>:
+> PS3 BD Remote driver in fakehid is not able to detect remote unpairing, thus
+>  not handling it properly.
+>  Also it keeps permanent BT link with remote controller, which drains batteries.
 >
 
-Besides this it seems pretty good, please also make sure the DBus
-signals are right, which in this case means we shouldn't emit
-disconnected when dropping the second connection attempt, you can use
-dbus-monitor --system sender='org.bluez'.
+Will you accept this patch to the mainstream? Because I have further
+ideas and want to know if I should send next patches based on my
+current tree or to send all the diffs again from trunk.
 
-Regards,
+Thanks and regards.
 
--- 
-Luiz Augusto von Dentz
-Engenheiro de Computação
+----
+Looking forward to reading yours.
+     Ruslan N. Marchenko
