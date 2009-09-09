@@ -1,48 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4AA7CE83.8010509@charter.net>
+Date: Wed, 09 Sep 2009 11:49:23 -0400
 From: Peter Hurley <phurley@charter.net>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	Peter Hurley <phurley@charter.net>
-Subject: [PATCH 1/1] Fixed duplicate attempt from device to connect 'signalling' channel
-Date: Wed,  9 Sep 2009 13:25:35 -0400
-Message-Id: <1252517135-7753-1-git-send-email-phurley@charter.net>
+MIME-Version: 1.0
+To: Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: Re: Fix for audio stream XCASE connect:connect failures
+References: <4AA6C556.9050804@charter.net> <20090908222839.GA25653@jh-x301>
 In-Reply-To: <20090908222839.GA25653@jh-x301>
-References: <20090908222839.GA25653@jh-x301>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-A device may attempt to initiate a duplicate avdtp channel while
-a host-initiated channel connection is still pending. This
-situation is referred to as 'XCASE connect:connect' in sink.c and
-source.c. This fix rejects the device-initiated connection in this
-circumstance.
----
- audio/avdtp.c |   12 ++++++++++++
- 1 files changed, 12 insertions(+), 0 deletions(-)
+Johan Hedberg wrote:
+> That's some really nice analysis of the situation you've done.
+Thanks.
+> - Use /* .. */ for comments instead of //
+> - Make sure your lines are max 80 columns (e.g. shorten the debug message
+>   or split it into two lines if necessary)
+> - commit it to your own tree with a descriptive commit message and prepare
+>   a patch using "git format-patch". This way it's easy for me to apply it
+>   using "git am" and e.g. the author field gets correctly preserved.
+>   
+Sorry about the style snafus: that's fixed, committed & the patch has 
+been generated.  Since I use T-bird as my email client and that doesn't 
+seem to be going too well with inline patches, I'm setting up Postfix so 
+I can use git send-email.  Just need to get SMTP AUTH working with my ISP...
 
-diff --git a/audio/avdtp.c b/audio/avdtp.c
-index 131ff4f..6cb9e7d 100644
---- a/audio/avdtp.c
-+++ b/audio/avdtp.c
-@@ -2119,6 +2119,18 @@ static void avdtp_confirm_cb(GIOChannel *chan, gpointer data)
- 	if (!session)
- 		goto drop;
- 
-+	/* This state (ie, session is already *connecting*) happens when the
-+	 *  device initiates a connect (really a config'd L2CAP channel) even
-+	 *  though there is a connect we initiated in progress.  In sink.c &
-+	 *  source.c, this state is referred to as XCASE connect:connect.
-+	 * Abort the device's channel in favor of our own.
-+	 */
-+	if (session->state == AVDTP_SESSION_STATE_CONNECTING) {
-+		debug("avdtp_confirm_cb: connect already in progress" \
-+					" (XCASE connect:connect)");
-+		goto drop;
-+	}
-+
- 	if (session->pending_open && session->pending_open->open_acp) {
- 		if (!bt_io_accept(chan, avdtp_connect_cb, session, NULL, NULL))
- 			goto drop;
--- 
-1.6.0.4
+Luiz Augusto von Dentz wrote:
+> ........................ please also make sure the DBus
+> signals are right, which in this case means we shouldn't emit
+> disconnected when dropping the second connection attempt, you can use
+> dbus-monitor --system sender='org.bluez'.
+>   
+I will be sure to double-check that before I mail the patch.  (Shouldn't 
+be a problem because the state change to _CONNECTING on the duplicate 
+connect attempt never happens).
 
+Regards,
+Peter
