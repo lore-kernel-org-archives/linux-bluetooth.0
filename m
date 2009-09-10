@@ -1,59 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1252564369.8931.38.camel@violet>
-References: <5078d8af0909092016g7ba97265yc725537e04a709d5@mail.gmail.com>
-	 <1252564369.8931.38.camel@violet>
-Date: Thu, 10 Sep 2009 18:24:54 +0300
-Message-ID: <5078d8af0909100824k4dbea674u222d138ecd14e5fd@mail.gmail.com>
-Subject: Re: Source device selection for org.bluez.client.SendFiles
-From: Timothy Madden <terminatorul@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-To: unlisted-recipients:; (no To-header on input)
+Subject: [PATCH] bluez-gnome: Fix crash on pairing request of known rfcomm
+ device
+From: Stanislav Brabec <sbrabec@suse.cz>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="ISO-8859-2"
+Date: Thu, 10 Sep 2009 17:10:15 +0200
+Message-Id: <1252595415.3430.17.camel@hammer.suse.cz>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Oh, yes, indeed
+Attached patch fixes crash after access attempt to the device configured
+in rfcomm.conf, but not yet paired.
 
-On Thu, Sep 10, 2009 at 9:32 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Timothy,
->
->> I noticed method SendFiles in org.bluez.client was ignoring the given
->> source in the device dictionary passed as argument.
->>
->> I had to modify the send_files() function in obexd-0.17/client/main.c
->> and replace the NULL parameter it was passing on to session_create
->> with the given source from the dictionary. Than I could select the
->> source device when calling SendFiles from python. Should I send in a
->> patch ?
->
-> you mean something like this:
->
-> commit e1214330b4391d5577e5e2411a6ee34604d6bea4
-> Author: Claudio Takahasi <claudio.takahasi@openbossa.org>
-> Date:   Thu Sep 3 11:17:42 2009 -0300
->
->    Fixed SendFiles to use "Source" argument.
->
->    SendFiles was ignoring "Source" argument and using the default adapter
->    always.
->
-> diff --git a/client/main.c b/client/main.c
-> index e903a75..32eca26 100644
-> --- a/client/main.c
-> +++ b/client/main.c
-> @@ -187,7 +187,7 @@ static DBusMessage *send_files(DBusConnection *connection,
->        data->agent = g_strdup(agent);
->        data->files = files;
->
-> -       if (session_create(NULL, dest, "OPP", channel, create_callback,
-> +       if (session_create(source, dest, "OPP", channel, create_callback,
->                                data) == 0)
->                return NULL;
->
-> Regards
->
-> Marcel
->
->
->
+How to reproduce:
+
+1. Configure an unknown RFCOMM device that requires authentication in
+   rfcomm.conf (e. g. mobile phone).
+2. run pppd on /dev/rfcomm1
+
+Behavior:
+- Pairing request on mobile phone
+- Crash of bluetooth-applet on desktop
+
+The patch fixes only the crash, not the error completely (at least in
+version 1.8). Behavior after the fix:
+- Pairing request on mobile phone, then ask for PIN
+- No reaction on desktop
+
+Signed-off-by: Stanislav Brabec <sbrabec@suse.cz>
+
+Index: bluez-gnome-1.8/common/bluetooth-client.c
+===================================================================
+--- bluez-gnome-1.8.orig/common/bluetooth-client.c
++++ bluez-gnome-1.8/common/bluetooth-client.c
+@@ -330,7 +330,7 @@ static void add_device(DBusGProxy *adapt
+ 		name = value ? g_value_get_string(value) : NULL;
+ 
+ 		value = g_hash_table_lookup(hash, "Class");
+-		type = class_to_type(g_value_get_uint(value));
++		type = value ? class_to_type(g_value_get_uint(value)) : BLUETOOTH_TYPE_ANY;
+ 
+ 		value = g_hash_table_lookup(hash, "Icon");
+ 		icon = value ? g_value_get_string(value) : "bluetooth";
+
+-- 
+Best Regards / S pozdravem,
+
+Stanislav Brabec
+software developer
+---------------------------------------------------------------------
+SUSE LINUX, s. r. o.                          e-mail: sbrabec@suse.cz
+Lihovarská 1060/12           tel: +420 284 028 966, +49 911 740538747
+190 00 Praha 9                                  fax: +420 284 028 951
+Czech Republic                                    http://www.suse.cz/
+
