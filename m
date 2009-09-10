@@ -1,20 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <5c11eae40909101215n438f77c5sbcd289d0b1f77c5f@mail.gmail.com>
-References: <5c11eae40909101215n438f77c5sbcd289d0b1f77c5f@mail.gmail.com>
-Date: Thu, 10 Sep 2009 14:31:58 -0500
-Message-ID: <5c11eae40909101231w18b66f7p13832fc60819c856@mail.gmail.com>
-Subject: Fwd: HDP profile support
-From: Chris Robinson <cckrobinson@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCH 3/3] Hidraw: ioctl to expose 'uniq'
+From: Marcel Holtmann <marcel@holtmann.org>
+To: SephirXV <sephirxv@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-input@vger.kernel.org
+In-Reply-To: <21b895620909101040vd71e774g71ee4a6a04b0f8ca@mail.gmail.com>
+References: <21b895620909101040vd71e774g71ee4a6a04b0f8ca@mail.gmail.com>
+Content-Type: text/plain
+Date: Thu, 10 Sep 2009 19:51:18 +0200
+Message-Id: <1252605078.8931.47.camel@violet>
+Mime-Version: 1.0
+Sender: linux-input-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
-Is there currently a timetable in place for adding the HDP profile to
-Bluez?  I'm doing some concept work for an Android device and one of
-the Bluetooth requirements is to support the HDP profile.
+Hi Christopher,
 
-Thanks,
-Chris Robinson
+> Simple, deterministic way of getting uniq field bound to hidrawN
+> files. Flame me on this one, so long as I get some feedback I can use.
+> 
+> Signed-off-by: Christopher Olson <sephirxv@gmail.com>
+> 
+> ---
+> 
+> --- drivers/hid/hidraw.c        2009-09-10 10:32:28.000000000 -0500
+> +++ drivers/hid/hidraw.c.1      2009-09-10 10:32:13.000000000 -0500
+> @@ -264,6 +264,12 @@ static long hidraw_ioctl(struct file *fi
+>                                         ret = -EFAULT;
+>                                 break;
+>                         }
+> +               case HIDIOCGRAWINFO + 1:        //HIDIOCG_UNIQ
+> +                       {
+> +                               if (copy_to_user(user_arg, dev->hid->uniq, 64))
+> +                                       ret = -EFAULT;
+> +                               break;
+> +                       }
+>                 default:
+>                         ret = -ENOTTY;
+>         }
+
+wrong mailing list to begin with.
+
+Regards
+
+Marcel
+
+
