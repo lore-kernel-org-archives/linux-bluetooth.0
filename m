@@ -1,19 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Madula Sasikiran <Madula.Sasikiran@Atheros.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Fri, 11 Sep 2009 15:30:45 +0530
-Subject: [bluetooth device not working fine]issue with usb core probe at
- hibernate & resume
-Message-ID: <44EE5C37ADC36343B0625A05DD408C48506872FB7C@CHEXMB-01.global.atheros.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Subject: Re: [PATCH] bluez-gnome: Fix crash on pairing request of known
+ rfcomm device
+From: Bastien Nocera <hadess@hadess.net>
+To: Stanislav Brabec <sbrabec@suse.cz>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1252595415.3430.17.camel@hammer.suse.cz>
+References: <1252595415.3430.17.camel@hammer.suse.cz>
+Content-Type: text/plain
+Date: Thu, 10 Sep 2009 16:21:44 +0100
+Message-Id: <1252596104.23937.1329.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Thu, 2009-09-10 at 17:10 +0200, Stanislav Brabec wrote:
+> Attached patch fixes crash after access attempt to the device configured
+> in rfcomm.conf, but not yet paired.
+> 
+> How to reproduce:
+> 
+> 1. Configure an unknown RFCOMM device that requires authentication in
+>    rfcomm.conf (e. g. mobile phone).
+> 2. run pppd on /dev/rfcomm1
+> 
+> Behavior:
+> - Pairing request on mobile phone
+> - Crash of bluetooth-applet on desktop
+> 
+> The patch fixes only the crash, not the error completely (at least in
+> version 1.8). Behavior after the fix:
+> - Pairing request on mobile phone, then ask for PIN
+> - No reaction on desktop
 
-I am a bluetooth developer, came into bluetooth field recently. My bluetooth device is not working fine when I do hibernate and resume in linux 2.6.28 (ubuntu 9.0.4). It is working fine in the older versions. When I debugged the issue I see that when usb core is calling probe for the usb bluetooth dongle and the driver related to that is loading the firmware into the device. When I suspend and resume, usb core is calling probe and the firmware is getting loaded fine. For hibernate resume usb core is not calling probe and firmware is not getting loaded. I would like to know whether it is the issue with the usb core or Do I need to do any changes in the driver for this. Can I call the probe of my usb bluetooth dongle explicitly using any scripts?
+Fixed the same bug in gnome-bluetooth.
 
+Cheers
 
-Thanks,
-Sasikiran.
