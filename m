@@ -1,64 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Fwd: HDP profile support
+Subject: Re: [bluetooth device not working fine]issue with usb core probe
+ at hibernate & resume
 From: Marcel Holtmann <marcel@holtmann.org>
-To: ngh@isomerica.net
-Cc: linux-bluetooth@vger.kernel.org,
-	Chris Robinson <cckrobinson@gmail.com>
-In-Reply-To: <1252612666.30957.42.camel@localhost.localdomain>
-References: <5c11eae40909101215n438f77c5sbcd289d0b1f77c5f@mail.gmail.com>
-	 <5c11eae40909101231w18b66f7p13832fc60819c856@mail.gmail.com>
-	 <1252612666.30957.42.camel@localhost.localdomain>
+To: Madula Sasikiran <Madula.Sasikiran@Atheros.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <44EE5C37ADC36343B0625A05DD408C48506872FB7C@CHEXMB-01.global.atheros.com>
+References: <44EE5C37ADC36343B0625A05DD408C48506872FB7C@CHEXMB-01.global.atheros.com>
 Content-Type: text/plain
-Date: Fri, 11 Sep 2009 13:29:46 +0200
-Message-Id: <1252668586.8931.71.camel@violet>
+Date: Fri, 11 Sep 2009 12:07:00 +0200
+Message-Id: <1252663620.8931.66.camel@violet>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nathan,
+Hi,
 
-> > Is there currently a timetable in place for adding the HDP profile to
-> > Bluez?  I'm doing some concept work for an Android device and one of
-> > the Bluetooth requirements is to support the HDP profile.
-> 
-> Full HDP support (especially on the Android platform) requires a few
-> supporting features that haven't quite made the mainline of development
-> yet.  It is possible--I did so earlier this summer--and the situation
-> has improved drastically due the efforts of various people.
-> 
-> The first step is to get L2CAP enhanced retransmission and streaming
-> mode support in your kernel.  Gustavo Padovan worked on this over the
-> summer for a Google Summer of Code project.  He has done an excellent
-> job taking my initial patches, extending the functionality and cleanly
-> integrating them into the bluetooth-testing kernel.
+> I am a bluetooth developer, came into bluetooth field recently. My bluetooth device is not working fine when I do hibernate and resume in linux 2.6.28 (ubuntu 9.0.4). It is working fine in the older versions. When I debugged the issue I see that when usb core is calling probe for the usb bluetooth dongle and the driver related to that is loading the firmware into the device. When I suspend and resume, usb core is calling probe and the firmware is getting loaded fine. For hibernate resume usb core is not calling probe and firmware is not getting loaded. I would like to know whether it is the issue with the usb core or Do I need to do any changes in the driver for this. Can I call the probe of my usb bluetooth dongle explicitly using any scripts?
 
-they will be in 2.6.32 btw.
-
-> >From there, HDP depends upon the Bluetooth Multi-Channel Adaptation
-> Protocol.  This provides an additional control channel layered on top of
-> L2CAP sockets.  Additionally, some simple SDP work is required (which
-> can use BlueZ's existing SDP services).
-
-The part of MCAP and HDP needs to be done similar to how we did AVDTP
-and AVRCP and thus as a plugin for bluetoothd. Mainly because I assume
-it mostly interact with other system components. So a concept similar to
-obexd is not feasible.
-
-> As for implementation upon Android, there's a bit more work.  The
-> Android kernel (on the Cupcake/Donut branches at least) already includes
-> basic L2CAP statically linked into the kernel.  This causes conflicts
-> when attempting to load a module with Enhanced L2CAP support built in.
-> In order to do so, I've had to build my own kernel and system images,
-> and then flash them to a development phone.  If you go this way, you'll
-> have to backport the applicable patches onto the 2.6.29 kernel used in
-> Donut.  I've never even tried to backport to the 2.6.27 kernel in
-> Cupcake.
-
-Backporting them to 2.6.29 is kinda hard and also a pretty stupid
-endeavorer. I would have to check, but most likely we are talking about
-100 or more patches that would need backporting. If Google would finally
-get their act together and polish and merge patches upstream there would
-have been no problem in just taking a newer upstream kernel.
+and again, re-test against 2.6.31 kernel.
 
 Regards
 
