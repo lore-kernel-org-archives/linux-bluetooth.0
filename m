@@ -1,37 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4AAF2B32.1010304@Atheros.com>
-Date: Tue, 15 Sep 2009 11:20:42 +0530
-From: Sasikiran Maddula <Madula.Sasikiran@Atheros.com>
+Date: Tue, 15 Sep 2009 00:11:45 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: =?iso-8859-1?Q?RISK=D3?= Gergely <gergely@risko.hu>
+Cc: linux-bluetooth@vger.kernel.org,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Context Devel mailing list <context-devel@projects.maemo.org>
+Subject: Re: [PATCH] Add introspection interface to the output of
+	introspection calls.
+Message-ID: <20090914211145.GA16947@jh-x301>
+References: <87eiqq3ge7.fsf@bubble.risko.hu> <87k50hoee1.fsf@bubble.risko.hu> <2d5a2c100909020746t63bcd89bj1b25d053a6f4f9ca@mail.gmail.com> <87pra9nspo.fsf@bubble.risko.hu> <20090914141816.GA17774@jh-x301> <871vm9fuis.fsf@bubble.risko.hu>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [bluetooth device not working fine]issue with usb core probe
- at hibernate & resume
-References: <44EE5C37ADC36343B0625A05DD408C48506872FB7C@CHEXMB-01.global.atheros.com> <1252663620.8931.66.camel@violet>
-In-Reply-To: <1252663620.8931.66.camel@violet>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <871vm9fuis.fsf@bubble.risko.hu>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Gergely,
 
-I verified with the latest kernnel version and it is working very fine. 
-Thanks for your suggestion.
+On Mon, Sep 14, 2009, RISKÓ Gergely wrote:
+> Thank you for all of your advise, here is the result.
+> 
+> BR,
+> Gergely
+> 
+> From 91b64b5cd3b174317bde5f9ccf4cc1d420086eb7 Mon Sep 17 00:00:00 2001
+> From: Gergely Risko <gergely@risko.hu>
+> Date: Mon, 14 Sep 2009 17:46:29 +0300
+> Subject: [PATCH] Add introspection interface description into the DBus introspection replies.
+> 
+> ---
+>  gdbus/object.c |    8 +++++++-
+>  1 files changed, 7 insertions(+), 1 deletions(-)
 
-Thanks,
-Sasikiran.
+Thanks! The patch has now been pushed upstream.
 
-Marcel Holtmann wrote:
-> Hi,
->
->   
->> I am a bluetooth developer, came into bluetooth field recently. My bluetooth device is not working fine when I do hibernate and resume in linux 2.6.28 (ubuntu 9.0.4). It is working fine in the older versions. When I debugged the issue I see that when usb core is calling probe for the usb bluetooth dongle and the driver related to that is loading the firmware into the device. When I suspend and resume, usb core is calling probe and the firmware is getting loaded fine. For hibernate resume usb core is not calling probe and firmware is not getting loaded. I would like to know whether it is the issue with the usb core or Do I need to do any changes in the driver for this. Can I call the probe of my usb bluetooth dongle explicitly using any scripts?
->>     
->
-> and again, re-test against 2.6.31 kernel.
->
-> Regards
->
-> Marcel
->
->
->   
+One thing that came to my mind is that it might be possible to simplify
+the code by making the introspection interface less of a special case
+within gdbus:
+
+Instead of hard coding this XML snippet and handling the Introspect method
+call separately from the rest of the method calls for a particular object
+path gdbus could use its own public interface registration system
+(i.e. g_dbus_register_interface) to implicitly register the Introspectable
+interface as the first interface when creating new object paths. This way
+the existing interface callback mechanism would do most of the work and
+there wouldn't be a need to explicitly add the extra snippet to the XML
+output like your patch now does.
+
+Any thoughts on this?
+
+Johan
