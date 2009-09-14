@@ -1,62 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 14 Sep 2009 17:18:16 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?iso-8859-1?Q?RISK=D3?= Gergely <gergely@risko.hu>
-Cc: linux-bluetooth@vger.kernel.org,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Context Devel mailing list <context-devel@projects.maemo.org>
-Subject: Re: [PATCH] Add introspection interface to the output of
-	introspection calls.
-Message-ID: <20090914141816.GA17774@jh-x301>
-References: <87eiqq3ge7.fsf@bubble.risko.hu> <87k50hoee1.fsf@bubble.risko.hu> <2d5a2c100909020746t63bcd89bj1b25d053a6f4f9ca@mail.gmail.com> <87pra9nspo.fsf@bubble.risko.hu>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <87pra9nspo.fsf@bubble.risko.hu>
+Subject: Re: can we disable/enable eSCO by using setsockopt of sco socket?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Lan Zhu <zhu.lan.cn@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <113d36d80909140452jb808a2bub393aae7307c7450@mail.gmail.com>
+References: <113d36d80909140452jb808a2bub393aae7307c7450@mail.gmail.com>
+Content-Type: text/plain
+Date: Mon, 14 Sep 2009 06:32:34 -0700
+Message-Id: <1252935154.3421.17.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gergely,
+Hi,
 
-On Wed, Sep 02, 2009, RISKÓ Gergely wrote:
-> About the other services on my home system:
-> 22975@20:39 risko@bubble:~$ qdbus --system | grep -v '^:'
->  org.freedesktop.Avahi
->  org.freedesktop.Hal
->  org.bluez
->  org.freedesktop.ConsoleKit
-> org.freedesktop.DBus
+> When we connect a SCO socket, BlueZ decides whether to connect SCO or
+> eSCO type according to the remote feature. If the remote device
+> declares supporting eSCO in the remote feature, BlueZ will select eSCO
+> type to connect with it.
 > 
-> 22978@20:42 risko@bubble:~$ for i in `qdbus --system | grep -v '^:'` ; do QDBUS_DEBUG=1 qdbus --system $i 2>&1| grep -q '<interface.*Introspectable' || echo $i; done
-> org.bluez
+> But in fact  there are some old carkits or headsets which are only
+> support SCO but wrongly declare to support eSCO, such as Motorola
+> HF850 and HS820 which use a very old CSR chip, so we have problem to
+> create sco connection with them.
 > 
-> So Avahi, Hal, ConsoleKit and even DBus itself exposes the introspection
-> API in the introspection API, the only exception is BlueZ.
+> We thought a method to resolve this issue, which is force to create
+> SCO type connection if we find the HFP version of one remote device is
+> less than 1.2. So we need a method to control the SCO type from user
+> space. We want to use setsockopt() functon to do that. The code change
+> in net/bluetooth/sco.c is like below,
 > 
-> And this issue is causing problems for QDBus users everywhere, not just
-> for me: https://bugs.launchpad.net/ubuntu/+source/bluez/+bug/371299
 > 
-> The guy who handled the bug report even thought that BlueZ doesn't
-> support introspection because of this.
+> @@ -653,12 +653,25 @@ static int sco_sock_setsockopt(struct socket *sock, int le
+>  {
+>        struct sock *sk = sock->sk;
+>        int err = 0;
+> +       u32 opt;
 > 
-> I still think that this is bad, because all of the other common services
-> behave the other way around and it is incompatible with some silly
-> implementations (QtDBus which I know of, probably others).
+>        BT_DBG("sk %p", sk);
 > 
-> If there is any other research I can do, please say so, happy to help,
-> Gergely
+>        lock_sock(sk);
+> 
+> +       if (level != SOL_SCO) {
+> +               err = -ENOPROTOOPT;
+> +               return err;
+> +       }
+> +
+>        switch (optname) {
+> +       case BT_DISABLE_ESCO:
+> +               if (get_user(opt, (u32 __user *) optval)) {
+> +                       err = -EFAULT;
+> +                       break;
+> +               }
+> +               disable_esco = opt;
+> +               break;
+>        default:
+>                err = -ENOPROTOOPT;
+>                break;
+> 
+> 
+> Then, in the user space, we can call setsockopt(fd, SOL_SCO,
+> BT_DISABLE_ESCO, &disabled, sizeof(disabled)) to force to connect SCO.
+> 
+> Do you agree with this change?
 
-I agree that it would be good to have this fix in. Since there's no
-official guideline for this and neither solution can be said to be
-completely incorrect I think that we should go with whatever works best
-with existing D-Bus applications, i.e. have the introspection interface
-declared as part of the XML. Could you still do the following please:
+I don't. You first have to prove to me that this change is needed at
+all. Show me the hcidump -X -V connections attempts for these carkits.
 
-- Since the added XML content is fixed, use just one
-  g_string_append_printf call for it (and split the string into multiple
-  lines). Also try to have the lines max 80 columns to adhere to the
-  coding style.
+Also your analysis is wrong. BlueZ doesn't care if the remote headset
+supports eSCO or not. We just care about if our local controller has the
+synchronous setup commands. It is the job of the link manager inside the
+controller firmware to either establish SCO or eSCO. And we do retry
+with SCO if eSCO fails. This sounds more like the case that you have an
+outdated kernel.
 
-- Create a "git am" compatible patch out of the change by commiting it to
-  your tree with a descriptive commit message and then use git format-patch
+Regards
 
-Johan
+Marcel
+
+
