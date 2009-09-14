@@ -1,70 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <5d223510909040942u7ee2ae0ds96e1321b1fab24b9@mail.gmail.com>
-References: <5d223510909040942u7ee2ae0ds96e1321b1fab24b9@mail.gmail.com>
-Date: Mon, 14 Sep 2009 15:17:02 -0300
-Message-ID: <e0ab60670909141117t697926f6gf309b1f24052162b@mail.gmail.com>
-Subject: Re: choppy audio on ARM
-From: Douglas Lopes Pereira <douglaslopespereira@gmail.com>
-To: Rafael Seste <rseste@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org, gustavo@padovan.org
+Subject: [PATCH] Add duplex test case to l2test
+Date: Mon, 14 Sep 2009 14:55:54 -0300
+Message-Id: <1252950954-7585-1-git-send-email-gustavo@las.ic.unicamp.br>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Use a SOCK_NONBLOCK to send and receive at the same time.
+---
+ test/l2test.c |   43 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 42 insertions(+), 1 deletions(-)
 
-On Fri, Sep 4, 2009 at 1:42 PM, Rafael Seste <rseste@gmail.com> wrote:
->
-> Hi all,
->
-> A couple of months ago I sent a email about a problem with the
-> bluetooth audio on a ARM platform. I have a choppy audio on the
-> incoming stream. I still didn't solve this problem but I found a setup
-> that this problem doesn't happens.
->
-> My ARM device has only one USB port, so I always connect the BT dongle
-> in this port. Last week I bought a USB hub and plug it into the usb
-> and the BT dongle in the hub. Miraculously this problem disappeared. I
-> removed the hub and tried again and the problem returns.
->
-> Does anybody has any clue why the USB hub "fixed" this choppy audio???
-> Does it use a different USB drivers?
->
-> tks in advance
->
-> --
-> Rafael S. Seste
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-does anyone has more information on that?
-
-I have the same scenario here. Same kernel modules loaded but audio
-only works if my bluetooth dongle is connected on my external
-self-powered USB Hub.
-
-Check out dmesg output:
-
-- Connecting bluetooth dongle over USB Hub:
-
-usb 1-1: new high speed USB device using orion-ehci and address 19
-usb 1-1: configuration #1 chosen from 1 choice
-hub 1-1:1.0: USB hub found
-hub 1-1:1.0: 4 ports detected
-usb 1-1.3: new full speed USB device using orion-ehci and address 20
-usb 1-1.3: configuration #1 chosen from 1 choice
-
-- Connecting bluetooth directly on Sheeva Plug:
-
-usb 1-1: new full speed USB device using orion-ehci and address 14
-usb 1-1: configuration #1 chosen from 1 choice
-
-The only difference is the high device speed device which is my USB Hub.
-
-Can anyone help me to understand what is happening?
-
-Thanks,
-Douglas
+diff --git a/test/l2test.c b/test/l2test.c
+index a937905..4d25961 100644
+--- a/test/l2test.c
++++ b/test/l2test.c
+@@ -60,6 +60,8 @@ enum {
+ 	LSEND,
+ 	SENDDUMP,
+ 	LSENDDUMP,
++	LSENDRECV,
++	CSENDRECV,
+ 	INFOREQ,
+ 	PAIRING,
+ };
+@@ -775,6 +777,22 @@ static void senddump_mode(int sk)
+ 	dump_mode(sk);
+ }
+ 
++static void send_and_recv_mode(int sk)
++{
++	int flags;
++
++	if ((flags = fcntl(sk, F_GETFL, 0)) < 0)
++		flags = 0;
++	fcntl(sk, F_SETFL, flags | O_NONBLOCK);
++
++	/* fork for duplex channel */
++	if (fork())
++		send_mode(sk);
++	else
++		recv_mode(sk);
++	return;
++}
++
+ static void reconnect_mode(char *svr)
+ {
+ 	while (1) {
+@@ -1024,6 +1042,8 @@ static void usage(void)
+ 		"\t-w listen and send\n"
+ 		"\t-d listen and dump incoming data\n"
+ 		"\t-x listen, then send, then dump incoming data\n"
++		"\t-t listen, then send and receive at the same time\n"
++		"\t-q connect, then send and receive at the same time\n"
+ 		"\t-s connect and send\n"
+ 		"\t-u connect and receive\n"
+ 		"\t-n connect and be silent\n"
+@@ -1060,7 +1080,7 @@ int main(int argc, char *argv[])
+ 
+ 	bacpy(&bdaddr, BDADDR_ANY);
+ 
+-	while ((opt=getopt(argc,argv,"rdscuwmnxyzpb:i:P:I:O:B:N:L:W:C:D:X:F:RGAESMT")) != EOF) {
++	while ((opt=getopt(argc,argv,"rdscuwmntqxyzpb:i:P:I:O:B:N:L:W:C:D:X:F:RGAESMT")) != EOF) {
+ 		switch(opt) {
+ 		case 'r':
+ 			mode = RECV;
+@@ -1099,6 +1119,15 @@ int main(int argc, char *argv[])
+ 			need_addr = 1;
+ 			break;
+ 
++		case 't':
++			mode = LSENDRECV;
++			break;
++
++		case 'q':
++			mode = CSENDRECV;
++			need_addr = 1;
++			break;
++
+ 		case 'x':
+ 			mode = LSENDDUMP;
+ 			break;
+@@ -1281,6 +1310,18 @@ int main(int argc, char *argv[])
+ 			do_listen(senddump_mode);
+ 			break;
+ 
++		case LSENDRECV:
++			do_listen(send_and_recv_mode);
++			break;
++
++		case CSENDRECV:
++			sk = do_connect(argv[optind]);
++			if (sk < 0)
++				exit(1);
++
++			send_and_recv_mode(sk);
++			break;
++
+ 		case INFOREQ:
+ 			info_request(argv[optind]);
+ 			exit(0);
+-- 
+1.6.3.3
