@@ -1,47 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: RE: ioctl(RFCOMMCREATEDEV) failed: File descriptor in bad state
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Zhang, Zhenhua" <zhenhua.zhang@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <0463F45F3606F4428ED35AC8C709F92E089A416114@pdsmsx502.ccr.corp.intel.com>
-References: <0463F45F3606F4428ED35AC8C709F92E089A4160F9@pdsmsx502.ccr.corp.intel.com>
-	 <1252926108.3421.5.camel@localhost.localdomain>
-	 <0463F45F3606F4428ED35AC8C709F92E089A416114@pdsmsx502.ccr.corp.intel.com>
-Content-Type: text/plain
-Date: Mon, 14 Sep 2009 06:28:20 -0700
-Message-Id: <1252934900.3421.12.camel@localhost.localdomain>
-Mime-Version: 1.0
+Date: Mon, 14 Sep 2009 15:13:45 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Sasikiran Maddula <Madula.Sasikiran@Atheros.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Bluez stack issue with sco after headset profile disconnect
+Message-ID: <20090914121345.GA3276@jh-x301>
+References: <4AAA55D0.1050505@Atheros.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4AAA55D0.1050505@Atheros.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Sasikiran,
 
-> >> I am calling ioctl(RFCOMMCREATEDEV) to create tty device from a
-> >> rfcomm fd using hands-free profile. If the HF send connection
-> >> request to AG and make rfcomm connect, the tty could be made
-> >> successfully. However, if the AG(mobile) side make request to create
-> >> rfcomm connection, the rfcomm could be created but fail to create
-> >> the tty device. The kernel returns error because socket is not
-> >> connected, see below code. Any idea? Thanks much! 
-> > 
-> > why do you wanna create the TTY in the first place? Going via the TTY
-> > layer is pretty bad idea. Don't even think about doing that. Use the
-> > RFCOMM socket.
->
-> I want to create TTY and expose it to Ofono as /dev/rfcomm0. Ofono side 
-> could treat bluetooth connection as a TTY device, and create 
-> GAtChat *chat by using g_at_chat_new_from_tty(tty, syntax).
+On Fri, Sep 11, 2009, Sasikiran Maddula wrote:
+> I verified with different dongles in linux. The behavior is same in all  
+> the cases. Firstly we will connect the headset using headset profile. We  
+> will start skype call / some other sco connection. We will disconnect  
+> the headset service from the headset profile. hcitool con says sco  
+> connection is still available after disconnection successful. So, some  
+> body suggest me how to stop the sco connection when we disconnect the  
+> service.
 
-and that is just wrong to begin with. Write an oFono plugin that uses
-Bluetooth RFCOMM sockets directly. I really don't understand why you
-wanna make your life so complicated. Within oFono you have to do a
-non-blocking RFCOMM connect() anyway using GIOChannel. And once you have
-the GIOChannel you can just hand it to g_at_chat_new(). Plain and
-simple. Just extend modemconf.c to support a "bluetooth" driver and then
-you can even configure address and channel.
+You haven't mentioned which bluez and kernel versions you use but there
+was a bug like this which got fixed. The fix was to call shutdown() before
+close() for the SCO socket in bluetoothd (to force a disconnection even
+though other processes, like skype, have copy of the socket), and add a
+proper shutdown handler for SCO sockets on the kernel side. So you need
+both the userspace fix (part of bluez since 4.42) as well as the kernel
+fix. I'm not sure exactly which kernel version is needed but maybe Marcel
+has an idea.
 
-Regards
+bluez patch:
+http://git.kernel.org/?p=bluetooth/bluez.git;a=commitdiff;h=45873a73136b4c76353e445b8c6891b99dff89ce
+kernel patch:
+http://git.kernel.org/?p=linux/kernel/git/holtmann/bluetooth-testing.git;a=commitdiff;h=a0ed7b886953a1953d4aa6b3357c06096adb9cc7
 
-Marcel
-
-
+Johan
