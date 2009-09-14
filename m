@@ -1,32 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: ioctl(RFCOMMCREATEDEV) failed: File descriptor in bad state
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Zhang, Zhenhua" <zhenhua.zhang@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <0463F45F3606F4428ED35AC8C709F92E089A4160F9@pdsmsx502.ccr.corp.intel.com>
-References: <0463F45F3606F4428ED35AC8C709F92E089A4160F9@pdsmsx502.ccr.corp.intel.com>
-Content-Type: text/plain
-Date: Mon, 14 Sep 2009 04:01:48 -0700
-Message-Id: <1252926108.3421.5.camel@localhost.localdomain>
-Mime-Version: 1.0
+From: "Zhang, Zhenhua" <zhenhua.zhang@intel.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 14 Sep 2009 18:02:03 +0800
+Subject: ioctl(RFCOMMCREATEDEV) failed: File descriptor in bad state
+Message-ID: <0463F45F3606F4428ED35AC8C709F92E089A4160F9@pdsmsx502.ccr.corp.intel.com>
+Content-Type: text/plain; charset="gb2312"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-> I am calling ioctl(RFCOMMCREATEDEV) to create tty device from a rfcomm fd 
-> using hands-free profile. If the HF send connection request to AG and make
-> rfcomm connect, the tty could be made successfully. However, if the 
-> AG(mobile) side make request to create rfcomm connection, the rfcomm could
-> be created but fail to create the tty device. The kernel returns error 
-> because socket is not connected, see below code. Any idea? Thanks much!
-
-why do you wanna create the TTY in the first place? Going via the TTY
-layer is pretty bad idea. Don't even think about doing that. Use the
-RFCOMM socket.
-
-Regards
-
-Marcel
-
-
+RGVhciBhbGwsDQoNCkkgYW0gY2FsbGluZyBpb2N0bChSRkNPTU1DUkVBVEVERVYpIHRvIGNyZWF0
+ZSB0dHkgZGV2aWNlIGZyb20gYSByZmNvbW0gZmQgDQp1c2luZyBoYW5kcy1mcmVlIHByb2ZpbGUu
+IElmIHRoZSBIRiBzZW5kIGNvbm5lY3Rpb24gcmVxdWVzdCB0byBBRyBhbmQgbWFrZQ0KcmZjb21t
+IGNvbm5lY3QsIHRoZSB0dHkgY291bGQgYmUgbWFkZSBzdWNjZXNzZnVsbHkuIEhvd2V2ZXIsIGlm
+IHRoZSANCkFHKG1vYmlsZSkgc2lkZSBtYWtlIHJlcXVlc3QgdG8gY3JlYXRlIHJmY29tbSBjb25u
+ZWN0aW9uLCB0aGUgcmZjb21tIGNvdWxkDQpiZSBjcmVhdGVkIGJ1dCBmYWlsIHRvIGNyZWF0ZSB0
+aGUgdHR5IGRldmljZS4gVGhlIGtlcm5lbCByZXR1cm5zIGVycm9yIA0KYmVjYXVzZSBzb2NrZXQg
+aXMgbm90IGNvbm5lY3RlZCwgc2VlIGJlbG93IGNvZGUuIEFueSBpZGVhPyBUaGFua3MgbXVjaCEN
+CiANCiAgICAgaWYgKHJlcS5mbGFncyAmICgxIDw8IFJGQ09NTV9SRVVTRV9ETEMpKSB7DQogICAg
+ICAgICAgICAgICAvKiBTb2NrZXQgbXVzdCBiZSBjb25uZWN0ZWQgKi8NCiAgICAgICAgICAgICAg
+IGlmIChzay0+c2tfc3RhdGUgIT0gQlRfQ09OTkVDVEVEKQ0KICAgICAgICAgICAgICAgICAgICAg
+ICAgcmV0dXJuIC1FQkFERkQ7DQogICAgICAgICAgICAgICANCg0KVGhlIHBzZXVkbyBjb2RlIGxv
+Z2ljIGxvb2tzIGxpa2UgdGhpczoNCg0Kdm9pZCByZmNvbW1fY29ubmVjdF9jYihHSU9DaGFubmVs
+ICpyZmNvbW0sIEdFcnJvciAqZXJyLA0KCQkJCWdwb2ludGVyIHVzZXJfZGF0YSkNCnsNCgkuLi4N
+CgliYTJzdHIoJmRldi0+c3JjLCBzcmMpOw0KCWJhMnN0cigmZGV2LT5kc3QsIGRzdCk7CQ0KCQ0K
+CS8qIG1ha2UgL2Rldi9yZmNvbW0gc2VyaWFsIHBvcnQgZnJvbSByZmNvbW0gKi8NCgltZW1zZXQo
+JnJlcSwgMCwgc2l6ZW9mKHJlcSkpOw0KCXJlcS5kZXZfaWQgPSAtMTsNCglyZXEuZmxhZ3MgPSAo
+MSA8PCBSRkNPTU1fUkVVU0VfRExDKTsgICAgICAgIDwtLS1zZXQgUkZDT01NX1JFVVNFX0RMQyBm
+bGFnDQoJYmFjcHkoJnJlcS5zcmMsICZkZXYtPnNyYyk7DQoJYmFjcHkoJnJlcS5kc3QsICZkZXYt
+PmRzdCk7DQoJcmVxLmNoYW5uZWwgPSBndy0+Y2hhbm5lbDsNCglzayA9IGdfaW9fY2hhbm5lbF91
+bml4X2dldF9mZChyZmNvbW0pOw0KCWlkID0gaW9jdGwoc2ssIFJGQ09NTUNSRUFURURFViwgJnJl
+cSk7DQoJaWYgKGlkIDwgMCkgew0KCSAgICBpbnQgZXJyID0gZXJybm87ICAgICAgICAgICAgICAg
+ICAgIDwtLS1yZXR1cm4gZXJybm8gNzcNCgkgICAgZXJyb3IoImlvY3RsKFJGQ09NTUNSRUFURURF
+VikgZmFpbGVkOiAlcyAoJWQpIiwgc3RyZXJyb3IoZXJyKSwgZXJyKTsNCgkgICAgZ19pb19jaGFu
+bmVsX3NodXRkb3duKHJmY29tbSwgVFJVRSwgTlVMTCk7DQoJCWdfaW9fY2hhbm5lbF91bnJlZihy
+ZmNvbW0pOw0KCQlndy0+cmZjb21tID0gTlVMTDsNCgkJZ290byBmYWlsOw0KCX0NCglndy0+cmZj
+b21tID0gZ19pb19jaGFubmVsX3JlZihyZmNvbW0pOw0KDQoJZ3ctPnJmY29tbV9pZCA9IGlkOw0K
+CWd3LT50dHkgPSBnX3N0cmR1cF9wcmludGYoIi9kZXYvcmZjb21tJWQiLCBpZCk7DQoNCmZhaWxl
+ZDoNCglyZXR1cm47DQp9DQoNCnN0YXRpYyB2b2lkIGhmX2lvX2NiKC4uLikNCnsNCglidF9pb19n
+ZXQoY2hhbiwgQlRfSU9fUkZDT01NLCAmZXJyLA0KCQkJQlRfSU9fT1BUX1NPVVJDRV9CREFERFIs
+ICZzcmMsDQoJCQlCVF9JT19PUFRfREVTVF9CREFERFIsICZkc3QsDQoJCQlCVF9JT19PUFRfQ0hB
+Tk5FTCwgJmNoLA0KCQkJQlRfSU9fT1BUX0lOVkFMSUQpOw0KCQ0KCS8vcmVxdWVzdCBhdXRob3Jp
+emF0aW9uDQoJaWYgKCFidF9pb19hY2NlcHQoZ3ctPnJmY29tbSwgcmZjb21tX2Nvbm5lY3RfY2Is
+IGRldiwgTlVMTCwNCgkJCQkJCQkmZXJyKSkgew0KCQllcnJvcigiYnRfaW9fYWNjZXB0OiAlcyIs
+IGVyci0+bWVzc2FnZSk7DQoJCWdfZXJyb3JfZnJlZShlcnIpOwkJDQoJfQ0KDQp9DQoNClJlZ2Fy
+ZHMsDQpaaGVuaHVhDQogDQo=
