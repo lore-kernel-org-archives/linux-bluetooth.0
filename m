@@ -1,146 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
+From: =?iso-8859-2?Q?RISK=D3?= Gergely <gergely@risko.hu>
+To: linux-bluetooth@vger.kernel.org,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Context Devel mailing list <context-devel@projects.maemo.org>
+Subject: Re: [PATCH] Add introspection interface to the output of introspection calls.
+References: <87eiqq3ge7.fsf@bubble.risko.hu> <87k50hoee1.fsf@bubble.risko.hu>
+	<2d5a2c100909020746t63bcd89bj1b25d053a6f4f9ca@mail.gmail.com>
+	<87pra9nspo.fsf@bubble.risko.hu> <20090914141816.GA17774@jh-x301>
+Date: Mon, 14 Sep 2009 17:52:43 +0300
+In-Reply-To: <20090914141816.GA17774@jh-x301> (Johan Hedberg's message of
+	"Mon, 14 Sep 2009 17:18:16 +0300")
+Message-ID: <871vm9fuis.fsf@bubble.risko.hu>
 MIME-Version: 1.0
-In-Reply-To: <1252935154.3421.17.camel@localhost.localdomain>
-References: <113d36d80909140452jb808a2bub393aae7307c7450@mail.gmail.com>
-	 <1252935154.3421.17.camel@localhost.localdomain>
-Date: Mon, 14 Sep 2009 23:29:07 +0800
-Message-ID: <113d36d80909140829g74828077tfd1a56348abcc916@mail.gmail.com>
-Subject: Re: can we disable/enable eSCO by using setsockopt of sco socket?
-From: Lan Zhu <zhu.lan.cn@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Johan,
 
-2009/9/14 Marcel Holtmann <marcel@holtmann.org>:
-> Hi,
->
->> When we connect a SCO socket, BlueZ decides whether to connect SCO or
->> eSCO type according to the remote feature. If the remote device
->> declares supporting eSCO in the remote feature, BlueZ will select eSCO
->> type to connect with it.
->>
->> But in fact =A0there are some old carkits or headsets which are only
->> support SCO but wrongly declare to support eSCO, such as Motorola
->> HF850 and HS820 which use a very old CSR chip, so we have problem to
->> create sco connection with them.
->>
->> We thought a method to resolve this issue, which is force to create
->> SCO type connection if we find the HFP version of one remote device is
->> less than 1.2. So we need a method to control the SCO type from user
->> space. We want to use setsockopt() functon to do that. The code change
->> in net/bluetooth/sco.c is like below,
->>
->>
->> @@ -653,12 +653,25 @@ static int sco_sock_setsockopt(struct socket *sock=
-, int le
->> =A0{
->> =A0 =A0 =A0 =A0struct sock *sk =3D sock->sk;
->> =A0 =A0 =A0 =A0int err =3D 0;
->> + =A0 =A0 =A0 u32 opt;
->>
->> =A0 =A0 =A0 =A0BT_DBG("sk %p", sk);
->>
->> =A0 =A0 =A0 =A0lock_sock(sk);
->>
->> + =A0 =A0 =A0 if (level !=3D SOL_SCO) {
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 err =3D -ENOPROTOOPT;
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return err;
->> + =A0 =A0 =A0 }
->> +
->> =A0 =A0 =A0 =A0switch (optname) {
->> + =A0 =A0 =A0 case BT_DISABLE_ESCO:
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (get_user(opt, (u32 __user *) optval)) =
-{
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 err =3D -EFAULT;
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 disable_esco =3D opt;
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
->> =A0 =A0 =A0 =A0default:
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0err =3D -ENOPROTOOPT;
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break;
->>
->>
->> Then, in the user space, we can call setsockopt(fd, SOL_SCO,
->> BT_DISABLE_ESCO, &disabled, sizeof(disabled)) to force to connect SCO.
->>
->> Do you agree with this change?
->
-> I don't. You first have to prove to me that this change is needed at
-> all. Show me the hcidump -X -V connections attempts for these carkits.
->
-> Also your analysis is wrong. BlueZ doesn't care if the remote headset
-> supports eSCO or not. We just care about if our local controller has the
-> synchronous setup commands. It is the job of the link manager inside the
-> controller firmware to either establish SCO or eSCO. And we do retry
-> with SCO if eSCO fails. This sounds more like the case that you have an
-> outdated kernel.
->
-> Regards
->
-> Marcel
->
->
->
+On Mon, 14 Sep 2009 17:18:16 +0300, Johan Hedberg <johan.hedberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> writes:
 
-Please excuse me for my inaccurate description. Actually it is LMP
-layer to check the remote feature then decide which SCO type shall be
-setup. So, if one remote device wrongly declare to support eSCO, it
-will cause problem. I do know you have a retry mechanism to retry SCO
-if eSCO failed, it is in below code in net/bluetooth/hci_event.c,
-right?
+> declared as part of the XML. Could you still do the following please:
 
-	case 0x1c:	/* SCO interval rejected */
-	case 0x1f:	/* Unspecified error */
-		if (conn->out && conn->attempt < 2) {
-			conn->pkt_type =3D (hdev->esco_type & SCO_ESCO_MASK) |
-					(hdev->esco_type & EDR_ESCO_MASK);
-			hci_setup_sync(conn, conn->link->handle);
-			goto unlock;
-		}
-		/* fall through */
+Thank you for all of your advise, here is the result.
 
-But the problem is, not all the returned error code can bring retry
-SCO. So, we still got problem when connecting some devices because it
-returns some error code else.
+BR,
+Gergely
 
-This is the hcidump log when we test SCO with HF850 carkit.
+>From 91b64b5cd3b174317bde5f9ccf4cc1d420086eb7 Mon Sep 17 00:00:00 2001
+From: Gergely Risko <gergely@risko.hu>
+Date: Mon, 14 Sep 2009 17:46:29 +0300
+Subject: [PATCH] Add introspection interface description into the DBus introspection replies.
 
-2009-09-03 17:26:29.093601 < HCI Command: Setup Synchronous Connection (0x0=
-1|0x0
-028) plen 17
-    handle 1 voice setting 0x0060
-2009-09-03 17:26:29.094608 > HCI Event: Command Status (0x0f) plen 4
-    Setup Synchronous Connection (0x01|0x0028) status 0x00 ncmd 1
-2009-09-03 17:26:34.190952 > HCI Event: Synchronous Connect Complete (0x2c)=
- plen
- 17
-    status 0x10 handle 257 bdaddr 00:50:CD:20:BA:E6 type eSCO
-    Error: Connection Accept Timeout Exceeded
-2009-09-03 17:26:34.191196 < HCI Command: Setup Synchronous Connection (0x0=
-1|0x0
-028) plen 17
-    handle 1 voice setting 0x0060
+---
+ gdbus/object.c |    8 +++++++-
+ 1 files changed, 7 insertions(+), 1 deletions(-)
 
->From the log you can see, the eSCO connection failed in 5 seconds with
-the error "0x10 Timeout Exceeded", and it do not retry SCO again.
+diff --git a/gdbus/object.c b/gdbus/object.c
+index 3186921..811c2e1 100644
+--- a/gdbus/object.c
++++ b/gdbus/object.c
+@@ -155,7 +155,13 @@ static void generate_introspection_xml(DBusConnection *conn,
+ 
+ 	gstr = g_string_new(DBUS_INTROSPECT_1_0_XML_DOCTYPE_DECL_NODE);
+ 
+-	g_string_append_printf(gstr, "<node name=\"%s\">\n", path);
++	g_string_append_printf(gstr,
++		"<node name=\"%s\">\n"
++		"\t<interface name=\"org.freedesktop.DBus.Introspectable\">\n"
++		"\t\t<method name=\"Introspect\">\n"
++		"\t\t\t<arg name=\"xml_data\" type=\"s\" direction=\"out\"/>\n"
++		"\t\t</method>\n"
++		"\t</interface>\n", path);
+ 
+ 	for (list = data->interfaces; list; list = list->next) {
+ 		struct interface_data *iface = list->data;
+-- 
+1.6.0.4
 
-In order to resolve such issue, we have thought about two methods to
-resolve this.
-
-The first one is, add a new case for "0x10" error code and then retry
-SCO. We do have tested this, SCO can be setup, but the 5 seconds delay
-can not be eliminated.
-
-The second one is, we hope to force to use the sco type of SCO for
-some special devices which have compatible issue with eSCO. We can
-force to connect SCO by calling hci_add_sco() or hci_setup_sync() with
-limited pkt_type for those kind of devices. This is why we want to add
-a DISABLE_ESCO option into setsockopt() function.
-
-
-Thank you,
-Zhu Lan
