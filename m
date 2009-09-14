@@ -1,105 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, gustavo@padovan.org
-Subject: [PATCH] Add duplex test case to l2test
-Date: Mon, 14 Sep 2009 14:55:54 -0300
-Message-Id: <1252950954-7585-1-git-send-email-gustavo@las.ic.unicamp.br>
+From: Mike Frysinger <vapier@gentoo.org>
+To: linux-bluetooth@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-kernel@vger.kernel.org, Michael Hennerich <michael.hennerich@analog.com>
+Subject: [PATCH v2] [Bluetooth] redo checks in IRQ handler for shared IRQ support
+Date: Mon, 14 Sep 2009 13:43:49 -0400
+Message-Id: <1252950229-9629-1-git-send-email-vapier@gentoo.org>
+In-Reply-To: <1252905504-26666-1-git-send-email-vapier@gentoo.org>
+References: <1252905504-26666-1-git-send-email-vapier@gentoo.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use a SOCK_NONBLOCK to send and receive at the same time.
----
- test/l2test.c |   43 ++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 42 insertions(+), 1 deletions(-)
+Commit ac019360fe3 changed the irq handler logic to BUG_ON rather than
+returning IRQ_NONE when the incoming argument is invalid.  While this
+works in most cases, it doesn't work when the IRQ is shared with other
+devices (or when DEBUG_SHIRQ is enabled).
 
-diff --git a/test/l2test.c b/test/l2test.c
-index a937905..4d25961 100644
---- a/test/l2test.c
-+++ b/test/l2test.c
-@@ -60,6 +60,8 @@ enum {
- 	LSEND,
- 	SENDDUMP,
- 	LSENDDUMP,
-+	LSENDRECV,
-+	CSENDRECV,
- 	INFOREQ,
- 	PAIRING,
- };
-@@ -775,6 +777,22 @@ static void senddump_mode(int sk)
- 	dump_mode(sk);
- }
+So revert the previous change and replace the warning message with a
+comment explaining that we want this behavior.
+
+Signed-off-by: Michael Hennerich <michael.hennerich@analog.com>
+Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+---
+v2
+	- tweak commit log to not use git-revert
+
+ drivers/bluetooth/bluecard_cs.c |    4 +++-
+ drivers/bluetooth/bt3c_cs.c     |    4 +++-
+ drivers/bluetooth/btuart_cs.c   |    4 +++-
+ drivers/bluetooth/dtl1_cs.c     |    4 +++-
+ 4 files changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/bluetooth/bluecard_cs.c b/drivers/bluetooth/bluecard_cs.c
+index b0e569b..a3a8f4d 100644
+--- a/drivers/bluetooth/bluecard_cs.c
++++ b/drivers/bluetooth/bluecard_cs.c
+@@ -503,7 +503,9 @@ static irqreturn_t bluecard_interrupt(int irq, void *dev_inst)
+ 	unsigned int iobase;
+ 	unsigned char reg;
  
-+static void send_and_recv_mode(int sk)
-+{
-+	int flags;
-+
-+	if ((flags = fcntl(sk, F_GETFL, 0)) < 0)
-+		flags = 0;
-+	fcntl(sk, F_SETFL, flags | O_NONBLOCK);
-+
-+	/* fork for duplex channel */
-+	if (fork())
-+		send_mode(sk);
-+	else
-+		recv_mode(sk);
-+	return;
-+}
-+
- static void reconnect_mode(char *svr)
- {
- 	while (1) {
-@@ -1024,6 +1042,8 @@ static void usage(void)
- 		"\t-w listen and send\n"
- 		"\t-d listen and dump incoming data\n"
- 		"\t-x listen, then send, then dump incoming data\n"
-+		"\t-t listen, then send and receive at the same time\n"
-+		"\t-q connect, then send and receive at the same time\n"
- 		"\t-s connect and send\n"
- 		"\t-u connect and receive\n"
- 		"\t-n connect and be silent\n"
-@@ -1060,7 +1080,7 @@ int main(int argc, char *argv[])
+-	BUG_ON(!info->hdev);
++	if (!info || !info->hdev)
++		/* our irq handler is shared */
++		return IRQ_NONE;
  
- 	bacpy(&bdaddr, BDADDR_ANY);
+ 	if (!test_bit(CARD_READY, &(info->hw_state)))
+ 		return IRQ_HANDLED;
+diff --git a/drivers/bluetooth/bt3c_cs.c b/drivers/bluetooth/bt3c_cs.c
+index d58e22b..9a7578e 100644
+--- a/drivers/bluetooth/bt3c_cs.c
++++ b/drivers/bluetooth/bt3c_cs.c
+@@ -345,7 +345,9 @@ static irqreturn_t bt3c_interrupt(int irq, void *dev_inst)
+ 	int iir;
+ 	irqreturn_t r = IRQ_NONE;
  
--	while ((opt=getopt(argc,argv,"rdscuwmnxyzpb:i:P:I:O:B:N:L:W:C:D:X:F:RGAESMT")) != EOF) {
-+	while ((opt=getopt(argc,argv,"rdscuwmntqxyzpb:i:P:I:O:B:N:L:W:C:D:X:F:RGAESMT")) != EOF) {
- 		switch(opt) {
- 		case 'r':
- 			mode = RECV;
-@@ -1099,6 +1119,15 @@ int main(int argc, char *argv[])
- 			need_addr = 1;
- 			break;
+-	BUG_ON(!info->hdev);
++	if (!info || !info->hdev)
++		/* our irq handler is shared */
++		return IRQ_NONE;
  
-+		case 't':
-+			mode = LSENDRECV;
-+			break;
-+
-+		case 'q':
-+			mode = CSENDRECV;
-+			need_addr = 1;
-+			break;
-+
- 		case 'x':
- 			mode = LSENDDUMP;
- 			break;
-@@ -1281,6 +1310,18 @@ int main(int argc, char *argv[])
- 			do_listen(senddump_mode);
- 			break;
+ 	iobase = info->p_dev->io.BasePort1;
  
-+		case LSENDRECV:
-+			do_listen(send_and_recv_mode);
-+			break;
-+
-+		case CSENDRECV:
-+			sk = do_connect(argv[optind]);
-+			if (sk < 0)
-+				exit(1);
-+
-+			send_and_recv_mode(sk);
-+			break;
-+
- 		case INFOREQ:
- 			info_request(argv[optind]);
- 			exit(0);
+diff --git a/drivers/bluetooth/btuart_cs.c b/drivers/bluetooth/btuart_cs.c
+index efd689a..cd9cb6c 100644
+--- a/drivers/bluetooth/btuart_cs.c
++++ b/drivers/bluetooth/btuart_cs.c
+@@ -295,7 +295,9 @@ static irqreturn_t btuart_interrupt(int irq, void *dev_inst)
+ 	int iir, lsr;
+ 	irqreturn_t r = IRQ_NONE;
+ 
+-	BUG_ON(!info->hdev);
++	if (!info || !info->hdev)
++		/* our irq handler is shared */
++		return IRQ_NONE;
+ 
+ 	iobase = info->p_dev->io.BasePort1;
+ 
+diff --git a/drivers/bluetooth/dtl1_cs.c b/drivers/bluetooth/dtl1_cs.c
+index 2cc7b32..588678a 100644
+--- a/drivers/bluetooth/dtl1_cs.c
++++ b/drivers/bluetooth/dtl1_cs.c
+@@ -299,7 +299,9 @@ static irqreturn_t dtl1_interrupt(int irq, void *dev_inst)
+ 	int iir, lsr;
+ 	irqreturn_t r = IRQ_NONE;
+ 
+-	BUG_ON(!info->hdev);
++	if (!info || !info->hdev)
++		/* our irq handler is shared */
++		return IRQ_NONE;
+ 
+ 	iobase = info->p_dev->io.BasePort1;
+ 
 -- 
-1.6.3.3
+1.6.4.2
