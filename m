@@ -1,56 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4AAF2C28.6000204@Atheros.com>
-Date: Tue, 15 Sep 2009 11:24:48 +0530
+Message-ID: <4AAF2B32.1010304@Atheros.com>
+Date: Tue, 15 Sep 2009 11:20:42 +0530
 From: Sasikiran Maddula <Madula.Sasikiran@Atheros.com>
 MIME-Version: 1.0
-To: <johan.hedberg@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: Bluez stack issue with sco after headset profile disconnect
-References: <4AAA55D0.1050505@Atheros.com> <20090914121345.GA3276@jh-x301>
-In-Reply-To: <20090914121345.GA3276@jh-x301>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [bluetooth device not working fine]issue with usb core probe
+ at hibernate & resume
+References: <44EE5C37ADC36343B0625A05DD408C48506872FB7C@CHEXMB-01.global.atheros.com> <1252663620.8931.66.camel@violet>
+In-Reply-To: <1252663620.8931.66.camel@violet>
 Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
-
-Thanks for your suggestion. Will try with the buez version 4.42 or later.
-
 Hi Marcel,
 
-Could you please suggest me the kernel version that has the fix for the 
-skype sco issue even after disconnection in bluetooth. I tried with the 
-2.6.28. Do you want me to try with 2.6.31?
+I verified with the latest kernnel version and it is working very fine. 
+Thanks for your suggestion.
 
 Thanks,
 Sasikiran.
 
-Johan Hedberg wrote:
-> Hi Sasikiran,
+Marcel Holtmann wrote:
+> Hi,
 >
-> On Fri, Sep 11, 2009, Sasikiran Maddula wrote:
 >   
->> I verified with different dongles in linux. The behavior is same in all
->> the cases. Firstly we will connect the headset using headset profile. We
->> will start skype call / some other sco connection. We will disconnect
->> the headset service from the headset profile. hcitool con says sco
->> connection is still available after disconnection successful. So, some
->> body suggest me how to stop the sco connection when we disconnect the
->> service.
+>> I am a bluetooth developer, came into bluetooth field recently. My bluetooth device is not working fine when I do hibernate and resume in linux 2.6.28 (ubuntu 9.0.4). It is working fine in the older versions. When I debugged the issue I see that when usb core is calling probe for the usb bluetooth dongle and the driver related to that is loading the firmware into the device. When I suspend and resume, usb core is calling probe and the firmware is getting loaded fine. For hibernate resume usb core is not calling probe and firmware is not getting loaded. I would like to know whether it is the issue with the usb core or Do I need to do any changes in the driver for this. Can I call the probe of my usb bluetooth dongle explicitly using any scripts?
 >>     
 >
-> You haven't mentioned which bluez and kernel versions you use but there
-> was a bug like this which got fixed. The fix was to call shutdown() before
-> close() for the SCO socket in bluetoothd (to force a disconnection even
-> though other processes, like skype, have copy of the socket), and add a
-> proper shutdown handler for SCO sockets on the kernel side. So you need
-> both the userspace fix (part of bluez since 4.42) as well as the kernel
-> fix. I'm not sure exactly which kernel version is needed but maybe Marcel
-> has an idea.
+> and again, re-test against 2.6.31 kernel.
 >
-> bluez patch:
-> http://git.kernel.org/?p=bluetooth/bluez.git;a=commitdiff;h=45873a73136b4c76353e445b8c6891b99dff89ce
-> kernel patch:
-> http://git.kernel.org/?p=linux/kernel/git/holtmann/bluetooth-testing.git;a=commitdiff;h=a0ed7b886953a1953d4aa6b3357c06096adb9cc7
+> Regards
 >
-> Johan
+> Marcel
+>
+>
 >   
