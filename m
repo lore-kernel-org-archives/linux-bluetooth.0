@@ -1,99 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Add introspection interface to the output of
- introspection calls.
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: =?ISO-8859-1?Q?RISK=D3?= Gergely <gergely@risko.hu>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	Context Devel mailing list <context-devel@projects.maemo.org>
-In-Reply-To: <20090915152240.GA4378@jh-x301>
-References: <87eiqq3ge7.fsf@bubble.risko.hu>
-	 <87k50hoee1.fsf@bubble.risko.hu>
-	 <2d5a2c100909020746t63bcd89bj1b25d053a6f4f9ca@mail.gmail.com>
-	 <87pra9nspo.fsf@bubble.risko.hu> <20090914141816.GA17774@jh-x301>
-	 <871vm9fuis.fsf@bubble.risko.hu> <20090914211145.GA16947@jh-x301>
-	 <2d5a2c100909150350r2e453cb6h5c4fe95c8638f9e9@mail.gmail.com>
-	 <87ws40e6iz.fsf@bubble.risko.hu>  <20090915152240.GA4378@jh-x301>
-Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 15 Sep 2009 10:27:05 -0700
-Message-Id: <1253035625.28416.2.camel@localhost.localdomain>
-Mime-Version: 1.0
+Date: Tue, 15 Sep 2009 19:58:54 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Florian Philipp <lists@binarywings.net>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: PIN Helper
+Message-ID: <20090915165854.GA6550@jh-x301>
+References: <6887eb5d0909142301r52343cd3sbe64c106da2d7434@mail.gmail.com> <20090915061104.GA20323@jh-x301> <4AAFBFA6.70007@binarywings.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4AAFBFA6.70007@binarywings.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi,
 
-> The general idea of the patch looks good but there are a few things I'd
-> still fix:
-> 
-> On Tue, Sep 15, 2009, RISKÓ Gergely wrote:
-> > -static DBusHandlerResult introspect(DBusConnection *connection,
-> > -				DBusMessage *message, struct generic_data *data)
-> > +static DBusMessage *introspect(DBusConnection *connection,
-> > +				DBusMessage *message, void *data_)
-> 
-> s/data_/user_data/ (to conform to the rest of the code and glib
-> conventions)
-> 
-> > +	struct generic_data *data = (struct generic_data *) data_;
-> 
-> Unnecessary explicit type-cast of a void pointer.
-> 
-> >  static struct generic_data *object_path_ref(DBusConnection *connection,
-> >  							const char *path)
-> >  {
-> >  	struct generic_data *data;
-> > +	struct interface_data *iface;
-> >  
-> >  	if (dbus_connection_get_object_path_data(connection, path,
-> >  						(void *) &data) == TRUE) {
-> > @@ -363,12 +355,23 @@ static struct generic_data *object_path_ref(DBusConnection *connection,
-> >  
-> >  	invalidate_parent_data(connection, path);
-> >  
-> > +	/* Register the introspection interface */
-> > +	iface = g_new0(struct interface_data, 1);
-> > +	iface->name = g_strdup("org.freedesktop.DBus.Introspectable"); // TODO: macro
-> 
-> Either add the macro or remove this comment. Also, we don't use C++ style
-> commenting.
-> 
-> > +	iface->methods = introspect_methods;
-> > +	iface->signals = NULL;
-> > +	iface->properties = NULL;
-> > +	iface->user_data = data;
-> > +	iface->destroy = NULL;
-> > +	data->interfaces = g_slist_append(data->interfaces, iface);
-> > +
-> 
-> Instead of this duplicate interface initialization code I think it would
-> make sense to refactor and create a new private function, e.g
-> 
-> static void add_interface(struct generic_cata *data, ...
-> 
-> and call that from the necessary places (afaics there are two of them)
-> 
-> > +	/* Free the introspection interface */
-> > +	iface = find_interface(data->interfaces, "org.freedesktop.DBus.Introspectable");
-> > +	if (iface) {
-> > +		data->interfaces = g_slist_remove(data->interfaces, iface);
-> > +
-> > +		if (iface->destroy)
-> > +			iface->destroy(iface->user_data);
-> > +
-> > +		g_free(iface->name);
-> > +		g_free(iface);
-> 
-> Would it make sense to refactor create a remove_interface function for
-> this too (to balance with the add_interface function)?
+On Tue, Sep 15, 2009, Florian Philipp wrote:
+> Just out of curiosity: Why does Bluez no longer provide any kind of
+> deamon as a pin helper any more?
 
-what are we gaining from doing it like this? I really don't see the
-benefit of doing it. Someone please explain it to me. It does add more
-code than it deletes.
+Isn't that exactly what the two command line based agents are if you run
+them in the background and modify them to always accept pairing requests?
+Or am I misunderstanding your question? Note that we can't anymore have
+interfaces which just deal with a simple PIN. Bluetooth 2.1 SSP brings
+along it's own set of callbacks that need handling and any interface that
+we define (be it a config file, D-Bus or something else) needs to take
+that into account.
 
-Regards
+> I mean, it's not like Bluetooth itself is limited to interactive systems
+> which rightly demand graphical interfaces nowadays. Stuff like NAP is a
+> classic client-server situation in which you don't want to use Gnome or
+> KDE apps on the server side and maybe not even on the client side.
 
-Marcel
+The current agent interface design doesn't restrict you in any way to
+interactive systems. It merely exports the pairing callbacks from
+bluetoothd to an external process. bluetoothd doesn't care if that process
+does some interactive stuff or not.
 
-
+Johan
