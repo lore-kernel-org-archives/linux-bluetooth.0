@@ -1,30 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4AB086D3.9070706@Atheros.com>
-Date: Wed, 16 Sep 2009 12:03:55 +0530
-From: Sasikiran Maddula <Madula.Sasikiran@Atheros.com>
+From: =?iso-8859-2?Q?RISK=D3?= Gergely <gergely@risko.hu>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,  linux-bluetooth@vger.kernel.org,  Context Devel mailing list <context-devel@projects.maemo.org>
+Subject: Re: [PATCH] Add introspection interface to the output of introspection calls.
+References: <87k50hoee1.fsf@bubble.risko.hu>
+	<2d5a2c100909020746t63bcd89bj1b25d053a6f4f9ca@mail.gmail.com>
+	<87pra9nspo.fsf@bubble.risko.hu> <20090914141816.GA17774@jh-x301>
+	<871vm9fuis.fsf@bubble.risko.hu> <20090914211145.GA16947@jh-x301>
+	<2d5a2c100909150350r2e453cb6h5c4fe95c8638f9e9@mail.gmail.com>
+	<87ws40e6iz.fsf@bubble.risko.hu> <20090915152240.GA4378@jh-x301>
+	<1253035625.28416.2.camel@localhost.localdomain>
+	<20090915175523.GA8393@jh-x301>
+Date: Tue, 15 Sep 2009 22:25:28 +0300
+In-Reply-To: <20090915175523.GA8393@jh-x301> (Johan Hedberg's message of "Tue,
+	15 Sep 2009 20:55:23 +0300")
+Message-ID: <877hw057tj.fsf@bubble.risko.hu>
 MIME-Version: 1.0
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Is there any limit on the bluetooth share folder in linux either
- in bluez stack or in obex ftp?
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-I tried to send a file of more than 2 GB using bluetooth in linux. It 
-says "Error while copying. There is not enough space on the destination. 
-Try to remove files to make space". When I look for more details it says 
-"There is 2.0GB available, but 2.8GB required", but the file size I am 
-trying to send is 2.8 GB, also in the other end it has more space than 
-the file size. I am trying to copy the file from laptop1 to laptop2 with 
-a share folder as "x" in laptop2. I used several vendor dongles. All of 
-them behave the same way. When I check for the properties of folder x in 
-laptop1 it shows as 2.0 GB used and 2.0 GB free. But actually the share 
-folder is not filled by 2.0GB, but it is more. I used linux 2.6.28 and 
-2.6.31 kernel versions with bluez 4.32. I even verified with 2.6.31 with 
-4.32 bluez and 2.6.28 with 4.53 bluez. All of them behave the same way. 
-Could some body suggest me where is the issue and how to rectify the issue.
+On Tue, 15 Sep 2009 20:55:23 +0300, Johan Hedberg <johan.hedberg@gmail.com> writes:
 
-Thanks,
-Sasikiran.
+> Hi Marcel,
+>
+> On Tue, Sep 15, 2009, Marcel Holtmann wrote:
+>> what are we gaining from doing it like this? I really don't see the
+>> benefit of doing it. Someone please explain it to me. It does add more
+>> code than it deletes.
+>
+> It's about avoiding special-casing the Introspect method and using the
+> framework that gdbus already has for method callbacks. This feels like a
+> cleaner approach to me and with the two refactoring tasks I suggested I
+> suspect we'd also be reducing the total line count (the current patch adds
+> 15 lines to the total but there's something like 15-20 new lines in it
+> that unnecessarily duplicate exsiting code).
+
+Yes, and actually I totally agree about all of your comments, so it was
+just my too big hurry, why even code with C++ comment could enter the
+mailing list.
+
+I will fix the issues and send a new patch tomorrow, thanks for the
+comments.
+
+Gergely
