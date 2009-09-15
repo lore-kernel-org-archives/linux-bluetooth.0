@@ -1,39 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 15 Sep 2009 19:58:54 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Florian Philipp <lists@binarywings.net>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: PIN Helper
-Message-ID: <20090915165854.GA6550@jh-x301>
-References: <6887eb5d0909142301r52343cd3sbe64c106da2d7434@mail.gmail.com> <20090915061104.GA20323@jh-x301> <4AAFBFA6.70007@binarywings.net>
+Message-ID: <4AAFBFA6.70007@binarywings.net>
+Date: Tue, 15 Sep 2009 18:24:06 +0200
+From: Florian Philipp <lists@binarywings.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4AAFBFA6.70007@binarywings.net>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: PIN Helper
+References: <6887eb5d0909142301r52343cd3sbe64c106da2d7434@mail.gmail.com> <20090915061104.GA20323@jh-x301>
+In-Reply-To: <20090915061104.GA20323@jh-x301>
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Johan Hedberg schrieb:
+> Hi,
+> 
+> On Tue, Sep 15, 2009, Kartikey Parmar wrote:
+>> I have installed bluez-4.52 with linux-2.6.30 on my arm board. I m
+>> trying to connect to headset but because of unavailability of linkkey
+>> I can't obtain connection.
+>>
+>> Is there any provision for linkkey generation for pairing in
+>> bluez-4.52? Any tool available that can be run on arm-linux board? I
+>> can't go for bluez-gnome else I need to install all its dependencies
+>> which will add more load in terms of memory.
+> 
+> You could try one of the sample agents that come with BlueZ, i.e.
+> test/simple-agent or test/agent.c. Or then just write your own agent to
+> suite your needs.
+> 
 
-On Tue, Sep 15, 2009, Florian Philipp wrote:
-> Just out of curiosity: Why does Bluez no longer provide any kind of
-> deamon as a pin helper any more?
+Just out of curiosity: Why does Bluez no longer provide any kind of
+deamon as a pin helper any more?
 
-Isn't that exactly what the two command line based agents are if you run
-them in the background and modify them to always accept pairing requests?
-Or am I misunderstanding your question? Note that we can't anymore have
-interfaces which just deal with a simple PIN. Bluetooth 2.1 SSP brings
-along it's own set of callbacks that need handling and any interface that
-we define (be it a config file, D-Bus or something else) needs to take
-that into account.
+I mean, it's not like Bluetooth itself is limited to interactive systems
+which rightly demand graphical interfaces nowadays. Stuff like NAP is a
+classic client-server situation in which you don't want to use Gnome or
+KDE apps on the server side and maybe not even on the client side.
 
-> I mean, it's not like Bluetooth itself is limited to interactive systems
-> which rightly demand graphical interfaces nowadays. Stuff like NAP is a
-> classic client-server situation in which you don't want to use Gnome or
-> KDE apps on the server side and maybe not even on the client side.
+The lack of such functionality is one of the reasons which still keep me
+on bluez-2.25. (lack of user documentation and howtos for >=3.x is the
+other reason, by the way).
 
-The current agent interface design doesn't restrict you in any way to
-interactive systems. It merely exports the pairing callbacks from
-bluetoothd to an external process. bluetoothd doesn't care if that process
-does some interactive stuff or not.
-
-Johan
+Just my two cents,
+Florian Philipp
