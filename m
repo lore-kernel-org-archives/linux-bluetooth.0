@@ -1,43 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Sep 2009 19:41:04 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Florian Philipp <lists@binarywings.net>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: PIN Helper
-Message-ID: <20090916164104.GA11739@jh-x301>
-References: <6887eb5d0909142301r52343cd3sbe64c106da2d7434@mail.gmail.com> <20090915061104.GA20323@jh-x301> <4AAFBFA6.70007@binarywings.net> <20090915165854.GA6550@jh-x301> <4AB107DE.5070700@binarywings.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4AB107DE.5070700@binarywings.net>
+Date: Wed, 16 Sep 2009 18:19:02 +0200
+From: Stefan Seyfried <stefan.seyfried@googlemail.com>
+To: BlueZ devel list <linux-bluetooth@vger.kernel.org>
+Subject: BNEP problem, hardware dependent?
+Message-ID: <20090916181902.52bf7e99@strolchi.home.s3e.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Wed, Sep 16, 2009, Florian Philipp wrote:
-> Of course I can't force you to do the programming but removing
-> functionality which worked - more or less - out of the box with an older
-> release and not providing any working alternative except of a
-> do-it-yourself solution ... well ... just sounds wrong.
+recently I was changing my work machine. When I wanted to do my usual
+setup (hacked up test-network script) to connect to the internet via my
+mobile phone, I got "bnep error".
 
-I think part of the explanation is lack of knowledge about exactly in
-which ways people use BlueZ and how popular these use cases are. To be
-honest, I'm not sure I still understand exactly what kind of behavior or
-feature you're after.
+It is this piese of code in network/connection.c:
 
-> Okay, so without some significant work, you could only support legacy
-> pairing for those old deamons and I suppose that's all those test apps
-> can, right?
+270         if (rsp->ctrl != BNEP_SETUP_CONN_RSP)
+271                 return TRUE;
+272
+273         r = ntohs(rsp->resp);
+274
+275         if (r != BNEP_SUCCESS) {
+276                 error("bnep failed");
+277                 goto failed;
+278         }
 
-Exactly which old daemons are you talking about? I don't see how any old
-software that isn't aware of the current pairing/agent interface could be
-made to work "without some significant work".
+I then found out that it did work with some dongles, and it did not
+work with others. Apparently there was no connection to the "quality"
+of the dongles (but I have to admit, that AFAIR all were broadcom or
+worse), there was a very cheap one that did work and more expensive
+ones that didn't.
 
-> a) Create and maintain the missing parts myself.
+I always thought that the "supported profiles" list on the packaging
+was just a "what we licensed in the driver" list and that all hardware
+could do everything.
 
-If the functionality makes sense and the implementation follows the usual
-coding standards that we have I don't see why you would be stuck
-maintaining it yourself. Surely it should be possibe to merge the work
-with upstream.
+Am I wrong?
 
-Johan
+Thanks,
+
+	Stefan
+-- 
+Stefan Seyfried
+
+"Any ideas, John?"
+"Well, surrounding them's out."
