@@ -1,85 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gene Heskett <gene.heskett@verizon.net>
-To: "linux-bluetooth" <linux-bluetooth@vger.kernel.org>
-Subject: hci0 is  invisible
-Date: Wed, 16 Sep 2009 12:04:13 -0400
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
-Message-id: <200909161204.13479.gene.heskett@verizon.net>
+Message-ID: <4AB107DE.5070700@binarywings.net>
+Date: Wed, 16 Sep 2009 17:44:30 +0200
+From: Florian Philipp <lists@binarywings.net>
+MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: PIN Helper
+References: <6887eb5d0909142301r52343cd3sbe64c106da2d7434@mail.gmail.com> <20090915061104.GA20323@jh-x301> <4AAFBFA6.70007@binarywings.net> <20090915165854.GA6550@jh-x301>
+In-Reply-To: <20090915165854.GA6550@jh-x301>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Greetings Marcel;
-Yet another failed pass at getting these &*^$ dongles from Conwise Tech to 
-work as a simple rs-232 link.
+Johan Hedberg schrieb:
+> Hi,
+> 
+> On Tue, Sep 15, 2009, Florian Philipp wrote:
+>> Just out of curiosity: Why does Bluez no longer provide any kind of
+>> deamon as a pin helper any more?
+> 
+> Isn't that exactly what the two command line based agents are if you run
+> them in the background and modify them to always accept pairing requests?
+> Or am I misunderstanding your question?
 
-I have simlinked the contents of /etc/bluetooth, /usr/etc/bluetooth, and 
-/usr/local/etc/bluetooth so that regardless of where it might look for config 
-files, it will find something.
+I suppose these two programs would suit my needs just fine - if I modify
+them as you suggested. I just don't understand the reasons why an
+arbitrary number of users (including me) should be bothered to
+write/modify/fork their own pin helper. If it is something so simple
+that every user can do it himself, sure enough the official bluez devs
+can do it too. The latter option would have some advantages:
 
-I've put the device on the other end of the path back into the non-paired 
-state.  It is an eb101, according to test-discovery, is:
-[root@coyote test]# ./test-discovery
-[ 00:0C:84:00:86:F8 ]               
-    Name = eb101                    
-    Paired = 0                      
-    LegacyPairing = 1               
-    Alias = eb101                   
-    Address = 00:0C:84:00:86:F8     
-    RSSI = 0                        
-    Class = 0x001f00                
+- programming it one time instead of programming it n times
+- me as a user can (to some degree) be confident that the app will still
+work with the next release whereas a 'test program' might just be
+dropped without any warning
+- linux distributions could provide packages for it. Therefore me as a
+user wouldn't have to maintain it, compile it against the newest bluez
+libs after every automatic update, test it, etc.
 
-[root@coyote tools]# hcitool  inq
-Inquiring ...
-        00:0C:84:00:86:F8       clock offset: 0x5711    class: 0x001f00
-[root@coyote tools]# hcitool  cc 00:0C:84:00:86:F8
-This last command can be repeated, with no errors reported.  And no device 
-can be created either in /dev, or in the link the messages file reports when 
-the dongle is plugged in:
+Of course I can't force you to do the programming but removing
+functionality which worked - more or less - out of the box with an older
+release and not providing any working alternative except of a
+do-it-yourself solution ... well ... just sounds wrong.
 
-Sep 16 11:39:04 coyote kernel: [564988.826049] usb 2-5.1: new full speed USB 
-device using ohci_hcd and address 9
-Sep 16 11:39:05 coyote kernel: [564988.919053] usb 2-5.1: New USB device 
-found, idVendor=0e5e, idProduct=6622
-Sep 16 11:39:05 coyote kernel: [564988.919057] usb 2-5.1: New USB device 
-strings: Mfr=0, Product=0, SerialNumber=0
-Sep 16 11:39:05 coyote kernel: [564988.919145] usb 2-5.1: configuration #1 
-chosen from 1 choice
-Sep 16 11:39:05 coyote bluetoothd[892]: HCI dev 0 registered
-Sep 16 11:39:05 coyote bluetoothd[892]: HCI dev 0 up
-Sep 16 11:39:05 coyote bluetoothd[892]: Starting security manager 0
-Sep 16 11:39:05 coyote bluetoothd[892]: Parsing 
-/usr/local/etc/bluetooth/serial.conf failed: Key file does not start with a 
-group
-Sep 16 11:39:05 coyote bluetoothd[892]: Adapter /org/bluez/892/hci0 has been 
-enabled
+> Note that we can't anymore have
+> interfaces which just deal with a simple PIN. Bluetooth 2.1 SSP brings
+> along it's own set of callbacks that need handling and any interface that
+> we define (be it a config file, D-Bus or something else) needs to take
+> that into account.
+> 
 
-Q: What defines this missing "group" in the serial.conf file?, which is now 
-100% commented.  Copied from the 4.51 serial tree verbatum since it wasn't 
-installed by a make install.
+Okay, so without some significant work, you could only support legacy
+pairing for those old deamons and I suppose that's all those test apps
+can, right?
 
-Firing up bluetooth-wizard, the eb101 is displayed, and can be selected, but 
-the pairing attempt fails.  Pin on both ends is 0000.
+>> I mean, it's not like Bluetooth itself is limited to interactive systems
+>> which rightly demand graphical interfaces nowadays. Stuff like NAP is a
+>> classic client-server situation in which you don't want to use Gnome or
+>> KDE apps on the server side and maybe not even on the client side.
+> 
+> The current agent interface design doesn't restrict you in any way to
+> interactive systems. It merely exports the pairing callbacks from
+> bluetoothd to an external process. bluetoothd doesn't care if that process
+> does some interactive stuff or not.
+> 
 
-What can I do to make minicom find and use this hci0 device as a modem 
-circuit?  /dev/hci0 doesn't exist, and minicom can't find  
-/org/bluez/892/hci0.
+I already understood that. It's just that the only programs which are
+currently available (precompiled and ready to go) for me as a user are
+interactive apps with dependencies on Gnome or KDE.
 
-Having minicom -s set for it, then save as coco3 (not df1), then launching a
-minicom coco3 returns:
-[root@coyote tools]# minicom coco3
-Device /org/bluez/892/hci0 access failed: No such file or directory.
+Do you understand what's my problem here? Bluetooth itself suits my
+current needs just fine: Wireless network with less range, less
+bandwidth and less power consumption than WLAN. That's why I adopted
+bluetooth for this project of mine. Now with bluez-3.x or 4.x, Bluetooth
+still suits my needs, it's just that the only available implementation
+doesn't suit them any longer.
 
+Now I have three options:
+a) Create and maintain the missing parts myself.
+b) Switch to WLAN which is far inferior for my use case but which will
+work out-of-the-box with deamons like wpa_supplicant.
+c) Stick with bluez-2.x until the situation becomes unbearable, then
+think again.
 
-Thank you.
-
--- 
-Cheers, Gene
-"There are four boxes to be used in defense of liberty:
- soap, ballot, jury, and ammo. Please use in that order."
--Ed Howdershelt (Author)
-The NRA is offering FREE Associate memberships to anyone who wants them.
-<https://www.nrahq.org/nrabonus/accept-membership.asp>
-
-Avoid the Gates of Hell.  Use Linux
-	-- unknown source
+Currently I'm with c)
