@@ -1,18 +1,18 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Sep 2009 15:33:59 +0800
+Date: Wed, 16 Sep 2009 15:28:58 +0800
 From: Yi Yang <yi.y.yang@intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH resent] bluez: correct udev rule for Dell mouse
-Message-ID: <20090916073359.GA22265@yangyi-dev.bj.intel.com>
+Subject: [PATCH] bluez: correct udev rule for Dell mouse
+Message-ID: <20090916072858.GA22262@yangyi-dev.bj.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 >From dbcfcf5dfbdef2377f64c7cd737886e31ae17615 Mon Sep 17 00:00:00 2001
-From: Yi Yang <yi.y.yang@intel.com>
+From: root <root@yangyi-dev.localdomain>
 Date: Wed, 16 Sep 2009 15:19:13 +0800
-Subject: [PATCH] Correct udev rule for Dell mouse
+Subject: [PATCH] Correct rule for Dell mouse
 
 Note: this rule should just for Dell bluetooth mouse, but it
 does function for Dell general USB mouse, such as this one:
