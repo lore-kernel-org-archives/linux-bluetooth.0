@@ -1,50 +1,21 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4AB13FFA.8080704@charter.net>
-Date: Wed, 16 Sep 2009 15:43:54 -0400
-From: Peter Hurley <phurley@charter.net>
+Message-ID: <585346.80777.qm@web52607.mail.re2.yahoo.com>
+Date: Wed, 16 Sep 2009 11:59:44 -0700 (PDT)
+From: Ed Tsang <netdesign_98@yahoo.com>
+Subject: Script to process received obex push files
+To: Bluettooth Linux <linux-bluetooth@vger.kernel.org>
 MIME-Version: 1.0
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: Odd eSCO behavior with BCM2045-based receiver
-References: <4AB128CC.6090807@charter.net>
-In-Reply-To: <4AB128CC.6090807@charter.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Peter Hurley wrote:
-> While attempting to setup a Motorola S9 headset with a BCM2045-based 
-> USB dongle (Dell-branded Logitech device), I've observed some strange 
-> eSCO behavior.  I'm running 64-bit 2.6.31 kernel with bluez 4.52.
->
-> Behavior # 1:  when attempting a SCO connection, frequently the 
-> connection is rejected with Reserved Slot Violation status return from 
-> the Synchronous Connect Complete event.  The SCO connection 
-> occasionally succeeds as an eSCO connection in CVSD mode. I've been 
-> experimenting with this for a while. (After some more observation, it 
-> may be that the successful path is preceded by a mode change to sniff 
-> mode) Any ideas?
->
-> Behavior # 2:  The bt receiver's LM crashes when the eSCO connection 
-> is disconnected (here's the hcidump):
->
->
-> After this, *all connections with every device* are terminated (note 
-> that in the above sequence handle 11 was disconnected as well) and 
-> cannot be restarted without unplugging the dongle ('hcitool reset' 
-> operates but is ineffective) and restarting the daemon.  Again, I'd 
-> welcome any suggestions for further experimentation.  I do not have a 
-> sniffer.
->
-> Thanks,
-> Peter Hurley
-Answered my own question by discovering the sco kernel module parameter, 
-'disable_esco'.  However, it doesn't make sense to me that one device 
-incompatibility disables an entire transport type.  Wouldn't it be 
-better if the user-space daemon controlled (or at least had the ability 
-to override) which transport was attempted?  At least, control would be 
-finer-grained (e.g., only HSP profiles could optionally connect to 
-SCO-only).  The sco driver has no idea that the connection attempt is 
-being driven for a headset.
+Hi, 
+I am developing a script that will process files received from phone via OOP. ie. user will send in a file (e.g. filename.filetype) via the OOP channel and the script will do something depend on the user's bluetooth address, filename.filetype and it's content.
+Some how my script's input will be ( src-bluetooth-address, filename.filetype). Any suggestion on where to start?
 
-Regards,
-Peter
+Regard, Ed
+
+
+
+      __________________________________________________________________
+Ask a question on any topic and get answers from real people. Go to Yahoo! Answers and share what you know at http://ca.answers.yahoo.com
