@@ -1,46 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Sep 2009 15:28:58 +0800
-From: Yi Yang <yi.y.yang@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] bluez: correct udev rule for Dell mouse
-Message-ID: <20090916072858.GA22262@yangyi-dev.bj.intel.com>
+Date: Wed, 16 Sep 2009 09:49:33 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Sasikiran Maddula <Madula.Sasikiran@Atheros.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Is there any limit on the bluetooth share folder in linux
+	either in bluez stack or in obex ftp?
+Message-ID: <20090916064933.GA28541@jh-x301>
+References: <4AB086D3.9070706@Atheros.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4AB086D3.9070706@Atheros.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
->From dbcfcf5dfbdef2377f64c7cd737886e31ae17615 Mon Sep 17 00:00:00 2001
-From: root <root@yangyi-dev.localdomain>
-Date: Wed, 16 Sep 2009 15:19:13 +0800
-Subject: [PATCH] Correct rule for Dell mouse
+Hi,
 
-Note: this rule should just for Dell bluetooth mouse, but it
-does function for Dell general USB mouse, such as this one:
+On Wed, Sep 16, 2009, Sasikiran Maddula wrote:
+> I tried to send a file of more than 2 GB using bluetooth in linux. It  
+> says "Error while copying. There is not enough space on the destination.  
+> Try to remove files to make space". When I look for more details it says  
+> "There is 2.0GB available, but 2.8GB required", but the file size I am  
+> trying to send is 2.8 GB, also in the other end it has more space than  
+> the file size. I am trying to copy the file from laptop1 to laptop2 with  
+> a share folder as "x" in laptop2. I used several vendor dongles. All of  
+> them behave the same way. When I check for the properties of folder x in  
+> laptop1 it shows as 2.0 GB used and 2.0 GB free. But actually the share  
+> folder is not filled by 2.0GB, but it is more. I used linux 2.6.28 and  
+> 2.6.31 kernel versions with bluez 4.32. I even verified with 2.6.31 with  
+> 4.32 bluez and 2.6.28 with 4.53 bluez. All of them behave the same way.  
+> Could some body suggest me where is the issue and how to rectify the 
+> issue.
 
-    ID 413c:3010 Dell Computer Corp. Optical Wheel Mouse
+BlueZ comes neither with an OBEX server nor an OBEX client. Which client
+and server are you using? AFAIK by using standard OBEX FTP the only way
+for the client to know the amount of free space in the server is through
+the capability object. Maybe the capability object on server contains
+false information or then your client is interpreting it incorrectly.
 
-We should let it just function for Dell bluetooth mouse, udev
-144 and later has included rules for hid2hci
-extras/hid2hci/70-hid2hci.rules which has correct one, so we
-should use that one
----
- scripts/bluetooth-hid2hci.rules |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
-
-diff --git a/scripts/bluetooth-hid2hci.rules b/scripts/bluetooth-hid2hci.rules
-index 1b231d1..eb63292 100644
---- a/scripts/bluetooth-hid2hci.rules
-+++ b/scripts/bluetooth-hid2hci.rules
-@@ -8,7 +8,8 @@
- #   413c:8154
- #   413c:8158
- #   413c:8162
--ACTION=="add", ENV{ID_VENDOR}=="413c", ENV{ID_CLASS}=="mouse", ATTRS{bmAttributes}=="e0", KERNEL=="mouse*", RUN+="/usr/sbin/hid2hci --method dell -v $env{ID_VENDOR} -p $env{ID_MODEL} --mode hci"
-+ATTR{bInterfaceClass}=="03", ATTR{bInterfaceSubClass}=="01", ATTR{bInterfaceProtocol}=="02", ATTRS{bDeviceClass}=="00", ATTRS{idVendor}=="413c", ATTRS{bmAttributes}=="e0", \
-+    RUN+="hid2hci --method dell -v $attr{idVendor} -p $attr{idProduct} --mode hci"
- 
- # Logitech devices
- ACTION=="add", ENV{ID_VENDOR}=="046d", ENV{ID_MODEL}=="c703" RUN+="/usr/sbin/hid2hci --method logitech -v $env{ID_VENDOR} -p $env{ID_MODEL} --mode hci"
--- 
-1.6.0.6
-
+Johan
