@@ -1,243 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?iso-8859-2?Q?RISK=D3?= Gergely <gergely@risko.hu>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Context Devel mailing list <context-devel@projects.maemo.org>
-Subject: Re: [PATCH] Add introspection interface to the output of introspection calls.
-References: <87eiqq3ge7.fsf@bubble.risko.hu> <87k50hoee1.fsf@bubble.risko.hu>
-	<2d5a2c100909020746t63bcd89bj1b25d053a6f4f9ca@mail.gmail.com>
-	<87pra9nspo.fsf@bubble.risko.hu> <20090914141816.GA17774@jh-x301>
-	<871vm9fuis.fsf@bubble.risko.hu> <20090914211145.GA16947@jh-x301>
-	<2d5a2c100909150350r2e453cb6h5c4fe95c8638f9e9@mail.gmail.com>
-	<87ws40e6iz.fsf@bubble.risko.hu> <20090915152240.GA4378@jh-x301>
-Date: Wed, 16 Sep 2009 14:07:22 +0300
-In-Reply-To: <20090915152240.GA4378@jh-x301> (Johan Hedberg's message of "Tue,
-	15 Sep 2009 18:22:40 +0300")
-Message-ID: <87eiq7du6t.fsf@bubble.risko.hu>
+Message-ID: <4AB0ACA9.8030102@Atheros.com>
+Date: Wed, 16 Sep 2009 14:45:21 +0530
+From: Sasikiran Maddula <Madula.Sasikiran@Atheros.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+To: <johan.hedberg@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Is there any limit on the bluetooth share folder in linux	either
+ in bluez stack or in obex ftp?
+References: <4AB086D3.9070706@Atheros.com> <20090916064933.GA28541@jh-x301>
+In-Reply-To: <20090916064933.GA28541@jh-x301>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Johan Hedberg wrote:
+> Hi,
+>
+> On Wed, Sep 16, 2009, Sasikiran Maddula wrote:
+>   
+>> I tried to send a file of more than 2 GB using bluetooth in linux. It
+>> says "Error while copying. There is not enough space on the destination.
+>> Try to remove files to make space". When I look for more details it says
+>> "There is 2.0GB available, but 2.8GB required", but the file size I am
+>> trying to send is 2.8 GB, also in the other end it has more space than
+>> the file size. I am trying to copy the file from laptop1 to laptop2 with
+>> a share folder as "x" in laptop2. I used several vendor dongles. All of
+>> them behave the same way. When I check for the properties of folder x in
+>> laptop1 it shows as 2.0 GB used and 2.0 GB free. But actually the share
+>> folder is not filled by 2.0GB, but it is more. I used linux 2.6.28 and
+>> 2.6.31 kernel versions with bluez 4.32. I even verified with 2.6.31 with
+>> 4.32 bluez and 2.6.28 with 4.53 bluez. All of them behave the same way.
+>> Could some body suggest me where is the issue and how to rectify the
+>> issue.
+>>     
+>
+> BlueZ comes neither with an OBEX server nor an OBEX client. Which client
+> and server are you using? AFAIK by using standard OBEX FTP the only way
+> for the client to know the amount of free space in the server is through
+> the capability object. Maybe the capability object on server contains
+> false information or then your client is interpreting it incorrectly.
+>
+> Johan
+>   
+By default Linux comes with obex-data-server. I am using that itself. Do 
+you think I need to update that and try. If so can you tell me what 
+version has the fix.
 
-Thanks for all the comments again, here is the next round.
-
-Diffstat says 58 insertions, 43 deletions, I think the extra 15 lines
-really worth that bluez no longer treats the introspection as a very
-specific interface.
-
-BR,
-Gergely
-
->From de18b546d3773e33c65616680a6608457804d894 Mon Sep 17 00:00:00 2001
-From: Gergely Risko <gergely@risko.hu>
-Date: Tue, 15 Sep 2009 15:23:24 +0300
-Subject: [PATCH] gdbus: handle introspection generally in generic_message.
-
-Previously it was a specific case, now introspection is just another
-interface, which is always implemented.  It is registered/unregistered
-when an object path is referenced first/last.
----
- gdbus/object.c |  101 ++++++++++++++++++++++++++++++++------------------------
- 1 files changed, 58 insertions(+), 43 deletions(-)
-
-diff --git a/gdbus/object.c b/gdbus/object.c
-index 811c2e1..09e9af7 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -155,13 +155,7 @@ static void generate_introspection_xml(DBusConnection *conn,
- 
- 	gstr = g_string_new(DBUS_INTROSPECT_1_0_XML_DOCTYPE_DECL_NODE);
- 
--	g_string_append_printf(gstr,
--		"<node name=\"%s\">\n"
--		"\t<interface name=\"org.freedesktop.DBus.Introspectable\">\n"
--		"\t\t<method name=\"Introspect\">\n"
--		"\t\t\t<arg name=\"xml_data\" type=\"s\" direction=\"out\"/>\n"
--		"\t\t</method>\n"
--		"\t</interface>\n", path);
-+	g_string_append_printf(gstr, "<node name=\"%s\">\n", path);
- 
- 	for (list = data->interfaces; list; list = list->next) {
- 		struct interface_data *iface = list->data;
-@@ -189,14 +183,15 @@ done:
- 	data->introspect = g_string_free(gstr, FALSE);
- }
- 
--static DBusHandlerResult introspect(DBusConnection *connection,
--				DBusMessage *message, struct generic_data *data)
-+static DBusMessage *introspect(DBusConnection *connection,
-+				DBusMessage *message, void *user_data)
- {
-+	struct generic_data *data = user_data;
- 	DBusMessage *reply;
- 
- 	if (!dbus_message_has_signature(message, DBUS_TYPE_INVALID_AS_STRING)) {
- 		error("Unexpected signature to introspect call");
--		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-+		return NULL;
- 	}
- 
- 	if (!data->introspect)
-@@ -205,16 +200,12 @@ static DBusHandlerResult introspect(DBusConnection *connection,
- 
- 	reply = dbus_message_new_method_return(message);
- 	if (!reply)
--		return DBUS_HANDLER_RESULT_NEED_MEMORY;
-+		return NULL;
- 
- 	dbus_message_append_args(reply, DBUS_TYPE_STRING, &data->introspect,
- 					DBUS_TYPE_INVALID);
- 
--	dbus_connection_send(connection, reply, NULL);
--
--	dbus_message_unref(reply);
--
--	return DBUS_HANDLER_RESULT_HANDLED;
-+	return reply;
- }
- 
- static void generic_unregister(DBusConnection *connection, void *user_data)
-@@ -250,11 +241,6 @@ static DBusHandlerResult generic_message(DBusConnection *connection,
- 	GDBusMethodTable *method;
- 	const char *interface;
- 
--	if (dbus_message_is_method_call(message,
--					DBUS_INTERFACE_INTROSPECTABLE,
--								"Introspect"))
--		return introspect(connection, message, data);
--
- 	interface = dbus_message_get_interface(message);
- 
- 	iface = find_interface(data->interfaces, interface);
-@@ -335,6 +321,31 @@ done:
- 	g_free(parent_path);
- }
- 
-+static GDBusMethodTable introspect_methods[] = {
-+	{ "Introspect",	"",	"s", introspect	},
-+	{ }
-+};
-+
-+static void add_interface(struct generic_data *data, const char *name,
-+			     GDBusMethodTable *methods,
-+			     GDBusSignalTable *signals,
-+			     GDBusPropertyTable *properties,
-+			     void *user_data,
-+			     GDBusDestroyFunction destroy)
-+{
-+	struct interface_data *iface;
-+
-+	iface = g_new0(struct interface_data, 1);
-+	iface->name = g_strdup(name);
-+	iface->methods = methods;
-+	iface->signals = signals;
-+	iface->properties = properties;
-+	iface->user_data = user_data;
-+	iface->destroy = destroy;
-+
-+	data->interfaces = g_slist_append(data->interfaces, iface);
-+}
-+
- static struct generic_data *object_path_ref(DBusConnection *connection,
- 							const char *path)
- {
-@@ -363,9 +374,30 @@ static struct generic_data *object_path_ref(DBusConnection *connection,
- 
- 	invalidate_parent_data(connection, path);
- 
-+	add_interface(data, DBUS_INTERFACE_INTROSPECTABLE,
-+			introspect_methods, NULL, NULL, data, NULL);
-+
- 	return data;
- }
- 
-+static gboolean remove_interface(struct generic_data *data, const char *name)
-+{
-+	struct interface_data *iface;
-+
-+	iface = find_interface(data->interfaces, name);
-+	if (iface) {
-+		data->interfaces = g_slist_remove(data->interfaces, iface);
-+
-+		if (iface->destroy)
-+			iface->destroy(iface->user_data);
-+
-+		g_free(iface->name);
-+		g_free(iface);
-+		return TRUE;
-+	} else
-+		return FALSE;
-+}
-+
- static void object_path_unref(DBusConnection *connection, const char *path)
- {
- 	struct generic_data *data = NULL;
-@@ -382,6 +414,8 @@ static void object_path_unref(DBusConnection *connection, const char *path)
- 	if (data->refcount > 0)
- 		return;
- 
-+	remove_interface(data, DBUS_INTERFACE_INTROSPECTABLE);
-+
- 	invalidate_parent_data(connection, path);
- 
- 	dbus_connection_unregister_object_path(connection, path);
-@@ -474,7 +508,6 @@ gboolean g_dbus_register_interface(DBusConnection *connection,
- 					GDBusDestroyFunction destroy)
- {
- 	struct generic_data *data;
--	struct interface_data *iface;
- 
- 	data = object_path_ref(connection, path);
- 	if (data == NULL)
-@@ -483,16 +516,8 @@ gboolean g_dbus_register_interface(DBusConnection *connection,
- 	if (find_interface(data->interfaces, name))
- 		return FALSE;
- 
--	iface = g_new0(struct interface_data, 1);
--
--	iface->name = g_strdup(name);
--	iface->methods = methods;
--	iface->signals = signals;
--	iface->properties = properties;
--	iface->user_data = user_data;
--	iface->destroy = destroy;
--
--	data->interfaces = g_slist_append(data->interfaces, iface);
-+	add_interface(data, name, methods, signals,
-+			properties, user_data, destroy);
- 
- 	g_free(data->introspect);
- 	data->introspect = NULL;
-@@ -504,7 +529,6 @@ gboolean g_dbus_unregister_interface(DBusConnection *connection,
- 					const char *path, const char *name)
- {
- 	struct generic_data *data = NULL;
--	struct interface_data *iface;
- 
- 	if (!path)
- 		return FALSE;
-@@ -516,18 +540,9 @@ gboolean g_dbus_unregister_interface(DBusConnection *connection,
- 	if (data == NULL)
- 		return FALSE;
- 
--	iface = find_interface(data->interfaces, name);
--	if (!iface)
-+	if (remove_interface(data, name) == FALSE)
- 		return FALSE;
- 
--	data->interfaces = g_slist_remove(data->interfaces, iface);
--
--	if (iface->destroy)
--		iface->destroy(iface->user_data);
--
--	g_free(iface->name);
--	g_free(iface);
--
- 	g_free(data->introspect);
- 	data->introspect = NULL;
- 
--- 
-1.6.0.4
-
+Thanks,
+Sasikiran.
