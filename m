@@ -1,121 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Sep 2009 20:22:24 +0200
-From: Stefan Seyfried <stefan.seyfried@googlemail.com>
-To: BlueZ devel list <linux-bluetooth@vger.kernel.org>
-Subject: Re: hci0 is  invisible
-Message-ID: <20090916202224.3eef8bd3@strolchi.home.s3e.de>
-In-Reply-To: <200909161204.13479.gene.heskett@verizon.net>
-References: <200909161204.13479.gene.heskett@verizon.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Message-ID: <4AB128CC.6090807@charter.net>
+Date: Wed, 16 Sep 2009 14:05:00 -0400
+From: Peter Hurley <phurley@charter.net>
+MIME-Version: 1.0
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Odd eSCO behavior with BCM2045-based receiver
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gene,
+While attempting to setup a Motorola S9 headset with a BCM2045-based USB 
+dongle (Dell-branded Logitech device), I've observed some strange eSCO 
+behavior.  I'm running 64-bit 2.6.31 kernel with bluez 4.52.
 
-On Wed, 16 Sep 2009 12:04:13 -0400
-Gene Heskett <gene.heskett@verizon.net> wrote:
+Behavior # 1:  when attempting a SCO connection, frequently the 
+connection is rejected with Reserved Slot Violation status return from 
+the Synchronous Connect Complete event.  The SCO connection occasionally 
+succeeds as an eSCO connection in CVSD mode. I've been experimenting 
+with this for a while. (After some more observation, it may be that the 
+successful path is preceded by a mode change to sniff mode) Any ideas?
 
-> Greetings Marcel;
-> Yet another failed pass at getting these &*^$ dongles from Conwise
-> Tech to work as a simple rs-232 link.
-> 
-> I have simlinked the contents of /etc/bluetooth, /usr/etc/bluetooth,
-> and /usr/local/etc/bluetooth so that regardless of where it might
-> look for config files, it will find something.
+Behavior # 2:  The bt receiver's LM crashes when the eSCO connection is 
+disconnected (here's the hcidump):
 
-It should actually work without lots of config files.
- 
-> I've put the device on the other end of the path back into the
-> non-paired state.  It is an eb101, according to test-discovery, is:
-> [root@coyote test]# ./test-discovery
-> [ 00:0C:84:00:86:F8 ]               
->     Name = eb101                    
->     Paired = 0                      
->     LegacyPairing = 1               
->     Alias = eb101                   
->     Address = 00:0C:84:00:86:F8     
->     RSSI = 0                        
->     Class = 0x001f00                
+2009-09-15 18:35:41.675877 > SCO data: handle 6 flags 0x00 dlen 48
+    0000: 29 00 4f 00 46 00 0a 00  00 00 0b 00 1f 00 10 00  ).O.F...........
+    0010: e8 ff ee ff eb ff bf ff  da ff 1e 00 fd ff f1 ff  ................
+    0020: 00 00 ee ff 2b 00 26 00  c8 ff bf ff e4 ff 0b 00  ....+.&.........
+2009-09-15 18:35:41.676957 < HCI Command: Disconnect (0x01|0x0006) plen 3
+    handle 6 reason 0x13
+    Reason: Remote User Terminated Connection
+2009-09-15 18:35:41.681877 > HCI Event: Command Status (0x0f) plen 4
+    Disconnect (0x01|0x0006) status 0x00 ncmd 1
+2009-09-15 18:35:41.685875 > SCO data: handle 6 flags 0x00 dlen 48
+    0000: 38 00 2d 00 ef ff fd ff  01 00 05 00 29 00 29 00  8.-.........).).
+    0010: cd ff b1 ff ce ff c9 ff  f9 ff 09 00 dd ff 15 00  ................
+    0020: 02 00 0c 00 49 00 15 00  fc ff e6 ff f7 ff 34 00  ....I.........4.
+2009-09-15 18:35:41.685876 > SCO data: handle 6 flags 0x00 dlen 48
+    0000: 20 00 17 00 27 00 fe ff  e5 ff eb ff 0c 00 23 00   ...'.........#.
+    0010: e7 ff a4 ff c8 ff f6 ff  f7 ff fa ff 0e 00 06 00  ................
+    0020: 10 00 46 00 29 00 d5 ff  c4 ff ec ff f4 ff 11 00  ..F.)...........
+2009-09-15 18:35:41.685876 > SCO data: handle 6 flags 0x00 dlen 48
+    0000: 3b 00 20 00 09 00 14 00  ec ff c5 ff f1 ff 26 00  ;. ...........&.
+    0010: 1e 00 03 00 cf ff b5 ff  f5 ff 0d 00 fb ff 0b 00  ................
+    0020: e2 ff d6 ff 16 00 1d 00  06 00 0f 00 2f 00 40 00  ............/.@.
+2009-09-15 18:35:41.695877 > SCO data: handle 6 flags 0x00 dlen 48
+    0000: 1a 00 eb ff eb ff f0 ff  bf ff c3 ff 07 00 07 00  ................
+    0010: f9 ff 09 00 06 00 0c 00  16 00 fe ff ea ff 10 00  ................
+    0020: 21 00 01 00 e3 ff ce ff  d8 ff f3 ff f4 ff 0f 00  !...............
+2009-09-15 18:36:11.758191 > HCI Event: Disconn Complete (0x05) plen 4
+    status 0x00 handle 6 reason 0x22
+    Reason: LMP Response Timeout
+2009-09-15 18:36:11.908200 > HCI Event: Disconn Complete (0x05) plen 4
+    status 0x00 handle 11 reason 0x22
+    Reason: LMP Response Timeout
 
-Very good, it means your adapter and the other side is up and running.
+After this, *all connections with every device* are terminated (note 
+that in the above sequence handle 11 was disconnected as well) and 
+cannot be restarted without unplugging the dongle ('hcitool reset' 
+operates but is ineffective) and restarting the daemon.  Again, I'd 
+welcome any suggestions for further experimentation.  I do not have a 
+sniffer.
 
-> [root@coyote tools]# hcitool  inq
-> Inquiring ...
->         00:0C:84:00:86:F8       clock offset: 0x5711    class:
-> 0x001f00 [root@coyote tools]# hcitool  cc 00:0C:84:00:86:F8
-> This last command can be repeated, with no errors reported.  And no
-> device can be created either in /dev, or in the link the messages
-> file reports when the dongle is plugged in:
+Thanks,
+Peter Hurley
 
-This is a misunderstanding on your side. There is no such thing as a
-device in /dev for the bluetooth adapter. Think of it like an ethernet
-interface - you also don't have /dev/eth0 and still it works.
 
-> Sep 16 11:39:04 coyote kernel: [564988.826049] usb 2-5.1: new full
-> speed USB device using ohci_hcd and address 9
-> Sep 16 11:39:05 coyote kernel: [564988.919053] usb 2-5.1: New USB
-> device found, idVendor=0e5e, idProduct=6622
-> Sep 16 11:39:05 coyote kernel: [564988.919057] usb 2-5.1: New USB
-> device strings: Mfr=0, Product=0, SerialNumber=0
-> Sep 16 11:39:05 coyote kernel: [564988.919145] usb 2-5.1:
-> configuration #1 chosen from 1 choice
-> Sep 16 11:39:05 coyote bluetoothd[892]: HCI dev 0 registered
-> Sep 16 11:39:05 coyote bluetoothd[892]: HCI dev 0 up
-> Sep 16 11:39:05 coyote bluetoothd[892]: Starting security manager 0
-> Sep 16 11:39:05 coyote bluetoothd[892]: Parsing 
-> /usr/local/etc/bluetooth/serial.conf failed: Key file does not start
-> with a group
-> Sep 16 11:39:05 coyote bluetoothd[892]: Adapter /org/bluez/892/hci0
-> has been enabled
- 
-> Q: What defines this missing "group" in the serial.conf file?, which
-> is now 100% commented.  Copied from the 4.51 serial tree verbatum
-> since it wasn't installed by a make install.
 
-It is not needed, since the defaults are just fine.
-
-> Firing up bluetooth-wizard, the eb101 is displayed, and can be
-> selected, but the pairing attempt fails.  Pin on both ends is 0000.
-> 
-> What can I do to make minicom find and use this hci0 device as a
-> modem circuit?  /dev/hci0 doesn't exist, and minicom can't find  
-> /org/bluez/892/hci0.
-
-You need to either create a rfcomm device with "rfcomm bind <bdaddr>
-<channel>" or use something like test-serial to set up the rfcomm
-device for you.
-
-This rfcomm device (usually "/dev/rfcomm0") then is the "serial port"
-that you hook up screen, or minicom or pppd or whatever.
-
-I have written something up about rfcomm in a former life on
-http://en.opensuse.org/Bluetooth
-(it is not suse specific at all, but it might be outdated), for your
-case http://en.opensuse.org/Bluetooth/rfcomm might be even more
-specific.
-
-Nowadays, you might also get good results with "test-serial".
-At least on my phone "test-serial <bdaddr>" gets me an /dev/rfcomm0
-which I can use to talk to it with AT commands. Be prepared that all
-those test-* commands will cancel the connection after 1000 seconds,
-but increasing the timeout is easy as it is a simple python script ;)
-
-The /org/bluez/892/hci0 is no filesystem path but a pointer to where
-the device lives on the famous D-Bus ;)
-
-> [root@coyote tools]# minicom coco3
-> Device /org/bluez/892/hci0 access failed: No such file or directory.
-
-which then, of course, is to be expected.
-
-I hope this gets you going into the right direction, have fun ;)
-
-Best regards,
-
-	Stefan
--- 
-Stefan Seyfried
-
-"Any ideas, John?"
-"Well, surrounding them's out."
