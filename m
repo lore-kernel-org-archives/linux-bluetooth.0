@@ -1,91 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4AB130C4.5030205@binarywings.net>
-Date: Wed, 16 Sep 2009 20:39:00 +0200
-From: Florian Philipp <lists@binarywings.net>
+Message-ID: <4AB12F11.5060305@dell.com>
+Date: Wed, 16 Sep 2009 13:31:45 -0500
+From: Mario Limonciello <mario_limonciello@dell.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: PIN Helper
-References: <6887eb5d0909142301r52343cd3sbe64c106da2d7434@mail.gmail.com> <20090915061104.GA20323@jh-x301> <4AAFBFA6.70007@binarywings.net> <20090915165854.GA6550@jh-x301> <4AB107DE.5070700@binarywings.net> <20090916164104.GA11739@jh-x301>
-In-Reply-To: <20090916164104.GA11739@jh-x301>
-Content-Type: text/plain; charset=ISO-8859-1
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] bluez: correct udev rule for Dell mouse
+References: <20090916072858.GA22262@yangyi-dev.bj.intel.com>
+In-Reply-To: <20090916072858.GA22262@yangyi-dev.bj.intel.com>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="------------enigB239CC956F296C0A85EAE9D9"
+To: unlisted-recipients:; (no To-header on input)
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Johan Hedberg schrieb:
-> Hi,
-> 
-> On Wed, Sep 16, 2009, Florian Philipp wrote:
->> Of course I can't force you to do the programming but removing
->> functionality which worked - more or less - out of the box with an older
->> release and not providing any working alternative except of a
->> do-it-yourself solution ... well ... just sounds wrong.
-> 
-> I think part of the explanation is lack of knowledge about exactly in
-> which ways people use BlueZ and how popular these use cases are. To be
-> honest, I'm not sure I still understand exactly what kind of behavior or
-> feature you're after.
-> 
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enigB239CC956F296C0A85EAE9D9
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-Okay, it's easy to explain it. What I originally set up in late 2007
-resembles what is commonly called a "wlan router" just with bluetooth
-instead of IEEE-802.11. It's a bluetooth GN with a pre-shared key. The
-GN connects to an ethernet bridge with DHCP and DNS servers, NAT and
-firewall for internet access. All built on a Gentoo Linux laptop.
 
-It sure isn't one of the most common usages for bluetooth but it was
-well supported at that time with lots of howtos and an easy setup. You
-basically just had to put up some config files, a one line long script
-for expanding the ethernet bridge for every connection and start the
-daemon with the right parameters.
 
->> Okay, so without some significant work, you could only support legacy
->> pairing for those old deamons and I suppose that's all those test apps
->> can, right?
-> 
-> Exactly which old daemons are you talking about? I don't see how any old
-> software that isn't aware of the current pairing/agent interface could be
-> made to work "without some significant work".
-> 
+Yi Yang wrote:
+> From dbcfcf5dfbdef2377f64c7cd737886e31ae17615 Mon Sep 17 00:00:00 2001
+> From: root <root@yangyi-dev.localdomain>
+> Date: Wed, 16 Sep 2009 15:19:13 +0800
+> Subject: [PATCH] Correct rule for Dell mouse
+>
+> Note: this rule should just for Dell bluetooth mouse, but it
+> does function for Dell general USB mouse, such as this one:
+>
+>     ID 413c:3010 Dell Computer Corp. Optical Wheel Mouse
+>
+> We should let it just function for Dell bluetooth mouse, udev
+> 144 and later has included rules for hid2hci
+> extras/hid2hci/70-hid2hci.rules which has correct one, so we
+> should use that one
+> ---
+>  scripts/bluetooth-hid2hci.rules |    3 ++-
+>  1 files changed, 2 insertions(+), 1 deletions(-)
+>
+> diff --git a/scripts/bluetooth-hid2hci.rules b/scripts/bluetooth-hid2hc=
+i.rules
+> index 1b231d1..eb63292 100644
+> --- a/scripts/bluetooth-hid2hci.rules
+> +++ b/scripts/bluetooth-hid2hci.rules
+> @@ -8,7 +8,8 @@
+>  #   413c:8154
+>  #   413c:8158
+>  #   413c:8162
+> -ACTION=3D=3D"add", ENV{ID_VENDOR}=3D=3D"413c", ENV{ID_CLASS}=3D=3D"mou=
+se", ATTRS{bmAttributes}=3D=3D"e0", KERNEL=3D=3D"mouse*", RUN+=3D"/usr/sb=
+in/hid2hci --method dell -v $env{ID_VENDOR} -p $env{ID_MODEL} --mode hci"=
 
-Apologies when I mix up some things here. It's not like I'm working with
-bluez right now. I've left my current solution alone for at least 5
-months and cared about other things.
+> +ATTR{bInterfaceClass}=3D=3D"03", ATTR{bInterfaceSubClass}=3D=3D"01", A=
+TTR{bInterfaceProtocol}=3D=3D"02", ATTRS{bDeviceClass}=3D=3D"00", ATTRS{i=
+dVendor}=3D=3D"413c", ATTRS{bmAttributes}=3D=3D"e0", \
+> +    RUN+=3D"hid2hci --method dell -v $attr{idVendor} -p $attr{idProduc=
+t} --mode hci"
+> =20
+>  # Logitech devices
+>  ACTION=3D=3D"add", ENV{ID_VENDOR}=3D=3D"046d", ENV{ID_MODEL}=3D=3D"c70=
+3" RUN+=3D"/usr/sbin/hid2hci --method logitech -v $env{ID_VENDOR} -p $env=
+{ID_MODEL} --mode hci"
+>  =20
+I think hid2hci should just be dropped, or hid2hci AND rules should be
+synced from the udev source.  Everything is done right in the udev
+source tree.
+--=20
+Mario Limonciello
+*Dell | Linux Engineering*
+mario_limonciello@dell.com
 
-As far as I remember, at least bluez-3.x had support for a legacy
-interface which more or less resembled the old 2.x daemons. For some
-reason that stopped to work for me (or maybe it never worked and I just
-didn't notice until I needed the network again some months after the
-update). Although I can't fully remember I'm pretty sure I never found
-out why. When I searched help on this list, someone told me that 3.x was
-too old for him to look into that problem and that I should move forward
-to 4.x
 
-Well, 4.x never worked for me so I went back to 2.x and here I am now.
+--------------enigB239CC956F296C0A85EAE9D9
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
->> a) Create and maintain the missing parts myself.
-> 
-> If the functionality makes sense and the implementation follows the usual
-> coding standards that we have I don't see why you would be stuck
-> maintaining it yourself. Surely it should be possibe to merge the work
-> with upstream.
-> 
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
 
-Well, I'm pretty sure some other guys came up with the exact same
-question which was the start of this thread at various occasions last
-year or so (i.e. wanting to have a simple daemon-like pin helper). From
-your post I read that you acknowledge that this functionality which
-those other guys and me miss in bluez is something you'd like to have
-back in, right?
+iEYEARECAAYFAkqxLxEACgkQ2CrZjkA73Ys9GACcDrh4//SL92L1YzF07AkTf1U3
+QvkAn1RJqZ92VttsssxYBbt4rChn6Moo
+=yM82
+-----END PGP SIGNATURE-----
 
-So, if any solution, maybe heavily based on those two test programs
-would really make it back into upstream and would not be dropped because
-it somehow does not fit in the current design or whatever (that's what
-my original question was because the functionality _was already there_
-in 2.x), then why is the answer to those requests always "Do it
-yourself" and not at least "Do it yourself and maybe send it to us so we
-can merge it into upstream"?
-
-That's exactly what I wanted to know in the first place: Why you would
-not want this functionality in bluez but rather put people requesting it
-down with "Do it yourself (and leave us alone)". At least that was my
-impression.
+--------------enigB239CC956F296C0A85EAE9D9--
