@@ -1,37 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 18 Sep 2009 14:18:03 +0100 (BST)
-To: Lorenzo Brito Morales <lorenzo.brito@gmail.com>
+Date: Thu, 17 Sep 2009 21:16:44 +0100 (BST)
+To: Jai Kishore <kishore.gj@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Help
-In-Reply-To: <c1d79cc40909180419t45198d46h91b06ca20383fc12@mail.gmail.com>
-References: <c1d79cc40909180419t45198d46h91b06ca20383fc12@mail.gmail.com>
+Subject: Re: Unknown SDP Service UUID
+In-Reply-To: <8073ecd30909170036l4fa7cf39q383ecc4430262e14@mail.gmail.com>
+References: <8073ecd30909170036l4fa7cf39q383ecc4430262e14@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII
-Message-Id: <1253279884.019277.17552.nullmailer@galant.ukfsn.org>
+Message-Id: <1253218604.644617.20563.nullmailer@galant.ukfsn.org>
 From: Iain Hibbert <plunky@rya-online.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 18 Sep 2009, Lorenzo Brito Morales wrote:
+On Thu, 17 Sep 2009, Jai Kishore wrote:
 
-> Hi, im a beggineer in bluez and also in programming stuff, i have read
-> a coupble of things about bluez and programming,  what i want to do is
-> a progran that send files to the phone is near by,,im trying to get
-> work these code, its compile, and conect to the phone , but in the
-> phone ask for a number security, ahta later i have to type in the
-> computer...... how can i send a file whitout asking a number? just
-> asking in the phone about aceptting the file
+> Dear Team,
+>
+> When I try to connect my Bluetooth Mobile with some Hands Free device,
+> it is asking for SDP request with service search uuid as 8E 77 13 02.
+> The information regarding this uuid is not present in Bluetooth
+> specifications at
+> https://www.bluetooth.org/Technical/AssignedNumbers/service_discovery.htm.
+>
+> Can somebody kindly provide a pointer to the mentioned service search
+> uuid or any other link which includes information about this service
+> uuid.
 
-Well, in this case the phone requires authentication to connect to the
-service on RFCOMM channel #1 so you are out of luck unless you can provide
-the same PIN at both ends (or other pairing)
+if you google for 0x8e771302 you will find something. I don't know if its
+much use since it only really gives references to the BlueZ sdptool which
+knows about it as relating to "SEMC High Level Authentication". It seems
+that SEMC is "Sony Ericsson Mobile Communications".
 
-You need to investiage "OBEX Object Push". Sometimes you can send a text
-file without authentication, but the person who owns the phone will
-usually be required to authorise the connection (ie a message will appear,
-asking if they wish to receive the file and they will need to approve)
-
-It is a long way to do it yourself, look for "obexd" at www.bluez.org
+Much more information is found by googling "SEMC HLA" but I don't care to
+wade through it, good luck!
 
 iain
 
