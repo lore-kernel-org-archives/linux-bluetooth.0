@@ -1,166 +1,398 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: can we disable/enable eSCO by using setsockopt of sco socket?
+Subject: Re: kernel panic happens when disconnecting Bluetooth headset
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Lan Zhu <zhu.lan.cn@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <113d36d80909180347g59ac5444ta70e17c7eb3cb86e@mail.gmail.com>
-References: <113d36d80909140452jb808a2bub393aae7307c7450@mail.gmail.com>
-	 <1252935154.3421.17.camel@localhost.localdomain>
-	 <113d36d80909140829g74828077tfd1a56348abcc916@mail.gmail.com>
-	 <113d36d80909180347g59ac5444ta70e17c7eb3cb86e@mail.gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Cc: Nick Pelly <npelly@google.com>, Lan Zhu <zhu.lan.cn@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+In-Reply-To: <508e92ca0909180106o33438f0dxfceb8475dac85c2d@mail.gmail.com>
+References: <113d36d80909110053ybd2c203xeda76bd36248bb17@mail.gmail.com>
+	 <1252657436.8931.52.camel@violet>
+	 <113d36d80909110828i1b53e8f5x5b913fb7861850fd@mail.gmail.com>
+	 <1252687514.8931.77.camel@violet>
+	 <113d36d80909140210n476f5826x1ae2ea621b57782c@mail.gmail.com>
+	 <35c90d960909161821g64fa4662y46495f9c241b415c@mail.gmail.com>
+	 <1253153868.28416.12.camel@localhost.localdomain>
+	 <508e92ca0909180106o33438f0dxfceb8475dac85c2d@mail.gmail.com>
 Content-Type: text/plain
-Date: Fri, 18 Sep 2009 08:31:23 -0700
-Message-Id: <1253287883.28416.30.camel@localhost.localdomain>
+Date: Fri, 18 Sep 2009 08:24:13 -0700
+Message-Id: <1253287453.28416.24.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Andrei,
 
-> >>> When we connect a SCO socket, BlueZ decides whether to connect SCO or
-> >>> eSCO type according to the remote feature. If the remote device
-> >>> declares supporting eSCO in the remote feature, BlueZ will select eSCO
-> >>> type to connect with it.
-> >>>
-> >>> But in fact  there are some old carkits or headsets which are only
-> >>> support SCO but wrongly declare to support eSCO, such as Motorola
-> >>> HF850 and HS820 which use a very old CSR chip, so we have problem to
-> >>> create sco connection with them.
-> >>>
-> >>> We thought a method to resolve this issue, which is force to create
-> >>> SCO type connection if we find the HFP version of one remote device is
-> >>> less than 1.2. So we need a method to control the SCO type from user
-> >>> space. We want to use setsockopt() functon to do that. The code change
-> >>> in net/bluetooth/sco.c is like below,
-> >>>
-> >>>
-> >>> @@ -653,12 +653,25 @@ static int sco_sock_setsockopt(struct socket *sock, int le
-> >>>  {
-> >>>        struct sock *sk = sock->sk;
-> >>>        int err = 0;
-> >>> +       u32 opt;
-> >>>
-> >>>        BT_DBG("sk %p", sk);
-> >>>
-> >>>        lock_sock(sk);
-> >>>
-> >>> +       if (level != SOL_SCO) {
-> >>> +               err = -ENOPROTOOPT;
-> >>> +               return err;
-> >>> +       }
-> >>> +
-> >>>        switch (optname) {
-> >>> +       case BT_DISABLE_ESCO:
-> >>> +               if (get_user(opt, (u32 __user *) optval)) {
-> >>> +                       err = -EFAULT;
-> >>> +                       break;
-> >>> +               }
-> >>> +               disable_esco = opt;
-> >>> +               break;
-> >>>        default:
-> >>>                err = -ENOPROTOOPT;
-> >>>                break;
-> >>>
-> >>>
-> >>> Then, in the user space, we can call setsockopt(fd, SOL_SCO,
-> >>> BT_DISABLE_ESCO, &disabled, sizeof(disabled)) to force to connect SCO.
-> >>>
-> >>> Do you agree with this change?
+> >> >>> >> We met a issue that kernel panic happens when disconnecting some kinds
+> >> >>> >> of Bluetooth headset, then we did some analysis and made some changes
+> >> >>> >> on kernel code which have avoided the panic happening. Would you
+> >> >>> >> please help to check if our analysis and fix is correct?
+> >> >>> >>
+> >> >>> >> =============
+> >> >>> >> Issue description
+> >> >>> >> =============
+> >> >>> >> On Android platform(kernel 2.6.29), disconnecting Bluetooth headset
+> >> >>> >> may cause kernel panic on certain conditions.
+> >> >>> >>
+> >> >>> >> (Pre-condition is android paired with headset.)
+> >> >>> >> Initiate the connection from android, disconnect it from android, result is OK.
+> >> >>> >> Initiate the connection from android, disconnect it from headset, result is OK.
+> >> >>> >> Initiate the connection from headset, disconnect it from headset, result is OK.
+> >> >>> >> Initiate the connection from headset, disconnect it from android, for
+> >> >>> >> Motorola H12 headset, result is OK.
+> >> >>> >> Initiate the connection from headset, disconnect it from android, for
+> >> >>> >> Motorola H620/560 headset, result is kernel panic.
+> >> >>> >>
+> >> >>> >> =============
+> >> >>> >> Kernel panic point
+> >> >>> >> =============
+> >> >>> >> kernel panic at __list_del() in the function rfcomm_session_del() ,
+> >> >>> >> panic reason is "Unable to handle kernel paging request at virtual
+> >> >>> >> address 00200200"
+> >> >>> >>
+> >> >>> >> =============
+> >> >>> >> Kernel log analysis
+> >> >>> >> =============
+> >> >>> >> rfcomm_session_del() is still called after the session entry is
+> >> >>> >> removed from the list. Then __list_del() will cause kernel panic
+> >> >>> >> because of the incorrect pointer. This situation occurs when calling
+> >> >>> >> rfcomm_recv_ua() when the socket state is BT_CLOSED . So we need to
+> >> >>> >> find out why the socket state become BT_CLOSED before we calling
+> >> >>> >> rfcomm_recv_ua().
+> >> >>> >>
+> >> >>> >> # [  171.677429] rfcomm_sock_sendmsg: sock ce9a0960, sk cc5c4c00
+> >> >>> >> [  171.683532] rfcomm_dlc_send: dlc cd3fe920 mtu 255 len 14
+> >> >>> >> [  171.689422] rfcomm_process_rx: session cc751be0 state 1 qlen 0
+> >> >>> >> [  171.695709] rfcomm_process_rx: @@@ @@@ sk_state = 1
+> >> >>> >> [  171.701110] rfcomm_process_dlcs: session cc751be0 state 1
+> >> >>> >> [  171.706939] rfcomm_process_tx: dlc cd3fe920 state 1 cfc 40
+> >> >>> >> rx_credits 33 tx_credits 31
+> >> >>> >> [  171.715515] rfcomm_send_frame: session cc751be0 len 18
+> >> >>> >> [  171.721130] rfcomm_session_put: in rfcomm_session_put, s->refcnt = 3
+> >> >>> >> [  174.127807] rfcomm_sock_sendmsg: sock ce9a0960, sk cc5c4c00
+> >> >>> >> [  174.134490] rfcomm_dlc_send: dlc cd3fe920 mtu 255 len 6
+> >> >>> >> [  174.141540] rfcomm_process_rx: session cc751be0 state 1 qlen 0
+> >> >>> >> [  174.148498] rfcomm_process_rx: @@@ @@@ sk_state = 1
+> >> >>> >> [  174.154968] rfcomm_process_dlcs: session cc751be0 state 1
+> >> >>> >> [  174.161437] rfcomm_process_tx: dlc cd3fe920 state 1 cfc 40
+> >> >>> >> rx_credits 33 tx_credits 30
+> >> >>> >> [  174.171173] rfcomm_send_frame: session cc751be0 len 10
+> >> >>> >> [  174.177642] rfcomm_session_put: in rfcomm_session_put, s->refcnt = 3
+> >> >>> >> [  174.205932] rfcomm_sock_release: sock ce9a0960, sk cc5c4c00
+> >> >>> >> [  174.212707] rfcomm_sock_shutdown: sock ce9a0960, sk cc5c4c00
+> >> >>> >> [  174.220031] __rfcomm_sock_close: sk cc5c4c00 state 1 socket ce9a0960
+> >> >>> >> [  174.227508] __rfcomm_dlc_close: dlc cd3fe920 state 1 dlci 20 err 0
+> >> >>> >> session cc751be0
+> >> >>> >> [  174.236877] rfcomm_send_disc: cc751be0 dlci 20
+> >> >>> >> [  174.242706] rfcomm_send_frame: session cc751be0 len 4
+> >> >>> >> [  174.248962] rfcomm_dlc_set_timer: dlc cd3fe920 state 8 timeout 2560
+> >> >>> >> [  174.256835] rfcomm_sock_kill: sk cc5c4c00 state 1 refcnt 2
+> >> >>> >> [  174.263336] rfcomm_sock_destruct: sk cc5c4c00 dlc cd3fe920
+> >> >>> >> [  174.399444] rfcomm_l2data_ready: ccf70400 bytes 4
+> >> >>> >> [  174.404724] rfcomm_process_rx: session cc751be0 state 1 qlen 1
+> >> >>> >> [  174.411010] rfcomm_process_rx: @@@ @@@ sk_state = 1
+> >> >>> >> [  174.416412] rfcomm_recv_ua: session cc751be0 state 1 dlci 20
+> >> >>> >> [  174.422515] __rfcomm_dlc_close: dlc cd3fe920 state 9 dlci 20 err 0
+> >> >>> >> session cc751be0
+> >> >>> >> [  174.430816] rfcomm_dlc_clear_timer: dlc cd3fe920 state 9
+> >> >>> >> [  174.436553] rfcomm_dlc_unlink: dlc cd3fe920 refcnt 1 session cc751be0
+> >> >>> >> [  174.443572] rfcomm_dlc_free: cd3fe920
+> >> >>> >> [  174.447570] rfcomm_session_put: in rfcomm_session_put, s->refcnt = 3
+> >> >>> >> [  174.454528] rfcomm_send_disc: cc751be0 dlci 0
+> >> >>> >> [  174.459259] rfcomm_send_frame: session cc751be0 len 4
+> >> >>> >> [  174.464904] rfcomm_process_dlcs: session cc751be0 state 8
+> >> >>> >> [  174.470703] rfcomm_session_put: in rfcomm_session_put, s->refcnt = 2
+> >> >>> >> [  174.898284] rfcomm_l2data_ready: ccf70400 bytes 4
+> >> >>> >> [  174.903442] rfcomm_l2state_change: ccf70400 state 9
+> >> >>> >> [  174.908874] rfcomm_process_rx: session cc751be0 state 8 qlen 1
+> >> >>> >> [  174.915130] rfcomm_process_rx: @@@ @@@ sk_state = 9
+> >> >>> >> [  174.920562] rfcomm_recv_ua: session cc751be0 state 8 dlci 0
+> >> >>> >> [  174.926574] rfcomm_session_put: in rfcomm_session_put, s->refcnt = 2
+> >> >>> >> [  174.933532] rfcomm_process_rx: @@@ @@@ sk_state == BT_CLOSED , s->initiator=0
+> >> >>> >> [  174.941253] rfcomm_session_put: in rfcomm_session_put, s->refcnt = 1
+> >> >>> >> [  174.948211] rfcomm_session_del: session cc751be0 state 8
+> >> >>> >> [  174.953918] @@@@ in rfcomm_session_del()
+> >> >>> >> [  174.958312] @@@@ s->list = cc751be0
+> >> >>> >> [  174.962097] @@@@ s->list.next = ccbfe9a0
+> >> >>> >> [  174.966369] @@@@ s->list.prev = c047d524
+> >> >>> >> [  174.970733] @@@@ list is valid, call list_del()
+> >> >>> >> [  174.975646] @@@@ after list_del()
+> >> >>> >> [  174.979278] @@@@ s->list = cc751be0
+> >> >>> >> [  174.983184] @@@@ s->list.next = 00100100
+> >> >>> >> [  174.987457] @@@@ s->list.prev = 00200200
+> >> >>> >> [  174.991729] rfcomm_session_close: session cc751be0 state 8 err 104
+> >> >>> >> [  174.998504] rfcomm_session_put: in rfcomm_session_put, s->refcnt = 1
+> >> >>> >> [  175.005310] rfcomm_session_del: session cc751be0 state 9
+> >> >>> >> [  175.011169] @@@@ in rfcomm_session_del()
+> >> >>> >> [  175.015441] @@@@ s->list = cc751be0
+> >> >>> >> [  175.019409] @@@@ s->list.next = 00100100
+> >> >>> >> [  175.023651] @@@@ s->list.prev = 00200200
+> >> >>> >> [  175.027923] @@@@ list is valid, call list_del()
+> >> >>> >> [  175.032958] Unable to handle kernel paging request at virtual
+> >> >>> >> address 00200200
+> >> >>> >> [  175.040679] pgd = c0004000
+> >> >>> >> [  175.043792] [00200200] *pgd=00000000
+> >> >>> >> [  175.047821] Internal error: Oops: 817 [#1]
+> >> >>> >> [  175.052246] Modules linked in:
+> >> >>> >> [  175.055725] CPU: 0    Not tainted  (2.6.29-omap1-dirty #34)
+> >> >>> >> [  175.061859] PC is at rfcomm_session_del+0x6c/0x108
+> >> >>> >> [  175.067047] LR is at release_console_sem+0x190/0x1a0
+> >> >>> >> [  175.072509] pc : [<c033ded8>]    lr : [<c0066308>]    psr: 60000013
+> >> >>> >> [  175.072509] sp : cc1abf38  ip : cc1abe68  fp : cc1abf4c
+> >> >>> >> [  175.084960] r10: cc751c04  r9 : c036d2fc  r8 : cc751be0
+> >> >>> >> [  175.090545] r7 : 00000068  r6 : cc751c04  r5 : 00000009  r4 : cc751be0
+> >> >>> >> [  175.097656] r3 : 00100100  r2 : 00100100  r1 : 00200200  r0 : c0422876
+> >> >>> >>
+> >> >>> >> =============
+> >> >>> >> HCI log analysis
+> >> >>> >> =============
+> >> >>> >> Compare the hcidump log of the correct case with the one of the panic
+> >> >>> >> case, we found there is only one difference in the message sequence.
+> >> >>> >> In the panic case, headset send L2CAP Disconn_Req immediately after
+> >> >>> >> sending rfcomm UA frame to android. We think this is the reason that
+> >> >>> >> cause the socket state become BT_CLOSED.
+> >> >>> >>
+> >> >>> >> Please compare these two log, pay attention to the message direction
+> >> >>> >> of the last Disconn_Req.
+> >> >>> >>
+> >> >>> >>
+> >> >>> >> Log of correct case:
+> >> >>> >> ----------------------------
+> >> >>> >>
+> >> >>> >>
+> >> >>> >> 009-09-10 15:27:28.963519 < ACL data: handle 1 flags 0x02 dlen 22
+> >> >>> >>    L2CAP(d): cid 0x0047 len 18 [psm 3]
+> >> >>> >>      RFCOMM(d): UIH: cr 0 dlci 20 pf 0 ilen 14 fcs 0xeb
+> >> >>> >>      0000: 0d 0a 2b 43 49 45 56 3a  20 37 2c 33 0d 0a        ..+CIEV: 7,3..
+> >> >>> >> 009-09-10 15:27:28.967272 > HCI Event: Number of Completed Packets (0x13) plen
+> >> >>> >>
+> >> >>> >>    handle 1 packets 1
+> >> >>> >> 009-09-10 15:27:29.243945 < ACL data: handle 1 flags 0x02 dlen 8
+> >> >>> >>    L2CAP(d): cid 0x0047 len 4 [psm 3]
+> >> >>> >>      RFCOMM(s): DISC: cr 0 dlci 20 pf 1 ilen 0 fcs 0x7d
+> >> >>> >> 009-09-10 15:27:29.247363 > HCI Event: Number of Completed Packets (0x13) plen
+> >> >>> >>
+> >> >>> >>    handle 1 packets 1
+> >> >>> >> 009-09-10 15:27:29.274890 > ACL data: handle 1 flags 0x02 dlen 8
+> >> >>> >>    L2CAP(d): cid 0x0040 len 4 [psm 3]
+> >> >>> >>      RFCOMM(s): UA: cr 0 dlci 20 pf 1 ilen 0 fcs 0x57
+> >> >>> >> 009-09-10 15:27:29.296343 < ACL data: handle 1 flags 0x02 dlen 8
+> >> >>> >>    L2CAP(d): cid 0x0047 len 4 [psm 3]
+> >> >>> >>      RFCOMM(s): DISC: cr 0 dlci 0 pf 1 ilen 0 fcs 0x9c
+> >> >>> >> 009-09-10 15:27:29.298480 > HCI Event: Number of Completed Packets (0x13) plen
+> >> >>> >>
+> >> >>> >>    handle 1 packets 1
+> >> >>> >> 009-09-10 15:27:29.319873 > ACL data: handle 1 flags 0x02 dlen 8
+> >> >>> >>    L2CAP(d): cid 0x0040 len 4 [psm 3]
+> >> >>> >>      RFCOMM(s): UA: cr 0 dlci 0 pf 1 ilen 0 fcs 0xb6
+> >> >>> >> 009-09-10 15:27:29.320727 < ACL data: handle 1 flags 0x02 dlen 12
+> >> >>> >>    L2CAP(s): Disconn req: dcid 0x0047 scid 0x0040
+> >> >>> >> 009-09-10 15:27:29.323474 > HCI Event: Number of Completed Packets (0x13) plen
+> >> >>> >>
+> >> >>> >>    handle 1 packets 1
+> >> >>> >> 009-09-10 15:27:29.337237 > ACL data: handle 1 flags 0x02 dlen 12
+> >> >>> >>    L2CAP(s): Disconn rsp: dcid 0x0047 scid 0x0040
+> >> >>> >>
+> >> >>> >>
+> >> >>> >>
+> >> >>> >>
+> >> >>> >> log of panic case:
+> >> >>> >> ------------------------
+> >> >>> >>
+> >> >>> >>
+> >> >>> >>
+> >> >>> >> 2009-09-10 13:34:24.020208 < ACL data: handle 1 flags 0x02 dlen 22
+> >> >>> >>     L2CAP(d): cid 0x0041 len 18 [psm 3]
+> >> >>> >>       RFCOMM(d): UIH: cr 0 dlci 20 pf 0 ilen 14 fcs 0xeb
+> >> >>> >>       0000: 0d 0a 2b 43 49 45 56 3a  20 37 2c 33 0d 0a        ..+CIEV: 7,3..
+> >> >>> >> 2009-09-10 13:34:24.281256 > HCI Event: Number of Completed Packets (0x13) plen
+> >> >>> >> 5
+> >> >>> >>     handle 1 packets 1
+> >> >>> >> 2009-09-10 13:34:24.083580 < ACL data: handle 1 flags 0x02 dlen 8
+> >> >>> >>     L2CAP(d): cid 0x0041 len 4 [psm 3]
+> >> >>> >>       RFCOMM(s): DISC: cr 0 dlci 20 pf 1 ilen 0 fcs 0x7d
+> >> >>> >> 2009-09-10 13:34:24.529442 > HCI Event: Number of Completed Packets (0x13) plen
+> >> >>> >> 5
+> >> >>> >>     handle 1 packets 1
+> >> >>> >> 2009-09-10 13:34:24.531914 > ACL data: handle 1 flags 0x02 dlen 8
+> >> >>> >>     L2CAP(d): cid 0x0040 len 4 [psm 3]
+> >> >>> >>       RFCOMM(s): UA: cr 0 dlci 20 pf 1 ilen 0 fcs 0x57
+> >> >>> >> 2009-09-10 13:34:24.533135 < ACL data: handle 1 flags 0x02 dlen 8
+> >> >>> >>     L2CAP(d): cid 0x0041 len 4 [psm 3]
+> >> >>> >>       RFCOMM(s): DISC: cr 0 dlci 0 pf 1 ilen 0 fcs 0x9c
+> >> >>> >> 2009-09-10 13:34:25.028649 > HCI Event: Number of Completed Packets (0x13) plen
+> >> >>> >> 5
+> >> >>> >>     handle 1 packets 1
+> >> >>> >> 2009-09-10 13:34:25.032128 > ACL data: handle 1 flags 0x02 dlen 8
+> >> >>> >>     L2CAP(d): cid 0x0040 len 4 [psm 3]
+> >> >>> >>       RFCOMM(s): UA: cr 0 dlci 0 pf 1 ilen 0 fcs 0xb6
+> >> >>> >> 2009-09-10 13:34:25.032341 > ACL data: handle 1 flags 0x02 dlen 12
+> >> >>> >>     L2CAP(s): Disconn req: dcid 0x0040 scid 0x0041
+> >> >>> >> 2009-09-10 13:34:25.032646 < ACL data: handle 1 flags 0x02 dlen 12
+> >> >>> >>     L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0041
+> >> >>> >>
+> >> >>> >> =============
+> >> >>> >> Analysis Result
+> >> >>> >> =============
+> >> >>> >> For some kinds of Bluetooth headset such as Motorola H560/H620 which
+> >> >>> >> are based on BCM2044S, they will send L2CAP Disconn_Req command right
+> >> >>> >> after sending rfcomm UA frame. This L2CAP Disconn_Req will cause the
+> >> >>> >> rfcomm socket state become BT_CLOSED before completely handling UA
+> >> >>> >> frame, thus it will cause kernel panic. I think we can ignore the
+> >> >>> >> received rfcomm frames if socket state is BT_CLOSED, because it
+> >> >>> >> doesn't make sense in the BT_CLOSED state.
+> >> >>> >>
+> >> >>> >>
+> >> >>> >> =============
+> >> >>> >> Changed Code
+> >> >>> >> =============
+> >> >>> >> We changed the code in the function rfcomm_process_rx() in
+> >> >>> >> net/bluetooth/rfcomm/core.c, check the socket state first before
+> >> >>> >> handling the received framew. If the socket state is BT_CLOSED, we
+> >> >>> >> don't handle any rfcomm frames but just close the session.
+> >> >>> >>
+> >> >>> >> The change is like below
+> >> >>> >>
+> >> >>> >> +       if (sk->sk_state != BT_CLOSED) {
+> >> >>> >>         /* Get data directly from socket receive queue without copying it. */
+> >> >>> >>         while ((skb = skb_dequeue(&sk->sk_receive_queue))) {
+> >> >>> >>                 skb_orphan(skb);
+> >> >>> >>                 rfcomm_recv_frame(s, skb);
+> >> >>> >>         }
+> >> >>> >> -
+> >> >>> >> -       if (sk->sk_state == BT_CLOSED) {
+> >> >>> >> +       } else {
+> >> >>> >>                 if (!s->initiator)
+> >> >>> >>                         rfcomm_session_put(s);
+> >> >>> >>
+> >> >>> >>                 rfcomm_session_close(s, sk->sk_err);
+> >> >>> >>          }
+> >> >>> >
+> >> >>> > so I do see the issue here, but I don't agree with the fix since it
+> >> >>> > changes behavior that might cause other issues. So in case the frame
+> >> >>> > processing leads to sk->sk_state == BT_CLOSED we are not closing the
+> >> >>> > connection anymore if we make it depend on a state before the frame
+> >> >>> > processing. And nothing guarantees that rfcomm_process_rx gets scheduled
+> >> >>> > again.
+> >> >>> >
+> >> >>> > diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+> >> >>> > index 94b3388..606143b 100644
+> >> >>> > --- a/net/bluetooth/rfcomm/core.c
+> >> >>> > +++ b/net/bluetooth/rfcomm/core.c
+> >> >>> > @@ -1798,12 +1798,16 @@ static inline void rfcomm_process_rx(struct rfcomm_session *s)
+> >> >>> >
+> >> >>> >        BT_DBG("session %p state %ld qlen %d", s, s->state, skb_queue_len(&sk->sk_receive_queue));
+> >> >>> >
+> >> >>> > +       rfcomm_session_hold(s);
+> >> >>> > +
+> >> >>> >        /* Get data directly from socket receive queue without copying it. */
+> >> >>> >        while ((skb = skb_dequeue(&sk->sk_receive_queue))) {
+> >> >>> >                skb_orphan(skb);
+> >> >>> >                rfcomm_recv_frame(s, skb);
+> >> >>> >        }
+> >> >>> >
+> >> >>> > +       rfcomm_session_put(s);
+> >> >>> > +
+> >> >>> >        if (sk->sk_state == BT_CLOSED) {
+> >> >>> >                if (!s->initiator)
+> >> >>> >                        rfcomm_session_put(s);
+> >> >>> >
+> >> >>> > What does the above patch do for you? Since if I read it correctly, then
+> >> >>> > the rfcomm_recv_ua causes the rfcomm_session_put to trigger the closing
+> >> >>> > of the session. And then in this case it is delayed until after all
+> >> >>> > frames are processed.
+> >> >>> >
+> >> >>> >
+> >> >>>
+> >> >>> I've tried your patch but unfortunately kernel panic still happened.
+> >> >>>
+> >> >>> From the log I noticed that if rfcomm_l2state_change is called before
+> >> >>> rfcomm_process_rx, kernel panic will happen definitely.
+> >> >>>
+> >> >>> Below lines are in the correct log,
+> >> >>>
+> >> >>> [  139.323852] rfcomm_l2data_ready: ccf70000 bytes 4
+> >> >>> [  139.346252] rfcomm_process_rx: session ccb94ce0 state 8 qlen 1
+> >> >>> ...
+> >> >>> [  139.457519] rfcomm_l2state_change: ccf70000 state 9
+> >> >>> (disconnect ok)
+> >> >>>
+> >> >>> In the above case, when process_rx, the code in the condition "if
+> >> >>> (sk->sk_state == BT_CLOSED)" will never run.
+> >> >>>
+> >> >>> Below lines are in the panic log,
+> >> >>>
+> >> >>> [  174.898284] rfcomm_l2data_ready: ccf70400 bytes 4
+> >> >>> [  174.903442] rfcomm_l2state_change: ccf70400 state 9
+> >> >>> [  174.908874] rfcomm_process_rx: session cc751be0 state 8 qlen 1
+> >> >>> ...
+> >> >>> ( then panic)
+> >> >>>
+> >> >>> In the above case, sk_state is changed to 9 (BT_CLOSED) firstly,  then
+> >> >>> process_rx, so the code in the condition "if (sk->sk_state ==
+> >> >>> BT_CLOSED) " will be run, it will call session_put twice. I think this
+> >> >>> is the root cause of panic.
+> >> >>
+> >> >> I know why it happens, that is not the problem. My point is not to break
+> >> >> current scheduling assumptions.
+> >> >>
+> >> >> So if you move the rfcomm_session_put() now at the end of the function,
+> >> >> then it should be fine, right?
+> >> >>
+> >> >> Regards
+> >> >>
+> >> >> Marcel
+> >> >>
+> >> >>
+> >> >>
+> >> >
+> >> > You are right. I moved the rfcomm_session_put() at the end of
+> >> > rfcomm_process_tx() then kernel panic doesn't happen any longer.
+> >> >
+> >> > The changed code is like below,
+> >> >
+> >> > @@ -1796,6 +1796,8 @@ static inline void rfcomm_process_rx(struct rfcomm_session
+> >> >
+> >> >        BT_DBG("session %p state %ld qlen %d", s, s->state, skb_queue_len(&sk->s
+> >> >
+> >> > +       rfcomm_session_hold(s);
+> >> > +
+> >> >        /* Get data directly from socket receive queue without copying it. */
+> >> >        while ((skb = skb_dequeue(&sk->sk_receive_queue))) {
+> >> >                skb_orphan(skb);
+> >> > @@ -1808,6 +1810,8 @@ static inline void rfcomm_process_rx(struct rfcomm_session
+> >> >
+> >> >                rfcomm_session_close(s, sk->sk_err);
+> >> >        }
+> >> > +
+> >> > +       rfcomm_session_put(s);
+> >> >  }
+> >> >
+> >> >  static inline void rfcomm_accept_connection(struct rfcomm_session *s)
+> >> >
+> >> > Please submit this change to bluez release.
+> >> >
+> >> > Thank you,
+> >> > Zhu Lan
 > >>
-> >> I don't. You first have to prove to me that this change is needed at
-> >> all. Show me the hcidump -X -V connections attempts for these carkits.
+> >> http://android.git.kernel.org/?p=kernel/common.git;a=commit;h=6f505dbe5337e49302574f8d2e65fd83e30f9117
 > >>
-> >> Also your analysis is wrong. BlueZ doesn't care if the remote headset
-> >> supports eSCO or not. We just care about if our local controller has the
-> >> synchronous setup commands. It is the job of the link manager inside the
-> >> controller firmware to either establish SCO or eSCO. And we do retry
-> >> with SCO if eSCO fails. This sounds more like the case that you have an
-> >> outdated kernel.
-> >>
-> >> Regards
-> >>
-> >> Marcel
-> >>
-> >>
-> >>
+> >> If Bluez wants to cherry-pick it.
 > >
-> > Please excuse me for my inaccurate description. Actually it is LMP
-> > layer to check the remote feature then decide which SCO type shall be
-> > setup. So, if one remote device wrongly declare to support eSCO, it
-> > will cause problem. I do know you have a retry mechanism to retry SCO
-> > if eSCO failed, it is in below code in net/bluetooth/hci_event.c,
-> > right?
-> >
-> >        case 0x1c:      /* SCO interval rejected */
-> >        case 0x1f:      /* Unspecified error */
-> >                if (conn->out && conn->attempt < 2) {
-> >                        conn->pkt_type = (hdev->esco_type & SCO_ESCO_MASK) |
-> >                                        (hdev->esco_type & EDR_ESCO_MASK);
-> >                        hci_setup_sync(conn, conn->link->handle);
-> >                        goto unlock;
-> >                }
-> >                /* fall through */
-> >
-> > But the problem is, not all the returned error code can bring retry
-> > SCO. So, we still got problem when connecting some devices because it
-> > returns some error code else.
-> >
-> > This is the hcidump log when we test SCO with HF850 carkit.
-> >
-> > 2009-09-03 17:26:29.093601 < HCI Command: Setup Synchronous Connection (0x01|0x0
-> > 028) plen 17
-> >    handle 1 voice setting 0x0060
-> > 2009-09-03 17:26:29.094608 > HCI Event: Command Status (0x0f) plen 4
-> >    Setup Synchronous Connection (0x01|0x0028) status 0x00 ncmd 1
-> > 2009-09-03 17:26:34.190952 > HCI Event: Synchronous Connect Complete (0x2c) plen
-> >  17
-> >    status 0x10 handle 257 bdaddr 00:50:CD:20:BA:E6 type eSCO
-> >    Error: Connection Accept Timeout Exceeded
-> > 2009-09-03 17:26:34.191196 < HCI Command: Setup Synchronous Connection (0x01|0x0
-> > 028) plen 17
-> >    handle 1 voice setting 0x0060
-> >
-> > From the log you can see, the eSCO connection failed in 5 seconds with
-> > the error "0x10 Timeout Exceeded", and it do not retry SCO again.
-> >
-> > In order to resolve such issue, we have thought about two methods to
-> > resolve this.
-> >
-> > The first one is, add a new case for "0x10" error code and then retry
-> > SCO. We do have tested this, SCO can be setup, but the 5 seconds delay
-> > can not be eliminated.
-> >
-> > The second one is, we hope to force to use the sco type of SCO for
-> > some special devices which have compatible issue with eSCO. We can
-> > force to connect SCO by calling hci_add_sco() or hci_setup_sync() with
-> > limited pkt_type for those kind of devices. This is why we want to add
-> > a DISABLE_ESCO option into setsockopt() function.
->
-> We did some investigation on Mecel Bluetooth stack and Qualcomm's,
-> they both provide the upper layer with the option to specify SCO type
-> or eSCO type when creating synchronous connection. There are plenty of
-> different Bluetooth devices in the world, compatiblility with them is
-> usually a big issue for one Bluetooth product. So the rubestness will
-> be a very important target for a product. Sometimes the Bluetooth
-> developer need enough flexibility to handle many specific cases,
-> because that can not be totally dealt with
-> in stack layer. Actually Bluez already has an excellent architecture,
-> but still a little weak in the rubestness. Then, why not give the
-> developer more flexibility to deal with some problems?
+> > if it would have a proper commit message and author details, I would,
+> > but that is not the case. The whole patch + commit message is missing
+> > the background on why we have to do it.
+> 
+> Guys how are we going to proceed with it? I think this patch is
+> important as we also see couple of crashes recently. Is commit to
+> android missing some information?
 
-BlueZ is not weak in robustness. Do me a favor and get your English
-right here and do not spread FUD. You are saying that it is important to
-work around some total broken eSCO capable chip to be robust. I do
-question that statement. It is nice to have good interoperability with
-broken devices, but there is a limit of broken devices we can support.
-
-And the userspace option to select between SCO and eSCO is just stupid
-since you just start hacking some blacklist non-sense into the code that
-becomes a big magic blob that nobody can track or understand.
-
-The way forward here is to analyze the headset and see what information
-it gives us to determine that eSCO might not be working good enough. So
-I want output from hcitool info and detailed hcidump.
+what do you mean by some? You guys must be kidding me here. You really
+think that I am going to commit a patch like this without at least three
+lengthy paragraphs of commit message and a comment inside the code. If
+so then you must be joking. Writing the proper commit message is as
+important as the patch. Since I already wrote the patch, you could have
+at least spent the time for the commit message, but it seems that I have
+to do that by myself, too.
 
 Regards
 
