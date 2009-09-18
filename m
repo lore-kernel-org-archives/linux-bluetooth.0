@@ -1,39 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 17 Sep 2009 21:16:44 +0100 (BST)
-To: Jai Kishore <kishore.gj@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Unknown SDP Service UUID
-In-Reply-To: <8073ecd30909170036l4fa7cf39q383ecc4430262e14@mail.gmail.com>
-References: <8073ecd30909170036l4fa7cf39q383ecc4430262e14@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Message-Id: <1253218604.644617.20563.nullmailer@galant.ukfsn.org>
-From: Iain Hibbert <plunky@rya-online.net>
+Date: Fri, 18 Sep 2009 07:19:23 -0400
+Message-ID: <c1d79cc40909180419t45198d46h91b06ca20383fc12@mail.gmail.com>
+Subject: Help
+From: Lorenzo Brito Morales <lorenzo.brito@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 17 Sep 2009, Jai Kishore wrote:
+Hi, im a beggineer in bluez and also in programming stuff, i have read
+a coupble of things about bluez and programming,  what i want to do is
+a progran that send files to the phone is near by,,im trying to get
+work these code, its compile, and conect to the phone , but in the
+phone ask for a number security, ahta later i have to type in the
+computer...... how can i send a file whitout asking a number? just
+asking in the phone about aceptting the file
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <bluetooth/bluetooth.h>
+#include <bluetooth/rfcomm.h>
 
-> Dear Team,
->
-> When I try to connect my Bluetooth Mobile with some Hands Free device,
-> it is asking for SDP request with service search uuid as 8E 77 13 02.
-> The information regarding this uuid is not present in Bluetooth
-> specifications at
-> https://www.bluetooth.org/Technical/AssignedNumbers/service_discovery.htm.
->
-> Can somebody kindly provide a pointer to the mentioned service search
-> uuid or any other link which includes information about this service
-> uuid.
+int main(int argc, char **argv)
+{
+    struct sockaddr_rc addr = { 0 };
+    int s, status;
+    char dest[18] = "00:23:F1:CC:BF:10";
 
-if you google for 0x8e771302 you will find something. I don't know if its
-much use since it only really gives references to the BlueZ sdptool which
-knows about it as relating to "SEMC High Level Authentication". It seems
-that SEMC is "Sony Ericsson Mobile Communications".
+    // allocate a socket
+    s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
 
-Much more information is found by googling "SEMC HLA" but I don't care to
-wade through it, good luck!
+    // set the connection parameters (who to connect to)
+    addr.rc_family = AF_BLUETOOTH;
+    addr.rc_channel = 1;
+    str2ba( dest, &addr.rc_bdaddr );
 
-iain
+    // connect to server
+    status = connect(s, (struct sockaddr *)&addr, sizeof(addr));
 
+    // send a message
+    if( 0 == status ) {
+        status = send(s, "hello!", 6, 0);
+    }
 
+    if( status < 0 ) perror("uh oh");
+
+    close(s);
+    return 0;
+}
