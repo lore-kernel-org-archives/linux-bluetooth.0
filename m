@@ -1,47 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1253272222.18963.4109.camel@localhost.localdomain>
-References: <a70b8cd30908280742k6cdcaa2l3a267661fe1da17d@mail.gmail.com>
-	 <1253272222.18963.4109.camel@localhost.localdomain>
-Date: Fri, 18 Sep 2009 15:31:44 +0200
-Message-ID: <a70b8cd30909180631r4546ffc0q66edc6cc8bd010f2@mail.gmail.com>
-Subject: Re: [PATCH] PS3Remote unpairing and power-saving
-From: "Ruslan N. Marchenko" <rufferson@gmail.com>
-To: Bastien Nocera <hadess@hadess.net>
+Date: Fri, 18 Sep 2009 14:18:03 +0100 (BST)
+To: Lorenzo Brito Morales <lorenzo.brito@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: Help
+In-Reply-To: <c1d79cc40909180419t45198d46h91b06ca20383fc12@mail.gmail.com>
+References: <c1d79cc40909180419t45198d46h91b06ca20383fc12@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Message-Id: <1253279884.019277.17552.nullmailer@galant.ukfsn.org>
+From: Iain Hibbert <plunky@rya-online.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+On Fri, 18 Sep 2009, Lorenzo Brito Morales wrote:
 
-Thanks for finding your time for review.
+> Hi, im a beggineer in bluez and also in programming stuff, i have read
+> a coupble of things about bluez and programming,  what i want to do is
+> a progran that send files to the phone is near by,,im trying to get
+> work these code, its compile, and conect to the phone , but in the
+> phone ask for a number security, ahta later i have to type in the
+> computer...... how can i send a file whitout asking a number? just
+> asking in the phone about aceptting the file
 
-2009/9/18, Bastien Nocera <hadess@hadess.net>:
-> Don't use statics, add those to a ps3 specific struct.
+Well, in this case the phone requires authentication to connect to the
+service on RFCOMM channel #1 so you are out of luck unless you can provide
+the same PIN at both ends (or other pairing)
 
-This function is ps3remote_event which supposed to be use for ps3remote only,
-also the driver assumes only single ps3remote device per bluez instance.
-I just copied semantic from ps3remote_decode function, where also 2
-statics are used. Though I can move them all to input structure.
-Should I?
+You need to investiage "OBEX Object Push". Sometimes you can send a text
+file without authentication, but the person who owns the phone will
+usually be required to authorise the connection (ie a message will appear,
+asking if they wish to receive the file and they will need to approve)
 
-> > +     g_timer_start(((struct fake_hid *)fake->priv)->timer);
->
->
-> Why do you start the timer unconditionally, instead of just when using
->  the HOME key?
->
+It is a long way to do it yourself, look for "obexd" at www.bluez.org
 
-Because this statement is to reset event timer, which causes remote to
-be disconnected on idle. Each key-press resets the timer
-unconditionally. g_timer_start is recommended to use instead of
-g_timer_reset since they do the same thing and reset will be
-deprecated (I guess).
+iain
 
 
-Regards,
-
--- 
-Looking forward to reading yours.
-     Ruslan N. Marchenko
