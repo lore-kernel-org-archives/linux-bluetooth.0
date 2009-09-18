@@ -1,51 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Fri, 18 Sep 2009 07:19:23 -0400
-Message-ID: <c1d79cc40909180419t45198d46h91b06ca20383fc12@mail.gmail.com>
-Subject: Help
-From: Lorenzo Brito Morales <lorenzo.brito@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH] PS3Remote unpairing and power-saving
+From: Bastien Nocera <hadess@hadess.net>
+To: "Ruslan N. Marchenko" <rufferson@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <a70b8cd30908280742k6cdcaa2l3a267661fe1da17d@mail.gmail.com>
+References: <a70b8cd30908280742k6cdcaa2l3a267661fe1da17d@mail.gmail.com>
+Content-Type: text/plain
+Date: Fri, 18 Sep 2009 12:10:22 +0100
+Message-Id: <1253272222.18963.4109.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, im a beggineer in bluez and also in programming stuff, i have read
-a coupble of things about bluez and programming,  what i want to do is
-a progran that send files to the phone is near by,,im trying to get
-work these code, its compile, and conect to the phone , but in the
-phone ask for a number security, ahta later i have to type in the
-computer...... how can i send a file whitout asking a number? just
-asking in the phone about aceptting the file
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/rfcomm.h>
+On Fri, 2009-08-28 at 16:42 +0200, Ruslan N. Marchenko wrote:
+> PS3 BD Remote driver in fakehid is not able to detect remote unpairing, thus
+> not handling it properly.
+> Also it keeps permanent BT link with remote controller, which drains batteries.
+> With these changes it now utilize IdleTimeout to implicitly unpair device,
+> forcing it to enter low power sleep mode.
+> IdleTimeout is treated in seconds, in contrast with default - minutes.
+> HID device is created on first pairing, and then kept cached till the end of
+> daemon life, allowing pairing key-presses to be sent to application with minimum
+> delays.
+> HID is distinguished by vendor/product codes, which restricts it to only single
+> HID for all registered and active PS3 BD Remote controllers.
 
-int main(int argc, char **argv)
-{
-    struct sockaddr_rc addr = { 0 };
-    int s, status;
-    char dest[18] = "00:23:F1:CC:BF:10";
+Please split your patch into 2:
+- one part for the disconnect timeout
+- one for the PS button disconnecting the remote
 
-    // allocate a socket
-    s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+Also, don't call it "unpair", it's not paired in the first place, and it
+doesn't unpair it, it disconnects it.
 
-    // set the connection parameters (who to connect to)
-    addr.rc_family = AF_BLUETOOTH;
-    addr.rc_channel = 1;
-    str2ba( dest, &addr.rc_bdaddr );
+<snip>
+> +		fake_hid->timeout = iconn->timeout/60;
 
-    // connect to server
-    status = connect(s, (struct sockaddr *)&addr, sizeof(addr));
+Have the timeout be either in seconds, or minutes, don't mix them up.
+<snip>
+> +static gboolean ps3remote_sendkey(int uinput, unsigned int key,
+> +				  unsigned int value)
+> +{
+> +	struct uinput_event event;
+> +	memset(&event, 0, sizeof(event));
 
-    // send a message
-    if( 0 == status ) {
-        status = send(s, "hello!", 6, 0);
-    }
+Add a linefeed after declarations.
 
-    if( status < 0 ) perror("uh oh");
+<snip>
+>  static gboolean ps3remote_event(GIOChannel *chan, GIOCondition cond,
+>  				gpointer data)
+>  {
+> +	static unsigned int lastkey = 0;
+> +	static unsigned int lastval = 0;
 
-    close(s);
-    return 0;
-}
+Don't use statics, add those to a ps3 specific struct.
+<snip>
+> +	g_timer_start(((struct fake_hid *)fake->priv)->timer);
+
+Why do you start the timer unconditionally, instead of just when using
+the HOME key?
+
+<snip>
+> -failed:
+> +failed: /*
+>  	ioctl(fake->uinput, UI_DEV_DESTROY);
+>  	close(fake->uinput);
+> -	fake->uinput = -1;
+> +	fake->uinput = -1;*/
+
+That looks very wrong to me.
+
+Cheers
+
