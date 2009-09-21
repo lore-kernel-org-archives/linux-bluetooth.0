@@ -1,34 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
+MIME-Version: 1.0
+Date: Mon, 21 Sep 2009 12:49:46 +0530
+Message-ID: <6887eb5d0909210019n6646cf37q8b9f45041dc1ba3@mail.gmail.com>
+Subject: Folder not created (/var/
+From: Kartikey Parmar <kartikey2781@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, gustavo@padovan.org
-Subject: [PATCH 1/4] Bluetooth: Put Basic Mode to be the default when using SOCK_SEQPACKET
-Date: Mon, 21 Sep 2009 11:07:26 -0300
-Message-Id: <1253542049-8503-1-git-send-email-gustavo@las.ic.unicamp.br>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When no one specifies the mode and sk_type is SOCK_SEQPACKET Basic Mode
-shall me used.
+HI,
 
-Signed-off-by: Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
----
- net/bluetooth/l2cap.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+I m using Bluez-4.52 cross compiled with ronetix-arm-linux-4.3.3
+toolchain on AT91SAM9263.
+When I insert bluetooth USB dongle in my system and running command
+./hciconfig -a hci0 up it brings up the device.
 
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index b030125..9d586fb 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -2202,7 +2202,7 @@ static int l2cap_build_conf_req(struct sock *sk, void *data)
- {
- 	struct l2cap_pinfo *pi = l2cap_pi(sk);
- 	struct l2cap_conf_req *req = data;
--	struct l2cap_conf_rfc rfc = { .mode = L2CAP_MODE_ERTM };
-+	struct l2cap_conf_rfc rfc = { .mode = L2CAP_MODE_BASIC };
- 	void *ptr = req->data;
- 
- 	BT_DBG("sk %p", sk);
+Then I run my test program that searchs for nearby bluetooth device
+and later on as per user's selection it allows voice path after
+successful pairng.
+
+My problem is the folder with MAC address name is not created in
+/var/lib/bluetooth also bluetoothd logs are not created in
+/var/log/messages file.
+
+I don't find any reason why this folder and file is not created on my
+board. Because when I run the same application on Linux pc it created
+both folder and file of log
+
+Am I missing any setting that prevent folder and file creation on board???
+
+Kindly guide me.
 -- 
-1.6.3.3
-
+Kartikey Parmar
+R&D Software Engg
+Matrix Telecom Pvt Ltd
+Baroda, Gujarat (India)
+09879095390 (M)
