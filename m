@@ -1,50 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 22 Sep 2009 21:31:22 +0100 (BST)
+To: bluezprofile kernel <bluezprofile@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: LLMNR request
+In-Reply-To: <ba5648fa0909221034p79063400t92033fedcf052762@mail.gmail.com>
+References: <ba5648fa0909221034p79063400t92033fedcf052762@mail.gmail.com>
 MIME-Version: 1.0
-Date: Tue, 22 Sep 2009 18:31:47 -0300
-Message-ID: <f9d4bd30909221431p33970fe8weab8c440b3d35edf@mail.gmail.com>
-Subject: [PATCH] Fix extra PropertyChanged signal sent after DeviceRemoved
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Message-Id: <1253651482.664376.8022.nullmailer@galant.ukfsn.org>
+From: Iain Hibbert <plunky@rya-online.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Tue, 22 Sep 2009, bluezprofile kernel wrote:
 
-for paired devices, there is an extra PropertyChanged signal sent
-after DeviceRemoved:
+> Is it possible to send LLMNR request over bnep interface?.
 
-signal sender=:1.78 -> dest=(null destination) serial=145
-path=/org/bluez/24533/hci0; interface=org.bluez.Adapter;
-member=PropertyChanged
-   string "Devices"
-   variant       array [
-      ]
-signal sender=:1.78 -> dest=(null destination) serial=146
-path=/org/bluez/24533/hci0; interface=org.bluez.Adapter;
-member=DeviceRemoved
-   object path "/org/bluez/24533/hci0/dev_00_1F_00_CE_BE_AF"
-signal sender=:1.78 -> dest=(null destination) serial=147
-path=/org/bluez/24533/hci0/dev_00_1F_00_CE_BE_AF;
-interface=org.bluez.Device; member=PropertyChanged
-   string "Paired"
-   variant       boolean false
+I see no reason to believe otherwise.
+
+> How to send?
+
+It would be no different sending it on any other transport since LLMNR is
+(according to Wikipedia) an application layer protocol using UDP/TCP and
+BNEP is a link layer protocol.
+
+> Please provide me some guide lines regarding this.
+
+Just use the normal method. (whatever that is)
+
+iain
 
 
-The patch to fix this issue is in my branch devel:
-
-git://git.infradead.org/users/cktakahasi/bluez.git devel
-
-I removed  "textfile_caseget()" call before call "textfile_casedel()",
-let me know if you wanna keep this check, I can revert this minor
-change.
-
-Br,
-Claudio
-
--- 
---
-Claudio Takahasi
-Instituto Nokia de Tecnologia
-Recife - Pernambuco - Brasil
-+55 81 30879999
