@@ -1,26 +1,19 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sreenivasulu Yellamaraju <sreenivasulu.yellamaraju@sasken.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Tue, 22 Sep 2009 19:02:05 +0530
-Subject: RE: BlueZ Supported Profiles
-Message-ID: <653A85C7F32C4741880F71219266EA02030BD03BB6@EXGMBX01.sasken.com>
+MIME-Version: 1.0
+In-Reply-To: <20090922143053.287fc8a5@vlado>
 References: <ba5648fa0909212143g36f47acck2e4b610429c477ec@mail.gmail.com>
 	 <20090922143053.287fc8a5@vlado>
- <2d5a2c100909220608j1600e8f2k4063d6b2ff7b3296@mail.gmail.com>
-In-Reply-To: <2d5a2c100909220608j1600e8f2k4063d6b2ff7b3296@mail.gmail.com>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
+Date: Tue, 22 Sep 2009 10:08:19 -0300
+Message-ID: <2d5a2c100909220608j1600e8f2k4063d6b2ff7b3296@mail.gmail.com>
+Subject: Re: BlueZ Supported Profiles
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Vladimir Botka <vbotka@gmail.com>
+Cc: bluezprofile kernel <bluezprofile@gmail.com>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
-
-
-
------Original Message-----
-From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
-Sent: Tuesday, September 22, 2009 6:38 PM
-To: Vladimir Botka
-Cc: bluezprofile kernel; Linux Kernel Mailing List; linux-bluetooth@vger.kernel.org
-Subject: Re: BlueZ Supported Profiles
 
 Hi,
 
@@ -53,37 +46,7 @@ and phones.
 You can do the very same think locally:
 # sdptool browse local
 
+
 -- 
 Luiz Augusto von Dentz
 Engenheiro de Computação
---
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-Hi,
-
-"sdptool browse local" command will only show currently registered services and this list may not be exhaustive. 
-The actual list of supported services can be seen from manpage of sdptool. Search for a list of keywords-
-OPUSH,SP,KEYB,AVRTG etc.  You can try adding all of those services one by one and see if they are 
-registered without any errors in local database.
-
-However, mere successful registration of service in local database doesn't mean a certain
-Profile is activated and working in the host. So, you can depend on service registration
-process for only a hint.
-
-Regards,
-Sreenivasulu Y
-SASKEN BUSINESS DISCLAIMER
--------------------------
-This message may contain confidential, proprietary or legally privileged information. In 
-case you are not the original intended Recipient of the message, you must not, directly or 
-indirectly, use, Disclose, distribute, print, or copy any part of this message and you are 
-requested to delete it and inform the sender. Any views expressed in this message are 
-those of the individual sender unless otherwise stated. Nothing contained in this message 
-shall be construed as an offer or acceptance of any offer by Sasken Communication 
-Technologies Limited ("Sasken") unless sent with that express intent and with due 
-authority of Sasken. Sasken has taken enough precautions to prevent the spread of 
-viruses. However the company accepts no liability for any damage caused by any virus 
-transmitted by this email
-
