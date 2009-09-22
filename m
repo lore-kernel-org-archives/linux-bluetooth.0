@@ -1,36 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Adam=20Go=C5=82=C4=99biowski?= <adamg@pld-linux.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Adam=20Go=C5=82=C4=99biowski?= <adamg@pld-linux.org>
-Subject: [PATCH] Fix parallel build
-Date: Tue, 22 Sep 2009 20:46:34 +0200
-Message-Id: <1253645194-85628-1-git-send-email-adamg@pld-linux.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 22 Sep 2009 23:04:05 +0530
+Message-ID: <ba5648fa0909221034p79063400t92033fedcf052762@mail.gmail.com>
+Subject: LLMNR request
+From: bluezprofile kernel <bluezprofile@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since src/bluetoothd needs libbluetooth, add it to its dependencies.
-Parallel build tested with make -j16.
+Hi All,
+Is it possible to send LLMNR request over bnep interface?. How to
+send? Please provide me some guide lines regarding this.
 
-Signed-off-by: Adam Gołębiowski <adamg@pld-linux.org>
----
- Makefile.am |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
-
-diff --git a/Makefile.am b/Makefile.am
-index 0226554..642affc 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -194,7 +194,7 @@ src_bluetoothd_SOURCES = $(gdbus_sources) $(builtin_sources) \
- src_bluetoothd_LDADD = lib/libbluetooth.la @GLIB_LIBS@ @DBUS_LIBS@ -ldl
- src_bluetoothd_LDFLAGS = -Wl,--export-dynamic \
- 					-Wl,--version-script=src/bluetooth.ver
--src_bluetoothd_DEPENDENCIES = src/bluetooth.ver
-+src_bluetoothd_DEPENDENCIES = src/bluetooth.ver lib/libbluetooth.la
- 
- builtin_files = src/builtin.h $(builtin_nodist)
- 
--- 
-1.6.4.4
-
+-- Nic Shen
