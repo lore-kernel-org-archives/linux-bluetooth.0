@@ -1,30 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Fix parallel build
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Adam =?UTF-8?Q?Go=C5=82=C4=99biowski?= <adamg@pld-linux.org>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1253645194-85628-1-git-send-email-adamg@pld-linux.org>
-References: <1253645194-85628-1-git-send-email-adamg@pld-linux.org>
-Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 22 Sep 2009 14:51:09 -0700
-Message-Id: <1253656269.2931.4.camel@localhost.localdomain>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Date: Tue, 22 Sep 2009 18:31:47 -0300
+Message-ID: <f9d4bd30909221431p33970fe8weab8c440b3d35edf@mail.gmail.com>
+Subject: [PATCH] Fix extra PropertyChanged signal sent after DeviceRemoved
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Adam,
+Hi,
 
-> Since src/bluetoothd needs libbluetooth, add it to its dependencies.
-> Parallel build tested with make -j16.
+for paired devices, there is an extra PropertyChanged signal sent
+after DeviceRemoved:
 
-patch has been applied. Thanks.
+signal sender=:1.78 -> dest=(null destination) serial=145
+path=/org/bluez/24533/hci0; interface=org.bluez.Adapter;
+member=PropertyChanged
+   string "Devices"
+   variant       array [
+      ]
+signal sender=:1.78 -> dest=(null destination) serial=146
+path=/org/bluez/24533/hci0; interface=org.bluez.Adapter;
+member=DeviceRemoved
+   object path "/org/bluez/24533/hci0/dev_00_1F_00_CE_BE_AF"
+signal sender=:1.78 -> dest=(null destination) serial=147
+path=/org/bluez/24533/hci0/dev_00_1F_00_CE_BE_AF;
+interface=org.bluez.Device; member=PropertyChanged
+   string "Paired"
+   variant       boolean false
 
-> Signed-off-by: Adam Gołębiowski <adamg@pld-linux.org>
 
-The signed-off-by lines are not used within BlueZ.
+The patch to fix this issue is in my branch devel:
 
-Regards
+git://git.infradead.org/users/cktakahasi/bluez.git devel
 
-Marcel
+I removed  "textfile_caseget()" call before call "textfile_casedel()",
+let me know if you wanna keep this check, I can revert this minor
+change.
 
+Br,
+Claudio
 
+-- 
+--
+Claudio Takahasi
+Instituto Nokia de Tecnologia
+Recife - Pernambuco - Brasil
++55 81 30879999
