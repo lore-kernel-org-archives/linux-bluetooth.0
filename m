@@ -1,59 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4AB94E32.8060703@pardus.org.tr>
-Date: Wed, 23 Sep 2009 01:22:42 +0300
-From: =?UTF-8?B?T3phbiDDh2HEn2xheWFu?= <ozan@pardus.org.tr>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Undefined symbols in netlink plugin
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH] Fix extra PropertyChanged signal sent after
+ DeviceRemoved
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <f9d4bd30909221431p33970fe8weab8c440b3d35edf@mail.gmail.com>
+References: <f9d4bd30909221431p33970fe8weab8c440b3d35edf@mail.gmail.com>
+Content-Type: text/plain
+Date: Tue, 22 Sep 2009 14:54:30 -0700
+Message-Id: <1253656470.2931.5.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Claudio,
 
-I'm getting the following when I launch bluetoothd with -n -d:
+> for paired devices, there is an extra PropertyChanged signal sent
+> after DeviceRemoved:
+> 
+> signal sender=:1.78 -> dest=(null destination) serial=145
+> path=/org/bluez/24533/hci0; interface=org.bluez.Adapter;
+> member=PropertyChanged
+>    string "Devices"
+>    variant       array [
+>       ]
+> signal sender=:1.78 -> dest=(null destination) serial=146
+> path=/org/bluez/24533/hci0; interface=org.bluez.Adapter;
+> member=DeviceRemoved
+>    object path "/org/bluez/24533/hci0/dev_00_1F_00_CE_BE_AF"
+> signal sender=:1.78 -> dest=(null destination) serial=147
+> path=/org/bluez/24533/hci0/dev_00_1F_00_CE_BE_AF;
+> interface=org.bluez.Device; member=PropertyChanged
+>    string "Paired"
+>    variant       boolean false
+> 
+> 
+> The patch to fix this issue is in my branch devel:
+> 
+> git://git.infradead.org/users/cktakahasi/bluez.git devel
 
-..
-Can't load plugin /usr/lib/bluetooth/plugins/netlink.so:
-/usr/lib/bluetooth/plugins/netlink.so: undefined symbol: debug
-..
+patch has been applied. Thanks.
 
-AFAIK, those libtool plugins are allowed to have undefined symbols after
-linking as they will probably be resolved during runtime loading but the
-warning above wasn't present on previous versions like 4.41 for example.
+> I removed  "textfile_caseget()" call before call "textfile_casedel()",
+> let me know if you wanna keep this check, I can revert this minor
+> change.
 
-# ldd -u -r /usr/lib/bluetooth/plugins/netlink.so
-     26771:     /usr/lib/bluetooth/plugins/netlink.so: error: symbol
-lookup error: undefined symbol: g_io_channel_unix_new (continued)
-undefined symbol: g_io_channel_unix_new
-(/usr/lib/bluetooth/plugins/netlink.so)
-     26771:     /usr/lib/bluetooth/plugins/netlink.so: error: symbol
-lookup error: undefined symbol: debug (continued)
-undefined symbol: debug (/usr/lib/bluetooth/plugins/netlink.so)
-     26771:     /usr/lib/bluetooth/plugins/netlink.so: error: symbol
-lookup error: undefined symbol: g_io_add_watch (continued)
-undefined symbol: g_io_add_watch       
-(/usr/lib/bluetooth/plugins/netlink.so)
-     26771:     /usr/lib/bluetooth/plugins/netlink.so: error: symbol
-lookup error: undefined symbol: info (continued)
-undefined symbol: info  (/usr/lib/bluetooth/plugins/netlink.so)
-     26771:     /usr/lib/bluetooth/plugins/netlink.so: error: symbol
-lookup error: undefined symbol: g_io_channel_unref (continued)
-undefined symbol: g_io_channel_unref   
-(/usr/lib/bluetooth/plugins/netlink.so)
-Unused direct dependencies:
+I can't remember why it is there. Johan might know and we can revert it
+then later if I missed the reason.
 
+Regards
 
-So we have 3 undefined symbol from glib and 2 internal symbols from
-logging.c: debug() and info(). There's no difference if I install the
-libtool la file or not. Since glib is already needed by bluez daemon,
-those undefined symbols seems harmless but AFAIK the internal ones
-should have been linked against the static logging.o.
-
-Or do I miss something?
-
-
-Thanks,
-Ozan Caglayan
+Marcel
 
 
