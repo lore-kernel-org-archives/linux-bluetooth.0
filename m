@@ -1,28 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Compiling bluez for python in /usr/local
-From: Marcel Holtmann <marcel@holtmann.org>
-To: John Frankish <j-frankish@slb.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <6AC5A55546F64545AE996F8200E3AC4E0C80070A@NL0105EXC01V01.eur.slb.com>
-References: <6AC5A55546F64545AE996F8200E3AC4E0C80070A@NL0105EXC01V01.eur.slb.com>
-Content-Type: text/plain
-Date: Thu, 24 Sep 2009 09:55:23 -0700
-Message-Id: <1253811323.2931.17.camel@localhost.localdomain>
-Mime-Version: 1.0
+Message-ID: <4ABB952F.6020208@pardus.org.tr>
+Date: Thu, 24 Sep 2009 18:50:07 +0300
+From: =?UTF-8?B?T3phbiDDh2HEn2xheWFu?= <ozan@pardus.org.tr>
+MIME-Version: 1.0
+To: Kartikey Parmar <kartikey2781@gmail.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: hci_cmd_task:hci0 command tx timeout
+References: <6887eb5d0909240501o3f7e959ewf797e18dd09e2fd4@mail.gmail.com>
+In-Reply-To: <6887eb5d0909240501o3f7e959ewf797e18dd09e2fd4@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+Kartikey Parmar wrote:
+> Hi,
+>
+> I m getting "hci_cmd_task:hci0 command tx timeout" during connect()
+> socket call for SCO connection.
+>
+> Exactly why this timeout is occured. I m using Bluez-4.52 with kernel
+> 2.6.30 on AT91SAM9263.
+>
+>
+>   
 
-> I just compiled bluez-4.53 on a system with python at /usr/local/bin/python - unless I messed up somewhere, it seems simple-agent and the other python scripts still expected to find python at /usr/bin/python.
-> 
-> Whilst this can be fixed with a symlink, it might be better that the scripts refer to the actual location of python?
 
-they are test scripts and not meant to be installed. So we don't care
-about the install path of the Python interpreter.
+Not me but a user on our bugzilla reported that on 2.6.30(.5), he's
+having those timeouts when he tries to scan using hcitool. I've searched
+on the internet, found a lot of bug reports which seems to be
+resolved/fixed post 2.6.28. The user says that the dongle is working OK
+on other operating systems.
 
-Regards
+Do we have some means for debugging further the cause of this problem?
 
-Marcel
-
-
+Thanks,
