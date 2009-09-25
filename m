@@ -1,34 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 25 Sep 2009 13:54:41 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Nick Davies <nickavies@yahoo.com>
-Cc: Iain Hibbert <plunky@rya-online.net>,
-	linux-bluetooth@vger.kernel.org
+Message-ID: <807937.34864.qm@web112809.mail.gq1.yahoo.com>
+References: <418098.94079.qm@web112804.mail.gq1.yahoo.com> <1253864301.981724.225.nullmailer@galant.ukfsn.org>
+Date: Fri, 25 Sep 2009 02:34:53 -0700 (PDT)
+From: Nick Davies <nickavies@yahoo.com>
 Subject: Re: Volume control for headset
-Message-ID: <20090925105441.GA19339@jh-x301>
-References: <418098.94079.qm@web112804.mail.gq1.yahoo.com> <1253864301.981724.225.nullmailer@galant.ukfsn.org> <807937.34864.qm@web112809.mail.gq1.yahoo.com>
+To: Iain Hibbert <plunky@rya-online.net>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1253864301.981724.225.nullmailer@galant.ukfsn.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <807937.34864.qm@web112809.mail.gq1.yahoo.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Iain,
 
-On Fri, Sep 25, 2009, Nick Davies wrote:
->   OK, but I don't know where the RFCOMM socket is created,
+  Thanks for your quick response! :)
 
-audio/headset.c
+> Yes, it uses a straight serial (over RFCOMM) link with commands/responses
+> being sent each way in plaintext. eg from Audio Gateway (computer) to
+> Headset:
+> 
+> +VGS=n
+> 
+> set headset speaker volume (0-15)
+> 
+> +VGM=n
+> 
+> set headset microphone gain (0-15)
+  
+  OK, but I don't know where the RFCOMM socket is created, how can I connect to existing socket? 
 
->   how can I connect to existing socket?
+Best regards,
+Nick
 
-You can't really but you also shouldn't need to. You can request
-bluetoothd to change the volume using the SetProperty("SpeakerGain", 0-15)
-method on the org.bluez.Headset interface on the D-Bus object that
-represents your headset. There's a python script in the bluez source that
-lets you do it too, e.g:
 
-test/test-telephony <remote address> speakergain 10
-test/test-telephony <remote address> microphonegain 5
 
-Johan
+      
+
