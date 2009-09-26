@@ -1,49 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4ABEAB27.9010806@dtsp.co.nz>
-Date: Sun, 27 Sep 2009 13:00:39 +1300
-From: David Sainty <david.sainty@dtsp.co.nz>
 MIME-Version: 1.0
+In-Reply-To: <200909251636.06774.sgrubb@redhat.com>
+References: <200909251636.06774.sgrubb@redhat.com>
+Date: Sat, 26 Sep 2009 19:29:14 -0300
+Message-ID: <2d5a2c100909261529j700b78a6p12fdfc27f81f1015@mail.gmail.com>
+Subject: Re: [PATCH] misc fixups
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Steve Grubb <sgrubb@redhat.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] init and extra checking fixups
-References: <200909261237.58379.sgrubb@redhat.com>
-In-Reply-To: <200909261237.58379.sgrubb@redhat.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Steve Grubb wrote:
-> In tools/hcitool.c, around line 687, handle could conceivably be used without
-> being initialized. I set it to 0.
+Hi,
+
+On Fri, Sep 25, 2009 at 5:36 PM, Steve Grubb <sgrubb@redhat.com> wrote:
+> Hello,
 >
->   
+> I was doing some code reviews of the 4.54 release and found a couple
+> things that should be fixed up. The first is that in audio/pcm_bluetooth.c,
+> a data structure is being overrun. Because the underlying buffer is 512
+> bytes, no overflow really occurs. What appears to happen is too much
+> data gets copied.
+>
+> The other issue is in  cups/main.c, error is a stack variable and its address
+> cannot be NULL. So, no need to check its value.
+>
+> Signed-off-by: Steve Grubb <sgrubb@redhat.com>
+>
+>
+> diff -urp bluez-4.54.orig/audio/pcm_bluetooth.c bluez-4.54/audio/pcm_bluetooth.c
+> --- bluez-4.54.orig/audio/pcm_bluetooth.c       2009-09-25 11:33:47.000000000 -0400
+> +++ bluez-4.54/audio/pcm_bluetooth.c    2009-09-25 14:35:35.000000000 -0400
+> @@ -729,7 +729,7 @@ static int bluetooth_a2dp_hw_params(snd_
+>        req->h.length = sizeof(*req);
+>
+>        memcpy(&req->codec, &a2dp->sbc_capabilities,
+> -                       sizeof(a2dp->sbc_capabilities));
+> +                       sizeof(req->codec));
 
-Modern gcc is great at telling you when uninitialised variables might be 
-used. But it can't do that job if you just initialise the variable at 
-the start. The error code patch probably falls into the same category.
+Be careful that this structs are different, we really want to copy sbc
+codec capabilities which is used to configure latter.
 
-At the very least for this specific case, handle should be reset at the 
-start of the loop it's used in, not just at the start of the function.
-
-But it probably makes sense to tidy the code up a bit instead. cc is a 
-boolean that is true iff handle is valid, so maybe some of those (handle 
- > 0) tests should go away and be replaced by (cc).
-
-Though this code would be a bit simpler if it didn't try to survive and 
-continue after malloc() failures, which seems a bit excessive. An error 
-and exit seems more reasonable from hcitool.
-
-> diff -urp bluez-4.54.orig/tools/hcitool.c bluez-4.54/tools/hcitool.c
-> --- bluez-4.54.orig/tools/hcitool.c	2009-09-26 08:43:56.000000000 -0400
-> +++ bluez-4.54/tools/hcitool.c	2009-09-26 12:31:28.000000000 -0400
-> @@ -505,7 +505,7 @@ static void cmd_scan(int dev_id, int arg
->  	uint8_t lap[3] = { 0x33, 0x8b, 0x9e };
->  	int num_rsp, length, flags;
->  	uint8_t cls[3], features[8];
-> -	uint16_t handle;
-> +	uint16_t handle = 0;
->  	char addr[18], name[249], oui[9], *comp, *tmp;
->  	struct hci_version version;
->  	struct hci_dev_info di;
->   
-
+-- 
+Luiz Augusto von Dentz
+Engenheiro de Computação
