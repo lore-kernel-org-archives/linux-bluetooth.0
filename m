@@ -1,158 +1,167 @@
 Return-Path: <cyrus@holtmann.org>
-From: Steve Grubb <sgrubb@redhat.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] init and extra checking fixups
-Date: Sat, 26 Sep 2009 12:37:58 -0400
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Message-Id: <200909261237.58379.sgrubb@redhat.com>
+Date: Sat, 26 Sep 2009 16:32:47 +0200
+Message-ID: <a70b8cd30909260732h549c21bay7a97dcc4941478c9@mail.gmail.com>
+Subject: [PATCH 4/4] Bluez: input: PS3 BD Remote alternate keymapping (compat)
+From: "Ruslan N. Marchenko" <rufferson@gmail.com>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+This patch adds alternate keymap for PS3 BD Remote driver. New
+layout is compatible with standard (old) xinput, allowing it to
+recieve key events without additional event routers or xinput
+driver patches.
+It adds new section [PS3 Remote] to input.conf, with parameter
+Compat, which enables alternate layout.
 
-I was doing some code reviews of the 4.54 release and found a couple
-things that should be fixed up. This patch is looking at things that may not
-have been initialized or is doing value checks that are unnecessary.
+Signed-off-by: Ruslan N. Marchenko <rufferson@gmail.com>
+---
+ input/device.h   |    1 +
+ input/fakehid.c  |   59 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ input/input.conf |    8 +++++++
+ input/manager.c  |    7 ++++++
+ 4 files changed, 73 insertions(+), 2 deletions(-)
 
-In audio/avdtp.c, the avdtp_setconf_cmd function has an exit jump for failed.
-There are several calls to the goto that do not set err to something, meaning
-that the stack contents are what's used. I set err =0 in the beginning so that
-we no longer use the stack contents, but it seems like there should be some
-general error code that says we failed for an unspecified reason.
+diff --git a/input/device.h b/input/device.h
+index c019930..721a98a 100644
+--- a/input/device.h
++++ b/input/device.h
+@@ -29,6 +29,7 @@
 
-In audio/control.c, the function control_cb takes a variable cond and first
-thing it or's G_IO_IN with it and uses the result for a test in an if
-statement. I suspect it should be a '&' operator.
+ struct input_dev_conf {
+ 	int timeout;
++	int ps3remote_compat;
+ };
+ struct input_device {
+ 	DBusConnection		*conn;
+diff --git a/input/fakehid.c b/input/fakehid.c
+index 3687ea7..441f58e 100644
+--- a/input/fakehid.c
++++ b/input/fakehid.c
+@@ -94,7 +94,7 @@ static unsigned int ps3remote_bits[] = {
+ 	[PS3R_BIT_SELECT] = 0x50,
+ };
 
-In audio/unix.c, the function a2dp_discovery_complete at line 659 has a
-variable ca2dp. There is a check at line 661 to see that its not NULL. It can
-never be NULL because its position in the unix_client structure will never
-let it be NULL. So, this check should be dropped.
+-static unsigned int ps3remote_keymap[] = {
++static unsigned int ps3keymap_def[] = {
+ 	[0x16] = KEY_EJECTCD,
+ 	[0x64] = KEY_AUDIO,
+ 	[0x65] = KEY_ANGLE,
+@@ -147,6 +147,59 @@ static unsigned int ps3remote_keymap[] = {
+ 	[0x39] = KEY_PAUSE,
+ 	[0x61] = KEY_FRAMEFORWARD,	/* slow/step forward */
+ 	[0xff] = KEY_MAX,
++}, ps3keymap_alt[] = {
++	[0x16] = KEY_EJECTCD,
++	[0x64] = KEY_A,			/* audio */
++	[0x65] = KEY_Z,			/* angle */
++	[0x63] = KEY_T,			/* subtitle */
++	[0x0f] = KEY_DELETE,		/* clear */
++	[0x28] = KEY_END,		/* timer */
++	[0x00] = KEY_1,
++	[0x01] = KEY_2,
++	[0x02] = KEY_3,
++	[0x03] = KEY_4,
++	[0x04] = KEY_5,
++	[0x05] = KEY_6,
++	[0x06] = KEY_7,
++	[0x07] = KEY_8,
++	[0x08] = KEY_9,
++	[0x09] = KEY_0,
++	[0x81] = KEY_F7,		/* red */
++	[0x82] = KEY_F8,		/* green */
++	[0x83] = KEY_F9,		/* yellow */
++	[0x80] = KEY_F10,		/* blue */
++	[0x70] = KEY_D,			/* display */
++	[0x1a] = KEY_MENU,		/* top menu */
++	[0x40] = KEY_F11,		/* pop up/menu */
++	[0x0e] = KEY_ESC,		/* return */
++	[0x5c] = KEY_F12,		/* options/triangle */
++	[0x5d] = KEY_BACK,		/* back/circle */
++	[0x5f] = KEY_V,			/* view/square */
++	[0x5e] = KEY_X,			/* cross */
++	[0x54] = KEY_UP,
++	[0x56] = KEY_DOWN,
++	[0x57] = KEY_LEFT,
++	[0x55] = KEY_RIGHT,
++	[0x0b] = KEY_ENTER,
++	[0x5a] = KEY_F1,		/* L1 */
++	[0x58] = KEY_F2,		/* L2 */
++	[0x51] = KEY_F3,		/* L3 */
++	[0x5b] = KEY_F4,		/* R1 */
++	[0x59] = KEY_F5,		/* R2 */
++	[0x52] = KEY_F6,		/* R3 */
++	[0x43] = KEY_HOMEPAGE,		/* PS button */
++	[0x50] = KEY_INSERT,		/* select */
++	[0x53] = KEY_HOME,		/* start */
++	[0x33] = KEY_R,			/* scan back */
++	[0x32] = KEY_PLAY,
++	[0x34] = KEY_F,			/* scan forward */
++	[0x30] = KEY_PAGEUP,		/* next */
++	[0x38] = KEY_STOP,
++	[0x31] = KEY_PAGEDOWN,		/* previous */
++	[0x60] = KEY_COMMA,		/* slow/step back */
++	[0x39] = KEY_PAUSE,
++	[0x61] = KEY_DOT,		/* slow/step forward */
++	[0xff] = KEY_MAX,
+ };
 
-In compat/hidd.c, there is a function do_connect with a variable, name. It
-could conceivably be uninitialized when used in a strcmp at line 473. 
-
-In lib/sdp.c, the function sdp_get_lang_attr has a variable pCode that is
-being checked for non-NULL at line 2029. It gets its value from curr_data which
-has to be non-NULL to enter the loop. So, checking pCode does nothing. It
-should be dropped.
-
-Same file, in the function sdp_service_attr_req there is a variable
-rsp_concat_buf. If the allocations for reqbuf or rspbuf fail, it goes to end
-where it will attempt to free rsp_concat_buf.data which is whatever the stack
-contents are. This same issue pops up again in the function,
-sdp_service_search_attr_req a little farther down.
-
-NOT FIXED - In src/sdpd-service.c, the function create_ext_inquiry_response
-has a variable uuid that is used at line 223 in an equality test without
-having been initialized. No idea what the right code for that is.
-
-In tools/hcitool.c, around line 687, handle could conceivably be used without
-being initialized. I set it to 0.
-
-Signed-off-by: Steve Grubb <sgrubb@redhat.com>
-
-
-diff -urp bluez-4.54.orig/audio/avdtp.c bluez-4.54/audio/avdtp.c
---- bluez-4.54.orig/audio/avdtp.c	2009-09-26 08:43:56.000000000 -0400
-+++ bluez-4.54/audio/avdtp.c	2009-09-26 11:17:07.000000000 -0400
-@@ -1248,7 +1248,7 @@ static gboolean avdtp_setconf_cmd(struct
- 	struct conf_rej rej;
- 	struct avdtp_local_sep *sep;
- 	struct avdtp_stream *stream;
--	uint8_t err, category = 0x00;
-+	uint8_t err = 0, category = 0x00;
- 	struct audio_device *dev;
- 	bdaddr_t src, dst;
- 	GSList *l;
-diff -urp bluez-4.54.orig/audio/control.c bluez-4.54/audio/control.c
---- bluez-4.54.orig/audio/control.c	2009-09-26 08:43:56.000000000 -0400
-+++ bluez-4.54/audio/control.c	2009-09-26 11:24:04.000000000 -0400
-@@ -472,7 +472,7 @@ static gboolean control_cb(GIOChannel *c
- 	struct avrcp_header *avrcp;
- 	int ret, packet_size, operand_count, sock;
- 
--	if (!(cond | G_IO_IN))
-+	if (!(cond & G_IO_IN))
- 		goto failed;
- 
- 	sock = g_io_channel_unix_get_fd(control->io);
-diff -urp bluez-4.54.orig/audio/gsta2dpsink.c bluez-4.54/audio/gsta2dpsink.c
---- bluez-4.54.orig/audio/gsta2dpsink.c	2009-09-26 08:43:56.000000000 -0400
-+++ bluez-4.54/audio/gsta2dpsink.c	2009-09-26 11:47:40.000000000 -0400
-@@ -143,8 +143,7 @@ remove_element_and_fail:
- 	return NULL;
- 
- cleanup_and_fail:
--	if (element != NULL)
--		g_object_unref(G_OBJECT(element));
-+	g_object_unref(G_OBJECT(element));
- 
- 	return NULL;
- }
-diff -urp bluez-4.54.orig/audio/unix.c bluez-4.54/audio/unix.c
---- bluez-4.54.orig/audio/unix.c	2009-09-26 08:43:56.000000000 -0400
-+++ bluez-4.54/audio/unix.c	2009-09-26 12:03:47.000000000 -0400
-@@ -658,8 +658,7 @@ static void a2dp_discovery_complete(stru
- 			struct unix_client *c = cl->data;
- 			struct a2dp_data *ca2dp = &c->d.a2dp;
- 
--			if (ca2dp && ca2dp->session == session &&
--					c->seid == seid) {
-+			if (ca2dp->session == session && c->seid == seid) {
- 				lock = c->lock;
- 				break;
- 			}
-diff -urp bluez-4.54.orig/compat/hidd.c bluez-4.54/compat/hidd.c
---- bluez-4.54.orig/compat/hidd.c	2009-09-26 08:43:56.000000000 -0400
-+++ bluez-4.54/compat/hidd.c	2009-09-26 12:10:14.000000000 -0400
-@@ -453,6 +453,7 @@ static void do_connect(int ctl, bdaddr_t
- 	int csk, isk, err;
- 
- 	memset(&req, 0, sizeof(req));
-+	name[0] = 0;
- 
- 	err = get_sdp_device_info(src, dst, &req);
- 	if (err < 0 && fakehid)
-diff -urp bluez-4.54.orig/lib/sdp.c bluez-4.54/lib/sdp.c
---- bluez-4.54.orig/lib/sdp.c	2009-09-26 08:43:56.000000000 -0400
-+++ bluez-4.54/lib/sdp.c	2009-09-26 12:22:08.000000000 -0400
-@@ -2026,7 +2026,7 @@ int sdp_get_lang_attr(const sdp_record_t
- 		sdp_data_t *pCode = curr_data;
- 		sdp_data_t *pEncoding = pCode->next;
- 		sdp_data_t *pOffset = pEncoding->next;
--		if (pCode && pEncoding && pOffset) {
-+		if (pEncoding && pOffset) {
- 			lang = malloc(sizeof(sdp_lang_attr_t));
- 			lang->code_ISO639 = pCode->val.uint16;
- 			lang->encoding = pEncoding->val.uint16;
-@@ -3473,6 +3473,7 @@ sdp_record_t *sdp_service_attr_req(sdp_s
- 	rspbuf = malloc(SDP_RSP_BUFFER_SIZE);
- 	if (!reqbuf || !rspbuf) {
- 		errno = ENOMEM;
-+		rsp_concat_buf.data = NULL;
- 		goto end;
+ static int ps3remote_decode(char *buff, int size, unsigned int *value,
+@@ -390,7 +443,9 @@ static gboolean ps3remote_connect(struct
+fake_input *fake, GError **err)
+ 		struct ps3remote_data *ps3 = g_new0(struct ps3remote_data, 1);
+ 		ps3->timer = g_timer_new();
+ 		ps3->timeout = fake->idev->conf->timeout;
+-		ps3->keymap = ps3remote_keymap;
++		ps3->keymap = (fake->idev->conf
++					&& fake->idev->conf->ps3remote_compat)?
++						ps3keymap_alt : ps3keymap_def;
+ 		fake->data = ps3;
  	}
- 	memset((char *) &rsp_concat_buf, 0, sizeof(sdp_buf_t));
-@@ -4293,6 +4294,7 @@ int sdp_service_search_attr_req(sdp_sess
- 	if (!reqbuf || !rspbuf) {
- 		errno = ENOMEM;
- 		status = -1;
-+		rsp_concat_buf.data = NULL;
- 		goto end;
+ 	return TRUE;
+diff --git a/input/input.conf b/input/input.conf
+index 6381dc2..59ff635 100644
+--- a/input/input.conf
++++ b/input/input.conf
+@@ -7,3 +7,11 @@
+ # Set idle timeout (in seconds) before the connection will
+ # be disconnect (defaults to 0 for no timeout)
+ #IdleTimeout=30
++
++##
++# Section for options, specific to Sony PS3 BD Remote driver
++[PS3 Remote]
++
++# Set keymap to generic keycodes/scancodes, in order
++# to be compatible with old XInput driver.
++#Compat=1
+diff --git a/input/manager.c b/input/manager.c
+index 7d349ff..4606f70 100644
+--- a/input/manager.c
++++ b/input/manager.c
+@@ -183,6 +183,13 @@ int input_manager_init(DBusConnection *conn,
+GKeyFile *config)
+ 			debug("input.conf: %s", err->message);
+ 			g_error_free(err);
+ 		}
++		idev_conf.ps3remote_compat =
++				g_key_file_get_integer(config,
++				"PS3 Remote", "Compat", &err);
++		if (err) {
++			debug("input.conf: %s", err->message);
++			g_error_free(err);
++		}
  	}
- 
-diff -urp bluez-4.54.orig/tools/hcitool.c bluez-4.54/tools/hcitool.c
---- bluez-4.54.orig/tools/hcitool.c	2009-09-26 08:43:56.000000000 -0400
-+++ bluez-4.54/tools/hcitool.c	2009-09-26 12:31:28.000000000 -0400
-@@ -505,7 +505,7 @@ static void cmd_scan(int dev_id, int arg
- 	uint8_t lap[3] = { 0x33, 0x8b, 0x9e };
- 	int num_rsp, length, flags;
- 	uint8_t cls[3], features[8];
--	uint16_t handle;
-+	uint16_t handle = 0;
- 	char addr[18], name[249], oui[9], *comp, *tmp;
- 	struct hci_version version;
- 	struct hci_dev_info di;
+
+ 	connection = dbus_connection_ref(conn);
+-- 
+1.6.0.4
+
+
+
+-- 
+Looking forward to reading yours.
+     Ruslan N. Marchenko
