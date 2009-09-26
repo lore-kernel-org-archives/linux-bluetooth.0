@@ -1,8 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Sat, 26 Sep 2009 16:32:47 +0200
-Message-ID: <a70b8cd30909260732h549c21bay7a97dcc4941478c9@mail.gmail.com>
-Subject: [PATCH 4/4] Bluez: input: PS3 BD Remote alternate keymapping (compat)
+Date: Sat, 26 Sep 2009 16:31:08 +0200
+Message-ID: <a70b8cd30909260731o4c95dcb1tf07955e368b11b30@mail.gmail.com>
+Subject: [PATCH 3/4] Bluez: input: PS3 BD Remote "PS" button handling (turn
+	off)
 From: "Ruslan N. Marchenko" <rufferson@gmail.com>
 To: Bastien Nocera <hadess@hadess.net>
 Cc: linux-bluetooth@vger.kernel.org
@@ -10,153 +11,179 @@ Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds alternate keymap for PS3 BD Remote driver. New
-layout is compatible with standard (old) xinput, allowing it to
-recieve key events without additional event routers or xinput
-driver patches.
-It adds new section [PS3 Remote] to input.conf, with parameter
-Compat, which enables alternate layout.
+If you hold PS button on PS3 BD Remote for more then 5 seconds, it
+disconnects BT channel, entering low power mode. This patch enables
+fakehid driver to handle this behaviour. It also delays PS button
+keypress event till release, to avoid sending the events if you are
+turning the remote off.
+
+The patch also fixes poll loop, when BT channel disconnects from
+remote controller (i.e. with PS button or by removing batteries),
+bursting CPU to 100%.
 
 Signed-off-by: Ruslan N. Marchenko <rufferson@gmail.com>
 ---
- input/device.h   |    1 +
- input/fakehid.c  |   59 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
- input/input.conf |    8 +++++++
- input/manager.c  |    7 ++++++
- 4 files changed, 73 insertions(+), 2 deletions(-)
+ input/device.h  |    2 +
+ input/fakehid.c |   77 +++++++++++++++++++++++++++++++++++++-----------------
+ input/fakehid.h |    1 +
+ 3 files changed, 56 insertions(+), 24 deletions(-)
 
 diff --git a/input/device.h b/input/device.h
-index c019930..721a98a 100644
+index 7cbfe9f..c019930 100644
 --- a/input/device.h
 +++ b/input/device.h
-@@ -29,6 +29,7 @@
-
- struct input_dev_conf {
- 	int timeout;
-+	int ps3remote_compat;
+@@ -55,6 +55,8 @@ struct fake_input {
+ 	void		*priv;
+ 	void		*data;
+ 	const struct input_device * idev;
++	guint		sid_in;
++	guint		sid_out;
  };
- struct input_device {
- 	DBusConnection		*conn;
+
+ int fake_input_register(DBusConnection *conn, struct btd_device *device,
 diff --git a/input/fakehid.c b/input/fakehid.c
-index 3687ea7..441f58e 100644
+index b068e22..3687ea7 100644
 --- a/input/fakehid.c
 +++ b/input/fakehid.c
-@@ -94,7 +94,7 @@ static unsigned int ps3remote_bits[] = {
- 	[PS3R_BIT_SELECT] = 0x50,
- };
+@@ -209,7 +209,31 @@ error:
+ 					ps3->lastmask & 0xff, ps3->lastkey);
+ 	return -1;
+ }
++static gboolean ps3remote_sendkey(int uinput, unsigned int key,
++				  unsigned int value)
++{
++	struct uinput_event event;
++
++	memset(&event, 0, sizeof(event));
++	gettimeofday(&event.time, NULL);
++	event.type = EV_KEY;
++	event.code = key;
++	event.value = value;
++	if (write(uinput, &event, sizeof(event)) != sizeof(event)) {
++		error("Error writing to uinput device");
++		return FALSE;
++	}
 
--static unsigned int ps3remote_keymap[] = {
-+static unsigned int ps3keymap_def[] = {
- 	[0x16] = KEY_EJECTCD,
- 	[0x64] = KEY_AUDIO,
- 	[0x65] = KEY_ANGLE,
-@@ -147,6 +147,59 @@ static unsigned int ps3remote_keymap[] = {
- 	[0x39] = KEY_PAUSE,
- 	[0x61] = KEY_FRAMEFORWARD,	/* slow/step forward */
- 	[0xff] = KEY_MAX,
-+}, ps3keymap_alt[] = {
-+	[0x16] = KEY_EJECTCD,
-+	[0x64] = KEY_A,			/* audio */
-+	[0x65] = KEY_Z,			/* angle */
-+	[0x63] = KEY_T,			/* subtitle */
-+	[0x0f] = KEY_DELETE,		/* clear */
-+	[0x28] = KEY_END,		/* timer */
-+	[0x00] = KEY_1,
-+	[0x01] = KEY_2,
-+	[0x02] = KEY_3,
-+	[0x03] = KEY_4,
-+	[0x04] = KEY_5,
-+	[0x05] = KEY_6,
-+	[0x06] = KEY_7,
-+	[0x07] = KEY_8,
-+	[0x08] = KEY_9,
-+	[0x09] = KEY_0,
-+	[0x81] = KEY_F7,		/* red */
-+	[0x82] = KEY_F8,		/* green */
-+	[0x83] = KEY_F9,		/* yellow */
-+	[0x80] = KEY_F10,		/* blue */
-+	[0x70] = KEY_D,			/* display */
-+	[0x1a] = KEY_MENU,		/* top menu */
-+	[0x40] = KEY_F11,		/* pop up/menu */
-+	[0x0e] = KEY_ESC,		/* return */
-+	[0x5c] = KEY_F12,		/* options/triangle */
-+	[0x5d] = KEY_BACK,		/* back/circle */
-+	[0x5f] = KEY_V,			/* view/square */
-+	[0x5e] = KEY_X,			/* cross */
-+	[0x54] = KEY_UP,
-+	[0x56] = KEY_DOWN,
-+	[0x57] = KEY_LEFT,
-+	[0x55] = KEY_RIGHT,
-+	[0x0b] = KEY_ENTER,
-+	[0x5a] = KEY_F1,		/* L1 */
-+	[0x58] = KEY_F2,		/* L2 */
-+	[0x51] = KEY_F3,		/* L3 */
-+	[0x5b] = KEY_F4,		/* R1 */
-+	[0x59] = KEY_F5,		/* R2 */
-+	[0x52] = KEY_F6,		/* R3 */
-+	[0x43] = KEY_HOMEPAGE,		/* PS button */
-+	[0x50] = KEY_INSERT,		/* select */
-+	[0x53] = KEY_HOME,		/* start */
-+	[0x33] = KEY_R,			/* scan back */
-+	[0x32] = KEY_PLAY,
-+	[0x34] = KEY_F,			/* scan forward */
-+	[0x30] = KEY_PAGEUP,		/* next */
-+	[0x38] = KEY_STOP,
-+	[0x31] = KEY_PAGEDOWN,		/* previous */
-+	[0x60] = KEY_COMMA,		/* slow/step back */
-+	[0x39] = KEY_PAUSE,
-+	[0x61] = KEY_DOT,		/* slow/step forward */
-+	[0xff] = KEY_MAX,
- };
-
- static int ps3remote_decode(char *buff, int size, unsigned int *value,
-@@ -390,7 +443,9 @@ static gboolean ps3remote_connect(struct
-fake_input *fake, GError **err)
- 		struct ps3remote_data *ps3 = g_new0(struct ps3remote_data, 1);
- 		ps3->timer = g_timer_new();
- 		ps3->timeout = fake->idev->conf->timeout;
--		ps3->keymap = ps3remote_keymap;
-+		ps3->keymap = (fake->idev->conf
-+					&& fake->idev->conf->ps3remote_compat)?
-+						ps3keymap_alt : ps3keymap_def;
- 		fake->data = ps3;
- 	}
++	memset(&event, 0, sizeof(event));
++	gettimeofday(&event.time, NULL);
++	event.type = EV_SYN;
++	event.code = SYN_REPORT;
++	if (write(uinput, &event, sizeof(event)) != sizeof(event)) {
++		error("Error writing to uinput device");
++		return FALSE;
++	}
++	return TRUE;
++}
+ static gboolean ps3remote_out(GIOChannel *chan, GIOCondition cond,
+                                 gpointer data)
+ {
+@@ -223,7 +247,7 @@ static gboolean ps3remote_out(GIOChannel *chan,
+GIOCondition cond,
+ 		device_request_disconnect(idev->device, NULL);
+ 		return FALSE;
+ 	} else
+-		usleep(100);
++		usleep(750);
  	return TRUE;
-diff --git a/input/input.conf b/input/input.conf
-index 6381dc2..59ff635 100644
---- a/input/input.conf
-+++ b/input/input.conf
-@@ -7,3 +7,11 @@
- # Set idle timeout (in seconds) before the connection will
- # be disconnect (defaults to 0 for no timeout)
- #IdleTimeout=30
-+
-+##
-+# Section for options, specific to Sony PS3 BD Remote driver
-+[PS3 Remote]
-+
-+# Set keymap to generic keycodes/scancodes, in order
-+# to be compatible with old XInput driver.
-+#Compat=1
-diff --git a/input/manager.c b/input/manager.c
-index 7d349ff..4606f70 100644
---- a/input/manager.c
-+++ b/input/manager.c
-@@ -183,6 +183,13 @@ int input_manager_init(DBusConnection *conn,
-GKeyFile *config)
- 			debug("input.conf: %s", err->message);
- 			g_error_free(err);
- 		}
-+		idev_conf.ps3remote_compat =
-+				g_key_file_get_integer(config,
-+				"PS3 Remote", "Compat", &err);
-+		if (err) {
-+			debug("input.conf: %s", err->message);
-+			g_error_free(err);
-+		}
- 	}
+ }
+ static gboolean ps3remote_event(GIOChannel *chan, GIOCondition cond,
+@@ -231,14 +255,19 @@ static gboolean ps3remote_event(GIOChannel
+*chan, GIOCondition cond,
+ {
+ 	struct fake_input *fake = data;
+ 	struct ps3remote_data *ps3 = (struct ps3remote_data *)fake->data;
+-	struct uinput_event event;
+ 	unsigned int key, value = 0;
+ 	gsize size;
+ 	char buff[50];
 
- 	connection = dbus_connection_ref(conn);
+ 	g_timer_start(ps3->timer);
+-	if (cond & G_IO_NVAL)
+-		return FALSE;
++	if (cond & G_IO_NVAL) {
++		if(ps3->lastkey == KEY_HOMEPAGE && ps3->lastval == 1)
++			DBG("Remote turned off");
++		else
++			DBG("Remote disconnected [%u:%u]", ps3->lastkey,
++								ps3->lastval);
++		goto failed;
++	}
+
+ 	if (cond & (G_IO_HUP | G_IO_ERR)) {
+ 		error("Hangup or error on rfcomm server socket");
+@@ -260,29 +289,27 @@ static gboolean ps3remote_event(GIOChannel
+*chan, GIOCondition cond,
+ 	} else if (key == KEY_MAX)
+ 		return TRUE;
+
+-	memset(&event, 0, sizeof(event));
+-	gettimeofday(&event.time, NULL);
+-	event.type = EV_KEY;
+-	event.code = key;
+-	event.value = value;
+-	if (write(fake->uinput, &event, sizeof(event)) != sizeof(event)) {
+-		error("Error writing to uinput device");
+-		goto failed;
+-	}
+-
+-	memset(&event, 0, sizeof(event));
+-	gettimeofday(&event.time, NULL);
+-	event.type = EV_SYN;
+-	event.code = SYN_REPORT;
+-	if (write(fake->uinput, &event, sizeof(event)) != sizeof(event)) {
+-		error("Error writing to uinput device");
++	/* Delaying key till release, assuming possible turn-off */
++	if(key == KEY_HOMEPAGE) {
++		if(value == 0 && ps3->lastkey == KEY_HOMEPAGE
++							&& ps3->lastval == 1) {
++			ps3remote_sendkey(fake->uinput, key, 1);
++			ps3remote_sendkey(fake->uinput, key, 0);
++		} else
++			DBG("Delayed: %u:%u (%u:%u)", key, value,
++						ps3->lastkey, ps3->lastval);
++	} else if(!ps3remote_sendkey(fake->uinput, key, value))
+ 		goto failed;
+-	}
+
++	ps3->lastkey = key;
++	ps3->lastval = value;
++	DBG("Passed key %u:%u", key, value);
+ 	return TRUE;
+
+ failed:
+ 	g_timer_stop(ps3->timer);
++	g_source_remove(fake->sid_in);
++	g_source_remove(fake->sid_out);
+ 	g_io_channel_unref(fake->io);
+ 	DBG("Event failed");
+ 	return FALSE;
+@@ -446,8 +473,10 @@ int fake_hid_connadd(struct fake_input *fake,
+GIOChannel *intr_io,
+
+ 	fake->io = g_io_channel_ref(intr_io);
+ 	g_io_channel_set_close_on_unref(fake->io, TRUE);
+-	g_io_add_watch(fake->io, G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
+-					(GIOFunc) fake_hid->event, fake);
+-	g_io_add_watch(fake->io, G_IO_OUT, (GIOFunc) fake_hid->oevent, fake);
++	fake->sid_in = g_io_add_watch(fake->io,
++				G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
++				(GIOFunc) fake_hid->event, fake);
++	fake->sid_out = g_io_add_watch(fake->io, G_IO_OUT,
++				(GIOFunc) fake_hid->oevent, fake);
+ 	return 0;
+ }
+diff --git a/input/fakehid.h b/input/fakehid.h
+index dfac4f6..8657c76 100644
+--- a/input/fakehid.h
++++ b/input/fakehid.h
+@@ -37,6 +37,7 @@ struct fake_hid {
+
+ struct ps3remote_data {
+ 	unsigned int	lastkey;
++	unsigned int	lastval;
+ 	unsigned int	lastmask;
+ 	GTimer *	timer;
+ 	uint16_t 	timeout;
 -- 
 1.6.0.4
 
