@@ -1,34 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Sun, 27 Sep 2009 11:20:12 +0800
-Message-ID: <113d36d80909262020y3dc487v880012747475a8e7@mail.gmail.com>
-Subject: null pointer error in bluez kernel
-From: Lan Zhu <zhu.lan.cn@gmail.com>
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <200909261237.58379.sgrubb@redhat.com>
+References: <200909261237.58379.sgrubb@redhat.com>
+Date: Sun, 27 Sep 2009 00:01:08 -0300
+Message-ID: <2d5a2c100909262001h731c8c7bxcebc9a07b4fd470d@mail.gmail.com>
+Subject: Re: [PATCH] init and extra checking fixups
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Steve Grubb <sgrubb@redhat.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When we test Bluetooth "out of range" case, occasionally we got kernel
-panic result. From the panic log we can see it was caused by NULL
-point error.
+Hi Steve,
 
-In one panic case, the NULL pointer happens at:
+On Sat, Sep 26, 2009 at 1:37 PM, Steve Grubb <sgrubb@redhat.com> wrote:
+> diff -urp bluez-4.54.orig/audio/control.c bluez-4.54/audio/control.c
+> --- bluez-4.54.orig/audio/control.c     2009-09-26 08:43:56.000000000 -0400
+> +++ bluez-4.54/audio/control.c  2009-09-26 11:24:04.000000000 -0400
+> @@ -472,7 +472,7 @@ static gboolean control_cb(GIOChannel *c
+>        struct avrcp_header *avrcp;
+>        int ret, packet_size, operand_count, sock;
+>
+> -       if (!(cond | G_IO_IN))
+> +       if (!(cond & G_IO_IN))
+>                goto failed;
 
-" if (sk->sk_state == BT_CONNECTED)" in the function
-l2cap_sock_sendmsg() of l2cap.c
-
-In another panic case, the NULL pointer is at:
-
-"parent->sk_data_ready(parent, 0);" in the function l2cap_conn_start()
-of l2cap.c
-
-In a normal call sequence, these null pointer shall never happen,
-because it is already well considered. But it seems that the "out of
-range" test usually leads the unexpected call sequence which may
-randomly cause NULL pointer. Is there any way we can use to avoid the
-NULL pointer?
+I don't think this is actually right, if we change it to AND operation
+it would mean we won't process any other error condition if it happens
+together with G_IO_IN, but still the OR seems wrong here, normally we
+use the following check which I believe is more appropriate:
 
 
-Thanks,
-Zhu Lan
+	if (cond & (G_IO_HUP | G_IO_ERR))
+		goto failed;
+
+-- 
+Luiz Augusto von Dentz
+Engenheiro de Computação
