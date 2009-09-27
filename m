@@ -1,69 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Drop Posix Capabilities
-From: Marcel Holtmann <marcel@holtmann.org>
+Date: Sun, 27 Sep 2009 11:41:51 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Steve Grubb <sgrubb@redhat.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <200909261029.06609.sgrubb@redhat.com>
-References: <200909251647.15440.sgrubb@redhat.com>
-	 <1253914521.2659.1.camel@localhost.localdomain>
-	 <200909261029.06609.sgrubb@redhat.com>
-Content-Type: text/plain
-Date: Sun, 27 Sep 2009 13:31:25 -0700
-Message-Id: <1254083485.2659.14.camel@localhost.localdomain>
-Mime-Version: 1.0
+Subject: Re: [PATCH] init and extra checking fixups
+Message-ID: <20090927084151.GB18495@jh-x301>
+References: <200909261237.58379.sgrubb@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <200909261237.58379.sgrubb@redhat.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Steve,
 
-> > > diff -urp bluez-4.54.orig/acinclude.m4 bluez-4.54/acinclude.m4
-> > > --- bluez-4.54.orig/acinclude.m4      2009-09-25 11:33:47.000000000 -0400
-> > > +++ bluez-4.54/acinclude.m4   2009-09-25 16:38:32.000000000 -0400
-> > > @@ -352,3 +352,36 @@ AC_DEFUN([AC_ARG_BLUEZ], [
-> > >       AM_CONDITIONAL(CONFIGFILES, test "${configfiles_enable}" = "yes")
-> > >       AM_CONDITIONAL(CABLE, test "${cable_enable}" = "yes" && test
-> > > "${cable_found}" = "yes") ])
-> > 
-> > please base the patch against upstream and not the Fedora package.
-> 
-> I just retried against the 4.54 tarball and it applies, but with some fuzz.
-> 
-> patch -p1 < ../bluez-4.54-capability.patch 
-> patching file acinclude.m4
-> Hunk #1 succeeded at 336 with fuzz 2 (offset -16 lines).
-> patching file configure.ac
-> Hunk #1 succeeded at 44 (offset -1 lines).
-> patching file Makefile.am
-> Hunk #1 succeeded at 191 (offset -9 lines).
-> patching file src/main.c
+On Sat, Sep 26, 2009, Steve Grubb wrote:
+> In audio/avdtp.c, the avdtp_setconf_cmd function has an exit jump for failed.
+> There are several calls to the goto that do not set err to something, meaning
+> that the stack contents are what's used. I set err =0 in the beginning so that
+> we no longer use the stack contents, but it seems like there should be some
+> general error code that says we failed for an unspecified reason.
 
-and git am will not like fuzz that much. So I prefer to have patches
-against the upstream GIT repository and not the Fedora tree.
+> diff -urp bluez-4.54.orig/audio/avdtp.c bluez-4.54/audio/avdtp.c
+> --- bluez-4.54.orig/audio/avdtp.c	2009-09-26 08:43:56.000000000 -0400
+> +++ bluez-4.54/audio/avdtp.c	2009-09-26 11:17:07.000000000 -0400
+> @@ -1248,7 +1248,7 @@ static gboolean avdtp_setconf_cmd(struct
+>  	struct conf_rej rej;
+>  	struct avdtp_local_sep *sep;
+>  	struct avdtp_stream *stream;
+> -	uint8_t err, category = 0x00;
+> +	uint8_t err = 0, category = 0x00;
+>  	struct audio_device *dev;
+>  	bdaddr_t src, dst;
+>  	GSList *l;
 
-> > > +AC_DEFUN([LIBCAP_NG_PATH],
-> > > +[
-> > > +     AC_ARG_WITH(libcap-ng,
-> > > +     [ --with-libcap-ng=[auto/yes/no]  Add Libcap-ng support
-> > > +             [default=auto]],, with_libcap_ng=auto)
-> > > +
-> > 
-> > I mention this to Bastien already. I want pkgconfig support here and not
-> > some old style aclocal magic.
-> 
-> libcap-ng itself does not provide any pkgconfig support. I'll check on this.
+The right error for the two places is AVDTP_BAD_STATE. Setting that error
+before jumping to failed also means that we avoid the initialization upon
+declaration for the err variable.
 
-According to the bug you guys have open for this, you try to fix this
-upstream in libcap-ng. So please push a pkgconfig file to libcap-ng and
-then I am more than happy to accept a patch for this.
+David and Luiz commented already on a few other issues which would be good
+to fix too. Furthermore, don't be afraid to split your patches into
+smaller logical chunks. That way some of them could have been already
+applied and pushed upstream. And please leave out the Signed-off-by line
+since we don't use it in bluez.
 
-I like to have capability dropping in bluetoothd, but I do wanna do it
-with a proper upstream project. And not having pkgconfig support in
-library is just not cutting it anymore. Since the project seems to be
-maintained by you, it should be easy to fix ;)
-
-Regards
-
-Marcel
-
-
-
+Johan
