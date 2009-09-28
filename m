@@ -1,71 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Steve Grubb <sgrubb@redhat.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] misc fixups
-Date: Mon, 28 Sep 2009 10:08:24 -0400
-References: <200909251636.06774.sgrubb@redhat.com> <2d5a2c100909261529j700b78a6p12fdfc27f81f1015@mail.gmail.com>
-In-Reply-To: <2d5a2c100909261529j700b78a6p12fdfc27f81f1015@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <200909281008.24999.sgrubb@redhat.com>
+In-Reply-To: <20090928091416.278260@gmx.net>
+References: <20090928091416.278260@gmx.net>
+Date: Mon, 28 Sep 2009 11:06:47 -0300
+Message-ID: <2d5a2c100909280706w19304a0u212bd5340cfb967a@mail.gmail.com>
+Subject: Re: Video Streaming over Bluetooth with bluez
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Anna Richter <anna.richter1@gmx.net>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Saturday 26 September 2009 06:29:14 pm you wrote:
-> > The first is that in audio/pcm_bluetooth.c, a data structure is being
-> > overrun. Because the underlying buffer is 512 bytes, no overflow really
-> > occurs. What appears to happen is too much data gets copied.
-> >
-> > diff -urp bluez-4.54.orig/audio/pcm_bluetooth.c
-> > bluez-4.54/audio/pcm_bluetooth.c ---
-> > bluez-4.54.orig/audio/pcm_bluetooth.c       2009-09-25 11:33:47.000000000
-> > -0400 +++ bluez-4.54/audio/pcm_bluetooth.c    2009-09-25
-> > 14:35:35.000000000 -0400 @@ -729,7 +729,7 @@ static int
-> > bluetooth_a2dp_hw_params(snd_
-> >        req->h.length = sizeof(*req);
-> >
-> >        memcpy(&req->codec, &a2dp->sbc_capabilities,
-> > -                       sizeof(a2dp->sbc_capabilities));
-> > +                       sizeof(req->codec));
-> 
-> Be careful that this structs are different, we really want to copy sbc
-> codec capabilities which is used to configure latter.
+Hi,
 
-OK, I see the uint8_t data[0] in codec_capabilities_t which usually means data
-to follow. Missed that. OK, the revised patch would just drop that.
+On Mon, Sep 28, 2009 at 6:14 AM, Anna Richter <anna.richter1@gmx.net> wrote:
+> Hi everyone!
+>
+> I am writing my master thesis now and a part of it deals with video streaming over bluetooth in linux and I have some questions about how to implement it with bluez. I am new with bluetooth programming and I tried to find answers to my questions in the internet, but all what I found is very general information. It would be great, if you could help me.
+> My application consits of three units: server, gateway and client. The server sends the video packets (RTP/RTCP) to the gateway via Ethernet. Gateway receives them and should send them to the client over bluetooth.
+>
+> 1) As far as I could find in the internet, the Video Distribution Profile is not yet supported in the current version of bluez. Is that right? On the bluez wiki page I found, that VDP was a proposal for the Google Summer of Code this year. Did anybody take this project so that VDP could be supported in the near future?
 
--Steve
+Nope, nobody took the opportunity to implement it :(
 
+> 2) Since the VDP is apparently not yet supported, I thought of several possible ways of realising video streaming over blueotooth: SPP/L2CAP, BNEP/L2CAP and HCI.
 
-diff -urp bluez-4.54.orig/cups/main.c bluez-4.54/cups/main.c
---- bluez-4.54.orig/cups/main.c	2009-09-25 11:33:47.000000000 -0400
-+++ bluez-4.54/cups/main.c	2009-09-25 14:48:46.000000000 -0400
-@@ -426,7 +426,7 @@ static gboolean list_known_printers(cons
- 
- 	dbus_message_unref(message);
- 
--	if (&error != NULL && dbus_error_is_set(&error))
-+	if (dbus_error_is_set(&error))
- 		return FALSE;
- 
- 	dbus_message_iter_init(reply, &reply_iter);
-@@ -527,7 +527,7 @@ static gboolean list_printers(void)
- 
- 	dbus_error_init(&error);
- 	hcid_exists = dbus_bus_name_has_owner(conn, "org.bluez", &error);
--	if (&error != NULL && dbus_error_is_set(&error))
-+	if (dbus_error_is_set(&error))
- 		return TRUE;
- 
- 	if (!hcid_exists)
-@@ -547,7 +547,7 @@ static gboolean list_printers(void)
- 
- 	dbus_message_unref(message);
- 
--	if (&error != NULL && dbus_error_is_set(&error)) {
-+	if (dbus_error_is_set(&error)) {
- 		dbus_connection_unref(conn);
- 		/* No adapter */
- 		return TRUE;
+I would say only bnep is really convenient for you, because that would
+make bluetooth transport transparent for you. But that will take all
+of fun of implementation :D and perhaps you don't have enough material
+to your thesis. In the other hand vdp wouldn't be that difficult to
+fully support on BlueZ, we already implemented avdtp protocol for a2dp
+profile, so you don't have to worry about inventing your own codec
+negotiation protocol, also vdp uses better the bandwidth of bluetooth,
+since there is only l2cap involved where on bnep there is l2cap+bnep.
+
+> So for my application it seems to be the easiest and best way to use the SPP/L2CAP way with the send(...) and recv(...) commands to realise video streaming over bluetooth. Of course I know that the speed and the video quality may not be the best and until now it is better to use WLAN for video streaming instead of bluetooth. But my task is to do both and then compare them.
+
+Not really, as I said either you go with bnep where you can handle
+both Bluetooth and WLAN in the same way, in other words rtp over
+tcp/udp, or you implement VDP which is basically rtp over l2cap.
+
+Regards,
+
+-- 
+Luiz Augusto von Dentz
+Engenheiro de Computação
