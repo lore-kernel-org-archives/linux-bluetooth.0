@@ -1,33 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, gustavo@padovan.org
-Subject: [PATCH 1/7] Bluetooth: Put Basic Mode to be the default when using SOCK_SEQPACKET
-Date: Tue, 29 Sep 2009 01:42:23 -0300
-Message-Id: <1254199349-19713-1-git-send-email-gustavo@las.ic.unicamp.br>
+Subject: Re: [PATCH] Bluetooth: Enable auto sleep mode for btmrvl driver
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Bing Zhao <bzhao@marvell.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Amitkumar Karwar <akarwar@marvell.com>
+In-Reply-To: <1254192601-2553-1-git-send-email-bzhao@marvell.com>
+References: <1254192601-2553-1-git-send-email-bzhao@marvell.com>
+Content-Type: text/plain
+Date: Mon, 28 Sep 2009 21:14:35 -0700
+Message-Id: <1254197675.2659.70.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We can't break userspace app that will continue using SOCK_SEQPACKET.
-The default mode for SOCK_SEQPACKET is Basic Mode, so when no one
-specifies the mode and sk_type is SOCK_SEQPACKET Basic Mode shall be used.
+Hi Bing,
 
-Signed-off-by: Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
----
- net/bluetooth/l2cap.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+> From: Amitkumar Karwar <akarwar@marvell.com>
+> 
+> The auto sleep mode for btmrvl driver is not enabled by default.
+> This patch enables auto sleep mode when card is probed.
+> 
+> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+> Signed-off-by: Bing Zhao <bzhao@marvell.com>
+> ---
+>  drivers/bluetooth/btmrvl_drv.h  |    1 +
+>  drivers/bluetooth/btmrvl_main.c |   56 +++++++++++++++++++++++---------------
+>  drivers/bluetooth/btmrvl_sdio.c |    2 +
+>  3 files changed, 37 insertions(+), 22 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
+> index 411c7a7..523d197 100644
+> --- a/drivers/bluetooth/btmrvl_drv.h
+> +++ b/drivers/bluetooth/btmrvl_drv.h
+> @@ -131,6 +131,7 @@ void btmrvl_check_evtpkt(struct btmrvl_private *priv, struct sk_buff *skb);
+>  int btmrvl_process_event(struct btmrvl_private *priv, struct sk_buff *skb);
+>  
+>  int btmrvl_send_module_cfg_cmd(struct btmrvl_private *priv, int subcmd);
+> +int btmrvl_enable_ps(struct btmrvl_private *priv);
+>  int btmrvl_prepare_command(struct btmrvl_private *priv);
+>  
+>  #ifdef CONFIG_DEBUG_FS
+> diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
+> index e605563..43b5b68 100644
+> --- a/drivers/bluetooth/btmrvl_main.c
+> +++ b/drivers/bluetooth/btmrvl_main.c
+> @@ -189,6 +189,39 @@ int btmrvl_send_module_cfg_cmd(struct btmrvl_private *priv, int subcmd)
+>  }
+>  EXPORT_SYMBOL_GPL(btmrvl_send_module_cfg_cmd);
+>  
+> +int btmrvl_enable_ps(struct btmrvl_private *priv)
+> +{
+> +	struct sk_buff *skb;
+> +	struct btmrvl_cmd *cmd;
+> +	int ret = 0;
+> +
+> +	skb = bt_skb_alloc(sizeof(*cmd), GFP_ATOMIC);
+> +	if (skb == NULL) {
+> +		BT_ERR("No free skb");
+> +		return -ENOMEM;
+> +	}
+> +
+> +	cmd = (struct btmrvl_cmd *) skb_put(skb, sizeof(*cmd));
+> +	cmd->ocf_ogf = cpu_to_le16(hci_opcode_pack(OGF,
+> +					BT_CMD_AUTO_SLEEP_MODE));
+> +	cmd->length = 1;
+> +
+> +	if (priv->btmrvl_dev.psmode)
+> +		cmd->data[0] = BT_PS_ENABLE;
+> +	else
+> +		cmd->data[0] = BT_PS_DISABLE;
+> +
+> +	bt_cb(skb)->pkt_type = MRVL_VENDOR_PKT;
+> +
+> +	skb->dev = (void *) priv->btmrvl_dev.hcidev;
+> +	skb_queue_head(&priv->adapter->tx_queue, skb);
+> +
+> +	BT_DBG("Queue PSMODE Command:%d", cmd->data[0]);
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(btmrvl_enable_ps);
 
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index b030125..9d586fb 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -2202,7 +2202,7 @@ static int l2cap_build_conf_req(struct sock *sk, void *data)
- {
- 	struct l2cap_pinfo *pi = l2cap_pi(sk);
- 	struct l2cap_conf_req *req = data;
--	struct l2cap_conf_rfc rfc = { .mode = L2CAP_MODE_ERTM };
-+	struct l2cap_conf_rfc rfc = { .mode = L2CAP_MODE_BASIC };
- 	void *ptr = req->data;
- 
- 	BT_DBG("sk %p", sk);
--- 
-1.6.3.3
+can we please stop this non-sense with int ret = 0. That variable is not
+used anywhere. And if you wouldn't init it, the compiler would loudly
+complain about it already.
+
+Regards
+
+Marcel
+
+
