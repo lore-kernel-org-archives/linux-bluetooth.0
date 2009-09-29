@@ -1,75 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Drop Posix Capabilities
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Steve Grubb <sgrubb@redhat.com>
+MIME-Version: 1.0
+In-Reply-To: <1254200583.2659.82.camel@localhost.localdomain>
+References: <113d36d80909262020y3dc487v880012747475a8e7@mail.gmail.com>
+	 <1254200583.2659.82.camel@localhost.localdomain>
+Date: Tue, 29 Sep 2009 23:16:37 +0800
+Message-ID: <113d36d80909290816g4065595ax1488ed014a11c7de@mail.gmail.com>
+Subject: Re: null pointer error in bluez kernel
+From: Lan Zhu <zhu.lan.cn@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <200909290900.51115.sgrubb@redhat.com>
-References: <200909251647.15440.sgrubb@redhat.com>
-	 <200909281731.00670.sgrubb@redhat.com>
-	 <1254181253.2659.27.camel@localhost.localdomain>
-	 <200909290900.51115.sgrubb@redhat.com>
-Content-Type: text/plain
-Date: Tue, 29 Sep 2009 11:03:46 -0700
-Message-Id: <1254247426.2659.90.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Steve,
+Hi,
 
-> > Thanks foradding this. Another question that comes to my mind. Where do you
-> > have the GIT tree for libcap-ng so we can track the development?
-> 
-> I've never needed to use git - so no git tree. The project has a home page 
-> here:  http://people.redhat.com/sgrubb/libcap-ng/
-> and I announce package updates at freshmeat.net. The libcap-ng package is 
-> stable and I would not have made a release yesterday if it weren't for needing 
-> to a pc file. I don't forsee much development in libcap-ng unless there are 
-> updates in the kernel that I need to take into account. IOW, all planned 
-> features are complete and I'm not tracking any bugs.
+2009/9/29 Marcel Holtmann <marcel@holtmann.org>:
+> Hi,
+>
+>> When we test Bluetooth "out of range" case, occasionally we got kernel
+>> panic result. From the panic log we can see it was caused by NULL
+>> point error.
+>>
+>> In one panic case, the NULL pointer happens at:
+>>
+>> " if (sk->sk_state == BT_CONNECTED)" in the function
+>> l2cap_sock_sendmsg() of l2cap.c
+>>
+>> In another panic case, the NULL pointer is at:
+>>
+>> "parent->sk_data_ready(parent, 0);" in the function l2cap_conn_start()
+>> of l2cap.c
+>>
+>> In a normal call sequence, these null pointer shall never happen,
+>> because it is already well considered. But it seems that the "out of
+>> range" test usually leads the unexpected call sequence which may
+>> randomly cause NULL pointer. Is there any way we can use to avoid the
+>> NULL pointer?
+>
+> what kernel version is this? Never had this problem since the link
+> supervision timeout should trigger a HCI Disconnect.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
 
-from a security point of it is nice if you have a source code repository
-with version tracking. Only thinking about your security team if
-something might happen :)
- 
-> > > > I like to have capability dropping in bluetoothd, but I do wanna do it
-> > > > with a proper upstream project.
-> > > 
-> > > one other thing I thought I would point out. The patch I sent can make it
-> > > easy  to run the bluetooth daemon as non-root user. If we switch this
-> > > line: 
-> > > capng_apply(CAPNG_SELECT_BOTH);
-> > > 
-> > > to
-> > > 
-> > > capng_change_id(uid, gid, CAPNG_DROP_SUPP_GRP | CAPNG_CLEAR_BOUNDING);
-> > > 
-> > > then the job is easier. Of course you would likely need to fixup file 
-> > > permissions in places, but in theory a non-root bluetooth daemon is
-> > > possible  with a 1 line change in the patch. You would probably want to
-> > > add error handling and a way to specify the uid/gid, too.
-> > 
-> > I am not really sold on the non-root daemon idea and there might be
-> > hidden problems where this will not work out. However I don't mind
-> > trying at some point, but there are other things to sort out first. We
-> > should postpone this for the 5.x series.
-> 
-> Sure, I just wanted to point out that its a 1 line change in code if you ever 
-> wanted to do this.
-> 
-> 
-> > Please re-send the original patch using pkg-config so I can go ahead an
-> > apply it. Even if Rawhide is not carrying the updated libcap-ng package.
-> 
-> OK, as soon as I figure out pkg-config. M4 is easier. :)
+The kernel version is 2.6.29.
 
-But the number of people who can read M4 getting less and less. I can
-read it, but then nobody else inside the team will have a real clue.
-Just send me a patch without the pkg-config magic and I can add that for
-you after I applied the patch.
-
-Regards
-
-Marcel
-
-
+Thanks,
+Zhu Lan
