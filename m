@@ -1,63 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Steve Grubb <sgrubb@redhat.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH] Drop Posix Capabilities
-Date: Tue, 29 Sep 2009 09:00:50 -0400
+Subject: Re: [PATCH 2/7] Bluetooth: Initialize variables and timers for
+ both channel's sides
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
 Cc: linux-bluetooth@vger.kernel.org
-References: <200909251647.15440.sgrubb@redhat.com> <200909281731.00670.sgrubb@redhat.com> <1254181253.2659.27.camel@localhost.localdomain>
-In-Reply-To: <1254181253.2659.27.camel@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-15"
-Message-Id: <200909290900.51115.sgrubb@redhat.com>
+In-Reply-To: <6b53b1990909282215l6a823048sf3e684cc8ceeb047@mail.gmail.com>
+References: <1254199349-19713-1-git-send-email-gustavo@las.ic.unicamp.br>
+	 <1254199349-19713-2-git-send-email-gustavo@las.ic.unicamp.br>
+	 <1254200130.2659.72.camel@localhost.localdomain>
+	 <6b53b1990909282215l6a823048sf3e684cc8ceeb047@mail.gmail.com>
+Content-Type: text/plain
+Date: Mon, 28 Sep 2009 22:18:42 -0700
+Message-Id: <1254201522.2659.85.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Monday 28 September 2009 07:40:53 pm Marcel Holtmann wrote:
-> I quickly looked over the pc.in file and it looks good to me.
+Hi Gustavo,
 
-Thanks.
-
-> Thanks foradding this. Another question that comes to my mind. Where do you
-> have the GIT tree for libcap-ng so we can track the development?
-
-I've never needed to use git - so no git tree. The project has a home page 
-here:  http://people.redhat.com/sgrubb/libcap-ng/
-and I announce package updates at freshmeat.net. The libcap-ng package is 
-stable and I would not have made a release yesterday if it weren't for needing 
-to a pc file. I don't forsee much development in libcap-ng unless there are 
-updates in the kernel that I need to take into account. IOW, all planned 
-features are complete and I'm not tracking any bugs.
-
- 
-> > > I like to have capability dropping in bluetoothd, but I do wanna do it
-> > > with a proper upstream project.
-> > 
-> > one other thing I thought I would point out. The patch I sent can make it
-> > easy  to run the bluetooth daemon as non-root user. If we switch this
-> > line: 
-> > capng_apply(CAPNG_SELECT_BOTH);
-> > 
-> > to
-> > 
-> > capng_change_id(uid, gid, CAPNG_DROP_SUPP_GRP | CAPNG_CLEAR_BOUNDING);
-> > 
-> > then the job is easier. Of course you would likely need to fixup file 
-> > permissions in places, but in theory a non-root bluetooth daemon is
-> > possible  with a 1 line change in the patch. You would probably want to
-> > add error handling and a way to specify the uid/gid, too.
+> >> ERTM entity need to handle state vars, timers and counters to send and
+> >> receive I-frames. We initialize all of them to the default values here.
+> >
+> > while this is a good idea. Where is the justification for pushing this
+> > after the merge window?
 > 
-> I am not really sold on the non-root daemon idea and there might be
-> hidden problems where this will not work out. However I don't mind
-> trying at some point, but there are other things to sort out first. We
-> should postpone this for the 5.x series.
+> These patches are bug fixes and implementations of missing parts of ERTM spec.
+> For instance, they enable ERTM to transmit in a full duplex among other things.
+> Also, ERTM isn't enabled on L2CAP, so we aren't introducing any regressions and
+> ASAP we put this code on mainline more feedback we can get from
+> possible testers.
+> 
+> Should I put this on the commit message?
 
-Sure, I just wanted to point out that its a 1 line change in code if you ever 
-wanted to do this.
+if it fixes a bug in the current implementation, then that is fine. If
+it adds another feature, then it is not acceptable. However if that
+feature is mandatory by the specification, then that is a different
+story. Make it perfectly clear what you are fixing or adding.
+
+L2CAP has been in the kernel before and so the not introducing a
+regression is not a real valid argument. You normally only get that for
+new drivers or subsystems.
+
+And forget about the idea with the more testers. After the merge window
+that comment is void.
+
+Regards
+
+Marcel
 
 
-> Please re-send the original patch using pkg-config so I can go ahead an
-> apply it. Even if Rawhide is not carrying the updated libcap-ng package.
-
-OK, as soon as I figure out pkg-config. M4 is easier. :)
-
--Steve
