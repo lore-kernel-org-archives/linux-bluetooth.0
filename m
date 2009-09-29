@@ -1,25 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 1/7] Bluetooth: Put Basic Mode to be the default when
- using SOCK_SEQPACKET
+Subject: Re: [PATCH 7/7] Bluetooth: Send ReqSeq on 'SendRRorRNR' function
 From: Marcel Holtmann <marcel@holtmann.org>
 To: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
 Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org
-In-Reply-To: <1254199349-19713-1-git-send-email-gustavo@las.ic.unicamp.br>
+In-Reply-To: <1254199349-19713-7-git-send-email-gustavo@las.ic.unicamp.br>
 References: <1254199349-19713-1-git-send-email-gustavo@las.ic.unicamp.br>
+	 <1254199349-19713-2-git-send-email-gustavo@las.ic.unicamp.br>
+	 <1254199349-19713-3-git-send-email-gustavo@las.ic.unicamp.br>
+	 <1254199349-19713-4-git-send-email-gustavo@las.ic.unicamp.br>
+	 <1254199349-19713-5-git-send-email-gustavo@las.ic.unicamp.br>
+	 <1254199349-19713-6-git-send-email-gustavo@las.ic.unicamp.br>
+	 <1254199349-19713-7-git-send-email-gustavo@las.ic.unicamp.br>
 Content-Type: text/plain
-Date: Mon, 28 Sep 2009 22:00:46 -0700
-Message-Id: <1254200446.2659.79.camel@localhost.localdomain>
+Date: Mon, 28 Sep 2009 22:00:18 -0700
+Message-Id: <1254200418.2659.78.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Gustavo,
 
-> We can't break userspace app that will continue using SOCK_SEQPACKET.
-> The default mode for SOCK_SEQPACKET is Basic Mode, so when no one
-> specifies the mode and sk_type is SOCK_SEQPACKET Basic Mode shall be used.
+> SendRRorRNR need to acknowledge received I-frames so ReqSeq is set
+> to BufferSeq on the the outgoing S-frame.
 
-this one is fine. Applied to my tree.
+same here :(
 
 Regards
 
