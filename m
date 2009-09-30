@@ -1,37 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
 To: linux-bluetooth@vger.kernel.org
-Cc: gustavo@padovan.org
-Subject: [PATCH] Don't force dirs on bootstrap-configure
-Date: Wed, 30 Sep 2009 23:14:38 -0300
-Message-Id: <1254363278-20735-1-git-send-email-gustavo@las.ic.unicamp.br>
+Cc: marcel@holtmann.org, gustavo@padovan.org
+Subject: [PATCH 5/5] Bluetooth: Fix 'SendRRorRNR' to send the ReqSeq value
+Date: Wed, 30 Sep 2009 20:44:21 -0300
+Message-Id: <1254354262-27405-5-git-send-email-gustavo@las.ic.unicamp.br>
+In-Reply-To: <1254354262-27405-4-git-send-email-gustavo@las.ic.unicamp.br>
+References: <1254354262-27405-1-git-send-email-gustavo@las.ic.unicamp.br>
+ <1254354262-27405-2-git-send-email-gustavo@las.ic.unicamp.br>
+ <1254354262-27405-3-git-send-email-gustavo@las.ic.unicamp.br>
+ <1254354262-27405-4-git-send-email-gustavo@las.ic.unicamp.br>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fixes a problem with ./bootstrap-configure --prefix=some/dir.
-bootstrap-configure was forcing dirs configuration like mandir and
-sysconfdir unless user pass all its desired dirs on
-./bootstrap-configure.
----
- bootstrap-configure |    5 -----
- 1 files changed, 0 insertions(+), 5 deletions(-)
+SendRRorRNR need to acknowledge received I-frames (actually every packet
+need to acknowledge received I-received by sending the proper ReqSeq value),
+so ReqSeq is set to BufferSeq (the packet to acknowledge) on the outgoing
+S-frame.
 
-diff --git a/bootstrap-configure b/bootstrap-configure
-index 5414518..1a48fa9 100755
---- a/bootstrap-configure
-+++ b/bootstrap-configure
-@@ -11,11 +11,6 @@ fi
- ./bootstrap && \
-     ./configure --enable-maintainer-mode \
- 		--enable-debug \
--		--prefix=/usr \
--		--mandir=/usr/share/man \
--		--sysconfdir=/etc \
--		--localstatedir=/var \
--		--libexecdir=/lib \
- 		--enable-netlink \
- 		--enable-tools \
- 		--enable-bccmd \
+Signed-off-by: Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
+---
+ net/bluetooth/l2cap.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
+
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index 0c4fdea..2f29e40 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -373,6 +373,8 @@ static inline int l2cap_send_rr_or_rnr(struct l2cap_pinfo *pi, u16 control)
+ 	else
+ 		control |= L2CAP_SUPER_RCV_READY;
+ 
++	control |= pi->buffer_seq << L2CAP_CTRL_REQSEQ_SHIFT;
++
+ 	return l2cap_send_sframe(pi, control);
+ }
+ 
 -- 
 1.6.3.3
 
