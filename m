@@ -1,120 +1,125 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
+From: Bing Zhao <bzhao@marvell.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, gustavo@padovan.org
-Subject: [PATCH 1/5] Bluetooth: Initialize variables and timers for both channel's sides
-Date: Wed, 30 Sep 2009 20:44:17 -0300
-Message-Id: <1254354262-27405-1-git-send-email-gustavo@las.ic.unicamp.br>
+Cc: Bing Zhao <bzhao@marvell.com>,
+	Amitkumar Karwar <akarwar@marvell.com>
+Subject: [PATCH v2] Bluetooth: Enable auto sleep mode for btmrvl driver
+Date: Wed, 30 Sep 2009 11:18:30 -0700
+Message-Id: <1254334710-1811-1-git-send-email-bzhao@marvell.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fix ERTM's full-duplex channel to work as specified by ERTM spec. ERTM
-needs to handle state vars, timers and counters to send and receive
-I-frames, i.e., for both sides of data communication. We initialize all of
-them to the default values here.
+From: Amitkumar Karwar <akarwar@marvell.com>
 
-Signed-off-by: Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
+The auto sleep mode for btmrvl driver is not enabled by default.
+This patch enables auto sleep mode when card is probed.
+
+Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+Signed-off-by: Bing Zhao <bzhao@marvell.com>
 ---
- net/bluetooth/l2cap.c |   54 ++++++++++++++++++++++++++++++++----------------
- 1 files changed, 36 insertions(+), 18 deletions(-)
+ drivers/bluetooth/btmrvl_drv.h  |    1 +
+ drivers/bluetooth/btmrvl_main.c |   55 +++++++++++++++++++++++---------------
+ drivers/bluetooth/btmrvl_sdio.c |    2 +
+ 3 files changed, 36 insertions(+), 22 deletions(-)
 
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 9d586fb..c709da0 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -2169,6 +2169,21 @@ static void l2cap_add_conf_opt(void **ptr, u8 type, u8 len, unsigned long val)
- 	*ptr += L2CAP_CONF_OPT_SIZE + len;
+diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
+index 411c7a7..523d197 100644
+--- a/drivers/bluetooth/btmrvl_drv.h
++++ b/drivers/bluetooth/btmrvl_drv.h
+@@ -131,6 +131,7 @@ void btmrvl_check_evtpkt(struct btmrvl_private *priv, struct sk_buff *skb);
+ int btmrvl_process_event(struct btmrvl_private *priv, struct sk_buff *skb);
+ 
+ int btmrvl_send_module_cfg_cmd(struct btmrvl_private *priv, int subcmd);
++int btmrvl_enable_ps(struct btmrvl_private *priv);
+ int btmrvl_prepare_command(struct btmrvl_private *priv);
+ 
+ #ifdef CONFIG_DEBUG_FS
+diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
+index e605563..f97771c 100644
+--- a/drivers/bluetooth/btmrvl_main.c
++++ b/drivers/bluetooth/btmrvl_main.c
+@@ -189,6 +189,38 @@ int btmrvl_send_module_cfg_cmd(struct btmrvl_private *priv, int subcmd)
  }
+ EXPORT_SYMBOL_GPL(btmrvl_send_module_cfg_cmd);
  
-+static inline void l2cap_ertm_init(struct sock *sk)
++int btmrvl_enable_ps(struct btmrvl_private *priv)
 +{
-+	l2cap_pi(sk)->expected_ack_seq = 0;
-+	l2cap_pi(sk)->unacked_frames = 0;
-+	l2cap_pi(sk)->buffer_seq = 0;
-+	l2cap_pi(sk)->num_to_ack = 0;
++	struct sk_buff *skb;
++	struct btmrvl_cmd *cmd;
 +
-+	setup_timer(&l2cap_pi(sk)->retrans_timer,
-+			l2cap_retrans_timeout, (unsigned long) sk);
-+	setup_timer(&l2cap_pi(sk)->monitor_timer,
-+			l2cap_monitor_timeout, (unsigned long) sk);
++	skb = bt_skb_alloc(sizeof(*cmd), GFP_ATOMIC);
++	if (skb == NULL) {
++		BT_ERR("No free skb");
++		return -ENOMEM;
++	}
 +
-+	__skb_queue_head_init(SREJ_QUEUE(sk));
++	cmd = (struct btmrvl_cmd *) skb_put(skb, sizeof(*cmd));
++	cmd->ocf_ogf = cpu_to_le16(hci_opcode_pack(OGF,
++					BT_CMD_AUTO_SLEEP_MODE));
++	cmd->length = 1;
++
++	if (priv->btmrvl_dev.psmode)
++		cmd->data[0] = BT_PS_ENABLE;
++	else
++		cmd->data[0] = BT_PS_DISABLE;
++
++	bt_cb(skb)->pkt_type = MRVL_VENDOR_PKT;
++
++	skb->dev = (void *) priv->btmrvl_dev.hcidev;
++	skb_queue_head(&priv->adapter->tx_queue, skb);
++
++	BT_DBG("Queue PSMODE Command:%d", cmd->data[0]);
++
++	return 0;
 +}
++EXPORT_SYMBOL_GPL(btmrvl_enable_ps);
 +
- static int l2cap_mode_supported(__u8 mode, __u32 feat_mask)
+ static int btmrvl_enable_hs(struct btmrvl_private *priv)
  {
- 	u32 local_feat_mask = l2cap_feat_mask;
-@@ -2752,17 +2767,13 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 			l2cap_pi(sk)->fcs = L2CAP_FCS_CRC16;
+ 	struct sk_buff *skb;
+@@ -258,28 +290,7 @@ int btmrvl_prepare_command(struct btmrvl_private *priv)
  
- 		sk->sk_state = BT_CONNECTED;
--		l2cap_pi(sk)->next_tx_seq = 0;
--		l2cap_pi(sk)->expected_ack_seq = 0;
--		l2cap_pi(sk)->unacked_frames = 0;
+ 	if (priv->btmrvl_dev.pscmd) {
+ 		priv->btmrvl_dev.pscmd = 0;
 -
--		setup_timer(&l2cap_pi(sk)->retrans_timer,
--				l2cap_retrans_timeout, (unsigned long) sk);
--		setup_timer(&l2cap_pi(sk)->monitor_timer,
--				l2cap_monitor_timeout, (unsigned long) sk);
- 
-+		l2cap_pi(sk)->next_tx_seq = 0;
-+		l2cap_pi(sk)->expected_tx_seq = 0;
- 		__skb_queue_head_init(TX_QUEUE(sk));
--		__skb_queue_head_init(SREJ_QUEUE(sk));
-+		if (l2cap_pi(sk)->mode == L2CAP_MODE_ERTM)
-+			l2cap_ertm_init(sk);
-+
- 		l2cap_chan_ready(sk);
- 		goto unlock;
- 	}
-@@ -2841,11 +2852,12 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 			l2cap_pi(sk)->fcs = L2CAP_FCS_CRC16;
- 
- 		sk->sk_state = BT_CONNECTED;
-+		l2cap_pi(sk)->next_tx_seq = 0;
- 		l2cap_pi(sk)->expected_tx_seq = 0;
--		l2cap_pi(sk)->buffer_seq = 0;
--		l2cap_pi(sk)->num_to_ack = 0;
- 		__skb_queue_head_init(TX_QUEUE(sk));
--		__skb_queue_head_init(SREJ_QUEUE(sk));
-+		if (l2cap_pi(sk)->mode ==  L2CAP_MODE_ERTM)
-+			l2cap_ertm_init(sk);
-+
- 		l2cap_chan_ready(sk);
+-		skb = bt_skb_alloc(sizeof(*cmd), GFP_ATOMIC);
+-		if (skb == NULL) {
+-			BT_ERR("No free skb");
+-			return -ENOMEM;
+-		}
+-
+-		cmd = (struct btmrvl_cmd *) skb_put(skb, sizeof(*cmd));
+-		cmd->ocf_ogf = cpu_to_le16(hci_opcode_pack(OGF, BT_CMD_AUTO_SLEEP_MODE));
+-		cmd->length = 1;
+-
+-		if (priv->btmrvl_dev.psmode)
+-			cmd->data[0] = BT_PS_ENABLE;
+-		else
+-			cmd->data[0] = BT_PS_DISABLE;
+-
+-		bt_cb(skb)->pkt_type = MRVL_VENDOR_PKT;
+-
+-		skb->dev = (void *) priv->btmrvl_dev.hcidev;
+-		skb_queue_head(&priv->adapter->tx_queue, skb);
+-
+-		BT_DBG("Queue PSMODE Command:%d", cmd->data[0]);
++		btmrvl_enable_ps(priv);
  	}
  
-@@ -2877,9 +2889,12 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn, struct l2cap_cmd
- 	sk->sk_shutdown = SHUTDOWN_MASK;
+ 	if (priv->btmrvl_dev.hscmd) {
+diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+index 5b33b85..d6aaf51 100644
+--- a/drivers/bluetooth/btmrvl_sdio.c
++++ b/drivers/bluetooth/btmrvl_sdio.c
+@@ -930,6 +930,8 @@ static int btmrvl_sdio_probe(struct sdio_func *func,
+ 	priv->hw_wakeup_firmware = btmrvl_sdio_wakeup_fw;
  
- 	skb_queue_purge(TX_QUEUE(sk));
--	skb_queue_purge(SREJ_QUEUE(sk));
--	del_timer(&l2cap_pi(sk)->retrans_timer);
--	del_timer(&l2cap_pi(sk)->monitor_timer);
-+
-+	if (l2cap_pi(sk)->mode == L2CAP_MODE_ERTM) {
-+		skb_queue_purge(SREJ_QUEUE(sk));
-+		del_timer(&l2cap_pi(sk)->retrans_timer);
-+		del_timer(&l2cap_pi(sk)->monitor_timer);
-+	}
+ 	btmrvl_send_module_cfg_cmd(priv, MODULE_BRINGUP_REQ);
++	priv->btmrvl_dev.psmode = 1;
++	btmrvl_enable_ps(priv);
  
- 	l2cap_chan_del(sk, ECONNRESET);
- 	bh_unlock_sock(sk);
-@@ -2904,9 +2919,12 @@ static inline int l2cap_disconnect_rsp(struct l2cap_conn *conn, struct l2cap_cmd
- 		return 0;
+ 	return 0;
  
- 	skb_queue_purge(TX_QUEUE(sk));
--	skb_queue_purge(SREJ_QUEUE(sk));
--	del_timer(&l2cap_pi(sk)->retrans_timer);
--	del_timer(&l2cap_pi(sk)->monitor_timer);
-+
-+	if (l2cap_pi(sk)->mode == L2CAP_MODE_ERTM) {
-+		skb_queue_purge(SREJ_QUEUE(sk));
-+		del_timer(&l2cap_pi(sk)->retrans_timer);
-+		del_timer(&l2cap_pi(sk)->monitor_timer);
-+	}
- 
- 	l2cap_chan_del(sk, 0);
- 	bh_unlock_sock(sk);
 -- 
-1.6.3.3
+1.5.4.3
 
