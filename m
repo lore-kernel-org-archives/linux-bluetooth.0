@@ -1,499 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <20091002232721.385245919@vyatta.com>
-References: <20091002232520.925496630@vyatta.com>
-Date: Fri, 02 Oct 2009 16:25:21 -0700
-From: Stephen Hemminger <shemminger@vyatta.com>
-To: "David S. Miller" <davem@davemloft.net>
-Cc: Karsten Keil <isdn@linux-pingi.de>,
-        Andreas Eversberg <andreas@eversberg.eu>,
-        Matthias Urlichs <matthias@urlichs.de>,
-        Hannes Eder <hannes@hanneseder.net>,
-        Michal Ostrowski <mostrows@earthlink.net>,
-        Cyrill Gorcunov <gorcunov@openvz.org>,
-        Rusty Russell <rusty@rustcorp.com.au>,
-        James Chapman <jchapman@katalix.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Harvey Harrison <harvey.harrison@gmail.com>,
-        Arnaldo Carvalho de Melo <acme@ghostprotocols.net>,
-        Mark Smith <markzzzsmith@yahoo.com.au>,
-        Eric Dumazet <eric.dumazet@gmail.com>,
-        Alan Cox <alan@lxorguk.ukuu.org.uk>,
-        David Woodhouse <David.Woodhouse@intel.com>,
-        Chas Williams <chas@cmf.nrl.navy.mil>, Joerg Reuter <jreuter@yaina.de>,
-        Ralf Baechle <ralf@linux-mips.org>,
-        Bernard Pidoux F6BVP <f6bvp@free.fr>, James Morris <jmorris@namei.org>,
-        Dave Young <hidave.darkstar@gmail.com>,
-        Jan Engelhardt <jengelh@medozas.de>,
-        Oliver Hartkopp <oliver@hartkopp.net>, Ingo Molnar <mingo@elte.hu>,
-        Johan Hedberg <johan.hedberg@nokia.com>,
-        Urs Thuermann <urs@isnogud.escape.de>,
-        Christine Caulfield <christine.caulfield@googlemail.com>,
-        Stephen Hemminger <shemminger@vyatta.com>,
-        Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>,
-        Sergey Lapin <slapin@ossfans.org>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        "Pekka Savola (ipv6)" <pekkas@netcore.fi>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Patrick McHardy <kaber@trash.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "Denis V. Lunev" <den@openvz.org>,
-        Vlad Yasevich <vladislav.yasevich@hp.com>,
-        Alexey Dobriyan <adobriyan@gmail.com>,
-        Samuel Ortiz <samuel@sortiz.org>,
-        Ursula Braun <ursula.braun@de.ibm.com>, linux390@de.ibm.com,
-        Hendrik Brueckner <brueckner@linux.vnet.ibm.com>,
-        Qinghuang Feng <qhfeng.kernel@gmail.com>,
-        Jiri Pirko <jpirko@redhat.com>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        <remi.denis-courmont@nokia.com>, Andy Grover <andy.grover@oracle.com>,
-        Huang Weiyi <weiyi.huang@gmail.com>,
-        David Howells <dhowells@redhat.com>, Dan Carpenter <error27@gmail.com>,
-        Al Viro <viro@zeniv.linux.org.uk>, Henner Eisen <eis@baty.hanse.de>,
-        netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-hams@vger.kernel.org, linux-decnet-user@lists.sourceforge.net,
-        linux-zigbee-devel@lists.sourceforge.net, linux-s390@vger.kernel.org,
-        rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
-        linux-x25@vger.kernel.org
-Subject: [PATCH 1/1] net: mark net_proto_ops as const
+Message-ID: <4AC6247E.7050308@hartkopp.net>
+Date: Fri, 02 Oct 2009 18:04:14 +0200
+From: Oliver Hartkopp <oliver@hartkopp.net>
+MIME-Version: 1.0
+To: Dave Young <hidave.darkstar@gmail.com>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+ Linux Netdev List <netdev@vger.kernel.org>,
+ linux-bluetooth@vger.kernel.org
+Subject: Re: [BUG net-2.6] bluetooth/rfcomm : sleeping function called from
+ 	invalid context at mm/slub.c:1719
+References: <4AC59D8A.6000102@hartkopp.net> <a8e1da0910020401m2fb8493ax95ff55a3b66131a5@mail.gmail.com>
+In-Reply-To: <a8e1da0910020401m2fb8493ax95ff55a3b66131a5@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-All users of structure net_proto_ops should be declared const.
+Dave Young wrote:
+> On Fri, Oct 2, 2009 at 2:28 PM, Oliver Hartkopp <oliver@hartkopp.net> wrote:
+>> Hello Marcel,
+>>
+>> with current net-2.6 tree ...
+>>
+>> While starting my PPP Bluetooth dialup networking, i got this:
+> 
+> Hi, oliver
+> 
+> please try following patch:
+> http://patchwork.kernel.org/patch/51326/
 
----
- drivers/isdn/mISDN/socket.c       |    3 +--
- drivers/net/pppox.c               |    2 +-
- include/net/bluetooth/bluetooth.h |    2 +-
- net/appletalk/ddp.c               |    2 +-
- net/atm/pvc.c                     |    2 +-
- net/atm/svc.c                     |    2 +-
- net/ax25/af_ax25.c                |    2 +-
- net/bluetooth/af_bluetooth.c      |    4 ++--
- net/bluetooth/bnep/sock.c         |    2 +-
- net/bluetooth/cmtp/sock.c         |    2 +-
- net/bluetooth/hci_sock.c          |    2 +-
- net/bluetooth/hidp/sock.c         |    2 +-
- net/bluetooth/l2cap.c             |    2 +-
- net/bluetooth/rfcomm/sock.c       |    2 +-
- net/bluetooth/sco.c               |    2 +-
- net/can/af_can.c                  |    2 +-
- net/decnet/af_decnet.c            |    2 +-
- net/econet/af_econet.c            |    2 +-
- net/ieee802154/af_ieee802154.c    |    2 +-
- net/ipv4/af_inet.c                |    2 +-
- net/ipv6/af_inet6.c               |    2 +-
- net/ipx/af_ipx.c                  |    2 +-
- net/irda/af_irda.c                |    2 +-
- net/iucv/af_iucv.c                |    2 +-
- net/key/af_key.c                  |    2 +-
- net/llc/af_llc.c                  |    2 +-
- net/netlink/af_netlink.c          |    2 +-
- net/netrom/af_netrom.c            |    2 +-
- net/packet/af_packet.c            |    2 +-
- net/phonet/af_phonet.c            |    2 +-
- net/rds/af_rds.c                  |    2 +-
- net/rose/af_rose.c                |    2 +-
- net/rxrpc/af_rxrpc.c              |    2 +-
- net/unix/af_unix.c                |    2 +-
- net/x25/af_x25.c                  |    2 +-
- 35 files changed, 36 insertions(+), 37 deletions(-)
+Hi Dave,
 
---- a/drivers/isdn/mISDN/socket.c	2009-10-02 16:20:02.320291655 -0700
-+++ b/drivers/isdn/mISDN/socket.c	2009-10-02 16:20:43.210280312 -0700
-@@ -808,8 +808,7 @@ mISDN_sock_create(struct net *net, struc
- 	return err;
- }
- 
--static struct
--net_proto_family mISDN_sock_family_ops = {
-+static const struct net_proto_family mISDN_sock_family_ops = {
- 	.owner  = THIS_MODULE,
- 	.family = PF_ISDN,
- 	.create = mISDN_sock_create,
---- a/drivers/net/pppox.c	2009-10-01 19:03:16.918349768 -0700
-+++ b/drivers/net/pppox.c	2009-10-02 16:20:43.210280312 -0700
-@@ -125,7 +125,7 @@ out:
- 	return rc;
- }
- 
--static struct net_proto_family pppox_proto_family = {
-+static const struct net_proto_family pppox_proto_family = {
- 	.family	= PF_PPPOX,
- 	.create	= pppox_create,
- 	.owner	= THIS_MODULE,
---- a/include/net/bluetooth/bluetooth.h	2009-10-01 19:03:17.038350923 -0700
-+++ b/include/net/bluetooth/bluetooth.h	2009-10-02 16:20:43.210280312 -0700
-@@ -121,7 +121,7 @@ struct bt_sock_list {
- 	rwlock_t          lock;
- };
- 
--int  bt_sock_register(int proto, struct net_proto_family *ops);
-+int  bt_sock_register(int proto, const struct net_proto_family *ops);
- int  bt_sock_unregister(int proto);
- void bt_sock_link(struct bt_sock_list *l, struct sock *s);
- void bt_sock_unlink(struct bt_sock_list *l, struct sock *s);
---- a/net/appletalk/ddp.c	2009-10-01 19:03:16.634348458 -0700
-+++ b/net/appletalk/ddp.c	2009-10-02 16:20:43.210280312 -0700
-@@ -1821,7 +1821,7 @@ static int atalk_compat_ioctl(struct soc
- #endif
- 
- 
--static struct net_proto_family atalk_family_ops = {
-+static const struct net_proto_family atalk_family_ops = {
- 	.family		= PF_APPLETALK,
- 	.create		= atalk_create,
- 	.owner		= THIS_MODULE,
---- a/net/atm/pvc.c	2009-10-02 16:20:02.440301882 -0700
-+++ b/net/atm/pvc.c	2009-10-02 16:20:43.210280312 -0700
-@@ -137,7 +137,7 @@ static int pvc_create(struct net *net, s
- }
- 
- 
--static struct net_proto_family pvc_family_ops = {
-+static const struct net_proto_family pvc_family_ops = {
- 	.family = PF_ATMPVC,
- 	.create = pvc_create,
- 	.owner = THIS_MODULE,
---- a/net/atm/svc.c	2009-10-02 16:20:02.440301882 -0700
-+++ b/net/atm/svc.c	2009-10-02 16:20:43.210280312 -0700
-@@ -666,7 +666,7 @@ static int svc_create(struct net *net, s
- }
- 
- 
--static struct net_proto_family svc_family_ops = {
-+static const struct net_proto_family svc_family_ops = {
- 	.family = PF_ATMSVC,
- 	.create = svc_create,
- 	.owner = THIS_MODULE,
---- a/net/ax25/af_ax25.c	2009-10-02 16:20:02.440301882 -0700
-+++ b/net/ax25/af_ax25.c	2009-10-02 16:20:43.210280312 -0700
-@@ -1961,7 +1961,7 @@ static const struct file_operations ax25
- 
- #endif
- 
--static struct net_proto_family ax25_family_ops = {
-+static const struct net_proto_family ax25_family_ops = {
- 	.family =	PF_AX25,
- 	.create =	ax25_create,
- 	.owner	=	THIS_MODULE,
---- a/net/bluetooth/af_bluetooth.c	2009-10-01 19:03:16.854348407 -0700
-+++ b/net/bluetooth/af_bluetooth.c	2009-10-02 16:20:43.210280312 -0700
-@@ -45,7 +45,7 @@
- 
- /* Bluetooth sockets */
- #define BT_MAX_PROTO	8
--static struct net_proto_family *bt_proto[BT_MAX_PROTO];
-+static const struct net_proto_family *bt_proto[BT_MAX_PROTO];
- static DEFINE_RWLOCK(bt_proto_lock);
- 
- static struct lock_class_key bt_lock_key[BT_MAX_PROTO];
-@@ -86,7 +86,7 @@ static inline void bt_sock_reclassify_lo
- 				bt_key_strings[proto], &bt_lock_key[proto]);
- }
- 
--int bt_sock_register(int proto, struct net_proto_family *ops)
-+int bt_sock_register(int proto, const struct net_proto_family *ops)
- {
- 	int err = 0;
- 
---- a/net/bluetooth/bnep/sock.c	2009-10-01 19:03:16.898350369 -0700
-+++ b/net/bluetooth/bnep/sock.c	2009-10-02 16:20:43.210280312 -0700
-@@ -222,7 +222,7 @@ static int bnep_sock_create(struct net *
- 	return 0;
- }
- 
--static struct net_proto_family bnep_sock_family_ops = {
-+static const struct net_proto_family bnep_sock_family_ops = {
- 	.family = PF_BLUETOOTH,
- 	.owner	= THIS_MODULE,
- 	.create = bnep_sock_create
---- a/net/bluetooth/cmtp/sock.c	2009-10-01 19:03:16.874349134 -0700
-+++ b/net/bluetooth/cmtp/sock.c	2009-10-02 16:20:43.220342414 -0700
-@@ -217,7 +217,7 @@ static int cmtp_sock_create(struct net *
- 	return 0;
- }
- 
--static struct net_proto_family cmtp_sock_family_ops = {
-+static const struct net_proto_family cmtp_sock_family_ops = {
- 	.family	= PF_BLUETOOTH,
- 	.owner	= THIS_MODULE,
- 	.create	= cmtp_sock_create
---- a/net/bluetooth/hci_sock.c	2009-10-02 16:20:02.440301882 -0700
-+++ b/net/bluetooth/hci_sock.c	2009-10-02 16:20:43.220342414 -0700
-@@ -687,7 +687,7 @@ static int hci_sock_dev_event(struct not
- 	return NOTIFY_DONE;
- }
- 
--static struct net_proto_family hci_sock_family_ops = {
-+static const struct net_proto_family hci_sock_family_ops = {
- 	.family	= PF_BLUETOOTH,
- 	.owner	= THIS_MODULE,
- 	.create	= hci_sock_create,
---- a/net/bluetooth/hidp/sock.c	2009-10-01 19:03:16.794397698 -0700
-+++ b/net/bluetooth/hidp/sock.c	2009-10-02 16:20:43.220342414 -0700
-@@ -268,7 +268,7 @@ static int hidp_sock_create(struct net *
- 	return 0;
- }
- 
--static struct net_proto_family hidp_sock_family_ops = {
-+static const struct net_proto_family hidp_sock_family_ops = {
- 	.family	= PF_BLUETOOTH,
- 	.owner	= THIS_MODULE,
- 	.create	= hidp_sock_create
---- a/net/bluetooth/l2cap.c	2009-10-02 16:20:02.440301882 -0700
-+++ b/net/bluetooth/l2cap.c	2009-10-02 16:20:43.220342414 -0700
-@@ -3916,7 +3916,7 @@ static const struct proto_ops l2cap_sock
- 	.getsockopt	= l2cap_sock_getsockopt
- };
- 
--static struct net_proto_family l2cap_sock_family_ops = {
-+static const struct net_proto_family l2cap_sock_family_ops = {
- 	.family	= PF_BLUETOOTH,
- 	.owner	= THIS_MODULE,
- 	.create	= l2cap_sock_create,
---- a/net/bluetooth/rfcomm/sock.c	2009-10-02 16:20:02.440301882 -0700
-+++ b/net/bluetooth/rfcomm/sock.c	2009-10-02 16:20:43.220342414 -0700
-@@ -1101,7 +1101,7 @@ static const struct proto_ops rfcomm_soc
- 	.mmap		= sock_no_mmap
- };
- 
--static struct net_proto_family rfcomm_sock_family_ops = {
-+static const struct net_proto_family rfcomm_sock_family_ops = {
- 	.family		= PF_BLUETOOTH,
- 	.owner		= THIS_MODULE,
- 	.create		= rfcomm_sock_create
---- a/net/bluetooth/sco.c	2009-10-02 16:20:02.440301882 -0700
-+++ b/net/bluetooth/sco.c	2009-10-02 16:20:43.220342414 -0700
-@@ -993,7 +993,7 @@ static const struct proto_ops sco_sock_o
- 	.getsockopt	= sco_sock_getsockopt
- };
- 
--static struct net_proto_family sco_sock_family_ops = {
-+static const struct net_proto_family sco_sock_family_ops = {
- 	.family	= PF_BLUETOOTH,
- 	.owner	= THIS_MODULE,
- 	.create	= sco_sock_create,
---- a/net/can/af_can.c	2009-10-01 19:03:16.437350580 -0700
-+++ b/net/can/af_can.c	2009-10-02 16:20:43.220342414 -0700
-@@ -842,7 +842,7 @@ static struct packet_type can_packet __r
- 	.func = can_rcv,
- };
- 
--static struct net_proto_family can_family_ops __read_mostly = {
-+static const struct net_proto_family can_family_ops __read_mostly = {
- 	.family = PF_CAN,
- 	.create = can_create,
- 	.owner  = THIS_MODULE,
---- a/net/decnet/af_decnet.c	2009-10-02 16:20:02.450290721 -0700
-+++ b/net/decnet/af_decnet.c	2009-10-02 16:20:43.220342414 -0700
-@@ -2325,7 +2325,7 @@ static const struct file_operations dn_s
- };
- #endif
- 
--static struct net_proto_family	dn_family_ops = {
-+static const struct net_proto_family	dn_family_ops = {
- 	.family =	AF_DECnet,
- 	.create =	dn_create,
- 	.owner	=	THIS_MODULE,
---- a/net/econet/af_econet.c	2009-10-01 19:03:16.381348558 -0700
-+++ b/net/econet/af_econet.c	2009-10-02 16:20:43.220342414 -0700
-@@ -742,7 +742,7 @@ static int econet_ioctl(struct socket *s
- 	return 0;
- }
- 
--static struct net_proto_family econet_family_ops = {
-+static const struct net_proto_family econet_family_ops = {
- 	.family =	PF_ECONET,
- 	.create =	econet_create,
- 	.owner	=	THIS_MODULE,
---- a/net/ieee802154/af_ieee802154.c	2009-10-01 19:03:16.534350765 -0700
-+++ b/net/ieee802154/af_ieee802154.c	2009-10-02 16:20:43.220342414 -0700
-@@ -285,7 +285,7 @@ out:
- 	return rc;
- }
- 
--static struct net_proto_family ieee802154_family_ops = {
-+static const struct net_proto_family ieee802154_family_ops = {
- 	.family		= PF_IEEE802154,
- 	.create		= ieee802154_create,
- 	.owner		= THIS_MODULE,
---- a/net/ipv4/af_inet.c	2009-10-02 16:20:02.450290721 -0700
-+++ b/net/ipv4/af_inet.c	2009-10-02 16:20:43.220342414 -0700
-@@ -931,7 +931,7 @@ static const struct proto_ops inet_sockr
- #endif
- };
- 
--static struct net_proto_family inet_family_ops = {
-+static const struct net_proto_family inet_family_ops = {
- 	.family = PF_INET,
- 	.create = inet_create,
- 	.owner	= THIS_MODULE,
---- a/net/ipv6/af_inet6.c	2009-10-01 19:03:16.558349136 -0700
-+++ b/net/ipv6/af_inet6.c	2009-10-02 16:20:43.220342414 -0700
-@@ -552,7 +552,7 @@ const struct proto_ops inet6_dgram_ops =
- #endif
- };
- 
--static struct net_proto_family inet6_family_ops = {
-+static const struct net_proto_family inet6_family_ops = {
- 	.family = PF_INET6,
- 	.create = inet6_create,
- 	.owner	= THIS_MODULE,
---- a/net/ipx/af_ipx.c	2009-10-02 16:20:02.460301560 -0700
-+++ b/net/ipx/af_ipx.c	2009-10-02 16:20:43.220342414 -0700
-@@ -1927,7 +1927,7 @@ static int ipx_compat_ioctl(struct socke
-  * Socket family declarations
-  */
- 
--static struct net_proto_family ipx_family_ops = {
-+static const struct net_proto_family ipx_family_ops = {
- 	.family		= PF_IPX,
- 	.create		= ipx_create,
- 	.owner		= THIS_MODULE,
---- a/net/irda/af_irda.c	2009-10-02 16:20:02.460301560 -0700
-+++ b/net/irda/af_irda.c	2009-10-02 16:20:43.220342414 -0700
-@@ -2463,7 +2463,7 @@ bed:
- 	return 0;
- }
- 
--static struct net_proto_family irda_family_ops = {
-+static const struct net_proto_family irda_family_ops = {
- 	.family = PF_IRDA,
- 	.create = irda_create,
- 	.owner	= THIS_MODULE,
---- a/net/iucv/af_iucv.c	2009-10-02 16:20:02.460301560 -0700
-+++ b/net/iucv/af_iucv.c	2009-10-02 16:20:43.220342414 -0700
-@@ -1715,7 +1715,7 @@ static const struct proto_ops iucv_sock_
- 	.getsockopt	= iucv_sock_getsockopt,
- };
- 
--static struct net_proto_family iucv_sock_family_ops = {
-+static const struct net_proto_family iucv_sock_family_ops = {
- 	.family	= AF_IUCV,
- 	.owner	= THIS_MODULE,
- 	.create	= iucv_sock_create,
---- a/net/key/af_key.c	2009-10-01 19:03:16.477349034 -0700
-+++ b/net/key/af_key.c	2009-10-02 16:20:43.230306460 -0700
-@@ -3644,7 +3644,7 @@ static const struct proto_ops pfkey_ops 
- 	.recvmsg	=	pfkey_recvmsg,
- };
- 
--static struct net_proto_family pfkey_family_ops = {
-+static const struct net_proto_family pfkey_family_ops = {
- 	.family	=	PF_KEY,
- 	.create	=	pfkey_create,
- 	.owner	=	THIS_MODULE,
---- a/net/llc/af_llc.c	2009-10-02 16:20:02.460301560 -0700
-+++ b/net/llc/af_llc.c	2009-10-02 16:20:43.230306460 -0700
-@@ -1092,7 +1092,7 @@ out:
- 	return rc;
- }
- 
--static struct net_proto_family llc_ui_family_ops = {
-+static const struct net_proto_family llc_ui_family_ops = {
- 	.family = PF_LLC,
- 	.create = llc_ui_create,
- 	.owner	= THIS_MODULE,
---- a/net/netlink/af_netlink.c	2009-10-02 16:20:02.460301560 -0700
-+++ b/net/netlink/af_netlink.c	2009-10-02 16:20:43.230306460 -0700
-@@ -2050,7 +2050,7 @@ static const struct proto_ops netlink_op
- 	.sendpage =	sock_no_sendpage,
- };
- 
--static struct net_proto_family netlink_family_ops = {
-+static const struct net_proto_family netlink_family_ops = {
- 	.family = PF_NETLINK,
- 	.create = netlink_create,
- 	.owner	= THIS_MODULE,	/* for consistency 8) */
---- a/net/netrom/af_netrom.c	2009-10-02 16:20:02.460301560 -0700
-+++ b/net/netrom/af_netrom.c	2009-10-02 16:20:43.230306460 -0700
-@@ -1372,7 +1372,7 @@ static const struct file_operations nr_i
- };
- #endif	/* CONFIG_PROC_FS */
- 
--static struct net_proto_family nr_family_ops = {
-+static const struct net_proto_family nr_family_ops = {
- 	.family		=	PF_NETROM,
- 	.create		=	nr_create,
- 	.owner		=	THIS_MODULE,
---- a/net/packet/af_packet.c	2009-10-02 16:20:02.460301560 -0700
-+++ b/net/packet/af_packet.c	2009-10-02 16:20:43.230306460 -0700
-@@ -2363,7 +2363,7 @@ static const struct proto_ops packet_ops
- 	.sendpage =	sock_no_sendpage,
- };
- 
--static struct net_proto_family packet_family_ops = {
-+static const struct net_proto_family packet_family_ops = {
- 	.family =	PF_PACKET,
- 	.create =	packet_create,
- 	.owner	=	THIS_MODULE,
---- a/net/phonet/af_phonet.c	2009-10-01 19:03:16.674395303 -0700
-+++ b/net/phonet/af_phonet.c	2009-10-02 16:20:43.230306460 -0700
-@@ -118,7 +118,7 @@ out:
- 	return err;
- }
- 
--static struct net_proto_family phonet_proto_family = {
-+static const struct net_proto_family phonet_proto_family = {
- 	.family = PF_PHONET,
- 	.create = pn_socket_create,
- 	.owner = THIS_MODULE,
---- a/net/rds/af_rds.c	2009-10-02 16:20:02.460301560 -0700
-+++ b/net/rds/af_rds.c	2009-10-02 16:20:43.230306460 -0700
-@@ -431,7 +431,7 @@ void rds_sock_put(struct rds_sock *rs)
- 	sock_put(rds_rs_to_sk(rs));
- }
- 
--static struct net_proto_family rds_family_ops = {
-+static const struct net_proto_family rds_family_ops = {
- 	.family =	AF_RDS,
- 	.create =	rds_create,
- 	.owner	=	THIS_MODULE,
---- a/net/rose/af_rose.c	2009-10-02 16:20:02.460301560 -0700
-+++ b/net/rose/af_rose.c	2009-10-02 16:20:43.230306460 -0700
-@@ -1509,7 +1509,7 @@ static const struct file_operations rose
- };
- #endif	/* CONFIG_PROC_FS */
- 
--static struct net_proto_family rose_family_ops = {
-+static const struct net_proto_family rose_family_ops = {
- 	.family		=	PF_ROSE,
- 	.create		=	rose_create,
- 	.owner		=	THIS_MODULE,
---- a/net/rxrpc/af_rxrpc.c	2009-10-02 16:20:02.460301560 -0700
-+++ b/net/rxrpc/af_rxrpc.c	2009-10-02 16:20:43.230306460 -0700
-@@ -777,7 +777,7 @@ static struct proto rxrpc_proto = {
- 	.max_header	= sizeof(struct rxrpc_header),
- };
- 
--static struct net_proto_family rxrpc_family_ops = {
-+static const struct net_proto_family rxrpc_family_ops = {
- 	.family	= PF_RXRPC,
- 	.create = rxrpc_create,
- 	.owner	= THIS_MODULE,
---- a/net/unix/af_unix.c	2009-10-01 19:03:16.518348870 -0700
-+++ b/net/unix/af_unix.c	2009-10-02 16:20:43.230306460 -0700
-@@ -2214,7 +2214,7 @@ static const struct file_operations unix
- 
- #endif
- 
--static struct net_proto_family unix_family_ops = {
-+static const struct net_proto_family unix_family_ops = {
- 	.family = PF_UNIX,
- 	.create = unix_create,
- 	.owner	= THIS_MODULE,
---- a/net/x25/af_x25.c	2009-10-02 16:20:02.470281669 -0700
-+++ b/net/x25/af_x25.c	2009-10-02 16:20:43.230306460 -0700
-@@ -1476,7 +1476,7 @@ static int x25_ioctl(struct socket *sock
- 	return rc;
- }
- 
--static struct net_proto_family x25_family_ops = {
-+static const struct net_proto_family x25_family_ops = {
- 	.family =	AF_X25,
- 	.create =	x25_create,
- 	.owner	=	THIS_MODULE,
+that fixed it at ppp startup!
 
--- 
+Tested-by: Oliver Hartkopp <oliver@hartkopp.net>
+
+Btw. when shutting down the ppp connection i still get this:
+
+[  361.996887] INFO: trying to register non-static key.
+[  361.996897] the code is fine but needs lockdep annotation.
+[  361.996902] turning off the locking correctness validator.
+[  361.996912] Pid: 0, comm: swapper Not tainted 2.6.31-08939-gdb8abec-dirty #22
+[  361.996919] Call Trace:
+[  361.996933]  [<c12e4fb2>] ? printk+0xf/0x11
+[  361.996947]  [<c1042214>] register_lock_class+0x5a/0x295
+[  361.996957]  [<c1043af2>] __lock_acquire+0x9b/0xc03
+[  361.996967]  [<c104464b>] ? __lock_acquire+0xbf4/0xc03
+[  361.996985]  [<fa59a168>] ? l2cap_get_chan_by_scid+0x35/0x43 [l2cap]
+[  361.996995]  [<c104491f>] ? lock_release_non_nested+0x17b/0x1db
+[  361.997008]  [<fa59a168>] ? l2cap_get_chan_by_scid+0x35/0x43 [l2cap]
+[  361.997018]  [<c10426fd>] ? trace_hardirqs_off+0xb/0xd
+[  361.997028]  [<c10446b6>] lock_acquire+0x5c/0x73
+[  361.997039]  [<c124cd14>] ? skb_dequeue+0x12/0x4c
+[  361.997049]  [<c12e6e23>] _spin_lock_irqsave+0x24/0x34
+[  361.997058]  [<c124cd14>] ? skb_dequeue+0x12/0x4c
+[  361.997066]  [<c124cd14>] skb_dequeue+0x12/0x4c
+[  361.997075]  [<c124d579>] skb_queue_purge+0x14/0x1b
+[  361.997088]  [<fa59ce3f>] l2cap_recv_frame+0xe9e/0x129a [l2cap]
+[  361.997099]  [<c10421d1>] ? register_lock_class+0x17/0x295
+[  361.997110]  [<c104464b>] ? __lock_acquire+0xbf4/0xc03
+[  361.997128]  [<c104464b>] ? __lock_acquire+0xbf4/0xc03
+[  361.997139]  [<c120de74>] ? uhci_giveback_urb+0xf2/0x162
+[  361.997163]  [<f8bb4c45>] ? hci_rx_task+0xfe/0x1f8 [bluetooth]
+[  361.997177]  [<fa59d2e4>] l2cap_recv_acldata+0xa9/0x1be [l2cap]
+[  361.997190]  [<fa59d23b>] ? l2cap_recv_acldata+0x0/0x1be [l2cap]
+[  361.997208]  [<f8bb4c77>] hci_rx_task+0x130/0x1f8 [bluetooth]
+[  361.997219]  [<c102a098>] tasklet_action+0x6b/0xb2
+[  361.997228]  [<c102a46b>] __do_softirq+0x82/0x101
+[  361.997237]  [<c102a515>] do_softirq+0x2b/0x43
+[  361.997246]  [<c102a619>] irq_exit+0x35/0x68
+[  361.997256]  [<c1004513>] do_IRQ+0x80/0x96
+[  361.997265]  [<c10030ae>] common_interrupt+0x2e/0x34
+[  361.997275]  [<c104007b>] ? tick_device_uses_broadcast+0x71/0x7c
+[  361.997286]  [<c11747a8>] ? acpi_idle_enter_simple+0x103/0x12e
+[  361.997296]  [<c1174515>] acpi_idle_enter_bm+0xc3/0x253
+[  361.997306]  [<c1238b6f>] cpuidle_idle_call+0x60/0x91
+[  361.997315]  [<c1001d44>] cpu_idle+0x49/0x65
+[  361.997324]  [<c12e2f0e>] start_secondary+0x190/0x195
+
+
+Thanks,
+Oliver
