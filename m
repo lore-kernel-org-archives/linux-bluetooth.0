@@ -1,38 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: So very close, but so frustrating...
-From: Bastien Nocera <hadess@hadess.net>
-To: Rick Jones <rick@activeservice.co.uk>
-Cc: Dan Williams <dcbw@redhat.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	networkmanager-list@gnome.org
-In-Reply-To: <CB7A3691FBC7EB0E857B7330@mineee>
-References: <4AC3EFD9.1020602@shic.co.uk>
-	 <7cd7fc040909301718r3e441c53x767084b0b01f4a7c@mail.gmail.com>
-	 <1254433173.9657.155.camel@localhost.localdomain>
-	 <1254439169.22191.317.camel@localhost.localdomain>
-	 <CB7A3691FBC7EB0E857B7330@mineee>
-Content-Type: text/plain; charset="ISO-8859-1"
-Date: Fri, 02 Oct 2009 09:39:21 +0100
-Message-Id: <1254472761.22191.879.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <4AC59D8A.6000102@hartkopp.net>
+Date: Fri, 02 Oct 2009 08:28:26 +0200
+From: Oliver Hartkopp <oliver@hartkopp.net>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Linux Netdev List <netdev@vger.kernel.org>,
+ linux-bluetooth@vger.kernel.org
+Subject: [BUG net-2.6] bluetooth/rfcomm : sleeping function called from invalid
+ context at mm/slub.c:1719
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 2009-10-02 at 01:55 +0100, Rick Jones wrote:
-> I've just installed blueman, to replace bluez-gnome, and it does this
-> perfectly.
-> 
-> It's a much better UI-oriented manager for BT devices altogether, it
-> shows my phone, I click on "attach serial service", and it exposes the
-> BT modem in DBus. NM 0.7 sees it just like a USB modem and it connects
-> first time. Magic!
-> 
-> I'm too hardened to be often impressed first-time with a piece of
-> software, but this was spot-on (does audio, obex, etc just as neatly).
-> OK, it takes a couple of extra clicks to connect the phone, which I
-> guess a built-in NM implementation could do automatically, but that's
-> pretty minor.
+Hello Marcel,
 
-Except that blueman does this the way that causes Dan to receive bug
-reports.
+with current net-2.6 tree ...
 
+While starting my PPP Bluetooth dialup networking, i got this:
+
+[  722.461549] PPP generic driver version 2.4.2
+[  722.477519] BUG: sleeping function called from invalid context at
+mm/slub.c:1719
+[  722.477530] in_atomic(): 1, irqs_disabled(): 0, pid: 4677, name: pppd
+[  722.477537] 3 locks held by pppd/4677:
+[  722.477542]  #0:  (rfcomm_mutex){+.+.+.}, at: [<fa5df2a1>]
+rfcomm_dlc_open+0x28/0x2d6 [rfcomm]
+[  722.477568]  #1:  (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+.+.}, at:
+[<fa5414f8>] l2cap_sock_connect+0x62/0x2c6 [l2cap]
+[  722.477589]  #2:  (&hdev->lock){+...+.}, at: [<fa5415b4>]
+l2cap_sock_connect+0x11e/0x2c6 [l2cap]
+[  722.477613] Pid: 4677, comm: pppd Not tainted 2.6.31-08939-gdb8abec-dirty #21
+[  722.477619] Call Trace:
+[  722.477633]  [<c1042a2b>] ? __debug_show_held_locks+0x1e/0x20
+[  722.477644]  [<c10212a1>] __might_sleep+0xc9/0xce
+[  722.477655]  [<c1078b62>] __kmalloc+0x6d/0xfb
+[  722.477666]  [<c119e739>] ? kzalloc+0xb/0xd
+[  722.477674]  [<c119e739>] kzalloc+0xb/0xd
+[  722.477683]  [<c119ef1a>] device_private_init+0x15/0x3d
+[  722.477693]  [<c11a0e1b>] dev_set_drvdata+0x18/0x26
+[  722.477718]  [<f8b7ca1b>] hci_conn_init_sysfs+0x3d/0xc7 [bluetooth]
+[  722.477737]  [<f8b791b3>] hci_conn_add+0x1c0/0x1d5 [bluetooth]
+[  722.477756]  [<f8b79360>] hci_connect+0x71/0x17d [bluetooth]
+[  722.477769]  [<fa54162c>] l2cap_sock_connect+0x196/0x2c6 [l2cap]
+[  722.477782]  [<c1246e3d>] kernel_connect+0xd/0x12
+[  722.477795]  [<fa5df3c3>] rfcomm_dlc_open+0x14a/0x2d6 [rfcomm]
+[  722.477810]  [<fa5e10fa>] ? rfcomm_tty_open+0x73/0x227 [rfcomm]
+[  722.477825]  [<fa5e1130>] rfcomm_tty_open+0xa9/0x227 [rfcomm]
+[  722.477836]  [<c1022e3f>] ? default_wake_function+0x0/0xd
+[  722.477847]  [<c1180c79>] tty_open+0x29e/0x399
+[  722.477858]  [<c107e9bd>] chrdev_open+0x13f/0x156
+[  722.477868]  [<c107b0d3>] __dentry_open+0x11b/0x20f
+[  722.477878]  [<c107b261>] nameidata_to_filp+0x2c/0x43
+[  722.477888]  [<c107e87e>] ? chrdev_open+0x0/0x156
+[  722.477898]  [<c1084e9e>] do_filp_open+0x3c6/0x70a
+[  722.477910]  [<c108d3e4>] ? alloc_fd+0xc8/0xd2
+[  722.477920]  [<c108d3e4>] ? alloc_fd+0xc8/0xd2
+[  722.477930]  [<c107aebc>] do_sys_open+0x4a/0xe7
+[  722.477940]  [<c1002acc>] ? restore_all_notrace+0x0/0x18
+[  722.477950]  [<c107af9b>] sys_open+0x1e/0x26
+[  722.477959]  [<c1002a18>] sysenter_do_call+0x12/0x36
+[  729.658613] PPP BSD Compression module registered
+[  729.684789] PPP Deflate Compression module registered
+
+Any idea?
+
+Regards,
+Oliver
