@@ -1,67 +1,182 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4AC59D8A.6000102@hartkopp.net>
-Date: Fri, 02 Oct 2009 08:28:26 +0200
-From: Oliver Hartkopp <oliver@hartkopp.net>
+Date: Fri, 02 Oct 2009 01:55:27 +0100
+From: Rick Jones <rick@activeservice.co.uk>
+To: Bastien Nocera <hadess@hadess.net>, Dan Williams <dcbw@redhat.com>
+Subject: Re: So very close, but so frustrating...
+Message-ID: <CB7A3691FBC7EB0E857B7330@mineee>
+In-Reply-To: <1254439169.22191.317.camel@localhost.localdomain>
+References: <4AC3EFD9.1020602@shic.co.uk>
+	<7cd7fc040909301718r3e441c53x767084b0b01f4a7c@mail.gmail.com>
+	<1254433173.9657.155.camel@localhost.localdomain>
+	<1254439169.22191.317.camel@localhost.localdomain>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Linux Netdev List <netdev@vger.kernel.org>,
- linux-bluetooth@vger.kernel.org
-Subject: [BUG net-2.6] bluetooth/rfcomm : sleeping function called from invalid
- context at mm/slub.c:1719
-Content-Type: text/plain; charset=ISO-8859-1
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	networkmanager-list@gnome.org
+List-Unsubscribe: <http://mail.gnome.org/mailman/options/networkmanager-list>,
+	<mailto:networkmanager-list-request@gnome.org?subject=unsubscribe>
+List-Archive: <http://mail.gnome.org/archives/networkmanager-list/>
+List-Post: <mailto:networkmanager-list@gnome.org>
+List-Help: <mailto:networkmanager-list-request@gnome.org?subject=help>
+List-Subscribe: <http://mail.gnome.org/mailman/listinfo/networkmanager-list>,
+	<mailto:networkmanager-list-request@gnome.org?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============0565932402=="
+Sender: networkmanager-list-bounces@gnome.org
+Errors-To: networkmanager-list-bounces@gnome.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Marcel,
+--===============0565932402==
+Content-Type: multipart/alternative;
+ boundary="==========859D65B41421F3EA5F3C=========="
+Content-Disposition: inline
 
-with current net-2.6 tree ...
+--==========859D65B41421F3EA5F3C==========
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-While starting my PPP Bluetooth dialup networking, i got this:
+I've just installed blueman, to replace bluez-gnome, and it does this 
+perfectly.
 
-[  722.461549] PPP generic driver version 2.4.2
-[  722.477519] BUG: sleeping function called from invalid context at
-mm/slub.c:1719
-[  722.477530] in_atomic(): 1, irqs_disabled(): 0, pid: 4677, name: pppd
-[  722.477537] 3 locks held by pppd/4677:
-[  722.477542]  #0:  (rfcomm_mutex){+.+.+.}, at: [<fa5df2a1>]
-rfcomm_dlc_open+0x28/0x2d6 [rfcomm]
-[  722.477568]  #1:  (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+.+.}, at:
-[<fa5414f8>] l2cap_sock_connect+0x62/0x2c6 [l2cap]
-[  722.477589]  #2:  (&hdev->lock){+...+.}, at: [<fa5415b4>]
-l2cap_sock_connect+0x11e/0x2c6 [l2cap]
-[  722.477613] Pid: 4677, comm: pppd Not tainted 2.6.31-08939-gdb8abec-dirty #21
-[  722.477619] Call Trace:
-[  722.477633]  [<c1042a2b>] ? __debug_show_held_locks+0x1e/0x20
-[  722.477644]  [<c10212a1>] __might_sleep+0xc9/0xce
-[  722.477655]  [<c1078b62>] __kmalloc+0x6d/0xfb
-[  722.477666]  [<c119e739>] ? kzalloc+0xb/0xd
-[  722.477674]  [<c119e739>] kzalloc+0xb/0xd
-[  722.477683]  [<c119ef1a>] device_private_init+0x15/0x3d
-[  722.477693]  [<c11a0e1b>] dev_set_drvdata+0x18/0x26
-[  722.477718]  [<f8b7ca1b>] hci_conn_init_sysfs+0x3d/0xc7 [bluetooth]
-[  722.477737]  [<f8b791b3>] hci_conn_add+0x1c0/0x1d5 [bluetooth]
-[  722.477756]  [<f8b79360>] hci_connect+0x71/0x17d [bluetooth]
-[  722.477769]  [<fa54162c>] l2cap_sock_connect+0x196/0x2c6 [l2cap]
-[  722.477782]  [<c1246e3d>] kernel_connect+0xd/0x12
-[  722.477795]  [<fa5df3c3>] rfcomm_dlc_open+0x14a/0x2d6 [rfcomm]
-[  722.477810]  [<fa5e10fa>] ? rfcomm_tty_open+0x73/0x227 [rfcomm]
-[  722.477825]  [<fa5e1130>] rfcomm_tty_open+0xa9/0x227 [rfcomm]
-[  722.477836]  [<c1022e3f>] ? default_wake_function+0x0/0xd
-[  722.477847]  [<c1180c79>] tty_open+0x29e/0x399
-[  722.477858]  [<c107e9bd>] chrdev_open+0x13f/0x156
-[  722.477868]  [<c107b0d3>] __dentry_open+0x11b/0x20f
-[  722.477878]  [<c107b261>] nameidata_to_filp+0x2c/0x43
-[  722.477888]  [<c107e87e>] ? chrdev_open+0x0/0x156
-[  722.477898]  [<c1084e9e>] do_filp_open+0x3c6/0x70a
-[  722.477910]  [<c108d3e4>] ? alloc_fd+0xc8/0xd2
-[  722.477920]  [<c108d3e4>] ? alloc_fd+0xc8/0xd2
-[  722.477930]  [<c107aebc>] do_sys_open+0x4a/0xe7
-[  722.477940]  [<c1002acc>] ? restore_all_notrace+0x0/0x18
-[  722.477950]  [<c107af9b>] sys_open+0x1e/0x26
-[  722.477959]  [<c1002a18>] sysenter_do_call+0x12/0x36
-[  729.658613] PPP BSD Compression module registered
-[  729.684789] PPP Deflate Compression module registered
+It's a much better UI-oriented manager for BT devices altogether, it shows 
+my phone, I click on "attach serial service", and it exposes the BT modem 
+in DBus. NM 0.7 sees it just like a USB modem and it connects first time. 
+Magic!
 
-Any idea?
+I'm too hardened to be often impressed first-time with a piece of software, 
+but this was spot-on (does audio, obex, etc just as neatly). OK, it takes a 
+couple of extra clicks to connect the phone, which I guess a built-in NM 
+implementation could do automatically, but that's pretty minor.
 
-Regards,
-Oliver
+Rick
+
+--On Friday, October 02, 2009 00:19:29 +0100 Bastien Nocera 
+<hadess@hadess.net> wrote:
+
+> On Thu, 2009-10-01 at 14:39 -0700, Dan Williams wrote:
+> > On Wed, 2009-09-30 at 20:18 -0400, Darren Albers wrote:
+> <snip>
+> > > At this time Network Manager does not support Bluetooth modems.   I
+> > > think 0.8 supports phones if they use Bluetooth PAN but not Bluetooth
+> > > DUN.
+> >
+> > Correct; I may just get bored enough today triaging bugs to go implement
+> > DUN in 0.8.  That opens up a huge number of cellphones, which will
+> > inevitably lead to even more bugs since there's much more phone
+> > variation than in the relatively small data card space.  Oh well; it
+> > would help a lot of people out.
+>
+> 1. Add ability for MM to identify Bluetooth modems
+> 2. Add plugin in bluez to poke at the modem with MM if it doesn't know
+> the type of device, cache the result, the bluez plugin exports the
+> information through a service
+> 3. Add DUN gnome-bluetooth plugin to nm-applet which would poke the
+> bluez service
+> 4. Add native support in NM to do the connection through bluetoothd
+>
+> After 3., if the box is ticked, the device should appear like an
+> unconfigured WWAN modem to the user. The service configuration can then
+> be done through nm-applet.
+>
+> I can certainly take care of 2. and 3. if you do 1. and the left-overs
+> of 4 :)
+>
+> Cheers
+>
+>
+>
+
+
+
+--==========859D65B41421F3EA5F3C==========
+Content-Type: text/html; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+<HTML>
+
+<BODY>
+
+I've just installed blueman, to replace bluez-gnome, and it does this =
+perfectly.<br>
+<br>
+It's a much better UI-oriented manager for BT devices altogether, it shows =
+my phone, I click on &quot;attach serial service&quot;, and it exposes the =
+BT modem in DBus. NM 0.7 sees it just like a USB modem and it connects =
+first time. Magic!<br>
+<br>
+I'm too hardened to be often impressed first-time with a piece of software, =
+but this was spot-on (does audio, obex, etc just as neatly). OK, it takes a =
+couple of extra clicks to connect the phone, which I guess a built-in NM =
+implementation could do automatically, but that's pretty minor.<br>
+<br>
+Rick<br>
+<br>
+--On Friday, October 02, 2009 00:19:29 +0100 Bastien Nocera =
+&lt;hadess@hadess.net&gt; wrote:<br>
+<font color=3D"#993366"><br>
+&gt; On Thu, 2009-10-01 at 14:39 -0700, Dan Williams wrote:<br>
+&gt; &gt; On Wed, 2009-09-30 at 20:18 -0400, Darren Albers wrote:<br>
+&gt; &lt;snip&gt;<br>
+&gt; &gt; &gt; At this time Network Manager does not support Bluetooth =
+modems.&nbsp;&nbsp;&nbsp;I<br>
+&gt; &gt; &gt; think 0.8 supports phones if they use Bluetooth PAN but not =
+Bluetooth<br>
+&gt; &gt; &gt; DUN.<br>
+&gt; &gt; <br>
+&gt; &gt; Correct; I may just get bored enough today triaging bugs to go =
+implement<br>
+&gt; &gt; DUN in 0.8.&nbsp;&nbsp;That opens up a huge number of cellphones, =
+which will<br>
+&gt; &gt; inevitably lead to even more bugs since there's much more =
+phone<br>
+&gt; &gt; variation than in the relatively small data card =
+space.&nbsp;&nbsp;Oh well; it<br>
+&gt; &gt; would help a lot of people out.<br>
+&gt; <br>
+&gt; 1. Add ability for MM to identify Bluetooth modems<br>
+&gt; 2. Add plugin in bluez to poke at the modem with MM if it doesn't =
+know<br>
+&gt; the type of device, cache the result, the bluez plugin exports the<br>
+&gt; information through a service<br>
+&gt; 3. Add DUN gnome-bluetooth plugin to nm-applet which would poke =
+the<br>
+&gt; bluez service<br>
+&gt; 4. Add native support in NM to do the connection through =
+bluetoothd<br>
+&gt; <br>
+&gt; After 3., if the box is ticked, the device should appear like an<br>
+&gt; unconfigured WWAN modem to the user. The service configuration can =
+then<br>
+&gt; be done through nm-applet.<br>
+&gt; <br>
+&gt; I can certainly take care of 2. and 3. if you do 1. and the =
+left-overs<br>
+&gt; of 4 :)<br>
+&gt; <br>
+&gt; Cheers<br>
+&gt; <br>
+&gt; <br>
+&gt; </font><br>
+<br>
+<br>
+
+
+</BODY>
+
+</HTML>
+
+--==========859D65B41421F3EA5F3C==========--
+
+
+--===============0565932402==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+NetworkManager-list mailing list
+NetworkManager-list@gnome.org
+http://mail.gnome.org/mailman/listinfo/networkmanager-list
+
+--===============0565932402==--
