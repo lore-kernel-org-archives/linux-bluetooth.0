@@ -2,84 +2,120 @@ Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org, gustavo@padovan.org
-Subject: [PATCH 3/5] Bluetooth: Fix sending ReqSeq on I-frames
-Date: Sat,  3 Oct 2009 02:34:38 -0300
-Message-Id: <1254548080-13478-3-git-send-email-gustavo@las.ic.unicamp.br>
-In-Reply-To: <1254548080-13478-2-git-send-email-gustavo@las.ic.unicamp.br>
-References: <1254548080-13478-1-git-send-email-gustavo@las.ic.unicamp.br>
- <1254548080-13478-2-git-send-email-gustavo@las.ic.unicamp.br>
+Subject: [PATCH 1/5] Bluetooth: Initialize variables and timers for both channel's sides
+Date: Sat,  3 Oct 2009 02:34:36 -0300
+Message-Id: <1254548080-13478-1-git-send-email-gustavo@las.ic.unicamp.br>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-As specified by ERTM spec an ERTM channel can acknowledge received
-I-frames(the data frames) by sending an I-frame with the proper ReqSeq
-value (i.e. ReqSeq is set to BufferSeq).  Until now we aren't setting the
-ReqSeq value on I-frame control bits. That way we can save sending
-S-frames(Supervise frames) only to acknowledge receipt of I-frames. It
-is very helpful to the full-duplex channel.
-ReqSeq is the packet sequence number sent in an acknowledgement frame to
-acknowledge receipt of frames up to (ReqSeq - 1).
-BufferSeq controls the receiver buffer, it is used to delay
-acknowledgement of new frames to not cause buffer overflow. BufferSeq
-value is not increased until frames are pulled by reassembly function.
+Fix ERTM's full-duplex channel to work as specified by ERTM spec. ERTM
+needs to handle state vars, timers and counters to send and receive
+I-frames(the data frames), i.e., for both sides of data communication.
+We initialize all of them to the default values here.
+Full-duplex channel is a mandatory feature of ERTM spec.
 
 Signed-off-by: Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
 ---
- include/net/bluetooth/l2cap.h |    1 -
- net/bluetooth/l2cap.c         |    8 ++++++--
- 2 files changed, 6 insertions(+), 3 deletions(-)
+ net/bluetooth/l2cap.c |   54 ++++++++++++++++++++++++++++++++----------------
+ 1 files changed, 36 insertions(+), 18 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 9516f4b..327eb57 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -324,7 +324,6 @@ struct l2cap_pinfo {
- 
- 	__u8		next_tx_seq;
- 	__u8		expected_ack_seq;
--	__u8		req_seq;
- 	__u8		expected_tx_seq;
- 	__u8		buffer_seq;
- 	__u8		buffer_seq_srej;
 diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index a63fefe..9d6f3cf 100644
+index 9d586fb..c709da0 100644
 --- a/net/bluetooth/l2cap.c
 +++ b/net/bluetooth/l2cap.c
-@@ -1329,7 +1329,7 @@ static int l2cap_retransmit_frame(struct sock *sk, u8 tx_seq)
- 		tx_skb = skb_clone(skb, GFP_ATOMIC);
- 		bt_cb(skb)->retries++;
- 		control = get_unaligned_le16(tx_skb->data + L2CAP_HDR_SIZE);
--		control |= (pi->req_seq << L2CAP_CTRL_REQSEQ_SHIFT)
-+		control |= (pi->buffer_seq << L2CAP_CTRL_REQSEQ_SHIFT)
- 				| (tx_seq << L2CAP_CTRL_TXSEQ_SHIFT);
- 		put_unaligned_le16(control, tx_skb->data + L2CAP_HDR_SIZE);
+@@ -2169,6 +2169,21 @@ static void l2cap_add_conf_opt(void **ptr, u8 type, u8 len, unsigned long val)
+ 	*ptr += L2CAP_CONF_OPT_SIZE + len;
+ }
  
-@@ -1371,7 +1371,7 @@ static int l2cap_ertm_send(struct sock *sk)
- 		bt_cb(skb)->retries++;
- 
- 		control = get_unaligned_le16(tx_skb->data + L2CAP_HDR_SIZE);
--		control |= (pi->req_seq << L2CAP_CTRL_REQSEQ_SHIFT)
-+		control |= (pi->buffer_seq << L2CAP_CTRL_REQSEQ_SHIFT)
- 				| (pi->next_tx_seq << L2CAP_CTRL_TXSEQ_SHIFT);
- 		put_unaligned_le16(control, tx_skb->data + L2CAP_HDR_SIZE);
- 
-@@ -3289,12 +3289,16 @@ static inline int l2cap_data_channel_iframe(struct sock *sk, u16 rx_control, str
- {
- 	struct l2cap_pinfo *pi = l2cap_pi(sk);
- 	u8 tx_seq = __get_txseq(rx_control);
-+	u8 req_seq = __get_reqseq(rx_control);
- 	u16 tx_control = 0;
- 	u8 sar = rx_control >> L2CAP_CTRL_SAR_SHIFT;
- 	int err = 0;
- 
- 	BT_DBG("sk %p rx_control 0x%4.4x len %d", sk, rx_control, skb->len);
- 
-+	pi->expected_ack_seq = req_seq;
-+	l2cap_drop_acked_frames(sk);
++static inline void l2cap_ertm_init(struct sock *sk)
++{
++	l2cap_pi(sk)->expected_ack_seq = 0;
++	l2cap_pi(sk)->unacked_frames = 0;
++	l2cap_pi(sk)->buffer_seq = 0;
++	l2cap_pi(sk)->num_to_ack = 0;
 +
- 	if (tx_seq == pi->expected_tx_seq)
- 		goto expected;
++	setup_timer(&l2cap_pi(sk)->retrans_timer,
++			l2cap_retrans_timeout, (unsigned long) sk);
++	setup_timer(&l2cap_pi(sk)->monitor_timer,
++			l2cap_monitor_timeout, (unsigned long) sk);
++
++	__skb_queue_head_init(SREJ_QUEUE(sk));
++}
++
+ static int l2cap_mode_supported(__u8 mode, __u32 feat_mask)
+ {
+ 	u32 local_feat_mask = l2cap_feat_mask;
+@@ -2752,17 +2767,13 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 			l2cap_pi(sk)->fcs = L2CAP_FCS_CRC16;
  
+ 		sk->sk_state = BT_CONNECTED;
+-		l2cap_pi(sk)->next_tx_seq = 0;
+-		l2cap_pi(sk)->expected_ack_seq = 0;
+-		l2cap_pi(sk)->unacked_frames = 0;
+-
+-		setup_timer(&l2cap_pi(sk)->retrans_timer,
+-				l2cap_retrans_timeout, (unsigned long) sk);
+-		setup_timer(&l2cap_pi(sk)->monitor_timer,
+-				l2cap_monitor_timeout, (unsigned long) sk);
+ 
++		l2cap_pi(sk)->next_tx_seq = 0;
++		l2cap_pi(sk)->expected_tx_seq = 0;
+ 		__skb_queue_head_init(TX_QUEUE(sk));
+-		__skb_queue_head_init(SREJ_QUEUE(sk));
++		if (l2cap_pi(sk)->mode == L2CAP_MODE_ERTM)
++			l2cap_ertm_init(sk);
++
+ 		l2cap_chan_ready(sk);
+ 		goto unlock;
+ 	}
+@@ -2841,11 +2852,12 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 			l2cap_pi(sk)->fcs = L2CAP_FCS_CRC16;
+ 
+ 		sk->sk_state = BT_CONNECTED;
++		l2cap_pi(sk)->next_tx_seq = 0;
+ 		l2cap_pi(sk)->expected_tx_seq = 0;
+-		l2cap_pi(sk)->buffer_seq = 0;
+-		l2cap_pi(sk)->num_to_ack = 0;
+ 		__skb_queue_head_init(TX_QUEUE(sk));
+-		__skb_queue_head_init(SREJ_QUEUE(sk));
++		if (l2cap_pi(sk)->mode ==  L2CAP_MODE_ERTM)
++			l2cap_ertm_init(sk);
++
+ 		l2cap_chan_ready(sk);
+ 	}
+ 
+@@ -2877,9 +2889,12 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn, struct l2cap_cmd
+ 	sk->sk_shutdown = SHUTDOWN_MASK;
+ 
+ 	skb_queue_purge(TX_QUEUE(sk));
+-	skb_queue_purge(SREJ_QUEUE(sk));
+-	del_timer(&l2cap_pi(sk)->retrans_timer);
+-	del_timer(&l2cap_pi(sk)->monitor_timer);
++
++	if (l2cap_pi(sk)->mode == L2CAP_MODE_ERTM) {
++		skb_queue_purge(SREJ_QUEUE(sk));
++		del_timer(&l2cap_pi(sk)->retrans_timer);
++		del_timer(&l2cap_pi(sk)->monitor_timer);
++	}
+ 
+ 	l2cap_chan_del(sk, ECONNRESET);
+ 	bh_unlock_sock(sk);
+@@ -2904,9 +2919,12 @@ static inline int l2cap_disconnect_rsp(struct l2cap_conn *conn, struct l2cap_cmd
+ 		return 0;
+ 
+ 	skb_queue_purge(TX_QUEUE(sk));
+-	skb_queue_purge(SREJ_QUEUE(sk));
+-	del_timer(&l2cap_pi(sk)->retrans_timer);
+-	del_timer(&l2cap_pi(sk)->monitor_timer);
++
++	if (l2cap_pi(sk)->mode == L2CAP_MODE_ERTM) {
++		skb_queue_purge(SREJ_QUEUE(sk));
++		del_timer(&l2cap_pi(sk)->retrans_timer);
++		del_timer(&l2cap_pi(sk)->monitor_timer);
++	}
+ 
+ 	l2cap_chan_del(sk, 0);
+ 	bh_unlock_sock(sk);
 -- 
 1.6.4.4
 
