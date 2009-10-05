@@ -1,74 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: So very close, but so frustrating...
-From: Bastien Nocera <hadess@hadess.net>
-To: Dan Williams <dcbw@redhat.com>
-In-Reply-To: <1254557285.8653.4.camel@localhost.localdomain>
-References: <4AC3EFD9.1020602@shic.co.uk>
-	<7cd7fc040909301718r3e441c53x767084b0b01f4a7c@mail.gmail.com>
-	<1254433173.9657.155.camel@localhost.localdomain>
-	<1254439169.22191.317.camel@localhost.localdomain>
-	<1254534287.11531.41.camel@localhost.localdomain>
-	<1254557285.8653.4.camel@localhost.localdomain>
-Date: Mon, 05 Oct 2009 11:55:55 +0100
-Message-Id: <1254740155.22191.5412.camel@localhost.localdomain>
-Mime-Version: 1.0
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
-	networkmanager-list@gnome.org
-List-Unsubscribe: <http://mail.gnome.org/mailman/options/networkmanager-list>,
-	<mailto:networkmanager-list-request@gnome.org?subject=unsubscribe>
-List-Archive: <http://mail.gnome.org/archives/networkmanager-list/>
-List-Post: <mailto:networkmanager-list@gnome.org>
-List-Help: <mailto:networkmanager-list-request@gnome.org?subject=help>
-List-Subscribe: <http://mail.gnome.org/mailman/listinfo/networkmanager-list>,
-	<mailto:networkmanager-list-request@gnome.org?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: networkmanager-list-bounces@gnome.org
-Errors-To: networkmanager-list-bounces@gnome.org
+MIME-Version: 1.0
+In-Reply-To: <20091004180635.GA11272@vigoh>
+References: <4AC59D8A.6000102@hartkopp.net>
+	 <a8e1da0910020401m2fb8493ax95ff55a3b66131a5@mail.gmail.com>
+	 <4AC6247E.7050308@hartkopp.net> <20091003070622.GA4110@darkstar>
+	 <4AC71CAA.9090704@hartkopp.net>
+	 <a8e1da0910032026m66200c08jf9201bbfe34b2f30@mail.gmail.com>
+	 <20091004180635.GA11272@vigoh>
+Date: Mon, 5 Oct 2009 12:08:53 +0800
+Message-ID: <a8e1da0910042108h2adad63j46e81f8ef0ff38d4@mail.gmail.com>
+Subject: Re: [BUG net-2.6] bluetooth/rfcomm : sleeping function called from
+	invalid context at mm/slub.c:1719
+From: Dave Young <hidave.darkstar@gmail.com>
+To: "Gustavo F. Padovan" <gustavo@padovan.org>
+Cc: Oliver Hartkopp <oliver@hartkopp.net>, Marcel Holtmann <marcel@holtmann.org>,
+	Linux Netdev List <netdev@vger.kernel.org>, linux-bluetooth@vger.kernel.org,
+	"Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, 2009-10-03 at 01:08 -0700, Dan Williams wrote:
-> See the 'btdun' branch of nm-applet, where I've added DUN support to
-> the
-> gnome-bluetooth plugin.  There's nothing in the applet or NM side yet,
-> both will need further fixes.  But the gnome-bt plugin seems to work
-> OK
-> at the moment.  Bastien, can you sanity check it?  There's a lot of
-> async dbus calls going on there between the plugin, Bluez, and MM.
-> Needs another set of eyes.
-> 
-> 8b0ae181efd1e3856851e6a44e16bd51d440d0ce
-> c1c13b9dff6772bf13ab6217a2eecb986bd67687 
+On Mon, Oct 5, 2009 at 2:06 AM, Gustavo F. Padovan <gustavo@padovan.org> wr=
+ote:
+>
+> Hi all,
+>
+> * Dave Young <hidave.darkstar@gmail.com> [2009-10-04 11:26:17 +0800]:
+>
+>>
+>> I can reproduce the bug.
+>>
+>> It's probably caused by the l2cap changes by =C2=A0Gustavo F. Padovan
+>> <gustavo@las.ic.unicamp.br>, I didn't see such problem after reverting
+>> Gustavo's patch series.
+>
+> I can't reproduce the bug. I'm trying to reproduce it to figure out what =
+of
+> my changes cause it.
+>
+> I' running
+>
+> $ dund -snu -i 00:11:67:CD:0F:CB # to pretend to be dialup/telephone
+>
+> and on the other side
+>
+> $ rfcomm bind 0 00:11:67:CD:0F:CB 1
+> $ wvdial =C2=A0# wvdial to /dev/rfcomm0
+>
+> Both sides are on the same machine. Do you see any real difference
+> between my try and the call that get the bug?
 
-I'd do:
-+ return (get_best_method (bdaddr, uuids) != BT_METHOD_UNKNOWN);
-instead of:
-+ return !!get_best_method (bdaddr, uuids);
+Just try connecting to a mobile phone with bluetooth on, then set rfcomm.co=
+nf
 
-Also, you're inside the wizard (or the properties, once I actually write
-that code), so you can remove stuff like:
-find_device_cb() and use bluetooth_client_get_model() instead
+I did:
+rfcomm connect 0;
+after connection ok, press ctrl+C to hangup
 
-Something like:
-client = bluetooth_client_new ();
-model = bluetooth_client_get_model(client);
-/* Loop to find the device's proxy object */
-g_object_unref (model);
-g_object_unref (client);
-/* change the interface on the proxy object */
+>
+>
+> --
+> Gustavo F. Padovan
+>
 
-That would remove the need to get the default adapter as well.
 
-You can use lib/test-client to see what the model looks like (adapters
-with devices as the children).
 
-The code under:
-/* Watch for BT device property changes */
-is probably racy-ish. Would need to connect to the properties before
-launching the connect
-
-Cheers
-
-_______________________________________________
-NetworkManager-list mailing list
-NetworkManager-list@gnome.org
-http://mail.gnome.org/mailman/listinfo/networkmanager-list
+--=20
+Regards
+dave
