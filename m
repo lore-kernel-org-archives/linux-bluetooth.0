@@ -1,36 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Wed, 7 Oct 2009 12:01:09 -0300
-Message-ID: <6b53b1990910070801p6fa975c8i4ee5ffcf36cf96f7@mail.gmail.com>
-Subject: bluez build error
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
+In-Reply-To: <d008c3190910070221l58f0a1fblf4c9349515dbb41e@mail.gmail.com>
+References: <d008c3190910070221l58f0a1fblf4c9349515dbb41e@mail.gmail.com>
+Date: Wed, 7 Oct 2009 15:21:23 +0200
+Message-ID: <d008c3190910070621m68d10696u936b63b0f9c4ffd1@mail.gmail.com>
+Subject: Fwd: Can I get some information about bccmd?
+From: Albert Vigolo <vigolame@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi guys,
+Hi,
 
-I'm getting this error when doing a ./bootstrapconfigure and the make:
+I'm trying to set (change) maximum transmit power bluetooth module
+(Free2Move 03GX). I know
+bccmd Linux command, but using it, power didn't change:
+I've send
 
+    ./bccmd psset 17 18
 
-tools/kword.c:36:20: error: parser.h: No such file or directory
-tools/kword.c:41: error: 'K_BIND' undeclared here (not in a function)
-tools/kword.c:42: error: 'K_DEVICE' undeclared here (not in a function)
-tools/kword.c:43: error: 'K_CHANNEL' undeclared here (not in a function)
-tools/kword.c:44: error: 'K_COMMENT' undeclared here (not in a function)
-tools/kword.c:46: error: 'K_YES' undeclared here (not in a function)
-tools/kword.c:47: error: 'K_NO' undeclared here (not in a function)
-make[1]: *** [tools/kword.o] Error 1
-make[1]: *** Waiting for unfinished jobs....
-updating tools/parser.h
-make: *** [all] Error 2
+where 17 is pskey 'Maximum transmit power' and 18 is power value that
+I want to set.
+
+Can you help me please? Have somebody same problem?
 
 
+PS: other bccmd command work
 
-A second make goes fine and everything compiles.
+(PPS:Please answer me, also if I'm OT)
+
+Best regards,
+
+    Alberto
+
+--
+Walk on the wild side
+
 
 
 -- 
-Gustavo F. Padovan
-http://padovan.org
+Walk on the wild side
