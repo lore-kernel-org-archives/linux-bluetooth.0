@@ -1,129 +1,121 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 9 Oct 2009 08:44:53 +0800
-From: Dave Young <hidave.darkstar@gmail.com>
-To: "Gustavo F. Padovan" <gustavo@padovan.org>
-Cc: Oliver Hartkopp <oliver@hartkopp.net>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Linux Netdev List <netdev@vger.kernel.org>,
-	linux-bluetooth@vger.kernel.org,
-	"Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
+MIME-Version: 1.0
+In-Reply-To: <4ACCCCF5.9060203@hartkopp.net>
+References: <4AC59D8A.6000102@hartkopp.net>
+	 <a8e1da0910020401m2fb8493ax95ff55a3b66131a5@mail.gmail.com>
+	 <4AC6247E.7050308@hartkopp.net> <4ACCCCF5.9060203@hartkopp.net>
+Date: Thu, 8 Oct 2009 09:25:07 +0800
+Message-ID: <a8e1da0910071825m7b7f4f1fw400dba4e97ff1427@mail.gmail.com>
 Subject: Re: [BUG net-2.6] bluetooth/rfcomm : sleeping function called from
 	invalid context at mm/slub.c:1719
-Message-ID: <20091009004452.GA2395@darkstar>
-References: <4AC59D8A.6000102@hartkopp.net> <a8e1da0910020401m2fb8493ax95ff55a3b66131a5@mail.gmail.com> <4AC6247E.7050308@hartkopp.net> <20091003070622.GA4110@darkstar> <4AC71CAA.9090704@hartkopp.net> <a8e1da0910032026m66200c08jf9201bbfe34b2f30@mail.gmail.com> <20091004180635.GA11272@vigoh>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20091004180635.GA11272@vigoh>
+From: Dave Young <hidave.darkstar@gmail.com>
+To: Oliver Hartkopp <oliver@hartkopp.net>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Linux Netdev List <netdev@vger.kernel.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, Oct 04, 2009 at 06:06:35PM +0000, Gustavo F. Padovan wrote:
-> 
-> Hi all,
-> 
-> * Dave Young <hidave.darkstar@gmail.com> [2009-10-04 11:26:17 +0800]:
-> 
-> > 
-> > I can reproduce the bug.
-> > 
-> > It's probably caused by the l2cap changes by  Gustavo F. Padovan
-> > <gustavo@las.ic.unicamp.br>, I didn't see such problem after reverting
-> > Gustavo's patch series.
-> 
-> I can't reproduce the bug. I'm trying to reproduce it to figure out what of
-> my changes cause it.
-> 
-> I' running
-> 
-> $ dund -snu -i 00:11:67:CD:0F:CB # to pretend to be dialup/telephone
-> 
-> and on the other side 
-> 
-> $ rfcomm bind 0 00:11:67:CD:0F:CB 1
-> $ wvdial  # wvdial to /dev/rfcomm0
-> 
-> Both sides are on the same machine. Do you see any real difference
-> between my try and the call that get the bug?
-> 
+On Thu, Oct 8, 2009 at 1:16 AM, Oliver Hartkopp <oliver@hartkopp.net> wrote=
+:
+> Oliver Hartkopp wrote:
+>> Dave Young wrote:
+>>> On Fri, Oct 2, 2009 at 2:28 PM, Oliver Hartkopp <oliver@hartkopp.net> w=
+rote:
+>>>> Hello Marcel,
+>>>>
+>>>> with current net-2.6 tree ...
+>>>>
+>>>> While starting my PPP Bluetooth dialup networking, i got this:
+>>> Hi, oliver
+>>>
+>>> please try following patch:
+>>> http://patchwork.kernel.org/patch/51326/
+>>
+>> Hi Dave,
+>>
+>> that fixed it at ppp startup!
+>>
+>> Tested-by: Oliver Hartkopp <oliver@hartkopp.net>
+>
+> Hi Dave,
+>
+> what's the state of this patch?
+>
+> Has it gone upstream?
 
-Hi oliver
+Not yet.
 
-Could try following patch?
----
+Marcel, could you pick it?  If there's potential problem please tell.
 
-When shutdown ppp connection, lockdep waring about non-static key
-will happen, it is caused by the lock is not initialized properly
-at that time.
+>
+> Regards,
+> Oliver
+>
+>>
+>> Btw. when shutting down the ppp connection i still get this:
+>>
+>> [ =C2=A0361.996887] INFO: trying to register non-static key.
+>> [ =C2=A0361.996897] the code is fine but needs lockdep annotation.
+>> [ =C2=A0361.996902] turning off the locking correctness validator.
+>> [ =C2=A0361.996912] Pid: 0, comm: swapper Not tainted 2.6.31-08939-gdb8a=
+bec-dirty #22
+>> [ =C2=A0361.996919] Call Trace:
+>> [ =C2=A0361.996933] =C2=A0[<c12e4fb2>] ? printk+0xf/0x11
+>> [ =C2=A0361.996947] =C2=A0[<c1042214>] register_lock_class+0x5a/0x295
+>> [ =C2=A0361.996957] =C2=A0[<c1043af2>] __lock_acquire+0x9b/0xc03
+>> [ =C2=A0361.996967] =C2=A0[<c104464b>] ? __lock_acquire+0xbf4/0xc03
+>> [ =C2=A0361.996985] =C2=A0[<fa59a168>] ? l2cap_get_chan_by_scid+0x35/0x4=
+3 [l2cap]
+>> [ =C2=A0361.996995] =C2=A0[<c104491f>] ? lock_release_non_nested+0x17b/0=
+x1db
+>> [ =C2=A0361.997008] =C2=A0[<fa59a168>] ? l2cap_get_chan_by_scid+0x35/0x4=
+3 [l2cap]
+>> [ =C2=A0361.997018] =C2=A0[<c10426fd>] ? trace_hardirqs_off+0xb/0xd
+>> [ =C2=A0361.997028] =C2=A0[<c10446b6>] lock_acquire+0x5c/0x73
+>> [ =C2=A0361.997039] =C2=A0[<c124cd14>] ? skb_dequeue+0x12/0x4c
+>> [ =C2=A0361.997049] =C2=A0[<c12e6e23>] _spin_lock_irqsave+0x24/0x34
+>> [ =C2=A0361.997058] =C2=A0[<c124cd14>] ? skb_dequeue+0x12/0x4c
+>> [ =C2=A0361.997066] =C2=A0[<c124cd14>] skb_dequeue+0x12/0x4c
+>> [ =C2=A0361.997075] =C2=A0[<c124d579>] skb_queue_purge+0x14/0x1b
+>> [ =C2=A0361.997088] =C2=A0[<fa59ce3f>] l2cap_recv_frame+0xe9e/0x129a [l2=
+cap]
+>> [ =C2=A0361.997099] =C2=A0[<c10421d1>] ? register_lock_class+0x17/0x295
+>> [ =C2=A0361.997110] =C2=A0[<c104464b>] ? __lock_acquire+0xbf4/0xc03
+>> [ =C2=A0361.997128] =C2=A0[<c104464b>] ? __lock_acquire+0xbf4/0xc03
+>> [ =C2=A0361.997139] =C2=A0[<c120de74>] ? uhci_giveback_urb+0xf2/0x162
+>> [ =C2=A0361.997163] =C2=A0[<f8bb4c45>] ? hci_rx_task+0xfe/0x1f8 [bluetoo=
+th]
+>> [ =C2=A0361.997177] =C2=A0[<fa59d2e4>] l2cap_recv_acldata+0xa9/0x1be [l2=
+cap]
+>> [ =C2=A0361.997190] =C2=A0[<fa59d23b>] ? l2cap_recv_acldata+0x0/0x1be [l=
+2cap]
+>> [ =C2=A0361.997208] =C2=A0[<f8bb4c77>] hci_rx_task+0x130/0x1f8 [bluetoot=
+h]
+>> [ =C2=A0361.997219] =C2=A0[<c102a098>] tasklet_action+0x6b/0xb2
+>> [ =C2=A0361.997228] =C2=A0[<c102a46b>] __do_softirq+0x82/0x101
+>> [ =C2=A0361.997237] =C2=A0[<c102a515>] do_softirq+0x2b/0x43
+>> [ =C2=A0361.997246] =C2=A0[<c102a619>] irq_exit+0x35/0x68
+>> [ =C2=A0361.997256] =C2=A0[<c1004513>] do_IRQ+0x80/0x96
+>> [ =C2=A0361.997265] =C2=A0[<c10030ae>] common_interrupt+0x2e/0x34
+>> [ =C2=A0361.997275] =C2=A0[<c104007b>] ? tick_device_uses_broadcast+0x71=
+/0x7c
+>> [ =C2=A0361.997286] =C2=A0[<c11747a8>] ? acpi_idle_enter_simple+0x103/0x=
+12e
+>> [ =C2=A0361.997296] =C2=A0[<c1174515>] acpi_idle_enter_bm+0xc3/0x253
+>> [ =C2=A0361.997306] =C2=A0[<c1238b6f>] cpuidle_idle_call+0x60/0x91
+>> [ =C2=A0361.997315] =C2=A0[<c1001d44>] cpu_idle+0x49/0x65
+>> [ =C2=A0361.997324] =C2=A0[<c12e2f0e>] start_secondary+0x190/0x195
+>>
+>>
+>> Thanks,
+>> Oliver
+>>
+>>
+>
+>
 
-Fix with tuning the lock/skb_queue_head init order
 
-[   94.339261] INFO: trying to register non-static key.
-[   94.342509] the code is fine but needs lockdep annotation.
-[   94.342509] turning off the locking correctness validator.
-[   94.342509] Pid: 0, comm: swapper Not tainted 2.6.31-mm1 #2
-[   94.342509] Call Trace:
-[   94.342509]  [<c0248fbe>] register_lock_class+0x58/0x241
-[   94.342509]  [<c024b5df>] ? __lock_acquire+0xb57/0xb73
-[   94.342509]  [<c024ab34>] __lock_acquire+0xac/0xb73
-[   94.342509]  [<c024b7fa>] ? lock_release_non_nested+0x17b/0x1de
-[   94.342509]  [<c024b662>] lock_acquire+0x67/0x84
-[   94.342509]  [<c04cd1eb>] ? skb_dequeue+0x15/0x41
-[   94.342509]  [<c054a857>] _spin_lock_irqsave+0x2f/0x3f
-[   94.342509]  [<c04cd1eb>] ? skb_dequeue+0x15/0x41
-[   94.342509]  [<c04cd1eb>] skb_dequeue+0x15/0x41
-[   94.342509]  [<c054a648>] ? _read_unlock+0x1d/0x20
-[   94.342509]  [<c04cd641>] skb_queue_purge+0x14/0x1b
-[   94.342509]  [<fab94fdc>] l2cap_recv_frame+0xea1/0x115a [l2cap]
-[   94.342509]  [<c024b5df>] ? __lock_acquire+0xb57/0xb73
-[   94.342509]  [<c0249c04>] ? mark_lock+0x1e/0x1c7
-[   94.342509]  [<f8364963>] ? hci_rx_task+0xd2/0x1bc [bluetooth]
-[   94.342509]  [<fab95346>] l2cap_recv_acldata+0xb1/0x1c6 [l2cap]
-[   94.342509]  [<f8364997>] hci_rx_task+0x106/0x1bc [bluetooth]
-[   94.342509]  [<fab95295>] ? l2cap_recv_acldata+0x0/0x1c6 [l2cap]
-[   94.342509]  [<c02302c4>] tasklet_action+0x69/0xc1
-[   94.342509]  [<c022fbef>] __do_softirq+0x94/0x11e
-[   94.342509]  [<c022fcaf>] do_softirq+0x36/0x5a
-[   94.342509]  [<c022fe14>] irq_exit+0x35/0x68
-[   94.342509]  [<c0204ced>] do_IRQ+0x72/0x89
-[   94.342509]  [<c02038ee>] common_interrupt+0x2e/0x34
-[   94.342509]  [<c024007b>] ? pm_qos_add_requirement+0x63/0x9d
-[   94.342509]  [<c038e8a5>] ? acpi_idle_enter_bm+0x209/0x238
-[   94.342509]  [<c049d238>] cpuidle_idle_call+0x5c/0x94
-[   94.342509]  [<c02023f8>] cpu_idle+0x4e/0x6f
-[   94.342509]  [<c0534153>] rest_init+0x53/0x55
-[   94.342509]  [<c0781894>] start_kernel+0x2f0/0x2f5
-[   94.342509]  [<c0781091>] i386_start_kernel+0x91/0x96
 
-Reported-by: Oliver Hartkopp <oliver@hartkopp.net>
-Signed-off-by: Dave Young <hidave.darkstar@gmail.com>
----
-net/bluetooth/l2cap.c |    9 ++++++---
-1 file changed, 6 insertions(+), 3 deletions(-)
-
---- linux-2.6.31.orig/net/bluetooth/l2cap.c	2009-10-09 08:32:46.000000000 +0800
-+++ linux-2.6.31/net/bluetooth/l2cap.c	2009-10-09 08:33:57.000000000 +0800
-@@ -555,12 +555,12 @@ static struct l2cap_conn *l2cap_conn_add
- 
- 	conn->feat_mask = 0;
- 
--	setup_timer(&conn->info_timer, l2cap_info_timeout,
--						(unsigned long) conn);
--
- 	spin_lock_init(&conn->lock);
- 	rwlock_init(&conn->chan_list.lock);
- 
-+	setup_timer(&conn->info_timer, l2cap_info_timeout,
-+						(unsigned long) conn);
-+
- 	conn->disc_reason = 0x13;
- 
- 	return conn;
-@@ -783,6 +783,9 @@ static void l2cap_sock_init(struct sock 
- 	/* Default config options */
- 	pi->conf_len = 0;
- 	pi->flush_to = L2CAP_DEFAULT_FLUSH_TO;
-+	skb_queue_head_init(TX_QUEUE(sk));
-+	skb_queue_head_init(SREJ_QUEUE(sk));
-+	INIT_LIST_HEAD(SREJ_LIST(sk));
- }
- 
- static struct proto l2cap_proto = {
+--=20
+Regards
+dave
