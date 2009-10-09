@@ -1,107 +1,129 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 9 Oct 2009 08:44:53 +0800
+From: Dave Young <hidave.darkstar@gmail.com>
+To: "Gustavo F. Padovan" <gustavo@padovan.org>
+Cc: Oliver Hartkopp <oliver@hartkopp.net>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Linux Netdev List <netdev@vger.kernel.org>,
+	linux-bluetooth@vger.kernel.org,
+	"Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
+Subject: Re: [BUG net-2.6] bluetooth/rfcomm : sleeping function called from
+	invalid context at mm/slub.c:1719
+Message-ID: <20091009004452.GA2395@darkstar>
+References: <4AC59D8A.6000102@hartkopp.net> <a8e1da0910020401m2fb8493ax95ff55a3b66131a5@mail.gmail.com> <4AC6247E.7050308@hartkopp.net> <20091003070622.GA4110@darkstar> <4AC71CAA.9090704@hartkopp.net> <a8e1da0910032026m66200c08jf9201bbfe34b2f30@mail.gmail.com> <20091004180635.GA11272@vigoh>
 MIME-Version: 1.0
-In-Reply-To: <113d36d80909290816g4065595ax1488ed014a11c7de@mail.gmail.com>
-References: <113d36d80909262020y3dc487v880012747475a8e7@mail.gmail.com>
-	 <1254200583.2659.82.camel@localhost.localdomain>
-	 <113d36d80909290816g4065595ax1488ed014a11c7de@mail.gmail.com>
-Date: Fri, 9 Oct 2009 18:50:39 +0800
-Message-ID: <113d36d80910090350k54db5688p6144ec4316b7c9ec@mail.gmail.com>
-Subject: Re: null pointer error in bluez kernel
-From: Lan Zhu <zhu.lan.cn@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20091004180635.GA11272@vigoh>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Sun, Oct 04, 2009 at 06:06:35PM +0000, Gustavo F. Padovan wrote:
+> 
+> Hi all,
+> 
+> * Dave Young <hidave.darkstar@gmail.com> [2009-10-04 11:26:17 +0800]:
+> 
+> > 
+> > I can reproduce the bug.
+> > 
+> > It's probably caused by the l2cap changes by  Gustavo F. Padovan
+> > <gustavo@las.ic.unicamp.br>, I didn't see such problem after reverting
+> > Gustavo's patch series.
+> 
+> I can't reproduce the bug. I'm trying to reproduce it to figure out what of
+> my changes cause it.
+> 
+> I' running
+> 
+> $ dund -snu -i 00:11:67:CD:0F:CB # to pretend to be dialup/telephone
+> 
+> and on the other side 
+> 
+> $ rfcomm bind 0 00:11:67:CD:0F:CB 1
+> $ wvdial  # wvdial to /dev/rfcomm0
+> 
+> Both sides are on the same machine. Do you see any real difference
+> between my try and the call that get the bug?
+> 
 
-2009/9/29 Lan Zhu <zhu.lan.cn@gmail.com>:
-> Hi,
->
-> 2009/9/29 Marcel Holtmann <marcel@holtmann.org>:
->> Hi,
->>
->>> When we test Bluetooth "out of range" case, occasionally we got kernel
->>> panic result. From the panic log we can see it was caused by NULL
->>> point error.
->>>
->>> In one panic case, the NULL pointer happens at:
->>>
->>> " if (sk->sk_state == BT_CONNECTED)" in the function
->>> l2cap_sock_sendmsg() of l2cap.c
->>>
->>> In another panic case, the NULL pointer is at:
->>>
->>> "parent->sk_data_ready(parent, 0);" in the function l2cap_conn_start()
->>> of l2cap.c
->>>
->>> In a normal call sequence, these null pointer shall never happen,
->>> because it is already well considered. But it seems that the "out of
->>> range" test usually leads the unexpected call sequence which may
->>> randomly cause NULL pointer. Is there any way we can use to avoid the
->>> NULL pointer?
->>
->> what kernel version is this? Never had this problem since the link
->> supervision timeout should trigger a HCI Disconnect.
->>
->> Regards
->>
->> Marcel
->>
->>
->>
->
-> The kernel version is 2.6.29.
->
-> Thanks,
-> Zhu Lan
->
+Hi oliver
 
-I have caught the kernel log when the panic happened.
+Could try following patch?
+---
 
-Reproduce steps:
-1. Pair and connect with Motorola S305 headset.
-2. Disconnect and unpair with the headset.
-3. Turn off and then turn on the headset. The headset will auto pair with phone.
-4. Input PIN code "0000" on the phone to complete the incoming pairing.
+When shutdown ppp connection, lockdep waring about non-static key
+will happen, it is caused by the lock is not initialized properly
+at that time.
 
-Repeat step 2-4 for many times, then kernel panic may happen right
-after step 4.
+Fix with tuning the lock/skb_queue_head init order
 
->From the kernel log, I found if the bt_accept_unlink() is called
-before l2cap_conn_start(), then panic will happen because in the
-bt_accept_unlink() function it set parent to NULL.
+[   94.339261] INFO: trying to register non-static key.
+[   94.342509] the code is fine but needs lockdep annotation.
+[   94.342509] turning off the locking correctness validator.
+[   94.342509] Pid: 0, comm: swapper Not tainted 2.6.31-mm1 #2
+[   94.342509] Call Trace:
+[   94.342509]  [<c0248fbe>] register_lock_class+0x58/0x241
+[   94.342509]  [<c024b5df>] ? __lock_acquire+0xb57/0xb73
+[   94.342509]  [<c024ab34>] __lock_acquire+0xac/0xb73
+[   94.342509]  [<c024b7fa>] ? lock_release_non_nested+0x17b/0x1de
+[   94.342509]  [<c024b662>] lock_acquire+0x67/0x84
+[   94.342509]  [<c04cd1eb>] ? skb_dequeue+0x15/0x41
+[   94.342509]  [<c054a857>] _spin_lock_irqsave+0x2f/0x3f
+[   94.342509]  [<c04cd1eb>] ? skb_dequeue+0x15/0x41
+[   94.342509]  [<c04cd1eb>] skb_dequeue+0x15/0x41
+[   94.342509]  [<c054a648>] ? _read_unlock+0x1d/0x20
+[   94.342509]  [<c04cd641>] skb_queue_purge+0x14/0x1b
+[   94.342509]  [<fab94fdc>] l2cap_recv_frame+0xea1/0x115a [l2cap]
+[   94.342509]  [<c024b5df>] ? __lock_acquire+0xb57/0xb73
+[   94.342509]  [<c0249c04>] ? mark_lock+0x1e/0x1c7
+[   94.342509]  [<f8364963>] ? hci_rx_task+0xd2/0x1bc [bluetooth]
+[   94.342509]  [<fab95346>] l2cap_recv_acldata+0xb1/0x1c6 [l2cap]
+[   94.342509]  [<f8364997>] hci_rx_task+0x106/0x1bc [bluetooth]
+[   94.342509]  [<fab95295>] ? l2cap_recv_acldata+0x0/0x1c6 [l2cap]
+[   94.342509]  [<c02302c4>] tasklet_action+0x69/0xc1
+[   94.342509]  [<c022fbef>] __do_softirq+0x94/0x11e
+[   94.342509]  [<c022fcaf>] do_softirq+0x36/0x5a
+[   94.342509]  [<c022fe14>] irq_exit+0x35/0x68
+[   94.342509]  [<c0204ced>] do_IRQ+0x72/0x89
+[   94.342509]  [<c02038ee>] common_interrupt+0x2e/0x34
+[   94.342509]  [<c024007b>] ? pm_qos_add_requirement+0x63/0x9d
+[   94.342509]  [<c038e8a5>] ? acpi_idle_enter_bm+0x209/0x238
+[   94.342509]  [<c049d238>] cpuidle_idle_call+0x5c/0x94
+[   94.342509]  [<c02023f8>] cpu_idle+0x4e/0x6f
+[   94.342509]  [<c0534153>] rest_init+0x53/0x55
+[   94.342509]  [<c0781894>] start_kernel+0x2f0/0x2f5
+[   94.342509]  [<c0781091>] i386_start_kernel+0x91/0x96
 
-Below is the call order  when the result is successful. We can see the
-parent is not NULL.
+Reported-by: Oliver Hartkopp <oliver@hartkopp.net>
+Signed-off-by: Dave Young <hidave.darkstar@gmail.com>
+---
+net/bluetooth/l2cap.c |    9 ++++++---
+1 file changed, 6 insertions(+), 3 deletions(-)
 
-[  190.162475] bt_accept_enqueue: parent ccda5298, sk cdb68920
-[  190.170104] bt_accept_enqueue: parent ccda5d10, sk cdf5cd90
-[  190.191223] l2cap_conn_start: conn cd14a320
-[  190.218719] l2cap_conn_start: conn cd14a320
-[  190.223480] l2cap_conn_start: @@@ in l2cap_conn_start --- sk =
-cdb68920, parent = ccda5298
-[  190.235565] bt_accept_unlink: sk cdb68920 state 6
-
-Below is the call order when the result is kernel panic.
-bt_accept_unlink is called first, then we can see the parent is NULL.
-
-[  238.188812] bt_accept_enqueue: parent ccda5298, sk ccf60040
-[  238.196350] bt_accept_enqueue: parent ccda5d10, sk cdf5c960
-[  238.217590] l2cap_conn_start: conn cd14a848
-[  238.223449] bt_accept_unlink: sk ccf60040 state 6
-[  238.229400] l2cap_sock_accept: new socket ccf60040
-[  238.245086] l2cap_conn_start: conn cd14a848
-[  238.249725] l2cap_conn_start: @@@ in l2cap_conn_start --- sk =
-ccf60040, parent = (null)
-[  238.258636] Unable to handle kernel NULL pointer dereference at
-virtual address 00000120
-[  238.267456] pgd = cdb34000
-[  238.270446] [00000120] *pgd=8db32031, *pte=00000000, *ppte=00000000
-[  238.277740] Internal error: Oops: 17 [#1] PREEMPT
-
-
-I think this might be a call competing issue, how do we fix it?
-
-Thanks,
-Zhu Lan
+--- linux-2.6.31.orig/net/bluetooth/l2cap.c	2009-10-09 08:32:46.000000000 +0800
++++ linux-2.6.31/net/bluetooth/l2cap.c	2009-10-09 08:33:57.000000000 +0800
+@@ -555,12 +555,12 @@ static struct l2cap_conn *l2cap_conn_add
+ 
+ 	conn->feat_mask = 0;
+ 
+-	setup_timer(&conn->info_timer, l2cap_info_timeout,
+-						(unsigned long) conn);
+-
+ 	spin_lock_init(&conn->lock);
+ 	rwlock_init(&conn->chan_list.lock);
+ 
++	setup_timer(&conn->info_timer, l2cap_info_timeout,
++						(unsigned long) conn);
++
+ 	conn->disc_reason = 0x13;
+ 
+ 	return conn;
+@@ -783,6 +783,9 @@ static void l2cap_sock_init(struct sock 
+ 	/* Default config options */
+ 	pi->conf_len = 0;
+ 	pi->flush_to = L2CAP_DEFAULT_FLUSH_TO;
++	skb_queue_head_init(TX_QUEUE(sk));
++	skb_queue_head_init(SREJ_QUEUE(sk));
++	INIT_LIST_HEAD(SREJ_LIST(sk));
+ }
+ 
+ static struct proto l2cap_proto = {
