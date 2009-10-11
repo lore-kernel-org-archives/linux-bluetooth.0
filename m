@@ -1,65 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4AD2D155.8040008@pardus.org.tr>
-Date: Mon, 12 Oct 2009 09:48:53 +0300
-From: =?UTF-8?B?T3phbiDDh2HEn2xheWFu?= <ozan@pardus.org.tr>
 MIME-Version: 1.0
+Date: Sun, 11 Oct 2009 15:20:10 -0300
+Message-ID: <1e9e22610910111120p25a850bflcc31794f7e29192e@mail.gmail.com>
+Subject: Failed to connect to SDP server / Connection reset by peer
+From: Addo Del Grossi <addo.delgrossi@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-CC: marcel@holtmann.org
-Subject: Re: Undefined symbols in netlink plugin
-References: <4AB94E32.8060703@pardus.org.tr>
-In-Reply-To: <4AB94E32.8060703@pardus.org.tr>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Ozan Ã‡aÄŸlayan wrote On 23-09-2009 01:22:
+Hi,
 
-> Hi,
->
-> I'm getting the following when I launch bluetoothd with -n -d:
->
-> ..
-> Can't load plugin /usr/lib/bluetooth/plugins/netlink.so:
-> /usr/lib/bluetooth/plugins/netlink.so: undefined symbol: debug
-> ..
->
-> AFAIK, those libtool plugins are allowed to have undefined symbols after
-> linking as they will probably be resolved during runtime loading but the
-> warning above wasn't present on previous versions like 4.41 for example.
->
-> # ldd -u -r /usr/lib/bluetooth/plugins/netlink.so
->      26771:     /usr/lib/bluetooth/plugins/netlink.so: error: symbol
-> lookup error: undefined symbol: g_io_channel_unix_new (continued)
-> undefined symbol: g_io_channel_unix_new
-> (/usr/lib/bluetooth/plugins/netlink.so)
->      26771:     /usr/lib/bluetooth/plugins/netlink.so: error: symbol
-> lookup error: undefined symbol: debug (continued)
-> undefined symbol: debug (/usr/lib/bluetooth/plugins/netlink.so)
->      26771:     /usr/lib/bluetooth/plugins/netlink.so: error: symbol
-> lookup error: undefined symbol: g_io_add_watch (continued)
-> undefined symbol: g_io_add_watch       
-> (/usr/lib/bluetooth/plugins/netlink.so)
->      26771:     /usr/lib/bluetooth/plugins/netlink.so: error: symbol
-> lookup error: undefined symbol: info (continued)
-> undefined symbol: info  (/usr/lib/bluetooth/plugins/netlink.so)
->      26771:     /usr/lib/bluetooth/plugins/netlink.so: error: symbol
-> lookup error: undefined symbol: g_io_channel_unref (continued)
-> undefined symbol: g_io_channel_unref   
-> (/usr/lib/bluetooth/plugins/netlink.so)
-> Unused direct dependencies:
->
->
-> So we have 3 undefined symbol from glib and 2 internal symbols from
-> logging.c: debug() and info(). There's no difference if I install the
-> libtool la file or not. Since glib is already needed by bluez daemon,
-> those undefined symbols seems harmless but AFAIK the internal ones
-> should have been linked against the static logging.o.
->
-> Or do I miss something?
->
->
-> Thanks,
-> Ozan Caglayan
->
->   
+I upgraded to Ubuntu Karmic and found problems when using the command sdptool.
+I was found that the problem only when use the kernel 2.6.31,
+using the old 2.6.28 Kernel sdptool the command works correctly.
 
-Still an issue on bluez 4.56. CC'ing Marcel Holtmann.
+Note: We also did the test by downloading the Vanilla kernel
+kernel.org site and the same error was found.
+
+The commands sequence above reproduce the scenario:
+
+Kernel: 2.6.31-10-generic
+
+root@suporte-desktop:/home/suporte# uname -a
+Linux suporte-desktop 2.6.31-10-generic #34-Ubuntu SMP Wed Sep 16
+00:23:19 UTC 2009 i686 GNU/Linux
+
+root@suporte-desktop:/home/suporte# dpkg -l | grep bluez
+ii  bluez                                4.51-0ubuntu1
+             Bluetooth tools and daemons
+ii  bluez-alsa                           4.51-0ubuntu1
+             Bluetooth audio support
+ii  bluez-gstreamer                      4.51-0ubuntu1
+             Bluetooth GStreamer support
+
+root@suporte-desktop:/home/suporte# sdptool -i hci0 search --bdaddr
+00:0E:6D:70:B9:A6 opush
+Failed to connect to SDP server on 00:0E:6D:70:B9:A6: Connection reset by peer
+
+---------------------------------------------------------------------------------------
+
+Kernel: 2.6.28-15-generic
+
+root@suporte-desktop:/home/suporte# uname -a
+Linux suporte-desktop 2.6.28-15-generic #49-Ubuntu SMP Wed Sep 16
+00:33:34 UTC 2009 i686 GNU/Linux
+
+root@suporte-desktop:/home/suporte# dpkg -l | grep bluez
+ii  bluez                                4.51-0ubuntu1
+             Bluetooth tools and daemons
+ii  bluez-alsa                           4.51-0ubuntu1
+             Bluetooth audio support
+ii  bluez-gstreamer                      4.51-0ubuntu1
+             Bluetooth GStreamer support
+
+root@suporte-desktop:/home/suporte# sdptool -i hci0 search --bdaddr
+00:0E:6D:70:B9:A6 opush
+Searching for opush on 00:0E:6D:70:B9:A6 ...
+Service Name: OBEX Object Push
+Service RecHandle: 0x10003
+Service Class ID List:
+ "OBEX Object Push" (0x1105)
+Protocol Descriptor List:
+ "L2CAP" (0x0100)
+ "RFCOMM" (0x0003)
+   Channel: 9
+ "OBEX" (0x0008)
+Language Base Attr List:
+ code_ISO639: 0x656e
+ encoding:    0x6a
+ base_offset: 0x100
+Profile Descriptor List:
+ "OBEX Object Push" (0x1105)
+   Version: 0x0100
+
+Thanks,
+Addo
