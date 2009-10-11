@@ -1,555 +1,145 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Add sixaxis cable-pairing plugin
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1255094350.4201.30.camel@localhost.localdomain>
-References: <1255094350.4201.30.camel@localhost.localdomain>
-Content-Type: text/plain
-Date: Sun, 11 Oct 2009 11:40:54 +0200
-Message-Id: <1255254054.19127.63.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <20091010134517.GA2855@darkstar.tsinghua.edu.cn>
+References: <4AC59D8A.6000102@hartkopp.net>
+	 <a8e1da0910020401m2fb8493ax95ff55a3b66131a5@mail.gmail.com>
+	 <4AC6247E.7050308@hartkopp.net> <20091003070622.GA4110@darkstar>
+	 <4AC71CAA.9090704@hartkopp.net>
+	 <a8e1da0910032026m66200c08jf9201bbfe34b2f30@mail.gmail.com>
+	 <20091004180635.GA11272@vigoh> <20091009004452.GA2395@darkstar>
+	 <1255171112.19127.1.camel@localhost.localdomain>
+	 <20091010134517.GA2855@darkstar.tsinghua.edu.cn>
+Date: Sun, 11 Oct 2009 10:39:36 +0800
+Message-ID: <a8e1da0910101939u77e8ab30gac1e47f13384865c@mail.gmail.com>
+Subject: Re: [BUG net-2.6] bluetooth/rfcomm : sleeping function called from
+	invalid context at mm/slub.c:1719
+From: Dave Young <hidave.darkstar@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>, Oliver Hartkopp <oliver@hartkopp.net>,
+	Linux Netdev List <netdev@vger.kernel.org>, linux-bluetooth@vger.kernel.org,
+	"Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+On Sat, Oct 10, 2009 at 9:45 PM, Dave Young <hidave.darkstar@gmail.com> wro=
+te:
+> On Sat, Oct 10, 2009 at 12:38:32PM +0200, Marcel Holtmann wrote:
+>> Hi Dave,
+>>
+>> > > * Dave Young <hidave.darkstar@gmail.com> [2009-10-04 11:26:17 +0800]=
+:
+>> > >
+>> > > >
+>> > > > I can reproduce the bug.
+>> > > >
+>> > > > It's probably caused by the l2cap changes by =C2=A0Gustavo F. Pado=
+van
+>> > > > <gustavo@las.ic.unicamp.br>, I didn't see such problem after rever=
+ting
+>> > > > Gustavo's patch series.
+>> > >
+>> > > I can't reproduce the bug. I'm trying to reproduce it to figure out =
+what of
+>> > > my changes cause it.
+>> > >
+>> > > I' running
+>> > >
+>> > > $ dund -snu -i 00:11:67:CD:0F:CB # to pretend to be dialup/telephone
+>> > >
+>> > > and on the other side
+>> > >
+>> > > $ rfcomm bind 0 00:11:67:CD:0F:CB 1
+>> > > $ wvdial =C2=A0# wvdial to /dev/rfcomm0
+>> > >
+>> > > Both sides are on the same machine. Do you see any real difference
+>> > > between my try and the call that get the bug?
+>> > >
+>> >
+>> > Hi oliver
+>> >
+>> > Could try following patch?
+>> > ---
+>> >
+>> > When shutdown ppp connection, lockdep waring about non-static key
+>> > will happen, it is caused by the lock is not initialized properly
+>> > at that time.
+>> >
+>> > Fix with tuning the lock/skb_queue_head init order
+>> >
+>> > [ =C2=A0 94.339261] INFO: trying to register non-static key.
+>> > [ =C2=A0 94.342509] the code is fine but needs lockdep annotation.
+>> > [ =C2=A0 94.342509] turning off the locking correctness validator.
+>> > [ =C2=A0 94.342509] Pid: 0, comm: swapper Not tainted 2.6.31-mm1 #2
+>> > [ =C2=A0 94.342509] Call Trace:
+>> > [ =C2=A0 94.342509] =C2=A0[<c0248fbe>] register_lock_class+0x58/0x241
+>> > [ =C2=A0 94.342509] =C2=A0[<c024b5df>] ? __lock_acquire+0xb57/0xb73
+>> > [ =C2=A0 94.342509] =C2=A0[<c024ab34>] __lock_acquire+0xac/0xb73
+>> > [ =C2=A0 94.342509] =C2=A0[<c024b7fa>] ? lock_release_non_nested+0x17b=
+/0x1de
+>> > [ =C2=A0 94.342509] =C2=A0[<c024b662>] lock_acquire+0x67/0x84
+>> > [ =C2=A0 94.342509] =C2=A0[<c04cd1eb>] ? skb_dequeue+0x15/0x41
+>> > [ =C2=A0 94.342509] =C2=A0[<c054a857>] _spin_lock_irqsave+0x2f/0x3f
+>> > [ =C2=A0 94.342509] =C2=A0[<c04cd1eb>] ? skb_dequeue+0x15/0x41
+>> > [ =C2=A0 94.342509] =C2=A0[<c04cd1eb>] skb_dequeue+0x15/0x41
+>> > [ =C2=A0 94.342509] =C2=A0[<c054a648>] ? _read_unlock+0x1d/0x20
+>> > [ =C2=A0 94.342509] =C2=A0[<c04cd641>] skb_queue_purge+0x14/0x1b
+>> > [ =C2=A0 94.342509] =C2=A0[<fab94fdc>] l2cap_recv_frame+0xea1/0x115a [=
+l2cap]
+>> > [ =C2=A0 94.342509] =C2=A0[<c024b5df>] ? __lock_acquire+0xb57/0xb73
+>> > [ =C2=A0 94.342509] =C2=A0[<c0249c04>] ? mark_lock+0x1e/0x1c7
+>> > [ =C2=A0 94.342509] =C2=A0[<f8364963>] ? hci_rx_task+0xd2/0x1bc [bluet=
+ooth]
+>> > [ =C2=A0 94.342509] =C2=A0[<fab95346>] l2cap_recv_acldata+0xb1/0x1c6 [=
+l2cap]
+>> > [ =C2=A0 94.342509] =C2=A0[<f8364997>] hci_rx_task+0x106/0x1bc [blueto=
+oth]
+>> > [ =C2=A0 94.342509] =C2=A0[<fab95295>] ? l2cap_recv_acldata+0x0/0x1c6 =
+[l2cap]
+>> > [ =C2=A0 94.342509] =C2=A0[<c02302c4>] tasklet_action+0x69/0xc1
+>> > [ =C2=A0 94.342509] =C2=A0[<c022fbef>] __do_softirq+0x94/0x11e
+>> > [ =C2=A0 94.342509] =C2=A0[<c022fcaf>] do_softirq+0x36/0x5a
+>> > [ =C2=A0 94.342509] =C2=A0[<c022fe14>] irq_exit+0x35/0x68
+>> > [ =C2=A0 94.342509] =C2=A0[<c0204ced>] do_IRQ+0x72/0x89
+>> > [ =C2=A0 94.342509] =C2=A0[<c02038ee>] common_interrupt+0x2e/0x34
+>> > [ =C2=A0 94.342509] =C2=A0[<c024007b>] ? pm_qos_add_requirement+0x63/0=
+x9d
+>> > [ =C2=A0 94.342509] =C2=A0[<c038e8a5>] ? acpi_idle_enter_bm+0x209/0x23=
+8
+>> > [ =C2=A0 94.342509] =C2=A0[<c049d238>] cpuidle_idle_call+0x5c/0x94
+>> > [ =C2=A0 94.342509] =C2=A0[<c02023f8>] cpu_idle+0x4e/0x6f
+>> > [ =C2=A0 94.342509] =C2=A0[<c0534153>] rest_init+0x53/0x55
+>> > [ =C2=A0 94.342509] =C2=A0[<c0781894>] start_kernel+0x2f0/0x2f5
+>> > [ =C2=A0 94.342509] =C2=A0[<c0781091>] i386_start_kernel+0x91/0x96
+>> >
+>> > Reported-by: Oliver Hartkopp <oliver@hartkopp.net>
+>> > Signed-off-by: Dave Young <hidave.darkstar@gmail.com>
+>>
+>> actually Gustavo send a patch titled "Initialize variables and timers
+>> for both channel's sides" that should fix this, too. Can we test that
+>> patch before I include this one.
 
-> Implement the old "sixpair" using libudev and libusb-1.0.
-> 
-> When a Sixaxis device is plugged in, events are filtered, and
-> the device is selected, poked around to set the default Bluetooth
-> address, and added to the database of the current default adapter.
-> ---
->  Makefile.am     |    9 +-
->  acinclude.m4    |   16 +++
->  configure.ac    |    1 +
->  plugins/cable.c |  384
-> +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 408 insertions(+), 2 deletions(-)
->  create mode 100644 plugins/cable.c
-> 
-> diff --git a/Makefile.am b/Makefile.am
-> index c8337d6..e5eccdf 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -162,6 +162,11 @@ builtin_modules += service
->  builtin_sources += plugins/service.c
->  endif
->  
-> +if CABLE
-> +builtin_modules += cable
-> +builtin_sources += plugins/cable.c
-> +endif
-> +
+Marcel, I tested Gustavo's latest patch series including
+the "Initialize variables and timers for both channel". Lockdep
+warning still happen.
 
-since it is not really a generic cable pairing. I prefer that we just
-call this SIXPAIR and sixpair.c
+>>
+>
+> Hi, marcel, of course.
+>
+>> Regards
+>>
+>> Marcel
+>>
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetoot=
+h" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at =C2=A0http://vger.kernel.org/majordomo-info.html
+>
 
->  builtin_modules += hciops
->  builtin_sources += plugins/hciops.c
->  
-> @@ -192,7 +197,7 @@ src_bluetoothd_SOURCES = $(gdbus_sources)
-> $(builtin_sources) \
->                         src/dbus-common.c src/dbus-common.h \
->                         src/dbus-hci.h src/dbus-hci.c
->  src_bluetoothd_LDADD = lib/libbluetooth.la @GLIB_LIBS@ @DBUS_LIBS@ \
-> -                                                       @CAPNG_LIBS@
-> -ldl
-> +                                                       @CAPNG_LIBS@
-> @CABLE_LIBS@ -ldl
->  src_bluetoothd_LDFLAGS = -Wl,--export-dynamic \
->                                         -Wl,--version-script=src/bluetooth.ver
->  src_bluetoothd_DEPENDENCIES = src/bluetooth.ver lib/libbluetooth.la
-> @@ -305,7 +310,7 @@ EXTRA_DIST += doc/manager-api.txt \
->  
->  AM_YFLAGS = -d
->  
-> -AM_CFLAGS = @DBUS_CFLAGS@ @GLIB_CFLAGS@ @CAPNG_CFLAGS@ \
-> +AM_CFLAGS = @DBUS_CFLAGS@ @GLIB_CFLAGS@ @CAPNG_CFLAGS@ @CABLE_CFLAGS@
-> \
->                 -DBLUETOOTH_PLUGIN_BUILTIN -DPLUGINDIR=
-> \""$(plugindir)"\"
 
-This needs changing. I wanna have a separate udev and libusb1 check.
-However I can do that for you in case there are problems.
- 
->  INCLUDES = -I$(builddir)/lib -I$(builddir)/src -I$(srcdir)/src \
-> diff --git a/acinclude.m4 b/acinclude.m4
-> index e7d1c32..10e5241 100644
-> --- a/acinclude.m4
-> +++ b/acinclude.m4
-> @@ -142,6 +142,12 @@ AC_DEFUN([AC_PATH_USB], [
->                         [Define to 1 if you need the
-> usb_interrupt_read() function.]))
->  ])
->  
-> +AC_DEFUN([AC_PATH_CABLE], [
-> +       PKG_CHECK_MODULES(CABLE, libudev libusb-1.0, cable_found=yes,
-> cable_found=no)
-> +       AC_SUBST(CABLE_CFLAGS)
-> +       AC_SUBST(CABLE_LIBS)
-> +])
-> +
->  AC_DEFUN([AC_PATH_NETLINK], [
->         PKG_CHECK_MODULES(NETLINK, libnl-1, netlink_found=yes,
-> netlink_found=no)
->         AC_SUBST(NETLINK_CFLAGS)
-> @@ -170,6 +176,7 @@ AC_DEFUN([AC_ARG_BLUEZ], [
->         netlink_enable=no
->         hal_enable=${hal_found}
->         usb_enable=${usb_found}
-> +       cable_enable=${cable_found}
->         alsa_enable=${alsa_found}
->         gstreamer_enable=${gstreamer_found}
->         audio_enable=yes
-> @@ -239,6 +246,10 @@ AC_DEFUN([AC_ARG_BLUEZ], [
->                 usb_enable=${enableval}
->         ])
->  
-> +       AC_ARG_ENABLE(cable, AC_HELP_STRING([--enable-cable], [enable
-> DeviceKit support]), [
-> +               cable_enable=${enableval}
-> +       ])
-> +
->         AC_ARG_ENABLE(netlink, AC_HELP_STRING([--enable-netlink],
-> [enable NETLINK support]), [
->                 netlink_enable=${enableval}
->         ])
-> @@ -326,6 +337,10 @@ AC_DEFUN([AC_ARG_BLUEZ], [
->                 AC_DEFINE(HAVE_CAPNG, 1, [Define to 1 if you have
-> capabilities library.])
->         fi
->  
-> +       if (test "${cable_enable}" = "yes" && test "${cable_found}" =
-> "yes"); then
-> +               AC_DEFINE(HAVE_CABLE, 1, [Define to 1 if you have
-> libcable.])
-> +       fi
-> +
->         AM_CONDITIONAL(SNDFILE, test "${sndfile_enable}" = "yes" &&
-> test "${sndfile_found}" = "yes")
->         AM_CONDITIONAL(NETLINK, test "${netlink_enable}" = "yes" &&
-> test "${netlink_found}" = "yes")
->         AM_CONDITIONAL(USB, test "${usb_enable}" = "yes" && test
-> "${usb_found}" = "yes")
-> @@ -350,4 +365,5 @@ AC_DEFUN([AC_ARG_BLUEZ], [
->         AM_CONDITIONAL(DFUTOOL, test "${dfutool_enable}" = "yes" &&
-> test "${usb_found}" = "yes")
->         AM_CONDITIONAL(UDEVRULES, test "${udevrules_enable}" = "yes")
->         AM_CONDITIONAL(CONFIGFILES, test "${configfiles_enable}" =
-> "yes")
-> +       AM_CONDITIONAL(CABLE, test "${cable_enable}" = "yes" && test
-> "${cable_found}" = "yes")
->  ])
-> diff --git a/configure.ac b/configure.ac
-> index b93cca0..5df134f 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -40,6 +40,7 @@ AC_PATH_GLIB
->  AC_PATH_ALSA
->  AC_PATH_GSTREAMER
->  AC_PATH_USB
-> +AC_PATH_CABLE
->  AC_PATH_NETLINK
->  AC_PATH_SNDFILE
->  AC_PATH_CAPNG
-> diff --git a/plugins/cable.c b/plugins/cable.c
-> new file mode 100644
-> index 0000000..0b7cc7a
-> --- /dev/null
-> +++ b/plugins/cable.c
-> @@ -0,0 +1,384 @@
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2009  Bastien Nocera <hadess@hadess.net>
-> + *
-> + *
-> + *  This program is free software; you can redistribute it and/or
-> modify
-> + *  it under the terms of the GNU General Public License as published
-> by
-> + *  the Free Software Foundation; either version 2 of the License, or
-> + *  (at your option) any later version.
-> + *
-> + *  This program is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + *  GNU General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU General Public License
-> + *  along with this program; if not, write to the Free Software
-> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
-> 02110-1301  USA
-> + *
-> + */
-> +
-> +#ifdef HAVE_CONFIG_H
-> +#include <config.h>
-> +#endif
-> +
-> +#include <glib.h>
-> +#define LIBUDEV_I_KNOW_THE_API_IS_SUBJECT_TO_CHANGE 1
-> +#include <libudev.h>
-> +#include <dbus/dbus.h>
-> +#include <bluetooth/bluetooth.h>
-> +#include <bluetooth/sdp.h>
-> +#include <libusb.h>
-> +
-> +#include "plugin.h"
-> +#include "logging.h"
-> +
-> +#include "manager.h"
-> +#include "adapter.h"
-> +#include "device.h"
-> +
-> +#include "storage.h"
-> +#include "sdp_lib.h"
-> +
-> +/* Vendor and product ID for the Sixaxis PS3 controller */
-> +#define VENDOR 0x054c
-> +#define PRODUCT 0x0268
-> +#define SIXAXIS_PNP_RECORD
-> "3601920900000A000100000900013503191124090004350D35061901000900113503190011090006350909656E09006A0901000900093508350619112409010009000D350F350D350619010009001335031900110901002513576972656C65737320436F6E74726F6C6C65720901012513576972656C65737320436F6E74726F6C6C6572090102251B536F6E7920436F6D707574657220456E7465727461696E6D656E740902000901000902010901000902020800090203082109020428010902052801090206359A35980822259405010904A101A102850175089501150026FF00810375019513150025013500450105091901291381027501950D0600FF8103150026FF0005010901A10075089504350046FF0009300931093209358102C0050175089527090181027508953009019102750895300901B102C0A1028502750895300901B102C0A10285EE750895300901B102C0A10285EF750895300901B102C0C0090207350835060904090901000902082800090209280109020A280109020B09010009020C093E8009020D280009020E2800"
-> +#define HID_UUID "00001124-0000-1000-8000-00805f9b34fb"
-> +
-> +static struct btd_device *create_cable_association(DBusConnection
-> *conn,
-> +                                                   struct btd_adapter
-> *adapter,
-> +                                                   const char *name,
-> +                                                   const char
-> *address,
-> +                                                   guint32 vendor_id,
-> +                                                   guint32
-> product_id,
-> +                                                   const char
-> *pnp_record)
-> +{
-> +       sdp_record_t *rec;
-> +       struct btd_device *device;
-> +       bdaddr_t src, dst;
-> +       char srcaddr[18];
-> +
-> +       device = adapter_find_device(adapter, address);
-> +       if (device == NULL)
-> +               device = adapter_create_device(conn, adapter,
-> address);
-> +       if (device != NULL) {
-> +               device_set_temporary(device, FALSE);
-> +               device_set_name(device, name);
-> +       }
-> +
-> +       str2ba(address, &dst);
-> +       adapter_get_address(adapter, &src);
-> +       ba2str(&src, srcaddr);
-> +
-> +       write_device_name(&dst, &src, (char *) name);
-> +
-> +       /* Store the device's SDP record */
-> +       rec = record_from_string(pnp_record);
-> +       store_record(srcaddr, address, rec);
-> +       sdp_record_free(rec);
-> +       /* Set the device id */
-> +       store_device_id(srcaddr, address, 0xffff, vendor_id,
-> product_id, 0);
-> +       /* Don't write a profile, it will be updated when the device
-> connects */
-> +
-> +       write_trust(srcaddr, address, "[all]", TRUE);
-> +
-> +       return device;
-> +}
-> +
-> +static char *get_bdaddr(libusb_device_handle *devh, int itfnum)
-> +{
-> +       unsigned char msg[17];
-> +       char *address;
-> +       int res;
-> +
-> +       res = libusb_control_transfer(devh,
-> +                                     LIBUSB_ENDPOINT_IN |
-> LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE,
-> +                                     0x01, 0x03f2, itfnum,
-> +                                     (void*) msg, sizeof(msg),
-> +                                     5000);
-> +
-> +       if (res < 0) {
-> +               debug("Getting the device Bluetooth address failed");
-> +               return NULL;
-> +       }
-> +
-> +       address = g_strdup_printf("%02X:%02X:%02X:%02X:%02X:%02X",
-> +                                 msg[4], msg[5], msg[6], msg[7],
-> msg[8], msg[9]);
-> +
-> +       debug("Device Bluetooth address: %s\n", address);
-> +
-> +       return address;
-> +}
-> +
-> +static gboolean set_master_bdaddr(libusb_device_handle *devh, int
-> itfnum, char *host)
-> +{
-> +       unsigned char msg[8];
-> +       int mac[6];
-> +       int res;
-> +
-> +       if (sscanf(host, "%X:%X:%X:%X:%X:%X",
-> +                  &mac[0],&mac[1],&mac[2],&mac[3],&mac[4],&mac[5]) !=
-> 6) {
-> +               return FALSE;
-> +       }
-> +
-> +       msg[0] = 0x01;
-> +       msg[1] = 0x00;
-> +       msg[2] = mac[0];
-> +       msg[3] = mac[1];
-> +       msg[4] = mac[2];
-> +       msg[5] = mac[3];
-> +       msg[6] = mac[4];
-> +       msg[7] = mac[5];
-> +
-> +       res = libusb_control_transfer(devh,
-> +                                     LIBUSB_ENDPOINT_OUT |
-> LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE,
-> +                                     0x09, 0x03f5, itfnum,
-> +                                     (void*) msg, sizeof(msg),
-> +                                     5000);
-> +
-> +       if (res < 0) {
-> +               debug("Setting the master Bluetooth address failed");
-> +               return FALSE;
-> +       }
-> +
-> +       return TRUE;
-> +}
 
-These are all blocking functions. That worries me a little bit in case
-we have weird timeouts. I know that libusb1 supports async operation. Is
-it possible to use that?
-
-> +static void handle_usb_device(struct btd_adapter *adapter,
-> +                             libusb_device *dev,
-> +                             struct libusb_config_descriptor *cfg,
-> +                             int itfnum,
-> +                             const struct libusb_interface_descriptor
-> *alt)
-> +{
-> +       DBusConnection *conn;
-> +       libusb_device_handle *devh;
-> +       char *device_bdaddr;
-> +       char adapter_bdaddr[18];
-> +       struct btd_device *device;
-> +       bdaddr_t dst;
-> +
-> +       conn = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
-> +       if (conn == NULL) {
-> +               debug("Failed to get on the bus");
-> +               return;
-> +       }
-> +
-> +       if (libusb_open(dev, &devh) < 0) {
-> +               debug("Can't open device");
-> +               goto bail;
-> +       }
-> +       libusb_detach_kernel_driver(devh, itfnum);
-> +
-> +       if (libusb_claim_interface(devh, itfnum) < 0) {
-> +               debug("Can't claim interface %d", itfnum);
-> +               goto bail;
-> +       }
-> +
-> +       device_bdaddr = get_bdaddr(devh, itfnum);
-> +       if (device_bdaddr == NULL) {
-> +               debug("Failed to get the Bluetooth address from the
-> device");
-> +               goto bail;
-> +       }
-> +
-> +       device = create_cable_association(conn,
-> +                                         adapter,
-> +                                         "PLAYSTATION(R)3
-> Controller",
-> +                                         device_bdaddr,
-> +                                         VENDOR, PRODUCT,
-> SIXAXIS_PNP_RECORD);
-> +       btd_device_add_uuid(device, HID_UUID);
-> +
-> +       adapter_get_address(adapter, &dst);
-> +       ba2str(&dst, adapter_bdaddr);
-> +       debug("Adapter bdaddr %s", adapter_bdaddr);
-> +
-> +       if (set_master_bdaddr(devh, itfnum, adapter_bdaddr) == FALSE)
-> {
-> +               debug("Failed to set the master Bluetooth address");
-> +               goto bail;
-> +       }
-> +
-> +bail:
-> +       dbus_connection_unref(conn);
-> +       g_free(device_bdaddr);
-> +       libusb_release_interface(devh, itfnum);
-> +       /* We ignore errors from the reattach, as there's nothing we
-> +        * can do about it */
-> +       libusb_attach_kernel_driver(devh, itfnum);
-> +       if (devh != NULL)
-> +               libusb_close(devh);
-> +}
-
-It has been a long time I looked through this stuff. So does the
-controller user USB control messages or are they just plain HID message.
-If HID, then I would prefer if we use hidraw and don't have to detach
-the kernel driver.
-
-> +
-> +static void handle_device_plug(struct udev_device *udevice)
-> +{
-> +       struct btd_adapter *adapter;
-> +       int adapter_id;
-> +       guint i;
-> +
-> +       libusb_device **list, *usbdev;
-> +       ssize_t num_devices;
-> +       struct libusb_device_descriptor desc;
-> +       guint8 j;
-> +
-> +       if (g_strcmp0(udev_device_get_property_value(udevice,
-> "ID_SERIAL"),
-> +                     "Sony_PLAYSTATION_R_3_Controller") != 0)
-> +               return;
-> +       /* Don't look at events with an associated driver */
-> +       if (udev_device_get_property_value(udevice, "ID_USB_DRIVER") !
-> = NULL)
-> +               return;
-> +
-> +       debug("Found Sixaxis device");
-> +
-> +       /* Look for the default adapter */
-> +       adapter_id = manager_get_default_adapter();
-> +       if (adapter_id == -1) {
-> +               debug("No adapters, exiting");
-> +               return;
-> +       }
-> +       adapter = manager_find_adapter_by_id(adapter_id);
-> +       if (adapter == NULL)
-> +               return;
-> +
-> +       /* Look for the USB device */
-> +       libusb_init(NULL);
-> +
-> +       num_devices = libusb_get_device_list(NULL, &list);
-> +       if (num_devices < 0) {
-> +               debug("libusb_get_device_list failed");
-> +               return;
-> +       }
-> +
-> +       usbdev = NULL;
-> +       for (i = 0; i < num_devices; i++) {
-> +               char *path;
-> +
-> +               path = g_strdup_printf("%s/%03d/%03d", "/dev/bus/usb",
-> +                                      libusb_get_bus_number(list[i]),
-> +
-> libusb_get_device_address(list[i]));
-> +               if (g_strcmp0(path, udev_device_get_devnode(udevice))
-> == 0) {
-> +                       g_free(path);
-> +                       usbdev = libusb_ref_device(list[i]);
-> +                       break;
-> +               }
-> +               g_free(path);
-> +       }
-> +
-> +       libusb_free_device_list(list, TRUE);
-> +       if (usbdev == NULL) {
-> +               debug("Found a Sixaxis, but couldn't find it via
-> libusb");
-> +               goto out;
-> +       }
-> +
-> +       if (libusb_get_device_descriptor(usbdev, &desc) < 0) {
-> +               debug("libusb_get_device_descriptor() failed");
-> +               goto out;
-> +       }
-> +
-> +       /* Look for the interface number that interests us */
-> +       for (j = 0; j < desc.bNumConfigurations; j++) {
-> +               struct libusb_config_descriptor *config;
-> +               guint8 k;
-> +
-> +               if (libusb_get_config_descriptor(usbdev, j, &config) <
-> 0) {
-> +                       debug("Failed to get config descriptor %d",
-> j);
-> +                       continue;
-> +               }
-> +
-> +               for (k = 0; k < config->bNumInterfaces; k++) {
-> +                       const struct libusb_interface *itf =
-> &config->interface[k];
-> +                       int l;
-> +
-> +                       for (l = 0; l < itf->num_altsetting ; l++) {
-> +                               struct libusb_interface_descriptor
-> alt;
-> +
-> +                               alt = itf->altsetting[l];
-> +                               if (alt.bInterfaceClass == 3) {
-> +                                       handle_usb_device(adapter,
-> usbdev, config, l, &alt);
-> +                               }
-> +                       }
-> +               }
-> +       }
-> +
-> +out:
-> +       if (usbdev != NULL)
-> +               libusb_unref_device(usbdev);
-> +       libusb_exit(NULL);
-> +}
-
-What we are missing from libusb1 is a function to create the device
-handle directly from a udev syspath. The enumeration is actually pretty
-bad since it wakes up all USB devices on the all busses.
-
-> +
-> +static gboolean device_event_idle(struct udev_device *udevice)
-> +{
-> +       handle_device_plug(udevice);
-> +       udev_device_unref(udevice);
-> +       return FALSE;
-> +}
-> +
-> +static struct udev *ctx = NULL;
-> +static struct udev_monitor *monitor = NULL;
-> +static guint watch_id = 0;
-> +
-> +static gboolean
-> +monitor_event(GIOChannel *source,
-> +             GIOCondition condition,
-> +             gpointer data)
-> +{
-> +       struct udev_device *udevice;
-> +
-> +       udevice = udev_monitor_receive_device(monitor);
-> +       if (udevice == NULL)
-> +               goto out;
-> +       if (g_strcmp0(udev_device_get_action(udevice), "add") != 0)
-> +               goto out;
-> +
-> +       g_timeout_add_seconds(1, (GSourceFunc) device_event_idle,
-> udevice);
-> +
-> +out:
-> +       return TRUE;
-> +}
-
-Why is the timeout thing needed? Or do you actually want idle callback?
-
+--=20
 Regards
-
-Marcel
-
-
+dave
