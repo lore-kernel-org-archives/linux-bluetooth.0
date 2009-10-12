@@ -1,70 +1,155 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <113d36d80910090350k54db5688p6144ec4316b7c9ec@mail.gmail.com>
-References: <113d36d80909262020y3dc487v880012747475a8e7@mail.gmail.com>
-	 <1254200583.2659.82.camel@localhost.localdomain>
-	 <113d36d80909290816g4065595ax1488ed014a11c7de@mail.gmail.com>
-	 <113d36d80910090350k54db5688p6144ec4316b7c9ec@mail.gmail.com>
-Date: Tue, 13 Oct 2009 10:13:18 +0800
-Message-ID: <113d36d80910121913q38fc9edao658b284fc409ded6@mail.gmail.com>
-Subject: Re: null pointer error in bluez kernel
-From: Lan Zhu <zhu.lan.cn@gmail.com>
+From: Bing Zhao <bzhao@marvell.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Cc: Amitkumar Karwar <akarwar@marvell.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 12 Oct 2009 12:58:16 -0700
+Subject: RE: [PATCH v2] Bluetooth: Enable auto sleep mode for btmrvl driver
+Message-ID: <477F20668A386D41ADCC57781B1F704306DDE0965B@SC-VEXCH1.marvell.com>
+References: <1254334710-1811-1-git-send-email-bzhao@marvell.com>
+In-Reply-To: <1254334710-1811-1-git-send-email-bzhao@marvell.com>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
+
 
 Hi Marcel,
 
->
-> Reproduce steps:
-> 1. Pair and connect with Motorola S305 headset.
-> 2. Disconnect and unpair with the headset.
-> 3. Turn off and then turn on the headset. The headset will auto pair with=
- phone.
-> 4. Input PIN code "0000" on the phone to complete the incoming pairing.
->
-> Repeat step 2-4 for many times, then kernel panic may happen right
-> after step 4.
->
-> From the kernel log, I found if the bt_accept_unlink() is called
-> before l2cap_conn_start(), then panic will happen because in the
-> bt_accept_unlink() function it set parent to NULL.
->
-> Below is the call order =A0when the result is successful. We can see the
-> parent is not NULL.
->
-> [ =A0190.162475] bt_accept_enqueue: parent ccda5298, sk cdb68920
-> [ =A0190.170104] bt_accept_enqueue: parent ccda5d10, sk cdf5cd90
-> [ =A0190.191223] l2cap_conn_start: conn cd14a320
-> [ =A0190.218719] l2cap_conn_start: conn cd14a320
-> [ =A0190.223480] l2cap_conn_start: @@@ in l2cap_conn_start --- sk =3D
-> cdb68920, parent =3D ccda5298
-> [ =A0190.235565] bt_accept_unlink: sk cdb68920 state 6
->
-> Below is the call order when the result is kernel panic.
-> bt_accept_unlink is called first, then we can see the parent is NULL.
->
-> [ =A0238.188812] bt_accept_enqueue: parent ccda5298, sk ccf60040
-> [ =A0238.196350] bt_accept_enqueue: parent ccda5d10, sk cdf5c960
-> [ =A0238.217590] l2cap_conn_start: conn cd14a848
-> [ =A0238.223449] bt_accept_unlink: sk ccf60040 state 6
-> [ =A0238.229400] l2cap_sock_accept: new socket ccf60040
-> [ =A0238.245086] l2cap_conn_start: conn cd14a848
-> [ =A0238.249725] l2cap_conn_start: @@@ in l2cap_conn_start --- sk =3D
-> ccf60040, parent =3D (null)
-> [ =A0238.258636] Unable to handle kernel NULL pointer dereference at
-> virtual address 00000120
-> [ =A0238.267456] pgd =3D cdb34000
-> [ =A0238.270446] [00000120] *pgd=3D8db32031, *pte=3D00000000, *ppte=3D000=
-00000
-> [ =A0238.277740] Internal error: Oops: 17 [#1] PREEMPT
->
->
-> I think this might be a call competing issue, how do we fix it?
->
+> -----Original Message-----
+> From: Bing Zhao [mailto:bzhao@marvell.com]
+> Sent: Wednesday, September 30, 2009 11:19 AM
+> To: linux-bluetooth@vger.kernel.org
+> Cc: Bing Zhao; Amitkumar Karwar
+> Subject: [PATCH v2] Bluetooth: Enable auto sleep mode for btmrvl driver
+>=20
+> From: Amitkumar Karwar <akarwar@marvell.com>
+>=20
+> The auto sleep mode for btmrvl driver is not enabled by default.
+> This patch enables auto sleep mode when card is probed.
+>=20
+> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+> Signed-off-by: Bing Zhao <bzhao@marvell.com>
 
-any idea for this issue?
+Does this patch look okay to you? Please let me know if any change is neede=
+d.
 
 Thanks,
-Zhu Lan
+
+Bing
+
+
+> ---
+>  drivers/bluetooth/btmrvl_drv.h  |    1 +
+>  drivers/bluetooth/btmrvl_main.c |   55 +++++++++++++++++++++++----------=
+-----
+>  drivers/bluetooth/btmrvl_sdio.c |    2 +
+>  3 files changed, 36 insertions(+), 22 deletions(-)
+>=20
+> diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_dr=
+v.h
+> index 411c7a7..523d197 100644
+> --- a/drivers/bluetooth/btmrvl_drv.h
+> +++ b/drivers/bluetooth/btmrvl_drv.h
+> @@ -131,6 +131,7 @@ void btmrvl_check_evtpkt(struct btmrvl_private *priv,=
+ struct sk_buff *skb);
+>  int btmrvl_process_event(struct btmrvl_private *priv, struct sk_buff *sk=
+b);
+>=20
+>  int btmrvl_send_module_cfg_cmd(struct btmrvl_private *priv, int subcmd);
+> +int btmrvl_enable_ps(struct btmrvl_private *priv);
+>  int btmrvl_prepare_command(struct btmrvl_private *priv);
+>=20
+>  #ifdef CONFIG_DEBUG_FS
+> diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_m=
+ain.c
+> index e605563..f97771c 100644
+> --- a/drivers/bluetooth/btmrvl_main.c
+> +++ b/drivers/bluetooth/btmrvl_main.c
+> @@ -189,6 +189,38 @@ int btmrvl_send_module_cfg_cmd(struct btmrvl_private=
+ *priv, int subcmd)
+>  }
+>  EXPORT_SYMBOL_GPL(btmrvl_send_module_cfg_cmd);
+>=20
+> +int btmrvl_enable_ps(struct btmrvl_private *priv)
+> +{
+> +	struct sk_buff *skb;
+> +	struct btmrvl_cmd *cmd;
+> +
+> +	skb =3D bt_skb_alloc(sizeof(*cmd), GFP_ATOMIC);
+> +	if (skb =3D=3D NULL) {
+> +		BT_ERR("No free skb");
+> +		return -ENOMEM;
+> +	}
+> +
+> +	cmd =3D (struct btmrvl_cmd *) skb_put(skb, sizeof(*cmd));
+> +	cmd->ocf_ogf =3D cpu_to_le16(hci_opcode_pack(OGF,
+> +					BT_CMD_AUTO_SLEEP_MODE));
+> +	cmd->length =3D 1;
+> +
+> +	if (priv->btmrvl_dev.psmode)
+> +		cmd->data[0] =3D BT_PS_ENABLE;
+> +	else
+> +		cmd->data[0] =3D BT_PS_DISABLE;
+> +
+> +	bt_cb(skb)->pkt_type =3D MRVL_VENDOR_PKT;
+> +
+> +	skb->dev =3D (void *) priv->btmrvl_dev.hcidev;
+> +	skb_queue_head(&priv->adapter->tx_queue, skb);
+> +
+> +	BT_DBG("Queue PSMODE Command:%d", cmd->data[0]);
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(btmrvl_enable_ps);
+> +
+>  static int btmrvl_enable_hs(struct btmrvl_private *priv)
+>  {
+>  	struct sk_buff *skb;
+> @@ -258,28 +290,7 @@ int btmrvl_prepare_command(struct btmrvl_private *pr=
+iv)
+>=20
+>  	if (priv->btmrvl_dev.pscmd) {
+>  		priv->btmrvl_dev.pscmd =3D 0;
+> -
+> -		skb =3D bt_skb_alloc(sizeof(*cmd), GFP_ATOMIC);
+> -		if (skb =3D=3D NULL) {
+> -			BT_ERR("No free skb");
+> -			return -ENOMEM;
+> -		}
+> -
+> -		cmd =3D (struct btmrvl_cmd *) skb_put(skb, sizeof(*cmd));
+> -		cmd->ocf_ogf =3D cpu_to_le16(hci_opcode_pack(OGF, BT_CMD_AUTO_SLEEP_MO=
+DE));
+> -		cmd->length =3D 1;
+> -
+> -		if (priv->btmrvl_dev.psmode)
+> -			cmd->data[0] =3D BT_PS_ENABLE;
+> -		else
+> -			cmd->data[0] =3D BT_PS_DISABLE;
+> -
+> -		bt_cb(skb)->pkt_type =3D MRVL_VENDOR_PKT;
+> -
+> -		skb->dev =3D (void *) priv->btmrvl_dev.hcidev;
+> -		skb_queue_head(&priv->adapter->tx_queue, skb);
+> -
+> -		BT_DBG("Queue PSMODE Command:%d", cmd->data[0]);
+> +		btmrvl_enable_ps(priv);
+>  	}
+>=20
+>  	if (priv->btmrvl_dev.hscmd) {
+> diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_s=
+dio.c
+> index 5b33b85..d6aaf51 100644
+> --- a/drivers/bluetooth/btmrvl_sdio.c
+> +++ b/drivers/bluetooth/btmrvl_sdio.c
+> @@ -930,6 +930,8 @@ static int btmrvl_sdio_probe(struct sdio_func *func,
+>  	priv->hw_wakeup_firmware =3D btmrvl_sdio_wakeup_fw;
+>=20
+>  	btmrvl_send_module_cfg_cmd(priv, MODULE_BRINGUP_REQ);
+> +	priv->btmrvl_dev.psmode =3D 1;
+> +	btmrvl_enable_ps(priv);
+>=20
+>  	return 0;
+>=20
+> --
+> 1.5.4.3
