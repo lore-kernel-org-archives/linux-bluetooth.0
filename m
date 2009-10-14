@@ -1,112 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <2d5a2c100910120306g54a8c79bt42164babb123f4b2@mail.gmail.com>
-References: <1e9e22610910111120p25a850bflcc31794f7e29192e@mail.gmail.com>
-	 <2d5a2c100910120306g54a8c79bt42164babb123f4b2@mail.gmail.com>
-Date: Wed, 14 Oct 2009 08:51:25 -0300
-Message-ID: <1e9e22610910140451t7b98d14eq807fddb53a83d43c@mail.gmail.com>
-Subject: Re: Failed to connect to SDP server / Connection reset by peer
-From: Addo Del Grossi <addo.delgrossi@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20091013120018.GA29395@elf.ucw.cz>
+References: <20091013120018.GA29395@elf.ucw.cz>
+Date: Wed, 14 Oct 2009 14:55:06 +0800
+Message-ID: <a8e1da0910132355g5e2b786p529b4b522c19e75a@mail.gmail.com>
+Subject: Re: 2.6.32-rc3+: bluetooth needs lockdep anotation?
+From: Dave Young <hidave.darkstar@gmail.com>
+To: Pavel Machek <pavel@ucw.cz>
+Cc: kernel list <linux-kernel@vger.kernel.org>, marcel@holtmann.org,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
-
-
-Below the hcidump resulsts.
-
-HCI sniffer - Bluetooth packet analyzer ver 1.42
-device: hci0 snap_len: 1028 filter: 0xffffffffffffffff
-2009-10-14 08:46:21.982680 < HCI Command: Create Connection
-(0x01|0x0005) plen 13
-    bdaddr 00:0E:6D:70:B9:A6 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-2009-10-14 08:46:22.014774 > HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-2009-10-14 08:46:24.795777 > HCI Event: Connect Complete (0x03) plen 11
-    status 0x00 handle 42 bdaddr 00:0E:6D:70:B9:A6 type ACL encrypt 0x00
-2009-10-14 08:46:24.795829 < HCI Command: Read Remote Supported
-Features (0x01|0x001b) plen 2
-    handle 42
-2009-10-14 08:46:24.800673 > HCI Event: Command Status (0x0f) plen 4
-    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 0
-2009-10-14 08:46:24.812688 > HCI Event: Max Slots Change (0x1b) plen 3
-    handle 42 slots 5
-2009-10-14 08:46:24.814685 > HCI Event: Command Status (0x0f) plen 4
-    Unknown (0x00|0x0000) status 0x00 ncmd 1
-2009-10-14 08:46:24.814699 < HCI Command: Remote Name Request
-(0x01|0x0019) plen 10
-    bdaddr 00:0E:6D:70:B9:A6 mode 2 clkoffset 0x0000
-2009-10-14 08:46:24.819703 > HCI Event: Command Status (0x0f) plen 4
-    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
-2009-10-14 08:46:24.823702 > HCI Event: Read Remote Supported Features
-(0x0b) plen 11
-    status 0x00 handle 42
-    Features: 0xbf 0x28 0x21 0x00 0x00 0x00 0x00 0x00
-2009-10-14 08:46:24.823739 < ACL data: handle 42 flags 0x02 dlen 10
-    L2CAP(s): Info req: type 2
-2009-10-14 08:46:24.829775 > HCI Event: Number of Completed Packets
-(0x13) plen 5
-    handle 42 packets 1
-2009-10-14 08:46:24.845778 > ACL data: handle 42 flags 0x02 dlen 12
-    L2CAP(s): Info rsp: type 1 result 1
-      Not supported
-2009-10-14 08:46:24.865698 > HCI Event: Remote Name Req Complete (0x07) plen 255
-    status 0x00 bdaddr 00:0E:6D:70:B9:A6 name 'Nokia 6610'
-2009-10-14 08:46:24.868054 < HCI Command: Read Remote Version
-Information (0x01|0x001d) plen 2
-    handle 42
-2009-10-14 08:46:24.869689 > HCI Event: QoS Setup Complete (0x0d) plen 21
-    status 0x00 handle 42 flags 0
-    Service type: 1
-    Token rate: 0
-    Peak bandwith: 0
-    Latency: 5000
-    Delay variation: -1
-2009-10-14 08:46:24.873773 > HCI Event: Command Status (0x0f) plen 4
-    Read Remote Version Information (0x01|0x001d) status 0x00 ncmd 1
-2009-10-14 08:46:24.883704 > HCI Event: Read Remote Ver Info Complete
-(0x0c) plen 8
-    status 0x00 handle 42
-    LMP Version: 1.1 (0x1) LMP Subversion: 0x248
-    Manufacturer: Nokia Mobile Phones (1)
-2009-10-14 08:46:28.896709 > HCI Event: Disconn Complete (0x05) plen 4
-    status 0x00 handle 42 reason 0x13
-    Reason: Remote User Terminated Connection
-
-
-
-Thank you very much!,
-Addo
-
-
-
-
-On Mon, Oct 12, 2009 at 7:06 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi,
+On Tue, Oct 13, 2009 at 8:00 PM, Pavel Machek <pavel@ucw.cz> wrote:
+> Hi!
 >
-> On Sun, Oct 11, 2009 at 8:20 PM, Addo Del Grossi
-> <addo.delgrossi@gmail.com> wrote:
->> Hi,
->>
->> I upgraded to Ubuntu Karmic and found problems when using the command sdptool.
->> I was found that the problem only when use the kernel 2.6.31,
->> using the old 2.6.28 Kernel sdptool the command works correctly.
->>
->> Note: We also did the test by downloading the Vanilla kernel
->> kernel.org site and the same error was found.
->>
+> I just got this in my dmesg:
 >
-> It is difficult to guess without hcidump output, could you please try
-> this: > sudo hcidump -XVt
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0Pavel
 >
-> There is a high chance that this is not really related to sdptool
-> itself, as you are using the same BlueZ version in both cases, but
-> some pairing/bonding/security issue.
 >
-> --
-> Luiz Augusto von Dentz
+> drivers/usb/core/inode.c: creating file '005'
+> hub 5-0:1.0: state 7 ports 2 chg 0000 evt 0002
+> hub 1-0:1.0: hub_suspend
+> usb usb1: bus auto-suspend
+> ehci_hcd 0000:00:1d.7: suspend root hub
+> uhci_hcd 0000:00:1d.3: reserve dev 5 ep81-INT, period 1, phase 0, 23 us
+> INFO: trying to register non-static key.
+> the code is fine but needs lockdep annotation.
+> turning off the locking correctness validator.
+> Pid: 1696, comm: udevd Not tainted 2.6.32-rc3-00192-gd33e6ec-dirty #78
+> Call Trace:
+> =C2=A0[<c079e978>] ? printk+0x18/0x1a
+> =C2=A0[<c0256432>] __lock_acquire+0x492/0xac0
+> =C2=A0[<c0256ac8>] lock_acquire+0x68/0x90
+> =C2=A0[<c067e3cd>] ? skb_dequeue+0x1d/0x70
+> =C2=A0[<c07a1a5b>] _spin_lock_irqsave+0x3b/0x50
+> =C2=A0[<c067e3cd>] ? skb_dequeue+0x1d/0x70
+> =C2=A0[<c067e3cd>] skb_dequeue+0x1d/0x70
+> =C2=A0[<c067f084>] skb_queue_purge+0x14/0x30
+> =C2=A0[<c071fe8f>] l2cap_recv_frame+0x5df/0x32c0
+> =C2=A0[<c025617d>] ? __lock_acquire+0x1dd/0xac0
+> =C2=A0[<c025617d>] ? __lock_acquire+0x1dd/0xac0
+> =C2=A0[<c067e2d9>] ? skb_queue_tail+0x39/0x50
+> =C2=A0[<c025617d>] ? __lock_acquire+0x1dd/0xac0
+> =C2=A0[<c025617d>] ? __lock_acquire+0x1dd/0xac0
+> =C2=A0[<c0722d02>] l2cap_recv_acldata+0x192/0x3d0
+> =C2=A0[<c0713d50>] ? hci_rx_task+0x280/0x460
+> =C2=A0[<c0722b70>] ? l2cap_recv_acldata+0x0/0x3d0
+> =C2=A0[<c0713d83>] hci_rx_task+0x2b3/0x460
+> =C2=A0[<c025617d>] ? __lock_acquire+0x1dd/0xac0
+> =C2=A0[<c02362d0>] tasklet_action+0x50/0xb0
+> =C2=A0[<c0236a35>] __do_softirq+0x85/0x110
+> =C2=A0[<c0236aed>] do_softirq+0x2d/0x40
+> =C2=A0[<c0236c55>] irq_exit+0x65/0x90
+> =C2=A0[<c0204c1f>] do_IRQ+0x4f/0xc0
+> =C2=A0[<c025617d>] ? __lock_acquire+0x1dd/0xac0
+> =C2=A0[<c02034a9>] common_interrupt+0x29/0x30
+> =C2=A0[<c07a183a>] ? _spin_unlock_irqrestore+0x2a/0x40
+> =C2=A0[<c0223f00>] __wake_up+0x40/0x50
+> =C2=A0[<c030167e>] journal_stop+0x27e/0x2b0
+> =C2=A0[<c02f4577>] __ext3_journal_stop+0x27/0x50
+> =C2=A0[<c02ecdd9>] ext3_delete_inode+0x99/0xf0
+> =C2=A0[<c02ecd40>] ? ext3_delete_inode+0x0/0xf0
+> =C2=A0[<c02accf2>] generic_delete_inode+0x72/0x110
+> =C2=A0[<c02acddf>] generic_drop_inode+0x4f/0x80
+> =C2=A0[<c02abcf7>] iput+0x47/0x50
+> =C2=A0[<c02a926f>] dentry_iput+0x6f/0xf0
+> =C2=A0[<c02a93a5>] d_kill+0x25/0x50
+> =C2=A0[<c02a9abd>] dput+0x5d/0x110
+> =C2=A0[<c02a4125>] do_rmdir+0xb5/0xe0
+> =C2=A0[<c024a296>] ? up_read+0x16/0x30
+> =C2=A0[<c021c19e>] ? do_page_fault+0x15e/0x250
+> =C2=A0[<c02a41b0>] sys_rmdir+0x10/0x20
+> =C2=A0[<c0202e50>] sysenter_do_call+0x12/0x31
+> Registered led device: iwl-phy0::radio
+> Registered led device: iwl-phy0::assoc
+> Registered led device: iwl-phy0::RX
+> Registered led device: iwl-phy0::TX
+> wlan0: Selected IBSS BSSID 7a:ad:1e:84:b0:4c based on configured SSID
+> Registered led device: iwl-phy0::radio
+> Registered led device: iwl-phy0::assoc
+> Registered led device: iwl-phy0::RX
+> Registered led device: iwl-phy0::TX
+> wlan0: Selected IBSS BSSID 7a:ad:1e:84:b0:4c based on configured SSID
+>
+>
+
+Hi,
+
+I have a pending patch for this:
+http://marc.info/?l=3Dlinux-bluetooth&m=3D125504924206686&w=3D2
+
+--=20
+Regards
+dave
