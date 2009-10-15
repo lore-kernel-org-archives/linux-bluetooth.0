@@ -1,48 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1255599537.3797.63.camel@localhost.localdomain>
-References: <2d5a2c100910141815l3300ee34p12fbbac2dd6a96b6@mail.gmail.com>
-	 <1255599537.3797.63.camel@localhost.localdomain>
-Date: Thu, 15 Oct 2009 11:22:43 -0300
-Message-ID: <2d5a2c100910150722x3fb617fbgc01c0fb4476b3d6d@mail.gmail.com>
 Subject: Re: dun profile
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Bastien Nocera <hadess@hadess.net>
+From: Bastien Nocera <hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <2d5a2c100910141815l3300ee34p12fbbac2dd6a96b6@mail.gmail.com>
+References: <2d5a2c100910141815l3300ee34p12fbbac2dd6a96b6@mail.gmail.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Date: Thu, 15 Oct 2009 10:38:57 +0100
+Message-Id: <1255599537.3797.63.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Wed, 2009-10-14 at 22:15 -0300, Luiz Augusto von Dentz wrote:
+> Hi List,
+> 
+> Im trying to put an end to this problem of detecting rfcomm port
+> properly, so what seems to be missing is to associate the profile to
+> the port so that udev can properly announce it as modem in case of dun
+> profile. I don't know of any mechanism to attach any profile
+> information to the port itself, but in theory we could identify the
+> port by name, so instead of using rfcomm# for all ports created by
+> Serial interface we could name it dun# for instance, so how about
+> that? Also we probably want to make this persistent so once this is
+> configured this will be restored in the next boot.
 
-On Thu, Oct 15, 2009 at 6:38 AM, Bastien Nocera <hadess@hadess.net> wrote:
-> Same questions as Stefan I'm afraid.
->
-> In any case, I think the front-ends should be creating the port
-> themselves, so they would know which one to handle.
->
-> See the recent (and less recent) work done in NetworkManager for DUN
-> support.
+Same questions as Stefan I'm afraid.
 
+In any case, I think the front-ends should be creating the port
+themselves, so they would know which one to handle.
 
-Basically I want to avoid the code done in NetworkManager, simply
-because it doesn't work for anything but the one that create the port.
-So what Im proposing is that udev take care of setting the
-capabilities to the port, not the applet manually doing it, but to
-make it possible there must be something indicating that it is a port
-to dun profile channel (or spp if that matters). The other suggestion
-is that this port should be somehow stored so it is recreated after
-boot, but as Stefan cleverly point out this would be a bit difficult
-since some device insist in changing the channel/hide the service each
-time the profile got in use, so perhaps it is not a good idea in the
-end.
+See the recent (and less recent) work done in NetworkManager for DUN
+support.
 
-What Im still missing is how I attach the information to the port so
-that udev properly recognized and nobody has to do workarounds, store
-the return of Serial.Connect("dun") and then wait it to be announced
-by udev, than I can do it directly on bluetoothd and has to duplicate
-this code on front-ends.
+Cheers
 
--- 
-Luiz Augusto von Dentz
-Engenheiro de Computação
