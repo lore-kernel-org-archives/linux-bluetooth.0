@@ -1,23 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <267658.23250.qm@web94907.mail.in2.yahoo.com>
-Date: Thu, 15 Oct 2009 09:47:57 +0530 (IST)
-From: Pavan Savoy <pavan_savoy@yahoo.co.in>
-Subject: alternative to hci_ldisc for BT-UART
-To: linux-bluetooth@vger.kernel.org
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Date: Wed, 14 Oct 2009 22:15:57 -0300
+Message-ID: <2d5a2c100910141815l3300ee34p12fbbac2dd6a96b6@mail.gmail.com>
+Subject: dun profile
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi List,
 
-Currently if the BT chip has an UART transport, it stops me from making of UART for any other purpose when BT is active.
-In combo-chip cases(BT/FM), the TTY line discipline has to be more generic so that any other driver can make use of that line discipline to send across data to chip.
+Im trying to put an end to this problem of detecting rfcomm port
+properly, so what seems to be missing is to associate the profile to
+the port so that udev can properly announce it as modem in case of dun
+profile. I don't know of any mechanism to attach any profile
+information to the port itself, but in theory we could identify the
+port by name, so instead of using rfcomm# for all ports created by
+Serial interface we could name it dun# for instance, so how about
+that? Also we probably want to make this persistent so once this is
+configured this will be restored in the next boot.
 
-Is this possible and valid ?
 
-regards,
-Pavan
-
-
-      Connect more, do more and share more with Yahoo! India Mail. Learn more. http://in.overview.mail.yahoo.com/
+-- 
+Luiz Augusto von Dentz
+Engenheiro de Computação
