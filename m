@@ -1,48 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <20091015202758.591296185@linutronix.de>
-Date: Thu, 15 Oct 2009 20:28:53 -0000
-From: Thomas Gleixner <tglx@linutronix.de>
-To: LKML <linux-kernel@vger.kernel.org>
-Cc: ALan Cox <alan@lxorguk.ukuu.org.uk>, Arnd Bergmann <arnd@arndb.de>,
-        Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Subject: [patch 5/5] bluetooth: Remove stub ioctl in hci_vhci
-References: <20091015202722.372890083@linutronix.de>
+From: Thadeu Lima de Souza Cascardo <cascardo@holoscopio.com>
+To: trivial@kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>, "David S. Miller" <davem@davemloft.net>, Thadeu Lima de Souza Cascardo <cascardo@holoscopio.com>, Stephen Hemminger <shemminger@vyatta.com>, Wang Chen <wangchen@cn.fujitsu.com>, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org 
+Subject: [PATCH 6/8] trivial: fix typo s/refference/reference/ in comment
+Date: Thu, 15 Oct 2009 17:16:23 -0300
+Message-Id: <1255637783-6109-1-git-send-email-cascardo@holoscopio.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Remove the empty ioctl which just returns -EINVAL. vfs_ioctl() will
-return -ENOTTY instead, but I doubt that any application will notice
-the difference :)
-
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-
+Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@holoscopio.com>
 ---
- drivers/bluetooth/hci_vhci.c |    7 -------
- 1 file changed, 7 deletions(-)
+ net/bluetooth/bnep/core.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-Index: linux-2.6-tip/drivers/bluetooth/hci_vhci.c
-===================================================================
---- linux-2.6-tip.orig/drivers/bluetooth/hci_vhci.c
-+++ linux-2.6-tip/drivers/bluetooth/hci_vhci.c
-@@ -218,12 +218,6 @@ static unsigned int vhci_poll(struct fil
- 	return POLLOUT | POLLWRNORM;
- }
- 
--static int vhci_ioctl(struct inode *inode, struct file *file,
--					unsigned int cmd, unsigned long arg)
--{
--	return -EINVAL;
--}
--
- static int vhci_open(struct inode *inode, struct file *file)
+diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+index cafe9f5..1bd9398 100644
+--- a/net/bluetooth/bnep/core.c
++++ b/net/bluetooth/bnep/core.c
+@@ -78,7 +78,7 @@ static struct bnep_session *__bnep_get_session(u8 *dst)
+ static void __bnep_link_session(struct bnep_session *s)
  {
- 	struct vhci_data *data;
-@@ -287,7 +281,6 @@ static const struct file_operations vhci
- 	.read		= vhci_read,
- 	.write		= vhci_write,
- 	.poll		= vhci_poll,
--	.ioctl		= vhci_ioctl,
- 	.open		= vhci_open,
- 	.release	= vhci_release,
- };
+ 	/* It's safe to call __module_get() here because sessions are added
+-	   by the socket layer which has to hold the refference to this module.
++	   by the socket layer which has to hold the reference to this module.
+ 	 */
+ 	__module_get(THIS_MODULE);
+ 	list_add(&s->list, &bnep_session_list);
+-- 
+1.6.3.3
