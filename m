@@ -1,51 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 6/8] trivial: fix typo s/refference/reference/ in
- comment
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Jiri Kosina <jkosina@suse.cz>
-Cc: Thadeu Lima de Souza Cascardo <cascardo@holoscopio.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Stephen Hemminger <shemminger@vyatta.com>,
-	Wang Chen <wangchen@cn.fujitsu.com>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-In-Reply-To: <alpine.LSU.2.00.0910161524480.8582@wotan.suse.de>
-References: <1255637783-6109-1-git-send-email-cascardo@holoscopio.com>
-	 <alpine.LSU.2.00.0910161524480.8582@wotan.suse.de>
-Content-Type: text/plain
-Date: Fri, 16 Oct 2009 18:08:17 +0200
-Message-Id: <1255709297.31260.2.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-kernel-owner@vger.kernel.org
+Message-ID: <4AD884D7.6020404@start.ca>
+Date: Fri, 16 Oct 2009 10:36:07 -0400
+From: Colin Beckingham <colbec@start.ca>
+MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org
+Subject: Bluetooth signals "Unable to open seid 64"
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jiri,
+Using Suse 11.1
+Bluez 4.54
+Blueman from svn 602
+Pulseaudio 0.9.19
+Hardware Jabra BT2040 headset and adapter dongle MSI Starkey
 
-> On Thu, 15 Oct 2009, Thadeu Lima de Souza Cascardo wrote:
-> 
-> > diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
-> > index cafe9f5..1bd9398 100644
-> > --- a/net/bluetooth/bnep/core.c
-> > +++ b/net/bluetooth/bnep/core.c
-> > @@ -78,7 +78,7 @@ static struct bnep_session *__bnep_get_session(u8 *dst)
-> >  static void __bnep_link_session(struct bnep_session *s)
-> >  {
-> >  	/* It's safe to call __module_get() here because sessions are added
-> > -	   by the socket layer which has to hold the refference to this module.
-> > +	   by the socket layer which has to hold the reference to this module.
-> >  	 */
-> >  	__module_get(THIS_MODULE);
-> >  	list_add(&s->list, &bnep_session_list);
-> 
-> Merged together with patches 2-8 from your series and applied to trivial
-> queue.
+Blueman is able to open a link to the headset and start the headset 
+service, shortly after this there is a message from pulseaudio that 
+something has gone awry with the audio link.
 
-trivial, but neverless ...
+bluetoothd -nd has much output including the following which seems relevant:
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+bluetoothd[26861]: Audio API: BT_REQUEST <- BT_OPEN
+bluetoothd[26861]: open sco - 
+object=/org/bluez/26861/hci0/dev_00_1A_45_32_E7_16 source=ANY 
+destination=ANY lock=readwrite
+bluetoothd[26861]: Unable to open seid 64
+bluetoothd[26861]: sending error Invalid argument(22)
+bluetoothd[26861]: Audio API: BT_ERROR -> BT_OPEN
+bluetoothd[26861]: Unix client disconnected (fd=31)
 
-Regards
-
-Marcel
-
-
+Does this mean anything to the bluetooth community? Suggestions welcome.
