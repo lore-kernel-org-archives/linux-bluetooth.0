@@ -1,33 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4AD884D7.6020404@start.ca>
-Date: Fri, 16 Oct 2009 10:36:07 -0400
-From: Colin Beckingham <colbec@start.ca>
+Date: Fri, 16 Oct 2009 15:24:21 +0200 (CEST)
+From: Jiri Kosina <jkosina@suse.cz>
+To: Thadeu Lima de Souza Cascardo <cascardo@holoscopio.com>
+Cc: linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	bonding-devel@lists.sourceforge.net, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org, users@host1.serialmonkey.com,
+	linux-scsi@vger.kernel.org, devel@driverdev.osuosl.org,
+	linux-ext4@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-sctp@vger.kernel.org
+Subject: Re: [PATCH 7/8] trivial: fix many typos s/untill/until/
+In-Reply-To: <1255638072-6236-1-git-send-email-cascardo@holoscopio.com>
+Message-ID: <alpine.LSU.2.00.0910161523400.8582@wotan.suse.de>
+References: <1255638072-6236-1-git-send-email-cascardo@holoscopio.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Bluetooth signals "Unable to open seid 64"
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Using Suse 11.1
-Bluez 4.54
-Blueman from svn 602
-Pulseaudio 0.9.19
-Hardware Jabra BT2040 headset and adapter dongle MSI Starkey
+On Thu, 15 Oct 2009, Thadeu Lima de Souza Cascardo wrote:
 
-Blueman is able to open a link to the headset and start the headset 
-service, shortly after this there is a message from pulseaudio that 
-something has gone awry with the audio link.
+> Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@holoscopio.com>
+> ---
+>  drivers/infiniband/ulp/iser/iser_verbs.c |    2 +-
+>  drivers/net/bonding/bond_alb.c           |    2 +-
+>  drivers/net/wireless/rt2x00/rt2800usb.c  |    2 +-
+>  drivers/scsi/bnx2i/bnx2i_iscsi.c         |    2 +-
+>  drivers/staging/rtl8187se/r8180.h        |    2 +-
+>  fs/ext4/balloc.c                         |    2 +-
+>  net/bluetooth/bnep/core.c                |    2 +-
+>  net/sctp/sm_statefuns.c                  |    2 +-
+>  8 files changed, 8 insertions(+), 8 deletions(-)
 
-bluetoothd -nd has much output including the following which seems relevant:
+Merged together with patches 2-8 from your series and applied to trivial 
+queue.
 
-bluetoothd[26861]: Audio API: BT_REQUEST <- BT_OPEN
-bluetoothd[26861]: open sco - 
-object=/org/bluez/26861/hci0/dev_00_1A_45_32_E7_16 source=ANY 
-destination=ANY lock=readwrite
-bluetoothd[26861]: Unable to open seid 64
-bluetoothd[26861]: sending error Invalid argument(22)
-bluetoothd[26861]: Audio API: BT_ERROR -> BT_OPEN
-bluetoothd[26861]: Unix client disconnected (fd=31)
-
-Does this mean anything to the bluetooth community? Suggestions welcome.
+-- 
+Jiri Kosina
+SUSE Labs, Novell Inc.
