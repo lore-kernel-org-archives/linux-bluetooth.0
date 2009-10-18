@@ -1,70 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 19 Oct 2009 14:24:41 +0800
-From: Dave Young <hidave.darkstar@gmail.com>
-To: marcel@holtmann.org
-Cc: alan@lxorguk.ukuu.org.uk, oliver@hartkopp.net, netdev@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] bluetooth: scheduling while atomic bug fix
-Message-ID: <20091019062441.GA4102@darkstar.vlan7>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org, gustavo@padovan.org
+Subject: [PATCH 1/1] Bluetooth: Fix regression into L2CAP when using Basic Mode
+Date: Sat, 17 Oct 2009 21:41:01 -0300
+Message-Id: <1255826461-7741-1-git-send-email-gustavo@las.ic.unicamp.br>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Due to driver core changes dev_set_drvdata will call kzalloc which should be
-in might_sleep context, but hci_conn_add will be called in atomic context
+Basic Mode is the default mode of operation of a L2CAP entity, so we don't
+need to send a RFC (Retransmission and Flow Control) Configuration Option.
+This patch makes L2CAP do not send RFC when Basic Mode is selected.
+The regression was introduced by the ERTM (Enhanced Retransmission Mode)
+patches.
 
-Like dev_set_name move dev_set_drvdata to work queue function.
-
-oops as following:
-
-Oct  2 17:41:59 darkstar kernel: [  438.001341] BUG: sleeping function called from invalid context at mm/slqb.c:1546
-Oct  2 17:41:59 darkstar kernel: [  438.001345] in_atomic(): 1, irqs_disabled(): 0, pid: 2133, name: sdptool
-Oct  2 17:41:59 darkstar kernel: [  438.001348] 2 locks held by sdptool/2133:
-Oct  2 17:41:59 darkstar kernel: [  438.001350]  #0:  (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+.+.}, at: [<faa1d2f5>] lock_sock+0xa/0xc [l2cap]
-Oct  2 17:41:59 darkstar kernel: [  438.001360]  #1:  (&hdev->lock){+.-.+.}, at: [<faa20e16>] l2cap_sock_connect+0x103/0x26b [l2cap]
-Oct  2 17:41:59 darkstar kernel: [  438.001371] Pid: 2133, comm: sdptool Not tainted 2.6.31-mm1 #2
-Oct  2 17:41:59 darkstar kernel: [  438.001373] Call Trace:
-Oct  2 17:41:59 darkstar kernel: [  438.001381]  [<c022433f>] __might_sleep+0xde/0xe5
-Oct  2 17:41:59 darkstar kernel: [  438.001386]  [<c0298843>] __kmalloc+0x4a/0x15a
-Oct  2 17:41:59 darkstar kernel: [  438.001392]  [<c03f0065>] ? kzalloc+0xb/0xd
-Oct  2 17:41:59 darkstar kernel: [  438.001396]  [<c03f0065>] kzalloc+0xb/0xd
-Oct  2 17:41:59 darkstar kernel: [  438.001400]  [<c03f04ff>] device_private_init+0x15/0x3d
-Oct  2 17:41:59 darkstar kernel: [  438.001405]  [<c03f24c5>] dev_set_drvdata+0x18/0x26
-Oct  2 17:41:59 darkstar kernel: [  438.001414]  [<fa51fff7>] hci_conn_init_sysfs+0x40/0xd9 [bluetooth]
-Oct  2 17:41:59 darkstar kernel: [  438.001422]  [<fa51cdc0>] ? hci_conn_add+0x128/0x186 [bluetooth]
-Oct  2 17:41:59 darkstar kernel: [  438.001429]  [<fa51ce0f>] hci_conn_add+0x177/0x186 [bluetooth]
-Oct  2 17:41:59 darkstar kernel: [  438.001437]  [<fa51cf8a>] hci_connect+0x3c/0xfb [bluetooth]
-Oct  2 17:41:59 darkstar kernel: [  438.001442]  [<faa20e87>] l2cap_sock_connect+0x174/0x26b [l2cap]
-Oct  2 17:41:59 darkstar kernel: [  438.001448]  [<c04c8df5>] sys_connect+0x60/0x7a
-Oct  2 17:41:59 darkstar kernel: [  438.001453]  [<c024b703>] ? lock_release_non_nested+0x84/0x1de
-Oct  2 17:41:59 darkstar kernel: [  438.001458]  [<c028804b>] ? might_fault+0x47/0x81
-Oct  2 17:41:59 darkstar kernel: [  438.001462]  [<c028804b>] ? might_fault+0x47/0x81
-Oct  2 17:41:59 darkstar kernel: [  438.001468]  [<c033361f>] ? __copy_from_user_ll+0x11/0xce
-Oct  2 17:41:59 darkstar kernel: [  438.001472]  [<c04c9419>] sys_socketcall+0x82/0x17b
-Oct  2 17:41:59 darkstar kernel: [  438.001477]  [<c020329d>] syscall_call+0x7/0xb
-
-Signed-off-by: Dave Young <hidave.darkstar@gmail.com>
+Signed-off-by: Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
 ---
-net/bluetooth/hci_sysfs.c |    4 ++--
-1 file changed, 2 insertions(+), 2 deletions(-)
+ net/bluetooth/l2cap.c |   11 ++++++++---
+ 1 files changed, 8 insertions(+), 3 deletions(-)
 
---- linux-2.6.31.orig/net/bluetooth/hci_sysfs.c	2009-10-09 20:50:43.000000000 +0800
-+++ linux-2.6.31/net/bluetooth/hci_sysfs.c	2009-10-10 21:24:56.000000000 +0800
-@@ -92,6 +92,8 @@ static void add_conn(struct work_struct 
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index 243aac7..bafac04 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -2408,6 +2408,10 @@ done:
+ 			rfc.monitor_timeout = L2CAP_DEFAULT_MONITOR_TO;
  
- 	dev_set_name(&conn->dev, "%s:%d", hdev->name, conn->handle);
- 
-+	dev_set_drvdata(&conn->dev, conn);
+ 			pi->conf_state |= L2CAP_CONF_MODE_DONE;
 +
- 	if (device_add(&conn->dev) < 0) {
- 		BT_ERR("Failed to register connection device");
- 		return;
-@@ -144,8 +146,6 @@ void hci_conn_init_sysfs(struct hci_conn
- 	conn->dev.class = bt_class;
- 	conn->dev.parent = &hdev->dev;
++			l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC,
++					sizeof(rfc), (unsigned long) &rfc);
++
+ 			break;
  
--	dev_set_drvdata(&conn->dev, conn);
+ 		case L2CAP_MODE_STREAMING:
+@@ -2415,6 +2419,10 @@ done:
+ 			pi->max_pdu_size = rfc.max_pdu_size;
+ 
+ 			pi->conf_state |= L2CAP_CONF_MODE_DONE;
++
++			l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC,
++					sizeof(rfc), (unsigned long) &rfc);
++
+ 			break;
+ 
+ 		default:
+@@ -2424,9 +2432,6 @@ done:
+ 			rfc.mode = pi->mode;
+ 		}
+ 
+-		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC,
+-					sizeof(rfc), (unsigned long) &rfc);
 -
- 	device_initialize(&conn->dev);
- 
- 	INIT_WORK(&conn->work_add, add_conn);
+ 		if (result == L2CAP_CONF_SUCCESS)
+ 			pi->conf_state |= L2CAP_CONF_OUTPUT_DONE;
+ 	}
+-- 
+1.6.4.4
