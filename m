@@ -1,28 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 19 Oct 2009 19:37:11 -0700 (PDT)
-Message-Id: <20091019.193711.147629067.davem@davemloft.net>
-To: hidave.darkstar@gmail.com
-Cc: marcel@holtmann.org, alan@lxorguk.ukuu.org.uk, oliver@hartkopp.net,
- netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] bluetooth: scheduling while atomic bug fix
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20091019062441.GA4102@darkstar.vlan7>
-References: <20091019062441.GA4102@darkstar.vlan7>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Message-ID: <4ADC0899.2090409@pardus.org.tr>
+Date: Mon, 19 Oct 2009 09:35:05 +0300
+From: =?UTF-8?B?T3phbiDDh2HEn2xheWFu?= <ozan@pardus.org.tr>
+MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: hci_cmd_task:hci0 command tx timeout
+References: <6887eb5d0909240501o3f7e959ewf797e18dd09e2fd4@mail.gmail.com> <4ABB952F.6020208@pardus.org.tr>
+In-Reply-To: <4ABB952F.6020208@pardus.org.tr>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Dave Young <hidave.darkstar@gmail.com>
-Date: Mon, 19 Oct 2009 14:24:41 +0800
+Ozan Çağlayan wrote On 24-09-2009 18:50:
+> Kartikey Parmar wrote:
+>   
+>> Hi,
+>>
+>> I m getting "hci_cmd_task:hci0 command tx timeout" during connect()
+>> socket call for SCO connection.
+>>
+>> Exactly why this timeout is occured. I m using Bluez-4.52 with kernel
+>> 2.6.30 on AT91SAM9263.
+>>
+>>
+>>   
+>>     
+>
+>
+> Not me but a user on our bugzilla reported that on 2.6.30(.5), he's
+> having those timeouts when he tries to scan using hcitool. I've searched
+> on the internet, found a lot of bug reports which seems to be
+> resolved/fixed post 2.6.28. The user says that the dongle is working OK
+> on other operating systems.
+>
+> Do we have some means for debugging further the cause of this problem?
+>
+>   
 
-> Due to driver core changes dev_set_drvdata will call kzalloc which should be
-> in might_sleep context, but hci_conn_add will be called in atomic context
-> 
-> Like dev_set_name move dev_set_drvdata to work queue function.
-> 
-> oops as following:
- ...
-> Signed-off-by: Dave Young <hidave.darkstar@gmail.com>
-
-Applied.
+Any clues?
