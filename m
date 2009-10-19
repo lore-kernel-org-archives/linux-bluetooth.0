@@ -1,40 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4ADC0899.2090409@pardus.org.tr>
-Date: Mon, 19 Oct 2009 09:35:05 +0300
-From: =?UTF-8?B?T3phbiDDh2HEn2xheWFu?= <ozan@pardus.org.tr>
+Date: Mon, 19 Oct 2009 14:28:30 +0800
+From: Dave Young <hidave.darkstar@gmail.com>
+To: marcel@holtmann.org
+Cc: oliver@hartkopp.net, netdev@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 2/2] bluetooth: static lock key fix
+Message-ID: <20091019062830.GB4102@darkstar.vlan7>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: hci_cmd_task:hci0 command tx timeout
-References: <6887eb5d0909240501o3f7e959ewf797e18dd09e2fd4@mail.gmail.com> <4ABB952F.6020208@pardus.org.tr>
-In-Reply-To: <4ABB952F.6020208@pardus.org.tr>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Ozan Çağlayan wrote On 24-09-2009 18:50:
-> Kartikey Parmar wrote:
->   
->> Hi,
->>
->> I m getting "hci_cmd_task:hci0 command tx timeout" during connect()
->> socket call for SCO connection.
->>
->> Exactly why this timeout is occured. I m using Bluez-4.52 with kernel
->> 2.6.30 on AT91SAM9263.
->>
->>
->>   
->>     
->
->
-> Not me but a user on our bugzilla reported that on 2.6.30(.5), he's
-> having those timeouts when he tries to scan using hcitool. I've searched
-> on the internet, found a lot of bug reports which seems to be
-> resolved/fixed post 2.6.28. The user says that the dongle is working OK
-> on other operating systems.
->
-> Do we have some means for debugging further the cause of this problem?
->
->   
+When shutdown ppp connection, lockdep waring about non-static key
+will happen, it is caused by the lock is not initialized properly
+at that time.
 
-Any clues?
+Fix with tuning the lock/skb_queue_head init order
+
+[   94.339261] INFO: trying to register non-static key.
+[   94.342509] the code is fine but needs lockdep annotation.
+[   94.342509] turning off the locking correctness validator.
+[   94.342509] Pid: 0, comm: swapper Not tainted 2.6.31-mm1 #2
+[   94.342509] Call Trace:
+[   94.342509]  [<c0248fbe>] register_lock_class+0x58/0x241
+[   94.342509]  [<c024b5df>] ? __lock_acquire+0xb57/0xb73
+[   94.342509]  [<c024ab34>] __lock_acquire+0xac/0xb73
+[   94.342509]  [<c024b7fa>] ? lock_release_non_nested+0x17b/0x1de
+[   94.342509]  [<c024b662>] lock_acquire+0x67/0x84
+[   94.342509]  [<c04cd1eb>] ? skb_dequeue+0x15/0x41
+[   94.342509]  [<c054a857>] _spin_lock_irqsave+0x2f/0x3f
+[   94.342509]  [<c04cd1eb>] ? skb_dequeue+0x15/0x41
+[   94.342509]  [<c04cd1eb>] skb_dequeue+0x15/0x41
+[   94.342509]  [<c054a648>] ? _read_unlock+0x1d/0x20
+[   94.342509]  [<c04cd641>] skb_queue_purge+0x14/0x1b
+[   94.342509]  [<fab94fdc>] l2cap_recv_frame+0xea1/0x115a [l2cap]
+[   94.342509]  [<c024b5df>] ? __lock_acquire+0xb57/0xb73
+[   94.342509]  [<c0249c04>] ? mark_lock+0x1e/0x1c7
+[   94.342509]  [<f8364963>] ? hci_rx_task+0xd2/0x1bc [bluetooth]
+[   94.342509]  [<fab95346>] l2cap_recv_acldata+0xb1/0x1c6 [l2cap]
+[   94.342509]  [<f8364997>] hci_rx_task+0x106/0x1bc [bluetooth]
+[   94.342509]  [<fab95295>] ? l2cap_recv_acldata+0x0/0x1c6 [l2cap]
+[   94.342509]  [<c02302c4>] tasklet_action+0x69/0xc1
+[   94.342509]  [<c022fbef>] __do_softirq+0x94/0x11e
+[   94.342509]  [<c022fcaf>] do_softirq+0x36/0x5a
+[   94.342509]  [<c022fe14>] irq_exit+0x35/0x68
+[   94.342509]  [<c0204ced>] do_IRQ+0x72/0x89
+[   94.342509]  [<c02038ee>] common_interrupt+0x2e/0x34
+[   94.342509]  [<c024007b>] ? pm_qos_add_requirement+0x63/0x9d
+[   94.342509]  [<c038e8a5>] ? acpi_idle_enter_bm+0x209/0x238
+[   94.342509]  [<c049d238>] cpuidle_idle_call+0x5c/0x94
+[   94.342509]  [<c02023f8>] cpu_idle+0x4e/0x6f
+[   94.342509]  [<c0534153>] rest_init+0x53/0x55
+[   94.342509]  [<c0781894>] start_kernel+0x2f0/0x2f5
+[   94.342509]  [<c0781091>] i386_start_kernel+0x91/0x96
+
+Reported-by: Oliver Hartkopp <oliver@hartkopp.net>
+Signed-off-by: Dave Young <hidave.darkstar@gmail.com>
+Tested-by: Oliver Hartkopp <oliver@hartkopp.net>
+---
+net/bluetooth/l2cap.c |    9 ++++++---
+1 file changed, 6 insertions(+), 3 deletions(-)
+
+--- linux-2.6.31.orig/net/bluetooth/l2cap.c	2009-10-09 08:32:46.000000000 +0800
++++ linux-2.6.31/net/bluetooth/l2cap.c	2009-10-09 08:33:57.000000000 +0800
+@@ -555,12 +555,12 @@ static struct l2cap_conn *l2cap_conn_add
+ 
+ 	conn->feat_mask = 0;
+ 
+-	setup_timer(&conn->info_timer, l2cap_info_timeout,
+-						(unsigned long) conn);
+-
+ 	spin_lock_init(&conn->lock);
+ 	rwlock_init(&conn->chan_list.lock);
+ 
++	setup_timer(&conn->info_timer, l2cap_info_timeout,
++						(unsigned long) conn);
++
+ 	conn->disc_reason = 0x13;
+ 
+ 	return conn;
+@@ -783,6 +783,9 @@ static void l2cap_sock_init(struct sock 
+ 	/* Default config options */
+ 	pi->conf_len = 0;
+ 	pi->flush_to = L2CAP_DEFAULT_FLUSH_TO;
++	skb_queue_head_init(TX_QUEUE(sk));
++	skb_queue_head_init(SREJ_QUEUE(sk));
++	INIT_LIST_HEAD(SREJ_LIST(sk));
+ }
+ 
+ static struct proto l2cap_proto = {
