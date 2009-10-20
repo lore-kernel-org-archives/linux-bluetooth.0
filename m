@@ -1,87 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <ac8af0be0910200205q3c3b57a6o4bd66870c8c4778a@mail.gmail.com>
+In-Reply-To: <1256023119.9142.19.camel@pohly-mobl1.ikn.intel.com>
 References: <1256007499-19250-1-git-send-email-forrest.zhao@intel.com>
 	 <1256023119.9142.19.camel@pohly-mobl1.ikn.intel.com>
-	 <ac8af0be0910200205q3c3b57a6o4bd66870c8c4778a@mail.gmail.com>
-Date: Tue, 20 Oct 2009 11:18:33 -0200
-Message-ID: <aa32413d0910200618p2fe3a940j304a5e598b0a04ac@mail.gmail.com>
+Date: Tue, 20 Oct 2009 17:05:31 +0800
+Message-ID: <ac8af0be0910200205q3c3b57a6o4bd66870c8c4778a@mail.gmail.com>
 Subject: Re: [PATCH] Implements the OBEX server/SyncML client binding for
 	syncEvolution (http://syncevolution.org/).
-From: =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@gmail.com>
-To: Zhao Forrest <forrest.zhao@gmail.com>
-Cc: Patrick Ohly <patrick.ohly@intel.com>,
-	"Zhao, Forrest" <forrest.zhao@intel.com>,
+From: Zhao Forrest <forrest.zhao@gmail.com>
+To: Patrick Ohly <patrick.ohly@intel.com>
+Cc: "Zhao, Forrest" <forrest.zhao@intel.com>,
 	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Oct 20, 2009 at 7:05 AM, Zhao Forrest <forrest.zhao@gmail.com> wrote:
->>> --- a/src/main.c
->>> +++ b/src/main.c
->>> @@ -53,6 +53,7 @@
->>> Â #define OPP_CHANNEL Â  Â 9
->>> Â #define FTP_CHANNEL Â  Â 10
->>> Â #define PBAP_CHANNEL Â  15
->>> +#define SYNCEVOLUTION_CHANNEL Â 16
->>> Â #define PCSUITE_CHANNEL Â  Â  Â  Â 24
->>
->> Do we want to call this "SYNCEVOLUTION" or "SYNCML"? Both has pros and
->> cons. Treating it as generic SyncML capability hides the detail that
->> it's currently based on SyncEvolution. Exposing SyncEvolution itself
->> would allow to activate multiple different SyncML implementations at the
->> same time.
->>
->> My preference would be to keep it as is, but I wanted to ask anyway.
-> I have the same idea as you do, and prefer to keep it as "SYNCEVOLUTION".
+>> --- a/src/main.c
+>> +++ b/src/main.c
+>> @@ -53,6 +53,7 @@
+>>  #define OPP_CHANNEL    9
+>>  #define FTP_CHANNEL    10
+>>  #define PBAP_CHANNEL   15
+>> +#define SYNCEVOLUTION_CHANNEL  16
+>>  #define PCSUITE_CHANNEL        24
 >
->>
->> Off topic: what is the "PC Suite Services server"?
->>
-> It's Nokia OBEX PC Suite Services. Johan may know more details about it.
+> Do we want to call this "SYNCEVOLUTION" or "SYNCML"? Both has pros and
+> cons. Treating it as generic SyncML capability hides the detail that
+> it's currently based on SyncEvolution. Exposing SyncEvolution itself
+> would allow to activate multiple different SyncML implementations at the
+> same time.
 >
->>> + Â  Â  Â  { "syncevolution", 'e', 0, G_OPTION_ARG_NONE, &option_syncevolution,
->>> + Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  "Enable OBEX server for Syncevolution client" },
->>
->> Mind the spelling: "syncevolution" (lower case) is the command line
->> tool, "SyncEvolution" (camel case) the project. "Syncevolution" is a
->> typo ;-)
->>
-> Will fix it ASAP.
->
->> Is there documentation that should be updated together with introducing
->> the new feature?
-> The patch does not introduce any new d-bus API to obexd, so no doc need to
-> be updated.
->
->>
->>> + Â  Â  Â  if (option_syncevolution == TRUE) {
->>> + Â  Â  Â  Â  Â  Â  Â  services |= OBEX_SYNCEVOLUTION;
->>> + Â  Â  Â  Â  Â  Â  Â  bluetooth_init(OBEX_SYNCEVOLUTION, "OBEX server for"
->>> + Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  " Syncevolution client", NULL,
->>> + Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  SYNCEVOLUTION_CHANNEL, TRUE, FALSE, FALSE,
->>> + Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  NULL);
->>> + Â  Â  Â  }
->>> +
->>
->> Which string is going to appear in the service description (the SDP
->> part)? This one here? Mentioning "SyncML" would be useful. So I suggest
->> "OBEX server for SyncML, using SyncEvolution". Leave out the
->> "SyncEvolution client", because the term client is a) overloaded
->> (SyncML/OBEX/D-Bus) and b) SyncEvolution could be both client and server
->> in this context (SAN => SyncML client, SyncML message => SyncML server).
->>
-> OK. Will expose service name as "OBEX server for SyncML, using SyncEvolution"
-> since ProviderName attribute is not supported by obexd now.
+> My preference would be to keep it as is, but I wanted to ask anyway.
+I have the same idea as you do, and prefer to keep it as "SYNCEVOLUTION".
 
-If it's consensus the right way would be exposing SyncEvolution
-through ProviderName, please add a comment to the code telling that,
-so someone remember to fix it by the time obexd supports it.
+>
+> Off topic: what is the "PC Suite Services server"?
+>
+It's Nokia OBEX PC Suite Services. Johan may know more details about it.
 
--- 
-JoÃ£o Paulo Rechi Vita
-MSc Computer Science Student
-Computer Engineer
-IC / Unicamp
-http://jprvita.wordpress.com/
+>> +       { "syncevolution", 'e', 0, G_OPTION_ARG_NONE, &option_syncevolution,
+>> +                               "Enable OBEX server for Syncevolution client" },
+>
+> Mind the spelling: "syncevolution" (lower case) is the command line
+> tool, "SyncEvolution" (camel case) the project. "Syncevolution" is a
+> typo ;-)
+>
+Will fix it ASAP.
+
+> Is there documentation that should be updated together with introducing
+> the new feature?
+The patch does not introduce any new d-bus API to obexd, so no doc need to
+be updated.
+
+>
+>> +       if (option_syncevolution == TRUE) {
+>> +               services |= OBEX_SYNCEVOLUTION;
+>> +               bluetooth_init(OBEX_SYNCEVOLUTION, "OBEX server for"
+>> +                               " Syncevolution client", NULL,
+>> +                               SYNCEVOLUTION_CHANNEL, TRUE, FALSE, FALSE,
+>> +                               NULL);
+>> +       }
+>> +
+>
+> Which string is going to appear in the service description (the SDP
+> part)? This one here? Mentioning "SyncML" would be useful. So I suggest
+> "OBEX server for SyncML, using SyncEvolution". Leave out the
+> "SyncEvolution client", because the term client is a) overloaded
+> (SyncML/OBEX/D-Bus) and b) SyncEvolution could be both client and server
+> in this context (SAN => SyncML client, SyncML message => SyncML server).
+>
+OK. Will expose service name as "OBEX server for SyncML, using SyncEvolution"
+since ProviderName attribute is not supported by obexd now.
