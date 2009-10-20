@@ -1,58 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 20 Oct 2009 16:38:46 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Valmantas =?iso-8859-15?Q?Palik=A8a?= <walmis@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Corruption in bluetoothd if started when adapter was rfkilled
-Message-ID: <20091020133610.GA14042@jh-x301>
-References: <1255696908.12027.15.camel@walmis-laptop>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="SWTRyWv/ijrBap1m"
-In-Reply-To: <1255696908.12027.15.camel@walmis-laptop>
+In-Reply-To: <ac8af0be0910200205q3c3b57a6o4bd66870c8c4778a@mail.gmail.com>
+References: <1256007499-19250-1-git-send-email-forrest.zhao@intel.com>
+	 <1256023119.9142.19.camel@pohly-mobl1.ikn.intel.com>
+	 <ac8af0be0910200205q3c3b57a6o4bd66870c8c4778a@mail.gmail.com>
+Date: Tue, 20 Oct 2009 11:18:33 -0200
+Message-ID: <aa32413d0910200618p2fe3a940j304a5e598b0a04ac@mail.gmail.com>
+Subject: Re: [PATCH] Implements the OBEX server/SyncML client binding for
+	syncEvolution (http://syncevolution.org/).
+From: =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@gmail.com>
+To: Zhao Forrest <forrest.zhao@gmail.com>
+Cc: Patrick Ohly <patrick.ohly@intel.com>,
+	"Zhao, Forrest" <forrest.zhao@intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Tue, Oct 20, 2009 at 7:05 AM, Zhao Forrest <forrest.zhao@gmail.com> wrote:
+>>> --- a/src/main.c
+>>> +++ b/src/main.c
+>>> @@ -53,6 +53,7 @@
+>>>  #define OPP_CHANNEL    9
+>>>  #define FTP_CHANNEL    10
+>>>  #define PBAP_CHANNEL   15
+>>> +#define SYNCEVOLUTION_CHANNEL  16
+>>>  #define PCSUITE_CHANNEL        24
+>>
+>> Do we want to call this "SYNCEVOLUTION" or "SYNCML"? Both has pros and
+>> cons. Treating it as generic SyncML capability hides the detail that
+>> it's currently based on SyncEvolution. Exposing SyncEvolution itself
+>> would allow to activate multiple different SyncML implementations at the
+>> same time.
+>>
+>> My preference would be to keep it as is, but I wanted to ask anyway.
+> I have the same idea as you do, and prefer to keep it as "SYNCEVOLUTION".
+>
+>>
+>> Off topic: what is the "PC Suite Services server"?
+>>
+> It's Nokia OBEX PC Suite Services. Johan may know more details about it.
+>
+>>> +       { "syncevolution", 'e', 0, G_OPTION_ARG_NONE, &option_syncevolution,
+>>> +                               "Enable OBEX server for Syncevolution client" },
+>>
+>> Mind the spelling: "syncevolution" (lower case) is the command line
+>> tool, "SyncEvolution" (camel case) the project. "Syncevolution" is a
+>> typo ;-)
+>>
+> Will fix it ASAP.
+>
+>> Is there documentation that should be updated together with introducing
+>> the new feature?
+> The patch does not introduce any new d-bus API to obexd, so no doc need to
+> be updated.
+>
+>>
+>>> +       if (option_syncevolution == TRUE) {
+>>> +               services |= OBEX_SYNCEVOLUTION;
+>>> +               bluetooth_init(OBEX_SYNCEVOLUTION, "OBEX server for"
+>>> +                               " Syncevolution client", NULL,
+>>> +                               SYNCEVOLUTION_CHANNEL, TRUE, FALSE, FALSE,
+>>> +                               NULL);
+>>> +       }
+>>> +
+>>
+>> Which string is going to appear in the service description (the SDP
+>> part)? This one here? Mentioning "SyncML" would be useful. So I suggest
+>> "OBEX server for SyncML, using SyncEvolution". Leave out the
+>> "SyncEvolution client", because the term client is a) overloaded
+>> (SyncML/OBEX/D-Bus) and b) SyncEvolution could be both client and server
+>> in this context (SAN => SyncML client, SyncML message => SyncML server).
+>>
+> OK. Will expose service name as "OBEX server for SyncML, using SyncEvolution"
+> since ProviderName attribute is not supported by obexd now.
 
---SWTRyWv/ijrBap1m
-Content-Type: text/plain; charset=iso-8859-15
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+If it's consensus the right way would be exposing SyncEvolution
+through ProviderName, please add a comment to the code telling that,
+so someone remember to fix it by the time obexd supports it.
 
-Hi,
-
-On Fri, Oct 16, 2009, Valmantas Palik�a wrote:
-> Steps to reproduce:
-> 1. rfkill block bluetooth
-> 2. start bluetoothd
-> 3. kill bluetoothd
-
-I don't seem to have rfkill support (at least using that command) on my
-laptop so I can't verify this fix, but could you try the attached patch
-and see if it resolves the issue? The problem seems to be that in this use
-case we never load/probe the adapter drivers but still call their remove
-callbacks when the adapter initialization fails. This causes some drivers
-to call btd_adapter_unref on adapter objects for which they do not own a
-reference.
-
-Johan
-
---SWTRyWv/ijrBap1m
-Content-Type: text/x-diff; charset=us-ascii
-Content-Disposition: attachment; filename="adapter-init.patch"
-
-diff --git a/src/adapter.c b/src/adapter.c
-index ab07ca7..d225b86 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2472,7 +2472,8 @@ void adapter_remove(struct btd_adapter *adapter)
- 		device_remove(l->data, FALSE);
- 	g_slist_free(adapter->devices);
- 
--	unload_drivers(adapter);
-+	if (adapter->initialized)
-+		unload_drivers(adapter);
- 
- 	/* Return adapter to down state if it was not up on init */
- 	if (adapter->up && !adapter->already_up)
-
---SWTRyWv/ijrBap1m--
+-- 
+João Paulo Rechi Vita
+MSc Computer Science Student
+Computer Engineer
+IC / Unicamp
+http://jprvita.wordpress.com/
