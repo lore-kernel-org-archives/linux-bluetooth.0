@@ -1,50 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-From: jaikumar@google.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Jaikumar Ganesh <jaikumar@google.com>
-Subject: [PATCH] Fix SDP handling when the SDP record is modified on remote device.
-Date: Thu, 22 Oct 2009 15:46:27 -0700
-Message-Id: <1256251587-18043-1-git-send-email-jaikumar@google.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: David Vrabel <david.vrabel@csr.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org, David Vrabel <david.vrabel@csr.com>
+Subject: [PATCH] bluetooth: don't DMA to stack in btsdio driver
+Date: Wed, 21 Oct 2009 16:41:40 +0000
+Message-Id: <1256143300-16149-1-git-send-email-david.vrabel@csr.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Jaikumar Ganesh <jaikumar@google.com>
+sdio_read() may use DMA so read the Type-A header into a kmalloc'd
+buffer instead of an on-stack buffer (which results in a DMA API
+warning).
 
-We invalidate the in-memory SDP records list only when a profile
-is added or removed. So when a SDP record attribute like the rfcomm
-channel number is modified on the remote device, we will miss the update.
+Signed-off-by: David Vrabel <david.vrabel@csr.com>
 ---
- src/device.c |   10 +++++-----
- 1 files changed, 5 insertions(+), 5 deletions(-)
+ drivers/bluetooth/btsdio.c |   34 +++++++++++++++++++++-------------
+ 1 files changed, 21 insertions(+), 13 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index 63f35de..6cb9641 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1313,11 +1313,6 @@ static void search_cb(sdp_list_t *recs, int err, gpointer user_data)
+diff --git a/drivers/bluetooth/btsdio.c b/drivers/bluetooth/btsdio.c
+index 7e29827..70468a2 100644
+--- a/drivers/bluetooth/btsdio.c
++++ b/drivers/bluetooth/btsdio.c
+@@ -54,6 +54,7 @@ MODULE_DEVICE_TABLE(sdio, btsdio_table);
+ struct btsdio_data {
+ 	struct hci_dev   *hdev;
+ 	struct sdio_func *func;
++	u8 *hdr_buf;
  
- 	update_services(req, recs);
+ 	struct work_struct work;
  
--	if (!req->profiles_added && !req->profiles_removed) {
--		debug("%s: No service update", device->path);
--		goto proceed;
--	}
--
- 	if (device->tmp_records && req->records) {
- 		sdp_list_free(device->tmp_records,
- 					(sdp_free_func_t) sdp_record_free);
-@@ -1325,6 +1320,11 @@ static void search_cb(sdp_list_t *recs, int err, gpointer user_data)
- 		req->records = NULL;
- 	}
+@@ -122,7 +123,7 @@ static void btsdio_work(struct work_struct *work)
  
-+	if (!req->profiles_added && !req->profiles_removed) {
-+		debug("%s: No service update", device->path);
-+		goto proceed;
-+	}
+ static int btsdio_rx_packet(struct btsdio_data *data)
+ {
+-	u8 hdr[4] __attribute__ ((aligned(4)));
++	u8 *hdr = data->hdr_buf;
+ 	struct sk_buff *skb;
+ 	int err, len;
+ 
+@@ -299,9 +300,9 @@ static int btsdio_probe(struct sdio_func *func,
+ 				const struct sdio_device_id *id)
+ {
+ 	struct btsdio_data *data;
+-	struct hci_dev *hdev;
++	struct hci_dev *hdev = NULL;
+ 	struct sdio_func_tuple *tuple = func->tuples;
+-	int err;
++	int err = -ENOMEM;
+ 
+ 	BT_DBG("func %p id %p class 0x%04x", func, id, func->class);
+ 
+@@ -312,7 +313,11 @@ static int btsdio_probe(struct sdio_func *func,
+ 
+ 	data = kzalloc(sizeof(*data), GFP_KERNEL);
+ 	if (!data)
+-		return -ENOMEM;
++		goto error;
 +
- 	/* Probe matching drivers for services added */
- 	if (req->profiles_added)
- 		device_probe_drivers(device, req->profiles_added);
++	data->hdr_buf = kmalloc(4, GFP_KERNEL);
++	if (!data->hdr_buf)
++		goto error;
+ 
+ 	data->func = func;
+ 
+@@ -321,10 +326,8 @@ static int btsdio_probe(struct sdio_func *func,
+ 	skb_queue_head_init(&data->txq);
+ 
+ 	hdev = hci_alloc_dev();
+-	if (!hdev) {
+-		kfree(data);
+-		return -ENOMEM;
+-	}
++	if (!hdev)
++		goto error;
+ 
+ 	hdev->type = HCI_SDIO;
+ 	hdev->driver_data = data;
+@@ -342,15 +345,20 @@ static int btsdio_probe(struct sdio_func *func,
+ 	hdev->owner = THIS_MODULE;
+ 
+ 	err = hci_register_dev(hdev);
+-	if (err < 0) {
+-		hci_free_dev(hdev);
+-		kfree(data);
+-		return err;
+-	}
++	if (err < 0)
++		goto error;
+ 
+ 	sdio_set_drvdata(func, data);
+ 
+ 	return 0;
++error:
++	if (data) {
++		if (hdev)
++			hci_free_dev(hdev);
++		kfree(data->hdr_buf);
++		kfree(data);
++	}
++	return err;
+ }
+ 
+ static void btsdio_remove(struct sdio_func *func)
 -- 
-1.6.2.3
-
+1.6.3.3
