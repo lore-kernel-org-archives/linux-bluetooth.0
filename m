@@ -1,57 +1,115 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 23 Oct 2009 02:58:58 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jaikumar Ganesh <jaikumar@google.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Update SDP storage records when a record is deleted.
-Message-ID: <20091022235858.GA20063@jh-x301>
-References: <1256253562-22532-1-git-send-email-jaikumar@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1256253562-22532-1-git-send-email-jaikumar@google.com>
+From: Jaikumar Ganesh <jaikumar@google.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jaikumar Ganesh <jaikumar@google.com>
+Subject: [PATCH] Update SDP storage records when a record is deleted.
+Date: Thu, 22 Oct 2009 16:19:22 -0700
+Message-Id: <1256253562-22532-1-git-send-email-jaikumar@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaikumar,
+When a SDP record is deleted at the remote end, we update
+the storage only if we have a device driver registered for that UUID.
+Update the cache in all cases.
+---
+ src/device.c |   48 +++++++++++++++++++++++++++---------------------
+ 1 files changed, 27 insertions(+), 21 deletions(-)
 
-A few quick coments on this:
+diff --git a/src/device.c b/src/device.c
+index 63f35de..9386681 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1110,19 +1110,37 @@ void device_probe_drivers(struct btd_device *device, GSList *profiles)
+ 	}
+ }
+ 
+-static void device_remove_drivers(struct btd_device *device, GSList *uuids)
+-{
++static void update_service_records(struct btd_device *device) {
+ 	struct btd_adapter *adapter = device_get_adapter(device);
+-	GSList *list, *next;
+-	char srcaddr[18], dstaddr[18];
+ 	bdaddr_t src;
+-	sdp_list_t *records;
++	sdp_list_t *records, *seq;
++	sdp_record_t *rec;
++	char srcaddr[18], dstaddr[18];
++	GSList *l;
++	const char *uuid;
+ 
+ 	adapter_get_address(adapter, &src);
+ 	ba2str(&src, srcaddr);
+ 	ba2str(&device->bdaddr, dstaddr);
+ 
+ 	records = read_records(&src, &device->bdaddr);
++	for (l = device->uuids; l; l = l->next) {
++		uuid = l->data;
++		rec = find_record_in_list(records, uuid);
++		if (rec)
++			records = sdp_list_remove(records, rec);
++	}
++	for (seq = records; seq; seq = seq->next) {
++		rec = (sdp_record_t *) seq->data;
++		delete_record(srcaddr, dstaddr, rec->handle);
++	}
++	if (records)
++		sdp_list_free(records, (sdp_free_func_t) sdp_record_free);
++}
++
++static void device_remove_drivers(struct btd_device *device, GSList *uuids)
++{
++	GSList *list, *next;
+ 
+ 	debug("Remove drivers for %s", device->path);
+ 
+@@ -1134,36 +1152,22 @@ static void device_remove_drivers(struct btd_device *device, GSList *uuids)
+ 		next = list->next;
+ 
+ 		for (uuid = driver->uuids; *uuid; uuid++) {
+-			sdp_record_t *rec;
+-
+ 			if (!g_slist_find_custom(uuids, *uuid,
+ 					(GCompareFunc) strcasecmp))
+ 				continue;
+ 
+-			debug("UUID %s was removed from device %s",
+-							*uuid, dstaddr);
++			debug("UUID %s was removed from device path %s",
++							*uuid, device->path);
+ 
+ 			driver->remove(device);
+ 			device->drivers = g_slist_remove(device->drivers,
+ 								driver_data);
+ 			g_free(driver_data);
+ 
+-			rec = find_record_in_list(records, *uuid);
+-			if (!rec)
+-				break;
+-
+-			delete_record(srcaddr, dstaddr, rec->handle);
+-
+-			records = sdp_list_remove(records, rec);
+-			sdp_record_free(rec);
+-
+ 			break;
+ 		}
+ 	}
+ 
+-	if (records)
+-		sdp_list_free(records, (sdp_free_func_t) sdp_record_free);
+-
+ 	for (list = uuids; list; list = list->next)
+ 		device->uuids = g_slist_remove(device->uuids, list->data);
+ }
+@@ -1333,6 +1337,8 @@ static void search_cb(sdp_list_t *recs, int err, gpointer user_data)
+ 	if (req->profiles_removed)
+ 		device_remove_drivers(device, req->profiles_removed);
+ 
++	update_service_records(device);
++
+ 	/* Propagate services changes */
+ 	services_changed(req->device);
+ 
+-- 
+1.6.2.3
 
-On Thu, Oct 22, 2009, Jaikumar Ganesh wrote:
-> +static void update_service_records(struct btd_device *device) {
-
-Coding style: opening bracket of a function on its own line.
-
->  	records = read_records(&src, &device->bdaddr);
-> +	for (l = device->uuids; l; l = l->next) {
-> +		uuid = l->data;
-> +		rec = find_record_in_list(records, uuid);
-> +		if (rec)
-> +			records = sdp_list_remove(records, rec);
-> +	}
-
-It looks like you're leaking memory here. I guess rec should be freed
-after the sdp_list_remove.
-
-> +	for (seq = records; seq; seq = seq->next) {
-> +		rec = (sdp_record_t *) seq->data;
-
-Since seq->data is void* the cast is unnecessary here.
-
-> +		delete_record(srcaddr, dstaddr, rec->handle);
-> +	}
-> +	if (records)
-> +		sdp_list_free(records, (sdp_free_func_t) sdp_record_free);
-> +}
-
-Coding style: I'd add empty lines between the for-loops as well as before
-the if-statement here.
-
-Other than those issues one thing that bothers me a little is that it
-seems the req->profiles_removed list isn't used anymore at this point but
-a list of removed records is built from scratch a second time. Are you
-sure that this existing list of removed UUIDs couldn't be used somehow to
-make the code more efficient? It might well be that this I'm missing
-something and this list can't be used but I thought it'd be good to check
-that you've considered this possibility nevertheless.
-
-Johan
