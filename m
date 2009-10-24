@@ -1,33 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 24 Oct 2009 17:13:18 +0200
-From: Andrea Veri <andrea.veri89@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: rfkill read / write access needs to be enabled for normal users
-Message-ID: <20091024171318.345c2bbf@bluepaper>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Message-ID: <4AE2D292.1050709@pardus.org.tr>
+Date: Sat, 24 Oct 2009 13:10:26 +0300
+From: =?UTF-8?B?T3phbiDDh2HEn2xheWFu?= <ozan@pardus.org.tr>
+MIME-Version: 1.0
+To: Mario Limonciello <mario_limonciello@dell.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: hid2hci rules breaks standard USB dell mouses
+References: <4AE18EA3.50701@pardus.org.tr> <4AE1E1E8.3080902@dell.com>
+In-Reply-To: <4AE1E1E8.3080902@dell.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-hi,
+Mario Limonciello wrote:
+> Don't use the rules and tool in bluez, they're broke.
+>
+> Use the rules in udev.
+>
+>   
 
-while working on gnome-bluetooth for Debian, I noticed that rfkill's
-read / write access needs to be enabled for normal users.
+So why do we still have that broken tool and rules in bluez? Either they
+should be in sync with udev or it should be dropped.
 
-There is a patch for this already:
+Thanks,
 
-KERNEL=="rfkill", ENV{ACL_MANAGE}="1"
-
-This is done through an udev rule, but I don't think this is the best
-way to have it fixed.
-
-I guess that having a fix included into bluez itself would make the
-trick IMHO.
-
-Is there someone working on this already? if not, someone can suggest
-me another way to have this fixed without having to use an udev rule?
-
-Thanks for your time,
-
-
-Andrea
