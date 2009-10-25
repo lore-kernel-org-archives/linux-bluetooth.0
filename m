@@ -1,76 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
+From: Kilian Lackhove <Kilian.Lackhove@web.de>
+To: linux-bluetooth@vger.kernel.org
+Subject: Connecting Headset results in "FD error: POLLHUP"
+Date: Sun, 25 Oct 2009 14:48:29 +0100
 MIME-Version: 1.0
-In-Reply-To: <2d5a2c100910231044u6a6c65e0ka8258a6f65d08f41@mail.gmail.com>
-References: <1256253562-22532-1-git-send-email-jaikumar@google.com>
-	<2d5a2c100910230649u1946e632qa4c50b33b6654218@mail.gmail.com>
-	<e8892a6a0910230817l6f096f70s4de1fe534799de86@mail.gmail.com>
-	<2d5a2c100910231044u6a6c65e0ka8258a6f65d08f41@mail.gmail.com>
-From: Jaikumar Ganesh <jaikumar@google.com>
-Date: Mon, 26 Oct 2009 08:20:59 -0700
-Message-ID: <e8892a6a0910260820g43b4f688g2c33d7d1ae771d07@mail.gmail.com>
-Subject: Re: [PATCH] Update SDP storage records when a record is deleted.
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200910251448.29160.Kilian.Lackhove@web.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz:
+Hello List!
 
-On Fri, Oct 23, 2009 at 10:44 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi,
->
-> On Fri, Oct 23, 2009 at 12:17 PM, Jaikumar Ganesh <jaikumar@google.com> wrote:
-> >
-> > My mail to linux bluetooth bounced yesterday.  Sending it again.
-> >
-> >    The req->profiles_removed gets updated from device->uuids.
-> > However, in the case, where we are paired with the remote device and
-> > we unpair and then repair, since we will free device->uuids on the
-> > unpair, the req->profiles_removed won't get updated after the SDP
-> > query on repair. And so we would need to update the storage from
-> > device->uuids.
->
-> Im not sure if I get you right, but if you are saying that when device
-> object is gone profiles_removed is empty that is the a new device and
-> we shouldn't have any profile at that point for consistence, so either
-> we remove the sdp cache on device_remove_stored or we never remove
-> records from the cache. Perhaps the record cache is really useless and
-> we should only cache the uuids information and query the record on
-> every connect attempt (we are going to connect anyway so the cost is
-> about the same.)
+I am trying to connect a "Plantronics Explorer 230" Headset to my PC. The 
+Bluetooth adapter is a "Gigabyte GN-BTD02" and supports Bluetooth 1.2 and the 
+hsp profile. An apple wireless keyboard pro is also connected to the computer.
 
-When the device is removed, we remove the cache and remove the device->uuids
-value. So when the device is created the next time, we cannot depend on
-the profiles_removed value, we need to reconstruct from device->uuids.
-device_remove_drivers call is based on the profiles_removed flag and hence that
-call will never be made, when a new device is created.
+I am running arch linux with bluez 4.56-1 and pulseaudio 0.9.15-1 on kernel 
+2.6.31.4-1.
 
-My change removes the dependency of SDP records and the probe_drivers,
-Thus, removal of SDP records doesn't depend on the profiles_removed flag
-but rather uses device->uuids directly.
+The headset was successfully paired using gnome-bluetooth applet.
+According to the bluez-wiki i entered in pacmd:
+load-module module-bluetooth-device profile=hsp sink_name=fred 
+address=00:23:7F:35:XX:XX
+wich doesnt produce any output in pacmd
 
-profiles_added and profiles_removed flags are useful in the case where the user
-calls discover services on an already created device and there are
-changes in the SDP
-records.
+Unloading the module module-bluetooth-discover didnt change anything.
 
->
-> > Since req->profiles_removed would be empty, device_remove_drivers
-> > won't get called. Also I believe it makes sense to have 2 functions,
-> > even though there is slight overhead, since the deletion of SDP
-> > records from storage, and removing device_probe_drivers are 2 distinct
-> > operations.
->
-> Maybe if you called it on device_remove_stored too, but if we are
-> going to validate that information on every connection attempt I doubt
-> this is useful in the end.
->
-> --
-> Luiz Augusto von Dentz
-> Engenheiro de Computação
+this is the output of pulseaudio -v:
+http://pastebin.com/m26a5fcf9
 
-Thanks
-Jaikumar
+this is what hcidump says:
+---*snip*---
+< HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
+> HCI Event: Command Status (0x0f) plen 4
+> HCI Event: Synchronous Connect Complete (0x2c) plen 17
+
+This is hciconfig hci0 -a:   
+	Type: USB
+        BD Address: 00:0F:EA:9A:A3:4B ACL MTU: 192:8 SCO MTU: 64:8
+        UP RUNNING PSCAN ISCAN
+        RX bytes:130180 acl:6734 sco:0 events:99 errors:0
+        TX bytes:1268 acl:35 sco:0 commands:43 errors:0
+        Features: 0xff 0xff 0x8f 0xf8 0x18 0x18 0x00 0x80
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+        Name: 'rechenknecht'
+        Class: 0x4a0104
+        Service Classes: Networking, Capturing, Telephony
+        Device Class: Computer, Desktop workstation
+        HCI Ver: 1.2 (0x2) HCI Rev: 0x512 LMP Ver: 1.2 (0x2) LMP Subver: 0x512
+        Manufacturer: Cambridge Silicon Radio (10)
+
+This is the output ob bluetoothd -d
+http://pastebin.com/d2db878f7
+
+and this is the vendors description of my bluetooth adapter:
+http://pastebin.com/d3ad02c8
+
+Regards, Kilian
