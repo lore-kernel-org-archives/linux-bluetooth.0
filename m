@@ -1,66 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-From: Thadeu Lima de Souza Cascardo <cascardo@holoscopio.com>
-To: marcel@holtmann.org
-Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org, Thadeu Lima de Souza Cascardo <cascardo@holoscopio.com>
-Subject: [PATCH] bluetooth: remove useless variable in virtual hci driver
-Date: Mon, 26 Oct 2009 13:59:19 -0200
-Message-Id: <1256572759-3042-1-git-send-email-cascardo@holoscopio.com>
+MIME-Version: 1.0
+In-Reply-To: <2d5a2c100910231044u6a6c65e0ka8258a6f65d08f41@mail.gmail.com>
+References: <1256253562-22532-1-git-send-email-jaikumar@google.com>
+	<2d5a2c100910230649u1946e632qa4c50b33b6654218@mail.gmail.com>
+	<e8892a6a0910230817l6f096f70s4de1fe534799de86@mail.gmail.com>
+	<2d5a2c100910231044u6a6c65e0ka8258a6f65d08f41@mail.gmail.com>
+From: Jaikumar Ganesh <jaikumar@google.com>
+Date: Mon, 26 Oct 2009 08:20:59 -0700
+Message-ID: <e8892a6a0910260820g43b4f688g2c33d7d1ae771d07@mail.gmail.com>
+Subject: Re: [PATCH] Update SDP storage records when a record is deleted.
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Commit ac28494c has removed the option to give a minor number as
-parameter for VHCI driver. Remove the variable used for that parameter.
-Printing the requested minor number, which would always be
-MISC_DYNAMIC_MINOR, is not needed. And return the error code returned by
-misc_register, instead of -EIO in init function.
+Hi Luiz:
 
-Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@holoscopio.com>
----
- drivers/bluetooth/hci_vhci.c |   15 +++------------
- 1 files changed, 3 insertions(+), 12 deletions(-)
+On Fri, Oct 23, 2009 at 10:44 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi,
+>
+> On Fri, Oct 23, 2009 at 12:17 PM, Jaikumar Ganesh <jaikumar@google.com> wrote:
+> >
+> > My mail to linux bluetooth bounced yesterday.  Sending it again.
+> >
+> >    The req->profiles_removed gets updated from device->uuids.
+> > However, in the case, where we are paired with the remote device and
+> > we unpair and then repair, since we will free device->uuids on the
+> > unpair, the req->profiles_removed won't get updated after the SDP
+> > query on repair. And so we would need to update the storage from
+> > device->uuids.
+>
+> Im not sure if I get you right, but if you are saying that when device
+> object is gone profiles_removed is empty that is the a new device and
+> we shouldn't have any profile at that point for consistence, so either
+> we remove the sdp cache on device_remove_stored or we never remove
+> records from the cache. Perhaps the record cache is really useless and
+> we should only cache the uuids information and query the record on
+> every connect attempt (we are going to connect anyway so the cost is
+> about the same.)
 
-diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
-index d5cde6d..8fed210 100644
---- a/drivers/bluetooth/hci_vhci.c
-+++ b/drivers/bluetooth/hci_vhci.c
-@@ -41,8 +41,6 @@
- 
- #define VERSION "1.3"
- 
--static int minor = MISC_DYNAMIC_MINOR;
--
- struct vhci_data {
- 	struct hci_dev *hdev;
- 
-@@ -292,7 +290,7 @@ static const struct file_operations vhci_fops = {
- 	.release	= vhci_release,
- };
- 
--static struct miscdevice vhci_miscdev= {
-+static struct miscdevice vhci_miscdev = {
- 	.name	= "vhci",
- 	.fops	= &vhci_fops,
- 	.minor	= MISC_DYNAMIC_MINOR,
-@@ -301,19 +299,12 @@ static struct miscdevice vhci_miscdev= {
- static int __init vhci_init(void)
- {
- 	BT_INFO("Virtual HCI driver ver %s", VERSION);
--
--	if (misc_register(&vhci_miscdev) < 0) {
--		BT_ERR("Can't register misc device with minor %d", minor);
--		return -EIO;
--	}
--
--	return 0;
-+	return misc_register(&vhci_miscdev);
- }
- 
- static void __exit vhci_exit(void)
- {
--	if (misc_deregister(&vhci_miscdev) < 0)
--		BT_ERR("Can't unregister misc device with minor %d", minor);
-+	misc_deregister(&vhci_miscdev);
- }
- 
- module_init(vhci_init);
--- 
-1.6.3.3
+When the device is removed, we remove the cache and remove the device->uuids
+value. So when the device is created the next time, we cannot depend on
+the profiles_removed value, we need to reconstruct from device->uuids.
+device_remove_drivers call is based on the profiles_removed flag and hence that
+call will never be made, when a new device is created.
+
+My change removes the dependency of SDP records and the probe_drivers,
+Thus, removal of SDP records doesn't depend on the profiles_removed flag
+but rather uses device->uuids directly.
+
+profiles_added and profiles_removed flags are useful in the case where the user
+calls discover services on an already created device and there are
+changes in the SDP
+records.
+
+>
+> > Since req->profiles_removed would be empty, device_remove_drivers
+> > won't get called. Also I believe it makes sense to have 2 functions,
+> > even though there is slight overhead, since the deletion of SDP
+> > records from storage, and removing device_probe_drivers are 2 distinct
+> > operations.
+>
+> Maybe if you called it on device_remove_stored too, but if we are
+> going to validate that information on every connection attempt I doubt
+> this is useful in the end.
+>
+> --
+> Luiz Augusto von Dentz
+> Engenheiro de Computação
+
+Thanks
+Jaikumar
