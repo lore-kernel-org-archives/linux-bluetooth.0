@@ -1,69 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1256648475.2367.106.camel@localhost.localdomain>
-References: <1256648475.2367.106.camel@localhost.localdomain>
-Date: Tue, 27 Oct 2009 17:32:20 -0300
-Message-ID: <2d5a2c100910271332p1a036037x7ae1db9276c6ce1e@mail.gmail.com>
-Subject: Re: Transient devices
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: David Vrabel <david.vrabel@csr.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org, David Vrabel <david.vrabel@csr.com>
+Subject: [PATCH] bluetooth: don't DMA to stack in btsdio driver
+Date: Tue, 27 Oct 2009 14:28:31 +0000
+Message-Id: <1256653711-17959-1-git-send-email-david.vrabel@csr.com>
+In-Reply-To: <1256143300-16149-1-git-send-email-david.vrabel@csr.com>
+References: <1256143300-16149-1-git-send-email-david.vrabel@csr.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+sdio_read() may use DMA so read the Type-A header into a kmalloc'd
+buffer instead of an on-stack buffer (which results in a DMA API
+warning).
 
-On Tue, Oct 27, 2009 at 10:01 AM, Bastien Nocera <hadess@hadess.net> wrote:
-> Heya,
->
-> I've had a few thoughts about some use cases that currently cause
-> problems (or would cause problems) with bluetoothd.
->
->
-> 1) Printer pairing and setup
->
-> The cups backend will create a non-paired device to detect whether
-> devices with a printer class have supported services.
->
-> The problem is that the CUPS backend will not remove the device once
-> done, and the device will now appear in the list of known devices for
-> bluetoothd. In terms of UIs, that means it shows up in the wizard (as
-> it's not paired or setup), but not in the properties, thus can't be
-> removed from the list.
->
-> It would be nice to receive this data and have it cached client-side
-> instead, like we do for discovery results.
+Signed-off-by: David Vrabel <david.vrabel@csr.com>
+---
+Apply this instead, it frees the header buffer.
 
-Not sure if Im following, but you can always cache the device
-properties even if the device was created by CUPs. Also I think any
-other process willing to do its own wizard for bluetooth is a bad idea
-specially if you are caching some data in the application side, btw,
-why do you need to cache this information?
+David
 
-I believe the most convenient is always using the applet to create
-devices in a way that you virtually plug devices, so other subsystems
-doesn't have to care about doing this, actually this very similar to
-what macos does for 'Connect Network', what about 'Connect Printer'?
+ drivers/bluetooth/btsdio.c |   35 ++++++++++++++++++++++-------------
+ 1 files changed, 22 insertions(+), 13 deletions(-)
 
-I know this cause an extra step to really enable the device, but
-remember bluetooth is not really connected all the time.
-
-> 2) Adapter provided devices
->
-> Although we don't currently have code for that, it would be nice to
-> handle the possibility.
->
-> Some adapters provide a way to store link keys, and other data
-> pertaining to input devices.
->
-> The problem with setting those up is that the pairing will be permanent
-> on the bluetoothd side. We should make sure the associations go away
-> when the adapter goes down.
-
-The link key is per adapter and afaik there is no way to use it with
-another adapter.
-
+diff --git a/drivers/bluetooth/btsdio.c b/drivers/bluetooth/btsdio.c
+index 7e29827..59d0d3b 100644
+--- a/drivers/bluetooth/btsdio.c
++++ b/drivers/bluetooth/btsdio.c
+@@ -54,6 +54,7 @@ MODULE_DEVICE_TABLE(sdio, btsdio_table);
+ struct btsdio_data {
+ 	struct hci_dev   *hdev;
+ 	struct sdio_func *func;
++	u8 *hdr_buf;
+ 
+ 	struct work_struct work;
+ 
+@@ -122,7 +123,7 @@ static void btsdio_work(struct work_struct *work)
+ 
+ static int btsdio_rx_packet(struct btsdio_data *data)
+ {
+-	u8 hdr[4] __attribute__ ((aligned(4)));
++	u8 *hdr = data->hdr_buf;
+ 	struct sk_buff *skb;
+ 	int err, len;
+ 
+@@ -292,6 +293,7 @@ static void btsdio_destruct(struct hci_dev *hdev)
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
++	kfree(data->hdr_buf);
+ 	kfree(data);
+ }
+ 
+@@ -299,9 +301,9 @@ static int btsdio_probe(struct sdio_func *func,
+ 				const struct sdio_device_id *id)
+ {
+ 	struct btsdio_data *data;
+-	struct hci_dev *hdev;
++	struct hci_dev *hdev = NULL;
+ 	struct sdio_func_tuple *tuple = func->tuples;
+-	int err;
++	int err = -ENOMEM;
+ 
+ 	BT_DBG("func %p id %p class 0x%04x", func, id, func->class);
+ 
+@@ -312,7 +314,11 @@ static int btsdio_probe(struct sdio_func *func,
+ 
+ 	data = kzalloc(sizeof(*data), GFP_KERNEL);
+ 	if (!data)
+-		return -ENOMEM;
++		goto error;
++
++	data->hdr_buf = kmalloc(4, GFP_KERNEL);
++	if (!data->hdr_buf)
++		goto error;
+ 
+ 	data->func = func;
+ 
+@@ -321,10 +327,8 @@ static int btsdio_probe(struct sdio_func *func,
+ 	skb_queue_head_init(&data->txq);
+ 
+ 	hdev = hci_alloc_dev();
+-	if (!hdev) {
+-		kfree(data);
+-		return -ENOMEM;
+-	}
++	if (!hdev)
++		goto error;
+ 
+ 	hdev->type = HCI_SDIO;
+ 	hdev->driver_data = data;
+@@ -342,15 +346,20 @@ static int btsdio_probe(struct sdio_func *func,
+ 	hdev->owner = THIS_MODULE;
+ 
+ 	err = hci_register_dev(hdev);
+-	if (err < 0) {
+-		hci_free_dev(hdev);
+-		kfree(data);
+-		return err;
+-	}
++	if (err < 0)
++		goto error;
+ 
+ 	sdio_set_drvdata(func, data);
+ 
+ 	return 0;
++error:
++	if (data) {
++		if (hdev)
++			hci_free_dev(hdev);
++		kfree(data->hdr_buf);
++		kfree(data);
++	}
++	return err;
+ }
+ 
+ static void btsdio_remove(struct sdio_func *func)
 -- 
-Luiz Augusto von Dentz
-Engenheiro de Computação
+1.6.3.3
