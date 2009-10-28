@@ -1,40 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 29 Oct 2009 01:34:25 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <e8892a6a0910260820g43b4f688g2c33d7d1ae771d07@mail.gmail.com>
+References: <1256253562-22532-1-git-send-email-jaikumar@google.com>
+	<2d5a2c100910230649u1946e632qa4c50b33b6654218@mail.gmail.com>
+	<e8892a6a0910230817l6f096f70s4de1fe534799de86@mail.gmail.com>
+	<2d5a2c100910231044u6a6c65e0ka8258a6f65d08f41@mail.gmail.com>
+	<e8892a6a0910260820g43b4f688g2c33d7d1ae771d07@mail.gmail.com>
+From: jaikumar Ganesh <jaikumarg@gmail.com>
+Date: Wed, 28 Oct 2009 12:00:06 -0700
+Message-ID: <ac290f760910281200i4e8f208bwc959fa7fdbe6ae81@mail.gmail.com>
+Subject: Re: [PATCH] Update SDP storage records when a record is deleted.
 To: Jaikumar Ganesh <jaikumar@google.com>
 Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Update SDP storage records when a record is deleted.
-Message-ID: <20091028233425.GA13183@jh-x301>
-References: <1256253562-22532-1-git-send-email-jaikumar@google.com> <2d5a2c100910230649u1946e632qa4c50b33b6654218@mail.gmail.com> <e8892a6a0910230817l6f096f70s4de1fe534799de86@mail.gmail.com> <2d5a2c100910231044u6a6c65e0ka8258a6f65d08f41@mail.gmail.com> <e8892a6a0910260820g43b4f688g2c33d7d1ae771d07@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <e8892a6a0910260820g43b4f688g2c33d7d1ae771d07@mail.gmail.com>
+	linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaikumar,
+Hey Luiz, Johan:
 
-On Mon, Oct 26, 2009, Jaikumar Ganesh wrote:
+On Mon, Oct 26, 2009 at 8:20 AM, Jaikumar Ganesh <jaikumar@google.com> wrote:
+> Hi Luiz:
+>
+> On Fri, Oct 23, 2009 at 10:44 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>>
+>> Hi,
+>>
+>> On Fri, Oct 23, 2009 at 12:17 PM, Jaikumar Ganesh <jaikumar@google.com> wrote:
+>> >
+>> > My mail to linux bluetooth bounced yesterday.  Sending it again.
+>> >
+>> >    The req->profiles_removed gets updated from device->uuids.
+>> > However, in the case, where we are paired with the remote device and
+>> > we unpair and then repair, since we will free device->uuids on the
+>> > unpair, the req->profiles_removed won't get updated after the SDP
+>> > query on repair. And so we would need to update the storage from
+>> > device->uuids.
+>>
+>> Im not sure if I get you right, but if you are saying that when device
+>> object is gone profiles_removed is empty that is the a new device and
+>> we shouldn't have any profile at that point for consistence, so either
+>> we remove the sdp cache on device_remove_stored or we never remove
+>> records from the cache. Perhaps the record cache is really useless and
+>> we should only cache the uuids information and query the record on
+>> every connect attempt (we are going to connect anyway so the cost is
+>> about the same.)
+>
 > When the device is removed, we remove the cache and remove the device->uuids
 > value. So when the device is created the next time, we cannot depend on
 > the profiles_removed value, we need to reconstruct from device->uuids.
 > device_remove_drivers call is based on the profiles_removed flag and hence that
 > call will never be made, when a new device is created.
-> 
+>
 > My change removes the dependency of SDP records and the probe_drivers,
 > Thus, removal of SDP records doesn't depend on the profiles_removed flag
 > but rather uses device->uuids directly.
-> 
-> profiles_added and profiles_removed flags are useful in the case where
-> the user calls discover services on an already created device and there
-> are changes in the SDP records.
+>
+> profiles_added and profiles_removed flags are useful in the case where the user
+> calls discover services on an already created device and there are
+> changes in the SDP
+> records.
+>
+>>
+>> > Since req->profiles_removed would be empty, device_remove_drivers
+>> > won't get called. Also I believe it makes sense to have 2 functions,
+>> > even though there is slight overhead, since the deletion of SDP
+>> > records from storage, and removing device_probe_drivers are 2 distinct
+>> > operations.
+>>
+>> Maybe if you called it on device_remove_stored too, but if we are
+>> going to validate that information on every connection attempt I doubt
+>> this is useful in the end.
+>>
+>> --
+>> Luiz Augusto von Dentz
+>> Engenheiro de Computação
+>
+> Thanks
+> Jaikumar
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
 
-If a device was removed then we shouldn't have any records stored records
-for it left in the cache and so it shouldn't matter that the
-profiles_removed list is empty when the device is recreated again, right?
-It seems there's a bug in the device_remove_stored function in device.c
-since it doesn't remove the record cache, so that's at least something
-that should be fixed.
+Any update on this ?
 
-Johan
+Thanks
+Jaikumar
