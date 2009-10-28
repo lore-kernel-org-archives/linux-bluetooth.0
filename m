@@ -1,91 +1,153 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <e8892a6a0910260820g43b4f688g2c33d7d1ae771d07@mail.gmail.com>
-References: <1256253562-22532-1-git-send-email-jaikumar@google.com>
-	<2d5a2c100910230649u1946e632qa4c50b33b6654218@mail.gmail.com>
-	<e8892a6a0910230817l6f096f70s4de1fe534799de86@mail.gmail.com>
-	<2d5a2c100910231044u6a6c65e0ka8258a6f65d08f41@mail.gmail.com>
-	<e8892a6a0910260820g43b4f688g2c33d7d1ae771d07@mail.gmail.com>
-From: jaikumar Ganesh <jaikumarg@gmail.com>
-Date: Wed, 28 Oct 2009 12:00:06 -0700
-Message-ID: <ac290f760910281200i4e8f208bwc959fa7fdbe6ae81@mail.gmail.com>
-Subject: Re: [PATCH] Update SDP storage records when a record is deleted.
-To: Jaikumar Ganesh <jaikumar@google.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com
+In-Reply-To: <1256743414.6820.33.camel@german-desktop>
+References: <1256730946.6820.14.camel@german-desktop>
+	 <f9d4bd30910280621u2f2102afq4d363b5722ff285@mail.gmail.com>
+	 <1256740999.6820.23.camel@german-desktop>
+	 <4CAA0D07-C612-4AA6-A5D8-1143F8B252AF@gmail.com>
+	 <1256743414.6820.33.camel@german-desktop>
+Date: Wed, 28 Oct 2009 21:07:35 +0530
+Message-ID: <8b5debfa0910280837g7f40ef98i31a46982d3f78793@mail.gmail.com>
+Subject: Re: bluetooth-agent
+From: alok barsode <alokbarsode@gmail.com>
+To: =?ISO-8859-1?Q?Germ=E1n_Pedrosa?=
+	<german.pedrosa@fundacionctic.org>
+Cc: LORENZO ANTONIO BRITO MORALES <lorenzo.brito@gmail.com>,
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hey Luiz, Johan:
+Hi German,
 
-On Mon, Oct 26, 2009 at 8:20 AM, Jaikumar Ganesh <jaikumar@google.com> wrote:
-> Hi Luiz:
+On Wed, Oct 28, 2009 at 8:53 PM, Germán Pedrosa
+<german.pedrosa@fundacionctic.org> wrote:
+> I agree with your point that use JNI would be better than run shell
+> commands from Java code.
 >
-> On Fri, Oct 23, 2009 at 10:44 AM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
+> But here the scenario is totally different: in our architecture the Java
+> components are not in charge to run such a kind of things; there are a
+> set on bash scripts that run some previous deendencies of our system,
+> such as bluetoth-agent.
+
+Are you refering to  /test/agent program ?
+
+Can you register an agent per adapter ? just run ./adapter --agent
+"hciX" 0000 for every 'X' adapter.
+
+Or you can use the python script simple-agent for every adapter  by
+running ./simple-agent hciX
+
+Hope this helps.
+
+Cheers,
+Alok.
+
+>
+> Therefore I'd need to replicate the behaviour explained by Claudio
+> before in this thread, but instead of calling the native api, invoking
+> the command line tool.
+>
+> Best regards,
+>
+> El mié, 28-10-2009 a las 09:09 -0600, LORENZO ANTONIO BRITO MORALES
+> escribió:
+>> im very shure, but the library from java dont support a lot of
+>> commands...
+>> Im developing a system based in bluez , i think is better to code
+>> somethings in c, then use
+>> JINI to use C in java.. i think it will be easier for you doing in
+>> this way, than using a command line from java.
+>
+>> On 28/10/2009, at 08:43 a.m., Germán Pedrosa wrote:
 >>
->> Hi,
->>
->> On Fri, Oct 23, 2009 at 12:17 PM, Jaikumar Ganesh <jaikumar@google.com> wrote:
+>> > Dear Claudio,
 >> >
->> > My mail to linux bluetooth bounced yesterday.  Sending it again.
+>> > thanks for your quick answer.
 >> >
->> >    The req->profiles_removed gets updated from device->uuids.
->> > However, in the case, where we are paired with the remote device and
->> > we unpair and then repair, since we will free device->uuids on the
->> > unpair, the req->profiles_removed won't get updated after the SDP
->> > query on repair. And so we would need to update the storage from
->> > device->uuids.
+>> > But I'm not using BlueZ's API from a C program. We're using Java, so
+>> > I'd
+>> > like to run bluetooh-agent directly from the shell. Is there any way
+>> > to
+>> > handle requests for all dongles using the command line tool?
+>> >
+>> > I tried using --path, but I didn't get any result. Probably because
+>> > I'm
+>> > not sure how the mapping between bluetooth and unix devices work.
+>> >
+>> > Thanks in advance.
+>> >
+>> > Best,
+>> >
+>> >
+>> > El mié, 28-10-2009 a las 11:21 -0200, Claudio Takahasi escribió:
+>> >>
+>> >> Hi German,
+>> >>
+>> >> you can register the same bluetooth-agent to handle requests for
+>> >> all dongles.
+>> >>
+>> >> See simple-agent code under test directory, there is an example how
+>> >> to
+>> >> register agent.
+>> >> Basically you need to call:
+>> >> adapter0.RegisterAgent(path, "DisplayYesNo")
+>> >> adapter1.RegisterAgent(path, "DisplayYesNo")
+>> >> ...
+>> >>
+>> >> There isn't man pages for bluetooth-agent, see agent-api.txt under
+>> >> doc
+>> >> directory.
+>> >>
+>> >> Cheers,
+>> >> krau
+>> >
+>> > On Wed, Oct 28, 2009 at 9:55 AM, Germán Pedrosa
+>> >> <german.pedrosa@fundacionctic.org> wrote:
+>> >>> Hi,
+>> >>>
+>> >>> I am newbie with bluez and I'm developing a research project where I
+>> >>> need to use various Bluetooth USB-dongles.
+>> >>>
+>> >>> I need to deploy an automatic bluetooth pairing by command line
+>> >>> (it is a
+>> >>> project requirement), but the problem is that bluetooth-agent does
+>> >>> only
+>> >>> listen to hci0 device (I mean, if in any case I need to pair with
+>> >>> any
+>> >>> other dongle, bluetooth-agent does not reply).
+>> >>>
+>> >>> Is there any possibility where bluetooth-agent could respond to the
+>> >>> other devices? The man page for bluetooth-agent is missing, and I
+>> >>> have
+>> >>> not found any way to get it.
+>> >>>
+>> >>> Thanks a lot and best regards.
+>> >>>
+>> >>>
+>> >>>
+>> >>> --
+>> >>> To unsubscribe from this list: send the line "unsubscribe linux-
+>> >>> bluetooth" in
+>> >>> the body of a message to majordomo@vger.kernel.org
+>> >>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>> >>>
+>> > --
+>> > Germán Pedrosa <german.pedrosa@fundacionctic.org>
+>> >
+>> > --
+>> > To unsubscribe from this list: send the line "unsubscribe linux-
+>> > bluetooth" in
+>> > the body of a message to majordomo@vger.kernel.org
+>> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >>
->> Im not sure if I get you right, but if you are saying that when device
->> object is gone profiles_removed is empty that is the a new device and
->> we shouldn't have any profile at that point for consistence, so either
->> we remove the sdp cache on device_remove_stored or we never remove
->> records from the cache. Perhaps the record cache is really useless and
->> we should only cache the uuids information and query the record on
->> every connect attempt (we are going to connect anyway so the cost is
->> about the same.)
->
-> When the device is removed, we remove the cache and remove the device->uuids
-> value. So when the device is created the next time, we cannot depend on
-> the profiles_removed value, we need to reconstruct from device->uuids.
-> device_remove_drivers call is based on the profiles_removed flag and hence that
-> call will never be made, when a new device is created.
->
-> My change removes the dependency of SDP records and the probe_drivers,
-> Thus, removal of SDP records doesn't depend on the profiles_removed flag
-> but rather uses device->uuids directly.
->
-> profiles_added and profiles_removed flags are useful in the case where the user
-> calls discover services on an already created device and there are
-> changes in the SDP
-> records.
->
+>> LORENZO ANTONIO BRITO MORALES
+>> lorenzo.brito@gmail.com
+>> lorbrito.blogspot.com
 >>
->> > Since req->profiles_removed would be empty, device_remove_drivers
->> > won't get called. Also I believe it makes sense to have 2 functions,
->> > even though there is slight overhead, since the deletion of SDP
->> > records from storage, and removing device_probe_drivers are 2 distinct
->> > operations.
->>
->> Maybe if you called it on device_remove_stored too, but if we are
->> going to validate that information on every connection attempt I doubt
->> this is useful in the end.
->>
->> --
->> Luiz Augusto von Dentz
->> Engenheiro de Computação
 >
-> Thanks
-> Jaikumar
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
 > the body of a message to majordomo@vger.kernel.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >
-
-Any update on this ?
-
-Thanks
-Jaikumar
