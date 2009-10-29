@@ -1,159 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4AE971D9.2010409@gmail.com>
-Date: Thu, 29 Oct 2009 11:43:37 +0100
-From: sancane <sancane@gmail.com>
+Date: Thu, 29 Oct 2009 02:15:31 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jaikumar Ganesh <jaikumar@google.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Update SDP storage records when a record is deleted.
+Message-ID: <20091029001531.GA14617@jh-x301>
+References: <1256253562-22532-1-git-send-email-jaikumar@google.com> <2d5a2c100910230649u1946e632qa4c50b33b6654218@mail.gmail.com> <e8892a6a0910230817l6f096f70s4de1fe534799de86@mail.gmail.com> <2d5a2c100910231044u6a6c65e0ka8258a6f65d08f41@mail.gmail.com> <e8892a6a0910260820g43b4f688g2c33d7d1ae771d07@mail.gmail.com> <20091028233425.GA13183@jh-x301> <e8892a6a0910281645r39d3b793wa9b9f2cc948da3da@mail.gmail.com> <20091028235434.GA13715@jh-x301> <e8892a6a0910281702y952d88evca1bb6a7674b9de7@mail.gmail.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: ERMT and Streaming mode in L2CAP
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <e8892a6a0910281702y952d88evca1bb6a7674b9de7@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
-I'm programming a MCAP library for Bluez, (it is in beta state yet). I
-need add support for ERTM and Streaming mode to L2CAP sockets and i've
-seen some work included in l2cap kernel module by Gustavo F. Padovan. I
-have downloaded the kernel source from
-git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6.git
-<http://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6.git>
-and compiled it enabling ERTM module parameter to test my current
-implementation of MCAP profile.
-I would like to know which is the current state of ERTM and Streaming
-mode in l2cap and if you are planning to continue the development task
-in above mentioned retransmission modes.
-My tests using ERTM results in kernel oops messages when i try to
-send/receive a buffer data. I tested Streaming mode too but it does not
-do anything when data is sent over L2CAP sockets.
-In [1] i adjunct the kernel oops message when ERTM is used.
 
-Is it possible that i'm doing something wrong?. Next is the code that
-i'm using to set ERTM and Streaming mode in l2cap:
+On Wed, Oct 28, 2009, Jaikumar Ganesh wrote:
+> > On Wed, Oct 28, 2009, Jaikumar Ganesh wrote:
+> >> The SDP cache is  removed when the device is removed. In fact, you
+> >> fixed this a few days back.
+> >
+> > Which commit are you referring to?
+> 
+> Commit number:
+> 
+> 4bec43039626e853489e72149014868f8c8afedc
+> 
+> http://git.kernel.org/?p=bluetooth/bluez.git;a=commit;h=4bec43039626e853489e72149014868f8c8afedc
 
-static int set_sock_options (int sock, uint16_t imtu, uint16_t omtu,
-uint8_t mode) {
-   struct l2cap_options opts;
-   int err;
-   socklen_t optlen = sizeof(opts);
+Ok, so we're talking about different things here. I was talking about
+removing the records from /var/lib/bluetooth/...
 
-   err = getsockopt( sock, SOL_L2CAP, L2CAP_OPTIONS, &opts, &optlen );
-   if (!err) {
-       opts.omtu = omtu;
-       opts.imtu = imtu;
-       opts.mode = mode;
-       MCAP_DBG("Mode %d, fcs %d", opts.mode, opts.fcs);
-       err = setsockopt( sock, SOL_L2CAP, L2CAP_OPTIONS, &opts, optlen );
-   }
-   return err;
+> We can also fix this by removing the on disk SDP records when the
+> device is freed.
+> (I think which is what you suggested - by cache I was interpreting it
+> as in memory cache)
+> Will submit a new patch. Let me know if I read you wrong.
 
-}
+No, you're right. I was referring to the disk cache. I'm glad we have this
+misunderstanding finally sorted out :)
 
-i'm using L2CAP_MODE_ERTM and L2CAP_MODE_STREAMING macros to set the
-l2cap option mode field.
-
-Best regards
-
-[1] http://www.kerneloops.org/submitresult.php?number=858407
-<http://www.kerneloops.org/submitresult.php?number=858407>
-
-Next is the output that i got before kernel error is shown:
-
-HCI sniffer - Bluetooth packet analyzer ver 1.42
-device: hci0 snap_len: 1028 filter: 0xffffffff
-> HCI Event: Connect Request (0x04) plen 10
-   bdaddr 00:0A:94:02:CE:87 class 0x4a0100 type ACL
-< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
-   bdaddr 00:0A:94:02:CE:87 role 0x00
-   Role: Master
-> HCI Event: Command Status (0x0f) plen 4
-   Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
-> HCI Event: Role Change (0x12) plen 8
-   status 0x00 bdaddr 00:0A:94:02:CE:87 role 0x00
-   Role: Master
-> HCI Event: Connect Complete (0x03) plen 11
-   status 0x00 handle 46 bdaddr 00:0A:94:02:CE:87 type ACL encrypt 0x00
-< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
-   handle 46
-> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
-   bdaddr 00:0A:94:02:CE:87 mode 1
-> HCI Event: Command Status (0x0f) plen 4
-   Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 0
-> HCI Event: Max Slots Change (0x1b) plen 3
-   handle 46 slots 5
-> HCI Event: Command Status (0x0f) plen 4
-   Unknown (0x00|0x0000) status 0x00 ncmd 1
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
-   bdaddr 00:0A:94:02:CE:87 mode 2 clkoffset 0x0000
-> HCI Event: Read Remote Supported Features (0x0b) plen 11
-   status 0x00 handle 46
-   Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
-> HCI Event: Command Status (0x0f) plen 4
-   Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
-> ACL data: handle 46 flags 0x02 dlen 10
-   L2CAP(s): Info req: type 2
-< ACL data: handle 46 flags 0x02 dlen 16
-   L2CAP(s): Info rsp: type 2 result 0
-     Extended feature mask 0x00b8
-> HCI Event: Number of Completed Packets (0x13) plen 5
-   handle 46 packets 1
-> ACL data: handle 46 flags 0x02 dlen 10
-   L2CAP(s): Info req: type 3
-< ACL data: handle 46 flags 0x02 dlen 20
-   L2CAP(s): Info rsp: type 3 result 0
-     Unknown (len 8)
-> ACL data: handle 46 flags 0x02 dlen 12
-   L2CAP(s): Connect req: psm 4097 scid 0x0040
-< ACL data: handle 46 flags 0x02 dlen 16
-   L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 1 status 0
-     Connection pending - No futher information available
-< ACL data: handle 46 flags 0x02 dlen 10
-   L2CAP(s): Info req: type 2
-> HCI Event: Remote Name Req Complete (0x07) plen 255
-   status 0x00 bdaddr 00:0A:94:02:CE:87 name 'blueztester-0'
-> HCI Event: Number of Completed Packets (0x13) plen 5
-   handle 46 packets 1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-   handle 46 packets 1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-   handle 46 packets 1
-> ACL data: handle 46 flags 0x02 dlen 16
-   L2CAP(s): Info rsp: type 2 result 0
-     Extended feature mask 0x00b8
-< ACL data: handle 46 flags 0x02 dlen 10
-   L2CAP(s): Info req: type 3
-> HCI Event: Number of Completed Packets (0x13) plen 5
-   handle 46 packets 1
-> ACL data: handle 46 flags 0x02 dlen 20
-   L2CAP(s): Info rsp: type 3 result 0
-     Unknown (len 8)
-< ACL data: handle 46 flags 0x02 dlen 16
-   L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
-     Connection successful
-> HCI Event: Number of Completed Packets (0x13) plen 5
-   handle 46 packets 1
-> ACL data: handle 46 flags 0x02 dlen 23
-   L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 11
-     RFC 0x03 (Reserved)
-< ACL data: handle 46 flags 0x02 dlen 29
-   L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 15
-     MTU 672 RFC 0x03 (Reserved)
-< ACL data: handle 46 flags 0x02 dlen 23
-   L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 11
-     RFC 0x03 (Reserved)
-> HCI Event: Number of Completed Packets (0x13) plen 5
-   handle 46 packets 1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-   handle 46 packets 1
-> ACL data: handle 46 flags 0x02 dlen 29
-   L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 15
-     MTU 672 RFC 0x03 (Reserved)
-> ACL data: handle 46 flags 0x02 dlen 13
-   L2CAP(d): cid 0x0040 len 9 ctrl 0x0000 fcs 0x33e3 [psm 4097]
-     I-frame: Unsegmented TxSeq 0 ReqSeq 0
-     0000: 01 01 00 01 01                                    .....
-< ACL data: handle 46 flags 0x02 dlen 13
-   L2CAP(d): cid 0x0040 len 9 ctrl 0x0000 fcs 0x9ff6 [psm 4097]
-     I-frame: Unsegmented TxSeq 0 ReqSeq 0
-     0000: 02 00 01 00 01                                    .....
-
-Message from syslogd@XXXX at Oct 29 11:15:02 ...
- kernel:[ 7162.427921] ------------[ cut here ]------------
+Johan
