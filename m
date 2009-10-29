@@ -1,142 +1,181 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20091029001531.GA14617@jh-x301>
-References: <1256253562-22532-1-git-send-email-jaikumar@google.com>
-	<2d5a2c100910230649u1946e632qa4c50b33b6654218@mail.gmail.com>
-	<e8892a6a0910230817l6f096f70s4de1fe534799de86@mail.gmail.com>
-	<2d5a2c100910231044u6a6c65e0ka8258a6f65d08f41@mail.gmail.com>
-	<e8892a6a0910260820g43b4f688g2c33d7d1ae771d07@mail.gmail.com>
-	<20091028233425.GA13183@jh-x301> <e8892a6a0910281645r39d3b793wa9b9f2cc948da3da@mail.gmail.com>
-	<20091028235434.GA13715@jh-x301> <e8892a6a0910281702y952d88evca1bb6a7674b9de7@mail.gmail.com>
-	<20091029001531.GA14617@jh-x301>
-From: Jaikumar Ganesh <jaikumar@google.com>
-Date: Thu, 29 Oct 2009 11:42:16 -0700
-Message-ID: <e8892a6a0910291142w7d3271d8v13ec5e35330821ac@mail.gmail.com>
-Subject: Re: [PATCH] Update SDP storage records when a record is deleted.
-To: Jaikumar Ganesh <jaikumar@google.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=001636ed6870709c780477174654
+In-Reply-To: <4AE971D9.2010409@gmail.com>
+References: <4AE971D9.2010409@gmail.com>
+Date: Thu, 29 Oct 2009 15:06:23 -0200
+Message-ID: <6b53b1990910291006x5c9473eep26725b082334c953@mail.gmail.com>
+Subject: Re: ERMT and Streaming mode in L2CAP
+From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
+To: sancane <sancane@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---001636ed6870709c780477174654
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+Hi sancane,
 
-Hi Johan:
-
-On Wed, Oct 28, 2009 at 5:15 PM, Johan Hedberg <johan.hedberg@gmail.com> wr=
-ote:
+On Thu, Oct 29, 2009 at 8:43 AM, sancane <sancane@gmail.com> wrote:
 > Hi,
+> I'm programming a MCAP library for Bluez, (it is in beta state yet). I
+> need add support for ERTM and Streaming mode to L2CAP sockets and i've
+> seen some work included in l2cap kernel module by Gustavo F. Padovan. I
+> have downloaded the kernel source from
+> git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6.git
+> <http://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6.git>
+> and compiled it enabling ERTM module parameter to test my current
+> implementation of MCAP profile.
+> I would like to know which is the current state of ERTM and Streaming
+> mode in l2cap and if you are planning to continue the development task
+> in above mentioned retransmission modes.
+> My tests using ERTM results in kernel oops messages when i try to
+> send/receive a buffer data. I tested Streaming mode too but it does not
+> do anything when data is sent over L2CAP sockets.
+> In [1] i adjunct the kernel oops message when ERTM is used.
 >
-> On Wed, Oct 28, 2009, Jaikumar Ganesh wrote:
->> > On Wed, Oct 28, 2009, Jaikumar Ganesh wrote:
->> >> The SDP cache is =A0removed when the device is removed. In fact, you
->> >> fixed this a few days back.
->> >
->> > Which commit are you referring to?
->>
->> Commit number:
->>
->> 4bec43039626e853489e72149014868f8c8afedc
->>
->> http://git.kernel.org/?p=3Dbluetooth/bluez.git;a=3Dcommit;h=3D4bec430396=
-26e853489e72149014868f8c8afedc
+> Is it possible that i'm doing something wrong?. Next is the code that
+> i'm using to set ERTM and Streaming mode in l2cap:
 >
-> Ok, so we're talking about different things here. I was talking about
-> removing the records from /var/lib/bluetooth/...
+> static int set_sock_options (int sock, uint16_t imtu, uint16_t omtu,
+> uint8_t mode) {
+>   struct l2cap_options opts;
+>   int err;
+>   socklen_t optlen = sizeof(opts);
 >
->> We can also fix this by removing the on disk SDP records when the
->> device is freed.
->> (I think which is what you suggested - by cache I was interpreting it
->> as in memory cache)
->> Will submit a new patch. Let me know if I read you wrong.
+>   err = getsockopt( sock, SOL_L2CAP, L2CAP_OPTIONS, &opts, &optlen );
+>   if (!err) {
+>       opts.omtu = omtu;
+>       opts.imtu = imtu;
+>       opts.mode = mode;
+>       MCAP_DBG("Mode %d, fcs %d", opts.mode, opts.fcs);
+>       err = setsockopt( sock, SOL_L2CAP, L2CAP_OPTIONS, &opts, optlen );
+>   }
+>   return err;
 >
-> No, you're right. I was referring to the disk cache. I'm glad we have thi=
-s
-> misunderstanding finally sorted out :)
+> }
+>
+> i'm using L2CAP_MODE_ERTM and L2CAP_MODE_STREAMING macros to set the
+> l2cap option mode field.
+>
+> Best regards
+>
+> [1] http://www.kerneloops.org/submitresult.php?number=858407
+> <http://www.kerneloops.org/submitresult.php?number=858407>
+>
+> Next is the output that i got before kernel error is shown:
+>
+> HCI sniffer - Bluetooth packet analyzer ver 1.42
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+>> HCI Event: Connect Request (0x04) plen 10
+>   bdaddr 00:0A:94:02:CE:87 class 0x4a0100 type ACL
+> < HCI Command: Accept Connection Request (0x01|0x0009) plen 7
+>   bdaddr 00:0A:94:02:CE:87 role 0x00
+>   Role: Master
+>> HCI Event: Command Status (0x0f) plen 4
+>   Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
+>> HCI Event: Role Change (0x12) plen 8
+>   status 0x00 bdaddr 00:0A:94:02:CE:87 role 0x00
+>   Role: Master
+>> HCI Event: Connect Complete (0x03) plen 11
+>   status 0x00 handle 46 bdaddr 00:0A:94:02:CE:87 type ACL encrypt 0x00
+> < HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
+>   handle 46
+>> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
+>   bdaddr 00:0A:94:02:CE:87 mode 1
+>> HCI Event: Command Status (0x0f) plen 4
+>   Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 0
+>> HCI Event: Max Slots Change (0x1b) plen 3
+>   handle 46 slots 5
+>> HCI Event: Command Status (0x0f) plen 4
+>   Unknown (0x00|0x0000) status 0x00 ncmd 1
+> < HCI Command: Remote Name Request (0x01|0x0019) plen 10
+>   bdaddr 00:0A:94:02:CE:87 mode 2 clkoffset 0x0000
+>> HCI Event: Read Remote Supported Features (0x0b) plen 11
+>   status 0x00 handle 46
+>   Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
+>> HCI Event: Command Status (0x0f) plen 4
+>   Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+>> ACL data: handle 46 flags 0x02 dlen 10
+>   L2CAP(s): Info req: type 2
+> < ACL data: handle 46 flags 0x02 dlen 16
+>   L2CAP(s): Info rsp: type 2 result 0
+>     Extended feature mask 0x00b8
+>> HCI Event: Number of Completed Packets (0x13) plen 5
+>   handle 46 packets 1
+>> ACL data: handle 46 flags 0x02 dlen 10
+>   L2CAP(s): Info req: type 3
+> < ACL data: handle 46 flags 0x02 dlen 20
+>   L2CAP(s): Info rsp: type 3 result 0
+>     Unknown (len 8)
+>> ACL data: handle 46 flags 0x02 dlen 12
+>   L2CAP(s): Connect req: psm 4097 scid 0x0040
+> < ACL data: handle 46 flags 0x02 dlen 16
+>   L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 1 status 0
+>     Connection pending - No futher information available
+> < ACL data: handle 46 flags 0x02 dlen 10
+>   L2CAP(s): Info req: type 2
+>> HCI Event: Remote Name Req Complete (0x07) plen 255
+>   status 0x00 bdaddr 00:0A:94:02:CE:87 name 'blueztester-0'
+>> HCI Event: Number of Completed Packets (0x13) plen 5
+>   handle 46 packets 1
+>> HCI Event: Number of Completed Packets (0x13) plen 5
+>   handle 46 packets 1
+>> HCI Event: Number of Completed Packets (0x13) plen 5
+>   handle 46 packets 1
+>> ACL data: handle 46 flags 0x02 dlen 16
+>   L2CAP(s): Info rsp: type 2 result 0
+>     Extended feature mask 0x00b8
+> < ACL data: handle 46 flags 0x02 dlen 10
+>   L2CAP(s): Info req: type 3
+>> HCI Event: Number of Completed Packets (0x13) plen 5
+>   handle 46 packets 1
+>> ACL data: handle 46 flags 0x02 dlen 20
+>   L2CAP(s): Info rsp: type 3 result 0
+>     Unknown (len 8)
+> < ACL data: handle 46 flags 0x02 dlen 16
+>   L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
+>     Connection successful
+>> HCI Event: Number of Completed Packets (0x13) plen 5
+>   handle 46 packets 1
+>> ACL data: handle 46 flags 0x02 dlen 23
+>   L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 11
+>     RFC 0x03 (Reserved)
+> < ACL data: handle 46 flags 0x02 dlen 29
+>   L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 15
+>     MTU 672 RFC 0x03 (Reserved)
+> < ACL data: handle 46 flags 0x02 dlen 23
+>   L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 11
+>     RFC 0x03 (Reserved)
+>> HCI Event: Number of Completed Packets (0x13) plen 5
+>   handle 46 packets 1
+>> HCI Event: Number of Completed Packets (0x13) plen 5
+>   handle 46 packets 1
+>> ACL data: handle 46 flags 0x02 dlen 29
+>   L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 15
+>     MTU 672 RFC 0x03 (Reserved)
+>> ACL data: handle 46 flags 0x02 dlen 13
+>   L2CAP(d): cid 0x0040 len 9 ctrl 0x0000 fcs 0x33e3 [psm 4097]
+>     I-frame: Unsegmented TxSeq 0 ReqSeq 0
+>     0000: 01 01 00 01 01                                    .....
+> < ACL data: handle 46 flags 0x02 dlen 13
+>   L2CAP(d): cid 0x0040 len 9 ctrl 0x0000 fcs 0x9ff6 [psm 4097]
+>     I-frame: Unsegmented TxSeq 0 ReqSeq 0
+>     0000: 02 00 01 00 01
 
-   New patch attached.
 
+It looks you are using a duplex channel. This code doesn't support
+that. You need the patches I sent to mailing list on Oct 3.
+                                 .....
 >
-> Johan
+> Message from syslogd@XXXX at Oct 29 11:15:02 ...
+>  kernel:[ 7162.427921] ------------[ cut here ]------------
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >
 
---001636ed6870709c780477174654
-Content-Type: text/x-diff; charset=US-ASCII; name="0001-Fix-handling-of-SDP-records.patch"
-Content-Disposition: attachment;
-	filename="0001-Fix-handling-of-SDP-records.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_g1dutfa30
 
-RnJvbSAzYjk3M2M4YThmY2MzMmFjOWZlOGVmOTM5OTMyODAwZDcwYjU5ZTQ4IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBKYWlrdW1hciBHYW5lc2ggPGphaWt1bWFyQGdvb2dsZS5jb20+
-CkRhdGU6IFRodSwgMjkgT2N0IDIwMDkgMTE6MjM6MjUgLTA3MDAKU3ViamVjdDogW1BBVENIXSBG
-aXggaGFuZGxpbmcgb2YgU0RQIHJlY29yZHMuCgoxLiBEZWxldGUgYWxsIFNEUCByZWNvcmRzIHdo
-ZW4gdGhlIGRldmljZSBpcyByZW1vdmVkLgogICBXZSBhcmUgZ29pbmcgdG8gZG8gdGhlIFNEUCBj
-b25uZWN0aW9uIGFnYWluIGFueXdheXMgbmV4dCB0aW1lLgogICBUaGlzIGZpeGVzIHRoZSBpc3N1
-ZXMgb2Ygc3RhbGUgU0RQIHJlY29yZHMuCjIuIEhhbmRsZSBkZWxldGlvbiBvZiBTRFAgcmVjb3Jk
-cyBldmVuIHdoZW4gdGhlcmUgaXMgbm8gZHJpdmVyCiAgIHJlZ2lzdGVyZWQgZm9yIHRoYXQgVVVJ
-RAotLS0KIHNyYy9kZXZpY2UuYyAgfCAgIDI5ICsrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0t
-CiBzcmMvc3RvcmFnZS5jIHwgICAyMCArKysrKysrKysrKysrKysrKysrKwogc3JjL3N0b3JhZ2Uu
-aCB8ICAgIDEgKwogMyBmaWxlcyBjaGFuZ2VkLCAzNyBpbnNlcnRpb25zKCspLCAxMyBkZWxldGlv
-bnMoLSkKCmRpZmYgLS1naXQgYS9zcmMvZGV2aWNlLmMgYi9zcmMvZGV2aWNlLmMKaW5kZXggNmNi
-OTY0MS4uNzYwZTY2MSAxMDA2NDQKLS0tIGEvc3JjL2RldmljZS5jCisrKyBiL3NyYy9kZXZpY2Uu
-YwpAQCAtOTM3LDEwICs5MzcsMTIgQEAgc3RhdGljIHZvaWQgZGV2aWNlX3JlbW92ZV9zdG9yZWQo
-c3RydWN0IGJ0ZF9kZXZpY2UgKmRldmljZSkKIAogCWFkYXB0ZXJfZ2V0X2FkZHJlc3MoZGV2aWNl
-LT5hZGFwdGVyLCAmc3JjKTsKIAliYTJzdHIoJmRldmljZS0+YmRhZGRyLCBhZGRyKTsKKwogCWlm
-IChkZXZpY2UtPnBhaXJlZCkKIAkJZGV2aWNlX3JlbW92ZV9ib25kaW5nKGRldmljZSk7CiAJZGVs
-ZXRlX2VudHJ5KCZzcmMsICJwcm9maWxlcyIsIGFkZHIpOwogCWRlbGV0ZV9lbnRyeSgmc3JjLCAi
-dHJ1c3RzIiwgYWRkcik7CisJZGVsZXRlX2FsbF9yZWNvcmRzKCZzcmMsICZkZXZpY2UtPmJkYWRk
-cik7CiB9CiAKIHZvaWQgZGV2aWNlX3JlbW92ZShzdHJ1Y3QgYnRkX2RldmljZSAqZGV2aWNlLCBn
-Ym9vbGVhbiByZW1vdmVfc3RvcmVkKQpAQCAtMTEzNCw4ICsxMTM2LDYgQEAgc3RhdGljIHZvaWQg
-ZGV2aWNlX3JlbW92ZV9kcml2ZXJzKHN0cnVjdCBidGRfZGV2aWNlICpkZXZpY2UsIEdTTGlzdCAq
-dXVpZHMpCiAJCW5leHQgPSBsaXN0LT5uZXh0OwogCiAJCWZvciAodXVpZCA9IGRyaXZlci0+dXVp
-ZHM7ICp1dWlkOyB1dWlkKyspIHsKLQkJCXNkcF9yZWNvcmRfdCAqcmVjOwotCiAJCQlpZiAoIWdf
-c2xpc3RfZmluZF9jdXN0b20odXVpZHMsICp1dWlkLAogCQkJCQkoR0NvbXBhcmVGdW5jKSBzdHJj
-YXNlY21wKSkKIAkJCQljb250aW51ZTsKQEAgLTExNDgsMjQgKzExNDgsMjcgQEAgc3RhdGljIHZv
-aWQgZGV2aWNlX3JlbW92ZV9kcml2ZXJzKHN0cnVjdCBidGRfZGV2aWNlICpkZXZpY2UsIEdTTGlz
-dCAqdXVpZHMpCiAJCQkJCQkJCWRyaXZlcl9kYXRhKTsKIAkJCWdfZnJlZShkcml2ZXJfZGF0YSk7
-CiAKLQkJCXJlYyA9IGZpbmRfcmVjb3JkX2luX2xpc3QocmVjb3JkcywgKnV1aWQpOwotCQkJaWYg
-KCFyZWMpCi0JCQkJYnJlYWs7CisJCQlicmVhazsKKwkJfQorCX0KKworCWZvciAobGlzdCA9IHV1
-aWRzOyBsaXN0OyBsaXN0ID0gbGlzdC0+bmV4dCkgeworCQlkZXZpY2UtPnV1aWRzID0gZ19zbGlz
-dF9yZW1vdmUoZGV2aWNlLT51dWlkcywgbGlzdC0+ZGF0YSk7CisKKwkJc2RwX3JlY29yZF90ICpy
-ZWM7CisJCXJlYyA9IGZpbmRfcmVjb3JkX2luX2xpc3QocmVjb3JkcywgbGlzdC0+ZGF0YSk7CisJ
-CWlmICghcmVjKQorCQkJY29udGludWU7CiAKLQkJCWRlbGV0ZV9yZWNvcmQoc3JjYWRkciwgZHN0
-YWRkciwgcmVjLT5oYW5kbGUpOworCQlkZWxldGVfcmVjb3JkKHNyY2FkZHIsIGRzdGFkZHIsIHJl
-Yy0+aGFuZGxlKTsKIAotCQkJcmVjb3JkcyA9IHNkcF9saXN0X3JlbW92ZShyZWNvcmRzLCByZWMp
-OwotCQkJc2RwX3JlY29yZF9mcmVlKHJlYyk7CisJCXJlY29yZHMgPSBzZHBfbGlzdF9yZW1vdmUo
-cmVjb3JkcywgcmVjKTsKKwkJc2RwX3JlY29yZF9mcmVlKHJlYyk7CiAKLQkJCWJyZWFrOwotCQl9
-CiAJfQogCiAJaWYgKHJlY29yZHMpCiAJCXNkcF9saXN0X2ZyZWUocmVjb3JkcywgKHNkcF9mcmVl
-X2Z1bmNfdCkgc2RwX3JlY29yZF9mcmVlKTsKLQotCWZvciAobGlzdCA9IHV1aWRzOyBsaXN0OyBs
-aXN0ID0gbGlzdC0+bmV4dCkKLQkJZGV2aWNlLT51dWlkcyA9IGdfc2xpc3RfcmVtb3ZlKGRldmlj
-ZS0+dXVpZHMsIGxpc3QtPmRhdGEpOwogfQogCiBzdGF0aWMgdm9pZCBzZXJ2aWNlc19jaGFuZ2Vk
-KHN0cnVjdCBidGRfZGV2aWNlICpkZXZpY2UpCmRpZmYgLS1naXQgYS9zcmMvc3RvcmFnZS5jIGIv
-c3JjL3N0b3JhZ2UuYwppbmRleCA1NzYwNjU2Li5jZDMzMjA2IDEwMDY0NAotLS0gYS9zcmMvc3Rv
-cmFnZS5jCisrKyBiL3NyYy9zdG9yYWdlLmMKQEAgLTkxMyw2ICs5MTMsMjYgQEAgc3RhdGljIHZv
-aWQgY3JlYXRlX3N0b3JlZF9yZWNvcmRzX2Zyb21fa2V5cyhjaGFyICprZXksIGNoYXIgKnZhbHVl
-LAogCXJlY19saXN0LT5yZWNzID0gc2RwX2xpc3RfYXBwZW5kKHJlY19saXN0LT5yZWNzLCByZWMp
-OwogfQogCit2b2lkIGRlbGV0ZV9hbGxfcmVjb3JkcyhiZGFkZHJfdCAqc3JjLCBiZGFkZHJfdCAq
-ZHN0KQoreworCXNkcF9saXN0X3QgKnJlY29yZHMsICpzZXE7CisJc2RwX3JlY29yZF90ICpyZWM7
-CisJY2hhciBzcmNhZGRyWzE4XSwgZHN0YWRkclsxOF07CisKKwliYTJzdHIoc3JjLCBzcmNhZGRy
-KTsKKwliYTJzdHIoZHN0LCBkc3RhZGRyKTsKKworCXJlY29yZHMgPSByZWFkX3JlY29yZHMoc3Jj
-LCBkc3QpOworCisJZm9yIChzZXEgPSByZWNvcmRzOyBzZXE7IHNlcSA9IHNlcS0+bmV4dCkgewor
-CQlyZWMgPSBzZXEtPmRhdGE7CisJCWRlbGV0ZV9yZWNvcmQoc3JjYWRkciwgZHN0YWRkciwgcmVj
-LT5oYW5kbGUpOworCX0KKworCWlmIChyZWNvcmRzKQorCQlzZHBfbGlzdF9mcmVlKHJlY29yZHMs
-IChzZHBfZnJlZV9mdW5jX3QpIHNkcF9yZWNvcmRfZnJlZSk7Cit9CisKIHNkcF9saXN0X3QgKnJl
-YWRfcmVjb3JkcyhiZGFkZHJfdCAqc3JjLCBiZGFkZHJfdCAqZHN0KQogewogCWNoYXIgZmlsZW5h
-bWVbUEFUSF9NQVggKyAxXTsKZGlmZiAtLWdpdCBhL3NyYy9zdG9yYWdlLmggYi9zcmMvc3RvcmFn
-ZS5oCmluZGV4IDMxNTlmMmEuLjZlNDAxNTEgMTAwNjQ0Ci0tLSBhL3NyYy9zdG9yYWdlLmgKKysr
-IGIvc3JjL3N0b3JhZ2UuaApAQCAtNjMsNiArNjMsNyBAQCBpbnQgc3RvcmVfcmVjb3JkKGNvbnN0
-IGdjaGFyICpzcmMsIGNvbnN0IGdjaGFyICpkc3QsIHNkcF9yZWNvcmRfdCAqcmVjKTsKIHNkcF9y
-ZWNvcmRfdCAqcmVjb3JkX2Zyb21fc3RyaW5nKGNvbnN0IGdjaGFyICpzdHIpOwogc2RwX3JlY29y
-ZF90ICpmZXRjaF9yZWNvcmQoY29uc3QgZ2NoYXIgKnNyYywgY29uc3QgZ2NoYXIgKmRzdCwgY29u
-c3QgdWludDMyX3QgaGFuZGxlKTsKIGludCBkZWxldGVfcmVjb3JkKGNvbnN0IGdjaGFyICpzcmMs
-IGNvbnN0IGdjaGFyICpkc3QsIGNvbnN0IHVpbnQzMl90IGhhbmRsZSk7Cit2b2lkIGRlbGV0ZV9h
-bGxfcmVjb3JkcyhiZGFkZHJfdCAqc3JjLCBiZGFkZHJfdCAqZHN0KTsKIHNkcF9saXN0X3QgKnJl
-YWRfcmVjb3JkcyhiZGFkZHJfdCAqc3JjLCBiZGFkZHJfdCAqZHN0KTsKIHNkcF9yZWNvcmRfdCAq
-ZmluZF9yZWNvcmRfaW5fbGlzdChzZHBfbGlzdF90ICpyZWNzLCBjb25zdCBjaGFyICp1dWlkKTsK
-IGludCBzdG9yZV9kZXZpY2VfaWQoY29uc3QgZ2NoYXIgKnNyYywgY29uc3QgZ2NoYXIgKmRzdCwK
-LS0gCjEuNi4yLjMKCg==
---001636ed6870709c780477174654--
+
+-- 
+Gustavo F. Padovan
+http://padovan.org
