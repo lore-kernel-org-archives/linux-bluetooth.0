@@ -1,82 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <2d5a2c100910291334n6e97013cnc71d658b45496bf0@mail.gmail.com>
+In-Reply-To: <e8892a6a0910291330q2169e53pb30816dd24bf359d@mail.gmail.com>
 References: <1256253562-22532-1-git-send-email-jaikumar@google.com>
-	<e8892a6a0910260820g43b4f688g2c33d7d1ae771d07@mail.gmail.com>
-	<20091028233425.GA13183@jh-x301> <e8892a6a0910281645r39d3b793wa9b9f2cc948da3da@mail.gmail.com>
-	<20091028235434.GA13715@jh-x301> <e8892a6a0910281702y952d88evca1bb6a7674b9de7@mail.gmail.com>
-	<20091029001531.GA14617@jh-x301> <e8892a6a0910291142w7d3271d8v13ec5e35330821ac@mail.gmail.com>
-	<e8892a6a0910291330q2169e53pb30816dd24bf359d@mail.gmail.com>
-	<2d5a2c100910291334n6e97013cnc71d658b45496bf0@mail.gmail.com>
-From: Jaikumar Ganesh <jaikumar@google.com>
-Date: Thu, 29 Oct 2009 14:04:36 -0700
-Message-ID: <e8892a6a0910291404m5728465ck39353be8f7173361@mail.gmail.com>
+	 <2d5a2c100910231044u6a6c65e0ka8258a6f65d08f41@mail.gmail.com>
+	 <e8892a6a0910260820g43b4f688g2c33d7d1ae771d07@mail.gmail.com>
+	 <20091028233425.GA13183@jh-x301>
+	 <e8892a6a0910281645r39d3b793wa9b9f2cc948da3da@mail.gmail.com>
+	 <20091028235434.GA13715@jh-x301>
+	 <e8892a6a0910281702y952d88evca1bb6a7674b9de7@mail.gmail.com>
+	 <20091029001531.GA14617@jh-x301>
+	 <e8892a6a0910291142w7d3271d8v13ec5e35330821ac@mail.gmail.com>
+	 <e8892a6a0910291330q2169e53pb30816dd24bf359d@mail.gmail.com>
+Date: Thu, 29 Oct 2009 17:34:39 -0300
+Message-ID: <2d5a2c100910291334n6e97013cnc71d658b45496bf0@mail.gmail.com>
 Subject: Re: [PATCH] Update SDP storage records when a record is deleted.
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Jaikumar Ganesh <jaikumar@google.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=001636e1f0fc7cc0570477194322
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---001636e1f0fc7cc0570477194322
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-Hi Johan:
+They look so much better now :D
 
-On Thu, Oct 29, 2009 at 1:34 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi,
->
-> They look so much better now :D
-
-Attached.
-
-
->
-> --
-> Luiz Augusto von Dentz
-> Engenheiro de Computa=E7=E3o
->
-
---001636e1f0fc7cc0570477194322
-Content-Type: text/x-diff; charset=US-ASCII; name="0001-Fix-handling-of-SDP-records.patch"
-Content-Disposition: attachment;
-	filename="0001-Fix-handling-of-SDP-records.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_g1e0686n0
-
-RnJvbSBhYjViNGRhMzg3YmRkMWQzNDYxYThhNDVkMDVhNGM2YTEzMTU3ZTZhIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBKYWlrdW1hciBHYW5lc2ggPGphaWt1bWFyQGdvb2dsZS5jb20+
-CkRhdGU6IFRodSwgMjkgT2N0IDIwMDkgMTQ6MDE6MzYgLTA3MDAKU3ViamVjdDogW1BBVENIXSBG
-aXggaGFuZGxpbmcgb2YgU0RQIHJlY29yZHMuCgpXZSB3ZXJlIGRlbGV0aW5nIHRoZSBTRFAgcmVj
-b3JkcyBvbmx5IGlmIGEgZGV2aWNlIHdhcyByZWdpc3RlcmVkIGZvcgp0aG9zZSBVVUlEcy4gV2l0
-aCB0aGlzIGNoYW5nZSwgd2UgZGVsZXRlIHRoZSBTRFAgcmVjb3JkcyBldmVuIGlmIHRoZXJlCmFy
-ZSBubyBkcml2ZXJzIHJlZ2lzdGVyZWQuCi0tLQogc3JjL2RldmljZS5jIHwgICAyOCArKysrKysr
-KysrKysrKystLS0tLS0tLS0tLS0tCiAxIGZpbGVzIGNoYW5nZWQsIDE1IGluc2VydGlvbnMoKyks
-IDEzIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL3NyYy9kZXZpY2UuYyBiL3NyYy9kZXZpY2Uu
-YwppbmRleCA1NTg1MjcxLi42OWE2OGRiIDEwMDY0NAotLS0gYS9zcmMvZGV2aWNlLmMKKysrIGIv
-c3JjL2RldmljZS5jCkBAIC0xMTM2LDggKzExMzYsNiBAQCBzdGF0aWMgdm9pZCBkZXZpY2VfcmVt
-b3ZlX2RyaXZlcnMoc3RydWN0IGJ0ZF9kZXZpY2UgKmRldmljZSwgR1NMaXN0ICp1dWlkcykKIAkJ
-bmV4dCA9IGxpc3QtPm5leHQ7CiAKIAkJZm9yICh1dWlkID0gZHJpdmVyLT51dWlkczsgKnV1aWQ7
-IHV1aWQrKykgewotCQkJc2RwX3JlY29yZF90ICpyZWM7Ci0KIAkJCWlmICghZ19zbGlzdF9maW5k
-X2N1c3RvbSh1dWlkcywgKnV1aWQsCiAJCQkJCShHQ29tcGFyZUZ1bmMpIHN0cmNhc2VjbXApKQog
-CQkJCWNvbnRpbnVlOwpAQCAtMTE1MCwyNCArMTE0OCwyOCBAQCBzdGF0aWMgdm9pZCBkZXZpY2Vf
-cmVtb3ZlX2RyaXZlcnMoc3RydWN0IGJ0ZF9kZXZpY2UgKmRldmljZSwgR1NMaXN0ICp1dWlkcykK
-IAkJCQkJCQkJZHJpdmVyX2RhdGEpOwogCQkJZ19mcmVlKGRyaXZlcl9kYXRhKTsKIAotCQkJcmVj
-ID0gZmluZF9yZWNvcmRfaW5fbGlzdChyZWNvcmRzLCAqdXVpZCk7Ci0JCQlpZiAoIXJlYykKLQkJ
-CQlicmVhazsKKwkJCWJyZWFrOworCQl9CisJfQogCi0JCQlkZWxldGVfcmVjb3JkKHNyY2FkZHIs
-IGRzdGFkZHIsIHJlYy0+aGFuZGxlKTsKKwlmb3IgKGxpc3QgPSB1dWlkczsgbGlzdDsgbGlzdCA9
-IGxpc3QtPm5leHQpIHsKKwkJc2RwX3JlY29yZF90ICpyZWM7CiAKLQkJCXJlY29yZHMgPSBzZHBf
-bGlzdF9yZW1vdmUocmVjb3JkcywgcmVjKTsKLQkJCXNkcF9yZWNvcmRfZnJlZShyZWMpOworCQlk
-ZXZpY2UtPnV1aWRzID0gZ19zbGlzdF9yZW1vdmUoZGV2aWNlLT51dWlkcywgbGlzdC0+ZGF0YSk7
-CisKKwkJcmVjID0gZmluZF9yZWNvcmRfaW5fbGlzdChyZWNvcmRzLCBsaXN0LT5kYXRhKTsKKwkJ
-aWYgKCFyZWMpCisJCQljb250aW51ZTsKKworCQlkZWxldGVfcmVjb3JkKHNyY2FkZHIsIGRzdGFk
-ZHIsIHJlYy0+aGFuZGxlKTsKKworCQlyZWNvcmRzID0gc2RwX2xpc3RfcmVtb3ZlKHJlY29yZHMs
-IHJlYyk7CisJCXNkcF9yZWNvcmRfZnJlZShyZWMpOwogCi0JCQlicmVhazsKLQkJfQogCX0KIAog
-CWlmIChyZWNvcmRzKQogCQlzZHBfbGlzdF9mcmVlKHJlY29yZHMsIChzZHBfZnJlZV9mdW5jX3Qp
-IHNkcF9yZWNvcmRfZnJlZSk7Ci0KLQlmb3IgKGxpc3QgPSB1dWlkczsgbGlzdDsgbGlzdCA9IGxp
-c3QtPm5leHQpCi0JCWRldmljZS0+dXVpZHMgPSBnX3NsaXN0X3JlbW92ZShkZXZpY2UtPnV1aWRz
-LCBsaXN0LT5kYXRhKTsKIH0KIAogc3RhdGljIHZvaWQgc2VydmljZXNfY2hhbmdlZChzdHJ1Y3Qg
-YnRkX2RldmljZSAqZGV2aWNlKQotLSAKMS42LjIuMwoK
---001636e1f0fc7cc0570477194322--
+-- 
+Luiz Augusto von Dentz
+Engenheiro de Computação
