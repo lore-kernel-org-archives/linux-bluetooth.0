@@ -1,30 +1,165 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <e8892a6a0910291330q2169e53pb30816dd24bf359d@mail.gmail.com>
+In-Reply-To: <e8892a6a0910291142w7d3271d8v13ec5e35330821ac@mail.gmail.com>
 References: <1256253562-22532-1-git-send-email-jaikumar@google.com>
-	 <2d5a2c100910231044u6a6c65e0ka8258a6f65d08f41@mail.gmail.com>
-	 <e8892a6a0910260820g43b4f688g2c33d7d1ae771d07@mail.gmail.com>
-	 <20091028233425.GA13183@jh-x301>
-	 <e8892a6a0910281645r39d3b793wa9b9f2cc948da3da@mail.gmail.com>
-	 <20091028235434.GA13715@jh-x301>
-	 <e8892a6a0910281702y952d88evca1bb6a7674b9de7@mail.gmail.com>
-	 <20091029001531.GA14617@jh-x301>
-	 <e8892a6a0910291142w7d3271d8v13ec5e35330821ac@mail.gmail.com>
-	 <e8892a6a0910291330q2169e53pb30816dd24bf359d@mail.gmail.com>
-Date: Thu, 29 Oct 2009 17:34:39 -0300
-Message-ID: <2d5a2c100910291334n6e97013cnc71d658b45496bf0@mail.gmail.com>
+	<e8892a6a0910230817l6f096f70s4de1fe534799de86@mail.gmail.com>
+	<2d5a2c100910231044u6a6c65e0ka8258a6f65d08f41@mail.gmail.com>
+	<e8892a6a0910260820g43b4f688g2c33d7d1ae771d07@mail.gmail.com>
+	<20091028233425.GA13183@jh-x301> <e8892a6a0910281645r39d3b793wa9b9f2cc948da3da@mail.gmail.com>
+	<20091028235434.GA13715@jh-x301> <e8892a6a0910281702y952d88evca1bb6a7674b9de7@mail.gmail.com>
+	<20091029001531.GA14617@jh-x301> <e8892a6a0910291142w7d3271d8v13ec5e35330821ac@mail.gmail.com>
+From: Jaikumar Ganesh <jaikumar@google.com>
+Date: Thu, 29 Oct 2009 13:30:14 -0700
+Message-ID: <e8892a6a0910291330q2169e53pb30816dd24bf359d@mail.gmail.com>
 Subject: Re: [PATCH] Update SDP storage records when a record is deleted.
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Jaikumar Ganesh <jaikumar@google.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=001517740dda88839c047718c8d5
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+--001517740dda88839c047718c8d5
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-They look so much better now :D
+Hi Johan:
 
--- 
-Luiz Augusto von Dentz
-Engenheiro de Computação
+On Thu, Oct 29, 2009 at 11:42 AM, Jaikumar Ganesh <jaikumar@google.com> wro=
+te:
+> Hi Johan:
+>
+> On Wed, Oct 28, 2009 at 5:15 PM, Johan Hedberg <johan.hedberg@gmail.com> =
+wrote:
+>> Hi,
+>>
+>> On Wed, Oct 28, 2009, Jaikumar Ganesh wrote:
+>>> > On Wed, Oct 28, 2009, Jaikumar Ganesh wrote:
+>>> >> The SDP cache is =A0removed when the device is removed. In fact, you
+>>> >> fixed this a few days back.
+>>> >
+>>> > Which commit are you referring to?
+>>>
+>>> Commit number:
+>>>
+>>> 4bec43039626e853489e72149014868f8c8afedc
+>>>
+>>> http://git.kernel.org/?p=3Dbluetooth/bluez.git;a=3Dcommit;h=3D4bec43039=
+626e853489e72149014868f8c8afedc
+>>
+>> Ok, so we're talking about different things here. I was talking about
+>> removing the records from /var/lib/bluetooth/...
+>>
+>>> We can also fix this by removing the on disk SDP records when the
+>>> device is freed.
+>>> (I think which is what you suggested - by cache I was interpreting it
+>>> as in memory cache)
+>>> Will submit a new patch. Let me know if I read you wrong.
+>>
+>> No, you're right. I was referring to the disk cache. I'm glad we have th=
+is
+>> misunderstanding finally sorted out :)
+>
+> =A0 New patch attached.
+
+The patch broken into 2 patches are attached.
+
+>
+>>
+>> Johan
+>>
+>
+
+--001517740dda88839c047718c8d5
+Content-Type: text/x-diff; charset=US-ASCII;
+	name="0001-When-a-device-is-removed-delete-the-SDP-records.patch"
+Content-Disposition: attachment;
+	filename="0001-When-a-device-is-removed-delete-the-SDP-records.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_g1dyvmal1
+
+RnJvbSBlZGZhNWQyYWFjMzE3Mzk2NGU5MTRmOWZlZWE1MTFlNjIwMjVlMDUxIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBKYWlrdW1hciBHYW5lc2ggPGphaWt1bWFyQGdvb2dsZS5jb20+
+CkRhdGU6IFRodSwgMjkgT2N0IDIwMDkgMTM6MTk6NTEgLTA3MDAKU3ViamVjdDogW1BBVENIIDEv
+Ml0gV2hlbiBhIGRldmljZSBpcyByZW1vdmVkIGRlbGV0ZSB0aGUgU0RQIHJlY29yZHMuCgpUaGlz
+IGZpeGVzIHRoZSBpc3N1ZXMgb2Ygc3RhbGUgU0RQIHJlY29yZHMsIHdoZW4gdGhlClNEUCByZWNv
+cmRzIGFyZSBtb2RpZmllZCBvbiB0aGUgcmVtb3RlIGVuZCwgYmVmb3JlIHRoZSBuZXh0CmNvbm5l
+Y3Rpb24uIFNpbmNlIHdlIGFyZSBnb2luZyB0byBwZXJmb3JtIFNEUCBvbiB0aGUgbmV4dCBjb25u
+ZWN0aW9uCmFueXdheSwgdGhpcyBkb2Vzbid0IGludHJvZHVjZSBhbnkgbmV3IG92ZXJoZWFkcy4K
+LS0tCiBzcmMvZGV2aWNlLmMgIHwgICAgMiArKwogc3JjL3N0b3JhZ2UuYyB8ICAgMjAgKysrKysr
+KysrKysrKysrKysrKysKIHNyYy9zdG9yYWdlLmggfCAgICAxICsKIDMgZmlsZXMgY2hhbmdlZCwg
+MjMgaW5zZXJ0aW9ucygrKSwgMCBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9zcmMvZGV2aWNl
+LmMgYi9zcmMvZGV2aWNlLmMKaW5kZXggNmNiOTY0MS4uNTU4NTI3MSAxMDA2NDQKLS0tIGEvc3Jj
+L2RldmljZS5jCisrKyBiL3NyYy9kZXZpY2UuYwpAQCAtOTM3LDEwICs5MzcsMTIgQEAgc3RhdGlj
+IHZvaWQgZGV2aWNlX3JlbW92ZV9zdG9yZWQoc3RydWN0IGJ0ZF9kZXZpY2UgKmRldmljZSkKIAog
+CWFkYXB0ZXJfZ2V0X2FkZHJlc3MoZGV2aWNlLT5hZGFwdGVyLCAmc3JjKTsKIAliYTJzdHIoJmRl
+dmljZS0+YmRhZGRyLCBhZGRyKTsKKwogCWlmIChkZXZpY2UtPnBhaXJlZCkKIAkJZGV2aWNlX3Jl
+bW92ZV9ib25kaW5nKGRldmljZSk7CiAJZGVsZXRlX2VudHJ5KCZzcmMsICJwcm9maWxlcyIsIGFk
+ZHIpOwogCWRlbGV0ZV9lbnRyeSgmc3JjLCAidHJ1c3RzIiwgYWRkcik7CisJZGVsZXRlX2FsbF9y
+ZWNvcmRzKCZzcmMsICZkZXZpY2UtPmJkYWRkcik7CiB9CiAKIHZvaWQgZGV2aWNlX3JlbW92ZShz
+dHJ1Y3QgYnRkX2RldmljZSAqZGV2aWNlLCBnYm9vbGVhbiByZW1vdmVfc3RvcmVkKQpkaWZmIC0t
+Z2l0IGEvc3JjL3N0b3JhZ2UuYyBiL3NyYy9zdG9yYWdlLmMKaW5kZXggNTc2MDY1Ni4uY2QzMzIw
+NiAxMDA2NDQKLS0tIGEvc3JjL3N0b3JhZ2UuYworKysgYi9zcmMvc3RvcmFnZS5jCkBAIC05MTMs
+NiArOTEzLDI2IEBAIHN0YXRpYyB2b2lkIGNyZWF0ZV9zdG9yZWRfcmVjb3Jkc19mcm9tX2tleXMo
+Y2hhciAqa2V5LCBjaGFyICp2YWx1ZSwKIAlyZWNfbGlzdC0+cmVjcyA9IHNkcF9saXN0X2FwcGVu
+ZChyZWNfbGlzdC0+cmVjcywgcmVjKTsKIH0KIAordm9pZCBkZWxldGVfYWxsX3JlY29yZHMoYmRh
+ZGRyX3QgKnNyYywgYmRhZGRyX3QgKmRzdCkKK3sKKwlzZHBfbGlzdF90ICpyZWNvcmRzLCAqc2Vx
+OworCXNkcF9yZWNvcmRfdCAqcmVjOworCWNoYXIgc3JjYWRkclsxOF0sIGRzdGFkZHJbMThdOwor
+CisJYmEyc3RyKHNyYywgc3JjYWRkcik7CisJYmEyc3RyKGRzdCwgZHN0YWRkcik7CisKKwlyZWNv
+cmRzID0gcmVhZF9yZWNvcmRzKHNyYywgZHN0KTsKKworCWZvciAoc2VxID0gcmVjb3Jkczsgc2Vx
+OyBzZXEgPSBzZXEtPm5leHQpIHsKKwkJcmVjID0gc2VxLT5kYXRhOworCQlkZWxldGVfcmVjb3Jk
+KHNyY2FkZHIsIGRzdGFkZHIsIHJlYy0+aGFuZGxlKTsKKwl9CisKKwlpZiAocmVjb3JkcykKKwkJ
+c2RwX2xpc3RfZnJlZShyZWNvcmRzLCAoc2RwX2ZyZWVfZnVuY190KSBzZHBfcmVjb3JkX2ZyZWUp
+OworfQorCiBzZHBfbGlzdF90ICpyZWFkX3JlY29yZHMoYmRhZGRyX3QgKnNyYywgYmRhZGRyX3Qg
+KmRzdCkKIHsKIAljaGFyIGZpbGVuYW1lW1BBVEhfTUFYICsgMV07CmRpZmYgLS1naXQgYS9zcmMv
+c3RvcmFnZS5oIGIvc3JjL3N0b3JhZ2UuaAppbmRleCAzMTU5ZjJhLi42ZTQwMTUxIDEwMDY0NAot
+LS0gYS9zcmMvc3RvcmFnZS5oCisrKyBiL3NyYy9zdG9yYWdlLmgKQEAgLTYzLDYgKzYzLDcgQEAg
+aW50IHN0b3JlX3JlY29yZChjb25zdCBnY2hhciAqc3JjLCBjb25zdCBnY2hhciAqZHN0LCBzZHBf
+cmVjb3JkX3QgKnJlYyk7CiBzZHBfcmVjb3JkX3QgKnJlY29yZF9mcm9tX3N0cmluZyhjb25zdCBn
+Y2hhciAqc3RyKTsKIHNkcF9yZWNvcmRfdCAqZmV0Y2hfcmVjb3JkKGNvbnN0IGdjaGFyICpzcmMs
+IGNvbnN0IGdjaGFyICpkc3QsIGNvbnN0IHVpbnQzMl90IGhhbmRsZSk7CiBpbnQgZGVsZXRlX3Jl
+Y29yZChjb25zdCBnY2hhciAqc3JjLCBjb25zdCBnY2hhciAqZHN0LCBjb25zdCB1aW50MzJfdCBo
+YW5kbGUpOwordm9pZCBkZWxldGVfYWxsX3JlY29yZHMoYmRhZGRyX3QgKnNyYywgYmRhZGRyX3Qg
+KmRzdCk7CiBzZHBfbGlzdF90ICpyZWFkX3JlY29yZHMoYmRhZGRyX3QgKnNyYywgYmRhZGRyX3Qg
+KmRzdCk7CiBzZHBfcmVjb3JkX3QgKmZpbmRfcmVjb3JkX2luX2xpc3Qoc2RwX2xpc3RfdCAqcmVj
+cywgY29uc3QgY2hhciAqdXVpZCk7CiBpbnQgc3RvcmVfZGV2aWNlX2lkKGNvbnN0IGdjaGFyICpz
+cmMsIGNvbnN0IGdjaGFyICpkc3QsCi0tIAoxLjYuMi4zCgo=
+--001517740dda88839c047718c8d5
+Content-Type: text/x-diff; charset=US-ASCII; name="0002-Fix-handling-of-SDP-records.patch"
+Content-Disposition: attachment;
+	filename="0002-Fix-handling-of-SDP-records.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_g1dywbdu2
+
+RnJvbSAxYjkwMWRhYmRlMzA0MjM3ZGMxY2EwNWViMTdhNDIxMzdhNjUwZTE2IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBKYWlrdW1hciBHYW5lc2ggPGphaWt1bWFyQGdvb2dsZS5jb20+
+CkRhdGU6IFRodSwgMjkgT2N0IDIwMDkgMTM6MjQ6MDUgLTA3MDAKU3ViamVjdDogW1BBVENIIDIv
+Ml0gRml4IGhhbmRsaW5nIG9mIFNEUCByZWNvcmRzLgoKV2Ugd2VyZSBkZWxldGluZyB0aGUgU0RQ
+IHJlY29yZHMgb25seSBpZiBhIGRldmljZQp3YXMgcmVnaXN0ZXJlZCBmb3IgdGhvc2UgVVVJRHMu
+IFdpdGggdGhpcyBjaGFuZ2UsCndlIGRlbGV0ZSB0aGUgU0RQIHJlY29yZHMgZXZlbiBpZiB0aGVy
+ZSBhcmUgbm8KZHJpdmVycyByZWdpc3RlcmVkLgotLS0KIHNyYy9kZXZpY2UuYyB8ICAgMjcgKysr
+KysrKysrKysrKystLS0tLS0tLS0tLS0tCiAxIGZpbGVzIGNoYW5nZWQsIDE0IGluc2VydGlvbnMo
+KyksIDEzIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL3NyYy9kZXZpY2UuYyBiL3NyYy9kZXZp
+Y2UuYwppbmRleCA1NTg1MjcxLi43NjBlNjYxIDEwMDY0NAotLS0gYS9zcmMvZGV2aWNlLmMKKysr
+IGIvc3JjL2RldmljZS5jCkBAIC0xMTM2LDggKzExMzYsNiBAQCBzdGF0aWMgdm9pZCBkZXZpY2Vf
+cmVtb3ZlX2RyaXZlcnMoc3RydWN0IGJ0ZF9kZXZpY2UgKmRldmljZSwgR1NMaXN0ICp1dWlkcykK
+IAkJbmV4dCA9IGxpc3QtPm5leHQ7CiAKIAkJZm9yICh1dWlkID0gZHJpdmVyLT51dWlkczsgKnV1
+aWQ7IHV1aWQrKykgewotCQkJc2RwX3JlY29yZF90ICpyZWM7Ci0KIAkJCWlmICghZ19zbGlzdF9m
+aW5kX2N1c3RvbSh1dWlkcywgKnV1aWQsCiAJCQkJCShHQ29tcGFyZUZ1bmMpIHN0cmNhc2VjbXAp
+KQogCQkJCWNvbnRpbnVlOwpAQCAtMTE1MCwyNCArMTE0OCwyNyBAQCBzdGF0aWMgdm9pZCBkZXZp
+Y2VfcmVtb3ZlX2RyaXZlcnMoc3RydWN0IGJ0ZF9kZXZpY2UgKmRldmljZSwgR1NMaXN0ICp1dWlk
+cykKIAkJCQkJCQkJZHJpdmVyX2RhdGEpOwogCQkJZ19mcmVlKGRyaXZlcl9kYXRhKTsKIAotCQkJ
+cmVjID0gZmluZF9yZWNvcmRfaW5fbGlzdChyZWNvcmRzLCAqdXVpZCk7Ci0JCQlpZiAoIXJlYykK
+LQkJCQlicmVhazsKKwkJCWJyZWFrOworCQl9CisJfQogCi0JCQlkZWxldGVfcmVjb3JkKHNyY2Fk
+ZHIsIGRzdGFkZHIsIHJlYy0+aGFuZGxlKTsKKwlmb3IgKGxpc3QgPSB1dWlkczsgbGlzdDsgbGlz
+dCA9IGxpc3QtPm5leHQpIHsKKwkJZGV2aWNlLT51dWlkcyA9IGdfc2xpc3RfcmVtb3ZlKGRldmlj
+ZS0+dXVpZHMsIGxpc3QtPmRhdGEpOwogCi0JCQlyZWNvcmRzID0gc2RwX2xpc3RfcmVtb3ZlKHJl
+Y29yZHMsIHJlYyk7Ci0JCQlzZHBfcmVjb3JkX2ZyZWUocmVjKTsKKwkJc2RwX3JlY29yZF90ICpy
+ZWM7CisJCXJlYyA9IGZpbmRfcmVjb3JkX2luX2xpc3QocmVjb3JkcywgbGlzdC0+ZGF0YSk7CisJ
+CWlmICghcmVjKQorCQkJY29udGludWU7CisKKwkJZGVsZXRlX3JlY29yZChzcmNhZGRyLCBkc3Rh
+ZGRyLCByZWMtPmhhbmRsZSk7CisKKwkJcmVjb3JkcyA9IHNkcF9saXN0X3JlbW92ZShyZWNvcmRz
+LCByZWMpOworCQlzZHBfcmVjb3JkX2ZyZWUocmVjKTsKIAotCQkJYnJlYWs7Ci0JCX0KIAl9CiAK
+IAlpZiAocmVjb3JkcykKIAkJc2RwX2xpc3RfZnJlZShyZWNvcmRzLCAoc2RwX2ZyZWVfZnVuY190
+KSBzZHBfcmVjb3JkX2ZyZWUpOwotCi0JZm9yIChsaXN0ID0gdXVpZHM7IGxpc3Q7IGxpc3QgPSBs
+aXN0LT5uZXh0KQotCQlkZXZpY2UtPnV1aWRzID0gZ19zbGlzdF9yZW1vdmUoZGV2aWNlLT51dWlk
+cywgbGlzdC0+ZGF0YSk7CiB9CiAKIHN0YXRpYyB2b2lkIHNlcnZpY2VzX2NoYW5nZWQoc3RydWN0
+IGJ0ZF9kZXZpY2UgKmRldmljZSkKLS0gCjEuNi4yLjMKCg==
+--001517740dda88839c047718c8d5--
