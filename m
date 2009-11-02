@@ -1,33 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH net-next] iwmc3200bt: Add iwmc3200 bluetooth driver
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Tomas Winkler <tomas.winkler@intel.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, linux-mmc@vger.kernel.org,
-	guy.cohen@intel.com, ron.rindjunsky@intel.com
-In-Reply-To: <1257204990-18669-1-git-send-email-tomas.winkler@intel.com>
-References: <1257204990-18669-1-git-send-email-tomas.winkler@intel.com>
-Content-Type: text/plain
-Date: Tue, 03 Nov 2009 10:40:25 +0900
-Message-Id: <1257212425.3420.2.camel@localhost.localdomain>
-Mime-Version: 1.0
+Message-ID: <4AEF6F94.4080209@zgod.cjb.net>
+Date: Tue, 03 Nov 2009 00:47:32 +0100
+From: Julius Schwartzenberg <julius@zgod.cjb.net>
+MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org
+Subject: Logitech Bluetooth mouse batteries drain quickly
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dave,
+Hi,
 
-> Add Intel Wireless MultiCom 3200 SDIO BT driver
-> IWMC3200 is 4Wireless Com CHIP (GPS/BT/WiFi/WiMAX).
-> wmc3200bt is derived from btsdio driver
+I have a rather strange problem. I bought a Logitech Bluetooth mouse 
+some time ago. It works very well in Ubuntu and I never had any usage 
+problems.
 
-just a heads up, this is not a net-next patch. This clearly goes via
-proper review on linux-bluetooth and bluetooth-next tree first. So
-please don't pull until I ack it.
+The strange thing is though, that the batteries that are inside the 
+mouse drain extremely quickly. I compared the time it takes the mouse to 
+drain a set full batteries to my flatmate's who uses the exact same 
+mouse with Mac OS X. It turns out that my batteries drain about four 
+times as quickly as his.
 
-Tomas, please try not to jump the gun here.
+I didn't test much else. May be the problem could also be related to my 
+Bluetooth "receiver" which is a Broadcom BCM2046.
 
-Regards
+I suspect however that Bluez is somehow talking with the device in such 
+a way the mouse doesn't sleep as quickly as when Mac OS X talks to it. 
+Could this somehow be the case? If so, what could I do to help solve 
+this with Bluez?
 
-Marcel
-
-
+Thanks a lot in advance,
+Julius
