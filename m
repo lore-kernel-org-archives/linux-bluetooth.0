@@ -1,35 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] SSP double paring fix: init auth_type with
- HCI_AT_GENERAL_BONDING
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Date: Tue, 3 Nov 2009 10:21:43 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: bluezprofile kernel <bluezprofile@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <508e92ca0911030005r4a010b9cl98990f892ec28a18@mail.gmail.com>
-References: <508e92ca0907020657o561effbeg1911f8f84af27f37@mail.gmail.com>
-	 <1251885004.1266.57.camel@localhost.localdomain>
-	 <508e92ca0909030255g3dfd825dy5062458c7a5cafcb@mail.gmail.com>
-	 <508e92ca0909090043j365d050cg2715c95fa73cc9b0@mail.gmail.com>
-	 <508e92ca0911030005r4a010b9cl98990f892ec28a18@mail.gmail.com>
-Content-Type: text/plain
-Date: Tue, 03 Nov 2009 17:41:29 +0900
-Message-Id: <1257237689.3420.56.camel@localhost.localdomain>
-Mime-Version: 1.0
+Subject: Re: Attending skype calls from bluetooth headset
+Message-ID: <20091103082143.GA21755@jh-x301>
+References: <ba5648fa0911022149y544fcfbcsd81a68a731f0604c@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <ba5648fa0911022149y544fcfbcsd81a68a731f0604c@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Bala,
 
-same warning as for everybody else. NO top posting.
+(lkml left out from the recipients since this is pretty obviously
+off-topic there)
 
-> I have heard that you have tested this patch. Will it be finally
-> applied? Do I need to change commit message? If you find that message
-> does not represent patch good enough can you change it yourself?
+On Tue, Nov 03, 2009, Bala wrote:
+> I am trying to attend skype calls from bluetooth headset.
+> I am hearing the ringtone but I am not able to answer the call by
+> pressing the call button in the headset.
+> 
+> Control comes to function telephony_key_press_req() in
+> audio/telephone_dummy.c [bluez 4.32] when call button in the headset
+> is pressed.
+> Any idea how to communicate this event to skype so that the call can
+> be answered?
 
-I am in the process of creating a repository for Dave to pull from and
-yes that patch will be part of it.
+As you see from audio/headset.c the event will also emit a
+"AnswerRequested" D-Bus signal. So all you need to do is get the source
+code for skype and fix it to listen for and react to this signal. Oh wait,
+skype is closed source ;)
+However, if the rumors are true we might see an open source skype UI for
+Linux soon and then the issue could really be solved. This is btw assuming
+that skype doesn't already have some API for external call control. If it
+does, you might be able to hack together a telephony-skype.c which calls
+into this API.
 
-Regards
-
-Marcel
-
-
+Johan
