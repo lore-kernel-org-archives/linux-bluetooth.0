@@ -1,51 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4AF02DAF.5050603@csr.com>
-Date: Tue, 03 Nov 2009 13:18:39 +0000
-From: David Vrabel <david.vrabel@csr.com>
 MIME-Version: 1.0
-To: Tomas Winkler <tomas.winkler@intel.com>
-CC: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
-        guy.cohen@intel.com, ron.rindjunsky@intel.com
-Subject: Re: [PATCH net-next] iwmc3200bt: Add iwmc3200 bluetooth driver
-References: <1257204990-18669-1-git-send-email-tomas.winkler@intel.com>
-In-Reply-To: <1257204990-18669-1-git-send-email-tomas.winkler@intel.com>
+In-Reply-To: <20091103082143.GA21755@jh-x301>
+References: <ba5648fa0911022149y544fcfbcsd81a68a731f0604c@mail.gmail.com>
+	 <20091103082143.GA21755@jh-x301>
+Date: Tue, 3 Nov 2009 14:41:33 +0530
+Message-ID: <8b5debfa0911030111g29c88d2n496dd3dedcce9760@mail.gmail.com>
+Subject: Re: Attending skype calls from bluetooth headset
+From: alok barsode <alokbarsode@gmail.com>
+To: bluezprofile kernel <bluezprofile@gmail.com>,
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Tomas Winkler wrote:
-> Add Intel Wireless MultiCom 3200 SDIO BT driver
-> IWMC3200 is 4Wireless Com CHIP (GPS/BT/WiFi/WiMAX).
-> wmc3200bt is derived from btsdio driver
+Hi Bala,
 
-Can you list the hardware differences between this chip and the standard?
+On Tue, Nov 3, 2009 at 1:51 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Bala,
+>
+> (lkml left out from the recipients since this is pretty obviously
+> off-topic there)
+>
+> On Tue, Nov 03, 2009, Bala wrote:
+>> I am trying to attend skype calls from bluetooth headset.
+>> I am hearing the ringtone but I am not able to answer the call by
+>> pressing the call button in the headset.
+>>
+>> Control comes to function telephony_key_press_req() in
+>> audio/telephone_dummy.c [bluez 4.32] when call button in the headset
+>> is pressed.
+>> Any idea how to communicate this event to skype so that the call can
+>> be answered?
+>
+> As you see from audio/headset.c the event will also emit a
+> "AnswerRequested" D-Bus signal. So all you need to do is get the source
+> code for skype and fix it to listen for and react to this signal. Oh wait,
+> skype is closed source ;)
+> However, if the rumors are true we might see an open source skype UI for
+> Linux soon and then the issue could really be solved. This is btw assuming
+> that skype doesn't already have some API for external call control. If it
+> does, you might be able to hack together a telephony-skype.c which calls
+> into this API.
 
-> +	unsigned char tx_buf[2048];
-> +	unsigned char rx_buf[2048];
+This might help.
+https://developer.skype.com/Docs/ApiDoc/FrontPage
 
-I don't think these buffers are cache line aligned so can't be used for DMA.
+>
+> Johan
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
 
-> +		/* in IWMC_BT we need to read the transfer length
-> +		 * before interrupt clearing */
-> +		val1 = sdio_readb(data->func, REG_H2D_COUNT_L, &err);
-> +		IBT_DBG(data->func, "%s to read len1,"
-> +			" reg_addr=%x ret=%d val=%x\n",
-> +			err ? "Failed" : "Succeeded",
-> +			REG_H2D_COUNT_L, err, err ? 0xff : val1);
-> +		if (err == 0) {
-> +			val2 = sdio_readb(data->func, REG_H2D_COUNT_H, &err);
-> +			IBT_DBG(data->func, "%s to read len2,"
-> +				" reg_addr=%x ret=%d val=%x\n",
-> +				err ? "Failed" : "Succeeded",
-> +				REG_H2D_COUNT_H, err, err ? 0xff : val2);
-
-Wow.  Intel really messed up the hardware here.  An extra two SDIO
-commands per packet?  I guess no one was thinking of performance...
-
-David
--- 
-David Vrabel, Senior Software Engineer, Drivers
-CSR, Churchill House, Cambridge Business Park,  Tel: +44 (0)1223 692562
-Cowley Road, Cambridge, CB4 0WZ                 http://www.csr.com/
-
-
-Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
+Cheers,
+Alok.
