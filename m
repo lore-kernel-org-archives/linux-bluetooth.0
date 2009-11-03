@@ -1,41 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bing Zhao <bzhao@marvell.com>
-To: Javier Martinez Canillas <martinez.javier@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Rahul Tank <rahult@marvell.com>, Julia Lawall <julia@diku.dk>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>
-Date: Tue, 3 Nov 2009 10:52:24 -0800
-Subject: RE: [PATCH] bluetooth/btmrl_sdio.c: Fix compile warning
-Message-ID: <477F20668A386D41ADCC57781B1F704306E01F6E92@SC-VEXCH1.marvell.com>
-References: <1256968124.29147.4.camel@laptop>
-In-Reply-To: <1256968124.29147.4.camel@laptop>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Subject: Re: Persisting power state when set via rfkill directly
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: Ross Burton <ross@linux.intel.com>, linux-bluetooth@vger.kernel.org
+In-Reply-To: <1257267896.23167.129.camel@localhost.localdomain>
+References: <1257263702.8893.101.camel@flashheart.burtonini.com>
+	 <1257267138.3420.114.camel@localhost.localdomain>
+	 <1257267896.23167.129.camel@localhost.localdomain>
+Content-Type: text/plain
+Date: Wed, 04 Nov 2009 02:16:47 +0900
+Message-Id: <1257268607.3420.119.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgSmF2aWVyLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IEphdmll
-ciBNYXJ0aW5leiBDYW5pbGxhcyBbbWFpbHRvOm1hcnRpbmV6LmphdmllckBnbWFpbC5jb21dDQo+
-IFNlbnQ6IEZyaWRheSwgT2N0b2JlciAzMCwgMjAwOSAxMDo0OSBQTQ0KPiBUbzogTWFyY2VsIEhv
-bHRtYW5uOyBCaW5nIFpoYW87IFJhaHVsIFRhbms7IEp1bGlhIExhd2FsbDsgbGludXgtYmx1ZXRv
-b3RoQHZnZXIua2VybmVsLm9yZzsga2VybmVsLQ0KPiBqYW5pdG9yc0B2Z2VyLmtlcm5lbC5vcmcN
-Cj4gU3ViamVjdDogW1BBVENIXSBibHVldG9vdGgvYnRtcmxfc2Rpby5jOiBGaXggY29tcGlsZSB3
-YXJuaW5nDQo+IA0KPiBJbiBsaW51eC1uZXh0IDIwMDkxMDMwIEkgZ290IHRoaXMgY29tcGlsZSB3
-YXJuaW5nOg0KPiANCj4gZHJpdmVycy9ibHVldG9vdGgvYnRtcnZsX3NkaW8uYzogSW4gZnVuY3Rp
-b24g4oCYYnRtcnZsX3NkaW9fdmVyaWZ5X2Z3X2Rvd25sb2Fk4oCZOg0KPiBkcml2ZXJzL2JsdWV0
-b290aC9idG1ydmxfc2Rpby5jOjc5OiB3YXJuaW5nOiDigJhmd3Mx4oCZIG1heSBiZSB1c2VkIHVu
-aW5pdGlhbGl6ZWQgaW4gdGhpcyBmdW5jdGlvbg0KPiBkcml2ZXJzL2JsdWV0b290aC9idG1ydmxf
-c2Rpby5jOjc5OiBub3RlOiDigJhmd3Mx4oCZIHdhcyBkZWNsYXJlZCBoZXJlDQo+IA0KPiBUaGlz
-IHBhdGNoIHNvbHZlcyB0aGUgaXNzdWUuDQoNCllvdXIgcGF0Y2ggaXMgdmFsaWQuDQoNClRoYW5r
-cywNCg0KQmluZw0KDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBKYXZpZXIgTWFydGluZXogQ2FuaWxs
-YXMgPG1hcnRpbmV6LmphdmllckBnbWFpbC5jb20+DQo+IC0tLQ0KPiAgZHJpdmVycy9ibHVldG9v
-dGgvYnRtcnZsX3NkaW8uYyB8ICAgIDIgKy0NCj4gIDEgZmlsZXMgY2hhbmdlZCwgMSBpbnNlcnRp
-b25zKCspLCAxIGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvYmx1ZXRv
-b3RoL2J0bXJ2bF9zZGlvLmMgYi9kcml2ZXJzL2JsdWV0b290aC9idG1ydmxfc2Rpby5jDQo+IGlu
-ZGV4IDViMzNiODUuLjQxZDY0ZmQgMTAwNjQ0DQo+IC0tLSBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0
-bXJ2bF9zZGlvLmMNCj4gKysrIGIvZHJpdmVycy9ibHVldG9vdGgvYnRtcnZsX3NkaW8uYw0KPiBA
-QCAtNzYsNyArNzYsNyBAQCBzdGF0aWMgaW50IGJ0bXJ2bF9zZGlvX2dldF9yeF91bml0KHN0cnVj
-dCBidG1ydmxfc2Rpb19jYXJkICpjYXJkKQ0KPiANCj4gIHN0YXRpYyBpbnQgYnRtcnZsX3NkaW9f
-cmVhZF9md19zdGF0dXMoc3RydWN0IGJ0bXJ2bF9zZGlvX2NhcmQgKmNhcmQsIHUxNiAqZGF0KQ0K
-PiAgew0KPiAtCXU4IGZ3czAsIGZ3czE7DQo+ICsJdTggZndzMCwgZndzMSA9IDA7DQo+ICAJaW50
-IHJldDsNCj4gDQo+ICAJKmRhdCA9IDA7DQo+IC0tDQo+IDEuNi4wLjQNCj4gDQo+IA0KDQo=
+Hi Bastien,
+
+> > > I see that bluez has support for saving the current power state to disk
+> > > (in /var/lib/bluetooth/[id]/config) when the Powered adaptor property is
+> > > toggled, so that the same state can be restored when restarted.
+> > > However, this only works if the powered state is toggled via the Bluez
+> > > DBus API, applications which directly touch rfkill (such as
+> > > gnome-bluetooth) don't cause the current mode to be persisted.
+> > > 
+> > > From a quick look at the code I'd say that rfkill_event() shouldn't
+> > > return early if the adaptor was powered down and instead get the adaptor
+> > > pointer and write the new mode state.  Does this sound reasonable?
+> > 
+> > I explained a couple of times that gnome-bluetooth should not use RFKILL
+> > as a way to toggle Powered state. Use the D-Bus interface to do so and
+> > not go behind its back. RFKILL states are not persistent and we will not
+> > take RFKILL as an input for this.
+> 
+> Funny that. I was telling Ross I already knew what your answer would be.
+> 
+> Except that means handling both rfkill switches from the kernel, ignore
+> the soft killswitches that'll only change the powered state of adapters,
+> and then poke bluetoothd directly about those.
+> 
+> That means gnome-bluetooth handling 2 types of killswitches. Which is
+> the type of problems that having a decent kernel rfkill subsystem is
+> trying to avoid.
+> 
+> I'll also note that setting the Powered state on the adapter on the
+> bluetoothd side won't be updating the rfkill state to soft killed.
+> 
+> So there's a few holes in your theory there.
+
+you are trying to use RFKILL for something that it is not. What you want
+is to power your Bluetooth adapter on or off. And we do hciconfig down
+for that adapter when Powered=false. This is as effective as using
+RFKILL and hope you hit the special platform one that takes it off the
+bus. We have a kernel with proper USB power saving for btusb now and it
+does the right thing when hciconfig down. The USB device will be powered
+down since all URBs are killed and the port will be switched off after
+some idle time. What else do you want.
+
+The RFKILL support is for a third entity that has to kill a radio
+technology for some reasons. Like policy, flight mode or because it is
+just a hardware button. And RFKILL itself is not persistent. You need
+something that makes it persistent and this will not be bluetoothd nor
+should it be the UI.
+
+Regards
+
+Marcel
+
+
