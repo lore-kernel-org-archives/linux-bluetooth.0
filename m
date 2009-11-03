@@ -1,57 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 3 Nov 2009 09:06:56 +0000 (GMT)
+To: Julius Schwartzenberg <julius@zgod.cjb.net>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Logitech Bluetooth mouse batteries drain quickly
+In-Reply-To: <4AEF6F94.4080209@zgod.cjb.net>
+References: <4AEF6F94.4080209@zgod.cjb.net>
 MIME-Version: 1.0
-In-Reply-To: <20091103082143.GA21755@jh-x301>
-References: <ba5648fa0911022149y544fcfbcsd81a68a731f0604c@mail.gmail.com>
-	 <20091103082143.GA21755@jh-x301>
-Date: Tue, 3 Nov 2009 14:41:33 +0530
-Message-ID: <8b5debfa0911030111g29c88d2n496dd3dedcce9760@mail.gmail.com>
-Subject: Re: Attending skype calls from bluetooth headset
-From: alok barsode <alokbarsode@gmail.com>
-To: bluezprofile kernel <bluezprofile@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Message-Id: <1257239216.552583.1029.nullmailer@galant.ukfsn.org>
+From: Iain Hibbert <plunky@rya-online.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bala,
+On Tue, 3 Nov 2009, Julius Schwartzenberg wrote:
 
-On Tue, Nov 3, 2009 at 1:51 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Bala,
+> I have a rather strange problem. I bought a Logitech Bluetooth mouse some time
+> ago. It works very well in Ubuntu and I never had any usage problems.
 >
-> (lkml left out from the recipients since this is pretty obviously
-> off-topic there)
->
-> On Tue, Nov 03, 2009, Bala wrote:
->> I am trying to attend skype calls from bluetooth headset.
->> I am hearing the ringtone but I am not able to answer the call by
->> pressing the call button in the headset.
->>
->> Control comes to function telephony_key_press_req() in
->> audio/telephone_dummy.c [bluez 4.32] when call button in the headset
->> is pressed.
->> Any idea how to communicate this event to skype so that the call can
->> be answered?
->
-> As you see from audio/headset.c the event will also emit a
-> "AnswerRequested" D-Bus signal. So all you need to do is get the source
-> code for skype and fix it to listen for and react to this signal. Oh wait,
-> skype is closed source ;)
-> However, if the rumors are true we might see an open source skype UI for
-> Linux soon and then the issue could really be solved. This is btw assuming
-> that skype doesn't already have some API for external call control. If it
-> does, you might be able to hack together a telephony-skype.c which calls
-> into this API.
+> The strange thing is though, that the batteries that are inside the mouse
+> drain extremely quickly. I compared the time it takes the mouse to drain a set
+> full batteries to my flatmate's who uses the exact same mouse with Mac OS X.
+> It turns out that my batteries drain about four times as quickly as his.
 
-This might help.
-https://developer.skype.com/Docs/ApiDoc/FrontPage
+how quickly is 'extremely quickly' ?
 
->
-> Johan
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+> I suspect however that Bluez is somehow talking with the device in such a way
+> the mouse doesn't sleep as quickly as when Mac OS X talks to it. Could this
+> somehow be the case? If so, what could I do to help solve this with Bluez?
 
-Cheers,
-Alok.
+what are the link policy settings for that link? (see hcitool(1))
+
+for instance, if I don't enable SNIFF mode then my [Apple] keyboard drains
+the batteries in a few days, vs many weeks otherwise ..
+
+regards,
+iain
+
+
