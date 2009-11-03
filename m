@@ -1,47 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Persisting power state when set via rfkill directly
-From: Ross Burton <ross@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-7vvBoXLPioSyK0G7wNt1"
-Date: Tue, 03 Nov 2009 15:55:02 +0000
-Message-ID: <1257263702.8893.101.camel@flashheart.burtonini.com>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <4AF02DAF.5050603@csr.com>
+Date: Tue, 03 Nov 2009 13:18:39 +0000
+From: David Vrabel <david.vrabel@csr.com>
+MIME-Version: 1.0
+To: Tomas Winkler <tomas.winkler@intel.com>
+CC: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
+        guy.cohen@intel.com, ron.rindjunsky@intel.com
+Subject: Re: [PATCH net-next] iwmc3200bt: Add iwmc3200 bluetooth driver
+References: <1257204990-18669-1-git-send-email-tomas.winkler@intel.com>
+In-Reply-To: <1257204990-18669-1-git-send-email-tomas.winkler@intel.com>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Tomas Winkler wrote:
+> Add Intel Wireless MultiCom 3200 SDIO BT driver
+> IWMC3200 is 4Wireless Com CHIP (GPS/BT/WiFi/WiMAX).
+> wmc3200bt is derived from btsdio driver
 
---=-7vvBoXLPioSyK0G7wNt1
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Can you list the hardware differences between this chip and the standard?
 
-Hi,
+> +	unsigned char tx_buf[2048];
+> +	unsigned char rx_buf[2048];
 
-I see that bluez has support for saving the current power state to disk
-(in /var/lib/bluetooth/[id]/config) when the Powered adaptor property is
-toggled, so that the same state can be restored when restarted.
-However, this only works if the powered state is toggled via the Bluez
-DBus API, applications which directly touch rfkill (such as
-gnome-bluetooth) don't cause the current mode to be persisted.
+I don't think these buffers are cache line aligned so can't be used for DMA.
 
->>From a quick look at the code I'd say that rfkill_event() shouldn't
-return early if the adaptor was powered down and instead get the adaptor
-pointer and write the new mode state.  Does this sound reasonable?
+> +		/* in IWMC_BT we need to read the transfer length
+> +		 * before interrupt clearing */
+> +		val1 = sdio_readb(data->func, REG_H2D_COUNT_L, &err);
+> +		IBT_DBG(data->func, "%s to read len1,"
+> +			" reg_addr=%x ret=%d val=%x\n",
+> +			err ? "Failed" : "Succeeded",
+> +			REG_H2D_COUNT_L, err, err ? 0xff : val1);
+> +		if (err == 0) {
+> +			val2 = sdio_readb(data->func, REG_H2D_COUNT_H, &err);
+> +			IBT_DBG(data->func, "%s to read len2,"
+> +				" reg_addr=%x ret=%d val=%x\n",
+> +				err ? "Failed" : "Succeeded",
+> +				REG_H2D_COUNT_H, err, err ? 0xff : val2);
 
-Ross
---=20
-Intel Open Source Technology Centre
-http://oss.intel.com/
+Wow.  Intel really messed up the hardware here.  An extra two SDIO
+commands per packet?  I guess no one was thinking of performance...
 
---=-7vvBoXLPioSyK0G7wNt1
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
+David
+-- 
+David Vrabel, Senior Software Engineer, Drivers
+CSR, Churchill House, Cambridge Business Park,  Tel: +44 (0)1223 692562
+Cowley Road, Cambridge, CB4 0WZ                 http://www.csr.com/
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
 
-iD8DBQBK8FJWLQnkR9C0M98RAuc5AJ9om/u8YOsx2WorQSy6xynbFMV9AgCghBNc
-Fd15CNWmjEu3shjD6bbAqXw=
-=XeY4
------END PGP SIGNATURE-----
-
---=-7vvBoXLPioSyK0G7wNt1--
+Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
