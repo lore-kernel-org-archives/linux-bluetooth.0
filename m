@@ -1,39 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Bluetooth audio via pulse doesn't function unless I chant the
- magic  incantations
-From: Bastien Nocera <hadess@hadess.net>
-To: Russ Dill <russ.dill@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <f9d2a5e10911040014p238a14lb14a1a3d45942e44@mail.gmail.com>
-References: <f9d2a5e10911040014p238a14lb14a1a3d45942e44@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Date: Wed, 04 Nov 2009 13:29:29 +0000
-Message-ID: <1257341369.23167.149.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <4AF17210.2070008@csr.com>
+Date: Wed, 04 Nov 2009 12:22:40 +0000
+From: David Vrabel <david.vrabel@csr.com>
+MIME-Version: 1.0
+To: Tomas Winkler <tomasw@gmail.com>
+CC: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] bluetooth: don't DMA to stack in btsdio driver
+References: <1256143300-16149-1-git-send-email-david.vrabel@csr.com>	 <1256653711-17959-1-git-send-email-david.vrabel@csr.com> <1ba2fa240911040256p3645aac6sea271919f1e6e651@mail.gmail.com>
+In-Reply-To: <1ba2fa240911040256p3645aac6sea271919f1e6e651@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2009-11-04 at 01:14 -0700, Russ Dill wrote:
-> I have ubuntu lucid (its just karmic+2.6.32-rc5) and I can only get
-> pulseaudio to detect my Sony DR-BT50 headset if I send some dbus
-> commands:
+Tomas Winkler wrote:
 > 
-> addr=00:1a:80:67:63:2c
-> hci=$(dbus-send --print-reply --system --dest=org.bluez /
-> org.bluez.Manager.DefaultAdapter | tail -n 1 | cut -f 2 -d '"')
-> dev=$(dbus-send --print-reply --system --dest=org.bluez $hci
-> org.bluez.Adapter.FindDevice string:$addr | tail -n 1 | cut -f 2 -d
-> '"')
-> dbus-send --print-reply --system --dest=org.bluez $dev org.bluez.Audio.Connect
+>> @@ -299,9 +301,9 @@ static int btsdio_probe(struct sdio_func *func,
+>>                                const struct sdio_device_id *id)
+>>  {
+>>        struct btsdio_data *data;
+>> -       struct hci_dev *hdev;
+>> +       struct hci_dev *hdev = NULL;
 > 
-> Additionally, the device shows up under the gnome bluetooth-properties
-> applet under "Known devices" with the gold star and the keys. The
-> connected plug doesn't appear until I exec the above commands.
-> Clicking the plug without the above commands does nothing.
+> This kind of assignments prevent useful warning from compiler, maybe
+> it's better to stage
+> the error bailout.
 
-You're using bluez-gnome (or possibly an old version of
-gnome-bluetooth). Make sure you use the latest version (2.28.3).
+I think that having to have an  error_foo label for each error makes
+writing error handling harder not easier.  I'm not inclined to change
+this, particular as I can't think of any "useful warnings" are prevented.
 
-Cheers
+>>        struct sdio_func_tuple *tuple = func->tuples;
+>> -       int err;
+>> +       int err = -ENOMEM;
+> You are assuming no other code  between 2 allocations, it's seems to
+> me error prone.
+
+Yeah, it's probably best to set err at the source of the error.  This
+code is so short it doesn't make any real practical difference.  I'll
+keep it in mind for the future though.
+
+David
+-- 
+David Vrabel, Senior Software Engineer, Drivers
+CSR, Churchill House, Cambridge Business Park,  Tel: +44 (0)1223 692562
+Cowley Road, Cambridge, CB4 0WZ                 http://www.csr.com/
 
 
+Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
