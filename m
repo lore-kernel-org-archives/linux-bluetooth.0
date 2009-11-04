@@ -1,111 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 4 Nov 2009 11:26:29 +0100
-From: Pavel Machek <pavel@ucw.cz>
-To: Dave Young <hidave.darkstar@gmail.com>
-Cc: kernel list <linux-kernel@vger.kernel.org>,
-	linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Subject: Re: 2.6.32-rc5: bluetooth still broken
-Message-ID: <20091104102629.GA15003@elf.ucw.cz>
-References: <20091030061635.GB28648@elf.ucw.cz>
- <a8e1da0911031701q4328604ayef5ee7eb939a9d50@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <a8e1da0911031701q4328604ayef5ee7eb939a9d50@mail.gmail.com>
+Date: Wed, 4 Nov 2009 01:14:02 -0700
+Message-ID: <f9d2a5e10911040014p238a14lb14a1a3d45942e44@mail.gmail.com>
+Subject: Bluetooth audio via pulse doesn't function unless I chant the magic
+	incantations
+From: Russ Dill <russ.dill@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed 2009-11-04 09:01:20, Dave Young wrote:
-> On Fri, Oct 30, 2009 at 2:16 PM, Pavel Machek <pavel@ucw.cz> wrote:
-> > Hi!
-> >
-> > Today I got this... IIRC I was told it was fixed already...?
-> 
-> Hi, this looks like another case.  Can you tell the way to
-> reproduce?
+I have ubuntu lucid (its just karmic+2.6.32-rc5) and I can only get
+pulseaudio to detect my Sony DR-BT50 headset if I send some dbus
+commands:
 
-Well, repeatedly start/stop bluetooth connecting script in attempt to
-get PC <-> android tethering to work :-(. So no, I do not think I can 
-reproduce this easily.
+addr=00:1a:80:67:63:2c
+hci=$(dbus-send --print-reply --system --dest=org.bluez /
+org.bluez.Manager.DefaultAdapter | tail -n 1 | cut -f 2 -d '"')
+dev=$(dbus-send --print-reply --system --dest=org.bluez $hci
+org.bluez.Adapter.FindDevice string:$addr | tail -n 1 | cut -f 2 -d
+'"')
+dbus-send --print-reply --system --dest=org.bluez $dev org.bluez.Audio.Connect
 
-								Pavel
+Additionally, the device shows up under the gnome bluetooth-properties
+applet under "Known devices" with the gold star and the keys. The
+connected plug doesn't appear until I exec the above commands.
+Clicking the plug without the above commands does nothing.
 
+bluez 4.51-0ubuntu2
+libbluetooth3 4.51-0ubuntu2
+pulseaudio 1:0.9.19-0ubuntu4
+pulseaudio-module-bluetooth 1:0.9.19-0ubuntu4
 
-> > ehci_hcd 0000:00:1d.7: suspend root hub
-> > EXT3 FS on sda4, internal journal
-> > kjournald starting.  Commit interval 5 seconds
-> > EXT3 FS on sda2, internal journal
-> > EXT3-fs: mounted filesystem with ordered data mode.
-> > iwl3945 0000:03:00.0: firmware: requesting iwlwifi-3945-2.ucode
-> > iwl3945 0000:03:00.0: iwlwifi-3945-2.ucode firmware file req failed: -2
-> > iwl3945 0000:03:00.0: firmware: requesting iwlwifi-3945-1.ucode
-> > iwl3945 0000:03:00.0: Loaded firmware iwlwifi-3945-1.ucode, which is deprecated.  Please use API v2 instead.
-> > iwl3945 0000:03:00.0: Firmware has old API version. Expected 2, got 1. New firmware can be obtained from http://www.intellinuxwireless.org.
-> > iwl3945 0000:03:00.0: loaded firmware version 15.28.1.8
-> > Registered led device: iwl-phy0::radio
-> > Registered led device: iwl-phy0::assoc
-> > Registered led device: iwl-phy0::RX
-> > Registered led device: iwl-phy0::TX
-> > coda_read_super: Bad mount data
-> > coda_read_super: device index: 0
-> > coda_read_super: rootfid is (01234567.ffffffff.08051b10.00000000)
-> > coda: Unexpected interruption.
-> > Failure of coda_cnode_make for root: error -4
-> > CE: hpet increasing min_delta_ns to 15000 nsec
-> > CE: hpet increasing min_delta_ns to 22500 nsec
-> > uhci_hcd 0000:00:1d.3: reserve dev 2 ep81-INT, period 1, phase 0, 23 us
-> > INFO: trying to register non-static key.
-> > the code is fine but needs lockdep annotation.
-> > turning off the locking correctness validator.
-> > Pid: 30385, comm: ps Not tainted 2.6.32-rc5-00154-gfbad3ad-dirty #83
-> > Call Trace:
-> >  [<c0791da9>] ? printk+0x18/0x1a
-> >  [<c0255492>] __lock_acquire+0x4a2/0xad0
-> >  [<c0255b28>] lock_acquire+0x68/0x90
-> >  [<c06733bd>] ? skb_dequeue+0x1d/0x70
-> >  [<c0794e0b>] _spin_lock_irqsave+0x3b/0x50
-> >  [<c06733bd>] ? skb_dequeue+0x1d/0x70
-> >  [<c06733bd>] skb_dequeue+0x1d/0x70
-> >  [<c0674034>] skb_queue_purge+0x14/0x20
-> >  [<c07139a7>] l2cap_recv_frame+0x5d7/0x3270
-> >  [<c02551e5>] ? __lock_acquire+0x1f5/0xad0
-> >  [<c02551e5>] ? __lock_acquire+0x1f5/0xad0
-> >  [<c06732c9>] ? skb_queue_tail+0x39/0x50
-> >  [<c02551e5>] ? __lock_acquire+0x1f5/0xad0
-> >  [<c050cd50>] ? usb_submit_urb+0x140/0x360
-> >  [<c02551e5>] ? __lock_acquire+0x1f5/0xad0
-> >  [<c07167d2>] l2cap_recv_acldata+0x192/0x3d0
-> >  [<c07079b8>] ? hci_rx_task+0x268/0x440
-> >  [<c0716640>] ? l2cap_recv_acldata+0x0/0x3d0
-> >  [<c07079e5>] hci_rx_task+0x295/0x440
-> >  [<c02551e5>] ? __lock_acquire+0x1f5/0xad0
-> >  [<c0235b30>] tasklet_action+0x50/0xb0
-> >  [<c0236275>] __do_softirq+0x85/0x110
-> >  [<c023632d>] do_softirq+0x2d/0x40
-> >  [<c0236495>] irq_exit+0x65/0x80
-> >  [<c0204bbf>] do_IRQ+0x4f/0xc0
-> >  [<c02034a9>] common_interrupt+0x29/0x30
-> >  [<c0794a2f>] ? _write_unlock_irq+0x1f/0x30
-> >  [<c023474f>] do_exit+0x3df/0x650
-> >  [<c021bdc2>] ? do_page_fault+0x152/0x240
-> >  [<c02349f3>] do_group_exit+0x33/0x90
-> >  [<c0234a63>] sys_exit_group+0x13/0x20
-> >  [<c0202e50>] sysenter_do_call+0x12/0x31
-> > e1000e: eth0 NIC Link is Up 100 Mbps Full Duplex, Flow Control: RX/TX
-> > 0000:02:00.0: eth0: 10/100 speed: disabling TSO
-> > hci_acl_tx_to: hci0 ACL tx timeout
-> > hci_acl_tx_to: hci0 killing stalled ACL connection 80:09:6E:BA:21:00
-> >
-> > --
-> > (english) http://www.livejournal.com/~pavelmachek
-> > (cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> > the body of a message to majordomo@vger.kernel.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> >
-> 
-> 
-> 
+hci0:	Type: USB
+	BD Address: 00:16:CF:F7:04:20 ACL MTU: 1017:8 SCO MTU: 64:8
+	UP RUNNING PSCAN ISCAN
+	RX bytes:142026 acl:16520 sco:0 events:10116 errors:0
+	TX bytes:33958806 acl:39854 sco:0 commands:73 errors:0
 
--- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+(after above commands)
+
+Connections:
+	< ACL 00:1A:80:67:63:2C handle 11 state 1 lm MASTER
+
+How can I get my machine to automatically pair with this headset?
