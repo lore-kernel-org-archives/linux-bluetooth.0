@@ -1,103 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4AF3F0EC.3050703@gmail.com>
-Date: Fri, 06 Nov 2009 10:48:28 +0100
-From: sancane <sancane@gmail.com>
+Date: Thu, 5 Nov 2009 19:43:54 +0000 (GMT)
+To: Julius Schwartzenberg <julius@zgod.cjb.net>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Logitech Bluetooth mouse batteries drain quickly
+In-Reply-To: <4AF2B5EB.40202@zgod.cjb.net>
+References: <4AEF6F94.4080209@zgod.cjb.net> <1257239216.552583.1029.nullmailer@galant.ukfsn.org> <4AF2B5EB.40202@zgod.cjb.net>
 MIME-Version: 1.0
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: Problems opening connections for an HDP implementation.
-References: <200911051551.40829.jcaden@libresoft.es>
-In-Reply-To: <200911051551.40829.jcaden@libresoft.es>
-Content-Type: text/plain; charset=ISO-8859-1
-To: unlisted-recipients:; (no To-header on input)
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Message-Id: <1257450234.926723.29928.nullmailer@galant.ukfsn.org>
+From: Iain Hibbert <plunky@rya-online.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi José,
+On Thu, 5 Nov 2009, Julius Schwartzenberg wrote:
 
-José Antonio Santos Cadenas escribió:
-> Hi everybody,
-> 
-> I am developing a free/open source implementation of HDP using sancane's MCAP 
-> implementation. I am using ERTM and STREAMING mode provided by Gustavo's 
-> patches from 3th October. I've been testing my implementation between two 
-> computers (both of them using the previously mentioned profiles). This test 
-> seems working correctly but I am also trying to test it against a Nonin Onix 
-> II 9560BT PulseOximeter (certified by Continua). This device is using HDP but 
-> when I try to test my HDP implementation I've observed that the MCAP control 
-> channel L2CAP connection is not correctly opened (see trace bellow)
-> 
-> ...
->> HCI Event: Number of Completed Packets (0x13) plen 5
->     handle 46 packets 1
->> ACL data: handle 46 flags 0x02 dlen 12
->     L2CAP(s): Connect req: psm 49704 scid 0x0041
-> < ACL data: handle 46 flags 0x02 dlen 16
->     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0041 result 0 status 0
->       Connection successful
-> ....
-> 
-> There is a thread waiting for incoming connections on this psm, but it is 
-> never waked up from the recv system call.
-> 
+> Yes, it's indeed not days, but months. Here is the output from hcitool:
+> Link policy settings: RSWITCH HOLD SNIFF PARK
+>
+> So this looks good I guess?
 
-MCAP control channels are simply L2CAP socket with ERTM enabled. Current
-implementations waits in a recv call for incoming connections. When a
-device connect with you, the thread is waked up to create an MCAP
-Communications Link (MCL). Since here, all negotiations are established
-using MCAP commands.
-At a minimum, the l2cap connection should be opened before MCAP working
-thread will be waked up.
-I suspect that the problem is that the l2cap with ERMT connections is
-not opened.
+guess so
 
-> .....
->> HCI Event: Number of Completed Packets (0x13) plen 5
->     handle 46 packets 1
->> HCI Event: Link Key Request (0x17) plen 6
->     bdaddr 00:1C:05:00:19:56
-> < HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
->     bdaddr 00:1C:05:00:19:56 key DD4D176E23CDB1D95334CD8A7D077773
->> HCI Event: Command Complete (0x0e) plen 10
->     Link Key Request Reply (0x01|0x000b) ncmd 1
->     status 0x00 bdaddr 00:1C:05:00:19:56
->> HCI Event: Encrypt Change (0x08) plen 4
->     status 0x00 handle 46 encrypt 0x01
-> < HCI Command: Read RSSI (0x05|0x0005) plen 2
->     handle 46
-> ....
-> This part of the trace is repeated until local host closes L2CAP connection.
-> ....
-> 
-> < ACL data: handle 46 flags 0x02 dlen 12
->     L2CAP(s): Disconn req: dcid 0x0041 scid 0x0040
->> HCI Event: Number of Completed Packets (0x13) plen 5
->     handle 46 packets 1
->> ACL data: handle 46 flags 0x02 dlen 12
->     L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x0040
-> ....
-> 
->> HCI Event: Command Complete (0x0e) plen 7
->     Read Transmit Power Level (0x03|0x002d) ncmd 1
->     status 0x00 handle 46 level 3
-> < HCI Command: Disconnect (0x01|0x0006) plen 3
->     handle 46 reason 0x13
->     Reason: Remote User Terminated Connection
->> HCI Event: Command Status (0x0f) plen 4
->     Disconnect (0x01|0x0006) status 0x00 ncmd 1
->> HCI Event: Disconn Complete (0x05) plen 4
->     status 0x00 handle 46 reason 0x16
->     Reason: Connection Terminated by Local Host
-> 
-> 
-> What am I doing wrong? Why the connection to this socket is not finished?
-> 
-> If you are interested in the complete trace I can send it to you.
-> 
-> 
-> Thank you very much.
-> Regards.
-> 
-> Jose.
-> 
+> When I look at the info, I get this:
+> Requesting information ...
+>         BD Address:  00:07:61:DF:0D:C7
+>         Device Name: Bluetooth Laser Travel Mouse
+>         LMP Version: 2.0 (0x3) LMP Subversion: 0x229
+>         Manufacturer: Broadcom Corporation (15)
+>         Features: 0xbc 0x02 0x04 0x38 0x08 0x00 0x00 0x00
+>                 <encryption> <slot offset> <timing accuracy> <role switch>
+>                 <sniff mode> <RSSI> <power control> <enhanced iscan>
+>                 <interlaced iscan> <interlaced pscan> <AFH cap. slave>
+>
+> Could the problem be related to the "power control" feature which may not be
+> fully used right now?
+
+No, that relates to Link Manager Protocol which is carried out entirely
+within the controller and I don't think there is any way for the host to
+influence any decisions regarding that..
+
+My suggestion is to use rechargeables. They will likely last longer than
+alkalines, and I normally have spares already charged (use AA for bicycle
+lights) so it never really bothered me to have a flat..
+
+iain
 
 
