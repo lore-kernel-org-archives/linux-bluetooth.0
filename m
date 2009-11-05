@@ -1,139 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-From: Denis Kenzior <denkenz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: RFC: New Handsfree Client Role API
-Date: Thu, 5 Nov 2009 13:22:17 -0600
-References: <200911051142.31929.denkenz@gmail.com> <20091105185232.GA27336@jh-x301>
-In-Reply-To: <20091105185232.GA27336@jh-x301>
+Message-ID: <4AF32308.3060400@dell.com>
+Date: Thu, 05 Nov 2009 13:10:00 -0600
+From: Mario Limonciello <mario_limonciello@dell.com>
 MIME-Version: 1.0
-Content-Type: Multipart/Mixed;
-  boundary="Boundary-00=_qXy8K0I9fXhV0Bw"
-Message-Id: <200911051322.18130.denkenz@gmail.com>
+To: Stefan Seyfried <stefan.seyfried@googlemail.com>
+CC: BlueZ devel list <linux-bluetooth@vger.kernel.org>
+Subject: Re: hid2hci rules breaks standard USB dell mouses
+References: <4AE18EA3.50701@pardus.org.tr>	<4AE1E1E8.3080902@dell.com>	<1256373518.7812.1.camel@localhost.localdomain>	<4AE7651C.7010809@dell.com> <20091028093118.71e8f55c@strolchi.home.s3e.de>
+In-Reply-To: <20091028093118.71e8f55c@strolchi.home.s3e.de>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="------------enigB09D0FA8D4EE2B5899E4CA8A"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---Boundary-00=_qXy8K0I9fXhV0Bw
-Content-Type: text/plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enigB09D0FA8D4EE2B5899E4CA8A
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-Hi Johan,
+Stefan:
 
-> > Properties	boolean Connected [readonly]
-> >
-> > 			Indicates if there is an active connection to the
-> > 			AG service on the remote device.
+Stefan Seyfried wrote:
+> On Tue, 27 Oct 2009 16:24:44 -0500
+> Mario Limonciello <mario_limonciello@dell.com> wrote:
 >
-> In addition to (or instead of) this property we could also have a string
-> State property which would also communicate the "connecting" and "playing"
-> states. This is what we have for some other interfaces and it has proved
-> to be useful there (not sure if that'll be equally true for this new
-> interface but it's still worth considering).
-
-Sure, updated.
-
+> Maybe a compromise for the near future:
+> * update the rules / tools in bluez to be in sync with udev
+> * don't install them by default unless "--enable-old-udev" (or
+>   something like that) is ./configure'd
 >
-> As discussed on the #ofono channel, you might want to add here that the
-> assumption is that the agent responds to this method only after it has
-> completed the establishment of the SLC (or when it chooses to reject the
-> connection).
+> Reasoning:
+> * people might want to use new bluez with old udev (I personally would
+>   avoid updating udev in a running system since it seems to interdepend=
 
-Yep, good catch.
+>   on many things. Updating bluez has been painless for me over the last=
 
-Here's the updated API based on more discussion on #ofono.
+>   years).
+>
+> Marcel, Mario, does this sound acceptable? If yes, I am willing to
+> prepare a patch.
+>  =20
+Since Marcel doesn't seem keen on my dropping support in BlueZ for
+hid2hci (the patch has been ignored twice now), i'm fine with this.
 
-Regards,
--Denis
+--=20
+Mario Limonciello
+*Dell | Linux Engineering*
+mario_limonciello@dell.com
 
---Boundary-00=_qXy8K0I9fXhV0Bw
-Content-Type: text/plain;
-  charset="UTF-8";
-  name="hfp-api.txt"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename="hfp-api.txt"
 
-Gateway hierarchy
-========================
+--------------enigB09D0FA8D4EE2B5899E4CA8A
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Service		org.bluez
-Interface	org.bluez.HandsfreeGateway
-Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
 
-This interface is available for remote devices which can function in the Audio
-Gateway role of the HFP profiles.  It is intended to be used with external
-telephony stacks / handlers of the HFP protocol.
+iEYEARECAAYFAkrzIwgACgkQ2CrZjkA73YtfsQCgkWshjAjmzm6zQa5J9nGYOL66
+8ogAni7NZUJPtrLLwhhaVgtznVfg8xlY
+=x24t
+-----END PGP SIGNATURE-----
 
-Methods		void Connect()
-
-			Connect to the AG service on the remote device.
-
-		void Disconnect()
-
-			Disconnect from the AG service on the remote device
-
-		dict GetProperties()
-
-			Returns all properties for the interface. See the
-			properties section for available properties.
-
-		void RegisterAgent(object path)
-
-			The object path defines the path the of the agent
-			that will be called when a new Handsfree connection
-			is established.
-			
-			If an application disconnects from the bus all of its
-			registered agents will be removed.
-
-		void UnregisterAgent(object path)
-
-			This unregisters the agent that has been previously
-			registered. The object path parameter must match the
-			same value that has been used on registration.
-
-Signals		PropertyChanged(string name, variant value)
-
-			This signal indicates a changed value of the given
-			property.
-
-Properties	string Connected [readonly]
-
-			Indicates the state of the connection.  Possible
-			values are:
-				"disconnected"
-				"connecting"
-				"connected"
-				"playing"
-
-HandsfreeAgent hierarchy
-===============
-
-Service         unique name
-Interface       org.bluez.HandsfreeAgent
-Object path     freely definable
-
-Methods		void NewConnection(filedescriptor fd)
-
-			This method gets called whenever a new handsfree
-			connection has been established.  The objectpath
-			contains the object path of the remote device.  This
-			method assumes that DBus daemon with file descriptor
-			passing capability is being used.
-
-			The agent should only return successfully once the
-			establishment of the service level connection (SLC)
-			has been completed.  In the case of Handsfree this
-			means that BRSF exchange has been performed and
-			necessary initialization has been done.
-
-			Possible Errors: org.bluez.Error.InvalidArguments
-					 org.bluez.Error.Failed
-
-		void Release()
-
-			This method gets called whenever the service daemon
-			unregisters the agent.
-
---Boundary-00=_qXy8K0I9fXhV0Bw--
+--------------enigB09D0FA8D4EE2B5899E4CA8A--
