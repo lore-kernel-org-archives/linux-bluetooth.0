@@ -1,59 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4AF2B5EB.40202@zgod.cjb.net>
-Date: Thu, 05 Nov 2009 12:24:27 +0100
-From: Julius Schwartzenberg <julius@zgod.cjb.net>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: Logitech Bluetooth mouse batteries drain quickly
-References: <4AEF6F94.4080209@zgod.cjb.net> <1257239216.552583.1029.nullmailer@galant.ukfsn.org>
-In-Reply-To: <1257239216.552583.1029.nullmailer@galant.ukfsn.org>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: Bluetooth audio via pulse doesn't function unless I chant the
+ magic incantations
+From: Bastien Nocera <hadess@hadess.net>
+To: Russ Dill <russ.dill@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <f9d2a5e10911041813r36675253n9e0b6b81bd6b1055@mail.gmail.com>
+References: <f9d2a5e10911040014p238a14lb14a1a3d45942e44@mail.gmail.com>
+	 <1257341369.23167.149.camel@localhost.localdomain>
+	 <f9d2a5e10911041813r36675253n9e0b6b81bd6b1055@mail.gmail.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Date: Thu, 05 Nov 2009 02:49:30 +0000
+Message-ID: <1257389371.23167.155.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Iain Hibbert wrote:
-> On Tue, 3 Nov 2009, Julius Schwartzenberg wrote:
+On Wed, 2009-11-04 at 19:13 -0700, Russ Dill wrote:
+> On Wed, Nov 4, 2009 at 6:29 AM, Bastien Nocera <hadess@hadess.net> wrote:
+> > On Wed, 2009-11-04 at 01:14 -0700, Russ Dill wrote:
+> >> I have ubuntu lucid (its just karmic+2.6.32-rc5) and I can only get
+> >> pulseaudio to detect my Sony DR-BT50 headset if I send some dbus
+> >> commands:
+> >>
+> >> addr=00:1a:80:67:63:2c
+> >> hci=$(dbus-send --print-reply --system --dest=org.bluez /
+> >> org.bluez.Manager.DefaultAdapter | tail -n 1 | cut -f 2 -d '"')
+> >> dev=$(dbus-send --print-reply --system --dest=org.bluez $hci
+> >> org.bluez.Adapter.FindDevice string:$addr | tail -n 1 | cut -f 2 -d
+> >> '"')
+> >> dbus-send --print-reply --system --dest=org.bluez $dev org.bluez.Audio.Connect
+> >>
+> >> Additionally, the device shows up under the gnome bluetooth-properties
+> >> applet under "Known devices" with the gold star and the keys. The
+> >> connected plug doesn't appear until I exec the above commands.
+> >> Clicking the plug without the above commands does nothing.
+> >
+> > You're using bluez-gnome (or possibly an old version of
+> > gnome-bluetooth). Make sure you use the latest version (2.28.3).
+> >
+> > Cheers
+> >
 > 
->> I have a rather strange problem. I bought a Logitech Bluetooth mouse some time
->> ago. It works very well in Ubuntu and I never had any usage problems.
->>
->> The strange thing is though, that the batteries that are inside the mouse
->> drain extremely quickly. I compared the time it takes the mouse to drain a set
->> full batteries to my flatmate's who uses the exact same mouse with Mac OS X.
->> It turns out that my batteries drain about four times as quickly as his.
+> Thank you for the awesomeness.
 > 
-> how quickly is 'extremely quickly' ?
+> Next question, I get events from keypresses on the headset via a
+> /dev/input/eventX file, but how do I do things with those events?
 
-I have the mouse for about 7 months now. This is my 4rd or 5th pair of 
-batteries I think.
+If you use GNOME, the buttons should be forwarded to X11, and to the
+desktop. So the volume buttons should already work. Check the Sound and
+Keyboard shortcuts preferences.
 
+If you're using something else, I'm afraid I wouldn't know...
 
->> I suspect however that Bluez is somehow talking with the device in such a way
->> the mouse doesn't sleep as quickly as when Mac OS X talks to it. Could this
->> somehow be the case? If so, what could I do to help solve this with Bluez?
-> 
-> what are the link policy settings for that link? (see hcitool(1))
-> 
-> for instance, if I don't enable SNIFF mode then my [Apple] keyboard drains
-> the batteries in a few days, vs many weeks otherwise ..
+Cheers
 
-Yes, it's indeed not days, but months. Here is the output from hcitool:
-Link policy settings: RSWITCH HOLD SNIFF PARK
-
-So this looks good I guess?
-
-When I look at the info, I get this:
-Requesting information ...
-         BD Address:  00:07:61:DF:0D:C7
-         Device Name: Bluetooth Laser Travel Mouse
-         LMP Version: 2.0 (0x3) LMP Subversion: 0x229
-         Manufacturer: Broadcom Corporation (15)
-         Features: 0xbc 0x02 0x04 0x38 0x08 0x00 0x00 0x00
-                 <encryption> <slot offset> <timing accuracy> <role switch>
-                 <sniff mode> <RSSI> <power control> <enhanced iscan>
-                 <interlaced iscan> <interlaced pscan> <AFH cap. slave>
-
-Could the problem be related to the "power control" feature which may 
-not be fully used right now?
-
-Julius
