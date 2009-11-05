@@ -1,67 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4AF32308.3060400@dell.com>
-Date: Thu, 05 Nov 2009 13:10:00 -0600
-From: Mario Limonciello <mario_limonciello@dell.com>
 MIME-Version: 1.0
-To: Stefan Seyfried <stefan.seyfried@googlemail.com>
-CC: BlueZ devel list <linux-bluetooth@vger.kernel.org>
-Subject: Re: hid2hci rules breaks standard USB dell mouses
-References: <4AE18EA3.50701@pardus.org.tr>	<4AE1E1E8.3080902@dell.com>	<1256373518.7812.1.camel@localhost.localdomain>	<4AE7651C.7010809@dell.com> <20091028093118.71e8f55c@strolchi.home.s3e.de>
-In-Reply-To: <20091028093118.71e8f55c@strolchi.home.s3e.de>
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="------------enigB09D0FA8D4EE2B5899E4CA8A"
+In-Reply-To: <200911051142.31929.denkenz@gmail.com>
+References: <200911051142.31929.denkenz@gmail.com>
+Date: Thu, 5 Nov 2009 15:53:57 -0300
+Message-ID: <2d5a2c100911051053m636c5532n5f105c30d721cfb6@mail.gmail.com>
+Subject: Re: RFC: New Handsfree Client Role API
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Denis Kenzior <denkenz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enigB09D0FA8D4EE2B5899E4CA8A
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+Hi Denis,
 
-Stefan:
-
-Stefan Seyfried wrote:
-> On Tue, 27 Oct 2009 16:24:44 -0500
-> Mario Limonciello <mario_limonciello@dell.com> wrote:
+On Thu, Nov 5, 2009 at 2:42 PM, Denis Kenzior <denkenz@gmail.com> wrote:
+> Hi Everyone,
 >
-> Maybe a compromise for the near future:
-> * update the rules / tools in bluez to be in sync with udev
-> * don't install them by default unless "--enable-old-udev" (or
->   something like that) is ./configure'd
+> As you know we're currently working to add support for Handsfree Profile (HFP)
+> as another possible backend for oFono.  The missing piece is audio integration
+> which is done in BlueZ.
 >
-> Reasoning:
-> * people might want to use new bluez with old udev (I personally would
->   avoid updating udev in a running system since it seems to interdepend=
+> Proposed is an API for such integration between BlueZ and an AT engine that
+> will implement the Handsfree Profile Client role.  The API will replace the
+> current org.bluez.HeadsetGateway interface, if accepted.
 
->   on many things. Updating bluez has been painless for me over the last=
+I wonder if we couldn't create something more generic for telephony as
+SAP could use the same agent, although SAP doesn't use AT commands
+there are some overlap between handsfree Profile and Sim Access. Also
+I prefer just RegisterAgent and UnregisterAgent, the interface already
+has Handsfree in its name.
 
->   years).
->
-> Marcel, Mario, does this sound acceptable? If yes, I am willing to
-> prepare a patch.
->  =20
-Since Marcel doesn't seem keen on my dropping support in BlueZ for
-hid2hci (the patch has been ignored twice now), i'm fine with this.
+> An interesting thing to note here is that the API will utilize DBus 1.3+
+> capability for file-descriptor passing to pass the RFCOMM socket from
+> bluetoothd to oFono.
 
---=20
-Mario Limonciello
-*Dell | Linux Engineering*
-mario_limonciello@dell.com
+Pretty good, fd seems to fit very nicely here.
 
+> This API has passed first round of review, but further comments, suggestions
+> and refinements are welcome.
 
---------------enigB09D0FA8D4EE2B5899E4CA8A
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+In general I prefer this Agent based (runtime) mechanism rather than
+having those telephony drivers in BlueZ (buildtime), even for server
+role, it is much easier to test (no rebuild and restart) and also very
+convenient if e.g. the platform needs to talk to something (telepathy)
+in session bus, in that case the agent process just need to connect to
+both system and session bus but the driver can't do that since we
+don't know about session.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
-
-iEYEARECAAYFAkrzIwgACgkQ2CrZjkA73YtfsQCgkWshjAjmzm6zQa5J9nGYOL66
-8ogAni7NZUJPtrLLwhhaVgtznVfg8xlY
-=x24t
------END PGP SIGNATURE-----
-
---------------enigB09D0FA8D4EE2B5899E4CA8A--
+-- 
+Luiz Augusto von Dentz
+Engenheiro de Computação
