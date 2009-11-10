@@ -1,31 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4AF9721B.3010405@gmx.de>
-Date: Tue, 10 Nov 2009 15:00:59 +0100
-From: Susanne Goldammer <susanne.goldammer@gmx.de>
-Reply-To: Susanne Goldammer <susanne.goldammer@gmx.de>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Make bluetoothd start w/o SDP Server
-Content-Type: text/plain; charset=ISO-8859-15
+Date: Tue, 10 Nov 2009 12:04:21 +0100
+From: Stefan Seyfried <stefan.seyfried@googlemail.com>
+To: BlueZ devel list <linux-bluetooth@vger.kernel.org>
+Subject: Re: PAND error?
+Message-ID: <20091110120421.00dd42c9@strolchi.home.s3e.de>
+In-Reply-To: <4AF8CE07.402@tozzi.eu>
+References: <4AF8CE07.402@tozzi.eu>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+On Tue, 10 Nov 2009 03:20:55 +0100
+Gabriele Tozzi <gabriele@tozzi.eu> wrote:
 
-i was worrying about the missing cmdline option of bluetoothd which
-would allow the new daemon to start without its internal sdp server.
-Such an option was available for the old hcid.
+> Hello,
+> 
+> after a system update, I got a nice "success" pand error issuing the
+> command:
+> 
+> pand --connect <address>
+> 
+> The error is:
+> 
+> Connect to <address> failed. Success(0)
+> 
+> I'm trying to connect to a Windows Mobile NAP to be a PANU. Everyting
+> worked fine util some weeks ago.
 
-So i created a patch for me to fix this in bluez-4.51 source, which
-works fine here but might not be the best implementation.
-Now I would like to know if anyone is interested in this patch at all
-and might want to make it a bit more professional :-)
+I am successfully using the dbus API to achieve that as written here:
+http://seife.kernalert.de/blog/2009/08/10/using-pannap-instead-of-rfcommppd/
+-- 
+Stefan Seyfried
 
-Or is there already another way to suppress the internal sdp server
-starting, so the changes are not needed anymore????
-
-Thanks for responses in advance !
-
-Best regards
-Susanne
-
+"Any ideas, John?"
+"Well, surrounding them's out."
