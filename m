@@ -1,37 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 10 Nov 2009 12:04:21 +0100
-From: Stefan Seyfried <stefan.seyfried@googlemail.com>
-To: BlueZ devel list <linux-bluetooth@vger.kernel.org>
-Subject: Re: PAND error?
-Message-ID: <20091110120421.00dd42c9@strolchi.home.s3e.de>
-In-Reply-To: <4AF8CE07.402@tozzi.eu>
-References: <4AF8CE07.402@tozzi.eu>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Message-ID: <4AF8CE07.402@tozzi.eu>
+Date: Tue, 10 Nov 2009 03:20:55 +0100
+From: Gabriele Tozzi <gabriele@tozzi.eu>
+MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org
+Subject: PAND error?
+Content-Type: text/plain; charset=ISO-8859-15
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 10 Nov 2009 03:20:55 +0100
-Gabriele Tozzi <gabriele@tozzi.eu> wrote:
+Hello,
 
-> Hello,
-> 
-> after a system update, I got a nice "success" pand error issuing the
-> command:
-> 
-> pand --connect <address>
-> 
-> The error is:
-> 
-> Connect to <address> failed. Success(0)
-> 
-> I'm trying to connect to a Windows Mobile NAP to be a PANU. Everyting
-> worked fine util some weeks ago.
+after a system update, I got a nice "success" pand error issuing the
+command:
 
-I am successfully using the dbus API to achieve that as written here:
-http://seife.kernalert.de/blog/2009/08/10/using-pannap-instead-of-rfcommppd/
--- 
-Stefan Seyfried
+pand --connect <address>
 
-"Any ideas, John?"
-"Well, surrounding them's out."
+The error is:
+
+Connect to <address> failed. Success(0)
+
+I'm trying to connect to a Windows Mobile NAP to be a PANU. Everyting
+worked fine util some weeks ago.
+I'm pretty sure I've not changed my setup. Connecting to the Windows
+Mobile from the same guest machine using some proprietary Redmond's OS
+works fine. It's annying to reboot to Redmond just to surf the internet.
+I've also tried to get support on various forums and communities, but
+nobody seems to know how to solve this.
+
+Please help.
+
+Thank you
+
+Gabriele
