@@ -1,48 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: Oliver Neukum <oliver@neukum.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: GPF in run_workqueue()/list_del_init(cwq->worklist.next) on resume (was: Re: Help needed: Resume problems in 2.6.32-rc, perhaps related to preempt_count leakage in keventd)
-Date: Wed, 11 Nov 2009 22:13:30 +0100
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
- "Rafael J. Wysocki" <rjw@sisk.pl>,
- Thomas Gleixner <tglx@linutronix.de>,
- Mike Galbraith <efault@gmx.de>,
- Ingo Molnar <mingo@elte.hu>,
- LKML <linux-kernel@vger.kernel.org>,
- pm list <linux-pm@lists.linux-foundation.org>,
- Greg KH <gregkh@suse.de>,
- Jesse Barnes <jbarnes@virtuousgeek.org>,
- Tejun Heo <tj@kernel.org>,
- Oleg Nesterov <oleg@redhat.com>,
- linux-bluetooth@vger.kernel.org
-References: <200911091250.31626.rjw@sisk.pl> <alpine.LFD.2.01.0911111142340.31845@localhost.localdomain> <1257970719.21467.4.camel@violet>
-In-Reply-To: <1257970719.21467.4.camel@violet>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="utf-8"
-Message-Id: <200911112213.30673.oliver@neukum.org>
+Subject: Re: [PATCH 13/13] pcmcia: rework the irq_req_t typedef
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Dominik Brodowski <linux@dominikbrodowski.net>
+Cc: linux-pcmcia@lists.infradead.org, netdev@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-wireless@vger.kernel.org, linux-scsi@vger.kernel.org,
+	alsa-devel@alsa-project.org, Jaroslav Kysela <perex@perex.cz>,
+	Jiri Kosina <jkosina@suse.cz>,
+	Karsten Keil <isdn@linux-pingi.de>
+In-Reply-To: <1257971899-9274-13-git-send-email-linux@dominikbrodowski.net>
+References: <20091111203303.GA7939@comet.dominikbrodowski.net>
+	 <1257971899-9274-13-git-send-email-linux@dominikbrodowski.net>
+Content-Type: text/plain; charset="UTF-8"
+Date: Wed, 11 Nov 2009 21:46:03 +0100
+Message-ID: <1257972363.21467.7.camel@violet>
+Mime-Version: 1.0
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am Mittwoch, 11. November 2009 21:18:39 schrieb Marcel Holtmann:
-> > I'm looking at btusb_disconnect(), for example. It's one of the few BT 
-> > drivers that seem to use workqueues, and I'm not seeing a 
-> > cancel_work_sync() in the disconnect routine - but maybe the
-> > btusb_close()  routine is called indirectly some way that I just don't
-> > see.
-> 
-> so the btusb_close() should be called before btusb_destruct() and the
-> destruct() callback is only when the last reference count gets dropped
-> and we do have to free the memory. So it seems we are doing something
-> wrong in btusb_close(). The close() callback is triggered via
-> hci_unregister_dev() from btusb_disconnect().
-> 
-> As it seems the btusb_close() only cancels the work workqueue and not
-> the waker workqueue. Could that be the problem.
+Hi Dominik,
 
-Yes, btusb_close() needs to cancel the waker workqueue, too.
-In addition, in order to avoid a memory leak it must call
-usb_scuttle_anchored_urbs(&data->deferred)
-to make sure any deferred data is destroyed.
+> Most of the irq_req_t typedef'd struct can be re-worked quite
+> easily:
+> 
+> (1) IRQInfo2 was unused in any case, so drop it.
+> 
+> (2) IRQInfo1 was used write-only, so drop it.
+> 
+> (3) Instance (private data to be passed to the IRQ handler):
+> 	Most PCMCIA drivers using pcmcia_request_irq() to actually
+> 	register an IRQ handler set the "dev_id" to the same pointer
+> 	as the "priv" pointer in struct pcmcia_device. Modify the two
+> 	exceptions (ipwireless, ibmtr_cs) to also work this waym and
+> 	set the IRQ handler's "dev_id" to p_dev->priv unconditionally.
+> 
+> (4) Handler is to be of type irq_handler_t.
+> 
+> (5) Handler != NULL already tells whether an IRQ handler is present.
+> 	Therefore, we do not need the IRQ_HANDLER_PRESENT flag in
+> 	irq_req_t.Attributes.
+> 
+> CC: netdev@vger.kernel.org
+> CC: linux-bluetooth@vger.kernel.org
+> CC: linux-ide@vger.kernel.org
+> CC: linux-wireless@vger.kernel.org
+> CC: linux-scsi@vger.kernel.org
+> CC: alsa-devel@alsa-project.org
+> CC: Jaroslav Kysela <perex@perex.cz>
+> CC: Jiri Kosina <jkosina@suse.cz>
+> CC: Karsten Keil <isdn@linux-pingi.de>
+> Signed-off-by: Dominik Brodowski <linux@dominikbrodowski.net>
+> ---
+>  drivers/ata/pata_pcmcia.c                        |    1 -
+>  drivers/bluetooth/bluecard_cs.c                  |    4 +---
+>  drivers/bluetooth/bt3c_cs.c                      |    4 +---
+>  drivers/bluetooth/btuart_cs.c                    |    4 +---
+>  drivers/bluetooth/dtl1_cs.c                      |    4 +---
 
-	Regards
-		Oliver
+for the Bluetooth parts:
+
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+
+Regards
+
+Marcel
+
+
