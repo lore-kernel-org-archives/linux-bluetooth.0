@@ -1,39 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4AFBF5AE.9090107@gmail.com>
-Date: Thu, 12 Nov 2009 12:46:54 +0100
-From: sancane <sancane@gmail.com>
+Message-ID: <4AFBE7B4.5010709@gmx.de>
+Date: Thu, 12 Nov 2009 11:47:16 +0100
+From: Susanne Goldammer <susanne.goldammer@gmx.de>
+Reply-To: Susanne Goldammer <susanne.goldammer@gmx.de>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-CC: =?ISO-8859-1?Q?Pedro_de_las_Heras_Quir=F3s?= <pheras@gsyc.es>,
-	scarot@libresoft.es,
-	=?ISO-8859-1?Q?Jos=E9_Antonio_Santos_Cadenas?=
-	<jcaden@libresoft.es>
-Subject: HDP & MCAP developed for Bluez
+To: Iain Hibbert <plunky@rya-online.net>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: Make bluetoothd start w/o SDP Server
+References: <4AF9721B.3010405@gmx.de> <1257861916.10888.1372.camel@localhost.localdomain> <4AF97659.2050807@gmx.de> <4AFBD3B6.6020706@gmx.de> <1258020990.988942.3883.nullmailer@galant.ukfsn.org>
+In-Reply-To: <1258020990.988942.3883.nullmailer@galant.ukfsn.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Iain,
 
-I would like to announce to you that we have finished our open
-source MCAP-HDP implementation for Bluez. We've successfully tested it
-against a Nonin Onyx II 9560 using the el2cap Gustavo's kernel
-implementation.
+thanks for you reply!
 
-We're planning to release it under GNU/GPL v3. If you are interested, we
-can add it to Bluez official library. We are open to any suggestion or
-recommendation.
+I think you missunderstood a bit.
 
-At current moment we are working on it to set the code in a more stable
-state. We will plan to upload our libraries in next few days, we will
-announce here when the code is available.
+First, yes it is a handsfree kit.
 
-We have noticed that it is necessary to add some functionalities to the
-SDP implementation (which affect to HDP records), at the current moment,
-we have included it in HDP, but we think that it is better to include it
-in SDP. If you want, we can submit a patch to add it.
+But: We don't want to provide our own proprietary SDP Stuff. This makes
+no sense cause we want to be compatible to other BT-devices supporting
+interesting BT-profiles like HFP etc. And also I was talking about the
+SDP-Server side means i want to sent responses.
 
-You can get more information about the project in
-http://openhealth.morfeo-project.org/
+What we want to do is robustness testing, means our test SDP Server
+listens for a SDP request (which can come from headunit but also from
+any other sdp capable mobile phone or whatsoever to request the services
+provided by the communication partner). We have some predefined correct
+answers for some of the SDP requests, but before sending the one fitting
+for the received request we fuzz the answer, means we make it invalid
+regarding length etc. pp.
 
-best regards!
+Then we send this answer to the bt device under test and look if it
+becomes instable cause e.g. of missing checks in SDP implementation.
+
+There are thousands of tools like scapy doing such things for tcp/ip
+stack. We are doing similar tests for Bluetooth communication ( L2CAP,
+Obex and finally  SDP, too). Here a correct and primarily robust
+implementation needs to be ensured through testing. The best way to do
+so is to confront the DuT with such invalid packets.
+
+I hope this help to understand a bit better.
