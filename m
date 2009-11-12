@@ -1,46 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4AFBE7B4.5010709@gmx.de>
-Date: Thu, 12 Nov 2009 11:47:16 +0100
-From: Susanne Goldammer <susanne.goldammer@gmx.de>
-Reply-To: Susanne Goldammer <susanne.goldammer@gmx.de>
-MIME-Version: 1.0
-To: Iain Hibbert <plunky@rya-online.net>
-CC: linux-bluetooth@vger.kernel.org
+Date: Thu, 12 Nov 2009 10:16:30 +0000 (GMT)
+To: Susanne Goldammer <susanne.goldammer@gmx.de>
+Cc: linux-bluetooth@vger.kernel.org
 Subject: Re: Make bluetoothd start w/o SDP Server
-References: <4AF9721B.3010405@gmx.de> <1257861916.10888.1372.camel@localhost.localdomain> <4AF97659.2050807@gmx.de> <4AFBD3B6.6020706@gmx.de> <1258020990.988942.3883.nullmailer@galant.ukfsn.org>
-In-Reply-To: <1258020990.988942.3883.nullmailer@galant.ukfsn.org>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <4AFBD3B6.6020706@gmx.de>
+References: <4AF9721B.3010405@gmx.de> <1257861916.10888.1372.camel@localhost.localdomain> <4AF97659.2050807@gmx.de> <4AFBD3B6.6020706@gmx.de>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Message-Id: <1258020990.988942.3883.nullmailer@galant.ukfsn.org>
+From: Iain Hibbert <plunky@rya-online.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Iain,
+On Thu, 12 Nov 2009, Susanne Goldammer wrote:
 
-thanks for you reply!
+> I would like to explain in more detail why I use this option to start
+> bluetoothd without its own SDP-Server.
+>
+> The goal is to test the SDP implementation of bluetooth-capable Daimler
+> headunits. For this i need my own SDP-Server implementation running,
+> cause this SDP Server answers with predefined and invalid SDP Responses
+> to special Requests from headunit.
 
-I think you missunderstood a bit.
+I guess that a "Daimler headunit" is something to do with the Daimler car,
+is that some kind of builtin radio with integrated handsfree capability?
 
-First, yes it is a handsfree kit.
+I would be interested to find out why you need to use proprietary SDP
+requests?  They would only be accessible from a proprietary device and as
+there are no vendor-specific PDU IDs defined in the SDP specification
+there is a chance of conflict with future extensions. (I admit its
+unlikely, but the ID is only 8-bit).
 
-But: We don't want to provide our own proprietary SDP Stuff. This makes
-no sense cause we want to be compatible to other BT-devices supporting
-interesting BT-profiles like HFP etc. And also I was talking about the
-SDP-Server side means i want to sent responses.
+The Bluetooth specifications allow numerous ways to provide proprietary
+services, and IMO the proper way to advertise such is to create your own
+UUID describing the service class, your own UUID describing the protocol
+(if any), search for that in the standard way and connect to the service
+in the same way as you would any other. The attribute values are defined
+by the service class so you can provide as much information as you want in
+this way, no secret handshakes required at all.
 
-What we want to do is robustness testing, means our test SDP Server
-listens for a SDP request (which can come from headunit but also from
-any other sdp capable mobile phone or whatsoever to request the services
-provided by the communication partner). We have some predefined correct
-answers for some of the SDP requests, but before sending the one fitting
-for the received request we fuzz the answer, means we make it invalid
-regarding length etc. pp.
+regards,
+iain
 
-Then we send this answer to the bt device under test and look if it
-becomes instable cause e.g. of missing checks in SDP implementation.
+(please note, I don't even run BlueZ/Linux and thus can't object to this
+specific implementation in any meaningful way. I'm just interested :)
 
-There are thousands of tools like scapy doing such things for tcp/ip
-stack. We are doing similar tests for Bluetooth communication ( L2CAP,
-Obex and finally  SDP, too). Here a correct and primarily robust
-implementation needs to be ensured through testing. The best way to do
-so is to confront the DuT with such invalid packets.
 
-I hope this help to understand a bit better.
+
