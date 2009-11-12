@@ -1,57 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-From: Oliver Neukum <oliver@neukum.org>
-To: "Rafael J. Wysocki" <rjw@sisk.pl>,
- Marcel Holtmann <marcel@holtmann.org>,
- linux-bluetooth@vger.kernel.org
-Subject: fix memory leak in fixed btusb_close
-Date: Thu, 12 Nov 2009 16:52:31 +0100
+Message-ID: <4AFC26C3.50006@gmx.de>
+Date: Thu, 12 Nov 2009 16:16:19 +0100
+From: Susanne Goldammer <susanne.goldammer@gmx.de>
+Reply-To: Susanne Goldammer <susanne.goldammer@gmx.de>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200911121652.31850.oliver@neukum.org>
+To: Bastien Nocera <hadess@hadess.net>
+CC: BlueZ devel list <linux-bluetooth@vger.kernel.org>
+Subject: Re: Make bluetoothd start w/o SDP Server
+References: <4AF9721B.3010405@gmx.de>	 <1257861916.10888.1372.camel@localhost.localdomain>	 <4AF97659.2050807@gmx.de>	<4AFBD3B6.6020706@gmx.de>	 <20091112131357.1106213e@strolchi.home.s3e.de>	<4AFC05BD.40508@gmx.de>	 <20091112140840.1efa7475@strolchi.home.s3e.de>  <4AFC1803.2080703@gmx.de> <1258037845.2158.0.camel@localhost.localdomain>
+In-Reply-To: <1258037845.2158.0.camel@localhost.localdomain>
+Content-Type: multipart/mixed;
+ boundary="------------070404050007040905010506"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If the waker is killed before it can replay outstanding URBs,
-these URBs won't be freed or will be replayed at the next open.
-This patch closes the window by explicitely discarding outstanding
-URBs.
+This is a multi-part message in MIME format.
+--------------070404050007040905010506
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Oliver Neukum <oliver@neukum.org>
+Bastien Nocera schrieb:
+> On Thu, 2009-11-12 at 15:13 +0100, Susanne Goldammer wrote:
+>   
+>> +                               "Don't run SDP service (debuggin
+>> option)" },
+>>     
+>
+> Typo there: s/debuggin/debugging/
+>
+>   
+Fixed. New patch attached.
 
-Rafael, could you test this just to make sure? I don't want to screw
-up the same driver twice.
+--------------070404050007040905010506
+Content-Type: text/plain;
+ name="no_sdp_server_option.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="no_sdp_server_option.patch"
 
-	Regards
-		Oliver
-
---
-
-commit 8a3e793888c75bc7a49ff8b0be7ec6bd5438d985
-Author: Oliver Neukum <oliver@neukum.org>
-Date:   Thu Nov 12 16:41:46 2009 +0100
-
-    btusb: close race in disconnect leading to a memory leak
-    
-    if the waker work is cancelled any deferred IO must be discarded
-    in close to free the memory and make sure the data isn't replayed
-    later
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 2fb3802..44bc8bb 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -600,11 +600,13 @@ static int btusb_close(struct hci_dev *hdev)
- 	btusb_stop_traffic(data);
- 	err = usb_autopm_get_interface(data->intf);
- 	if (err < 0)
--		return 0;
-+		goto failed;
+diff -r -u bluez-4.57/src/main.c bluez-4.57_no_sdp_option/src/main.c
+--- bluez-4.57/src/main.c	2009-10-04 05:56:37.000000000 +0200
++++ bluez-4.57_no_sdp_option/src/main.c	2009-11-12 16:09:32.000000000 +0100
+@@ -296,6 +296,8 @@
+ static gboolean option_detach = TRUE;
+ static gboolean option_debug = FALSE;
+ static gboolean option_udev = FALSE;
++static gboolean option_runsdp = TRUE;
++
  
- 	data->intf->needs_remote_wakeup = 0;
- 	usb_autopm_put_interface(data->intf);
+ static guint last_adapter_timeout = 0;
  
-+failed:
-+	usb_scuttle_anchored_urbs(&data->deferred);
- 	return 0;
- }
+@@ -335,6 +337,9 @@
+ 				"Enable debug information output" },
+ 	{ "udev", 'u', 0, G_OPTION_ARG_NONE, &option_udev,
+ 				"Run from udev mode of operation" },
++	{ "nosdp", 'S', G_OPTION_FLAG_REVERSE,
++				G_OPTION_ARG_NONE, &option_runsdp,
++				"Don't run SDP service (debugging option)" },
+ 	{ NULL },
+ };
  
+@@ -429,7 +434,13 @@
+ 		}
+ 	}
+ 
+-	start_sdp_server(mtu, main_opts.deviceid, SDP_SERVER_COMPAT);
++	if (option_runsdp == TRUE)
++		start_sdp_server(mtu, main_opts.deviceid, SDP_SERVER_COMPAT);
++	else {
++		/* see sdpd-server.c: start_sdp_server() -> init_server() */
++		register_public_browse_group();
++		register_server_service();
++	}
+ 
+ 	/* Loading plugins has to be done after D-Bus has been setup since
+ 	 * the plugins might wanna expose some paths on the bus. However the
+@@ -458,7 +469,11 @@
+ 
+ 	plugin_cleanup();
+ 
+-	stop_sdp_server();
++	if (option_runsdp == TRUE) 
++		stop_sdp_server();
++	else
++		/* see sdpd-server.c: stop_sdp_server() */
++		sdp_svcdb_reset();
+ 
+ 	agent_exit();
+ 
+
+--------------070404050007040905010506--
