@@ -1,26 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <837446.30282.qm@web111403.mail.gq1.yahoo.com>
-References: <837446.30282.qm@web111403.mail.gq1.yahoo.com>
-Date: Thu, 12 Nov 2009 15:06:43 -0700
-Message-ID: <d89ddf300911121406r10097d55s733c32cb2d9f91ca@mail.gmail.com>
-Subject: Re: Simultaneous outgoing audio streams
-From: Brad Midgley <bmidgley@gmail.com>
-To: Mark Stanovich <stanmj@yahoo.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+From: "Rafael J. Wysocki" <rjw@sisk.pl>
+To: Oliver Neukum <oliver@neukum.org>
+Subject: Re: fix memory leak in fixed btusb_close
+Date: Thu, 12 Nov 2009 23:13:30 +0100
+Cc: Marcel Holtmann <marcel@holtmann.org>,
 	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+References: <200911121652.31850.oliver@neukum.org>
+In-Reply-To: <200911121652.31850.oliver@neukum.org>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <200911122313.31045.rjw@sisk.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Mark
+On Thursday 12 November 2009, Oliver Neukum wrote:
+> If the waker is killed before it can replay outstanding URBs,
+> these URBs won't be freed or will be replayed at the next open.
+> This patch closes the window by explicitely discarding outstanding
+> URBs.
+> 
+> Signed-off-by: Oliver Neukum <oliver@neukum.org>
+> 
+> Rafael, could you test this just to make sure? I don't want to screw
+> up the same driver twice.
 
-> Looking at the output again, I get something different, with a sco_bind: Address already in use error.  I guess this indicates that there can be only one SCO connection at a time?
+It doesn't appear to kill the box right away and I have no traces of failure
+in the logs after several consecutive suspend-resume cycles.
 
->From memory, it seems this was a usb resource allocation issue. I
-don't remember all the specifics at the moment, only that the
-alternate setting of the isochronous interface needed to be adjusted
-dynamically but we didn't have the right hook to do it.
-
--- 
-Brad Midgley
+Thanks,
+Rafael
