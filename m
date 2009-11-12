@@ -1,65 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <837446.30282.qm@web111403.mail.gq1.yahoo.com>
-Date: Thu, 12 Nov 2009 12:56:57 -0800 (PST)
-From: Mark Stanovich <stanmj@yahoo.com>
-Subject: Re: Simultaneous outgoing audio streams
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4AFBF5AE.9090107@gmail.com>
+References: <4AFBF5AE.9090107@gmail.com>
+Date: Thu, 12 Nov 2009 15:51:59 -0300
+Message-ID: <2d5a2c100911121051u5824197an19d5607eb9a2e40c@mail.gmail.com>
+Subject: Re: HDP & MCAP developed for Bluez
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: sancane <sancane@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	=?ISO-8859-1?Q?Pedro_de_las_Heras_Quir=F3s?= <pheras@gsyc.es>,
+	scarot@libresoft.es,
+	=?ISO-8859-1?Q?Jos=E9_Antonio_Santos_Cadenas?=
+	<jcaden@libresoft.es>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Mark Stanovich wrote:
+Hi,
 
+2009/11/12 sancane <sancane@gmail.com>:
+> Hi all,
+>
+> I would like to announce to you that we have finished our open
+> source MCAP-HDP implementation for Bluez. We've successfully tested it
+> against a Nonin Onyx II 9560 using the el2cap Gustavo's kernel
+> implementation.
 
-> Maybe as you mentioned it is requesting another SCO connection and prevented 
-> from creating one with another device?  I will try to dig deeper and see where 
+Look pretty good, I just check the video.
 
-Looking at the output again, I get something different, with a sco_bind: Address already in use error.  I guess this indicates that there can be only one SCO connection at a time?
+> We're planning to release it under GNU/GPL v3. If you are interested, we
+> can add it to Bluez official library. We are open to any suggestion or
+> recommendation.
+>
+> At current moment we are working on it to set the code in a more stable
+> state. We will plan to upload our libraries in next few days, we will
+> announce here when the code is available.
 
-bluetoothd[13455]: Accepted new client connection on unix socket (fd=22)
-bluetoothd[13455]: Audio API: BT_REQUEST <- BT_GET_CAPABILITIES
-bluetoothd[13455]: Audio API: BT_RESPONSE -> BT_GET_CAPABILITIES
-bluetoothd[13455]: Audio API: BT_REQUEST <- BT_OPEN
-bluetoothd[13455]: open sco - object=ANY source=ANY destination=00:18:13:87:3D:BF lock=write
-bluetoothd[13455]: Audio API: BT_RESPONSE -> BT_OPEN
-bluetoothd[13455]: Audio API: BT_REQUEST <- BT_SET_CONFIGURATION
-bluetoothd[13455]: State changed /org/bluez/13455/hci0/dev_00_18_13_87_3D_BF: HEADSET_STATE_DISCONNECTED -> HEADSET_STATE_CONNECTING
-bluetoothd[13455]: link_key_request (sba=00:11:67:00:00:00, dba=00:18:13:87:3D:BF)
-bluetoothd[13455]: kernel auth requirements = 0x00
-bluetoothd[13455]: stored link key type = 0x00
-bluetoothd[13455]: adapter_get_device(00:18:13:87:3D:BF)
-bluetoothd[13455]: Discovered Handsfree service on channel 2
-bluetoothd[13455]: /org/bluez/13455/hci0/dev_00_18_13_87_3D_BF: Connecting to 00:18:13:87:3D:BF channel 2
-bluetoothd[13455]: /org/bluez/13455/hci0/dev_00_18_13_87_3D_BF: Connected to 00:18:13:87:3D:BF
-bluetoothd[13455]: Received AT+BRSF=24
-bluetoothd[13455]: HFP HF features: "Voice recognition activation" "Remote volume control" 
-bluetoothd[13455]: Received AT+CIND=?
-bluetoothd[13455]: Received AT+CIND?
-bluetoothd[13455]: Received AT+CMER=3, 0, 0, 1
-bluetoothd[13455]: Event reporting (CMER): mode=3, ind=1
-bluetoothd[13455]: HFP Service Level Connection established
-bluetoothd[13455]: telephony-dummy: device 0xb916fb68 connected
-bluetoothd[13455]: State changed /org/bluez/13455/hci0/dev_00_18_13_87_3D_BF: HEADSET_STATE_CONNECTING -> HEADSET_STATE_CONNECTED
-bluetoothd[13455]: Audio API: BT_RESPONSE -> BT_SET_CONFIGURATION
-bluetoothd[13455]: Audio API: BT_REQUEST <- BT_START_STREAM
-bluetoothd[13455]: sco_bind: Address already in use (98)
-bluetoothd[13455]: start_resume: resume failed
-bluetoothd[13455]: sending error Input/output error(5)
-bluetoothd[13455]: Audio API: BT_ERROR -> BT_START_STREAM
-bluetoothd[13455]: Unix client disconnected (fd=22)
-bluetoothd[13455]: client_free(0xb91691f8)
-bluetoothd[13455]: Received AT+VGS=09
-bluetoothd[13455]: Received AT*SEAUDIO=4,4022
-bluetoothd[13455]: Badly formated or unrecognized command: AT*SEAUDIO=4,4022
-bluetoothd[13455]: Received AT*SEAM="HBH-PV705",13
-bluetoothd[13455]: Badly formated or unrecognized command: AT*SEAM="HBH-PV705",13
-bluetoothd[13455]: Received AT*SEABS=0
-bluetoothd[13455]: Badly formated or unrecognized command: AT*SEABS=0
-bluetoothd[13455]: telephony-dummy: device 0xb916fb68 disconnected
-bluetoothd[13455]: State changed /org/bluez/13455/hci0/dev_00_18_13_87_3D_BF: HEADSET_STATE_CONNECTED -> HEADSET_STATE_DISCONNECTED
+Normally we implement the profile as device drivers (bluetoothd device
+driver not kernel :D), it would be nice to have and appropriate driver
+to handle MCAP-HDP records and put together a nice DBus API so any
+application can easily access its informations without having to
+really use any library.
 
+> We have noticed that it is necessary to add some functionalities to the
+> SDP implementation (which affect to HDP records), at the current moment,
+> we have included it in HDP, but we think that it is better to include it
+> in SDP. If you want, we can submit a patch to add it.
 
+Patches are always welcome :D
 
-      
+-- 
+Luiz Augusto von Dentz
+Engenheiro de Computação
