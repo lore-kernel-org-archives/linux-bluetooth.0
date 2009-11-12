@@ -1,28 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-From: Nick Pelly <npelly@google.com>
-Date: Thu, 12 Nov 2009 16:39:12 -0800
-Message-ID: <35c90d960911121639o8b0b0bfxde880af69adc9f95@mail.gmail.com>
-Subject: What is the motivation for conn->power_save
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <837446.30282.qm@web111403.mail.gq1.yahoo.com>
+References: <837446.30282.qm@web111403.mail.gq1.yahoo.com>
+Date: Thu, 12 Nov 2009 15:06:43 -0700
+Message-ID: <d89ddf300911121406r10097d55s733c32cb2d9f91ca@mail.gmail.com>
+Subject: Re: Simultaneous outgoing audio streams
+From: Brad Midgley <bmidgley@gmail.com>
+To: Mark Stanovich <stanmj@yahoo.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If I understand correctly, conn->power_save prevents the host stack
-from requesting active mode if it was not the host stack that
-requested sniff mode.
+Mark
 
-I don't understand the motivation for this. If we have ACL data to
-send, then it seems like a good idea for the host stack to explicitly
-request active mode, regardless of the reason that we entered sniff
-mode.
+> Looking at the output again, I get something different, with a sco_bind: Address already in use error.  I guess this indicates that there can be only one SCO connection at a time?
 
-We want to enter active mode more aggressively when setting up SCO
-connections, to avoid a 5 second delay with certain sniff modes. But
-the conn->power_save code is getting in the way and doesn't appear to
-be useful in the first place.
+>From memory, it seems this was a usb resource allocation issue. I
+don't remember all the specifics at the moment, only that the
+alternate setting of the isochronous interface needed to be adjusted
+dynamically but we didn't have the right hook to do it.
 
-Sending patches in another email...
-
-Nick
+-- 
+Brad Midgley
