@@ -2,83 +2,56 @@ Return-Path: <cyrus@holtmann.org>
 From: Nick Pelly <npelly@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Nick Pelly <npelly@google.com>
-Subject: [PATCH 2/2] Bluetooth: Enter active mode even if the remote device initiated sniff mode.
-Date: Thu, 12 Nov 2009 16:38:33 -0800
-Message-Id: <1258072713-25262-1-git-send-email-npelly@google.com>
+Subject: [PATCH 1/2] Bluetooth: Enter active mode before establishing a SCO link.
+Date: Thu, 12 Nov 2009 16:37:50 -0800
+Message-Id: <1258072670-20405-1-git-send-email-npelly@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-power_save == 0 indicated the remote device initiated sniff mode, and prevented
-hci_conn_enter_active_mode from entering active mode. Therefore when sending
-ACL data we relied on the link manager or the remote device to exit sniff mode.
+When in sniff mode with a long interval time (1.28s) it can take 4+ seconds to
+establish a SCO link. Fix by requesting active mode before requesting SCO
+connection. This improves SCO setup time to ~500ms.
 
-I'm not sure what the motivation for this behavior is - it seems more desirable
-to explicitly enter active mode when required.
+Bluetooth headsets that use a long interval time, and exhibit the long SCO
+connection time include Motorola H790, HX1 and H17. They have a CSR 2.1 chipset
+    BD Address:  00:1A:0E:F2:68:65
+    Device Name: Motorola H790
+    LMP Version: 2.1 (0x4) LMP Subversion: 0x165d
+    Manufacturer: Cambridge Silicon Radio (10)
+    Features page 0: 0xdf 0xfe 0x0b 0xc0 0x1b 0xbe 0x59 0x83
+        <3-slot packets> <5-slot packets> <encryption> <slot offset>
+        <timing accuracy> <hold mode> <sniff mode> <RSSI>
+        <channel quality> <SCO link> <HV2 packets> <HV3 packets>
+        <u-law log> <A-law log> <CVSD> <paging scheme>
+        <transparent SCO> <inquiry with RSSI> <extended SCO>
+        <EV4 packets> <EV5 packets> <AFH cap. slave>
+        <AFH class. slave> <sniff subrating> <pause encryption>
+        <AFH cap. master> <AFH class. master> <EDR eSCO 2 Mbps>
+        <3-slot EDR eSCO> <extended inquiry> <simple pairing>
+        <encapsulated PDU> <non-flush flag> <LSTO> <inquiry TX power>
+        <extended features>
+    Features page 1: 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00
 
-As a result of this behavior it can take 4+ seconds to setup a SCO connection
-if the remote device initiated sniff mode, because we fail to enter active mode
-before requesting a SCO connection.
-
-Tested on host Bluetooth chipsets: TI1271 and BCM4329.
+Verified this behavior and fix with host Bluetooth chipsets: BCM4329 and
+TI1271.
 
 Signed-off-by: Nick Pelly <npelly@google.com>
 ---
- include/net/bluetooth/hci_core.h |    1 -
- net/bluetooth/hci_conn.c         |    3 +--
- net/bluetooth/hci_event.c        |    7 +------
- 3 files changed, 2 insertions(+), 9 deletions(-)
+ net/bluetooth/hci_conn.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 7b640ae..87403eb 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -172,7 +172,6 @@ struct hci_conn {
- 	__u32		 link_mode;
- 	__u8             auth_type;
- 	__u8             sec_level;
--	__u8             power_save;
- 	__u16            disc_timeout;
- 	unsigned long	 pend;
- 
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index b3e0338..8fd7fd4 100644
+index a975098..b3e0338 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -212,7 +212,6 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
- 	conn->mode  = HCI_CM_ACTIVE;
- 	conn->state = BT_OPEN;
+@@ -376,6 +376,7 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
  
--	conn->power_save = 1;
- 	conn->disc_timeout = HCI_DISCONN_TIMEOUT;
- 
- 	switch (type) {
-@@ -497,7 +496,7 @@ void hci_conn_enter_active_mode(struct hci_conn *conn)
- 	if (test_bit(HCI_RAW, &hdev->flags))
- 		return;
- 
--	if (conn->mode != HCI_CM_SNIFF || !conn->power_save)
-+	if (conn->mode != HCI_CM_SNIFF)
- 		goto timer;
- 
- 	if (!test_and_set_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend)) {
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index e99fe38..c4450f1 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1473,12 +1473,7 @@ static inline void hci_mode_change_evt(struct hci_dev *hdev, struct sk_buff *skb
- 		conn->mode = ev->mode;
- 		conn->interval = __le16_to_cpu(ev->interval);
- 
--		if (!test_and_clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend)) {
--			if (conn->mode == HCI_CM_ACTIVE)
--				conn->power_save = 1;
--			else
--				conn->power_save = 0;
--		}
-+		clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend);
- 	}
- 
- 	hci_dev_unlock(hdev);
+ 	if (acl->state == BT_CONNECTED &&
+ 			(sco->state == BT_OPEN || sco->state == BT_CLOSED)) {
++		hci_conn_enter_active_mode(acl);
+ 		if (lmp_esco_capable(hdev))
+ 			hci_setup_sync(sco, acl->handle);
+ 		else
 -- 
 1.6.3.1
 
