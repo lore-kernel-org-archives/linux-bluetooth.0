@@ -1,50 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: What is the motivation for conn->power_save
+Subject: Re: fix memory leak in fixed btusb_close
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Nick Pelly <npelly@google.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <35c90d960911121639o8b0b0bfxde880af69adc9f95@mail.gmail.com>
-References: <35c90d960911121639o8b0b0bfxde880af69adc9f95@mail.gmail.com>
+To: Oliver Neukum <oliver@neukum.org>
+Cc: "Rafael J. Wysocki" <rjw@sisk.pl>, linux-bluetooth@vger.kernel.org
+In-Reply-To: <200911121652.31850.oliver@neukum.org>
+References: <200911121652.31850.oliver@neukum.org>
 Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 13 Nov 2009 04:14:58 +0100
-Message-ID: <1258082098.7715.7.camel@violet>
+Date: Fri, 13 Nov 2009 04:08:20 +0100
+Message-ID: <1258081700.7715.1.camel@violet>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nick,
+Hi Oliver,
 
-> If I understand correctly, conn->power_save prevents the host stack
-> from requesting active mode if it was not the host stack that
-> requested sniff mode.
+> If the waker is killed before it can replay outstanding URBs,
+> these URBs won't be freed or will be replayed at the next open.
+> This patch closes the window by explicitely discarding outstanding
+> URBs.
 > 
-> I don't understand the motivation for this. If we have ACL data to
-> send, then it seems like a good idea for the host stack to explicitly
-> request active mode, regardless of the reason that we entered sniff
-> mode.
-> 
-> We want to enter active mode more aggressively when setting up SCO
-> connections, to avoid a 5 second delay with certain sniff modes. But
-> the conn->power_save code is getting in the way and doesn't appear to
-> be useful in the first place.
+> Signed-off-by: Oliver Neukum <oliver@neukum.org>
 
-we have discussed this a few times. And if you lock through the code
-history then you see that initially we just took devices out of sniff
-mode if we had to send data. However with HID devices this falls flat on
-its face. They need to stay in control of sniff mode if they initiated
-it. Some of them crash and others just drain the battery. With sniff
-mode you can send small amounts of data even while in sniff and for HID
-that is sometimes used. So the remote side better not interfere.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-What we really need is a socket option where we can control this on a
-per socket basis if we take devices out of sniff mode. And one extra
-case might be when we try to establish a SCO channel, because then it is
-clearly not an HID device. However even A2DP has this sort of problems
-sometimes where the stream setup takes time.
+> Rafael, could you test this just to make sure? I don't want to screw
+> up the same driver twice.
 
-Not sure if we have to make SCO setup special. The only reason would be
-if there is a case where we don't get an AT command before SCO needs to
-be established.
+Feel free to send this directly to Linus for inclusion.
 
 Regards
 
