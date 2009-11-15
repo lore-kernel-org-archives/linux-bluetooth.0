@@ -1,49 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <dfb262380911141026x72fafeb8tbffd8692bd0c1ad5@mail.gmail.com>
-References: <dfb262380911141026x72fafeb8tbffd8692bd0c1ad5@mail.gmail.com>
-Date: Sun, 15 Nov 2009 14:31:20 +0200
-Message-ID: <dfb262380911150431h79650f28kadea09c26aee811f@mail.gmail.com>
-Subject: Re: bluetooth audio fails
+In-Reply-To: <1258286281.3299.28.camel@violet>
+References: <dfb262380911140245v20973542v61cc82ba1071064d@mail.gmail.com>
+	 <1258286281.3299.28.camel@violet>
+Date: Sun, 15 Nov 2009 14:26:25 +0200
+Message-ID: <dfb262380911150426i3fe8c155sd232cdedec24579d@mail.gmail.com>
+Subject: Re: 'cat /dev/rfcomm0' yields strange data
 From: Ramagudi Naziir <naziirr@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=windows-1252
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I have just tried that also with a Motorola H700 headset,
-and got exact same error message.
+Hi Marcel,
 
-(I also tried bluez 4.56 and got same error)
+On Sun, Nov 15, 2009 at 1:58 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> you have to switch the device into raw mode before cat will work. The
+> rfcomm utility should have a --raw option.
 
-please help me to debug this.
+Do I have to do that also if I plan to open /dev/rfcomm0 with an
+application that expects a standard serial tty device (e.g. I usually
+feed it with /dev/ttyS1) ?
 
-thank you,
-naziirr
+Can you please explain in a few words what exactly does --raw do ?
 
-
-On Sat, Nov 14, 2009 at 8:26 PM, Ramagudi Naziir <naziirr@gmail.com> wrote:
-> Hi all,
+Thanks!
+Naziir
 >
-> Can anyone pls help me debug this:
+> Regards
 >
-> # aplay -D bluetooth /startup.wav
-> ALSA lib audio/pcm_bluetooth.c:1607:(audioservice_expect)
-> BT_GET_CAPABILITIES failed : Input/output error(5)
-> aplay: main:608: audio open error: Input/output error
->
-> I'm running the latest bluez git sources with a 9xxPlantronics HFP headset.
-> I tried both "auto" and "voice" in .asoundrc:
->
-> pcm.bluetooth {
->        type bluetooth
->        device mybdaddr
->        profile “voice”
-> }
+> Marcel
 >
 >
-> Any idea what this could be and how to debug/fix it ?
->
-> thank you
-> naziirr
 >
