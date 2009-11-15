@@ -1,35 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1258286281.3299.28.camel@violet>
-References: <dfb262380911140245v20973542v61cc82ba1071064d@mail.gmail.com>
-	 <1258286281.3299.28.camel@violet>
-Date: Sun, 15 Nov 2009 14:26:25 +0200
-Message-ID: <dfb262380911150426i3fe8c155sd232cdedec24579d@mail.gmail.com>
 Subject: Re: 'cat /dev/rfcomm0' yields strange data
-From: Ramagudi Naziir <naziirr@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Ramagudi Naziir <naziirr@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <dfb262380911140245v20973542v61cc82ba1071064d@mail.gmail.com>
+References: <dfb262380911140245v20973542v61cc82ba1071064d@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Sun, 15 Nov 2009 12:58:01 +0100
+Message-ID: <1258286281.3299.28.camel@violet>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Ramagudi,
 
-On Sun, Nov 15, 2009 at 1:58 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> you have to switch the device into raw mode before cat will work. The
-> rfcomm utility should have a --raw option.
+> # rfcomm watch /dev/rfcomm0 1 muahahahah
+> Waiting for connection on channel 1
+> Connection from xxx to /dev/rfcomm0
+> Press CTRL-C for hangup
+> 
+> 
+> on another terminal:
+> 
+> 
+> # cat /dev/rfcomm0
+> 
+> ^J^J^J
+> ^J^J^J
+> 
+> 
+> 
+> ^J
+> 
+> 
+> 
+> ^J
+> 
+> 
+> 
+> ^J^J
+> 
+> 
+> 
+> ^^J
+> ...
+> ...
+> 
+> and these character output goes on and on for a minute or so until it stops.
+> 
+> Any idea what is it ? is it supposed to be here ?
+> I was expecting the 'cat' command to show me only data that was sent
+> from the remote end
+> (e.g. If I do on the remote peer 'echo bla > /dev/rfcomm0' I do see
+> the bla here on the local 'cat').
 
-Do I have to do that also if I plan to open /dev/rfcomm0 with an
-application that expects a standard serial tty device (e.g. I usually
-feed it with /dev/ttyS1) ?
+you have to switch the device into raw mode before cat will work. The
+rfcomm utility should have a --raw option.
 
-Can you please explain in a few words what exactly does --raw do ?
+Regards
 
-Thanks!
-Naziir
->
-> Regards
->
-> Marcel
->
->
->
+Marcel
+
+
