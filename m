@@ -1,217 +1,140 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bing Zhao <bzhao@marvell.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Bing Zhao <bzhao@marvell.com>,
-	Amitkumar Karwar <akarwar@marvell.com>
-Subject: [PATCH] Bluetooth: btmrvl: Fix issue when btmrvl driver and firmware are cross-sending
-Date: Mon, 16 Nov 2009 20:20:00 -0800
-Message-Id: <1258431600-3826-1-git-send-email-bzhao@marvell.com>
+MIME-Version: 1.0
+In-Reply-To: <1080565272.3913901258382253455.JavaMail.root@sz0149a.westchester.pa.mail.comcast.net>
+References: <dfb262380911160209v42da3134y8e645b33ac65ccdb@mail.gmail.com>
+	 <1080565272.3913901258382253455.JavaMail.root@sz0149a.westchester.pa.mail.comcast.net>
+Date: Mon, 16 Nov 2009 21:46:32 +0200
+Message-ID: <dfb262380911161146j3b0b52a2o55b1b6f9c055534c@mail.gmail.com>
+Subject: Re: bluetooth audio fails
+From: Ramagudi Naziir <naziirr@gmail.com>
+To: marjnkl@comcast.net
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Amitkumar Karwar <akarwar@marvell.com>
+Hi Mark,
 
-When driver is sending a command or data and the firmware is also
-sending a sleep event, sometimes it is observed that driver will
-continue to send the command/data to firmware after processing sleep
-event. Once sleep event is processed driver is not supposed to send
-anything because firmware is in sleep state after that.
-Previously RX processing was done in interrupt callback handler called
-from MMC core. Now it is done in btmrvl driver main thread to solve the
-issue.
+On Mon, Nov 16, 2009 at 4:37 PM,  <marjnkl@comcast.net> wrote:
+> and daemon mode off.  That is, run /usr/sbin/bluetoothd -nd.  This will spit
 
-Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
-Signed-off-by: Bing Zhao <bzhao@marvell.com>
----
- drivers/bluetooth/btmrvl_drv.h  |    1 +
- drivers/bluetooth/btmrvl_main.c |    7 ++-
- drivers/bluetooth/btmrvl_sdio.c |   90 ++++++++++++++++++++------------------
- 3 files changed, 53 insertions(+), 45 deletions(-)
+thank you - good tip !
 
-diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
-index 411c7a7..2756de9 100644
---- a/drivers/bluetooth/btmrvl_drv.h
-+++ b/drivers/bluetooth/btmrvl_drv.h
-@@ -73,6 +73,7 @@ struct btmrvl_private {
- 	int (*hw_host_to_card) (struct btmrvl_private *priv,
- 				u8 *payload, u16 nb);
- 	int (*hw_wakeup_firmware) (struct btmrvl_private *priv);
-+	int (*hw_get_int_status) (struct btmrvl_private *priv, u8 *ireg);
- 	spinlock_t driver_lock;		/* spinlock used by driver */
- #ifdef CONFIG_DEBUG_FS
- 	void *debugfs_data;
-diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
-index e605563..1fdc627 100644
---- a/drivers/bluetooth/btmrvl_main.c
-+++ b/drivers/bluetooth/btmrvl_main.c
-@@ -448,6 +448,7 @@ static int btmrvl_service_main_thread(void *data)
- 	struct btmrvl_private *priv = thread->priv;
- 	struct btmrvl_adapter *adapter = priv->adapter;
- 	wait_queue_t wait;
-+	u8 ireg = 0;
- 	struct sk_buff *skb;
- 	ulong flags;
- 
-@@ -482,14 +483,16 @@ static int btmrvl_service_main_thread(void *data)
- 		spin_lock_irqsave(&priv->driver_lock, flags);
- 		if (adapter->int_count) {
- 			adapter->int_count = 0;
-+			spin_unlock_irqrestore(&priv->driver_lock, flags);
-+			priv->hw_get_int_status(priv, &ireg);
- 		} else if (adapter->ps_state == PS_SLEEP &&
- 					!skb_queue_empty(&adapter->tx_queue)) {
- 			spin_unlock_irqrestore(&priv->driver_lock, flags);
- 			adapter->wakeup_tries++;
- 			priv->hw_wakeup_firmware(priv);
- 			continue;
--		}
--		spin_unlock_irqrestore(&priv->driver_lock, flags);
-+		} else
-+			spin_unlock_irqrestore(&priv->driver_lock, flags);
- 
- 		if (adapter->ps_state == PS_SLEEP)
- 			continue;
-diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index 5b33b85..d0393a8 100644
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -46,6 +46,7 @@
-  * module_exit function is called.
-  */
- static u8 user_rmmod;
-+static u8 sdio_ireg;
- 
- static const struct btmrvl_sdio_device btmrvl_sdio_sd6888 = {
- 	.helper		= "sd8688_helper.bin",
-@@ -557,75 +558,77 @@ exit:
- static int btmrvl_sdio_get_int_status(struct btmrvl_private *priv, u8 * ireg)
- {
- 	int ret;
--	u8 sdio_ireg = 0;
-+	ulong flags;
- 	struct btmrvl_sdio_card *card = priv->btmrvl_dev.card;
- 
--	*ireg = 0;
--
--	sdio_ireg = sdio_readb(card->func, HOST_INTSTATUS_REG, &ret);
--	if (ret) {
--		BT_ERR("sdio_readb: read int status register failed");
--		ret = -EIO;
--		goto done;
--	}
--
--	if (sdio_ireg != 0) {
--		/*
--		 * DN_LD_HOST_INT_STATUS and/or UP_LD_HOST_INT_STATUS
--		 * Clear the interrupt status register and re-enable the
--		 * interrupt.
--		 */
--		BT_DBG("sdio_ireg = 0x%x", sdio_ireg);
--
--		sdio_writeb(card->func, ~(sdio_ireg) & (DN_LD_HOST_INT_STATUS |
--							UP_LD_HOST_INT_STATUS),
--			    HOST_INTSTATUS_REG, &ret);
--		if (ret) {
--			BT_ERR("sdio_writeb: clear int status register "
--				"failed");
--			ret = -EIO;
--			goto done;
--		}
--	}
-+	spin_lock_irqsave(&priv->driver_lock, flags);
-+	*ireg = sdio_ireg;
-+	sdio_ireg = 0;
-+	spin_unlock_irqrestore(&priv->driver_lock, flags);
- 
--	if (sdio_ireg & DN_LD_HOST_INT_STATUS) {
-+	sdio_claim_host(card->func);
-+	if (*ireg & DN_LD_HOST_INT_STATUS) {
- 		if (priv->btmrvl_dev.tx_dnld_rdy)
- 			BT_DBG("tx_done already received: "
--				" int_status=0x%x", sdio_ireg);
-+				" int_status=0x%x", *ireg);
- 		else
- 			priv->btmrvl_dev.tx_dnld_rdy = true;
- 	}
- 
--	if (sdio_ireg & UP_LD_HOST_INT_STATUS)
-+	if (*ireg & UP_LD_HOST_INT_STATUS)
- 		btmrvl_sdio_card_to_host(priv);
- 
--	*ireg = sdio_ireg;
--
- 	ret = 0;
-+	sdio_release_host(card->func);
- 
--done:
- 	return ret;
- }
- 
- static void btmrvl_sdio_interrupt(struct sdio_func *func)
- {
- 	struct btmrvl_private *priv;
--	struct hci_dev *hcidev;
- 	struct btmrvl_sdio_card *card;
-+	ulong flags;
- 	u8 ireg = 0;
-+	int ret;
- 
- 	card = sdio_get_drvdata(func);
--	if (card && card->priv) {
--		priv = card->priv;
--		hcidev = priv->btmrvl_dev.hcidev;
-+	if (!card || !card->priv) {
-+		BT_ERR("sbi_interrupt(%p) card or priv is "
-+				"NULL, card=%p\n", func, card);
-+		return;
-+	}
- 
--		if (btmrvl_sdio_get_int_status(priv, &ireg))
--			BT_ERR("reading HOST_INT_STATUS_REG failed");
--		else
--			BT_DBG("HOST_INT_STATUS_REG %#x", ireg);
-+	priv = card->priv;
- 
--		btmrvl_interrupt(priv);
-+	ireg = sdio_readb(card->func, HOST_INTSTATUS_REG, &ret);
-+	if (ret) {
-+		BT_ERR("sdio_readb: read int status register failed");
-+		return;
- 	}
-+
-+	if (ireg != 0) {
-+		/*
-+		 * DN_LD_HOST_INT_STATUS and/or UP_LD_HOST_INT_STATUS
-+		 * Clear the interrupt status register and re-enable the
-+		 * interrupt.
-+		 */
-+		BT_DBG("ireg = 0x%x", ireg);
-+
-+		sdio_writeb(card->func, ~(ireg) & (DN_LD_HOST_INT_STATUS |
-+					UP_LD_HOST_INT_STATUS),
-+				HOST_INTSTATUS_REG, &ret);
-+		if (ret) {
-+			BT_ERR("sdio_writeb: clear int status register "
-+					"failed");
-+			return;
-+		}
-+	}
-+
-+	spin_lock_irqsave(&priv->driver_lock, flags);
-+	sdio_ireg |= ireg;
-+	spin_unlock_irqrestore(&priv->driver_lock, flags);
-+	btmrvl_interrupt(priv);
- }
- 
- static int btmrvl_sdio_register_dev(struct btmrvl_sdio_card *card)
-@@ -928,6 +931,7 @@ static int btmrvl_sdio_probe(struct sdio_func *func,
- 	/* Initialize the interface specific function pointers */
- 	priv->hw_host_to_card = btmrvl_sdio_host_to_card;
- 	priv->hw_wakeup_firmware = btmrvl_sdio_wakeup_fw;
-+	priv->hw_get_int_status = btmrvl_sdio_get_int_status;
- 
- 	btmrvl_send_module_cfg_cmd(priv, MODULE_BRINGUP_REQ);
- 
--- 
-1.5.4.3
+These are the logs I see when I try to run the aplay command:
 
+bluetoothd[1260]: Accepted new client connection on unix socket (fd=23)
+bluetoothd[1260]: Audio API: BT_REQUEST <- BT_GET_CAPABILITIES
+bluetoothd[1260]: sending error Input/output error(5)
+bluetoothd[1260]: Audio API: BT_ERROR -> BT_GET_CAPABILITIES
+bluetoothd[1260]: Unix client disconnected (fd=23)
+bluetoothd[1260]: client_free(0x2a09f318)
+
+
+> helpful.  Also, in your .asoundrc file you may want to try profile "auto" or
+> just remove the line completely.
+
+change applied (same results, though).
+
+> you may want to try the bluez-gnome to assist in pairing and connecting the
+> headset.
+
+can't - I have no screen :)
+
+I use the C agent for that:
+
+# /test/agent 0000 00:14:13:00:25:93
+Pincode request for device /org/bluez/1260/hci0/dev_00_14_13_00_25_93
+Agent has been released
+
+It seems successful, and indeed the device seems to be paired.
+What strikes me as odd is that I can't see any link-key info in
+/var/lib/bluetooth.
+I only see there my laptop and no headset which I seem to pair with
+successful (and I've tried already 3 different headsets, all yield the
+same result).
+
+
+Besides that, I see 2 errors in the logs.
+
+1. while executing running bluetoothd, I see this line:
+bluetoothd[1260]: Failed to open control socket: Protocol not supported (93)
+Is this bad or can I ignore it ? what socket is it ? NETLINK ? what it
+is used for ?
+
+2. while adding (+up'ing) hci0, I see this line:
+(bluetoothd:1260): GLib-CRITICAL **: g_key_file_get_boolean: assertion
+`key_file != NULL' failed
+...
+bluetoothd[1260]: Adapter /org/bluez/1260/hci0 has been enabled
+bluetoothd[1260]: Failed to access HAL
+
+can you pls also tell me what are those errors and whether I should debug them ?
+
+>  It provides a nice visual interface.  Anyway hope this helps a
+> little and if you have any additional info please post it.
+
+Thanks a lot for the help!!!!!
+
+naziir.
+
+>
+>   - Mark
+>
+> ----- Original Message -----
+> From: "Ramagudi Naziir" <naziirr@gmail.com>
+> To: linux-bluetooth@vger.kernel.org
+> Sent: Monday, November 16, 2009 5:09:23 AM GMT -05:00 US/Canada Eastern
+> Subject: Re: bluetooth audio fails
+>
+> I have just tried that with bluez 3.36 and it works!
+>
+> So - should I downgrade to bluez 3.36 ?
+>
+> Can you just tell me how you would debug this ?
+>
+> On Sun, Nov 15, 2009 at 2:31 PM, Ramagudi Naziir <naziirr@gmail.com> wrote:
+>> I have just tried that also with a Motorola H700 headset,
+>> and got exact same error message.
+>>
+>> (I also tried bluez 4.56 and got same error)
+>>
+>> please help me to debug this.
+>>
+>> thank you,
+>> naziirr
+>>
+>>
+>> On Sat, Nov 14, 2009 at 8:26 PM, Ramagudi Naziir <naziirr@gmail.com>
+>> wrote:
+>>> Hi all,
+>>>
+>>> Can anyone pls help me debug this:
+>>>
+>>> # aplay -D bluetooth /startup.wav
+>>> ALSA lib audio/pcm_bluetooth.c:1607:(audioservice_expect)
+>>> BT_GET_CAPABILITIES failed : Input/output error(5)
+>>> aplay: main:608: audio open error: Input/output error
+>>>
+>>> I'm running the latest bluez git sources with a 9xxPlantronics HFP
+>>> headset.
+>>> I tried both "auto" and "voice" in .asoundrc:
+>>>
+>>> pcm.bluetooth {
+>>>        type bluetooth
+>>>        device mybdaddr
+>>>        profile “voice”
+>>> }
+>>>
+>>>
+>>> Any idea what this could be and how to debug/fix it ?
+>>>
+>>> thank you
+>>> naziirr
+>>>
+>>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
