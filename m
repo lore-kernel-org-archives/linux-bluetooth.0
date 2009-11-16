@@ -1,108 +1,130 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1258084357.7715.26.camel@violet>
-References: <35c90d960911121639o8b0b0bfxde880af69adc9f95@mail.gmail.com>
-	<1258082098.7715.7.camel@violet> <35c90d960911121931n687a2cd4ie8130f919041ee70@mail.gmail.com>
-	<1258084357.7715.26.camel@violet>
-From: Nick Pelly <npelly@google.com>
-Date: Mon, 16 Nov 2009 10:55:48 -0800
-Message-ID: <35c90d960911161055y695933fdjd221ad3b689ae3cf@mail.gmail.com>
-Subject: Re: What is the motivation for conn->power_save
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <200911131343.21326.jcaden@libresoft.es>
+References: <200911131343.21326.jcaden@libresoft.es>
+Date: Mon, 16 Nov 2009 15:52:46 -0200
+Message-ID: <f9d4bd30911160952k2041ccc6t2abb4ac280080124@mail.gmail.com>
+Subject: Re: [PATCH] SDP patch to add support for HDP
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: jcaden@libresoft.es
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-
-On Thu, Nov 12, 2009 at 7:52 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
-> Hi Nick,
->
->> >> If I understand correctly, conn->power_save prevents the host stack
->> >> from requesting active mode if it was not the host stack that
->> >> requested sniff mode.
->> >>
->> >> I don't understand the motivation for this. If we have ACL data to
->> >> send, then it seems like a good idea for the host stack to explicitly
->> >> request active mode, regardless of the reason that we entered sniff
->> >> mode.
->> >>
->> >> We want to enter active mode more aggressively when setting up SCO
->> >> connections, to avoid a 5 second delay with certain sniff modes. But
->> >> the conn->power_save code is getting in the way and doesn't appear to
->> >> be useful in the first place.
->> >
->> > we have discussed this a few times. And if you lock through the code
->> > history then you see that initially we just took devices out of sniff
->> > mode if we had to send data. However with HID devices this falls flat =
-on
->> > its face. They need to stay in control of sniff mode if they initiated
->> > it. Some of them crash and others just drain the battery. With sniff
->> > mode you can send small amounts of data even while in sniff and for HI=
-D
->> > that is sometimes used. So the remote side better not interfere.
->> >
->> > What we really need is a socket option where we can control this on a
->> > per socket basis if we take devices out of sniff mode. And one extra
->> > case might be when we try to establish a SCO channel, because then it =
-is
->> > clearly not an HID device. However even A2DP has this sort of problems
->> > sometimes where the stream setup takes time.
->>
->> Makes sense. Thanks for the explanation.
->
-> this means you will be working on a patch for this :)
->
->> > Not sure if we have to make SCO setup special. The only reason would b=
-e
->> > if there is a case where we don't get an AT command before SCO needs t=
-o
->> > be established.
->>
->> If you are in-call, and transfer audio from handset to BT headset,
->> then there is SCO setup without any AT command.
->
-> Fair enough.
->
->> I think for the SCO setup case we would always want to enter active
->> mode. I could modify enter_active_mode() to take a parameter like 'int
->> force' that would force us to enter active mode regardless of the
->> state of power_save, and use this when setting up SCO. What do you
->> think?
->
-> Actually when you leave sniff mode, then all bets for the power_save
-> value are off again. So you better set power_save and just call
-> enter_active_mode. Something like this:
->
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index a975098..e4591e0 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -376,6 +376,9 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, in=
-t type,
->
-> =A0 =A0 =A0 =A0if (acl->state =3D=3D BT_CONNECTED &&
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0(sco->state =3D=3D BT_OPEN=
- || sco->state =3D=3D BT_CLOSED)) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 acl->power_save =3D 1;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 hci_conn_enter_active_mode(acl);
-> +
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (lmp_esco_capable(hdev))
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0hci_setup_sync(sco, acl->h=
-andle);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0else
->
-> Alternatively we could create hci_conn_force_active_mode() or just
-> implement a proper per socket sniff/active policy.
->
-> Regards
->
-> Marcel
-
-Patch submitted to Android tree as:
-
-http://android.git.kernel.org/?p=3Dkernel/common.git;a=3Dcommit;h=3D201ac2f=
-225a31dffcb05f1db4d609c467c9c694c
-
-Nick
+SGkgSm9zZScsCgpncGcgZGlzYWJsZWQgOi0pCgpPbiBGcmksIE5vdiAxMywgMjAwOSBhdCAxMDo0
+MyBBTSwgSm9zw6kgQW50b25pbyBTYW50b3MgQ2FkZW5hcwo8amNhZGVuQGxpYnJlc29mdC5lcz4g
+d3JvdGU6Cj4gVGhpcyBwYXRjaCB0cmllcyB0byBzaW1wbGlmeSB0aGUgd2F5IHRoZSBTRFAgcmVj
+b3JkcyBmb3IgSERQIGFyZSBjcmVhdGVkLiBUaGUKPiBjcmVhdGVkIGZ1bmN0aW9ucyBhbGxvdyBh
+ZGRpbmcgc3VwcG9ydGVkIGZlYXR1cmVzIGVhc2lseSB0byBhbiBzZHAgcmVjb3JkLiBUaGUKPiBh
+cmUgc2ltaWxhciB0byBzZHBfc2V0X3Byb2ZpbGVfZGVzY3MgYW5kIHNkcF9nZXRfcHJvZmlsZV9k
+ZXNjcy4gwqBJJ3ZlIGFsc28gYWRkZWQKPiBzb21lIG1hY3JvcyB0byBkZWZpbmUgbmV3IFVVSUQn
+cyBmb3IgSERQLgo+Cj4KPiBkaWZmIC0tZ2l0IGEvbGliL3NkcC5jIGIvbGliL3NkcC5jCj4gaW5k
+ZXggODIyZWMxYS4uOTM0OTBlNyAxMDA2NDQKPiAtLS0gYS9saWIvc2RwLmMKPiArKysgYi9saWIv
+c2RwLmMKPiBAQCAtNDYyMSwzICs0NjIxLDgyIEBAIHVpbnQxNl90IHNkcF9nZW5fdGlkKHNkcF9z
+ZXNzaW9uX3QgKnNlc3Npb24pCj4gwqB7Cj4gwqAgwqAgwqAgwqByZXR1cm4gc2Vzc2lvbi0+dGlk
+Kys7Cj4gwqB9Cj4gKwo+ICsvKgo+ICsqIFNldCB0aGUgc3VwcG9ydGVkIGZlYXR1cmVzCj4gKyov
+Cj4gK3ZvaWQgc2RwX3NldF9zdXBwX2ZlYXQoc2RwX3JlY29yZF90ICpyZWMsIGNvbnN0IHNkcF9s
+aXN0X3QgKnNmKQo+ICt7Cj4gKyDCoCDCoCDCoCBjb25zdCBzZHBfbGlzdF90ICpwLCAqcjsKPiAr
+IMKgIMKgIMKgIHNkcF9kYXRhX3QgKmZlYXQgPSBOVUxMLCAqc2VxX2ZlYXQgPSBOVUxMOwpBdm9p
+ZCBkZWNsYXJhdGlvbiBhbmQgaW5pdGlhbGl6YXRpb24uCgo+ICsKPiArIMKgIMKgIMKgIGludCBz
+ZXFsZW4gPSBzZHBfbGlzdF9sZW4oc2YpOwo+ICsgwqAgwqAgwqAgdm9pZCAqKnNlcURURHMgPSAo
+dm9pZCAqKiltYWxsb2MgKHNlcWxlbiAqIMKgc2l6ZW9mKHZvaWQgKikpOwo+ICsgwqAgwqAgwqAg
+dm9pZCAqKnNlcVZhbHMgPSAodm9pZCAqKiltYWxsb2MgKHNlcWxlbiAqIMKgc2l6ZW9mKHZvaWQg
+KikpOwo+ICsgwqAgwqAgwqAgaW50IGkgPSAwOwo+ICsKPiArIMKgIMKgIMKgIGZvciAocCA9IHNm
+OyBwOyBwID0gcC0+bmV4dCkgewo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgaW50IHBsZW4gPSBz
+ZHBfbGlzdF9sZW4ocC0+ZGF0YSk7Cj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCB2b2lkICoqZHRk
+cyA9ICh2b2lkICoqKW1hbGxvYyAocGxlbiAqIMKgc2l6ZW9mKHZvaWQgKikpOwo+ICsgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgdm9pZCAqKnZhbHMgPSAodm9pZCAqKiltYWxsb2MgKHBsZW4gKiDCoHNp
+emVvZih2b2lkICopKTsKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIGludCBqID0gMDsKPiArIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIGZvciAocj1wLT5kYXRhOyByOyByID0gci0+bmV4dCkgewpjb2Rp
+bmcgc3R5bGU6IG1pc3Npbmcgc3BhY2UgInI9cC0+ZGF0YSIKCj4gKyDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCBzZHBfZGF0YV90ICpkYXRhID0gKHNkcF9kYXRhX3QqKXItPmRhdGE7
+Cj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBkdGRzW2pdID0gJmRhdGEtPmR0
+ZDsKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIHZhbHNbal0gPSAmZGF0YS0+
+dmFsOwo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgaisrOwo+ICsgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgfQo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgZmVhdCA9IHNkcF9zZXFf
+YWxsb2MoZHRkcywgdmFscywgcGxlbik7Cj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCBmcmVlKGR0
+ZHMpOwo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgZnJlZSh2YWxzKTsKPiArCj4gKyDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCBzZXFEVERzW2ldID0gJmZlYXQtPmR0ZDsKPiArIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIHNlcVZhbHNbaV0gPSBmZWF0Owo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgaSsrOwo+
+ICsgwqAgwqAgwqAgfQo+ICsgwqAgwqAgwqAgc2VxX2ZlYXQgPSBzZHBfc2VxX2FsbG9jKHNlcURU
+RHMsIHNlcVZhbHMsIHNlcWxlbik7Cj4gKwo+ICsgwqAgwqAgwqAgc2RwX2F0dHJfcmVwbGFjZShy
+ZWMsIFNEUF9BVFRSX1NVUFBPUlRFRF9GRUFUVVJFU19MSVNULCBzZXFfZmVhdCk7CkNoZWNrIGlm
+IHNlcURURHMgYW5kIHNlcVZhbHMgbmVlZCB0byBiZSBmcmVlZC4KCj4gK30KPiArCj4gKy8qCj4g
+KyAqIEdldCB0aGUgc3VwcG9ydGVkIGZlYXR1cmVzCj4gKyAqIElmIGFuIGVycm9yIG9jY3VycmVk
+IC0xIGlzIHJldHVybmVkIGFuZCBlcnJubyBpcyBzZXQKPiArICovCj4gK2ludCBzZHBfZ2V0X3N1
+cHBfZmVhdCAoY29uc3Qgc2RwX3JlY29yZF90ICpyZWMsIHNkcF9saXN0X3QgKipzZXFwKQo+ICt7
+Cj4gKwo+ICsgwqAgwqAgwqAgKnNlcXAgPSBOVUxMOwo+ICsgwqAgwqAgwqAgc2RwX2RhdGFfdCAq
+IHNkcGRhdGEgPSBOVUxMOwpDb21waWxlciB3YXJuaW5nOiBJU08gQzkwIGZvcmJpZHMgbWl4ZWQg
+ZGVjbGFyYXRpb25zIGFuZCBjb2RlLiBSZW1vdmUKZXh0cmEgc3BhY2UgYW5kICJzZHBkYXRhIiBp
+bml0aWFsaXphdGlvbi4KCkF2b2lkIG5lc3RlZCBpZi9lbHNlL2ZvcjoKCj4gKwo+ICsgwqAgwqAg
+wqAgc2RwZGF0YSA9IHNkcF9kYXRhX2dldChyZWMsIFNEUF9BVFRSX1NVUFBPUlRFRF9GRUFUVVJF
+U19MSVNUKTsKPiArIMKgIMKgIMKgIGlmIChzZHBkYXRhICYmIHNkcGRhdGEtPmR0ZCA+PSBTRFBf
+U0VROCAmJiBzZHBkYXRhLT5kdGQgPD0gU0RQX1NFUTMyKSB7Cj4gKyDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCBzZHBfZGF0YV90ICpkOwo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgZm9yIChkID0gc2Rw
+ZGF0YS0+dmFsLmRhdGFzZXE7IGQ7IGQgPSBkLT5uZXh0KSB7Cj4gKyDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCBpZiAoIGQtPmR0ZCA+PSBTRFBfU0VROCAmJiBkLT5kdGQgPD0gU0RQ
+X1NFUTMyICkgewo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgc2RwX2RhdGFfdCAqZGQ7Cj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCBzZHBfbGlzdF90ICpzdWJzZXEgPSBOVUxMOwo+ICsgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgZm9yIChkZCA9IGQtPnZhbC5kYXRhc2VxOyBk
+ZDsgZGQgPSBkZC0+bmV4dCkgewo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgc2RwX2RhdGFfdCAqZGF0YTsKPiArIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIGlmICggZGQtPmR0
+ZCAhPSBTRFBfVUlOVDggJiYKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIGRkLT5kdGQgIT0gU0RQX1VJTlQxNiAm
+Jgo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgZGQtPmR0ZCAhPSBTRFBfVEVYVF9TVFI4KQo+ICsgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgZ290byBmYWlsOwo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgZGF0YSA9IHNkcF9kYXRhX2FsbG9jKGRkLT5kdGQsICZkZC0+dmFs
+KTsKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIHN1YnNlcSA9IHNkcF9saXN0X2FwcGVuZChzdWJzZXEsIGRhdGEpOwo+ICsgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgfQo+ICsgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgKnNlcXAgPSBzZHBfbGlzdF9hcHBlbmQg
+KCpzZXFwLCBzdWJzZXEpOwo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgfSBl
+bHNlCj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBnb3Rv
+IGZhaWw7CklmIHlvdSBpbnZlcnQgdGhlIGxvZ2ljIHlvdSBkb24ndCBuZWVkIHRoaXMgImdvdG8i
+Cgo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgfQo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgcmV0
+dXJuIDA7Cj4gKyDCoCDCoCDCoCB9Cj4gKwo+ICsKUmVtb3ZlIGV4dHJhIGxpbmUuCkRvIHlvdSBo
+YXZlIGFuIGFwcGxpY2F0aW9uIG9yIHNkcHRvb2wncyBwYXRjaCB0byB0ZXN0IHRoZXNlIGZ1bmN0
+aW9ucz8KCkJyLApDbGF1ZGlvLgo+ICsgwqAgwqAgwqAgcmV0dXJuIHNkcF9nZXRfdXVpZHNlcV9h
+dHRyKHJlYywgU0RQX0FUVFJfU1VQUE9SVEVEX0ZFQVRVUkVTX0xJU1QsIHNlcXApOwo+ICsKPiAr
+ZmFpbDoKPiArIMKgIMKgIMKgIHNkcF9saXN0X2ZyZWUoKnNlcXAsIGZyZWUpOwo+ICsgwqAgwqAg
+wqAgZXJybm8gPSBFSU5WQUw7Cj4gKyDCoCDCoCDCoCByZXR1cm4gLTE7Cj4gK30KPiBkaWZmIC0t
+Z2l0IGEvbGliL3NkcC5oIGIvbGliL3NkcC5oCj4gaW5kZXggMzc1MjYxZS4uMWJiMzUxYSAxMDA2
+NDQKPiAtLS0gYS9saWIvc2RwLmgKPiArKysgYi9saWIvc2RwLmgKPiBAQCAtMjQ0LDEzICsyNDQs
+MTYgQEAgZXh0ZXJuICJDIiB7Cj4gwqAjZGVmaW5lIFNEUF9BVFRSX0dST1VQX0lEIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgMHgwMjAwCj4gwqAjZGVmaW5lIFNEUF9BVFRSX0lQX1NV
+Qk5FVCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCAweDAyMDAKPiDCoCNkZWZpbmUgU0RQ
+X0FUVFJfVkVSU0lPTl9OVU1fTElTVCDCoCDCoCDCoCDCoCDCoCDCoCDCoDB4MDIwMAo+ICsjZGVm
+aW5lIFNEUF9BVFRSX1NVUFBPUlRFRF9GRUFUVVJFU19MSVNUIDB4MDIwMAo+IMKgI2RlZmluZSBT
+RFBfQVRUUl9TVkNEQl9TVEFURSDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCAweDAyMDEKPgo+
+IMKgI2RlZmluZSBTRFBfQVRUUl9TRVJWSUNFX1ZFUlNJT04gwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+MHgwMzAwCj4gwqAjZGVmaW5lIFNEUF9BVFRSX0VYVEVSTkFMX05FVFdPUksgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAweDAzMDEKPiDCoCNkZWZpbmUgU0RQX0FUVFJfU1VQUE9SVEVEX0RBVEFfU1RPUkVT
+X0xJU1QgwqAgwqAweDAzMDEKPiArI2RlZmluZSBTRFBfQVRUUl9EQVRBX0VYQ0hBTkdFX1NQRUMg
+wqAgwqAgwqAgwqAgwqAgwqAweDAzMDEKPiDCoCNkZWZpbmUgU0RQX0FUVFJfRkFYX0NMQVNTMV9T
+VVBQT1JUIMKgIMKgIMKgIMKgIMKgIMKgMHgwMzAyCj4gwqAjZGVmaW5lIFNEUF9BVFRSX1JFTU9U
+RV9BVURJT19WT0xVTUVfQ09OVFJPTCDCoCAweDAzMDIKPiArI2RlZmluZSBTRFBfQVRUUl9NQ0FQ
+X1NVUFBPUlRFRF9QUk9DRURVUkVTIMKgIMKgIDB4MDMwMgo+IMKgI2RlZmluZSBTRFBfQVRUUl9G
+QVhfQ0xBU1MyMF9TVVBQT1JUIMKgIMKgIMKgIMKgIMKgIDB4MDMwMwo+IMKgI2RlZmluZSBTRFBf
+QVRUUl9TVVBQT1JURURfRk9STUFUU19MSVNUIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgMHgwMzAz
+Cj4gwqAjZGVmaW5lIFNEUF9BVFRSX0ZBWF9DTEFTUzJfU1VQUE9SVCDCoCDCoCDCoCDCoCDCoCDC
+oDB4MDMwNAo+IGRpZmYgLS1naXQgYS9saWIvc2RwX2xpYi5oIGIvbGliL3NkcF9saWIuaAo+IGlu
+ZGV4IGVlMzlkZjguLjQxZDU3ODYgMTAwNjQ0Cj4gLS0tIGEvbGliL3NkcF9saWIuaAo+ICsrKyBi
+L2xpYi9zZHBfbGliLmgKPiBAQCAtNTg1LDYgKzU4NSwxOSBAQCBzdGF0aWMgaW5saW5lIGludCBz
+ZHBfZ2V0X2ljb25fdXJsKGNvbnN0IHNkcF9yZWNvcmRfdAo+ICpyZWMsIGNoYXIgKnN0ciwgaW50
+IGxlbikKPiDCoCDCoCDCoCDCoHJldHVybiBzZHBfZ2V0X3N0cmluZ19hdHRyKHJlYywgU0RQX0FU
+VFJfSUNPTl9VUkwsIHN0ciwgbGVuKTsKPiDCoH0KPgo+ICsvKgo+ICsgKiBTZXQgdGhlIHN1cHBv
+cnRlZCBmZWF0dXJlcwo+ICsgKiBzZiBzaG91bGQgYmUgYSBsaXN0IG9mIGxpc3Qgd2l0aCBlYWNo
+IGZlYXR1cmUgZGF0YQo+ICsgKi8KPiArdm9pZCBzZHBfc2V0X3N1cHBfZmVhdChzZHBfcmVjb3Jk
+X3QgKnJlYywgY29uc3Qgc2RwX2xpc3RfdCAqc2YpOwo+ICsKPiArLyoKPiArICogR2V0IHRoZSBz
+dXBwb3J0ZWQgZmVhdHVyZXMKPiArICogc2VxcCBpcyBzZXQgdG8gYSBsaXN0IG9mIGxpc3Qgd2l0
+aCBlYWNoIGZlYXR1cmUgZGF0YQo+ICsgKiBJZiBhbiBlcnJvciBvY2N1cnJlZCAtMSBpcyByZXR1
+cm5lZCBhbmQgZXJybm8gaXMgc2V0Cj4gKyAqLwo+ICtpbnQgc2RwX2dldF9zdXBwX2ZlYXQgKGNv
+bnN0IHNkcF9yZWNvcmRfdCAqcmVjLCBzZHBfbGlzdF90ICoqc2VxcCk7Cj4gKwo+IMKgc2RwX3Jl
+Y29yZF90ICpzZHBfZXh0cmFjdF9wZHUoY29uc3QgdWludDhfdCAqcGRhdGEsIGludCBidWZzaXpl
+LCBpbnQKPiAqc2Nhbm5lZCk7Cj4gwqBzZHBfcmVjb3JkX3QgKnNkcF9jb3B5X3JlY29yZChzZHBf
+cmVjb3JkX3QgKnJlYyk7Cj4KPgo=
