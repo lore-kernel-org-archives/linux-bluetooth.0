@@ -1,54 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 16 Nov 2009 12:22:54 +0100
-From: Pavel Machek <pavel@ucw.cz>
-To: kernel list <linux-kernel@vger.kernel.org>, marcel@holtmann.org,
-	linux-bluetooth@vger.kernel.org
-Cc: "Rafael J. Wysocki" <rjw@sisk.pl>
-Subject: -rc6: something (probably active usb bluetooth) blocks suspend
-Message-ID: <20091116112254.GB12315@elf.ucw.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <dfb262380911150431h79650f28kadea09c26aee811f@mail.gmail.com>
+References: <dfb262380911141026x72fafeb8tbffd8692bd0c1ad5@mail.gmail.com>
+	 <dfb262380911150431h79650f28kadea09c26aee811f@mail.gmail.com>
+Date: Mon, 16 Nov 2009 12:09:23 +0200
+Message-ID: <dfb262380911160209v42da3134y8e645b33ac65ccdb@mail.gmail.com>
+Subject: Re: bluetooth audio fails
+From: Ramagudi Naziir <naziirr@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Linux amd 2.6.32-rc6-00498-g05b553a-dirty #89 SMP Fri Nov 13 10:43:31
-CET 2009 i686 GNU/Linux
+I have just tried that with bluez 3.36 and it works!
 
-...and yes, it is a regression. Hw is thinkpad x60.
+So - should I downgrade to bluez 3.36 ?
 
-Tried to suspend, machine came right back, used radio kill switch, and
-it suspended ok. Relevant messages seem to be:
+Can you just tell me how you would debug this ?
 
-								Pavel
-
-PM: Preparing system for mem sleep
-Freezing user space processes ... (elapsed 0.02 seconds) done.
-Freezing remaining freezable tasks ... (elapsed 0.00 seconds) done.
-PM: Entering mem sleep
-usb 5-2: usb suspend
-btusb_intr_complete: hci0 urb f3b57420 failed to resubmit (1)
-uhci_hcd 0000:00:1d.3: release dev 2 ep81-INT, period 1, phase 0, 23
-us
-btusb_bulk_complete: hci0 urb f3b57680 failed to resubmit (1)
-btusb_bulk_complete: hci0 urb f3b57718 failed to resubmit (1)
-usb 5-1: usb suspend
-usb 5-1: usb auto-resume
-uhci_hcd 0000:00:1d.3: port 1 portsc 0095,01
-usb 5-1: finish resume
-uhci_hcd 0000:00:1d.3: reserve dev 2 ep81-INT, period 1, phase 0, 23
-us
-hub 5-0:1.0: port 1 nyet suspended
-hub 5-0:1.0: suspend error -16
-pm_op(): usb_dev_suspend+0x0/0x10 returns -16
-PM: Device usb5 failed to suspend: error -16
-PM: Some devices failed to suspend
-thinkpad_acpi: ACPI backlight control delay disabled
-usb 5-2: usb resume
-uhci_hcd 0000:00:1d.3: port 2 portsc 00a5,01
-usb 5-2: finish resume
-usb usb4: usb resume
-usb usb4: wakeup_rh
-
-									Pavel
--- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+On Sun, Nov 15, 2009 at 2:31 PM, Ramagudi Naziir <naziirr@gmail.com> wrote:
+> I have just tried that also with a Motorola H700 headset,
+> and got exact same error message.
+>
+> (I also tried bluez 4.56 and got same error)
+>
+> please help me to debug this.
+>
+> thank you,
+> naziirr
+>
+>
+> On Sat, Nov 14, 2009 at 8:26 PM, Ramagudi Naziir <naziirr@gmail.com> wrote:
+>> Hi all,
+>>
+>> Can anyone pls help me debug this:
+>>
+>> # aplay -D bluetooth /startup.wav
+>> ALSA lib audio/pcm_bluetooth.c:1607:(audioservice_expect)
+>> BT_GET_CAPABILITIES failed : Input/output error(5)
+>> aplay: main:608: audio open error: Input/output error
+>>
+>> I'm running the latest bluez git sources with a 9xxPlantronics HFP headset.
+>> I tried both "auto" and "voice" in .asoundrc:
+>>
+>> pcm.bluetooth {
+>>        type bluetooth
+>>        device mybdaddr
+>>        profile “voice”
+>> }
+>>
+>>
+>> Any idea what this could be and how to debug/fix it ?
+>>
+>> thank you
+>> naziirr
+>>
+>
