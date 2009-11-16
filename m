@@ -1,57 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: Oliver Neukum <oliver@neukum.org>
-To: Pavel Machek <pavel@ucw.cz>
-Subject: Re: -rc6: something (probably active usb bluetooth) blocks suspend
-Date: Mon, 16 Nov 2009 14:47:51 +0100
-Cc: Alan Stern <stern@rowland.harvard.edu>,
- USB list <linux-usb@vger.kernel.org>,
- kernel list <linux-kernel@vger.kernel.org>,
- marcel@holtmann.org,
- linux-bluetooth@vger.kernel.org,
- "Rafael J. Wysocki" <rjw@sisk.pl>
-References: <20091116112254.GB12315@elf.ucw.cz> <200911161248.29924.oliver@neukum.org> <20091114111021.GA1378@ucw.cz>
-In-Reply-To: <20091114111021.GA1378@ucw.cz>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <200911161447.51651.oliver@neukum.org>
+Subject: Problem on PulseAudio
+From: Josu Lazkano <josu.lazkano@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Date: Mon, 16 Nov 2009 14:41:13 +0100
+Message-ID: <1258378873.2419.1.camel@HP>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am Samstag, 14. November 2009 12:10:21 schrieb Pavel Machek:
-> On Mon 2009-11-16 12:48:29, Oliver Neukum wrote:
-> > Am Montag, 16. November 2009 12:22:54 schrieb Pavel Machek:
-> >
-> > Hi Pavle,
-> >
-> :-)
-> :
-> > first the obvious question. Does it work if you down the interface?
-> > (not by killswitch)
-> 
-> Well, I'm not sure how repeatable it is. It happens once in two tries
-> today.
+I have a problem to get working my laptop with a bluetooth headset on
+PulseAudio. I wrote to PulseAudio mail-list, but they recomend to write
+on this mail-list.
 
-Ok, so it looks like a race.
+The proble is that I hava Ubuntu Karmic installed on two laptops, each
+ne has it own's BT built in hardware:
 
-> > > usb 5-1: usb suspend
-> > > usb 5-1: usb auto-resume
-> > > uhci_hcd 0000:00:1d.3: port 1 portsc 0095,01
-> > > usb 5-1: finish resume
-> > > uhci_hcd 0000:00:1d.3: reserve dev 2 ep81-INT, period 1, phase 0, 23
-> > > us
-> >
-> > Why is the device autoresumed here? Are you using autosuspend?
-> > This is odd, as the freezer should block the send path and remote
-> > wakeups should be deferred.
-> 
-> I believe I have it enabled in kconfig but not during runtime.
+$ hciconfig -a (this the one that not work, and now it has Ubuntu
+Karmic)
 
-Please check.
- 
-> (Another problem is that I need to turn the kill switch on/off to get
-> my bt usb after resume. That used not be the case long time ago.)
+hci0:    Type: USB
+    BD Address: 00:10:C6:xx:xx:xx ACL MTU: 377:10 SCO MTU: 16:0
+    UP RUNNING
+    RX bytes:664 acl:0 sco:0 events:18 errors:0
+    TX bytes:73 acl:0 sco:0 commands:19 errors:0
+    Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+    Link policy:
+    Link mode: SLAVE ACCEPT
+    Name: 'HP integrated Bluetooth module'
+    Class: 0x4a0000
+    Service Classes: Networking, Capturing, Telephony
+    Device Class: Miscellaneous,
+    HCI Ver: 1.2 (0x2) HCI Rev: 0x11 LMP Ver: 1.2 (0x2) LMP Subver:
+0x6963
+    Manufacturer: Broadcom Corporation (15)
 
-That is possibly another problem.
+And this is the one that works: (now runing Debian Lenny)
 
-	Regards
-		Oliver
+# hciconfig -a
+hci0:    Type: USB
+    BD Address: 00:21:85:xx:xx:xx ACL MTU: 310:10 SCO MTU: 64:8
+    UP RUNNING PSCAN ISCAN
+    RX bytes:1237 acl:0 sco:0 events:30 errors:0
+    TX bytes:852 acl:0 sco:0 commands:29 errors:0
+    Features: 0xff 0xff 0x8f 0xfe 0x9b 0xff 0x59 0x83
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+    Link policy: RSWITCH HOLD SNIFF PARK
+    Link mode: SLAVE ACCEPT
+    Name: 'LG'
+    Class: 0x00010c
+    Service Classes: Unspecified
+    Device Class: Computer, Laptop
+    HCI Ver: 2.1 (0x4) HCI Rev: 0x12e7 LMP Ver: 2.1 (0x4) LMP Subver:
+0x12e7
+    Manufacturer: Cambridge Silicon Radio (10)
+
+The problem is that I have this errors on PulseAudio on Ubuntu:
+http://pastebin.com/f37840107
+
+
+This line is in red: "E: module-bluetooth-device.c: Failed to write data
+to SCO socket: Argumento inválido"
+
+Argumento inválido = Invalid argument (in spanish)
+
+Can you help with this? Is my harware compatible?
+
+
+Thanks for all and best regards.
+
