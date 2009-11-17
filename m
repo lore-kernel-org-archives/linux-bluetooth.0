@@ -1,13 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 17 Nov 2009 20:18:10 +0530
-From: Vasanthakumar Thiagarajan <vasanth@atheros.com>
+From: Vikram Kandukuri <Vikram.Kandukuri@Atheros.com>
 To: <marcel@holtmann.org>
-CC: <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH] DFU Driver and firmware for Atheros bluetooth chipset
-	AR3011
-Message-ID: <20091117144809.GA16092@vasanth-dev.users.atheros.com>
+CC: <linux-bluetooth@vger.kernel.org>, Vikram Kandukuri
+	<Vikram.Kandukuri@Atheros.com>, Vikram Kandukuri
+	<Vikram.Kandukuri@atheors.com>
+Subject: [PATCH] DFU Driver and firmware for Atheros bluetooth chipset AR3011
+Date: Tue, 17 Nov 2009 20:18:39 +0530
+Message-ID: <1258469319-30719-1-git-send-email-Vikram.Kandukuri@Atheros.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Signed-off-by: Vikram Kandukuri <Vikram.Kandukuri@atheors.com>
