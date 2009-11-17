@@ -1,34 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4B0319E1.5030000@dtsp.co.nz>
-Date: Wed, 18 Nov 2009 10:47:13 +1300
-From: David Sainty <david.sainty@dtsp.co.nz>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "Luis R. Rodriguez" <lrodriguez@atheros.com>,
- Vikram Kandukuri <Vikram.Kandukuri@Atheros.com>,
- "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] DFU Driver and firmware for Atheros bluetooth chipset
- AR3011
-References: <20091117143613.GA29705@atheros-laptop>	 <1258469940.2003.25.camel@violet>  <20091117191112.GD11382@tux> <1258489653.2003.30.camel@violet>
-In-Reply-To: <1258489653.2003.30.camel@violet>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <1258491418.2003.37.camel@violet>
+References: <c6e9632c0911131047s565cc191w84d22bc1dff710a0@mail.gmail.com>
+	 <1258286232.3299.27.camel@violet>
+	 <c6e9632c0911170853g5ef4061cr75c42c71a1a87b7d@mail.gmail.com>
+	 <1258491418.2003.37.camel@violet>
+Date: Tue, 17 Nov 2009 22:18:59 +0100
+Message-ID: <c6e9632c0911171318l1b60fa85h55b3e6083777d516@mail.gmail.com>
+Subject: Re: Getting/setting Inquiry trasmit power level unsolved
+From: Natale Vinto <ebballon@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Marcel Holtmann wrote:
->> Also Vikram -- why not just ISC license the files as we do with ath9k ? Then also
->> use:
->>
->> MODULE_LICENSE("Dual BSD/GPL");
->>
->> This would be more consistant with what we do with our other upstream Atheros
->> modules.
->>     
->
-> Since this is just a firmware loading driver, I prefer if you just keep
-> it GPL only. It is not worth going into too much details. Especially
-> since it looks inspired (nicely phrased) from bcm203x.c driver.
->   
+Hi Marcel,
+I'm sorry I didn't even know  the meaning of top-posting before this
+email, I just answered using gmail.
 
-In the interests of supporting the device from *BSD operating systems 
-it'd be nice if it was clear that the firmware itself could be included 
-under a BSD licence.
+> # hciconfig hci0 inqtpl
+> hci0:   Type: USB
+>        BD Address: 00:19:DB:xx:xx:xx ACL MTU: 310:10 SCO MTU: 64:8
+>        Inquiry transmit power level: 4
+>
+> # hcidump -X -V
+> < HCI Command: Read Inquiry Response Transmit Power Level (0x03|0x0058) plen 0
+>> HCI Event: Command Complete (0x0e) plen 5
+>    Read Inquiry Response Transmit Power Level (0x03|0x0058) ncmd 1
+>    status 0x00 level 4
+>
+> Looks all good to me and works perfectly fine with the CSR dongle, I
+> tested this with.
+>
+So I'll try only with CSR dongles, thank you for useful informations.
+
+Best Regards
+
+
+-- 
+Natale Vinto
+http://www.hictech.com
+http://bluesman.gotext.org
