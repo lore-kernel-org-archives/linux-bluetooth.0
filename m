@@ -1,5 +1,5 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 17 Nov 2009 11:11:12 -0800
+Date: Tue, 17 Nov 2009 09:45:33 -0800
 From: "Luis R. Rodriguez" <lrodriguez@atheros.com>
 To: Marcel Holtmann <marcel@holtmann.org>
 CC: Vikram Kandukuri <Vikram.Kandukuri@Atheros.com>,
@@ -7,7 +7,7 @@ CC: Vikram Kandukuri <Vikram.Kandukuri@Atheros.com>,
  Rodriguez <Luis.Rodriguez@Atheros.com>
 Subject: Re: [PATCH] DFU Driver and firmware for Atheros bluetooth chipset
 	AR3011
-Message-ID: <20091117191112.GD11382@tux>
+Message-ID: <20091117174533.GB11382@tux>
 References: <20091117143613.GA29705@atheros-laptop> <1258469940.2003.25.camel@violet>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -15,36 +15,25 @@ In-Reply-To: <1258469940.2003.25.camel@violet>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 On Tue, Nov 17, 2009 at 06:59:00AM -0800, Marcel Holtmann wrote:
-> > +MODULE_AUTHOR("Atheros Communications");
-> > +MODULE_DESCRIPTION("Atheros AR3011 firmware driver");
-> > +MODULE_VERSION(DRV_VERSION);
-> > +MODULE_SUPPORTED_DEVICE("Atheros AR3011 chipset");
-> > +MODULE_LICENSE("GPL");
-> > +MODULE_FIRMWARE("atherosbt.bin");
+> > diff --git a/firmware/atherosbt.bin b/firmware/atherosbt.bin
+> > new file mode 100644
+> > index 0000000000000000000000000000000000000000..4a5ffb8de898fab1595662742f287493689e2b3b
+> > GIT binary patch
 > 
-> The
-> module author needs to have a contact information and not just the
-> company name. Read it as who maintains this driver.
+> What license is on this firmware. We can't include it into the Linux
+> kernel unless it us under GPL.
 
-This is probably just following what we have on ath9k / ath9k_common / ath9k_hw / ath
-modules which so far no one has asked us to change:
+Actually GPL-compatible.
 
-MODULE_AUTHOR("Atheros Communications");
-MODULE_DESCRIPTION("Support for Atheros 802.11n wireless LAN cards.");
-MODULE_SUPPORTED_DEVICE("Atheros 802.11n WLAN cards");
-MODULE_LICENSE("Dual BSD/GPL");
+> If it is a binary license and has a
+> proper distribution license then it can go to the linux-firmware tree
+> once you fixed the name of it of course.
 
-Using one contact point for ath9k stuff doesn't work for us as we have a group
-and for that the MAINTAINERS file seems just suitable. Plus -- some module authors
-are sometimes not the current maintainers so the MDOULE_AUTHOR really doesn't mean
-much. Wouldn't updating the MAINTAINERS file accordingly be better?
+Vikram, you can use this firmware if you are not opening up the firmware:
 
-Also Vikram -- why not just ISC license the files as we do with ath9k ? Then also
-use:
+http://kernel.org/pub/linux/kernel/people/mcgrof/firmware/LICENCE.atheros_firmware
 
-MODULE_LICENSE("Dual BSD/GPL");
-
-This would be more consistant with what we do with our other upstream Atheros
-modules.
+Our legal department has given us the blessing to use this for our firmware for
+802.11 when we don't open it up and release it under a GPL-compatible license.
 
   Luis
