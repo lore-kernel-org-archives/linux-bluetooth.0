@@ -1,38 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 18 Nov 2009 18:18:00 +0100
-From: Pavel Machek <pavel@ucw.cz>
-To: Oliver Neukum <oliver@neukum.org>
-Cc: Alan Stern <stern@rowland.harvard.edu>,
-	USB list <linux-usb@vger.kernel.org>,
-	kernel list <linux-kernel@vger.kernel.org>, marcel@holtmann.org,
-	linux-bluetooth@vger.kernel.org, "Rafael J. Wysocki" <rjw@sisk.pl>
-Subject: Re: -rc6: something (probably active usb bluetooth) blocks suspend
-Message-ID: <20091118171759.GB25150@elf.ucw.cz>
-References: <20091116112254.GB12315@elf.ucw.cz>
- <200911161443.20704.oliver@neukum.org>
+Date: Tue, 17 Nov 2009 13:59:09 -0800
+From: "Luis R. Rodriguez" <lrodriguez@atheros.com>
+To: David Sainty <david.sainty@dtsp.co.nz>
+CC: Marcel Holtmann <marcel@holtmann.org>, Luis Rodriguez
+	<Luis.Rodriguez@Atheros.com>, Vikram Kandukuri
+	<Vikram.Kandukuri@Atheros.com>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] DFU Driver and firmware for Atheros bluetooth chipset
+	AR3011
+Message-ID: <20091117215909.GE11382@tux>
+References: <20091117143613.GA29705@atheros-laptop> <1258469940.2003.25.camel@violet> <20091117191112.GD11382@tux> <1258489653.2003.30.camel@violet> <4B0319E1.5030000@dtsp.co.nz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <200911161443.20704.oliver@neukum.org>
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <4B0319E1.5030000@dtsp.co.nz>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon 2009-11-16 14:43:20, Oliver Neukum wrote:
-> Am Montag, 16. November 2009 12:22:54 schrieb Pavel Machek:
-> > Linux amd 2.6.32-rc6-00498-g05b553a-dirty #89 SMP Fri Nov 13 10:43:31
-> > CET 2009 i686 GNU/Linux
-> > 
-> > ...and yes, it is a regression. Hw is thinkpad x60.
-> > 
-> > Tried to suspend, machine came right back, used radio kill switch, and
-> > it suspended ok. Relevant messages seem to be:
+On Tue, Nov 17, 2009 at 01:47:13PM -0800, David Sainty wrote:
+> Marcel Holtmann wrote:
+> >> Also Vikram -- why not just ISC license the files as we do with ath9k ? Then also
+> >> use:
+> >>
+> >> MODULE_LICENSE("Dual BSD/GPL");
+> >>
+> >> This would be more consistant with what we do with our other upstream Atheros
+> >> modules.
+> >>
+> >
+> > Since this is just a firmware loading driver, I prefer if you just keep
+> > it GPL only. It is not worth going into too much details. Especially
+> > since it looks inspired (nicely phrased) from bcm203x.c driver.
+> >
 > 
-> I forgot to ask. Is this repeatable? The code is build on the assumption
-> that workqueues are frozen as the system calls suspend for system
-> sleep. If that assumption is wrong, a race can lead to this failure.
-> Is it wrong?
+> In the interests of supporting the device from *BSD operating systems
+> it'd be nice if it was clear that the firmware itself could be included
+> under a BSD licence.
 
-I (shortly) tried to repeat it but could not.
-									Pavel
+Did you read the license? It allow free redistribution.
 
--- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+  Luis
