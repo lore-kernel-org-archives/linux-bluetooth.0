@@ -1,29 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-From: Alexander H Deriziotis <deriziotis@gmail.com>
-Date: Thu, 19 Nov 2009 11:21:53 +0000
-Message-ID: <5eee8c670911190321gd44f7f4x522dc8af67e19c2f@mail.gmail.com>
-Subject: Connecting to Bluetooth Speakers via command line
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=windows-1252
+Subject: Re: Getting/setting Inquiry trasmit power level unsolved
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Natale Vinto <ebballon@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <c6e9632c0911180959p3e56668aqc298a673baea7350@mail.gmail.com>
+References: <c6e9632c0911131047s565cc191w84d22bc1dff710a0@mail.gmail.com>
+	 <1258286232.3299.27.camel@violet>
+	 <c6e9632c0911170853g5ef4061cr75c42c71a1a87b7d@mail.gmail.com>
+	 <1258491418.2003.37.camel@violet>
+	 <c6e9632c0911171318l1b60fa85h55b3e6083777d516@mail.gmail.com>
+	 <c6e9632c0911180959p3e56668aqc298a673baea7350@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Wed, 18 Nov 2009 19:15:14 +0100
+Message-ID: <1258568114.2003.128.camel@violet>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Forgive me if this isn't the correct place to ask this.
+Hi Natale,
 
-In Ubuntu 9.10 the Bluetooth applet has improved functionality for
-managing connected devices. Once I pair my Bluetooth speakers with my
-computer, I can click on the Bluetooth applet, select my speakers and
-click ‘Connect’ in order to establish a connection.
+> I would also know what could be the problem for other CSR based usb
+> bluetooth dongles, the dongle I've linked before from Cubic 3c. Corp.
+> is CSR according to lsusb. Is a linux-usb issue or the implementation
+> of TPL in BlueZ that deal only with certain kind of chipset?
+> 
+> When you talk about CSR dongle do you mean some developer stuff like
+> Nanosira-EDR USB Bluetooth Dongle
+> available at http://www.csr.com/store/search.php?q=PTS
+> or other CSR based dongles as Belkin or Targus ACB10US, as I read in Bluez News?
 
-This seems to automatically connect to the speakers and create a
-pulseaudio sink for me which I can use, however, every time I reboot,
-I need to manually click on Connect again to get my sink back.
+I tried it with a Fujitsu-Siemens BlueCore4-External flashed with a 2.1
+firmware. That was the one I had laying on my desk.
 
-Is there any way to connect to my Bluetooth speakers from the
-command-line, so that I can set-up my system to automatically use the
-relevant sink whenever I boot-up?
+And as I said, before run "hciconfig hci0 commands" and see if the
+command is actually supported. Maybe the ROM chips are different.
 
-Many thanks,
+Regards
 
-Alex
+Marcel
+
+
