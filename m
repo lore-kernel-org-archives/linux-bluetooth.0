@@ -1,36 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 18 Nov 2009 18:22:11 +0100
+From: Pavel Machek <pavel@ucw.cz>
+To: Oliver Neukum <oliver@neukum.org>
+Cc: Alan Stern <stern@rowland.harvard.edu>,
+	USB list <linux-usb@vger.kernel.org>,
+	kernel list <linux-kernel@vger.kernel.org>, marcel@holtmann.org,
+	linux-bluetooth@vger.kernel.org, "Rafael J. Wysocki" <rjw@sisk.pl>
+Subject: Re: -rc6: something (probably active usb bluetooth) blocks suspend
+Message-ID: <20091118172211.GC25150@elf.ucw.cz>
+References: <20091116112254.GB12315@elf.ucw.cz>
+ <200911161248.29924.oliver@neukum.org>
+ <20091114111021.GA1378@ucw.cz>
+ <200911161447.51651.oliver@neukum.org>
 MIME-Version: 1.0
-In-Reply-To: <c6e9632c0911171318l1b60fa85h55b3e6083777d516@mail.gmail.com>
-References: <c6e9632c0911131047s565cc191w84d22bc1dff710a0@mail.gmail.com>
-	 <1258286232.3299.27.camel@violet>
-	 <c6e9632c0911170853g5ef4061cr75c42c71a1a87b7d@mail.gmail.com>
-	 <1258491418.2003.37.camel@violet>
-	 <c6e9632c0911171318l1b60fa85h55b3e6083777d516@mail.gmail.com>
-Date: Wed, 18 Nov 2009 18:59:34 +0100
-Message-ID: <c6e9632c0911180959p3e56668aqc298a673baea7350@mail.gmail.com>
-Subject: Re: Getting/setting Inquiry trasmit power level unsolved
-From: Natale Vinto <ebballon@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <200911161447.51651.oliver@neukum.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-I would also know what could be the problem for other CSR based usb
-bluetooth dongles, the dongle I've linked before from Cubic 3c. Corp.
-is CSR according to lsusb. Is a linux-usb issue or the implementation
-of TPL in BlueZ that deal only with certain kind of chipset?
+Hi!
 
-When you talk about CSR dongle do you mean some developer stuff like
-Nanosira-EDR USB Bluetooth Dongle
-available at http://www.csr.com/store/search.php?q=PTS
-or other CSR based dongles as Belkin or Targus ACB10US, as I read in Bluez News?
+> > > Why is the device autoresumed here? Are you using autosuspend?
+> > > This is odd, as the freezer should block the send path and remote
+> > > wakeups should be deferred.
+> > 
+> > I believe I have it enabled in kconfig but not during runtime.
+> 
+> Please check.
 
-Just to understand, thanks
+CONFIG_USB_SUSPEND=y
 
-Best Regards
+I'm not aware of  boot scripts enabling anything.
 
+> > (Another problem is that I need to turn the kill switch on/off to get
+> > my bt usb after resume. That used not be the case long time ago.)
+> 
+> That is possibly another problem.
 
-Natale Vinto
-http://www.hictech.com
-http://bluesman.gotext.org
+Yes, I guess so. With those many USB experts around, I thought I'd
+mention it :-).
+									Pavel
+-- 
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
