@@ -1,52 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Fri, 20 Nov 2009 11:15:13 +0530
-Message-ID: <912bb79a0911192145j2c97d8adjfd9ae445a9b3e50a@mail.gmail.com>
-Subject: Pincode request Problem
-From: nirav rabara <niravrabara@gmail.com>
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1258635027.2150.9168.camel@localhost.localdomain>
+References: <5eee8c670911190321gd44f7f4x522dc8af67e19c2f@mail.gmail.com>
+	<20091119123535.GA4305@jh-x301> <1258635027.2150.9168.camel@localhost.localdomain>
+From: Alexander H Deriziotis <deriziotis@gmail.com>
+Date: Thu, 19 Nov 2009 14:13:20 +0000
+Message-ID: <5eee8c670911190613q774ff195me5728f3f3dc6061e@mail.gmail.com>
+Subject: Re: Connecting to Bluetooth Speakers via command line
+To: Bastien Nocera <hadess@hadess.net>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+2009/11/19 Bastien Nocera <hadess@hadess.net>:
+> On Thu, 2009-11-19 at 14:35 +0200, Johan Hedberg wrote:
+>
+> How about trying to connect to the last used audio device? That would
+> probably solve most use cases, and avoid surprises.
+>
+> Do you want to file a bug against gnome-bluetooth to ask for that? I'll
+> try to implement it then.
+>
+> Cheers
+>
 
-How to get PIN request and wait for the reply without using gnome.
+Hi Bastien,
 
-My scenario is as below,
+This would fit my needs perfectly. If I want to stop using the
+bluetooth speakers, I'll just Disconnect them through the applet.
+Sounds pretty intuitive.
 
-I have cross complied  Bluez-4.52 and using with my custom board with ARM.
-./bluetoothd is running in background.
-In my application I do DeviceDiscovery (hci_inquiry) and able get the
-discovered devices addresses.
+Hopefully I've filed the bug in the correct place:
 
-But when I tried to connect selected address from the discovered
-address on RFCOM, bluetoothd is trying to get Pincode and get fails
-because I am not using gnome on my embedded platform.(to solve this
-problem I have hard coded Pin code in bluetoothd)
+https://bugzilla.gnome.org/show_bug.cgi?id=602409
 
-I am using Qt for GUI, Now I want to wait in bluetoothd  for Pincode
-and  want to pass the pincode from Qt to bluetoothd , and then
-bluetoothd should proceed.
+I take it if anyone disagrees with this behaviour, then they'll raise
+it here, or on the bugreport.
 
-In other way I want to pass pincode from one process to another
-process, but I am using Qt not GTK which has been used in Bluez.
+Thanks,
+Alex
 
-But is there any window to solve with problem, I mean any API OR any
-document which can help me Or Is anybody has done something like that.
-
-I have got few queries regarding to solve the above issue
-
-1) Is it Strongly recommended to  write another application similar to
-bluetoothd if I don't want to use GTK OR If I use custom board?
-2) Is there any API that can I use to get Pin request and send the
-PinCode to bluetooth deamon.
-OR
-Any Suggestion.
-
-Your suggestion would be a great help for me....
-Thanks in Advance
-
--- 
-With Regards,
-Nirav Rabara
+p.s. Thanks Johan for the script, I'll test it when I get home tonight :)
