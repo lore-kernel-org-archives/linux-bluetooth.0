@@ -1,57 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4B0968F9.6050807@sezampro.rs>
-Date: Sun, 22 Nov 2009 16:38:17 +0000
 From: Aleksandar Radovanovic <biblbroks@sezampro.rs>
-MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Subject: struct hci_conn leaked on 2.6.31.6
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: [PATCH] Bluetooth: Fix struct hci_conn memory leak
+Date: Sun, 22 Nov 2009 16:38:48 +0000
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200911221638.48432.biblbroks@sezampro.rs>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Fix struct hci_conn being leaked on unsuccessful HCI connection attempts
 
-I noticed recently that my "size-512" slab cache is constantly growing
-on a machine with a lot of Bluetooth activity. kmemleak points to struct
-hci_conn allocation in hci_conn_add().
+Signed-off-by: Aleksandar Radovanovic <biblbroks@sezampro.rs>
 
-After examining the code I found out that, on a successful connection
-attempt, the connection is registered with sysfs and that sysfs code is
-responsible for freeing struct hci_conn once sysfs device is released.
-However, on an unsuccessful connection attempt (connection complete
-event returns with a non-zero status in hci_conn_complete_evt()), the
-connection is never registered with sysfs in the first place, so it
-never gets unregistered and struct hci_conn is subsequently leaked.
+---
 
-This leak can be reliably reproduced by trying to page a dummy BDADDR,
-e.g. with something like
+ hci_conn.c  |    2 +-
+ hci_event.c |    2 --
+ hci_sysfs.c |    4 +++-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-while true
-do
-    hcitool cc 11:22:33:44:55:66
-done
-
-and watching the "size-512" slab cache grow.
-
-I instrumented the code with printk's to confirm that del_conn() is
-never queued and executed in this case. I tested this on 2.6.31.5 and
-2.6.31.6, on arm and x86 with same results.
-
-IMHO, there are two problems here:
-
-First, conn->devref counting is wrong, it is initialized to zero and
-only incremented once a successful connection complete event arrives.
-But any hci_conn_del() will decrement it, (whether from a failed
-connection complete event or maybe for some other reason) - in this case
-below 0, so del_conn() never gets queued for execution.
-
-Second, del_conn() never calls put_device(&conn->dev) if the connection
-has not been actually added to the sysfs tree - which, in this case, it
-isn't.
-
-I've created a simple patch that fixes these problems, which follows.
-
-Cheers,
-Aleksandar
-
+diff -Naur linux-2.6.31.6.orig/net/bluetooth/hci_conn.c linux-2.6.31.6/net/bluetooth/hci_conn.c
+--- linux-2.6.31.6.orig/net/bluetooth/hci_conn.c	2009-11-10 00:32:31.000000000 +0000
++++ linux-2.6.31.6/net/bluetooth/hci_conn.c	2009-11-19 13:33:50.000000000 +0000
+@@ -246,7 +246,7 @@
+ 	if (hdev->notify)
+ 		hdev->notify(hdev, HCI_NOTIFY_CONN_ADD);
+ 
+-	atomic_set(&conn->devref, 0);
++	atomic_set(&conn->devref, 1);
+ 
+ 	hci_conn_init_sysfs(conn);
+ 
+diff -Naur linux-2.6.31.6.orig/net/bluetooth/hci_event.c linux-2.6.31.6/net/bluetooth/hci_event.c
+--- linux-2.6.31.6.orig/net/bluetooth/hci_event.c	2009-11-10 00:32:31.000000000 +0000
++++ linux-2.6.31.6/net/bluetooth/hci_event.c	2009-11-19 13:33:49.000000000 +0000
+@@ -887,7 +887,6 @@
+ 		} else
+ 			conn->state = BT_CONNECTED;
+ 
+-		hci_conn_hold_device(conn);
+ 		hci_conn_add_sysfs(conn);
+ 
+ 		if (test_bit(HCI_AUTH, &hdev->flags))
+@@ -1694,7 +1693,6 @@
+ 		conn->handle = __le16_to_cpu(ev->handle);
+ 		conn->state  = BT_CONNECTED;
+ 
+-		hci_conn_hold_device(conn);
+ 		hci_conn_add_sysfs(conn);
+ 		break;
+ 
+diff -Naur linux-2.6.31.6.orig/net/bluetooth/hci_sysfs.c linux-2.6.31.6/net/bluetooth/hci_sysfs.c
+--- linux-2.6.31.6.orig/net/bluetooth/hci_sysfs.c	2009-11-10 00:32:31.000000000 +0000
++++ linux-2.6.31.6/net/bluetooth/hci_sysfs.c	2009-11-19 14:03:47.000000000 +0000
+@@ -115,8 +115,10 @@
+ 	struct hci_conn *conn = container_of(work, struct hci_conn, work_del);
+ 	struct hci_dev *hdev = conn->hdev;
+ 
+-	if (!device_is_registered(&conn->dev))
++	if (!device_is_registered(&conn->dev)) {
++		put_device(&conn->dev);
+ 		return;
++	}
+ 
+ 	while (1) {
+ 		struct device *dev;
 
