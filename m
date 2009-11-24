@@ -1,48 +1,257 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <574573.55804.qm@web94901.mail.in2.yahoo.com>
-Date: Tue, 24 Nov 2009 17:26:52 +0530 (IST)
-From: Pavan Savoy <pavan_savoy@yahoo.co.in>
-Subject: Re: alternative to hci_ldisc for BT-UART
-To: linux-bluetooth@vger.kernel.org
+Date: Tue, 24 Nov 2009 15:40:10 +0530
+From: Kandukuri Vikram <vkandukuri@atheros.com>
+To: <marcel@holtmann.org>, <linux-kernel@vger.kernel.org>,
+	<linux-bluetooth@vger.kernel.org>
+CC: <vikram.kandukuri@gmail.com>, <lrodriguez@atheros.com>,
+	<atheros.eng.projects.ath9k-devel@mailman.users.atheros.com>
+Subject: [PATCH] DFU Driver for Atheros bluetooth chipset AR3011
+Message-ID: <20091124101007.GC7551@atheros-laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Currently there is a line discipline driver which works similar to hci_ldisc however it now, has exported a write function and takes in an skb in that and dumps it onto the UART.
-when data is received, the 1st byte is checked for either of BT packets (event, sco, acl) if not it is forwarded to the 2nd driver (in this case FM driver).
+Signed-off-by: Vikram Kandukuri <Vikram.Kandukuri@atheors.com>
+Signed-off-by: Alicke Xu <sxu@atheros.com>
+Reviewed-by: Luis R. Rodriguez <lrodriguez@atheros.com>
 
-with this BT apps can send/receive data as usual (over hci0 interface), and there can be an FM application working on a simple char device say /dev/radio (or a v4l2 device) and still talk to chip when BT is on.
+---
+ drivers/bluetooth/Kconfig  |   12 +++
+ drivers/bluetooth/Makefile |    1 +
+ drivers/bluetooth/ath3k.c  |  191 ++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 204 insertions(+), 0 deletions(-)
+ create mode 100644 drivers/bluetooth/ath3k.c
 
-Where should this driver be placed ? in the kernel source code ? If at all it's accepted by the community ?
-
-regards,
-Pavan
-
---- On Thu, 15/10/09, Pavan Savoy <pavan_savoy@yahoo.co.in> wrote:
-
-> From: Pavan Savoy <pavan_savoy@yahoo.co.in>
-> Subject: alternative to hci_ldisc for BT-UART
-> To: linux-bluetooth@vger.kernel.org
-> Date: Thursday, 15 October, 2009, 9:47 AM
-> Hi,
-> 
-> Currently if the BT chip has an UART transport, it stops me
-> from making of UART for any other purpose when BT is
-> active.
-> In combo-chip cases(BT/FM), the TTY line discipline has to
-> be more generic so that any other driver can make use of
-> that line discipline to send across data to chip.
-> 
-> Is this possible and valid ?
-> 
-> regards,
-> Pavan
-> 
-> 
->       Connect more, do more and share more
-> with Yahoo! India Mail. Learn more. http://in.overview.mail.yahoo.com/
-> 
-
-
-      The INTERNET now has a personality. YOURS! See your Yahoo! Homepage. http://in.yahoo.com/
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index 652367a..89f079e 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -195,5 +195,17 @@ config BT_MRVL_SDIO
+ 	  Say Y here to compile support for Marvell BT-over-SDIO driver
+ 	  into the kernel or say M to compile it as module.
+ 
++config BT_ATH3K
++	tristate "Atheros firmware download driver"
++	depends on BT_HCIBTUSB
++	select FW_LOADER
++	help
++	  Bluetooth firmware download driver.
++	  This driver loads the firmware into the Atheros bluetooth
++          chipset.
++
++	  Say Y here to compile support for "Atheros AR30XX firmware download driver"
++          into the  kernel or say M to compile it as module (ath3k).
++
+ endmenu
+ 
+diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
+index b3f57d2..6fcdeb7 100644
+--- a/drivers/bluetooth/Makefile
++++ b/drivers/bluetooth/Makefile
+@@ -15,6 +15,7 @@ obj-$(CONFIG_BT_HCIBTUART)	+= btuart_cs.o
+ obj-$(CONFIG_BT_HCIBTUSB)	+= btusb.o
+ obj-$(CONFIG_BT_HCIBTSDIO)	+= btsdio.o
+ 
++obj-$(CONFIG_BT_ATH3K)	        += ath3k.o
+ obj-$(CONFIG_BT_MRVL)		+= btmrvl.o
+ obj-$(CONFIG_BT_MRVL_SDIO)	+= btmrvl_sdio.o
+ 
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+new file mode 100644
+index 0000000..d338802
+--- /dev/null
++++ b/drivers/bluetooth/ath3k.c
+@@ -0,0 +1,191 @@
++/*
++ * Copyright (c) 2008-2009 Atheros Communications Inc.
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ *
++ */
++
++
++#include <linux/module.h>
++#include <linux/kernel.h>
++#include <linux/init.h>
++#include <linux/slab.h>
++#include <linux/types.h>
++#include <linux/errno.h>
++#include <linux/device.h>
++#include <linux/firmware.h>
++#include <linux/usb.h>
++#include <net/bluetooth/bluetooth.h>
++
++#define VERSION "1.0"
++
++
++static struct usb_device_id ath3k_table[] = {
++	/* Atheros AR3011 */
++	{ USB_DEVICE(0x0CF3, 0x3000) },
++	{ }	/* Terminating entry */
++};
++
++MODULE_DEVICE_TABLE(usb, ath3k_table);
++
++#define USB_REQ_DFU_DNLOAD	1
++#define FIRST_20BYTE            20
++#define BULK_SIZE               4096
++
++#define ATHBT_IN_EP(data)       (0x81)
++#define ATHBT_OUT_EP(data)	(0x02)
++
++struct ath3k_data {
++	struct usb_device *udev;
++	u8 *fw_data;
++	u32 fw_size;
++	u32 fw_sent;
++};
++
++static int ath3k_load_firmware(struct ath3k_data *data,
++				unsigned char *firmware,
++				int count)
++{
++	u8 *send_buf;
++	int err, pipe, len, size, sent = 0;
++
++	BT_DBG("ath3k %p udev %p\n", data, data->udev);
++
++	pipe = usb_sndctrlpipe(data->udev, 0);
++
++	if ((usb_control_msg(data->udev, pipe,
++				USB_REQ_DFU_DNLOAD,
++				USB_TYPE_VENDOR, 0, 0,
++				firmware, 20, USB_CTRL_SET_TIMEOUT)) < 0) {
++		BT_ERR("Can't change to loading configuration err\n");
++		return -EBUSY;
++	}
++	sent += 20;
++	count -= 20;
++
++	send_buf = kmalloc(BULK_SIZE, GFP_ATOMIC);
++	if (!send_buf) {
++		BT_ERR("Can't allocate memory chunk for firmware\n");
++		return -ENOMEM;
++	}
++
++	while (count) {
++		size = min_t(uint, count, BULK_SIZE);
++		pipe = usb_sndbulkpipe(data->udev, ATHBT_OUT_EP(data));
++		memcpy(send_buf, firmware + sent, size);
++
++		err = usb_bulk_msg(data->udev, pipe, send_buf, size,
++					&len, 3000);
++
++		if (err || (len != size)) {
++			BT_ERR("Error in firmware loading err = %d,"
++				"len = %d, size = %d\n", err, len, size);
++			goto error;
++		}
++
++		sent  += size;
++		count -= size;
++	}
++
++	kfree(send_buf);
++	return 0;
++
++error:
++	kfree(send_buf);
++	return err;
++}
++
++static int ath3k_probe(struct usb_interface *intf,
++			const struct usb_device_id *id)
++{
++	const struct firmware *firmware;
++	struct usb_device *udev = interface_to_usbdev(intf);
++	struct ath3k_data *data;
++	int size;
++
++	BT_DBG("ath3k_probe intf %p id %p\n", intf, id);
++
++	if (intf->cur_altsetting->desc.bInterfaceNumber != 0)
++		return -ENODEV;
++
++	data = kzalloc(sizeof(*data), GFP_KERNEL);
++	if (!data)
++		return -ENOMEM;
++
++	data->udev  = udev;
++
++	if (request_firmware(&firmware, "ath3k-1.fw", &udev->dev) < 0) {
++		kfree(data);
++		return -EIO;
++	}
++
++	size = max_t(uint, firmware->size, 4096);
++	data->fw_data = kmalloc(size, GFP_KERNEL);
++	if (!data->fw_data) {
++		release_firmware(firmware);
++		kfree(data);
++		return -ENOMEM;
++	}
++
++	memcpy(data->fw_data, firmware->data, firmware->size);
++	data->fw_size = firmware->size;
++	data->fw_sent = 0;
++	release_firmware(firmware);
++
++	usb_set_intfdata(intf, data);
++	if (ath3k_load_firmware(data, data->fw_data, data->fw_size)) {
++		usb_set_intfdata(intf, NULL);
++		return -EIO;
++	}
++
++	return 0;
++}
++
++static void ath3k_disconnect(struct usb_interface *intf)
++{
++	struct ath3k_data *data = usb_get_intfdata(intf);
++
++	BT_DBG("ath3k_disconnect intf %p\n", intf);
++
++	kfree(data->fw_data);
++	kfree(data);
++}
++
++static struct usb_driver ath3k_driver = {
++	.name		= "ath3k",
++	.probe		= ath3k_probe,
++	.disconnect	= ath3k_disconnect,
++	.id_table	= ath3k_table,
++};
++
++static int __init ath3k_init(void)
++{
++	BT_INFO("Atheros AR30XX firmware driver ver %s", VERSION);
++	return usb_register(&ath3k_driver);
++}
++
++static void __exit ath3k_exit(void)
++{
++	usb_deregister(&ath3k_driver);
++}
++
++module_init(ath3k_init);
++module_exit(ath3k_exit);
++
++MODULE_AUTHOR("Atheros Communications");
++MODULE_DESCRIPTION("Atheros AR30XX firmware driver");
++MODULE_VERSION(VERSION);
++MODULE_LICENSE("GPL");
++MODULE_FIRMWARE("ath3k-1.fw");
+-- 
+1.6.0.4
