@@ -1,65 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 24 Nov 2009 08:51:48 -0500
-From: Celejar <celejar@gmail.com>
+Message-ID: <574573.55804.qm@web94901.mail.in2.yahoo.com>
+Date: Tue, 24 Nov 2009 17:26:52 +0530 (IST)
+From: Pavan Savoy <pavan_savoy@yahoo.co.in>
+Subject: Re: alternative to hci_ldisc for BT-UART
 To: linux-bluetooth@vger.kernel.org
-Subject: ppp over bluetooth trouble
-Message-Id: <20091124085148.a82fed54.celejar@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Currently there is a line discipline driver which works similar to hci_ldisc however it now, has exported a write function and takes in an skb in that and dumps it onto the UART.
+when data is received, the 1st byte is checked for either of BT packets (event, sco, acl) if not it is forwarded to the 2nd driver (in this case FM driver).
 
-I'm having trouble connecting my Palm Centro (basically a Treo) to my
-Debian system via bluetooth, following these directions:
+with this BT apps can send/receive data as usual (over hci0 interface), and there can be an FM application working on a simple char device say /dev/radio (or a v4l2 device) and still talk to chip when BT is on.
 
-http://wiki.debian.org/BluetoothPalmOSConnection
+Where should this driver be placed ? in the kernel source code ? If at all it's accepted by the community ?
 
-Here's what I get:
+regards,
+Pavan
 
-~# dund --nodetach --listen --persist --msdun call centro
-dund[4423]: Bluetooth DUN daemon version 4.57
-using channel 12
-Using interface ppp0
-Connect: ppp0 <--> /dev/rfcomm0
-sent [LCP ConfReq id=0x1 <asyncmap 0x0> <magic 0xa399cef2> <pcomp> <accomp>]
-dund[4424]: New connection from 00:07:E0:E7:25:6E
-sent [LCP ConfReq id=0x1 <asyncmap 0x0> <magic 0xa399cef2> <pcomp> <accomp>]
-rcvd [LCP ConfReq id=0x2 <asyncmap 0x0> <pcomp> <accomp>]
-sent [LCP ConfAck id=0x2 <asyncmap 0x0> <pcomp> <accomp>]
-sent [LCP ConfReq id=0x1 <asyncmap 0x0> <magic 0xa399cef2> <pcomp> <accomp>]
-rcvd [LCP ConfReq id=0x3 <asyncmap 0x0> <pcomp> <accomp>]
-sent [LCP ConfAck id=0x3 <asyncmap 0x0> <pcomp> <accomp>]
-sent [LCP ConfReq id=0x1 <asyncmap 0x0> <magic 0xa399cef2> <pcomp> <accomp>]
-sent [LCP ConfReq id=0x1 <asyncmap 0x0> <magic 0xa399cef2> <pcomp> <accomp>]
-rcvd [LCP ConfReq id=0x4 <asyncmap 0x0> <pcomp> <accomp>]
-sent [LCP ConfAck id=0x4 <asyncmap 0x0> <pcomp> <accomp>]
-sent [LCP ConfReq id=0x1 <asyncmap 0x0> <magic 0xa399cef2> <pcomp> <accomp>]
-rcvd [LCP ConfReq id=0x5 <asyncmap 0x0> <pcomp> <accomp>]
-sent [LCP ConfAck id=0x5 <asyncmap 0x0> <pcomp> <accomp>]
-sent [LCP ConfReq id=0x1 <asyncmap 0x0> <magic 0xa399cef2> <pcomp> <accomp>]
-rcvd [LCP ConfReq id=0x6 <asyncmap 0x0> <pcomp> <accomp>]
-sent [LCP ConfAck id=0x6 <asyncmap 0x0> <pcomp> <accomp>]
-sent [LCP ConfReq id=0x1 <asyncmap 0x0> <magic 0xa399cef2> <pcomp> <accomp>]
-rcvd [LCP ConfReq id=0x7 <asyncmap 0x0> <pcomp> <accomp>]
-sent [LCP ConfAck id=0x7 <asyncmap 0x0> <pcomp> <accomp>]
-sent [LCP ConfReq id=0x1 <asyncmap 0x0> <magic 0xa399cef2> <pcomp> <accomp>]
-sent [LCP ConfReq id=0x1 <asyncmap 0x0> <magic 0xa399cef2> <pcomp> <accomp>]
-rcvd [LCP ConfReq id=0x8 <asyncmap 0x0> <pcomp> <accomp>]
-sent [LCP ConfAck id=0x8 <asyncmap 0x0> <pcomp> <accomp>]
-LCP: timeout sending Config-Requests
-Connection terminated.
-Modem hangup
+--- On Thu, 15/10/09, Pavan Savoy <pavan_savoy@yahoo.co.in> wrote:
 
-I don't know exactly what all the LCP messages mean, but I do note that
-the rcvd lines are all ConfReq's, and IIUC, I should be getting a
-ConfAck in response to the sent ConfReq.  Can anyone figure out
-what's going on here?
+> From: Pavan Savoy <pavan_savoy@yahoo.co.in>
+> Subject: alternative to hci_ldisc for BT-UART
+> To: linux-bluetooth@vger.kernel.org
+> Date: Thursday, 15 October, 2009, 9:47 AM
+> Hi,
+> 
+> Currently if the BT chip has an UART transport, it stops me
+> from making of UART for any other purpose when BT is
+> active.
+> In combo-chip cases(BT/FM), the TTY line discipline has to
+> be more generic so that any other driver can make use of
+> that line discipline to send across data to chip.
+> 
+> Is this possible and valid ?
+> 
+> regards,
+> Pavan
+> 
+> 
+>       Connect more, do more and share more
+> with Yahoo! India Mail. Learn more. http://in.overview.mail.yahoo.com/
+> 
 
-Celejar
--- 
-foffl.sourceforge.net - Feeds OFFLine, an offline RSS/Atom aggregator
-mailmin.sourceforge.net - remote access via secure (OpenPGP) email
-ssuds.sourceforge.net - A Simple Sudoku Solver and Generator
 
+      The INTERNET now has a personality. YOURS! See your Yahoo! Homepage. http://in.yahoo.com/
