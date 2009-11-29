@@ -1,51 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Sun, 29 Nov 2009 16:58:01 +0100
+From: Pavel Machek <pavel@ucw.cz>
+To: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
+	kernel list <linux-kernel@vger.kernel.org>
+Subject: bluetooth cf slow (10KB/sec), lots of dmesg spam
+Message-ID: <20091129155801.GA1634@ucw.cz>
 MIME-Version: 1.0
-In-Reply-To: <912bb79a0911292226o1c42baeemb2a8596fce465e65@mail.gmail.com>
-References: <912bb79a0911292226o1c42baeemb2a8596fce465e65@mail.gmail.com>
-Date: Mon, 30 Nov 2009 12:48:01 -0200
-Message-ID: <f9d4bd30911300648v4fc8d1f2pfa59fae4e7548107@mail.gmail.com>
-Subject: Re: Problem in understanding of agent
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: nirav rabara <niravrabara@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Nov 30, 2009 at 4:26 AM, nirav rabara <niravrabara@gmail.com> wrote:
-> Hi,
->
-> I am newbie to bluetooth, I have gone through agent.c and simple-agent
-> but not getting clear idea, how agent works??
-> Because In my application i m using Qt , I am poor at GTK+ , glib and pthython.
-> But what I understood is Agent will contain all the function defined
-> in agent.api, and when PIN requrest comes this api will serve the
-> request for this we need to create agent and register agent.
->
-> I am using qt binding, can anybody show me the right direction to
-> implement agent??
->
-> Your suggestion would be a great help for me
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
 
-Hi Nirav,
+Hi!
 
-You can find an example of obex-client agent here:
-http://gitorious.org/qt-obex-ftp-client-library
+I'm using CF bluetooth card:
 
-The concept is similar, copy the agent/adaptor code and implement the
-methods based on the API description only.
-Let me know if you still have problem. We can publish an example of a Qt agent.
+toy:~# setserial -av /dev/ttyS0
+/dev/ttyS0, Line 0, UART: 16950/954, Port: 0xc48202f8, IRQ: 201
+	Baud_base: 921600, close_delay: 50, divisor: 0
+	closing_wait: 3000
+	Flags: spd_normal skip_test
 
-Br,
-Claudio.
+toy:~# hciconfig
+hci0:	Type: UART
+	BD Address: 00:10:60:AB:25:9A ACL MTU: 192:8 SCO MTU: 64:8
+	UP RUNNING PSCAN ISCAN 
+	RX bytes:1612262 acl:5084 sco:0 events:3602 errors:0
+	TX bytes:507156 acl:3779 sco:0 commands:28 errors:0
+
+
+...and it mostly works, but slowly, and with tons of complains. Card
+is:
+
+toy:~# lspcmcia -v
+Socket 0 Bridge:   	[pxa2xx-pcmcia] 	(bus ID: pxa2xx-pcmcia)
+	Configuration:	state: on	ready: yes
+			Voltage: 3.3V Vcc: 3.3V Vpp: 0.0V
+Socket 0 Device 0:	[serial_cs]		(bus ID: 0.0)
+	Configuration:	state: on
+	Product Name:   Compact Flash Bluetooth Card 
+	Identification:	manf_id: 0x0279	card_id: 0x950b
+			function: 2 (serial)
+			prod_id(1): "Compact Flash" (0x95521410)
+			prod_id(2): "Bluetooth Card" (0x7664fb1d)
+			prod_id(3): --- (---)
+			prod_id(4): --- (---)
+
+I believe the problem is 115200 bitrate between system and CF serial;
+I did setserial baud_base 921600,  but that does not seem to speed it
+up. Do I need to do some special magic to enable high speed?
+
+Any ideas?
+									Pavel
+
+PM: Adding info for No Bus:hci0
+bcsp_recv: Out-of-order packet arrived, got 1 expected 0
+PM: Adding info for No Bus:rfcomm1
+PM: Adding info for No Bus:hci0:41
+PM: Adding info for No Bus:bnep0
+bcsp_recv: Short BCSP packet
+bcsp_recv: Out-of-order packet arrived, got 5 expected 4
+bcsp_recv: Out-of-order packet arrived, got 6 expected 4
+SysRq : Changing Loglevel
+Loglevel set to 1
+bcsp_recv: Short BCSP packet
+bcsp_recv: Out-of-order packet arrived, got 1 expected 0
+bcsp_recv: Out-of-order packet arrived, got 2 expected 0
+bcsp_recv: Out-of-order packet arrived, got 3 expected 0
+bcsp_recv: Short BCSP packet
+...
+bcsp_recv: Out-of-order packet arrived, got 2 expected 7
+bcsp_recv: Short BCSP packet
+bcsp_recv: Out-of-order packet arrived, got 7 expected 6
+bcsp_recv: Out-of-order packet arrived, got 0 expected 6
+bcsp_recv: Out-of-order packet arrived, got 1 expected 6
+bcsp_recv: Short BCSP packet
+bcsp_recv: Error in BCSP hdr checksum
+bcsp_recv: Out-of-order packet arrived, got 4 expected 2
+bcsp_recv: Out-of-order packet arrived, got 5 expected 2
+bcsp_recv: Short BCSP packet
+bcsp_recv: Out-of-order packet arrived, got 2 expected 1
+bcsp_recv: Out-of-order packet arrived, got 3 expected 1
+bcsp_recv: Out-of-order packet arrived, got 4 expected 1
+bcsp_unslip_one_byte: Invalid byte 00 after esc byte
+bcsp_recv: Out-of-order packet arrived, got 4 expected 3
+bcsp_recv: Out-of-order packet arrived, got 5 expected 3
+bcsp_recv: Out-of-order packet arrived, got 6 expected 3
+bcsp_recv: Short BCSP packet
+
 -- 
---
-Claudio Takahasi
-Instituto Nokia de Tecnologia
-Recife - Pernambuco - Brasil
-+55 81 30879999
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
