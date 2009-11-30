@@ -1,24 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Mon, 30 Nov 2009 11:56:44 +0530
-Message-ID: <912bb79a0911292226o1c42baeemb2a8596fce465e65@mail.gmail.com>
-Subject: Problem in understanding of agent
+In-Reply-To: <912bb79a0911292030m7bdbe03w744145e4d16f6a68@mail.gmail.com>
+References: <912bb79a0911272152y6fb12a05p299090e97ac91a54@mail.gmail.com>
+	 <4B115279.3060705@openwide.fr>
+	 <912bb79a0911292030m7bdbe03w744145e4d16f6a68@mail.gmail.com>
+Date: Mon, 30 Nov 2009 11:47:21 +0530
+Message-ID: <912bb79a0911292217w10dbbf2bpbbd4e0326982d769@mail.gmail.com>
+Subject: Right way of pairing?
 From: nirav rabara <niravrabara@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+I forgot to tell that, for headset device paring, I have hard coded
+the pin code  "0000" in bluetoothd.
 
-I am newbie to bluetooth, I have gone through agent.c and simple-agent
-but not getting clear idea, how agent works??
-Because In my application i m using Qt , I am poor at GTK+ , glib and pthython.
-But what I understood is Agent will contain all the function defined
-in agent.api, and when PIN requrest comes this api will serve the
-request for this we need to create agent and register agent.
+Now  If I open RFCOM socket connection, connect with another device,
+then close that RFCOM socket, Will bluetoothd remove all the pairing
+information from the linkkeys file or not.
 
-I am using qt binding, can anybody show me the right direction to
-implement agent??
+Because When I close RFCOM connection pairing information is getting
+lost, I would like to know weather it's a common or am I doing
+something wrong??
 
-Your suggestion would be a great help for me
+Your suggestion would be a great help for me..
+
+
+
+-- 
+With Regards,
+Nirav Rabara
