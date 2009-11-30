@@ -1,36 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Mon, 30 Nov 2009 16:18:33 +0100
-Message-ID: <a0d5085b0911300718r234612cyd61ab3b1d7bc31a7@mail.gmail.com>
-Subject: [PATCH 1/2] A couple of bugs in bluetooth
-From: Luiz Pena <carlos.luiz.pena@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <912bb79a0911292226o1c42baeemb2a8596fce465e65@mail.gmail.com>
+References: <912bb79a0911292226o1c42baeemb2a8596fce465e65@mail.gmail.com>
+Date: Mon, 30 Nov 2009 12:48:01 -0200
+Message-ID: <f9d4bd30911300648v4fc8d1f2pfa59fae4e7548107@mail.gmail.com>
+Subject: Re: Problem in understanding of agent
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: nirav rabara <niravrabara@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I have been working on a small home-project in bluez, and I think I might have
-stumbled on a couple of bugs. I am not sure they are correct so bear with me if
-I am mistaken.
+On Mon, Nov 30, 2009 at 4:26 AM, nirav rabara <niravrabara@gmail.com> wrote:
+> Hi,
+>
+> I am newbie to bluetooth, I have gone through agent.c and simple-agent
+> but not getting clear idea, how agent works??
+> Because In my application i m using Qt , I am poor at GTK+ , glib and pthython.
+> But what I understood is Agent will contain all the function defined
+> in agent.api, and when PIN requrest comes this api will serve the
+> request for this we need to create agent and register agent.
+>
+> I am using qt binding, can anybody show me the right direction to
+> implement agent??
+>
+> Your suggestion would be a great help for me
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
 
-The first one seems to be a race condition. I have not been able to verify if
-the BT_CLOSED state is still relevant, but if it is, then it seems we should
-hold the lock till after the unlink.
+Hi Nirav,
 
+You can find an example of obex-client agent here:
+http://gitorious.org/qt-obex-ftp-client-library
 
-Signed-off-by: Carlos Luiz Pena <carlos.luiz.pena@gmail.com>
----
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 8cfb5a8..206fa4e 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -206,8 +206,8 @@ struct sock *bt_accept_dequeue(struct sock
-*parent, struct socket *newsock)
+The concept is similar, copy the agent/adaptor code and implement the
+methods based on the API description only.
+Let me know if you still have problem. We can publish an example of a Qt agent.
 
- 		/* FIXME: Is this check still needed */
- 		if (sk->sk_state == BT_CLOSED) {
--			release_sock(sk);
- 			bt_accept_unlink(sk);
-+			release_sock(sk);
- 			continue;
- 		}
+Br,
+Claudio.
+-- 
+--
+Claudio Takahasi
+Instituto Nokia de Tecnologia
+Recife - Pernambuco - Brasil
++55 81 30879999
