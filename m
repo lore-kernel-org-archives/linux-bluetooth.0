@@ -1,48 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Don't force dirs on bootstrap-configure
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
-Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org
-In-Reply-To: <1254363278-20735-1-git-send-email-gustavo@las.ic.unicamp.br>
-References: <1254363278-20735-1-git-send-email-gustavo@las.ic.unicamp.br>
-Content-Type: text/plain
-Date: Thu, 01 Oct 2009 04:58:19 +0200
-Message-Id: <1254365899.2659.102.camel@localhost.localdomain>
+Date: Mon, 30 Nov 2009 23:57:39 +0000
+From: Alan Cox <alan@lxorguk.ukuu.org.uk>
+To: Pavel Machek <pavel@ucw.cz>
+Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
+        kernel list <linux-kernel@vger.kernel.org>
+Subject: Re: bluetooth cf slow (10KB/sec), lots of dmesg spam
+Message-ID: <20091130235739.6dfa3d66@lxorguk.ukuu.org.uk>
+In-Reply-To: <20091129164450.GA1438@ucw.cz>
+References: <20091129155801.GA1634@ucw.cz>
+	<20091130153915.0a6910e3@lxorguk.ukuu.org.uk>
+	<20091129164450.GA1438@ucw.cz>
 Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+> ioctl(3, SNDCTL_TMR_START or TCSETS, {B921600 -opost -isig -icanon -echo ...}) = 0
 
-> Fixes a problem with ./bootstrap-configure --prefix=some/dir.
-> bootstrap-configure was forcing dirs configuration like mandir and
-> sysconfdir unless user pass all its desired dirs on
-> ./bootstrap-configure.
-> ---
->  bootstrap-configure |    5 -----
->  1 files changed, 0 insertions(+), 5 deletions(-)
+It's certainly trying
 > 
-> diff --git a/bootstrap-configure b/bootstrap-configure
-> index 5414518..1a48fa9 100755
-> --- a/bootstrap-configure
-> +++ b/bootstrap-configure
-> @@ -11,11 +11,6 @@ fi
->  ./bootstrap && \
->      ./configure --enable-maintainer-mode \
->  		--enable-debug \
-> -		--prefix=/usr \
-> -		--mandir=/usr/share/man \
-> -		--sysconfdir=/etc \
-> -		--localstatedir=/var \
-> -		--libexecdir=/lib \
->  		--enable-netlink \
->  		--enable-tools \
->  		--enable-bccmd \
+> ...set 921K using TCSETS/B921600... and kernel says ok, but ...
 
-we do this on purpose this way. So NAK.
+Careful: termios is one of those "gotcha" ioctls. It returns 0 to say
+"stuff happened" and returns a termios struct which contains the results
+- which may not be what you requested.
 
-Regards
+So a set to an unsupported rate (too high for the chip clock) will
+produce a response of 0 and return the baud rate you actually got given.
 
-Marcel
+> ...we are still at 115200... I wonder if 921600 is the right speed to
+> use after all? Any other speeds I should try? (and can 400MHz arm
+> handle 921K on serial line?)
 
+It's pushing it on an x86 with a 16550A. You've got about 14 character
+times of worst case latency permitted and 14 x 10 bits isn't a lot at
+that rate. Some of the clones have much bigger FIFOs so it may depend
+what you actually have.
 
+Alan
