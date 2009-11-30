@@ -1,29 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 30 Nov 2009 15:39:15 +0000
-From: Alan Cox <alan@lxorguk.ukuu.org.uk>
-To: Pavel Machek <pavel@ucw.cz>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
-        kernel list <linux-kernel@vger.kernel.org>
-Subject: Re: bluetooth cf slow (10KB/sec), lots of dmesg spam
-Message-ID: <20091130153915.0a6910e3@lxorguk.ukuu.org.uk>
-In-Reply-To: <20091129155801.GA1634@ucw.cz>
-References: <20091129155801.GA1634@ucw.cz>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Date: Mon, 30 Nov 2009 16:21:24 +0100
+Message-ID: <a0d5085b0911300721y49e6b87fs262f750e8b97d383@mail.gmail.com>
+Subject: [PATCH 2/2] A couple of bugs in bluetooth
+From: Luiz Pena <carlos.luiz.pena@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> I believe the problem is 115200 bitrate between system and CF serial;
+The second one is a few instances of copying data from the skb->data without
+verifying the it has the data (there is an if statement a few lines above which
+only check till the length field).
 
-and lack of flow control I assume ?
 
-> I did setserial baud_base 921600,  but that does not seem to speed it
-> up. Do I need to do some special magic to enable high speed?
+Signed-off-by: Carlos Luiz Pena <carlos.luiz.pena@gmail.com>
+---
+diff --git a/net/bluetooth/cmtp/capi.c b/net/bluetooth/cmtp/capi.c
+index 97f8d68..f060b4f 100644
+--- a/net/bluetooth/cmtp/capi.c
++++ b/net/bluetooth/cmtp/capi.c
+@@ -250,11 +250,10 @@ static void cmtp_recv_interopmsg(struct
+cmtp_session *session, struct sk_buff *s
+ 			if (skb->len < CAPI_MSG_BASELEN + 15)
+ 				break;
 
-Just set the baud rate to 921600. You may need to write an app to do this
-directly via the TERMIOS2 ioctl because it seems three years ago is a bit
-quick for the glibc maintainers to keep up.
+-			controller = CAPIMSG_U32(skb->data, CAPI_MSG_BASELEN + 10);
+-
+ 			if (!info && ctrl) {
+ 				int len = min_t(uint, CAPI_MANUFACTURER_LEN,
+ 						skb->data[CAPI_MSG_BASELEN + 14]);
++				len = min_t(uint, len, skb->len - 14 - CAPI_MSG_BASELEN);
 
-Basically set the baud to BOTHER, set the ispeed = ospeed = 921600 and
-the kernel will do its best to give you your request
+ 				memset(ctrl->manu, 0, CAPI_MANUFACTURER_LEN);
+ 				strncpy(ctrl->manu,
+@@ -267,8 +266,6 @@ static void cmtp_recv_interopmsg(struct
+cmtp_session *session, struct sk_buff *s
+ 			if (skb->len < CAPI_MSG_BASELEN + 32)
+ 				break;
 
-Alan
+-			controller = CAPIMSG_U32(skb->data, CAPI_MSG_BASELEN + 12);
+-
+ 			if (!info && ctrl) {
+ 				ctrl->version.majorversion = CAPIMSG_U32(skb->data, CAPI_MSG_BASELEN + 16);
+ 				ctrl->version.minorversion = CAPIMSG_U32(skb->data, CAPI_MSG_BASELEN + 20);
+@@ -282,11 +279,10 @@ static void cmtp_recv_interopmsg(struct
+cmtp_session *session, struct sk_buff *s
+ 			if (skb->len < CAPI_MSG_BASELEN + 17)
+ 				break;
+
+-			controller = CAPIMSG_U32(skb->data, CAPI_MSG_BASELEN + 12);
+-
+ 			if (!info && ctrl) {
+ 				int len = min_t(uint, CAPI_SERIAL_LEN,
+ 						skb->data[CAPI_MSG_BASELEN + 16]);
++				len = min_t(uint, len, skb->len - 16 - CAPI_MSG_BASELEN);
+
+ 				memset(ctrl->serial, 0, CAPI_SERIAL_LEN);
+ 				strncpy(ctrl->serial,
