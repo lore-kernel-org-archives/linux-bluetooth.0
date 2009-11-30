@@ -1,62 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 29 Nov 2009 17:44:51 +0100
-From: Pavel Machek <pavel@ucw.cz>
-To: Alan Cox <alan@lxorguk.ukuu.org.uk>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
-	kernel list <linux-kernel@vger.kernel.org>
-Subject: Re: bluetooth cf slow (10KB/sec), lots of dmesg spam
-Message-ID: <20091129164450.GA1438@ucw.cz>
-References: <20091129155801.GA1634@ucw.cz> <20091130153915.0a6910e3@lxorguk.ukuu.org.uk>
+Date: Mon, 30 Nov 2009 19:42:55 +0000 (GMT)
+To: linux-bluetooth@vger.kernel.org
+Subject: [patch] bluez-hcidump fix SDP universal attributes
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20091130153915.0a6910e3@lxorguk.ukuu.org.uk>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Message-Id: <1259610176.010210.13279.nullmailer@galant.ukfsn.org>
+From: Iain Hibbert <plunky@rya-online.net>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
+Hi,
 
-> > I believe the problem is 115200 bitrate between system and CF serial;
-> 
-> and lack of flow control I assume ?
+hcidump shows SDP universal attribute 0x000d as IconURL but in fact it is
+defined as "Additional Protocol Descriptor Lists". IconURL is 0x000c and I
+don't know what Icon_10 was, perhaps an older name?
 
-I guess so. (But flow control can be hard for bluetooth, I guess. Data
-are coming from the air...)
+Eg, from an SDP probe of a mouse:
 
-> > I did setserial baud_base 921600,  but that does not seem to speed it
-> > up. Do I need to do some special magic to enable high speed?
-> 
-> Just set the baud rate to 921600. You may need to write an app to do this
-> directly via the TERMIOS2 ioctl because it seems three years ago is a bit
-> quick for the glibc maintainers to keep up.
-> 
-> Basically set the baud to BOTHER, set the ispeed = ospeed = 921600 and
-> the kernel will do its best to give you your request
+      aid 0x000d (IconURL)
+         < < < uuid-16 0x0100 (L2CAP) uint 0x13 > < uuid-16 0x0011 (HIDP) > > >
 
-hciattach seems to do this:
+Anyway, patch below fixes it up. Sorry, I don't have a git here can't
+provide a gitpatch atm
 
-...
-open("/dev/ttyBT", O_RDWR|O_NOCTTY)     = 3
-ioctl(3, TCFLSH, 0x2)                   = 0
-ioctl(3, SNDCTL_TMR_TIMEBASE or TCGETS, {B115200 -opost -isig -icanon -echo ...}) = 0
-ioctl(3, SNDCTL_TMR_TIMEBASE or TCGETS, {B115200 -opost -isig -icanon -echo ...}) = 0
-ioctl(3, SNDCTL_TMR_START or TCSETS, {B115200 -opost -isig -icanon -echo ...}) = 0
-ioctl(3, SNDCTL_TMR_TIMEBASE or TCGETS, {B115200 -opost -isig -icanon -echo ...}) = 0
-ioctl(3, SNDCTL_TMR_TIMEBASE or TCGETS, {B115200 -opost -isig -icanon -echo ...}) = 0
-ioctl(3, SNDCTL_TMR_START or TCSETS, {B921600 -opost -isig -icanon -echo ...}) = 0
+regards,
+iain
 
-...set 921K using TCSETS/B921600... and kernel says ok, but ...
 
-ioctl(3, SNDCTL_TMR_TIMEBASE or TCGETS, {B115200 -opost -isig -icanon -echo ...}) = 0
-ioctl(3, TCFLSH, 0x2)                   = 0
-ioctl(3, SNDCTL_TMR_TIMEBASE or TCGETS, {B115200 -opost -isig -icanon -echo ...}) = 0
+--- parser/sdp.h.orig	2009-11-30 19:29:35.000000000 +0000
++++ parser/sdp.h
+@@ -129,8 +129,8 @@
+ #define SDP_ATTR_ID_BLUETOOTH_PROFILE_DESCRIPTOR_LIST  0x0009
+ #define SDP_ATTR_ID_DOCUMENTATION_URL                  0x000A
+ #define SDP_ATTR_ID_CLIENT_EXECUTABLE_URL              0x000B
+-#define SDP_ATTR_ID_ICON_10                            0x000C
+-#define SDP_ATTR_ID_ICON_URL                           0x000D
++#define SDP_ATTR_ID_ICON_URL                           0x000C
++#define SDP_ATTR_ID_ADDITIONAL_PROTOCOL_DESC_LISTS     0x000D
+ #define SDP_ATTR_ID_SERVICE_NAME                       0x0100
+ #define SDP_ATTR_ID_SERVICE_DESCRIPTION                0x0101
+ #define SDP_ATTR_ID_PROVIDER_NAME                      0x0102
+--- parser/sdp.c.orig	2009-11-30 19:29:31.000000000 +0000
++++ parser/sdp.c
+@@ -194,8 +194,8 @@ static sdp_attr_id_nam_lookup_table_t sd
+ 	{ SDP_ATTR_ID_BLUETOOTH_PROFILE_DESCRIPTOR_LIST, "BTProfileDescList"  },
+ 	{ SDP_ATTR_ID_DOCUMENTATION_URL,                 "DocURL"             },
+ 	{ SDP_ATTR_ID_CLIENT_EXECUTABLE_URL,             "ClientExeURL"       },
+-	{ SDP_ATTR_ID_ICON_10,                           "Icon10"             },
+ 	{ SDP_ATTR_ID_ICON_URL,                          "IconURL"            },
++	{ SDP_ATTR_ID_ADDITIONAL_PROTOCOL_DESC_LISTS,    "AdditionalProtocolDescLists" },
+ 	{ SDP_ATTR_ID_SERVICE_NAME,                      "SrvName"            },
+ 	{ SDP_ATTR_ID_SERVICE_DESCRIPTION,               "SrvDesc"            },
+ 	{ SDP_ATTR_ID_PROVIDER_NAME,                     "ProviderName"       },
 
-...we are still at 115200... I wonder if 921600 is the right speed to
-use after all? Any other speeds I should try? (and can 400MHz arm
-handle 921K on serial line?)
 
-...when I was setting 921600 baud_base, I basically broke it so that
-it used 115200, right? I guess I should play a bit more...
-
-									Pavel
--- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
