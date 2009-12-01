@@ -1,42 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 1 Dec 2009 21:36:43 +0100
+From: Pavel Machek <pavel@ucw.cz>
+To: Alan Cox <alan@lxorguk.ukuu.org.uk>
+Cc: kernel list <linux-kernel@vger.kernel.org>,
+	linux-bluetooth@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: divide by zero in termios when setting bluetooth
+Message-ID: <20091201203642.GA2431@elf.ucw.cz>
+References: <20091201151315.GC2262@elf.ucw.cz>
+ <20091201155244.0523d9c9@lxorguk.ukuu.org.uk>
+ <20091201160151.GD2262@elf.ucw.cz>
+ <20091201190010.317d5b29@lxorguk.ukuu.org.uk>
 MIME-Version: 1.0
-Date: Wed, 2 Dec 2009 10:31:51 +0530
-Message-ID: <912bb79a0912012101k16ac6689s5afcc7135a755ca3@mail.gmail.com>
-Subject: How to auto connect Headset (on power ON)
-From: nirav rabara <niravrabara@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20091201190010.317d5b29@lxorguk.ukuu.org.uk>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Tue 2009-12-01 19:00:10, Alan Cox wrote:
+> > > +	/* Should never happen */
+> > > +	WARN_ON(1);
+> > >  	return 0;
+> > 
+> > Does this mean WARN_ON() on user error? Maybe printk(KERN_ERR) with
+> > explanation would be better?
+> 
+> It shouldn't be possible to cause that case user error or otherwise.
 
-I am using simple-agent for pairing.
-Once the pairing has done, If I turn OFF the headset and again turn ON
-it, headset trying to connect with my adapter but cannot connect and
-shows following debug
+You are right, I did not notice for() loop above. I actually tested
+the change now, and it seems to fix the problem.
 
-bluetoothd[804]: adapter_get_device(00:02:5B:00:AA:A5)
-bluetoothd[804]: adapter_creat_device(00:02:5B:00:AA:A5)
-bluetoothd[804]: creating device /org/bluez/804/hci0/dev_00_02_5B_00_A5_A5
-bluetoothd[804]: btd_device_ref(0x2a06c658): ref=1
-bluetoothd[804]: link_key_request (sba=00:15:83:0C:16:BF, bda=00:02:5B:00:AA:A5)
-bluetoothd[804]: kernel auth requirement = 0x00
-bluetoothd[804]: pin_code_request (sba=00:15:83:0C:16:BF, bda=00:02:5B:00:AA:A5)
-bluetoothd[804]: adapter_get_device(00:02:5B:00:AA:A5)
-bluetoothd[804]: /org/bluez/804/hci0/dev_00_02_5B_00_A5_A5: requesting
-agent authentication
-bluetoothd[804]: No agent available for 0 request
-bluetoothd[804]: Removing temporary device
-/org/bluez/804/hci0/dev_00_02_5B_00_A5_A5
-bluetoothd[804]: Removing device /org/bluez/804/hci0/dev_00_02_5B_00_A5_A5
-bluetoothd[804]: btd_device_unref(0x2a06c658): ref=0
-bluetoothd[804]: device_free(0x2a06c658)
+ACK.
 
-> "bluetoothd[804]: No agent available for 0 request" Is there any separate agent required ?
-
-Can anybody suggest me how to auto connect headset with adapter on power on.
-
+									Pavel
 -- 
-With Regards,
-Nirav
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
