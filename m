@@ -1,76 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 1 Dec 2009 16:13:16 +0100
+Date: Tue, 1 Dec 2009 16:10:52 +0100
 From: Pavel Machek <pavel@ucw.cz>
 To: kernel list <linux-kernel@vger.kernel.org>
 Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
-Subject: divide by zero in termios when setting bluetooth
-Message-ID: <20091201151315.GC2262@elf.ucw.cz>
+Subject: warn_on in mutex_lock_nested after hciattach
+Message-ID: <20091201151052.GB2262@elf.ucw.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi!
 
-I triggered this by mistake... "W" taint is from the  WARN_ON()
-before.
-							Pavel
+I get this, repeatably.
 
-root@amd:~# setserial /dev/ttyBT baud_base $[115200*1]
-root@amd:~# echo $[115200/8]
-14400
-root@amd:~# hciattach -s 14400 /dev/ttyS0 bcsp 1440
-divide error: 0000 [#1] SMP DEBUG_PAGEALLOC
-last sysfs file:
-/sys/devices/pci0000:00/0000:00:1c.1/0000:03:00.0/firmware/0000:03:00.0/loading
+								Pavel
+
+root@amd:~# setserial /dev/ttyBT baud_base 921600
+root@amd:~# hciattach -s 921600 /dev/ttyS0 bcsp
+Device setup complete
+root@amd:~# ------------[ cut here ]------------
+WARNING: at kernel/mutex.c:207 mutex_lock_nested+0x219/0x230()
+Hardware name: 17097HU
 Modules linked in:
-
-Pid: 2058, comm: hciattach Tainted: G        W
-(2.6.32-rc8-00165-g2471433-dirty #92) 17097HU
-EIP: 0060:[<c043de2f>] EFLAGS: 00010246 CPU: 1
-EIP is at uart_get_divisor+0x1f/0x40
-EAX: 001c2000 EBX: 00000000 ECX: c0f9bf40 EDX: 00000000
-ESI: c0f9bf40 EDI: f6316550 EBP: c5fe7d0c ESP: c5fe7d08
- DS: 007b ES: 007b FS: 00d8 GS: 0033 SS: 0068
-Process hciattach (pid: 2058, ti=c5fe6000 task=f6096680
-task.ti=c5fe6000)
-Stack:
- 00000013 c5fe7d3c c0442780 00000007 00007080 00000000 00000001
-00000000
-<0> 00000001 c03e1d6b c09e6d80 c0f9bf40 c5fe7d98 c5fe7d50 c043deaf
-f631f7f0
-<0> c5fe7d98 f631f7f0 c5fe7d7c c043e57d f58fc7f0 f631f868 00001cb7
-22222222
+Pid: 0, comm: swapper Not tainted 2.6.32-rc8-00165-g2471433-dirty #92
 Call Trace:
- [<c0442780>] ? serial8250_set_termios+0x360/0x420
- [<c03e1d6b>] ? set_termios+0xcb/0x430
- [<c043deaf>] ? uart_change_speed+0x5f/0x90
- [<c043e57d>] ? uart_set_termios+0x3d/0x250
- [<c03e1efd>] ? set_termios+0x25d/0x430
- [<c03e2560>] ? tty_mode_ioctl+0x3c0/0x5b0
- [<c03dcf33>] ? tty_wakeup+0x33/0x70
- [<c03e299b>] ? tty_ldisc_try+0x1b/0x50
- [<c03e278a>] ? n_tty_ioctl_helper+0x3a/0x190
-Dec  1 12:30:25 amd kernel:  [<c0594c5e>] ?
-hci_uart_tty_ioctl+0x5e/0x240
-Dec  1 12:30:25 amd kernel:  [<c0594c00>] ?
-hci_uart_tty_ioctl+0x0/0x240
-Dec  1 12:30:25 amd kernel:  [<c0594c00>] ?
-hci_uart_tty_ioctl+0x0/0x240
-Dec  1 12:30:25 amd kernel:  [<c03dd1be>] ? tty_ioctl+0xae/0x880
-Dec  1 12:30:25 amd kernel:  [<c03dd110>] ? tty_ioctl+0x0/0x880
-Dec  1 12:30:25 amd kernel:  [<c02a4ae8>] ? vfs_ioctl+0x28/0x80
-Dec  1 12:30:25 amd kernel:  [<c02a4faa>] ? do_vfs_ioctl+0x39a/0x590
-Dec  1 12:30:25 amd kernel:  [<c0282037>] ? handle_mm_fault+0xe7/0x5e0
-Dec  1 12:30:25 amd kernel:  [<c0249646>] ? up_read+0x16/0x30
-Dec  1 12:30:25 amd kernel:  [<c02a51d9>] ? sys_ioctl+0x39/0x70
-Dec  1 12:30:25 amd kernel:  [<c0202e50>] ? sysenter_do_call+0x12/0x31
-Dec  1 12:30:25 amd kernel: Code: 86 84 00 00 00 5e 5d c3 8d 74 26 00
-55 81 fa 00 96 00 00 89 e5 89 c1 53 89 d3 74 18 8d 04 dd 00 00 00 00
-31 d2 03 41 34 c1 e3 04 <f7> f3 5b 5d c3 8d 74 26 00 8b 40 7c 25
-30 10 00 00 83 f8 30 75
-Dec  1 12:30:25 amd kernel: EIP: [<c043de2f>]
-uart_get_divisor+0x1f/0x40 SS:ESP 0068:c5fe7d08
-Dec  1 12:30:25 amd kernel: ---[ end trace bab0b3b26c16fcf6 ]---
+ [<c07824d9>] ? printk+0x18/0x1a
+ [<c07843c9>] ? mutex_lock_nested+0x219/0x230
+ [<c023131c>] warn_slowpath_common+0x6c/0xc0
+ [<c07843c9>] ? mutex_lock_nested+0x219/0x230
+ [<c0231385>] warn_slowpath_null+0x15/0x20
+ [<c07843c9>] mutex_lock_nested+0x219/0x230
+ [<c03e1afb>] ? tty_unthrottle+0x1b/0x50
+ [<c0594bf2>] ? hci_uart_tty_receive+0x62/0x70
+ [<c03e1afb>] tty_unthrottle+0x1b/0x50
+ [<c0594bf9>] hci_uart_tty_receive+0x69/0x70
+ [<c03e380b>] flush_to_ldisc+0x15b/0x190
+ [<c03e38ab>] tty_flip_buffer_push+0x6b/0x80
+ [<c0443587>] serial8250_handle_port+0x197/0x230
+ [<c078545a>] ? _spin_lock+0x3a/0x40
+ [<c044368e>] serial8250_interrupt+0x6e/0xf0
+ [<c026801e>] handle_IRQ_event+0x2e/0xc0
+ [<c0269ac4>] handle_fasteoi_irq+0x64/0xd0
+ [<c02053fa>] handle_irq+0x1a/0x30
+ [<c0204bb6>] do_IRQ+0x46/0xc0
+ [<c024abb2>] ? sched_clock_local+0xd2/0x170
+ [<c02034a9>] common_interrupt+0x29/0x30
+ [<c024007b>] ? sys_setpgid+0xfb/0x180
+ [<c03cf298>] ? acpi_idle_enter_simple+0x132/0x15d
+ [<c03cef8b>] acpi_idle_enter_bm+0xc3/0x29e
+ [<c05a360d>] cpuidle_idle_call+0x7d/0xc0
+ [<c0201efd>] cpu_idle+0x4d/0x80
+ [<c075e943>] rest_init+0x53/0x60
+ [<c0a5981a>] start_kernel+0x272/0x2ad
+ [<c0a5936e>] ? unknown_bootoption+0x0/0x1e9
+ [<c0a5906b>] i386_start_kernel+0x6b/0x6d
+---[ end trace bab0b3b26c16fcf5 ]---
+
 
 -- 
 (english) http://www.livejournal.com/~pavelmachek
