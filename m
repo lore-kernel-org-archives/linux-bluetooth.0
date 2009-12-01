@@ -1,60 +1,127 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 1 Dec 2009 16:10:52 +0100
+Date: Tue, 1 Dec 2009 13:37:44 +0100
 From: Pavel Machek <pavel@ucw.cz>
-To: kernel list <linux-kernel@vger.kernel.org>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
-Subject: warn_on in mutex_lock_nested after hciattach
-Message-ID: <20091201151052.GB2262@elf.ucw.cz>
+To: Alan Cox <alan@lxorguk.ukuu.org.uk>
+Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
+	kernel list <linux-kernel@vger.kernel.org>
+Subject: Re: bluetooth cf slow (10KB/sec), lots of dmesg spam
+Message-ID: <20091201123744.GC1982@elf.ucw.cz>
+References: <20091129155801.GA1634@ucw.cz>
+ <20091130153915.0a6910e3@lxorguk.ukuu.org.uk>
+ <20091129164450.GA1438@ucw.cz>
+ <20091130235739.6dfa3d66@lxorguk.ukuu.org.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20091130235739.6dfa3d66@lxorguk.ukuu.org.uk>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
+On Mon 2009-11-30 23:57:39, Alan Cox wrote:
+> > ioctl(3, SNDCTL_TMR_START or TCSETS, {B921600 -opost -isig -icanon -echo ...}) = 0
+> 
+> It's certainly trying
+> > 
+> > ...set 921K using TCSETS/B921600... and kernel says ok, but ...
+> 
+> Careful: termios is one of those "gotcha" ioctls. It returns 0 to say
+> "stuff happened" and returns a termios struct which contains the results
+> - which may not be what you requested.
+> 
+> So a set to an unsupported rate (too high for the chip clock) will
+> produce a response of 0 and return the baud rate you actually got
+> given.
 
-I get this, repeatably.
+Ok, that part seems to work.
 
-								Pavel
+> > ...we are still at 115200... I wonder if 921600 is the right speed to
+> > use after all? Any other speeds I should try? (and can 400MHz arm
+> > handle 921K on serial line?)
+> 
+> It's pushing it on an x86 with a 16550A. You've got about 14 character
+> times of worst case latency permitted and 14 x 10 bits isn't a lot at
+> that rate. Some of the clones have much bigger FIFOs so it may depend
+> what you actually have.
 
-root@amd:~# setserial /dev/ttyBT baud_base 921600
-root@amd:~# hciattach -s 921600 /dev/ttyS0 bcsp
-Device setup complete
-root@amd:~# ------------[ cut here ]------------
-WARNING: at kernel/mutex.c:207 mutex_lock_nested+0x219/0x230()
-Hardware name: 17097HU
-Modules linked in:
-Pid: 0, comm: swapper Not tainted 2.6.32-rc8-00165-g2471433-dirty #92
-Call Trace:
- [<c07824d9>] ? printk+0x18/0x1a
- [<c07843c9>] ? mutex_lock_nested+0x219/0x230
- [<c023131c>] warn_slowpath_common+0x6c/0xc0
- [<c07843c9>] ? mutex_lock_nested+0x219/0x230
- [<c0231385>] warn_slowpath_null+0x15/0x20
- [<c07843c9>] mutex_lock_nested+0x219/0x230
- [<c03e1afb>] ? tty_unthrottle+0x1b/0x50
- [<c0594bf2>] ? hci_uart_tty_receive+0x62/0x70
- [<c03e1afb>] tty_unthrottle+0x1b/0x50
- [<c0594bf9>] hci_uart_tty_receive+0x69/0x70
- [<c03e380b>] flush_to_ldisc+0x15b/0x190
- [<c03e38ab>] tty_flip_buffer_push+0x6b/0x80
- [<c0443587>] serial8250_handle_port+0x197/0x230
- [<c078545a>] ? _spin_lock+0x3a/0x40
- [<c044368e>] serial8250_interrupt+0x6e/0xf0
- [<c026801e>] handle_IRQ_event+0x2e/0xc0
- [<c0269ac4>] handle_fasteoi_irq+0x64/0xd0
- [<c02053fa>] handle_irq+0x1a/0x30
- [<c0204bb6>] do_IRQ+0x46/0xc0
- [<c024abb2>] ? sched_clock_local+0xd2/0x170
- [<c02034a9>] common_interrupt+0x29/0x30
- [<c024007b>] ? sys_setpgid+0xfb/0x180
- [<c03cf298>] ? acpi_idle_enter_simple+0x132/0x15d
- [<c03cef8b>] acpi_idle_enter_bm+0xc3/0x29e
- [<c05a360d>] cpuidle_idle_call+0x7d/0xc0
- [<c0201efd>] cpu_idle+0x4d/0x80
- [<c075e943>] rest_init+0x53/0x60
- [<c0a5981a>] start_kernel+0x272/0x2ad
- [<c0a5936e>] ? unknown_bootoption+0x0/0x1e9
- [<c0a5906b>] i386_start_kernel+0x6b/0x6d
----[ end trace bab0b3b26c16fcf5 ]---
+/dev/ttyBT, Line 0, UART: 16950/954, Port: 0x9100, IRQ: 16
+
+...so hopefully it has bigger buffers.
+
+This patch was flying around for about forever and seems vaguely
+related, but... the card seems to only be detected with divisor of 8,
+not even divisor of 1 seems to work :-(.
+									Pavel
+diff --git a/drivers/serial/8250.c b/drivers/serial/8250.c
+index 737b4c9..8540343 100644
+--- a/drivers/serial/8250.c
++++ b/drivers/serial/8250.c
+@@ -7,6 +7,9 @@
+  *
+  *  Copyright (C) 2001 Russell King.
+  *
++ *  2005/09/16: Enabled higher baud rates for 16C95x.
++ *		(Mathias Adam <a2@adamis.de>)
++ *
+  * This program is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+  * the Free Software Foundation; either version 2 of the License, or
+@@ -2229,6 +2232,14 @@ static unsigned int serial8250_get_divisor(struct uart_port *port, unsigned int
+ 	else if ((port->flags & UPF_MAGIC_MULTIPLIER) &&
+ 		 baud == (port->uartclk/8))
+ 		quot = 0x8002;
++	/*
++	 * For 16C950s UART_TCR is used in combination with divisor==1
++	 * to achieve baud rates up to baud_base*4.
++	 */
++	else if ((port->type == PORT_16C950) &&
++		 baud > (port->uartclk/16))
++		quot = 1;
++
+ 	else
+ 		quot = uart_get_divisor(port, baud);
+ 
+@@ -2242,7 +2253,7 @@ serial8250_set_termios(struct uart_port *port, struct ktermios *termios,
+ 	struct uart_8250_port *up = (struct uart_8250_port *)port;
+ 	unsigned char cval, fcr = 0;
+ 	unsigned long flags;
+-	unsigned int baud, quot;
++	unsigned int baud, quot, max_baud;
+ 
+ 	switch (termios->c_cflag & CSIZE) {
+ 	case CS5:
+@@ -2274,9 +2285,11 @@ serial8250_set_termios(struct uart_port *port, struct ktermios *termios,
+ 	/*
+ 	 * Ask the core to calculate the divisor for us.
+ 	 */
+-	baud = uart_get_baud_rate(port, termios, old,
+-				  port->uartclk / 16 / 0xffff,
+-				  port->uartclk / 16);
++ 	max_baud = port->uartclk/16;
++	if (up->port.type == PORT_16C950)
++		max_baud = port->uartclk/4;
++	baud = uart_get_baud_rate(port, termios, old, max_baud / 0xffff,
++				  max_baud / 16);
+ 	quot = serial8250_get_divisor(port, baud);
+ 
+ 	/*
+@@ -2313,6 +2326,19 @@ serial8250_set_termios(struct uart_port *port, struct ktermios *termios,
+ 	spin_lock_irqsave(&up->port.lock, flags);
+ 
+ 	/*
++	 * 16C950 supports additional prescaler ratios between 1:16 and 1:4
++	 * thus increasing max baud rate to uartclk/4.
++	 */
++	if (up->port.type == PORT_16C950) {
++		if (baud == port->uartclk/4)
++			serial_icr_write(up, UART_TCR, 0x4);
++		else if (baud == port->uartclk/8)
++			serial_icr_write(up, UART_TCR, 0x8);
++		else
++			serial_icr_write(up, UART_TCR, 0);
++	}
++
++	/*
+ 	 * Update the per-port timeout.
+ 	 */
+ 	uart_update_timeout(port, termios->c_cflag, baud);
 
 
 -- 
