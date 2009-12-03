@@ -1,52 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 3 Dec 2009 14:51:10 +0100 (CET)
-From: Jiri Kosina <jkosina@suse.cz>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Brian Gunn <bgunn@solekai.com>
-Subject: [RESEND] [PATCH] Bluetooth: implement raw output for hidp 
-Message-ID: <alpine.LNX.2.00.0912031450400.3755@pobox.suse.cz>
+Message-ID: <487821.92480.qm@web94906.mail.in2.yahoo.com>
+Date: Thu, 3 Dec 2009 18:16:11 +0530 (IST)
+From: Pavan Savoy <pavan_savoy@yahoo.co.in>
+Subject: installing n_hci upon DEVUP
+To: linux-bluetooth@vger.kernel.org
+Cc: johan.hedberg@nokia.com
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Implment raw output callback which is used by hidraw to send raw data to 
-the underlying device.
+Hi,
 
-Without this patch, the userspace hidraw-based applications can't send 
-output reports to HID bluetooth devices.
+I am faced with a problem, where-in my transport is UART and the hci0 interface from my driver (a TTY line discipline driver) is exposed @ boot time.
 
-Reported-and-tested-by: Brian Gunn <bgunn@solekai.com>
-Signed-off-by: Jiri Kosina <jkosina@suse.cz>
+On Bluetooth-On, I perform a dev-up (or run bluetoothd/hcid which does that), how do I set the initialize my transport @ this point ?
 
---- 
- net/bluetooth/hidp/core.c |    9 +++++++++
- 1 files changed, 9 insertions(+), 0 deletions(-)
+I so desperately don't want to use hciattach, and want to allow my line discipline driver to do the firmware download (the reason why i have johan in CC) like the hci_h4p.
 
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index 49d8495..5697500 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -280,6 +280,13 @@ static int hidp_send_report(struct hidp_session *session, struct hid_report *rep
- 	return hidp_queue_report(session, buf, rsize);
- }
- 
-+static int hidp_output_raw_report(struct hid_device *hid, unsigned char *data, size_t count)
-+{
-+	if (hidp_queue_report(hid->driver_data, data, count))
-+		return -ENOMEM;
-+	return count;
-+}
-+
- static void hidp_idle_timeout(unsigned long arg)
- {
- 	struct hidp_session *session = (struct hidp_session *) arg;
-@@ -785,6 +792,8 @@ static int hidp_setup_hid(struct hidp_session *session,
- 	hid->dev.parent = hidp_get_device(session);
- 	hid->ll_driver = &hidp_hid_driver;
- 
-+	hid->hid_output_raw_report = hidp_output_raw_report;
-+
- 	err = hid_add_device(hid);
- 	if (err < 0)
- 		goto failed;
+However, I would like to maintain my driver as a line discipline to avoid making use of primitive UART calls [like the hci_h4p].
+Want to make use of DMA enabled, PM featured UART if available.
+
+regards,
+Pavan
+
+
+      The INTERNET now has a personality. YOURS! See your Yahoo! Homepage. http://in.yahoo.com/
