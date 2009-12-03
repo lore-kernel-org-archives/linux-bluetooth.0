@@ -1,28 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <487821.92480.qm@web94906.mail.in2.yahoo.com>
-Date: Thu, 3 Dec 2009 18:16:11 +0530 (IST)
-From: Pavan Savoy <pavan_savoy@yahoo.co.in>
-Subject: installing n_hci upon DEVUP
-To: linux-bluetooth@vger.kernel.org
-Cc: johan.hedberg@nokia.com
+Date: Thu, 3 Dec 2009 15:12:51 +0530
+From: Kandukuri Vikram <vkandukuri@atheros.com>
+To: <marcel@holtmann.org>
+CC: <linux-bluetooth@vger.kernel.org>, <vikram.kandukuri@gmail.com>
+Subject: [PATCH] According to BNEP test spec proper response should be sent
+	for a setup connection request message after the BNEP connection
+	setup has been completed
+Message-ID: <20091203094250.GC7602@atheros-laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
 
-I am faced with a problem, where-in my transport is UART and the hci0 interface from my driver (a TTY line discipline driver) is exposed @ boot time.
+ Signed-off-by: Vikram Kandukuri <Vikram.Kandukuri@atheors.com>
+---
+ net/bluetooth/bnep/core.c |    5 ++++-
+ 1 files changed, 4 insertions(+), 1 deletions(-)
 
-On Bluetooth-On, I perform a dev-up (or run bluetoothd/hcid which does that), how do I set the initialize my transport @ this point ?
-
-I so desperately don't want to use hciattach, and want to allow my line discipline driver to do the firmware download (the reason why i have johan in CC) like the hci_h4p.
-
-However, I would like to maintain my driver as a line discipline to avoid making use of primitive UART calls [like the hci_h4p].
-Want to make use of DMA enabled, PM featured UART if available.
-
-regards,
-Pavan
-
-
-      The INTERNET now has a personality. YOURS! See your Yahoo! Homepage. http://in.yahoo.com/
+diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+index cafe9f5..29b1b22 100644
+--- a/net/bluetooth/bnep/core.c
++++ b/net/bluetooth/bnep/core.c
+@@ -230,7 +230,6 @@ static int bnep_rx_control(struct bnep_session *s, void *data, int len)
+ 
+ 	switch (cmd) {
+ 	case BNEP_CMD_NOT_UNDERSTOOD:
+-	case BNEP_SETUP_CONN_REQ:
+ 	case BNEP_SETUP_CONN_RSP:
+ 	case BNEP_FILTER_NET_TYPE_RSP:
+ 	case BNEP_FILTER_MULTI_ADDR_RSP:
+@@ -245,6 +244,10 @@ static int bnep_rx_control(struct bnep_session *s, void *data, int len)
+ 		err = bnep_ctrl_set_mcfilter(s, data, len);
+ 		break;
+ 
++	case BNEP_SETUP_CONN_REQ:
++		err = bnep_send_rsp(s, BNEP_SETUP_CONN_RSP, BNEP_CONN_NOT_ALLOWED);
++		break;
++
+ 	default: {
+ 			u8 pkt[3];
+ 			pkt[0] = BNEP_CONTROL;
+-- 
+1.6.0.4
