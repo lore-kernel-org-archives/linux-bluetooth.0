@@ -1,63 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4B18E581.6070305@novero.com>
-Date: Fri, 4 Dec 2009 11:33:37 +0100
-From: Bas Vermeulen <Bas.Vermeulen@novero.com>
+Message-ID: <4B18D58A.3070602@gdatech.co.in>
+Date: Fri, 04 Dec 2009 14:55:30 +0530
+From: Sankar Raj <s.shankarraj@gdatech.co.in>
 MIME-Version: 1.0
-To: <linux-bluetooth@vger.kernel.org>
-Subject: Bug in sbc decoder gstreamer plugin
-Content-Type: multipart/mixed;
-	boundary="------------060203070506050609080601"
+To: venu <vjosyula@gmail.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: BT Issue - WiFi/BT combo module WM-BG-MR-03
+References: <4B18CB27.1080506@gdatech.co.in> <53ea87da0912040103o7cf23785i94e76b6bfe55e69e@mail.gmail.com>
+In-Reply-To: <53ea87da0912040103o7cf23785i94e76b6bfe55e69e@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---------------060203070506050609080601
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
-Content-Transfer-Encoding: quoted-printable
+hi Venu,
+1 . When we issue command
+#hciattach ttyS1 bcsp 115200
+we are able to see the tx line toggling from the processor .
 
-Hello *,
+2. But when we issue command
+#hciattach ttyS1 any
+hci0 device is created.
+But no toggling in tx line when we issue command "hciconfig hci0 up"
 
-We've run into a problem with the gstreamer sbcdec plugin, where a=20
-pipeline would accumulate memory at the rate of data sent into it. This=20
-is caused by invalid data in a packet (incomplete or wrong data in the=20
-stream), causing sbc_decode to return -2 (sbc_unpack_frame can't find=20
-the SBC_SYNCWORD in data[0]).
-The sbcdec plugin handles this by putting away the buffer, and trying=20
-again when a new buffer comes in. Since the buffer isn't changed (only=20
-new data tacked on), sbc_decode will continue to send the -2 response=20
-from sbc_unpack_frame function, and the sbcdec plugin will continue to=20
-accumulate data into the buffer it is working on.
+we dont have any debug interface.
+-Regards,
+Shankar
+>
+>
+> Have seen what happening over the air, when this happens... I mean ask 
+> from UART via HCI, is even reaching Link manager/baseband ?
+>
+> Do u have interface such JTAG to debug...
+>
+> Cheers,
+> Venu
+>
+> On Fri, Dec 4, 2009 at 2:11 PM, Sankar Raj <s.shankarraj@gdatech.co.in 
+> <mailto:s.shankarraj@gdatech.co.in>> wrote:
+>
+>     Hi all,
+>     We are working with the WiFi/BT combo module WM-BG-MR-03 of USI
+>     Technologies.
+>
+>     We have interfaced the Bluetooth module through UART to the OMAP3530
+>     Processor and wifi through SDIO interface. Currently we are facing an
+>     issue with the bluetooth interface.
+>
+>     The device is  not  responding for BCSP/CSR protocol of bluez utility
+>     (hciattach). When
+>     we probe the Serial line between the processor and the BT module, we
+>     observed
+>     signal toggling in the tx line. Hence we feel that the initialisation
+>     sequence is issued by the processor, but the BT module is not
+>     responding to that.
+>
+>     running the below commands.
+>
+>     #hciattach ttyS1 bcsp 115200
+>
+>     Gives output "Initialisation timed out"and we can see  toggling
+>     data in tx
+>     line
+>
+>
+>     #hciattach ttyS1 any
+>     output:dev0 is created and we couldnt see any  data in tx line when we
+>     isssue the command hciconfig hci0 up.
+>
+>     "Please let me know have any one used this chip ?
+>
+>     has any one faced this problem?Please give ur suggestion.
+>
+>     Please also help us to debug.
+>
+>     regards
+>     Shankar
+>     --
+>     To unsubscribe from this list: send the line "unsubscribe
+>     linux-bluetooth" in
+>     the body of a message to majordomo@vger.kernel.org
+>     <mailto:majordomo@vger.kernel.org>
+>     More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+>
+>
+> -- 
+> - J. Venumadhav
 
-The fix is to simply drop a buffer when sbc_decode returns -2.
 
-Regards,
-
-Bas Vermeulen
---
-novero gmbh | parsevalstr. 7 a | 40468 d=FCsseldorf | germany |=20
-amtsgericht d=FCsseldorf | hrb 58283 | umsatzsteueridentifikationsnummer:=
-=20
-de 814973142 | gesch=E4ftsf=FChrender gesellschafter: razvan olosu
-
---------------060203070506050609080601
-Content-Type: text/plain; name="bluez-gstsbcdec.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline; filename="bluez-gstsbcdec.patch"
-
---- /usr/src/nokia/mms_p2430-mute/mms_p2430/src/plugins/audio/decoder/gstrtpsbc/src/gstsbcdec.c	2009-12-01 11:32:45.000000000 +0100
-+++ gstsbcdec.c	2009-12-04 10:06:34.000000000 +0100
-@@ -95,7 +95,12 @@
- 					GST_BUFFER_DATA(output), codesize,
- 					NULL);
- 		if (consumed <= 0)
--			break;
-+		{
-+			if (-2 == consumed)
-+				goto done;
-+			else 
-+				break;
-+		}
- 
- 		/* we will reuse the same caps object */
- 		if (dec->outcaps == NULL) {
-
---------------060203070506050609080601--
