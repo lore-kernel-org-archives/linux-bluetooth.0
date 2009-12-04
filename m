@@ -1,47 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4B18CB27.1080506@gdatech.co.in>
-Date: Fri, 04 Dec 2009 14:11:11 +0530
-From: Sankar Raj <s.shankarraj@gdatech.co.in>
+Date: Fri, 4 Dec 2009 12:07:48 +0530
+From: Kandukuri Vikram <vkandukuri@atheros.com>
+To: <marcel@holtmann.org>
+CC: <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH] According to BNEP test spec proper response should be sent
+	for a setup connection request message after the BNEP connection
+	setup has been completed
+Message-ID: <20091204063748.GA3774@atheros-laptop>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: BT Issue - WiFi/BT combo module WM-BG-MR-03
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
-We are working with the WiFi/BT combo module WM-BG-MR-03 of USI
-Technologies.
 
-We have interfaced the Bluetooth module through UART to the OMAP3530
-Processor and wifi through SDIO interface. Currently we are facing an
-issue with the bluetooth interface.
+ Signed-off-by: Vikram Kandukuri <vikram.kandukuri@atheros.com>
+---
+ net/bluetooth/bnep/core.c |    5 ++++-
+ 1 files changed, 4 insertions(+), 1 deletions(-)
 
-The device is  not  responding for BCSP/CSR protocol of bluez utility
-(hciattach). When
-we probe the Serial line between the processor and the BT module, we
-observed
-signal toggling in the tx line. Hence we feel that the initialisation
-sequence is issued by the processor, but the BT module is not
-responding to that.
-
-running the below commands.
-
-#hciattach ttyS1 bcsp 115200
-
-Gives output "Initialisation timed out"and we can see  toggling data in tx
-line
-
-
-#hciattach ttyS1 any
-output:dev0 is created and we couldnt see any  data in tx line when we
-isssue the command hciconfig hci0 up.
-
-"Please let me know have any one used this chip ?
-
-has any one faced this problem?Please give ur suggestion.
-
-Please also help us to debug.
-
-regards
-Shankar
+diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+index cafe9f5..29b1b22 100644
+--- a/net/bluetooth/bnep/core.c
++++ b/net/bluetooth/bnep/core.c
+@@ -230,7 +230,6 @@ static int bnep_rx_control(struct bnep_session *s, void *data, int len)
+ 
+ 	switch (cmd) {
+ 	case BNEP_CMD_NOT_UNDERSTOOD:
+-	case BNEP_SETUP_CONN_REQ:
+ 	case BNEP_SETUP_CONN_RSP:
+ 	case BNEP_FILTER_NET_TYPE_RSP:
+ 	case BNEP_FILTER_MULTI_ADDR_RSP:
+@@ -245,6 +244,10 @@ static int bnep_rx_control(struct bnep_session *s, void *data, int len)
+ 		err = bnep_ctrl_set_mcfilter(s, data, len);
+ 		break;
+ 
++	case BNEP_SETUP_CONN_REQ:
++		err = bnep_send_rsp(s, BNEP_SETUP_CONN_RSP, BNEP_CONN_NOT_ALLOWED);
++		break;
++
+ 	default: {
+ 			u8 pkt[3];
+ 			pkt[0] = BNEP_CONTROL;
+-- 
+1.6.0.4
