@@ -1,58 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 7 Dec 2009 18:54:42 +0100 (CET)
-From: Jiri Kosina <jkosina@suse.cz>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Brian Gunn <bgunn@solekai.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: [RESEND #2] [PATCH] Bluetooth: implement raw output for hidp 
-In-Reply-To: <alpine.LNX.2.00.0912031450400.3755@pobox.suse.cz>
-Message-ID: <alpine.LNX.2.00.0912071853230.3755@pobox.suse.cz>
-References: <alpine.LNX.2.00.0912031450400.3755@pobox.suse.cz>
+Message-ID: <4B1D3714.9080003@marcansoft.com>
+Date: Mon, 07 Dec 2009 18:10:44 +0100
+From: Hector Martin <hector@marcansoft.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+To: linux-bluetooth@vger.kernel.org
+CC: Bastien Nocera <hadess@hadess.net>,
+ Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: Wiimote pairing?
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Implment raw output callback which is used by hidraw to send raw data to 
-the underlying device.
+Sorry for the lack of proper thread headers. I subscribed to ask about
+this very issue and it turns out it was asked two days ago in the
+already, after I checked out the archives :)
 
-Without this patch, the userspace hidraw-based applications can't send 
-output reports to HID bluetooth devices.
+Seeing as everything is done using strings everywhere, including the
+storage (which is a text file), I think it might be easier to just
+define a hex format. Something like $0011deadbeef for raw binary
+pincodes expressed as hex. This will let all the existing tools handle a
+raw PIN.
 
-Reported-and-tested-by: Brian Gunn <bgunn@solekai.com>
-Signed-off-by: Jiri Kosina <jkosina@suse.cz>
+The Bluetooth spec talks about numeric and alphanumeric PIN codes, but I
+haven't seen mention of special characters. I think the likelihood of
+having issues with real PINs with a starting $ sign is fairly low (and
+they could always be expressed as hex).
 
---- 
+An alternative would be to use a more traditional backslash escape
+sequence type format, but that's harder to parse.
 
-added akpm to CC.
-
- net/bluetooth/hidp/core.c |    9 +++++++++
- 1 files changed, 9 insertions(+), 0 deletions(-)
-
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index 49d8495..5697500 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -280,6 +280,13 @@ static int hidp_send_report(struct hidp_session *session, struct hid_report *rep
- 	return hidp_queue_report(session, buf, rsize);
- }
- 
-+static int hidp_output_raw_report(struct hid_device *hid, unsigned char *data, size_t count)
-+{
-+	if (hidp_queue_report(hid->driver_data, data, count))
-+		return -ENOMEM;
-+	return count;
-+}
-+
- static void hidp_idle_timeout(unsigned long arg)
- {
- 	struct hidp_session *session = (struct hidp_session *) arg;
-@@ -785,6 +792,8 @@ static int hidp_setup_hid(struct hidp_session *session,
- 	hid->dev.parent = hidp_get_device(session);
- 	hid->ll_driver = &hidp_hid_driver;
- 
-+	hid->hid_output_raw_report = hidp_output_raw_report;
-+
- 	err = hid_add_device(hid);
- 	if (err < 0)
- 		goto failed;
+-- 
+Hector Martin (hector@marcansoft.com)
+Public Key: http://www.marcansoft.com/marcan.asc
