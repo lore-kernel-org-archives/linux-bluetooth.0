@@ -1,33 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4B1D3714.9080003@marcansoft.com>
-Date: Mon, 07 Dec 2009 18:10:44 +0100
-From: Hector Martin <hector@marcansoft.com>
+Message-ID: <4B1CFA8A.4030503@hempeldesigngroup.com>
+Date: Mon, 07 Dec 2009 07:52:26 -0500
+From: Ralph Hempel <rhempel@hempeldesigngroup.com>
 MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-CC: Bastien Nocera <hadess@hadess.net>,
- Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: Wiimote pairing?
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Linkkeys not permanent with Belkin 050d:016a Dongle
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Sorry for the lack of proper thread headers. I subscribed to ask about
-this very issue and it turns out it was asked two days ago in the
-already, after I checked out the archives :)
+I'm running Debian 5.0.3 with bluez-4.57 and am having some
+issues pairing my LEGO MINDSTORMS NXT with my Belkin Mini Dongle.
 
-Seeing as everything is done using strings everywhere, including the
-storage (which is a text file), I think it might be easier to just
-define a hex format. Something like $0011deadbeef for raw binary
-pincodes expressed as hex. This will let all the existing tools handle a
-raw PIN.
+The linkkey is always deleted after the connection is closed.
 
-The Bluetooth spec talks about numeric and alphanumeric PIN codes, but I
-haven't seen mention of special characters. I think the likelihood of
-having issues with real PINs with a starting $ sign is fairly low (and
-they could always be expressed as hex).
+lsusb: ID 050d:016a Belkin Components
 
-An alternative would be to use a more traditional backslash escape
-sequence type format, but that's harder to parse.
+I can sucessfully pair to the LEGO NXT with the built-in Dell
+Bluetooth adapter on my Dell D610
 
--- 
-Hector Martin (hector@marcansoft.com)
-Public Key: http://www.marcansoft.com/marcan.asc
+The Dell is BT 2.0 compatible, the Belkin 2.1 if that's any use.
+
+Looking at the feature differences, the Belkin supports simple
+pairing...
+
+The LEGO NXT is probably BT 2.0.
+
+---------------------------------------------------------------
+
+I've got the following files set up correctly for each device:
+
+/var/lib/bluetooth/xx:yy:zz:aa:bb:cc/pincodes - btaddr pincode
+/var/lib/bluetooth/xx:yy:zz:aa:bb:cc/trusts   - btaddr [all]
+/etc/bluetooth/rfcomm.conf                    - device info
+
+My pairing attempts are all from the command line, no additional
+GUI tools are loaded or used. I enable hcidump and have bluetoothd
+running in the foreground with debugging on.
+
+I'm using minicom (after pairing) to talk to the LEGO NXT using
+the /dev/rfcomm0 device.
+
+When I pair successfully using the Dell Bluetooth device the linkkey
+file is updated and never changed unless I manually delete the
+key for the specific device, in which case I have to re-pair.
+
+That's expected.
+
+When I pair with the Belkin dongle, the linkkey file is updated
+BUT when I close the connection the hcidump says:
+
+HCI Command: Delete Stored Link Key (0x03|0x0012) plen 7
+
+and the key is deleted from the linkkeys file.
+
+I've poked around in the bluez source and see that link key removal
+seems to be tied to a "temporary" flag that gets set at connection
+time.
+
+Would additional bluetoothd dumps from each paring attempt be useful,
+or is there a set of commands I can run on each dongle to dump out
+feature sets?
+
+Ralph
+
+
