@@ -1,39 +1,20 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <453936.71245.qm@web52604.mail.re2.yahoo.com>
+Date: Tue, 8 Dec 2009 14:15:20 -0800 (PST)
+From: Ed Tsang <netdesign_98@yahoo.com>
+Subject: How to force a fix pin
+To: Bluettooth Linux <linux-bluetooth@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20091208073542.GC22204@atheros-laptop>
-References: <20091208073542.GC22204@atheros-laptop>
-From: Julian Calaby <julian.calaby@gmail.com>
-Date: Wed, 9 Dec 2009 09:44:14 +1100
-Message-ID: <646765f40912081444t64d94ac3k9bcea8b5296a9591@mail.gmail.com>
-Subject: Re: [PATCH] Added compat-bluetooth to compat-wireless-2.6
-To: Bala Shanmugam <sbalashanmugam@atheros.com>
-Cc: Luis Rodriguez <Luis.Rodriguez@atheros.com>,
-	mcgrof@bombadil.infradead.org, linux-wireless@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Dec 8, 2009 at 18:35, Bala Shanmugam <sbalashanmugam@atheros.com> wrote:
->
-> Added compat-bluetooth to compat-wireless-2.6
->
-> Added new scripts to load and unload wireless
-> and bluetooth modules seperately.
->
-> Compat is compiled as separate kernel module as
-> both wireless and bluetooth modules require it.
->
-> Compat Bluetooth has support to compile latest bluetooth code
-> for kernel versions 2.6.27 to 2.6.31.
+Hi, My application scan for devices, send file to it. But some device (blackberry) will request a pin. With the bluetoothd 4.51. bluetooth-applet will pop up and enter a pin. If de-install it, the bluetoothd will complain "No agent available for 0 request (pin_code_request?).". And the remote device failed to pair with a "default pin 0000".
+Is there a way to force a default pin "0000".  look like /etc/bluetooth/pin is history.  Is there a simply work around.
 
-Should all this new functionality be documented in the README document?
+Net Des
 
-Thanks,
 
--- 
 
-Julian Calaby
-
-Email: julian.calaby@gmail.com
-.Plan: http://sites.google.com/site/juliancalaby/
+      __________________________________________________________________
+Get a sneak peak at messages with a handy reading pane with All new Yahoo! Mail: http://ca.promos.yahoo.com/newmail/overview2/
