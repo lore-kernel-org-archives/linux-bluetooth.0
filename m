@@ -1,45 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4B201199.7020801@pricom.com.au>
-Date: Thu, 10 Dec 2009 08:07:37 +1100
-From: Philip Rhoades <phil@pricom.com.au>
-Reply-To: phil@pricom.com.au
+Message-ID: <724010.84706.qm@web52606.mail.re2.yahoo.com>
+References: <453936.71245.qm@web52604.mail.re2.yahoo.com> <e378cfb20912090123m51645679n3e410d6208c6f51e@mail.gmail.com> <4B1FA40F.2020003@hempeldesigngroup.com> <724791.92906.qm@web52608.mail.re2.yahoo.com> <4B1FE329.90401@hempeldesigngroup.com>
+Date: Wed, 9 Dec 2009 11:09:24 -0800 (PST)
+From: Ed Tsang <netdesign_98@yahoo.com>
+Subject: Re: How to force a fix pin
+To: Ralph Hempel <rhempel@hempeldesigngroup.com>,
+	Bluettooth Linux <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <4B1FE329.90401@hempeldesigngroup.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: More verbose log messages?
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-People,
+Ralph, 
+ Thanks for the suggestion.  
+ I ended up changing the test/simple-agent and get it to return "0000". It pair ok with the fix pin now.
 
-I sent a note re this to help me work out what was going on with an
-LG U880 mobile phone "Connection dropped" message but didn't get any 
-responses so I am resending the note to see if the the new Subject gets 
-a better response . .
+Ed
 
-I am trying to send a file from an LG U880 mobile phone to my Fedora 12 
-server after a few seconds gives a "Connection dropped" message.  The 
-bluetoothd on the server logs:
 
-bluetoothd[714]: link_key_request (sba=00:11:67:55:91:FC, 
-dba=00:12:56:CC:63:B6)
-bluetoothd[714]: kernel auth requirements = 0x00
-bluetoothd[714]: stored link key type = 0x00
-bluetoothd[714]: adapter_get_device(00:12:56:CC:63:B6)
+      __________________________________________________________________
+Looking for the perfect gift? Give the gift of Flickr! 
 
-which does not give me much info about why the connection was dropped (I 
-can send files from the server to the phone OK).
-
-Any ideas about what the problem is?  Is there some way of getting a 
-more verbose log? (I am already using the -d switch).
-
-Thanks,
-
-Phil.
--- 
-Philip Rhoades
-
-GPO Box 3411
-Sydney NSW	2001
-Australia
-E-mail:  phil@pricom.com.au
+http://www.flickr.com/gift/
