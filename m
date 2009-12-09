@@ -1,44 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: RFC: Allow Bluez to select flushable or non-flushable ACL
- packets  with L2CAP_LM_RELIABLE
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Nick Pelly <npelly@google.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <35c90d960912081950t135e3f10m8848e54fde1e596f@mail.gmail.com>
-References: <35c90d960912081950t135e3f10m8848e54fde1e596f@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 09 Dec 2009 06:06:15 +0100
-Message-ID: <1260335175.2901.20.camel@violet>
-Mime-Version: 1.0
+MIME-Version: 1.0
+From: Nick Pelly <npelly@google.com>
+Date: Tue, 8 Dec 2009 19:50:34 -0800
+Message-ID: <35c90d960912081950t135e3f10m8848e54fde1e596f@mail.gmail.com>
+Subject: RFC: Allow Bluez to select flushable or non-flushable ACL packets
+	with L2CAP_LM_RELIABLE
+To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=00151743f922ef8a1f047a439881
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nick,
+--00151743f922ef8a1f047a439881
+Content-Type: text/plain; charset=ISO-8859-1
 
-> Right now Bluez always requests flushable ACL packets (but does not
-> set a flush timeout, so effectively they are non-flushable):
-> 
-> However it is desirable to use an ACL flush timeout on A2DP packets so
-> that if the ACL packets block for some reason then the LM can flush
-> them to make room for newer packets.
-> 
-> Is it reasonable for Bluez to use the 0x00 ACL packet boundary flag by
-> default (non-flushable packet), and let userspace request flushable
-> packets on A2DP L2CAP sockets with the socket option
-> L2CAP_LM_RELIABLE.
+Right now Bluez always requests flushable ACL packets (but does not
+set a flush timeout, so effectively they are non-flushable):
 
-the reliable option has a different meaning. It comes back from the old
-Bluetooth 1.1 qualification days where we had to tests on L2CAP that had
-to confirm that we can detect malformed packets and report them. These
-days it is just fine to drop them.
+However it is desirable to use an ACL flush timeout on A2DP packets so
+that if the ACL packets block for some reason then the LM can flush
+them to make room for newer packets.
 
-You can not just blindly use ACL_START_FLUSHABLE without proper version
-checking. This feature has been introduced later and will not work with
-all stacks out there. Please go through the different spec. versions to
-see the difference.
+Is it reasonable for Bluez to use the 0x00 ACL packet boundary flag by
+default (non-flushable packet), and let userspace request flushable
+packets on A2DP L2CAP sockets with the socket option
+L2CAP_LM_RELIABLE.
 
-Regards
+Make sense? Any other suggestions?
 
-Marcel
+Attached is a rough (untested) patch of what I had in mind.
 
+See core spec 2.E.5.4.2 for reference.
 
+Nick
+
+--00151743f922ef8a1f047a439881
+Content-Type: application/octet-stream;
+	name="0001-Bluetooth-Send-non-flushable-ACL-packets-by-default.patch"
+Content-Disposition: attachment;
+	filename="0001-Bluetooth-Send-non-flushable-ACL-packets-by-default.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_g2zk3xd80
+
+RnJvbSA5MGY5OTcwNzFkM2U3OTVkNmU2NzQ4MjFjMWQwZjQwNTdlZGI1ODM4IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBOaWNrIFBlbGx5IDxucGVsbHlAZ29vZ2xlLmNvbT4KRGF0ZTog
+VHVlLCA4IERlYyAyMDA5IDE5OjQyOjIxIC0wODAwClN1YmplY3Q6IFtQQVRDSF0gQmx1ZXRvb3Ro
+OiBTZW5kIG5vbi1mbHVzaGFibGUgQUNMIHBhY2tldHMgYnkgZGVmYXVsdC4KCkwyQ0FQIHNvY2tl
+dHMgY2FuIHJlcXVlc3QgZmx1c2hhYmxlIEFDTCBwYWNrZXRzIHdpdGggTDJDQVBfTE1fUkVMSUFC
+TEUKClNpZ25lZC1vZmYtYnk6IE5pY2sgUGVsbHkgPG5wZWxseUBnb29nbGUuY29tPgotLS0KIGlu
+Y2x1ZGUvbmV0L2JsdWV0b290aC9oY2kuaCB8ICAgIDMgKysrCiBuZXQvYmx1ZXRvb3RoL2hjaV9j
+b3JlLmMgICAgfCAgICA2ICsrKystLQogbmV0L2JsdWV0b290aC9sMmNhcC5jICAgICAgIHwgICAx
+MCArKysrKysrKy0tCiAzIGZpbGVzIGNoYW5nZWQsIDE1IGluc2VydGlvbnMoKyksIDQgZGVsZXRp
+b25zKC0pCgpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2hjaS5oIGIvaW5jbHVk
+ZS9uZXQvYmx1ZXRvb3RoL2hjaS5oCmluZGV4IGY2OWYwMTUuLmM2ZjZjZTUgMTAwNjQ0Ci0tLSBh
+L2luY2x1ZGUvbmV0L2JsdWV0b290aC9oY2kuaAorKysgYi9pbmNsdWRlL25ldC9ibHVldG9vdGgv
+aGNpLmgKQEAgLTE0MiwxMSArMTQyLDE0IEBAIGVudW0gewogI2RlZmluZSBFRFJfRVNDT19NQVNL
+ICAoRVNDT18yRVYzIHwgRVNDT18zRVYzIHwgRVNDT18yRVY1IHwgRVNDT18zRVY1KQogCiAvKiBB
+Q0wgZmxhZ3MgKi8KKyNkZWZpbmUgQUNMX1NUQVJUX0ZMVVNIQUJMRQkweDAwCiAjZGVmaW5lIEFD
+TF9DT05UCQkweDAxCiAjZGVmaW5lIEFDTF9TVEFSVAkJMHgwMgogI2RlZmluZSBBQ0xfQUNUSVZF
+X0JDQVNUCTB4MDQKICNkZWZpbmUgQUNMX1BJQ09fQkNBU1QJCTB4MDgKIAorI2RlZmluZSBBQ0xf
+UEJfTUFTSwkoQUNMX0NPTlQgfCBBQ0xfU1RBUlQpCisKIC8qIEJhc2ViYW5kIGxpbmtzICovCiAj
+ZGVmaW5lIFNDT19MSU5LCTB4MDAKICNkZWZpbmUgQUNMX0xJTksJMHgwMQpkaWZmIC0tZ2l0IGEv
+bmV0L2JsdWV0b290aC9oY2lfY29yZS5jIGIvbmV0L2JsdWV0b290aC9oY2lfY29yZS5jCmluZGV4
+IGNkMDYxNTEuLmFlYWYwN2YgMTAwNjQ0Ci0tLSBhL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuYwor
+KysgYi9uZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmMKQEAgLTEyMDAsNyArMTIwMCw3IEBAIGludCBo
+Y2lfc2VuZF9hY2woc3RydWN0IGhjaV9jb25uICpjb25uLCBzdHJ1Y3Qgc2tfYnVmZiAqc2tiLCBf
+X3UxNiBmbGFncykKIAogCXNrYi0+ZGV2ID0gKHZvaWQgKikgaGRldjsKIAlidF9jYihza2IpLT5w
+a3RfdHlwZSA9IEhDSV9BQ0xEQVRBX1BLVDsKLQloY2lfYWRkX2FjbF9oZHIoc2tiLCBjb25uLT5o
+YW5kbGUsIGZsYWdzIHwgQUNMX1NUQVJUKTsKKwloY2lfYWRkX2FjbF9oZHIoc2tiLCBjb25uLT5o
+YW5kbGUsIGZsYWdzKTsKIAogCWlmICghKGxpc3QgPSBza2Jfc2hpbmZvKHNrYiktPmZyYWdfbGlz
+dCkpIHsKIAkJLyogTm9uIGZyYWdtZW50ZWQgKi8KQEAgLTEyMTcsMTIgKzEyMTcsMTQgQEAgaW50
+IGhjaV9zZW5kX2FjbChzdHJ1Y3QgaGNpX2Nvbm4gKmNvbm4sIHN0cnVjdCBza19idWZmICpza2Is
+IF9fdTE2IGZsYWdzKQogCQlzcGluX2xvY2tfYmgoJmNvbm4tPmRhdGFfcS5sb2NrKTsKIAogCQlf
+X3NrYl9xdWV1ZV90YWlsKCZjb25uLT5kYXRhX3EsIHNrYik7CisJCWZsYWdzICY9IH5BQ0xfUEJf
+TUFTSzsKKwkJZmxhZ3MgfD0gQUNMX0NPTlQ7CiAJCWRvIHsKIAkJCXNrYiA9IGxpc3Q7IGxpc3Qg
+PSBsaXN0LT5uZXh0OwogCiAJCQlza2ItPmRldiA9ICh2b2lkICopIGhkZXY7CiAJCQlidF9jYihz
+a2IpLT5wa3RfdHlwZSA9IEhDSV9BQ0xEQVRBX1BLVDsKLQkJCWhjaV9hZGRfYWNsX2hkcihza2Is
+IGNvbm4tPmhhbmRsZSwgZmxhZ3MgfCBBQ0xfQ09OVCk7CisJCQloY2lfYWRkX2FjbF9oZHIoc2ti
+LCBjb25uLT5oYW5kbGUsIGZsYWdzKTsKIAogCQkJQlRfREJHKCIlcyBmcmFnICVwIGxlbiAlZCIs
+IGhkZXYtPm5hbWUsIHNrYiwgc2tiLT5sZW4pOwogCmRpZmYgLS1naXQgYS9uZXQvYmx1ZXRvb3Ro
+L2wyY2FwLmMgYi9uZXQvYmx1ZXRvb3RoL2wyY2FwLmMKaW5kZXggY2E0ZDNiNC4uYmYxNmE2YSAx
+MDA2NDQKLS0tIGEvbmV0L2JsdWV0b290aC9sMmNhcC5jCisrKyBiL25ldC9ibHVldG9vdGgvbDJj
+YXAuYwpAQCAtMzI1LDcgKzMyNSw3IEBAIHN0YXRpYyBpbmxpbmUgaW50IGwyY2FwX3NlbmRfY21k
+KHN0cnVjdCBsMmNhcF9jb25uICpjb25uLCB1OCBpZGVudCwgdTggY29kZSwgdTE2CiAJaWYgKCFz
+a2IpCiAJCXJldHVybiAtRU5PTUVNOwogCi0JcmV0dXJuIGhjaV9zZW5kX2FjbChjb25uLT5oY29u
+LCBza2IsIDApOworCXJldHVybiBoY2lfc2VuZF9hY2woY29ubi0+aGNvbiwgc2tiLCBBQ0xfU1RB
+UlQpOwogfQogCiBzdGF0aWMgdm9pZCBsMmNhcF9kb19zdGFydChzdHJ1Y3Qgc29jayAqc2spCkBA
+IC0xMTE2LDYgKzExMTYsNyBAQCBzdGF0aWMgaW5saW5lIGludCBsMmNhcF9kb19zZW5kKHN0cnVj
+dCBzb2NrICpzaywgc3RydWN0IG1zZ2hkciAqbXNnLCBpbnQgbGVuKQogCXN0cnVjdCBza19idWZm
+ICpza2IsICoqZnJhZzsKIAlpbnQgZXJyLCBobGVuLCBjb3VudCwgc2VudD0wOwogCXN0cnVjdCBs
+MmNhcF9oZHIgKmxoOworCXUxNiBmbGFnczsKIAogCUJUX0RCRygic2sgJXAgbGVuICVkIiwgc2ss
+IGxlbik7CiAKQEAgLTExNjgsNyArMTE2OSwxMiBAQCBzdGF0aWMgaW5saW5lIGludCBsMmNhcF9k
+b19zZW5kKHN0cnVjdCBzb2NrICpzaywgc3RydWN0IG1zZ2hkciAqbXNnLCBpbnQgbGVuKQogCQlm
+cmFnID0gJigqZnJhZyktPm5leHQ7CiAJfQogCi0JaWYgKChlcnIgPSBoY2lfc2VuZF9hY2woY29u
+bi0+aGNvbiwgc2tiLCAwKSkgPCAwKQorCWlmIChsMmNhcF9waShzayktPmZvcmNlX3JlbGlhYmxl
+KQorCQlmbGFncyA9IEFDTF9TVEFSVDsKKwllbHNlCisJCWZsYWdzID0gQUNMX1NUQVJUX0ZMVVNI
+QUJMRTsKKworCWlmICgoZXJyID0gaGNpX3NlbmRfYWNsKGNvbm4tPmhjb24sIHNrYiwgZmxhZ3Mp
+KSA8IDApCiAJCWdvdG8gZmFpbDsKIAogCXJldHVybiBzZW50OwotLSAKMS42LjUuMwoK
+--00151743f922ef8a1f047a439881--
