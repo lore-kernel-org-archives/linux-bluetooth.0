@@ -1,43 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4B1F6B12.1060509@atheros.com>
+Date: Wed, 9 Dec 2009 14:47:06 +0530
+From: Bala Shanmugam <sbalashanmugam@atheros.com>
 MIME-Version: 1.0
-In-Reply-To: <453936.71245.qm@web52604.mail.re2.yahoo.com>
-References: <453936.71245.qm@web52604.mail.re2.yahoo.com>
-Date: Wed, 9 Dec 2009 14:53:28 +0530
-Message-ID: <e378cfb20912090123m51645679n3e410d6208c6f51e@mail.gmail.com>
-Subject: Re: How to force a fix pin
-From: Nel D <newatlinux@gmail.com>
-To: Ed Tsang <netdesign_98@yahoo.com>
-Cc: Bluettooth Linux <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+To: Julian Calaby <julian.calaby@gmail.com>
+CC: Shanmugamkamatchi Balashanmugam
+	<Shanmugamkamatchi.Balashanmugam@Atheros.com>,
+	Luis Rodriguez <Luis.Rodriguez@Atheros.com>,
+	"mcgrof@bombadil.infradead.org" <mcgrof@bombadil.infradead.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Added compat-bluetooth to compat-wireless-2.6
+References: <20091208073542.GC22204@atheros-laptop> <646765f40912081444t64d94ac3k9bcea8b5296a9591@mail.gmail.com>
+In-Reply-To: <646765f40912081444t64d94ac3k9bcea8b5296a9591@mail.gmail.com>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi ,
+Yes Julian.  REAME has to be updated.
+Will do that shortly.
 
-
-On Wed, Dec 9, 2009 at 3:45 AM, Ed Tsang <netdesign_98@yahoo.com> wrote:
-> Hi, My application scan for devices, send file to it. But some device (blackberry) will request a pin. With the bluetoothd 4.51. bluetooth-applet will pop up and enter a pin. If de-install it, the bluetoothd will complain "No agent available for 0 request (pin_code_request?).". And the remote device failed to pair with a "default pin 0000".
-> Is there a way to force a default pin "0000".  look like /etc/bluetooth/pin is history.  Is there a simply work around.
+Regards,
+Bala.
+Julian Calaby wrote:
+> On Tue, Dec 8, 2009 at 18:35, Bala Shanmugam <sbalashanmugam@atheros.com> wrote:
+>   
+>> Added compat-bluetooth to compat-wireless-2.6
+>>
+>> Added new scripts to load and unload wireless
+>> and bluetooth modules seperately.
+>>
+>> Compat is compiled as separate kernel module as
+>> both wireless and bluetooth modules require it.
+>>
+>> Compat Bluetooth has support to compile latest bluetooth code
+>> for kernel versions 2.6.27 to 2.6.31.
+>>     
 >
-> Net Des
+> Should all this new functionality be documented in the README document?
 >
-
-Do you have the sources of 4.51 ? . I remember a command line utility
-named simple-agent in test folder ( the location might have changed)
-which i had used to pair.
-
-Hope this helps.
-
-Thanks,
- Nel
-
-
+> Thanks,
 >
->
->      __________________________________________________________________
-> Get a sneak peak at messages with a handy reading pane with All new Yahoo! Mail: http://ca.promos.yahoo.com/newmail/overview2/
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >
+> Julian Calaby
+>
+> Email: julian.calaby@gmail.com
+> .Plan: http://sites.google.com/site/juliancalaby/
+> .
+>
+>   
+
