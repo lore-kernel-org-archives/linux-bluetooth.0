@@ -1,39 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20091208073542.GC22204@atheros-laptop>
-References: <20091208073542.GC22204@atheros-laptop>
-From: "Luis R. Rodriguez" <mcgrof@gmail.com>
-Date: Thu, 10 Dec 2009 23:42:59 -0800
-Message-ID: <43e72e890912102342q478593f3ge162d3b8cddd3f61@mail.gmail.com>
-Subject: Re: [PATCH] Added compat-bluetooth to compat-wireless-2.6
-To: Bala Shanmugam <sbalashanmugam@atheros.com>
-Cc: Luis Rodriguez <Luis.Rodriguez@atheros.com>,
-	mcgrof@bombadil.infradead.org, linux-wireless@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: RFC: Allow Bluez to select flushable or non-flushable ACL
+ packets  with L2CAP_LM_RELIABLE
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Nick Pelly <npelly@google.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <35c90d960912082213s26fb0ebse75ce85d43213d9@mail.gmail.com>
+References: <35c90d960912081950t135e3f10m8848e54fde1e596f@mail.gmail.com>
+	 <1260335175.2901.20.camel@violet>
+	 <35c90d960912082213s26fb0ebse75ce85d43213d9@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 10 Dec 2009 23:03:54 +0100
+Message-ID: <1260482634.2901.70.camel@violet>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Dec 7, 2009 at 11:35 PM, Bala Shanmugam
-<sbalashanmugam@atheros.com> wrote:
->
-> Added compat-bluetooth to compat-wireless-2.6
->
-> Added new scripts to load and unload wireless
-> and bluetooth modules seperately.
->
-> Compat is compiled as separate kernel module as
-> both wireless and bluetooth modules require it.
->
-> Compat Bluetooth has support to compile latest bluetooth code
-> for kernel versions 2.6.27 to 2.6.31.
-> Signed-off-by: Bala Shanmugam <sbalashanmugam@atheros.com>
+Hi Nick,
 
-Thanks a lot Bala, applied. I made a few changes now like move some of
-the compat hunks that are specific to an actual kernel change to their
-respective patches/*.patch file. I nuked the old compat files and
-updated compat.git to add all the missing items. Additionally changed
-the build process and selection for components but I'll elaborate on
-that on another e-mail.
+> >> Right now Bluez always requests flushable ACL packets (but does not
+> >> set a flush timeout, so effectively they are non-flushable):
+> >>
+> >> However it is desirable to use an ACL flush timeout on A2DP packets so
+> >> that if the ACL packets block for some reason then the LM can flush
+> >> them to make room for newer packets.
+> >>
+> >> Is it reasonable for Bluez to use the 0x00 ACL packet boundary flag by
+> >> default (non-flushable packet), and let userspace request flushable
+> >> packets on A2DP L2CAP sockets with the socket option
+> >> L2CAP_LM_RELIABLE.
+> >
+> > the reliable option has a different meaning. It comes back from the old
+> > Bluetooth 1.1 qualification days where we had to tests on L2CAP that had
+> > to confirm that we can detect malformed packets and report them. These
+> > days it is just fine to drop them.
+> 
+> Got it, how about introducing
+> 
+> #define L2CAP_LM_FLUSHABLE 0x0040
 
-  Luis
+that l2cap_sock_setsockopt_old() sets this didn't give you a hint that
+we might wanna deprecate this socket options ;)
+
+I need to read up on the flushable stuff, but in the end it deserves its
+own socket option. Also an ioctl() to actually trigger Enhanced flush
+might be needed.
+
+> struct l2cap_pinfo {
+>    ...
+>    __u8 flushable;
+> }
+
+Sure. In the long run we need to turn this into a bitmask. We are just
+wasting memory here.
+
+Regards
+
+Marcel
+
+
