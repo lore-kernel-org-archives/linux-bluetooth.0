@@ -1,92 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 11 Dec 2009 19:04:18 +0000 (GMT)
+To: Germa Pedrosa <german.pedrosa@fundacionctic.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Pairing with several Bluetooth dongles
+In-Reply-To: <1259154332.20954.1.camel@german-desktop>
+References: <09700B613C4DD84FA9F2FEA52188281903083937@ayalga.fundacionctic.org> <1259154332.20954.1.camel@german-desktop>
 MIME-Version: 1.0
-In-Reply-To: <1251085520-9094-1-git-send-email-gustavo@las.ic.unicamp.br>
-References: <1251085520-9094-1-git-send-email-gustavo@las.ic.unicamp.br>
-Date: Mon, 14 Dec 2009 12:36:21 +0200
-Message-ID: <508e92ca0912140236t2c93a8a1q3aae97cf9e7bdfd@mail.gmail.com>
-Subject: Re: [PATCH 1/2] Bluetooth: Add locking scheme to timeout callbacks.
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, gustavo@padovan.org
-Content-Type: multipart/mixed; boundary=0016364c76a7297318047aadd8f7
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Message-Id: <1260558258.467003.9352.nullmailer@galant.ukfsn.org>
+From: Iain Hibbert <plunky@rya-online.net>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---0016364c76a7297318047aadd8f7
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+On Wed, 25 Nov 2009, Germa Pedrosa wrote:
 
-Hi,
+I apologise this was a while ago I didn't have anything to say at the time
+but it came back to me while I was thinking about something else..
 
-On Mon, Aug 24, 2009 at 5:45 AM, Gustavo F. Padovan
-<gustavo@las.ic.unicamp.br> wrote:
-> Avoid race conditions when acessing the sock.
->
-> Signed-off-by: Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
-> ---
-> =A0net/bluetooth/l2cap.c | =A0 =A04 ++++
-> =A01 files changed, 4 insertions(+), 0 deletions(-)
->
-> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-> index c04526f..efac637 100644
-> --- a/net/bluetooth/l2cap.c
-> +++ b/net/bluetooth/l2cap.c
-> @@ -1192,6 +1192,7 @@ static void l2cap_monitor_timeout(unsigned long arg=
-)
-> =A0 =A0 =A0 =A0struct sock *sk =3D (void *) arg;
-> =A0 =A0 =A0 =A0u16 control;
->
-> + =A0 =A0 =A0 bh_lock_sock(sk);
-> =A0 =A0 =A0 =A0if (l2cap_pi(sk)->retry_count >=3D l2cap_pi(sk)->remote_ma=
-x_tx) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0l2cap_send_disconn_req(l2cap_pi(sk)->conn,=
- sk);
+> What I want to achieve is that each device is *paired exactly once*
+> against the system despite the dongle D2-DN that finally treats the
+> operation.
 
-missing unlock ?
+I think you will get trouble with this approach. As you have found,
+pairing is between two dongles and depends on the bdaddr at each end.
 
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return;
-> @@ -1203,6 +1204,7 @@ static void l2cap_monitor_timeout(unsigned long arg=
-)
-> =A0 =A0 =A0 =A0control =3D L2CAP_CTRL_POLL;
-> =A0 =A0 =A0 =A0control |=3D L2CAP_SUPER_RCV_READY;
-> =A0 =A0 =A0 =A0l2cap_send_sframe(l2cap_pi(sk), control);
-> + =A0 =A0 =A0 bh_unlock_sock(sk);
-> =A0}
+> The solution I thought of was using bdaddr tool for assigning the same
+> MAC address to all D2 ... DN dongles, in that way that every one uses
+> the same linkeys to save paired devices.
 
-Please consider following patch:
+Perhaps it will work and perhaps not but I think there will be long term
+problems in overlapping areas of coverage using devices with the same
+bdaddr. The frequency hopping in the piconet depends also on the master
+device clock so at least the devices are likely to be out of sync but
+collisions may occur causing intermittent problems, I don't really know.
 
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -1208,6 +1208,7 @@ static void l2cap_monitor_timeout(unsigned long arg)
-        bh_lock_sock(sk);
-        if (l2cap_pi(sk)->retry_count >=3D l2cap_pi(sk)->remote_max_tx) {
-                l2cap_send_disconn_req(l2cap_pi(sk)->conn, sk);
-+               bh_unlock_sock(sk);
-                return;
-        }
+I think you would probably be better to have the security aspect on a
+separate level. ie, you create a token that the higher level stack can
+present to authenticate itself upon connecting to the service, leaving the
+baseband connection to be unauthenticated.
+
+for example, the OBEX specification contains a means for a device to
+authenticate (this is designed so that just plugging in a cable is not
+enough to access contents on a device) though I don't think that openobex
+supports this so none of the open source OBEX applications would handle
+it. Also, higher layer authentication is discussed in the PAN profile
+document, like running a VPN over an open wireless point.
+
+regards,
+iain
 
 
-Also see complete patch attached.
-
-Regards,
-Andrei Emeltchenko
-
---0016364c76a7297318047aadd8f7
-Content-Type: application/x-gzip;
-	name="0001-Bluetooth-Fix-locking-scheme-regression.patch.gz"
-Content-Disposition: attachment;
-	filename="0001-Bluetooth-Fix-locking-scheme-regression.patch.gz"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_g37406sa0
-
-H4sICLIUJksAAzAwMDEtQmx1ZXRvb3RoLUZpeC1sb2NraW5nLXNjaGVtZS1yZWdyZXNzaW9uLnBh
-dGNoAJ1S0W7TMBR9rr/iPLZKkyUhbZcA0wbbhEAgpCHxgFDk2DeNaWMX24FOwL/jZAKkwV6wrJv4
-+Ojco3N9bU2Pgsp8k1O7ktQUkrhMUyIh5aZsJa2KTVFmq/VKFnhtNG7ogGyDNK2mjTxNM3YdZCpc
-aGlJ4aqnvRcd6Z3BEz5hCf3BzrXZKZ4I05+xS+6pGmWXyApckhjlSmR5lZdV/ghRGs7sZmg+kfAV
-Pry9ePf8xUc82w/kjfFdhWt1xN6IndJbuNCgJ1jaWnJOGZ0w9j70/E34yh2U9tbIQZCE7whkrbE4
-cN+hsVyLbiJp4+H5jjQLdAMuhBm0T3A1sUdGGwAZxOAO3DqCMDKUjqZGCV4N0jh4w15yrfBG7YY9
-D25u1FaTjE3bxs3t/wQWxzGDJn/S/IrgZJ8LfkgEviOsDBELpVV7csEO11uSIdtg1JH1IRI3jxZL
-pJC0p7tzvGBMqrZFHG+VBz/5t3zzbzwEJOmIsti0p02TJOvwisrTFlmaroti9PuQIoui6EHV83PE
-WZ6eLteIpu8GAXKeeyXwxSiJiVn3RitvbO1VT2bw80G7KeIw8jBvbrcLhlnT1eMLqF0oc7dbPA6Y
-ajG/kzioEYvPLHl7W0+DxtlT3L/sjae658faHxf4FhRmdwxHWtZSOWG0ri19vqc6wktMTaPZ6GTQ
-f3mZhdaD1ePvD4aQGViWrJM0KRj7CdCWqsKhAwAA
---0016364c76a7297318047aadd8f7--
