@@ -1,70 +1,109 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-From: "Luis R. Rodriguez" <mcgrof@gmail.com>
-Date: Fri, 11 Dec 2009 00:32:17 -0800
-Message-ID: <43e72e890912110032q32ba456eqbc7752e36e00fa09@mail.gmail.com>
-Subject: Changes to compat-wireless for 2.6.33
-To: linux-wireless <linux-wireless@vger.kernel.org>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: linux-kernel@vger.kernel.org,
-	Bala Shanmugam <sbalashanmugam@atheros.com>
-Content-Type: text/plain; charset=UTF-8
+Date: Fri, 11 Dec 2009 10:25:43 +0200
+Message-ID: <eb7933e20912110025y20eb4a6aw615660648d4756f8@mail.gmail.com>
+Subject: [PATCH] dbus timeout handling
+From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Compat-wireless [1] now relies on the linux-next git tree [2] as such
-we are to add backports for the next kernel release as we move along
-with the 802.11 subsystem while a stable linux-2.6.33.y branch will be
-prepared that sticks to Linus' tree to iron out fixes for that release
-along with the standard kernel release cycle. To be clear: we used to
-keep the bleeding edge compat-wireless in synch only with the latest
-rc kernel by using wireless-testing, bleeding edge compat-wireless
-will now move along with the next kernel release and not stick to the
-latest rc kernel. The main advantage here is the possibility add
-backporting for other subsystems in one package using one single git
-tree.
+Hi,
 
-Thanks to Bala Shanmugam's patch compat-wireless now drags in the
-bluetooth subsystem as well. Since two subsystems are now being
-backported they now share a common rfkill backport module and a
-general kernel compatibility module. Future patches to compat-wireless
-then will just be for the patches/ directory and general build
-updates. As before I continue to try to push most compatibility code
-in the compat-2.6.*[ch] files while *only* things which cannot be
-backported through code is left to the patches/*.patch files. Due to
-the split to compat-wireless and compat.git please send compat patches
-against the new compat.git tree [3], you can use the linux-wireless
-mailing list for them.
+When receiving a file it's possible to crash obexd by letting the
+"org.openobex.Error.Rejected" reply from the call to
+request_authorization and the obexd timeout for the response occur at
+roughly the same time.
 
-I welcome others to use compat.git for other compatibility needs and
-to send patches for it for more general kernel compatibility, even if
-that is for other subsystems. For now the focus on compat-wireless
-will just be 802.11 drivers and bluetooth drivers but I will likely
-extend it to include some other network drivers and would be open to
-other subsystems if someone commits to keeping them updated.
+No crash seen if the obexd timeout reaches function "agent_reply"
+first. But if the agent's response arrives just before the obexd
+timeout, the timeout will still be dispatched causing what looks like
+an issue in the dbus-obexd integration. Added my own debug output to
+show the situation:
 
-Part of the change to using linux-next meant addressing the 2.6.33
-changes already but it also meant running into some items I did not
-really care to backport like the PCMCIA changes. This meant disabling
-the ssb module, and therefore the Ethernet b44, and 802.11 b43,
-b43legacy. I also ran into some small snag with libertas so ended up
-disabling it but it seems that one can be fixed easily. All other
-drivers were kept enabled and backported. I have *not* tested the
-bluetooth drivers since the change to linux-next nor building it
-mainly due to the fact my current kernel had CONFIG_BT=y. I'll test
-that out tomorrow, but welcome your help.
+obexd[8454]: entering remove_timeout
+obexd[8454]: entering timeout_handler_dispatch
+obexd[8454]: entering remove_timeout
+obexd[8454]: entering timeout_handler_free
+obexd[8454]: entering agent_reply
+obexd[8454]: Agent replied with an error: org.bluez.Error.Rejected,
+request rejected
+obexd[8454]: after g_main_context_iteration in request_authorization
+[segmentation fault, valgrind complains on two locations in
+/lib/libdbus-1.so.3.4.0]
 
-Enabling 802.11 or bluetooth is pretty easy through the top level
-Makefile, should be intuitive. Perhaps using this sort of build
-process will let us use our own mconf for our own options in the near
-future -- I didn't update scripts/driver-select, that remains busted.
-I noticed Ubuntu is shipping CONFIG_BT=y on 2.6.27..2.6.32 while
-Fedora should have CONFIG_BT=m (haven't checked the kernel ranges).
-Building the compat-bluetooth stuff requires the later so if you'd
-like to take advantage of this stuff please consider a change.
+To fix this, there seems to be a chance to  avoid dispatching the
+timeout in callback function mainloop.c:remove_timeout (this function
+is currently empty, but maybe for good reason?)
 
-[1] git://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/compat-wireless-2.6.git
-[2] git://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git
-[3] git://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/compat.git
+After having moved the g_source_remove call on the timer to
+"remove_timeout" from "timeout_handler_free" the issue was not
+reproduced, although I can't claim to understand the dbus mainloop
+integration code completely. It might be a bit awkward to break up the
+g_source_remove and g_free of the timer into different callbacks.
 
-  Luis
+Is this an acceptable solution for removing the crash?
+
+Best regards,
+Daniel
+
+-----
+
+For reference, the authorization method used to get the crash:
+
+QString Widget::Authorize(QDBusObjectPath transger,QString bdaddr,QString name,
+			QString type, int length, int time, QDBusMessage msg)
+{	
+	QTest::qWait(60000);
+
+	QDBusConnection conn(QDBusConnection::sessionBus());
+	QDBusMessage reply(msg.createErrorReply("org.bluez.Error.Rejected","request
+rejected"));
+	conn.send(reply);
+	
+	return QString();	
+}
+
+
+------
+
+>From 1ec3f03d3c0d3fa6011db95e329b03e163bd1524 Mon Sep 17 00:00:00 2001
+From: Daniel Orstadius <daniel.orstadius@gmail.com>
+Date: Fri, 11 Dec 2009 09:50:23 +0200
+Subject: [PATCH] dbus timeout handling
+
+---
+ gdbus/mainloop.c |    9 ++++++++-
+ 1 files changed, 8 insertions(+), 1 deletions(-)
+
+diff --git a/gdbus/mainloop.c b/gdbus/mainloop.c
+index bd775f8..b583ace 100644
+--- a/gdbus/mainloop.c
++++ b/gdbus/mainloop.c
+@@ -183,7 +183,6 @@ static void timeout_handler_free(void *data)
+ 	if (!handler)
+ 		return;
+
+-	g_source_remove(handler->id);
+ 	g_free(handler);
+ }
+
+@@ -207,6 +206,14 @@ static dbus_bool_t add_timeout(DBusTimeout
+*timeout, void *data)
+
+ static void remove_timeout(DBusTimeout *timeout, void *data)
+ {
++        timeout_handler_t *handler;
++
++        handler = dbus_timeout_get_data(timeout);
++
++        if (!handler)
++                return;
++
++        g_source_remove(handler->id);
+ }
+
+ static void timeout_toggled(DBusTimeout *timeout, void *data)
+-- 
+1.6.0.4
