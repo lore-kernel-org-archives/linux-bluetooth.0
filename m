@@ -1,188 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?iso-8859-1?q?Jos=E9_Antonio_Santos_Cadenas?= <jcaden@libresoft.es>
-Reply-To: jcaden@libresoft.es
-To: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH] SDP patch to add support for HDP
-Date: Mon, 14 Dec 2009 12:35:16 +0100
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>,
- "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <200911131343.21326.jcaden@libresoft.es> <200912111021.18521.jcaden@libresoft.es> <1260556350.2901.74.camel@violet>
-In-Reply-To: <1260556350.2901.74.camel@violet>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Message-Id: <200912141235.16872.jcaden@libresoft.es>
+In-Reply-To: <1251085520-9094-1-git-send-email-gustavo@las.ic.unicamp.br>
+References: <1251085520-9094-1-git-send-email-gustavo@las.ic.unicamp.br>
+Date: Mon, 14 Dec 2009 12:36:21 +0200
+Message-ID: <508e92ca0912140236t2c93a8a1q3aae97cf9e7bdfd@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Bluetooth: Add locking scheme to timeout callbacks.
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, gustavo@padovan.org
+Content-Type: multipart/mixed; boundary=0016364c76a7297318047aadd8f7
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+--0016364c76a7297318047aadd8f7
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-Here's the corrected patch
+Hi,
 
-Regards.
+On Mon, Aug 24, 2009 at 5:45 AM, Gustavo F. Padovan
+<gustavo@las.ic.unicamp.br> wrote:
+> Avoid race conditions when acessing the sock.
+>
+> Signed-off-by: Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
+> ---
+> =A0net/bluetooth/l2cap.c | =A0 =A04 ++++
+> =A01 files changed, 4 insertions(+), 0 deletions(-)
+>
+> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> index c04526f..efac637 100644
+> --- a/net/bluetooth/l2cap.c
+> +++ b/net/bluetooth/l2cap.c
+> @@ -1192,6 +1192,7 @@ static void l2cap_monitor_timeout(unsigned long arg=
+)
+> =A0 =A0 =A0 =A0struct sock *sk =3D (void *) arg;
+> =A0 =A0 =A0 =A0u16 control;
+>
+> + =A0 =A0 =A0 bh_lock_sock(sk);
+> =A0 =A0 =A0 =A0if (l2cap_pi(sk)->retry_count >=3D l2cap_pi(sk)->remote_ma=
+x_tx) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0l2cap_send_disconn_req(l2cap_pi(sk)->conn,=
+ sk);
+
+missing unlock ?
+
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return;
+> @@ -1203,6 +1204,7 @@ static void l2cap_monitor_timeout(unsigned long arg=
+)
+> =A0 =A0 =A0 =A0control =3D L2CAP_CTRL_POLL;
+> =A0 =A0 =A0 =A0control |=3D L2CAP_SUPER_RCV_READY;
+> =A0 =A0 =A0 =A0l2cap_send_sframe(l2cap_pi(sk), control);
+> + =A0 =A0 =A0 bh_unlock_sock(sk);
+> =A0}
+
+Please consider following patch:
+
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -1208,6 +1208,7 @@ static void l2cap_monitor_timeout(unsigned long arg)
+        bh_lock_sock(sk);
+        if (l2cap_pi(sk)->retry_count >=3D l2cap_pi(sk)->remote_max_tx) {
+                l2cap_send_disconn_req(l2cap_pi(sk)->conn, sk);
++               bh_unlock_sock(sk);
+                return;
+        }
 
 
-diff --git a/lib/sdp.c b/lib/sdp.c
-index 822ec1a..89505f9 100644
---- a/lib/sdp.c
-+++ b/lib/sdp.c
-@@ -4621,3 +4621,114 @@ uint16_t sdp_gen_tid(sdp_session_t *session)
- {
- 	return session->tid++;
- }
-+
-+/*
-+ * Set the supported features
-+ */
-+int sdp_set_supp_feat(sdp_record_t *rec, const sdp_list_t *sf)
-+{
-+	const sdp_list_t *p, *r;
-+	sdp_data_t *feat, *seq_feat;
-+	int seqlen, i;
-+	void **seqDTDs, **seqVals;
-+
-+	seqlen = sdp_list_len(sf);
-+	seqDTDs = malloc(seqlen * sizeof(void *));
-+	if (!seqDTDs)
-+		return -1;
-+	seqVals = malloc(seqlen * sizeof(void *));
-+	if (!seqVals) {
-+		free(seqDTDs);
-+		return -1;
-+	}
-+
-+	for (p = sf, i = 0; p; p = p->next, i++) {
-+		int plen, j;
-+		void **dtds, **vals;
-+
-+		plen = sdp_list_len(p->data);
-+		dtds = malloc(plen * sizeof(void *));
-+		if (!dtds)
-+			goto fail;
-+		vals = malloc(plen * sizeof(void *));
-+		if (!vals) {
-+			free(dtds);
-+			goto fail;
-+		}
-+		for (r = p->data, j = 0; r; r = r->next, j++) {
-+			sdp_data_t *data = (sdp_data_t*)r->data;
-+			dtds[j] = &data->dtd;
-+			vals[j] = &data->val;
-+		}
-+		feat = sdp_seq_alloc(dtds, vals, plen);
-+		free(dtds);
-+		free(vals);
-+		if (!feat)
-+			goto fail;
-+		seqDTDs[i] = &feat->dtd;
-+		seqVals[i] = feat;
-+	}
-+	seq_feat = sdp_seq_alloc(seqDTDs, seqVals, seqlen);
-+	if (!seq_feat)
-+		goto fail;
-+	sdp_attr_replace(rec, SDP_ATTR_SUPPORTED_FEATURES_LIST, seq_feat);
-+
-+	free(seqVals);
-+	free(seqDTDs);
-+	return 0;
-+
-+fail:
-+	free(seqVals);
-+	free(seqDTDs);
-+	return -1;
-+}
-+
-+/*
-+ * Get the supported features
-+ * If an error occurred -1 is returned and errno is set
-+ */
-+int sdp_get_supp_feat(const sdp_record_t *rec, sdp_list_t **seqp)
-+{
-+	sdp_data_t *sdpdata, *d;
-+	sdp_list_t *tseq;
-+	tseq = NULL;
-+
-+	sdpdata = sdp_data_get(rec, SDP_ATTR_SUPPORTED_FEATURES_LIST);
-+
-+	if (!sdpdata || sdpdata->dtd < SDP_SEQ8 || sdpdata->dtd > SDP_SEQ32)
-+		return sdp_get_uuidseq_attr(rec,
-+				     SDP_ATTR_SUPPORTED_FEATURES_LIST, seqp);
-+
-+	for (d = sdpdata->val.dataseq; d; d = d->next) {
-+		sdp_data_t *dd;
-+		sdp_list_t *subseq;
-+
-+		if (d->dtd < SDP_SEQ8 || d->dtd > SDP_SEQ32)
-+			goto fail;
-+		subseq = NULL;
-+		for (dd = d->val.dataseq; dd; dd = dd->next) {
-+			sdp_data_t *data;
-+			if (dd->dtd != SDP_UINT8 && dd->dtd != SDP_UINT16 &&
-+						dd->dtd != SDP_TEXT_STR8)
-+				goto fail;
-+			data = sdp_data_alloc(dd->dtd, &dd->val);
-+			if (data)
-+				subseq = sdp_list_append(subseq, data);
-+		}
-+		tseq = sdp_list_append(tseq, subseq);
-+	}
-+	*seqp = tseq;
-+	return 0;
-+
-+fail:
-+	while (tseq) {
-+		sdp_list_t * next;
-+
-+		next = tseq->next;
-+		sdp_list_free(tseq, free);
-+		tseq = next;
-+	}
-+	errno = EINVAL;
-+	return -1;
-+}
-+
-diff --git a/lib/sdp.h b/lib/sdp.h
-index 375261e..b493985 100644
---- a/lib/sdp.h
-+++ b/lib/sdp.h
-@@ -244,13 +244,16 @@ extern "C" {
- #define SDP_ATTR_GROUP_ID			0x0200
- #define SDP_ATTR_IP_SUBNET			0x0200
- #define SDP_ATTR_VERSION_NUM_LIST		0x0200
-+#define SDP_ATTR_SUPPORTED_FEATURES_LIST	0x0200
- #define SDP_ATTR_SVCDB_STATE			0x0201
- 
- #define SDP_ATTR_SERVICE_VERSION		0x0300
- #define SDP_ATTR_EXTERNAL_NETWORK		0x0301
- #define SDP_ATTR_SUPPORTED_DATA_STORES_LIST	0x0301
-+#define SDP_ATTR_DATA_EXCHANGE_SPEC		0x0301
- #define SDP_ATTR_FAX_CLASS1_SUPPORT		0x0302
- #define SDP_ATTR_REMOTE_AUDIO_VOLUME_CONTROL	0x0302
-+#define SDP_ATTR_MCAP_SUPPORTED_PROCEDURES	0x0302
- #define SDP_ATTR_FAX_CLASS20_SUPPORT		0x0303
- #define SDP_ATTR_SUPPORTED_FORMATS_LIST		0x0303
- #define SDP_ATTR_FAX_CLASS2_SUPPORT		0x0304
-diff --git a/lib/sdp_lib.h b/lib/sdp_lib.h
-index ee39df8..bebb745 100644
---- a/lib/sdp_lib.h
-+++ b/lib/sdp_lib.h
-@@ -585,6 +585,20 @@ static inline int sdp_get_icon_url(const sdp_record_t *rec, char *str, int len)
- 	return sdp_get_string_attr(rec, SDP_ATTR_ICON_URL, str, len);
- }
- 
-+/*
-+ * Set the supported features
-+ * sf should be a list of list with each feature data
-+ * Returns 0 on success -1 on fail
-+ */
-+int sdp_set_supp_feat(sdp_record_t *rec, const sdp_list_t *sf);
-+
-+/*
-+ * Get the supported features
-+ * seqp is set to a list of list with each feature data
-+ * Returns 0 on success, if an error occurred -1 is returned and errno is set
-+ */
-+int sdp_get_supp_feat(const sdp_record_t *rec, sdp_list_t **seqp);
-+
- sdp_record_t *sdp_extract_pdu(const uint8_t *pdata, int bufsize, int *scanned);
- sdp_record_t *sdp_copy_record(sdp_record_t *rec);
- 
+Also see complete patch attached.
+
+Regards,
+Andrei Emeltchenko
+
+--0016364c76a7297318047aadd8f7
+Content-Type: application/x-gzip;
+	name="0001-Bluetooth-Fix-locking-scheme-regression.patch.gz"
+Content-Disposition: attachment;
+	filename="0001-Bluetooth-Fix-locking-scheme-regression.patch.gz"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_g37406sa0
+
+H4sICLIUJksAAzAwMDEtQmx1ZXRvb3RoLUZpeC1sb2NraW5nLXNjaGVtZS1yZWdyZXNzaW9uLnBh
+dGNoAJ1S0W7TMBR9rr/iPLZKkyUhbZcA0wbbhEAgpCHxgFDk2DeNaWMX24FOwL/jZAKkwV6wrJv4
++Ojco3N9bU2Pgsp8k1O7ktQUkrhMUyIh5aZsJa2KTVFmq/VKFnhtNG7ogGyDNK2mjTxNM3YdZCpc
+aGlJ4aqnvRcd6Z3BEz5hCf3BzrXZKZ4I05+xS+6pGmWXyApckhjlSmR5lZdV/ghRGs7sZmg+kfAV
+Pry9ePf8xUc82w/kjfFdhWt1xN6IndJbuNCgJ1jaWnJOGZ0w9j70/E34yh2U9tbIQZCE7whkrbE4
+cN+hsVyLbiJp4+H5jjQLdAMuhBm0T3A1sUdGGwAZxOAO3DqCMDKUjqZGCV4N0jh4w15yrfBG7YY9
+D25u1FaTjE3bxs3t/wQWxzGDJn/S/IrgZJ8LfkgEviOsDBELpVV7csEO11uSIdtg1JH1IRI3jxZL
+pJC0p7tzvGBMqrZFHG+VBz/5t3zzbzwEJOmIsti0p02TJOvwisrTFlmaroti9PuQIoui6EHV83PE
+WZ6eLteIpu8GAXKeeyXwxSiJiVn3RitvbO1VT2bw80G7KeIw8jBvbrcLhlnT1eMLqF0oc7dbPA6Y
+ajG/kzioEYvPLHl7W0+DxtlT3L/sjae658faHxf4FhRmdwxHWtZSOWG0ri19vqc6wktMTaPZ6GTQ
+f3mZhdaD1ePvD4aQGViWrJM0KRj7CdCWqsKhAwAA
+--0016364c76a7297318047aadd8f7--
