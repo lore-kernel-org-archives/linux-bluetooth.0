@@ -1,38 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Tue, 15 Dec 2009 16:15:34 +0530
-Message-ID: <ba5648fa0912150245k65a7e9b9iffff1550883dae3c@mail.gmail.com>
-Subject: Audio Sink Support
-From: bluezprofile kernel <bluezprofile@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>, "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>, gustavo@padovan.org,
-	jprvita@gmail.com
+In-Reply-To: <1260813183.4041.15.camel@localhost.localdomain>
+References: <1251085520-9094-1-git-send-email-gustavo@las.ic.unicamp.br>
+	 <508e92ca0912140236t2c93a8a1q3aae97cf9e7bdfd@mail.gmail.com>
+	 <1260813183.4041.15.camel@localhost.localdomain>
+Date: Tue, 15 Dec 2009 10:03:16 +0200
+Message-ID: <508e92ca0912150003w6c12e0f5q9430c6fafb51e6ba@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Bluetooth: Add locking scheme to timeout callbacks.
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>, linux-bluetooth@vger.kernel.org,
+	gustavo@padovan.org
 Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
-I am trying to connect my A2DP enabled mobile with Bluez host in
-Ubuntu 9.10 karmic Koala.
-Bluez version : 4.51 (A2DP sink support added in 4.46)
-Kernel: 2.6.31
-Pulseaudio: 0.9.19 and 0.9.21
+Hi Marcel,
 
-I read following link to do
-http://jprvita.wordpress.com/2009/07/17/bluez-now-has-a2dp-sink-support/
+> I am actually forgiving when people send patches as attachments since
+> sometimes the corporate email servers are just stupid. However gzipped
+> patches is where I draw the line. Please re-send it.
 
-1) As mentioned in the link, I am able to connect to the audio sink and
-see the audio streaming in the hcidump. It disconnects in few seconds.
-Is this the current status of Audio sink or any other patches added
-2) Is any one played the song in host successfully with any player(There is
-no player to decode the stream) using sink support.
-Then please give me a hint to proceed.
-3) Some times my audio configuration setting is getting crashed once I
-play the song from mobile.
-Is this know issue?
+Please check patch below:
 
-Do I need to enable any flag on bluez/pulseaudio to succeed this?
-or any specific kernel patch do I need to apply?
-Please advice.
+Subject: [PATCH] Bluetooth: Fix locking scheme regression.
 
-Thanks,
-Nic Shen
+When locking was introduced the error path branch was not taken
+into account. Error was found in sparse code checking. Kudos to
+Jani Nikula.
+
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+Acked-by: Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
+---
+ net/bluetooth/l2cap.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index 947f8bb..6f5d98f 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -1208,6 +1208,7 @@ static void l2cap_monitor_timeout(unsigned long arg)
+ 	bh_lock_sock(sk);
+ 	if (l2cap_pi(sk)->retry_count >= l2cap_pi(sk)->remote_max_tx) {
+ 		l2cap_send_disconn_req(l2cap_pi(sk)->conn, sk);
++		bh_unlock_sock(sk);
+ 		return;
+ 	}
+
+-- 
+1.6.0.4
