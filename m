@@ -1,33 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1260906227.4b27e6f39cc7c@www.fastmail.com.br>
-Date: Tue, 15 Dec 2009 17:43:47 -0200
-From: dcobra@videam.com.br
+From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
 To: linux-bluetooth@vger.kernel.org
-Subject: Long delay to (re)connect a bluetooth mouse
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: marcel@holtmann.org, gustavo@padovan.org
+Subject: [PATCH 1/1] Bluetooth: fix unset of RemoteBusy flag
+Date: Tue, 15 Dec 2009 15:56:34 -0200
+Message-Id: <1260899794-5107-1-git-send-email-gustavo@las.ic.unicamp.br>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I have a bluetooth mouse that I have tried to use with a notebook running
-Kubuntu Jaunty, Kubuntu Karmic, and sidux 2009-03. With all three distros it
-always takes about 5 to 6 seconds for the mouse to connect (or reconnect,
-coming out of sleep mode). However, if I boot the notebook under Windows XP,
-the same mouse always (re)connects in under one second. Having to wait for 5-6
-seconds every time I bring the mouse out of sleep mode under Linux is quite
-annoying!
+RemoteBusy flag need to be unset before l2cap_ertm_send(), otherwise
+l2cap_ertm_send() will return without sending packets because it checks
+that flag before start sending.
 
-I have opened an Ubuntu bug and posted to the Ubuntu and sidux forums about
-this, but got exactly zero replies (the Ubuntu bug was opened back in May and
-nobody has even touched it!) So now I come to see if I have better luck here on
-this mailing list.
+Signed-off-by: Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
+---
+ net/bluetooth/l2cap.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-Specifically, I'd like to ask: is there some bluez configuration option I can
-try to speed up the mouse (re)connection, or is this 5-6 second delay the norm
-under Linux?
-
-The notebook is an Asus A8Js with a built-in bluetooth module, and the mouse is
-a Targus AMB02US. In my latest attempt, under sidux, I followed the directions
-found in http://www.sidux.com/index.php?module=Wikula&tag=hwBluetooth to set it
-up. Please let me know if there is any additional information I should provide
-about my system to help diagnose this problem.
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index 8a2b3d3..2a2da9d 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -3469,8 +3469,8 @@ static inline int l2cap_data_channel_sframe(struct sock *sk, u16 rx_control, str
+ 					&& (pi->unacked_frames > 0))
+ 				__mod_retrans_timer();
+ 
+-			l2cap_ertm_send(sk);
+ 			pi->conn_state &= ~L2CAP_CONN_REMOTE_BUSY;
++			l2cap_ertm_send(sk);
+ 		}
+ 		break;
+ 
+-- 
+1.6.4.4
