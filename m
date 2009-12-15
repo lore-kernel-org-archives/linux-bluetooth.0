@@ -1,23 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <217103.89543.qm@web52606.mail.re2.yahoo.com>
-Date: Tue, 15 Dec 2009 12:52:45 -0800 (PST)
-From: Ed Tsang <netdesign_98@yahoo.com>
-Subject: obexd - retrieve remote BT address
-To: Bluettooth Linux <linux-bluetooth@vger.kernel.org>
+Message-ID: <1260906227.4b27e6f39cc7c@www.fastmail.com.br>
+Date: Tue, 15 Dec 2009 17:43:47 -0200
+From: dcobra@videam.com.br
+To: linux-bluetooth@vger.kernel.org
+Subject: Long delay to (re)connect a bluetooth mouse
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,  my application is:
-1. remote device send it a file via opp.
-2. my app will send back some file to the remote device base on the file name, file type and file content of the received file.
-  obexd is doing fine, received the file and put it in the proper directory. The critical thing I need now is the bluetooth address to associate it with the received file.
-  I tried look into the obex.c ... but could not easily figure out how to get the back the bluetooth address. 
-  Any hint from our guru?
+I have a bluetooth mouse that I have tried to use with a notebook running
+Kubuntu Jaunty, Kubuntu Karmic, and sidux 2009-03. With all three distros it
+always takes about 5 to 6 seconds for the mouse to connect (or reconnect,
+coming out of sleep mode). However, if I boot the notebook under Windows XP,
+the same mouse always (re)connects in under one second. Having to wait for 5-6
+seconds every time I bring the mouse out of sleep mode under Linux is quite
+annoying!
 
-Ed
+I have opened an Ubuntu bug and posted to the Ubuntu and sidux forums about
+this, but got exactly zero replies (the Ubuntu bug was opened back in May and
+nobody has even touched it!) So now I come to see if I have better luck here on
+this mailing list.
 
+Specifically, I'd like to ask: is there some bluez configuration option I can
+try to speed up the mouse (re)connection, or is this 5-6 second delay the norm
+under Linux?
 
-      __________________________________________________________________
-The new Internet Explorer® 8 - Faster, safer, easier.  Optimized for Yahoo!  Get it Now for Free! at http://downloads.yahoo.com/ca/internetexplorer/
+The notebook is an Asus A8Js with a built-in bluetooth module, and the mouse is
+a Targus AMB02US. In my latest attempt, under sidux, I followed the directions
+found in http://www.sidux.com/index.php?module=Wikula&tag=hwBluetooth to set it
+up. Please let me know if there is any additional information I should provide
+about my system to help diagnose this problem.
