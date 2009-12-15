@@ -1,34 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
+MIME-Version: 1.0
+Date: Tue, 15 Dec 2009 16:15:34 +0530
+Message-ID: <ba5648fa0912150245k65a7e9b9iffff1550883dae3c@mail.gmail.com>
+Subject: Audio Sink Support
+From: bluezprofile kernel <bluezprofile@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, gustavo@padovan.org
-Subject: [PATCH 1/1] Bluetooth: fix unset of RemoteBusy flag
-Date: Tue, 15 Dec 2009 15:56:34 -0200
-Message-Id: <1260899794-5107-1-git-send-email-gustavo@las.ic.unicamp.br>
+Cc: Marcel Holtmann <marcel@holtmann.org>, "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>, gustavo@padovan.org,
+	jprvita@gmail.com
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-RemoteBusy flag need to be unset before l2cap_ertm_send(), otherwise
-l2cap_ertm_send() will return without sending packets because it checks
-that flag before start sending.
+Hi All,
+I am trying to connect my A2DP enabled mobile with Bluez host in
+Ubuntu 9.10 karmic Koala.
+Bluez version : 4.51 (A2DP sink support added in 4.46)
+Kernel: 2.6.31
+Pulseaudio: 0.9.19 and 0.9.21
 
-Signed-off-by: Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
----
- net/bluetooth/l2cap.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+I read following link to do
+http://jprvita.wordpress.com/2009/07/17/bluez-now-has-a2dp-sink-support/
 
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 8a2b3d3..2a2da9d 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -3469,8 +3469,8 @@ static inline int l2cap_data_channel_sframe(struct sock *sk, u16 rx_control, str
- 					&& (pi->unacked_frames > 0))
- 				__mod_retrans_timer();
- 
--			l2cap_ertm_send(sk);
- 			pi->conn_state &= ~L2CAP_CONN_REMOTE_BUSY;
-+			l2cap_ertm_send(sk);
- 		}
- 		break;
- 
--- 
-1.6.4.4
+1) As mentioned in the link, I am able to connect to the audio sink and
+see the audio streaming in the hcidump. It disconnects in few seconds.
+Is this the current status of Audio sink or any other patches added
+2) Is any one played the song in host successfully with any player(There is
+no player to decode the stream) using sink support.
+Then please give me a hint to proceed.
+3) Some times my audio configuration setting is getting crashed once I
+play the song from mobile.
+Is this know issue?
+
+Do I need to enable any flag on bluez/pulseaudio to succeed this?
+or any specific kernel patch do I need to apply?
+Please advice.
+
+Thanks,
+Nic Shen
