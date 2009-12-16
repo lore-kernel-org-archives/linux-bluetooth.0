@@ -1,35 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH]btusb:Prevent illtimed autosuspend
+Subject: Re: RFC: Allow Bluez to select flushable or non-flushable ACL
+ packets  with L2CAP_LM_RELIABLE
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Matthew Garrett <mjg59@srcf.ucam.org>
-Cc: Oliver Neukum <oliver@neukum.org>, linux-usb@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-In-Reply-To: <20091216182600.GA20031@srcf.ucam.org>
-References: <200912161923.43127.oliver@neukum.org>
-	 <20091216182600.GA20031@srcf.ucam.org>
+To: Nick Pelly <npelly@google.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <35c90d960912161359u2b3f9b2fi875288896a7a8478@mail.gmail.com>
+References: <35c90d960912081950t135e3f10m8848e54fde1e596f@mail.gmail.com>
+	 <1260335175.2901.20.camel@violet>
+	 <35c90d960912082213s26fb0ebse75ce85d43213d9@mail.gmail.com>
+	 <1260482634.2901.70.camel@violet>
+	 <35c90d960912161359u2b3f9b2fi875288896a7a8478@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 16 Dec 2009 15:37:57 -0800
-Message-Id: <1261006677.4041.41.camel@localhost.localdomain>
+Date: Wed, 16 Dec 2009 15:36:36 -0800
+Message-Id: <1261006596.4041.39.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Oliver and Matthew,
+Hi Nick,
 
-> > commit 0b72b0a05c1d950e4f35520926cc36bc01fb998a
-> > Author: Oliver Neukum <oliver@neukum.org>
-> > Date:   Mon Dec 14 22:09:49 2009 +0100
-> > 
-> >     btusb:Prevent illtimed autosuspend
-> >     
-> >     The device must be marked busy as it recieves data.
-> >     
-> >     Signed-off-by: Oliver Neukum <oliver@neukum.org>
+> >> >> Right now Bluez always requests flushable ACL packets (but does not
+> >> >> set a flush timeout, so effectively they are non-flushable):
+> >> >>
+> >> >> However it is desirable to use an ACL flush timeout on A2DP packets so
+> >> >> that if the ACL packets block for some reason then the LM can flush
+> >> >> them to make room for newer packets.
+> >> >>
+> >> >> Is it reasonable for Bluez to use the 0x00 ACL packet boundary flag by
+> >> >> default (non-flushable packet), and let userspace request flushable
+> >> >> packets on A2DP L2CAP sockets with the socket option
+> >> >> L2CAP_LM_RELIABLE.
+> >> >
+> >> > the reliable option has a different meaning. It comes back from the old
+> >> > Bluetooth 1.1 qualification days where we had to tests on L2CAP that had
+> >> > to confirm that we can detect malformed packets and report them. These
+> >> > days it is just fine to drop them.
+> >>
+> >> Got it, how about introducing
+> >>
+> >> #define L2CAP_LM_FLUSHABLE 0x0040
+> >
+> > that l2cap_sock_setsockopt_old() sets this didn't give you a hint that
+> > we might wanna deprecate this socket options ;)
+> >
+> > I need to read up on the flushable stuff, but in the end it deserves its
+> > own socket option. Also an ioctl() to actually trigger Enhanced flush
+> > might be needed.
+> >
+> >> struct l2cap_pinfo {
+> >>    ...
+> >>    __u8 flushable;
+> >> }
+> >
+> > Sure. In the long run we need to turn this into a bitmask. We are just
+> > wasting memory here.
 > 
-> Tested-by: Matthew Garrett <mjg@redhat.com>
+> Attached is an updated patch, that checks the LMP features bitmask
+> before using the new non-flushable packet type.
+> 
+> I am still using L2CAP_LM_FLUSHABLE socket option in
+> l2cap_sock_setsockopt_old(), which I don't think you are happy with.
+> So how about a new option:
+> 
+> SOL_L2CAP, L2CAP_ACL_FLUSH
+> which has a default value of 0, and can be set to 1 to make the ACL
+> data sent by this L2CAP socket flushable.
+> 
+> In a later commit we would then add
+> SOL_ACL, ACL_FLUSH_TIMEOUT
+> That is used to set an automatic flush timeout for the ACL link on a
+> L2CAP socket. Note that SOL_ACL is new.
 
-thanks for figuring this out. I will queue this patch up along with the
-other changes and send them to Dave this week.
+can I stop you right here (without even looking at the patch). We do
+have the generic SOL_BLUETOOTH that you should be using. So adding
+SOL_ACL is not a viable option at all.
+
+Remember that it would also be nice if this works with RFCOMM sockets.
+Even if the usefulness is limited for these sockets.
 
 Regards
 
