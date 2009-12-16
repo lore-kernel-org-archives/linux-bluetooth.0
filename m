@@ -1,217 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 16 Dec 2009 18:26:00 +0000
+From: Matthew Garrett <mjg59@srcf.ucam.org>
+To: Oliver Neukum <oliver@neukum.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-usb@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH]btusb:Prevent illtimed autosuspend
+Message-ID: <20091216182600.GA20031@srcf.ucam.org>
+References: <200912161923.43127.oliver@neukum.org>
 MIME-Version: 1.0
-In-Reply-To: <1260482634.2901.70.camel@violet>
-References: <35c90d960912081950t135e3f10m8848e54fde1e596f@mail.gmail.com>
-	<1260335175.2901.20.camel@violet> <35c90d960912082213s26fb0ebse75ce85d43213d9@mail.gmail.com>
-	<1260482634.2901.70.camel@violet>
-From: Nick Pelly <npelly@google.com>
-Date: Wed, 16 Dec 2009 13:59:18 -0800
-Message-ID: <35c90d960912161359u2b3f9b2fi875288896a7a8478@mail.gmail.com>
-Subject: Re: RFC: Allow Bluez to select flushable or non-flushable ACL packets
-	with L2CAP_LM_RELIABLE
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=000e0cd6aee8783cdb047adf9ffe
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <200912161923.43127.oliver@neukum.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---000e0cd6aee8783cdb047adf9ffe
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+On Wed, Dec 16, 2009 at 07:23:43PM +0100, Oliver Neukum wrote:
+> commit 0b72b0a05c1d950e4f35520926cc36bc01fb998a
+> Author: Oliver Neukum <oliver@neukum.org>
+> Date:   Mon Dec 14 22:09:49 2009 +0100
+> 
+>     btusb:Prevent illtimed autosuspend
+>     
+>     The device must be marked busy as it recieves data.
+>     
+>     Signed-off-by: Oliver Neukum <oliver@neukum.org>
 
-Hi Marcel,
+Tested-by: Matthew Garrett <mjg@redhat.com>
 
-On Thu, Dec 10, 2009 at 2:03 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
-> Hi Nick,
->
->> >> Right now Bluez always requests flushable ACL packets (but does not
->> >> set a flush timeout, so effectively they are non-flushable):
->> >>
->> >> However it is desirable to use an ACL flush timeout on A2DP packets s=
-o
->> >> that if the ACL packets block for some reason then the LM can flush
->> >> them to make room for newer packets.
->> >>
->> >> Is it reasonable for Bluez to use the 0x00 ACL packet boundary flag b=
-y
->> >> default (non-flushable packet), and let userspace request flushable
->> >> packets on A2DP L2CAP sockets with the socket option
->> >> L2CAP_LM_RELIABLE.
->> >
->> > the reliable option has a different meaning. It comes back from the ol=
-d
->> > Bluetooth 1.1 qualification days where we had to tests on L2CAP that h=
-ad
->> > to confirm that we can detect malformed packets and report them. These
->> > days it is just fine to drop them.
->>
->> Got it, how about introducing
->>
->> #define L2CAP_LM_FLUSHABLE 0x0040
->
-> that l2cap_sock_setsockopt_old() sets this didn't give you a hint that
-> we might wanna deprecate this socket options ;)
->
-> I need to read up on the flushable stuff, but in the end it deserves its
-> own socket option. Also an ioctl() to actually trigger Enhanced flush
-> might be needed.
->
->> struct l2cap_pinfo {
->> =A0 =A0...
->> =A0 =A0__u8 flushable;
->> }
->
-> Sure. In the long run we need to turn this into a bitmask. We are just
-> wasting memory here.
-
-Attached is an updated patch, that checks the LMP features bitmask
-before using the new non-flushable packet type.
-
-I am still using L2CAP_LM_FLUSHABLE socket option in
-l2cap_sock_setsockopt_old(), which I don't think you are happy with.
-So how about a new option:
-
-SOL_L2CAP, L2CAP_ACL_FLUSH
-which has a default value of 0, and can be set to 1 to make the ACL
-data sent by this L2CAP socket flushable.
-
-In a later commit we would then add
-SOL_ACL, ACL_FLUSH_TIMEOUT
-That is used to set an automatic flush timeout for the ACL link on a
-L2CAP socket. Note that SOL_ACL is new.
-
-But maybe this is not what you had in mind, so I'm looking for your
-advice before I implement this.
-
-Nick
-
---000e0cd6aee8783cdb047adf9ffe
-Content-Type: application/octet-stream;
-	name="0001-Bluetooth-Use-non-flushable-pb-flag-by-default-for-A.patch"
-Content-Disposition: attachment;
-	filename="0001-Bluetooth-Use-non-flushable-pb-flag-by-default-for-A.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_g3amw7cp0
-
-RnJvbSBjZTFkM2FiNGRmZTNmYzU4ZjFlMTg3NTgxYjRmOGM3MmZiNDhhMzA2IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBOaWNrIFBlbGx5IDxucGVsbHlAZ29vZ2xlLmNvbT4KRGF0ZTog
-VHVlLCA4IERlYyAyMDA5IDE5OjQyOjIxIC0wODAwClN1YmplY3Q6IFtQQVRDSF0gQmx1ZXRvb3Ro
-OiBVc2Ugbm9uLWZsdXNoYWJsZSBwYiBmbGFnIGJ5IGRlZmF1bHQgZm9yIEFDTCBkYXRhIG9uIGNh
-cGFibGUgY2hpcHNldHMuCgpXaXRoIEJsdWV0b290aCAyLjEgQUNMIHBhY2tldHMgY2FuIGJlIGZs
-dXNoYWJsZSBvciBub24tZmx1c2hhYmxlLiBUaGlzIGNvbW1pdAptYWtlcyBBQ0wgZGF0YSBwYWNr
-ZXRzIG5vbi1mbHVzaGFibGUgYnkgZGVmYXVsdCBvbiBjb21wYXRpYmxlIGNoaXBzZXRzLCBhbmQK
-YWRkcyB0aGUgTDJDQVBfTE1fRkxVU0hBQkxFIHNvY2tldCBvcHRpb24gdG8gZXhwbGljaXRseSBy
-ZXF1ZXN0IGZsdXNoYWJsZSBBQ0wKZGF0YSBwYWNrZXRzIGZvciBhIGdpdmVuIEwyQ0FQIHNvY2tl
-dC4gVGhpcyBpcyB1c2VmdWwgZm9yIEEyRFAgZGF0YSB3aGljaCBjYW4KYmUgc2FmZWx5IGRpc2Nh
-cmRlZCBpZiBpdCBjYW4gbm90IGJlIGRlbGl2ZXJlZCB3aXRoaW4gYSBzaG9ydCB0aW1lICh3aGls
-ZQpvdGhlciBBQ0wgZGF0YSBzaG91bGQgbm90IGJlIGRpc2NhcmRlZCkuCgpOb3RlIHRoYXQgbWFr
-aW5nIEFDTCBkYXRhIGZsdXNoYWJsZSBoYXMgbm8gZWZmZWN0IHVubGVzcyB0aGUgYXV0b21hdGlj
-IGZsdXNoCnRpbWVvdXQgZm9yIHRoYXQgQUNMIGxpbmsgaXMgY2hhbmdlZCBmcm9tIGl0cyBkZWZh
-dWx0IG9mIDAgKGluZmluaXRlKS4KClNpZ25lZC1vZmYtYnk6IE5pY2sgUGVsbHkgPG5wZWxseUBn
-b29nbGUuY29tPgotLS0KIGluY2x1ZGUvbmV0L2JsdWV0b290aC9oY2kuaCAgICAgIHwgICAgNCAr
-KysrCiBpbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuaCB8ICAgIDEgKwogaW5jbHVkZS9u
-ZXQvYmx1ZXRvb3RoL2wyY2FwLmggICAgfCAgICAyICsrCiBuZXQvYmx1ZXRvb3RoL2hjaV9jb3Jl
-LmMgICAgICAgICB8ICAgIDYgKysrKy0tCiBuZXQvYmx1ZXRvb3RoL2wyY2FwLmMgICAgICAgICAg
-ICB8ICAgMjQgKysrKysrKysrKysrKysrKysrKysrLS0tCiA1IGZpbGVzIGNoYW5nZWQsIDMyIGlu
-c2VydGlvbnMoKyksIDUgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9uZXQvYmx1
-ZXRvb3RoL2hjaS5oIGIvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2hjaS5oCmluZGV4IDVkYmQ2YTQu
-LjQ0YmIzNGMgMTAwNjQ0Ci0tLSBhL2luY2x1ZGUvbmV0L2JsdWV0b290aC9oY2kuaAorKysgYi9p
-bmNsdWRlL25ldC9ibHVldG9vdGgvaGNpLmgKQEAgLTE0MiwxMSArMTQyLDE0IEBAIGVudW0gewog
-I2RlZmluZSBFRFJfRVNDT19NQVNLICAoRVNDT18yRVYzIHwgRVNDT18zRVYzIHwgRVNDT18yRVY1
-IHwgRVNDT18zRVY1KQogCiAvKiBBQ0wgZmxhZ3MgKi8KKyNkZWZpbmUgQUNMX1NUQVJUX05PX0ZM
-VVNICTB4MDAKICNkZWZpbmUgQUNMX0NPTlQJCTB4MDEKICNkZWZpbmUgQUNMX1NUQVJUCQkweDAy
-CiAjZGVmaW5lIEFDTF9BQ1RJVkVfQkNBU1QJMHgwNAogI2RlZmluZSBBQ0xfUElDT19CQ0FTVAkJ
-MHgwOAogCisjZGVmaW5lIEFDTF9QQl9NQVNLCShBQ0xfQ09OVCB8IEFDTF9TVEFSVCkKKwogLyog
-QmFzZWJhbmQgbGlua3MgKi8KICNkZWZpbmUgU0NPX0xJTksJMHgwMAogI2RlZmluZSBBQ0xfTElO
-SwkweDAxCkBAIC0xODUsNiArMTg4LDcgQEAgZW51bSB7CiAjZGVmaW5lIExNUF9FRFJfRVNDT18z
-TQkweDQwCiAjZGVmaW5lIExNUF9FRFJfM1NfRVNDTwkweDgwCiAKKyNkZWZpbmUgTE1QX05PX0ZM
-VVNICTB4MDEKICNkZWZpbmUgTE1QX1NJTVBMRV9QQUlSCTB4MDgKIAogLyogQ29ubmVjdGlvbiBt
-b2RlcyAqLwpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmggYi9p
-bmNsdWRlL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuaAppbmRleCBlZDE2ZWZiLi45MDcyZDY0IDEw
-MDY0NAotLS0gYS9pbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuaAorKysgYi9pbmNsdWRl
-L25ldC9ibHVldG9vdGgvaGNpX2NvcmUuaApAQCAtNDY4LDYgKzQ2OCw3IEBAIHZvaWQgaGNpX2Nv
-bm5fZGVsX3N5c2ZzKHN0cnVjdCBoY2lfY29ubiAqY29ubik7CiAjZGVmaW5lIGxtcF9zbmlmZnN1
-YnJfY2FwYWJsZShkZXYpICgoZGV2KS0+ZmVhdHVyZXNbNV0gJiBMTVBfU05JRkZfU1VCUikKICNk
-ZWZpbmUgbG1wX2VzY29fY2FwYWJsZShkZXYpICAgICAgKChkZXYpLT5mZWF0dXJlc1szXSAmIExN
-UF9FU0NPKQogI2RlZmluZSBsbXBfc3NwX2NhcGFibGUoZGV2KSAgICAgICAoKGRldiktPmZlYXR1
-cmVzWzZdICYgTE1QX1NJTVBMRV9QQUlSKQorI2RlZmluZSBsbXBfbm9fZmx1c2hfY2FwYWJsZShk
-ZXYpICAoKGRldiktPmZlYXR1cmVzWzZdICYgTE1QX05PX0ZMVVNIKQogCiAvKiAtLS0tLSBIQ0kg
-cHJvdG9jb2xzIC0tLS0tICovCiBzdHJ1Y3QgaGNpX3Byb3RvIHsKZGlmZiAtLWdpdCBhL2luY2x1
-ZGUvbmV0L2JsdWV0b290aC9sMmNhcC5oIGIvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2wyY2FwLmgK
-aW5kZXggZjU2NmFhMS4uOWU1OGU0MyAxMDA2NDQKLS0tIGEvaW5jbHVkZS9uZXQvYmx1ZXRvb3Ro
-L2wyY2FwLmgKKysrIGIvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2wyY2FwLmgKQEAgLTYyLDYgKzYy
-LDcgQEAgc3RydWN0IGwyY2FwX2Nvbm5pbmZvIHsKICNkZWZpbmUgTDJDQVBfTE1fVFJVU1RFRAkw
-eDAwMDgKICNkZWZpbmUgTDJDQVBfTE1fUkVMSUFCTEUJMHgwMDEwCiAjZGVmaW5lIEwyQ0FQX0xN
-X1NFQ1VSRQkJMHgwMDIwCisjZGVmaW5lIEwyQ0FQX0xNX0ZMVVNIQUJMRQkweDAwNDAKIAogLyog
-TDJDQVAgY29tbWFuZCBjb2RlcyAqLwogI2RlZmluZSBMMkNBUF9DT01NQU5EX1JFSiAweDAxCkBA
-IC0yNDUsNiArMjQ2LDcgQEAgc3RydWN0IGwyY2FwX3BpbmZvIHsKIAlfX3U4ICAgICAgICAgICAg
-c2VjX2xldmVsOwogCV9fdTgJCXJvbGVfc3dpdGNoOwogCV9fdTggICAgICAgICAgICBmb3JjZV9y
-ZWxpYWJsZTsKKwlfX3U4ICAgICAgICAgICAgZmx1c2hhYmxlOwogCiAJX191OAkJY29uZl9yZXFb
-NjRdOwogCV9fdTgJCWNvbmZfbGVuOwpkaWZmIC0tZ2l0IGEvbmV0L2JsdWV0b290aC9oY2lfY29y
-ZS5jIGIvbmV0L2JsdWV0b290aC9oY2lfY29yZS5jCmluZGV4IGNkMDYxNTEuLmFlYWYwN2YgMTAw
-NjQ0Ci0tLSBhL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuYworKysgYi9uZXQvYmx1ZXRvb3RoL2hj
-aV9jb3JlLmMKQEAgLTEyMDAsNyArMTIwMCw3IEBAIGludCBoY2lfc2VuZF9hY2woc3RydWN0IGhj
-aV9jb25uICpjb25uLCBzdHJ1Y3Qgc2tfYnVmZiAqc2tiLCBfX3UxNiBmbGFncykKIAogCXNrYi0+
-ZGV2ID0gKHZvaWQgKikgaGRldjsKIAlidF9jYihza2IpLT5wa3RfdHlwZSA9IEhDSV9BQ0xEQVRB
-X1BLVDsKLQloY2lfYWRkX2FjbF9oZHIoc2tiLCBjb25uLT5oYW5kbGUsIGZsYWdzIHwgQUNMX1NU
-QVJUKTsKKwloY2lfYWRkX2FjbF9oZHIoc2tiLCBjb25uLT5oYW5kbGUsIGZsYWdzKTsKIAogCWlm
-ICghKGxpc3QgPSBza2Jfc2hpbmZvKHNrYiktPmZyYWdfbGlzdCkpIHsKIAkJLyogTm9uIGZyYWdt
-ZW50ZWQgKi8KQEAgLTEyMTcsMTIgKzEyMTcsMTQgQEAgaW50IGhjaV9zZW5kX2FjbChzdHJ1Y3Qg
-aGNpX2Nvbm4gKmNvbm4sIHN0cnVjdCBza19idWZmICpza2IsIF9fdTE2IGZsYWdzKQogCQlzcGlu
-X2xvY2tfYmgoJmNvbm4tPmRhdGFfcS5sb2NrKTsKIAogCQlfX3NrYl9xdWV1ZV90YWlsKCZjb25u
-LT5kYXRhX3EsIHNrYik7CisJCWZsYWdzICY9IH5BQ0xfUEJfTUFTSzsKKwkJZmxhZ3MgfD0gQUNM
-X0NPTlQ7CiAJCWRvIHsKIAkJCXNrYiA9IGxpc3Q7IGxpc3QgPSBsaXN0LT5uZXh0OwogCiAJCQlz
-a2ItPmRldiA9ICh2b2lkICopIGhkZXY7CiAJCQlidF9jYihza2IpLT5wa3RfdHlwZSA9IEhDSV9B
-Q0xEQVRBX1BLVDsKLQkJCWhjaV9hZGRfYWNsX2hkcihza2IsIGNvbm4tPmhhbmRsZSwgZmxhZ3Mg
-fCBBQ0xfQ09OVCk7CisJCQloY2lfYWRkX2FjbF9oZHIoc2tiLCBjb25uLT5oYW5kbGUsIGZsYWdz
-KTsKIAogCQkJQlRfREJHKCIlcyBmcmFnICVwIGxlbiAlZCIsIGhkZXYtPm5hbWUsIHNrYiwgc2ti
-LT5sZW4pOwogCmRpZmYgLS1naXQgYS9uZXQvYmx1ZXRvb3RoL2wyY2FwLmMgYi9uZXQvYmx1ZXRv
-b3RoL2wyY2FwLmMKaW5kZXggY2E0ZDNiNC4uOTBkZmFmMyAxMDA2NDQKLS0tIGEvbmV0L2JsdWV0
-b290aC9sMmNhcC5jCisrKyBiL25ldC9ibHVldG9vdGgvbDJjYXAuYwpAQCAtMzE5LDEzICszMTks
-MTkgQEAgc3RhdGljIGlubGluZSB1OCBsMmNhcF9nZXRfaWRlbnQoc3RydWN0IGwyY2FwX2Nvbm4g
-KmNvbm4pCiBzdGF0aWMgaW5saW5lIGludCBsMmNhcF9zZW5kX2NtZChzdHJ1Y3QgbDJjYXBfY29u
-biAqY29ubiwgdTggaWRlbnQsIHU4IGNvZGUsIHUxNiBsZW4sIHZvaWQgKmRhdGEpCiB7CiAJc3Ry
-dWN0IHNrX2J1ZmYgKnNrYiA9IGwyY2FwX2J1aWxkX2NtZChjb25uLCBjb2RlLCBpZGVudCwgbGVu
-LCBkYXRhKTsKKwl1OCBmbGFnczsKIAogCUJUX0RCRygiY29kZSAweCUyLjJ4IiwgY29kZSk7CiAK
-IAlpZiAoIXNrYikKIAkJcmV0dXJuIC1FTk9NRU07CiAKLQlyZXR1cm4gaGNpX3NlbmRfYWNsKGNv
-bm4tPmhjb24sIHNrYiwgMCk7CisJaWYgKGxtcF9ub19mbHVzaF9jYXBhYmxlKGNvbm4tPmhkZXYp
-KQorCQlmbGFncyA9IEFDTF9TVEFSVF9OT19GTFVTSDsKKwllbHNlCisJCWZsYWdzID0gQUNMX1NU
-QVJUOworCisJcmV0dXJuIGhjaV9zZW5kX2FjbChjb25uLT5oY29uLCBza2IsIGZsYWdzKTsKIH0K
-IAogc3RhdGljIHZvaWQgbDJjYXBfZG9fc3RhcnQoc3RydWN0IHNvY2sgKnNrKQpAQCAtNzE0LDEy
-ICs3MjAsMTQgQEAgc3RhdGljIHZvaWQgbDJjYXBfc29ja19pbml0KHN0cnVjdCBzb2NrICpzaywg
-c3RydWN0IHNvY2sgKnBhcmVudCkKIAkJcGktPnNlY19sZXZlbCA9IGwyY2FwX3BpKHBhcmVudCkt
-PnNlY19sZXZlbDsKIAkJcGktPnJvbGVfc3dpdGNoID0gbDJjYXBfcGkocGFyZW50KS0+cm9sZV9z
-d2l0Y2g7CiAJCXBpLT5mb3JjZV9yZWxpYWJsZSA9IGwyY2FwX3BpKHBhcmVudCktPmZvcmNlX3Jl
-bGlhYmxlOworCQlwaS0+Zmx1c2hhYmxlID0gbDJjYXBfcGkocGFyZW50KS0+Zmx1c2hhYmxlOwog
-CX0gZWxzZSB7CiAJCXBpLT5pbXR1ID0gTDJDQVBfREVGQVVMVF9NVFU7CiAJCXBpLT5vbXR1ID0g
-MDsKIAkJcGktPnNlY19sZXZlbCA9IEJUX1NFQ1VSSVRZX0xPVzsKIAkJcGktPnJvbGVfc3dpdGNo
-ID0gMDsKIAkJcGktPmZvcmNlX3JlbGlhYmxlID0gMDsKKwkJcGktPmZsdXNoYWJsZSA9IDA7CiAJ
-fQogCiAJLyogRGVmYXVsdCBjb25maWcgb3B0aW9ucyAqLwpAQCAtMTExNiw2ICsxMTI0LDcgQEAg
-c3RhdGljIGlubGluZSBpbnQgbDJjYXBfZG9fc2VuZChzdHJ1Y3Qgc29jayAqc2ssIHN0cnVjdCBt
-c2doZHIgKm1zZywgaW50IGxlbikKIAlzdHJ1Y3Qgc2tfYnVmZiAqc2tiLCAqKmZyYWc7CiAJaW50
-IGVyciwgaGxlbiwgY291bnQsIHNlbnQ9MDsKIAlzdHJ1Y3QgbDJjYXBfaGRyICpsaDsKKwl1MTYg
-ZmxhZ3M7CiAKIAlCVF9EQkcoInNrICVwIGxlbiAlZCIsIHNrLCBsZW4pOwogCkBAIC0xMTY4LDcg
-KzExNzcsMTIgQEAgc3RhdGljIGlubGluZSBpbnQgbDJjYXBfZG9fc2VuZChzdHJ1Y3Qgc29jayAq
-c2ssIHN0cnVjdCBtc2doZHIgKm1zZywgaW50IGxlbikKIAkJZnJhZyA9ICYoKmZyYWcpLT5uZXh0
-OwogCX0KIAotCWlmICgoZXJyID0gaGNpX3NlbmRfYWNsKGNvbm4tPmhjb24sIHNrYiwgMCkpIDwg
-MCkKKwlpZiAobG1wX25vX2ZsdXNoX2NhcGFibGUoY29ubi0+aGRldikgJiYgIWwyY2FwX3BpKHNr
-KS0+Zmx1c2hhYmxlKQorCQlmbGFncyA9IEFDTF9TVEFSVF9OT19GTFVTSDsKKwllbHNlCisJCWZs
-YWdzID0gQUNMX1NUQVJUOworCisJaWYgKChlcnIgPSBoY2lfc2VuZF9hY2woY29ubi0+aGNvbiwg
-c2tiLCBmbGFncykpIDwgMCkKIAkJZ290byBmYWlsOwogCiAJcmV0dXJuIHNlbnQ7CkBAIC0xMjc3
-LDYgKzEyOTEsNyBAQCBzdGF0aWMgaW50IGwyY2FwX3NvY2tfc2V0c29ja29wdF9vbGQoc3RydWN0
-IHNvY2tldCAqc29jaywgaW50IG9wdG5hbWUsIGNoYXIgX191cwogCiAJCWwyY2FwX3BpKHNrKS0+
-cm9sZV9zd2l0Y2ggICAgPSAob3B0ICYgTDJDQVBfTE1fTUFTVEVSKTsKIAkJbDJjYXBfcGkoc2sp
-LT5mb3JjZV9yZWxpYWJsZSA9IChvcHQgJiBMMkNBUF9MTV9SRUxJQUJMRSk7CisJCWwyY2FwX3Bp
-KHNrKS0+Zmx1c2hhYmxlID0gKG9wdCAmIEwyQ0FQX0xNX0ZMVVNIQUJMRSk7CiAJCWJyZWFrOwog
-CiAJZGVmYXVsdDoKQEAgLTE0MDMsNiArMTQxOCw5IEBAIHN0YXRpYyBpbnQgbDJjYXBfc29ja19n
-ZXRzb2Nrb3B0X29sZChzdHJ1Y3Qgc29ja2V0ICpzb2NrLCBpbnQgb3B0bmFtZSwgY2hhciBfX3Vz
-CiAJCWlmIChsMmNhcF9waShzayktPmZvcmNlX3JlbGlhYmxlKQogCQkJb3B0IHw9IEwyQ0FQX0xN
-X1JFTElBQkxFOwogCisJCWlmIChsMmNhcF9waShzayktPmZsdXNoYWJsZSkKKwkJCW9wdCB8PSBM
-MkNBUF9MTV9GTFVTSEFCTEU7CisKIAkJaWYgKHB1dF91c2VyKG9wdCwgKHUzMiBfX3VzZXIgKikg
-b3B0dmFsKSkKIAkJCWVyciA9IC1FRkFVTFQ7CiAJCWJyZWFrOwpAQCAtMjYxMyw3ICsyNjMxLDcg
-QEAgc3RhdGljIGludCBsMmNhcF9yZWN2X2FjbGRhdGEoc3RydWN0IGhjaV9jb25uICpoY29uLCBz
-dHJ1Y3Qgc2tfYnVmZiAqc2tiLCB1MTYgZmwKIAogCUJUX0RCRygiY29ubiAlcCBsZW4gJWQgZmxh
-Z3MgMHgleCIsIGNvbm4sIHNrYi0+bGVuLCBmbGFncyk7CiAKLQlpZiAoZmxhZ3MgJiBBQ0xfU1RB
-UlQpIHsKKwlpZiAoIShmbGFncyAmIEFDTF9DT05UKSkgewogCQlzdHJ1Y3QgbDJjYXBfaGRyICpo
-ZHI7CiAJCWludCBsZW47CiAKLS0gCjEuNi41LjMKCg==
---000e0cd6aee8783cdb047adf9ffe--
+-- 
+Matthew Garrett | mjg59@srcf.ucam.org
