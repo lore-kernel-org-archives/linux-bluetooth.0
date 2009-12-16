@@ -1,62 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: The Big Picture
-From: Robert Siemer <Robert.Siemer@backsla.sh>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 16 Dec 2009 17:29:17 +0800
-Message-Id: <1260955757.21218.9.camel@asus-1130818068>
-Mime-Version: 1.0
+From: "Marian Harbach" <harbach@Mathematik.Uni-Marburg.de>
+To: <linux-bluetooth@vger.kernel.org>
+Cc: "'Siarhei Siamashka'" <siarhei.siamashka@gmail.com>
+References: <002301ca7dd1$cb5fa3c0$621eeb40$@uni-marburg.de> <200912160203.53737.siarhei.siamashka@gmail.com>
+In-Reply-To: <200912160203.53737.siarhei.siamashka@gmail.com>
+Subject: AW: gstreamer and sbcdec problem
+Date: Wed, 16 Dec 2009 09:28:23 +0100
+Message-ID: <003c01ca7e29$bd2d1e10$37875a30$@uni-marburg.de>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dear list members...
+Hey thanks for the reply. To clarify:
 
-Is there any place where I can find the big picture of the working of
-bluetooth under linux? In this case: how does the binding work and do
-HID devices get discovered and handled.
+I use gstreamer to run a 16kHz PCM wav file through one sbc encoder/decoder
+step and save the results back to a 16kHz PCM wav file. When I examine the
+original file and the result file in a tool like Audacity, there is an
+offset between the two files of about 0.0125 secs. If I delay one file
+accordingly, the waveforms in the remaining parts fit. Yet, the first couple
+of samples of the original waveform have no resamblances with the resulting
+waveform. 
 
+If that delay mentioned above was actually a fixed value, I'd have no
+problem in my application. But the delay depends on input filesize and also
+increases when running the result file through an sbcenc/sbcdec pair again.
+At least that is the pattern that I see for now.
 
-I imagine something like that (example for a bluetooth mouse):
+I hope that helps.
+Cheers
+Marian
 
-1) the mouse, once switched on, looks for the last host to connect to 
-   (standard mice store only one host and cannot find laptop _and_ 
-   desktop PC by themselves...)
-2) /usr/sbin/bluetoothd notices and establishes a XYZ connection, with 
-   the help of key files in /var/.../.../...
-3) after the establishment bluetoothd queries for the device type and 
-   dispatches an event on dbus / for listeners on /dev/bluesock, ...
-4) this is normally /sbin/udevd, which should make sure hidp is loaded
-5) hidp in turn checks (who informs it?) for HID bluetooth devices and 
-   creates /dev/input/..., this results in another event, etc, etc, but 
-   the device is ready for use anyway...
+-----Ursprüngliche Nachricht-----
+Von: linux-bluetooth-owner@vger.kernel.org
+[mailto:linux-bluetooth-owner@vger.kernel.org] Im Auftrag von Siarhei
+Siamashka
+Gesendet: Mittwoch, 16. Dezember 2009 01:04
+An: Marian Harbach
+Cc: linux-bluetooth@vger.kernel.org
+Betreff: Re: gstreamer and sbcdec problem
 
+On Tuesday 15 December 2009, Marian Harbach wrote:
+> Hi,
+>
+> I have the same problem as described in this post:
+>
+> http://www.spinics.net/lists/linux-bluetooth/msg03627.html
 
-Okay, this is completely invented here, but I would like to know the
-truth, especially in case the device is not bound yet, e.g. something
-like this:
+This looks like either some completely random garbage gets there (valgrind
+can probably help), or the decoder is not reinitialized properly and has
+some stale data from the previous decode in some of its internal buffers.
 
+> I found that depending on filesize, the original input is delayed by 
+> some bytes (180-260 for 16kHz PCM input)
 
-2b) /usr/sbin/bluetoothd will not be able to completely open the
-connection, because of missing keys. So it tries to do a keyexchange,
-which requires the famous PIN, which bluetoothd will try to get via
-dbus. You can see the request with "dbus_dump --class xxx --listen" and
-you can send a corresponding answer via  "dbus_messenger --id yyy --send
---string '0000'; the yyy corresponds to the id seen in the request; and
-take care that some mice require to skip the pin negotiation,
-because ..., ... ... you can do that with the command ... ...
+SBC introduces some delay to the audio data due to the way how it works.
+Some of the trailing samples of the buffer you feed to the 'sbc_encode' 
+function are actually not represented fully in the encoded data for this
+frame, but are kept in the ring buffer and get processed later on next
+'sbc_encode' call.
 
-2c) In case the mouse does not connect to the host, because it never
-knew it before, you can connect to the mouse with "hcitool --connect
-hw_addr", this will trigger the rest as written above... ...
+The reference binary encoder introduces exactly the same delay.
 
+> and additionally the first few samples are overwritten when doing 
+> sbcenc followed by sbcdec.
 
+Could you please clarify this part? In what way and where do they get
+overwritten (in files, memory buffers, ...)?
 
+> Is there a fix for this issue?
 
-I think this describes best what Iâ€™m looking for: the big picture, and
-the command lines, to walk through it.
+My guess is that the client application can be aware of this delay and take
+it into account somehow.
 
+Also I don't have much trust in the current bluez SBC decoder
+implementation.
+Its quality may be not the very best. I was considering to eventually review
+its code, do some refactoring and merge some of its parts with the encoder
+(SBC encode and decode are quite symmetric), but did not find some spare
+time for this yet. Considering that bluez got SBC sink support now,
+improving the decoder may make sense.
 
-
-Thanks,
-Robert 
+--
+Best regards,
+Siarhei Siamashka
 
