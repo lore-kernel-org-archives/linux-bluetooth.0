@@ -1,124 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <eb7933e20912110025y20eb4a6aw615660648d4756f8@mail.gmail.com>
-References: <eb7933e20912110025y20eb4a6aw615660648d4756f8@mail.gmail.com>
-Date: Wed, 16 Dec 2009 12:11:21 +0200
-Message-ID: <eb7933e20912160211h165d90f2s4969c6cfea2d9b01@mail.gmail.com>
-Subject: Re: [PATCH] dbus timeout handling
-From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
+Subject: The Big Picture
+From: Robert Siemer <Robert.Siemer@backsla.sh>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset="UTF-8"
+Date: Wed, 16 Dec 2009 17:29:17 +0800
+Message-Id: <1260955757.21218.9.camel@asus-1130818068>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Dec 11, 2009 at 10:25 AM, Daniel Örstadius
-<daniel.orstadius@gmail.com> wrote:
+Dear list members...
 
-> When receiving a file it's possible to crash obexd by letting the
-> "org.openobex.Error.Rejected" reply from the call to
-> request_authorization and the obexd timeout for the response occur at
-> roughly the same time.
->
+Is there any place where I can find the big picture of the working of
+bluetooth under linux? In this case: how does the binding work and do
+HID devices get discovered and handled.
 
-Making a new patch proposal for this after discussion with Johan.
 
-The patch concerns how dbus timeouts are stopped in obexd in the
-functions remove_timeout and timeout_handler_free. Without this patch
-it is all done in the latter. Using the patch it is done in both, with
-the freeing being made in timeout_handler_free.
+I imagine something like that (example for a bluetooth mouse):
 
-The reason for making this modification is that in at least one corner
-case it looks to be possible for obexd to dispatch (by
-timeout_handler_dispatch) a timeout on which dbus has called
-remove_timeout (which is currently empty).
+1) the mouse, once switched on, looks for the last host to connect to 
+   (standard mice store only one host and cannot find laptop _and_ 
+   desktop PC by themselves...)
+2) /usr/sbin/bluetoothd notices and establishes a XYZ connection, with 
+   the help of key files in /var/.../.../...
+3) after the establishment bluetoothd queries for the device type and 
+   dispatches an event on dbus / for listeners on /dev/bluesock, ...
+4) this is normally /sbin/udevd, which should make sure hidp is loaded
+5) hidp in turn checks (who informs it?) for HID bluetooth devices and 
+   creates /dev/input/..., this results in another event, etc, etc, but 
+   the device is ready for use anyway...
 
-Compared the obexd-dbus mainloop integration with the dbus-glib
-implementation at
-http://cgit.freedesktop.org/dbus/dbus-glib/tree/dbus/dbus-gmain.c
 
-Its corresponding callbacks for obexd's remove_timeout and
-timeout_handler_free both do the same thing as far as I understood the
-code.
+Okay, this is completely invented here, but I would like to know the
+truth, especially in case the device is not bound yet, e.g. something
+like this:
 
->From the dbus-glib code:
 
-dbus_connection_set_timeout_functions (.., remove_timeout,..)
-leading to
+2b) /usr/sbin/bluetoothd will not be able to completely open the
+connection, because of missing keys. So it tries to do a keyexchange,
+which requires the famous PIN, which bluetoothd will try to get via
+dbus. You can see the request with "dbus_dump --class xxx --listen" and
+you can send a corresponding answer via  "dbus_messenger --id yyy --send
+--string '0000'; the yyy corresponds to the id seen in the request; and
+take care that some mice require to skip the pin negotiation,
+because ..., ... ... you can do that with the command ... ...
 
-remove_timeout ->
-connection_setup_remove_timeout ->
-timeout_handler_destroy_source ->
-g_source_destroy
+2c) In case the mouse does not connect to the host, because it never
+knew it before, you can connect to the mouse with "hcitool --connect
+hw_addr", this will trigger the rest as written above... ...
 
-and
-add_timeout -> dbus_timeout_set_data (.., timeout_handler_timeout_freed)
-leading to
 
-timeout_handler_timeout_freed ->
-timeout_handler_destroy_source ->
-g_source_destroy
 
-They both stop the timeout, but do not free the timeout_handler
-structure. This is done in timeout_handler_source_finalized which is
-set via
 
-g_source_set_callback (.., timeout_handler_source_finalized) in add_timeout.
+I think this describes best what Iâ€™m looking for: the big picture, and
+the command lines, to walk through it.
 
-obexd does not use this kind of finalize callback. Other than this,
-the intention is for the patch to map to the dbus-glib implementation
-by removing the timer in both callbacks.
 
-(I'm not an expert in dbus nor glib, there could be pitfalls with this
-modification)
 
-/Daniel
+Thanks,
+Robert 
 
----------
-
->From 70cc29c724c089e1468a6670c53e1f77d5b3ebcc Mon Sep 17 00:00:00 2001
-From: Daniel Orstadius <daniel.orstadius@gmail.com>
-Date: Wed, 16 Dec 2009 11:23:46 +0200
-Subject: [PATCH] dbus timeout handling
-
----
- gdbus/mainloop.c |   17 ++++++++++++++++-
- 1 files changed, 16 insertions(+), 1 deletions(-)
-
-diff --git a/gdbus/mainloop.c b/gdbus/mainloop.c
-index bd775f8..f808f5d 100644
---- a/gdbus/mainloop.c
-+++ b/gdbus/mainloop.c
-@@ -183,7 +183,11 @@ static void timeout_handler_free(void *data)
- 	if (!handler)
- 		return;
-
--	g_source_remove(handler->id);
-+	if (handler->id != 0) {
-+		g_source_remove(handler->id);
-+		handler->id = 0;
-+	}
-+
- 	g_free(handler);
- }
-
-@@ -207,6 +211,17 @@ static dbus_bool_t add_timeout(DBusTimeout
-*timeout, void *data)
-
- static void remove_timeout(DBusTimeout *timeout, void *data)
- {
-+        timeout_handler_t *handler;
-+
-+        handler = dbus_timeout_get_data(timeout);
-+
-+        if (!handler)
-+                return;
-+
-+        if (handler->id != 0) {
-+                g_source_remove(handler->id);
-+                handler->id = 0;
-+        }
- }
-
- static void timeout_toggled(DBusTimeout *timeout, void *data)
--- 
-1.6.0.4
