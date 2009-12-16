@@ -1,88 +1,124 @@
 Return-Path: <cyrus@holtmann.org>
-From: Siarhei Siamashka <siarhei.siamashka@gmail.com>
-To: "Marian Harbach" <harbach@mathematik.uni-marburg.de>
-Subject: Re: AW: gstreamer and sbcdec problem
-Date: Wed, 16 Dec 2009 12:15:42 +0200
-Cc: linux-bluetooth@vger.kernel.org
-References: <002301ca7dd1$cb5fa3c0$621eeb40$@uni-marburg.de> <200912160203.53737.siarhei.siamashka@gmail.com> <003c01ca7e29$bd2d1e10$37875a30$@uni-marburg.de>
-In-Reply-To: <003c01ca7e29$bd2d1e10$37875a30$@uni-marburg.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed;
-  boundary="nextPart1505197.TqY6t6IG9X";
-  protocol="application/pgp-signature";
-  micalg=pgp-sha1
-Message-Id: <200912161215.47014.siarhei.siamashka@gmail.com>
+In-Reply-To: <eb7933e20912110025y20eb4a6aw615660648d4756f8@mail.gmail.com>
+References: <eb7933e20912110025y20eb4a6aw615660648d4756f8@mail.gmail.com>
+Date: Wed, 16 Dec 2009 12:11:21 +0200
+Message-ID: <eb7933e20912160211h165d90f2s4969c6cfea2d9b01@mail.gmail.com>
+Subject: Re: [PATCH] dbus timeout handling
+From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---nextPart1505197.TqY6t6IG9X
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+On Fri, Dec 11, 2009 at 10:25 AM, Daniel Örstadius
+<daniel.orstadius@gmail.com> wrote:
 
-On Wednesday 16 December 2009, Marian Harbach wrote:
-> Hey thanks for the reply. To clarify:
+> When receiving a file it's possible to crash obexd by letting the
+> "org.openobex.Error.Rejected" reply from the call to
+> request_authorization and the obexd timeout for the response occur at
+> roughly the same time.
 >
-> I use gstreamer to run a 16kHz PCM wav file through one sbc encoder/decod=
-er
-> step and save the results back to a 16kHz PCM wav file. When I examine the
-> original file and the result file in a tool like Audacity, there is an
-> offset between the two files of about 0.0125 secs. If I delay one file
-> accordingly, the waveforms in the remaining parts fit.
 
-Yes, this is something to be expected unless I'm mistaken. You can google
-for "SBC algorithmic delay" or something like this.
+Making a new patch proposal for this after discussion with Johan.
 
-> Yet, the first couple of samples of the original waveform have no
-> resamblances with the resulting waveform.
+The patch concerns how dbus timeouts are stopped in obexd in the
+functions remove_timeout and timeout_handler_free. Without this patch
+it is all done in the latter. Using the patch it is done in both, with
+the freeing being made in timeout_handler_free.
 
-This may actually need a bit of tweaking. When starting encoding, we don't
-have a preceding history, but older nonexisting samples are still needed as
-input for the polyphase filter. The encoder from bluez currently treats tho=
-se
-missing samples as zero. Having a quick look at A2DP spec again, I don't see
-any special explanations about how the encoding process should start.
-Experimenting a bit with the reference binary encoder and trying to guess
-how it deals with the initial samples may help.
+The reason for making this modification is that in at least one corner
+case it looks to be possible for obexd to dispatch (by
+timeout_handler_dispatch) a timeout on which dbus has called
+remove_timeout (which is currently empty).
 
-> If that delay mentioned above was actually a fixed value, I'd have no
-> problem in my application.
+Compared the obexd-dbus mainloop integration with the dbus-glib
+implementation at
+http://cgit.freedesktop.org/dbus/dbus-glib/tree/dbus/dbus-gmain.c
 
-It should be a fixed value, which only depends on encoding parameters.
+Its corresponding callbacks for obexd's remove_timeout and
+timeout_handler_free both do the same thing as far as I understood the
+code.
 
-> But the delay depends on input filesize=20
+>From the dbus-glib code:
 
-This is strange. The encoder/decoder works with the stream of data and is n=
-ot
-even supposed to know how big is the input file.
+dbus_connection_set_timeout_functions (.., remove_timeout,..)
+leading to
 
-Either your tool is not very precise at measuring this delay, or there could
-be some bugs in sbc or in the gstreamer layer.
+remove_timeout ->
+connection_setup_remove_timeout ->
+timeout_handler_destroy_source ->
+g_source_destroy
 
-I suggest you to experiment with standalone sbcenc/sbcdec comand line tools
-and check if the same behavior is also reproduced there.
+and
+add_timeout -> dbus_timeout_set_data (.., timeout_handler_timeout_freed)
+leading to
 
-> and also increases when running the result file through an sbcenc/sbcdec
-> pair again. At least that is the pattern that I see for now.
+timeout_handler_timeout_freed ->
+timeout_handler_destroy_source ->
+g_source_destroy
 
-Sure, there is a constant delay introduced on each encode/decode operation.
-Repeating it multiple times will result in this delay accumulating.
+They both stop the timeout, but do not free the timeout_handler
+structure. This is done in timeout_handler_source_finalized which is
+set via
 
-=2D-=20
-Best regards,
-Siarhei Siamashka
+g_source_set_callback (.., timeout_handler_source_finalized) in add_timeout.
 
---nextPart1505197.TqY6t6IG9X
-Content-Type: application/pgp-signature; name=signature.asc 
-Content-Description: This is a digitally signed message part.
+obexd does not use this kind of finalize callback. Other than this,
+the intention is for the patch to map to the dbus-glib implementation
+by removing the timer in both callbacks.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.6 (GNU/Linux)
+(I'm not an expert in dbus nor glib, there could be pitfalls with this
+modification)
 
-iD8DBQBLKLNSvyB/CfYEEt4RAr0PAKDMA4oouSr96ucmFWNUhQrnLB71kACgvZ+X
-xiIx20eyF0O5ZzOmi/lv1EQ=
-=hMQl
------END PGP SIGNATURE-----
+/Daniel
 
---nextPart1505197.TqY6t6IG9X--
+---------
+
+>From 70cc29c724c089e1468a6670c53e1f77d5b3ebcc Mon Sep 17 00:00:00 2001
+From: Daniel Orstadius <daniel.orstadius@gmail.com>
+Date: Wed, 16 Dec 2009 11:23:46 +0200
+Subject: [PATCH] dbus timeout handling
+
+---
+ gdbus/mainloop.c |   17 ++++++++++++++++-
+ 1 files changed, 16 insertions(+), 1 deletions(-)
+
+diff --git a/gdbus/mainloop.c b/gdbus/mainloop.c
+index bd775f8..f808f5d 100644
+--- a/gdbus/mainloop.c
++++ b/gdbus/mainloop.c
+@@ -183,7 +183,11 @@ static void timeout_handler_free(void *data)
+ 	if (!handler)
+ 		return;
+
+-	g_source_remove(handler->id);
++	if (handler->id != 0) {
++		g_source_remove(handler->id);
++		handler->id = 0;
++	}
++
+ 	g_free(handler);
+ }
+
+@@ -207,6 +211,17 @@ static dbus_bool_t add_timeout(DBusTimeout
+*timeout, void *data)
+
+ static void remove_timeout(DBusTimeout *timeout, void *data)
+ {
++        timeout_handler_t *handler;
++
++        handler = dbus_timeout_get_data(timeout);
++
++        if (!handler)
++                return;
++
++        if (handler->id != 0) {
++                g_source_remove(handler->id);
++                handler->id = 0;
++        }
+ }
+
+ static void timeout_toggled(DBusTimeout *timeout, void *data)
+-- 
+1.6.0.4
