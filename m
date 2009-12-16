@@ -1,31 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 17 Dec 2009 07:34:48 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Daniel =?iso-8859-1?Q?=D6rstadius?= <daniel.orstadius@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] dbus timeout handling
-Message-ID: <20091217053448.GA22217@jh-x301>
-References: <eb7933e20912110025y20eb4a6aw615660648d4756f8@mail.gmail.com>
- <eb7933e20912160211h165d90f2s4969c6cfea2d9b01@mail.gmail.com>
+Date: Wed, 16 Dec 2009 15:54:50 -0800
+From: Greg KH <greg@kroah.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Matthew Garrett <mjg59@srcf.ucam.org>,
+	Oliver Neukum <oliver@neukum.org>, linux-usb@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH]btusb:Prevent illtimed autosuspend
+Message-ID: <20091216235449.GA6108@kroah.com>
+References: <200912161923.43127.oliver@neukum.org>
+ <20091216182600.GA20031@srcf.ucam.org>
+ <1261006677.4041.41.camel@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <eb7933e20912160211h165d90f2s4969c6cfea2d9b01@mail.gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1261006677.4041.41.camel@localhost.localdomain>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Daniel,
-
-On Wed, Dec 16, 2009, Daniel Örstadius wrote:
-> From 70cc29c724c089e1468a6670c53e1f77d5b3ebcc Mon Sep 17 00:00:00 2001
-> From: Daniel Orstadius <daniel.orstadius@gmail.com>
-> Date: Wed, 16 Dec 2009 11:23:46 +0200
-> Subject: [PATCH] dbus timeout handling
+On Wed, Dec 16, 2009 at 03:37:57PM -0800, Marcel Holtmann wrote:
+> Hi Oliver and Matthew,
 > 
-> ---
->  gdbus/mainloop.c |   17 ++++++++++++++++-
->  1 files changed, 16 insertions(+), 1 deletions(-)
+> > > commit 0b72b0a05c1d950e4f35520926cc36bc01fb998a
+> > > Author: Oliver Neukum <oliver@neukum.org>
+> > > Date:   Mon Dec 14 22:09:49 2009 +0100
+> > > 
+> > >     btusb:Prevent illtimed autosuspend
+> > >     
+> > >     The device must be marked busy as it recieves data.
+> > >     
+> > >     Signed-off-by: Oliver Neukum <oliver@neukum.org>
+> > 
+> > Tested-by: Matthew Garrett <mjg@redhat.com>
+> 
+> thanks for figuring this out. I will queue this patch up along with the
+> other changes and send them to Dave this week.
 
-Thanks for the patch. I've pushed it upstream with one minor coding
-style change: "> 0" instead of "!= 0" (Marcel requested this).
+This also might be a -stable patch, right?  Care to mark it as such?
 
-Johan
+thanks,
+
+greg k-h
