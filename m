@@ -1,68 +1,277 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 17 Dec 2009 18:24:56 +0530
+From: Bala Shanmugam <sbalashanmugam@atheros.com>
+To: Luis Rodriguez <Luis.Rodriguez@Atheros.com>,
+	<mcgrof@bombadil.infradead.org>
+CC: Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>,
+	<linux-bluetooth@vger.kernel.org>, <linux-wireless@vger.kernel.org>
+Subject: [PATCH]compat-wireless:Fixed bluetooth modules compilation issues.
+Message-ID: <20091217125456.GA3860@atheros-laptop>
 MIME-Version: 1.0
-Date: Thu, 17 Dec 2009 15:44:45 +0200
-Message-ID: <eb7933e20912170544p2d07fc0endc0c50026e42f8c1@mail.gmail.com>
-Subject: [PATCH] spurious disconnection attempt
-From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=0016e652f6b0734ec1047aecd3b5
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---0016e652f6b0734ec1047aecd3b5
-Content-Type: text/plain; charset=ISO-8859-1
+Bluetooth modules in net/bluetooth were not compiled as
+CONFIG macro in config.mk and Makefile are different.
 
-This sequence can happen when disconnecting the MOTOROKR T505
+Bluetooth modules has compilation issues as source code 
+is taken from linux-next.git tree.  Fixed the same.
 
-2009-11-27 12:05:30.636932 > ACL data: handle 11 flags 0x02 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0048
-2009-11-27 12:05:30.637054 < ACL data: handle 11 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0048
-2009-11-27 12:05:30.822540 > HCI Event: Number of Completed Packets
-(0x13) plen 5
-    handle 11 packets 1
-2009-11-27 12:05:30.985656 > HCI Event: Disconn Complete (0x05) plen 4
-    status 0x00 handle 11 reason 0x13
-    Reason: Remote User Terminated Connection
-2009-11-27 12:05:32.655273 < HCI Command: Disconnect (0x01|0x0006) plen 3
-    handle 0 reason 0x13
-    Reason: Remote User Terminated Connection
-2009-11-27 12:05:32.661621 > HCI Event: Command Status (0x0f) plen 4
-    Disconnect (0x01|0x0006) status 0x12 ncmd 1
-    Error: Invalid HCI Command Parameters
+ Signed-off-by: Bala Shanmugam <sbalashanmugam@atheros.com>
 
-A similar situation (trying to disconnect handle 0) can occur by
-increasing the timeout value DISCONNECT_TIMER in src/device.c (default
-is 2).
+---
+ Makefile                   |    2 +-
+ patches/16-bluetooth.patch |  195 ++++++++++++++++++++++++++++++++++++++++++++
+ scripts/admin-update.sh    |    9 +-
+ 3 files changed, 200 insertions(+), 6 deletions(-)
 
-The problem seems to be that bluetoothd still calls
-src/device.c:do_disconnect even though the link has been disconnected.
-Attaching a patch proposal for function device_remove_connection to
-try to avoid this. The function looks to be called only when there is
-no longer an hci connection to the remote.
+diff --git a/Makefile b/Makefile
+index 66790f2..ddaa656 100644
+--- a/Makefile
++++ b/Makefile
+@@ -28,7 +28,7 @@ obj-$(CONFIG_COMPAT_WIRELESS_MODULES) += drivers/net/wireless/
+ 
+ obj-$(CONFIG_COMPAT_NET_USB_MODULES) += drivers/net/usb/
+ 
+-obj-$(CONFIG_COMPAT_BT) += net/bluetooth/
++obj-$(CONFIG_COMPAT_BLUETOOTH) += net/bluetooth/
+ obj-$(CONFIG_COMPAT_BLUETOOTH_MODULES) += drivers/bluetooth/
+ 
+ obj-$(CONFIG_COMPAT_NETWORK_MODULES) += drivers/net/
+diff --git a/patches/16-bluetooth.patch b/patches/16-bluetooth.patch
+index 32529a0..47e9d0e 100644
+--- a/patches/16-bluetooth.patch
++++ b/patches/16-bluetooth.patch
+@@ -446,3 +446,198 @@ diff -Nur a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+  {
+  	struct sock *sk = sock->sk;
+  	int err = 0;
++diff -Nur orig_bt/net/bluetooth/af_bluetooth.c mod_bt/net/bluetooth/af_bluetooth.c
++--- orig_bt/net/bluetooth/af_bluetooth.c	2009-12-15 16:40:20.000000000 +0530
+++++ mod_bt/net/bluetooth/af_bluetooth.c	2009-12-15 16:46:50.000000000 +0530
++@@ -126,8 +126,12 @@
++ }
++ EXPORT_SYMBOL(bt_sock_unregister);
++
+++#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32))
++ static int bt_sock_create(struct net *net, struct socket *sock, int proto,
++			  int kern)
+++#else
+++static int bt_sock_create(struct net *net, struct socket *sock, int proto)
+++#endif
++ {
++	int err;
++
++@@ -145,7 +149,11 @@
++	read_lock(&bt_proto_lock);
++
++	if (bt_proto[proto] && try_module_get(bt_proto[proto]->owner)) {
+++#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32))
++		err = bt_proto[proto]->create(net, sock, proto, kern);
+++#else
+++		err = bt_proto[proto]->create(net, sock, proto);
+++#endif
++		bt_sock_reclassify_lock(sock, proto);
++		module_put(bt_proto[proto]->owner);
++	}
++@@ -258,7 +266,11 @@
++	skb_reset_transport_header(skb);
++	err = skb_copy_datagram_iovec(skb, 0, msg->msg_iov, copied);
++	if (err == 0)
+++#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32))
++		sock_recv_ts_and_drops(msg, sk, skb);
+++#else
+++	  sock_recv_timestamp(msg, sk, skb);
+++#endif
++
++	skb_free_datagram(sk, skb);
++
++diff -Nur orig_bt/net/bluetooth/bnep/sock.c mod_bt/net/bluetooth/bnep/sock.c
++--- orig_bt/net/bluetooth/bnep/sock.c	2009-12-15 16:40:59.000000000 +0530
+++++ mod_bt/net/bluetooth/bnep/sock.c	2009-12-15 16:48:19.000000000 +0530
++@@ -195,8 +195,12 @@
++	.obj_size	= sizeof(struct bt_sock)
++ };
++
+++#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32))
++ static int bnep_sock_create(struct net *net, struct socket *sock, int protocol,
++			    int kern)
+++#else
+++static int bnep_sock_create(struct net *net, struct socket *sock, int protocol)
+++#endif
++ {
++	struct sock *sk;
++
++diff -Nur orig_bt/net/bluetooth/cmtp/sock.c mod_bt/net/bluetooth/cmtp/sock.c
++--- orig_bt/net/bluetooth/cmtp/sock.c	2009-12-15 16:41:29.000000000 +0530
+++++ mod_bt/net/bluetooth/cmtp/sock.c	2009-12-15 16:48:31.000000000 +0530
++@@ -190,8 +190,12 @@
++	.obj_size	= sizeof(struct bt_sock)
++ };
++
+++#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32))
++ static int cmtp_sock_create(struct net *net, struct socket *sock, int protocol,
++			    int kern)
+++#else
+++static int cmtp_sock_create(struct net *net, struct socket *sock, int protocol)
+++#endif
++ {
++	struct sock *sk;
++
++diff -Nur orig_bt/net/bluetooth/hci_sock.c mod_bt/net/bluetooth/hci_sock.c
++--- orig_bt/net/bluetooth/hci_sock.c	2009-12-15 16:40:20.000000000 +0530
+++++ mod_bt/net/bluetooth/hci_sock.c	2009-12-15 16:47:47.000000000 +0530
++@@ -630,8 +630,12 @@
++	.obj_size	= sizeof(struct hci_pinfo)
++ };
++
+++#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32))
++ static int hci_sock_create(struct net *net, struct socket *sock, int protocol,
++			   int kern)
+++#else
+++static int hci_sock_create(struct net *net, struct socket *sock, int protocol)
+++#endif
++ {
++	struct sock *sk;
++
++diff -Nur orig_bt/net/bluetooth/hidp/core.c mod_bt/net/bluetooth/hidp/core.c
++--- orig_bt/net/bluetooth/hidp/core.c	2009-12-15 16:41:45.000000000 +0530
+++++ mod_bt/net/bluetooth/hidp/core.c	2009-12-15 16:48:45.000000000 +0530
++@@ -280,12 +280,14 @@
++	return hidp_queue_report(session, buf, rsize);
++ }
++
+++#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,27))
++ static int hidp_output_raw_report(struct hid_device *hid, unsigned char *data, size_t count)
++ {
++	if (hidp_queue_report(hid->driver_data, data, count))
++		return -ENOMEM;
++	return count;
++ }
+++#endif
++
++ static void hidp_idle_timeout(unsigned long arg)
++ {
++diff -Nur orig_bt/net/bluetooth/hidp/sock.c mod_bt/net/bluetooth/hidp/sock.c
++--- orig_bt/net/bluetooth/hidp/sock.c	2009-12-15 16:41:45.000000000 +0530
+++++ mod_bt/net/bluetooth/hidp/sock.c	2009-12-15 16:48:51.000000000 +0530
++@@ -241,8 +241,12 @@
++	.obj_size	= sizeof(struct bt_sock)
++ };
++
+++#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32))
++ static int hidp_sock_create(struct net *net, struct socket *sock, int protocol,
++			    int kern)
+++#else
+++static int hidp_sock_create(struct net *net, struct socket *sock, int protocol)
+++#endif
++ {
++	struct sock *sk;
++
++diff -Nur orig_bt/net/bluetooth/l2cap.c mod_bt/net/bluetooth/l2cap.c
++--- orig_bt/net/bluetooth/l2cap.c	2009-12-15 16:40:20.000000000 +0530
+++++ mod_bt/net/bluetooth/l2cap.c	2009-12-15 16:46:56.000000000 +0530
++@@ -822,8 +822,12 @@
++	return sk;
++ }
++
+++#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32))
++ static int l2cap_sock_create(struct net *net, struct socket *sock, int protocol,
++			     int kern)
+++#else
+++static int l2cap_sock_create(struct net *net, struct socket *sock, int protocol)
+++#endif
++ {
++	struct sock *sk;
++
++@@ -835,7 +839,11 @@
++			sock->type != SOCK_DGRAM && sock->type != SOCK_RAW)
++		return -ESOCKTNOSUPPORT;
++
+++#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32))
++	if (sock->type == SOCK_RAW && !kern && !capable(CAP_NET_RAW))
+++#else
+++	if (sock->type == SOCK_RAW && !capable(CAP_NET_RAW))
+++#endif
++		return -EPERM;
++
++	sock->ops = &l2cap_sock_ops;
++diff -Nur orig_bt/net/bluetooth/rfcomm/sock.c mod_bt/net/bluetooth/rfcomm/sock.c
++--- orig_bt/net/bluetooth/rfcomm/sock.c	2009-12-15 16:42:14.000000000 +0530
+++++ mod_bt/net/bluetooth/rfcomm/sock.c	2009-12-15 16:49:07.000000000 +0530
++@@ -323,8 +323,13 @@
++	return sk;
++ }
++
+++#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32))
++ static int rfcomm_sock_create(struct net *net, struct socket *sock,
++			      int protocol, int kern)
+++#else
+++static int rfcomm_sock_create(struct net *net, struct socket *sock,
+++			      int protocol)
+++#endif
++ {
++	struct sock *sk;
++
++@@ -704,7 +709,11 @@
++		copied += chunk;
++		size   -= chunk;
++
+++#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32))
++		sock_recv_ts_and_drops(msg, sk, skb);
+++#else
+++		sock_recv_timestamp(msg, sk, skb);
+++#endif
++
++		if (!(flags & MSG_PEEK)) {
++			atomic_sub(chunk, &sk->sk_rmem_alloc);
++diff -Nur orig_bt/net/bluetooth/sco.c mod_bt/net/bluetooth/sco.c
++--- orig_bt/net/bluetooth/sco.c	2009-12-15 16:40:20.000000000 +0530
+++++ mod_bt/net/bluetooth/sco.c	2009-12-15 16:47:04.000000000 +0530
++@@ -430,8 +430,12 @@
++	return sk;
++ }
++
+++#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32))
++ static int sco_sock_create(struct net *net, struct socket *sock, int protocol,
++			   int kern)
+++#else
+++static int sco_sock_create(struct net *net, struct socket *sock, int protocol)
+++#endif
++ {
++	struct sock *sk;
++
+diff --git a/scripts/admin-update.sh b/scripts/admin-update.sh
+index 78652d2..500fe07 100755
+--- a/scripts/admin-update.sh
++++ b/scripts/admin-update.sh
+@@ -15,8 +15,7 @@
+ # 
+ # for example
+ #
+-GIT_URL="git://git.kernel.org/pub/scm/linux/kernel/git/linville/wireless-testing.git"
+-GIT_BT_URL="git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-testing.git"
++GIT_URL="git://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git"
+ GIT_COMPAT_URL="git://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/compat.git"
+ 
+ INCLUDE_NET_BT="hci_core.h l2cap.h bluetooth.h rfcomm.h hci.h"
+@@ -48,12 +47,12 @@ UNDERLINE="\033[02m"
+ NET_DIRS="wireless mac80211 rfkill"
+ # User exported this variable
+ if [ -z $GIT_TREE ]; then
+-	GIT_TREE="/home/$USER/wireless-testing/"
++	GIT_TREE="/home/$USER/linux-next/"
+ 	if [ ! -d $GIT_TREE ]; then
+-		echo "Please tell me where your wireless-testing git tree is."
++		echo "Please tell me where your linux-next git tree is."
+ 		echo "You can do this by exporting its location as follows:"
+ 		echo
+-		echo "  export GIT_TREE=/home/$USER/wireless-testing/"
++		echo "  export GIT_TREE=/home/$USER/linux-next/"
+ 		echo
+ 		echo "If you do not have one you can clone the repository:"
+ 		echo "  git-clone $GIT_URL"
+-- 
+1.6.0.4
 
-/Daniel
-
---0016e652f6b0734ec1047aecd3b5
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-adding-removal-of-disconnect-timer-to-avoid-spurious.patch"
-Content-Disposition: attachment;
-	filename="0001-adding-removal-of-disconnect-timer-to-avoid-spurious.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_g3bkukyh0
-
-RnJvbSAxNWRhNGRjNWFlNjYyMzVmNzI3NDAwODkzOGVkMGEyMTQxMjYzNGQzIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQGdt
-YWlsLmNvbT4KRGF0ZTogVGh1LCAxNyBEZWMgMjAwOSAxNToyOTo1MSArMDIwMApTdWJqZWN0OiBb
-UEFUQ0hdIGFkZGluZyByZW1vdmFsIG9mIGRpc2Nvbm5lY3QgdGltZXIgdG8gYXZvaWQgc3B1cmlv
-dXMgZGlzY29ubmVjdGlvbiBhdHRlbXB0CgotLS0KIHNyYy9kZXZpY2UuYyB8ICAgIDUgKysrKysK
-IDEgZmlsZXMgY2hhbmdlZCwgNSBpbnNlcnRpb25zKCspLCAwIGRlbGV0aW9ucygtKQoKZGlmZiAt
-LWdpdCBhL3NyYy9kZXZpY2UuYyBiL3NyYy9kZXZpY2UuYwppbmRleCAxN2U0ZWExLi41MTNhODEz
-IDEwMDY0NAotLS0gYS9zcmMvZGV2aWNlLmMKKysrIGIvc3JjL2RldmljZS5jCkBAIC03NjUsNiAr
-NzY1LDExIEBAIHZvaWQgZGV2aWNlX3JlbW92ZV9jb25uZWN0aW9uKHN0cnVjdCBidGRfZGV2aWNl
-ICpkZXZpY2UsIERCdXNDb25uZWN0aW9uICpjb25uLAogCiAJZGV2aWNlLT5oYW5kbGUgPSAwOwog
-CisJaWYgKGRldmljZS0+ZGlzY29ubl90aW1lciA+IDApIHsKKwkJZ19zb3VyY2VfcmVtb3ZlKGRl
-dmljZS0+ZGlzY29ubl90aW1lcik7CisJCWRldmljZS0+ZGlzY29ubl90aW1lciA9IDA7CisJfQor
-CiAJd2hpbGUgKGRldmljZS0+ZGlzY29ubmVjdHMpIHsKIAkJREJ1c01lc3NhZ2UgKm1zZyA9IGRl
-dmljZS0+ZGlzY29ubmVjdHMtPmRhdGE7CiAKLS0gCjEuNi4wLjQKCg==
---0016e652f6b0734ec1047aecd3b5--
