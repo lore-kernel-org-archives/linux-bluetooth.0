@@ -1,24 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 1/1] Bluetooth: Ack I-frames before retransmit missing
- packet
+Subject: Re: [PATCH] HID: PTR_ERR return of wrong pointer in
+ hidp_setup_hid()
 From: Marcel Holtmann <marcel@holtmann.org>
-To: "Gustavo F. Padovan" <gustavo@las.ic.unicamp.br>
-Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org
-In-Reply-To: <1260915207-10338-1-git-send-email-gustavo@las.ic.unicamp.br>
-References: <1260915207-10338-1-git-send-email-gustavo@las.ic.unicamp.br>
+To: Roel Kluin <roel.kluin@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Andrew Morton <akpm@linux-foundation.org>,
+	LKML <linux-kernel@vger.kernel.org>
+In-Reply-To: <4B1D01C9.3070305@gmail.com>
+References: <4B1D01C9.3070305@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Date: Thu, 17 Dec 2009 12:05:49 -0800
-Message-Id: <1261080349.4041.46.camel@localhost.localdomain>
+Date: Thu, 17 Dec 2009 11:48:24 -0800
+Message-Id: <1261079304.4041.45.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Roel,
 
-> Moving the Ack to before l2cap_retransmit_frame() we can avoid the case
-> where txWindow is full and the packet can't be retransmited.
+> Return the PTR_ERR of the correct pointer.
 
-patch has been applied. Thanks.
+patch has been applied to my tree. Thanks.
 
 Regards
 
