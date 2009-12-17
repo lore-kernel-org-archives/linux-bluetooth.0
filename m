@@ -1,23 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <509357.32587.qm@web52606.mail.re2.yahoo.com>
-Date: Thu, 17 Dec 2009 08:30:49 -0800 (PST)
-From: Ed Tsang <netdesign_98@yahoo.com>
-Subject: How to disable simple pairing? (Vista -> Linux using fix pin)
-To: Bluettooth Linux <linux-bluetooth@vger.kernel.org>
+Message-ID: <4B2A4B90.1040009@videam.com.br>
+Date: Thu, 17 Dec 2009 13:17:36 -0200
+From: "Daniel T. Cobra" <dcobra@videam.com.br>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: Long delay to (re)connect a bluetooth mouse
+References: <1260906227.4b27e6f39cc7c@www.fastmail.com.br>
+In-Reply-To: <1260906227.4b27e6f39cc7c@www.fastmail.com.br>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, 
-The situation is: I am using a linux box. It will have to talk to other devices (cell phone, notbook ..etc.). The linux box is unmaned. It could force the box to use a fix pin by modifying the simple-agent. All other devices user know the fix pin. It work fine with most cell phones so far (not the latest phone?). But with Window Vista, it fail, because vista when try to pair with the box will generate a random number (great security) and expect us to enter the same number in the other side.  
-I am not sure but I guess it is associate with the new simple paring feature? 
-Is there a way to tell the other side we do not support simple pairing?
-Or is there a way to tell the other side that we do not have a pin input method?
+Not a single reply two days later! It seems nobody is interested in this 
+subject here or in the Ubuntu and sidux forums. Do so few people 
+actually use bluetooth mice? Folks, I'm starting to feel ignored!
 
-Ed
+I've been a Linux user for more than 15 years. I know nothing about the 
+bluetooth protocol and I'm not a developer, but over the years I have 
+made small contributions to the Open Sound System code, a couple of Gnu 
+applications and other open-source software. Never before have I 
+experienced such difficulty in finding someone with whom to discuss a 
+Linux-related issue as now with this problem of the bluetooth mouse 
+reconnection delay!
 
+I'm sorry if this kind of discussion is not appropriate for this mailing 
+list. If so, will somebody please be kind enough to suggest a forum 
+where I could ask if there are any bluez configuration options I could 
+try out to speed up the mouse reconnection when it comes out of sleep 
+mode. As I mentioned in my first post, this same mouse reconnects very 
+fast when I boot my notebook under Windows XP, and I want to try to 
+achieve the same kind of performance under Linux.
 
+Somebody please talk to me! :-)
 
-      __________________________________________________________________
-Be smarter than spam. See how smart SpamGuard is at giving junk email the boot with the All-new Yahoo! Mail.  Click on Options in Mail and switch to New Mail today or register for free at http://mail.yahoo.ca
+Daniel
+
