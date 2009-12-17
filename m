@@ -1,28 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] HID: PTR_ERR return of wrong pointer in
- hidp_setup_hid()
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Roel Kluin <roel.kluin@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>,
-	LKML <linux-kernel@vger.kernel.org>
-In-Reply-To: <4B1D01C9.3070305@gmail.com>
-References: <4B1D01C9.3070305@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Thu, 17 Dec 2009 11:48:24 -0800
-Message-Id: <1261079304.4041.45.camel@localhost.localdomain>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Date: Thu, 17 Dec 2009 12:21:19 -0500
+Message-ID: <cf4ddc810912170921g7b774371u4843dac6f1725ec8@mail.gmail.com>
+Subject: sixpair.c compile comments patch
+From: Nathan Fearnley <nfearnley@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Roel,
-
-> Return the PTR_ERR of the correct pointer.
-
-patch has been applied to my tree. Thanks.
-
-Regards
-
-Marcel
+Here's a small patch that updates the instructions on how to compile
+the sixpair.c program. They were out of date since the common folder
+was merged with src.
+--Nathan Fearnley
 
 
+--- sixpair.c   2009-12-17 12:01:59.202237665 -0500
++++ sixpair.new.c       2009-12-17 12:03:37.130237071 -0500
+@@ -1,5 +1,5 @@
+ /* To compile
+- * gcc -g -Wall -I../src -I../lib/ -I../include
+-DSTORAGEDIR=\"/var/lib/bluetooth\" -o sixpair sixpair.c
+../src/storage.c ../common/libhelper.a -I../common `pkg-config --libs
+--cflags glib-2.0 libusb-1.0` -lbluetooth
++ * gcc -g -Wall -I../src -I../lib/ -I../include
+-DSTORAGEDIR=\"/var/lib/bluetooth\" -o sixpair sixpair.c
+../src/storage.c ../src/textfile.c ../src/glib-helper.c -I../common
+`pkg-config --libs --cflags glib-2.0 libusb-1.0` -lbluetooth
+  */
+
+ #include <unistd.h>
