@@ -1,91 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: RFC: Allow Bluez to select flushable or non-flushable ACL
- packets  with L2CAP_LM_RELIABLE
+Subject: Re: kernel panic happens when disconnecting Bluetooth headset
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Nick Pelly <npelly@google.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <35c90d960912161548p6cdcc1f0i7d74b31a4bc145b6@mail.gmail.com>
-References: <35c90d960912081950t135e3f10m8848e54fde1e596f@mail.gmail.com>
-	 <1260335175.2901.20.camel@violet>
-	 <35c90d960912082213s26fb0ebse75ce85d43213d9@mail.gmail.com>
-	 <1260482634.2901.70.camel@violet>
-	 <35c90d960912161359u2b3f9b2fi875288896a7a8478@mail.gmail.com>
-	 <1261006596.4041.39.camel@localhost.localdomain>
-	 <35c90d960912161548p6cdcc1f0i7d74b31a4bc145b6@mail.gmail.com>
+Cc: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	Lan Zhu <zhu.lan.cn@gmail.com>, linux-bluetooth@vger.kernel.org
+In-Reply-To: <35c90d960912181430t4bf36fb9gbc6ae71eeaf16602@mail.gmail.com>
+References: <113d36d80909110053ybd2c203xeda76bd36248bb17@mail.gmail.com>
+	 <1252657436.8931.52.camel@violet>
+	 <113d36d80909110828i1b53e8f5x5b913fb7861850fd@mail.gmail.com>
+	 <1252687514.8931.77.camel@violet>
+	 <113d36d80909140210n476f5826x1ae2ea621b57782c@mail.gmail.com>
+	 <35c90d960909211752u389e5d6dqbd4afe0e055c43d0@mail.gmail.com>
+	 <35c90d960909211829u71880f94j861055c61efc8c@mail.gmail.com>
+	 <35c90d960909221318m4b918d2dg3e2688a89427319a@mail.gmail.com>
+	 <508e92ca0912180620l3550bdb7w1211094681cbc87b@mail.gmail.com>
+	 <1261173555.4041.91.camel@localhost.localdomain>
+	 <35c90d960912181430t4bf36fb9gbc6ae71eeaf16602@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 18 Dec 2009 15:05:40 -0800
-Message-Id: <1261177540.4041.106.camel@localhost.localdomain>
+Date: Fri, 18 Dec 2009 15:02:27 -0800
+Message-Id: <1261177347.4041.103.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Nick,
 
-> >> >> >> Right now Bluez always requests flushable ACL packets (but does not
-> >> >> >> set a flush timeout, so effectively they are non-flushable):
-> >> >> >>
-> >> >> >> However it is desirable to use an ACL flush timeout on A2DP packets so
-> >> >> >> that if the ACL packets block for some reason then the LM can flush
-> >> >> >> them to make room for newer packets.
-> >> >> >>
-> >> >> >> Is it reasonable for Bluez to use the 0x00 ACL packet boundary flag by
-> >> >> >> default (non-flushable packet), and let userspace request flushable
-> >> >> >> packets on A2DP L2CAP sockets with the socket option
-> >> >> >> L2CAP_LM_RELIABLE.
-> >> >> >
-> >> >> > the reliable option has a different meaning. It comes back from the old
-> >> >> > Bluetooth 1.1 qualification days where we had to tests on L2CAP that had
-> >> >> > to confirm that we can detect malformed packets and report them. These
-> >> >> > days it is just fine to drop them.
-> >> >>
-> >> >> Got it, how about introducing
-> >> >>
-> >> >> #define L2CAP_LM_FLUSHABLE 0x0040
-> >> >
-> >> > that l2cap_sock_setsockopt_old() sets this didn't give you a hint that
-> >> > we might wanna deprecate this socket options ;)
-> >> >
-> >> > I need to read up on the flushable stuff, but in the end it deserves its
-> >> > own socket option. Also an ioctl() to actually trigger Enhanced flush
-> >> > might be needed.
-> >> >
-> >> >> struct l2cap_pinfo {
-> >> >>    ...
-> >> >>    __u8 flushable;
-> >> >> }
-> >> >
-> >> > Sure. In the long run we need to turn this into a bitmask. We are just
-> >> > wasting memory here.
+> >> Processing a RFCOMM UA frame when the socket is closed and we were not
+> >> the
+> >> RFCOMM initiator would cause rfcomm_session_put() to be called twice
+> >> during
+> >> rfcomm_process_rx(). This would cause a kernel panic in
+> >> rfcomm_session_close.
 > >>
-> >> Attached is an updated patch, that checks the LMP features bitmask
-> >> before using the new non-flushable packet type.
+> >> This could be easily reproduced during disconnect with devices such as
+> >> Motorola H270 that send RFCOMM UA followed quickly by L2CAP disconnect
+> >> request.
+> >> This hcidump for this looks like:
 > >>
-> >> I am still using L2CAP_LM_FLUSHABLE socket option in
-> >> l2cap_sock_setsockopt_old(), which I don't think you are happy with.
-> >> So how about a new option:
+> >> 2009-09-21 17:22:37.788895 < ACL data: handle 1 flags 0x02 dlen 8
+> >>    L2CAP(d): cid 0x0041 len 4 [psm 3]
+> >>      RFCOMM(s): DISC: cr 0 dlci 20 pf 1 ilen 0 fcs 0x7d
+> >> 2009-09-21 17:22:37.906204 > HCI Event: Number of Completed Packets
+> >> (0x13)
+> >> plen 5
+> >>    handle 1 packets 1
+> >> 2009-09-21 17:22:37.933090 > ACL data: handle 1 flags 0x02 dlen 8
+> >>    L2CAP(d): cid 0x0040 len 4 [psm 3]
+> >>      RFCOMM(s): UA: cr 0 dlci 20 pf 1 ilen 0 fcs 0x57
+> >> 2009-09-21 17:22:38.636764 < ACL data: handle 1 flags 0x02 dlen 8
+> >>    L2CAP(d): cid 0x0041 len 4 [psm 3]
+> >>      RFCOMM(s): DISC: cr 0 dlci 0 pf 1 ilen 0 fcs 0x9c
+> >> 2009-09-21 17:22:38.744125 > HCI Event: Number of Completed Packets
+> >> (0x13)
+> >> plen 5
+> >>    handle 1 packets 1
+> >> 2009-09-21 17:22:38.763687 > ACL data: handle 1 flags 0x02 dlen 8
+> >>    L2CAP(d): cid 0x0040 len 4 [psm 3]
+> >>      RFCOMM(s): UA: cr 0 dlci 0 pf 1 ilen 0 fcs 0xb6
+> >> 2009-09-21 17:22:38.783554 > ACL data: handle 1 flags 0x02 dlen 12
+> >>    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0041
 > >>
-> >> SOL_L2CAP, L2CAP_ACL_FLUSH
-> >> which has a default value of 0, and can be set to 1 to make the ACL
-> >> data sent by this L2CAP socket flushable.
-> 
-> Was this proposal ok?
-
-Even SOL_L2CAP goes away. Use SOL_BLUETOOTH for this.
-
-> >> In a later commit we would then add
-> >> SOL_ACL, ACL_FLUSH_TIMEOUT
-> >> That is used to set an automatic flush timeout for the ACL link on a
-> >> L2CAP socket. Note that SOL_ACL is new.
+> >> Avoid calling rfcomm_session_put() twice by skipping this call
+> >> in rfcomm_recv_ua() if the socket is closed.
+> >>
+> >> Picked from:
+> >> http://android.git.kernel.org/?p=kernel/common.git;a=commit;h=1048e007842da2d6440679e1ca80f45438a6369d
+> >>
+> >> Signed-off-by: Nick Pelly <npelly@google.com>
+> >> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> >> ---
+> >>  net/bluetooth/rfcomm/core.c |    3 ++-
+> >>  1 files changed, 2 insertions(+), 1 deletions(-)
+> >>
+> >> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+> >> index 0313e88..56ffcb8 100644
+> >> --- a/net/bluetooth/rfcomm/core.c
+> >> +++ b/net/bluetooth/rfcomm/core.c
+> >> @@ -1148,7 +1148,8 @@ static int rfcomm_recv_ua(struct rfcomm_session
+> >> *s, u8 dlci)
+> >>                         break;
+> >>
+> >>                 case BT_DISCONN:
+> >> -                       rfcomm_session_put(s);
+> >> +                       if (s->sock->sk->sk_state != BT_CLOSED)
+> >> +                               rfcomm_session_put(s);
+> >>                         break;
+> >>                 }
+> >>         }
 > >
-> > can I stop you right here (without even looking at the patch). We do
-> > have the generic SOL_BLUETOOTH that you should be using. So adding
-> > SOL_ACL is not a viable option at all.
+> > I am not a big fan of conditionally decreasing reference counts. I do
+> > think it would be better to fix this by holding an extra pair of
+> > reference counts or actually fixing the imbalance. What about the other
+> > patches I proposed?
 > 
-> This would be in a later patch, and SOL_BLUETOOTH, ACL_FLUSH_TIMEOUT
-> is fine too, or whatever you prefer.
+> Your proposed patch was to add an extra hold() / put() reference count
+> around the offending put(). I did test this patch, and found it does
+> not fix the underlying imbalance, it just moves the kernel panic
+> somewhere else.
+> 
+> As best I can tell, my patch does address the underlying imbalance. It
+> is in production on Android phones and seems to work well. As best I
+> can tell, there is not a cleaner solution that does not involve
+> significant refactoring of rfcomm refcounting.
 
-Why not just use BT_FLUSHABLE and have it always take a timeout option
-and then 0 means not flushable. And advantage of having it separated?
+the RFCOMM reference counting is something nasty and it does need to be
+re-written. One thing that needs to happen that we stop using the L2CAP
+sockets directly. We have to put a proper L2CAP in-kernel specific API
+in between that ensures we are not mixing things. That is the one issues
+that we always had in this area.
+
+Before applying this patch, I like to have additionally a comment in
+front of this conditional put call that explains a little bit the
+problem area here. The long explanation with logs etc. should be in the
+commit message. I have to make sure that we fully understand what is
+going on here and why we did it.
 
 Regards
 
