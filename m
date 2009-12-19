@@ -1,232 +1,234 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1261182368.4041.114.camel@localhost.localdomain>
-References: <35c90d960912081950t135e3f10m8848e54fde1e596f@mail.gmail.com>
-	<1260482634.2901.70.camel@violet> <35c90d960912161359u2b3f9b2fi875288896a7a8478@mail.gmail.com>
-	<1261006596.4041.39.camel@localhost.localdomain> <35c90d960912161548p6cdcc1f0i7d74b31a4bc145b6@mail.gmail.com>
-	<1261177540.4041.106.camel@localhost.localdomain> <35c90d960912181523n1067f87cw1d585a17ba57475a@mail.gmail.com>
-	<1261180228.4041.111.camel@localhost.localdomain> <35c90d960912181612x494c5626r8cd01168e4991e7@mail.gmail.com>
-	<1261182368.4041.114.camel@localhost.localdomain>
-From: Nick Pelly <npelly@google.com>
-Date: Fri, 18 Dec 2009 17:50:15 -0800
-Message-ID: <35c90d960912181750g6f82c3c1tf89df6aec2ae97cf@mail.gmail.com>
-Subject: Re: RFC: Allow Bluez to select flushable or non-flushable ACL packets
-	with L2CAP_LM_RELIABLE
+Message-ID: <1261185699.4b2c2aa37a9c4@www.fastmail.com.br>
+Date: Fri, 18 Dec 2009 23:21:39 -0200
+From: dcobra@videam.com.br
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Long delay to (re)connect a bluetooth mouse
+References: <1260906227.4b27e6f39cc7c@www.fastmail.com.br>  <4B2A4B90.1040009@videam.com.br>  <4B2BBF58.4030901@videam.com.br>  <1261173899.4041.96.camel@localhost.localdomain>  <1261176544.4b2c06e0e0eae@www.fastmail.com.br> <1261177111.4041.99.camel@localhost.localdomain>
+In-Reply-To: <1261177111.4041.99.camel@localhost.localdomain>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Dec 18, 2009 at 4:26 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
-> Hi Nick,
->
->> =A0 =A0 =A0 =A0 > > > >> >> >> Right now Bluez always requests flushable=
- ACL
->> =A0 =A0 =A0 =A0 packets (but does not
->> =A0 =A0 =A0 =A0 > > > >> >> >> set a flush timeout, so effectively they =
-are
->> =A0 =A0 =A0 =A0 non-flushable):
->> =A0 =A0 =A0 =A0 > > > >> >> >>
->> =A0 =A0 =A0 =A0 > > > >> >> >> However it is desirable to use an ACL flu=
-sh
->> =A0 =A0 =A0 =A0 timeout on A2DP packets so
->> =A0 =A0 =A0 =A0 > > > >> >> >> that if the ACL packets block for some re=
-ason
->> =A0 =A0 =A0 =A0 then the LM can flush
->> =A0 =A0 =A0 =A0 > > > >> >> >> them to make room for newer packets.
->> =A0 =A0 =A0 =A0 > > > >> >> >>
->> =A0 =A0 =A0 =A0 > > > >> >> >> Is it reasonable for Bluez to use the 0x0=
-0 ACL
->> =A0 =A0 =A0 =A0 packet boundary flag by
->> =A0 =A0 =A0 =A0 > > > >> >> >> default (non-flushable packet), and let
->> =A0 =A0 =A0 =A0 userspace request flushable
->> =A0 =A0 =A0 =A0 > > > >> >> >> packets on A2DP L2CAP sockets with the so=
-cket
->> =A0 =A0 =A0 =A0 option
->> =A0 =A0 =A0 =A0 > > > >> >> >> L2CAP_LM_RELIABLE.
->> =A0 =A0 =A0 =A0 > > > >> >> >
->> =A0 =A0 =A0 =A0 > > > >> >> > the reliable option has a different meanin=
-g. It
->> =A0 =A0 =A0 =A0 comes back from the old
->> =A0 =A0 =A0 =A0 > > > >> >> > Bluetooth 1.1 qualification days where we =
-had to
->> =A0 =A0 =A0 =A0 tests on L2CAP that had
->> =A0 =A0 =A0 =A0 > > > >> >> > to confirm that we can detect malformed pa=
-ckets
->> =A0 =A0 =A0 =A0 and report them. These
->> =A0 =A0 =A0 =A0 > > > >> >> > days it is just fine to drop them.
->> =A0 =A0 =A0 =A0 > > > >> >>
->> =A0 =A0 =A0 =A0 > > > >> >> Got it, how about introducing
->> =A0 =A0 =A0 =A0 > > > >> >>
->> =A0 =A0 =A0 =A0 > > > >> >> #define L2CAP_LM_FLUSHABLE 0x0040
->> =A0 =A0 =A0 =A0 > > > >> >
->> =A0 =A0 =A0 =A0 > > > >> > that l2cap_sock_setsockopt_old() sets this di=
-dn't
->> =A0 =A0 =A0 =A0 give you a hint that
->> =A0 =A0 =A0 =A0 > > > >> > we might wanna deprecate this socket options =
-;)
->> =A0 =A0 =A0 =A0 > > > >> >
->> =A0 =A0 =A0 =A0 > > > >> > I need to read up on the flushable stuff, but=
- in
->> =A0 =A0 =A0 =A0 the end it deserves its
->> =A0 =A0 =A0 =A0 > > > >> > own socket option. Also an ioctl() to actuall=
-y
->> =A0 =A0 =A0 =A0 trigger Enhanced flush
->> =A0 =A0 =A0 =A0 > > > >> > might be needed.
->> =A0 =A0 =A0 =A0 > > > >> >
->> =A0 =A0 =A0 =A0 > > > >> >> struct l2cap_pinfo {
->> =A0 =A0 =A0 =A0 > > > >> >> =A0 =A0...
->> =A0 =A0 =A0 =A0 > > > >> >> =A0 =A0__u8 flushable;
->> =A0 =A0 =A0 =A0 > > > >> >> }
->> =A0 =A0 =A0 =A0 > > > >> >
->> =A0 =A0 =A0 =A0 > > > >> > Sure. In the long run we need to turn this in=
-to a
->> =A0 =A0 =A0 =A0 bitmask. We are just
->> =A0 =A0 =A0 =A0 > > > >> > wasting memory here.
->> =A0 =A0 =A0 =A0 > > > >>
->> =A0 =A0 =A0 =A0 > > > >> Attached is an updated patch, that checks the L=
-MP
->> =A0 =A0 =A0 =A0 features bitmask
->> =A0 =A0 =A0 =A0 > > > >> before using the new non-flushable packet type.
->> =A0 =A0 =A0 =A0 > > > >>
->> =A0 =A0 =A0 =A0 > > > >> I am still using L2CAP_LM_FLUSHABLE socket opti=
-on in
->> =A0 =A0 =A0 =A0 > > > >> l2cap_sock_setsockopt_old(), which I don't thin=
-k you
->> =A0 =A0 =A0 =A0 are happy with.
->> =A0 =A0 =A0 =A0 > > > >> So how about a new option:
->> =A0 =A0 =A0 =A0 > > > >>
->> =A0 =A0 =A0 =A0 > > > >> SOL_L2CAP, L2CAP_ACL_FLUSH
->> =A0 =A0 =A0 =A0 > > > >> which has a default value of 0, and can be set =
-to 1
->> =A0 =A0 =A0 =A0 to make the ACL
->> =A0 =A0 =A0 =A0 > > > >> data sent by this L2CAP socket flushable.
->> =A0 =A0 =A0 =A0 > > >
->> =A0 =A0 =A0 =A0 > > > Was this proposal ok?
->> =A0 =A0 =A0 =A0 > >
->> =A0 =A0 =A0 =A0 > > Even SOL_L2CAP goes away. Use SOL_BLUETOOTH for this=
-.
->> =A0 =A0 =A0 =A0 > >
->> =A0 =A0 =A0 =A0 > > > >> In a later commit we would then add
->> =A0 =A0 =A0 =A0 > > > >> SOL_ACL, ACL_FLUSH_TIMEOUT
->> =A0 =A0 =A0 =A0 > > > >> That is used to set an automatic flush timeout =
-for
->> =A0 =A0 =A0 =A0 the ACL link on a
->> =A0 =A0 =A0 =A0 > > > >> L2CAP socket. Note that SOL_ACL is new.
->> =A0 =A0 =A0 =A0 > > > >
->> =A0 =A0 =A0 =A0 > > > > can I stop you right here (without even looking =
-at the
->> =A0 =A0 =A0 =A0 patch). We do
->> =A0 =A0 =A0 =A0 > > > > have the generic SOL_BLUETOOTH that you should b=
-e
->> =A0 =A0 =A0 =A0 using. So adding
->> =A0 =A0 =A0 =A0 > > > > SOL_ACL is not a viable option at all.
->> =A0 =A0 =A0 =A0 > > >
->> =A0 =A0 =A0 =A0 > > > This would be in a later patch, and SOL_BLUETOOTH,
->> =A0 =A0 =A0 =A0 ACL_FLUSH_TIMEOUT
->> =A0 =A0 =A0 =A0 > > > is fine too, or whatever you prefer.
->> =A0 =A0 =A0 =A0 > >
->> =A0 =A0 =A0 =A0 > > Why not just use BT_FLUSHABLE and have it always tak=
-e a
->> =A0 =A0 =A0 =A0 timeout option
->> =A0 =A0 =A0 =A0 > > and then 0 means not flushable. And advantage of hav=
-ing it
->> =A0 =A0 =A0 =A0 separated?
->> =A0 =A0 =A0 =A0 >
->> =A0 =A0 =A0 =A0 > I think keeping them separate makes it clear that the =
-flush
->> =A0 =A0 =A0 =A0 timeout is
->> =A0 =A0 =A0 =A0 > global for a given ACL link, whereas the
->> =A0 =A0 =A0 =A0 flushable/non-flushable
->> =A0 =A0 =A0 =A0 > boolean is specific to a L2CAP channel. (Which is why =
-I
->> =A0 =A0 =A0 =A0 suggested
->> =A0 =A0 =A0 =A0 > introducing a new level SOL_ACL for the ACL_FLUSH_TIME=
-OUT
->> =A0 =A0 =A0 =A0 option -
->> =A0 =A0 =A0 =A0 > since this option applies at the ACL level in the stac=
-k).
->> =A0 =A0 =A0 =A0 >
->> =A0 =A0 =A0 =A0 > A specific advantage of this is that flushable packets=
- can
->> =A0 =A0 =A0 =A0 be enabled
->> =A0 =A0 =A0 =A0 > without over-writing a previous flush timeout that was=
- set
->> =A0 =A0 =A0 =A0 on a
->> =A0 =A0 =A0 =A0 > different L2CAP socket on the same ACL link. I guess t=
-his
->> =A0 =A0 =A0 =A0 can also be
->> =A0 =A0 =A0 =A0 > achieved with getsockopt() but that is racy.
->>
->>
->> =A0 =A0 =A0 =A0 I am talking here about Enhanced Flush support and that =
-would
->> =A0 =A0 =A0 =A0 happen on
->> =A0 =A0 =A0 =A0 a per ACL handle basis. So it actually almost applies on=
- a per
->> =A0 =A0 =A0 =A0 L2CAP
->> =A0 =A0 =A0 =A0 socket level. Only exception is if you establish two or =
-more
->> =A0 =A0 =A0 =A0 L2CAP
->> =A0 =A0 =A0 =A0 connections to the same remote device and set them all t=
-o
->> =A0 =A0 =A0 =A0 flushable.
->> =A0 =A0 =A0 =A0 Then of course all of them will be flushed. So strictly
->> =A0 =A0 =A0 =A0 speaking it
->> =A0 =A0 =A0 =A0 might be an ACL link feature, but we don't wanna use it =
-that
->> =A0 =A0 =A0 =A0 way. And in
->> =A0 =A0 =A0 =A0 practice you won't have multiple concurrent flushable L2=
-CAP
->> =A0 =A0 =A0 =A0 connections
->> =A0 =A0 =A0 =A0 to one remote device anyway.
->>
->>
->> I agree that having 2 flush-able L2CAP channels to the same device
->> would probably not be common. But who knows what new profiles the
->> Bluetooth SIG will come up with that might also benefit from
->> flush-able ACL data. And if a use-case comes up, then your proposed
->> API will require programmers to write a racy getsockopt/setsockopt if
->> they want to turn on flushing on one l2cap connection without
->> affecting the ACL flush timeout set by another connection. Building
->> race conditions into an API seems like a sub-optimal design choice.
->
-> are you expecting to change this frequently and from different parts of
-> the code during the lifetime of a socket. I just don't see that
-> happening at all actually. Either you create a "flushable" socket or you
-> don't. Fill me in on how you wanna actually use this feature.
+Hi Marcel:
 
-My use case is just for A2DP. I turn on flushing with a timeout of say
-160ms just before starting streaming of A2DP data, and turn it off
-when I finish. This is not a problem with either API proposal.
+> even if I use Bluetooth on a daily basis, I don't use any mouse or
+> keyboard devices anymore. So I have no idea on how many people are
+> actually using these.
 
-Where it becomes a problem is if there is a reason to have two
-flush-able L2CAP connections to the same host. With your API proposal,
-the second connection has no way of turning on flushing without
-over-writing the flush timeout set by the first socket. You could
-implement another API to read the current flush timeout, and have the
-second socket read that API, but thats racy.
+I'm getting the impression they are not very popular! To me it seemed like a
+clear advantage to use a mouse with my notebook's built-in bluetooth module
+without needing a dongle.
 
-If this is not a use-case you care about, then ok. But I just want to
-point out that this is a problem that will be baked into the API - and
-will require ugly workarounds in userspace as soon as someone requires
-2 flushable L2CAP connections to one host. Given the rate at which
-Bluetooth changes and new profiles and use cases are added I would not
-be so quick to dismiss this use case.
+> I used to travel with a lot of HID devices to just
+> be able to test and verify things, but I don't do that anymore. So I
+> wouldn't be of much help until I am back at home and have my device
+> library at my disposal (and bought new batteries).
 
->
->> But its not worth arguing over. SOL_BLUETOOTH, BT_FLUSHABLE is fine
->> (or BT_FLUSH_TIMEOUT instead).
->
-> I would call it BT_FLUSHABLE as of now. Since that is how the
-> specification calls it. However I do have to refresh my memory with the
-> actual details. I haven't read that part of the specification in a long
-> time.
->
-> Regards
->
-> Marcel
->
->
->
+O.k., if you find the time to look into this, I installed hcidump (didn't know
+about it until you mentioned it), and here's the output with the "-t" flag (any
+others I should use?) during a mouse reconnection:
+
+
+HCI sniffer - Bluetooth packet analyzer ver 1.42                       
+device: hci0 snap_len: 1028 filter: 0xffffffff                         
+1261183973.054875 > HCI Event: Connect Request (0x04) plen 10          
+1261183973.054911 < HCI Command: Accept Connection Request (0x01|0x0009) plen 7
+1261183973.062868 > HCI Event: Command Status (0x0f) plen 4                    
+1261183973.255871 > HCI Event: Role Change (0x12) plen 8                       
+1261183973.349870 > HCI Event: Connect Complete (0x03) plen 11                 
+1261183973.349892 < HCI Command: Read Remote Supported Features (0x01|0x001b)
+plen 2                                                                         
+  
+1261183973.351861 > HCI Event: Page Scan Repetition Mode Change (0x20) plen 7  
+
+1261183973.351870 > ACL data: handle 42 flags 0x02 dlen 12                     
+
+    L2CAP(s): Connect req: psm 17 scid 0x0060                                  
+
+1261183973.351932 < ACL data: handle 42 flags 0x02 dlen 16                     
+
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0060 result 1 status 0           
+
+      Connection pending - No futher information available                     
+
+1261183973.351937 < ACL data: handle 42 flags 0x02 dlen 10                     
+
+    L2CAP(s): Info req: type 2                                                 
+
+1261183973.358863 > HCI Event: Number of Completed Packets (0x13) plen 5       
+
+1261183973.361860 > HCI Event: Number of Completed Packets (0x13) plen 5       
+
+1261183973.363865 > HCI Event: Command Status (0x0f) plen 4                    
+
+1261183973.363881 < HCI Command: Remote Name Request (0x01|0x0019) plen 10     
+
+1261183973.373864 > HCI Event: Read Remote Supported Features (0x0b) plen 11   
+
+1261183973.375857 > HCI Event: Command Status (0x0f) plen 4                    
+
+1261183973.443867 > HCI Event: Remote Name Req Complete (0x07) plen 255        
+
+1261183977.351019 < ACL data: handle 42 flags 0x02 dlen 16                     
+
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0060 result 0 status 0           
+
+      Connection successful                                                    
+
+1261183977.361870 > HCI Event: Number of Completed Packets (0x13) plen 5       
+
+1261183977.383875 > ACL data: handle 42 flags 0x02 dlen 16                     
+
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4                        
+
+      MTU 133                                                                  
+
+1261183977.383896 < ACL data: handle 42 flags 0x02 dlen 18                     
+
+    L2CAP(s): Config rsp: scid 0x0060 flags 0x00 result 0 clen 4               
+
+      MTU 133                                                                  
+
+1261183977.383901 < ACL data: handle 42 flags 0x02 dlen 12                     
+
+    L2CAP(s): Config req: dcid 0x0060 flags 0x00 clen 0                        
+
+1261183977.391870 > HCI Event: Number of Completed Packets (0x13) plen 5       
+
+1261183977.393868 > HCI Event: Number of Completed Packets (0x13) plen 5       
+
+1261183977.403870 > ACL data: handle 42 flags 0x02 dlen 17                     
+
+1261183977.405872 > ACL data: handle 42 flags 0x01 dlen 1                      
+
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4               
+
+      MTU 133                                                                  
+
+1261183977.407872 > ACL data: handle 42 flags 0x02 dlen 12                     
+
+    L2CAP(s): Connect req: psm 19 scid 0x0061                                  
+
+1261183977.407895 < ACL data: handle 42 flags 0x02 dlen 16                     
+
+    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0061 result 1 status 2           
+
+      Connection pending - Authorization pending                               
+
+1261183977.408042 < ACL data: handle 42 flags 0x02 dlen 16                     
+
+    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0061 result 0 status 0           
+
+      Connection successful                                                    
+
+1261183977.413868 > HCI Event: Number of Completed Packets (0x13) plen 5       
+
+1261183977.415868 > HCI Event: Number of Completed Packets (0x13) plen 5       
+
+1261183977.437867 > ACL data: handle 42 flags 0x02 dlen 16                     
+
+    L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 4                        
+
+      MTU 133                                                                  
+
+1261183977.437892 < ACL data: handle 42 flags 0x02 dlen 18                     
+
+    L2CAP(s): Config rsp: scid 0x0061 flags 0x00 result 0 clen 4               
+
+      MTU 133                                                                  
+
+1261183977.437898 < ACL data: handle 42 flags 0x02 dlen 12                     
+
+    L2CAP(s): Config req: dcid 0x0061 flags 0x00 clen 0                        
+
+1261183977.443870 > HCI Event: Number of Completed Packets (0x13) plen 5       
+
+1261183977.445866 > HCI Event: Number of Completed Packets (0x13) plen 5       
+
+1261183977.459875 > ACL data: handle 42 flags 0x02 dlen 18                     
+
+    L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 4               
+
+      MTU 133                                                                  
+
+1261183977.461865 > ACL data: handle 42 flags 0x02 dlen 14                     
+
+    L2CAP(d): cid 0x0041 len 10 [psm 19]                                       
+
+      HIDP: Data: Input report                                                 
+
+1261183977.464114 < ACL data: handle 42 flags 0x02 dlen 11                     
+
+    L2CAP(d): cid 0x0061 len 7 [psm 19]                                        
+
+      HIDP: Data: Output report                                                
+
+1261183977.464180 < ACL data: handle 42 flags 0x02 dlen 7                      
+
+    L2CAP(d): cid 0x0061 len 3 [psm 19]                                        
+
+      HIDP: Data: Output report                                                
+
+1261183977.464223 < ACL data: handle 42 flags 0x02 dlen 7                      
+
+    L2CAP(d): cid 0x0061 len 3 [psm 19]                                        
+
+      HIDP: Data: Output report                                                
+
+1261183977.464294 < ACL data: handle 42 flags 0x02 dlen 14                     
+
+    L2CAP(d): cid 0x0061 len 10 [psm 19]                                       
+
+      HIDP: Data: Output report                                                
+
+1261183977.464335 < ACL data: handle 42 flags 0x02 dlen 8                      
+
+    L2CAP(d): cid 0x0061 len 4 [psm 19]
+      HIDP: Data: Output report
+1261183977.464375 < ACL data: handle 42 flags 0x02 dlen 11
+    L2CAP(d): cid 0x0061 len 7 [psm 19]
+      HIDP: Data: Output report
+1261183977.464416 < ACL data: handle 42 flags 0x02 dlen 7
+    L2CAP(d): cid 0x0061 len 3 [psm 19]
+      HIDP: Data: Output report
+1261183977.464455 < ACL data: handle 42 flags 0x02 dlen 14
+    L2CAP(d): cid 0x0061 len 10 [psm 19]
+      HIDP: Data: Output report
+1261183977.466860 > HCI Event: QoS Setup Complete (0x0d) plen 21
+1261183977.471858 > HCI Event: Number of Completed Packets (0x13) plen 5
+1261183977.473858 > HCI Event: Number of Completed Packets (0x13) plen 5
+1261183977.476859 > HCI Event: Number of Completed Packets (0x13) plen 5
+1261183977.478862 > HCI Event: Number of Completed Packets (0x13) plen 5
+1261183977.480857 > HCI Event: Number of Completed Packets (0x13) plen 5
+1261183977.484866 > HCI Event: Mode Change (0x14) plen 6
+1261183977.487865 > ACL data: handle 42 flags 0x02 dlen 11
+    L2CAP(d): cid 0x0041 len 7 [psm 19]
+      HIDP: Data: Input report
+1261183977.697866 > ACL data: handle 42 flags 0x02 dlen 11
+    L2CAP(d): cid 0x0041 len 7 [psm 19]
+      HIDP: Data: Input report
+
+
+This is all Greek to me. The whole process took 4.6 seconds (a little less than
+the 5-6 seconds I had estimated without actually clocking it, but still
+significantly longer than under Windows XP, where the mouse connects in under
+one second every time). Most of the delay takes place between the "Remote Name
+Req Complete" and reception of the next ACL data. Does that tell you
+something?
+
+As far as logs go, during reconnection the only lines that were logged into
+/var/log/messages were (any other log files I should check?):
+
+
+Dec 18 22:52:57 photon kernel: input: Targus Bluetooth Media Mouse for Notebook
+as
+/devices/pci0000:00/0000:00:1d.1/usb3/3-1/3-1:1.0/bluetooth/hci0/hci0:42/input14
+Dec 18 22:52:57 photon kernel: generic-bluetooth 0005:0461:4B01.0004:
+input,hidraw0: BLUETOOTH HID v1.08 Mouse [Targus Bluetooth Media Mouse for
+Notebook] on 00:18:F3:8C:F7:73
+
+Regards,
+
+Daniel
