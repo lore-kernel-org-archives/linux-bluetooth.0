@@ -1,52 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: peterhuewe@gmx.de
-To: Jiri Kosina <trivial@kernel.org>
-Cc: kernel-janitors@vger.kernel.org, Peter Huewe <peterhuewe@gmx.de>, Marcel Holtmann <marcel@holtmann.org>, Bing Zhao <bzhao@marvell.com>, Ben Hutchings <ben@decadent.org.uk>, =?UTF-8?q?Andr=C3=A9=20Goddard=20Rosa?= <andre.goddard@gmail.com>, Julia Lawall <julia@diku.dk>, linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 04/10] bluetooth: add __init/__exit macros to drivers/bluetooth/btmrvl_sdio.c
-Date: Tue, 22 Dec 2009 09:34:20 +0100
-Message-Id: <1261470861-23988-1-git-send-email-peterhuewe@gmx.de>
+Date: Sat, 19 Dec 2009 09:46:22 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Nick Pelly <npelly@google.com>, linux-bluetooth@vger.kernel.org
+Subject: Re: RFC: Allow Bluez to select flushable or non-flushable ACL
+ packets  with L2CAP_LM_RELIABLE
+Message-ID: <20091219074622.GA27738@jh-x301>
+References: <35c90d960912161359u2b3f9b2fi875288896a7a8478@mail.gmail.com>
+ <1261006596.4041.39.camel@localhost.localdomain>
+ <35c90d960912161548p6cdcc1f0i7d74b31a4bc145b6@mail.gmail.com>
+ <1261177540.4041.106.camel@localhost.localdomain>
+ <35c90d960912181523n1067f87cw1d585a17ba57475a@mail.gmail.com>
+ <1261180228.4041.111.camel@localhost.localdomain>
+ <35c90d960912181612x494c5626r8cd01168e4991e7@mail.gmail.com>
+ <1261182368.4041.114.camel@localhost.localdomain>
+ <35c90d960912181750g6f82c3c1tf89df6aec2ae97cf@mail.gmail.com>
+ <1261188322.4041.127.camel@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1261188322.4041.127.camel@localhost.localdomain>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Peter Huewe <peterhuewe@gmx.de>
+Hi Marcel,
 
-Trivial patch which adds the __init/__exit macros to the module_init/
-module_exit functions of
+On Fri, Dec 18, 2009, Marcel Holtmann wrote:
+> > > are you expecting to change this frequently and from different parts of
+> > > the code during the lifetime of a socket. I just don't see that
+> > > happening at all actually. Either you create a "flushable" socket or you
+> > > don't. Fill me in on how you wanna actually use this feature.
+> > 
+> > My use case is just for A2DP. I turn on flushing with a timeout of say
+> > 160ms just before starting streaming of A2DP data, and turn it off
+> > when I finish. This is not a problem with either API proposal.
+> 
+> I count this as creating socket, setting flushable and then using it.
+> Then closing it. And especially in A2DP case where the media socket is
+> brought up and taken down a lot that is a proper usage. However I do
+> expect that each socket should not change from flushable to
+> non-flushable in mid term usage. While potentially possible it don't see
+> its usage at all.
 
-drivers/bluetooth/btmrvl_sdio.c
+I hope you remember that the A2DP media transport socket is kept open
+much longer periods than e.g. the SCO socket in HFP/HSP since suspending
+an A2DP stream only means stopping sending data but still keeping the
+media socket open. Only when the configured codec parameters aren't
+suitable for the audio data would you close, reconfigure and recreate
+the media socket. So is it ok to keep the flushable setting even while
+the A2DP stream is suspended?
 
-Please have a look at the small patch and either pull it through
-your tree, or please ack' it so Jiri can pull it through the trivial
-tree.
-
-Patch against linux-next-tree, 22. Dez 08:38:18 CET 2009
-but also present in linus tree.
-
-Signed-off-by: Peter Huewe <peterhuewe@gmx.de>
----
- drivers/bluetooth/btmrvl_sdio.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index f36defa..e397170 100644
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -975,7 +975,7 @@ static struct sdio_driver bt_mrvl_sdio = {
- 	.remove		= btmrvl_sdio_remove,
- };
- 
--static int btmrvl_sdio_init_module(void)
-+static int __init btmrvl_sdio_init_module(void)
- {
- 	if (sdio_register_driver(&bt_mrvl_sdio) != 0) {
- 		BT_ERR("SDIO Driver Registration Failed");
-@@ -988,7 +988,7 @@ static int btmrvl_sdio_init_module(void)
- 	return 0;
- }
- 
--static void btmrvl_sdio_exit_module(void)
-+static void __exit btmrvl_sdio_exit_module(void)
- {
- 	/* Set the flag as user is removing this module. */
- 	user_rmmod = 1;
--- 
-1.6.4.4
+Johan
