@@ -1,29 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Tue, 22 Dec 2009 15:51:51 +0530
-Message-ID: <f63322490912220221w2dbf7db0m1681d68c11aa19c6@mail.gmail.com>
-Subject: HFP Implementation Issue
-From: Bhaskar <abc.bhaskar@gmail.com>
+Date: Tue, 22 Dec 2009 18:10:11 +0900
+Message-ID: <ca39c8ec0912220110h4938395ch584912ed0dc3a2eb@mail.gmail.com>
+Subject: Re a2dp control functions
+From: Asutosh Das <das.asutosh@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dear Team,
+Hi
+I have compiled bluez 3.36 for arm and am able to play and listen mp3
+files on a bluetooth headset (590plantronics). I am using mplayer to
+play the music. When I press the volume up and down the volume gets
+increased and decreased properly. So far so good. But the forward and
+backward buttons donot respond at all neither do the play/pause.
 
-The goal is to implement Hands Free Profile in the Bluetooth stack
-developed by the third party.
+I ran the hcid as hcid -nd & and it gave me some prints as below :-
 
-After studying the HFP spec, I started with sending phone book
-retrieval AT commands to the mobile and able to retrieve the missed
-call, dialed call entries.
+hcid[1033]: AVRCP command 0x0, subunit_type 0x09, subunit_id 0x0,
+opcode 0x7C, 2 operands
+hcid[1033]: AVRCP: PREV pressed
+hcid[1033]: Got 8 bytes of data for AVCTP session 0x2a06e158
+hcid[1033]: AVCTP transaction 3, packet type 0, C/R 0, IPID 0, PID 0x110E
 
-Everything works as expected with mobiles like Nokia 3110 series.  But
-when I test the same with Apple Iphone, it issues disconnection
-request before going into the sleep mode.
+hcid[1033]: AVRCP command 0x0, subunit_type 0x09, subunit_id 0x0,
+opcode 0x7C, 2 operands
+hcid[1033]: AVRCP: PREV released
+hcid[1033]: Got 8 bytes of data for AVCTP session 0x2a06e158
+hcid[1033]: AVCTP transaction 4, packet type 0, C/R 0, IPID 0, PID 0x110E
 
-Please kindly guide me in the correct direction.  What might be the
-reason for disconnection request and wheather it should be handled at
-stack level or profile level.
+hcid[1033]: AVRCP command 0x0, subunit_type 0x09, subunit_id 0x0,
+opcode 0x7C, 2 operands
+AVRCP: Play Called
+hcid[1033]: AVRCP: PLAY pressed
+hcid[1033]: Got 8 bytes of data for AVCTP session 0x2a06e158
+hcid[1033]: AVCTP transaction 7, packet type 0, C/R 0, IPID 0, PID 0x110E
 
-Regards.
+
+AVRCP: Play Called
+hcid[1033]: AVRCP: PLAY released
+hcid[1033]: Got 8 bytes of data for AVCTP session 0x2a06e158
+hcid[1033]: AVCTP transaction 8, packet type 0, C/R 0, IPID 0, PID 0x110E
+
+So it seems that the device is getting the control packets from the
+headset but for some reason it aint received by mplayer !!!
+
+The mplayer doesn't seem to respond to these commands and just keeps
+playing ....
+
+My asound.conf looks like
+
+pcm.bluetooth {
+        type bluetooth
+        device "00:19:7F:6F:6E:83"
+        profile "auto"
+}
+ctl.bluetooth {
+        type bluetooth
+        device "00:19:7F:6F:6E:83"
+        profile "auto"
+}
+
+Am I missing something ?
+
+
+--
+Thank you,
+Warm Regards,
+Asutosh Das
