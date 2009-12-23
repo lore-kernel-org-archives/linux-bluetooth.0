@@ -1,42 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4B3220D1.3000107@csr.com>
-Date: Wed, 23 Dec 2009 13:53:21 +0000
-From: Steven Singer <steven.singer@csr.com>
-MIME-Version: 1.0
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: Getting/setting Inquiry trasmit power level unsolved
-References: <c6e9632c0911131047s565cc191w84d22bc1dff710a0@mail.gmail.com>	 <1258286232.3299.27.camel@violet>	 <c6e9632c0911170853g5ef4061cr75c42c71a1a87b7d@mail.gmail.com>	 <1258491418.2003.37.camel@violet>	 <c6e9632c0911171318l1b60fa85h55b3e6083777d516@mail.gmail.com>	 <c6e9632c0911180959p3e56668aqc298a673baea7350@mail.gmail.com>	 <1258568114.2003.128.camel@violet>	 <c6e9632c0911271011p1268ee8ek16e389fc779e0d77@mail.gmail.com>	 <c6e9632c0912140824m5650d242w8296dd756943993f@mail.gmail.com> <1260813314.4041.17.camel@localhost.localdomain>
-In-Reply-To: <1260813314.4041.17.camel@localhost.localdomain>
-Content-Type: text/plain; charset=UTF-8
-To: unlisted-recipients:; (no To-header on input)
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 23 Dec 2009 14:51:19 +0100
+From: Stefan Seyfried <stefan.seyfried@googlemail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org, Jeremy Jackson <jerj@coplanar.net>,
+ linux-bluetooth@vger.kernel.org
+Subject: Re: btusb regression on commands unsupported by adapter
+Message-ID: <20091223145119.3ef1651b@strolchi.home.s3e.de>
+In-Reply-To: <1261173206.4041.89.camel@localhost.localdomain>
+References: <1261158272.4932.184.camel@ragnarok>
+	<1261173206.4041.89.camel@localhost.localdomain>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Marcel Holtmann wrote:
-> Natale Vinto wrote:
->> I finally got the Belkin F8T016, linked from CSR website (
->> http://www.csr.com/applications/qual-mod.php?catID=14 ) as qualified
->> end product with CSR's BlueCore chip.
-[...]
->> The output is always the same:
->>
->> # hciconfig hci0
->> hci0:   Type: USB
->>         BD Address: 00:0A:3A:xx:xx:xx ACL MTU: 1021:8 SCO MTU: 64:1
+Hi Marcel,
 
-I can tell from the ACL MTU that's not one of ours.
+On Fri, 18 Dec 2009 13:53:26 -0800
+Marcel Holtmann <marcel@holtmann.org> wrote:
+> > The question for kernel side is, regression, or corrected behaviour?
+> 
+> this is basically a bluetoothd issue. We should be reading the list of
+> supported commands and then either issue or not issue this command. Feel
+> free to write a patch for that.
 
-I have heard rumours (probably on this mailing list) that OEMs
-sometimes change the chipset they use in devices without telling
-anyone.
+This sounded like fun, and because I had nothing better to do, I wanted
+to take a shot at that.
 
-Isn't there some option to hciconfig that dumps the manufacturer ID
-and firmware version (maybe hciconfig hci0 version)?
+The result looks something like that (not to be applied,
+whitespace-damaged!):
+
+diff --git a/src/adapter.c b/src/adapter.c
+index 2e43662..2690227 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2121,6 +2121,7 @@ int adapter_start(struct btd_adapter *adapter)
+        struct hci_dev_info di;
+        struct hci_version ver;
+        uint8_t features[8];
++       uint8_t cmds[64];
+        int dd, err;
+        char mode[14], address[18];
+
+@@ -2203,8 +2204,16 @@ int adapter_start(struct btd_adapter *adapter)
+        }
+
+ setup:
+-       hci_send_cmd(dd, OGF_LINK_POLICY, OCF_READ_DEFAULT_LINK_POLICY,
+-                                                               0, NULL);
++       if (hci_read_local_commands(dd, cmds, 1000) < 0) {
++               error("Can't read supported commands on %s: %s (%d)\n",
++                                       adapter->path, strerror(errno), errno);
++       }
++
++       /* bit 43 is "Read Default Link Policy Settings" command support */
++       if (cmds[5] & (1 << 3))
++               hci_send_cmd(dd, OGF_LINK_POLICY,
++                                       OCF_READ_DEFAULT_LINK_POLICY, 0, NULL);
++
+        hci_close_dev(dd);
+
+        adapter->current_cod = 0;
+
+
+One question I faced was, if we should error out if
+hci_read_local_commands fails? I'm generally against it since it might
+introduce an 
+
+But then I noticed that we are not even reading the answer to this
+command (or is there no answer? would seem strange for a "read"
+command), so I concluded that the best way to fix the problem would
+probably be to just revert commit 8563b779 which added this command.
+
+Is my conclusion correct or did I overlook something?
+
+Have fun,
+
+	seife
 -- 
-Steven Singer
-Software Engineer
-Cambridge Silicon Radio Ltd. Tel: +44 (0)1223 692000 Fax: +44 (0)1223 692001
-Churchill House, Cambridge Business Park, Cowley Road, Cambridge CB4 0WZ, UK
+Stefan Seyfried
 
-
-Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
+"Any ideas, John?"
+"Well, surrounding them's out."
