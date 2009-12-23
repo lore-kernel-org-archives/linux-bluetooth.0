@@ -1,37 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4B31F893.6030009@videam.com.br>
-Date: Wed, 23 Dec 2009 09:01:39 -0200
-From: "Daniel T. Cobra" <dcobra@videam.com.br>
+Date: Wed, 23 Dec 2009 10:19:13 +0000 (GMT)
+To: bluezprofile kernel <bluezprofile@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: service search for headset
+In-Reply-To: <ba5648fa0912230200k3aae7de2v920cb00de10cef43@mail.gmail.com>
+References: <ba5648fa0912230200k3aae7de2v920cb00de10cef43@mail.gmail.com>
 MIME-Version: 1.0
-To: venu <vjosyula@gmail.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: Long delay to (re)connect a bluetooth mouse
-References: <1260906227.4b27e6f39cc7c@www.fastmail.com.br>	 <4B2A4B90.1040009@videam.com.br> <4B2BBF58.4030901@videam.com.br>	 <1261173899.4041.96.camel@localhost.localdomain>	 <1261176544.4b2c06e0e0eae@www.fastmail.com.br>	 <1261177111.4041.99.camel@localhost.localdomain>	 <1261185699.4b2c2aa37a9c4@www.fastmail.com.br>	 <4B30B555.5000202@videam.com.br> <4B30B6FF.4090300@videam.com.br> <53ea87da0912222033y530c83dci41bb6d9b99ece6c@mail.gmail.com>
-In-Reply-To: <53ea87da0912222033y530c83dci41bb6d9b99ece6c@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Message-Id: <1261563553.504805.2509.nullmailer@galant.ukfsn.org>
+From: Iain Hibbert <plunky@rya-online.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Venu:
+On Wed, 23 Dec 2009, bluezprofile kernel wrote:
 
-Thanks for replying.
+> I have done between two laptops and I am able to see the services available.
+> When I do the same for my hands free device, I am not able to get the
+> service details of handsfree unit.
+> I have debugged this using sdptool application source.
+> sdptool application sends the attribute request to the hands free
+> device, in the reply I am not getting anything. (sdp_send_req and sdp_read_rsp)
 
-Indeed, the reconnection is always successful, and, once it reconnects, 
-the mouse works well, without any lag or other issues. The whole problem 
-is the 4 second delay that happens during reconnection (see the last two 
-timestamps in the hicdump), making the overall process take about 5 
-seconds, which is a lot to wait every time you need to awake the mouse 
-from sleep mode.
+All that a "browse" does is start searching for the "Browse Group Root"
+UUID and if the handsfree device doesn't provide that UUID in any of the
+records then it will return no results when you search for it.  Many
+devices don't provide "Browse Groups" at all (see SDP specification),
+probably your handsfree is like that.
 
-Since the delay takes place right after the remote name request, I 
-wonder if that may have something to do with it, and if a solution might 
-be to not request again the name of a device that was previously 
-connected, and is merely coming out of sleep mode. (This is just a 
-guess, as I am not familiar with the Bluetooth protocol.) If you can 
-suggest how I may provide more information that would help ascertain the 
-cause of the delay (other hcidump flags, perhaps?), please let me know.
+Searching for L2CAP will usually suffice to find all of the (relevant)
+service records in a Bluetooth environment, as most bluetooth protocols
+operate over L2CAP.
 
-Regards,
+iain
 
-Daniel
 
