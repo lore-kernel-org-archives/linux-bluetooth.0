@@ -1,51 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 23 Dec 2009 16:48:41 +0100
-From: Stefan Seyfried <stefan.seyfried@googlemail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>, "Daniel T. Cobra"
- <dcobra@videam.com.br>
+Message-ID: <4B32396F.3090105@videam.com.br>
+Date: Wed, 23 Dec 2009 13:38:23 -0200
+From: "Daniel T. Cobra" <dcobra@videam.com.br>
+MIME-Version: 1.0
+To: venu <vjosyula@gmail.com>
+CC: linux-bluetooth@vger.kernel.org
 Subject: Re: Long delay to (re)connect a bluetooth mouse
-Message-ID: <20091223164841.7070e75d@strolchi.home.s3e.de>
-In-Reply-To: <1261177111.4041.99.camel@localhost.localdomain>
-References: <1260906227.4b27e6f39cc7c@www.fastmail.com.br>
-	<4B2A4B90.1040009@videam.com.br>
-	<4B2BBF58.4030901@videam.com.br>
-	<1261173899.4041.96.camel@localhost.localdomain>
-	<1261176544.4b2c06e0e0eae@www.fastmail.com.br>
-	<1261177111.4041.99.camel@localhost.localdomain>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+References: <1260906227.4b27e6f39cc7c@www.fastmail.com.br>	 <4B2BBF58.4030901@videam.com.br>	 <1261173899.4041.96.camel@localhost.localdomain>	 <1261176544.4b2c06e0e0eae@www.fastmail.com.br>	 <1261177111.4041.99.camel@localhost.localdomain>	 <1261185699.4b2c2aa37a9c4@www.fastmail.com.br>	 <4B30B555.5000202@videam.com.br> <4B30B6FF.4090300@videam.com.br>	 <53ea87da0912222033y530c83dci41bb6d9b99ece6c@mail.gmail.com>	 <4B32336C.8080806@videam.com.br> <53ea87da0912230727q617dce1axe5053cd32d03bbf5@mail.gmail.com>
+In-Reply-To: <53ea87da0912230727q617dce1axe5053cd32d03bbf5@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 18 Dec 2009 14:58:31 -0800
-Marcel Holtmann <marcel@holtmann.org> wrote:
+O.k., Venu:
 
-> even if I use Bluetooth on a daily basis, I don't use any mouse or
-> keyboard devices anymore. So I have no idea on how many people are
-> actually using these.
+I'll reverse the order of your suggestions and try getting the HCI trace 
+for Windows first. As you say, comparing it to the bluez trace will 
+probably throw more light into the reason for the difference in 
+performance and will help make clear whether changing the code is the 
+way to go. I'll post the results later.
 
-I'm still using it occasionally at home (when not sitting on the sofa
-with my notebook ;) and for the last few years they worked fine
-(actually since we worked out the reconnect problem of the
-Logitech mx1000, which looked similar, but probably was not).
+Regards,
 
-My collection of two bluetooth mice still work fine and reconnect
-quickly IIRC, but I will check this evening.
+Daniel
 
-David, "every time I bring the mouse out of sleep mode", does this mean
-the mouse went to sleep, you click the button (or move the mouse) and
-it takes 5 seconds to reconnect? If so, could you try if it makes a
-difference if you switch off the mouse instead? (wait until it falls
-asleep, then switch off and on and check if it reconnects faster. Might
-not be easy if this is a mouse that wakes up on movement, then you
-probably need to lay it upside down until it sleeps).
+P.S.: Folks, if this discussion is not appropriate for this mailing 
+list, please let me know and I will continue talking to Venu privately.
 
-> wouldn't be of much help until I am back at home and have my device
-> library at my disposal (and bought new batteries).
+Citando venu:
+> Hi
+>
+> I work on the bluetooth protocol, but I have not worked on Bluez stack 
+> at all. I have worked/working on existing protocol stack for 
+> semiconductor company. When I look at the HCI Commands log, I donot 
+> see any HCI Command Remote Name request, for getting the remote 
+> features, I see that hci command for reading remote name request being 
+> sent directly to the host. Ours is a PC Solution which has USB Transport.
+>
+> Even to follow, your suggestion you would need to modify the HID 
+> Profile stack to effect that. 
+>
+> But if you can get HCI Logs for windows for your case and compare it , 
+> it would throw light what/where the problem could be.
+>
+> Cheers,
+> Venu
 
-I can recommend eneloop rechargeables for BT HID devices ;)
--- 
-Stefan Seyfried
-
-"Any ideas, John?"
-"Well, surrounding them's out."
