@@ -1,28 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 28 Dec 2009 17:44:08 -0700
-From: Pete Zaitcev <zaitcev@redhat.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
 Subject: Re: How to snoop traffic
-Message-ID: <20091228174408.30cc5065@redhat.com>
-In-Reply-To: <1262043222.16627.100.camel@localhost.localdomain>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Pete Zaitcev <zaitcev@redhat.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20091228162807.5a16d9f5@redhat.com>
 References: <20091228162807.5a16d9f5@redhat.com>
-	<1262043222.16627.100.camel@localhost.localdomain>
+Content-Type: text/plain; charset="UTF-8"
+Date: Mon, 28 Dec 2009 15:33:42 -0800
+Message-ID: <1262043222.16627.100.camel@localhost.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 28 Dec 2009 15:33:42 -0800
-Marcel Holtmann <marcel@holtmann.org> wrote:
+Hi Pete,
 
-> > What is the preferred method to snoop the Bluetooth traffic?
+> What is the preferred method to snoop the Bluetooth traffic?
+> E.g. my phone seems to pair with my computer fine, but then it
+> stops communicating, what now? I would like to debug the issue
+> myself from the bottom up.
 
-> just use hcidump -X -V. It will trace and decode the Bluetooth HCI
-> traffic for you.
+just use hcidump -X -V. It will trace and decode the Bluetooth HCI
+traffic for you.
 
-Thanks a lot. As it turned out, my distribution (Fedora) packaged
-it into a nondefault package (bluez-hcidump), so I missed it, sorry.
-I thought we might've moved to a libpcap-based capture while I wasn't
-looking, but fortunately not.
+Regards
 
--- Pete
+Marcel
+
+
