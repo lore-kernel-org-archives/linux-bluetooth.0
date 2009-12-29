@@ -1,36 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: How to snoop traffic
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Pete Zaitcev <zaitcev@redhat.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20091228174408.30cc5065@redhat.com>
-References: <20091228162807.5a16d9f5@redhat.com>
-	 <1262043222.16627.100.camel@localhost.localdomain>
-	 <20091228174408.30cc5065@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Mon, 28 Dec 2009 18:20:00 -0800
-Message-ID: <1262053200.16627.101.camel@localhost.localdomain>
-Mime-Version: 1.0
+Date: Mon, 28 Dec 2009 20:59:53 -0500
+From: "Luis R. Rodriguez" <mcgrof@bombadil.infradead.org>
+To: Bala Shanmugam <sbalashanmugam@atheros.com>
+Cc: Luis Rodriguez <Luis.Rodriguez@Atheros.com>,
+	Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>,
+	linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org
+Subject: Re: [PATCH] compat-2.6: New targets to compile bluetooth alone
+Message-ID: <20091229015953.GD30201@bombadil.infradead.org>
+References: <20091224112428.GA30483@atheros-laptop>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20091224112428.GA30483@atheros-laptop>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Pete,
-
-> > > What is the preferred method to snoop the Bluetooth traffic?
+On Thu, Dec 24, 2009 at 04:54:28PM +0530, Bala Shanmugam wrote:
+> Compiling compat-pacakage consumes more time
+> as both wireless and bluetooth modules are compiled.
 > 
-> > just use hcidump -X -V. It will trace and decode the Bluetooth HCI
-> > traffic for you.
+> For someone who wants to use bluetooth alone
+> compiling and installing wireless modules is unnecessary
+> and is time consuming.
 > 
-> Thanks a lot. As it turned out, my distribution (Fedora) packaged
-> it into a nondefault package (bluez-hcidump), so I missed it, sorry.
-> I thought we might've moved to a libpcap-based capture while I wasn't
-> looking, but fortunately not.
+> New targets are declared to compile, install, uninstall, load
+> and unload bluetooth modules seperately.
+> 
+> Usage is updated in README.
+> Signed-off-by: Bala Shanmugam <sbalashanmugam@atheros.com>
 
-actually PCAP is not possible since we can't store packet direction in
-PCAP format and that is needed for HCI traffic.
+Applied, thanks
 
-Regards
-
-Marcel
-
-
+  Luis
