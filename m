@@ -1,33 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 28 Dec 2009 20:59:53 -0500
-From: "Luis R. Rodriguez" <mcgrof@bombadil.infradead.org>
-To: Bala Shanmugam <sbalashanmugam@atheros.com>
-Cc: Luis Rodriguez <Luis.Rodriguez@Atheros.com>,
-	Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>,
-	linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org
-Subject: Re: [PATCH] compat-2.6: New targets to compile bluetooth alone
-Message-ID: <20091229015953.GD30201@bombadil.infradead.org>
-References: <20091224112428.GA30483@atheros-laptop>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20091224112428.GA30483@atheros-laptop>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 28 Dec 2009 17:44:08 -0700
+From: Pete Zaitcev <zaitcev@redhat.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: How to snoop traffic
+Message-ID: <20091228174408.30cc5065@redhat.com>
+In-Reply-To: <1262043222.16627.100.camel@localhost.localdomain>
+References: <20091228162807.5a16d9f5@redhat.com>
+	<1262043222.16627.100.camel@localhost.localdomain>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Dec 24, 2009 at 04:54:28PM +0530, Bala Shanmugam wrote:
-> Compiling compat-pacakage consumes more time
-> as both wireless and bluetooth modules are compiled.
-> 
-> For someone who wants to use bluetooth alone
-> compiling and installing wireless modules is unnecessary
-> and is time consuming.
-> 
-> New targets are declared to compile, install, uninstall, load
-> and unload bluetooth modules seperately.
-> 
-> Usage is updated in README.
-> Signed-off-by: Bala Shanmugam <sbalashanmugam@atheros.com>
+On Mon, 28 Dec 2009 15:33:42 -0800
+Marcel Holtmann <marcel@holtmann.org> wrote:
 
-Applied, thanks
+> > What is the preferred method to snoop the Bluetooth traffic?
 
-  Luis
+> just use hcidump -X -V. It will trace and decode the Bluetooth HCI
+> traffic for you.
+
+Thanks a lot. As it turned out, my distribution (Fedora) packaged
+it into a nondefault package (bluez-hcidump), so I missed it, sorry.
+I thought we might've moved to a libpcap-based capture while I wasn't
+looking, but fortunately not.
+
+-- Pete
