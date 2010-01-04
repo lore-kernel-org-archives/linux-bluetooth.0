@@ -1,89 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 5 Jan 2010 09:25:04 +1000
-From: Peter Hutterer <peter.hutterer@who-t.net>
-To: =?utf-8?Q?Przemys=C5=82aw?= Firszt <przemo@firszt.eu>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	Ping <pinglinux@gmail.com>
-Subject: Re: [PATCH] Two small patches
-Message-ID: <20100104232504.GB27365@barra.redhat.com>
-References: <1262647038.2983.5.camel@pldmachine>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1262647038.2983.5.camel@pldmachine>
+Subject: Re: [RFC] Media API
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <2d5a2c101001040614o6627985ei278805369290b1b0@mail.gmail.com>
+References: <2d5a2c101001040614o6627985ei278805369290b1b0@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Mon, 04 Jan 2010 15:39:47 -0800
+Message-ID: <1262648387.16627.343.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jan 04, 2010 at 11:17:18PM +0000, Przemysław Firszt wrote:
-> Hi,
-> 2 patches:
-> - use defined variable is_proximity 
-> -remove duplicate comment from xf86WacomDefs.h
-> 
-> Those two are not important, but I don't want to leave it till later -
-> "the later" it might never happen.
-> --
-> Przemo
+Hi Luiz,
 
-> From a1865a5f06f165a398d9a87d34c96b59b1d8660c Mon Sep 17 00:00:00 2001
-> From: Przemo Firszt <przemo@firszt.eu>
-> Date: Mon, 4 Jan 2010 19:25:20 +0000
-> Subject: [PATCH 2/3] is_proximity is defined, so let's use it
+> The idea is to complete replace the existing audio IPC with DBus.
+> Johan and I discussed this a few times in the past and today we
+> finally archive something, so here are some design choices so far:
 > 
-> Signed-off-by: Przemo Firszt <przemo@firszt.eu>
-> ---
->  src/wcmCommon.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+> 1. Codec capabilities and configuration are blobs (array of bytes or
+> 'ay'), so there is no attempt to format codec structures into dbus
+> structures, this make it easier for both end points as well as
+> bluetoothd and also enables proprietary codecs. (suggested by Marcel
+> in the last BlueZ meeting)
 > 
-> diff --git a/src/wcmCommon.c b/src/wcmCommon.c
-> index 32ad82e..1c1cc2c 100644
-> --- a/src/wcmCommon.c
-> +++ b/src/wcmCommon.c
-> @@ -779,7 +779,7 @@ void xf86WcmSendEvents(LocalDevicePtr local, const WacomDeviceState* ds)
->  	}
->  
->  	/* don't move the cursor when going out-prox */
-> -	if (!ds->proximity)
-> +	if (!is_proximity)
->  	{
->  		x = priv->oldX;
->  		y = priv->oldY;
-> -- 
-> 1.6.5.7
-> 
+> 2. The spec is not a2dp specific. So it should be possible to register
+> end points for HFP and VDP.
 
-I'd prefer a more verbose explanation here. Why not just use ds->proximity
-and remove is_proximity? (I know the answer, but it'd be nice to get it from
-the patch, not from the code)
+if you really wanna achieve that, then I would prefer not to use
+StreamEndPoint as interface.
 
-> From 714b4b3b989ae5a36b839bd4fe229999233cd192 Mon Sep 17 00:00:00 2001
-> From: Przemo Firszt <przemo@firszt.eu>
-> Date: Mon, 4 Jan 2010 23:13:06 +0000
-> Subject: [PATCH 3/3] Remove duplicate comment in xf86WacomDefs.h
-> 
-> Signed-off-by: Przemo Firszt <przemo@firszt.eu>
-> ---
->  src/xf86WacomDefs.h |    4 ----
->  1 files changed, 0 insertions(+), 4 deletions(-)
-> 
-> diff --git a/src/xf86WacomDefs.h b/src/xf86WacomDefs.h
-> index 1e4a441..34a9375 100644
-> --- a/src/xf86WacomDefs.h
-> +++ b/src/xf86WacomDefs.h
-> @@ -324,10 +324,6 @@ struct _WacomChannel
->  
->  	WacomDeviceState work;                         /* next state */
->  
-> -	/* the following struct contains the current known state of the
-> -	 * device channel, as well as the previous MAX_SAMPLES states
-> -	 * for use in detecting hardware defects, jitter, trends, etc. */
-> -
->  	/* the following union contains the current known state of the
->  	 * device channel, as well as the previous MAX_SAMPLES states
->  	 * for use in detecting hardware defects, jitter, trends, etc. */
-> -- 
-> 1.6.5.7
+So first of all it should be StreamEndpoint. While SEP takes the P into
+account, the word "endpoint" in itself is proper enough.
 
-merged, thanks.
+And if this should support HFP, then the term Stream is kinda tricky. We
+could just allow that, but I prefer not to mix streaming with headset
+functionality. So what about just using the "Endpoint" as a generic
+agent type interface. Or "MediaEndpoint" if you need to tie it to the
+media interface?
 
-Cheers,
-  Peter
+Regards
+
+Marcel
+
+
