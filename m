@@ -1,30 +1,107 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Fix pad button definition in hid-wacom.c
-From: Bastien Nocera <hadess@hadess.net>
-To: Jiri Kosina <jkosina@suse.cz>
-Cc: =?UTF-8?Q?Przemys=C5=82aw?= Firszt <przemo@firszt.eu>,  linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <alpine.LNX.2.00.1001041224010.2277@pobox.suse.cz>
-References: <1262544397.10071.60.camel@pldmachine>
-	 <alpine.LNX.2.00.1001041224010.2277@pobox.suse.cz>
-Content-Type: text/plain; charset="UTF-8"
-Date: Mon, 04 Jan 2010 16:39:06 +0100
-Message-ID: <1262619546.19140.1.camel@localhost.localdomain>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Date: Mon, 4 Jan 2010 16:14:49 +0200
+Message-ID: <2d5a2c101001040614o6627985ei278805369290b1b0@mail.gmail.com>
+Subject: [RFC] Media API
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=0016364275a32a0cff047c5758a8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 2010-01-04 at 12:24 +0100, Jiri Kosina wrote:
-> On Sun, 3 Jan 2010, Przemysław Firszt wrote:
-> 
-> > Please check attached patch and apply if it's possible.
-> > The patch was also discussed here:
-> > http://www.mail-archive.com/linuxwacom-devel@lists.sourceforge.net/msg00128.htm
-> 
-> Adding Bastien (the author of hid-wacom.c) to CC.
+--0016364275a32a0cff047c5758a8
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-I'm on the list already :)
+Hi,
 
-> I have queued the patch in my tree, thanks.
+The idea is to complete replace the existing audio IPC with DBus.
+Johan and I discussed this a few times in the past and today we
+finally archive something, so here are some design choices so far:
 
-Looks good, thanks for the patch!
+1. Codec capabilities and configuration are blobs (array of bytes or
+'ay'), so there is no attempt to format codec structures into dbus
+structures, this make it easier for both end points as well as
+bluetoothd and also enables proprietary codecs. (suggested by Marcel
+in the last BlueZ meeting)
 
-Cheers
+2. The spec is not a2dp specific. So it should be possible to register
+end points for HFP and VDP.
+
+3. There is no representation of remote end points, so end points in
+this spec always refer to local end points. This is to minimize object
+creation, which adds more round trips not necessary with the current
+design as capabilities is now fully available to bluetoothd.
+
+4. Stream object is the only new object which is created by
+bluetoothd, this is necessary so end point process can pull the file
+descriptor from bluetoothd. Note that Acquire/Release should works
+differently depending on the profile, for A2DP it actually
+resume/start the stream on Acquire and suspend/stop the stream on
+Release while for HFP it should open sco socket on Acquire and closes
+it on Release.
+
+5. Stream.Acquire will return an error if the
+StreamEndPoint.SetConfiguration has not returned yet, this is to avoid
+any chance of a process block waiting the Acquire reply while
+SetConfigure is in place.
+
+--=20
+Luiz Augusto von Dentz
+Engenheiro de Computa=E7=E3o
+
+--0016364275a32a0cff047c5758a8
+Content-Type: text/x-patch; charset=US-ASCII; name="0002-Add-media-API.patch"
+Content-Disposition: attachment; filename="0002-Add-media-API.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_g41b4il20
+
+RnJvbSA2MDBkY2JjMTU4ZDFlZDJmOTU0MGM5YjgzNWQ5YzA4Nzg5YzIzMjRjIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBMdWl6IEF1Z3VzdG8gVm9uIERlbnR6IDxsdWl6LmRlbnR6LXZv
+bkBub2tpYS5jb20+CkRhdGU6IE1vbiwgNCBKYW4gMjAxMCAxNDo1MToyOCArMDIwMApTdWJqZWN0
+OiBbUEFUQ0ggMi8yXSBBZGQgbWVkaWEgQVBJCgpNZWRpYSBBUEkgaXMgYSByZXBsYWNlbWVudCBm
+b3IgdGhlIGludGVybmFsIGF1ZGlvIElQQyB3aGljaCBpcyBubyBsb25nZXIKbmVjZXNzYXJ5IGFz
+IERCVVMgMS40IGFuZCBuZXdlciBhcmUgY2FwYWJsZSBvZiB0cmFuZmVyaW5nIGZpbGUgZGVzY3Jp
+cHRvcnMuCi0tLQogZG9jL2F1ZGlvLWFwaS50eHQgfCAgIDE2ICsrKysrKysrKysrKysrKwogZG9j
+L21lZGlhLWFwaS50eHQgfCAgIDU1ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrCiAyIGZpbGVzIGNoYW5nZWQsIDcxIGluc2VydGlvbnMoKyksIDAg
+ZGVsZXRpb25zKC0pCiBjcmVhdGUgbW9kZSAxMDA2NDQgZG9jL21lZGlhLWFwaS50eHQKCmRpZmYg
+LS1naXQgYS9kb2MvYXVkaW8tYXBpLnR4dCBiL2RvYy9hdWRpby1hcGkudHh0CmluZGV4IDFmMDlj
+ZDUuLjU5ZWZkYzggMTAwNjQ0Ci0tLSBhL2RvYy9hdWRpby1hcGkudHh0CisrKyBiL2RvYy9hdWRp
+by1hcGkudHh0CkBAIC00NTYsMyArNDU2LDE5IEBAIHByb3BlcnRpZXMJYm9vbGVhbiBDb25uZWN0
+ZWQgW3JlYWRvbmx5XQogCQl1aW50MTYgTWljcm9waG9uZUdhaW4gIFtyZWFkb25seV0KIAogCQkJ
+VGhlIHNwZWFrZXIgZ2FpbiB3aGVuIGF2YWlsYWJsZS4KKworU3RyZWFtIGhpZXJhcmNoeQorPT09
+PT09PT09PT09PT09PQorCitTZXJ2aWNlCQlvcmcuYmx1ZXoKK0ludGVyZmFjZQlvcmcuYmx1ZXou
+U3RyZWFtCitPYmplY3QgcGF0aAlbdmFyaWFibGUgcHJlZml4XS97aGNpMCxoY2kxLC4uLn0vZGV2
+X1hYX1hYX1hYX1hYX1hYX1hYL3N0cmVhbVgKKworTWV0aG9kcwkJaW50IEFjcXVpcmUob2JqZWN0
+IGVuZHBvaW50KQorCisJCQlBY3F1aXJlIHN0cmVhbSBmaWxlIGRlc2NyaXB0b3IgdXNpbmcgZW5k
+IHBvaW50IHR5cGUKKwkJCXByb3BlcnR5IGFzIGFjY2VzcyB0eXBlLgorCisJCXZvaWQgUmVsZWFz
+ZShvYmplY3QgZW5kcG9pbnQpCisKKwkJCVJlbGVhc2VzIGZpbGUgZGVzY3JpcHRvcgpkaWZmIC0t
+Z2l0IGEvZG9jL21lZGlhLWFwaS50eHQgYi9kb2MvbWVkaWEtYXBpLnR4dApuZXcgZmlsZSBtb2Rl
+IDEwMDY0NAppbmRleCAwMDAwMDAwLi45ODE4Y2RhCi0tLSAvZGV2L251bGwKKysrIGIvZG9jL21l
+ZGlhLWFwaS50eHQKQEAgLTAsMCArMSw1NSBAQAorQmx1ZVogRC1CdXMgTWVkaWEgQVBJIGRlc2Ny
+aXB0aW9uCisqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioKKworTWVkaWEgaGllcmFy
+Y2h5Cis9PT09PT09PT09PT09PT0KKworU2VydmljZQkJb3JnLmJsdWV6CitJbnRlcmZhY2UJb3Jn
+LmJsdWV6Lk1lZGlhCitPYmplY3QgcGF0aAlbdmFyaWFibGUgcHJlZml4XS97aGNpMCxoY2kxLC4u
+Ln0KKworTWV0aG9kcwkJdm9pZCBSZWdpc3RlclN0cmVhbUVuZFBvaW50KG9iamVjdCBlbmRwb2lu
+dCwgZGljdCBwcm9wZXJ0aWVzKQorCisJCQlSZWdpc3RlciBhIGxvY2FsIGVuZCBwb2ludCB0byBz
+ZW5kZXIsIHRoZSBzZW5kZXIgY2FuCisJCQlyZWdpc3RlciBhcyBtYW55IGVuZCBwb2ludHMgYXMg
+aXQgbGlrZXMuCisKKwkJCU5vdGU6IElmIHRoZSBzZW5kZXIgZGlzY29ubmVjdHMgdGhlIGVuZCBw
+b2ludHMgYXJlCisJCQlhdXRvbWF0aWNhbGx5IHVucmVnaXN0ZXJlZC4KKworCQl2b2lkIFVucmVn
+aXN0ZXJTdHJlYW1FbmRQb2ludChvYmplY3QgZW5kcG9pbnQpCisKKwkJCVVucmVnaXN0ZXIgc2Vu
+ZGVyIGVuZCBwb2ludAorCitTdHJlYW1FbmRQb2ludCBoaWVyYXJjaHkKKz09PT09PT09PT09PT09
+PT09PT09PT09PQorCitTZXJ2aWNlCQl1bmlxdWUgbmFtZQorSW50ZXJmYWNlCW9yZy5ibHVlei5T
+dHJlYW1FbmRQb2ludAorT2JqZWN0IHBhdGgJZnJlZWx5IGRlZmluYWJsZQorCitNZXRob2RzCQlk
+aWN0IEdldFByb3BlcnRpZXMoKQorCisJCQlSZXR1cm5zIGFsbCBwcm9wZXJ0aWVzIGZvciB0aGUg
+aW50ZXJmYWNlLiBTZWUgdGhlCisJCQlwcm9wZXJ0aWVzIHNlY3Rpb24gZm9yIGF2YWlsYWJsZSBw
+cm9wZXJ0aWVzLgorCisJCXZvaWQgU2V0Q29uZmlndXJhdGlvbihvYmplY3Qgc3RyZWFtLCBhcnJh
+eXtieXRlc30gY29uZmlndXJhdGlvbikKKworCQkJU2V0IGNvbmZpZ3VyYXRpb24gZm9yIHRoZSBz
+dHJlYW0KKworCQl2b2lkIENsZWFyQ29uZmlndXJhdGlvbigpCisKKwkJCUNsZWFyIGFueSBjb25m
+aWd1cmF0aW9uIHNldC4KKworUHJvcGVydGllcwlzdHJpbmcgTWVkaWEgW3JlYWRvbmx5XQorCisJ
+CQlQb3NzaWJsZSB2YWx1ZXM6ICJhdWRpbyIgb3IgInZpZGVvIgorCisJCXN0cmluZyBUeXBlIFty
+ZWFkb25seV0KKworCQkJUG9zc2libGUgdmFsdWVzOiAic291cmNlIiwgInNpbmsiIG9yICI/Igor
+CisJCWFycmF5e2J5dGVzfSBDYXBhYmlsaXRpZXMgW3JlYWRvbmx5XQorCisJCQlDYXBhYmlsaXRp
+ZXMgYmxvYiBhcyBpbiBhdmR0cCBzcGVjLiBUaGlzIGlzIGNvcGllZCBhcworCQkJaXQgaXMgdG8g
+YXZkdHAgR0VUX0NBUEFCSUxJVElFUyBjb21tYW5kLCBzbyB0aGUgc2l6ZQorCQkJYW5kIGJ5dGUg
+b3JkZXIgbXVzdCBtYXRjaC4KLS0gCjEuNi4zLjMKCg==
+--0016364275a32a0cff047c5758a8--
