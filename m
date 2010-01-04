@@ -1,26 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4B423816.4060405@videam.com.br>
-Date: Mon, 04 Jan 2010 16:48:54 -0200
-From: "Daniel T. Cobra" <dcobra@videam.com.br>
-MIME-Version: 1.0
-To: Stefan Seyfried <stefan.seyfried@googlemail.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: Long delay to (re)connect a bluetooth mouse
-References: <1260906227.4b27e6f39cc7c@www.fastmail.com.br> <4B2A4B90.1040009@videam.com.br> <4B2BBF58.4030901@videam.com.br> <1261173899.4041.96.camel@localhost.localdomain> <1261176544.4b2c06e0e0eae@www.fastmail.com.br> <1261177111.4041.99.camel@localhost.localdomain> <20091223164841.7070e75d@strolchi.home.s3e.de> <4B325905.6090103@videam.com.br> <20091229160135.12d85fe6@strolchi.home.s3e.de>
-In-Reply-To: <20091229160135.12d85fe6@strolchi.home.s3e.de>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCH] Fix pad button definition in hid-wacom.c
+From: Bastien Nocera <hadess@hadess.net>
+To: Jiri Kosina <jkosina@suse.cz>
+Cc: =?UTF-8?Q?Przemys=C5=82aw?= Firszt <przemo@firszt.eu>,  linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <alpine.LNX.2.00.1001041224010.2277@pobox.suse.cz>
+References: <1262544397.10071.60.camel@pldmachine>
+	 <alpine.LNX.2.00.1001041224010.2277@pobox.suse.cz>
+Content-Type: text/plain; charset="UTF-8"
+Date: Mon, 04 Jan 2010 16:39:06 +0100
+Message-ID: <1262619546.19140.1.camel@localhost.localdomain>
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Stefan:
+On Mon, 2010-01-04 at 12:24 +0100, Jiri Kosina wrote:
+> On Sun, 3 Jan 2010, Przemysław Firszt wrote:
+> 
+> > Please check attached patch and apply if it's possible.
+> > The patch was also discussed here:
+> > http://www.mail-archive.com/linuxwacom-devel@lists.sourceforge.net/msg00128.htm
+> 
+> Adding Bastien (the author of hid-wacom.c) to CC.
 
-I'm back from the holidays.
+I'm on the list already :)
 
-Since I was not able to find a free hcidump equivalent for Windows, I 
-think we could at least compare the dumps for your mouse and mine, as 
-you suggested. Could you please post yours (with timestamps)?
+> I have queued the patch in my tree, thanks.
 
-Regards,
+Looks good, thanks for the patch!
 
-Daniel
-
+Cheers
