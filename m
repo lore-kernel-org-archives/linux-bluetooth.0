@@ -1,26 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: Remove double free of skb pointer
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+From: Gene Heskett <gene.heskett@verizon.net>
+To: Stefan Seyfried <stefan.seyfried@googlemail.com>
+Subject: Re: need understanding about bt
+Date: Wed, 06 Jan 2010 16:10:22 -0500
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <508e92ca0912220656j6913ef64w4bd6c1557079d0b5@mail.gmail.com>
-References: <508e92ca0912220656j6913ef64w4bd6c1557079d0b5@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 06 Jan 2010 19:47:38 -0800
-Message-ID: <1262836058.16627.455.camel@localhost.localdomain>
-Mime-Version: 1.0
+References: <201001051910.08204.gene.heskett@verizon.net>
+ <20100106092350.47ba4a63@strolchi.home.s3e.de>
+In-reply-to: <20100106092350.47ba4a63@strolchi.home.s3e.de>
+MIME-version: 1.0
+Content-type: Text/Plain; charset=iso-8859-1
+Message-id: <201001061610.22914.gene.heskett@verizon.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+On Wednesday 06 January 2010, Stefan Seyfried wrote:
+[...]
 
-> Trivial fix for double free of skb pointer with kfree_skb to
-> make code simplier and cleaner. Remove unused variable err.
+>Note that the test-serial has a fixed timeout of 1000 seconds and will
+>close the link afterwards, but that should be trivial to hack out of
+>the script.
 
-patch has been applied. Thanks.
+I already had a script I'd played the 10,000 monkeys scene writing, so I just 
+streamlined that one.  No timeouts in it. ;)
 
-Regards
+>If you want to use the old-fashioned style, I had written some
+>documentation about that in a former life. It's still available through
+>http://en.opensuse.org/Bluetooth/rfcomm (it's not SUSE-specific at all,
+>if anything, you might need to put a call to "rfcomm bind all" into a
+>late-running init script for your distro).
 
-Marcel
+I've done that, except the bind is issued for the bdaddr, enabled the script 
+and it works for at least the last reboot.
+
+I think the newer kernels have helped make it dependable now.
+
+Many thanks.
+
+>Hope this helps and Good Luck :-)
+>
+>	seife
+>
 
 
+-- 
+Cheers, Gene
+"There are four boxes to be used in defense of liberty:
+ soap, ballot, jury, and ammo. Please use in that order."
+-Ed Howdershelt (Author)
+
+The cable TV sex channels don't expand our horizons, don't make us better
+people, and don't come in clearly enough.
+		-- Bill Maher
