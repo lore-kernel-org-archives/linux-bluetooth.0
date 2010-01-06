@@ -1,109 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Wed, 6 Jan 2010 20:08:41 +0900
-Message-ID: <ca39c8ec1001060308x33aef29em6cce9e2fd6f0b449@mail.gmail.com>
-Subject: Re Bluez Stack stalls
-From: Asutosh Das <das.asutosh@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Date: Wed, 6 Jan 2010 09:23:50 +0100
+From: Stefan Seyfried <stefan.seyfried@googlemail.com>
+To: Gene Heskett <gene.heskett@verizon.net>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: need understanding about bt
+Message-ID: <20100106092350.47ba4a63@strolchi.home.s3e.de>
+In-Reply-To: <201001051910.08204.gene.heskett@verizon.net>
+References: <201001051910.08204.gene.heskett@verizon.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
-I have ported the bluez-3.36 stack on an arm based board. When I play
-songs using mplayer, it plays like 10 songs continuously, but after
-sometime the stack hangs. Please find the log pasted below.
+Hi Gene,
 
-Additional Info
-- The bt chip uses a hci-uart interface
-- Its a broadcom based chip bcm 4325
+(didn't we have a similar thread ~half a year ago?)
 
-Please give me anything/any thought that you may have. I shall dig from there.
+On Tue, 05 Jan 2010 19:10:08 -0500
+Gene Heskett <gene.heskett@verizon.net> wrote:
 
-==================================================================================================================================================
-Playing EK PYAR KA NAGMA HAI.mp3.
-called: process_queue
-Audio file file format detected.
-==========================================================================
-Opening audio decoder: [mp3lib] MPEG layer-2, layer-3
-AUDIO: 44100 Hz, 2 ch, s16le, 160.0 kbit/11.34% (ratio: 20000->176400)
-Selected audio codec: [mp3] afm: mp3lib (mp3lib MPEG layer-2, layer-3)
-==========================================================================
-hcid[1016]: Audio API: received BT_GETCAPABILITIES_REQ
-DEBUG: handle_getcapabilities_req Called
-hcid[1016]: Audio API: sending BT_GETCAPABILITIES_RSP
-hcid[1016]: Audio API: received BT_SETCONFIGURATION_REQ
-DEBUG: handle_setconfiguration_req Called
-hcid[1016]: config a2dp - device = 00:19:7F:6F:6E:83 access_mode = 2
-hcid[1016]: codec sbc - frequency = 2 channel_mode = 1 allocation = 1
-subbands = 1 blocks = 1 bitpool = 32
-hcid[1016]: Audio API: sending BT_SETCONFIGURATION_RSP
-hcid[1016]: Audio API: received BT_STREAMSTART_REQ
-called: send_request
-called: send_req
-hcid[1016]: Audio API: sending BT_STREAMSTART_RSP
-hcid[1016]: Audio API: sending BT_STREAMFD_IND
-called: process_queue
-AO: [alsa] 44100Hz 2ch s16le (2 bytes per sample)
-Video: no video
-Starting playback...
-h4_recv: Unknown HCI packet type 050) 33.5%
-h4_recv: Unknown HCI packet type 01
-h4_recv: Unknown HCI packet type 0c
-h4_recv: Unknown HCI packet type 00
-A: 254.8 (04:14.7) of 254hci_acl_tx_to: hci0 ACL tx timeout
-hci_acl_tx_to: hci0 killing stalled ACL connection 83:6E:6F:7F:19:00
-.0 (04:14.0) 33.3%
-called: send_request
-called: send_req
+> So, how do I reliably get this /dev/rfcomm0 device created?  Running kernels 
+> in the 2.6.32.x range here.
 
-Playing gazab_ka_hai_din.mp3.
-Audio file file format detected.
-Clip info:
- Title: Track 09
- Artist: artist
- Album: title
- Year:
- Comment:
- Track: 9
- Genre: Other
-==========================================================================
-Opening audio decoder: [mp3lib] MPEG layer-2, layer-3
-AUDIO: 11025 Hz, 2 ch, s16le, 16.0 kbit/4.54% (ratio: 2000->44100)
-Selected audio codec: [mp3] afm: mp3lib (mp3lib MPEG layer-2, layer-3)
-==========================================================================
-hcid[1016]: Audio API: received BT_GETCAPABILITIES_REQ
-DEBUG: handle_getcapabilities_req Called
-hcid[1016]: Audio API: sending BT_GETCAPABILITIES_RSP
-hcid[1016]: Audio API: received BT_SETCONFIGURATION_REQ
-DEBUG: handle_setconfiguration_req Called
-hcid[1016]: config a2dp - device = 00:19:7F:6F:6E:83 access_mode = 2
-hcid[1016]: codec sbc - frequency = 8 channel_mode = 1 allocation = 1
-subbands = 1 blocks = 1 bitpool = 32
-called: send_request
-called: send_req
-hcid[1016]: Suspend hci_acl_tx_to: hci0 ACL tx timeout
-hci_acl_tx_to: hci0 killing stalled ACL connection 83:6E:6F:7F:19:00
-hci_cmd_task: hci0 command tx timeout
-request timed out
-called: send_request
-called: send_req
-hcid[1016]: Abort requhci_acl_tx_to: hci0 ACL tx timeout
-hci_acl_tx_to: hci0 killing stalled ACL connection 83:6E:6F:7F:19:00
-hci_cmd_task: hci0 command tx timeout
-[/home/maverick/projects/bluetooth/bt-remote/bt_dev.c : btdev_release
-: 99] Releasing all...
-hci_acl_tx_to: hci0 ACL tx timeout
-hci_acl_tx_to: hci0 killing stalled ACL connection 83:6E:6F:7F:19:00
-hci_acl_tx_to: hci0 ACL tx timeout
-hci_acl_tx_to: hci0 killing stalled ACL connection 83:6E:6F:7F:19:00
-est timed out
-hcid[1016]: connection_lost: ref count not 1 after all callbacks
+You can either use the rfcomm utility, see "rfcomm -h", or use the
+test-serial script from bluez-test (if it is packaged for your distro,
+otherwise it lives in the bluez source in test/test-serial) which is
+the preferred method nowadays IIUC and which works for me:
 
-=============================================================================================================================================================
+seife@strolchi:~> test-serial 00:24:EF:D1:B3:23
+Connected /dev/rfcomm0 to 00:24:EF:D1:B3:23
+Press CTRL-C to disconnect
 
+then, in another terminal, I can send AT commands to my phone
+via /dev/rfcomm0.
 
---
-Thank you,
-Warm Regards,
-Asutosh Das
+Note that the test-serial has a fixed timeout of 1000 seconds and will
+close the link afterwards, but that should be trivial to hack out of
+the script.
+
+If you want to use the old-fashioned style, I had written some
+documentation about that in a former life. It's still available through
+http://en.opensuse.org/Bluetooth/rfcomm (it's not SUSE-specific at all,
+if anything, you might need to put a call to "rfcomm bind all" into a
+late-running init script for your distro).
+
+Hope this helps and Good Luck :-)
+
+	seife
+
+-- 
+Stefan Seyfried
+
+"Any ideas, John?"
+"Well, surrounding them's out."
