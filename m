@@ -1,27 +1,20 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: pairing on hci level with pin
-From: Alejandro von Mankowski <alejandro@vonmankowski.de>
-To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Two small patches
+From: =?UTF-8?Q?Przemys=C5=82aw?= Firszt <przemo@firszt.eu>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1262648063.16627.338.camel@localhost.localdomain>
+References: <1262647038.2983.5.camel@pldmachine>
+	 <1262648063.16627.338.camel@localhost.localdomain>
 Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 08 Jan 2010 10:45:53 +0100
-Message-ID: <1262943953.2595.56.camel@alejandro-laptop>
+Date: Thu, 07 Jan 2010 20:18:19 +0000
+Message-ID: <1262895499.3414.89.camel@pldmachine>
 Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
-
-I'm currently working on a home project about data transmission over
-bluetooth with pin-pairing. I've learned how to get rfcomm-connection
-established and work. The pin has to be hard coded in the program,
-because it is an embedded system and there won't be a user interaction.
-
-But when I come to implement pairing with pin, what hci_request do I
-have to send to get the devices to pair?
-Another question that I couldn't resolve is the purpose of the pin_type
-variable. What is it for?
-
-Best regards,
-
-Alejandro
-
+Dnia 2010-01-04, pon o godzinie 15:34 -0800, Marcel Holtmann pisze:
+[..]
+> I think the Bluetooth mailing list is the wrong on here. Better use some
+> X.org related mailing list or similar.
+Ooops, sorry for the noise - wrong list.
+Przemo
