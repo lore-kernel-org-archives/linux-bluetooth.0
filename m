@@ -1,82 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Thu, 7 Jan 2010 15:01:20 +0530
-Message-ID: <912bb79a1001070131p6621cf32ke452d49e05f7483d@mail.gmail.com>
-Subject: SetMicrophoneGain & SetSpeakerGain API problem
-From: nirav rabara <niravrabara@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Date: Thu, 7 Jan 2010 10:15:21 +0100
+From: Stefan Seyfried <stefan.seyfried@googlemail.com>
+To: Gene Heskett <gene.heskett@verizon.net>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: need understanding about bt
+Message-ID: <20100107101521.010b16b3@strolchi.home.s3e.de>
+In-Reply-To: <201001061610.22914.gene.heskett@verizon.net>
+References: <201001051910.08204.gene.heskett@verizon.net>
+	<20100106092350.47ba4a63@strolchi.home.s3e.de>
+	<201001061610.22914.gene.heskett@verizon.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I am using bluez 4.58 stack, I am able to connect, & disconnect HS
-with bluetoothd. Also I am able to access API provided in bluez for
-manager , adapter & headset etc.
+On Wed, 06 Jan 2010 16:10:22 -0500
+Gene Heskett <gene.heskett@verizon.net> wrote:
 
-I am using HCI layer only for SCO connection and rest of the
-functionality for HS (connection, disconnection properties information
-) am using D-BUS API.
+> On Wednesday 06 January 2010, Stefan Seyfried wrote:
+> [...]
+> 
+> >Note that the test-serial has a fixed timeout of 1000 seconds and will
+> >close the link afterwards, but that should be trivial to hack out of
+> >the script.
+> 
+> I already had a script I'd played the 10,000 monkeys scene writing, so I just 
+> streamlined that one.  No timeouts in it. ;)
 
-But When I call SetMicrophoneGain/ SetSpeakerGain with gain
-value(0-15),  GetProperties gives following message
 
-(SpeakerGain - 11 )
-QDBusMessage(type=MethoReturn,
-service=":1.0",signature="a[sv]",contents=([Argument: a{sv} {"Playing
-=[Variant(bool):false],"State" = [Variant(QString):"connected",
-"Connected" = [Variant(bool):true], "SpeakerGain"  = [Variant(ushort):
-10], "MicrophoneGain" = [Varinat(ushort): 6]}]))
+Good ;-)
 
-(SpeakerGain - 10 )
-QDBusMessage(type=MethoReturn,
-service=":1.0",signature="a[sv]",contents=([Argument: a{sv} {"Playing
-=[Variant(bool):false],"State" = [Variant(QString):"connected",
-"Connected" = [Variant(bool):true], "SpeakerGain"  = [Variant(ushort):
-10], "MicrophoneGain" = [Varinat(ushort): 6]}]))
+> >If you want to use the old-fashioned style, I had written some
+> >documentation about that in a former life. It's still available through
+> >http://en.opensuse.org/Bluetooth/rfcomm (it's not SUSE-specific at all,
+> >if anything, you might need to put a call to "rfcomm bind all" into a
+> >late-running init script for your distro).
+> 
+> I've done that, except the bind is issued for the bdaddr, enabled the script 
+> and it works for at least the last reboot.
 
-(SpeakerGain - 7 )
-QDBusMessage(type=MethoReturn,
-service=":1.0",signature="a[sv]",contents=([Argument: a{sv} {"Playing
-=[Variant(bool):false],"State" = [Variant(QString):"connected",
-"Connected" = [Variant(bool):true], "SpeakerGain"  = [Variant(ushort):
-7], "MicrophoneGain" = [Varinat(ushort): 6]}]))
+That's fine, the "bind all" just means "bind all the entries from the
+config file". You can of course also configure it manually without the
+config file.
 
-(SpeakerGain - 15 )
-QDBusMessage(type=MethoReturn,
-service=":1.0",signature="a[sv]",contents=([Argument: a{sv} {"Playing
-=[Variant(bool):false],"State" = [Variant(QString):"connected",
-"Connected" = [Variant(bool):true], "SpeakerGain"  = [Variant(ushort):
-15], "MicrophoneGain" = [Varinat(ushort): 6]}]))
+> I think the newer kernels have helped make it dependable now.
 
-(MicrophoneGain - 8 )
-QDBusMessage(type=MethoReturn,
-service=":1.0",signature="a[sv]",contents=([Argument: a{sv} {"Playing
-=[Variant(bool):false],"State" = [Variant(QString):"connected",
-"Connected" = [Variant(bool):true], "SpeakerGain"  = [Variant(ushort):
-10], "MicrophoneGain" = [Varinat(ushort): 8]}]))
+I'm not sure if it's the kernel or newer bluez or whatever, and it
+probably does not matter as long as it works for you ;-)
 
-(MicrophoneGain- 4)
-QDBusMessage(type=MethoReturn,
-service=":1.0",signature="a[sv]",contents=([Argument: a{sv} {"Playing
-=[Variant(bool):false],"State" = [Variant(QString):"connected",
-"Connected" = [Variant(bool):true], "SpeakerGain"  = [Variant(ushort):
-7], "MicrophoneGain" = [Varinat(ushort): 4]}]))
+Have fun,
 
-(MicrophoneGain - 11 )
-QDBusMessage(type=MethoReturn,
-service=":1.0",signature="a[sv]",contents=([Argument: a{sv} {"Playing
-=[Variant(bool):false],"State" = [Variant(QString):"connected",
-"Connected" = [Variant(bool):true], "SpeakerGain"  = [Variant(ushort):
-15], "MicrophoneGain" = [Varinat(ushort): 11]}]))
+	seife
 
-So when I use GetProperties its shows that gain for Microphone and
-Speaker has changed but actually it has no impact on HS.
-Is this a right way to set gain for Mic and Speaker of HS. Or I must
-do it though RFCOMM socket
-
-Why API doesn't have any impact even though values are getting changed.
-
-Any help will be appreciable.
 -- 
-With Regards,
-Nirav Rabara
+Stefan Seyfried
+
+"Any ideas, John?"
+"Well, surrounding them's out."
