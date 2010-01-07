@@ -1,111 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Thu, 7 Jan 2010 19:42:48 +0900
-Message-ID: <ca39c8ec1001070242j18769ba0p79c699cbf0a88c56@mail.gmail.com>
-Subject: Bluez Stack stalls problem
-From: Asutosh Das <das.asutosh@gmail.com>
+Date: Thu, 7 Jan 2010 15:01:20 +0530
+Message-ID: <912bb79a1001070131p6621cf32ke452d49e05f7483d@mail.gmail.com>
+Subject: SetMicrophoneGain & SetSpeakerGain API problem
+From: nirav rabara <niravrabara@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
-I have ported the bluez-3.36 stack on an arm based board. When I play
-songs using mplayer, it plays like 10 songs continuously, but after
-sometime the stack hangs. Please find the log pasted below.
+I am using bluez 4.58 stack, I am able to connect, & disconnect HS
+with bluetoothd. Also I am able to access API provided in bluez for
+manager , adapter & headset etc.
 
-Additional Info
-- The bt chip uses a hci-uart interface
-- Its a broadcom based chip bcm 4325
+I am using HCI layer only for SCO connection and rest of the
+functionality for HS (connection, disconnection properties information
+) am using D-BUS API.
 
-Please give me anything/any thought that you may have. I shall dig from there.
+But When I call SetMicrophoneGain/ SetSpeakerGain with gain
+value(0-15),  GetProperties gives following message
 
-Appreciate your help.
+(SpeakerGain - 11 )
+QDBusMessage(type=MethoReturn,
+service=":1.0",signature="a[sv]",contents=([Argument: a{sv} {"Playing
+=[Variant(bool):false],"State" = [Variant(QString):"connected",
+"Connected" = [Variant(bool):true], "SpeakerGain"  = [Variant(ushort):
+10], "MicrophoneGain" = [Varinat(ushort): 6]}]))
 
-==================================================================================================================================================
-Playing EK PYAR KA NAGMA HAI.mp3.
-called: process_queue
-Audio file file format detected.
-==========================================================================
-Opening audio decoder: [mp3lib] MPEG layer-2, layer-3
-AUDIO: 44100 Hz, 2 ch, s16le, 160.0 kbit/11.34% (ratio: 20000->176400)
-Selected audio codec: [mp3] afm: mp3lib (mp3lib MPEG layer-2, layer-3)
-==========================================================================
-hcid[1016]: Audio API: received BT_GETCAPABILITIES_REQ
-DEBUG: handle_getcapabilities_req Called
-hcid[1016]: Audio API: sending BT_GETCAPABILITIES_RSP
-hcid[1016]: Audio API: received BT_SETCONFIGURATION_REQ
-DEBUG: handle_setconfiguration_req Called
-hcid[1016]: config a2dp - device = 00:19:7F:6F:6E:83 access_mode = 2
-hcid[1016]: codec sbc - frequency = 2 channel_mode = 1 allocation = 1
-subbands = 1 blocks = 1 bitpool = 32
-hcid[1016]: Audio API: sending BT_SETCONFIGURATION_RSP
-hcid[1016]: Audio API: received BT_STREAMSTART_REQ
-called: send_request
-called: send_req
-hcid[1016]: Audio API: sending BT_STREAMSTART_RSP
-hcid[1016]: Audio API: sending BT_STREAMFD_IND
-called: process_queue
-AO: [alsa] 44100Hz 2ch s16le (2 bytes per sample)
-Video: no video
-Starting playback...
-h4_recv: Unknown HCI packet type 050) 33.5%
-h4_recv: Unknown HCI packet type 01
-h4_recv: Unknown HCI packet type 0c
-h4_recv: Unknown HCI packet type 00
-A: 254.8 (04:14.7) of 254hci_acl_tx_to: hci0 ACL tx timeout
-hci_acl_tx_to: hci0 killing stalled ACL connection 83:6E:6F:7F:19:00
-.0 (04:14.0) 33.3%
-called: send_request
-called: send_req
+(SpeakerGain - 10 )
+QDBusMessage(type=MethoReturn,
+service=":1.0",signature="a[sv]",contents=([Argument: a{sv} {"Playing
+=[Variant(bool):false],"State" = [Variant(QString):"connected",
+"Connected" = [Variant(bool):true], "SpeakerGain"  = [Variant(ushort):
+10], "MicrophoneGain" = [Varinat(ushort): 6]}]))
 
-Playing gazab_ka_hai_din.mp3.
-Audio file file format detected.
-Clip info:
- Title: Track 09
- Artist: artist
- Album: title
- Year:
- Comment:
- Track: 9
- Genre: Other
-==========================================================================
-Opening audio decoder: [mp3lib] MPEG layer-2, layer-3
-AUDIO: 11025 Hz, 2 ch, s16le, 16.0 kbit/4.54% (ratio: 2000->44100)
-Selected audio codec: [mp3] afm: mp3lib (mp3lib MPEG layer-2, layer-3)
-==========================================================================
-hcid[1016]: Audio API: received BT_GETCAPABILITIES_REQ
-DEBUG: handle_getcapabilities_req Called
-hcid[1016]: Audio API: sending BT_GETCAPABILITIES_RSP
-hcid[1016]: Audio API: received BT_SETCONFIGURATION_REQ
-DEBUG: handle_setconfiguration_req Called
-hcid[1016]: config a2dp - device = 00:19:7F:6F:6E:83 access_mode = 2
-hcid[1016]: codec sbc - frequency = 8 channel_mode = 1 allocation = 1
-subbands = 1 blocks = 1 bitpool = 32
-called: send_request
-called: send_req
-hcid[1016]: Suspend hci_acl_tx_to: hci0 ACL tx timeout
-hci_acl_tx_to: hci0 killing stalled ACL connection 83:6E:6F:7F:19:00
-hci_cmd_task: hci0 command tx timeout
-request timed out
-called: send_request
-called: send_req
-hcid[1016]: Abort requhci_acl_tx_to: hci0 ACL tx timeout
-hci_acl_tx_to: hci0 killing stalled ACL connection 83:6E:6F:7F:19:00
-hci_cmd_task: hci0 command tx timeout
-[/home/maverick/projects/bluetooth/bt-remote/bt_dev.c : btdev_release
-: 99] Releasing all...
-hci_acl_tx_to: hci0 ACL tx timeout
-hci_acl_tx_to: hci0 killing stalled ACL connection 83:6E:6F:7F:19:00
-hci_acl_tx_to: hci0 ACL tx timeout
-hci_acl_tx_to: hci0 killing stalled ACL connection 83:6E:6F:7F:19:00
-est timed out
-hcid[1016]: connection_lost: ref count not 1 after all callbacks
+(SpeakerGain - 7 )
+QDBusMessage(type=MethoReturn,
+service=":1.0",signature="a[sv]",contents=([Argument: a{sv} {"Playing
+=[Variant(bool):false],"State" = [Variant(QString):"connected",
+"Connected" = [Variant(bool):true], "SpeakerGain"  = [Variant(ushort):
+7], "MicrophoneGain" = [Varinat(ushort): 6]}]))
 
-=============================================================================================================================================================
+(SpeakerGain - 15 )
+QDBusMessage(type=MethoReturn,
+service=":1.0",signature="a[sv]",contents=([Argument: a{sv} {"Playing
+=[Variant(bool):false],"State" = [Variant(QString):"connected",
+"Connected" = [Variant(bool):true], "SpeakerGain"  = [Variant(ushort):
+15], "MicrophoneGain" = [Varinat(ushort): 6]}]))
 
+(MicrophoneGain - 8 )
+QDBusMessage(type=MethoReturn,
+service=":1.0",signature="a[sv]",contents=([Argument: a{sv} {"Playing
+=[Variant(bool):false],"State" = [Variant(QString):"connected",
+"Connected" = [Variant(bool):true], "SpeakerGain"  = [Variant(ushort):
+10], "MicrophoneGain" = [Varinat(ushort): 8]}]))
 
---
-Thank you,
-Warm Regards,
-Asutosh Das
+(MicrophoneGain- 4)
+QDBusMessage(type=MethoReturn,
+service=":1.0",signature="a[sv]",contents=([Argument: a{sv} {"Playing
+=[Variant(bool):false],"State" = [Variant(QString):"connected",
+"Connected" = [Variant(bool):true], "SpeakerGain"  = [Variant(ushort):
+7], "MicrophoneGain" = [Varinat(ushort): 4]}]))
+
+(MicrophoneGain - 11 )
+QDBusMessage(type=MethoReturn,
+service=":1.0",signature="a[sv]",contents=([Argument: a{sv} {"Playing
+=[Variant(bool):false],"State" = [Variant(QString):"connected",
+"Connected" = [Variant(bool):true], "SpeakerGain"  = [Variant(ushort):
+15], "MicrophoneGain" = [Varinat(ushort): 11]}]))
+
+So when I use GetProperties its shows that gain for Microphone and
+Speaker has changed but actually it has no impact on HS.
+Is this a right way to set gain for Mic and Speaker of HS. Or I must
+do it though RFCOMM socket
+
+Why API doesn't have any impact even though values are getting changed.
+
+Any help will be appreciable.
+-- 
+With Regards,
+Nirav Rabara
