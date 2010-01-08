@@ -1,26 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <91473.91180.qm@web52605.mail.re2.yahoo.com>
-Date: Fri, 8 Jan 2010 08:51:05 -0800 (PST)
-From: Ed Tsang <netdesign_98@yahoo.com>
-Subject: bluetooth-sendto dbus-timeout
-To: Bluettooth Linux <linux-bluetooth@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: pairing on hci level with pin
+From: Alejandro von Mankowski <alejandro@vonmankowski.de>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 08 Jan 2010 10:45:53 +0100
+Message-ID: <1262943953.2595.56.camel@alejandro-laptop>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, 
-Hope one of you expert could help me on this.
-I am trying to use bluetooth-sendto (bluz-gnome) to push files to remote and record detail of the result (e.g. cannot connect to SDP, cannot locate the opp .....). I was able to go into the obex-client to get more detail when the transfer fail.  But when the remote (user) do not response to the connection request, I got a DBUS_GERROR_REMOTE_EXCEPTION (Did not receive a reply...). 
-   I am guessing the method timeout, but it was too fast (prefer to give the remote device user more time). 
-  Is there a way to increase the timeout value to a much much larger number?
-  Is there a time out on the obexd side on the SDP connect and rfcomm connect in case the user do not response to the connection request. 
+Hi all,
 
-Ed
+I'm currently working on a home project about data transmission over
+bluetooth with pin-pairing. I've learned how to get rfcomm-connection
+established and work. The pin has to be hard coded in the program,
+because it is an embedded system and there won't be a user interaction.
 
+But when I come to implement pairing with pin, what hci_request do I
+have to send to get the devices to pair?
+Another question that I couldn't resolve is the purpose of the pin_type
+variable. What is it for?
 
+Best regards,
 
-      __________________________________________________________________
-Looking for the perfect gift? Give the gift of Flickr! 
+Alejandro
 
-http://www.flickr.com/gift/
