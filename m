@@ -1,31 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <370999.25109.qm@web52601.mail.re2.yahoo.com>
-References: <91473.91180.qm@web52605.mail.re2.yahoo.com> <1262969995.2233.5.camel@localhost.localdomain>
-Date: Fri, 8 Jan 2010 11:05:51 -0800 (PST)
-From: Ed Tsang <netdesign_98@yahoo.com>
 Subject: Re: bluetooth-sendto dbus-timeout
-To: Bastien Nocera <hadess@hadess.net>
-Cc: Bluettooth Linux <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1262969995.2233.5.camel@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: linux-bluetooth-owner@vger.kernel.org
-List-ID: <linux-bluetooth.vger.kernel.org>
-
-Hi Bastien,
-   I tried gnome-bluetooth 2.28.1, similar situation, when remote Nokia phone user don't response, got "Did not receive ..."
-
-Cheers.
-Ed
-
-
-
------ Original Message ----
 From: Bastien Nocera <hadess@hadess.net>
 To: Ed Tsang <netdesign_98@yahoo.com>
 Cc: Bluettooth Linux <linux-bluetooth@vger.kernel.org>
-Sent: Fri, January 8, 2010 11:59:55 AM
-Subject: Re: bluetooth-sendto dbus-timeout
+In-Reply-To: <91473.91180.qm@web52605.mail.re2.yahoo.com>
+References: <91473.91180.qm@web52605.mail.re2.yahoo.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Date: Fri, 08 Jan 2010 16:59:55 +0000
+Message-ID: <1262969995.2233.5.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
+List-ID: <linux-bluetooth.vger.kernel.org>
 
 On Fri, 2010-01-08 at 08:51 -0800, Ed Tsang wrote:
 > Hi, 
@@ -48,12 +33,3 @@ Try with the latest version of gnome-bluetooth instead.
 
 Cheers
 
---
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
-      __________________________________________________________________
-Get the name you've always wanted @ymail.com or @rocketmail.com! Go to http://ca.promos.yahoo.com/jacko/
