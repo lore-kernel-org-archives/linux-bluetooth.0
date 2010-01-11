@@ -1,60 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mailing List SVR <lists@svrinformatica.it>
-Reply-To: lists@svrinformatica.it
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: pc as headset: some progress but still no audio
-Date: Mon, 11 Jan 2010 10:51:27 +0100
-References: <201001091142.00568.lists@svrinformatica.it>
-In-Reply-To: <201001091142.00568.lists@svrinformatica.it>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-15"
-Message-Id: <201001111051.27627.lists@svrinformatica.it>
+Date: Mon, 11 Jan 2010 16:58:22 +0900
+Message-ID: <ca39c8ec1001102358k65cb0385sce42113c71cb5a7d@mail.gmail.com>
+Subject: Re movon Bluetooth headset
+From: Asutosh Das <das.asutosh@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-After further investigation I got this error:
+Hi
+I am using a movon BT headset. I have compiled bluez 3.36 for arm and
+am able to play music with a plantronics headset. But I am unable to
+play with the movon headset.
 
-bluetoothd[2094]: State changed /org/bluez/2094/hci0/dev_00_1C_D4_2A_4B_54: 
-HEADSET_STATE_CONNECTING -> HEADSET_STATE_CONNECTED
-bluetoothd[2094]: Refusing non-HFP SCO connect attempt from 00:1C:D4:2A:4B:54
-bluetoothd[2094]: No matching connection found for handle 1
+Chip - BCM4325
+Headset - movon & 590plantronics
 
-so seems that bluez doesn't support the use of pc as headset,
+I have done the following:
+1. I have changed the /etc/asound.conf to movon bdaddr
+2. I have created a new audio device for movon using the dbus command
+line. The following log shows the two audio devices created:
 
-Nicola
+    # dbus-send --system --print-reply --type=method_call
+--dest=org.bluez /org/blue
+z/audio org.bluez.audio.Manager.ListDevices
+method return sender=:1.15 -> dest=:1.48 reply_serial=2
+   array [
+      string "/org/bluez/audio/device0"
+      string "/org/bluez/audio/device1"
+   ]
 
-In data sabato 9 gennaio 2010 11:42:00, Mailing List SVR ha scritto:
-: > Hi,
-> 
-> I made some progress:
-> 
-> 1) my phone can now recognize my pc as an headset
-> 2) I'm able to pair the two device
-> 3) I advertise the hsp service with the attacched pybluez script
-> 4) the phone can connect to the pc and the output of the script is:
-> 
-> Waiting for connection on RFCOMM 1
-> Accepted connection  ('00:1E:96:00:07:D2', 1)
-> received
-> OK
-> 
-> so the connection is successfull and the phone answer ok to AT+CKPD
-> 5) I run bluetoothd -n -d and I see some errors like this:
-> 
-> bluetoothd[5938]: No matching connection found for handle 1
-> 
-> 6) with hcidump I see sco data:
-> > SCO data: handle 1 flags 0x00 dlen 48
-> 
-> and I think this sco data cause the error "No matching connection found for
-> handle 1"
-> 
-> so I think there is something wrong in the sco link estabilishment, can you
-> please give my some hints?
-> 
-> Is there a way to use a pc as an headset using bluez?
-> 
-> thanks
-> Nicola
-> 
+Now device0 -> movon & device1 -> plantronics
+
+
+3. The following command works fine and I am able to hear the music in
+plantronics.
+   dbus-send --system --print-reply --type=method_call
+--dest=org.bluez /org/blue
+z/audio/device1 org.bluez.audio.Sink.Connect
+
+./mplayer -ao alsa:device=bluetooth /Music/AKJS.mp3
+
+
+4.  The following command doesn't work and gives me an error .
+
+dbus-send --system --print-reply --type=method_call --dest=org.bluez /org/blue
+z/audio/device0 org.bluez.audio.Sink.Connect
+hcid[1061]: avdtp_ref(0x70f20): ref=2
+called: send_request
+called: send_req
+This func l2cap_connect
+l2cap_connect
+L2CAP TRANSPORT
+
+This func l2cap_connect
+hcid[1061]: stream creation in progress
+hcid[1061]: link_key_request (sba=43:25:D1:00:00:00, dba=00:13:7B:40:1E:8E)
+hcid[1061]: kernel auth requirements = 0x00
+called: l2cap_connect_cb
+hcid[1061]: connect(): Connection refused (111)
+This error l2cap_connect_cb
+hcid[1061]: avdtp_unref(0x70f20): ref=1
+hcid[1061]: connect:connect XCASE detected
+hcid[1061]: avdtp_unref(0x70f20): ref=0
+hcid[1061]: avdtp_unref(0x70f20): freeing session and removing from list
+
+
+hcid[1061]: Stream setup failed, after XCASE connect:connect
+Error org.bluez.Error.Failed: Stream setup failed
+
+
+5. My default device is device0 i.e. movon
+# dbus-send --system --print-reply --type=method_call --dest=org.bluez /org/blue
+z/audio org.bluez.audio.Manager.DefaultDevice
+method return sender=:1.15 -> dest=:1.49 reply_serial=2
+   string "/org/bluez/audio/device0"
+
+
+I put the movon headset in discoverable mode and the alternate red &
+blue blinking changes to blue alone but stream setup fails !!! ...
+Please can you let me know what I am missing here ....
+-- 
+Thank you,
+Warm Regards,
+Das
