@@ -1,67 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <4B4C3BCF.8030501@xenontk.org>
-References: <4B4C3BCF.8030501@xenontk.org>
-Date: Tue, 12 Jan 2010 13:58:26 +0200
-Message-ID: <2d5a2c101001120358g6f2a320cm358c71d910933296@mail.gmail.com>
-Subject: Re: BUG: Commit 9e726b17 (Bluetooth: Fix rejected connection not
-	disconnecting ACL link) causes trace
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davidjon@xenontk.org
-Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: can we disable/enable eSCO by using setsockopt of sco socket?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Liang Bao <tim.bao@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <6aeb672b1001120157x18b2fee0n2e47078214e0f239@mail.gmail.com>
+References: <6aeb672b1001120157x18b2fee0n2e47078214e0f239@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Tue, 12 Jan 2010 03:22:17 -0800
+Message-ID: <1263295337.12466.22.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Liang,
 
-On Tue, Jan 12, 2010 at 11:07 AM, David John <davidjon@xenontk.org> wrote:
-> Hi,
->
-> The commit 9e726b17 (Bluetooth: Fix rejected connection not
-> disconnecting ACL link) causes the following trace:
->
-> BUG: sleeping function called from invalid context at net/core/sock.c:1897
-> in_atomic(): 1, irqs_disabled(): 0, pid: 0, name: swapper
-> Pid: 0, comm: swapper Tainted: P а а а а а 2.6.32 #31
-> Call Trace:
-> а<IRQ> а[<ffffffff81036455>] __might_sleep+0xf8/0xfa
-> а[<ffffffff8138ef1d>] lock_sock_nested+0x29/0xc4
-> а[<ffffffffa03921b3>] lock_sock+0xb/0xd [l2cap]
-> а[<ffffffffa03948e6>] l2cap_sock_shutdown+0x1c/0x76 [l2cap]
-> а[<ffffffff8106adea>] ? clockevents_program_event+0x75/0x7e
-> а[<ffffffff8106bea2>] ? tick_dev_program_event+0x37/0xa5
-> а[<ffffffffa0394967>] l2cap_sock_release+0x27/0x67 [l2cap]
-> а[<ffffffff8138c971>] sock_release+0x1a/0x67
-> а[<ffffffffa03d2492>] rfcomm_session_del+0x34/0x53 [rfcomm]
-> а[<ffffffffa03d24c5>] rfcomm_session_put+0x14/0x16 [rfcomm]
-> а[<ffffffffa03d28b4>] rfcomm_session_timeout+0xe/0x1a [rfcomm]
-> а[<ffffffff810554a8>] run_timer_softirq+0x1e2/0x29a
-> а[<ffffffffa03d28a6>] ? rfcomm_session_timeout+0x0/0x1a [rfcomm]
-> а[<ffffffff8104e0f6>] __do_softirq+0xfe/0x1c5
-> а[<ffffffff8100e8ce>] ? timer_interrupt+0x1a/0x21
-> а[<ffffffff8100cc4c>] call_softirq+0x1c/0x28
-> а[<ffffffff8100e05b>] do_softirq+0x33/0x6b
-> а[<ffffffff8104daf6>] irq_exit+0x36/0x85
-> а[<ffffffff8100d7a9>] do_IRQ+0xa6/0xbd
-> а[<ffffffff8100c493>] ret_from_intr+0x0/0xa
-> а<EOI> а[<ffffffff812585b3>] ? acpi_idle_enter_bm+0x269/0x294
-> а[<ffffffff812585a9>] ? acpi_idle_enter_bm+0x25f/0x294
-> а[<ffffffff81373ddc>] ? cpuidle_idle_call+0x97/0x107
-> а[<ffffffff8100aca0>] ? cpu_idle+0x53/0xaa
-> а[<ffffffff81429006>] ? rest_init+0x7a/0x7c
-> а[<ffffffff8177bc8c>] ? start_kernel+0x389/0x394
-> а[<ffffffff8177b29c>] ? x86_64_start_reservations+0xac/0xb0
-> а[<ffffffff8177b384>] ? x86_64_start_kernel+0xe4/0xeb
->
-> since lock_sock is called from the timer function rfcomm_session_timeout.
+> We resumed the work of troubleshooting some problematic carkits
+> recently. While we agree with that eSCO/SCO is handled by the stuff
+> below HCI and bluez is absoultely right handling this, we still need
+> to face the fact that there're bunch of carkits and headsets with
+> hidden issues which only get exposed in certain combination like the
+> HF850 and our phones. Bluez can still be even better.
+> 
+> In our case, the HF850 claims eSCO but when you're trying to connect
+> with it, it will timeout. So to have the stack works with those
+> on-market products, it's better if the developers sitting above the
+> HCI layer have some tweaking method on bluez behavior in ununsal
+> cases.
+> 
+> Regarding the particular eSCO timeout failure, we add the following
+> delta into the net/bluetooth/hci_event.c
+> 
+>         hci_proto_connect_cfm(conn, ev->status);
+> +
+> +    if (conn->out && (ev->status == 0x1a || ev->status == 0x1c ||
+> +            ev->status == 0x1f || ev->status == 0x10) &&
+> +            conn->attempt < 2) {
+> +        conn->pkt_type = (hdev->esco_type & SCO_ESCO_MASK) |
+> +                    (hdev->esco_type & EDR_ESCO_MASK);
+> +        hci_setup_sync(conn, conn->link->handle);
+> +        goto unlock;
+> +    }
+> +
+>       if (ev->status)
+>               hci_conn_del(conn);
+> 
+> With this code change, we can successfully retry a SCO link after eSCO
+> attempt timeout. Still, a setsockopt interface will be better for
+> tweaking. Or is there any better idea on how to allow bluez work with
+> those on-market problematic devices?
 
-So it is not possible while in timer context? I guess not.
+no you can NOT. It is race condition hazard. You can not call
+hci_proto_connect_cfm() and then just hci_setup_sync(). That confuses
+upper layers and just works by pure luck.
 
-@Marcel: Any idea how we can possibly fix this? iirc we do a similar
-thing for rfcomm_dlc_timeout, but that doesn't cause a sleep so I
-guess we need a different approach for rfcomm_session_timeout.
+The upstream code actually handles already the 0x1c and 0x1f error codes
+and retries the setup without eSCO packets types. So you snippet is
+against an old kernel (older than 2.6.30 at least).
 
--- 
-Luiz Augusto von Dentz
-Engenheiro de Computaчуo
+> The hcidump log is copied again here for your convenience:
+> > 2009-09-03 17:26:29.093601 < HCI Command: Setup Synchronous Connection (0x01|0x0
+> > 028) plen 17
+> >    handle 1 voice setting 0x0060
+> > 2009-09-03 17:26:29.094608 > HCI Event: Command Status (0x0f) plen 4
+> >    Setup Synchronous Connection (0x01|0x0028) status 0x00 ncmd 1
+> > 2009-09-03 17:26:34.190952 > HCI Event: Synchronous Connect Complete (0x2c) plen
+> >  17
+> >    status 0x10 handle 257 bdaddr 00:50:CD:20:BA:E6 type eSCO
+> >    Error: Connection Accept Timeout Exceeded
+
+The accept timeout has a pretty clear definition and while we could
+retry, I am having some concerns here. This also does not explain why
+0x1a is in your code snippet.
+
+Regards
+
+Marcel
+
+
