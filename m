@@ -1,31 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4B4CE9A0.3020902@pardus.org.tr>
+Date: Tue, 12 Jan 2010 23:29:04 +0200
+From: =?UTF-8?B?T3phbiDDh2HEn2xheWFu?= <ozan@pardus.org.tr>
 MIME-Version: 1.0
-In-Reply-To: <4B4CE9A0.3020902@pardus.org.tr>
-References: <4B4CE9A0.3020902@pardus.org.tr>
-From: "Luis R. Rodriguez" <mcgrof@gmail.com>
-Date: Tue, 12 Jan 2010 15:51:11 -0800
-Message-ID: <43e72e891001121551n2caadccfy67db57ea0e3e97b0@mail.gmail.com>
-Subject: Re: CONFIG_BT_CMTP is not checked in compat-wireless
-To: =?UTF-8?B?T3phbiDDh2HEn2xheWFu?= <ozan@pardus.org.tr>
-Cc: Linux Wireless List <linux-wireless@vger.kernel.org>,
+To: Linux Wireless List <linux-wireless@vger.kernel.org>,
 	linux-bluetooth@vger.kernel.org
+Subject: CONFIG_BT_CMTP is not checked in compat-wireless
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Jan 12, 2010 at 1:29 PM, Ozan Çağlayan <ozan@pardus.org.tr> wrote:
-> Hi,
->
-> CONFIG_BT_CMTP depends on BT && BT_L2CAP && ISDN_CAPI but in config.mk there isn't an explicit check for
-> those conditions. On a ISDN_CAPI disabled kernel this causes unresolved symbols as cmtp.ko is built
->
-> Something like below fixes the problem (at least for CMTP case) by not compiling net/bluetooth/cmtp:
->
-> # CONFIG_BT_CMTP depends on ISDN_CAPI
-> ifneq ($(CONFIG_BT_CMTP),)
-> CONFIG_BT_CMTP=m
-> endif
+Hi,
 
-I applied this change, thanks for the report.
+CONFIG_BT_CMTP depends on BT && BT_L2CAP && ISDN_CAPI but in config.mk there isn't an explicit check for
+those conditions. On a ISDN_CAPI disabled kernel this causes unresolved symbols as cmtp.ko is built
 
-  Luis
+Something like below fixes the problem (at least for CMTP case) by not compiling net/bluetooth/cmtp:
+
+# CONFIG_BT_CMTP depends on ISDN_CAPI
+ifneq ($(CONFIG_BT_CMTP),)
+CONFIG_BT_CMTP=m
+endif
+
+
+Regards,
+Ozan Caglayan
+
