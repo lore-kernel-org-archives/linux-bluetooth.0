@@ -1,34 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gene Heskett <gene.heskett@verizon.net>
+From: Zhu Yanhai <yanhai.zhu@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: weak bt?
-Date: Sat, 16 Jan 2010 10:38:49 -0500
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
-Message-id: <201001161038.49294.gene.heskett@verizon.net>
+Cc: Zhu Yanhai <yanhai.zhu@linux.intel.com>
+Subject: [PATCH] Pick up the first modem found by oFono
+Date: Fri, 15 Jan 2010 15:51:49 +0800
+Message-Id: <1263541909-19739-1-git-send-email-yanhai.zhu@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Greetings all;
+During the initial phase, for now we just pick up the first modem
+detected by oFono, and skip over the others. If there are no modems
+found, just exit silently.
 
-I have a broadcom bluetooth dongle plugged into a full bandwidth 7 port hub, 
-and another (an a7 brand eb-301)built into an rs-232 emulation device plugged 
-into a legacy computer.
+Signed-off-by: Zhu Yanhai <yanhai.zhu@linux.intel.com>
+---
+ audio/telephony-ofono.c |   23 ++++++++++++++---------
+ 1 files changed, 14 insertions(+), 9 deletions(-)
 
-It works about 10% of the time, so speeds are very poor.
-
-Starting bluetooth-proximity, that shows the signal is quite weak, ranging 
-from 3 up to 30 and this is an overnight session that has been recording for 
-about 10 hours now.  The devices are about 16 to 18 feet and the house wooden 
-flooring apart as the legacy machine is in the basement.
-
-Is this distance what would be called fringe area in tv reception?  Or should 
-it be working better than this?
-
+diff --git a/audio/telephony-ofono.c b/audio/telephony-ofono.c
+index 2778cfc..9b99dc5 100644
+--- a/audio/telephony-ofono.c
++++ b/audio/telephony-ofono.c
+@@ -571,18 +571,23 @@ static void list_modem_reply(DBusPendingCall *call, void *user_data)
+ 	dbus_message_iter_next(&iter_property);
+ 	dbus_message_iter_recurse(&iter_property, &iter_arrary);
+ 	dbus_message_iter_recurse(&iter_arrary, &sub);
+-	while (dbus_message_iter_get_arg_type(&sub) != DBUS_TYPE_INVALID) {
+ 
+-		dbus_message_iter_get_basic(&sub, &modem_obj_path_local);
+-		modem_obj_path = g_strdup(modem_obj_path_local);
+-		debug("modem_obj_path is %p, %s\n", modem_obj_path,
+-						modem_obj_path);
+-		dbus_message_iter_next(&sub);
++	if (dbus_message_iter_get_arg_type(&sub) != DBUS_TYPE_OBJECT_PATH) {
++		debug("No modem found.");
++		goto done;
+ 	}
+ 
+-	ret = get_registration_and_signal_status();
+-	if (ret < 0)
+-		error("get_registration_and_signal_status() failed(%d)", ret);
++	dbus_message_iter_get_basic(&sub, &modem_obj_path_local);
++	if (modem_obj_path_local != NULL) {
++		modem_obj_path = g_strdup(modem_obj_path_local);
++		debug("modem_obj_path is %s", modem_obj_path);
++		ret = get_registration_and_signal_status();
++		if (ret < 0)
++			error("get_registration_and_signal_status() failed(%d)",
++				   ret);
++	} else
++		error("Fail to retrieve modem's object path.");
++
+ done:
+ 	dbus_message_unref(reply);
+ }
 -- 
-Cheers, Gene
-"There are four boxes to be used in defense of liberty:
- soap, ballot, jury, and ammo. Please use in that order."
--Ed Howdershelt (Author)
+1.6.2.2
 
-It is amazing how complete is the delusion that beauty is goodness.
