@@ -1,42 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Bram Jansen" <bramsbox@gmail.com>
-To: <linux-bluetooth@vger.kernel.org>
-Subject: max 16 hci devices on usb 2.0
-Date: Sun, 17 Jan 2010 00:35:16 +0100
-Message-ID: <BABDE7A517704C42BC70E146983535B6@radon>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+From: Gene Heskett <gene.heskett@verizon.net>
+To: linux-bluetooth@vger.kernel.org
+Subject: weak bt?
+Date: Sat, 16 Jan 2010 10:38:49 -0500
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
+Message-id: <201001161038.49294.gene.heskett@verizon.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Greetings all;
 
-I have a question regarding the connection of 16 hci devices to a linux box.
-I've been looking around for quite some time and I was not able to find
-something useful, therefore I hope anyone of you guys is able to point me in
-the right direction.
+I have a broadcom bluetooth dongle plugged into a full bandwidth 7 port hub, 
+and another (an a7 brand eb-301)built into an rs-232 emulation device plugged 
+into a legacy computer.
 
-We have used quite a few kernel versions to try to connect 16 hci devices to
-one system with usb 2.0 enabled.
-This gives a problem after 7 devices. Devices hci7-hci15 give timeouts and
-errors after initializing.
+It works about 10% of the time, so speeds are very poor.
 
-We solved this problem by disabling ehci in the kernel, so the bluetooth had
-to use usb 1.1 (ohci)
-with these settings it works without any problems and all 16 hci devices are
-initialized properly after insertion/boot
+Starting bluetooth-proximity, that shows the signal is quite weak, ranging 
+from 3 up to 30 and this is an overnight session that has been recording for 
+about 10 hours now.  The devices are about 16 to 18 feet and the house wooden 
+flooring apart as the legacy machine is in the basement.
 
-now there has come the need for usb 2.0 on the same system.
+Is this distance what would be called fringe area in tv reception?  Or should 
+it be working better than this?
 
-Is there a known solution for this issue?
+-- 
+Cheers, Gene
+"There are four boxes to be used in defense of liberty:
+ soap, ballot, jury, and ammo. Please use in that order."
+-Ed Howdershelt (Author)
 
-Thanks in advance,
-
-Regards,
-
-Bram Jansen
-
-
-
-
+It is amazing how complete is the delusion that beauty is goodness.
