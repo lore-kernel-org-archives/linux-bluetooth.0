@@ -1,57 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <f6c5b8d91001170441m1d0d8755x15147f92b85b477f@mail.gmail.com>
-References: <f6c5b8d91001170441m1d0d8755x15147f92b85b477f@mail.gmail.com>
-Date: Sun, 17 Jan 2010 18:20:42 +0530
-Message-ID: <f6c5b8d91001170450n415bf083l5044e193014d8f85@mail.gmail.com>
-Subject: A2DP multiple sink support
-From: Anil Sasidharan <anilvpr@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=windows-1252
+Subject: Re: max 16 hci devices on usb 2.0
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Bram Jansen <bramsbox@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <BABDE7A517704C42BC70E146983535B6@radon>
+References: <BABDE7A517704C42BC70E146983535B6@radon>
+Content-Type: text/plain; charset="UTF-8"
+Date: Sat, 16 Jan 2010 17:44:23 -0800
+Message-ID: <1263692663.5591.54.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Bram,
+
+> I have a question regarding the connection of 16 hci devices to a linux box.
+> I've been looking around for quite some time and I was not able to find
+> something useful, therefore I hope anyone of you guys is able to point me in
+> the right direction.
+> 
+> We have used quite a few kernel versions to try to connect 16 hci devices to
+> one system with usb 2.0 enabled.
+> This gives a problem after 7 devices. Devices hci7-hci15 give timeouts and
+> errors after initializing.
+> 
+> We solved this problem by disabling ehci in the kernel, so the bluetooth had
+> to use usb 1.1 (ohci)
+> with these settings it works without any problems and all 16 hci devices are
+> initialized properly after insertion/boot
+> 
+> now there has come the need for usb 2.0 on the same system.
+> 
+> Is there a known solution for this issue?
+
+you better ask such questions on the Linux USB mailing list since I have
+no idea why sometimes the hubs causes problems.
+
+As a side note. The 16 HCI devices limit is not fixed actually. You can
+just compile your own libbluetooth with a different limit. The kernel
+supports as many devices as you have memory :)
+
+Regards
+
+Marcel
 
 
-
-                We are trying to use Bluecore BT module (from CSR) for
-A2DP profile support. In the present use case, our device acts as a
-A2DP SRC. We are able to stream 44.1kHz stereo audio to a A2DP
-headset. Now the next use case scenarios that we would like to try out
-in A2DP context are the following:
-
-
-
-1.       A2DP multicast; where single SRC streams audio to multiple
-SNKs (all of them paired and connected with the SRC at the same time)
-
-2.       Send 2 different audio streams (from the same device) to 2
-different A2DP SINK devices (2 headsets).
-
-
-
-SRC1 -> SNK1     (music stream – 1)
-
-SRC2 -> SNK2     (music stream – 2)
-
-
-
-Here SRC1 and SRC2 are two logical A2DP sources using the same BT HW
-module  (same physical BT module)
-
-
-
-Both the A2DP headsets are paired and connected to the BT module on
-our device at the same time.
-
-
-
-It would be really helpful if someone can throw more light on this (If
-the use cases mentioned above are viable, then how?)
-
-
-
-Warm Regards,
-
-Anil
