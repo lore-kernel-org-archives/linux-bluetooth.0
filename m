@@ -1,215 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCHes] Implement Bluetooth Wacom tablet's mode change in the
- kernel
-From: Bastien Nocera <hadess@hadess.net>
-To: Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	linux-input <linux-input@vger.kernel.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Cc: bgunn@solekai.com, Ping <pinglinux@gmail.com>
-Content-Type: multipart/mixed; boundary="=-OIT4h28Og8BvJnndCxBY"
-Date: Mon, 18 Jan 2010 16:49:59 +0000
-Message-ID: <1263833399.20565.2905.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-input-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <fbf08281001131539l342a3062w70883c197dc52983@mail.gmail.com>
+References: <fbf08281001110908s2c3412m456b3aa980b8ca10@mail.gmail.com>
+	 <fbf08281001111105pc2f0d3au61d0e205e1689ec2@mail.gmail.com>
+	 <fbf08281001131539l342a3062w70883c197dc52983@mail.gmail.com>
+Date: Mon, 18 Jan 2010 13:38:16 +0200
+Message-ID: <2d5a2c101001180338n2a37f0e9y76942650b755166@mail.gmail.com>
+Subject: Re: [RFC] HFP support into oFono and BlueZ
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>, ofono@ofono.org,
+	zhenhua.zhang@intel.com
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi,
 
---=-OIT4h28Og8BvJnndCxBY
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
+On Thu, Jan 14, 2010 at 1:39 AM, Gustavo F. Padovan
+<padovan@profusion.mobi> wrote:
+> Hi,
+>
+> On Mon, Jan 11, 2010 at 5:05 PM, Gustavo F. Padovan
+> <padovan@profusion.mobi> wrote:
+>> On Mon, Jan 11, 2010 at 3:08 PM, Gustavo F. Padovan
+>> <padovan@profusion.mobi> wrote:
+>>> Hi,
+>>>
+>>> These patches implement the new API for the Audio Gateway in BlueZ. It
+>>> follows the last version of the HandsfreeGateway and HandsfreeAgent
+>>> Intefaces API.
+>>> The first two patches is for BlueZ and the other for oFono. You can
+>>> test it with using enable-modem and test-voicecall scripts into the
+>>> test dir of oFono.
+>>> Feel free to test it and send me your comments. We have some bugs yet.
+>>
+>> New version of the patches: now we do not handle tty stuff on the BlueZ side.
+>
+> New version of the patches. Known issues:
+> "'org.bluez.HandsfreeAgent.Release' part not implemented" and it's not
+> working with more than one bluetooth devices in some cases. Comments
+> are welcome.
 
-Heya,
+Since nobody really respond me in the thread about merging endpoints
+with this spec I will comment in this one, although Johan disagree on
+having it as a MediaEndpoint I guess it is probably a good idea to
+have a similar design as we will have in endpoints, so the
+registration actually happen in adapter path rather than device path,
+which probably should avoid the having to resolve the device path
+while probing if we just send the device path as a parameter of
+NewConnection so we can do while in DEFER_SETUP stage so we don't risk
+missing or getting timeouts while transferring the the fd to ofono.
 
-Here's a patch to do the Bluetooth Wacom tablet's mode setting in the
-kernel. In the past, it was done in a patch in bluetootd.
+>>
+>>>
+>>> The audio part is not working yet. We are going to work on pulseaudio
+>>> this week to get this done soon.
 
-The first patch is probably completely wrong. Right now,
-hid_output_raw_report is done on the intr socket, instead of the ctrl
-socket. If it's correct to do it on the intr socket, we'd need to add
-some API as a way to select the ctrl socket instead for use in that
-driver.
+Well I suppose we will be using the endpoint to handle this.
 
-I still have the exact same problems as with the user-space patch in
-that an error occurs sending the second blob of data to the tablet, the
-first time the driver is initialised. Ping, any ideas about that?
+>>> Regards,
+>>>
+>>> --
+>>> Gustavo F. Padovan
+>>> ProFUSION embedded systems - http://profusion.mobi
+>>>
+>>
+>>
+>>
+>> --
+>> Gustavo F. Padovan
+>> ProFUSION embedded systems - http://profusion.mobi
+>>
+>
+>
+>
+> --
+> Gustavo F. Padovan
+> ProFUSION embedded systems - http://profusion.mobi
+>
 
-Cheers
 
---=-OIT4h28Og8BvJnndCxBY
-Content-Disposition: attachment; filename="0001-hidp-Use-the-control-socket-for-raw-messages.patch"
-Content-Type: text/x-patch; name="0001-hidp-Use-the-control-socket-for-raw-messages.patch"; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
 
->From 024b4ebd722ddb18f5f455c4db4a3f5ff41caa38 Mon Sep 17 00:00:00 2001
-From: Bastien Nocera <hadess@hadess.net>
-Date: Mon, 18 Jan 2010 16:11:33 +0000
-Subject: [PATCH 1/2] [hidp] Use the control socket for raw messages
-
-In commit 2da31939a42f7a676a0bc5155d6a0a39ed8451f2, support
-for Bluetooth hid_output_raw_report was added, but it pushes
-the data to the intr socket instead of the ctrl one.
-
-This patch makes hid_output_raw_report use the control socket
-instead.
-
-Signed-off-by: Bastien Nocera <hadess@hadess.net>
----
- net/bluetooth/hidp/core.c |   70 +++++++++++++++++++++++----------------------
- 1 files changed, 36 insertions(+), 34 deletions(-)
-
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index 5697500..8866582 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -243,6 +243,39 @@ static void hidp_input_report(struct hidp_session *session, struct sk_buff *skb)
- 	input_sync(dev);
- }
- 
-+static int __hidp_send_ctrl_message(struct hidp_session *session,
-+			unsigned char hdr, unsigned char *data, int size)
-+{
-+	struct sk_buff *skb;
-+
-+	BT_DBG("session %p data %p size %d", session, data, size);
-+
-+	if (!(skb = alloc_skb(size + 1, GFP_ATOMIC))) {
-+		BT_ERR("Can't allocate memory for new frame");
-+		return -ENOMEM;
-+	}
-+
-+	*skb_put(skb, 1) = hdr;
-+	if (data && size > 0)
-+		memcpy(skb_put(skb, size), data, size);
-+
-+	skb_queue_tail(&session->ctrl_transmit, skb);
-+
-+	return 0;
-+}
-+
-+static inline int hidp_send_ctrl_message(struct hidp_session *session,
-+			unsigned char hdr, unsigned char *data, int size)
-+{
-+	int err;
-+
-+	err = __hidp_send_ctrl_message(session, hdr, data, size);
-+
-+	hidp_schedule(session);
-+
-+	return err;
-+}
-+
- static int hidp_queue_report(struct hidp_session *session,
- 				unsigned char *data, int size)
- {
-@@ -282,7 +315,9 @@ static int hidp_send_report(struct hidp_session *session, struct hid_report *rep
- 
- static int hidp_output_raw_report(struct hid_device *hid, unsigned char *data, size_t count)
- {
--	if (hidp_queue_report(hid->driver_data, data, count))
-+	if (count <= 1)
-+		return -EINVAL;
-+	if (hidp_send_ctrl_message(hid->driver_data, data[0], data + 1, count - 1))
- 		return -ENOMEM;
- 	return count;
- }
-@@ -307,39 +342,6 @@ static inline void hidp_del_timer(struct hidp_session *session)
- 		del_timer(&session->timer);
- }
- 
--static int __hidp_send_ctrl_message(struct hidp_session *session,
--			unsigned char hdr, unsigned char *data, int size)
--{
--	struct sk_buff *skb;
--
--	BT_DBG("session %p data %p size %d", session, data, size);
--
--	if (!(skb = alloc_skb(size + 1, GFP_ATOMIC))) {
--		BT_ERR("Can't allocate memory for new frame");
--		return -ENOMEM;
--	}
--
--	*skb_put(skb, 1) = hdr;
--	if (data && size > 0)
--		memcpy(skb_put(skb, size), data, size);
--
--	skb_queue_tail(&session->ctrl_transmit, skb);
--
--	return 0;
--}
--
--static inline int hidp_send_ctrl_message(struct hidp_session *session,
--			unsigned char hdr, unsigned char *data, int size)
--{
--	int err;
--
--	err = __hidp_send_ctrl_message(session, hdr, data, size);
--
--	hidp_schedule(session);
--
--	return err;
--}
--
- static void hidp_process_handshake(struct hidp_session *session,
- 					unsigned char param)
- {
 -- 
-1.6.5.2
-
-
---=-OIT4h28Og8BvJnndCxBY
-Content-Disposition: attachment; filename="0002-hid-Implement-Wacom-quirk-in-the-kernel.patch"
-Content-Type: text/x-patch; name="0002-hid-Implement-Wacom-quirk-in-the-kernel.patch"; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-
->From 6f83c0d084631033db9cb9b9452f5cf2e2bf67c2 Mon Sep 17 00:00:00 2001
-From: Bastien Nocera <hadess@hadess.net>
-Date: Mon, 18 Jan 2010 16:13:41 +0000
-Subject: [PATCH 2/2] [hid] Implement Wacom quirk in the kernel
-
-The hid-wacom driver required user-space to poke at the tablet
-to make it send data about the cursor location.
-
-This patch makes it do the same thing but in the kernel.
-
-Signed-off-by: Bastien Nocera <hadess@hadess.net>
----
- drivers/hid/hid-wacom.c |   13 +++++++++++++
- 1 files changed, 13 insertions(+), 0 deletions(-)
-
-diff --git a/drivers/hid/hid-wacom.c b/drivers/hid/hid-wacom.c
-index 7475421..4030824 100644
---- a/drivers/hid/hid-wacom.c
-+++ b/drivers/hid/hid-wacom.c
-@@ -155,6 +155,7 @@ static int wacom_probe(struct hid_device *hdev,
- 	struct hid_input *hidinput;
- 	struct input_dev *input;
- 	struct wacom_data *wdata;
-+	char rep_data[3];
- 	int ret;
- 
- 	wdata = kzalloc(sizeof(*wdata), GFP_KERNEL);
-@@ -177,6 +178,18 @@ static int wacom_probe(struct hid_device *hdev,
- 		goto err_free;
- 	}
- 
-+	rep_data[0] = 0x53; /* HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_FEATURE */
-+	rep_data[1] = 0x03; rep_data[2] = 0x00;
-+	ret = hdev->hid_output_raw_report (hdev, rep_data, 3);
-+	if (ret < 0)
-+		dev_err(&hdev->dev, "failed to poke device #1, %d\n", ret);
-+
-+	rep_data[0] = 0x71; /* HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_FEATURE */
-+	/* 0x06 - high reporting speed, 0x05 - low speed */
-+	rep_data[1] = 0x06; rep_data[2] = 0x00;
-+	ret = hdev->hid_output_raw_report (hdev, rep_data, 3);
-+		dev_err(&hdev->dev, "failed to poke device #2, %d\n", ret);
-+
- 	hidinput = list_entry(hdev->inputs.next, struct hid_input, list);
- 	input = hidinput->input;
- 
--- 
-1.6.5.2
-
-
---=-OIT4h28Og8BvJnndCxBY--
-
+Luiz Augusto von Dentz
+Engenheiro de Computação
