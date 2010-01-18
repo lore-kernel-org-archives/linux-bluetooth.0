@@ -1,27 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4B5433F1.9090706@gmail.com>
-Date: Mon, 18 Jan 2010 11:12:01 +0100
-From: sancane <sancane@gmail.com>
 MIME-Version: 1.0
+Date: Mon, 18 Jan 2010 15:35:06 +0530
+Message-ID: <912bb79a1001180205y18dee28dj628d0187f90e4ceb@mail.gmail.com>
+Subject: Unable to get AT+CKPD=200 (key press command )
+From: nirav rabara <niravrabara@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Bluez question about new profiles delopment
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
-I want to develop a new bluetooth profiles for blueZ basing on my
-recently experience gained with my prototype implementation of MCAP &
-HDP (http://openhealth.morfeo-project.org). My goal is integrate above
-profiles using the BlueZ architecture, but i have some question to do.
+I am connection HS by using "Connect" DBUS API of headset interface, I
+am able to connect with device, but when I press key single time on HS
+it's not showing AT+CKPD=200 (I kept debugg in source).
 
-* I don't have clear what is the difference between implement a new
-bluetooth profile (for example MCAP) like a Service or implement it like
-a Plugin. What exactly a plugin is?
+But when I press HS key two times it show me,
 
-I open to any suggestion about the architecture integration of MCAP and
-HDP. You can contact with me by email or at irc.freenode.net (i'm sancane).
+bluetoothd[815]: Received AT+BLDN
+bluetoothd[815]: Telephone indicator "callsetup" 0 -> 2
+bluetoothd[815]: Telephone indicator "callsetup" 2 -> 3
 
-Any ideas are welcome.
+and then when I press HS key single time it show following,
 
-Best regards.
+bluetoothd[815]: Received AT+CHUP
+bluetoothd[815]: Telephone indicator "callsetup" 3 -> 0
+bluetoothd[815]: Received AT+BTRH?
+
+But I am not able to get AT+CKPD=200, It would be really appreciable
+if somebody guide/suggest me what should I do to get AT+CKPD=200 when
+connected through API "Connect" on DBUS.
+
+-- 
+With Regards,
+Nirav Rabara
