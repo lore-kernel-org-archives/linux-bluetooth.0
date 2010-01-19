@@ -1,39 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 19 Jan 2010 16:40:25 +0100
-From: Stefan Seyfried <stefan.seyfried@googlemail.com>
-To: Gene Heskett <gene.heskett@verizon.net>
-Cc: linux-bluetooth@vger.kernel.org, linux-bluetooth@vger.kernel.org
+From: Gene Heskett <gene.heskett@verizon.net>
+To: linux-bluetooth@vger.kernel.org
 Subject: Re: weak bt?
-Message-ID: <20100119164025.29a32372@strolchi.home.s3e.de>
-In-Reply-To: <201001161038.49294.gene.heskett@verizon.net>
+Date: Tue, 19 Jan 2010 09:38:18 -0500
 References: <201001161038.49294.gene.heskett@verizon.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-reply-to: <201001161038.49294.gene.heskett@verizon.net>
+MIME-version: 1.0
+Content-type: Text/Plain; charset=iso-8859-1
+Message-id: <201001190938.18821.gene.heskett@verizon.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gene,
+Ping?
 
-On Sat, 16 Jan 2010 10:38:49 -0500
-Gene Heskett <gene.heskett@verizon.net> wrote:
+On Saturday 16 January 2010, Gene Heskett wrote:
+>Greetings all;
+>
+>I have a broadcom bluetooth dongle plugged into a full bandwidth 7 port
+> hub, and another (an a7 brand eb-301)built into an rs-232 emulation device
+> plugged into a legacy computer.
+>
+>It works about 10% of the time, so speeds are very poor.
+>
+>Starting bluetooth-proximity, that shows the signal is quite weak, ranging
+>from 3 up to 30 and this is an overnight session that has been recording
+> for about 10 hours now.  The devices are about 16 to 18 feet and the house
+> wooden flooring apart as the legacy machine is in the basement.
+>
+>Is this distance what would be called fringe area in tv reception?  Or
+> should it be working better than this?
+>
 
-> The devices are about 16 to 18 feet and the house wooden 
-> flooring apart as the legacy machine is in the basement.
-> 
-> Is this distance what would be called fringe area in tv reception?  Or should 
-> it be working better than this?
 
-"It depends". See http://en.wikipedia.org/wiki/Bluetooth#Uses
-
-At my last job, I had an Aircable "dongle", similar to the
-http://www.aircable.net/host-xr2.html (but in a box more like the
-Aircable Industrial XR), and it was really astonishing how many
-bluetooth devices it could see (> 20), when the builtin BT adapter saw
-2 or three.
-
-So it really depends on the hardware.
 -- 
-Stefan Seyfried
+Cheers, Gene
+"There are four boxes to be used in defense of liberty:
+ soap, ballot, jury, and ammo. Please use in that order."
+-Ed Howdershelt (Author)
 
-"Any ideas, John?"
-"Well, surrounding them's out."
+AMAZING BUT TRUE ...
+	There is so much sand in Northern Africa that if it were spread out it
+	would completely cover the Sahara Desert.
