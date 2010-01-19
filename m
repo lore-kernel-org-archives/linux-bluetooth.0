@@ -1,58 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 19 Jan 2010 11:41:52 +0000 (GMT)
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [patch] bluez-hcidump fix SDP universal attributes
+In-Reply-To: <1259610176.010210.13279.nullmailer@galant.ukfsn.org>
+References: <1259610176.010210.13279.nullmailer@galant.ukfsn.org>
 MIME-Version: 1.0
-In-Reply-To: <20100119103338.GA22431@jh-x301>
-References: <fbf08281001110908s2c3412m456b3aa980b8ca10@mail.gmail.com>
-	 <fbf08281001131539l342a3062w70883c197dc52983@mail.gmail.com>
-	 <2d5a2c101001180338n2a37f0e9y76942650b755166@mail.gmail.com>
-	 <201001171637.22263.denkenz@gmail.com>
-	 <2d5a2c101001190130u3b73737cl2589ba04ec5abd45@mail.gmail.com>
-	 <20100119103338.GA22431@jh-x301>
-Date: Tue, 19 Jan 2010 14:26:51 +0200
-Message-ID: <2d5a2c101001190426y71683193qbe4b132393a9d01f@mail.gmail.com>
-Subject: Re: [RFC] HFP support into oFono and BlueZ
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Denis Kenzior <denkenz@gmail.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	ofono@ofono.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: MULTIPART/MIXED; BOUNDARY="0-973940780-1263901312=:224"
+Message-Id: <1263901312.199442.295.nullmailer@galant.ukfsn.org>
+From: Iain Hibbert <plunky@rya-online.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-On Tue, Jan 19, 2010 at 12:33 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Luiz,
+--0-973940780-1263901312=:224
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+
+On Mon, 30 Nov 2009, Iain Hibbert wrote:
+
+> hcidump shows SDP universal attribute 0x000d as IconURL but in fact it is
+> defined as "Additional Protocol Descriptor Lists". IconURL is 0x000c and I
+> don't know what Icon_10 was, perhaps an older name?
 >
-> On Tue, Jan 19, 2010, Luiz Augusto von Dentz wrote:
->> Also the problem with this being in the device path is that ofono may
->> not be registered as an agent on connect (both ways) which will cause
->> the connection to drop and the round trips to resolve device path only
->> makes it worse, if this happen to be on adapter path this would not be
->> a problem since we know before hand who to call.
+> Eg, from an SDP probe of a mouse:
 >
-> I don't think this is an issue in the case of a per-adapter handsfree
-> agent. Typically the agent would be registered upon the creation of the
-> device object. Yes, in theory a HFP connection establishment may occur
-> before ofono manages to register an agent for the device but the
-> connection doesn't need to be dropped because of it. Since it's the
-> HF-role device (i.e. us) that sends the initial AT command in HFP SLC
-> establishment bluetoothd could just sit quietly waiting until an agent
-> registers itself. When an agent finally gets registered bluetoothd would
-> (after replying to the registration method call) immediately call the
-> NewConnection() method for the agent.
+>       aid 0x000d (IconURL)
+>          < < < uuid-16 0x0100 (L2CAP) uint 0x13 > < uuid-16 0x0011 (HIDP) > > >
 
-Well it might work, but does it worth? Also I got the impression that
-this is not optimal, specially if the we are simulating a combo device
-hfp+a2dp this may delay the setup indefinitely until somebody register
-an agent , so if I got it right our current code behind Audio.Connect
-will not even attempt to connect the sink until headset state
-transition from connecting.
+Reposting because there was no response to this, patch is attached..
 
-Maybe and being paranoid, but I guess this might be troublesome for
-mobile hardware where dbus is not that fast.
+See "5.1.6 AdditionalProtocolDescriptorList attribute" and "5.1.14 IconURL
+Attribute" sections in the core specification for reference..
+
+(they sometimes call it AdditionalProtocolDescriptorLists and that is more
+accurate as more than one protocol descriptor list may be included)
+
+regards,
+iain
+--0-973940780-1263901312=:224
+Content-Type: TEXT/PLAIN; charset=US-ASCII; name=patch.txt
+Content-Transfer-Encoding: BASE64
+Content-ID: <alpine.NEB.2.00.1001191141520.224@localhost.>
+Content-Description: fix SDP universal attributes for bluez-hcidump
+Content-Disposition: attachment; filename=patch.txt
+
+LS0tIHBhcnNlci9zZHAuYy5vcmlnCTIwMDktMTEtMzAgMTk6Mjk6MzEuMDAw
+MDAwMDAwICswMDAwDQorKysgcGFyc2VyL3NkcC5jDQpAQCAtMTk0LDggKzE5
+NCw4IEBAIHN0YXRpYyBzZHBfYXR0cl9pZF9uYW1fbG9va3VwX3RhYmxlX3Qg
+c2QNCiAJeyBTRFBfQVRUUl9JRF9CTFVFVE9PVEhfUFJPRklMRV9ERVNDUklQ
+VE9SX0xJU1QsICJCVFByb2ZpbGVEZXNjTGlzdCIgIH0sDQogCXsgU0RQX0FU
+VFJfSURfRE9DVU1FTlRBVElPTl9VUkwsICAgICAgICAgICAgICAgICAiRG9j
+VVJMIiAgICAgICAgICAgICB9LA0KIAl7IFNEUF9BVFRSX0lEX0NMSUVOVF9F
+WEVDVVRBQkxFX1VSTCwgICAgICAgICAgICAgIkNsaWVudEV4ZVVSTCIgICAg
+ICAgfSwNCi0JeyBTRFBfQVRUUl9JRF9JQ09OXzEwLCAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICJJY29uMTAiICAgICAgICAgICAgIH0sDQogCXsgU0RQ
+X0FUVFJfSURfSUNPTl9VUkwsICAgICAgICAgICAgICAgICAgICAgICAgICAi
+SWNvblVSTCIgICAgICAgICAgICB9LA0KKwl7IFNEUF9BVFRSX0lEX0FERElU
+SU9OQUxfUFJPVE9DT0xfREVTQ19MSVNUUywgICAgIkFkZGl0aW9uYWxQcm90
+b2NvbERlc2NMaXN0cyIgfSwNCiAJeyBTRFBfQVRUUl9JRF9TRVJWSUNFX05B
+TUUsICAgICAgICAgICAgICAgICAgICAgICJTcnZOYW1lIiAgICAgICAgICAg
+IH0sDQogCXsgU0RQX0FUVFJfSURfU0VSVklDRV9ERVNDUklQVElPTiwgICAg
+ICAgICAgICAgICAiU3J2RGVzYyIgICAgICAgICAgICB9LA0KIAl7IFNEUF9B
+VFRSX0lEX1BST1ZJREVSX05BTUUsICAgICAgICAgICAgICAgICAgICAgIlBy
+b3ZpZGVyTmFtZSIgICAgICAgfSwNCi0tLSBwYXJzZXIvc2RwLmgub3JpZwky
+MDA5LTExLTMwIDE5OjI5OjM1LjAwMDAwMDAwMCArMDAwMA0KKysrIHBhcnNl
+ci9zZHAuaA0KQEAgLTEyOSw4ICsxMjksOCBAQA0KICNkZWZpbmUgU0RQX0FU
+VFJfSURfQkxVRVRPT1RIX1BST0ZJTEVfREVTQ1JJUFRPUl9MSVNUICAweDAw
+MDkNCiAjZGVmaW5lIFNEUF9BVFRSX0lEX0RPQ1VNRU5UQVRJT05fVVJMICAg
+ICAgICAgICAgICAgICAgMHgwMDBBDQogI2RlZmluZSBTRFBfQVRUUl9JRF9D
+TElFTlRfRVhFQ1VUQUJMRV9VUkwgICAgICAgICAgICAgIDB4MDAwQg0KLSNk
+ZWZpbmUgU0RQX0FUVFJfSURfSUNPTl8xMCAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAweDAwMEMNCi0jZGVmaW5lIFNEUF9BVFRSX0lEX0lDT05fVVJM
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgMHgwMDBEDQorI2RlZmluZSBT
+RFBfQVRUUl9JRF9JQ09OX1VSTCAgICAgICAgICAgICAgICAgICAgICAgICAg
+IDB4MDAwQw0KKyNkZWZpbmUgU0RQX0FUVFJfSURfQURESVRJT05BTF9QUk9U
+T0NPTF9ERVNDX0xJU1RTICAgICAweDAwMEQNCiAjZGVmaW5lIFNEUF9BVFRS
+X0lEX1NFUlZJQ0VfTkFNRSAgICAgICAgICAgICAgICAgICAgICAgMHgwMTAw
+DQogI2RlZmluZSBTRFBfQVRUUl9JRF9TRVJWSUNFX0RFU0NSSVBUSU9OICAg
+ICAgICAgICAgICAgIDB4MDEwMQ0KICNkZWZpbmUgU0RQX0FUVFJfSURfUFJP
+VklERVJfTkFNRSAgICAgICAgICAgICAgICAgICAgICAweDAxMDINCg==
+
+--0-973940780-1263901312=:224--
 
 
--- 
-Luiz Augusto von Dentz
-Engenheiro de Computação
