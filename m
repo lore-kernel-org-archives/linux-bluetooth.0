@@ -1,41 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 19 Jan 2010 12:33:38 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Denis Kenzior <denkenz@gmail.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	ofono@ofono.org
-Subject: Re: [RFC] HFP support into oFono and BlueZ
-Message-ID: <20100119103338.GA22431@jh-x301>
-References: <fbf08281001110908s2c3412m456b3aa980b8ca10@mail.gmail.com>
- <fbf08281001131539l342a3062w70883c197dc52983@mail.gmail.com>
- <2d5a2c101001180338n2a37f0e9y76942650b755166@mail.gmail.com>
- <201001171637.22263.denkenz@gmail.com>
- <2d5a2c101001190130u3b73737cl2589ba04ec5abd45@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <2d5a2c101001190130u3b73737cl2589ba04ec5abd45@mail.gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCHes] Implement Bluetooth Wacom tablet's mode change in
+ the kernel
+From: Bastien Nocera <hadess@hadess.net>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        linux-input <linux-input@vger.kernel.org>,
+        BlueZ development <linux-bluetooth@vger.kernel.org>, bgunn@solekai.com,
+        Ping <pinglinux@gmail.com>, Jiri Kosina <jikos@jikos.cz>
+In-Reply-To: <1263886149.5591.166.camel@localhost.localdomain>
+References: <1263833399.20565.2905.camel@localhost.localdomain>
+	 <1263886149.5591.166.camel@localhost.localdomain>
+Content-Type: text/plain; charset="ISO-8859-1"
+Date: Tue, 19 Jan 2010 10:30:15 +0000
+Message-ID: <1263897015.20565.3988.camel@localhost.localdomain>
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+On Mon, 2010-01-18 at 23:29 -0800, Marcel Holtmann wrote:
+> Hi Bastien,
+> 
+> > Here's a patch to do the Bluetooth Wacom tablet's mode setting in the
+> > kernel. In the past, it was done in a patch in bluetootd.
+> > 
+> > The first patch is probably completely wrong. Right now,
+> > hid_output_raw_report is done on the intr socket, instead of the ctrl
+> > socket. If it's correct to do it on the intr socket, we'd need to add
+> > some API as a way to select the ctrl socket instead for use in that
+> > driver.
+> 
+> actually the interrupt should be incoming only. So moving the raw output
+> to the control channel seems fine to. Any reason why it is on the
+> interrupt channel in the first place?
 
-On Tue, Jan 19, 2010, Luiz Augusto von Dentz wrote:
-> Also the problem with this being in the device path is that ofono may
-> not be registered as an agent on connect (both ways) which will cause
-> the connection to drop and the round trips to resolve device path only
-> makes it worse, if this happen to be on adapter path this would not be
-> a problem since we know before hand who to call.
-
-I don't think this is an issue in the case of a per-adapter handsfree
-agent. Typically the agent would be registered upon the creation of the
-device object. Yes, in theory a HFP connection establishment may occur
-before ofono manages to register an agent for the device but the
-connection doesn't need to be dropped because of it. Since it's the
-HF-role device (i.e. us) that sends the initial AT command in HFP SLC
-establishment bluetoothd could just sit quietly waiting until an agent
-registers itself. When an agent finally gets registered bluetoothd would
-(after replying to the registration method call) immediately call the
-NewConnection() method for the agent.
-
-Johan
+The patch was written by Jiri and tested by Brian. Not sure what sort of
+device Brian tested this with...
