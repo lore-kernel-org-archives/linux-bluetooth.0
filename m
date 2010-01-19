@@ -1,51 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gunn, Brian" <bgunn@solekai.com>
-To: Bastien Nocera <hadess@hadess.net>, Marcel Holtmann <marcel@holtmann.org>
-CC: Dmitry Torokhov <dmitry.torokhov@gmail.com>, linux-input
-	<linux-input@vger.kernel.org>, BlueZ development
-	<linux-bluetooth@vger.kernel.org>, Ping <pinglinux@gmail.com>, Jiri Kosina
-	<jikos@jikos.cz>
-Date: Tue, 19 Jan 2010 08:36:58 -0800
-Subject: RE: [PATCHes] Implement Bluetooth Wacom tablet's mode change in the
- kernel
-Message-ID: <FE57175CCE23E5419899C1B0CFA26FAD101B5F8B9D@EXMBXSD.dm.solekai.com>
-References: <1263833399.20565.2905.camel@localhost.localdomain>
-	 <1263886149.5591.166.camel@localhost.localdomain>,<1263897015.20565.3988.camel@localhost.localdomain>
-In-Reply-To: <1263897015.20565.3988.camel@localhost.localdomain>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+Date: Tue, 19 Jan 2010 18:53:46 +0300
+Message-ID: <5d6875a11001190753j58aef427v2205f50760bcd477@mail.gmail.com>
+Subject: bluetoothd Permission denied (13) when connecting A2DP headset
+From: Murz <murznn@gmail.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I tested this with a Bluetooth remote control.  As I understand, reports ca=
-n be written to either the interrupt or control sockets.  I'm happy to test=
- other changes to let this be selectable.
+I have using bluez 4.60-0ubuntu1 and blueman 1.21-1~ppa1k on Kubuntu 9.10 AMD64.
+My bluetooth dongle is USB:
+Bus 002 Device 002: ID 1131:1004 Integrated System Solution Corp.
+Bluetooth Device
 
-Brian
+I can successfully pair computer with mobile phone (HTC Touch HD, WM
+6.5.3), connect via serial (dialup) and send files via bluetooth to
+the device.
+I have a Nokia BH-504 headset. It successfully connects with mobile
+phone via A2DP and Headset profiles.
 
-________________________________________
-From: Bastien Nocera [hadess@hadess.net]
-Sent: Tuesday, January 19, 2010 2:30 AM
-To: Marcel Holtmann
-Cc: Dmitry Torokhov; linux-input; BlueZ development; Gunn, Brian; Ping; Jir=
-i Kosina
-Subject: Re: [PATCHes] Implement Bluetooth Wacom tablet's mode change in th=
-e kernel
+But I can't connect it with bluez on computer!
 
-On Mon, 2010-01-18 at 23:29 -0800, Marcel Holtmann wrote:
-> Hi Bastien,
->
-> > Here's a patch to do the Bluetooth Wacom tablet's mode setting in the
-> > kernel. In the past, it was done in a patch in bluetootd.
-> >
-> > The first patch is probably completely wrong. Right now,
-> > hid_output_raw_report is done on the intr socket, instead of the ctrl
-> > socket. If it's correct to do it on the intr socket, we'd need to add
-> > some API as a way to select the ctrl socket instead for use in that
-> > driver.
->
-> actually the interrupt should be incoming only. So moving the raw output
-> to the control channel seems fine to. Any reason why it is on the
-> interrupt channel in the first place?
+I try this on four computers, and on one fresh install of Kubuntu 9.10
+and always see the permission error!
 
-The patch was written by Jiri and tested by Brian. Not sure what sort of
-device Brian tested this with...
+bluez see the headset, I can succesfully pair it with password "0000".
+But when I try connect to any service (A2DP or Headset), I see the
+error in /var/log/daemon.log:
+Jan 19 18:29:47 axe bluetoothd[22040]: Permission denied (13)
+
+If I run bluetoothd -n -d, on connect process I see:
+bluetoothd[22040]: avdtp_ref(0x7f6b42fa6c10): ref=2
+bluetoothd[22040]: stream creation in progress
+bluetoothd[22040]: adapter_get_device(00:22:FC:74:AA:3C)
+bluetoothd[22040]: Permission denied (13)
+bluetoothd[22040]: Disconnected from 00:22:FC:74:AA:3C
+bluetoothd[22040]: avdtp_unref(0x7f6b42fa6c10): ref=1
+bluetoothd[22040]: connect:connect XCASE detected
+bluetoothd[22040]: avdtp_unref(0x7f6b42fa6c10): ref=0
+bluetoothd[22040]: avdtp_unref(0x7f6b42fa6c10): freeing session and
+removing from list
+bluetoothd[22040]: Stream setup failed, after XCASE connect:connect
+
+bluetoothd is ran as root, blueman I try to ran as my user and as root too.
+
+Which permissions does bluetoothd needs to create this connection? How
+I can give they to him?
+
+I can give you any additional info about my system, please help me
+detect the problem!
