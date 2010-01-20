@@ -1,78 +1,124 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH] [hid] Enable Sixaxis controller over Bluetooth as well
+Subject: [PATCH 1/2] [hidp] Use the control socket for raw messages
 From: Bastien Nocera <hadess@hadess.net>
 To: Dmitry Torokhov <dmitry.torokhov@gmail.com>,
 	linux-input <linux-input@vger.kernel.org>,
 	BlueZ development <linux-bluetooth@vger.kernel.org>,
 	Jiri Kosina <jikos@jikos.cz>
 Content-Type: text/plain; charset="ISO-8859-1"
-Date: Wed, 20 Jan 2010 12:01:53 +0000
-Message-ID: <1263988913.1735.2532.camel@localhost.localdomain>
+Date: Wed, 20 Jan 2010 12:00:42 +0000
+Message-ID: <1263988842.1735.2519.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-input-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Now that hid_output_raw_report works, port the PS3 Sixaxis
-Bluetooth quirk from user-space, into kernel-space.
+In commit 2da31939a42f7a676a0bc5155d6a0a39ed8451f2, support
+for Bluetooth hid_output_raw_report was added, but it pushes
+the data to the intr socket instead of the ctrl one.
+
+This patch makes hid_output_raw_report use the control socket
+instead.
 
 Signed-off-by: Bastien Nocera <hadess@hadess.net>
 ---
- drivers/hid/hid-core.c |    1 +
- drivers/hid/hid-sony.c |   15 ++++++++++++++-
- 2 files changed, 15 insertions(+), 1 deletions(-)
+ net/bluetooth/hidp/core.c |   70 +++++++++++++++++++++++----------------------
+ 1 files changed, 36 insertions(+), 34 deletions(-)
 
-diff --git a/drivers/hid/hid-core.c b/drivers/hid/hid-core.c
-index 3773f69..d88bebf 100644
---- a/drivers/hid/hid-core.c
-+++ b/drivers/hid/hid-core.c
-@@ -1337,6 +1337,7 @@ static const struct hid_device_id hid_blacklist[] = {
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_PETALYNX, USB_DEVICE_ID_PETALYNX_MAXTER_REMOTE) },
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_SAMSUNG, USB_DEVICE_ID_SAMSUNG_IR_REMOTE) },
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS3_CONTROLLER) },
-+	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS3_CONTROLLER) },
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_VAIO_VGX_MOUSE) },
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_SUNPLUS, USB_DEVICE_ID_SUNPLUS_WDESKTOP) },
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_THRUSTMASTER, 0xb300) },
-diff --git a/drivers/hid/hid-sony.c b/drivers/hid/hid-sony.c
-index 96d723e..d69ac22 100644
---- a/drivers/hid/hid-sony.c
-+++ b/drivers/hid/hid-sony.c
-@@ -73,6 +73,12 @@ static int sony_set_operational(struct hid_device *hdev)
- 	return ret;
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index 5697500..40879ed 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -243,6 +243,39 @@ static void hidp_input_report(struct hidp_session *session, struct sk_buff *skb)
+ 	input_sync(dev);
  }
  
-+static int sony_set_operational_bt(struct hid_device *hdev)
++static int __hidp_send_ctrl_message(struct hidp_session *session,
++			unsigned char hdr, unsigned char *data, int size)
 +{
-+	unsigned char buf[] = { 0x53, 0xf4,  0x42, 0x03, 0x00, 0x00 };
-+	return hdev->hid_output_raw_report(hdev, buf, sizeof(buf));
++	struct sk_buff *skb;
++
++	BT_DBG("session %p data %p size %d", session, data, size);
++
++	if (!(skb = alloc_skb(size + 1, GFP_ATOMIC))) {
++		BT_ERR("Can't allocate memory for new frame");
++		return -ENOMEM;
++	}
++
++	*skb_put(skb, 1) = hdr;
++	if (data && size > 0)
++		memcpy(skb_put(skb, size), data, size);
++
++	skb_queue_tail(&session->ctrl_transmit, skb);
++
++	return 0;
 +}
 +
- static int sony_probe(struct hid_device *hdev, const struct hid_device_id *id)
- {
- 	int ret;
-@@ -101,7 +107,13 @@ static int sony_probe(struct hid_device *hdev, const struct hid_device_id *id)
- 		goto err_free;
- 	}
- 
--	ret = sony_set_operational(hdev);
-+	if (hdev->bus == BUS_USB)
-+		ret = sony_set_operational(hdev);
-+	else if (hdev->bus == BUS_BLUETOOTH)
-+		ret = sony_set_operational_bt(hdev);
-+	else
-+		ret = 0;
++static inline int hidp_send_ctrl_message(struct hidp_session *session,
++			unsigned char hdr, unsigned char *data, int size)
++{
++	int err;
 +
- 	if (ret < 0)
- 		goto err_stop;
++	err = __hidp_send_ctrl_message(session, hdr, data, size);
++
++	hidp_schedule(session);
++
++	return err;
++}
++
+ static int hidp_queue_report(struct hidp_session *session,
+ 				unsigned char *data, int size)
+ {
+@@ -282,7 +315,9 @@ static int hidp_send_report(struct hidp_session *session, struct hid_report *rep
  
-@@ -121,6 +133,7 @@ static void sony_remove(struct hid_device *hdev)
+ static int hidp_output_raw_report(struct hid_device *hid, unsigned char *data, size_t count)
+ {
+-	if (hidp_queue_report(hid->driver_data, data, count))
++	if (hidp_send_ctrl_message(hid->driver_data,
++			HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_FEATURE,
++			data, count))
+ 		return -ENOMEM;
+ 	return count;
+ }
+@@ -307,39 +342,6 @@ static inline void hidp_del_timer(struct hidp_session *session)
+ 		del_timer(&session->timer);
+ }
  
- static const struct hid_device_id sony_devices[] = {
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS3_CONTROLLER) },
-+	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS3_CONTROLLER) },
- 	{ HID_USB_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_VAIO_VGX_MOUSE),
- 		.driver_data = VAIO_RDESC_CONSTANT },
- 	{ }
+-static int __hidp_send_ctrl_message(struct hidp_session *session,
+-			unsigned char hdr, unsigned char *data, int size)
+-{
+-	struct sk_buff *skb;
+-
+-	BT_DBG("session %p data %p size %d", session, data, size);
+-
+-	if (!(skb = alloc_skb(size + 1, GFP_ATOMIC))) {
+-		BT_ERR("Can't allocate memory for new frame");
+-		return -ENOMEM;
+-	}
+-
+-	*skb_put(skb, 1) = hdr;
+-	if (data && size > 0)
+-		memcpy(skb_put(skb, size), data, size);
+-
+-	skb_queue_tail(&session->ctrl_transmit, skb);
+-
+-	return 0;
+-}
+-
+-static inline int hidp_send_ctrl_message(struct hidp_session *session,
+-			unsigned char hdr, unsigned char *data, int size)
+-{
+-	int err;
+-
+-	err = __hidp_send_ctrl_message(session, hdr, data, size);
+-
+-	hidp_schedule(session);
+-
+-	return err;
+-}
+-
+ static void hidp_process_handshake(struct hidp_session *session,
+ 					unsigned char param)
+ {
 -- 
 1.6.5.2
 
