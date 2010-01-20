@@ -1,29 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Perelet, Oleg" <operelet@quicinc.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Wed, 20 Jan 2010 07:56:56 -0800
-Subject: AMP & BlueZ
-Message-ID: <BCDE476F204B134B8B235FB275BC3AD80343410330@NALASEXMB01.na.qualcomm.com>
-References: <1263988913.1735.2532.camel@localhost.localdomain>
-In-Reply-To: <1263988913.1735.2532.camel@localhost.localdomain>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: [PATCH] [hid] Enable Sixaxis controller over Bluetooth as well
+From: Bastien Nocera <hadess@hadess.net>
+To: Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	linux-input <linux-input@vger.kernel.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Jiri Kosina <jikos@jikos.cz>
+Content-Type: text/plain; charset="ISO-8859-1"
+Date: Wed, 20 Jan 2010 12:01:53 +0000
+Message-ID: <1263988913.1735.2532.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-input-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello.
+Now that hid_output_raw_report works, port the PS3 Sixaxis
+Bluetooth quirk from user-space, into kernel-space.
 
-I was curious about state of AMP & BlueZ. We had preliminary discussions about it during last couple BlueZ conferences, and we went over it. I'm just wandering where things are. 
+Signed-off-by: Bastien Nocera <hadess@hadess.net>
+---
+ drivers/hid/hid-core.c |    1 +
+ drivers/hid/hid-sony.c |   15 ++++++++++++++-
+ 2 files changed, 15 insertions(+), 1 deletions(-)
 
-Marcel, IIRC in Stuttgart you said that there's some WLAN project that is doing part of it (was it PAL?) can you please point toward it. Sorry if I'm missing something obvious:)
+diff --git a/drivers/hid/hid-core.c b/drivers/hid/hid-core.c
+index 3773f69..d88bebf 100644
+--- a/drivers/hid/hid-core.c
++++ b/drivers/hid/hid-core.c
+@@ -1337,6 +1337,7 @@ static const struct hid_device_id hid_blacklist[] = {
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_PETALYNX, USB_DEVICE_ID_PETALYNX_MAXTER_REMOTE) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_SAMSUNG, USB_DEVICE_ID_SAMSUNG_IR_REMOTE) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS3_CONTROLLER) },
++	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS3_CONTROLLER) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_VAIO_VGX_MOUSE) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_SUNPLUS, USB_DEVICE_ID_SUNPLUS_WDESKTOP) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_THRUSTMASTER, 0xb300) },
+diff --git a/drivers/hid/hid-sony.c b/drivers/hid/hid-sony.c
+index 96d723e..d69ac22 100644
+--- a/drivers/hid/hid-sony.c
++++ b/drivers/hid/hid-sony.c
+@@ -73,6 +73,12 @@ static int sony_set_operational(struct hid_device *hdev)
+ 	return ret;
+ }
+ 
++static int sony_set_operational_bt(struct hid_device *hdev)
++{
++	unsigned char buf[] = { 0x53, 0xf4,  0x42, 0x03, 0x00, 0x00 };
++	return hdev->hid_output_raw_report(hdev, buf, sizeof(buf));
++}
++
+ static int sony_probe(struct hid_device *hdev, const struct hid_device_id *id)
+ {
+ 	int ret;
+@@ -101,7 +107,13 @@ static int sony_probe(struct hid_device *hdev, const struct hid_device_id *id)
+ 		goto err_free;
+ 	}
+ 
+-	ret = sony_set_operational(hdev);
++	if (hdev->bus == BUS_USB)
++		ret = sony_set_operational(hdev);
++	else if (hdev->bus == BUS_BLUETOOTH)
++		ret = sony_set_operational_bt(hdev);
++	else
++		ret = 0;
++
+ 	if (ret < 0)
+ 		goto err_stop;
+ 
+@@ -121,6 +133,7 @@ static void sony_remove(struct hid_device *hdev)
+ 
+ static const struct hid_device_id sony_devices[] = {
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS3_CONTROLLER) },
++	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS3_CONTROLLER) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_VAIO_VGX_MOUSE),
+ 		.driver_data = VAIO_RDESC_CONSTANT },
+ 	{ }
+-- 
+1.6.5.2
 
-Quite few of HW manufacturers who are using our chipsets on embedded Linux are asking about that. Also, there's quite wide range of BT/WLAN chips/brands that are used with our platform. 
 
-If every BT/WLAN chip maker and HW manufacturer will start doing homegrown AMP implementation (even opensource) - whole thing will end up in bloody mess.
-
-I'm pretty sure this situation is common for every chip/HW platform running on Linux, that's why I'm asking you guys for your opinion.
-
-Thanks!
-
-Oleg.
-Qualcomm Innovation Center
