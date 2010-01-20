@@ -1,39 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4B5749B9.2080108@zydacron.com>
-Date: Wed, 20 Jan 2010 19:21:45 +0100
-From: Philip Oberstaller <p.oberstaller@zydacron.com>
-MIME-Version: 1.0
+From: "Perelet, Oleg" <operelet@quicinc.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Scan of already paired devices
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Date: Wed, 20 Jan 2010 07:56:56 -0800
+Subject: AMP & BlueZ
+Message-ID: <BCDE476F204B134B8B235FB275BC3AD80343410330@NALASEXMB01.na.qualcomm.com>
+References: <1263988913.1735.2532.camel@localhost.localdomain>
+In-Reply-To: <1263988913.1735.2532.camel@localhost.localdomain>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hello.
 
-I would like to know if it's possible to see already paired devices in 
-the scan results?
+I was curious about state of AMP & BlueZ. We had preliminary discussions about it during last couple BlueZ conferences, and we went over it. I'm just wandering where things are. 
 
-My scenario is the following:
-First I create a connection from my host to a device and pair the device 
-and the host. Then I disconnect the connection by simply switching off 
-the device. I remove the pairing at the host but obviously cannot remove 
-the pairing from the device because there is no connection anymore. If I 
-then switch on the device again I am not able to find it in the scanning 
-results because the device has stored the "old" pairing and thus seems 
-to be invisible.
+Marcel, IIRC in Stuttgart you said that there's some WLAN project that is doing part of it (was it PAL?) can you please point toward it. Sorry if I'm missing something obvious:)
 
-The device reappears in the scanning results only when I remove the 
-pairing at the device itself.
+Quite few of HW manufacturers who are using our chipsets on embedded Linux are asking about that. Also, there's quite wide range of BT/WLAN chips/brands that are used with our platform. 
 
-Thus anybody know what I could do from the host side to be able to make 
-the device "visible" again.
+If every BT/WLAN chip maker and HW manufacturer will start doing homegrown AMP implementation (even opensource) - whole thing will end up in bloody mess.
 
-I am forced to use a quiet old bluez version 3.33. Maybe this behavior 
-has changed in the meantime?
+I'm pretty sure this situation is common for every chip/HW platform running on Linux, that's why I'm asking you guys for your opinion.
 
-I am grateful for any hints.
+Thanks!
 
-Philip Oberstaller
-
-
+Oleg.
+Qualcomm Innovation Center
