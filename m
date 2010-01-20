@@ -1,49 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: Add DFU driver for Atheros Bluetooth
- chipset AR3011
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Luis R. Rodriguez" <lrodriguez@atheros.com>
-Cc: torvalds@linux-foundation.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org, mcgrof@gmail.com,
-	Vikram Kandukuri <vkandukuri@atheros.com>,
-	Vikram Kandukuri <vikram.kandukuri@atheros.com>,
-	Alicke Xu <sxu@atheros.com>, David Miller <davem@davemloft.net>
-In-Reply-To: <1264017679-19324-1-git-send-email-lrodriguez@atheros.com>
-References: <1264017679-19324-1-git-send-email-lrodriguez@atheros.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 20 Jan 2010 12:27:48 -0800
-Message-ID: <1264019268.5591.223.camel@localhost.localdomain>
-Mime-Version: 1.0
+MIME-Version: 1.0
+From: "Luis R. Rodriguez" <mcgrof@gmail.com>
+Date: Wed, 20 Jan 2010 12:13:26 -0800
+Message-ID: <43e72e891001201213x6a2c203dl7121f2dde6d61fb9@mail.gmail.com>
+Subject: FYI - new compat-wireless based on 2.6.33-rc4
+To: linux-wireless <linux-wireless@vger.kernel.org>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luis,
+The compat_firmware_class was having some issues which should now be
+hopefully addressed:
 
-> Signed-off-by: Vikram Kandukuri <vikram.kandukuri@atheros.com>
-> Signed-off-by: Alicke Xu <sxu@atheros.com>
-> Reviewed-by: Luis R. Rodriguez <lrodriguez@atheros.com>
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
-> 
-> Linus, this was merged into linux-next already. The driver is small enough,
-> it just uploads firmware, I figured it would likely be welcomed into 2.6.33-rc5.
-> The patch is the same as it went into linux-next. The firmware is already
-> merged as part of the linux-firmware git tree.
+  * Use a different subsystem name for sysfs registration, now compat_firmware
+  * The new subsystem name change required a new udev rule to be added
 
-what is going on here? Overstepping myself and also Dave for merging a
-new driver at this point of time in the development cycle.
+The new compat-wireless for 2.6.33-rc4 has been pushed out with the
+new changes. Unfortunately 2.6.33-rc5 hasn't been pushed out yet so I
+just overwrote the old rc4 package (next time I'll just add an extra
+extra version when this happens). The new sha1sum for this release is:
 
-The driver is small and self-contained, I agree on that. But remember
-the reason why it was not part of 2.6.33-rc1. You guys actually screwed
-up the submission. And I didn't get any fixes for 1.5 month. Now you are
-pushing it like this?
+c007d7c8649d6149f415ea87dc7a34d4ee808766  compat-wireless-2.6.33-rc4.tar.bz2
 
-Dave, I have no objection to merging this. So if you are happy in taking
-in it this late, I include it in the round of fixes that I am putting
-together.
+Just kicked out a bleeding edge release with the same fixes:
 
-Regards
+65bb3cd6565f1788a2c63bfe8ccfdd8dfc1fb368  compat-wireless-2010-01-20.tar.bz2
 
-Marcel
+Please let us know if there are any issues. I should note that the new
+compat_firmware_class will be used *every time* compat-wireless is
+used firmware needs to be uploaded, not just for the new
+request_firmware_nowait().
 
-
+  Luis
