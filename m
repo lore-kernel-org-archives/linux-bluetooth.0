@@ -1,32 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 20 Jan 2010 18:21:37 +0000 (GMT)
-To: Philip Oberstaller <p.oberstaller@zydacron.com>
-Cc: "linux-bluetooth\@vger\.kernel\.org"
-	<linux-bluetooth@vger.kernel.org>
-Subject: Re: Scan of already paired devices
-In-Reply-To: <4B5749B9.2080108@zydacron.com>
-References: <4B5749B9.2080108@zydacron.com>
+Message-ID: <4B5749B9.2080108@zydacron.com>
+Date: Wed, 20 Jan 2010 19:21:45 +0100
+From: Philip Oberstaller <p.oberstaller@zydacron.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Message-Id: <1264011697.849429.595.nullmailer@galant.ukfsn.org>
-From: Iain Hibbert <plunky@rya-online.net>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Scan of already paired devices
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 20 Jan 2010, Philip Oberstaller wrote:
+Hello,
 
-> Thus anybody know what I could do from the host side to be able to make the
-> device "visible" again.
+I would like to know if it's possible to see already paired devices in 
+the scan results?
 
-Obviously, you cannot control the device from the host if you are not even
-connected to it..
+My scenario is the following:
+First I create a connection from my host to a device and pair the device 
+and the host. Then I disconnect the connection by simply switching off 
+the device. I remove the pairing at the host but obviously cannot remove 
+the pairing from the device because there is no connection anymore. If I 
+then switch on the device again I am not able to find it in the scanning 
+results because the device has stored the "old" pairing and thus seems 
+to be invisible.
 
-What device is it?  If it is a phone then it may be possible to make it
-visible always, but many limited connection devices (HID, or headphones
-etc) will not advertise themselves if they have a pairing as there is no
-point to do that and it wastes power.
+The device reappears in the scanning results only when I remove the 
+pairing at the device itself.
 
-regards,
-iain
+Thus anybody know what I could do from the host side to be able to make 
+the device "visible" again.
+
+I am forced to use a quiet old bluez version 3.33. Maybe this behavior 
+has changed in the meantime?
+
+I am grateful for any hints.
+
+Philip Oberstaller
 
 
