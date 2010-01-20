@@ -1,79 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH 2/2] [hid-wacom] Implement Wacom quirk in the kernel
-From: Bastien Nocera <hadess@hadess.net>
-To: Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+Subject: Re: [PATCHes] Implement Bluetooth Wacom tablet's mode change in
+ the kernel
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>,
 	linux-input <linux-input@vger.kernel.org>,
 	BlueZ development <linux-bluetooth@vger.kernel.org>,
 	Jiri Kosina <jikos@jikos.cz>
-Content-Type: text/plain; charset="ISO-8859-1"
-Date: Wed, 20 Jan 2010 12:00:53 +0000
-Message-ID: <1263988853.1735.2524.camel@localhost.localdomain>
+In-Reply-To: <1263988051.1735.2474.camel@localhost.localdomain>
+References: <1263988051.1735.2474.camel@localhost.localdomain>
+Content-Type: text/plain; charset="UTF-8"
+Date: Wed, 20 Jan 2010 03:52:13 -0800
+Message-ID: <1263988333.5591.205.camel@localhost.localdomain>
 Mime-Version: 1.0
-Sender: linux-input-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The hid-wacom driver required user-space to poke at the tablet
-to make it send data about the cursor location.
+Hi Bastien,
 
-This patch makes it do the same thing but in the kernel.
+> Here's a patch to do the Bluetooth Wacom tablet's mode setting in the
+> kernel. In the past, it was done in a patch in bluetootd.
+> 
+> - 0001-hidp-Use-the-control-socket-for-raw-messages.patch
+> 
+> As discussed, now uses the ctrl channel for sending raw reports to the device.
+> 
+> - 0002-hid-wacom-Implement-Wacom-quirk-in-the-kernel.patch
+> 
+> Uses the above to poke at the device and turn it into mode2
+> 
+> - 0001-hid-sony-Fix-typo-in-error-message.patch
+> 
+> Small typo, for the input tree
+> 
+> - 0001-hid-Enable-Sixaxis-controller-over-Bluetooth-as-well.patch
+> 
+> Use the hidp patch above to enable the sixaxis controller
 
-Signed-off-by: Bastien Nocera <hadess@hadess.net>
----
- drivers/hid/hid-wacom.c |   25 +++++++++++++++++++++++++
- 1 files changed, 25 insertions(+), 0 deletions(-)
+please send them one patch per email and send them inline. In case of
+troubles just use git send-email.
 
-diff --git a/drivers/hid/hid-wacom.c b/drivers/hid/hid-wacom.c
-index 7475421..e55ed3f 100644
---- a/drivers/hid/hid-wacom.c
-+++ b/drivers/hid/hid-wacom.c
-@@ -155,7 +155,9 @@ static int wacom_probe(struct hid_device *hdev,
- 	struct hid_input *hidinput;
- 	struct input_dev *input;
- 	struct wacom_data *wdata;
-+	char rep_data[2];
- 	int ret;
-+	int limit;
- 
- 	wdata = kzalloc(sizeof(*wdata), GFP_KERNEL);
- 	if (wdata == NULL) {
-@@ -165,6 +167,7 @@ static int wacom_probe(struct hid_device *hdev,
- 
- 	hid_set_drvdata(hdev, wdata);
- 
-+	/* Parse the HID report now */
- 	ret = hid_parse(hdev);
- 	if (ret) {
- 		dev_err(&hdev->dev, "parse failed\n");
-@@ -177,6 +180,28 @@ static int wacom_probe(struct hid_device *hdev,
- 		goto err_free;
- 	}
- 
-+	/* Set Wacom mode2 */
-+	rep_data[0] = 0x03; rep_data[1] = 0x00;
-+	limit =3;
-+	do {
-+		ret = hdev->hid_output_raw_report(hdev, rep_data, 2);
-+	} while (ret < 0 && limit-- > 0);
-+	if (ret < 0) {
-+		dev_err(&hdev->dev, "failed to poke device #1, %d\n", ret);
-+		goto err_free;
-+	}
-+
-+	/* 0x06 - high reporting speed, 0x05 - low speed */
-+	rep_data[0] = 0x06; rep_data[1] = 0x00;
-+	limit = 3;
-+	do {
-+		ret = hdev->hid_output_raw_report(hdev, rep_data, 2);
-+	} while (ret < 0 && limit-- > 0);
-+	if (ret < 0) {
-+		dev_err(&hdev->dev, "failed to poke device #2, %d\n", ret);
-+		goto err_free;
-+	}
-+
- 	hidinput = list_entry(hdev->inputs.next, struct hid_input, list);
- 	input = hidinput->input;
- 
--- 
-1.6.5.2
+Regards
+
+Marcel
 
 
