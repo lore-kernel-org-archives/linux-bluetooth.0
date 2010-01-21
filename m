@@ -1,53 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Zhang, Zhenhua" <zhenhua.zhang@intel.com>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Date: Thu, 21 Jan 2010 14:28:08 +0800
-Subject: RE: [RFC] HFP support into oFono and BlueZ
-Message-ID: <8B81FACE836F9248894A7844CC0BA8141C9C543163@shzsmsx501.ccr.corp.intel.com>
-References: <fbf08281001110908s2c3412m456b3aa980b8ca10@mail.gmail.com>
-	<fbf08281001111105pc2f0d3au61d0e205e1689ec2@mail.gmail.com>
-	<fbf08281001131539l342a3062w70883c197dc52983@mail.gmail.com>
-	<fbf08281001201158q23d13d9bj930a66271c527b43@mail.gmail.com>
-In-Reply-To: <fbf08281001201158q23d13d9bj930a66271c527b43@mail.gmail.com>
-MIME-Version: 1.0
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	"ofono@ofono.org" <ofono@ofono.org>
-Reply-To: ofono@ofono.org
-List-Unsubscribe: <http://lists.ofono.org/options/ofono>,
-	<mailto:ofono-request@ofono.org?subject=unsubscribe>
-List-Archive: <http://lists.ofono.org/pipermail/ofono>
-List-Post: <mailto:ofono@ofono.org>
-List-Help: <mailto:ofono-request@ofono.org?subject=help>
-List-Subscribe: <http://lists.ofono.org/listinfo/ofono>,
-	<mailto:ofono-request@ofono.org?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Sender: ofono-bounces@ofono.org
-Errors-To: ofono-bounces@ofono.org
+Subject: RE: [PATCHes] Implement Bluetooth Wacom tablet's mode change in
+ the kernel
+From: Bastien Nocera <hadess@hadess.net>
+To: "Gunn, Brian" <bgunn@solekai.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        linux-input <linux-input@vger.kernel.org>,
+        BlueZ development <linux-bluetooth@vger.kernel.org>,
+        Ping <pinglinux@gmail.com>, Jiri Kosina <jikos@jikos.cz>
+In-Reply-To: <FE57175CCE23E5419899C1B0CFA26FAD101B5E591A@EXMBXSD.dm.solekai.com>
+References: <1263833399.20565.2905.camel@localhost.localdomain>
+	 <1263886149.5591.166.camel@localhost.localdomain>
+	 <1263897015.20565.3988.camel@localhost.localdomain>
+	 <FE57175CCE23E5419899C1B0CFA26FAD101B5E591A@EXMBXSD.dm.solekai.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Date: Thu, 21 Jan 2010 01:35:59 +0000
+Message-ID: <1264037759.1735.5008.camel@localhost.localdomain>
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgUGFkb3ZhbiwNCg0KR3VzdGF2byBGLiBQYWRvdmFuIHdyb3RlOg0KPj4gTmV3IHZlcnNpb24g
-b2YgdGhlIHBhdGNoZXMuIEtub3duIGlzc3VlczoNCj4+ICInb3JnLmJsdWV6LkhhbmRzZnJlZUFn
-ZW50LlJlbGVhc2UnIHBhcnQgbm90IGltcGxlbWVudGVkIiBhbmQgaXQncw0KPj4gbm90IHdvcmtp
-bmcgd2l0aCBtb3JlIHRoYW4gb25lIGJsdWV0b290aCBkZXZpY2VzIGluIHNvbWUgY2FzZXMuDQo+
-PiBDb21tZW50cyBhcmUgd2VsY29tZS4gDQo+PiANCj4gDQo+IEFub3RoZXIgbmV3IHZlcnNpb24g
-b2YgdGhlIHBhdGNoZXMuIE5vdyBvZm9ubyBxdWVyeSBhbGwgYmx1ZXRvb3RoDQo+IGRldmljZXMg
-YW5kIHNlYXJjaGVzIGZvciB0aGUgb25lcyB3aXRoIEdhdGV3YXkgaW50ZXJmYWNlLiBCbHVleiBo
-YXMNCj4gc29tZSBmaXhlcyBhbmQgbm93IHN1cHBvcnRzIGNvbm5lY3Rpb24gY29taW5nIGZyb20g
-dGhlIEFHLiANCj4gVGhlIHBhdGNoZXMgYXJlIHVzaW5nIGEgcGVyLWRldmljZSBhZ2VudCBhcyBk
-ZXNjcmliZWQgYnkgdGhlIGxhc3QNCj4gdmVyc2lvbiBvZiBIYW5kc2ZyZWUgQVBJLiANCj4gDQo+
-IEkgZGlkIG5vdCBpbXBsZW1lbnRlZCB5ZXQgJ29yZy5ibHVlei5IYW5kc2ZyZWVBZ2VudC5SZWxl
-YXNlJy4NCj4gDQo+IENvbW1lbnRzIGFyZSB3ZWxjb21lLiA6KQ0KDQpUd28gc21hbGwgY29tbWVu
-dHMuDQoNCjEuIFJlbW92ZSB1bnVzZWQgdmFyaWFibGVzLg0KDQptYWtlIC0tbm8tcHJpbnQtZGly
-ZWN0b3J5IGFsbC1hbQ0KICBDQyAgICAgcGx1Z2lucy9oZnAubw0KY2MxOiB3YXJuaW5ncyBiZWlu
-ZyB0cmVhdGVkIGFzIGVycm9ycw0KcGx1Z2lucy9oZnAuYzogSW4gZnVuY3Rpb24g4oCYZ2V0X3By
-b3BlcnRpZXNfY2LigJk6DQpwbHVnaW5zL2hmcC5jOjUwMDogZXJyb3I6IHVudXNlZCB2YXJpYWJs
-ZSDigJhlcnLigJkNCnBsdWdpbnMvaGZwLmM6IEluIGZ1bmN0aW9uIOKAmGxpc3RfZGV2aWNlc19j
-YuKAmToNCnBsdWdpbnMvaGZwLmM6NTI5OiBlcnJvcjogdW51c2VkIHZhcmlhYmxlIOKAmG1vZGVt
-4oCZDQpwbHVnaW5zL2hmcC5jOiBJbiBmdW5jdGlvbiDigJhoZnBfcHJvYmXigJk6DQpwbHVnaW5z
-L2hmcC5jOjY1NjogZXJyb3I6IHVudXNlZCB2YXJpYWJsZSDigJhkYXRh4oCZDQptYWtlWzFdOiAq
-KiogW3BsdWdpbnMvaGZwLm9dIEVycm9yIDENCm1ha2U6ICoqKiBbYWxsXSBFcnJvciAyDQoNCjIu
-IFlvdSBtYXkgdXNlIExpbnV4IGtlcm5lbCAvc2NyaXB0cy9jaGVja3BhdGNoLnBsIHRvIGNoZWNr
-IHlvdXIgcGF0Y2guDQpFLmcsIHRoZXJlJ3JlIHRyYWlsaW5nIHNwYWNlIGluIDAwMDIucGF0Y2gg
-bGluZSA4MzIuDQoNClJlZ2FyZHMsDQpaaGVuaHVhDQpfX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fXwpvZm9ubyBtYWlsaW5nIGxpc3QKb2Zvbm9Ab2Zvbm8ub3Jn
-Cmh0dHA6Ly9saXN0cy5vZm9uby5vcmcvbGlzdGluZm8vb2Zvbm8K
+On Wed, 2010-01-20 at 17:08 -0800, Gunn, Brian wrote:
+> Bastien Nocera wrote:
+> > The patch was written by Jiri and tested by Brian. Not sure what sort of
+> > device Brian tested this with...
+> 
+> I just tested this patch with my device and it does work.  I had to
+> slightly alter the data I send (had to add 0xA2 to the front of it),
+> but then it does work.
+> 
+> In my initial attempts, it does seem to work a little worse, but that
+> is probably because of the device I'm using, which is still under
+> development.
+
+I sent a new version of the patch, which uses "HIDP_TRANS_SET_REPORT |
+HIDP_DATA_RTYPE_FEATURE" for the first byte. Would that work?
