@@ -1,26 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1264102368-8918-1-git-send-email-hauke@hauke-m.de>
-References: <43e72e891001211012y4f4c8721t7eb9e0eea0221820@mail.gmail.com>
-	<1264102368-8918-1-git-send-email-hauke@hauke-m.de>
-From: "Luis R. Rodriguez" <lrodriguez@atheros.com>
-Date: Thu, 21 Jan 2010 11:53:11 -0800
-Message-ID: <43e72e891001211153u5e2e6618rbf3158286f0bd075@mail.gmail.com>
-Subject: Re: [PATCH] compat: fix build on arm
-To: Hauke Mehrtens <hauke@hauke-m.de>
+From: Hauke Mehrtens <hauke@hauke-m.de>
+To: lrodriguez@atheros.com
 Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	awozniak@irobot.com, mcgrof@infradead.org
-Content-Type: text/plain; charset=UTF-8
+	awozniak@irobot.com, mcgrof@infradead.org,
+	Hauke Mehrtens <hauke@hauke-m.de>
+Subject: [PATCH] compat: fix build on arm
+Date: Thu, 21 Jan 2010 20:32:48 +0100
+Message-Id: <1264102368-8918-1-git-send-email-hauke@hauke-m.de>
+In-Reply-To: <43e72e891001211012y4f4c8721t7eb9e0eea0221820@mail.gmail.com>
+References: <43e72e891001211012y4f4c8721t7eb9e0eea0221820@mail.gmail.com>
 Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Jan 21, 2010 at 11:32 AM, Hauke Mehrtens <hauke@hauke-m.de> wrote:
-> ARM does not provided the include file asm/compat.h. Use linux/compat.h
-> instead, it includes asm/compat.h if needed.
-> This patch is from OpenWRT:
-> https://dev.openwrt.org/browser/trunk/package/mac80211/patches/020-fix_compat_h.patch?rev=19063
->
+ARM does not provided the include file asm/compat.h. Use linux/compat.h
+instead, it includes asm/compat.h if needed.
+This patch is from OpenWRT:
+https://dev.openwrt.org/browser/trunk/package/mac80211/patches/020-fix_compat_h.patch?rev=19063
 
-Thanks applied.
+Signed-off-by: Hauke Mehrtens <hauke@hauke-m.de>
+---
+ include/linux/compat-2.6.32.h |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-  Luis
+diff --git a/include/linux/compat-2.6.32.h b/include/linux/compat-2.6.32.h
+index c3e4dbe..11060d8 100644
+--- a/include/linux/compat-2.6.32.h
++++ b/include/linux/compat-2.6.32.h
+@@ -6,7 +6,7 @@
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,32))
+ 
+ #include <linux/netdevice.h>
+-#include <asm/compat.h>
++#include <linux/compat.h>
+ #include <net/iw_handler.h>
+ #include <linux/workqueue.h>
+ 
+-- 
+1.6.3.3
+
