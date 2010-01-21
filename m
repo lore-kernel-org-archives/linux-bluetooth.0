@@ -1,24 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-From: Janet Traub <jtraub@google.com>
-Date: Thu, 21 Jan 2010 21:02:56 -0500
-Message-ID: <6ab27861001211802q45d8ec50kcc3a9234d7c98f00@mail.gmail.com>
-Subject: Any new work on eL2CAP, MCAP or HDP profiles?
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <4B58C997.2060904@irobot.com>
+References: <43e72e891001201213x6a2c203dl7121f2dde6d61fb9@mail.gmail.com>
+	<4B5897C8.2080006@irobot.com> <43e72e891001211012y4f4c8721t7eb9e0eea0221820@mail.gmail.com>
+	<4B58B432.5050200@irobot.com> <43e72e891001211217t17ffed80i2d5bc6f923b56210@mail.gmail.com>
+	<4B58C622.2090004@irobot.com> <4B58C997.2060904@irobot.com>
+From: "Luis R. Rodriguez" <mcgrof@gmail.com>
+Date: Thu, 21 Jan 2010 14:21:14 -0800
+Message-ID: <43e72e891001211421l6c861f59mcaad3c5e39950b49@mail.gmail.com>
+Subject: Re: FYI - new compat-wireless based on 2.6.33-rc4
+To: Adam Wozniak <awozniak@irobot.com>
+Cc: linux-wireless <linux-wireless@vger.kernel.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Thu, Jan 21, 2010 at 1:39 PM, Adam Wozniak <awozniak@irobot.com> wrote:
+> Ok, I see what's going on now.  The openembedded recipe I'm working with
+> didn't copy the udev stuff.
 
-Is anyone working on HDP contributions to BlueZ? Specifically working
-on eL2CAP, MCAP or HDP profiles?
+OK so not our fault? You just had to update your install target?
 
-Google is considering sponsoring the development and stabilization of
-enhanced L2CAP features in the Linux kernel (Enhanced Retransmission
-Mode, Streaming Mode, FCS option) as well as contributing to MCAP and
-HDP profiles.
-
-Thank you!
-Janet
-Google Health Team
+  Luis
