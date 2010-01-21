@@ -1,37 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4B58C622.2090004@irobot.com>
-Date: Thu, 21 Jan 2010 13:24:50 -0800
-From: Adam Wozniak <awozniak@irobot.com>
 MIME-Version: 1.0
-To: "Luis R. Rodriguez" <mcgrof@gmail.com>
-CC: linux-wireless <linux-wireless@vger.kernel.org>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: FYI - new compat-wireless based on 2.6.33-rc4
-References: <43e72e891001201213x6a2c203dl7121f2dde6d61fb9@mail.gmail.com> 	<4B5897C8.2080006@irobot.com> <43e72e891001211012y4f4c8721t7eb9e0eea0221820@mail.gmail.com> 	<4B58B432.5050200@irobot.com> <43e72e891001211217t17ffed80i2d5bc6f923b56210@mail.gmail.com>
-In-Reply-To: <43e72e891001211217t17ffed80i2d5bc6f923b56210@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <1264105871-27322-2-git-send-email-padovan@profusion.mobi>
+References: <1264105871-27322-1-git-send-email-padovan@profusion.mobi>
+	 <1264105871-27322-2-git-send-email-padovan@profusion.mobi>
+Date: Thu, 21 Jan 2010 18:20:23 -0300
+Message-ID: <2a9506371001211320r6dc7958h5b0040cec6f79e4b@mail.gmail.com>
+Subject: Re: [PATCH 2/2] Implement HandsfreeGateway Interface
+From: Vinicius Gomes <vinicius.gomes@openbossa.org>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org, ofono@ofono.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Luis R. Rodriguez wrote:
-> BTW Haukes posted a fix for the compile build against ARM. Try that.
-> That patch applies to compat.git but you should be able to mangle it
-> to apply to compat-wireless easily too.
->   
-That worked, thank you.
-> OK so it failed here, you may want to try to debug udev stuff now
-> then, what distribution do you have? Where are your udev rules put?
-> Where is the original udev rule for firmware for your box?
->
-> You can debug udev stuff by using 'udevadm monitor'
->   
-I'm using openembedded.  Rules are in /etc/udev/rules.d
-It contains a file 50-udev-default.rules with a line:
-
-SUBSYSTEM=="firmware", ACTION=="add", RUN+="firmware.sh"
-
-If I copy & paste and change the SUBSYSTEM to "compat_firmware" things 
-seem to load ok.
-
---Adam
-
+SGkgR3VzdGF2bywKCk9uIFRodSwgSmFuIDIxLCAyMDEwIGF0IDU6MzEgUE0sIEd1c3Rhdm8gRi4g
+UGFkb3Zhbgo8cGFkb3ZhbkBwcm9mdXNpb24ubW9iaT4gd3JvdGU6Cj4gKyDCoCDCoCDCoCBndy0+
+c2NvID0gY2hhbjsKPiArIMKgIMKgIMKgIGdfaW9fY2hhbm5lbF9yZWYoY2hhbik7Cj4gKwoKWW91
+IG11c3QgaGF2ZSBmb3Jnb3R0ZW4gdG8gY2hhbmdlIHRoaXMuCgo+IEBAIC0zMDcsMTcgKzU2NSwx
+NSBAQCBzdHJ1Y3QgZ2F0ZXdheSAqZ2F0ZXdheV9pbml0KHN0cnVjdCBhdWRpb19kZXZpY2UgKmRl
+dikKPiDCoHsKPiDCoCDCoCDCoCDCoHN0cnVjdCBnYXRld2F5ICpndzsKPgo+ICsgwqAgwqAgwqAg
+Z3cgPSBnX25ldzAoc3RydWN0IGdhdGV3YXksIDEpOwo+ICsKPiDCoCDCoCDCoCDCoGlmICghZ19k
+YnVzX3JlZ2lzdGVyX2ludGVyZmFjZShkZXYtPmNvbm4sIGRldi0+cGF0aCwKPiDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoEFVRElPX0dB
+VEVXQVlfSU5URVJGQUNFLAo+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgZ2F0ZXdheV9tZXRob2RzLCBnYXRld2F5X3NpZ25hbHMsCj4g
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqBOVUxMLCBkZXYsIE5VTEwpKQo+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgcmV0dXJuIE5VTEw7
+Cj4KClNlZW1zIGxpa2UgZ3cgaXMgbGVha2luZyBpZiByZWdpc3RyYXRpb24gZmFpbHMuIE1vdmUg
+aXQgZG93biBhIGxpdHRsZSwgcGVyaGFwcz8KCj4gLSDCoCDCoCDCoCBkZWJ1ZygiaW4gZ2F0ZXdh
+eV9pbml0LCBkZXYgaXMgJXAiLCBkZXYpOwo+IC0gwqAgwqAgwqAgZ3cgPSBnX25ldzAoc3RydWN0
+IGdhdGV3YXksIDEpOwo+IC0gwqAgwqAgwqAgZ3ctPnN0YXRlID0gR0FURVdBWV9TVEFURV9ESVND
+T05ORUNURUQ7Cj4gwqAgwqAgwqAgwqByZXR1cm4gZ3c7Cj4gLQo+IMKgfQo+CgoKQ2hlZXJzLAot
+LSAKVmluaWNpdXMgR29tZXMKSU5kVCAtIEluc3RpdHV0byBOb2tpYSBkZSBUZWNub2xvZ2lhCg==
