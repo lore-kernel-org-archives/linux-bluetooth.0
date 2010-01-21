@@ -1,66 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4B58C622.2090004@irobot.com>
+Date: Thu, 21 Jan 2010 13:24:50 -0800
+From: Adam Wozniak <awozniak@irobot.com>
 MIME-Version: 1.0
-In-Reply-To: <2a9506371001211320r6dc7958h5b0040cec6f79e4b@mail.gmail.com>
-References: <1264105871-27322-1-git-send-email-padovan@profusion.mobi>
-	 <1264105871-27322-2-git-send-email-padovan@profusion.mobi>
-	 <2a9506371001211320r6dc7958h5b0040cec6f79e4b@mail.gmail.com>
-Date: Thu, 21 Jan 2010 19:25:19 -0200
-Message-ID: <fbf08281001211325g33b2828cve6dcd9201d83f558@mail.gmail.com>
-Subject: Re: [PATCH 2/2] Implement HandsfreeGateway Interface
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Vinicius Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org, ofono@ofono.org
-Content-Type: text/plain; charset=UTF-8
+To: "Luis R. Rodriguez" <mcgrof@gmail.com>
+CC: linux-wireless <linux-wireless@vger.kernel.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: FYI - new compat-wireless based on 2.6.33-rc4
+References: <43e72e891001201213x6a2c203dl7121f2dde6d61fb9@mail.gmail.com> 	<4B5897C8.2080006@irobot.com> <43e72e891001211012y4f4c8721t7eb9e0eea0221820@mail.gmail.com> 	<4B58B432.5050200@irobot.com> <43e72e891001211217t17ffed80i2d5bc6f923b56210@mail.gmail.com>
+In-Reply-To: <43e72e891001211217t17ffed80i2d5bc6f923b56210@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Jan 21, 2010 at 7:20 PM, Vinicius Gomes
-<vinicius.gomes@openbossa.org> wrote:
-> Hi Gustavo,
+Luis R. Rodriguez wrote:
+> BTW Haukes posted a fix for the compile build against ARM. Try that.
+> That patch applies to compat.git but you should be able to mangle it
+> to apply to compat-wireless easily too.
+>   
+That worked, thank you.
+> OK so it failed here, you may want to try to debug udev stuff now
+> then, what distribution do you have? Where are your udev rules put?
+> Where is the original udev rule for firmware for your box?
 >
-> On Thu, Jan 21, 2010 at 5:31 PM, Gustavo F. Padovan
-> <padovan@profusion.mobi> wrote:
->> +       gw->sco = chan;
->> +       g_io_channel_ref(chan);
->> +
->
-> You must have forgotten to change this.
->
->> @@ -307,17 +565,15 @@ struct gateway *gateway_init(struct audio_device *dev)
->>  {
->>        struct gateway *gw;
->>
->> +       gw = g_new0(struct gateway, 1);
->> +
->>        if (!g_dbus_register_interface(dev->conn, dev->path,
->>                                        AUDIO_GATEWAY_INTERFACE,
->>                                        gateway_methods, gateway_signals,
->>                                        NULL, dev, NULL))
->>                return NULL;
->>
->
-> Seems like gw is leaking if registration fails. Move it down a little, perhaps?
+> You can debug udev stuff by using 'udevadm monitor'
+>   
+I'm using openembedded.  Rules are in /etc/udev/rules.d
+It contains a file 50-udev-default.rules with a line:
 
-Sounds good.  Thanks. :)
+SUBSYSTEM=="firmware", ACTION=="add", RUN+="firmware.sh"
 
->
->> -       debug("in gateway_init, dev is %p", dev);
->> -       gw = g_new0(struct gateway, 1);
->> -       gw->state = GATEWAY_STATE_DISCONNECTED;
->>        return gw;
->> -
->>  }
->>
->
->
-> Cheers,
-> --
-> Vinicius Gomes
-> INdT - Instituto Nokia de Tecnologia
->
+If I copy & paste and change the SUBSYSTEM to "compat_firmware" things 
+seem to load ok.
 
+--Adam
 
-
--- 
-Gustavo F. Padovan
-ProFUSION embedded systems - http://profusion.mobi
