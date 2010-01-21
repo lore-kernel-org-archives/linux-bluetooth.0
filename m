@@ -1,29 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
+From: Denis Kenzior <denis.kenzior@intel.com>
+To: Zhao Forrest <forrest.zhao@gmail.com>
+Subject: Re: [RFC] HFP support into oFono and BlueZ
+Date: Wed, 20 Jan 2010 20:56:33 -0600
+Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
+	"linux-bluetooth" <linux-bluetooth@vger.kernel.org>,
+	ofono@ofono.org, zhenhua.zhang@intel.com
+References: <fbf08281001110908s2c3412m456b3aa980b8ca10@mail.gmail.com> <fbf08281001201158q23d13d9bj930a66271c527b43@mail.gmail.com> <ac8af0be1001202354i7f1a98dbw55c56fc65f878358@mail.gmail.com>
+In-Reply-To: <ac8af0be1001202354i7f1a98dbw55c56fc65f878358@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <4B5897C8.2080006@irobot.com>
-References: <43e72e891001201213x6a2c203dl7121f2dde6d61fb9@mail.gmail.com>
-	<4B5897C8.2080006@irobot.com>
-From: "Luis R. Rodriguez" <mcgrof@gmail.com>
-Date: Thu, 21 Jan 2010 10:12:45 -0800
-Message-ID: <43e72e891001211012y4f4c8721t7eb9e0eea0221820@mail.gmail.com>
-Subject: Re: FYI - new compat-wireless based on 2.6.33-rc4
-To: Adam Wozniak <awozniak@irobot.com>
-Cc: linux-wireless <linux-wireless@vger.kernel.org>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Message-Id: <201001202056.33659.denis.kenzior@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Jan 21, 2010 at 10:07 AM, Adam Wozniak <awozniak@irobot.com> wrote:
-> compat-wireless-2010-01-20.tar.bz2 does not compile cleanly on ARM
-> architectures.
-> Commenting out line 9 of compat-2.6.32.h (#include <asm/compat.h>) fixes the
-> issue.
-> There is no arch/arm/include/asm/compat.h
-> I suspect there are several other architectures which have similar issues.
->
+Hi Forrest,
 
-Thanks for the report, the asm/compat.h was needed as otherwise there
-was a compile issue, not sure how to address this, hrm...
+> Your patch removes many DBus APIs provided by audio/gateway.c, which
+> was originally designed to provide a set of DBus functions/signals for
+> ease of application development. In other words, your patch is too
+> oFono-specific, and is not a general support for HFP HF unit role in
+> BlueZ IMO. The DBus interface provided by your patch is not easy to
+> develop the application because the application developer has to parse
+> the AT commands by himself. I know that oFono could parse AT commands.
 
-  Luis
+That is actually the point :)
+
+> But I don't think it a common case for other application developers.
+> Why not extend audio/gateway.c instead of removing its DBus APIs or
+> create a new file to support HFP for oFono in blueZ?
+
+If we were to extend the current BlueZ API we'd be duplicating all of what 
+oFono has already solved (particularly 3-way calls, multiparty and other 
+advanced features) and force the developers to support yet-another DBus API.  
+This makes no sense and oFono already supports the full HFP protocol along 
+with most of the nasty corner cases.  This in fact simplifies things quite a 
+bit...
+
+Regards,
+-Denis
