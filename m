@@ -1,31 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gunn, Brian" <bgunn@solekai.com>
-To: Bastien Nocera <hadess@hadess.net>, Marcel Holtmann <marcel@holtmann.org>
-CC: Dmitry Torokhov <dmitry.torokhov@gmail.com>, linux-input
-	<linux-input@vger.kernel.org>, BlueZ development
-	<linux-bluetooth@vger.kernel.org>, Ping <pinglinux@gmail.com>, Jiri Kosina
-	<jikos@jikos.cz>
-Date: Wed, 20 Jan 2010 17:08:37 -0800
-Subject: RE: [PATCHes] Implement Bluetooth Wacom tablet's mode change in the
- kernel
-Message-ID: <FE57175CCE23E5419899C1B0CFA26FAD101B5E591A@EXMBXSD.dm.solekai.com>
-References: <1263833399.20565.2905.camel@localhost.localdomain>
-	 <1263886149.5591.166.camel@localhost.localdomain>
- <1263897015.20565.3988.camel@localhost.localdomain>
-In-Reply-To: <1263897015.20565.3988.camel@localhost.localdomain>
-Content-Type: text/plain; charset="us-ascii"
+Message-ID: <4B579DF0.5080305@gmail.com>
+Date: Wed, 20 Jan 2010 19:21:04 -0500
+From: Richard Farina <sidhayn@gmail.com>
 MIME-Version: 1.0
+To: "Luis R. Rodriguez" <mcgrof@gmail.com>
+CC: linux-wireless <linux-wireless@vger.kernel.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: FYI - new compat-wireless based on 2.6.33-rc4
+References: <43e72e891001201213x6a2c203dl7121f2dde6d61fb9@mail.gmail.com>
+In-Reply-To: <43e72e891001201213x6a2c203dl7121f2dde6d61fb9@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Bastien Nocera wrote:
-> The patch was written by Jiri and tested by Brian. Not sure what sort of
-> device Brian tested this with...
+Default udev from this package confirmed working on Gentoo.
 
-I just tested this patch with my device and it does work.  I had to slightl=
-y alter the data I send (had to add 0xA2 to the front of it), but then it d=
-oes work.
+Tested-by: Rick Farina
 
-In my initial attempts, it does seem to work a little worse, but that is pr=
-obably because of the device I'm using, which is still under development.
+Thanks,
+Rick Farina
 
-Brian
+Luis R. Rodriguez wrote:
+> The compat_firmware_class was having some issues which should now be
+> hopefully addressed:
+>
+>   * Use a different subsystem name for sysfs registration, now compat_firmware
+>   * The new subsystem name change required a new udev rule to be added
+>
+> The new compat-wireless for 2.6.33-rc4 has been pushed out with the
+> new changes. Unfortunately 2.6.33-rc5 hasn't been pushed out yet so I
+> just overwrote the old rc4 package (next time I'll just add an extra
+> extra version when this happens). The new sha1sum for this release is:
+>
+> c007d7c8649d6149f415ea87dc7a34d4ee808766  compat-wireless-2.6.33-rc4.tar.bz2
+>
+> Just kicked out a bleeding edge release with the same fixes:
+>
+> 65bb3cd6565f1788a2c63bfe8ccfdd8dfc1fb368  compat-wireless-2010-01-20.tar.bz2
+>
+> Please let us know if there are any issues. I should note that the new
+> compat_firmware_class will be used *every time* compat-wireless is
+> used firmware needs to be uploaded, not just for the new
+> request_firmware_nowait().
+>
+>   Luis
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-wireless" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>   
+
