@@ -1,22 +1,22 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4B5A38E7.5010206@irobot.com>
+Date: Fri, 22 Jan 2010 15:46:47 -0800
+From: Adam Wozniak <awozniak@irobot.com>
 MIME-Version: 1.0
-From: "Luis R. Rodriguez" <mcgrof@gmail.com>
-Date: Fri, 22 Jan 2010 16:52:29 -0800
-Message-ID: <43e72e891001221652s1ead6966r808c72d5b4bdf340@mail.gmail.com>
-Subject: ath3k for 2.6.33-rc6
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: "Luis R. Rodriguez" <mcgrof@gmail.com>
+CC: linux-wireless <linux-wireless@vger.kernel.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: FYI - new compat-wireless based on 2.6.33-rc4
+References: <43e72e891001201213x6a2c203dl7121f2dde6d61fb9@mail.gmail.com> 	<4B5897C8.2080006@irobot.com> <43e72e891001211012y4f4c8721t7eb9e0eea0221820@mail.gmail.com> 	<4B58B432.5050200@irobot.com> <43e72e891001211217t17ffed80i2d5bc6f923b56210@mail.gmail.com> 	<4B58C622.2090004@irobot.com> <4B58C997.2060904@irobot.com> <43e72e891001211421l6c861f59mcaad3c5e39950b49@mail.gmail.com>
+In-Reply-To: <43e72e891001211421l6c861f59mcaad3c5e39950b49@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hey Marcel,
+Correct.  In this case, not your fault.  There is no openembedded recipe 
+for compat-wireless, so I had to roll my own, and I flubbed it by 
+leaving out the udev stuff.
 
-sorry about the confusion the other day about overstepping you for a
-push for ath3k into 2.6.33, I'd like to clarify that was not my
-intention, I made the incorrect assumption you received my ping but
-didn't care to push it. I wanted to see what you think its OK to push
-ath3k into the next cycle for the 2.6.33-rc6 release.
+Luis R. Rodriguez wrote:
+> OK so not our fault? You just had to update your install target?
 
-Thanks,
-
-  Luis
