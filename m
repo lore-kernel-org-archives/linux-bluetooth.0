@@ -1,22 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4B5A38E7.5010206@irobot.com>
-Date: Fri, 22 Jan 2010 15:46:47 -0800
-From: Adam Wozniak <awozniak@irobot.com>
 MIME-Version: 1.0
-To: "Luis R. Rodriguez" <mcgrof@gmail.com>
-CC: linux-wireless <linux-wireless@vger.kernel.org>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: FYI - new compat-wireless based on 2.6.33-rc4
-References: <43e72e891001201213x6a2c203dl7121f2dde6d61fb9@mail.gmail.com> 	<4B5897C8.2080006@irobot.com> <43e72e891001211012y4f4c8721t7eb9e0eea0221820@mail.gmail.com> 	<4B58B432.5050200@irobot.com> <43e72e891001211217t17ffed80i2d5bc6f923b56210@mail.gmail.com> 	<4B58C622.2090004@irobot.com> <4B58C997.2060904@irobot.com> <43e72e891001211421l6c861f59mcaad3c5e39950b49@mail.gmail.com>
-In-Reply-To: <43e72e891001211421l6c861f59mcaad3c5e39950b49@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <201001221317.11486.ml@vdm-design.de>
+References: <201001221317.11486.ml@vdm-design.de>
+Date: Fri, 22 Jan 2010 17:39:31 +0200
+Message-ID: <2d5a2c101001220739m135c8eadn891c0ac2183b6433@mail.gmail.com>
+Subject: Re: obexd: Question about PBAP support
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Thomas Zimmermann <ml@vdm-design.de>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Correct.  In this case, not your fault.  There is no openembedded recipe 
-for compat-wireless, so I had to roll my own, and I flubbed it by 
-leaving out the udev stuff.
+Hi Thomas,
 
-Luis R. Rodriguez wrote:
-> OK so not our fault? You just had to update your install target?
+On Fri, Jan 22, 2010 at 2:17 PM, Thomas Zimmermann <ml@vdm-design.de> wrote:
+> Hi,
+> i tried to write a plugin for obexd to support the phonebook of
+> freesmartphone.org.
+>
+> Browsing the device with "sdptool browse" shows Phonebook Access on channel
+> 15, so i thing obexd is running properly. But when connecting a real PBAP
+> device (tried Parrot Minikit and a BMW car system) the methods in my plugin
+> aren't called. (I added some debug output at the beginning of the functions
+> and that's not shown.)
 
+Before running obexd you need to make sure that your driver will be
+linked as phonebook.c, you can select it by doing
+--with-phonebook=<driver name>, this will be expanded to
+phonebook-<driver name>.c where it should be implemented.
+
+> So, did someone tried before to use PBAP with a real device?
+> And how can i help to get this working?
+
+I got it working with obex-client + pbap-client and obexd + ebook
+driver, but pbap code is maybe not mature yet for real devices, the
+driver support was just introduced few months ago and of course
+patches are welcome.
+
+Regards,
+
+
+-- 
+Luiz Augusto von Dentz
+Engenheiro de Computação
