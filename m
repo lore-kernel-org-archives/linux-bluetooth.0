@@ -1,26 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Sun, 24 Jan 2010 17:18:36 +0200
-Message-ID: <549992e51001240718l19528937j7e2cb166a3b2bd2c@mail.gmail.com>
-Subject: bridge: mac addresses question (for bluetooth pan-nap)
-From: Metuki Sabhe <sabhe.metuki@gmail.com>
-To: netdev@vger.kernel.org
-Cc: bridge@lists.linux-foundation.org, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH 1/1] add configurable support for bridge forward delay
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Thomas Egerer <hakke_007@gmx.de>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <4B5C6062.4030705@gmx.de>
+References: <4B5C554D.4030702@gmx.de> <1264343316.11653.0.camel@violet>
+	 <4B5C6062.4030705@gmx.de>
+Content-Type: text/plain; charset="UTF-8"
+Date: Sun, 24 Jan 2010 16:13:40 +0100
+Message-ID: <1264346020.11653.1.camel@violet>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Thomas,
 
-I have a single bridge with up to 7 virtual TAP ports,
-which are being added and removed dynamically.
+> I get your point, but what's your suggestion? The ioctl is marked
+> deprecated, too and the problem of setting the forward delay persists.
+> Would it suffer your needs if I got rid of libsysfs in general and
+> simply use the ioctl or is there a different replacement strategy you
+> prefer?
 
-Can I use the same MAC address for all ports and for the bridge ?
-(I don't use STP as the topology is very very simple).
+if it has an ioctl, then use that one. I really don't understand why
+everybody things ioctl are bad. They work just fine and are often
+simpler to handle than sysfs files.
 
-This is needed to allow macaddress header compression of BNEP...
-(i plan to use the radio BDADDR as the MAC address for all TAP ports
-and for the bridge)
+Regards
 
-thank you,
-sabhe
+Marcel
+
+
