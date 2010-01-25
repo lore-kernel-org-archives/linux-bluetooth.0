@@ -1,39 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Mon, 25 Jan 2010 16:14:58 -0200
-Message-ID: <f9d4bd31001251014w1caaa753v39254c3031f5db0e@mail.gmail.com>
-Subject: bluetoothd bug
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Johan Hedberg <johan.hedberg@nokia.com>, luiz.dentz-von@nokia.com
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: dynamically change the local device name
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Ed Tsang <netdesign_98@yahoo.com>
+Cc: Bluettooth Linux <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <670422.1091.qm@web52607.mail.re2.yahoo.com>
+References: <670422.1091.qm@web52607.mail.re2.yahoo.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Mon, 25 Jan 2010 18:00:30 +0100
+Message-ID: <1264438830.11653.14.camel@violet>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan/Luiz,
+Hi Ed,
 
-I found an error "invalid read". The pastebin log shows a PBAP
-connection in the RFCOMM channel 15. See line 195 of the first log,
-when the connection is refused the "temporary" device is being
-removed, however it seems that the "reverse" SDP query still active.
-PTS is establishing RFCOMM connection before "Encrypt Change" event,
-but this wrong procedure should not "harm" bluetoothd. In some cases I
-noticed segmentation fault, probably due this error.
+> I am looking into if it is possible to change the local device name base on the bluetooth address of the remote device.
+>  i.e. when a remote device request our name, we return a different name base on the the address of the remote device.
+>   There seem to be a hci_write_local_name to store the local name, but I could not find something similar to hci_pin_code_request_reply which seem to allow us to return a different value each time.
+>    Is there any work around??
 
-http://pastebin.com/m308f85ef
-http://pastebin.com/m2d80dd71
+because there is nothing like this. This can not be done.
 
-How to reproduce:
-PTS v 3.3.1.4
-Simple pairing enabled
-Test Case: TC_PSE_SSM_BV_08_I (phonebook)
+Regards
 
-Regards,
-Claudio.
+Marcel
 
--- 
---
-Claudio Takahasi
-Instituto Nokia de Tecnologia
-Recife - Pernambuco - Brasil
-+55 81 30879999
+
