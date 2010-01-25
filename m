@@ -1,46 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20100123191419.GA19717@jh-x301>
-References: <a69c0aba1001230519v3a197d9cq7942599e3a371168@mail.gmail.com>
-	<20100123172550.GA18667@jh-x301> <a69c0aba1001231101i3d093edfh94ebd007e6713692@mail.gmail.com>
-	<20100123191419.GA19717@jh-x301>
-From: papukaija <papukaija@skynet.be>
-Date: Mon, 25 Jan 2010 14:52:47 +0100
-Message-ID: <a69c0aba1001250552t22bcd736q8d7cf9e466e2b994@mail.gmail.com>
-Subject: Re: Feature request: remember bluetooth on/off setting
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: headset target seems to be playing but no sound
+From: "Brian J. Murrell" <brian@interlinx.bc.ca>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <8396c2281001242013y1246bcaaq73ad85ff82f57cab@mail.gmail.com>
+References: <8396c2281001242007n5ae20eccj53d496f1297e5d22@mail.gmail.com>
+	 <8396c2281001242013y1246bcaaq73ad85ff82f57cab@mail.gmail.com>
+Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-mrzzJQQrk1lo8vOo8Xa5"
+Date: Sun, 24 Jan 2010 23:21:56 -0500
+Message-ID: <1264393316.22989.862.camel@pc.interlinx.bc.ca>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> Hi,
->
-> On Sat, Jan 23, 2010, papukaija wrote:
->> > On Sat, Jan 23, 2010, papukaija wrote:
->> >> I rarely use bluetooth devices, so I turn bluetooth off until I need
->> >> it. Every time I start my system (netbook; Samsung nc10) up again and
->> >> log in again, I manually turn bluetooth off again.  I'd like
->> >> bluetoothd to remember whether I last had bluetooth off or on, and use
->> >> that same setting the next time.
->> >
->> > bluetoothd already has this feature. You just need to make sure that
->> > RememberPowered=true in /etc/bluetooth/main.conf
->> >
->> > Johan
->> >
->> >
->>
->> In that case this feature doesn't work. I'm using Ubuntu Netbook Remix
->> v. 9.10 (Karmic) and I have "RememberPowered=true in
->> /etc/bluetooth/main.conf".
->
-> I'm running latest git here and works fine for me. Could it be that you
-> have some other component in your system that's always powering on
-> Bluetooth?
->
-> Johan
->
->
 
-Maybe gnome's bluetooth applet doesn't read this setting or maybe it's
-ignoring the setting completely.
+--=-mrzzJQQrk1lo8vOo8Xa5
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, 2010-01-25 at 12:13 +0800, Chao Deng wrote:=20
+> Hi, Brain,
+>=20
+> I have the same problem like you. Do you find the root cause of it?
+
+Nope, not a clue.  Unfortunately my posting here didn't get any ideas of
+why or what I should do to debug either.  I kinda gave up, yet again, as
+I have done many times in the last 2-3 years of simply trying to get a
+Bluetooth headset working on Linux.  Sadly it always seems like the
+answer is "next [kernel|bluez] release -- it should work great".
+
+> The kernel I used is 2.6.31, and the bluez is 4.51
+
+Seems we are in the same boat.
+
+Sorry I don't have better answers for you.
+
+b.
+
+
+--=-mrzzJQQrk1lo8vOo8Xa5
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEABECAAYFAktdHGEACgkQl3EQlGLyuXBAiwCg6kFmDtEO9yv14h4VIFMuKKPa
++8EAn1RPR4xXOwpaZq9V7oBJdRlNuDqp
+=D9a5
+-----END PGP SIGNATURE-----
+
+--=-mrzzJQQrk1lo8vOo8Xa5--
+
