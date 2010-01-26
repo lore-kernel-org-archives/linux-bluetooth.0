@@ -1,86 +1,143 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 25 Jan 2010 19:23:34 -0600
-From: pigiron@gmx.com
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: headset target seems to be playing but no sound
-Message-ID: <20100125192334.6725779d@atom.pigiron.org>
-In-Reply-To: <1264393316.22989.862.camel@pc.interlinx.bc.ca>
-References: <8396c2281001242007n5ae20eccj53d496f1297e5d22@mail.gmail.com>
-	<8396c2281001242013y1246bcaaq73ad85ff82f57cab@mail.gmail.com>
-	<1264393316.22989.862.camel@pc.interlinx.bc.ca>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 26 Jan 2010 01:47:57 +0100 (CET)
+From: Jiri Kosina <jkosina@suse.cz>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	linux-input <linux-input@vger.kernel.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH 1/2] [hidp] Use the control socket for raw messages
+In-Reply-To: <1263988842.1735.2519.camel@localhost.localdomain>
+Message-ID: <alpine.LNX.2.00.1001260145510.30977@pobox.suse.cz>
+References: <1263988842.1735.2519.camel@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, 24 Jan 2010 23:21:56 -0500 "Brian J. Murrell" <brian@interlinx.bc.ca>
-wrote:
+On Wed, 20 Jan 2010, Bastien Nocera wrote:
 
-> On Mon, 2010-01-25 at 12:13 +0800, Chao Deng wrote: 
-> > Hi, Brain,
-> > 
-> > I have the same problem like you. Do you find the root cause of it?
+> In commit 2da31939a42f7a676a0bc5155d6a0a39ed8451f2, support
+> for Bluetooth hid_output_raw_report was added, but it pushes
+> the data to the intr socket instead of the ctrl one.
 > 
-> Nope, not a clue.  Unfortunately my posting here didn't get any ideas of
-> why or what I should do to debug either.  I kinda gave up, yet again, as
-> I have done many times in the last 2-3 years of simply trying to get a
-> Bluetooth headset working on Linux.  Sadly it always seems like the
-> answer is "next [kernel|bluez] release -- it should work great".
+> This patch makes hid_output_raw_report use the control socket
+> instead.
 > 
-> > The kernel I used is 2.6.31, and the bluez is 4.51
+> Signed-off-by: Bastien Nocera <hadess@hadess.net>
+> ---
+>  net/bluetooth/hidp/core.c |   70 +++++++++++++++++++++++----------------------
+>  1 files changed, 36 insertions(+), 34 deletions(-)
+
+Marcel, what is your take on this one please?
+
+I'd like to merge the fixes to Sony and Wacom drivers that depend on this 
+patch into my tree, so it would be nice if you could either Ack/Sign-off 
+on it so that I could merge it through my tree, or take it for .34 through 
+your tree.
+
+Thanks!
+
 > 
-> Seems we are in the same boat.
+> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+> index 5697500..40879ed 100644
+> --- a/net/bluetooth/hidp/core.c
+> +++ b/net/bluetooth/hidp/core.c
+> @@ -243,6 +243,39 @@ static void hidp_input_report(struct hidp_session *session, struct sk_buff *skb)
+>  	input_sync(dev);
+>  }
+>  
+> +static int __hidp_send_ctrl_message(struct hidp_session *session,
+> +			unsigned char hdr, unsigned char *data, int size)
+> +{
+> +	struct sk_buff *skb;
+> +
+> +	BT_DBG("session %p data %p size %d", session, data, size);
+> +
+> +	if (!(skb = alloc_skb(size + 1, GFP_ATOMIC))) {
+> +		BT_ERR("Can't allocate memory for new frame");
+> +		return -ENOMEM;
+> +	}
+> +
+> +	*skb_put(skb, 1) = hdr;
+> +	if (data && size > 0)
+> +		memcpy(skb_put(skb, size), data, size);
+> +
+> +	skb_queue_tail(&session->ctrl_transmit, skb);
+> +
+> +	return 0;
+> +}
+> +
+> +static inline int hidp_send_ctrl_message(struct hidp_session *session,
+> +			unsigned char hdr, unsigned char *data, int size)
+> +{
+> +	int err;
+> +
+> +	err = __hidp_send_ctrl_message(session, hdr, data, size);
+> +
+> +	hidp_schedule(session);
+> +
+> +	return err;
+> +}
+> +
+>  static int hidp_queue_report(struct hidp_session *session,
+>  				unsigned char *data, int size)
+>  {
+> @@ -282,7 +315,9 @@ static int hidp_send_report(struct hidp_session *session, struct hid_report *rep
+>  
+>  static int hidp_output_raw_report(struct hid_device *hid, unsigned char *data, size_t count)
+>  {
+> -	if (hidp_queue_report(hid->driver_data, data, count))
+> +	if (hidp_send_ctrl_message(hid->driver_data,
+> +			HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_FEATURE,
+> +			data, count))
+>  		return -ENOMEM;
+>  	return count;
+>  }
+> @@ -307,39 +342,6 @@ static inline void hidp_del_timer(struct hidp_session *session)
+>  		del_timer(&session->timer);
+>  }
+>  
+> -static int __hidp_send_ctrl_message(struct hidp_session *session,
+> -			unsigned char hdr, unsigned char *data, int size)
+> -{
+> -	struct sk_buff *skb;
+> -
+> -	BT_DBG("session %p data %p size %d", session, data, size);
+> -
+> -	if (!(skb = alloc_skb(size + 1, GFP_ATOMIC))) {
+> -		BT_ERR("Can't allocate memory for new frame");
+> -		return -ENOMEM;
+> -	}
+> -
+> -	*skb_put(skb, 1) = hdr;
+> -	if (data && size > 0)
+> -		memcpy(skb_put(skb, size), data, size);
+> -
+> -	skb_queue_tail(&session->ctrl_transmit, skb);
+> -
+> -	return 0;
+> -}
+> -
+> -static inline int hidp_send_ctrl_message(struct hidp_session *session,
+> -			unsigned char hdr, unsigned char *data, int size)
+> -{
+> -	int err;
+> -
+> -	err = __hidp_send_ctrl_message(session, hdr, data, size);
+> -
+> -	hidp_schedule(session);
+> -
+> -	return err;
+> -}
+> -
+>  static void hidp_process_handshake(struct hidp_session *session,
+>  					unsigned char param)
+>  {
+> -- 
+> 1.6.5.2
 > 
-> Sorry I don't have better answers for you.
-> 
-> b.
 > 
 
-Yep. It's unfortunate that no one responded. I've spent many hours digging into
-this bug, and was hoping that others my have some valid pointers/directions.
-
-Anyway, I'm not a Bluez developer, nor do I speak fluent "Bluetooth", but
-here's what I've found so far...
-
-This is not a new bug. Galaha Shine found the crux of the problem back in 2008:
-
-http://mailman.alsa-project.org/pipermail/alsa-devel/2008-September/010721.html
-
-and after firing up my debugger, this still seems to be the same issue today
-(at least when I looked at the previous releases).
-
-As you may know, headsets can have different bluetooth capabilities described
-in their profiles. There's the HSP/HFP profiles for doing things like talking on
-the phone, and then there's the A2DP profile for listening in stereo. And there
-are others.
-
-Brian, you don't state which profile you're using when it fails, but from
-looking at your hcidump info, it appears like it's HSP or HFP because your data
-packets are 48 bytes long... which is the MTU size in Bluez for HSP/HFP. When
-using the A2DP profile (if supported by your headset), the data packets are
-much larger.
-
-Chao, I have 2 sets of Motorola S805's also, and it can do both of those
-"types" of profiles. If the headset is put into HFP mode, then you experience
-the joy of this problem. In A2DP mode, it (mostly) works if you only want to
-listen in stereo.
-
-The root cause of the problem (at least from my debugging experience) is that if
-you are using HSP or HFP mode... and your application is talking directly to
-ALSA (like "aplay" does)... then your audio data eventually makes it's way to
-the snd_pcm_rate_commit_area() function in ALSA in 48 byte (MTU sized) "chunks".
-But, if this function receives less than a "slave_size" amount of data, it
-simply drops it by calling the snd_pcm_rewind() function.
-
-To super simplify the problem description, Bluez keeps sending 48 byte "chunks"
-of audio data, that ALSA happily ignores... nice.
-
-Just like Galaha, I'm stuck trying finding a solution. I tried his Bluez patch,
-but it doesn't work. And so far, I've not been able to get my head wrapped
-around even a "big picture" of the Bluez SCO data path to find an acceptable
-alternative. With the goal being to create a (hopefully suitable) patch to some
-component, somewhere... anywhere. Or possibly there's another solution??? Any
-help would be appreciated. 
-
-It *appears* that others *may* be having some success using PulseAudio for
-this, but I prefer not to go there... just call me stubborn.
+-- 
+Jiri Kosina
+SUSE Labs, Novell Inc.
