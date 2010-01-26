@@ -1,67 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4B5EA94B.1000204@gmx.de>
-Date: Tue, 26 Jan 2010 09:35:23 +0100
-From: Thomas Egerer <hakke_007@gmx.de>
-MIME-Version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: Marcel Holtmann <marcel@holtmann.org>,
- linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/1] add configurable support for bridge forward delay
-References: <4B5C554D.4030702@gmx.de> <1264343316.11653.0.camel@violet>	 <4B5C6062.4030705@gmx.de> <1264346020.11653.1.camel@violet> <2d5a2c101001241309u6e292a12hfc5c67011d6b77ba@mail.gmail.com>
-In-Reply-To: <2d5a2c101001241309u6e292a12hfc5c67011d6b77ba@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Date: Mon, 25 Jan 2010 19:23:34 -0600
+From: pigiron@gmx.com
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: headset target seems to be playing but no sound
+Message-ID: <20100125192334.6725779d@atom.pigiron.org>
+In-Reply-To: <1264393316.22989.862.camel@pc.interlinx.bc.ca>
+References: <8396c2281001242007n5ae20eccj53d496f1297e5d22@mail.gmail.com>
+	<8396c2281001242013y1246bcaaq73ad85ff82f57cab@mail.gmail.com>
+	<1264393316.22989.862.camel@pc.interlinx.bc.ca>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA512
+On Sun, 24 Jan 2010 23:21:56 -0500 "Brian J. Murrell" <brian@interlinx.bc.ca>
+wrote:
 
-Luiz Augusto von Dentz wrote:
-> Hi,
+> On Mon, 2010-01-25 at 12:13 +0800, Chao Deng wrote: 
+> > Hi, Brain,
+> > 
+> > I have the same problem like you. Do you find the root cause of it?
 > 
-> On Sun, Jan 24, 2010 at 5:13 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
->> Hi Thomas,
->>
->>> I get your point, but what's your suggestion? The ioctl is marked
->>> deprecated, too and the problem of setting the forward delay persists.
->>> Would it suffer your needs if I got rid of libsysfs in general and
->>> simply use the ioctl or is there a different replacement strategy you
->>> prefer?
->> if it has an ioctl, then use that one. I really don't understand why
->> everybody things ioctl are bad. They work just fine and are often
->> simpler to handle than sysfs files.
+> Nope, not a clue.  Unfortunately my posting here didn't get any ideas of
+> why or what I should do to debug either.  I kinda gave up, yet again, as
+> I have done many times in the last 2-3 years of simply trying to get a
+> Bluetooth headset working on Linux.  Sadly it always seems like the
+> answer is "next [kernel|bluez] release -- it should work great".
 > 
-> The documentation on
-> http://www.linuxfoundation.org/collaborate/workgroups/networking/bridge
-> state:
+> > The kernel I used is 2.6.31, and the bluez is 4.51
 > 
-> "If the bridge is being used standalone (no other bridges near by).
-> Then it is safe to turn the forwarding delay off (set it to zero),
-> before adding interface to a bridge. Then you can run DHCP client
-> right away." Which I guess is what the PAN spec expects for a NAP
-> server, so perhaps having another entry in network.conf is not really
-> needed or only really useful for a GN server if someone is messing
-> with it e.g. mesh network, but even for that purpose it just seems
-> wrong to expect that in a fixed amount of time it will be able to
-> resolve the topology, so why bother?
-Luiz,
-let me tell you why I'd like to have an extra config variable. Let's
-imagine an admin who want to add the upcoming bnep interfaces to an
-_already_ existing bridge (for that matter a test whether the given
-interface name already exists would be nice, too) plus he knows about
-the infrastructure behind the bridge and decides to set a different
-forward delay. He could, of course reset the delay, once the bridge is
-up. But ideally he would specify the setting in the network.conf. Hence
-the extra config variable (which btw. were actually two variables by the
-time I started writing the patch).
+> Seems we are in the same boat.
+> 
+> Sorry I don't have better answers for you.
+> 
+> b.
+> 
 
-Cheers,
+Yep. It's unfortunate that no one responded. I've spent many hours digging into
+this bug, and was hoping that others my have some valid pointers/directions.
 
-Thomas
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
+Anyway, I'm not a Bluez developer, nor do I speak fluent "Bluetooth", but
+here's what I've found so far...
 
-iEYEAREKAAYFAkteqUoACgkQ2/ggQBUI/sm6FQCcD8btgzXLig9UD59AE8u753bP
-iFAAn1+ZiWlJ1ysVLgIq7jvpxL8u0dPm
-=AtT9
------END PGP SIGNATURE-----
+This is not a new bug. Galaha Shine found the crux of the problem back in 2008:
+
+http://mailman.alsa-project.org/pipermail/alsa-devel/2008-September/010721.html
+
+and after firing up my debugger, this still seems to be the same issue today
+(at least when I looked at the previous releases).
+
+As you may know, headsets can have different bluetooth capabilities described
+in their profiles. There's the HSP/HFP profiles for doing things like talking on
+the phone, and then there's the A2DP profile for listening in stereo. And there
+are others.
+
+Brian, you don't state which profile you're using when it fails, but from
+looking at your hcidump info, it appears like it's HSP or HFP because your data
+packets are 48 bytes long... which is the MTU size in Bluez for HSP/HFP. When
+using the A2DP profile (if supported by your headset), the data packets are
+much larger.
+
+Chao, I have 2 sets of Motorola S805's also, and it can do both of those
+"types" of profiles. If the headset is put into HFP mode, then you experience
+the joy of this problem. In A2DP mode, it (mostly) works if you only want to
+listen in stereo.
+
+The root cause of the problem (at least from my debugging experience) is that if
+you are using HSP or HFP mode... and your application is talking directly to
+ALSA (like "aplay" does)... then your audio data eventually makes it's way to
+the snd_pcm_rate_commit_area() function in ALSA in 48 byte (MTU sized) "chunks".
+But, if this function receives less than a "slave_size" amount of data, it
+simply drops it by calling the snd_pcm_rewind() function.
+
+To super simplify the problem description, Bluez keeps sending 48 byte "chunks"
+of audio data, that ALSA happily ignores... nice.
+
+Just like Galaha, I'm stuck trying finding a solution. I tried his Bluez patch,
+but it doesn't work. And so far, I've not been able to get my head wrapped
+around even a "big picture" of the Bluez SCO data path to find an acceptable
+alternative. With the goal being to create a (hopefully suitable) patch to some
+component, somewhere... anywhere. Or possibly there's another solution??? Any
+help would be appreciated. 
+
+It *appears* that others *may* be having some success using PulseAudio for
+this, but I prefer not to go there... just call me stubborn.
