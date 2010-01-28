@@ -1,31 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 28 Jan 2010 17:32:47 +0000 (GMT)
-To: Ed Tsang <netdesign_98@yahoo.com>
-Cc: Bluettooth Linux <linux-bluetooth@vger.kernel.org>
-Subject: Re: hcitool cc ....    connected and drop
-In-Reply-To: <91686.99772.qm@web52606.mail.re2.yahoo.com>
-References: <615585.7801.qm@web52606.mail.re2.yahoo.com> <1264624890.117914.1293.nullmailer@galant.ukfsn.org> <91686.99772.qm@web52606.mail.re2.yahoo.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Message-Id: <1264699968.366595.545.nullmailer@galant.ukfsn.org>
-From: Iain Hibbert <plunky@rya-online.net>
+Date: Thu, 28 Jan 2010 17:19:36 +0200
+Message-ID: <eb7933e21001280719w32d2adfco89ce9b99940c968b@mail.gmail.com>
+Subject: [PATCH] Release conference call in telephony-maemo
+From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=001636c5b63e4fa08c047e3b0c0e
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 28 Jan 2010, Ed Tsang wrote:
+--001636c5b63e4fa08c047e3b0c0e
+Content-Type: text/plain; charset=ISO-8859-1
 
-> >the Linux kernel does that for all completed connections
->
-> I am still very "green" to bluez and linux. Is there a place where I can
-> look into the bluetooth related kernel codes?
+Currently telephony-maemo only ends the first call found on
+receiving AT+CHUP (hang up) from the headset. This patch checks
+if the call is part of a conference call and in that case releases
+the whole conference.
 
-I don't think there is any API documentation, but the kernel sources can
-be seen at many places on the internet, such as
+--001636c5b63e4fa08c047e3b0c0e
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-Release-conference-call-in-telephony-maemo.patch"
+Content-Disposition: attachment;
+	filename="0001-Release-conference-call-in-telephony-maemo.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_g4zov8wt0
 
-  http://lxr.linux.no/#linux+v2.6.32/net/bluetooth/
-
-> Is the disconnect command came from the kernel code too?
-
-most likely
-
-iain
+RnJvbSA4M2M3MWYxNmUyMzUyOTAxNDZhZDc3ZWJiZDRlODE4ZDBiNTIwNTQwIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQGdt
+YWlsLmNvbT4KRGF0ZTogVGh1LCAyOCBKYW4gMjAxMCAxNzoxNDo0MCArMDIwMApTdWJqZWN0OiBb
+UEFUQ0hdIFJlbGVhc2UgY29uZmVyZW5jZSBjYWxsIGluIHRlbGVwaG9ueS1tYWVtbwoKQ3VycmVu
+dGx5IHRlbGVwaG9ueS1tYWVtbyBvbmx5IGVuZHMgdGhlIGZpcnN0IGNhbGwgZm91bmQgb24KcmVj
+ZWl2aW5nIEFUK0NIVVAgKGhhbmcgdXApIGZyb20gdGhlIGhlYWRzZXQuIFRoaXMgcGF0Y2ggY2hl
+Y2tzCmlmIHRoZSBjYWxsIGlzIHBhcnQgb2YgYSBjb25mZXJlbmNlIGNhbGwgYW5kIGluIHRoYXQg
+Y2FzZSByZWxlYXNlcwp0aGUgd2hvbGUgY29uZmVyZW5jZS4KLS0tCiBhdWRpby90ZWxlcGhvbnkt
+bWFlbW8uYyB8ICAgMjggKysrKysrKysrKysrKysrKysrKysrKysrKysrLQogMSBmaWxlcyBjaGFu
+Z2VkLCAyNyBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2F1ZGlv
+L3RlbGVwaG9ueS1tYWVtby5jIGIvYXVkaW8vdGVsZXBob255LW1hZW1vLmMKaW5kZXggOThmNDQw
+OS4uODFiZGZlZSAxMDA2NDQKLS0tIGEvYXVkaW8vdGVsZXBob255LW1hZW1vLmMKKysrIGIvYXVk
+aW8vdGVsZXBob255LW1hZW1vLmMKQEAgLTEwNiw2ICsxMDYsNyBAQCBzdGF0aWMgdWludDMyX3Qg
+Y2FsbGVyaWQgPSAwOwogI2RlZmluZSBDU0RfQ0FMTF9JTlNUQU5DRQkiY29tLm5va2lhLmNzZC5D
+YWxsLkluc3RhbmNlIgogI2RlZmluZSBDU0RfQ0FMTF9DT05GRVJFTkNFCSJjb20ubm9raWEuY3Nk
+LkNhbGwuQ29uZmVyZW5jZSIKICNkZWZpbmUgQ1NEX0NBTExfUEFUSAkJIi9jb20vbm9raWEvY3Nk
+L2NhbGwiCisjZGVmaW5lIENTRF9DQUxMX0NPTkZFUkVOQ0VfUEFUSCAiL2NvbS9ub2tpYS9jc2Qv
+Y2FsbC9jb25mZXJlbmNlIgogCiAvKiBDYWxsIHN0YXR1cyB2YWx1ZXMgYXMgZXhwb3J0ZWQgYnkg
+dGhlIENTRCBDQUxMIHBsdWdpbiAqLwogI2RlZmluZSBDU0RfQ0FMTF9TVEFUVVNfSURMRQkJCTAK
+QEAgLTMxMyw2ICszMTQsMjUgQEAgc3RhdGljIHN0cnVjdCBjc2RfY2FsbCAqZmluZF9jYWxsX3dp
+dGhfc3RhdHVzKGludCBzdGF0dXMpCiAJcmV0dXJuIE5VTEw7CiB9CiAKK3N0YXRpYyBpbnQgcmVs
+ZWFzZV9jb25mZXJlbmNlKHZvaWQpCit7CisJREJ1c01lc3NhZ2UgKm1zZzsKKworCWRlYnVnKCJy
+ZWxlYXNpbmcgY29uZmVyZW5jZSBjYWxsIik7CisJbXNnID0gZGJ1c19tZXNzYWdlX25ld19tZXRo
+b2RfY2FsbChDU0RfQ0FMTF9CVVNfTkFNRSwKKwkJCQkJCUNTRF9DQUxMX0NPTkZFUkVOQ0VfUEFU
+SCwKKwkJCQkJCUNTRF9DQUxMX0lOU1RBTkNFLAorCQkJCQkJIlJlbGVhc2UiKTsKKwlpZiAoIW1z
+ZykgeworCQllcnJvcigiVW5hYmxlIHRvIGFsbG9jYXRlIG5ldyBELUJ1cyBtZXNzYWdlIik7CisJ
+CXJldHVybiAtRU5PTUVNOworCX0KKworCWdfZGJ1c19zZW5kX21lc3NhZ2UoY29ubmVjdGlvbiwg
+bXNnKTsKKworCXJldHVybiAwOworfQorCiBzdGF0aWMgaW50IHJlbGVhc2VfY2FsbChzdHJ1Y3Qg
+Y3NkX2NhbGwgKmNhbGwpCiB7CiAJREJ1c01lc3NhZ2UgKm1zZzsKQEAgLTUxNyw2ICs1MzcsNyBA
+QCB2b2lkIHRlbGVwaG9ueV9sYXN0X2RpYWxlZF9udW1iZXJfcmVxKHZvaWQgKnRlbGVwaG9ueV9k
+ZXZpY2UpCiB2b2lkIHRlbGVwaG9ueV90ZXJtaW5hdGVfY2FsbF9yZXEodm9pZCAqdGVsZXBob255
+X2RldmljZSkKIHsKIAlzdHJ1Y3QgY3NkX2NhbGwgKmNhbGw7CisJaW50IGVycjsKIAogCWNhbGwg
+PSBmaW5kX2NhbGxfd2l0aF9zdGF0dXMoQ1NEX0NBTExfU1RBVFVTX0FDVElWRSk7CiAJaWYgKCFj
+YWxsKQpAQCAtNTI5LDcgKzU1MCwxMiBAQCB2b2lkIHRlbGVwaG9ueV90ZXJtaW5hdGVfY2FsbF9y
+ZXEodm9pZCAqdGVsZXBob255X2RldmljZSkKIAkJcmV0dXJuOwogCX0KIAotCWlmIChyZWxlYXNl
+X2NhbGwoY2FsbCkgPCAwKQorCWlmIChjYWxsLT5jb25mZXJlbmNlKQorCQllcnIgPSByZWxlYXNl
+X2NvbmZlcmVuY2UoKTsKKwllbHNlCisJCWVyciA9IHJlbGVhc2VfY2FsbChjYWxsKTsKKworCWlm
+IChlcnIgPCAwKQogCQl0ZWxlcGhvbnlfdGVybWluYXRlX2NhbGxfcnNwKHRlbGVwaG9ueV9kZXZp
+Y2UsCiAJCQkJCQlDTUVfRVJST1JfQUdfRkFJTFVSRSk7CiAJZWxzZQotLSAKMS42LjAuNAoK
+--001636c5b63e4fa08c047e3b0c0e--
