@@ -1,53 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Michael Poole <mdpoole@troilus.org>
-To: Bastien Nocera <hadess@hadess.net>,  Marcel Holtmann <marcel@holtmann.org>
-Cc: Jiri Kosina <jkosina@suse.cz>,  "Gunn\, Brian" <bgunn@solekai.com>,  Ping <pinglinux@gmail.com>,  linux-kernel@vger.kernel.org,  BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 0/3] HID: make raw output callback more flexible
-References: <alpine.LNX.2.00.1001291515560.356@pobox.suse.cz>
-	<1264783166.29532.5302.camel@localhost.localdomain>
-Date: Fri, 29 Jan 2010 19:46:39 -0500
-In-Reply-To: <1264783166.29532.5302.camel@localhost.localdomain> (Bastien
-	Nocera's message of "Fri, 29 Jan 2010 16:39:26 +0000")
-Message-ID: <87iqakifm8.fsf@troilus.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: RE: headset target seems to be playing but no sound
+From: "Brian J. Murrell" <brian@interlinx.bc.ca>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <FE57175CCE23E5419899C1B0CFA26FAD12CDF72D40@EXMBXSD.dm.solekai.com>
+References: <8396c2281001242007n5ae20eccj53d496f1297e5d22@mail.gmail.com>
+	 <8396c2281001242013y1246bcaaq73ad85ff82f57cab@mail.gmail.com>
+	 <1264393316.22989.862.camel@pc.interlinx.bc.ca>
+	 <20100125192334.6725779d@atom.pigiron.org>
+	 <8396c2281001261928r31d2a5a9w6e4a2a3b5b96221e@mail.gmail.com>
+	 <20100128215042.4cfc0eb1@atom.pigiron.org>
+	 <1264796636.26570.612.camel@pc.interlinx.bc.ca>
+	 <FE57175CCE23E5419899C1B0CFA26FAD12CDF72D40@EXMBXSD.dm.solekai.com>
+Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-v23miXUhis86NqSeLGC9"
+Date: Fri, 29 Jan 2010 17:03:20 -0500
+Message-ID: <1264802600.26570.717.camel@pc.interlinx.bc.ca>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Bastien Nocera writes:
 
-> On Fri, 2010-01-29 at 15:20 +0100, Jiri Kosina wrote:
->> Hi,
->> 
->> this is a followup to the thread
->> 
->> 	"Implement Bluetooth Wacom tablet's mode change in the kernel"
->> 
->> First patch alters the raw output API so that it is able to actually 
->> distinguish between feature and output reports (and modifies low-level 
->> drivers accordingly), and the two followup patches make use of this for 
->> in-kernel mode setting of Sony and Wacom bluetooth devices.
->> 
->> Marcel, could you please review the Bluetooth part?
+--=-v23miXUhis86NqSeLGC9
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Count this as another vote for review, please -- I have a similar
-patch[1] that I would prefer to drop.
+On Fri, 2010-01-29 at 13:42 -0800, Gunn, Brian wrote:=20
+>=20
+> Don't know if this will help you guys or not, but I get garbled audio unl=
+ess I specify a 48 byte buffer.
 
-[1]- http://www.spinics.net/lists/linux-input/msg06768.html
+Sadly, no, this does not help.  :-(
 
-> Patches 1 and 2 work as expected (minus the hidp parsing issue[1]).
-> Couldn't test patch 3 for the Sony Sixaxis right now.
->
-> Cheers
->
-> [1]: Comments on the patch at
-> http://thread.gmane.org/gmane.linux.bluez.kernel/4279 would be
-> appreciated
+> Here's the command I use to send audio to headsets:
+>=20
+> aplay -D bluetooth -f S16_LE --buffer-size=3D48 test.wav
+>=20
+> For me though, without the "--buffer-size=3D48", I get audio; it's just r=
+eally garbled.
 
-This patch does not work for me.  Before, the first time after each boot
-that I tried to connect to an Apple Magic Mouse, it failed with -14
-(EFAULT).  With this patch, it fails with -22 (EINVAL) instead.  The
--EFAULT *was* due to hidp_parse()'s copy_from_user().  I have not looked
-yet to see where the -EINVAL is coming from -- would that help?  (Both
-with and without your patch, the second attempt to connect works.)
+I've never got garbled.  Just always get the beep before and after the
+audio is supposed to be playing.
 
-Michael Poole
+b.
+
+
+--=-v23miXUhis86NqSeLGC9
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEABECAAYFAktjWyQACgkQl3EQlGLyuXCBHACfW/bBpu7IBMtXDiCAoiA8ntuS
+KNMAoOGxm2hVZykaw2V+XRlWfaRycYuv
+=qvUR
+-----END PGP SIGNATURE-----
+
+--=-v23miXUhis86NqSeLGC9--
+
