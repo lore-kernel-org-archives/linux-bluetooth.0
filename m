@@ -1,35 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 29 Jan 2010 14:53:02 +0100 (CET)
+From: Jiri Kosina <jkosina@suse.cz>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: "Gunn, Brian" <bgunn@solekai.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	linux-input <linux-input@vger.kernel.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Ping <pinglinux@gmail.com>
+Subject: RE: [PATCHes] Implement Bluetooth Wacom tablet's mode change in the
+ kernel
+In-Reply-To: <1264772713.29532.4943.camel@localhost.localdomain>
+Message-ID: <alpine.LNX.2.00.1001291448510.356@pobox.suse.cz>
+References: <1263833399.20565.2905.camel@localhost.localdomain>  <1263886149.5591.166.camel@localhost.localdomain>  <1263897015.20565.3988.camel@localhost.localdomain>  <FE57175CCE23E5419899C1B0CFA26FAD101B5E591A@EXMBXSD.dm.solekai.com>
+ <1264037759.1735.5008.camel@localhost.localdomain>  <FE57175CCE23E5419899C1B0CFA26FAD12CDF72C0F@EXMBXSD.dm.solekai.com>  <1264719198.29532.3149.camel@localhost.localdomain>  <FE57175CCE23E5419899C1B0CFA26FAD12CDF72C1E@EXMBXSD.dm.solekai.com>
+ <alpine.LRH.2.00.1001291039350.15694@twin.jikos.cz> <1264772713.29532.4943.camel@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20100125140609.GA6616@jh-x301>
-References: <a69c0aba1001230519v3a197d9cq7942599e3a371168@mail.gmail.com>
-	<20100123172550.GA18667@jh-x301> <a69c0aba1001231101i3d093edfh94ebd007e6713692@mail.gmail.com>
-	<20100123191419.GA19717@jh-x301> <a69c0aba1001250552t22bcd736q8d7cf9e466e2b994@mail.gmail.com>
-	<20100125140609.GA6616@jh-x301>
-From: papukaija <papukaija@skynet.be>
-Date: Fri, 29 Jan 2010 15:07:27 +0100
-Message-ID: <a69c0aba1001290607j6035621fy5a473022579ae1ee@mail.gmail.com>
-Subject: Re: Feature request: remember bluetooth on/off setting
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> Hi,
->
-> On Mon, Jan 25, 2010, papukaija wrote:
->> > I'm running latest git here and works fine for me. Could it be that you
->> > have some other component in your system that's always powering on
->> > Bluetooth?
->>
->> Maybe gnome's bluetooth applet doesn't read this setting or maybe it's
->> ignoring the setting completely.
->
-> The applet is not supposed to know about the setting. It's just supposed
-> to toggle the Powered property for an adapter through the SetProperty
-> D-Bus method that bluetoothd exports.
->
-> Johan
->
->
+On Fri, 29 Jan 2010, Bastien Nocera wrote:
 
-Is there a way to debug this bug?
+> > Having separate methods for feature and output reports should be 
+> > sufficient and general enough, right?
+> 
+> Most likely, yes. Feature is enough for the 2 devices I provided patches
+> for. Could you please comment on what you'd like the implementation of
+> this to look like? 
+
+I think that we should probably introduce flag parameter into 
+hid_output_raw_report(), which would indicate whether OUTPUT or FEATURE 
+report should be sent.
+
+This makes sense both for Bluetooth and HID.
+
+I will send out patches later today for you guys to test (and for Marcel 
+to Ack the Bluetooth part).
+
+> This simple bug fix is turning into a lot more to-and-fro than I would 
+> have anticipated.
+
+It's nice example of evolution, isn't it? :)
+
+Thanks,
+
+-- 
+Jiri Kosina
+SUSE Labs, Novell Inc.
