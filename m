@@ -1,161 +1,182 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: headset target seems to be playing but no sound
-From: "Brian J. Murrell" <brian@interlinx.bc.ca>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <20100128215042.4cfc0eb1@atom.pigiron.org>
-References: <8396c2281001242007n5ae20eccj53d496f1297e5d22@mail.gmail.com>
-	 <8396c2281001242013y1246bcaaq73ad85ff82f57cab@mail.gmail.com>
-	 <1264393316.22989.862.camel@pc.interlinx.bc.ca>
-	 <20100125192334.6725779d@atom.pigiron.org>
-	 <8396c2281001261928r31d2a5a9w6e4a2a3b5b96221e@mail.gmail.com>
-	 <20100128215042.4cfc0eb1@atom.pigiron.org>
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-h/T8G3A7pEVmcc6z4Iwk"
-Date: Fri, 29 Jan 2010 15:23:56 -0500
-Message-ID: <1264796636.26570.612.camel@pc.interlinx.bc.ca>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <alpine.LNX.2.00.1001291519250.356@pobox.suse.cz>
+References: <alpine.LNX.2.00.1001291515560.356@pobox.suse.cz>
+	 <alpine.LNX.2.00.1001291519250.356@pobox.suse.cz>
+Date: Fri, 29 Jan 2010 09:14:59 -0800
+Message-ID: <167e8a331001290914t578ffef7y16d52e40c8c54079@mail.gmail.com>
+Subject: Re: [PATCH 2/3] HID: Implement Wacom quirk in the kernel
+From: Ping Cheng <pinglinux@gmail.com>
+To: Jiri Kosina <jkosina@suse.cz>
+Cc: "Gunn, Brian" <bgunn@solekai.com>, Marcel Holtmann <marcel@holtmann.org>, linux-kernel@vger.kernel.org,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: multipart/alternative; boundary=001636ed67247e9948047e50c6cb
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+--001636ed67247e9948047e50c6cb
+Content-Type: text/plain; charset=ISO-8859-1
 
---=-h/T8G3A7pEVmcc6z4Iwk
-Content-Type: text/plain; charset="UTF-8"
+On Fri, Jan 29, 2010 at 6:20 AM, Jiri Kosina <jkosina@suse.cz> wrote:
+
+> From: Bastien Nocera <hadess@hadess.net>
+>
+> The hid-wacom driver required user-space to poke at the tablet
+> to make it send data about the cursor location.
+>
+> This patch makes it do the same thing but in the kernel.
+>
+> Signed-off-by: Bastien Nocera <hadess@hadess.net>
+> Signed-off-by: Jiri Kosina <jkosina@suse.cz>
+> ---
+>  drivers/hid/hid-wacom.c |   27 +++++++++++++++++++++++++++
+>  1 files changed, 27 insertions(+), 0 deletions(-)
+>
+> diff --git a/drivers/hid/hid-wacom.c b/drivers/hid/hid-wacom.c
+> index 12dcda5..d7897b5 100644
+> --- a/drivers/hid/hid-wacom.c
+> +++ b/drivers/hid/hid-wacom.c
+> @@ -156,7 +156,9 @@ static int wacom_probe(struct hid_device *hdev,
+>        struct hid_input *hidinput;
+>        struct input_dev *input;
+>        struct wacom_data *wdata;
+> +       char rep_data[2];
+>        int ret;
+> +       int limit;
+>
+>        wdata = kzalloc(sizeof(*wdata), GFP_KERNEL);
+>        if (wdata == NULL) {
+> @@ -166,6 +168,7 @@ static int wacom_probe(struct hid_device *hdev,
+>
+>        hid_set_drvdata(hdev, wdata);
+>
+> +       /* Parse the HID report now */
+>        ret = hid_parse(hdev);
+>        if (ret) {
+>                dev_err(&hdev->dev, "parse failed\n");
+> @@ -178,6 +181,30 @@ static int wacom_probe(struct hid_device *hdev,
+>                goto err_free;
+>        }
+>
+> +       /* Set Wacom mode2 */
+> +       rep_data[0] = 0x03; rep_data[1] = 0x00;
+> +       limit =3;
+> +       do {
+> +               ret = hdev->hid_output_raw_report(hdev, rep_data, 2,
+> +                               HID_FEATURE_REPORT);
+> +       } while (ret < 0 && limit-- > 0);
+>
+
+hdev->hid_output_raw_report error is not a hard failure, i.e., the following
+four lines are unnecessay. We can continue with the rest of the code.
+
+
+> +       if (ret < 0) {
+> +               dev_err(&hdev->dev, "failed to poke device #1, %d\n", ret);
+> +               goto err_free;
+> +       }
+> +
+> +       /* 0x06 - high reporting speed, 0x05 - low speed */
+> +       rep_data[0] = 0x06; rep_data[1] = 0x00;
+> +       limit = 3;
+> +       do {
+> +               ret = hdev->hid_output_raw_report(hdev, rep_data, 2,
+> +                               HID_FEATURE_REPORT);
+> +       } while (ret < 0 && limit-- > 0);
+>
+
+Same comments apply here. "/* Note that if query fails it is not a hard
+failure */" is the comments we use in the corresponding Wacom USB driver,
+wacom_sys.c
+
+
+> +       if (ret < 0) {
+> +               dev_err(&hdev->dev, "failed to poke device #2, %d\n", ret);
+> +               goto err_free;
+> +       }
+> +
+>        hidinput = list_entry(hdev->inputs.next, struct hid_input, list);
+>        input = hidinput->input;
+
+
+Everything else looks good to me.
+
+Ping
+
+--001636ed67247e9948047e50c6cb
+Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2010-01-28 at 21:50 -0600, pigiron@gmx.com wrote:=20
->=20
-> Good point. I set up a debug environment (again), created some 8k Hz audi=
-o
-> files, and confirmed that you are correct.
->=20
-> But the 8k mono file worked in my environment.
+<div class=3D"gmail_quote">On Fri, Jan 29, 2010 at 6:20 AM, Jiri Kosina <sp=
+an dir=3D"ltr">&lt;<a href=3D"mailto:jkosina@suse.cz">jkosina@suse.cz</a>&g=
+t;</span> wrote:<br>
+<blockquote style=3D"BORDER-LEFT: #ccc 1px solid; MARGIN: 0px 0px 0px 0.8ex=
+; PADDING-LEFT: 1ex" class=3D"gmail_quote">From: Bastien Nocera &lt;<a href=
+=3D"mailto:hadess@hadess.net">hadess@hadess.net</a>&gt;<br><br>The hid-waco=
+m driver required user-space to poke at the tablet<br>
+to make it send data about the cursor location.<br><br>This patch makes it =
+do the same thing but in the kernel.<br><br>Signed-off-by: Bastien Nocera &=
+lt;<a href=3D"mailto:hadess@hadess.net">hadess@hadess.net</a>&gt;<br>Signed=
+-off-by: Jiri Kosina &lt;<a href=3D"mailto:jkosina@suse.cz">jkosina@suse.cz=
+</a>&gt;<br>
+---<br>=A0drivers/hid/hid-wacom.c | =A0 27 +++++++++++++++++++++++++++<br>=
+=A01 files changed, 27 insertions(+), 0 deletions(-)<br><br>diff --git a/dr=
+ivers/hid/hid-wacom.c b/drivers/hid/hid-wacom.c<br>index 12dcda5..d7897b5 1=
+00644<br>
+--- a/drivers/hid/hid-wacom.c<br>+++ b/drivers/hid/hid-wacom.c<br>@@ -156,7=
+ +156,9 @@ static int wacom_probe(struct hid_device *hdev,<br>=A0 =A0 =A0 =
+=A0struct hid_input *hidinput;<br>=A0 =A0 =A0 =A0struct input_dev *input;<b=
+r>=A0 =A0 =A0 =A0struct wacom_data *wdata;<br>
++ =A0 =A0 =A0 char rep_data[2];<br>=A0 =A0 =A0 =A0int ret;<br>+ =A0 =A0 =A0=
+ int limit;<br><br>=A0 =A0 =A0 =A0wdata =3D kzalloc(sizeof(*wdata), GFP_KER=
+NEL);<br>=A0 =A0 =A0 =A0if (wdata =3D=3D NULL) {<br>@@ -166,6 +168,7 @@ sta=
+tic int wacom_probe(struct hid_device *hdev,<br>
+<br>=A0 =A0 =A0 =A0hid_set_drvdata(hdev, wdata);<br><br>+ =A0 =A0 =A0 /* Pa=
+rse the HID report now */<br>=A0 =A0 =A0 =A0ret =3D hid_parse(hdev);<br>=A0=
+ =A0 =A0 =A0if (ret) {<br>=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0dev_err(&amp;hdev-=
+&gt;dev, &quot;parse failed\n&quot;);<br>@@ -178,6 +181,30 @@ static int wa=
+com_probe(struct hid_device *hdev,<br>
+=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0goto err_free;<br>=A0 =A0 =A0 =A0}<br><br>+ =
+=A0 =A0 =A0 /* Set Wacom mode2 */<br>+ =A0 =A0 =A0 rep_data[0] =3D 0x03; re=
+p_data[1] =3D 0x00;<br>+ =A0 =A0 =A0 limit =3D3;<br>+ =A0 =A0 =A0 do {<br>+=
+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 ret =3D hdev-&gt;hid_output_raw_report(hdev, r=
+ep_data, 2,<br>
++ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 HID_FEATURE_R=
+EPORT);<br>+ =A0 =A0 =A0 } while (ret &lt; 0 &amp;&amp; limit-- &gt; 0);<br=
+></blockquote>
+<div>=A0</div>
+<div>hdev-&gt;hid_output_raw_report error is not a hard failure, i.e., the =
+following four lines are unnecessay.=A0We can continue with the rest of the=
+ code.</div>
+<div>=A0</div>
+<blockquote style=3D"BORDER-LEFT: #ccc 1px solid; MARGIN: 0px 0px 0px 0.8ex=
+; PADDING-LEFT: 1ex" class=3D"gmail_quote">+ =A0 =A0 =A0 if (ret &lt; 0) {<=
+br>+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 dev_err(&amp;hdev-&gt;dev, &quot;failed to=
+ poke device #1, %d\n&quot;, ret);<br>
++ =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto err_free;<br>+ =A0 =A0 =A0 }<br>+<br>+ =
+=A0 =A0 =A0 /* 0x06 - high reporting speed, 0x05 - low speed */<br>+ =A0 =
+=A0 =A0 rep_data[0] =3D 0x06; rep_data[1] =3D 0x00;<br>+ =A0 =A0 =A0 limit =
+=3D 3;<br>+ =A0 =A0 =A0 do {<br>+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 ret =3D hdev-=
+&gt;hid_output_raw_report(hdev, rep_data, 2,<br>
++ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 HID_FEATURE_R=
+EPORT);<br>+ =A0 =A0 =A0 } while (ret &lt; 0 &amp;&amp; limit-- &gt; 0);<br=
+></blockquote>
+<div>=A0</div>
+<div>Same comments apply here.=A0&quot;/* Note that if query fails it is no=
+t a hard failure */&quot; is=A0the comments=A0we use in the corresponding W=
+acom USB driver, wacom_sys.c</div>
+<div>=A0</div>
+<blockquote style=3D"BORDER-LEFT: #ccc 1px solid; MARGIN: 0px 0px 0px 0.8ex=
+; PADDING-LEFT: 1ex" class=3D"gmail_quote">+ =A0 =A0 =A0 if (ret &lt; 0) {<=
+br>+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 dev_err(&amp;hdev-&gt;dev, &quot;failed to=
+ poke device #2, %d\n&quot;, ret);<br>
++ =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto err_free;<br>+ =A0 =A0 =A0 }<br>+<br>=A0=
+ =A0 =A0 =A0hidinput =3D list_entry(hdev-&gt;inputs.next, struct hid_input,=
+ list);<br>=A0 =A0 =A0 =A0input =3D hidinput-&gt;input;</blockquote>
+<div>=A0</div>
+<div>Everything else looks good to me.</div>
+<div>=A0</div>
+<div>Ping</div>
+<div>=A0</div>
+<div>=A0</div></div><br>
 
-Unfortunately it doesn't in my environment.  :-(
-
-> I put the S805 headset into HFP mode and did this:
-
-Hrm.  I don't know that I have to or know how to do this with my
-headset.  Can you elaborate?
-
-> $ aplay -D s805 8k.wav
->   Playing WAVE '8k.wav' : Unsigned 8 bit, Rate 8000 Hz, Mono
-
-When I use sox to provide the same kind of input, I get no luck:
-
-$ sox /mnt/mp3/bad_mouth.wav -c 1 -b 8 -r 8k -t wav - | aplay -D bluetoothf=
-oo
-Playing WAVE 'stdin' : Unsigned 8 bit, Rate 8000 Hz, Mono
-
-I still get nothing except the headset beeps when the stream starts and
-then ends.  FWIW, my alsa configuration for bluetoothfoo:
-
-pcm.bluetoothraw {
-   type bluetooth
-   device 00:1A:45:1B:19:89
-   #profile "auto" #optional, supported profiles are: auto, hifi and
-voice
-   #profile "voice" #optional, supported profiles are: auto, hifi and
-voice
-}
-
-pcm.bluetoothfoo {
-    type plug
-    slave {
-        pcm bluetoothraw
-    }
-}
-
-Trying to use bluetoothraw directly doesn't work either:
-
-$ sox /mnt/mp3/bad_mouth.wav -c 1 -b 8 -r 8k -t wav - | aplay -D bluetoothr=
-aw
-Playing WAVE 'stdin' : Unsigned 8 bit, Rate 8000 Hz, Mono
-aplay: set_params:979: Sample format non available
-
-> and verified that I was using the SCO path (HSP/HFP) by firing up hcidump
-> during playback:
->=20
->   # hcidump -x
-
-Me too:
-
->   [snip]
-
-> SCO data: handle 1 flags 0x00 dlen 48
-    DD FF 2C 00 B9 FD 86 FF 5D FF 06 FE 52 FF 89 FD F6 FE 55 FF=20
-    77 FD 4A FF 84 FF 4C FE FA FE ED FF 6C 00 D6 FF 43 FE 20 00=20
-    E1 00 E3 FF FD 00 03 00=20
-> SCO data: handle 1 flags 0x00 dlen 48
-    CB FE C0 FE 24 FE 77 FE 39 FF A3 FD B6 FF A9 FF 32 FD 6C 01=20
-    B5 FE E5 FD DD 00 4A FE 2F 01 C1 FF C0 FD B2 00 05 00 61 FF=20
-    FE FF CF FF F3 FF 03 FF=20
-> SCO data: handle 1 flags 0x00 dlen 48
-    3A 00 71 00 3E FF 4D 00 59 FF D7 FF 1C 00 E7 FE 3B FF E9 FF=20
-    2A FE 2E FF BC FF 7E FC AC FE 1A FF 70 FE 30 FF A8 FD 58 FF=20
-    69 FF 68 FE 76 FF 4E 00=20
-
-
-
-> The bluetooth USB computer dongle:
->=20
->   # hciconfig -a
->   hci0:   Type: USB
->         BD Address: AA:BB:CC:DD:EE:FF ACL MTU: 1021:7 SCO MTU: 64:1
->         UP RUNNING PSCAN
->         RX bytes:64829124 acl:41 sco:1271103 events:139 errors:0
->         TX bytes:3077 acl:43 sco:0 commands:85 errors:0
->         Features: 0xff 0xff 0x8f 0xfe 0x9b 0xff 0x79 0x83
->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->         Link policy: RSWITCH HOLD SNIFF PARK
->         Link mode: SLAVE ACCEPT
->         Name: 'atom-0'
->         Class: 0x4a0104
->         Service Classes: Networking, Capturing, Telephony
->         Device Class: Computer, Desktop workstation
->         HCI Ver: 2.1 (0x4) HCI Rev: 0x5332 LMP Ver: 2.1 (0x4) LMP Subver:=
- 0x420e
->         Manufacturer: Broadcom Corporation (15)
-
-Just for contrast, here's mine:
-
-$ hciconfig -a
-hci0:	Type: USB
-	BD Address: 00:0D:18:01:3B:9B ACL MTU: 1017:8 SCO MTU: 64:0
-	UP RUNNING PSCAN ISCAN=20
-	RX bytes:3679050 acl:84 sco:72118 events:143 errors:13
-	TX bytes:2177 acl:75 sco:0 commands:59 errors:0
-	Features: 0xff 0xff 0x8d 0xfe 0x9b 0xf9 0x00 0x80
-	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3=20
-	Link policy: RSWITCH HOLD SNIFF PARK=20
-	Link mode: SLAVE ACCEPT=20
-	Name: 'pc-0'
-	Class: 0x0a0104
-	Service Classes: Networking, Capturing
-	Device Class: Computer, Desktop workstation
-	HCI Ver: 2.0 (0x3) HCI Rev: 0x4000 LMP Ver: 2.0 (0x3) LMP Subver: 0x430e
-	Manufacturer: Broadcom Corporation (15)
-
-Interestingly enough, both are Broadcom dongles.
-
-> Keep me posted (maybe privately???)
-
-Please, to the list, so that everyone can benefit.
-
-> if you find any good nuggets.
-
-b.
-
-
---=-h/T8G3A7pEVmcc6z4Iwk
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-
-iEYEABECAAYFAktjQ9gACgkQl3EQlGLyuXAUAQCg3U6NyGGP17jJsxoqp/fj2BJ3
-8VUAn0PdN1+37MOPQEj/jngJ2GfcGadm
-=FoRZ
------END PGP SIGNATURE-----
-
---=-h/T8G3A7pEVmcc6z4Iwk--
-
+--001636ed67247e9948047e50c6cb--
