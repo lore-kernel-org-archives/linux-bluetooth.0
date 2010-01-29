@@ -1,41 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 29 Jan 2010 10:39:59 +0100 (CET)
-From: Jiri Kosina <jkosina@suse.cz>
-To: "Gunn, Brian" <bgunn@solekai.com>
-Cc: Bastien Nocera <hadess@hadess.net>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	linux-input <linux-input@vger.kernel.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Ping <pinglinux@gmail.com>
-Subject: RE: [PATCHes] Implement Bluetooth Wacom tablet's mode change in the
- kernel
-In-Reply-To: <FE57175CCE23E5419899C1B0CFA26FAD12CDF72C1E@EXMBXSD.dm.solekai.com>
-Message-ID: <alpine.LRH.2.00.1001291039350.15694@twin.jikos.cz>
-References: <1263833399.20565.2905.camel@localhost.localdomain>  <1263886149.5591.166.camel@localhost.localdomain>  <1263897015.20565.3988.camel@localhost.localdomain>  <FE57175CCE23E5419899C1B0CFA26FAD101B5E591A@EXMBXSD.dm.solekai.com>
- <1264037759.1735.5008.camel@localhost.localdomain>  <FE57175CCE23E5419899C1B0CFA26FAD12CDF72C0F@EXMBXSD.dm.solekai.com> <1264719198.29532.3149.camel@localhost.localdomain> <FE57175CCE23E5419899C1B0CFA26FAD12CDF72C1E@EXMBXSD.dm.solekai.com>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: ath3k for 2.6.33-rc6
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Luis R. Rodriguez" <mcgrof@bombadil.infradead.org>
+Cc: "Luis R. Rodriguez" <mcgrof@gmail.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	lrodriguez@atheros.com
+In-Reply-To: <20100128215828.GE8069@bombadil.infradead.org>
+References: <43e72e891001221652s1ead6966r808c72d5b4bdf340@mail.gmail.com>
+	 <20100128215828.GE8069@bombadil.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 29 Jan 2010 08:17:00 +0100
+Message-ID: <1264749420.5591.248.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 28 Jan 2010, Gunn, Brian wrote:
+Hi Luis,
 
-> > > > I sent a new version of the patch, which uses "HIDP_TRANS_SET_REPORT |
-> > > > HIDP_DATA_RTYPE_FEATURE" for the first byte. Would that work?
-> > >
-> > > Actually for my application it doesn't.  I use HIDP_TRANS_DATA |
-> > HIDP_DATA_RTYPE_OUTPUT.
-> > >
-> > > Perhaps allowing the user the choice of what do to here is more flexible.
-> >
-> > Except that it would mean different code for USB and Bluetooth
-> > versions...
+> > sorry about the confusion the other day about overstepping you for a
+> > push for ath3k into 2.6.33, I'd like to clarify that was not my
+> > intention, I made the incorrect assumption you received my ping but
+> > didn't care to push it. I wanted to see what you think its OK to push
+> > ath3k into the next cycle for the 2.6.33-rc6 release.
+> > 
+> > Thanks,
 > 
-> So do we need a method of setting which device reports we're sending before writing them?
+> Marcel, was wondering if you have given this some thought. Thanks,
 
-Having separate methods for feature and output reports should be 
-sufficient and general enough, right?
+I push the tree as soon as I get to Seattle. Just between flights right
+now.
 
--- 
-Jiri Kosina
-SUSE Labs, Novell Inc.
+Regards
+
+Marcel
+
+
