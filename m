@@ -1,60 +1,347 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1264776266-7646-1-git-send-email-jprvita@gmail.com>
-References: <1264776266-7646-1-git-send-email-jprvita@gmail.com>
-Date: Fri, 29 Jan 2010 12:53:24 -0200
-Message-ID: <aa32413d1001290653x717105bfx1d90653054a3cd24@mail.gmail.com>
-Subject: Re: [RFC] [PATCH 0/2] HFP AG integration with PulseAudio
-From: =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@gmail.com>
+From: =?utf-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?= <jprvita@gmail.com>
 To: pulseaudio-discuss@mail.0pointer.de
 Cc: Gustavo Padovan <padovan@profusion.mobi>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
 	Zheng Huan <huan.zheng@intel.com>,
 	Lennart Poettering <lennart@poettering.net>, ofono@ofono.org,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+	linux-bluetooth@vger.kernel.org,
+	=?utf-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
+	<jprvita@profusion.mobi>
+Subject: [PATCH 2/2] bluetooth: add HFP Gateway support
+Date: Fri, 29 Jan 2010 12:44:26 -0200
+Message-Id: <1264776266-7646-3-git-send-email-jprvita@gmail.com>
+In-Reply-To: <1264776266-7646-2-git-send-email-jprvita@gmail.com>
+References: <1264776266-7646-1-git-send-email-jprvita@gmail.com>
+ <1264776266-7646-2-git-send-email-jprvita@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-2010/1/29 João Paulo Rechi Vita <jprvita@gmail.com>:
-> Hi all,
->
-> I'm trying to add support for the Handsfree Gateway role Gustavo just added
-> to BlueZ and oFono. The BlueZ patches can be found on [1] and [2] and the
-> oFono part was just merged upstream.
->
-> But when it comes to integrate them with Pulse, I'm getting a POLLHUP when
-> trying to write on the fd. Also, it seems different gateways have different
-> behaviours regarding when they connect the SCO link. Some phone connect
-> them just after the RFCOMM link (some Nokia phones), when there is no call
-> going on yet, and others just when a call is started (Android 1.5).
->
-> Also, right now the same property (State) is beeing used to refer when the
-> RFCOOM link is established (State=Connected) and when the SCO link is
-> established (State=Playing). Shouldn't this be handled by separate props?
->
-> And last but not least, is the new Media API intended to handle the audio
-> part of handsfree gateways too? If so, maybe we should use all this work
-> as a prototype for latter integration with the new API.
->
-> Any help on testing and getting this working together or comments on the
-> topic would be appreciated.
->
-> [1] http://www.spinics.net/lists/linux-bluetooth/msg04250.html
-> [2] http://www.spinics.net/lists/linux-bluetooth/msg04251.html
->
-> --
-> João Paulo Rechi Vita
-> http://jprvita.wordpress.com/
->
->
+From: João Paulo Rechi Vita <jprvita@profusion.mobi>
 
-I forgot to add, suspending of the sink/source seemed to cause
-disconnection by the AG, so you might want to disable
-module-suspend-on-idle when testing. BTW, Lennart, is there any way to
-mark a source/sink to not be suspended?
+Create the 'Handsfree Gateway' profile for bluetooth cards and add
+filters for 'org.bluez.HandsfreeGateway' to the discover module so
+module-bluetooth-device is loaded with the correct profile when a
+Handsfree Gateway connects to bluetoothd (in this case bluetoothd
+is acting as the headset).
+---
+ src/modules/bluetooth/bluetooth-util.c            |   30 ++++++++++--
+ src/modules/bluetooth/bluetooth-util.h            |    3 +
+ src/modules/bluetooth/module-bluetooth-device.c   |   50 +++++++++++++++-----
+ src/modules/bluetooth/module-bluetooth-discover.c |    9 +++-
+ 4 files changed, 72 insertions(+), 20 deletions(-)
 
+diff --git a/src/modules/bluetooth/bluetooth-util.c b/src/modules/bluetooth/bluetooth-util.c
+index d3f3bfe..a873e25 100644
+--- a/src/modules/bluetooth/bluetooth-util.c
++++ b/src/modules/bluetooth/bluetooth-util.c
+@@ -97,6 +97,7 @@ static pa_bluetooth_device* device_new(const char *path) {
+     d->audio_sink_state = PA_BT_AUDIO_STATE_INVALID;
+     d->audio_source_state = PA_BT_AUDIO_STATE_INVALID;
+     d->headset_state = PA_BT_AUDIO_STATE_INVALID;
++    d->hfgw_state = PA_BT_AUDIO_STATE_INVALID;
+ 
+     return d;
+ }
+@@ -122,11 +123,11 @@ static pa_bool_t device_is_audio(pa_bluetooth_device *d) {
+     pa_assert(d);
+ 
+     return
+-        d->device_info_valid &&
++        d->device_info_valid && (d->hfgw_state != PA_BT_AUDIO_STATE_INVALID ||
+         (d->audio_state != PA_BT_AUDIO_STATE_INVALID &&
+          (d->audio_sink_state != PA_BT_AUDIO_STATE_INVALID ||
+           d->audio_source_state != PA_BT_AUDIO_STATE_INVALID ||
+-          d->headset_state != PA_BT_AUDIO_STATE_INVALID));
++          d->headset_state != PA_BT_AUDIO_STATE_INVALID)));
+ }
+ 
+ static int parse_device_property(pa_bluetooth_discovery *y, pa_bluetooth_device *d, DBusMessageIter *i) {
+@@ -229,7 +230,10 @@ static int parse_device_property(pa_bluetooth_discovery *y, pa_bluetooth_device
+                     PA_LLIST_PREPEND(pa_bluetooth_uuid, d->uuids, node);
+ 
+                     /* Vudentz said the interfaces are here when the UUIDs are announced */
+-                    if (strcasecmp(HSP_HS_UUID, value) == 0 || strcasecmp(HFP_HS_UUID, value) == 0) {
++                    if (strcasecmp(HSP_AG_UUID, value) == 0 || strcasecmp(HFP_AG_UUID, value) == 0) {
++                        pa_assert_se(m = dbus_message_new_method_call("org.bluez", d->path, "org.bluez.HandsfreeGateway", "GetProperties"));
++                        send_and_add_to_pending(y, d, m, get_properties_reply);
++                    } else if (strcasecmp(HSP_HS_UUID, value) == 0 || strcasecmp(HFP_HS_UUID, value) == 0) {
+                         pa_assert_se(m = dbus_message_new_method_call("org.bluez", d->path, "org.bluez.Headset", "GetProperties"));
+                         send_and_add_to_pending(y, d, m, get_properties_reply);
+                     } else if (strcasecmp(A2DP_SINK_UUID, value) == 0) {
+@@ -396,9 +400,14 @@ static void get_properties_reply(DBusPendingCall *pending, void *userdata) {
+             }  else if (dbus_message_has_interface(p->message, "org.bluez.AudioSink")) {
+                 if (parse_audio_property(y, &d->audio_sink_state, &dict_i) < 0)
+                     goto finish;
++
+             }  else if (dbus_message_has_interface(p->message, "org.bluez.AudioSource")) {
+                 if (parse_audio_property(y, &d->audio_source_state, &dict_i) < 0)
+                     goto finish;
++
++            }  else if (dbus_message_has_interface(p->message, "org.bluez.HandsfreeGateway")) {
++                if (parse_audio_property(y, &d->hfgw_state, &arg_i) < 0)
++                    goto finish;
+             }
+         }
+ 
+@@ -626,6 +635,7 @@ static DBusHandlerResult filter_cb(DBusConnection *bus, DBusMessage *m, void *us
+                dbus_message_is_signal(m, "org.bluez.Headset", "PropertyChanged") ||
+                dbus_message_is_signal(m, "org.bluez.AudioSink", "PropertyChanged") ||
+                dbus_message_is_signal(m, "org.bluez.AudioSource", "PropertyChanged") ||
++               dbus_message_is_signal(m, "org.bluez.HandsfreeGateway", "PropertyChanged") ||
+                dbus_message_is_signal(m, "org.bluez.Device", "PropertyChanged")) {
+ 
+         pa_bluetooth_device *d;
+@@ -653,9 +663,14 @@ static DBusHandlerResult filter_cb(DBusConnection *bus, DBusMessage *m, void *us
+             }  else if (dbus_message_has_interface(m, "org.bluez.AudioSink")) {
+                 if (parse_audio_property(y, &d->audio_sink_state, &arg_i) < 0)
+                     goto fail;
++
+             }  else if (dbus_message_has_interface(m, "org.bluez.AudioSource")) {
+                 if (parse_audio_property(y, &d->audio_source_state, &arg_i) < 0)
+                     goto fail;
++
++            }  else if (dbus_message_has_interface(m, "org.bluez.HandsfreeGateway")) {
++                if (parse_audio_property(y, &d->hfgw_state, &arg_i) < 0)
++                    goto fail;
+             }
+ 
+             run_callback(y, d, FALSE);
+@@ -672,6 +687,7 @@ static DBusHandlerResult filter_cb(DBusConnection *bus, DBusMessage *m, void *us
+             d->audio_sink_state = PA_BT_AUDIO_STATE_DISCONNECTED;
+             d->audio_source_state = PA_BT_AUDIO_STATE_DISCONNECTED;
+             d->headset_state = PA_BT_AUDIO_STATE_DISCONNECTED;
++            d->hfgw_state = PA_BT_AUDIO_STATE_DISCONNECTED;
+ 
+             run_callback(y, d, FALSE);
+         }
+@@ -801,7 +817,9 @@ pa_bluetooth_discovery* pa_bluetooth_discovery_get(pa_core *c) {
+                 "type='signal',sender='org.bluez',interface='org.bluez.Audio',member='PropertyChanged'",
+                 "type='signal',sender='org.bluez',interface='org.bluez.Headset',member='PropertyChanged'",
+                 "type='signal',sender='org.bluez',interface='org.bluez.AudioSink',member='PropertyChanged'",
+-                "type='signal',sender='org.bluez',interface='org.bluez.AudioSource',member='PropertyChanged'", NULL) < 0) {
++                "type='signal',sender='org.bluez',interface='org.bluez.AudioSource',member='PropertyChanged'",
++                "type='signal',sender='org.bluez',interface='org.bluez.HandsfreeGateway',member='PropertyChanged'",
++                NULL) < 0) {
+         pa_log("Failed to add D-Bus matches: %s", err.message);
+         goto fail;
+     }
+@@ -855,7 +873,9 @@ void pa_bluetooth_discovery_unref(pa_bluetooth_discovery *y) {
+                                "type='signal',sender='org.bluez',interface='org.bluez.Audio',member='PropertyChanged'",
+                                "type='signal',sender='org.bluez',interface='org.bluez.Headset',member='PropertyChanged'",
+                                "type='signal',sender='org.bluez',interface='org.bluez.AudioSink',member='PropertyChanged'",
+-                               "type='signal',sender='org.bluez',interface='org.bluez.AudioSource',member='PropertyChanged'", NULL);
++                               "type='signal',sender='org.bluez',interface='org.bluez.AudioSource',member='PropertyChanged'",
++                               "type='signal',sender='org.bluez',interface='org.bluez.HandsfreeGateway',member='PropertyChanged'",
++                               NULL);
+ 
+         dbus_connection_remove_filter(pa_dbus_connection_get(y->connection), filter_cb, y);
+ 
+diff --git a/src/modules/bluetooth/bluetooth-util.h b/src/modules/bluetooth/bluetooth-util.h
+index e2a0c3d..9cee3de 100644
+--- a/src/modules/bluetooth/bluetooth-util.h
++++ b/src/modules/bluetooth/bluetooth-util.h
+@@ -89,6 +89,9 @@ struct pa_bluetooth_device {
+ 
+     /* Headset state */
+     pa_bt_audio_state_t headset_state;
++
++    /* HandsfreeGateway state */
++    pa_bt_audio_state_t hfgw_state;
+ };
+ 
+ pa_bluetooth_discovery* pa_bluetooth_discovery_get(pa_core *core);
+diff --git a/src/modules/bluetooth/module-bluetooth-device.c b/src/modules/bluetooth/module-bluetooth-device.c
+index 0ba1421..f383aa7 100644
+--- a/src/modules/bluetooth/module-bluetooth-device.c
++++ b/src/modules/bluetooth/module-bluetooth-device.c
+@@ -71,7 +71,7 @@ PA_MODULE_USAGE(
+         "source_name=<name for the source> "
+         "source_properties=<properties for the source> "
+         "address=<address of the device> "
+-        "profile=<a2dp|hsp> "
++        "profile=<a2dp|hsp|hfgw> "
+         "rate=<sample rate> "
+         "channels=<number of channels> "
+         "path=<device object path> "
+@@ -133,6 +133,7 @@ enum profile {
+     PROFILE_A2DP,
+     PROFILE_A2DP_SOURCE,
+     PROFILE_HSP,
++    PROFILE_HFGW,
+     PROFILE_OFF
+ };
+ 
+@@ -316,12 +317,12 @@ static int parse_caps(struct userdata *u, uint8_t seid, const struct bt_get_capa
+     pa_log_debug("Payload size is %lu %lu", (unsigned long) bytes_left, (unsigned long) sizeof(*codec));
+ 
+     if (((u->profile == PROFILE_A2DP || u->profile == PROFILE_A2DP_SOURCE) && codec->transport != BT_CAPABILITIES_TRANSPORT_A2DP) ||
+-        (u->profile == PROFILE_HSP && codec->transport != BT_CAPABILITIES_TRANSPORT_SCO)) {
++        ((u->profile == PROFILE_HSP || u->profile == PROFILE_HFGW) && codec->transport != BT_CAPABILITIES_TRANSPORT_SCO)) {
+         pa_log_error("Got capabilities for wrong codec.");
+         return -1;
+     }
+ 
+-    if (u->profile == PROFILE_HSP) {
++    if (u->profile == PROFILE_HSP || u->profile == PROFILE_HFGW) {
+ 
+         if (bytes_left <= 0 || codec->length != sizeof(u->hsp.pcm_capabilities))
+             return -1;
+@@ -399,7 +400,7 @@ static int get_caps(struct userdata *u, uint8_t seid) {
+     if (u->profile == PROFILE_A2DP || u->profile == PROFILE_A2DP_SOURCE)
+         msg.getcaps_req.transport = BT_CAPABILITIES_TRANSPORT_A2DP;
+     else {
+-        pa_assert(u->profile == PROFILE_HSP);
++        pa_assert(u->profile == PROFILE_HSP || u->profile == PROFILE_HFGW);
+         msg.getcaps_req.transport = BT_CAPABILITIES_TRANSPORT_SCO;
+     }
+     msg.getcaps_req.flags = u->auto_connect ? BT_FLAG_AUTOCONNECT : 0;
+@@ -695,7 +696,7 @@ static int set_conf(struct userdata *u) {
+         if (setup_a2dp(u) < 0)
+             return -1;
+     } else {
+-        pa_assert(u->profile == PROFILE_HSP);
++        pa_assert(u->profile == PROFILE_HSP || u->profile == PROFILE_HFGW);
+ 
+         u->sample_spec.format = PA_SAMPLE_S16LE;
+         u->sample_spec.channels = 1;
+@@ -987,7 +988,7 @@ static int hsp_process_render(struct userdata *u) {
+     int ret = 0;
+ 
+     pa_assert(u);
+-    pa_assert(u->profile == PROFILE_HSP);
++    pa_assert(u->profile == PROFILE_HSP || u->profile == PROFILE_HFGW);
+     pa_assert(u->sink);
+ 
+     /* First, render some data */
+@@ -1052,7 +1053,7 @@ static int hsp_process_push(struct userdata *u) {
+     pa_memchunk memchunk;
+ 
+     pa_assert(u);
+-    pa_assert(u->profile == PROFILE_HSP);
++    pa_assert(u->profile == PROFILE_HSP || u->profile == PROFILE_HFGW);
+     pa_assert(u->source);
+     pa_assert(u->read_smoother);
+ 
+@@ -1426,7 +1427,7 @@ static void thread_func(void *userdata) {
+             if (pollfd && (pollfd->revents & POLLIN)) {
+                 int n_read;
+ 
+-                if (u->profile == PROFILE_HSP)
++                if (u->profile == PROFILE_HSP || PROFILE_HFGW)
+                     n_read = hsp_process_push(u);
+                 else
+                     n_read = a2dp_process_push(u);
+@@ -1834,7 +1835,7 @@ static int add_source(struct userdata *u) {
+         data.module = u->module;
+         pa_source_new_data_set_sample_spec(&data, &u->sample_spec);
+         pa_proplist_sets(data.proplist, "bluetooth.protocol", u->profile == PROFILE_A2DP_SOURCE ? "a2dp_source" : "hsp");
+-        if (u->profile == PROFILE_HSP)
++        if ((u->profile == PROFILE_HSP) || (u->profile == PROFILE_HFGW))
+             pa_proplist_sets(data.proplist, PA_PROP_DEVICE_INTENDED_ROLES, "phone");
+         data.card = u->card;
+         data.name = get_name("source", u->modargs, u->address, &b);
+@@ -1862,8 +1863,10 @@ static int add_source(struct userdata *u) {
+                                     pa_bytes_to_usec(u->block_size, &u->sample_spec));
+     }
+ 
+-    if (u->profile == PROFILE_HSP) {
++    if (u->profile == PROFILE_HSP || u->profile == PROFILE_HFGW)
+         pa_proplist_sets(u->source->proplist, "bluetooth.nrec", (u->hsp.pcm_capabilities.flags & BT_PCM_FLAG_NREC) ? "1" : "0");
++
++    if (u->profile == PROFILE_HSP) {
+         u->source->set_volume = source_set_volume_cb;
+         u->source->n_volume_steps = 16;
+     }
+@@ -1951,12 +1954,14 @@ static int init_profile(struct userdata *u) {
+         return -1;
+ 
+     if (u->profile == PROFILE_A2DP ||
+-        u->profile == PROFILE_HSP)
++        u->profile == PROFILE_HSP ||
++        u->profile == PROFILE_HFGW)
+         if (add_sink(u) < 0)
+             r = -1;
+ 
+     if (u->profile == PROFILE_HSP ||
+-        u->profile == PROFILE_A2DP_SOURCE)
++        u->profile == PROFILE_A2DP_SOURCE ||
++        u->profile == PROFILE_HFGW)
+         if (add_source(u) < 0)
+             r = -1;
+ 
+@@ -2091,6 +2096,10 @@ static int card_set_profile(pa_card *c, pa_card_profile *new_profile) {
+         pa_log_warn("A2DP is not connected, refused to switch profile");
+         return -PA_ERR_IO;
+     }
++    else if (device->hfgw_state <= PA_BT_AUDIO_STATE_CONNECTED && *d == PROFILE_HFGW) {
++        pa_log_warn("HandsfreeGateway is not connected, refused to switch profile");
++        return -PA_ERR_IO;
++    }
+ 
+     if (u->sink) {
+         inputs = pa_sink_move_all_start(u->sink, NULL);
+@@ -2226,6 +2235,20 @@ static int add_card(struct userdata *u, const pa_bluetooth_device *device) {
+         pa_hashmap_put(data.profiles, p->name, p);
+     }
+ 
++    if (pa_bluetooth_uuid_has(device->uuids, HFP_AG_UUID)) {
++        p = pa_card_profile_new("hfgw", _("Handsfree Gateway"), sizeof(enum profile));
++        p->priority = 20;
++        p->n_sinks = 1;
++        p->n_sources = 1;
++        p->max_sink_channels = 1;
++        p->max_source_channels = 1;
++
++        d = PA_CARD_PROFILE_DATA(p);
++        *d = PROFILE_HFGW;
++
++        pa_hashmap_put(data.profiles, p->name, p);
++    }
++
+     pa_assert(!pa_hashmap_isempty(data.profiles));
+ 
+     p = pa_card_profile_new("off", _("Off"), sizeof(enum profile));
+@@ -2254,7 +2277,8 @@ static int add_card(struct userdata *u, const pa_bluetooth_device *device) {
+     d = PA_CARD_PROFILE_DATA(u->card->active_profile);
+ 
+     if ((device->headset_state < PA_BT_AUDIO_STATE_CONNECTED && *d == PROFILE_HSP) ||
+-        (device->audio_sink_state < PA_BT_AUDIO_STATE_CONNECTED && *d == PROFILE_A2DP)) {
++        (device->audio_sink_state < PA_BT_AUDIO_STATE_CONNECTED && *d == PROFILE_A2DP) ||
++        (device->hfgw_state < PA_BT_AUDIO_STATE_CONNECTED && *d == PROFILE_HFGW)) {
+         pa_log_warn("Default profile not connected, selecting off profile");
+         u->card->active_profile = pa_hashmap_get(u->card->profiles, "off");
+         u->card->save_profile = FALSE;
+diff --git a/src/modules/bluetooth/module-bluetooth-discover.c b/src/modules/bluetooth/module-bluetooth-discover.c
+index 0085fa8..fd34c6f 100644
+--- a/src/modules/bluetooth/module-bluetooth-discover.c
++++ b/src/modules/bluetooth/module-bluetooth-discover.c
+@@ -83,8 +83,10 @@ static pa_hook_result_t load_module_for_device(pa_bluetooth_discovery *y, const
+ 
+     mi = pa_hashmap_get(u->hashmap, d->path);
+ 
+-    if (!d->dead &&
+-        d->device_connected > 0 && (d->audio_state >= PA_BT_AUDIO_STATE_CONNECTED || d->audio_source_state >= PA_BT_AUDIO_STATE_CONNECTED)) {
++    if (!d->dead && d->device_connected > 0 &&
++        (d->audio_state >= PA_BT_AUDIO_STATE_CONNECTED ||
++         d->audio_source_state >= PA_BT_AUDIO_STATE_CONNECTED ||
++         d->hfgw_state > PA_BT_AUDIO_STATE_CONNECTED)) {
+ 
+         if (!mi) {
+             pa_module *m = NULL;
+@@ -119,6 +121,9 @@ static pa_hook_result_t load_module_for_device(pa_bluetooth_discovery *y, const
+             if (d->audio_source_state >= PA_BT_AUDIO_STATE_CONNECTED)
+                 args = pa_sprintf_malloc("%s profile=\"a2dp_source\" auto_connect=no", args);
+ 
++            if (d->hfgw_state > PA_BT_AUDIO_STATE_CONNECTED)
++                args = pa_sprintf_malloc("%s profile=\"hfgw\"", args);
++
+             pa_log_debug("Loading module-bluetooth-device %s", args);
+             m = pa_module_load(u->module->core, "module-bluetooth-device", args);
+             pa_xfree(args);
 -- 
-João Paulo Rechi Vita
-http://jprvita.wordpress.com/
+1.6.3.3
+
