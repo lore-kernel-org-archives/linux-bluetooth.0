@@ -1,31 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 29 Jan 2010 15:20:38 +0100 (CET)
-From: Jiri Kosina <jkosina@suse.cz>
-To: "Gunn, Brian" <bgunn@solekai.com>,
-	Marcel Holtmann <marcel@holtmann.org>, Ping <pinglinux@gmail.com>
-Cc: linux-kernel@vger.kernel.org,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH 0/3] HID: make raw output callback more flexible
-Message-ID: <alpine.LNX.2.00.1001291515560.356@pobox.suse.cz>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+In-Reply-To: <20100125140609.GA6616@jh-x301>
+References: <a69c0aba1001230519v3a197d9cq7942599e3a371168@mail.gmail.com>
+	<20100123172550.GA18667@jh-x301> <a69c0aba1001231101i3d093edfh94ebd007e6713692@mail.gmail.com>
+	<20100123191419.GA19717@jh-x301> <a69c0aba1001250552t22bcd736q8d7cf9e466e2b994@mail.gmail.com>
+	<20100125140609.GA6616@jh-x301>
+From: papukaija <papukaija@skynet.be>
+Date: Fri, 29 Jan 2010 15:07:27 +0100
+Message-ID: <a69c0aba1001290607j6035621fy5a473022579ae1ee@mail.gmail.com>
+Subject: Re: Feature request: remember bluetooth on/off setting
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+> Hi,
+>
+> On Mon, Jan 25, 2010, papukaija wrote:
+>> > I'm running latest git here and works fine for me. Could it be that you
+>> > have some other component in your system that's always powering on
+>> > Bluetooth?
+>>
+>> Maybe gnome's bluetooth applet doesn't read this setting or maybe it's
+>> ignoring the setting completely.
+>
+> The applet is not supposed to know about the setting. It's just supposed
+> to toggle the Powered property for an adapter through the SetProperty
+> D-Bus method that bluetoothd exports.
+>
+> Johan
+>
+>
 
-this is a followup to the thread
-
-	"Implement Bluetooth Wacom tablet's mode change in the kernel"
-
-First patch alters the raw output API so that it is able to actually 
-distinguish between feature and output reports (and modifies low-level 
-drivers accordingly), and the two followup patches make use of this for 
-in-kernel mode setting of Sony and Wacom bluetooth devices.
-
-Marcel, could you please review the Bluetooth part?
-
-Thanks,
-
--- 
-Jiri Kosina
-SUSE Labs, Novell Inc.
+Is there a way to debug this bug?
