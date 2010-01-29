@@ -1,47 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?utf-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?= <jprvita@gmail.com>
-To: pulseaudio-discuss@mail.0pointer.de
-Subject: [RFC] [PATCH 0/2] HFP AG integration with PulseAudio
-Date: Fri, 29 Jan 2010 12:44:24 -0200
-Message-Id: <1264776266-7646-1-git-send-email-jprvita@gmail.com>
+Date: Fri, 29 Jan 2010 15:21:03 +0100 (CET)
+From: Jiri Kosina <jkosina@suse.cz>
+To: "Gunn, Brian" <bgunn@solekai.com>,
+	Marcel Holtmann <marcel@holtmann.org>, Ping <pinglinux@gmail.com>
+Cc: linux-kernel@vger.kernel.org,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH 3/3] HID: Enable Sixaxis controller over Bluetooth
+In-Reply-To: <alpine.LNX.2.00.1001291515560.356@pobox.suse.cz>
+Message-ID: <alpine.LNX.2.00.1001291519560.356@pobox.suse.cz>
+References: <alpine.LNX.2.00.1001291515560.356@pobox.suse.cz>
 MIME-Version: 1.0
-Cc: Zheng Huan <huan.zheng@intel.com>, linux-bluetooth@vger.kernel.org,
-	Lennart Poettering <lennart@poettering.net>, ofono@ofono.org
-Reply-To: ofono@ofono.org
-List-Unsubscribe: <http://lists.ofono.org/options/ofono>,
-	<mailto:ofono-request@ofono.org?subject=unsubscribe>
-List-Archive: <http://lists.ofono.org/pipermail/ofono>
-List-Post: <mailto:ofono@ofono.org>
-List-Help: <mailto:ofono-request@ofono.org?subject=help>
-List-Subscribe: <http://lists.ofono.org/listinfo/ofono>,
-	<mailto:ofono-request@ofono.org?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Sender: ofono-bounces@ofono.org
-Errors-To: ofono-bounces@ofono.org
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgYWxsLAoKSSdtIHRyeWluZyB0byBhZGQgc3VwcG9ydCBmb3IgdGhlIEhhbmRzZnJlZSBHYXRl
-d2F5IHJvbGUgR3VzdGF2byBqdXN0IGFkZGVkCnRvIEJsdWVaIGFuZCBvRm9uby4gVGhlIEJsdWVa
-IHBhdGNoZXMgY2FuIGJlIGZvdW5kIG9uIFsxXSBhbmQgWzJdIGFuZCB0aGUKb0Zvbm8gcGFydCB3
-YXMganVzdCBtZXJnZWQgdXBzdHJlYW0uCgpCdXQgd2hlbiBpdCBjb21lcyB0byBpbnRlZ3JhdGUg
-dGhlbSB3aXRoIFB1bHNlLCBJJ20gZ2V0dGluZyBhIFBPTExIVVAgd2hlbgp0cnlpbmcgdG8gd3Jp
-dGUgb24gdGhlIGZkLiBBbHNvLCBpdCBzZWVtcyBkaWZmZXJlbnQgZ2F0ZXdheXMgaGF2ZSBkaWZm
-ZXJlbnQKYmVoYXZpb3VycyByZWdhcmRpbmcgd2hlbiB0aGV5IGNvbm5lY3QgdGhlIFNDTyBsaW5r
-LiBTb21lIHBob25lIGNvbm5lY3QKdGhlbSBqdXN0IGFmdGVyIHRoZSBSRkNPTU0gbGluayAoc29t
-ZSBOb2tpYSBwaG9uZXMpLCB3aGVuIHRoZXJlIGlzIG5vIGNhbGwKZ29pbmcgb24geWV0LCBhbmQg
-b3RoZXJzIGp1c3Qgd2hlbiBhIGNhbGwgaXMgc3RhcnRlZCAoQW5kcm9pZCAxLjUpLgoKQWxzbywg
-cmlnaHQgbm93IHRoZSBzYW1lIHByb3BlcnR5IChTdGF0ZSkgaXMgYmVlaW5nIHVzZWQgdG8gcmVm
-ZXIgd2hlbiB0aGUKUkZDT09NIGxpbmsgaXMgZXN0YWJsaXNoZWQgKFN0YXRlPUNvbm5lY3RlZCkg
-YW5kIHdoZW4gdGhlIFNDTyBsaW5rIGlzCmVzdGFibGlzaGVkIChTdGF0ZT1QbGF5aW5nKS4gU2hv
-dWxkbid0IHRoaXMgYmUgaGFuZGxlZCBieSBzZXBhcmF0ZSBwcm9wcz8KCkFuZCBsYXN0IGJ1dCBu
-b3QgbGVhc3QsIGlzIHRoZSBuZXcgTWVkaWEgQVBJIGludGVuZGVkIHRvIGhhbmRsZSB0aGUgYXVk
-aW8KcGFydCBvZiBoYW5kc2ZyZWUgZ2F0ZXdheXMgdG9vPyBJZiBzbywgbWF5YmUgd2Ugc2hvdWxk
-IHVzZSBhbGwgdGhpcyB3b3JrCmFzIGEgcHJvdG90eXBlIGZvciBsYXR0ZXIgaW50ZWdyYXRpb24g
-d2l0aCB0aGUgbmV3IEFQSS4KCkFueSBoZWxwIG9uIHRlc3RpbmcgYW5kIGdldHRpbmcgdGhpcyB3
-b3JraW5nIHRvZ2V0aGVyIG9yIGNvbW1lbnRzIG9uIHRoZQp0b3BpYyB3b3VsZCBiZSBhcHByZWNp
-YXRlZC4KClsxXSBodHRwOi8vd3d3LnNwaW5pY3MubmV0L2xpc3RzL2xpbnV4LWJsdWV0b290aC9t
-c2cwNDI1MC5odG1sClsyXSBodHRwOi8vd3d3LnNwaW5pY3MubmV0L2xpc3RzL2xpbnV4LWJsdWV0
-b290aC9tc2cwNDI1MS5odG1sCgotLQpKb8OjbyBQYXVsbyBSZWNoaSBWaXRhCmh0dHA6Ly9qcHJ2
-aXRhLndvcmRwcmVzcy5jb20vCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fXwpvZm9ubyBtYWlsaW5nIGxpc3QKb2Zvbm9Ab2Zvbm8ub3JnCmh0dHA6Ly9saXN0
-cy5vZm9uby5vcmcvbGlzdGluZm8vb2Zvbm8K
+From: Bastien Nocera <hadess@hadess.net>
+
+Now that hid_output_raw_report works, port the PS3 Sixaxis Bluetooth quirk 
+from user-space, into kernel-space.
+
+Signed-off-by: Bastien Nocera <hadess@hadess.net>
+Signed-off-by: Jiri Kosina <jkosina@suse.cz>
+---
+ drivers/hid/hid-core.c |    1 +
+ drivers/hid/hid-sony.c |   15 ++++++++++++++-
+ 2 files changed, 15 insertions(+), 1 deletions(-)
+
+diff --git a/drivers/hid/hid-core.c b/drivers/hid/hid-core.c
+index eabe5f8..f7f80e1 100644
+--- a/drivers/hid/hid-core.c
++++ b/drivers/hid/hid-core.c
+@@ -1340,6 +1340,7 @@ static const struct hid_device_id hid_blacklist[] = {
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_PETALYNX, USB_DEVICE_ID_PETALYNX_MAXTER_REMOTE) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_SAMSUNG, USB_DEVICE_ID_SAMSUNG_IR_REMOTE) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS3_CONTROLLER) },
++	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS3_CONTROLLER) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_VAIO_VGX_MOUSE) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_SUNPLUS, USB_DEVICE_ID_SUNPLUS_WDESKTOP) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_THRUSTMASTER, 0xb300) },
+diff --git a/drivers/hid/hid-sony.c b/drivers/hid/hid-sony.c
+index 4e84502..08b7fa0 100644
+--- a/drivers/hid/hid-sony.c
++++ b/drivers/hid/hid-sony.c
+@@ -73,6 +73,12 @@ static int sony_set_operational(struct hid_device *hdev)
+ 	return ret;
+ }
+ 
++static int sony_set_operational_bt(struct hid_device *hdev)
++{
++	unsigned char buf[] = { 0x53, 0xf4,  0x42, 0x03, 0x00, 0x00 };
++	return hdev->hid_output_raw_report(hdev, buf, sizeof(buf), HID_FEATURE_REPORT);
++}
++
+ static int sony_probe(struct hid_device *hdev, const struct hid_device_id *id)
+ {
+ 	int ret;
+@@ -101,7 +107,13 @@ static int sony_probe(struct hid_device *hdev, const struct hid_device_id *id)
+ 		goto err_free;
+ 	}
+ 
+-	ret = sony_set_operational(hdev);
++	if (hdev->bus == BUS_USB)
++		ret = sony_set_operational(hdev);
++	else if (hdev->bus == BUS_BLUETOOTH)
++		ret = sony_set_operational_bt(hdev);
++	else
++		ret = 0;
++
+ 	if (ret < 0)
+ 		goto err_stop;
+ 
+@@ -121,6 +133,7 @@ static void sony_remove(struct hid_device *hdev)
+ 
+ static const struct hid_device_id sony_devices[] = {
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS3_CONTROLLER) },
++	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS3_CONTROLLER) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_VAIO_VGX_MOUSE),
+ 		.driver_data = VAIO_RDESC_CONSTANT },
+ 	{ }
+-- 
+1.6.4.2
