@@ -1,47 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
 From: =?utf-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?= <jprvita@gmail.com>
 To: pulseaudio-discuss@mail.0pointer.de
-Cc: Gustavo Padovan <padovan@profusion.mobi>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Zheng Huan <huan.zheng@intel.com>,
-	Lennart Poettering <lennart@poettering.net>, ofono@ofono.org,
-	linux-bluetooth@vger.kernel.org,
-	=?utf-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
-	<jprvita@profusion.mobi>
-Subject: [PATCH 1/2] bluetooth: improve dbus logging a little bit
-Date: Fri, 29 Jan 2010 12:44:25 -0200
-Message-Id: <1264776266-7646-2-git-send-email-jprvita@gmail.com>
-In-Reply-To: <1264776266-7646-1-git-send-email-jprvita@gmail.com>
-References: <1264776266-7646-1-git-send-email-jprvita@gmail.com>
+Subject: [RFC] [PATCH 0/2] HFP AG integration with PulseAudio
+Date: Fri, 29 Jan 2010 12:44:24 -0200
+Message-Id: <1264776266-7646-1-git-send-email-jprvita@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: Zheng Huan <huan.zheng@intel.com>, linux-bluetooth@vger.kernel.org,
+	Lennart Poettering <lennart@poettering.net>, ofono@ofono.org
+Reply-To: ofono@ofono.org
+List-Unsubscribe: <http://lists.ofono.org/options/ofono>,
+	<mailto:ofono-request@ofono.org?subject=unsubscribe>
+List-Archive: <http://lists.ofono.org/pipermail/ofono>
+List-Post: <mailto:ofono@ofono.org>
+List-Help: <mailto:ofono-request@ofono.org?subject=help>
+List-Subscribe: <http://lists.ofono.org/listinfo/ofono>,
+	<mailto:ofono-request@ofono.org?subject=subscribe>
+Content-Type: text/plain; charset="utf-8"
+Sender: ofono-bounces@ofono.org
+Errors-To: ofono-bounces@ofono.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: João Paulo Rechi Vita <jprvita@profusion.mobi>
-
----
- src/modules/bluetooth/bluetooth-util.c |    5 +++--
- 1 files changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/src/modules/bluetooth/bluetooth-util.c b/src/modules/bluetooth/bluetooth-util.c
-index 47d6200..d3f3bfe 100644
---- a/src/modules/bluetooth/bluetooth-util.c
-+++ b/src/modules/bluetooth/bluetooth-util.c
-@@ -292,9 +292,10 @@ static int parse_audio_property(pa_bluetooth_discovery *u, int *state, DBusMessa
-             const char *value;
-             dbus_message_iter_get_basic(&variant_i, &value);
- 
--            if (pa_streq(key, "State"))
-+            if (pa_streq(key, "State")) {
-                 *state = pa_bt_audio_state_from_string(value);
--/*             pa_log_debug("Value %s", value); */
-+                pa_log_debug("dbus: property 'State' changed to value '%s'", value);
-+            }
- 
-             break;
-         }
--- 
-1.6.3.3
-
+SGkgYWxsLAoKSSdtIHRyeWluZyB0byBhZGQgc3VwcG9ydCBmb3IgdGhlIEhhbmRzZnJlZSBHYXRl
+d2F5IHJvbGUgR3VzdGF2byBqdXN0IGFkZGVkCnRvIEJsdWVaIGFuZCBvRm9uby4gVGhlIEJsdWVa
+IHBhdGNoZXMgY2FuIGJlIGZvdW5kIG9uIFsxXSBhbmQgWzJdIGFuZCB0aGUKb0Zvbm8gcGFydCB3
+YXMganVzdCBtZXJnZWQgdXBzdHJlYW0uCgpCdXQgd2hlbiBpdCBjb21lcyB0byBpbnRlZ3JhdGUg
+dGhlbSB3aXRoIFB1bHNlLCBJJ20gZ2V0dGluZyBhIFBPTExIVVAgd2hlbgp0cnlpbmcgdG8gd3Jp
+dGUgb24gdGhlIGZkLiBBbHNvLCBpdCBzZWVtcyBkaWZmZXJlbnQgZ2F0ZXdheXMgaGF2ZSBkaWZm
+ZXJlbnQKYmVoYXZpb3VycyByZWdhcmRpbmcgd2hlbiB0aGV5IGNvbm5lY3QgdGhlIFNDTyBsaW5r
+LiBTb21lIHBob25lIGNvbm5lY3QKdGhlbSBqdXN0IGFmdGVyIHRoZSBSRkNPTU0gbGluayAoc29t
+ZSBOb2tpYSBwaG9uZXMpLCB3aGVuIHRoZXJlIGlzIG5vIGNhbGwKZ29pbmcgb24geWV0LCBhbmQg
+b3RoZXJzIGp1c3Qgd2hlbiBhIGNhbGwgaXMgc3RhcnRlZCAoQW5kcm9pZCAxLjUpLgoKQWxzbywg
+cmlnaHQgbm93IHRoZSBzYW1lIHByb3BlcnR5IChTdGF0ZSkgaXMgYmVlaW5nIHVzZWQgdG8gcmVm
+ZXIgd2hlbiB0aGUKUkZDT09NIGxpbmsgaXMgZXN0YWJsaXNoZWQgKFN0YXRlPUNvbm5lY3RlZCkg
+YW5kIHdoZW4gdGhlIFNDTyBsaW5rIGlzCmVzdGFibGlzaGVkIChTdGF0ZT1QbGF5aW5nKS4gU2hv
+dWxkbid0IHRoaXMgYmUgaGFuZGxlZCBieSBzZXBhcmF0ZSBwcm9wcz8KCkFuZCBsYXN0IGJ1dCBu
+b3QgbGVhc3QsIGlzIHRoZSBuZXcgTWVkaWEgQVBJIGludGVuZGVkIHRvIGhhbmRsZSB0aGUgYXVk
+aW8KcGFydCBvZiBoYW5kc2ZyZWUgZ2F0ZXdheXMgdG9vPyBJZiBzbywgbWF5YmUgd2Ugc2hvdWxk
+IHVzZSBhbGwgdGhpcyB3b3JrCmFzIGEgcHJvdG90eXBlIGZvciBsYXR0ZXIgaW50ZWdyYXRpb24g
+d2l0aCB0aGUgbmV3IEFQSS4KCkFueSBoZWxwIG9uIHRlc3RpbmcgYW5kIGdldHRpbmcgdGhpcyB3
+b3JraW5nIHRvZ2V0aGVyIG9yIGNvbW1lbnRzIG9uIHRoZQp0b3BpYyB3b3VsZCBiZSBhcHByZWNp
+YXRlZC4KClsxXSBodHRwOi8vd3d3LnNwaW5pY3MubmV0L2xpc3RzL2xpbnV4LWJsdWV0b290aC9t
+c2cwNDI1MC5odG1sClsyXSBodHRwOi8vd3d3LnNwaW5pY3MubmV0L2xpc3RzL2xpbnV4LWJsdWV0
+b290aC9tc2cwNDI1MS5odG1sCgotLQpKb8OjbyBQYXVsbyBSZWNoaSBWaXRhCmh0dHA6Ly9qcHJ2
+aXRhLndvcmRwcmVzcy5jb20vCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fXwpvZm9ubyBtYWlsaW5nIGxpc3QKb2Zvbm9Ab2Zvbm8ub3JnCmh0dHA6Ly9saXN0
+cy5vZm9uby5vcmcvbGlzdGluZm8vb2Zvbm8K
