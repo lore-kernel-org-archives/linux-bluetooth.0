@@ -1,37 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 0/3] HID: make raw output callback more flexible
-From: Bastien Nocera <hadess@hadess.net>
-To: Michael Poole <mdpoole@troilus.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Jiri Kosina <jkosina@suse.cz>,
-        "Gunn, Brian" <bgunn@solekai.com>, Ping <pinglinux@gmail.com>,
-        linux-kernel@vger.kernel.org,
-        BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <87iqakifm8.fsf@troilus.org>
-References: <alpine.LNX.2.00.1001291515560.356@pobox.suse.cz>
-	 <1264783166.29532.5302.camel@localhost.localdomain>
-	 <87iqakifm8.fsf@troilus.org>
-Content-Type: text/plain; charset="ISO-8859-1"
-Date: Sat, 30 Jan 2010 14:11:03 +0000
-Message-ID: <1264860663.29532.7887.camel@localhost.localdomain>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <6aeb672b1001292054h39d1a692g9b29e5f9505dc6d2@mail.gmail.com>
+References: <f97b2b971001292013i3edd6bdajde0d9e39ed021fbd@mail.gmail.com>
+	 <f97b2b971001292024u7ddf84b6gd063280efa6c1a4e@mail.gmail.com>
+	 <f97b2b971001292040hf7537d2yeef91fecf4189c50@mail.gmail.com>
+	 <6aeb672b1001292054h39d1a692g9b29e5f9505dc6d2@mail.gmail.com>
+Date: Sat, 30 Jan 2010 13:39:25 +0200
+Message-ID: <f97b2b971001300339w7850c6e2td4f3a194197cb499@mail.gmail.com>
+Subject: Re: Kernel panic when dongle is disconnected during sco connection
+From: Ahmed Ragab <elmasri.ahmed@gmail.com>
+To: Liang Bao <tim.bao@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 2010-01-29 at 19:46 -0500, Michael Poole wrote:
-> > [1]: Comments on the patch at
-> > http://thread.gmane.org/gmane.linux.bluez.kernel/4279 would be
-> > appreciated
-> 
-> This patch does not work for me.  Before, the first time after each
-> boot
-> that I tried to connect to an Apple Magic Mouse, it failed with -14
-> (EFAULT).  With this patch, it fails with -22 (EINVAL) instead.  The
-> -EFAULT *was* due to hidp_parse()'s copy_from_user().  I have not
-> looked
-> yet to see where the -EINVAL is coming from -- would that help?  (Both
-> with and without your patch, the second attempt to connect works.) 
+Actually the kernel is not compiled with debugging feature enabled,
+however this panic
+Can be reproduced by just disconnecting usb bluetooth dongle while sco
+socket stream
+Is sending or receiving
 
-I don't get -EFAULT anymore (it was failing to copy the rd_data from
-user-space), but I do get -EINVALs now. I haven't investigated it
-though. My guess is that the hid parser fails.
+Elmasri
 
-Could you compare the sizes of the data gathered in user-space?
+
+
+On 30 January 2010 06:54, Liang Bao <tim.bao@gmail.com> wrote:
+> I am not a maintainer of bluez package but just wondering if you have
+> a panic back-trace captured?
+>
+> 2010/1/30 Ahmed Ragab <elmasri.ahmed@gmail.com>:
+>> I Forgot to mention kernel version 2.6.26 however i have the latest
+>> bluez package
+>>
+>> Please confirm this bug, Linux kernel hangs when usb bluetooth dongle
+>> is disconnected
+>> During SCO connection stream (read, write).
+>> I don't think it's a problem of the dongle however i am using dongle
+>> trust bluetooth 2 USB Adapter 100m BT-2305p
+>> which has a Cambridge silicon radio chip set 2.1
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>
