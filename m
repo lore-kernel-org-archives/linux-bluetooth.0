@@ -1,71 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Michael Poole <mdpoole@troilus.org>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: Marcel Holtmann <marcel@holtmann.org>,  Jiri Kosina <jkosina@suse.cz>,  "Gunn\, Brian" <bgunn@solekai.com>,  Ping <pinglinux@gmail.com>,  linux-kernel@vger.kernel.org,  BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 0/3] HID: make raw output callback more flexible
-References: <alpine.LNX.2.00.1001291515560.356@pobox.suse.cz>
-	<1264783166.29532.5302.camel@localhost.localdomain>
-	<87iqakifm8.fsf@troilus.org>
-	<1264860663.29532.7887.camel@localhost.localdomain>
-Date: Sat, 30 Jan 2010 22:27:42 -0500
-In-Reply-To: <1264860663.29532.7887.camel@localhost.localdomain> (Bastien
-	Nocera's message of "Sat, 30 Jan 2010 14:11:03 +0000")
-Message-ID: <87636jhs29.fsf@troilus.org>
+Date: Sat, 30 Jan 2010 07:23:46 -0800
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Daniel =?iso-8859-1?Q?=D6rstadius?= <daniel.orstadius@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Release conference call in telephony-maemo
+Message-ID: <20100130152346.GA2714@jh-x301>
+References: <eb7933e21001280719w32d2adfco89ce9b99940c968b@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <eb7933e21001280719w32d2adfco89ce9b99940c968b@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Bastien Nocera writes:
+Hi Daniel,
 
-> On Fri, 2010-01-29 at 19:46 -0500, Michael Poole wrote:
->> > [1]: Comments on the patch at
->> > http://thread.gmane.org/gmane.linux.bluez.kernel/4279 would be
->> > appreciated
->> 
->> This patch does not work for me.  Before, the first time after each
->> boot
->> that I tried to connect to an Apple Magic Mouse, it failed with -14
->> (EFAULT).  With this patch, it fails with -22 (EINVAL) instead.  The
->> -EFAULT *was* due to hidp_parse()'s copy_from_user().  I have not
->> looked
->> yet to see where the -EINVAL is coming from -- would that help?  (Both
->> with and without your patch, the second attempt to connect works.) 
->
-> I don't get -EFAULT anymore (it was failing to copy the rd_data from
-> user-space), but I do get -EINVALs now. I haven't investigated it
-> though. My guess is that the hid parser fails.
->
-> Could you compare the sizes of the data gathered in user-space?
+On Thu, Jan 28, 2010, Daniel Örstadius wrote:
+> From 83c71f16e235290146ad77ebbd4e818d0b520540 Mon Sep 17 00:00:00 2001
+> From: Daniel Orstadius <daniel.orstadius@gmail.com>
+> Date: Thu, 28 Jan 2010 17:14:40 +0200
+> Subject: [PATCH] Release conference call in telephony-maemo
+> 
+> Currently telephony-maemo only ends the first call found on
+> receiving AT+CHUP (hang up) from the headset. This patch checks
+> if the call is part of a conference call and in that case releases
+> the whole conference.
+> ---
+>  audio/telephony-maemo.c |   28 +++++++++++++++++++++++++++-
+>  1 files changed, 27 insertions(+), 1 deletions(-)
 
-It looks like something else is overwriting parts of the hidp_session
-structure; I hope to find out what that is tomorrow.  Based on a
-printk() in hidp_sock_ioctl(), user space consistently passes a 99-byte
-HID report descriptor.  I added another printk() to hidp_parse() to
-characterize things:
-  printk("hidp_parse(%p): %u@%p\n", hid, req->rd_size, req->rd_data);
+The patch has been pushed upstream (with a few minor cosmetic changes).
+Thanks!
 
-With your patch, the first time I connect to the mouse:
-[  244.109619] hidp_parse(ffff880138f90000): 0@0000002800000000
-[  244.109694] magicmouse 0005:05AC:030D.0001: magicmouse hid parse
-  failed
-[  244.109708] magicmouse: probe of 0005:05AC:030D.0001 failed with
-  error -22
-
-With your patch, the second time:
-[  258.840542] hidp_parse(ffff880134e14000): 99@ffff88008fd8f880
-[  258.841415] input: Apple Wireless Mouse as
-  /devices/pci0000:00/0000:00:1d.2/usb8/8-1/8-1:1.0/bluetooth/hci0/hci0:12/input11
-
-Without your patch, the first time:
-[  157.569000] hidp_parse(ffff8801313cc000): 11859@ffffffff811397c0
-[  157.569018] magicmouse 0005:05AC:030D.0001: magicmouse hid parse
-  failed
-[  157.569031] magicmouse: probe of 0005:05AC:030D.0001 failed with
-  error -14
-
-Without your patch, the second time:
-[  178.983956] hidp_parse(ffff88012e660000): 99@00007f40d7d44880
-[  178.984977] input: Apple Wireless Mouse as
-  /devices/pci0000:00/0000:00:1d.2/usb8/8-1/8-1:1.0/bluetooth/hci0/hci0:12/input11
-
-Michael Poole
+Johan
