@@ -1,67 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <272603.59641.qm@web52603.mail.re2.yahoo.com>
-Date: Tue, 2 Feb 2010 12:33:55 -0800 (PST)
-From: Ed Tsang <netdesign_98@yahoo.com>
-Subject: double Connect req: psm 1 scid 0x0040 ?
-To: Bluettooth Linux <linux-bluetooth@vger.kernel.org>
+Date: Tue, 2 Feb 2010 15:16:12 -0200
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: nirav rabara <niravrabara@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Kernel panic when SCO connection
+Message-ID: <20100202171612.GA7034@vigoh>
+References: <912bb79a1002020858lda468aci6fef3e73fac07bd6@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <912bb79a1002020858lda468aci6fef3e73fac07bd6@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
-  I was pulling my hair on opp a file to a Blackberry. Blackerry is set to "receive using bluetooth".
-1. If the Blackberry was not paired before. It ran through ok: enter the pin, accept connection, accept the file.
-2. If the Blackberry was paired and in it's device properties, I change the encryption off for my box. It ran through ok, accept connection, accept the file...
-3. If the Blackberry was paired and I leave the device properties unchange (default is encryption on). It will fail, not seeing any prompt to accept the connection.
+Hi Nirav,
 
-In hcidump I seem to see a problem in #3. After the Encrypt Change there seem to be 2 >con. req. psm 1 scid 0x0040
+* nirav rabara <niravrabara@gmail.com> [2010-02-02 22:28:53 +0530]:
 
-Any suggestion on how to trace it down/work around this?
-.............
+> Hi,
+> When I try to connect SCO socket, Kernel getting crash.
+> Linux kernel - 2.6.22
+> Bluez - 4.58
 
-> HCI Event: Read Remote
-Supported Features (0x0b) plen 11
-< ACL data: handle 42 flags
-0x02 dlen 10
-    L2CAP(s): Info req: type 2
-> HCI Event: Number of
-Completed Packets (0x13) plen 5
-> HCI Event: Encrypt Change
-(0x08) plen 4
-< ACL data: handle 42 flags
-0x02 dlen 12
-    L2CAP(s): Connect req: psm 1 scid 0x0040
-> ACL data: handle 42 flags
-0x02 dlen 12
-    L2CAP(s): Info rsp: type 2 result 1
-      Not supported
-< ACL data: handle 42 flags
-0x02 dlen 12
-    L2CAP(s): Connect req: psm 1 scid 0x0040
-> HCI Event: Number of
-Completed Packets (0x13) plen 5
-> HCI Event: Number of
-Completed Packets (0x13) plen 5
-> ACL data: handle 42 flags
-0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0040 scid
-0x0040 result 0 status 0
-      Connection successful
-< ACL data: handle 42 flags
-0x02 dlen 12
-    L2CAP(s): Config req: dcid 0x0040 flags
-0x00 clen 0
-> ACL data: handle 42 flags
-0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0041 scid
-0x0040 result 4 status 0
-      Connection refused - no resources
-available
-.................
-Regards, Ed
+Please try a 2.6.33 kernel and tell us if the bug still happens.
 
+> 
+> error message,
+> __tx_submit:hci0 tx submit failed urb c0552c14 type 3 err -19
+> 
+> sometimes in connection is showing error while connection as below,
+> hci_acldata_packet:hci0 ACL packet data for unknown connection handler 2
+> 
+> It would be really appreciable if  somebody put some on light on this
+> issue, OR suggest me any patch or documentation.
+> 
+> -- 
+> With Regards,
+> Nirav Rabara
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
+-- 
+Gustavo F. Padovan
+http://padovan.org
 
-      __________________________________________________________________
-Get a sneak peak at messages with a handy reading pane with All new Yahoo! Mail: http://ca.promos.yahoo.com/newmail/overview2/
+ProFUSION embedded systems - http://profusion.mobi
