@@ -1,48 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 2 Feb 2010 15:16:12 -0200
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: nirav rabara <niravrabara@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Kernel panic when SCO connection
-Message-ID: <20100202171612.GA7034@vigoh>
-References: <912bb79a1002020858lda468aci6fef3e73fac07bd6@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <912bb79a1002020858lda468aci6fef3e73fac07bd6@mail.gmail.com>
+In-Reply-To: <1264776266-7646-1-git-send-email-jprvita@gmail.com>
+References: <1264776266-7646-1-git-send-email-jprvita@gmail.com>
+Date: Tue, 2 Feb 2010 09:03:57 -0800
+Message-ID: <2d5a2c101002020903p19f78ddbxef5aaf6bb6096433@mail.gmail.com>
+Subject: Re: [RFC] [PATCH 0/2] HFP AG integration with PulseAudio
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: =?ISO-8859-1?Q?Jo=E3o_Paulo_Rechi_Vita?= <jprvita@gmail.com>
+Cc: pulseaudio-discuss@mail.0pointer.de,
+	Gustavo Padovan <padovan@profusion.mobi>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Zheng Huan <huan.zheng@intel.com>,
+	Lennart Poettering <lennart@poettering.net>, ofono@ofono.org,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nirav,
+Hi,
 
-* nirav rabara <niravrabara@gmail.com> [2010-02-02 22:28:53 +0530]:
+2010/1/29 João Paulo Rechi Vita <jprvita@gmail.com>:
+> Hi all,
+>
+> I'm trying to add support for the Handsfree Gateway role Gustavo just added
+> to BlueZ and oFono. The BlueZ patches can be found on [1] and [2] and the
+> oFono part was just merged upstream.
+>
+> But when it comes to integrate them with Pulse, I'm getting a POLLHUP when
+> trying to write on the fd. Also, it seems different gateways have different
+> behaviours regarding when they connect the SCO link. Some phone connect
+> them just after the RFCOMM link (some Nokia phones), when there is no call
+> going on yet, and others just when a call is started (Android 1.5).
+>
+> Also, right now the same property (State) is beeing used to refer when the
+> RFCOOM link is established (State=Connected) and when the SCO link is
+> established (State=Playing). Shouldn't this be handled by separate props?
+>
+> And last but not least, is the new Media API intended to handle the audio
+> part of handsfree gateways too? If so, maybe we should use all this work
+> as a prototype for latter integration with the new API.
 
-> Hi,
-> When I try to connect SCO socket, Kernel getting crash.
-> Linux kernel - 2.6.22
-> Bluez - 4.58
+Yep, Media API is supposed to handle this, that why I asked them to be
+though in an integrated manner maybe being registered in the same
+interface (although hfp is not really media only), anyway basically we
+should have pa acting as a2dp source/sink and/or hfp gateway/headset
+endpoint handling the audio. So in essence ofono is acting as a
+controller/target in a very similar way as avrcp does for a2dp,
+although for avrcp we don't really need an agent as we use uinput.
 
-Please try a 2.6.33 kernel and tell us if the bug still happens.
+> Any help on testing and getting this working together or comments on the
+> topic would be appreciated.
 
-> 
-> error message,
-> __tx_submit:hci0 tx submit failed urb c0552c14 type 3 err -19
-> 
-> sometimes in connection is showing error while connection as below,
-> hci_acldata_packet:hci0 ACL packet data for unknown connection handler 2
-> 
-> It would be really appreciable if  somebody put some on light on this
-> issue, OR suggest me any patch or documentation.
-> 
-> -- 
-> With Regards,
-> Nirav Rabara
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+There is already some code in my git tree:
+http://gitorious.org/~vudentz/bluez/vudentzs-clone/commits/for-upstream
 
 -- 
-Gustavo F. Padovan
-http://padovan.org
-
-ProFUSION embedded systems - http://profusion.mobi
+Luiz Augusto von Dentz
+Engenheiro de Computação
