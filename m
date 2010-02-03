@@ -1,67 +1,135 @@
 Return-Path: <cyrus@holtmann.org>
-From: Nick Pelly <npelly@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Nick Pelly <npelly@google.com>
-Subject: [PATCH] Bluetooth: Do not call rfcomm_session_put() due to RFCOMM UA on closed socket.
-Date: Wed,  3 Feb 2010 16:18:36 -0800
-Message-Id: <1265242716-68978-1-git-send-email-npelly@google.com>
+MIME-Version: 1.0
+Date: Thu, 4 Feb 2010 00:09:36 +0300
+Message-ID: <24cc6d3e1002031309u3e867b46y5eaa5d79e9f72a47@mail.gmail.com>
+Subject: 
+From: =?KOI8-R?B?4czFy9PFyiDz1czJzg==?= <sulinalex@gmail.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Processing a RFCOMM UA frame when the socket is closed and we were not the
-RFCOMM initiator would cause rfcomm_session_put() to be called twice during
-rfcomm_process_rx(). This would cause a kernel panic in rfcomm_session_close.
+Hello! My bluetooth headset IQUA BHS-333 work only on kernel 2.6.24.
+On all newer
+does not work. Tried last kernel from git blietooth-test, it also does not
+work.
 
-This could be easily reproduced during disconnect with devices such as
-Motorola H270 that send RFCOMM UA followed quickly by L2CAP disconnect request.
-This hcidump for this looks like:
+nilus@HoMe /usr/src/linux-2.6.24-gentoo-r8 $ cat .config | grep BT
+CONFIG_BT=y
+CONFIG_BT_L2CAP=m
+CONFIG_BT_SCO=m
+CONFIG_BT_RFCOMM=m
+CONFIG_BT_RFCOMM_TTY=y
+CONFIG_BT_BNEP=m
+CONFIG_BT_BNEP_MC_FILTER=y
+CONFIG_BT_BNEP_PROTO_FILTER=y
+CONFIG_BT_HIDP=m
+CONFIG_BT_HCIUSB=m
+CONFIG_BT_HCIUSB_SCO=y
+CONFIG_BT_HCIUART=m
+CONFIG_BT_HCIUART_H4=y
+CONFIG_BT_HCIUART_BCSP=y
+CONFIG_BT_HCIUART_LL=y
+CONFIG_BT_HCIBCM203X=m
+CONFIG_BT_HCIBPA10X=m
+CONFIG_BT_HCIBFUSB=m
+CONFIG_BT_HCIDTL1=m
+CONFIG_BT_HCIBT3C=m
+CONFIG_BT_HCIBLUECARD=m
+CONFIG_BT_HCIBTUART=m
+CONFIG_BT_HCIVHCI=m
+CONFIG_MAC_EMUMOUSEBTN=y
 
-2009-09-21 17:22:37.788895 < ACL data: handle 1 flags 0x02 dlen 8
-   L2CAP(d): cid 0x0041 len 4 [psm 3]
-     RFCOMM(s): DISC: cr 0 dlci 20 pf 1 ilen 0 fcs 0x7d
-2009-09-21 17:22:37.906204 > HCI Event: Number of Completed Packets (0x13)
-plen 5
-   handle 1 packets 1
-2009-09-21 17:22:37.933090 > ACL data: handle 1 flags 0x02 dlen 8
-   L2CAP(d): cid 0x0040 len 4 [psm 3]
-     RFCOMM(s): UA: cr 0 dlci 20 pf 1 ilen 0 fcs 0x57
-2009-09-21 17:22:38.636764 < ACL data: handle 1 flags 0x02 dlen 8
-   L2CAP(d): cid 0x0041 len 4 [psm 3]
-     RFCOMM(s): DISC: cr 0 dlci 0 pf 1 ilen 0 fcs 0x9c
-2009-09-21 17:22:38.744125 > HCI Event: Number of Completed Packets (0x13)
-plen 5
-   handle 1 packets 1
-2009-09-21 17:22:38.763687 > ACL data: handle 1 flags 0x02 dlen 8
-   L2CAP(d): cid 0x0040 len 4 [psm 3]
-     RFCOMM(s): UA: cr 0 dlci 0 pf 1 ilen 0 fcs 0xb6
-2009-09-21 17:22:38.783554 > ACL data: handle 1 flags 0x02 dlen 12
-   L2CAP(s): Disconn req: dcid 0x0040 scid 0x0041
 
-Avoid calling rfcomm_session_put() twice by skipping this call
-in rfcomm_recv_ua() if the socket is closed.
+Now installed gentoo-kernel-2.6.31
+net-wireless/bluez-4.39-r2
+media-sound/pulseaudio-0.9.19
 
-Signed-off-by: Nick Pelly <npelly@google.com>
----
- net/bluetooth/rfcomm/core.c |    6 +++++-
- 1 files changed, 5 insertions(+), 1 deletions(-)
+The headset is connected, I hear the hiss, but the sound is not heard.
+Microphone does not work too.
 
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index 25692bc..950d95c 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -1148,7 +1148,11 @@ static int rfcomm_recv_ua(struct rfcomm_session *s, u8 dlci)
- 			break;
- 
- 		case BT_DISCONN:
--			rfcomm_session_put(s);
-+			/* When socket is closed and we are not RFCOMM
-+			 * initiator rfcomm_process_rx already calls
-+			 * rfcomm_session_put() */
-+			if (s->sock->sk->sk_state != BT_CLOSED)
-+				rfcomm_session_put(s);
- 			break;
- 		}
- 	}
--- 
-1.6.5.3
+# cat /usr/src/linux-2.6.31-gentoo-r6/.config | grep BT
+CONFIG_BT=y
+CONFIG_BT_L2CAP=m
+CONFIG_BT_SCO=m
+CONFIG_BT_RFCOMM=m
+CONFIG_BT_RFCOMM_TTY=y
+CONFIG_BT_BNEP=m
+CONFIG_BT_BNEP_MC_FILTER=y
+CONFIG_BT_BNEP_PROTO_FILTER=y
+CONFIG_BT_HIDP=m
+CONFIG_BT_HCIBTUSB=m
+CONFIG_BT_HCIUART=m
+CONFIG_BT_HCIUART_H4=y
+CONFIG_BT_HCIUART_BCSP=y
+CONFIG_BT_HCIUART_LL=y
+CONFIG_BT_HCIBCM203X=m
+CONFIG_BT_HCIBPA10X=m
+CONFIG_BT_HCIBFUSB=m
+CONFIG_BT_HCIDTL1=m
+CONFIG_BT_HCIBT3C=m
+CONFIG_BT_HCIBLUECARD=m
+CONFIG_BT_HCIBTUART=m
+CONFIG_BT_HCIVHCI=m
+# CONFIG_TABLET_USB_KBTAB is not set
+# CONFIG_INPUT_WISTRON_BTNS is not set
+# CONFIG_INPUT_ATLAS_BTNS is not set
+# CONFIG_VIDEO_BT848 is not set
+# CONFIG_SND_BT87X is not set
+# CONFIG_BTRFS_FS is not set
 
+
+$ sudo tailf /var/log/messages
+
+Feb 3 22:52:16 Geenna pulseaudio[3996]: ratelimit.c: 136 events suppressed
+Feb 3 22:52:21 Geenna pulseaudio[3996]: ratelimit.c: 127 events suppressed
+Feb 3 22:52:25 Geenna bluetoothd[4081]: Disconnected from
+00:15:BE:2A:71:81, /org/bluez/4081/hci0/dev_00_15_BE_2A_71_81
+Feb 3 22:52:26 Geenna pulseaudio[3996]: ratelimit.c: 99 events suppressed
+Feb 3 22:52:31 Geenna pulseaudio[3996]: ratelimit.c: 91 events suppressed
+Feb 3 22:52:36 Geenna pulseaudio[3996]: ratelimit.c: 24 events suppressed
+Feb 3 22:52:41 Geenna pulseaudio[3996]: ratelimit.c: 25 events suppressed
+Feb 3 22:52:44 Geenna bluetoothd[4081]: link_key_request
+(sba=00:0A:94:02:D2:E0, dba=00:15:BE:2A:71:81)
+Feb 3 22:52:46 Geenna pulseaudio[3996]: ratelimit.c: 48 events suppressed
+Feb 3 22:52:47 Geenna kernel: [18995.307339] btusb_isoc_complete: hci0
+corrupted SCO packet
+Feb 3 22:52:47 Geenna kernel: [18995.307378] hci_scodata_packet: hci0
+SCO packet for unknown connection handle 0
+Feb 3 22:52:47 Geenna kernel: [18995.307384] hci_scodata_packet: hci0
+SCO packet for unknown connection handle 0
+Feb 3 22:52:47 Geenna kernel: [18995.307389] hci_scodata_packet: hci0
+SCO packet for unknown connection handle 0
+Feb 3 22:52:47 Geenna kernel: [18995.307394] hci_scodata_packet: hci0
+SCO packet for unknown connection handle 0
+Feb 3 22:52:47 Geenna kernel: [18995.307398] hci_scodata_packet: hci0
+SCO packet for unknown connection handle 0
+Feb 3 22:52:51 Geenna pulseaudio[3996]: ratelimit.c: 52 events suppressed
+Feb 3 22:52:52 Geenna kernel: [19000.347654] hci_scodata_packet: hci0
+SCO packet for unknown connection handle 43
+Feb 3 22:52:52 Geenna kernel: [19000.347664] hci_scodata_packet: hci0
+SCO packet for unknown connection handle 43
+Feb 3 22:52:52 Geenna kernel: [19000.347669] hci_scodata_packet: hci0
+SCO packet for unknown connection handle 43
+Feb 3 22:52:52 Geenna bluetoothd[4081]: No matching connection found
+for handle 43
+Feb 3 22:52:56 Geenna pulseaudio[3996]: ratelimit.c: 22 events suppressed
+Feb 3 22:53:01 Geenna pulseaudio[3996]: ratelimit.c: 24 events suppressed
+Feb 3 22:53:06 Geenna pulseaudio[3996]: ratelimit.c: 26 events suppressed
+Feb 3 22:53:12 Geenna pulseaudio[3996]: ratelimit.c: 19 events suppressed
+Feb 3 22:53:17 Geenna pulseaudio[3996]: ratelimit.c: 42 events suppressed
+Feb 3 22:53:22 Geenna pulseaudio[3996]: ratelimit.c: 40 events suppressed
+Feb 3 22:53:27 Geenna pulseaudio[3996]: ratelimit.c: 26 events suppressed
+Feb 3 22:53:32 Geenna pulseaudio[3996]: ratelimit.c: 36 events suppressed
+Feb 3 22:53:37 Geenna pulseaudio[3996]: ratelimit.c: 30 events suppressed
+Feb 3 22:53:42 Geenna pulseaudio[3996]: ratelimit.c: 40 events suppressed
+Feb 3 22:53:47 Geenna pulseaudio[3996]: ratelimit.c: 38 events suppressed
+Feb 3 22:53:52 Geenna pulseaudio[3996]: ratelimit.c: 68 events suppressed
+Feb 3 22:53:57 Geenna pulseaudio[3996]: ratelimit.c: 44 events suppressed
+Feb 3 22:54:02 Geenna bluetoothd[4081]: Disconnected from
+00:15:BE:2A:71:81, /org/bluez/4081/hci0/dev_00_15_BE_2A_71_81
+Feb 3 22:54:02 Geenna bluetoothd[4081]: No matching connection found
+for handle 43
+
+
+What other logs need to send?
