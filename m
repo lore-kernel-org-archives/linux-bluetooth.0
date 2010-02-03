@@ -3,8 +3,8 @@ From: Nick Pelly <npelly@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Nick Pelly <npelly@google.com>
 Subject: [PATCH] Set OPUSH SDP record supported format list to 0xff (any object type).
-Date: Wed,  3 Feb 2010 11:21:27 -0800
-Message-Id: <1265224887-48653-1-git-send-email-npelly@google.com>
+Date: Wed,  3 Feb 2010 11:15:06 -0800
+Message-Id: <1265224506-48518-1-git-send-email-npelly@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -25,6 +25,8 @@ For reference:
 0x05 = vNote
 0x06 = vMessage
 0xFF = any type of object.
+
+Signed-off-by: Nick Pelly <npelly@google.com>
 ---
  tools/sdptool.c |    3 +--
  1 files changed, 1 insertions(+), 2 deletions(-)
