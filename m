@@ -1,29 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 1/1] Bluetooth:L2CAP check FEAT success
+Subject: Re: double Connect req: psm 1 scid 0x0040 ?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Liejun Tao <liejuntao001@gmail.com>
+To: Ed Tsang <netdesign_98@yahoo.com>
 Cc: Bluettooth Linux <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <8a7a8d7b1002021350o3c80c7d9p948365ea983a0d89@mail.gmail.com>
-References: <8a7a8d7b1002021350o3c80c7d9p948365ea983a0d89@mail.gmail.com>
+In-Reply-To: <90704.85857.qm@web52601.mail.re2.yahoo.com>
+References: <272603.59641.qm@web52603.mail.re2.yahoo.com>
+	 <1265156906.31341.106.camel@localhost.localdomain>
+	 <90704.85857.qm@web52601.mail.re2.yahoo.com>
 Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 03 Feb 2010 07:22:27 -0800
-Message-ID: <1265210547.31341.118.camel@localhost.localdomain>
+Date: Wed, 03 Feb 2010 07:07:53 -0800
+Message-ID: <1265209673.31341.116.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Liejun,
+Hi Ed,
 
-> Resolve the connection issue with Blackbery 8900, if encryption is ON.
-> If encryption turned on indication comes when L2CAP is in "Information
-> Request" process, there will be 2 l2cap_conn_req, and one is denied
-> from remote, cause the connection dropped.
-> This patch applies to kernel version 2.6.29. 2.6.32 should have same issue.
-> Please review.
+> >> In hcidump I seem to see a problem in #3. After the Encrypt Change there seem to be 2 >con. req. psm 1 scid 0x0040
+> 
+> >what kernel version is this? I think we fixed that already.
+> It is a ubutunu distribution. 2.6.31-17-generic.
 
-I might have an idea what is going here. Can you send me the whole
-hcidump -X -V from the Create Connection to the Connection Refused
-without having it mangled via your mailer.
+can you test with a 2.6.33-rc6 vanilla kernel. I really thing this got
+fixed and you might see a side effect or bad patch here.
 
 Regards
 
