@@ -1,71 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Long delay to (re)connect a bluetooth mouse
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Daniel T. Cobra" <dcobra@videam.com.br>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <4B69898E.1070001@videam.com.br>
-References: <1260906227.4b27e6f39cc7c@www.fastmail.com.br>
-	 <4B2A4B90.1040009@videam.com.br>	<4B2BBF58.4030901@videam.com.br>
-	 <1261173899.4041.96.camel@localhost.localdomain>
-	 <1261176544.4b2c06e0e0eae@www.fastmail.com.br>
-	 <1261177111.4041.99.camel@localhost.localdomain>
-	 <20091223164841.7070e75d@strolchi.home.s3e.de>
-	 <4B325905.6090103@videam.com.br>
-	 <20091229160135.12d85fe6@strolchi.home.s3e.de>
-	 <4B423816.4060405@videam.com.br>
-	 <20100105115152.506eb191@strolchi.home.s3e.de>
-	 <4B6961A4.5040503@videam.com.br>
-	 <1265206358.31341.109.camel@localhost.localdomain>
-	 <4B69898E.1070001@videam.com.br>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 03 Feb 2010 06:37:57 -0800
-Message-ID: <1265207877.31341.115.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 3 Feb 2010 15:37:06 +0100 (CET)
+From: Jiri Kosina <jkosina@suse.cz>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Bastien Nocera <hadess@hadess.net>,
+	Michael Poole <mdpoole@troilus.org>,
+	"Gunn, Brian" <bgunn@solekai.com>, Ping <pinglinux@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 1/3] HID: make raw reports possible for both feature and
+ output reports
+In-Reply-To: <1265206478.31341.111.camel@localhost.localdomain>
+Message-ID: <alpine.LNX.2.00.1002031536220.15395@pobox.suse.cz>
+References: <alpine.LNX.2.00.1001291515560.356@pobox.suse.cz>  <1264783166.29532.5302.camel@localhost.localdomain>  <87iqakifm8.fsf@troilus.org>  <1264860663.29532.7887.camel@localhost.localdomain>  <87bpg7glf7.fsf@troilus.org>  <1265190440.32444.8417.camel@localhost.localdomain>
+  <alpine.LNX.2.00.1002031202040.15395@pobox.suse.cz>  <alpine.LNX.2.00.1002031343500.15395@pobox.suse.cz>  <alpine.LNX.2.00.1002031348450.15395@pobox.suse.cz> <1265206478.31341.111.camel@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Daniel,
+On Wed, 3 Feb 2010, Marcel Holtmann wrote:
 
-> Great! It is starting to make sense. Next, let me ask two questions:
+> > In commit 2da31939a42 ("Bluetooth: Implement raw output support for HIDP
+> > layer"), support for Bluetooth hid_output_raw_report was added, but it
+> > pushes the data to the intr socket instead of the ctrl one. This has been
+> > fixed by 6bf8268f9a91f1 ("Bluetooth: Use the control channel for raw HID reports")
+> > 
+> > Still, it is necessary to distinguish whether the report in question should be
+> > either FEATURE or OUTPUT. For this, we have to extend the generic HID API,
+> > so that hid_output_raw_report() callback provides means to specify this
+> > value so that it can be passed down to lower level hardware drivers (currently
+> > Bluetooth and USB).
+> > 
+> > Based on original patch by Bastien Nocera <hadess@hadess.net>
+> > Signed-off-by: Jiri Kosina <jkosina@suse.cz>
+> > ---
+> >  drivers/hid/hidraw.c          |    2 +-
+> >  drivers/hid/usbhid/hid-core.c |    5 +++--
+> >  include/linux/hid.h           |    2 +-
+> >  net/bluetooth/hidp/core.c     |   13 ++++++++++---
+> >  4 files changed, 15 insertions(+), 7 deletions(-)
 > 
-> 1) You say the information request is needed, but do you mean it is 
-> needed at every reconnection with the device or, as Stefan suggested, 
-> would it make sense to request it only when the connection is first 
-> established and cache the result?
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+>  
+> > -static int hidp_output_raw_report(struct hid_device *hid, unsigned char *data, size_t count)
+> > +static int hidp_output_raw_report(struct hid_device *hid, unsigned char *data, size_t count,
+> > +		unsigned char report_type)
+> >  {
+> > -	if (hidp_send_ctrl_message(hid->driver_data,
+> > -			HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_FEATURE,
+> > +	if (report_type == HID_FEATURE_REPORT)
+> > +		report_type = HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_FEATURE;
+> > +	else if (report_type == HID_OUTPUT_REPORT)
+> > +		report_type = HIDP_TRANS_DATA | HIDP_DATA_RTYPE_OUPUT;
+> > +	else
+> > +		return -EINVAL;
 > 
-> 2) Is there a way to know that the device does not support extended 
-> features, to avoid sending a request that is going to time out without a 
-> reply? In net/bluetooth/hci_event.c I found this:
-> 
-> 1171                if (conn->state == BT_CONFIG) {
-> 1172                        if (!ev->status && lmp_ssp_capable(hdev) &&
-> 1173                                                lmp_ssp_capable(conn)) {
-> 1174                                struct 
-> hci_cp_read_remote_ext_features cp;
-> 1175                                cp.handle = ev->handle;
-> 1176                                cp.page = 0x01;
-> 1177                                hci_send_cmd(hdev,
-> 1178                                        HCI_OP_READ_REMOTE_EXT_FEATURES,
-> 1179                                                        sizeof(cp), 
-> &cp);
-> 1180                        } else {
-> 1181                                conn->state = BT_CONNECTED;
-> 1182                                hci_proto_connect_cfm(conn, ev->status);
-> 1183                                hci_conn_put(conn);
-> 1184                        }
-> 1185                }
-> 
-> Is this the right place to look? It seems SSP capability is used as a 
-> test for whether to read the device's extended features. Is this really 
-> the best way, or could there be a more suitable indicator of whether the 
-> device supports extended features, thus avoiding the timeout?
+> If you wanna be a little bit more readable, then using a switch
+> statement helps instead of else if. Just my 2 cents.
 
-that is the wrong place. You need to look into net/bluetooth/l2cap.c.
-The LMP features are mandatory at all costs. Otherwise hell breaks loose
-if you don't do the right.
+I have converted this to switch, added your Acked-by and queued in my 
+tree.
 
-Regards
+Thanks Marcel.
 
-Marcel
-
-
+-- 
+Jiri Kosina
+SUSE Labs, Novell Inc.
