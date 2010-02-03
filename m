@@ -1,860 +1,379 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: ofono@ofono.org
-Subject: [PATCH] Implement HandsfreeGateway Interface
-Date: Wed,  3 Feb 2010 16:26:39 -0200
-Message-Id: <1265221599-17565-1-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1265150872-26759-1-git-send-email-padovan@profusion.mobi>
-References: <1265150872-26759-1-git-send-email-padovan@profusion.mobi>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1265210547.31341.118.camel@localhost.localdomain>
+References: <8a7a8d7b1002021350o3c80c7d9p948365ea983a0d89@mail.gmail.com>
+	 <1265210547.31341.118.camel@localhost.localdomain>
+Date: Wed, 3 Feb 2010 12:13:40 -0600
+Message-ID: <8a7a8d7b1002031013n3203cb23h93d07a4f15d0304f@mail.gmail.com>
+Subject: Re: [PATCH 1/1] Bluetooth:L2CAP check FEAT success
+From: Liejun Tao <liejuntao001@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Bluettooth Linux <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Create a interface where a Handsfree agent can register and use BlueZ to
-handle the rfcomm and sco links.
+Hi Marcel,
 
-Many thanks to Zhenhua Zhang <zhenhua.zhang@intel.com> for his
-prototype on this code.
----
- audio/device.c  |    3 +
- audio/gateway.c |  417 ++++++++++++++++++++++++++++++++++++++++++-------------
- audio/gateway.h |   13 ++-
- audio/manager.c |   22 +--
- audio/unix.c    |    8 +
- doc/hfp-api.txt |   82 +++++++++++
- 6 files changed, 433 insertions(+), 112 deletions(-)
- create mode 100644 doc/hfp-api.txt
+> Hi Liejun,
+>
+> I might have an idea what is going here. Can you send me the whole
+> hcidump -X -V from the Create Connection to the Connection Refused
+> without having it mangled via your mailer.
+>
+> Regards
+>
+> Marcel
 
-diff --git a/audio/device.c b/audio/device.c
-index f7141e5..b8ea927 100644
---- a/audio/device.c
-+++ b/audio/device.c
-@@ -663,6 +663,9 @@ void audio_device_unregister(struct audio_device *device)
- 	if (device->headset)
- 		headset_unregister(device);
- 
-+	if (device->gateway)
-+		gateway_unregister(device);
-+
- 	if (device->sink)
- 		sink_unregister(device);
- 
-diff --git a/audio/gateway.c b/audio/gateway.c
-index 3dc09ff..cc32450 100644
---- a/audio/gateway.c
-+++ b/audio/gateway.c
-@@ -5,6 +5,8 @@
-  *  Copyright (C) 2006-2010  Nokia Corporation
-  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-  *  Copyright (C) 2008-2009  Leonid Movshovich <event.riga@gmail.org>
-+ *  Copyright (C) 2009-2010  Zhenhua Zhang <zhenhua.zhang@intel.com>
-+ *  Copyright (C) 2010  Gustavo F. Padovan <padovan@profusion.mobi>
-  *
-  *
-  *  This program is free software; you can redistribute it and/or modify
-@@ -52,20 +54,99 @@
- #include "btio.h"
- #include "dbus-common.h"
- 
--#define RFCOMM_BUF_SIZE 256
-+#ifndef DBUS_TYPE_UNIX_FD
-+#define DBUS_TYPE_UNIX_FD -1
-+#endif
-+
-+struct hf_agent {
-+	char *name;	/* Bus id */
-+	char *path;	/* D-Bus path */
-+	guint watch;	/* Disconnect watch */
-+};
- 
- struct gateway {
- 	gateway_state_t state;
- 	GIOChannel *rfcomm;
--	guint rfcomm_watch_id;
- 	GIOChannel *sco;
- 	gateway_stream_cb_t sco_start_cb;
- 	void *sco_start_cb_data;
--	DBusMessage *connect_message;
-+	struct hf_agent *agent;
-+	DBusMessage *msg;
- };
- 
- int gateway_close(struct audio_device *device);
- 
-+static const char *state2str(gateway_state_t state)
-+{
-+	switch (state) {
-+	case GATEWAY_STATE_DISCONNECTED:
-+		return "disconnected";
-+	case GATEWAY_STATE_CONNECTING:
-+		return "connecting";
-+	case GATEWAY_STATE_CONNECTED:
-+		return "connected";
-+	case GATEWAY_STATE_PLAYING:
-+		return "playing";
-+	default:
-+		return "";
-+	}
-+}
-+
-+static void agent_free(struct hf_agent *agent)
-+{
-+	if (!agent)
-+		return;
-+
-+	g_free(agent->name);
-+	g_free(agent->path);
-+	g_free(agent);
-+}
-+
-+static void change_state(struct audio_device *dev, gateway_state_t new_state)
-+{
-+	struct gateway *gw = dev->gateway;
-+	const char *val = state2str(new_state);
-+
-+	gw->state = new_state;
-+
-+	emit_property_changed(dev->conn, dev->path,
-+			AUDIO_GATEWAY_INTERFACE, "State",
-+			DBUS_TYPE_STRING, &val);
-+}
-+
-+static void agent_disconnect(struct audio_device *dev, struct hf_agent *agent)
-+{
-+	DBusMessage *msg;
-+
-+	msg = dbus_message_new_method_call(agent->name, agent->path,
-+			"org.bluez.HandsfreeAgent", "Release");
-+
-+	dbus_message_set_no_reply(msg, TRUE);
-+	g_dbus_send_message(dev->conn, msg);
-+}
-+
-+static gboolean agent_sendfd(struct hf_agent *agent, int fd,
-+		DBusPendingCallNotifyFunction notify, void *data)
-+{
-+	struct audio_device *dev = data;
-+	DBusMessage *msg;
-+	DBusPendingCall *call;
-+
-+	msg = dbus_message_new_method_call(agent->name, agent->path,
-+			"org.bluez.HandsfreeAgent", "NewConnection");
-+
-+	dbus_message_append_args(msg, DBUS_TYPE_UNIX_FD, &fd,
-+					DBUS_TYPE_INVALID);
-+
-+	if (dbus_connection_send_with_reply(dev->conn, msg, &call, -1) == FALSE)
-+		return FALSE;
-+
-+	dbus_pending_call_set_notify(call, notify, dev, NULL);
-+	dbus_pending_call_unref(call);
-+
-+	return TRUE;
-+}
-+
- static gboolean sco_io_cb(GIOChannel *chan, GIOCondition cond,
- 			struct audio_device *dev)
- {
-@@ -79,6 +160,7 @@ static gboolean sco_io_cb(GIOChannel *chan, GIOCondition cond,
- 		g_io_channel_shutdown(gw->sco, TRUE, NULL);
- 		g_io_channel_unref(gw->sco);
- 		gw->sco = NULL;
-+		change_state(dev, GATEWAY_STATE_CONNECTED);
- 		return FALSE;
- 	}
- 
-@@ -92,64 +174,97 @@ static void sco_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
- 
- 	debug("at the begin of sco_connect_cb() in gateway.c");
- 
-+	gw->sco = g_io_channel_ref(chan);
-+
- 	if (err) {
- 		error("sco_connect_cb(): %s", err->message);
--		/* not sure, but from other point of view,
--		 * what is the reason to have headset which
--		 * cannot play audio? */
--		if (gw->sco_start_cb)
--			gw->sco_start_cb(NULL, gw->sco_start_cb_data);
- 		gateway_close(dev);
- 		return;
- 	}
- 
--	gw->sco = g_io_channel_ref(chan);
- 	if (gw->sco_start_cb)
- 		gw->sco_start_cb(dev, gw->sco_start_cb_data);
- 
--	/* why is this here? */
--	fcntl(g_io_channel_unix_get_fd(chan), F_SETFL, 0);
- 	g_io_add_watch(gw->sco, G_IO_ERR | G_IO_HUP | G_IO_NVAL,
- 				(GIOFunc) sco_io_cb, dev);
- }
- 
-+static void newconnection_reply(DBusPendingCall *call, void *data)
-+{
-+	struct audio_device *dev = data;
-+	DBusMessage *reply = dbus_pending_call_steal_reply(call);
-+	DBusError derr;
-+
-+	if (!dev->gateway->rfcomm) {
-+		debug("RFCOMM disconnected from server before agent reply");
-+		goto done;
-+	}
-+
-+	dbus_error_init(&derr);
-+	if (!dbus_set_error_from_message(&derr, reply)) {
-+		debug("Agent reply: file descriptor passed successfuly");
-+		change_state(dev, GATEWAY_STATE_CONNECTED);
-+		goto done;
-+	}
-+
-+	debug("Agent reply: %s", derr.message);
-+
-+	dbus_error_free(&derr);
-+	gateway_close(dev);
-+
-+done:
-+	dbus_message_unref(reply);
-+}
-+
- static void rfcomm_connect_cb(GIOChannel *chan, GError *err,
- 				gpointer user_data)
- {
- 	struct audio_device *dev = user_data;
- 	struct gateway *gw = dev->gateway;
--	gchar gw_addr[18];
--	GIOFlags flags;
-+	DBusMessage *reply;
-+	int sk;
- 
- 	if (err) {
- 		error("connect(): %s", err->message);
- 		if (gw->sco_start_cb)
- 			gw->sco_start_cb(NULL, gw->sco_start_cb_data);
--		return;
-+		goto fail;
- 	}
- 
--	ba2str(&dev->dst, gw_addr);
--	/* Blocking mode should be default, but just in case: */
--	flags = g_io_channel_get_flags(chan);
--	flags &= ~G_IO_FLAG_NONBLOCK;
--	flags &= G_IO_FLAG_MASK;
--	g_io_channel_set_flags(chan, flags, NULL);
--	g_io_channel_set_encoding(chan, NULL, NULL);
--	g_io_channel_set_buffered(chan, FALSE);
--	if (!gw->rfcomm)
--		gw->rfcomm = g_io_channel_ref(chan);
-+	if (!gw->agent)
-+		error("Handfree Agent not registered");
- 
--	if (NULL != gw->sco_start_cb)
--		gw->sco_start_cb(NULL, gw->sco_start_cb_data);
-+	sk = g_io_channel_unix_get_fd(chan);
- 
--	gateway_close(dev);
-+	gw->rfcomm = g_io_channel_ref(chan);
-+
-+	if (!agent_sendfd(gw->agent, sk, newconnection_reply, dev))
-+		reply = g_dbus_create_error(gw->msg, ERROR_INTERFACE ".Failed",
-+					"Can not pass file descriptor");
-+	else
-+		reply = dbus_message_new_method_return(gw->msg);
-+
-+	g_dbus_send_message(dev->conn, reply);
-+	dbus_message_unref(gw->msg);
-+
-+	return;
-+
-+fail:
-+	if (gw->msg) {
-+		error_common_reply(dev->conn, gw->msg,
-+						ERROR_INTERFACE ".Failed",
-+						"Connection attempt failed");
-+		dbus_message_unref(gw->msg);
-+	}
-+
-+	change_state(dev, GATEWAY_STATE_DISCONNECTED);
- }
- 
- static void get_record_cb(sdp_list_t *recs, int perr, gpointer user_data)
- {
- 	struct audio_device *dev = user_data;
--	DBusMessage *msg = dev->gateway->connect_message;
--	int ch = -1;
-+	struct gateway *gw = dev->gateway;
-+	int ch;
- 	sdp_list_t *protos, *classes;
- 	uuid_t uuid;
- 	gateway_stream_cb_t sco_cb;
-@@ -182,8 +297,6 @@ static void get_record_cb(sdp_list_t *recs, int perr, gpointer user_data)
- 
- 	if (!sdp_uuid128_to_uuid(&uuid) || uuid.type != SDP_UUID16 ||
- 			uuid.value.uuid16 != HANDSFREE_AGW_SVCLASS_ID) {
--		sdp_list_foreach(protos, (sdp_list_func_t) sdp_list_free,
--									NULL);
- 		sdp_list_free(protos, NULL);
- 		error("Invalid service record or not HFP");
- 		goto fail;
-@@ -204,25 +317,26 @@ static void get_record_cb(sdp_list_t *recs, int perr, gpointer user_data)
- 				BT_IO_OPT_INVALID);
- 	if (!io) {
- 		error("Unable to connect: %s", err->message);
--		if (msg) {
--			error_common_reply(dev->conn, msg, ERROR_INTERFACE
--						".ConnectionAttemptFailed",
--						err->message);
--			msg = NULL;
--		}
--		g_error_free(err);
-+		if (err)
-+			g_error_free(err);
- 		gateway_close(dev);
-+		goto fail;
- 	}
- 
- 	g_io_channel_unref(io);
-+
-+	change_state(dev, GATEWAY_STATE_CONNECTING);
- 	return;
- 
- fail:
--	if (msg)
--		error_common_reply(dev->conn, msg, ERROR_INTERFACE
--					".NotSupported", "Not supported");
-+	if (gw->msg) {
-+		error_common_reply(dev->conn, gw->msg,
-+					ERROR_INTERFACE ".NotSupported",
-+					"Not supported");
-+		dbus_message_unref(gw->msg);
-+	}
- 
--	dev->gateway->connect_message = NULL;
-+	change_state(dev, GATEWAY_STATE_DISCONNECTED);
- 
- 	sco_cb = dev->gateway->sco_start_cb;
- 	if (sco_cb)
-@@ -244,23 +358,58 @@ static DBusMessage *ag_connect(DBusConnection *conn, DBusMessage *msg,
- 	struct audio_device *au_dev = (struct audio_device *) data;
- 	struct gateway *gw = au_dev->gateway;
- 
--	debug("at the begin of ag_connect()");
--	if (gw->rfcomm)
-+	if (!gw->agent)
- 		return g_dbus_create_error(msg, ERROR_INTERFACE
--					".AlreadyConnected",
--					"Already Connected");
-+				".Failed", "Agent not assigned");
- 
--	gw->connect_message = dbus_message_ref(msg);
--	if (get_records(au_dev) < 0) {
--		dbus_message_unref(gw->connect_message);
-+	if (get_records(au_dev) < 0)
- 		return g_dbus_create_error(msg, ERROR_INTERFACE
- 					".ConnectAttemptFailed",
- 					"Connect Attempt Failed");
--	}
--	debug("at the end of ag_connect()");
-+
-+	gw->msg = dbus_message_ref(msg);
-+
- 	return NULL;
- }
- 
-+void gateway_exit(struct audio_device *dev)
-+{
-+	if (dev->gateway->agent)
-+		agent_disconnect(dev, dev->gateway->agent);
-+}
-+
-+int gateway_close(struct audio_device *device)
-+{
-+	struct gateway *gw = device->gateway;
-+	gboolean value = FALSE;
-+	int sock;
-+
-+	if (gw->rfcomm) {
-+		sock = g_io_channel_unix_get_fd(gw->rfcomm);
-+		shutdown(sock, SHUT_RDWR);
-+
-+		g_io_channel_shutdown(gw->rfcomm, TRUE, NULL);
-+		g_io_channel_unref(gw->rfcomm);
-+		gw->rfcomm = NULL;
-+	}
-+
-+	if (gw->sco) {
-+		g_io_channel_shutdown(gw->sco, TRUE, NULL);
-+		g_io_channel_unref(gw->sco);
-+		gw->sco = NULL;
-+		gw->sco_start_cb = NULL;
-+		gw->sco_start_cb_data = NULL;
-+	}
-+
-+	gw->state = GATEWAY_STATE_DISCONNECTED;
-+
-+	emit_property_changed(device->conn, device->path,
-+				AUDIO_GATEWAY_INTERFACE,
-+				"Connected", DBUS_TYPE_BOOLEAN, &value);
-+
-+	return 0;
-+}
-+
- static DBusMessage *ag_disconnect(DBusConnection *conn, DBusMessage *msg,
- 					void *data)
- {
-@@ -269,6 +418,9 @@ static DBusMessage *ag_disconnect(DBusConnection *conn, DBusMessage *msg,
- 	DBusMessage *reply = NULL;
- 	char gw_addr[18];
- 
-+	if (!device->conn)
-+		return NULL;
-+
- 	reply = dbus_message_new_method_return(msg);
- 	if (!reply)
- 		return NULL;
-@@ -285,16 +437,110 @@ static DBusMessage *ag_disconnect(DBusConnection *conn, DBusMessage *msg,
- 	return reply;
- }
- 
-+static void agent_exited(DBusConnection *conn, void *data)
-+{
-+	struct gateway *gateway = data;
-+	struct hf_agent *agent = gateway->agent;
-+
-+	debug("Agent %s exited", agent->name);
-+
-+	agent_free(agent);
-+	gateway->agent = NULL;
-+}
-+
- static DBusMessage *ag_get_properties(DBusConnection *conn, DBusMessage *msg,
- 					void *data)
- {
--	return NULL;
-+	struct audio_device *device = data;
-+	struct gateway *gw = device->gateway;
-+	DBusMessage *reply;
-+	DBusMessageIter iter;
-+	DBusMessageIter dict;
-+	const char *value;
-+
-+
-+	reply = dbus_message_new_method_return(msg);
-+	if (!reply)
-+		return NULL;
-+
-+	dbus_message_iter_init_append(reply, &iter);
-+
-+	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
-+			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
-+			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
-+			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
-+
-+	value = state2str(gw->state);
-+	dict_append_entry(&dict, "State",
-+			DBUS_TYPE_STRING, &value);
-+
-+	dbus_message_iter_close_container(&iter, &dict);
-+
-+	return reply;
-+}
-+
-+static DBusMessage *register_agent(DBusConnection *conn,
-+					DBusMessage *msg, void *data)
-+{
-+	struct audio_device *device = data;
-+	struct gateway *gw = device->gateway;
-+	struct hf_agent *agent;
-+	const char *path, *name;
-+
-+
-+	if (gw->agent)
-+		return g_dbus_create_error(msg,
-+					ERROR_INTERFACE ".AlreadyExists",
-+					"Agent already exists");
-+
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
-+						DBUS_TYPE_INVALID))
-+		return g_dbus_create_error(msg,
-+					ERROR_INTERFACE ".InvalidArguments",
-+					"Invalid argument");
-+
-+	name = dbus_message_get_sender(msg);
-+	agent = g_new0(struct hf_agent, 1);
-+
-+	agent->name = g_strdup(name);
-+	agent->path = g_strdup(path);
-+
-+	agent->watch = g_dbus_add_disconnect_watch(conn, name,
-+						agent_exited, gw, NULL);
-+
-+	gw->agent = agent;
-+
-+	return dbus_message_new_method_return(msg);
-+}
-+
-+static DBusMessage *unregister_agent(DBusConnection *conn,
-+				DBusMessage *msg, void *data)
-+{
-+	struct audio_device *device = data;
-+	struct gateway *gw = device->gateway;
-+
-+	if (!gw->agent)
-+		goto done;
-+
-+	if (strcmp(gw->agent->name, dbus_message_get_sender(msg)) != 0)
-+		return g_dbus_create_error(msg, ERROR_INTERFACE ".Failed",
-+							"Permission denied");
-+
-+	g_dbus_remove_watch(device->conn, gw->agent->watch);
-+
-+	agent_free(gw->agent);
-+	gw->agent = NULL;
-+
-+done:
-+	return dbus_message_new_method_return(msg);
- }
- 
- static GDBusMethodTable gateway_methods[] = {
- 	{ "Connect", "", "", ag_connect, G_DBUS_METHOD_FLAG_ASYNC },
--	{ "Disconnect", "", "", ag_disconnect },
-+	{ "Disconnect", "", "", ag_disconnect, G_DBUS_METHOD_FLAG_ASYNC },
- 	{ "GetProperties", "", "a{sv}", ag_get_properties },
-+	{ "RegisterAgent", "o", "", register_agent },
-+	{ "UnregisterAgent", "o", "", unregister_agent },
- 	{ NULL, NULL, NULL, NULL }
- };
- 
-@@ -303,9 +549,16 @@ static GDBusSignalTable gateway_signals[] = {
- 	{ NULL, NULL }
- };
- 
-+void gateway_unregister(struct audio_device *dev)
-+{
-+	g_dbus_unregister_interface(dev->conn, dev->path,
-+						AUDIO_GATEWAY_INTERFACE);
-+}
-+
- struct gateway *gateway_init(struct audio_device *dev)
- {
--	struct gateway *gw;
-+	if (DBUS_TYPE_UNIX_FD < 0)
-+		return NULL;
- 
- 	if (!g_dbus_register_interface(dev->conn, dev->path,
- 					AUDIO_GATEWAY_INTERFACE,
-@@ -313,10 +566,7 @@ struct gateway *gateway_init(struct audio_device *dev)
- 					NULL, dev, NULL))
- 		return NULL;
- 
--	debug("in gateway_init, dev is %p", dev);
--	gw = g_new0(struct gateway, 1);
--	gw->state = GATEWAY_STATE_DISCONNECTED;
--	return gw;
-+	return g_new0(struct gateway, 1);
- 
- }
- 
-@@ -331,8 +581,7 @@ int gateway_connect_rfcomm(struct audio_device *dev, GIOChannel *io)
- 	if (!io)
- 		return -EINVAL;
- 
--	g_io_channel_ref(io);
--	dev->gateway->rfcomm = io;
-+	dev->gateway->rfcomm = g_io_channel_ref(io);
- 
- 	return 0;
- }
-@@ -347,42 +596,25 @@ int gateway_connect_sco(struct audio_device *dev, GIOChannel *io)
- 	gw->sco = g_io_channel_ref(io);
- 
- 	g_io_add_watch(gw->sco, G_IO_ERR | G_IO_HUP | G_IO_NVAL,
--                                (GIOFunc) sco_io_cb, dev);
-+						(GIOFunc) sco_io_cb, dev);
-+
-+	change_state(dev, GATEWAY_STATE_PLAYING);
-+
- 	return 0;
- }
- 
--void gateway_start_service(struct audio_device *device)
-+void gateway_start_service(struct audio_device *dev)
- {
--	rfcomm_connect_cb(device->gateway->rfcomm, NULL, device);
--}
--
--int gateway_close(struct audio_device *device)
--{
--	struct gateway *gw = device->gateway;
--	GIOChannel *rfcomm = gw->rfcomm;
--	GIOChannel *sco = gw->sco;
--	gboolean value = FALSE;
-+	struct gateway *gw = dev->gateway;
-+	GError *err = NULL;
- 
--	if (rfcomm) {
--		g_io_channel_shutdown(rfcomm, TRUE, NULL);
--		g_io_channel_unref(rfcomm);
--		gw->rfcomm = NULL;
--	}
-+	if (gw->rfcomm == NULL)
-+		return;
- 
--	if (sco) {
--		g_io_channel_shutdown(sco, TRUE, NULL);
--		g_io_channel_unref(sco);
--		gw->sco = NULL;
--		gw->sco_start_cb = NULL;
--		gw->sco_start_cb_data = NULL;
-+	if (!bt_io_accept(gw->rfcomm, rfcomm_connect_cb, dev, NULL, &err)) {
-+		error("bt_io_accept: %s", err->message);
-+		g_error_free(err);
- 	}
--
--	gw->state = GATEWAY_STATE_DISCONNECTED;
--
--	emit_property_changed(device->conn, device->path,
--				AUDIO_GATEWAY_INTERFACE,
--				"Connected", DBUS_TYPE_BOOLEAN, &value);
--	return 0;
- }
- 
- /* These are functions to be called from unix.c for audio system
-@@ -410,10 +642,8 @@ gboolean gateway_request_stream(struct audio_device *dev,
- 			g_error_free(err);
- 			return FALSE;
- 		}
--	} else {
--		if (cb)
--			cb(dev, user_data);
--	}
-+	} else if (cb)
-+		cb(dev, user_data);
- 
- 	return TRUE;
- }
-@@ -464,4 +694,3 @@ void gateway_suspend_stream(struct audio_device *dev)
- 	gw->sco_start_cb = NULL;
- 	gw->sco_start_cb_data = NULL;
- }
--
-diff --git a/audio/gateway.h b/audio/gateway.h
-index 3b0457f..0cc1da9 100644
---- a/audio/gateway.h
-+++ b/audio/gateway.h
-@@ -4,6 +4,7 @@
-  *
-  *  Copyright (C) 2006-2010  Nokia Corporation
-  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *  Copyright (C) 2009-2010  Zhenhua Zhang <zhenhua.zhang@intel.com>
-  *
-  *
-  *  This program is free software; you can redistribute it and/or modify
-@@ -22,20 +23,24 @@
-  *
-  */
- 
--#define AUDIO_GATEWAY_INTERFACE "org.bluez.HeadsetGateway"
-+#define AUDIO_GATEWAY_INTERFACE "org.bluez.HandsfreeGateway"
- 
--#define DEFAULT_HSP_HS_CHANNEL 6
- #define DEFAULT_HFP_HS_CHANNEL 7
- 
- typedef enum {
- 	GATEWAY_STATE_DISCONNECTED,
--	GATEWAY_STATE_CONNECTED
-+	GATEWAY_STATE_CONNECTED,
-+	GATEWAY_STATE_CONNECTING,
-+	GATEWAY_STATE_PLAYING,
- } gateway_state_t;
- 
- typedef void (*gateway_stream_cb_t) (struct audio_device *dev, void *user_data);
-+
-+void gateway_unregister(struct audio_device *dev);
- struct gateway *gateway_init(struct audio_device *device);
-+void gateway_exit(struct audio_device *device);
- gboolean gateway_is_connected(struct audio_device *dev);
--int gateway_connect_rfcomm(struct audio_device *dev, GIOChannel *chan);
-+int gateway_connect_rfcomm(struct audio_device *dev, GIOChannel *io);
- int gateway_connect_sco(struct audio_device *dev, GIOChannel *chan);
- void gateway_start_service(struct audio_device *device);
- gboolean gateway_request_stream(struct audio_device *dev,
-diff --git a/audio/manager.c b/audio/manager.c
-index 413c1f3..0238e72 100644
---- a/audio/manager.c
-+++ b/audio/manager.c
-@@ -198,7 +198,7 @@ static void handle_uuid(const char *uuidstr, struct audio_device *device)
- 		break;
- 	case HANDSFREE_AGW_SVCLASS_ID:
- 		debug("Found Handsfree AG record");
--		if (device->gateway == NULL)
-+		if (enabled.gateway && (device->gateway == NULL))
- 			device->gateway = gateway_init(device);
- 		break;
- 	case AUDIO_SINK_SVCLASS_ID:
-@@ -567,8 +567,8 @@ static void hf_io_cb(GIOChannel *chan, gpointer data)
- 		return;
- 	}
- 
--	server_uuid = HFP_HS_UUID;
--	remote_uuid = HFP_AG_UUID;
-+	server_uuid = HFP_AG_UUID;
-+	remote_uuid = HFP_HS_UUID;
- 	svclass = HANDSFREE_AGW_SVCLASS_ID;
- 
- 	device = manager_get_device(&src, &dst, TRUE);
-@@ -791,9 +791,13 @@ static void audio_remove(struct btd_device *device)
- 	if (!dev)
- 		return;
- 
-+	if (dev->gateway)
-+		gateway_exit(dev);
-+
- 	devices = g_slist_remove(devices, dev);
- 
- 	audio_device_unregister(dev);
-+
- }
- 
- static struct audio_adapter *audio_adapter_ref(struct audio_adapter *adp)
-@@ -905,22 +909,12 @@ static void headset_server_remove(struct btd_adapter *adapter)
- static int gateway_server_probe(struct btd_adapter *adapter)
- {
- 	struct audio_adapter *adp;
--	const gchar *path = adapter_get_path(adapter);
--	int ret;
--
--	DBG("path %s", path);
- 
- 	adp = audio_adapter_get(adapter);
- 	if (!adp)
- 		return -EINVAL;
- 
--	ret = gateway_server_init(adp);
--	if (ret < 0) {
--		audio_adapter_ref(adp);
--		return ret;
--	}
--
--	return 0;
-+	return gateway_server_init(adp);
- }
- 
- static void gateway_server_remove(struct btd_adapter *adapter)
-diff --git a/audio/unix.c b/audio/unix.c
-index 5cf4f94..bd1a415 100644
---- a/audio/unix.c
-+++ b/audio/unix.c
-@@ -395,6 +395,9 @@ static void gateway_resume_complete(struct audio_device *dev, void *user_data)
- 	struct bt_start_stream_rsp *rsp = (void *) buf;
- 	struct bt_new_stream_ind *ind = (void *) buf;
- 
-+	if (!dev)
-+		goto failed;
-+
- 	memset(buf, 0, sizeof(buf));
- 	rsp->h.type = BT_RESPONSE;
- 	rsp->h.name = BT_START_STREAM;
-@@ -416,6 +419,11 @@ static void gateway_resume_complete(struct audio_device *dev, void *user_data)
- 	}
- 
- 	client->req_id = 0;
-+	return;
-+
-+failed:
-+	error("gateway_resume_complete: resume failed");
-+	unix_ipc_error(client, BT_START_STREAM, EIO);
- }
- 
- static void headset_suspend_complete(struct audio_device *dev, void *user_data)
-diff --git a/doc/hfp-api.txt b/doc/hfp-api.txt
-new file mode 100644
-index 0000000..8180de0
---- /dev/null
-+++ b/doc/hfp-api.txt
-@@ -0,0 +1,82 @@
-+Gateway hierarchy
-+========================
-+
-+Service		org.bluez
-+Interface	org.bluez.HandsfreeGateway
-+Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
-+
-+This interface is available for remote devices which can function in the Audio
-+Gateway role of the HFP profiles.  It is intended to be used with external
-+telephony stacks / handlers of the HFP protocol.
-+
-+Methods		void Connect()
-+
-+			Connect to the AG service on the remote device.
-+
-+		void Disconnect()
-+
-+			Disconnect from the AG service on the remote device
-+
-+		dict GetProperties()
-+
-+			Returns all properties for the interface. See the
-+			properties section for available properties.
-+
-+		void RegisterAgent(object path)
-+
-+			The object path defines the path the of the agent
-+			that will be called when a new Handsfree connection
-+			is established.
-+
-+			If an application disconnects from the bus all of its
-+			registered agents will be removed.
-+
-+		void UnregisterAgent(object path)
-+
-+			This unregisters the agent that has been previously
-+			registered. The object path parameter must match the
-+			same value that has been used on registration.
-+
-+Signals		PropertyChanged(string name, variant value)
-+
-+			This signal indicates a changed value of the given
-+			property.
-+
-+Properties	string State [readonly]
-+
-+			Indicates the state of the connection.  Possible
-+			values are:
-+				"disconnected"
-+				"connecting"
-+				"connected"
-+				"playing"
-+
-+HandsfreeAgent hierarchy
-+===============
-+
-+Service         unique name
-+Interface       org.bluez.HandsfreeAgent
-+Object path     freely definable
-+
-+Methods		void NewConnection(filedescriptor fd)
-+
-+			This method gets called whenever a new handsfree
-+			connection has been established.  The objectpath
-+			contains the object path of the remote device.  This
-+			method assumes that DBus daemon with file descriptor
-+			passing capability is being used.
-+
-+			The agent should only return successfully once the
-+			establishment of the service level connection (SLC)
-+			has been completed.  In the case of Handsfree this
-+			means that BRSF exchange has been performed and
-+			necessary initialization has been done.
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.Failed
-+
-+		void Release()
-+
-+			This method gets called whenever the service daemon
-+			unregisters the agent or whenever the Adapter where
-+			the HandsfreeAgent registers itself is removed.
--- 
-1.6.4.4
+In my source, function l2cap_security_cfm & l2cap_information_rsp is
+almost same as 2.6.33-rc6.
 
+Ed's log looks almost same as mine.
+There migh be minor vairaty like
+
+1.sometimes after Info Req: type 2, there is a Info Req: type 3.
+
+HCI sniffer - Bluetooth packet analyzer ver 1.42
+
+device: hci0 snap_len: 1028 filter: 0xffffffff
+
+2010-02-03 18:03:47.446807 < HCI Command: Create Connection
+(0x01|0x0005) plen 13
+
+    bdaddr 00:24:9F:AC:1E:EA ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+
+2010-02-03 18:03:47.455749 > HCI Event: Command Status (0x0f) plen 4
+
+    Create Connection (0x01|0x0005) status 0x00 ncmd 1
+
+2010-02-03 18:03:47.993408 > HCI Event: Link Key Request (0x17) plen 6
+
+    bdaddr 00:24:9F:AC:1E:EA
+
+2010-02-03 18:03:47.997131 < HCI Command: Link Key Request Reply
+(0x01|0x000b) plen 22
+
+    bdaddr 00:24:9F:AC:1E:EA key 09F010B636EBEC8A3E0E81BBD7AE1CAA
+
+2010-02-03 18:03:47.997802 > HCI Event: Command Complete (0x0e) plen 10
+
+    Link Key Request Reply (0x01|0x000b) ncmd 1
+
+    status 0x00 bdaddr 00:24:9F:AC:1E:EA
+
+2010-02-03 18:03:48.014465 > HCI Event: Connect Complete (0x03) plen 11
+
+    status 0x00 handle 1 bdaddr 00:24:9F:AC:1E:EA type ACL encrypt 0x00
+
+2010-02-03 18:03:48.014678 < HCI Command: Read Remote Supported
+Features (0x01|0x001b) plen 2
+
+    handle 1
+
+2010-02-03 18:03:48.015563 > HCI Event: Command Status (0x0f) plen 4
+
+    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
+
+2010-02-03 18:03:48.022430 < HCI Command: Remote Name Request
+(0x01|0x0019) plen 10
+
+    bdaddr 00:24:9F:AC:1E:EA mode 2 clkoffset 0x0000
+
+2010-02-03 18:03:48.023437 > HCI Event: Command Status (0x0f) plen 4
+
+    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+
+2010-02-03 18:03:48.024230 > HCI Event: Max Slots Change (0x1b) plen 3
+
+    handle 1 slots 5
+
+2010-02-03 18:03:48.028198 > HCI Event: Read Remote Supported Features
+(0x0b) plen 11
+
+    status 0x00 handle 1
+
+    Features: 0xbf 0xfe 0x8f 0xfe 0x98 0x19 0x00 0x80
+
+2010-02-03 18:03:48.028320 < ACL data: handle 1 flags 0x02 dlen 10
+
+    L2CAP(s): Info req: type 2
+
+2010-02-03 18:03:48.031616 > HCI Event: Number of Completed Packets
+(0x13) plen 5
+
+    handle 1 packets 1
+
+2010-02-03 18:03:48.039977 > HCI Event: Remote Name Req Complete (0x07) plen 255
+
+    status 0x00 bdaddr 00:24:9F:AC:1E:EA name 'BlackBerry 8900'
+
+2010-02-03 18:03:48.042755 > ACL data: handle 1 flags 0x02 dlen 12
+
+    L2CAP(s): Info rsp: type 2 result 1
+
+      Not supported
+
+2010-02-03 18:03:48.042846 < ACL data: handle 1 flags 0x02 dlen 10
+
+    L2CAP(s): Info req: type 3
+
+2010-02-03 18:03:48.045226 > HCI Event: Number of Completed Packets
+(0x13) plen 5
+
+    handle 1 packets 1
+
+2010-02-03 18:03:48.090545 > HCI Event: Encrypt Change (0x08) plen 4
+
+    status 0x00 handle 1 encrypt 0x01
+
+2010-02-03 18:03:48.090728 < ACL data: handle 1 flags 0x02 dlen 12
+
+    L2CAP(s): Connect req: psm 3 scid 0x0040
+
+2010-02-03 18:03:48.094024 > HCI Event: Number of Completed Packets
+(0x13) plen 5
+
+    handle 1 packets 1
+
+2010-02-03 18:03:48.094146 > ACL data: handle 1 flags 0x02 dlen 12
+
+    L2CAP(s): Info rsp: type 3 result 1
+
+      Not supported
+
+2010-02-03 18:03:48.094238 < ACL data: handle 1 flags 0x02 dlen 12
+
+    L2CAP(s): Connect req: psm 3 scid 0x0040
+
+2010-02-03 18:03:48.096618 > HCI Event: Number of Completed Packets
+(0x13) plen 5
+
+    handle 1 packets 1
+
+2010-02-03 18:03:48.104003 > ACL data: handle 1 flags 0x02 dlen 16
+
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
+
+      Connection successful
+
+2010-02-03 18:03:48.104095 < ACL data: handle 1 flags 0x02 dlen 16
+
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
+
+      MTU 1013
+
+2010-02-03 18:03:48.104125 > ACL data: handle 1 flags 0x02 dlen 16
+
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
+
+      MTU 1024
+
+2010-02-03 18:03:48.104156 < ACL data: handle 1 flags 0x02 dlen 18
+
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
+
+      MTU 1024
+
+2010-02-03 18:03:48.104339 > ACL data: handle 1 flags 0x02 dlen 16
+
+    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0040 result 4 status 0
+
+      Connection refused - no resources available
+
+2010-02-03 18:03:48.107696 > HCI Event: Number of Completed Packets
+(0x13) plen 5
+
+    handle 1 packets 2
+
+2010-02-03 18:03:48.115264 > ACL data: handle 1 flags 0x02 dlen 14
+
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
+
+      Success
+
+2010-02-03 18:03:48.115386 > ACL data: handle 1 flags 0x02 dlen 12
+
+    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
+
+2010-02-03 18:03:50.101531 < HCI Command: Disconnect (0x01|0x0006) plen 3
+
+    handle 1 reason 0x13
+
+    Reason: Remote User Terminated Connection
+
+2010-02-03 18:03:50.102508 > HCI Event: Command Status (0x0f) plen 4
+
+    Disconnect (0x01|0x0006) status 0x00 ncmd 1
+
+2010-02-03 18:03:50.105438 > HCI Event: Disconn Complete (0x05) plen 4
+
+    status 0x00 handle 1 reason 0x16
+
+    Reason: Connection Terminated by Local Host
+
+
+2. sometimes Encrypt Change is before Info Req: type 2
+
+HCI sniffer - Bluetooth packet analyzer ver 1.42
+
+2010-02-03 17:58:29.214416 < HCI Command: Create Connection
+(0x01|0x0005) plen 13
+
+    bdaddr 00:24:9F:AC:1E:EA ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+
+2010-02-03 17:58:29.234832 > HCI Event: Command Status (0x0f) plen 4
+
+    Create Connection (0x01|0x0005) status 0x00 ncmd 1
+
+2010-02-03 17:58:30.559875 > HCI Event: Link Key Request (0x17) plen 6
+
+    bdaddr 00:24:9F:AC:1E:EA
+
+2010-02-03 17:58:30.563995 < HCI Command: Link Key Request Reply
+(0x01|0x000b) plen 22
+
+    bdaddr 00:24:9F:AC:1E:EA key 09F010B636EBEC8A3E0E81BBD7AE1CAA
+
+2010-02-03 17:58:30.564819 > HCI Event: Command Complete (0x0e) plen 10
+
+    Link Key Request Reply (0x01|0x000b) ncmd 1
+
+    status 0x00 bdaddr 00:24:9F:AC:1E:EA
+
+2010-02-03 17:58:30.580596 > HCI Event: Connect Complete (0x03) plen 11
+
+    status 0x00 handle 1 bdaddr 00:24:9F:AC:1E:EA type ACL encrypt 0x00
+
+2010-02-03 17:58:30.580779 < HCI Command: Read Remote Supported
+Features (0x01|0x001b) plen 2
+
+    handle 1
+
+2010-02-03 17:58:30.581634 > HCI Event: Command Status (0x0f) plen 4
+
+    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
+
+2010-02-03 17:58:30.587951 > HCI Event: Max Slots Change (0x1b) plen 3
+
+    handle 1 slots 5
+
+2010-02-03 17:58:30.590515 > HCI Event: Read Remote Supported Features
+(0x0b) plen 11
+
+    status 0x00 handle 1
+
+    Features: 0xbf 0xfe 0x8f 0xfe 0x98 0x19 0x00 0x80
+
+2010-02-03 17:58:30.590667 < ACL data: handle 1 flags 0x02 dlen 10
+
+    L2CAP(s): Info req: type 2
+
+2010-02-03 17:58:30.593902 > HCI Event: Number of Completed Packets
+(0x13) plen 5
+
+    handle 1 packets 1
+
+2010-02-03 17:58:30.600280 < HCI Command: Remote Name Request
+(0x01|0x0019) plen 10
+
+    bdaddr 00:24:9F:AC:1E:EA mode 2 clkoffset 0x0000
+
+2010-02-03 17:58:30.600799 > HCI Event: Command Status (0x0f) plen 4
+
+    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+
+2010-02-03 17:58:30.615020 > HCI Event: Remote Name Req Complete (0x07) plen 255
+
+    status 0x00 bdaddr 00:24:9F:AC:1E:EA name 'BlackBerry 8900'
+
+2010-02-03 17:58:30.639282 > HCI Event: Encrypt Change (0x08) plen 4
+
+    status 0x00 handle 1 encrypt 0x01
+
+2010-02-03 17:58:30.639434 < ACL data: handle 1 flags 0x02 dlen 12
+
+    L2CAP(s): Connect req: psm 3 scid 0x0040
+
+2010-02-03 17:58:30.642669 > HCI Event: Number of Completed Packets
+(0x13) plen 5
+
+    handle 1 packets 1
+
+2010-02-03 17:58:30.642822 > ACL data: handle 1 flags 0x02 dlen 12
+
+    L2CAP(s): Info rsp: type 2 result 1
+
+      Not supported
+
+2010-02-03 17:58:30.642883 < ACL data: handle 1 flags 0x02 dlen 12
+
+    L2CAP(s): Connect req: psm 3 scid 0x0040
+
+2010-02-03 17:58:30.645141 > HCI Event: Number of Completed Packets
+(0x13) plen 5
+
+    handle 1 packets 1
+
+2010-02-03 17:58:30.652862 > ACL data: handle 1 flags 0x02 dlen 16
+
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
+
+      Connection successful
+
+2010-02-03 17:58:30.652862 > ACL data: handle 1 flags 0x02 dlen 16
+
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
+
+      MTU 1024
+
+2010-02-03 17:58:30.652984 > ACL data: handle 1 flags 0x02 dlen 16
+
+    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0040 result 4 status 0
+
+      Connection refused - no resources available
+
+2010-02-03 17:58:30.653137 < ACL data: handle 1 flags 0x02 dlen 16
+
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
+
+      MTU 1013
+
+2010-02-03 17:58:30.653198 < ACL data: handle 1 flags 0x02 dlen 18
+
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
+
+      MTU 1024
+
+2010-02-03 17:58:30.657653 > HCI Event: Number of Completed Packets
+(0x13) plen 5
+
+    handle 1 packets 2
+
+2010-02-03 17:58:30.665191 > ACL data: handle 1 flags 0x02 dlen 14
+
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
+
+      Success
+
+2010-02-03 17:58:30.665283 > ACL data: handle 1 flags 0x02 dlen 12
+
+    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
+
+2010-02-03 17:58:32.648467 < HCI Command: Disconnect (0x01|0x0006) plen 3
+
+    handle 1 reason 0x13
+
+    Reason: Remote User Terminated Connection
+
+2010-02-03 17:58:32.649322 > HCI Event: Command Status (0x0f) plen 4
+
+    Disconnect (0x01|0x0006) status 0x00 ncmd 1
+
+2010-02-03 17:58:32.652984 > HCI Event: Disconn Complete (0x05) plen 4
+
+    status 0x00 handle 1 reason 0x16
+
+    Reason: Connection Terminated by Local Host
