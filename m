@@ -1,57 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4B69AEAE.4050005@videam.com.br>
-Date: Wed, 03 Feb 2010 15:13:18 -0200
-From: "Daniel T. Cobra" <dcobra@videam.com.br>
-MIME-Version: 1.0
+Message-ID: <18126.60718.qm@web52604.mail.re2.yahoo.com>
+References: <272603.59641.qm@web52603.mail.re2.yahoo.com>  <1265156906.31341.106.camel@localhost.localdomain>  <90704.85857.qm@web52601.mail.re2.yahoo.com> <1265209673.31341.116.camel@localhost.localdomain>
+Date: Wed, 3 Feb 2010 08:02:18 -0800 (PST)
+From: Ed Tsang <netdesign_98@yahoo.com>
+Subject: Re: double Connect req: psm 1 scid 0x0040 ?
 To: Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: Long delay to (re)connect a bluetooth mouse
-References: <1260906227.4b27e6f39cc7c@www.fastmail.com.br>	 <4B2A4B90.1040009@videam.com.br>	<4B2BBF58.4030901@videam.com.br>	 <1261173899.4041.96.camel@localhost.localdomain>	 <1261176544.4b2c06e0e0eae@www.fastmail.com.br>	 <1261177111.4041.99.camel@localhost.localdomain>	 <20091223164841.7070e75d@strolchi.home.s3e.de>	 <4B325905.6090103@videam.com.br>	 <20091229160135.12d85fe6@strolchi.home.s3e.de>	 <4B423816.4060405@videam.com.br>	 <20100105115152.506eb191@strolchi.home.s3e.de>	 <4B6961A4.5040503@videam.com.br>	 <1265206358.31341.109.camel@localhost.localdomain>	 <4B69898E.1070001@videam.com.br> <1265207877.31341.115.camel@localhost.localdomain>
-In-Reply-To: <1265207877.31341.115.camel@localhost.localdomain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Cc: Bluettooth Linux <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1265209673.31341.116.camel@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel:
-
-> that is the wrong place. You need to look into net/bluetooth/l2cap.c.
-> The LMP features are mandatory at all costs. Otherwise hell breaks loose
-> if you don't do the right.
-
-I looked into l2cap.c but I'd need to know the protocol better to make 
-sense of what's going on in there.
-
-Basically, do you think the failure to reply to the L2CAP information 
-request is a non-compliance to the protocol on the part of this 
-particular mouse model, or does it implement an older version of the 
-protocol, or something like that? (The delay does not happen under MS 
-Windows, if it means anything.)
-
- From the hci dump, it seems the mouse replies to the HCI Read Remote 
-Supported Features:
-
-2010-01-08 00:15:03.144090 > HCI Event: Command Status (0x0f) plen 4
-    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
-2010-01-08 00:15:03.144103 < HCI Command: Remote Name Request 
-(0x01|0x0019) plen 10
-    bdaddr 00:16:38:E2:A5:57 mode 2 clkoffset 0x0000
-2010-01-08 00:15:03.146089 > HCI Event: Number of Completed Packets 
-(0x13) plen 5
-    handle 42 packets 2
-2010-01-08 00:15:03.149092 > HCI Event: Read Remote Supported Features 
-(0x0b) plen 11
-    status 0x00 handle 42
-    Features: 0xbc 0x02 0x04 0x28 0x08 0x08 0x00 0x00
-
-Is this unrelated to the L2CAP information request? Why would one work 
-and not the other? Perhaps one is related to the device's features and 
-the other to the connection's features?
-
-In short, can anything be done to avoid this L2CAP timeout on the 
-information request (something that, in addition to solving my problem, 
-would result in a small improvement to bluez, in terms of device 
-compatibility), or should I just forget about it and get a new BT mouse? 
-What do you think?
-
-Regards,
-
-Daniel
+Marcel,=0A=0A>> It is a ubutunu distribution. 2.6.31-17-generic.=0A>can you=
+ test with a 2.6.33-rc6 vanilla kernel. I really thing this got=0A>fixed an=
+d you might see a side effect or bad patch here.=0A=0AI think you are absol=
+ute right. This look like the Bluetooth:L2CAP... patch that Liejun is worki=
+ng on.=0AI am just too new to linux, need to learn how to compile and insta=
+ll the kernel first.=0AIf it does not work out on 2.6.33, then I will come =
+back with more info.=0AIn the mean time: hcidump -X -V  (hope a bit more in=
+fo to confirm the same issue).=0A------------------------------------------=
+---------------------=0A> HCI Event: Connect Complete (0x03) plen 11=0A    =
+status 0x00 handle 42 bdaddr 00:1C:CC:23:8F:68 type ACL encrypt 0x00=0A< HC=
+I Command: Read Remote Supported Features (0x01|0x001b) plen 2=0A    handle=
+ 42=0A> HCI Event: Command Status (0x0f) plen 4=0A    Read Remote Supported=
+ Features (0x01|0x001b) status 0x00 ncmd 0=0A> HCI Event: Page Scan Repetit=
+ion Mode Change (0x20) plen 7=0A    bdaddr 00:1C:CC:23:8F:68 mode 1=0A> HCI=
+ Event: Max Slots Change (0x1b) plen 3=0A    handle 42 slots 5=0A> HCI Even=
+t: Command Status (0x0f) plen 4=0A    Unknown (0x00|0x0000) status 0x00 ncm=
+d 1=0A> HCI Event: Read Remote Supported Features (0x0b) plen 11=0A    stat=
+us 0x00 handle 42=0A    Features: 0xbf 0xfe 0x8f 0xfe 0x98 0x19 0x00 0x80=
+=0A< ACL data: handle 42 flags 0x02 dlen 10=0A    L2CAP(s): Info req: type =
+2                          (***)=0A> HCI Event: Encrypt Change (0x08) plen =
+4     (***)=0A    status 0x00 handle 42 encrypt 0x01=0A< ACL data: handle 4=
+2 flags 0x02 dlen 12=0A    L2CAP(s): Connect req: psm 1 scid 0x0040     (**=
+**)=0A> HCI Event: Number of Completed Packets (0x13) plen 5=0A    handle 4=
+2 packets 1=0A> HCI Event: Number of Completed Packets (0x13) plen 5=0A    =
+handle 42 packets 1=0A> ACL data: handle 42 flags 0x02 dlen 12=0A    L2CAP(=
+s): Info rsp: type 2 result 1=0A      Not supported=0A< ACL data: handle 42=
+ flags 0x02 dlen 12=0A    L2CAP(s): Connect req: psm 1 scid 0x0040   (****)=
+=0A> ACL data: handle 42 flags 0x02 dlen 16=0A    L2CAP(s): Connect rsp: dc=
+id 0x0040 scid 0x0040 result 0 status 0=0A      Connection successful      =
+                         (****)=0A< ACL data: handle 42 flags 0x02 dlen 12=
+=0A    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0=0A> ACL data: ha=
+ndle 42 flags 0x02 dlen 16=0A    L2CAP(s): Config req: dcid 0x0040 flags 0x=
+00 clen 4=0A      MTU 1024=0A< ACL data: handle 42 flags 0x02 dlen 18=0A   =
+ L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4=0A      MTU 1=
+024=0A> HCI Event: Number of Completed Packets (0x13) plen 5=0A    handle 4=
+2 packets 1=0A> HCI Event: Number of Completed Packets (0x13) plen 5=0A    =
+handle 42 packets 1=0A> HCI Event: Number of Completed Packets (0x13) plen =
+5=0A    handle 42 packets 1=0A> ACL data: handle 42 flags 0x02 dlen 16=0A  =
+  L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0040 result 4 status 0=0A      =
+Connection refused - no resources available        (***)=0A> ACL data: hand=
+le 42 flags 0x02 dlen 14=0A    L2CAP(s): Config rsp: scid 0x0040 flags 0x00=
+ result 0 clen 0=0A      Success=0A< HCI Command: Remote Name Request (0x01=
+|0x0019) plen 10=0A    bdaddr 00:1C:CC:23:8F:68 mode 2 clkoffset 0x0000=0A>=
+ HCI Event: Command Status (0x0f) plen 4=0A    Remote Name Request (0x01|0x=
+0019) status 0x00 ncmd 1=0A> HCI Event: Remote Name Req Complete (0x07) ple=
+n 255=0A    status 0x00 bdaddr 00:1C:CC:23:8F:68 name 'bb 8300e'=0A< HCI Co=
+mmand: Disconnect (0x01|0x0006) plen 3=0A    handle 42 reason 0x13=0A    Re=
+ason: Remote User Terminated Connection=0A---------------------------------=
+-----------------------------=0ARegards, Ed=0A=0A=0A      _________________=
+_________________________________________________=0AThe new Internet Explor=
+er=AE 8 - Faster, safer, easier.  Optimized for Yahoo!  Get it Now for Free=
+! at http://downloads.yahoo.com/ca/internetexplorer/
