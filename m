@@ -1,69 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 1/3] HID: make raw reports possible for both feature
- and output reports
+Subject: Re: Long delay to (re)connect a bluetooth mouse
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Jiri Kosina <jkosina@suse.cz>
-Cc: Bastien Nocera <hadess@hadess.net>,
-	Michael Poole <mdpoole@troilus.org>,
-	"Gunn, Brian" <bgunn@solekai.com>, Ping <pinglinux@gmail.com>,
-	linux-kernel@vger.kernel.org,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <alpine.LNX.2.00.1002031348450.15395@pobox.suse.cz>
-References: <alpine.LNX.2.00.1001291515560.356@pobox.suse.cz>
-	 <1264783166.29532.5302.camel@localhost.localdomain>
-	 <87iqakifm8.fsf@troilus.org>
-	 <1264860663.29532.7887.camel@localhost.localdomain>
-	 <87bpg7glf7.fsf@troilus.org>
-	 <1265190440.32444.8417.camel@localhost.localdomain>
-	 <alpine.LNX.2.00.1002031202040.15395@pobox.suse.cz>
-	 <alpine.LNX.2.00.1002031343500.15395@pobox.suse.cz>
-	 <alpine.LNX.2.00.1002031348450.15395@pobox.suse.cz>
+To: "Daniel T. Cobra" <dcobra@videam.com.br>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <4B6961A4.5040503@videam.com.br>
+References: <1260906227.4b27e6f39cc7c@www.fastmail.com.br>
+	 <4B2A4B90.1040009@videam.com.br>	<4B2BBF58.4030901@videam.com.br>
+	 <1261173899.4041.96.camel@localhost.localdomain>
+	 <1261176544.4b2c06e0e0eae@www.fastmail.com.br>
+	 <1261177111.4041.99.camel@localhost.localdomain>
+	 <20091223164841.7070e75d@strolchi.home.s3e.de>
+	 <4B325905.6090103@videam.com.br>
+	 <20091229160135.12d85fe6@strolchi.home.s3e.de>
+	 <4B423816.4060405@videam.com.br>
+	 <20100105115152.506eb191@strolchi.home.s3e.de>
+	 <4B6961A4.5040503@videam.com.br>
 Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 03 Feb 2010 06:14:38 -0800
-Message-ID: <1265206478.31341.111.camel@localhost.localdomain>
+Date: Wed, 03 Feb 2010 06:12:38 -0800
+Message-ID: <1265206358.31341.109.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jiri,
+Hi Daniel,
 
-> In commit 2da31939a42 ("Bluetooth: Implement raw output support for HIDP
-> layer"), support for Bluetooth hid_output_raw_report was added, but it
-> pushes the data to the intr socket instead of the ctrl one. This has been
-> fixed by 6bf8268f9a91f1 ("Bluetooth: Use the control channel for raw HID reports")
+> For me, this is going to be a shot in the dark, not being familiar with 
+> the Bluetooth protocol, but could one of you developers please say if 
+> any of what follows makes sense?
 > 
-> Still, it is necessary to distinguish whether the report in question should be
-> either FEATURE or OUTPUT. For this, we have to extend the generic HID API,
-> so that hid_output_raw_report() callback provides means to specify this
-> value so that it can be passed down to lower level hardware drivers (currently
-> Bluetooth and USB).
+> Comparing the hci dumps from my mouse's reconnection and Stefan's, I am 
+> suspicious of the first line below:
 > 
-> Based on original patch by Bastien Nocera <hadess@hadess.net>
-> Signed-off-by: Jiri Kosina <jkosina@suse.cz>
-> ---
->  drivers/hid/hidraw.c          |    2 +-
->  drivers/hid/usbhid/hid-core.c |    5 +++--
->  include/linux/hid.h           |    2 +-
->  net/bluetooth/hidp/core.c     |   13 ++++++++++---
->  4 files changed, 15 insertions(+), 7 deletions(-)
+> [...]                        
+> 2010-01-08 00:15:03.136170 < ACL data: handle 42 flags 0x02 dlen 10
+>     L2CAP(s): Info req: type 2
+> 2010-01-08 00:15:03.144090 > HCI Event: Command Status (0x0f) plen 4
+>     Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
- 
-> -static int hidp_output_raw_report(struct hid_device *hid, unsigned char *data, size_t count)
-> +static int hidp_output_raw_report(struct hid_device *hid, unsigned char *data, size_t count,
-> +		unsigned char report_type)
->  {
-> -	if (hidp_send_ctrl_message(hid->driver_data,
-> -			HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_FEATURE,
-> +	if (report_type == HID_FEATURE_REPORT)
-> +		report_type = HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_FEATURE;
-> +	else if (report_type == HID_OUTPUT_REPORT)
-> +		report_type = HIDP_TRANS_DATA | HIDP_DATA_RTYPE_OUPUT;
-> +	else
-> +		return -EINVAL;
+I totally missed this command. Yes, you are on the right track. We have
+a timeout for devices not responding to information request.
 
-If you wanna be a little bit more readable, then using a switch
-statement helps instead of else if. Just my 2 cents.
+#define L2CAP_INFO_TIMEOUT      (4000)  /*  4 seconds */
+
+Problem here is that information request is actually needed to determine
+the features of the remote L2CAP stack.
 
 Regards
 
