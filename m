@@ -1,379 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 3 Feb 2010 18:04:31 +0000 (GMT)
+To: "Daniel T\. Cobra" <dcobra@videam.com.br>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Long delay to (re)connect a bluetooth mouse
+In-Reply-To: <4B69AEAE.4050005@videam.com.br>
+References: <1260906227.4b27e6f39cc7c@www.fastmail.com.br>  <4B2A4B90.1040009@videam.com.br> <4B2BBF58.4030901@videam.com.br>  <1261173899.4041.96.camel@localhost.localdomain>  <1261176544.4b2c06e0e0eae@www.fastmail.com.br>  <1261177111.4041.99.camel@localhost.localdomain>
+  <20091223164841.7070e75d@strolchi.home.s3e.de>  <4B325905.6090103@videam.com.br>  <20091229160135.12d85fe6@strolchi.home.s3e.de>  <4B423816.4060405@videam.com.br>  <20100105115152.506eb191@strolchi.home.s3e.de>  <4B6961A4.5040503@videam.com.br>
+ <1265206358.31341.109.camel@localhost.localdomain>  <4B69898E.1070001@videam.com.br> <1265207877.31341.115.camel@localhost.localdomain> <4B69AEAE.4050005@videam.com.br>
 MIME-Version: 1.0
-In-Reply-To: <1265210547.31341.118.camel@localhost.localdomain>
-References: <8a7a8d7b1002021350o3c80c7d9p948365ea983a0d89@mail.gmail.com>
-	 <1265210547.31341.118.camel@localhost.localdomain>
-Date: Wed, 3 Feb 2010 12:13:40 -0600
-Message-ID: <8a7a8d7b1002031013n3203cb23h93d07a4f15d0304f@mail.gmail.com>
-Subject: Re: [PATCH 1/1] Bluetooth:L2CAP check FEAT success
-From: Liejun Tao <liejuntao001@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Bluettooth Linux <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Message-Id: <1265220271.415099.26064.nullmailer@galant.ukfsn.org>
+From: Iain Hibbert <plunky@rya-online.net>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+On Wed, 3 Feb 2010, Daniel T. Cobra wrote:
 
-> Hi Liejun,
->
-> I might have an idea what is going here. Can you send me the whole
-> hcidump -X -V from the Create Connection to the Connection Refused
-> without having it mangled via your mailer.
->
-> Regards
->
-> Marcel
+> Basically, do you think the failure to reply to the L2CAP information
+> request is a non-compliance to the protocol on the part of this
+> particular mouse model, or does it implement an older version of the
+> protocol, or something like that? (The delay does not happen under MS
+> Windows, if it means anything.)
 
-In my source, function l2cap_security_cfm & l2cap_information_rsp is
-almost same as 2.6.33-rc6.
+I think the mouse is non-compliant, as the L2CAP Information request has
+been present since at least 1.1 of the specification which says that a
+valid response should be sent.
 
-Ed's log looks almost same as mine.
-There migh be minor vairaty like
+Sending such a request is optional however, and probably the people who
+wrote that mouse stack never tested it against anything that sent one.
+Even if it didn't understand it, it should reply with a "command not
+understood" message..
 
-1.sometimes after Info Req: type 2, there is a Info Req: type 3.
+> From the hci dump, it seems the mouse replies to the HCI Read Remote
+> Supported Features:
 
-HCI sniffer - Bluetooth packet analyzer ver 1.42
+that is unrelated
 
-device: hci0 snap_len: 1028 filter: 0xffffffff
+regards,
+iain
 
-2010-02-03 18:03:47.446807 < HCI Command: Create Connection
-(0x01|0x0005) plen 13
 
-    bdaddr 00:24:9F:AC:1E:EA ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-
-2010-02-03 18:03:47.455749 > HCI Event: Command Status (0x0f) plen 4
-
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-
-2010-02-03 18:03:47.993408 > HCI Event: Link Key Request (0x17) plen 6
-
-    bdaddr 00:24:9F:AC:1E:EA
-
-2010-02-03 18:03:47.997131 < HCI Command: Link Key Request Reply
-(0x01|0x000b) plen 22
-
-    bdaddr 00:24:9F:AC:1E:EA key 09F010B636EBEC8A3E0E81BBD7AE1CAA
-
-2010-02-03 18:03:47.997802 > HCI Event: Command Complete (0x0e) plen 10
-
-    Link Key Request Reply (0x01|0x000b) ncmd 1
-
-    status 0x00 bdaddr 00:24:9F:AC:1E:EA
-
-2010-02-03 18:03:48.014465 > HCI Event: Connect Complete (0x03) plen 11
-
-    status 0x00 handle 1 bdaddr 00:24:9F:AC:1E:EA type ACL encrypt 0x00
-
-2010-02-03 18:03:48.014678 < HCI Command: Read Remote Supported
-Features (0x01|0x001b) plen 2
-
-    handle 1
-
-2010-02-03 18:03:48.015563 > HCI Event: Command Status (0x0f) plen 4
-
-    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
-
-2010-02-03 18:03:48.022430 < HCI Command: Remote Name Request
-(0x01|0x0019) plen 10
-
-    bdaddr 00:24:9F:AC:1E:EA mode 2 clkoffset 0x0000
-
-2010-02-03 18:03:48.023437 > HCI Event: Command Status (0x0f) plen 4
-
-    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
-
-2010-02-03 18:03:48.024230 > HCI Event: Max Slots Change (0x1b) plen 3
-
-    handle 1 slots 5
-
-2010-02-03 18:03:48.028198 > HCI Event: Read Remote Supported Features
-(0x0b) plen 11
-
-    status 0x00 handle 1
-
-    Features: 0xbf 0xfe 0x8f 0xfe 0x98 0x19 0x00 0x80
-
-2010-02-03 18:03:48.028320 < ACL data: handle 1 flags 0x02 dlen 10
-
-    L2CAP(s): Info req: type 2
-
-2010-02-03 18:03:48.031616 > HCI Event: Number of Completed Packets
-(0x13) plen 5
-
-    handle 1 packets 1
-
-2010-02-03 18:03:48.039977 > HCI Event: Remote Name Req Complete (0x07) plen 255
-
-    status 0x00 bdaddr 00:24:9F:AC:1E:EA name 'BlackBerry 8900'
-
-2010-02-03 18:03:48.042755 > ACL data: handle 1 flags 0x02 dlen 12
-
-    L2CAP(s): Info rsp: type 2 result 1
-
-      Not supported
-
-2010-02-03 18:03:48.042846 < ACL data: handle 1 flags 0x02 dlen 10
-
-    L2CAP(s): Info req: type 3
-
-2010-02-03 18:03:48.045226 > HCI Event: Number of Completed Packets
-(0x13) plen 5
-
-    handle 1 packets 1
-
-2010-02-03 18:03:48.090545 > HCI Event: Encrypt Change (0x08) plen 4
-
-    status 0x00 handle 1 encrypt 0x01
-
-2010-02-03 18:03:48.090728 < ACL data: handle 1 flags 0x02 dlen 12
-
-    L2CAP(s): Connect req: psm 3 scid 0x0040
-
-2010-02-03 18:03:48.094024 > HCI Event: Number of Completed Packets
-(0x13) plen 5
-
-    handle 1 packets 1
-
-2010-02-03 18:03:48.094146 > ACL data: handle 1 flags 0x02 dlen 12
-
-    L2CAP(s): Info rsp: type 3 result 1
-
-      Not supported
-
-2010-02-03 18:03:48.094238 < ACL data: handle 1 flags 0x02 dlen 12
-
-    L2CAP(s): Connect req: psm 3 scid 0x0040
-
-2010-02-03 18:03:48.096618 > HCI Event: Number of Completed Packets
-(0x13) plen 5
-
-    handle 1 packets 1
-
-2010-02-03 18:03:48.104003 > ACL data: handle 1 flags 0x02 dlen 16
-
-    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
-
-      Connection successful
-
-2010-02-03 18:03:48.104095 < ACL data: handle 1 flags 0x02 dlen 16
-
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-
-      MTU 1013
-
-2010-02-03 18:03:48.104125 > ACL data: handle 1 flags 0x02 dlen 16
-
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-
-      MTU 1024
-
-2010-02-03 18:03:48.104156 < ACL data: handle 1 flags 0x02 dlen 18
-
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
-
-      MTU 1024
-
-2010-02-03 18:03:48.104339 > ACL data: handle 1 flags 0x02 dlen 16
-
-    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0040 result 4 status 0
-
-      Connection refused - no resources available
-
-2010-02-03 18:03:48.107696 > HCI Event: Number of Completed Packets
-(0x13) plen 5
-
-    handle 1 packets 2
-
-2010-02-03 18:03:48.115264 > ACL data: handle 1 flags 0x02 dlen 14
-
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
-
-      Success
-
-2010-02-03 18:03:48.115386 > ACL data: handle 1 flags 0x02 dlen 12
-
-    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
-
-2010-02-03 18:03:50.101531 < HCI Command: Disconnect (0x01|0x0006) plen 3
-
-    handle 1 reason 0x13
-
-    Reason: Remote User Terminated Connection
-
-2010-02-03 18:03:50.102508 > HCI Event: Command Status (0x0f) plen 4
-
-    Disconnect (0x01|0x0006) status 0x00 ncmd 1
-
-2010-02-03 18:03:50.105438 > HCI Event: Disconn Complete (0x05) plen 4
-
-    status 0x00 handle 1 reason 0x16
-
-    Reason: Connection Terminated by Local Host
-
-
-2. sometimes Encrypt Change is before Info Req: type 2
-
-HCI sniffer - Bluetooth packet analyzer ver 1.42
-
-2010-02-03 17:58:29.214416 < HCI Command: Create Connection
-(0x01|0x0005) plen 13
-
-    bdaddr 00:24:9F:AC:1E:EA ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-
-2010-02-03 17:58:29.234832 > HCI Event: Command Status (0x0f) plen 4
-
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-
-2010-02-03 17:58:30.559875 > HCI Event: Link Key Request (0x17) plen 6
-
-    bdaddr 00:24:9F:AC:1E:EA
-
-2010-02-03 17:58:30.563995 < HCI Command: Link Key Request Reply
-(0x01|0x000b) plen 22
-
-    bdaddr 00:24:9F:AC:1E:EA key 09F010B636EBEC8A3E0E81BBD7AE1CAA
-
-2010-02-03 17:58:30.564819 > HCI Event: Command Complete (0x0e) plen 10
-
-    Link Key Request Reply (0x01|0x000b) ncmd 1
-
-    status 0x00 bdaddr 00:24:9F:AC:1E:EA
-
-2010-02-03 17:58:30.580596 > HCI Event: Connect Complete (0x03) plen 11
-
-    status 0x00 handle 1 bdaddr 00:24:9F:AC:1E:EA type ACL encrypt 0x00
-
-2010-02-03 17:58:30.580779 < HCI Command: Read Remote Supported
-Features (0x01|0x001b) plen 2
-
-    handle 1
-
-2010-02-03 17:58:30.581634 > HCI Event: Command Status (0x0f) plen 4
-
-    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
-
-2010-02-03 17:58:30.587951 > HCI Event: Max Slots Change (0x1b) plen 3
-
-    handle 1 slots 5
-
-2010-02-03 17:58:30.590515 > HCI Event: Read Remote Supported Features
-(0x0b) plen 11
-
-    status 0x00 handle 1
-
-    Features: 0xbf 0xfe 0x8f 0xfe 0x98 0x19 0x00 0x80
-
-2010-02-03 17:58:30.590667 < ACL data: handle 1 flags 0x02 dlen 10
-
-    L2CAP(s): Info req: type 2
-
-2010-02-03 17:58:30.593902 > HCI Event: Number of Completed Packets
-(0x13) plen 5
-
-    handle 1 packets 1
-
-2010-02-03 17:58:30.600280 < HCI Command: Remote Name Request
-(0x01|0x0019) plen 10
-
-    bdaddr 00:24:9F:AC:1E:EA mode 2 clkoffset 0x0000
-
-2010-02-03 17:58:30.600799 > HCI Event: Command Status (0x0f) plen 4
-
-    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
-
-2010-02-03 17:58:30.615020 > HCI Event: Remote Name Req Complete (0x07) plen 255
-
-    status 0x00 bdaddr 00:24:9F:AC:1E:EA name 'BlackBerry 8900'
-
-2010-02-03 17:58:30.639282 > HCI Event: Encrypt Change (0x08) plen 4
-
-    status 0x00 handle 1 encrypt 0x01
-
-2010-02-03 17:58:30.639434 < ACL data: handle 1 flags 0x02 dlen 12
-
-    L2CAP(s): Connect req: psm 3 scid 0x0040
-
-2010-02-03 17:58:30.642669 > HCI Event: Number of Completed Packets
-(0x13) plen 5
-
-    handle 1 packets 1
-
-2010-02-03 17:58:30.642822 > ACL data: handle 1 flags 0x02 dlen 12
-
-    L2CAP(s): Info rsp: type 2 result 1
-
-      Not supported
-
-2010-02-03 17:58:30.642883 < ACL data: handle 1 flags 0x02 dlen 12
-
-    L2CAP(s): Connect req: psm 3 scid 0x0040
-
-2010-02-03 17:58:30.645141 > HCI Event: Number of Completed Packets
-(0x13) plen 5
-
-    handle 1 packets 1
-
-2010-02-03 17:58:30.652862 > ACL data: handle 1 flags 0x02 dlen 16
-
-    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
-
-      Connection successful
-
-2010-02-03 17:58:30.652862 > ACL data: handle 1 flags 0x02 dlen 16
-
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-
-      MTU 1024
-
-2010-02-03 17:58:30.652984 > ACL data: handle 1 flags 0x02 dlen 16
-
-    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0040 result 4 status 0
-
-      Connection refused - no resources available
-
-2010-02-03 17:58:30.653137 < ACL data: handle 1 flags 0x02 dlen 16
-
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-
-      MTU 1013
-
-2010-02-03 17:58:30.653198 < ACL data: handle 1 flags 0x02 dlen 18
-
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
-
-      MTU 1024
-
-2010-02-03 17:58:30.657653 > HCI Event: Number of Completed Packets
-(0x13) plen 5
-
-    handle 1 packets 2
-
-2010-02-03 17:58:30.665191 > ACL data: handle 1 flags 0x02 dlen 14
-
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
-
-      Success
-
-2010-02-03 17:58:30.665283 > ACL data: handle 1 flags 0x02 dlen 12
-
-    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
-
-2010-02-03 17:58:32.648467 < HCI Command: Disconnect (0x01|0x0006) plen 3
-
-    handle 1 reason 0x13
-
-    Reason: Remote User Terminated Connection
-
-2010-02-03 17:58:32.649322 > HCI Event: Command Status (0x0f) plen 4
-
-    Disconnect (0x01|0x0006) status 0x00 ncmd 1
-
-2010-02-03 17:58:32.652984 > HCI Event: Disconn Complete (0x05) plen 4
-
-    status 0x00 handle 1 reason 0x16
-
-    Reason: Connection Terminated by Local Host
