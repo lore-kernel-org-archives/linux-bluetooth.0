@@ -1,67 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Michael Poole <mdpoole@troilus.org>
-To: Bastien Nocera <hadess@hadess.net>, Marcel Holtmann <marcel@holtmann.org>
-Cc: Jiri Kosina <jkosina@suse.cz>,  "Gunn\, Brian" <bgunn@solekai.com>,  Ping <pinglinux@gmail.com>,  linux-kernel@vger.kernel.org,  BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 0/3] HID: make raw output callback more flexible
-References: <alpine.LNX.2.00.1001291515560.356@pobox.suse.cz>
-	<1264783166.29532.5302.camel@localhost.localdomain>
-	<87iqakifm8.fsf@troilus.org>
-	<1264860663.29532.7887.camel@localhost.localdomain>
-Date: Tue, 02 Feb 2010 20:25:32 -0500
-In-Reply-To: <1264860663.29532.7887.camel@localhost.localdomain> (Bastien
-	Nocera's message of "Sat, 30 Jan 2010 14:11:03 +0000")
-Message-ID: <87bpg7glf7.fsf@troilus.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: Re: double Connect req: psm 1 scid 0x0040 ?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Ed Tsang <netdesign_98@yahoo.com>
+Cc: Bluettooth Linux <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <272603.59641.qm@web52603.mail.re2.yahoo.com>
+References: <272603.59641.qm@web52603.mail.re2.yahoo.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Tue, 02 Feb 2010 16:28:26 -0800
+Message-ID: <1265156906.31341.106.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Bastien Nocera writes:
+Hi Ed,
 
-> On Fri, 2010-01-29 at 19:46 -0500, Michael Poole wrote:
->> > [1]: Comments on the patch at
->> > http://thread.gmane.org/gmane.linux.bluez.kernel/4279 would be
->> > appreciated
->> 
->> This patch does not work for me.  Before, the first time after each
->> boot
->> that I tried to connect to an Apple Magic Mouse, it failed with -14
->> (EFAULT).  With this patch, it fails with -22 (EINVAL) instead.  The
->> -EFAULT *was* due to hidp_parse()'s copy_from_user().  I have not
->> looked
->> yet to see where the -EINVAL is coming from -- would that help?  (Both
->> with and without your patch, the second attempt to connect works.) 
->
-> I don't get -EFAULT anymore (it was failing to copy the rd_data from
-> user-space), but I do get -EINVALs now. I haven't investigated it
-> though. My guess is that the hid parser fails.
->
-> Could you compare the sizes of the data gathered in user-space?
+>   I was pulling my hair on opp a file to a Blackberry. Blackerry is set to "receive using bluetooth".
+> 1. If the Blackberry was not paired before. It ran through ok: enter the pin, accept connection, accept the file.
+> 2. If the Blackberry was paired and in it's device properties, I change the encryption off for my box. It ran through ok, accept connection, accept the file...
+> 3. If the Blackberry was paired and I leave the device properties unchange (default is encryption on). It will fail, not seeing any prompt to accept the connection.
+> 
+> In hcidump I seem to see a problem in #3. After the Encrypt Change there seem to be 2 >con. req. psm 1 scid 0x0040
 
-The bug mysteriously disappeared when I tried to apply kgdb to the
-problem.  Your patch won't do the trick because the hidp_connadd_req
-structure has also gone out of scope by the time the hid-(whatever)
-probe function is called.  The ioctl has returned to the user, but the
-new hid-(whatever) module is not yet loaded.
+what kernel version is this? I think we fixed that already.
 
-That is, the sequence looks like this:
+Regards
 
-  - Application triggers hidp_sock_ioctl(socket, HIDPCONNADD, &connadd).
-    - This starts the connection, and returns 0...
-    - ... but also indicates that some other module needs to be loaded.
+Marcel
 
-  - User-space loads the appropriate module does init_module()...
-    - which calls the module_init() function...
-    - which calls hid_register_driver()...
-    - which eventually attaches the new driver to the device...
-    - triggering the module's probe() function to call hid_parse()...
-    - hid_parse() fails because its hidp_connadd_req is gone.
 
-Marcel, I think this is a case where the subsystem maintainer should
-make the call on how to fix it.  I can write and locally test a patch,
-but I don't want to assume that (for example) the desired solution is to
-keep a copy of the Report descriptor in the hidp_session.  The USB HID
-core sends a GET_DESCRIPTOR request for the Report descriptor, which
-isn't practical here because that descriptor is only available through
-SDP.
-
-Michael Poole
