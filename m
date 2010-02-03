@@ -1,115 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 3 Feb 2010 14:58:33 +0100
-From: Stefan Seyfried <stefan.seyfried@googlemail.com>
-To: "Daniel T. Cobra" <dcobra@videam.com.br>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Long delay to (re)connect a bluetooth mouse
-Message-ID: <20100203145833.2c370c51@strolchi>
-In-Reply-To: <4B6961A4.5040503@videam.com.br>
-References: <1260906227.4b27e6f39cc7c@www.fastmail.com.br>
-	<4B2A4B90.1040009@videam.com.br>
-	<4B2BBF58.4030901@videam.com.br>
-	<1261173899.4041.96.camel@localhost.localdomain>
-	<1261176544.4b2c06e0e0eae@www.fastmail.com.br>
-	<1261177111.4041.99.camel@localhost.localdomain>
-	<20091223164841.7070e75d@strolchi.home.s3e.de>
-	<4B325905.6090103@videam.com.br>
-	<20091229160135.12d85fe6@strolchi.home.s3e.de>
-	<4B423816.4060405@videam.com.br>
-	<20100105115152.506eb191@strolchi.home.s3e.de>
-	<4B6961A4.5040503@videam.com.br>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 3 Feb 2010 13:50:21 +0100 (CET)
+From: Jiri Kosina <jkosina@suse.cz>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: Michael Poole <mdpoole@troilus.org>,
+	"Gunn, Brian" <bgunn@solekai.com>, Ping <pinglinux@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: [PATCH 3/3] HID: Enable Sixaxis controller over Bluetooth
+In-Reply-To: <alpine.LNX.2.00.1002031343500.15395@pobox.suse.cz>
+Message-ID: <alpine.LNX.2.00.1002031349550.15395@pobox.suse.cz>
+References: <alpine.LNX.2.00.1001291515560.356@pobox.suse.cz>  <1264783166.29532.5302.camel@localhost.localdomain>  <87iqakifm8.fsf@troilus.org>  <1264860663.29532.7887.camel@localhost.localdomain>  <87bpg7glf7.fsf@troilus.org> <1265190440.32444.8417.camel@localhost.localdomain>
+ <alpine.LNX.2.00.1002031202040.15395@pobox.suse.cz> <alpine.LNX.2.00.1002031343500.15395@pobox.suse.cz>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 03 Feb 2010 09:44:36 -0200
-"Daniel T. Cobra" <dcobra@videam.com.br> wrote:
+From: Bastien Nocera <hadess@hadess.net>
 
-> For me, this is going to be a shot in the dark, not being familiar with 
-> the Bluetooth protocol, but could one of you developers please say if 
-> any of what follows makes sense?
+Now that hid_output_raw_report works, port the PS3 Sixaxis
+Bluetooth quirk from user-space, into kernel-space.
 
-[Disclaimer: I'm neither a bluez develper, nor am I familiar with the
- protocols etc ;)]
+Signed-off-by: Bastien Nocera <hadess@hadess.net>
+Signed-off-by: Jiri Kosina <jkosina@suse.cz>
+---
+ drivers/hid/hid-core.c |    1 +
+ drivers/hid/hid-sony.c |   15 ++++++++++++++-
+ 2 files changed, 15 insertions(+), 1 deletions(-)
 
-Yee, I think this makes sense. Maybe we can make bluez just cache the
-data instead of re-requesting it at wakeup (I'm not sure if it should
-do that actually, because the spec says so, or if the mouse just has a
-broken implementation and we just should do it for convenience). After
-all I don't expect the extended features to change all the time while
-the mouse is asleep ;)
-> 
-> Comparing the hci dumps from my mouse's reconnection and Stefan's, I am 
-> suspicious of the first line below:
-> 
-> [...]                        
-> 2010-01-08 00:15:03.136170 < ACL data: handle 42 flags 0x02 dlen 10
->     L2CAP(s): Info req: type 2
-> 2010-01-08 00:15:03.144090 > HCI Event: Command Status (0x0f) plen 4
->     Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
-> 2010-01-08 00:15:03.144103 < HCI Command: Remote Name Request 
-> (0x01|0x0019) plen 10
->     bdaddr 00:16:38:E2:A5:57 mode 2 clkoffset 0x0000
-> 2010-01-08 00:15:03.146089 > HCI Event: Number of Completed Packets 
-> (0x13) plen 5           
->     handle 42 packets 2
-> 2010-01-08 00:15:03.149092 > HCI Event: Read Remote Supported Features 
-> (0x0b) plen 11       
->     status 0x00 handle 42
->     Features: 0xbc 0x02 0x04 0x28 0x08 0x08 0x00 0x00
-> 2010-01-08 00:15:03.155089 > HCI Event: Command Status (0x0f) plen 4
->     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
-> 2010-01-08 00:15:03.227093 > HCI Event: Remote Name Req Complete (0x07) 
-> plen 255
->     status 0x00 bdaddr 00:16:38:E2:A5:57 name 'Targus Bluetooth Media 
-> Mouse for Notebook'
-> 2010-01-08 00:15:07.135253 < ACL data: handle 42 flags 0x02 dlen 16
->     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0042 result 0 status 0
->       Connection successful
-> [...]
-> 
-> In Stefan's hci dump we have:
-> 
-> [...]
-> 2010-01-05 11:36:51.517876 < ACL data: handle 11 flags 0x02 dlen 10
->     L2CAP(s): Info req: type 2
-> 2010-01-05 11:36:51.525808 > ACL data: handle 11 flags 0x02 dlen 16
->     L2CAP(s): Info rsp: type 2 result 0
->       Extended feature mask 0x0004
->         Bi-directional QoS
-> 2010-01-05 11:36:51.525853 < ACL data: handle 11 flags 0x02 dlen 16
->     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0042 result 0 status 0
->       Connection successful
-> [...]
-> 
-> What is happening here? Is bluez making a request to read the device's 
-> extended features and Stefan's mouse replies while mine doesn't (and the 
-> 4 sec delay I experience is bluez waiting for the reply until it times out)?
-> 
-> If it helps, here's the output of "hcitool info" for my mouse:
-> 
-> Requesting information ...
->         BD Address:  00:16:38:A2:C5:56
->         Device Name: Targus Bluetooth Media Mouse for Notebook
->         LMP Version: 1.1 (0x1) LMP Subversion: 0x100
->         Manufacturer: Broadcom Corporation (15)
->         Features: 0xbc 0x02 0x04 0x28 0x08 0x08 0x00 0x00
->                 <encryption> <slot offset> <timing accuracy> <role switch>
->                 <sniff mode> <RSSI> <power control> <enhanced iscan>
->                 <interlaced pscan> <AFH cap. slave> <AFH cap. master>
-> 
-> So, am I going in the right direction or am I totally off the mark? I'd 
-> really appreciate some comment from you guys who know how this works.
-
-I don't know how it works, but your conclusion seems logical to me.
-Which, of course, says nothing about its correctness ;)
-
-Have fun,
-
-	seife
+diff --git a/drivers/hid/hid-core.c b/drivers/hid/hid-core.c
+index eabe5f8..f7f80e1 100644
+--- a/drivers/hid/hid-core.c
++++ b/drivers/hid/hid-core.c
+@@ -1340,6 +1340,7 @@ static const struct hid_device_id hid_blacklist[] = {
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_PETALYNX, USB_DEVICE_ID_PETALYNX_MAXTER_REMOTE) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_SAMSUNG, USB_DEVICE_ID_SAMSUNG_IR_REMOTE) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS3_CONTROLLER) },
++	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS3_CONTROLLER) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_VAIO_VGX_MOUSE) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_SUNPLUS, USB_DEVICE_ID_SUNPLUS_WDESKTOP) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_THRUSTMASTER, 0xb300) },
+diff --git a/drivers/hid/hid-sony.c b/drivers/hid/hid-sony.c
+index 4e84502..08b7fa0 100644
+--- a/drivers/hid/hid-sony.c
++++ b/drivers/hid/hid-sony.c
+@@ -73,6 +73,12 @@ static int sony_set_operational(struct hid_device *hdev)
+ 	return ret;
+ }
+ 
++static int sony_set_operational_bt(struct hid_device *hdev)
++{
++	unsigned char buf[] = { 0x53, 0xf4,  0x42, 0x03, 0x00, 0x00 };
++	return hdev->hid_output_raw_report(hdev, buf, sizeof(buf), HID_FEATURE_REPORT);
++}
++
+ static int sony_probe(struct hid_device *hdev, const struct hid_device_id *id)
+ {
+ 	int ret;
+@@ -101,7 +107,13 @@ static int sony_probe(struct hid_device *hdev, const struct hid_device_id *id)
+ 		goto err_free;
+ 	}
+ 
+-	ret = sony_set_operational(hdev);
++	if (hdev->bus == BUS_USB)
++		ret = sony_set_operational(hdev);
++	else if (hdev->bus == BUS_BLUETOOTH)
++		ret = sony_set_operational_bt(hdev);
++	else
++		ret = 0;
++
+ 	if (ret < 0)
+ 		goto err_stop;
+ 
+@@ -121,6 +133,7 @@ static void sony_remove(struct hid_device *hdev)
+ 
+ static const struct hid_device_id sony_devices[] = {
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS3_CONTROLLER) },
++	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS3_CONTROLLER) },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_VAIO_VGX_MOUSE),
+ 		.driver_data = VAIO_RDESC_CONSTANT },
+ 	{ }
 -- 
-Stefan Seyfried
-
-"Any ideas, John?"
-"Well, surrounding them's out."
+1.6.4.2
