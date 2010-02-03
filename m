@@ -1,109 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 3 Feb 2010 15:50:29 +0100 (CET)
+Date: Wed, 3 Feb 2010 15:42:32 +0100 (CET)
 From: Jiri Kosina <jkosina@suse.cz>
-To: Ping Cheng <pinglinux@gmail.com>
-Cc: "Gunn, Brian" <bgunn@solekai.com>,
-	Marcel Holtmann <marcel@holtmann.org>, linux-kernel@vger.kernel.org,
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Bastien Nocera <hadess@hadess.net>,
+	Michael Poole <mdpoole@troilus.org>,
+	"Gunn, Brian" <bgunn@solekai.com>, Ping <pinglinux@gmail.com>,
+	linux-kernel@vger.kernel.org,
 	BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 2/3] HID: Implement Wacom quirk in the kernel
-In-Reply-To: <167e8a331001290914t578ffef7y16d52e40c8c54079@mail.gmail.com>
-Message-ID: <alpine.LNX.2.00.1002031549560.15395@pobox.suse.cz>
-References: <alpine.LNX.2.00.1001291515560.356@pobox.suse.cz>  <alpine.LNX.2.00.1001291519250.356@pobox.suse.cz> <167e8a331001290914t578ffef7y16d52e40c8c54079@mail.gmail.com>
+Subject: Re: [PATCH 3/3] HID: Enable Sixaxis controller over Bluetooth
+In-Reply-To: <1265206650.31341.113.camel@localhost.localdomain>
+Message-ID: <alpine.LNX.2.00.1002031542222.15395@pobox.suse.cz>
+References: <alpine.LNX.2.00.1001291515560.356@pobox.suse.cz>  <1264783166.29532.5302.camel@localhost.localdomain>  <87iqakifm8.fsf@troilus.org>  <1264860663.29532.7887.camel@localhost.localdomain>  <87bpg7glf7.fsf@troilus.org>  <1265190440.32444.8417.camel@localhost.localdomain>
+  <alpine.LNX.2.00.1002031202040.15395@pobox.suse.cz>  <alpine.LNX.2.00.1002031343500.15395@pobox.suse.cz>  <alpine.LNX.2.00.1002031349550.15395@pobox.suse.cz> <1265206650.31341.113.camel@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=ISO-8859-1
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 29 Jan 2010, Ping Cheng wrote:
+On Wed, 3 Feb 2010, Marcel Holtmann wrote:
 
->       +       rep_data[0] = 0x03; rep_data[1] = 0x00;
->       +       limit =3;
->       +       do {
->       +               ret = hdev->hid_output_raw_report(hdev, rep_data, 2,
->       +                               HID_FEATURE_REPORT);
->       +       } while (ret < 0 && limit-- > 0);
+> Hi Jiri,
 > 
->  
-> hdev->hid_output_raw_report error is not a hard failure, i.e., the following four lines are unnecessay. We can continue with the
-> rest of the code.
->  
->       +       if (ret < 0) {
->       +               dev_err(&hdev->dev, "failed to poke device #1, %d\n", ret);
->       +               goto err_free;
->       +       }
->       +
->       +       /* 0x06 - high reporting speed, 0x05 - low speed */
->       +       rep_data[0] = 0x06; rep_data[1] = 0x00;
->       +       limit = 3;
->       +       do {
->       +               ret = hdev->hid_output_raw_report(hdev, rep_data, 2,
->       +                               HID_FEATURE_REPORT);
->       +       } while (ret < 0 && limit-- > 0);
+> > Now that hid_output_raw_report works, port the PS3 Sixaxis
+> > Bluetooth quirk from user-space, into kernel-space.
+> > 
+> > Signed-off-by: Bastien Nocera <hadess@hadess.net>
+> > Signed-off-by: Jiri Kosina <jkosina@suse.cz>
 > 
->  
-> Same comments apply here. "/* Note that if query fails it is not a hard failure */" is the comments we use in the corresponding
-> Wacom USB driver, wacom_sys.c
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+>  
+> > -	ret = sony_set_operational(hdev);
+> > +	if (hdev->bus == BUS_USB)
+> > +		ret = sony_set_operational(hdev);
+> > +	else if (hdev->bus == BUS_BLUETOOTH)
+> > +		ret = sony_set_operational_bt(hdev);
+> > +	else
+> > +		ret = 0;
+> > +
+> 
+> I would do sony_set_operational_usb() and sony_set_operational_bt() and
+> also turn this into a switch statement for better readability.
 
-Thanks for the feedback. I have queued the patch below on top of all the 
-other changes.
+Fixed and applied. Thanks,
 
-
-From: Jiri Kosina <jkosina@suse.cz>
-Subject: [PATCH] HID: make Wacom modesetting failures non-fatal
-
-With Wacom tablet mode-setting moved from userspace into kernel,
-we don't have to consider failures of device queries through the
-_raw callback as hard failure, as the driver can safely continue
-anyway.
-
-This is consistent with the current USB driver in wacom_sys.c
-
-Reported-by: Ping Cheng <pinglinux@gmail.com>
-Signed-off-by: Jiri Kosina <jkosina@suse.cz>
----
- drivers/hid/hid-wacom.c |   17 +++++++++--------
- 1 files changed, 9 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/hid/hid-wacom.c b/drivers/hid/hid-wacom.c
-index b8778db..8d3b46f 100644
---- a/drivers/hid/hid-wacom.c
-+++ b/drivers/hid/hid-wacom.c
-@@ -181,6 +181,11 @@ static int wacom_probe(struct hid_device *hdev,
- 		goto err_free;
- 	}
- 
-+	/*
-+	 * Note that if the raw queries fail, it's not a hard failure and it
-+	 * is safe to continue
-+	 */
-+
- 	/* Set Wacom mode2 */
- 	rep_data[0] = 0x03; rep_data[1] = 0x00;
- 	limit = 3;
-@@ -188,10 +193,8 @@ static int wacom_probe(struct hid_device *hdev,
- 		ret = hdev->hid_output_raw_report(hdev, rep_data, 2,
- 				HID_FEATURE_REPORT);
- 	} while (ret < 0 && limit-- > 0);
--	if (ret < 0) {
--		dev_err(&hdev->dev, "failed to poke device #1, %d\n", ret);
--		goto err_free;
--	}
-+	if (ret < 0)
-+		dev_warn(&hdev->dev, "failed to poke device #1, %d\n", ret);
- 
- 	/* 0x06 - high reporting speed, 0x05 - low speed */
- 	rep_data[0] = 0x06; rep_data[1] = 0x00;
-@@ -200,10 +203,8 @@ static int wacom_probe(struct hid_device *hdev,
- 		ret = hdev->hid_output_raw_report(hdev, rep_data, 2,
- 				HID_FEATURE_REPORT);
- 	} while (ret < 0 && limit-- > 0);
--	if (ret < 0) {
--		dev_err(&hdev->dev, "failed to poke device #2, %d\n", ret);
--		goto err_free;
--	}
-+	if (ret < 0)
-+		dev_warn(&hdev->dev, "failed to poke device #2, %d\n", ret);
- 
- 	hidinput = list_entry(hdev->inputs.next, struct hid_input, list);
- 	input = hidinput->input;
 -- 
-1.6.4.2
+Jiri Kosina
+SUSE Labs, Novell Inc.
