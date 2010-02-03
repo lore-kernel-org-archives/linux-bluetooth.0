@@ -1,5 +1,5 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 3 Feb 2010 15:42:32 +0100 (CET)
+Date: Wed, 3 Feb 2010 15:40:34 +0100 (CET)
 From: Jiri Kosina <jkosina@suse.cz>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: Bastien Nocera <hadess@hadess.net>,
@@ -7,11 +7,11 @@ Cc: Bastien Nocera <hadess@hadess.net>,
 	"Gunn, Brian" <bgunn@solekai.com>, Ping <pinglinux@gmail.com>,
 	linux-kernel@vger.kernel.org,
 	BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 3/3] HID: Enable Sixaxis controller over Bluetooth
-In-Reply-To: <1265206650.31341.113.camel@localhost.localdomain>
-Message-ID: <alpine.LNX.2.00.1002031542222.15395@pobox.suse.cz>
+Subject: Re: [PATCH 2/3] HID: Implement Wacom quirk in the kernel
+In-Reply-To: <1265206741.31341.114.camel@localhost.localdomain>
+Message-ID: <alpine.LNX.2.00.1002031540221.15395@pobox.suse.cz>
 References: <alpine.LNX.2.00.1001291515560.356@pobox.suse.cz>  <1264783166.29532.5302.camel@localhost.localdomain>  <87iqakifm8.fsf@troilus.org>  <1264860663.29532.7887.camel@localhost.localdomain>  <87bpg7glf7.fsf@troilus.org>  <1265190440.32444.8417.camel@localhost.localdomain>
-  <alpine.LNX.2.00.1002031202040.15395@pobox.suse.cz>  <alpine.LNX.2.00.1002031343500.15395@pobox.suse.cz>  <alpine.LNX.2.00.1002031349550.15395@pobox.suse.cz> <1265206650.31341.113.camel@localhost.localdomain>
+  <alpine.LNX.2.00.1002031202040.15395@pobox.suse.cz>  <alpine.LNX.2.00.1002031343500.15395@pobox.suse.cz>  <alpine.LNX.2.00.1002031349230.15395@pobox.suse.cz> <1265206741.31341.114.camel@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -20,27 +20,24 @@ On Wed, 3 Feb 2010, Marcel Holtmann wrote:
 
 > Hi Jiri,
 > 
-> > Now that hid_output_raw_report works, port the PS3 Sixaxis
-> > Bluetooth quirk from user-space, into kernel-space.
+> > The hid-wacom driver required user-space to poke at the tablet
+> > to make it send data about the cursor location.
+> > 
+> > This patch makes it do the same thing but in the kernel.
 > > 
 > > Signed-off-by: Bastien Nocera <hadess@hadess.net>
 > > Signed-off-by: Jiri Kosina <jkosina@suse.cz>
 > 
 > Acked-by: Marcel Holtmann <marcel@holtmann.org>
->  
-> > -	ret = sony_set_operational(hdev);
-> > +	if (hdev->bus == BUS_USB)
-> > +		ret = sony_set_operational(hdev);
-> > +	else if (hdev->bus == BUS_BLUETOOTH)
-> > +		ret = sony_set_operational_bt(hdev);
-> > +	else
-> > +		ret = 0;
-> > +
 > 
-> I would do sony_set_operational_usb() and sony_set_operational_bt() and
-> also turn this into a switch statement for better readability.
+> >  
+> > +	/* Set Wacom mode2 */
+> > +	rep_data[0] = 0x03; rep_data[1] = 0x00;
+> > +	limit =3;
+> 
+> Small nitpick here. The space after = is missing ;)
 
-Fixed and applied. Thanks,
+Fixed and applied. Thank you.
 
 -- 
 Jiri Kosina
