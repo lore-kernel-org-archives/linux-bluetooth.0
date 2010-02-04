@@ -3,10 +3,10 @@ From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: ofono@ofono.org
 Subject: [PATCH] Implement HandsfreeGateway Interface
-Date: Thu,  4 Feb 2010 16:48:11 -0200
-Message-Id: <1265309291-5940-1-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1265307534-1250-1-git-send-email-padovan@profusion.mobi>
-References: <1265307534-1250-1-git-send-email-padovan@profusion.mobi>
+Date: Thu,  4 Feb 2010 16:18:54 -0200
+Message-Id: <1265307534-1250-1-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1265303486-10865-1-git-send-email-padovan@profusion.mobi>
+References: <1265303486-10865-1-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -17,12 +17,12 @@ Many thanks to Zhenhua Zhang <zhenhua.zhang@intel.com> for his
 prototype on this code.
 ---
  audio/device.c  |    3 +
- audio/gateway.c |  447 +++++++++++++++++++++++++++++++++++++++++--------------
- audio/gateway.h |   14 +-
+ audio/gateway.c |  433 ++++++++++++++++++++++++++++++++++++++++++-------------
+ audio/gateway.h |   14 ++-
  audio/manager.c |   19 +--
- audio/unix.c    |   13 +-
- doc/hfp-api.txt |   82 ++++++++++
- 6 files changed, 445 insertions(+), 133 deletions(-)
+ audio/unix.c    |   13 ++-
+ doc/hfp-api.txt |   82 +++++++++++
+ 6 files changed, 438 insertions(+), 126 deletions(-)
  create mode 100644 doc/hfp-api.txt
 
 diff --git a/audio/device.c b/audio/device.c
@@ -40,7 +40,7 @@ index f7141e5..b8ea927 100644
  		sink_unregister(device);
  
 diff --git a/audio/gateway.c b/audio/gateway.c
-index 3dc09ff..8150a5e 100644
+index 3dc09ff..eaac8ab 100644
 --- a/audio/gateway.c
 +++ b/audio/gateway.c
 @@ -5,6 +5,7 @@
@@ -165,7 +165,7 @@ index 3dc09ff..8150a5e 100644
  		return FALSE;
  	}
  
-@@ -92,88 +176,123 @@ static void sco_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+@@ -92,67 +176,99 @@ static void sco_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
  
  	debug("at the begin of sco_connect_cb() in gateway.c");
  
@@ -283,8 +283,7 @@ index 3dc09ff..8150a5e 100644
 +	change_state(dev, GATEWAY_STATE_DISCONNECTED);
  }
  
--static void get_record_cb(sdp_list_t *recs, int perr, gpointer user_data)
-+static void get_record_cb(sdp_list_t *recs, int err, gpointer user_data)
+ static void get_record_cb(sdp_list_t *recs, int perr, gpointer user_data)
  {
  	struct audio_device *dev = user_data;
 -	DBusMessage *msg = dev->gateway->connect_message;
@@ -295,33 +294,25 @@ index 3dc09ff..8150a5e 100644
  	uuid_t uuid;
 -	gateway_stream_cb_t sco_cb;
  	GIOChannel *io;
--	GError *err = NULL;
-+	GError *gerr = NULL;
+ 	GError *err = NULL;
  
--	if (perr < 0) {
--		error("Unable to get service record: %s (%d)", strerror(-perr),
--					-perr);
-+	if (err < 0) {
-+		error("Unable to get service record: %s (%d)", strerror(-err),
-+					-err);
- 		goto fail;
- 	}
+@@ -164,16 +280,19 @@ static void get_record_cb(sdp_list_t *recs, int perr, gpointer user_data)
  
  	if (!recs || !recs->data) {
  		error("No records found");
-+		err = -EIO;
++		perr = EIO;
  		goto fail;
  	}
  
  	if (sdp_get_service_classes(recs->data, &classes) < 0) {
  		error("Unable to get service classes from record");
-+		err = -EINVAL;
++		perr = EINVAL;
  		goto fail;
  	}
  
  	if (sdp_get_access_protos(recs->data, &protos) < 0) {
  		error("Unable to get access protocols from record");
-+		err = -ENODATA;
++		perr = ENODATA;
  		goto fail;
  	}
  
@@ -333,26 +324,22 @@ index 3dc09ff..8150a5e 100644
 -									NULL);
  		sdp_list_free(protos, NULL);
  		error("Invalid service record or not HFP");
-+		err = -EIO;
++		perr = EIO;
  		goto fail;
  	}
  
-@@ -194,39 +312,42 @@ static void get_record_cb(sdp_list_t *recs, int perr, gpointer user_data)
+@@ -194,6 +312,7 @@ static void get_record_cb(sdp_list_t *recs, int perr, gpointer user_data)
  	sdp_list_free(protos, NULL);
  	if (ch <= 0) {
  		error("Unable to extract RFCOMM channel from service record");
-+		err = -EIO;
++		perr = EIO;
  		goto fail;
  	}
  
--	io = bt_io_connect(BT_IO_RFCOMM, rfcomm_connect_cb, dev, NULL, &err,
-+	io = bt_io_connect(BT_IO_RFCOMM, rfcomm_connect_cb, dev, NULL, &gerr,
- 				BT_IO_OPT_SOURCE_BDADDR, &dev->src,
- 				BT_IO_OPT_DEST_BDADDR, &dev->dst,
- 				BT_IO_OPT_CHANNEL, ch,
+@@ -204,29 +323,31 @@ static void get_record_cb(sdp_list_t *recs, int perr, gpointer user_data)
  				BT_IO_OPT_INVALID);
  	if (!io) {
--		error("Unable to connect: %s", err->message);
+ 		error("Unable to connect: %s", err->message);
 -		if (msg) {
 -			error_common_reply(dev->conn, msg, ERROR_INTERFACE
 -						".ConnectionAttemptFailed",
@@ -360,7 +347,6 @@ index 3dc09ff..8150a5e 100644
 -			msg = NULL;
 -		}
 -		g_error_free(err);
-+		error("Unable to connect: %s", gerr->message);
  		gateway_close(dev);
 +		goto fail;
  	}
@@ -385,14 +371,14 @@ index 3dc09ff..8150a5e 100644
 -	sco_cb = dev->gateway->sco_start_cb;
 -	if (sco_cb)
 -		sco_cb(NULL, dev->gateway->sco_start_cb_data);
-+	if (!gerr)
-+		g_set_error(&gerr, BT_IO_ERROR, BT_IO_ERROR_FAILED,
-+				"connect: %s (%d)", strerror(-err), -err);
++	if (!err)
++		g_set_error(&err, BT_IO_ERROR, BT_IO_ERROR_FAILED,
++				"connect: %s (%d)", strerror(perr), perr);
 +
 +	if (gw->sco_start_cb)
-+		gw->sco_start_cb(dev, gerr, gw->sco_start_cb_data);
++		gw->sco_start_cb(dev, err, gw->sco_start_cb_data);
 +
-+	g_error_free(gerr);
++	g_error_free(err);
  }
  
  static int get_records(struct audio_device *device)
