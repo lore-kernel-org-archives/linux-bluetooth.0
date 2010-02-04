@@ -1,38 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <912bb79a1002032156t55dfeb3cr8a64ba5538bdd3fc@mail.gmail.com>
-References: <912bb79a1002020858lda468aci6fef3e73fac07bd6@mail.gmail.com>
-	 <20100202171612.GA7034@vigoh>
-	 <f97b2b971002021401j66b31fb7g5d1bcae11dd49a1c@mail.gmail.com>
-	 <912bb79a1002032156t55dfeb3cr8a64ba5538bdd3fc@mail.gmail.com>
-Date: Thu, 4 Feb 2010 17:26:14 +0200
-Message-ID: <f97b2b971002040726h3bc02d0dr16e3b8290f316f5@mail.gmail.com>
-Subject: Re: Kernel panic when SCO connection
-From: Ahmed Ragab <elmasri.ahmed@gmail.com>
-To: nirav rabara <niravrabara@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH] Bluetooth: Keep a copy of each HID device's report
+ descriptor.
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Michael Poole <mdpoole@troilus.org>
+Cc: Bastien Nocera <hadess@hadess.net>, Jiri Kosina <jkosina@suse.cz>,
+	"Gunn, Brian" <bgunn@solekai.com>, Ping <pinglinux@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <871vh1gpaz.fsf_-_@troilus.org>
+References: <alpine.LNX.2.00.1001291515560.356@pobox.suse.cz>
+	 <1264783166.29532.5302.camel@localhost.localdomain>
+	 <87iqakifm8.fsf@troilus.org>
+	 <1264860663.29532.7887.camel@localhost.localdomain>
+	 <871vh1gpaz.fsf_-_@troilus.org>
+Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 04 Feb 2010 06:23:10 -0800
+Message-ID: <1265293390.31341.156.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nirav,
+Hi Michael,
 
-I didn't find any solutions yet however i will try the solution
-Suggested by SINGH DEVENDRA-DHGW76 and if it didn't work
-I will upgrade to kernal 2.6.33-rc6 and see what happens
+> This patch works for me.  Bastien, does it also fix it for you?
+> 
+> Michael Poole
+> 
+> From f8aeb64ac2d42f5fae080c00a287fdbd8304ffa2 Mon Sep 17 00:00:00 2001
+> From: Michael Poole <mdpoole@troilus.org>
+> Date: Wed, 3 Feb 2010 21:49:48 -0500
+> Subject: [PATCH] Bluetooth: Keep a copy of each HID device's report descriptor.
+> 
+> The report descriptor is read by user space (via the Service
+> Discovery Protocol), so it is only available during the ioctl
+> to connect.  However, the probe function that needs the
+> descriptor might not be called until a specific module is
+> loaded.  Keep a copy of the descriptor so it is available for
+> later use.
+
+looks good to me. I just prefer that you do the allocation of the report
+descriptor before the HID object:
+
+@@ -770,12 +770,24 @@ static int hidp_setup_hid(struct hidp_session *session,
+        bdaddr_t src, dst;
+        int err;
+ 
++       session->rd_data = kzalloc(req->rd_size, GFP_KERNEL);
++       if (!session->rd_data)
++               return -ENOMEM;
++
++       if (copy_from_user(session->rd_data, req->rd_data, req->rd_size)) {
++               err = -EFAULT;
++               goto fault;
++       }
++
++       session->rd_size = req->rd_size;
++
+        hid = hid_allocate_device();
+-       if (IS_ERR(hid))
+-               return PTR_ERR(hid);
++       if (IS_ERR(hid)) {
++               err = PTR_ERR(hid);
++               goto fault;
++       }
+ 
+        session->hid = hid;
+-       session->req = req;
+        hid->driver_data = session;
+ 
+        baswap(&src, &bt_sk(session->ctrl_sock->sk)->src);
+@@ -806,6 +818,10 @@ failed:
+        hid_destroy_device(hid);
+        session->hid = NULL;
+ 
++fault:
++       kfree(session->rd_data);
++       session->rd_data = NULL;
++
+        return err;
 
 Regards
 
-Ahmed
+Marcel
 
 
-
-On 4 February 2010 07:56, nirav rabara <niravrabara@gmail.com> wrote:
-> Hey Ahmed,
->
-> Did you find any solution for kernel crash due to SCO connection.
->
-> --
-> With Regards,
-> Nirav Rabara
->
