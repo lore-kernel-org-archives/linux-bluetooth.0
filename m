@@ -1,90 +1,110 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4B6A3D25.2040508@intel.com>
-Date: Thu, 04 Feb 2010 11:21:09 +0800
-From: Zhenhua Zhang <zhenhua.zhang@intel.com>
-MIME-Version: 1.0
-To: =?UTF-8?B?Sm/Do28gUGF1bG8gUmVjaGkgVml0YQ==?= <jprvita@gmail.com>
-Subject: Re: [RFC] [PATCH 0/2] HFP AG integration with PulseAudio
-References: <1264776266-7646-1-git-send-email-jprvita@gmail.com>	
-	<aa32413d1002010909h1ba06e13n1511d56903406945@mail.gmail.com>	
-	<4B67A102.6090304@intel.com>
-	<aa32413d1002031030s446edef6gea3d234bc440c170@mail.gmail.com>
-In-Reply-To: <aa32413d1002031030s446edef6gea3d234bc440c170@mail.gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"ofono@ofono.org" <ofono@ofono.org>
-Reply-To: ofono@ofono.org
-List-Unsubscribe: <http://lists.ofono.org/options/ofono>,
-	<mailto:ofono-request@ofono.org?subject=unsubscribe>
-List-Archive: <http://lists.ofono.org/pipermail/ofono>
-List-Post: <mailto:ofono@ofono.org>
-List-Help: <mailto:ofono-request@ofono.org?subject=help>
-List-Subscribe: <http://lists.ofono.org/listinfo/ofono>,
-	<mailto:ofono-request@ofono.org?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
-Sender: ofono-bounces@ofono.org
-Errors-To: ofono-bounces@ofono.org
+Subject: Re: What is the motivation for conn->power_save
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Nick Pelly <npelly@google.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <35c90d961002031659v2a58a80cwdd86c17dc093a07d@mail.gmail.com>
+References: <35c90d960911121639o8b0b0bfxde880af69adc9f95@mail.gmail.com>
+	 <1258082098.7715.7.camel@violet>
+	 <35c90d960911121931n687a2cd4ie8130f919041ee70@mail.gmail.com>
+	 <1258084357.7715.26.camel@violet>
+	 <35c90d960911161055y695933fdjd221ad3b689ae3cf@mail.gmail.com>
+	 <1265228415.31341.135.camel@localhost.localdomain>
+	 <35c90d961002031659v2a58a80cwdd86c17dc093a07d@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Wed, 03 Feb 2010 19:13:13 -0800
+Message-ID: <1265253193.31341.151.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgSnBydml0YSwKCk9uIDAyLzA0LzIwMTAgMDI6MzAgQU0sIEpvw6NvIFBhdWxvIFJlY2hpIFZp
-dGEgd3JvdGU6Cj4+Pgo+Pj4gSnVzdCB1cGRhdGluZywgdGhpcyBwYXRjaCBhY3R1YWxseSB3b3Jr
-ZWQgd2hlbiB0ZXN0aW5nIHdpdGggYQo+Pj4gZGlmZmVyZW50IGFkYXB0ZXIgKEZ1aml0c3UtU2ll
-bWVucyBDU1ItYmFzZWQpLiBUaGUgYWRhcHRlciBjYXVzaW5nCj4+PiBwcm9ibGVtcyB3YXMgYSBC
-cm9hZGNvbSAyLjEsIHRoZSBpbnRlcm5hbCBhZGFwdGVyIG9mIGEgRGVsbCBNaW5pMTAuCj4+PiBB
-bHNvLCBzdXNwZW5kaW5nIHRoZSBzb3VyY2UgLyBzaW5rIGFjdHVhbGx5IGRvZXNuJ3QgaW50ZXJm
-ZXJlLgo+Pj4KPj4+IEkgZGlkIGEgc21hbGwgdmlkZW8gb2YgdGhlIHdob2xlIHN0dWZmOiBodHRw
-Oi8vd3d3LnZpbWVvLmNvbS85MDc4Nzk5Cj4+Pgo+Pj4gVGhlcmUgYXJlIHN0aWxsIHNvbWUgcHJv
-YmxlbXMgd2hlbiB0ZXN0aW5nIGFnYWluc3QgTm9raWEgTjkwMCBhbmQKPj4+IDI2NjAuIEFmdGVy
-IHRoZSAiZW5hYmxlLW1vZGVtIiBzdGVwLCB0aGUgUkZDT01NIGxpbmsgaXMgY29ubmVjdGVkIGFu
-ZAo+Pj4gdGhlIFNDTyBqdXN0IGFmdGVyIHRoYXQsIGxlYWRpbmcgbW9kdWxlLWJsdWV0b290aC1k
-aXNjb3ZlciB0byBsb2FkCj4+PiBtb2R1bGUtYmx1ZXRvb3RoLWRldmljZS4gU29tZXRpbWVzIGFm
-dGVyIHRoYXQgdGhlIHBvbGxpbmcgb24gdGhlCj4+PiBzdHJlYW0gZmQgZ2V0IGEgUE9MTEhVUCBh
-bmQgdGhlIG1vZHVsZS1ibHVldG9vdGgtZGV2aWNlIHVubG9hZHMKPj4+IGl0c2VsZi4gT3RoZXIg
-dGltZXMgdGhlIFBPTExIVVAgZG9lc24ndCBoYXBwZW4gYW5kIHRoZSByZW1haW5pbmcgc3RlcHMK
-Pj4+IGdvIHdpdGhvdXQgYW55IHByb2JsZW0uCj4+Pgo+Pj4gSWRlYXMgb24gaG93IHRvIGltcHJv
-dmUgdGhpcyBzY2VuYXJpbyB3aWxsIGJlIHZlcnkgaGVscGZ1bC4KPj4+Cj4+Pgo+Pgo+PiBUaGUg
-b3V0cHV0IGZyb20gYmx1ZXRvb3RoZCBsaWtlcyBiZWxvdzoKPj4KPj4gYmx1ZXRvb3RoZFsyMTE0
-MV06IEFjY2VwdGVkIEFHIGNvbm5lY3Rpb24gZnJvbSAwMDpCRDozQTpENDo0RTo1MyBmb3IKPj4g
-L29yZy9ibHVlei8yMTE0MS9oY2kwL2Rldl8wMF9CRF8zQV9ENF80RV81Mwo+PiBibHVldG9vdGhk
-WzIxMTQxXTogQWNjZXB0ZWQgU0NPIGNvbm5lY3Rpb24gZnJvbSAwMDpCRDozQTpENDo0RTo1Mwo+
-PiBibHVldG9vdGhkWzIxMTQxXTogTm8gbWF0Y2hpbmcgY29ubmVjdGlvbiBmb3VuZCBmb3IgaGFu
-ZGxlIDYKPj4gYmx1ZXRvb3RoZFsyMTE0MV06IHNjbyBjb25uZWN0aW9uIGlzIHJlbGVhc2VkCj4+
-Cj4+IEkgdGhpbmsgeW91IHNob3VsZCBub3QgbG9hZCBtb2R1bGUtYmx1ZXRvb3RoLWRldmljZSB1
-bnRpbCBhIHZvaWNlIGNhbGwgaXMKPj4gc3RhcnRlZCwgbm8gbWF0dGVyIGluY29taW5nIG9yIG91
-dGdvaW5nLiBCZWNhdXNlIFBBIG1heSBwbGF5IG11c2ljIGZyb20KPj4gb3RoZXIgZGV2aWNlIGF0
-IHRoZSBzYW1lIHRpbWUuIEFuZCBibHVldG9vdGgtZGV2aWNlIGFuZCBsb29wYmFjayBtb2R1bGUg
-YXJlCj4+IGxvYWRlZCB0b2dldGhlci4gQWNjb3JkaW5nIHRvIEhGUCB2MS41IDQuMTMsIHRoZXJl
-IGFyZSB0d28gY2FzZXMgZm9yCj4+IGluY29taW5nIGNhbGwuIEFuZCBvdXRnb2luZyBjYWxsIGlz
-IHNpbXBsZXIgdGhhbiBpbmNvbWluZyBjYWxsLgo+Pgo+PiBJZiBBRyBhbmQgSEYgYm90aCBzdXBw
-b3J0IGluIGJhbmQgcmluZyB0b25lcywgd2Ugc2hvdWxkIHNlbmQgYSBzaWduYWwgZnJvbQo+PiBv
-Rm9ubyB0byBQQSB3aGVuIGNhbGxzZXR1cD0xLiBJZiBub3QsIHdlIHNob3VsZCBzZW5kIGl0IHdo
-ZW4gY2FsbD0xLgo+Pgo+PiBJIGhhZCBhIHBhdGNoIG9yaWdpbmFsbHkgYnV0IEkgY2Fubm90IGZp
-bmQgaXQgbm93LiA6LSguIFRoZSBiYXNpYyBpZGVhIGlzIHRvCj4+IGFkZCBhIGZpbHRlciBpbiBj
-aWV2X25vdGlmeSgpIHRvIGVtaXQgc2lnbmFsIChDYWxsU3RhcnRlZCBhbmQgQ2FsbEVuZGVkKSB0
-bwo+PiBQQS4gQW5kIFBBIGxvYWRzIG1vZHVsZSBvbmNlIGl0IGdvdCB0aGF0IHNpZ25hbC4gTWF5
-YmUgdGhlIHNpZ25hbCBuYW1lIHdhcwo+PiBiYWQgYW5kIHlvdSBjb3VsZCBjaG9vc2UgYmV0dGVy
-IG9uZSBhcyB5b3Ugd2FudC4gOy0pCj4+Cj4KPiBJIHRoaW5rIGxvYWRpbmcgbW9kdWxlLWJsdWV0
-b290aC1kZXZpY2Ugb25seSB3aGVuIHRoZXJlIGlzIGFuIGFjdGl2ZQo+IGNhbGwgY2FuIGJlIGEg
-Z29vZCBzb2x1dGlvbi4gQnV0IEknbSBjb25jZXJuZWQgYWJvdXQgb3RoZXIgYXVkaW8KPiBldmVu
-dHMsIGkuIGUuOiByaW5naW5nLCBTTVMgbm90aWZpY2F0aW9uIGV0Yy46IGRvZXNuJ3QgdGhlIEFH
-Cj4gZXN0YWJsaXNoZXMgYSBTQ08gY2hhbm5lbCBmb3IgdGhlIHRoZXNlIGV2ZW50cz8gQWxzbywg
-SSBkb24ndCB0aGluawo+IHB1bHNlIHNob3VsZCBsaXN0ZW4gdG8gb2Zvbm8gc2lnbmFscywgaXQg
-c2hvdWxkIGJlIGFnZW50LWFnbm9zdGljLiBCdXQKPiBhIHNpZ25hbCBjb3VsZCBiZSBhZGRlZCB0
-byB0aGUgYWdlbnQgaW50ZXJmYWNlIGluIHRoaXMgY2FzZS4KClllYWguIE1heWJlIHlvdSBhcmUg
-cmlnaHQuIFBBIHNob3VsZCBub3QgbGlzdGVuIHRvIG9mb25vIHNpZ25hbCBkaXJlY3RseSAKYnV0
-IHRocm91Z2ggYW4gYWdlbnQgc2lnbmFsIHRvIG1ha2UgaXQgbW9yZSBnZW5lcmljLiBBRkFLLCBT
-TVMgCm5vdGlmaWNhdGlvbiBkb2Vzbid0IHJlcXVpcmUgU0NPLiBVcHBlciBhcHAgY291bGQgc2lt
-cGx5IHdhdGNoIHRoZSAKcHJvcGVydHkgY2hhbmdlcyBmcm9tIG9Gb25vLgoKPiBBbmQgSSdtIG5v
-dCBzdXJlIGlmIGF1dG9tYXRpY2FsbHkgbG9hZGluZyBtb2R1bGUtbG9vcGJhY2sgaXMgYSBnb29k
-Cj4gaWRlYSwgSSB0aGluayB3ZSBiZXR0ZXIgZXhwb3NlIHRocm91Z2ggdGhlIFVJIGhvdyB0byBo
-YW5kbGUgdGhlIGF1ZGlvCj4gc3RyZWFtLiBTb21lIHVzZXJzIG1heSBoYXZlIGEgYnVuY2ggb2Yg
-c291bmRjYXJkcyBvciBzb21lIHZlcnkgd2VpcmQKPiBhdWRpbyBzZXR1cCwgYW5kIGl0J3MgdXAg
-dG8gdGhlbSB0byBkZWNpZGUgd2hpY2ggc291bmRjYXJkIHRvIGNvbm5lY3QKPiB0aGUgSEZQIHN0
-cmVhbS4KPgoKSSBhbSBub3QgYXVkaW8gZXhwZXJ0IGJ1dCBBRkFLIFBBIGhhcyB2YXJpYW50IHBv
-bGljaWVzIHRvIGNvbnRyb2wgd2hpY2ggCmF1ZGlvIHN0cmVhbSBzaG91bGQgYmUgZmVlZGVkIGlu
-dG8gdGhlIHNwZWFrZXIvbWljLiBMb2FkaW5nIAptb2R1bGUtYmx1ZXRvb3RoLWRldmljZSBpcyBv
-bmx5IHRoZSAxc3Qgc3RlcCB0byBjcmVhdGUgc291cmNlL3NpbmsuIEkgCnRoaW5rIHRoZSB2b2lj
-ZWNhbGwgaGF2ZSB0aGUgaGlnaGVyIHByaW9yaXR5IHRoYW4gb3RoZXIgc3RlYW0gbGlrZSAKbXVz
-aWMsIGV0Yy4gQW5kIHllcywgbG9hZGluZyBtb2R1bGUtbG9vcGJhY2sgY291bGQgYmUgZGVjaWRl
-ZCBieSBQQSBwb2xpY3kuCgpUaGFua3MuClpoZW5odWEuCgpfX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fXwpvZm9ubyBtYWlsaW5nIGxpc3QKb2Zvbm9Ab2Zvbm8u
-b3JnCmh0dHA6Ly9saXN0cy5vZm9uby5vcmcvbGlzdGluZm8vb2Zvbm8K
+Hi Nick,
+
+> >> >> >> If I understand correctly, conn->power_save prevents the host stack
+> >> >> >> from requesting active mode if it was not the host stack that
+> >> >> >> requested sniff mode.
+> >> >> >>
+> >> >> >> I don't understand the motivation for this. If we have ACL data to
+> >> >> >> send, then it seems like a good idea for the host stack to explicitly
+> >> >> >> request active mode, regardless of the reason that we entered sniff
+> >> >> >> mode.
+> >> >> >>
+> >> >> >> We want to enter active mode more aggressively when setting up SCO
+> >> >> >> connections, to avoid a 5 second delay with certain sniff modes. But
+> >> >> >> the conn->power_save code is getting in the way and doesn't appear to
+> >> >> >> be useful in the first place.
+> >> >> >
+> >> >> > we have discussed this a few times. And if you lock through the code
+> >> >> > history then you see that initially we just took devices out of sniff
+> >> >> > mode if we had to send data. However with HID devices this falls flat on
+> >> >> > its face. They need to stay in control of sniff mode if they initiated
+> >> >> > it. Some of them crash and others just drain the battery. With sniff
+> >> >> > mode you can send small amounts of data even while in sniff and for HID
+> >> >> > that is sometimes used. So the remote side better not interfere.
+> >> >> >
+> >> >> > What we really need is a socket option where we can control this on a
+> >> >> > per socket basis if we take devices out of sniff mode. And one extra
+> >> >> > case might be when we try to establish a SCO channel, because then it is
+> >> >> > clearly not an HID device. However even A2DP has this sort of problems
+> >> >> > sometimes where the stream setup takes time.
+> >> >>
+> >> >> Makes sense. Thanks for the explanation.
+> >> >
+> >> > this means you will be working on a patch for this :)
+> >> >
+> >> >> > Not sure if we have to make SCO setup special. The only reason would be
+> >> >> > if there is a case where we don't get an AT command before SCO needs to
+> >> >> > be established.
+> >> >>
+> >> >> If you are in-call, and transfer audio from handset to BT headset,
+> >> >> then there is SCO setup without any AT command.
+> >> >
+> >> > Fair enough.
+> >> >
+> >> >> I think for the SCO setup case we would always want to enter active
+> >> >> mode. I could modify enter_active_mode() to take a parameter like 'int
+> >> >> force' that would force us to enter active mode regardless of the
+> >> >> state of power_save, and use this when setting up SCO. What do you
+> >> >> think?
+> >> >
+> >> > Actually when you leave sniff mode, then all bets for the power_save
+> >> > value are off again. So you better set power_save and just call
+> >> > enter_active_mode. Something like this:
+> >> >
+> >> > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> >> > index a975098..e4591e0 100644
+> >> > --- a/net/bluetooth/hci_conn.c
+> >> > +++ b/net/bluetooth/hci_conn.c
+> >> > @@ -376,6 +376,9 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type,
+> >> >
+> >> >        if (acl->state == BT_CONNECTED &&
+> >> >                        (sco->state == BT_OPEN || sco->state == BT_CLOSED)) {
+> >> > +               acl->power_save = 1;
+> >> > +               hci_conn_enter_active_mode(acl);
+> >> > +
+> >> >                if (lmp_esco_capable(hdev))
+> >> >                        hci_setup_sync(sco, acl->handle);
+> >> >                else
+> >> >
+> >> > Alternatively we could create hci_conn_force_active_mode() or just
+> >> > implement a proper per socket sniff/active policy.
+> >> >
+> >>
+> >> Patch submitted to Android tree as:
+> >>
+> >> http://android.git.kernel.org/?p=kernel/common.git;a=commit;h=201ac2f225a31dffcb05f1db4d609c467c9c694c
+> >
+> > can you please send a version to the mailing list so I can easily apply
+> > it and also have it here for reference in the archives.
+> 
+> Patch attached.
+
+patch has been applied. Please keep the commit message to 72 chars so
+that git log doesn't exceed on an 80 chars terminal. Also your hcidump
+seems to line wrap. I had to fix that ;)
+
+Regards
+
+Marcel
+
+
