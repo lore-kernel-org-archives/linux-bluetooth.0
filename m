@@ -1,78 +1,172 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 4 Feb 2010 23:05:16 +0100
-From: Frank Maas <frank.maas@cheiron-it.nl>
-To: linux-bluetooth@vger.kernel.org
-Subject: Problem with 'inquiry_cache' in sysfs
-Message-ID: <20100204220516.GC8556@xs4all.nl>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <C408AA84F077D5498977E4A236357B2206C1E687@ZMY16EXM67.ds.mot.com>
+References: <912bb79a1002020858lda468aci6fef3e73fac07bd6@mail.gmail.com>
+	 <20100202171612.GA7034@vigoh>
+	 <912bb79a1002022051o1faf229en95605084fa0e380b@mail.gmail.com>
+	 <C408AA84F077D5498977E4A236357B2206C1E687@ZMY16EXM67.ds.mot.com>
+Date: Thu, 4 Feb 2010 22:06:58 +0200
+Message-ID: <f97b2b971002041206t3d04a520x81a67c2452ee4838@mail.gmail.com>
+Subject: Re: Kernel panic when SCO connection
+From: Ahmed Ragab <elmasri.ahmed@gmail.com>
+To: SINGH DEVENDRA-DHGW76 <DevSingh@motorola.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dear developers!
+Hi Dev,
 
-I have just connected to your mailing list as this is your prefered way 
-of contact. So excuse me for barging in a bit... And excuse me if the 
-following is too much text...
+> 2. Increased transfer buffer size to 1.5K.
 
-I am currently developing a system that relies heavily on the Linux 
-bluetooth stack. That system uses the sysfs interface to the kernel 
-module and more specifically the entry 'inquiry_cache' of the device 
-"directory".
+Please advise in which module should i increase the buffer size
 
-While using this approach I experienced strange errors, varying from a 
-dead system, a system that went crazy, a system that spewed kernel 
-errors and the worse effect was a straight kernel panic. After blaming 
-everyone else (including myself) I found that I could reproduce the 
-error quite simple by just 'cat'-ing the above named inquiry_cache.
+Thanks
 
-[If you like to try yourself, then go to an area where you have a lot of ]
-[of BT devices, wait for a while and do 'cat /sys/.../inquiry_cache'.    ]
-[Or, to make it more certain that your system will crash: create a       ]
-[script that continuously does that command.                             ]
-
-So I took a dive in the code and I think I found the problem. The sysfs 
-"documentation" says
-
-	'Attributes should be ASCII text files, preferably with only 
-	one value per file. It is noted that it may not be efficient to 
-	contain only one value per file, so it is socially acceptable 
-	to express an array of values of the same type. 
-	... expressing multiple lines of data ... is heavily frowned 
-	upon.'
-
-a little bit further it states
-
-	'To read [...] attributes, [a] show() [...] method must be
-	specified [...] sysfs allocates a buffer of size (PAGE_SIZE) and 
-	passes it to the method. '
-
-The Bluetooth stack defines function show_inquiry_cache() to serve the 
-above named file. For every entry in the cache a line is sprint'ed to 
-the buffer. While doing so there is no check if it still fits the 
-buffer. With a common value of 4096 for PAGE_SIZE it takes a bit more 
-than 50 entries to create a bufferoverflow. Since this is in kernelspace 
-bad things can and will happen...
-
-I purposely quoted the documentation above since I have no simple 
-solution. I fear that one can argue if 'inquiry_cache' should be 
-available. It does not show a simple attribute(-list) but the contents 
-of a cache that can be rather large. However I do see a benefit for 
-having this cache available (I *am* using it, now am I).
-Simply stop when the buffer is full is not an option since then one will 
-not see the complete cache (and so one can miss newly detected devices). 
-Showing only the most recent is a bit better, but one is still not 
-seeing everything.
-
-
-So there you have it. I had a quick scan through your mail archive and 
-did not find this issue. I might have missearched or perhaps this topic 
-has already been tackled elsewhere. If so then please redirect me and 
-accept my appologies. 
-
-Happy to hear from you,
-
-Frank
+Ahmed
 
 
 
+On 4 February 2010 13:36, SINGH DEVENDRA-DHGW76 <DevSingh@motorola.com> wrote:
+> Hi,
+>
+> I noticed the same problem when I was working with a embedded board with
+> Broadcom chipset and Linux kernel 2.6.18 (I guess). Use case was, a
+> Bluetooth based headset sends data to the CSR Bluetooth dongle(USB),
+> which in turn provide data to the Application through bluez stack.
+>
+>
+> Following were my observation:
+>
+> 1. Board processor is not strong enough and so there was no URB in the
+> queue and audio data was getting accumulated in the USB host controller.
+> There are only 2 Rx URBs (hci_usb.h: #define HCI_MAX_ISOC_RX
+> 2).
+> 2. Actual length of data for data in the URB is reaching to the level of
+> 1K bytes. (Max ISOC data length) however Bluetooth driver is expecting
+> 10 packets of 64 bytes each. hci_usb_isoc_rx_submit function in
+> hci_usb.c file.
+> 3. Completion routine copies data for actual length returned for packet
+> that could be 1024 while limit for one packet is 64B only. (hci_usb.c:
+> hci_usb_rx_complete function).
+> 4. These "SCO packet for unknown connection handle" error logs further
+> complicated the problem as this will further eat-up cpu time.
+>
+>
+> Cause:
+>
+> Max length of available transfer buffer could be 640 bytes (that's
+> depend upon the buffer index) and copying big chunk of data was
+> resulting into memory overrun and kernel memory was getting corrupted
+> that results in un-expected behavior line connection break, lots of
+> noise  and even kernel panic some times.
+>
+>
+> Following was the work around:
+>
+> 1. Increased number of Rx URBs to 6. (hci_usb.h: #define HCI_MAX_ISOC_RX
+> 6).
+> 2. Increased transfer buffer size to 1.5K.
+> 3. Put a check in completion routine that in case actual length is more
+> then frame length then copy only frame length size data as follows:
+>
+> int len = (urb->iso_frame_desc[i].actual_length >
+> urb->iso_frame_desc[i].length)?
+>             urb->iso_frame_desc[i].length:
+>             urb->iso_frame_desc[i].actual_length;
+>
+> __recv_frame(husb,
+>                 _urb->type,
+>                urb->transfer_buffer + urb->iso_frame_desc[i].offset,
+>                len);
+> 4. Logging "SCO packet for unknown connection handle" error only once
+> for 100 errors. This will give more change to queue a URB as
+> follows(hci_core.c:hci_scodata_packet function):
+> hdev->stat.err_rx++;
+> if(!(hdev->stat.err_rx % 100))
+> {
+>        BT_ERR("%s 100 SCO packets for unknown connection
+> handles",hdev->name);
+> }
+>
+>
+> I must say that I did not try with latest Linux kernel however I could
+> not see any code change regarding this functionality. Hope this will
+> help.
+>
+> Regards,
+> Dev
+>
+>
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org
+> [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of nirav rabara
+> Sent: Wednesday, February 03, 2010 10:21 AM
+> To: Gustavo F. Padovan
+> Cc: linux-bluetooth@vger.kernel.org
+> Subject: Re: Kernel panic when SCO connection
+>
+> - Show quoted text -
+> On Tue, Feb 2, 2010 at 10:46 PM, Gustavo F. Padovan
+> <padovan@profusion.mobi> wrote:
+>> Hi Nirav,
+>>
+>> * nirav rabara <niravrabara@gmail.com> [2010-02-02 22:28:53 +0530]:
+>>
+>>> Hi,
+>>> When I try to connect SCO socket, Kernel getting crash.
+>>> Linux kernel - 2.6.22
+>>> Bluez - 4.58
+>>
+>> Please try a 2.6.33 kernel and tell us if the bug still happens.
+>>
+>>>
+>>> error message,
+>>> __tx_submit:hci0 tx submit failed urb c0552c14 type 3 err -19
+>>>
+>>> sometimes in connection is showing error while connection as below,
+>>> hci_acldata_packet:hci0 ACL packet data for unknown connection
+>>> handler 2
+>>>
+>>> It would be really appreciable if  somebody put some on light on this
+>
+>>> issue, OR suggest me any patch or documentation.
+>>>
+>>> --
+>>> With Regards,
+>>> Nirav Rabara
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe
+>>> linux-bluetooth" in the body of a message to
+>>> majordomo@vger.kernel.org More majordomo info at
+>>> http://vger.kernel.org/majordomo-info.html
+>>
+>> --
+>> Gustavo F. Padovan
+>> http://padovan.org
+>>
+>> ProFUSION embedded systems - http://profusion.mobi
+>>
+>
+> Hi Gustavo,
+>
+> Thanks for your suggestion, but I am using bluez 4.58 on ATMEL
+> AT91SAM9263, no patch available for the newer kernel 2.6.33 . Patches
+> related to my board only available up to 2.6.30.
+>
+> It would be a great help if suggest me any alternet for this issue. OR
+> any patches for the same problem as i mentioned for 2.6.22.
+>
+>
+> --
+> With Regards,
+> Nirav Rabara
+> --
+> To unsubscribe from this list: send the line "unsubscribe
+> linux-bluetooth" in the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
