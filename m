@@ -1,107 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: What is the motivation for conn->power_save
+Subject: Re: [PATCH] bluetooth: fix memory leak Marvell BT-over-SDIO driver
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Nick Pelly <npelly@google.com>
+To: Yoichi Yuasa <yuasa@linux-mips.org>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <35c90d961002031659v2a58a80cwdd86c17dc093a07d@mail.gmail.com>
-References: <35c90d960911121639o8b0b0bfxde880af69adc9f95@mail.gmail.com>
-	 <1258082098.7715.7.camel@violet>
-	 <35c90d960911121931n687a2cd4ie8130f919041ee70@mail.gmail.com>
-	 <1258084357.7715.26.camel@violet>
-	 <35c90d960911161055y695933fdjd221ad3b689ae3cf@mail.gmail.com>
-	 <1265228415.31341.135.camel@localhost.localdomain>
-	 <35c90d961002031659v2a58a80cwdd86c17dc093a07d@mail.gmail.com>
+In-Reply-To: <20100204095551.8d6a8c40.yuasa@linux-mips.org>
+References: <20100204095551.8d6a8c40.yuasa@linux-mips.org>
 Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 03 Feb 2010 19:13:13 -0800
-Message-ID: <1265253193.31341.151.camel@localhost.localdomain>
+Date: Wed, 03 Feb 2010 19:09:31 -0800
+Message-ID: <1265252971.31341.150.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nick,
+Hi Yoichi,
 
-> >> >> >> If I understand correctly, conn->power_save prevents the host stack
-> >> >> >> from requesting active mode if it was not the host stack that
-> >> >> >> requested sniff mode.
-> >> >> >>
-> >> >> >> I don't understand the motivation for this. If we have ACL data to
-> >> >> >> send, then it seems like a good idea for the host stack to explicitly
-> >> >> >> request active mode, regardless of the reason that we entered sniff
-> >> >> >> mode.
-> >> >> >>
-> >> >> >> We want to enter active mode more aggressively when setting up SCO
-> >> >> >> connections, to avoid a 5 second delay with certain sniff modes. But
-> >> >> >> the conn->power_save code is getting in the way and doesn't appear to
-> >> >> >> be useful in the first place.
-> >> >> >
-> >> >> > we have discussed this a few times. And if you lock through the code
-> >> >> > history then you see that initially we just took devices out of sniff
-> >> >> > mode if we had to send data. However with HID devices this falls flat on
-> >> >> > its face. They need to stay in control of sniff mode if they initiated
-> >> >> > it. Some of them crash and others just drain the battery. With sniff
-> >> >> > mode you can send small amounts of data even while in sniff and for HID
-> >> >> > that is sometimes used. So the remote side better not interfere.
-> >> >> >
-> >> >> > What we really need is a socket option where we can control this on a
-> >> >> > per socket basis if we take devices out of sniff mode. And one extra
-> >> >> > case might be when we try to establish a SCO channel, because then it is
-> >> >> > clearly not an HID device. However even A2DP has this sort of problems
-> >> >> > sometimes where the stream setup takes time.
-> >> >>
-> >> >> Makes sense. Thanks for the explanation.
-> >> >
-> >> > this means you will be working on a patch for this :)
-> >> >
-> >> >> > Not sure if we have to make SCO setup special. The only reason would be
-> >> >> > if there is a case where we don't get an AT command before SCO needs to
-> >> >> > be established.
-> >> >>
-> >> >> If you are in-call, and transfer audio from handset to BT headset,
-> >> >> then there is SCO setup without any AT command.
-> >> >
-> >> > Fair enough.
-> >> >
-> >> >> I think for the SCO setup case we would always want to enter active
-> >> >> mode. I could modify enter_active_mode() to take a parameter like 'int
-> >> >> force' that would force us to enter active mode regardless of the
-> >> >> state of power_save, and use this when setting up SCO. What do you
-> >> >> think?
-> >> >
-> >> > Actually when you leave sniff mode, then all bets for the power_save
-> >> > value are off again. So you better set power_save and just call
-> >> > enter_active_mode. Something like this:
-> >> >
-> >> > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> >> > index a975098..e4591e0 100644
-> >> > --- a/net/bluetooth/hci_conn.c
-> >> > +++ b/net/bluetooth/hci_conn.c
-> >> > @@ -376,6 +376,9 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type,
-> >> >
-> >> >        if (acl->state == BT_CONNECTED &&
-> >> >                        (sco->state == BT_OPEN || sco->state == BT_CLOSED)) {
-> >> > +               acl->power_save = 1;
-> >> > +               hci_conn_enter_active_mode(acl);
-> >> > +
-> >> >                if (lmp_esco_capable(hdev))
-> >> >                        hci_setup_sync(sco, acl->handle);
-> >> >                else
-> >> >
-> >> > Alternatively we could create hci_conn_force_active_mode() or just
-> >> > implement a proper per socket sniff/active policy.
-> >> >
-> >>
-> >> Patch submitted to Android tree as:
-> >>
-> >> http://android.git.kernel.org/?p=kernel/common.git;a=commit;h=201ac2f225a31dffcb05f1db4d609c467c9c694c
-> >
-> > can you please send a version to the mailing list so I can easily apply
-> > it and also have it here for reference in the archives.
+> Signed-off-by: Yoichi Yuasa <yuasa@linux-mips.org>
+> ---
+>  drivers/bluetooth/btmrvl_sdio.c |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
 > 
-> Patch attached.
+> diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+> index f36defa..57d965b 100644
+> --- a/drivers/bluetooth/btmrvl_sdio.c
+> +++ b/drivers/bluetooth/btmrvl_sdio.c
+> @@ -808,6 +808,7 @@ static int btmrvl_sdio_host_to_card(struct btmrvl_private *priv,
+>  
+>  exit:
+>  	sdio_release_host(card->func);
+> +	kfree(tmpbuf);
+>  
+>  	return ret;
+>  }
 
-patch has been applied. Please keep the commit message to 72 chars so
-that git log doesn't exceed on an 80 chars terminal. Also your hcidump
-seems to line wrap. I had to fix that ;)
+patch has been applied. Thanks.
 
 Regards
 
