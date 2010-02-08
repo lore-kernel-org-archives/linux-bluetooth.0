@@ -1,59 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <6AC5A55546F64545AE996F8200E3AC4E0323A72E4D@NL0105EXC01V01.eur.slb.com>
-References: <6AC5A55546F64545AE996F8200E3AC4E0323A72E4D@NL0105EXC01V01.eur.slb.com>
-Date: Mon, 8 Feb 2010 09:54:39 +0200
-Message-ID: <2d5a2c101002072354u74cd7b77jc933d7cb61666b90@mail.gmail.com>
-Subject: Re: bluez and a2dp sennheiser pcx310 headphones
+In-Reply-To: <20100207133015.GD28037@xs4all.nl>
+References: <20100204220516.GC8556@xs4all.nl>
+	 <1265399409.31341.241.camel@localhost.localdomain>
+	 <20100207133015.GD28037@xs4all.nl>
+Date: Mon, 8 Feb 2010 09:48:15 +0200
+Message-ID: <2d5a2c101002072348xe83e0e0w5211a1bf2dd51327@mail.gmail.com>
+Subject: Re: Problem with 'inquiry_cache' in sysfs
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: John Frankish <j-frankish@slb.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Frank Maas <frank.maas@cheiron-it.nl>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+Hi,
 
-On Mon, Feb 8, 2010 at 8:19 AM, John Frankish <j-frankish@slb.com> wrote:
-> Hi,
+On Sun, Feb 7, 2010 at 3:30 PM, Frank Maas <frank.maas@cheiron-it.nl> wrote:
+> Hello Marcel,
 >
-> Using the .asoundrc below with bluez-4.53, I've been able to play music to a pair of sennheiser pcx310 headphones without problems, but although the remote volume control on the headphones works, the track skip/fastforward/repeat does not.
+>> > I am currently developing a system that relies heavily on the Linux
+>> > bluetooth stack. That system uses the sysfs interface to the kernel
+>> > module and more specifically the entry 'inquiry_cache' of the device
+>> > "directory".
+>>
+>> that file should have been moved to debugfs, but we haven't done that
+>> yet. It really doesn't belong in sysfs at all. And should not be treated
+>> as an API.
 >
-> According to the headphones manual, the remote controls reply on an avrcp profile - is this something supported by bluez or is it something that should be supported by the audio source (or both)?
+> If I can be blunt: please remove it asap. It is very simple to make a
+> system crash for a simple user while this is part of the distribution.
+> And perhaps even worse options exists.
+>
+> I'd like to point out that the functionality it offers is of use. As far
+> as I have seen the 'hcitool' offers an inquiry functionality, but that
+> starts an inquiry itself. The 'benefit' of the current inquire_cache
+> file is that one can use it without having to wait for an inquiry to
+> finish and while knowing that the cache is pretty recent. Perhaps
+> hcitool could be extended with an option for 'inq' that suppresses the
+> inquiry itself?
 
-You probably need to load uinput module to make this to work, also you
-should probably try pulse audio which has a better integration with
-bluetooth headsets so you don't need to manually configure alsa it
-will do all this automatically for you.
+Well if you use bluetoothd there is no such problem, it won't block
+while inquiring/discovering and provide you dbus signals with the
+important part of the inquire results.
 
-> Is the .asoundrc file correct for a2dp headphones with remote control?
->
->
-> Regards
-> John
->
->
-> pcm.!default {
->   type plug
->   slave.pcm "dmix"
-> }
->
-> ctl.mixer0 {
->   type hw
->   card 0
-> }
->
-> pcm.bluetooth {
->       type bluetooth
->       device "00:1B:66:00:31:88"
->       profile "auto"
-> }
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-
+Regards,
 
 
 -- 
