@@ -1,35 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Michael Poole <mdpoole@troilus.org>
-To: Jiri Kosina <jkosina@suse.cz>, linux-input@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 0/2] Provide a driver for the Apple Magic Mouse
-References: <alpine.LNX.2.00.1001291515560.356@pobox.suse.cz>
-	<dd18b0c31002082322m4238a4a6m73fc30752ba30447@mail.gmail.com>
-	<1265710460.2383.5685.camel@localhost.localdomain>
-	<201002090736.55576.edt@aei.ca>
-	<alpine.LNX.2.00.1002091339190.30967@pobox.suse.cz>
-Date: Tue, 09 Feb 2010 08:10:48 -0500
-In-Reply-To: <alpine.LNX.2.00.1002091339190.30967@pobox.suse.cz> (Jiri
-	Kosina's message of "Tue, 9 Feb 2010 13:40:58 +0100 (CET)")
-Message-ID: <87y6j2eeqv.fsf_-_@troilus.org>
+Date: Tue, 9 Feb 2010 13:40:58 +0100 (CET)
+From: Jiri Kosina <jkosina@suse.cz>
+To: Ed Tomlinson <edt@aei.ca>
+Cc: Bastien Nocera <hadess@hadess.net>,
+	Justin Mattock <justinmattock@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Michael Poole <mdpoole@troilus.org>,
+	"Gunn, Brian" <bgunn@solekai.com>, Ping <pinglinux@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth: Keep a copy of each HID device's report
+ descriptor.
+In-Reply-To: <201002090736.55576.edt@aei.ca>
+Message-ID: <alpine.LNX.2.00.1002091339190.30967@pobox.suse.cz>
+References: <alpine.LNX.2.00.1001291515560.356@pobox.suse.cz> <dd18b0c31002082322m4238a4a6m73fc30752ba30447@mail.gmail.com> <1265710460.2383.5685.camel@localhost.localdomain> <201002090736.55576.edt@aei.ca>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I think this patch is ready for real review.  The Magic Mouse requires
-that a driver send an unlock Report(Feature) command, similar to the
-Wacom wireless tablet and Sixaxis controller quirks.  This turns on an
-Input Report that isn't published in the input Report descriptor that
-contains touch data (and usually overrides the normal motion and click
-Report).
+On Tue, 9 Feb 2010, Ed Tomlinson wrote:
 
-Because the mouse has only one switch and no scroll wheel, the driver
-(under control of parameters) emulates a middle button and scroll wheel.
-User space could also ignore and/or re-synthesize those events based on
-the reported events.
+> What I am looking for is the patches to the kernel that add the new 
+> function to bluetooth allowing the extra probing.  eg the patches (or 
+> tree based on .32) that addthe initial version of 
+> "hidp_output_raw_report" and friends.
 
-The first patch exports hid_register_report() so the driver can turn on
-the multitouch report.  The second patch adds the device ID and the
-driver.  Some user-space tools to talk to the mouse directly (that is,
-when it is not associated with the host's HIDP stack) are at
-http://github.com/entrope/linux-magicmouse .
+It's commit 2da31939a4 (and fix 6bf8268f9a9 on top of that). You need 
+quite recent 2.6.33-rc snapshot to have them both:
+
+	$ git describe --contains 6bf8268f9a9
+	v2.6.33-rc7~20^2~3^2
+
+Plus there is additional patch queued in my tree, which allows user to 
+specify type of the report that is to be sent (feature/output).
+
+-- 
+Jiri Kosina
+SUSE Labs, Novell Inc.
