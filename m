@@ -1,66 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4B71D59E.2060102@gmail.com>
+Date: Tue, 09 Feb 2010 13:37:34 -0800
+From: "Justin P. Mattock" <justinmattock@gmail.com>
 MIME-Version: 1.0
-Date: Tue, 9 Feb 2010 20:25:43 -0200
-Message-ID: <f9d4bd31002091425l3cf8a4e0u7e3ad0ec0f1766ec@mail.gmail.com>
-Subject: [PATCH] Add argument verification when unregistering Handsfree agent
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Cc: padovan@profusion.mobi
-Content-Type: multipart/mixed; boundary=000e0cd567bcfdda37047f3265bf
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Michael Poole <mdpoole@troilus.org>
+CC: Jiri Kosina <jkosina@suse.cz>, linux-input@vger.kernel.org,
+ Marcel Holtmann <marcel@holtmann.org>,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/2] Provide a driver for the Apple Magic Mouse
+References: <alpine.LNX.2.00.1001291515560.356@pobox.suse.cz>	<dd18b0c31002082322m4238a4a6m73fc30752ba30447@mail.gmail.com>	<1265710460.2383.5685.camel@localhost.localdomain>	<201002090736.55576.edt@aei.ca>	<alpine.LNX.2.00.1002091339190.30967@pobox.suse.cz> <87y6j2eeqv.fsf_-_@troilus.org>
+In-Reply-To: <87y6j2eeqv.fsf_-_@troilus.org>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---000e0cd567bcfdda37047f3265bf
-Content-Type: text/plain; charset=UTF-8
+On 02/09/10 05:10, Michael Poole wrote:
+> I think this patch is ready for real review.  The Magic Mouse requires
+> that a driver send an unlock Report(Feature) command, similar to the
+> Wacom wireless tablet and Sixaxis controller quirks.  This turns on an
+> Input Report that isn't published in the input Report descriptor that
+> contains touch data (and usually overrides the normal motion and click
+> Report).
+>
+> Because the mouse has only one switch and no scroll wheel, the driver
+> (under control of parameters) emulates a middle button and scroll wheel.
+> User space could also ignore and/or re-synthesize those events based on
+> the reported events.
+>
+> The first patch exports hid_register_report() so the driver can turn on
+> the multitouch report.  The second patch adds the device ID and the
+> driver.  Some user-space tools to talk to the mouse directly (that is,
+> when it is not associated with the host's HIDP stack) are at
+> http://github.com/entrope/linux-magicmouse .
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Please read the FAQ at  http://www.tux.org/lkml/
+>
 
-Hi,
 
-this patch fix a minor problem in the handsfree gateway/agent code:
-the object path
-argument is not being verified.
+First, is I made a mistake with the procedure(early post) i.g.
+sudo /usr/bin/test-device trusted D4:9A:20:88:C7:48
+forgot to add yes at the end.
+(so rebooting works and so forth).
 
-Regards,
-Claudio.
+As to this module I pulled the latest mainstream
+added:
+http://lkml.org/lkml/2010/1/29/146
+plus the two other patches you had submitted with this thread and
+everything compiled good.
 
---000e0cd567bcfdda37047f3265bf
-Content-Type: application/octet-stream;
-	name="0001-Add-argument-verification-when-unregistering-Handsfr.patch"
-Content-Disposition: attachment;
-	filename="0001-Add-argument-verification-when-unregistering-Handsfr.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_g5h8je9m0
+Glad to see the mouse is working with these patches(thank you vary much 
+gentlemen).
 
-RnJvbSA4MTJjMzkwMmZhNThmMzExYzM3NDRiOWQ5YWI4OTNkODE4ZmMwNjljIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBDbGF1ZGlvIFRha2FoYXNpIDxjbGF1ZGlvLnRha2FoYXNpQG9w
-ZW5ib3NzYS5vcmc+CkRhdGU6IFR1ZSwgOSBGZWIgMjAxMCAxOTozNjoyNiAtMDIwMApTdWJqZWN0
-OiBbUEFUQ0ggMS8xXSBBZGQgYXJndW1lbnQgdmVyaWZpY2F0aW9uIHdoZW4gdW5yZWdpc3Rlcmlu
-ZyBIYW5kc2ZyZWUgYWdlbnQKClRoZSBnaXZlbiBvYmplY3QgcGF0aCBhcmd1bWVudCBtdXN0IG1h
-dGNoIHRoZSBzYW1lIHZhbHVlIHRoYXQgaGFzIGJlZW4KdXNlZCBvbiByZWdpc3RyYXRpb24uCi0t
-LQogYXVkaW8vZ2F0ZXdheS5jIHwgICAxNSArKysrKysrKysrKysrKy0KIGRvYy9oZnAtYXBpLnR4
-dCB8ICAgIDQgKysrKwogMiBmaWxlcyBjaGFuZ2VkLCAxOCBpbnNlcnRpb25zKCspLCAxIGRlbGV0
-aW9ucygtKQoKZGlmZiAtLWdpdCBhL2F1ZGlvL2dhdGV3YXkuYyBiL2F1ZGlvL2dhdGV3YXkuYwpp
-bmRleCA4MTUwYTVlLi5iMDQzZTI0IDEwMDY0NAotLS0gYS9hdWRpby9nYXRld2F5LmMKKysrIGIv
-YXVkaW8vZ2F0ZXdheS5jCkBAIC01MTMsMTMgKzUxMywyNiBAQCBzdGF0aWMgREJ1c01lc3NhZ2Ug
-KnVucmVnaXN0ZXJfYWdlbnQoREJ1c0Nvbm5lY3Rpb24gKmNvbm4sCiB7CiAJc3RydWN0IGF1ZGlv
-X2RldmljZSAqZGV2aWNlID0gZGF0YTsKIAlzdHJ1Y3QgZ2F0ZXdheSAqZ3cgPSBkZXZpY2UtPmdh
-dGV3YXk7CisJY29uc3QgY2hhciAqcGF0aDsKIAogCWlmICghZ3ctPmFnZW50KQogCQlnb3RvIGRv
-bmU7CiAKIAlpZiAoc3RyY21wKGd3LT5hZ2VudC0+bmFtZSwgZGJ1c19tZXNzYWdlX2dldF9zZW5k
-ZXIobXNnKSkgIT0gMCkKIAkJcmV0dXJuIGdfZGJ1c19jcmVhdGVfZXJyb3IobXNnLCBFUlJPUl9J
-TlRFUkZBQ0UgIi5GYWlsZWQiLAotCQkJCQkJCSJQZXJtaXNzaW9uIGRlbmllZCIpOworCQkJCSJQ
-ZXJtaXNzaW9uIGRlbmllZCIpOworCisJaWYgKCFkYnVzX21lc3NhZ2VfZ2V0X2FyZ3MobXNnLCBO
-VUxMLAorCQkJCURCVVNfVFlQRV9PQkpFQ1RfUEFUSCwgJnBhdGgsCisJCQkJREJVU19UWVBFX0lO
-VkFMSUQpKQorCQlyZXR1cm4gZ19kYnVzX2NyZWF0ZV9lcnJvcihtc2csCisJCQkJRVJST1JfSU5U
-RVJGQUNFICIuSW52YWxpZEFyZ3VtZW50cyIsCisJCQkJIkludmFsaWQgYXJndW1lbnQiKTsKKwor
-CWlmIChzdHJjbXAoZ3ctPmFnZW50LT5wYXRoLCBwYXRoKSAhPSAwKQorCQlyZXR1cm4gZ19kYnVz
-X2NyZWF0ZV9lcnJvcihtc2csCisJCQkJRVJST1JfSU5URVJGQUNFICIuRmFpbGVkIiwKKwkJCQki
-VW5rbm93biBvYmplY3QgcGF0aCIpOwogCiAJZ19kYnVzX3JlbW92ZV93YXRjaChkZXZpY2UtPmNv
-bm4sIGd3LT5hZ2VudC0+d2F0Y2gpOwogCmRpZmYgLS1naXQgYS9kb2MvaGZwLWFwaS50eHQgYi9k
-b2MvaGZwLWFwaS50eHQKaW5kZXggODE4MGRlMC4uOTMyNTFlOCAxMDA2NDQKLS0tIGEvZG9jL2hm
-cC1hcGkudHh0CisrKyBiL2RvYy9oZnAtYXBpLnR4dApAQCAtMzcsNiArMzcsMTAgQEAgTWV0aG9k
-cwkJdm9pZCBDb25uZWN0KCkKIAkJCXJlZ2lzdGVyZWQuIFRoZSBvYmplY3QgcGF0aCBwYXJhbWV0
-ZXIgbXVzdCBtYXRjaCB0aGUKIAkJCXNhbWUgdmFsdWUgdGhhdCBoYXMgYmVlbiB1c2VkIG9uIHJl
-Z2lzdHJhdGlvbi4KIAorCQkJUG9zc2libGUgRXJyb3JzOiBvcmcuYmx1ZXouRXJyb3IuRmFpbGVk
-CisJCQkJCSBvcmcuYmx1ZXouRXJyb3IuSW52YWxpZEFyZ3VtZW50cworCisKIFNpZ25hbHMJCVBy
-b3BlcnR5Q2hhbmdlZChzdHJpbmcgbmFtZSwgdmFyaWFudCB2YWx1ZSkKIAogCQkJVGhpcyBzaWdu
-YWwgaW5kaWNhdGVzIGEgY2hhbmdlZCB2YWx1ZSBvZiB0aGUgZ2l2ZW4KLS0gCjEuNi42LjEKCg==
---000e0cd567bcfdda37047f3265bf--
+I can scroll up and down(need to get used to this).
+copy/past works
+right/left click works.
+(need to figure out forward/reverse with firefox probably).
+
+suspend works. I'm getting a resumbit urb, but that's been there
+prior to this module. Although there was a moment after wakeup
+I turned off the mouse, then reconnecting didnt, but then on another 
+go(reboot)it worked(maybe hit some odd thing).
+
+Other than not seeing any menu entry under hid
+with make menuconfig, I would have to say vary nice
+job with this, all functions I need to function are
+there(scroll,right/left click, copy/past).
+
+nice job, and thanks for this..
+(without this I would of had a non
+functional magic mouse).
+
+Justin P. Mattock
