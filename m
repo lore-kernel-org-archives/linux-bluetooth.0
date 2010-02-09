@@ -1,75 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4B71D59E.2060102@gmail.com>
-Date: Tue, 09 Feb 2010 13:37:34 -0800
-From: "Justin P. Mattock" <justinmattock@gmail.com>
 MIME-Version: 1.0
-To: Michael Poole <mdpoole@troilus.org>
-CC: Jiri Kosina <jkosina@suse.cz>, linux-input@vger.kernel.org,
- Marcel Holtmann <marcel@holtmann.org>,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/2] Provide a driver for the Apple Magic Mouse
-References: <alpine.LNX.2.00.1001291515560.356@pobox.suse.cz>	<dd18b0c31002082322m4238a4a6m73fc30752ba30447@mail.gmail.com>	<1265710460.2383.5685.camel@localhost.localdomain>	<201002090736.55576.edt@aei.ca>	<alpine.LNX.2.00.1002091339190.30967@pobox.suse.cz> <87y6j2eeqv.fsf_-_@troilus.org>
-In-Reply-To: <87y6j2eeqv.fsf_-_@troilus.org>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <1265738807.2383.6336.camel@localhost.localdomain>
+References: <1265738807.2383.6336.camel@localhost.localdomain>
+Date: Tue, 9 Feb 2010 22:44:51 +0200
+Message-ID: <2d5a2c101002091244y7ddafc40mc8d565c8c86a2760@mail.gmail.com>
+Subject: Re: [PATCH] osso-gwobex export
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 02/09/10 05:10, Michael Poole wrote:
-> I think this patch is ready for real review.  The Magic Mouse requires
-> that a driver send an unlock Report(Feature) command, similar to the
-> Wacom wireless tablet and Sixaxis controller quirks.  This turns on an
-> Input Report that isn't published in the input Report descriptor that
-> contains touch data (and usually overrides the normal motion and click
-> Report).
+Hi Bastien,
+
+On Tue, Feb 9, 2010 at 8:06 PM, Bastien Nocera <hadess@hadess.net> wrote:
+> Heya,
 >
-> Because the mouse has only one switch and no scroll wheel, the driver
-> (under control of parameters) emulates a middle button and scroll wheel.
-> User space could also ignore and/or re-synthesize those events based on
-> the reported events.
+> Here's a patch to fix libgwobex not using a soname, and fixing a few
+> build problems.
 >
-> The first patch exports hid_register_report() so the driver can turn on
-> the multitouch report.  The second patch adds the device ID and the
-> driver.  Some user-space tools to talk to the mouse directly (that is,
-> when it is not associated with the host's HIDP stack) are at
-> http://github.com/entrope/linux-magicmouse .
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
+> I couldn't run the test suite, as gnome-bluetooth's ancient btctl Python
+> module isn't around any more.
 >
+> Could I bribe someone into making a release that I could use for gvfs'
+> ObexFTP module[1]?
+>
+> Cheers
+>
+> [1]: https://bugzilla.gnome.org/show_bug.cgi?id=609340
 
+I thought the plan was to use obex-client daemon in gvfs backend, well
+obex-client uses gwobex so it is mostly the same code, but it would be
+good to know if there is there any specific reason, or reasons, not to
+use obex-client as it is what we normally uses for testing obexd
+functionality.
 
-First, is I made a mistake with the procedure(early post) i.g.
-sudo /usr/bin/test-device trusted D4:9A:20:88:C7:48
-forgot to add yes at the end.
-(so rebooting works and so forth).
+Regards,
 
-As to this module I pulled the latest mainstream
-added:
-http://lkml.org/lkml/2010/1/29/146
-plus the two other patches you had submitted with this thread and
-everything compiled good.
-
-Glad to see the mouse is working with these patches(thank you vary much 
-gentlemen).
-
-I can scroll up and down(need to get used to this).
-copy/past works
-right/left click works.
-(need to figure out forward/reverse with firefox probably).
-
-suspend works. I'm getting a resumbit urb, but that's been there
-prior to this module. Although there was a moment after wakeup
-I turned off the mouse, then reconnecting didnt, but then on another 
-go(reboot)it worked(maybe hit some odd thing).
-
-Other than not seeing any menu entry under hid
-with make menuconfig, I would have to say vary nice
-job with this, all functions I need to function are
-there(scroll,right/left click, copy/past).
-
-nice job, and thanks for this..
-(without this I would of had a non
-functional magic mouse).
-
-Justin P. Mattock
+-- 
+Luiz Augusto von Dentz
+Computer Engineer
