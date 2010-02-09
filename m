@@ -1,147 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH] osso-gwobex export
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Content-Type: multipart/mixed; boundary="=-dhSH/ypxhXWPbuWcKqs9"
-Date: Tue, 09 Feb 2010 18:06:47 +0000
-Message-ID: <1265738807.2383.6336.camel@localhost.localdomain>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Date: Tue, 9 Feb 2010 18:51:40 +0200
+Message-ID: <eb7933e21002090851m4d3b41f9kfa2f578bb0e4f825@mail.gmail.com>
+Subject: [PATCH] Handle unanswered AVDTP request on disconnect
+From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=000e0ce0450a596389047f2dbb06
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+--000e0ce0450a596389047f2dbb06
+Content-Type: text/plain; charset=ISO-8859-1
 
---=-dhSH/ypxhXWPbuWcKqs9
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
+See attachment.
 
-Heya,
+One way to reproduce the issue is to turn off the remote device abruptly
+(so that it doesn't make a proper disconnection, for example with a
+carkit unplug the power),
+and then try to start the stream (Audio API: BT_REQUEST <-
+BT_START_STREAM), followed by
+making a disconnection. Then there will be no BT RESPONSE on the Audio API.
 
-Here's a patch to fix libgwobex not using a soname, and fixing a few
-build problems.
+/Daniel
 
-I couldn't run the test suite, as gnome-bluetooth's ancient btctl Python
-module isn't around any more.
+--000e0ce0450a596389047f2dbb06
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-Handle-unanswered-AVDTP-request-on-disconnect.patch"
+Content-Disposition: attachment;
+	filename="0001-Handle-unanswered-AVDTP-request-on-disconnect.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_g5gxilmn0
 
-Could I bribe someone into making a release that I could use for gvfs'
-ObexFTP module[1]?
-
-Cheers
-
-[1]: https://bugzilla.gnome.org/show_bug.cgi?id=609340
-
---=-dhSH/ypxhXWPbuWcKqs9
-Content-Disposition: attachment; filename="0001-Export-libgwobex.patch"
-Content-Type: text/x-patch; name="0001-Export-libgwobex.patch"; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-
->From 8d430811bd39c025e30a2b32370cce426a85f796 Mon Sep 17 00:00:00 2001
-From: Bastien Nocera <hadess@hadess.net>
-Date: Tue, 9 Feb 2010 18:03:24 +0000
-Subject: [PATCH] Export libgwobex
-
-Set the soname for the library, and fix some distchecking problems.
----
- Makefile.am      |    2 ++
- configure.ac     |   15 +++++++++++++++
- libgwobex.pc.in  |    2 +-
- src/Makefile.am  |    4 ++++
- test/Makefile.am |    4 ++--
- 5 files changed, 24 insertions(+), 3 deletions(-)
- mode change 100644 => 100755 test/coverage.py
-
-diff --git a/Makefile.am b/Makefile.am
-index f604eb8..58d017d 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -16,6 +16,8 @@ EXTRA_DIST =                        \
- pkgconfigdir = $(libdir)/pkgconfig
- pkgconfig_DATA = libgwobex.pc
- 
-+CLEANFILES = libgwobex.pc
-+
- if DOXYGEN_DOCS_ENABLED
-   DOXYGEN_LINE = $(DOXYGEN) doxygen.cfg
- else 
-diff --git a/configure.ac b/configure.ac
-index aca038f..2b2b12a 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -13,6 +13,17 @@ AC_PROG_LIBTOOL
- GWOBEX_COMPILE_WARNINGS
- GWOBEX_CHECK_TIMEZONE
- 
-+# Before making a release, the CHEESE_LT_VERSION string should be modified.
-+# The string is of the form C:R:A.
-+# - If interfaces have been changed or added, but binary compatibility has
-+#   been preserved, change to C+1:0:A+1
-+# - If binary compatibility has been broken (eg removed or changed interfaces)
-+#   change to C+1:0:0
-+# - If the interface is the same as the previous version, change to C:R+1:A
-+GWOBEX_LT_VERSION=0:0:0
-+AC_SUBST(GWOBEX_LT_VERSION)
-+
-+
- changequote(,)dnl
- if test "x$GCC" = "xyes"; then
-     CFLAGS="$CFLAGS $WARN_CFLAGS"
-@@ -46,6 +57,10 @@ PKG_CHECK_MODULES(GW_OBEX, [
- AC_SUBST(GW_OBEX_CFLAGS)
- AC_SUBST(GW_OBEX_LIBS)
- 
-+PKG_CHECK_MODULES(TESTS, bluez >= 4.0)
-+AC_SUBST(TESTS_CFLAGS)
-+AC_SUBST(TESTS_LIBS)
-+
- ### Doxygen Documentation
- AC_PATH_PROG(DOXYGEN, doxygen, no)
- 
-diff --git a/libgwobex.pc.in b/libgwobex.pc.in
-index 22c9eee..316fcb2 100644
---- a/libgwobex.pc.in
-+++ b/libgwobex.pc.in
-@@ -5,7 +5,7 @@ includedir=@includedir@
-  
- Name: libgwobex
- Description: libgwobex
--Requires: glib-2.0 openobex
-+Requires: glib-2.0 gthread-2.0 openobex
- Version: @VERSION@
- Libs: -L${libdir} -lgwobex
- Cflags: -I${includedir}
-diff --git a/src/Makefile.am b/src/Makefile.am
-index a58ce3b..916cd37 100644
---- a/src/Makefile.am
-+++ b/src/Makefile.am
-@@ -24,6 +24,10 @@ libgwobex_la_SOURCES =               \
- libgwobexinclude_HEADERS = gw-obex.h
- 
- libgwobex_la_LIBADD = $(GW_OBEX_LIBS)
-+libgwobex_la_LDFLAGS =                     \
-+	-version-info $(GWOBEX_LT_VERSION) \
-+	-no-undefined                      \
-+	$(AM_LDFLAGS)
- 
- libgwobexincludedir = $(includedir)
- 
-diff --git a/test/Makefile.am b/test/Makefile.am
-index 5822d59..4910d96 100644
---- a/test/Makefile.am
-+++ b/test/Makefile.am
-@@ -1,5 +1,5 @@
--LDADD = ../src/libgwobex.la
--INCLUDES := -I$(top_srcdir)/src  $(shell pkg-config --cflags glib-2.0)
-+AM_LDFLAGS = $(TESTS_LIBS) $(top_builddir)/src/libgwobex.la
-+INCLUDES := -I$(top_srcdir)/src  $(GW_OBEX_CFLAGS) $(TESTS_CFLAGS)
- 
- check_PROGRAMS = setup callback capability getfile putfile getfd putfd getbuf \
- putbuf chdir mkdir readdir delete move move2 copy putasync  xfercb objtime \
-diff --git a/test/coverage.py b/test/coverage.py
-old mode 100644
-new mode 100755
--- 
-1.6.6
-
-
---=-dhSH/ypxhXWPbuWcKqs9--
-
+RnJvbSAwMjdhMGRlODExYWQyNDYxM2Q5YmIwMDYwYjNjMjgzYWNjNGJlNjA0IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQGdt
+YWlsLmNvbT4KRGF0ZTogVHVlLCA5IEZlYiAyMDEwIDE4OjIzOjUwICswMjAwClN1YmplY3Q6IFtQ
+QVRDSF0gSGFuZGxlIHVuYW5zd2VyZWQgQVZEVFAgcmVxdWVzdCBvbiBkaXNjb25uZWN0CgpJZiB0
+aGUgY29ubmVjdGlvbiBpcyBsb3N0IHdoZW4gdGhlcmUgaXMgYW4gQVZEVFAgcmVxdWVzdCB0aGUK
+cmVtb3RlIGhhcyBub3QgcmVwbGllZCB0byBhbmQgd2hpY2ggaGFzIG5vdCB0aW1lZCBvdXQsIHRo
+ZW4gYXQKbGVhc3QgaW4gc29tZSBjYXNlcyB0aGUgY2FsbGJhY2sgZm9yIHRoZSByZXF1ZXN0IGlz
+IG5vdCBjYWxsZWQKbGVhZGluZyB0byBubyBFcnJvciByZXNwb25zZSBiZWluZyBzZW50IG9uIHRo
+ZSBBdWRpbyBBUEkuCgpUaGlzIHBhdGNoIGNoZWNrcyBpZiB0aGVyZSBpcyBhbiBvdXRzdGFuZGlu
+ZyByZXF1ZXN0IHdoZW4gdGhlIHN0cmVhbQpzdGF0ZSBnb2VzIHRvIGlkbGUgYW5kIGluIHRoYXQg
+Y2FzZSB0cmlnZ2VycyB0aGUgY29ycmVzcG9uZGluZyBjYWxsYmFjawp3aXRoIGFuIGVycm9yLgot
+LS0KIGF1ZGlvL2F2ZHRwLmMgfCAgIDU4ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrLQogMSBmaWxlcyBjaGFuZ2VkLCA1NyBpbnNlcnRpb25z
+KCspLCAxIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2F1ZGlvL2F2ZHRwLmMgYi9hdWRpby9h
+dmR0cC5jCmluZGV4IGU1NjIyZTQuLjMzYWQyNzcgMTAwNjQ0Ci0tLSBhL2F1ZGlvL2F2ZHRwLmMK
+KysrIGIvYXVkaW8vYXZkdHAuYwpAQCAtODk4LDYgKzg5OCw2MiBAQCBzdGF0aWMgdm9pZCBjbGVh
+bnVwX3F1ZXVlKHN0cnVjdCBhdmR0cCAqc2Vzc2lvbiwgc3RydWN0IGF2ZHRwX3N0cmVhbSAqc3Ry
+ZWFtKQogCX0KIH0KIAorc3RhdGljIHZvaWQgaGFuZGxlX3VuYW5zd2VyZWRfcmVxKHN0cnVjdCBh
+dmR0cCAqc2Vzc2lvbiwgc3RydWN0IGF2ZHRwX3N0cmVhbSAqc3RyZWFtKQoreworCXN0cnVjdCBw
+ZW5kaW5nX3JlcSAqcmVxOworCXN0cnVjdCBhdmR0cF9sb2NhbF9zZXAgKmxzZXA7CisJc3RydWN0
+IGF2ZHRwX2Vycm9yIGVycjsKKworCWVycm9yKCJhdmR0cDogZW50ZXJpbmcgaGFuZGxlX3VuYW5z
+d2VyZWRfcmVxIik7CisKKwlyZXEgPSBzZXNzaW9uLT5yZXE7CisJc2Vzc2lvbi0+cmVxID0gTlVM
+TDsKKworCWF2ZHRwX2Vycm9yX2luaXQoJmVyciwgQVZEVFBfRVJST1JfRVJSTk8sIEVJTyk7CisK
+Kwlsc2VwID0gc3RyZWFtLT5sc2VwOworCisJc3dpdGNoIChyZXEtPnNpZ25hbF9pZCkgeworCWNh
+c2UgQVZEVFBfUkVDT05GSUdVUkU6CisJCWVycm9yKCJObyByZXBseSB0byBSZWNvbmZpZ3VyZSBy
+ZXF1ZXN0Iik7CisJCWlmIChsc2VwICYmIGxzZXAtPmNmbSAmJiBsc2VwLT5jZm0tPnJlY29uZmln
+dXJlKQorCQkJbHNlcC0+Y2ZtLT5yZWNvbmZpZ3VyZShzZXNzaW9uLCBsc2VwLCBzdHJlYW0sICZl
+cnIsCisJCQkJCQlsc2VwLT51c2VyX2RhdGEpOworCQlicmVhazsKKwljYXNlIEFWRFRQX09QRU46
+CisJCWVycm9yKCJObyByZXBseSB0byBPcGVuIHJlcXVlc3QiKTsKKwkJaWYgKGxzZXAgJiYgbHNl
+cC0+Y2ZtICYmIGxzZXAtPmNmbS0+b3BlbikKKwkJCWxzZXAtPmNmbS0+b3BlbihzZXNzaW9uLCBs
+c2VwLCBzdHJlYW0sICZlcnIsCisJCQkJCWxzZXAtPnVzZXJfZGF0YSk7CisJCWJyZWFrOworCWNh
+c2UgQVZEVFBfU1RBUlQ6CisJCWVycm9yKCJObyByZXBseSB0byBTdGFydCByZXF1ZXN0Iik7CisJ
+CWlmIChsc2VwICYmIGxzZXAtPmNmbSAmJiBsc2VwLT5jZm0tPnN0YXJ0KQorCQkJbHNlcC0+Y2Zt
+LT5zdGFydChzZXNzaW9uLCBsc2VwLCBzdHJlYW0sICZlcnIsCisJCQkJCQlsc2VwLT51c2VyX2Rh
+dGEpOworCQlicmVhazsKKwljYXNlIEFWRFRQX1NVU1BFTkQ6CisJCWVycm9yKCJObyByZXBseSB0
+byBTdXNwZW5kIHJlcXVlc3QiKTsKKwkJaWYgKGxzZXAgJiYgbHNlcC0+Y2ZtICYmIGxzZXAtPmNm
+bS0+c3VzcGVuZCkKKwkJCWxzZXAtPmNmbS0+c3VzcGVuZChzZXNzaW9uLCBsc2VwLCBzdHJlYW0s
+ICZlcnIsCisJCQkJCQlsc2VwLT51c2VyX2RhdGEpOworCQlicmVhazsKKwljYXNlIEFWRFRQX0NM
+T1NFOgorCQllcnJvcigiTm8gcmVwbHkgdG8gQ2xvc2UgcmVxdWVzdCIpOworCQlpZiAobHNlcCAm
+JiBsc2VwLT5jZm0gJiYgbHNlcC0+Y2ZtLT5jbG9zZSkKKwkJCWxzZXAtPmNmbS0+Y2xvc2Uoc2Vz
+c2lvbiwgbHNlcCwgc3RyZWFtLCAmZXJyLAorCQkJCQkJbHNlcC0+dXNlcl9kYXRhKTsKKwkJYnJl
+YWs7CisJY2FzZSBBVkRUUF9TRVRfQ09ORklHVVJBVElPTjoKKwkJZXJyb3IoIk5vIHJlcGx5IHRv
+IFNldENvbmZpZ3VyYXRpb24gcmVxdWVzdCIpOworCQlpZiAobHNlcCAmJiBsc2VwLT5jZm0gJiYg
+bHNlcC0+Y2ZtLT5zZXRfY29uZmlndXJhdGlvbikKKwkJCWxzZXAtPmNmbS0+c2V0X2NvbmZpZ3Vy
+YXRpb24oc2Vzc2lvbiwgbHNlcCwgc3RyZWFtLAorCQkJCQkJCSZlcnIsIGxzZXAtPnVzZXJfZGF0
+YSk7CisJfQorCisJcGVuZGluZ19yZXFfZnJlZShyZXEpOworfQorCiBzdGF0aWMgdm9pZCBhdmR0
+cF9zZXBfc2V0X3N0YXRlKHN0cnVjdCBhdmR0cCAqc2Vzc2lvbiwKIAkJCQlzdHJ1Y3QgYXZkdHBf
+bG9jYWxfc2VwICpzZXAsCiAJCQkJYXZkdHBfc3RhdGVfdCBzdGF0ZSkKQEAgLTk1OSw3ICsxMDE1
+LDcgQEAgc3RhdGljIHZvaWQgYXZkdHBfc2VwX3NldF9zdGF0ZShzdHJ1Y3QgYXZkdHAgKnNlc3Np
+b24sCiAJCWlmIChzZXNzaW9uLT5wZW5kaW5nX29wZW4gPT0gc3RyZWFtKQogCQkJaGFuZGxlX3Ry
+YW5zcG9ydF9jb25uZWN0KHNlc3Npb24sIE5VTEwsIDAsIDApOwogCQlpZiAoc2Vzc2lvbi0+cmVx
+ICYmIHNlc3Npb24tPnJlcS0+c3RyZWFtID09IHN0cmVhbSkKLQkJCXNlc3Npb24tPnJlcS0+c3Ry
+ZWFtID0gTlVMTDsKKwkJCWhhbmRsZV91bmFuc3dlcmVkX3JlcShzZXNzaW9uLCBzdHJlYW0pOwog
+CQkvKiBSZW1vdmUgcGVuZGluZyBjb21tYW5kcyBmb3IgdGhpcyBzdHJlYW0gZnJvbSB0aGUgcXVl
+dWUgKi8KIAkJY2xlYW51cF9xdWV1ZShzZXNzaW9uLCBzdHJlYW0pOwogCQlzdHJlYW1fZnJlZShz
+dHJlYW0pOwotLSAKMS42LjAuNAoK
+--000e0ce0450a596389047f2dbb06--
