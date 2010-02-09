@@ -1,90 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4B71795A.7000000@gmail.com>
+Date: Tue, 09 Feb 2010 07:03:54 -0800
+From: "Justin P. Mattock" <justinmattock@gmail.com>
 MIME-Version: 1.0
-Date: Tue, 9 Feb 2010 18:51:40 +0200
-Message-ID: <eb7933e21002090851m4d3b41f9kfa2f578bb0e4f825@mail.gmail.com>
-Subject: [PATCH] Handle unanswered AVDTP request on disconnect
-From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=000e0ce0450a596389047f2dbb06
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Bastien Nocera <hadess@hadess.net>
+CC: Ed Tomlinson <edt@aei.ca>, Marcel Holtmann <marcel@holtmann.org>,
+ Michael Poole <mdpoole@troilus.org>,
+ Jiri Kosina <jkosina@suse.cz>, "Gunn, Brian" <bgunn@solekai.com>,
+ Ping <pinglinux@gmail.com>,
+ linux-kernel@vger.kernel.org,
+ BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth: Keep a copy of each HID device's report  descriptor.
+References: <alpine.LNX.2.00.1001291515560.356@pobox.suse.cz>	 <87vdebfvfk.fsf@troilus.org>	 <1265392303.31341.235.camel@localhost.localdomain>	 <201002082106.06301.edt@aei.ca>	 <dd18b0c31002082322m4238a4a6m73fc30752ba30447@mail.gmail.com> <1265710460.2383.5685.camel@localhost.localdomain>
+In-Reply-To: <1265710460.2383.5685.camel@localhost.localdomain>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---000e0ce0450a596389047f2dbb06
-Content-Type: text/plain; charset=ISO-8859-1
+On 02/09/10 02:14, Bastien Nocera wrote:
+> On Mon, 2010-02-08 at 23:22 -0800, Justin Mattock wrote:
+>>> TIA
+>>> Ed Tomlinson
+>>>
+>>> On Friday 05 February 2010 12:51:43 Marcel Holtmann wrote:
+>>>> Hi Michael,
+>>>>
+>>>>>> looks good to me. I just prefer that you do the allocation of the report
+>>>>>> descriptor before the HID object:
+>>>>>
+>>>>> An updated patch is below.  Sorry for the delay -- inclement weather
+>>>>> here got in the way of testing this as quickly as I would have liked.
+>>>>>
+>>>>>  From e245ef87247f5e257db40c412af7991c9af375ab Mon Sep 17 00:00:00 2001
+>>>>> From: Michael Poole<mdpoole@troilus.org>
+>>>>> Date: Fri, 5 Feb 2010 12:21:38 -0500
+>>>>> Subject: [PATCH] Bluetooth: Keep a copy of each HID device's report descriptor.
+>>>>>
+>>>>> The report descriptor is read by user space (via the Service
+>>>>> Discovery Protocol), so it is only available during the ioctl
+>>>>> to connect.  However, the probe function that needs the
+>>>>> descriptor might not be called until a specific module is
+>>>>> loaded.  Keep a copy of the descriptor so it is available for
+>>>>> later use.
+>>>>
+>>>> patch has been applied. Thanks.
+>>>>
+>>>> Regards
+>>>>
+>>>> Marcel
+>>>>
+>>>>
+>>>> --
+>>>> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+>>>> the body of a message to majordomo@vger.kernel.org
+>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>>> Please read the FAQ at  http://www.tux.org/lkml/
+>>
+>>
+>>> Hi,
+>>>
+>>> I have been trying to test Michael's magic mouse drivers against 32.7 (or .8-rc).   Is there a tree
+>>> based on .32 with these patches?  If not would it be possible to post the patches to lkml?  I do not
+>>> mind sorting out a few conflicts - this thread assume one knows a little more about the process being
+>>> used here than is obvious.
+>>>
+>>
+>>
+>> just got one of those magic things as well.
+>> I did apply the patchs to the current HEAD, but
+>> am getting a lifeless result i.g. here's what I did:
+>>
+>> sudo /usr/bin/hcitool scan
+>> sudo /usr/bin/simple-agent hci0 D4:9A:20:88:C7:48
 
-See attachment.
+pin was already done at this point i.g. after 0000 was able to use
+the mouse(no scroll function), but was able to work.
+>> sudo /usr/bin/dbus-send --system --dest=org.bluez --print-reply
+>> /org/bluez/1897/hci0/dev_D4_9A_20_88_C7_48 org.bluez.Input.Connect
+>> sudo /usr/bin/test-device trusted D4:9A:20:88:C7:48
+>>
 
-One way to reproduce the issue is to turn off the remote device abruptly
-(so that it doesn't make a proper disconnection, for example with a
-carkit unplug the power),
-and then try to start the stream (Audio API: BT_REQUEST <-
-BT_START_STREAM), followed by
-making a disconnection. Then there will be no BT RESPONSE on the Audio API.
+this is to verify that you want to trust this device.
+after this you should always be connected even after a reboot.
+in this case magic mouse was not functioning after a reboot.
 
-/Daniel
+>> the thing works after that(no scroll), fast cursor though.
+>> then reboot
+>> once up and running nothing.
+>> cat /var/log/daemon.log (shows this)
+>>
+>> Feb  8 22:57:40 Linux-1 bluetoothd[1973]: link_key_request
+>> (sba=00:25:00:C0:6C:4F, dba=D4:9A:20:88:C7:48)
+>> Feb  8 22:58:21 Linux-1 bluetoothd[1973]: last message repeated 5 times
+>> Feb  8 22:59:21 Linux-1 bluetoothd[1973]: last message repeated 3 times
+>> Feb  8 23:03:10 Linux-1 bluetoothd[1973]: link_key_request
+>> (sba=00:25:00:C0:6C:4F, dba=D4:9A:20:88:C7:48)
+>
+> That means that your computer and the mouse aren't paired. The pin code
+> for Apple mice is usually "0000" (as opposed to most mice which don't
+> need pairing, just a poke and setting as trusted).
+>
 
---000e0ce0450a596389047f2dbb06
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Handle-unanswered-AVDTP-request-on-disconnect.patch"
-Content-Disposition: attachment;
-	filename="0001-Handle-unanswered-AVDTP-request-on-disconnect.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_g5gxilmn0
+I'll spend some time today(need a break from looking at another 
+problem), to see if I can get this thing functioning.
 
-RnJvbSAwMjdhMGRlODExYWQyNDYxM2Q5YmIwMDYwYjNjMjgzYWNjNGJlNjA0IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQGdt
-YWlsLmNvbT4KRGF0ZTogVHVlLCA5IEZlYiAyMDEwIDE4OjIzOjUwICswMjAwClN1YmplY3Q6IFtQ
-QVRDSF0gSGFuZGxlIHVuYW5zd2VyZWQgQVZEVFAgcmVxdWVzdCBvbiBkaXNjb25uZWN0CgpJZiB0
-aGUgY29ubmVjdGlvbiBpcyBsb3N0IHdoZW4gdGhlcmUgaXMgYW4gQVZEVFAgcmVxdWVzdCB0aGUK
-cmVtb3RlIGhhcyBub3QgcmVwbGllZCB0byBhbmQgd2hpY2ggaGFzIG5vdCB0aW1lZCBvdXQsIHRo
-ZW4gYXQKbGVhc3QgaW4gc29tZSBjYXNlcyB0aGUgY2FsbGJhY2sgZm9yIHRoZSByZXF1ZXN0IGlz
-IG5vdCBjYWxsZWQKbGVhZGluZyB0byBubyBFcnJvciByZXNwb25zZSBiZWluZyBzZW50IG9uIHRo
-ZSBBdWRpbyBBUEkuCgpUaGlzIHBhdGNoIGNoZWNrcyBpZiB0aGVyZSBpcyBhbiBvdXRzdGFuZGlu
-ZyByZXF1ZXN0IHdoZW4gdGhlIHN0cmVhbQpzdGF0ZSBnb2VzIHRvIGlkbGUgYW5kIGluIHRoYXQg
-Y2FzZSB0cmlnZ2VycyB0aGUgY29ycmVzcG9uZGluZyBjYWxsYmFjawp3aXRoIGFuIGVycm9yLgot
-LS0KIGF1ZGlvL2F2ZHRwLmMgfCAgIDU4ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrLQogMSBmaWxlcyBjaGFuZ2VkLCA1NyBpbnNlcnRpb25z
-KCspLCAxIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2F1ZGlvL2F2ZHRwLmMgYi9hdWRpby9h
-dmR0cC5jCmluZGV4IGU1NjIyZTQuLjMzYWQyNzcgMTAwNjQ0Ci0tLSBhL2F1ZGlvL2F2ZHRwLmMK
-KysrIGIvYXVkaW8vYXZkdHAuYwpAQCAtODk4LDYgKzg5OCw2MiBAQCBzdGF0aWMgdm9pZCBjbGVh
-bnVwX3F1ZXVlKHN0cnVjdCBhdmR0cCAqc2Vzc2lvbiwgc3RydWN0IGF2ZHRwX3N0cmVhbSAqc3Ry
-ZWFtKQogCX0KIH0KIAorc3RhdGljIHZvaWQgaGFuZGxlX3VuYW5zd2VyZWRfcmVxKHN0cnVjdCBh
-dmR0cCAqc2Vzc2lvbiwgc3RydWN0IGF2ZHRwX3N0cmVhbSAqc3RyZWFtKQoreworCXN0cnVjdCBw
-ZW5kaW5nX3JlcSAqcmVxOworCXN0cnVjdCBhdmR0cF9sb2NhbF9zZXAgKmxzZXA7CisJc3RydWN0
-IGF2ZHRwX2Vycm9yIGVycjsKKworCWVycm9yKCJhdmR0cDogZW50ZXJpbmcgaGFuZGxlX3VuYW5z
-d2VyZWRfcmVxIik7CisKKwlyZXEgPSBzZXNzaW9uLT5yZXE7CisJc2Vzc2lvbi0+cmVxID0gTlVM
-TDsKKworCWF2ZHRwX2Vycm9yX2luaXQoJmVyciwgQVZEVFBfRVJST1JfRVJSTk8sIEVJTyk7CisK
-Kwlsc2VwID0gc3RyZWFtLT5sc2VwOworCisJc3dpdGNoIChyZXEtPnNpZ25hbF9pZCkgeworCWNh
-c2UgQVZEVFBfUkVDT05GSUdVUkU6CisJCWVycm9yKCJObyByZXBseSB0byBSZWNvbmZpZ3VyZSBy
-ZXF1ZXN0Iik7CisJCWlmIChsc2VwICYmIGxzZXAtPmNmbSAmJiBsc2VwLT5jZm0tPnJlY29uZmln
-dXJlKQorCQkJbHNlcC0+Y2ZtLT5yZWNvbmZpZ3VyZShzZXNzaW9uLCBsc2VwLCBzdHJlYW0sICZl
-cnIsCisJCQkJCQlsc2VwLT51c2VyX2RhdGEpOworCQlicmVhazsKKwljYXNlIEFWRFRQX09QRU46
-CisJCWVycm9yKCJObyByZXBseSB0byBPcGVuIHJlcXVlc3QiKTsKKwkJaWYgKGxzZXAgJiYgbHNl
-cC0+Y2ZtICYmIGxzZXAtPmNmbS0+b3BlbikKKwkJCWxzZXAtPmNmbS0+b3BlbihzZXNzaW9uLCBs
-c2VwLCBzdHJlYW0sICZlcnIsCisJCQkJCWxzZXAtPnVzZXJfZGF0YSk7CisJCWJyZWFrOworCWNh
-c2UgQVZEVFBfU1RBUlQ6CisJCWVycm9yKCJObyByZXBseSB0byBTdGFydCByZXF1ZXN0Iik7CisJ
-CWlmIChsc2VwICYmIGxzZXAtPmNmbSAmJiBsc2VwLT5jZm0tPnN0YXJ0KQorCQkJbHNlcC0+Y2Zt
-LT5zdGFydChzZXNzaW9uLCBsc2VwLCBzdHJlYW0sICZlcnIsCisJCQkJCQlsc2VwLT51c2VyX2Rh
-dGEpOworCQlicmVhazsKKwljYXNlIEFWRFRQX1NVU1BFTkQ6CisJCWVycm9yKCJObyByZXBseSB0
-byBTdXNwZW5kIHJlcXVlc3QiKTsKKwkJaWYgKGxzZXAgJiYgbHNlcC0+Y2ZtICYmIGxzZXAtPmNm
-bS0+c3VzcGVuZCkKKwkJCWxzZXAtPmNmbS0+c3VzcGVuZChzZXNzaW9uLCBsc2VwLCBzdHJlYW0s
-ICZlcnIsCisJCQkJCQlsc2VwLT51c2VyX2RhdGEpOworCQlicmVhazsKKwljYXNlIEFWRFRQX0NM
-T1NFOgorCQllcnJvcigiTm8gcmVwbHkgdG8gQ2xvc2UgcmVxdWVzdCIpOworCQlpZiAobHNlcCAm
-JiBsc2VwLT5jZm0gJiYgbHNlcC0+Y2ZtLT5jbG9zZSkKKwkJCWxzZXAtPmNmbS0+Y2xvc2Uoc2Vz
-c2lvbiwgbHNlcCwgc3RyZWFtLCAmZXJyLAorCQkJCQkJbHNlcC0+dXNlcl9kYXRhKTsKKwkJYnJl
-YWs7CisJY2FzZSBBVkRUUF9TRVRfQ09ORklHVVJBVElPTjoKKwkJZXJyb3IoIk5vIHJlcGx5IHRv
-IFNldENvbmZpZ3VyYXRpb24gcmVxdWVzdCIpOworCQlpZiAobHNlcCAmJiBsc2VwLT5jZm0gJiYg
-bHNlcC0+Y2ZtLT5zZXRfY29uZmlndXJhdGlvbikKKwkJCWxzZXAtPmNmbS0+c2V0X2NvbmZpZ3Vy
-YXRpb24oc2Vzc2lvbiwgbHNlcCwgc3RyZWFtLAorCQkJCQkJCSZlcnIsIGxzZXAtPnVzZXJfZGF0
-YSk7CisJfQorCisJcGVuZGluZ19yZXFfZnJlZShyZXEpOworfQorCiBzdGF0aWMgdm9pZCBhdmR0
-cF9zZXBfc2V0X3N0YXRlKHN0cnVjdCBhdmR0cCAqc2Vzc2lvbiwKIAkJCQlzdHJ1Y3QgYXZkdHBf
-bG9jYWxfc2VwICpzZXAsCiAJCQkJYXZkdHBfc3RhdGVfdCBzdGF0ZSkKQEAgLTk1OSw3ICsxMDE1
-LDcgQEAgc3RhdGljIHZvaWQgYXZkdHBfc2VwX3NldF9zdGF0ZShzdHJ1Y3QgYXZkdHAgKnNlc3Np
-b24sCiAJCWlmIChzZXNzaW9uLT5wZW5kaW5nX29wZW4gPT0gc3RyZWFtKQogCQkJaGFuZGxlX3Ry
-YW5zcG9ydF9jb25uZWN0KHNlc3Npb24sIE5VTEwsIDAsIDApOwogCQlpZiAoc2Vzc2lvbi0+cmVx
-ICYmIHNlc3Npb24tPnJlcS0+c3RyZWFtID09IHN0cmVhbSkKLQkJCXNlc3Npb24tPnJlcS0+c3Ry
-ZWFtID0gTlVMTDsKKwkJCWhhbmRsZV91bmFuc3dlcmVkX3JlcShzZXNzaW9uLCBzdHJlYW0pOwog
-CQkvKiBSZW1vdmUgcGVuZGluZyBjb21tYW5kcyBmb3IgdGhpcyBzdHJlYW0gZnJvbSB0aGUgcXVl
-dWUgKi8KIAkJY2xlYW51cF9xdWV1ZShzZXNzaW9uLCBzdHJlYW0pOwogCQlzdHJlYW1fZnJlZShz
-dHJlYW0pOwotLSAKMS42LjAuNAoK
---000e0ce0450a596389047f2dbb06--
+
+>> (could be missing something though(don't use gnome/kde-bluetooth)although
+>> mightymouse works).
+>
+> Cheers
+>
+>
+
+Justin P. Mattock
