@@ -1,49 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ed Tomlinson <edt@aei.ca>
+Date: Thu, 11 Feb 2010 11:26:22 +0100 (CET)
+From: Jiri Kosina <jkosina@suse.cz>
 To: Michael Poole <mdpoole@troilus.org>
-Subject: Re: [PATCH 2/2] Add a device driver for the Apple Magic Mouse (2.6.32.8)
-Date: Thu, 11 Feb 2010 07:51:14 -0500
-Cc: Jiri Kosina <jkosina@suse.cz>,
- linux-input@vger.kernel.org,
- Marcel Holtmann <marcel@holtmann.org>,
- linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <alpine.LNX.2.00.1001291515560.356@pobox.suse.cz> <201002102205.58967.edt@aei.ca> <878wb0e9w2.fsf@troilus.org>
-In-Reply-To: <878wb0e9w2.fsf@troilus.org>
+Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	linux-input@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] hid-magicmouse: Coding style and probe failure fixes.
+In-Reply-To: <873a18e3qu.fsf_-_@troilus.org>
+Message-ID: <alpine.LNX.2.00.1002111124030.30967@pobox.suse.cz>
+References: <87y6j2eeqv.fsf_-_@troilus.org> <87pr4eeemz.fsf_-_@troilus.org> <20100210182024.GA29610@core.coreip.homeip.net> <873a18e3qu.fsf_-_@troilus.org>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201002110751.14813.edt@aei.ca>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wednesday 10 February 2010 22:20:13 Michael Poole wrote:
-> Ed Tomlinson writes:
-> 
-> > Hi,
-> >
-> > When I apply this to head, I get:
-> >
-> > drivers/hid/hid-magicmouse.c: In function 'magicmouse_probe':                                                         
-> > drivers/hid/hid-magicmouse.c:393: error: too many arguments to function 'hdev->hid_output_raw_report'                 
-> > drivers/hid/hid-magicmouse.c:400: error: too many arguments to function 'hdev->hid_output_raw_report'                 
-> >
-> > I only need the second patch - the first seems to be in tree.
-> >
-> > Any ideas as to what I am missing?
-> >
-> > TIA
-> > Ed
-> 
-> You're missing the patch that makes hid_output_raw_report() more generic.
-> It is in the HID tree[1] as commit d4bfa033.
-> 
-> [1]- http://git.kernel.org/?p=linux/kernel/git/jikos/hid.git
+On Thu, 11 Feb 2010, Michael Poole wrote:
 
-Ok.  With this I have a patchset that applies to 2.6.32.8.  If anyone wants it
-just email.  
+> I haven't had a chance to run-test these changes yet -- hid/for-next
+> causes corrupt X display on my laptop, whereas v2.6.33-rc6 and -rc7 are
+> fine; 
 
-Of course, Michael's cleanups came just after I booted with the new kernel.  I'll
-apply it and update & post my changes that allow both x and y scrolling and almost 
-work for a few multitouch gestures.
+That's indeed quite strange. I'd be curious to see the result of the 
+bisection, thanks a lot for doing this.
 
-Ed
+I have applied your patch to the branch containing your driver.
+
+Thanks,
+
+-- 
+Jiri Kosina
+SUSE Labs, Novell Inc.
