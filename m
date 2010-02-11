@@ -1,58 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Thu, 11 Feb 2010 15:56:01 -0500
-Message-ID: <9c9ad6a31002111256v1c3394d1rade3c3640ee7efb5@mail.gmail.com>
-Subject: [PATCH] eSCO fallback to SCO on Error: Connection Failed to Complete
-From: smcoe1 <smcoe1@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: mcgrof@gmail.com
+From: "Luis R. Rodriguez" <lrodriguez@atheros.com>
+Date: Thu, 11 Feb 2010 12:10:24 -0800
+Message-ID: <43e72e891002111210l55d6a802pc5a1384e3535c845@mail.gmail.com>
+Subject: Coordinating development for Bluetooth 3.0 between 802.11 and BT
+	trees
+To: "John W. Linville" <linville@tuxdriver.com>, Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-wireless <linux-wireless@vger.kernel.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>, Dan Tian <Dan.Tian@atheros.com>,
+	Kevin Hayes <kevin@atheros.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Below is a patch necessary to pass test case TC_AG_ACS_BC_10_I on
-SIG's PTS Software
+John, Marcel,
 
+we are reviewing possibilities of working on Bluetooth 3.0. With
+Bluetooth 3.0 you essentially will switch to transmitting large data
+over your 802.11 device instead of the BT device. One of the first
+questions we need to address first is how we would go about
+coordinating development between wireless-testing and
+bluetooth-testing. First I'll note that I know squat of bluetooth so
+bare with me if I'm not being 100% accurate here. From what I gather
+on the mac80211 side the biggest piece will be the PAL implementation
+which should translate HCI commands to respective 802.11 frames where
+needed. It seems this would likely be the first thing tackled. Prior
+to working on 802.11 though we realize that at some point we'll need
+to synchronize the 802.11 and Bluetooth trees though so work done on
+wireless-testing for a PAL is reasonable but then the
+bluetooth-testing won't have the respective updates.
 
-2007-09-20 12:08:09.471838 > HCI Event: Command Status (0x0f) plen 4
-    Setup Synchronous Connection (0x01|0x0028) status 0x00 ncmd 1
-2007-09-20 12:08:09.479874 > HCI Event: Max Slots Change (0x1b) plen 3
-    handle 39 slots 1
-2007-09-20 12:08:11.821730 > HCI Event: Synchronous Connect Complete
-(0x2c) plen 17
-    status 0x11 handle 39 bdaddr 00:16:93:01:01:7A type eSCO
-    Error: Unsupported Feature or Parameter Value
-2007-09-20 12:08:11.821839 < HCI Command: Setup Synchronous Connection
-(0x01|0x0028) plen 17
-    handle 39 voice setting 0x0060
-2007-09-20 12:08:11.824099 > HCI Event: Command Status (0x0f) plen 4
-    Setup Synchronous Connection (0x01|0x0028) status 0x00 ncmd 0
-2007-09-20 12:08:11.832809 > HCI Event: Max Slots Change (0x1b) plen 3
-    handle 39 slots 5
-2007-09-20 12:08:11.832840 > HCI Event: Command Status (0x0f) plen 4
-    Unknown (0x00|0x0000) status 0x00 ncmd 1
-2007-09-20 12:08:11.841195 > HCI Event: Max Slots Change (0x1b) plen 3
-    handle 39 slots 1
-2007-09-20 12:08:12.063088 > HCI Event: Synchronous Connect Complete
-(0x2c) plen 17
-    status 0x00 handle 38 bdaddr 00:16:93:01:01:7A type SCO
-    Air mode: CVSD
+Using linux-next is one possibility but using linux-next proves a pain
+due to the fact that every single update on breaks updates, so the
+only way to update is:
 
+git fetch
+git reset --hard origin
 
-Signed-off-by: Stephen Coe <smcoe1@gmail.com>
----
- net/bluetooth/hci_event.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+Wanted to get your feedback on what you think would be the best
+approach to take for focus on development for Bluetooth 3.0 support.
+Hoping there is a better solution than using linux-next.
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 592da5c..715162c 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1698,6 +1698,7 @@ static inline void
-hci_sync_conn_complete_evt(struct hci_dev *hdev, struct sk_bu
- 		hci_conn_add_sysfs(conn);
- 		break;
-
-+	case 0x11:	/* Connection Failed to Complete */
- 	case 0x1c:	/* SCO interval rejected */
- 	case 0x1a:	/* Unsupported Remote Feature */
- 	case 0x1f:	/* Unspecified error */
+  Luis
