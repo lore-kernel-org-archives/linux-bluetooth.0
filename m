@@ -1,33 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Add {deprecated} annotation to ListDevices()
-Date: Fri, 12 Feb 2010 16:16:31 -0200
-Message-Id: <1265998592-7249-1-git-send-email-padovan@profusion.mobi>
+Subject: Re: [PATCH] g_dbus_remove_watch function
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <f9d4bd31002111306h143c82den71b0e89c41c98463@mail.gmail.com>
+References: <f9d4bd31002111306h143c82den71b0e89c41c98463@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 12 Feb 2010 18:57:51 +0100
+Message-ID: <1265997471.21559.1.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/adapter-api.txt |    4 +++-
- 1 files changed, 3 insertions(+), 1 deletions(-)
+Hi Claudio,
 
-diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-index 213bc02..48cab40 100644
---- a/doc/adapter-api.txt
-+++ b/doc/adapter-api.txt
-@@ -80,9 +80,11 @@ Methods		dict GetProperties()
- 			Possible Errors: org.bluez.Error.DoesNotExist
- 					 org.bluez.Error.InvalidArguments
- 
--		array{object} ListDevices()
-+		array{object} ListDevices() {deprecated}
- 
- 			Returns list of device object paths.
-+			This method is deprecated, instead use the Devices
-+			Property to get the list of devices object paths.
- 
- 			Possible errors: org.bluez.Error.InvalidArguments
- 					 org.bluez.Error.Failed
--- 
-1.6.4.4
+> this patch removes an unnecessary argument(D-Bus connection) of
+> g_dbus_remove_watch.
+
+I would prefer if we keep it. In theory we can open watches on per
+connection basis. And keep the watch id based on this connection.
+
+Regards
+
+Marcel
+
 
