@@ -1,24 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] g_dbus_remove_watch function
+Subject: Re: [PATCH] eSCO fallback to SCO on Error: Connection Failed to
+ Complete
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <f9d4bd31002111306h143c82den71b0e89c41c98463@mail.gmail.com>
-References: <f9d4bd31002111306h143c82den71b0e89c41c98463@mail.gmail.com>
+To: smcoe1 <smcoe1@gmail.com>
+Cc: Nick Pelly <npelly@google.com>, linux-bluetooth@vger.kernel.org
+In-Reply-To: <9c9ad6a31002120806m381e6548xacf28c5ba9b079de@mail.gmail.com>
+References: <9c9ad6a31002111256v1c3394d1rade3c3640ee7efb5@mail.gmail.com>
+	 <35c90d961002111320n3e5626d6oca767c7facccc356@mail.gmail.com>
+	 <9c9ad6a31002120806m381e6548xacf28c5ba9b079de@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 12 Feb 2010 18:57:51 +0100
-Message-ID: <1265997471.21559.1.camel@localhost.localdomain>
+Date: Fri, 12 Feb 2010 18:56:42 +0100
+Message-ID: <1265997402.21559.0.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Stephen,
 
-> this patch removes an unnecessary argument(D-Bus connection) of
-> g_dbus_remove_watch.
+> Thanks, I guess I wasn't really paying attention, it was a late nite.
+> 
+> Signed-off-by: Stephen Coe <smcoe1@gmail.com>
+> ---
+>   net/bluetooth/hci_event.c |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 592da5c..6c57fc7 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -1698,6 +1698,7 @@ static inline void
+> hci_sync_conn_complete_evt(struct hci_dev *hdev, struct sk_bu
+>  		hci_conn_add_sysfs(conn);
+>  		break;
+> 
+> +	case 0x11:	/* Unsupported Feature or Parameter Value */
+>  	case 0x1c:	/* SCO interval rejected */
+>  	case 0x1a:	/* Unsupported Remote Feature */
+>  	case 0x1f:	/* Unspecified error */
 
-I would prefer if we keep it. In theory we can open watches on per
-connection basis. And keep the watch id based on this connection.
+I need a proper patch with the hcidump and the name of the device that
+causes this issue. See how Nick has done it lately.
 
 Regards
 
