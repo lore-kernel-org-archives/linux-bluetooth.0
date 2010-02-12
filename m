@@ -1,35 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4B75A271.7010705@csr.com>
-Date: Fri, 12 Feb 2010 18:48:17 +0000
-From: David Vrabel <david.vrabel@csr.com>
-MIME-Version: 1.0
-To: "John W. Linville" <linville@tuxdriver.com>
-CC: "Luis R. Rodriguez" <lrodriguez@atheros.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
+Date: Fri, 12 Feb 2010 13:33:09 -0500
+From: "John W. Linville" <linville@tuxdriver.com>
+To: "Luis R. Rodriguez" <lrodriguez@atheros.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
         linux-wireless <linux-wireless@vger.kernel.org>,
         linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Dan Tian <Dan.Tian@atheros.com>, Kevin Hayes <kevin@atheros.com>
 Subject: Re: Coordinating development for Bluetooth 3.0 between 802.11 and
- BT trees
-References: <43e72e891002111210l55d6a802pc5a1384e3535c845@mail.gmail.com> <20100212183309.GB4983@tuxdriver.com>
-In-Reply-To: <20100212183309.GB4983@tuxdriver.com>
-Content-Type: text/plain; charset=ISO-8859-1
+	BT trees
+Message-ID: <20100212183309.GB4983@tuxdriver.com>
+References: <43e72e891002111210l55d6a802pc5a1384e3535c845@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <43e72e891002111210l55d6a802pc5a1384e3535c845@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-John W. Linville wrote:
+On Thu, Feb 11, 2010 at 12:10:24PM -0800, Luis R. Rodriguez wrote:
+
+> we are reviewing possibilities of working on Bluetooth 3.0. With
+> Bluetooth 3.0 you essentially will switch to transmitting large data
+> over your 802.11 device instead of the BT device. One of the first
+> questions we need to address first is how we would go about
+> coordinating development between wireless-testing and
+> bluetooth-testing. First I'll note that I know squat of bluetooth so
+> bare with me if I'm not being 100% accurate here. From what I gather
+> on the mac80211 side the biggest piece will be the PAL implementation
+> which should translate HCI commands to respective 802.11 frames where
+> needed. It seems this would likely be the first thing tackled. Prior
+> to working on 802.11 though we realize that at some point we'll need
+> to synchronize the 802.11 and Bluetooth trees though so work done on
+> wireless-testing for a PAL is reasonable but then the
+> bluetooth-testing won't have the respective updates.
 > 
-> In any case, I was under the impression that at least the initial
-> parts of the 802.11 AMP implementation could happen independently
-> from any bluetooth stack changes...?
+> Using linux-next is one possibility but using linux-next proves a pain
+> due to the fact that every single update on breaks updates, so the
+> only way to update is:
+> 
+> git fetch
+> git reset --hard origin
+> 
+> Wanted to get your feedback on what you think would be the best
+> approach to take for focus on development for Bluetooth 3.0 support.
+> Hoping there is a better solution than using linux-next.
 
-You should be able to do (almost) all of the AMP PAL development and
-testing without a Bluetooth stack.
+I'm sure Marcel and Johannes are way ahead of us on this. :-)
 
-David
+I think you covered the basics, but you did leave-out the possibility
+of using net-next-2.6 for bleeding-edge development of bluetooth 3.
+Since both Marcel and I feed Dave's tree and Dave endeavours to
+keep the history of that tree stable then this would seem like your
+best bet.
+
+In any case, I was under the impression that at least the initial
+parts of the 802.11 AMP implementation could happen independently
+from any bluetooth stack changes...?
+
+John
 -- 
-David Vrabel, Senior Software Engineer, Drivers
-CSR, Churchill House, Cambridge Business Park,  Tel: +44 (0)1223 692562
-Cowley Road, Cambridge, CB4 0WZ                 http://www.csr.com/
-
-
-Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
