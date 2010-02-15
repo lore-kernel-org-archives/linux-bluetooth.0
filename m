@@ -1,67 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ed Tomlinson <edt@aei.ca>
-To: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Subject: Re: [PATCH 0/2] Provide a driver for the Apple Magic Mouse - opps
-Date: Mon, 15 Feb 2010 07:42:45 -0500
-Cc: Jiri Kosina <jkosina@suse.cz>,
- Michael Poole <mdpoole@troilus.org>,
- linux-input@vger.kernel.org,
- Marcel Holtmann <marcel@holtmann.org>,
- linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <alpine.LNX.2.00.1001291515560.356@pobox.suse.cz> <201002140922.42014.edt@aei.ca> <20100215071145.GA9135@core.coreip.homeip.net>
-In-Reply-To: <20100215071145.GA9135@core.coreip.homeip.net>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201002150742.46242.edt@aei.ca>
+Subject: [PATCH] Fix DSO linking
+From: Bastien Nocera <hadess@hadess.net>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="=-7itL3jrcVkdCKoWKdWsR"
+Date: Mon, 15 Feb 2010 10:43:57 +0000
+Message-ID: <1266230637.2310.127.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Monday 15 February 2010 02:11:46 Dmitry Torokhov wrote:
-> On Sun, Feb 14, 2010 at 09:22:41AM -0500, Ed Tomlinson wrote:
-> > On Sunday 14 February 2010 03:03:44 Dmitry Torokhov wrote:
-> > > On Sat, Feb 13, 2010 at 02:29:29PM -0500, Ed Tomlinson wrote:
-> > > > On Wednesday 10 February 2010 08:57:37 Jiri Kosina wrote:
-> > > > > On Tue, 9 Feb 2010, Michael Poole wrote:
-> > > > > 
-> > > > > > I think this patch is ready for real review.  The Magic Mouse requires
-> > > > > > that a driver send an unlock Report(Feature) command, similar to the
-> > > > > > Wacom wireless tablet and Sixaxis controller quirks.  This turns on an
-> > > > > > Input Report that isn't published in the input Report descriptor that
-> > > > > > contains touch data (and usually overrides the normal motion and click
-> > > > > > Report).
-> > > > > > 
-> > > > > > Because the mouse has only one switch and no scroll wheel, the driver
-> > > > > > (under control of parameters) emulates a middle button and scroll wheel.
-> > > > > > User space could also ignore and/or re-synthesize those events based on
-> > > > > > the reported events.
-> > > > > > 
-> > > > > > The first patch exports hid_register_report() so the driver can turn on
-> > > > > > the multitouch report.  The second patch adds the device ID and the
-> > > > > > driver.  Some user-space tools to talk to the mouse directly (that is,
-> > > > > > when it is not associated with the host's HIDP stack) are at
-> > > > > > http://github.com/entrope/linux-magicmouse .
-> > > > > 
-> > > > > I have applied the driver into apple_magic_mouse branch and merged this 
-> > > > > branch into for-next, so it should appear in the upcoming linux-next.
-> > > > 
-> > > 
-> > > > This driver (or the hid changes) can triggers an opps.  What I did was
-> > > > start X.  Turn on the magic mouse.  It connected on input7&8.  Then I
-> > > > powered it off and on.  This time it conneced on input9&10.  Then I
-> > > > exited X and got the opps.  Note my X does not hotplug the magic
-> > > > mouse.  I've also included a trace of the udev events that generated
-> > > > the log below (if there was a remove after X stopped it would not be
-> > > > included).  To my eyes it looks like we leak an input device (there is
-> > > > not a remove event for input8).
-> > > >
-> > > 
-> > > Indeed, we seem to be missing call to input_unregister_device() in
-> > > magicmouse_remove().
-> > 
-> > How does this look?  With this udevadm shows input8 being removed and
-> > there is no more opps.
-> 
-> Almost... you need to do hid_hw_stop() first and only then unregister
-> input device, Otherwise if you unload the module while moving the mouse
-> it is likely to still oops.
+
+--=-7itL3jrcVkdCKoWKdWsR
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+
+We need to link explicitly against libm, to avoid the error mentioned in
+the patch.
+
+Cheers
+
+--=-7itL3jrcVkdCKoWKdWsR
+Content-Disposition: attachment; filename="0001-Fix-DSO-linking.patch"
+Content-Type: text/x-patch; name="0001-Fix-DSO-linking.patch"; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+
+>From 6447181296e56e20c6b504978477d24cc55655e9 Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Mon, 15 Feb 2010 10:41:40 +0000
+Subject: [PATCH] Fix DSO linking
+
+Explicitely link against libm, to avoid linking problems:
+CCLD   sbc/sbctester
+/usr/bin/ld: sbc/sbctester.o: undefined reference to symbol 'sqrt@@GLIBC_2.2.5'
+/usr/bin/ld: note: 'sqrt@@GLIBC_2.2.5' is defined in DSO /lib64/libm.so.6 so try adding it to the linker command line
+/lib64/libm.so.6: could not read symbols: Invalid operation
+
+https://bugzilla.redhat.com/show_bug.cgi?id=564799
+---
+ Makefile.am |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 584b921..fc7b2c0 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -81,7 +81,7 @@ sbc_sbcenc_LDADD = sbc/libsbc.la
+ if SNDFILE
+ noinst_PROGRAMS += sbc/sbctester
+ 
+-sbc_sbctester_LDADD = @SNDFILE_LIBS@
++sbc_sbctester_LDADD = @SNDFILE_LIBS@ -lm
+ sbc_sbctest_CFLAGS = @SNDFILE_CFLAGS@
+ endif
+ endif
+-- 
+1.6.6
+
+
+--=-7itL3jrcVkdCKoWKdWsR--
+
