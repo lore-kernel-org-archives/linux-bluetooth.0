@@ -1,27 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Mon, 15 Feb 2010 18:37:39 -0300
-Message-ID: <1b8fcc6f1002151337s18fc3b68hc7e5eb19a002c0fb@mail.gmail.com>
-Subject: problems with local usb bluetooth devices to make 350 to 380 followed
-	inquirys
-From: Oliver Salinas <oliver.salinas@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix out of scope variable access in
+ hci_sock_cmsg()
+From: Johann Felix Soden <johfel@gmx.de>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Date: Mon, 15 Feb 2010 22:23:48 +0100
+Message-ID: <1266269028.8680.4.camel@LAPJFS>
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-hello my name is Oliver and I live in chile, I'm doing my university
-project and I am making a software that sends personal messages to
-groups of users enrolled in a student aid system, for this I am using
-Bluez on linux and therefore, bluetooth devices are constantly working
-within a loop while (1), the problem is that every 350 to 380
-inquirys, bluetooth usb devices stop working
+From: Johann Felix Soden <johfel@users.sourceforge.net>
 
-my question if they know that would cause this problem? and can be resolved?
+The pointer data can point to the variable ctv.
+Access to data happens when ctv is already out of scope.
 
-any answer is very WELCOME
+Signed-off-by: Johann Felix Soden <johfel@users.sourceforge.net>
+---
+ net/bluetooth/hci_sock.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-
-Oliver Salinas Aranguiz
-Est. Ingenieria Civil Informatica
-Universidad del Bio Bio
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 688cfeb..b0e6108 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -338,8 +338,8 @@ static inline void hci_sock_cmsg(struct sock *sk, struct msghdr *msg, struct sk_
+ 		data = &tv;
+ 		len = sizeof(tv);
+ #ifdef CONFIG_COMPAT
++		struct compat_timeval ctv;
+ 		if (msg->msg_flags & MSG_CMSG_COMPAT) {
+-			struct compat_timeval ctv;
+ 			ctv.tv_sec = tv.tv_sec;
+ 			ctv.tv_usec = tv.tv_usec;
+ 			data = &ctv;
+-- 
+1.6.6.2
