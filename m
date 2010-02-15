@@ -1,61 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH] Fix DSO linking
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="=-7itL3jrcVkdCKoWKdWsR"
-Date: Mon, 15 Feb 2010 10:43:57 +0000
-Message-ID: <1266230637.2310.127.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Sun, 14 Feb 2010 23:18:50 -0800
+From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+To: Ed Tomlinson <edt@aei.ca>
+Cc: Michael Poole <mdpoole@troilus.org>, Jiri Kosina <jkosina@suse.cz>,
+	linux-input@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/1] Enable xy scrolling for Apple Magic Mouse
+Message-ID: <20100215071850.GB9135@core.coreip.homeip.net>
+References: <alpine.LNX.2.00.1001291515560.356@pobox.suse.cz>
+ <201002141724.33223.edt@aei.ca>
+ <87zl3bbfdo.fsf@troilus.org>
+ <201002141858.26917.edt@aei.ca>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <201002141858.26917.edt@aei.ca>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Sun, Feb 14, 2010 at 06:58:26PM -0500, Ed Tomlinson wrote:
+> On Sunday 14 February 2010 17:51:15 Michael Poole wrote:
+> > Ed Tomlinson writes:
+> > 
+> > > Hi,
+> > >
+> > > Here is a patch that enables xy scrolling with the magic mouse.  I have also
+> > > changed the accelleration logic to work better with xy scrolling.
+> > 
+> > Hi Ed,
+> > 
+> > Your other patch to call input_unregister_device() looks good -- thanks!
+> 
+> Thanks.  One question about it though.  Do we have to check if msc is null before
+> the unregister?
 
---=-7itL3jrcVkdCKoWKdWsR
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
+If it is NULL whan remove() is running there are much bigger problems
+with the driver/HID subsystem.
 
-We need to link explicitly against libm, to avoid the error mentioned in
-the patch.
+> 
+> > I've never used a horizontal scroll wheel -- what are the common uses
+> > for it?  Why should the acceleration be separate for the two directions
+> > rather than using the same factor?  Why does the kernel need to emulate
+> > this rather than having user-space implement the emulation?
+> 
+> Its usefull for scrolling left and right while browsing.  If you use kde it can
+> be used to scroll between applications on the taskbar.   Here most applications
+> with a horizontial scrollbar work as expected.
+> 
+> I first tried with a single acceleration value for both axies.  It leads to confusing
+> things happening.   For example.  I quickly scroll down, then nudge the
+> window to the left.  This works as expect with two values.  With one the
+> nudge is accelerated and moves too far.
+> 
+> My personal goal is to have the basic, apple defined, gestures working
+> from kernel space.  This way the device works as expected without needing
+> to fiddle with X or other managers (think wayland and/or chromeOS).
 
-Cheers
+I am not sure if this is the desired approach. The current idea is to
+export useable but minimally processed events to userspace and let them
+be turned into gestures there (by evdev, synaptics driver and so forth).
 
---=-7itL3jrcVkdCKoWKdWsR
-Content-Disposition: attachment; filename="0001-Fix-DSO-linking.patch"
-Content-Type: text/x-patch; name="0001-Fix-DSO-linking.patch"; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-
->From 6447181296e56e20c6b504978477d24cc55655e9 Mon Sep 17 00:00:00 2001
-From: Bastien Nocera <hadess@hadess.net>
-Date: Mon, 15 Feb 2010 10:41:40 +0000
-Subject: [PATCH] Fix DSO linking
-
-Explicitely link against libm, to avoid linking problems:
-CCLD   sbc/sbctester
-/usr/bin/ld: sbc/sbctester.o: undefined reference to symbol 'sqrt@@GLIBC_2.2.5'
-/usr/bin/ld: note: 'sqrt@@GLIBC_2.2.5' is defined in DSO /lib64/libm.so.6 so try adding it to the linker command line
-/lib64/libm.so.6: could not read symbols: Invalid operation
-
-https://bugzilla.redhat.com/show_bug.cgi?id=564799
----
- Makefile.am |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
-
-diff --git a/Makefile.am b/Makefile.am
-index 584b921..fc7b2c0 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -81,7 +81,7 @@ sbc_sbcenc_LDADD = sbc/libsbc.la
- if SNDFILE
- noinst_PROGRAMS += sbc/sbctester
+Thanks.
  
--sbc_sbctester_LDADD = @SNDFILE_LIBS@
-+sbc_sbctester_LDADD = @SNDFILE_LIBS@ -lm
- sbc_sbctest_CFLAGS = @SNDFILE_CFLAGS@
- endif
- endif
 -- 
-1.6.6
-
-
---=-7itL3jrcVkdCKoWKdWsR--
-
+Dmitry
