@@ -2,7 +2,7 @@ Return-Path: <cyrus@holtmann.org>
 From: Ed Tomlinson <edt@aei.ca>
 To: Dmitry Torokhov <dmitry.torokhov@gmail.com>
 Subject: Re: [PATCH 0/2] Provide a driver for the Apple Magic Mouse - opps
-Date: Mon, 15 Feb 2010 07:44:51 -0500
+Date: Mon, 15 Feb 2010 07:42:45 -0500
 Cc: Jiri Kosina <jkosina@suse.cz>,
  Michael Poole <mdpoole@troilus.org>,
  linux-input@vger.kernel.org,
@@ -14,7 +14,7 @@ In-Reply-To: <20100215071145.GA9135@core.coreip.homeip.net>
 MIME-Version: 1.0
 Content-Type: Text/Plain;
   charset="iso-8859-1"
-Message-Id: <201002150744.51730.edt@aei.ca>
+Message-Id: <201002150742.46242.edt@aei.ca>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 On Monday 15 February 2010 02:11:46 Dmitry Torokhov wrote:
@@ -65,23 +65,3 @@ On Monday 15 February 2010 02:11:46 Dmitry Torokhov wrote:
 > Almost... you need to do hid_hw_stop() first and only then unregister
 > input device, Otherwise if you unload the module while moving the mouse
 > it is likely to still oops.
-
-How about this?  It applies on top of yesterdays patch.
-
-Ed
-
----
-diff --git a/drivers/hid/hid-magicmouse.c b/drivers/hid/hid-magicmouse.c
-index 7d252d2..46fdeee 100644
---- a/drivers/hid/hid-magicmouse.c
-+++ b/drivers/hid/hid-magicmouse.c
-@@ -430,8 +430,8 @@ static void magicmouse_remove(struct hid_device *hdev)
- {
- 	struct magicmouse_sc *msc;
- 	msc = hid_get_drvdata(hdev);
--	input_unregister_device(msc->input);
- 	hid_hw_stop(hdev);
-+	input_unregister_device(msc->input);
- 	kfree(msc);
- }
- 
