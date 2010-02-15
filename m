@@ -1,70 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 14 Feb 2010 23:11:46 -0800
-From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-To: Ed Tomlinson <edt@aei.ca>
-Cc: Jiri Kosina <jkosina@suse.cz>, Michael Poole <mdpoole@troilus.org>,
-	linux-input@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/2] Provide a driver for the Apple Magic Mouse - opps
-Message-ID: <20100215071145.GA9135@core.coreip.homeip.net>
-References: <alpine.LNX.2.00.1001291515560.356@pobox.suse.cz>
- <201002131429.29671.edt@aei.ca>
- <20100214080344.GA4423@core.coreip.homeip.net>
- <201002140922.42014.edt@aei.ca>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <201002140922.42014.edt@aei.ca>
+From: Adam Bliss <abliss@google.com>
+Date: Sun, 14 Feb 2010 22:29:31 -0800
+Message-ID: <ee007d8e1002142229m22bec4fdweb8150bdb8e8706d@mail.gmail.com>
+Subject: SolidTek ASK-3962 keyboard works but mouse doesn't [patch]
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, Feb 14, 2010 at 09:22:41AM -0500, Ed Tomlinson wrote:
-> On Sunday 14 February 2010 03:03:44 Dmitry Torokhov wrote:
-> > On Sat, Feb 13, 2010 at 02:29:29PM -0500, Ed Tomlinson wrote:
-> > > On Wednesday 10 February 2010 08:57:37 Jiri Kosina wrote:
-> > > > On Tue, 9 Feb 2010, Michael Poole wrote:
-> > > > 
-> > > > > I think this patch is ready for real review.  The Magic Mouse requires
-> > > > > that a driver send an unlock Report(Feature) command, similar to the
-> > > > > Wacom wireless tablet and Sixaxis controller quirks.  This turns on an
-> > > > > Input Report that isn't published in the input Report descriptor that
-> > > > > contains touch data (and usually overrides the normal motion and click
-> > > > > Report).
-> > > > > 
-> > > > > Because the mouse has only one switch and no scroll wheel, the driver
-> > > > > (under control of parameters) emulates a middle button and scroll wheel.
-> > > > > User space could also ignore and/or re-synthesize those events based on
-> > > > > the reported events.
-> > > > > 
-> > > > > The first patch exports hid_register_report() so the driver can turn on
-> > > > > the multitouch report.  The second patch adds the device ID and the
-> > > > > driver.  Some user-space tools to talk to the mouse directly (that is,
-> > > > > when it is not associated with the host's HIDP stack) are at
-> > > > > http://github.com/entrope/linux-magicmouse .
-> > > > 
-> > > > I have applied the driver into apple_magic_mouse branch and merged this 
-> > > > branch into for-next, so it should appear in the upcoming linux-next.
-> > > 
-> > 
-> > > This driver (or the hid changes) can triggers an opps.  What I did was
-> > > start X.  Turn on the magic mouse.  It connected on input7&8.  Then I
-> > > powered it off and on.  This time it conneced on input9&10.  Then I
-> > > exited X and got the opps.  Note my X does not hotplug the magic
-> > > mouse.  I've also included a trace of the udev events that generated
-> > > the log below (if there was a remove after X stopped it would not be
-> > > included).  To my eyes it looks like we leak an input device (there is
-> > > not a remove event for input8).
-> > >
-> > 
-> > Indeed, we seem to be missing call to input_unregister_device() in
-> > magicmouse_remove().
-> 
-> How does this look?  With this udevadm shows input8 being removed and
-> there is no more opps.
+Hi there,
 
-Almost... you need to do hid_hw_stop() first and only then unregister
-input device, Otherwise if you unload the module while moving the mouse
-it is likely to still oops.
+I bought a SolidTek ASK-3962 Keyboard/Mouse for use with my Home
+Theatre PC.  The keyboard connects and works great with bluez 4.60 --
+hooray!
 
-Thanks.
+However, the mouse does not work.  I traced this down to the subclass
+the device reports when it connects.  It reports 0x40, while bluez
+expects it to include 0x80 to be treated as a mouse.  I found this
+patch to work great:
 
--- 
-Dmitry
+
+--- bluez-4.60/input/device.c   2010-01-09 12:52:17.000000000 -0800
++++ bluez-4.60-new/input/device.c       2010-02-14 22:16:22.000000000 -0800
+@@ -647,6 +647,12 @@
+        if (idev->name)
+                strncpy(req->name, idev->name, sizeof(req->name) - 1);
+
++       if (req->vendor == 0x0dc6 && req->product == 0x3752) {
++               // The SolidTek ask-3962 has a keyboard and a mouse, but
++               // incorrectly reports its subclass.
++               req->subclass |= 0x80;
++       }
++
+        /* Encryption is mandatory for keyboards */
+        if (req->subclass & 0x40) {
+                err = bt_acl_encrypt(&idev->src, &idev->dst,
+encrypt_completed, req);
+
+
+(You can also do this with the old hidd program by passing "-b 192" to
+force the subclass.)
+
+I don't know if one-off hacks in device.c are the right way to solve
+this problem -- I was "inspired" by the one-off patch in there already
+for 054c:0268.  Let me know if there's a more appropriate way to fix
+this, and I'll be happy to send in another patch.
+
+Cheers,
+--Adam Bliss
