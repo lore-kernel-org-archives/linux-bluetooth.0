@@ -1,51 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 15 Feb 2010 17:40:16 +0100
-From: pavol@klacansky.com
+MIME-Version: 1.0
+From: Baptiste Mille-Mathias <baptiste.millemathias@gmail.com>
+Date: Mon, 15 Feb 2010 13:54:44 +0100
+Message-ID: <920101ab1002150454t31c94b2bh4b1825b4d8ed0db9@mail.gmail.com>
+Subject: API broken in bluez 4.61
 To: linux-bluetooth@vger.kernel.org
-Subject: thinkpad laser bluetooth mouse
-Message-Id: <20100215174016.9dd3beff.pavol@klacansky.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hallo, I can connect my mouse by command 'hidd --search' (mouse is in pairing mode), but autoconnect not works
+Hello,
 
-/etc/conf.d/bluetooth file
-# Bluetooth configuraton file
+While packaging latest release of bluez, I seen the API compatibility
+was broken.
+hci_read_inquiry_transmit_power_level was removed and thus would have
+required to bump the soname.
 
-# Bluetooth services (allowed values are "true" and "false")
+Thanks for fixing that.
 
-# Run the bluetoothd daemon (default: true)
-#DAEMON_ENABLE="false"
-
-# Run hid2hci (default: false)
-HID2HCI_ENABLE="true"
-
-# Run the sdp daemon (default: false)
-# If this is disabled, hcid's internal sdp daemon will be used
-#SDPD_ENABLE="true"
-
-# Run the bluetooth HID daemon (default: false)
-HIDD_ENABLE="true"
-
-# Activate rfcomm ports (default: false)
-#RFCOMM_ENABLE="true"
-
-# Run bluetooth dial-up networking daemon (default: false)
-#DUND_ENABLE="true"
-
-# Run bluetooth PAN daemon (default: false)
-#PAND_ENABLE="true"
-
-# rfcomm configuration file (default: /etc/bluetooth/rfcomm.conf)
-#RFCOMM_CONFIG="/etc/bluetooth/rfcomm.conf"
-
-# Options for hidd, dund and pand (default: none)
-#HIDD_OPTIONS="--server --connect"
-#DUND_OPTIONS=""
-#PAND_OPTIONS=""
-
-
+Regards
 -- 
- <pavol@klacansky.com>
+Baptiste Mille-Mathias
+Les gens heureux ne sont pas pressés
