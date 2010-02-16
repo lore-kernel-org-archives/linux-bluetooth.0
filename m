@@ -1,119 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Tue, 16 Feb 2010 12:36:47 +0200
-Message-ID: <508e92ca1002160236k34c18949jc7d7187645ef4aa0@mail.gmail.com>
-Subject: [PATCH] Bluetooth: Fix kernel crash on BT stress tests.
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Date: Tue, 16 Feb 2010 09:25:29 +0000 (GMT)
 To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=0015174c179e913b21047fb54f5f
+Subject: Re: [PATCH] bluez-hcidump fix SDP universal attributes
+In-Reply-To: <1263901312.199442.295.nullmailer@galant.ukfsn.org>
+References: <1259610176.010210.13279.nullmailer@galant.ukfsn.org> <1263901312.199442.295.nullmailer@galant.ukfsn.org>
+MIME-Version: 1.0
+Content-Type: MULTIPART/MIXED; BOUNDARY="0-1804564332-1266312330=:1624"
+Message-Id: <1266312330.230253.2026.nullmailer@galant.ukfsn.org>
+From: Iain Hibbert <plunky@rya-online.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---0015174c179e913b21047fb54f5f
-Content-Type: text/plain; charset=ISO-8859-1
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
->From 0135f732cb45e5e91062aca84a61a40b172200a4 Mon Sep 17 00:00:00 2001
-From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
-Date: Tue, 16 Feb 2010 10:52:33 +0200
-Subject: [PATCH] Bluetooth: Fix kernel crash on BT stress tests.
+--0-1804564332-1266312330=:1624
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 
-Added very simple check that req buffer has enough space to
-fit configuration parameters. Shall be enough to reject packets
-with configuration size more than req buffer.
+On Tue, 19 Jan 2010, Iain Hibbert wrote:
 
-Crash trace below
+> On Mon, 30 Nov 2009, Iain Hibbert wrote:
+>
+> > hcidump shows SDP universal attribute 0x000d as IconURL but in fact it is
+> > defined as "Additional Protocol Descriptor Lists". IconURL is 0x000c and I
+> > don't know what Icon_10 was, perhaps an older name?
+> >
+> > Eg, from an SDP probe of a mouse:
+> >
+> >       aid 0x000d (IconURL)
+> >          < < < uuid-16 0x0100 (L2CAP) uint 0x13 > < uuid-16 0x0011 (HIDP) > > >
+>
+> Reposting because there was no response to this, patch is attached..
+>
+> See "5.1.6 AdditionalProtocolDescriptorList attribute" and "5.1.14 IconURL
+> Attribute" sections in the core specification for reference..
+>
+> (they sometimes call it AdditionalProtocolDescriptorLists and that is more
+> accurate as more than one protocol descriptor list may be included)
 
-[ 6069.659393] Unable to handle kernel paging request at virtual
-address 02000205
-[ 6069.673034] Internal error: Oops: 805 [#1] PREEMPT
-...
-[ 6069.727172] PC is at l2cap_add_conf_opt+0x70/0xf0 [l2cap]
-[ 6069.732604] LR is at l2cap_recv_frame+0x1350/0x2e78 [l2cap]
-...
-[ 6070.030303] Backtrace:
-[ 6070.032806] [<bf1c2880>] (l2cap_add_conf_opt+0x0/0xf0 [l2cap]) from
-[<bf1c6624>] (l2cap_recv_frame+0x1350/0x2e78 [l2cap])
-[ 6070.043823]  r8:dc5d3100 r7:df2a91d6 r6:00000001 r5:df2a8000 r4:00000200
-[ 6070.050659] [<bf1c52d4>] (l2cap_recv_frame+0x0/0x2e78 [l2cap]) from
-[<bf1c8408>] (l2cap_recv_acldata+0x2bc/0x350 [l2cap])
-[ 6070.061798] [<bf1c814c>] (l2cap_recv_acldata+0x0/0x350 [l2cap]) from
-[<bf0037a4>] (hci_rx_task+0x244/0x478 [bluetooth])
-[ 6070.072631]  r6:dc647700 r5:00000001 r4:df2ab740
-[ 6070.077362] [<bf003560>] (hci_rx_task+0x0/0x478 [bluetooth]) from
-[<c006b9fc>] (tasklet_action+0x78/0xd8)
-[ 6070.087005] [<c006b984>] (tasklet_action+0x0/0xd8) from [<c006c160>]
+posting this simple (and easily verified) patch for hcidump for the third
+time..
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
----
- net/bluetooth/l2cap.c |    6 ++++++
- 1 files changed, 6 insertions(+), 0 deletions(-)
+regards,
+iain
+--0-1804564332-1266312330=:1624
+Content-Type: TEXT/PLAIN; charset=US-ASCII; name=patch.txt
+Content-Transfer-Encoding: BASE64
+Content-ID: <alpine.NEB.2.00.1002160925290.1624@localhost.>
+Content-Description: fix SDP universal attributes
+Content-Disposition: attachment; filename=patch.txt
 
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 400efa2..69b7280 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -2830,6 +2830,12 @@ static inline int l2cap_config_rsp(struct
-l2cap_conn *conn, struct l2cap_cmd_hdr
- 			int len = cmd->len - sizeof(*rsp);
- 			char req[64];
+LS0tIHBhcnNlci9zZHAuYy5vcmlnCTIwMDktMTEtMzAgMTk6Mjk6MzEuMDAw
+MDAwMDAwICswMDAwDQorKysgcGFyc2VyL3NkcC5jDQpAQCAtMTk0LDggKzE5
+NCw4IEBAIHN0YXRpYyBzZHBfYXR0cl9pZF9uYW1fbG9va3VwX3RhYmxlX3Qg
+c2QNCiAJeyBTRFBfQVRUUl9JRF9CTFVFVE9PVEhfUFJPRklMRV9ERVNDUklQ
+VE9SX0xJU1QsICJCVFByb2ZpbGVEZXNjTGlzdCIgIH0sDQogCXsgU0RQX0FU
+VFJfSURfRE9DVU1FTlRBVElPTl9VUkwsICAgICAgICAgICAgICAgICAiRG9j
+VVJMIiAgICAgICAgICAgICB9LA0KIAl7IFNEUF9BVFRSX0lEX0NMSUVOVF9F
+WEVDVVRBQkxFX1VSTCwgICAgICAgICAgICAgIkNsaWVudEV4ZVVSTCIgICAg
+ICAgfSwNCi0JeyBTRFBfQVRUUl9JRF9JQ09OXzEwLCAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICJJY29uMTAiICAgICAgICAgICAgIH0sDQogCXsgU0RQ
+X0FUVFJfSURfSUNPTl9VUkwsICAgICAgICAgICAgICAgICAgICAgICAgICAi
+SWNvblVSTCIgICAgICAgICAgICB9LA0KKwl7IFNEUF9BVFRSX0lEX0FERElU
+SU9OQUxfUFJPVE9DT0xfREVTQ19MSVNUUywgICAgIkFkZGl0aW9uYWxQcm90
+b2NvbERlc2NMaXN0cyIgfSwNCiAJeyBTRFBfQVRUUl9JRF9TRVJWSUNFX05B
+TUUsICAgICAgICAgICAgICAgICAgICAgICJTcnZOYW1lIiAgICAgICAgICAg
+IH0sDQogCXsgU0RQX0FUVFJfSURfU0VSVklDRV9ERVNDUklQVElPTiwgICAg
+ICAgICAgICAgICAiU3J2RGVzYyIgICAgICAgICAgICB9LA0KIAl7IFNEUF9B
+VFRSX0lEX1BST1ZJREVSX05BTUUsICAgICAgICAgICAgICAgICAgICAgIlBy
+b3ZpZGVyTmFtZSIgICAgICAgfSwNCi0tLSBwYXJzZXIvc2RwLmgub3JpZwky
+MDA5LTExLTMwIDE5OjI5OjM1LjAwMDAwMDAwMCArMDAwMA0KKysrIHBhcnNl
+ci9zZHAuaA0KQEAgLTEyOSw4ICsxMjksOCBAQA0KICNkZWZpbmUgU0RQX0FU
+VFJfSURfQkxVRVRPT1RIX1BST0ZJTEVfREVTQ1JJUFRPUl9MSVNUICAweDAw
+MDkNCiAjZGVmaW5lIFNEUF9BVFRSX0lEX0RPQ1VNRU5UQVRJT05fVVJMICAg
+ICAgICAgICAgICAgICAgMHgwMDBBDQogI2RlZmluZSBTRFBfQVRUUl9JRF9D
+TElFTlRfRVhFQ1VUQUJMRV9VUkwgICAgICAgICAgICAgIDB4MDAwQg0KLSNk
+ZWZpbmUgU0RQX0FUVFJfSURfSUNPTl8xMCAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAweDAwMEMNCi0jZGVmaW5lIFNEUF9BVFRSX0lEX0lDT05fVVJM
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgMHgwMDBEDQorI2RlZmluZSBT
+RFBfQVRUUl9JRF9JQ09OX1VSTCAgICAgICAgICAgICAgICAgICAgICAgICAg
+IDB4MDAwQw0KKyNkZWZpbmUgU0RQX0FUVFJfSURfQURESVRJT05BTF9QUk9U
+T0NPTF9ERVNDX0xJU1RTICAgICAweDAwMEQNCiAjZGVmaW5lIFNEUF9BVFRS
+X0lEX1NFUlZJQ0VfTkFNRSAgICAgICAgICAgICAgICAgICAgICAgMHgwMTAw
+DQogI2RlZmluZSBTRFBfQVRUUl9JRF9TRVJWSUNFX0RFU0NSSVBUSU9OICAg
+ICAgICAgICAgICAgIDB4MDEwMQ0KICNkZWZpbmUgU0RQX0FUVFJfSURfUFJP
+VklERVJfTkFNRSAgICAgICAgICAgICAgICAgICAgICAweDAxMDINCg==
 
-+			if (len > sizeof(req) - sizeof(struct l2cap_conf_req)) {
-+				BT_ERR("Config response is too big");
-+				l2cap_send_disconn_req(conn, sk);
-+				goto done;
-+			}
-+
- 			/* throw out any old stored conf requests */
- 			result = L2CAP_CONF_SUCCESS;
- 			len = l2cap_parse_conf_rsp(sk, rsp->data,
--- 
-1.6.0.4
+--0-1804564332-1266312330=:1624--
 
---0015174c179e913b21047fb54f5f
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Bluetooth-Fix-kernel-crash-on-BT-stress-tests.patch"
-Content-Disposition: attachment;
-	filename="0001-Bluetooth-Fix-kernel-crash-on-BT-stress-tests.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_g5qk5qpn0
 
-RnJvbSAwMTM1ZjczMmNiNDVlNWU5MTA2MmFjYTg0YTYxYTQwYjE3MjIwMGE0IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBBbmRyZWkgRW1lbHRjaGVua28gPGFuZHJlaS5lbWVsdGNoZW5r
-b0Bub2tpYS5jb20+CkRhdGU6IFR1ZSwgMTYgRmViIDIwMTAgMTA6NTI6MzMgKzAyMDAKU3ViamVj
-dDogW1BBVENIXSBCbHVldG9vdGg6IEZpeCBrZXJuZWwgY3Jhc2ggb24gQlQgc3RyZXNzIHRlc3Rz
-LgoKQWRkZWQgdmVyeSBzaW1wbGUgY2hlY2sgdGhhdCByZXEgYnVmZmVyIGhhcyBlbm91Z2ggc3Bh
-Y2UgdG8KZml0IGNvbmZpZ3VyYXRpb24gcGFyYW1ldGVycy4gU2hhbGwgYmUgZW5vdWdoIHRvIHJl
-amVjdCBwYWNrZXRzCndpdGggY29uZmlndXJhdGlvbiBzaXplIG1vcmUgdGhhbiByZXEgYnVmZmVy
-LgoKQ3Jhc2ggdHJhY2UgYmVsb3cKClsgNjA2OS42NTkzOTNdIFVuYWJsZSB0byBoYW5kbGUga2Vy
-bmVsIHBhZ2luZyByZXF1ZXN0IGF0IHZpcnR1YWwgYWRkcmVzcyAwMjAwMDIwNQpbIDYwNjkuNjcz
-MDM0XSBJbnRlcm5hbCBlcnJvcjogT29wczogODA1IFsjMV0gUFJFRU1QVAouLi4KWyA2MDY5Ljcy
-NzE3Ml0gUEMgaXMgYXQgbDJjYXBfYWRkX2NvbmZfb3B0KzB4NzAvMHhmMCBbbDJjYXBdClsgNjA2
-OS43MzI2MDRdIExSIGlzIGF0IGwyY2FwX3JlY3ZfZnJhbWUrMHgxMzUwLzB4MmU3OCBbbDJjYXBd
-Ci4uLgpbIDYwNzAuMDMwMzAzXSBCYWNrdHJhY2U6ClsgNjA3MC4wMzI4MDZdIFs8YmYxYzI4ODA+
-XSAobDJjYXBfYWRkX2NvbmZfb3B0KzB4MC8weGYwIFtsMmNhcF0pIGZyb20KWzxiZjFjNjYyND5d
-IChsMmNhcF9yZWN2X2ZyYW1lKzB4MTM1MC8weDJlNzggW2wyY2FwXSkKWyA2MDcwLjA0MzgyM10g
-IHI4OmRjNWQzMTAwIHI3OmRmMmE5MWQ2IHI2OjAwMDAwMDAxIHI1OmRmMmE4MDAwIHI0OjAwMDAw
-MjAwClsgNjA3MC4wNTA2NTldIFs8YmYxYzUyZDQ+XSAobDJjYXBfcmVjdl9mcmFtZSsweDAvMHgy
-ZTc4IFtsMmNhcF0pIGZyb20KWzxiZjFjODQwOD5dIChsMmNhcF9yZWN2X2FjbGRhdGErMHgyYmMv
-MHgzNTAgW2wyY2FwXSkKWyA2MDcwLjA2MTc5OF0gWzxiZjFjODE0Yz5dIChsMmNhcF9yZWN2X2Fj
-bGRhdGErMHgwLzB4MzUwIFtsMmNhcF0pIGZyb20KWzxiZjAwMzdhND5dIChoY2lfcnhfdGFzaysw
-eDI0NC8weDQ3OCBbYmx1ZXRvb3RoXSkKWyA2MDcwLjA3MjYzMV0gIHI2OmRjNjQ3NzAwIHI1OjAw
-MDAwMDAxIHI0OmRmMmFiNzQwClsgNjA3MC4wNzczNjJdIFs8YmYwMDM1NjA+XSAoaGNpX3J4X3Rh
-c2srMHgwLzB4NDc4IFtibHVldG9vdGhdKSBmcm9tCls8YzAwNmI5ZmM+XSAodGFza2xldF9hY3Rp
-b24rMHg3OC8weGQ4KQpbIDYwNzAuMDg3MDA1XSBbPGMwMDZiOTg0Pl0gKHRhc2tsZXRfYWN0aW9u
-KzB4MC8weGQ4KSBmcm9tIFs8YzAwNmMxNjA+XQoKU2lnbmVkLW9mZi1ieTogQW5kcmVpIEVtZWx0
-Y2hlbmtvIDxhbmRyZWkuZW1lbHRjaGVua29Abm9raWEuY29tPgotLS0KIG5ldC9ibHVldG9vdGgv
-bDJjYXAuYyB8ICAgIDYgKysrKysrCiAxIGZpbGVzIGNoYW5nZWQsIDYgaW5zZXJ0aW9ucygrKSwg
-MCBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9uZXQvYmx1ZXRvb3RoL2wyY2FwLmMgYi9uZXQv
-Ymx1ZXRvb3RoL2wyY2FwLmMKaW5kZXggNDAwZWZhMi4uNjliNzI4MCAxMDA2NDQKLS0tIGEvbmV0
-L2JsdWV0b290aC9sMmNhcC5jCisrKyBiL25ldC9ibHVldG9vdGgvbDJjYXAuYwpAQCAtMjgzMCw2
-ICsyODMwLDEyIEBAIHN0YXRpYyBpbmxpbmUgaW50IGwyY2FwX2NvbmZpZ19yc3Aoc3RydWN0IGwy
-Y2FwX2Nvbm4gKmNvbm4sIHN0cnVjdCBsMmNhcF9jbWRfaGRyCiAJCQlpbnQgbGVuID0gY21kLT5s
-ZW4gLSBzaXplb2YoKnJzcCk7CiAJCQljaGFyIHJlcVs2NF07CiAKKwkJCWlmIChsZW4gPiBzaXpl
-b2YocmVxKSAtIHNpemVvZihzdHJ1Y3QgbDJjYXBfY29uZl9yZXEpKSB7CisJCQkJQlRfRVJSKCJD
-b25maWcgcmVzcG9uc2UgaXMgdG9vIGJpZyIpOworCQkJCWwyY2FwX3NlbmRfZGlzY29ubl9yZXEo
-Y29ubiwgc2spOworCQkJCWdvdG8gZG9uZTsKKwkJCX0KKwogCQkJLyogdGhyb3cgb3V0IGFueSBv
-bGQgc3RvcmVkIGNvbmYgcmVxdWVzdHMgKi8KIAkJCXJlc3VsdCA9IEwyQ0FQX0NPTkZfU1VDQ0VT
-UzsKIAkJCWxlbiA9IGwyY2FwX3BhcnNlX2NvbmZfcnNwKHNrLCByc3AtPmRhdGEsCi0tIAoxLjYu
-MC40Cgo=
---0015174c179e913b21047fb54f5f--
