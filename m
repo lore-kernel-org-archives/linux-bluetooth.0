@@ -1,26 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
+From: Ed Tomlinson <edt@aei.ca>
+To: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Subject: Re: [PATCH 0/2] Provide a driver for the Apple Magic Mouse - opps
+Date: Tue, 16 Feb 2010 07:34:47 -0500
+Cc: Jiri Kosina <jkosina@suse.cz>,
+ Michael Poole <mdpoole@troilus.org>,
+ linux-input@vger.kernel.org,
+ Marcel Holtmann <marcel@holtmann.org>,
+ linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <alpine.LNX.2.00.1001291515560.356@pobox.suse.cz> <201002140922.42014.edt@aei.ca> <20100215071145.GA9135@core.coreip.homeip.net>
+In-Reply-To: <20100215071145.GA9135@core.coreip.homeip.net>
 MIME-Version: 1.0
-Date: Tue, 16 Feb 2010 18:15:35 +0530
-Message-ID: <912bb79a1002160445l3aaa09ape8ac685397a87944@mail.gmail.com>
-Subject: Unable to change speaker and microphone gain
-From: nirav rabara <niravrabara@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201002160734.47588.edt@aei.ca>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-Using D-Bus API (SetSpeakerGain() & SetMicrophoneGain()) I am changing
-the speaker & microphone gain of Headset.
-Whenever I use this API to change the gain value , Signal
-SpeakerGainChanged & MicrophoneGainChanged emitted by bluetoothd, It
-shows me the same value as I have set.
-i.e if I set speakergain to 10, signal SpeakerGainChanged shows me 10.
-But it doesn't affect the HS actual gain(i.e. on impact on actual
-voice on HS ) it remains as it is.
+On Monday 15 February 2010 02:11:46 Dmitry Torokhov wrote:
+> Almost... you need to do hid_hw_stop() first and only then unregister
+> input device, Otherwise if you unload the module while moving the mouse
+> it is likely to still oops.
 
-Can somebody suggest me what I am missing??
+The exit routing for the module also has a hid_hw_stop.  Is it going to cause
+problems when it gets called twice?
 
--- 
-With Regards,
-Nirav Rabara
+TIA
+Ed
