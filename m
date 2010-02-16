@@ -1,67 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Tue, 16 Feb 2010 17:07:54 +0100
-Message-ID: <889018151002160807g779e128cnb6bd93eee0108aed@mail.gmail.com>
-Subject: a2dp with mouse input device - skipping,pitch change in stream
-From: "Pal Z. Illes" <illespal@gmail.com>
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1266334628.8849.5.camel@localhost.localdomain>
+References: <2d5a2c101002160659j1fd3fff8hc5418ddb7481b25d@mail.gmail.com>
+	 <2d5a2c101002160715l7f9a2f07y4a40b19e31fa98b3@mail.gmail.com>
+	 <1266334628.8849.5.camel@localhost.localdomain>
+Date: Tue, 16 Feb 2010 17:58:04 +0200
+Message-ID: <2d5a2c101002160758k131bd0f1y3477958780d11a02@mail.gmail.com>
+Subject: Re: [PATCH] Fix signal watch when a service name is given
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi Marcel,
 
-I wanted to ask if you are aware of the following issue:
+On Tue, Feb 16, 2010 at 5:37 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Luiz,
+>
+>> > This should fix g_dbus_add_signal_watch when a service like org.bluez is given.
+>>
+>>
+>> Updating since the last one was broken.
+>
+> I also think that in check_service() we actually have a missing call to
+> dbus_pending_unref(). That would cause a memory leak.
 
-Using a2dp and BT mouse together with bluez it very frequently results
-in pitch changes and skipping in the audio stream.
+There is a call to  dbus_pending_call_unref on check_service after
+dbus_pending_call_set_notify, which I took a look and seems correct
+but we have another problem there since we never cancel the pending
+call if the filter is unregister. Anyway there is a leak on
+service_reply where I don't call dbus_message_unref, so I will come up
+with another update soon.
 
-I am using 2 notebooks with my Sony dr-bt21g  stereo headset and a
-gigabyte BT mouse. One notebook is with 2.0 and the other with 2.1
-profile. (The thing is not reproducible under Windows.) A bunch of
-ubuntu users opened a bug on the launchpad (
-http://bugs.launchpad.net/ubuntu/+source/bluez/+bug/424215 )
-
-I'm using arch linux amd64. kernel 2.6.32 + bluez-git. Tried 4.60 too.
-Tried with simple ALSA bluetooth, and with pulseaudio too. I have
-hcidump and am running 'bluetoothd -dn'. Couldn't spot any special
-hints in the dump or logs. I can possibly try kernel 2.6.33-rc* too if
-there's something related (i have checked changelog of the kernel,
-couldnt spot anything related, but you will know it better).
-
-If this is new to you, or even old, anyway how can I help you to
-discover the cause of it?
-
-Or is there a configuration option I'm missing here? (I have tried
-hciconfig parameters lm,lp, different settings, modifying mtu size and
-whatever i could, no avail.)
-
-Regards,
-Pal Zoltan Illes
-
-
------
-
-The 2.0 device:
-
-hciconfig -a
-
-hci0:   Type: BR/EDR  Bus: USB
-        BD Address: 00:1D:92:1E:13:01  ACL MTU: 310:10  SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:3293882 acl:115129 sco:0 events:188738 errors:0
-        TX bytes:56340728 acl:196228 sco:0 commands:352 errors:8
-        Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'CSR - bc4'
-        Class: 0x1a010c
-        Service Classes: Networking, Capturing, Object Transfer
-        Device Class: Computer, Laptop
-        HCI Ver: 2.0 (0x3)  HCI Rev: 0xc5c
-        LMP Ver: 2.0 (0x3)  LMP Subver: 0xc5c
-        Manufacturer: Cambridge Silicon Radio (10)
-
-(link policies already tried: with or without RSWITCH, lm
-master,accept / slave / etc etc...)
+-- 
+Luiz Augusto von Dentz
+Computer Engineer
