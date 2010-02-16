@@ -1,71 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <2d5a2c101002160758k131bd0f1y3477958780d11a02@mail.gmail.com>
-References: <2d5a2c101002160659j1fd3fff8hc5418ddb7481b25d@mail.gmail.com>
-	 <2d5a2c101002160715l7f9a2f07y4a40b19e31fa98b3@mail.gmail.com>
-	 <1266334628.8849.5.camel@localhost.localdomain>
-	 <2d5a2c101002160758k131bd0f1y3477958780d11a02@mail.gmail.com>
-Date: Tue, 16 Feb 2010 21:34:47 -0300
-Message-ID: <2a9506371002161634h71ef3517pdc8be4f4e400c82e@mail.gmail.com>
-Subject: Re: [PATCH] Fix signal watch when a service name is given
-From: Vinicius Gomes <vinicius.gomes@openbossa.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH] eSCO fallback to SCO on Error: Unsupported Feature or
+ Parameter Value
+From: Marcel Holtmann <marcel@holtmann.org>
+To: smcoe@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, Stephen Coe <smcoe1@gmail.com>
+In-Reply-To: <1266337784-7898-1-git-send-email-smcoe@gmail.com>
+References: <1266337784-7898-1-git-send-email-smcoe@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Tue, 16 Feb 2010 10:05:39 -0800
+Message-ID: <1266343539.8849.12.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Stephen,
 
-On Tue, Feb 16, 2010 at 12:58 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Marcel,
->
-> On Tue, Feb 16, 2010 at 5:37 PM, Marcel Holtmann <marcel@holtmann.org> wr=
-ote:
->> Hi Luiz,
->>
->>> > This should fix g_dbus_add_signal_watch when a service like org.bluez=
- is given.
->>>
->>>
->>> Updating since the last one was broken.
->>
->> I also think that in check_service() we actually have a missing call to
->> dbus_pending_unref(). That would cause a memory leak.
->
-> There is a call to =C2=A0dbus_pending_call_unref on check_service after
-> dbus_pending_call_set_notify, which I took a look and seems correct
-> but we have another problem there since we never cancel the pending
-> call if the filter is unregister. Anyway there is a leak on
-> service_reply where I don't call dbus_message_unref, so I will come up
-> with another update soon.
->
+> The Bluetooth SIG PTS test case: TC_AG_ACS_BV_10_I, rejects eSCO with
+> "Unsupported Feature or Parameter Value" (0x11).  This patch adds case
+> for SCO fall back.
+> 
+> 2007-09-20 12:20:37.787747 > HCI Event: Number of Completed Packets
+> (0x13) plen 5
+>    handle 38 packets 1
+> 2007-09-20 12:20:37.842154 < HCI Command: Setup Synchronous Connection
+> (0x01|0x0028) plen 17
+>    handle 38 voice setting 0x0060
+> 2007-09-20 12:20:37.847037 > HCI Event: Command Status (0x0f) plen 4
+>    Setup Synchronous Connection (0x01|0x0028) status 0x00 ncmd 1
+> 2007-09-20 12:20:37.855233 > HCI Event: Max Slots Change (0x1b) plen 3
+>    handle 38 slots 1
+> 2007-09-20 12:20:39.913354 > HCI Event: Synchronous Connect Complete
+> (0x2c) plen 17
+>    status 0x11 handle 38 bdaddr 00:16:93:01:01:7A type eSCO
+>    Error: Unsupported Feature or Parameter Value
+> 2007-09-20 12:20:39.922629 > HCI Event: Max Slots Change (0x1b) plen 3
+>    handle 38 slots 5
+> 2007-09-20 12:20:58.126886 < ACL data: handle 38 flags 0x02 dlen 8
+>    L2CAP(d): cid 0x0041 len 4 [psm 0]
+>      0000: 0b 53 01 b8                                       .S..
+> 2007-09-20 12:20:58.130138 > HCI Event: Number of Completed Packets
+> (0x13) plen 5
+>    handle 38 packets 1
+> 
+> Signed-off-by: Stephen Coe <smcoe1@gmail.com>
+> ---
+>  net/bluetooth/hci_event.c |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
 
-This is fixed on obexd, but as far as I could see it is not (yet?)
-applied on the other users
-of gdbus.
+patch has been applied to bluetooth-2.6 tree.
 
-And, from what I tested the greater problem is that the timeout of the
-pending call would still
-trigger. This would cause libdbus to terminate the application, if
-libdbus was built with debug enabled,
-because one assert would fail (the message is "trying to remove an
-nonexistent timeout" or
- something like it). The timeout still triggering is the reason we
-don't see the pending call leaking.
+Regards
 
-> --
-> Luiz Augusto von Dentz
-> Computer Engineer
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at =C2=A0http://vger.kernel.org/majordomo-info.html
->
+Marcel
 
 
-Cheers,
---=20
-Vinicius Gomes
-INdT - Instituto Nokia de Tecnologia
