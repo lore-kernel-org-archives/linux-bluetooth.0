@@ -1,38 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1266334628.8849.5.camel@localhost.localdomain>
-References: <2d5a2c101002160659j1fd3fff8hc5418ddb7481b25d@mail.gmail.com>
-	 <2d5a2c101002160715l7f9a2f07y4a40b19e31fa98b3@mail.gmail.com>
-	 <1266334628.8849.5.camel@localhost.localdomain>
-Date: Tue, 16 Feb 2010 17:58:04 +0200
-Message-ID: <2d5a2c101002160758k131bd0f1y3477958780d11a02@mail.gmail.com>
-Subject: Re: [PATCH] Fix signal watch when a service name is given
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH] bluez-hcidump fix SDP universal attributes
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Iain Hibbert <plunky@rya-online.net>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <1266312330.230253.2026.nullmailer@galant.ukfsn.org>
+References: <1259610176.010210.13279.nullmailer@galant.ukfsn.org>
+	 <1263901312.199442.295.nullmailer@galant.ukfsn.org>
+	 <1266312330.230253.2026.nullmailer@galant.ukfsn.org>
+Content-Type: text/plain; charset="UTF-8"
+Date: Tue, 16 Feb 2010 07:42:42 -0800
+Message-ID: <1266334962.8849.8.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Iain,
 
-On Tue, Feb 16, 2010 at 5:37 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Luiz,
->
->> > This should fix g_dbus_add_signal_watch when a service like org.bluez is given.
->>
->>
->> Updating since the last one was broken.
->
-> I also think that in check_service() we actually have a missing call to
-> dbus_pending_unref(). That would cause a memory leak.
+> > > hcidump shows SDP universal attribute 0x000d as IconURL but in fact it is
+> > > defined as "Additional Protocol Descriptor Lists". IconURL is 0x000c and I
+> > > don't know what Icon_10 was, perhaps an older name?
+> > >
+> > > Eg, from an SDP probe of a mouse:
+> > >
+> > >       aid 0x000d (IconURL)
+> > >          < < < uuid-16 0x0100 (L2CAP) uint 0x13 > < uuid-16 0x0011 (HIDP) > > >
+> >
+> > Reposting because there was no response to this, patch is attached..
+> >
+> > See "5.1.6 AdditionalProtocolDescriptorList attribute" and "5.1.14 IconURL
+> > Attribute" sections in the core specification for reference..
+> >
+> > (they sometimes call it AdditionalProtocolDescriptorLists and that is more
+> > accurate as more than one protocol descriptor list may be included)
+> 
+> posting this simple (and easily verified) patch for hcidump for the third
+> time..
 
-There is a call to  dbus_pending_call_unref on check_service after
-dbus_pending_call_set_notify, which I took a look and seems correct
-but we have another problem there since we never cancel the pending
-call if the filter is unregister. Anyway there is a leak on
-service_reply where I don't call dbus_message_unref, so I will come up
-with another update soon.
+sorry for having missed it. For some reason it got sorted away. Can you
+create a proper patch with git format-patch. That makes it way easier
+for me to apply them.
 
--- 
-Luiz Augusto von Dentz
-Computer Engineer
+Regards
+
+Marcel
+
+
