@@ -1,71 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: Allow SCO/eSCO packet type selection for
- outgoing SCO connections.
+Subject: Re: [PATCH] bluez-hcidump fix SDP universal attributes
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Nick Pelly <npelly@google.com>
-Cc: Ville Tervo <ville.tervo@nokia.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <35c90d961002170849m1d13743fg725a87594d63b80c@mail.gmail.com>
-References: <1265918068-14721-1-git-send-email-npelly@google.com>
-	 <35c90d961002111159h6727bc2cw28b55ce6e919fb4f@mail.gmail.com>
-	 <35c90d961002151315i5fc0f5b9y36aaba4415987a2f@mail.gmail.com>
-	 <4B7BB746.1040806@nokia.com>
-	 <35c90d961002170849m1d13743fg725a87594d63b80c@mail.gmail.com>
+To: Iain Hibbert <plunky@rya-online.net>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1266402749.757708.1900.nullmailer@galant.ukfsn.org>
+References: <1259610176.010210.13279.nullmailer@galant.ukfsn.org>
+	 <1263901312.199442.295.nullmailer@galant.ukfsn.org>
+	 <1266312330.230253.2026.nullmailer@galant.ukfsn.org>
+	 <1266334962.8849.8.camel@localhost.localdomain>
+	 <1266360907.186765.4119.nullmailer@galant.ukfsn.org>
+	 <1266400962.8849.55.camel@localhost.localdomain>
+	 <1266402749.757708.1900.nullmailer@galant.ukfsn.org>
 Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 17 Feb 2010 09:31:34 -0800
-Message-ID: <1266427894.8849.66.camel@localhost.localdomain>
+Date: Wed, 17 Feb 2010 09:19:59 -0800
+Message-ID: <1266427199.8849.59.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nick,
+Hi Iain,
 
-> >> As a first step, can we get consensus on the userspace API:
-> >>
-> >> --- a/include/net/bluetooth/hci.h
-> >> +++ b/include/net/bluetooth/hci.h
-> >> @@ -139,8 +139,11 @@ enum {
-> >> +#define ALL_SCO_PKTS   (SCO_ESCO_MASK | EDR_ESCO_MASK)
-> >> +#define ALL_ESCO_PKTS  (SCO_ESCO_MASK | ESCO_EV3 | ESCO_EV4 | ESCO_EV5)
-> >>
-> >> --- a/include/net/bluetooth/sco.h
-> >> +++ b/include/net/bluetooth/sco.h
-> >> @@ -37,6 +37,7 @@
-> >> struct sockaddr_sco {
-> >>       sa_family_t     sco_family;
-> >>       bdaddr_t        sco_bdaddr;
-> >> +       __u16           sco_pkt_type;
-> >> };
-> >>
-> >> This will at least unblock my work.
+> > > > > > > hcidump shows SDP universal attribute 0x000d as IconURL but in fact it is
+> > > > > > > defined as "Additional Protocol Descriptor Lists". IconURL is 0x000c and I
+> > > > > > > don't know what Icon_10 was, perhaps an older name?
+> > > > > > >
+> > > > > > > Eg, from an SDP probe of a mouse:
+> > > > > > >
+> > > > > > >       aid 0x000d (IconURL)
+> > > > > > >          < < < uuid-16 0x0100 (L2CAP) uint 0x13 > < uuid-16 0x0011 (HIDP) > > >
+> > > > > >
+> > > > > > Reposting because there was no response to this, patch is attached..
+> > > > > >
+> > > > > > See "5.1.6 AdditionalProtocolDescriptorList attribute" and "5.1.14 IconURL
+> > > > > > Attribute" sections in the core specification for reference..
+> > > > > >
+> > > > > > (they sometimes call it AdditionalProtocolDescriptorLists and that is more
+> > > > > > accurate as more than one protocol descriptor list may be included)
+> > > > >
+> > > > > posting this simple (and easily verified) patch for hcidump for the third
+> > > > > time..
+> > > >
+> > > > sorry for having missed it. For some reason it got sorted away. Can you
+> > > > create a proper patch with git format-patch. That makes it way easier
+> > > > for me to apply them.
+> > >
+> > > I am not a git user but perhaps this is correct?
 > >
-> > Would it be better to add new sockopt for sco socket?
+> > almost, but you need to edit your .gitconfig to create a proper author
+> > name and more specific author email entry.
 > 
-> What advantage does that have?
-> 
-> Putting it in struct sockaddr_sco seems to make more sense since
-> packet types can only be selected during SCO connection establishment.
-> They can't be changed once the socket is connected.
+> Perhaps this is finally correct, but you discourage contributions by being
+> so restrictive in accepting submissions.  Also, you really do need a bug
+> tracker.
 
-in theory you can change the allowed packet types for ACL, SCO and eSCO
-after the connection is active. However the usefulness here is fairly
-limited. In case of ACL it is purely academical and most link manager
-will just ignore you. Mainly because the host stack can't really make a
-good decision here anyway.
+patch has been applied. Thanks.
 
-Personally I think it is a total brain dead concept to give this into
-the control of the host stack anyway. For eSCO packet types this make a
-bit more sense since you might wanna control the bandwidth. However
-changing them later is just pointless. And I don't recall of any profile
-actually mentioning about it. I think they had a great idea behind eSCO
-support, but since it is impossible to get the negotiation parts right,
-everybody sticks with simple eSCO channels and doesn't bother to change
-them.
-
-And even if we would be going for a setsockopt(), that would be blocking
-and then again pretty much pointless API. The sockaddr is most logical
-thing that fits into what we wanna achieve. Disallow/allow certain
-packet types and essentially force SCO over eSCO.
+And if I am not restrictive with the patch submission, then I am always
+going to clean up after them. Not really something I plan to do.
 
 Regards
 
