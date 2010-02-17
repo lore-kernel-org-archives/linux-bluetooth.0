@@ -1,457 +1,311 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <4B7BB746.1040806@nokia.com>
-References: <1265918068-14721-1-git-send-email-npelly@google.com>
-	<35c90d961002111159h6727bc2cw28b55ce6e919fb4f@mail.gmail.com>
-	<35c90d961002151315i5fc0f5b9y36aaba4415987a2f@mail.gmail.com>
-	<4B7BB746.1040806@nokia.com>
-From: Nick Pelly <npelly@google.com>
-Date: Wed, 17 Feb 2010 08:49:11 -0800
-Message-ID: <35c90d961002170849m1d13743fg725a87594d63b80c@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Allow SCO/eSCO packet type selection for
-	outgoing SCO connections.
-To: Ville Tervo <ville.tervo@nokia.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1266400825.8849.53.camel@localhost.localdomain>
+References: <2d5a2c101002160659j1fd3fff8hc5418ddb7481b25d@mail.gmail.com>
+	 <2d5a2c101002160715l7f9a2f07y4a40b19e31fa98b3@mail.gmail.com>
+	 <1266334628.8849.5.camel@localhost.localdomain>
+	 <2d5a2c101002160758k131bd0f1y3477958780d11a02@mail.gmail.com>
+	 <2a9506371002161634h71ef3517pdc8be4f4e400c82e@mail.gmail.com>
+	 <2d5a2c101002170106t68e7ab17nbed678c7a4f62f9e@mail.gmail.com>
+	 <1266400825.8849.53.camel@localhost.localdomain>
+Date: Wed, 17 Feb 2010 18:08:57 +0200
+Message-ID: <2d5a2c101002170808r2c583b4fuf24b38a71d4c06d3@mail.gmail.com>
+Subject: Re: [PATCH] Fix signal watch when a service name is given
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Vinicius Gomes <vinicius.gomes@openbossa.org>, linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=0016e6d6454e4e18fc047fce11f9
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Feb 17, 2010 at 1:30 AM, Ville Tervo <ville.tervo@nokia.com> wrote:
-> ext Nick Pelly wrote:
->>
->> On Thu, Feb 11, 2010 at 11:59 AM, Nick Pelly <npelly@google.com> wrote:
->>>
->>> On Thu, Feb 11, 2010 at 11:54 AM, Nick Pelly <npelly@google.com> wrote:
->>>>
->>>> __u16 sco_pkt_type is introduced to struct sockaddr_sco. It allows
->>>> bitwise
->>>> selection of SCO/eSCO packet types as per the Packet_Type parameter in
->>>> HCI Setup Synchrnous Connection Command.
->>>>
->>>> 0x0001 HV1 may be used.
->>>> 0x0002 HV2 may be used.
->>>> 0x0004 HV3 may be used.
->>>> 0x0008 EV3 may be used.
->>>> 0x0010 EV4 may be used.
->>>> 0x0020 EV5 may be used.
->>>> 0x0040 2-EV3 may not be used.
->>>> 0x0080 3-EV3 may not be used.
->>>> 0x0100 2-EV5 may not be used.
->>>> 0x0200 3-EV5 may not be used.
->>>>
->>>> We've followed the Bluetooth SIG convention of reversing the logic on
->>>> the
->>>> EDR bits.
->>>>
->>>> Packet type selection is just a request made to the Bluetooth chipset,
->>>> and
->>>> it is up to the link manager on the chipset to negiotiate and decide on
->>>> the
->>>> actual packet types used. Furthermore, when a SCO/eSCO connection is
->>>> eventually
->>>> made there is no way for the host stack to determine which packet type
->>>> was used
->>>> (however it is possible to get the link type of SCO or eSCO).
->>>>
->>>> sco_pkt_type is ignored for incoming SCO connections. It is possible
->>>> to add this in the future as a parameter to the Accept Synchronous
->>>> Connection
->>>> Command, however its a little trickier because the kernel does not
->>>> currently preserve sockaddr_sco data between userspace calls to
->>>> accept().
->>>>
->>>> Typically userspace just wants to select eSCO or SCO packet types, which
->>>> can be
->>>> done with the new constants ALL_SCO_PKTS or ALL_ESCO_PKTS. If
->>>> sco_pkt_type is
->>>> zero, or userspace uses the old sockaddr_sco structure size, then
->>>> ALL_ESCO_PKTS
->>>> will be selected as default.
->>>>
->>>> This patch is motivated by broken Bluetooth carkits such as the Motorolo
->>>> HF850 (it claims to support eSCO, but will actually reject eSCO
->>>> connections
->>>> after 5 seconds) and the 2007/2008 Infiniti G35/37 (fails to route audio
->>>> if a 2-EV5 packet type is negiotiated). With this patch userspace can
->>>> maintain
->>>> a blacklist of packet types to workaround broken remote devices such as
->>>> these.
->>>>
->>>> Signed-off-by: Nick Pelly <npelly@google.com>
->>>> ---
->>>>  include/net/bluetooth/hci.h      |    7 +++-
->>>>  include/net/bluetooth/hci_core.h |    7 +++-
->>>>  include/net/bluetooth/sco.h      |    4 ++-
->>>>  net/bluetooth/hci_conn.c         |   25 +++++++++------
->>>>  net/bluetooth/hci_event.c        |    6 ++-
->>>>  net/bluetooth/l2cap.c            |    2 +-
->>>>  net/bluetooth/sco.c              |   61
->>>> +++++++++++++++++++++++++------------
->>>>  7 files changed, 74 insertions(+), 38 deletions(-)
->>>>
->>>> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
->>>> index 4f7795f..72efc94 100644
->>>> --- a/include/net/bluetooth/hci.h
->>>> +++ b/include/net/bluetooth/hci.h
->>>> @@ -139,8 +139,11 @@ enum {
->>>>  #define ESCO_2EV5      0x0100
->>>>  #define ESCO_3EV5      0x0200
->>>>
->>>> -#define SCO_ESCO_MASK  (ESCO_HV1 | ESCO_HV2 | ESCO_HV3)
->>>> -#define EDR_ESCO_MASK  (ESCO_2EV3 | ESCO_3EV3 | ESCO_2EV5 | ESCO_3EV5)
->>>> +#define SCO_ESCO_MASK  (ESCO_HV1 | ESCO_HV2 | ESCO_HV3)
->>>> +#define EDR_ESCO_MASK  (ESCO_2EV3 | ESCO_3EV3 | ESCO_2EV5 | ESCO_3EV5)
->>>> +
->>>> +#define ALL_SCO_PKTS   (SCO_ESCO_MASK | EDR_ESCO_MASK)
->>>> +#define ALL_ESCO_PKTS  (SCO_ESCO_MASK | ESCO_EV3 | ESCO_EV4 | ESCO_EV5)
->>>>
->>>>  /* ACL flags */
->>>>  #define ACL_START              0x00
->>>> diff --git a/include/net/bluetooth/hci_core.h
->>>> b/include/net/bluetooth/hci_core.h
->>>> index b6d36cb..cbcc5b1 100644
->>>> --- a/include/net/bluetooth/hci_core.h
->>>> +++ b/include/net/bluetooth/hci_core.h
->>>> @@ -326,12 +326,15 @@ void hci_acl_disconn(struct hci_conn *conn, __u8
->>>> reason);
->>>>  void hci_add_sco(struct hci_conn *conn, __u16 handle);
->>>>  void hci_setup_sync(struct hci_conn *conn, __u16 handle);
->>>>
->>>> -struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t
->>>> *dst);
->>>> +struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type,
->>>> +                                       __u16 pkt_type, bdaddr_t *dst);
->>>>  int hci_conn_del(struct hci_conn *conn);
->>>>  void hci_conn_hash_flush(struct hci_dev *hdev);
->>>>  void hci_conn_check_pending(struct hci_dev *hdev);
->>>>
->>>> -struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t
->>>> *dst, __u8 sec_level, __u8 auth_type);
->>>> +struct hci_conn *hci_connect(struct hci_dev *hdev, int type,
->>>> +                                       __u16 pkt_type, bdaddr_t *dst,
->>>> +                                       __u8 sec_level, __u8 auth_type);
->>>>  int hci_conn_check_link_mode(struct hci_conn *conn);
->>>>  int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8
->>>> auth_type);
->>>>  int hci_conn_change_link_key(struct hci_conn *conn);
->>>> diff --git a/include/net/bluetooth/sco.h b/include/net/bluetooth/sco.h
->>>> index e28a2a7..924338a 100644
->>>> --- a/include/net/bluetooth/sco.h
->>>> +++ b/include/net/bluetooth/sco.h
->>>> @@ -37,6 +37,7 @@
->>>>  struct sockaddr_sco {
->>>>       sa_family_t     sco_family;
->>>>       bdaddr_t        sco_bdaddr;
->>>> +       __u16           sco_pkt_type;
->>>>  };
->>>>
->>>>  /* SCO socket options */
->>>> @@ -72,7 +73,8 @@ struct sco_conn {
->>>>
->>>>  struct sco_pinfo {
->>>>       struct bt_sock  bt;
->>>> -       __u32           flags;
->>>> +       __u16           pkt_type;
->>>> +
->>>>       struct sco_conn *conn;
->>>>  };
->>>>
->>>> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
->>>> index fa8b412..8ced057 100644
->>>> --- a/net/bluetooth/hci_conn.c
->>>> +++ b/net/bluetooth/hci_conn.c
->>>> @@ -196,7 +196,8 @@ static void hci_conn_idle(unsigned long arg)
->>>>       hci_conn_enter_sniff_mode(conn);
->>>>  }
->>>>
->>>> -struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t
->>>> *dst)
->>>> +struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type,
->>>> +                                       __u16 pkt_type, bdaddr_t *dst)
->>>>  {
->>>>       struct hci_conn *conn;
->>>>
->>>> @@ -221,14 +222,16 @@ struct hci_conn *hci_conn_add(struct hci_dev
->>>> *hdev, int type, bdaddr_t *dst)
->>>>               conn->pkt_type = hdev->pkt_type & ACL_PTYPE_MASK;
->>>>               break;
->>>>       case SCO_LINK:
->>>> +               if (!pkt_type)
->>>> +                       pkt_type = ALL_SCO_PKTS;
->>>> +       case ESCO_LINK:
->>>> +               if (!pkt_type)
->>>> +                       pkt_type = ALL_ESCO_PKTS;
->>>>               if (lmp_esco_capable(hdev))
->>>> -                       conn->pkt_type = (hdev->esco_type &
->>>> SCO_ESCO_MASK) |
->>>> -                                       (hdev->esco_type &
->>>> EDR_ESCO_MASK);
->>>> +                       conn->pkt_type = pkt_type & hdev->esco_type;
->>>>               else
->>>> -                       conn->pkt_type = hdev->pkt_type &
->>>> SCO_PTYPE_MASK;
->>>> -               break;
->>>> -       case ESCO_LINK:
->>>> -               conn->pkt_type = hdev->esco_type & ~EDR_ESCO_MASK;
->>>> +                       conn->pkt_type = (pkt_type << 5) &
->>>> hdev->pkt_type &
->>>> +                                       SCO_PTYPE_MASK;
->>>>               break;
->>>>       }
->>>>
->>>> @@ -340,7 +343,9 @@ EXPORT_SYMBOL(hci_get_route);
->>>>
->>>>  /* Create SCO or ACL connection.
->>>>  * Device _must_ be locked */
->>>> -struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t
->>>> *dst, __u8 sec_level, __u8 auth_type)
->>>> +struct hci_conn *hci_connect(struct hci_dev *hdev, int type,
->>>> +                                       __u16 pkt_type, bdaddr_t *dst,
->>>> +                                       __u8 sec_level, __u8 auth_type)
->>>>  {
->>>>       struct hci_conn *acl;
->>>>       struct hci_conn *sco;
->>>> @@ -348,7 +353,7 @@ struct hci_conn *hci_connect(struct hci_dev *hdev,
->>>> int type, bdaddr_t *dst, __u8
->>>>       BT_DBG("%s dst %s", hdev->name, batostr(dst));
->>>>
->>>>       if (!(acl = hci_conn_hash_lookup_ba(hdev, ACL_LINK, dst))) {
->>>> -               if (!(acl = hci_conn_add(hdev, ACL_LINK, dst)))
->>>> +               if (!(acl = hci_conn_add(hdev, ACL_LINK, 0, dst)))
->>>>                       return NULL;
->>>>       }
->>>>
->>>> @@ -364,7 +369,7 @@ struct hci_conn *hci_connect(struct hci_dev *hdev,
->>>> int type, bdaddr_t *dst, __u8
->>>>               return acl;
->>>>
->>>>       if (!(sco = hci_conn_hash_lookup_ba(hdev, type, dst))) {
->>>> -               if (!(sco = hci_conn_add(hdev, type, dst))) {
->>>> +               if (!(sco = hci_conn_add(hdev, type, pkt_type, dst))) {
->>>>                       hci_conn_put(acl);
->>>>                       return NULL;
->>>>               }
->>>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->>>> index 10edd1a..5343e0f 100644
->>>> --- a/net/bluetooth/hci_event.c
->>>> +++ b/net/bluetooth/hci_event.c
->>>> @@ -579,7 +579,7 @@ static inline void hci_cs_create_conn(struct hci_dev
->>>> *hdev, __u8 status)
->>>>               }
->>>>       } else {
->>>>               if (!conn) {
->>>> -                       conn = hci_conn_add(hdev, ACL_LINK,
->>>> &cp->bdaddr);
->>>> +                       conn = hci_conn_add(hdev, ACL_LINK, 0,
->>>> &cp->bdaddr);
->>>>                       if (conn) {
->>>>                               conn->out = 1;
->>>>                               conn->link_mode |= HCI_LM_MASTER;
->>>> @@ -964,7 +964,9 @@ static inline void hci_conn_request_evt(struct
->>>> hci_dev *hdev, struct sk_buff *sk
->>>>
->>>>               conn = hci_conn_hash_lookup_ba(hdev, ev->link_type,
->>>> &ev->bdaddr);
->>>>               if (!conn) {
->>>> -                       if (!(conn = hci_conn_add(hdev, ev->link_type,
->>>> &ev->bdaddr))) {
->>>> +                       /* pkt_type not yet used for incoming
->>>> connections */
->>>> +                       if (!(conn = hci_conn_add(hdev, ev->link_type,
->>>> 0,
->>>> +                                                       &ev->bdaddr))) {
->>>>                               BT_ERR("No memmory for new connection");
->>>>                               hci_dev_unlock(hdev);
->>>>                               return;
->>>> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
->>>> index d056886..b342f06 100644
->>>> --- a/net/bluetooth/l2cap.c
->>>> +++ b/net/bluetooth/l2cap.c
->>>> @@ -955,7 +955,7 @@ static int l2cap_do_connect(struct sock *sk)
->>>>               }
->>>>       }
->>>>
->>>> -       hcon = hci_connect(hdev, ACL_LINK, dst,
->>>> +       hcon = hci_connect(hdev, ACL_LINK, 0, dst,
->>>>                                       l2cap_pi(sk)->sec_level,
->>>> auth_type);
->>>>       if (!hcon)
->>>>               goto done;
->>>> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
->>>> index 77f4153..4976ad5 100644
->>>> --- a/net/bluetooth/sco.c
->>>> +++ b/net/bluetooth/sco.c
->>>> @@ -176,6 +176,7 @@ static int sco_connect(struct sock *sk)
->>>>  {
->>>>       bdaddr_t *src = &bt_sk(sk)->src;
->>>>       bdaddr_t *dst = &bt_sk(sk)->dst;
->>>> +       __u16 pkt_type = sco_pi(sk)->pkt_type;
->>>>       struct sco_conn *conn;
->>>>       struct hci_conn *hcon;
->>>>       struct hci_dev  *hdev;
->>>> @@ -192,10 +193,14 @@ static int sco_connect(struct sock *sk)
->>>>
->>>>       if (lmp_esco_capable(hdev) && !disable_esco)
->>>>               type = ESCO_LINK;
->>>> -       else
->>>> +       else {
->>>>               type = SCO_LINK;
->>>> +               pkt_type &= SCO_ESCO_MASK;
->>>> +               pkt_type |= EDR_ESCO_MASK;
->>>> +       }
->>>>
->>>> -       hcon = hci_connect(hdev, type, dst, BT_SECURITY_LOW,
->>>> HCI_AT_NO_BONDING);
->>>> +       hcon = hci_connect(hdev, type, pkt_type, dst,
->>>> +                                       BT_SECURITY_LOW,
->>>> HCI_AT_NO_BONDING);
->>>>       if (!hcon)
->>>>               goto done;
->>>>
->>>> @@ -451,18 +456,22 @@ static int sco_sock_create(struct net *net, struct
->>>> socket *sock, int protocol)
->>>>       return 0;
->>>>  }
->>>>
->>>> -static int sco_sock_bind(struct socket *sock, struct sockaddr *addr,
->>>> int addr_len)
->>>> +static int sco_sock_bind(struct socket *sock, struct sockaddr *addr,
->>>> int alen)
->>>>  {
->>>> -       struct sockaddr_sco *sa = (struct sockaddr_sco *) addr;
->>>> +       struct sockaddr_sco sa;
->>>>       struct sock *sk = sock->sk;
->>>> -       bdaddr_t *src = &sa->sco_bdaddr;
->>>> -       int err = 0;
->>>> +       bdaddr_t *src = &sa.sco_bdaddr;
->>>> +       int len, err = 0;
->>>>
->>>> -       BT_DBG("sk %p %s", sk, batostr(&sa->sco_bdaddr));
->>>> +       BT_DBG("sk %p %s", sk, batostr(&sa.sco_bdaddr));
->>>>
->>>>       if (!addr || addr->sa_family != AF_BLUETOOTH)
->>>>               return -EINVAL;
->>>>
->>>> +       memset(&sa, 0, sizeof(sa));
->>>> +       len = min_t(unsigned int, sizeof(sa), alen);
->>>> +       memcpy(&sa, addr, len);
->>>> +
->>>>       lock_sock(sk);
->>>>
->>>>       if (sk->sk_state != BT_OPEN) {
->>>> @@ -476,7 +485,8 @@ static int sco_sock_bind(struct socket *sock, struct
->>>> sockaddr *addr, int addr_le
->>>>               err = -EADDRINUSE;
->>>>       } else {
->>>>               /* Save source address */
->>>> -               bacpy(&bt_sk(sk)->src, &sa->sco_bdaddr);
->>>> +               bacpy(&bt_sk(sk)->src, &sa.sco_bdaddr);
->>>> +               sco_pi(sk)->pkt_type = sa.sco_pkt_type;
->>>>               sk->sk_state = BT_BOUND;
->>>>       }
->>>>
->>>> @@ -489,26 +499,34 @@ done:
->>>>
->>>>  static int sco_sock_connect(struct socket *sock, struct sockaddr *addr,
->>>> int alen, int flags)
->>>>  {
->>>> -       struct sockaddr_sco *sa = (struct sockaddr_sco *) addr;
->>>>       struct sock *sk = sock->sk;
->>>> -       int err = 0;
->>>> -
->>>> +       struct sockaddr_sco sa;
->>>> +       int len, err = 0;
->>>>
->>>>       BT_DBG("sk %p", sk);
->>>>
->>>> -       if (addr->sa_family != AF_BLUETOOTH || alen < sizeof(struct
->>>> sockaddr_sco))
->>>> +       if (!addr || addr->sa_family != AF_BLUETOOTH)
->>>>               return -EINVAL;
->>>>
->>>> -       if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND)
->>>> -               return -EBADFD;
->>>> -
->>>> -       if (sk->sk_type != SOCK_SEQPACKET)
->>>> -               return -EINVAL;
->>>> +       memset(&sa, 0, sizeof(sa));
->>>> +       len = min_t(unsigned int, sizeof(sa), alen);
->>>> +       memcpy(&sa, addr, len);
->>>>
->>>>       lock_sock(sk);
->>>>
->>>> +       if (sk->sk_type != SOCK_SEQPACKET) {
->>>> +               err = -EINVAL;
->>>> +               goto done;
->>>> +       }
->>>> +
->>>> +       if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND) {
->>>> +               err = -EBADFD;
->>>> +               goto done;
->>>> +       }
->>>> +
->>>>       /* Set destination address and psm */
->>>> -       bacpy(&bt_sk(sk)->dst, &sa->sco_bdaddr);
->>>> +       bacpy(&bt_sk(sk)->dst, &sa.sco_bdaddr);
->>>> +       sco_pi(sk)->pkt_type = sa.sco_pkt_type;
->>>>
->>>>       if ((err = sco_connect(sk)))
->>>>               goto done;
->>>> @@ -610,10 +628,13 @@ static int sco_sock_getname(struct socket *sock,
->>>> struct sockaddr *addr, int *len
->>>>       addr->sa_family = AF_BLUETOOTH;
->>>>       *len = sizeof(struct sockaddr_sco);
->>>>
->>>> -       if (peer)
->>>> +       if (peer) {
->>>>               bacpy(&sa->sco_bdaddr, &bt_sk(sk)->dst);
->>>> -       else
->>>> +               sa->sco_pkt_type = sco_pi(sk)->pkt_type;
->>>> +       } else {
->>>>               bacpy(&sa->sco_bdaddr, &bt_sk(sk)->src);
->>>> +               sa->sco_pkt_type = sco_pi(sk)->pkt_type;
->>>> +       }
->>>>
->>>>       return 0;
->>>>  }
->>>> --
->>>> 1.6.5.3
->>>>
->>>>
->>> BTW i'm happy to switch the logic on the EDR bits, such that 1 is
->>> always 'allow this packet type'. I stuck with the Bluetooth SIG
->>> convention in this patch because the logic actually came out cleanly.
->>>
->>> Either way, its confusing for userspace, and we should document it
->>> carefully in the patch to userspace headers.
->>
->> Ping.
->>
->> As a first step, can we get consensus on the userspace API:
->>
->> --- a/include/net/bluetooth/hci.h
->> +++ b/include/net/bluetooth/hci.h
->> @@ -139,8 +139,11 @@ enum {
->> +#define ALL_SCO_PKTS   (SCO_ESCO_MASK | EDR_ESCO_MASK)
->> +#define ALL_ESCO_PKTS  (SCO_ESCO_MASK | ESCO_EV3 | ESCO_EV4 | ESCO_EV5)
->>
->> --- a/include/net/bluetooth/sco.h
->> +++ b/include/net/bluetooth/sco.h
->> @@ -37,6 +37,7 @@
->> struct sockaddr_sco {
->>       sa_family_t     sco_family;
->>       bdaddr_t        sco_bdaddr;
->> +       __u16           sco_pkt_type;
->> };
->>
->> This will at least unblock my work.
+--0016e6d6454e4e18fc047fce11f9
+Content-Type: text/plain; charset=ISO-8859-1
+
+Hi Marcel,
+
+On Wed, Feb 17, 2010 at 12:00 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Luiz,
 >
-> Would it be better to add new sockopt for sco socket?
+>> @Marcel: So before you apply this you should really apply Vinicius
+>> patch to the rest of projects: bluez, ofono, connman...
+>
+> has been applied to all projects now. Please resend your other patch
+> based on the latest tree.
 
-What advantage does that have?
+Resending the patch and also add another one to make sure we cancel
+any pending operation during watch removal.
 
-Putting it in struct sockaddr_sco seems to make more sense since
-packet types can only be selected during SCO connection establishment.
-They can't be changed once the socket is connected.
+-- 
+Luiz Augusto von Dentz
+Computer Engineer
 
-Nick
+--0016e6d6454e4e18fc047fce11f9
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-Fix-signal-watch-when-a-service-name-is-given.patch"
+Content-Disposition: attachment;
+	filename="0001-Fix-signal-watch-when-a-service-name-is-given.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_g5sbh6yk0
+
+RnJvbSBiNDk2ZjQ3ZGQ3Y2RkM2UzOTMwZDEzNTc5MDIxOTA4YThiM2Y4NTdiIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBMdWl6IEF1Z3VzdG8gVm9uIERlbnR6IDxsdWl6LmRlbnR6LXZv
+bkBub2tpYS5jb20+CkRhdGU6IFdlZCwgMTcgRmViIDIwMTAgMTc6MTE6MDIgKzAyMDAKU3ViamVj
+dDogW1BBVENIIDEvMl0gRml4IHNpZ25hbCB3YXRjaCB3aGVuIGEgc2VydmljZSBuYW1lIGlzIGdp
+dmVuCgpUaGUgYnVzIG5hbWUgc2hvdWxkIGJlIHJlc29sdmVkIHdoZW4gYWRkaW5nIGEgd2F0Y2gg
+Ynkgc2VydmljZSBuYW1lIHNpbmNlCm1lc3NhZ2VzIGRvIGFsd2F5cyBjb21lIHdpdGggc2VuZGVy
+IHNldCB0byBvd25lcidzIGJ1cyBuYW1lLCBhbHNvIGl0CnNob3VsZCBsaXN0ZW4gdG8gb3duZXIg
+dXBkYXRlcyBzaW5jZSBpdCBjYW4gY2hhbmdlIHdpdGhvdXQgaW52YWxpZGF0aW5nCnRoZSB3YXRj
+aC4KLS0tCiBnZGJ1cy93YXRjaC5jIHwgIDE2MSArKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0KIDEgZmlsZXMgY2hhbmdlZCwgMTI4IGluc2Vy
+dGlvbnMoKyksIDMzIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2dkYnVzL3dhdGNoLmMgYi9n
+ZGJ1cy93YXRjaC5jCmluZGV4IDFkNDc5ZmEuLmVmMDIyMDEgMTAwNjQ0Ci0tLSBhL2dkYnVzL3dh
+dGNoLmMKKysrIGIvZ2RidXMvd2F0Y2guYwpAQCAtNTUsMTkgKzU1LDIyIEBAIHN0cnVjdCBmaWx0
+ZXJfY2FsbGJhY2sgewogc3RydWN0IGZpbHRlcl9kYXRhIHsKIAlEQnVzQ29ubmVjdGlvbiAqY29u
+bmVjdGlvbjsKIAlEQnVzSGFuZGxlTWVzc2FnZUZ1bmN0aW9uIGhhbmRsZV9mdW5jOwotCWNoYXIg
+KnNlbmRlcjsKKwljaGFyICpuYW1lOworCWNoYXIgKm93bmVyOwogCWNoYXIgKnBhdGg7CiAJY2hh
+ciAqaW50ZXJmYWNlOwogCWNoYXIgKm1lbWJlcjsKIAljaGFyICphcmd1bWVudDsKIAlHU0xpc3Qg
+KmNhbGxiYWNrczsKIAlHU0xpc3QgKnByb2Nlc3NlZDsKKwlndWludCBuYW1lX3dhdGNoOwogCWdi
+b29sZWFuIGxvY2s7CiAJZ2Jvb2xlYW4gcmVnaXN0ZXJlZDsKIH07CiAKIHN0YXRpYyBzdHJ1Y3Qg
+ZmlsdGVyX2RhdGEgKmZpbHRlcl9kYXRhX2ZpbmQoREJ1c0Nvbm5lY3Rpb24gKmNvbm5lY3Rpb24s
+Ci0JCQkJCQkJY29uc3QgY2hhciAqc2VuZGVyLAorCQkJCQkJCWNvbnN0IGNoYXIgKm5hbWUsCisJ
+CQkJCQkJY29uc3QgY2hhciAqb3duZXIsCiAJCQkJCQkJY29uc3QgY2hhciAqcGF0aCwKIAkJCQkJ
+CQljb25zdCBjaGFyICppbnRlcmZhY2UsCiAJCQkJCQkJY29uc3QgY2hhciAqbWVtYmVyLApAQCAt
+ODIsOCArODUsMTIgQEAgc3RhdGljIHN0cnVjdCBmaWx0ZXJfZGF0YSAqZmlsdGVyX2RhdGFfZmlu
+ZChEQnVzQ29ubmVjdGlvbiAqY29ubmVjdGlvbiwKIAkJaWYgKGNvbm5lY3Rpb24gIT0gZGF0YS0+
+Y29ubmVjdGlvbikKIAkJCWNvbnRpbnVlOwogCi0JCWlmIChzZW5kZXIgJiYgZGF0YS0+c2VuZGVy
+ICYmCi0JCQkJZ19zdHJfZXF1YWwoc2VuZGVyLCBkYXRhLT5zZW5kZXIpID09IEZBTFNFKQorCQlp
+ZiAobmFtZSAmJiBkYXRhLT5uYW1lICYmCisJCQkJZ19zdHJfZXF1YWwobmFtZSwgZGF0YS0+bmFt
+ZSkgPT0gRkFMU0UpCisJCQljb250aW51ZTsKKworCQlpZiAob3duZXIgJiYgZGF0YS0+b3duZXIg
+JiYKKwkJCQlnX3N0cl9lcXVhbChvd25lciwgZGF0YS0+b3duZXIpID09IEZBTFNFKQogCQkJY29u
+dGludWU7CiAKIAkJaWYgKHBhdGggJiYgZGF0YS0+cGF0aCAmJgpAQCAtMTEwLDEzICsxMTcsMTUg
+QEAgc3RhdGljIHN0cnVjdCBmaWx0ZXJfZGF0YSAqZmlsdGVyX2RhdGFfZmluZChEQnVzQ29ubmVj
+dGlvbiAqY29ubmVjdGlvbiwKIAogc3RhdGljIHZvaWQgZm9ybWF0X3J1bGUoc3RydWN0IGZpbHRl
+cl9kYXRhICpkYXRhLCBjaGFyICpydWxlLCBzaXplX3Qgc2l6ZSkKIHsKKwljb25zdCBjaGFyICpz
+ZW5kZXI7CiAJaW50IG9mZnNldDsKIAogCW9mZnNldCA9IHNucHJpbnRmKHJ1bGUsIHNpemUsICJ0
+eXBlPSdzaWduYWwnIik7CisJc2VuZGVyID0gZGF0YS0+bmFtZSA/IDogZGF0YS0+b3duZXI7CiAK
+LQlpZiAoZGF0YS0+c2VuZGVyKQorCWlmIChzZW5kZXIpCiAJCW9mZnNldCArPSBzbnByaW50Zihy
+dWxlICsgb2Zmc2V0LCBzaXplIC0gb2Zmc2V0LAotCQkJCSIsc2VuZGVyPSclcyciLCBkYXRhLT5z
+ZW5kZXIpOworCQkJCSIsc2VuZGVyPSclcyciLCBzZW5kZXIpOwogCWlmIChkYXRhLT5wYXRoKQog
+CQlvZmZzZXQgKz0gc25wcmludGYocnVsZSArIG9mZnNldCwgc2l6ZSAtIG9mZnNldCwKIAkJCQki
+LHBhdGg9JyVzJyIsIGRhdGEtPnBhdGgpOwpAQCAtMTgzLDggKzE5MiwxMCBAQCBzdGF0aWMgc3Ry
+dWN0IGZpbHRlcl9kYXRhICpmaWx0ZXJfZGF0YV9nZXQoREJ1c0Nvbm5lY3Rpb24gKmNvbm5lY3Rp
+b24sCiAJCQkJCWNvbnN0IGNoYXIgKmFyZ3VtZW50KQogewogCXN0cnVjdCBmaWx0ZXJfZGF0YSAq
+ZGF0YTsKKwljb25zdCBjaGFyICpuYW1lID0gTlVMTCwgKm93bmVyID0gTlVMTDsKIAotCWlmICgh
+ZmlsdGVyX2RhdGFfZmluZChjb25uZWN0aW9uLCBOVUxMLCBOVUxMLCBOVUxMLCBOVUxMLCBOVUxM
+KSkgeworCWlmICghZmlsdGVyX2RhdGFfZmluZChjb25uZWN0aW9uLCBOVUxMLCBOVUxMLCBOVUxM
+LCBOVUxMLCBOVUxMLAorCQkJCU5VTEwpKSB7CiAJCWlmICghZGJ1c19jb25uZWN0aW9uX2FkZF9m
+aWx0ZXIoY29ubmVjdGlvbiwKIAkJCQkJbWVzc2FnZV9maWx0ZXIsIE5VTEwsIE5VTEwpKSB7CiAJ
+CQllcnJvcigiZGJ1c19jb25uZWN0aW9uX2FkZF9maWx0ZXIoKSBmYWlsZWQiKTsKQEAgLTE5Miwx
+NSArMjAzLDI1IEBAIHN0YXRpYyBzdHJ1Y3QgZmlsdGVyX2RhdGEgKmZpbHRlcl9kYXRhX2dldChE
+QnVzQ29ubmVjdGlvbiAqY29ubmVjdGlvbiwKIAkJfQogCX0KIAotCWRhdGEgPSBmaWx0ZXJfZGF0
+YV9maW5kKGNvbm5lY3Rpb24sIHNlbmRlciwgcGF0aCwgaW50ZXJmYWNlLCBtZW1iZXIsCi0JCQkJ
+CWFyZ3VtZW50KTsKKwlpZiAoc2VuZGVyID09IE5VTEwpCisJCWdvdG8gcHJvY2VlZDsKKworCWlm
+IChzZW5kZXJbMF0gPT0gJzonKQorCQlvd25lciA9IHNlbmRlcjsKKwllbHNlCisJCW5hbWUgPSBz
+ZW5kZXI7CisKK3Byb2NlZWQ6CisJZGF0YSA9IGZpbHRlcl9kYXRhX2ZpbmQoY29ubmVjdGlvbiwg
+bmFtZSwgb3duZXIsIHBhdGgsIGludGVyZmFjZSwKKwkJCQkJbWVtYmVyLCBhcmd1bWVudCk7CiAJ
+aWYgKGRhdGEpCiAJCXJldHVybiBkYXRhOwogCiAJZGF0YSA9IGdfbmV3MChzdHJ1Y3QgZmlsdGVy
+X2RhdGEsIDEpOwogCiAJZGF0YS0+Y29ubmVjdGlvbiA9IGRidXNfY29ubmVjdGlvbl9yZWYoY29u
+bmVjdGlvbik7Ci0JZGF0YS0+c2VuZGVyID0gZ19zdHJkdXAoc2VuZGVyKTsKKwlkYXRhLT5uYW1l
+ID0gbmFtZSA/IGdfc3RyZHVwKG5hbWUpIDogTlVMTDsKKwlkYXRhLT5vd25lciA9IG93bmVyID8g
+Z19zdHJkdXAob3duZXIpIDogTlVMTDsKIAlkYXRhLT5wYXRoID0gZ19zdHJkdXAocGF0aCk7CiAJ
+ZGF0YS0+aW50ZXJmYWNlID0gZ19zdHJkdXAoaW50ZXJmYWNlKTsKIAlkYXRhLT5tZW1iZXIgPSBn
+X3N0cmR1cChtZW1iZXIpOwpAQCAtMjQ0LDcgKzI2NSw5IEBAIHN0YXRpYyB2b2lkIGZpbHRlcl9k
+YXRhX2ZyZWUoc3RydWN0IGZpbHRlcl9kYXRhICpkYXRhKQogCQlnX2ZyZWUobC0+ZGF0YSk7CiAK
+IAlnX3NsaXN0X2ZyZWUoZGF0YS0+Y2FsbGJhY2tzKTsKLQlnX2ZyZWUoZGF0YS0+c2VuZGVyKTsK
+KwlnX2RidXNfcmVtb3ZlX3dhdGNoKGRhdGEtPmNvbm5lY3Rpb24sIGRhdGEtPm5hbWVfd2F0Y2gp
+OworCWdfZnJlZShkYXRhLT5uYW1lKTsKKwlnX2ZyZWUoZGF0YS0+b3duZXIpOwogCWdfZnJlZShk
+YXRhLT5wYXRoKTsKIAlnX2ZyZWUoZGF0YS0+aW50ZXJmYWNlKTsKIAlnX2ZyZWUoZGF0YS0+bWVt
+YmVyKTsKQEAgLTMyMiw3ICszNDUsOCBAQCBzdGF0aWMgZ2Jvb2xlYW4gZmlsdGVyX2RhdGFfcmVt
+b3ZlX2NhbGxiYWNrKHN0cnVjdCBmaWx0ZXJfZGF0YSAqZGF0YSwKIAlmaWx0ZXJfZGF0YV9mcmVl
+KGRhdGEpOwogCiAJLyogUmVtb3ZlIGZpbHRlciBpZiB0aGVyZSBhcmUgbm8gbGlzdGVuZXJzIGxl
+ZnQgZm9yIHRoZSBjb25uZWN0aW9uICovCi0JZGF0YSA9IGZpbHRlcl9kYXRhX2ZpbmQoY29ubmVj
+dGlvbiwgTlVMTCwgTlVMTCwgTlVMTCwgTlVMTCwgTlVMTCk7CisJZGF0YSA9IGZpbHRlcl9kYXRh
+X2ZpbmQoY29ubmVjdGlvbiwgTlVMTCwgTlVMTCwgTlVMTCwgTlVMTCwgTlVMTCwKKwkJCQkJTlVM
+TCk7CiAJaWYgKCFkYXRhKQogCQlkYnVzX2Nvbm5lY3Rpb25fcmVtb3ZlX2ZpbHRlcihjb25uZWN0
+aW9uLCBtZXNzYWdlX2ZpbHRlciwKIAkJCQkJCU5VTEwpOwpAQCAtMzU5LDYgKzM4MywzNyBAQCBz
+dGF0aWMgREJ1c0hhbmRsZXJSZXN1bHQgc2lnbmFsX2ZpbHRlcihEQnVzQ29ubmVjdGlvbiAqY29u
+bmVjdGlvbiwKIAlyZXR1cm4gREJVU19IQU5ETEVSX1JFU1VMVF9OT1RfWUVUX0hBTkRMRUQ7CiB9
+CiAKK3N0YXRpYyB2b2lkIHVwZGF0ZV9uYW1lX2NhY2hlKGNvbnN0IGNoYXIgKm5hbWUsIGNvbnN0
+IGNoYXIgKm93bmVyKQoreworCUdTTGlzdCAqbDsKKworCWZvciAobCA9IGxpc3RlbmVyczsgbCAh
+PSBOVUxMOyBsID0gbC0+bmV4dCkgeworCQlzdHJ1Y3QgZmlsdGVyX2RhdGEgKmRhdGEgPSBsLT5k
+YXRhOworCisJCWlmIChnX3N0cmNtcDAoZGF0YS0+bmFtZSwgbmFtZSkgIT0gMCkKKwkJCWNvbnRp
+bnVlOworCisJCWdfZnJlZShkYXRhLT5vd25lcik7CisJCWRhdGEtPm93bmVyID0gZ19zdHJkdXAo
+b3duZXIpOworCX0KK30KKworc3RhdGljIGNvbnN0IGNoYXIgKmNoZWNrX25hbWVfY2FjaGUoY29u
+c3QgY2hhciAqbmFtZSkKK3sKKwlHU0xpc3QgKmw7CisKKwlmb3IgKGwgPSBsaXN0ZW5lcnM7IGwg
+IT0gTlVMTDsgbCA9IGwtPm5leHQpIHsKKwkJc3RydWN0IGZpbHRlcl9kYXRhICpkYXRhID0gbC0+
+ZGF0YTsKKworCQlpZiAoZ19zdHJjbXAwKGRhdGEtPm5hbWUsIG5hbWUpICE9IDApCisJCQljb250
+aW51ZTsKKworCQlyZXR1cm4gZGF0YS0+b3duZXI7CisJfQorCisJcmV0dXJuIE5VTEw7Cit9CisK
+IHN0YXRpYyBEQnVzSGFuZGxlclJlc3VsdCBzZXJ2aWNlX2ZpbHRlcihEQnVzQ29ubmVjdGlvbiAq
+Y29ubmVjdGlvbiwKIAkJCQkJREJ1c01lc3NhZ2UgKm1lc3NhZ2UsIHZvaWQgKnVzZXJfZGF0YSkK
+IHsKQEAgLTM3NSw2ICs0MzAsOCBAQCBzdGF0aWMgREJ1c0hhbmRsZXJSZXN1bHQgc2VydmljZV9m
+aWx0ZXIoREJ1c0Nvbm5lY3Rpb24gKmNvbm5lY3Rpb24sCiAJCXJldHVybiBEQlVTX0hBTkRMRVJf
+UkVTVUxUX05PVF9ZRVRfSEFORExFRDsKIAl9CiAKKwl1cGRhdGVfbmFtZV9jYWNoZShuYW1lLCBu
+ZXcpOworCiAJd2hpbGUgKGRhdGEtPmNhbGxiYWNrcykgewogCQljYiA9IGRhdGEtPmNhbGxiYWNr
+cy0+ZGF0YTsKIApAQCAtNDIxLDcgKzQ3OCw5IEBAIHN0YXRpYyBEQnVzSGFuZGxlclJlc3VsdCBt
+ZXNzYWdlX2ZpbHRlcihEQnVzQ29ubmVjdGlvbiAqY29ubmVjdGlvbiwKIAltZW1iZXIgPSBkYnVz
+X21lc3NhZ2VfZ2V0X21lbWJlcihtZXNzYWdlKTsKIAlkYnVzX21lc3NhZ2VfZ2V0X2FyZ3MobWVz
+c2FnZSwgTlVMTCwgREJVU19UWVBFX1NUUklORywgJmFyZywgREJVU19UWVBFX0lOVkFMSUQpOwog
+Ci0JZGF0YSA9IGZpbHRlcl9kYXRhX2ZpbmQoY29ubmVjdGlvbiwgc2VuZGVyLCBwYXRoLCBpZmFj
+ZSwgbWVtYmVyLCBhcmcpOworCS8qIFNlbmRlciBpcyBhbHdheXMgYnVzIG5hbWUgKi8KKwlkYXRh
+ID0gZmlsdGVyX2RhdGFfZmluZChjb25uZWN0aW9uLCBOVUxMLCBzZW5kZXIsIHBhdGgsIGlmYWNl
+LCBtZW1iZXIsCisJCQkJCWFyZyk7CiAJaWYgKCFkYXRhKSB7CiAJCWVycm9yKCJHb3QgJXMuJXMg
+c2lnbmFsIHdoaWNoIGhhcyBubyBsaXN0ZW5lcnMiLCBpZmFjZSwgbWVtYmVyKTsKIAkJcmV0dXJu
+IERCVVNfSEFORExFUl9SRVNVTFRfTk9UX1lFVF9IQU5ETEVEOwpAQCAtNDQ2LDcgKzUwNSw4IEBA
+IHN0YXRpYyBEQnVzSGFuZGxlclJlc3VsdCBtZXNzYWdlX2ZpbHRlcihEQnVzQ29ubmVjdGlvbiAq
+Y29ubmVjdGlvbiwKIAlmaWx0ZXJfZGF0YV9mcmVlKGRhdGEpOwogCiAJLyogUmVtb3ZlIGZpbHRl
+ciBpZiB0aGVyZSBubyBsaXN0ZW5lciBsZWZ0IGZvciB0aGUgY29ubmVjdGlvbiAqLwotCWRhdGEg
+PSBmaWx0ZXJfZGF0YV9maW5kKGNvbm5lY3Rpb24sIE5VTEwsIE5VTEwsIE5VTEwsIE5VTEwsIE5V
+TEwpOworCWRhdGEgPSBmaWx0ZXJfZGF0YV9maW5kKGNvbm5lY3Rpb24sIE5VTEwsIE5VTEwsIE5V
+TEwsIE5VTEwsIE5VTEwsCisJCQkJCU5VTEwpOwogCWlmICghZGF0YSkKIAkJZGJ1c19jb25uZWN0
+aW9uX3JlbW92ZV9maWx0ZXIoY29ubmVjdGlvbiwgbWVzc2FnZV9maWx0ZXIsCiAJCQkJCQlOVUxM
+KTsKQEAgLTQ1NiwzOCArNTE2LDYwIEBAIHN0YXRpYyBEQnVzSGFuZGxlclJlc3VsdCBtZXNzYWdl
+X2ZpbHRlcihEQnVzQ29ubmVjdGlvbiAqY29ubmVjdGlvbiwKIAogc3RydWN0IHNlcnZpY2VfZGF0
+YSB7CiAJREJ1c0Nvbm5lY3Rpb24gKmNvbm47CisJY2hhciAqbmFtZTsKKwljb25zdCBjaGFyICpv
+d25lcjsKIAlHREJ1c1dhdGNoRnVuY3Rpb24gY29ubl9mdW5jOwogCXZvaWQgKnVzZXJfZGF0YTsK
+IH07CiAKK3N0YXRpYyB2b2lkIHNlcnZpY2VfZGF0YV9mcmVlKHN0cnVjdCBzZXJ2aWNlX2RhdGEg
+KmRhdGEpCit7CisJZGJ1c19jb25uZWN0aW9uX3VucmVmKGRhdGEtPmNvbm4pOworCWdfZnJlZShk
+YXRhLT5uYW1lKTsKKwlnX2ZyZWUoZGF0YSk7Cit9CisKK3N0YXRpYyBnYm9vbGVhbiB1cGRhdGVf
+c2VydmljZSh2b2lkICp1c2VyX2RhdGEpCit7CisJc3RydWN0IHNlcnZpY2VfZGF0YSAqZGF0YSA9
+IHVzZXJfZGF0YTsKKworCXVwZGF0ZV9uYW1lX2NhY2hlKGRhdGEtPm5hbWUsIGRhdGEtPm93bmVy
+KTsKKwlpZiAoZGF0YS0+Y29ubl9mdW5jKQorCQlkYXRhLT5jb25uX2Z1bmMoZGF0YS0+Y29ubiwg
+ZGF0YS0+dXNlcl9kYXRhKTsKKworCXNlcnZpY2VfZGF0YV9mcmVlKGRhdGEpOworCisJcmV0dXJu
+IEZBTFNFOworfQorCiBzdGF0aWMgdm9pZCBzZXJ2aWNlX3JlcGx5KERCdXNQZW5kaW5nQ2FsbCAq
+Y2FsbCwgdm9pZCAqdXNlcl9kYXRhKQogewogCXN0cnVjdCBzZXJ2aWNlX2RhdGEgKmRhdGEgPSB1
+c2VyX2RhdGE7CiAJREJ1c01lc3NhZ2UgKnJlcGx5OwotCURCdXNFcnJvciBlcnJvcjsKLQlkYnVz
+X2Jvb2xfdCBoYXNfb3duZXI7CisJREJ1c0Vycm9yIGVycjsKIAogCXJlcGx5ID0gZGJ1c19wZW5k
+aW5nX2NhbGxfc3RlYWxfcmVwbHkoY2FsbCk7CiAJaWYgKHJlcGx5ID09IE5VTEwpCiAJCXJldHVy
+bjsKIAotCWRidXNfZXJyb3JfaW5pdCgmZXJyb3IpOworCWRidXNfZXJyb3JfaW5pdCgmZXJyKTsK
+IAotCWlmIChkYnVzX21lc3NhZ2VfZ2V0X2FyZ3MocmVwbHksICZlcnJvciwKLQkJCQkJREJVU19U
+WVBFX0JPT0xFQU4sICZoYXNfb3duZXIsCi0JCQkJCQlEQlVTX1RZUEVfSU5WQUxJRCkgPT0gRkFM
+U0UpIHsKLQkJaWYgKGRidXNfZXJyb3JfaXNfc2V0KCZlcnJvcikgPT0gVFJVRSkgewotCQkJZXJy
+b3IoIiVzIiwgZXJyb3IubWVzc2FnZSk7Ci0JCQlkYnVzX2Vycm9yX2ZyZWUoJmVycm9yKTsKLQkJ
+fSBlbHNlIHsKLQkJCWVycm9yKCJXcm9uZyBhcmd1bWVudHMgZm9yIE5hbWVIYXNPd25lciByZXBs
+eSIpOwotCQl9Ci0JCWdvdG8gZG9uZTsKLQl9CisJaWYgKGRidXNfc2V0X2Vycm9yX2Zyb21fbWVz
+c2FnZSgmZXJyLCByZXBseSkpCisJCWdvdG8gZmFpbDsKIAotCWlmIChoYXNfb3duZXIgJiYgZGF0
+YS0+Y29ubl9mdW5jKQotCQlkYXRhLT5jb25uX2Z1bmMoZGF0YS0+Y29ubiwgZGF0YS0+dXNlcl9k
+YXRhKTsKKwlpZiAoZGJ1c19tZXNzYWdlX2dldF9hcmdzKHJlcGx5LCAmZXJyLAorCQkJCQlEQlVT
+X1RZUEVfU1RSSU5HLCAmZGF0YS0+b3duZXIsCisJCQkJCQlEQlVTX1RZUEVfSU5WQUxJRCkgPT0g
+RkFMU0UpCisJCWdvdG8gZmFpbDsKIAorCXVwZGF0ZV9zZXJ2aWNlKGRhdGEpOworCisJZ290byBk
+b25lOworCitmYWlsOgorCWVycm9yKCIlcyIsIGVyci5tZXNzYWdlKTsKKwlkYnVzX2Vycm9yX2Zy
+ZWUoJmVycik7CisJc2VydmljZV9kYXRhX2ZyZWUoZGF0YSk7CiBkb25lOgogCWRidXNfbWVzc2Fn
+ZV91bnJlZihyZXBseSk7CiB9CkBAIC01MDUsMTIgKzU4NywxOSBAQCBzdGF0aWMgdm9pZCBjaGVj
+a19zZXJ2aWNlKERCdXNDb25uZWN0aW9uICpjb25uZWN0aW9uLCBjb25zdCBjaGFyICpuYW1lLAog
+CQlyZXR1cm47CiAJfQogCi0JZGF0YS0+Y29ubiA9IGNvbm5lY3Rpb247CisJZGF0YS0+Y29ubiA9
+IGRidXNfY29ubmVjdGlvbl9yZWYoY29ubmVjdGlvbik7CisJZGF0YS0+bmFtZSA9IGdfc3RyZHVw
+KG5hbWUpOwogCWRhdGEtPmNvbm5fZnVuYyA9IGNvbm5lY3Q7CiAJZGF0YS0+dXNlcl9kYXRhID0g
+dXNlcl9kYXRhOwogCisJZGF0YS0+b3duZXIgPSBjaGVja19uYW1lX2NhY2hlKG5hbWUpOworCWlm
+IChkYXRhLT5vd25lciAhPSBOVUxMKSB7CisJCWdfaWRsZV9hZGQodXBkYXRlX3NlcnZpY2UsIGRh
+dGEpOworCQlyZXR1cm47CisJfQorCiAJbWVzc2FnZSA9IGRidXNfbWVzc2FnZV9uZXdfbWV0aG9k
+X2NhbGwoREJVU19TRVJWSUNFX0RCVVMsCi0JCQlEQlVTX1BBVEhfREJVUywgREJVU19JTlRFUkZB
+Q0VfREJVUywgIk5hbWVIYXNPd25lciIpOworCQkJREJVU19QQVRIX0RCVVMsIERCVVNfSU5URVJG
+QUNFX0RCVVMsICJHZXROYW1lT3duZXIiKTsKIAlpZiAobWVzc2FnZSA9PSBOVUxMKSB7CiAJCWVy
+cm9yKCJDYW4ndCBhbGxvY2F0ZSBuZXcgbWVzc2FnZSIpOwogCQlnX2ZyZWUoZGF0YSk7CkBAIC01
+OTYsNiArNjg1LDExIEBAIGd1aW50IGdfZGJ1c19hZGRfc2lnbmFsX3dhdGNoKERCdXNDb25uZWN0
+aW9uICpjb25uZWN0aW9uLAogCWlmICghY2IpCiAJCXJldHVybiAwOwogCisJaWYgKGRhdGEtPm5h
+bWUgIT0gTlVMTCAmJiBkYXRhLT5uYW1lX3dhdGNoID09IDApCisJCWRhdGEtPm5hbWVfd2F0Y2gg
+PSBnX2RidXNfYWRkX3NlcnZpY2Vfd2F0Y2goY29ubmVjdGlvbiwKKwkJCQkJCQlkYXRhLT5uYW1l
+LCBOVUxMLAorCQkJCQkJCU5VTEwsIE5VTEwsIE5VTEwpOworCiAJcmV0dXJuIGNiLT5pZDsKIH0K
+IApAQCAtNjI1LDcgKzcxOSw4IEBAIHZvaWQgZ19kYnVzX3JlbW92ZV9hbGxfd2F0Y2hlcyhEQnVz
+Q29ubmVjdGlvbiAqY29ubmVjdGlvbikKIHsKIAlzdHJ1Y3QgZmlsdGVyX2RhdGEgKmRhdGE7CiAK
+LQl3aGlsZSAoKGRhdGEgPSBmaWx0ZXJfZGF0YV9maW5kKGNvbm5lY3Rpb24sIE5VTEwsIE5VTEws
+IE5VTEwsIE5VTEwsIE5VTEwpKSkgeworCXdoaWxlICgoZGF0YSA9IGZpbHRlcl9kYXRhX2ZpbmQo
+Y29ubmVjdGlvbiwgTlVMTCwgTlVMTCwgTlVMTCwgTlVMTCwKKwkJCQkJTlVMTCwgTlVMTCkpKSB7
+CiAJCWxpc3RlbmVycyA9IGdfc2xpc3RfcmVtb3ZlKGxpc3RlbmVycywgZGF0YSk7CiAJCWZpbHRl
+cl9kYXRhX2NhbGxfYW5kX2ZyZWUoZGF0YSk7CiAJfQotLSAKMS42LjMuMwoK
+--0016e6d6454e4e18fc047fce11f9
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0002-Fix-calling-watch-callbacks-after-it-has-been-remove.patch"
+Content-Disposition: attachment;
+	filename="0002-Fix-calling-watch-callbacks-after-it-has-been-remove.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_g5sbiase1
+
+RnJvbSBjMjgyODQwZGRiYTdmYjlhY2U1MDUwYmI5M2FlOWNhNDRiNTdkYjlmIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBMdWl6IEF1Z3VzdG8gVm9uIERlbnR6IDxsdWl6LmRlbnR6LXZv
+bkBub2tpYS5jb20+CkRhdGU6IFdlZCwgMTcgRmViIDIwMTAgMTc6MTI6MTkgKzAyMDAKU3ViamVj
+dDogW1BBVENIIDIvMl0gRml4IGNhbGxpbmcgd2F0Y2ggY2FsbGJhY2tzIGFmdGVyIGl0IGhhcyBi
+ZWVuIHJlbW92ZWQKClBlbmRpbmcgY2FsbCBzaG91bGQgYmUgcmVtb3ZlZCBpZiB0aGUgd2F0Y2gg
+aXMgcmVtb3ZlZCBzaW5jZSB0aGUKYXBwbGljYXRpb24gbm8gbG9uZ2VyIGV4cGVjdCB0aGF0IHRv
+IGJlIHJlYWNoZWQgYW5kIG1heSBhbHJlYWR5IGZyZWVkIHRoZQpkYXRhIGFzc29jaWF0ZWQgd2l0
+aCBpdC4KLS0tCiBnZGJ1cy93YXRjaC5jIHwgICA3OSArKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tLQogMSBmaWxlcyBjaGFuZ2VkLCA0OSBpbnNl
+cnRpb25zKCspLCAzMCBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9nZGJ1cy93YXRjaC5jIGIv
+Z2RidXMvd2F0Y2guYwppbmRleCBlZjAyMjAxLi4yYmVjMjFhIDEwMDY0NAotLS0gYS9nZGJ1cy93
+YXRjaC5jCisrKyBiL2dkYnVzL3dhdGNoLmMKQEAgLTQzLDExICs0MywyMSBAQCBzdGF0aWMgREJ1
+c0hhbmRsZXJSZXN1bHQgbWVzc2FnZV9maWx0ZXIoREJ1c0Nvbm5lY3Rpb24gKmNvbm5lY3Rpb24s
+CiBzdGF0aWMgZ3VpbnQgbGlzdGVuZXJfaWQgPSAwOwogc3RhdGljIEdTTGlzdCAqbGlzdGVuZXJz
+ID0gTlVMTDsKIAorc3RydWN0IHNlcnZpY2VfZGF0YSB7CisJREJ1c0Nvbm5lY3Rpb24gKmNvbm47
+CisJREJ1c1BlbmRpbmdDYWxsICpjYWxsOworCWNoYXIgKm5hbWU7CisJY29uc3QgY2hhciAqb3du
+ZXI7CisJZ3VpbnQgaWQ7CisJc3RydWN0IGZpbHRlcl9jYWxsYmFjayAqY2FsbGJhY2s7Cit9Owor
+CiBzdHJ1Y3QgZmlsdGVyX2NhbGxiYWNrIHsKIAlHREJ1c1dhdGNoRnVuY3Rpb24gY29ubl9mdW5j
+OwogCUdEQnVzV2F0Y2hGdW5jdGlvbiBkaXNjX2Z1bmM7CiAJR0RCdXNTaWduYWxGdW5jdGlvbiBz
+aWduYWxfZnVuYzsKIAlHREJ1c0Rlc3Ryb3lGdW5jdGlvbiBkZXN0cm95X2Z1bmM7CisJc3RydWN0
+IHNlcnZpY2VfZGF0YSAqZGF0YTsKIAl2b2lkICp1c2VyX2RhdGE7CiAJZ3VpbnQgaWQ7CiB9OwpA
+QCAtMzAyLDcgKzMxMiw3IEBAIHN0YXRpYyBzdHJ1Y3QgZmlsdGVyX2NhbGxiYWNrICpmaWx0ZXJf
+ZGF0YV9hZGRfY2FsbGJhY2soCiB7CiAJc3RydWN0IGZpbHRlcl9jYWxsYmFjayAqY2IgPSBOVUxM
+OwogCi0JY2IgPSBnX25ldyhzdHJ1Y3QgZmlsdGVyX2NhbGxiYWNrLCAxKTsKKwljYiA9IGdfbmV3
+MChzdHJ1Y3QgZmlsdGVyX2NhbGxiYWNrLCAxKTsKIAogCWNiLT5jb25uX2Z1bmMgPSBjb25uZWN0
+OwogCWNiLT5kaXNjX2Z1bmMgPSBkaXNjb25uZWN0OwpAQCAtMzE5LDYgKzMyOSwyNCBAQCBzdGF0
+aWMgc3RydWN0IGZpbHRlcl9jYWxsYmFjayAqZmlsdGVyX2RhdGFfYWRkX2NhbGxiYWNrKAogCXJl
+dHVybiBjYjsKIH0KIAorc3RhdGljIHZvaWQgc2VydmljZV9kYXRhX2ZyZWUoc3RydWN0IHNlcnZp
+Y2VfZGF0YSAqZGF0YSkKK3sKKwlzdHJ1Y3QgZmlsdGVyX2NhbGxiYWNrICpjYWxsYmFjayA9IGRh
+dGEtPmNhbGxiYWNrOworCisJZGJ1c19jb25uZWN0aW9uX3VucmVmKGRhdGEtPmNvbm4pOworCisJ
+aWYgKGRhdGEtPmNhbGwpCisJCWRidXNfcGVuZGluZ19jYWxsX3VucmVmKGRhdGEtPmNhbGwpOwor
+CisJaWYgKGRhdGEtPmlkKQorCQlnX3NvdXJjZV9yZW1vdmUoZGF0YS0+aWQpOworCisJZ19mcmVl
+KGRhdGEtPm5hbWUpOworCWdfZnJlZShkYXRhKTsKKworCWNhbGxiYWNrLT5kYXRhID0gTlVMTDsK
+K30KKwogc3RhdGljIGdib29sZWFuIGZpbHRlcl9kYXRhX3JlbW92ZV9jYWxsYmFjayhzdHJ1Y3Qg
+ZmlsdGVyX2RhdGEgKmRhdGEsCiAJCQkJCQlzdHJ1Y3QgZmlsdGVyX2NhbGxiYWNrICpjYikKIHsK
+QEAgLTMyNyw2ICszNTUsMTMgQEAgc3RhdGljIGdib29sZWFuIGZpbHRlcl9kYXRhX3JlbW92ZV9j
+YWxsYmFjayhzdHJ1Y3QgZmlsdGVyX2RhdGEgKmRhdGEsCiAJZGF0YS0+Y2FsbGJhY2tzID0gZ19z
+bGlzdF9yZW1vdmUoZGF0YS0+Y2FsbGJhY2tzLCBjYik7CiAJZGF0YS0+cHJvY2Vzc2VkID0gZ19z
+bGlzdF9yZW1vdmUoZGF0YS0+cHJvY2Vzc2VkLCBjYik7CiAKKwkvKiBDYW5jZWwgcGVuZGluZyBv
+cGVyYXRpb25zICovCisJaWYgKGNiLT5kYXRhKSB7CisJCWlmIChjYi0+ZGF0YS0+Y2FsbCkKKwkJ
+CWRidXNfcGVuZGluZ19jYWxsX2NhbmNlbChjYi0+ZGF0YS0+Y2FsbCk7CisJCXNlcnZpY2VfZGF0
+YV9mcmVlKGNiLT5kYXRhKTsKKwl9CisKIAlpZiAoY2ItPmRlc3Ryb3lfZnVuYykKIAkJY2ItPmRl
+c3Ryb3lfZnVuYyhjYi0+dXNlcl9kYXRhKTsKIApAQCAtNTE0LDI4ICs1NDksMTQgQEAgc3RhdGlj
+IERCdXNIYW5kbGVyUmVzdWx0IG1lc3NhZ2VfZmlsdGVyKERCdXNDb25uZWN0aW9uICpjb25uZWN0
+aW9uLAogCXJldHVybiBEQlVTX0hBTkRMRVJfUkVTVUxUX05PVF9ZRVRfSEFORExFRDsKIH0KIAot
+c3RydWN0IHNlcnZpY2VfZGF0YSB7Ci0JREJ1c0Nvbm5lY3Rpb24gKmNvbm47Ci0JY2hhciAqbmFt
+ZTsKLQljb25zdCBjaGFyICpvd25lcjsKLQlHREJ1c1dhdGNoRnVuY3Rpb24gY29ubl9mdW5jOwot
+CXZvaWQgKnVzZXJfZGF0YTsKLX07Ci0KLXN0YXRpYyB2b2lkIHNlcnZpY2VfZGF0YV9mcmVlKHN0
+cnVjdCBzZXJ2aWNlX2RhdGEgKmRhdGEpCi17Ci0JZGJ1c19jb25uZWN0aW9uX3VucmVmKGRhdGEt
+PmNvbm4pOwotCWdfZnJlZShkYXRhLT5uYW1lKTsKLQlnX2ZyZWUoZGF0YSk7Ci19Ci0KIHN0YXRp
+YyBnYm9vbGVhbiB1cGRhdGVfc2VydmljZSh2b2lkICp1c2VyX2RhdGEpCiB7CiAJc3RydWN0IHNl
+cnZpY2VfZGF0YSAqZGF0YSA9IHVzZXJfZGF0YTsKKwlzdHJ1Y3QgZmlsdGVyX2NhbGxiYWNrICpj
+YiA9IGRhdGEtPmNhbGxiYWNrOwogCiAJdXBkYXRlX25hbWVfY2FjaGUoZGF0YS0+bmFtZSwgZGF0
+YS0+b3duZXIpOwotCWlmIChkYXRhLT5jb25uX2Z1bmMpCi0JCWRhdGEtPmNvbm5fZnVuYyhkYXRh
+LT5jb25uLCBkYXRhLT51c2VyX2RhdGEpOworCWlmIChjYi0+Y29ubl9mdW5jKQorCQljYi0+Y29u
+bl9mdW5jKGRhdGEtPmNvbm4sIGNiLT51c2VyX2RhdGEpOwogCiAJc2VydmljZV9kYXRhX2ZyZWUo
+ZGF0YSk7CiAKQEAgLTU3NCwxMSArNTk1LDExIEBAIGRvbmU6CiAJZGJ1c19tZXNzYWdlX3VucmVm
+KHJlcGx5KTsKIH0KIAotc3RhdGljIHZvaWQgY2hlY2tfc2VydmljZShEQnVzQ29ubmVjdGlvbiAq
+Y29ubmVjdGlvbiwgY29uc3QgY2hhciAqbmFtZSwKLQkJCQlHREJ1c1dhdGNoRnVuY3Rpb24gY29u
+bmVjdCwgdm9pZCAqdXNlcl9kYXRhKQorc3RhdGljIHZvaWQgY2hlY2tfc2VydmljZShEQnVzQ29u
+bmVjdGlvbiAqY29ubmVjdGlvbiwKKwkJCQkJY29uc3QgY2hhciAqbmFtZSwKKwkJCQkJc3RydWN0
+IGZpbHRlcl9jYWxsYmFjayAqY2FsbGJhY2spCiB7CiAJREJ1c01lc3NhZ2UgKm1lc3NhZ2U7Ci0J
+REJ1c1BlbmRpbmdDYWxsICpjYWxsOwogCXN0cnVjdCBzZXJ2aWNlX2RhdGEgKmRhdGE7CiAKIAlk
+YXRhID0gZ190cnlfbWFsbG9jMChzaXplb2YoKmRhdGEpKTsKQEAgLTU4OSwxMiArNjEwLDEyIEBA
+IHN0YXRpYyB2b2lkIGNoZWNrX3NlcnZpY2UoREJ1c0Nvbm5lY3Rpb24gKmNvbm5lY3Rpb24sIGNv
+bnN0IGNoYXIgKm5hbWUsCiAKIAlkYXRhLT5jb25uID0gZGJ1c19jb25uZWN0aW9uX3JlZihjb25u
+ZWN0aW9uKTsKIAlkYXRhLT5uYW1lID0gZ19zdHJkdXAobmFtZSk7Ci0JZGF0YS0+Y29ubl9mdW5j
+ID0gY29ubmVjdDsKLQlkYXRhLT51c2VyX2RhdGEgPSB1c2VyX2RhdGE7CisJZGF0YS0+Y2FsbGJh
+Y2sgPSBjYWxsYmFjazsKKwljYWxsYmFjay0+ZGF0YSA9IGRhdGE7CiAKIAlkYXRhLT5vd25lciA9
+IGNoZWNrX25hbWVfY2FjaGUobmFtZSk7CiAJaWYgKGRhdGEtPm93bmVyICE9IE5VTEwpIHsKLQkJ
+Z19pZGxlX2FkZCh1cGRhdGVfc2VydmljZSwgZGF0YSk7CisJCWRhdGEtPmlkID0gZ19pZGxlX2Fk
+ZCh1cGRhdGVfc2VydmljZSwgZGF0YSk7CiAJCXJldHVybjsKIAl9CiAKQEAgLTYxMCwyMSArNjMx
+LDE5IEBAIHN0YXRpYyB2b2lkIGNoZWNrX3NlcnZpY2UoREJ1c0Nvbm5lY3Rpb24gKmNvbm5lY3Rp
+b24sIGNvbnN0IGNoYXIgKm5hbWUsCiAJCQkJCQkJREJVU19UWVBFX0lOVkFMSUQpOwogCiAJaWYg
+KGRidXNfY29ubmVjdGlvbl9zZW5kX3dpdGhfcmVwbHkoY29ubmVjdGlvbiwgbWVzc2FnZSwKLQkJ
+CQkJCQkmY2FsbCwgLTEpID09IEZBTFNFKSB7CisJCQkJCQkJJmRhdGEtPmNhbGwsIC0xKSA9PSBG
+QUxTRSkgewogCQllcnJvcigiRmFpbGVkIHRvIGV4ZWN1dGUgbWV0aG9kIGNhbGwiKTsKIAkJZ19m
+cmVlKGRhdGEpOwogCQlnb3RvIGRvbmU7CiAJfQogCi0JaWYgKGNhbGwgPT0gTlVMTCkgeworCWlm
+IChkYXRhLT5jYWxsID09IE5VTEwpIHsKIAkJZXJyb3IoIkQtQnVzIGNvbm5lY3Rpb24gbm90IGF2
+YWlsYWJsZSIpOwogCQlnX2ZyZWUoZGF0YSk7CiAJCWdvdG8gZG9uZTsKIAl9CiAKLQlkYnVzX3Bl
+bmRpbmdfY2FsbF9zZXRfbm90aWZ5KGNhbGwsIHNlcnZpY2VfcmVwbHksIGRhdGEsIE5VTEwpOwot
+Ci0JZGJ1c19wZW5kaW5nX2NhbGxfdW5yZWYoY2FsbCk7CisJZGJ1c19wZW5kaW5nX2NhbGxfc2V0
+X25vdGlmeShkYXRhLT5jYWxsLCBzZXJ2aWNlX3JlcGx5LCBkYXRhLCBOVUxMKTsKIAogZG9uZToK
+IAlkYnVzX21lc3NhZ2VfdW5yZWYobWVzc2FnZSk7CkBAIC02NTMsNyArNjcyLDcgQEAgZ3VpbnQg
+Z19kYnVzX2FkZF9zZXJ2aWNlX3dhdGNoKERCdXNDb25uZWN0aW9uICpjb25uZWN0aW9uLCBjb25z
+dCBjaGFyICpuYW1lLAogCQlyZXR1cm4gMDsKIAogCWlmIChjb25uZWN0KQotCQljaGVja19zZXJ2
+aWNlKGNvbm5lY3Rpb24sIG5hbWUsIGNvbm5lY3QsIHVzZXJfZGF0YSk7CisJCWNoZWNrX3NlcnZp
+Y2UoY29ubmVjdGlvbiwgbmFtZSwgY2IpOwogCiAJcmV0dXJuIGNiLT5pZDsKIH0KLS0gCjEuNi4z
+LjMKCg==
+--0016e6d6454e4e18fc047fce11f9--
