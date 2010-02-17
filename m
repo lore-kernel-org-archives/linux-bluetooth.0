@@ -1,33 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] prevent buffer overruns when parsing invalid OBEX
- frames
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Iain Hibbert <plunky@rya-online.net>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1266433932.690365.3132.nullmailer@galant.ukfsn.org>
-References: <1266433932.690365.3132.nullmailer@galant.ukfsn.org>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 17 Feb 2010 11:15:16 -0800
-Message-ID: <1266434116.8849.67.camel@localhost.localdomain>
-Mime-Version: 1.0
+Date: Wed, 17 Feb 2010 19:12:12 +0000 (GMT)
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] prevent buffer overruns when parsing invalid OBEX frames
+MIME-Version: 1.0
+Content-Type: MULTIPART/MIXED; BOUNDARY="0-1181583239-1266433932=:3255"
+Message-Id: <1266433932.690365.3132.nullmailer@galant.ukfsn.org>
+From: Iain Hibbert <plunky@rya-online.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Iain,
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-> While I have git installed then, I found a problem recently where hcidump
-> would dump core when parsing an OBEX packet. It turned out that the OBEX
-> packet was faulty at my end (socket buffer exhausted), but the patch
-> attached prevents the parsing code from running off the end of the buffer
-> and receiving a SIGSEGV.
-> 
-> The patch does not make any complaint about the invalid frame, adding that
-> would be a little more complex and I'm not sure its necessary?
+--0-1181583239-1266433932=:3255
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 
-patch has been applied. Thanks.
+Hi,
 
-Regards
+While I have git installed then, I found a problem recently where hcidump
+would dump core when parsing an OBEX packet. It turned out that the OBEX
+packet was faulty at my end (socket buffer exhausted), but the patch
+attached prevents the parsing code from running off the end of the buffer
+and receiving a SIGSEGV.
 
-Marcel
+The patch does not make any complaint about the invalid frame, adding that
+would be a little more complex and I'm not sure its necessary?
+
+iain
+--0-1181583239-1266433932=:3255
+Content-Type: TEXT/PLAIN; charset=US-ASCII; name=0001-prevent-buffer-overruns-when-parsing-invalid-OBEX-fr.patch
+Content-Transfer-Encoding: BASE64
+Content-ID: <alpine.NEB.2.00.1002171912120.3255@localhost.>
+Content-Description: 
+Content-Disposition: attachment; filename=0001-prevent-buffer-overruns-when-parsing-invalid-OBEX-fr.patch
+
+RnJvbSAwYTE2MzY1NmI3MzE0MDI2NWNkYjc2NDNhYjQ1OTZmZDNlZmVmNjJj
+IE1vbiBTZXAgMTcgMDA6MDA6MDAgMjAwMQ0KRnJvbTogSWFpbiBIaWJiZXJ0
+IDxwbHVua3lAcnlhLW9ubGluZS5uZXQ+DQpEYXRlOiBXZWQsIDE3IEZlYiAy
+MDEwIDE4OjU4OjM3ICswMDAwDQpTdWJqZWN0OiBbUEFUQ0hdIHByZXZlbnQg
+YnVmZmVyIG92ZXJydW5zIHdoZW4gcGFyc2luZyBpbnZhbGlkIE9CRVggZnJh
+bWVzDQoNCi0tLQ0KIHBhcnNlci9vYmV4LmMgfCAgIDQ3ICsrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tDQogMSBmaWxl
+cyBjaGFuZ2VkLCA0MSBpbnNlcnRpb25zKCspLCA2IGRlbGV0aW9ucygtKQ0K
+DQpkaWZmIC0tZ2l0IGEvcGFyc2VyL29iZXguYyBiL3BhcnNlci9vYmV4LmMN
+CmluZGV4IDEzM2YyYTIuLjUwYjk3MzcgMTAwNjQ0DQotLS0gYS9wYXJzZXIv
+b2JleC5jDQorKysgYi9wYXJzZXIvb2JleC5jDQpAQCAtMjAwLDI3ICsyMDAs
+NTUgQEAgc3RhdGljIHZvaWQgcGFyc2VfaGVhZGVycyhpbnQgbGV2ZWwsIHN0
+cnVjdCBmcmFtZSAqZnJtKQ0KIAkJcHJpbnRmKCIlcyAoMHglMDJ4KSIsIGhp
+MnN0cihoaSksIGhpKTsNCiAJCXN3aXRjaCAoaGkgJiAweGMwKSB7DQogCQlj
+YXNlIDB4MDA6CS8qIFVuaWNvZGUgKi8NCisJCQlpZiAoZnJtLT5sZW4gPCAy
+KSB7DQorCQkJCXByaW50ZigiXG4iKTsNCisJCQkJcmV0dXJuOw0KKwkJCX0N
+CisNCiAJCQlsZW4gPSBnZXRfdTE2KGZybSkgLSAzOw0KIAkJCXByaW50Zigi
+ID0gVW5pY29kZSBsZW5ndGggJWRcbiIsIGxlbik7DQorDQorCQkJaWYgKGZy
+bS0+bGVuIDwgbGVuKQ0KKwkJCQlyZXR1cm47DQorDQogCQkJcmF3X25kdW1w
+KGxldmVsLCBmcm0sIGxlbik7DQogCQkJZnJtLT5wdHIgKz0gbGVuOw0KIAkJ
+CWZybS0+bGVuIC09IGxlbjsNCiAJCQlicmVhazsNCiANCiAJCWNhc2UgMHg0
+MDoJLyogQnl0ZSBzZXF1ZW5jZSAqLw0KKwkJCWlmIChmcm0tPmxlbiA8IDIp
+IHsNCisJCQkJcHJpbnRmKCJcbiIpOw0KKwkJCQlyZXR1cm47DQorCQkJfQ0K
+Kw0KIAkJCWxlbiA9IGdldF91MTYoZnJtKSAtIDM7DQogCQkJcHJpbnRmKCIg
+PSBTZXF1ZW5jZSBsZW5ndGggJWRcbiIsIGxlbik7DQorDQorCQkJaWYgKGZy
+bS0+bGVuIDwgbGVuKQ0KKwkJCQlyZXR1cm47DQorDQogCQkJcmF3X25kdW1w
+KGxldmVsLCBmcm0sIGxlbik7DQogCQkJZnJtLT5wdHIgKz0gbGVuOw0KIAkJ
+CWZybS0+bGVuIC09IGxlbjsNCiAJCQlicmVhazsNCiANCiAJCWNhc2UgMHg4
+MDoJLyogT25lIGJ5dGUgKi8NCisJCQlpZiAoZnJtLT5sZW4gPCAxKSB7DQor
+CQkJCXByaW50ZigiXG4iKTsNCisJCQkJcmV0dXJuOw0KKwkJCX0NCisNCiAJ
+CQlodjggPSBnZXRfdTgoZnJtKTsNCiAJCQlwcmludGYoIiA9ICVkXG4iLCBo
+djgpOw0KIAkJCWJyZWFrOw0KIA0KIAkJY2FzZSAweGMwOgkvKiBGb3VyIGJ5
+dGVzICovDQorCQkJaWYgKGZybS0+bGVuIDwgNCkgew0KKwkJCQlwcmludGYo
+IlxuIik7DQorCQkJCXJldHVybjsNCisJCQl9DQorDQogCQkJaHYzMiA9IGdl
+dF91MzIoZnJtKTsNCiAJCQlwcmludGYoIiA9ICV1XG4iLCBodjMyKTsNCiAJ
+CQlicmVhazsNCkBAIC0yNzYsNiArMzA0LDExIEBAIHZvaWQgb2JleF9kdW1w
+KGludCBsZXZlbCwgc3RydWN0IGZyYW1lICpmcm0pDQogDQogCQlzd2l0Y2gg
+KG9wY29kZSAmIDB4N2YpIHsNCiAJCWNhc2UgMHgwMDoJLyogQ29ubmVjdCAq
+Lw0KKwkJCWlmIChmcm0tPmxlbiA8IDQpIHsNCisJCQkJcHJpbnRmKCJcbiIp
+Ow0KKwkJCQlyZXR1cm47DQorCQkJfQ0KKw0KIAkJCXZlcnNpb24gPSBnZXRf
+dTgoZnJtKTsNCiAJCQlmbGFncyAgID0gZ2V0X3U4KGZybSk7DQogCQkJcGt0
+bGVuICA9IGdldF91MTYoZnJtKTsNCkBAIC0yODQsMTcgKzMxNywxOSBAQCB2
+b2lkIG9iZXhfZHVtcChpbnQgbGV2ZWwsIHN0cnVjdCBmcmFtZSAqZnJtKQ0K
+IAkJCWJyZWFrOw0KIA0KIAkJY2FzZSAweDA1OgkvKiBTZXRQYXRoICovDQot
+CQkJaWYgKGxlbmd0aCA+IDMpIHsNCi0JCQkJZmxhZ3MgICAgID0gZ2V0X3U4
+KGZybSk7DQotCQkJCWNvbnN0YW50cyA9IGdldF91OChmcm0pOw0KLQkJCQlw
+cmludGYoIiBmbGFncyAlZCBjb25zdGFudHMgJWRcbiIsDQotCQkJCQkJCWZs
+YWdzLCBjb25zdGFudHMpOw0KLQkJCX0gZWxzZQ0KKwkJCWlmIChmcm0tPmxl
+biA8IDIpIHsNCiAJCQkJcHJpbnRmKCJcbiIpOw0KKwkJCQlyZXR1cm47DQor
+CQkJfQ0KKw0KKwkJCWZsYWdzICAgICA9IGdldF91OChmcm0pOw0KKwkJCWNv
+bnN0YW50cyA9IGdldF91OChmcm0pOw0KKwkJCXByaW50ZigiIGZsYWdzICVk
+IGNvbnN0YW50cyAlZFxuIiwgZmxhZ3MsIGNvbnN0YW50cyk7DQogCQkJYnJl
+YWs7DQogDQogCQlkZWZhdWx0Og0KIAkJCXByaW50ZigiXG4iKTsNCisJCQli
+cmVhazsNCiAJCX0NCiANCiAJCWlmICgoc3RhdHVzICYgMHg3MCkgJiYgKHBh
+cnNlci5mbGFncyAmIERVTVBfVkVSQk9TRSkpIHsNCi0tIA0KMS42LjYNCg0K
+
+--0-1181583239-1266433932=:3255--
 
 
