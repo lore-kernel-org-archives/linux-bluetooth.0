@@ -1,95 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 17 Feb 2010 19:12:12 +0000 (GMT)
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] prevent buffer overruns when parsing invalid OBEX frames
-MIME-Version: 1.0
-Content-Type: MULTIPART/MIXED; BOUNDARY="0-1181583239-1266433932=:3255"
-Message-Id: <1266433932.690365.3132.nullmailer@galant.ukfsn.org>
-From: Iain Hibbert <plunky@rya-online.net>
+Subject: Re: [PATCH] Bluetooth: Allow SCO/eSCO packet type selection for
+ outgoing SCO connections.
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Nick Pelly <npelly@google.com>
+Cc: Ville Tervo <ville.tervo@nokia.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <35c90d961002170849m1d13743fg725a87594d63b80c@mail.gmail.com>
+References: <1265918068-14721-1-git-send-email-npelly@google.com>
+	 <35c90d961002111159h6727bc2cw28b55ce6e919fb4f@mail.gmail.com>
+	 <35c90d961002151315i5fc0f5b9y36aaba4415987a2f@mail.gmail.com>
+	 <4B7BB746.1040806@nokia.com>
+	 <35c90d961002170849m1d13743fg725a87594d63b80c@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Wed, 17 Feb 2010 09:31:34 -0800
+Message-ID: <1266427894.8849.66.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+Hi Nick,
 
---0-1181583239-1266433932=:3255
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+> >> As a first step, can we get consensus on the userspace API:
+> >>
+> >> --- a/include/net/bluetooth/hci.h
+> >> +++ b/include/net/bluetooth/hci.h
+> >> @@ -139,8 +139,11 @@ enum {
+> >> +#define ALL_SCO_PKTS   (SCO_ESCO_MASK | EDR_ESCO_MASK)
+> >> +#define ALL_ESCO_PKTS  (SCO_ESCO_MASK | ESCO_EV3 | ESCO_EV4 | ESCO_EV5)
+> >>
+> >> --- a/include/net/bluetooth/sco.h
+> >> +++ b/include/net/bluetooth/sco.h
+> >> @@ -37,6 +37,7 @@
+> >> struct sockaddr_sco {
+> >>       sa_family_t     sco_family;
+> >>       bdaddr_t        sco_bdaddr;
+> >> +       __u16           sco_pkt_type;
+> >> };
+> >>
+> >> This will at least unblock my work.
+> >
+> > Would it be better to add new sockopt for sco socket?
+> 
+> What advantage does that have?
+> 
+> Putting it in struct sockaddr_sco seems to make more sense since
+> packet types can only be selected during SCO connection establishment.
+> They can't be changed once the socket is connected.
 
-Hi,
+in theory you can change the allowed packet types for ACL, SCO and eSCO
+after the connection is active. However the usefulness here is fairly
+limited. In case of ACL it is purely academical and most link manager
+will just ignore you. Mainly because the host stack can't really make a
+good decision here anyway.
 
-While I have git installed then, I found a problem recently where hcidump
-would dump core when parsing an OBEX packet. It turned out that the OBEX
-packet was faulty at my end (socket buffer exhausted), but the patch
-attached prevents the parsing code from running off the end of the buffer
-and receiving a SIGSEGV.
+Personally I think it is a total brain dead concept to give this into
+the control of the host stack anyway. For eSCO packet types this make a
+bit more sense since you might wanna control the bandwidth. However
+changing them later is just pointless. And I don't recall of any profile
+actually mentioning about it. I think they had a great idea behind eSCO
+support, but since it is impossible to get the negotiation parts right,
+everybody sticks with simple eSCO channels and doesn't bother to change
+them.
 
-The patch does not make any complaint about the invalid frame, adding that
-would be a little more complex and I'm not sure its necessary?
+And even if we would be going for a setsockopt(), that would be blocking
+and then again pretty much pointless API. The sockaddr is most logical
+thing that fits into what we wanna achieve. Disallow/allow certain
+packet types and essentially force SCO over eSCO.
 
-iain
---0-1181583239-1266433932=:3255
-Content-Type: TEXT/PLAIN; charset=US-ASCII; name=0001-prevent-buffer-overruns-when-parsing-invalid-OBEX-fr.patch
-Content-Transfer-Encoding: BASE64
-Content-ID: <alpine.NEB.2.00.1002171912120.3255@localhost.>
-Content-Description: 
-Content-Disposition: attachment; filename=0001-prevent-buffer-overruns-when-parsing-invalid-OBEX-fr.patch
+Regards
 
-RnJvbSAwYTE2MzY1NmI3MzE0MDI2NWNkYjc2NDNhYjQ1OTZmZDNlZmVmNjJj
-IE1vbiBTZXAgMTcgMDA6MDA6MDAgMjAwMQ0KRnJvbTogSWFpbiBIaWJiZXJ0
-IDxwbHVua3lAcnlhLW9ubGluZS5uZXQ+DQpEYXRlOiBXZWQsIDE3IEZlYiAy
-MDEwIDE4OjU4OjM3ICswMDAwDQpTdWJqZWN0OiBbUEFUQ0hdIHByZXZlbnQg
-YnVmZmVyIG92ZXJydW5zIHdoZW4gcGFyc2luZyBpbnZhbGlkIE9CRVggZnJh
-bWVzDQoNCi0tLQ0KIHBhcnNlci9vYmV4LmMgfCAgIDQ3ICsrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tDQogMSBmaWxl
-cyBjaGFuZ2VkLCA0MSBpbnNlcnRpb25zKCspLCA2IGRlbGV0aW9ucygtKQ0K
-DQpkaWZmIC0tZ2l0IGEvcGFyc2VyL29iZXguYyBiL3BhcnNlci9vYmV4LmMN
-CmluZGV4IDEzM2YyYTIuLjUwYjk3MzcgMTAwNjQ0DQotLS0gYS9wYXJzZXIv
-b2JleC5jDQorKysgYi9wYXJzZXIvb2JleC5jDQpAQCAtMjAwLDI3ICsyMDAs
-NTUgQEAgc3RhdGljIHZvaWQgcGFyc2VfaGVhZGVycyhpbnQgbGV2ZWwsIHN0
-cnVjdCBmcmFtZSAqZnJtKQ0KIAkJcHJpbnRmKCIlcyAoMHglMDJ4KSIsIGhp
-MnN0cihoaSksIGhpKTsNCiAJCXN3aXRjaCAoaGkgJiAweGMwKSB7DQogCQlj
-YXNlIDB4MDA6CS8qIFVuaWNvZGUgKi8NCisJCQlpZiAoZnJtLT5sZW4gPCAy
-KSB7DQorCQkJCXByaW50ZigiXG4iKTsNCisJCQkJcmV0dXJuOw0KKwkJCX0N
-CisNCiAJCQlsZW4gPSBnZXRfdTE2KGZybSkgLSAzOw0KIAkJCXByaW50Zigi
-ID0gVW5pY29kZSBsZW5ndGggJWRcbiIsIGxlbik7DQorDQorCQkJaWYgKGZy
-bS0+bGVuIDwgbGVuKQ0KKwkJCQlyZXR1cm47DQorDQogCQkJcmF3X25kdW1w
-KGxldmVsLCBmcm0sIGxlbik7DQogCQkJZnJtLT5wdHIgKz0gbGVuOw0KIAkJ
-CWZybS0+bGVuIC09IGxlbjsNCiAJCQlicmVhazsNCiANCiAJCWNhc2UgMHg0
-MDoJLyogQnl0ZSBzZXF1ZW5jZSAqLw0KKwkJCWlmIChmcm0tPmxlbiA8IDIp
-IHsNCisJCQkJcHJpbnRmKCJcbiIpOw0KKwkJCQlyZXR1cm47DQorCQkJfQ0K
-Kw0KIAkJCWxlbiA9IGdldF91MTYoZnJtKSAtIDM7DQogCQkJcHJpbnRmKCIg
-PSBTZXF1ZW5jZSBsZW5ndGggJWRcbiIsIGxlbik7DQorDQorCQkJaWYgKGZy
-bS0+bGVuIDwgbGVuKQ0KKwkJCQlyZXR1cm47DQorDQogCQkJcmF3X25kdW1w
-KGxldmVsLCBmcm0sIGxlbik7DQogCQkJZnJtLT5wdHIgKz0gbGVuOw0KIAkJ
-CWZybS0+bGVuIC09IGxlbjsNCiAJCQlicmVhazsNCiANCiAJCWNhc2UgMHg4
-MDoJLyogT25lIGJ5dGUgKi8NCisJCQlpZiAoZnJtLT5sZW4gPCAxKSB7DQor
-CQkJCXByaW50ZigiXG4iKTsNCisJCQkJcmV0dXJuOw0KKwkJCX0NCisNCiAJ
-CQlodjggPSBnZXRfdTgoZnJtKTsNCiAJCQlwcmludGYoIiA9ICVkXG4iLCBo
-djgpOw0KIAkJCWJyZWFrOw0KIA0KIAkJY2FzZSAweGMwOgkvKiBGb3VyIGJ5
-dGVzICovDQorCQkJaWYgKGZybS0+bGVuIDwgNCkgew0KKwkJCQlwcmludGYo
-IlxuIik7DQorCQkJCXJldHVybjsNCisJCQl9DQorDQogCQkJaHYzMiA9IGdl
-dF91MzIoZnJtKTsNCiAJCQlwcmludGYoIiA9ICV1XG4iLCBodjMyKTsNCiAJ
-CQlicmVhazsNCkBAIC0yNzYsNiArMzA0LDExIEBAIHZvaWQgb2JleF9kdW1w
-KGludCBsZXZlbCwgc3RydWN0IGZyYW1lICpmcm0pDQogDQogCQlzd2l0Y2gg
-KG9wY29kZSAmIDB4N2YpIHsNCiAJCWNhc2UgMHgwMDoJLyogQ29ubmVjdCAq
-Lw0KKwkJCWlmIChmcm0tPmxlbiA8IDQpIHsNCisJCQkJcHJpbnRmKCJcbiIp
-Ow0KKwkJCQlyZXR1cm47DQorCQkJfQ0KKw0KIAkJCXZlcnNpb24gPSBnZXRf
-dTgoZnJtKTsNCiAJCQlmbGFncyAgID0gZ2V0X3U4KGZybSk7DQogCQkJcGt0
-bGVuICA9IGdldF91MTYoZnJtKTsNCkBAIC0yODQsMTcgKzMxNywxOSBAQCB2
-b2lkIG9iZXhfZHVtcChpbnQgbGV2ZWwsIHN0cnVjdCBmcmFtZSAqZnJtKQ0K
-IAkJCWJyZWFrOw0KIA0KIAkJY2FzZSAweDA1OgkvKiBTZXRQYXRoICovDQot
-CQkJaWYgKGxlbmd0aCA+IDMpIHsNCi0JCQkJZmxhZ3MgICAgID0gZ2V0X3U4
-KGZybSk7DQotCQkJCWNvbnN0YW50cyA9IGdldF91OChmcm0pOw0KLQkJCQlw
-cmludGYoIiBmbGFncyAlZCBjb25zdGFudHMgJWRcbiIsDQotCQkJCQkJCWZs
-YWdzLCBjb25zdGFudHMpOw0KLQkJCX0gZWxzZQ0KKwkJCWlmIChmcm0tPmxl
-biA8IDIpIHsNCiAJCQkJcHJpbnRmKCJcbiIpOw0KKwkJCQlyZXR1cm47DQor
-CQkJfQ0KKw0KKwkJCWZsYWdzICAgICA9IGdldF91OChmcm0pOw0KKwkJCWNv
-bnN0YW50cyA9IGdldF91OChmcm0pOw0KKwkJCXByaW50ZigiIGZsYWdzICVk
-IGNvbnN0YW50cyAlZFxuIiwgZmxhZ3MsIGNvbnN0YW50cyk7DQogCQkJYnJl
-YWs7DQogDQogCQlkZWZhdWx0Og0KIAkJCXByaW50ZigiXG4iKTsNCisJCQli
-cmVhazsNCiAJCX0NCiANCiAJCWlmICgoc3RhdHVzICYgMHg3MCkgJiYgKHBh
-cnNlci5mbGFncyAmIERVTVBfVkVSQk9TRSkpIHsNCi0tIA0KMS42LjYNCg0K
-
---0-1181583239-1266433932=:3255--
+Marcel
 
 
