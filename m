@@ -1,41 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: lenovo laser bt mouse
-From: Pavol =?UTF-8?Q?Kla=C4=8Dansk=C3=BD?= <pavol@klacansky.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-gzxBuyIRSSSN+XH0J4Fb"
-Date: Wed, 17 Feb 2010 15:58:03 +0100
-Message-ID: <1266418683.2126.1.camel@pk-laptop>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Stefan Seyfried <stefan.seyfried@googlemail.com>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Stefan Seyfried <seife@sphairon.com>
+Subject: [PATCH 2/2] Add hack to allow compilation with old bluez lib
+Date: Wed, 17 Feb 2010 13:49:42 +0100
+Message-Id: <1266410982-26964-3-git-send-email-stefan.seyfried@googlemail.com>
+In-Reply-To: <1266410982-26964-2-git-send-email-stefan.seyfried@googlemail.com>
+References: <1266410982-26964-1-git-send-email-stefan.seyfried@googlemail.com>
+ <1266410982-26964-2-git-send-email-stefan.seyfried@googlemail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Stefan Seyfried <seife@sphairon.com>
 
---=-gzxBuyIRSSSN+XH0J4Fb
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+---
+ parser/hci.c |    6 ++++++
+ 1 files changed, 6 insertions(+), 0 deletions(-)
 
-Could you help me with autopairing settings (no applets, only config
-files)
-
-THX
-
---=-gzxBuyIRSSSN+XH0J4Fb
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Toto je =?ISO-8859-1?Q?digit=E1lne?=
- =?ISO-8859-1?Q?_podp=EDsan=E1?= =?UTF-8?Q?_=C4=8Das=C5=A5?=
- =?ISO-8859-1?Q?_spr=E1vy?=
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
-
-iQEcBAABAgAGBQJLfAP7AAoJEAngsRR8YrCnaZcH/RTVZLK7SDgvjx8eblE+hWaK
-JH40rIrh24JGldk71HTtAyCvb13DTLTfwqNZTFxdnQ/FakigqVe7d0uNmPrjR+Do
-AWtH/G+uuRQrd0NILq663eVLakXZB2QmdWzMVsEl2Wd4VdggSkRRzfutHLvTmWxp
-8nL7cuFzpatCZxHp33gKKoQKd1/Td7y7mS9tVJJFu9S8zyPf7EwX7jYTxq2Krg6I
-yHdA8wCrluDNqElL81N9toh5ATUNa/b8E/4uPFJW5dD4zw4aMy6cn4PSde5/KYAi
-04Yh1cMaAqGZgJQ8incKd4VAhobS9qUy7QO1K4UPohs0KlVUW8khk+Y3tBzJS4k=
-=7weS
------END PGP SIGNATURE-----
-
---=-gzxBuyIRSSSN+XH0J4Fb--
-
+diff --git a/parser/hci.c b/parser/hci.c
+index e4fc473..33c3640 100644
+--- a/parser/hci.c
++++ b/parser/hci.c
+@@ -41,6 +41,12 @@
+ #include <bluetooth/hci.h>
+ #include <bluetooth/hci_lib.h>
+ 
++/* ugly hack, as hci.h changed incompatibly with bluez 4.61 */
++#ifndef OCF_READ_INQ_RESPONSE_TX_POWER_LEVEL
++#define OCF_READ_INQ_RESPONSE_TX_POWER_LEVEL OCF_READ_INQUIRY_TRANSMIT_POWER_LEVEL
++#define read_inq_response_tx_power_level_rp read_inquiry_transmit_power_level_rp
++#endif
++
+ #include "parser.h"
+ 
+ static uint16_t manufacturer = DEFAULT_COMPID;
+-- 
+1.6.6.1
