@@ -1,71 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: obexd-0.21: configure doesn't work as expected
-From: Pacho Ramos <pacho@condmat1.ciencias.uniovi.es>
-Reply-To: pacho@condmat1.ciencias.uniovi.es
-To: Vinicius Gomes <vinicius.gomes@openbossa.org>
+Date: Fri, 19 Feb 2010 14:32:58 -0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Daniel =?iso-8859-1?Q?=D6rstadius?= <daniel.orstadius@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <2a9506371002190924p2ff4ff6eq243dc3031ae3b3a7@mail.gmail.com>
-References: <2a9506371002190924p2ff4ff6eq243dc3031ae3b3a7@mail.gmail.com>
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-qAUofjiI/gDMevB5Fr3G"
-Date: Fri, 19 Feb 2010 18:40:25 +0100
-Message-Id: <1266601225.5249.25.camel@localhost.localdomain>
-Mime-Version: 1.0
+Subject: Re: [PATCH] Fix double free on AVDTP Abort response
+Message-ID: <20100219173257.GA12855@jh-x301>
+References: <eb7933e21002190820x7b2b0ea3v3f48ce96a5d11a1e@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <eb7933e21002190820x7b2b0ea3v3f48ce96a5d11a1e@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Daniel,
 
---=-qAUofjiI/gDMevB5Fr3G
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Fri, Feb 19, 2010, Daniel Örstadius wrote:
+> +	if (session->req == AVDTP_ABORT) {
+> +		/* Avoid freeing the Abort request here */
+> +		debug("handle_unanswered_req: Abort req, returning");
+> +		session->req->stream = NULL;
+> +		return;
+> +	}
 
-El vie, 19-02-2010 a las 14:24 -0300, Vinicius Gomes escribi=C3=B3:
->=20
-> 2010/2/19 Pacho Ramos <pacho@condmat1.ciencias.uniovi.es>:
-> > Ah, then, why is plugins folder being created even if nothing will be
-> > installed in it?
-> >
->=20
-> Nothing is installed right now. But it doesn't mean that nothing will
-> ever be ;-)
->
-> And if you want to have a custom plugin for some application, you just wr=
-ite
-> it and install it there, no need to mess with core obexd.
->=20
+Please try to at least do a compile check before you submit patches.
+This one gives the following error:
+audio/avdtp.c: In function ‘handle_unanswered_req’:
+audio/avdtp.c:908: error: comparison between pointer and integer
 
-True, silly me!=20
+What you probably want is session->req->signal_id == AVDTP_ABORT.
 
-> >> Thanks for the report, this is a bug. There's a patch for it in my
-> >> development tree. Waiting for review.
-> >>
-> >> But before the next release happens, disabling a plugin is equivalent
-> >> to setting its value to dummy, i.e.
-> >> --without-phonebook (if it worked ;-) would be the same as
-> >> --with-phonebook=3Ddummy.
-> >>
-> >
-> > Great, where could I see your development tree?
-> >
->=20
-> Sure. Forgot the link, here it is:
-> http://git.infradead.org/users/vcgomes/obexd.git (devel branch)
->=20
-Great :-D
-
-Thanks and best regards
-
---=-qAUofjiI/gDMevB5Fr3G
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Esta parte del mensaje =?ISO-8859-1?Q?est=E1?= firmada
- digitalmente
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.14 (GNU/Linux)
-
-iEYEABECAAYFAkt+zQkACgkQCaWpQKGI+9QoAwCfeEK2U2zpWgH5I8mpsPaRgv19
-68YAn1FHGDKf+PSR//WZz56kRXPW5VBx
-=mIpU
------END PGP SIGNATURE-----
-
---=-qAUofjiI/gDMevB5Fr3G--
-
+Johan
