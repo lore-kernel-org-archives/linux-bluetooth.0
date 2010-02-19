@@ -1,72 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: obexd-0.21: configure doesn't work as expected
-From: Pacho Ramos <pacho@condmat1.ciencias.uniovi.es>
-Reply-To: pacho@condmat1.ciencias.uniovi.es
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-FMzcuKC3rxSgNUR6g+UC"
-Date: Fri, 19 Feb 2010 12:13:48 +0100
-Message-Id: <1266578028.5249.1.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <4B7E46FC.5030408@nokia.com>
+Date: Fri, 19 Feb 2010 10:08:28 +0200
+From: Ville Tervo <ville.tervo@nokia.com>
+MIME-Version: 1.0
+To: ext Nick Pelly <npelly@google.com>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth: Allow SCO/eSCO packet type selection for
+ outgoing SCO connections.
+References: <1265918068-14721-1-git-send-email-npelly@google.com> 	<35c90d961002111159h6727bc2cw28b55ce6e919fb4f@mail.gmail.com> 	<35c90d961002151315i5fc0f5b9y36aaba4415987a2f@mail.gmail.com> 	<4B7BB746.1040806@nokia.com> <35c90d961002170849m1d13743fg725a87594d63b80c@mail.gmail.com> 	<1266427894.8849.66.camel@localhost.localdomain> <35c90d961002181547x1ea26ba7je4eee29ef29e6fd2@mail.gmail.com>
+In-Reply-To: <35c90d961002181547x1ea26ba7je4eee29ef29e6fd2@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Nick
 
---=-FMzcuKC3rxSgNUR6g+UC
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+>> And even if we would be going for a setsockopt(), that would be blocking
+>> and then again pretty much pointless API. The sockaddr is most logical
+>> thing that fits into what we wanna achieve. Disallow/allow certain
+>> packet types and essentially force SCO over eSCO.
+> 
+> Ok seems like there is agreement on using struct sockaddr_sco for sco_pkt_type.
+> 
+> A more controversial question is whether to follow the SIG convention
+> of reversing the logic on the EDR bits in the packet type mask (1
+> means do *not* use this packet for the EDR bits), or to use consistent
+> logic for each bit (1 always means *allow* this packet type) for
+> packet selection in scokaddr_sco.sco_pkt_type.
+> 
+> The original patch I posted followed the SIG convention. However after
+> more thinking I am leaning towards using consistent logic for each
+> bit. 1 will always mean 'allow this packet'. My rationale is that the
+> most common use for sco_pkt_type will be to request only SCO packet
+> types allowed. If however the SIG adds more reverse logic packet
+> types, and we follow the SIG convention, then old userspace code that
+> just requested the SCO packet types will now end up with the new
+> packet types as well. So I think it is best to avoid this situation
+> and for 1 to always mean 'allow this packet' in
+> sockaddr_sco.sco_pkt_type.
+> 
+> Attached is a new patch with the consistent bit logic.
+> 
+> Comments?
 
-Hello all!
+In order to keep backwards compatibility 1 should mean "don't allow this 
+packet type" for all packets. Other wise old application with new kernel 
+would not allow any packet types.
 
-The problem we are suffering downstream is the following:
-http://bugs.gentoo.org/show_bug.cgi?id=3D305063#c5
-
-In summary, the same files are being *installed* with
---with-phonebook=3Debook and --with-phonebook=3Ddummy (in both cases,
-phonebook files are not being installed at all). A
-$PREFIX/lib/obex/plugins directory is created but nothing is installed
-on it.
-
-Another problem is that, when passing --without-phonebook to configure,
-build fails with:
-$ make
-make --no-print-directory all-am
-  CC     gdbus/mainloop.o
-  CC     gdbus/object.o
-  CC     gdbus/watch.o
-  CC     plugins/filesystem.o
-  CC     plugins/opp.o
-  CC     plugins/ftp.o
-  CC     plugins/pbap.o
-  CC     plugins/syncevolution.o
-  CC     src/main.o
-  GEN    src/builtin.h
-  CC     src/plugin.o
-  CC     src/logging.o
-  CC     src/btio.o
-  CC     src/manager.o
-  CC     src/obex.o
-  CC     src/bluetooth.o
-  CC     src/mimetype.o
-  CC     src/service.o
-make[1]: *** No rule to make target `plugins/phonebook-no.c', needed by
-`plugins/phonebook.c'.  Stop.
-make: *** [all] Error 2
-
-
-Thanks a lot for your help :-)
-
---=-FMzcuKC3rxSgNUR6g+UC
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Esta parte del mensaje =?ISO-8859-1?Q?est=E1?= firmada
- digitalmente
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.14 (GNU/Linux)
-
-iEYEABECAAYFAkt+cmwACgkQCaWpQKGI+9S1UwCeKYd4E7iEPVEN0FNvBAA0moqR
-2eYAn3mEBvwKPWFnutWGYSBQRQehWlDR
-=AHa/
------END PGP SIGNATURE-----
-
---=-FMzcuKC3rxSgNUR6g+UC--
-
+-- 
+Ville
