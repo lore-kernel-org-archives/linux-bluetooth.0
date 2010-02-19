@@ -1,32 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 19 Feb 2010 14:32:58 -0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Daniel =?iso-8859-1?Q?=D6rstadius?= <daniel.orstadius@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix double free on AVDTP Abort response
-Message-ID: <20100219173257.GA12855@jh-x301>
-References: <eb7933e21002190820x7b2b0ea3v3f48ce96a5d11a1e@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <eb7933e21002190820x7b2b0ea3v3f48ce96a5d11a1e@mail.gmail.com>
+Date: Fri, 19 Feb 2010 18:20:48 +0200
+Message-ID: <eb7933e21002190820x7b2b0ea3v3f48ce96a5d11a1e@mail.gmail.com>
+Subject: [PATCH] Fix double free on AVDTP Abort response
+From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=000e0cd1f8b46a6aa9047ff67700
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Daniel,
+--000e0cd1f8b46a6aa9047ff67700
+Content-Type: text/plain; charset=ISO-8859-1
 
-On Fri, Feb 19, 2010, Daniel Örstadius wrote:
-> +	if (session->req == AVDTP_ABORT) {
-> +		/* Avoid freeing the Abort request here */
-> +		debug("handle_unanswered_req: Abort req, returning");
-> +		session->req->stream = NULL;
-> +		return;
-> +	}
+With the patch I submitted some time ago
+http://git.kernel.org/?p=bluetooth/bluez.git;a=commit;h=e9b1a8f7266d0674b1ea068a5bb5698e9ee424c9
+there is a code path leading to a double free:
+session_cb -> avdtp_parse_resp -> avdtp_abort_resp ->
+avdtp_sep_set_state(..., AVDTP_STATE_IDLE) -> handle_unanswered_req
 
-Please try to at least do a compile check before you submit patches.
-This one gives the following error:
-audio/avdtp.c: In function ‘handle_unanswered_req’:
-audio/avdtp.c:908: error: comparison between pointer and integer
+A response to AVDTP Abort could lead to the pending request being
+freed both in session_cb and handle_unanswered_req.
 
-What you probably want is session->req->signal_id == AVDTP_ABORT.
+This patch avoids doing it in the latter function. The primary purpose
+of adding handle_unanswered_req was to trigger responses on the Audio
+API (it was based on avdtp.c:request_timeout). AFAIU, AVDTP Abort
+doesn't lead to an API response and will be freed elsewhere
+(session_cb or avdtp_unref).
 
-Johan
+/Daniel
+
+--000e0cd1f8b46a6aa9047ff67700
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-Fix-double-free-on-AVDTP-Abort-response.patch"
+Content-Disposition: attachment;
+	filename="0001-Fix-double-free-on-AVDTP-Abort-response.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_g5v6fbew0
+
+RnJvbSA4MDM2MzdiYzBlNDUyMzkyNDk4NzE0Y2Q4MjQ1YTA2ZjVhZWEyZWRjIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQGdt
+YWlsLmNvbT4KRGF0ZTogRnJpLCAxOSBGZWIgMjAxMCAxNzo1MTo0OCArMDIwMApTdWJqZWN0OiBb
+UEFUQ0hdIEZpeCBkb3VibGUgZnJlZSBvbiBBVkRUUCBBYm9ydCByZXNwb25zZQoKVGhlIHBlbmRp
+bmcgcmVxdWVzdCBtaWdodCBiZSBmcmVlZCB0d2ljZSB3aGVuIHJlY2VpdmluZyBhbiBBYm9ydApy
+ZXNwb25zZSwgaW4gaGFuZGxlX3VuYW5zd2VyZWRfcmVxIGFuZCBzZXNzaW9uX2NiLiBBdm9pZCBm
+cmVlaW5nCml0IGluIGhhbmRsZV91bmFuc3dlcmVkX3JlcS4KLS0tCiBhdWRpby9hdmR0cC5jIHwg
+ICAgNyArKysrKysrCiAxIGZpbGVzIGNoYW5nZWQsIDcgaW5zZXJ0aW9ucygrKSwgMCBkZWxldGlv
+bnMoLSkKCmRpZmYgLS1naXQgYS9hdWRpby9hdmR0cC5jIGIvYXVkaW8vYXZkdHAuYwppbmRleCAy
+NTkxODQ1Li5hZTdjODhlIDEwMDY0NAotLS0gYS9hdWRpby9hdmR0cC5jCisrKyBiL2F1ZGlvL2F2
+ZHRwLmMKQEAgLTkwNSw2ICs5MDUsMTMgQEAgc3RhdGljIHZvaWQgaGFuZGxlX3VuYW5zd2VyZWRf
+cmVxKHN0cnVjdCBhdmR0cCAqc2Vzc2lvbiwKIAlzdHJ1Y3QgYXZkdHBfbG9jYWxfc2VwICpsc2Vw
+OwogCXN0cnVjdCBhdmR0cF9lcnJvciBlcnI7CiAKKwlpZiAoc2Vzc2lvbi0+cmVxID09IEFWRFRQ
+X0FCT1JUKSB7CisJCS8qIEF2b2lkIGZyZWVpbmcgdGhlIEFib3J0IHJlcXVlc3QgaGVyZSAqLwor
+CQlkZWJ1ZygiaGFuZGxlX3VuYW5zd2VyZWRfcmVxOiBBYm9ydCByZXEsIHJldHVybmluZyIpOwor
+CQlzZXNzaW9uLT5yZXEtPnN0cmVhbSA9IE5VTEw7CisJCXJldHVybjsKKwl9CisKIAlyZXEgPSBz
+ZXNzaW9uLT5yZXE7CiAJc2Vzc2lvbi0+cmVxID0gTlVMTDsKIAotLSAKMS42LjAuNAoK
+--000e0cd1f8b46a6aa9047ff67700--
