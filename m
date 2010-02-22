@@ -1,139 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 22 Feb 2010 07:47:00 -0600
-From: Caleb Katz <c2.katz@gmail.com>
-To: Linux-Bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Automatically connect to Bluetooth devices?
-Message-ID: <20100222074700.0c6e0b9c@shogun.epicvoyage.org>
-Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="MP_/HWUxrLhFYCiiVW+gttqEta3"
+From: Tomas Winkler <tomas.winkler@intel.com>
+To: marcel@holtmann.org, linux-bluetooth@vger.kernel.org
+Cc: guy.cohen@intel.com, ron.rindjunsky@intel.com,
+	Tomas Winkler <tomas.winkler@intel.com>
+Subject: [bluetooth-next] bluetooth: hci_sysfs: use strict_strtoul instead of simple_strtoul
+Date: Mon, 22 Feb 2010 15:05:33 +0200
+Message-Id: <1266843933-28802-2-git-send-email-tomas.winkler@intel.com>
+In-Reply-To: <1266843933-28802-1-git-send-email-tomas.winkler@intel.com>
+References: <1266843933-28802-1-git-send-email-tomas.winkler@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---MP_/HWUxrLhFYCiiVW+gttqEta3
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Signed-off-by: Tomas Winkler <tomas.winkler@intel.com>
+---
+ net/bluetooth/hci_sysfs.c |   24 ++++++++++++------------
+ 1 files changed, 12 insertions(+), 12 deletions(-)
 
-Hey,
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index 2bc6f6a..e4bfce5 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -286,11 +286,11 @@ static ssize_t show_idle_timeout(struct device *dev, struct device_attribute *at
+ static ssize_t store_idle_timeout(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
+ {
+ 	struct hci_dev *hdev = dev_get_drvdata(dev);
+-	char *ptr;
+-	__u32 val;
++	unsigned long val;
++	int ret;
+ 
+-	val = simple_strtoul(buf, &ptr, 10);
+-	if (ptr == buf)
++	ret = strict_strtoul(buf, 0, &val);
++	if (ret)
+ 		return -EINVAL;
+ 
+ 	if (val != 0 && (val < 500 || val > 3600000))
+@@ -310,11 +310,11 @@ static ssize_t show_sniff_max_interval(struct device *dev, struct device_attribu
+ static ssize_t store_sniff_max_interval(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
+ {
+ 	struct hci_dev *hdev = dev_get_drvdata(dev);
+-	char *ptr;
+-	__u16 val;
++	unsigned long val;
++	int ret;
+ 
+-	val = simple_strtoul(buf, &ptr, 10);
+-	if (ptr == buf)
++	ret = strict_strtoul(buf, 0, &val);
++	if (ret)
+ 		return -EINVAL;
+ 
+ 	if (val < 0x0002 || val > 0xFFFE || val % 2)
+@@ -337,11 +337,11 @@ static ssize_t show_sniff_min_interval(struct device *dev, struct device_attribu
+ static ssize_t store_sniff_min_interval(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
+ {
+ 	struct hci_dev *hdev = dev_get_drvdata(dev);
+-	char *ptr;
+-	__u16 val;
++	unsigned long val;
++	int ret;
+ 
+-	val = simple_strtoul(buf, &ptr, 10);
+-	if (ptr == buf)
++	ret = strict_strtoul(buf, 0, &val);
++	if (ret)
+ 		return -EINVAL;
+ 
+ 	if (val < 0x0002 || val > 0xFFFE || val % 2)
+-- 
+1.6.0.6
 
-How do I make a Bluetooth keyboard and mouse connect automatically on system startup? If that is not possible (and I would understand security reasons why it would not be), how do I make Bluez/bluetoothd automatically accept their connections?
+---------------------------------------------------------------------
+Intel Israel (74) Limited
 
-In a slightly longer form:
+This e-mail and any attachments may contain confidential material for
+the sole use of the intended recipient(s). Any review or distribution
+by others is strictly prohibited. If you are not the intended
+recipient, please contact the sender and delete all copies.
 
-My Bluetooth keyboard and mouse are able to behave as a standard USB keyboard/mouse (where the Bluetooth connection is hidden from the hardware/software) but the extra features like the scroll wheel and media keys do not work. In order to use them, I have to configure both as Bluetooth devices.
-
-It is easy enough to get them working. My distro (Slackware) already starts bluetoothd at boot, and the command "hidd --search --master" can find both after I press the "Connect" button on each. But that is the problem. I have to run a command after telling them to find the computer. When this combo is the only keyboard and mouse available, it is a little difficult to do that, especially when they automatically disconnect after a timeout in order to conserve battery power.
-
-Last night I got frustrated and wrote a short script that is launched into the background by the local init script. I'm attaching it (rocketfish.sh) for critique but it does increase my system load slightly. Please tell me there is a better way.
-
-I have the hardware address for the keyboard and mouse and have added this to my /etc/bluetooth/hcid.conf as someone elsewhere recommended (I have been unable to find documentation for it):
-
-device 00:02:76:03:3A:EA {
-	name "RocketFish Keyboard";
-	auth enable;
-	encrypt enable;
-}
-
-device 00:02:76:0A:D2:2E {
-	name "RocketFish Mouse";
-}
-
-When I run "bluetoothd -n -d," there are messages that indicate it detects the keyboard and mouse -- even when a key is pressed -- but then it removes their temporary entry.
-
-Obligatory system information:
-Slackware 13/kernel 2.6.29.5 (kernel was from pre-release)
-Bluez v4.47
-Keyboard and Mouse are models RF-BTKB2 and RF-BTMSE2
-My main.conf and hcid.conf are both attached.
-
-Thanks,
-
-Caleb
---MP_/HWUxrLhFYCiiVW+gttqEta3
-Content-Type: application/x-shellscript
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename=rocketfish.sh
-
-IyEvYmluL3NoCgpNT1VTRT0nMDA6MDI6NzY6MDM6M0E6RUEnCktFWUJPQVJEPScwMDowMjo3Njow
-QTpEMjoyRScKCkhDSVRPT0w9Jy91c3IvYmluL2hjaXRvb2wnCkVHUkVQPScvdXNyL2Jpbi9lZ3Jl
-cCcKSElERD0nL3Vzci9iaW4vaGlkZCcKQVdLPScvdXNyL2Jpbi9hd2snCldDPScvdXNyL2Jpbi93
-YycKCmhpZF9odW50KCkgewoJJEhDSVRPT0wgc2NhbnwkQVdLICd7cHJpbnQgJDF9J3x3aGlsZSBy
-ZWFkIExJTkU7IGRvCgkJaWYgWyAieCRMSU5FIiA9PSAieCRNT1VTRSIgLW8gIngkTElORSIgPT0g
-IngkS0VZQk9BUkQiIF07IHRoZW4KCQkJJEhJREQgLS1jb25uZWN0ICRMSU5FCgkJZmkKCWRvbmUK
-fQoKd2hpbGUgL2Jpbi90cnVlOyBkbwoJREVWSUNFUz1gJEhDSVRPT0wgY29ufCRBV0sgJ3twcmlu
-dCAkM30nfCRFR1JFUCAiJE1PVVNFfCRLRVlCT0FSRCJ8JFdDIC1sYAoJaWYgWyAiJERFVklDRVMi
-IC1sdCAyIF07IHRoZW4KCQloaWRfaHVudAoJI2VsaWYgWyAiJERFVklDRVMiIC1lcSAyIF07IHRo
-ZW4KCSMJZXhpdDsKCWZpCgoJc2xlZXAgMQpkb25lCg==
-
---MP_/HWUxrLhFYCiiVW+gttqEta3
-Content-Type: application/octet-stream; name=main.conf
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename=main.conf
-
-W0dlbmVyYWxdCgojIExpc3Qgb2YgcGx1Z2lucyB0aGF0IHNob3VsZCBub3QgYmUgbG9hZGVkIG9u
-IGJsdWV0b290aGQgc3RhcnR1cAojRGlzYWJsZVBsdWdpbnMgPSBuZXR3b3JrLGlucHV0CgojIERl
-ZmF1bHQgYWRhcGVyIG5hbWUKIyAlaCAtIHN1YnN0aXR1dGVkIGZvciBob3N0bmFtZQojICVkIC0g
-c3Vic3RpdHV0ZWQgZm9yIGFkYXB0ZXIgaWQKTmFtZSA9ICVoLSVkCgojIERlZmF1bHQgZGV2aWNl
-IGNsYXNzLiBPbmx5IHRoZSBtYWpvciBhbmQgbWlub3IgZGV2aWNlIGNsYXNzIGJpdHMgYXJlCiMg
-Y29uc2lkZXJlZC4KQ2xhc3MgPSAweDAwMDEwMAoKIyBIb3cgbG9uZyB0byBzdGF5IGluIGRpc2Nv
-dmVyYWJsZSBtb2RlIGJlZm9yZSBnb2luZyBiYWNrIHRvIG5vbi1kaXNjb3ZlcmFibGUKIyBUaGUg
-dmFsdWUgaXMgaW4gc2Vjb25kcy4gRGVmYXVsdCBpcyAxODAsIGkuZS4gMyBtaW51dGVzLgojIDAg
-PSBkaXNhYmxlIHRpbWVyLCBpLmUuIHN0YXkgZGlzY292ZXJhYmxlIGZvcmV2ZXIKRGlzY292ZXJh
-YmxlVGltZW91dCA9IDAKCiMgSG93IGxvbmcgdG8gc3RheSBpbiBwYWlyYWJsZSBtb2RlIGJlZm9y
-ZSBnb2luZyBiYWNrIHRvIG5vbi1kaXNjb3ZlcmFibGUKIyBUaGUgdmFsdWUgaXMgaW4gc2Vjb25k
-cy4gRGVmYXVsdCBpcyAwLgojIDAgPSBkaXNhYmxlIHRpbWVyLCBpLmUuIHN0YXkgcGFpcmFibGUg
-Zm9yZXZlcgpQYWlyYWJsZVRpbWVvdXQgPSAwCgojIFVzZSBzb21lIG90aGVyIHBhZ2UgdGltZW91
-dCB0aGFuIHRoZSBjb250cm9sbGVyIGRlZmF1bHQgb25lCiMgd2hpY2ggaXMgMTYzODQgKDEwIHNl
-Y29uZHMpLgpQYWdlVGltZW91dCA9IDgxOTIKCiMgRGlzY292ZXIgc2NoZWR1bGVyIGludGVydmFs
-IHVzZWQgaW4gQWRhcHRlci5EaXNjb3ZlckRldmljZXMKIyBUaGUgdmFsdWUgaXMgaW4gc2Vjb25k
-cy4gRGVmYXVsdHMgaXMgMCB0byB1c2UgY29udHJvbGxlciBzY2hlZHVsZXIuCiNEaXNjb3ZlclNj
-aGVkdWxlckludGVydmFsID0gMTAKCiMgV2hhdCB2YWx1ZSBzaG91bGQgYmUgYXNzdW1lZCBmb3Ig
-dGhlIGFkYXB0ZXIgUG93ZXJlZCBwcm9wZXJ0eSB3aGVuCiMgU2V0UHJvcGVydHkoUG93ZXJlZCwg
-Li4uKSBoYXNuJ3QgYmVlbiBjYWxsZWQgeWV0LiBEZWZhdWx0cyB0byB0cnVlCkluaXRpYWxseVBv
-d2VyZWQgPSB0cnVlCgojIFJlbWVtYmVyIHRoZSBwcmV2aW91c2x5IHN0b3JlZCBQb3dlcmVkIHN0
-YXRlIHdoZW4gaW5pdGlhbGl6aW5nIGFkYXB0ZXJzClJlbWVtYmVyUG93ZXJlZCA9IHRydWUKCiMg
-VXNlIHZlbmRvciwgcHJvZHVjdCBhbmQgdmVyc2lvbiBpbmZvcm1hdGlvbiBmb3IgRElEIHByb2Zp
-bGUgc3VwcG9ydC4KIyBUaGUgdmFsdWVzIGFyZSBzZXBhcmF0ZWQgYnkgIjoiIGFuZCBWSUQsIFBJ
-RCBhbmQgdmVyc2lvbi4KI0RldmljZUlEID0gMTIzNDo1Njc4OmFiY2QKCiMgRG8gcmV2ZXJzZSBz
-ZXJ2aWNlIGRpc2NvdmVyeSBmb3IgcHJldmlvdXNseSB1bmtub3duIGRldmljZXMgdGhhdCBjb25u
-ZWN0IHRvCiMgdXMuIFRoaXMgb3B0aW9uIGlzIHJlYWxseSBvbmx5IG5lZWRlZCBmb3IgcXVhbGlm
-aWNhdGlvbiBzaW5jZSB0aGUgQklURSB0ZXN0ZXIKIyBkb2Vzbid0IGxpa2UgdXMgZG9pbmcgcmV2
-ZXJzZSBTRFAgZm9yIHNvbWUgdGVzdCBjYXNlcyAodGhvdWdoIHRoZXJlIGNvdWxkIGluCiMgdGhl
-b3J5IGJlIG90aGVyIHVzZWZ1bCBwdXJwb3NlcyBmb3IgdGhpcyB0b28pLiBEZWZhdWx0cyB0byB0
-cnVlLgpSZXZlcnNlU2VydmljZURpc2NvdmVyeSA9IHRydWUKCiMgRW5hYmxlIG5hbWUgcmVzb2x2
-aW5nIGFmdGVyIGlucXVpcnkuIFNldCBpdCB0byAnZmFsc2UnIGlmIHlvdSBkb24ndCBuZWVkCiMg
-cmVtb3RlIGRldmljZXMgbmFtZSBhbmQgd2FudCBzaG9ydGVyIGRpc2NvdmVyeSBjeWNsZS4gRGVm
-YXVsdHMgdG8gJ3RydWUnLgpOYW1lUmVzb2x2aW5nID0gdHJ1ZQo=
-
---MP_/HWUxrLhFYCiiVW+gttqEta3
-Content-Type: application/octet-stream; name=hcid.conf
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename=hcid.conf
-
-IwojIEhDSSBkYWVtb24gY29uZmlndXJhdGlvbiBmaWxlLgojCgojIEhDSWQgb3B0aW9ucwpvcHRp
-b25zIHsKCSMgQXV0b21hdGljYWxseSBpbml0aWFsaXplIG5ldyBkZXZpY2VzCglhdXRvaW5pdCB5
-ZXM7CgoJIyBTZWN1cml0eSBNYW5hZ2VyIG1vZGUKCSMgICBub25lIC0gU2VjdXJpdHkgbWFuYWdl
-ciBkaXNhYmxlZAoJIyAgIGF1dG8gLSBVc2UgbG9jYWwgUElOIGZvciBpbmNvbWluZyBjb25uZWN0
-aW9ucwoJIyAgIHVzZXIgLSBBbHdheXMgYXNrIHVzZXIgZm9yIGEgUElOCgkjCglzZWN1cml0eSB1
-c2VyOwoKCSMgUGFpcmluZyBtb2RlCgkjICAgbm9uZSAgLSBQYWlyaW5nIGRpc2FibGVkCgkjICAg
-bXVsdGkgLSBBbGxvdyBwYWlyaW5nIHdpdGggYWxyZWFkeSBwYWlyZWQgZGV2aWNlcwoJIyAgIG9u
-Y2UgIC0gUGFpciBvbmNlIGFuZCBkZW55IHN1Y2Nlc3NpdmUgYXR0ZW1wdHMKCXBhaXJpbmcgbXVs
-dGk7CgoJIyBEZWZhdWx0IFBJTiBjb2RlIGZvciBpbmNvbWluZyBjb25uZWN0aW9ucwoJcGFzc2tl
-eSAiNjQyMSI7Cn0KCiMgRGVmYXVsdCBzZXR0aW5ncyBmb3IgSENJIGRldmljZXMKZGV2aWNlIHsK
-CSMgTG9jYWwgZGV2aWNlIG5hbWUKCSMgICAlZCAtIGRldmljZSBpZAoJIyAgICVoIC0gaG9zdCBu
-YW1lCgluYW1lICIlaC0lZCI7CgoJIyBMb2NhbCBkZXZpY2UgY2xhc3MKCSNjbGFzcyAweDAwMDEw
-MDsKCWNsYXNzIDB4NTIwMjA0OwoKCSMgRGVmYXVsdCBwYWNrZXQgdHlwZQoJI3BrdF90eXBlIERI
-MSxETTEsSFYxOwoKCSMgSW5xdWlyeSBhbmQgUGFnZSBzY2FuCglpc2NhbiBlbmFibGU7IHBzY2Fu
-IGVuYWJsZTsKCWRpc2NvdnRvIDA7CgoJIyBEZWZhdWx0IGxpbmsgbW9kZQoJIyAgIG5vbmUgICAt
-IG5vIHNwZWNpZmljIHBvbGljeSAKCSMgICBhY2NlcHQgLSBhbHdheXMgYWNjZXB0IGluY29taW5n
-IGNvbm5lY3Rpb25zCgkjICAgbWFzdGVyIC0gYmVjb21lIG1hc3RlciBvbiBpbmNvbWluZyBjb25u
-ZWN0aW9ucywKCSMgICAgICAgICAgICBkZW55IHJvbGUgc3dpdGNoIG9uIG91dGdvaW5nIGNvbm5l
-Y3Rpb25zCglsbSBhY2NlcHQ7CgoJIyBEZWZhdWx0IGxpbmsgcG9saWN5CgkjICAgbm9uZSAgICAt
-IG5vIHNwZWNpZmljIHBvbGljeQoJIyAgIHJzd2l0Y2ggLSBhbGxvdyByb2xlIHN3aXRjaAoJIyAg
-IGhvbGQgICAgLSBhbGxvdyBob2xkIG1vZGUKCSMgICBzbmlmZiAgIC0gYWxsb3cgc25pZmYgbW9k
-ZQoJIyAgIHBhcmsgICAgLSBhbGxvdyBwYXJrIG1vZGUKCWxwIHJzd2l0Y2gsaG9sZCxzbmlmZixw
-YXJrOwp9CgpkZXZpY2UgMDA6MDI6NzY6MDM6M0E6RUEgewoJbmFtZSAiUm9ja2V0RmlzaCBLZXli
-b2FyZCI7CglhdXRoIGVuYWJsZTsKCWVuY3J5cHQgZW5hYmxlOwp9CgpkZXZpY2UgMDA6MDI6NzY6
-MEE6RDI6MkUgewoJbmFtZSAiUm9ja2V0RmlzaCBNb3VzZSI7Cn0K
-
---MP_/HWUxrLhFYCiiVW+gttqEta3--
