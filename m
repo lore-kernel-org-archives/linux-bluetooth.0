@@ -2,73 +2,149 @@ Return-Path: <cyrus@holtmann.org>
 From: Tomas Winkler <tomas.winkler@intel.com>
 To: marcel@holtmann.org, linux-bluetooth@vger.kernel.org
 Cc: guy.cohen@intel.com, ron.rindjunsky@intel.com,
-	Tomas Winkler <tomas.winkler@intel.com>
-Subject: [bluetooth-next] bluetooth: hci_sysfs: use strict_strtoul instead of simple_strtoul
-Date: Mon, 22 Feb 2010 15:05:33 +0200
-Message-Id: <1266843933-28802-2-git-send-email-tomas.winkler@intel.com>
-In-Reply-To: <1266843933-28802-1-git-send-email-tomas.winkler@intel.com>
-References: <1266843933-28802-1-git-send-email-tomas.winkler@intel.com>
+	Gregory Paskar <gregory.paskar@intel.com>
+Subject: [bluetooth-next V2] Bluetooth: handle device reset event
+Date: Mon, 22 Feb 2010 15:05:32 +0200
+Message-Id: <1266843933-28802-1-git-send-email-tomas.winkler@intel.com>
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Signed-off-by: Tomas Winkler <tomas.winkler@intel.com>
----
- net/bluetooth/hci_sysfs.c |   24 ++++++++++++------------
- 1 files changed, 12 insertions(+), 12 deletions(-)
+From: Gregory Paskar <gregory.paskar@intel.com>
 
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index 2bc6f6a..e4bfce5 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -286,11 +286,11 @@ static ssize_t show_idle_timeout(struct device *dev, struct device_attribute *at
- static ssize_t store_idle_timeout(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
- {
- 	struct hci_dev *hdev = dev_get_drvdata(dev);
--	char *ptr;
--	__u32 val;
-+	unsigned long val;
-+	int ret;
+A Bluetooth device experiencing hardware failure may issue
+a HARDWARE_ERROR hci event. The reaction to this event is device
+reset flow implemented in following sequence.
+
+1. Notify: HCI_DEV_DOWN
+2. Reinitialize internal structures.
+3. Call driver flush function
+4. Send HCI reset request to the device.
+5. Send HCI init sequence reset to the device.
+6. Notify HCI_DEV_UP.
+
+Signed-off-by: Gregory Paskar <gregory.paskar@intel.com>
+Signed-off-by: Tomas Winkler <tomas.winkler@intel.com>
+Reviewed-by: Ron Rindjunsky <ron.rindjunsky@intel.com>
+---
+V2:
+1. Fix email typo
+2. Fix style issues
+
+ include/net/bluetooth/hci.h      |    5 ++++
+ include/net/bluetooth/hci_core.h |    2 +
+ net/bluetooth/hci_core.c         |   47 +++++++++++++++++++++++++++++++++++++-
+ net/bluetooth/hci_event.c        |    3 ++
+ 4 files changed, 56 insertions(+), 1 deletions(-)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index ed3aea1..cd23eb4 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -691,6 +691,11 @@ struct hci_ev_cmd_status {
+ 	__le16   opcode;
+ } __attribute__ ((packed));
  
--	val = simple_strtoul(buf, &ptr, 10);
--	if (ptr == buf)
-+	ret = strict_strtoul(buf, 0, &val);
-+	if (ret)
- 		return -EINVAL;
++#define HCI_EV_HARDWARE_ERROR 0x10
++struct hci_ev_hw_error {
++	__u8     hw_code;
++} __attribute__ ((packed));
++
+ #define HCI_EV_ROLE_CHANGE		0x12
+ struct hci_ev_role_change {
+ 	__u8     status;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 7b86094..d2b1cba 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -110,6 +110,8 @@ struct hci_dev {
+ 	struct tasklet_struct	rx_task;
+ 	struct tasklet_struct	tx_task;
  
- 	if (val != 0 && (val < 500 || val > 3600000))
-@@ -310,11 +310,11 @@ static ssize_t show_sniff_max_interval(struct device *dev, struct device_attribu
- static ssize_t store_sniff_max_interval(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
- {
- 	struct hci_dev *hdev = dev_get_drvdata(dev);
--	char *ptr;
--	__u16 val;
-+	unsigned long val;
-+	int ret;
++	struct work_struct 	hw_err_work;
++
+ 	struct sk_buff_head	rx_q;
+ 	struct sk_buff_head	raw_q;
+ 	struct sk_buff_head	cmd_q;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 94ba349..b7c0fbf 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -834,6 +834,51 @@ static int hci_rfkill_set_block(void *data, bool blocked)
+ 	return 0;
+ }
  
--	val = simple_strtoul(buf, &ptr, 10);
--	if (ptr == buf)
-+	ret = strict_strtoul(buf, 0, &val);
-+	if (ret)
- 		return -EINVAL;
++static void hci_device_hw_error(struct hci_dev *hdev)
++{
++	hci_req_lock(hdev);
++
++	/* notify: going down */
++	clear_bit(HCI_UP, &hdev->flags);
++	hci_notify(hdev, HCI_DEV_DOWN);
++
++	tasklet_disable(&hdev->tx_task);
++	skb_queue_purge(&hdev->rx_q);
++	skb_queue_purge(&hdev->cmd_q);
++
++	hci_dev_lock_bh(hdev);
++	inquiry_cache_flush(hdev);
++	hci_conn_hash_flush(hdev);
++	hci_dev_unlock_bh(hdev);
++
++	if (hdev->flush)
++		hdev->flush(hdev);
++
++	/* reset device */
++	atomic_set(&hdev->cmd_cnt, 1);
++	hdev->acl_cnt = 0;
++	hdev->sco_cnt = 0;
++	hci_reset_req(hdev, 0);
++
++	/* init device */
++	atomic_set(&hdev->cmd_cnt, 1);
++	hci_init_req(hdev, 0);
++
++	tasklet_enable(&hdev->tx_task);
++
++	/* notify: going back up */
++	set_bit(HCI_UP, &hdev->flags);
++	hci_notify(hdev, HCI_DEV_UP);
++
++	hci_req_unlock(hdev);
++}
++
++static void hci_hw_err_work(struct work_struct *ws)
++{
++	struct hci_dev *hdev = container_of(ws, struct hci_dev, hw_err_work);
++	hci_device_hw_error(hdev);
++}
++
+ static const struct rfkill_ops hci_rfkill_ops = {
+ 	.set_block = hci_rfkill_set_block,
+ };
+@@ -903,7 +948,7 @@ int hci_register_dev(struct hci_dev *hdev)
+ 	tasklet_init(&hdev->cmd_task, hci_cmd_task,(unsigned long) hdev);
+ 	tasklet_init(&hdev->rx_task, hci_rx_task, (unsigned long) hdev);
+ 	tasklet_init(&hdev->tx_task, hci_tx_task, (unsigned long) hdev);
+-
++	INIT_WORK(&hdev->hw_err_work, hci_hw_err_work);
+ 	skb_queue_head_init(&hdev->rx_q);
+ 	skb_queue_head_init(&hdev->cmd_q);
+ 	skb_queue_head_init(&hdev->raw_q);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 28517ba..e8f48cc 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1953,6 +1953,9 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 	case HCI_EV_REMOTE_HOST_FEATURES:
+ 		hci_remote_host_features_evt(hdev, skb);
+ 		break;
++	case HCI_EV_HARDWARE_ERROR:
++		schedule_work(&hdev->hw_err_work);
++		break;
  
- 	if (val < 0x0002 || val > 0xFFFE || val % 2)
-@@ -337,11 +337,11 @@ static ssize_t show_sniff_min_interval(struct device *dev, struct device_attribu
- static ssize_t store_sniff_min_interval(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
- {
- 	struct hci_dev *hdev = dev_get_drvdata(dev);
--	char *ptr;
--	__u16 val;
-+	unsigned long val;
-+	int ret;
- 
--	val = simple_strtoul(buf, &ptr, 10);
--	if (ptr == buf)
-+	ret = strict_strtoul(buf, 0, &val);
-+	if (ret)
- 		return -EINVAL;
- 
- 	if (val < 0x0002 || val > 0xFFFE || val % 2)
+ 	default:
+ 		BT_DBG("%s event 0x%x", hdev->name, event);
 -- 
 1.6.0.6
 
