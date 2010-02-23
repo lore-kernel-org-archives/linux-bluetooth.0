@@ -1,49 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 23 Feb 2010 10:48:10 -0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCHes] osso-gwobex patches for review
-Message-ID: <20100223134810.GA6157@jh-x301>
-References: <1266762470.25029.2195.camel@localhost.localdomain>
+Date: Tue, 23 Feb 2010 13:58:54 +0100
+From: Jacek Szczech <jszczech@8planet.net>
+To: linux-bluetooth@vger.kernel.org
+Subject: A2DP sink indications + autoclose after suspension
+Message-ID: <20100223125854.GA22065@8planets.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1266762470.25029.2195.camel@localhost.localdomain>
+Content-Type: text/plain; charset=iso-8859-2
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+Hi,
 
-On Sun, Feb 21, 2010, Bastien Nocera wrote:
-> The first patch fixes a few typos.
+I succeeded writing a program that receives a2dp stream (from my mobile
+phone), decodes and sends to stdout using unix/ipc interface. It'll be run on
+old hw without X enviroment, that's why I didn't use already available
+software (like pulseaudio).
 
-Yep, looks good and I've pushed it upstream.
+I faced a few problems connected with suspension of stream:
 
-> The second one requires the openobex patches I posted to the list, but
-> should fail gracefully if the support does not exist.
+1) Unix.c does not support indications (am I right?). How can I detect changes
+of states (e.g. OPEN<->STREAMING)? I can detect suspension with EAGAIN on
+stream_fd but it does not seem to be proper solution. Do you plan to support
+indications in unix/ipc interface?
 
-This patch has some issues:
+2) Will it be possible to get indications concerning OPEN<->STREAMING changes
+on dbus Media interface?
 
-> +    /* Setup low-level USB */
-> +    if (!gw_obex_transport_setup_usb(&handle)) {
-> +        debug("gw_obex_transport_setup_usb() failed, no USB support?\n");
-> +        return NULL;
-> +    }
+3) After suspension of stream (SUSPEND sent from SRC) the stream
+is CLOSEd after about 10 seconds. What part of code disconnects this? Is it a
+way to avoid this? 
 
-You forget to set *error before returning NULL here.
-
-> +    /* Do the transport connection */
-> +    if (OBEX_InterfaceConnect(handle, iface) < 0) {
-> +        debug("Could not connect to USB device '%s'\n", dev);
-> +        if (error)
-> +            *error = GW_OBEX_ERROR_NO_SERVICE;
-> +        return NULL;
-> +    }
-
-This looks like a memory leak since you don't do the same cleanup of ctx->mutex
-and ctx as you do in the other failure cases. Maybe the function could use a
-"fail" label where you jump to for cleanup tasks?
-
-Besides those issues the patch seems ok'ish.
-
-Johan
+regards,
+Jacek
