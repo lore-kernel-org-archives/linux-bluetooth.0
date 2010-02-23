@@ -1,101 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Tue, 23 Feb 2010 12:07:24 +0200
-Message-ID: <2d5a2c101002230207h3e3f5da8p1917c273fb27943a@mail.gmail.com>
-Subject: [PATCH 2/2] Fix pcsuite WHO header
+Date: Tue, 23 Feb 2010 12:06:14 +0200
+Message-ID: <2d5a2c101002230206r5a945ec0hd8b638f171440a33@mail.gmail.com>
+Subject: [PATCH 1/2] Fix service driver selection when WHO header is informed
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=0016e6d99f6f5f7119048041b788
+Content-Type: multipart/mixed; boundary=0016e6d7e8722d103f048041b397
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---0016e6d99f6f5f7119048041b788
+--0016e6d7e8722d103f048041b397
 Content-Type: text/plain; charset=ISO-8859-1
 
+Drivers which support WHO header should be checked first since they have
+priority e.g. pcsuite over ftp.
 ---
- plugins/ftp.c |   10 +++++-----
- 1 files changed, 5 insertions(+), 5 deletions(-)
+ src/service.c |   10 +++++++---
+ 1 files changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/plugins/ftp.c b/plugins/ftp.c
-index e0a3b97..c3a4193 100644
---- a/plugins/ftp.c
-+++ b/plugins/ftp.c
-@@ -93,6 +93,7 @@
- </record>"
+diff --git a/src/service.c b/src/service.c
+index 196a5c1..c6ce101 100644
+--- a/src/service.c
++++ b/src/service.c
+@@ -49,8 +49,8 @@ struct obex_service_driver
+*obex_service_driver_find(GSList *list,
+ 		struct obex_service_driver *driver = l->data;
 
- #define PCSUITE_CHANNEL        24
-+#define PCSUITE_WHO_SIZE 8
- #define PCSUITE_RECORD "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>
-                                 \
- <record>
-         \
-   <attribute id=\"0x0001\">
-         \
-@@ -140,9 +141,8 @@ static const guint8 FTP_TARGET[TARGET_SIZE] = {
- 			0xF9, 0xEC, 0x7B, 0xC4,  0x95, 0x3C, 0x11, 0xD2,
- 			0x98, 0x4E, 0x52, 0x54,  0x00, 0xDC, 0x9E, 0x09  };
+ 		if (driver->who && who &&
+-				driver->who_size == who_size &&
+-				memcmp(driver->who, who, who_size) != 0)
++				(driver->who_size != who_size ||
++				memcmp(driver->who, who, who_size) != 0))
+ 			continue;
 
--static const guint8 PCSUITE_TARGET[TARGET_SIZE] = {
--			0x00, 0x00, 0x50, 0x05, 0x00, 0x00, 0x10, 0x00,
--			0x80, 0x00, 0x00, 0x02, 0xEE, 0x00, 0x00, 0x01 };
-+static const guint8 PCSUITE_WHO[PCSUITE_WHO_SIZE] = {
-+			'P','C',' ','S','u','i','t','e' };
+ 		if (driver->target == NULL && target == NULL)
+@@ -97,7 +97,11 @@ int obex_service_driver_register(struct
+obex_service_driver *driver)
 
- static gint get_by_type(struct obex_session *os, gchar *type, size_t *size)
- {
-@@ -464,8 +464,8 @@ struct obex_service_driver pcsuite = {
- 	.record = PCSUITE_RECORD,
- 	.target = FTP_TARGET,
- 	.target_size = TARGET_SIZE,
--	.who = PCSUITE_TARGET,
--	.who_size = TARGET_SIZE,
-+	.who = PCSUITE_WHO,
-+	.who_size = PCSUITE_WHO_SIZE,
- 	.connect = ftp_connect,
- 	.get = ftp_get,
- 	.put = ftp_put,
+ 	debug("driver %p service %s registered", driver, driver->name);
+
+-	drivers = g_slist_append(drivers, driver);
++	/* Drivers that support who has priority */
++	if (driver->who)
++		drivers = g_slist_prepend(drivers, driver);
++	else
++		drivers = g_slist_append(drivers, driver);
+
+ 	return 0;
+ }
 -- 
 1.6.3.3
-
 
 -- 
 Luiz Augusto von Dentz
 Computer Engineer
 
---0016e6d99f6f5f7119048041b788
-Content-Type: text/x-patch; charset=US-ASCII; name="0002-Fix-pcsuite-WHO-header.patch"
+--0016e6d7e8722d103f048041b397
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-Fix-service-driver-selection-when-WHO-header-is-info.patch"
 Content-Disposition: attachment;
-	filename="0002-Fix-pcsuite-WHO-header.patch"
+	filename="0001-Fix-service-driver-selection-when-WHO-header-is-info.patch"
 Content-Transfer-Encoding: base64
-X-Attachment-Id: f_g60j8hx90
+X-Attachment-Id: f_g60j6o8l0
 
-RnJvbSA0MDMzNGQwNjNmYjM0ZWY2MDg1ODk3YWQ2OThkODNkNWEwODAzNTUxIE1vbiBTZXAgMTcg
+RnJvbSBjY2U2MzM5M2M0MGU1NWRkYmRiYzgyNDFiZGRhZWNkYjVkNzMwNmVmIE1vbiBTZXAgMTcg
 MDA6MDA6MDAgMjAwMQpGcm9tOiBMdWl6IEF1Z3VzdG8gVm9uIERlbnR6IDxsdWl6LmRlbnR6LXZv
-bkBub2tpYS5jb20+CkRhdGU6IE1vbiwgMjIgRmViIDIwMTAgMTc6MzY6NTEgKzAyMDAKU3ViamVj
-dDogW1BBVENIIDIvMl0gRml4IHBjc3VpdGUgV0hPIGhlYWRlcgoKLS0tCiBwbHVnaW5zL2Z0cC5j
-IHwgICAxMCArKysrKy0tLS0tCiAxIGZpbGVzIGNoYW5nZWQsIDUgaW5zZXJ0aW9ucygrKSwgNSBk
-ZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9wbHVnaW5zL2Z0cC5jIGIvcGx1Z2lucy9mdHAuYwpp
-bmRleCBlMGEzYjk3Li5jM2E0MTkzIDEwMDY0NAotLS0gYS9wbHVnaW5zL2Z0cC5jCisrKyBiL3Bs
-dWdpbnMvZnRwLmMKQEAgLTkzLDYgKzkzLDcgQEAKIDwvcmVjb3JkPiIKIAogI2RlZmluZSBQQ1NV
-SVRFX0NIQU5ORUwgICAgICAgIDI0CisjZGVmaW5lIFBDU1VJVEVfV0hPX1NJWkUgOAogI2RlZmlu
-ZSBQQ1NVSVRFX1JFQ09SRCAiPD94bWwgdmVyc2lvbj1cIjEuMFwiIGVuY29kaW5nPVwiVVRGLThc
-IiA/PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKIDxyZWNvcmQ+ICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBcCiAgIDxhdHRyaWJ1dGUgaWQ9XCIweDAwMDFcIj4gICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXApAQCAtMTQwLDkgKzE0MSw4IEBAIHN0
-YXRpYyBjb25zdCBndWludDggRlRQX1RBUkdFVFtUQVJHRVRfU0laRV0gPSB7CiAJCQkweEY5LCAw
-eEVDLCAweDdCLCAweEM0LCAgMHg5NSwgMHgzQywgMHgxMSwgMHhEMiwKIAkJCTB4OTgsIDB4NEUs
-IDB4NTIsIDB4NTQsICAweDAwLCAweERDLCAweDlFLCAweDA5ICB9OwogCi1zdGF0aWMgY29uc3Qg
-Z3VpbnQ4IFBDU1VJVEVfVEFSR0VUW1RBUkdFVF9TSVpFXSA9IHsKLQkJCTB4MDAsIDB4MDAsIDB4
-NTAsIDB4MDUsIDB4MDAsIDB4MDAsIDB4MTAsIDB4MDAsCi0JCQkweDgwLCAweDAwLCAweDAwLCAw
-eDAyLCAweEVFLCAweDAwLCAweDAwLCAweDAxIH07CitzdGF0aWMgY29uc3QgZ3VpbnQ4IFBDU1VJ
-VEVfV0hPW1BDU1VJVEVfV0hPX1NJWkVdID0geworCQkJJ1AnLCdDJywnICcsJ1MnLCd1JywnaScs
-J3QnLCdlJyB9OwogCiBzdGF0aWMgZ2ludCBnZXRfYnlfdHlwZShzdHJ1Y3Qgb2JleF9zZXNzaW9u
-ICpvcywgZ2NoYXIgKnR5cGUsIHNpemVfdCAqc2l6ZSkKIHsKQEAgLTQ2NCw4ICs0NjQsOCBAQCBz
-dHJ1Y3Qgb2JleF9zZXJ2aWNlX2RyaXZlciBwY3N1aXRlID0gewogCS5yZWNvcmQgPSBQQ1NVSVRF
-X1JFQ09SRCwKIAkudGFyZ2V0ID0gRlRQX1RBUkdFVCwKIAkudGFyZ2V0X3NpemUgPSBUQVJHRVRf
-U0laRSwKLQkud2hvID0gUENTVUlURV9UQVJHRVQsCi0JLndob19zaXplID0gVEFSR0VUX1NJWkUs
-CisJLndobyA9IFBDU1VJVEVfV0hPLAorCS53aG9fc2l6ZSA9IFBDU1VJVEVfV0hPX1NJWkUsCiAJ
-LmNvbm5lY3QgPSBmdHBfY29ubmVjdCwKIAkuZ2V0ID0gZnRwX2dldCwKIAkucHV0ID0gZnRwX3B1
-dCwKLS0gCjEuNi4zLjMKCg==
---0016e6d99f6f5f7119048041b788--
+bkBub2tpYS5jb20+CkRhdGU6IE1vbiwgMjIgRmViIDIwMTAgMTc6MjY6MjYgKzAyMDAKU3ViamVj
+dDogW1BBVENIIDEvMl0gRml4IHNlcnZpY2UgZHJpdmVyIHNlbGVjdGlvbiB3aGVuIFdITyBoZWFk
+ZXIgaXMgaW5mb3JtZWQKCkRyaXZlcnMgd2hpY2ggc3VwcG9ydCBXSE8gaGVhZGVyIHNob3VsZCBi
+ZSBjaGVja2VkIGZpcnN0IHNpbmNlIHRoZXkgaGF2ZQpwcmlvcml0eSBlLmcuIHBjc3VpdGUgb3Zl
+ciBmdHAuCi0tLQogc3JjL3NlcnZpY2UuYyB8ICAgMTAgKysrKysrKy0tLQogMSBmaWxlcyBjaGFu
+Z2VkLCA3IGluc2VydGlvbnMoKyksIDMgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvc3JjL3Nl
+cnZpY2UuYyBiL3NyYy9zZXJ2aWNlLmMKaW5kZXggMTk2YTVjMS4uYzZjZTEwMSAxMDA2NDQKLS0t
+IGEvc3JjL3NlcnZpY2UuYworKysgYi9zcmMvc2VydmljZS5jCkBAIC00OSw4ICs0OSw4IEBAIHN0
+cnVjdCBvYmV4X3NlcnZpY2VfZHJpdmVyICpvYmV4X3NlcnZpY2VfZHJpdmVyX2ZpbmQoR1NMaXN0
+ICpsaXN0LAogCQlzdHJ1Y3Qgb2JleF9zZXJ2aWNlX2RyaXZlciAqZHJpdmVyID0gbC0+ZGF0YTsK
+IAogCQlpZiAoZHJpdmVyLT53aG8gJiYgd2hvICYmCi0JCQkJZHJpdmVyLT53aG9fc2l6ZSA9PSB3
+aG9fc2l6ZSAmJgotCQkJCW1lbWNtcChkcml2ZXItPndobywgd2hvLCB3aG9fc2l6ZSkgIT0gMCkK
+KwkJCQkoZHJpdmVyLT53aG9fc2l6ZSAhPSB3aG9fc2l6ZSB8fAorCQkJCW1lbWNtcChkcml2ZXIt
+Pndobywgd2hvLCB3aG9fc2l6ZSkgIT0gMCkpCiAJCQljb250aW51ZTsKIAogCQlpZiAoZHJpdmVy
+LT50YXJnZXQgPT0gTlVMTCAmJiB0YXJnZXQgPT0gTlVMTCkKQEAgLTk3LDcgKzk3LDExIEBAIGlu
+dCBvYmV4X3NlcnZpY2VfZHJpdmVyX3JlZ2lzdGVyKHN0cnVjdCBvYmV4X3NlcnZpY2VfZHJpdmVy
+ICpkcml2ZXIpCiAKIAlkZWJ1ZygiZHJpdmVyICVwIHNlcnZpY2UgJXMgcmVnaXN0ZXJlZCIsIGRy
+aXZlciwgZHJpdmVyLT5uYW1lKTsKIAotCWRyaXZlcnMgPSBnX3NsaXN0X2FwcGVuZChkcml2ZXJz
+LCBkcml2ZXIpOworCS8qIERyaXZlcnMgdGhhdCBzdXBwb3J0IHdobyBoYXMgcHJpb3JpdHkgKi8K
+KwlpZiAoZHJpdmVyLT53aG8pCisJCWRyaXZlcnMgPSBnX3NsaXN0X3ByZXBlbmQoZHJpdmVycywg
+ZHJpdmVyKTsKKwllbHNlCisJCWRyaXZlcnMgPSBnX3NsaXN0X2FwcGVuZChkcml2ZXJzLCBkcml2
+ZXIpOwogCiAJcmV0dXJuIDA7CiB9Ci0tIAoxLjYuMy4zCgo=
+--0016e6d7e8722d103f048041b397--
