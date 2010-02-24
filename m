@@ -1,54 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <367108.65360.qm@web52604.mail.re2.yahoo.com>
-Date: Wed, 24 Feb 2010 14:23:37 -0800 (PST)
+Message-ID: <236059.54740.qm@web52607.mail.re2.yahoo.com>
+Date: Wed, 24 Feb 2010 13:50:04 -0800 (PST)
 From: Ed Tsang <netdesign_98@yahoo.com>
-Subject: Re: obexd 0.14  "put" file corruption
+Subject: obexd 0.14  "put" file corruption
 To: Bluettooth Linux <linux-bluetooth@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi, 
+I am using obexd 0.14 to push files into phone. The image file received by some phone seem a bit strange and in some phone it could not be display at all. So I tried a simple text file with line number as text. Then I saw the file received from the phone is corrupted. Looking into the hcidump look like the second "Put cmd" and forward, the first "0xc8" bytes was not copied (stay the same as the firs put cmd).
+  Anyone know if this is a known problem in 0.14 or fixed in the latest (obexd 0.20).
 
-
->I am using obexd 0.14 to push files into phone. The image file received by some phone seem a bit strange and in some phone it could not be >display at all. So I tried a simple text file with line number as text. Then I saw the file received from the phone is corrupted. Looking into the >hcidump look like the second "Put cmd" and forward, the first "0xc8" bytes was not copied (stay the same as the firs put cmd).
->  Anyone know if this is a known problem in 0.14 or fixed in the latest (obexd 0.20).
- Installed the obexd o.20. Same problem???
--------------------------- first put
-     RFCOMM(d): UIH: cr 1 dlci 12 pf 0 ilen 303 fcs 0x4f 
-        OBEX: Put cmd(c): len 3922
-        Name (0x01) = Unicode length 12
-        0000: 00 74 00 2e 00 74 00 78  00 74 00 00              .t...t.x.t..
-        Length (0xc3) = 8208
-        Body (0x48) = Sequence length 3896
-        0000: 30 30 20 66 69 72 73 74  20 6c 69 6e 65 20 20 0a  00 first line  .
-        0010: 31 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  1              .
-
-...................... second put  (after 0xc8 is fine)
-      RFCOMM(d): UIH: cr 1 dlci 12 pf 0 ilen 283 fcs 0x4f 
-        OBEX: Put cmd(c): len 3902 (continue)
-        Body (0x48) = Sequence length 3896
-        0000: 30 30 20 66 69 72 73 74  20 6c 69 6e 65 20 20 0a  00 first line  .
-        0010: 31 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  1              .
-        0020: 32 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  2              .
-        0030: 33 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  3              .
-        0040: 34 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  4              .
-        0050: 35 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  5              .
-        0060: 36 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  6              .
-        0070: 37 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  7              .
-        0080: 38 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  8              .
-        0090: 39 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  9              .
-        00a0: 41 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  A              .
-        00b0: 42 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  B              .
-        00c0: 43 20 20 20 20 20 20 20  31 30 30 20 73 65 63 6f  C       100 seco
-        00d0: 6e 64 20 70 61 67 65 0a  31 20 20 20 20 20 20 20  nd page.1       
-        00e0: 20 20 20 20 20 20 32 0a  32 20 20 20 20 20 20 20        2.2      
-
-Anyone bump into this?? look like the start of copying problem...
-
+Thanks,
 Ed
 
 
 
       __________________________________________________________________
-Make your browsing faster, safer, and easier with the new Internet Explorer® 8. Optimized for Yahoo! Get it Now for Free! at http://downloads.yahoo.com/ca/internetexplorer/
+Get the name you've always wanted @ymail.com or @rocketmail.com! Go to http://ca.promos.yahoo.com/jacko/
+
