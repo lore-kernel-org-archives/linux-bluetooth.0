@@ -1,49 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 26 Feb 2010 09:20:43 +0000 (GMT)
-To: Nick Pelly <npelly@google.com>
-Cc: Ville Tervo <ville.tervo@nokia.com>, Marcel Holtmann <marcel@holtmann.org>, "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Bluetooth: Allow SCO/eSCO packet type selection for
- outgoing SCO connections.
-In-Reply-To: <35c90d961002251705j2cd95a8cjc7d10aa432a49f4@mail.gmail.com>
-References: <1265918068-14721-1-git-send-email-npelly@google.com>  <35c90d961002111159h6727bc2cw28b55ce6e919fb4f@mail.gmail.com>  <35c90d961002151315i5fc0f5b9y36aaba4415987a2f@mail.gmail.com>  <4B7BB746.1040806@nokia.com> <35c90d961002170849m1d13743fg725a87594d63b80c@mail.gmail.com>
-  <1266427894.8849.66.camel@localhost.localdomain> <35c90d961002181547x1ea26ba7je4eee29ef29e6fd2@mail.gmail.com>  <4B7E46FC.5030408@nokia.com> <35c90d961002191323x50203ca1x8ed709b3f128e41d@mail.gmail.com>  <4B82380A.6040204@nokia.com>
- <35c90d961002251705j2cd95a8cjc7d10aa432a49f4@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Message-Id: <1267176043.538008.21230.nullmailer@galant.ukfsn.org>
-From: Iain Hibbert <plunky@rya-online.net>
+In-Reply-To: <367108.65360.qm@web52604.mail.re2.yahoo.com>
+References: <367108.65360.qm@web52604.mail.re2.yahoo.com>
+Date: Fri, 26 Feb 2010 10:41:56 +0200
+Message-ID: <2d5a2c101002260041n472b3d23m10f9048f69ea1b23@mail.gmail.com>
+Subject: Re: obexd 0.14 "put" file corruption
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Ed Tsang <netdesign_98@yahoo.com>
+Cc: Bluettooth Linux <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 25 Feb 2010, Nick Pelly wrote:
+Hi,
 
-> On Sun, Feb 21, 2010 at 11:53 PM, Ville Tervo <ville.tervo@nokia.com> wrote:
-> > Nick Pelly wrote:
-> >>>>
-> >>>> Attached is a new patch with the consistent bit logic.
-> >>>>
-> >>>> Comments?
-> >>>
-> >>> In order to keep backwards compatibility 1 should mean "don't allow this
-> >>> packet type" for all packets. Other wise old application with new kernel
-> >>> would not allow any packet types.
-> >>
-> >> The current patch achieves this backwards compatibility by assuming
-> >> that all packet types are allowed if the old sockaddr_sco struct is
-> >> used (it checks the size), or if sco_pkt_type is 0.
-> >
-> > OK. Then my concerns are gone.
+On Thu, Feb 25, 2010 at 12:23 AM, Ed Tsang <netdesign_98@yahoo.com> wrote:
 >
-> As best I can tell there are no objections. We're going ahead with this patch.
 >
-> http://android.git.kernel.org/?p=kernel/common.git;a=commit;h=3b077241e02041b1f03fee912896b8de1d7ac096
+>>I am using obexd 0.14 to push files into phone. The image file received by some phone seem a bit strange and in some phone it could not be >display at all. So I tried a simple text file with line number as text. Then I saw the file received from the phone is corrupted. Looking into the >hcidump look like the second "Put cmd" and forward, the first "0xc8" bytes was not copied (stay the same as the firs put cmd).
+>>  Anyone know if this is a known problem in 0.14 or fixed in the latest (obexd 0.20).
+>  Installed the obexd o.20. Same problem???
+> -------------------------- first put
+>     RFCOMM(d): UIH: cr 1 dlci 12 pf 0 ilen 303 fcs 0x4f
+>        OBEX: Put cmd(c): len 3922
+>        Name (0x01) = Unicode length 12
+>        0000: 00 74 00 2e 00 74 00 78  00 74 00 00              .t...t.x.t..
+>        Length (0xc3) = 8208
+>        Body (0x48) = Sequence length 3896
+>        0000: 30 30 20 66 69 72 73 74  20 6c 69 6e 65 20 20 0a  00 first line  .
+>        0010: 31 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  1              .
+>
+> ...................... second put  (after 0xc8 is fine)
+>      RFCOMM(d): UIH: cr 1 dlci 12 pf 0 ilen 283 fcs 0x4f
+>        OBEX: Put cmd(c): len 3902 (continue)
+>        Body (0x48) = Sequence length 3896
+>        0000: 30 30 20 66 69 72 73 74  20 6c 69 6e 65 20 20 0a  00 first line  .
+>        0010: 31 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  1              .
+>        0020: 32 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  2              .
+>        0030: 33 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  3              .
+>        0040: 34 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  4              .
+>        0050: 35 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  5              .
+>        0060: 36 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  6              .
+>        0070: 37 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  7              .
+>        0080: 38 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  8              .
+>        0090: 39 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  9              .
+>        00a0: 41 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  A              .
+>        00b0: 42 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  B              .
+>        00c0: 43 20 20 20 20 20 20 20  31 30 30 20 73 65 63 6f  C       100 seco
+>        00d0: 6e 64 20 70 61 67 65 0a  31 20 20 20 20 20 20 20  nd page.1
+>        00e0: 20 20 20 20 20 20 32 0a  32 20 20 20 20 20 20 20        2.2
+>
+> Anyone bump into this?? look like the start of copying problem...
 
-FWIW (I am not a Linux, Android or BlueZ developer) I think abusing the
-socket address structure for this is wrong and a socket option should be
-used to set options for the socket.
+Weird, are you sure the client is sending this properly? Anyway we do
+store the data in a buffer even if was sent together with put cmd, Im
+very suspicious that this is not the problem since we would have
+notice this before. Btw obexd does not push/send files obex-client
+does, are you talking about obex-client?
 
-In general, the "Address Family" AF_BLUETOOTH domain sockets should all
-use the same socket address structure. That BlueZ/Linux does not and never
-has done so should be considered a bug.
-
-regards,
-iain
+-- 
+Luiz Augusto von Dentz
+Computer Engineer
