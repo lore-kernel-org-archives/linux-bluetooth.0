@@ -1,157 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4B87A10C.4070100@nokia.com>
-Date: Fri, 26 Feb 2010 12:23:08 +0200
-From: Ville Tervo <ville.tervo@nokia.com>
 MIME-Version: 1.0
-To: ext Nick Pelly <npelly@google.com>
-CC: Dave Young <hidave.darkstar@gmail.com>,
-	Bluettooth Linux <linux-bluetooth@vger.kernel.org>
-Subject: Re: Kernel panic in rfcomm_run - unbalanced refcount on 	rfcomm_session
-References: <35c90d961002172104q3af1ca8p850004f8b93e8af7@mail.gmail.com> 	<a8e1da1002200017t6e856c7cu1300ac5b3b3a43b@mail.gmail.com> <35c90d961002211300s25507542y9b73724881be5540@mail.gmail.com>
-In-Reply-To: <35c90d961002211300s25507542y9b73724881be5540@mail.gmail.com>
-Content-Type: multipart/mixed;
- boundary="------------090600040003040804080802"
+Date: Fri, 26 Feb 2010 11:26:32 +0200
+Message-ID: <508e92ca1002260126r600ff956hb18c333504fe6525@mail.gmail.com>
+Subject: lockdep warns: inconsistent lock state ({IN-SOFTIRQ-W} ->
+	{SOFTIRQ-ON-W})
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------090600040003040804080802
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Hi,
 
-Nick Pelly wrote:
-> On Sat, Feb 20, 2010 at 12:17 AM, Dave Young <hidave.darkstar@gmail.com> wrote:
->> On Thu, Feb 18, 2010 at 1:04 PM, Nick Pelly <npelly@google.com> wrote:
->>> Since 2.6.32 we are seeing kernel panics like:
->>>
->>> [10651.110229] Unable to handle kernel paging request at virtual
->>> address 6b6b6b6b
->>> [10651.111968] Internal error: Oops: 5 [#1] PREEMPT
->>> [10651.113952] CPU: 0    Tainted: G        W   (2.6.32-59979-gd0c97db #1)
->>> [10651.114624] PC is at rfcomm_run+0xa04/0xdbc
->>> <...>
->>> [10651.406188] [<c031ad24>] (rfcomm_run+0xa04/0xdbc) from [<c006ce30>]
->>> (kthread+0x78/0x80)
->>> [10651.406585] [<c006ce30>] (kthread+0x78/0x80) from [<c002793c>]
->>> (kernel_thread_exit+0x0/0x8)
->>>
->>> (rfcomm_run() is all inlined so theres not much of a stack trace))
+Enabling locking debug we have triggered warning below:
 
-l2cap socket status might change while rfcomm is processing frames. And 
-that makes rfcomm_process_rx to do double rfcomm_session_put() for 
-incoming session reference. We cannot use sk_state.
-
-Could you try with this patch if it helps to your problems also? My OPP 
-problems went away with this patch.
-
-I moved rfcomm_session_put() for incoming session to 
-rfcomm_session_close in order to get more clear _hold()/_put() pairs.
-
--- 
-Ville
-
-
---------------090600040003040804080802
-Content-Type: text/x-patch;
- name="0001-Bluetooth-Drop-rfcomm-session-reference-only-once-fo.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename*0="0001-Bluetooth-Drop-rfcomm-session-reference-only-once-fo.pa";
- filename*1="tch"
-
->From e713b2e8ae93aa46465984237247698d18f6a671 Mon Sep 17 00:00:00 2001
-From: Ville Tervo <ville.tervo@nokia.com>
-Date: Fri, 26 Feb 2010 12:21:01 +0200
-Subject: [PATCH] Bluetooth: Drop rfcomm session reference only once for incoming session
-
-Move decision to drop reference for incoming session to
-rfcomm_session_close to get more clear
-rfcomm_session_hold()/rfcomm_session_put() pairs.
-
-Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
----
- net/bluetooth/rfcomm/core.c |   23 ++++++++++-------------
- 1 files changed, 10 insertions(+), 13 deletions(-)
-
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index 89f4a59..adccd92 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -662,6 +662,9 @@ static void rfcomm_session_close(struct rfcomm_session *s, int err)
- 
- 	BT_DBG("session %p state %ld err %d", s, s->state, err);
- 
-+	if (s->state == BT_CLOSED)
-+		return;
-+
- 	rfcomm_session_hold(s);
- 
- 	s->state = BT_CLOSED;
-@@ -674,6 +677,11 @@ static void rfcomm_session_close(struct rfcomm_session *s, int err)
- 	}
- 
- 	rfcomm_session_clear_timer(s);
-+
-+	/* Drop reference for incoming sessions */
-+	if (!s->initiator)
-+		rfcomm_session_put(s);
-+
- 	rfcomm_session_put(s);
- }
- 
-@@ -1150,11 +1158,7 @@ static int rfcomm_recv_ua(struct rfcomm_session *s, u8 dlci)
- 			break;
- 
- 		case BT_DISCONN:
--			/* When socket is closed and we are not RFCOMM
--			 * initiator rfcomm_process_rx already calls
--			 * rfcomm_session_put() */
--			if (s->sock->sk->sk_state != BT_CLOSED)
--				rfcomm_session_put(s);
-+			rfcomm_session_close(s, 0);
- 			break;
- 		}
- 	}
-@@ -1185,7 +1189,6 @@ static int rfcomm_recv_dm(struct rfcomm_session *s, u8 dlci)
- 		else
- 			err = ECONNRESET;
- 
--		s->state = BT_CLOSED;
- 		rfcomm_session_close(s, err);
- 	}
- 	return 0;
-@@ -1220,7 +1223,6 @@ static int rfcomm_recv_disc(struct rfcomm_session *s, u8 dlci)
- 		else
- 			err = ECONNRESET;
- 
--		s->state = BT_CLOSED;
- 		rfcomm_session_close(s, err);
- 	}
- 
-@@ -1845,12 +1847,8 @@ static inline void rfcomm_process_rx(struct rfcomm_session *s)
- 		rfcomm_recv_frame(s, skb);
- 	}
- 
--	if (sk->sk_state == BT_CLOSED) {
--		if (!s->initiator)
--			rfcomm_session_put(s);
--
-+	if (sk->sk_state == BT_CLOSED)
- 		rfcomm_session_close(s, sk->sk_err);
--	}
- }
- 
- static inline void rfcomm_accept_connection(struct rfcomm_session *s)
-@@ -1904,7 +1902,6 @@ static inline void rfcomm_check_connection(struct rfcomm_session *s)
- 		break;
- 
- 	case BT_CLOSED:
--		s->state = BT_CLOSED;
- 		rfcomm_session_close(s, sk->sk_err);
- 		break;
- 	}
--- 
-1.6.4.4
-
-
---------------090600040003040804080802--
+[ 2917.827178] =================================
+[ 2917.833068] [ INFO: inconsistent lock state ]
+[ 2917.837432] 2.6.32 #54
+[ 2917.841125] ---------------------------------
+[ 2917.845520] inconsistent {IN-SOFTIRQ-W} -> {SOFTIRQ-ON-W} usage.
+[ 2917.851562] krfcommd/1516 [HC0[0]:SC0[0]:HE1:SE1] takes:
+[ 2917.856903]  (slock-AF_BLUETOOTH){+.?...}, at: [<bf057b50>]
+rfcomm_sk_state_change+0x78/0x160 [rfcomm]
+[ 2917.866363] {IN-SOFTIRQ-W} state was registered at:
+[ 2917.871276]   [<c008d33c>] mark_lock+0x298/0x630
+[ 2917.875946]   [<c008ed3c>] __lock_acquire+0x5f4/0x175c
+[ 2917.881134]   [<c008ff0c>] lock_acquire+0x68/0x7c
+[ 2917.885864]   [<c036938c>] _spin_lock+0x48/0x58
+[ 2917.890441]   [<bf025960>] l2cap_conn_start+0x80/0x388 [l2cap]
+[ 2917.896362]   [<bf028f44>] l2cap_recv_frame+0x1c58/0x2fe0 [l2cap]
+[ 2917.902526]   [<bf02a3cc>] l2cap_recv_acldata+0x100/0x350 [l2cap]
+[ 2917.908691]   [<bf0035a8>] hci_rx_task+0x244/0x478 [bluetooth]
+[ 2917.914642]   [<c006c4d0>] tasklet_action+0x78/0xd8
+[ 2917.919555]   [<c006cc34>] __do_softirq+0xa8/0x154
+[ 2917.924407]   [<c006cd40>] irq_exit+0x60/0xb4
+[ 2917.928802]   [<c0030078>] asm_do_IRQ+0x78/0x90
+[ 2917.933380]   [<c0030af0>] __irq_svc+0x50/0xbc
+[ 2917.937866]   [<c0043c74>] omap3_enter_idle_bm+0x1d0/0x238
+[ 2917.943389]   [<c029ee94>] cpuidle_idle_call+0xb4/0x114
+[ 2917.948669]   [<c00320b0>] cpu_idle+0x58/0xac
+[ 2917.953063]   [<c0360b18>] rest_init+0x70/0x84
+[ 2917.957550]   [<c00089fc>] start_kernel+0x2b4/0x318
+[ 2917.962493]   [<80008034>] 0x80008034
+[ 2917.966186] irq event stamp: 312
+[ 2917.969421] hardirqs last  enabled at (312): [<c03691ac>]
+_spin_unlock_irqrestore+0x44/0x70
+[ 2917.977844] hardirqs last disabled at (311): [<c036947c>]
+_spin_lock_irqsave+0x24/0x68
+[ 2917.985809] softirqs last  enabled at (261): [<c006ccc8>]
+__do_softirq+0x13c/0x154
+[ 2917.993438] softirqs last disabled at (244): [<c006cde8>]
+do_softirq+0x54/0x78
+[ 2918.000732]
+[ 2918.000732] other info that might help us debug this:
+[ 2918.007293] 2 locks held by krfcommd/1516:
+[ 2918.011413]  #0:  (rfcomm_mutex){+.+.+.}, at: [<bf054df4>]
+rfcomm_run+0x1f0/0xb00 [rfcomm]
+[ 2918.019805]  #1:  (&d->lock){+.+...}, at: [<bf055220>]
+rfcomm_run+0x61c/0xb00 [rfcomm]
+[ 2918.027832]
+[ 2918.027832] stack backtrace:
+[ 2918.032226] Backtrace:
+[ 2918.034729] [<c00348d0>] (dump_backtrace+0x0/0x110) from [<c036616c>]
+(dump_stack+0x18/0x1c)
+[ 2918.043212]  r7:dc8f6c00 r6:c0425252 r5:00000001 r4:00000001
+[ 2918.048950] [<c0366154>] (dump_stack+0x0/0x1c) from [<c008d060>]
+(print_usage_bug+0x178/0x1bc)
+[ 2918.057617] [<c008cee8>] (print_usage_bug+0x0/0x1bc) from [<c008d408>]
+(mark_lock+0x364/0x630)
+[ 2918.066284] [<c008d0a4>] (mark_lock+0x0/0x630) from [<c008edcc>]
+(__lock_acquire+0x684/0x175c)
+[ 2918.074951] [<c008e748>] (__lock_acquire+0x0/0x175c) from [<c008ff0c>]
+(lock_acquire+0x68/0x7c)
+[ 2918.083709] [<c008fea4>] (lock_acquire+0x0/0x7c) from [<c036938c>]
+(_spin_lock+0x48/0x58)
+[ 2918.091949]  r7:dba9402c r6:dba5c3c0 r5:dba9402c r4:bf057b50
+[ 2918.097717] [<c0369344>] (_spin_lock+0x0/0x58) from [<bf057b50>]
+(rfcomm_sk_state_change+0x78/0x160 [rfcomm])
+[ 2918.107696]  r5:dba94000 r4:00000000
+[ 2918.111358] [<bf057ad8>] (rfcomm_sk_state_change+0x0/0x160 [rfcomm]) from
+[<bf055238>] (rfcomm_run+0x634/0xb00 [rfcomm])
+[ 2918.122283]  r7:dba5c450 r6:dba5d6c0 r5:dba5c3c0 r4:dba5c430
+[ 2918.128051] [<bf054c04>] (rfcomm_run+0x0/0xb00 [rfcomm]) from [<c007cc10>]
+(kthread+0x88/0x90)
+[ 2918.136749] [<c007cb88>] (kthread+0x0/0x90) from [<c006a86c>]
+(do_exit+0x0/0x678)
+[ 2918.144256]  r7:00000000 r6:00000000 r5:00000000 r4:00000000
