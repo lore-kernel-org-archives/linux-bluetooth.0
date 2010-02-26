@@ -1,47 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4b87e4aa.1408c00a.502e.056f@mx.google.com>
 MIME-Version: 1.0
-In-Reply-To: <8a7a8d7b1002171330m7d1549deye643aecad10c5822@mail.gmail.com>
-References: <8a7a8d7b1002171330m7d1549deye643aecad10c5822@mail.gmail.com>
-Date: Fri, 26 Feb 2010 18:19:34 -0600
-Message-ID: <8a7a8d7b1002261619s497fd87al5232ea0957037d94@mail.gmail.com>
-Subject: Re: What's the idea of security_cfm is called for both
-	hci_proto_auth_cfm and hci_proto_encrypt_cfm? -resend
-From: Liejun Tao <liejuntao001@gmail.com>
-To: Bluettooth Linux <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Bao Liang <tim.bao@gmail.com>
+Subject: Re: [PATCH] Allow disable park state in main.conf
+Date: Fri, 26 Feb 2010 23:11:37 +0800
+To: Johan Hedberg <johan.hedberg@gmail.com>, <marcel@holtmann.org>
+CC: <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Feb 17, 2010 at 3:30 PM, Liejun Tao <liejuntao001@gmail.com> wrote:
-> Hi Marcel,
-> Beside the l2cap issue with Blackberry 8900, I meet another l2cap
-> connection failure issue when testing
-> PTS AVRCP_TC_TG_PTT_BV_01_I.
->
-> For 8900, the sequence is:
-> l2cap_do_start(): send L2CAP_INFO_REQ
-> security_cfm(): send L2CAP_CONN_REQ
-> l2cap_information_rsp(): call l2cap_do_start(), send L2CAP_CONN_REQ again
->
-> For PTS AVRCP_TC_TG_PTT_BV_01_I, the sequence is:
-> l2cap_do_start(): send L2CAP_CONN_REQ
-> security_cfm():send L2CAP_CONN_REQ again
-> l2cap_conn_rsp(): receive L2CAP_CR_PEND
-> l2cap_conn_rsp(): receive L2CAP_CR_NO_MEM
->
-> In both cases, security_cfm() is called from hci_proto_encrypt_cfm(),
-> and interrupt the normal sequence of l2cap connection.
->
-> security_cfm() is also called in hci_proto_auth_cfm. I feel auth_cfm
-> and encryption_cfm are for different events, why they call the same
-> function?
->
-> What's your mind to avoid 2 connection request?
->
-> Aside, should we set a state bit after send l2CAP_CONN_REQ?
->
+Thanks for your comment . The reason I do this is that only park mode makes=
+ trouble when used  by certain models as far as I know . But I'm open to  m=
+ake this parameter an hex value if it make more sense .
 
-Ping.
+----- =E5=8E=9F=E5=A7=8B=E9=82=AE=E4=BB=B6 -----
+=E5=8F=91=E4=BB=B6=E4=BA=BA: Johan Hedberg <johan.hedberg@gmail.com>
+=E5=8F=91=E9=80=81=E6=97=B6=E9=97=B4: 2010=E5=B9=B42=E6=9C=8826=E6=97=A5 22=
+:38
+=E6=94=B6=E4=BB=B6=E4=BA=BA: Liang Bao <tim.bao@gmail.com>; marcel@holtmann=
+.org
+=E6=8A=84=E9=80=81: linux-bluetooth@vger.kernel.org
+=E4=B8=BB=E9=A2=98: Re: [PATCH] Allow disable park state in main.conf
 
-Hi Marcel,
-Any idea how to resolve these 2 issues?
+Hi,
+
+On Fri, Feb 26, 2010, Liang Bao wrote:
+> Currently BlueZ is hard-coding the default link policy to include
+> hold mode, role switch, sniff mode and park state. However, some
+> device will have problem to maintain the connection or setup SCO
+> if they are in park state. Making the park state configurable in
+> main.conf improves flexibility so it can be disabled when needed.
+>=20
+> Signed-off-by: Tim Bao <tim.bao@gmail.com>
+> ---
+>  src/main.c    |   13 +++++++++----
+>  src/main.conf |    5 +++++
+>  2 files changed, 14 insertions(+), 4 deletions(-)
+
+In principle the patch looks ok to me, however we might want to discuss
+a little bit about the naming of the parameter in the config file and
+its possible values. E.g. would it make sense to be able to define the
+link policy more flexibly than just toggling park mode on and off.
+Marcel, do you have any thoughts on this?
+
+Johan
