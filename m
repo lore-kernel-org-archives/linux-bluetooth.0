@@ -1,182 +1,227 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Sun, 3 Jan 2010 00:26:19 +0100
-Message-ID: <c66253311001021526o7711bb9ayde9f47ea8a918f88@mail.gmail.com>
-Subject: 3com pcmcia bluetooth card does'n work with bt3c_cs
-From: =?ISO-8859-1?Q?Szigetv=E1ri_J=E1nos?= <jszigetvari@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: [PATCH] Add sysfs battery & speed attributes for wacom bluetooth
+ tablet
+From: Przemo Firszt <przemo@firszt.eu>
+To: Bastien Nocera <hadess@hadess.net>, linux-bluetooth <linux-bluetooth@vger.kernel.org>, marcel <marcel@holtmann.org>, Jiri Kosina <jkosina@suse.cz>, Peter Hutterer <peter.hutterer@who-t.net>
+Cc: Ping <pinglinux@gmail.com>
+Content-Type: multipart/mixed; boundary="=-RltzgGBJGq1WPQ58HrbP"
+Date: Sun, 28 Feb 2010 20:39:13 +0000
+Message-ID: <1267389553.24791.22.camel@pldmachine>
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
 
-I have a 3Com Bluetooth PC Card of type 3CRWB6096 (Ver. 2.0, Rev: AA).
-I'm using kernel 2.6.30.9 on a Slackware 13.0-based system.
-I have the following problems:
-- when I insert the pc card, a hci device is created, but the
-bluetooth MAC address is always all-zero.
-- I can't bring the newly created interface up, using hciconfig,
-because it results in a timeout.
-- if I remove the card using pccardctl eject, and plug it in once
-more, the kernel panics. (I can't currently attach any hard evidence,
-as the log doesn't contain anything about this happening.)
+--=-RltzgGBJGq1WPQ58HrbP
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 
-Here are the outputs of some commands, that describe my system:
+Hi,
+I need your opinion if reporting battery condition/changing reporting
+speed of a bluetooth device through sysfs is an acceptable practice.
 
-root@orion:~# uname -a
-Linux orion 2.6.30.9-orion #4 Sat Jan 2 10:15:52 CET 2010 i686 Mobile
-Pentium II GenuineIntel GNU/Linux
+[PATCH] Add sysfs battery & speed attributes for wacom bluetooth tablet
 
-root@orion:~# hciconfig -a
-hci0:	Type: PCCARD
-	BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO MTU: 0:0
-	DOWN
-	RX bytes:0 acl:0 sco:0 events:0 errors:0
-	TX bytes:4 acl:0 sco:0 commands:1 errors:0
+The patch creates 2 sysfs attributes:
+The battery attribute is read-only and it appears in:
+/sys/bus/hid/devices/{btaddr}/battery
+/sys/class/bluetooth/hci*:*/{btaddr}/battery
+/sys/class/hidraw/hidraw*/device/battery
+Capacity values are in %, zero value means AC plug is connected.
 
-root@orion:~# hciconfig hci0 up
-Can't init device hci0: Connection timed out (110)
+The speed attribute allows to poke reporting speed of wacom tablet.
+This attribute is RW, valid values are: 5 for low speed, 6 is high
+speed. High speed is the default value. Using low speed is
+a workaround if you experience big delay between move of stylus on
+the tablet and move of cursor on screen.
 
-root@orion:~# hciconfig hci0 features
-hci0:	Type: PCCARD
-	BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO MTU: 0:0
-	Features: 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-		
-root@orion:~# hciconfig hci0 commands
-Can't read support commands on hci0: Connection timed out (110)
-root@orion:~# hciconfig hci0 reset
-Can't init device hci0: Connection timed out (110)
+--
+Kind regards,
+Przemo
 
-root@orion:~# pccardctl info 1
-PRODID_1="3COM"
-PRODID_2="3CRWB60-A"
-PRODID_3="Bluetooth PC Card"
-PRODID_4=""
-MANFID=0101,0040
-FUNCID=2
+--=-RltzgGBJGq1WPQ58HrbP
+Content-Disposition: attachment; filename*0=0001-Add-sysfs-battery-speed-attributes-for-wacom-bluetoo.pat; filename*1=ch
+Content-Type: text/x-patch; name="0001-Add-sysfs-battery-speed-attributes-for-wacom-bluetoo.patch"; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 
-I have also added some additional debug messages to the kernel module
-source, to better see, which code blocks are executed when the card is
-inserted, and configured:
+>From d61bb3eb0fd8109c235ade904a8d7184fc96b68a Mon Sep 17 00:00:00 2001
+From: Przemo Firszt <przemo@firszt.eu>
+Date: Sat, 20 Feb 2010 12:58:41 +0000
+Subject: [PATCH] Add sysfs battery & speed attributes for wacom bluetooth tablet
 
-root@orion:/usr/src/linux/drivers/bluetooth# diff bt3c_cs.c.orig bt3c_cs.c
-484a485
-> printk(KERN_INFO "fwload 1\n");
-494a496
-> printk(KERN_INFO "fwload 2\n");
-544a547
-> printk(KERN_INFO "fwload 3\n");
-565a569
-> printk(KERN_INFO "open 1\n");
-569a574
-> printk(KERN_INFO "open 2\n");
-573a579
-> printk(KERN_INFO "open 3\n");
-576a583
-> printk(KERN_INFO "open 3\n");
-584a592
-> printk(KERN_INFO "open 4\n");
-595a604
-> printk(KERN_INFO "open 5\n");
-598a608
-> printk(KERN_INFO "open 6\n");
-602a613
-> printk(KERN_INFO "open 7\n");
-604c615
-<
+The patch creates 2 sysfs attributes:
+The battery attribute is read-only and it appears in:
+/sys/bus/hid/devices/{btaddr}/battery
+/sys/class/bluetooth/hci*:*/{btaddr}/battery
+/sys/class/hidraw/hidraw*/device/battery
+Capacity values are in %, zero value means AC plug is connected.
+
+The speed attribute allows to poke reporting speed of wacom tablet.
+This attribute is RW, valid values are: 5 for low speed, 6 is high
+speed. High speed is the default value. Using low speed is
+a workaround if you experience big delay between move of stylus on
+the tablet and move of cursor on screen.
+
+Signed-off-by: Przemo Firszt <przemo@firszt.eu>
+Acked-by: Ping Cheng <pingc@wacom.com>
 ---
-> printk(KERN_INFO "open 8\n");
-614a626
-> printk(KERN_INFO "open 9\n");
-617a630
-> printk(KERN_INFO "open 10\n");
-624a638
-> printk(KERN_INFO "open 11\n");
-632a647
-> printk(KERN_INFO "close 1\n");
-637a653
-> printk(KERN_INFO "close 2\n");
-642a659
-> printk(KERN_INFO "close 3\n");
-651a669
-> printk(KERN_INFO "probe 1\n");
-670a689
-> printk(KERN_INFO "probe 2\n");
-671a691
-> printk(KERN_INFO "probe 3\n");
-676a697
-> printk(KERN_INFO "detach 1\n");
-688a710
-> printk(KERN_INFO "check_config 1\n");
-700a723
-> printk(KERN_INFO "check_config_np 2\n");
-709a733
-> printk(KERN_INFO "check_config_np 1\n");
-720a745
-> printk(KERN_INFO "check_config_np 2\n");
-725a751
-> printk(KERN_INFO "config 1\n");
-735a762
-> printk(KERN_INFO "config 2\n");
-741a769
-> printk(KERN_INFO "config 3\n");
-746a775
-> printk(KERN_INFO "config 4\n");
-752a782
-> printk(KERN_INFO "config 5\n");
-758a789
-> printk(KERN_INFO "config 6\n");
-763a795
-> printk(KERN_INFO "config 7\n");
-784a817
-> 	PCMCIA_DEVICE_MANF_CARD(0x0101, 0x0040),
-800a834
-> printk(KERN_INFO "init 1\n");
-801a836
-> printk(KERN_INFO "init 2\n");
+ drivers/hid/hid-wacom.c |  113 +++++++++++++++++++++++++++++++++++++----------
+ 1 files changed, 89 insertions(+), 24 deletions(-)
 
-After installing the modified module and inserting the card, I got the
-following output:
+diff --git a/drivers/hid/hid-wacom.c b/drivers/hid/hid-wacom.c
+index 8d3b46f..ce2782c 100644
+--- a/drivers/hid/hid-wacom.c
++++ b/drivers/hid/hid-wacom.c
+@@ -24,11 +24,86 @@
+ 
+ #include "hid-ids.h"
+ 
++#define WACOM_SPEED_LO	0X05
++#define WACOM_SPEED_HI	0x06
++
+ struct wacom_data {
+ 	__u16 tool;
+ 	unsigned char butstate;
++	unsigned char battery;
+ };
+ 
++/* Battery capacity, 0 value means AC connected */
++static unsigned short batcap[8] = { 1, 15, 25, 35, 50, 70, 100, 0 };
++
++static void wacom_poke(struct hid_device *hdev, u8 data)
++{
++	struct wacom_data *wdata = hid_get_drvdata(hdev);
++	int limit;
++	int ret;
++	char rep_data[2];
++
++	/*
++	 * Note that if the raw queries fail, it's not a hard failure and it
++	 * is safe to continue
++	 */
++	rep_data[0] = 0x03 ; rep_data[1] = 0x00;
++	limit = 3;
++	do {
++		ret = hdev->hid_output_raw_report(hdev, rep_data, 2,
++				HID_FEATURE_REPORT);
++	} while (ret < 0 && limit-- > 0);
++	if (ret >= 0)
++		rep_data[0] = data ; rep_data[1] = 0x00;
++		limit = 3;
++		do {
++			ret = hdev->hid_output_raw_report(hdev, rep_data, 2,
++					HID_FEATURE_REPORT);
++		} while (ret < 0 && limit-- > 0);
++	if (ret >= 0) {
++		wdata->speed = data;
++		return;
++	}
++
++	dev_warn(&hdev->dev, "failed to poke device, command %d, err %d\n",
++				data, ret);
++}
++
++static ssize_t wacom_show_battery(struct device *dev, struct device_attribute
++				*attr, char *buf)
++{
++	struct wacom_data *wdata = dev_get_drvdata(dev);
++	return snprintf(buf, PAGE_SIZE, "%i\n", batcap[wdata->battery]);
++}
++
++static DEVICE_ATTR(battery, S_IRUGO, wacom_show_battery, NULL);
++
++static ssize_t wacom_show_speed(struct device *dev,
++				struct device_attribute
++				*attr, char *buf)
++{
++	struct wacom_data *wdata = dev_get_drvdata(dev);
++	return snprintf(buf, PAGE_SIZE, "%i\n", wdata->speed);
++}
++
++static ssize_t wacom_store_speed(struct device *dev,
++				struct device_attribute *attr,
++				const char *buf, size_t count)
++{
++	struct hid_device *hdev = container_of(dev, struct hid_device, dev);
++	int new_speed;
++
++	sscanf(buf, "%1d", &new_speed);
++	if (new_speed == WACOM_SPEED_HI || new_speed == WACOM_SPEED_LO) {
++		wacom_poke(hdev, new_speed);
++		return strnlen(buf, PAGE_SIZE);
++	} else
++		return -EINVAL;
++}
++
++static DEVICE_ATTR(speed, S_IRUGO | S_IWUGO,
++		wacom_show_speed, wacom_store_speed);
++
+ static int wacom_raw_event(struct hid_device *hdev, struct hid_report *report,
+ 		u8 *raw_data, int size)
+ {
+@@ -147,6 +222,11 @@ static int wacom_raw_event(struct hid_device *hdev, struct hid_report *report,
+ 		input_sync(input);
+ 	}
+ 
++	/* Store current battery capacity */
++	rw = (data[7] >> 2 & 0x07);
++	if (rw != wdata->battery)
++		wdata->battery = rw;
++
+ 	return 1;
+ }
+ 
+@@ -156,9 +236,7 @@ static int wacom_probe(struct hid_device *hdev,
+ 	struct hid_input *hidinput;
+ 	struct input_dev *input;
+ 	struct wacom_data *wdata;
+-	char rep_data[2];
+ 	int ret;
+-	int limit;
+ 
+ 	wdata = kzalloc(sizeof(*wdata), GFP_KERNEL);
+ 	if (wdata == NULL) {
+@@ -181,30 +259,17 @@ static int wacom_probe(struct hid_device *hdev,
+ 		goto err_free;
+ 	}
+ 
+-	/*
+-	 * Note that if the raw queries fail, it's not a hard failure and it
+-	 * is safe to continue
+-	 */
++	ret = device_create_file(&hdev->dev, &dev_attr_battery);
++	if (ret)
++		dev_warn(&hdev->dev,
++			"can't create sysfs battery attribute err: %d\n", ret);
+ 
+-	/* Set Wacom mode2 */
+-	rep_data[0] = 0x03; rep_data[1] = 0x00;
+-	limit = 3;
+-	do {
+-		ret = hdev->hid_output_raw_report(hdev, rep_data, 2,
+-				HID_FEATURE_REPORT);
+-	} while (ret < 0 && limit-- > 0);
+-	if (ret < 0)
+-		dev_warn(&hdev->dev, "failed to poke device #1, %d\n", ret);
++	ret = device_create_file(&hdev->dev, &dev_attr_speed);
++	if (ret)
++		dev_warn(&hdev->dev,
++			"can't create sysfs speed attribute err: %d\n", ret);
+ 
+-	/* 0x06 - high reporting speed, 0x05 - low speed */
+-	rep_data[0] = 0x06; rep_data[1] = 0x00;
+-	limit = 3;
+-	do {
+-		ret = hdev->hid_output_raw_report(hdev, rep_data, 2,
+-				HID_FEATURE_REPORT);
+-	} while (ret < 0 && limit-- > 0);
+-	if (ret < 0)
+-		dev_warn(&hdev->dev, "failed to poke device #2, %d\n", ret);
++	wacom_poke(hdev, WACOM_SPEED_HI);
+ 
+ 	hidinput = list_entry(hdev->inputs.next, struct hid_input, list);
+ 	input = hidinput->input;
+-- 
+1.6.6.1
 
-root@orion:~# dmesg | tail -n 26
-init 1
-probe 1
-probe 2
-config 1
-check_config 1
-check_config_np 2
-check_config 1
-check_config_np 2
-config 2
-check_config_np 1
-config 4
-config 5
-config 6
-open 1
-open 2
-open 3
-open 4
-open 5
-bt3c_cs 1.0: firmware: requesting BT3CPCC.bin
-open 7
-fwload 1
-fwload 2
-fwload 3
-open 8
-open 9
-config 7
---EJECTING CARD--
-pcmcia_socket pcmcia_socket1: pccard: card ejected from slot 1
-detach 1
-close 1
-close 2
-close 3
 
-Sorry for the long letter, hopefully it will help to track down the problem.
-If you know about this, or a similar problem, or if it is already
-fixed in a more recent kernel release, please inform me.
-Thanks!
-
-Best regards,
-Janos Szigetvari
+--=-RltzgGBJGq1WPQ58HrbP--
