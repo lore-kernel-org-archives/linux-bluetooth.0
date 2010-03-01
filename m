@@ -1,107 +1,659 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4B8B8E9C.2030008@atheros.com>
+Date: Mon, 1 Mar 2010 15:23:32 +0530
+From: Suraj Sumangala <suraj@atheros.com>
 MIME-Version: 1.0
-In-Reply-To: <6aeb672b1001272156m678aa8fepec2498386947936a@mail.gmail.com>
-References: <6aeb672b1001220212u518836fds5df2a7e3de8463bf@mail.gmail.com>
-	 <6aeb672b1001272156m678aa8fepec2498386947936a@mail.gmail.com>
-Date: Mon, 1 Mar 2010 17:54:15 +0800
-Message-ID: <6aeb672b1003010154u6660632fj53fdbac2c8d0e302@mail.gmail.com>
-Subject: Re: Kernel panic when handing Motorola S305 headset
-From: Liang Bao <tim.bao@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=0016e644b91a60ff970480ba3b03
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Vikram Kandukuri <Vikram.Kandukuri@Atheros.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, "Suraj
+ Sumangala" <Suraj.Sumangala@Atheros.com>, Luis Rodriguez
+	<Luis.Rodriguez@Atheros.com>, Jothikumar Mothilal
+	<Jothikumar.Mothilal@Atheros.com>
+Subject: Re: [PATCH] Added support for Atheros AR300x UART Bluetooth Chip
+References: <20100209114231.GA6587@ATH-LT-538> <1266805799.18491.33.camel@violet> <4B836ABE.70505@atheros.com>
+In-Reply-To: <4B836ABE.70505@atheros.com>
+Content-Type: text/plain; charset="us-ascii"; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---0016e644b91a60ff970480ba3b03
-Content-Type: text/plain; charset=ISO-8859-1
+Suraj Sumangala wrote:
+> Marcel Holtmann wrote:
+>
+>   
+>> Hi Vikram,
+>>
+>>
+>>     
+>>>  drivers/bluetooth/Kconfig     |   10 +
+>>>  drivers/bluetooth/Makefile    |    1 +
+>>>  drivers/bluetooth/hci_ath.c   |  545 +++++++++++++++++++++++++++++++++++++++++
+>>>  drivers/bluetooth/hci_ath.h   |   72 ++++++
+>>>  drivers/bluetooth/hci_ldisc.c |    6 +
+>>>  drivers/bluetooth/hci_uart.h  |    8 +-
+>>>  6 files changed, 641 insertions(+), 1 deletions(-)
+>>>  create mode 100755 drivers/bluetooth/hci_ath.c
+>>>  create mode 100755 drivers/bluetooth/hci_ath.h
+>>>
+>>> diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+>>> index 058fbcc..32b98a4 100644
+>>> --- a/drivers/bluetooth/Kconfig
+>>> +++ b/drivers/bluetooth/Kconfig
+>>> @@ -58,6 +58,16 @@ config BT_HCIUART_BCSP
+>>>
+>>>         Say Y here to compile support for HCI BCSP protocol.
+>>>
+>>> +config BT_HCIUART_ATH
+>>> +     bool "Atheros AR3001 Board support"
+>>> +     depends on BT_HCIUART
+>>> +     help
+>>> +       HCIATH (HCI Atheros) is a serial protocol for communication
+>>> +       between Bluetooth device and host. This protocol is required for
+>>> +       serial Bluetooth devices that are based on Atheros AR3001 chips.
+>>> +
+>>> +       Say Y here to compile support for HCIATH protocol.
+>>> +
+>>>
+>>>       
+>> it would be nice if you add a document explaining this special Atheros
+>> protocol that is used.
+>>
+>>     
+> I will send the document with the required changes
+>
+>   
+>>> +static void ath_context_switch(struct work_struct *work)
+>>> +{
+>>> +     int status;
+>>> +     struct ath_struct *ath;
+>>> +     struct hci_uart *hu;
+>>> +     struct tty_struct *tty;
+>>> +     struct sk_buff *skbuf;
+>>> +     ath = container_of(work, struct ath_struct, ctxtsw);
+>>> +     hu = ath->hu;
+>>> +     tty = hu->tty;
+>>> +     status = ath_wakeup_ar3001(tty);
+>>> +     if ((status & TIOCM_CTS)) {
+>>> +             while ((skbuf = skb_dequeue(&ath->tx_wait_q)))
+>>> +                     skb_queue_tail(&ath->txq, skbuf);
+>>> +
+>>> +             /* Ready to send Data */
+>>> +             clear_bit(HCI_UART_SENDING, &hu->tx_state);
+>>> +             hci_uart_tx_wakeup(hu);
+>>> +     }
+>>> +}
+>>> +
+>>> +/* Initialize protocol */
+>>> +static int ath_open(struct hci_uart *hu)
+>>> +{
+>>> +     struct ath_struct *ath;
+>>> +     BT_DBG("hu %p", hu);
+>>> +     ath = kzalloc(sizeof(*ath), GFP_ATOMIC);
+>>> +     if (!ath)
+>>> +             return -ENOMEM;
+>>> +     skb_queue_head_init(&ath->txq);
+>>> +     skb_queue_head_init(&ath->tx_wait_q);
+>>> +     skb_queue_head_init(&ath->tx_cmd_wait_q);
+>>> +     spin_lock_init(&ath->hciath_lock);
+>>> +     ath->cur_sleep = 0;
+>>> +     ath->num_cmds_complete = 1;
+>>> +     hu->priv = ath;
+>>> +     ath->hu = hu;
+>>> +     init_waitqueue_head(&ath->wqevt);
+>>> +     INIT_WORK(&ath->ctxtsw, ath_context_switch);
+>>> +     return 0;
+>>> +}
+>>>
+>>>       
+>> In all the function, use at least some empty lines in between so that
+>> somebody can try to read these function. Cramping everything in less
+>> space doesn't make it simpler.
+>>
+>>     
+> We will make the necessary changes
+>
+>   
+>>> +/* Enqueue frame for transmittion (padding, crc, etc) */
+>>> +/* may be called from two simultaneous tasklets */
+>>>
+>>>       
+>> Why are you stealing the comments from hci_ll.c. Are you using actually
+>> padding and CRC?
+>>
+>>     
+> Will do the cleanup along with the other changes mentioned
+>
+>   
+>>> +static int ath_enqueue(struct hci_uart *hu, struct sk_buff *skb)
+>>> +{
+>>> +     struct ath_struct *ath;
+>>> +     ath = hu->priv;
+>>>
+>>>       
+>> Direct assignment on declaration.
+>>
+>>     
+> Will correct it along with other changes
+>
+>   
+>>> +     if (HCI_SCODATA_PKT == bt_cb(skb)->pkt_type) {
+>>>
+>>>       
+>> Always the other way around. Variable compares to constant. Not the
+>> constant to variable.
+>>
+>>     
+> Will correct it along with other changes
+>
+>   
+>>> +static struct sk_buff *ath_dequeue(struct hci_uart *hu)
+>>> +{
+>>> +     struct ath_struct *ath;
+>>> +     struct sk_buff *skbuff;
+>>> +     ath = hu->priv;
+>>> +     skbuff = skb_dequeue(&ath->txq);
+>>> +     if (NULL != skbuff) {
+>>>
+>>>       
+>> Never ever use the variable name skbuff and also if (skbuff) here.
+>> However preferable this is if (!skb) return NULL;
+>>
+>>     
+> I will take care of the variable name change
+>
+>   
+>>> +             ath_handle_host_data(ath, bt_cb(skbuff)->pkt_type,
+>>> +                                  &skbuff->data[1], skbuff->len - 1);
+>>> +     }
+>>> +     return skbuff;
+>>> +}
+>>> +
+>>> +static inline int ath_check_data_len(struct ath_struct *ath, int len)
+>>> +{
+>>> +     register int room = skb_tailroom(ath->rx_skb);
+>>> +     BT_DBG("len %d room %d", len, room);
+>>> +     if (!len) {
+>>> +             hci_recv_frame(ath->rx_skb);
+>>> +     } else if (len > room) {
+>>> +             BT_ERR("Data length is too large");
+>>> +             kfree_skb(ath->rx_skb);
+>>> +     } else {
+>>> +             ath->rx_state = HCIATH_W4_DATA;
+>>> +             ath->rx_count = len;
+>>> +             return len;
+>>> +     }
+>>>
+>>>       
+>> How is this if statement even suppose to work?
+>>
+>>     
+> Retained this code as this was part of the hci_ll implementation that we used as template. Will make the necessary changes.
+>
+>   
+>>> +     ath->rx_state = HCIATH_W4_PACKET_TYPE;
+>>> +     ath->rx_skb = NULL;
+>>> +     ath->rx_count = 0;
+>>> +     return 0;
+>>> +}
+>>> +
+>>> +/* Recv data */
+>>> +static int ath_recv(struct hci_uart *hu, void *data, int count)
+>>> +{
+>>> +     struct ath_struct *ath = hu->priv;
+>>> +     register char *ptr;
+>>> +     struct hci_event_hdr *eh;
+>>> +     struct hci_acl_hdr *ah;
+>>> +     struct hci_sco_hdr *sh;
+>>> +     struct sk_buff *skbuff;
+>>> +     register int len, type, dlen;
+>>> +     skbuff = NULL;
+>>> +     BT_DBG("hu %p count %d rx_state %d rx_count %d", hu, count,
+>>> +            ath->rx_state, ath->rx_count);
+>>> +     ptr = data;
+>>> +     while (count) {
+>>> +             if (ath->rx_count) {
+>>> +                     len = min_t(unsigned int, ath->rx_count, count);
+>>> +                     memcpy(skb_put(ath->rx_skb, len), ptr, len);
+>>> +                     ath->rx_count -= len;
+>>> +                     count -= len;
+>>> +                     ptr += len;
+>>> +                     if (ath->rx_count)
+>>> +                             continue;
+>>> +                     switch (ath->rx_state) {
+>>> +                     case HCIATH_W4_DATA:
+>>> +                             ath_handle_data_from_controller(ath,
+>>> +                                                             bt_cb
+>>> +                                                             (ath->rx_skb)->
+>>> +                                                             pkt_type,
+>>> +                                                             ath->rx_skb->
+>>> +                                                             data,
+>>> +                                                             ath->rx_skb->
+>>> +                                                             len);
+>>> +                             if (HCI_EVENT_PKT ==
+>>> +                                 bt_cb(ath->rx_skb)->pkt_type
+>>> +                                 && ath->num_cmds_complete > 0) {
+>>> +
+>>> +                                     skbuff =
+>>> +                                         skb_dequeue(&ath->tx_cmd_wait_q);
+>>> +                                     if (skbuff != NULL) {
+>>> +                                             skb_queue_tail(&ath->txq,
+>>> +                                                            skbuff);
+>>> +                                             schedule_work(&ath->ctxtsw);
+>>> +                                     }
+>>> +                             }
+>>> +                             if (ath_verify_event_discardable
+>>> +                                 (hu, bt_cb(ath->rx_skb)->pkt_type,
+>>> +                                  ath->rx_skb->data)) {
+>>> +                                     kfree(ath->rx_skb);
+>>> +                                     ath->rx_skb = NULL;
+>>> +                             } else {
+>>> +                                     hci_recv_frame(ath->rx_skb);
+>>> +                             }
+>>> +                             ath->rx_state = HCIATH_W4_PACKET_TYPE;
+>>> +                             ath->rx_skb = NULL;
+>>> +                             ath->rx_count = 0;
+>>> +                             continue;
+>>> +                     case HCIATH_W4_EVENT_HDR:
+>>> +                             eh = (struct hci_event_hdr *)ath->rx_skb->data;
+>>> +                             BT_DBG("Event header: evt 0x%2.2x plen %d",
+>>> +                                    eh->evt, eh->plen);
+>>> +                             ath_check_data_len(ath, eh->plen);
+>>> +                             continue;
+>>> +                     case HCIATH_W4_ACL_HDR:
+>>> +                             ah = (struct hci_acl_hdr *)ath->rx_skb->data;
+>>> +                             dlen = __le16_to_cpu(ah->dlen);
+>>> +                             BT_DBG("ACL header: dlen %d", dlen);
+>>> +                             ath_check_data_len(ath, dlen);
+>>> +                             continue;
+>>> +                     case HCIATH_W4_SCO_HDR:
+>>> +                             sh = (struct hci_sco_hdr *)ath->rx_skb->data;
+>>> +                             BT_DBG("SCO header: dlen %d", sh->dlen);
+>>> +                             ath_check_data_len(ath, sh->dlen);
+>>> +                             continue;
+>>> +                     }
+>>> +             }
+>>> +
+>>> +             /* HCIATH_W4_PACKET_TYPE */
+>>> +             switch (*ptr) {
+>>> +             case HCI_EVENT_PKT:
+>>> +                     BT_DBG("Event packet");
+>>> +                     ath->rx_state = HCIATH_W4_EVENT_HDR;
+>>> +                     ath->rx_count = HCI_EVENT_HDR_SIZE;
+>>> +                     type = HCI_EVENT_PKT;
+>>> +                     break;
+>>> +             case HCI_ACLDATA_PKT:
+>>> +                     BT_DBG("ACL packet");
+>>> +                     ath->rx_state = HCIATH_W4_ACL_HDR;
+>>> +                     ath->rx_count = HCI_ACL_HDR_SIZE;
+>>> +                     type = HCI_ACLDATA_PKT;
+>>> +                     break;
+>>> +             case HCI_SCODATA_PKT:
+>>> +                     BT_DBG("SCO packet");
+>>> +                     ath->rx_state = HCIATH_W4_SCO_HDR;
+>>> +                     ath->rx_count = HCI_SCO_HDR_SIZE;
+>>> +                     type = HCI_SCODATA_PKT;
+>>> +                     break;
+>>> +             default:
+>>> +                     BT_ERR("Unknown HCI packet type %2.2x", (__u8) *ptr);
+>>> +                     hu->hdev->stat.err_rx++;
+>>> +                     ptr++;
+>>> +                     count--;
+>>> +                     continue;
+>>> +             };
+>>> +             ptr++;
+>>> +             count--;
+>>> +
+>>> +             /* Allocate packet */
+>>> +             ath->rx_skb = bt_skb_alloc(HCI_MAX_FRAME_SIZE, GFP_ATOMIC);
+>>> +             if (!ath->rx_skb) {
+>>> +                     BT_ERR("Can't allocate mem for new packet");
+>>> +                     ath->rx_state = HCIATH_W4_PACKET_TYPE;
+>>> +                     ath->rx_count = 0;
+>>> +                     return 0;
+>>> +             }
+>>> +             ath->rx_skb->dev = (void *)hu->hdev;
+>>> +             bt_cb(ath->rx_skb)->pkt_type = type;
+>>> +     } return count;
+>>> +}
+>>>
+>>>       
+>> We have a common exported function called hci_recv_fragment that should
+>> be doing exactly this.
+>>
+>>     
+>
+> I have provided the explanation at the bottom
+>
+>   
+>>> +static void ath_controller_sleep_mode(struct hci_uart *hu, bool enable)
+>>> +{
+>>> +     unsigned char sleepcmd[] = { 0x01, 0x04, 0xFC, 0x01, 0x00 };
+>>> +     sleepcmd[4] = enable;
+>>> +     ath_write_data_to_cntrlr(hu->hdev, sleepcmd, sizeof(sleepcmd));
+>>> +}
+>>>
+>>>       
+>> Special vendor commands need a comment. Explain the data structure of
+>> them and what are the options.
+>>
+>>     
+> Will add the necessary comments
+>
+>   
+>>> +int ath_wakeup_ar3001(struct tty_struct *tty)
+>>> +{
+>>> +     struct termios settings;
+>>> +     int status = 0x00;
+>>> +     mm_segment_t oldfs;
+>>> +     status = tty->driver->ops->tiocmget(tty, NULL);
+>>> +
+>>> +     if ((status & TIOCM_CTS))
+>>> +             return status;
+>>> +
+>>> +     oldfs = get_fs();
+>>> +     set_fs(KERNEL_DS);
+>>> +     n_tty_ioctl_helper(tty, NULL, TCGETS, (unsigned long)&settings);
+>>> +
+>>> +     settings.c_cflag &= ~CRTSCTS;
+>>> +     n_tty_ioctl_helper(tty, NULL, TCSETS, (unsigned long)&settings);
+>>> +     set_fs(oldfs);
+>>> +     status = tty->driver->ops->tiocmget(tty, NULL);
+>>> +
+>>> +     tty->driver->ops->tiocmset(tty, NULL, 0x00, TIOCM_RTS);
+>>> +     mdelay(20);
+>>> +
+>>> +     status = tty->driver->ops->tiocmget(tty, NULL);
+>>> +
+>>> +     tty->driver->ops->tiocmset(tty, NULL, TIOCM_RTS, 0x00);
+>>> +     mdelay(20);
+>>> +
+>>> +     status = tty->driver->ops->tiocmget(tty, NULL);
+>>> +     oldfs = get_fs();
+>>> +     set_fs(KERNEL_DS);
+>>> +     n_tty_ioctl_helper(tty, NULL, TCGETS, (unsigned long)&settings);
+>>> +
+>>> +     settings.c_cflag |= CRTSCTS;
+>>> +     n_tty_ioctl_helper(tty, NULL, TCSETS, (unsigned long)&settings);
+>>> +     set_fs(oldfs);
+>>> +     return status;
+>>> +}
+>>>
+>>>       
+>> Why is this magic in kernel space and not inside hciattach?
+>>
+>>     
+>
+> if there is no Bluetooth activity for a while,
+> so the driver will verify if the controller is sleeping and
+> try to wake up the controller using the RTS/CTS mechanism.
+> This has to be done before sending any packet to controller.
+> This cannot be done in hciattach as this is required to be called throughout the life of the driver and not just when the driver is loaded.
+>
+>   
+>>> +int ath_fullboot_config(struct hci_uart *hu, int current_event)
+>>> +{
+>>> +     struct sk_buff *skbuf;
+>>> +     struct ath_struct *ath = hu->priv;
+>>> +     static int autosleep;
+>>> +     unsigned char rstevt[] = { 0x1, 0x3, 0xc, 0x0 };
+>>> +     if (current_event == HCI_RESET) {
+>>> +
+>>> +             if (ath->cur_sleep) {
+>>> +                     autosleep = 1;
+>>> +                     ath_controller_sleep_mode(hu, 1);
+>>> +                     return 1;
+>>> +             } else {
+>>> +                     return 0;
+>>> +             }
+>>> +     }
+>>> +
+>>> +     if (current_event == HCI_SET_SLEEP_MODE) {
+>>> +
+>>> +             if (autosleep == 0)
+>>> +                     return 1;
+>>> +
+>>> +             while ((skbuf = skb_dequeue(&ath->tx_wait_q)))
+>>> +                     skb_queue_tail(&ath->txq, skbuf);
+>>> +
+>>> +             ath_write_data_to_host(hu->hdev, rstevt, sizeof(rstevt));
+>>> +             autosleep = 0;
+>>> +             return 1;
+>>> +     }
+>>> +     return 0;
+>>> +}
+>>>
+>>>       
+>> Why is this function not static? And all the others?
+>>
+>>     
+> will make every function static
+>
+>   
+>>> +int ath_write_data_to_host(void *dev, unsigned char *data, u8 length)
+>>> +{
+>>> +     struct sk_buff *skbuf;
+>>> +     struct hci_dev *hdev;
+>>> +     hdev = (struct hci_dev *)dev;
+>>> +     skbuf = bt_skb_alloc(length, GFP_ATOMIC);
+>>> +     if (!skbuf) {
+>>> +             BT_ERR("Memory allocation failed");
+>>> +             return -1;
+>>> +     }
+>>> +     skb_orphan(skbuf);
+>>> +
+>>> +     /* First byte will be added as packet type */
+>>> +     bt_cb(skbuf)->pkt_type = data[0];
+>>> +     skbuf->dev = (void *)hdev;
+>>> +     memcpy(skb_put(skbuf, length - 1), &data[1], length - 1);
+>>> +     hci_recv_frame(skbuf);
+>>> +     return length;
+>>> +}
+>>>
+>>>       
+>> What is this exactly for? Do you have a secondary receive path?
+>>
+>>     
+>
+> Yes, we have situation where driver sends HCI events to depending on acknowledgement of sleep enable vendor specific command.
+> the reason is explained at the bottom
+>
+>   
+>>> +int ath_write_data_to_cntrlr(void *dev, unsigned char *Data, u8 len)
+>>> +{
+>>> +     struct sk_buff *skbuff;
+>>> +     struct ath_struct *ath;
+>>> +     struct hci_uart *hu;
+>>> +     struct hci_dev *hdev;
+>>> +     if (NULL == dev) {
+>>> +             BT_DBG("NULL handle received %p  \n", dev);
+>>> +             return 0;
+>>> +     }
+>>> +     hdev = (struct hci_dev *)dev;
+>>> +     hu = (struct hci_uart *)hdev->driver_data;
+>>> +     if (hu == NULL) {
+>>> +             BT_DBG("NULL handle received %p  \n", hdev);
+>>> +             return 0;
+>>> +     }
+>>> +     ath = hu->priv;
+>>> +     if (ath == NULL) {
+>>> +             BT_DBG("NULL handle received  \n");
+>>> +             return 0;
+>>> +     }
+>>> +     skbuff = bt_skb_alloc(len, GFP_ATOMIC);
+>>> +     if (skbuff == NULL) {
+>>> +             BT_DBG("Malloc Fail memory %p   \n", skbuff);
+>>> +             return 0;
+>>> +     }
+>>> +     skb_orphan(skbuff);
+>>> +
+>>> +     if (len != 0)
+>>> +             memcpy(skb_put(skbuff, len), Data, len);
+>>> +
+>>> +     bt_cb(skbuff)->pkt_type = HCI_COMMAND_PKT;
+>>> +     skbuff->dev = dev;
+>>> +     if (ath->num_cmds_complete > 0) {
+>>> +             skb_queue_tail(&ath->txq, skbuff);
+>>> +             schedule_work(&ath->ctxtsw);
+>>> +     } else {
+>>> +             skb_queue_tail(&ath->tx_cmd_wait_q, skbuff);
+>>> +     }
+>>> +     return len;
+>>> +}
+>>>
+>>>       
+>> Messing with num_cmds_complete inside the driver is wrong. What are you
+>> doing here?
+>>
+>>     
+> I have explained the reason at the bottom
+>
+>   
+>>> +int ath_check_sleep_cmd(struct ath_struct *ath, unsigned char *packet)
+>>> +{
+>>> +     if (packet[0] == HCI_EVENT_PKT && packet[1] == 0xFC)
+>>> +             ath->cur_sleep = packet[3];
+>>>
+>>>       
+>> How is this working. Every vendor event is sleep event?
+>>
+>>     
+>
+> Will correct it. It should have been packet[0] == 0x04.
+>
+>   
+>>> +int ath_verify_event_discardable(struct hci_uart *hu, unsigned char pkt_type,
+>>> +                              unsigned char *packet)
+>>> +{
+>>> +     if (pkt_type != HCI_EVENT_PKT)
+>>> +             return 0;
+>>> +
+>>> +     switch (packet[0]) {
+>>> +     case 0x0E:              /* Command Complete Event */
+>>> +             if (packet[3] == 0x03 && packet[4] == 0x0C) {
+>>> +
+>>> +                     /* Command complete for HCI Reset Received */
+>>> +                     return ath_fullboot_config(hu, HCI_RESET);
+>>> +             } else if (packet[3] == 0x04 && packet[4] == 0xFC) {
+>>> +                     return ath_fullboot_config(hu, HCI_SET_SLEEP_MODE);
+>>> +             }
+>>> +             break;
+>>> +     }
+>>> +     return 0;
+>>> +}
+>>>
+>>>       
+>> What are you doing here?
+>>
+>>     
+>
+> Events for vendor specific commands sent from driver need not go to the host. They are discarded at the driver level
+>
+>   
+>>> +void ath_handle_hci_event(struct ath_struct *ath, u8 * packet)
+>>> +{
+>>> +     switch (packet[0]) {
+>>> +     case 0x05:              /* ACL Disconnection Complete Event */
+>>> +             break;
+>>> +     case 0x03:              /* ACL Connection Complete Event */
+>>> +             break;
+>>> +     case 0x0E:              /* Command Complete Event */
+>>> +             spin_lock(&ath->hciath_lock);
+>>> +             ath->num_cmds_complete = packet[2];
+>>> +             spin_unlock(&ath->hciath_lock);
+>>> +             break;
+>>> +     case 0x0F:              /* Command Status Event */
+>>> +             spin_lock(&ath->hciath_lock);
+>>> +             ath->num_cmds_complete = packet[3];
+>>> +             spin_unlock(&ath->hciath_lock);
+>>> +             break;
+>>> +     }
+>>> +}
+>>>
+>>>       
+>> Something is really wrong in this driver? Are you really know how this
+>> is suppose to work if you have to interfere this much?
+>>
+>>     
+> I have provided the reason for this implementation at the bottom
+>
+>   
+>>> +void ath_handle_host_data(struct ath_struct *ath, u8 pktType, u8 * packet,
+>>> +                       unsigned int len)
+>>> +{
+>>> +     switch (pktType) {
+>>> +     case HCI_ACLDATA_PKT:   /* ACL packets */
+>>> +             break;
+>>> +     case HCI_COMMAND_PKT:   /* HCI Commands */
+>>> +             ath_handle_hci_cmd(ath, packet);
+>>> +             ath_check_sleep_cmd(ath, packet);
+>>> +             break;
+>>> +     }
+>>> +}
+>>> +
+>>> +void ath_handle_data_from_controller(struct ath_struct *ath, u8 pktType,
+>>> +                                  u8 *packet, unsigned int len)
+>>> +{
+>>> +     switch (pktType) {
+>>> +     case HCI_ACLDATA_PKT:   /* ACL packets */
+>>> +             break;
+>>> +     case HCI_EVENT_PKT:     /* HCI Events */
+>>> +             ath_handle_hci_event(ath, packet);
+>>> +             break;
+>>> +     }
+>>> +}
+>>>
+>>>       
+>> Seriously? are you implemented your own Bluetooth stack? Please explain
+>> what you really need. And then the host stack can provide it for you.
+>> This is not acceptable.
+>>
+>>     
+> The reason for this implementation is.
+>
+> The AR3001 supports power management feature that can be enabled from host during hciattach.
+>
+> This will let the controller go to sleep if there is no data transfer for some time.
+> This feature is disabled automatically on receiving HCI RESET command and has to be enabled
+> again by sending Sleep enable Vendor specific command after every HCI Reset command.
+>
+> This required the driver to keep track of HCI RESET command complete event and sent Sleep Enable command on receiving the event.
+> Host will be notified of the HCI Reset command complete event only after the Sleep enable command is acknowledged by controller.
+> This is the reason for the following implementation changes
+>
+> 1. We had to avoid using hci_recv_fragment as we need to verify and decide if the packet has to be sent to Host (In case of HCI RESET).
+> 2. We had to add ath_write_data_to_host so that we can sent HCI RESET
+>    command complete on receiving Sleep Enable command complete event from controller.
+> 3. We had to add ath_write_data_to_cntrlr  so that driver can send the Sleep enable command after every HCI RESET.
+> 4. Have ath_verify_event_discardable which keep track of the HCI RESET and Sleep Enable Command complete event
+>    and decide whether to send the HCI RESET event to host or send only after sleep enable.
+>
+>
+> Regarding the use of num_cmds_complete inside driver
+>
+> Due to a controller specific optimization, we have to send vendor specific commands from the driver to configure the controller depending on the status of ACL connection.
+> This might cause driver to send a command to controller when it is already busy with command sent from host.
+> That is the reason why we had to go for streamlining the command flow in the driver.
+>
+> If you can export hci_send_cmd API in hci_core.c, then we might be able to use it to send a command to controller without worrying about command streamlining.
+>
+> Please do let me know your comments,
+>
+> Regards
+> Suraj
+>
+>   
+>> Regards
+>>
+>> Marcel
+>>
+>>
+>>
+>>     
+>
+>
+>   
+Hi Marcel,
 
-I'd like to continue the previous thread on that Motorola S305 causes
-kernel panic because I did find some clue here. Sorry for misleading
-guess one month ago if any.
+can you please let me know your comments regarding my answers. I can 
+then have a second look at our implementation based on your comments.
 
-Recap the problem here so that you don't to read the first long post.
-The pattern to reproduce the issue is:
-1. Pair the S305 headset from the phone or the PC( I am using a Ubuntu)
-2. Remove pairing on the phone or PC
-3. Power off and then power on S305.
-4. The S305 will try to connect and since link key removed on this
-side it will try to pair. Input 0000.
-5. Kernel panic happens. This can be observed on kernel version
-2.6.29(on the Droid phone, yes, it's a modified version),
-2.6.31-19-generic on a Ubuntu and a pretty latest 2.6.33-020633rc8
-from Ubuntu official RC release.
-
-The exact kernel crash point is
-             if (l2cap_check_security(sk)) {
-                  if (bt_sk(sk)->defer_setup) {
-                      struct sock *parent = bt_sk(sk)->parent;
-                      rsp.result = cpu_to_le16(L2CAP_CR_PEND);
-                      rsp.status = cpu_to_le16(L2CAP_CS_AUTHOR_PEND);
->>>                   parent->sk_data_ready(parent, 0)
-                  } else {
-
-After tracing the issue for a couple of weeks, I find the difference
-between a normal flow and the panic one. If the user space process
-accepts the L2CAP connection request before L2CAP_INFO_RSP received,
-the following calls will be carried out:
-
-l2cap_sock_accept-> bt_accept_dequeue->bt_accept_unlink(in the branch
-bt_sk(parent)->defer_setup)-> set bt_sk(sk)->parent = NULL. Later when
-L2CAP_INFO_RSP arrives, the l2cap_conn_start() will try to call the
-marked line above and de-referring NULL happen.
-
-To fix this, shall we consider checking if a pending socket can be
-accepted in bt_accept_dequeue() prior to a pending L2CAP_INFO_REQ
-responded? For example,  adding a check to BT_CONNECT2 in
-af_bluetooth.c.
-
-215         if (sk->sk_state == BT_CONNECTED || !newsock ||
-216                         ( bt_sk(parent)->defer_setup &&
-(sk->sk_state != BT_CONNECT2))) {
-
-Again, I am not sure if this will bring a side-effect. Please advise
-the most appropriate way. Thanks.
-
-p.s: I attached partial trace files for those who're interested to the traces.
-
---0016e644b91a60ff970480ba3b03
-Content-Type: text/plain; charset=US-ASCII; name="s305-good-bad-trace.txt"
-Content-Disposition: attachment; filename="s305-good-bad-trace.txt"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_g693azsd1
-
-VHJhY2Ugd2hlbiBwYW5pYyBoYXBwZW5kZWQ6CjwzPlsgIDM1Ni43NTg0ODNdIGwyY2FwX2Nvbm5l
-Y3RfcmVxOiBwc20gMHgxOSBzY2lkIDB4MDA0MQ0KPDM+WyAgMzU2Ljc2Mzg1NF0gbDJjYXBfY29u
-bmVjdF9yZXE6IHBhcmVudCBjN2U4ZjYwMA0KPDM+WyAgMzU2Ljc2ODgyOV0gX19sMmNhcF9jaGFu
-X2FkZDogY29ubiBjN2ZhMzdjMCwgcHNtIDB4MTksIGRjaWQgMHgwMDQxDQo8Mz5bICAzNTYuNzc1
-NDgyXSBsMmNhcF9jb25uZWN0X3JlcTogYmVmb3JlIHJldHVybiwgc2sgYzVkNjZjMDAgcGFyZW50
-IGM3ZThmNjAwDQo8Mz5bICAzNTYuNzgyODk3XSBsMmNhcF9jb25uZWN0X3JlcTogcHNtIDB4MDEg
-c2NpZCAweDAwNDINCjwzPlsgIDM1Ni43ODgxNzddIGwyY2FwX2Nvbm5lY3RfcmVxOiBwYXJlbnQg
-YzdlOGZlMDANCjwzPlsgIDM1Ni43OTMxMjFdIF9fbDJjYXBfY2hhbl9hZGQ6IGNvbm4gYzdmYTM3
-YzAsIHBzbSAweDAxLCBkY2lkIDB4MDA0Mg0KPDM+WyAgMzU2Ljc5OTc3NF0gbDJjYXBfY29ubmVj
-dF9yZXE6IGJlZm9yZSByZXR1cm4sIHNrIGM1ZDY2YTAwIHBhcmVudCBjN2U4ZmUwMA0KPDM+WyAg
-MzU2LjgzNzE1OF0gbDJjYXBfc29ja19hY2NlcHQ6IG5ldyBzb2NrZXQgYzVkNjZjMDANCjwzPlsg
-IDM1Ni44NDI1OTBdIGwyY2FwX2Nvbm5fc3RhcnQ6IEJUX0NPTk5FQ1RFMiwgc2sgYzVkNjZjMDAs
-IHBhcmVudCAobnVsbCkKClRyYWNlIHdoZW4gZXZlcnl0aGluZyBnb2VzIG9uIHdlbGwuCjwzPlsg
-IDY0MS4zOTM0NjNdIGwyY2FwX2Nvbm5lY3RfcmVxOiBwc20gMHgxOSBzY2lkIDB4MDA0MQo8Mz5b
-ICA2NDEuMzk4OTU2XSBsMmNhcF9jb25uZWN0X3JlcTogcGFyZW50IGM3ZTkxMjAwCjwzPlsgIDY0
-MS40MDM3NzhdIF9fbDJjYXBfY2hhbl9hZGQ6IGNvbm4gYzk1MTk0NDAsIHBzbSAweDE5LCBkY2lk
-IDB4MDA0MQo8Mz5bICA2NDEuNDEwNDYxXSBsMmNhcF9jb25uZWN0X3JlcTogYmVmb3JlIHJldHVy
-biwgc2sgYzk3ZTNhMDAgcGFyZW50IGM3ZTkxMjAwCjwzPlsgIDY0MS40MTc4NzddIGwyY2FwX2Nv
-bm5lY3RfcmVxOiBwc20gMHgwMSBzY2lkIDB4MDA0Mgo8Mz5bICA2NDEuNDIzMTU2XSBsMmNhcF9j
-b25uZWN0X3JlcTogcGFyZW50IGM2NGIwYzAwCjwzPlsgIDY0MS40MjgxMzFdIF9fbDJjYXBfY2hh
-bl9hZGQ6IGNvbm4gYzk1MTk0NDAsIHBzbSAweDAxLCBkY2lkIDB4MDA0Mgo8Mz5bICA2NDEuNDM0
-NzUzXSBsMmNhcF9jb25uZWN0X3JlcTogYmVmb3JlIHJldHVybiwgc2sgYzk3ZTM0MDAgcGFyZW50
-IGM2NGIwYzAwCjwzPlsgIDY0MS40NzYxNjVdIGwyY2FwX2Nvbm5fc3RhcnQ6IEJUX0NPTk5FQ1RF
-Miwgc2sgYzk3ZTNhMDAsIHBhcmVudCBjN2U5MTIwMAo8Mz5bICA2NDEuNDgzODU2XSBsMmNhcF9z
-b2NrX2FjY2VwdDogbmV3IHNvY2tldCBjOTdlM2EwMAo8Mz5bICA2NDEuNTUxNTEzXSBsMmNhcF9z
-b2NrX2FjY2VwdDogbmV3IHNvY2tldCBjOTdlMzQwMAo8Mz5bICA2NDEuNTkyNzQyXSBsMmNhcF9z
-b2NrX3NodXRkb3duOiBzb2NrIGNlYTdhODQwLCBzayBjOTdlM2EwMCwgaG93IDIKPDM+WyAgNjQx
-LjYwNzcyN10gbDJjYXBfc29ja19zaHV0ZG93bjogc29jayBjZWE3YTBjMCwgc2sgYzk3ZTM0MDAs
-IGhvdyAyCjwzPlsgIDY0NC4wNTU0MTldIF9fbDJjYXBfY2hhbl9hZGQ6IGNvbm4gYzk1MTk0NDAs
-IHBzbSAweDAxLCBkY2lkIDB4MDAwMAo8Mz5bICA2NTAuMDU1ODE2XSBsMmNhcF9zb2NrX3NodXRk
-b3duOiBzb2NrIGNlYTdhMGMwLCBzayBjOTdlMzQwMCwgaG93IDIKPDM+WyAgNjUwLjA2MzAxOF0g
-bDJjYXBfc29ja19zaHV0ZG93bjogc2stc2h1dGRvd24gPSB0cnVlCjwzPlsgIDY1MC4wNjk0Mjdd
-IF9fbDJjYXBfc29ja19jbG9zZTogc2sgYzk3ZTM0MDAgc3RhdGUgMSBzb2NrZXQgY2VhN2EwYzAg
-cmVhc29uIDAKCg==
---0016e644b91a60ff970480ba3b03--
+Regards
+Suraj
