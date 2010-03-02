@@ -1,41 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <aa6ee971003020826m7e6db9b2jd5b9456a1aa1d368@mail.gmail.com>
-References: <aa6ee971003020826m7e6db9b2jd5b9456a1aa1d368@mail.gmail.com>
-Date: Tue, 2 Mar 2010 14:14:10 -0300
-Message-ID: <2a9506371003020914q3786eb70k57f5b1adda62c05@mail.gmail.com>
-Subject: Re: Bluetooth SPP on Nokia N900 (Maemo 5)
-From: Vinicius Gomes <vinicius.gomes@openbossa.org>
-To: Henry Owens <owens.henry@googlemail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Date: Tue, 2 Mar 2010 16:26:51 +0000
+Message-ID: <aa6ee971003020826m7e6db9b2jd5b9456a1aa1d368@mail.gmail.com>
+Subject: Bluetooth SPP on Nokia N900 (Maemo 5)
+From: Henry Owens <owens.henry@googlemail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Henry,
+Hi All,
 
-On Tue, Mar 2, 2010 at 1:26 PM, Henry Owens <owens.henry@googlemail.com> wrote:
-> Hi All,
->
-> My first mail to this list. I am currently trying to get a bluetooth
-> SPP connection going on my Nokia N900, but I'm having some
-> difficulties using the examples on the HOWTO Wiki.
->
-> Specifically, I get an error related to the ActivateService call in
-> the example - I have seen reference to this being obselete in Bluez
-> 4.x, is this the problem in the example code?
->
+My first mail to this list. I am currently trying to get a bluetooth
+SPP connection going on my Nokia N900, but I'm having some
+difficulties using the examples on the HOWTO Wiki.
 
-Yeah, the example code in the wiki is outdated, take a look at the
-example in the sources [1],
-for a working one.
+Specifically, I get an error related to the ActivateService call in
+the example - I have seen reference to this being obselete in Bluez
+4.x, is this the problem in the example code?
 
-Also, in that same directory there are a few more examples that could be useful.
+If so, how could the code be rewritten to allow a connection (I have
+no prior experience with BT programming, but am comfortable in
+Python).
+
+The code at the moment is:
+
+import dbus
+import time
+import sys
+bus = dbus.SystemBus()
+bmgr = dbus.Interface(bus.get_object('org.bluez', '/org/bluez'),
+'org.bluez.Manager')
+bus_id = bmgr.ActivateService('serial')
+serial = dbus.Interface(bus.get_object(bus_id, '/org/bluez/serial'),
+'org.bluez.serial.Manager')
+# Service connection, read the serial API to check the available patterns
+if (len(sys.argv) < 2):
+        print "Usage: %s <address> [service]" % (sys.argv[0])
+        sys.exit(1)
+address = sys.argv[1]
+if (len(sys.argv) < 3):
+        service = "spp"
+else:
+        service = sys.argv[2]
+# Bind to the default local adapter
+device = serial.ConnectService(address, service)
+print "Connected %s to %s" % (device, address)
+print "Press CTRL-C to disconnect"
+try:
+        time.sleep(1000)
+        print "Terminating connection"
+except:
+        pass
+serial.DisconnectService(device)
 
 
-Cheers,
--- 
-Vinicius Gomes
-INdT - Instituto Nokia de Tecnologia
-
-[1] http://git.kernel.org/?p=bluetooth/bluez.git;a=blob;f=test/test-serial;hb=HEAD
+Regards,
+Henry.
