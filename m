@@ -1,60 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Add sysfs battery & speed attributes for wacom
- bluetooth tablet
-From: Bastien Nocera <hadess@hadess.net>
-To: Przemo Firszt <przemo@firszt.eu>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        marcel
- <marcel@holtmann.org>, Jiri Kosina <jkosina@suse.cz>,
-        Peter Hutterer
- <peter.hutterer@who-t.net>, Ping <pinglinux@gmail.com>
-In-Reply-To: <1267389553.24791.22.camel@pldmachine>
-References: <1267389553.24791.22.camel@pldmachine>
-Content-Type: text/plain; charset="ISO-8859-1"
-Date: Tue, 02 Mar 2010 12:02:17 +0000
-Message-ID: <1267531337.23521.14275.camel@localhost.localdomain>
+Subject: Re: linux-next: Tree for March 1 (bluetooth/hci_sysfs)
+From: Marcel Holtmann <marcel@holtmann.org>
+To: David Miller <davem@davemloft.net>
+Cc: sfr@canb.auug.org.au, randy.dunlap@oracle.com,
+	linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+In-Reply-To: <20100301.181415.266447389.davem@davemloft.net>
+References: <20100301210210.c6f465e6.sfr@canb.auug.org.au>
+	 <4B8C2CC5.8000603@oracle.com>
+	 <20100302121526.36a1ea88.sfr@canb.auug.org.au>
+	 <20100301.181415.266447389.davem@davemloft.net>
+Content-Type: text/plain; charset="UTF-8"
+Date: Mon, 01 Mar 2010 23:06:18 -0800
+Message-ID: <1267513578.2710.1.camel@localhost.localdomain>
 Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hey Przemo,
+Hi Dave,
 
-On Sun, 2010-02-28 at 20:39 +0000, Przemo Firszt wrote:
-> Hi,
-> I need your opinion if reporting battery condition/changing reporting
-> speed of a bluetooth device through sysfs is an acceptable practice.
+> >> static ssize_t inquiry_cache_read(struct file *file, char __user *userbuf,
+> >> 						size_t count, loff_t *ppos)
+> >> {
+> >> 	struct hci_dev *hdev = file->private_data;
+> >> 	struct inquiry_cache *cache = &hdev->inq_cache;
+> >> 	struct inquiry_entry *e;
+> >> 	char buf[4096]; // <<<<<<<<<<<<<<<<<<<<<<<<<<< huh? don't do that on stack.
+> >> 	int n = 0;
+> > 
+> > Dave Miller is following up on that.
 > 
-> [PATCH] Add sysfs battery & speed attributes for wacom bluetooth tablet
+> This looks like a job for.... SEQ FILE! :-)
 > 
-> The patch creates 2 sysfs attributes:
-> The battery attribute is read-only and it appears in:
-> /sys/bus/hid/devices/{btaddr}/battery
-> /sys/class/bluetooth/hci*:*/{btaddr}/battery
-> /sys/class/hidraw/hidraw*/device/battery
-> Capacity values are in %, zero value means AC plug is connected.
+> I'm testing the following fix.
 
-A couple of comments:
-- battery status and adapter status should probably be 2 separate
-values. I don't know what the hardware actually exports, but I hope to
-have access to the specs of the device soon, which should answer that
-question.
-- isn't there a more kernel-y way to export that data, so that it's
-automatically picked up by things like upower (né DeviceKit-power)?
+the patch looks good, but it doesn't do the job. I have to look into why
+that is. Will try to come up with a proper patch soon.
 
-> The speed attribute allows to poke reporting speed of wacom tablet.
-> This attribute is RW, valid values are: 5 for low speed, 6 is high
-> speed. High speed is the default value. Using low speed is
-> a workaround if you experience big delay between move of stylus on
-> the tablet and move of cursor on screen.
+Regards
 
-5 and 6 are magic values. I'd rather have a boolean "high_speed"
-attribute which would switch between high-speed and low-speed.
+Marcel
 
-Finally, the patch should be split in at least 2 parts, one to add the
-sysfs infrastructure and one of the properties, and another one adding
-the property itself (maybe even 3, if we were to split the sysfs
-enablement from the properties themselves).
 
-But that's a minor problem, and if the maintainers are happy taking a
-single patch for the features, then I'm happy as well :)
-
-Cheers
