@@ -1,45 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-From: "Luis R. Rodriguez" <mcgrof@gmail.com>
-Date: Wed, 3 Mar 2010 16:43:37 -0800
-Message-ID: <43e72e891003031643u353c72dcj23bf429363a16ec8@mail.gmail.com>
-Subject: Linux Bluetooth Coexistence documentation in general and for ath9k
-To: linux-wireless <linux-wireless@vger.kernel.org>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	linux-kernel@vger.kernel.org,
-	"Kevin Hayes\" <kevin@atheros.com>, \"Dan Tian\""
-	<Dan.Tian@atheros.com>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-wireless-owner@vger.kernel.org
+From: Bing Zhao <bzhao@marvell.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Bing Zhao <bzhao@marvell.com>
+Subject: [PATCH 3/3] Bluetooth: set hdev->dev_type based on Marvell device type
+Date: Wed,  3 Mar 2010 14:37:37 -0800
+Message-Id: <1267655857-10171-3-git-send-email-bzhao@marvell.com>
+In-Reply-To: <1267655857-10171-1-git-send-email-bzhao@marvell.com>
+References: <1267655857-10171-1-git-send-email-bzhao@marvell.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Marcel, a question for you below.
+Get the device type from MODULE_BRINGUP_REQ command response.
 
-The question of Bluetooth coexistence pops up here, on IRC and on bug
-reports quite too often so I've stuffed what I could onto a page with
-a few references / code and about ath9k's schemes for BT coexistence,
-feel free to extend or correct:
+Signed-off-by: Bing Zhao <bzhao@marvell.com>
+---
+ drivers/bluetooth/btmrvl_drv.h  |    2 ++
+ drivers/bluetooth/btmrvl_main.c |    9 +++++++++
+ 2 files changed, 11 insertions(+), 0 deletions(-)
 
-http://wireless.kernel.org/en/users/Documentation/Bluetooth-coexistence
-http://wireless.kernel.org/en/users/Drivers/ath9k/btcoex
+diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
+index ec8ac5e..bd91652 100644
+--- a/drivers/bluetooth/btmrvl_drv.h
++++ b/drivers/bluetooth/btmrvl_drv.h
+@@ -41,6 +41,8 @@ struct btmrvl_device {
+ 	void *card;
+ 	struct hci_dev *hcidev;
+ 
++	u8 dev_type;
++
+ 	u8 tx_dnld_rdy;
+ 
+ 	u8 psmode;
+diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
+index 277cb10..956f40c 100644
+--- a/drivers/bluetooth/btmrvl_main.c
++++ b/drivers/bluetooth/btmrvl_main.c
+@@ -116,6 +116,13 @@ int btmrvl_process_event(struct btmrvl_private *priv, struct sk_buff *skb)
+ 				((event->data[2] == MODULE_BROUGHT_UP) ||
+ 				(event->data[2] == MODULE_ALREADY_UP)) ?
+ 				"Bring-up succeed" : "Bring-up failed");
++
++			if (event->length > 3)
++				priv->btmrvl_dev.dev_type = event->data[3];
++			else
++				priv->btmrvl_dev.dev_type = HCI_BREDR;
++
++			BT_DBG("dev_type: %d", priv->btmrvl_dev.dev_type);
+ 		} else if (priv->btmrvl_dev.sendcmdflag &&
+ 				event->data[1] == MODULE_SHUTDOWN_REQ) {
+ 			BT_DBG("EVENT:%s", (event->data[2]) ?
+@@ -549,6 +556,8 @@ int btmrvl_register_hdev(struct btmrvl_private *priv)
+ 
+ 	btmrvl_send_module_cfg_cmd(priv, MODULE_BRINGUP_REQ);
+ 
++	hdev->dev_type = priv->btmrvl_dev.dev_type;
++
+ 	ret = hci_register_dev(hdev);
+ 	if (ret < 0) {
+ 		BT_ERR("Can not register HCI device");
+-- 
+1.5.3.6
 
-I'm still not sure if "2-wire" and "3-wire" are generic terms and if
-someone owns a trademark on them or what, but looking down the road I
-think it would be nice to export this information through nl80211, if
-a device supports any of these BT-coex schemes and if so, perhaps
-display the current signal status of:
-
-  * WLAN_ACTIVE
-  * BT_PRIORITY
-  * BT_STATE
-
-I do wonder if this could be useful to network applets like network
-manager/connman. The other BT coex schemes are BT specific it seems
-and not sure if those devices can expose that information out and
-inform userspace of certain events.
-
-Marcel, does the BlueZ support exporting if certain bt-coex schemes
-are supported like AFH, channel skipping, TDM, and also if they are
-being used and details of that?
-
-  Luis
