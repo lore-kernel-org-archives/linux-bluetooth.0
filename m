@@ -1,44 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: bluez installs alsa related stuff under /etc/alsa instead of
- /usr/share/alsa
-From: Pacho Ramos <pacho@condmat1.ciencias.uniovi.es>
-Reply-To: pacho@condmat1.ciencias.uniovi.es
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-59R7oPVK5gbRwCsbBTGT"
-Date: Thu, 04 Mar 2010 09:37:39 +0100
-Message-Id: <1267691859.10782.14.camel@localhost.localdomain>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <20100304035014.GA26956@jh-x301>
+References: <2d5a2c101003021309o34b63249ub5940f67112eab6a@mail.gmail.com>
+	 <20100303033233.GA20411@jh-x301>
+	 <2d5a2c101003030025v40b2ca4ma985e5a544d7e707@mail.gmail.com>
+	 <20100304035014.GA26956@jh-x301>
+Date: Thu, 4 Mar 2010 10:32:47 +0200
+Message-ID: <2d5a2c101003040032g70434725ne3ad56042a080ed9@mail.gmail.com>
+Subject: Re: [PATCH] Fix using invalid data from previous headset connection
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Johan,
 
---=-59R7oPVK5gbRwCsbBTGT
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+On Thu, Mar 4, 2010 at 5:50 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Luiz,
+>
+> On Wed, Mar 03, 2010, Luiz Augusto von Dentz wrote:
+>> > First of all could we just call a "session" what the HFP spec calls it,
+>> > i.e. a Service Level Connection, e.g. hs->slc? Or do you have some
+>> > better suggestion?
+>>
+>> I suggested session since it represents the connection itself, even
+>> the at comands buffer is in the new structure so I guess it doesn't
+>> really represents slc, maybe connection is more suitable since there
+>> could be only one.
+>
+> True, though "connection" is longer than "session" and we should try to
+> use something that's short and clean. IMHO "slc" isn't totally bad even
+> though the data is already used before the SLC establishment is fully
+> completed. You could think of it as "data needed for SLC establishment
+> and state handling" in which case the name would be kind of justified.
 
-Hello
+Yep, I will update the name to slc.
 
-bluez installs stuff into /etc/alsa and it seems wrong since default
-location for alsa stuff seems to be /usr/share/alsa instead. You can
-also see that this is been workarounded in ubuntu, gentoo (and probably
-debian also).
+>> > Secondly you need to be careful when doing one-to-one replacements of
+>> > existing hs->foo statements with hs->session->foo statements. What if
+>> > hs->session is NULL? Are there some valid use cases when a function that
+>> > can access hs->session could get called while hs->session is NULL?
+>>
+>> Afaik no there aren't, the session represent the lifetime of the
+>> rfcomm connection and the only thing that are accessible are the gains
+>> via dbus interface but we protect them by checking the state and if by
+>> some reason we don't have a session then there is probably a bug so
+>> checking hs->session would probably hide those.
+>
+> There's also the telephony driver that can call into headset.c. However,
+> I suppose that case could also be considered a bug in the driver if it
+> does these calls while there's no connection. It's probably still a good
+> idea to check if the current drivers (particularly telephony-maemo.c) do
+> anything like this.
 
-Any reason why using /etc/alsa instead?
+I will give telephony-maemo a try, so far I didn't experience any problem.
 
-Thanks a lot
 
---=-59R7oPVK5gbRwCsbBTGT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Esta parte del mensaje =?ISO-8859-1?Q?est=E1?= firmada
- digitalmente
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.14 (GNU/Linux)
-
-iEYEABECAAYFAkuPcVMACgkQCaWpQKGI+9SBLgCeN4P4cLb6GntyIhjEzPjW0WE/
-JlAAnjJQsOspkYxn44w+PiWG+s2KQQ9Q
-=IEWy
------END PGP SIGNATURE-----
-
---=-59R7oPVK5gbRwCsbBTGT--
-
+-- 
+Luiz Augusto von Dentz
+Computer Engineer
