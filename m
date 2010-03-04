@@ -1,32 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 4 Mar 2010 16:25:59 -0400
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix using invalid data from previous headset connection
-Message-ID: <20100304202559.GA9944@jh-x301>
-References: <2d5a2c101003021309o34b63249ub5940f67112eab6a@mail.gmail.com>
- <20100303033233.GA20411@jh-x301>
- <2d5a2c101003030025v40b2ca4ma985e5a544d7e707@mail.gmail.com>
- <20100304035014.GA26956@jh-x301>
- <2d5a2c101003040032g70434725ne3ad56042a080ed9@mail.gmail.com>
- <2d5a2c101003040629m39a89b32he5112bcf6e0d2047@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <2d5a2c101003040629m39a89b32he5112bcf6e0d2047@mail.gmail.com>
+Subject: Re: Linux Bluetooth Coexistence documentation in general and for
+ ath9k
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Luis R. Rodriguez" <mcgrof@gmail.com>
+Cc: linux-wireless <linux-wireless@vger.kernel.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	linux-kernel@vger.kernel.org,
+	"Kevin Hayes\" <kevin@atheros.com>, \"Dan Tian\""
+	<Dan.Tian@atheros.com>
+In-Reply-To: <43e72e891003031643u353c72dcj23bf429363a16ec8@mail.gmail.com>
+References: <43e72e891003031643u353c72dcj23bf429363a16ec8@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 04 Mar 2010 07:10:51 -0800
+Message-ID: <1267715451.29510.20.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Luis,
 
-On Thu, Mar 04, 2010, Luiz Augusto von Dentz wrote:
-> Attached is a new version no using slc instead of session,
+> The question of Bluetooth coexistence pops up here, on IRC and on bug
+> reports quite too often so I've stuffed what I could onto a page with
+> a few references / code and about ath9k's schemes for BT coexistence,
+> feel free to extend or correct:
+> 
+> http://wireless.kernel.org/en/users/Documentation/Bluetooth-coexistence
+> http://wireless.kernel.org/en/users/Drivers/ath9k/btcoex
+> 
+> I'm still not sure if "2-wire" and "3-wire" are generic terms and if
+> someone owns a trademark on them or what, but looking down the road I
+> think it would be nice to export this information through nl80211, if
+> a device supports any of these BT-coex schemes and if so, perhaps
+> display the current signal status of:
+> 
+>   * WLAN_ACTIVE
+>   * BT_PRIORITY
+>   * BT_STATE
+> 
+> I do wonder if this could be useful to network applets like network
+> manager/connman. The other BT coex schemes are BT specific it seems
+> and not sure if those devices can expose that information out and
+> inform userspace of certain events.
+> 
+> Marcel, does the BlueZ support exporting if certain bt-coex schemes
+> are supported like AFH, channel skipping, TDM, and also if they are
+> being used and details of that?
 
-Thanks. The patch is now pushed upstream.
+the only thing the host has control over is AFH channel map, and even
+modifying that is not really needed. The Bluetooth controller will do
+AFH automatically and it is on by default. We never switch that off
+actually.
 
-> so far no problem with any telephony driver.
+Normally the co-ex stuff is hard-wired between the Bluetooth and WiFi
+and thus out of control to the host OS.
 
-Ok, good. I think that we're protected by this thanks to the
-"if (!active_devices)" check in most telephony*_ind functions.
+Regards
 
-Johan
+Marcel
+
+
