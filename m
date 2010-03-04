@@ -1,44 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Linux Bluetooth Coexistence documentation in general and for
- ath9k
-From: Bastien Nocera <hadess@hadess.net>
-To: "Luis R. Rodriguez" <mcgrof@gmail.com>
-Cc: linux-wireless <linux-wireless@vger.kernel.org>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+MIME-Version: 1.0
+From: "Luis R. Rodriguez" <mcgrof@gmail.com>
+Date: Wed, 3 Mar 2010 16:43:37 -0800
+Message-ID: <43e72e891003031643u353c72dcj23bf429363a16ec8@mail.gmail.com>
+Subject: Linux Bluetooth Coexistence documentation in general and for ath9k
+To: linux-wireless <linux-wireless@vger.kernel.org>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
 	linux-kernel@vger.kernel.org,
 	"Kevin Hayes\" <kevin@atheros.com>, \"Dan Tian\""
 	<Dan.Tian@atheros.com>
-In-Reply-To: <43e72e891003031643u353c72dcj23bf429363a16ec8@mail.gmail.com>
-References: <43e72e891003031643u353c72dcj23bf429363a16ec8@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Date: Thu, 04 Mar 2010 00:59:13 +0000
-Message-ID: <1267664353.10407.1960.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2010-03-03 at 16:43 -0800, Luis R. Rodriguez wrote:
-> Marcel, a question for you below.
-> 
-> The question of Bluetooth coexistence pops up here, on IRC and on bug
-> reports quite too often so I've stuffed what I could onto a page with
-> a few references / code and about ath9k's schemes for BT coexistence,
-> feel free to extend or correct:
-<snip>
-> I do wonder if this could be useful to network applets like network
-> manager/connman.
+Marcel, a question for you below.
 
-Not really. To me, it sounds like a "make it work" button. The kernel
-bits of Bluetooth should already have an idea of when a device is
-connected, so the kernel should be able to "do the right thing".
+The question of Bluetooth coexistence pops up here, on IRC and on bug
+reports quite too often so I've stuffed what I could onto a page with
+a few references / code and about ath9k's schemes for BT coexistence,
+feel free to extend or correct:
 
-Having options over what "the right thing" is is probably a good idea
-whilst the kinks are worked out from the default behaviour, but this is
-not something that should be advertised to users.
+http://wireless.kernel.org/en/users/Documentation/Bluetooth-coexistence
+http://wireless.kernel.org/en/users/Drivers/ath9k/btcoex
 
->  The other BT coex schemes are BT specific it seems
-> and not sure if those devices can expose that information out and
-> inform userspace of certain events.
+I'm still not sure if "2-wire" and "3-wire" are generic terms and if
+someone owns a trademark on them or what, but looking down the road I
+think it would be nice to export this information through nl80211, if
+a device supports any of these BT-coex schemes and if so, perhaps
+display the current signal status of:
 
-Cheers
+  * WLAN_ACTIVE
+  * BT_PRIORITY
+  * BT_STATE
 
+I do wonder if this could be useful to network applets like network
+manager/connman. The other BT coex schemes are BT specific it seems
+and not sure if those devices can expose that information out and
+inform userspace of certain events.
+
+Marcel, does the BlueZ support exporting if certain bt-coex schemes
+are supported like AFH, channel skipping, TDM, and also if they are
+being used and details of that?
+
+  Luis
