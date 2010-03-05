@@ -1,41 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Fri, 5 Mar 2010 20:48:54 -0800
-Message-ID: <49bf44f11003052048s5f5192ebkad57359274241e4@mail.gmail.com>
-Subject: Backtrace: _dbus_check_is_valid_path
-From: Grant <emailgrant@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <745591.47999.qm@web52606.mail.re2.yahoo.com>
+References: <367108.65360.qm@web52604.mail.re2.yahoo.com>
+	 <2d5a2c101002260041n472b3d23m10f9048f69ea1b23@mail.gmail.com>
+	 <1267806674.22567.4.camel@localhost.localdomain>
+	 <768077.72808.qm@web52601.mail.re2.yahoo.com>
+	 <2a9506371003051135v3bf107dct36cc9ab71a213326@mail.gmail.com>
+	 <745591.47999.qm@web52606.mail.re2.yahoo.com>
+Date: Fri, 5 Mar 2010 17:38:40 -0300
+Message-ID: <2a9506371003051238r3be587e2s2681fab9f459a5c9@mail.gmail.com>
+Subject: Re: obexd 0.14 "put" file corruption
+From: Vinicius Gomes <vinicius.gomes@openbossa.org>
+To: Ed Tsang <netdesign_98@yahoo.com>
+Cc: Bluettooth Linux <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I get the following backtrace when running /usr/sbin/bluetoothd:
+Hi Ed,
 
-process 3759: arguments to dbus_message_new_signal() were incorrect,
-assertion "_dbus_check_is_valid_path (path)" failed in file
-dbus-message.c line 1161.
-This is normally a bug in some application using the D-Bus library.
-  /usr/lib/libdbus-1.so.3 [0x7bd6ea11b797]
-  /usr/lib/libdbus-1.so.3 [0x7bd6ea11ad39]
-  /usr/lib/libdbus-1.so.3 [0x7bd6ea11039d]
-  /usr/lib/libdbus-1.so.3(dbus_message_new_signal+0x183) [0x7bd6ea100883]
-  /usr/sbin/bluetoothd(emit_property_changed+0x37) [0xe8eacada59c]
-  /usr/sbin/bluetoothd [0xe8eacad6de9]
-  /usr/sbin/bluetoothd(device_add_connection+0x72) [0xe8eacad6eac]
-  /usr/sbin/bluetoothd(adapter_add_connection+0x55) [0xe8eacad56e6]
-  /usr/sbin/bluetoothd(hcid_dbus_conn_complete+0x9e) [0xe8eacadbd76]
-  /usr/sbin/bluetoothd [0xe8eacac6095]
-  /usr/sbin/bluetoothd [0xe8eacac5770]
-  /usr/lib/libglib-2.0.so.0(g_main_context_dispatch+0x24a) [0x7bd6ea37565a]
-  /usr/lib/libglib-2.0.so.0 [0x7bd6ea378ca8]
-  /usr/lib/libglib-2.0.so.0(g_main_loop_run+0x1bd) [0x7bd6ea37917d]
-  /usr/sbin/bluetoothd(main+0x2a9) [0xe8eacac46fa]
-  /lib/libc.so.6(__libc_start_main+0xe6) [0x7bd6e997fa26]
-  /usr/sbin/bluetoothd [0xe8eacac39c9]
+On Fri, Mar 5, 2010 at 4:51 PM, Ed Tsang <netdesign_98@yahoo.com> wrote:
+> Vinicius,
+>>  Care to send a patch against the current git?
+>
+>   I love to, but I don't know how to generate the patch and setup git?.
+>
+>  The delta is  on  client/session.c   put_xfer_progerss(..)
+> - memmove(session->buffer + written, session->buffer, session->filled);
+> + memmove(session->buffer, session->buffer + written,  session->filled);
+>
+> Could you help me put it into the source.
+> If you are kind enough to point me a link to setup the git and generate a patch, I could be ready next time.
+>
 
-Program received signal SIGABRT, Aborted.
-0x00007bd6e9993315 in ?? ()
+Sure, just asked for this patch to be included.
 
-Can anyone tell me how to fix this?  It used to work.
+Here[1][2][3] are some references to get you started.
 
-- Grant
+>
+> Ed
+>
+
+
+Cheers,
+-- 
+Vinicius Gomes
+INdT - Instituto Nokia de Tecnologia
+
+[1] http://www.kernel.org/pub/software/scm/git/docs/
+
+[2] http://git.wiki.kernel.org/index.php/GitDocumentation
+
+[3] http://book.git-scm.com/
