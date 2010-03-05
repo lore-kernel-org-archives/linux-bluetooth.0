@@ -1,41 +1,97 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: bluez-hcidump-1.42 fails to build against bluez-4.61
-From: Pacho Ramos <pacho@condmat1.ciencias.uniovi.es>
-Reply-To: pacho@condmat1.ciencias.uniovi.es
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-ViuEHpM4Ag0yKpiJneg6"
-Date: Fri, 05 Mar 2010 19:48:42 +0100
-Message-Id: <1267814922.6970.19.camel@localhost.localdomain>
-Mime-Version: 1.0
+Message-ID: <768077.72808.qm@web52601.mail.re2.yahoo.com>
+References: <367108.65360.qm@web52604.mail.re2.yahoo.com>  <2d5a2c101002260041n472b3d23m10f9048f69ea1b23@mail.gmail.com> <1267806674.22567.4.camel@localhost.localdomain>
+Date: Fri, 5 Mar 2010 10:07:39 -0800 (PST)
+From: Ed Tsang <netdesign_98@yahoo.com>
+Subject: Re: obexd 0.14 "put" file corruption
+To: Bastien Nocera <hadess@hadess.net>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Bluettooth Linux <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1267806674.22567.4.camel@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+I think I found the problem.  It is when the MTU is 4096, the send size is set to
+3896 (200 for the overhead). So the last 200 did not get send
+and it remember as "pre-fill" for the next transfer. The code did try to move the data but incorrectly.
 
---=-ViuEHpM4Ag0yKpiJneg6
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+   clinet/session.c  put_xfer_progress()
+----- origional 
+  memmove(session->buffer + written, session->buffer, session->filled);
+  /* try to move from the remaining from the bottom of the buffer to the beginning of buffer 
+   but memove is (*dest, * src, len)  not as normally most people, including me, will guess (*src, *dest, len) 
+-------- should be
+  memmove(session->buffer, session->buffer + written,  session->filled);
 
-This is for recovering:
-http://comments.gmane.org/gmane.linux.bluez.kernel/4619
 
-since more users are getting this problem and I would like to know if
-patches provided in that thread can be used and accepted by upstream or
-they are not good enough.
+with the change, it seem working now?
 
-Thanks a lot
 
---=-ViuEHpM4Ag0yKpiJneg6
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Esta parte del mensaje =?ISO-8859-1?Q?est=E1?= firmada
- digitalmente
+Ed
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.14 (GNU/Linux)
+----- Original Message ----
+From: Bastien Nocera <hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Ed Tsang <netdesign_98@yahoo.com>; Bluettooth Linux <linux-bluetooth@vger.kernel.org>
+Sent: Fri, March 5, 2010 11:31:14 AM
+Subject: Re: obexd 0.14 "put" file corruption
 
-iEYEABECAAYFAkuRUgoACgkQCaWpQKGI+9QI0ACdFriD7mIMfLAH1c+8fdVOBris
-M8oAniImsGXf6RsXzgAoCCAII6hUcRe0
-=gl43
------END PGP SIGNATURE-----
+On Fri, 2010-02-26 at 10:41 +0200, Luiz Augusto von Dentz wrote:
+> Hi,
+> 
+> On Thu, Feb 25, 2010 at 12:23 AM, Ed Tsang <netdesign_98@yahoo.com> wrote:
+> >
+> >
+> >>I am using obexd 0.14 to push files into phone. The image file received by some phone seem a bit strange and in some phone it could not be >display at all. So I tried a simple text file with line number as text. Then I saw the file received from the phone is corrupted. Looking into the >hcidump look like the second "Put cmd" and forward, the first "0xc8" bytes was not copied (stay the same as the firs put cmd).
+> >>  Anyone know if this is a known problem in 0.14 or fixed in the latest (obexd 0.20).
+> >  Installed the obexd o.20. Same problem???
+> > -------------------------- first put
+> >     RFCOMM(d): UIH: cr 1 dlci 12 pf 0 ilen 303 fcs 0x4f
+> >        OBEX: Put cmd(c): len 3922
+> >        Name (0x01) = Unicode length 12
+> >        0000: 00 74 00 2e 00 74 00 78  00 74 00 00              .t...t.x.t..
+> >        Length (0xc3) = 8208
+> >        Body (0x48) = Sequence length 3896
+> >        0000: 30 30 20 66 69 72 73 74  20 6c 69 6e 65 20 20 0a  00 first line  .
+> >        0010: 31 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  1              .
+> >
+> > ...................... second put  (after 0xc8 is fine)
+> >      RFCOMM(d): UIH: cr 1 dlci 12 pf 0 ilen 283 fcs 0x4f
+> >        OBEX: Put cmd(c): len 3902 (continue)
+> >        Body (0x48) = Sequence length 3896
+> >        0000: 30 30 20 66 69 72 73 74  20 6c 69 6e 65 20 20 0a  00 first line  .
+> >        0010: 31 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  1              .
+> >        0020: 32 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  2              .
+> >        0030: 33 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  3              .
+> >        0040: 34 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  4              .
+> >        0050: 35 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  5              .
+> >        0060: 36 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  6              .
+> >        0070: 37 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  7              .
+> >        0080: 38 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  8              .
+> >        0090: 39 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  9              .
+> >        00a0: 41 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  A              .
+> >        00b0: 42 20 20 20 20 20 20 20  20 20 20 20 20 20 20 0a  B              .
+> >        00c0: 43 20 20 20 20 20 20 20  31 30 30 20 73 65 63 6f  C       100 seco
+> >        00d0: 6e 64 20 70 61 67 65 0a  31 20 20 20 20 20 20 20  nd page.1
+> >        00e0: 20 20 20 20 20 20 32 0a  32 20 20 20 20 20 20 20        2.2
+> >
+> > Anyone bump into this?? look like the start of copying problem...
+> 
+> Weird, are you sure the client is sending this properly? Anyway we do
+> store the data in a buffer even if was sent together with put cmd, Im
+> very suspicious that this is not the problem since we would have
+> notice this before. Btw obexd does not push/send files obex-client
+> does, are you talking about obex-client?
 
---=-ViuEHpM4Ag0yKpiJneg6--
+This has been reported to me as well, with obexd 0.19:
+https://bugzilla.redhat.com/show_bug.cgi?id=550538
 
+Ideas on how to debug this?
+
+Cheers
+
+
+      __________________________________________________________________
+The new Internet Explorer® 8 - Faster, safer, easier.  Optimized for Yahoo!  Get it Now for Free! at http://downloads.yahoo.com/ca/internetexplorer/
