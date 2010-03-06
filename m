@@ -1,51 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 6 Mar 2010 14:15:52 +0300
-From: Dan Carpenter <error27@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Dave Young <hidave.darkstar@gmail.com>,
-	Greg Kroah-Hartman <gregkh@suse.de>,
-	Roger Quadros <ext-roger.quadros@nokia.com>,
-	Bing Zhao <bzhao@marvell.com>, linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [patch] bluetooth: debugfs changes use too much stack
-Message-ID: <20100306111552.GK4958@bicker>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Date: Fri, 5 Mar 2010 20:48:54 -0800
+Message-ID: <49bf44f11003052048s5f5192ebkad57359274241e4@mail.gmail.com>
+Subject: Backtrace: _dbus_check_is_valid_path
+From: Grant <emailgrant@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The original code would break with a 4K stack.
+I get the following backtrace when running /usr/sbin/bluetoothd:
 
-Signed-off-by: Dan Carpenter <error27@gmail.com>
----
-This was compile tested only.  Sorry about that.
+process 3759: arguments to dbus_message_new_signal() were incorrect,
+assertion "_dbus_check_is_valid_path (path)" failed in file
+dbus-message.c line 1161.
+This is normally a bug in some application using the D-Bus library.
+  /usr/lib/libdbus-1.so.3 [0x7bd6ea11b797]
+  /usr/lib/libdbus-1.so.3 [0x7bd6ea11ad39]
+  /usr/lib/libdbus-1.so.3 [0x7bd6ea11039d]
+  /usr/lib/libdbus-1.so.3(dbus_message_new_signal+0x183) [0x7bd6ea100883]
+  /usr/sbin/bluetoothd(emit_property_changed+0x37) [0xe8eacada59c]
+  /usr/sbin/bluetoothd [0xe8eacad6de9]
+  /usr/sbin/bluetoothd(device_add_connection+0x72) [0xe8eacad6eac]
+  /usr/sbin/bluetoothd(adapter_add_connection+0x55) [0xe8eacad56e6]
+  /usr/sbin/bluetoothd(hcid_dbus_conn_complete+0x9e) [0xe8eacadbd76]
+  /usr/sbin/bluetoothd [0xe8eacac6095]
+  /usr/sbin/bluetoothd [0xe8eacac5770]
+  /usr/lib/libglib-2.0.so.0(g_main_context_dispatch+0x24a) [0x7bd6ea37565a]
+  /usr/lib/libglib-2.0.so.0 [0x7bd6ea378ca8]
+  /usr/lib/libglib-2.0.so.0(g_main_loop_run+0x1bd) [0x7bd6ea37917d]
+  /usr/sbin/bluetoothd(main+0x2a9) [0xe8eacac46fa]
+  /lib/libc.so.6(__libc_start_main+0xe6) [0x7bd6e997fa26]
+  /usr/sbin/bluetoothd [0xe8eacac39c9]
 
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index 1a79a6c..835758f 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -417,9 +417,11 @@ static ssize_t inquiry_cache_read(struct file *file, char __user *userbuf,
- 	struct hci_dev *hdev = file->private_data;
- 	struct inquiry_cache *cache = &hdev->inq_cache;
- 	struct inquiry_entry *e;
--	char buf[4096];
-+	char *buf;
- 	int n = 0;
-+	ssize_t ret;
- 
-+	buf = kmalloc(4096, GFP_KERNEL);
- 	hci_dev_lock_bh(hdev);
- 
- 	for (e = cache->list; e; e = e->next) {
-@@ -437,7 +439,10 @@ static ssize_t inquiry_cache_read(struct file *file, char __user *userbuf,
- 
- 	hci_dev_unlock_bh(hdev);
- 
--	return simple_read_from_buffer(userbuf, count, ppos, buf, n);
-+	ret = simple_read_from_buffer(userbuf, count, ppos, buf, n);
-+	kfree(buf);
-+
-+	return ret;
- }
- 
- static const struct file_operations inquiry_cache_fops = {
+Program received signal SIGABRT, Aborted.
+0x00007bd6e9993315 in ?? ()
+
+Can anyone tell me how to fix this?  It used to work.
+
+- Grant
