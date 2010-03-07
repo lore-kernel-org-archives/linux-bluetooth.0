@@ -1,47 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: t.a.c.henriques@googlemail.com
-To: gregkh@suse.de,
-	t.a.c.henriques@gmail.com
-Cc: marcel@holtmann.org, adobriyan@gmail.com, tglx@linutronix.de, linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: fix coding style issue in hci_vhci.c This patch affects hci_vhci.c it fixes some warnings detected by the checkpath.pl tool Signed-off-by: Tiago Henriques <t.a.c.henriques@gmail.com>
-Date: Sun,  7 Mar 2010 04:03:51 +0000
-Message-Id: <1267934631-3531-1-git-send-email-t.a.c.henriques@gmail.com>
-In-Reply-To: <Fix Bluetooth Code Style warnings>
-References: <Fix Bluetooth Code Style warnings>
+Date: Sat, 6 Mar 2010 21:50:05 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Pacho Ramos <pacho@condmat1.ciencias.uniovi.es>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: bluez-4.61 fails to build if configured with
+ "--disable-gstreamer --disable-alsa --enable-test"
+Message-ID: <20100307005005.GA15923@vigoh>
+References: <1267899275.32038.33.camel@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1267899275.32038.33.camel@localhost.localdomain>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: root <root@balganUbuntuVM.(none)>
+Hi Pacho,
 
----
- drivers/bluetooth/hci_vhci.c |    7 ++-----
- 1 files changed, 2 insertions(+), 5 deletions(-)
+* Pacho Ramos <pacho@condmat1.ciencias.uniovi.es> [2010-03-06 19:14:35 +0100]:
 
-diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
-index bb0aefd..4a5386e 100644
---- a/drivers/bluetooth/hci_vhci.c
-+++ b/drivers/bluetooth/hci_vhci.c
-@@ -264,12 +264,9 @@ static int vhci_release(struct inode *inode, struct file *file)
- 	struct vhci_data *data = file->private_data;
- 	struct hci_dev *hdev = data->hdev;
- 
--	if (hci_unregister_dev(hdev) < 0) {
-+	if (hci_unregister_dev(hdev) < 0)
- 		BT_ERR("Can't unregister HCI device %s", hdev->name);
--	}
--
- 	hci_free_dev(hdev);
--
- 	file->private_data = NULL;
- 
- 	return 0;
-@@ -284,7 +281,7 @@ static const struct file_operations vhci_fops = {
- 	.release	= vhci_release,
- };
- 
--static struct miscdevice vhci_miscdev= {
-+static struct miscdevice vhci_miscdev = {
- 	.name	= "vhci",
- 	.fops	= &vhci_fops,
- 	.minor	= MISC_DYNAMIC_MINOR,
+> It fails with:
+>   CC     test/ipctest.o
+>   CC     audio/ipc.o
+>   CCLD   test/ipctest
+> gcc: sbc/.libs/libsbc.a: No such file or directory
+> make[1]: *** [test/ipctest] Error 1
+> make: *** [all] Error 2
+> 
+> 
+> Also, other combinations (like --enable-services, --enable-audio...) can
+> end up with errors like:
+> libtool: link: x86_64-pc-linux-gnu-gcc -I/usr/include/dbus-1.0
+> -I/usr/lib64/dbus-1.0/include -I/usr/include/glib-2.0
+> -I/usr/lib64/glib-2.0/include -DBLUETOOTH_PLUGIN_BUILTIN
+> -DPLUGINDIR=\"/usr/lib64/bluetooth/plugins\" -O2 -march=athlon64-sse3
+> -mtune=athlon64-sse3 -pipe -D_FORTIFY_SOURCE=2 -fPIC -Wl,-O1 -pie -o
+> test/ipctest test/ipctest.o audio/ipc.o  /usr/lib64/libglib-2.0.so
+> sbc/.libs/libsbc.a
+> test/ipctest.o: In function `set_conf':
+> ipctest.c:(.text+0x1462): undefined reference to `sbc_reinit'
+> ipctest.c:(.text+0x14af): undefined reference to `sbc_init'
+> ipctest.c:(.text+0x161b): undefined reference to `sbc_get_codesize'
+> collect2: ld returned 1 exit status
+> make[1]: *** [test/ipctest] Error 1
+> make: *** [all] Error 2
+
+Vinicius has a patch to fix this. Let's wait he send the patch to the
+mailing list.
+
+
+> 
+> Thanks a lot for your help
+
+
 -- 
-1.6.3.3
+Gustavo F. Padovan
+http://padovan.org
+
+ProFUSION embedded systems - http://profusion.mobi
