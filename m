@@ -1,33 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4B94E5FA.1020202@csr.com>
-Date: Mon, 08 Mar 2010 11:56:42 +0000
-From: David Vrabel <david.vrabel@csr.com>
+Date: Mon, 8 Mar 2010 12:07:10 +0100 (CET)
+From: Jiri Kosina <jkosina@suse.cz>
+To: Przemo Firszt <przemo@firszt.eu>
+Cc: Bastien Nocera <hadess@hadess.net>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	marcel <marcel@holtmann.org>,
+	Peter Hutterer <peter.hutterer@who-t.net>, Ping <pinglinux@gmail.com>
+Subject: Re: [PATCH] Add sysfs battery & speed attributes for wacom bluetooth
+ tablet
+In-Reply-To: <1267389553.24791.22.camel@pldmachine>
+Message-ID: <alpine.LNX.2.00.1003081206210.17799@pobox.suse.cz>
+References: <1267389553.24791.22.camel@pldmachine>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: tmonahan@codeaurora.org, linux-bluetooth@vger.kernel.org
-Subject: Re: RFC: QuIC's AMP + eL2CAP Technical Plans
-References: <5a628eb7dc7c4773fbc9478499fde70b.squirrel@www.codeaurora.org> <1267753300.29510.25.camel@localhost.localdomain>
-In-Reply-To: <1267753300.29510.25.camel@localhost.localdomain>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Marcel Holtmann wrote:
+On Sun, 28 Feb 2010, Przemo Firszt wrote:
+
+> Hi,
+> I need your opinion if reporting battery condition/changing reporting
+> speed of a bluetooth device through sysfs is an acceptable practice.
+
+> [PATCH] Add sysfs battery & speed attributes for wacom bluetooth tablet
 > 
-> The block-based flow control is a missing piece, but the AMP type
-> extension has been merged upstream. We can create HCI_BREDR and
-> HCI_80211 controllers now. The AMP controllers are for now forced to be
-> raw devices, but that can be changed easily once we have the controller
-> init for AMP up and ready.
+> The patch creates 2 sysfs attributes:
+> The battery attribute is read-only and it appears in:
+> /sys/bus/hid/devices/{btaddr}/battery
+> /sys/class/bluetooth/hci*:*/{btaddr}/battery
+> /sys/class/hidraw/hidraw*/device/battery
+> Capacity values are in %, zero value means AC plug is connected.
+> 
+> The speed attribute allows to poke reporting speed of wacom tablet.
+> This attribute is RW, valid values are: 5 for low speed, 6 is high
+> speed. High speed is the default value. Using low speed is
+> a workaround if you experience big delay between move of stylus on
+> the tablet and move of cursor on screen.
 
-Why HCI_80211 and not HCI_AMP?  The stack shouldn't care what the AMP's
-radio actually is and with some devices (e.g., standard SDIO ones) it's
-not even possible to tell what the radio is.
+Hi Przemo,
 
-David
+do you see any obstacle to using CONFIG_POWER_SUPPLY (see drivers/power) 
+infrastructure for this?
+
+Thanks,
+
 -- 
-David Vrabel, Senior Software Engineer, Drivers
-CSR, Churchill House, Cambridge Business Park,  Tel: +44 (0)1223 692562
-Cowley Road, Cambridge, CB4 0WZ                 http://www.csr.com/
-
-
-Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
+Jiri Kosina
+SUSE Labs, Novell Inc.
