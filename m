@@ -1,32 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 8 Mar 2010 15:15:59 +0300
-From: Dan Carpenter <error27@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Bing Zhao <bzhao@marvell.com>, Rahul Tank <rahult@marvell.com>,
-	Amitkumar Karwar <akarwar@marvell.com>,
-	linux-bluetooth@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [patch] bluetooth: storing negative values as unsigned char
-Message-ID: <20100308121559.GG6469@bicker>
+Message-ID: <4B94E5FA.1020202@csr.com>
+Date: Mon, 08 Mar 2010 11:56:42 +0000
+From: David Vrabel <david.vrabel@csr.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: tmonahan@codeaurora.org, linux-bluetooth@vger.kernel.org
+Subject: Re: RFC: QuIC's AMP + eL2CAP Technical Plans
+References: <5a628eb7dc7c4773fbc9478499fde70b.squirrel@www.codeaurora.org> <1267753300.29510.25.camel@localhost.localdomain>
+In-Reply-To: <1267753300.29510.25.camel@localhost.localdomain>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is mostly cleanup.  There is only one caller and it just checks for 
-non-zero return values.  Still "ret" should be int because we want to return 
--EINVAL on errors.
+Marcel Holtmann wrote:
+> 
+> The block-based flow control is a missing piece, but the AMP type
+> extension has been merged upstream. We can create HCI_BREDR and
+> HCI_80211 controllers now. The AMP controllers are for now forced to be
+> raw devices, but that can be changed easily once we have the controller
+> init for AMP up and ready.
 
-Signed-off-by: Dan Carpenter <error27@gmail.com>
+Why HCI_80211 and not HCI_AMP?  The stack shouldn't care what the AMP's
+radio actually is and with some devices (e.g., standard SDIO ones) it's
+not even possible to tell what the radio is.
 
-diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
-index 53a43ad..49ec89c 100644
---- a/drivers/bluetooth/btmrvl_main.c
-+++ b/drivers/bluetooth/btmrvl_main.c
-@@ -66,7 +66,7 @@ int btmrvl_process_event(struct btmrvl_private *priv, struct sk_buff *skb)
- {
- 	struct btmrvl_adapter *adapter = priv->adapter;
- 	struct btmrvl_event *event;
--	u8 ret = 0;
-+	int ret = 0;
- 
- 	event = (struct btmrvl_event *) skb->data;
- 	if (event->ec != 0xff) {
+David
+-- 
+David Vrabel, Senior Software Engineer, Drivers
+CSR, Churchill House, Cambridge Business Park,  Tel: +44 (0)1223 692562
+Cowley Road, Cambridge, CB4 0WZ                 http://www.csr.com/
+
+
+Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
