@@ -1,48 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Add sysfs battery & speed attributes for wacom
- bluetooth tablet
-From: Przemo Firszt <przemo@firszt.eu>
-To: Jiri Kosina <jkosina@suse.cz>
-Cc: Bastien Nocera <hadess@hadess.net>, linux-bluetooth <linux-bluetooth@vger.kernel.org>, marcel <marcel@holtmann.org>, Peter Hutterer <peter.hutterer@who-t.net>, Ping <pinglinux@gmail.com>
-In-Reply-To: <alpine.LNX.2.00.1003081206210.17799@pobox.suse.cz>
-References: <1267389553.24791.22.camel@pldmachine>
-	 <alpine.LNX.2.00.1003081206210.17799@pobox.suse.cz>
+Subject: Re: RFC: QuIC's AMP + eL2CAP Technical Plans
+From: Marcel Holtmann <marcel@holtmann.org>
+To: David Vrabel <david.vrabel@csr.com>
+Cc: tmonahan@codeaurora.org, linux-bluetooth@vger.kernel.org
+In-Reply-To: <4B94E5FA.1020202@csr.com>
+References: <5a628eb7dc7c4773fbc9478499fde70b.squirrel@www.codeaurora.org>
+	 <1267753300.29510.25.camel@localhost.localdomain>
+	 <4B94E5FA.1020202@csr.com>
 Content-Type: text/plain; charset="UTF-8"
-Date: Mon, 08 Mar 2010 20:04:12 +0000
-Message-ID: <1268078652.3632.3.camel@pldmachine>
+Date: Mon, 08 Mar 2010 10:22:52 -0800
+Message-ID: <1268072572.3712.24.camel@localhost.localdomain>
 Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dnia 2010-03-08, pon o godzinie 12:07 +0100, Jiri Kosina pisze:
-> On Sun, 28 Feb 2010, Przemo Firszt wrote:
+Hi David,
+
+> > The block-based flow control is a missing piece, but the AMP type
+> > extension has been merged upstream. We can create HCI_BREDR and
+> > HCI_80211 controllers now. The AMP controllers are for now forced to be
+> > raw devices, but that can be changed easily once we have the controller
+> > init for AMP up and ready.
 > 
-> > Hi,
-> > I need your opinion if reporting battery condition/changing reporting
-> > speed of a bluetooth device through sysfs is an acceptable practice.
-> 
-> > [PATCH] Add sysfs battery & speed attributes for wacom bluetooth tablet
-> > 
-> > The patch creates 2 sysfs attributes:
-> > The battery attribute is read-only and it appears in:
-> > /sys/bus/hid/devices/{btaddr}/battery
-> > /sys/class/bluetooth/hci*:*/{btaddr}/battery
-> > /sys/class/hidraw/hidraw*/device/battery
-> > Capacity values are in %, zero value means AC plug is connected.
-> > 
-> > The speed attribute allows to poke reporting speed of wacom tablet.
-> > This attribute is RW, valid values are: 5 for low speed, 6 is high
-> > speed. High speed is the default value. Using low speed is
-> > a workaround if you experience big delay between move of stylus on
-> > the tablet and move of cursor on screen.
-> 
-> Hi Przemo,
-> 
-> do you see any obstacle to using CONFIG_POWER_SUPPLY (see drivers/power) 
-> infrastructure for this?
-No, I don't. I'm very sorry for the delay, but I've been rather busy in
-last few days. I've got patch implementing usage of power_supply ready -
-I just wanted to send it together with switching of reporting speed.
-I'll clean it and send it ASAP (but not today :-( ). 
---
-Cheers,
-Przemo
+> Why HCI_80211 and not HCI_AMP?  The stack shouldn't care what the AMP's
+> radio actually is and with some devices (e.g., standard SDIO ones) it's
+> not even possible to tell what the radio is.
+
+we will be adding a HCI_UWB once that specification gets ratified. And
+the controller type is an official piece of information inside the AMP
+manager. That part needs to know which type of AMP it is. Also the
+driver actually should know what type of AMP it is.
+
+I see your point that for fully generic HCI transports they might not
+know the type upfront and we need to handle that. We will cross that
+bridge when we come to it. Right now we just got started.
+
+Regards
+
+Marcel
+
+
