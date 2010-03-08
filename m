@@ -1,47 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: obexd 0.14 "put" file corruption
-From: Bastien Nocera <hadess@hadess.net>
-To: Vinicius Gomes <vinicius.gomes@openbossa.org>
-Cc: Ed Tsang <netdesign_98@yahoo.com>,
-	Bluettooth Linux <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <2a9506371003051238r3be587e2s2681fab9f459a5c9@mail.gmail.com>
-References: <367108.65360.qm@web52604.mail.re2.yahoo.com>
-	 <2d5a2c101002260041n472b3d23m10f9048f69ea1b23@mail.gmail.com>
-	 <1267806674.22567.4.camel@localhost.localdomain>
-	 <768077.72808.qm@web52601.mail.re2.yahoo.com>
-	 <2a9506371003051135v3bf107dct36cc9ab71a213326@mail.gmail.com>
-	 <745591.47999.qm@web52606.mail.re2.yahoo.com>
-	 <2a9506371003051238r3be587e2s2681fab9f459a5c9@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Date: Mon, 08 Mar 2010 14:31:41 +0000
-Message-ID: <1268058702.22567.160.camel@localhost.localdomain>
+Date: Mon, 8 Mar 2010 15:05:18 +0100
+From: Stefan Seyfried <stefan.seyfried@googlemail.com>
+To: pacho@condmat1.ciencias.uniovi.es
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: bluez-hcidump-1.42 fails to build against bluez-4.61
+Message-ID: <20100308150518.7f5b79a5@strolchi>
+In-Reply-To: <1268056614.7822.4.camel@localhost.localdomain>
+References: <1267998239.3712.11.camel@localhost.localdomain>
+	<1268056614.7822.4.camel@localhost.localdomain>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 2010-03-05 at 17:38 -0300, Vinicius Gomes wrote:
-> Hi Ed,
-> 
-> On Fri, Mar 5, 2010 at 4:51 PM, Ed Tsang <netdesign_98@yahoo.com> wrote:
-> > Vinicius,
-> >>  Care to send a patch against the current git?
-> >
-> >   I love to, but I don't know how to generate the patch and setup git?.
-> >
-> >  The delta is  on  client/session.c   put_xfer_progerss(..)
-> > - memmove(session->buffer + written, session->buffer, session->filled);
-> > + memmove(session->buffer, session->buffer + written,  session->filled);
-> >
-> > Could you help me put it into the source.
-> > If you are kind enough to point me a link to setup the git and generate a patch, I could be ready next time.
-> >
-> 
-> Sure, just asked for this patch to be included.
+On Mon, 08 Mar 2010 14:56:54 +0100
+Pacho Ramos <pacho@condmat1.ciencias.uniovi.es> wrote:
 
-You could at least have mentioned Ed's name in the commit log, or
-attributed the patch to him...
+> We should then simply wait for bluez-4.62 and, then, no patches would be
+> needed for bluez-hcidump, not? (or I have missed anything?)
 
-> Here[1][2][3] are some references to get you started.
+Yes, I verified this already: after I had updated bluez to 4.62 in the
+openSUSE buildservice, I could safely drop the two patches from the
+bluez-hcidump package and it still builds fine.
+-- 
+Stefan Seyfried
 
-
-
+"Any ideas, John?"
+"Well, surrounding them's out."
