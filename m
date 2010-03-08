@@ -1,29 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 8 Mar 2010 15:05:18 +0100
-From: Stefan Seyfried <stefan.seyfried@googlemail.com>
-To: pacho@condmat1.ciencias.uniovi.es
+Subject: Re: bluez-4.61 fails to build if configured with
+ "--disable-gstreamer --disable-alsa --enable-test"
+From: Pacho Ramos <pacho@condmat1.ciencias.uniovi.es>
+Reply-To: pacho@condmat1.ciencias.uniovi.es
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: bluez-hcidump-1.42 fails to build against bluez-4.61
-Message-ID: <20100308150518.7f5b79a5@strolchi>
-In-Reply-To: <1268056614.7822.4.camel@localhost.localdomain>
-References: <1267998239.3712.11.camel@localhost.localdomain>
-	<1268056614.7822.4.camel@localhost.localdomain>
+In-Reply-To: <20100307005005.GA15923@vigoh>
+References: <20100307005005.GA15923@vigoh>
+Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-dpaqDdfySQcyRoHVPG7u"
+Date: Mon, 08 Mar 2010 14:57:34 +0100
+Message-Id: <1268056654.7822.5.camel@localhost.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 08 Mar 2010 14:56:54 +0100
-Pacho Ramos <pacho@condmat1.ciencias.uniovi.es> wrote:
 
-> We should then simply wait for bluez-4.62 and, then, no patches would be
-> needed for bluez-hcidump, not? (or I have missed anything?)
+--=-dpaqDdfySQcyRoHVPG7u
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Yes, I verified this already: after I had updated bluez to 4.62 in the
-openSUSE buildservice, I could safely drop the two patches from the
-bluez-hcidump package and it still builds fine.
--- 
-Stefan Seyfried
+El s=C3=A1b, 06-03-2010 a las 21:50 -0300, Gustavo F. Padovan escribi=C3=B3=
+:
+> Hi Pacho,
+>=20
+> * Pacho Ramos <pacho@condmat1.ciencias.uniovi.es> [2010-03-06 19:14:35 +0=
+100]:
+>=20
+> > It fails with:
+> >   CC     test/ipctest.o
+> >   CC     audio/ipc.o
+> >   CCLD   test/ipctest
+> > gcc: sbc/.libs/libsbc.a: No such file or directory
+> > make[1]: *** [test/ipctest] Error 1
+> > make: *** [all] Error 2
+> >=20
+> >=20
+> > Also, other combinations (like --enable-services, --enable-audio...) ca=
+n
+> > end up with errors like:
+> > libtool: link: x86_64-pc-linux-gnu-gcc -I/usr/include/dbus-1.0
+> > -I/usr/lib64/dbus-1.0/include -I/usr/include/glib-2.0
+> > -I/usr/lib64/glib-2.0/include -DBLUETOOTH_PLUGIN_BUILTIN
+> > -DPLUGINDIR=3D\"/usr/lib64/bluetooth/plugins\" -O2 -march=3Dathlon64-ss=
+e3
+> > -mtune=3Dathlon64-sse3 -pipe -D_FORTIFY_SOURCE=3D2 -fPIC -Wl,-O1 -pie -=
+o
+> > test/ipctest test/ipctest.o audio/ipc.o  /usr/lib64/libglib-2.0.so
+> > sbc/.libs/libsbc.a
+> > test/ipctest.o: In function `set_conf':
+> > ipctest.c:(.text+0x1462): undefined reference to `sbc_reinit'
+> > ipctest.c:(.text+0x14af): undefined reference to `sbc_init'
+> > ipctest.c:(.text+0x161b): undefined reference to `sbc_get_codesize'
+> > collect2: ld returned 1 exit status
+> > make[1]: *** [test/ipctest] Error 1
+> > make: *** [all] Error 2
+>=20
+> Vinicius has a patch to fix this. Let's wait he send the patch to the
+> mailing list.
+>=20
 
-"Any ideas, John?"
-"Well, surrounding them's out."
+Fine :-D
+
+Thanks a lot for the information
+
+--=-dpaqDdfySQcyRoHVPG7u
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Esta parte del mensaje =?ISO-8859-1?Q?est=E1?= firmada
+ digitalmente
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.14 (GNU/Linux)
+
+iEYEABECAAYFAkuVAk4ACgkQCaWpQKGI+9QPvgCcDHrYTr8G9lF8jLQ24/Wnx82F
+iZUAnjcViLVKswBVDuqfpRayAmWAfcET
+=s0Ei
+-----END PGP SIGNATURE-----
+
+--=-dpaqDdfySQcyRoHVPG7u--
+
