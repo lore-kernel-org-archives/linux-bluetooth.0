@@ -1,34 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH] Fix compilation when --enable-test is passed
-Date: Mon,  8 Mar 2010 20:01:32 -0300
-Message-Id: <1268089292-18303-1-git-send-email-vinicius.gomes@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCH] Add sysfs battery & speed attributes for wacom
+ bluetooth tablet
+From: Przemo Firszt <przemo@firszt.eu>
+To: Jiri Kosina <jkosina@suse.cz>
+Cc: Bastien Nocera <hadess@hadess.net>, linux-bluetooth <linux-bluetooth@vger.kernel.org>, marcel <marcel@holtmann.org>, Peter Hutterer <peter.hutterer@who-t.net>, Ping <pinglinux@gmail.com>
+In-Reply-To: <alpine.LNX.2.00.1003081206210.17799@pobox.suse.cz>
+References: <1267389553.24791.22.camel@pldmachine>
+	 <alpine.LNX.2.00.1003081206210.17799@pobox.suse.cz>
+Content-Type: text/plain; charset="UTF-8"
+Date: Mon, 08 Mar 2010 20:04:12 +0000
+Message-ID: <1268078652.3632.3.camel@pldmachine>
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When --enable-test is passed along with --disable-alsa and
---disable-gstreamer, the SBC lib is not built, which breaks
-compilation of the ipctest test program.
----
- acinclude.m4 |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
-
-diff --git a/acinclude.m4 b/acinclude.m4
-index 2e4444d..0eaf236 100644
---- a/acinclude.m4
-+++ b/acinclude.m4
-@@ -316,7 +316,8 @@ AC_DEFUN([AC_ARG_BLUEZ], [
- 
- 	AM_CONDITIONAL(SNDFILE, test "${sndfile_enable}" = "yes" && test "${sndfile_found}" = "yes")
- 	AM_CONDITIONAL(USB, test "${usb_enable}" = "yes" && test "${usb_found}" = "yes")
--	AM_CONDITIONAL(SBC, test "${alsa_enable}" = "yes" || test "${gstreamer_enable}" = "yes")
-+	AM_CONDITIONAL(SBC, test "${alsa_enable}" = "yes" || test "${gstreamer_enable}" = "yes" ||
-+			test "${test_enable}" = "yes")
- 	AM_CONDITIONAL(ALSA, test "${alsa_enable}" = "yes" && test "${alsa_found}" = "yes")
- 	AM_CONDITIONAL(GSTREAMER, test "${gstreamer_enable}" = "yes" && test "${gstreamer_found}" = "yes")
- 	AM_CONDITIONAL(AUDIOPLUGIN, test "${audio_enable}" = "yes")
--- 
-1.7.0
-
+Dnia 2010-03-08, pon o godzinie 12:07 +0100, Jiri Kosina pisze:
+> On Sun, 28 Feb 2010, Przemo Firszt wrote:
+> 
+> > Hi,
+> > I need your opinion if reporting battery condition/changing reporting
+> > speed of a bluetooth device through sysfs is an acceptable practice.
+> 
+> > [PATCH] Add sysfs battery & speed attributes for wacom bluetooth tablet
+> > 
+> > The patch creates 2 sysfs attributes:
+> > The battery attribute is read-only and it appears in:
+> > /sys/bus/hid/devices/{btaddr}/battery
+> > /sys/class/bluetooth/hci*:*/{btaddr}/battery
+> > /sys/class/hidraw/hidraw*/device/battery
+> > Capacity values are in %, zero value means AC plug is connected.
+> > 
+> > The speed attribute allows to poke reporting speed of wacom tablet.
+> > This attribute is RW, valid values are: 5 for low speed, 6 is high
+> > speed. High speed is the default value. Using low speed is
+> > a workaround if you experience big delay between move of stylus on
+> > the tablet and move of cursor on screen.
+> 
+> Hi Przemo,
+> 
+> do you see any obstacle to using CONFIG_POWER_SUPPLY (see drivers/power) 
+> infrastructure for this?
+No, I don't. I'm very sorry for the delay, but I've been rather busy in
+last few days. I've got patch implementing usage of power_supply ready -
+I just wanted to send it together with switching of reporting speed.
+I'll clean it and send it ASAP (but not today :-( ). 
+--
+Cheers,
+Przemo
