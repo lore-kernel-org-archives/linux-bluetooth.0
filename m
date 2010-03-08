@@ -1,52 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: bluez-hcidump-1.42 fails to build against bluez-4.61
-From: Pacho Ramos <pacho@condmat1.ciencias.uniovi.es>
-Reply-To: pacho@condmat1.ciencias.uniovi.es
-To: Stefan Seyfried <stefan.seyfried@googlemail.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20100308150518.7f5b79a5@strolchi>
-References: <20100308150518.7f5b79a5@strolchi>
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-YfMH8AGH3jPUgWSluExc"
-Date: Mon, 08 Mar 2010 15:36:14 +0100
-Message-Id: <1268058974.7822.6.camel@localhost.localdomain>
+Subject: Re: obexd 0.14 "put" file corruption
+From: Bastien Nocera <hadess@hadess.net>
+To: Vinicius Gomes <vinicius.gomes@openbossa.org>
+Cc: Ed Tsang <netdesign_98@yahoo.com>,
+	Bluettooth Linux <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <2a9506371003051238r3be587e2s2681fab9f459a5c9@mail.gmail.com>
+References: <367108.65360.qm@web52604.mail.re2.yahoo.com>
+	 <2d5a2c101002260041n472b3d23m10f9048f69ea1b23@mail.gmail.com>
+	 <1267806674.22567.4.camel@localhost.localdomain>
+	 <768077.72808.qm@web52601.mail.re2.yahoo.com>
+	 <2a9506371003051135v3bf107dct36cc9ab71a213326@mail.gmail.com>
+	 <745591.47999.qm@web52606.mail.re2.yahoo.com>
+	 <2a9506371003051238r3be587e2s2681fab9f459a5c9@mail.gmail.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Date: Mon, 08 Mar 2010 14:31:41 +0000
+Message-ID: <1268058702.22567.160.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Fri, 2010-03-05 at 17:38 -0300, Vinicius Gomes wrote:
+> Hi Ed,
+> 
+> On Fri, Mar 5, 2010 at 4:51 PM, Ed Tsang <netdesign_98@yahoo.com> wrote:
+> > Vinicius,
+> >>  Care to send a patch against the current git?
+> >
+> >   I love to, but I don't know how to generate the patch and setup git?.
+> >
+> >  The delta is  on  client/session.c   put_xfer_progerss(..)
+> > - memmove(session->buffer + written, session->buffer, session->filled);
+> > + memmove(session->buffer, session->buffer + written,  session->filled);
+> >
+> > Could you help me put it into the source.
+> > If you are kind enough to point me a link to setup the git and generate a patch, I could be ready next time.
+> >
+> 
+> Sure, just asked for this patch to be included.
 
---=-YfMH8AGH3jPUgWSluExc
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+You could at least have mentioned Ed's name in the commit log, or
+attributed the patch to him...
 
-El lun, 08-03-2010 a las 15:05 +0100, Stefan Seyfried escribi=C3=B3:
-> On Mon, 08 Mar 2010 14:56:54 +0100
-> Pacho Ramos <pacho@condmat1.ciencias.uniovi.es> wrote:
->=20
-> > We should then simply wait for bluez-4.62 and, then, no patches would b=
-e
-> > needed for bluez-hcidump, not? (or I have missed anything?)
->=20
-> Yes, I verified this already: after I had updated bluez to 4.62 in the
-> openSUSE buildservice, I could safely drop the two patches from the
-> bluez-hcidump package and it still builds fine.
+> Here[1][2][3] are some references to get you started.
 
-Yes, I have just confirmed it, sorry for the inconvenience, I didn't
-notice 4.62 was already released
 
-Thanks a lot
-
---=-YfMH8AGH3jPUgWSluExc
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Esta parte del mensaje =?ISO-8859-1?Q?est=E1?= firmada
- digitalmente
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.14 (GNU/Linux)
-
-iEYEABECAAYFAkuVC14ACgkQCaWpQKGI+9T7XwCfTFX+1qD0BfM+elT9s/qw6dNN
-LVUAnA/AJ2zohz2fRW8/3EtBJn98bUdJ
-=HxyY
------END PGP SIGNATURE-----
-
---=-YfMH8AGH3jPUgWSluExc--
 
