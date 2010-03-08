@@ -1,27 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <9698.25397.qm@web52603.mail.re2.yahoo.com>
-References: <367108.65360.qm@web52604.mail.re2.yahoo.com>  <2d5a2c101002260041n472b3d23m10f9048f69ea1b23@mail.gmail.com>  <1267806674.22567.4.camel@localhost.localdomain>  <768077.72808.qm@web52601.mail.re2.yahoo.com>  <2a9506371003051135v3bf107dct36cc9ab71a213326@mail.gmail.com>  <745591.47999.qm@web52606.mail.re2.yahoo.com>  <2a9506371003051238r3be587e2s2681fab9f459a5c9@mail.gmail.com> <1268058702.22567.160.camel@localhost.localdomain>
-Date: Mon, 8 Mar 2010 08:53:04 -0800 (PST)
-From: Ed Tsang <netdesign_98@yahoo.com>
-Subject: Re: obexd 0.14 "put" file corruption
-To: Bastien Nocera <hadess@hadess.net>,
-	Vinicius Gomes <vinicius.gomes@openbossa.org>
-Cc: Bluettooth Linux <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1268058702.22567.160.camel@localhost.localdomain>
+Message-ID: <b07645c41093608ae0c82fda60b26804.squirrel@www.codeaurora.org>
+In-Reply-To: <4B94E5FA.1020202@csr.com>
+References: <5a628eb7dc7c4773fbc9478499fde70b.squirrel@www.codeaurora.org>
+    <1267753300.29510.25.camel@localhost.localdomain>
+    <4B94E5FA.1020202@csr.com>
+Date: Mon, 8 Mar 2010 06:52:32 -0800 (PST)
+Subject: Re: RFC: QuIC's AMP + eL2CAP Technical Plans
+From: tmonahan@codeaurora.org
+To: "David Vrabel" <david.vrabel@csr.com>
+Cc: "Marcel Holtmann" <marcel@holtmann.org>, tmonahan@codeaurora.org,
+	linux-bluetooth@vger.kernel.org
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi, David,
 
+>> The block-based flow control is a missing piece, but the AMP type
+>> extension has been merged upstream. We can create HCI_BREDR and
+>> HCI_80211 controllers now. The AMP controllers are for now forced to be
+>> raw devices, but that can be changed easily once we have the controller
+>> init for AMP up and ready.
+>
+> Why HCI_80211 and not HCI_AMP?  The stack shouldn't care what the AMP's
+> radio actually is and with some devices (e.g., standard SDIO ones) it's
+> not even possible to tell what the radio is.
 
->You could at least have mentioned Ed's name in the commit log, or
->attributed the patch to him...
-That is unnecessarily. 
+One answer is, the "Read Local AMP Info Command" requires the Controller
+Type. The value appears in some other AMP HCI commands as well.
 
-Ed
+Regards,
+Tim
 
-
-      __________________________________________________________________
-Yahoo! Canada Toolbar: Search from anywhere on the web, and bookmark your favourite sites. Download it now
-http://ca.toolbar.yahoo.com.
