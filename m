@@ -1,33 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4B95F67A.9090305@nokia.com>
-Date: Tue, 09 Mar 2010 09:19:22 +0200
-From: Ville Tervo <ville.tervo@nokia.com>
-MIME-Version: 1.0
-To: "Tervo Ville (Nokia-D/Helsinki)" <Ville.Tervo@nokia.com>
-CC: Nick Pelly <npelly@google.com>, Dave Young <hidave.darkstar@gmail.com>,
-        Bluettooth Linux <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: Kernel panic in rfcomm_run - unbalanced refcount on 	rfcomm_session
-References: <35c90d961002172104q3af1ca8p850004f8b93e8af7@mail.gmail.com> 	<a8e1da1002200017t6e856c7cu1300ac5b3b3a43b@mail.gmail.com> <35c90d961002211300s25507542y9b73724881be5540@mail.gmail.com> <4B87A10C.4070100@nokia.com>
-In-Reply-To: <4B87A10C.4070100@nokia.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: Phonebook functions for BlueZ
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Felix Huber <felix.huber@schyf.de>, linux-bluetooth@vger.kernel.org
+In-Reply-To: <20100309033841.GA21210@jh-x301>
+References: <4B8A3EEA.3030901@schyf.de> <20100301192050.GA25876@jh-x301>
+	 <1267982102.7714.87.camel@rb-l1.nos.office>
+	 <20100309033841.GA21210@jh-x301>
+Content-Type: text/plain; charset="UTF-8"
+Date: Mon, 08 Mar 2010 21:27:21 -0800
+Message-ID: <1268112441.3712.46.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Tervo Ville (Nokia-D/Helsinki) wrote:
-> 
-> l2cap socket status might change while rfcomm is processing frames. And 
-> that makes rfcomm_process_rx to do double rfcomm_session_put() for 
-> incoming session reference. We cannot use sk_state.
-> 
-> Could you try with this patch if it helps to your problems also? My OPP 
-> problems went away with this patch.
-> 
-> I moved rfcomm_session_put() for incoming session to 
-> rfcomm_session_close in order to get more clear _hold()/_put() pairs.
-> 
-> 
+Hi Johan,
 
-Any comments about the patch in previous mail?
+> > > > +	if (g_str_equal(property, "direction")) {
+> > > > +		dbus_message_iter_get_basic(&sub, &direction);
+> > > > +	} else if (g_str_equal(property, "peer")) {
+> > > > +		dbus_message_iter_get_basic(&sub, &peer);
+> > > > +		vc->number = g_strdup(peer);
+> > > > +	} else if (g_str_equal(property, "reason")) {
+> > > > +		dbus_message_iter_get_basic(&sub, &reason);
+> > > > +	} else if (g_str_equal(property, "auxstatus")) {
+> > > > +		dbus_message_iter_get_basic(&sub, &auxstatus);
+> > > > +	} else if (g_str_equal(property, "line")) {
+> > > > +		dbus_message_iter_get_basic(&sub, &line);
+> > > > +	}
+> > > 
+> > > No braces for one-line scopes.
+> > Well, here we have a conflict: The kernel style guide says that if one
+> > of the blocks has braces the other one should also have, even if it is a
+> > single line.
+> 
+> Yesh, I noticed the same thing when checking the kernel coding style
+> guidelines. Most of BlueZ code is in conflict with the kernel coding
+> style in this respect, so I think we'd need some comment from Marcel on
+> what exactly he wants the BlueZ style to be (might be that I've already
+> discussed this a long time ago with him but I can't remember the outcome
+> right now).
 
--- 
-Ville
+there is not real rule here that can be followed and will be true in all
+cases. As long as the code is easy to read and understand it is fine. It
+goes more like this: If the else statement is by itself then don't
+bother with braces around it. Even if the if needs braces. If you have
+multiple else if then the braces are actually a good idea. I would
+almost go that far for complex ones like the one above using braces
+would make it less error prone if you change something later. Even if
+the compiler actually does warn you these days.
+
+Use your own personal judgment here. However if the reviewing the code
+make my brain hurt, then you did it wrong ;)
+
+Regards
+
+Marcel
+
+
