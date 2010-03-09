@@ -1,36 +1,221 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [bluetooth-next V2] bluetooth: hci_sysfs: use strict_strtoul
- instead of simple_strtoul
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Tomas Winkler <tomas.winkler@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, guy.cohen@intel.com,
-	ron.rindjunsky@intel.com
-In-Reply-To: <1268163483-26181-1-git-send-email-tomas.winkler@intel.com>
-References: <1268163483-26181-1-git-send-email-tomas.winkler@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 09 Mar 2010 12:41:54 -0800
-Message-ID: <1268167314.3712.59.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <35c90d960912161359u2b3f9b2fi875288896a7a8478@mail.gmail.com>
+References: <35c90d960912081950t135e3f10m8848e54fde1e596f@mail.gmail.com>
+	<1260335175.2901.20.camel@violet> <35c90d960912082213s26fb0ebse75ce85d43213d9@mail.gmail.com>
+	<1260482634.2901.70.camel@violet> <35c90d960912161359u2b3f9b2fi875288896a7a8478@mail.gmail.com>
+From: Nick Pelly <npelly@google.com>
+Date: Tue, 9 Mar 2010 12:07:02 -0800
+Message-ID: <35c90d961003091207u66571bt789461dcc7972693@mail.gmail.com>
+Subject: Re: RFC: Allow Bluez to select flushable or non-flushable ACL packets
+	with L2CAP_LM_RELIABLE
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=0050450294bece2be4048163ba2e
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tomas,
+--0050450294bece2be4048163ba2e
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-> use strict_strtoul as suggested by checkpatch.pl
-> 
-> Signed-off-by: Tomas Winkler <tomas.winkler@intel.com>
-> ---
-> V2:
-> 1. more verbose commit message
-> 2. return the error code that was produced by strict_strtoul 
+On Wed, Dec 16, 2009 at 1:59 PM, Nick Pelly <npelly@google.com> wrote:
+> Hi Marcel,
+>
+> On Thu, Dec 10, 2009 at 2:03 PM, Marcel Holtmann <marcel@holtmann.org> wr=
+ote:
+>> Hi Nick,
+>>
+>>> >> Right now Bluez always requests flushable ACL packets (but does not
+>>> >> set a flush timeout, so effectively they are non-flushable):
+>>> >>
+>>> >> However it is desirable to use an ACL flush timeout on A2DP packets =
+so
+>>> >> that if the ACL packets block for some reason then the LM can flush
+>>> >> them to make room for newer packets.
+>>> >>
+>>> >> Is it reasonable for Bluez to use the 0x00 ACL packet boundary flag =
+by
+>>> >> default (non-flushable packet), and let userspace request flushable
+>>> >> packets on A2DP L2CAP sockets with the socket option
+>>> >> L2CAP_LM_RELIABLE.
+>>> >
+>>> > the reliable option has a different meaning. It comes back from the o=
+ld
+>>> > Bluetooth 1.1 qualification days where we had to tests on L2CAP that =
+had
+>>> > to confirm that we can detect malformed packets and report them. Thes=
+e
+>>> > days it is just fine to drop them.
+>>>
+>>> Got it, how about introducing
+>>>
+>>> #define L2CAP_LM_FLUSHABLE 0x0040
+>>
+>> that l2cap_sock_setsockopt_old() sets this didn't give you a hint that
+>> we might wanna deprecate this socket options ;)
+>>
+>> I need to read up on the flushable stuff, but in the end it deserves its
+>> own socket option. Also an ioctl() to actually trigger Enhanced flush
+>> might be needed.
+>>
+>>> struct l2cap_pinfo {
+>>> =A0 =A0...
+>>> =A0 =A0__u8 flushable;
+>>> }
+>>
+>> Sure. In the long run we need to turn this into a bitmask. We are just
+>> wasting memory here.
+>
+> Attached is an updated patch, that checks the LMP features bitmask
+> before using the new non-flushable packet type.
+>
+> I am still using L2CAP_LM_FLUSHABLE socket option in
+> l2cap_sock_setsockopt_old(), which I don't think you are happy with.
+> So how about a new option:
+>
+> SOL_L2CAP, L2CAP_ACL_FLUSH
+> which has a default value of 0, and can be set to 1 to make the ACL
+> data sent by this L2CAP socket flushable.
+>
+> In a later commit we would then add
+> SOL_ACL, ACL_FLUSH_TIMEOUT
+> That is used to set an automatic flush timeout for the ACL link on a
+> L2CAP socket. Note that SOL_ACL is new.
+>
+> But maybe this is not what you had in mind, so I'm looking for your
+> advice before I implement this.
 
-why do you bother actually. Reading the comment about struct_strtoul it
-will only return -EINVAL or 0. So using my proposal would be just fine.
-I also don't prefer to differ the return value to user space until it
-actually makes sense. Invalid argument is just fine for all error cases.
+Attached an updated patch for 2.6.32 kernel. We've been using this
+patch successfully on production devices.
 
-Regards
+Nick
 
-Marcel
+--0050450294bece2be4048163ba2e
+Content-Type: application/octet-stream;
+	name="0001-Bluetooth-Use-non-flushable-pb-flag-by-default-for-A.patch"
+Content-Disposition: attachment;
+	filename="0001-Bluetooth-Use-non-flushable-pb-flag-by-default-for-A.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_g6l4t5v31
 
-
+RnJvbSA4MGVhMWVmNmQ4MmU1YmNiZGU4NWMyM2M4NTg1Y2NhYzgyMGY1NTE1IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBOaWNrIFBlbGx5IDxucGVsbHlAZ29vZ2xlLmNvbT4KRGF0ZTog
+VHVlLCA4IERlYyAyMDA5IDE5OjQyOjIxIC0wODAwClN1YmplY3Q6IFtQQVRDSF0gQmx1ZXRvb3Ro
+OiBVc2Ugbm9uLWZsdXNoYWJsZSBwYiBmbGFnIGJ5IGRlZmF1bHQgZm9yIEFDTCBkYXRhIG9uIGNh
+cGFibGUgY2hpcHNldHMuCgpXaXRoIEJsdWV0b290aCAyLjEgQUNMIHBhY2tldHMgY2FuIGJlIGZs
+dXNoYWJsZSBvciBub24tZmx1c2hhYmxlLiBUaGlzIGNvbW1pdAptYWtlcyBBQ0wgZGF0YSBwYWNr
+ZXRzIG5vbi1mbHVzaGFibGUgYnkgZGVmYXVsdCBvbiBjb21wYXRpYmxlIGNoaXBzZXRzLCBhbmQK
+YWRkcyB0aGUgTDJDQVBfTE1fRkxVU0hBQkxFIHNvY2tldCBvcHRpb24gdG8gZXhwbGljaXRseSBy
+ZXF1ZXN0IGZsdXNoYWJsZSBBQ0wKZGF0YSBwYWNrZXRzIGZvciBhIGdpdmVuIEwyQ0FQIHNvY2tl
+dC4gVGhpcyBpcyB1c2VmdWwgZm9yIEEyRFAgZGF0YSB3aGljaCBjYW4KYmUgc2FmZWx5IGRpc2Nh
+cmRlZCBpZiBpdCBjYW4gbm90IGJlIGRlbGl2ZXJlZCB3aXRoaW4gYSBzaG9ydCB0aW1lICh3aGls
+ZQpvdGhlciBBQ0wgZGF0YSBzaG91bGQgbm90IGJlIGRpc2NhcmRlZCkuCgpOb3RlIHRoYXQgbWFr
+aW5nIEFDTCBkYXRhIGZsdXNoYWJsZSBoYXMgbm8gZWZmZWN0IHVubGVzcyB0aGUgYXV0b21hdGlj
+IGZsdXNoCnRpbWVvdXQgZm9yIHRoYXQgQUNMIGxpbmsgaXMgY2hhbmdlZCBmcm9tIGl0cyBkZWZh
+dWx0IG9mIDAgKGluZmluaXRlKS4KClNpZ25lZC1vZmYtYnk6IE5pY2sgUGVsbHkgPG5wZWxseUBn
+b29nbGUuY29tPgotLS0KIGluY2x1ZGUvbmV0L2JsdWV0b290aC9oY2kuaCAgICAgIHwgICAgNCAr
+KysrCiBpbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuaCB8ICAgIDEgKwogaW5jbHVkZS9u
+ZXQvYmx1ZXRvb3RoL2wyY2FwLmggICAgfCAgICAyICsrCiBuZXQvYmx1ZXRvb3RoL2hjaV9jb3Jl
+LmMgICAgICAgICB8ICAgIDYgKysrKy0tCiBuZXQvYmx1ZXRvb3RoL2wyY2FwLmMgICAgICAgICAg
+ICB8ICAgMjUgKysrKysrKysrKysrKysrKysrKysrKy0tLQogNSBmaWxlcyBjaGFuZ2VkLCAzMyBp
+bnNlcnRpb25zKCspLCA1IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2luY2x1ZGUvbmV0L2Js
+dWV0b290aC9oY2kuaCBiL2luY2x1ZGUvbmV0L2JsdWV0b290aC9oY2kuaAppbmRleCA5NzE2ZTVh
+Li5iZmQyM2FlIDEwMDY0NAotLS0gYS9pbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpLmgKKysrIGIv
+aW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2hjaS5oCkBAIC0xNDUsMTEgKzE0NSwxNCBAQCBlbnVtIHsK
+IAkJCUVEUl9FU0NPX01BU0spCiAKIC8qIEFDTCBmbGFncyAqLworI2RlZmluZSBBQ0xfU1RBUlRf
+Tk9fRkxVU0gJMHgwMAogI2RlZmluZSBBQ0xfQ09OVAkJMHgwMQogI2RlZmluZSBBQ0xfU1RBUlQJ
+CTB4MDIKICNkZWZpbmUgQUNMX0FDVElWRV9CQ0FTVAkweDA0CiAjZGVmaW5lIEFDTF9QSUNPX0JD
+QVNUCQkweDA4CiAKKyNkZWZpbmUgQUNMX1BCX01BU0sJKEFDTF9DT05UIHwgQUNMX1NUQVJUKQor
+CiAvKiBCYXNlYmFuZCBsaW5rcyAqLwogI2RlZmluZSBTQ09fTElOSwkweDAwCiAjZGVmaW5lIEFD
+TF9MSU5LCTB4MDEKQEAgLTE4OCw2ICsxOTEsNyBAQCBlbnVtIHsKICNkZWZpbmUgTE1QX0VEUl9F
+U0NPXzNNCTB4NDAKICNkZWZpbmUgTE1QX0VEUl8zU19FU0NPCTB4ODAKIAorI2RlZmluZSBMTVBf
+Tk9fRkxVU0gJMHgwMQogI2RlZmluZSBMTVBfU0lNUExFX1BBSVIJMHgwOAogCiAvKiBDb25uZWN0
+aW9uIG1vZGVzICovCmRpZmYgLS1naXQgYS9pbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpX2NvcmUu
+aCBiL2luY2x1ZGUvbmV0L2JsdWV0b290aC9oY2lfY29yZS5oCmluZGV4IGNiY2M1YjEuLmY1ZGE0
+ZTYgMTAwNjQ0Ci0tLSBhL2luY2x1ZGUvbmV0L2JsdWV0b290aC9oY2lfY29yZS5oCisrKyBiL2lu
+Y2x1ZGUvbmV0L2JsdWV0b290aC9oY2lfY29yZS5oCkBAIC00NzksNiArNDc5LDcgQEAgdm9pZCBo
+Y2lfY29ubl9kZWxfc3lzZnMoc3RydWN0IGhjaV9jb25uICpjb25uKTsKICNkZWZpbmUgbG1wX3Nu
+aWZmc3Vicl9jYXBhYmxlKGRldikgKChkZXYpLT5mZWF0dXJlc1s1XSAmIExNUF9TTklGRl9TVUJS
+KQogI2RlZmluZSBsbXBfZXNjb19jYXBhYmxlKGRldikgICAgICAoKGRldiktPmZlYXR1cmVzWzNd
+ICYgTE1QX0VTQ08pCiAjZGVmaW5lIGxtcF9zc3BfY2FwYWJsZShkZXYpICAgICAgICgoZGV2KS0+
+ZmVhdHVyZXNbNl0gJiBMTVBfU0lNUExFX1BBSVIpCisjZGVmaW5lIGxtcF9ub19mbHVzaF9jYXBh
+YmxlKGRldikgICgoZGV2KS0+ZmVhdHVyZXNbNl0gJiBMTVBfTk9fRkxVU0gpCiAKIC8qIC0tLS0t
+IEhDSSBwcm90b2NvbHMgLS0tLS0gKi8KIHN0cnVjdCBoY2lfcHJvdG8gewpkaWZmIC0tZ2l0IGEv
+aW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2wyY2FwLmggYi9pbmNsdWRlL25ldC9ibHVldG9vdGgvbDJj
+YXAuaAppbmRleCA5NTE2ZjRiLi4yM2YzN2I0IDEwMDY0NAotLS0gYS9pbmNsdWRlL25ldC9ibHVl
+dG9vdGgvbDJjYXAuaAorKysgYi9pbmNsdWRlL25ldC9ibHVldG9vdGgvbDJjYXAuaApAQCAtNzAs
+NiArNzAsNyBAQCBzdHJ1Y3QgbDJjYXBfY29ubmluZm8gewogI2RlZmluZSBMMkNBUF9MTV9UUlVT
+VEVECTB4MDAwOAogI2RlZmluZSBMMkNBUF9MTV9SRUxJQUJMRQkweDAwMTAKICNkZWZpbmUgTDJD
+QVBfTE1fU0VDVVJFCQkweDAwMjAKKyNkZWZpbmUgTDJDQVBfTE1fRkxVU0hBQkxFCTB4MDA0MAog
+CiAvKiBMMkNBUCBjb21tYW5kIGNvZGVzICovCiAjZGVmaW5lIEwyQ0FQX0NPTU1BTkRfUkVKCTB4
+MDEKQEAgLTMxNiw2ICszMTcsNyBAQCBzdHJ1Y3QgbDJjYXBfcGluZm8gewogCV9fdTgJCXNlY19s
+ZXZlbDsKIAlfX3U4CQlyb2xlX3N3aXRjaDsKIAlfX3U4CQlmb3JjZV9yZWxpYWJsZTsKKwlfX3U4
+CQlmbHVzaGFibGU7CiAKIAlfX3U4CQljb25mX3JlcVs2NF07CiAJX191OAkJY29uZl9sZW47CmRp
+ZmYgLS1naXQgYS9uZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmMgYi9uZXQvYmx1ZXRvb3RoL2hjaV9j
+b3JlLmMKaW5kZXggZTFkYThmNi4uODRhOWQ3NSAxMDA2NDQKLS0tIGEvbmV0L2JsdWV0b290aC9o
+Y2lfY29yZS5jCisrKyBiL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuYwpAQCAtMTIzOSw3ICsxMjM5
+LDcgQEAgaW50IGhjaV9zZW5kX2FjbChzdHJ1Y3QgaGNpX2Nvbm4gKmNvbm4sIHN0cnVjdCBza19i
+dWZmICpza2IsIF9fdTE2IGZsYWdzKQogCiAJc2tiLT5kZXYgPSAodm9pZCAqKSBoZGV2OwogCWJ0
+X2NiKHNrYiktPnBrdF90eXBlID0gSENJX0FDTERBVEFfUEtUOwotCWhjaV9hZGRfYWNsX2hkcihz
+a2IsIGNvbm4tPmhhbmRsZSwgZmxhZ3MgfCBBQ0xfU1RBUlQpOworCWhjaV9hZGRfYWNsX2hkcihz
+a2IsIGNvbm4tPmhhbmRsZSwgZmxhZ3MpOwogCiAJaWYgKCEobGlzdCA9IHNrYl9zaGluZm8oc2ti
+KS0+ZnJhZ19saXN0KSkgewogCQkvKiBOb24gZnJhZ21lbnRlZCAqLwpAQCAtMTI1NiwxMiArMTI1
+NiwxNCBAQCBpbnQgaGNpX3NlbmRfYWNsKHN0cnVjdCBoY2lfY29ubiAqY29ubiwgc3RydWN0IHNr
+X2J1ZmYgKnNrYiwgX191MTYgZmxhZ3MpCiAJCXNwaW5fbG9ja19iaCgmY29ubi0+ZGF0YV9xLmxv
+Y2spOwogCiAJCV9fc2tiX3F1ZXVlX3RhaWwoJmNvbm4tPmRhdGFfcSwgc2tiKTsKKwkJZmxhZ3Mg
+Jj0gfkFDTF9QQl9NQVNLOworCQlmbGFncyB8PSBBQ0xfQ09OVDsKIAkJZG8gewogCQkJc2tiID0g
+bGlzdDsgbGlzdCA9IGxpc3QtPm5leHQ7CiAKIAkJCXNrYi0+ZGV2ID0gKHZvaWQgKikgaGRldjsK
+IAkJCWJ0X2NiKHNrYiktPnBrdF90eXBlID0gSENJX0FDTERBVEFfUEtUOwotCQkJaGNpX2FkZF9h
+Y2xfaGRyKHNrYiwgY29ubi0+aGFuZGxlLCBmbGFncyB8IEFDTF9DT05UKTsKKwkJCWhjaV9hZGRf
+YWNsX2hkcihza2IsIGNvbm4tPmhhbmRsZSwgZmxhZ3MpOwogCiAJCQlCVF9EQkcoIiVzIGZyYWcg
+JXAgbGVuICVkIiwgaGRldi0+bmFtZSwgc2tiLCBza2ItPmxlbik7CiAKZGlmZiAtLWdpdCBhL25l
+dC9ibHVldG9vdGgvbDJjYXAuYyBiL25ldC9ibHVldG9vdGgvbDJjYXAuYwppbmRleCA2ZTNiNTk2
+Li40NTI5ZTk5IDEwMDY0NAotLS0gYS9uZXQvYmx1ZXRvb3RoL2wyY2FwLmMKKysrIGIvbmV0L2Js
+dWV0b290aC9sMmNhcC5jCkBAIC0zMjUsMTMgKzMyNSwxOSBAQCBzdGF0aWMgaW5saW5lIHU4IGwy
+Y2FwX2dldF9pZGVudChzdHJ1Y3QgbDJjYXBfY29ubiAqY29ubikKIHN0YXRpYyBpbmxpbmUgaW50
+IGwyY2FwX3NlbmRfY21kKHN0cnVjdCBsMmNhcF9jb25uICpjb25uLCB1OCBpZGVudCwgdTggY29k
+ZSwgdTE2IGxlbiwgdm9pZCAqZGF0YSkKIHsKIAlzdHJ1Y3Qgc2tfYnVmZiAqc2tiID0gbDJjYXBf
+YnVpbGRfY21kKGNvbm4sIGNvZGUsIGlkZW50LCBsZW4sIGRhdGEpOworCXU4IGZsYWdzOwogCiAJ
+QlRfREJHKCJjb2RlIDB4JTIuMngiLCBjb2RlKTsKIAogCWlmICghc2tiKQogCQlyZXR1cm4gLUVO
+T01FTTsKIAotCXJldHVybiBoY2lfc2VuZF9hY2woY29ubi0+aGNvbiwgc2tiLCAwKTsKKwlpZiAo
+bG1wX25vX2ZsdXNoX2NhcGFibGUoY29ubi0+aGNvbi0+aGRldikpCisJCWZsYWdzID0gQUNMX1NU
+QVJUX05PX0ZMVVNIOworCWVsc2UKKwkJZmxhZ3MgPSBBQ0xfU1RBUlQ7CisKKwlyZXR1cm4gaGNp
+X3NlbmRfYWNsKGNvbm4tPmhjb24sIHNrYiwgZmxhZ3MpOwogfQogCiBzdGF0aWMgaW5saW5lIGlu
+dCBsMmNhcF9zZW5kX3NmcmFtZShzdHJ1Y3QgbDJjYXBfcGluZm8gKnBpLCB1MTYgY29udHJvbCkK
+QEAgLTc3MCw2ICs3NzYsNyBAQCBzdGF0aWMgdm9pZCBsMmNhcF9zb2NrX2luaXQoc3RydWN0IHNv
+Y2sgKnNrLCBzdHJ1Y3Qgc29jayAqcGFyZW50KQogCQlwaS0+c2VjX2xldmVsID0gbDJjYXBfcGko
+cGFyZW50KS0+c2VjX2xldmVsOwogCQlwaS0+cm9sZV9zd2l0Y2ggPSBsMmNhcF9waShwYXJlbnQp
+LT5yb2xlX3N3aXRjaDsKIAkJcGktPmZvcmNlX3JlbGlhYmxlID0gbDJjYXBfcGkocGFyZW50KS0+
+Zm9yY2VfcmVsaWFibGU7CisJCXBpLT5mbHVzaGFibGUgPSBsMmNhcF9waShwYXJlbnQpLT5mbHVz
+aGFibGU7CiAJfSBlbHNlIHsKIAkJcGktPmltdHUgPSBMMkNBUF9ERUZBVUxUX01UVTsKIAkJcGkt
+Pm9tdHUgPSAwOwpAQCAtNzc4LDYgKzc4NSw3IEBAIHN0YXRpYyB2b2lkIGwyY2FwX3NvY2tfaW5p
+dChzdHJ1Y3Qgc29jayAqc2ssIHN0cnVjdCBzb2NrICpwYXJlbnQpCiAJCXBpLT5zZWNfbGV2ZWwg
+PSBCVF9TRUNVUklUWV9MT1c7CiAJCXBpLT5yb2xlX3N3aXRjaCA9IDA7CiAJCXBpLT5mb3JjZV9y
+ZWxpYWJsZSA9IDA7CisJCXBpLT5mbHVzaGFibGUgPSAwOwogCX0KIAogCS8qIERlZmF1bHQgY29u
+ZmlnIG9wdGlvbnMgKi8KQEAgLTEyNTgsMTEgKzEyNjYsMTggQEAgc3RhdGljIHZvaWQgbDJjYXBf
+ZHJvcF9hY2tlZF9mcmFtZXMoc3RydWN0IHNvY2sgKnNrKQogc3RhdGljIGlubGluZSBpbnQgbDJj
+YXBfZG9fc2VuZChzdHJ1Y3Qgc29jayAqc2ssIHN0cnVjdCBza19idWZmICpza2IpCiB7CiAJc3Ry
+dWN0IGwyY2FwX3BpbmZvICpwaSA9IGwyY2FwX3BpKHNrKTsKKwlzdHJ1Y3QgaGNpX2Nvbm4gKmhj
+b24gPSBwaS0+Y29ubi0+aGNvbjsKIAlpbnQgZXJyOworCXUxNiBmbGFnczsKIAogCUJUX0RCRygi
+c2sgJXAsIHNrYiAlcCBsZW4gJWQiLCBzaywgc2tiLCBza2ItPmxlbik7CiAKLQllcnIgPSBoY2lf
+c2VuZF9hY2wocGktPmNvbm4tPmhjb24sIHNrYiwgMCk7CisJaWYgKGxtcF9ub19mbHVzaF9jYXBh
+YmxlKGhjb24tPmhkZXYpICYmICFsMmNhcF9waShzayktPmZsdXNoYWJsZSkKKwkJZmxhZ3MgPSBB
+Q0xfU1RBUlRfTk9fRkxVU0g7CisJZWxzZQorCQlmbGFncyA9IEFDTF9TVEFSVDsKKworCWVyciA9
+IGhjaV9zZW5kX2FjbChoY29uLCBza2IsIGZsYWdzKTsKIAlpZiAoZXJyIDwgMCkKIAkJa2ZyZWVf
+c2tiKHNrYik7CiAKQEAgLTE3NDcsNiArMTc2Miw3IEBAIHN0YXRpYyBpbnQgbDJjYXBfc29ja19z
+ZXRzb2Nrb3B0X29sZChzdHJ1Y3Qgc29ja2V0ICpzb2NrLCBpbnQgb3B0bmFtZSwgY2hhciBfX3Vz
+CiAKIAkJbDJjYXBfcGkoc2spLT5yb2xlX3N3aXRjaCAgICA9IChvcHQgJiBMMkNBUF9MTV9NQVNU
+RVIpOwogCQlsMmNhcF9waShzayktPmZvcmNlX3JlbGlhYmxlID0gKG9wdCAmIEwyQ0FQX0xNX1JF
+TElBQkxFKTsKKwkJbDJjYXBfcGkoc2spLT5mbHVzaGFibGUgPSAob3B0ICYgTDJDQVBfTE1fRkxV
+U0hBQkxFKTsKIAkJYnJlYWs7CiAKIAlkZWZhdWx0OgpAQCAtMTg3NCw2ICsxODkwLDkgQEAgc3Rh
+dGljIGludCBsMmNhcF9zb2NrX2dldHNvY2tvcHRfb2xkKHN0cnVjdCBzb2NrZXQgKnNvY2ssIGlu
+dCBvcHRuYW1lLCBjaGFyIF9fdXMKIAkJaWYgKGwyY2FwX3BpKHNrKS0+Zm9yY2VfcmVsaWFibGUp
+CiAJCQlvcHQgfD0gTDJDQVBfTE1fUkVMSUFCTEU7CiAKKwkJaWYgKGwyY2FwX3BpKHNrKS0+Zmx1
+c2hhYmxlKQorCQkJb3B0IHw9IEwyQ0FQX0xNX0ZMVVNIQUJMRTsKKwogCQlpZiAocHV0X3VzZXIo
+b3B0LCAodTMyIF9fdXNlciAqKSBvcHR2YWwpKQogCQkJZXJyID0gLUVGQVVMVDsKIAkJYnJlYWs7
+CkBAIC0zODAxLDcgKzM4MjAsNyBAQCBzdGF0aWMgaW50IGwyY2FwX3JlY3ZfYWNsZGF0YShzdHJ1
+Y3QgaGNpX2Nvbm4gKmhjb24sIHN0cnVjdCBza19idWZmICpza2IsIHUxNiBmbAogCiAJQlRfREJH
+KCJjb25uICVwIGxlbiAlZCBmbGFncyAweCV4IiwgY29ubiwgc2tiLT5sZW4sIGZsYWdzKTsKIAot
+CWlmIChmbGFncyAmIEFDTF9TVEFSVCkgeworCWlmICghKGZsYWdzICYgQUNMX0NPTlQpKSB7CiAJ
+CXN0cnVjdCBsMmNhcF9oZHIgKmhkcjsKIAkJaW50IGxlbjsKIAotLSAKMS42LjUuMwoK
+--0050450294bece2be4048163ba2e--
