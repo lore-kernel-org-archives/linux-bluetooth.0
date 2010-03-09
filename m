@@ -1,29 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Phonebook functions for BlueZ
+Subject: Re: lockdep warns: inconsistent lock state ({IN-SOFTIRQ-W} ->
+ {SOFTIRQ-ON-W})
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Stefan Seyfried <stefan.seyfried@googlemail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20100309150213.32d47c48@strolchi>
-References: <4B8A3EEA.3030901@schyf.de> <20100301192050.GA25876@jh-x301>
-	 <1267982102.7714.87.camel@rb-l1.nos.office>
-	 <20100309033841.GA21210@jh-x301>
-	 <1268112441.3712.46.camel@localhost.localdomain>
-	 <20100309150213.32d47c48@strolchi>
+In-Reply-To: <508e92ca1003090034y53871120n928f62573f56417d@mail.gmail.com>
+References: <508e92ca1002260126r600ff956hb18c333504fe6525@mail.gmail.com>
+	 <1268096416.3712.34.camel@localhost.localdomain>
+	 <508e92ca1003090034y53871120n928f62573f56417d@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 09 Mar 2010 08:58:42 -0800
-Message-ID: <1268153922.3712.55.camel@localhost.localdomain>
+Date: Tue, 09 Mar 2010 08:57:52 -0800
+Message-ID: <1268153872.3712.54.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Stefan,
+Hi Andrei,
 
-> > Use your own personal judgment here. However if the reviewing the code
-> > make my brain hurt, then you did it wrong ;)
+> > is this still present with 2.6.34-rc1 kernel?
 > 
-> Now all one needs to invent is a "Marcel's-brain-hurt-O-meter" :-P
+> We are using 2.6.32-XX kernel so far.
 
-if you get one of these, send me one ;)
+please check with 2.6.34-rc1 to ensure it is still present. And do you
+have instructions on how to re-produce it?
 
 Regards
 
