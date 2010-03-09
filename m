@@ -1,66 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Fix compilation when --enable-test is passed
-From: Pacho Ramos <pacho@condmat1.ciencias.uniovi.es>
-Reply-To: pacho@condmat1.ciencias.uniovi.es
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: Re: RFC: Allow Bluez to select flushable or non-flushable ACL
+ packets  with L2CAP_LM_RELIABLE
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Nick Pelly <npelly@google.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1268089292-18303-1-git-send-email-vinicius.gomes@openbossa.org>
-References: <1268089292-18303-1-git-send-email-vinicius.gomes@openbossa.org>
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-cHNm+T/gOVVbskX8NkV9"
-Date: Tue, 09 Mar 2010 21:53:20 +0100
-Message-Id: <1268168000.28218.0.camel@localhost.localdomain>
+In-Reply-To: <35c90d961003091207u66571bt789461dcc7972693@mail.gmail.com>
+References: <35c90d960912081950t135e3f10m8848e54fde1e596f@mail.gmail.com>
+	 <1260335175.2901.20.camel@violet>
+	 <35c90d960912082213s26fb0ebse75ce85d43213d9@mail.gmail.com>
+	 <1260482634.2901.70.camel@violet>
+	 <35c90d960912161359u2b3f9b2fi875288896a7a8478@mail.gmail.com>
+	 <35c90d961003091207u66571bt789461dcc7972693@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Tue, 09 Mar 2010 12:45:24 -0800
+Message-ID: <1268167524.3712.61.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Nick,
 
---=-cHNm+T/gOVVbskX8NkV9
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> >>> >> Right now Bluez always requests flushable ACL packets (but does not
+> >>> >> set a flush timeout, so effectively they are non-flushable):
+> >>> >>
+> >>> >> However it is desirable to use an ACL flush timeout on A2DP packets so
+> >>> >> that if the ACL packets block for some reason then the LM can flush
+> >>> >> them to make room for newer packets.
+> >>> >>
+> >>> >> Is it reasonable for Bluez to use the 0x00 ACL packet boundary flag by
+> >>> >> default (non-flushable packet), and let userspace request flushable
+> >>> >> packets on A2DP L2CAP sockets with the socket option
+> >>> >> L2CAP_LM_RELIABLE.
+> >>> >
+> >>> > the reliable option has a different meaning. It comes back from the old
+> >>> > Bluetooth 1.1 qualification days where we had to tests on L2CAP that had
+> >>> > to confirm that we can detect malformed packets and report them. These
+> >>> > days it is just fine to drop them.
+> >>>
+> >>> Got it, how about introducing
+> >>>
+> >>> #define L2CAP_LM_FLUSHABLE 0x0040
+> >>
+> >> that l2cap_sock_setsockopt_old() sets this didn't give you a hint that
+> >> we might wanna deprecate this socket options ;)
+> >>
+> >> I need to read up on the flushable stuff, but in the end it deserves its
+> >> own socket option. Also an ioctl() to actually trigger Enhanced flush
+> >> might be needed.
+> >>
+> >>> struct l2cap_pinfo {
+> >>>    ...
+> >>>    __u8 flushable;
+> >>> }
+> >>
+> >> Sure. In the long run we need to turn this into a bitmask. We are just
+> >> wasting memory here.
+> >
+> > Attached is an updated patch, that checks the LMP features bitmask
+> > before using the new non-flushable packet type.
+> >
+> > I am still using L2CAP_LM_FLUSHABLE socket option in
+> > l2cap_sock_setsockopt_old(), which I don't think you are happy with.
+> > So how about a new option:
+> >
+> > SOL_L2CAP, L2CAP_ACL_FLUSH
+> > which has a default value of 0, and can be set to 1 to make the ACL
+> > data sent by this L2CAP socket flushable.
+> >
+> > In a later commit we would then add
+> > SOL_ACL, ACL_FLUSH_TIMEOUT
+> > That is used to set an automatic flush timeout for the ACL link on a
+> > L2CAP socket. Note that SOL_ACL is new.
+> >
+> > But maybe this is not what you had in mind, so I'm looking for your
+> > advice before I implement this.
+> 
+> Attached an updated patch for 2.6.32 kernel. We've been using this
+> patch successfully on production devices.
 
-El lun, 08-03-2010 a las 20:01 -0300, Vinicius Costa Gomes escribi=C3=B3:
-> When --enable-test is passed along with --disable-alsa and
-> --disable-gstreamer, the SBC lib is not built, which breaks
-> compilation of the ipctest test program.
-> ---
->  acinclude.m4 |    3 ++-
->  1 files changed, 2 insertions(+), 1 deletions(-)
->=20
-> diff --git a/acinclude.m4 b/acinclude.m4
-> index 2e4444d..0eaf236 100644
-> --- a/acinclude.m4
-> +++ b/acinclude.m4
-> @@ -316,7 +316,8 @@ AC_DEFUN([AC_ARG_BLUEZ], [
-> =20
->  	AM_CONDITIONAL(SNDFILE, test "${sndfile_enable}" =3D "yes" && test "${s=
-ndfile_found}" =3D "yes")
->  	AM_CONDITIONAL(USB, test "${usb_enable}" =3D "yes" && test "${usb_found=
-}" =3D "yes")
-> -	AM_CONDITIONAL(SBC, test "${alsa_enable}" =3D "yes" || test "${gstreame=
-r_enable}" =3D "yes")
-> +	AM_CONDITIONAL(SBC, test "${alsa_enable}" =3D "yes" || test "${gstreame=
-r_enable}" =3D "yes" ||
-> +			test "${test_enable}" =3D "yes")
->  	AM_CONDITIONAL(ALSA, test "${alsa_enable}" =3D "yes" && test "${alsa_fo=
-und}" =3D "yes")
->  	AM_CONDITIONAL(GSTREAMER, test "${gstreamer_enable}" =3D "yes" && test =
-"${gstreamer_found}" =3D "yes")
->  	AM_CONDITIONAL(AUDIOPLUGIN, test "${audio_enable}" =3D "yes")
+can see anything wrong with that patch. However we need to use
+SOL_BLUETOOTH for it of course. So we need to come up with something to
+make this simple.
 
-Thanks a lot for the patch, I will try it as soon as I am able to :-)
+An additional change I like to see is to use flags for booleans like
+flushable in the structures. Can you work on changing that.
 
---=-cHNm+T/gOVVbskX8NkV9
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Esta parte del mensaje =?ISO-8859-1?Q?est=E1?= firmada
- digitalmente
+Also do we have decoding support for this in hcidump. It might be nice
+to include some really simple examples in the commit message.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.14 (GNU/Linux)
+Regards
 
-iEYEABECAAYFAkuWtUAACgkQCaWpQKGI+9RgfwCfUXa3+3Jm/Cs/ZsQj7rWrYE9Q
-eyUAninO/+gpecLkmmEyLV8x/hj0zVW8
-=znd4
------END PGP SIGNATURE-----
+Marcel
 
---=-cHNm+T/gOVVbskX8NkV9--
 
