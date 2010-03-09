@@ -1,49 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: RE: [bluetooth-next] bluetooth: hci_sysfs: use strict_strtoul
- instead of simple_strtoul
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Winkler, Tomas" <tomas.winkler@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+From: "Winkler, Tomas" <tomas.winkler@intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
 	"Cohen, Guy" <guy.cohen@intel.com>,
 	"Rindjunsky, Ron" <ron.rindjunsky@intel.com>
-In-Reply-To: <6F5C1D715B2DA5498A628E6B9C124F04016C0E8D6B@hasmsx504.ger.corp.intel.com>
+Date: Tue, 9 Mar 2010 03:14:09 +0200
+Subject: RE: [bluetooth-next] bluetooth: hci_sysfs: use strict_strtoul
+ instead of simple_strtoul
+Message-ID: <6F5C1D715B2DA5498A628E6B9C124F04016C0E8D6B@hasmsx504.ger.corp.intel.com>
 References: <1266843933-28802-1-git-send-email-tomas.winkler@intel.com>
 	 <1266843933-28802-2-git-send-email-tomas.winkler@intel.com>
-	 <1268096639.3712.37.camel@localhost.localdomain>
-	 <6F5C1D715B2DA5498A628E6B9C124F04016C0E8D6B@hasmsx504.ger.corp.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Mon, 08 Mar 2010 18:16:35 -0800
-Message-ID: <1268100995.3712.39.camel@localhost.localdomain>
-Mime-Version: 1.0
+ <1268096639.3712.37.camel@localhost.localdomain>
+In-Reply-To: <1268096639.3712.37.camel@localhost.localdomain>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tomas,
-
-> > > Signed-off-by: Tomas Winkler <tomas.winkler@intel.com>
-> > > ---
-> > >  net/bluetooth/hci_sysfs.c |   24 ++++++++++++------------
-> > >  1 files changed, 12 insertions(+), 12 deletions(-)
-> > 
-> > can you please explain the rational behind this change. What is the
-> > benefit? I just fail to see it right away.
-> 
-> The real reason using strict instead of simple strtoul is explained here thttp://www.kernel.org/doc/htmldocs/kernel-api/re42.html
-> In the bottom line it just something a chackpatch is complain about. I've touched the file to insert some test hook for the HCI reset so I fixed that on the way. 
-
-I am fine with that. However please use the following constructs:
-
-	if (strict_strtoul(...) < 0)
-		return -EINVAL;
-
-There is no point in having ret variable if you don't use it.
-
-Also I like to have a commit body and not only a subject line. It
-doesn't have to be a novel, but only the subject is not good enough for
-me.
-
-Regards
-
-Marcel
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTWFyY2VsIEhvbHRtYW5u
+IFttYWlsdG86bWFyY2VsQGhvbHRtYW5uLm9yZ10NCj4gU2VudDogVHVlc2RheSwgTWFyY2ggMDks
+IDIwMTAgMzowNCBBTQ0KPiBUbzogV2lua2xlciwgVG9tYXMNCj4gQ2M6IGxpbnV4LWJsdWV0b290
+aEB2Z2VyLmtlcm5lbC5vcmc7IENvaGVuLCBHdXk7IFJpbmRqdW5za3ksIFJvbg0KPiBTdWJqZWN0
+OiBSZTogW2JsdWV0b290aC1uZXh0XSBibHVldG9vdGg6IGhjaV9zeXNmczogdXNlIHN0cmljdF9z
+dHJ0b3VsDQo+IGluc3RlYWQgb2Ygc2ltcGxlX3N0cnRvdWwNCj4gDQo+IEhpIFRvbWFzLA0KPiAN
+Cj4gPiBTaWduZWQtb2ZmLWJ5OiBUb21hcyBXaW5rbGVyIDx0b21hcy53aW5rbGVyQGludGVsLmNv
+bT4NCj4gPiAtLS0NCj4gPiAgbmV0L2JsdWV0b290aC9oY2lfc3lzZnMuYyB8ICAgMjQgKysrKysr
+KysrKysrLS0tLS0tLS0tLS0tDQo+ID4gIDEgZmlsZXMgY2hhbmdlZCwgMTIgaW5zZXJ0aW9ucygr
+KSwgMTIgZGVsZXRpb25zKC0pDQo+IA0KPiBjYW4geW91IHBsZWFzZSBleHBsYWluIHRoZSByYXRp
+b25hbCBiZWhpbmQgdGhpcyBjaGFuZ2UuIFdoYXQgaXMgdGhlDQo+IGJlbmVmaXQ/IEkganVzdCBm
+YWlsIHRvIHNlZSBpdCByaWdodCBhd2F5Lg0KDQpUaGUgcmVhbCByZWFzb24gdXNpbmcgc3RyaWN0
+IGluc3RlYWQgb2Ygc2ltcGxlIHN0cnRvdWwgaXMgZXhwbGFpbmVkIGhlcmUgdGh0dHA6Ly93d3cu
+a2VybmVsLm9yZy9kb2MvaHRtbGRvY3Mva2VybmVsLWFwaS9yZTQyLmh0bWwNCkluIHRoZSBib3R0
+b20gbGluZSBpdCBqdXN0IHNvbWV0aGluZyBhIGNoYWNrcGF0Y2ggaXMgY29tcGxhaW4gYWJvdXQu
+IEkndmUgdG91Y2hlZCB0aGUgZmlsZSB0byBpbnNlcnQgc29tZSB0ZXN0IGhvb2sgZm9yIHRoZSBI
+Q0kgcmVzZXQgc28gSSBmaXhlZCB0aGF0IG9uIHRoZSB3YXkuIA0KDQpUaGFua3MNClRvbWFzDQoN
+Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLQpJbnRlbCBJc3JhZWwgKDc0KSBMaW1pdGVkCgpUaGlzIGUtbWFpbCBhbmQg
+YW55IGF0dGFjaG1lbnRzIG1heSBjb250YWluIGNvbmZpZGVudGlhbCBtYXRlcmlhbCBmb3IKdGhl
+IHNvbGUgdXNlIG9mIHRoZSBpbnRlbmRlZCByZWNpcGllbnQocykuIEFueSByZXZpZXcgb3IgZGlz
+dHJpYnV0aW9uCmJ5IG90aGVycyBpcyBzdHJpY3RseSBwcm9oaWJpdGVkLiBJZiB5b3UgYXJlIG5v
+dCB0aGUgaW50ZW5kZWQKcmVjaXBpZW50LCBwbGVhc2UgY29udGFjdCB0aGUgc2VuZGVyIGFuZCBk
+ZWxldGUgYWxsIGNvcGllcy4K
 
