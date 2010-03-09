@@ -1,35 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Expose wacom pen tablet battery and ac thru
- power_supply class
+Subject: [PATCH] Expose wacom pen tablet battery and ac thru power_supply
+ class
 From: Przemo Firszt <przemo@firszt.eu>
 To: Bastien Nocera <hadess@hadess.net>
 Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>, marcel <marcel@holtmann.org>, Jiri Kosina <jkosina@suse.cz>, Peter Hutterer <peter.hutterer@who-t.net>, Ping <pinglinux@gmail.com>, Peter Huewe <peterhuewe@gmx.de>
-In-Reply-To: <1268161944.3632.21.camel@pldmachine>
+In-Reply-To: <1267531889.23521.14301.camel@localhost.localdomain>
 References: <1267389553.24791.22.camel@pldmachine>
 	 <1267531337.23521.14275.camel@localhost.localdomain>
 	 <1267531889.23521.14301.camel@localhost.localdomain>
-	 <1268161944.3632.21.camel@pldmachine>
-Content-Type: multipart/mixed; boundary="=-qJf76uyge/p+BFraw6Xv"
-Date: Tue, 09 Mar 2010 19:25:57 +0000
-Message-ID: <1268162757.3632.33.camel@pldmachine>
+Content-Type: multipart/mixed; boundary="=-8r/j0PgEKt8qJ976O88N"
+Date: Tue, 09 Mar 2010 19:12:24 +0000
+Message-ID: <1268161944.3632.21.camel@pldmachine>
 Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
---=-qJf76uyge/p+BFraw6Xv
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+--=-8r/j0PgEKt8qJ976O88N
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Please ignore previous patch
---
+Dnia 2010-03-02, wto o godzinie 12:11 +0000, Bastien Nocera pisze:
+[..]
+> > A couple of comments:
+> <snip>
+> > - isn't there a more kernel-y way to export that data, so that it's
+> > automatically picked up by things like upower (n=C3=A9 DeviceKit-power)=
+?
+>=20
+> I've been told it should use the power_supply class, so it would work
+> pretty much out-of-the-box with things like upower and
+> gnome-power-manager.
+Thanks for the comments - it was exactly that what I was looking
+for! :-)
+Please find attached revamped patch - this time battery & ac patch only.
+Speed switching isn't yet ready for release.
+
+For some reason gnome-power-manager isn't updating the values properly,
+despite of that they are OK in:
+/sys/class/power_supply/wacom_{ac,battery}/uevent
+
+I'm not sure if it's a result of lack of .external_power_changed (it's
+missing in some drivers using power_supply) or something else. Any
+hints?
+
+Cheers,
 Przemo
 
---=-qJf76uyge/p+BFraw6Xv
+--=-8r/j0PgEKt8qJ976O88N
 Content-Disposition: attachment; filename*0=0001-Expose-wacom-pen-tablet-battery-and-ac-thru-power_su.pat; filename*1=ch
 Content-Type: text/x-patch; name="0001-Expose-wacom-pen-tablet-battery-and-ac-thru-power_su.patch"; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 
->From 74b4e83f11b74d800850b659c81d64fe32fd8ca8 Mon Sep 17 00:00:00 2001
+>From c56101ee1fe781a46e43de930b94ee3397b08b69 Mon Sep 17 00:00:00 2001
 From: Przemo Firszt <przemo@firszt.eu>
 Date: Fri, 5 Mar 2010 17:19:44 +0000
 Subject: [PATCH] Expose wacom pen tablet battery and ac thru power_supply class
@@ -39,14 +61,14 @@ power_supply class is sysfs.
 
 Signed-off-by: Przemo Firszt <przemo@firszt.eu>
 ---
- drivers/hid/hid-wacom.c |  114 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 114 insertions(+), 0 deletions(-)
+ drivers/hid/hid-wacom.c |  150 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 150 insertions(+), 0 deletions(-)
 
 diff --git a/drivers/hid/hid-wacom.c b/drivers/hid/hid-wacom.c
-index 8d3b46f..9fc2898 100644
+index 8d3b46f..e5fa473 100644
 --- a/drivers/hid/hid-wacom.c
 +++ b/drivers/hid/hid-wacom.c
-@@ -21,14 +21,82 @@
+@@ -21,14 +21,118 @@
  #include <linux/device.h>
  #include <linux/hid.h>
  #include <linux/module.h>
@@ -126,10 +148,46 @@ index 8d3b46f..9fc2898 100644
 +	return ret;
 +}
 +
++static void wacom_poke(struct hid_device *hdev, u8 data)
++{
++	int limit;
++	int ret;
++	char rep_data[2];
++	/*
++	 * data has to be one of those:
++	 * 0x05 - low reporting speed
++	 * 0x06 - high reporting speed
++	 */
++
++	/*
++	 * Note that if the raw queries fail, it's not a hard failure and it
++	 * is safe to continue
++	 */
++	rep_data[0] = 0x03 ; rep_data[1] = 0x00;
++	limit = 3;
++	do {
++		ret = hdev->hid_output_raw_report(hdev, rep_data, 2,
++				HID_FEATURE_REPORT);
++	} while (ret < 0 && limit-- > 0);
++	if (ret >= 0) {
++		rep_data[0] = data ; rep_data[1] = 0x00;
++		limit = 3;
++		do {
++			ret = hdev->hid_output_raw_report(hdev, rep_data, 2,
++							HID_FEATURE_REPORT);
++		} while (ret < 0 && limit-- > 0);
++		if (ret < 0)
++			dev_warn(&hdev->dev,
++				"failed to poke device, command %d, err %d\n"
++				, data, ret);
++	}
++
++}
++
  static int wacom_raw_event(struct hid_device *hdev, struct hid_report *report,
  		u8 *raw_data, int size)
  {
-@@ -147,6 +215,11 @@ static int wacom_raw_event(struct hid_device *hdev, struct hid_report *report,
+@@ -147,6 +251,11 @@ static int wacom_raw_event(struct hid_device *hdev, struct hid_report *report,
  		input_sync(input);
  	}
  
@@ -141,7 +199,7 @@ index 8d3b46f..9fc2898 100644
  	return 1;
  }
  
-@@ -206,6 +279,43 @@ static int wacom_probe(struct hid_device *hdev,
+@@ -206,6 +315,43 @@ static int wacom_probe(struct hid_device *hdev,
  	if (ret < 0)
  		dev_warn(&hdev->dev, "failed to poke device #2, %d\n", ret);
  
@@ -185,7 +243,7 @@ index 8d3b46f..9fc2898 100644
  	hidinput = list_entry(hdev->inputs.next, struct hid_input, list);
  	input = hidinput->input;
  
-@@ -250,7 +360,11 @@ err_free:
+@@ -250,7 +396,11 @@ err_free:
  
  static void wacom_remove(struct hid_device *hdev)
  {
@@ -201,4 +259,4 @@ index 8d3b46f..9fc2898 100644
 1.7.0.1
 
 
---=-qJf76uyge/p+BFraw6Xv--
+--=-8r/j0PgEKt8qJ976O88N--
