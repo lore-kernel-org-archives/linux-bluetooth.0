@@ -1,32 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <e8dc052360dd27d2ac7460d359e7645c.squirrel@www.codeaurora.org>
-Date: Tue, 9 Mar 2010 23:06:15 -0600 (CST)
-Subject: AMP Key Management Simplification?
-From: "Tim Monahan-Mitchell" <tmonahan@codeaurora.org>
-To: "Marcel Holtmann" <marcel@holtmann.org>
-Cc: "BlueZ mailing list" <linux-bluetooth@vger.kernel.org>
+From: "Winkler, Tomas" <tomas.winkler@intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"Cohen, Guy" <guy.cohen@intel.com>, "Rindjunsky, Ron"
+	<ron.rindjunsky@intel.com>, "Paskar, Gregory" <gregory.paskar@intel.com>
+Date: Tue, 9 Mar 2010 23:22:42 +0200
+Subject: RE: [bluetooth-next V2] Bluetooth: handle device reset event
+Message-ID: <6F5C1D715B2DA5498A628E6B9C124F04016C0E97A6@hasmsx504.ger.corp.intel.com>
+References: <1266843933-28802-1-git-send-email-tomas.winkler@intel.com>
+ <1268096587.3712.36.camel@localhost.localdomain>
+In-Reply-To: <1268096587.3712.36.camel@localhost.localdomain>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-
-A discussion was missing from our original posting ("QuIC's AMP + eL2CAP
-Technical Plans"), regarding AMP Keys.
-
-We would like to defer the ability to work with more than one AMP device
-type initially, since doing so would necessitate having to persist the
-Dedicated AMP Keys for each AMP device type. Is this approach acceptable?
-
-Limiting the initial design to a single AMP device, the Dedicated AMP key
-can be generated any time from the associated link key.
-
-I can provide more details as to why if needed (refer to 8.1 & 8.2 in the
-Core spec).
-
-Thanks,
-Tim Monahan-Mitchell
-Qualcomm Innovation Center, Inc.,
-A member of the Code Aurora Forum
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTWFyY2VsIEhvbHRtYW5u
+IFttYWlsdG86bWFyY2VsQGhvbHRtYW5uLm9yZ10NCj4gU2VudDogVHVlc2RheSwgTWFyY2ggMDks
+IDIwMTAgMzowMyBBTQ0KPiBUbzogV2lua2xlciwgVG9tYXMNCj4gQ2M6IGxpbnV4LWJsdWV0b290
+aEB2Z2VyLmtlcm5lbC5vcmc7IENvaGVuLCBHdXk7IFJpbmRqdW5za3ksIFJvbjsgUGFza2FyLA0K
+PiBHcmVnb3J5DQo+IFN1YmplY3Q6IFJlOiBbYmx1ZXRvb3RoLW5leHQgVjJdIEJsdWV0b290aDog
+aGFuZGxlIGRldmljZSByZXNldCBldmVudA0KPiANCj4gSGkgVG9tYXMsDQo+IA0KPiA+IEEgQmx1
+ZXRvb3RoIGRldmljZSBleHBlcmllbmNpbmcgaGFyZHdhcmUgZmFpbHVyZSBtYXkgaXNzdWUNCj4g
+PiBhIEhBUkRXQVJFX0VSUk9SIGhjaSBldmVudC4gVGhlIHJlYWN0aW9uIHRvIHRoaXMgZXZlbnQg
+aXMgZGV2aWNlDQo+ID4gcmVzZXQgZmxvdyBpbXBsZW1lbnRlZCBpbiBmb2xsb3dpbmcgc2VxdWVu
+Y2UuDQo+ID4NCj4gPiAxLiBOb3RpZnk6IEhDSV9ERVZfRE9XTg0KPiA+IDIuIFJlaW5pdGlhbGl6
+ZSBpbnRlcm5hbCBzdHJ1Y3R1cmVzLg0KPiA+IDMuIENhbGwgZHJpdmVyIGZsdXNoIGZ1bmN0aW9u
+DQo+ID4gNC4gU2VuZCBIQ0kgcmVzZXQgcmVxdWVzdCB0byB0aGUgZGV2aWNlLg0KPiA+IDUuIFNl
+bmQgSENJIGluaXQgc2VxdWVuY2UgcmVzZXQgdG8gdGhlIGRldmljZS4NCj4gPiA2LiBOb3RpZnkg
+SENJX0RFVl9VUC4NCj4gDQo+IEkgcHJlZmVyIGlmIHdlIGNyZWF0ZSBhIGdlbmVyaWMgcGVyIGNv
+bnRyb2xsZXIgd29ya3F1ZXVlIGZpcnN0IGJlZm9yZQ0KPiBoYXZpbmcgYSB3b3JrcXVldWUgZm9y
+IGV2ZXJ5IHRhc2suIFNvbWV0aGluZyBzaW1pbGFyIHRvIHdoYXQgdGhlDQo+IG1hYzgwMjExIGxh
+eWVyIG9mZmVycyByaWdodCBub3cuDQoNClRoYXQgd291bGQgYmUgZ29vZCBhcHByb2FjaCBidXQg
+d2UgYXJlIHVzaW5nIGRlZmF1bHQga2VybmVsIHdvcmtxdWV1ZSBpbiB0aGlzIHNvbHV0aW9uIHNv
+IHRoZXJlIGlzIG5vIHdvcmtxdWV1ZSBmb3IgZXZlcnkgdGFzay4gDQpJJ20gbm90IHN1cmUgaWYg
+dGhpcyBlZmZvcnQgc2hvdWxkIGJsb2NrIHRoaXMgcGF0Y2guIA0KDQo+IEFsc28gaW4gYSBzZWNv
+bmQgc3RlcCB3ZSBtaWdodCB3YW5uYSBtb3ZlIHRoZSBIQ0kgZXZlbnQgcHJvY2Vzc2luZw0KPiBj
+b21wbGV0ZWx5IGludG8gYSB3b3JrcXVldWUuIElmIHdlIGdldCBubyBwZXJmb3JtYW5jZSBoaXQg
+d2l0aCB0aGF0LA0KPiB0aGVuIHN5c2ZzIGhhbmRsaW5nIGFuZCBkZXZpY2UgcmVzZXQgYmVjb21l
+cyBhIGxvdCBzaW1wbGVyIGFuZCBsZXNzDQo+IHByb25lIHRvIHJhY2UgY29uZGl0aW9ucyB3aXRo
+IGRldmljZSByZW1vdmFsLg0KDQpMb29rcyBnb29kIHRvIG1lLiBTbyB3aGVuIHRoaXMgaXMgcmVh
+ZHkgd2UgY2FuIG1vdmUgYWxzbyB0aGUgcmVzZXQgYWxzbyB0byBwZXIgY29udHJvbGxlciBxdWV1
+ZS4NCg0KVGhhbmtzDQpUb21hcyANCg0KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCkludGVsIElzcmFlbCAoNzQpIExp
+bWl0ZWQKClRoaXMgZS1tYWlsIGFuZCBhbnkgYXR0YWNobWVudHMgbWF5IGNvbnRhaW4gY29uZmlk
+ZW50aWFsIG1hdGVyaWFsIGZvcgp0aGUgc29sZSB1c2Ugb2YgdGhlIGludGVuZGVkIHJlY2lwaWVu
+dChzKS4gQW55IHJldmlldyBvciBkaXN0cmlidXRpb24KYnkgb3RoZXJzIGlzIHN0cmljdGx5IHBy
+b2hpYml0ZWQuIElmIHlvdSBhcmUgbm90IHRoZSBpbnRlbmRlZApyZWNpcGllbnQsIHBsZWFzZSBj
+b250YWN0IHRoZSBzZW5kZXIgYW5kIGRlbGV0ZSBhbGwgY29waWVzLgo=
