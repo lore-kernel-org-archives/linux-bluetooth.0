@@ -1,35 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 9 Mar 2010 22:22:00 +0100 (CET)
-From: Jiri Kosina <jkosina@suse.cz>
-To: Przemo Firszt <przemo@firszt.eu>
-Cc: Bastien Nocera <hadess@hadess.net>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	marcel <marcel@holtmann.org>,
-	Peter Hutterer <peter.hutterer@who-t.net>,
-	Ping <pinglinux@gmail.com>, Peter Huewe <peterhuewe@gmx.de>
-Subject: Re: [PATCH] Expose wacom pen tablet battery and ac thru power_supply
- class
-In-Reply-To: <1268162757.3632.33.camel@pldmachine>
-Message-ID: <alpine.LNX.2.00.1003092220160.17799@pobox.suse.cz>
-References: <1267389553.24791.22.camel@pldmachine>  <1267531337.23521.14275.camel@localhost.localdomain>  <1267531889.23521.14301.camel@localhost.localdomain>  <1268161944.3632.21.camel@pldmachine> <1268162757.3632.33.camel@pldmachine>
+From: "Winkler, Tomas" <tomas.winkler@intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"Cohen, Guy" <guy.cohen@intel.com>, "Rindjunsky, Ron"
+	<ron.rindjunsky@intel.com>
+Date: Tue, 9 Mar 2010 23:13:02 +0200
+Subject: RE: [bluetooth-next V2] bluetooth: hci_sysfs: use strict_strtoul
+ instead of simple_strtoul
+Message-ID: <6F5C1D715B2DA5498A628E6B9C124F04016C0E9798@hasmsx504.ger.corp.intel.com>
+References: <1268163483-26181-1-git-send-email-tomas.winkler@intel.com>
+ <1268167314.3712.59.camel@localhost.localdomain>
+In-Reply-To: <1268167314.3712.59.camel@localhost.localdomain>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 9 Mar 2010, Przemo Firszt wrote:
-
-> Please ignore previous patch
-
-Hi Prezemo,
-
-thanks for basing the patch on power_supply infrastructure.
-
-Anyway, you'll have to sort out the new dependency on CONFIG_POWER_SUPPLY 
-somehow (compiling the battery code out from the driver if 
-CONFIG_POWER_SUPPLY is unset, or selecting it directly from Kconfig).
-
-Thanks,
-
--- 
-Jiri Kosina
-SUSE Labs, Novell Inc.
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTWFyY2VsIEhvbHRtYW5u
+IFttYWlsdG86bWFyY2VsQGhvbHRtYW5uLm9yZ10NCj4gU2VudDogVHVlc2RheSwgTWFyY2ggMDks
+IDIwMTAgMTA6NDIgUE0NCj4gVG86IFdpbmtsZXIsIFRvbWFzDQo+IENjOiBsaW51eC1ibHVldG9v
+dGhAdmdlci5rZXJuZWwub3JnOyBDb2hlbiwgR3V5OyBSaW5kanVuc2t5LCBSb24NCj4gU3ViamVj
+dDogUmU6IFtibHVldG9vdGgtbmV4dCBWMl0gYmx1ZXRvb3RoOiBoY2lfc3lzZnM6IHVzZSBzdHJp
+Y3Rfc3RydG91bA0KPiBpbnN0ZWFkIG9mIHNpbXBsZV9zdHJ0b3VsDQo+IA0KPiBIaSBUb21hcywN
+Cj4gDQo+ID4gdXNlIHN0cmljdF9zdHJ0b3VsIGFzIHN1Z2dlc3RlZCBieSBjaGVja3BhdGNoLnBs
+DQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBUb21hcyBXaW5rbGVyIDx0b21hcy53aW5rbGVyQGlu
+dGVsLmNvbT4NCj4gPiAtLS0NCj4gPiBWMjoNCj4gPiAxLiBtb3JlIHZlcmJvc2UgY29tbWl0IG1l
+c3NhZ2UNCj4gPiAyLiByZXR1cm4gdGhlIGVycm9yIGNvZGUgdGhhdCB3YXMgcHJvZHVjZWQgYnkg
+c3RyaWN0X3N0cnRvdWwNCj4gDQo+IHdoeSBkbyB5b3UgYm90aGVyIGFjdHVhbGx5LiBSZWFkaW5n
+IHRoZSBjb21tZW50IGFib3V0IHN0cnVjdF9zdHJ0b3VsIGl0DQo+IHdpbGwgb25seSByZXR1cm4g
+LUVJTlZBTCBvciAwLiBTbyB1c2luZyBteSBwcm9wb3NhbCB3b3VsZCBiZSBqdXN0IGZpbmUuDQo+
+IEkgYWxzbyBkb24ndCBwcmVmZXIgdG8gZGlmZmVyIHRoZSByZXR1cm4gdmFsdWUgdG8gdXNlciBz
+cGFjZSB1bnRpbCBpdA0KPiBhY3R1YWxseSBtYWtlcyBzZW5zZS4gSW52YWxpZCBhcmd1bWVudCBp
+cyBqdXN0IGZpbmUgZm9yIGFsbCBlcnJvciBjYXNlcy4NCj4NClllcyBJIGtub3cgYnV0IEkndmUg
+dXNlIG9mIHRoaXMgb3ZlciB0aGUga2VybmVsIGNvZGUgYW5kIHdoYXQgSSd2ZSB1c2VkIGlzIHRo
+ZSBtb3N0bHkgdXNlZCBpZGlvbQ0KDQpUaGFua3MNClRvbWFzDQoNCg0KDQotLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0K
+SW50ZWwgSXNyYWVsICg3NCkgTGltaXRlZAoKVGhpcyBlLW1haWwgYW5kIGFueSBhdHRhY2htZW50
+cyBtYXkgY29udGFpbiBjb25maWRlbnRpYWwgbWF0ZXJpYWwgZm9yCnRoZSBzb2xlIHVzZSBvZiB0
+aGUgaW50ZW5kZWQgcmVjaXBpZW50KHMpLiBBbnkgcmV2aWV3IG9yIGRpc3RyaWJ1dGlvbgpieSBv
+dGhlcnMgaXMgc3RyaWN0bHkgcHJvaGliaXRlZC4gSWYgeW91IGFyZSBub3QgdGhlIGludGVuZGVk
+CnJlY2lwaWVudCwgcGxlYXNlIGNvbnRhY3QgdGhlIHNlbmRlciBhbmQgZGVsZXRlIGFsbCBjb3Bp
+ZXMuCg==
