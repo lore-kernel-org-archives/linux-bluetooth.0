@@ -1,42 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Winkler, Tomas" <tomas.winkler@intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"Cohen, Guy" <guy.cohen@intel.com>, "Rindjunsky, Ron"
-	<ron.rindjunsky@intel.com>
-Date: Tue, 9 Mar 2010 23:13:02 +0200
-Subject: RE: [bluetooth-next V2] bluetooth: hci_sysfs: use strict_strtoul
- instead of simple_strtoul
-Message-ID: <6F5C1D715B2DA5498A628E6B9C124F04016C0E9798@hasmsx504.ger.corp.intel.com>
-References: <1268163483-26181-1-git-send-email-tomas.winkler@intel.com>
- <1268167314.3712.59.camel@localhost.localdomain>
-In-Reply-To: <1268167314.3712.59.camel@localhost.localdomain>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Subject: Re: [PATCH] Fix compilation when --enable-test is passed
+From: Pacho Ramos <pacho@condmat1.ciencias.uniovi.es>
+Reply-To: pacho@condmat1.ciencias.uniovi.es
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1268089292-18303-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1268089292-18303-1-git-send-email-vinicius.gomes@openbossa.org>
+Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-cHNm+T/gOVVbskX8NkV9"
+Date: Tue, 09 Mar 2010 21:53:20 +0100
+Message-Id: <1268168000.28218.0.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTWFyY2VsIEhvbHRtYW5u
-IFttYWlsdG86bWFyY2VsQGhvbHRtYW5uLm9yZ10NCj4gU2VudDogVHVlc2RheSwgTWFyY2ggMDks
-IDIwMTAgMTA6NDIgUE0NCj4gVG86IFdpbmtsZXIsIFRvbWFzDQo+IENjOiBsaW51eC1ibHVldG9v
-dGhAdmdlci5rZXJuZWwub3JnOyBDb2hlbiwgR3V5OyBSaW5kanVuc2t5LCBSb24NCj4gU3ViamVj
-dDogUmU6IFtibHVldG9vdGgtbmV4dCBWMl0gYmx1ZXRvb3RoOiBoY2lfc3lzZnM6IHVzZSBzdHJp
-Y3Rfc3RydG91bA0KPiBpbnN0ZWFkIG9mIHNpbXBsZV9zdHJ0b3VsDQo+IA0KPiBIaSBUb21hcywN
-Cj4gDQo+ID4gdXNlIHN0cmljdF9zdHJ0b3VsIGFzIHN1Z2dlc3RlZCBieSBjaGVja3BhdGNoLnBs
-DQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBUb21hcyBXaW5rbGVyIDx0b21hcy53aW5rbGVyQGlu
-dGVsLmNvbT4NCj4gPiAtLS0NCj4gPiBWMjoNCj4gPiAxLiBtb3JlIHZlcmJvc2UgY29tbWl0IG1l
-c3NhZ2UNCj4gPiAyLiByZXR1cm4gdGhlIGVycm9yIGNvZGUgdGhhdCB3YXMgcHJvZHVjZWQgYnkg
-c3RyaWN0X3N0cnRvdWwNCj4gDQo+IHdoeSBkbyB5b3UgYm90aGVyIGFjdHVhbGx5LiBSZWFkaW5n
-IHRoZSBjb21tZW50IGFib3V0IHN0cnVjdF9zdHJ0b3VsIGl0DQo+IHdpbGwgb25seSByZXR1cm4g
-LUVJTlZBTCBvciAwLiBTbyB1c2luZyBteSBwcm9wb3NhbCB3b3VsZCBiZSBqdXN0IGZpbmUuDQo+
-IEkgYWxzbyBkb24ndCBwcmVmZXIgdG8gZGlmZmVyIHRoZSByZXR1cm4gdmFsdWUgdG8gdXNlciBz
-cGFjZSB1bnRpbCBpdA0KPiBhY3R1YWxseSBtYWtlcyBzZW5zZS4gSW52YWxpZCBhcmd1bWVudCBp
-cyBqdXN0IGZpbmUgZm9yIGFsbCBlcnJvciBjYXNlcy4NCj4NClllcyBJIGtub3cgYnV0IEkndmUg
-dXNlIG9mIHRoaXMgb3ZlciB0aGUga2VybmVsIGNvZGUgYW5kIHdoYXQgSSd2ZSB1c2VkIGlzIHRo
-ZSBtb3N0bHkgdXNlZCBpZGlvbQ0KDQpUaGFua3MNClRvbWFzDQoNCg0KDQotLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0K
-SW50ZWwgSXNyYWVsICg3NCkgTGltaXRlZAoKVGhpcyBlLW1haWwgYW5kIGFueSBhdHRhY2htZW50
-cyBtYXkgY29udGFpbiBjb25maWRlbnRpYWwgbWF0ZXJpYWwgZm9yCnRoZSBzb2xlIHVzZSBvZiB0
-aGUgaW50ZW5kZWQgcmVjaXBpZW50KHMpLiBBbnkgcmV2aWV3IG9yIGRpc3RyaWJ1dGlvbgpieSBv
-dGhlcnMgaXMgc3RyaWN0bHkgcHJvaGliaXRlZC4gSWYgeW91IGFyZSBub3QgdGhlIGludGVuZGVk
-CnJlY2lwaWVudCwgcGxlYXNlIGNvbnRhY3QgdGhlIHNlbmRlciBhbmQgZGVsZXRlIGFsbCBjb3Bp
-ZXMuCg==
+
+--=-cHNm+T/gOVVbskX8NkV9
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+El lun, 08-03-2010 a las 20:01 -0300, Vinicius Costa Gomes escribi=C3=B3:
+> When --enable-test is passed along with --disable-alsa and
+> --disable-gstreamer, the SBC lib is not built, which breaks
+> compilation of the ipctest test program.
+> ---
+>  acinclude.m4 |    3 ++-
+>  1 files changed, 2 insertions(+), 1 deletions(-)
+>=20
+> diff --git a/acinclude.m4 b/acinclude.m4
+> index 2e4444d..0eaf236 100644
+> --- a/acinclude.m4
+> +++ b/acinclude.m4
+> @@ -316,7 +316,8 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+> =20
+>  	AM_CONDITIONAL(SNDFILE, test "${sndfile_enable}" =3D "yes" && test "${s=
+ndfile_found}" =3D "yes")
+>  	AM_CONDITIONAL(USB, test "${usb_enable}" =3D "yes" && test "${usb_found=
+}" =3D "yes")
+> -	AM_CONDITIONAL(SBC, test "${alsa_enable}" =3D "yes" || test "${gstreame=
+r_enable}" =3D "yes")
+> +	AM_CONDITIONAL(SBC, test "${alsa_enable}" =3D "yes" || test "${gstreame=
+r_enable}" =3D "yes" ||
+> +			test "${test_enable}" =3D "yes")
+>  	AM_CONDITIONAL(ALSA, test "${alsa_enable}" =3D "yes" && test "${alsa_fo=
+und}" =3D "yes")
+>  	AM_CONDITIONAL(GSTREAMER, test "${gstreamer_enable}" =3D "yes" && test =
+"${gstreamer_found}" =3D "yes")
+>  	AM_CONDITIONAL(AUDIOPLUGIN, test "${audio_enable}" =3D "yes")
+
+Thanks a lot for the patch, I will try it as soon as I am able to :-)
+
+--=-cHNm+T/gOVVbskX8NkV9
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Esta parte del mensaje =?ISO-8859-1?Q?est=E1?= firmada
+ digitalmente
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.14 (GNU/Linux)
+
+iEYEABECAAYFAkuWtUAACgkQCaWpQKGI+9RgfwCfUXa3+3Jm/Cs/ZsQj7rWrYE9Q
+eyUAninO/+gpecLkmmEyLV8x/hj0zVW8
+=znd4
+-----END PGP SIGNATURE-----
+
+--=-cHNm+T/gOVVbskX8NkV9--
+
