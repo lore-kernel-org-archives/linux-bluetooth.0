@@ -1,32 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <e8dc052360dd27d2ac7460d359e7645c.squirrel@www.codeaurora.org>
+Date: Tue, 9 Mar 2010 23:06:15 -0600 (CST)
+Subject: AMP Key Management Simplification?
+From: "Tim Monahan-Mitchell" <tmonahan@codeaurora.org>
+To: "Marcel Holtmann" <marcel@holtmann.org>
+Cc: "BlueZ mailing list" <linux-bluetooth@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 10 Mar 2010 15:14:03 +0530
-Message-ID: <912bb79a1003100144g7d14c3daj9560dc0ae0dc8e31@mail.gmail.com>
-Subject: Bluetooth Dongle version mismatch Confusion
-From: nirav rabara <niravrabara@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcel,
 
-I have been using bluez 4.58 with 2.6.30 on ARM platform , I am newbie
-and found problem with Headset & Dongle version mismatch.
+A discussion was missing from our original posting ("QuIC's AMP + eL2CAP
+Technical Plans"), regarding AMP Keys.
 
-I can use v2.0 Dongle with v2.0 Headset & v2.1 Dongle with v2.1
-Headset.( result is good I can hear voice on HS)
+We would like to defer the ability to work with more than one AMP device
+type initially, since doing so would necessitate having to persist the
+Dedicated AMP Keys for each AMP device type. Is this approach acceptable?
 
-But if I use v2.0 Dongle with v2.1 HS & v2.1 Dongle with v2.0 HS
-result is unpredictable some time noise or No voice).
+Limiting the initial design to a single AMP device, the Dedicated AMP key
+can be generated any time from the associated link key.
 
-I am doing anything wrong with SCO implementation? OR Bluetooth have
-limitation with version mismatch. OR I must use same version Dongle &
-HS(why ?).
+I can provide more details as to why if needed (refer to 8.1 & 8.2 in the
+Core spec).
 
-Thanks in Advance
+Thanks,
+Tim Monahan-Mitchell
+Qualcomm Innovation Center, Inc.,
+A member of the Code Aurora Forum
 
-
---
-With Regards,
-Nirav Rabara
