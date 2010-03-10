@@ -1,52 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 10 Mar 2010 21:48:19 +0100
-From: Pavel Machek <pavel@ucw.cz>
+From: "Winkler, Tomas" <tomas.winkler@intel.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Luis R. Rodriguez" <mcgrof@gmail.com>,
-	linux-wireless <linux-wireless@vger.kernel.org>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	linux-kernel@vger.kernel.org,
-	"Kevin Hayes <kevin@atheros.com>, Dan Tian" <Dan.Tian@atheros.com>
-Subject: Re: Linux Bluetooth Coexistence documentation in general and for
-	ath9k
-Message-ID: <20100310204818.GF1394@ucw.cz>
-References: <43e72e891003031643u353c72dcj23bf429363a16ec8@mail.gmail.com> <1267715451.29510.20.camel@localhost.localdomain>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"Cohen, Guy" <guy.cohen@intel.com>, "Rindjunsky, Ron"
+	<ron.rindjunsky@intel.com>, "Paskar, Gregory" <gregory.paskar@intel.com>
+Date: Wed, 10 Mar 2010 21:35:35 +0200
+Subject: RE: [bluetooth-next V2] Bluetooth: handle device reset event
+Message-ID: <6F5C1D715B2DA5498A628E6B9C124F04016C15DFA3@hasmsx504.ger.corp.intel.com>
+References: <1266843933-28802-1-git-send-email-tomas.winkler@intel.com>
+	 <1268096587.3712.36.camel@localhost.localdomain>
+	 <6F5C1D715B2DA5498A628E6B9C124F04016C0E97A6@hasmsx504.ger.corp.intel.com>
+ <1268239760.3712.84.camel@localhost.localdomain>
+In-Reply-To: <1268239760.3712.84.camel@localhost.localdomain>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1267715451.29510.20.camel@localhost.localdomain>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
-
-> > The question of Bluetooth coexistence pops up here, on IRC and on bug
-> > reports quite too often so I've stuffed what I could onto a page with
-> > a few references / code and about ath9k's schemes for BT coexistence,
-> > feel free to extend or correct:
-> > 
-> > http://wireless.kernel.org/en/users/Documentation/Bluetooth-coexistence
-> > http://wireless.kernel.org/en/users/Drivers/ath9k/btcoex
-> > 
-> > I'm still not sure if "2-wire" and "3-wire" are generic terms and if
-> > someone owns a trademark on them or what, but looking down the road I
-> > think it would be nice to export this information through nl80211, if
-> > a device supports any of these BT-coex schemes and if so, perhaps
-> > display the current signal status of:
-> > 
-> >   * WLAN_ACTIVE
-> >   * BT_PRIORITY
-> >   * BT_STATE
-...
-> the only thing the host has control over is AFH channel map, and even
-> modifying that is not really needed. The Bluetooth controller will do
-> AFH automatically and it is on by default. We never switch that off
-> actually.
-> 
-> Normally the co-ex stuff is hard-wired between the Bluetooth and WiFi
-> and thus out of control to the host OS.
-
-I believe that 'internal wifi, usb bluetooth' is still quite common
-setup...
-								Pavel
--- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTWFyY2VsIEhvbHRtYW5u
+IFttYWlsdG86bWFyY2VsQGhvbHRtYW5uLm9yZ10NCj4gU2VudDogV2VkbmVzZGF5LCBNYXJjaCAx
+MCwgMjAxMCA2OjQ5IFBNDQo+IFRvOiBXaW5rbGVyLCBUb21hcw0KPiBDYzogbGludXgtYmx1ZXRv
+b3RoQHZnZXIua2VybmVsLm9yZzsgQ29oZW4sIEd1eTsgUmluZGp1bnNreSwgUm9uOyBQYXNrYXIs
+DQo+IEdyZWdvcnkNCj4gU3ViamVjdDogUkU6IFtibHVldG9vdGgtbmV4dCBWMl0gQmx1ZXRvb3Ro
+OiBoYW5kbGUgZGV2aWNlIHJlc2V0IGV2ZW50DQo+IA0KPiBIaSBUb21hcywNCj4gDQo+ID4gPiA+
+IEEgQmx1ZXRvb3RoIGRldmljZSBleHBlcmllbmNpbmcgaGFyZHdhcmUgZmFpbHVyZSBtYXkgaXNz
+dWUNCj4gPiA+ID4gYSBIQVJEV0FSRV9FUlJPUiBoY2kgZXZlbnQuIFRoZSByZWFjdGlvbiB0byB0
+aGlzIGV2ZW50IGlzIGRldmljZQ0KPiA+ID4gPiByZXNldCBmbG93IGltcGxlbWVudGVkIGluIGZv
+bGxvd2luZyBzZXF1ZW5jZS4NCj4gPiA+ID4NCj4gPiA+ID4gMS4gTm90aWZ5OiBIQ0lfREVWX0RP
+V04NCj4gPiA+ID4gMi4gUmVpbml0aWFsaXplIGludGVybmFsIHN0cnVjdHVyZXMuDQo+ID4gPiA+
+IDMuIENhbGwgZHJpdmVyIGZsdXNoIGZ1bmN0aW9uDQo+ID4gPiA+IDQuIFNlbmQgSENJIHJlc2V0
+IHJlcXVlc3QgdG8gdGhlIGRldmljZS4NCj4gPiA+ID4gNS4gU2VuZCBIQ0kgaW5pdCBzZXF1ZW5j
+ZSByZXNldCB0byB0aGUgZGV2aWNlLg0KPiA+ID4gPiA2LiBOb3RpZnkgSENJX0RFVl9VUC4NCj4g
+PiA+DQo+ID4gPiBJIHByZWZlciBpZiB3ZSBjcmVhdGUgYSBnZW5lcmljIHBlciBjb250cm9sbGVy
+IHdvcmtxdWV1ZSBmaXJzdCBiZWZvcmUNCj4gPiA+IGhhdmluZyBhIHdvcmtxdWV1ZSBmb3IgZXZl
+cnkgdGFzay4gU29tZXRoaW5nIHNpbWlsYXIgdG8gd2hhdCB0aGUNCj4gPiA+IG1hYzgwMjExIGxh
+eWVyIG9mZmVycyByaWdodCBub3cuDQo+ID4NCj4gPiBUaGF0IHdvdWxkIGJlIGdvb2QgYXBwcm9h
+Y2ggYnV0IHdlIGFyZSB1c2luZyBkZWZhdWx0IGtlcm5lbCB3b3JrcXVldWUgaW4NCj4gdGhpcyBz
+b2x1dGlvbiBzbyB0aGVyZSBpcyBubyB3b3JrcXVldWUgZm9yIGV2ZXJ5IHRhc2suDQo+ID4gSSdt
+IG5vdCBzdXJlIGlmIHRoaXMgZWZmb3J0IHNob3VsZCBibG9jayB0aGlzIHBhdGNoLg0KPiANCj4g
+SSBoYXZlIGFuIGluaXRpYWwgcGF0Y2ggdGhhdCBJIGhhdmUgdG8gZGlnIG91dC4gSXQgaXMgYWN0
+dWFsbHkgbm90IHRoYXQNCj4gY29tcGxpY2F0ZWQuIEFuZCBJIHdvdWxkIHByZWZlciB0byBnZXQg
+dGhhdCBvbmUgZmlyc3QgYmVmb3JlIHdlIGFwcGx5DQo+IHRoaXMgcGF0Y2guDQoNCk9rYXksIEkg
+Y2FuIHRlc3QgdGhpcyBwYXJ0aWN1bGFyIGZsb3cgd2l0aCB5b3VyIHBhdGNoIGlmIHlvdSBzZW5k
+IGl0IHRvIG1lLg0KDQo+IFRoZSByZWFzb24gd2h5IEkgcmVhbGx5IHdhbm5hIHNvbHZlIHRoaXMg
+aXMgYmVjYXVzZSBvZiBwb3RlbnRpYWwgcmFjZQ0KPiBjb25kaXRpb25zIGJldHdlZW4gdGhlIHdv
+cmtxdWV1ZSBhbmQgYSBkZXZpY2UgcmVtb3ZhbC4gSSBoYXZlIGEgYmFkDQo+IGZlZWxpbmcgdGhh
+dCBldmVuIHdpdGggdGhlIGN1cnJlbnQgc3lzZnMgd29ya3F1ZXVlIHdlIGhhdmUgYSByYWNlDQo+
+IGNvbmRpdGlvbiBoaWRpbmcgc29tZXdoZXJlLiBTbyBpZiBnb2luZyBmb3J3YXJkIHdlIGhhdmUg
+dG8gc2hpZnQgbW9yZQ0KPiBhbmQgbW9yZSBjb2RlIGludG8gd29ya3F1ZXVlcyB3ZSBuZWVkIGEg
+c2luZ2xlIHBvaW50IHdoZXJlIHRoaXMgY2FuIGJlDQo+IGZpeGVkLg0KDQpVbmRlcnN0b29kLg0K
+DQpJbiB0aGF0IGNvbnRleHQgSSB3b3VsZCBuZWVkIHRvIGRvIHNvbWUgbW9yZSBpbnN0cnVtZW50
+YXRpb24gdG8gdGVzdCB0aGlzIGtpbmQgb2YgcmFjZSBmb3IgdGhpcyBmZWF0dXJlLiANCg0KPiA+
+ID4gQWxzbyBpbiBhIHNlY29uZCBzdGVwIHdlIG1pZ2h0IHdhbm5hIG1vdmUgdGhlIEhDSSBldmVu
+dCBwcm9jZXNzaW5nDQo+ID4gPiBjb21wbGV0ZWx5IGludG8gYSB3b3JrcXVldWUuIElmIHdlIGdl
+dCBubyBwZXJmb3JtYW5jZSBoaXQgd2l0aCB0aGF0LA0KPiA+ID4gdGhlbiBzeXNmcyBoYW5kbGlu
+ZyBhbmQgZGV2aWNlIHJlc2V0IGJlY29tZXMgYSBsb3Qgc2ltcGxlciBhbmQgbGVzcw0KPiA+ID4g
+cHJvbmUgdG8gcmFjZSBjb25kaXRpb25zIHdpdGggZGV2aWNlIHJlbW92YWwuDQo+ID4NCj4gPiBM
+b29rcyBnb29kIHRvIG1lLiBTbyB3aGVuIHRoaXMgaXMgcmVhZHkgd2UgY2FuIG1vdmUgYWxzbyB0
+aGUgcmVzZXQgYWxzbyB0bw0KPiBwZXIgY29udHJvbGxlciBxdWV1ZS4NCj4gDQo+IEkgaGF2ZW4n
+dCBkb25lIGFueSBwZXJmb3JtYW5jZSB0ZXN0aW5nIHdpdGggdGhpcyBhcHByb2FjaC4gU28gSSBo
+b3BlIHdlDQo+IGFyZSBub3Qgc2hvb3Rpbmcgb3Vyc2VsdmVzIGluIHRoZSBmb290IHdpdGggaXQu
+DQoNClRoYW5rcw0KVG9tYXMNCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpJbnRlbCBJc3JhZWwgKDc0KSBMaW1pdGVk
+CgpUaGlzIGUtbWFpbCBhbmQgYW55IGF0dGFjaG1lbnRzIG1heSBjb250YWluIGNvbmZpZGVudGlh
+bCBtYXRlcmlhbCBmb3IKdGhlIHNvbGUgdXNlIG9mIHRoZSBpbnRlbmRlZCByZWNpcGllbnQocyku
+IEFueSByZXZpZXcgb3IgZGlzdHJpYnV0aW9uCmJ5IG90aGVycyBpcyBzdHJpY3RseSBwcm9oaWJp
+dGVkLiBJZiB5b3UgYXJlIG5vdCB0aGUgaW50ZW5kZWQKcmVjaXBpZW50LCBwbGVhc2UgY29udGFj
+dCB0aGUgc2VuZGVyIGFuZCBkZWxldGUgYWxsIGNvcGllcy4K
