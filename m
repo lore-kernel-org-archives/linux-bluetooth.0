@@ -1,58 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mike Tsai <Mike.Tsai@Atheros.com>
-To: nirav rabara <niravrabara@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Wed, 10 Mar 2010 13:40:33 -0800
-Subject: RE: Bluetooth Dongle version mismatch Confusion
-Message-ID: <35B17FE5076C7040809188FBE7913F983A1CC4443E@SC1EXMB-MBCL.global.atheros.com>
-References: <912bb79a1003100144g7d14c3daj9560dc0ae0dc8e31@mail.gmail.com>
-In-Reply-To: <912bb79a1003100144g7d14c3daj9560dc0ae0dc8e31@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
+Date: Wed, 10 Mar 2010 21:48:19 +0100
+From: Pavel Machek <pavel@ucw.cz>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "Luis R. Rodriguez" <mcgrof@gmail.com>,
+	linux-wireless <linux-wireless@vger.kernel.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	linux-kernel@vger.kernel.org,
+	"Kevin Hayes <kevin@atheros.com>, Dan Tian" <Dan.Tian@atheros.com>
+Subject: Re: Linux Bluetooth Coexistence documentation in general and for
+	ath9k
+Message-ID: <20100310204818.GF1394@ucw.cz>
+References: <43e72e891003031643u353c72dcj23bf429363a16ec8@mail.gmail.com> <1267715451.29510.20.camel@localhost.localdomain>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1267715451.29510.20.camel@localhost.localdomain>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nirav,
+Hi!
 
-	2.1 HS shall be able to operate with 2.0 dongle and vise versa. The major difference between 2.0 and 2.1 devices is the pairing method.
+> > The question of Bluetooth coexistence pops up here, on IRC and on bug
+> > reports quite too often so I've stuffed what I could onto a page with
+> > a few references / code and about ath9k's schemes for BT coexistence,
+> > feel free to extend or correct:
+> > 
+> > http://wireless.kernel.org/en/users/Documentation/Bluetooth-coexistence
+> > http://wireless.kernel.org/en/users/Drivers/ath9k/btcoex
+> > 
+> > I'm still not sure if "2-wire" and "3-wire" are generic terms and if
+> > someone owns a trademark on them or what, but looking down the road I
+> > think it would be nice to export this information through nl80211, if
+> > a device supports any of these BT-coex schemes and if so, perhaps
+> > display the current signal status of:
+> > 
+> >   * WLAN_ACTIVE
+> >   * BT_PRIORITY
+> >   * BT_STATE
+...
+> the only thing the host has control over is AFH channel map, and even
+> modifying that is not really needed. The Bluetooth controller will do
+> AFH automatically and it is on by default. We never switch that off
+> actually.
+> 
+> Normally the co-ex stuff is hard-wired between the Bluetooth and WiFi
+> and thus out of control to the host OS.
 
-	I think the issue most likely is due to the compatibility between different vendors, not the version miss match issue.
-
-	BTW, do you know what are the SCO parameters negotiated? Also, is sniff running at the same time?
-
-Thanks,
-
-Mike
- 	
-
------Original Message-----
-From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of nirav rabara
-Sent: Wednesday, March 10, 2010 1:44 AM
-To: linux-bluetooth@vger.kernel.org
-Subject: Bluetooth Dongle version mismatch Confusion
-
-Hi,
-
-I have been using bluez 4.58 with 2.6.30 on ARM platform , I am newbie
-and found problem with Headset & Dongle version mismatch.
-
-I can use v2.0 Dongle with v2.0 Headset & v2.1 Dongle with v2.1
-Headset.( result is good I can hear voice on HS)
-
-But if I use v2.0 Dongle with v2.1 HS & v2.1 Dongle with v2.0 HS
-result is unpredictable some time noise or No voice).
-
-I am doing anything wrong with SCO implementation? OR Bluetooth have
-limitation with version mismatch. OR I must use same version Dongle &
-HS(why ?).
-
-Thanks in Advance
-
-
---
-With Regards,
-Nirav Rabara
---
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+I believe that 'internal wifi, usb bluetooth' is still quite common
+setup...
+								Pavel
+-- 
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
