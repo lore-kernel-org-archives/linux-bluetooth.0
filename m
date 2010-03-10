@@ -1,68 +1,230 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Winkler, Tomas" <tomas.winkler@intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"Cohen, Guy" <guy.cohen@intel.com>, "Rindjunsky, Ron"
-	<ron.rindjunsky@intel.com>, "Paskar, Gregory" <gregory.paskar@intel.com>
-Date: Wed, 10 Mar 2010 21:35:35 +0200
-Subject: RE: [bluetooth-next V2] Bluetooth: handle device reset event
-Message-ID: <6F5C1D715B2DA5498A628E6B9C124F04016C15DFA3@hasmsx504.ger.corp.intel.com>
-References: <1266843933-28802-1-git-send-email-tomas.winkler@intel.com>
-	 <1268096587.3712.36.camel@localhost.localdomain>
-	 <6F5C1D715B2DA5498A628E6B9C124F04016C0E97A6@hasmsx504.ger.corp.intel.com>
- <1268239760.3712.84.camel@localhost.localdomain>
-In-Reply-To: <1268239760.3712.84.camel@localhost.localdomain>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Subject: Re: [PATCH] Expose wacom pen tablet battery and ac thru
+ power_supply class
+From: Przemo Firszt <przemo@firszt.eu>
+To: Jiri Kosina <jkosina@suse.cz>
+Cc: Bastien Nocera <hadess@hadess.net>, linux-bluetooth <linux-bluetooth@vger.kernel.org>, marcel <marcel@holtmann.org>, Peter Hutterer <peter.hutterer@who-t.net>, Ping <pinglinux@gmail.com>, Peter Huewe <peterhuewe@gmx.de>
+In-Reply-To: <alpine.LNX.2.00.1003092220160.17799@pobox.suse.cz>
+References: <1267389553.24791.22.camel@pldmachine>
+	 <1267531337.23521.14275.camel@localhost.localdomain>
+	 <1267531889.23521.14301.camel@localhost.localdomain>
+	 <1268161944.3632.21.camel@pldmachine> <1268162757.3632.33.camel@pldmachine>
+	 <alpine.LNX.2.00.1003092220160.17799@pobox.suse.cz>
+Content-Type: multipart/mixed; boundary="=-ooS0njs8b3pjiJ1YCV9k"
+Date: Wed, 10 Mar 2010 19:03:37 +0000
+Message-ID: <1268247817.3632.41.camel@pldmachine>
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTWFyY2VsIEhvbHRtYW5u
-IFttYWlsdG86bWFyY2VsQGhvbHRtYW5uLm9yZ10NCj4gU2VudDogV2VkbmVzZGF5LCBNYXJjaCAx
-MCwgMjAxMCA2OjQ5IFBNDQo+IFRvOiBXaW5rbGVyLCBUb21hcw0KPiBDYzogbGludXgtYmx1ZXRv
-b3RoQHZnZXIua2VybmVsLm9yZzsgQ29oZW4sIEd1eTsgUmluZGp1bnNreSwgUm9uOyBQYXNrYXIs
-DQo+IEdyZWdvcnkNCj4gU3ViamVjdDogUkU6IFtibHVldG9vdGgtbmV4dCBWMl0gQmx1ZXRvb3Ro
-OiBoYW5kbGUgZGV2aWNlIHJlc2V0IGV2ZW50DQo+IA0KPiBIaSBUb21hcywNCj4gDQo+ID4gPiA+
-IEEgQmx1ZXRvb3RoIGRldmljZSBleHBlcmllbmNpbmcgaGFyZHdhcmUgZmFpbHVyZSBtYXkgaXNz
-dWUNCj4gPiA+ID4gYSBIQVJEV0FSRV9FUlJPUiBoY2kgZXZlbnQuIFRoZSByZWFjdGlvbiB0byB0
-aGlzIGV2ZW50IGlzIGRldmljZQ0KPiA+ID4gPiByZXNldCBmbG93IGltcGxlbWVudGVkIGluIGZv
-bGxvd2luZyBzZXF1ZW5jZS4NCj4gPiA+ID4NCj4gPiA+ID4gMS4gTm90aWZ5OiBIQ0lfREVWX0RP
-V04NCj4gPiA+ID4gMi4gUmVpbml0aWFsaXplIGludGVybmFsIHN0cnVjdHVyZXMuDQo+ID4gPiA+
-IDMuIENhbGwgZHJpdmVyIGZsdXNoIGZ1bmN0aW9uDQo+ID4gPiA+IDQuIFNlbmQgSENJIHJlc2V0
-IHJlcXVlc3QgdG8gdGhlIGRldmljZS4NCj4gPiA+ID4gNS4gU2VuZCBIQ0kgaW5pdCBzZXF1ZW5j
-ZSByZXNldCB0byB0aGUgZGV2aWNlLg0KPiA+ID4gPiA2LiBOb3RpZnkgSENJX0RFVl9VUC4NCj4g
-PiA+DQo+ID4gPiBJIHByZWZlciBpZiB3ZSBjcmVhdGUgYSBnZW5lcmljIHBlciBjb250cm9sbGVy
-IHdvcmtxdWV1ZSBmaXJzdCBiZWZvcmUNCj4gPiA+IGhhdmluZyBhIHdvcmtxdWV1ZSBmb3IgZXZl
-cnkgdGFzay4gU29tZXRoaW5nIHNpbWlsYXIgdG8gd2hhdCB0aGUNCj4gPiA+IG1hYzgwMjExIGxh
-eWVyIG9mZmVycyByaWdodCBub3cuDQo+ID4NCj4gPiBUaGF0IHdvdWxkIGJlIGdvb2QgYXBwcm9h
-Y2ggYnV0IHdlIGFyZSB1c2luZyBkZWZhdWx0IGtlcm5lbCB3b3JrcXVldWUgaW4NCj4gdGhpcyBz
-b2x1dGlvbiBzbyB0aGVyZSBpcyBubyB3b3JrcXVldWUgZm9yIGV2ZXJ5IHRhc2suDQo+ID4gSSdt
-IG5vdCBzdXJlIGlmIHRoaXMgZWZmb3J0IHNob3VsZCBibG9jayB0aGlzIHBhdGNoLg0KPiANCj4g
-SSBoYXZlIGFuIGluaXRpYWwgcGF0Y2ggdGhhdCBJIGhhdmUgdG8gZGlnIG91dC4gSXQgaXMgYWN0
-dWFsbHkgbm90IHRoYXQNCj4gY29tcGxpY2F0ZWQuIEFuZCBJIHdvdWxkIHByZWZlciB0byBnZXQg
-dGhhdCBvbmUgZmlyc3QgYmVmb3JlIHdlIGFwcGx5DQo+IHRoaXMgcGF0Y2guDQoNCk9rYXksIEkg
-Y2FuIHRlc3QgdGhpcyBwYXJ0aWN1bGFyIGZsb3cgd2l0aCB5b3VyIHBhdGNoIGlmIHlvdSBzZW5k
-IGl0IHRvIG1lLg0KDQo+IFRoZSByZWFzb24gd2h5IEkgcmVhbGx5IHdhbm5hIHNvbHZlIHRoaXMg
-aXMgYmVjYXVzZSBvZiBwb3RlbnRpYWwgcmFjZQ0KPiBjb25kaXRpb25zIGJldHdlZW4gdGhlIHdv
-cmtxdWV1ZSBhbmQgYSBkZXZpY2UgcmVtb3ZhbC4gSSBoYXZlIGEgYmFkDQo+IGZlZWxpbmcgdGhh
-dCBldmVuIHdpdGggdGhlIGN1cnJlbnQgc3lzZnMgd29ya3F1ZXVlIHdlIGhhdmUgYSByYWNlDQo+
-IGNvbmRpdGlvbiBoaWRpbmcgc29tZXdoZXJlLiBTbyBpZiBnb2luZyBmb3J3YXJkIHdlIGhhdmUg
-dG8gc2hpZnQgbW9yZQ0KPiBhbmQgbW9yZSBjb2RlIGludG8gd29ya3F1ZXVlcyB3ZSBuZWVkIGEg
-c2luZ2xlIHBvaW50IHdoZXJlIHRoaXMgY2FuIGJlDQo+IGZpeGVkLg0KDQpVbmRlcnN0b29kLg0K
-DQpJbiB0aGF0IGNvbnRleHQgSSB3b3VsZCBuZWVkIHRvIGRvIHNvbWUgbW9yZSBpbnN0cnVtZW50
-YXRpb24gdG8gdGVzdCB0aGlzIGtpbmQgb2YgcmFjZSBmb3IgdGhpcyBmZWF0dXJlLiANCg0KPiA+
-ID4gQWxzbyBpbiBhIHNlY29uZCBzdGVwIHdlIG1pZ2h0IHdhbm5hIG1vdmUgdGhlIEhDSSBldmVu
-dCBwcm9jZXNzaW5nDQo+ID4gPiBjb21wbGV0ZWx5IGludG8gYSB3b3JrcXVldWUuIElmIHdlIGdl
-dCBubyBwZXJmb3JtYW5jZSBoaXQgd2l0aCB0aGF0LA0KPiA+ID4gdGhlbiBzeXNmcyBoYW5kbGlu
-ZyBhbmQgZGV2aWNlIHJlc2V0IGJlY29tZXMgYSBsb3Qgc2ltcGxlciBhbmQgbGVzcw0KPiA+ID4g
-cHJvbmUgdG8gcmFjZSBjb25kaXRpb25zIHdpdGggZGV2aWNlIHJlbW92YWwuDQo+ID4NCj4gPiBM
-b29rcyBnb29kIHRvIG1lLiBTbyB3aGVuIHRoaXMgaXMgcmVhZHkgd2UgY2FuIG1vdmUgYWxzbyB0
-aGUgcmVzZXQgYWxzbyB0bw0KPiBwZXIgY29udHJvbGxlciBxdWV1ZS4NCj4gDQo+IEkgaGF2ZW4n
-dCBkb25lIGFueSBwZXJmb3JtYW5jZSB0ZXN0aW5nIHdpdGggdGhpcyBhcHByb2FjaC4gU28gSSBo
-b3BlIHdlDQo+IGFyZSBub3Qgc2hvb3Rpbmcgb3Vyc2VsdmVzIGluIHRoZSBmb290IHdpdGggaXQu
-DQoNClRoYW5rcw0KVG9tYXMNCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpJbnRlbCBJc3JhZWwgKDc0KSBMaW1pdGVk
-CgpUaGlzIGUtbWFpbCBhbmQgYW55IGF0dGFjaG1lbnRzIG1heSBjb250YWluIGNvbmZpZGVudGlh
-bCBtYXRlcmlhbCBmb3IKdGhlIHNvbGUgdXNlIG9mIHRoZSBpbnRlbmRlZCByZWNpcGllbnQocyku
-IEFueSByZXZpZXcgb3IgZGlzdHJpYnV0aW9uCmJ5IG90aGVycyBpcyBzdHJpY3RseSBwcm9oaWJp
-dGVkLiBJZiB5b3UgYXJlIG5vdCB0aGUgaW50ZW5kZWQKcmVjaXBpZW50LCBwbGVhc2UgY29udGFj
-dCB0aGUgc2VuZGVyIGFuZCBkZWxldGUgYWxsIGNvcGllcy4K
+
+--=-ooS0njs8b3pjiJ1YCV9k
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+
+Dnia 2010-03-09, wto o godzinie 22:22 +0100, Jiri Kosina pisze:
+Hi,
+[..]
+> Anyway, you'll have to sort out the new dependency on CONFIG_POWER_SUPPLY 
+> somehow (compiling the battery code out from the driver if 
+> CONFIG_POWER_SUPPLY is unset, or selecting it directly from Kconfig).
+Thanks for checking the patch.
+See attached updated version - is it OK?
+Does it make sense to add a line to Kconfig to explain that
+CONFIG_POWER_SUPPLY/CONFIG_POWER_SUPPLY_MODULE is required to enable
+monitoring battery/ac state?
+
+Cheers,
+Przemo
+
+--=-ooS0njs8b3pjiJ1YCV9k
+Content-Disposition: attachment; filename*0=0001-Expose-wacom-pen-tablet-battery-and-ac-thru-power_su.pat; filename*1=ch
+Content-Type: text/x-patch; name="0001-Expose-wacom-pen-tablet-battery-and-ac-thru-power_su.patch"; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+
+>From f5eb6397ebd3a001289f676383df5adaaa17f8ea Mon Sep 17 00:00:00 2001
+From: Przemo Firszt <przemo@firszt.eu>
+Date: Fri, 5 Mar 2010 17:19:44 +0000
+Subject: [PATCH] Expose wacom pen tablet battery and ac thru power_supply class
+
+This patch exposes wacom pen tablet battery capacity and ac state thru
+power_supply class is sysfs.
+
+Signed-off-by: Przemo Firszt <przemo@firszt.eu>
+---
+ drivers/hid/hid-wacom.c |  128 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 128 insertions(+), 0 deletions(-)
+
+diff --git a/drivers/hid/hid-wacom.c b/drivers/hid/hid-wacom.c
+index 8d3b46f..5c9cfe4 100644
+--- a/drivers/hid/hid-wacom.c
++++ b/drivers/hid/hid-wacom.c
+@@ -21,14 +21,89 @@
+ #include <linux/device.h>
+ #include <linux/hid.h>
+ #include <linux/module.h>
++#if defined(CONFIG_POWER_SUPPLY) || defined(CONFIG_POWER_SUPPLY_MODULE)
++#define ENABLE_POWER_SUPPLY
++#include <linux/power_supply.h>
++#endif
+ 
+ #include "hid-ids.h"
+ 
+ struct wacom_data {
+ 	__u16 tool;
+ 	unsigned char butstate;
++#ifdef ENABLE_POWER_SUPPLY
++	int battery_capacity;
++	struct power_supply battery;
++	struct power_supply ac;
++#endif
+ };
+ 
++#ifdef ENABLE_POWER_SUPPLY
++/*percent of battery capacity, 0 means AC online*/
++static unsigned short batcap[8] = { 1, 15, 25, 35, 50, 70, 100, 0 };
++
++static enum power_supply_property wacom_battery_props[] = {
++	POWER_SUPPLY_PROP_PRESENT,
++	POWER_SUPPLY_PROP_CAPACITY
++};
++
++static enum power_supply_property wacom_ac_props[] = {
++	POWER_SUPPLY_PROP_PRESENT,
++	POWER_SUPPLY_PROP_ONLINE
++};
++
++static int wacom_battery_get_property(struct power_supply *psy,
++				enum power_supply_property psp,
++				union power_supply_propval *val)
++{
++	struct wacom_data *wdata = container_of(psy,
++					struct wacom_data, battery);
++	int power_state = batcap[wdata->battery_capacity];
++	int ret = 0;
++
++	switch (psp) {
++	case POWER_SUPPLY_PROP_PRESENT:
++		val->intval = 1;
++		break;
++	case POWER_SUPPLY_PROP_CAPACITY:
++		/* show 100% battery capacity when charging */
++		if (power_state == 0)
++			val->intval = 100;
++		else
++			val->intval = power_state;
++		break;
++	default:
++		ret = -EINVAL;
++		break;
++	}
++	return ret;
++}
++
++static int wacom_ac_get_property(struct power_supply *psy,
++				enum power_supply_property psp,
++				union power_supply_propval *val)
++{
++	struct wacom_data *wdata = container_of(psy, struct wacom_data, ac);
++	int power_state = batcap[wdata->battery_capacity];
++	int ret = 0;
++
++	switch (psp) {
++	case POWER_SUPPLY_PROP_PRESENT:
++		/* fall through */
++	case POWER_SUPPLY_PROP_ONLINE:
++		if (power_state == 0)
++			val->intval = 1;
++		else
++			val->intval = 0;
++		break;
++	default:
++		ret = -EINVAL;
++		break;
++	}
++	return ret;
++}
++#endif
++
+ static int wacom_raw_event(struct hid_device *hdev, struct hid_report *report,
+ 		u8 *raw_data, int size)
+ {
+@@ -147,6 +222,12 @@ static int wacom_raw_event(struct hid_device *hdev, struct hid_report *report,
+ 		input_sync(input);
+ 	}
+ 
++#ifdef ENABLE_POWER_SUPPLY
++	/* Store current battery capacity */
++	rw = (data[7] >> 2 & 0x07);
++	if (rw != wdata->battery_capacity)
++		wdata->battery_capacity = rw;
++#endif
+ 	return 1;
+ }
+ 
+@@ -206,6 +287,45 @@ static int wacom_probe(struct hid_device *hdev,
+ 	if (ret < 0)
+ 		dev_warn(&hdev->dev, "failed to poke device #2, %d\n", ret);
+ 
++#ifdef ENABLE_POWER_SUPPLY
++	wdata->battery.properties = wacom_battery_props;
++	wdata->battery.num_properties = ARRAY_SIZE(wacom_battery_props);
++	wdata->battery.get_property = wacom_battery_get_property;
++	wdata->battery.name = "wacom_battery";
++	wdata->battery.type = POWER_SUPPLY_TYPE_BATTERY;
++	wdata->battery.use_for_apm = 0;
++
++	ret = power_supply_register(&hdev->dev, &wdata->battery);
++	if (ret) {
++		dev_warn(&hdev->dev,
++			"can't create sysfs battery attribute, err: %d\n", ret);
++		/*
++		 * battery attribute is not critical for the tablet, but if it
++		 * failed then there is no need to create ac attribute
++		 */
++		goto move_on;
++	}
++
++	wdata->ac.properties = wacom_ac_props;
++	wdata->ac.num_properties = ARRAY_SIZE(wacom_ac_props);
++	wdata->ac.get_property = wacom_ac_get_property;
++	wdata->ac.name = "wacom_ac";
++	wdata->ac.type = POWER_SUPPLY_TYPE_MAINS;
++	wdata->ac.use_for_apm = 0;
++
++	ret = power_supply_register(&hdev->dev, &wdata->ac);
++	if (ret) {
++		dev_warn(&hdev->dev,
++			"can't create ac battery attribute, err: %d\n", ret);
++		/*
++		 * ac attribute is not critical for the tablet, but if it
++		 * failed then we don't want to battery attribute to exist
++		 */
++		power_supply_unregister(&wdata->battery);
++	}
++
++move_on:
++#endif
+ 	hidinput = list_entry(hdev->inputs.next, struct hid_input, list);
+ 	input = hidinput->input;
+ 
+@@ -250,7 +370,15 @@ err_free:
+ 
+ static void wacom_remove(struct hid_device *hdev)
+ {
++#ifdef ENABLE_POWER_SUPPLY
++	struct wacom_data *wdata = hid_get_drvdata(hdev);
++#endif
+ 	hid_hw_stop(hdev);
++
++#ifdef ENABLE_POWER_SUPPLY
++	power_supply_unregister(&wdata->battery);
++	power_supply_unregister(&wdata->ac);
++#endif
+ 	kfree(hid_get_drvdata(hdev));
+ }
+ 
+-- 
+1.7.0.1
+
+
+--=-ooS0njs8b3pjiJ1YCV9k--
