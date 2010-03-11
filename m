@@ -1,71 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Bug in parsing of SDP_ServiceSearchAttributeResponse?
-From: Daniel Abraham <daniel.shrugged@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary="=-grmh/fZJtFqFLZT63krE"
-Date: Thu, 11 Mar 2010 23:57:33 +0200
-Message-ID: <1268344653.9884.42.camel@dabraham-mobl>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 11 Mar 2010 09:35:36 -0800
+From: "Luis R. Rodriguez" <lrodriguez@atheros.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Suraj Sumangala <Suraj.Sumangala@Atheros.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Vikram
+ Kandukuri <Vikram.Kandukuri@Atheros.com>, Luis Rodriguez
+	<Luis.Rodriguez@Atheros.com>, Jothikumar Mothilal
+	<Jothikumar.Mothilal@Atheros.com>
+Subject: Re: [PATCH] Added support for Atheros AR300x Bluetooth Chip
+Message-ID: <20100311173536.GC3000@tux>
+References: <20100209114231.GA6587@ATH-LT-538>
+ <4B98ED8F.2020000@atheros.com>
+ <1268327744.3712.88.camel@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <1268327744.3712.88.camel@localhost.localdomain>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Thu, Mar 11, 2010 at 09:15:44AM -0800, Marcel Holtmann wrote:
+> Hi Suraj,
+> 
+> > Signed-off-by: Suraj <suraj@atheros.com>
+> > 
+> > ---
+> > drivers/bluetooth/Kconfig | 11 ++
+> > drivers/bluetooth/Makefile | 1 +
+> > drivers/bluetooth/hci_ath.c | 353 +++++++++++++++++++++++++++++++++++++++++
+> > drivers/bluetooth/hci_ldisc.c | 6 +
+> > drivers/bluetooth/hci_uart.h | 8 +-
+> > 5 files changed, 378 insertions(+), 1 deletions(-)
+> > create mode 100755 drivers/bluetooth/hci_ath.c
+> > 
+> > diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+> > index 058fbcc..81abeff 100644
+> > --- a/drivers/bluetooth/Kconfig
+> > +++ b/drivers/bluetooth/Kconfig
+> > @@ -58,6 +58,17 @@ config BT_HCIUART_BCSP
+> > 
+> > Say Y here to compile support for HCI BCSP protocol.
+> > 
+> > +config BT_HCIUART_ATH
+> > + bool "Atheros AR300x Board support"
+> > + depends on BT_HCIUART
+> > + help
+> > + HCIATH (HCI Atheros) is a serial protocol for communication
+> > + between Bluetooth device and host with support for Atheros AR300x
+> > + power management feature. This protocol is required for
+> > + serial Bluetooth devices that are based on Atheros AR300x chips.
+> > +
+> > + Say Y here to compile support for Atheros AR300x Chips.
+> 
+> your patch is messed up. Make sure your mailer doesn't mess with tabs
+> and whitespaces.
 
---=-grmh/fZJtFqFLZT63krE
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+I had issues with our Exchange server for patches but that was only for
+receiving patches [1], but that is now fixed. I don't think the SMTP
+server should screw with patches on their way out. Suraj, did you
+actually intend for the patch to go out as is?
 
-Hi, this is my first time here, so I'm not sure about etiquette, or
-if/where there's a BlueZ bug repository...
+[1] http://bombadil.infradead.org/~mcgrof/MS-exchange-sucks-for-patches/
 
-I'm using BlueZ 4.62, and I ran the command line "sdptool browse <BD
-address>" against a remote computer. I got this error output: "Service
-search failed: Success".
-
-According to hcidump (attached), the SDP_ServiceSearchAttributeResponse
-is malformed, but a different Bluetooth stack (IVT on Windows) is able
-to report correctly the remote computer's available services.
-
-So I'm guessing this is a parsing error or interoperability weakness in
-BlueZ...? (Or, less likely but possible, a bug in the other 2 stacks?)
-
-Thanks
-
---=-grmh/fZJtFqFLZT63krE
-Content-Type: application/octet-stream; name="sdptool-browse-error.hcidump"
-Content-Disposition: attachment; filename="sdptool-browse-error.hcidump"
-Content-Transfer-Encoding: base64
-
-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
-
-
---=-grmh/fZJtFqFLZT63krE--
-
+  Luis
