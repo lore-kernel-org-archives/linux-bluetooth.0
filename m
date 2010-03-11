@@ -1,59 +1,150 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Added support for Atheros AR300x Bluetooth Chip
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Suraj Sumangala <suraj@atheros.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Vikram Kandukuri <Vikram.Kandukuri@Atheros.com>,
-	Suraj Sumangala <Suraj.Sumangala@Atheros.com>,
-	Luis Rodriguez <Luis.Rodriguez@Atheros.com>,
-	Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>
-In-Reply-To: <4B98ED8F.2020000@atheros.com>
-References: <20100209114231.GA6587@ATH-LT-538>
-	 <4B98ED8F.2020000@atheros.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Thu, 11 Mar 2010 09:15:44 -0800
-Message-ID: <1268327744.3712.88.camel@localhost.localdomain>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <508e92ca1002180818n4fd0e277qf845e19596d0cf48@mail.gmail.com>
+References: <508e92ca1002160236k34c18949jc7d7187645ef4aa0@mail.gmail.com>
+	 <20100216113408.GA15436@vigoh>
+	 <508e92ca1002160358g1c6b599bo329f4f51cae18041@mail.gmail.com>
+	 <20100217235755.GA6011@vigoh>
+	 <508e92ca1002180818n4fd0e277qf845e19596d0cf48@mail.gmail.com>
+Date: Thu, 11 Mar 2010 16:54:21 +0200
+Message-ID: <508e92ca1003110654t45cfc9d7j9704b60f9f2b4af2@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Fix kernel crash on BT stress tests.
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Suraj,
+Hei,
 
-> Signed-off-by: Suraj <suraj@atheros.com>
-> 
-> ---
-> drivers/bluetooth/Kconfig | 11 ++
-> drivers/bluetooth/Makefile | 1 +
-> drivers/bluetooth/hci_ath.c | 353 +++++++++++++++++++++++++++++++++++++++++
-> drivers/bluetooth/hci_ldisc.c | 6 +
-> drivers/bluetooth/hci_uart.h | 8 +-
-> 5 files changed, 378 insertions(+), 1 deletions(-)
-> create mode 100755 drivers/bluetooth/hci_ath.c
-> 
-> diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-> index 058fbcc..81abeff 100644
-> --- a/drivers/bluetooth/Kconfig
-> +++ b/drivers/bluetooth/Kconfig
-> @@ -58,6 +58,17 @@ config BT_HCIUART_BCSP
-> 
-> Say Y here to compile support for HCI BCSP protocol.
-> 
-> +config BT_HCIUART_ATH
-> + bool "Atheros AR300x Board support"
-> + depends on BT_HCIUART
-> + help
-> + HCIATH (HCI Atheros) is a serial protocol for communication
-> + between Bluetooth device and host with support for Atheros AR300x
-> + power management feature. This protocol is required for
-> + serial Bluetooth devices that are based on Atheros AR300x chips.
-> +
-> + Say Y here to compile support for Atheros AR300x Chips.
+What is the status of this patch proposed?
 
-your patch is messed up. Make sure your mailer doesn't mess with tabs
-and whitespaces.
+-- Andrei
 
-Regards
-
-Marcel
-
-
+On Thu, Feb 18, 2010 at 6:18 PM, Andrei Emeltchenko
+<andrei.emeltchenko.news@gmail.com> wrote:
+> Hi Gustavo
+>
+> On Thu, Feb 18, 2010 at 1:57 AM, Gustavo F. Padovan
+> <padovan@profusion.mobi> wrote:
+>> Hi Andrei,
+>>
+>> * Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2010-02-16 13:58:34 +0200]:
+>>
+>>> On Tue, Feb 16, 2010 at 1:34 PM, Gustavo F. Padovan
+>>> <padovan@profusion.mobi> wrote:
+>>> > Hi Andrei,
+>>> >
+>>> > * Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2010-02-16 12:36:47 +0200]:
+>>> >
+>>> >> From 0135f732cb45e5e91062aca84a61a40b172200a4 Mon Sep 17 00:00:00 2001
+>>> >> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+>>> >> Date: Tue, 16 Feb 2010 10:52:33 +0200
+>>> >> Subject: [PATCH] Bluetooth: Fix kernel crash on BT stress tests.
+>>> >>
+>>> >> Added very simple check that req buffer has enough space to
+>>> >> fit configuration parameters. Shall be enough to reject packets
+>>> >> with configuration size more than req buffer.
+>>> >>
+>>> >> Crash trace below
+>>> >>
+>>> >> [ 6069.659393] Unable to handle kernel paging request at virtual
+>>> >> address 02000205
+>>> >> [ 6069.673034] Internal error: Oops: 805 [#1] PREEMPT
+>>> >> ...
+>>> >> [ 6069.727172] PC is at l2cap_add_conf_opt+0x70/0xf0 [l2cap]
+>>> >> [ 6069.732604] LR is at l2cap_recv_frame+0x1350/0x2e78 [l2cap]
+>>> >> ...
+>>> >> [ 6070.030303] Backtrace:
+>>> >> [ 6070.032806] [<bf1c2880>] (l2cap_add_conf_opt+0x0/0xf0 [l2cap]) from
+>>> >> [<bf1c6624>] (l2cap_recv_frame+0x1350/0x2e78 [l2cap])
+>>> >> [ 6070.043823]  r8:dc5d3100 r7:df2a91d6 r6:00000001 r5:df2a8000 r4:00000200
+>>> >> [ 6070.050659] [<bf1c52d4>] (l2cap_recv_frame+0x0/0x2e78 [l2cap]) from
+>>> >> [<bf1c8408>] (l2cap_recv_acldata+0x2bc/0x350 [l2cap])
+>>> >> [ 6070.061798] [<bf1c814c>] (l2cap_recv_acldata+0x0/0x350 [l2cap]) from
+>>> >> [<bf0037a4>] (hci_rx_task+0x244/0x478 [bluetooth])
+>>> >> [ 6070.072631]  r6:dc647700 r5:00000001 r4:df2ab740
+>>> >> [ 6070.077362] [<bf003560>] (hci_rx_task+0x0/0x478 [bluetooth]) from
+>>> >> [<c006b9fc>] (tasklet_action+0x78/0xd8)
+>>> >> [ 6070.087005] [<c006b984>] (tasklet_action+0x0/0xd8) from [<c006c160>]
+>>> >
+>>> > Are you using ERTM or Streaming mode? If yes, I have a guess about the
+>>> > source of the problem. On l2cap_parse_conf_rsp we check for:
+>>> >
+>>> >        while (len >= L2CAP_CONF_OPT_SIZE) {
+>>> >                len -= l2cap_get_conf_opt(&rsp, &type, &olen, &val);
+>>> >
+>>> > But on case L2CAP_CONF_RFC olen is greater than L2CAP_CONF_OPT_SIZE we
+>>> > can exceed the buffer size. So the right fix will be check if len >=
+>>> > olen in that case.
+>
+> Is len always bigger then olen?
+>
+> in  l2cap_get_conf_opt :
+>
+> len = L2CAP_CONF_OPT_SIZE + opt->len;
+>
+> opt->len is olen
+>
+> -- Andrei
+>
+>>>
+>>> We use test tool which sends "Configure Response" packet with size 262
+>>> bytes. So "req" buffer gets overwritten. But in the code nobody checks
+>>> that "req" might be overwritten.
+>>
+>> So I have found another issue. ;)
+>> Have to fix it.
+>>
+>>>
+>>> -- Andrei
+>>>
+>>> >
+>>> >
+>>> >>
+>>> >> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+>>> >> ---
+>>> >>  net/bluetooth/l2cap.c |    6 ++++++
+>>> >>  1 files changed, 6 insertions(+), 0 deletions(-)
+>>> >>
+>>> >> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+>>> >> index 400efa2..69b7280 100644
+>>> >> --- a/net/bluetooth/l2cap.c
+>>> >> +++ b/net/bluetooth/l2cap.c
+>>> >> @@ -2830,6 +2830,12 @@ static inline int l2cap_config_rsp(struct
+>>> >> l2cap_conn *conn, struct l2cap_cmd_hdr
+>>> >>                       int len = cmd->len - sizeof(*rsp);
+>>> >>                       char req[64];
+>>> >>
+>>> >> +                     if (len > sizeof(req) - sizeof(struct l2cap_conf_req)) {
+>>> >> +                             BT_ERR("Config response is too big");
+>>> >> +                             l2cap_send_disconn_req(conn, sk);
+>>> >> +                             goto done;
+>>> >> +                     }
+>>> >> +
+>>> >>                       /* throw out any old stored conf requests */
+>>> >>                       result = L2CAP_CONF_SUCCESS;
+>>> >>                       len = l2cap_parse_conf_rsp(sk, rsp->data,
+>>> >> --
+>>> >> 1.6.0.4
+>>> >
+>>> >
+>>> > --
+>>> > Gustavo F. Padovan
+>>> > http://padovan.org
+>>> >
+>>> > ProFUSION embedded systems - http://profusion.mobi
+>>> >
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>> --
+>> Gustavo F. Padovan
+>> http://padovan.org
+>>
+>> ProFUSION embedded systems - http://profusion.mobi
+>>
+>
