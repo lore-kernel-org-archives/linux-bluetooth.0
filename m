@@ -1,474 +1,409 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4B98ED8F.2020000@atheros.com>
-Date: Thu, 11 Mar 2010 18:48:07 +0530
-From: Suraj Sumangala <suraj@atheros.com>
+From: Mike Tsai <Mike.Tsai@Atheros.com>
+To: shy <shyboysby@gmail.com>
+CC: Pavel Machek <pavel@ucw.cz>, Marcel Holtmann <marcel@holtmann.org>, "Luis
+ R. Rodriguez" <mcgrof@gmail.com>, linux-wireless
+	<linux-wireless@vger.kernel.org>, linux-bluetooth
+	<linux-bluetooth@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Dan Tian <Dan.Tian@Atheros.com>
+Date: Wed, 10 Mar 2010 18:27:11 -0800
+Subject: RE: Linux Bluetooth Coexistence documentation in general and for
+ 	ath9k
+Message-ID: <35B17FE5076C7040809188FBE7913F983A1CC445CF@SC1EXMB-MBCL.global.atheros.com>
+References: <43e72e891003031643u353c72dcj23bf429363a16ec8@mail.gmail.com>
+ 	<1267715451.29510.20.camel@localhost.localdomain>
+ <20100310204818.GF1394@ucw.cz>
+ 	<35B17FE5076C7040809188FBE7913F983A1CC44471@SC1EXMB-MBCL.global.atheros.com>
+ <a11267f31003101733q50d8755bmae7b6812d1e5e6b4@mail.gmail.com>
+In-Reply-To: <a11267f31003101733q50d8755bmae7b6812d1e5e6b4@mail.gmail.com>
+Content-Type: multipart/alternative;
+	boundary="_000_35B17FE5076C7040809188FBE7913F983A1CC445CFSC1EXMBMBCLgl_"
 MIME-Version: 1.0
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: Vikram Kandukuri <Vikram.Kandukuri@Atheros.com>, "marcel@holtmann.org"
-	<marcel@holtmann.org>, Suraj Sumangala <Suraj.Sumangala@Atheros.com>, "Luis
- Rodriguez" <Luis.Rodriguez@Atheros.com>, Jothikumar Mothilal
-	<Jothikumar.Mothilal@Atheros.com>
-Subject: [PATCH] Added support for Atheros AR300x Bluetooth Chip
-References: <20100209114231.GA6587@ATH-LT-538>
-In-Reply-To: <20100209114231.GA6587@ATH-LT-538>
-Content-Type: text/plain; charset="us-ascii"; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+--_000_35B17FE5076C7040809188FBE7913F983A1CC445CFSC1EXMBMBCLgl_
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Suraj <suraj@atheros.com>
+Shy,
 
----
-drivers/bluetooth/Kconfig | 11 ++
-drivers/bluetooth/Makefile | 1 +
-drivers/bluetooth/hci_ath.c | 353 +++++++++++++++++++++++++++++++++++++++++
-drivers/bluetooth/hci_ldisc.c | 6 +
-drivers/bluetooth/hci_uart.h | 8 +-
-5 files changed, 378 insertions(+), 1 deletions(-)
-create mode 100755 drivers/bluetooth/hci_ath.c
+            There are 3 sources of channel map inputs that LM  has to consi=
+der for an optimal channel map. Host input is the one that LM must obey, th=
+e other 2 are optional (internal and peer device channel map),
 
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index 058fbcc..81abeff 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -58,6 +58,17 @@ config BT_HCIUART_BCSP
+BR,
 
-Say Y here to compile support for HCI BCSP protocol.
+Mike
 
-+config BT_HCIUART_ATH
-+ bool "Atheros AR300x Board support"
-+ depends on BT_HCIUART
-+ help
-+ HCIATH (HCI Atheros) is a serial protocol for communication
-+ between Bluetooth device and host with support for Atheros AR300x
-+ power management feature. This protocol is required for
-+ serial Bluetooth devices that are based on Atheros AR300x chips.
-+
-+ Say Y here to compile support for Atheros AR300x Chips.
-+
-config BT_HCIUART_LL
-bool "HCILL protocol support"
-depends on BT_HCIUART
-diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
-index 7e5aed5..1481faa 100644
---- a/drivers/bluetooth/Makefile
-+++ b/drivers/bluetooth/Makefile
-@@ -26,4 +26,5 @@ hci_uart-y := hci_ldisc.o
-hci_uart-$(CONFIG_BT_HCIUART_H4) += hci_h4.o
-hci_uart-$(CONFIG_BT_HCIUART_BCSP) += hci_bcsp.o
-hci_uart-$(CONFIG_BT_HCIUART_LL) += hci_ll.o
-+hci_uart-$(CONFIG_BT_HCIUART_ATH) += hci_ath.o
-hci_uart-objs := $(hci_uart-y)
-diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
-new file mode 100755
-index 0000000..13e4404
---- /dev/null
-+++ b/drivers/bluetooth/hci_ath.c
-@@ -0,0 +1,353 @@
-+/*
-+ * Copyright (c) 2009-2010 Atheros Communications Inc.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, write to the Free Software
-+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-+ *
-+ */
-+
-+#include <linux/module.h>
-+#include <linux/kernel.h>
-+
-+#include <linux/init.h>
-+#include <linux/slab.h>
-+#include <linux/tty.h>
-+#include <linux/errno.h>
-+#include <linux/ioctl.h>
-+#include <linux/skbuff.h>
-+
-+#include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/hci_core.h>
-+
-+#include "hci_uart.h"
-+
-+
-+/* HCIATH receiver States */
-+#define HCIATH_W4_PACKET_TYPE 0
-+#define HCIATH_W4_EVENT_HDR 1
-+#define HCIATH_W4_ACL_HDR 2
-+#define HCIATH_W4_SCO_HDR 3
-+#define HCIATH_W4_DATA 4
-+
-+struct ath_struct {
-+ struct hci_uart *hu;
-+ unsigned int rx_state;
-+ unsigned int rx_count;
-+ unsigned int cur_sleep;
-+
-+ spinlock_t hciath_lock;
-+ struct sk_buff *rx_skb;
-+ struct sk_buff_head txq;
-+ wait_queue_head_t wqevt;
-+ struct work_struct ctxtsw;
-+};
-+
-+int ath_wakeup_ar3001(struct tty_struct *tty)
-+{
-+ struct termios settings;
-+ int status = 0x00;
-+ mm_segment_t oldfs;
-+ status = tty->driver->ops->tiocmget(tty, NULL);
-+
-+ if ((status & TIOCM_CTS))
-+ return status;
-+
-+ oldfs = get_fs();
-+ set_fs(KERNEL_DS);
-+ n_tty_ioctl_helper(tty, NULL, TCGETS, (unsigned long)&settings);
-+
-+ settings.c_cflag &= ~CRTSCTS;
-+ n_tty_ioctl_helper(tty, NULL, TCSETS, (unsigned long)&settings);
-+ set_fs(oldfs);
-+ status = tty->driver->ops->tiocmget(tty, NULL);
-+
-+ /* Wake up board */
-+ tty->driver->ops->tiocmset(tty, NULL, 0x00, TIOCM_RTS);
-+ mdelay(20);
-+
-+ status = tty->driver->ops->tiocmget(tty, NULL);
-+
-+ tty->driver->ops->tiocmset(tty, NULL, TIOCM_RTS, 0x00);
-+ mdelay(20);
-+
-+ status = tty->driver->ops->tiocmget(tty, NULL);
-+ oldfs = get_fs();
-+ set_fs(KERNEL_DS);
-+ n_tty_ioctl_helper(tty, NULL, TCGETS, (unsigned long)&settings);
-+
-+ settings.c_cflag |= CRTSCTS;
-+ n_tty_ioctl_helper(tty, NULL, TCSETS, (unsigned long)&settings);
-+ set_fs(oldfs);
-+ return status;
-+}
-+
-+static void ath_context_switch(struct work_struct *work)
-+{
-+ int status;
-+ struct ath_struct *ath;
-+ struct hci_uart *hu;
-+ struct tty_struct *tty;
-+
-+ ath = container_of(work, struct ath_struct, ctxtsw);
-+
-+ hu = ath->hu;
-+ tty = hu->tty;
-+
-+ /* verify and wake up controller */
-+ if (ath->cur_sleep) {
-+
-+ status = ath_wakeup_ar3001(tty);
-+ if (!(status & TIOCM_CTS))
-+ return;
-+ }
-+
-+ /* Ready to send Data */
-+ clear_bit(HCI_UART_SENDING, &hu->tx_state);
-+ hci_uart_tx_wakeup(hu);
-+}
-+
-+int ath_check_sleep_cmd(struct ath_struct *ath, unsigned char *packet)
-+{
-+ if (packet[0] == 0x04 && packet[1] == 0xFC)
-+ ath->cur_sleep = packet[3];
-+
-+ return 0;
-+}
-+
-+
-+/* Initialize protocol */
-+static int ath_open(struct hci_uart *hu)
-+{
-+ struct ath_struct *ath;
-+ BT_DBG("hu %p", hu);
-+
-+ ath = kzalloc(sizeof(*ath), GFP_ATOMIC);
-+ if (!ath)
-+ return -ENOMEM;
-+
-+ skb_queue_head_init(&ath->txq);
-+ spin_lock_init(&ath->hciath_lock);
-+
-+ ath->cur_sleep = 0;
-+ hu->priv = ath;
-+ ath->hu = hu;
-+
-+ init_waitqueue_head(&ath->wqevt);
-+ INIT_WORK(&ath->ctxtsw, ath_context_switch);
-+ return 0;
-+}
-+
-+/* Flush protocol data */
-+static int ath_flush(struct hci_uart *hu)
-+{
-+ struct ath_struct *ath = hu->priv;
-+ BT_DBG("hu %p", hu);
-+ skb_queue_purge(&ath->txq);
-+
-+ return 0;
-+}
-+
-+/* Close protocol */
-+static int ath_close(struct hci_uart *hu)
-+{
-+ struct ath_struct *ath = hu->priv;
-+ BT_DBG("hu %p", hu);
-+
-+ skb_queue_purge(&ath->txq);
-+
-+ if (ath->rx_skb)
-+ kfree_skb(ath->rx_skb);
-+
-+ wake_up_interruptible(&ath->wqevt);
-+ hu->priv = NULL;
-+ kfree(ath);
-+ return 0;
-+}
-+
-+/* Enqueue frame for transmittion */
-+static int ath_enqueue(struct hci_uart *hu, struct sk_buff *skb)
-+{
-+ struct ath_struct *ath = hu->priv;
-+ if (bt_cb(skb)->pkt_type == HCI_SCODATA_PKT) {
-+
-+ /* Discard SCO packet.AR3001 does not support SCO over HCI */
-+ BT_DBG("SCO Packet over HCI received Dropping\n");
-+ kfree(skb);
-+ return 0;
-+ }
-+ BT_DBG("hu %p skb %p", hu, skb);
-+
-+ /* Prepend skb with frame type */
-+ memcpy(skb_push(skb, 1), &bt_cb(skb)->pkt_type, 1);
-+
-+ skb_queue_tail(&ath->txq, skb);
-+ set_bit(HCI_UART_SENDING, &hu->tx_state);
-+
-+ schedule_work(&ath->ctxtsw);
-+ return 0;
-+}
-+
-+static struct sk_buff *ath_dequeue(struct hci_uart *hu)
-+{
-+ struct ath_struct *ath = hu->priv;
-+ struct sk_buff *skbuf;
-+
-+ skbuf = skb_dequeue(&ath->txq);
-+ if (skbuf != NULL)
-+ ath_check_sleep_cmd(ath, &skbuf->data[1]);
-+
-+ return skbuf;
-+}
-+
-+static inline int ath_check_data_len(struct ath_struct *ath, int len)
-+{
-+ register int room = skb_tailroom(ath->rx_skb);
-+ BT_DBG("len %d room %d", len, room);
-+
-+ if (len > room) {
-+ BT_ERR("Data length is too large");
-+ kfree_skb(ath->rx_skb);
-+ ath->rx_state = HCIATH_W4_PACKET_TYPE;
-+ ath->rx_skb = NULL;
-+ ath->rx_count = 0;
-+ } else {
-+ ath->rx_state = HCIATH_W4_DATA;
-+ ath->rx_count = len;
-+ return len;
-+ }
-+
-+ return 0;
-+}
-+
-+/* Recv data */
-+static int ath_recv(struct hci_uart *hu, void *data, int count)
-+{
-+ struct ath_struct *ath = hu->priv;
-+ register char *ptr;
-+ struct hci_event_hdr *eh;
-+ struct hci_acl_hdr *ah;
-+ struct hci_sco_hdr *sh;
-+ struct sk_buff *skbuf;
-+ register int len, type, dlen;
-+
-+ skbuf = NULL;
-+ BT_DBG("hu %p count %d rx_state %d rx_count %d", hu, count,
-+ ath->rx_state, ath->rx_count);
-+ ptr = data;
-+ while (count) {
-+ if (ath->rx_count) {
-+
-+ len = min_t(unsigned int, ath->rx_count, count);
-+ memcpy(skb_put(ath->rx_skb, len), ptr, len);
-+ ath->rx_count -= len;
-+ count -= len;
-+ ptr += len;
-+
-+ if (ath->rx_count)
-+ continue;
-+ switch (ath->rx_state) {
-+ case HCIATH_W4_DATA:
-+ hci_recv_frame(ath->rx_skb);
-+ ath->rx_state = HCIATH_W4_PACKET_TYPE;
-+ ath->rx_skb = NULL;
-+ ath->rx_count = 0;
-+ continue;
-+ case HCIATH_W4_EVENT_HDR:
-+ eh = (struct hci_event_hdr *)ath->rx_skb->data;
-+ BT_DBG("Event header: evt 0x%2.2x plen %d",
-+ eh->evt, eh->plen);
-+ ath_check_data_len(ath, eh->plen);
-+ continue;
-+ case HCIATH_W4_ACL_HDR:
-+ ah = (struct hci_acl_hdr *)ath->rx_skb->data;
-+ dlen = __le16_to_cpu(ah->dlen);
-+ BT_DBG("ACL header: dlen %d", dlen);
-+ ath_check_data_len(ath, dlen);
-+ continue;
-+ case HCIATH_W4_SCO_HDR:
-+ sh = (struct hci_sco_hdr *)ath->rx_skb->data;
-+ BT_DBG("SCO header: dlen %d", sh->dlen);
-+ ath_check_data_len(ath, sh->dlen);
-+ continue;
-+ }
-+ }
-+
-+ /* HCIATH_W4_PACKET_TYPE */
-+ switch (*ptr) {
-+ case HCI_EVENT_PKT:
-+ BT_DBG("Event packet");
-+ ath->rx_state = HCIATH_W4_EVENT_HDR;
-+ ath->rx_count = HCI_EVENT_HDR_SIZE;
-+ type = HCI_EVENT_PKT;
-+ break;
-+ case HCI_ACLDATA_PKT:
-+ BT_DBG("ACL packet");
-+ ath->rx_state = HCIATH_W4_ACL_HDR;
-+ ath->rx_count = HCI_ACL_HDR_SIZE;
-+ type = HCI_ACLDATA_PKT;
-+ break;
-+ case HCI_SCODATA_PKT:
-+ BT_DBG("SCO packet");
-+ ath->rx_state = HCIATH_W4_SCO_HDR;
-+ ath->rx_count = HCI_SCO_HDR_SIZE;
-+ type = HCI_SCODATA_PKT;
-+ break;
-+ default:
-+ BT_ERR("Unknown HCI packet type %2.2x", (__u8) *ptr);
-+ hu->hdev->stat.err_rx++;
-+ ptr++;
-+ count--;
-+ continue;
-+ };
-+ ptr++;
-+ count--;
-+
-+ /* Allocate packet */
-+ ath->rx_skb = bt_skb_alloc(HCI_MAX_FRAME_SIZE, GFP_ATOMIC);
-+ if (!ath->rx_skb) {
-+ BT_ERR("Can't allocate mem for new packet");
-+ ath->rx_state = HCIATH_W4_PACKET_TYPE;
-+ ath->rx_count = 0;
-+ return -ENOMEM;
-+ }
-+ ath->rx_skb->dev = (void *)hu->hdev;
-+ bt_cb(ath->rx_skb)->pkt_type = type;
-+ } return count;
-+}
-+
-+static struct hci_uart_proto athp = {
-+ .id = HCI_UART_ATH,
-+ .open = ath_open,
-+ .close = ath_close,
-+ .recv = ath_recv,
-+ .enqueue = ath_enqueue,
-+ .dequeue = ath_dequeue,
-+ .flush = ath_flush,
-+};
-+
-+int ath_init(void)
-+{
-+ int err = hci_uart_register_proto(&athp);
-+ if (!err)
-+ BT_INFO("HCIATH protocol initialized");
-+
-+ else
-+ BT_ERR("HCIATH protocol registration failed");
-+ return err;
-+}
-+
-+int ath_deinit(void)
-+{
-+ return hci_uart_unregister_proto(&athp);
-+}
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 76a1abb..7dd76d1 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -542,6 +542,9 @@ static int __init hci_uart_init(void)
-#ifdef CONFIG_BT_HCIUART_LL
-ll_init();
-#endif
-+#ifdef CONFIG_BT_HCIUART_ATH
-+ ath_init();
-+#endif
 
-return 0;
-}
-@@ -559,6 +562,9 @@ static void __exit hci_uart_exit(void)
-#ifdef CONFIG_BT_HCIUART_LL
-ll_deinit();
-#endif
-+#ifdef CONFIG_BT_HCIUART_ATH
-+ ath_deinit();
-+#endif
+________________________________
+From: shy [mailto:shyboysby@gmail.com]
+Sent: Wednesday, March 10, 2010 5:33 PM
+To: Mike Tsai
+Cc: Pavel Machek; Marcel Holtmann; Luis R. Rodriguez; linux-wireless; linux=
+-bluetooth; linux-kernel@vger.kernel.org; Dan Tian
+Subject: Re: Linux Bluetooth Coexistence documentation in general and for a=
+th9k
 
-/* Release tty registration of line discipline */
-if ((err = tty_unregister_ldisc(N_HCI)))
-diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-index 50113db..385537f 100644
---- a/drivers/bluetooth/hci_uart.h
-+++ b/drivers/bluetooth/hci_uart.h
-@@ -33,13 +33,14 @@
-#define HCIUARTGETDEVICE _IOR('U', 202, int)
+Mike,
+This is done by controller. If host take the charge of channel map, then it=
+ must act  as LMP role.
+Best regards
+shy
 
-/* UART protocols */
--#define HCI_UART_MAX_PROTO 5
-+#define HCI_UART_MAX_PROTO 6
+2010/3/11 Mike Tsai <Mike.Tsai@atheros.com<mailto:Mike.Tsai@atheros.com>>
+Hi,
 
-#define HCI_UART_H4 0
-#define HCI_UART_BCSP 1
-#define HCI_UART_3WIRE 2
-#define HCI_UART_H4DS 3
-#define HCI_UART_LL 4
-+#define HCI_UART_ATH 5
+I think host shall provide channel map to controller because it is consider=
+ed to be much more accurate than the channel map generated by controller ba=
+sed on the RSSI reading.
 
-struct hci_uart;
+Mike
 
-@@ -91,3 +92,8 @@ int bcsp_deinit(void);
-int ll_init(void);
-int ll_deinit(void);
-#endif
-+
-+#ifdef CONFIG_BT_HCIUART_ATH
-+int ath_init(void);
-+int ath_deinit(void);
-+#endif
--- 
-1.6.3.3
+-----Original Message-----
+From: linux-bluetooth-owner@vger.kernel.org<mailto:linux-bluetooth-owner@vg=
+er.kernel.org> [mailto:linux-bluetooth-owner@vger.kernel.org<mailto:linux-b=
+luetooth-owner@vger.kernel.org>] On Behalf Of Pavel Machek
+Sent: Wednesday, March 10, 2010 12:48 PM
+To: Marcel Holtmann
+Cc: Luis R. Rodriguez; linux-wireless; linux-bluetooth; linux-kernel@vger.k=
+ernel.org<mailto:linux-kernel@vger.kernel.org>; Dan Tian
+Subject: Re: Linux Bluetooth Coexistence documentation in general and for a=
+th9k
+
+Hi!
+
+> > The question of Bluetooth coexistence pops up here, on IRC and on bug
+> > reports quite too often so I've stuffed what I could onto a page with
+> > a few references / code and about ath9k's schemes for BT coexistence,
+> > feel free to extend or correct:
+> >
+> > http://wireless.kernel.org/en/users/Documentation/Bluetooth-coexistence
+> > http://wireless.kernel.org/en/users/Drivers/ath9k/btcoex
+> >
+> > I'm still not sure if "2-wire" and "3-wire" are generic terms and if
+> > someone owns a trademark on them or what, but looking down the road I
+> > think it would be nice to export this information through nl80211, if
+> > a device supports any of these BT-coex schemes and if so, perhaps
+> > display the current signal status of:
+> >
+> >   * WLAN_ACTIVE
+> >   * BT_PRIORITY
+> >   * BT_STATE
+...
+> the only thing the host has control over is AFH channel map, and even
+> modifying that is not really needed. The Bluetooth controller will do
+> AFH automatically and it is on by default. We never switch that off
+> actually.
+>
+> Normally the co-ex stuff is hard-wired between the Bluetooth and WiFi
+> and thus out of control to the host OS.
+
+I believe that 'internal wifi, usb bluetooth' is still quite common
+setup...
+                                                               Pavel
+--
+(english) http://www.livejournal.com/~pavelmachek<http://www.livejournal.co=
+m/%7Epavelmachek>
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
+g.html<http://atrey.karlin.mff.cuni.cz/%7Epavel/picture/horses/blog.html>
+--
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" =
+in
+the body of a message to majordomo@vger.kernel.org<mailto:majordomo@vger.ke=
+rnel.org>
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+--
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" =
+in
+the body of a message to majordomo@vger.kernel.org<mailto:majordomo@vger.ke=
+rnel.org>
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+--_000_35B17FE5076C7040809188FBE7913F983A1CC445CFSC1EXMBMBCLgl_
+Content-Type: text/html; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+<html xmlns:v=3D"urn:schemas-microsoft-com:vml" xmlns:o=3D"urn:schemas-micr=
+osoft-com:office:office" xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
+xmlns:st1=3D"urn:schemas-microsoft-com:office:smarttags" xmlns=3D"http://ww=
+w.w3.org/TR/REC-html40">
+
+<head>
+<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; charset=3Dus-ascii"=
+>
+<meta name=3DGenerator content=3D"Microsoft Word 11 (filtered medium)">
+<!--[if !mso]>
+<style>
+v\:* {behavior:url(#default#VML);}
+o\:* {behavior:url(#default#VML);}
+w\:* {behavior:url(#default#VML);}
+.shape {behavior:url(#default#VML);}
+</style>
+<![endif]--><o:SmartTagType
+ namespaceuri=3D"urn:schemas-microsoft-com:office:smarttags" name=3D"Person=
+Name"/>
+<!--[if !mso]>
+<style>
+st1\:*{behavior:url(#default#ieooui) }
+</style>
+<![endif]-->
+<style>
+<!--
+ /* Font Definitions */
+ @font-face
+	{font-family:Tahoma;
+	panose-1:2 11 6 4 3 5 4 4 2 4;}
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0in;
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman";}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:blue;
+	text-decoration:underline;}
+span.EmailStyle17
+	{mso-style-type:personal-reply;
+	font-family:Arial;
+	color:navy;}
+@page Section1
+	{size:727.1pt 11.0in;
+	margin:.5in .5in .5in .5in;}
+div.Section1
+	{page:Section1;}
+-->
+</style>
+
+</head>
+
+<body lang=3DEN-US link=3Dblue vlink=3Dblue>
+
+<div class=3DSection1>
+
+<p class=3DMsoNormal><font size=3D2 color=3Dnavy face=3DArial><span style=
+=3D'font-size:
+10.0pt;font-family:Arial;color:navy'>Shy,<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 color=3Dnavy face=3DArial><span style=
+=3D'font-size:
+10.0pt;font-family:Arial;color:navy'><o:p>&nbsp;</o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 color=3Dnavy face=3DArial><span style=
+=3D'font-size:
+10.0pt;font-family:Arial;color:navy'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp; There are 3 sources of channel
+map inputs that LM &nbsp;has to consider for an optimal channel map. Host i=
+nput is
+the one that LM must obey, the other 2 are optional (internal and peer devi=
+ce
+channel map),<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 color=3Dnavy face=3DArial><span style=
+=3D'font-size:
+10.0pt;font-family:Arial;color:navy'><o:p>&nbsp;</o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 color=3Dnavy face=3DArial><span style=
+=3D'font-size:
+10.0pt;font-family:Arial;color:navy'>BR,<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 color=3Dnavy face=3DArial><span style=
+=3D'font-size:
+10.0pt;font-family:Arial;color:navy'><o:p>&nbsp;</o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 color=3Dnavy face=3DArial><span style=
+=3D'font-size:
+10.0pt;font-family:Arial;color:navy'>Mike<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 color=3Dnavy face=3DArial><span style=
+=3D'font-size:
+10.0pt;font-family:Arial;color:navy'><o:p>&nbsp;</o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 color=3Dnavy face=3DArial><span style=
+=3D'font-size:
+10.0pt;font-family:Arial;color:navy'><o:p>&nbsp;</o:p></span></font></p>
+
+<div>
+
+<div class=3DMsoNormal align=3Dcenter style=3D'text-align:center'><font siz=
+e=3D3
+face=3D"Times New Roman"><span style=3D'font-size:12.0pt'>
+
+<hr size=3D2 width=3D"100%" align=3Dcenter tabindex=3D-1>
+
+</span></font></div>
+
+<p class=3DMsoNormal><b><font size=3D2 face=3DTahoma><span style=3D'font-si=
+ze:10.0pt;
+font-family:Tahoma;font-weight:bold'>From:</span></font></b><font size=3D2
+face=3DTahoma><span style=3D'font-size:10.0pt;font-family:Tahoma'> shy
+[mailto:shyboysby@gmail.com] <br>
+<b><span style=3D'font-weight:bold'>Sent:</span></b> Wednesday, March 10, 2=
+010
+5:33 PM<br>
+<b><span style=3D'font-weight:bold'>To:</span></b> Mike Tsai<br>
+<b><span style=3D'font-weight:bold'>Cc:</span></b> Pavel Machek; Marcel Hol=
+tmann;
+Luis R. Rodriguez; linux-wireless; linux-bluetooth;
+linux-kernel@vger.kernel.org; Dan Tian<br>
+<b><span style=3D'font-weight:bold'>Subject:</span></b> Re: Linux Bluetooth
+Coexistence documentation in general and for ath9k</span></font><o:p></o:p>=
+</p>
+
+</div>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span style=3D=
+'font-size:
+12.0pt'><o:p>&nbsp;</o:p></span></font></p>
+
+<p class=3DMsoNormal style=3D'margin-bottom:12.0pt'><font size=3D3
+face=3D"Times New Roman"><span style=3D'font-size:12.0pt'>Mike,<br>
+This is done by controller. If host take the charge of channel map, then it
+must act&nbsp; as LMP role.<br clear=3Dall>
+Best regards<br>
+shy<br>
+<br>
+<o:p></o:p></span></font></p>
+
+<div>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span style=3D=
+'font-size:
+12.0pt'>2010/3/11 Mike Tsai &lt;<a href=3D"mailto:Mike.Tsai@atheros.com">Mi=
+ke.Tsai@atheros.com</a>&gt;<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span style=3D=
+'font-size:
+12.0pt'>Hi,<br>
+<br>
+I think host shall provide channel map to controller because it is consider=
+ed
+to be much more accurate than the channel map generated by controller based=
+ on
+the RSSI reading.<br>
+<font color=3D"#888888"><span style=3D'color:#888888'><br>
+Mike</span></font><o:p></o:p></span></font></p>
+
+<div>
+
+<div>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span style=3D=
+'font-size:
+12.0pt'><br>
+-----Original Message-----<br>
+From: <a href=3D"mailto:linux-bluetooth-owner@vger.kernel.org">linux-blueto=
+oth-owner@vger.kernel.org</a>
+[mailto:<a href=3D"mailto:linux-bluetooth-owner@vger.kernel.org">linux-blue=
+tooth-owner@vger.kernel.org</a>]
+On Behalf Of Pavel Machek<br>
+Sent: Wednesday, March 10, 2010 12:48 PM<br>
+To: Marcel Holtmann<br>
+Cc: Luis R. Rodriguez; linux-wireless; linux-bluetooth; <a
+href=3D"mailto:linux-kernel@vger.kernel.org">linux-kernel@vger.kernel.org</=
+a>;
+Dan Tian<br>
+Subject: Re: Linux Bluetooth Coexistence documentation in general and for a=
+th9k<br>
+<br>
+Hi!<br>
+<br>
+&gt; &gt; The question of Bluetooth coexistence pops up here, on IRC and on=
+ bug<br>
+&gt; &gt; reports quite too often so I've stuffed what I could onto a page =
+with<br>
+&gt; &gt; a few references / code and about ath9k's schemes for BT coexiste=
+nce,<br>
+&gt; &gt; feel free to extend or correct:<br>
+&gt; &gt;<br>
+&gt; &gt; <a
+href=3D"http://wireless.kernel.org/en/users/Documentation/Bluetooth-coexist=
+ence"
+target=3D"_blank">http://wireless.kernel.org/en/users/Documentation/Bluetoo=
+th-coexistence</a><br>
+&gt; &gt; <a href=3D"http://wireless.kernel.org/en/users/Drivers/ath9k/btco=
+ex"
+target=3D"_blank">http://wireless.kernel.org/en/users/Drivers/ath9k/btcoex<=
+/a><br>
+&gt; &gt;<br>
+&gt; &gt; I'm still not sure if &quot;2-wire&quot; and &quot;3-wire&quot; a=
+re
+generic terms and if<br>
+&gt; &gt; someone owns a trademark on them or what, but looking down the ro=
+ad I<br>
+&gt; &gt; think it would be nice to export this information through nl80211=
+, if<br>
+&gt; &gt; a device supports any of these BT-coex schemes and if so, perhaps=
+<br>
+&gt; &gt; display the current signal status of:<br>
+&gt; &gt;<br>
+&gt; &gt; &nbsp; * WLAN_ACTIVE<br>
+&gt; &gt; &nbsp; * BT_PRIOR<st1:PersonName w:st=3D"on">IT</st1:PersonName>Y=
+<br>
+&gt; &gt; &nbsp; * BT_STATE<br>
+...<br>
+&gt; the only thing the host has control over is AFH channel map, and even<=
+br>
+&gt; modifying that is not really needed. The Bluetooth controller will do<=
+br>
+&gt; AFH automatically and it is on by default. We never switch that off<br=
+>
+&gt; actually.<br>
+&gt;<br>
+&gt; Normally the co-ex stuff is hard-wired between the Bluetooth and WiFi<=
+br>
+&gt; and thus out of control to the host OS.<br>
+<br>
+I believe that 'internal wifi, usb bluetooth' is still quite common<br>
+setup...<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp=
+;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp=
+;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Pavel<=
+br>
+--<br>
+(english) <a href=3D"http://www.livejournal.com/%7Epavelmachek" target=3D"_=
+blank">http://www.livejournal.com/~pavelmachek</a><br>
+(cesky, pictures) <a
+href=3D"http://atrey.karlin.mff.cuni.cz/%7Epavel/picture/horses/blog.html"
+target=3D"_blank">http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
+g.html</a><br>
+--<br>
+To unsubscribe from this list: send the line &quot;unsubscribe
+linux-bluetooth&quot; in<br>
+the body of a message to <a href=3D"mailto:majordomo@vger.kernel.org">major=
+domo@vger.kernel.org</a><br>
+More majordomo info at &nbsp;<a
+href=3D"http://vger.kernel.org/majordomo-info.html" target=3D"_blank">http:=
+//vger.kernel.org/majordomo-info.html</a><br>
+--<br>
+To unsubscribe from this list: send the line &quot;unsubscribe
+linux-bluetooth&quot; in<br>
+the body of a message to <a href=3D"mailto:majordomo@vger.kernel.org">major=
+domo@vger.kernel.org</a><br>
+More majordomo info at &nbsp;<a
+href=3D"http://vger.kernel.org/majordomo-info.html" target=3D"_blank">http:=
+//vger.kernel.org/majordomo-info.html</a><o:p></o:p></span></font></p>
+
+</div>
+
+</div>
+
+</div>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span style=3D=
+'font-size:
+12.0pt'><o:p>&nbsp;</o:p></span></font></p>
+
+</div>
+
+</body>
+
+</html>
+
+--_000_35B17FE5076C7040809188FBE7913F983A1CC445CFSC1EXMBMBCLgl_--
