@@ -1,44 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: RE: [bluetooth-next V2] bluetooth: hci_sysfs: use strict_strtoul
- instead of simple_strtoul
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Winkler, Tomas" <tomas.winkler@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"Cohen, Guy" <guy.cohen@intel.com>,
-	"Rindjunsky, Ron" <ron.rindjunsky@intel.com>
-In-Reply-To: <6F5C1D715B2DA5498A628E6B9C124F04016C0E9798@hasmsx504.ger.corp.intel.com>
-References: <1268163483-26181-1-git-send-email-tomas.winkler@intel.com>
-	 <1268167314.3712.59.camel@localhost.localdomain>
-	 <6F5C1D715B2DA5498A628E6B9C124F04016C0E9798@hasmsx504.ger.corp.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Thu, 11 Mar 2010 16:28:51 -0800
-Message-ID: <1268353731.3712.93.camel@localhost.localdomain>
-Mime-Version: 1.0
+Date: Fri, 12 Mar 2010 00:04:14 +0000 (GMT)
+To: Daniel Abraham <daniel.shrugged@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Bug in parsing of SDP_ServiceSearchAttributeResponse?
+In-Reply-To: <1268344653.9884.42.camel@dabraham-mobl>
+References: <1268344653.9884.42.camel@dabraham-mobl>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Message-Id: <1268352254.586562.6662.nullmailer@galant.ukfsn.org>
+From: Iain Hibbert <plunky@rya-online.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tomas,
+On Thu, 11 Mar 2010, Daniel Abraham wrote:
 
-> > > use strict_strtoul as suggested by checkpatch.pl
-> > >
-> > > Signed-off-by: Tomas Winkler <tomas.winkler@intel.com>
-> > > ---
-> > > V2:
-> > > 1. more verbose commit message
-> > > 2. return the error code that was produced by strict_strtoul
-> > 
-> > why do you bother actually. Reading the comment about struct_strtoul it
-> > will only return -EINVAL or 0. So using my proposal would be just fine.
-> > I also don't prefer to differ the return value to user space until it
-> > actually makes sense. Invalid argument is just fine for all error cases.
-> >
-> Yes I know but I've use of this over the kernel code and what I've used is the mostly used idiom
+> Hi, this is my first time here, so I'm not sure about etiquette, or
+> if/where there's a BlueZ bug repository...
+>
+> I'm using BlueZ 4.62, and I ran the command line "sdptool browse <BD
+> address>" against a remote computer. I got this error output: "Service
+> search failed: Success".
 
-I choose to have it as I originally proposed. Patch has been pushed into
-bluetooth-testing tree.
+what computer is that?
 
-Regards
+> According to hcidump (attached), the SDP_ServiceSearchAttributeResponse
+> is malformed, but a different Bluetooth stack (IVT on Windows) is able
+> to report correctly the remote computer's available services.
 
-Marcel
+It could be that the different Bluetooth stacks fetch that information via
+a different request than ServiceSearchAttributes, or that it queries the
+services that it hopes to see individually rather than just the
+PublicBrowseGroup to get everything as in this case.
+
+> So I'm guessing this is a parsing error or interoperability weakness in
+> BlueZ...? (Or, less likely but possible, a bug in the other 2 stacks?)
+
+The PDU that the remote computer sends is truncated at the end of the
+first L2CAP frame (all the 0's that hcidump shows are just empty buffer as
+it does not check the actual frame length). But, each L2CAP frame is
+supposed to contain an entire PDU and when the data exceeds the MTU it
+sends a non zero Continuation State to enable the client to request more
+data.
+
+It might be that this computer was not expecting that the response would
+overflow the L2CAP frame and they didn't write the code to handle that,
+but in the meantime many services were added..
+
+You can probably use "sdptool search" to find specific services ok?
+
+Although sdptool has no way to increase the "Incoming MTU" on the SDP
+connection, if you could work out how to do that it might allow more
+information to be received (in lib/sdp.c:sdp_connect_l2cap() set
+L2CAP_OPTIONS with imtu at some large number than 672, before the
+connect())
+
+regards,
+iain
 
 
