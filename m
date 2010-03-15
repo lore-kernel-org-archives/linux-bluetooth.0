@@ -1,254 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Expose wacom pen tablet battery and ac thru
- power_supply class
-From: Przemo Firszt <przemo@firszt.eu>
-To: Jiri Kosina <jkosina@suse.cz>
-Cc: Bastien Nocera <hadess@hadess.net>, linux-bluetooth <linux-bluetooth@vger.kernel.org>, marcel <marcel@holtmann.org>, Peter Hutterer <peter.hutterer@who-t.net>, Ping <pinglinux@gmail.com>, Peter Huewe <peterhuewe@gmx.de>
-In-Reply-To: <alpine.LNX.2.00.1003151454110.18642@pobox.suse.cz>
-References: <1267389553.24791.22.camel@pldmachine>
-	 <1267531337.23521.14275.camel@localhost.localdomain>
-	 <1267531889.23521.14301.camel@localhost.localdomain>
-	 <1268161944.3632.21.camel@pldmachine> <1268162757.3632.33.camel@pldmachine>
-	 <alpine.LNX.2.00.1003092220160.17799@pobox.suse.cz>
-	 <1268247817.3632.41.camel@pldmachine>
-	 <alpine.LNX.2.00.1003151454110.18642@pobox.suse.cz>
-Content-Type: multipart/mixed; boundary="=-LbK6yLIqm9waoM0DNMBU"
-Date: Mon, 15 Mar 2010 22:00:54 +0000
-Message-ID: <1268690454.3452.7.camel@pldmachine>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <1660E2CC4AF24655A1FFE788570A34FF@mapleworks.com>
+References: <1660E2CC4AF24655A1FFE788570A34FF@mapleworks.com>
+From: Nick Pelly <npelly@google.com>
+Date: Mon, 15 Mar 2010 14:35:13 -0700
+Message-ID: <35c90d961003151435i6dc2a096j300198decb4844e6@mail.gmail.com>
+Subject: Re: A strange compatible problem for eSCO audio with CSR USB
+	Bluetooth dongle
+To: Cooper Xu <cooper.xu@mapleworks.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Sun, Mar 14, 2010 at 4:01 PM, Cooper Xu <cooper.xu@mapleworks.com> wrote:
+> Hi,
+>
+>
+> We have a strange compatible problem with Bluez for eSCO audio.
+>
+> We develope an embedded application based on Bluez library that can play the
+> role of HF and it uses a generic CSR USB Bluetooth dongle. The application
+> worked well for most cell phones (iPhone, Blackberry etc). But when we tried
+> it with an Android phone (Motorola Droid), we found one way voice problem.
+> The Android phone side can not hear the voice.
+>
+> We know that Android phone also uses the Bluez library. So we tried to pair
+> our application with another Linux with Bluez library with another CSR USB
+> Bluetooth dongle. We used "hcidump" to capture the SCO packets in that
+> system. We received a lot of SCO packets, but the content of packets is all
+> zero. However from another end of SCO connection, we actually sent a lot
+> non-zero contents.
+>
+> To simply our debug, we then used the "scotest" program from the Bluez 4.65
+> source and used one system as client and another as server. From the hcidump
+> output, we still saw the content of packets is all zero. However when we
+> changed one USB dongle to another USB dongle with the Broadcom chipset, we
+> can receive some non-zero data. In both case, we didn't see Bluez kernel
+> error message.
+>
+> The Linux kernel for the system we used for test is 2.6.30.  The attachment
+> is the SCO packet we captured for receiving side. The following is the
+> information of Bluetooth USB dongle we use:
+>
+>
+>        hciconfig -a
+>
+>        hci0:   Type: USB
+>
+>        BD Address: 00:11:F6:0B:CA:EE ACL MTU: 310:10 SCO MTU: 64:8
+>        UP RUNNING PSCAN AUTH ENCRYPT
+>        RX bytes:2081370 acl:185 sco:17775 events:9695 errors:0
+>        TX bytes:252089 acl:164 sco:3002 commands:4693 errors:0
+>        Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
+>        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>        Link policy: RSWITCH HOLD SNIFF PARK
+>        Link mode: SLAVE ACCEPT
+>        Name: 'test'
+>        Class: 0x000408
+>        Service Classes: Unspecified
+>        Device Class: Audio/Video, Hands-free
+>        HCI Ver: 2.0 (0x3) HCI Rev: 0xc5c LMP Ver: 2.0 (0x3) LMP Subver:
+> 0xc5c
+>        Manufacturer: Cambridge Silicon Radio (10)
+>
+>
+>
+>        hciconfig hci0 revision:
+>
+>        hci0:   Type: USB
+>
+>          BD Address: 00:11:F6:0B:CA:EE ACL MTU: 310:10 SCO MTU: 64:8
+>          Unified 21e
+>          Chip version: BlueCore4-ROM
+>          Max key size: 128 bit
+>          SCO mapping:  HCI
+>
+>
+> This audio problem seems only happen if both ends use Bluez library. If one
+> side uses a different Bluetooth library, this issue will not appear. What
+> can be the cause of this? I am very confused.
 
---=-LbK6yLIqm9waoM0DNMBU
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+I wonder if this is some eSCO packet type incompatibility between
+chipsets. Try setting /sys/module/sco/parameters/disable_esco to 1 to
+see if this resolves the issue.
 
-Dnia 2010-03-15, pon o godzinie 14:54 +0100, Jiri Kosina pisze:
-> On Wed, 10 Mar 2010, Przemo Firszt wrote:
-[..]
-> > Does it make sense to add a line to Kconfig to explain that
-> > CONFIG_POWER_SUPPLY/CONFIG_POWER_SUPPLY_MODULE is required to enable
-> > monitoring battery/ac state?
-> 
-> Either that, or introducing separate CONFIG sub-option for the Wacom 
-> driver might be reasonable option as well.
-Hi Jiri,
-Thanks for help - next time I'll know how to do it :-)
-I went the CONFIG sub-option way - see attached.
-
-thanks,
-Przemo
-
-
-
---=-LbK6yLIqm9waoM0DNMBU
-Content-Disposition: attachment; filename*0=0001-Expose-wacom-pen-tablet-battery-and-ac-thru-power_su.pat; filename*1=ch
-Content-Type: text/x-patch; name="0001-Expose-wacom-pen-tablet-battery-and-ac-thru-power_su.patch"; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-
->From d6ec58bc114bdf0dd01bc0407f5f7bbb8161e45e Mon Sep 17 00:00:00 2001
-From: Przemo Firszt <przemo@firszt.eu>
-Date: Mon, 15 Mar 2010 19:16:23 +0000
-Subject: [PATCH] Expose wacom pen tablet battery and ac thru power_supply class
-
-This patch exposes wacom pen tablet battery capacity and ac state thru
-power_supply class is sysfs.
-
-Signed-off-by: Przemo Firszt <przemo@firszt.eu>
----
- drivers/hid/Kconfig     |    8 +++
- drivers/hid/hid-wacom.c |  127 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 135 insertions(+), 0 deletions(-)
-
-diff --git a/drivers/hid/Kconfig b/drivers/hid/Kconfig
-index 71d4c07..8e1b505 100644
---- a/drivers/hid/Kconfig
-+++ b/drivers/hid/Kconfig
-@@ -357,6 +357,14 @@ config HID_WACOM
- 	---help---
- 	Support for Wacom Graphire Bluetooth tablet.
- 
-+config HID_WACOM_POWER_SUPPLY
-+	bool "Wacom Bluetooth devices power supply status support"
-+	depends on HID_WACOM
-+	select POWER_SUPPLY
-+	---help---
-+	  Say Y here if you want to enable power supply status monitoring for
-+	  Wacom Bluetooth devices.
-+
- config HID_ZEROPLUS
- 	tristate "Zeroplus based game controller support" if EMBEDDED
- 	depends on USB_HID
-diff --git a/drivers/hid/hid-wacom.c b/drivers/hid/hid-wacom.c
-index 8d3b46f..4d2d2a2 100644
---- a/drivers/hid/hid-wacom.c
-+++ b/drivers/hid/hid-wacom.c
-@@ -21,14 +21,88 @@
- #include <linux/device.h>
- #include <linux/hid.h>
- #include <linux/module.h>
-+#ifdef CONFIG_HID_WACOM_POWER_SUPPLY
-+#include <linux/power_supply.h>
-+#endif
- 
- #include "hid-ids.h"
- 
- struct wacom_data {
- 	__u16 tool;
- 	unsigned char butstate;
-+#ifdef CONFIG_HID_WACOM_POWER_SUPPLY
-+	int battery_capacity;
-+	struct power_supply battery;
-+	struct power_supply ac;
-+#endif
- };
- 
-+#ifdef CONFIG_HID_WACOM_POWER_SUPPLY
-+/*percent of battery capacity, 0 means AC online*/
-+static unsigned short batcap[8] = { 1, 15, 25, 35, 50, 70, 100, 0 };
-+
-+static enum power_supply_property wacom_battery_props[] = {
-+	POWER_SUPPLY_PROP_PRESENT,
-+	POWER_SUPPLY_PROP_CAPACITY
-+};
-+
-+static enum power_supply_property wacom_ac_props[] = {
-+	POWER_SUPPLY_PROP_PRESENT,
-+	POWER_SUPPLY_PROP_ONLINE
-+};
-+
-+static int wacom_battery_get_property(struct power_supply *psy,
-+				enum power_supply_property psp,
-+				union power_supply_propval *val)
-+{
-+	struct wacom_data *wdata = container_of(psy,
-+					struct wacom_data, battery);
-+	int power_state = batcap[wdata->battery_capacity];
-+	int ret = 0;
-+
-+	switch (psp) {
-+	case POWER_SUPPLY_PROP_PRESENT:
-+		val->intval = 1;
-+		break;
-+	case POWER_SUPPLY_PROP_CAPACITY:
-+		/* show 100% battery capacity when charging */
-+		if (power_state == 0)
-+			val->intval = 100;
-+		else
-+			val->intval = power_state;
-+		break;
-+	default:
-+		ret = -EINVAL;
-+		break;
-+	}
-+	return ret;
-+}
-+
-+static int wacom_ac_get_property(struct power_supply *psy,
-+				enum power_supply_property psp,
-+				union power_supply_propval *val)
-+{
-+	struct wacom_data *wdata = container_of(psy, struct wacom_data, ac);
-+	int power_state = batcap[wdata->battery_capacity];
-+	int ret = 0;
-+
-+	switch (psp) {
-+	case POWER_SUPPLY_PROP_PRESENT:
-+		/* fall through */
-+	case POWER_SUPPLY_PROP_ONLINE:
-+		if (power_state == 0)
-+			val->intval = 1;
-+		else
-+			val->intval = 0;
-+		break;
-+	default:
-+		ret = -EINVAL;
-+		break;
-+	}
-+	return ret;
-+}
-+#endif
-+
- static int wacom_raw_event(struct hid_device *hdev, struct hid_report *report,
- 		u8 *raw_data, int size)
- {
-@@ -147,6 +221,12 @@ static int wacom_raw_event(struct hid_device *hdev, struct hid_report *report,
- 		input_sync(input);
- 	}
- 
-+#ifdef CONFIG_HID_WACOM_POWER_SUPPLY
-+	/* Store current battery capacity */
-+	rw = (data[7] >> 2 & 0x07);
-+	if (rw != wdata->battery_capacity)
-+		wdata->battery_capacity = rw;
-+#endif
- 	return 1;
- }
- 
-@@ -206,6 +286,45 @@ static int wacom_probe(struct hid_device *hdev,
- 	if (ret < 0)
- 		dev_warn(&hdev->dev, "failed to poke device #2, %d\n", ret);
- 
-+#ifdef CONFIG_HID_WACOM_POWER_SUPPLY
-+	wdata->battery.properties = wacom_battery_props;
-+	wdata->battery.num_properties = ARRAY_SIZE(wacom_battery_props);
-+	wdata->battery.get_property = wacom_battery_get_property;
-+	wdata->battery.name = "wacom_battery";
-+	wdata->battery.type = POWER_SUPPLY_TYPE_BATTERY;
-+	wdata->battery.use_for_apm = 0;
-+
-+	ret = power_supply_register(&hdev->dev, &wdata->battery);
-+	if (ret) {
-+		dev_warn(&hdev->dev,
-+			"can't create sysfs battery attribute, err: %d\n", ret);
-+		/*
-+		 * battery attribute is not critical for the tablet, but if it
-+		 * failed then there is no need to create ac attribute
-+		 */
-+		goto move_on;
-+	}
-+
-+	wdata->ac.properties = wacom_ac_props;
-+	wdata->ac.num_properties = ARRAY_SIZE(wacom_ac_props);
-+	wdata->ac.get_property = wacom_ac_get_property;
-+	wdata->ac.name = "wacom_ac";
-+	wdata->ac.type = POWER_SUPPLY_TYPE_MAINS;
-+	wdata->ac.use_for_apm = 0;
-+
-+	ret = power_supply_register(&hdev->dev, &wdata->ac);
-+	if (ret) {
-+		dev_warn(&hdev->dev,
-+			"can't create ac battery attribute, err: %d\n", ret);
-+		/*
-+		 * ac attribute is not critical for the tablet, but if it
-+		 * failed then we don't want to battery attribute to exist
-+		 */
-+		power_supply_unregister(&wdata->battery);
-+	}
-+
-+move_on:
-+#endif
- 	hidinput = list_entry(hdev->inputs.next, struct hid_input, list);
- 	input = hidinput->input;
- 
-@@ -250,7 +369,15 @@ err_free:
- 
- static void wacom_remove(struct hid_device *hdev)
- {
-+#ifdef CONFIG_HID_WACOM_POWER_SUPPLY
-+	struct wacom_data *wdata = hid_get_drvdata(hdev);
-+#endif
- 	hid_hw_stop(hdev);
-+
-+#ifdef CONFIG_HID_WACOM_POWER_SUPPLY
-+	power_supply_unregister(&wdata->battery);
-+	power_supply_unregister(&wdata->ac);
-+#endif
- 	kfree(hid_get_drvdata(hdev));
- }
- 
--- 
-1.7.0.1
-
-
---=-LbK6yLIqm9waoM0DNMBU--
+Nick
