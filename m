@@ -1,200 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
+Sender: "Gustavo F. Padovan" <gfpadovan@gmail.com>
+Date: Mon, 15 Mar 2010 12:05:18 -0300
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+Subject: Re: [PATCH] Bluetooth: Fix kernel crash on BT stress tests.
+Message-ID: <20100315150203.GA31186@vigoh>
+References: <508e92ca1002160236k34c18949jc7d7187645ef4aa0@mail.gmail.com>
+ <20100311224140.GA17295@vigoh>
+ <508e92ca1003150357t77defd4fqcd843965af35970a@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <6aeb672b1003010154u6660632fj53fdbac2c8d0e302@mail.gmail.com>
-References: <6aeb672b1001220212u518836fds5df2a7e3de8463bf@mail.gmail.com>
-	<6aeb672b1001272156m678aa8fepec2498386947936a@mail.gmail.com>
-	<6aeb672b1003010154u6660632fj53fdbac2c8d0e302@mail.gmail.com>
-From: jaikumar Ganesh <jaikumarg@gmail.com>
-Date: Mon, 15 Mar 2010 10:27:29 -0700
-Message-ID: <ac290f761003151027nc7ef2fava63c84eedad0f0dd@mail.gmail.com>
-Subject: Re: Kernel panic when handing Motorola S305 headset
-To: Liang Bao <tim.bao@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, padovan@profusion.mobi
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=0016367b6db63a27fe0481da3363
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <508e92ca1003150357t77defd4fqcd843965af35970a@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---0016367b6db63a27fe0481da3363
-Content-Type: multipart/alternative; boundary=0016367b6db63a27f60481da3361
+* Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2010-03-15 12:57:=
+18 +0200]:
 
---0016367b6db63a27f60481da3361
-Content-Type: text/plain; charset=ISO-8859-1
+> Hi Gustavo
+>=20
+> On Fri, Mar 12, 2010 at 12:41 AM, Gustavo F. Padovan
+> <padovan@profusion.mobi> wrote:
+> > Hi Andrei,
+> >
+> > * Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2010-02-16 12=
+:36:47 +0200]:
+> >
+> >> From 0135f732cb45e5e91062aca84a61a40b172200a4 Mon Sep 17 00:00:00 2001
+> >> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> >> Date: Tue, 16 Feb 2010 10:52:33 +0200
+> >> Subject: [PATCH] Bluetooth: Fix kernel crash on BT stress tests.
+> >>
+> >> Added very simple check that req buffer has enough space to
+> >> fit configuration parameters. Shall be enough to reject packets
+> >> with configuration size more than req buffer.
+> >>
+> >> Crash trace below
+> >>
+> >> [ 6069.659393] Unable to handle kernel paging request at virtual
+> >> address 02000205
+> >> [ 6069.673034] Internal error: Oops: 805 [#1] PREEMPT
+> >> ...
+> >> [ 6069.727172] PC is at l2cap_add_conf_opt+0x70/0xf0 [l2cap]
+> >> [ 6069.732604] LR is at l2cap_recv_frame+0x1350/0x2e78 [l2cap]
+> >> ...
+> >> [ 6070.030303] Backtrace:
+> >> [ 6070.032806] [<bf1c2880>] (l2cap_add_conf_opt+0x0/0xf0 [l2cap]) from
+> >> [<bf1c6624>] (l2cap_recv_frame+0x1350/0x2e78 [l2cap])
+> >> [ 6070.043823] =A0r8:dc5d3100 r7:df2a91d6 r6:00000001 r5:df2a8000 r4:0=
+0000200
+> >> [ 6070.050659] [<bf1c52d4>] (l2cap_recv_frame+0x0/0x2e78 [l2cap]) from
+> >> [<bf1c8408>] (l2cap_recv_acldata+0x2bc/0x350 [l2cap])
+> >> [ 6070.061798] [<bf1c814c>] (l2cap_recv_acldata+0x0/0x350 [l2cap]) from
+> >> [<bf0037a4>] (hci_rx_task+0x244/0x478 [bluetooth])
+> >> [ 6070.072631] =A0r6:dc647700 r5:00000001 r4:df2ab740
+> >> [ 6070.077362] [<bf003560>] (hci_rx_task+0x0/0x478 [bluetooth]) from
+> >> [<c006b9fc>] (tasklet_action+0x78/0xd8)
+> >> [ 6070.087005] [<c006b984>] (tasklet_action+0x0/0xd8) from [<c006c160>]
+> >>
+> >> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> >> ---
+> >> =A0net/bluetooth/l2cap.c | =A0 =A06 ++++++
+> >> =A01 files changed, 6 insertions(+), 0 deletions(-)
+> >>
+> >> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> >> index 400efa2..69b7280 100644
+> >> --- a/net/bluetooth/l2cap.c
+> >> +++ b/net/bluetooth/l2cap.c
+> >> @@ -2830,6 +2830,12 @@ static inline int l2cap_config_rsp(struct
+> >> l2cap_conn *conn, struct l2cap_cmd_hdr
+> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 int len =3D cmd->len - siz=
+eof(*rsp);
+> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 char req[64];
+> >>
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (len > sizeof(req) - size=
+of(struct l2cap_conf_req)) {
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 BT_ERR("Conf=
+ig response is too big");
+> >
+> > Remove the BT_ERR, normally we don't print any error on
+> > l2cap_send_disconn_req.
+> >
+> >
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 l2cap_send_d=
+isconn_req(conn, sk);
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto done;
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> >> +
+> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* throw out any old store=
+d conf requests */
+> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 result =3D L2CAP_CONF_SUCC=
+ESS;
+> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 len =3D l2cap_parse_conf_r=
+sp(sk, rsp->data,
+> >
+> > Also, this is very rare crash. Even if we add all configure options to
+> > req we won't overwrite it. Doesn't make sense to me send a
+> > configuration option more than once in the same config_{rsp,req}. The
+> > only way to crash l2cap is using a bugous remote stack or a stress test
+> > tools. We need to be protected against those bugous stacks so I'll
+> > ack your patch after you send the updated patch without the BT_ERR.
+> >
+>=20
+> I am attaching patch to the mail, otherwise it may be screwed up by maile=
+rs.
 
-Hi Marcel / Gustavo:
+Acked-by: Gustavo F. Padovan <gustavo@padovan.org>
 
-On Mon, Mar 1, 2010 at 2:54 AM, Liang Bao <tim.bao@gmail.com> wrote:
-
-> I'd like to continue the previous thread on that Motorola S305 causes
-> kernel panic because I did find some clue here. Sorry for misleading
-> guess one month ago if any.
->
-> Recap the problem here so that you don't to read the first long post.
-> The pattern to reproduce the issue is:
-> 1. Pair the S305 headset from the phone or the PC( I am using a Ubuntu)
-> 2. Remove pairing on the phone or PC
-> 3. Power off and then power on S305.
-> 4. The S305 will try to connect and since link key removed on this
-> side it will try to pair. Input 0000.
-> 5. Kernel panic happens. This can be observed on kernel version
-> 2.6.29(on the Droid phone, yes, it's a modified version),
-> 2.6.31-19-generic on a Ubuntu and a pretty latest 2.6.33-020633rc8
-> from Ubuntu official RC release.
->
-> The exact kernel crash point is
->             if (l2cap_check_security(sk)) {
->                   if (bt_sk(sk)->defer_setup) {
->                      struct sock *parent = bt_sk(sk)->parent;
->                      rsp.result = cpu_to_le16(L2CAP_CR_PEND);
->                      rsp.status = cpu_to_le16(L2CAP_CS_AUTHOR_PEND);
-> >>>                   parent->sk_data_ready(parent, 0)
->                   } else {
->
-> After tracing the issue for a couple of weeks, I find the difference
-> between a normal flow and the panic one. If the user space process
-> accepts the L2CAP connection request before L2CAP_INFO_RSP received,
-> the following calls will be carried out:
->
-> l2cap_sock_accept-> bt_accept_dequeue->bt_accept_unlink(in the branch
-> bt_sk(parent)->defer_setup)-> set bt_sk(sk)->parent = NULL. Later when
-> L2CAP_INFO_RSP arrives, the l2cap_conn_start() will try to call the
-> marked line above and de-referring NULL happen.
->
-> To fix this, shall we consider checking if a pending socket can be
-> accepted in bt_accept_dequeue() prior to a pending L2CAP_INFO_REQ
-> responded? For example,  adding a check to BT_CONNECT2 in
-> af_bluetooth.c.
->
-> 215         if (sk->sk_state == BT_CONNECTED || !newsock ||
-> 216                         ( bt_sk(parent)->defer_setup &&
-> (sk->sk_state != BT_CONNECT2))) {
->
-> Again, I am not sure if this will bring a side-effect. Please advise
-> the most appropriate way. Thanks.
->
-> p.s: I attached partial trace files for those who're interested to the
-> traces.
->
+>=20
+> Regards,
+> Andrei
 
 
-Can you ACK or NACK the analysis ?
-
-Thanks
-Jaikumar
-
---0016367b6db63a27f60481da3361
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-
-Hi Marcel / Gustavo:<br><br><div class=3D"gmail_quote">On Mon, Mar 1, 2010 =
-at 2:54 AM, Liang Bao <span dir=3D"ltr">&lt;<a href=3D"mailto:tim.bao@gmail=
-.com">tim.bao@gmail.com</a>&gt;</span> wrote:<br><blockquote class=3D"gmail=
-_quote" style=3D"border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt=
- 0pt 0.8ex; padding-left: 1ex;">
-
-I&#39;d like to continue the previous thread on that Motorola S305 causes<b=
-r>
-kernel panic because I did find some clue here. Sorry for misleading<br>
-guess one month ago if any.<br>
-<br>
-Recap the problem here so that you don&#39;t to read the first long post.<b=
-r>
-<div class=3D"im">The pattern to reproduce the issue is:<br>
-</div>1. Pair the S305 headset from the phone or the PC( I am using a Ubunt=
-u)<br>
-2. Remove pairing on the phone or PC<br>
-<div class=3D"im">3. Power off and then power on S305.<br>
-</div>4. The S305 will try to connect and since link key removed on this<br=
->
-side it will try to pair. Input 0000.<br>
-5. Kernel panic happens. This can be observed on kernel version<br>
-2.6.29(on the Droid phone, yes, it&#39;s a modified version),<br>
-2.6.31-19-generic on a Ubuntu and a pretty latest 2.6.33-020633rc8<br>
-from Ubuntu official RC release.<br>
-<br>
-The exact kernel crash point is<br>
- =A0 =A0 =A0 =A0 =A0 =A0 if (l2cap_check_security(sk)) {<br>
-<div class=3D"im"> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (bt_sk(sk)-&gt;def=
-er_setup) {<br>
- =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0struct sock *parent =3D bt_sk(s=
-k)-&gt;parent;<br>
- =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rsp.result =3D cpu_to_le16(L2CA=
-P_CR_PEND);<br>
- =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rsp.status =3D cpu_to_le16(L2CA=
-P_CS_AUTHOR_PEND);<br>
-&gt;&gt;&gt; =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 parent-&gt;sk_data_ready(p=
-arent, 0)<br>
-</div> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0} else {<br>
-<br>
-After tracing the issue for a couple of weeks, I find the difference<br>
-between a normal flow and the panic one. If the user space process<br>
-accepts the L2CAP connection request before L2CAP_INFO_RSP received,<br>
-the following calls will be carried out:<br>
-<br>
-l2cap_sock_accept-&gt; bt_accept_dequeue-&gt;bt_accept_unlink(in the branch=
-<br>
-bt_sk(parent)-&gt;defer_setup)-&gt; set bt_sk(sk)-&gt;parent =3D NULL. Late=
-r when<br>
-L2CAP_INFO_RSP arrives, the l2cap_conn_start() will try to call the<br>
-marked line above and de-referring NULL happen.<br>
-<br>
-To fix this, shall we consider checking if a pending socket can be<br>
-accepted in bt_accept_dequeue() prior to a pending L2CAP_INFO_REQ<br>
-responded? For example, =A0adding a check to BT_CONNECT2 in<br>
-af_bluetooth.c.<br>
-<br>
-215 =A0 =A0 =A0 =A0 if (sk-&gt;sk_state =3D=3D BT_CONNECTED || !newsock ||<=
-br>
-216 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ( bt_sk(parent)-&gt;def=
-er_setup &amp;&amp;<br>
-(sk-&gt;sk_state !=3D BT_CONNECT2))) {<br>
-<br>
-Again, I am not sure if this will bring a side-effect. Please advise<br>
-the most appropriate way. Thanks.<br>
-<br>
-p.s: I attached partial trace files for those who&#39;re interested to the =
-traces.<br>
-</blockquote></div><br><br>Can you ACK or NACK the analysis ?<br><br>Thanks=
-<br>Jaikumar<br>
-
---0016367b6db63a27f60481da3361--
-
---0016367b6db63a27fe0481da3363
-Content-Type: text/plain; charset=US-ASCII; name="s305-good-bad-trace.txt"
-Content-Disposition: attachment; filename="s305-good-bad-trace.txt"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_g693azsd1
-
-VHJhY2Ugd2hlbiBwYW5pYyBoYXBwZW5kZWQ6CjwzPlsgIDM1Ni43NTg0ODNdIGwyY2FwX2Nvbm5l
-Y3RfcmVxOiBwc20gMHgxOSBzY2lkIDB4MDA0MQ0KPDM+WyAgMzU2Ljc2Mzg1NF0gbDJjYXBfY29u
-bmVjdF9yZXE6IHBhcmVudCBjN2U4ZjYwMA0KPDM+WyAgMzU2Ljc2ODgyOV0gX19sMmNhcF9jaGFu
-X2FkZDogY29ubiBjN2ZhMzdjMCwgcHNtIDB4MTksIGRjaWQgMHgwMDQxDQo8Mz5bICAzNTYuNzc1
-NDgyXSBsMmNhcF9jb25uZWN0X3JlcTogYmVmb3JlIHJldHVybiwgc2sgYzVkNjZjMDAgcGFyZW50
-IGM3ZThmNjAwDQo8Mz5bICAzNTYuNzgyODk3XSBsMmNhcF9jb25uZWN0X3JlcTogcHNtIDB4MDEg
-c2NpZCAweDAwNDINCjwzPlsgIDM1Ni43ODgxNzddIGwyY2FwX2Nvbm5lY3RfcmVxOiBwYXJlbnQg
-YzdlOGZlMDANCjwzPlsgIDM1Ni43OTMxMjFdIF9fbDJjYXBfY2hhbl9hZGQ6IGNvbm4gYzdmYTM3
-YzAsIHBzbSAweDAxLCBkY2lkIDB4MDA0Mg0KPDM+WyAgMzU2Ljc5OTc3NF0gbDJjYXBfY29ubmVj
-dF9yZXE6IGJlZm9yZSByZXR1cm4sIHNrIGM1ZDY2YTAwIHBhcmVudCBjN2U4ZmUwMA0KPDM+WyAg
-MzU2LjgzNzE1OF0gbDJjYXBfc29ja19hY2NlcHQ6IG5ldyBzb2NrZXQgYzVkNjZjMDANCjwzPlsg
-IDM1Ni44NDI1OTBdIGwyY2FwX2Nvbm5fc3RhcnQ6IEJUX0NPTk5FQ1RFMiwgc2sgYzVkNjZjMDAs
-IHBhcmVudCAobnVsbCkKClRyYWNlIHdoZW4gZXZlcnl0aGluZyBnb2VzIG9uIHdlbGwuCjwzPlsg
-IDY0MS4zOTM0NjNdIGwyY2FwX2Nvbm5lY3RfcmVxOiBwc20gMHgxOSBzY2lkIDB4MDA0MQo8Mz5b
-ICA2NDEuMzk4OTU2XSBsMmNhcF9jb25uZWN0X3JlcTogcGFyZW50IGM3ZTkxMjAwCjwzPlsgIDY0
-MS40MDM3NzhdIF9fbDJjYXBfY2hhbl9hZGQ6IGNvbm4gYzk1MTk0NDAsIHBzbSAweDE5LCBkY2lk
-IDB4MDA0MQo8Mz5bICA2NDEuNDEwNDYxXSBsMmNhcF9jb25uZWN0X3JlcTogYmVmb3JlIHJldHVy
-biwgc2sgYzk3ZTNhMDAgcGFyZW50IGM3ZTkxMjAwCjwzPlsgIDY0MS40MTc4NzddIGwyY2FwX2Nv
-bm5lY3RfcmVxOiBwc20gMHgwMSBzY2lkIDB4MDA0Mgo8Mz5bICA2NDEuNDIzMTU2XSBsMmNhcF9j
-b25uZWN0X3JlcTogcGFyZW50IGM2NGIwYzAwCjwzPlsgIDY0MS40MjgxMzFdIF9fbDJjYXBfY2hh
-bl9hZGQ6IGNvbm4gYzk1MTk0NDAsIHBzbSAweDAxLCBkY2lkIDB4MDA0Mgo8Mz5bICA2NDEuNDM0
-NzUzXSBsMmNhcF9jb25uZWN0X3JlcTogYmVmb3JlIHJldHVybiwgc2sgYzk3ZTM0MDAgcGFyZW50
-IGM2NGIwYzAwCjwzPlsgIDY0MS40NzYxNjVdIGwyY2FwX2Nvbm5fc3RhcnQ6IEJUX0NPTk5FQ1RF
-Miwgc2sgYzk3ZTNhMDAsIHBhcmVudCBjN2U5MTIwMAo8Mz5bICA2NDEuNDgzODU2XSBsMmNhcF9z
-b2NrX2FjY2VwdDogbmV3IHNvY2tldCBjOTdlM2EwMAo8Mz5bICA2NDEuNTUxNTEzXSBsMmNhcF9z
-b2NrX2FjY2VwdDogbmV3IHNvY2tldCBjOTdlMzQwMAo8Mz5bICA2NDEuNTkyNzQyXSBsMmNhcF9z
-b2NrX3NodXRkb3duOiBzb2NrIGNlYTdhODQwLCBzayBjOTdlM2EwMCwgaG93IDIKPDM+WyAgNjQx
-LjYwNzcyN10gbDJjYXBfc29ja19zaHV0ZG93bjogc29jayBjZWE3YTBjMCwgc2sgYzk3ZTM0MDAs
-IGhvdyAyCjwzPlsgIDY0NC4wNTU0MTldIF9fbDJjYXBfY2hhbl9hZGQ6IGNvbm4gYzk1MTk0NDAs
-IHBzbSAweDAxLCBkY2lkIDB4MDAwMAo8Mz5bICA2NTAuMDU1ODE2XSBsMmNhcF9zb2NrX3NodXRk
-b3duOiBzb2NrIGNlYTdhMGMwLCBzayBjOTdlMzQwMCwgaG93IDIKPDM+WyAgNjUwLjA2MzAxOF0g
-bDJjYXBfc29ja19zaHV0ZG93bjogc2stc2h1dGRvd24gPSB0cnVlCjwzPlsgIDY1MC4wNjk0Mjdd
-IF9fbDJjYXBfc29ja19jbG9zZTogc2sgYzk3ZTM0MDAgc3RhdGUgMSBzb2NrZXQgY2VhN2EwYzAg
-cmVhc29uIDAKCg==
---0016367b6db63a27fe0481da3363--
+--=20
+Gustavo F. Padovan
+http://padovan.org
