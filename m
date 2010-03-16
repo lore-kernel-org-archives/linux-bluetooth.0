@@ -4,8 +4,8 @@ To: "'Marcel Holtmann'" <marcel@holtmann.org>
 Cc: <linux-bluetooth@vger.kernel.org>
 References: <1660E2CC4AF24655A1FFE788570A34FF@mapleworks.com> <1268609330.3897.51.camel@localhost.localdomain> <7ED1002624DD4A3BB31F08AF5DC6090E@mapleworks.com> <1268707083.2700.14.camel@localhost.localdomain>
 Subject: RE: A strange compatible problem for eSCO audio with CSR USB Bluetooth dongle
-Date: Mon, 15 Mar 2010 23:06:21 -0400
-Message-ID: <AD89715662C34356B6C5C4CD64709319@mapleworks.com>
+Date: Mon, 15 Mar 2010 22:53:18 -0400
+Message-ID: <D35076D90CB4405DA3D5032BCFECCA47@mapleworks.com>
 MIME-Version: 1.0
 Content-Type: text/plain;
 	charset="us-ascii"
@@ -14,22 +14,24 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-Another thing worth to say is that so far I found the pattern is like the
-following:
+I had tried with device class to 0x200404 and it didn't make any difference.
+I use the "scotest.c" to simplify the debug. The actual application is much
+more complicated. But the issue is similar with test result of "scotest.c".
+I assume the "scotest.c" should give me some valid data, as I sent so many
+real data from one side. I can actually receive real data with some USB
+dongles. But I have problem CSR chipset USB dongles with relatively newer
+firmware. That is something real confused me. 
 
-If the sender side is CSR chipset USB dongle with Bluez and receiver side is
-also Bluez, it will most likely read all zero.  
-
-If the sender side is CSR chipset USB dongle with Bluez and receiver side is
-NOT Bluez, it seems OK.
-
-If the sender side is another chipset and receiver side is also Bluez, it
-seems OK, but voice is a little choppy.
-
+Regards,
 Cooper
 
+
+
+
+
 -----Original Message-----
-From: Marcel Holtmann [mailto:marcel@holtmann.org] 
+From: linux-bluetooth-owner@vger.kernel.org
+[mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Marcel Holtmann
 Sent: Monday, March 15, 2010 10:38 PM
 To: Cooper Xu
 Cc: linux-bluetooth@vger.kernel.org
@@ -52,3 +54,10 @@ Handsfree profile is not fully setup.
 Regards
 
 Marcel
+
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
