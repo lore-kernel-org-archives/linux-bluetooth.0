@@ -1,126 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Mat Martineau" <mathewm@codeaurora.org>
-To: "'Gustavo F. Padovan'" <gustavo@padovan.org>,
-	<linux-bluetooth@vger.kernel.org>
-References: <1268699189-2910-1-git-send-email-gustavo@padovan.org>
-In-Reply-To: <1268699189-2910-1-git-send-email-gustavo@padovan.org>
-Subject: RE: [PATCH 1/4] Bluetooth: Add sockopt configuration for txWindow on L2CAP
-Date: Tue, 16 Mar 2010 08:15:58 -0700
-Message-ID: <000001cac51b$9563e060$c02ba120$@org>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCH] Expose wacom pen tablet battery and ac thru
+ power_supply class
+From: Przemo Firszt <przemo@firszt.eu>
+To: Jiri Kosina <jkosina@suse.cz>
+Cc: Bastien Nocera <hadess@hadess.net>, linux-bluetooth <linux-bluetooth@vger.kernel.org>, marcel <marcel@holtmann.org>, Peter Hutterer <peter.hutterer@who-t.net>, Ping <pinglinux@gmail.com>, Peter Huewe <peterhuewe@gmx.de>
+In-Reply-To: <alpine.LNX.2.00.1003161149100.18642@pobox.suse.cz>
+References: <1267389553.24791.22.camel@pldmachine>
+	 <1267531337.23521.14275.camel@localhost.localdomain>
+	 <1267531889.23521.14301.camel@localhost.localdomain>
+	 <1268161944.3632.21.camel@pldmachine> <1268162757.3632.33.camel@pldmachine>
+	 <alpine.LNX.2.00.1003092220160.17799@pobox.suse.cz>
+	 <1268247817.3632.41.camel@pldmachine>
+	 <alpine.LNX.2.00.1003151454110.18642@pobox.suse.cz>
+	 <1268690454.3452.7.camel@pldmachine>
+	 <alpine.LNX.2.00.1003161149100.18642@pobox.suse.cz>
+Content-Type: text/plain; charset="UTF-8"
+Date: Tue, 16 Mar 2010 14:09:36 +0000
+Message-ID: <1268748576.4682.16.camel@pldmachine>
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Gustavo -
+Dnia 2010-03-16, wto o godzinie 11:49 +0100, Jiri Kosina pisze:
+[..]
+> I have applied it, thanks.
+Thanks!
+> One question still though ..
+> 
+> > +       case POWER_SUPPLY_PROP_CAPACITY:
+> > +               /* show 100% battery capacity when charging */
+> > +               if (power_state == 0)
+> > +                       val->intval = 100;
+> > +               else
+> > +                       val->intval = power_state;
+> > +               break;
+> 
+> Why is it not possible to show the actual percentage in the charging state 
+> as well?
+The device doesn't report capacity during charging as far as I can tell.
+We could keep last reported value (bad idea IMHO), set it to 0 (even
+worse) or set it to 100% - a bit misleading, but I can't see any other
+option.
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Gustavo F. Padovan
-> Sent: Monday, March 15, 2010 5:26 PM
-> To: linux-bluetooth@vger.kernel.org
-> Cc: marcel@holtmann.org; gustavo@padovan.org
-> Subject: [PATCH 1/4] Bluetooth: Add sockopt configuration for txWindow
-> on L2CAP
-> 
-> Now can set/get Transmission Window size via sockopt.
-
-It would be better to use __u16 for the Tx Window size, so we can use
-extended window sizes in the future.  This is important for AMP, where the
-amount of data in-flight can be large enough for the extended Tx Window to
-matter.
-
-> 
-> Signed-off-by: Gustavo F. Padovan <gustavo@padovan.org>
-> ---
->  include/net/bluetooth/l2cap.h |    2 ++
->  net/bluetooth/l2cap.c         |    7 ++++++-
->  2 files changed, 8 insertions(+), 1 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/l2cap.h
-> b/include/net/bluetooth/l2cap.h
-> index 48f10f4..c7bf676 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -56,6 +56,7 @@ struct l2cap_options {
->  	__u16 flush_to;
->  	__u8  mode;
->  	__u8  fcs;
-> +	__u8  txwin_size;
->  };
-> 
->  #define L2CAP_CONNINFO	0x02
-> @@ -339,6 +340,7 @@ struct l2cap_pinfo {
-> 
->  	__u8		ident;
-> 
-> +	__u8		tx_win;
->  	__u8		remote_tx_win;
->  	__u8		remote_max_tx;
->  	__u16		retrans_timeout;
-> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-> index 930f987..6679418 100644
-> --- a/net/bluetooth/l2cap.c
-> +++ b/net/bluetooth/l2cap.c
-> @@ -780,6 +780,7 @@ static void l2cap_sock_init(struct sock *sk, struct
-> sock *parent)
->  		pi->omtu = l2cap_pi(parent)->omtu;
->  		pi->mode = l2cap_pi(parent)->mode;
->  		pi->fcs  = l2cap_pi(parent)->fcs;
-> +		pi->tx_win = l2cap_pi(parent)->tx_win;
->  		pi->sec_level = l2cap_pi(parent)->sec_level;
->  		pi->role_switch = l2cap_pi(parent)->role_switch;
->  		pi->force_reliable = l2cap_pi(parent)->force_reliable;
-> @@ -788,6 +789,7 @@ static void l2cap_sock_init(struct sock *sk, struct
-> sock *parent)
->  		pi->omtu = 0;
->  		pi->mode = L2CAP_MODE_BASIC;
->  		pi->fcs  = L2CAP_FCS_CRC16;
-> +		pi->tx_win = L2CAP_DEFAULT_TX_WINDOW;
->  		pi->sec_level = BT_SECURITY_LOW;
->  		pi->role_switch = 0;
->  		pi->force_reliable = 0;
-> @@ -1776,6 +1778,7 @@ static int l2cap_sock_setsockopt_old(struct
-> socket *sock, int optname, char __us
->  		opts.flush_to = l2cap_pi(sk)->flush_to;
->  		opts.mode     = l2cap_pi(sk)->mode;
->  		opts.fcs      = l2cap_pi(sk)->fcs;
-> +		opts.txwin_size = l2cap_pi(sk)->tx_win;
-> 
->  		len = min_t(unsigned int, sizeof(opts), optlen);
->  		if (copy_from_user((char *) &opts, optval, len)) {
-> @@ -1787,6 +1790,7 @@ static int l2cap_sock_setsockopt_old(struct
-> socket *sock, int optname, char __us
->  		l2cap_pi(sk)->omtu = opts.omtu;
->  		l2cap_pi(sk)->mode = opts.mode;
->  		l2cap_pi(sk)->fcs  = opts.fcs;
-> +		l2cap_pi(sk)->tx_win = opts.txwin_size;
->  		break;
-> 
->  	case L2CAP_LM:
-> @@ -1901,6 +1905,7 @@ static int l2cap_sock_getsockopt_old(struct
-> socket *sock, int optname, char __us
->  		opts.flush_to = l2cap_pi(sk)->flush_to;
->  		opts.mode     = l2cap_pi(sk)->mode;
->  		opts.fcs      = l2cap_pi(sk)->fcs;
-> +		opts.txwin_size = l2cap_pi(sk)->tx_win;
-> 
->  		len = min_t(unsigned int, len, sizeof(opts));
->  		if (copy_to_user(optval, (char *) &opts, len))
-> @@ -2318,7 +2323,7 @@ done:
-> 
->  	case L2CAP_MODE_ERTM:
->  		rfc.mode            = L2CAP_MODE_ERTM;
-> -		rfc.txwin_size      = L2CAP_DEFAULT_TX_WINDOW;
-> +		rfc.txwin_size      = pi->tx_win;
->  		rfc.max_transmit    = max_transmit;
->  		rfc.retrans_timeout = 0;
->  		rfc.monitor_timeout = 0;
-
-
-Mat Martineau
-Qualcomm Innovation Center, Inc.,
-A member of the Code Aurora Forum
-
-
+cheers,
+Przemo
