@@ -1,45 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Expose wacom pen tablet battery and ac thru
- power_supply class
-From: Przemo Firszt <przemo@firszt.eu>
-To: Jiri Kosina <jkosina@suse.cz>
-Cc: Bastien Nocera <hadess@hadess.net>, linux-bluetooth <linux-bluetooth@vger.kernel.org>, marcel <marcel@holtmann.org>, Peter Hutterer <peter.hutterer@who-t.net>, Ping <pinglinux@gmail.com>, Peter Huewe <peterhuewe@gmx.de>
-In-Reply-To: <alpine.LNX.2.00.1003161149100.18642@pobox.suse.cz>
-References: <1267389553.24791.22.camel@pldmachine>
-	 <1267531337.23521.14275.camel@localhost.localdomain>
-	 <1267531889.23521.14301.camel@localhost.localdomain>
-	 <1268161944.3632.21.camel@pldmachine> <1268162757.3632.33.camel@pldmachine>
-	 <alpine.LNX.2.00.1003092220160.17799@pobox.suse.cz>
-	 <1268247817.3632.41.camel@pldmachine>
-	 <alpine.LNX.2.00.1003151454110.18642@pobox.suse.cz>
-	 <1268690454.3452.7.camel@pldmachine>
-	 <alpine.LNX.2.00.1003161149100.18642@pobox.suse.cz>
-Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 16 Mar 2010 14:09:36 +0000
-Message-ID: <1268748576.4682.16.camel@pldmachine>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Date: Tue, 16 Mar 2010 14:33:13 +0200
+Message-ID: <2c3916b71003160533s714e9ef3h6c803f88a79f27d2@mail.gmail.com>
+Subject: [PATCH] Fix display of last device classes in hciconfig
+From: Daniel Abraham <daniel.shrugged@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dnia 2010-03-16, wto o godzinie 11:49 +0100, Jiri Kosina pisze:
-[..]
-> I have applied it, thanks.
-Thanks!
-> One question still though ..
-> 
-> > +       case POWER_SUPPLY_PROP_CAPACITY:
-> > +               /* show 100% battery capacity when charging */
-> > +               if (power_state == 0)
-> > +                       val->intval = 100;
-> > +               else
-> > +                       val->intval = power_state;
-> > +               break;
-> 
-> Why is it not possible to show the actual percentage in the charging state 
-> as well?
-The device doesn't report capacity during charging as far as I can tell.
-We could keep last reported value (bad idea IMHO), set it to 0 (even
-worse) or set it to 100% - a bit misleading, but I can't see any other
-option.
+This is my first ever patch, so it's very simple...
+Based on current content in:
+http://www.bluetooth.org/assigned-numbers/baseband.htm
 
-cheers,
-Przemo
+Signed-off-by: Daniel Abraham <daniel.shrugged@gmail.com>
+---
+ tools/hciconfig.c |   30 ++++++++++++++++++++++++++----
+ 1 files changed, 26 insertions(+), 4 deletions(-)
+
+diff --git a/tools/hciconfig.c b/tools/hciconfig.c
+index 3f687e0..c97ce44 100644
+--- a/tools/hciconfig.c
++++ b/tools/hciconfig.c
+@@ -645,8 +645,26 @@ static char *get_minor_device_name(int major, int minor)
+ 			return "Game";
+ 		}
+ 		break;
+-	case 63:	/* uncategorised */
+-		return "";
++	case 9: /* health */
++		switch(minor) {
++		case 0:
++			return "Undefined";
++		case 1:
++			return "Blood Pressure Monitor";
++		case 2:
++			return "Thermometer";
++		case 3:
++			return "Weighing Scale";
++		case 4:
++			return "Glucose Meter";
++		case 5:
++			return "Pulse Oximeter";
++		case 6:
++			return "Heart/Pulse Rate Monitor";
++		case 7:
++			return "Health Data Display";
++		}
++		break;
+ 	}
+ 	return "Unknown (reserved) minor device class";
+ }
+@@ -668,7 +686,9 @@ static void cmd_class(int ctl, int hdev, char *opt)
+ 					"Audio/Video",
+ 					"Peripheral",
+ 					"Imaging",
+-					"Uncategorized" };
++					"Wearable",
++					"Toy",
++					"Health" };
+ 	int s = hci_open_dev(hdev);
+
+ 	if (s < 0) {
+@@ -706,7 +726,9 @@ static void cmd_class(int ctl, int hdev, char *opt)
+ 		} else
+ 			printf("Unspecified");
+ 		printf("\n\tDevice Class: ");
+-		if ((cls[1] & 0x1f) >= sizeof(major_devices) / sizeof(*major_devices))
++		if (0x1f == cls[1])
++			printf("Uncategorized\n");
++		else if ((cls[1] & 0x1f) >= sizeof(major_devices) / sizeof(*major_devices))
+ 			printf("Invalid Device Class!\n");
+ 		else
+ 			printf("%s, %s\n", major_devices[cls[1] & 0x1f],
+-- 
+1.6.6.1
