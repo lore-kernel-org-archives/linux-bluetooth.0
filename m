@@ -3,94 +3,91 @@ Sender: "Gustavo F. Padovan" <gfpadovan@gmail.com>
 From: "Gustavo F. Padovan" <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org, gustavo@padovan.org
-Subject: [PATCH 2/4] Bluetooth: Fix remote and local txWindow roles on L2CAP
-Date: Mon, 15 Mar 2010 21:26:27 -0300
-Message-Id: <1268699189-2910-2-git-send-email-gustavo@padovan.org>
-In-Reply-To: <1268699189-2910-1-git-send-email-gustavo@padovan.org>
-References: <1268699189-2910-1-git-send-email-gustavo@padovan.org>
+Subject: [PATCH 1/4] Bluetooth: Add sockopt configuration for txWindow on L2CAP
+Date: Mon, 15 Mar 2010 21:26:26 -0300
+Message-Id: <1268699189-2910-1-git-send-email-gustavo@padovan.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-L2CAP was misusing the values of txWindow. Now the remote txWindow is used
-on the acknowledgement of I-frames and the local txWindow on the sending
-of I-frames. It also renames pi->num_to_ack to a better name:
-pi->num_acked.
+Now can set/get Transmission Window size via sockopt.
 
 Signed-off-by: Gustavo F. Padovan <gustavo@padovan.org>
 ---
- include/net/bluetooth/l2cap.h |    5 ++---
- net/bluetooth/l2cap.c         |    9 +++++----
- 2 files changed, 7 insertions(+), 7 deletions(-)
+ include/net/bluetooth/l2cap.h |    2 ++
+ net/bluetooth/l2cap.c         |    7 ++++++-
+ 2 files changed, 8 insertions(+), 1 deletions(-)
 
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index c7bf676..f1eca05 100644
+index 48f10f4..c7bf676 100644
 --- a/include/net/bluetooth/l2cap.h
 +++ b/include/net/bluetooth/l2cap.h
-@@ -30,7 +30,6 @@
- #define L2CAP_DEFAULT_MIN_MTU		48
- #define L2CAP_DEFAULT_FLUSH_TO		0xffff
- #define L2CAP_DEFAULT_TX_WINDOW		63
--#define L2CAP_DEFAULT_NUM_TO_ACK        (L2CAP_DEFAULT_TX_WINDOW/5)
- #define L2CAP_DEFAULT_MAX_TX		3
- #define L2CAP_DEFAULT_RETRANS_TO	1000    /* 1 second */
- #define L2CAP_DEFAULT_MONITOR_TO	12000   /* 12 seconds */
-@@ -333,7 +332,7 @@ struct l2cap_pinfo {
- 	__u8		frames_sent;
- 	__u8		unacked_frames;
- 	__u8		retry_count;
--	__u8		num_to_ack;
-+	__u8		num_acked;
- 	__u16		sdu_len;
- 	__u16		partial_sdu_len;
- 	struct sk_buff	*sdu;
-@@ -399,7 +398,7 @@ static inline int l2cap_tx_window_full(struct sock *sk)
- 	if (sub < 0)
- 		sub += 64;
+@@ -56,6 +56,7 @@ struct l2cap_options {
+ 	__u16 flush_to;
+ 	__u8  mode;
+ 	__u8  fcs;
++	__u8  txwin_size;
+ };
  
--	return (sub == pi->remote_tx_win);
-+	return (sub == pi->tx_win);
- }
+ #define L2CAP_CONNINFO	0x02
+@@ -339,6 +340,7 @@ struct l2cap_pinfo {
  
- #define __get_txseq(ctrl) ((ctrl) & L2CAP_CTRL_TXSEQ) >> 1
+ 	__u8		ident;
+ 
++	__u8		tx_win;
+ 	__u8		remote_tx_win;
+ 	__u8		remote_max_tx;
+ 	__u16		retrans_timeout;
 diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 6679418..85ec8b2 100644
+index 930f987..6679418 100644
 --- a/net/bluetooth/l2cap.c
 +++ b/net/bluetooth/l2cap.c
-@@ -2248,7 +2248,7 @@ static inline void l2cap_ertm_init(struct sock *sk)
- 	l2cap_pi(sk)->expected_ack_seq = 0;
- 	l2cap_pi(sk)->unacked_frames = 0;
- 	l2cap_pi(sk)->buffer_seq = 0;
--	l2cap_pi(sk)->num_to_ack = 0;
-+	l2cap_pi(sk)->num_acked = 0;
- 	l2cap_pi(sk)->frames_sent = 0;
+@@ -780,6 +780,7 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
+ 		pi->omtu = l2cap_pi(parent)->omtu;
+ 		pi->mode = l2cap_pi(parent)->mode;
+ 		pi->fcs  = l2cap_pi(parent)->fcs;
++		pi->tx_win = l2cap_pi(parent)->tx_win;
+ 		pi->sec_level = l2cap_pi(parent)->sec_level;
+ 		pi->role_switch = l2cap_pi(parent)->role_switch;
+ 		pi->force_reliable = l2cap_pi(parent)->force_reliable;
+@@ -788,6 +789,7 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
+ 		pi->omtu = 0;
+ 		pi->mode = L2CAP_MODE_BASIC;
+ 		pi->fcs  = L2CAP_FCS_CRC16;
++		pi->tx_win = L2CAP_DEFAULT_TX_WINDOW;
+ 		pi->sec_level = BT_SECURITY_LOW;
+ 		pi->role_switch = 0;
+ 		pi->force_reliable = 0;
+@@ -1776,6 +1778,7 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname, char __us
+ 		opts.flush_to = l2cap_pi(sk)->flush_to;
+ 		opts.mode     = l2cap_pi(sk)->mode;
+ 		opts.fcs      = l2cap_pi(sk)->fcs;
++		opts.txwin_size = l2cap_pi(sk)->tx_win;
  
- 	setup_timer(&l2cap_pi(sk)->retrans_timer,
-@@ -2571,7 +2571,7 @@ static int l2cap_parse_conf_rsp(struct sock *sk, void *rsp, int len, void *data,
- 	if (*result == L2CAP_CONF_SUCCESS) {
- 		switch (rfc.mode) {
- 		case L2CAP_MODE_ERTM:
--			pi->remote_tx_win   = rfc.txwin_size;
-+			pi->tx_win   = rfc.txwin_size;
- 			pi->retrans_timeout = rfc.retrans_timeout;
- 			pi->monitor_timeout = rfc.monitor_timeout;
- 			pi->max_pdu_size    = le16_to_cpu(rfc.max_pdu_size);
-@@ -3408,6 +3408,7 @@ static inline int l2cap_data_channel_iframe(struct sock *sk, u16 rx_control, str
- 	u8 tx_seq = __get_txseq(rx_control);
- 	u8 req_seq = __get_reqseq(rx_control);
- 	u8 sar = rx_control >> L2CAP_CTRL_SAR_SHIFT;
-+	int num_to_ack = (pi->remote_tx_win/5) + 1;
- 	int err = 0;
+ 		len = min_t(unsigned int, sizeof(opts), optlen);
+ 		if (copy_from_user((char *) &opts, optval, len)) {
+@@ -1787,6 +1790,7 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname, char __us
+ 		l2cap_pi(sk)->omtu = opts.omtu;
+ 		l2cap_pi(sk)->mode = opts.mode;
+ 		l2cap_pi(sk)->fcs  = opts.fcs;
++		l2cap_pi(sk)->tx_win = opts.txwin_size;
+ 		break;
  
- 	BT_DBG("sk %p rx_control 0x%4.4x len %d", sk, rx_control, skb->len);
-@@ -3501,8 +3502,8 @@ expected:
+ 	case L2CAP_LM:
+@@ -1901,6 +1905,7 @@ static int l2cap_sock_getsockopt_old(struct socket *sock, int optname, char __us
+ 		opts.flush_to = l2cap_pi(sk)->flush_to;
+ 		opts.mode     = l2cap_pi(sk)->mode;
+ 		opts.fcs      = l2cap_pi(sk)->fcs;
++		opts.txwin_size = l2cap_pi(sk)->tx_win;
  
- 	__mod_ack_timer();
+ 		len = min_t(unsigned int, len, sizeof(opts));
+ 		if (copy_to_user(optval, (char *) &opts, len))
+@@ -2318,7 +2323,7 @@ done:
  
--	pi->num_to_ack = (pi->num_to_ack + 1) % L2CAP_DEFAULT_NUM_TO_ACK;
--	if (pi->num_to_ack == L2CAP_DEFAULT_NUM_TO_ACK - 1)
-+	pi->num_acked = (pi->num_acked + 1) % num_to_ack;
-+	if (pi->num_acked == num_to_ack - 1)
- 		l2cap_send_ack(pi);
- 
- 	return 0;
+ 	case L2CAP_MODE_ERTM:
+ 		rfc.mode            = L2CAP_MODE_ERTM;
+-		rfc.txwin_size      = L2CAP_DEFAULT_TX_WINDOW;
++		rfc.txwin_size      = pi->tx_win;
+ 		rfc.max_transmit    = max_transmit;
+ 		rfc.retrans_timeout = 0;
+ 		rfc.monitor_timeout = 0;
 -- 
 1.6.4.4
