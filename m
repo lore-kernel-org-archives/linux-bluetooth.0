@@ -1,51 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 16 Mar 2010 11:49:59 +0100 (CET)
-From: Jiri Kosina <jkosina@suse.cz>
-To: Przemo Firszt <przemo@firszt.eu>
-Cc: Bastien Nocera <hadess@hadess.net>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	marcel <marcel@holtmann.org>,
-	Peter Hutterer <peter.hutterer@who-t.net>,
-	Ping <pinglinux@gmail.com>, Peter Huewe <peterhuewe@gmx.de>
-Subject: Re: [PATCH] Expose wacom pen tablet battery and ac thru power_supply
- class
-In-Reply-To: <1268690454.3452.7.camel@pldmachine>
-Message-ID: <alpine.LNX.2.00.1003161149100.18642@pobox.suse.cz>
-References: <1267389553.24791.22.camel@pldmachine>  <1267531337.23521.14275.camel@localhost.localdomain>  <1267531889.23521.14301.camel@localhost.localdomain>  <1268161944.3632.21.camel@pldmachine> <1268162757.3632.33.camel@pldmachine>
- <alpine.LNX.2.00.1003092220160.17799@pobox.suse.cz>  <1268247817.3632.41.camel@pldmachine>  <alpine.LNX.2.00.1003151454110.18642@pobox.suse.cz> <1268690454.3452.7.camel@pldmachine>
+From: "Cooper Xu" <cooper.xu@mapleworks.com>
+To: "'Marcel Holtmann'" <marcel@holtmann.org>
+Cc: <linux-bluetooth@vger.kernel.org>
+References: <1660E2CC4AF24655A1FFE788570A34FF@mapleworks.com> <1268609330.3897.51.camel@localhost.localdomain> <7ED1002624DD4A3BB31F08AF5DC6090E@mapleworks.com> <1268707083.2700.14.camel@localhost.localdomain>
+Subject: RE: A strange compatible problem for eSCO audio with CSR USB Bluetooth dongle
+Date: Mon, 15 Mar 2010 23:06:21 -0400
+Message-ID: <AD89715662C34356B6C5C4CD64709319@mapleworks.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain;
+	charset="us-ascii"
+In-Reply-To: <1268707083.2700.14.camel@localhost.localdomain>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 15 Mar 2010, Przemo Firszt wrote:
+Hi Marcel,
 
-> > > Does it make sense to add a line to Kconfig to explain that
-> > > CONFIG_POWER_SUPPLY/CONFIG_POWER_SUPPLY_MODULE is required to enable
-> > > monitoring battery/ac state?
-> > 
-> > Either that, or introducing separate CONFIG sub-option for the Wacom 
-> > driver might be reasonable option as well.
-> Hi Jiri,
-> Thanks for help - next time I'll know how to do it :-)
-> I went the CONFIG sub-option way - see attached.
+Another thing worth to say is that so far I found the pattern is like the
+following:
 
-I have applied it, thanks.
+If the sender side is CSR chipset USB dongle with Bluez and receiver side is
+also Bluez, it will most likely read all zero.  
 
-One question still though ..
+If the sender side is CSR chipset USB dongle with Bluez and receiver side is
+NOT Bluez, it seems OK.
 
-> +       case POWER_SUPPLY_PROP_CAPACITY:
-> +               /* show 100% battery capacity when charging */
-> +               if (power_state == 0)
-> +                       val->intval = 100;
-> +               else
-> +                       val->intval = power_state;
-> +               break;
+If the sender side is another chipset and receiver side is also Bluez, it
+seems OK, but voice is a little choppy.
 
-Why is it not possible to show the actual percentage in the charging state 
-as well?
+Cooper
 
-Thanks,
+-----Original Message-----
+From: Marcel Holtmann [mailto:marcel@holtmann.org] 
+Sent: Monday, March 15, 2010 10:38 PM
+To: Cooper Xu
+Cc: linux-bluetooth@vger.kernel.org
+Subject: RE: A strange compatible problem for eSCO audio with CSR USB
+Bluetooth dongle
 
--- 
-Jiri Kosina
-SUSE Labs, Novell Inc.
+Hi Cooper,
+
+no top posting on this mailing list. We do proper inline quoting.
+
+> I used the attached scotest.c to do the test for both client and server.
+> This file is from Bluez 4.58. I modified a little because the original is
+> sending packets too fast. I turned off eSCO according to Nick's
+suggestion.
+
+the scotest.c tool is just for basic testing. There is no guarantee that
+it does the right job. Some devices might send silence if the Headset or
+Handsfree profile is not fully setup.
+
+Regards
+
+Marcel
