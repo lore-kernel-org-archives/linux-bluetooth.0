@@ -1,141 +1,126 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <000001cac51b$9563e060$c02ba120$@org>
+From: "Mat Martineau" <mathewm@codeaurora.org>
+To: "'Gustavo F. Padovan'" <gustavo@padovan.org>,
+	<linux-bluetooth@vger.kernel.org>
 References: <1268699189-2910-1-git-send-email-gustavo@padovan.org>
-	 <000001cac51b$9563e060$c02ba120$@org>
-Date: Tue, 16 Mar 2010 12:30:20 -0300
-Message-ID: <6b53b1991003160830s72c84d97m28900de9cbb1302c@mail.gmail.com>
-Subject: Re: [PATCH 1/4] Bluetooth: Add sockopt configuration for txWindow on
-	L2CAP
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <1268699189-2910-1-git-send-email-gustavo@padovan.org>
+Subject: RE: [PATCH 1/4] Bluetooth: Add sockopt configuration for txWindow on L2CAP
+Date: Tue, 16 Mar 2010 08:15:58 -0700
+Message-ID: <000001cac51b$9563e060$c02ba120$@org>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Gustavo -
 
-On Tue, Mar 16, 2010 at 12:15 PM, Mat Martineau <mathewm@codeaurora.org> wrote:
-> Gustavo -
->
->> -----Original Message-----
->> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
->> owner@vger.kernel.org] On Behalf Of Gustavo F. Padovan
->> Sent: Monday, March 15, 2010 5:26 PM
->> To: linux-bluetooth@vger.kernel.org
->> Cc: marcel@holtmann.org; gustavo@padovan.org
->> Subject: [PATCH 1/4] Bluetooth: Add sockopt configuration for txWindow
->> on L2CAP
->>
->> Now can set/get Transmission Window size via sockopt.
->
-> It would be better to use __u16 for the Tx Window size, so we can use
-> extended window sizes in the future.  This is important for AMP, where the
-> amount of data in-flight can be large enough for the extended Tx Window to
-> matter.
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Gustavo F. Padovan
+> Sent: Monday, March 15, 2010 5:26 PM
+> To: linux-bluetooth@vger.kernel.org
+> Cc: marcel@holtmann.org; gustavo@padovan.org
+> Subject: [PATCH 1/4] Bluetooth: Add sockopt configuration for txWindow
+> on L2CAP
+> 
+> Now can set/get Transmission Window size via sockopt.
 
-It's better to update it to __u16 when we actually implement the
-Extended Tx Window.
+It would be better to use __u16 for the Tx Window size, so we can use
+extended window sizes in the future.  This is important for AMP, where the
+amount of data in-flight can be large enough for the extended Tx Window to
+matter.
 
->
->>
->> Signed-off-by: Gustavo F. Padovan <gustavo@padovan.org>
->> ---
->>  include/net/bluetooth/l2cap.h |    2 ++
->>  net/bluetooth/l2cap.c         |    7 ++++++-
->>  2 files changed, 8 insertions(+), 1 deletions(-)
->>
->> diff --git a/include/net/bluetooth/l2cap.h
->> b/include/net/bluetooth/l2cap.h
->> index 48f10f4..c7bf676 100644
->> --- a/include/net/bluetooth/l2cap.h
->> +++ b/include/net/bluetooth/l2cap.h
->> @@ -56,6 +56,7 @@ struct l2cap_options {
->>       __u16 flush_to;
->>       __u8  mode;
->>       __u8  fcs;
->> +     __u8  txwin_size;
->>  };
->>
->>  #define L2CAP_CONNINFO       0x02
->> @@ -339,6 +340,7 @@ struct l2cap_pinfo {
->>
->>       __u8            ident;
->>
->> +     __u8            tx_win;
->>       __u8            remote_tx_win;
->>       __u8            remote_max_tx;
->>       __u16           retrans_timeout;
->> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
->> index 930f987..6679418 100644
->> --- a/net/bluetooth/l2cap.c
->> +++ b/net/bluetooth/l2cap.c
->> @@ -780,6 +780,7 @@ static void l2cap_sock_init(struct sock *sk, struct
->> sock *parent)
->>               pi->omtu = l2cap_pi(parent)->omtu;
->>               pi->mode = l2cap_pi(parent)->mode;
->>               pi->fcs  = l2cap_pi(parent)->fcs;
->> +             pi->tx_win = l2cap_pi(parent)->tx_win;
->>               pi->sec_level = l2cap_pi(parent)->sec_level;
->>               pi->role_switch = l2cap_pi(parent)->role_switch;
->>               pi->force_reliable = l2cap_pi(parent)->force_reliable;
->> @@ -788,6 +789,7 @@ static void l2cap_sock_init(struct sock *sk, struct
->> sock *parent)
->>               pi->omtu = 0;
->>               pi->mode = L2CAP_MODE_BASIC;
->>               pi->fcs  = L2CAP_FCS_CRC16;
->> +             pi->tx_win = L2CAP_DEFAULT_TX_WINDOW;
->>               pi->sec_level = BT_SECURITY_LOW;
->>               pi->role_switch = 0;
->>               pi->force_reliable = 0;
->> @@ -1776,6 +1778,7 @@ static int l2cap_sock_setsockopt_old(struct
->> socket *sock, int optname, char __us
->>               opts.flush_to = l2cap_pi(sk)->flush_to;
->>               opts.mode     = l2cap_pi(sk)->mode;
->>               opts.fcs      = l2cap_pi(sk)->fcs;
->> +             opts.txwin_size = l2cap_pi(sk)->tx_win;
->>
->>               len = min_t(unsigned int, sizeof(opts), optlen);
->>               if (copy_from_user((char *) &opts, optval, len)) {
->> @@ -1787,6 +1790,7 @@ static int l2cap_sock_setsockopt_old(struct
->> socket *sock, int optname, char __us
->>               l2cap_pi(sk)->omtu = opts.omtu;
->>               l2cap_pi(sk)->mode = opts.mode;
->>               l2cap_pi(sk)->fcs  = opts.fcs;
->> +             l2cap_pi(sk)->tx_win = opts.txwin_size;
->>               break;
->>
->>       case L2CAP_LM:
->> @@ -1901,6 +1905,7 @@ static int l2cap_sock_getsockopt_old(struct
->> socket *sock, int optname, char __us
->>               opts.flush_to = l2cap_pi(sk)->flush_to;
->>               opts.mode     = l2cap_pi(sk)->mode;
->>               opts.fcs      = l2cap_pi(sk)->fcs;
->> +             opts.txwin_size = l2cap_pi(sk)->tx_win;
->>
->>               len = min_t(unsigned int, len, sizeof(opts));
->>               if (copy_to_user(optval, (char *) &opts, len))
->> @@ -2318,7 +2323,7 @@ done:
->>
->>       case L2CAP_MODE_ERTM:
->>               rfc.mode            = L2CAP_MODE_ERTM;
->> -             rfc.txwin_size      = L2CAP_DEFAULT_TX_WINDOW;
->> +             rfc.txwin_size      = pi->tx_win;
->>               rfc.max_transmit    = max_transmit;
->>               rfc.retrans_timeout = 0;
->>               rfc.monitor_timeout = 0;
->
->
-> Mat Martineau
-> Qualcomm Innovation Center, Inc.,
-> A member of the Code Aurora Forum
->
->
->
+> 
+> Signed-off-by: Gustavo F. Padovan <gustavo@padovan.org>
+> ---
+>  include/net/bluetooth/l2cap.h |    2 ++
+>  net/bluetooth/l2cap.c         |    7 ++++++-
+>  2 files changed, 8 insertions(+), 1 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/l2cap.h
+> b/include/net/bluetooth/l2cap.h
+> index 48f10f4..c7bf676 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -56,6 +56,7 @@ struct l2cap_options {
+>  	__u16 flush_to;
+>  	__u8  mode;
+>  	__u8  fcs;
+> +	__u8  txwin_size;
+>  };
+> 
+>  #define L2CAP_CONNINFO	0x02
+> @@ -339,6 +340,7 @@ struct l2cap_pinfo {
+> 
+>  	__u8		ident;
+> 
+> +	__u8		tx_win;
+>  	__u8		remote_tx_win;
+>  	__u8		remote_max_tx;
+>  	__u16		retrans_timeout;
+> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> index 930f987..6679418 100644
+> --- a/net/bluetooth/l2cap.c
+> +++ b/net/bluetooth/l2cap.c
+> @@ -780,6 +780,7 @@ static void l2cap_sock_init(struct sock *sk, struct
+> sock *parent)
+>  		pi->omtu = l2cap_pi(parent)->omtu;
+>  		pi->mode = l2cap_pi(parent)->mode;
+>  		pi->fcs  = l2cap_pi(parent)->fcs;
+> +		pi->tx_win = l2cap_pi(parent)->tx_win;
+>  		pi->sec_level = l2cap_pi(parent)->sec_level;
+>  		pi->role_switch = l2cap_pi(parent)->role_switch;
+>  		pi->force_reliable = l2cap_pi(parent)->force_reliable;
+> @@ -788,6 +789,7 @@ static void l2cap_sock_init(struct sock *sk, struct
+> sock *parent)
+>  		pi->omtu = 0;
+>  		pi->mode = L2CAP_MODE_BASIC;
+>  		pi->fcs  = L2CAP_FCS_CRC16;
+> +		pi->tx_win = L2CAP_DEFAULT_TX_WINDOW;
+>  		pi->sec_level = BT_SECURITY_LOW;
+>  		pi->role_switch = 0;
+>  		pi->force_reliable = 0;
+> @@ -1776,6 +1778,7 @@ static int l2cap_sock_setsockopt_old(struct
+> socket *sock, int optname, char __us
+>  		opts.flush_to = l2cap_pi(sk)->flush_to;
+>  		opts.mode     = l2cap_pi(sk)->mode;
+>  		opts.fcs      = l2cap_pi(sk)->fcs;
+> +		opts.txwin_size = l2cap_pi(sk)->tx_win;
+> 
+>  		len = min_t(unsigned int, sizeof(opts), optlen);
+>  		if (copy_from_user((char *) &opts, optval, len)) {
+> @@ -1787,6 +1790,7 @@ static int l2cap_sock_setsockopt_old(struct
+> socket *sock, int optname, char __us
+>  		l2cap_pi(sk)->omtu = opts.omtu;
+>  		l2cap_pi(sk)->mode = opts.mode;
+>  		l2cap_pi(sk)->fcs  = opts.fcs;
+> +		l2cap_pi(sk)->tx_win = opts.txwin_size;
+>  		break;
+> 
+>  	case L2CAP_LM:
+> @@ -1901,6 +1905,7 @@ static int l2cap_sock_getsockopt_old(struct
+> socket *sock, int optname, char __us
+>  		opts.flush_to = l2cap_pi(sk)->flush_to;
+>  		opts.mode     = l2cap_pi(sk)->mode;
+>  		opts.fcs      = l2cap_pi(sk)->fcs;
+> +		opts.txwin_size = l2cap_pi(sk)->tx_win;
+> 
+>  		len = min_t(unsigned int, len, sizeof(opts));
+>  		if (copy_to_user(optval, (char *) &opts, len))
+> @@ -2318,7 +2323,7 @@ done:
+> 
+>  	case L2CAP_MODE_ERTM:
+>  		rfc.mode            = L2CAP_MODE_ERTM;
+> -		rfc.txwin_size      = L2CAP_DEFAULT_TX_WINDOW;
+> +		rfc.txwin_size      = pi->tx_win;
+>  		rfc.max_transmit    = max_transmit;
+>  		rfc.retrans_timeout = 0;
+>  		rfc.monitor_timeout = 0;
 
 
+Mat Martineau
+Qualcomm Innovation Center, Inc.,
+A member of the Code Aurora Forum
 
--- 
-Gustavo F. Padovan
-http://padovan.org
+
