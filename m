@@ -1,162 +1,116 @@
 Return-Path: <cyrus@holtmann.org>
-From: Tomas Winkler <tomas.winkler@intel.com>
-To: marcel@holtmann.org,
-	linux-bluetooth@vger.kernel.org
-Cc: guy.cohen@intel.com,
-	ron.rindjunsky@intel.com,
-	Gregory Paskar <gregory.paskar@intel.com>,
-	Tomas Winkler <tomas.winkler@intel.com>
-Subject: [bluetooth-next V3] Bluetooth: handle device reset event
-Date: Thu, 18 Mar 2010 09:44:06 +0200
-Message-Id: <1268898246-22693-1-git-send-email-tomas.winkler@intel.com>
+From: Mike Tsai <Mike.Tsai@Atheros.com>
+To: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: "marcel@holtmann.org" <marcel@holtmann.org>, "mathewm@codeaurora.org"
+	<mathewm@codeaurora.org>
+Date: Wed, 17 Mar 2010 14:47:49 -0700
+Subject: RE: [PATCH 2/4] Bluetooth: Change acknowledgement to use the value
+ of txWindow
+Message-ID: <35B17FE5076C7040809188FBE7913F983A1DA4F474@SC1EXMB-MBCL.global.atheros.com>
+References: <1268852016-3826-1-git-send-email-gustavo@padovan.org>
+ <1268852016-3826-2-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1268852016-3826-2-git-send-email-gustavo@padovan.org>
 Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gregory Paskar <gregory.paskar@intel.com>
+Just out of curiosity, where does this (pi->txWindow/6 + 1) come from?
 
-A Bluetooth device experiencing hardware failure may issue
-a HARDWARE_ERROR hci event. The reaction to this event is device
-reset flow implemented in following sequence.
+Thanks,
 
-1. Notify: HCI_DEV_DOWN
-2. Reinitialize internal structures.
-3. Call driver flush function
-4. Send HCI reset request to the device.
-5. Send HCI init sequence reset to the device.
-6. Notify HCI_DEV_UP.
+Mike
 
-Signed-off-by: Gregory Paskar <gregory.paskar@intel.com>
-Signed-off-by: Tomas Winkler <tomas.winkler@intel.com>
-Reviewed-by: Ron Rindjunsky <ron.rindjunsky@intel.com>
+
+-----Original Message-----
+From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@v=
+ger.kernel.org] On Behalf Of Gustavo F. Padovan
+Sent: Wednesday, March 17, 2010 11:54 AM
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org; gustavo@padovan.org; mathewm@codeaurora.org
+Subject: [PATCH 2/4] Bluetooth: Change acknowledgement to use the value of =
+txWindow
+
+Now that we can set the txWindow we need to change the acknowledgement
+procedure to ack after each (pi->txWindow/6 + 1). The plus 1 is to avoid
+the zero value.
+It also renames pi->num_to_ack to a better name: pi->num_acked.
+
+Signed-off-by: Gustavo F. Padovan <gustavo@padovan.org>
 ---
-V2:
-1. Fix email typo
-2. Fix style issues
-V3:
-1. align with naming convention hw_err_work -> work_hw_err 
-2. use per controller workqueue
+ include/net/bluetooth/l2cap.h |    3 +--
+ net/bluetooth/l2cap.c         |    9 +++++----
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
- include/net/bluetooth/hci.h      |    5 ++++
- include/net/bluetooth/hci_core.h |    2 +
- net/bluetooth/hci_core.c         |   47 +++++++++++++++++++++++++++++++++++++-
- net/bluetooth/hci_event.c        |    3 ++
- 4 files changed, 56 insertions(+), 1 deletions(-)
-
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index fc0c502..3f986e7 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -695,6 +695,11 @@ struct hci_ev_cmd_status {
- 	__le16   opcode;
- } __attribute__ ((packed));
- 
-+#define HCI_EV_HARDWARE_ERROR 0x10
-+struct hci_ev_hw_error {
-+	__u8     hw_code;
-+} __attribute__ ((packed));
-+
- #define HCI_EV_ROLE_CHANGE		0x12
- struct hci_ev_role_change {
- 	__u8     status;
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index e17849e..1c9601d 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -113,6 +113,8 @@ struct hci_dev {
- 	struct tasklet_struct	rx_task;
- 	struct tasklet_struct	tx_task;
- 
-+	struct work_struct	work_hw_err;
-+
- 	struct sk_buff_head	rx_q;
- 	struct sk_buff_head	raw_q;
- 	struct sk_buff_head	cmd_q;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 8b4baac..c5a43e3 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -839,6 +839,51 @@ static int hci_rfkill_set_block(void *data, bool blocked)
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index c7bf676..9358b9e 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -30,7 +30,6 @@
+ #define L2CAP_DEFAULT_MIN_MTU		48
+ #define L2CAP_DEFAULT_FLUSH_TO		0xffff
+ #define L2CAP_DEFAULT_TX_WINDOW		63
+-#define L2CAP_DEFAULT_NUM_TO_ACK        (L2CAP_DEFAULT_TX_WINDOW/5)
+ #define L2CAP_DEFAULT_MAX_TX		3
+ #define L2CAP_DEFAULT_RETRANS_TO	1000    /* 1 second */
+ #define L2CAP_DEFAULT_MONITOR_TO	12000   /* 12 seconds */
+@@ -333,7 +332,7 @@ struct l2cap_pinfo {
+ 	__u8		frames_sent;
+ 	__u8		unacked_frames;
+ 	__u8		retry_count;
+-	__u8		num_to_ack;
++	__u8		num_acked;
+ 	__u16		sdu_len;
+ 	__u16		partial_sdu_len;
+ 	struct sk_buff	*sdu;
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index 6679418..959be0f 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -2248,7 +2248,7 @@ static inline void l2cap_ertm_init(struct sock *sk)
+ 	l2cap_pi(sk)->expected_ack_seq =3D 0;
+ 	l2cap_pi(sk)->unacked_frames =3D 0;
+ 	l2cap_pi(sk)->buffer_seq =3D 0;
+-	l2cap_pi(sk)->num_to_ack =3D 0;
++	l2cap_pi(sk)->num_acked =3D 0;
+ 	l2cap_pi(sk)->frames_sent =3D 0;
+=20
+ 	setup_timer(&l2cap_pi(sk)->retrans_timer,
+@@ -2571,7 +2571,7 @@ static int l2cap_parse_conf_rsp(struct sock *sk, void=
+ *rsp, int len, void *data,
+ 	if (*result =3D=3D L2CAP_CONF_SUCCESS) {
+ 		switch (rfc.mode) {
+ 		case L2CAP_MODE_ERTM:
+-			pi->remote_tx_win   =3D rfc.txwin_size;
++			pi->tx_win   =3D rfc.txwin_size;
+ 			pi->retrans_timeout =3D rfc.retrans_timeout;
+ 			pi->monitor_timeout =3D rfc.monitor_timeout;
+ 			pi->max_pdu_size    =3D le16_to_cpu(rfc.max_pdu_size);
+@@ -3408,6 +3408,7 @@ static inline int l2cap_data_channel_iframe(struct so=
+ck *sk, u16 rx_control, str
+ 	u8 tx_seq =3D __get_txseq(rx_control);
+ 	u8 req_seq =3D __get_reqseq(rx_control);
+ 	u8 sar =3D rx_control >> L2CAP_CTRL_SAR_SHIFT;
++	int num_to_ack =3D (pi->tx_win/6) + 1;
+ 	int err =3D 0;
+=20
+ 	BT_DBG("sk %p rx_control 0x%4.4x len %d", sk, rx_control, skb->len);
+@@ -3501,8 +3502,8 @@ expected:
+=20
+ 	__mod_ack_timer();
+=20
+-	pi->num_to_ack =3D (pi->num_to_ack + 1) % L2CAP_DEFAULT_NUM_TO_ACK;
+-	if (pi->num_to_ack =3D=3D L2CAP_DEFAULT_NUM_TO_ACK - 1)
++	pi->num_acked =3D (pi->num_acked + 1) % num_to_ack;
++	if (pi->num_acked =3D=3D num_to_ack - 1)
+ 		l2cap_send_ack(pi);
+=20
  	return 0;
- }
- 
-+static void hci_device_hw_error(struct hci_dev *hdev)
-+{
-+	hci_req_lock(hdev);
-+
-+	/* notify: going down */
-+	clear_bit(HCI_UP, &hdev->flags);
-+	hci_notify(hdev, HCI_DEV_DOWN);
-+
-+	tasklet_disable(&hdev->tx_task);
-+	skb_queue_purge(&hdev->rx_q);
-+	skb_queue_purge(&hdev->cmd_q);
-+
-+	hci_dev_lock_bh(hdev);
-+	inquiry_cache_flush(hdev);
-+	hci_conn_hash_flush(hdev);
-+	hci_dev_unlock_bh(hdev);
-+
-+	if (hdev->flush)
-+		hdev->flush(hdev);
-+
-+	/* reset device */
-+	atomic_set(&hdev->cmd_cnt, 1);
-+	hdev->acl_cnt = 0;
-+	hdev->sco_cnt = 0;
-+	hci_reset_req(hdev, 0);
-+
-+	/* init device */
-+	atomic_set(&hdev->cmd_cnt, 1);
-+	hci_init_req(hdev, 0);
-+
-+	tasklet_enable(&hdev->tx_task);
-+
-+	/* notify: going back up */
-+	set_bit(HCI_UP, &hdev->flags);
-+	hci_notify(hdev, HCI_DEV_UP);
-+
-+	hci_req_unlock(hdev);
-+}
-+
-+static void hci_work_hw_err(struct work_struct *ws)
-+{
-+	struct hci_dev *hdev = container_of(ws, struct hci_dev, work_hw_err);
-+	hci_device_hw_error(hdev);
-+}
-+
- static const struct rfkill_ops hci_rfkill_ops = {
- 	.set_block = hci_rfkill_set_block,
- };
-@@ -908,7 +953,7 @@ int hci_register_dev(struct hci_dev *hdev)
- 	tasklet_init(&hdev->cmd_task, hci_cmd_task,(unsigned long) hdev);
- 	tasklet_init(&hdev->rx_task, hci_rx_task, (unsigned long) hdev);
- 	tasklet_init(&hdev->tx_task, hci_tx_task, (unsigned long) hdev);
--
-+	INIT_WORK(&hdev->work_hw_err, hci_work_hw_err);
- 	skb_queue_head_init(&hdev->rx_q);
- 	skb_queue_head_init(&hdev->cmd_q);
- 	skb_queue_head_init(&hdev->raw_q);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 6c57fc7..6bcf3e9 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1955,6 +1955,9 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 	case HCI_EV_REMOTE_HOST_FEATURES:
- 		hci_remote_host_features_evt(hdev, skb);
- 		break;
-+	case HCI_EV_HARDWARE_ERROR:
-+		queue_work(hdev->workqueue, &hdev->work_hw_err);
-+		break;
- 
- 	default:
- 		BT_DBG("%s event 0x%x", hdev->name, event);
--- 
-1.6.6.1
+--=20
+1.6.4.4
 
----------------------------------------------------------------------
-Intel Israel (74) Limited
-
-This e-mail and any attachments may contain confidential material for
-the sole use of the intended recipient(s). Any review or distribution
-by others is strictly prohibited. If you are not the intended
-recipient, please contact the sender and delete all copies.
+--
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" =
+in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
