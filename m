@@ -1,139 +1,162 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH 1/2] Add separate mode switching function wacom bluetooth
- pen tablet.
-From: Przemo Firszt <przemo@firszt.eu>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>, Bastien Nocera <hadess@hadess.net>, marcel <marcel@holtmann.org>, Ping <pinglinux@gmail.com>,  Peter Hutterer <peter.hutterer@who-t.net>, Jiri Kosina <jkosina@suse.cz>
-Content-Type: multipart/mixed; boundary="=-rX0f/+wYfsh/c5rNR3e6"
-Date: Thu, 18 Mar 2010 15:25:02 +0000
-Message-ID: <1268925902.12672.25.camel@pldmachine>
-Mime-Version: 1.0
+From: Tomas Winkler <tomas.winkler@intel.com>
+To: marcel@holtmann.org,
+	linux-bluetooth@vger.kernel.org
+Cc: guy.cohen@intel.com,
+	ron.rindjunsky@intel.com,
+	Gregory Paskar <gregory.paskar@intel.com>,
+	Tomas Winkler <tomas.winkler@intel.com>
+Subject: [bluetooth-next V3] Bluetooth: handle device reset event
+Date: Thu, 18 Mar 2010 09:44:06 +0200
+Message-Id: <1268898246-22693-1-git-send-email-tomas.winkler@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Gregory Paskar <gregory.paskar@intel.com>
 
---=-rX0f/+wYfsh/c5rNR3e6
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+A Bluetooth device experiencing hardware failure may issue
+a HARDWARE_ERROR hci event. The reaction to this event is device
+reset flow implemented in following sequence.
 
-Hi,
-Two patches to allow switching of reporting speed of wacom bluetooth
-tablet from userspace through sysfs. 
+1. Notify: HCI_DEV_DOWN
+2. Reinitialize internal structures.
+3. Call driver flush function
+4. Send HCI reset request to the device.
+5. Send HCI init sequence reset to the device.
+6. Notify HCI_DEV_UP.
 
-kind reagrds,
-Przemo
-
---=-rX0f/+wYfsh/c5rNR3e6
-Content-Disposition: attachment; filename*0=0001-Add-separate-mode-switching-function-wacom-bluetooth.pat; filename*1=ch
-Content-Type: text/x-patch; name="0001-Add-separate-mode-switching-function-wacom-bluetooth.patch"; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-
->From ac9a87b92cf2f8cc27a1d29123c5fa1a8bebd71a Mon Sep 17 00:00:00 2001
-From: Przemo Firszt <przemo@firszt.eu>
-Date: Thu, 18 Mar 2010 11:58:22 +0000
-Subject: [PATCH 1/2] Add separate mode switching function wacom bluetooth pen tablet.
-
-wacom_poke function allows to switch tablet reporting speed. The patch
-dosen't add any new functionality, but it's preparation for user-space
-speed switching through sysfs.
-
-Signed-off-by: Przemo Firszt <przemo@firszt.eu>
+Signed-off-by: Gregory Paskar <gregory.paskar@intel.com>
+Signed-off-by: Tomas Winkler <tomas.winkler@intel.com>
+Reviewed-by: Ron Rindjunsky <ron.rindjunsky@intel.com>
 ---
- drivers/hid/hid-wacom.c |   66 ++++++++++++++++++++++++++++------------------
- 1 files changed, 40 insertions(+), 26 deletions(-)
+V2:
+1. Fix email typo
+2. Fix style issues
+V3:
+1. align with naming convention hw_err_work -> work_hw_err 
+2. use per controller workqueue
 
-diff --git a/drivers/hid/hid-wacom.c b/drivers/hid/hid-wacom.c
-index 4d2d2a2..f9d4939 100644
---- a/drivers/hid/hid-wacom.c
-+++ b/drivers/hid/hid-wacom.c
-@@ -103,6 +103,44 @@ static int wacom_ac_get_property(struct power_supply *psy,
- }
- #endif
+ include/net/bluetooth/hci.h      |    5 ++++
+ include/net/bluetooth/hci_core.h |    2 +
+ net/bluetooth/hci_core.c         |   47 +++++++++++++++++++++++++++++++++++++-
+ net/bluetooth/hci_event.c        |    3 ++
+ 4 files changed, 56 insertions(+), 1 deletions(-)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index fc0c502..3f986e7 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -695,6 +695,11 @@ struct hci_ev_cmd_status {
+ 	__le16   opcode;
+ } __attribute__ ((packed));
  
-+static void wacom_poke(struct hid_device *hdev, u8 speed)
++#define HCI_EV_HARDWARE_ERROR 0x10
++struct hci_ev_hw_error {
++	__u8     hw_code;
++} __attribute__ ((packed));
++
+ #define HCI_EV_ROLE_CHANGE		0x12
+ struct hci_ev_role_change {
+ 	__u8     status;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index e17849e..1c9601d 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -113,6 +113,8 @@ struct hci_dev {
+ 	struct tasklet_struct	rx_task;
+ 	struct tasklet_struct	tx_task;
+ 
++	struct work_struct	work_hw_err;
++
+ 	struct sk_buff_head	rx_q;
+ 	struct sk_buff_head	raw_q;
+ 	struct sk_buff_head	cmd_q;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 8b4baac..c5a43e3 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -839,6 +839,51 @@ static int hci_rfkill_set_block(void *data, bool blocked)
+ 	return 0;
+ }
+ 
++static void hci_device_hw_error(struct hci_dev *hdev)
 +{
-+	int limit, ret;
-+	char rep_data[2];
++	hci_req_lock(hdev);
 +
-+	rep_data[0] = 0x03 ; rep_data[1] = 0x00;
-+	limit = 3;
-+	do {
-+		ret = hdev->hid_output_raw_report(hdev, rep_data, 2,
-+				HID_FEATURE_REPORT);
-+	} while (ret < 0 && limit-- > 0);
++	/* notify: going down */
++	clear_bit(HCI_UP, &hdev->flags);
++	hci_notify(hdev, HCI_DEV_DOWN);
 +
-+	if (ret >= 0) {
-+		if (speed == 0)
-+			rep_data[0] = 0x05;
-+		else
-+			rep_data[0] = 0x06;
++	tasklet_disable(&hdev->tx_task);
++	skb_queue_purge(&hdev->rx_q);
++	skb_queue_purge(&hdev->cmd_q);
 +
-+		rep_data[1] = 0x00;
-+		limit = 3;
-+		do {
-+			ret = hdev->hid_output_raw_report(hdev, rep_data, 2,
-+					HID_FEATURE_REPORT);
-+		} while (ret < 0 && limit-- > 0);
++	hci_dev_lock_bh(hdev);
++	inquiry_cache_flush(hdev);
++	hci_conn_hash_flush(hdev);
++	hci_dev_unlock_bh(hdev);
 +
-+		if (ret >= 0)
-+			return;
-+	}
++	if (hdev->flush)
++		hdev->flush(hdev);
 +
-+	/*
-+	 * Note that if the raw queries fail, it's not a hard failure and it
-+	 * is safe to continue
-+	 */
-+	dev_warn(&hdev->dev, "failed to poke device, command %d, err %d\n",
-+				rep_data[0], ret);
-+	return;
++	/* reset device */
++	atomic_set(&hdev->cmd_cnt, 1);
++	hdev->acl_cnt = 0;
++	hdev->sco_cnt = 0;
++	hci_reset_req(hdev, 0);
++
++	/* init device */
++	atomic_set(&hdev->cmd_cnt, 1);
++	hci_init_req(hdev, 0);
++
++	tasklet_enable(&hdev->tx_task);
++
++	/* notify: going back up */
++	set_bit(HCI_UP, &hdev->flags);
++	hci_notify(hdev, HCI_DEV_UP);
++
++	hci_req_unlock(hdev);
 +}
 +
- static int wacom_raw_event(struct hid_device *hdev, struct hid_report *report,
- 		u8 *raw_data, int size)
- {
-@@ -236,9 +274,7 @@ static int wacom_probe(struct hid_device *hdev,
- 	struct hid_input *hidinput;
- 	struct input_dev *input;
- 	struct wacom_data *wdata;
--	char rep_data[2];
- 	int ret;
--	int limit;
- 
- 	wdata = kzalloc(sizeof(*wdata), GFP_KERNEL);
- 	if (wdata == NULL) {
-@@ -261,30 +297,8 @@ static int wacom_probe(struct hid_device *hdev,
- 		goto err_free;
- 	}
- 
--	/*
--	 * Note that if the raw queries fail, it's not a hard failure and it
--	 * is safe to continue
--	 */
++static void hci_work_hw_err(struct work_struct *ws)
++{
++	struct hci_dev *hdev = container_of(ws, struct hci_dev, work_hw_err);
++	hci_device_hw_error(hdev);
++}
++
+ static const struct rfkill_ops hci_rfkill_ops = {
+ 	.set_block = hci_rfkill_set_block,
+ };
+@@ -908,7 +953,7 @@ int hci_register_dev(struct hci_dev *hdev)
+ 	tasklet_init(&hdev->cmd_task, hci_cmd_task,(unsigned long) hdev);
+ 	tasklet_init(&hdev->rx_task, hci_rx_task, (unsigned long) hdev);
+ 	tasklet_init(&hdev->tx_task, hci_tx_task, (unsigned long) hdev);
 -
--	/* Set Wacom mode2 */
--	rep_data[0] = 0x03; rep_data[1] = 0x00;
--	limit = 3;
--	do {
--		ret = hdev->hid_output_raw_report(hdev, rep_data, 2,
--				HID_FEATURE_REPORT);
--	} while (ret < 0 && limit-- > 0);
--	if (ret < 0)
--		dev_warn(&hdev->dev, "failed to poke device #1, %d\n", ret);
--
--	/* 0x06 - high reporting speed, 0x05 - low speed */
--	rep_data[0] = 0x06; rep_data[1] = 0x00;
--	limit = 3;
--	do {
--		ret = hdev->hid_output_raw_report(hdev, rep_data, 2,
--				HID_FEATURE_REPORT);
--	} while (ret < 0 && limit-- > 0);
--	if (ret < 0)
--		dev_warn(&hdev->dev, "failed to poke device #2, %d\n", ret);
-+	/* Set Wacom mode 2 with high reporting speed */
-+	wacom_poke(hdev, 1);
++	INIT_WORK(&hdev->work_hw_err, hci_work_hw_err);
+ 	skb_queue_head_init(&hdev->rx_q);
+ 	skb_queue_head_init(&hdev->cmd_q);
+ 	skb_queue_head_init(&hdev->raw_q);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 6c57fc7..6bcf3e9 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1955,6 +1955,9 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 	case HCI_EV_REMOTE_HOST_FEATURES:
+ 		hci_remote_host_features_evt(hdev, skb);
+ 		break;
++	case HCI_EV_HARDWARE_ERROR:
++		queue_work(hdev->workqueue, &hdev->work_hw_err);
++		break;
  
- #ifdef CONFIG_HID_WACOM_POWER_SUPPLY
- 	wdata->battery.properties = wacom_battery_props;
+ 	default:
+ 		BT_DBG("%s event 0x%x", hdev->name, event);
 -- 
-1.7.0.1
+1.6.6.1
 
+---------------------------------------------------------------------
+Intel Israel (74) Limited
 
---=-rX0f/+wYfsh/c5rNR3e6--
+This e-mail and any attachments may contain confidential material for
+the sole use of the intended recipient(s). Any review or distribution
+by others is strictly prohibited. If you are not the intended
+recipient, please contact the sender and delete all copies.
