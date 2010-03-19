@@ -1,176 +1,194 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20100315150203.GA31186@vigoh>
-References: <508e92ca1002160236k34c18949jc7d7187645ef4aa0@mail.gmail.com>
-	 <20100311224140.GA17295@vigoh>
-	 <508e92ca1003150357t77defd4fqcd843965af35970a@mail.gmail.com>
-	 <20100315150203.GA31186@vigoh>
-Date: Fri, 19 Mar 2010 10:31:01 +0200
-Message-ID: <508e92ca1003190131l61964e71ke0d813c2c2644b8d@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Fix kernel crash on BT stress tests.
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: "Gustavo F. Padovan" <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Content-Type: multipart/mixed; boundary=00032555a08ee8f57e0482232aef
+Subject: Re: [bluetooth-next V3] Bluetooth: handle device reset event
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Tomas Winkler <tomas.winkler@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, guy.cohen@intel.com,
+	ron.rindjunsky@intel.com, Gregory Paskar <gregory.paskar@intel.com>
+In-Reply-To: <1268898246-22693-1-git-send-email-tomas.winkler@intel.com>
+References: <1268898246-22693-1-git-send-email-tomas.winkler@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 19 Mar 2010 06:32:58 +0100
+Message-ID: <1268976778.3003.14.camel@violet>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---00032555a08ee8f57e0482232aef
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+Hi Tomas,
 
-Hi,
+> From: Gregory Paskar <gregory.paskar@intel.com>
+> 
+> A Bluetooth device experiencing hardware failure may issue
+> a HARDWARE_ERROR hci event. The reaction to this event is device
+> reset flow implemented in following sequence.
+> 
+> 1. Notify: HCI_DEV_DOWN
+> 2. Reinitialize internal structures.
+> 3. Call driver flush function
+> 4. Send HCI reset request to the device.
+> 5. Send HCI init sequence reset to the device.
+> 6. Notify HCI_DEV_UP.
+> 
+> Signed-off-by: Gregory Paskar <gregory.paskar@intel.com>
+> Signed-off-by: Tomas Winkler <tomas.winkler@intel.com>
+> Reviewed-by: Ron Rindjunsky <ron.rindjunsky@intel.com>
+> ---
+> V2:
+> 1. Fix email typo
+> 2. Fix style issues
+> V3:
+> 1. align with naming convention hw_err_work -> work_hw_err 
+> 2. use per controller workqueue
+> 
+>  include/net/bluetooth/hci.h      |    5 ++++
+>  include/net/bluetooth/hci_core.h |    2 +
+>  net/bluetooth/hci_core.c         |   47 +++++++++++++++++++++++++++++++++++++-
+>  net/bluetooth/hci_event.c        |    3 ++
+>  4 files changed, 56 insertions(+), 1 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index fc0c502..3f986e7 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -695,6 +695,11 @@ struct hci_ev_cmd_status {
+>  	__le16   opcode;
+>  } __attribute__ ((packed));
+>  
+> +#define HCI_EV_HARDWARE_ERROR 0x10
+> +struct hci_ev_hw_error {
+> +	__u8     hw_code;
+> +} __attribute__ ((packed));
+> +
 
-On Mon, Mar 15, 2010 at 5:05 PM, Gustavo F. Padovan <gustavo@padovan.org> w=
-rote:
-> * Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2010-03-15 12:5=
-7:18 +0200]:
->
->> Hi Gustavo
->>
->> On Fri, Mar 12, 2010 at 12:41 AM, Gustavo F. Padovan
->> <padovan@profusion.mobi> wrote:
->> > Hi Andrei,
->> >
->> > * Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2010-02-16 1=
-2:36:47 +0200]:
->> >
->> >> From 0135f732cb45e5e91062aca84a61a40b172200a4 Mon Sep 17 00:00:00 200=
-1
->> >> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
->> >> Date: Tue, 16 Feb 2010 10:52:33 +0200
->> >> Subject: [PATCH] Bluetooth: Fix kernel crash on BT stress tests.
->> >>
->> >> Added very simple check that req buffer has enough space to
->> >> fit configuration parameters. Shall be enough to reject packets
->> >> with configuration size more than req buffer.
->> >>
->> >> Crash trace below
->> >>
->> >> [ 6069.659393] Unable to handle kernel paging request at virtual
->> >> address 02000205
->> >> [ 6069.673034] Internal error: Oops: 805 [#1] PREEMPT
->> >> ...
->> >> [ 6069.727172] PC is at l2cap_add_conf_opt+0x70/0xf0 [l2cap]
->> >> [ 6069.732604] LR is at l2cap_recv_frame+0x1350/0x2e78 [l2cap]
->> >> ...
->> >> [ 6070.030303] Backtrace:
->> >> [ 6070.032806] [<bf1c2880>] (l2cap_add_conf_opt+0x0/0xf0 [l2cap]) fro=
-m
->> >> [<bf1c6624>] (l2cap_recv_frame+0x1350/0x2e78 [l2cap])
->> >> [ 6070.043823] =A0r8:dc5d3100 r7:df2a91d6 r6:00000001 r5:df2a8000 r4:=
-00000200
->> >> [ 6070.050659] [<bf1c52d4>] (l2cap_recv_frame+0x0/0x2e78 [l2cap]) fro=
-m
->> >> [<bf1c8408>] (l2cap_recv_acldata+0x2bc/0x350 [l2cap])
->> >> [ 6070.061798] [<bf1c814c>] (l2cap_recv_acldata+0x0/0x350 [l2cap]) fr=
-om
->> >> [<bf0037a4>] (hci_rx_task+0x244/0x478 [bluetooth])
->> >> [ 6070.072631] =A0r6:dc647700 r5:00000001 r4:df2ab740
->> >> [ 6070.077362] [<bf003560>] (hci_rx_task+0x0/0x478 [bluetooth]) from
->> >> [<c006b9fc>] (tasklet_action+0x78/0xd8)
->> >> [ 6070.087005] [<c006b984>] (tasklet_action+0x0/0xd8) from [<c006c160=
->]
->> >>
->> >> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
->> >> ---
->> >> =A0net/bluetooth/l2cap.c | =A0 =A06 ++++++
->> >> =A01 files changed, 6 insertions(+), 0 deletions(-)
->> >>
->> >> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
->> >> index 400efa2..69b7280 100644
->> >> --- a/net/bluetooth/l2cap.c
->> >> +++ b/net/bluetooth/l2cap.c
->> >> @@ -2830,6 +2830,12 @@ static inline int l2cap_config_rsp(struct
->> >> l2cap_conn *conn, struct l2cap_cmd_hdr
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 int len =3D cmd->len - si=
-zeof(*rsp);
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 char req[64];
->> >>
->> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (len > sizeof(req) - siz=
-eof(struct l2cap_conf_req)) {
->> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 BT_ERR("Con=
-fig response is too big");
->> >
->> > Remove the BT_ERR, normally we don't print any error on
->> > l2cap_send_disconn_req.
->> >
->> >
->> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 l2cap_send_=
-disconn_req(conn, sk);
->> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto done;
->> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
->> >> +
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* throw out any old stor=
-ed conf requests */
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 result =3D L2CAP_CONF_SUC=
-CESS;
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 len =3D l2cap_parse_conf_=
-rsp(sk, rsp->data,
->> >
->> > Also, this is very rare crash. Even if we add all configure options to
->> > req we won't overwrite it. Doesn't make sense to me send a
->> > configuration option more than once in the same config_{rsp,req}. The
->> > only way to crash l2cap is using a bugous remote stack or a stress tes=
-t
->> > tools. We need to be protected against those bugous stacks so I'll
->> > ack your patch after you send the updated patch without the BT_ERR.
->> >
->>
->> I am attaching patch to the mail, otherwise it may be screwed up by mail=
-ers.
->
-> Acked-by: Gustavo F. Padovan <gustavo@padovan.org>
+So the rule is that the HCI_EV and hci_ev struct names are matching up.
+It should be matching what we have in the library (not a hard
+requirement though):
 
-Thanks.  I am attaching patch.
+#define EVT_HARDWARE_ERROR              0x10
+typedef struct {
+        uint8_t         code;
+} __attribute__ ((packed)) evt_hardware_error;
 
-Regards,
-Andrei
+So just spell it out hardware_error. This means it is also code and not
+hw_code inside the struct.
 
---00032555a08ee8f57e0482232aef
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Bluetooth-Fix-kernel-crash-on-BT-stress-tests.patch"
-Content-Disposition: attachment;
-	filename="0001-Bluetooth-Fix-kernel-crash-on-BT-stress-tests.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_g6yqa4520
+>  #define HCI_EV_ROLE_CHANGE		0x12
+>  struct hci_ev_role_change {
+>  	__u8     status;
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index e17849e..1c9601d 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -113,6 +113,8 @@ struct hci_dev {
+>  	struct tasklet_struct	rx_task;
+>  	struct tasklet_struct	tx_task;
+>  
+> +	struct work_struct	work_hw_err;
+> +
 
-RnJvbSBhZjhjYWIzMDg3Y2Y0ZDQ4NjVhZDg4ZmIyNWQxMzBlYmVhMTA4ZGIwIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBBbmRyZWkgRW1lbHRjaGVua28gPGFuZHJlaS5lbWVsdGNoZW5r
-b0Bub2tpYS5jb20+CkRhdGU6IFR1ZSwgMTYgRmViIDIwMTAgMTA6NTI6MzMgKzAyMDAKU3ViamVj
-dDogW1BBVENIXSBCbHVldG9vdGg6IEZpeCBrZXJuZWwgY3Jhc2ggb24gQlQgc3RyZXNzIHRlc3Rz
-LgoKQWRkZWQgdmVyeSBzaW1wbGUgY2hlY2sgdGhhdCByZXEgYnVmZmVyIGhhcyBlbm91Z2ggc3Bh
-Y2UgdG8KZml0IGNvbmZpZ3VyYXRpb24gcGFyYW1ldGVycy4gU2hhbGwgYmUgZW5vdWdoIHRvIHJl
-amVjdCBwYWNrZXRzCndpdGggY29uZmlndXJhdGlvbiBzaXplIG1vcmUgdGhhbiByZXEgYnVmZmVy
-LgoKQ3Jhc2ggdHJhY2UgYmVsb3cKClsgNjA2OS42NTkzOTNdIFVuYWJsZSB0byBoYW5kbGUga2Vy
-bmVsIHBhZ2luZyByZXF1ZXN0IGF0IHZpcnR1YWwgYWRkcmVzcyAwMjAwMDIwNQpbIDYwNjkuNjcz
-MDM0XSBJbnRlcm5hbCBlcnJvcjogT29wczogODA1IFsjMV0gUFJFRU1QVAouLi4KWyA2MDY5Ljcy
-NzE3Ml0gUEMgaXMgYXQgbDJjYXBfYWRkX2NvbmZfb3B0KzB4NzAvMHhmMCBbbDJjYXBdClsgNjA2
-OS43MzI2MDRdIExSIGlzIGF0IGwyY2FwX3JlY3ZfZnJhbWUrMHgxMzUwLzB4MmU3OCBbbDJjYXBd
-Ci4uLgpbIDYwNzAuMDMwMzAzXSBCYWNrdHJhY2U6ClsgNjA3MC4wMzI4MDZdIFs8YmYxYzI4ODA+
-XSAobDJjYXBfYWRkX2NvbmZfb3B0KzB4MC8weGYwIFtsMmNhcF0pIGZyb20KWzxiZjFjNjYyND5d
-IChsMmNhcF9yZWN2X2ZyYW1lKzB4MTM1MC8weDJlNzggW2wyY2FwXSkKWyA2MDcwLjA0MzgyM10g
-IHI4OmRjNWQzMTAwIHI3OmRmMmE5MWQ2IHI2OjAwMDAwMDAxIHI1OmRmMmE4MDAwIHI0OjAwMDAw
-MjAwClsgNjA3MC4wNTA2NTldIFs8YmYxYzUyZDQ+XSAobDJjYXBfcmVjdl9mcmFtZSsweDAvMHgy
-ZTc4IFtsMmNhcF0pIGZyb20KWzxiZjFjODQwOD5dIChsMmNhcF9yZWN2X2FjbGRhdGErMHgyYmMv
-MHgzNTAgW2wyY2FwXSkKWyA2MDcwLjA2MTc5OF0gWzxiZjFjODE0Yz5dIChsMmNhcF9yZWN2X2Fj
-bGRhdGErMHgwLzB4MzUwIFtsMmNhcF0pIGZyb20KWzxiZjAwMzdhND5dIChoY2lfcnhfdGFzaysw
-eDI0NC8weDQ3OCBbYmx1ZXRvb3RoXSkKWyA2MDcwLjA3MjYzMV0gIHI2OmRjNjQ3NzAwIHI1OjAw
-MDAwMDAxIHI0OmRmMmFiNzQwClsgNjA3MC4wNzczNjJdIFs8YmYwMDM1NjA+XSAoaGNpX3J4X3Rh
-c2srMHgwLzB4NDc4IFtibHVldG9vdGhdKSBmcm9tCls8YzAwNmI5ZmM+XSAodGFza2xldF9hY3Rp
-b24rMHg3OC8weGQ4KQpbIDYwNzAuMDg3MDA1XSBbPGMwMDZiOTg0Pl0gKHRhc2tsZXRfYWN0aW9u
-KzB4MC8weGQ4KSBmcm9tIFs8YzAwNmMxNjA+XQoKU2lnbmVkLW9mZi1ieTogQW5kcmVpIEVtZWx0
-Y2hlbmtvIDxhbmRyZWkuZW1lbHRjaGVua29Abm9raWEuY29tPgpBY2tlZC1ieTogR3VzdGF2byBG
-LiBQYWRvdmFuIDxndXN0YXZvQHBhZG92YW4ub3JnPgotLS0KIG5ldC9ibHVldG9vdGgvbDJjYXAu
-YyB8ICAgIDUgKysrKysKIDEgZmlsZXMgY2hhbmdlZCwgNSBpbnNlcnRpb25zKCspLCAwIGRlbGV0
-aW9ucygtKQoKZGlmZiAtLWdpdCBhL25ldC9ibHVldG9vdGgvbDJjYXAuYyBiL25ldC9ibHVldG9v
-dGgvbDJjYXAuYwppbmRleCA5MzBmOTg3Li5mNDI1OGJjIDEwMDY0NAotLS0gYS9uZXQvYmx1ZXRv
-b3RoL2wyY2FwLmMKKysrIGIvbmV0L2JsdWV0b290aC9sMmNhcC5jCkBAIC0yODk3LDYgKzI4OTcs
-MTEgQEAgc3RhdGljIGlubGluZSBpbnQgbDJjYXBfY29uZmlnX3JzcChzdHJ1Y3QgbDJjYXBfY29u
-biAqY29ubiwgc3RydWN0IGwyY2FwX2NtZF9oZHIKIAkJCWludCBsZW4gPSBjbWQtPmxlbiAtIHNp
-emVvZigqcnNwKTsKIAkJCWNoYXIgcmVxWzY0XTsKIAorCQkJaWYgKGxlbiA+IHNpemVvZihyZXEp
-IC0gc2l6ZW9mKHN0cnVjdCBsMmNhcF9jb25mX3JlcSkpIHsKKwkJCQlsMmNhcF9zZW5kX2Rpc2Nv
-bm5fcmVxKGNvbm4sIHNrKTsKKwkJCQlnb3RvIGRvbmU7CisJCQl9CisKIAkJCS8qIHRocm93IG91
-dCBhbnkgb2xkIHN0b3JlZCBjb25mIHJlcXVlc3RzICovCiAJCQlyZXN1bHQgPSBMMkNBUF9DT05G
-X1NVQ0NFU1M7CiAJCQlsZW4gPSBsMmNhcF9wYXJzZV9jb25mX3JzcChzaywgcnNwLT5kYXRhLAot
-LSAKMS42LjAuNAoK
---00032555a08ee8f57e0482232aef--
+I would prefer if you just call it reset_work actually. I know that we
+are acting on a hardware error, but the action that we are performing is
+actually a full reset. It might be useful for other parts of the stack
+as well.
+
+>  	struct sk_buff_head	rx_q;
+>  	struct sk_buff_head	raw_q;
+>  	struct sk_buff_head	cmd_q;
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 8b4baac..c5a43e3 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -839,6 +839,51 @@ static int hci_rfkill_set_block(void *data, bool blocked)
+>  	return 0;
+>  }
+>  
+> +static void hci_device_hw_error(struct hci_dev *hdev)
+> +{
+> +	hci_req_lock(hdev);
+> +
+> +	/* notify: going down */
+> +	clear_bit(HCI_UP, &hdev->flags);
+> +	hci_notify(hdev, HCI_DEV_DOWN);
+> +
+> +	tasklet_disable(&hdev->tx_task);
+> +	skb_queue_purge(&hdev->rx_q);
+> +	skb_queue_purge(&hdev->cmd_q);
+> +
+> +	hci_dev_lock_bh(hdev);
+> +	inquiry_cache_flush(hdev);
+> +	hci_conn_hash_flush(hdev);
+> +	hci_dev_unlock_bh(hdev);
+> +
+> +	if (hdev->flush)
+> +		hdev->flush(hdev);
+> +
+> +	/* reset device */
+> +	atomic_set(&hdev->cmd_cnt, 1);
+> +	hdev->acl_cnt = 0;
+> +	hdev->sco_cnt = 0;
+> +	hci_reset_req(hdev, 0);
+> +
+> +	/* init device */
+> +	atomic_set(&hdev->cmd_cnt, 1);
+> +	hci_init_req(hdev, 0);
+> +
+> +	tasklet_enable(&hdev->tx_task);
+> +
+> +	/* notify: going back up */
+> +	set_bit(HCI_UP, &hdev->flags);
+> +	hci_notify(hdev, HCI_DEV_UP);
+> +
+> +	hci_req_unlock(hdev);
+> +}
+> +
+> +static void hci_work_hw_err(struct work_struct *ws)
+> +{
+> +	struct hci_dev *hdev = container_of(ws, struct hci_dev, work_hw_err);
+> +	hci_device_hw_error(hdev);
+> +}
+> +
+
+Please name it hci_reset_work to match it properly. And then put
+everything in the same function. No need to really split it here.
+
+What I would prefer if we can split out the open/close code and re-use
+it it here.
+
+>  static const struct rfkill_ops hci_rfkill_ops = {
+>  	.set_block = hci_rfkill_set_block,
+>  };
+> @@ -908,7 +953,7 @@ int hci_register_dev(struct hci_dev *hdev)
+>  	tasklet_init(&hdev->cmd_task, hci_cmd_task,(unsigned long) hdev);
+>  	tasklet_init(&hdev->rx_task, hci_rx_task, (unsigned long) hdev);
+>  	tasklet_init(&hdev->tx_task, hci_tx_task, (unsigned long) hdev);
+> -
+> +	INIT_WORK(&hdev->work_hw_err, hci_work_hw_err);
+>  	skb_queue_head_init(&hdev->rx_q);
+>  	skb_queue_head_init(&hdev->cmd_q);
+>  	skb_queue_head_init(&hdev->raw_q);
+
+I am missing the cancel_work_sync() call in hci_unregister_dev().
+
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 6c57fc7..6bcf3e9 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -1955,6 +1955,9 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+>  	case HCI_EV_REMOTE_HOST_FEATURES:
+>  		hci_remote_host_features_evt(hdev, skb);
+>  		break;
+> +	case HCI_EV_HARDWARE_ERROR:
+> +		queue_work(hdev->workqueue, &hdev->work_hw_err);
+> +		break;
+>  
+>  	default:
+>  		BT_DBG("%s event 0x%x", hdev->name, event);
+
+Since it seems you have the only hardware where this can be re-produced,
+it would be great if you include some hcidump -X -V extracts inside the
+commit message.
+
+Regards
+
+Marcel
+
+
