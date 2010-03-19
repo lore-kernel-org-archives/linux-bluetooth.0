@@ -1,212 +1,136 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Winkler, Tomas" <tomas.winkler@intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"Cohen, Guy" <guy.cohen@intel.com>, "Rindjunsky, Ron"
+	<ron.rindjunsky@intel.com>, "Paskar, Gregory" <gregory.paskar@intel.com>
+Date: Sat, 20 Mar 2010 01:03:23 +0200
 Subject: RE: [bluetooth-next V3] Bluetooth: handle device reset event
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Winkler, Tomas" <tomas.winkler@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"Cohen, Guy" <guy.cohen@intel.com>,
-	"Rindjunsky, Ron" <ron.rindjunsky@intel.com>,
-	"Paskar, Gregory" <gregory.paskar@intel.com>
-In-Reply-To: <6F5C1D715B2DA5498A628E6B9C124F04016C304710@hasmsx504.ger.corp.intel.com>
+Message-ID: <6F5C1D715B2DA5498A628E6B9C124F04016C304710@hasmsx504.ger.corp.intel.com>
 References: <1268898246-22693-1-git-send-email-tomas.winkler@intel.com>
-	 <1268976778.3003.14.camel@violet>
-	 <6F5C1D715B2DA5498A628E6B9C124F04016C304710@hasmsx504.ger.corp.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Sun, 21 Mar 2010 06:48:41 +0100
-Message-ID: <1269150521.4851.2.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+ <1268976778.3003.14.camel@violet>
+In-Reply-To: <1268976778.3003.14.camel@violet>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tomas,
-
-> > > A Bluetooth device experiencing hardware failure may issue
-> > > a HARDWARE_ERROR hci event. The reaction to this event is device
-> > > reset flow implemented in following sequence.
-> > >
-> > > 1. Notify: HCI_DEV_DOWN
-> > > 2. Reinitialize internal structures.
-> > > 3. Call driver flush function
-> > > 4. Send HCI reset request to the device.
-> > > 5. Send HCI init sequence reset to the device.
-> > > 6. Notify HCI_DEV_UP.
-> > >
-> > > Signed-off-by: Gregory Paskar <gregory.paskar@intel.com>
-> > > Signed-off-by: Tomas Winkler <tomas.winkler@intel.com>
-> > > Reviewed-by: Ron Rindjunsky <ron.rindjunsky@intel.com>
-> > > ---
-> > > V2:
-> > > 1. Fix email typo
-> > > 2. Fix style issues
-> > > V3:
-> > > 1. align with naming convention hw_err_work -> work_hw_err
-> > > 2. use per controller workqueue
-> > >
-> > >  include/net/bluetooth/hci.h      |    5 ++++
-> > >  include/net/bluetooth/hci_core.h |    2 +
-> > >  net/bluetooth/hci_core.c         |   47
-> > +++++++++++++++++++++++++++++++++++++-
-> > >  net/bluetooth/hci_event.c        |    3 ++
-> > >  4 files changed, 56 insertions(+), 1 deletions(-)
-> > >
-> > > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> > > index fc0c502..3f986e7 100644
-> > > --- a/include/net/bluetooth/hci.h
-> > > +++ b/include/net/bluetooth/hci.h
-> > > @@ -695,6 +695,11 @@ struct hci_ev_cmd_status {
-> > >  	__le16   opcode;
-> > >  } __attribute__ ((packed));
-> > >
-> > > +#define HCI_EV_HARDWARE_ERROR 0x10
-> > > +struct hci_ev_hw_error {
-> > > +	__u8     hw_code;
-> > > +} __attribute__ ((packed));
-> > > +
-> > 
-> > So the rule is that the HCI_EV and hci_ev struct names are matching up.
-> > It should be matching what we have in the library (not a hard
-> > requirement though):
-> > 
-> > #define EVT_HARDWARE_ERROR              0x10
-> > typedef struct {
-> >         uint8_t         code;
-> > } __attribute__ ((packed)) evt_hardware_error;
-> > 
-> > So just spell it out hardware_error. This means it is also code and not
-> > hw_code inside the struct.
-> > 
-> > >  #define HCI_EV_ROLE_CHANGE		0x12
-> > >  struct hci_ev_role_change {
-> > >  	__u8     status;
-> > > diff --git a/include/net/bluetooth/hci_core.h
-> > b/include/net/bluetooth/hci_core.h
-> > > index e17849e..1c9601d 100644
-> > > --- a/include/net/bluetooth/hci_core.h
-> > > +++ b/include/net/bluetooth/hci_core.h
-> > > @@ -113,6 +113,8 @@ struct hci_dev {
-> > >  	struct tasklet_struct	rx_task;
-> > >  	struct tasklet_struct	tx_task;
-> > >
-> > > +	struct work_struct	work_hw_err;
-> > > +
-> > 
-> > I would prefer if you just call it reset_work actually. I know that we
-> > are acting on a hardware error, but the action that we are performing is
-> > actually a full reset. It might be useful for other parts of the stack
-> > as well.
-> > 
-> > >  	struct sk_buff_head	rx_q;
-> > >  	struct sk_buff_head	raw_q;
-> > >  	struct sk_buff_head	cmd_q;
-> > > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > > index 8b4baac..c5a43e3 100644
-> > > --- a/net/bluetooth/hci_core.c
-> > > +++ b/net/bluetooth/hci_core.c
-> > > @@ -839,6 +839,51 @@ static int hci_rfkill_set_block(void *data, bool
-> > blocked)
-> > >  	return 0;
-> > >  }
-> > >
-> > > +static void hci_device_hw_error(struct hci_dev *hdev)
-> > > +{
-> > > +	hci_req_lock(hdev);
-> > > +
-> > > +	/* notify: going down */
-> > > +	clear_bit(HCI_UP, &hdev->flags);
-> > > +	hci_notify(hdev, HCI_DEV_DOWN);
-> > > +
-> > > +	tasklet_disable(&hdev->tx_task);
-> > > +	skb_queue_purge(&hdev->rx_q);
-> > > +	skb_queue_purge(&hdev->cmd_q);
-> > > +
-> > > +	hci_dev_lock_bh(hdev);
-> > > +	inquiry_cache_flush(hdev);
-> > > +	hci_conn_hash_flush(hdev);
-> > > +	hci_dev_unlock_bh(hdev);
-> > > +
-> > > +	if (hdev->flush)
-> > > +		hdev->flush(hdev);
-> > > +
-> > > +	/* reset device */
-> > > +	atomic_set(&hdev->cmd_cnt, 1);
-> > > +	hdev->acl_cnt = 0;
-> > > +	hdev->sco_cnt = 0;
-> > > +	hci_reset_req(hdev, 0);
-> > > +
-> > > +	/* init device */
-> > > +	atomic_set(&hdev->cmd_cnt, 1);
-> > > +	hci_init_req(hdev, 0);
-> > > +
-> > > +	tasklet_enable(&hdev->tx_task);
-> > > +
-> > > +	/* notify: going back up */
-> > > +	set_bit(HCI_UP, &hdev->flags);
-> > > +	hci_notify(hdev, HCI_DEV_UP);
-> > > +
-> > > +	hci_req_unlock(hdev);
-> > > +}
-> > > +
-> > > +static void hci_work_hw_err(struct work_struct *ws)
-> > > +{
-> > > +	struct hci_dev *hdev = container_of(ws, struct hci_dev, work_hw_err);
-> > > +	hci_device_hw_error(hdev);
-> > > +}
-> > > +
-> > 
-> > Please name it hci_reset_work to match it properly. And then put
-> > everything in the same function. No need to really split it here.
-> > 
-> > What I would prefer if we can split out the open/close code and re-use
-> > it it here.
-> > 
-> > >  static const struct rfkill_ops hci_rfkill_ops = {
-> > >  	.set_block = hci_rfkill_set_block,
-> > >  };
-> > > @@ -908,7 +953,7 @@ int hci_register_dev(struct hci_dev *hdev)
-> > >  	tasklet_init(&hdev->cmd_task, hci_cmd_task,(unsigned long) hdev);
-> > >  	tasklet_init(&hdev->rx_task, hci_rx_task, (unsigned long) hdev);
-> > >  	tasklet_init(&hdev->tx_task, hci_tx_task, (unsigned long) hdev);
-> > > -
-> > > +	INIT_WORK(&hdev->work_hw_err, hci_work_hw_err);
-> > >  	skb_queue_head_init(&hdev->rx_q);
-> > >  	skb_queue_head_init(&hdev->cmd_q);
-> > >  	skb_queue_head_init(&hdev->raw_q);
-> > 
-> > I am missing the cancel_work_sync() call in hci_unregister_dev().
-> > 
-> > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > > index 6c57fc7..6bcf3e9 100644
-> > > --- a/net/bluetooth/hci_event.c
-> > > +++ b/net/bluetooth/hci_event.c
-> > > @@ -1955,6 +1955,9 @@ void hci_event_packet(struct hci_dev *hdev, struct
-> > sk_buff *skb)
-> > >  	case HCI_EV_REMOTE_HOST_FEATURES:
-> > >  		hci_remote_host_features_evt(hdev, skb);
-> > >  		break;
-> > > +	case HCI_EV_HARDWARE_ERROR:
-> > > +		queue_work(hdev->workqueue, &hdev->work_hw_err);
-> > > +		break;
-> > >
-> > >  	default:
-> > >  		BT_DBG("%s event 0x%x", hdev->name, event);
-> > 
-> > Since it seems you have the only hardware where this can be re-produced,
-> > it would be great if you include some hcidump -X -V extracts inside the
-> > commit message.
-> > 
-> 
-> What exactly are you looking for? I'm testing it by artificially triggering the error. Does hci dump has any value in that case?
-
-you mentioned that you see hardware error events on real hardware. I
-like to see the hcidump from that actually.
-
-And btw. the bluetooth-testing tree now contains the patches to push
-event processing into a workqueue. They have limit testing so far, but
-seems to work fine. Someone still needs to do some performance testing
-before we can clear that patch for upstream. However it should make your
-reset logic patch a lot simpler.
-
-Regards
-
-Marcel
-
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTWFyY2VsIEhvbHRtYW5u
+IFttYWlsdG86bWFyY2VsQGhvbHRtYW5uLm9yZ10NCj4gU2VudDogRnJpZGF5LCBNYXJjaCAxOSwg
+MjAxMCA3OjMzIEFNDQo+IFRvOiBXaW5rbGVyLCBUb21hcw0KPiBDYzogbGludXgtYmx1ZXRvb3Ro
+QHZnZXIua2VybmVsLm9yZzsgQ29oZW4sIEd1eTsgUmluZGp1bnNreSwgUm9uOyBQYXNrYXIsDQo+
+IEdyZWdvcnkNCj4gU3ViamVjdDogUmU6IFtibHVldG9vdGgtbmV4dCBWM10gQmx1ZXRvb3RoOiBo
+YW5kbGUgZGV2aWNlIHJlc2V0IGV2ZW50DQo+IA0KPiBIaSBUb21hcywNCj4gDQo+ID4gRnJvbTog
+R3JlZ29yeSBQYXNrYXIgPGdyZWdvcnkucGFza2FyQGludGVsLmNvbT4NCj4gPg0KPiA+IEEgQmx1
+ZXRvb3RoIGRldmljZSBleHBlcmllbmNpbmcgaGFyZHdhcmUgZmFpbHVyZSBtYXkgaXNzdWUNCj4g
+PiBhIEhBUkRXQVJFX0VSUk9SIGhjaSBldmVudC4gVGhlIHJlYWN0aW9uIHRvIHRoaXMgZXZlbnQg
+aXMgZGV2aWNlDQo+ID4gcmVzZXQgZmxvdyBpbXBsZW1lbnRlZCBpbiBmb2xsb3dpbmcgc2VxdWVu
+Y2UuDQo+ID4NCj4gPiAxLiBOb3RpZnk6IEhDSV9ERVZfRE9XTg0KPiA+IDIuIFJlaW5pdGlhbGl6
+ZSBpbnRlcm5hbCBzdHJ1Y3R1cmVzLg0KPiA+IDMuIENhbGwgZHJpdmVyIGZsdXNoIGZ1bmN0aW9u
+DQo+ID4gNC4gU2VuZCBIQ0kgcmVzZXQgcmVxdWVzdCB0byB0aGUgZGV2aWNlLg0KPiA+IDUuIFNl
+bmQgSENJIGluaXQgc2VxdWVuY2UgcmVzZXQgdG8gdGhlIGRldmljZS4NCj4gPiA2LiBOb3RpZnkg
+SENJX0RFVl9VUC4NCj4gPg0KPiA+IFNpZ25lZC1vZmYtYnk6IEdyZWdvcnkgUGFza2FyIDxncmVn
+b3J5LnBhc2thckBpbnRlbC5jb20+DQo+ID4gU2lnbmVkLW9mZi1ieTogVG9tYXMgV2lua2xlciA8
+dG9tYXMud2lua2xlckBpbnRlbC5jb20+DQo+ID4gUmV2aWV3ZWQtYnk6IFJvbiBSaW5kanVuc2t5
+IDxyb24ucmluZGp1bnNreUBpbnRlbC5jb20+DQo+ID4gLS0tDQo+ID4gVjI6DQo+ID4gMS4gRml4
+IGVtYWlsIHR5cG8NCj4gPiAyLiBGaXggc3R5bGUgaXNzdWVzDQo+ID4gVjM6DQo+ID4gMS4gYWxp
+Z24gd2l0aCBuYW1pbmcgY29udmVudGlvbiBod19lcnJfd29yayAtPiB3b3JrX2h3X2Vycg0KPiA+
+IDIuIHVzZSBwZXIgY29udHJvbGxlciB3b3JrcXVldWUNCj4gPg0KPiA+ICBpbmNsdWRlL25ldC9i
+bHVldG9vdGgvaGNpLmggICAgICB8ICAgIDUgKysrKw0KPiA+ICBpbmNsdWRlL25ldC9ibHVldG9v
+dGgvaGNpX2NvcmUuaCB8ICAgIDIgKw0KPiA+ICBuZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmMgICAg
+ICAgICB8ICAgNDcNCj4gKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0NCj4g
+PiAgbmV0L2JsdWV0b290aC9oY2lfZXZlbnQuYyAgICAgICAgfCAgICAzICsrDQo+ID4gIDQgZmls
+ZXMgY2hhbmdlZCwgNTYgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbnMoLSkNCj4gPg0KPiA+IGRp
+ZmYgLS1naXQgYS9pbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpLmggYi9pbmNsdWRlL25ldC9ibHVl
+dG9vdGgvaGNpLmgNCj4gPiBpbmRleCBmYzBjNTAyLi4zZjk4NmU3IDEwMDY0NA0KPiA+IC0tLSBh
+L2luY2x1ZGUvbmV0L2JsdWV0b290aC9oY2kuaA0KPiA+ICsrKyBiL2luY2x1ZGUvbmV0L2JsdWV0
+b290aC9oY2kuaA0KPiA+IEBAIC02OTUsNiArNjk1LDExIEBAIHN0cnVjdCBoY2lfZXZfY21kX3N0
+YXR1cyB7DQo+ID4gIAlfX2xlMTYgICBvcGNvZGU7DQo+ID4gIH0gX19hdHRyaWJ1dGVfXyAoKHBh
+Y2tlZCkpOw0KPiA+DQo+ID4gKyNkZWZpbmUgSENJX0VWX0hBUkRXQVJFX0VSUk9SIDB4MTANCj4g
+PiArc3RydWN0IGhjaV9ldl9od19lcnJvciB7DQo+ID4gKwlfX3U4ICAgICBod19jb2RlOw0KPiA+
+ICt9IF9fYXR0cmlidXRlX18gKChwYWNrZWQpKTsNCj4gPiArDQo+IA0KPiBTbyB0aGUgcnVsZSBp
+cyB0aGF0IHRoZSBIQ0lfRVYgYW5kIGhjaV9ldiBzdHJ1Y3QgbmFtZXMgYXJlIG1hdGNoaW5nIHVw
+Lg0KPiBJdCBzaG91bGQgYmUgbWF0Y2hpbmcgd2hhdCB3ZSBoYXZlIGluIHRoZSBsaWJyYXJ5IChu
+b3QgYSBoYXJkDQo+IHJlcXVpcmVtZW50IHRob3VnaCk6DQo+IA0KPiAjZGVmaW5lIEVWVF9IQVJE
+V0FSRV9FUlJPUiAgICAgICAgICAgICAgMHgxMA0KPiB0eXBlZGVmIHN0cnVjdCB7DQo+ICAgICAg
+ICAgdWludDhfdCAgICAgICAgIGNvZGU7DQo+IH0gX19hdHRyaWJ1dGVfXyAoKHBhY2tlZCkpIGV2
+dF9oYXJkd2FyZV9lcnJvcjsNCj4gDQo+IFNvIGp1c3Qgc3BlbGwgaXQgb3V0IGhhcmR3YXJlX2Vy
+cm9yLiBUaGlzIG1lYW5zIGl0IGlzIGFsc28gY29kZSBhbmQgbm90DQo+IGh3X2NvZGUgaW5zaWRl
+IHRoZSBzdHJ1Y3QuDQo+IA0KPiA+ICAjZGVmaW5lIEhDSV9FVl9ST0xFX0NIQU5HRQkJMHgxMg0K
+PiA+ICBzdHJ1Y3QgaGNpX2V2X3JvbGVfY2hhbmdlIHsNCj4gPiAgCV9fdTggICAgIHN0YXR1czsN
+Cj4gPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmgNCj4gYi9p
+bmNsdWRlL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuaA0KPiA+IGluZGV4IGUxNzg0OWUuLjFjOTYw
+MWQgMTAwNjQ0DQo+ID4gLS0tIGEvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmgNCj4g
+PiArKysgYi9pbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuaA0KPiA+IEBAIC0xMTMsNiAr
+MTEzLDggQEAgc3RydWN0IGhjaV9kZXYgew0KPiA+ICAJc3RydWN0IHRhc2tsZXRfc3RydWN0CXJ4
+X3Rhc2s7DQo+ID4gIAlzdHJ1Y3QgdGFza2xldF9zdHJ1Y3QJdHhfdGFzazsNCj4gPg0KPiA+ICsJ
+c3RydWN0IHdvcmtfc3RydWN0CXdvcmtfaHdfZXJyOw0KPiA+ICsNCj4gDQo+IEkgd291bGQgcHJl
+ZmVyIGlmIHlvdSBqdXN0IGNhbGwgaXQgcmVzZXRfd29yayBhY3R1YWxseS4gSSBrbm93IHRoYXQg
+d2UNCj4gYXJlIGFjdGluZyBvbiBhIGhhcmR3YXJlIGVycm9yLCBidXQgdGhlIGFjdGlvbiB0aGF0
+IHdlIGFyZSBwZXJmb3JtaW5nIGlzDQo+IGFjdHVhbGx5IGEgZnVsbCByZXNldC4gSXQgbWlnaHQg
+YmUgdXNlZnVsIGZvciBvdGhlciBwYXJ0cyBvZiB0aGUgc3RhY2sNCj4gYXMgd2VsbC4NCj4gDQo+
+ID4gIAlzdHJ1Y3Qgc2tfYnVmZl9oZWFkCXJ4X3E7DQo+ID4gIAlzdHJ1Y3Qgc2tfYnVmZl9oZWFk
+CXJhd19xOw0KPiA+ICAJc3RydWN0IHNrX2J1ZmZfaGVhZAljbWRfcTsNCj4gPiBkaWZmIC0tZ2l0
+IGEvbmV0L2JsdWV0b290aC9oY2lfY29yZS5jIGIvbmV0L2JsdWV0b290aC9oY2lfY29yZS5jDQo+
+ID4gaW5kZXggOGI0YmFhYy4uYzVhNDNlMyAxMDA2NDQNCj4gPiAtLS0gYS9uZXQvYmx1ZXRvb3Ro
+L2hjaV9jb3JlLmMNCj4gPiArKysgYi9uZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmMNCj4gPiBAQCAt
+ODM5LDYgKzgzOSw1MSBAQCBzdGF0aWMgaW50IGhjaV9yZmtpbGxfc2V0X2Jsb2NrKHZvaWQgKmRh
+dGEsIGJvb2wNCj4gYmxvY2tlZCkNCj4gPiAgCXJldHVybiAwOw0KPiA+ICB9DQo+ID4NCj4gPiAr
+c3RhdGljIHZvaWQgaGNpX2RldmljZV9od19lcnJvcihzdHJ1Y3QgaGNpX2RldiAqaGRldikNCj4g
+PiArew0KPiA+ICsJaGNpX3JlcV9sb2NrKGhkZXYpOw0KPiA+ICsNCj4gPiArCS8qIG5vdGlmeTog
+Z29pbmcgZG93biAqLw0KPiA+ICsJY2xlYXJfYml0KEhDSV9VUCwgJmhkZXYtPmZsYWdzKTsNCj4g
+PiArCWhjaV9ub3RpZnkoaGRldiwgSENJX0RFVl9ET1dOKTsNCj4gPiArDQo+ID4gKwl0YXNrbGV0
+X2Rpc2FibGUoJmhkZXYtPnR4X3Rhc2spOw0KPiA+ICsJc2tiX3F1ZXVlX3B1cmdlKCZoZGV2LT5y
+eF9xKTsNCj4gPiArCXNrYl9xdWV1ZV9wdXJnZSgmaGRldi0+Y21kX3EpOw0KPiA+ICsNCj4gPiAr
+CWhjaV9kZXZfbG9ja19iaChoZGV2KTsNCj4gPiArCWlucXVpcnlfY2FjaGVfZmx1c2goaGRldik7
+DQo+ID4gKwloY2lfY29ubl9oYXNoX2ZsdXNoKGhkZXYpOw0KPiA+ICsJaGNpX2Rldl91bmxvY2tf
+YmgoaGRldik7DQo+ID4gKw0KPiA+ICsJaWYgKGhkZXYtPmZsdXNoKQ0KPiA+ICsJCWhkZXYtPmZs
+dXNoKGhkZXYpOw0KPiA+ICsNCj4gPiArCS8qIHJlc2V0IGRldmljZSAqLw0KPiA+ICsJYXRvbWlj
+X3NldCgmaGRldi0+Y21kX2NudCwgMSk7DQo+ID4gKwloZGV2LT5hY2xfY250ID0gMDsNCj4gPiAr
+CWhkZXYtPnNjb19jbnQgPSAwOw0KPiA+ICsJaGNpX3Jlc2V0X3JlcShoZGV2LCAwKTsNCj4gPiAr
+DQo+ID4gKwkvKiBpbml0IGRldmljZSAqLw0KPiA+ICsJYXRvbWljX3NldCgmaGRldi0+Y21kX2Nu
+dCwgMSk7DQo+ID4gKwloY2lfaW5pdF9yZXEoaGRldiwgMCk7DQo+ID4gKw0KPiA+ICsJdGFza2xl
+dF9lbmFibGUoJmhkZXYtPnR4X3Rhc2spOw0KPiA+ICsNCj4gPiArCS8qIG5vdGlmeTogZ29pbmcg
+YmFjayB1cCAqLw0KPiA+ICsJc2V0X2JpdChIQ0lfVVAsICZoZGV2LT5mbGFncyk7DQo+ID4gKwlo
+Y2lfbm90aWZ5KGhkZXYsIEhDSV9ERVZfVVApOw0KPiA+ICsNCj4gPiArCWhjaV9yZXFfdW5sb2Nr
+KGhkZXYpOw0KPiA+ICt9DQo+ID4gKw0KPiA+ICtzdGF0aWMgdm9pZCBoY2lfd29ya19od19lcnIo
+c3RydWN0IHdvcmtfc3RydWN0ICp3cykNCj4gPiArew0KPiA+ICsJc3RydWN0IGhjaV9kZXYgKmhk
+ZXYgPSBjb250YWluZXJfb2Yod3MsIHN0cnVjdCBoY2lfZGV2LCB3b3JrX2h3X2Vycik7DQo+ID4g
+KwloY2lfZGV2aWNlX2h3X2Vycm9yKGhkZXYpOw0KPiA+ICt9DQo+ID4gKw0KPiANCj4gUGxlYXNl
+IG5hbWUgaXQgaGNpX3Jlc2V0X3dvcmsgdG8gbWF0Y2ggaXQgcHJvcGVybHkuIEFuZCB0aGVuIHB1
+dA0KPiBldmVyeXRoaW5nIGluIHRoZSBzYW1lIGZ1bmN0aW9uLiBObyBuZWVkIHRvIHJlYWxseSBz
+cGxpdCBpdCBoZXJlLg0KPiANCj4gV2hhdCBJIHdvdWxkIHByZWZlciBpZiB3ZSBjYW4gc3BsaXQg
+b3V0IHRoZSBvcGVuL2Nsb3NlIGNvZGUgYW5kIHJlLXVzZQ0KPiBpdCBpdCBoZXJlLg0KPiANCj4g
+PiAgc3RhdGljIGNvbnN0IHN0cnVjdCByZmtpbGxfb3BzIGhjaV9yZmtpbGxfb3BzID0gew0KPiA+
+ICAJLnNldF9ibG9jayA9IGhjaV9yZmtpbGxfc2V0X2Jsb2NrLA0KPiA+ICB9Ow0KPiA+IEBAIC05
+MDgsNyArOTUzLDcgQEAgaW50IGhjaV9yZWdpc3Rlcl9kZXYoc3RydWN0IGhjaV9kZXYgKmhkZXYp
+DQo+ID4gIAl0YXNrbGV0X2luaXQoJmhkZXYtPmNtZF90YXNrLCBoY2lfY21kX3Rhc2ssKHVuc2ln
+bmVkIGxvbmcpIGhkZXYpOw0KPiA+ICAJdGFza2xldF9pbml0KCZoZGV2LT5yeF90YXNrLCBoY2lf
+cnhfdGFzaywgKHVuc2lnbmVkIGxvbmcpIGhkZXYpOw0KPiA+ICAJdGFza2xldF9pbml0KCZoZGV2
+LT50eF90YXNrLCBoY2lfdHhfdGFzaywgKHVuc2lnbmVkIGxvbmcpIGhkZXYpOw0KPiA+IC0NCj4g
+PiArCUlOSVRfV09SSygmaGRldi0+d29ya19od19lcnIsIGhjaV93b3JrX2h3X2Vycik7DQo+ID4g
+IAlza2JfcXVldWVfaGVhZF9pbml0KCZoZGV2LT5yeF9xKTsNCj4gPiAgCXNrYl9xdWV1ZV9oZWFk
+X2luaXQoJmhkZXYtPmNtZF9xKTsNCj4gPiAgCXNrYl9xdWV1ZV9oZWFkX2luaXQoJmhkZXYtPnJh
+d19xKTsNCj4gDQo+IEkgYW0gbWlzc2luZyB0aGUgY2FuY2VsX3dvcmtfc3luYygpIGNhbGwgaW4g
+aGNpX3VucmVnaXN0ZXJfZGV2KCkuDQo+IA0KPiA+IGRpZmYgLS1naXQgYS9uZXQvYmx1ZXRvb3Ro
+L2hjaV9ldmVudC5jIGIvbmV0L2JsdWV0b290aC9oY2lfZXZlbnQuYw0KPiA+IGluZGV4IDZjNTdm
+YzcuLjZiY2YzZTkgMTAwNjQ0DQo+ID4gLS0tIGEvbmV0L2JsdWV0b290aC9oY2lfZXZlbnQuYw0K
+PiA+ICsrKyBiL25ldC9ibHVldG9vdGgvaGNpX2V2ZW50LmMNCj4gPiBAQCAtMTk1NSw2ICsxOTU1
+LDkgQEAgdm9pZCBoY2lfZXZlbnRfcGFja2V0KHN0cnVjdCBoY2lfZGV2ICpoZGV2LCBzdHJ1Y3QN
+Cj4gc2tfYnVmZiAqc2tiKQ0KPiA+ICAJY2FzZSBIQ0lfRVZfUkVNT1RFX0hPU1RfRkVBVFVSRVM6
+DQo+ID4gIAkJaGNpX3JlbW90ZV9ob3N0X2ZlYXR1cmVzX2V2dChoZGV2LCBza2IpOw0KPiA+ICAJ
+CWJyZWFrOw0KPiA+ICsJY2FzZSBIQ0lfRVZfSEFSRFdBUkVfRVJST1I6DQo+ID4gKwkJcXVldWVf
+d29yayhoZGV2LT53b3JrcXVldWUsICZoZGV2LT53b3JrX2h3X2Vycik7DQo+ID4gKwkJYnJlYWs7
+DQo+ID4NCj4gPiAgCWRlZmF1bHQ6DQo+ID4gIAkJQlRfREJHKCIlcyBldmVudCAweCV4IiwgaGRl
+di0+bmFtZSwgZXZlbnQpOw0KPiANCj4gU2luY2UgaXQgc2VlbXMgeW91IGhhdmUgdGhlIG9ubHkg
+aGFyZHdhcmUgd2hlcmUgdGhpcyBjYW4gYmUgcmUtcHJvZHVjZWQsDQo+IGl0IHdvdWxkIGJlIGdy
+ZWF0IGlmIHlvdSBpbmNsdWRlIHNvbWUgaGNpZHVtcCAtWCAtViBleHRyYWN0cyBpbnNpZGUgdGhl
+DQo+IGNvbW1pdCBtZXNzYWdlLg0KPiANCg0KV2hhdCBleGFjdGx5IGFyZSB5b3UgbG9va2luZyBm
+b3I/IEknbSB0ZXN0aW5nIGl0IGJ5IGFydGlmaWNpYWxseSB0cmlnZ2VyaW5nIHRoZSBlcnJvci4g
+RG9lcyBoY2kgZHVtcCBoYXMgYW55IHZhbHVlIGluIHRoYXQgY2FzZT8NCg0KVGhhbmtzDQpUb21h
+cw0KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tCkludGVsIElzcmFlbCAoNzQpIExpbWl0ZWQKClRoaXMgZS1tYWlsIGFu
+ZCBhbnkgYXR0YWNobWVudHMgbWF5IGNvbnRhaW4gY29uZmlkZW50aWFsIG1hdGVyaWFsIGZvcgp0
+aGUgc29sZSB1c2Ugb2YgdGhlIGludGVuZGVkIHJlY2lwaWVudChzKS4gQW55IHJldmlldyBvciBk
+aXN0cmlidXRpb24KYnkgb3RoZXJzIGlzIHN0cmljdGx5IHByb2hpYml0ZWQuIElmIHlvdSBhcmUg
+bm90IHRoZSBpbnRlbmRlZApyZWNpcGllbnQsIHBsZWFzZSBjb250YWN0IHRoZSBzZW5kZXIgYW5k
+IGRlbGV0ZSBhbGwgY29waWVzLgo=
