@@ -1,46 +1,176 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <35c90d961003082331p6798006do17d6178ae2840591@mail.gmail.com>
-References: <35c90d961002172104q3af1ca8p850004f8b93e8af7@mail.gmail.com>
-	 <a8e1da1002200017t6e856c7cu1300ac5b3b3a43b@mail.gmail.com>
-	 <35c90d961002211300s25507542y9b73724881be5540@mail.gmail.com>
-	 <4B87A10C.4070100@nokia.com> <4B95F67A.9090305@nokia.com>
-	 <35c90d961003082331p6798006do17d6178ae2840591@mail.gmail.com>
-Date: Fri, 19 Mar 2010 10:33:02 +0200
-Message-ID: <508e92ca1003190133m1e2769ev36430d3c3b28504@mail.gmail.com>
-Subject: Re: Kernel panic in rfcomm_run - unbalanced refcount on
-	rfcomm_session
+In-Reply-To: <20100315150203.GA31186@vigoh>
+References: <508e92ca1002160236k34c18949jc7d7187645ef4aa0@mail.gmail.com>
+	 <20100311224140.GA17295@vigoh>
+	 <508e92ca1003150357t77defd4fqcd843965af35970a@mail.gmail.com>
+	 <20100315150203.GA31186@vigoh>
+Date: Fri, 19 Mar 2010 10:31:01 +0200
+Message-ID: <508e92ca1003190131l61964e71ke0d813c2c2644b8d@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Fix kernel crash on BT stress tests.
 From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Nick Pelly <npelly@google.com>
-Cc: Ville Tervo <ville.tervo@nokia.com>, Dave Young <hidave.darkstar@gmail.com>,
-	Bluettooth Linux <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset=ISO-8859-1
+To: "Gustavo F. Padovan" <gustavo@padovan.org>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+Content-Type: multipart/mixed; boundary=00032555a08ee8f57e0482232aef
 List-ID: <linux-bluetooth.vger.kernel.org>
+
+--00032555a08ee8f57e0482232aef
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
 Hi,
 
-On Tue, Mar 9, 2010 at 9:31 AM, Nick Pelly <npelly@google.com> wrote:
-> On Mon, Mar 8, 2010 at 11:19 PM, Ville Tervo <ville.tervo@nokia.com> wrote:
->> Tervo Ville (Nokia-D/Helsinki) wrote:
->>>
->>> l2cap socket status might change while rfcomm is processing frames. And
->>> that makes rfcomm_process_rx to do double rfcomm_session_put() for incoming
->>> session reference. We cannot use sk_state.
->>>
->>> Could you try with this patch if it helps to your problems also? My OPP
->>> problems went away with this patch.
->>>
->>> I moved rfcomm_session_put() for incoming session to rfcomm_session_close
->>> in order to get more clear _hold()/_put() pairs.
->>>
->>>
->>
->> Any comments about the patch in previous mail?
+On Mon, Mar 15, 2010 at 5:05 PM, Gustavo F. Padovan <gustavo@padovan.org> w=
+rote:
+> * Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2010-03-15 12:5=
+7:18 +0200]:
 >
-> Your patch looks sane to me, although I know enough of the Bluez
-> rfcomm state machine to know that I don't know it that well :)
+>> Hi Gustavo
+>>
+>> On Fri, Mar 12, 2010 at 12:41 AM, Gustavo F. Padovan
+>> <padovan@profusion.mobi> wrote:
+>> > Hi Andrei,
+>> >
+>> > * Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2010-02-16 1=
+2:36:47 +0200]:
+>> >
+>> >> From 0135f732cb45e5e91062aca84a61a40b172200a4 Mon Sep 17 00:00:00 200=
+1
+>> >> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+>> >> Date: Tue, 16 Feb 2010 10:52:33 +0200
+>> >> Subject: [PATCH] Bluetooth: Fix kernel crash on BT stress tests.
+>> >>
+>> >> Added very simple check that req buffer has enough space to
+>> >> fit configuration parameters. Shall be enough to reject packets
+>> >> with configuration size more than req buffer.
+>> >>
+>> >> Crash trace below
+>> >>
+>> >> [ 6069.659393] Unable to handle kernel paging request at virtual
+>> >> address 02000205
+>> >> [ 6069.673034] Internal error: Oops: 805 [#1] PREEMPT
+>> >> ...
+>> >> [ 6069.727172] PC is at l2cap_add_conf_opt+0x70/0xf0 [l2cap]
+>> >> [ 6069.732604] LR is at l2cap_recv_frame+0x1350/0x2e78 [l2cap]
+>> >> ...
+>> >> [ 6070.030303] Backtrace:
+>> >> [ 6070.032806] [<bf1c2880>] (l2cap_add_conf_opt+0x0/0xf0 [l2cap]) fro=
+m
+>> >> [<bf1c6624>] (l2cap_recv_frame+0x1350/0x2e78 [l2cap])
+>> >> [ 6070.043823] =A0r8:dc5d3100 r7:df2a91d6 r6:00000001 r5:df2a8000 r4:=
+00000200
+>> >> [ 6070.050659] [<bf1c52d4>] (l2cap_recv_frame+0x0/0x2e78 [l2cap]) fro=
+m
+>> >> [<bf1c8408>] (l2cap_recv_acldata+0x2bc/0x350 [l2cap])
+>> >> [ 6070.061798] [<bf1c814c>] (l2cap_recv_acldata+0x0/0x350 [l2cap]) fr=
+om
+>> >> [<bf0037a4>] (hci_rx_task+0x244/0x478 [bluetooth])
+>> >> [ 6070.072631] =A0r6:dc647700 r5:00000001 r4:df2ab740
+>> >> [ 6070.077362] [<bf003560>] (hci_rx_task+0x0/0x478 [bluetooth]) from
+>> >> [<c006b9fc>] (tasklet_action+0x78/0xd8)
+>> >> [ 6070.087005] [<c006b984>] (tasklet_action+0x0/0xd8) from [<c006c160=
+>]
+>> >>
+>> >> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+>> >> ---
+>> >> =A0net/bluetooth/l2cap.c | =A0 =A06 ++++++
+>> >> =A01 files changed, 6 insertions(+), 0 deletions(-)
+>> >>
+>> >> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+>> >> index 400efa2..69b7280 100644
+>> >> --- a/net/bluetooth/l2cap.c
+>> >> +++ b/net/bluetooth/l2cap.c
+>> >> @@ -2830,6 +2830,12 @@ static inline int l2cap_config_rsp(struct
+>> >> l2cap_conn *conn, struct l2cap_cmd_hdr
+>> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 int len =3D cmd->len - si=
+zeof(*rsp);
+>> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 char req[64];
+>> >>
+>> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (len > sizeof(req) - siz=
+eof(struct l2cap_conf_req)) {
+>> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 BT_ERR("Con=
+fig response is too big");
+>> >
+>> > Remove the BT_ERR, normally we don't print any error on
+>> > l2cap_send_disconn_req.
+>> >
+>> >
+>> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 l2cap_send_=
+disconn_req(conn, sk);
+>> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto done;
+>> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+>> >> +
+>> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* throw out any old stor=
+ed conf requests */
+>> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 result =3D L2CAP_CONF_SUC=
+CESS;
+>> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 len =3D l2cap_parse_conf_=
+rsp(sk, rsp->data,
+>> >
+>> > Also, this is very rare crash. Even if we add all configure options to
+>> > req we won't overwrite it. Doesn't make sense to me send a
+>> > configuration option more than once in the same config_{rsp,req}. The
+>> > only way to crash l2cap is using a bugous remote stack or a stress tes=
+t
+>> > tools. We need to be protected against those bugous stacks so I'll
+>> > ack your patch after you send the updated patch without the BT_ERR.
+>> >
+>>
+>> I am attaching patch to the mail, otherwise it may be screwed up by mail=
+ers.
+>
+> Acked-by: Gustavo F. Padovan <gustavo@padovan.org>
 
-We have tested this patch and it looks to be working. Shall we apply it?
+Thanks.  I am attaching patch.
 
 Regards,
 Andrei
+
+--00032555a08ee8f57e0482232aef
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-Bluetooth-Fix-kernel-crash-on-BT-stress-tests.patch"
+Content-Disposition: attachment;
+	filename="0001-Bluetooth-Fix-kernel-crash-on-BT-stress-tests.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_g6yqa4520
+
+RnJvbSBhZjhjYWIzMDg3Y2Y0ZDQ4NjVhZDg4ZmIyNWQxMzBlYmVhMTA4ZGIwIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBBbmRyZWkgRW1lbHRjaGVua28gPGFuZHJlaS5lbWVsdGNoZW5r
+b0Bub2tpYS5jb20+CkRhdGU6IFR1ZSwgMTYgRmViIDIwMTAgMTA6NTI6MzMgKzAyMDAKU3ViamVj
+dDogW1BBVENIXSBCbHVldG9vdGg6IEZpeCBrZXJuZWwgY3Jhc2ggb24gQlQgc3RyZXNzIHRlc3Rz
+LgoKQWRkZWQgdmVyeSBzaW1wbGUgY2hlY2sgdGhhdCByZXEgYnVmZmVyIGhhcyBlbm91Z2ggc3Bh
+Y2UgdG8KZml0IGNvbmZpZ3VyYXRpb24gcGFyYW1ldGVycy4gU2hhbGwgYmUgZW5vdWdoIHRvIHJl
+amVjdCBwYWNrZXRzCndpdGggY29uZmlndXJhdGlvbiBzaXplIG1vcmUgdGhhbiByZXEgYnVmZmVy
+LgoKQ3Jhc2ggdHJhY2UgYmVsb3cKClsgNjA2OS42NTkzOTNdIFVuYWJsZSB0byBoYW5kbGUga2Vy
+bmVsIHBhZ2luZyByZXF1ZXN0IGF0IHZpcnR1YWwgYWRkcmVzcyAwMjAwMDIwNQpbIDYwNjkuNjcz
+MDM0XSBJbnRlcm5hbCBlcnJvcjogT29wczogODA1IFsjMV0gUFJFRU1QVAouLi4KWyA2MDY5Ljcy
+NzE3Ml0gUEMgaXMgYXQgbDJjYXBfYWRkX2NvbmZfb3B0KzB4NzAvMHhmMCBbbDJjYXBdClsgNjA2
+OS43MzI2MDRdIExSIGlzIGF0IGwyY2FwX3JlY3ZfZnJhbWUrMHgxMzUwLzB4MmU3OCBbbDJjYXBd
+Ci4uLgpbIDYwNzAuMDMwMzAzXSBCYWNrdHJhY2U6ClsgNjA3MC4wMzI4MDZdIFs8YmYxYzI4ODA+
+XSAobDJjYXBfYWRkX2NvbmZfb3B0KzB4MC8weGYwIFtsMmNhcF0pIGZyb20KWzxiZjFjNjYyND5d
+IChsMmNhcF9yZWN2X2ZyYW1lKzB4MTM1MC8weDJlNzggW2wyY2FwXSkKWyA2MDcwLjA0MzgyM10g
+IHI4OmRjNWQzMTAwIHI3OmRmMmE5MWQ2IHI2OjAwMDAwMDAxIHI1OmRmMmE4MDAwIHI0OjAwMDAw
+MjAwClsgNjA3MC4wNTA2NTldIFs8YmYxYzUyZDQ+XSAobDJjYXBfcmVjdl9mcmFtZSsweDAvMHgy
+ZTc4IFtsMmNhcF0pIGZyb20KWzxiZjFjODQwOD5dIChsMmNhcF9yZWN2X2FjbGRhdGErMHgyYmMv
+MHgzNTAgW2wyY2FwXSkKWyA2MDcwLjA2MTc5OF0gWzxiZjFjODE0Yz5dIChsMmNhcF9yZWN2X2Fj
+bGRhdGErMHgwLzB4MzUwIFtsMmNhcF0pIGZyb20KWzxiZjAwMzdhND5dIChoY2lfcnhfdGFzaysw
+eDI0NC8weDQ3OCBbYmx1ZXRvb3RoXSkKWyA2MDcwLjA3MjYzMV0gIHI2OmRjNjQ3NzAwIHI1OjAw
+MDAwMDAxIHI0OmRmMmFiNzQwClsgNjA3MC4wNzczNjJdIFs8YmYwMDM1NjA+XSAoaGNpX3J4X3Rh
+c2srMHgwLzB4NDc4IFtibHVldG9vdGhdKSBmcm9tCls8YzAwNmI5ZmM+XSAodGFza2xldF9hY3Rp
+b24rMHg3OC8weGQ4KQpbIDYwNzAuMDg3MDA1XSBbPGMwMDZiOTg0Pl0gKHRhc2tsZXRfYWN0aW9u
+KzB4MC8weGQ4KSBmcm9tIFs8YzAwNmMxNjA+XQoKU2lnbmVkLW9mZi1ieTogQW5kcmVpIEVtZWx0
+Y2hlbmtvIDxhbmRyZWkuZW1lbHRjaGVua29Abm9raWEuY29tPgpBY2tlZC1ieTogR3VzdGF2byBG
+LiBQYWRvdmFuIDxndXN0YXZvQHBhZG92YW4ub3JnPgotLS0KIG5ldC9ibHVldG9vdGgvbDJjYXAu
+YyB8ICAgIDUgKysrKysKIDEgZmlsZXMgY2hhbmdlZCwgNSBpbnNlcnRpb25zKCspLCAwIGRlbGV0
+aW9ucygtKQoKZGlmZiAtLWdpdCBhL25ldC9ibHVldG9vdGgvbDJjYXAuYyBiL25ldC9ibHVldG9v
+dGgvbDJjYXAuYwppbmRleCA5MzBmOTg3Li5mNDI1OGJjIDEwMDY0NAotLS0gYS9uZXQvYmx1ZXRv
+b3RoL2wyY2FwLmMKKysrIGIvbmV0L2JsdWV0b290aC9sMmNhcC5jCkBAIC0yODk3LDYgKzI4OTcs
+MTEgQEAgc3RhdGljIGlubGluZSBpbnQgbDJjYXBfY29uZmlnX3JzcChzdHJ1Y3QgbDJjYXBfY29u
+biAqY29ubiwgc3RydWN0IGwyY2FwX2NtZF9oZHIKIAkJCWludCBsZW4gPSBjbWQtPmxlbiAtIHNp
+emVvZigqcnNwKTsKIAkJCWNoYXIgcmVxWzY0XTsKIAorCQkJaWYgKGxlbiA+IHNpemVvZihyZXEp
+IC0gc2l6ZW9mKHN0cnVjdCBsMmNhcF9jb25mX3JlcSkpIHsKKwkJCQlsMmNhcF9zZW5kX2Rpc2Nv
+bm5fcmVxKGNvbm4sIHNrKTsKKwkJCQlnb3RvIGRvbmU7CisJCQl9CisKIAkJCS8qIHRocm93IG91
+dCBhbnkgb2xkIHN0b3JlZCBjb25mIHJlcXVlc3RzICovCiAJCQlyZXN1bHQgPSBMMkNBUF9DT05G
+X1NVQ0NFU1M7CiAJCQlsZW4gPSBsMmNhcF9wYXJzZV9jb25mX3JzcChzaywgcnNwLT5kYXRhLAot
+LSAKMS42LjAuNAoK
+--00032555a08ee8f57e0482232aef--
