@@ -1,89 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <2c3916b71003160533s714e9ef3h6c803f88a79f27d2@mail.gmail.com>
-References: <2c3916b71003160533s714e9ef3h6c803f88a79f27d2@mail.gmail.com>
-Date: Mon, 22 Mar 2010 18:36:26 -0300
-Message-ID: <2a9506371003221436s1cf1b465r907f726797b4f251@mail.gmail.com>
-Subject: Re: [PATCH] Fix display of last device classes in hciconfig
-From: Vinicius Gomes <vinicius.gomes@openbossa.org>
-To: Daniel Abraham <daniel.shrugged@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: BlueZ GSoC 2010
+From: Bastien Nocera <hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Vinicius Gomes <vinicius.gomes@openbossa.org>,
+	BlueZ <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <2d5a2c101003220914m41188e22ha0872104d4c6db4f@mail.gmail.com>
+References: <2a9506371003181850h15a417a4u35bc0ed70e60f548@mail.gmail.com>
+	 <1269259999.21548.3330.camel@localhost.localdomain>
+	 <2d5a2c101003220914m41188e22ha0872104d4c6db4f@mail.gmail.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Date: Mon, 22 Mar 2010 17:27:52 +0000
+Message-ID: <1269278872.4465.271.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgRGFuaWVsLAoKT24gVHVlLCBNYXIgMTYsIDIwMTAgYXQgOTozMyBBTSwgRGFuaWVsIEFicmFo
-YW0KPGRhbmllbC5zaHJ1Z2dlZEBnbWFpbC5jb20+IHdyb3RlOgo+IFRoaXMgaXMgbXkgZmlyc3Qg
-ZXZlciBwYXRjaCwgc28gaXQncyB2ZXJ5IHNpbXBsZS4uLgo+IEJhc2VkIG9uIGN1cnJlbnQgY29u
-dGVudCBpbjoKPiBodHRwOi8vd3d3LmJsdWV0b290aC5vcmcvYXNzaWduZWQtbnVtYmVycy9iYXNl
-YmFuZC5odG0KPgoKSXQncyBuaWNlIHRoYXQgdGhpcyBpcyB5b3VyIGZpcnN0IChvZiBtYW55LCBJ
-IGhvcGUgOy0pIGNvbnRyaWJ1dGlvbiwKYnV0IEkgZmVlbCBpdCdzIGJldHRlciBpZiB3ZSBsZWZ0
-IHRoZSBjb21taXQgbWVzc2FnZSB3aXRoIGp1c3QKZXhwbGFpbmluZyB3aGF0IHRoZSBwYXRjaCBk
-b2VzLgoKPiBTaWduZWQtb2ZmLWJ5OiBEYW5pZWwgQWJyYWhhbSA8ZGFuaWVsLnNocnVnZ2VkQGdt
-YWlsLmNvbT4KCldlIGRvbid0IHVzZSB0aGUgIlNpZ25lZC1vZmYtYnkiIGxpbmUgaW4gQmx1ZVog
-dXNlcmxhbmQgY29kZS4KCj4gLS0tCj4gwqB0b29scy9oY2ljb25maWcuYyB8IMKgIDMwICsrKysr
-KysrKysrKysrKysrKysrKysrKysrLS0tLQo+IMKgMSBmaWxlcyBjaGFuZ2VkLCAyNiBpbnNlcnRp
-b25zKCspLCA0IGRlbGV0aW9ucygtKQo+Cj4gZGlmZiAtLWdpdCBhL3Rvb2xzL2hjaWNvbmZpZy5j
-IGIvdG9vbHMvaGNpY29uZmlnLmMKPiBpbmRleCAzZjY4N2UwLi5jOTdjZTQ0IDEwMDY0NAo+IC0t
-LSBhL3Rvb2xzL2hjaWNvbmZpZy5jCj4gKysrIGIvdG9vbHMvaGNpY29uZmlnLmMKPiBAQCAtNjQ1
-LDggKzY0NSwyNiBAQCBzdGF0aWMgY2hhciAqZ2V0X21pbm9yX2RldmljZV9uYW1lKGludCBtYWpv
-ciwgaW50IG1pbm9yKQo+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgcmV0dXJu
-ICJHYW1lIjsKPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoH0KPiDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoGJyZWFrOwo+IC0gwqAgwqAgwqAgY2FzZSA2MzogwqAgwqAgwqAgwqAvKiB1bmNhdGVnb3Jp
-c2VkICovCj4gLSDCoCDCoCDCoCDCoCDCoCDCoCDCoCByZXR1cm4gIiI7CgpJIHRoaW5rIHRoYXQg
-dGhlIHRlc3QgZm9yIHRoZSAiVW5jYXRlZ29yaXNlZCIgKHdoaWNoIHNlZW1zIHRvIGJlCm1pc3Nw
-ZWxsZWQgaW4gbWFueSBwbGFjZXMpIGRldmljZSBjbGFzcyB3b3VsZCBiZSBiZXR0ZXIgc3RheWlu
-ZyBoZXJlLApiZWNhdXNlIHRoZSBzYW1lIGNvZGUgaXMgdXNlZCBpbnNpZGUgaGNpdG9vbC5jLiBG
-aXhpbmcgdGhlcmUgd291bGQgYmUKbmljZSB0b28uCgpBbm90aGVyIHRoaW5nLCBsb29rcyBsaWtl
-IHRoaXMgImNhc2UgNjM6IiBpcyB3cm9uZywgIG1ham9yIGRldmljZQpjbGFzcyBpcyBhIDUgYml0
-IG51bWJlciwgYW5kIHRoZSB1bmNhdGVnb3JpemVkIGRldmljZSBjbGFzcyBpcyBkZWZpbmVkCmFz
-IDMxLiBMb29rcyBsaWtlIGEgbGVnYWN5IGZyb20gYW5jaWVudCB0aW1lcyA7LSkKCj4gKyDCoCDC
-oCDCoCBjYXNlIDk6IC8qIGhlYWx0aCAqLwo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgc3dpdGNo
-KG1pbm9yKSB7Cj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCBjYXNlIDA6Cj4gKyDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCByZXR1cm4gIlVuZGVmaW5lZCI7Cj4gKyDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCBjYXNlIDE6Cj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBy
-ZXR1cm4gIkJsb29kIFByZXNzdXJlIE1vbml0b3IiOwo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-Y2FzZSAyOgo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgcmV0dXJuICJUaGVy
-bW9tZXRlciI7Cj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCBjYXNlIDM6Cj4gKyDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCByZXR1cm4gIldlaWdoaW5nIFNjYWxlIjsKPiArIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIGNhc2UgNDoKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIHJldHVybiAiR2x1Y29zZSBNZXRlciI7Cj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCBjYXNl
-IDU6Cj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCByZXR1cm4gIlB1bHNlIE94
-aW1ldGVyIjsKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIGNhc2UgNjoKPiArIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIHJldHVybiAiSGVhcnQvUHVsc2UgUmF0ZSBNb25pdG9yIjsK
-PiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIGNhc2UgNzoKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIHJldHVybiAiSGVhbHRoIERhdGEgRGlzcGxheSI7Cj4gKyDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCB9Cj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCBicmVhazsKPiDCoCDCoCDCoCDC
-oH0KPiDCoCDCoCDCoCDCoHJldHVybiAiVW5rbm93biAocmVzZXJ2ZWQpIG1pbm9yIGRldmljZSBj
-bGFzcyI7Cj4gwqB9Cj4gQEAgLTY2OCw3ICs2ODYsOSBAQCBzdGF0aWMgdm9pZCBjbWRfY2xhc3Mo
-aW50IGN0bCwgaW50IGhkZXYsIGNoYXIgKm9wdCkKPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCJBdWRpby9WaWRlbyIsCj4gwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAiUGVy
-aXBoZXJhbCIsCj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAiSW1hZ2luZyIsCj4gLSDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCAiVW5jYXRlZ29yaXplZCIgfTsKPiArIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgICJXZWFy
-YWJsZSIsCj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCAiVG95IiwKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgICJIZWFsdGgiIH07Cj4gwqAgwqAgwqAgwqBpbnQgcyA9IGhj
-aV9vcGVuX2RldihoZGV2KTsKPgo+IMKgIMKgIMKgIMKgaWYgKHMgPCAwKSB7Cj4gQEAgLTcwNiw3
-ICs3MjYsOSBAQCBzdGF0aWMgdm9pZCBjbWRfY2xhc3MoaW50IGN0bCwgaW50IGhkZXYsIGNoYXIg
-Km9wdCkKPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoH0gZWxzZQo+IMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgcHJpbnRmKCJVbnNwZWNpZmllZCIpOwo+IMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgcHJpbnRmKCJcblx0RGV2aWNlIENsYXNzOiAiKTsKPiAtIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIGlmICgoY2xzWzFdICYgMHgxZikgPj0gc2l6ZW9mKG1ham9yX2RldmljZXMpIC8gc2l6
-ZW9mKCptYWpvcl9kZXZpY2VzKSkKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIGlmICgweDFmID09
-IGNsc1sxXSkKClRoaXMgdGVzdCBpcyBpbnZlcnRlZCwgaW4gQmx1ZVogY29kZSB3ZSB1c2UgdGhl
-IGZvcm06ICh2YXJpYWJsZQpvcGVyYXRvciBjb25zdGFudCkKCj4gKyDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCBwcmludGYoIlVuY2F0ZWdvcml6ZWRcbiIpOwo+ICsgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgZWxzZSBpZiAoKGNsc1sxXSAmIDB4MWYpID49IHNpemVvZihtYWpvcl9kZXZp
-Y2VzKSAvIHNpemVvZigqbWFqb3JfZGV2aWNlcykpCgpTZWUgYWJvdmUuCgo+IMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgcHJpbnRmKCJJbnZhbGlkIERldmljZSBDbGFzcyFcbiIp
-Owo+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgZWxzZQo+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgcHJpbnRmKCIlcywgJXNcbiIsIG1ham9yX2RldmljZXNbY2xzWzFdICYgMHgx
-Zl0sCj4gLS0KPiAxLjYuNi4xCj4gLS0KPiBUbyB1bnN1YnNjcmliZSBmcm9tIHRoaXMgbGlzdDog
-c2VuZCB0aGUgbGluZSAidW5zdWJzY3JpYmUgbGludXgtYmx1ZXRvb3RoIiBpbgo+IHRoZSBib2R5
-IG9mIGEgbWVzc2FnZSB0byBtYWpvcmRvbW9Admdlci5rZXJuZWwub3JnCj4gTW9yZSBtYWpvcmRv
-bW8gaW5mbyBhdCDCoGh0dHA6Ly92Z2VyLmtlcm5lbC5vcmcvbWFqb3Jkb21vLWluZm8uaHRtbAo+
-CgoKQ2hlZXJzLAotLSAKVmluaWNpdXMgR29tZXMKSU5kVCAtIEluc3RpdHV0byBOb2tpYSBkZSBU
-ZWNub2xvZ2lhCg==
+On Mon, 2010-03-22 at 18:14 +0200, Luiz Augusto von Dentz wrote:
+> Hi Bastien,
+> 
+> On Mon, Mar 22, 2010 at 2:13 PM, Bastien Nocera <hadess@hadess.net> wrote:
+> > Hey,
+> >
+> > On Thu, 2010-03-18 at 22:50 -0300, Vinicius Gomes wrote:
+> >> Hi,
+> >>
+> >> BlueZ just got accepted as an organization for this year's Google
+> >> Summer of Code.
+> >>
+> >> There is a small list of project ideas here[1], for the next days we
+> >> need to polish it and add more content. Any help is appreciated.
+> >>
+> >> We are also looking for mentors, if this idea interests you, please
+> >> contact me off-list or go to #bluez-gsoc at freenode, this is also
+> >> where most of the discussion regarding GSoC will take place, in case
+> >> you just want to follow it.
+> >>
+> >> As always, patches and suggestions are welcome ;-)
+> >
+> > A couple of comments:
+> > - Is AVRCP 1.4 support really a full Summer's work? Could be with
+> > PulseAudio or application integration?
+> 
+> Some avrcp 1.4 needs some integration so I guess it is ok.
+> 
+> > - The "any" adapter work is a waste of resources, as I've mentioned in
+> > the past on the list.
+> 
+> Well if it eliminates one round trip for most application I guess it
+> is worth adding, and we might add other tricks as storage and API
+> simplifications on top of it.
+
+One round-trip at the cost of more code on your side. I'm really not
+sure it's worth it.
+
+> > - The VDP support probably needs kernel-level hacking as well, to avoid
+> > being constrained to one of the supported frameworks, and create a
+> > user-space driver for the device (using CUSE?)
+> 
+> It could be considerate, but if that is a good idea to vdp it would
+> also be for a2dp, there is also the problem that avdtp is currently
+> implemented in bluetoothd so I wonder if we should start changing
+> things or just implement vdp on top of the existing avdtp code.
+
+Right, except that for sound we have a "broker" application in
+PulseAudio. There's no such thing for V4L devices. In any case, it
+should probably be a separate application that would take the data from
+bluetoothd and make it available as a video device through v4l.
+
+The VDP-using webcam I have uses MPEG-4 as the video codec, and you
+probably don't want to have to reimplement that, so the broker app could
+probably use GStreamer to make the video available.
+
+> > I'd be happy to do testing and some integration work for both the VDP
+> > and DUN works.
+> >
+> > I could also add:
+> > - Port gnome-user-share to obexd, instead of obex-data-server (easy)
+> > - Port osso-gwobex test suite and extend it (medium)
+> > (Those 2 could be combined into one project)
+> > - Printer (initial) setup integration in gnome-bluetooth (medium)
+> 
+> I guess those are too gnome related for being in BlueZ, expect maybe
+> gwobex, of course we could help/co/mentor projects under gnome
+> organization.
+
+Or vice-versa :)
+Given that porting gnome-user-share to obexd shouldn't be a long winded
+task, porting the osso-gwobex test suite would nicely complete it.
+
+The printer integration work could probably be re-used by other
+bluetoothd-setup front-ends like KDE.
+
+> > - Extended hostname support (using xdg-hostname) (medium)
+> > - Kernel driver and user-space changes for Sixaxis joypad (including
+> > rumble). The bdaddr assignment would be done in the kernel, with a
+> > helper in bluetoothd, extra functionality would be added in the kernel
+> > for the other features (medium)
+> 
+> Great ideas and those fits perfectly as bluez organization projects.
+
+Cheers
+
