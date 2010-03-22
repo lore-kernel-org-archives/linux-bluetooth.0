@@ -1,119 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Tue, 23 Mar 2010 17:41:54 +0800
-Message-ID: <8396c2281003230241i7dd14d5fnb3f98152392e05d3@mail.gmail.com>
-Subject: Can't turn off bluetooth with discoverable mode on Lucid
-From: Chao Deng <dcs1983@gmail.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <2c3916b71003160533s714e9ef3h6c803f88a79f27d2@mail.gmail.com>
+References: <2c3916b71003160533s714e9ef3h6c803f88a79f27d2@mail.gmail.com>
+Date: Mon, 22 Mar 2010 18:36:26 -0300
+Message-ID: <2a9506371003221436s1cf1b465r907f726797b4f251@mail.gmail.com>
+Subject: Re: [PATCH] Fix display of last device classes in hciconfig
+From: Vinicius Gomes <vinicius.gomes@openbossa.org>
+To: Daniel Abraham <daniel.shrugged@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When I use "hciconfig" to turn off Bluetooth, I meet a problem that it
-can't be turned off correctly when discoverable. I need to run
-"hciconfig hci0 down" twice to turn off it, following is the log
-information.
-[LOG]
-root@ubuntu-laptop:/home/ubuntu# hciconfig
-hci0: Type: SDIO
-        BD Address: 00:24:23:10:97:A3 ACL MTU: 1021:7 SCO MTU: 240:3
-        UP RUNNING PSCAN ISCAN
-        RX bytes:2324 acl:0 sco:0 events:71 errors:0
-        TX bytes:2746 acl:0 sco:0 commands:71 errors:0
-
-root@ubuntu-laptop:/home/ubuntu# hciconfig hci0 down
-root@ubuntu-laptop:/home/ubuntu# hciconfig
-hci0: Type: SDIO
-        BD Address: 00:24:23:10:97:A3 ACL MTU: 1021:7 SCO MTU: 240:3
-        UP RUNNING PSCAN
-        RX bytes:3467 acl:0 sco:0 events:105 errors:0
-        TX bytes:4227 acl:0 sco:0 commands:105 errors:0
-
-root@ubuntu-laptop:/home/ubuntu# hciconfig hci0 down
-root@ubuntu-laptop:/home/ubuntu# hciconfig
-hci0: Type: SDIO
-        BD Address: 00:24:23:10:97:A3 ACL MTU: 1021:7 SCO MTU: 240:3
-        DOWN
-        RX bytes:3477 acl:0 sco:0 events:106 errors:0
-        TX bytes:4234 acl:0 sco:0 commands:106 errors:0
-
-[/LOG]
-At the first time of "hciconfig hci0 down", the bluetooth adapter is
-turned off and then turned on again (who turn on it?). The mode is
-changed from "UP RUNNING PSCAN ISCAN" to "DOWN" (I can't capture this
-change), and then from "DOWN" to "UP RUNNING PSCAN" (This is what we
-see after run this command). You can see the time stamp in the log
-file (syslog)
-At the second time, the bluetooth adapter is turned off, mode is
-changed to "DOWN".
-
-This is part of the /var/log/syslog, you can see the state of "HCI dev 0"
-[LOG]
-Jul 29 08:54:01 ubuntu-laptop bluetoothd[1061]: Bluetooth daemon 4.60
-Jul 29 08:54:01 ubuntu-laptop bluetoothd[1062]: Starting SDP server
-Jul 29 08:54:01 ubuntu-laptop bluetoothd[1062]: Starting experimental
-netlink support
-Jul 29 08:54:01 ubuntu-laptop bluetoothd[1062]: Failed to find
-Bluetooth netlink family
-Jul 29 08:54:01 ubuntu-laptop bluetoothd[1062]: Failed to init netlink plugin
-Jul 29 08:54:02 ubuntu-laptop bluetoothd[1062]: Can't create GN bridge
-Jul 29 08:54:02 ubuntu-laptop bluetoothd[1062]: Unable to start SCO
-server socket
-Jul 29 08:54:02 ubuntu-laptop bluetoothd[1062]: Failed to init audio plugin
-Jul 29 08:54:02 ubuntu-laptop bluetoothd[1062]: HCI dev 0 registered
-Jul 29 08:54:02 ubuntu-laptop bluetoothd[1062]: Failed to open RFKILL
-control device
-Jul 29 08:54:02 ubuntu-laptop bluetoothd[1062]: accept: Socket
-operation on non-socket (88)
-Jul 29 08:54:02 ubuntu-laptop bluetoothd[1062]: HCI dev 0 up
-Jul 29 08:54:02 ubuntu-laptop bluetoothd[1062]: Starting security manager 0
-Jul 29 08:54:02 ubuntu-laptop bluetoothd[1062]: Parsing
-/etc/bluetooth/serial.conf failed: No such file or directory
-Jul 29 08:54:02 ubuntu-laptop bluetoothd[1062]: Adapter
-/org/bluez/1061/hci0 has been enabled
-Jul 29 08:54:15 ubuntu-laptop AptDaemon: INFO: Initializing daemon
-Jul 29 08:54:33 ubuntu-laptop bluetoothd[1062]: HCI dev 0 down
-Jul 29 08:54:33 ubuntu-laptop bluetoothd[1062]: Adapter
-/org/bluez/1061/hci0 has been disabled
-Jul 29 08:54:33 ubuntu-laptop bluetoothd[1062]: Stopping security manager 0
-Jul 29 08:54:33 ubuntu-laptop bluetoothd[1062]: HCI dev 0 up
-Jul 29 08:54:33 ubuntu-laptop bluetoothd[1062]: Starting security manager 0
-Jul 29 08:54:33 ubuntu-laptop bluetoothd[1062]: Adapter
-/org/bluez/1061/hci0 has been enabled
-Jul 29 08:59:16 ubuntu-laptop AptDaemon: INFO: Quiting due to inactivity
-Jul 29 08:59:16 ubuntu-laptop AptDaemon: INFO: Shutdown was requested
-Jul 29 09:06:29 ubuntu-laptop bluetoothd[1062]: HCI dev 0 down
-Jul 29 09:06:29 ubuntu-laptop bluetoothd[1062]: Adapter
-/org/bluez/1061/hci0 has been disabled
-Jul 29 09:06:29 ubuntu-laptop bluetoothd[1062]: Stopping security manager 0
-Jul 29 09:06:29 ubuntu-laptop bluetoothd[1062]: HCI dev 0 up
-Jul 29 09:06:29 ubuntu-laptop bluetoothd[1062]: Starting security manager 0
-Jul 29 09:06:29 ubuntu-laptop bluetoothd[1062]: Adapter
-/org/bluez/1061/hci0 has been enabled
-Jul 29 09:06:41 ubuntu-laptop bluetoothd[1062]: HCI dev 0 down
-Jul 29 09:06:41 ubuntu-laptop bluetoothd[1062]: Adapter
-/org/bluez/1061/hci0 has been disabled
-Jul 29 09:06:41 ubuntu-laptop bluetoothd[1062]: Stopping security manager 0
-
-[/LOG]
-
-The release of Ubuntu that I use is Ubuntu Lucid.
-    root@ubuntu-laptop:/home/ubuntu# lsb_release -rd
-    Description: Ubuntu lucid (development branch)
-    Release: 10.04
-And the bluez version is 4.60-0ubuntu5.
-The kernel version is 2.6.32.9.
-The test platform that I use is Dove (ARM platform), and the Bluetooth
-Adapter is Marvell SD8688.
-
-By the way, I have test it on Karmic with the same kernel and driver,
-it's workable. I also try to downgrade the Bluez version from 4.60 to
-4.51(used in Karmic release), but it doesn't help, the problem still
-exists.
-Then, I kill the process "bluetoothd" and try it again, I can run
-"hciconfig hci0 down" only once to turn off it (from "UP RUNNING PSCAN
-ISCAN" to "DOWN"). So maybe something happens and lets "bluetoothd" to
-turn on the adapter, how to trace it?
-
-Do anyone else have the same problem like me? Or could you share some
-methods to debug it?
+SGkgRGFuaWVsLAoKT24gVHVlLCBNYXIgMTYsIDIwMTAgYXQgOTozMyBBTSwgRGFuaWVsIEFicmFo
+YW0KPGRhbmllbC5zaHJ1Z2dlZEBnbWFpbC5jb20+IHdyb3RlOgo+IFRoaXMgaXMgbXkgZmlyc3Qg
+ZXZlciBwYXRjaCwgc28gaXQncyB2ZXJ5IHNpbXBsZS4uLgo+IEJhc2VkIG9uIGN1cnJlbnQgY29u
+dGVudCBpbjoKPiBodHRwOi8vd3d3LmJsdWV0b290aC5vcmcvYXNzaWduZWQtbnVtYmVycy9iYXNl
+YmFuZC5odG0KPgoKSXQncyBuaWNlIHRoYXQgdGhpcyBpcyB5b3VyIGZpcnN0IChvZiBtYW55LCBJ
+IGhvcGUgOy0pIGNvbnRyaWJ1dGlvbiwKYnV0IEkgZmVlbCBpdCdzIGJldHRlciBpZiB3ZSBsZWZ0
+IHRoZSBjb21taXQgbWVzc2FnZSB3aXRoIGp1c3QKZXhwbGFpbmluZyB3aGF0IHRoZSBwYXRjaCBk
+b2VzLgoKPiBTaWduZWQtb2ZmLWJ5OiBEYW5pZWwgQWJyYWhhbSA8ZGFuaWVsLnNocnVnZ2VkQGdt
+YWlsLmNvbT4KCldlIGRvbid0IHVzZSB0aGUgIlNpZ25lZC1vZmYtYnkiIGxpbmUgaW4gQmx1ZVog
+dXNlcmxhbmQgY29kZS4KCj4gLS0tCj4gwqB0b29scy9oY2ljb25maWcuYyB8IMKgIDMwICsrKysr
+KysrKysrKysrKysrKysrKysrKysrLS0tLQo+IMKgMSBmaWxlcyBjaGFuZ2VkLCAyNiBpbnNlcnRp
+b25zKCspLCA0IGRlbGV0aW9ucygtKQo+Cj4gZGlmZiAtLWdpdCBhL3Rvb2xzL2hjaWNvbmZpZy5j
+IGIvdG9vbHMvaGNpY29uZmlnLmMKPiBpbmRleCAzZjY4N2UwLi5jOTdjZTQ0IDEwMDY0NAo+IC0t
+LSBhL3Rvb2xzL2hjaWNvbmZpZy5jCj4gKysrIGIvdG9vbHMvaGNpY29uZmlnLmMKPiBAQCAtNjQ1
+LDggKzY0NSwyNiBAQCBzdGF0aWMgY2hhciAqZ2V0X21pbm9yX2RldmljZV9uYW1lKGludCBtYWpv
+ciwgaW50IG1pbm9yKQo+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgcmV0dXJu
+ICJHYW1lIjsKPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoH0KPiDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoGJyZWFrOwo+IC0gwqAgwqAgwqAgY2FzZSA2MzogwqAgwqAgwqAgwqAvKiB1bmNhdGVnb3Jp
+c2VkICovCj4gLSDCoCDCoCDCoCDCoCDCoCDCoCDCoCByZXR1cm4gIiI7CgpJIHRoaW5rIHRoYXQg
+dGhlIHRlc3QgZm9yIHRoZSAiVW5jYXRlZ29yaXNlZCIgKHdoaWNoIHNlZW1zIHRvIGJlCm1pc3Nw
+ZWxsZWQgaW4gbWFueSBwbGFjZXMpIGRldmljZSBjbGFzcyB3b3VsZCBiZSBiZXR0ZXIgc3RheWlu
+ZyBoZXJlLApiZWNhdXNlIHRoZSBzYW1lIGNvZGUgaXMgdXNlZCBpbnNpZGUgaGNpdG9vbC5jLiBG
+aXhpbmcgdGhlcmUgd291bGQgYmUKbmljZSB0b28uCgpBbm90aGVyIHRoaW5nLCBsb29rcyBsaWtl
+IHRoaXMgImNhc2UgNjM6IiBpcyB3cm9uZywgIG1ham9yIGRldmljZQpjbGFzcyBpcyBhIDUgYml0
+IG51bWJlciwgYW5kIHRoZSB1bmNhdGVnb3JpemVkIGRldmljZSBjbGFzcyBpcyBkZWZpbmVkCmFz
+IDMxLiBMb29rcyBsaWtlIGEgbGVnYWN5IGZyb20gYW5jaWVudCB0aW1lcyA7LSkKCj4gKyDCoCDC
+oCDCoCBjYXNlIDk6IC8qIGhlYWx0aCAqLwo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgc3dpdGNo
+KG1pbm9yKSB7Cj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCBjYXNlIDA6Cj4gKyDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCByZXR1cm4gIlVuZGVmaW5lZCI7Cj4gKyDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCBjYXNlIDE6Cj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBy
+ZXR1cm4gIkJsb29kIFByZXNzdXJlIE1vbml0b3IiOwo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+Y2FzZSAyOgo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgcmV0dXJuICJUaGVy
+bW9tZXRlciI7Cj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCBjYXNlIDM6Cj4gKyDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCByZXR1cm4gIldlaWdoaW5nIFNjYWxlIjsKPiArIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIGNhc2UgNDoKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIHJldHVybiAiR2x1Y29zZSBNZXRlciI7Cj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCBjYXNl
+IDU6Cj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCByZXR1cm4gIlB1bHNlIE94
+aW1ldGVyIjsKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIGNhc2UgNjoKPiArIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIHJldHVybiAiSGVhcnQvUHVsc2UgUmF0ZSBNb25pdG9yIjsK
+PiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIGNhc2UgNzoKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIHJldHVybiAiSGVhbHRoIERhdGEgRGlzcGxheSI7Cj4gKyDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCB9Cj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCBicmVhazsKPiDCoCDCoCDCoCDC
+oH0KPiDCoCDCoCDCoCDCoHJldHVybiAiVW5rbm93biAocmVzZXJ2ZWQpIG1pbm9yIGRldmljZSBj
+bGFzcyI7Cj4gwqB9Cj4gQEAgLTY2OCw3ICs2ODYsOSBAQCBzdGF0aWMgdm9pZCBjbWRfY2xhc3Mo
+aW50IGN0bCwgaW50IGhkZXYsIGNoYXIgKm9wdCkKPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCJBdWRpby9WaWRlbyIsCj4gwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAiUGVy
+aXBoZXJhbCIsCj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAiSW1hZ2luZyIsCj4gLSDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCAiVW5jYXRlZ29yaXplZCIgfTsKPiArIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgICJXZWFy
+YWJsZSIsCj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCAiVG95IiwKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgICJIZWFsdGgiIH07Cj4gwqAgwqAgwqAgwqBpbnQgcyA9IGhj
+aV9vcGVuX2RldihoZGV2KTsKPgo+IMKgIMKgIMKgIMKgaWYgKHMgPCAwKSB7Cj4gQEAgLTcwNiw3
+ICs3MjYsOSBAQCBzdGF0aWMgdm9pZCBjbWRfY2xhc3MoaW50IGN0bCwgaW50IGhkZXYsIGNoYXIg
+Km9wdCkKPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoH0gZWxzZQo+IMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgcHJpbnRmKCJVbnNwZWNpZmllZCIpOwo+IMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgcHJpbnRmKCJcblx0RGV2aWNlIENsYXNzOiAiKTsKPiAtIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIGlmICgoY2xzWzFdICYgMHgxZikgPj0gc2l6ZW9mKG1ham9yX2RldmljZXMpIC8gc2l6
+ZW9mKCptYWpvcl9kZXZpY2VzKSkKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIGlmICgweDFmID09
+IGNsc1sxXSkKClRoaXMgdGVzdCBpcyBpbnZlcnRlZCwgaW4gQmx1ZVogY29kZSB3ZSB1c2UgdGhl
+IGZvcm06ICh2YXJpYWJsZQpvcGVyYXRvciBjb25zdGFudCkKCj4gKyDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCBwcmludGYoIlVuY2F0ZWdvcml6ZWRcbiIpOwo+ICsgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgZWxzZSBpZiAoKGNsc1sxXSAmIDB4MWYpID49IHNpemVvZihtYWpvcl9kZXZp
+Y2VzKSAvIHNpemVvZigqbWFqb3JfZGV2aWNlcykpCgpTZWUgYWJvdmUuCgo+IMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgcHJpbnRmKCJJbnZhbGlkIERldmljZSBDbGFzcyFcbiIp
+Owo+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgZWxzZQo+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgcHJpbnRmKCIlcywgJXNcbiIsIG1ham9yX2RldmljZXNbY2xzWzFdICYgMHgx
+Zl0sCj4gLS0KPiAxLjYuNi4xCj4gLS0KPiBUbyB1bnN1YnNjcmliZSBmcm9tIHRoaXMgbGlzdDog
+c2VuZCB0aGUgbGluZSAidW5zdWJzY3JpYmUgbGludXgtYmx1ZXRvb3RoIiBpbgo+IHRoZSBib2R5
+IG9mIGEgbWVzc2FnZSB0byBtYWpvcmRvbW9Admdlci5rZXJuZWwub3JnCj4gTW9yZSBtYWpvcmRv
+bW8gaW5mbyBhdCDCoGh0dHA6Ly92Z2VyLmtlcm5lbC5vcmcvbWFqb3Jkb21vLWluZm8uaHRtbAo+
+CgoKQ2hlZXJzLAotLSAKVmluaWNpdXMgR29tZXMKSU5kVCAtIEluc3RpdHV0byBOb2tpYSBkZSBU
+ZWNub2xvZ2lhCg==
