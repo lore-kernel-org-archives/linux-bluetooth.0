@@ -1,32 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <gfpadovan@gmail.com>
-Date: Tue, 23 Mar 2010 17:39:03 -0300
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org
-Subject: [RFC] Release Plan for ERTM, Streaming Mode, FCS and SAR on L2CAP
-Message-ID: <20100323203903.GA13897@vigoh>
+Cc: marcel@holtmann.org, gustavo@padovan.org, jprvita@profusion.mobi, ulisses@profusion.mobi
+Subject: [PATCH 19/19] Bluetooth: Move specific Basic Mode code to the right place
+Date: Tue, 23 Mar 2010 16:48:46 -0300
+Message-Id: <1269373726-13209-20-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1269373726-13209-19-git-send-email-padovan@profusion.mobi>
+References: <1269373726-13209-1-git-send-email-padovan@profusion.mobi>
+ <1269373726-13209-2-git-send-email-padovan@profusion.mobi>
+ <1269373726-13209-3-git-send-email-padovan@profusion.mobi>
+ <1269373726-13209-4-git-send-email-padovan@profusion.mobi>
+ <1269373726-13209-5-git-send-email-padovan@profusion.mobi>
+ <1269373726-13209-6-git-send-email-padovan@profusion.mobi>
+ <1269373726-13209-7-git-send-email-padovan@profusion.mobi>
+ <1269373726-13209-8-git-send-email-padovan@profusion.mobi>
+ <1269373726-13209-9-git-send-email-padovan@profusion.mobi>
+ <1269373726-13209-10-git-send-email-padovan@profusion.mobi>
+ <1269373726-13209-11-git-send-email-padovan@profusion.mobi>
+ <1269373726-13209-12-git-send-email-padovan@profusion.mobi>
+ <1269373726-13209-13-git-send-email-padovan@profusion.mobi>
+ <1269373726-13209-14-git-send-email-padovan@profusion.mobi>
+ <1269373726-13209-15-git-send-email-padovan@profusion.mobi>
+ <1269373726-13209-16-git-send-email-padovan@profusion.mobi>
+ <1269373726-13209-17-git-send-email-padovan@profusion.mobi>
+ <1269373726-13209-18-git-send-email-padovan@profusion.mobi>
+ <1269373726-13209-19-git-send-email-padovan@profusion.mobi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi People,
+Inside "case L2CAP_MODE_BASIC:" we don't need to check for sk_type and
+L2CAP mode. So only the length check is fine.
 
-I was thinking about a release plan for Enhanced Retransmission Mode,
-Streaming Mode, Frame Check Sequence(FCS) and Segmentation and
-Reassembly(SAR).
+Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+Reviewed-by: João Paulo Rechi Vita <jprvita@profusion.mobi>
+---
+ net/bluetooth/l2cap.c |   11 ++++++-----
+ 1 files changed, 6 insertions(+), 5 deletions(-)
 
-2.6.35: Upstream Streaming Mode, FCS, SAR and add a sub-menu option
-to L2CAP at Kconfig for ERTM with an EXPERIMENTAL flag. So we will have
-a chance to test ERTM more intensively.
-
-2.6.36: Upstream ERTM. After that ERTM will be the default mode with
-SOCK_STREAM and also enabled by default under L2CAP. If you think it's
-not worth release Streaming Mode, FCS and SAR without ERTM we can
-upstream them together on 2.6.36.
-
-Comments, ideas?
-
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index 0dc7b95..8c8b5d9 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -1660,11 +1660,6 @@ static int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock, struct ms
+ 	if (msg->msg_flags & MSG_OOB)
+ 		return -EOPNOTSUPP;
+ 
+-	/* Check outgoing MTU */
+-	if (sk->sk_type == SOCK_SEQPACKET && pi->mode == L2CAP_MODE_BASIC &&
+-	    len > pi->omtu)
+-		return -EINVAL;
+-
+ 	lock_sock(sk);
+ 
+ 	if (sk->sk_state != BT_CONNECTED) {
+@@ -1681,6 +1676,12 @@ static int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock, struct ms
+ 
+ 	switch (pi->mode) {
+ 	case L2CAP_MODE_BASIC:
++		/* Check outgoing MTU */
++		if (len > pi->omtu) {
++			err = -EINVAL;
++			goto done;
++		}
++
+ 		/* Create a basic PDU */
+ 		skb = l2cap_create_basic_pdu(sk, msg, len);
+ 		if (IS_ERR(skb)) {
 -- 
-Gustavo F. Padovan
-http://padovan.org
+1.6.4.4
