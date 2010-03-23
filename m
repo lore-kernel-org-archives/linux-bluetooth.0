@@ -3,10 +3,10 @@ Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org, gustavo@padovan.org, jprvita@profusion.mobi, ulisses@profusion.mobi
-Subject: [PATCH 14/19] Bluetooth: Group the ack of I-frames into l2cap_data_channel_rrframe()
-Date: Tue, 23 Mar 2010 16:48:41 -0300
-Message-Id: <1269373726-13209-15-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1269373726-13209-14-git-send-email-padovan@profusion.mobi>
+Subject: [PATCH 13/19] Bluetooth: Handle all cases of receipt of RNR-frames into L2CAP
+Date: Tue, 23 Mar 2010 16:48:40 -0300
+Message-Id: <1269373726-13209-14-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1269373726-13209-13-git-send-email-padovan@profusion.mobi>
 References: <1269373726-13209-1-git-send-email-padovan@profusion.mobi>
  <1269373726-13209-2-git-send-email-padovan@profusion.mobi>
  <1269373726-13209-3-git-send-email-padovan@profusion.mobi>
@@ -20,56 +20,70 @@ References: <1269373726-13209-1-git-send-email-padovan@profusion.mobi>
  <1269373726-13209-11-git-send-email-padovan@profusion.mobi>
  <1269373726-13209-12-git-send-email-padovan@profusion.mobi>
  <1269373726-13209-13-git-send-email-padovan@profusion.mobi>
- <1269373726-13209-14-git-send-email-padovan@profusion.mobi>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It also fix a bug: we weren't acknowledging I-frames when P=1.
-Note that when F=1 we are acknowledging packets before setting
-RemoteBusy to False. The spec says we should do that in the opposite
-order, but acknowledment of packets doesn't care about RemoteBusy flag
-so we can do that in the order we want.
+We weren't handling the receipt under SREJ_SENT state table.
+It also introduce l2cap_send_srejtail(). It will be used in the nexts
+commits too.
 
 Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 Reviewed-by: João Paulo Rechi Vita <jprvita@profusion.mobi>
 ---
- net/bluetooth/l2cap.c |    9 +++------
- 1 files changed, 3 insertions(+), 6 deletions(-)
+ net/bluetooth/l2cap.c |   32 ++++++++++++++++++++++++++++----
+ 1 files changed, 28 insertions(+), 4 deletions(-)
 
 diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index f966ed3..d6667fa 100644
+index 2f32e91..f966ed3 100644
 --- a/net/bluetooth/l2cap.c
 +++ b/net/bluetooth/l2cap.c
-@@ -3490,7 +3490,9 @@ expected:
- static inline void l2cap_data_channel_rrframe(struct sock *sk, u16 rx_control)
- {
- 	struct l2cap_pinfo *pi = l2cap_pi(sk);
--	u8 tx_seq = __get_reqseq(rx_control);
+@@ -1447,6 +1447,22 @@ static int l2cap_send_ack(struct l2cap_pinfo *pi)
+ 	return 0;
+ }
+ 
++static int l2cap_send_srejtail(struct sock *sk)
++{
++	struct srej_list *tail;
++	u16 control;
 +
-+	pi->expected_ack_seq = __get_reqseq(rx_control);
-+	l2cap_drop_acked_frames(sk);
++	control = L2CAP_SUPER_SELECT_REJECT;
++	control |= L2CAP_CTRL_FINAL;
++
++	tail = list_entry(SREJ_LIST(sk)->prev, struct srej_list, list);
++	control |= tail->tx_seq << L2CAP_CTRL_REQSEQ_SHIFT;
++
++	l2cap_send_sframe(l2cap_pi(sk), control);
++
++	return 0;
++}
++
+ static inline int l2cap_skbuff_fromiovec(struct sock *sk, struct msghdr *msg, int len, int count, struct sk_buff *skb)
+ {
+ 	struct l2cap_conn *conn = l2cap_pi(sk)->conn;
+@@ -3579,11 +3595,19 @@ static inline void l2cap_data_channel_rnrframe(struct sock *sk, u16 rx_control)
+ 	pi->expected_ack_seq = tx_seq;
+ 	l2cap_drop_acked_frames(sk);
  
- 	if (rx_control & L2CAP_CTRL_POLL) {
- 		l2cap_send_i_or_rr_or_rnr(sk);
-@@ -3498,8 +3500,6 @@ static inline void l2cap_data_channel_rrframe(struct sock *sk, u16 rx_control)
+-	del_timer(&pi->retrans_timer);
+-	if (rx_control & L2CAP_CTRL_POLL) {
+-		u16 control = L2CAP_CTRL_FINAL;
+-		l2cap_send_rr_or_rnr(pi, control);
++	if (!(pi->conn_state & L2CAP_CONN_SREJ_SENT)) {
++		del_timer(&pi->retrans_timer);
++		if (rx_control & L2CAP_CTRL_POLL) {
++			u16 control = L2CAP_CTRL_FINAL;
++			l2cap_send_rr_or_rnr(pi, control);
++		}
++		return;
+ 	}
++
++	if (rx_control & L2CAP_CTRL_POLL)
++		l2cap_send_srejtail(sk);
++	else
++		l2cap_send_sframe(pi, L2CAP_SUPER_RCV_READY);
+ }
  
- 	} else if (rx_control & L2CAP_CTRL_FINAL) {
- 		pi->conn_state &= ~L2CAP_CONN_REMOTE_BUSY;
--		pi->expected_ack_seq = tx_seq;
--		l2cap_drop_acked_frames(sk);
- 
- 		if (pi->conn_state & L2CAP_CONN_REJ_ACT)
- 			pi->conn_state &= ~L2CAP_CONN_REJ_ACT;
-@@ -3510,9 +3510,6 @@ static inline void l2cap_data_channel_rrframe(struct sock *sk, u16 rx_control)
- 		}
- 
- 	} else {
--		pi->expected_ack_seq = tx_seq;
--		l2cap_drop_acked_frames(sk);
--
- 		if ((pi->conn_state & L2CAP_CONN_REMOTE_BUSY) &&
- 				(pi->unacked_frames > 0))
- 			__mod_retrans_timer();
+ static inline int l2cap_data_channel_sframe(struct sock *sk, u16 rx_control, struct sk_buff *skb)
 -- 
 1.6.4.4
