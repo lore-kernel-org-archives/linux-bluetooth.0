@@ -3,36 +3,71 @@ Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org, gustavo@padovan.org, jprvita@profusion.mobi, ulisses@profusion.mobi
-Subject: [PATCH 03/19] Bluetooth: Fix memory leak of S-frames into L2CAP
-Date: Tue, 23 Mar 2010 16:48:30 -0300
-Message-Id: <1269373726-13209-4-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1269373726-13209-3-git-send-email-padovan@profusion.mobi>
+Subject: [PATCH 02/19] Bluetooth: Support case with F bit set under WAIT_F state.
+Date: Tue, 23 Mar 2010 16:48:29 -0300
+Message-Id: <1269373726-13209-3-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1269373726-13209-2-git-send-email-padovan@profusion.mobi>
 References: <1269373726-13209-1-git-send-email-padovan@profusion.mobi>
  <1269373726-13209-2-git-send-email-padovan@profusion.mobi>
- <1269373726-13209-3-git-send-email-padovan@profusion.mobi>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-l2cap_data_channel do not free the S-frame, so we free it here.
+On receipt of a F=1 under WAIT_F state ERTM shall stop monitor timer and
+start retransmission timer (if there are unacked frames).
 
 Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 Reviewed-by: João Paulo Rechi Vita <jprvita@profusion.mobi>
 ---
- net/bluetooth/l2cap.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+ net/bluetooth/l2cap.c |   22 ++++++++++++++--------
+ 1 files changed, 14 insertions(+), 8 deletions(-)
 
 diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index ab3f0c4..a020b9f 100644
+index 18328a4..ab3f0c4 100644
 --- a/net/bluetooth/l2cap.c
 +++ b/net/bluetooth/l2cap.c
-@@ -3559,6 +3559,7 @@ static inline int l2cap_data_channel_sframe(struct sock *sk, u16 rx_control, str
- 		break;
- 	}
+@@ -3356,6 +3356,13 @@ static inline int l2cap_data_channel_iframe(struct sock *sk, u16 rx_control, str
  
-+	kfree_skb(skb);
- 	return 0;
- }
+ 	BT_DBG("sk %p rx_control 0x%4.4x len %d", sk, rx_control, skb->len);
  
++	if (L2CAP_CTRL_FINAL & rx_control) {
++		del_timer(&pi->monitor_timer);
++		if (pi->unacked_frames > 0)
++			__mod_retrans_timer();
++		pi->conn_state &= ~L2CAP_CONN_WAIT_F;
++	}
++
+ 	pi->expected_ack_seq = req_seq;
+ 	l2cap_drop_acked_frames(sk);
+ 
+@@ -3445,6 +3452,13 @@ static inline int l2cap_data_channel_sframe(struct sock *sk, u16 rx_control, str
+ 
+ 	BT_DBG("sk %p rx_control 0x%4.4x len %d", sk, rx_control, skb->len);
+ 
++	if (L2CAP_CTRL_FINAL & rx_control) {
++		del_timer(&pi->monitor_timer);
++		if (pi->unacked_frames > 0)
++			__mod_retrans_timer();
++		pi->conn_state &= ~L2CAP_CONN_WAIT_F;
++	}
++
+ 	switch (rx_control & L2CAP_CTRL_SUPERVISE) {
+ 	case L2CAP_SUPER_RCV_READY:
+ 		if (rx_control & L2CAP_CTRL_POLL) {
+@@ -3464,14 +3478,6 @@ static inline int l2cap_data_channel_sframe(struct sock *sk, u16 rx_control, str
+ 				l2cap_ertm_send(sk);
+ 			}
+ 
+-			if (!(pi->conn_state & L2CAP_CONN_WAIT_F))
+-				break;
+-
+-			pi->conn_state &= ~L2CAP_CONN_WAIT_F;
+-			del_timer(&pi->monitor_timer);
+-
+-			if (pi->unacked_frames > 0)
+-				__mod_retrans_timer();
+ 		} else {
+ 			pi->expected_ack_seq = tx_seq;
+ 			l2cap_drop_acked_frames(sk);
 -- 
 1.6.4.4
