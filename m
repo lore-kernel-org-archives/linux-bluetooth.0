@@ -1,34 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 25 Mar 2010 15:26:40 +0100
-From: Pavel Machek <pavel@ucw.cz>
-To: Marcel Holtmann <marcel@holtmann.org>, netdev@vger.kernel.org,
-	"Rafael J. Wysocki" <rjw@sisk.pl>
-Cc: kernel list <linux-kernel@vger.kernel.org>,
-	linux-bluetooth@vger.kernel.org, "Rafael J. Wysocki" <rjw@sisk.pl>
-Subject: Re: 2.6.34-rc1: bluetooth oops
-Message-ID: <20100325142640.GA1602@ucw.cz>
-References: <20100314201434.GE22059@elf.ucw.cz> <1268598500.3897.36.camel@localhost.localdomain> <20100314204434.GB5208@elf.ucw.cz>
+Date: Thu, 25 Mar 2010 15:13:36 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Danilo Cesar Lemes de Paula <danilo.eu@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Danilo Cesar Lemes de Paula <danilo.cesar@openbossa.org>
+Subject: Re: [PATCH] Support relative path on send-files example
+Message-ID: <20100325131336.GA31674@jh-x301>
+References: <1267814806-6806-1-git-send-email-danilo.cesar@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20100314204434.GB5208@elf.ucw.cz>
+In-Reply-To: <1267814806-6806-1-git-send-email-danilo.cesar@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun 2010-03-14 21:44:34, Pavel Machek wrote:
-> Hi!
-> 
-> > > I got this after trying to use bnep for few minutes... Machine locked
-> > > after that, not sure if it is related.
-> > 
-> > I can't explain it since we haven't changed the BNEP code. So that might
-> > be a problem in the networking layer. So posting it to netdev might be a
-> > good idea.
-> 
-> Ok, I'll try using bnep some more. I had bad problems with cellphone
-> connection at that point, so maybe it is not easy to repeat, and it
-> the fact I have not seen it before may not mean much...
+Hi Danilo,
 
-So it seems to repeat about twice a week, definitely a regression :-(.
+On Fri, Mar 05, 2010, Danilo Cesar Lemes de Paula wrote:
+> Agent should receive the absolute path as it runs on a different CWD
+> ---
+>  test/send-files |    4 +++-
+>  1 files changed, 3 insertions(+), 1 deletions(-)
 
--- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+This patch has now been pushed upstream. Thanks.
+
+Johan
