@@ -1,53 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?iso-8859-1?q?Jos=E9_Antonio_Santos_Cadenas?=
-	<jcaden@libresoft.es>
-Reply-To: jcaden@libresoft.es
-To: linux-bluetooth@vger.kernel.org
-Subject: Problems with bt_io_listen
-Date: Thu, 25 Mar 2010 15:45:52 +0100
+Date: Thu, 25 Mar 2010 15:26:40 +0100
+From: Pavel Machek <pavel@ucw.cz>
+To: Marcel Holtmann <marcel@holtmann.org>, netdev@vger.kernel.org,
+	"Rafael J. Wysocki" <rjw@sisk.pl>
+Cc: kernel list <linux-kernel@vger.kernel.org>,
+	linux-bluetooth@vger.kernel.org, "Rafael J. Wysocki" <rjw@sisk.pl>
+Subject: Re: 2.6.34-rc1: bluetooth oops
+Message-ID: <20100325142640.GA1602@ucw.cz>
+References: <20100314201434.GE22059@elf.ucw.cz> <1268598500.3897.36.camel@localhost.localdomain> <20100314204434.GB5208@elf.ucw.cz>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <201003251545.52988.jcaden@libresoft.es>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20100314204434.GB5208@elf.ucw.cz>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+On Sun 2010-03-14 21:44:34, Pavel Machek wrote:
+> Hi!
+> 
+> > > I got this after trying to use bnep for few minutes... Machine locked
+> > > after that, not sure if it is related.
+> > 
+> > I can't explain it since we haven't changed the BNEP code. So that might
+> > be a problem in the networking layer. So posting it to netdev might be a
+> > good idea.
+> 
+> Ok, I'll try using bnep some more. I had bad problems with cellphone
+> connection at that point, so maybe it is not easy to repeat, and it
+> the fact I have not seen it before may not mean much...
 
-We are developing an implementation of HDP and MCAP for bluez. We are triying 
-to perform many connections between two devices but when we make the second 
-connection it is not created correctly.
+So it seems to repeat about twice a week, definitely a regression :-(.
 
-We are using a defer connection (we passed a confirm callback to the 
-bt_io_listen function) and we think that we are missing something but  we 
-can't find what. If we used the connection callback (not defer) all the 
-connections are done successfully.
-
-We are listening with the following code:
-
-static void confirm_cb(GIOChannel *chan, gpointer user_data)
-{
-	...
-	node->chan = g_io_channel_ref(chan);
-	...
-	/* All is ok */
-	return;
-drop:
-	/* Connection refused */
-	g_io_channel_shutdown(chan, TRUE, NULL);
-}
-
-....
-chan = bt_io_listen(BT_IO_L2CAP, NULL, confirm_cb, NULL,
-				NULL, &gerr,
-				BT_IO_OPT_SOURCE_BDADDR, &src,
-				BT_IO_OPT_PSM, 0x1001,
-				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
-				BT_IO_OPT_INVALID);
-...
-
-Any ideas?
-
-Regards and thank.
-
-Jose.
+-- 
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
