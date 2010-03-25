@@ -1,66 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4BAB8BB0.4080405@gmail.com>
+Date: Thu, 25 Mar 2010 17:13:36 +0100
+From: sancane <sancane@gmail.com>
 MIME-Version: 1.0
-Date: Fri, 26 Mar 2010 11:12:57 +0800
-Message-ID: <f163bb471003252012o2d6e72bep723847cc1317e69c@mail.gmail.com>
-Subject: Small issue to receive "org.bluez.AudioSource" dbus message
-From: dove xia <dovexia@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: Problems with bt_io_listen
+References: <201003251545.52988.jcaden@libresoft.es> <2d5a2c101003250822g34187992m8509e17e825f50c8@mail.gmail.com>
+In-Reply-To: <2d5a2c101003250822g34187992m8509e17e825f50c8@mail.gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
+To: unlisted-recipients:; (no To-header on input)
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hello,
 
-	This is Dove as a new comer to Linux-bluetooth group.
-	
-	Currently, I am developing BlueZ stack works as A2DP Sink. After the
-BlueZ runs, it works smoothly. I have developed a program run on Linux
-user space to catch the BlueZ DBus messages. But the program can't
-receive DBus messages from "org.bluez.AudioSource".
-	I have test the BlueZ works as source before, I can receive DBus
-messages from  "org.bluez.AudioSink".
-	
-	The test step is:
-	1. Update the audio.conf to set the bluetooth works as A2DP Sink.
-	2. Set the bluetooth into discoverable mode.
-	3. Use another bluetooth device (a mobile), search and connect BlueZ.
-	3. Play music from mobile.
-	4. use a test program on Linux user space to catch the BlueZ
-AudioSource DBus messages.
-	The test case will expect the test program can catch the AudioSource
-dbus messages, but it failed.
-	
-	I have traced the BlueZ source code, found a little clew in
-audio/a2dp.c, the function sbc_setconf_ind() and mpeg_setconf_ind()
-have not called source_new_stream() while the a2dp_sep->type is
-AVDTP_SEP_TYPE_SINK, I patched code to call source_new_stream().
-base on BlueZ 4.62, in audio/a2dp.c
+> Hi,
+> 
+> On Thu, Mar 25, 2010 at 4:45 PM, José Antonio Santos Cadenas
+> <jcaden@libresoft.es> wrote:
+>> Hi all,
+>>
+>> We are developing an implementation of HDP and MCAP for bluez. We are triying
+>> to perform many connections between two devices but when we make the second
+>> connection it is not created correctly.
+>>
+>> We are using a defer connection (we passed a confirm callback to the
+>> bt_io_listen function) and we think that we are missing something but  we
+>> can't find what. If we used the connection callback (not defer) all the
+>> connections are done successfully.
+>>
+>> We are listening with the following code:
+>>
+>> static void confirm_cb(GIOChannel *chan, gpointer user_data)
+>> {
+>>        ...
+>>        node->chan = g_io_channel_ref(chan);
+>>        ...
+>>        /* All is ok */
+>>        return;
+>> drop:
+>>        /* Connection refused */
+>>        g_io_channel_shutdown(chan, TRUE, NULL);
+>> }
+> 
+> Im not really sure what is the problem but maybe it is the missing
+> bt_io_accept, but of course it can be that you just hide it in those
+> ...
 
-@@ -341,6 +341,8 @@
+You're rigth, we forgot the bt_io_accept call.
 
- 	if (a2dp_sep->type == AVDTP_SEP_TYPE_SOURCE)
- 		sink_new_stream(dev, session, stream);
-+	if (a2dp_sep->type == AVDTP_SEP_TYPE_SINK)
-+		source_new_stream(dev, session, stream);
-
- 	return TRUE;
- }
-@@ -445,6 +447,8 @@
-
- 	if (a2dp_sep->type == AVDTP_SEP_TYPE_SOURCE)
- 		sink_new_stream(dev, session, stream);
-+	if (a2dp_sep->type == AVDTP_SEP_TYPE_SINK)
-+		source_new_stream(dev, session, stream);
-
- 	return TRUE;
- }
-
-	After I patched the code, my test program can receive the
-"org.bluez.AudioSource" DBus messages. the BlueZ work smoothly as
-before. so I think this is a correct fix.
-
-	Need your confirm.
-	
--- 
-BR
-Dove
+> 
+>> ....
+>> chan = bt_io_listen(BT_IO_L2CAP, NULL, confirm_cb, NULL,
+>>                                NULL, &gerr,
+>>                                BT_IO_OPT_SOURCE_BDADDR, &src,
+>>                                BT_IO_OPT_PSM, 0x1001,
+>>                                BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
+>>                                BT_IO_OPT_INVALID);
+>> ...
+> 
+> The listen part at least seems ok.
+> 
+> 
+Thanks.
