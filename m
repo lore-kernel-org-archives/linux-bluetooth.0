@@ -1,115 +1,166 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Fix display of last device classes in hciconfig
-From: Daniel Abraham <daniel.shrugged@gmail.com>
-To: Vinicius Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <2a9506371003221436s1cf1b465r907f726797b4f251@mail.gmail.com>
-References: <2c3916b71003160533s714e9ef3h6c803f88a79f27d2@mail.gmail.com>
-	 <2a9506371003221436s1cf1b465r907f726797b4f251@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Sat, 27 Mar 2010 11:28:31 +0300
-Message-ID: <1269678511.22795.22.camel@localhost.localdomain>
-Mime-Version: 1.0
+From: Francisco Alecrim <francisco.alecrim@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Francisco Alecrim <francisco.alecrim@openbossa.org>
+Subject: [PATCH v2 2/2] Emit Adapter.PropertyChanged when UUIDs change
+Date: Fri, 26 Mar 2010 18:54:36 -0400
+Message-Id: <1269644076-10544-2-git-send-email-francisco.alecrim@openbossa.org>
+In-Reply-To: <1269644076-10544-1-git-send-email-francisco.alecrim@openbossa.org>
+References: <1269644076-10544-1-git-send-email-francisco.alecrim@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> > ---
-> >  tools/hciconfig.c |   30 ++++++++++++++++++++++++++----
-> >  1 files changed, 26 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/tools/hciconfig.c b/tools/hciconfig.c
-> > index 3f687e0..c97ce44 100644
-> > --- a/tools/hciconfig.c
-> > +++ b/tools/hciconfig.c
-> > @@ -645,8 +645,26 @@ static char *get_minor_device_name(int major, int minor)
-> >                        return "Game";
-> >                }
-> >                break;
-> > -       case 63:        /* uncategorised */
-> > -               return "";
-> 
-> I think that the test for the "Uncategorised" (which seems to be
-> misspelled in many places) device class would be better staying here,
-> because the same code is used inside hcitool.c. Fixing there would be
-> nice too.
-> 
-> Another thing, looks like this "case 63:" is wrong,  major device
-> class is a 5 bit number, and the uncategorized device class is defined
-> as 31. Looks like a legacy from ancient times ;-)
+Emitting Adapter.PropertyChanged signal when UUIDs change. D-Bus message
+to inform that adapter properties changed.
+---
+ src/adapter.c       |   75 ++++++++++++++++++++++++++++++++++++++++++++------
+ src/adapter.h       |    1 +
+ src/sdpd-database.c |    3 ++
+ 3 files changed, 70 insertions(+), 9 deletions(-)
 
-That's exactly why I changed it: the original check below whether to
-enter this function ("if ((cls[1] & 0x1f) >= ...") meant <no. of
-categories + 1> where +1 meant "Unrecognized", but this is mistaken as
-you wrote.
-
-I don't mind fixing it in "hcitool.c" as well, but see followup question
-at the bottom.
-
-> > +       case 9: /* health */
-> > +               switch(minor) {
-> > +               case 0:
-> > +                       return "Undefined";
-> > +               case 1:
-> > +                       return "Blood Pressure Monitor";
-> > +               case 2:
-> > +                       return "Thermometer";
-> > +               case 3:
-> > +                       return "Weighing Scale";
-> > +               case 4:
-> > +                       return "Glucose Meter";
-> > +               case 5:
-> > +                       return "Pulse Oximeter";
-> > +               case 6:
-> > +                       return "Heart/Pulse Rate Monitor";
-> > +               case 7:
-> > +                       return "Health Data Display";
-> > +               }
-> > +               break;
-> >        }
-> >        return "Unknown (reserved) minor device class";
-> >  }
-> > @@ -668,7 +686,9 @@ static void cmd_class(int ctl, int hdev, char *opt)
-> >                                        "Audio/Video",
-> >                                        "Peripheral",
-> >                                        "Imaging",
-> > -                                       "Uncategorized" };
-> > +                                       "Wearable",
-> > +                                       "Toy",
-> > +                                       "Health" };
-> >        int s = hci_open_dev(hdev);
-> >
-> >        if (s < 0) {
-> > @@ -706,7 +726,9 @@ static void cmd_class(int ctl, int hdev, char *opt)
-> >                } else
-> >                        printf("Unspecified");
-> >                printf("\n\tDevice Class: ");
-> > -               if ((cls[1] & 0x1f) >= sizeof(major_devices) / sizeof(*major_devices))
-> > +               if (0x1f == cls[1])
-> 
-> This test is inverted, in BlueZ code we use the form: (variable
-> operator constant)
-> 
-> > +                       printf("Uncategorized\n");
-> > +               else if ((cls[1] & 0x1f) >= sizeof(major_devices) / sizeof(*major_devices))
-> 
-> See above.
-
-Will fix both.
-
-> >                        printf("Invalid Device Class!\n");
-> >                else
-> >                        printf("%s, %s\n", major_devices[cls[1] & 0x1f],
-> > --
-> > 1.6.6.1
-> > --
-> >
-> 
-> 
-> Cheers,
-
-Thanks for the comments! I'll send a fixed patch.
-
-But here's a followup question: what's the convention for submitting a
-change to a patch - another patch on top of it, or a full replacement
-patch? As a reply to this thread, or as new message?
+diff --git a/src/adapter.c b/src/adapter.c
+index 2027484..884762f 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1034,6 +1034,71 @@ static void adapter_update_devices(struct btd_adapter *adapter)
+ 	g_free(devices);
+ }
+ 
++static char **adapter_get_uuids(struct btd_adapter *adapter)
++{
++	char **uuids;
++	sdp_list_t *list, *lfree;
++	int i;
++
++	list = sdp_get_record_list_by_device(&adapter->bdaddr);
++	if (!list)
++		return NULL;
++
++	/* Keep head to prevent leak */
++	lfree = list;
++	uuids = g_new0(char *, sdp_list_len(list) + 1);
++	for (i = 0; list; list = list->next, i++) {
++		sdp_record_t *rec = list->data;
++		uuids[i] = bt_uuid2string(&rec->svclass);
++	}
++
++	sdp_list_free(lfree, NULL);
++	return uuids;
++}
++
++static void adapter_emit_uuids_updated(struct btd_adapter *adapter)
++{
++	char **uuids;
++	int i;
++
++	uuids = adapter_get_uuids(adapter);
++	if (!uuids)
++		return;
++
++	emit_array_property_changed(connection, adapter->path,
++			ADAPTER_INTERFACE, "UUIDs",
++			DBUS_TYPE_STRING, &uuids);
++
++	for (i = 0; uuids[i]; i++)
++		g_free(uuids[i]);
++	g_free(uuids);
++}
++
++void adapter_uuids_updated(const bdaddr_t *bdaddr)
++{
++	GSList *adapters;
++	struct btd_adapter *adapter;
++
++	if (bacmp(bdaddr, BDADDR_ANY) != 0) {
++		/* Only one adapter */
++		adapter = manager_find_adapter(bdaddr);
++		if (!adapter)
++			return;
++
++		adapter_emit_uuids_updated(adapter);
++
++		return;
++	}
++
++	/* Emit D-Bus msg to all adapters */
++	adapters = manager_get_adapters();
++
++	for (; adapters; adapters = adapters->next) {
++		adapter = adapters->data;
++		adapter_emit_uuids_updated(adapter);
++	}
++}
++
+ struct btd_device *adapter_create_device(DBusConnection *conn,
+ 						struct btd_adapter *adapter,
+ 						const char *address)
+@@ -1198,7 +1263,6 @@ static DBusMessage *get_properties(DBusConnection *conn,
+ 	char str[MAX_NAME_LENGTH + 1], srcaddr[18];
+ 	gboolean value;
+ 	char **devices, **uuids;
+-	sdp_list_t *list, *lfree;
+ 	int i;
+ 	GSList *l;
+ 
+@@ -1273,17 +1337,10 @@ static DBusMessage *get_properties(DBusConnection *conn,
+ 	g_free(devices);
+ 
+ 	/* UUIDs */
+-	list = sdp_get_record_list_by_device(&adapter->bdaddr);
+-	lfree = list; /* keep head to prevent leak */
+-	uuids = g_new0(char *, sdp_list_len(list) + 1);
++	uuids = adapter_get_uuids(adapter);
+ 
+-	for (i = 0; list; list = list->next, i++) {
+-		sdp_record_t *rec = list->data;
+-		uuids[i] = bt_uuid2string(&rec->svclass);
+-	}
+ 	dict_append_array(&dict, "UUIDs", DBUS_TYPE_STRING, &uuids, i);
+ 
+-	sdp_list_free(lfree, NULL);
+ 	for (i = 0; uuids[i]; i++)
+ 		g_free(uuids[i]);
+ 	g_free(uuids);
+diff --git a/src/adapter.h b/src/adapter.h
+index 9b4ce10..e453eff 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -121,6 +121,7 @@ void adapter_mode_changed(struct btd_adapter *adapter, uint8_t scan_mode);
+ void adapter_setname_complete(bdaddr_t *local, uint8_t status);
+ void adapter_update_tx_power(bdaddr_t *bdaddr, uint8_t status, void *ptr);
+ void adapter_update_local_name(bdaddr_t *bdaddr, uint8_t status, void *ptr);
++void adapter_uuids_updated(const bdaddr_t *bdaddr);
+ void adapter_set_class_complete(bdaddr_t *bdaddr, uint8_t status);
+ 
+ struct agent *adapter_get_agent(struct btd_adapter *adapter);
+diff --git a/src/sdpd-database.c b/src/sdpd-database.c
+index 8f99758..97befe0 100644
+--- a/src/sdpd-database.c
++++ b/src/sdpd-database.c
+@@ -40,6 +40,7 @@
+ 
+ #include "sdpd.h"
+ #include "logging.h"
++#include "adapter.h"
+ 
+ static sdp_list_t *service_db;
+ static sdp_list_t *access_db;
+@@ -183,6 +184,7 @@ void sdp_record_add(const bdaddr_t *device, sdp_record_t *rec)
+ 	dev->handle = rec->handle;
+ 
+ 	access_db = sdp_list_insert_sorted(access_db, dev, access_sort);
++	adapter_uuids_updated(device);
+ }
+ 
+ static sdp_list_t *record_locate(uint32_t handle)
+@@ -253,6 +255,7 @@ int sdp_record_remove(uint32_t handle)
+ 		a = (sdp_access_t *) p->data;
+ 		if (a) {
+ 			access_db = sdp_list_remove(access_db, a);
++			adapter_uuids_updated(&a->device);
+ 			access_free(a);
+ 		}
+ 	}
+-- 
+1.6.3.3
 
