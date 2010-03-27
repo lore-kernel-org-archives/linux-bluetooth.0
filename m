@@ -1,86 +1,135 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: hci0 urb xxxxxxxxx failed to resubmit (1)
-From: Dick <dick@mrns.nl>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Date: Sat, 27 Mar 2010 15:19:19 +0100
-Message-ID: <1269699559.3363.4.camel@latitude>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <1269678511.22795.22.camel@localhost.localdomain>
+References: <2c3916b71003160533s714e9ef3h6c803f88a79f27d2@mail.gmail.com>
+	 <2a9506371003221436s1cf1b465r907f726797b4f251@mail.gmail.com>
+	 <1269678511.22795.22.camel@localhost.localdomain>
+Date: Sat, 27 Mar 2010 06:20:56 -0300
+Message-ID: <6b53b1991003270220s3034f541s7b0c645dbb0ed79b@mail.gmail.com>
+Subject: Re: [PATCH] Fix display of last device classes in hciconfig
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
+To: Daniel Abraham <daniel.shrugged@gmail.com>
+Cc: Vinicius Gomes <vinicius.gomes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Daniel,
 
-Since I've updated my kernel to 2.6.32.10 I get the following errors in
-dmesg:
+On Sat, Mar 27, 2010 at 5:28 AM, Daniel Abraham
+<daniel.shrugged@gmail.com> wrote:
+>> > ---
+>> >  tools/hciconfig.c |   30 ++++++++++++++++++++++++++----
+>> >  1 files changed, 26 insertions(+), 4 deletions(-)
+>> >
+>> > diff --git a/tools/hciconfig.c b/tools/hciconfig.c
+>> > index 3f687e0..c97ce44 100644
+>> > --- a/tools/hciconfig.c
+>> > +++ b/tools/hciconfig.c
+>> > @@ -645,8 +645,26 @@ static char *get_minor_device_name(int major, int minor)
+>> >                        return "Game";
+>> >                }
+>> >                break;
+>> > -       case 63:        /* uncategorised */
+>> > -               return "";
+>>
+>> I think that the test for the "Uncategorised" (which seems to be
+>> misspelled in many places) device class would be better staying here,
+>> because the same code is used inside hcitool.c. Fixing there would be
+>> nice too.
+>>
+>> Another thing, looks like this "case 63:" is wrong,  major device
+>> class is a 5 bit number, and the uncategorized device class is defined
+>> as 31. Looks like a legacy from ancient times ;-)
+>
+> That's exactly why I changed it: the original check below whether to
+> enter this function ("if ((cls[1] & 0x1f) >= ...") meant <no. of
+> categories + 1> where +1 meant "Unrecognized", but this is mistaken as
+> you wrote.
+>
+> I don't mind fixing it in "hcitool.c" as well, but see followup question
+> at the bottom.
+>
+>> > +       case 9: /* health */
+>> > +               switch(minor) {
+>> > +               case 0:
+>> > +                       return "Undefined";
+>> > +               case 1:
+>> > +                       return "Blood Pressure Monitor";
+>> > +               case 2:
+>> > +                       return "Thermometer";
+>> > +               case 3:
+>> > +                       return "Weighing Scale";
+>> > +               case 4:
+>> > +                       return "Glucose Meter";
+>> > +               case 5:
+>> > +                       return "Pulse Oximeter";
+>> > +               case 6:
+>> > +                       return "Heart/Pulse Rate Monitor";
+>> > +               case 7:
+>> > +                       return "Health Data Display";
+>> > +               }
+>> > +               break;
+>> >        }
+>> >        return "Unknown (reserved) minor device class";
+>> >  }
+>> > @@ -668,7 +686,9 @@ static void cmd_class(int ctl, int hdev, char *opt)
+>> >                                        "Audio/Video",
+>> >                                        "Peripheral",
+>> >                                        "Imaging",
+>> > -                                       "Uncategorized" };
+>> > +                                       "Wearable",
+>> > +                                       "Toy",
+>> > +                                       "Health" };
+>> >        int s = hci_open_dev(hdev);
+>> >
+>> >        if (s < 0) {
+>> > @@ -706,7 +726,9 @@ static void cmd_class(int ctl, int hdev, char *opt)
+>> >                } else
+>> >                        printf("Unspecified");
+>> >                printf("\n\tDevice Class: ");
+>> > -               if ((cls[1] & 0x1f) >= sizeof(major_devices) / sizeof(*major_devices))
+>> > +               if (0x1f == cls[1])
+>>
+>> This test is inverted, in BlueZ code we use the form: (variable
+>> operator constant)
+>>
+>> > +                       printf("Uncategorized\n");
+>> > +               else if ((cls[1] & 0x1f) >= sizeof(major_devices) / sizeof(*major_devices))
+>>
+>> See above.
+>
+> Will fix both.
+>
+>> >                        printf("Invalid Device Class!\n");
+>> >                else
+>> >                        printf("%s, %s\n", major_devices[cls[1] & 0x1f],
+>> > --
+>> > 1.6.6.1
+>> > --
+>> >
+>>
+>>
+>> Cheers,
+>
+> Thanks for the comments! I'll send a fixed patch.
+>
+> But here's a followup question: what's the convention for submitting a
+> change to a patch - another patch on top of it, or a full replacement
+> patch? As a reply to this thread, or as new message?
 
-...
-btusb_bulk_complete: hci0 urb e48c1b00 failed to resubmit (1)
-btusb_intr_complete: hci0 urb f201c280 failed to resubmit (1)
-btusb_bulk_complete: hci0 urb f201c100 failed to resubmit (1)
-btusb_bulk_complete: hci0 urb f201c180 failed to resubmit (1)
-btusb_intr_complete: hci0 urb f2007580 failed to resubmit (1)
-btusb_bulk_complete: hci0 urb f2007f00 failed to resubmit (1)
-btusb_bulk_complete: hci0 urb f2007a00 failed to resubmit (1)
-btusb_intr_complete: hci0 urb f20eb200 failed to resubmit (1)
-btusb_bulk_complete: hci0 urb f20ebf00 failed to resubmit (1)
-btusb_bulk_complete: hci0 urb f20eb300 failed to resubmit (1)
+Send a full replacement inline patch as a reply to this thread.
 
-I've had urb / isoc errors before and I've fixed that issue with isoc=0
-on the 
-kernel module, this parameter doesn't seem available anymore.
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
 
-# modinfo btusb
-filename:       /lib/modules/2.6.32.10-1-
-fl.smp.gcc4.1.x86.i686/kernel/drivers/bluetooth/btusb.ko
-license:        GPL
-version:        0.6
-description:    Generic Bluetooth USB driver ver 0.6
-author:         Marcel Holtmann <marcel@holtmann.org>
-srcversion:     F297975F8C54B1A9EB522AC
-alias:          usb:v0C10p0000d*dc*dsc*dp*ic*isc*ip*
-alias:          usb:v0BDBp1002d*dc*dsc*dp*ic*isc*ip*
-alias:          usb:v044Ep3002d*dc*dsc*dp*ic*isc*ip*
-alias:          usb:v044Ep3001d*dc*dsc*dp*ic*isc*ip*
-alias:          usb:v04BFp030Ad*dc*dsc*dp*ic*isc*ip*
-alias:          usb:v057Cp3800d*dc*dsc*dp*ic*isc*ip*
-alias:          usb:v*p*d*dcE0dsc01dp01ic*isc*ip*
-depends:        bluetooth
-vermagic:       2.6.32.10-1-fl.smp.gcc4.1.x86.i686 SMP mod_unload 686 
-parm:           ignore_dga:Ignore devices with id 08fd:0001 (bool)
-parm:           ignore_csr:Ignore devices with id 0a12:0001 (bool)
-parm:           ignore_sniffer:Ignore devices with id 0a12:0002 (bool)
-parm:           disable_scofix:Disable fixup of wrong SCO buffer size
-(bool)
-parm:           force_scofix:Force fixup of wrong SCO buffers size
-(bool)
-parm:           reset:Send HCI reset command on initialization (bool)
 
-bluez=4.62-1-0.0.1
 
-# hciconfig hci0 -a
-hci0:   Type: BR/EDR  Bus: USB
-        BD Address: 00:16:41:92:xx:xx  ACL MTU: 384:8  SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN 
-        RX bytes:441742 acl:23420 sco:0 events:2251 errors:0
-        TX bytes:1678 acl:28 sco:0 commands:90 errors:1
-        Features: 0xff 0xff 0x9f 0xfe 0x9b 0xf9 0x00 0x80
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
-        Link policy: RSWITCH HOLD SNIFF PARK 
-        Link mode: SLAVE ACCEPT 
-        Name: 'latitude'
-        Class: 0x4a010c
-        Service Classes: Networking, Capturing, Telephony
-        Device Class: Computer, Laptop
-        HCI Version: 2.0 (0x3)  Revision: 0x976
-        LMP Version: 2.0 (0x3)  Subversion: 0x976
-        Manufacturer: Cambridge Silicon Radio (10)
-
-# lsusb
-Bus 001 Device 014: ID 413c:8103 Dell Computer Corp. Wireless 350
-Bluetooth
-
-My HID devices are laggy and sometimes freeze for a minute.
-
-Please help :)
-
+-- 
+Gustavo F. Padovan
+http://padovan.org
