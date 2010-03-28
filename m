@@ -1,21 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?iso-8859-1?q?Jos=E9_Antonio_Santos_Cadenas?=
-	<jcaden@libresoft.es>
-Reply-To: jcaden@libresoft.es
-To: linux-bluetooth@vger.kernel.org
-Subject: Sending big patches
-Date: Mon, 29 Mar 2010 09:03:05 +0200
+Message-ID: <4BAF963C.6030507@solaris.kirov.ru>
+Date: Sun, 28 Mar 2010 21:47:40 +0400
+From: Andrey Sokolov <keremet@solaris.kirov.ru>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <201003290903.05586.jcaden@libresoft.es>
+To: linux-bluetooth@vger.kernel.org
+Subject: GSOC 2010 - DUN Client
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hello!
 
-Las friday Sancane and me tried to send a firts patch with MCAP and HDP, but it 
-seems it has been retained. The patch is about 5K lines and we sent it as an 
-attached file. Is there a better way to send this patch?
+I have been working on a Linux system during 3 years. I have contributed 
+to Bluetooth Stack & Drivers OpenSolaris project 
+(http://hub.opensolaris.org/bin/view/Project+bluetooth/ , "Special 
+Contributions" section). I have ported bthcid from NetBSD to OpenSolaris.
+I graduated Vyatka State University (Russia) from department of 
+Computing Machines in 2007. Now I am a magistracy's student (AI). I had 
+internship at Intel Summer School 2006 in Nizhniy Novgorod (Russia). I 
+am really interested in open source operating systems. More than that, I 
+am rather experienced in bluetooth sphere. I have worked with 
+OpenSolaris and I am sure I won't have any problems with Linux. I guess 
+it will be for hobby. I will have my exams in June. I will be able to 
+dedicate 20 hours per week to the project.
+I prefer to work on the DUN client idea, but other ideas are acceptable too.
 
-Regards
+
+Andrey
