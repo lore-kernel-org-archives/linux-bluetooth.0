@@ -1,56 +1,495 @@
 Return-Path: <cyrus@holtmann.org>
+Subject: Re: [PATCH] Added support for Atheros AR300x Bluetooth Chip
+From: suraj <suraj@atheros.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <marcel@holtmann.org>, <Luis.Rodriguez@Atheros.com>,
+	<Jothikumar.Mothilal@Atheros.com>
+In-Reply-To: <1269408445.23163.0.camel@atheros013-desktop>
+References: <1268629296.21425.23.camel@atheros013-desktop>
+	 <1269408445.23163.0.camel@atheros013-desktop>
+Content-Type: text/plain; charset="UTF-8"
+Date: Mon, 29 Mar 2010 14:31:26 +0530
+Message-ID: <1269853286.16177.6.camel@atheros013-desktop>
 MIME-Version: 1.0
-In-Reply-To: <1269851341.11714.203.camel@localhost.localdomain>
-References: <1269644076-10544-1-git-send-email-francisco.alecrim@openbossa.org>
-	 <1269644076-10544-2-git-send-email-francisco.alecrim@openbossa.org>
-	 <20100329074539.GA20839@jh-x301>
-	 <1269851341.11714.203.camel@localhost.localdomain>
-Date: Mon, 29 Mar 2010 21:48:49 +0300
-Message-ID: <2d5a2c101003291148u1836742w1222097fb865ef61@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] Emit Adapter.PropertyChanged when UUIDs change
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	Francisco Alecrim <francisco.alecrim@openbossa.org>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Wed, 2010-03-24 at 10:57 +0530, suraj wrote:
+> On Mon, 2010-03-15 at 10:31 +0530, suraj wrote:
+> > This protocol implements support for power management feature provided by AR300x chip.
+> > This lets the controller chip go to sleep mode if there is no Bluetooth activity for some time.
+> > It then wakes up the chip in case of a Bluetooth activity.
+> > 
+> > 
+> >  Signed-off-by: Suraj <suraj@atheros.com>
+> > 
+> > ---
+> >  drivers/bluetooth/Kconfig     |   11 ++
+> >  drivers/bluetooth/Makefile    |    1 +
+> >  drivers/bluetooth/hci_ath.c   |  353 +++++++++++++++++++++++++++++++++++++++++
+> >  drivers/bluetooth/hci_ldisc.c |    6 +
+> >  drivers/bluetooth/hci_uart.h  |    8 +-
+> >  5 files changed, 378 insertions(+), 1 deletions(-)
+> >  create mode 100755 drivers/bluetooth/hci_ath.c
+> > 
+> > diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+> > index 058fbcc..81abeff 100644
+> > --- a/drivers/bluetooth/Kconfig
+> > +++ b/drivers/bluetooth/Kconfig
+> > @@ -58,6 +58,17 @@ config BT_HCIUART_BCSP
+> >  
+> >  	  Say Y here to compile support for HCI BCSP protocol.
+> >  
+> > +config BT_HCIUART_ATH
+> > +	bool "Atheros AR300x Board support"
+> > +	depends on BT_HCIUART
+> > +	help
+> > +	  HCIATH (HCI Atheros) is a serial protocol for communication
+> > +	  between Bluetooth device and host with support for Atheros AR300x
+> > +	  power management feature. This protocol is required for
+> > +	  serial Bluetooth devices that are based on Atheros AR300x chips.
+> > +
+> > +	  Say Y here to compile support for HCIATH protocol.
+> > +
+> >  config BT_HCIUART_LL
+> >  	bool "HCILL protocol support"
+> >  	depends on BT_HCIUART
+> > diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
+> > index 7e5aed5..1481faa 100644
+> > --- a/drivers/bluetooth/Makefile
+> > +++ b/drivers/bluetooth/Makefile
+> > @@ -26,4 +26,5 @@ hci_uart-y				:= hci_ldisc.o
+> >  hci_uart-$(CONFIG_BT_HCIUART_H4)	+= hci_h4.o
+> >  hci_uart-$(CONFIG_BT_HCIUART_BCSP)	+= hci_bcsp.o
+> >  hci_uart-$(CONFIG_BT_HCIUART_LL)	+= hci_ll.o
+> > +hci_uart-$(CONFIG_BT_HCIUART_ATH)	+= hci_ath.o
+> >  hci_uart-objs				:= $(hci_uart-y)
+> > diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
+> > new file mode 100755
+> > index 0000000..13e4404
+> > --- /dev/null
+> > +++ b/drivers/bluetooth/hci_ath.c
+> > @@ -0,0 +1,353 @@
+> > +/*
+> > + * Copyright (c) 2009-2010 Atheros Communications Inc.
+> > + *
+> > + *  This program is free software; you can redistribute it and/or modify
+> > + *  it under the terms of the GNU General Public License as published by
+> > + *  the Free Software Foundation; either version 2 of the License, or
+> > + *  (at your option) any later version.
+> > + *
+> > + *  This program is distributed in the hope that it will be useful,
+> > + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> > + *  GNU General Public License for more details.
+> > + *
+> > + *  You should have received a copy of the GNU General Public License
+> > + *  along with this program; if not, write to the Free Software
+> > + *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+> > + *
+> > + */
+> > +
+> > +#include <linux/module.h>
+> > +#include <linux/kernel.h>
+> > +
+> > +#include <linux/init.h>
+> > +#include <linux/slab.h>
+> > +#include <linux/tty.h>
+> > +#include <linux/errno.h>
+> > +#include <linux/ioctl.h>
+> > +#include <linux/skbuff.h>
+> > +
+> > +#include <net/bluetooth/bluetooth.h>
+> > +#include <net/bluetooth/hci_core.h>
+> > +
+> > +#include "hci_uart.h"
+> > +
+> > +
+> > +/* HCIATH receiver States */
+> > +#define HCIATH_W4_PACKET_TYPE			0
+> > +#define HCIATH_W4_EVENT_HDR			1
+> > +#define HCIATH_W4_ACL_HDR			2
+> > +#define HCIATH_W4_SCO_HDR			3
+> > +#define HCIATH_W4_DATA				4
+> > +
+> > +struct ath_struct {
+> > +	struct hci_uart *hu;
+> > +	unsigned int rx_state;
+> > +	unsigned int rx_count;
+> > +	unsigned int cur_sleep;
+> > +
+> > +	spinlock_t hciath_lock;
+> > +	struct sk_buff *rx_skb;
+> > +	struct sk_buff_head txq;
+> > +	wait_queue_head_t wqevt;
+> > +	struct work_struct ctxtsw;
+> > +};
+> > +
+> > +int ath_wakeup_ar3001(struct tty_struct *tty)
+> > +{
+> > +	struct termios settings;
+> > +	int status = 0x00;
+> > +	mm_segment_t oldfs;
+> > +	status = tty->driver->ops->tiocmget(tty, NULL);
+> > +
+> > +	if ((status & TIOCM_CTS))
+> > +		return status;
+> > +
+> > +	oldfs = get_fs();
+> > +	set_fs(KERNEL_DS);
+> > +	n_tty_ioctl_helper(tty, NULL, TCGETS, (unsigned long)&settings);
+> > +
+> > +	settings.c_cflag &= ~CRTSCTS;
+> > +	n_tty_ioctl_helper(tty, NULL, TCSETS, (unsigned long)&settings);
+> > +	set_fs(oldfs);
+> > +	status = tty->driver->ops->tiocmget(tty, NULL);
+> > +
+> > +	/* Wake up board */
+> > +	tty->driver->ops->tiocmset(tty, NULL, 0x00, TIOCM_RTS);
+> > +	mdelay(20);
+> > +
+> > +	status = tty->driver->ops->tiocmget(tty, NULL);
+> > +
+> > +	tty->driver->ops->tiocmset(tty, NULL, TIOCM_RTS, 0x00);
+> > +	mdelay(20);
+> > +
+> > +	status = tty->driver->ops->tiocmget(tty, NULL);
+> > +	oldfs = get_fs();
+> > +	set_fs(KERNEL_DS);
+> > +	n_tty_ioctl_helper(tty, NULL, TCGETS, (unsigned long)&settings);
+> > +
+> > +	settings.c_cflag |= CRTSCTS;
+> > +	n_tty_ioctl_helper(tty, NULL, TCSETS, (unsigned long)&settings);
+> > +	set_fs(oldfs);
+> > +	return status;
+> > +}
+> > +
+> > +static void ath_context_switch(struct work_struct *work)
+> > +{
+> > +	int status;
+> > +	struct ath_struct *ath;
+> > +	struct hci_uart *hu;
+> > +	struct tty_struct *tty;
+> > +
+> > +	ath = container_of(work, struct ath_struct, ctxtsw);
+> > +
+> > +	hu = ath->hu;
+> > +	tty = hu->tty;
+> > +
+> > +	/* verify and wake up controller */
+> > +	if (ath->cur_sleep) {
+> > +
+> > +		status = ath_wakeup_ar3001(tty);
+> > +		if (!(status & TIOCM_CTS))
+> > +			return;
+> > +	}
+> > +
+> > +	/* Ready to send Data */
+> > +	clear_bit(HCI_UART_SENDING, &hu->tx_state);
+> > +	hci_uart_tx_wakeup(hu);
+> > +}
+> > +
+> > +int ath_check_sleep_cmd(struct ath_struct *ath, unsigned char *packet)
+> > +{
+> > +	if (packet[0] == 0x04 && packet[1] == 0xFC)
+> > +		ath->cur_sleep = packet[3];
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +
+> > +/* Initialize protocol */
+> > +static int ath_open(struct hci_uart *hu)
+> > +{
+> > +	struct ath_struct *ath;
+> > +	BT_DBG("hu %p", hu);
+> > +
+> > +	ath = kzalloc(sizeof(*ath), GFP_ATOMIC);
+> > +	if (!ath)
+> > +		return -ENOMEM;
+> > +
+> > +	skb_queue_head_init(&ath->txq);
+> > +	spin_lock_init(&ath->hciath_lock);
+> > +
+> > +	ath->cur_sleep = 0;
+> > +	hu->priv = ath;
+> > +	ath->hu = hu;
+> > +
+> > +	init_waitqueue_head(&ath->wqevt);
+> > +	INIT_WORK(&ath->ctxtsw, ath_context_switch);
+> > +	return 0;
+> > +}
+> > +
+> > +/* Flush protocol data */
+> > +static int ath_flush(struct hci_uart *hu)
+> > +{
+> > +	struct ath_struct *ath = hu->priv;
+> > +	BT_DBG("hu %p", hu);
+> > +	skb_queue_purge(&ath->txq);
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +/* Close protocol */
+> > +static int ath_close(struct hci_uart *hu)
+> > +{
+> > +	struct ath_struct *ath = hu->priv;
+> > +	BT_DBG("hu %p", hu);
+> > +
+> > +	skb_queue_purge(&ath->txq);
+> > +
+> > +	if (ath->rx_skb)
+> > +		kfree_skb(ath->rx_skb);
+> > +
+> > +	wake_up_interruptible(&ath->wqevt);
+> > +	hu->priv = NULL;
+> > +	kfree(ath);
+> > +	return 0;
+> > +}
+> > +
+> > +/* Enqueue frame for transmittion */
+> > +static int ath_enqueue(struct hci_uart *hu, struct sk_buff *skb)
+> > +{
+> > +	struct ath_struct *ath = hu->priv;
+> > +	if (bt_cb(skb)->pkt_type == HCI_SCODATA_PKT) {
+> > +
+> > +		/* Discard SCO packet.AR3001 does not support SCO over HCI */
+> > +		BT_DBG("SCO Packet over HCI received Dropping\n");
+> > +		kfree(skb);
+> > +		return 0;
+> > +	}
+> > +	BT_DBG("hu %p skb %p", hu, skb);
+> > +
+> > +	/* Prepend skb with frame type */
+> > +	memcpy(skb_push(skb, 1), &bt_cb(skb)->pkt_type, 1);
+> > +
+> > +	skb_queue_tail(&ath->txq, skb);
+> > +	set_bit(HCI_UART_SENDING, &hu->tx_state);
+> > +
+> > +	schedule_work(&ath->ctxtsw);
+> > +	return 0;
+> > +}
+> > +
+> > +static struct sk_buff *ath_dequeue(struct hci_uart *hu)
+> > +{
+> > +	struct ath_struct *ath = hu->priv;
+> > +	struct sk_buff *skbuf;
+> > +
+> > +	skbuf = skb_dequeue(&ath->txq);
+> > +	if (skbuf != NULL)
+> > +		ath_check_sleep_cmd(ath, &skbuf->data[1]);
+> > +
+> > +	return skbuf;
+> > +}
+> > +
+> > +static inline int ath_check_data_len(struct ath_struct *ath, int len)
+> > +{
+> > +	register int room = skb_tailroom(ath->rx_skb);
+> > +	BT_DBG("len %d room %d", len, room);
+> > +
+> > +	if (len > room) {
+> > +		BT_ERR("Data length is too large");
+> > +		kfree_skb(ath->rx_skb);
+> > +		ath->rx_state = HCIATH_W4_PACKET_TYPE;
+> > +		ath->rx_skb = NULL;
+> > +		ath->rx_count = 0;
+> > +	} else {
+> > +		ath->rx_state = HCIATH_W4_DATA;
+> > +		ath->rx_count = len;
+> > +		return len;
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +/* Recv data */
+> > +static int ath_recv(struct hci_uart *hu, void *data, int count)
+> > +{
+> > +	struct ath_struct *ath = hu->priv;
+> > +	register char *ptr;
+> > +	struct hci_event_hdr *eh;
+> > +	struct hci_acl_hdr *ah;
+> > +	struct hci_sco_hdr *sh;
+> > +	struct sk_buff *skbuf;
+> > +	register int len, type, dlen;
+> > +
+> > +	skbuf = NULL;
+> > +	BT_DBG("hu %p count %d rx_state %d rx_count %d", hu, count,
+> > +	       ath->rx_state, ath->rx_count);
+> > +	ptr = data;
+> > +	while (count) {
+> > +		if (ath->rx_count) {
+> > +
+> > +			len = min_t(unsigned int, ath->rx_count, count);
+> > +			memcpy(skb_put(ath->rx_skb, len), ptr, len);
+> > +			ath->rx_count -= len;
+> > +			count -= len;
+> > +			ptr += len;
+> > +
+> > +			if (ath->rx_count)
+> > +				continue;
+> > +			switch (ath->rx_state) {
+> > +			case HCIATH_W4_DATA:
+> > +				hci_recv_frame(ath->rx_skb);
+> > +				ath->rx_state = HCIATH_W4_PACKET_TYPE;
+> > +				ath->rx_skb = NULL;
+> > +				ath->rx_count = 0;
+> > +				continue;
+> > +			case HCIATH_W4_EVENT_HDR:
+> > +				eh = (struct hci_event_hdr *)ath->rx_skb->data;
+> > +				BT_DBG("Event header: evt 0x%2.2x plen %d",
+> > +				       eh->evt, eh->plen);
+> > +				ath_check_data_len(ath, eh->plen);
+> > +				continue;
+> > +			case HCIATH_W4_ACL_HDR:
+> > +				ah = (struct hci_acl_hdr *)ath->rx_skb->data;
+> > +				dlen = __le16_to_cpu(ah->dlen);
+> > +				BT_DBG("ACL header: dlen %d", dlen);
+> > +				ath_check_data_len(ath, dlen);
+> > +				continue;
+> > +			case HCIATH_W4_SCO_HDR:
+> > +				sh = (struct hci_sco_hdr *)ath->rx_skb->data;
+> > +				BT_DBG("SCO header: dlen %d", sh->dlen);
+> > +				ath_check_data_len(ath, sh->dlen);
+> > +				continue;
+> > +			}
+> > +		}
+> > +
+> > +		/* HCIATH_W4_PACKET_TYPE */
+> > +		switch (*ptr) {
+> > +		case HCI_EVENT_PKT:
+> > +			BT_DBG("Event packet");
+> > +			ath->rx_state = HCIATH_W4_EVENT_HDR;
+> > +			ath->rx_count = HCI_EVENT_HDR_SIZE;
+> > +			type = HCI_EVENT_PKT;
+> > +			break;
+> > +		case HCI_ACLDATA_PKT:
+> > +			BT_DBG("ACL packet");
+> > +			ath->rx_state = HCIATH_W4_ACL_HDR;
+> > +			ath->rx_count = HCI_ACL_HDR_SIZE;
+> > +			type = HCI_ACLDATA_PKT;
+> > +			break;
+> > +		case HCI_SCODATA_PKT:
+> > +			BT_DBG("SCO packet");
+> > +			ath->rx_state = HCIATH_W4_SCO_HDR;
+> > +			ath->rx_count = HCI_SCO_HDR_SIZE;
+> > +			type = HCI_SCODATA_PKT;
+> > +			break;
+> > +		default:
+> > +			BT_ERR("Unknown HCI packet type %2.2x", (__u8) *ptr);
+> > +			hu->hdev->stat.err_rx++;
+> > +			ptr++;
+> > +			count--;
+> > +			continue;
+> > +		};
+> > +		ptr++;
+> > +		count--;
+> > +
+> > +		/* Allocate packet */
+> > +		ath->rx_skb = bt_skb_alloc(HCI_MAX_FRAME_SIZE, GFP_ATOMIC);
+> > +		if (!ath->rx_skb) {
+> > +			BT_ERR("Can't allocate mem for new packet");
+> > +			ath->rx_state = HCIATH_W4_PACKET_TYPE;
+> > +			ath->rx_count = 0;
+> > +			return -ENOMEM;
+> > +		}
+> > +		ath->rx_skb->dev = (void *)hu->hdev;
+> > +		bt_cb(ath->rx_skb)->pkt_type = type;
+> > +	} return count;
+> > +}
+> > +
+> > +static struct hci_uart_proto athp = {
+> > +	.id = HCI_UART_ATH,
+> > +	.open = ath_open,
+> > +	.close = ath_close,
+> > +	.recv = ath_recv,
+> > +	.enqueue = ath_enqueue,
+> > +	.dequeue = ath_dequeue,
+> > +	.flush = ath_flush,
+> > +};
+> > +
+> > +int ath_init(void)
+> > +{
+> > +	int err = hci_uart_register_proto(&athp);
+> > +	if (!err)
+> > +		BT_INFO("HCIATH protocol initialized");
+> > +
+> > +	else
+> > +		BT_ERR("HCIATH protocol registration failed");
+> > +	return err;
+> > +}
+> > +
+> > +int ath_deinit(void)
+> > +{
+> > +	return hci_uart_unregister_proto(&athp);
+> > +}
+> > diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+> > index 76a1abb..7dd76d1 100644
+> > --- a/drivers/bluetooth/hci_ldisc.c
+> > +++ b/drivers/bluetooth/hci_ldisc.c
+> > @@ -542,6 +542,9 @@ static int __init hci_uart_init(void)
+> >  #ifdef CONFIG_BT_HCIUART_LL
+> >  	ll_init();
+> >  #endif
+> > +#ifdef CONFIG_BT_HCIUART_ATH
+> > +	ath_init();
+> > +#endif
+> >  
+> >  	return 0;
+> >  }
+> > @@ -559,6 +562,9 @@ static void __exit hci_uart_exit(void)
+> >  #ifdef CONFIG_BT_HCIUART_LL
+> >  	ll_deinit();
+> >  #endif
+> > +#ifdef CONFIG_BT_HCIUART_ATH
+> > +	ath_deinit();
+> > +#endif
+> >  
+> >  	/* Release tty registration of line discipline */
+> >  	if ((err = tty_unregister_ldisc(N_HCI)))
+> > diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+> > index 50113db..385537f 100644
+> > --- a/drivers/bluetooth/hci_uart.h
+> > +++ b/drivers/bluetooth/hci_uart.h
+> > @@ -33,13 +33,14 @@
+> >  #define HCIUARTGETDEVICE	_IOR('U', 202, int)
+> >  
+> >  /* UART protocols */
+> > -#define HCI_UART_MAX_PROTO	5
+> > +#define HCI_UART_MAX_PROTO	6
+> >  
+> >  #define HCI_UART_H4	0
+> >  #define HCI_UART_BCSP	1
+> >  #define HCI_UART_3WIRE	2
+> >  #define HCI_UART_H4DS	3
+> >  #define HCI_UART_LL	4
+> > +#define HCI_UART_ATH	5
+> >  
+> >  struct hci_uart;
+> >  
+> > @@ -91,3 +92,8 @@ int bcsp_deinit(void);
+> >  int ll_init(void);
+> >  int ll_deinit(void);
+> >  #endif
+> > +
+> > +#ifdef CONFIG_BT_HCIUART_ATH
+> > +int ath_init(void);
+> > +int ath_deinit(void);
+> > +#endif
+> 
+> Hi Marcel,
+> 
+> Can you please give your comments regarding the patch that I have sent
+> you?
+> 
+> Regards
+> Suraj
 
-On Mon, Mar 29, 2010 at 11:29 AM, Marcel Holtmann <marcel@holtmann.org> wro=
-te:
-> Hi Johan,
->
->> > Emitting Adapter.PropertyChanged signal when UUIDs change. D-Bus messa=
-ge
->> > to inform that adapter properties changed.
->> > ---
->> > =A0src/adapter.c =A0 =A0 =A0 | =A0 75 ++++++++++++++++++++++++++++++++=
-++++++++++++------
->> > =A0src/adapter.h =A0 =A0 =A0 | =A0 =A01 +
->> > =A0src/sdpd-database.c | =A0 =A03 ++
->> > =A03 files changed, 70 insertions(+), 9 deletions(-)
->>
->> Thanks for the patches. In principle they look good, but I haven't
->> applied them yet due to one thing that looks a bit strange: both the SDP
->> server record UUID (0x1000) as well as the public browse group UUID
->> (0x1001) always show up in the UUIDs list. I wonder if there'd be any
->> clean way to avoid getting them into the list. Marcel, do you have any
->> idea about this or is it even a problem that these UUIDs are always in
->> the list?
->
-> these UUIDs are always in the server, but not in the public browse group
-> and we skip them on purpose. The only reason why they are always present
-> is that the specification requires it.
+Hi marcel,
 
-IMO, it should be the same list as we export in extended inquiry
-response, so perhaps we could use the data from
-create_ext_inquiry_response which already filter those away. Perhaps
-some refactoring could also be done since this code seems to be called
-multiple times in case of new services because it also changes class
-which then triggers create_ext_inquiry_response again.
+A gentle remainder.
 
+Can you please update the above driver to the Linux tree? If you find
+any issues please let me know so that I can do the needful.
 
---=20
-Luiz Augusto von Dentz
-Computer Engineer
+Regards
+Suraj
