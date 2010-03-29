@@ -1,76 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 30 Mar 2010 00:52:39 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Francisco Alecrim <francisco.alecrim@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] Emit Adapter.PropertyChanged when UUIDs change
-Message-ID: <20100329215239.GA3748@jh-x301>
-References: <1269644076-10544-1-git-send-email-francisco.alecrim@openbossa.org>
- <1269644076-10544-2-git-send-email-francisco.alecrim@openbossa.org>
- <20100329074539.GA20839@jh-x301>
- <1269851341.11714.203.camel@localhost.localdomain>
- <2d5a2c101003291148u1836742w1222097fb865ef61@mail.gmail.com>
+Message-ID: <4BB1048D.3070806@aircable.net>
+Date: Mon, 29 Mar 2010 16:50:37 -0300
+From: Manuel Naranjo <manuel@aircable.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <2d5a2c101003291148u1836742w1222097fb865ef61@mail.gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Allow bccmd psset to get words along with bytes
+Content-Type: multipart/mixed;
+ boundary="------------050600070007080500020705"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+This is a multi-part message in MIME format.
+--------------050600070007080500020705
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 29, 2010, Luiz Augusto von Dentz wrote:
-> On Mon, Mar 29, 2010 at 11:29 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> > Hi Johan,
-> >
-> >> > Emitting Adapter.PropertyChanged signal when UUIDs change. D-Bus message
-> >> > to inform that adapter properties changed.
-> >> > ---
-> >> >  src/adapter.c       |   75 ++++++++++++++++++++++++++++++++++++++++++++------
-> >> >  src/adapter.h       |    1 +
-> >> >  src/sdpd-database.c |    3 ++
-> >> >  3 files changed, 70 insertions(+), 9 deletions(-)
-> >>
-> >> Thanks for the patches. In principle they look good, but I haven't
-> >> applied them yet due to one thing that looks a bit strange: both the SDP
-> >> server record UUID (0x1000) as well as the public browse group UUID
-> >> (0x1001) always show up in the UUIDs list. I wonder if there'd be any
-> >> clean way to avoid getting them into the list. Marcel, do you have any
-> >> idea about this or is it even a problem that these UUIDs are always in
-> >> the list?
-> >
-> > these UUIDs are always in the server, but not in the public browse group
-> > and we skip them on purpose. The only reason why they are always present
-> > is that the specification requires it.
-> 
-> IMO, it should be the same list as we export in extended inquiry
-> response, so perhaps we could use the data from
-> create_ext_inquiry_response which already filter those away. Perhaps
-> some refactoring could also be done since this code seems to be called
-> multiple times in case of new services because it also changes class
-> which then triggers create_ext_inquiry_response again.
+Hello guys,
 
-That makes quite a lot sense, and is actually what I was chatting with
-Marcel about earlier today on irc. The EIR UUIDs list does have a few
-restrictions though that the Adapter UUIDs property doesn't have, such
-as a maximum limit on the amount of UUIDs (since EIR data is quite
-limited in size), so the lists will not always be exactly the same.
+This patch allows bccmd psset input to be compatible with psget output, 
+psget returns words not bytes, but when you want to get that back into 
+psset it complains. This patch fixes the problem by allowing words to be 
+input.
 
-You can see the creation of the EIR list in the for-loop of the
-create_ext_inquiry_response function in sdpd-service.c. The most
-important part for the Adapter UUIDs property would be the following
-code snippet which also answers the original question I had about how to
-best get rid of the unnecessary UUIDs:
+Here's the output that shows it works:
 
-       if (rec->svclass.value.uuid16 < 0x1100)
-               continue;
-       if (rec->svclass.value.uuid16 == PNP_INFO_SVCLASS_ID)
-               continue;
+[root@laptop:bluez-4.61]$ tools/bccmd psset -r -s psi 0x0031 0x3714 
+0x0100 0x411e 0x7100 0x00f4 0x4410 0x0100 0x4123 0x7100 0x00f8 0x4e11 
+0x0100 0x4123 0x6100 0x00fc 0x5d10 0x0100 0x4123 0x5100 0x0000 0x6914 
+0x0100 0x4b23 0x4000 0x0004 0x7317 0x0100 0x4123 0x3000 0x000a 0x731c 
+0x0100 0x4123 0x2000 0x000e 0x7321 0x0100 0x4123 0x1000 0x0014
 
-In addition those there's also the duplicate UUID check which I think
-the original patch was missing. So, if the same code could somehow be
-reused for EIR and the Adapter UUIDs property it'd be great. However, if
-it's too messy, the above two filters and the duplicate UUID check
-should at least be applied to the Adapter UUIDs property.
+[root@laptop:bluez-4.61]$ tools/bccmd psget 0x0031
+Radio power table: 0x3714 0x0100 0x411e 0x7100 0x00f4 0x4410 0x0100 
+0x4123 0x7100 0x00f8 0x4e11 0x0100 0x4123 0x6100 0x00fc 0x5d10 0x0100 
+0x4123 0x5100 0x0000 0x6914 0x0100 0x4b23 0x4000 0x0004 0x7317 0x0100 
+0x4123 0x3000 0x000a 0x731c 0x0100 0x4123 0x2000 0x000e 0x7321 0x0100 
+0x4123 0x1000 0x0014
 
-Johan
+Cheers,
+Manuel
+
+--------------050600070007080500020705
+Content-Type: text/plain;
+ name="bccmd.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="bccmd.patch"
+
+--- ../bluez-4.59/tools/bccmd.c	2009-02-01 23:30:43.000000000 -0200
++++ tools/bccmd.c	2010-03-29 16:47:04.000000000 -0300
+@@ -823,16 +823,32 @@ static int cmd_psset(int transport, int 
+ 		break;
+ 
+ 	default:
+-		if (argc != length * 2) {
++		if (argc != length * 2 && argc != length) {
+ 			errno = EINVAL;
+ 			return -1;
+ 		}
+ 
+-		for (i = 0; i < length * 2; i++)
+-			if (!strncasecmp(argv[0], "0x", 2))
++		if (argc == length * 2) {
++		    for (i = 0; i < length * 2; i++)
++			if (!strncasecmp(argv[0], "0x", 2)){
+ 				array[i + 6] = strtol(argv[i] + 2, NULL, 16);
++			}
+ 			else
+ 				array[i + 6] = atoi(argv[i]);
++		}
++		else {
++		    for (i = 0; i < length; i++){
++			uint16_t val = 0;
++
++			if (!strncasecmp(argv[0], "0x", 2))
++			    val = strtol(argv[i] + 2, NULL, 16);
++			else
++			    val = atoi(argv[i]);
++
++			array[i*2 + 7] = val % 0x100;
++			array[i*2 + 6] = (val / 0x100);
++		    }
++		}
+ 		break;
+ 	}
+ 
+
+--------------050600070007080500020705--
