@@ -1,47 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 30 Mar 2010 01:56:43 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Francisco Alecrim <francisco.alecrim@openbossa.org>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] Emit Adapter.PropertyChanged when UUIDs change
-Message-ID: <20100329225643.GA5460@jh-x301>
-References: <1269644076-10544-1-git-send-email-francisco.alecrim@openbossa.org>
- <1269644076-10544-2-git-send-email-francisco.alecrim@openbossa.org>
- <20100329074539.GA20839@jh-x301>
- <1269851341.11714.203.camel@localhost.localdomain>
- <2d5a2c101003291148u1836742w1222097fb865ef61@mail.gmail.com>
- <20100329215239.GA3748@jh-x301>
- <4BB125E8.1090200@openbossa.org>
+Message-ID: <4BB125E8.1090200@openbossa.org>
+Date: Mon, 29 Mar 2010 18:12:56 -0400
+From: Francisco Alecrim <francisco.alecrim@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4BB125E8.1090200@openbossa.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Francisco Alecrim <francisco.alecrim@openbossa.org>,
+ linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] Emit Adapter.PropertyChanged when UUIDs change
+References: <1269644076-10544-1-git-send-email-francisco.alecrim@openbossa.org> <1269644076-10544-2-git-send-email-francisco.alecrim@openbossa.org> <20100329074539.GA20839@jh-x301> <1269851341.11714.203.camel@localhost.localdomain> <2d5a2c101003291148u1836742w1222097fb865ef61@mail.gmail.com> <20100329215239.GA3748@jh-x301>
+In-Reply-To: <20100329215239.GA3748@jh-x301>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alecrim,
+Hi Johan and Luiz,
 
-On Mon, Mar 29, 2010, Francisco Alecrim wrote:
-> >> IMO, it should be the same list as we export in extended inquiry
-> >> response, so perhaps we could use the data from
-> >> create_ext_inquiry_response which already filter those away. Perhaps
-> >> some refactoring could also be done since this code seems to be called
-> >> multiple times in case of new services because it also changes class
-> >> which then triggers create_ext_inquiry_response again.
+Johan Hedberg wrote:
+> Hi Luiz,
 > 
-> I'm not so sure about it but create_ext_inquiry_response list all
-> services to any adapters. Shouldn't it list just services per
-> adapter(access_db)?
+> On Mon, Mar 29, 2010, Luiz Augusto von Dentz wrote:
+>> On Mon, Mar 29, 2010 at 11:29 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+>>> Hi Johan,
+>>>
+>>>>> Emitting Adapter.PropertyChanged signal when UUIDs change. D-Bus message
+>>>>> to inform that adapter properties changed.
+>>>>> ---
+>>>>>  src/adapter.c       |   75 ++++++++++++++++++++++++++++++++++++++++++++------
+>>>>>  src/adapter.h       |    1 +
+>>>>>  src/sdpd-database.c |    3 ++
+>>>>>  3 files changed, 70 insertions(+), 9 deletions(-)
+>>>> Thanks for the patches. In principle they look good, but I haven't
+>>>> applied them yet due to one thing that looks a bit strange: both the SDP
+>>>> server record UUID (0x1000) as well as the public browse group UUID
+>>>> (0x1001) always show up in the UUIDs list. I wonder if there'd be any
+>>>> clean way to avoid getting them into the list. Marcel, do you have any
+>>>> idea about this or is it even a problem that these UUIDs are always in
+>>>> the list?
+>>> these UUIDs are always in the server, but not in the public browse group
+>>> and we skip them on purpose. The only reason why they are always present
+>>> is that the specification requires it.
+>> IMO, it should be the same list as we export in extended inquiry
+>> response, so perhaps we could use the data from
+>> create_ext_inquiry_response which already filter those away. Perhaps
+>> some refactoring could also be done since this code seems to be called
+>> multiple times in case of new services because it also changes class
+>> which then triggers create_ext_inquiry_response again.
 
-It should be per-adapter (or records registered to BDADDR_ANY) since EIR
-is also per-adapter, so looks like a possible bug in the current
-implementation.
+I'm not so sure about it but create_ext_inquiry_response list all
+services to any adapters. Shouldn't it list just services per
+adapter(access_db)?
 
-Btw, another restriction to note with the current EIR UUID list
-implementation is that it only supports 16-bit UUIDs. The EIR format
-itself would support also 32 and 128 bit formats but probably for
-simplicity these have been left out. The Adapter UUIDs list should
-however contain all UUIDs (with the exceptions that we already
-discussed).
+> 
+> That makes quite a lot sense, and is actually what I was chatting with
+> Marcel about earlier today on irc. The EIR UUIDs list does have a few
+> restrictions though that the Adapter UUIDs property doesn't have, such
+> as a maximum limit on the amount of UUIDs (since EIR data is quite
+> limited in size), so the lists will not always be exactly the same.
+> 
+> You can see the creation of the EIR list in the for-loop of the
+> create_ext_inquiry_response function in sdpd-service.c. The most
+> important part for the Adapter UUIDs property would be the following
+> code snippet which also answers the original question I had about how to
+> best get rid of the unnecessary UUIDs:
+> 
+>        if (rec->svclass.value.uuid16 < 0x1100)
+>                continue;
+>        if (rec->svclass.value.uuid16 == PNP_INFO_SVCLASS_ID)
+>                continue;
+> 
+> In addition those there's also the duplicate UUID check which I think
+> the original patch was missing. So, if the same code could somehow be
+> reused for EIR and the Adapter UUIDs property it'd be great. However, if
+> it's too messy, the above two filters and the duplicate UUID check
+> should at least be applied to the Adapter UUIDs property.
 
-Johan
+Great! That's the piece of code I was trying to find. I'll try
+re-organize this code.
+
+Thanks,
+Alecrim.
