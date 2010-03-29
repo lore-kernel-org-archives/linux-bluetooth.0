@@ -1,34 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 29 Mar 2010 10:45:39 +0300
+Date: Mon, 29 Mar 2010 10:39:57 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Francisco Alecrim <francisco.alecrim@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Subject: Re: [PATCH v2 2/2] Emit Adapter.PropertyChanged when UUIDs change
-Message-ID: <20100329074539.GA20839@jh-x301>
-References: <1269644076-10544-1-git-send-email-francisco.alecrim@openbossa.org>
- <1269644076-10544-2-git-send-email-francisco.alecrim@openbossa.org>
+To: Forrest Zhao <forrest.zhao@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, forrest.zhao@gmail.com
+Subject: Re: [PATCH] Check modem_obj_path is not NULL
+Message-ID: <20100329073957.GA20677@jh-x301>
+References: <1269894774-3193-1-git-send-email-forrest.zhao@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1269644076-10544-2-git-send-email-francisco.alecrim@openbossa.org>
+In-Reply-To: <1269894774-3193-1-git-send-email-forrest.zhao@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Forrest,
 
-On Fri, Mar 26, 2010, Francisco Alecrim wrote:
-> Emitting Adapter.PropertyChanged signal when UUIDs change. D-Bus message
-> to inform that adapter properties changed.
+On Mon, Mar 29, 2010, Forrest Zhao wrote:
+> This could prevent crash in case modem_obj_path is NULL.
 > ---
->  src/adapter.c       |   75 ++++++++++++++++++++++++++++++++++++++++++++------
->  src/adapter.h       |    1 +
->  src/sdpd-database.c |    3 ++
->  3 files changed, 70 insertions(+), 9 deletions(-)
+>  audio/telephony-ofono.c |   11 +++++++++++
+>  1 files changed, 11 insertions(+), 0 deletions(-)
+> 
+> diff --git a/audio/telephony-ofono.c b/audio/telephony-ofono.c
+> index 45c3905..c145e87 100644
+> --- a/audio/telephony-ofono.c
+> +++ b/audio/telephony-ofono.c
+> @@ -281,6 +281,10 @@ void telephony_dial_number_req(void *telephony_device, const char *number)
+>  
+>  	debug("telephony-ofono: dial request to %s", number);
+>  
+> +	if (!modem_obj_path)
+> +		telephony_dial_number_rsp(telephony_device,
+> +					CME_ERROR_AG_FAILURE);
+> +
+>  	if (!strncmp(number, "*31#", 4)) {
+>  		number += 4;
+>  		clir = "enabled";
+> @@ -311,6 +315,10 @@ void telephony_transmit_dtmf_req(void *telephony_device, char tone)
+>  
+>  	debug("telephony-ofono: transmit dtmf: %c", tone);
+>  
+> +	if (!modem_obj_path)
+> +		telephony_transmit_dtmf_rsp(telephony_device,
+> +					CME_ERROR_AG_FAILURE);
+> +
+>  	tone_string = g_strdup_printf("%c", tone);
+>  	ret = send_method_call(OFONO_BUS_NAME, modem_obj_path,
 
-Thanks for the patches. In principle they look good, but I haven't
-applied them yet due to one thing that looks a bit strange: both the SDP
-server record UUID (0x1000) as well as the public browse group UUID
-(0x1001) always show up in the UUIDs list. I wonder if there'd be any
-clean way to avoid getting them into the list. Marcel, do you have any
-idea about this or is it even a problem that these UUIDs are always in
-the list?
+This doesn't look right. You report an error but still proceed in the
+functions (which will later try to access modem_obj_path). I guess you
+should return from the functions in both of these if-clauses.
 
 Johan
