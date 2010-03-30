@@ -2,36 +2,32 @@ Return-Path: <cyrus@holtmann.org>
 Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, gustavo@padovan.org, jprvita@profusion.mobi
-Subject: [PATCH 01/10] Bluetooth: Ignore Tx Window value with Streaming mode
-Date: Tue, 30 Mar 2010 15:52:31 -0300
-Message-Id: <1269975160-9994-1-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1269373726-13209-20-git-send-email-padovan@profusion.mobi>
-References: <1269373726-13209-20-git-send-email-padovan@profusion.mobi>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Cc: marcel@holtmann.org, gustavo@padovan.org
+Subject: [PATCH] Add new S-frame types to l2cap parser
+Date: Tue, 30 Mar 2010 15:52:23 -0300
+Message-Id: <1269975143-9951-1-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1269972441-24242-1-git-send-email-jprvita@gmail.com>
+References: <1269972441-24242-1-git-send-email-jprvita@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Tx Window value shall not be used with Streaming Mode and the receiver
-of the config Request shall ignore its value.
-
-Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
-Reviewed-by: João Paulo Rechi Vita <jprvita@profusion.mobi>
 ---
- net/bluetooth/l2cap.c |    1 -
- 1 files changed, 0 insertions(+), 1 deletions(-)
+ parser/l2cap.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 8c8b5d9..2cfad45 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -2491,7 +2491,6 @@ done:
- 			break;
- 
- 		case L2CAP_MODE_STREAMING:
--			pi->remote_tx_win = rfc.txwin_size;
- 			pi->max_pdu_size = rfc.max_pdu_size;
- 
- 			pi->conf_state |= L2CAP_CONF_MODE_DONE;
+diff --git a/parser/l2cap.c b/parser/l2cap.c
+index 799d4b7..ad3b7ff 100644
+--- a/parser/l2cap.c
++++ b/parser/l2cap.c
+@@ -352,8 +352,9 @@ static char *supervisory2str(uint8_t supervisory)
+ 	case 0x01:
+ 		return "Reject (REJ)";
+ 	case 0x02:
++		return "Receiver Not Ready (RNR)";
+ 	case 0x03:
+-		return "Reserved Supervisory";
++		return "Select Reject (SREJ)";
+ 	default:
+ 		return "Bad Supervisory";
+ 	}
 -- 
 1.6.4.4
