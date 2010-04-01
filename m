@@ -3,10 +3,10 @@ Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org, gustavo@padovan.org, jprvita@profusion.mobi
-Subject: [PATCH 34/34] Bluetooth: Remove unneeded check for MTU on sco_send_frame()
-Date: Thu,  1 Apr 2010 17:23:52 -0300
-Message-Id: <1270153432-6477-35-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1270153432-6477-34-git-send-email-padovan@profusion.mobi>
+Subject: [PATCH 32/34] Bluetooth: Return the data length sent on connectionless channels
+Date: Thu,  1 Apr 2010 17:23:50 -0300
+Message-Id: <1270153432-6477-33-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1270153432-6477-32-git-send-email-padovan@profusion.mobi>
 References: <1270153432-6477-1-git-send-email-padovan@profusion.mobi>
  <1270153432-6477-2-git-send-email-padovan@profusion.mobi>
  <1270153432-6477-3-git-send-email-padovan@profusion.mobi>
@@ -39,38 +39,30 @@ References: <1270153432-6477-1-git-send-email-padovan@profusion.mobi>
  <1270153432-6477-30-git-send-email-padovan@profusion.mobi>
  <1270153432-6477-31-git-send-email-padovan@profusion.mobi>
  <1270153432-6477-32-git-send-email-padovan@profusion.mobi>
- <1270153432-6477-33-git-send-email-padovan@profusion.mobi>
- <1270153432-6477-34-git-send-email-padovan@profusion.mobi>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We have
-
-count = min_t(unsigned int, conn->mtu, len);
-
-there, so no need to return on len > conn->mtu.
+Although the data was sent, userspace was receiving a "Send failed"
+error.
 
 Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 Reviewed-by: João Paulo Rechi Vita <jprvita@profusion.mobi>
 ---
- net/bluetooth/sco.c |    4 ----
- 1 files changed, 0 insertions(+), 4 deletions(-)
+ net/bluetooth/l2cap.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 1dc7856..e2da719 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -234,10 +234,6 @@ static inline int sco_send_frame(struct sock *sk, struct msghdr *msg, int len)
- 	struct sk_buff *skb;
- 	int err, count;
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index 12a93af..c699fe9 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -1656,6 +1656,7 @@ static int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock, struct ms
+ 	if (sk->sk_type == SOCK_DGRAM) {
+ 		skb = l2cap_create_connless_pdu(sk, msg, len);
+ 		l2cap_do_send(sk, skb);
++		err = len;
+ 		goto done;
+ 	}
  
--	/* Check outgoing MTU */
--	if (len > conn->mtu)
--		return -EINVAL;
--
- 	BT_DBG("sk %p len %d", sk, len);
- 
- 	count = min_t(unsigned int, conn->mtu, len);
 -- 
 1.6.4.4
