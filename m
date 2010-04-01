@@ -1,63 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Rafael J. Wysocki" <rjw@sisk.pl>
-To: Parag Warudkar <parag.lkml@gmail.com>
-Subject: Re: S2RAM broken on HP 8530p (btusb involved)
-Date: Fri, 2 Apr 2010 00:31:10 +0200
-Cc: linux-kernel@vger.kernel.org,
- Marcel Holtmann <marcel@holtmann.org>,
- linux-bluetooth@vger.kernel.org
-References: <alpine.DEB.2.00.1003312050370.1876@parag-laptop> <201004012352.18149.rjw@sisk.pl> <alpine.DEB.2.00.1004011814140.2792@parag-laptop>
-In-Reply-To: <alpine.DEB.2.00.1004011814140.2792@parag-laptop>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org, gustavo@padovan.org, jprvita@profusion.mobi
+Subject: [PATCH 33/34] Bluetooth: Clean sco_send_frame() flow
+Date: Thu,  1 Apr 2010 17:23:51 -0300
+Message-Id: <1270153432-6477-34-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1270153432-6477-33-git-send-email-padovan@profusion.mobi>
+References: <1270153432-6477-1-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-2-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-3-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-4-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-5-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-6-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-7-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-8-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-9-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-10-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-11-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-12-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-13-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-14-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-15-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-16-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-17-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-18-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-19-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-20-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-21-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-22-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-23-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-24-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-25-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-26-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-27-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-28-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-29-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-30-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-31-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-32-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-33-git-send-email-padovan@profusion.mobi>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201004020031.10632.rjw@sisk.pl>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Friday 02 April 2010, Parag Warudkar wrote:
-> 
-> On Thu, 1 Apr 2010, Rafael J. Wysocki wrote:
-> 
-> > On Thursday 01 April 2010, Parag Warudkar wrote:
-> > > 
-> > > On Thu, 1 Apr 2010, Rafael J. Wysocki wrote:
-> > > 
-> > > > Please try:
-> > > > 
-> > > > # echo devices > /sys/power/pm_test
-> > > > # echo mem > /sys/power/state
-> > > > 
-> > > > and see if that breaks too (it should get back to the command line in about
-> > > > 5-10 seconds).
-> > > 
-> > > That breaks too - hangs similarly during suspend. I enabled RTC tracing 
-> > > and every time it prints out different hash matches after reboot - 
-> > > tty/tty21, pcie04  and latest is 
-> > > 
-> > > [    0.865296] pcieport 0000:00:1c.1: hash matches
-> > > 
-> > > Also when the suspend fails the immediate boot after that I get a USB 
-> > > error on startup - unable to enumerate usb device on port 1. This error is 
-> > > not present on normal boots.
-> > 
-> > Well, try the above with the USB controller drivers unloaded.
-> > 
-> 
-> Turns out its not the controller drivers but btusb and friends. Once I 
-> removed btusb,sco,bnep,l2cap and family I was able to suspend resume just 
-> like before.
-> 
-> For now I have disabled Bluetooth in BIOS as I don't need it - it is 
-> likely that it was disabled earlier and so the suspend/resume was 
-> working but looks like after a BIOS update/reset I left it enabled.
-> 
-> So this does not seem to be a regression to me.
-> 
-> But may be it should be possible to suspend/resume with bluetooth enabled? 
-> :)
+Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+Reviewed-by: João Paulo Rechi Vita <jprvita@profusion.mobi>
+---
+ net/bluetooth/sco.c |    8 ++------
+ 1 files changed, 2 insertions(+), 6 deletions(-)
 
-Sure.
-
-Adding CCs to the bluetooth people.
-
-Rafael
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 50a9af8..1dc7856 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -245,17 +245,13 @@ static inline int sco_send_frame(struct sock *sk, struct msghdr *msg, int len)
+ 		return err;
+ 
+ 	if (memcpy_fromiovec(skb_put(skb, count), msg->msg_iov, count)) {
+-		err = -EFAULT;
+-		goto fail;
++		kfree_skb(skb);
++		return -EFAULT;
+ 	}
+ 
+ 	hci_send_sco(conn->hcon, skb);
+ 
+ 	return count;
+-
+-fail:
+-	kfree_skb(skb);
+-	return err;
+ }
+ 
+ static inline void sco_recv_frame(struct sco_conn *conn, struct sk_buff *skb)
+-- 
+1.6.4.4
