@@ -3,10 +3,10 @@ Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org, gustavo@padovan.org, jprvita@profusion.mobi
-Subject: [PATCH 33/34] Bluetooth: Clean sco_send_frame() flow
-Date: Thu,  1 Apr 2010 17:23:51 -0300
-Message-Id: <1270153432-6477-34-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1270153432-6477-33-git-send-email-padovan@profusion.mobi>
+Subject: [PATCH 34/34] Bluetooth: Remove unneeded check for MTU on sco_send_frame()
+Date: Thu,  1 Apr 2010 17:23:52 -0300
+Message-Id: <1270153432-6477-35-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1270153432-6477-34-git-send-email-padovan@profusion.mobi>
 References: <1270153432-6477-1-git-send-email-padovan@profusion.mobi>
  <1270153432-6477-2-git-send-email-padovan@profusion.mobi>
  <1270153432-6477-3-git-send-email-padovan@profusion.mobi>
@@ -40,39 +40,37 @@ References: <1270153432-6477-1-git-send-email-padovan@profusion.mobi>
  <1270153432-6477-31-git-send-email-padovan@profusion.mobi>
  <1270153432-6477-32-git-send-email-padovan@profusion.mobi>
  <1270153432-6477-33-git-send-email-padovan@profusion.mobi>
+ <1270153432-6477-34-git-send-email-padovan@profusion.mobi>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+We have
+
+count = min_t(unsigned int, conn->mtu, len);
+
+there, so no need to return on len > conn->mtu.
+
 Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 Reviewed-by: João Paulo Rechi Vita <jprvita@profusion.mobi>
 ---
- net/bluetooth/sco.c |    8 ++------
- 1 files changed, 2 insertions(+), 6 deletions(-)
+ net/bluetooth/sco.c |    4 ----
+ 1 files changed, 0 insertions(+), 4 deletions(-)
 
 diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 50a9af8..1dc7856 100644
+index 1dc7856..e2da719 100644
 --- a/net/bluetooth/sco.c
 +++ b/net/bluetooth/sco.c
-@@ -245,17 +245,13 @@ static inline int sco_send_frame(struct sock *sk, struct msghdr *msg, int len)
- 		return err;
+@@ -234,10 +234,6 @@ static inline int sco_send_frame(struct sock *sk, struct msghdr *msg, int len)
+ 	struct sk_buff *skb;
+ 	int err, count;
  
- 	if (memcpy_fromiovec(skb_put(skb, count), msg->msg_iov, count)) {
--		err = -EFAULT;
--		goto fail;
-+		kfree_skb(skb);
-+		return -EFAULT;
- 	}
- 
- 	hci_send_sco(conn->hcon, skb);
- 
- 	return count;
+-	/* Check outgoing MTU */
+-	if (len > conn->mtu)
+-		return -EINVAL;
 -
--fail:
--	kfree_skb(skb);
--	return err;
- }
+ 	BT_DBG("sk %p len %d", sk, len);
  
- static inline void sco_recv_frame(struct sco_conn *conn, struct sk_buff *skb)
+ 	count = min_t(unsigned int, conn->mtu, len);
 -- 
 1.6.4.4
