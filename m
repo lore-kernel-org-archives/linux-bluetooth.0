@@ -1,21 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Sun, 4 Apr 2010 13:40:35 +0300
-Message-ID: <k2h2c3916b71004040340t63dccd5bj11953c26d826d98f@mail.gmail.com>
-Subject: Question about BlueZ's configure script
-From: Daniel Abraham <daniel.shrugged@gmail.com>
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <OF48CCDAB9.2A474A60-ONC12576F9.00324700-C12576F9.0032EEC1@LocalDomain>
+References: <OF48CCDAB9.2A474A60-ONC12576F9.00324700-C12576F9.0032EEC1@LocalDomain>
+Date: Fri, 2 Apr 2010 06:49:13 -0300
+Message-ID: <z2o6b53b1991004020249t11eaae68u4ba5358f57bcbbe9@mail.gmail.com>
+Subject: Re: Bluetooth connection from Windows to uClinux
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
+To: Danny.Wijffelaars@humiq.nl
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In BlueZ's README, dev packages for ALSA, Gstreamer (+ plugins base),
-and libsnd are not listed as required or even optional.
+Hi Frank,
 
-However, the configure script does look for them (although it doesn't
-fail if they're missing).
+On Fri, Apr 2, 2010 at 6:15 AM,  <Danny.Wijffelaars@humiq.nl> wrote:
+> Hey everyone,
+> I'm trying to connect my windows xp pc (microsoft stack) to uClinux (bluez
+> stack), via Bluetooth.
+> The problem I'm having is that Windows wants a PIN for authentication, but
+> I can't find a way to get uClinux to give this PIN to Windows.
+> Can anybody tell me how to accomplish this?
 
-So my question is: why does it look for them? How do they affect BlueZ
-compilation/functionality?
+Are you using any kind of Agent for BlueZ? In the test/ dir of bluez
+sources there the simple-agent if you need one.
 
-Thanks
+-- 
+Gustavo F. Padovan
+http://padovan.org
