@@ -1,88 +1,146 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <6aeb672b1003010154u6660632fj53fdbac2c8d0e302@mail.gmail.com>
-References: <6aeb672b1001220212u518836fds5df2a7e3de8463bf@mail.gmail.com>
-	<6aeb672b1001272156m678aa8fepec2498386947936a@mail.gmail.com>
-	<6aeb672b1003010154u6660632fj53fdbac2c8d0e302@mail.gmail.com>
-From: Nick Pelly <npelly@google.com>
-Date: Wed, 7 Apr 2010 17:15:56 -0700
-Message-ID: <v2x35c90d961004071715m2c4d5550pb5ffc58af65663dc@mail.gmail.com>
-Subject: Re: Kernel panic when handing Motorola S305 headset
-To: Liang Bao <tim.bao@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: =?utf-8?q?Elvis=20Pf=C3=BCtzenreuter?= <epx@signove.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: epx@signove.com
+Subject: [PATCH] Update service class on adapter-by-adapter basis
+Date: Wed,  7 Apr 2010 18:34:13 -0300
+Message-Id: <1270676053-15699-1-git-send-email-epx@signove.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Mar 1, 2010 at 1:54 AM, Liang Bao <tim.bao@gmail.com> wrote:
-> I'd like to continue the previous thread on that Motorola S305 causes
-> kernel panic because I did find some clue here. Sorry for misleading
-> guess one month ago if any.
->
-> Recap the problem here so that you don't to read the first long post.
-> The pattern to reproduce the issue is:
-> 1. Pair the S305 headset from the phone or the PC( I am using a Ubuntu)
-> 2. Remove pairing on the phone or PC
-> 3. Power off and then power on S305.
-> 4. The S305 will try to connect and since link key removed on this
-> side it will try to pair. Input 0000.
-> 5. Kernel panic happens. This can be observed on kernel version
-> 2.6.29(on the Droid phone, yes, it's a modified version),
-> 2.6.31-19-generic on a Ubuntu and a pretty latest 2.6.33-020633rc8
-> from Ubuntu official RC release.
->
-> The exact kernel crash point is
-> =A0 =A0 =A0 =A0 =A0 =A0 if (l2cap_check_security(sk)) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (bt_sk(sk)->defer_setup) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0struct sock *parent =3D bt_sk(=
-sk)->parent;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rsp.result =3D cpu_to_le16(L2C=
-AP_CR_PEND);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rsp.status =3D cpu_to_le16(L2C=
-AP_CS_AUTHOR_PEND);
->>>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 parent->sk_data_ready(parent, 0)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0} else {
->
-> After tracing the issue for a couple of weeks, I find the difference
-> between a normal flow and the panic one. If the user space process
-> accepts the L2CAP connection request before L2CAP_INFO_RSP received,
-> the following calls will be carried out:
->
-> l2cap_sock_accept-> bt_accept_dequeue->bt_accept_unlink(in the branch
-> bt_sk(parent)->defer_setup)-> set bt_sk(sk)->parent =3D NULL. Later when
-> L2CAP_INFO_RSP arrives, the l2cap_conn_start() will try to call the
-> marked line above and de-referring NULL happen.
->
-> To fix this, shall we consider checking if a pending socket can be
-> accepted in bt_accept_dequeue() prior to a pending L2CAP_INFO_REQ
-> responded? For example, =A0adding a check to BT_CONNECT2 in
-> af_bluetooth.c.
->
-> 215 =A0 =A0 =A0 =A0 if (sk->sk_state =3D=3D BT_CONNECTED || !newsock ||
-> 216 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ( bt_sk(parent)->defe=
-r_setup &&
-> (sk->sk_state !=3D BT_CONNECT2))) {
->
-> Again, I am not sure if this will bring a side-effect. Please advise
-> the most appropriate way. Thanks.
->
-> p.s: I attached partial trace files for those who're interested to the tr=
-aces.
->
+From: Elvis Pfutzenreuter <epx@signove.com>
 
-We can reproduce this issue.
+When a service is added (or removed) for a specific adapter,
+only the service class of that specific adapter shall be updated.
+---
+ src/adapter.c      |   15 +++++++++++++++
+ src/adapter.h      |    2 ++
+ src/sdpd-service.c |   24 +++++++++++++++---------
+ src/sdpd.h         |    1 -
+ 4 files changed, 32 insertions(+), 10 deletions(-)
 
-There is nothing preventing an l2cap socket with deferred setup from
-accepting an l2cap connection before the info response packet has come
-in. This causes the null pointer panic when the info response
-eventually arrives.
+diff --git a/src/adapter.c b/src/adapter.c
+index 8fc47b9..1530f83 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1103,6 +1103,21 @@ void adapter_service_remove(const bdaddr_t *bdaddr, void *rec)
+ 	adapter_service_ins_rem(bdaddr, rec, FALSE);
+ }
+ 
++sdp_list_t *adapter_service_list(const bdaddr_t *bdaddr)
++{
++	struct btd_adapter *adapter;
++	sdp_list_t *list = NULL;
++
++	if (bacmp(bdaddr, BDADDR_ANY) != 0) {
++		/* Only one adapter */
++		adapter = manager_find_adapter(bdaddr);
++		if (adapter)
++			list = adapter->services;
++	}
++
++	return list;
++}
++
+ struct btd_device *adapter_create_device(DBusConnection *conn,
+ 						struct btd_adapter *adapter,
+ 						const char *address)
+diff --git a/src/adapter.h b/src/adapter.h
+index e4307d8..5975299 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -23,6 +23,7 @@
+  */
+ 
+ #include <bluetooth/bluetooth.h>
++#include <bluetooth/sdp.h>
+ #include <dbus/dbus.h>
+ #include <glib.h>
+ 
+@@ -123,6 +124,7 @@ void adapter_update_tx_power(bdaddr_t *bdaddr, uint8_t status, void *ptr);
+ void adapter_update_local_name(bdaddr_t *bdaddr, uint8_t status, void *ptr);
+ void adapter_service_insert(const bdaddr_t *bdaddr, void *rec);
+ void adapter_service_remove(const bdaddr_t *bdaddr, void *rec);
++sdp_list_t *adapter_service_list(const bdaddr_t *bdaddr);
+ void adapter_set_class_complete(bdaddr_t *bdaddr, uint8_t status);
+ 
+ struct agent *adapter_get_agent(struct btd_adapter *adapter);
+diff --git a/src/sdpd-service.c b/src/sdpd-service.c
+index 4551577..cddd87e 100644
+--- a/src/sdpd-service.c
++++ b/src/sdpd-service.c
+@@ -47,11 +47,10 @@
+ #include "sdpd.h"
+ #include "logging.h"
+ #include "manager.h"
++#include "adapter.h"
+ 
+ static sdp_record_t *server = NULL;
+ 
+-static uint8_t service_classes = 0x00;
+-
+ static uint16_t did_vendor = 0x0000;
+ static uint16_t did_product = 0x0000;
+ static uint16_t did_version = 0x0000;
+@@ -98,9 +97,9 @@ static void update_db_timestamp(void)
+ 	sdp_attr_replace(server, SDP_ATTR_SVCDB_STATE, d);
+ }
+ 
+-static void update_svclass_list(const bdaddr_t *src)
++static void update_adapter_svclass_list(const bdaddr_t *src)
+ {
+-	sdp_list_t *list = sdp_get_record_list();
++	sdp_list_t *list = adapter_service_list(src);
+ 	uint8_t val = 0;
+ 
+ 	for (; list; list = list->next) {
+@@ -156,14 +155,21 @@ static void update_svclass_list(const bdaddr_t *src)
+ 
+ 	SDPDBG("Service classes 0x%02x", val);
+ 
+-	service_classes = val;
+-
+ 	manager_update_svc(src, val);
+ }
+ 
+-uint8_t get_service_classes(const bdaddr_t *bdaddr)
++static void update_svclass_list(const bdaddr_t *src)
+ {
+-	return service_classes;
++	bdaddr_t bdaddr;
++	GSList *adapters = manager_get_adapters();
++
++	for (; adapters; adapters = adapters->next) {
++		adapter_get_address(adapters->data, &bdaddr);
++
++		if (bacmp(src, BDADDR_ANY) == 0 || bacmp(src, &bdaddr) == 0)
++			update_adapter_svclass_list(&bdaddr);
++	}
++
+ }
+ 
+ void create_ext_inquiry_response(const char *name,
+@@ -613,7 +619,7 @@ success:
+ 	}
+ 
+ 	update_db_timestamp();
+-	update_svclass_list(BDADDR_ANY);
++	update_svclass_list(&req->device);
+ 
+ 	/* Build a rsp buffer */
+ 	bt_put_unaligned(htonl(rec->handle), (uint32_t *) rsp->data);
+diff --git a/src/sdpd.h b/src/sdpd.h
+index 1f0a229..d496a4a 100644
+--- a/src/sdpd.h
++++ b/src/sdpd.h
+@@ -93,7 +93,6 @@ void stop_sdp_server(void);
+ int add_record_to_server(const bdaddr_t *src, sdp_record_t *rec);
+ int remove_record_from_server(uint32_t handle);
+ 
+-uint8_t get_service_classes(const bdaddr_t *bdaddr);
+ void create_ext_inquiry_response(const char *name,
+ 					int8_t tx_power, sdp_list_t *services,
+ 					uint8_t *data);
+-- 
+1.6.3.3
 
-I'm not sure the best way to fix this. Ideally we'd check
-L2CAP_INFO_FEAT_MASK_REQ_DONE, but that is not available in
-af_bluetooth.c:bt_accept_dequeue(). I think the problem is that
-BT_CONNECT2 - which is available in af_bluetooth.c is used for both
-deferred setup and for the case where we are waiting for the info
-response.
-
-Marcel, some advice on the best way to proceed here would be helpful.
-
-Nick
