@@ -1,27 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Francisco Alecrim <francisco.alecrim@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Francisco Alecrim <francisco.alecrim@openbossa.org>
-Subject: [PATCH v3 0/2] Services through DBus and correct EIR
-Date: Wed,  7 Apr 2010 12:25:48 -0400
-Message-Id: <1270657550-28767-1-git-send-email-francisco.alecrim@openbossa.org>
+Date: Wed, 7 Apr 2010 18:30:00 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Francisco Alecrim <francisco.alecrim@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] Report local services(UUIDs) through DBus
+Message-ID: <20100407153000.GA27553@jh-x301>
+References: <1270652663-23107-1-git-send-email-francisco.alecrim@openbossa.org>
+ <1270652663-23107-2-git-send-email-francisco.alecrim@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1270652663-23107-2-git-send-email-francisco.alecrim@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Third version:
-** Indent change at adapter_emit_uuids_updated
-** Use g_strfreev instead of loop to free **uuids.
+Hi Alecrim,
 
-Francisco Alecrim (2):
-  Report local services(UUIDs) through DBus
-  Correct UUIDs list to EIR
+A few more minor correction suggestions:
 
- doc/adapter-api.txt |    5 +++
- src/adapter.c       |   87 +++++++++++++++++++++++++++++++++++++++++++++++++-
- src/adapter.h       |    2 +
- src/sdpd-database.c |    4 ++
- src/sdpd-service.c  |    5 ++-
- src/sdpd.h          |    3 +-
- test/list-devices   |    3 ++
- 7 files changed, 104 insertions(+), 5 deletions(-)
+On Wed, Apr 07, 2010, Francisco Alecrim wrote:
+> +	emit_array_property_changed(connection, adapter->path,
+> +			ADAPTER_INTERFACE, "UUIDs",
+> +			DBUS_TYPE_STRING, &uuids);
 
+The general rule for continuation line indenting is: indent as much as
+possible as long as the total length doesn't go beyond 80. It looks like
+these two lines could be indented a bit more. There are a few other
+similar places too but I think you should be able to find them by
+yourself.
+
+> +	for (i = 0; uuids[i]; i++)
+> +		g_free(uuids[i]);
+> +	g_free(uuids);
+
+These three lines could be replaced simply with g_strfreev(uuids);
+
+> +	for (i = 0; uuids[i]; i++)
+> +		g_free(uuids[i]);
+> +	g_free(uuids);
+
+And same here.
+
+Johan
