@@ -1,42 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 7 Apr 2010 15:53:58 +0300
-From: "Kim B. Heino" <Kim.Heino@bluegiga.com>
-To: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
- linux-kernel@vger.kernel.org
-Subject: [PATCH] btusb: Raw mode and ACL/SCO data
-Message-ID: <20100407155358.083823f9@bluegiga.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+In-Reply-To: <1270577491.816321.874.nullmailer@galant.ukfsn.org>
+References: <g2p912bb79a1004060553kdec12987gc9c957506b436c1e@mail.gmail.com>
+	 <1270577491.816321.874.nullmailer@galant.ukfsn.org>
+Date: Wed, 7 Apr 2010 15:02:21 +0530
+Message-ID: <t2g912bb79a1004070232tf3fdfdbdx40bec76239ca0c6e@mail.gmail.com>
+Subject: Re: Question regarding HS Connection
+From: nirav rabara <niravrabara@gmail.com>
+To: Iain Hibbert <plunky@rya-online.net>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch allows sending ACL/SCO packets if device is in RAW mode.
-Previously only command packets were allowed.
+hi Lain,
 
-Signed-off-by: Kim B. Heino <Kim.Heino@bluegiga.com>
+Thanks for your suggestion,
+
+> you will probably find that because the HS device is very limited in
+> resources, it does not keep records of more than one paired device. So, if
+> you pair with another device it forgets about the first and you will not
+> be able to connect except that you pair it again.
+>
+
+Does it mean that once paired device information stored in our
+cellphones, if remote device(HS) doesn't have paired information, out
+cellphone will take care of re-pairing.
+
+So ultimately am I need to do pairing again??
 
 
-diff -ur orig/drivers/bluetooth/btusb.c linux-2.6.33.2/drivers/bluetooth/btusb.c
---- orig/drivers/bluetooth/btusb.c	2010-04-02 02:02:33.000000000 +0300
-+++ linux-2.6.33.2/drivers/bluetooth/btusb.c	2010-04-07 15:17:55.696672710 +0300
-@@ -663,7 +663,9 @@
- 		break;
- 
- 	case HCI_ACLDATA_PKT:
--		if (!data->bulk_tx_ep || hdev->conn_hash.acl_num < 1)
-+		if (!data->bulk_tx_ep ||
-+		    (!test_bit(HCI_RAW, &hdev->flags) &&
-+		     hdev->conn_hash.acl_num < 1))
- 			return -ENODEV;
- 
- 		urb = usb_alloc_urb(0, GFP_ATOMIC);
-@@ -680,7 +682,9 @@
- 		break;
- 
- 	case HCI_SCODATA_PKT:
--		if (!data->isoc_tx_ep || hdev->conn_hash.sco_num < 1)
-+		if (!data->isoc_tx_ep ||
-+		    (!test_bit(HCI_RAW, &hdev->flags) &&
-+		     hdev->conn_hash.sco_num < 1))
- 			return -ENODEV;
- 
- 		urb = usb_alloc_urb(BTUSB_MAX_ISOC_FRAMES, GFP_ATOMIC);
+-- 
+With Regards,
+Nirav Rabara
