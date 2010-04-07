@@ -1,43 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 7 Apr 2010 18:30:00 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Francisco Alecrim <francisco.alecrim@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] Report local services(UUIDs) through DBus
-Message-ID: <20100407153000.GA27553@jh-x301>
+From: Francisco Alecrim <francisco.alecrim@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Francisco Alecrim <francisco.alecrim@openbossa.org>
+Subject: [PATCH v2 2/2] Correct UUIDs list to EIR
+Date: Wed,  7 Apr 2010 11:04:23 -0400
+Message-Id: <1270652663-23107-3-git-send-email-francisco.alecrim@openbossa.org>
+In-Reply-To: <1270652663-23107-2-git-send-email-francisco.alecrim@openbossa.org>
 References: <1270652663-23107-1-git-send-email-francisco.alecrim@openbossa.org>
  <1270652663-23107-2-git-send-email-francisco.alecrim@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1270652663-23107-2-git-send-email-francisco.alecrim@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alecrim,
+Correct create_ext_inquiry_response to response only UUIDs per-adapter.
+---
+ src/adapter.c      |    3 ++-
+ src/sdpd-service.c |    5 +++--
+ src/sdpd.h         |    3 ++-
+ 3 files changed, 7 insertions(+), 4 deletions(-)
 
-A few more minor correction suggestions:
+diff --git a/src/adapter.c b/src/adapter.c
+index cdd5562..7008410 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -816,7 +816,8 @@ static void update_ext_inquiry_response(struct btd_adapter *adapter)
+ 
+ 	if (dev->ssp_mode > 0)
+ 		create_ext_inquiry_response((char *) dev->name,
+-						adapter->tx_power, data);
++						adapter->tx_power,
++						adapter->services, data);
+ 
+ 	if (hci_write_ext_inquiry_response(dd, fec, data,
+ 						HCI_REQ_TIMEOUT) < 0)
+diff --git a/src/sdpd-service.c b/src/sdpd-service.c
+index a8f7d47..4551577 100644
+--- a/src/sdpd-service.c
++++ b/src/sdpd-service.c
+@@ -167,9 +167,10 @@ uint8_t get_service_classes(const bdaddr_t *bdaddr)
+ }
+ 
+ void create_ext_inquiry_response(const char *name,
+-					int8_t tx_power, uint8_t *data)
++					int8_t tx_power, sdp_list_t *services,
++					uint8_t *data)
+ {
+-	sdp_list_t *list = sdp_get_record_list();
++	sdp_list_t *list = services;
+ 	uint8_t *ptr = data;
+ 	uint16_t uuid[24];
+ 	int i, index = 0;
+diff --git a/src/sdpd.h b/src/sdpd.h
+index 1352a83..1f0a229 100644
+--- a/src/sdpd.h
++++ b/src/sdpd.h
+@@ -95,4 +95,5 @@ int remove_record_from_server(uint32_t handle);
+ 
+ uint8_t get_service_classes(const bdaddr_t *bdaddr);
+ void create_ext_inquiry_response(const char *name,
+-					int8_t tx_power, uint8_t *data);
++					int8_t tx_power, sdp_list_t *services,
++					uint8_t *data);
+-- 
+1.6.3.3
 
-On Wed, Apr 07, 2010, Francisco Alecrim wrote:
-> +	emit_array_property_changed(connection, adapter->path,
-> +			ADAPTER_INTERFACE, "UUIDs",
-> +			DBUS_TYPE_STRING, &uuids);
-
-The general rule for continuation line indenting is: indent as much as
-possible as long as the total length doesn't go beyond 80. It looks like
-these two lines could be indented a bit more. There are a few other
-similar places too but I think you should be able to find them by
-yourself.
-
-> +	for (i = 0; uuids[i]; i++)
-> +		g_free(uuids[i]);
-> +	g_free(uuids);
-
-These three lines could be replaced simply with g_strfreev(uuids);
-
-> +	for (i = 0; uuids[i]; i++)
-> +		g_free(uuids[i]);
-> +	g_free(uuids);
-
-And same here.
-
-Johan
