@@ -1,120 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-From: Zhu Yanhai <zhu.yanhai@gmail.com>
-Date: Fri, 9 Apr 2010 16:35:56 +0800
-Message-ID: <o2p977a2be21004090135u225590edn39c803c9d201b308@mail.gmail.com>
-Subject: Is hsp code in BlueZ and pulseaudio broken?
-To: linux-bluetooth@vger.kernel.org,
-	pulseaudio-discuss@mail.0pointer.de
-Cc: vivian.zhang@intel.com, guannan.ou@intel.com,
-	Zheng Huan <huan.zheng@intel.com>,
-	Zhu Yanhai <yanhai.zhu@linux.intel.com>,
-	"Zhu, Yanhai" <yanhai.zhu@intel.com>
-Content-Type: text/plain; charset=UTF-8
+From: Francisco Alecrim <francisco.alecrim@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Francisco Alecrim <francisco.alecrim@openbossa.org>
+Subject: [PATCH] List with UUIDs per-adapter should be sorted
+Date: Thu,  8 Apr 2010 17:35:01 -0400
+Message-Id: <1270762501-28643-1-git-send-email-francisco.alecrim@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi list,
-I can't make hsp profile work with the latest bluez and pulseaudio,
-does anyone here know
-whether the hsp code in bluez and pulseaudio still can work?
+---
+ src/adapter.c       |    5 +++--
+ src/sdpd-database.c |    2 +-
+ src/sdpd.h          |    1 +
+ 3 files changed, 5 insertions(+), 3 deletions(-)
 
-I used a DELL BH200 headset, which has both A2DP, Headset and
-Headsfree profile support.
-The code of BlueZ and Pulseaudio are both directly cloned from their git repos.
+diff --git a/src/adapter.c b/src/adapter.c
+index 8fc47b9..c174793 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1081,8 +1081,9 @@ static void adapter_service_ins_rem(const bdaddr_t *bdaddr, void *rec,
+ 		adapter = adapters->data;
+ 
+ 		if (insert == TRUE)
+-			adapter->services = sdp_list_append(adapter->services,
+-									rec);
++			adapter->services = sdp_list_insert_sorted(
++							adapter->services, rec,
++							record_sort);
+ 		else
+ 			adapter->services = sdp_list_remove(adapter->services,
+ 									rec);
+diff --git a/src/sdpd-database.c b/src/sdpd-database.c
+index 224a4e7..263b16e 100644
+--- a/src/sdpd-database.c
++++ b/src/sdpd-database.c
+@@ -55,7 +55,7 @@ typedef struct {
+  * The service repository is a linked list in sorted order
+  * and the service record handle is the sort key
+  */
+-static int record_sort(const void *r1, const void *r2)
++int record_sort(const void *r1, const void *r2)
+ {
+ 	const sdp_record_t *rec1 = (const sdp_record_t *) r1;
+ 	const sdp_record_t *rec2 = (const sdp_record_t *) r2;
+diff --git a/src/sdpd.h b/src/sdpd.h
+index 1f0a229..ce189ca 100644
+--- a/src/sdpd.h
++++ b/src/sdpd.h
+@@ -70,6 +70,7 @@ sdp_buf_t *sdp_get_cached_rsp(sdp_cont_state_t *cstate);
+ void sdp_cstate_cache_init(void);
+ void sdp_cstate_clean_buf(void);
+ 
++int record_sort(const void *r1, const void *r2);
+ void sdp_svcdb_reset(void);
+ void sdp_svcdb_collect_all(int sock);
+ void sdp_svcdb_set_collectable(sdp_record_t *rec, int sock);
+-- 
+1.6.3.3
 
-BlueZ configure:
- $ ./configure --enable-maintainer-mode --enable-debug --prefix=/usr
---mandir=/usr/share/man --sysconfdir=/etc --localstatedir=/var
---libexecdir=/lib --enable-netlink --disable-capng --enable-tracer
---enable-tools --enable-bccmd --enable-dfutool --enable-hid2hci
---enable-hidd --enable-pand --enable-dund --enable-test --enable-cups
---disable-pcmcia --disable-udevrules --with-telephony=ofono
---disable-configfiles
-
-To make the testing steps clear, I unloaded module-bluetooth-discover
-before connecting the
-headset.
-
-After starting bluez with the option -n and -d, I called to
-org.bluez.Headset/Connect() using d-feet.
-BlueZ printed:
-
-bluetoothd[10791]: State changed
-/org/bluez/10791/hci0/dev_00_16_44_FD_84_CB:
-HEADSET_STATE_DISCONNECTED -> HEADSET_STATE_CONNECTING
-bluetoothd[10791]: link_key_request (sba=00:26:5E:A5:A8:65,
-dba=00:16:44:FD:84:CB)
-bluetoothd[10791]: kernel auth requirements = 0x00
-bluetoothd[10791]: stored link key type = 0x00
-bluetoothd[10791]: adapter_get_device(00:16:44:FD:84:CB)
-bluetoothd[10791]: Discovered Headset service on channel 8
-bluetoothd[10791]: /org/bluez/10791/hci0/dev_00_16_44_FD_84_CB:
-Connecting to 00:16:44:FD:84:CB channel 8
-bluetoothd[10791]: link_key_request (sba=00:26:5E:A5:A8:65,
-dba=00:16:44:FD:84:CB)
-bluetoothd[10791]: kernel auth requirements = 0x04
-bluetoothd[10791]: stored link key type = 0x00
-bluetoothd[10791]: hcid_dbus_bonding_process_complete: status=00
-bluetoothd[10791]: adapter_get_device(00:16:44:FD:84:CB)
-bluetoothd[10791]: hcid_dbus_bonding_process_complete: no pending auth request
-bluetoothd[10791]: /org/bluez/10791/hci0/dev_00_16_44_FD_84_CB:
-Connected to 00:16:44:FD:84:CB
-bluetoothd[10791]: telephony-ofono: device 0xb793c4d8 connected
-bluetoothd[10791]: State changed
-/org/bluez/10791/hci0/dev_00_16_44_FD_84_CB: HEADSET_STATE_CONNECTING
--> HEADSET_STATE_CONNECTED
-
-And then  'load-module module-bluetooth-discover' using pacmd. As soon
-as the module was loaded, BlueZ printed:
-
-bluetoothd[10791]: Accepted new client connection on unix socket (fd=22)
-bluetoothd[10791]: Audio API: BT_REQUEST <- BT_GET_CAPABILITIES
-bluetoothd[10791]: Audio API: BT_RESPONSE -> BT_GET_CAPABILITIES
-bluetoothd[10791]: Audio API: BT_REQUEST <- BT_GET_CAPABILITIES
-bluetoothd[10791]: Audio API: BT_RESPONSE -> BT_GET_CAPABILITIES
-bluetoothd[10791]: Audio API: BT_REQUEST <- BT_OPEN
-bluetoothd[10791]: open sco -
-object=/org/bluez/10791/hci0/dev_00_16_44_FD_84_CB source=ANY
-destination=ANY lock=readwrite
-bluetoothd[10791]: Audio API: BT_RESPONSE -> BT_OPEN
-bluetoothd[10791]: Audio API: BT_REQUEST <- BT_SET_CONFIGURATION
-bluetoothd[10791]: Audio API: BT_RESPONSE -> BT_SET_CONFIGURATION
-bluetoothd[10791]: Audio API: BT_REQUEST <- BT_START_STREAM
-bluetoothd[10791]: State changed
-/org/bluez/10791/hci0/dev_00_16_44_FD_84_CB: HEADSET_STATE_CONNECTED
--> HEADSET_STATE_PLAY_IN_PROGRESS
-bluetoothd[10791]: SCO socket opened for headset
-/org/bluez/10791/hci0/dev_00_16_44_FD_84_CB
-bluetoothd[10791]: SCO fd=24
-bluetoothd[10791]: Audio API: BT_RESPONSE -> BT_START_STREAM
-bluetoothd[10791]: Audio API: BT_INDICATION -> BT_NEW_STREAM
-bluetoothd[10791]: State changed
-/org/bluez/10791/hci0/dev_00_16_44_FD_84_CB:
-HEADSET_STATE_PLAY_IN_PROGRESS -> HEADSET_STATE_PLAYING
-
-Then, after waiting about 3-4 seconds, BlueZ printed:
-
-bluetoothd[10791]: No matching connection found for handle 6
-bluetoothd[10791]: Audio connection got disconnected
-bluetoothd[10791]: State changed
-/org/bluez/10791/hci0/dev_00_16_44_FD_84_CB: HEADSET_STATE_PLAYING ->
-HEADSET_STATE_CONNECTED
-bluetoothd[10791]: ERR or HUP on RFCOMM socket
-bluetoothd[10791]: telephony-ofono: device 0xb793c4d8 disconnected
-bluetoothd[10791]: State changed
-/org/bluez/10791/hci0/dev_00_16_44_FD_84_CB: HEADSET_STATE_CONNECTED
--> HEADSET_STATE_DISCONNECTED
-bluetoothd[10791]: Unix client disconnected (fd=22)
-bluetoothd[10791]: client_free(0xb79330d0)
-
-'hcitool con' reported there was no connections after that, and the
-headset was power off automatically. And of course I can't see this
-headset by
-'ilst-cards' or 'list-sinks' in pacmd.
-
-Is it because there is anything broken in the latest BlueZ +
-Pulseaudio, or am I doing something wrong?
-
-Thanks,
-Zhu Yanhai
