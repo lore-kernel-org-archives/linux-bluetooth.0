@@ -1,44 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: obexd-0.22 causes gnome-bluetooth sendto dialog to stop closing
- when operation ends
-From: Pacho Ramos <pacho@condmat1.ciencias.uniovi.es>
-Reply-To: pacho@condmat1.ciencias.uniovi.es
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-KFXx30xAw/nUYPAFajmp"
-Date: Sat, 10 Apr 2010 13:22:26 +0200
-Message-Id: <1270898546.5646.28.camel@localhost.localdomain>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <o2p977a2be21004090135u225590edn39c803c9d201b308@mail.gmail.com>
+References: <o2p977a2be21004090135u225590edn39c803c9d201b308@mail.gmail.com>
+Date: Fri, 9 Apr 2010 15:32:51 +0300
+Message-ID: <h2i2d5a2c101004090532o6c7e33a4k7563fe8f628f3d6f@mail.gmail.com>
+Subject: Re: Is hsp code in BlueZ and pulseaudio broken?
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Zhu Yanhai <zhu.yanhai@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	pulseaudio-discuss@mail.0pointer.de, vivian.zhang@intel.com,
+	guannan.ou@intel.com, Zheng Huan <huan.zheng@intel.com>,
+	Zhu Yanhai <yanhai.zhu@linux.intel.com>,
+	"Zhu, Yanhai" <yanhai.zhu@intel.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi,
 
---=-KFXx30xAw/nUYPAFajmp
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+On Fri, Apr 9, 2010 at 11:35 AM, Zhu Yanhai <zhu.yanhai@gmail.com> wrote:
+> 'hcitool con' reported there was no connections after that, and the
+> headset was power off automatically. And of course I can't see this
+> headset by
+> 'ilst-cards' or 'list-sinks' in pacmd.
+>
+> Is it because there is anything broken in the latest BlueZ +
+> Pulseaudio, or am I doing something wrong?
 
-Hello
+It seems ok in bluetoothd size, maybe it is the suspend logic that
+disconnect sco after a few seconds when idle, but it doesn't seems to
+be the case here as also rfcomm connection is dropped somehow.
 
-This is a regression over obexd-0.21. After updating to 0.22,
-gnome-bluetooth sendto dialog no longer closes when operation finishes,
-even if file is already properly sent.
-
-This has been reported also in:
-https://bugzilla.gnome.org/show_bug.cgi?id=3D613196
-
-Thanks a lot for your help
-
---=-KFXx30xAw/nUYPAFajmp
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Esta parte del mensaje =?ISO-8859-1?Q?est=E1?= firmada
- digitalmente
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.14 (GNU/Linux)
-
-iEYEABECAAYFAkvAX3IACgkQCaWpQKGI+9Re+QCaAvckRMGC3s7bQT4EOEjRa6su
-gfwAn0sJRBJUkWzJuvBkQKEX2XT9BrLy
-=3SV0
------END PGP SIGNATURE-----
-
---=-KFXx30xAw/nUYPAFajmp--
-
+-- 
+Luiz Augusto von Dentz
+Computer Engineer
