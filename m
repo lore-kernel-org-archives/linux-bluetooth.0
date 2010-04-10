@@ -1,60 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: obexd-0.22 causes gnome-bluetooth sendto dialog to stop
- closing when operation ends
-From: Pacho Ramos <pacho@condmat1.ciencias.uniovi.es>
-Reply-To: pacho@condmat1.ciencias.uniovi.es
-To: Vinicius Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <l2r2a9506371004100717p500f6b4o48e8a6d2dfb8f0c5@mail.gmail.com>
-References: <l2r2a9506371004100717p500f6b4o48e8a6d2dfb8f0c5@mail.gmail.com>
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-L6QQTl1eYcfSf+2UlZ/v"
-Date: Sat, 10 Apr 2010 20:38:52 +0200
-Message-Id: <1270924732.5646.48.camel@localhost.localdomain>
-Mime-Version: 1.0
+From: John Frankish <j-frankish@slb.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Sat, 10 Apr 2010 20:25:04 +0200
+Subject: RE: bluez and a2dp sennheiser pcx310 headphones
+Message-ID: <6AC5A55546F64545AE996F8200E3AC4E032CD6F8EB@NL0105EXC01V01.eur.slb.com>
+References: <6AC5A55546F64545AE996F8200E3AC4E0323A72E4D@NL0105EXC01V01.eur.slb.com>
+	 <2d5a2c101002072354u74cd7b77jc933d7cb61666b90@mail.gmail.com>
+	 <6AC5A55546F64545AE996F8200E3AC4E0323A730D7@NL0105EXC01V01.eur.slb.com>
+ <2d5a2c101002080102o71229a41ob75676b48a502919@mail.gmail.com>
+In-Reply-To: <2d5a2c101002080102o71229a41ob75676b48a502919@mail.gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
+> Sent: Monday, 08 February, 2010 11:55
+> To: John Frankish
+> Cc: linux-bluetooth@vger.kernel.org
+> Subject: Re: bluez and a2dp sennheiser pcx310 headphones
+>
+> Hi John,
+>
+> On Mon, Feb 8, 2010 at 8:19 AM, John Frankish <j-frankish@slb.com> wrote:
+>> Hi,
+>>
+>> Using the .asoundrc below with bluez-4.53, I've been able to play music to a pair of sennheiser pcx310 headphones without problems, but although the remote volume control on the headphones works, the track skip/fastforward/repeat does not.
+>>
+>> According to the headphones manual, the remote controls rely on an avrcp profile - is this something supported by bluez or is it something that should be supported by the audio source (or both)?
+>
+> You probably need to load uinput module to make this to work, also you
+> should probably try pulse audio which has a better integration with
+> bluetooth headsets so you don't need to manually configure alsa it
+> will do all this automatically for you.
+>
+OK, so I've updated the kernel to 2.6.33.2 and loaded the uinput module.
 
---=-L6QQTl1eYcfSf+2UlZ/v
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+I believe things are connected as I see this in dmesg after pressing the "track skip" button:
 
-El s=C3=A1b, 10-04-2010 a las 11:17 -0300, Vinicius Gomes escribi=C3=B3:
-> Hi Pacho,
->=20
-> 2010/4/10 Pacho Ramos <pacho@condmat1.ciencias.uniovi.es>:
-> > Hello
-> >
-> > This is a regression over obexd-0.21. After updating to 0.22,
-> > gnome-bluetooth sendto dialog no longer closes when operation finishes,
-> > even if file is already properly sent.
-> >
->=20
-> We noticed this regression as well. Luiz already has a fix for this,
-> it was just not integrated yet.
->=20
-> In case you want to take a look and perhaps help test it, the fix is here=
-[1].
->=20
->=20
-> Cheers,
+input: 00:1B:66:00:31:88 as /devices/virtual/input/input11
 
-Thanks a lot, I will try to use it as soon as I am able to
+mplayer -ao alsa:device=bluetooth /mnt/sda1/Music/f00/aayw.mp3
 
-Best regards
+Starting playback...
+[press track skip]
+No bind found for key ''.                         
 
---=-L6QQTl1eYcfSf+2UlZ/v
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Esta parte del mensaje =?ISO-8859-1?Q?est=E1?= firmada
- digitalmente
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.14 (GNU/Linux)
+Could anybody point me to a resource that explains how to manually "bind" the headphone controls to xmms, mplayer, rhythmbox, etc since I don't particularly want to use pulse audio
 
-iEYEABECAAYFAkvAxbwACgkQCaWpQKGI+9RehACfc3VKv6mDS8Hc82AZbEbkQCZa
-DbgAn1jNkK3Q3mLQtmS1VkxMq3PS5HdR
-=Dc2q
------END PGP SIGNATURE-----
-
---=-L6QQTl1eYcfSf+2UlZ/v--
-
+Thanks
+John
