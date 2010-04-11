@@ -1,106 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4BC1C340.50404@ce.unipr.it>
-Date: Sun, 11 Apr 2010 14:40:32 +0200
-From: Paolo Medici <medici@ce.unipr.it>
+Date: Sun, 11 Apr 2010 13:36:18 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Brian Rogers <brian@xyzw.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Mouse authentication regression after 4.63
+Message-ID: <20100411103618.GA7676@jh-x301>
+References: <4BC19B11.1090409@xyzw.org>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: Implement AVCTP passthrough commands
-References: <20100411083333.GA10451@ce.unipr.it>
-In-Reply-To: <20100411083333.GA10451@ce.unipr.it>
-Content-Type: multipart/mixed;
- boundary="------------010601010208000405010104"
+Content-Type: multipart/mixed; boundary="Kj7319i9nmIyA2yE"
+In-Reply-To: <4BC19B11.1090409@xyzw.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------010601010208000405010104
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
 
-Something like that (attached).
+--Kj7319i9nmIyA2yE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Paolo Medici wrote:
-> Hi,
->   Are there no contraindications to complete the implementation in audio/control.c of other commands (as well as VolumeUp/VolumeDown)?
->   In this case, to try to control my iPod Touch, I would like to add remaining ones.
->
->   Paolo
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->    
+Hi Brian,
 
+On Sun, Apr 11, 2010, Brian Rogers wrote:
+> Upon trying out a newer version of BlueZ, I found a regression in
+> support for my mouse caused by the following commit:
+> 
+> commit aee26b30bbc24cde464ba1a557c2b258ddec6432
+> Author: Johan Hedberg <johan.hedberg@nokia.com>
+> Date:   Tue Mar 30 13:36:46 2010 +0300
+> 
+>     Make BtIO default security level MEDIUM
+> 
+>     MEDIUM makes more sense than the kernel default LOW which maps to "no
+>     bonding" with SSP (something that's useful only for very special cases
+>     such as OPP).
+> 
+> 
+> After this commit, when I turn on or move my mouse, I get prompted
+> for a PIN to use for the connection. "0000" won't work, and blank
+> isn't accepted, so the mouse can't connect. Deleting and re-pairing
+> my mouse doesn't work either. I suspect my mouse just does not
+> support encryption. I've never seen AUTH or ENCRYPT on my mouse in
+> the output of "hcitool con" and I can't enable encryption on a
+> working bluez using "hcitool auth". It just prompts for a PIN, and
+> disconnects the mouse when I enter one. And there's no documentation
+> on what PIN should be used with this mouse.
+> 
+> With the above commit reverted, it works fine again. The mouse
+> information is below. Could this be a device-specific quirk? What
+> information is needed to resolve this?
 
---------------010601010208000405010104
-Content-Type: application/download;
- name="control.c.diff"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="control.c.diff"
+I don't think this needs anything device specific. Authentication is
+optional for mice so we can't really have the HID sockets requiring
+higher security than LOW. The attached patch should fix the issue.
 
-ZGlmZiAtLWdpdCBhL2F1ZGlvL2NvbnRyb2wuYyBiL2F1ZGlvL2NvbnRyb2wuYwppbmRleCAx
-NzYzZDYwLi4zNTliNjhhIDEwMDY0NAotLS0gYS9hdWRpby9jb250cm9sLmMKKysrIGIvYXVk
-aW8vY29udHJvbC5jCkBAIC0xMDAyLDggKzEwMDIsNyBAQCBzdGF0aWMgaW50IGF2Y3RwX3Nl
-bmRfcGFzc3Rocm91Z2goc3RydWN0IGNvbnRyb2wgKmNvbnRyb2wsIHVpbnQ4X3Qgb3ApCiAJ
-cmV0dXJuIHdyaXRlKHNrLCBidWYsIHNpemVvZihidWYpKTsKIH0KIAotc3RhdGljIERCdXNN
-ZXNzYWdlICp2b2x1bWVfdXAoREJ1c0Nvbm5lY3Rpb24gKmNvbm4sIERCdXNNZXNzYWdlICpt
-c2csCi0JCQkJCQkJCXZvaWQgKmRhdGEpCitzdGF0aWMgREJ1c01lc3NhZ2UgKmludGVybmFs
-X3NlbmRfcGFzc3Rocm91Z2goREJ1c0Nvbm5lY3Rpb24gKmNvbm4sIERCdXNNZXNzYWdlICpt
-c2csIHZvaWQgKmRhdGEsIHVpbnQ4X3Qgb3ApCiB7CiAJc3RydWN0IGF1ZGlvX2RldmljZSAq
-ZGV2aWNlID0gZGF0YTsKIAlzdHJ1Y3QgY29udHJvbCAqY29udHJvbCA9IGRldmljZS0+Y29u
-dHJvbDsKQEAgLTEwMjQsNyArMTAyMyw3IEBAIHN0YXRpYyBEQnVzTWVzc2FnZSAqdm9sdW1l
-X3VwKERCdXNDb25uZWN0aW9uICpjb25uLCBEQnVzTWVzc2FnZSAqbXNnLAogCQkJCQlFUlJP
-Ul9JTlRFUkZBQ0UgIi5Ob3RTdXBwb3J0ZWQiLAogCQkJCQkiQVZSQ1AgVGFyZ2V0IHJvbGUg
-bm90IHN1cHBvcnRlZCIpOwogCi0JZXJyID0gYXZjdHBfc2VuZF9wYXNzdGhyb3VnaChjb250
-cm9sLCBWT0xfVVBfT1ApOworCWVyciA9IGF2Y3RwX3NlbmRfcGFzc3Rocm91Z2goY29udHJv
-bCwgb3ApOwogCWlmIChlcnIgPCAwKQogCQlyZXR1cm4gZ19kYnVzX2NyZWF0ZV9lcnJvciht
-c2csIEVSUk9SX0lOVEVSRkFDRSAiLkZhaWxlZCIsCiAJCQkJCQkJc3RyZXJyb3IoLWVycikp
-OwpAQCAtMTAzMiwzNCArMTAzMSw0MCBAQCBzdGF0aWMgREJ1c01lc3NhZ2UgKnZvbHVtZV91
-cChEQnVzQ29ubmVjdGlvbiAqY29ubiwgREJ1c01lc3NhZ2UgKm1zZywKIAlyZXR1cm4gZGJ1
-c19tZXNzYWdlX25ld19tZXRob2RfcmV0dXJuKG1zZyk7CiB9CiAKLXN0YXRpYyBEQnVzTWVz
-c2FnZSAqdm9sdW1lX2Rvd24oREJ1c0Nvbm5lY3Rpb24gKmNvbm4sIERCdXNNZXNzYWdlICpt
-c2csCitzdGF0aWMgREJ1c01lc3NhZ2UgKnZvbHVtZV91cChEQnVzQ29ubmVjdGlvbiAqY29u
-biwgREJ1c01lc3NhZ2UgKm1zZywKIAkJCQkJCQkJdm9pZCAqZGF0YSkKIHsKLQlzdHJ1Y3Qg
-YXVkaW9fZGV2aWNlICpkZXZpY2UgPSBkYXRhOwotCXN0cnVjdCBjb250cm9sICpjb250cm9s
-ID0gZGV2aWNlLT5jb250cm9sOwotCURCdXNNZXNzYWdlICpyZXBseTsKLQlpbnQgZXJyOwor
-ICAgICAgICByZXR1cm4gaW50ZXJuYWxfc2VuZF9wYXNzdGhyb3VnaChjb25uLCBtc2csIGRh
-dGEsIFZPTF9VUF9PUCk7Cit9CiAKLQlyZXBseSA9IGRidXNfbWVzc2FnZV9uZXdfbWV0aG9k
-X3JldHVybihtc2cpOwotCWlmICghcmVwbHkpCi0JCXJldHVybiBOVUxMOworc3RhdGljIERC
-dXNNZXNzYWdlICp2b2x1bWVfZG93bihEQnVzQ29ubmVjdGlvbiAqY29ubiwgREJ1c01lc3Nh
-Z2UgKm1zZywKKwkJCQkJCQkJdm9pZCAqZGF0YSkKK3sKKyAgICAgICAgcmV0dXJuIGludGVy
-bmFsX3NlbmRfcGFzc3Rocm91Z2goY29ubiwgbXNnLCBkYXRhLCBWT0xfRE9XTl9PUCk7Cit9
-CiAKLQlpZiAoY29udHJvbC0+c3RhdGUgIT0gQVZDVFBfU1RBVEVfQ09OTkVDVEVEKQotCQly
-ZXR1cm4gZ19kYnVzX2NyZWF0ZV9lcnJvcihtc2csCi0JCQkJCUVSUk9SX0lOVEVSRkFDRSAi
-Lk5vdENvbm5lY3RlZCIsCi0JCQkJCSJEZXZpY2Ugbm90IENvbm5lY3RlZCIpOworc3RhdGlj
-IERCdXNNZXNzYWdlICpjb250cm9sX3BsYXkoREJ1c0Nvbm5lY3Rpb24gKmNvbm4sIERCdXNN
-ZXNzYWdlICptc2csCisJCQkJCQkJCXZvaWQgKmRhdGEpCit7CisgICAgICAgIHJldHVybiBp
-bnRlcm5hbF9zZW5kX3Bhc3N0aHJvdWdoKGNvbm4sIG1zZywgZGF0YSwgUExBWV9PUCk7Cit9
-CiAKLQlpZiAoIWNvbnRyb2wtPnRhcmdldCkKLQkJcmV0dXJuIGdfZGJ1c19jcmVhdGVfZXJy
-b3IobXNnLAotCQkJCQlFUlJPUl9JTlRFUkZBQ0UgIi5Ob3RTdXBwb3J0ZWQiLAotCQkJCQki
-QVZSQ1AgVGFyZ2V0IHJvbGUgbm90IHN1cHBvcnRlZCIpOworc3RhdGljIERCdXNNZXNzYWdl
-ICp2b2x1bWVfbXV0ZShEQnVzQ29ubmVjdGlvbiAqY29ubiwgREJ1c01lc3NhZ2UgKm1zZywK
-KwkJCQkJCQkJdm9pZCAqZGF0YSkKK3sKKyAgICAgICAgcmV0dXJuIGludGVybmFsX3NlbmRf
-cGFzc3Rocm91Z2goY29ubiwgbXNnLCBkYXRhLCBNVVRFX09QKTsKK30KIAotCWVyciA9IGF2
-Y3RwX3NlbmRfcGFzc3Rocm91Z2goY29udHJvbCwgVk9MX0RPV05fT1ApOwotCWlmIChlcnIg
-PCAwKQotCQlyZXR1cm4gZ19kYnVzX2NyZWF0ZV9lcnJvcihtc2csIEVSUk9SX0lOVEVSRkFD
-RSAiLkZhaWxlZCIsCi0JCQkJCQkJc3RyZXJyb3IoLWVycikpOworc3RhdGljIERCdXNNZXNz
-YWdlICpjb250cm9sX3N0b3AoREJ1c0Nvbm5lY3Rpb24gKmNvbm4sIERCdXNNZXNzYWdlICpt
-c2csCisJCQkJCQkJCXZvaWQgKmRhdGEpCit7CisgICAgICAgIHJldHVybiBpbnRlcm5hbF9z
-ZW5kX3Bhc3N0aHJvdWdoKGNvbm4sIG1zZywgZGF0YSwgU1RPUF9PUCk7Cit9CiAKLQlyZXR1
-cm4gZGJ1c19tZXNzYWdlX25ld19tZXRob2RfcmV0dXJuKG1zZyk7CitzdGF0aWMgREJ1c01l
-c3NhZ2UgKmNvbnRyb2xfcGF1c2UoREJ1c0Nvbm5lY3Rpb24gKmNvbm4sIERCdXNNZXNzYWdl
-ICptc2csCisJCQkJCQkJCXZvaWQgKmRhdGEpCit7CisgICAgICAgIHJldHVybiBpbnRlcm5h
-bF9zZW5kX3Bhc3N0aHJvdWdoKGNvbm4sIG1zZywgZGF0YSwgUEFVU0VfT1ApOwogfQogCiBz
-dGF0aWMgREJ1c01lc3NhZ2UgKmNvbnRyb2xfZ2V0X3Byb3BlcnRpZXMoREJ1c0Nvbm5lY3Rp
-b24gKmNvbm4sCkBAIC0xMDk3LDcgKzExMDIsMTEgQEAgc3RhdGljIEdEQnVzTWV0aG9kVGFi
-bGUgY29udHJvbF9tZXRob2RzW10gPSB7CiAJeyAiR2V0UHJvcGVydGllcyIsCSIiLAkiYXtz
-dn0iLGNvbnRyb2xfZ2V0X3Byb3BlcnRpZXMgfSwKIAl7ICJWb2x1bWVVcCIsCQkiIiwJIiIs
-CXZvbHVtZV91cCB9LAogCXsgIlZvbHVtZURvd24iLAkJIiIsCSIiLAl2b2x1bWVfZG93biB9
-LAotCXsgTlVMTCwgTlVMTCwgTlVMTCwgTlVMTCB9CisJeyAiTXV0ZSIsCQkiIiwJIiIsCXZv
-bHVtZV9tdXRlIH0sCisJeyAiUGxheSIsCQkiIiwJIiIsCWNvbnRyb2xfcGxheSB9LAorCXsg
-IlBhdXNlIiwJCSIiLAkiIiwJY29udHJvbF9wYXVzZSB9LAorCXsgIlN0b3AiLAkJIiIsCSIi
-LAljb250cm9sX3N0b3AgfSwKKyAgICB7IE5VTEwsIE5VTEwsIE5VTEwsIE5VTEwgfQogfTsK
-IAogc3RhdGljIEdEQnVzU2lnbmFsVGFibGUgY29udHJvbF9zaWduYWxzW10gPSB7Cg==
---------------010601010208000405010104--
+Johan
+
+--Kj7319i9nmIyA2yE
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment; filename="input-sec-level.patch"
+
+diff --git a/input/device.c b/input/device.c
+index 922dc98..e047009 100644
+--- a/input/device.c
++++ b/input/device.c
+@@ -886,6 +886,7 @@ static void control_connect_cb(GIOChannel *chan, GError *conn_err,
+ 				BT_IO_OPT_SOURCE_BDADDR, &idev->src,
+ 				BT_IO_OPT_DEST_BDADDR, &idev->dst,
+ 				BT_IO_OPT_PSM, L2CAP_PSM_HIDP_INTR,
++				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+ 				BT_IO_OPT_INVALID);
+ 	if (!io) {
+ 		error("%s", err->message);
+@@ -964,6 +965,7 @@ static DBusMessage *input_device_connect(DBusConnection *conn,
+ 					BT_IO_OPT_SOURCE_BDADDR, &idev->src,
+ 					BT_IO_OPT_DEST_BDADDR, &idev->dst,
+ 					BT_IO_OPT_PSM, L2CAP_PSM_HIDP_CTRL,
++					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+ 					BT_IO_OPT_INVALID);
+ 		iconn->ctrl_io = io;
+ 	}
+diff --git a/input/server.c b/input/server.c
+index 93ceea6..7eddf93 100644
+--- a/input/server.c
++++ b/input/server.c
+@@ -187,6 +187,7 @@ int server_start(const bdaddr_t *src)
+ 				server, NULL, &err,
+ 				BT_IO_OPT_SOURCE_BDADDR, src,
+ 				BT_IO_OPT_PSM, L2CAP_PSM_HIDP_CTRL,
++				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+ 				BT_IO_OPT_INVALID);
+ 	if (!server->ctrl) {
+ 		error("Failed to listen on control channel");
+@@ -199,6 +200,7 @@ int server_start(const bdaddr_t *src)
+ 				server, NULL, &err,
+ 				BT_IO_OPT_SOURCE_BDADDR, src,
+ 				BT_IO_OPT_PSM, L2CAP_PSM_HIDP_INTR,
++				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+ 				BT_IO_OPT_INVALID);
+ 	if (!server->intr) {
+ 		error("Failed to listen on interrupt channel");
+
+--Kj7319i9nmIyA2yE--
