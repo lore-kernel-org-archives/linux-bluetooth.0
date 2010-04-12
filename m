@@ -1,47 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4BC33E82.6090104@hschmitt.de>
+Date: Mon, 12 Apr 2010 17:38:42 +0200
+From: Harald Schmitt <commerce@hschmitt.de>
 MIME-Version: 1.0
-In-Reply-To: <h2i2d5a2c101004090532o6c7e33a4k7563fe8f628f3d6f@mail.gmail.com>
-References: <o2p977a2be21004090135u225590edn39c803c9d201b308@mail.gmail.com>
-	<h2i2d5a2c101004090532o6c7e33a4k7563fe8f628f3d6f@mail.gmail.com>
-From: Zhu Yanhai <zhu.yanhai@gmail.com>
-Date: Tue, 13 Apr 2010 15:52:19 +0800
-Message-ID: <p2o977a2be21004130052y6dc9af81n344d91dc8aecd9d8@mail.gmail.com>
-Subject: Re: Is hsp code in BlueZ and pulseaudio broken?
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	pulseaudio-discuss@mail.0pointer.de, vivian.zhang@intel.com,
-	guannan.ou@intel.com, Zheng Huan <huan.zheng@intel.com>,
-	Zhu Yanhai <yanhai.zhu@linux.intel.com>,
-	"Zhu, Yanhai" <yanhai.zhu@intel.com>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: obexd and phonebook-ebook.c (PBAP support)
+References: <4BB4B789.7070409@hschmitt.de> <4BB9A104.3050509@hschmitt.de>
+In-Reply-To: <4BB9A104.3050509@hschmitt.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-I think this bug is caused by the buggy implement of eSCO on the Dell
-BH200 headset. After echo 'Y' > /sys/module/sco/parameters/disable_esco,
-everything is OK then.
-
-Thanks,
-Zhu Yanhai
-
-2010/4/9 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
-> Hi,
->
-> On Fri, Apr 9, 2010 at 11:35 AM, Zhu Yanhai <zhu.yanhai@gmail.com> wrote:
->> 'hcitool con' reported there was no connections after that, and the
->> headset was power off automatically. And of course I can't see this
->> headset by
->> 'ilst-cards' or 'list-sinks' in pacmd.
+Harald Schmitt schrieb:
+> Harald Schmitt schrieb:
+>> Hi,
 >>
->> Is it because there is anything broken in the latest BlueZ +
->> Pulseaudio, or am I doing something wrong?
+>> Is it possible that obexd has to call g_type_init() if 
+>> phonebook-ebook is used?
+>> I think when you call e_book_new_default_addressbook() somewhere down 
+>> gconf_client_get_default() is called and it insists that 
+>> g_type_init() is called prior to its use.
+>>
+>> I tried to make obexd work on my N900, but I did not get there.
+>> My car kit does not use PBAP because it finds the Nokia SyncML 
+>> profile and uses it, but the N900 does not communicate with bluetooth 
+>> devices other than PC or Mobiles via SyncML.
+>> Is there a way to unregister a service from SDP?
+>>
+>> Regards,
+>>
+>> -- 
+>> Harald
+>> -- 
+>> To unsubscribe from this list: send the line "unsubscribe 
+>> linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+> Now I am using pbap-client from the obexd package from my notebook to 
+> test pbap on my N900. I am pretty far. All my contacts are read, but 
+> the obex message is not sent back successfully.
+> Here is the syslog (I added some messages):
+> Apr  5 09:56:35 Nokia-N900-51-1 obexd[1203]: pbap_get: pbap_get()
+> Apr  5 09:56:35 Nokia-N900-51-1 obexd[1203]: phonebook_pullphonebook: 
+> phonebook_pullphonebook
+> Apr  5 09:56:36 Nokia-N900-51-1 obexd[1203]: pbap_pullphonebook: 
+> phonebook_pullphonebook had no errors
+> Apr  5 09:56:36 Nokia-N900-51-1 obexd[1203]: 
+> pbap_add_result_apparam_header: pbap_add_result_apparam_header 
+> maxlistcount=65535 rspsize=0
+> Apr  5 09:56:36 Nokia-N900-51-1 obexd[1203]: pbap_get: pbap_get() no 
+> error
+> Apr  5 09:56:36 Nokia-N900-51-1 obexd[1203]: pbap_get: pbap_get() addbody
+> Apr  5 09:56:36 Nokia-N900-51-1 obexd[1203]: pbap_get: pbap_get() 
+> OBEX_ObjectSetRsp()
+> Apr  5 09:56:36 Nokia-N900-51-1 obexd[1203]: PROGRESS(0x0), GET(0x3), 
+> (null)(0x0)
+> Apr  5 09:56:36 Nokia-N900-51-1 obexd[1203]: ebookpull_cb: 
+> ebookpull_cb count=305 size=42944
+> Apr  5 09:56:36 Nokia-N900-51-1 obexd[1203]: STREAMEMPTY(0x8), 
+> CONNECT(0x0), (null)(0x0)
+> Apr  5 09:56:36 Nokia-N900-51-1 obexd[1203]: obex_write_stream: 
+> name=telecom/pb.vcf type=x-bt/phonebook tx_mtu=3896 file=(nil)
+> Apr  5 09:56:36 Nokia-N900-51-1 obexd[1203]: STREAMEMPTY(0x8), 
+> CONNECT(0x0), (null)(0x0)
+> Apr  5 09:56:36 Nokia-N900-51-1 obexd[1203]: obex_write_stream: 
+> name=telecom/pb.vcf type=x-bt/phonebook tx_mtu=3896 file=(nil)
+> Apr  5 09:56:36 Nokia-N900-51-1 obexd[1203]: PROGRESS(0x0), 
+> (null)(0x10), (null)(0x0)
+> Apr  5 09:56:37 Nokia-N900-51-1 obexd[1203]: REQDONE(0x3), 
+> (null)(0x10), (null)(0x3)
+> Apr  5 09:57:00 Nokia-N900-51-1 obexd[1203]: obex_handle_input: poll 
+> event HUP ERR
 >
-> It seems ok in bluetoothd size, maybe it is the suspend logic that
-> disconnect sco after a few seconds when idle, but it doesn't seems to
-> be the case here as also rfcomm connection is dropped somehow.
->
-> --
-> Luiz Augusto von Dentz
-> Computer Engineer
->
+> Best,
+> Harald
+I think the problem on my N900 is a bug in openobex 1.4, that is fixed 
+in 1.5:
+http://git.kernel.org/?p=bluetooth/openobex.git;a=commit;h=52bf1445d2fa4b95dac4b98e1cb6e9dbb5d5ed7d
+This situation applies on the way the PBAP plugin is implemented. To 
+make PBAP working with only replacing obexd, I think the only way is to 
+use the non-async e-book functions or could someone give me a hint to 
+something better?
+
+Best,
+Harald
