@@ -1,87 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4BC33E82.6090104@hschmitt.de>
-Date: Mon, 12 Apr 2010 17:38:42 +0200
-From: Harald Schmitt <commerce@hschmitt.de>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: obexd and phonebook-ebook.c (PBAP support)
-References: <4BB4B789.7070409@hschmitt.de> <4BB9A104.3050509@hschmitt.de>
-In-Reply-To: <4BB9A104.3050509@hschmitt.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: Re: obexd-0.22 causes gnome-bluetooth sendto dialog to stop
+ closing when operation ends
+From: Bastien Nocera <hadess@hadess.net>
+To: Vinicius Gomes <vinicius.gomes@openbossa.org>
+Cc: pacho@condmat1.ciencias.uniovi.es, linux-bluetooth@vger.kernel.org
+In-Reply-To: <l2r2a9506371004100717p500f6b4o48e8a6d2dfb8f0c5@mail.gmail.com>
+References: <1270898546.5646.28.camel@localhost.localdomain>
+	 <l2r2a9506371004100717p500f6b4o48e8a6d2dfb8f0c5@mail.gmail.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Date: Mon, 12 Apr 2010 16:22:39 +0100
+Message-ID: <1271085759.6731.6348.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Harald Schmitt schrieb:
-> Harald Schmitt schrieb:
->> Hi,
->>
->> Is it possible that obexd has to call g_type_init() if 
->> phonebook-ebook is used?
->> I think when you call e_book_new_default_addressbook() somewhere down 
->> gconf_client_get_default() is called and it insists that 
->> g_type_init() is called prior to its use.
->>
->> I tried to make obexd work on my N900, but I did not get there.
->> My car kit does not use PBAP because it finds the Nokia SyncML 
->> profile and uses it, but the N900 does not communicate with bluetooth 
->> devices other than PC or Mobiles via SyncML.
->> Is there a way to unregister a service from SDP?
->>
->> Regards,
->>
->> -- 
->> Harald
->> -- 
->> To unsubscribe from this list: send the line "unsubscribe 
->> linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
-> Now I am using pbap-client from the obexd package from my notebook to 
-> test pbap on my N900. I am pretty far. All my contacts are read, but 
-> the obex message is not sent back successfully.
-> Here is the syslog (I added some messages):
-> Apr  5 09:56:35 Nokia-N900-51-1 obexd[1203]: pbap_get: pbap_get()
-> Apr  5 09:56:35 Nokia-N900-51-1 obexd[1203]: phonebook_pullphonebook: 
-> phonebook_pullphonebook
-> Apr  5 09:56:36 Nokia-N900-51-1 obexd[1203]: pbap_pullphonebook: 
-> phonebook_pullphonebook had no errors
-> Apr  5 09:56:36 Nokia-N900-51-1 obexd[1203]: 
-> pbap_add_result_apparam_header: pbap_add_result_apparam_header 
-> maxlistcount=65535 rspsize=0
-> Apr  5 09:56:36 Nokia-N900-51-1 obexd[1203]: pbap_get: pbap_get() no 
-> error
-> Apr  5 09:56:36 Nokia-N900-51-1 obexd[1203]: pbap_get: pbap_get() addbody
-> Apr  5 09:56:36 Nokia-N900-51-1 obexd[1203]: pbap_get: pbap_get() 
-> OBEX_ObjectSetRsp()
-> Apr  5 09:56:36 Nokia-N900-51-1 obexd[1203]: PROGRESS(0x0), GET(0x3), 
-> (null)(0x0)
-> Apr  5 09:56:36 Nokia-N900-51-1 obexd[1203]: ebookpull_cb: 
-> ebookpull_cb count=305 size=42944
-> Apr  5 09:56:36 Nokia-N900-51-1 obexd[1203]: STREAMEMPTY(0x8), 
-> CONNECT(0x0), (null)(0x0)
-> Apr  5 09:56:36 Nokia-N900-51-1 obexd[1203]: obex_write_stream: 
-> name=telecom/pb.vcf type=x-bt/phonebook tx_mtu=3896 file=(nil)
-> Apr  5 09:56:36 Nokia-N900-51-1 obexd[1203]: STREAMEMPTY(0x8), 
-> CONNECT(0x0), (null)(0x0)
-> Apr  5 09:56:36 Nokia-N900-51-1 obexd[1203]: obex_write_stream: 
-> name=telecom/pb.vcf type=x-bt/phonebook tx_mtu=3896 file=(nil)
-> Apr  5 09:56:36 Nokia-N900-51-1 obexd[1203]: PROGRESS(0x0), 
-> (null)(0x10), (null)(0x0)
-> Apr  5 09:56:37 Nokia-N900-51-1 obexd[1203]: REQDONE(0x3), 
-> (null)(0x10), (null)(0x3)
-> Apr  5 09:57:00 Nokia-N900-51-1 obexd[1203]: obex_handle_input: poll 
-> event HUP ERR
->
-> Best,
-> Harald
-I think the problem on my N900 is a bug in openobex 1.4, that is fixed 
-in 1.5:
-http://git.kernel.org/?p=bluetooth/openobex.git;a=commit;h=52bf1445d2fa4b95dac4b98e1cb6e9dbb5d5ed7d
-This situation applies on the way the PBAP plugin is implemented. To 
-make PBAP working with only replacing obexd, I think the only way is to 
-use the non-async e-book functions or could someone give me a hint to 
-something better?
+On Sat, 2010-04-10 at 11:17 -0300, Vinicius Gomes wrote:
+> Hi Pacho,
+> 
+> 2010/4/10 Pacho Ramos <pacho@condmat1.ciencias.uniovi.es>:
+> > Hello
+> >
+> > This is a regression over obexd-0.21. After updating to 0.22,
+> > gnome-bluetooth sendto dialog no longer closes when operation finishes,
+> > even if file is already properly sent.
+> >
+> 
+> We noticed this regression as well. Luiz already has a fix for this,
+> it was just not integrated yet.
+> 
+> In case you want to take a look and perhaps help test it, the fix is here[1].
 
-Best,
-Harald
+Except that the patch is absolutely huge, and doesn't apply cleanly on
+0.22 either.
+
