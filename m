@@ -1,29 +1,19 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 13 Apr 2010 18:19:13 -0300
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
-To: Pavan Savoy <pavan_savoy@yahoo.co.in>
-Cc: linux-bluetooth@vger.kernel.org, shitiz_kumar@ti.com
-Subject: Re: l2cap connection id in user-space
-Message-ID: <20100413211913.GA20489@vigoh>
-References: <112852.88977.qm@web94911.mail.in2.yahoo.com>
+Message-ID: <112852.88977.qm@web94911.mail.in2.yahoo.com>
+Date: Wed, 14 Apr 2010 02:26:41 +0530 (IST)
+From: Pavan Savoy <pavan_savoy@yahoo.co.in>
+Subject: l2cap connection id in user-space
+To: linux-bluetooth@vger.kernel.org
+Cc: shitiz_kumar@ti.com
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <112852.88977.qm@web94911.mail.in2.yahoo.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Pavan,
+Is there a possibility as of now for me to extract the l2cap connection ID into my application ?
 
-* Pavan Savoy <pavan_savoy@yahoo.co.in> [2010-04-14 02:26:41 +0530]:
+I require 2 sets of information about an L2CAP connection in my bluetooth application, I require the connection ID on connection to a remote headset/sink, and also the maximum packet size for that connection (which I think is the MTU, I can get via the getsockopt).
 
-> Is there a possibility as of now for me to extract the l2cap connection ID into my application ?
+please respond.
 
-bluez-hcidump does that. Look to its source code to learn how.
-
-> 
-> I require 2 sets of information about an L2CAP connection in my bluetooth application, I require the connection ID on connection to a remote headset/sink, and also the maximum packet size for that connection (which I think is the MTU, I can get via the getsockopt).
-> 
-
--- 
-Gustavo F. Padovan
-http://padovan.org
+Send free SMS to your Friends on Mobile from your Yahoo! Messenger. Download Now! http://messenger.yahoo.com/download.php
