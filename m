@@ -1,19 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <112852.88977.qm@web94911.mail.in2.yahoo.com>
-Date: Wed, 14 Apr 2010 02:26:41 +0530 (IST)
-From: Pavan Savoy <pavan_savoy@yahoo.co.in>
-Subject: l2cap connection id in user-space
-To: linux-bluetooth@vger.kernel.org
-Cc: shitiz_kumar@ti.com
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <h2i2d5a2c101004090532o6c7e33a4k7563fe8f628f3d6f@mail.gmail.com>
+References: <o2p977a2be21004090135u225590edn39c803c9d201b308@mail.gmail.com>
+	<h2i2d5a2c101004090532o6c7e33a4k7563fe8f628f3d6f@mail.gmail.com>
+From: Zhu Yanhai <zhu.yanhai@gmail.com>
+Date: Tue, 13 Apr 2010 15:52:19 +0800
+Message-ID: <p2o977a2be21004130052y6dc9af81n344d91dc8aecd9d8@mail.gmail.com>
+Subject: Re: Is hsp code in BlueZ and pulseaudio broken?
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	pulseaudio-discuss@mail.0pointer.de, vivian.zhang@intel.com,
+	guannan.ou@intel.com, Zheng Huan <huan.zheng@intel.com>,
+	Zhu Yanhai <yanhai.zhu@linux.intel.com>,
+	"Zhu, Yanhai" <yanhai.zhu@intel.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Is there a possibility as of now for me to extract the l2cap connection ID into my application ?
+Hi,
+I think this bug is caused by the buggy implement of eSCO on the Dell
+BH200 headset. After echo 'Y' > /sys/module/sco/parameters/disable_esco,
+everything is OK then.
 
-I require 2 sets of information about an L2CAP connection in my bluetooth application, I require the connection ID on connection to a remote headset/sink, and also the maximum packet size for that connection (which I think is the MTU, I can get via the getsockopt).
+Thanks,
+Zhu Yanhai
 
-please respond.
-
-Send free SMS to your Friends on Mobile from your Yahoo! Messenger. Download Now! http://messenger.yahoo.com/download.php
+2010/4/9 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
+> Hi,
+>
+> On Fri, Apr 9, 2010 at 11:35 AM, Zhu Yanhai <zhu.yanhai@gmail.com> wrote:
+>> 'hcitool con' reported there was no connections after that, and the
+>> headset was power off automatically. And of course I can't see this
+>> headset by
+>> 'ilst-cards' or 'list-sinks' in pacmd.
+>>
+>> Is it because there is anything broken in the latest BlueZ +
+>> Pulseaudio, or am I doing something wrong?
+>
+> It seems ok in bluetoothd size, maybe it is the suspend logic that
+> disconnect sco after a few seconds when idle, but it doesn't seems to
+> be the case here as also rfcomm connection is dropped somehow.
+>
+> --
+> Luiz Augusto von Dentz
+> Computer Engineer
+>
