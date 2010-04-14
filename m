@@ -3,204 +3,169 @@ Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org, gustavo@padovan.org, jprvita@profusion.mobi, ulisses@profusion.mobi
-Subject: [PATCH 6/7] Bluetooth: Implement missing parts of the Invalid Frame Detection
-Date: Wed, 14 Apr 2010 16:41:51 -0300
-Message-Id: <1271274112-7806-7-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1271274112-7806-6-git-send-email-padovan@profusion.mobi>
+Subject: [PATCH 5/7] Bluetooth: Add SOCK_STREAM support to L2CAP
+Date: Wed, 14 Apr 2010 16:41:50 -0300
+Message-Id: <1271274112-7806-6-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1271274112-7806-5-git-send-email-padovan@profusion.mobi>
 References: <1271274112-7806-1-git-send-email-padovan@profusion.mobi>
  <1271274112-7806-2-git-send-email-padovan@profusion.mobi>
  <1271274112-7806-3-git-send-email-padovan@profusion.mobi>
  <1271274112-7806-4-git-send-email-padovan@profusion.mobi>
  <1271274112-7806-5-git-send-email-padovan@profusion.mobi>
- <1271274112-7806-6-git-send-email-padovan@profusion.mobi>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There is a plenty of situation where ERTM shall close the channel, this
-commit treats the cases regarding Invalid Frame Detection.
-It create one reassembly SDU function for ERTM and other for Streaming
-Mode to make the Invalid Frame Detection handling less complex.
+if enable_ertm is true and we have SOCK_STREAM the default mode will be
+ERTM, otherwise Basic Mode.
 
 Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 Reviewed-by: João Paulo Rechi Vita <jprvita@profusion.mobi>
 ---
- net/bluetooth/l2cap.c |  119 ++++++++++++++++++++++++++++++++++++++++++++++---
- 1 files changed, 112 insertions(+), 7 deletions(-)
+ net/bluetooth/l2cap.c |   40 ++++++++++++++++++++++++++--------------
+ 1 files changed, 26 insertions(+), 14 deletions(-)
 
 diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 0e24ee3..1f66541 100644
+index 63248aa..0e24ee3 100644
 --- a/net/bluetooth/l2cap.c
 +++ b/net/bluetooth/l2cap.c
-@@ -3317,12 +3317,111 @@ static void l2cap_add_to_srej_queue(struct sock *sk, struct sk_buff *skb, u8 tx_
- 	__skb_queue_tail(SREJ_QUEUE(sk), skb);
- }
+@@ -224,7 +224,7 @@ static void __l2cap_chan_add(struct l2cap_conn *conn, struct sock *sk, struct so
  
--static int l2cap_sar_reassembly_sdu(struct sock *sk, struct sk_buff *skb, u16 control)
-+static int l2cap_ertm_reassembly_sdu(struct sock *sk, struct sk_buff *skb, u16 control)
-+{
-+	struct l2cap_pinfo *pi = l2cap_pi(sk);
-+	struct sk_buff *_skb;
-+	int err = 0;
-+
-+	switch (control & L2CAP_CTRL_SAR) {
-+	case L2CAP_SDU_UNSEGMENTED:
-+		if (pi->conn_state & L2CAP_CONN_SAR_SDU)
-+			goto drop;
-+
-+		err = sock_queue_rcv_skb(sk, skb);
-+		if (!err)
-+			return err;
-+
-+		break;
-+
-+	case L2CAP_SDU_START:
-+		if (pi->conn_state & L2CAP_CONN_SAR_SDU)
-+			goto drop;
-+
-+		pi->sdu_len = get_unaligned_le16(skb->data);
-+		skb_pull(skb, 2);
-+
-+		if (pi->sdu_len > pi->imtu)
-+			goto disconnect;
-+
-+		pi->sdu = bt_skb_alloc(pi->sdu_len, GFP_ATOMIC);
-+		if (!pi->sdu) {
-+			err = -ENOMEM;
-+			break;
-+		}
-+
-+		memcpy(skb_put(pi->sdu, skb->len), skb->data, skb->len);
-+
-+		pi->conn_state |= L2CAP_CONN_SAR_SDU;
-+		pi->partial_sdu_len = skb->len;
-+		break;
-+
-+	case L2CAP_SDU_CONTINUE:
-+		if (!(pi->conn_state & L2CAP_CONN_SAR_SDU))
-+			goto disconnect;
-+
-+		if (!pi->sdu)
-+			goto disconnect;
-+
-+		memcpy(skb_put(pi->sdu, skb->len), skb->data, skb->len);
-+
-+		pi->partial_sdu_len += skb->len;
-+		if (pi->partial_sdu_len > pi->sdu_len)
-+			goto drop;
-+
-+		break;
-+
-+	case L2CAP_SDU_END:
-+		if (!(pi->conn_state & L2CAP_CONN_SAR_SDU))
-+			goto disconnect;
-+
-+		if (!pi->sdu)
-+			goto disconnect;
-+
-+		memcpy(skb_put(pi->sdu, skb->len), skb->data, skb->len);
-+
-+		pi->conn_state &= ~L2CAP_CONN_SAR_SDU;
-+		pi->partial_sdu_len += skb->len;
-+
-+		if (pi->partial_sdu_len > pi->imtu)
-+			goto drop;
-+
-+		if (pi->partial_sdu_len != pi->sdu_len)
-+			goto drop;
-+
-+		_skb = skb_clone(pi->sdu, GFP_ATOMIC);
-+		err = sock_queue_rcv_skb(sk, _skb);
-+		if (err < 0)
-+			kfree_skb(_skb);
-+
-+		kfree_skb(pi->sdu);
-+		break;
-+	}
-+
-+	kfree_skb(skb);
-+	return err;
-+
-+drop:
-+	kfree_skb(pi->sdu);
-+	pi->sdu = NULL;
-+
-+disconnect:
-+	l2cap_send_disconn_req(pi->conn, sk);
-+	kfree_skb(skb);
-+	return 0;
-+}
-+
-+static int l2cap_streaming_reassembly_sdu(struct sock *sk, struct sk_buff *skb, u16 control)
+ 	l2cap_pi(sk)->conn = conn;
+ 
+-	if (sk->sk_type == SOCK_SEQPACKET) {
++	if (sk->sk_type == SOCK_SEQPACKET || sk->sk_type == SOCK_STREAM) {
+ 		/* Alloc CID for connection-oriented socket */
+ 		l2cap_pi(sk)->scid = l2cap_alloc_cid(l);
+ 	} else if (sk->sk_type == SOCK_DGRAM) {
+@@ -452,7 +452,8 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 	for (sk = l->head; sk; sk = l2cap_pi(sk)->next_c) {
+ 		bh_lock_sock(sk);
+ 
+-		if (sk->sk_type != SOCK_SEQPACKET) {
++		if (sk->sk_type != SOCK_SEQPACKET &&
++				sk->sk_type != SOCK_STREAM) {
+ 			bh_unlock_sock(sk);
+ 			continue;
+ 		}
+@@ -512,7 +513,8 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
+ 	for (sk = l->head; sk; sk = l2cap_pi(sk)->next_c) {
+ 		bh_lock_sock(sk);
+ 
+-		if (sk->sk_type != SOCK_SEQPACKET) {
++		if (sk->sk_type != SOCK_SEQPACKET &&
++				sk->sk_type != SOCK_STREAM) {
+ 			l2cap_sock_clear_timer(sk);
+ 			sk->sk_state = BT_CONNECTED;
+ 			sk->sk_state_change(sk);
+@@ -721,7 +723,8 @@ static void __l2cap_sock_close(struct sock *sk, int reason)
+ 
+ 	case BT_CONNECTED:
+ 	case BT_CONFIG:
+-		if (sk->sk_type == SOCK_SEQPACKET) {
++		if (sk->sk_type == SOCK_SEQPACKET ||
++				sk->sk_type == SOCK_STREAM) {
+ 			struct l2cap_conn *conn = l2cap_pi(sk)->conn;
+ 
+ 			sk->sk_state = BT_DISCONN;
+@@ -732,7 +735,8 @@ static void __l2cap_sock_close(struct sock *sk, int reason)
+ 		break;
+ 
+ 	case BT_CONNECT2:
+-		if (sk->sk_type == SOCK_SEQPACKET) {
++		if (sk->sk_type == SOCK_SEQPACKET ||
++				sk->sk_type == SOCK_STREAM) {
+ 			struct l2cap_conn *conn = l2cap_pi(sk)->conn;
+ 			struct l2cap_conn_rsp rsp;
+ 			__u16 result;
+@@ -795,7 +799,10 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
+ 	} else {
+ 		pi->imtu = L2CAP_DEFAULT_MTU;
+ 		pi->omtu = 0;
+-		pi->mode = L2CAP_MODE_BASIC;
++		if (enable_ertm && sk->sk_type == SOCK_STREAM)
++			pi->mode = L2CAP_MODE_ERTM;
++		else
++			pi->mode = L2CAP_MODE_BASIC;
+ 		pi->max_tx = max_transmit;
+ 		pi->fcs  = L2CAP_FCS_CRC16;
+ 		pi->tx_win = tx_window;
+@@ -852,7 +859,7 @@ static int l2cap_sock_create(struct net *net, struct socket *sock, int protocol,
+ 
+ 	sock->state = SS_UNCONNECTED;
+ 
+-	if (sock->type != SOCK_SEQPACKET &&
++	if (sock->type != SOCK_SEQPACKET && sock->type != SOCK_STREAM &&
+ 			sock->type != SOCK_DGRAM && sock->type != SOCK_RAW)
+ 		return -ESOCKTNOSUPPORT;
+ 
+@@ -1000,7 +1007,8 @@ static int l2cap_do_connect(struct sock *sk)
+ 	l2cap_sock_set_timer(sk, sk->sk_sndtimeo);
+ 
+ 	if (hcon->state == BT_CONNECTED) {
+-		if (sk->sk_type != SOCK_SEQPACKET) {
++		if (sk->sk_type != SOCK_SEQPACKET &&
++				sk->sk_type != SOCK_STREAM) {
+ 			l2cap_sock_clear_timer(sk);
+ 			sk->sk_state = BT_CONNECTED;
+ 		} else
+@@ -1033,7 +1041,8 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
+ 
+ 	lock_sock(sk);
+ 
+-	if (sk->sk_type == SOCK_SEQPACKET && !la.l2_psm) {
++	if ((sk->sk_type == SOCK_SEQPACKET || sk->sk_type == SOCK_STREAM)
++			&& !la.l2_psm) {
+ 		err = -EINVAL;
+ 		goto done;
+ 	}
+@@ -1097,7 +1106,8 @@ static int l2cap_sock_listen(struct socket *sock, int backlog)
+ 
+ 	lock_sock(sk);
+ 
+-	if (sk->sk_state != BT_BOUND || sock->type != SOCK_SEQPACKET) {
++	if ((sock->type != SOCK_SEQPACKET && sock->type != SOCK_STREAM)
++			|| sk->sk_state != BT_BOUND) {
+ 		err = -EBADFD;
+ 		goto done;
+ 	}
+@@ -1832,7 +1842,8 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+ 
+ 	switch (optname) {
+ 	case BT_SECURITY:
+-		if (sk->sk_type != SOCK_SEQPACKET && sk->sk_type != SOCK_RAW) {
++		if (sk->sk_type != SOCK_SEQPACKET && sk->sk_type != SOCK_STREAM
++				&& sk->sk_type != SOCK_RAW) {
+ 			err = -EINVAL;
+ 			break;
+ 		}
+@@ -1982,7 +1993,8 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
+ 
+ 	switch (optname) {
+ 	case BT_SECURITY:
+-		if (sk->sk_type != SOCK_SEQPACKET && sk->sk_type != SOCK_RAW) {
++		if (sk->sk_type != SOCK_SEQPACKET && sk->sk_type != SOCK_STREAM
++				&& sk->sk_type != SOCK_RAW) {
+ 			err = -EINVAL;
+ 			break;
+ 		}
+@@ -2289,7 +2301,7 @@ static int l2cap_build_conf_req(struct sock *sk, void *data)
  {
  	struct l2cap_pinfo *pi = l2cap_pi(sk);
- 	struct sk_buff *_skb;
- 	int err = -EINVAL;
+ 	struct l2cap_conf_req *req = data;
+-	struct l2cap_conf_rfc rfc = { .mode = L2CAP_MODE_BASIC };
++	struct l2cap_conf_rfc rfc = { .mode = pi->mode };
+ 	void *ptr = req->data;
  
-+	/*
-+	 * TODO: We have to notify the userland if some data is lost with the
-+	 * Streaming Mode.
-+	 */
-+
- 	switch (control & L2CAP_CTRL_SAR) {
- 	case L2CAP_SDU_UNSEGMENTED:
- 		if (pi->conn_state & L2CAP_CONN_SAR_SDU) {
-@@ -3417,7 +3516,7 @@ static void l2cap_check_srej_gap(struct sock *sk, u8 tx_seq)
+ 	BT_DBG("sk %p", sk);
+@@ -3979,7 +3991,7 @@ static int l2cap_disconn_cfm(struct hci_conn *hcon, u8 reason)
  
- 		skb = skb_dequeue(SREJ_QUEUE(sk));
- 		control |= bt_cb(skb)->sar << L2CAP_CTRL_SAR_SHIFT;
--		l2cap_sar_reassembly_sdu(sk, skb, control);
-+		l2cap_ertm_reassembly_sdu(sk, skb, control);
- 		l2cap_pi(sk)->buffer_seq_srej =
- 			(l2cap_pi(sk)->buffer_seq_srej + 1) % 64;
- 		tx_seq++;
-@@ -3558,7 +3657,7 @@ expected:
+ static inline void l2cap_check_encryption(struct sock *sk, u8 encrypt)
+ {
+-	if (sk->sk_type != SOCK_SEQPACKET)
++	if (sk->sk_type != SOCK_SEQPACKET && sk->sk_type != SOCK_STREAM)
+ 		return;
  
- 	pi->buffer_seq = (pi->buffer_seq + 1) % 64;
- 
--	err = l2cap_sar_reassembly_sdu(sk, skb, rx_control);
-+	err = l2cap_ertm_reassembly_sdu(sk, skb, rx_control);
- 	if (err < 0)
- 		return err;
- 
-@@ -3786,20 +3885,26 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
- 		 * Receiver will miss it and start proper recovery
- 		 * procedures and ask retransmission.
- 		 */
--		if (len > pi->mps)
-+		if (len > pi->mps) {
-+			l2cap_send_disconn_req(pi->conn, sk);
- 			goto drop;
-+		}
- 
- 		if (l2cap_check_fcs(pi, skb))
- 			goto drop;
- 
- 		if (__is_iframe(control)) {
--			if (len < 4)
-+			if (len < 4){
-+				l2cap_send_disconn_req(pi->conn, sk);
- 				goto drop;
-+			}
- 
- 			l2cap_data_channel_iframe(sk, control, skb);
- 		} else {
--			if (len != 0)
-+			if (len != 0) {
-+				l2cap_send_disconn_req(pi->conn, sk);
- 				goto drop;
-+			}
- 
- 			l2cap_data_channel_sframe(sk, control, skb);
- 		}
-@@ -3830,7 +3935,7 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
- 		else
- 			pi->expected_tx_seq = (tx_seq + 1) % 64;
- 
--		l2cap_sar_reassembly_sdu(sk, skb, control);
-+		l2cap_streaming_reassembly_sdu(sk, skb, control);
- 
- 		goto done;
- 
+ 	if (encrypt == 0x00) {
 -- 
 1.6.4.4
