@@ -1,24 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mike Tsai <Mike.Tsai@Atheros.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Wed, 14 Apr 2010 09:31:40 -0700
-Subject: RE: detecting dead link
-Message-ID: <35B17FE5076C7040809188FBE7913F983A1E128A57@SC1EXMB-MBCL.global.atheros.com>
-References: <k2i2d5a2c101004140110s5834b2e6u86290c6466baa723@mail.gmail.com>
-In-Reply-To: <k2i2d5a2c101004140110s5834b2e6u86290c6466baa723@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+Date: Wed, 14 Apr 2010 11:10:48 +0300
+Message-ID: <k2i2d5a2c101004140110s5834b2e6u86290c6466baa723@mail.gmail.com>
+Subject: detecting dead link
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
-
-
-
------Original Message-----
-From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
-Sent: Wednesday, April 14, 2010 1:11 AM
-To: linux-bluetooth@vger.kernel.org
-Subject: detecting dead link
 
 Hi,
 
@@ -71,20 +60,6 @@ them if the timeout is reached, of course this has to take into
 account the user authorization framework/defer setup so it only
 timeout if there is no activity in the link.
 
-Hi Luiz,
-[MT] Page timeout is for creating ACL data link. In this case, ACL link is already created so page timeout is not involved. The 20 second timeout is the default link supervision timeout and the 35 second timeout is the LMP timeout (actually 30 seconds). I think if you have the sniff log for the LMP, it would appear that one of the LMP might be lost during SCO negotiation and it is quite possibly due to the existing sniff mode. A proper implementation of host stack shall probably exit sniff mode first before start the SCO link creation. So the log would look like this,
-
-	HCI command: Exit Sniff Mode
-	HCI event:   Command status, Exit Sniff Mode
-	HCI event:   Mode changed
-	HCI command: Setup Synchronous Connection
-
-I think the host was sending the commands out of order. It asks controller to set up SCO link before it asks controller to exit sniff mode. Note that both commands are async commands (meaning it will request controller to go through several state transition for those commands), so the controller might have hard time executing the host commands.
-
 -- 
 Luiz Augusto von Dentz
 Computer Engineer
---
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
