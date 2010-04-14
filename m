@@ -1,29 +1,19 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mike Tsai <Mike.Tsai@Atheros.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Wed, 14 Apr 2010 14:09:42 -0700
-Subject: RE: detecting dead link
-Message-ID: <35B17FE5076C7040809188FBE7913F983A1E128B77@SC1EXMB-MBCL.global.atheros.com>
+MIME-Version: 1.0
+In-Reply-To: <35B17FE5076C7040809188FBE7913F983A1E128B32@SC1EXMB-MBCL.global.atheros.com>
 References: <k2i2d5a2c101004140110s5834b2e6u86290c6466baa723@mail.gmail.com>
 	 <35B17FE5076C7040809188FBE7913F983A1E128A57@SC1EXMB-MBCL.global.atheros.com>
 	 <y2q2d5a2c101004141229gaf2dbac4u89e4e627004ddd95@mail.gmail.com>
 	 <35B17FE5076C7040809188FBE7913F983A1E128B32@SC1EXMB-MBCL.global.atheros.com>
- <z2k2d5a2c101004141334kc91838fatc9bcce8d81e38740@mail.gmail.com>
-In-Reply-To: <z2k2d5a2c101004141334kc91838fatc9bcce8d81e38740@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Date: Wed, 14 Apr 2010 23:34:26 +0300
+Message-ID: <z2k2d5a2c101004141334kc91838fatc9bcce8d81e38740@mail.gmail.com>
+Subject: Re: detecting dead link
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mike Tsai <Mike.Tsai@atheros.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
-
-
-
------Original Message-----
-From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com] 
-Sent: Wednesday, April 14, 2010 1:34 PM
-To: Mike Tsai
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: detecting dead link
 
 Hi,
 
@@ -49,8 +39,6 @@ Sorry, again I guess you are misunderstanding me, the link is _lost_,
 the device has being moved away or has been shutdown so I guess it
 pretty impossible to give anything else but disconnect to the user, or
 there is any way to maintain a link to an unreachable device?
-
->>Ok, so I do miss understanding the situation. In that case, host can program link supervision timeout to a shorter time (like 3 or 4 seconds) as suggested. So the link supervision timeout shall kick in far ahead of LMP response timeout. The user will get disconnect notification sooner,
 
 Btw, the trace I gave here was from a carkit which when turned off
 doesn't send any hci disconnect.
