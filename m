@@ -3,64 +3,29 @@ Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org, gustavo@padovan.org, jprvita@profusion.mobi, ulisses@profusion.mobi
-Subject: [PATCH 1/7] Bluetooth: Fix bug when retransmitting I-frames
-Date: Wed, 14 Apr 2010 16:41:46 -0300
-Message-Id: <1271274112-7806-2-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1271274112-7806-1-git-send-email-padovan@profusion.mobi>
-References: <1271274112-7806-1-git-send-email-padovan@profusion.mobi>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Subject: More patches to eL2CAP
+Date: Wed, 14 Apr 2010 16:41:45 -0300
+Message-Id: <1271274112-7806-1-git-send-email-padovan@profusion.mobi>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If there is no frames to retransmit l2cap was crashing the kernel, now
-we check if the queue is empty first.
+Hi,
 
-Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
-Reviewed-by: João Paulo Rechi Vita <jprvita@profusion.mobi>
----
- net/bluetooth/l2cap.c |   12 ++++++++----
- 1 files changed, 8 insertions(+), 4 deletions(-)
+This set of patches fix two bugs, add L2CAP Extended Features to the Kconfig.
+And as a RFC implements support for SOCK_STREAM and Local Busy condition
+(patches 5 and 7). Comments are welcome. :)
 
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index c699fe9..d38bfc2 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -3530,7 +3530,8 @@ expected:
- 		if (pi->conn_state & L2CAP_CONN_REJ_ACT)
- 			pi->conn_state &= ~L2CAP_CONN_REJ_ACT;
- 		else {
--			sk->sk_send_head = TX_QUEUE(sk)->next;
-+			if (!skb_queue_empty(TX_QUEUE(sk)))
-+				sk->sk_send_head = TX_QUEUE(sk)->next;
- 			pi->next_tx_seq = pi->expected_ack_seq;
- 			l2cap_ertm_send(sk);
- 		}
-@@ -3577,7 +3578,8 @@ static inline void l2cap_data_channel_rrframe(struct sock *sk, u16 rx_control)
- 		if (pi->conn_state & L2CAP_CONN_REJ_ACT)
- 			pi->conn_state &= ~L2CAP_CONN_REJ_ACT;
- 		else {
--			sk->sk_send_head = TX_QUEUE(sk)->next;
-+			if (!skb_queue_empty(TX_QUEUE(sk)))
-+				sk->sk_send_head = TX_QUEUE(sk)->next;
- 			pi->next_tx_seq = pi->expected_ack_seq;
- 			l2cap_ertm_send(sk);
- 		}
-@@ -3609,12 +3611,14 @@ static inline void l2cap_data_channel_rejframe(struct sock *sk, u16 rx_control)
- 		if (pi->conn_state & L2CAP_CONN_REJ_ACT)
- 			pi->conn_state &= ~L2CAP_CONN_REJ_ACT;
- 		else {
--			sk->sk_send_head = TX_QUEUE(sk)->next;
-+			if (!skb_queue_empty(TX_QUEUE(sk)))
-+				sk->sk_send_head = TX_QUEUE(sk)->next;
- 			pi->next_tx_seq = pi->expected_ack_seq;
- 			l2cap_ertm_send(sk);
- 		}
- 	} else {
--		sk->sk_send_head = TX_QUEUE(sk)->next;
-+		if (!skb_queue_empty(TX_QUEUE(sk)))
-+			sk->sk_send_head = TX_QUEUE(sk)->next;
- 		pi->next_tx_seq = pi->expected_ack_seq;
- 		l2cap_ertm_send(sk);
- 
--- 
-1.6.4.4
+The patchset is rebased against my last patchset sent to this mailing list.
+
+Gustavo F. Padovan (7):
+      Bluetooth: Fix bug when retransmitting I-frames
+      Bluetooth: Fix Indentation on L2CAP
+      Bluetooth: Fix crash when monitor timeout expires
+      Bluetooth: Add Kconfig option for L2CAP Extended Features
+      Bluetooth: Add SOCK_STREAM support to L2CAP
+      Bluetooth: Implement missing parts of the Invalid Frame Detection
+      Bluetooth: Implement Local Busy Condition handling
+
+ include/net/bluetooth/l2cap.h |    6 +
+ net/bluetooth/Kconfig         |   13 ++
+ net/bluetooth/l2cap.c         |  331 +++++++++++++++++++++++++++++++++++++----
+ 3 files changed, 320 insertions(+), 30 deletions(-)
