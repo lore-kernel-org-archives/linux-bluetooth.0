@@ -1,27 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <572595.91160.qm@web94916.mail.in2.yahoo.com>
-Date: Fri, 16 Apr 2010 00:55:58 +0530 (IST)
-From: Pavan Savoy <pavan_savoy@yahoo.co.in>
-Subject: killing stalled ACL connection
-To: linux-bluetooth@vger.kernel.org
+Message-ID: <4BC723CF.5000604@ce.unipr.it>
+Date: Thu, 15 Apr 2010 16:33:51 +0200
+From: Paolo Medici <medici@ce.unipr.it>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: Implement AVCTP passthrough commands + iPod Touch
+References: <20100411083333.GA10451@ce.unipr.it> <4BC1C340.50404@ce.unipr.it>
+In-Reply-To: <4BC1C340.50404@ce.unipr.it>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I am working on a platform which has a very aggressive power management features.
-So consider a situation, where an a2dp connection exists with a headset, and i pause the media over AVRCP, so my phone now goes into suspend state (shutting off UART clocks), 
-
-and when I wake-up (resume) using the AVRCP connection, via the play/pause button, I see the platform waking up and media player receiving the input, However I also see this,
-
-hci0  ACL tx timeout.
-killing stalled ACL connection.
-
-and media is not able to play on the headset anymore.
-Although the media player thinks it's being played.
-
-Now where should I look into, as to why a perfectly nice ACL (l2cap, a2dp) connection was dropped during the suspend ?
+I am currently trying bluez AVRCP on iPod Touch (3G)
+It seems, however, that it respond only at the 0x44 OpCode (PASS 
+THROUGH) and performs PLAY correctly.
+The other codes do not give any action.
 
 
+Paolo Medici wrote:
+> Something like that (attached).
+>
+> Paolo Medici wrote:
+>> Hi,
+>>   Are there no contraindications to complete the implementation in 
+>> audio/control.c of other commands (as well as VolumeUp/VolumeDown)?
+>>   In this case, to try to control my iPod Touch, I would like to add 
+>> remaining ones.
+>>
+>>   Paolo
+>> -- 
+>> To unsubscribe from this list: send the line "unsubscribe 
+>> linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>
 
-Send free SMS to your Friends on Mobile from your Yahoo! Messenger. Download Now! http://messenger.yahoo.com/download.php
+
+-- 
+Paolo Medici - R&D
+VisLab srl - P.I. 02516520349
+Dipartimento di Ingegneria dell'Informazione
+dell'Universita' di Parma - P.I. 00308780345
+Via G.P.Usberti 181/A I-43100 Parma ITALY
+Tel : +39 0521 90 5792
+Web : http://vislab.it/medici
+
