@@ -1,78 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <315060.46799.qm@web94904.mail.in2.yahoo.com>
-Date: Fri, 16 Apr 2010 19:58:53 +0530 (IST)
-From: Pavan Savoy <pavan_savoy@yahoo.co.in>
-Subject: Re: killing stalled ACL connection
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <p2u2d5a2c101004160102uafada73az98db61259c9e2d21@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <35B17FE5076C7040809188FBE7913F983A1E128B77@SC1EXMB-MBCL.global.atheros.com>
+References: <k2i2d5a2c101004140110s5834b2e6u86290c6466baa723@mail.gmail.com>
+	 <35B17FE5076C7040809188FBE7913F983A1E128A57@SC1EXMB-MBCL.global.atheros.com>
+	 <y2q2d5a2c101004141229gaf2dbac4u89e4e627004ddd95@mail.gmail.com>
+	 <35B17FE5076C7040809188FBE7913F983A1E128B32@SC1EXMB-MBCL.global.atheros.com>
+	 <z2k2d5a2c101004141334kc91838fatc9bcce8d81e38740@mail.gmail.com>
+	 <35B17FE5076C7040809188FBE7913F983A1E128B77@SC1EXMB-MBCL.global.atheros.com>
+Date: Fri, 16 Apr 2010 16:19:13 +0300
+Message-ID: <h2x2d5a2c101004160619w9bc99d1es5ecee3acb6caf615@mail.gmail.com>
+Subject: Re: detecting dead link
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mike Tsai <Mike.Tsai@atheros.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi,
 
---- On Fri, 16/4/10, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+On Thu, Apr 15, 2010 at 12:09 AM, Mike Tsai <Mike.Tsai@atheros.com> wrote:
+>>>Ok, so I do miss understanding the situation. In that case, host can program link supervision timeout to a shorter time (like 3 or 4 seconds) as suggested. So the link supervision timeout shall kick in far ahead of LMP response timeout. The user will get disconnect notification sooner,
 
-> From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> Subject: Re: killing stalled ACL connection
-> To: "Pavan Savoy" <pavan_savoy@yahoo.co.in>
-> Cc: linux-bluetooth@vger.kernel.org
-> Date: Friday, 16 April, 2010, 1:32 PM
-> Hi,
-> 
-> On Thu, Apr 15, 2010 at 10:25 PM, Pavan Savoy <pavan_savoy@yahoo.co.in>
-> wrote:
-> > I am working on a platform which has a very aggressive
-> power management features.
-> > So consider a situation, where an a2dp connection
-> exists with a headset, and i pause the media over AVRCP, so
-> my phone now goes into suspend state (shutting off UART
-> clocks),
-> >
-> > and when I wake-up (resume) using the AVRCP
-> connection, via the play/pause button, I see the platform
-> waking up and media player receiving the input, However I
-> also see this,
-> >
-> > hci0  ACL tx timeout.
-> > killing stalled ACL connection.
-> >
-> > and media is not able to play on the headset anymore.
-> > Although the media player thinks it's being played.
-> >
-> > Now where should I look into, as to why a perfectly
-> nice ACL (l2cap, a2dp) connection was dropped during the
-> suspend ?
-> 
-> I guess you mean the system is suspended, to be honest I
-> thought that
-> would mean shutting down the bluetooth chip too which
-> obviously will
-> drop all the connections, but that doesn't seems to be the
-> case here,
-> does it? Anyway if you shutdown the bus which you
-> communicate with the
-> chip it could eventually timeout, I guess in such situation
-> it is
-> better to enter sniff mode, use some kind of bus that can
-> wakeup/powerup automatically if there is data to transfer
-> or a
-> combination of both.
+It seems that somebody already give us a favor and patented it:
 
-UART does this kind of automatically, I mean there is no s/w calls that are made it go into suspend state. (there is a hardware module which does that - we just have to configure it)
+http://www.freepatentsonline.com/y2009/0258596.html
 
-And yes, bluetooth chip is actually alive and active after suspend/resume.
-However it's only the ACL connections that are getting dropped.
+That is exactly what I was looking for, depending on the link usage
+(a2dp, sco) reduce the link supervision timeout to detect the link
+loss faster. Well I guess the only option now is to do this
+statically, which I don't think will address the problem completely
+since we can only change the timeout once due to this patent.
 
-Is there some sort of timeout involved ? with these ACL connections ?
-because I guess even the LMP's time to leave messages would not be going to headset (if there is such a thing called TTL messages).
+Grrr, it is so obvious why people patent such generic usage, I really
+hate software patents. Very frustrating.
 
-I need some hint as to how I can debug this ...
-> 
-> -- 
-> Luiz Augusto von Dentz
-> Computer Engineer
-> 
-
-
+-- 
+Luiz Augusto von Dentz
+Computer Engineer
