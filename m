@@ -5,50 +5,46 @@ To: linux-bluetooth@vger.kernel.org
 Cc: gustavo@padovan.org,
 	marcel@holtmann.org,
 	"Gustavo F. Padovan" <padovan@profusion.mobi>
-Subject: [PATCH 2/3] Bluetooth: Use the proper function cast to get hdr data
-Date: Thu, 22 Apr 2010 03:51:38 -0300
-Message-Id: <1271919099-22107-2-git-send-email-gustavo@padovan.org>
-In-Reply-To: <1271919099-22107-1-git-send-email-gustavo@padovan.org>
-References: <1271919099-22107-1-git-send-email-gustavo@padovan.org>
+Subject: [PATCH 1/3] Bluetooth: Fix return value when bt_skb_alloc fails
+Date: Thu, 22 Apr 2010 03:51:37 -0300
+Message-Id: <1271919099-22107-1-git-send-email-gustavo@padovan.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo F. Padovan <padovan@profusion.mobi>
 
+Set the proper error(ENOMEM), instead of just return 0.
+
 Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 ---
- drivers/bluetooth/hci_ll.c |    6 +++---
- 1 files changed, 3 insertions(+), 3 deletions(-)
+ drivers/bluetooth/hci_h4.c |    2 +-
+ drivers/bluetooth/hci_ll.c |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
+index c0ce813..3f038f5 100644
+--- a/drivers/bluetooth/hci_h4.c
++++ b/drivers/bluetooth/hci_h4.c
+@@ -246,7 +246,7 @@ static int h4_recv(struct hci_uart *hu, void *data, int count)
+ 			BT_ERR("Can't allocate mem for new packet");
+ 			h4->rx_state = H4_W4_PACKET_TYPE;
+ 			h4->rx_count = 0;
+-			return 0;
++			return -ENOMEM;
+ 		}
+ 
+ 		h4->rx_skb->dev = (void *) hu->hdev;
 diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
-index 91e44df..fb8445c 100644
+index 5c65014..91e44df 100644
 --- a/drivers/bluetooth/hci_ll.c
 +++ b/drivers/bluetooth/hci_ll.c
-@@ -402,7 +402,7 @@ static int ll_recv(struct hci_uart *hu, void *data, int count)
- 				continue;
+@@ -491,7 +491,7 @@ static int ll_recv(struct hci_uart *hu, void *data, int count)
+ 			BT_ERR("Can't allocate mem for new packet");
+ 			ll->rx_state = HCILL_W4_PACKET_TYPE;
+ 			ll->rx_count = 0;
+-			return 0;
++			return -ENOMEM;
+ 		}
  
- 			case HCILL_W4_EVENT_HDR:
--				eh = (struct hci_event_hdr *) ll->rx_skb->data;
-+				eh = hci_event_hdr(ll->rx_skb);
- 
- 				BT_DBG("Event header: evt 0x%2.2x plen %d", eh->evt, eh->plen);
- 
-@@ -410,7 +410,7 @@ static int ll_recv(struct hci_uart *hu, void *data, int count)
- 				continue;
- 
- 			case HCILL_W4_ACL_HDR:
--				ah = (struct hci_acl_hdr *) ll->rx_skb->data;
-+				ah = hci_acl_hdr(ll->rx_skb);
- 				dlen = __le16_to_cpu(ah->dlen);
- 
- 				BT_DBG("ACL header: dlen %d", dlen);
-@@ -419,7 +419,7 @@ static int ll_recv(struct hci_uart *hu, void *data, int count)
- 				continue;
- 
- 			case HCILL_W4_SCO_HDR:
--				sh = (struct hci_sco_hdr *) ll->rx_skb->data;
-+				sh = hci_sco_hdr(ll->rx_skb);
- 
- 				BT_DBG("SCO header: dlen %d", sh->dlen);
- 
+ 		ll->rx_skb->dev = (void *) hu->hdev;
 -- 
 1.7.0.4
