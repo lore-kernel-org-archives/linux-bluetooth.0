@@ -1,51 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Users need to manually run "hid2hci --method dell -v 413c -p 8158
- --mode hci" even when udev rule is installed
-From: Pacho Ramos <pacho@condmat1.ciencias.uniovi.es>
-Reply-To: pacho@condmat1.ciencias.uniovi.es
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-xi4FE6jRzZoeIIFdEGd0"
-Date: Sat, 24 Apr 2010 20:42:32 +0200
-Message-ID: <1272134552.7585.9.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 23 Apr 2010 02:16:30 +0200 (CEST)
+From: Jiri Kosina <jkosina@suse.cz>
+To: Przemo Firszt <przemo@firszt.eu>
+Cc: Bastien Nocera <hadess@hadess.net>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	marcel <marcel@holtmann.org>,
+	Peter Hutterer <peter.hutterer@who-t.net>, Ping <pinglinux@gmail.com>
+Subject: Re: [PATCH 2/2] Add sysfs speed attribute for wacom bluetooth
+ tablet
+In-Reply-To: <1271965880.3540.16.camel@pldmachine>
+Message-ID: <alpine.LNX.2.00.1004230215040.7579@pobox.suse.cz>
+References: <1268925902.12672.25.camel@pldmachine>  <1268926015.12672.27.camel@pldmachine>  <1268926624.21548.1478.camel@localhost.localdomain>  <1268939541.3639.13.camel@pldmachine>  <alpine.LNX.2.00.1003220947310.18642@pobox.suse.cz>
+ <1271965880.3540.16.camel@pldmachine>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Thu, 22 Apr 2010, Przemo Firszt wrote:
 
---=-xi4FE6jRzZoeIIFdEGd0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> > The patch looks fine to me, so I have applied it to my tree.
+> > 
+> > Could you also please send a followup patch which would add 
+> > Documentation/ABI entry for the speed attribute?
+> Hi Jiri,
+> Sorry for the delayed reply. See attached patch for ABI entry.
 
-Hello
+Applied.
 
-I would like to ask for help to try to find where could be the problem
-causing this:
-http://bugs.gentoo.org/show_bug.cgi?id=3D315749
+> Is Kernel Version: 2.6.35 OK?
 
-Reporter seems to need to manually run:
-hid2hci --method dell -v 413c -p 8158 --mode hci
+Yup.
 
-to get bluetooth switched to hci mode.
+Thanks,
 
-I don't understand why he needs to run it since involved udev rule file
-seems to be properly installed.
-
-Could anybody help us on this please?
-
-Thanks a lot
-
---=-xi4FE6jRzZoeIIFdEGd0
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Esta parte del mensaje =?ISO-8859-1?Q?est=E1?= firmada
- digitalmente
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.14 (GNU/Linux)
-
-iEYEABECAAYFAkvTO5gACgkQCaWpQKGI+9QcRQCeLddFIptE/JfKpTnqBRfeKXkj
-ctQAnjTu0ETqZuaGWhIYnpcrGMobXq38
-=IHry
------END PGP SIGNATURE-----
-
---=-xi4FE6jRzZoeIIFdEGd0--
-
+-- 
+Jiri Kosina
+SUSE Labs, Novell Inc.
