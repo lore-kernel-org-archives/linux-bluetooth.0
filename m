@@ -1,32 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <x2z2c3916b71004260339j3cd86068g3b4adf5cd523c450@mail.gmail.com>
-References: <r2h2c3916b71004260229p48a39235m917ee7ebb0006efe@mail.gmail.com>
-	 <x2z2c3916b71004260339j3cd86068g3b4adf5cd523c450@mail.gmail.com>
-Date: Mon, 26 Apr 2010 21:24:19 +0300
-Message-ID: <g2s2d5a2c101004261124lcd36410dhbfe959945f0aa5a9@mail.gmail.com>
-Subject: Re: no client session close in obexd 0.23?
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Daniel Abraham <daniel.shrugged@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 26 Apr 2010 11:12:59 -0700 (PDT)
+Message-Id: <20100426.111259.112594696.davem@davemloft.net>
+To: gustavo@padovan.org
+Cc: error27@gmail.com, marcel@holtmann.org, andrei.emeltchenko@nokia.com,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ kernel-janitors@vger.kernel.org
+Subject: Re: [patch v2] bluetooth: handle l2cap_create_connless_pdu() errors
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20100426150919.GA12813@vigoh>
+References: <20100422123347.GA5265@vigoh>
+	<20100426113627.GS29093@bicker>
+	<20100426150919.GA12813@vigoh>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
+Date: Mon, 26 Apr 2010 12:09:19 -0300
 
-On Mon, Apr 26, 2010 at 1:39 PM, Daniel Abraham
-<daniel.shrugged@gmail.com> wrote:
-> Oops, didn't notice the (also new) client method "RemoveSession"
->
-> Out of curiosity, what's the benefit of moving close/remove from
-> session scope to client scope?
+> Hi Dan,
+> 
+> * Dan Carpenter <error27@gmail.com> [2010-04-26 13:36:27 +0200]:
+> 
+>> l2cap_create_connless_pdu() can sometimes return ERR_PTR(-ENOMEM) or
+>> ERR_PTR(-EFAULT).
+>> 
+>> Signed-off-by: Dan Carpenter <error27@gmail.com>
+>> ---
+>> In v2 I wrote the patch on top of Gustavo Padovon's devel tree
 
-No self destruction, in general it is bad idea, but in this case it
-even worse because the internally the session may be referred in many
-places.
+This is the kind of bug that could cause a crash if the path actually
+executes.
 
+Therefore it tires me that that submitter was told to regenerate this
+patch against some devel tree that is -next bound, when in fact this
+is the kind of fix that warrants inclusion right now into net-2.6
 
--- 
-Luiz Augusto von Dentz
-Computer Engineer
+Marcel, please do whatever magic you need to so I can get this into
+Linus's tree as I did the rest of the ERR_PTR() fixes from Dan already.
+No reason to treat Bluetooth special and defer these fixes to -next.
+
+Thanks.
