@@ -1,43 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 26 Apr 2010 13:36:27 +0200
-From: Dan Carpenter <error27@gmail.com>
-To: "Gustavo F. Padovan" <gustavo@padovan.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrei Emeltchenko <andrei.emeltchenko@nokia.com>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: [patch v2] bluetooth: handle l2cap_create_connless_pdu() errors
-Message-ID: <20100426113627.GS29093@bicker>
-References: <20100422095201.GO29647@bicker> <20100422123347.GA5265@vigoh>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20100422123347.GA5265@vigoh>
+In-Reply-To: <r2h2c3916b71004260229p48a39235m917ee7ebb0006efe@mail.gmail.com>
+References: <r2h2c3916b71004260229p48a39235m917ee7ebb0006efe@mail.gmail.com>
+Date: Mon, 26 Apr 2010 13:39:22 +0300
+Message-ID: <x2z2c3916b71004260339j3cd86068g3b4adf5cd523c450@mail.gmail.com>
+Subject: Re: no client session close in obexd 0.23?
+From: Daniel Abraham <daniel.shrugged@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-l2cap_create_connless_pdu() can sometimes return ERR_PTR(-ENOMEM) or
-ERR_PTR(-EFAULT).
+Oops, didn't notice the (also new) client method "RemoveSession"
 
-Signed-off-by: Dan Carpenter <error27@gmail.com>
----
-In v2 I wrote the patch on top of Gustavo Padovon's devel tree
+Out of curiosity, what's the benefit of moving close/remove from
+session scope to client scope?
 
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index a668ef4..b32682c 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -1712,8 +1712,12 @@ static int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock, struct ms
- 	/* Connectionless channel */
- 	if (sk->sk_type == SOCK_DGRAM) {
- 		skb = l2cap_create_connless_pdu(sk, msg, len);
--		l2cap_do_send(sk, skb);
--		err = len;
-+		if (IS_ERR(skb)) {
-+			err = PTR_ERR(skb);
-+		} else {
-+			l2cap_do_send(sk, skb);
-+			err = len;
-+		}
- 		goto done;
- 	}
- 
+
+On Mon, Apr 26, 2010 at 12:29 PM, Daniel Abraham
+<daniel.shrugged@gmail.com> wrote:
+> I noticed that the client session close method is missing in obexd 0.23
+> (and also from the API document, so I guess it's intentional)
+>
+> So how can I trigger it?
+>
+> Thanks
+>
