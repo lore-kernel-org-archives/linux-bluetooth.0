@@ -1,49 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 26 Apr 2010 22:20:59 -0300
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
-To: ofono@ofono.org,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: DUN client for oFono and BlueZ
-Message-ID: <20100427012059.GG12813@vigoh>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <g2s2d5a2c101004261124lcd36410dhbfe959945f0aa5a9@mail.gmail.com>
+References: <r2h2c3916b71004260229p48a39235m917ee7ebb0006efe@mail.gmail.com>
+	 <x2z2c3916b71004260339j3cd86068g3b4adf5cd523c450@mail.gmail.com>
+	 <g2s2d5a2c101004261124lcd36410dhbfe959945f0aa5a9@mail.gmail.com>
+Date: Tue, 27 Apr 2010 02:37:03 +0300
+Message-ID: <h2s2c3916b71004261637le0d83946y724f6ddb538c093@mail.gmail.com>
+Subject: Re: no client session close in obexd 0.23?
+From: Daniel Abraham <daniel.shrugged@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Thanks!
 
-I'm starting the DUN Client implementation for the Linux Stack. DUN is
-the Bluetooth dial-up network profile. It makes possible share internet
-connection between two Bluetooth devices. That is my Google Summer of Code
-project for this year.
+Followup question - I'm trying to use it, but it throws this exception:
+dbus.exceptions.DBusException: org.openobex.Error.InvalidArguments:
 
-Here follows a simple, and possible not complete, roadmap:
+What am I doing wrong? What is the right input?
 
-1. Put send_method_call() and send_method_call_with_reply() on gdbus: those
-functions are very useful for DBus operations. You can send a DBus message
-just calling them with the right parameters. Patch for that work already 
-on the mailing list.
+Here's a sample Python script:
 
-2. Create a bluetooth.c file with the bluetooth helpers. oFono plugins for HFP,
-DUN and SAP will be able to share the same bluetooth code to access BlueZ
-stuff. This is a ongoing work.
+---
 
-3. plugin/dun.c prototype. A simple prototype for the DUN client.
+#!/usr/bin/env python
 
-4. Agent server on BlueZ. This one is very similar to the HFP Agent server. At
-the end of the DUN agent project I plan to merge the both agent servers. SAP
-will take advantage of that merge too.
+import dbus
 
-5. oFono DUN agent. Implement the agent handling for DUN.
+bus = dbus.SessionBus()
+proxy = bus.get_object('org.openobex.client', '/')
+client = dbus.Interface(proxy, 'org.openobex.Client')
 
-6. AT command parser and PPP stack integration with DUN. The biggest task,
-where the core of the project is.
+address = '00:1C:26:FC:15:AF'
 
-7. ConnMan integration. Setup of the NAT and Internet Connections.
+print('Opening FTP session')
+path = client.CreateSession({'Target': 'ftp', 'Destination': address})
+print(path)
+client.RemoveSession(path)
+print('FTP session closed')
 
+---
 
-Comments are welcome. :)
+Output:
 
--- 
-Gustavo F. Padovan
-http://padovan.org
+Opening FTP session
+/org/openobex/session0
+Traceback (most recent call last):
+  File "./test-ftp.py", line 14, in <module>
+    client.RemoveSession(path)
+  File "/usr/lib/python2.6/site-packages/dbus/proxies.py", line 140, in __call__
+    **keywords)
+  File "/usr/lib/python2.6/site-packages/dbus/connection.py", line
+630, in call_blocking
+    message, timeout)
+dbus.exceptions.DBusException: org.openobex.Error.InvalidArguments:
