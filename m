@@ -1,177 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH 1/3] SDP
-From: Santiago Carot Nemesio <scarot@libresoft.es>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 27 Apr 2010 15:34:25 +0200
-Message-ID: <1272375265.2157.17.camel@mosquito>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <n2h2d5a2c101004270133xa4ea7dd5za238a58f9e67613@mail.gmail.com>
+References: <t2m2c3916b71004261612i68ccba50h78c83ab3a02713cb@mail.gmail.com>
+	 <g2l2d5a2c101004270020mb94d092cnef88b98b147beba0@mail.gmail.com>
+	 <n2h2d5a2c101004270133xa4ea7dd5za238a58f9e67613@mail.gmail.com>
+Date: Tue, 27 Apr 2010 14:51:58 +0300
+Message-ID: <q2z2c3916b71004270451r957e5befp631d413d4f316afe@mail.gmail.com>
+Subject: Re: obexd OPP pull problem
+From: Daniel Abraham <daniel.shrugged@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch removes some blanks spaces in sdp source code.
+On Tue, Apr 27, 2010 at 11:33 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> This should fix at least the D-Bus error:
+>
+> http://gitorious.org/obexd/vudentzs-clone/commit/32e48446b6b8cd72e15988c673a60c7fb47b0862
 
->>From a915f0ca83f4b1424eb986f7b4314a2ff09a56fc Mon Sep 17 00:00:00 2001
-From: Santiago Carot Nemesio <sancane@gmail.com>
-Date: Tue, 27 Apr 2010 13:56:29 +0200
-Subject: [PATCH 1/3] Removed blank spaces
+Actually, that's not what I see. I'm using the "pull-business-card"
+script (which doesn't use any try-except block), and it doesn't crash
+with an exception, even though "dbus-monitor --session" shows the
+error (below). Is it lost somehow before it reaches Python's D-Bus
+caller object?
 
-
-Signed-off-by: Santiago Carot Nemesio <sancane@gmail.com>
----
- lib/sdp.c |   34 +++++++++++++++++-----------------
- 1 files changed, 17 insertions(+), 17 deletions(-)
-
-diff --git a/lib/sdp.c b/lib/sdp.c
-index 7cf710b..ca16118 100644
---- a/lib/sdp.c
-+++ b/lib/sdp.c
-@@ -3254,7 +3254,7 @@ static int copy_cstate(uint8_t *pdata, int pdata_len, const sdp_cstate_t *cstate
- }
- 
- /*
-- * This is a service search request. 
-+ * This is a service search request.
-  *
-  * INPUT :
-  *
-@@ -3417,7 +3417,7 @@ end:
- }
- 
- /*
-- * This is a service attribute request. 
-+ * This is a service attribute request.
-  *
-  * INPUT :
-  *
-@@ -3438,7 +3438,7 @@ end:
-  *
-  *   sdp_list_t *attrid
-  *     Singly linked list containing attribute identifiers desired.
-- *     Every element is either a uint16_t(attrSpec = SDP_ATTR_REQ_INDIVIDUAL)  
-+ *     Every element is either a uint16_t(attrSpec = SDP_ATTR_REQ_INDIVIDUAL)
-  *     or a uint32_t(attrSpec=SDP_ATTR_REQ_RANGE)
-  *
-  * OUTPUT :
-@@ -3448,7 +3448,7 @@ end:
-  *     !0:
-  *	 The service record
-  */
--sdp_record_t *sdp_service_attr_req(sdp_session_t *session, uint32_t handle, 
-+sdp_record_t *sdp_service_attr_req(sdp_session_t *session, uint32_t handle,
- 			sdp_attrreq_type_t reqtype, const sdp_list_t *attrids)
- {
- 	uint32_t reqsize = 0, _reqsize;
-@@ -3494,7 +3494,7 @@ sdp_record_t *sdp_service_attr_req(sdp_session_t *session, uint32_t handle,
- 	pdata += sizeof(uint16_t);
- 
- 	// get attr seq PDU form
--	seqlen = gen_attridseq_pdu(pdata, attrids, 
-+	seqlen = gen_attridseq_pdu(pdata, attrids,
- 		reqtype == SDP_ATTR_REQ_INDIVIDUAL? SDP_UINT16 : SDP_UINT32);
- 	if (seqlen == -1) {
- 		errno = EINVAL;
-@@ -3558,7 +3558,7 @@ sdp_record_t *sdp_service_attr_req(sdp_session_t *session, uint32_t handle,
- 		SDPDBG("sdp_cstate_t length : %d\n", cstate_len);
- 
- 		/*
--		 * a split response: concatenate intermediate responses 
-+		 * a split response: concatenate intermediate responses
- 		 * and the last one (which has cstate_len == 0)
- 		 */
- 		if (cstate_len > 0 || rsp_concat_buf.data_size != 0) {
-@@ -3583,7 +3583,7 @@ sdp_record_t *sdp_service_attr_req(sdp_session_t *session, uint32_t handle,
- 		}
- 		rec = sdp_extract_pdu(pdata, pdata_len, &scanned);
- 	}
--	
-+
- end:
- 	if (reqbuf)
- 		free(reqbuf);
-@@ -3676,7 +3676,7 @@ int sdp_set_notify(sdp_session_t *session, sdp_callback_t *func, void *udata)
- 
- /*
-  * This function starts an asynchronous service search request.
-- * The incomming and outgoing data are stored in the transaction structure 
-+ * The incomming and outgoing data are stored in the transaction structure
-  * buffers. When there is incomming data the sdp_process function must be
-  * called to get the data and handle the continuation state.
-  *
-@@ -3771,7 +3771,7 @@ end:
- 
- /*
-  * This function starts an asynchronous service attribute request.
-- * The incomming and outgoing data are stored in the transaction structure 
-+ * The incomming and outgoing data are stored in the transaction structure
-  * buffers. When there is incomming data the sdp_process function must be
-  * called to get the data and handle the continuation state.
-  *
-@@ -3796,7 +3796,7 @@ end:
-  *
-  *   sdp_list_t *attrid_list
-  *     Singly linked list containing attribute identifiers desired.
-- *     Every element is either a uint16_t(attrSpec = SDP_ATTR_REQ_INDIVIDUAL)  
-+ *     Every element is either a uint16_t(attrSpec = SDP_ATTR_REQ_INDIVIDUAL)
-  *     or a uint32_t(attrSpec=SDP_ATTR_REQ_RANGE)
-  *
-  * OUTPUT :
-@@ -3912,7 +3912,7 @@ end:
-  *
-  *   sdp_list_t *attrid_list
-  *     Singly linked list containing attribute identifiers desired.
-- *     Every element is either a uint16_t(attrSpec = SDP_ATTR_REQ_INDIVIDUAL)  
-+ *     Every element is either a uint16_t(attrSpec = SDP_ATTR_REQ_INDIVIDUAL)
-  *     or a uint32_t(attrSpec=SDP_ATTR_REQ_RANGE)
-  *
- 
-@@ -4130,7 +4130,7 @@ int sdp_process(sdp_session_t *session)
- 			pdata += sizeof(uint16_t); /* point to csrc */
- 
- 			/* the first csrc contains the sum of partial csrc responses */
--			*pcsrc += bt_get_unaligned((uint16_t *) pdata); 
-+			*pcsrc += bt_get_unaligned((uint16_t *) pdata);
- 
- 			pdata += sizeof(uint16_t); /* point to the first handle */
- 			rsp_count = csrc * 4;
-@@ -4141,8 +4141,8 @@ int sdp_process(sdp_session_t *session)
- 	case SDP_SVC_SEARCH_ATTR_RSP:
- 		rsp_count = ntohs(bt_get_unaligned((uint16_t *) pdata));
- 		SDPDBG("Attrlist byte count : %d\n", rsp_count);
--	
--		/* 
-+
-+		/*
- 		 * Number of bytes in the AttributeLists parameter(without
- 		 * continuation state) + AttributeListsByteCount field size.
- 		 */
-@@ -4168,7 +4168,7 @@ int sdp_process(sdp_session_t *session)
- 
- 	SDPDBG("Cstate length : %d\n", pcstate->length);
- 
--	/* 
-+	/*
- 	 * Check out of bound. Continuation state must have at least
- 	 * 1 byte: ZERO to indicate that it is not a partial response.
- 	 */
-@@ -4202,7 +4202,7 @@ int sdp_process(sdp_session_t *session)
- 
- 		// set the request header's param length
- 		reqhdr->plen = htons(reqsize - sizeof(sdp_pdu_hdr_t));
--	
-+
- 		if (sdp_send_req(session, t->reqbuf, reqsize) < 0) {
- 			SDPERR("Error sendind data:%s(%d)", strerror(errno), errno);
- 			status = 0xffff;
-@@ -4253,7 +4253,7 @@ end:
-  *
-  *   sdp_list_t *attrids
-  *     Singly linked list containing attribute identifiers desired.
-- *     Every element is either a uint16_t(attrSpec = SDP_ATTR_REQ_INDIVIDUAL)  
-+ *     Every element is either a uint16_t(attrSpec = SDP_ATTR_REQ_INDIVIDUAL)
-  *     or a uint32_t(attrSpec=SDP_ATTR_REQ_RANGE)
-  *
-  * OUTPUT :
--- 
-1.6.3.3
-
+method call sender=:1.147 -> dest=:1.142 serial=4 path=/;
+interface=org.openobex.Client; member=PullBusinessCard
+   array [
+      dict entry(
+         string "Destination"
+         variant             string "00:1C:26:FC:15:AF"
+      )
+   ]
+   string "d.vcf"
+method call sender=:1.142 -> dest=org.freedesktop.DBus serial=18
+path=/org/freedesktop/DBus; interface=org.freedesktop.DBus;
+member=AddMatch
+   string "type='signal',interface='org.freedesktop.DBus',member='NameOwnerChanged',arg0=':1.147'"
+method return sender=:1.142 -> dest=:1.147 reply_serial=4
+error sender=:1.142 -> dest=:1.147
+error_name=org.openobex.Error.Failed reply_serial=4
+   string "Method not allowed"
+method call sender=:1.142 -> dest=org.freedesktop.DBus serial=21
+path=/org/freedesktop/DBus; interface=org.freedesktop.DBus;
+member=RemoveMatch
+   string "type='signal',interface='org.freedesktop.DBus',member='NameOwnerChanged',arg0=':1.147'"
+signal sender=org.freedesktop.DBus -> dest=(null destination)
+serial=10 path=/org/freedesktop/DBus; interface=org.freedesktop.DBus;
+member=NameOwnerChanged
+   string ":1.147"
+   string ":1.147"
+   string ""
