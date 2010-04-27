@@ -1,28 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <o2w2d5a2c101004270010gf01c8228ve01bbbcb3e58fa67@mail.gmail.com>
-References: <r2h2c3916b71004260229p48a39235m917ee7ebb0006efe@mail.gmail.com>
-	 <x2z2c3916b71004260339j3cd86068g3b4adf5cd523c450@mail.gmail.com>
-	 <g2s2d5a2c101004261124lcd36410dhbfe959945f0aa5a9@mail.gmail.com>
-	 <h2s2c3916b71004261637le0d83946y724f6ddb538c093@mail.gmail.com>
-	 <o2w2d5a2c101004270010gf01c8228ve01bbbcb3e58fa67@mail.gmail.com>
-Date: Tue, 27 Apr 2010 13:35:47 +0300
-Message-ID: <y2j2c3916b71004270335qa7cd0aa7l704685202ce19d90@mail.gmail.com>
-Subject: Re: no client session close in obexd 0.23?
-From: Daniel Abraham <daniel.shrugged@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 27 Apr 2010 13:15:32 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Santiago Carot Nemesio <scarot@libresoft.es>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH] SDP memory checks
+Message-ID: <20100427101532.GB6555@jh-x301>
+References: <1272353139.2157.8.camel@mosquito>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1272353139.2157.8.camel@mosquito>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Apr 27, 2010 at 10:10 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> It's a bug, could you please try this:
->
-> http://gitorious.org/~vudentz/obexd/vudentzs-clone/commit/fd4e8e2cef72542fb5bc924817f4b409415b3b54
->
-> I guess that should fix the problem.
+Hi,
 
-Confirmed, the fix works as intended.
+On Tue, Apr 27, 2010, Santiago Carot Nemesio wrote:
+> This patch add some memory checks after malloc is called. Also some
+> blank spaces at the end of the lines are removed.  I observed that
+> sometimes functions returns NULL or 0 without any convention. I set
+> all to NULL to formalice the source code.
+
+Thanks for the patch. It looks good, but could you split it into two
+parts: one patch for the coding style fixes (whitespace, changing 0 to
+NULL, etc) and another one to fix the missing malloc error checks. Also
+use "git format-patch" to create the patches so that they can be easily
+applied using "git am".
+
+Johan
