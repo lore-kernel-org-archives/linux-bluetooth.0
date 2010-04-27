@@ -1,10 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <t2m2c3916b71004261612i68ccba50h78c83ab3a02713cb@mail.gmail.com>
-References: <t2m2c3916b71004261612i68ccba50h78c83ab3a02713cb@mail.gmail.com>
-Date: Tue, 27 Apr 2010 10:20:11 +0300
-Message-ID: <g2l2d5a2c101004270020mb94d092cnef88b98b147beba0@mail.gmail.com>
-Subject: Re: obexd OPP pull problem
+In-Reply-To: <h2s2c3916b71004261637le0d83946y724f6ddb538c093@mail.gmail.com>
+References: <r2h2c3916b71004260229p48a39235m917ee7ebb0006efe@mail.gmail.com>
+	 <x2z2c3916b71004260339j3cd86068g3b4adf5cd523c450@mail.gmail.com>
+	 <g2s2d5a2c101004261124lcd36410dhbfe959945f0aa5a9@mail.gmail.com>
+	 <h2s2c3916b71004261637le0d83946y724f6ddb538c093@mail.gmail.com>
+Date: Tue, 27 Apr 2010 10:10:50 +0300
+Message-ID: <o2w2d5a2c101004270010gf01c8228ve01bbbcb3e58fa67@mail.gmail.com>
+Subject: Re: no client session close in obexd 0.23?
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Daniel Abraham <daniel.shrugged@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
@@ -14,27 +17,57 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Tue, Apr 27, 2010 at 2:12 AM, Daniel Abraham
+On Tue, Apr 27, 2010 at 2:37 AM, Daniel Abraham
 <daniel.shrugged@gmail.com> wrote:
-> I'm trying to write a Python script that pulls a business card via OPP
-> (almost the same as the obexd test script "pull-business-card", except
-> it also handles pairing).
+> Thanks!
 >
-> My problem is that when I call the method "PullBusinessCard", it
-> returns almost immediately, withtout a D-Bus exception (i.e. should be
-> successful), but no output file can be found.
+> Followup question - I'm trying to use it, but it throws this exception:
+> dbus.exceptions.DBusException: org.openobex.Error.InvalidArguments:
 >
-> Here's what I see in /var/log/messages:
+> What am I doing wrong? What is the right input?
 >
-> Apr 27 01:20:54 dabraham-mobl bluetoothd[1529]: link_key_request
-> (sba=00:21:86:7A:E7:67, dba=00:1C:26:FC:15:AF)
-> Apr 27 01:20:54 dabraham-mobl obex-client[3067]: Transfer(0xd4cb40)
-> Error: Method not allowed
+> Here's a sample Python script:
+>
+> ---
+>
+> #!/usr/bin/env python
+>
+> import dbus
+>
+> bus = dbus.SessionBus()
+> proxy = bus.get_object('org.openobex.client', '/')
+> client = dbus.Interface(proxy, 'org.openobex.Client')
+>
+> address = '00:1C:26:FC:15:AF'
+>
+> print('Opening FTP session')
+> path = client.CreateSession({'Target': 'ftp', 'Destination': address})
+> print(path)
+> client.RemoveSession(path)
+> print('FTP session closed')
+>
+> ---
+>
+> Output:
+>
+> Opening FTP session
+> /org/openobex/session0
+> Traceback (most recent call last):
+>  File "./test-ftp.py", line 14, in <module>
+>    client.RemoveSession(path)
+>  File "/usr/lib/python2.6/site-packages/dbus/proxies.py", line 140, in __call__
+>    **keywords)
+>  File "/usr/lib/python2.6/site-packages/dbus/connection.py", line
+> 630, in call_blocking
+>    message, timeout)
+> dbus.exceptions.DBusException: org.openobex.Error.InvalidArguments:
+>
 
-It should return a D-Bus error due to transfer error, which is why it
-doesn't complete the transfer, so it might be a bug in vcard pull
-logic, but why the transfer is failing  I don't know it shouldn't
-matter if you are paring or not.
+It's a bug, could you please try this:
+
+http://gitorious.org/~vudentz/obexd/vudentzs-clone/commit/fd4e8e2cef72542fb5bc924817f4b409415b3b54
+
+I guess that should fix the problem.
 
 
 -- 
