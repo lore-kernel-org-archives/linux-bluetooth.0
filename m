@@ -1,70 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 3/3] SDP
-From: Santiago Carot Nemesio <scarot@libresoft.es>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20100427150516.GA11895@jh-x301>
-References: <1272375265.2157.17.camel@mosquito>
-	 <1272375425.2157.20.camel@mosquito> <1272375578.2157.22.camel@mosquito>
-	 <20100427150516.GA11895@jh-x301>
-Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 27 Apr 2010 17:59:08 +0200
-Message-ID: <1272383948.6354.2.camel@mosquito>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 27 Apr 2010 08:55:55 -0700
+From: "Luis R. Rodriguez" <lrodriguez@atheros.com>
+To: Suraj Sumangala <Suraj.Sumangala@Atheros.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"dwmw2@infradead.org" <dwmw2@infradead.org>, Luis Rodriguez
+	<Luis.Rodriguez@Atheros.com>, Jothikumar Mothilal
+	<Jothikumar.Mothilal@Atheros.com>, "marcel@holtmann.org"
+	<marcel@holtmann.org>, Vikram Kandukuri <Vikram.Kandukuri@Atheros.com>
+Subject: Re: [PATCH] patch to request new firmware for AR3011 Chip
+Message-ID: <20100427155555.GA7423@tux>
+References: <1268629296.21425.23.camel@atheros013-desktop>
+ <1271758832.6585.33.camel@atheros013-desktop>
+ <1271845337.15010.1.camel@atheros013-desktop>
+ <1271927414.1409.3.camel@atheros013-desktop>
+ <1272279623.11239.1.camel@atheros013-desktop>
+ <1272349190.1393.11.camel@atheros013-desktop>
+ <1272356922.1393.14.camel@atheros013-desktop>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <1272356922.1393.14.camel@atheros013-desktop>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-El mar, 27-04-2010 a las 18:05 +0300, Johan Hedberg escribió:
-> Hi,
+On Tue, Apr 27, 2010 at 01:28:42AM -0700, Suraj Sumangala wrote:
 > 
-> On Tue, Apr 27, 2010, Santiago Carot Nemesio wrote:
-> > This patch add memory checks after malloc function is called.
-> > 
-> > >From 7cce3be5a1a1d506f4da71fc394ee3ccf71d8159 Mon Sep 17 00:00:00 2001
-> > From: Santiago Carot Nemesio <sancane@gmail.com>
-> > Date: Tue, 27 Apr 2010 15:19:44 +0200
-> > Subject: [PATCH 3/3] Added memory checks
-> > 
-> > 
-> > Signed-off-by: Santiago Carot Nemesio <sancane@gmail.com>
+> Signed-off-by: Vikram Kandukuri <vkandukuri@atheros.com>
+> ---
+>  drivers/bluetooth/ath3k.c |    9 ++++++---
+>  1 files changed, 6 insertions(+), 3 deletions(-)
 > 
-> I've pushed the first two patches upstream but I did have to fix their
-> commit messages before that. If you try "git am" yourself for what you
-> sent you'll see that the summary line becomes just "SDP" for all of them
-> and it should be more descriptive than that (for examples see the bluez
-> commit history).
-> 
-> The third patch should also see these changes but additionally there
-> were a few issues I noticed in the actual code:
-> 
-> >  			u = malloc(sizeof(uuid_t));
-> > +			if (!u) {
-> > +				errno = ENOMEM;
-> > +				goto fail;
-> > +			}
+> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+> index 128cae4..7bda549 100644
+> --- a/drivers/bluetooth/ath3k.c
+> +++ b/drivers/bluetooth/ath3k.c
+> @@ -122,9 +122,12 @@ static int ath3k_probe(struct usb_interface *intf,
+>  
+>  	data->udev = udev;
+>  
+> -	if (request_firmware(&firmware, "ath3k-1.fw", &udev->dev) < 0) {
+> -		kfree(data);
+> -		return -EIO;
+> +	if (request_firmware(&firmware, "ath3k-2.fw", &udev->dev) < 0) {
+> +		BT_DBG("requesting old firmware");
+> +		if (request_firmware(&firmware, "ath3k-1.fw", &udev->dev) < 0) {
+> +			kfree(data);
+> +			return -EIO;
+> +		}
+>  	}
+>  
+>  	size = max_t(uint, firmware->size, 4096);
 > 
 
-I known it, but much parts in sdp.c code still set errno to ENOMEM value
-when malloc fails, it is the reason which i set it to ENOMEM too.
+Looks OK but your subject should be something like:
 
-> malloc will set the errno for you on failure so you shouldn't need to do
-> it in your code.
-> 
-> >  			lang = malloc(sizeof(sdp_lang_attr_t));
-> > +			if (!lang) {
-> > +				errno = ENOMEM;
-> > +				goto fail;
-> 
-> Same here.
-> 
-> > -	uuid_t *uuid128 = bt_malloc(sizeof(uuid_t));
-> > +	uuid_t *uuid128 = malloc(sizeof(uuid_t));
-> 
-> This seems unrelated to the other changes in the patch. I don't know the
-> exact philosophy of when bt_malloc should be used and when malloc should
-> be used (maybe Marcel can comment on that), but I'd simply leave this
-> change out of the patch.
-> 
-> Johan
+[PATCH] ath3k: add support for new firmware
 
+And your commit log is empty, other than your subject, please
+be a little more descriptive. Describe what are the shiny new bells
+and whistles added onto the new firmware. The more description
+you can provide, the better.
 
+  Luis
