@@ -1,12 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <n2h2d5a2c101004270133xa4ea7dd5za238a58f9e67613@mail.gmail.com>
-References: <t2m2c3916b71004261612i68ccba50h78c83ab3a02713cb@mail.gmail.com>
-	 <g2l2d5a2c101004270020mb94d092cnef88b98b147beba0@mail.gmail.com>
-	 <n2h2d5a2c101004270133xa4ea7dd5za238a58f9e67613@mail.gmail.com>
-Date: Tue, 27 Apr 2010 14:51:58 +0300
-Message-ID: <q2z2c3916b71004270451r957e5befp631d413d4f316afe@mail.gmail.com>
-Subject: Re: obexd OPP pull problem
+In-Reply-To: <o2w2d5a2c101004270010gf01c8228ve01bbbcb3e58fa67@mail.gmail.com>
+References: <r2h2c3916b71004260229p48a39235m917ee7ebb0006efe@mail.gmail.com>
+	 <x2z2c3916b71004260339j3cd86068g3b4adf5cd523c450@mail.gmail.com>
+	 <g2s2d5a2c101004261124lcd36410dhbfe959945f0aa5a9@mail.gmail.com>
+	 <h2s2c3916b71004261637le0d83946y724f6ddb538c093@mail.gmail.com>
+	 <o2w2d5a2c101004270010gf01c8228ve01bbbcb3e58fa67@mail.gmail.com>
+Date: Tue, 27 Apr 2010 13:35:47 +0300
+Message-ID: <y2j2c3916b71004270335qa7cd0aa7l704685202ce19d90@mail.gmail.com>
+Subject: Re: no client session close in obexd 0.23?
 From: Daniel Abraham <daniel.shrugged@gmail.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
@@ -14,43 +16,13 @@ Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Apr 27, 2010 at 11:33 AM, Luiz Augusto von Dentz
+On Tue, Apr 27, 2010 at 10:10 AM, Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
 >
-> This should fix at least the D-Bus error:
+> It's a bug, could you please try this:
 >
-> http://gitorious.org/obexd/vudentzs-clone/commit/32e48446b6b8cd72e15988c673a60c7fb47b0862
+> http://gitorious.org/~vudentz/obexd/vudentzs-clone/commit/fd4e8e2cef72542fb5bc924817f4b409415b3b54
+>
+> I guess that should fix the problem.
 
-Actually, that's not what I see. I'm using the "pull-business-card"
-script (which doesn't use any try-except block), and it doesn't crash
-with an exception, even though "dbus-monitor --session" shows the
-error (below). Is it lost somehow before it reaches Python's D-Bus
-caller object?
-
-method call sender=:1.147 -> dest=:1.142 serial=4 path=/;
-interface=org.openobex.Client; member=PullBusinessCard
-   array [
-      dict entry(
-         string "Destination"
-         variant             string "00:1C:26:FC:15:AF"
-      )
-   ]
-   string "d.vcf"
-method call sender=:1.142 -> dest=org.freedesktop.DBus serial=18
-path=/org/freedesktop/DBus; interface=org.freedesktop.DBus;
-member=AddMatch
-   string "type='signal',interface='org.freedesktop.DBus',member='NameOwnerChanged',arg0=':1.147'"
-method return sender=:1.142 -> dest=:1.147 reply_serial=4
-error sender=:1.142 -> dest=:1.147
-error_name=org.openobex.Error.Failed reply_serial=4
-   string "Method not allowed"
-method call sender=:1.142 -> dest=org.freedesktop.DBus serial=21
-path=/org/freedesktop/DBus; interface=org.freedesktop.DBus;
-member=RemoveMatch
-   string "type='signal',interface='org.freedesktop.DBus',member='NameOwnerChanged',arg0=':1.147'"
-signal sender=org.freedesktop.DBus -> dest=(null destination)
-serial=10 path=/org/freedesktop/DBus; interface=org.freedesktop.DBus;
-member=NameOwnerChanged
-   string ":1.147"
-   string ":1.147"
-   string ""
+Confirmed, the fix works as intended.
