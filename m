@@ -1,38 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Zhang, Zhenhua" <zhenhua.zhang@intel.com>
-To: "ofono@ofono.org" <ofono@ofono.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Tue, 27 Apr 2010 15:53:54 +0800
-Subject: Modem emulator and DUN server side for oFono and BlueZ
-Message-ID: <33AB447FBD802F4E932063B962385B351D9FE1FA@shsmsx501.ccr.corp.intel.com>
-Content-Type: text/plain; charset="gb2312"
+From: Kalle Valo <kalle.valo@canonical.com>
+To: "Gustavo F. Padovan" <gustavo@padovan.org>
+Cc: ofono@ofono.org,
+	"linux-bluetooth\@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: DUN client for oFono and BlueZ
+References: <20100427012059.GG12813@vigoh> <8739yhsa92.fsf@potku.valot.fi>
+	<20100427063533.GA30819@vigoh>
+Date: Tue, 27 Apr 2010 10:26:27 +0300
+In-Reply-To: <20100427063533.GA30819@vigoh> (Gustavo F. Padovan's message of
+	"Tue, 27 Apr 2010 03:35:33 -0300")
+Message-ID: <87tyqxqrto.fsf@potku.valot.fi>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGksDQoNCkkgYW0gbm93IHdvcmtpbmcgb24gbW9kZW0gZW11bGF0b3IgYW5kIG9uZSB1c2FnZSBp
-cyBmb3IgRFVOIHNlcnZlciByb2xlLiBTaW5jZSBQYWRvdmFuIGlzIHdvcmtpbmcgb24gY2xpZW50
-IHJvbGUsIGl0J3MgZ29vZCB0byBzaGFyZSBteSByb3VnaCB0aGlua2luZyBmb3Igc2VydmVyIHNp
-ZGUgaW1wbGVtZW50YXRpb24uIEhlcmUgYXJlIHRoZSBzaW1wbGUgc3RlcHMgSSBoYXZlOg0KDQox
-LiBDcmVhdGUgYW4gb0Zvbm8gZW11bGF0b3IgYXRvbSBpbiBvRm9uby4gSXQncyB0aGUgZW11bGF0
-b3IgbWFuYWdlciB0aGF0IGNvdWxkIGNyZWF0ZSBEVU4sIEhGUCBBRyBvciBTUFAgdHlwZSBlbXVs
-YXRvcnMuIEl0IGV4cG9zZXMgZGJ1cyBtZXRob2RzIGxpa2UgQ3JlYXRlRW11bGF0b3IsIERlc3Ry
-b3lFbXVsYXRvciwgR2V0UHJvcGVydHksIGV0Yy4NCg0KMi4gRFVOIGFnZW50IHNlcnZlciBpbiBC
-bHVlWiB3YXRjaCBvRm9ubyBhbmQgY2FsbCBDcmVhdGVFbXVsYXRvciBhbmQgcGFzcyB0aGUgZmls
-ZSBkZXNjcmlwdG9yIHRvIG9Gb25vLiBUaGlzIHNlcnZlciBjb3VsZCBmdXJ0aGVyIGltcGxlbWVu
-dCBIRlAgQUcgYW5kIFNQUCBjb25uZWN0aW9uLg0KDQozLiBPbmNlIGFuIGVtdWxhdG9yIGlzIGNy
-ZWF0ZWQsIG90aGVyIGF0b20gbGlrZSB2b2ljZWNhbGwsIGdycHMsIHNtcyByZWdpc3RlciB0aGVp
-ciBpbnRlcmVzdGVkIEFUIGNvbW1hbmQgaGFuZGxlcnMgdG8gaXQuIFRoZSBnb2FsIGlzIHRoYXQg
-d2UgY291bGQgaGFuZGxlIGFsbCBtYW5kYXRvcnkgQVQgY29tbWFuZHMgZGVmaW5lZCBpbiBEVU4g
-cHJvZmlsZSBzcGVjLg0KDQo0LiBPbmNlIGEgRFVOIGVtdWxhdG9yIHJlY2VpdmVkIEFURCo5OSMs
-IERVTiBjbGllbnQgcGVyZm9ybXMgcHBwIGNvbm5lY3Rpb24gc28gd2UgZm9yd2FyZCBwcHAgY29t
-bWFuZCB0byBwcHAgc3RhY2suIEl0IGlzIGRvbmUgYnkgcHBwIHNlcnZlciBzaWRlIGV4dGVuc2lv
-bi4gSXQgc2hvdWxkIGJlIHRoZSBzaW1wbGUgY29tbWFuZCBmb3J3YXJkaW5nLg0KDQo1LiBPbmNl
-IHRoZSBQUFAgbGluayBvdmVyIERVTiBpcyBlc3RhYmxpc2hlZCwgRFVOIGNsaWVudCBwZXJmb3Jt
-cyBDb25uTWFuIGludGVncmF0aW9uIGFuZCBzZXR1cCBJUCBhZGRyZXNzLCBETlMgc2VydmVyLCBl
-dGMuDQoNCjYuIE9uY2UgdGhlIEJsdWV0b290aCBsaW5rIGlzIGRpc2Nvbm5lY3RlZCwgd2UgZGVz
-dHJveSB0aGUgUFBQIGFuZCBEVU4gZW11bGF0b3IuIElmIGVtdWxhdG9yIGF0b20gaXRzZWxmIGlz
-IGRlc3Ryb3llZCwgd2UgZGVzdHJveSB0aGUgUFBQIGFuZCB0aGUgQmx1ZXRvb3RoIGNvbm5lY3Rp
-b24uIElmIHRoZSBQUFAgbGluayBpcyBkaXNjb25uZWN0ZWQgYnV0IEJsdWV0b290aCBsaW5rIGlz
-IGFsaXZlLCB3ZSBkZXN0cm95IHRoZSBQUFAgYW5kIHN0YXkgZW11bGF0b3IgYWxpdmUuDQoNCkNv
-bW1lbnRzIGFyZSB3ZWxjb21lLiA6KQ0KDQpSZWdhcmRzLA0KWmhlbmh1YQ0KIA0K
+"Gustavo F. Padovan" <gustavo@padovan.org> writes:
+
+> Hi Kalle,
+
+Hi Gustavo,
+
+>> > 4. Agent server on BlueZ. This one is very similar to the HFP Agent server. At
+>> > the end of the DUN agent project I plan to merge the both agent servers. SAP
+>> > will take advantage of that merge too.
+>> >
+>> > 5. oFono DUN agent. Implement the agent handling for DUN.
+>> 
+>> Sorry, I'm not familiar with HFP Agent, but what will this agent
+>> actually do on a DUN connection
+>
+> The agent can request a RFCOMM connection and receive the RFCOMM channel
+> via DBus fd-passing. The the DUN plugin can do the handshake.
+
+Ah, that makes perfect sense. Thanks for explaining it.
+
+>> > 6. AT command parser and PPP stack integration with DUN. The biggest task,
+>> > where the core of the project is.
+>> >
+>> > 7. ConnMan integration. Setup of the NAT and Internet Connections.
+>> 
+>> Why NAT is needed? I guess only for connection sharing.
+>
+> No idea yet, I guess Denis told me about the NAT, but that will be the
+> last part of the project, so I'm not caring about it now. I have to
+> check on my irc logs.
+
+When I was using bt dun on my laptop (just manually running pppd with
+debian's pon script) I didn't need nat at all.
+
+-- 
+Kalle Valo
