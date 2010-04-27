@@ -1,29 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: DUN client for oFono and BlueZ
-From: Bastien Nocera <hadess@hadess.net>
-To: "Gustavo F. Padovan" <gustavo@padovan.org>
-Cc: ofono@ofono.org,
+From: "Zhang, Zhenhua" <zhenhua.zhang@intel.com>
+To: "ofono@ofono.org" <ofono@ofono.org>,
 	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <20100427012059.GG12813@vigoh>
-References: <20100427012059.GG12813@vigoh>
-Content-Type: text/plain; charset="ISO-8859-1"
-Date: Tue, 27 Apr 2010 09:15:28 +0100
-Message-ID: <1272356128.17421.6781.camel@localhost.localdomain>
-Mime-Version: 1.0
+Date: Tue, 27 Apr 2010 15:53:54 +0800
+Subject: Modem emulator and DUN server side for oFono and BlueZ
+Message-ID: <33AB447FBD802F4E932063B962385B351D9FE1FA@shsmsx501.ccr.corp.intel.com>
+Content-Type: text/plain; charset="gb2312"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 2010-04-26 at 22:20 -0300, Gustavo F. Padovan wrote:
-> Hi all,
-> 
-> I'm starting the DUN Client implementation for the Linux Stack. DUN is
-> the Bluetooth dial-up network profile. It makes possible share internet
-> connection between two Bluetooth devices. That is my Google Summer of Code
-> project for this year.
-
-Does this project include anything that will be reusable by non-oFono
-based projects? Native BT PPP line discipline would have been nice.
-
-Cheers
-
-
+SGksDQoNCkkgYW0gbm93IHdvcmtpbmcgb24gbW9kZW0gZW11bGF0b3IgYW5kIG9uZSB1c2FnZSBp
+cyBmb3IgRFVOIHNlcnZlciByb2xlLiBTaW5jZSBQYWRvdmFuIGlzIHdvcmtpbmcgb24gY2xpZW50
+IHJvbGUsIGl0J3MgZ29vZCB0byBzaGFyZSBteSByb3VnaCB0aGlua2luZyBmb3Igc2VydmVyIHNp
+ZGUgaW1wbGVtZW50YXRpb24uIEhlcmUgYXJlIHRoZSBzaW1wbGUgc3RlcHMgSSBoYXZlOg0KDQox
+LiBDcmVhdGUgYW4gb0Zvbm8gZW11bGF0b3IgYXRvbSBpbiBvRm9uby4gSXQncyB0aGUgZW11bGF0
+b3IgbWFuYWdlciB0aGF0IGNvdWxkIGNyZWF0ZSBEVU4sIEhGUCBBRyBvciBTUFAgdHlwZSBlbXVs
+YXRvcnMuIEl0IGV4cG9zZXMgZGJ1cyBtZXRob2RzIGxpa2UgQ3JlYXRlRW11bGF0b3IsIERlc3Ry
+b3lFbXVsYXRvciwgR2V0UHJvcGVydHksIGV0Yy4NCg0KMi4gRFVOIGFnZW50IHNlcnZlciBpbiBC
+bHVlWiB3YXRjaCBvRm9ubyBhbmQgY2FsbCBDcmVhdGVFbXVsYXRvciBhbmQgcGFzcyB0aGUgZmls
+ZSBkZXNjcmlwdG9yIHRvIG9Gb25vLiBUaGlzIHNlcnZlciBjb3VsZCBmdXJ0aGVyIGltcGxlbWVu
+dCBIRlAgQUcgYW5kIFNQUCBjb25uZWN0aW9uLg0KDQozLiBPbmNlIGFuIGVtdWxhdG9yIGlzIGNy
+ZWF0ZWQsIG90aGVyIGF0b20gbGlrZSB2b2ljZWNhbGwsIGdycHMsIHNtcyByZWdpc3RlciB0aGVp
+ciBpbnRlcmVzdGVkIEFUIGNvbW1hbmQgaGFuZGxlcnMgdG8gaXQuIFRoZSBnb2FsIGlzIHRoYXQg
+d2UgY291bGQgaGFuZGxlIGFsbCBtYW5kYXRvcnkgQVQgY29tbWFuZHMgZGVmaW5lZCBpbiBEVU4g
+cHJvZmlsZSBzcGVjLg0KDQo0LiBPbmNlIGEgRFVOIGVtdWxhdG9yIHJlY2VpdmVkIEFURCo5OSMs
+IERVTiBjbGllbnQgcGVyZm9ybXMgcHBwIGNvbm5lY3Rpb24gc28gd2UgZm9yd2FyZCBwcHAgY29t
+bWFuZCB0byBwcHAgc3RhY2suIEl0IGlzIGRvbmUgYnkgcHBwIHNlcnZlciBzaWRlIGV4dGVuc2lv
+bi4gSXQgc2hvdWxkIGJlIHRoZSBzaW1wbGUgY29tbWFuZCBmb3J3YXJkaW5nLg0KDQo1LiBPbmNl
+IHRoZSBQUFAgbGluayBvdmVyIERVTiBpcyBlc3RhYmxpc2hlZCwgRFVOIGNsaWVudCBwZXJmb3Jt
+cyBDb25uTWFuIGludGVncmF0aW9uIGFuZCBzZXR1cCBJUCBhZGRyZXNzLCBETlMgc2VydmVyLCBl
+dGMuDQoNCjYuIE9uY2UgdGhlIEJsdWV0b290aCBsaW5rIGlzIGRpc2Nvbm5lY3RlZCwgd2UgZGVz
+dHJveSB0aGUgUFBQIGFuZCBEVU4gZW11bGF0b3IuIElmIGVtdWxhdG9yIGF0b20gaXRzZWxmIGlz
+IGRlc3Ryb3llZCwgd2UgZGVzdHJveSB0aGUgUFBQIGFuZCB0aGUgQmx1ZXRvb3RoIGNvbm5lY3Rp
+b24uIElmIHRoZSBQUFAgbGluayBpcyBkaXNjb25uZWN0ZWQgYnV0IEJsdWV0b290aCBsaW5rIGlz
+IGFsaXZlLCB3ZSBkZXN0cm95IHRoZSBQUFAgYW5kIHN0YXkgZW11bGF0b3IgYWxpdmUuDQoNCkNv
+bW1lbnRzIGFyZSB3ZWxjb21lLiA6KQ0KDQpSZWdhcmRzLA0KWmhlbmh1YQ0KIA0K
