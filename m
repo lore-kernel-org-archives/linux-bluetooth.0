@@ -1,79 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 3/3] SDP
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Santiago Carot Nemesio <scarot@libresoft.es>,
-	linux-bluetooth@vger.kernel.org
-In-Reply-To: <20100427150516.GA11895@jh-x301>
-References: <1272375265.2157.17.camel@mosquito>
-	 <1272375425.2157.20.camel@mosquito> <1272375578.2157.22.camel@mosquito>
-	 <20100427150516.GA11895@jh-x301>
-Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 27 Apr 2010 17:50:22 +0200
-Message-ID: <1272383422.22838.151.camel@localhost.localdomain>
+Subject: Re: DUN client for oFono and BlueZ
+From: Bastien Nocera <hadess@hadess.net>
+To: "Gustavo F. Padovan" <gustavo@padovan.org>
+Cc: ofono@ofono.org,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <20100427153043.GA3374@vigoh>
+References: <20100427012059.GG12813@vigoh>
+	 <1272356128.17421.6781.camel@localhost.localdomain>
+	 <20100427153043.GA3374@vigoh>
+Content-Type: text/plain; charset="ISO-8859-1"
+Date: Tue, 27 Apr 2010 16:40:44 +0100
+Message-ID: <1272382844.17421.6792.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
-
-> > This patch add memory checks after malloc function is called.
+On Tue, 2010-04-27 at 12:30 -0300, Gustavo F. Padovan wrote:
+> Hi Bastien,
+> 
+> 
+> * Bastien Nocera <hadess@hadess.net> [2010-04-27 09:15:28 +0100]:
+> 
+> > On Mon, 2010-04-26 at 22:20 -0300, Gustavo F. Padovan wrote:
+> > > Hi all,
+> > > 
+> > > I'm starting the DUN Client implementation for the Linux Stack. DUN is
+> > > the Bluetooth dial-up network profile. It makes possible share internet
+> > > connection between two Bluetooth devices. That is my Google Summer of Code
+> > > project for this year.
 > > 
-> > >From 7cce3be5a1a1d506f4da71fc394ee3ccf71d8159 Mon Sep 17 00:00:00 2001
-> > From: Santiago Carot Nemesio <sancane@gmail.com>
-> > Date: Tue, 27 Apr 2010 15:19:44 +0200
-> > Subject: [PATCH 3/3] Added memory checks
+> > Does this project include anything that will be reusable by non-oFono
+> > based projects? Native BT PPP line discipline would have been nice.
 > > 
-> > 
-> > Signed-off-by: Santiago Carot Nemesio <sancane@gmail.com>
-
-not signed-off-by in BlueZ please. That is a kernel requirement.
-
-> I've pushed the first two patches upstream but I did have to fix their
-> commit messages before that. If you try "git am" yourself for what you
-> sent you'll see that the summary line becomes just "SDP" for all of them
-> and it should be more descriptive than that (for examples see the bluez
-> commit history).
 > 
-> The third patch should also see these changes but additionally there
-> were a few issues I noticed in the actual code:
-> 
-> >  			u = malloc(sizeof(uuid_t));
-> > +			if (!u) {
-> > +				errno = ENOMEM;
-> > +				goto fail;
-> > +			}
-> 
-> malloc will set the errno for you on failure so you shouldn't need to do
-> it in your code.
-> 
-> >  			lang = malloc(sizeof(sdp_lang_attr_t));
-> > +			if (!lang) {
-> > +				errno = ENOMEM;
-> > +				goto fail;
-> 
-> Same here.
-> 
-> > -	uuid_t *uuid128 = bt_malloc(sizeof(uuid_t));
-> > +	uuid_t *uuid128 = malloc(sizeof(uuid_t));
-> 
-> This seems unrelated to the other changes in the patch. I don't know the
-> exact philosophy of when bt_malloc should be used and when malloc should
-> be used (maybe Marcel can comment on that), but I'd simply leave this
-> change out of the patch.
+> Yes, oFono will be only the Agent, you can implement a new one if you
+> want.
 
-Since you are suppose to use bt_free to free the memory, you also should
-allocate it with bt_malloc. They are simple wrappers, but important to
-make sure all library allocation and freeing is done with the same
-function. Not free() or malloc() from library A against another one form
-library B.
+The ppp implementation in NetworkManager already works for me.
 
-In most cases this makes no difference, but there are corner cases where
-is does make a difference. So please keep bt_malloc() if the memory
-needs to be freed by the application.
+>  Also oFono already does the PPP line discipline, so we don't need
+> to duplicate such feature in BlueZ.
 
-Regards
-
-Marcel
-
+I thought BT PPP line discipline was a kernel feature.
 
