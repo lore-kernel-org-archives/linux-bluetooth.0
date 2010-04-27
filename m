@@ -1,52 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [patch v2] bluetooth: handle l2cap_create_connless_pdu() errors
-From: Marcel Holtmann <marcel@holtmann.org>
-To: David Miller <davem@davemloft.net>
-Cc: gustavo@padovan.org, error27@gmail.com,
-	andrei.emeltchenko@nokia.com, linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
-In-Reply-To: <20100426.111259.112594696.davem@davemloft.net>
-References: <20100422123347.GA5265@vigoh> <20100426113627.GS29093@bicker>
-	 <20100426150919.GA12813@vigoh>
-	 <20100426.111259.112594696.davem@davemloft.net>
-Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 27 Apr 2010 04:05:26 +0200
-Message-ID: <1272333926.22838.116.camel@localhost.localdomain>
-Mime-Version: 1.0
+Date: Mon, 26 Apr 2010 22:20:59 -0300
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
+To: ofono@ofono.org,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: DUN client for oFono and BlueZ
+Message-ID: <20100427012059.GG12813@vigoh>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dave,
+Hi all,
 
-> > * Dan Carpenter <error27@gmail.com> [2010-04-26 13:36:27 +0200]:
-> > 
-> >> l2cap_create_connless_pdu() can sometimes return ERR_PTR(-ENOMEM) or
-> >> ERR_PTR(-EFAULT).
-> >> 
-> >> Signed-off-by: Dan Carpenter <error27@gmail.com>
-> >> ---
-> >> In v2 I wrote the patch on top of Gustavo Padovon's devel tree
-> 
-> This is the kind of bug that could cause a crash if the path actually
-> executes.
-> 
-> Therefore it tires me that that submitter was told to regenerate this
-> patch against some devel tree that is -next bound, when in fact this
-> is the kind of fix that warrants inclusion right now into net-2.6
-> 
-> Marcel, please do whatever magic you need to so I can get this into
-> Linus's tree as I did the rest of the ERR_PTR() fixes from Dan already.
-> No reason to treat Bluetooth special and defer these fixes to -next.
+I'm starting the DUN Client implementation for the Linux Stack. DUN is
+the Bluetooth dial-up network profile. It makes possible share internet
+connection between two Bluetooth devices. That is my Google Summer of Code
+project for this year.
 
-my bad here. I looked at the patch and thought it was only an issue
-inside the development tree. So was letting Gustavo sort this out. You
-are 100% right, this needs to be fixed right away. If you wanna take
-this directly, then
+Here follows a simple, and possible not complete, roadmap:
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+1. Put send_method_call() and send_method_call_with_reply() on gdbus: those
+functions are very useful for DBus operations. You can send a DBus message
+just calling them with the right parameters. Patch for that work already 
+on the mailing list.
 
-Regards
+2. Create a bluetooth.c file with the bluetooth helpers. oFono plugins for HFP,
+DUN and SAP will be able to share the same bluetooth code to access BlueZ
+stuff. This is a ongoing work.
 
-Marcel
+3. plugin/dun.c prototype. A simple prototype for the DUN client.
+
+4. Agent server on BlueZ. This one is very similar to the HFP Agent server. At
+the end of the DUN agent project I plan to merge the both agent servers. SAP
+will take advantage of that merge too.
+
+5. oFono DUN agent. Implement the agent handling for DUN.
+
+6. AT command parser and PPP stack integration with DUN. The biggest task,
+where the core of the project is.
+
+7. ConnMan integration. Setup of the NAT and Internet Connections.
 
 
+Comments are welcome. :)
+
+-- 
+Gustavo F. Padovan
+http://padovan.org
