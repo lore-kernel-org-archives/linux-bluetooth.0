@@ -1,46 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 30 Apr 2010 05:03:19 -0300
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
-To: ofono@ofono.org
-Subject: Re: Modem emulator and DUN server side for oFono and BlueZ
-Message-ID: <20100430080319.GA11712@vigoh>
-References: <33AB447FBD802F4E932063B962385B351D9FE1FA@shsmsx501.ccr.corp.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <33AB447FBD802F4E932063B962385B351D9FE1FA@shsmsx501.ccr.corp.intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Reply-To: ofono@ofono.org
-List-Unsubscribe: <http://lists.ofono.org/options/ofono>,
-	<mailto:ofono-request@ofono.org?subject=unsubscribe>
-List-Archive: <http://lists.ofono.org/pipermail/ofono>
-List-Post: <mailto:ofono@ofono.org>
-List-Help: <mailto:ofono-request@ofono.org?subject=help>
-List-Subscribe: <http://lists.ofono.org/listinfo/ofono>,
-	<mailto:ofono-request@ofono.org?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: ofono-bounces@ofono.org
-Errors-To: ofono-bounces@ofono.org
+In-Reply-To: <1272361924.17421.6787.camel@localhost.localdomain>
+References: <1272318628.3269.44.camel@zony.bied.prout.be>
+	 <1272361924.17421.6787.camel@localhost.localdomain>
+Date: Thu, 29 Apr 2010 00:05:37 +0100
+Message-ID: <l2u54bbe4e01004281605l85d02f71l2023db70d04927fd@mail.gmail.com>
+Subject: Re: [PATCH] Actual code fixing Sixaxis
+From: Marcin Tolysz <tolysz@gmail.com>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-input@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	ospite@studenti.unina.it
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-input-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Zhenhua,
+On 27 April 2010 10:52, Bastien Nocera <hadess@hadess.net> wrote:
+> Separate the sixaxis changes from the hid core changes.
+Sixaxis changes does not mean anything without the ability to modify
+the descriptor ... but sure if it helps I can separate them.
 
-* Zhang, Zhenhua <zhenhua.zhang@intel.com> [2010-04-27 15:53:54 +0800]:
+> Add a documentation file for that, don't put it in the commit log.
+The documentation will need to grow for some time:
+https://code.google.com/p/ghid/
+https://code.google.com/p/ghid/wiki/HowTo
 
-> Hi,
-> 
-> I am now working on modem emulator and one usage is for DUN server role. Since Padovan is working on client role, it's good to share my rough thinking for server side implementation. Here are the simple steps I have:
-> 
-> 1. Create an oFono emulator atom in oFono. It's the emulator manager that could create DUN, HFP AG or SPP type emulators. It exposes dbus methods like CreateEmulator, DestroyEmulator, GetProperty, etc.
-> 
-> 2. DUN agent server in BlueZ watch oFono and call CreateEmulator and pass the file descriptor to oFono. This server could further implement HFP AG and SPP connection.
+> Won't that trigger udev's firmware code and popup PackageKit's firmware
+> downloader for each and every HID device?
+I do not use this, but the solution is probably to ask PackageKit' to
+ignore firmware/hid/ requests
 
+> Can't this be done for the BT one as well, rather than requiring a
+> modified firmware? (although the firmware hack could be useful as a
+> debugging tool).
+Sixaxis has broken HID report description(firmware?) and the only
+solution to fix this is to replace it, replacing firmware works for BT
+or USB devices in the same way (and sixaxis has got both descriptors
+broken) (well the other way is to write a dedicated driver mirroring
+the code from the general case)
 
-Shouldn't the emulator register itself on the BlueZ agent server?
-
-
--- 
-Gustavo F. Padovan
-http://padovan.org
-_______________________________________________
-ofono mailing list
-ofono@ofono.org
-http://lists.ofono.org/listinfo/ofono
+The main advantage of modifying HidRD is the kernel itself does all
+translations, thus it is possible to reconfigure the device by simply
+changing the descriptor.
+How to actually modify the descriptor? Some info and tools are on
+https://code.google.com/p/ghid/ and the rest on the
+http://www.usb.org/developers/hidpage/
