@@ -1,46 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
+From: =?iso-8859-1?q?Jos=E9_Antonio_Santos_Cadenas?=
+	<santoscadenas@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Subject: Re: [PATCH] Bug in sdp_set_supp_features solved
+Date: Thu, 29 Apr 2010 00:28:05 +0200
+Cc: linux-bluetooth@vger.kernel.org
+References: <201004281208.35923.jcaden@libresoft.es> <20100428195127.GA24058@jh-x301>
+In-Reply-To: <20100428195127.GA24058@jh-x301>
 MIME-Version: 1.0
-In-Reply-To: <1272361924.17421.6787.camel@localhost.localdomain>
-References: <1272318628.3269.44.camel@zony.bied.prout.be>
-	 <1272361924.17421.6787.camel@localhost.localdomain>
-Date: Thu, 29 Apr 2010 00:05:37 +0100
-Message-ID: <l2u54bbe4e01004281605l85d02f71l2023db70d04927fd@mail.gmail.com>
-Subject: Re: [PATCH] Actual code fixing Sixaxis
-From: Marcin Tolysz <tolysz@gmail.com>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-input@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	ospite@studenti.unina.it
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-input-owner@vger.kernel.org
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201004290028.06125.santoscadenas@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 27 April 2010 10:52, Bastien Nocera <hadess@hadess.net> wrote:
-> Separate the sixaxis changes from the hid core changes.
-Sixaxis changes does not mean anything without the ability to modify
-the descriptor ... but sure if it helps I can separate them.
+El Wednesday 28 April 2010 21:51:27 Johan Hedberg escribió:
+> Hi,
+> 
+> On Wed, Apr 28, 2010, José Antonio Santos Cadenas wrote:
+> > From 567522ed4ac5912d967fef3017bf905591b5c24e Mon Sep 17 00:00:00 2001
+> > From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+> > Date: Wed, 28 Apr 2010 12:02:31 +0200
+> > Subject: [PATCH] Bug in sdp_set_supp_features solved
+> > 
+> > When the data is a string or a sequence, it is not ok to dereference
+> > data->val because it is already a pointer.
+> > ---
+> >  lib/sdp.c |   33 +++++++++++++++++++++++++++++++--
+> >  1 files changed, 31 insertions(+), 2 deletions(-)
+> 
+> The patch has been pushed upstream with some minor changes. I had to
+> edit the commit message again (try "git am" on your mail yourself and
+> you'll see the diffeqrence to what got pushed upstream)
 
-> Add a documentation file for that, don't put it in the commit log.
-The documentation will need to grow for some time:
-https://code.google.com/p/ghid/
-https://code.google.com/p/ghid/wiki/HowTo
+I see, sorry I sent copiying to the mail reader the patch generated with
+git format-patch. I'll take it in count in the future and use git mail
 
-> Won't that trigger udev's firmware code and popup PackageKit's firmware
-> downloader for each and every HID device?
-I do not use this, but the solution is probably to ask PackageKit' to
-ignore firmware/hid/ requests
+> and I named the
+> new variable lengths instead of sizes since the function it gets passed
+> to is called sdp_seq_alloc_with_length.
+> 
+> Since there's no code in the bluez tree that calls this
+> sdp_set_supp_features function do you perhaps have some simple code
+> snippet/use case that the fixed functionality could be tested with?
 
-> Can't this be done for the BT one as well, rather than requiring a
-> modified firmware? (although the firmware hack could be useful as a
-> debugging tool).
-Sixaxis has broken HID report description(firmware?) and the only
-solution to fix this is to replace it, replacing firmware works for BT
-or USB devices in the same way (and sixaxis has got both descriptors
-broken) (well the other way is to write a dedicated driver mirroring
-the code from the general case)
+I'll try to do some simple program, but we are working on HDP profile that will 
+use this code.
 
-The main advantage of modifying HidRD is the kernel itself does all
-translations, thus it is possible to reconfigure the device by simply
-changing the descriptor.
-How to actually modify the descriptor? Some info and tools are on
-https://code.google.com/p/ghid/ and the rest on the
-http://www.usb.org/developers/hidpage/
+Regards
+
+Jose.
+
+> 
+> Johan
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
