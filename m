@@ -1,39 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <524968.95124.qm@web52608.mail.re2.yahoo.com>
-Date: Wed, 28 Apr 2010 13:14:42 -0700 (PDT)
-From: Ed Tsang <netdesign_98@yahoo.com>
-Subject: obexd pull-business-card
-To: Bluettooth Linux <linux-bluetooth@vger.kernel.org>
+Date: Wed, 28 Apr 2010 23:00:31 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Elvis Pfutzenreuter <epx@signove.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Update service class on adapter-by-adapter basis
+Message-ID: <20100428200031.GA24732@jh-x301>
+References: <1272484066-19133-1-git-send-email-epx@signove.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1272484066-19133-1-git-send-email-epx@signove.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I could not get on the same thread with Daniel and Luiz.
-I am trying to get pull-business-card working.  The target is a Blackberry (with pin code ...).
-When I ran it, with paring sucess...
-The script will fail, ...DBusException:  org.Openobex.Error.Failed:
-Dbus-monitor will 
-error sender.. error_name=Openobex.Error.Failed reply_serial=4
-  string ""
+Hi,
 
-Then I remember on the Blackberry normally the obex service is off so I
- get into it's media menu and select "receive using bluetooth.."
-The script now pass. 
-Dbus-monitor 
-   method call  ... serial=4
-         ....
-      string "d.vcf"
-   method return  ... reply_serial=4
+On Wed, Apr 28, 2010, Elvis Pfutzenreuter wrote:
+> When a service is added (or removed) for a specific adapter,
+> only the service class of that specific adapter shall be updated.
+> ---
+>  src/adapter.c      |    5 +++++
+>  src/adapter.h      |    2 ++
+>  src/manager.c      |   16 ++--------------
+>  src/manager.h      |    2 +-
+>  src/sdpd-service.c |   27 +++++++++++++++++----------
+>  src/sdpd.h         |    1 -
+>  6 files changed, 27 insertions(+), 26 deletions(-)
 
-but the file is no where to find.
-I tried with "default.vcf" as file name ... still no file.
-My stupid question is do we need to use a predefined name "d.vcf  or default.vcf or ..?"
- Or could it be the phone don't have a default vcard?
-  Or the ull-business-card is not functioning correctly?
-  Any hint?
+Thanks for the quick response! The patch is now pushed upstream.
 
-Regards, 
-Ed
-
-
+Johan
