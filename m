@@ -1,35 +1,173 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 28 Apr 2010 18:41:46 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?iso-8859-1?Q?Jo=E3o?= Paulo Rechi Vita <jprvita@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix bootstrap-configure command line parsing
-Message-ID: <20100428154146.GA7515@jh-x301>
-References: <1269972441-24242-1-git-send-email-jprvita@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1269972441-24242-1-git-send-email-jprvita@gmail.com>
+In-Reply-To: <1270676053-15699-1-git-send-email-epx@signove.com>
+References: <1270676053-15699-1-git-send-email-epx@signove.com>
+Date: Wed, 28 Apr 2010 16:45:45 +0300
+Message-ID: <o2x2d5a2c101004280645g2ef2bacdw818c864f81cec89d@mail.gmail.com>
+Subject: Re: [PATCH] Update service class on adapter-by-adapter basis
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: =?ISO-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Elvis,
 
-On Tue, Mar 30, 2010, João Paulo Rechi Vita wrote:
+On Thu, Apr 8, 2010 at 12:34 AM, Elvis Pfützenreuter <epx@signove.com> wrote:
+> From: Elvis Pfutzenreuter <epx@signove.com>
+>
+> When a service is added (or removed) for a specific adapter,
+> only the service class of that specific adapter shall be updated.
 > ---
->  bootstrap-configure |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-> 
-> diff --git a/bootstrap-configure b/bootstrap-configure
-> index 44e7ee8..5b7b88f 100755
-> --- a/bootstrap-configure
-> +++ b/bootstrap-configure
-> @@ -8,4 +8,4 @@ fi
->      ./configure --enable-maintainer-mode \
->  		--enable-debug \
->  		--prefix=/usr \
-> -		--mandir=/usr/share/man
-> +		--mandir=/usr/share/man $*
+>  src/adapter.c      |   15 +++++++++++++++
+>  src/adapter.h      |    2 ++
+>  src/sdpd-service.c |   24 +++++++++++++++---------
+>  src/sdpd.h         |    1 -
+>  4 files changed, 32 insertions(+), 10 deletions(-)
+>
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 8fc47b9..1530f83 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -1103,6 +1103,21 @@ void adapter_service_remove(const bdaddr_t *bdaddr, void *rec)
+>        adapter_service_ins_rem(bdaddr, rec, FALSE);
+>  }
+>
+> +sdp_list_t *adapter_service_list(const bdaddr_t *bdaddr)
+> +{
+> +       struct btd_adapter *adapter;
+> +       sdp_list_t *list = NULL;
+> +
+> +       if (bacmp(bdaddr, BDADDR_ANY) != 0) {
+> +               /* Only one adapter */
+> +               adapter = manager_find_adapter(bdaddr);
+> +               if (adapter)
+> +                       list = adapter->services;
+> +       }
+> +
+> +       return list;
+> +}
 
-This patch has now been pushed upstream. Thanks.
+The use of BDADDR_ANY doesn't seems really necessary, it seems that
+adapter_service_list will never get called passing BDADDR_ANY and if
+you think about it, it doesn't really make much sense to maintain a
+list for adapter any since it is just a combination of the real
+adapters. Also if you have to call manager_find_adapter to resolve the
+adapter pointer than it is better to place it manager.c resolve it
+there and have adapter_service_list to take adapter pointer as
+parameter.
 
-Johan
+>  struct btd_device *adapter_create_device(DBusConnection *conn,
+>                                                struct btd_adapter *adapter,
+>                                                const char *address)
+> diff --git a/src/adapter.h b/src/adapter.h
+> index e4307d8..5975299 100644
+> --- a/src/adapter.h
+> +++ b/src/adapter.h
+> @@ -23,6 +23,7 @@
+>  */
+>
+>  #include <bluetooth/bluetooth.h>
+> +#include <bluetooth/sdp.h>
+>  #include <dbus/dbus.h>
+>  #include <glib.h>
+>
+> @@ -123,6 +124,7 @@ void adapter_update_tx_power(bdaddr_t *bdaddr, uint8_t status, void *ptr);
+>  void adapter_update_local_name(bdaddr_t *bdaddr, uint8_t status, void *ptr);
+>  void adapter_service_insert(const bdaddr_t *bdaddr, void *rec);
+>  void adapter_service_remove(const bdaddr_t *bdaddr, void *rec);
+> +sdp_list_t *adapter_service_list(const bdaddr_t *bdaddr);
+>  void adapter_set_class_complete(bdaddr_t *bdaddr, uint8_t status);
+>
+>  struct agent *adapter_get_agent(struct btd_adapter *adapter);
+> diff --git a/src/sdpd-service.c b/src/sdpd-service.c
+> index 4551577..cddd87e 100644
+> --- a/src/sdpd-service.c
+> +++ b/src/sdpd-service.c
+> @@ -47,11 +47,10 @@
+>  #include "sdpd.h"
+>  #include "logging.h"
+>  #include "manager.h"
+> +#include "adapter.h"
+>
+>  static sdp_record_t *server = NULL;
+>
+> -static uint8_t service_classes = 0x00;
+> -
+>  static uint16_t did_vendor = 0x0000;
+>  static uint16_t did_product = 0x0000;
+>  static uint16_t did_version = 0x0000;
+> @@ -98,9 +97,9 @@ static void update_db_timestamp(void)
+>        sdp_attr_replace(server, SDP_ATTR_SVCDB_STATE, d);
+>  }
+>
+> -static void update_svclass_list(const bdaddr_t *src)
+> +static void update_adapter_svclass_list(const bdaddr_t *src)
+>  {
+> -       sdp_list_t *list = sdp_get_record_list();
+> +       sdp_list_t *list = adapter_service_list(src);
+>        uint8_t val = 0;
+>
+>        for (; list; list = list->next) {
+> @@ -156,14 +155,21 @@ static void update_svclass_list(const bdaddr_t *src)
+>
+>        SDPDBG("Service classes 0x%02x", val);
+>
+> -       service_classes = val;
+> -
+>        manager_update_svc(src, val);
+>  }
+>
+> -uint8_t get_service_classes(const bdaddr_t *bdaddr)
+> +static void update_svclass_list(const bdaddr_t *src)
+>  {
+> -       return service_classes;
+> +       bdaddr_t bdaddr;
+> +       GSList *adapters = manager_get_adapters();
+> +
+> +       for (; adapters; adapters = adapters->next) {
+> +               adapter_get_address(adapters->data, &bdaddr);
+> +
+> +               if (bacmp(src, BDADDR_ANY) == 0 || bacmp(src, &bdaddr) == 0)
+> +                       update_adapter_svclass_list(&bdaddr);
+> +       }
+> +
+>  }
+>
+>  void create_ext_inquiry_response(const char *name,
+> @@ -613,7 +619,7 @@ success:
+>        }
+>
+>        update_db_timestamp();
+> -       update_svclass_list(BDADDR_ANY);
+> +       update_svclass_list(&req->device);
+>
+>        /* Build a rsp buffer */
+>        bt_put_unaligned(htonl(rec->handle), (uint32_t *) rsp->data);
+> diff --git a/src/sdpd.h b/src/sdpd.h
+> index 1f0a229..d496a4a 100644
+> --- a/src/sdpd.h
+> +++ b/src/sdpd.h
+> @@ -93,7 +93,6 @@ void stop_sdp_server(void);
+>  int add_record_to_server(const bdaddr_t *src, sdp_record_t *rec);
+>  int remove_record_from_server(uint32_t handle);
+>
+> -uint8_t get_service_classes(const bdaddr_t *bdaddr);
+>  void create_ext_inquiry_response(const char *name,
+>                                        int8_t tx_power, sdp_list_t *services,
+>                                        uint8_t *data);
+> --
+> 1.6.3.3
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+
+
+
+-- 
+Luiz Augusto von Dentz
+Computer Engineer
