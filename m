@@ -1,175 +1,127 @@
 Return-Path: <cyrus@holtmann.org>
-From: Elvis Pfutzenreuter <epx@signove.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: epx@signove.com
-Subject: [PATCH] Health Device Profile API
-Date: Thu, 29 Apr 2010 22:44:12 -0300
-Message-Id: <1272591852-4961-1-git-send-email-epx@signove.com>
+From: =?iso-8859-1?q?Jos=E9_Antonio_Santos_Cadenas?=
+	<jcaden@libresoft.es>
+Reply-To: jcaden@libresoft.es
+To: Elvis =?iso-8859-1?q?Pf=FCtzenreuter?= <epx@signove.com>
+Subject: Re: More about proposed Health Device Profile API
+Date: Fri, 30 Apr 2010 13:05:45 +0200
+Cc: linux-bluetooth@vger.kernel.org, claudio.takahasi@openbossa.org,
+	scarot <scarot@libresoft.es>,
+	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	raul.herbster@signove.com,
+	Pedro de las Heras =?iso-8859-1?q?Quir=F3s?=
+	<pheras@gsyc.es>
+References: <8FDD2957-B97E-4646-B164-4B00E7910399@signove.com> <201004301259.45561.jcaden@libresoft.es>
+In-Reply-To: <201004301259.45561.jcaden@libresoft.es>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201004301305.45404.jcaden@libresoft.es>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Initial Health API proposal. Includes Adapter, Device and HealthAgent API
-description. Proposed API can address Health source and sink roles.
+Sorry, Santiago's address was wrong.
 
-Adapter methods exported on Health interface allow HealthAgent
-registration. Device methods exported on Health interface allow
-applications to actively created MCAP data channels and get informations
-of the services exported by the endpoints.
+Please answer to this mail.
 
-HealthAgent allows applications to receive multiple data streams encoded
-on IEEE 11073-20601 Personal Health Data Exchange Protocol.
----
- doc/health-api.txt |  141 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 141 insertions(+), 0 deletions(-)
- create mode 100644 doc/health-api.txt
-
-diff --git a/doc/health-api.txt b/doc/health-api.txt
-new file mode 100644
-index 0000000..9be3d6c
---- /dev/null
-+++ b/doc/health-api.txt
-@@ -0,0 +1,141 @@
-+BlueZ D-Bus Health API description
-+*********************************
-+
-+Copyright (C) 2010 Elvis Pfützenreuter <epx@signove.com>
-+
-+Health Adapter hierarchy
-+===============
-+
-+Service		org.bluez
-+Interface	org.bluez.Health
-+Object path	[variable prefix]/{hci0,hci1,...}
-+
-+This object hierarchy intend to be used by applications which want to enable
-+a Health source or sink end point. The most common usage scenario is the sink
-+role. Multi-channel protocol internals are hidden from the application interface.
-+
-+FD passing concept is used to allow applications to handle data channels.
-+
-+Methods:
-+	uint32 RegisterRole(dict options, object path)
-+
-+		Register an HDP role to the adapter and assign the health agent
-+		that shall be responsible by address data channel connections.
-+		Returns an identification for the HDP context.
-+
-+		Records and channels are automatically closed when the agent
-+		leaves the bus. Mandatory and optional options are described
-+		below:
-+			Optional parameters(dinamically assigned when not
-+			informed):
-+			uint16 CPSM: control channel
-+			uint16 DPSM: data channel
-+
-+			Mandatory parameters:
-+			array{dict EndPoint} EndPoints: Array of end points.
-+				Possible EndPoint properties:
-+				uint8 MDEPId: Mandatory MCAP Data End Point
-+					Identification
-+				uint16 DataType: Mandatory Endpoint data type
-+				string Role: "source" or "sink"
-+				string Description: Optional description
-+
-+	UnregisterRole(uint32 id)
-+
-+		Removes an HDP role and kills all connections related to it.
-+
-+Health Agent hierarchy
-+===============
-+
-+Service		unique name
-+Interface	org.bluez.HealthAgent
-+Object path	freely definable
-+
-+Agent responsible by address data channels connections. Either active or
-+passive connections are notified. FD passing mechanism is used to allows
-+the HealthAgent to access directly the data encoded on IEEE 11073-20601
-+Personal Health Data Exchange Protocol.
-+
-+Methods:
-+	void NewMDLConnection(filedescriptor fd, dict properties)
-+
-+		This method gets called when a new data channel connection
-+		is established. It addresses host and remote initiated
-+		connections.
-+
-+		Properties:
-+			uint8 LocalMDEPId:
-+			uint8 RemoteMDEPId:
-+			uint16 MDLId:
-+			boolean Passive: Device initiated connection
-+			boolean Reconnection: Previous established data
-+				channel reestablished
-+
-+	void Release()
-+
-+		This method gets called whenever the service daemon unregisters
-+		the agent or whenever the Adapter where the HealthAgent
-+		registers itself is removed.
-+
-+Health Device hierarchy
-+===============
-+
-+Service		org.bluez
-+Interface	org.bluez.Health
-+Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
-+
-+The methods described below can be used by applications that need
-+to manage data channel connections or get properties of service
-+exported by the remote device.
-+
-+Methods:
-+
-+	void Connect(uint8 local_mdepid, uint8 remote_mdepid, uint16 mdlid)
-+
-+		Method used by applications that need to actively create
-+		a data channel connection. When the remote connects back
-+		in the data channel PSM, the connection is reported to
-+		the registered HealthAgent.
-+
-+		mdlid greater than zero, means that the host is attempt
-+		to reestablish a previous session. Zero means that new
-+		session shall be established.
-+
-+		If the reconnection is not possible, a new connection
-+		will be created (automatic fallback). The MDL ID may
-+		change; the application needs to check it when receiving
-+		Agent connection data.
-+
-+	void Disconnect(uint16  mdlid)
-+
-+		Closes the give data channel but keeps the MDL ID valid for
-+		future reconnections.
-+
-+	void DeleteConnection(uint16 mdlid)
-+
-+		Closes the MDL connection and invalidates the MDL ID
-+
-+	dict GetProperties()
-+
-+		Returns the device properties.
-+
-+Signals:
-+
-+	PropertiesChanged()
-+
-+Properties:
-+		array{MDEPs}: array of remote data end points. Attributes of
-+			a MDEP entry are:
-+				uint8 MDEPId
-+				uint16 DataType
-+				string Role: "source" or "sink"
-+				string Description: optional  description
-+
-+		array{MDLs}: array of valid data channels. Mandatory
-+			MDLs attributes are:
-+			uint16 MDLId: Data channel identification
-+			uint8 LocalMDEPId: Local data channel identification
-+			uint8 RemoteMDEPId: Remote data channel identification
-+
-+		boolean Connected: true when the MCAP control channel is
-+					established
--- 
-1.7.0.4
-
+El Friday 30 April 2010 12:59:45 José Antonio Santos Cadenas escribió:
+> Hi all,
+> 
+> El Friday 30 April 2010 04:28:45 Elvis Pfützenreuter escribió:
+> > A very simple session graph that illustrates the proposed API can be seen
+> >  at http://epx.com.br/health_bluez.png.
+> >
+> > This API proposal was discussed jointly with Claudio Takahashi, Vinicius
+> >  Gomes, Raul Herbster and others, and it is based on previous work on
+> > MCAP API specification by Jose Cadenas and Santiago Nemesio, which have
+> > been CCed.
+> 
+> That sounds great. We are happy that our ideas are good for you. We spent a
+> lot of time on its desing. If you wish, we can have a meeting early next
+>  week via IRC or any other way in order to disscuss this api. We have
+>  already begun working in HDP so it will be very interesting to discuss
+>  this API with you. We have a quite mature implementation of MCAP. As you
+>  know, at the current moment we are having an internal reorganiation so we
+>  have publish an alternative git with the last mcap code (still working on
+>  it). Please, feel free to download and test it. All comments are wellcome.
+> 
+> git://193.147.51.48/git/mcap_devel.git
+> 
+> If you are interesting in the meeting please consider that in Madrid monday
+>  is holiday, so the first day that we can talk to you is Tuesday 4th.
+> 
+> > The main guidelines of our current proposal are:
+> >
+> > a) MCAP is just a protocol, which does not specify SDP records for its
+> > own needs. The HDP profile specifies the necessary SDP record, so we
+> > expose an API for HDP, not for MCAP.
+> >
+> > b) Avoid exposing MCAP protocol details to the API client, except where
+> >  unavoidable. Several MCAP parameters like PSM control channel may be
+> > left undefined by the client, and the implementation would fill them with
+> > reasonable values.
+> >
+> > c) MCAP control connection (MCL) is completely taken care of. The
+> >  application only deals with MCAP data channels (MDLs), if any.
+> >
+> > d) The application should not need to handle SDP records, which are quite
+> >  complicated in the HDP case. When it registers a HDP role, enough
+> >  information is passed so a SDP record may be published automatically.
+> >
+> > When a remote HDP device is present, its SDP record would be interpreted
+> >  automatically, so the application can discover easily the MDEP IDs and
+> >  data types offered by remote device.
+> >
+> > e) The API allows for active connection, but still the application must
+> >  register the HDP role beforehand. This ensures that a proper SDP record
+> >  will have been published. (HDP sinks, the most common role a
+> > BlueZ-running device will play, require the SDP record).
+> >
+> > f) HDP would be implemented inside bluetoothd as a plugin.
+> >
+> > g) HDP itself does not specify the data channels' protocol (it is
+> > normally the IEEE 11073-20601, but there may be others in the future).
+> > The API client would receive L2CAP sockets for each data channel, and
+> >  select()/recv()/send() them directly.
+> >
+> > h) The application would be responsible by keeping the relationship
+> > between MDL IDs and IEEE sessions, if it wants to enjoy the reconnection
+> > feature. Also, it needs to be prepared to have a MDL socket closed,
+> > receive another one and continue the session over it.
+> >
+> > If the application does not want to deal with reconnection, it may ask
+> > for MDL deletion upon socket closure, or just take the new socket as a
+> > brand new MDL.
+> >
+> > The HDP plugin would keep the necessary state information (local and
+> > remote MDEP IDs) to allow easy (and transparent) reconnection.
+> 
+> This is more or less what we think. We believe that is better to talk it by
+> IRC. By now he have a sequence diagram with the interaction of HDP with the
+> clients (agents or managers).
+> 
+> http://193.147.51.48/hdp_sequence.png
+> 
+> > Cadenas and Nemesio have already sent patches with an initial MCAP
+> >  implementation, some time ago. We hope to build on their initial effort
+> >  and collaborate with them in order to have HDP implemented as soon as
+> >  possible and offering a very comfortable API for the clients.
+> 
+> The patches are now obsolete, because we made a lot of changes on it. We
+> haven't sent it yet because we are still waiting for comments about the
+> architecture proposed in last patches. It will be better to discard those
+> patches. We can also comment/explain the MCAP arquitecture if we have a
+> meeting. We are planning to send new patches with all the changes next
+>  week.
+> 
+> 
+> 
+> Regards
+> 
+> Jose and Santiago
+> 
+> PS: Also CCing Pedro de-las-Heras who is also working with us.
+> 
+> > --
+> > Elvis
+> 
