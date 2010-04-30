@@ -1,49 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Antonio Ospite <ospite@studenti.unina.it>
-To: linux-input@vger.kernel.org
-Cc: Antonio Ospite <ospite@studenti.unina.it>,
-	cbe-oss-dev@lists.ozlabs.org, linux-bluetooth@vger.kernel.org,
-	hadess@hadess.net
-Subject: [PATCH] hid/hid-sony: fix sony_set_operational_bt
-Date: Fri, 30 Apr 2010 21:53:59 +0200
-Message-Id: <1272657239-29436-1-git-send-email-ospite@studenti.unina.it>
-Sender: linux-input-owner@vger.kernel.org
+From: =?iso-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
+Content-Type: text/plain; charset=us-ascii
+Subject: More about proposed Health Device Profile API
+Date: Thu, 29 Apr 2010 23:28:45 -0300
+Message-Id: <8FDD2957-B97E-4646-B164-4B00E7910399@signove.com>
+Cc: claudio.takahasi@openbossa.org,
+	Jose Antonio Santos Cadenas <santoscadenas@gmail.com>,
+	Santiago Carot Nemesio <sancane@gmail.com>,
+	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	raul.herbster@signove.com
+To: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0 (Apple Message framework v1078)
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Don't send the report type as part of the data, this prevents the
-controller from going into the operational state at all.
+A very simple session graph that illustrates the proposed API can be seen at http://epx.com.br/health_bluez.png.
 
-This is completely equivalent to what the code originally meant to accomplish:
-as per in net/bluetooth/hidp/core.c::hidp_output_raw_report(), by using
-HID_FEATURE_REPORT here, what will be actually sent is
-(HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_FEATURE) which is exactly 0x53.
+This API proposal was discussed jointly with Claudio Takahashi, Vinicius Gomes, Raul Herbster and others, and it is based on previous work on MCAP API specification by Jose Cadenas and Santiago Nemesio, which have been CCed.
 
-Signed-off-by: Antonio Ospite <ospite@studenti.unina.it>
----
+The main guidelines of our current proposal are:
 
-As this change makes sony_set_operational_bt work while it was non working
-before, it might be good to have it in 2.6.34.
+a) MCAP is just a protocol, which does not specify SDP records for its own needs. The HDP profile specifies the necessary SDP record, so we expose an API for HDP, not for MCAP.
 
-Thanks,
-   Antonio Ospite
-   http://ao2.it
+b) Avoid exposing MCAP protocol details to the API client, except where unavoidable. Several MCAP parameters like PSM control channel may be left undefined by the client, and the implementation would fill them with reasonable values.
 
- drivers/hid/hid-sony.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+c) MCAP control connection (MCL) is completely taken care of. The application only deals with MCAP data channels (MDLs), if any.
 
-diff --git a/drivers/hid/hid-sony.c b/drivers/hid/hid-sony.c
-index 7502a4b..402d557 100644
---- a/drivers/hid/hid-sony.c
-+++ b/drivers/hid/hid-sony.c
-@@ -76,7 +76,7 @@ static int sony_set_operational_usb(struct hid_device *hdev)
- 
- static int sony_set_operational_bt(struct hid_device *hdev)
- {
--	unsigned char buf[] = { 0x53, 0xf4,  0x42, 0x03, 0x00, 0x00 };
-+	unsigned char buf[] = { 0xf4,  0x42, 0x03, 0x00, 0x00 };
- 	return hdev->hid_output_raw_report(hdev, buf, sizeof(buf), HID_FEATURE_REPORT);
- }
- 
--- 
-1.7.1
+d) The application should not need to handle SDP records, which are quite complicated in the HDP case. When it registers a HDP role, enough information is passed so a SDP record may be published automatically.
 
+When a remote HDP device is present, its SDP record would be interpreted automatically, so the application can discover easily the MDEP IDs and data types offered by remote device.
+
+e) The API allows for active connection, but still the application must register the HDP role beforehand. This ensures that a proper SDP record will have been published. (HDP sinks, the most common role a BlueZ-running device will play, require the SDP record).
+
+f) HDP would be implemented inside bluetoothd as a plugin.
+
+g) HDP itself does not specify the data channels' protocol (it is normally the IEEE 11073-20601, but there may be others in the future). The API client would receive L2CAP sockets for each data channel, and select()/recv()/send() them directly.
+
+h) The application would be responsible by keeping the relationship between MDL IDs and IEEE sessions, if it wants to enjoy the reconnection feature. Also, it needs to be prepared to have a MDL socket closed, receive another one and continue the session over it.
+
+If the application does not want to deal with reconnection, it may ask for MDL deletion upon socket closure, or just take the new socket as a brand new MDL.
+
+The HDP plugin would keep the necessary state information (local and remote MDEP IDs) to allow easy (and transparent) reconnection.
+
+
+Cadenas and Nemesio have already sent patches with an initial MCAP implementation, some time ago. We hope to build on their initial effort and collaborate with them in order to have HDP implemented as soon as possible and offering a very comfortable API for the clients.
+
+--
+Elvis
