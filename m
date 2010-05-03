@@ -1,33 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 3 May 2010 17:19:57 +0200 (CEST)
-From: Jiri Kosina <jkosina@suse.cz>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: Antonio Ospite <ospite@studenti.unina.it>,
-	linux-input@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] hid/hid-sony: fix sony_set_operational_bt
-In-Reply-To: <1272583410.2582.441.camel@localhost.localdomain>
-Message-ID: <alpine.LNX.2.00.1005031719460.9849@pobox.suse.cz>
-References: <1272578374-9250-1-git-send-email-ospite@studenti.unina.it> <1272583410.2582.441.camel@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [PATCH] Health Device Profile API
+Mime-Version: 1.0 (Apple Message framework v1078)
+Content-Type: text/plain; charset=us-ascii
+From: =?iso-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
+In-Reply-To: <o2k2d5a2c101005030651ke836a891q7544e54e89201777@mail.gmail.com>
+Date: Mon, 3 May 2010 11:23:13 -0300
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <7248B550-7628-461E-B0BF-EDE8152B6200@signove.com>
+References: <1272591852-4961-1-git-send-email-epx@signove.com> <o2k2d5a2c101005030651ke836a891q7544e54e89201777@mail.gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 30 Apr 2010, Bastien Nocera wrote:
+In the case of HDP, the same device may support two different roles (source and sink) on a single SDP record. For example, a data concentrator that collects data from sensors and forwards to a PC will have a number of source and sink MDEPs, all of them under a single SDP record and a single "listening" L2CAP socket for MCAP control channel. When a remoty party connects, only the data channels that match are connected (both of same data type, one side source, other side sink).
 
-> > Don't send the report type as part of the data, this prevents the
-> > controller from going into the operational state at all.
-> > 
-> > This is completely equivalent to what the code originally meant to accomplish:
-> > as per in net/bluetooth/hidp/core.c::hidp_output_raw_report(), by using
-> > HID_FEATURE_REPORT here, what will be actually sent is
-> > (HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_FEATURE) which is exactly 0x53.
-> > 
-> > Signed-off-by: Antonio Ospite <ospite@studenti.unina.it>
-> Signed-off-by: Bastien Nocera <hadess@hadess.net>
+That's why we chose a single interface, a generic RegisterRole(), and role appears again in EndPoint dict.
 
-Applied, thanks.
+> In case of MDEP we might want to have two interfaces
+> org.bluez.HealthSink and org.bluez.HealthSource, this should fix the
+> reusing the interface name with different methods in adapter path and
+> device path, internally the code can take care of matching local ones
+> with remotes ones, well at least we did that for a2dp sink/source
+> although it is a completely different profile I think it might be
+> useful to have a similar logic in this case otherwise the ui (if there
+> is any in this case) has to figure out a lot of details to connect,
+> again in a2dp there is also sink/source concept and support for
+> multiples remote/local seps but we try to hide as much as possible in
+> the API.
+> 
+> -- 
+> Luiz Augusto von Dentz
+> Computer Engineer
 
--- 
-Jiri Kosina
-SUSE Labs, Novell Inc.
