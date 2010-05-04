@@ -1,158 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
+From: John Frankish <j-frankish@slb.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Tue, 4 May 2010 13:53:21 +0200
+Subject: RE: How to use a2dp avrcp controls
+Message-ID: <6AC5A55546F64545AE996F8200E3AC4E032D544173@NL0105EXC01V01.eur.slb.com>
+References: <6AC5A55546F64545AE996F8200E3AC4E032D4EB9A2@NL0105EXC01V01.eur.slb.com>
+ <44EE5C37ADC36343B0625A05DD408C4850DA702DD0@CHEXMB-01.global.atheros.com>
+In-Reply-To: <44EE5C37ADC36343B0625A05DD408C4850DA702DD0@CHEXMB-01.global.atheros.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <201005041254.37990.jcaden@libresoft.es>
-References: <1272959741.2182.123.camel@mosquito>
-	 <m2u2d5a2c101005040304ke238595n54b8584dd78b8f37@mail.gmail.com>
-	 <201005041254.37990.jcaden@libresoft.es>
-Date: Tue, 4 May 2010 17:50:51 +0300
-Message-ID: <p2h2d5a2c101005040750n6c5ea46dk4722b6ca3bea5543@mail.gmail.com>
-Subject: Re: HDP proposed API
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: jcaden@libresoft.es
-Cc: Santiago Carot-Nemesio <scarot@libresoft.es>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
 
-On Tue, May 4, 2010 at 1:54 PM, José Antonio Santos Cadenas
-<jcaden@libresoft.es> wrote:
-> Hi all,
->
-> Next a simple example program in python using the api that we proposed in this thread.
->
-> We still use the name Device but maybe a better name can be used.
->
-> Regards.
->
-> ----------
-> #!/usr/bin/python
-> # -*- coding: utf-8 -*-
->
-> import dbus
-> import dbus.service
-> from dbus.mainloop.glib import DBusGMainLoop
-> import gobject
-> import os
->
-> DBusGMainLoop(set_as_default=True)
-> loop = gobject.MainLoop()
->
-> obj_path = "/python/tester/hdp"
->
-> bus = dbus.SystemBus()
->
-> # This object receives the information from the daemon
-> class HDP(dbus.service.Object):
->        def __init__(self, bus, obj_path):
->                self.bus = bus
->                dbus.service.Object.__init__(self, self.bus, obj_path)
->        @dbus.service.method('org.bluez.HdpAgent',
->                             in_signature='o', out_signature='',
->                             sender_keyword='sender')
->        def DeviceConnected(self, path, sender=None):
->                print "Connected new device %s: (sender %s)" % (path, sender)
->        @dbus.service.method('org.bluez.HdpAgent',
->                             in_signature='o', out_signature='',
->                             sender_keyword='sender')
->        def DeviceDisconnected(self, path, sender=None):
->                print "Device %s: disconnected (sender: %s)" % (path, sender)
->        @dbus.service.method('org.bluez.HdpAgent',
->                             in_signature='oq', out_signature='',
->                             sender_keyword='sender')
->        def DeletedDc(self, dev, mdlid, sender=None):
->                print "Data channel: %d deleted on dev %s (sender %s)" % \
->                                                (mdlid, dev, sender)
->        @dbus.service.method('org.bluez.HdpAgent',
->                             in_signature='oqh', out_signature='',
->                             sender_keyword='sender')
->        def CreatedDc(self, dev, mdlid, fd, sender=None):
->                print "Data channel: %d created on dev %s: fd: %d " % \
->                                                (mdlid, dev, fd, sender)
->
-> hdp_obj = HDP(bus, obj_path);
->
-> manager = dbus.Interface(bus.get_object("org.bluez", "/"),
->                                                "org.bluez.Manager")
-> hdp = dbus.Interface(bus.get_object("org.bluez", manager.DefaultAdapter()),
->                                                "org.bluez.Hdp")
->
-> data_spec = 1
-> session_path = hdp.CreateSession(obj_path, data_spec)
->
-> session = dbus.Interface(bus.get_object("org.bluez", session_path),
->                                                "org.bluez.HdpSession")
->
-> # Configuration of the session, adding suported features
-> source_role = 0
-> mdep = session.AllocateMdep(source_role)
-> session.AddFeature(mdep, 4100, "Pulse oximeter")
->
-> sink_role = 1 # Sink role
-> mdep2 = session.AllocateMdep(sink_role)
-> session.AddFeature(mdep2, 4111, "Scale")
-> session.AddFeature(mdep2, 4100, "Pulse oximeter sink")
->
-> # Now start the session
-> # Starts a MCAP session and register in the SDP
-> session.Start()
->
-> # *****************************************************************************
-> # Now, if you start the main loop, the HDP events will be notified in HDP class
-> # *****************************************************************************
->
-> # Connect to a remote device
-> addr = "XX:XX:XX:XX:XX:XX"
 
-Where do I get this address from, and more importantly how do the
-application associate that this device supports hdp? To me bdaddr is
-meaningless in the API, we have done this mistake before and we
-learned the hard way that the API should be convenient to use and
-bdaddr hardly is.
+> -----Original Message-----
+> From: Vikram Kandukuri [mailto:Vikram.Kandukuri@Atheros.com]
+> Sent: Tuesday, 04 May, 2010 15:00
+> To: John Frankish
+> Subject: RE: How to use a2dp avrcp controls
+> 
+> Hi John,
+> Hi,
+> 
+> Although I can pair with and play music to a set of a2dp headphones
+> without problems, I cannot figure out how to enable the "track skip"
+> and similar remote controls on the headphones.
+> 
+> Is this something that can be done easily - if so, could somebody point
+> me to the documentation?
+> 
+> If not, are there music playing applications (rhythmbox or similar)
+> that already enable the remote controls on headphones?
+> 
+> Note that I see appropriate echoes in dmesg when I press the "track
+> skip" button, so the message is getting from the headphones to my
+> laptop...
+> 
+> Thanks
+> John
+> 
+> >>uinput module is responsible for AVRCP ; so do modprobe to uinput. It
+> will >>work
+> 
+> vikram
+----
 
-> dev_path = session.Connect(addr)
-> dev = dbus.Interface(bus.get_object("org.bluez", dev_path),
->                                                "org.bluez.HDPDevice")
->
-> dcid = dev.OpenDc(rem_mdep, conf)
-> fd = dev.GetDcFd(dcid)
->
-> # You can use the fd for write or read data.
-> # If the read/write operation fails, reconnection will be performed getting
-> # the file descriptor again
->
-> while some_condition:
->        try:
->                os.write(fd, "some_data")
->        except:
->                fd = dev.GetDcFd(dcid) # Implicit reconeciton of dc
->
-> dev.DeleteDc(dcid) # Close data channel
-> dev.DeleteAllDc() # Close all data channels for this mcl (device+session)
->
-> if power_save:
->        session.Disconnect(dev_path, False)
->        # Close the connection with the remote devide for power save,
->        # Reconnections will be possible
-> else:
->        session.Disconnect(dev_path, True)
->        # Close the connection with the remote devide forever and clean state
->        # Reconnections will NOT be possible
+Sorry, I should have mentioned that, but the uinput module is loaded (I don't get the messages in dmesg without that), but the tracks do not skip in rhythmbox or xmms
 
-IMHO leaving the application to decide when to do save power is a bad idea.
+$ dmesg
+...
+[press track skip]
+input: 00:1B:66:00:31:88 as /devices/virtual/input/input11
 
-> hdp.DeleteSession(session_path)
-> # Close the session, all connections and data channels will be closed
->
+John
 
-Sorry but this is way too complicated for my taste, I guess the one
-shared by Elvis sometime ago has more potential because the device
-path design is reused, and so is the device driver code I suppose,
-which is much more convenient if we want to maintain this upstream.
-Instead of trying to figure out alone you 2 should be cooperating.
-
--- 
-Luiz Augusto von Dentz
-Computer Engineer
