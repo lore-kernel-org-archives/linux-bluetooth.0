@@ -1,45 +1,158 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 4 May 2010 17:06:57 -0300
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
-To: Santiago Carot-Nemesio <sancane@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] MCAP implementation for BlueZ
-Message-ID: <20100504200657.GC26732@vigoh>
-References: <1272962595-4108-1-git-send-email-sancane@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1272962595-4108-1-git-send-email-sancane@gmail.com>
+In-Reply-To: <201005041254.37990.jcaden@libresoft.es>
+References: <1272959741.2182.123.camel@mosquito>
+	 <m2u2d5a2c101005040304ke238595n54b8584dd78b8f37@mail.gmail.com>
+	 <201005041254.37990.jcaden@libresoft.es>
+Date: Tue, 4 May 2010 17:50:51 +0300
+Message-ID: <p2h2d5a2c101005040750n6c5ea46dk4722b6ca3bea5543@mail.gmail.com>
+Subject: Re: HDP proposed API
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: jcaden@libresoft.es
+Cc: Santiago Carot-Nemesio <scarot@libresoft.es>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Santiago,
+Hi,
 
-* Santiago Carot-Nemesio <sancane@gmail.com> [2010-05-04 10:43:15 +0200]:
+On Tue, May 4, 2010 at 1:54 PM, José Antonio Santos Cadenas
+<jcaden@libresoft.es> wrote:
+> Hi all,
+>
+> Next a simple example program in python using the api that we proposed in this thread.
+>
+> We still use the name Device but maybe a better name can be used.
+>
+> Regards.
+>
+> ----------
+> #!/usr/bin/python
+> # -*- coding: utf-8 -*-
+>
+> import dbus
+> import dbus.service
+> from dbus.mainloop.glib import DBusGMainLoop
+> import gobject
+> import os
+>
+> DBusGMainLoop(set_as_default=True)
+> loop = gobject.MainLoop()
+>
+> obj_path = "/python/tester/hdp"
+>
+> bus = dbus.SystemBus()
+>
+> # This object receives the information from the daemon
+> class HDP(dbus.service.Object):
+>        def __init__(self, bus, obj_path):
+>                self.bus = bus
+>                dbus.service.Object.__init__(self, self.bus, obj_path)
+>        @dbus.service.method('org.bluez.HdpAgent',
+>                             in_signature='o', out_signature='',
+>                             sender_keyword='sender')
+>        def DeviceConnected(self, path, sender=None):
+>                print "Connected new device %s: (sender %s)" % (path, sender)
+>        @dbus.service.method('org.bluez.HdpAgent',
+>                             in_signature='o', out_signature='',
+>                             sender_keyword='sender')
+>        def DeviceDisconnected(self, path, sender=None):
+>                print "Device %s: disconnected (sender: %s)" % (path, sender)
+>        @dbus.service.method('org.bluez.HdpAgent',
+>                             in_signature='oq', out_signature='',
+>                             sender_keyword='sender')
+>        def DeletedDc(self, dev, mdlid, sender=None):
+>                print "Data channel: %d deleted on dev %s (sender %s)" % \
+>                                                (mdlid, dev, sender)
+>        @dbus.service.method('org.bluez.HdpAgent',
+>                             in_signature='oqh', out_signature='',
+>                             sender_keyword='sender')
+>        def CreatedDc(self, dev, mdlid, fd, sender=None):
+>                print "Data channel: %d created on dev %s: fd: %d " % \
+>                                                (mdlid, dev, fd, sender)
+>
+> hdp_obj = HDP(bus, obj_path);
+>
+> manager = dbus.Interface(bus.get_object("org.bluez", "/"),
+>                                                "org.bluez.Manager")
+> hdp = dbus.Interface(bus.get_object("org.bluez", manager.DefaultAdapter()),
+>                                                "org.bluez.Hdp")
+>
+> data_spec = 1
+> session_path = hdp.CreateSession(obj_path, data_spec)
+>
+> session = dbus.Interface(bus.get_object("org.bluez", session_path),
+>                                                "org.bluez.HdpSession")
+>
+> # Configuration of the session, adding suported features
+> source_role = 0
+> mdep = session.AllocateMdep(source_role)
+> session.AddFeature(mdep, 4100, "Pulse oximeter")
+>
+> sink_role = 1 # Sink role
+> mdep2 = session.AllocateMdep(sink_role)
+> session.AddFeature(mdep2, 4111, "Scale")
+> session.AddFeature(mdep2, 4100, "Pulse oximeter sink")
+>
+> # Now start the session
+> # Starts a MCAP session and register in the SDP
+> session.Start()
+>
+> # *****************************************************************************
+> # Now, if you start the main loop, the HDP events will be notified in HDP class
+> # *****************************************************************************
+>
+> # Connect to a remote device
+> addr = "XX:XX:XX:XX:XX:XX"
 
-> This patch enables MCAP in BlueZ.
-> Current implementation provides support for standard op. codes. Clock
-> Synchronization protocol is not yet supported.
-> ---
->  Makefile.am     |   11 +-
->  acinclude.m4    |    6 +
->  mcap/mcap.c     | 2146 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  mcap/mcap.h     |  176 +++++
->  mcap/mcap_lib.h |  162 +++++
->  5 files changed, 2500 insertions(+), 1 deletions(-)
->  create mode 100644 mcap/mcap.c
->  create mode 100644 mcap/mcap.h
->  create mode 100644 mcap/mcap_lib.h
+Where do I get this address from, and more importantly how do the
+application associate that this device supports hdp? To me bdaddr is
+meaningless in the API, we have done this mistake before and we
+learned the hard way that the API should be convenient to use and
+bdaddr hardly is.
 
-2500+ lines is too big for review. MCAP is way complicated to
-understand completely. I suggest you to split this patch and send
-smaller ones for each feature of MCAP you implement, then we can review
-each piece and not at once.
+> dev_path = session.Connect(addr)
+> dev = dbus.Interface(bus.get_object("org.bluez", dev_path),
+>                                                "org.bluez.HDPDevice")
+>
+> dcid = dev.OpenDc(rem_mdep, conf)
+> fd = dev.GetDcFd(dcid)
+>
+> # You can use the fd for write or read data.
+> # If the read/write operation fails, reconnection will be performed getting
+> # the file descriptor again
+>
+> while some_condition:
+>        try:
+>                os.write(fd, "some_data")
+>        except:
+>                fd = dev.GetDcFd(dcid) # Implicit reconeciton of dc
+>
+> dev.DeleteDc(dcid) # Close data channel
+> dev.DeleteAllDc() # Close all data channels for this mcl (device+session)
+>
+> if power_save:
+>        session.Disconnect(dev_path, False)
+>        # Close the connection with the remote devide for power save,
+>        # Reconnections will be possible
+> else:
+>        session.Disconnect(dev_path, True)
+>        # Close the connection with the remote devide forever and clean state
+>        # Reconnections will NOT be possible
 
-Also a MCAP test tool would be interesting to help on the
-review/merge/qualification process. Do you guys have one? Or are you
-planning to do one?
+IMHO leaving the application to decide when to do save power is a bad idea.
 
+> hdp.DeleteSession(session_path)
+> # Close the session, all connections and data channels will be closed
+>
+
+Sorry but this is way too complicated for my taste, I guess the one
+shared by Elvis sometime ago has more potential because the device
+path design is reused, and so is the device driver code I suppose,
+which is much more convenient if we want to maintain this upstream.
+Instead of trying to figure out alone you 2 should be cooperating.
 
 -- 
-Gustavo F. Padovan
-http://padovan.org
+Luiz Augusto von Dentz
+Computer Engineer
