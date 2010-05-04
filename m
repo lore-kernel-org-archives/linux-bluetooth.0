@@ -1,33 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: HDP proposed API
-Mime-Version: 1.0 (Apple Message framework v1078)
+Date: Tue, 4 May 2010 17:06:57 -0300
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
+To: Santiago Carot-Nemesio <sancane@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] MCAP implementation for BlueZ
+Message-ID: <20100504200657.GC26732@vigoh>
+References: <1272962595-4108-1-git-send-email-sancane@gmail.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-From: =?iso-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
-In-Reply-To: <201005041254.37990.jcaden@libresoft.es>
-Date: Tue, 4 May 2010 21:07:24 -0300
-Cc: Santiago Carot-Nemesio <scarot@libresoft.es>,
-	linux-bluetooth@vger.kernel.org
-Message-Id: <414EAFF0-4D91-488E-A19B-E0B063487B7D@signove.com>
-References: <1272959741.2182.123.camel@mosquito> <m2u2d5a2c101005040304ke238595n54b8584dd78b8f37@mail.gmail.com> <201005041254.37990.jcaden@libresoft.es>
-To: jcaden@libresoft.es
+In-Reply-To: <1272962595-4108-1-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Santiago,
 
-> while some_condition:
-> 	try:
-> 		os.write(fd, "some_data")
-> 	except:
-> 		fd = dev.GetDcFd(dcid) # Implicit reconeciton of dc
+* Santiago Carot-Nemesio <sancane@gmail.com> [2010-05-04 10:43:15 +0200]:
 
-I'd like to believe that power-saving disconneciton of a L2CAP channel and reconnection would be that simple to handle at application side. But I don't :)
+> This patch enables MCAP in BlueZ.
+> Current implementation provides support for standard op. codes. Clock
+> Synchronization protocol is not yet supported.
+> ---
+>  Makefile.am     |   11 +-
+>  acinclude.m4    |    6 +
+>  mcap/mcap.c     | 2146 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  mcap/mcap.h     |  176 +++++
+>  mcap/mcap_lib.h |  162 +++++
+>  5 files changed, 2500 insertions(+), 1 deletions(-)
+>  create mode 100644 mcap/mcap.c
+>  create mode 100644 mcap/mcap.h
+>  create mode 100644 mcap/mcap_lib.h
 
-Even if the fd is a L2CAP SOCK_SEQPACKET, which means that write() would be atomic for the message, the message might be still at output buffer when the connection drops. Or it might have been transmitted. The application would never know, and could not act upon.
+2500+ lines is too big for review. MCAP is way complicated to
+understand completely. I suggest you to split this patch and send
+smaller ones for each feature of MCAP you implement, then we can review
+each piece and not at once.
 
-I think that, talking specifically about this MCAP/HDP data channel reconnection stuff, we have two extremist albeit sensible approaches:
+Also a MCAP test tool would be interesting to help on the
+review/merge/qualification process. Do you guys have one? Or are you
+planning to do one?
 
-a) let the application handle it, as "my" API proposes. Application is notified about disconnection and chooses what to do, and lingering sessions must be prepared to deal with FD replacement;
 
-b) hide it completely from the application. This includes NOT passing the L2CAP fd, but a UNIX socket fd which HDP plug-in takes care of. Or, perhaps not to use any FD passing at all: just send HDP data messages via D-BUS, and that's it.
-
-Your API has a mix of "a" and "b": approaches: automatic reconnection but with possible mid-flight FD replacement.
+-- 
+Gustavo F. Padovan
+http://padovan.org
