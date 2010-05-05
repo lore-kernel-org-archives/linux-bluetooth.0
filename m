@@ -1,51 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: HDP proposed API
+Subject: Re: [PATCH] Health Device Profile API
 Mime-Version: 1.0 (Apple Message framework v1078)
 Content-Type: text/plain; charset=us-ascii
 From: =?iso-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
-In-Reply-To: <1272959741.2182.123.camel@mosquito>
-Date: Tue, 4 May 2010 21:32:36 -0300
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <43D728B9-46D9-4DA8-B41F-F3C7B895B8C8@signove.com>
-References: <1272959741.2182.123.camel@mosquito>
+In-Reply-To: <1272959405.2182.117.camel@mosquito>
+Date: Tue, 4 May 2010 21:19:37 -0300
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <F76BD3E9-A0AF-434E-AE1A-17E7ED692113@signove.com>
+References: <1272928958-8073-1-git-send-email-epx@signove.com> <1272959405.2182.117.camel@mosquito>
 To: Santiago Carot-Nemesio <scarot@libresoft.es>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Due to damn SCRUM reviews/meetings, I did not have time to make a good comparison between the two APIs, so I chose to reply directly to keep the ball rolling.
-
-> Service		org.bluez
-> Interface	org.bluez.HdpSession
-> Object path	[variable prefix]/{hci0,hci1,...}/{hdp0,hdp1,...}
-
-If we could agree on a "one process application = at most one HDP service record", we would not need this /hdpX suffix at all.
-
-An HDP session path would be interesting if other processes should be able to talk to this object too, but as far as I can see, this is something we definetively *don't* want :)
-
-> 		uint8 AllocateMdep(uint8 role)
-> 		void AddFeature(uint8 mdepid, uint16 dtype, string dscr)
-> 		void Start()
-
-As I have already said via IRC, I prefer "my" approach: passing a dict once with all these things at once. If the idea was to confine the MDEP handling, the dict can elide mentioning MDEPs at all, and use some application-attributed handle.
-
-> 		object Connect(string btaddr)
-
-This has been commented by von Dentz.
-
-> Service		org.bluez
-> Interface	org.bluez.HdpDevice
-> Object path	[variable prefix]/{hci0,hci1,...}/{hdp0,hdp1,...}/dev_XX_XX_XX_XX_XX_XX
 > 
-> 		boolean Echo(array{byte})
+> We have provided an abstraction based in HDP sessions becasue there may
+> exist different HDP sessions running in the same host. Your API doesn't
+> seem to take in count that possibility.
 
-This is something our API does not have, we would have to add.
+Note that our adapter.RegisterRole() is bound to a client process. You can have any number of processes, each one calling adapter.RegisterRole() and publishing its own HDP profile. When a process exits, the respective profile is killed.
 
+Our adapter.RegisterRole() has two limitations that you noted.
+
+First: only one HDP profile per client application. We feel that this is not bad.
+
+Second: we don't provide an option NOT to publish an HDP profile. This may be a bug indeed (sinks are not required to publish HDP records, as you kindly noted yesterday via IRC;i in our API we intended to force every every HDP service provider to publish a SDP record.
+
+> Above callbacks reflect same ideas that we have, but we propose a
+> session oriented agent (we call HdpAgent in the e-mail) that
+> applications should provide when they connect to a HdpSession. Once
+> applications are connected to a session, HDP will notify them using that
+> d-bus object.
+
+As said above, there is an (implicit) session per client.
+
+> You can't rely in remote HDP record for Source devices (it is not
+> mandatory for them to registry it).  we dont understand why you need to
+> provide a local mdep for the connection of the data channel, only the
+> remote mdep is required for do that.
+
+Point.
+
+> Reconnections may be transparent for applications, we believe that HDP
+> knows when a data channels is re-connected. (see our API for more
+> details)
+
+See other email about FD, reconnection semantics. I feel we must either expose both reconnections and FDs for the application, or neither one.
+
+>> +		array{MDLs}: array of open data channels. Mandatory
+>> +			MDLs attributes are:
+>> +			uint16 MDLId: Data channel identification
+>> +			string path: HealthData object path
 > 
-> HDPAgent hierarchy
-> ==================
-> 
-> Service         unique name
-> Interface       org.bluez.HdpAgent
-> Object path     freely definable
+> I think that above method is not necessary because an HdpAgent always is
+> notified when a new data channel is created or destroyed, but we are
+> open to discuss.
 
-What I liked in your Agent, that "mine" does not have, is device connected/device disconnected callback. Our proposal relied on listening D-BUS signals to know about new devices (which may not implement HDP). This is very handy for the application, in particular when it wants to take the initiative and connect to the device. The rest, as you said, looks like our Agent.
+As an occasional application writer, I'd like to have this list at hand :) Indeed the application can integrate every connection/disconnection and know the current state, but...
+
