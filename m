@@ -1,245 +1,233 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?iso-8859-1?q?Jos=E9_Antonio_Santos_Cadenas?=
-	<jcaden@libresoft.es>
-Reply-To: jcaden@libresoft.es
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: HDP proposed api (ver 0.2)
-Date: Wed, 5 May 2010 12:55:09 +0200
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <201005051255.09394.jcaden@libresoft.es>
+Subject: Re: HDP proposed API
+From: Santiago Carot-Nemesio <scarot@libresoft.es>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <p2h2d5a2c101005040750n6c5ea46dk4722b6ca3bea5543@mail.gmail.com>
+References: <1272959741.2182.123.camel@mosquito>
+	 <m2u2d5a2c101005040304ke238595n54b8584dd78b8f37@mail.gmail.com>
+	 <201005041254.37990.jcaden@libresoft.es>
+	 <p2h2d5a2c101005040750n6c5ea46dk4722b6ca3bea5543@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Wed, 05 May 2010 12:53:42 +0200
+Message-ID: <1273056822.2105.147.camel@mosquito>
+Mime-Version: 1.0
+To: unlisted-recipients:; (no To-header on input)
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
-
-Here is a new proposoal that tries to integrate all that have been comented
-and proposed in the list, as well as we talked yesterday on the IRC.
-
-There is still one thing that should be discussed, the fd passin issue. 
-We think that we must talk about this and find the best way for 
-the implementation as Elvis sugested.
-
-Regards.
-
----------------------------------------
+Hi,
+
+El mar, 04-05-2010 a las 17:50 +0300, Luiz Augusto von Dentz escribió:
+> Hi,
+> 
+> On Tue, May 4, 2010 at 1:54 PM, José Antonio Santos Cadenas
+> <jcaden@libresoft.es> wrote:
+> > Hi all,
+> >
+> > Next a simple example program in python using the api that we proposed in this thread.
+> >
+> > We still use the name Device but maybe a better name can be used.
+> >
+> > Regards.
+> >
+> > ----------
+> > #!/usr/bin/python
+> > # -*- coding: utf-8 -*-
+> >
+> > import dbus
+> > import dbus.service
+> > from dbus.mainloop.glib import DBusGMainLoop
+> > import gobject
+> > import os
+> >
+> > DBusGMainLoop(set_as_default=True)
+> > loop = gobject.MainLoop()
+> >
+> > obj_path = "/python/tester/hdp"
+> >
+> > bus = dbus.SystemBus()
+> >
+> > # This object receives the information from the daemon
+> > class HDP(dbus.service.Object):
+> >        def __init__(self, bus, obj_path):
+> >                self.bus = bus
+> >                dbus.service.Object.__init__(self, self.bus, obj_path)
+> >        @dbus.service.method('org.bluez.HdpAgent',
+> >                             in_signature='o', out_signature='',
+> >                             sender_keyword='sender')
+> >        def DeviceConnected(self, path, sender=None):
+> >                print "Connected new device %s: (sender %s)" % (path, sender)
+> >        @dbus.service.method('org.bluez.HdpAgent',
+> >                             in_signature='o', out_signature='',
+> >                             sender_keyword='sender')
+> >        def DeviceDisconnected(self, path, sender=None):
+> >                print "Device %s: disconnected (sender: %s)" % (path, sender)
+> >        @dbus.service.method('org.bluez.HdpAgent',
+> >                             in_signature='oq', out_signature='',
+> >                             sender_keyword='sender')
+> >        def DeletedDc(self, dev, mdlid, sender=None):
+> >                print "Data channel: %d deleted on dev %s (sender %s)" % \
+> >                                                (mdlid, dev, sender)
+> >        @dbus.service.method('org.bluez.HdpAgent',
+> >                             in_signature='oqh', out_signature='',
+> >                             sender_keyword='sender')
+> >        def CreatedDc(self, dev, mdlid, fd, sender=None):
+> >                print "Data channel: %d created on dev %s: fd: %d " % \
+> >                                                (mdlid, dev, fd, sender)
+> >
+> > hdp_obj = HDP(bus, obj_path);
+> >
+> > manager = dbus.Interface(bus.get_object("org.bluez", "/"),
+> >                                                "org.bluez.Manager")
+> > hdp = dbus.Interface(bus.get_object("org.bluez", manager.DefaultAdapter()),
+> >                                                "org.bluez.Hdp")
+> >
+> > data_spec = 1
+> > session_path = hdp.CreateSession(obj_path, data_spec)
+> >
+> > session = dbus.Interface(bus.get_object("org.bluez", session_path),
+> >                                                "org.bluez.HdpSession")
+> >
+> > # Configuration of the session, adding suported features
+> > source_role = 0
+> > mdep = session.AllocateMdep(source_role)
+> > session.AddFeature(mdep, 4100, "Pulse oximeter")
+> >
+> > sink_role = 1 # Sink role
+> > mdep2 = session.AllocateMdep(sink_role)
+> > session.AddFeature(mdep2, 4111, "Scale")
+> > session.AddFeature(mdep2, 4100, "Pulse oximeter sink")
+> >
+> > # Now start the session
+> > # Starts a MCAP session and register in the SDP
+> > session.Start()
+> >
+> > # *****************************************************************************
+> > # Now, if you start the main loop, the HDP events will be notified in HDP class
+> > # *****************************************************************************
+> >
+> > # Connect to a remote device
+> > addr = "XX:XX:XX:XX:XX:XX"
+> 
+> Where do I get this address from, and more importantly how do the
+> application associate that this device supports hdp? To me bdaddr is
+> meaningless in the API, we have done this mistake before and we
+> learned the hard way that the API should be convenient to use and
+> bdaddr hardly is.
+> 
+> > dev_path = session.Connect(addr)
+> > dev = dbus.Interface(bus.get_object("org.bluez", dev_path),
+> >                                                "org.bluez.HDPDevice")
+> >
+> > dcid = dev.OpenDc(rem_mdep, conf)
+> > fd = dev.GetDcFd(dcid)
+> >
+> > # You can use the fd for write or read data.
+> > # If the read/write operation fails, reconnection will be performed getting
+> > # the file descriptor again
+> >
+> > while some_condition:
+> >        try:
+> >                os.write(fd, "some_data")
+> >        except:
+> >                fd = dev.GetDcFd(dcid) # Implicit reconeciton of dc
+> >
+> > dev.DeleteDc(dcid) # Close data channel
+> > dev.DeleteAllDc() # Close all data channels for this mcl (device+session)
+> >
+> > if power_save:
+> >        session.Disconnect(dev_path, False)
+> >        # Close the connection with the remote devide for power save,
+> >        # Reconnections will be possible
+> > else:
+> >        session.Disconnect(dev_path, True)
+> >        # Close the connection with the remote devide forever and clean state
+> >        # Reconnections will NOT be possible
+> 
+> IMHO leaving the application to decide when to do save power is a bad idea.
+> 
+Sorry, may be that notation that we used in this example is not enough
+clear. Please, let me explain you this matter.
+
+The flag provided to disconnect an MCL indicates to MCAP layer if it
+should or not save the state of the MCL, what are all negotiated data
+channels and their configuration for possible future reconnections.
+
+Please, note that a quick reconnection of data channels is an important
+characteristic in MCAP, it will reduce the amount of data required to
+take up again a previous connection.
+
+In addition, bluetooth layer doesn't know when it should forget the
+state of an MCL because iso/ieee11073-20601 layer is transport agnostic,
+it means that only data exchange protocol layer knows when a
+disconnection is permanent (not the transport layer).
+
+Please, if you are thinking in alternatives to iso/ieee11073-20601 tell
+us so that we can take into count those.
+
+I don't know if you are familiarizated with the 11073-20601 protocol, in
+any case I'm going to try to summarize the importance os this issue. The
+iso/ieee11073-20601 defines a finite state machine that permits to an
+aaplication layer to know when a disconnection is or not permanent. You
+read the HDP white paper to see more examples of when a disconnection
+should not be permanent to reduce the amount of
+configuration-association data traffic exchanged between agents and
+manager after a reconnection takes place. A quite of 11073-20601
+knowledge may be required to understand the seriousness of this
+situation. If you don't permit that applications can close an MCL saving
+state for future reconnections, next time that some device connects
+again with a manager they should exchange association traffic to restore
+tha last state in wich agent and manager were last time that the device
+was connected with the manager. Please don't hesitate to ask to me if
+you have more doubts, I know that it may be difficult, but I only am
+trying to expose the importance of this question, of course, if you have
+a better solution it will be pleasure for me to listen it.
+
+And consider again that we are always guiding our design decision by the
+iso/ieee11073-20601 requeriments for what HDP was desgined. If you are
+considering another platforms, tell us please: it will be easier to
+agree on trade-offs.
+
+To conclude, due to above feature, a manager could say to the transport
+layer when a MCL should be stored or not in MCAP. If you don't do that,
+MCAP wont be able to distinguish when a disconnection is temporal or
+permanent and it will cache it for future reconnections. It may not be a
+problem if memory resource is not a concern for you and if you are not
+aware about that ;)
+
+Sorry if I'm detailing too much but I think that it is an importan
+design feature that we have to take into consideration before to fix the
+definitiva HDP API. We wouldn't like that it may become an the Achilles'
+hell of the entire protocol stack.
+
+> > hdp.DeleteSession(session_path)
+> > # Close the session, all connections and data channels will be closed
+> >
+> 
+> Sorry but this is way too complicated for my taste, I guess the one
+> shared by Elvis sometime ago has more potential because the device
+> path design is reused, and so is the device driver code I suppose,
+> which is much more convenient if we want to maintain this upstream.
+> Instead of trying to figure out alone you 2 should be cooperating.
+> 
+
+Sorry, but IMHO I think that it isn't question of choosing one or the
+other API. This shuldn't become a competition. I agree with you, I think
+that we should work together to get the best HDP implementation for
+Linux as soon as possible. Of course, we know you have a best knowledge
+about how blueZ APIs should be and we are very glad to listen to you and
+other members of the community.
+
+We have experience with HDP/MCAP/ieee11073-20601 and we sould like to
+share our knowledge with you to integrate it in blueA.
+
+We are working in a new API which takes into count all comments received
+by all of you. We will send to the list during the day so all you can
+see it and comment it.
+
+Please, let me know if you have some comments / questions.
+
+Thanks for your time and your attention.
+
+Best regards.
 
-BlueZ D-Bus HDP API description
-***********************************
-
-Health Device Profile hierarchy
-===============================
-
-Service		org.bluez
-Interface	org.bluez.Hdp
-Object path	[variable prefix]/{hci0,hci1,...}
-
-Methods		object CreateSession(object path, dict config)
-
-			Returns the object path for the new HDP session.
-			The path parameter is the path of the remote object
-			with the callbacks to nofity events (see
-			org.bluez.HdpAgent at the end of this document)
-			This petition starts an mcap session and also register
-			in the SDP is needed
-			Dict is defined as bellow:
-			{ "data_spec" : The data_spec is the data exchange
-					specficication (see section 5.2.10 of
-					the specification document),
-					(optional)
-			  "end_points" : [{ (optional)
-				"mdepid" : uint8, (optional)
-				"role" : uint8, (mandatory)
-				"specs" :[{ (mandatory)
-					"dtype" : uint16, (mandatory)
-					"description" : string, (optional)
-				}]
-			  }]
-			}
-
-			if "data_spec" is not set, no SDP record will be
-			registerd, so all the other data in the dictionary
-			will be ignored
-
-			Session will be closed by the call or implicitly when
-			the programs leaves the bus.
-
-			Possible errors: org.bluez.Error.InvalidArguments
-
-		void DeleteSession(object path)
-
-			Delete the HDP session identified by the object path.
-			Also session will be closed if the procces that started
-			it is removed from the D-Bus.
-
-			Possible errors: org.bluez.Error.InvalidArguments
-					 org.bluez.Error.NotFound
-
-		array remote_session_properties GetRemotesSessions()
-
-			Returns an array with the remote session_properties
-			of all the visible devices.
-			remote_session_properties is a dictionary like:
-			[{"session_id": a_session_identification (int or string,
-					 probably the SDP handler + btaddr)
-			 "data_spec" : the remote data spec,
-			 "end_points":
-				 ["mdepid": uint8,
-				  "role"  : uint8,
-				  "specs" : [{
-					  "dtype"	: uint16,
-					  "description"	: string, (optional)
-				  }]
-				 ]
-			}]
-
-			Note that only remotes with a SDP record will be
-			notified by this function.
-
---------------------------------------------------------------------------------
-
-Service		org.bluez
-Interface	org.bluez.HdpSession
-Object path	[variable prefix]/{hci0,hci1,...}/{hdp0,hdp1,...}
-
-		object Connect(remote_session_id)
-
-			Connects with the remote session and returns its object
-			path.
-
-			Possible errors: org.bluez.Error.InvalidArguments
-					 org.bluez.Error.HdpError
-
-		void Disconnect(object device, boolean delete)
-
-			Disconnect from the remote device. If delete is true, any
-			status will also be deleted. Otherwise, the status will
-			be keeped for allowing future reconnections.
-
-			Possible errors: org.bluez.Error.InvalidArguments
-					 org.bluez.Error.NotFound
-					 org.bluez.Error.HdpError
-
---------------------------------------------------------------------------------
-
-Service		org.bluez
-Interface	org.bluez.HdpRemoteSession
-Object path	[variable prefix]/{hci0,hci1,...}/{hdp0,hdp1,...}/rem_session_id
-
-		boolean Echo(array{byte})
-
-			Sends an echo petition to the remote session. Return True
-			if response matches with the buffer sended. If some error
-			is detected False value is returned and the associated
-			MCL is closed.
-
-		uint16 OpenDc(byte mdepid, byte config)
-
-			Creates a new data channel with the indicated config
-			to the remote MCAP Data End Point (MDEP).
-			The configuration should indicate the channel quality of
-			service.
-			Returns the data channel id.
-
-			Possible errors: org.bluez.Error.InvalidArguments
-					 org.bluez.Error.HdpError
-
-		file_descriptor GetDcFd(uint16 mdlid)
-
-			Gets a file descriptor where data can be readed or
-			writed for receive or sent by the data channel.
-			Returns the file descriptor
-
-			Possible errors: org.bluez.Error.InvalidArguments
-					 org.bluez.Error.NotFound
-					 org.bluez.Error.HdpError
-
-		void DeleteDc(uint16 mdlid)
-
-			Deletes a data channel so it will not be available for
-			use.
-
-			Possible errors: org.bluez.Error.InvalidArguments
-					 org.bluez.Error.NotFound
-					 org.bluez.Error.HdpError
-
-		void DeleteAllDc()
-
-			Deletes all data channels so it will not be available
-			for use. Typically this function is called when the
-			connection with the remote device will be closed
-			permanently
-
-			Possible errors: org.bluez.Error.HdpError
-
-		uint16 FirstRelDc()
-
-			Returns the identificator of the first reliable data
-			channel (ERTM) connected for this device.
-
-			Possible errors: org.bluez.Error.HdpError
-
-		uint16 GetBestEfforDc()
-
-			Returns the id of a best effort (streamming) data
-			channel if any.
-
-			Possible errors: org.bluez.Error.NotFound
-
-		array getStatus()
-
-			Returns an array with all the data channels available
-
-			returned array:
-			[uint16, ...]
-
-			Possible errors: org.bluez.Error.NotFound
-
-HDPAgent hierarchy
-==================
-
-(this object is implemented by the HDP client an receives notifications)
-
-Service         unique name
-Interface       org.bluez.HdpAgent
-Object path     freely definable
-
-		void DeviceConnected(object path)
-
-			This method is called whenever a new device connection
-			has been established over the control channel of the
-			current HDP session. The objectpath contains the object
-			path of the remote device.
-
-		void DeviceDisconnected(object path)
-
-			This method is called when a remote device is
-			disconnected definitively. Any future reconnections
-			will fail. Also all data channels associated to this
-			device will be closed.
-
-		void CreatedDc(object path, uint16 mdlid, filedescriptor fd)
-
-			This method is called when a new data channel is created
-			The path contains the object path of the device whith
-			the new connection is created, the mdlid the data
-			channel identificator and the fd is the file descriptor
-			where the data can be readed or writed.
-
-		void DeletedDc(object path, uint16 mdlid)
-
-			This method is called when a data channel is closed.
-			After this call the data channel will not be valid and
-			can be reused for future created data channels.
-
-		void DataReady(object path, uint16 mdlid, filedescriptor fd)
-
-			This method is called when there is new data that can be
-			readed in a data channel
-
-		void RemoteSession(dict remote_session_properties)
-
-			This methos is called when a new session is discorevered
-			in a remote device. See Hdp.GetRemotes to know how the
-			dictionary is formed.
