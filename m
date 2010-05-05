@@ -1,50 +1,21 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH v5] Add support for the Atheros AR300x Bluetooth Chip
-From: suraj <suraj@atheros.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <marcel@holtmann.org>, <Luis.Rodriguez@Atheros.com>,
-	<Jothikumar.Mothilal@Atheros.com>, <gfpadovan@gmail.com>
-In-Reply-To: <1272279623.11239.1.camel@atheros013-desktop>
-References: <1268629296.21425.23.camel@atheros013-desktop>
-	 <1271758832.6585.33.camel@atheros013-desktop>
-	 <1271845337.15010.1.camel@atheros013-desktop>
-	 <1271927414.1409.3.camel@atheros013-desktop>
-	 <1272279623.11239.1.camel@atheros013-desktop>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 5 May 2010 18:03:18 +0530
-Message-ID: <1273062798.19162.6.camel@atheros013-desktop>
-MIME-Version: 1.0
+Subject: Re: [PATCH] MCAP implementation for BlueZ
+Mime-Version: 1.0 (Apple Message framework v1078)
+Content-Type: text/plain; charset=us-ascii
+From: =?iso-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
+In-Reply-To: <1273045541.2105.27.camel@mosquito>
+Date: Wed, 5 May 2010 09:15:21 -0300
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Santiago Carot-Nemesio <sancane@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Message-Id: <391F3B56-3BDD-418D-9AE1-8DC00E2989A3@signove.com>
+References: <1272962595-4108-1-git-send-email-sancane@gmail.com> <20100504200657.GC26732@vigoh> <1273045541.2105.27.camel@mosquito>
+To: Santiago Carot-Nemesio <scarot@libresoft.es>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+> 
+> We have some home-made tools and scripts for testing MCAP, if you are
+> interested i'll put them in plubic git too.
 
-Can you take a look at the patch? Your review has been pending for
-sometime.
-
-On Mon, 2010-04-26 at 16:30 +0530, suraj wrote:
-> Hi marcel,
-> 
-> On Thu, 2010-04-22 at 14:40 +0530, suraj wrote:
-> > This implements the Atheros Bluetooth serial protocol to
-> > support the AR300x Bluetooth chipsets.
-> > The serial protocol implements enhanced power management
-> > features for the AR300x chipsets. 
-> > 
-> > Reviewed-by: Luis R. Rodriguez <lrodriguez@atheros.com>
-> > Reviewed-by: Gustavo F. Padovan <gustavo@padovan.org>
-> > Signed-off-by: Suraj <suraj@atheros.com>
-> > 
-> > ---
-> >  drivers/bluetooth/Kconfig     |   14 ++
-> >  drivers/bluetooth/Makefile    |    1 +
-> >  drivers/bluetooth/hci_ath.c   |  378 +++++++++++++++++++++++++++++++++++++++++
-> >  drivers/bluetooth/hci_ldisc.c |    6 +
-> >  drivers/bluetooth/hci_uart.h  |    8 +-
-> >  5 files changed, 406 insertions(+), 1 deletions(-)
-> >  create mode 100755 drivers/bluetooth/hci_ath.c
-> > 
-> Can you verify the patch let me know your comments? 
-> 
-> Regards
-> Suraj
-> 
+Yes, this is important, because we are about to write some MCAP tools too, and would be nice not to do the same thing again :)
