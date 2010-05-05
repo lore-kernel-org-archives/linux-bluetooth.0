@@ -2,69 +2,244 @@ Return-Path: <cyrus@holtmann.org>
 From: =?iso-8859-1?q?Jos=E9_Antonio_Santos_Cadenas?=
 	<jcaden@libresoft.es>
 Reply-To: jcaden@libresoft.es
-To: Elvis =?iso-8859-1?q?Pf=FCtzenreuter?= <epx@signove.com>
-Subject: Re: HDP proposed API
-Date: Wed, 5 May 2010 12:57:20 +0200
-Cc: "Santiago Carot-Nemesio" <scarot@libresoft.es>,
-	linux-bluetooth@vger.kernel.org
-References: <1272959741.2182.123.camel@mosquito> <201005041254.37990.jcaden@libresoft.es> <414EAFF0-4D91-488E-A19B-E0B063487B7D@signove.com>
-In-Reply-To: <414EAFF0-4D91-488E-A19B-E0B063487B7D@signove.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: HDP proposed api (ver 0.2)
+Date: Wed, 5 May 2010 12:55:09 +0200
 MIME-Version: 1.0
-Content-Type: Text/Plain;
+Content-Type: text/plain;
   charset="iso-8859-1"
-Message-Id: <201005051257.20525.jcaden@libresoft.es>
+Message-Id: <201005051255.09394.jcaden@libresoft.es>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-El Wednesday 05 May 2010 02:07:24 Elvis Pfützenreuter escribió:
-> 
-> > while some_condition:
-> > 	try:
-> > 		os.write(fd, "some_data")
-> > 	except:
-> > 		fd = dev.GetDcFd(dcid) # Implicit reconeciton of dc
-> 
-> I'd like to believe that power-saving disconneciton of a L2CAP channel and reconnection would be that simple to handle at application side. But I don't :)
-> 
-> Even if the fd is a L2CAP SOCK_SEQPACKET, which means that write() would be atomic for the message, the message might be still at output buffer when the connection drops. Or it might have been transmitted. The application would never know, and could not act upon.
-> 
-> I think that, talking specifically about this MCAP/HDP data channel reconnection stuff, we have two extremist albeit sensible approaches:
+Hi all,
 
-We think that this is an important issue and you are right, we didn't thought about the 
-buffers and could be a problem because dbus fd passing could be buffering the data.
-We based our design in AUDIO plugin that uses fd passing too.
+Here is a new proposoal that tries to integrate all that have been comented
+and proposed in the list, as well as we talked yesterday on the IRC.
 
-> 
-> a) let the application handle it, as "my" API proposes. Application is notified about disconnection and chooses what to do, and lingering sessions must be prepared to deal with FD replacement;
+There is still one thing that should be discussed, the fd passin issue. 
+We think that we must talk about this and find the best way for 
+the implementation as Elvis sugested.
 
-Here you have the same problem that you mentioned above, because you don't know
- what data was send, you also have the fd passing problem and you don't know the
- amount of data that was sent. 
+Regards.
 
-> 
-> b) hide it completely from the application. This includes NOT passing the L2CAP fd, but a UNIX socket fd which HDP plug-in takes care of. Or, perhaps not to use any FD passing at all: just send HDP data messages via D-BUS, and that's it.
+---------------------------------------
 
-We prefer this and we thought about it in the past. There are a little bit more complicated
-but probably safer.
+BlueZ D-Bus HDP API description
+***********************************
 
-The d-bus writing option: we thing that is too much load for the dbus and that will be very
-slow too. Because the change to xml formtat could be very expensive, and the amount of data
-could be very big. Note tha 11073-20601 defines apdus of 65Kb (we think that this is too much for d-bus)
+Health Device Profile hierarchy
+===============================
 
-The option of having a socket sounds a little bit complicated, but we think that it is the best.
-We also thought about it in the past but we discarted it because it is harder to implement it 
-than the fd-passing option (we didn't see the problems that you mentioned). In fact, the 
-no-bluez-integrated implementation that we did in the past used this method.
+Service		org.bluez
+Interface	org.bluez.Hdp
+Object path	[variable prefix]/{hci0,hci1,...}
 
-I think having an HDP socket is great because reconnections can be implicit for the upper layers
-that can see the socket as permantly connected even when it is closed. HDP should 
-reconenct when receives data from the client to send to the remote device. This way no data
-can be lost and reconnections  are implicit. An other advantage of this option is that the 
-upper aplication doesn't have any aditional load with the reconnection issue.
+Methods		object CreateSession(object path, dict config)
 
+			Returns the object path for the new HDP session.
+			The path parameter is the path of the remote object
+			with the callbacks to nofity events (see
+			org.bluez.HdpAgent at the end of this document)
+			This petition starts an mcap session and also register
+			in the SDP is needed
+			Dict is defined as bellow:
+			{ "data_spec" : The data_spec is the data exchange
+					specficication (see section 5.2.10 of
+					the specification document),
+					(optional)
+			  "end_points" : [{ (optional)
+				"mdepid" : uint8, (optional)
+				"role" : uint8, (mandatory)
+				"specs" :[{ (mandatory)
+					"dtype" : uint16, (mandatory)
+					"description" : string, (optional)
+				}]
+			  }]
+			}
 
-> 
-> Your API has a mix of "a" and "b": approaches: automatic reconnection but with possible mid-flight FD replacement.--
+			if "data_spec" is not set, no SDP record will be
+			registerd, so all the other data in the dictionary
+			will be ignored
 
+			Session will be closed by the call or implicitly when
+			the programs leaves the bus.
 
-Regards
+			Possible errors: org.bluez.Error.InvalidArguments
+
+		void DeleteSession(object path)
+
+			Delete the HDP session identified by the object path.
+			Also session will be closed if the procces that started
+			it is removed from the D-Bus.
+
+			Possible errors: org.bluez.Error.InvalidArguments
+					 org.bluez.Error.NotFound
+
+		array remote_session_properties GetRemotesSessions()
+
+			Returns an array with the remote session_properties
+			of all the visible devices.
+			remote_session_properties is a dictionary like:
+			[{"session_id": a_session_identification (int or string,
+					 probably the SDP handler + btaddr)
+			 "data_spec" : the remote data spec,
+			 "end_points":
+				 ["mdepid": uint8,
+				  "role"  : uint8,
+				  "specs" : [{
+					  "dtype"	: uint16,
+					  "description"	: string, (optional)
+				  }]
+				 ]
+			}]
+
+			Note that only remotes with a SDP record will be
+			notified by this function.
+
+--------------------------------------------------------------------------------
+
+Service		org.bluez
+Interface	org.bluez.HdpSession
+Object path	[variable prefix]/{hci0,hci1,...}/{hdp0,hdp1,...}
+
+		object Connect(remote_session_id)
+
+			Connects with the remote session and returns its object
+			path.
+
+			Possible errors: org.bluez.Error.InvalidArguments
+					 org.bluez.Error.HdpError
+
+		void Disconnect(object device, boolean delete)
+
+			Disconnect from the remote device. If delete is true, any
+			status will also be deleted. Otherwise, the status will
+			be keeped for allowing future reconnections.
+
+			Possible errors: org.bluez.Error.InvalidArguments
+					 org.bluez.Error.NotFound
+					 org.bluez.Error.HdpError
+
+--------------------------------------------------------------------------------
+
+Service		org.bluez
+Interface	org.bluez.HdpRemoteSession
+Object path	[variable prefix]/{hci0,hci1,...}/{hdp0,hdp1,...}/rem_session_id
+
+		boolean Echo(array{byte})
+
+			Sends an echo petition to the remote session. Return True
+			if response matches with the buffer sended. If some error
+			is detected False value is returned and the associated
+			MCL is closed.
+
+		uint16 OpenDc(byte mdepid, byte config)
+
+			Creates a new data channel with the indicated config
+			to the remote MCAP Data End Point (MDEP).
+			The configuration should indicate the channel quality of
+			service.
+			Returns the data channel id.
+
+			Possible errors: org.bluez.Error.InvalidArguments
+					 org.bluez.Error.HdpError
+
+		file_descriptor GetDcFd(uint16 mdlid)
+
+			Gets a file descriptor where data can be readed or
+			writed for receive or sent by the data channel.
+			Returns the file descriptor
+
+			Possible errors: org.bluez.Error.InvalidArguments
+					 org.bluez.Error.NotFound
+					 org.bluez.Error.HdpError
+
+		void DeleteDc(uint16 mdlid)
+
+			Deletes a data channel so it will not be available for
+			use.
+
+			Possible errors: org.bluez.Error.InvalidArguments
+					 org.bluez.Error.NotFound
+					 org.bluez.Error.HdpError
+
+		void DeleteAllDc()
+
+			Deletes all data channels so it will not be available
+			for use. Typically this function is called when the
+			connection with the remote device will be closed
+			permanently
+
+			Possible errors: org.bluez.Error.HdpError
+
+		uint16 FirstRelDc()
+
+			Returns the identificator of the first reliable data
+			channel (ERTM) connected for this device.
+
+			Possible errors: org.bluez.Error.HdpError
+
+		uint16 GetBestEfforDc()
+
+			Returns the id of a best effort (streamming) data
+			channel if any.
+
+			Possible errors: org.bluez.Error.NotFound
+
+		array getStatus()
+
+			Returns an array with all the data channels available
+
+			returned array:
+			[uint16, ...]
+
+			Possible errors: org.bluez.Error.NotFound
+
+HDPAgent hierarchy
+==================
+
+(this object is implemented by the HDP client an receives notifications)
+
+Service         unique name
+Interface       org.bluez.HdpAgent
+Object path     freely definable
+
+		void DeviceConnected(object path)
+
+			This method is called whenever a new device connection
+			has been established over the control channel of the
+			current HDP session. The objectpath contains the object
+			path of the remote device.
+
+		void DeviceDisconnected(object path)
+
+			This method is called when a remote device is
+			disconnected definitively. Any future reconnections
+			will fail. Also all data channels associated to this
+			device will be closed.
+
+		void CreatedDc(object path, uint16 mdlid, filedescriptor fd)
+
+			This method is called when a new data channel is created
+			The path contains the object path of the device whith
+			the new connection is created, the mdlid the data
+			channel identificator and the fd is the file descriptor
+			where the data can be readed or writed.
+
+		void DeletedDc(object path, uint16 mdlid)
+
+			This method is called when a data channel is closed.
+			After this call the data channel will not be valid and
+			can be reused for future created data channels.
+
+		void DataReady(object path, uint16 mdlid, filedescriptor fd)
+
+			This method is called when there is new data that can be
+			readed in a data channel
+
+		void RemoteSession(dict remote_session_properties)
+
+			This methos is called when a new session is discorevered
+			in a remote device. See Hdp.GetRemotes to know how the
+			dictionary is formed.
