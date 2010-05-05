@@ -1,59 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4BE14819.4080903@greffrath.com>
-Date: Wed, 05 May 2010 12:27:37 +0200
+Message-ID: <4BE14458.1020908@greffrath.com>
+Date: Wed, 05 May 2010 12:11:36 +0200
 From: Fabian Greffrath <fabian@greffrath.com>
 MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: Detect invalid (i.e. non-UTF-8) device names and fix them during
+Subject: Detect invalid (i.e. non-UTF-8) device names and fix them during
  initialization phase
-References: <4BE14458.1020908@greffrath.com>
-In-Reply-To: <4BE14458.1020908@greffrath.com>
 Content-Type: multipart/mixed;
- boundary="------------020204030209010708080903"
+ boundary="------------000300040701050206070203"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 This is a multi-part message in MIME format.
---------------020204030209010708080903
+--------------000300040701050206070203
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Dear Bluez list,
+Dear Bluez developers,
 
-I am sorry, I know this is the worst way to start getting in touch 
-with a software project, but I accidently attached the wrong patch to 
-my previous email. It's configure_device() that must be patched. 
-Please find a corrected patch attached (it has been written against 
-bluez 4.63 but applies perfectly against 4.64).
+recently I have experienced a problem with one of my USB bluetooth 
+dongles: Whenever I plugged it into an USB port, the kernel detected 
+the device (i.e. reasonable output in dmesg) and the correct kernel 
+module (i.e. btusb) was loaded, but bluez frontends like 
+gnome-bluetooth could still not activate the device. The bug that I 
+reported against this software can be found at: 
+<https://bugzilla.gnome.org/show_bug.cgi?id=617050>.
+
+It turned out that my USB dongle was the culprit, since it had an 
+invalid default device name that contained non-UTF-8 characters, as 
+reported by 'hciconfig -a'. When I changed the device name to 
+something reasonable via e.g. 'hciconfig hci0 name foobar', I had to 
+*restart* the bluetoothd daemon afterwards in order to get everything 
+working as expected. However, when I unplugged the USB dongle and 
+plugged it back in, the device name was reset to the defective default 
+again and I had to repeat this procedure.
+
+Since I found it unreasonable to be forced to manually change the 
+device name and restart the daemon each and every time I plugged my 
+USB dongle in, I wanted a solution that detected a faulty device name 
+string during the device initialization phase and instantly fixed it 
+by writing a converted string back to the device. The attached patch 
+does exact this and makes my USB dongle work out-of-the-box, despite 
+its defective default device name.
+
+Please review the patch for integration into Bluez.
 
 Cheers,
 Fabian
 
---------------020204030209010708080903
+PS: There is still one open question that I would like to address: 
+Since I am going to print both the faulty and the fixed device name 
+strings to stderr via debug(), should I make sure the strings do not 
+contain any ASCII control characters prior to that? At least this is 
+what is done in tools/hciconfig.c:442.
+
+
+--------------000300040701050206070203
 Content-Type: text/x-diff;
  name="fix_invalid_non-utf-8_device_name.patch"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment;
  filename="fix_invalid_non-utf-8_device_name.patch"
 
---- bluez-4.63.orig/plugins/hciops.c
-+++ bluez-4.63/plugins/hciops.c
-@@ -81,6 +81,7 @@ static void configure_device(int index)
+--- bluez-4.64.orig/plugins/hciops.c
++++ bluez-4.64/plugins/hciops.c
+@@ -119,6 +119,7 @@ static void init_device(int index)
  	struct hci_dev_info di;
- 	uint16_t policy;
+ 	pid_t pid;
  	int dd, err;
 +	char name[249];
  
- 	if (hci_devinfo(index, &di) < 0)
- 		return;
-@@ -96,6 +97,30 @@ static void configure_device(int index)
- 		return;
+ 	/* Do initialization in the separate process */
+ 	pid = fork();
+@@ -143,6 +144,30 @@ static void init_device(int index)
+ 		exit(1);
  	}
  
 +	if (hci_read_local_name(dd, sizeof(name), name, 1000) < 0) {
 +		error("Can't read local name on hci%d: %s (%d)\n",
 +						index, strerror(errno), errno);
-+		return;
++		exit(1);
 +	}
 +
 +	name[248] = '\0';
@@ -68,14 +94,14 @@ Content-Disposition: attachment;
 +			if (hci_write_local_name(dd, utf8_name, 2000) < 0) {
 +				error("Can't change local name on hci%d: %s (%d)\n",
 +								index, strerror(errno), errno);
-+				return;
++				exit(1);
 +			}
 +			g_free(utf8_name);
 +		}
 +	}
 +
- 	/* Set page timeout */
- 	if ((main_opts.flags & (1 << HCID_SET_PAGETO))) {
- 		write_page_timeout_cp cp;
+ 	memset(&dr, 0, sizeof(dr));
+ 	dr.dev_id = index;
+ 
 
---------------020204030209010708080903--
+--------------000300040701050206070203--
