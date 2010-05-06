@@ -1,83 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Elvis=20Pf=C3=BCtzenreuter?= <epx@signove.com>
+MIME-Version: 1.0
+In-Reply-To: <1273119951.22838.298.camel@localhost.localdomain>
+References: <h2q995d6c6b1005051457y48748e8am16cb509bd7b6d969@mail.gmail.com>
+	 <20100505223214.GA3699@jh-x301>
+	 <1273119951.22838.298.camel@localhost.localdomain>
+Date: Thu, 6 May 2010 11:13:02 -0700
+Message-ID: <v2g995d6c6b1005061113w80fb99fag5af6d8e25cf99229@mail.gmail.com>
+Subject: Re: choosing SCO parameters at run time
+From: takeiteasy <pdatta17@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: epx@signove.com
-Subject: [PATCH] Changed MDP profile name and macros to HDP
-Date: Thu,  6 May 2010 17:38:38 -0300
-Message-Id: <1273178318-10490-1-git-send-email-epx@signove.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- lib/sdp.c       |    6 +++---
- lib/sdp.h       |   12 ++++++------
- tools/sdptool.c |    6 +++---
- 3 files changed, 12 insertions(+), 12 deletions(-)
+On Wed, May 5, 2010 at 9:25 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Johan,
+>
+>> > I have a question related to SCO packet path configuration for
+>> > Bluetooth HSP/HFP profiles. As I understand,
+>> > we need to use SCO routing option in etc/bluetooth/audio.conf to
+>> > select the voice path to be over HCI or PCM.
+>> > It seems the option is configured at the init time.Can I select PCM or
+>> > HCI routing at runtime?
+>>
+>> That variable isn't intended to trigger a SCO routing change but to
+>> simply tell BlueZ & Pulse Audio (or whatever audio subsystem you use)
+>> what the hardware platforms configuration is. I.e. the actual routing of
+>> your bluetooth controller needs to be configured separately (and afaik
+>> there's no standard HCI command through which it could be done which
+>> further promotes the idea that BlueZ shouldn't have any code for it).
+>
+> in theory this is possible and I know of a few chips that can change the
+> routing before establishing the SCO link. However this is all highly
+> vendor specific and needs extensive kernel and driver support.
+>
+> So while possible, I haven't seen it in practice at all. Especially with
+> modern chips supports more than one SCO over PCM.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
 
-diff --git a/lib/sdp.c b/lib/sdp.c
-index aa22c63..ca3b4c4 100644
---- a/lib/sdp.c
-+++ b/lib/sdp.c
-@@ -201,9 +201,9 @@ static struct tupla ServiceClass[] = {
- 	{ VIDEO_SOURCE_SVCLASS_ID,		"Video Source"			},
- 	{ VIDEO_SINK_SVCLASS_ID,		"Video Sink"			},
- 	{ VIDEO_DISTRIBUTION_SVCLASS_ID,	"Video Distribution"		},
--	{ MDP_SVCLASS_ID,			"MDP"				},
--	{ MDP_SOURCE_SVCLASS_ID,		"MDP Source"			},
--	{ MDP_SINK_SVCLASS_ID,			"MDP Sink"			},
-+	{ HDP_SVCLASS_ID,			"HDP"				},
-+	{ HDP_SOURCE_SVCLASS_ID,		"HDP Source"			},
-+	{ HDP_SINK_SVCLASS_ID,			"HDP Sink"			},
- 	{ APPLE_AGENT_SVCLASS_ID,		"Apple Agent"			},
- 	{ 0 }
- };
-diff --git a/lib/sdp.h b/lib/sdp.h
-index 5b2901f..9c15ace 100644
---- a/lib/sdp.h
-+++ b/lib/sdp.h
-@@ -140,9 +140,9 @@ extern "C" {
- #define VIDEO_SOURCE_SVCLASS_ID		0x1303
- #define VIDEO_SINK_SVCLASS_ID		0x1304
- #define VIDEO_DISTRIBUTION_SVCLASS_ID	0x1305
--#define MDP_SVCLASS_ID			0x1400
--#define MDP_SOURCE_SVCLASS_ID		0x1401
--#define MDP_SINK_SVCLASS_ID		0x1402
-+#define HDP_SVCLASS_ID			0x1400
-+#define HDP_SOURCE_SVCLASS_ID		0x1401
-+#define HDP_SINK_SVCLASS_ID		0x1402
- #define APPLE_AGENT_SVCLASS_ID		0x2112
- 
- /*
-@@ -212,9 +212,9 @@ extern "C" {
- #define VIDEO_SOURCE_PROFILE_ID		VIDEO_SOURCE_SVCLASS_ID
- #define VIDEO_SINK_PROFILE_ID		VIDEO_SINK_SVCLASS_ID
- #define VIDEO_DISTRIBUTION_PROFILE_ID	VIDEO_DISTRIBUTION_SVCLASS_ID
--#define MDP_PROFILE_ID			MDP_SVCLASS_ID
--#define MDP_SOURCE_PROFILE_ID		MDP_SROUCE_SVCLASS_ID
--#define MDP_SINK_PROFILE_ID		MDP_SINK_SVCLASS_ID
-+#define HDP_PROFILE_ID			HDP_SVCLASS_ID
-+#define HDP_SOURCE_PROFILE_ID		HDP_SROUCE_SVCLASS_ID
-+#define HDP_SINK_PROFILE_ID		HDP_SINK_SVCLASS_ID
- #define APPLE_AGENT_PROFILE_ID		APPLE_AGENT_SVCLASS_ID
- 
- /*
-diff --git a/tools/sdptool.c b/tools/sdptool.c
-index 89166ae..1de53e8 100644
---- a/tools/sdptool.c
-+++ b/tools/sdptool.c
-@@ -322,9 +322,9 @@ static struct uuid_def uuid16_names[] = {
- 	{ 0x1303, "VideoSource", NULL, 0 },
- 	{ 0x1304, "VideoSink", NULL, 0 },
- 	{ 0x1305, "VideoDistribution", NULL, 0 },
--	{ 0x1400, "MDP", NULL, 0 },
--	{ 0x1401, "MDPSource", NULL, 0 },
--	{ 0x1402, "MDPSink", NULL, 0 },
-+	{ 0x1400, "HDP", NULL, 0 },
-+	{ 0x1401, "HDPSource", NULL, 0 },
-+	{ 0x1402, "HDPSink", NULL, 0 },
- 	{ 0x2112, "AppleAgent", NULL, 0 },
- };
- 
--- 
-1.7.0.4
+Hi,
 
+We know we can change the routing in hardware (over pcm/hci) but still
+we want to know
+if we can get a provision/interface in the stack to change this
+particular variable dynamically.
+If we need to do it ourselves, is it appropriate to put the dbus based
+call in headset.c (or)
+do we need to take care in other places?
+
+regards
