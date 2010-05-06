@@ -1,19 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <987394.67247.qm@web94902.mail.in2.yahoo.com>
-Date: Fri, 7 May 2010 03:34:42 +0530 (IST)
-From: Pavan Savoy <pavan_savoy@yahoo.co.in>
-Subject: multiple HCI_UART protocols over hci_ldisc
+From: =?UTF-8?q?Elvis=20Pf=C3=BCtzenreuter?= <epx@signove.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>, maxk@qualcomm.com
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Cc: epx@signove.com
+Subject: [PATCH v2] Change MDP profile name and macros to HDP
+Date: Thu,  6 May 2010 18:20:43 -0300
+Message-Id: <1273180843-4847-1-git-send-email-epx@signove.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,=0A=0AI am working on a line discipline which in many respects is=
- similar to the hci_ldisc, but only extended to do plenty of other function=
-ality.=0A=0AOne road block which i have hit is to support multiple devices/=
-or as Alan Cox puts it "avoid single device limits"=0A=0ASo, in somewhat re=
-lation to this, I wanted to ask, If in a system I have 2 UARTs both connect=
-ed to BT chips but only from different vendors say TI/HCI-Ll and broadcomm =
-with BCSP .. =0A=0ACan I have those 2 protocols on top of HCI-ldisc on diff=
-erent UARTs at the same time?=0AIs something like that feasible?=0A=0A
+---
+ lib/sdp.c       |    6 +++---
+ lib/sdp.h       |   18 ++++++++++++------
+ tools/sdptool.c |    6 +++---
+ 3 files changed, 18 insertions(+), 12 deletions(-)
+
+diff --git a/lib/sdp.c b/lib/sdp.c
+index aa22c63..ca3b4c4 100644
+--- a/lib/sdp.c
++++ b/lib/sdp.c
+@@ -201,9 +201,9 @@ static struct tupla ServiceClass[] = {
+ 	{ VIDEO_SOURCE_SVCLASS_ID,		"Video Source"			},
+ 	{ VIDEO_SINK_SVCLASS_ID,		"Video Sink"			},
+ 	{ VIDEO_DISTRIBUTION_SVCLASS_ID,	"Video Distribution"		},
+-	{ MDP_SVCLASS_ID,			"MDP"				},
+-	{ MDP_SOURCE_SVCLASS_ID,		"MDP Source"			},
+-	{ MDP_SINK_SVCLASS_ID,			"MDP Sink"			},
++	{ HDP_SVCLASS_ID,			"HDP"				},
++	{ HDP_SOURCE_SVCLASS_ID,		"HDP Source"			},
++	{ HDP_SINK_SVCLASS_ID,			"HDP Sink"			},
+ 	{ APPLE_AGENT_SVCLASS_ID,		"Apple Agent"			},
+ 	{ 0 }
+ };
+diff --git a/lib/sdp.h b/lib/sdp.h
+index 5b2901f..f31e654 100644
+--- a/lib/sdp.h
++++ b/lib/sdp.h
+@@ -140,9 +140,12 @@ extern "C" {
+ #define VIDEO_SOURCE_SVCLASS_ID		0x1303
+ #define VIDEO_SINK_SVCLASS_ID		0x1304
+ #define VIDEO_DISTRIBUTION_SVCLASS_ID	0x1305
+-#define MDP_SVCLASS_ID			0x1400
+-#define MDP_SOURCE_SVCLASS_ID		0x1401
+-#define MDP_SINK_SVCLASS_ID		0x1402
++#define HDP_SVCLASS_ID			0x1400
++#define MDP_SVCLASS_ID			HDP_SVCLASS_ID
++#define HDP_SOURCE_SVCLASS_ID		0x1401
++#define MDP_SOURCE_SVCLASS_ID		HDP_SOURCE_SVCLASS_ID
++#define HDP_SINK_SVCLASS_ID		0x1402
++#define MDP_SINK_SVCLASS_ID		HDP_SINK_SVCLASS_ID
+ #define APPLE_AGENT_SVCLASS_ID		0x2112
+ 
+ /*
+@@ -212,9 +215,12 @@ extern "C" {
+ #define VIDEO_SOURCE_PROFILE_ID		VIDEO_SOURCE_SVCLASS_ID
+ #define VIDEO_SINK_PROFILE_ID		VIDEO_SINK_SVCLASS_ID
+ #define VIDEO_DISTRIBUTION_PROFILE_ID	VIDEO_DISTRIBUTION_SVCLASS_ID
+-#define MDP_PROFILE_ID			MDP_SVCLASS_ID
+-#define MDP_SOURCE_PROFILE_ID		MDP_SROUCE_SVCLASS_ID
+-#define MDP_SINK_PROFILE_ID		MDP_SINK_SVCLASS_ID
++#define HDP_PROFILE_ID			HDP_SVCLASS_ID
++#define MDP_PROFILE_ID			HDP_PROFILE_ID
++#define HDP_SOURCE_PROFILE_ID		HDP_SOURCE_SVCLASS_ID
++#define MDP_SOURCE_PROFILE_ID		HDP_SOURCE_PROFILE_ID
++#define HDP_SINK_PROFILE_ID		HDP_SINK_SVCLASS_ID
++#define MDP_SINK_PROFILE_ID		HDP_SINK_PROFILE_ID
+ #define APPLE_AGENT_PROFILE_ID		APPLE_AGENT_SVCLASS_ID
+ 
+ /*
+diff --git a/tools/sdptool.c b/tools/sdptool.c
+index 89166ae..1de53e8 100644
+--- a/tools/sdptool.c
++++ b/tools/sdptool.c
+@@ -322,9 +322,9 @@ static struct uuid_def uuid16_names[] = {
+ 	{ 0x1303, "VideoSource", NULL, 0 },
+ 	{ 0x1304, "VideoSink", NULL, 0 },
+ 	{ 0x1305, "VideoDistribution", NULL, 0 },
+-	{ 0x1400, "MDP", NULL, 0 },
+-	{ 0x1401, "MDPSource", NULL, 0 },
+-	{ 0x1402, "MDPSink", NULL, 0 },
++	{ 0x1400, "HDP", NULL, 0 },
++	{ 0x1401, "HDPSource", NULL, 0 },
++	{ 0x1402, "HDPSink", NULL, 0 },
+ 	{ 0x2112, "AppleAgent", NULL, 0 },
+ };
+ 
+-- 
+1.7.0.4
+
