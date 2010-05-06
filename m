@@ -1,44 +1,19 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 6 May 2010 23:51:20 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Elvis =?iso-8859-1?Q?Pf=FCtzenreuter?= <epx@signove.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
 Subject: Re: [PATCH] Changed MDP profile name and macros to HDP
-From: Nathan Holstein <ngh@isomerica.net>
-Reply-To: ngh@isomerica.net
-To: linux-bluetooth@vger.kernel.org
-Cc: epx@signove.com
-In-Reply-To: <1273178318-10490-1-git-send-email-epx@signove.com>
+Message-ID: <20100506205120.GA10204@jh-x301>
 References: <1273178318-10490-1-git-send-email-epx@signove.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Thu, 06 May 2010 16:51:30 -0400
-Message-Id: <1273179090.8329.21.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1273178318-10490-1-git-send-email-epx@signove.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2010-05-06 at 17:38 -0300, Elvis Pfützenreuter wrote:
-> ---
->  lib/sdp.c       |    6 +++---
->  lib/sdp.h       |   12 ++++++------
->  tools/sdptool.c |    6 +++---
->  3 files changed, 12 insertions(+), 12 deletions(-)
-> 
-> diff --git a/lib/sdp.c b/lib/sdp.c
-> index aa22c63..ca3b4c4 100644
-> --- a/lib/sdp.c
-> +++ b/lib/sdp.c
-> @@ -201,9 +201,9 @@ static struct tupla ServiceClass[] = {
->  	{ VIDEO_SOURCE_SVCLASS_ID,		"Video Source"			},
->  	{ VIDEO_SINK_SVCLASS_ID,		"Video Sink"			},
->  	{ VIDEO_DISTRIBUTION_SVCLASS_ID,	"Video Distribution"		},
-> -	{ MDP_SVCLASS_ID,			"MDP"				},
-> -	{ MDP_SOURCE_SVCLASS_ID,		"MDP Source"			},
-> -	{ MDP_SINK_SVCLASS_ID,			"MDP Sink"			},
-> +	{ HDP_SVCLASS_ID,			"HDP"				},
-> +	{ HDP_SOURCE_SVCLASS_ID,		"HDP Source"			},
-> +	{ HDP_SINK_SVCLASS_ID,			"HDP Sink"			},
->  	{ APPLE_AGENT_SVCLASS_ID,		"Apple Agent"			},
->  	{ 0 }
->  };
-> diff --git a/lib/sdp.h b/lib/sdp.h
-> index 5b2901f..9c15ace 100644
+Hi Elvis,
+
+On Thu, May 06, 2010, Elvis Pf�tzenreuter wrote:
 > --- a/lib/sdp.h
 > +++ b/lib/sdp.h
 > @@ -140,9 +140,9 @@ extern "C" {
@@ -63,32 +38,18 @@ On Thu, 2010-05-06 at 17:38 -0300, Elvis Pfützenreuter wrote:
 > -#define MDP_SINK_PROFILE_ID		MDP_SINK_SVCLASS_ID
 > +#define HDP_PROFILE_ID			HDP_SVCLASS_ID
 > +#define HDP_SOURCE_PROFILE_ID		HDP_SROUCE_SVCLASS_ID
-
-Careful...there's a typo here from old versions of Bluez.  This should
-be "HDP_SOURCE_SVCLASS_ID" not "HDP_SROUCE_SVCLASS_ID".
-
 > +#define HDP_SINK_PROFILE_ID		HDP_SINK_SVCLASS_ID
 >  #define APPLE_AGENT_PROFILE_ID		APPLE_AGENT_SVCLASS_ID
->  
->  /*
-> diff --git a/tools/sdptool.c b/tools/sdptool.c
-> index 89166ae..1de53e8 100644
-> --- a/tools/sdptool.c
-> +++ b/tools/sdptool.c
-> @@ -322,9 +322,9 @@ static struct uuid_def uuid16_names[] = {
->  	{ 0x1303, "VideoSource", NULL, 0 },
->  	{ 0x1304, "VideoSink", NULL, 0 },
->  	{ 0x1305, "VideoDistribution", NULL, 0 },
-> -	{ 0x1400, "MDP", NULL, 0 },
-> -	{ 0x1401, "MDPSource", NULL, 0 },
-> -	{ 0x1402, "MDPSink", NULL, 0 },
-> +	{ 0x1400, "HDP", NULL, 0 },
-> +	{ 0x1401, "HDPSource", NULL, 0 },
-> +	{ 0x1402, "HDPSink", NULL, 0 },
->  	{ 0x2112, "AppleAgent", NULL, 0 },
->  };
 
+Thanks for the patch!
 
+Since this essentially breaks the library API we should probably
+consider leaving the MDP defines there as "synonyms" and then just add
+the HDP defines with the same values. However I'll leave it for Marcel
+to decide how important this non-breakage is.
 
-    --nathan
+Btw, the commit message summary line should be in the form "Change ..."
+or "Fix ..." (not "Changed ...") to be consistent with the rest of the
+commit history.
 
+Johan
