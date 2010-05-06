@@ -2,142 +2,92 @@ Return-Path: <cyrus@holtmann.org>
 From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Subject: [PATCH 4/6] Remove extra spaces in test dir
-Date: Fri,  7 May 2010 00:27:10 +0200
-Message-Id: <1273184832-8265-4-git-send-email-santoscadenas@gmail.com>
+Subject: [PATCH 3/6] Remove extra spaces from sdpd-request.c
+Date: Fri,  7 May 2010 00:27:09 +0200
+Message-Id: <1273184832-8265-3-git-send-email-santoscadenas@gmail.com>
 In-Reply-To: <1273184832-8265-1-git-send-email-santoscadenas@gmail.com>
 References: <1273184832-8265-1-git-send-email-santoscadenas@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- test/hciemu.c        |    6 +++---
- test/hstest.c        |    2 +-
- test/rctest.c        |   10 +++++-----
- test/scotest.c       |    2 +-
- test/test-textfile.c |    4 ++--
- 5 files changed, 12 insertions(+), 12 deletions(-)
+ src/sdpd-request.c |   18 +++++++++---------
+ 1 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/test/hciemu.c b/test/hciemu.c
-index 457add4..a20374f 100644
---- a/test/hciemu.c
-+++ b/test/hciemu.c
-@@ -295,7 +295,7 @@ static void command_complete(uint16_t ogf, uint16_t ocf, int plen, void *data)
- 	he = (void *) ptr; ptr += HCI_EVENT_HDR_SIZE;
+diff --git a/src/sdpd-request.c b/src/sdpd-request.c
+index 88d0afa..a8af8e4 100644
+--- a/src/sdpd-request.c
++++ b/src/sdpd-request.c
+@@ -98,7 +98,7 @@ struct attrid {
  
- 	he->evt  = EVT_CMD_COMPLETE;
--	he->plen = EVT_CMD_COMPLETE_SIZE + plen; 
-+	he->plen = EVT_CMD_COMPLETE_SIZE + plen;
+ /*
+  * Generic data element sequence extractor. Builds
+- * a list whose elements are those found in the 
++ * a list whose elements are those found in the
+  * sequence. The data type of elements found in the
+  * sequence is returned in the reference pDataType
+  */
+@@ -301,8 +301,8 @@ static int sdp_cstate_get(uint8_t *buffer, size_t len,
+  * specified in the "search pattern" must be present in the
+  * "target pattern". Here "search pattern" is the set of UUIDs
+  * specified by the service discovery client and "target pattern"
+- * is the set of UUIDs present in a service record. 
+- * 
++ * is the set of UUIDs present in a service record.
++ *
+  * Return 1 if each and every UUID in the search
+  * pattern exists in the target pattern, 0 if the
+  * match succeeds and -1 on error.
+@@ -420,7 +420,7 @@ static int service_search_req(sdp_req_t *req, sdp_buf_t *buf)
+ 			sdp_record_t *rec = (sdp_record_t *) list->data;
  
- 	cc = (void *) ptr; ptr += EVT_CMD_COMPLETE_SIZE;
- 
-@@ -327,7 +327,7 @@ static void connect_request(struct vhci_conn *conn)
- 	he = (void *) ptr; ptr += HCI_EVENT_HDR_SIZE;
- 
- 	he->evt  = EVT_CONN_REQUEST;
--	he->plen = EVT_CONN_REQUEST_SIZE; 
-+	he->plen = EVT_CONN_REQUEST_SIZE;
- 
- 	cr = (void *) ptr; ptr += EVT_CONN_REQUEST_SIZE;
- 
-@@ -355,7 +355,7 @@ static void connect_complete(struct vhci_conn *conn)
- 	he = (void *) ptr; ptr += HCI_EVENT_HDR_SIZE;
- 
- 	he->evt  = EVT_CONN_COMPLETE;
--	he->plen = EVT_CONN_COMPLETE_SIZE; 
-+	he->plen = EVT_CONN_COMPLETE_SIZE;
- 
- 	cc = (void *) ptr; ptr += EVT_CONN_COMPLETE_SIZE;
- 
-diff --git a/test/hstest.c b/test/hstest.c
-index f24bc33..08f2257 100644
---- a/test/hstest.c
-+++ b/test/hstest.c
-@@ -277,7 +277,7 @@ int main(int argc, char *argv[])
- 					case PLAY:
- 						rlen = read(fd, buf, rlen);
- 
--						wlen = 0; 
-+						wlen = 0;
- 						p = buf;
- 						while (rlen > sco_mtu) {
- 						        wlen += write(sd, p, sco_mtu);
-diff --git a/test/rctest.c b/test/rctest.c
-index a938a54..b3804f5 100644
---- a/test/rctest.c
-+++ b/test/rctest.c
-@@ -436,7 +436,7 @@ static void recv_mode(int sk)
- 				if (r < 0)
- 					syslog(LOG_ERR, "Read failed: %s (%d)",
- 							strerror(errno), errno);
--				return;	
-+				return;
- 			}
- 
- 			if (timestamp) {
-@@ -459,15 +459,15 @@ static void recv_mode(int sk)
- 				seq = sq;
- 			}
- 			seq++;
--			
+ 			SDPDBG("Checking svcRec : 0x%x", rec->handle);
+-				
 +
- 			/* Check length */
- 			l = btohs(*(uint16_t *) (buf + 4));
- 			if (r != l) {
- 				syslog(LOG_INFO, "size missmatch: %d -> %d", r, l);
- 				continue;
+ 			if (sdp_match_uuid(pattern, rec->pattern) > 0 &&
+ 					sdp_check_access(rec->handle, &req->device)) {
+ 				rsp_count++;
+@@ -429,7 +429,7 @@ static int service_search_req(sdp_req_t *req, sdp_buf_t *buf)
+ 				handleSize += sizeof(uint32_t);
  			}
--			
--			/* Verify data */	
-+
-+			/* Verify data */
- 			for (i = 6; i < r; i++) {
- 				if (buf[i] != 0x7f)
- 					syslog(LOG_INFO, "data missmatch: byte %d 0x%2.2x", i, buf[i]);
-@@ -511,7 +511,7 @@ static void do_send(int sk)
- 		*(uint32_t *) buf = htobl(seq);
- 		*(uint16_t *) (buf + 4) = htobs(data_size);
- 		seq++;
+ 		}
 -		
 +
- 		if (send(sk, buf, data_size, 0) <= 0) {
- 			syslog(LOG_ERR, "Send failed: %s (%d)",
- 							strerror(errno), errno);
-diff --git a/test/scotest.c b/test/scotest.c
-index a3d3ed2..50b622a 100644
---- a/test/scotest.c
-+++ b/test/scotest.c
-@@ -230,7 +230,7 @@ static void recv_mode(int sk)
- 				if (r < 0)
- 					syslog(LOG_ERR, "Read failed: %s (%d)",
- 							strerror(errno), errno);
--				return;	
-+				return;
- 			}
- 			total += r;
+ 		SDPDBG("Match count: %d", rsp_count);
+ 
+ 		buf->data_size += handleSize;
+@@ -525,7 +525,7 @@ static int service_search_req(sdp_req_t *req, sdp_buf_t *buf)
  		}
-diff --git a/test/test-textfile.c b/test/test-textfile.c
-index ab2f513..970e9e7 100644
---- a/test/test-textfile.c
-+++ b/test/test-textfile.c
-@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
+ 	}
  
+-done:	
++done:
+ 	if (cstate)
+ 		free(cstate);
+ 	if (pattern)
+@@ -684,11 +684,11 @@ static int service_attr_req(sdp_req_t *req, sdp_buf_t *buf)
+ 	SDPDBG("SvcRecHandle : 0x%x", handle);
+ 	SDPDBG("max_rsp_size : %d", max_rsp_size);
  
- 	sprintf(key, "00:00:00:00:00:00");
--	if (textfile_del(filename, key) < 0) 
-+	if (textfile_del(filename, key) < 0)
- 		fprintf(stderr, "%s (%d)\n", strerror(errno), errno);
+-	/* 
++	/*
+ 	 * Calculate Attribute size acording to MTU
+ 	 * We can send only (MTU - sizeof(sdp_pdu_hdr_t) - sizeof(sdp_cont_state_t))
+ 	 */
+-	max_rsp_size = MIN(max_rsp_size, req->mtu - sizeof(sdp_pdu_hdr_t) - 
++	max_rsp_size = MIN(max_rsp_size, req->mtu - sizeof(sdp_pdu_hdr_t) -
+ 			sizeof(uint32_t) - SDP_CONT_STATE_SIZE - sizeof(uint16_t));
  
- 	memset(value, 0, sizeof(value));
-@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
- 	if (textfile_put(filename, key, value) < 0)
- 		fprintf(stderr, "%s (%d)\n", strerror(errno), errno);
+ 	/* pull header for AttributeList byte count */
+@@ -840,7 +840,7 @@ static int service_search_attr_req(sdp_req_t *req, sdp_buf_t *buf)
+ 	tmpbuf.buf_size = USHRT_MAX;
+ 	memset(tmpbuf.data, 0, USHRT_MAX);
  
--	if (textfile_del(filename, key) < 0) 
-+	if (textfile_del(filename, key) < 0)
- 		fprintf(stderr, "%s (%d)\n", strerror(errno), errno);
- 
- 	str = textfile_get(filename, key);
+-	/* 
++	/*
+ 	 * Calculate Attribute size acording to MTU
+ 	 * We can send only (MTU - sizeof(sdp_pdu_hdr_t) - sizeof(sdp_cont_state_t))
+ 	 */
 -- 
 1.7.0.4
 
