@@ -1,46 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <4BE270EE.5080306@greffrath.com>
-References: <p2q793f89501005052222u4393c8dfhb55bea4454c454b9@mail.gmail.com>
-	 <4BE270EE.5080306@greffrath.com>
-Date: Thu, 6 May 2010 12:56:19 +0300
-Message-ID: <u2z793f89501005060256g3eb32a09ncff16e8e454bdcc@mail.gmail.com>
-Subject: Re: [bugreport]
-From: Serhiy Kachaniuk <serzholino@gmail.com>
+From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Cc: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+Subject: [PATCH] MCAP: Added default abort callback
+Date: Thu,  6 May 2010 10:21:43 +0200
+Message-Id: <1273134103-9592-1-git-send-email-santoscadenas@gmail.com>
+In-Reply-To: <1272962595-4108-1-git-send-email-sancane@gmail.com>
+References: <1272962595-4108-1-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-2010/5/6 Fabian Greffrath:
-> Could you please post the output of 'sudo hciconfig -a'? I am especially
-> interested in the Name part.
->
-For bluez version 4.60 (I'm at work now, i have 4.64 version only at home):
-hci0:   Type: USB
-       BD Address: 00:1A:7D:0A:C8:8A ACL MTU: 377:10 SCO MTU: 16:0
-       UP RUNNING
-       RX bytes:664 acl:0 sco:0 events:18 errors:0
-       TX bytes:73 acl:0 sco:0 commands:19 errors:0
-       Features: 0xff 0xff 0x0d 0x38 0x08 0x08 0x00 0x00
-       Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-       Link policy:
-       Link mode: SLAVE ACCEPT
-Can't read local name on hci0: Connection timed out (110)
+Also check if mcl was closed during a callback
+---
+ mcap/mcap.c |   19 ++++++++++++-------
+ 1 files changed, 12 insertions(+), 7 deletions(-)
 
-And for 4.32:
-hci0:   Type: USB
-       BD Address: 00:1A:7D:0A:C8:8A ACL MTU: 377:10 SCO MTU: 16:0
-       UP RUNNING PSCAN
-       RX bytes:1362 acl:0 sco:0 events:46 errors:0
-       TX bytes:693 acl:0 sco:0 commands:47 errors:0
-       Features: 0xff 0xff 0x0d 0x38 0x08 0x08 0x00 0x00
-       Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-       Link policy:
-       Link mode: SLAVE ACCEPT
-       Name: 'Broadcom BCM2035'
-       Class: 0x0a0100
-       Service Classes: Networking, Capturing
-       Device Class: Computer, Uncategorized
-       HCI Ver: 1.1 (0x1) HCI Rev: 0x3 LMP Ver: 1.1 (0x1) LMP Subver: 0x800
-       Manufacturer: Broadcom Corporation (15)
+diff --git a/mcap/mcap.c b/mcap/mcap.c
+index 5068054..404d7be 100644
+--- a/mcap/mcap.c
++++ b/mcap/mcap.c
+@@ -183,6 +183,10 @@ static void default_mdl_deleted_cb(struct mcap_mdl *mdl, gpointer data)
+ {
+ 	debug("MCAP Unmanaged mdl deleted");
+ }
++static void default_mdl_aborted_cb(struct mcap_mdl *mdl, gpointer data)
++{
++	debug("MCAP Unmanaged mdl aborted");
++}
+ static uint8_t default_mdl_conn_req_cb(struct mcap_mcl *mcl,
+ 						uint8_t mdepid, uint16_t mdlid,
+ 						uint8_t *conf, gpointer data)
+@@ -207,6 +211,7 @@ static void set_default_cb(struct mcap_mcl *mcl)
+ 	mcl->cb->mdl_connected = default_mdl_connected_cb;
+ 	mcl->cb->mdl_closed = default_mdl_closed_cb;
+ 	mcl->cb->mdl_deleted = default_mdl_deleted_cb;
++	mcl->cb->mdl_aborted = default_mdl_aborted_cb;
+ 	mcl->cb->mdl_conn_req = default_mdl_conn_req_cb;
+ 	mcl->cb->mdl_reconn_req = default_mdl_reconn_req_cb;
+ }
+@@ -1045,11 +1050,13 @@ static void process_md_create_mdl_req(struct mcap_mcl *mcl, uint8_t *cmd, uint32
+ 	/* Callback to upper layer */
+ 	rsp = mcl->cb->mdl_conn_req(mcl, mdep_id, mdl_id, &conf,
+ 							mcl->cb->user_data);
++	if (mcl->state == MCL_IDLE)
++		return;
+ 
+ 	if ((cfga != 0) && (cfga != conf)) {
+ 		/* Remote device set default configuration but upper profile */
+ 		/* has changed it. Protocol Error: force closing the MCL by */
+-		/* using remote device using UNESPECIFIED_ERROR response */
++		/* remote device using UNESPECIFIED_ERROR response */
+ 		send4B_cmd(mcl, MCAP_MD_CREATE_MDL_RSP, MCAP_UNESPECIFIED_ERROR,
+ 								mdl_id);
+ 		return;
+@@ -1102,6 +1109,9 @@ static void process_md_reconnect_mdl_req(struct mcap_mcl *mcl, uint8_t *cmd,
+ 
+ 	/* Callback to upper layer */
+ 	rsp = mcl->cb->mdl_reconn_req(mdl, mcl->cb->user_data);
++	if (mcl->state == MCL_IDLE)
++		return;
++
+ 	if (rsp != MCAP_SUCCESS) {
+ 		send4B_cmd(mcl, MCAP_MD_CREATE_MDL_RSP, rsp, mdl_id);
+ 		return;
+@@ -1734,12 +1744,7 @@ static gboolean mcl_control_cb(GIOChannel *chan, GIOCondition cond, gpointer dat
+ 	int sk, len;
+ 	uint8_t buf[MCAP_CC_MTU];
+ 
+-	if (cond & G_IO_NVAL) {
+-		error("Revise G_IO_NVAL");
+-		goto fail;
+-	}
+-
+-	if (cond & (G_IO_ERR | G_IO_HUP))
++	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL))
+ 		goto fail;
+ 
+ 	sk = g_io_channel_unix_get_fd(chan);
+-- 
+1.7.0.4
+
