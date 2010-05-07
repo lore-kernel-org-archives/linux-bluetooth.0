@@ -1,47 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?iso-8859-1?q?Jos=E9_Antonio_Santos_Cadenas?= <santoscadenas@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Subject: Re: [PATCH 6/6] Change end of line from DOS to UNIX
-Date: Fri, 7 May 2010 10:15:44 +0200
-Cc: linux-bluetooth@vger.kernel.org,
- marcel@holtmann.org
-References: <1273184832-8265-1-git-send-email-santoscadenas@gmail.com> <1273184832-8265-6-git-send-email-santoscadenas@gmail.com> <20100506225633.GA15821@jh-x301>
-In-Reply-To: <20100506225633.GA15821@jh-x301>
+Message-ID: <4BE39B28.2070504@atheros.com>
+Date: Fri, 7 May 2010 10:16:32 +0530
+From: Suraj Sumangala <suraj@atheros.com>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201005071015.44774.santoscadenas@gmail.com>
+To: Pavan Savoy <pavan_savoy@yahoo.co.in>
+CC: Max Krasnyansky <maxk@qualcomm.com>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: multiple HCI_UART protocols over hci_ldisc
+References: <549642.78851.qm@web94902.mail.in2.yahoo.com>
+In-Reply-To: <549642.78851.qm@web94902.mail.in2.yahoo.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-El Friday 07 May 2010 00:56:33 Johan Hedberg escribi=F3:
-> Hi,
->=20
-> On Fri, May 07, 2010, Jose Antonio Santos Cadenas wrote:
-> > Files tools/ubcsp.c and tools/ubcsp.h had DOS end of line now they
-> > are changed to UNIX end of line
-> > ---
-> >  tools/ubcsp.c | 2360 ++++++++++++++++++++++++++++---------------------=
-=2D------
-> >  tools/ubcsp.h |  414 +++++-----
-> >  2 files changed, 1387 insertions(+), 1387 deletions(-)
->=20
-> Thanks for these cleanup patches. I've pushed the first five upstream
-> but am a little bit hesitant about this sixth one since it essentially
-> replaces every line in the existing file and I'm not sure if it's worth
-> having that obfuscating the commit history (e.g. git blame wouldn't be
-> useful anymore). Marcel, do you have any opinion about having a patch
-> like that in the tree?
+Hi pavan,
 
-That's what I put this in a separate patch. I just wanted to note that some=
- files had this=20
-end of line. One of them had also some lines with DOS end fo line and other=
-s with UNIX eol.
-
->=20
-> Johan
+Pavan Savoy wrote:
+> Max,
+> 
+> --- On Fri, 7/5/10, Max Krasnyansky <maxk@qualcomm.com> wrote:
+> 
+>> From: Max Krasnyansky <maxk@qualcomm.com>
+>> Subject: Re: multiple HCI_UART protocols over hci_ldisc
+>> To: "Pavan Savoy" <pavan_savoy@yahoo.co.in>
+>> Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, "Marcel Holtmann" <marcel@holtmann.org>
+>> Date: Friday, 7 May, 2010, 4:00 AM
+>> On 05/06/2010 03:04 PM, Pavan Savoy
+>> wrote:
+>>> Hi Marcel,
+>>>
+>>> I am working on a line discipline which in many
+>> respects is similar to the hci_ldisc, but only extended to
+>> do plenty of other functionality.
+>>> One road block which i have hit is to support multiple
+>> devices/or as Alan Cox puts it "avoid single device limits"
+>>> So, in somewhat relation to this, I wanted to ask, If
+>> in a system I have 2 UARTs both connected to BT chips but
+>> only from different vendors say TI/HCI-Ll and broadcomm with
+>> BCSP ..
+>>> Can I have those 2 protocols on top of HCI-ldisc on
+>> different UARTs at the same time?
+>>> Is something like that feasible?
+>> Sure. You'll get two separate HCI devices in that case.
+> 
+> But there seems to be only 1,
+> static struct hci_uart_proto *hup[HCI_UART_MAX_PROTO];
+> int hci_uart_register_proto(struct hci_uart_proto *p)
+> {
+>         if (p->id >= HCI_UART_MAX_PROTO)
+>                 return -EINVAL;
+> 
+>         if (hup[p->id])
+>                 return -EEXIST;
+> 
+>         hup[p->id] = p;
+> 
+>         return 0;
+> }
+> 
+> So, If suppose I have 2 UARTs both on which HCI-Ldisc exists, and I try say HCI-LL on both, Now won't I get a -EEXIST for the 2nd HCI-LL ?
+> 
+> I am a bit confused, can you explain in brief ?
+> Is there a possibility of copies of *hup[HCI_UART_MAX_PROTO] for each UART?
+> 
+>> Max
+>>
+> 
+> 
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-" in
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
 > the body of a message to majordomo@vger.kernel.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
->=20
+
+The call "hci_uart_register_proto()" is used to register each protocol, 
+not each device.
+
+Each protocol calls this API to register themselves during module load, 
+and will be called only once for each protocol during the module's lifetime.
+
+Checkout the functions under #ifdef inside "hci_uart_init()". each of 
+them will be calling "hci_uart_register_proto()" to register themselves.
+
+Whenever you attach a UART BT device, "hci_uart_set_proto()" will be 
+called and this will be responsible for creating an hci device, Not 
+"hci_uart_register_proto()"
+
+Regards
+Suraj
