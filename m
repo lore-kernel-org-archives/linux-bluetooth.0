@@ -1,41 +1,257 @@
 Return-Path: <cyrus@holtmann.org>
+From: =?iso-8859-1?q?Jos=E9_Antonio_Santos_Cadenas?=
+	<jcaden@libresoft.es>
+Reply-To: jcaden@libresoft.es
+To: Elvis =?iso-8859-1?q?Pf=FCtzenreuter?= <epx@signove.com>
+Subject: Re: HDP proposed api (ver 0.2)
+Date: Fri, 7 May 2010 13:26:11 +0200
+Cc: linux-bluetooth@vger.kernel.org
+References: <201005051255.09394.jcaden@libresoft.es> <201005071207.52723.jcaden@libresoft.es> <201005071324.01531.jcaden@libresoft.es>
+In-Reply-To: <201005071324.01531.jcaden@libresoft.es>
 MIME-Version: 1.0
-Date: Fri, 7 May 2010 07:59:38 -0400
-Message-ID: <s2sf97b2b971005070459z83446366pd640d4345eda23d7@mail.gmail.com>
-Subject: MAC ADDRESS CHANGE
-From: Ahmed Ragab <elmasri.ahmed@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201005071326.12032.jcaden@libresoft.es>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+El Friday 07 May 2010 13:24:01 José Antonio Santos Cadenas escribió:
+> I cleaned up the API with the changes suggested in the thread. There are still
+> some parts that are being discussed.
+> 
+> 
+> BlueZ D-Bus HDP API description
+> ***********************************
+> 
+> Authors:
+> 
+> 	Santiago Carot-Nemesio <sancane@gmail.com>
+> 	José Antonio Santos-Cadenas <santoscadenas@gmail.com>
+> 	Elvis Pfützenreuter <epx@signove.com>
+> 
+> Health Device Profile hierarchy
+> ===============================
+> 
+> Service		org.bluez
+> Interface	org.bluez.Hdp
+> Object path	[variable prefix]/{hci0,hci1,...}
+> 
+> Methods		object CreateSession(object path, dict config)
+> 
+> 			Returns the object path for the new HDP session.
+> 			The path parameter is the path of the remote object
+> 			with the callbacks to notify events (see
+> 			org.bluez.HdpAgent at the end of this document)
+> 			This petition starts an mcap session and also register
+> 			in the SDP is needed
+> 			Dict is defined as bellow:
+> 			{ "data_spec" : The data_spec is the data exchange
+> 					specficication (see section 5.2.10 of
+> 					the specification document)
+> 					possible values:
+> 						0x00 = reserved,
+> 						0x01 [IEEE 11073-20601],
+> 						0x02..0xff reserved,
+> 					(optional)
+> 			  "end_points" : [{ (optional)
+> 				"mdepid" : uint8, (optional)
+> 				"role" : ("source" or "sink"), (mandatory)
+> 				"specs" :[{ (mandatory)
+> 					"data_type" : uint16, (mandatory)
+> 					"description" : string, (optional)
+> 				}]
+> 			  }]
+> 			}
+> 
+> 			if "data_spec" is not set, no SDP record will be
+> 			registered, so all the other data in the dictionary
+> 			will be ignored
+> 
+> 			Session will be closed by the call or implicitly when
+> 			the programs leaves the bus.
+> 
+> 			Possible errors: org.bluez.Error.InvalidArguments
+> 
+> 		void DeleteSession(object path)
+> 
+> 			Delete the HDP session identified by the object path.
+> 			Also session will be closed if the process that started
+> 			it is removed from the D-Bus.
+> 
+> 			Possible errors: org.bluez.Error.InvalidArguments
+> 					 org.bluez.Error.NotFound
+> 
+> 		array remote_session_properties GetRemoteSessions()
 
-I bought 4 bluetooth dongles and all off them have the same mac
-address.hciconfig -a show
-hci0:	Type: USB
-	BD Address: 00:15:83:15:A3:10 ACL MTU: 672:4 SCO MTU: 48:1
-	UP RUNNING PSCAN
-	RX bytes:5637 acl:26 sco:0 events:221 errors:0
-	TX bytes:2362 acl:25 sco:0 commands:179 errors:0
-	Features: 0xff 0x3e 0x85 0x38 0x18 0x18 0x00 0x00
-	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-	Link policy: RSWITCH HOLD SNIFF PARK
-	Link mode: SLAVE ACCEPT
-	Name: ''
-	Class: 0x000104
-	Service Classes: Unspecified
-	Device Class: Computer, Desktop workstation
-	HCI Ver: 2.0 (0x3) HCI Rev: 0xc5c LMP Ver: 2.0 (0x3) LMP Subver: 0xc5c
-	Manufacturer: Cambridge Silicon Radio (10)
+still being discussed
 
-I tried ./bdaddr -i hci0  00:09:DA:50:29:30 , ./bdaddr -i hci0 -r
-00:09:DA:50:29:30
-,bccmd -d 0 psset -s 0 bdaddr 0×44 0×00 0×66 0×55 0×33 0×00 0×22 0×11
-None of them seems to work. i have kernel  2.6.31 and bluez 4.60. i
-only need to change
-The mac address to avoid chaos when i proceed with my application
+> 
+> 			Returns an array with the remote session_properties
+> 			of all the visible devices.
+> 			remote_session_properties is a dictionary like:
+> 			[{"session_id": a_session_identification (int or string,
+> 					 probably the SDP handler + btaddr)
+> 			 "data_spec" : the remote data spec,
+> 			 "end_points":
+> 				 ["mdepid": uint8,
+> 				  "role"  : uint8,
+> 				  "specs" : [{
+> 					  "dtype"	: uint16,
+> 					  "description"	: string, (optional)
+> 				  }]
+> 				 ]
+> 			}]
+> 
+> 			Note that only remotes with a SDP record will be
+> 			notified by this function.
+> 
+> --------------------------------------------------------------------------------
+> 
+> Service		org.bluez
+> Interface	org.bluez.HdpSession
+> Object path	[variable prefix]/{hci0,hci1,...}/{hdp0,hdp1,...}
+> 
+> 		object Connect(remote_session_id)
+> 
+> 			Connects with the remote session and returns its object
+> 			path.
+> 
+> 			Possible errors: org.bluez.Error.InvalidArguments
+> 					 org.bluez.Error.HdpError
+> 
+> 		void Disconnect(object device, boolean delete)
+> 
+> 			Disconnect from the remote device. If delete is true, any
+> 			status will also be deleted. Otherwise, the status will
+> 			be kept for allowing future reconnections.
+> 
+> 			Possible errors: org.bluez.Error.InvalidArguments
+> 					 org.bluez.Error.NotFound
+> 					 org.bluez.Error.HdpError
+> 
+> --------------------------------------------------------------------------------
+> 
+> Service		org.bluez
+> Interface	org.bluez.HdpRemoteSession
+> Object path	[variable prefix]/{hci0,hci1,...}/{hdp0,hdp1,...}/rem_session_id
+> 
+> 		boolean Echo(array{byte})
+> 
+> 			Sends an echo petition to the remote session. Return True
+> 			if response matches with the buffer sent. If some error
+> 			is detected False value is returned and the associated
+> 			MCL is closed.
+> 
+> 		uint16 OpenDataChannel(byte mdepid, byte config)
+> 
+> 			Creates a new data channel with the indicated config
+> 			to the remote MCAP Data End Point (MDEP).
+> 			The configuration should indicate the channel quality of
+> 			service.
+> 			Returns the data channel id.
+> 
+> 			Possible errors: org.bluez.Error.InvalidArguments
+> 					 org.bluez.Error.HdpError
+> 
+> 		file_descriptor GetDcFd(uint16 mdlid)
 
-Thanks
+Wait till transport/fd-passing discussion is solved
 
-Ahmed
+> 
+> 			Gets a file descriptor where data can be read or
+> 			written for receive or sent by the data channel.
+> 			Returns the file descriptor
+> 
+> 			Possible errors: org.bluez.Error.InvalidArguments
+> 					 org.bluez.Error.NotFound
+> 					 org.bluez.Error.HdpError
+> 
+> 		void DeleteDataChannel(uint16 mdlid)
+> 
+> 			Deletes a data channel so it will not be available for
+> 			use.
+> 
+> 			Possible errors: org.bluez.Error.InvalidArguments
+> 					 org.bluez.Error.NotFound
+> 					 org.bluez.Error.HdpError
+> 
+> 		void DeleteAllDataChannels()
+still in discussion
+
+> 
+> 			Deletes all data channels so it will not be available
+> 			for use. Typically this function is called when the
+> 			connection with the remote device will be closed
+> 			permanently
+> 
+> 			Possible errors: org.bluez.Error.HdpError
+> 
+> 		dict GetDataChannelStatus()
+> 
+> 			Return a dictionary with all the data channels that
+> 			can be used to send data right now. The dictionary
+> 			is formed like follows:
+> 			{
+> 				"reliable": [id1, ..., idz],
+> 				"best_effort" : [idx, ..., idy]
+> 			}
+> 
+> 			The fist reliable data channel will always be the first
+> 			data channel in reliable array.
+> 
+> HDPAgent hierarchy
+> ==================
+> 
+> (this object is implemented by the HDP client an receives notifications)
+> 
+> Service         unique name
+> Interface       org.bluez.HdpAgent
+> Object path     freely definable
+> 
+> 		void DeviceConnected(object path)
+> 
+> 			This method is called whenever a new device connection
+> 			has been established over the control channel of the
+> 			current HDP session. The object path contains the object
+> 			path of the remote device.
+> 
+> 		void DeviceDisconnected(object path)
+> 
+> 			This method is called when a remote device is
+> 			disconnected definitively. Any future reconnections
+> 			will fail. Also all data channels associated to this
+> 			device will be closed.
+> 
+> 		void CreatedDataChannel(object path, uint16 mdlid,
+> 							filedescriptor fd)
+> 
+> 			This method is called when a new data channel is created
+> 			The path contains the object path of the device whith
+> 			the new connection is created, the mdlid the data
+> 			channel identificator and the fd is the file descriptor
+> 			where the data can be readed or writed.
+> 
+> 		void DeletedDataChannel(object path, uint16 mdlid)
+> 
+> 			This method is called when a data channel is closed.
+> 			After this call the data channel will not be valid and
+> 			can be reused for future created data channels.
+> 
+> 		void DataReady(object path, uint16 mdlid, filedescriptor fd)
+
+probably it will disappear, depends on transport/fd-passing discussion
+
+> 
+> 			This method is called when there is new data that can be
+> 			read in a data channel
+> 
+> 		void RemoteSession(dict remote_session_properties)
+> 
+> 			This method is called when a new session is discorevered
+> 			in a remote device. See Hdp.GetRemotes to know how the
+> 			dictionary is formed.
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
