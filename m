@@ -1,51 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 7 May 2010 17:17:20 -0300
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
+To: Elvis =?iso-8859-1?Q?Pf=FCtzenreuter?= <epx@signove.com>
+Cc: =?iso-8859-1?Q?Jos=E9?= Antonio Santos Cadenas
+	<jcaden@libresoft.es>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Data transmission and reconnections in HDP
+Message-ID: <20100507201648.GA5682@vigoh>
+References: <201005071302.36198.jcaden@libresoft.es>
+ <20100507120859.GD12461@vigoh>
+ <82D1897F-4DEE-47F9-BD00-57087F182C3D@signove.com>
+ <20100507194919.GA4857@vigoh>
+ <BC6ABF7A-4847-4DDE-B3D6-584BEF215D65@signove.com>
 MIME-Version: 1.0
-In-Reply-To: <2541510E-4912-4AEB-AEFB-83F4339EC3FA@signove.com>
-References: <201005051255.09394.jcaden@libresoft.es> <3CCD92AC-1578-4E78-AEE8-80AEE73511EB@signove.com>
-	<201005071203.23882.jcaden@libresoft.es> <2541510E-4912-4AEB-AEFB-83F4339EC3FA@signove.com>
-From: =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@gmail.com>
-Date: Fri, 7 May 2010 17:51:38 -0300
-Message-ID: <n2haa32413d1005071351qb6db6039u7caab57a5e893884@mail.gmail.com>
-Subject: Re: HDP proposed api (ver 0.2)
-To: =?UTF-8?Q?Elvis_Pf=C3=BCtzenreuter?= <epx@signove.com>
-Cc: jcaden@libresoft.es, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <BC6ABF7A-4847-4DDE-B3D6-584BEF215D65@signove.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, May 7, 2010 at 10:46, Elvis Pfützenreuter <epx@signove.com> wrote:
->>> "Forcing" a source to specify the MDEP IDs here, even if not publishing the
->>> record, makes checks easier further.
->>
->> Not sure about that. Note that when you don't publish a SDP record, nobody
->> could connect to you, so you won't receive data channel connections request,
->> so you don't need to check if the mdeps are in use or not.
->
-> Indeed, you are right; from spec point of view I am not forced to define MDEP IDs beforehand (my old habits of TCP/IP, having ports both sides, sometimes overwhelm me :)
->
-> The actual argument is higher level: whether should we *force* the application to specify the MDEP IDs / data types beforehand (as I "voted", with "my" API) or not (as you "voted").
->
-> This is the point we need more opinions, from people in the list :)
->
->
->>> Perhaps you tried to accomodate the notion that a data channel ID
->>> "survives" even if the device disappearrs for a short moment?
->>
->> Also this, remember that MCAP allow temporal disconnections to reestablish
->> them in future connections to save state.
->
-> Ok, I need to see whether BlueZ keeps the device objects in D-BUS tree after disconnection of if it removees it immediately. If it keeps the object, the sessions should be there as sub-paths (to be consistent with HdpSession being a part of adapter path.). If it doesn't, indeed they need to go somewhere else.
+* Elvis Pf�tzenreuter <epx@signove.com> [2010-05-07 16:55:13 -0300]:
 
-Device objects exists for each paired device. If the pairing is
-removed the object is also removed and a new pairing is needed before
-connecting to it (as imposed by the whole bluetooth stack logic
-anyway).
+> > 
+> > Also I still have to check the case when the remote side requests a
+> > disconnect. I'm adding these stuff to my todo list an I'll work on it
+> > soon.
+> 
+> I imagined the case when send(msg) returns, the msg is still in output buffer and then the connection drops due e.g. to faint signal (not voluntary close). (I understand ERTM guarantees atomic delivery of message, but I don't think it blocks send() until the message is safely at the other side.)
 
-Re-using the device path and adding sessions as sub-paths seems
-reasonable, but I would wait on comments from Johan / Luiz / Marcel if
-this is desirable or might have any side-implication before defining
-this topic as closed.
+The sock stays connected, if such error happen it will be disconnected
+and error will be reported. Also blocking on sending doesn't guarantee
+if you data will be delivered.
 
 -- 
-João Paulo Rechi Vita
-http://jprvita.wordpress.com/
+Gustavo F. Padovan
+http://padovan.org
