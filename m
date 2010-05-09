@@ -1,139 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Zhang, Zhenhua" <zhenhua.zhang@intel.com>
-To: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 10 May 2010 08:41:59 +0800
-Subject: RE: [PATCH] Dial-up Networking profile API
-Message-ID: <33AB447FBD802F4E932063B962385B351E79EBA6@shsmsx501.ccr.corp.intel.com>
-References: <1273371107-31813-1-git-send-email-gustavo@padovan.org>
-In-Reply-To: <1273371107-31813-1-git-send-email-gustavo@padovan.org>
-Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
+In-Reply-To: <32F45991-49B0-4B46-84C0-789A3B1D8766@signove.com>
+References: <201005051255.09394.jcaden@libresoft.es>
+	 <3CCD92AC-1578-4E78-AEE8-80AEE73511EB@signove.com>
+	 <201005071203.23882.jcaden@libresoft.es>
+	 <2541510E-4912-4AEB-AEFB-83F4339EC3FA@signove.com>
+	 <n2haa32413d1005071351qb6db6039u7caab57a5e893884@mail.gmail.com>
+	 <32F45991-49B0-4B46-84C0-789A3B1D8766@signove.com>
+Date: Sun, 9 May 2010 18:14:39 +0300
+Message-ID: <AANLkTimz7yYXB2gV0EyRROItnIP6hILvC8Tz4Hbd0iyx@mail.gmail.com>
+Subject: Re: HDP proposed api (ver 0.2)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: =?ISO-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
+Cc: =?ISO-8859-1?Q?Jo=E3o_Paulo_Rechi_Vita?= <jprvita@gmail.com>,
+	jcaden@libresoft.es, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Padovan,
+Hi,
 
-linux-bluetooth-owner@vger.kernel.org wrote:
-> It is exactly the same API of Handsfree profile. The idea is
-> to use the same Agent logic.
-> ---
-> doc/dun-api.txt |   82
-> +++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> 1 files changed, 82 insertions(+), 0 deletions(-)  create
-> mode 100644 doc/dun-api.txt
-> 
-> diff --git a/doc/dun-api.txt b/doc/dun-api.txt new file mode 100644
-> index 0000000..af1c507 --- /dev/null
-> +++ b/doc/dun-api.txt
-> @@ -0,0 +1,82 @@
-> +DUNGateway hierarchy
-> +========================
-> +
-> +Service		org.bluez
-> +Interface	org.bluez.DUNGateway
-> +Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX +
-> +This interface is available for remote devices which can function in
-> +the Gateway role of the DUN profile.  It is intended to be used with
-> +external  handlers of the DUN Protocol.
-> +
-> +Methods		void Connect()
-> +
-> +			Connect to the GW service on the remote device. +
-> +		void Disconnect()
-> +
-> +			Disconnect from the GW service on the
-> remote device
-> +
-> +		dict GetProperties()
-> +
-> +			Returns all properties for the
-> interface. See the
-> +			properties section for available properties.
-> +
-> +		void RegisterAgent(object path)
-> +
-> +			The object path defines the path the of
-> the agent
-> +			that will be called when a new DUN connection
-> +			is established.
-> +
-> +			If an application disconnects from the
-> bus all of its
-> +			registered agents will be removed.
-> +
-> +		void UnregisterAgent(object path)
-> +
-> +			This unregisters the agent that has
-> been previously
-> +			registered. The object path parameter
-> must match the
-> +			same value that has been used on registration.
-> +
-> +			Possible Errors: org.bluez.Error.Failed
-> +
-> org.bluez.Error.InvalidArguments
-> +
-> +
-> +Signals		PropertyChanged(string name, variant value) +
-> +			This signal indicates a changed value
-> of the given
-> +			property.
-> +
-> +Properties	string State [readonly]
-> +
-> +			Indicates the state of the connection.  Possible +			values are:
-> +				"disconnected"
-> +				"connecting"
-> +				"connected"
-> +
-> +DUNAgent hierarchy
-> +===============
-> +
-> +Service         unique name
-> +Interface       org.bluez.DUNAgent
-> +Object path     freely definable
-> +
-> +Methods		void NewConnection(filedescriptor fd)
-> +
-> +			This method gets called whenever a new DUN
-> +			connection has been established.  The objectpath
-> +			contains the object path of the remote
-> device.  This
-> +			method assumes that DBus daemon with
-> file descriptor
-> +			passing capability is being used.
-> +
-> +			The agent should only return
-> successfully once the
-> +			establishment of the data call has been fineshed
+On Sat, May 8, 2010 at 12:08 AM, Elvis Pfützenreuter <epx@signove.com> wrote:
+>>
+>> Device objects exists for each paired device. If the pairing is
+>> removed the object is also removed and a new pairing is needed before
+>> connecting to it (as imposed by the whole bluetooth stack logic
+>> anyway).
+>
+> AFAIK the HDP source and sink must be paired before any session can be established, so the relevant device objects will always be there, so the path can be (re)used.
 
-A typo 'fineshed' should be 'finished'.
+Exactly, I tried to explain this before that device objects is a
+better way to expose any relevant API since that would be created
+anyway. It also has integration with the sdp record cache and are
+reloaded during the initialization and I hardly see us doing anything
+to revert this, since pretty much every plugin depend on this to work.
 
-> +			without problems.
-> +
-> +			Possible Errors:
-> org.bluez.Error.InvalidArguments
-> +					 org.bluez.Error.Failed
-> +
-> +		void Release()
-> +
-> +			This method gets called whenever the service daemon
-> +			unregisters the agent.
+So, with this in mind, IMHO, the whole concept of exposure the
+sessions won't fit nicely in BlueZ API, first because it uses the
+adapter path to create session passing a device path, which btw
+already is associated with adapter anyway, second because any client
+seems to be able to create those sessions even if they are unable to
+control them because they don't hold an agent, and third I don't think
+we should be exposing protocol internals in a D-Bus API, this id's
+make as much sense as the bdaddr in the ui (read _none_), it is as
+usable as we starting exposing local and remote seid (Stream Endpoint
+id, surprisingly similar to endpoint here) to pulseaudio to carry on
+with all avdtp protocol details, this will only fragment the logic
+around those bits and certainly won't make it work better.
 
-Compared with hfp-api.txt, I think we should also add the sentence like "or whenever the Adapter where the DUNAgent registers itself is removed".
-
-> --
-> 1.7.1
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe
-> linux-bluetooth" in the body of a message to
-> majordomo@vger.kernel.org More majordomo info at
-> http://vger.kernel.org/majordomo-info.html
-
-
-
-Regards,
-Zhenhua
-
+-- 
+Luiz Augusto von Dentz
+Computer Engineer
