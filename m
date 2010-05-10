@@ -2,158 +2,95 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot Nemesio <sancane@gmail.com>
-Subject: [PATCH 07/25] Initiate creation of MCLs
-Date: Mon, 10 May 2010 12:15:09 +0200
-Message-Id: <1273486527-7855-7-git-send-email-sancane@gmail.com>
-In-Reply-To: <1273486527-7855-6-git-send-email-sancane@gmail.com>
+Subject: [PATCH 06/25] Add functions for caching and uncaching MCLs
+Date: Mon, 10 May 2010 12:15:08 +0200
+Message-Id: <1273486527-7855-6-git-send-email-sancane@gmail.com>
+In-Reply-To: <1273486527-7855-5-git-send-email-sancane@gmail.com>
 References: <1273486527-7855-1-git-send-email-sancane@gmail.com>
  <1273486527-7855-2-git-send-email-sancane@gmail.com>
  <1273486527-7855-3-git-send-email-sancane@gmail.com>
  <1273486527-7855-4-git-send-email-sancane@gmail.com>
  <1273486527-7855-5-git-send-email-sancane@gmail.com>
- <1273486527-7855-6-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Santiago Carot Nemesio <sancane@gmail.com>
 
 ---
- mcap/mcap.c |  115 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 115 insertions(+), 0 deletions(-)
+ mcap/mcap.c |   49 +++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 files changed, 47 insertions(+), 2 deletions(-)
 
 diff --git a/mcap/mcap.c b/mcap/mcap.c
-index ebfaf9e..0112154 100644
+index b15728c..ebfaf9e 100644
 --- a/mcap/mcap.c
 +++ b/mcap/mcap.c
-@@ -43,6 +43,12 @@
- 	__mcl->tid = 0;			\
- } while(0)
+@@ -34,6 +34,8 @@
+ #include "mcap_lib.h"
+ #include "mcap_internal.h"
  
-+struct connect_mcl {
-+	struct mcap_mcl		*mcl;		/* MCL for this operation */
-+	mcap_mcl_connect_cb	connect_cb;	/* Connect callback */
-+	gpointer		user_data;	/* Callback user data */
-+};
++#define MAX_CACHED	10	/* 10 devices */
 +
- /* MCAP finite state machine functions */
- static void proc_req_connected(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len);
- static void proc_req_pending(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len);
-@@ -419,6 +425,115 @@ fail:
- 	return FALSE;
- }
+ #define MCAP_ERROR g_quark_from_static_string("mcap-error-quark")
  
-+static void mcap_connect_mcl_cb(GIOChannel *chan, GError *conn_err,
-+							gpointer user_data)
-+{
-+	char dstaddr[18];
-+	struct connect_mcl *con = user_data;
-+	struct mcap_mcl *aux, *mcl = con->mcl;
-+	mcap_mcl_connect_cb connect_cb = con->connect_cb;
-+	gpointer data = con->user_data;
-+	GError *gerr = NULL;
-+
-+	g_free(con);
-+
-+	mcl->ctrl &= ~MCAP_CTRL_CONN;
-+
-+	if (conn_err) {
-+		if (mcl->ctrl & MCAP_CTRL_FREE)
-+			mcl->ms->mcl_uncached_cb(mcl, mcl->ms->user_data);
-+		mcap_mcl_check_del(mcl);
-+		connect_cb(NULL, conn_err, data);
-+		return;
-+	}
-+
-+	ba2str(&mcl->addr, dstaddr);
-+
-+	aux = find_mcl(mcl->ms->mcls, &mcl->addr);
-+	if (aux) {
-+		/* Double MCL connection case */
-+		if (aux != mcl) {
-+			/* This MCL was not in cache */
-+			mcap_mcl_unref(mcl);
-+		}
-+		error("MCL error: Device %s is already connected", dstaddr);
-+		g_set_error(&gerr, MCAP_ERROR, MCAP_ERROR_ALREADY_EXISTS,
-+				"MCL %s is already connected", dstaddr);
-+		connect_cb(NULL, gerr, data);
-+		g_error_free(gerr);
-+		return;
-+	}
-+
-+	mcl->state = MCL_CONNECTED;
-+	mcl->role = MCL_INITIATOR;
-+	mcl->req = MCL_AVAILABLE;
-+	mcl->ctrl |= MCAP_CTRL_STD_OP;
+ #define RELEASE_TIMER(__mcl) do {	\
+@@ -246,12 +248,55 @@ static void mcap_mcl_check_del(struct mcap_mcl *mcl)
+ 
+ static void mcap_cache_mcl(struct mcap_mcl *mcl)
+ {
+-	/* TODO: Store in cache this MCL for future reconnections */
++	GSList *l;
++	struct mcap_mcl *last;
++	int len;
 +
 +	if (mcl->ctrl & MCAP_CTRL_CACHED)
-+		mcap_uncache_mcl(mcl);
-+	else
-+		mcl->ms->mcls = g_slist_prepend(mcl->ms->mcls, mcl);
++		return;
 +
-+	mcl->wid = g_io_add_watch(mcl->cc, G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
-+				(GIOFunc) mcl_control_cb, mcl);
-+	connect_cb(mcl, gerr, data);
++	mcl->ms->mcls = g_slist_remove(mcl->ms->mcls, mcl);
 +
-+	if (mcl->ref == 1) {
-+		mcl->ms->mcls = g_slist_remove(mcl->ms->mcls, mcl);
++	if ((mcl->ctrl & MCAP_CTRL_NOCACHE) || (mcl->ref < 2)) {
 +		mcap_mcl_unref(mcl);
-+	}
-+}
-+
-+void mcap_create_mcl(struct mcap_session *ms,
-+				const bdaddr_t *addr,
-+				uint16_t ccpsm,
-+				GError **err,
-+				mcap_mcl_connect_cb connect_cb,
-+				gpointer user_data)
-+{
-+	struct mcap_mcl *mcl;
-+	struct connect_mcl *con;
-+
-+	mcl = find_mcl(ms->mcls, addr);
-+	if (mcl) {
-+		g_set_error(err, MCAP_ERROR, MCAP_ERROR_ALREADY_EXISTS,
-+					"MCL is already connected.");
 +		return;
 +	}
 +
-+	mcl = find_mcl(ms->cached, addr);
-+	if (!mcl) {
-+		mcl = g_new0(struct mcap_mcl, 1);
-+		mcl->ms = ms;
-+		mcl->state = MCL_IDLE;
-+		bacpy(&mcl->addr, addr);
-+		set_default_cb(mcl);
-+		mcl = mcap_mcl_ref(mcl);
-+	} else
-+		mcl->ctrl |= MCAP_CTRL_CONN;
++	debug("Caching MCL");
 +
-+	con = g_new0(struct connect_mcl, 1);
-+	con->mcl = mcl;
-+	con->connect_cb = connect_cb;
-+	con->user_data = user_data;
-+
-+	mcl->cc = bt_io_connect(BT_IO_L2CAP, mcap_connect_mcl_cb, con,
-+				NULL, err,
-+				BT_IO_OPT_SOURCE_BDADDR, &ms->src,
-+				BT_IO_OPT_DEST_BDADDR, addr,
-+				BT_IO_OPT_PSM, ccpsm,
-+				BT_IO_OPT_MTU, MCAP_CC_MTU,
-+				BT_IO_OPT_SEC_LEVEL, ms->sec,
-+				BT_IO_OPT_INVALID);
-+	if (*err) {
-+		g_free(con);
-+		mcl->ctrl &= ~MCAP_CTRL_CONN;
-+		if (mcl->ctrl & MCAP_CTRL_FREE)
-+			mcl->ms->mcl_uncached_cb(mcl, mcl->ms->user_data);
-+		mcap_mcl_check_del(mcl);
++	len = g_slist_length(mcl->ms->cached);
++	if (len == MAX_CACHED) {
++		/* Remove the latest cached mcl */
++		l = g_slist_last(mcl->ms->cached);
++		last = l->data;
++		mcl->ms->cached = g_slist_remove(mcl->ms->cached, last);
++		last->ctrl &= ~MCAP_CTRL_CACHED;
++		if (last->ctrl & MCAP_CTRL_CONN) {
++			/* If connection process is not success this MCL will be
++			 * freed next time that mcap_mcl_free is invoked */
++			last->ctrl |= MCAP_CTRL_FREE;
++		} else {
++			last->ms->mcl_uncached_cb(last, last->ms->user_data);
++			mcap_mcl_unref(last);
++		}
 +	}
-+}
 +
- static void confirm_dc_event_cb(GIOChannel *chan, gpointer user_data)
++	mcl->ms->cached = g_slist_prepend(mcl->ms->cached, mcl);
++	mcl->ctrl |= MCAP_CTRL_CACHED;
++	mcap_mcl_shutdown(mcl);
+ }
+ 
+ static void mcap_uncache_mcl(struct mcap_mcl *mcl)
  {
- 	/* TODO: Check if we can connect this data channel */
+-	/* TODO: Remove this MCL from cache */
++	if (!(mcl->ctrl & MCAP_CTRL_CACHED))
++		return;
++
++	debug("Got MCL from cache");
++
++	mcl->ms->cached = g_slist_remove(mcl->ms->cached, mcl);
++	mcl->ms->mcls = g_slist_prepend(mcl->ms->mcls, mcl);
++	mcl->ctrl &= ~MCAP_CTRL_CACHED;
++	mcl->ctrl &= ~MCAP_CTRL_FREE;
+ }
+ 
+ struct mcap_mcl *mcap_mcl_ref(struct mcap_mcl *mcl)
 -- 
 1.6.3.3
 
