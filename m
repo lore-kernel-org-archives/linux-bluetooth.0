@@ -2,10 +2,10 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot Nemesio <sancane@gmail.com>
-Subject: [PATCH 19/25] Enable support to get information about mdls
-Date: Mon, 10 May 2010 12:15:21 +0200
-Message-Id: <1273486527-7855-19-git-send-email-sancane@gmail.com>
-In-Reply-To: <1273486527-7855-18-git-send-email-sancane@gmail.com>
+Subject: [PATCH 18/25] Support for sending md_abort_mdl_req command
+Date: Mon, 10 May 2010 12:15:20 +0200
+Message-Id: <1273486527-7855-18-git-send-email-sancane@gmail.com>
+In-Reply-To: <1273486527-7855-17-git-send-email-sancane@gmail.com>
 References: <1273486527-7855-1-git-send-email-sancane@gmail.com>
  <1273486527-7855-2-git-send-email-sancane@gmail.com>
  <1273486527-7855-3-git-send-email-sancane@gmail.com>
@@ -23,43 +23,57 @@ References: <1273486527-7855-1-git-send-email-sancane@gmail.com>
  <1273486527-7855-15-git-send-email-sancane@gmail.com>
  <1273486527-7855-16-git-send-email-sancane@gmail.com>
  <1273486527-7855-17-git-send-email-sancane@gmail.com>
- <1273486527-7855-18-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Santiago Carot Nemesio <sancane@gmail.com>
 
 ---
- mcap/mcap.c |   16 ++++++++++++++++
- 1 files changed, 16 insertions(+), 0 deletions(-)
+ mcap/mcap.c |   31 +++++++++++++++++++++++++++++++
+ 1 files changed, 31 insertions(+), 0 deletions(-)
 
 diff --git a/mcap/mcap.c b/mcap/mcap.c
-index 34243df..2554cd9 100644
+index 75d3d58..34243df 100644
 --- a/mcap/mcap.c
 +++ b/mcap/mcap.c
-@@ -584,6 +584,22 @@ static struct mcap_mcl *find_mcl(GSList *list, const bdaddr_t *addr)
- 	return NULL;
+@@ -518,6 +518,37 @@ void mcap_req_mdl_deletion(struct mcap_mdl *mdl, GError **err,
+ 		g_free(con);
  }
  
-+int mcap_mdl_get_fd(struct mcap_mdl *mdl)
++void mcap_mdl_abort(struct mcap_mdl *mdl, GError **err,
++			mcap_mdl_del_cb abort_cb, gpointer user_data)
 +{
-+	if ((!mdl) || (mdl->state != MDL_CONNECTED))
-+		return -1;
++	struct mcap_mdl_op_cb *con;
++	struct mcap_mcl *mcl = mdl->mcl;
++	uint8_t *cmd;
 +
-+	return g_io_channel_unix_get_fd(mdl->dc);
++	if (mdl->state != MDL_WAITING) {
++		g_set_error(err, MCAP_ERROR, MCAP_ERROR_FAILED,
++							"Mdl in invalid state");
++		return;
++	}
++
++	con = g_new0(struct mcap_mdl_op_cb, 1);
++	cmd = create_req(MCAP_MD_ABORT_MDL_REQ, mdl->mdlid);
++	mcap_send_std_opcode(mcl, cmd, sizeof(mcap_md_req), err);
++	if (*err) {
++		g_free(con);
++		g_free(cmd);
++		return;
++	}
++
++	con->mdl = mdl;
++	con->cb.del = abort_cb;
++	con->user_data = user_data;
++
++	mcl->priv_data = con;
++
++	mcl->tid = g_timeout_add_seconds(RESPONSE_TIMER, wait_response_timer, mcl);
 +}
 +
-+uint16_t mcap_mdl_get_mdlid(struct mcap_mdl *mdl)
-+{
-+	if (!mdl)
-+		return MCAP_MDLID_RESERVED;
-+
-+	return mdl->mdlid;
-+}
-+
- static void shutdown_mdl(struct mcap_mdl *mdl)
+ static void update_mcl_state(struct mcap_mcl *mcl)
  {
- 	mdl->state = MDL_CLOSED;
+ 	GSList *l;
 -- 
 1.6.3.3
 
