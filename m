@@ -1,50 +1,139 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <8D8F1AA1-A7C1-4636-BB75-1EF1A2E1A556@signove.com>
-References: <201005071302.36198.jcaden@libresoft.es> <20100507120859.GD12461@vigoh>
-	<k2taa32413d1005071125ob7ce6505q8bb2cc57a77f1c8f@mail.gmail.com>
-	<20100507195704.GC4857@vigoh> <8D8F1AA1-A7C1-4636-BB75-1EF1A2E1A556@signove.com>
-From: =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@gmail.com>
-Date: Sun, 9 May 2010 22:08:04 -0300
-Message-ID: <u2paa32413d1005091808n54065c98o26ac89de1dde8770@mail.gmail.com>
-Subject: Re: Data transmission and reconnections in HDP
-To: =?UTF-8?Q?Elvis_Pf=C3=BCtzenreuter?= <epx@signove.com>
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	=?UTF-8?Q?Jos=C3=A9_Antonio_Santos_Cadenas?= <jcaden@libresoft.es>,
+From: "Zhang, Zhenhua" <zhenhua.zhang@intel.com>
+To: "Gustavo F. Padovan" <gustavo@padovan.org>,
 	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Date: Mon, 10 May 2010 08:41:59 +0800
+Subject: RE: [PATCH] Dial-up Networking profile API
+Message-ID: <33AB447FBD802F4E932063B962385B351E79EBA6@shsmsx501.ccr.corp.intel.com>
+References: <1273371107-31813-1-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1273371107-31813-1-git-send-email-gustavo@padovan.org>
+Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, May 7, 2010 at 18:18, Elvis Pfützenreuter <epx@signove.com> wrote:
->
->>> I guess the problem Jose tried to address here is the case that HDP
->>> had temporarily disconnected the data channel and then the application
->>> try to write to the FD (which will be closed). Some data may be lost
->>> by the application on this process.
->>
->> If you are using Streming Mode you really don't care, if ERTM an error
->> will be reported and the application will get notified. ;)
->
-> Ok, I think we have a conclusion, the Libresoft guys were right all along.
->
-> Since the IEEE protocol over the data channel is a request-indication guy, one of these possible scenarios will happen:
->
-> a) send request, receive indication
-> b) send request, socket closes
-> c) send request, socket closes, MCAP connection dropped feedback
->
-> Our problem is the (b) case. We don't know if the request arrived at the other end. So the application must be able to replay the request upon receving the new socket for the same data channel. The reconnection itself does not need to be notified (though fd replacement is a clear sign that it happened.). And best of all, we can pass the L2CAP socket itself, not a pipe.
->
-> The only thing that must be crystal clear in API is: the fd socket may get invalid anytime, and the application must be able to replay the pending requests. The reconnection is "transparent" pero no mucho :)
->
+Hi Padovan,
 
-Automatic reconnection should happen only in the case HDP has
-disconnected the transport for power-saving, because the data layer is
-idle, doesn't it? So will (b) ever happen? In the case the connection
-is dropped (loss of signal etc) the data layer should always be
-notified IMO (case c).
+linux-bluetooth-owner@vger.kernel.org wrote:
+> It is exactly the same API of Handsfree profile. The idea is
+> to use the same Agent logic.
+> ---
+> doc/dun-api.txt |   82
+> +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> 1 files changed, 82 insertions(+), 0 deletions(-)  create
+> mode 100644 doc/dun-api.txt
+> 
+> diff --git a/doc/dun-api.txt b/doc/dun-api.txt new file mode 100644
+> index 0000000..af1c507 --- /dev/null
+> +++ b/doc/dun-api.txt
+> @@ -0,0 +1,82 @@
+> +DUNGateway hierarchy
+> +========================
+> +
+> +Service		org.bluez
+> +Interface	org.bluez.DUNGateway
+> +Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX +
+> +This interface is available for remote devices which can function in
+> +the Gateway role of the DUN profile.  It is intended to be used with
+> +external  handlers of the DUN Protocol.
+> +
+> +Methods		void Connect()
+> +
+> +			Connect to the GW service on the remote device. +
+> +		void Disconnect()
+> +
+> +			Disconnect from the GW service on the
+> remote device
+> +
+> +		dict GetProperties()
+> +
+> +			Returns all properties for the
+> interface. See the
+> +			properties section for available properties.
+> +
+> +		void RegisterAgent(object path)
+> +
+> +			The object path defines the path the of
+> the agent
+> +			that will be called when a new DUN connection
+> +			is established.
+> +
+> +			If an application disconnects from the
+> bus all of its
+> +			registered agents will be removed.
+> +
+> +		void UnregisterAgent(object path)
+> +
+> +			This unregisters the agent that has
+> been previously
+> +			registered. The object path parameter
+> must match the
+> +			same value that has been used on registration.
+> +
+> +			Possible Errors: org.bluez.Error.Failed
+> +
+> org.bluez.Error.InvalidArguments
+> +
+> +
+> +Signals		PropertyChanged(string name, variant value) +
+> +			This signal indicates a changed value
+> of the given
+> +			property.
+> +
+> +Properties	string State [readonly]
+> +
+> +			Indicates the state of the connection.  Possible +			values are:
+> +				"disconnected"
+> +				"connecting"
+> +				"connected"
+> +
+> +DUNAgent hierarchy
+> +===============
+> +
+> +Service         unique name
+> +Interface       org.bluez.DUNAgent
+> +Object path     freely definable
+> +
+> +Methods		void NewConnection(filedescriptor fd)
+> +
+> +			This method gets called whenever a new DUN
+> +			connection has been established.  The objectpath
+> +			contains the object path of the remote
+> device.  This
+> +			method assumes that DBus daemon with
+> file descriptor
+> +			passing capability is being used.
+> +
+> +			The agent should only return
+> successfully once the
+> +			establishment of the data call has been fineshed
 
--- 
-João Paulo Rechi Vita
-http://jprvita.wordpress.com/
+A typo 'fineshed' should be 'finished'.
+
+> +			without problems.
+> +
+> +			Possible Errors:
+> org.bluez.Error.InvalidArguments
+> +					 org.bluez.Error.Failed
+> +
+> +		void Release()
+> +
+> +			This method gets called whenever the service daemon
+> +			unregisters the agent.
+
+Compared with hfp-api.txt, I think we should also add the sentence like "or whenever the Adapter where the DUNAgent registers itself is removed".
+
+> --
+> 1.7.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe
+> linux-bluetooth" in the body of a message to
+> majordomo@vger.kernel.org More majordomo info at
+> http://vger.kernel.org/majordomo-info.html
+
+
+
+Regards,
+Zhenhua
+
