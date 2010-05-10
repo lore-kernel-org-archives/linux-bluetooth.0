@@ -1,55 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 10 May 2010 13:12:50 -0700
-From: "Luis R. Rodriguez" <lrodriguez@atheros.com>
-To: Suraj Sumangala <Suraj.Sumangala@Atheros.com>, David Miller
-	<davem@davemloft.net>, "marcel@holtmann.org" <marcel@holtmann.org>,
-	Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Luis
- Rodriguez <Luis.Rodriguez@Atheros.com>, "gfpadovan@gmail.com"
-	<gfpadovan@gmail.com>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v5] Add support for the Atheros AR300x Bluetooth Chip
-Message-ID: <20100510201250.GL2177@tux>
-References: <1268629296.21425.23.camel@atheros013-desktop>
- <1271758832.6585.33.camel@atheros013-desktop>
- <1271845337.15010.1.camel@atheros013-desktop>
- <1271927414.1409.3.camel@atheros013-desktop>
- <1272279623.11239.1.camel@atheros013-desktop>
- <1273062798.19162.6.camel@atheros013-desktop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-In-Reply-To: <1273062798.19162.6.camel@atheros013-desktop>
+From: "Luis R. Rodriguez" <mcgrof@gmail.com>
+Date: Mon, 10 May 2010 12:45:41 -0700
+Message-ID: <k2z43e72e891005101245se32796ex47a17683ab05d8b5@mail.gmail.com>
+Subject: Using wireless.kernel.org for Bluetooth documentation as well ?
+To: linux-wireless <linux-wireless@vger.kernel.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>, linux-kernel@vger.kernel.org
+Cc: "John W. Linville" <linville@tuxdriver.com>, Marcel Holtmann <marcel@holtmann.org>,
+	Johannes Berg <johannes@sipsolutions.net>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, May 05, 2010 at 05:33:18AM -0700, Suraj Sumangala wrote:
-> Hi Marcel,
-> 
-> Can you take a look at the patch? Your review has been pending for
-> sometime.
+Today we have a wealth of information on 802.11 Linux wireless on
+http://wireless.kernel.org and I think the wiki model has worked
+wonders for us. I wanted to see what you thought of using the same
+site as a source of documentation for Bluetooth as well. We already
+have *some* Bluetooth documentation [1], and we could just point to
+the BlueZ pages for other docs but it doesn't seem to use a wiki and
+those google ads do blind my right eye.
 
-Marcel, new timeline:
+Thoughts?
 
-----------
-02-22-2010 - Marcel responded to your first patch version for UART bluetooth
-02-22-2010 - Suarj posted resplies to Marcel's questions
-03-01-2010 - Suraj poked Marcel for feedback based on Suraj's comments
-----------
-03-11-2010 - Suraj posts new V2 patch but its sent busted with tabs/space mixup
-03-11-2010 - Marcel asks for a resend
-----------
-03-14-2010 - Suaraj posts V3 patch with tabs/spaces fixed
-03-23-2010 - First poke to Marcel and list
-03-29-2010 - Second poke to Marcel and list
-03-31-2010 - Patch for userspace hciattach.c changes posted
-----------
-04-20-2010 - v3 patch posted
-04-21-2010 - v4 patch posted
-04-22-2010 - v5 patch posted
-04-26-2010 - v5 first poke
-05-05-2010 - v5 second poke
-----------
-
-What else can our team do?
-
-:(
+[1] http://wireless.kernel.org/en/users/Documentation/Bluetooth-coexistence
+[2] http://www.bluez.org
 
   Luis
