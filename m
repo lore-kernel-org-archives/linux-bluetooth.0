@@ -1,103 +1,165 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?iso-8859-1?q?Jos=E9_Antonio_Santos_Cadenas?=
-	<jcaden@libresoft.es>
-Reply-To: jcaden@libresoft.es
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: Re: HDP proposed api (ver 0.2)
-Date: Mon, 10 May 2010 14:57:08 +0200
-Cc: Elvis =?iso-8859-1?q?Pf=FCtzenreuter?= <epx@signove.com>,
-	=?iso-8859-1?q?Jo=E3o_Paulo_Rechi_Vita?= <jprvita@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-References: <201005051255.09394.jcaden@libresoft.es> <AANLkTimz7yYXB2gV0EyRROItnIP6hILvC8Tz4Hbd0iyx@mail.gmail.com> <201005101042.50984.jcaden@libresoft.es>
-In-Reply-To: <201005101042.50984.jcaden@libresoft.es>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201005101457.08727.jcaden@libresoft.es>
+From: Santiago Carot-Nemesio <sancane@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Santiago Carot Nemesio <sancane@gmail.com>
+Subject: [PATCH 25/25] Initial support for clock synchronization protocol
+Date: Mon, 10 May 2010 12:15:27 +0200
+Message-Id: <1273486527-7855-25-git-send-email-sancane@gmail.com>
+In-Reply-To: <1273486527-7855-24-git-send-email-sancane@gmail.com>
+References: <1273486527-7855-1-git-send-email-sancane@gmail.com>
+ <1273486527-7855-2-git-send-email-sancane@gmail.com>
+ <1273486527-7855-3-git-send-email-sancane@gmail.com>
+ <1273486527-7855-4-git-send-email-sancane@gmail.com>
+ <1273486527-7855-5-git-send-email-sancane@gmail.com>
+ <1273486527-7855-6-git-send-email-sancane@gmail.com>
+ <1273486527-7855-7-git-send-email-sancane@gmail.com>
+ <1273486527-7855-8-git-send-email-sancane@gmail.com>
+ <1273486527-7855-9-git-send-email-sancane@gmail.com>
+ <1273486527-7855-10-git-send-email-sancane@gmail.com>
+ <1273486527-7855-11-git-send-email-sancane@gmail.com>
+ <1273486527-7855-12-git-send-email-sancane@gmail.com>
+ <1273486527-7855-13-git-send-email-sancane@gmail.com>
+ <1273486527-7855-14-git-send-email-sancane@gmail.com>
+ <1273486527-7855-15-git-send-email-sancane@gmail.com>
+ <1273486527-7855-16-git-send-email-sancane@gmail.com>
+ <1273486527-7855-17-git-send-email-sancane@gmail.com>
+ <1273486527-7855-18-git-send-email-sancane@gmail.com>
+ <1273486527-7855-19-git-send-email-sancane@gmail.com>
+ <1273486527-7855-20-git-send-email-sancane@gmail.com>
+ <1273486527-7855-21-git-send-email-sancane@gmail.com>
+ <1273486527-7855-22-git-send-email-sancane@gmail.com>
+ <1273486527-7855-23-git-send-email-sancane@gmail.com>
+ <1273486527-7855-24-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-El Monday 10 May 2010 10:42:50 José Antonio Santos Cadenas escribió:
-> Hi all,
-> 
-> El Sunday 09 May 2010 17:14:39 Luiz Augusto von Dentz escribió:
-> > Hi,
-> > 
-> > On Sat, May 8, 2010 at 12:08 AM, Elvis Pfützenreuter <epx@signove.com>
-> 
-> wrote:
-> > >> Device objects exists for each paired device. If the pairing is
-> > >> removed the object is also removed and a new pairing is needed before
-> > >> connecting to it (as imposed by the whole bluetooth stack logic
-> > >> anyway).
-> > > 
-> > > AFAIK the HDP source and sink must be paired before any session can be
-> > > established, so the relevant device objects will always be there, so
-> > > the path can be (re)used.
-> > 
-> > Exactly, I tried to explain this before that device objects is a
-> > better way to expose any relevant API since that would be created
-> > anyway. It also has integration with the sdp record cache and are
-> > reloaded during the initialization and I hardly see us doing anything
-> > to revert this, since pretty much every plugin depend on this to work.
-> 
-> We agree that the best way to expose a remote device is using the path
-> already created by bluez. We are thinking, as Elvis suggested, in changing
-> some functions to that path for discovering remove services.
-> 
-> The main problem here is that sessions exist in HDP even if bluez is not
-> concerned about them. Imagine that we perform an implementation without
-> session management, this not implies that other implementations do the same
-> so a remote device could expose multiple HDP session (each one of them
-> could expose a SDP record). Now if you are not concern of the sessions and
-> you try to connect to a remote device that holds more than one session,
-> you can't decide which one of that sessions connect. A simple example of
-> this situation is described in the HDP implementation whitepaper (page 18,
-> figure 2.4).
-> 
-> > So, with this in mind, IMHO, the whole concept of exposure the
-> > sessions won't fit nicely in BlueZ API, first because it uses the
-> > adapter path to create session passing a device path, which btw
-> > already is associated with adapter anyway,
-> 
-> We think that the main problem here is that we don't choose a good path
-> name. But we are open to suggestion for a better one.
-> 
-> > second because any client
-> > seems to be able to create those sessions even if they are unable to
-> > control them because they don't hold an agent,
-> 
-> We think that this is not a good reason, the same could happend with other
-> profiles. Any client could connect to an Audio or Serial device even if
-> they are unable to use them or the don't know how to do it.
-> 
-> > and third I don't think
-> > we should be exposing protocol internals in a D-Bus API,
-> 
-> We don't understand this. What do you mean with protocol internal? Nothing
-> exposed in D-Bus in internal we just propose to concert the client about
-> the remote session (remote hdp instance) because it need to decide with
-> one to connect, as it decides the device that it will connect with a
-> Serial connection. Probably we need a better name than "session id".
-> 
-> > this id's
-> > make as much sense as the bdaddr in the ui (read _none_), it is as
-> > usable as we starting exposing local and remote seid (Stream Endpoint
-> > id, surprisingly similar to endpoint here) to pulseaudio to carry on
-> > with all avdtp protocol details, this will only fragment the logic
-> > around those bits and certainly won't make it work better.
-> 
-> Ok, we shouldn't expose mdepid. But we still need to expose the remote hdp
-> session or instances.
+From: Santiago Carot Nemesio <sancane@gmail.com>
 
-Sorry, I was wrong with this. I think that we need a way to identify the end 
-point (or feature or something) that will be connected in the remote hdp 
-session. Because the application should be able to select where to connect.
+---
+ Makefile.am |    4 +-
+ mcap/mcap.c |    2 +-
+ mcap/sync.c |   84 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 87 insertions(+), 3 deletions(-)
+ create mode 100644 mcap/sync.c
 
-> Note that in Audio profile the psm is fixed, so there
-> is just one listening on each device, but HDP is different because the psm
-> are not fixed and multiple instances can exist in  the same device.
-> 
-> 
+diff --git a/Makefile.am b/Makefile.am
+index 7d8f4b5..98dacdf 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -170,8 +170,8 @@ builtin_sources += plugins/service.c
+ endif
+ 
+ if MCAP
+-mcap_sources += mcap/mcap_lib.h \
+-		mcap/mcap_internal.h \
++mcap_sources += mcap/mcap_internal.h \
++		mcap/mcap_lib.h mcap/sync.c \
+ 		mcap/mcap.h mcap/mcap.c
+ endif
+ 
+diff --git a/mcap/mcap.c b/mcap/mcap.c
+index a292dcd..0fd5b97 100644
+--- a/mcap/mcap.c
++++ b/mcap/mcap.c
+@@ -1500,7 +1500,7 @@ static void rsend_req(struct mcap_mcl *mcl)
+ static void proc_cmd(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
+ {
+ 	if ((cmd[0] >= MCAP_MD_SYNC_CAP_REQ) && (cmd[0] <= MCAP_MD_SYNC_INFO_IND)) {
+-		send4B_cmd(mcl, cmd[0], MCAP_REQUEST_NOT_SUPPORTED, MCAP_MDLID_RESERVED);
++		proc_sync_cmd(mcl, cmd, len);
+ 		return;
+ 	}
+ 
+diff --git a/mcap/sync.c b/mcap/sync.c
+new file mode 100644
+index 0000000..ede125a
+--- /dev/null
++++ b/mcap/sync.c
+@@ -0,0 +1,84 @@
++/*
++ *
++ *  MCAP for BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2010 GSyC/LibreSoft, Universidad Rey Juan Carlos.
++ *
++ *  Authors:
++ *  Santiago Carot-Nemesio <sancane at gmail.com>
++ *  Jose Antonio Santos-Cadenas <santoscadenas at gmail.com>
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#include <stdint.h>
++#include <netinet/in.h>
++
++#include "logging.h"
++
++#include "mcap.h"
++#include "mcap_lib.h"
++#include "mcap_internal.h"
++
++static int send_unsupported_req(struct mcap_mcl *mcl, uint8_t oc)
++{
++	uint8_t *rsp;
++	mcap4B_rsp *rsp_err;
++	int sent;
++
++
++	rsp = g_malloc0(sizeof(mcap4B_rsp));
++
++	rsp_err = (mcap4B_rsp *)rsp;
++	rsp_err->op = oc;
++	rsp_err->rc = MCAP_REQUEST_NOT_SUPPORTED;
++	rsp_err->mdl = htons (MCAP_MDLID_RESERVED);
++
++	sent = mcap_send_data(g_io_channel_unix_get_fd(mcl->cc),
++					rsp,
++					sizeof(mcap4B_rsp));
++	g_free(rsp);
++	return sent;
++}
++
++void proc_sync_cmd(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
++{
++	switch (cmd[0]) {
++	case MCAP_MD_SYNC_CAP_REQ:
++		debug("TODO: received MCAP_MD_SYNC_CAP_REQ: %d",
++							MCAP_MD_SYNC_CAP_REQ);
++		break;
++	case MCAP_MD_SYNC_CAP_RSP:
++		debug("TODO: received MCAP_MD_SYNC_CAP_RSP: %d",
++							MCAP_MD_SYNC_CAP_RSP);
++		break;
++	case MCAP_MD_SYNC_SET_REQ:
++		debug("TODO: received MCAP_MD_SYNC_SET_REQ: %d",
++							MCAP_MD_SYNC_SET_REQ);
++		break;
++	case MCAP_MD_SYNC_SET_RSP:
++		debug("TODO: received MCAP_MD_SYNC_SET_RSP: %d",
++							MCAP_MD_SYNC_SET_RSP);
++		break;
++	case MCAP_MD_SYNC_INFO_IND:
++		debug("TODO: received MCAP_MD_SYNC_INFO_IND :%d",
++							MCAP_MD_SYNC_INFO_IND);
++		break;
++	}
++
++	/* Not implemented yet. Reply with unsupported request */
++        send_unsupported_req(mcl, cmd[0]);
++}
+-- 
+1.6.3.3
 
-Regards
