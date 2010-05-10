@@ -2,121 +2,175 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot Nemesio <sancane@gmail.com>
-Subject: [PATCH 03/25] Release resources depending if MCAP should cache or not a MCL
-Date: Mon, 10 May 2010 12:15:05 +0200
-Message-Id: <1273486527-7855-3-git-send-email-sancane@gmail.com>
-In-Reply-To: <1273486527-7855-2-git-send-email-sancane@gmail.com>
+Subject: [PATCH 02/25] Initial work to create and destroy MCAP sessions
+Date: Mon, 10 May 2010 12:15:04 +0200
+Message-Id: <1273486527-7855-2-git-send-email-sancane@gmail.com>
+In-Reply-To: <1273486527-7855-1-git-send-email-sancane@gmail.com>
 References: <1273486527-7855-1-git-send-email-sancane@gmail.com>
- <1273486527-7855-2-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Santiago Carot Nemesio <sancane@gmail.com>
 
 ---
- mcap/mcap.c |   83 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 81 insertions(+), 2 deletions(-)
+ mcap/mcap.c |  135 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 132 insertions(+), 3 deletions(-)
 
 diff --git a/mcap/mcap.c b/mcap/mcap.c
-index 1c94452..7d34b95 100644
+index df8dd50..1c94452 100644
 --- a/mcap/mcap.c
 +++ b/mcap/mcap.c
-@@ -36,14 +36,93 @@
+@@ -34,6 +34,49 @@
+ #include "mcap_lib.h"
+ #include "mcap_internal.h"
  
- #define MCAP_ERROR g_quark_from_static_string("mcap-error-quark")
- 
-+#define RELEASE_TIMER(__mcl) do {	\
-+	g_source_remove(__mcl->tid);	\
-+	__mcl->tid = 0;			\
-+} while(0)
++#define MCAP_ERROR g_quark_from_static_string("mcap-error-quark")
 +
-+static void shutdown_mdl(struct mcap_mdl *mdl)
++static void mcap_mcl_shutdown(struct mcap_mcl *mcl)
 +{
-+	mdl->state = MDL_CLOSED;
-+
-+	g_source_remove(mdl->wid);
-+
-+	if (mdl->dc) {
-+		g_io_channel_shutdown(mdl->dc, TRUE, NULL);
-+		g_io_channel_unref(mdl->dc);
-+		mdl->dc = NULL;
-+	}
++	/* TODO: Shutdown MCL */
 +}
 +
-+static void mcap_free_mdls(struct mcap_mcl *mcl, gboolean save)
++static void mcap_mcl_release(struct mcap_mcl *mcl)
 +{
++	/* TODO: Free MCL */
++}
++
++static void confirm_dc_event_cb(GIOChannel *chan, gpointer user_data)
++{
++	/* TODO: Check if we can connect this data channel */
++}
++
++static void confirm_mcl_event_cb(GIOChannel *chan, gpointer user_data)
++{
++	/* TODO: Check if we can connect this MCL */
++}
++
++struct mcap_mcl *mcap_mcl_ref(struct mcap_mcl *mcl)
++{
++	mcl->ref++;
++
++	debug("mcap_mcl_ref(%p): ref=%d", mcl, mcl->ref);
++
++	return mcl;
++}
++
++void mcap_mcl_unref(struct mcap_mcl *mcl)
++{
++	mcl->ref--;
++
++	debug("mcap_mcl_unref(%p): ref=%d", mcl, mcl->ref);
++
++	if (mcl->ref > 0)
++		return;
++
++	mcap_mcl_release(mcl);
++}
++
+ struct mcap_session *mcap_create_session(struct btd_adapter *btd_adapter,
+ 					BtIOSecLevel sec,
+ 					uint16_t ccpsm,
+@@ -45,11 +88,97 @@ struct mcap_session *mcap_create_session(struct btd_adapter *btd_adapter,
+ 					mcap_mcl_event_cb mcl_uncached,
+ 					gpointer user_data)
+ {
+-	/* TODO: Create MCAP Session */
+-	return NULL;
++	struct mcap_session *ms;
++
++	if (sec < BT_IO_SEC_MEDIUM) {
++		g_set_error(gerr, MCAP_ERROR, MCAP_ERROR_INVALID_ARGS,
++				"Security level can't be minor of %d",
++				BT_IO_SEC_MEDIUM);
++		return NULL;
++	}
++
++	if (!(mcl_connected && mcl_reconnected &&
++			mcl_disconnected && mcl_uncached)) {
++		g_set_error(gerr, MCAP_ERROR, MCAP_ERROR_INVALID_ARGS,
++				"The callbacks can't be null");
++		return NULL;
++	}
++
++	ms = g_new0(struct mcap_session, 1);
++
++	adapter_get_address(btd_adapter, &ms->src);
++
++	ms->sec = sec;
++	ms->mcl_connected_cb = mcl_connected;
++	ms->mcl_reconnected_cb = mcl_reconnected;
++	ms->mcl_disconnected_cb = mcl_disconnected;
++	ms->mcl_uncached_cb = mcl_uncached;
++	ms->user_data = user_data;
++
++	/* Listen incoming connections in control channel */
++	ms->ccio = bt_io_listen(BT_IO_L2CAP, NULL, confirm_mcl_event_cb, ms,
++				NULL, gerr,
++				BT_IO_OPT_SOURCE_BDADDR, &ms->src,
++				BT_IO_OPT_PSM, ccpsm,
++				BT_IO_OPT_MTU, MCAP_CC_MTU,
++				BT_IO_OPT_SEC_LEVEL, sec,
++				BT_IO_OPT_INVALID);
++	if (!ms->ccio) {
++		error("%s", (*gerr)->message);
++		g_free(ms);
++		return NULL;
++	}
++
++	/* Listen incoming connections in data channels */
++	ms->dcio = bt_io_listen(BT_IO_L2CAP, NULL, confirm_dc_event_cb, ms,
++				NULL, gerr,
++				BT_IO_OPT_SOURCE_BDADDR, &ms->src,
++				BT_IO_OPT_PSM, dcpsm,
++				BT_IO_OPT_MTU, MCAP_DC_MTU,
++				BT_IO_OPT_SEC_LEVEL, sec,
++				BT_IO_OPT_INVALID);
++	if (!ms->dcio) {
++		g_io_channel_shutdown(ms->ccio, TRUE, NULL);
++		g_io_channel_unref(ms->ccio);
++		ms->ccio = NULL;
++		error("%s", (*gerr)->message);
++		g_free(ms);
++		return NULL;
++	}
++
++	return ms;
+ }
+ 
+ void mcap_close_session(struct mcap_session *ms)
+ {
+-	/* Free MCAP session */
 +	GSList *l;
-+	struct mcap_mdl *mdl;
 +
-+	if (!mcl->mdls)
++	if (!ms)
 +		return;
 +
-+	for (l = mcl->mdls; l; l = l->next) {
-+		mdl = l->data;
-+		shutdown_mdl(mdl);
-+		if (!save)
-+			g_free(mdl);
++	if (ms->ccio) {
++		g_io_channel_shutdown(ms->ccio, TRUE, NULL);
++		g_io_channel_unref(ms->ccio);
++		ms->ccio = NULL;
 +	}
 +
-+	if (!save) {
-+		g_slist_free(mcl->mdls);
-+		mcl->mdls = NULL;
-+	}
-+}
-+
-+static void mcap_mcl_free(struct mcap_mcl *mcl, gboolean save)
-+{
-+	gboolean store = ((!(mcl->ctrl & MCAP_CTRL_FREE)) && save);
-+
-+	if (mcl->tid) {
-+		RELEASE_TIMER(mcl);
++	if (ms->dcio) {
++		g_io_channel_shutdown(ms->dcio, TRUE, NULL);
++		g_io_channel_unref(ms->dcio);
++		ms->dcio = NULL;
 +	}
 +
-+	if (mcl->cc) {
-+		g_io_channel_shutdown(mcl->cc, TRUE, NULL);
-+		g_io_channel_unref(mcl->cc);
-+		mcl->cc = NULL;
++	for (l = ms->mcls; l; l = l->next) {
++		mcap_mcl_shutdown(l->data);
++		mcap_mcl_unref(l->data);
 +	}
++	g_slist_free(ms->mcls);
++	ms->mcls = NULL;
 +
-+	g_source_remove(mcl->wid);
-+	if (mcl->lcmd) {
-+		g_free(mcl->lcmd);
-+		mcl->lcmd = NULL;
-+	}
++	for (l = ms->cached; l; l = l->next)
++		mcap_mcl_unref(l->data);
++	g_slist_free(ms->cached);
++	ms->cached = NULL;
 +
-+	if (mcl->priv_data) {
-+		g_free(mcl->priv_data);
-+		mcl->priv_data = NULL;
-+	}
-+
-+	mcap_free_mdls(mcl, store);
-+
-+	if (mcl->cb && !store) {
-+		g_free(mcl->cb);
-+		mcl->cb = NULL;
-+	}
-+
-+	mcl->state = MCL_IDLE;
-+
-+	if (store)
-+		return;
-+
-+	g_free(mcl);
-+}
-+
- static void mcap_mcl_shutdown(struct mcap_mcl *mcl)
- {
--	/* TODO: Shutdown MCL */
-+	mcap_mcl_free(mcl, TRUE);
++	g_free(ms);
  }
- 
- static void mcap_mcl_release(struct mcap_mcl *mcl)
- {
--	/* TODO: Free MCL */
-+	mcap_mcl_free(mcl, FALSE);
- }
- 
- static void confirm_dc_event_cb(GIOChannel *chan, gpointer user_data)
 -- 
 1.6.3.3
 
