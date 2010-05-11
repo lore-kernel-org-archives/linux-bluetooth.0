@@ -1,50 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH v2] ath3k: add support for new firmware
+Subject: Re: [PATCH v5] Add support for the Atheros AR300x Bluetooth Chip
 From: suraj <suraj@atheros.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: <dwmw2@infradead.org>, <Luis.Rodriguez@Atheros.com>,
-	<Jothikumar.Mothilal@Atheros.com>, <marcel@holtmann.org>,
-	<vkandukuri@atheros.com>
-In-Reply-To: <1272356922.1393.14.camel@atheros013-desktop>
+CC: <marcel@holtmann.org>, <Luis.Rodriguez@Atheros.com>,
+	<Jothikumar.Mothilal@Atheros.com>, <gfpadovan@gmail.com>
+In-Reply-To: <1273062798.19162.6.camel@atheros013-desktop>
 References: <1268629296.21425.23.camel@atheros013-desktop>
 	 <1271758832.6585.33.camel@atheros013-desktop>
 	 <1271845337.15010.1.camel@atheros013-desktop>
 	 <1271927414.1409.3.camel@atheros013-desktop>
 	 <1272279623.11239.1.camel@atheros013-desktop>
-	 <1272349190.1393.11.camel@atheros013-desktop>
-	 <1272356922.1393.14.camel@atheros013-desktop>
+	 <1273062798.19162.6.camel@atheros013-desktop>
 Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 11 May 2010 14:34:18 +0530
-Message-ID: <1273568658.2410.5.camel@atheros013-desktop>
+Date: Tue, 11 May 2010 13:59:08 +0530
+Message-ID: <1273566548.7023.2.camel@atheros013-desktop>
 MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-New firmware has few critical bug fixes and shared antenna support.
+Hi marcel,
 
-Signed-off-by: Vikram Kandukuri <vkandukuri@atheros.com>
----
- drivers/bluetooth/ath3k.c |    9 ++++++---
- 1 files changed, 6 insertions(+), 3 deletions(-)
+On Wed, 2010-05-05 at 18:03 +0530, suraj wrote:
+> Hi Marcel,
+> 
+> Can you take a look at the patch? Your review has been pending for
+> sometime.
+> 
+> On Mon, 2010-04-26 at 16:30 +0530, suraj wrote:
+> > Hi marcel,
+> > 
+> > On Thu, 2010-04-22 at 14:40 +0530, suraj wrote:
+> > > This implements the Atheros Bluetooth serial protocol to
+> > > support the AR300x Bluetooth chipsets.
+> > > The serial protocol implements enhanced power management
+> > > features for the AR300x chipsets. 
+> > > 
+> > > Reviewed-by: Luis R. Rodriguez <lrodriguez@atheros.com>
+> > > Reviewed-by: Gustavo F. Padovan <gustavo@padovan.org>
+> > > Signed-off-by: Suraj <suraj@atheros.com>
+> > > 
+> > > ---
+> > >  drivers/bluetooth/Kconfig     |   14 ++
+> > >  drivers/bluetooth/Makefile    |    1 +
+> > >  drivers/bluetooth/hci_ath.c   |  378 +++++++++++++++++++++++++++++++++++++++++
+> > >  drivers/bluetooth/hci_ldisc.c |    6 +
+> > >  drivers/bluetooth/hci_uart.h  |    8 +-
+> > >  5 files changed, 406 insertions(+), 1 deletions(-)
+> > >  create mode 100755 drivers/bluetooth/hci_ath.c
+> > > 
+> > Can you verify the patch let me know your comments? 
+> > 
+> > Regards
+> > Suraj
+> > 
+> 
+> 
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 128cae4..7bda549 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -122,9 +122,12 @@ static int ath3k_probe(struct usb_interface *intf,
- 
- 	data->udev = udev;
- 
--	if (request_firmware(&firmware, "ath3k-1.fw", &udev->dev) < 0) {
--		kfree(data);
--		return -EIO;
-+	if (request_firmware(&firmware, "ath3k-2.fw", &udev->dev) < 0) {
-+		BT_DBG("requesting old firmware");
-+		if (request_firmware(&firmware, "ath3k-1.fw", &udev->dev) < 0) {
-+			kfree(data);
-+			return -EIO;
-+		}
- 	}
- 
- 	size = max_t(uint, firmware->size, 4096);
--- 
-1.7.0
+your review has been pending for a long time. Please let me know what
+should be done regarding this.
+
+Regards
+Suraj
