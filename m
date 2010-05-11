@@ -1,35 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 11 May 2010 15:47:02 +0100 (BST)
-To: Serhiy Kachaniuk <serzholino@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [bugreport]
-In-Reply-To: <u2z793f89501005060256g3eb32a09ncff16e8e454bdcc@mail.gmail.com>
-References: <p2q793f89501005052222u4393c8dfhb55bea4454c454b9@mail.gmail.com>  <4BE270EE.5080306@greffrath.com> <u2z793f89501005060256g3eb32a09ncff16e8e454bdcc@mail.gmail.com>
+Message-ID: <4BE96910.7090602@gmail.com>
+Date: Tue, 11 May 2010 07:26:24 -0700
+From: "Justin P. Mattock" <justinmattock@gmail.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Message-Id: <1273589222.840882.854.nullmailer@galant.ukfsn.org>
-From: Iain Hibbert <plunky@rya-online.net>
+To: Jiri Kosina <jkosina@suse.cz>
+CC: linux-bluetooth@vger.kernel.org,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: magicmouse: claimed by neither input, hiddev nor hidraw
+References: <j2idd18b0c31005101341o43b652c1zf8729f5f9a60e0d3@mail.gmail.com>  <alpine.LRH.2.00.1005102334140.14809@twin.jikos.cz> <s2odd18b0c31005101439v22d03bfdw4e65d7c4b8315b6a@mail.gmail.com> <alpine.LNX.2.00.1005102351220.28092@pobox.suse.cz>
+In-Reply-To: <alpine.LNX.2.00.1005102351220.28092@pobox.suse.cz>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+o.k... I went and tested individual commits
+and right now if I git revert 28918c
+on the latest head, I don't receive
+the "claimed by neither input, hiddev nor hidraw"
+message, and I get all functionality back with the mouse.
+(without having hiddraw enabled in the kernel.
 
-Serhiy, from your message on the ubuntu bug report
-
-> Maybe the reason is that this dongle doesn't support reading/writing of
-> 'Default Link Policy Settings' ?
-
-and this command was introduced in spec version 1.2, and your device
-reports
-
->        HCI Ver: 1.1 (0x1) HCI Rev: 0x3 LMP Ver: 1.1 (0x1) LMP Subver: 0x800
-
-so yes, that is likely the problem as it is too old.
-
-That bluez has no handling for the possibility that the command may not be
-supported is possibly a bug or possibly an indication that older devices
-are no longer to be supported, I can't really say which.
-
-regards,
-iain
-
-
+Justin P. Mattock
