@@ -1,6 +1,6 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4BE8C7CD.7030206@gmail.com>
-Date: Mon, 10 May 2010 19:58:21 -0700
+Message-ID: <4BE8C4E5.5030906@gmail.com>
+Date: Mon, 10 May 2010 19:45:57 -0700
 From: "Justin P. Mattock" <justinmattock@gmail.com>
 MIME-Version: 1.0
 To: Michael Poole <mdpoole@troilus.org>
@@ -58,13 +58,7 @@ On 05/10/2010 07:28 PM, Michael Poole wrote:
 > Michael Poole
 >
 >    
-The only other thing that I remember
-when adding hidraw was adding
-BT_HCIUART_LL=m
-(not sure if it matters or not).
-
-here is dmesg:
-http://fpaste.org/OiDf/
+I'm using the latest HEAD, without any patches
+applied. (I'll send a post with dmesg after this post).
 
 Justin P. Mattock
-
