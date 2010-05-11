@@ -1,42 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <682855.82528.qm@web52605.mail.re2.yahoo.com>
-Date: Tue, 11 May 2010 13:48:55 -0700 (PDT)
-From: Ed Tsang <netdesign_98@yahoo.com>
-Subject: Fail to store link key for Blackberry
-To: Bluettooth Linux <linux-bluetooth@vger.kernel.org>
+Date: Tue, 11 May 2010 18:23:26 +0100 (BST)
+To: Serhiy Kachaniuk <serzholino@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [bugreport]
+In-Reply-To: <AANLkTilEsIYKxwdD4ZLbYaIExMlHfEmpuOnj8BKeI4XP@mail.gmail.com>
+References: <p2q793f89501005052222u4393c8dfhb55bea4454c454b9@mail.gmail.com>  <4BE270EE.5080306@greffrath.com>  <u2z793f89501005060256g3eb32a09ncff16e8e454bdcc@mail.gmail.com>  <1273589222.840882.854.nullmailer@galant.ukfsn.org>
+ <AANLkTilEsIYKxwdD4ZLbYaIExMlHfEmpuOnj8BKeI4XP@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Message-Id: <1273598606.491570.554.nullmailer@galant.ukfsn.org>
+From: Iain Hibbert <plunky@rya-online.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,  
-I was having trouble pairing with Blackberry (bluez-4.60). It was paired, but the next connection require pair again.
- hcidump: "Link Key Request Negative Reply"
-  check  /var/lib/bluetooth/xxx/linkkeys   not there.
-  Delete the device from BB side, went through pairing again
-   hcidump: > Link key Notification .. type 6 (Changed Combination key)
-   but  ../linkkeys still not there.
-  Trace down to dbus-hci.c   hcid_dbus_link_key_notify()
-/*  Only store the link key if one of the following is true:   
-     2. this is a changed combination key and there was a previously
-     stored one */
-...
-   if (key_type < 0x03 || (key_type == 0x06 && old_key_type != 0xff) ||
-...
-if I change it to the following, then the ../linkkeys is stored and paring with the Blackberry only need to do once   
-   if (key_type < 0x03 || (key_type == 0x06) ||
+On Tue, 11 May 2010, Serhiy Kachaniuk wrote:
 
-Look to me " hcidump: Link key Notification .. type 6 (Changed Combination key) " the "6" is coming from Blackberry. 
-I tried deleted the device from the Blackberry, delete the device and remove the battery from the Blackberry....
- hcidump > link key notification still type 6.
+> Yeah, i see that this device is a little buggy, but it worked in
+> previous version of bluez, so maybe it is possible to make it work
+> again for current version?
 
-/*     * 2. this is a changed combination key and there was a previously
-     *    stored one */ 
-in general make sense until we encounter device like this or for whatever reason, we lost the local link
-key for the device, then we might be stuck in "pairing everytime connect".
+I think the problem may be that the kernel itself now relies on setting
+the default link policy before accepting connections, so that the link
+policy does not need to be set after the connection is complete and there
+will be no window of uncertainty.
 
-Any comment?
+I am only an observer here, and don't know if this has been done with the
+conscious knowledge that older devices will no longer work or if it was a
+mistake..  but I can suggest that Bluetooth dongles are cheap, and you
+will likely find better connectivity with a 2.x + EDR device anyway..
 
-Ed
+regards,
+iain
 
 
