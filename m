@@ -1,36 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 11 May 2010 09:37:31 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: "Luis R. Rodriguez" <mcgrof@gmail.com>
-Cc: linux-wireless <linux-wireless@vger.kernel.org>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
-        Johannes Berg <johannes@sipsolutions.net>
-Subject: Re: Using wireless.kernel.org for Bluetooth documentation as well ?
-Message-ID: <20100511133731.GB9447@tuxdriver.com>
-References: <k2z43e72e891005101245se32796ex47a17683ab05d8b5@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <k2z43e72e891005101245se32796ex47a17683ab05d8b5@mail.gmail.com>
+In-Reply-To: <p2q793f89501005052222u4393c8dfhb55bea4454c454b9@mail.gmail.com>
+References: <p2q793f89501005052222u4393c8dfhb55bea4454c454b9@mail.gmail.com>
+Date: Tue, 11 May 2010 16:06:31 +0300
+Message-ID: <AANLkTinOD1ODHqYSWTLv5ho2ZYU-bfiJ1xYkWNlbgaZQ@mail.gmail.com>
+Subject: Re: [bugreport]
+From: Serhiy Kachaniuk <serzholino@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, May 10, 2010 at 12:45:41PM -0700, Luis R. Rodriguez wrote:
-> Today we have a wealth of information on 802.11 Linux wireless on
-> http://wireless.kernel.org and I think the wiki model has worked
-> wonders for us. I wanted to see what you thought of using the same
-> site as a source of documentation for Bluetooth as well. We already
-> have *some* Bluetooth documentation [1], and we could just point to
-> the BlueZ pages for other docs but it doesn't seem to use a wiki and
-> those google ads do blind my right eye.
-> 
-> Thoughts?
-> 
-> [1] http://wireless.kernel.org/en/users/Documentation/Bluetooth-coexistence
-> [2] http://www.bluez.org
+2010/5/6 Serhiy Kachaniuk <serzholino@gmail.com>:
+> Hi!
+>
+> My USB bluetooth adapter stopped working with new versions of bluez.
+> Latest version which works is 4.32.
+> I initially reported bug for ubuntu package in launchpad here
+> https://bugs.launchpad.net/ubuntu/+source/bluez/+bug/453885 , but then
+> i tried also opensuse livecd and problem remained there too, so looks
+> like it's not ubuntu specific.
+> jhe at #bluez-devel suggested to me to collect hcidump output on
+> bluetoothd startup, and then write to this mailinglist. I attached
+> suggested hcidumps for bluez versions 4.64 and 4.32, and looks like
+> 4.64 stops initialization process after it cannot read parameter
+> 'Default Link Policy Settings' from device.
+>
+> Can you please take a look at this bug?
+> Thanks in advance.
+>
 
-Personally, I have no objection.
-
-John
--- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+Can someone turn this e-mail thread into bluez bugreport? If i
+understand correctly, only developers can create bluez bugreports in
+trac? Also, if you need any more debugging info, i would be glad to
+provide you with any.
