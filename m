@@ -1,23 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4BE96910.7090602@gmail.com>
-Date: Tue, 11 May 2010 07:26:24 -0700
-From: "Justin P. Mattock" <justinmattock@gmail.com>
 MIME-Version: 1.0
-To: Jiri Kosina <jkosina@suse.cz>
-CC: linux-bluetooth@vger.kernel.org,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: magicmouse: claimed by neither input, hiddev nor hidraw
-References: <j2idd18b0c31005101341o43b652c1zf8729f5f9a60e0d3@mail.gmail.com>  <alpine.LRH.2.00.1005102334140.14809@twin.jikos.cz> <s2odd18b0c31005101439v22d03bfdw4e65d7c4b8315b6a@mail.gmail.com> <alpine.LNX.2.00.1005102351220.28092@pobox.suse.cz>
-In-Reply-To: <alpine.LNX.2.00.1005102351220.28092@pobox.suse.cz>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <AANLkTinOD1ODHqYSWTLv5ho2ZYU-bfiJ1xYkWNlbgaZQ@mail.gmail.com>
+References: <p2q793f89501005052222u4393c8dfhb55bea4454c454b9@mail.gmail.com>
+	 <AANLkTinOD1ODHqYSWTLv5ho2ZYU-bfiJ1xYkWNlbgaZQ@mail.gmail.com>
+Date: Tue, 11 May 2010 10:52:30 -0300
+Message-ID: <AANLkTiliG_XySAecN9JZ9cBt1rEc7IqtFB7ISaHP4yDb@mail.gmail.com>
+Subject: Re: [bugreport]
+From: Vinicius Gomes <vinicius.gomes@openbossa.org>
+To: Serhiy Kachaniuk <serzholino@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-o.k... I went and tested individual commits
-and right now if I git revert 28918c
-on the latest head, I don't receive
-the "claimed by neither input, hiddev nor hidraw"
-message, and I get all functionality back with the mouse.
-(without having hiddraw enabled in the kernel.
+Hi Serhiy,
 
-Justin P. Mattock
+On Tue, May 11, 2010 at 10:06 AM, Serhiy Kachaniuk <serzholino@gmail.com> wrote:
+> 2010/5/6 Serhiy Kachaniuk <serzholino@gmail.com>:
+>> Hi!
+>>
+>> My USB bluetooth adapter stopped working with new versions of bluez.
+>> Latest version which works is 4.32.
+>> I initially reported bug for ubuntu package in launchpad here
+>> https://bugs.launchpad.net/ubuntu/+source/bluez/+bug/453885 , but then
+>> i tried also opensuse livecd and problem remained there too, so looks
+>> like it's not ubuntu specific.
+>> jhe at #bluez-devel suggested to me to collect hcidump output on
+>> bluetoothd startup, and then write to this mailinglist. I attached
+>> suggested hcidumps for bluez versions 4.64 and 4.32, and looks like
+>> 4.64 stops initialization process after it cannot read parameter
+>> 'Default Link Policy Settings' from device.
+>>
+>> Can you please take a look at this bug?
+>> Thanks in advance.
+>>
+>
+> Can someone turn this e-mail thread into bluez bugreport? If i
+> understand correctly, only developers can create bluez bugreports in
+> trac? Also, if you need any more debugging info, i would be glad to
+> provide you with any.
+
+This (the mailing list) is the correct place for bug reports.
+
+Someone here in the office has an ancient Bluetooth 1.2 dongle, which
+shows a similar problem. Now that you discovered that it is probably a
+regression and I can reproduce it, I will try to debug it.
+
+And it looks like that the hcidump logs that you attached in your
+first email got lost somehow.
+
+Anyway, I think that the only information missing is your kernel version.
+
+
+Cheers,
+-- 
+Vinicius
