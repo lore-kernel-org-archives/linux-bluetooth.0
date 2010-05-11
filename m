@@ -1,26 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 11 May 2010 12:19:46 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Santiago Carot-Nemesio <sancane@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 26/26] Fix typo errors
-Message-ID: <20100511091946.GA7854@jh-x301>
-References: <1273486527-7855-25-git-send-email-sancane@gmail.com>
- <1273566123-2198-1-git-send-email-sancane@gmail.com>
+Subject: [PATCH v2] ath3k: add support for new firmware
+From: suraj <suraj@atheros.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <dwmw2@infradead.org>, <Luis.Rodriguez@Atheros.com>,
+	<Jothikumar.Mothilal@Atheros.com>, <marcel@holtmann.org>,
+	<vkandukuri@atheros.com>
+In-Reply-To: <1272356922.1393.14.camel@atheros013-desktop>
+References: <1268629296.21425.23.camel@atheros013-desktop>
+	 <1271758832.6585.33.camel@atheros013-desktop>
+	 <1271845337.15010.1.camel@atheros013-desktop>
+	 <1271927414.1409.3.camel@atheros013-desktop>
+	 <1272279623.11239.1.camel@atheros013-desktop>
+	 <1272349190.1393.11.camel@atheros013-desktop>
+	 <1272356922.1393.14.camel@atheros013-desktop>
+Content-Type: text/plain; charset="UTF-8"
+Date: Tue, 11 May 2010 14:34:18 +0530
+Message-ID: <1273568658.2410.5.camel@atheros013-desktop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1273566123-2198-1-git-send-email-sancane@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+New firmware has few critical bug fixes and shared antenna support.
 
-On Tue, May 11, 2010, Santiago Carot-Nemesio wrote:
->  mcap/mcap_internal.h |   28 ++++++++++++++--------------
->  1 files changed, 14 insertions(+), 14 deletions(-)
+Signed-off-by: Vikram Kandukuri <vkandukuri@atheros.com>
+---
+ drivers/bluetooth/ath3k.c |    9 ++++++---
+ 1 files changed, 6 insertions(+), 3 deletions(-)
 
-If possible, it'd be better if you just fix this in the original patch
-that introduced the typos instead of adding yet another patch
-(especially since nothing has been pushed upstream yet).
-
-Johan
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 128cae4..7bda549 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -122,9 +122,12 @@ static int ath3k_probe(struct usb_interface *intf,
+ 
+ 	data->udev = udev;
+ 
+-	if (request_firmware(&firmware, "ath3k-1.fw", &udev->dev) < 0) {
+-		kfree(data);
+-		return -EIO;
++	if (request_firmware(&firmware, "ath3k-2.fw", &udev->dev) < 0) {
++		BT_DBG("requesting old firmware");
++		if (request_firmware(&firmware, "ath3k-1.fw", &udev->dev) < 0) {
++			kfree(data);
++			return -EIO;
++		}
+ 	}
+ 
+ 	size = max_t(uint, firmware->size, 4096);
+-- 
+1.7.0
