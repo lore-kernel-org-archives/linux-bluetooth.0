@@ -1,150 +1,152 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Initial support for MCAP
+Subject: Re: [PATCH 03/25] Release resources depending if MCAP should cache
+ or  not a MCL
 From: Santiago Carot-Nemesio <scarot@libresoft.es>
 To: Raul Herbster <raul.herbster@signove.com>
 Cc: Santiago Carot-Nemesio <sancane@gmail.com>,
 	linux-bluetooth@vger.kernel.org
-In-Reply-To: <AANLkTikVs1YfnusOO8sRO9xbbOcZNU6STTlkygFvpNv3@mail.gmail.com>
+In-Reply-To: <AANLkTilMh75dW1rUlmOV_AZ7UZqGX1vv_nyZu9qaJgKX@mail.gmail.com>
 References: <1273486527-7855-1-git-send-email-sancane@gmail.com>
-	 <1273571962-3558-1-git-send-email-sancane@gmail.com>
-	 <1273572070.2126.30.camel@mosquito>
-	 <AANLkTikVs1YfnusOO8sRO9xbbOcZNU6STTlkygFvpNv3@mail.gmail.com>
+	 <1273486527-7855-2-git-send-email-sancane@gmail.com>
+	 <1273486527-7855-3-git-send-email-sancane@gmail.com>
+	 <AANLkTilMh75dW1rUlmOV_AZ7UZqGX1vv_nyZu9qaJgKX@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 12 May 2010 10:45:38 +0200
-Message-ID: <1273653938.1997.33.camel@mosquito>
+Date: Wed, 12 May 2010 09:05:14 +0200
+Message-ID: <1273647914.1997.15.camel@mosquito>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Raul,
-This patch is applied over a old version of MCAP (first that I sent).
-New version (splited in 25 patches) fix more of typo error that you are
-commented and Gustavo already notified.
-
-El mar, 11-05-2010 a las 19:00 -0300, Raul Herbster escribió:
+El mar, 11-05-2010 a las 19:09 -0300, Raul Herbster escribió:
 > Hi Santiago,
 > 
-> only typo errors:
+> 2010/5/10 Santiago Carot-Nemesio <sancane@gmail.com>:
+> > From: Santiago Carot Nemesio <sancane@gmail.com>
+> >
+> > ---
+> >  mcap/mcap.c |   83 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+> >  1 files changed, 81 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/mcap/mcap.c b/mcap/mcap.c
+> > index 1c94452..7d34b95 100644
+> > --- a/mcap/mcap.c
+> > +++ b/mcap/mcap.c
+> > @@ -36,14 +36,93 @@
+> >
+> >  #define MCAP_ERROR g_quark_from_static_string("mcap-error-quark")
+> >
+> > +#define RELEASE_TIMER(__mcl) do {      \
+> > +       g_source_remove(__mcl->tid);    \
+> > +       __mcl->tid = 0;                 \
+> > +} while(0)
+> > +
+> > +static void shutdown_mdl(struct mcap_mdl *mdl)
+> > +{
+> > +       mdl->state = MDL_CLOSED;
+> > +
+> > +       g_source_remove(mdl->wid);
+> > +
+> > +       if (mdl->dc) {
+> > +               g_io_channel_shutdown(mdl->dc, TRUE, NULL);
+> > +               g_io_channel_unref(mdl->dc);
+> > +               mdl->dc = NULL;
+> > +       }
+> > +}
+> > +
+> > +static void mcap_free_mdls(struct mcap_mcl *mcl, gboolean save)
+> > +{
+> > +       GSList *l;
+> > +       struct mcap_mdl *mdl;
+> > +
+> > +       if (!mcl->mdls)
+> > +               return;
+> > +
+> > +       for (l = mcl->mdls; l; l = l->next) {
+> > +               mdl = l->data;
+> > +               shutdown_mdl(mdl);
+> > +               if (!save)
+> > +                       g_free(mdl);
+> > +       }
+> > +
+> > +       if (!save) {
+> > +               g_slist_free(mcl->mdls);
+> > +               mcl->mdls = NULL;
+> > +       }
+> > +}
+> > +
+> > +static void mcap_mcl_free(struct mcap_mcl *mcl, gboolean save)
+> > +{
+> > +       gboolean store = ((!(mcl->ctrl & MCAP_CTRL_FREE)) && save);
+> > +
+> > +       if (mcl->tid) {
+> > +               RELEASE_TIMER(mcl);
+> > +       }
+> > +
+> > +       if (mcl->cc) {
+> > +               g_io_channel_shutdown(mcl->cc, TRUE, NULL);
+> > +               g_io_channel_unref(mcl->cc);
+> > +               mcl->cc = NULL;
+> > +       }
+> > +
+> > +       g_source_remove(mcl->wid);
+> > +       if (mcl->lcmd) {
+> > +               g_free(mcl->lcmd);
+> > +               mcl->lcmd = NULL;
+> > +       }
+> > +
+> > +       if (mcl->priv_data) {
+> > +               g_free(mcl->priv_data);
+> > +               mcl->priv_data = NULL;
+> > +       }
+> > +
+> > +       mcap_free_mdls(mcl, store);
+> > +
+> > +       if (mcl->cb && !store) {
+> > +               g_free(mcl->cb);
+> > +               mcl->cb = NULL;
+> > +       }
+> > +
+> > +       mcl->state = MCL_IDLE;
+> > +
+> > +       if (store)
+> > +               return;
+> > +
+> > +       g_free(mcl);
+> > +}
+> > +
 > 
-> diff --git a/mcap/mcap.c b/mcap/mcap.c
-> index 404d7be..6142938 100644
-> --- a/mcap/mcap.c
-> +++ b/mcap/mcap.c
-> @@ -116,7 +116,7 @@ struct mcap_mcl {
->  #define    MCAP_CTRL_CACHED    0x01    /* MCL is cached */
->  #define    MCAP_CTRL_STD_OP    0x02    /* Support for standard op
-> codes */
->  #define    MCAP_CTRL_SYNC_OP    0x04    /* Support for
-> synchronization commands */
-> -#define    MCAP_CTRL_CONN        0x08    /* MCL is in connectcting
-> process */
-> +#define    MCAP_CTRL_CONN        0x08    /* MCL is in connecting
-> process */
+> According to MCL state machine, if there're no more data channels (but
+> a control channel still exists), the current MCL state is CONNECTED.
+> Functions shutdown_mdl and mcap_free_mdls should update MCL state
+> machine properly.
 
-This error is already fixed in my previous patch. Be careful, above
-definitions are not yet included in mcap.c, update you work tree from
-latest patches ;)
+That's rigth and it is done when an MDL is closed, the function that
+does that is update_mcl_state that is executed when the appropriate MDL
+is clsoed, deleted or aborted. Seeing the "mdl_event_cb" callback
+function that is tied to the data channel, you can see that if last MDL
+is closed, the resulting state for the MCL will be CONNECTED.
 
->  #define    MCAP_CTRL_FREE        0x10    /* MCL is marked as
-> releasable */
->  #define    MCAP_CTRL_NOCACHE    0x20    /* MCL is marked as not
-> cacheable */
->  
-> @@ -242,7 +242,7 @@ static char *error2str(uint8_t rc)
->          return "Invalid Operation";
->      case MCAP_RESOURCE_UNAVAILABLE:
->          return "Resource Unavailable";
-> -    case MCAP_UNESPECIFIED_ERROR:
-> +    case MCAP_UNSPECIFIED_ERROR:
+The function that you are seeing is "mcap_mcl_free" that is used to
+shutdown an MCL, it means all MDLs + Control channel, above function
+should close the control channel and all data channels (shutdown MDLS)
+and resulting state for the MCL is IDLE because control channel is
+closed too.
 
-You're right, I'll redo the patch to fix all "UNESPECIFIED" erroneous
-word.
+Please, revise thats parts of the code and you will see that it is
+rigth.
 
->          return "Unspecified Error";
->      case MCAP_REQUEST_NOT_SUPPORTED:
->          return "Request Not Supported";
-> @@ -1056,8 +1056,8 @@ static void process_md_create_mdl_req(struct
-> mcap_mcl *mcl, uint8_t *cmd, uint32
->      if ((cfga != 0) && (cfga != conf)) {
->          /* Remote device set default configuration but upper profile
-> */
->          /* has changed it. Protocol Error: force closing the MCL by
-> */
-> -        /* remote device using UNESPECIFIED_ERROR response */
-> -        send4B_cmd(mcl, MCAP_MD_CREATE_MDL_RSP,
-> MCAP_UNESPECIFIED_ERROR,
-> +        /* remote device using UNSPECIFIED_ERROR response */
-> +        send4B_cmd(mcl, MCAP_MD_CREATE_MDL_RSP,
-> MCAP_UNSPECIFIED_ERROR,
->                                  mdl_id);
->          return;
->      }
-> @@ -1548,13 +1548,13 @@ static gboolean check_rsp(struct mcap_mcl
-> *mcl, uint8_t *cmd, uint32_t len)
->          return FALSE;
->      }
->  
-> -    if (rsp->rc == MCAP_UNESPECIFIED_ERROR)
-> +    if (rsp->rc == MCAP_UNSPECIFIED_ERROR)
->          goto close_mcl;
->  
->      return TRUE;
->  close_mcl:
-> -    if (rsp->rc == MCAP_UNESPECIFIED_ERROR)
-> -        g_set_error(&gerr, MCAP_ERROR, MCAP_ERROR_UNESPECIFIED_ERROR,
-> +    if (rsp->rc == MCAP_UNSPECIFIED_ERROR)
-> +        g_set_error(&gerr, MCAP_ERROR, MCAP_ERROR_UNSPECIFIED_ERROR,
->                          "%s", error2str(rsp->rc));
->      else
->          g_set_error(&gerr, MCAP_ERROR, MCAP_ERROR_FAILED,
-> diff --git a/mcap/mcap.h b/mcap/mcap.h
-> index 598e6ce..77c83c2 100644
-> --- a/mcap/mcap.h
-> +++ b/mcap/mcap.h
-> @@ -76,7 +76,7 @@ extern "C" {
->  #define MCAP_MDL_BUSY            0x06
->  #define MCAP_INVALID_OPERATION        0x07
->  #define MCAP_RESOURCE_UNAVAILABLE    0x08
-> -#define MCAP_UNESPECIFIED_ERROR        0x09
-> +#define MCAP_UNSPECIFIED_ERROR        0x09
->  #define MCAP_REQUEST_NOT_SUPPORTED    0x0A
->  #define MCAP_CONFIGURATION_REJECTED    0x0B
->  /*RESERVED                0x0C-0xFF*/
-> diff --git a/mcap/mcap_lib.h b/mcap/mcap_lib.h
-> index fd3eb74..d75e0f0 100644
-> --- a/mcap/mcap_lib.h
-> +++ b/mcap/mcap_lib.h
-> @@ -45,7 +45,7 @@ typedef enum {
->      MCAP_ERROR_MDL_BUSY,
->      MCAP_ERROR_INVALID_OPERATION,
->      MCAP_ERROR_RESOURCE_UNAVAILABLE,
-> -    MCAP_ERROR_UNESPECIFIED_ERROR,
-> +    MCAP_ERROR_UNSPECIFIED_ERROR,
->      MCAP_ERROR_REQUEST_NOT_SUPPORTED,
->      MCAP_ERROR_CONFIGURATION_REJECTED,
->  /* MCAP Internal Errors */
-> @@ -79,7 +79,7 @@ typedef void (* mcap_mdl_operation_cb) (struct
-> mcap_mdl *mdl, GError *err,
->                          gpointer data);
->  typedef void (* mcap_mdl_del_cb) (GError *err, gpointer data);
->  
-> -/* Next function should return an MCAP appropiate response code */
-> +/* Next function should return an MCAP appropriate response code */
+Thanks for the comment, and please, don't hesitate in make more comments
+about the code if you think that are necessary more explanations.
 
-Ok, we don't see that. I'll change it too.
+Regards.
 
->  typedef uint8_t (* mcap_remote_mdl_conn_req_cb) (struct mcap_mcl
-> *mcl,
->                          uint8_t mdepid, uint16_t mdlid,
->                          uint8_t *conf, gpointer data);
 > 
 > 
 > []' s
 > --Raul
-> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Thanks fore typo errors but I suggest to you work with latest patches I
-sent 2 days ago.
-
-Regards.
 
