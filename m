@@ -1,64 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4BEABA71.7000508@gmail.com>
+Date: Wed, 12 May 2010 07:25:53 -0700
+From: "Justin P. Mattock" <justinmattock@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1273486527-7855-8-git-send-email-sancane@gmail.com>
-References: <1273486527-7855-1-git-send-email-sancane@gmail.com>
-	 <1273486527-7855-2-git-send-email-sancane@gmail.com>
-	 <1273486527-7855-3-git-send-email-sancane@gmail.com>
-	 <1273486527-7855-4-git-send-email-sancane@gmail.com>
-	 <1273486527-7855-5-git-send-email-sancane@gmail.com>
-	 <1273486527-7855-6-git-send-email-sancane@gmail.com>
-	 <1273486527-7855-7-git-send-email-sancane@gmail.com>
-	 <1273486527-7855-8-git-send-email-sancane@gmail.com>
-Date: Wed, 12 May 2010 11:33:13 -0300
-Message-ID: <AANLkTikhyI_MBRgVAV3CpQ7_bSqUXqKdkarY1VTI_kI-@mail.gmail.com>
-Subject: Re: [PATCH 08/25] Profiles using MCAP can close a MCL deciding if it
-	should be cached
-From: Raul Herbster <raul.herbster@signove.com>
-To: Santiago Carot-Nemesio <sancane@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+To: Jiri Kosina <jkosina@suse.cz>
+CC: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	mdpoole@troilus.org
+Subject: Re: [PATCH] HID:magicmouse: This fixes a connection problem with
+ the magicmouse.
+References: <1273595363-4020-1-git-send-email-justinmattock@gmail.com> <alpine.LNX.2.00.1005121456150.28092@pobox.suse.cz> <4BEAAF9C.909@gmail.com> <alpine.LNX.2.00.1005121540340.28092@pobox.suse.cz> <4BEAB3AF.6020909@gmail.com> <alpine.LNX.2.00.1005121602240.28092@pobox.suse.cz>
+In-Reply-To: <alpine.LNX.2.00.1005121602240.28092@pobox.suse.cz>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Santiago,
-
-2010/5/10 Santiago Carot-Nemesio <sancane@gmail.com>:
-> From: Santiago Carot Nemesio <sancane@gmail.com>
+On 05/12/2010 07:03 AM, Jiri Kosina wrote:
+> On Wed, 12 May 2010, Justin P. Mattock wrote:
 >
-> ---
->  mcap/mcap.c |   17 +++++++++++++++++
->  1 files changed, 17 insertions(+), 0 deletions(-)
+>    
+>>>>>> --- a/drivers/hid/hid-magicmouse.c
+>>>>>> +++ b/drivers/hid/hid-magicmouse.c
+>>>>>> @@ -354,7 +354,7 @@ static int magicmouse_probe(struct hid_device
+>>>>>> *hdev,
+>>>>>>     		goto err_free;
+>>>>>>     	}
+>>>>>>
+>>>>>> -	ret = hid_hw_start(hdev, HID_CONNECT_DEFAULT&
+>>>>>> ~HID_CONNECT_HIDINPUT);
+>>>>>> +	ret = hid_hw_start(hdev, HID_CONNECT_DEFAULT);
+>>>>>>
+>>>>>>
+>>>>>>              
+>>>>> This is not particularly right, as we'll end up having dangling
+>>>>> input device.
+>>>>>
+>>>>> The problem is, that when HIDRAW is not set, hid_hw_start()
+>>>>> returns ENODEV as no subsystem has claimed the device, and probe
+>>>>> routine bails out. Which is not what we want.
+>>>>>
+>>>>> Does the testing patch below fix the problems you are seeing?
+>>>>>
+>>>>>            
+>>>> works good.. rebooted a few times mouse connects. suspended a few times
+>>>> mouse reconnects.
+>>>>
+>>>>          
+>>> I'd be glad if you could also double-check that device removal and
+>>> re-connecting it works well as well with this patch.
+>>>
+>>>        
+>> with  test I did different techniques,
+>> 1) regular suspend(leave device on)
+>> 2)suspend then shut off device
+>> 3)shut off device then suspend
+>> all of these techniques work properly
+>>      
+> Thanks for reporting and testing, I have queued the patch.
 >
-> diff --git a/mcap/mcap.c b/mcap/mcap.c
-> index 0112154..8f6fb78 100644
-> --- a/mcap/mcap.c
-> +++ b/mcap/mcap.c
-> @@ -305,6 +305,23 @@ static void mcap_uncache_mcl(struct mcap_mcl *mcl)
->        mcl->ctrl &= ~MCAP_CTRL_FREE;
->  }
->
-> +void mcap_close_mcl(struct mcap_mcl *mcl, gboolean cache)
-> +{
-> +       if (!mcl)
-> +               return;
-> +
-> +       if (mcl->cc) {
-> +               g_io_channel_shutdown(mcl->cc, TRUE, NULL);
-> +               g_io_channel_unref(mcl->cc);
-> +               mcl->cc = NULL;
-> +       }
-> +
-> +       mcl->state = MCL_IDLE;
-> +
-> +       if (!cache)
-> +               mcl->ctrl |= MCAP_CTRL_NOCACHE;
-> +}
-> +
+>    
+cool...
 
-According to MCAP spec (page 10, section 2.1.2), when the CC is
-closed, all of its associated DCs are closed as well. In fact, DCs are
-propely closed on mcap_mcl_free , but not on mcap_close_mcl. So, which
-one really closes MCL?
-
-[]´s
---Raul
+Justin P. Mattock
