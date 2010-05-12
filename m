@@ -1,113 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4BEAAF9C.909@gmail.com>
-Date: Wed, 12 May 2010 06:39:40 -0700
-From: "Justin P. Mattock" <justinmattock@gmail.com>
-MIME-Version: 1.0
-To: Jiri Kosina <jkosina@suse.cz>
-CC: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	mdpoole@troilus.org
-Subject: Re: [PATCH] HID:magicmouse: This fixes a connection problem with
- the magicmouse.
-References: <1273595363-4020-1-git-send-email-justinmattock@gmail.com> <alpine.LNX.2.00.1005121456150.28092@pobox.suse.cz>
-In-Reply-To: <alpine.LNX.2.00.1005121456150.28092@pobox.suse.cz>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 12 May 2010 15:12:35 +0200
+From: Antonio Ospite <ospite@studenti.unina.it>
+To: linux-input@vger.kernel.org
+Cc: Antonio Ospite <ospite@studenti.unina.it>,
+	Bastien Nocera <hadess@hadess.net>,
+	linux-bluetooth@vger.kernel.org, cbe-oss-dev@lists.ozlabs.org
+Subject: Re: [PATCH 0/2] Groundwork for Sixaxis paring into bluez.
+Message-Id: <20100512151235.78cd8ed3.ospite@studenti.unina.it>
+In-Reply-To: <1272917756-31098-1-git-send-email-ospite@studenti.unina.it>
+References: <1272917756-31098-1-git-send-email-ospite@studenti.unina.it>
+Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA1";
+ boundary="Signature=_Wed__12_May_2010_15_12_35_+0200_XXS3CMNDJeuxV/+W"
+Sender: linux-input-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 05/12/2010 05:58 AM, Jiri Kosina wrote:
-> On Tue, 11 May 2010, Justin P. Mattock wrote:
->
->    
->> With the latest HEAD, I've noticed that I needed to add: HIDRAW=y in
->> order for my apple magicmouse to connect. After receiving some posts, it
->> seems this it not the case(HIDRAW just relays HID events to userspace).
->>
->> The bisect results of this issue resulted in commit: HID:magicmouse: fix
->> oops after device removal.
->> (hash:28918c211d86b6eeb70182c523800c7bc442960c)
->>
->> After examining this commit, I've noticed that HID_CONNECT_DEFAULT has
->> also an entry in there of HID_CONNECT_HIDINPUT, not sure what "~" means,
->>      
-> ~ is zeroing out the HID_CONENCT_HIDINPUT bits from the connect mask, as
-> magicmouse driver is handling the input itself.
->
->    
-ah.. cool thanks for that..(I still have lots to learn(so many 
-expressions)).
->> before HID_CONNECT_HIDINPUT, but after removing
->> this(correct me if I'm wrong)"double" definition,
->> I'm able to have my magicmouse connect without the
->> need of HIDRAW, and also this in dmesg:
->>
->> magicmouse 0005:05AC:030D.0004: claimed by neither input, hiddev nor hidraw
->> magicmouse 0005:05AC:030D.0004: magicmouse hw start failed
->>
->> and as well as the crash that the above commit fixes when waking
->> up from suspend(mouse connects perfectly upon wakeup).
->>
->> Please have a look, and if this works, take it
->> if theres another solution let me know.
->> (so I can enjoy the power of the magicmouse!!).
->>
->>
->> Signed-off-by: Justin P. Mattock<justinmattock@gmail.com>
->>
->> ---
->>   drivers/hid/hid-magicmouse.c |    2 +-
->>   1 files changed, 1 insertions(+), 1 deletions(-)
->>
->> diff --git a/drivers/hid/hid-magicmouse.c b/drivers/hid/hid-magicmouse.c
->> index 0d471fc..0de5e96 100644
->> --- a/drivers/hid/hid-magicmouse.c
->> +++ b/drivers/hid/hid-magicmouse.c
->> @@ -354,7 +354,7 @@ static int magicmouse_probe(struct hid_device *hdev,
->>   		goto err_free;
->>   	}
->>
->> -	ret = hid_hw_start(hdev, HID_CONNECT_DEFAULT&  ~HID_CONNECT_HIDINPUT);
->> +	ret = hid_hw_start(hdev, HID_CONNECT_DEFAULT);
->>      
-> This is not particularly right, as we'll end up having dangling input
-> device.
->
-> The problem is, that when HIDRAW is not set, hid_hw_start() returns ENODEV
-> as no subsystem has claimed the device, and probe routine bails out. Which
-> is not what we want.
->
-> Does the testing patch below fix the problems you are seeing?
->
->
->    
-works good.. rebooted a few times
-mouse connects. suspended a few times mouse reconnects.
-> diff --git a/drivers/hid/hid-magicmouse.c b/drivers/hid/hid-magicmouse.c
-> index 0d471fc..f10d56a 100644
-> --- a/drivers/hid/hid-magicmouse.c
-> +++ b/drivers/hid/hid-magicmouse.c
-> @@ -354,12 +354,15 @@ static int magicmouse_probe(struct hid_device *hdev,
->   		goto err_free;
->   	}
->
-> -	ret = hid_hw_start(hdev, HID_CONNECT_DEFAULT&  ~HID_CONNECT_HIDINPUT);
-> +	ret = hid_hw_start(hdev, HID_CONNECT_DEFAULT);
->   	if (ret) {
->   		dev_err(&hdev->dev, "magicmouse hw start failed\n");
->   		goto err_free;
->   	}
->
-> +	/* we are handling the input ourselves */
-> +	hidinput_disconnect(hdev);
-> +
->   	report = hid_register_report(hdev, HID_INPUT_REPORT, TOUCH_REPORT_ID);
->   	if (!report) {
->   		dev_err(&hdev->dev, "unable to register touch report\n");
->
->    
+--Signature=_Wed__12_May_2010_15_12_35_+0200_XXS3CMNDJeuxV/+W
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-looks good over here.. If you'd like I can re-du
-this patch, add your sign off etc.. and re-send,
-or not worry.. either way this little quirk/problem
-is fixed.
+On Mon,  3 May 2010 22:15:54 +0200
+Antonio Ospite <ospite@studenti.unina.it> wrote:
 
-Justin P. Mattock
+> Hi,
+>=20
+> These changes are in preparation of seamless integration of the Sixaxis
+> pairing procedure into bluez. It was about time :)
+>
+
+Ping, and comments below.
+
+> The first one cleans up the quirks handling.
+>=20
+> The second one adds a sysfs interface to set and get the device and master
+> bdaddr, this is needed in order to setup the host for pairing. This kernel
+> interface is a mere workaround for the lack of features of hidraw[1], if
+> someone wants to add the missing features to hidraw I will be happy to dr=
+op
+> this one, otherwise consider queuing these for 2.6.35 if it's too late for
+> 2.6.34.
+>
+
+I guess the silence here was also because this particular
+hackish solution must not look very good to you. If there's really a
+strong objection to it I might consider extending hidraw capabilities by
+adding some ioctls, maybe I just need some extra motivation.
+
+Regards,
+   Antonio
+
+> Thanks,
+>    Antonio
+>=20
+> [1] http://www.spinics.net/lists/linux-input/msg08311.html
+>=20
+>=20
+> Antonio Ospite (2):
+>   hid/hid-sony: Apply sixaxis quirks only to sixaxis
+>   hid/hid-sony: get and set Sixaxis bdaddr via sysfs
+>=20
+>  drivers/hid/hid-sony.c |  170 ++++++++++++++++++++++++++++++++++++++++++=
++----
+>  1 files changed, 155 insertions(+), 15 deletions(-)
+
+--=20
+Antonio Ospite
+http://ao2.it
+
+PGP public key ID: 0x4553B001
+
+A: Because it messes up the order in which people normally read text.
+   See http://en.wikipedia.org/wiki/Posting_style
+Q: Why is top-posting such a bad thing?
+A: Top-posting.
+Q: What is the most annoying thing in e-mail?
+
+--Signature=_Wed__12_May_2010_15_12_35_+0200_XXS3CMNDJeuxV/+W
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAkvqqUMACgkQ5xr2akVTsAHNhQCdHkVzLtFR2YuJiIvhixF01Svq
+BDkAn3DEpYUJQCyUt2jgDqPxALVKk4kO
+=hqwX
+-----END PGP SIGNATURE-----
+
+--Signature=_Wed__12_May_2010_15_12_35_+0200_XXS3CMNDJeuxV/+W--
