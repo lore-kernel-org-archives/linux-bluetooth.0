@@ -2,78 +2,47 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot Nemesio <sancane@gmail.com>
-Subject: [PATCH 17/25] Support for sending md_delete_mdl_req command
-Date: Wed, 12 May 2010 11:59:24 +0200
-Message-Id: <1273658364-17720-1-git-send-email-sancane@gmail.com>
-In-Reply-To: <1273486527-7855-17-git-send-email-sancane@gmail.com>
-References: <1273486527-7855-17-git-send-email-sancane@gmail.com>
+Subject: [PATCH 14/25] Support for managing creation of data channels
+Date: Wed, 12 May 2010 11:58:12 +0200
+Message-Id: <1273658292-17670-1-git-send-email-sancane@gmail.com>
+In-Reply-To: <1273486527-7855-14-git-send-email-sancane@gmail.com>
+References: <1273486527-7855-14-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Santiago Carot Nemesio <sancane@gmail.com>
 
 ---
- mcap/mcap.c |  211 ++++++++++++++++++++++++++++++++++++++++------------------
- 1 files changed, 145 insertions(+), 66 deletions(-)
+ mcap/mcap.c |  172 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 171 insertions(+), 1 deletions(-)
 
 diff --git a/mcap/mcap.c b/mcap/mcap.c
-index 1d01937..75d3d58 100644
+index 6d548b9..3d442d1 100644
 --- a/mcap/mcap.c
 +++ b/mcap/mcap.c
-@@ -76,6 +76,88 @@ static void (*proc_req[])(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len) = {
- static void mcap_cache_mcl(struct mcap_mcl *mcl);
- static void mcap_uncache_mcl(struct mcap_mcl *mcl);
+@@ -49,6 +49,18 @@ struct connect_mcl {
+ 	gpointer		user_data;	/* Callback user data */
+ };
  
-+static void default_mdl_connected_cb(struct mcap_mdl *mdl, gpointer data)
-+{
-+	debug("MCAP Unmanaged mdl connection");
-+}
++typedef union {
++	mcap_mdl_operation_cb 		op;
++	mcap_mdl_operation_conf_cb	op_conf;
++	mcap_mdl_del_cb			del;
++} mcap_cb_type;
 +
-+static void default_mdl_closed_cb(struct mcap_mdl *mdl, gpointer data)
-+{
-+	debug("MCAP Unmanaged mdl clsoed");
-+}
++struct mcap_mdl_op_cb {
++	struct mcap_mdl		*mdl;		/* MDL for this operation */
++	mcap_cb_type		cb;		/* Operation callback */
++	gpointer		user_data;	/* Callback user data */
++};
 +
-+static void default_mdl_deleted_cb(struct mcap_mdl *mdl, gpointer data)
-+{
-+	debug("MCAP Unmanaged mdl deleted");
-+}
-+
-+static void default_mdl_aborted_cb(struct mcap_mdl *mdl, gpointer data)
-+{
-+	debug("MCAP Unmanaged mdl aborted");
-+}
-+
-+static uint8_t default_mdl_conn_req_cb(struct mcap_mcl *mcl,
-+						uint8_t mdepid, uint16_t mdlid,
-+						uint8_t *conf, gpointer data)
-+{
-+	debug("MCAP mdl remote connection aborted");
-+	/* Due to this callback is not managed this request won't be supported */
-+	return MCAP_REQUEST_NOT_SUPPORTED;
-+}
-+
-+static uint8_t default_mdl_reconn_req_cb(struct mcap_mdl *mdl,
-+						gpointer data)
-+{
-+	debug("MCAP mdl remote reconnection aborted");
-+	/* Due to this callback is not managed this request won't be supported */
-+	return MCAP_REQUEST_NOT_SUPPORTED;
-+}
-+
-+static void set_default_cb(struct mcap_mcl *mcl)
-+{
-+	if (!mcl->cb)
-+		mcl->cb = g_new0(struct mcap_mdl_cb, 1);
-+
-+	mcl->cb->mdl_connected = default_mdl_connected_cb;
-+	mcl->cb->mdl_closed = default_mdl_closed_cb;
-+	mcl->cb->mdl_deleted = default_mdl_deleted_cb;
-+	mcl->cb->mdl_aborted = default_mdl_aborted_cb;
-+	mcl->cb->mdl_conn_req = default_mdl_conn_req_cb;
-+	mcl->cb->mdl_reconn_req = default_mdl_reconn_req_cb;
-+}
-+
+ /* MCAP finite state machine functions */
+ static void proc_req_connected(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len);
+ static void proc_req_pending(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len);
+@@ -179,6 +191,38 @@ static void set_default_cb(struct mcap_mcl *mcl)
+ 	mcl->cb->mdl_reconn_req = default_mdl_reconn_req_cb;
+ }
+ 
 +static char *error2str(uint8_t rc)
 +{
 +	switch (rc) {
@@ -106,159 +75,158 @@ index 1d01937..75d3d58 100644
 +	}
 +}
 +
- static void mcap_send_std_opcode(struct mcap_mcl *mcl, uint8_t *cmd,
- 						uint32_t size, GError **err)
+ static void update_mcl_state(struct mcap_mcl *mcl)
  {
-@@ -357,86 +439,83 @@ void mcap_req_mdl_reconnect(struct mcap_mdl *mdl,
- 	mcl->tid = g_timeout_add_seconds(RESPONSE_TIMER, wait_response_timer, mcl);
+ 	GSList *l;
+@@ -833,6 +877,86 @@ static void proc_cmd(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
+ 		proc_req[mcl->state](mcl, cmd, len);
  }
  
--static void default_mdl_connected_cb(struct mcap_mdl *mdl, gpointer data)
-+static void send_delete_req(GError **err, struct mcap_mcl *mcl,
-+				struct mcap_mdl_op_cb *con, uint16_t mdlid)
- {
--	debug("MCAP Unmanaged mdl connection");
--}
-+	uint8_t *cmd;
- 
--static void default_mdl_closed_cb(struct mcap_mdl *mdl, gpointer data)
--{
--	debug("MCAP Unmanaged mdl clsoed");
--}
-+	cmd = create_req(MCAP_MD_DELETE_MDL_REQ, mdlid);
-+	mcap_send_std_opcode(mcl, cmd, sizeof(mcap_md_req), err);
-+	if (*err) {
-+		g_free(cmd);
++static gboolean mdl_event_cb(GIOChannel *chan, GIOCondition cond, gpointer data)
++{
++
++	struct mcap_mdl *mdl = data;
++	gboolean notify;
++
++	debug("Close MDL %d", mdl->mdlid);
++
++	notify = (mdl->state == MDL_CONNECTED);
++	shutdown_mdl(mdl);
++
++	update_mcl_state(mdl->mcl);
++
++	if (notify)
++		/*Callback to upper layer */
++		mdl->mcl->cb->mdl_closed(mdl, mdl->mcl->cb->user_data);
++
++	return FALSE;
++}
++
++static void mcap_connect_mdl_cb(GIOChannel *chan, GError *conn_err,
++							gpointer data)
++{
++	struct mcap_mdl_op_cb *con = data;
++	struct mcap_mdl *mdl = con->mdl;
++	mcap_mdl_operation_cb cb = con->cb.op;
++	gpointer user_data = con->user_data;
++
++	g_free(con);
++	debug("mdl connect callback");
++
++	if (conn_err) {
++		debug("ERROR: mdl connect callback");
++		mdl->state = MDL_CLOSED;
++		g_io_channel_unref(mdl->dc);
++		mdl->dc = NULL;
++		cb(mdl, conn_err, user_data);
 +		return;
 +	}
- 
--static void default_mdl_deleted_cb(struct mcap_mdl *mdl, gpointer data)
--{
--	debug("MCAP Unmanaged mdl deleted");
--}
-+	mcl->priv_data = con;
- 
--static void default_mdl_aborted_cb(struct mcap_mdl *mdl, gpointer data)
--{
--	debug("MCAP Unmanaged mdl aborted");
-+	mcl->tid = g_timeout_add_seconds(RESPONSE_TIMER, wait_response_timer, mcl);
- }
- 
--static uint8_t default_mdl_conn_req_cb(struct mcap_mcl *mcl,
--						uint8_t mdepid, uint16_t mdlid,
--						uint8_t *conf, gpointer data)
-+void mcap_req_mdl_delete_all(struct mcap_mcl *mcl, GError **err,
-+			mcap_mdl_del_cb delete_cb, gpointer user_data)
- {
--	debug("MCAP mdl remote connection aborted");
--	/* Due to this callback is not managed this request won't be supported */
--	return MCAP_REQUEST_NOT_SUPPORTED;
--}
-+	GSList *l;
-+	struct mcap_mdl *mdl;
++
++	mdl->state = MDL_CONNECTED;
++	mdl->wid = g_io_add_watch(mdl->dc, G_IO_ERR | G_IO_HUP | G_IO_NVAL,
++				(GIOFunc) mdl_event_cb, mdl);
++
++	cb(mdl, conn_err, user_data);
++}
++
++void mcap_mdl_connect(struct mcap_mdl *mdl, BtIOType BtType, uint16_t dcpsm,
++	GError **err, mcap_mdl_operation_cb connect_cb, gpointer user_data)
++{
 +	struct mcap_mdl_op_cb *con;
- 
--static uint8_t default_mdl_reconn_req_cb(struct mcap_mdl *mdl,
--						gpointer data)
--{
--	debug("MCAP mdl remote reconnection aborted");
--	/* Due to this callback is not managed this request won't be supported */
--	return MCAP_REQUEST_NOT_SUPPORTED;
--}
-+	debug("MCL in state: %d", mcl->state);
-+	if (!mcl->mdls) {
-+		g_set_error(err, MCAP_ERROR, MCAP_ERROR_FAILED,
-+				"There are not MDLs created");
-+		return;
-+	}
- 
--static void set_default_cb(struct mcap_mcl *mcl)
--{
--	if (!mcl->cb)
--		mcl->cb = g_new0(struct mcap_mdl_cb, 1);
-+	for (l = mcl->mdls; l; l = l->next) {
-+		mdl = l->data;
-+		if (mdl->state != MDL_WAITING)
-+			mdl->state = MDL_DELETING;
-+	}
- 
--	mcl->cb->mdl_connected = default_mdl_connected_cb;
--	mcl->cb->mdl_closed = default_mdl_closed_cb;
--	mcl->cb->mdl_deleted = default_mdl_deleted_cb;
--	mcl->cb->mdl_aborted = default_mdl_aborted_cb;
--	mcl->cb->mdl_conn_req = default_mdl_conn_req_cb;
--	mcl->cb->mdl_reconn_req = default_mdl_reconn_req_cb;
-+	con = g_new0(struct mcap_mdl_op_cb, 1);
-+	con->mdl = NULL;
-+	con->cb.del = delete_cb;
-+	con->user_data = user_data;
 +
-+	send_delete_req(err, mcl, con, MCAP_ALL_MDLIDS);
-+	if (*err)
-+		g_free(con);
- }
- 
--static char *error2str(uint8_t rc)
-+void mcap_req_mdl_deletion(struct mcap_mdl *mdl, GError **err,
-+			mcap_mdl_del_cb delete_cb, gpointer user_data)
- {
--	switch (rc) {
--	case MCAP_SUCCESS:
--		return "Success";
--	case MCAP_INVALID_OP_CODE:
--		return "Invalid Op Code";
--	case MCAP_INVALID_PARAM_VALUE:
--		return "Ivalid Parameter Value";
--	case MCAP_INVALID_MDEP:
--		return "Invalid MDEP";
--	case MCAP_MDEP_BUSY:
--		return "MDEP Busy";
--	case MCAP_INVALID_MDL:
--		return "Invalid MDL";
--	case MCAP_MDL_BUSY:
--		return "MDL Busy";
--	case MCAP_INVALID_OPERATION:
--		return "Invalid Operation";
--	case MCAP_RESOURCE_UNAVAILABLE:
--		return "Resource Unavailable";
--	case MCAP_UNSPECIFIED_ERROR:
--		return "Unspecified Error";
--	case MCAP_REQUEST_NOT_SUPPORTED:
--		return "Request Not Supported";
--	case MCAP_CONFIGURATION_REJECTED:
--		return "Configuration Rejected";
--	default:
--		return "Unknown Response Code";
-+	struct mcap_mcl *mcl= mdl->mcl;
-+	struct mcap_mdl_op_cb *con;
-+	GSList *l;
-+
-+	l = g_slist_find(mcl->mdls, mdl);
-+
-+	if (!l) {
++	if (mdl->state != MDL_WAITING) {
 +		g_set_error(err, MCAP_ERROR, MCAP_ERROR_INVALID_MDL,
-+					"%s" , error2str(MCAP_INVALID_MDEP));
-+		return;
- 	}
-+
-+	if (mdl->state == MDL_WAITING) {
-+		g_set_error(err, MCAP_ERROR, MCAP_ERROR_FAILED,
-+							"Mdl is not created");
++					"%s", error2str(MCAP_INVALID_MDL));
 +		return;
 +	}
-+	mdl->state = MDL_DELETING;
 +
 +	con = g_new0(struct mcap_mdl_op_cb, 1);
 +	con->mdl = mdl;
-+	con->cb.del = delete_cb;
++	con->cb.op = connect_cb;
 +	con->user_data = user_data;
 +
-+	send_delete_req(err, mcl, con, mdl->mdlid);
-+	if (*err)
++	/* TODO: Check if BtIOType is ERTM or Streaming before continue */
++
++	mdl->dc = bt_io_connect(BtType, mcap_connect_mdl_cb, con,
++				NULL, err,
++				BT_IO_OPT_SOURCE_BDADDR, &mdl->mcl->ms->src,
++				BT_IO_OPT_DEST_BDADDR, &mdl->mcl->addr,
++				BT_IO_OPT_PSM, dcpsm,
++				BT_IO_OPT_MTU, MCAP_DC_MTU,
++				BT_IO_OPT_SEC_LEVEL, mdl->mcl->ms->sec,
++				BT_IO_OPT_INVALID);
++	if (*err) {
++		debug("MDL Connection error");
++		mdl->state = MDL_CLOSED;
 +		g_free(con);
++	}
++}
++
+ static gboolean mcl_control_cb(GIOChannel *chan, GIOCondition cond, gpointer data)
+ {
+ 
+@@ -916,6 +1040,20 @@ static void mcap_connect_mcl_cb(GIOChannel *chan, GError *conn_err,
+ 	}
  }
  
- static void update_mcl_state(struct mcap_mcl *mcl)
++static void connect_dc_event_cb(GIOChannel *chan, GError *err, gpointer user_data)
++{
++	struct mcap_mdl *mdl = user_data;
++	struct mcap_mcl *mcl = mdl->mcl;
++
++	mdl->state = MDL_CONNECTED;
++	mdl->dc = g_io_channel_ref(chan);
++	mdl->wid = g_io_add_watch(mdl->dc, G_IO_ERR | G_IO_HUP | G_IO_NVAL,
++						(GIOFunc) mdl_event_cb, mdl);
++
++	mcl->state = MCL_ACTIVE;
++	mcl->cb->mdl_connected(mdl, mcl->cb->user_data);
++}
++
+ void mcap_create_mcl(struct mcap_session *ms,
+ 				const bdaddr_t *addr,
+ 				uint16_t ccpsm,
+@@ -968,7 +1106,39 @@ void mcap_create_mcl(struct mcap_session *ms,
+ 
+ static void confirm_dc_event_cb(GIOChannel *chan, gpointer user_data)
+ {
+-	/* TODO: Check if we can connect this data channel */
++	struct mcap_session *ms = user_data;
++	struct mcap_mcl *mcl;
++	struct mcap_mdl *mdl;
++	GError *err = NULL;
++	bdaddr_t dst;
++	GSList *l;
++
++	bt_io_get(chan, BT_IO_L2CAP, &err,
++			BT_IO_OPT_DEST_BDADDR, &dst,
++			BT_IO_OPT_INVALID);
++	if (err) {
++		error("%s", err->message);
++		g_error_free(err);
++		goto drop;
++	}
++
++	mcl = find_mcl(ms->mcls, &dst);
++	if (!mcl || (mcl->state != MCL_PENDING))
++		goto drop;
++
++	for (l = mcl->mdls; l; l = l->next) {
++		mdl = l->data;
++		if (mdl->state == MDL_WAITING) {
++			if (!bt_io_accept(chan, connect_dc_event_cb, mdl, NULL,
++									&err)) {
++				error("MDL accept error %s", err->message);
++				g_error_free(err);
++				goto drop;
++			}
++			return;
++		}
++	}
++drop:
+ 	g_io_channel_shutdown(chan, TRUE, NULL);
+ }
+ 
 -- 
 1.6.3.3
 
