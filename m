@@ -1,263 +1,150 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?iso-8859-1?q?Jos=E9_Antonio_Santos_Cadenas?=
-	<jcaden@libresoft.es>
-Reply-To: jcaden@libresoft.es
-To: linux-bluetooth@vger.kernel.org
-Subject: HDP proposed API (ver 0.3)
-Date: Wed, 12 May 2010 11:26:12 +0200
-Cc: Elvis =?iso-8859-1?q?Pf=FCtzenreuter?= <epx@signove.com>,
-	Santiago Carot <sancane@gmail.com>,
-	Raul Herbster <raul.herbster@signove.com>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201005121126.12859.jcaden@libresoft.es>
+Subject: Re: [PATCH] Initial support for MCAP
+From: Santiago Carot-Nemesio <scarot@libresoft.es>
+To: Raul Herbster <raul.herbster@signove.com>
+Cc: Santiago Carot-Nemesio <sancane@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+In-Reply-To: <AANLkTikVs1YfnusOO8sRO9xbbOcZNU6STTlkygFvpNv3@mail.gmail.com>
+References: <1273486527-7855-1-git-send-email-sancane@gmail.com>
+	 <1273571962-3558-1-git-send-email-sancane@gmail.com>
+	 <1273572070.2126.30.camel@mosquito>
+	 <AANLkTikVs1YfnusOO8sRO9xbbOcZNU6STTlkygFvpNv3@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Wed, 12 May 2010 10:45:38 +0200
+Message-ID: <1273653938.1997.33.camel@mosquito>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This api is a clean up of the previous one the changes.
+Hi Raul,
+This patch is applied over a old version of MCAP (first that I sent).
+New version (splited in 25 patches) fix more of typo error that you are
+commented and Gustavo already notified.
 
-We've added a new object that uses device path to get the sessions
-allocated on this device (as somebody recommended in other thread, 
-I think Luiz, Elvis or both, but I can't find the exact email). The discovery
-of new remote session should be done using device drivers, which is
-compliant with the BlueZ style.
+El mar, 11-05-2010 a las 19:00 -0300, Raul Herbster escribiÃ³:
+> Hi Santiago,
+> 
+> only typo errors:
+> 
+> diff --git a/mcap/mcap.c b/mcap/mcap.c
+> index 404d7be..6142938 100644
+> --- a/mcap/mcap.c
+> +++ b/mcap/mcap.c
+> @@ -116,7 +116,7 @@ struct mcap_mcl {
+>  #define    MCAP_CTRL_CACHED    0x01    /* MCL is cached */
+>  #define    MCAP_CTRL_STD_OP    0x02    /* Support for standard op
+> codes */
+>  #define    MCAP_CTRL_SYNC_OP    0x04    /* Support for
+> synchronization commands */
+> -#define    MCAP_CTRL_CONN        0x08    /* MCL is in connectcting
+> process */
+> +#define    MCAP_CTRL_CONN        0x08    /* MCL is in connecting
+> process */
 
-Discussions still in progress:
+This error is already fixed in my previous patch. Be careful, above
+definitions are not yet included in mcap.c, update you work tree from
+latest patches ;)
 
-- Fd-passing issue: As Elvis, Santiago and I discussed yesterday on
-IRC we think that the best propose is as follows (please Elvis correct
-me if I misunderstood something yesterday):
-	Reconnections should be implicit and the data channel should
-be perceived by the application layer as connected all the time.
-	When the application tries to write in a closed data channel, HDP
-will perform the data channel reconnection and if it fails, then the channel
-will be present as closed.
-	The implementation for this this behaviour will use pipes. Each data
-channel will use 2 pipes to do fd-passing to the application. The upper
-layer will write in this pipes and HDP will redirect it through the l2cap socket,
-in this operation, HDP can reconnect if th l2cap socket is closed.
+>  #define    MCAP_CTRL_FREE        0x10    /* MCL is marked as
+> releasable */
+>  #define    MCAP_CTRL_NOCACHE    0x20    /* MCL is marked as not
+> cacheable */
+>  
+> @@ -242,7 +242,7 @@ static char *error2str(uint8_t rc)
+>          return "Invalid Operation";
+>      case MCAP_RESOURCE_UNAVAILABLE:
+>          return "Resource Unavailable";
+> -    case MCAP_UNESPECIFIED_ERROR:
+> +    case MCAP_UNSPECIFIED_ERROR:
 
-- Sessions issues: We still think that session are necessary because they
-are mentioned in the standard and in the whitepaper and we think that
-bluez should follow the standards in order to pass PTS for allow Bluetooth SIG
-certifications. Any comment in this respect are welcome to improve the API
-usability and conformity with Bluez APIs.
+You're right, I'll redo the patch to fix all "UNESPECIFIED" erroneous
+word.
 
-- Paths issues: It will be great to find names and paths that are good for
-everybody, comments and suggestion on this respect are also welcome.
+>          return "Unspecified Error";
+>      case MCAP_REQUEST_NOT_SUPPORTED:
+>          return "Request Not Supported";
+> @@ -1056,8 +1056,8 @@ static void process_md_create_mdl_req(struct
+> mcap_mcl *mcl, uint8_t *cmd, uint32
+>      if ((cfga != 0) && (cfga != conf)) {
+>          /* Remote device set default configuration but upper profile
+> */
+>          /* has changed it. Protocol Error: force closing the MCL by
+> */
+> -        /* remote device using UNESPECIFIED_ERROR response */
+> -        send4B_cmd(mcl, MCAP_MD_CREATE_MDL_RSP,
+> MCAP_UNESPECIFIED_ERROR,
+> +        /* remote device using UNSPECIFIED_ERROR response */
+> +        send4B_cmd(mcl, MCAP_MD_CREATE_MDL_RSP,
+> MCAP_UNSPECIFIED_ERROR,
+>                                  mdl_id);
+>          return;
+>      }
+> @@ -1548,13 +1548,13 @@ static gboolean check_rsp(struct mcap_mcl
+> *mcl, uint8_t *cmd, uint32_t len)
+>          return FALSE;
+>      }
+>  
+> -    if (rsp->rc == MCAP_UNESPECIFIED_ERROR)
+> +    if (rsp->rc == MCAP_UNSPECIFIED_ERROR)
+>          goto close_mcl;
+>  
+>      return TRUE;
+>  close_mcl:
+> -    if (rsp->rc == MCAP_UNESPECIFIED_ERROR)
+> -        g_set_error(&gerr, MCAP_ERROR, MCAP_ERROR_UNESPECIFIED_ERROR,
+> +    if (rsp->rc == MCAP_UNSPECIFIED_ERROR)
+> +        g_set_error(&gerr, MCAP_ERROR, MCAP_ERROR_UNSPECIFIED_ERROR,
+>                          "%s", error2str(rsp->rc));
+>      else
+>          g_set_error(&gerr, MCAP_ERROR, MCAP_ERROR_FAILED,
+> diff --git a/mcap/mcap.h b/mcap/mcap.h
+> index 598e6ce..77c83c2 100644
+> --- a/mcap/mcap.h
+> +++ b/mcap/mcap.h
+> @@ -76,7 +76,7 @@ extern "C" {
+>  #define MCAP_MDL_BUSY            0x06
+>  #define MCAP_INVALID_OPERATION        0x07
+>  #define MCAP_RESOURCE_UNAVAILABLE    0x08
+> -#define MCAP_UNESPECIFIED_ERROR        0x09
+> +#define MCAP_UNSPECIFIED_ERROR        0x09
+>  #define MCAP_REQUEST_NOT_SUPPORTED    0x0A
+>  #define MCAP_CONFIGURATION_REJECTED    0x0B
+>  /*RESERVED                0x0C-0xFF*/
+> diff --git a/mcap/mcap_lib.h b/mcap/mcap_lib.h
+> index fd3eb74..d75e0f0 100644
+> --- a/mcap/mcap_lib.h
+> +++ b/mcap/mcap_lib.h
+> @@ -45,7 +45,7 @@ typedef enum {
+>      MCAP_ERROR_MDL_BUSY,
+>      MCAP_ERROR_INVALID_OPERATION,
+>      MCAP_ERROR_RESOURCE_UNAVAILABLE,
+> -    MCAP_ERROR_UNESPECIFIED_ERROR,
+> +    MCAP_ERROR_UNSPECIFIED_ERROR,
+>      MCAP_ERROR_REQUEST_NOT_SUPPORTED,
+>      MCAP_ERROR_CONFIGURATION_REJECTED,
+>  /* MCAP Internal Errors */
+> @@ -79,7 +79,7 @@ typedef void (* mcap_mdl_operation_cb) (struct
+> mcap_mdl *mdl, GError *err,
+>                          gpointer data);
+>  typedef void (* mcap_mdl_del_cb) (GError *err, gpointer data);
+>  
+> -/* Next function should return an MCAP appropiate response code */
+> +/* Next function should return an MCAP appropriate response code */
 
-I hope we can fix this API asap. All comments or ideas are welcome.
+Ok, we don't see that. I'll change it too.
+
+>  typedef uint8_t (* mcap_remote_mdl_conn_req_cb) (struct mcap_mcl
+> *mcl,
+>                          uint8_t mdepid, uint16_t mdlid,
+>                          uint8_t *conf, gpointer data);
+> 
+> 
+> []' s
+> --Raul
+> 
+
+Thanks fore typo errors but I suggest to you work with latest patches I
+sent 2 days ago.
 
 Regards.
 
---------------------------------------------------
-
-BlueZ D-Bus HDP API description
-***********************************
-
-        Santiago Carot-Nemesio <sancane@gmail.com>
-        José Antonio Santos-Cadenas <santoscadenas@gmail.com>
-        Elvis Pfützenreuter <epx@signove.com>
-
-Health Device Profile hierarchy
-===============================
-
-Service         org.bluez
-Interface       org.bluez.Hdp
-Object path     [variable prefix]/{hci0,hci1,...}
-
-Methods         object CreateSession(object path, dict config)
-
-                        Returns the object path for the new HDP session.
-                        The path parameter is the path of the remote object
-                        with the callbacks to notify events (see
-                        org.bluez.HdpAgent at the end of this document)
-                        This petition starts an mcap session and also register
-                        in the SDP is needed
-                        Dict is defined as bellow:
-                        { "data_spec" : The data_spec is the data exchange
-                                        specification (see section 5.2.10 of
-                                        the specification document)
-                                        possible values:
-                                                0x00 = reserved,
-                                                0x01 [IEEE 11073-20601],
-                                                0x02..0xff reserved,
-                                        (optional)
-                          "end_points" : [{ (optional)
-                                "mdepid" : uint8, (optional)
-                                "role" : ("source" or "sink"), (mandatory)
-                                "specs" :[{ (mandatory)
-                                        "data_type" : uint16, (mandatory)
-                                        "description" : string, (optional)
-                                }]
-                          }]
-                        }
-
-                        if "data_spec" is not set, no SDP record will be
-                        registered, so all the other data in the dictionary
-                        will be ignored
-
-                        Session will be closed by the call or implicitly when
-                        the programs leaves the bus.
-
-                        Possible errors: org.bluez.Error.InvalidArguments
-
-                void CloseSession(object path)
-
-                        Closes the HDP session identified by the object path.
-                        Also session will be closed if the process that started
-                        it is removed from the D-Bus.
-
-                        Possible errors: org.bluez.Error.InvalidArguments
-                                         org.bluez.Error.NotFound
-
---------------------------------------------------------------------------------
-
-Service         org.bluez
-Interface       org.bluez.Hdp
-Object path     [variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
-
-Methods	array GetSessions()
-
-			Gets the information of the remote sessions present 
-			in this device and published on its SDP record. The 
-			returned data follows this format.
-
-			[{"session_id": "a session identification as string",
-                         "data_spec" : session data spec,
-                         "end_points":
-                                 ["mdepid": uint8,
-                                  "role"  : "source" or "sink" ,
-                                  "specs" : [{
-                                          "dtype"       : uint16,
-                                          "description" : string, (optional)
-                                  }]
-                                 ]
-                        }]
-
---------------------------------------------------------------------------------
-
-Service         org.bluez
-Interface       org.bluez.HdpSession
-Object path     [variable prefix]/{hci0,hci1,...}/{hdp0,hdp1,...}
-
-                object Connect(remote_session_id)
-
-                        Connects with the remote session and returns its object
-                        path.
-
-                        Possible errors: org.bluez.Error.InvalidArguments
-                                         org.bluez.Error.HdpError
-
-                void Disconnect(object device, boolean delete)
-
-                        Disconnect from the remote device. If delete is true, any
-                        status will also be deleted. Otherwise, the status will
-                        be kept for allowing future reconnections.
-
-                        Possible errors: org.bluez.Error.InvalidArguments
-                                         org.bluez.Error.NotFound
-                                         org.bluez.Error.HdpError
-
---------------------------------------------------------------------------------
-
-Service         org.bluez
-Interface       org.bluez.HdpRemoteSession
-Object path     [variable prefix]/{hci0,hci1,...}/{hdp0,hdp1,...}/rem_session_id
-
-                boolean Echo(array{byte})
-
-                        Sends an echo petition to the remote session. Return True
-                        if response matches with the buffer sent. If some error
-                        is detected False value is returned and the associated
-                        MCL is closed.
-
-                uint16 OpenDataChannel(byte mdepid, byte config)
-
-                        Creates a new data channel with the indicated config
-                        to the remote MCAP Data End Point (MDEP).
-                        The configuration should indicate the channel quality of
-                        service.
-                        Returns the data channel id.
-
-                        Possible errors: org.bluez.Error.InvalidArguments
-                                         org.bluez.Error.HdpError
-
-                array GetDcFd(uint16 mdlid)
-
-                        Gets a file descriptor where data can be read or
-                        written for receive or sent by the data channel.
-                        Returns an array of file descriptors one for write
-			and other for read.
-
-                        Possible errors: org.bluez.Error.InvalidArguments
-                                         org.bluez.Error.NotFound
-                                         org.bluez.Error.HdpError
-
-                void DeleteDataChannel(uint16 mdlid)
-
-                        Deletes a data channel so it will not be available for
-                        use.
-
-                        Possible errors: org.bluez.Error.InvalidArguments
-                                         org.bluez.Error.NotFound
-                                         org.bluez.Error.HdpError
-
-                void DeleteAllDataChannels()
-
-                        Deletes all data channels so it will not be available
-                        for use. Typically this function is called when the
-                        connection with the remote device will be closed
-                        permanently
-
-                        Possible errors: org.bluez.Error.HdpError
-
-                dict GetDataChannelStatus()
-
-                        Return a dictionary with all the data channels that
-                        can be used to send data right now. The dictionary
-                        is formed like follows:
-                        {
-                                "reliable": [id1, ..., idz],
-                                "best_effort" : [idx, ..., idy]
-                        }
-
-                        The fist reliable data channel will always be the first
-                        data channel in reliable array.
-
-HDPAgent hierarchy
-==================
-
-(this object is implemented by the HDP client an receives notifications)
-
-Service         unique name
-Interface       org.bluez.HdpAgent
-Object path     freely definable
-
-                void DeviceConnected(object path)
-
-                        This method is called whenever a new device connection
-                        has been established over the control channel of the
-                        current HDP session. The object path contains the object
-                        path of the remote device.
-
-                void DeviceDisconnected(object path)
-
-                        This method is called when a remote device is
-                        disconnected definitively. Any future reconnections
-                        will fail. Also all data channels associated to this
-                        device will be closed.
-
-                void CreatedDataChannel(object path, uint16 mdlid)
-
-                        This method is called when a new data channel is created
-                        The path contains the object path of the device whith
-                        the new connection is created and the mdlid the data
-                        channel identificator.
-
-                void DeletedDataChannel(object path, uint16 mdlid)
-
-                        This method is called when a data channel is closed.
-                        After this call the data channel will not be valid and
-                        can be reused for future created data channels.
