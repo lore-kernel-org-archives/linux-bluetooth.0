@@ -3,44 +3,36 @@ Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org, gustavo@padovan.org
-Subject: [l2cap 2/6] Bluetooth: Fix drop of packets with invalid req_seq/tx_seq
-Date: Wed, 12 May 2010 00:05:54 -0300
-Message-Id: <1273633558-10576-2-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1273633558-10576-1-git-send-email-padovan@profusion.mobi>
+Subject: [l2cap 1/6] Bluetooth: Tweaks to l2cap_send_i_or_rr_or_rnr() flow
+Date: Wed, 12 May 2010 00:05:53 -0300
+Message-Id: <1273633558-10576-1-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1273513181-28258-2-git-send-email-gustavo@padovan.org>
 References: <1273513181-28258-2-git-send-email-gustavo@padovan.org>
- <1273633558-10576-1-git-send-email-padovan@profusion.mobi>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We can't use an unsigned var since we are expecting negatives value
-there too.
+l2cap_send_sframe() already set the F-bit if we set L2CAP_CONN_SEND_FBIT
+and unset L2CAP_CONN_SEND_FBIT after send the F-bit.
 
 Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 ---
- net/bluetooth/l2cap.c |    5 +++--
- 1 files changed, 3 insertions(+), 2 deletions(-)
+ net/bluetooth/l2cap.c |    3 +--
+ 1 files changed, 1 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index a7e14c0..93667ac 100644
+index e8c8f8b..a7e14c0 100644
 --- a/net/bluetooth/l2cap.c
 +++ b/net/bluetooth/l2cap.c
-@@ -3790,7 +3790,7 @@ static inline int l2cap_data_channel_iframe(struct sock *sk, u16 rx_control, str
- 	u8 tx_seq = __get_txseq(rx_control);
- 	u8 req_seq = __get_reqseq(rx_control);
- 	u8 sar = rx_control >> L2CAP_CTRL_SAR_SHIFT;
--	u8 tx_seq_offset, expected_tx_seq_offset;
-+	int tx_seq_offset, expected_tx_seq_offset;
- 	int num_to_ack = (pi->tx_win/6) + 1;
- 	int err = 0;
+@@ -3364,10 +3364,9 @@ static inline void l2cap_send_i_or_rr_or_rnr(struct sock *sk)
+ 	control |= pi->buffer_seq << L2CAP_CTRL_REQSEQ_SHIFT;
  
-@@ -4075,7 +4075,8 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
- 	struct sock *sk;
- 	struct l2cap_pinfo *pi;
- 	u16 control, len;
--	u8 tx_seq, req_seq, next_tx_seq_offset, req_seq_offset;
-+	u8 tx_seq, req_seq;
-+	int next_tx_seq_offset, req_seq_offset;
+ 	if (pi->conn_state & L2CAP_CONN_LOCAL_BUSY) {
+-		control |= L2CAP_SUPER_RCV_NOT_READY | L2CAP_CTRL_FINAL;
++		control |= L2CAP_SUPER_RCV_NOT_READY;
+ 		l2cap_send_sframe(pi, control);
+ 		pi->conn_state |= L2CAP_CONN_RNR_SENT;
+-		pi->conn_state &= ~L2CAP_CONN_SEND_FBIT;
+ 	}
  
- 	sk = l2cap_get_chan_by_scid(&conn->chan_list, cid);
- 	if (!sk) {
+ 	if (pi->conn_state & L2CAP_CONN_REMOTE_BUSY && pi->unacked_frames > 0)
 -- 
 1.6.4.4
