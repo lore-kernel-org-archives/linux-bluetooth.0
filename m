@@ -1,76 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 13 May 2010 22:02:03 +0200 (CEST)
-From: Julia Lawall <julia@diku.dk>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: [PATCH 9/20] drivers/bluetooth: Use kzalloc
-Message-ID: <Pine.LNX.4.64.1005132201470.6282@ask.diku.dk>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+From: =?UTF-8?q?Elvis=20Pf=C3=BCtzenreuter?= <epx@signove.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: epx@signove.com
+Subject: [PATCH v2 1/1] Makes extract_svclass_uuid function public
+Date: Thu, 13 May 2010 12:08:36 -0300
+Message-Id: <1273763316-28425-1-git-send-email-epx@signove.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Julia Lawall <julia@diku.dk>
-
-Use kzalloc rather than the combination of kmalloc and memset.
-
-The semantic patch that makes this change is as follows:
-(http://coccinelle.lip6.fr/)
-
-// <smpl>
-@@
-expression x,size,flags;
-statement S;
-@@
-
--x = kmalloc(size,flags);
-+x = kzalloc(size,flags);
- if (x == NULL) S
--memset(x, 0, size);
-// </smpl>
-
-Signed-off-by: Julia Lawall <julia@diku.dk>
-
+This patch makes the extract_svclass_uuid function public,
+so it may be used by applications that link to libbluetooth.
 ---
- drivers/bluetooth/btmrvl_sdio.c |    8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ lib/sdp.c     |    8 ++++----
+ lib/sdp_lib.h |    1 +
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
-diff -u -p a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -216,7 +216,7 @@ static int btmrvl_sdio_download_helper(s
+diff --git a/lib/sdp.c b/lib/sdp.c
+index aa22c63..fb8ccdc 100644
+--- a/lib/sdp.c
++++ b/lib/sdp.c
+@@ -591,7 +591,7 @@ sdp_data_t *sdp_seq_alloc(void **dtds, void **values, int len)
+ 	return sdp_data_alloc(SDP_SEQ8, seq);
+ }
  
- 	tmphlprbufsz = ALIGN_SZ(BTM_UPLD_SIZE, BTSDIO_DMA_ALIGN);
+-static void extract_svclass_uuid(sdp_data_t *data, uuid_t *uuid)
++void sdp_extract_svclass_uuid(sdp_data_t *data, uuid_t *uuid)
+ {
+ 	sdp_data_t *d;
  
--	tmphlprbuf = kmalloc(tmphlprbufsz, GFP_KERNEL);
-+	tmphlprbuf = kzalloc(tmphlprbufsz, GFP_KERNEL);
- 	if (!tmphlprbuf) {
- 		BT_ERR("Unable to allocate buffer for helper."
- 			" Terminating download");
-@@ -224,8 +224,6 @@ static int btmrvl_sdio_download_helper(s
- 		goto done;
- 	}
+@@ -619,7 +619,7 @@ int sdp_attr_add(sdp_record_t *rec, uint16_t attr, sdp_data_t *d)
+ 	rec->attrlist = sdp_list_insert_sorted(rec->attrlist, d, sdp_attrid_comp_func);
  
--	memset(tmphlprbuf, 0, tmphlprbufsz);
--
- 	helperbuf = (u8 *) ALIGN_ADDR(tmphlprbuf, BTSDIO_DMA_ALIGN);
+ 	if (attr == SDP_ATTR_SVCLASS_ID_LIST)
+-		extract_svclass_uuid(d, &rec->svclass);
++		sdp_extract_svclass_uuid(d, &rec->svclass);
  
- 	/* Perform helper data transfer */
-@@ -318,7 +316,7 @@ static int btmrvl_sdio_download_fw_w_hel
- 	BT_DBG("Downloading FW image (%d bytes)", firmwarelen);
+ 	return 0;
+ }
+@@ -978,7 +978,7 @@ void sdp_attr_replace(sdp_record_t *rec, uint16_t attr, sdp_data_t *d)
+ 	rec->attrlist = sdp_list_insert_sorted(rec->attrlist, d, sdp_attrid_comp_func);
  
- 	tmpfwbufsz = ALIGN_SZ(BTM_UPLD_SIZE, BTSDIO_DMA_ALIGN);
--	tmpfwbuf = kmalloc(tmpfwbufsz, GFP_KERNEL);
-+	tmpfwbuf = kzalloc(tmpfwbufsz, GFP_KERNEL);
- 	if (!tmpfwbuf) {
- 		BT_ERR("Unable to allocate buffer for firmware."
- 		       " Terminating download");
-@@ -326,8 +324,6 @@ static int btmrvl_sdio_download_fw_w_hel
- 		goto done;
- 	}
+ 	if (attr == SDP_ATTR_SVCLASS_ID_LIST)
+-		extract_svclass_uuid(d, &rec->svclass);
++		sdp_extract_svclass_uuid(d, &rec->svclass);
+ }
  
--	memset(tmpfwbuf, 0, tmpfwbufsz);
--
- 	/* Ensure aligned firmware buffer */
- 	fwbuf = (u8 *) ALIGN_ADDR(tmpfwbuf, BTSDIO_DMA_ALIGN);
+ int sdp_attrid_comp_func(const void *key1, const void *key2)
+@@ -1478,7 +1478,7 @@ sdp_record_t *sdp_extract_pdu(const uint8_t *buf, int bufsize, int *scanned)
+ 			rec->handle = data->val.uint32;
  
+ 		if (attr == SDP_ATTR_SVCLASS_ID_LIST)
+-			extract_svclass_uuid(data, &rec->svclass);
++			sdp_extract_svclass_uuid(data, &rec->svclass);
+ 
+ 		extracted += n;
+ 		p += n;
+diff --git a/lib/sdp_lib.h b/lib/sdp_lib.h
+index e506ac1..3d70f0e 100644
+--- a/lib/sdp_lib.h
++++ b/lib/sdp_lib.h
+@@ -167,6 +167,7 @@ sdp_data_t *sdp_seq_alloc(void **dtds, void **values, int len);
+ sdp_data_t *sdp_seq_alloc_with_length(void **dtds, void **values, int *length, int len);
+ sdp_data_t *sdp_seq_append(sdp_data_t *seq, sdp_data_t *data);
+ 
++void sdp_extract_svclass_uuid(sdp_data_t *data, uuid_t *uuid);
+ int sdp_attr_add(sdp_record_t *rec, uint16_t attr, sdp_data_t *data);
+ void sdp_attr_remove(sdp_record_t *rec, uint16_t attr);
+ void sdp_attr_replace(sdp_record_t *rec, uint16_t attr, sdp_data_t *data);
+-- 
+1.7.0.4
+
