@@ -2,10 +2,10 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 09/25] Process md_delete_mdl_req in CONNECTED state
-Date: Fri, 14 May 2010 12:19:36 +0200
-Message-Id: <1273832392-18654-9-git-send-email-sancane@gmail.com>
-In-Reply-To: <1273832392-18654-8-git-send-email-sancane@gmail.com>
+Subject: [PATCH 25/25] Initial support for clock synchronization protocol
+Date: Fri, 14 May 2010 12:19:52 +0200
+Message-Id: <1273832392-18654-25-git-send-email-sancane@gmail.com>
+In-Reply-To: <1273832392-18654-24-git-send-email-sancane@gmail.com>
 References: <1273832392-18654-1-git-send-email-sancane@gmail.com>
  <1273832392-18654-2-git-send-email-sancane@gmail.com>
  <1273832392-18654-3-git-send-email-sancane@gmail.com>
@@ -14,133 +14,152 @@ References: <1273832392-18654-1-git-send-email-sancane@gmail.com>
  <1273832392-18654-6-git-send-email-sancane@gmail.com>
  <1273832392-18654-7-git-send-email-sancane@gmail.com>
  <1273832392-18654-8-git-send-email-sancane@gmail.com>
+ <1273832392-18654-9-git-send-email-sancane@gmail.com>
+ <1273832392-18654-10-git-send-email-sancane@gmail.com>
+ <1273832392-18654-11-git-send-email-sancane@gmail.com>
+ <1273832392-18654-12-git-send-email-sancane@gmail.com>
+ <1273832392-18654-13-git-send-email-sancane@gmail.com>
+ <1273832392-18654-14-git-send-email-sancane@gmail.com>
+ <1273832392-18654-15-git-send-email-sancane@gmail.com>
+ <1273832392-18654-16-git-send-email-sancane@gmail.com>
+ <1273832392-18654-17-git-send-email-sancane@gmail.com>
+ <1273832392-18654-18-git-send-email-sancane@gmail.com>
+ <1273832392-18654-19-git-send-email-sancane@gmail.com>
+ <1273832392-18654-20-git-send-email-sancane@gmail.com>
+ <1273832392-18654-21-git-send-email-sancane@gmail.com>
+ <1273832392-18654-22-git-send-email-sancane@gmail.com>
+ <1273832392-18654-23-git-send-email-sancane@gmail.com>
+ <1273832392-18654-24-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- mcap/mcap.c |   88 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 87 insertions(+), 1 deletions(-)
+ Makefile.am |    4 +-
+ mcap/mcap.c |    3 +-
+ mcap/sync.c |   85 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 88 insertions(+), 4 deletions(-)
+ create mode 100644 mcap/sync.c
 
+diff --git a/Makefile.am b/Makefile.am
+index 0c139a1..9ab5be2 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -170,8 +170,8 @@ builtin_sources += plugins/service.c
+ endif
+ 
+ if MCAP
+-mcap_sources += mcap/mcap_internal.h	\
+-		mcap/mcap_lib.h		\
++mcap_sources += mcap/mcap_internal.h \
++		mcap/mcap_lib.h	mcap/sync.c \
+ 		mcap/mcap.h mcap/mcap.c
+ endif
+ 
 diff --git a/mcap/mcap.c b/mcap/mcap.c
-index a8bdc9e..e4d9a1a 100644
+index 6c98124..1c00769 100644
 --- a/mcap/mcap.c
 +++ b/mcap/mcap.c
-@@ -174,6 +174,26 @@ static gint compare_mdl(gconstpointer a, gconstpointer b)
- 		return 1;
- }
+@@ -1511,8 +1511,7 @@ static void proc_cmd(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
+ {
+ 	if ((cmd[0] >= MCAP_MD_SYNC_CAP_REQ) &&
+ 					(cmd[0] <= MCAP_MD_SYNC_INFO_IND)) {
+-		send4B_cmd(mcl, cmd[0], MCAP_REQUEST_NOT_SUPPORTED,
+-							MCAP_MDLID_RESERVED);
++		proc_sync_cmd(mcl, cmd, len);
+ 		return;
+ 	}
  
-+static void update_mcl_state(struct mcap_mcl *mcl)
+diff --git a/mcap/sync.c b/mcap/sync.c
+new file mode 100644
+index 0000000..8fa3dbd
+--- /dev/null
++++ b/mcap/sync.c
+@@ -0,0 +1,85 @@
++/*
++ *
++ *  MCAP for BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2010 GSyC/LibreSoft, Universidad Rey Juan Carlos.
++ *
++ *  Authors:
++ *  Santiago Carot-Nemesio <sancane at gmail.com>
++ *  Jose Antonio Santos-Cadenas <santoscadenas at gmail.com>
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#include <stdint.h>
++#include <netinet/in.h>
++
++#include "logging.h"
++
++#include "mcap.h"
++#include "mcap_lib.h"
++#include "mcap_internal.h"
++
++static int send_unsupported_req(struct mcap_mcl *mcl, uint8_t oc)
 +{
-+	GSList *l;
-+	struct mcap_mdl *mdl;
++	uint8_t *rsp;
++	mcap4B_rsp *rsp_err;
++	int sent;
 +
-+	if (mcl->state == MCL_PENDING)
-+		return;
 +
-+	for (l = mcl->mdls; l; l = l->next) {
-+		mdl = l->data;
++	rsp = g_malloc0(sizeof(mcap4B_rsp));
 +
-+		if (mdl->state == MDL_CONNECTED) {
-+			mcl->state = MCL_ACTIVE;
-+			return;
-+		}
-+	}
++	rsp_err = (mcap4B_rsp *)rsp;
++	rsp_err->op = oc;
++	rsp_err->rc = MCAP_REQUEST_NOT_SUPPORTED;
++	rsp_err->mdl = htons (MCAP_MDLID_RESERVED);
 +
-+	mcl->state = MCL_CONNECTED;
++	sent = mcap_send_data(g_io_channel_unix_get_fd(mcl->cc),
++					rsp,
++					sizeof(mcap4B_rsp));
++	g_free(rsp);
++	return sent;
 +}
 +
- static struct mcap_mcl *find_mcl(GSList *list, const bdaddr_t *addr)
- {
- 	GSList *l;
-@@ -407,6 +427,17 @@ static struct mcap_mdl *get_mdl(struct mcap_mcl *mcl, uint16_t mdlid)
- 	return NULL;
- }
- 
-+static void mcap_delete_mdl(gpointer elem, gpointer user_data)
++void proc_sync_cmd(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
 +{
-+	struct mcap_mdl *mdl = elem;
-+	gboolean notify = *(gboolean *)user_data;
-+
-+	shutdown_mdl(mdl);
-+	if (notify)
-+		mdl->mcl->cb->mdl_deleted(mdl, mdl->mcl->cb->user_data);
-+	g_free(mdl);
++	switch (cmd[0]) {
++	case MCAP_MD_SYNC_CAP_REQ:
++		debug("TODO: received MCAP_MD_SYNC_CAP_REQ: %d",
++							MCAP_MD_SYNC_CAP_REQ);
++		/* Not implemented yet. Reply with unsupported request */
++		send_unsupported_req(mcl, cmd[0]);
++		break;
++	case MCAP_MD_SYNC_CAP_RSP:
++		debug("TODO: received MCAP_MD_SYNC_CAP_RSP: %d",
++							MCAP_MD_SYNC_CAP_RSP);
++		break;
++	case MCAP_MD_SYNC_SET_REQ:
++		debug("TODO: received MCAP_MD_SYNC_SET_REQ: %d",
++							MCAP_MD_SYNC_SET_REQ);
++		/* Not implemented yet. Reply with unsupported request */
++		send_unsupported_req(mcl, cmd[0]);
++		break;
++	case MCAP_MD_SYNC_SET_RSP:
++		debug("TODO: received MCAP_MD_SYNC_SET_RSP: %d",
++							MCAP_MD_SYNC_SET_RSP);
++		break;
++	case MCAP_MD_SYNC_INFO_IND:
++		debug("TODO: received MCAP_MD_SYNC_INFO_IND :%d",
++							MCAP_MD_SYNC_INFO_IND);
++		break;
++	}
 +}
-+
- static void process_md_create_mdl_req(struct mcap_mcl *mcl, uint8_t *cmd,
- 								uint32_t len)
- {
-@@ -521,6 +552,61 @@ static void process_md_reconnect_mdl_req(struct mcap_mcl *mcl, uint8_t *cmd,
- 	send4B_cmd(mcl, MCAP_MD_RECONNECT_MDL_RSP, MCAP_SUCCESS, mdl_id);
- }
- 
-+static void process_md_delete_mdl_req(struct mcap_mcl *mcl, uint8_t *cmd,
-+								uint32_t len)
-+{
-+	mcap_md_req *req;
-+	struct mcap_mdl *mdl, *aux;
-+	uint16_t mdlid;
-+	gboolean notify;
-+	GSList *l;
-+
-+	if (len != sizeof(mcap_md_req)) {
-+		send4B_cmd(mcl, MCAP_MD_ABORT_MDL_RSP,
-+				MCAP_INVALID_PARAM_VALUE, MCAP_MDLID_RESERVED);
-+		return;
-+	}
-+
-+	req = (mcap_md_req *)cmd;
-+	mdlid = ntohs(req->mdl);
-+	if (mdlid == MCAP_ALL_MDLIDS) {
-+		notify = FALSE;
-+		g_slist_foreach(mcl->mdls, mcap_delete_mdl, &notify);
-+		g_slist_free(mcl->mdls);
-+		mcl->mdls = NULL;
-+		mcl->state = MCL_CONNECTED;
-+		/* NULL mdl means ALL_MDLS */
-+		mcl->cb->mdl_deleted(NULL, mcl->cb->user_data);
-+		goto resp;
-+	}
-+
-+	if ((mdlid < MCAP_MDLID_INITIAL) || (mdlid > MCAP_MDLID_FINAL)) {
-+		send4B_cmd(mcl, MCAP_MD_CREATE_MDL_RSP, MCAP_INVALID_MDL,
-+									mdlid);
-+		return;
-+	}
-+
-+	for (l=mcl->mdls, mdl = NULL; l; l = l->next) {
-+		aux = l->data;
-+		if (aux->mdlid == mdlid) {
-+			mdl = aux;
-+			break;
-+		}
-+	}
-+
-+	if (!mdl || (mdl->state == MDL_WAITING)) {
-+		send4B_cmd(mcl, MCAP_MD_DELETE_MDL_RSP, MCAP_INVALID_MDL,
-+									mdlid);
-+		return;
-+	}
-+	mcl->mdls = g_slist_remove(mcl->mdls, mdl);
-+	update_mcl_state(mcl);
-+	notify = TRUE;
-+	mcap_delete_mdl(mdl, &notify);
-+resp:
-+	send4B_cmd(mcl, MCAP_MD_DELETE_MDL_RSP, MCAP_SUCCESS, mdlid);
-+}
-+
- /* Function used to process commands depending of MCL state */
- static void proc_req_connected(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
- {
-@@ -532,7 +618,7 @@ static void proc_req_connected(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
- 		process_md_reconnect_mdl_req(mcl, cmd, len);
- 		break;
- 	case MCAP_MD_DELETE_MDL_REQ:
--		/*process_md_delete_mdl_req(mcl, cmd, len);*/
-+		process_md_delete_mdl_req(mcl, cmd, len);
- 		break;
- 	default:
- 		error_cmd_rsp(mcl, cmd, len);
 -- 
 1.6.3.3
 
