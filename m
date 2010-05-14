@@ -2,10 +2,10 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 25/25] Initial support for clock synchronization protocol
-Date: Fri, 14 May 2010 12:19:52 +0200
-Message-Id: <1273832392-18654-25-git-send-email-sancane@gmail.com>
-In-Reply-To: <1273832392-18654-24-git-send-email-sancane@gmail.com>
+Subject: [PATCH 18/25] Implement function to send md_abort_mdl_req
+Date: Fri, 14 May 2010 12:19:45 +0200
+Message-Id: <1273832392-18654-18-git-send-email-sancane@gmail.com>
+In-Reply-To: <1273832392-18654-17-git-send-email-sancane@gmail.com>
 References: <1273832392-18654-1-git-send-email-sancane@gmail.com>
  <1273832392-18654-2-git-send-email-sancane@gmail.com>
  <1273832392-18654-3-git-send-email-sancane@gmail.com>
@@ -23,143 +23,79 @@ References: <1273832392-18654-1-git-send-email-sancane@gmail.com>
  <1273832392-18654-15-git-send-email-sancane@gmail.com>
  <1273832392-18654-16-git-send-email-sancane@gmail.com>
  <1273832392-18654-17-git-send-email-sancane@gmail.com>
- <1273832392-18654-18-git-send-email-sancane@gmail.com>
- <1273832392-18654-19-git-send-email-sancane@gmail.com>
- <1273832392-18654-20-git-send-email-sancane@gmail.com>
- <1273832392-18654-21-git-send-email-sancane@gmail.com>
- <1273832392-18654-22-git-send-email-sancane@gmail.com>
- <1273832392-18654-23-git-send-email-sancane@gmail.com>
- <1273832392-18654-24-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- Makefile.am |    4 +-
- mcap/mcap.c |    3 +-
- mcap/sync.c |   85 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 88 insertions(+), 4 deletions(-)
- create mode 100644 mcap/sync.c
+ mcap/mcap.c |   48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 48 insertions(+), 0 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index 0c139a1..9ab5be2 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -170,8 +170,8 @@ builtin_sources += plugins/service.c
- endif
- 
- if MCAP
--mcap_sources += mcap/mcap_internal.h	\
--		mcap/mcap_lib.h		\
-+mcap_sources += mcap/mcap_internal.h \
-+		mcap/mcap_lib.h	mcap/sync.c \
- 		mcap/mcap.h mcap/mcap.c
- endif
- 
 diff --git a/mcap/mcap.c b/mcap/mcap.c
-index 6c98124..1c00769 100644
+index 1fd8e43..b0cf651 100644
 --- a/mcap/mcap.c
 +++ b/mcap/mcap.c
-@@ -1511,8 +1511,7 @@ static void proc_cmd(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
- {
- 	if ((cmd[0] >= MCAP_MD_SYNC_CAP_REQ) &&
- 					(cmd[0] <= MCAP_MD_SYNC_INFO_IND)) {
--		send4B_cmd(mcl, cmd[0], MCAP_REQUEST_NOT_SUPPORTED,
--							MCAP_MDLID_RESERVED);
-+		proc_sync_cmd(mcl, cmd, len);
- 		return;
- 	}
+@@ -520,6 +520,38 @@ void mcap_req_mdl_deletion(struct mcap_mdl *mdl, GError **err,
+ 		g_free(con);
+ }
  
-diff --git a/mcap/sync.c b/mcap/sync.c
-new file mode 100644
-index 0000000..8fa3dbd
---- /dev/null
-+++ b/mcap/sync.c
-@@ -0,0 +1,85 @@
-+/*
-+ *
-+ *  MCAP for BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2010 GSyC/LibreSoft, Universidad Rey Juan Carlos.
-+ *
-+ *  Authors:
-+ *  Santiago Carot-Nemesio <sancane at gmail.com>
-+ *  Jose Antonio Santos-Cadenas <santoscadenas at gmail.com>
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#include <stdint.h>
-+#include <netinet/in.h>
-+
-+#include "logging.h"
-+
-+#include "mcap.h"
-+#include "mcap_lib.h"
-+#include "mcap_internal.h"
-+
-+static int send_unsupported_req(struct mcap_mcl *mcl, uint8_t oc)
++void mcap_mdl_abort(struct mcap_mdl *mdl, GError **err,
++			mcap_mdl_del_cb abort_cb, gpointer user_data)
 +{
-+	uint8_t *rsp;
-+	mcap4B_rsp *rsp_err;
-+	int sent;
++	struct mcap_mdl_op_cb *con;
++	struct mcap_mcl *mcl = mdl->mcl;
++	uint8_t *cmd;
 +
-+
-+	rsp = g_malloc0(sizeof(mcap4B_rsp));
-+
-+	rsp_err = (mcap4B_rsp *)rsp;
-+	rsp_err->op = oc;
-+	rsp_err->rc = MCAP_REQUEST_NOT_SUPPORTED;
-+	rsp_err->mdl = htons (MCAP_MDLID_RESERVED);
-+
-+	sent = mcap_send_data(g_io_channel_unix_get_fd(mcl->cc),
-+					rsp,
-+					sizeof(mcap4B_rsp));
-+	g_free(rsp);
-+	return sent;
-+}
-+
-+void proc_sync_cmd(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
-+{
-+	switch (cmd[0]) {
-+	case MCAP_MD_SYNC_CAP_REQ:
-+		debug("TODO: received MCAP_MD_SYNC_CAP_REQ: %d",
-+							MCAP_MD_SYNC_CAP_REQ);
-+		/* Not implemented yet. Reply with unsupported request */
-+		send_unsupported_req(mcl, cmd[0]);
-+		break;
-+	case MCAP_MD_SYNC_CAP_RSP:
-+		debug("TODO: received MCAP_MD_SYNC_CAP_RSP: %d",
-+							MCAP_MD_SYNC_CAP_RSP);
-+		break;
-+	case MCAP_MD_SYNC_SET_REQ:
-+		debug("TODO: received MCAP_MD_SYNC_SET_REQ: %d",
-+							MCAP_MD_SYNC_SET_REQ);
-+		/* Not implemented yet. Reply with unsupported request */
-+		send_unsupported_req(mcl, cmd[0]);
-+		break;
-+	case MCAP_MD_SYNC_SET_RSP:
-+		debug("TODO: received MCAP_MD_SYNC_SET_RSP: %d",
-+							MCAP_MD_SYNC_SET_RSP);
-+		break;
-+	case MCAP_MD_SYNC_INFO_IND:
-+		debug("TODO: received MCAP_MD_SYNC_INFO_IND :%d",
-+							MCAP_MD_SYNC_INFO_IND);
-+		break;
++	if (mdl->state != MDL_WAITING) {
++		g_set_error(err, MCAP_ERROR, MCAP_ERROR_FAILED,
++							"Mdl in invalid state");
++		return;
 +	}
++
++	con = g_new0(struct mcap_mdl_op_cb, 1);
++	cmd = create_req(MCAP_MD_ABORT_MDL_REQ, mdl->mdlid);
++	mcap_send_std_opcode(mcl, cmd, sizeof(mcap_md_req), err);
++	if (*err) {
++		g_free(con);
++		g_free(cmd);
++		return;
++	}
++
++	con->mdl = mdl;
++	con->cb.del = abort_cb;
++	con->user_data = user_data;
++
++	mcl->priv_data = con;
++
++	mcl->tid = g_timeout_add_seconds(RESPONSE_TIMER, wait_response_timer,
++									mcl);
 +}
++
+ static void update_mcl_state(struct mcap_mcl *mcl)
+ {
+ 	GSList *l;
+@@ -555,6 +587,22 @@ static struct mcap_mcl *find_mcl(GSList *list, const bdaddr_t *addr)
+ 	return NULL;
+ }
+ 
++int mcap_mdl_get_fd(struct mcap_mdl *mdl)
++{
++	if ((!mdl) || (mdl->state != MDL_CONNECTED))
++		return -1;
++
++	return g_io_channel_unix_get_fd(mdl->dc);
++}
++
++uint16_t mcap_mdl_get_mdlid(struct mcap_mdl *mdl)
++{
++	if (!mdl)
++		return MCAP_MDLID_RESERVED;
++
++	return mdl->mdlid;
++}
++
+ static void shutdown_mdl(struct mcap_mdl *mdl)
+ {
+ 	mdl->state = MDL_CLOSED;
 -- 
 1.6.3.3
 
