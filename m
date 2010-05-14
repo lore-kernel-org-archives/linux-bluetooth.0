@@ -1,67 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: HDP proposed API (ver 0.4)
+Subject: Re: HDP proposed API (ver 0.3)
 Mime-Version: 1.0 (Apple Message framework v1078)
 Content-Type: text/plain; charset=us-ascii
 From: =?iso-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
-In-Reply-To: <201005141203.47929.jcaden@libresoft.es>
-Date: Fri, 14 May 2010 09:46:46 -0300
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <0F7F554B-D04C-46C1-8EE9-7AC3C6B72B5A@signove.com>
-References: <201005141203.47929.jcaden@libresoft.es>
+In-Reply-To: <201005141000.51935.jcaden@libresoft.es>
+Date: Fri, 14 May 2010 09:20:19 -0300
+Cc: =?iso-8859-1?Q?Jo=E3o_Paulo_Rechi_Vita?= <jprvita@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	Santiago Carot <sancane@gmail.com>,
+	Raul Herbster <raul.herbster@signove.com>
+Message-Id: <B632DD4E-3F0F-44A7-A5A3-5816F9E79C5D@signove.com>
+References: <201005121126.12859.jcaden@libresoft.es> <201005131002.24806.jcaden@libresoft.es> <AANLkTimjua-P8DgvGidKaIgRvCScuP4mGTi4Wm82-O-N@mail.gmail.com> <201005141000.51935.jcaden@libresoft.es>
 To: jcaden@libresoft.es
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Just some points,
+> 	- Giving this data to HDP is not only for registering a SDP record but 
+> also for doing checks when a connection is received, so this data will be 
+> finally passed to HDP.
+> 	- The HDP client doesn't know all the data that should be published in 
+> the SDP record, like PSM's where MCAP is waiting for connections or MCAP 
+> supported features (note that MCAP is not exported by D-BUS).
 
-> Health Device Profile hierarchy
-> ===============================
-> 
-> Service		org.bluez
-> Interface	org.bluez.HealthAdapter
-> Object path	[variable prefix]/{hci0,hci1,...}
-> 
-> Methods		object CreateInstance(object path, dict config)
+Also, MCAP uses dynamic PSMs, one more reason to encapsulate the SDP record generation/parsing. If the application had to do this, it would have to find two free PSMs (ugly).
 
-I guess that 'object path' parameter is redundant.
-
-> 
-> Service		org.bluez
-> Interface	org.bluez.HealthInstance
-> Object path	[variable prefix]/{hci0,hci1,...}/{hdp0,hdp1,...}
-> 
-> 		object Connect(remote_instance_id)
-> 
-> 			Connects with the remote instance and returns its object
-> 			path.
-
-It is important to mention explicitly that this remote_instance_id was revealed via GetHealthInstances(). 
-
-And mention that the object it returns implements the HealthLink interface.
-
-> 		void Disconnect(object device, boolean delete)
-> 
-> 			Disconnect from the remote device. If delete is true,
-> 			any status will also be deleted. Otherwise, the status
-> 			will be kept for allowing future reconnections.
-
-s/status/state/, and mention that state only survives while the respective adapter instance exists.
-> 
-> 		uint16 OpenDataChannel(byte mdepid, byte config)
-> 
-> 			Creates a new data channel with the indicated config
-> 			to the remote MCAP Data End Point (MDEP).
-> 			The configuration should indicate the channel quality of
-> 			service.
-> 			Returns the data channel id.
-
-Which is the actual format of 'byte config'?
-> 
-> 		void DeviceConnected(object path)
-> 
-> 			This method is called whenever a new device connection
-> 			has been established over the control channel of the
-> 			current HDP instance. The object path contains the
-> 			object path of the remote device.
-
-"Remote device" is redundant, since it seems that BlueZ always calls "device" the remote thing, and "adapter" the local thing. I saw it first here, but it appears throughout the text.
