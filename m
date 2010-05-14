@@ -2,10 +2,10 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 24/25] Enable connection of Data Channel with remote MCAP instances
-Date: Fri, 14 May 2010 12:19:51 +0200
-Message-Id: <1273832392-18654-24-git-send-email-sancane@gmail.com>
-In-Reply-To: <1273832392-18654-23-git-send-email-sancane@gmail.com>
+Subject: [PATCH 22/25] Process md_abort_mdl_rsp
+Date: Fri, 14 May 2010 12:19:49 +0200
+Message-Id: <1273832392-18654-22-git-send-email-sancane@gmail.com>
+In-Reply-To: <1273832392-18654-21-git-send-email-sancane@gmail.com>
 References: <1273832392-18654-1-git-send-email-sancane@gmail.com>
  <1273832392-18654-2-git-send-email-sancane@gmail.com>
  <1273832392-18654-3-git-send-email-sancane@gmail.com>
@@ -27,86 +27,57 @@ References: <1273832392-18654-1-git-send-email-sancane@gmail.com>
  <1273832392-18654-19-git-send-email-sancane@gmail.com>
  <1273832392-18654-20-git-send-email-sancane@gmail.com>
  <1273832392-18654-21-git-send-email-sancane@gmail.com>
- <1273832392-18654-22-git-send-email-sancane@gmail.com>
- <1273832392-18654-23-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- mcap/mcap.c |   60 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 60 insertions(+), 0 deletions(-)
+ mcap/mcap.c |   33 ++++++++++++++++++++++++++++++++-
+ 1 files changed, 32 insertions(+), 1 deletions(-)
 
 diff --git a/mcap/mcap.c b/mcap/mcap.c
-index a08e631..6c98124 100644
+index d55da16..eda8dd1 100644
 --- a/mcap/mcap.c
 +++ b/mcap/mcap.c
-@@ -1558,6 +1558,66 @@ static gboolean mdl_event_cb(GIOChannel *chan, GIOCondition cond, gpointer data)
- 	return FALSE;
+@@ -1301,7 +1301,38 @@ static gboolean process_md_reconnect_mdl_rsp(struct mcap_mcl *mcl,
+ static gboolean process_md_abort_mdl_rsp(struct mcap_mcl *mcl,
+ 						uint8_t *cmd, uint32_t len)
+ {
+-	return FALSE;
++	struct mcap_mdl_op_cb *abrt = mcl->priv_data;
++	struct mcap_mdl *mdl = abrt->mdl;
++	mcap_mdl_del_cb abrt_cb = abrt->cb.del;
++	gpointer user_data = abrt->user_data;
++	mcap4B_rsp *rsp = (mcap4B_rsp *) cmd;
++	mcap_md_req *cmdlast = (mcap_md_req *) mcl->lcmd;
++	uint16_t mdlid = ntohs(cmdlast->mdl);
++	GError *gerr = NULL;
++	gboolean close = FALSE;
++
++	g_free(mcl->priv_data);
++	mcl->priv_data = NULL;
++
++	rsp->mdl = ntohs(rsp->mdl);
++
++	close = check_err_rsp(rsp->mdl, mdlid, rsp->rc, len,
++						sizeof(mcap4B_rsp), &gerr);
++	g_free(mcl->lcmd);
++	mcl->lcmd = NULL;
++	mcl->req = MCL_AVAILABLE;
++
++	if (gerr) {
++		abrt_cb(gerr, user_data);
++		g_error_free(gerr);
++		return close;
++	}
++
++	mcl->mdls = g_slist_remove(mcl->mdls, mdl);
++	g_free(mdl);
++	update_mcl_state(mcl);
++	abrt_cb(gerr, user_data);
++	return close;
  }
  
-+static void mcap_connect_mdl_cb(GIOChannel *chan, GError *conn_err,
-+							gpointer data)
-+{
-+	struct mcap_mdl_op_cb *con = data;
-+	struct mcap_mdl *mdl = con->mdl;
-+	mcap_mdl_operation_cb cb = con->cb.op;
-+	gpointer user_data = con->user_data;
-+
-+	g_free(con);
-+	debug("mdl connect callback");
-+
-+	if (conn_err) {
-+		debug("ERROR: mdl connect callback");
-+		mdl->state = MDL_CLOSED;
-+		g_io_channel_unref(mdl->dc);
-+		mdl->dc = NULL;
-+		cb(mdl, conn_err, user_data);
-+		return;
-+	}
-+
-+	mdl->state = MDL_CONNECTED;
-+	mdl->wid = g_io_add_watch(mdl->dc, G_IO_ERR | G_IO_HUP | G_IO_NVAL,
-+				(GIOFunc) mdl_event_cb, mdl);
-+
-+	cb(mdl, conn_err, user_data);
-+}
-+
-+void mcap_mdl_connect(struct mcap_mdl *mdl, BtIOType BtType, uint16_t dcpsm,
-+	GError **err, mcap_mdl_operation_cb connect_cb, gpointer user_data)
-+{
-+	struct mcap_mdl_op_cb *con;
-+
-+	if (mdl->state != MDL_WAITING) {
-+		g_set_error(err, MCAP_ERROR, MCAP_ERROR_INVALID_MDL,
-+					"%s", error2str(MCAP_INVALID_MDL));
-+		return;
-+	}
-+
-+	con = g_new0(struct mcap_mdl_op_cb, 1);
-+	con->mdl = mdl;
-+	con->cb.op = connect_cb;
-+	con->user_data = user_data;
-+
-+	/* TODO: Check if BtIOType is ERTM or Streaming before continue */
-+
-+	mdl->dc = bt_io_connect(BtType, mcap_connect_mdl_cb, con,
-+				NULL, err,
-+				BT_IO_OPT_SOURCE_BDADDR, &mdl->mcl->ms->src,
-+				BT_IO_OPT_DEST_BDADDR, &mdl->mcl->addr,
-+				BT_IO_OPT_PSM, dcpsm,
-+				BT_IO_OPT_MTU, MCAP_DC_MTU,
-+				BT_IO_OPT_SEC_LEVEL, mdl->mcl->ms->sec,
-+				BT_IO_OPT_INVALID);
-+	if (*err) {
-+		debug("MDL Connection error");
-+		mdl->state = MDL_CLOSED;
-+		g_free(con);
-+	}
-+}
-+
- static gboolean mcl_control_cb(GIOChannel *chan, GIOCondition cond,
- 								gpointer data)
- {
+ static gboolean process_md_delete_mdl_rsp(struct mcap_mcl *mcl, uint8_t *cmd,
 -- 
 1.6.3.3
 
