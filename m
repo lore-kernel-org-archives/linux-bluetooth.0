@@ -2,230 +2,113 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 03/25] Initial work to process incomming connection of MCLs
-Date: Fri, 14 May 2010 12:19:30 +0200
-Message-Id: <1273832392-18654-3-git-send-email-sancane@gmail.com>
-In-Reply-To: <1273832392-18654-2-git-send-email-sancane@gmail.com>
+Subject: [PATCH 23/25] Process md_delete_mdl_rsp
+Date: Fri, 14 May 2010 12:19:50 +0200
+Message-Id: <1273832392-18654-23-git-send-email-sancane@gmail.com>
+In-Reply-To: <1273832392-18654-22-git-send-email-sancane@gmail.com>
 References: <1273832392-18654-1-git-send-email-sancane@gmail.com>
  <1273832392-18654-2-git-send-email-sancane@gmail.com>
+ <1273832392-18654-3-git-send-email-sancane@gmail.com>
+ <1273832392-18654-4-git-send-email-sancane@gmail.com>
+ <1273832392-18654-5-git-send-email-sancane@gmail.com>
+ <1273832392-18654-6-git-send-email-sancane@gmail.com>
+ <1273832392-18654-7-git-send-email-sancane@gmail.com>
+ <1273832392-18654-8-git-send-email-sancane@gmail.com>
+ <1273832392-18654-9-git-send-email-sancane@gmail.com>
+ <1273832392-18654-10-git-send-email-sancane@gmail.com>
+ <1273832392-18654-11-git-send-email-sancane@gmail.com>
+ <1273832392-18654-12-git-send-email-sancane@gmail.com>
+ <1273832392-18654-13-git-send-email-sancane@gmail.com>
+ <1273832392-18654-14-git-send-email-sancane@gmail.com>
+ <1273832392-18654-15-git-send-email-sancane@gmail.com>
+ <1273832392-18654-16-git-send-email-sancane@gmail.com>
+ <1273832392-18654-17-git-send-email-sancane@gmail.com>
+ <1273832392-18654-18-git-send-email-sancane@gmail.com>
+ <1273832392-18654-19-git-send-email-sancane@gmail.com>
+ <1273832392-18654-20-git-send-email-sancane@gmail.com>
+ <1273832392-18654-21-git-send-email-sancane@gmail.com>
+ <1273832392-18654-22-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- mcap/mcap.c |  193 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 192 insertions(+), 1 deletions(-)
+ mcap/mcap.c |   60 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 59 insertions(+), 1 deletions(-)
 
 diff --git a/mcap/mcap.c b/mcap/mcap.c
-index ff8c9b5..dce1c61 100644
+index eda8dd1..a08e631 100644
 --- a/mcap/mcap.c
 +++ b/mcap/mcap.c
-@@ -36,14 +36,205 @@
- 
- #define MCAP_ERROR g_quark_from_static_string("mcap-error-quark")
- 
-+static void default_mdl_connected_cb(struct mcap_mdl *mdl, gpointer data)
-+{
-+	debug("MCAP Unmanaged mdl connection");
-+}
-+
-+static void default_mdl_closed_cb(struct mcap_mdl *mdl, gpointer data)
-+{
-+	debug("MCAP Unmanaged mdl closed");
-+}
-+
-+static void default_mdl_deleted_cb(struct mcap_mdl *mdl, gpointer data)
-+{
-+	debug("MCAP Unmanaged mdl deleted");
-+}
-+
-+static void default_mdl_aborted_cb(struct mcap_mdl *mdl, gpointer data)
-+{
-+	debug("MCAP Unmanaged mdl aborted");
-+}
-+
-+static uint8_t default_mdl_conn_req_cb(struct mcap_mcl *mcl,
-+						uint8_t mdepid, uint16_t mdlid,
-+						uint8_t *conf, gpointer data)
-+{
-+	debug("MCAP mdl remote connection aborted");
-+	/* Due to this callback isn't managed this request won't be supported */
-+	return MCAP_REQUEST_NOT_SUPPORTED;
-+}
-+
-+static uint8_t default_mdl_reconn_req_cb(struct mcap_mdl *mdl,
-+						gpointer data)
-+{
-+	debug("MCAP mdl remote reconnection aborted");
-+	/* Due to this callback isn't managed this request won't be supported */
-+	return MCAP_REQUEST_NOT_SUPPORTED;
-+}
-+
-+static void set_default_cb(struct mcap_mcl *mcl)
-+{
-+	if (!mcl->cb)
-+		mcl->cb = g_new0(struct mcap_mdl_cb, 1);
-+
-+	mcl->cb->mdl_connected = default_mdl_connected_cb;
-+	mcl->cb->mdl_closed = default_mdl_closed_cb;
-+	mcl->cb->mdl_deleted = default_mdl_deleted_cb;
-+	mcl->cb->mdl_aborted = default_mdl_aborted_cb;
-+	mcl->cb->mdl_conn_req = default_mdl_conn_req_cb;
-+	mcl->cb->mdl_reconn_req = default_mdl_reconn_req_cb;
-+}
-+
-+static struct mcap_mcl *find_mcl(GSList *list, const bdaddr_t *addr)
-+{
-+	GSList *l;
-+	struct mcap_mcl *mcl;
-+
-+	for (l = list; l; l = l->next) {
-+		mcl = l->data;
-+
-+		if (!bacmp(&mcl->addr, addr))
-+			return mcl;
-+	}
-+
-+	return NULL;
-+}
-+
-+static void mcap_mcl_release(struct mcap_mcl *mcl)
-+{
-+	/* TODO */
-+}
-+
-+static void mcap_mcl_check_del(struct mcap_mcl *mcl)
-+{
-+	/* TODO */
-+}
-+
-+static void mcap_uncache_mcl(struct mcap_mcl *mcl)
-+{
-+	/* TODO */
-+}
-+
-+struct mcap_mcl *mcap_mcl_ref(struct mcap_mcl *mcl)
-+{
-+	mcl->ref++;
-+
-+	debug("mcap_mcl_ref(%p): ref=%d", mcl, mcl->ref);
-+
-+	return mcl;
-+}
-+
-+void mcap_mcl_unref(struct mcap_mcl *mcl)
-+{
-+	mcl->ref--;
-+
-+	debug("mcap_mcl_unref(%p): ref=%d", mcl, mcl->ref);
-+
-+	if (mcl->ref > 0)
-+		return;
-+
-+	mcap_mcl_release(mcl);
-+}
-+
-+static gboolean mcl_control_cb(GIOChannel *chan, GIOCondition cond,
-+								gpointer data)
-+{
-+
-+	/* TODO */
-+	return FALSE;
-+}
-+
- static void confirm_dc_event_cb(GIOChannel *chan, gpointer user_data)
- {
- 	/* TODO */
+@@ -1335,10 +1335,68 @@ static gboolean process_md_abort_mdl_rsp(struct mcap_mcl *mcl,
+ 	return close;
  }
  
-+static void connect_mcl_event_cb(GIOChannel *chan, GError *err,
-+							gpointer user_data)
++static void restore_mdl(gpointer elem, gpointer data)
 +{
-+	struct mcap_mcl *mcl = user_data;
-+	gboolean reconn;
++	struct mcap_mdl *mdl = elem;
 +
-+	if (err) {
-+		mcap_mcl_check_del(mcl);
-+		return;
-+	}
++	if (mdl->state == MDL_DELETING) {
++		if (mdl->dc)
++			mdl->state = MDL_CONNECTED;
++		else
++			mdl->state = MDL_CLOSED;
++	} else if (mdl->state == MDL_CLOSED)
++		mdl->mcl->cb->mdl_closed(mdl, mdl->mcl->cb->user_data);
++}
 +
-+	mcl->state = MCL_CONNECTED;
-+	mcl->role = MCL_ACCEPTOR;
+ static gboolean process_md_delete_mdl_rsp(struct mcap_mcl *mcl, uint8_t *cmd,
+ 								uint32_t len)
+ {
+-	return FALSE;
++	struct mcap_mdl_op_cb *del = mcl->priv_data;
++	struct mcap_mdl *mdl = del->mdl;
++	mcap_mdl_del_cb deleted_cb = del->cb.del;
++	gpointer user_data = del->user_data;
++	mcap4B_rsp *rsp = (mcap4B_rsp *) cmd;
++	mcap_md_req *cmdlast = (mcap_md_req *) mcl->lcmd;
++	uint16_t mdlid = ntohs(cmdlast->mdl);
++	GError *gerr = NULL;
++	gboolean close = FALSE;
++	gboolean notify = FALSE;
++
++	g_free(mcl->priv_data);
++	mcl->priv_data = NULL;
++
++	rsp->mdl = ntohs(rsp->mdl);
++
++	close = check_err_rsp(rsp->mdl, mdlid, rsp->rc, len,
++						sizeof(mcap4B_rsp), &gerr);
++
++	g_free(mcl->lcmd);
++	mcl->lcmd = NULL;
 +	mcl->req = MCL_AVAILABLE;
-+	mcl->cc = g_io_channel_ref(chan);
-+	mcl->ctrl |= MCAP_CTRL_STD_OP;
-+
-+	reconn = (mcl->ctrl & MCAP_CTRL_CACHED);
-+	if (reconn)
-+		mcap_uncache_mcl(mcl);
-+	else
-+		mcl->ms->mcls = g_slist_prepend(mcl->ms->mcls, mcl);
-+
-+	mcl->wid = g_io_add_watch(mcl->cc,
-+			G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
-+			(GIOFunc) mcl_control_cb, mcl);
-+
-+	/* Callback to report new MCL */
-+	if (reconn)
-+		mcl->ms->mcl_reconnected_cb(mcl, mcl->ms->user_data);
-+	else
-+		mcl->ms->mcl_connected_cb(mcl, mcl->ms->user_data);
-+
-+	if (mcl->ref == 1) {
-+		mcl->ms->mcls = g_slist_remove(mcl->ms->mcls, mcl);
-+		mcap_mcl_unref(mcl);
-+	}
-+}
-+
- static void confirm_mcl_event_cb(GIOChannel *chan, gpointer user_data)
- {
--	/* TODO */
-+	struct mcap_instance *ms = user_data;
-+	struct mcap_mcl *mcl;
-+	bdaddr_t dst;
-+	char address[18], srcstr[18];
-+	GError *err = NULL;
-+
-+	bt_io_get(chan, BT_IO_L2CAP, &err,
-+			BT_IO_OPT_DEST_BDADDR, &dst,
-+			BT_IO_OPT_DEST, address,
-+			BT_IO_OPT_INVALID);
-+	if (err) {
-+		error("%s", err->message);
-+		g_error_free(err);
-+		goto drop;
++	if (gerr) {
++		if (mdl)
++			restore_mdl(mdl, NULL);
++		else
++			g_slist_foreach(mcl->mdls, restore_mdl, NULL);
++		deleted_cb(gerr, user_data);
++		g_error_free(gerr);
++		return close;
 +	}
 +
-+	ba2str(&ms->src, srcstr);
-+	mcl = find_mcl(ms->mcls, &dst);
-+	if (mcl) {
-+		error("Control channel already created with %s on adapter %s",
-+				address, srcstr);
-+		goto drop;
++	if (mdlid == MCAP_ALL_MDLIDS) {
++		g_slist_foreach(mcl->mdls, mcap_delete_mdl, &notify);
++		g_slist_free(mcl->mdls);
++		mcl->mdls = NULL;
++		mcl->state = MCL_CONNECTED;
++		goto end;
 +	}
 +
-+	mcl = find_mcl(ms->cached, &dst);
-+	if (!mcl) {
-+		mcl = g_new0(struct mcap_mcl, 1);
-+		mcl->ms = ms;
-+		bacpy(&mcl->addr, &dst);
-+		set_default_cb(mcl);
-+		mcl = mcap_mcl_ref(mcl);
-+	}
-+
-+	if (!bt_io_accept(chan, connect_mcl_event_cb, mcl, NULL, &err)) {
-+		error("mcap accept error: %s", err->message);
-+		if (!(mcl->ctrl & MCAP_CTRL_CACHED))
-+			mcap_mcl_unref(mcl);
-+		g_error_free(err);
-+		goto drop;
-+	}
-+
-+	return;
-+drop:
-+	g_io_channel_shutdown(chan, TRUE, NULL);
++	mcl->mdls = g_slist_remove(mcl->mdls, mdl);
++	update_mcl_state(mcl);
++	mcap_delete_mdl(mdl, &notify);
++end:
++	deleted_cb(gerr, user_data);
++	return close;
  }
  
- struct mcap_instance *mcap_create_instance(struct btd_adapter *btd_adapter,
+ static gboolean check_rsp(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
 -- 
 1.6.3.3
 
