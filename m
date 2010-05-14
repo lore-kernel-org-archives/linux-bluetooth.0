@@ -2,10 +2,10 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 19/25] Process response to std. op. codes
-Date: Fri, 14 May 2010 12:19:46 +0200
-Message-Id: <1273832392-18654-19-git-send-email-sancane@gmail.com>
-In-Reply-To: <1273832392-18654-18-git-send-email-sancane@gmail.com>
+Subject: [PATCH 17/25] Implement function to send md_delete_mdl_req
+Date: Fri, 14 May 2010 12:19:44 +0200
+Message-Id: <1273832392-18654-17-git-send-email-sancane@gmail.com>
+In-Reply-To: <1273832392-18654-16-git-send-email-sancane@gmail.com>
 References: <1273832392-18654-1-git-send-email-sancane@gmail.com>
  <1273832392-18654-2-git-send-email-sancane@gmail.com>
  <1273832392-18654-3-git-send-email-sancane@gmail.com>
@@ -22,172 +22,143 @@ References: <1273832392-18654-1-git-send-email-sancane@gmail.com>
  <1273832392-18654-14-git-send-email-sancane@gmail.com>
  <1273832392-18654-15-git-send-email-sancane@gmail.com>
  <1273832392-18654-16-git-send-email-sancane@gmail.com>
- <1273832392-18654-17-git-send-email-sancane@gmail.com>
- <1273832392-18654-18-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- mcap/mcap.c |  140 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 139 insertions(+), 1 deletions(-)
+ mcap/mcap.c |  112 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 112 insertions(+), 0 deletions(-)
 
 diff --git a/mcap/mcap.c b/mcap/mcap.c
-index b0cf651..efc512a 100644
+index b4b8b09..1fd8e43 100644
 --- a/mcap/mcap.c
 +++ b/mcap/mcap.c
-@@ -1171,9 +1171,112 @@ static void proc_req_active(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
- 	}
+@@ -125,6 +125,38 @@ static void set_default_cb(struct mcap_mcl *mcl)
+ 	mcl->cb->mdl_reconn_req = default_mdl_reconn_req_cb;
  }
  
-+static gboolean process_md_create_mdl_rsp(struct mcap_mcl *mcl,
-+						uint8_t *cmd, uint32_t len)
++static char *error2str(uint8_t rc)
 +{
-+	return FALSE;
-+}
-+
-+static gboolean process_md_reconnect_mdl_rsp(struct mcap_mcl *mcl,
-+						uint8_t *cmd, uint32_t len)
-+{
-+	return FALSE;
-+}
-+
-+static gboolean process_md_abort_mdl_rsp(struct mcap_mcl *mcl,
-+						uint8_t *cmd, uint32_t len)
-+{
-+	return FALSE;
-+}
-+
-+static gboolean process_md_delete_mdl_rsp(struct mcap_mcl *mcl, uint8_t *cmd,
-+								uint32_t len)
-+{
-+	return FALSE;
-+}
-+
-+static gboolean check_rsp(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
-+{
-+	mcap4B_rsp *rsp;
-+	GError *gerr = NULL;
-+
-+	/* Check if the response matches with the last request */
-+	if ((cmd[0] != MCAP_ERROR_RSP) && ((mcl->lcmd[0] + 1) != cmd[0]))
-+		goto close_mcl;
-+
-+	if (len < 4)
-+		goto close_mcl;
-+
-+	rsp = (mcap4B_rsp *)cmd;
-+
-+	if (rsp->rc == MCAP_REQUEST_NOT_SUPPORTED) {
-+		debug("Remote does not support opcodes");
-+		g_set_error(&gerr, MCAP_ERROR, MCAP_ERROR_REQUEST_NOT_SUPPORTED,
-+						"%s", error2str(rsp->rc));
-+		mcap_notify_error(mcl, gerr);
-+		g_error_free(gerr);
-+
-+		g_free(mcl->lcmd);
-+		mcl->lcmd = NULL;
-+		mcl->ctrl &= ~MCAP_CTRL_STD_OP;
-+		mcl->req = MCL_AVAILABLE;
-+		update_mcl_state(mcl);
-+		return FALSE;
-+	}
-+
-+	if (rsp->rc == MCAP_UNSPECIFIED_ERROR)
-+		goto close_mcl;
-+
-+	return TRUE;
-+close_mcl:
-+	if (rsp->rc == MCAP_UNSPECIFIED_ERROR)
-+		g_set_error(&gerr, MCAP_ERROR, MCAP_ERROR_UNSPECIFIED_ERROR,
-+						"%s", error2str(rsp->rc));
-+	else
-+		g_set_error(&gerr, MCAP_ERROR, MCAP_ERROR_FAILED,
-+						"Protocol error");
-+	mcap_notify_error(mcl, gerr);
-+	g_error_free(gerr);
-+	mcl->ms->mcl_disconnected_cb(mcl, mcl->ms->user_data);
-+	mcap_cache_mcl(mcl);
-+	return FALSE;
-+}
-+
- static void proc_response(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
- {
--	/* TODO */
-+	gboolean close;
-+	RELEASE_TIMER(mcl);
-+
-+	if (!check_rsp(mcl, cmd, len))
-+		return;
-+
-+	switch (cmd[0]) {
-+	case MCAP_ERROR_RSP:
-+		error("MCAP_ERROR_RSP received");
-+		close = TRUE;
-+		break;
-+	case MCAP_MD_CREATE_MDL_RSP:
-+		close = process_md_create_mdl_rsp(mcl, cmd, len);
-+		break;
-+	case MCAP_MD_RECONNECT_MDL_RSP:
-+		close = process_md_reconnect_mdl_rsp(mcl, cmd, len);
-+		break;
-+	case MCAP_MD_ABORT_MDL_RSP:
-+		close = process_md_abort_mdl_rsp(mcl, cmd, len);
-+		break;
-+	case MCAP_MD_DELETE_MDL_RSP:
-+		close = process_md_delete_mdl_rsp(mcl, cmd, len);
-+		break;
++	switch (rc) {
++	case MCAP_SUCCESS:
++		return "Success";
++	case MCAP_INVALID_OP_CODE:
++		return "Invalid Op Code";
++	case MCAP_INVALID_PARAM_VALUE:
++		return "Invalid Parameter Value";
++	case MCAP_INVALID_MDEP:
++		return "Invalid MDEP";
++	case MCAP_MDEP_BUSY:
++		return "MDEP Busy";
++	case MCAP_INVALID_MDL:
++		return "Invalid MDL";
++	case MCAP_MDL_BUSY:
++		return "MDL Busy";
++	case MCAP_INVALID_OPERATION:
++		return "Invalid Operation";
++	case MCAP_RESOURCE_UNAVAILABLE:
++		return "Resource Unavailable";
++	case MCAP_UNSPECIFIED_ERROR:
++		return "Unspecified Error";
++	case MCAP_REQUEST_NOT_SUPPORTED:
++		return "Request Not Supported";
++	case MCAP_CONFIGURATION_REJECTED:
++		return "Configuration Rejected";
 +	default:
-+		debug("Unknown cmd response received (op code = %d)",cmd[0]);
-+		close = TRUE;
-+		break;
++		return "Unknown Response Code";
 +	}
-+
-+	if (close) {
-+		mcl->ms->mcl_disconnected_cb(mcl, mcl->ms->user_data);
-+		mcap_cache_mcl(mcl);
-+	}
- }
- 
- static void rsend_req(struct mcap_mcl *mcl)
-@@ -1632,3 +1735,38 @@ void mcap_release_instance(struct mcap_instance *ms)
- 	g_free(ms);
- }
- 
-+uint16_t mcap_get_ctrl_psm(struct mcap_instance *ms, GError **err)
-+{
-+	uint16_t lpsm;
-+
-+	if (!(ms && ms->ccio)) {
-+		g_set_error(err, MCAP_ERROR, MCAP_ERROR_INVALID_ARGS,
-+			"Invalid MCAP instance");
-+		return 0;
-+	}
-+
-+	bt_io_get(ms->ccio, BT_IO_L2CAP, err,
-+			BT_IO_OPT_PSM, &lpsm,
-+			BT_IO_OPT_INVALID);
-+	if (*err)
-+		return 0;
-+	return lpsm;
 +}
 +
-+uint16_t mcap_get_data_psm(struct mcap_instance *ms, GError **err)
+ static void mcap_send_std_opcode(struct mcap_mcl *mcl, uint8_t *cmd,
+ 						uint32_t size, GError **err)
+ {
+@@ -408,6 +440,86 @@ void mcap_req_mdl_reconnect(struct mcap_mdl *mdl,
+ 									mcl);
+ }
+ 
++static void send_delete_req(GError **err, struct mcap_mcl *mcl,
++				struct mcap_mdl_op_cb *con, uint16_t mdlid)
 +{
-+	uint16_t lpsm;
++	uint8_t *cmd;
 +
-+	if (!(ms && ms->dcio)) {
-+		g_set_error(err, MCAP_ERROR, MCAP_ERROR_INVALID_ARGS,
-+			"Invalid MCAP instance");
-+		return 0;
++	cmd = create_req(MCAP_MD_DELETE_MDL_REQ, mdlid);
++	mcap_send_std_opcode(mcl, cmd, sizeof(mcap_md_req), err);
++	if (*err) {
++		g_free(cmd);
++		return;
 +	}
 +
-+	bt_io_get(ms->dcio, BT_IO_L2CAP, err,
-+			BT_IO_OPT_PSM, &lpsm,
-+			BT_IO_OPT_INVALID);
-+	if (*err)
-+		return 0;
-+	return lpsm;
++	mcl->priv_data = con;
++
++	mcl->tid = g_timeout_add_seconds(RESPONSE_TIMER, wait_response_timer,
++									mcl);
 +}
++
++void mcap_req_mdl_delete_all(struct mcap_mcl *mcl, GError **err,
++			mcap_mdl_del_cb delete_cb, gpointer user_data)
++{
++	GSList *l;
++	struct mcap_mdl *mdl;
++	struct mcap_mdl_op_cb *con;
++
++	debug("MCL in state: %d", mcl->state);
++	if (!mcl->mdls) {
++		g_set_error(err, MCAP_ERROR, MCAP_ERROR_FAILED,
++				"There are not MDLs created");
++		return;
++	}
++
++	for (l = mcl->mdls; l; l = l->next) {
++		mdl = l->data;
++		if (mdl->state != MDL_WAITING)
++			mdl->state = MDL_DELETING;
++	}
++
++	con = g_new0(struct mcap_mdl_op_cb, 1);
++	con->mdl = NULL;
++	con->cb.del = delete_cb;
++	con->user_data = user_data;
++
++	send_delete_req(err, mcl, con, MCAP_ALL_MDLIDS);
++	if (*err)
++		g_free(con);
++}
++
++void mcap_req_mdl_deletion(struct mcap_mdl *mdl, GError **err,
++			mcap_mdl_del_cb delete_cb, gpointer user_data)
++{
++	struct mcap_mcl *mcl= mdl->mcl;
++	struct mcap_mdl_op_cb *con;
++	GSList *l;
++
++	l = g_slist_find(mcl->mdls, mdl);
++
++	if (!l) {
++		g_set_error(err, MCAP_ERROR, MCAP_ERROR_INVALID_MDL,
++					"%s" , error2str(MCAP_INVALID_MDEP));
++		return;
++	}
++
++	if (mdl->state == MDL_WAITING) {
++		g_set_error(err, MCAP_ERROR, MCAP_ERROR_FAILED,
++							"Mdl is not created");
++		return;
++	}
++	mdl->state = MDL_DELETING;
++
++	con = g_new0(struct mcap_mdl_op_cb, 1);
++	con->mdl = mdl;
++	con->cb.del = delete_cb;
++	con->user_data = user_data;
++
++	send_delete_req(err, mcl, con, mdl->mdlid);
++	if (*err)
++		g_free(con);
++}
++
+ static void update_mcl_state(struct mcap_mcl *mcl)
+ {
+ 	GSList *l;
 -- 
 1.6.3.3
 
