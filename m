@@ -2,10 +2,10 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 11/25] Process commands in ACTIVE state
-Date: Fri, 14 May 2010 12:19:38 +0200
-Message-Id: <1273832392-18654-11-git-send-email-sancane@gmail.com>
-In-Reply-To: <1273832392-18654-10-git-send-email-sancane@gmail.com>
+Subject: [PATCH 08/25] Process md_reconnect_mdl_req in CONNECTED state
+Date: Fri, 14 May 2010 12:19:35 +0200
+Message-Id: <1273832392-18654-8-git-send-email-sancane@gmail.com>
+In-Reply-To: <1273832392-18654-7-git-send-email-sancane@gmail.com>
 References: <1273832392-18654-1-git-send-email-sancane@gmail.com>
  <1273832392-18654-2-git-send-email-sancane@gmail.com>
  <1273832392-18654-3-git-send-email-sancane@gmail.com>
@@ -13,41 +13,75 @@ References: <1273832392-18654-1-git-send-email-sancane@gmail.com>
  <1273832392-18654-5-git-send-email-sancane@gmail.com>
  <1273832392-18654-6-git-send-email-sancane@gmail.com>
  <1273832392-18654-7-git-send-email-sancane@gmail.com>
- <1273832392-18654-8-git-send-email-sancane@gmail.com>
- <1273832392-18654-9-git-send-email-sancane@gmail.com>
- <1273832392-18654-10-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- mcap/mcap.c |   14 +++++++++++++-
- 1 files changed, 13 insertions(+), 1 deletions(-)
+ mcap/mcap.c |   44 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 43 insertions(+), 1 deletions(-)
 
 diff --git a/mcap/mcap.c b/mcap/mcap.c
-index ac0d938..dfa455f 100644
+index 15b9141..a8bdc9e 100644
 --- a/mcap/mcap.c
 +++ b/mcap/mcap.c
-@@ -680,7 +680,19 @@ static void proc_req_pending(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
- 
- static void proc_req_active(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
- {
--	/* TODO */
-+	switch (cmd[0]) {
-+	case MCAP_MD_CREATE_MDL_REQ:
-+		process_md_create_mdl_req(mcl, cmd, len);
-+		break;
-+	case MCAP_MD_RECONNECT_MDL_REQ:
-+		process_md_reconnect_mdl_req(mcl, cmd, len);
-+		break;
-+	case MCAP_MD_DELETE_MDL_REQ:
-+		process_md_delete_mdl_req(mcl, cmd, len);
-+		break;
-+	default:
-+		error_cmd_rsp(mcl, cmd, len);
-+	}
+@@ -479,6 +479,48 @@ static void process_md_create_mdl_req(struct mcap_mcl *mcl, uint8_t *cmd,
+ 	send5B_cmd(mcl, MCAP_MD_CREATE_MDL_RSP, MCAP_SUCCESS, mdl_id, conf);
  }
  
- static void proc_response(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
++static void process_md_reconnect_mdl_req(struct mcap_mcl *mcl, uint8_t *cmd,
++								uint32_t len)
++{
++	mcap_md_req *req;
++	struct mcap_mdl *mdl;
++	uint16_t mdl_id;
++	uint8_t rsp;
++
++	if (len != sizeof(mcap_md_req)) {
++		send4B_cmd(mcl, MCAP_MD_RECONNECT_MDL_RSP,
++				MCAP_INVALID_PARAM_VALUE, MCAP_MDLID_RESERVED);
++		return;
++	}
++
++	req = (mcap_md_req *)cmd;
++	mdl_id = ntohs(req->mdl);
++
++	mdl = get_mdl(mcl, mdl_id);
++	if (!mdl) {
++		send4B_cmd(mcl, MCAP_MD_RECONNECT_MDL_RSP,
++						MCAP_INVALID_MDL, mdl_id);
++		return;
++	}
++
++	/* Callback to upper layer */
++	rsp = mcl->cb->mdl_reconn_req(mdl, mcl->cb->user_data);
++	if (mcl->state == MCL_IDLE)
++		return;
++
++	if (rsp != MCAP_SUCCESS) {
++		send4B_cmd(mcl, MCAP_MD_CREATE_MDL_RSP, rsp, mdl_id);
++		return;
++	}
++
++	if (mdl->state == MDL_CONNECTED)
++		shutdown_mdl(mdl);
++
++	mdl->state = MDL_WAITING;
++	mcl->state = MCL_PENDING;
++	send4B_cmd(mcl, MCAP_MD_RECONNECT_MDL_RSP, MCAP_SUCCESS, mdl_id);
++}
++
+ /* Function used to process commands depending of MCL state */
+ static void proc_req_connected(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
+ {
+@@ -487,7 +529,7 @@ static void proc_req_connected(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
+ 		process_md_create_mdl_req(mcl, cmd, len);
+ 		break;
+ 	case MCAP_MD_RECONNECT_MDL_REQ:
+-		/*process_md_reconnect_mdl_req(mcl, cmd, len);*/
++		process_md_reconnect_mdl_req(mcl, cmd, len);
+ 		break;
+ 	case MCAP_MD_DELETE_MDL_REQ:
+ 		/*process_md_delete_mdl_req(mcl, cmd, len);*/
 -- 
 1.6.3.3
 
