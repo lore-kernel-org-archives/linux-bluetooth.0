@@ -1,31 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <81252.27318.qm@web52603.mail.re2.yahoo.com>
-References: <81252.27318.qm@web52603.mail.re2.yahoo.com>
-Date: Fri, 14 May 2010 21:10:12 +0300
-Message-ID: <AANLkTinUQ_ewXsBA-1Pm48cLcxmM1OCWasCOIumiZRaW@mail.gmail.com>
-Subject: Re: MAC address change
-From: Ahmed Ragab <elmasri.ahmed@gmail.com>
-To: Ed Tsang <netdesign_98@yahoo.com>, linux-bluetooth@vger.kernel.org
+Date: Fri, 14 May 2010 10:01:22 -0700
+Message-ID: <AANLkTilU5uaxHh0bxD5v3ZDbU1peyZXRR8RyYD_Viouh@mail.gmail.com>
+Subject: Bluetooth not working with linphone
+From: Grant <emailgrant@gmail.com>
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Ed,
+My bluetooth headset used to work in the voip client twinkle.
+Unfortunately twinkle has been removed from Gentoo's package tree so I
+can't test it to see if it's still working.  It works via 'aplay
+-Dbluetooth file.wav' but I can't get it to work in the voip client
+linphone at all, although others report their's working.
 
-Yes i tried and the situation is the same nothing changes, i even
-Tried the -r option in ./bdaddr and the problem is the same nothing
-Changes. i hope there is another way to change the address because
-In my country (egypt) all the bluetooth dongles have the sa
+# cat /etc/asound.conf
+pcm.bluetooth {
+	type bluetooth
+	device 00:11:22:33:44:55
+	profile "auto"
+}
 
-Ahmed
+Does anyone know how I can troubleshoot this?  I'm on bluez-4.64.
 
-On 14 May 2010 18:20, Ed Tsang <netdesign_98@yahoo.com> wrote:
-> Ahmed,
->   Did you try "hciconfig -a hci0 reset" after the address change.
->
-> Ed
->
->
->
->
+- Grant
