@@ -1,58 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 15 May 2010 23:19:15 +0200 (CEST)
-From: Julia Lawall <julia@diku.dk>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: [PATCH 20/37] drivers/bluetooth: Use kmemdup
-Message-ID: <Pine.LNX.4.64.1005152318590.21345@ask.diku.dk>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+In-Reply-To: <AANLkTilSynGNcpdq8h5YJQVD8e5MMyUDq55WzsB05AA2@mail.gmail.com>
+References: <w2ra6ca4e821005071241w9d7d982ezb78ad0ba4480e73d@mail.gmail.com>
+	 <s2oa6ca4e821005071249tdfd2e197i2595b57ae2ccb705@mail.gmail.com>
+	 <20100507195325.GB4857@vigoh>
+	 <AANLkTilSynGNcpdq8h5YJQVD8e5MMyUDq55WzsB05AA2@mail.gmail.com>
+Date: Sat, 15 May 2010 14:52:15 +0300
+Message-ID: <AANLkTilnMJQbRRfzjuVkVEV_HfN4CQmfZOhfnQQB0dml@mail.gmail.com>
+Subject: Re: Software caused connection abort (103 )
+From: john michelle <jhnmichelle@gmail.com>
+To: "Gustavo F. Padovan" <gustavo@padovan.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Julia Lawall <julia@diku.dk>
+Hi all,
 
-Use kmemdup when some other buffer is immediately copied into the
-allocated region.
+It seems that i am not the only one who is reporting this problem
+below is other reporters
 
-A simplified version of the semantic patch that makes this change is as
-follows: (http://coccinelle.lip6.fr/)
+http://www.mp3car.com/vbulletin/linux/125997-hfp-linux-bluetooth-hands-free-5.html
 
-// <smpl>
-@@
-expression from,to,size,flag;
-statement S;
-@@
+even an older post show this bug
 
--  to = \(kmalloc\|kzalloc\)(size,flag);
-+  to = kmemdup(from,size,flag);
-   if (to==NULL || ...) S
--  memcpy(to, from, size);
-// </smpl>
+http://osdir.com/ml/linux.bluez.user/2004-04/msg00016.html
 
-Signed-off-by: Julia Lawall <julia@diku.dk>
+I hope we got someone attention.
 
----
- drivers/bluetooth/bcm203x.c |    3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff -u -p a/drivers/bluetooth/bcm203x.c b/drivers/bluetooth/bcm203x.c
---- a/drivers/bluetooth/bcm203x.c
-+++ b/drivers/bluetooth/bcm203x.c
-@@ -224,7 +224,7 @@ static int bcm203x_probe(struct usb_inte
- 
- 	BT_DBG("firmware data %p size %zu", firmware->data, firmware->size);
- 
--	data->fw_data = kmalloc(firmware->size, GFP_KERNEL);
-+	data->fw_data = kmemdup(firmware->data, firmware->size, GFP_KERNEL);
- 	if (!data->fw_data) {
- 		BT_ERR("Can't allocate memory for firmware image");
- 		release_firmware(firmware);
-@@ -234,7 +234,6 @@ static int bcm203x_probe(struct usb_inte
- 		return -ENOMEM;
- 	}
- 
--	memcpy(data->fw_data, firmware->data, firmware->size);
- 	data->fw_size = firmware->size;
- 	data->fw_sent = 0;
- 
+John
+
+On Fri, May 14, 2010 at 12:39 AM, john michelle <jhnmichelle@gmail.com> wrote:
+> Hi Gustavo,
+>
+> Any update on the software caused connection abort issue, it's happenning more
+> And more making bluez unstable for our application
+>
+> John
+>
+> On Fri, May 7, 2010 at 3:53 PM, Gustavo F. Padovan <gustavo@padovan.org> wrote:
+>> * john michelle <jhnmichelle@gmail.com> [2010-05-07 15:49:05 -0400]:
+>>
+>>> Hi Bluetooth hackers,
+>>>
+>>> i am having this consistent problem with bluez , from time to time i
+>>> get the error Software caused connection abort (103 )
+>>> And the bluetooth stick seems to disconnect and reconnects. this
+>>> happens during an sco connection and it occurs even
+>>> More when i am having the voice stream comming through the internet
+>>> rather than the lan.i don't know what exact
+>>> Details you need to solve this problem please tell me and i will give
+>>> you an immediate reply . i have linux kernel 2.6.33 and bluez 4.62
+>>
+>> I get the same problem sometimes when testing ERTM with l2test. So the
+>> problem is on l2cap too. I didn't have time to debug this yet. Now that
+>> someone else have confirmed it too, I'll to take a look at the problem.
+>>
+>>>
+>>> John
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>> --
+>> Gustavo F. Padovan
+>> http://padovan.org
+>>
+>
