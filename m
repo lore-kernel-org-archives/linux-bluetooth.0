@@ -1,225 +1,235 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: =?iso-8859-1?q?Jos=E9_Antonio_Santos_Cadenas?=
+	<jcaden@libresoft.es>
+Reply-To: jcaden@libresoft.es
 To: linux-bluetooth@vger.kernel.org
-Cc: Johan Hedberg <johan.hedberg@nokia.com>
-Subject: [PATCH] Bluetooth: Add blacklist support for incoming connections
-Date: Mon, 17 May 2010 17:19:47 +0200
-Message-Id: <1274109587-26638-1-git-send-email-johan.hedberg@gmail.com>
+Subject: HDP proposed API(0.5)
+Date: Mon, 17 May 2010 16:54:36 +0200
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201005171654.36923.jcaden@libresoft.es>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@nokia.com>
+Hope the last one :)
 
-In some circumstances it could be desirable to reject incoming
-connections on the baseband level. This patch adds this feature through
-two new ioctl's: HCIBLOCKADDR and HCIUNBLOCKADDR. Both take a simple
-Bluetooth address as a parameter. BDADDR_ANY can be used with
-HCIUNBLOCKADDR to remove all devices from the blacklist.
+----------------------------
 
-Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
----
- fs/compat_ioctl.c                |    2 +
- include/net/bluetooth/hci.h      |    3 +
- include/net/bluetooth/hci_core.h |    8 +++
- net/bluetooth/hci_core.c         |    2 +
- net/bluetooth/hci_event.c        |    2 +-
- net/bluetooth/hci_sock.c         |   90 ++++++++++++++++++++++++++++++++++++++
- 6 files changed, 106 insertions(+), 1 deletions(-)
+BlueZ D-Bus Health API description
+**********************************
 
-diff --git a/fs/compat_ioctl.c b/fs/compat_ioctl.c
-index 641640d..1863896 100644
---- a/fs/compat_ioctl.c
-+++ b/fs/compat_ioctl.c
-@@ -1328,6 +1328,8 @@ COMPATIBLE_IOCTL(HCISETLINKPOL)
- COMPATIBLE_IOCTL(HCISETLINKMODE)
- COMPATIBLE_IOCTL(HCISETACLMTU)
- COMPATIBLE_IOCTL(HCISETSCOMTU)
-+COMPATIBLE_IOCTL(HCIBLOCKADDR)
-+COMPATIBLE_IOCTL(HCIUNBLOCKADDR)
- COMPATIBLE_IOCTL(HCIINQUIRY)
- COMPATIBLE_IOCTL(HCIUARTSETPROTO)
- COMPATIBLE_IOCTL(HCIUARTGETPROTO)
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index fc0c502..ca2518e 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -100,6 +100,9 @@ enum {
- #define HCISETACLMTU	_IOW('H', 227, int)
- #define HCISETSCOMTU	_IOW('H', 228, int)
- 
-+#define HCIBLOCKADDR	_IOW('H', 230, int)
-+#define HCIUNBLOCKADDR	_IOW('H', 231, int)
-+
- #define HCIINQUIRY	_IOR('H', 240, int)
- 
- /* HCI timeouts */
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index ce3c99e..ffe7827 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -62,6 +62,11 @@ struct hci_conn_hash {
- 	unsigned int     sco_num;
- };
- 
-+struct bdaddr_list {
-+	struct list_head list;
-+	bdaddr_t bdaddr;
-+};
-+
- struct hci_dev {
- 	struct list_head list;
- 	spinlock_t	lock;
-@@ -125,6 +130,7 @@ struct hci_dev {
- 
- 	struct inquiry_cache	inq_cache;
- 	struct hci_conn_hash	conn_hash;
-+	struct bdaddr_list	blacklist;
- 
- 	struct hci_dev_stats	stat;
- 
-@@ -422,6 +428,8 @@ int hci_get_conn_info(struct hci_dev *hdev, void __user *arg);
- int hci_get_auth_info(struct hci_dev *hdev, void __user *arg);
- int hci_inquiry(void __user *arg);
- 
-+struct bdaddr_list *hci_blacklist_lookup(struct hci_dev *hdev, bdaddr_t *bdaddr);
-+
- void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
- 
- int hci_recv_frame(struct sk_buff *skb);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 4ad2319..669b0db 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -922,6 +922,8 @@ int hci_register_dev(struct hci_dev *hdev)
- 
- 	hci_conn_hash_init(hdev);
- 
-+	INIT_LIST_HEAD(&hdev->blacklist.list);
-+
- 	memset(&hdev->stat, 0, sizeof(struct hci_dev_stats));
- 
- 	atomic_set(&hdev->promisc, 0);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 6c57fc7..4d651fc 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -952,7 +952,7 @@ static inline void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *sk
- 
- 	mask |= hci_proto_connect_ind(hdev, &ev->bdaddr, ev->link_type);
- 
--	if (mask & HCI_LM_ACCEPT) {
-+	if (mask & HCI_LM_ACCEPT && !hci_blacklist_lookup(hdev, &ev->bdaddr)) {
- 		/* Connection accepted */
- 		struct inquiry_entry *ie;
- 		struct hci_conn *conn;
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 38f08f6..7668c73 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -165,6 +165,86 @@ static int hci_sock_release(struct socket *sock)
- 	return 0;
- }
- 
-+struct bdaddr_list *hci_blacklist_lookup(struct hci_dev *hdev, bdaddr_t *bdaddr)
-+{
-+	struct list_head *p;
-+	struct bdaddr_list *blacklist = &hdev->blacklist;
-+
-+	list_for_each(p, &blacklist->list) {
-+		struct bdaddr_list *b;
-+
-+		b = list_entry(p, struct bdaddr_list, list);
-+
-+		if (bacmp(bdaddr, &b->bdaddr) == 0)
-+			return b;
-+	}
-+
-+	return NULL;
-+}
-+
-+static int hci_blacklist_add(struct hci_dev *hdev, void __user *arg)
-+{
-+	bdaddr_t bdaddr;
-+	struct bdaddr_list *entry;
-+
-+	if (copy_from_user(&bdaddr, arg, sizeof(bdaddr)))
-+		return -EFAULT;
-+
-+	if (bacmp(&bdaddr, BDADDR_ANY) == 0)
-+		return -EBADF;
-+
-+	if (hci_blacklist_lookup(hdev, &bdaddr))
-+		return -EEXIST;
-+
-+	entry = kzalloc(sizeof(struct bdaddr_list), GFP_KERNEL);
-+	if (!entry)
-+		return -ENOMEM;
-+
-+	bacpy(&entry->bdaddr, &bdaddr);
-+
-+	list_add(&entry->list, &hdev->blacklist.list);
-+
-+	return 0;
-+}
-+
-+static int hci_blacklist_clear(struct hci_dev *hdev)
-+{
-+	struct list_head *p, *n;
-+	struct bdaddr_list *blacklist = &hdev->blacklist;
-+
-+	list_for_each_safe(p, n, &blacklist->list) {
-+		struct bdaddr_list *b;
-+
-+		b = list_entry(p, struct bdaddr_list, list);
-+
-+		list_del(p);
-+		kfree(b);
-+	}
-+
-+	return 0;
-+}
-+
-+static int hci_blacklist_del(struct hci_dev *hdev, void __user *arg)
-+{
-+	bdaddr_t bdaddr;
-+	struct bdaddr_list *entry;
-+
-+	if (copy_from_user(&bdaddr, arg, sizeof(bdaddr)))
-+		return -EFAULT;
-+
-+	if (bacmp(&bdaddr, BDADDR_ANY) == 0)
-+		return hci_blacklist_clear(hdev);
-+
-+	entry = hci_blacklist_lookup(hdev, &bdaddr);
-+	if (!entry)
-+		return -ENOENT;
-+
-+	list_del(&entry->list);
-+	kfree(entry);
-+
-+	return 0;
-+}
-+
- /* Ioctls that require bound socket */
- static inline int hci_sock_bound_ioctl(struct sock *sk, unsigned int cmd, unsigned long arg)
- {
-@@ -194,6 +274,16 @@ static inline int hci_sock_bound_ioctl(struct sock *sk, unsigned int cmd, unsign
- 	case HCIGETAUTHINFO:
- 		return hci_get_auth_info(hdev, (void __user *) arg);
- 
-+	case HCIBLOCKADDR:
-+		if (!capable(CAP_NET_ADMIN))
-+			return -EACCES;
-+		return hci_blacklist_add(hdev, (void __user *) arg);
-+
-+	case HCIUNBLOCKADDR:
-+		if (!capable(CAP_NET_ADMIN))
-+			return -EACCES;
-+		return hci_blacklist_del(hdev, (void __user *) arg);
-+
- 	default:
- 		if (hdev->ioctl)
- 			return hdev->ioctl(hdev, cmd, arg);
--- 
-1.7.0.4
+	Santiago Carot-Nemesio <sancane@gmail.com>
+	José Antonio Santos-Cadenas <santoscadenas@gmail.com>
+	Elvis Pfützenreuter <epx@signove.com>
 
+Health Device Profile hierarchy
+===============================
+
+Service		org.bluez
+Interface	org.bluez.HealthAdapter
+Object path	[variable prefix]/{hci0,hci1,...}
+
+Methods		object CreateInstance(object path, dict config)
+
+			Returns the path for the new HealthInstance object.
+			The path parameter is the path of the remote object
+			with the callbacks to notify events (see
+			org.bluez.HealthAgent at the end of this document)
+			This petition starts an mcap instance and also register
+			in the SDP if is needed
+			Dict is defined as bellow:
+			{ "data_spec" : The data_spec is the data exchange
+					specification (see section 5.2.10 of
+					the specification document)
+					possible values:
+						0x00 = reserved,
+						0x01 [IEEE 11073-20601],
+						0x02..0xff reserved,
+					(optional)
+			  "end_points" : [{ (optional)
+				"mdepid" : uint8, (optional)
+				"role" : ("source" or "sink"), (mandatory)
+				"specs" :[{ (mandatory)
+					"data_type" : uint16, (mandatory)
+					"description" : string, (optional)
+				}]
+			  }]
+			}
+
+			if "data_spec" is not set, no SDP record will be
+			registered, so all the other data in the dictionary
+			will be ignored
+
+			Instance will be closed by the call or implicitly when
+			the programs leaves the bus.
+
+			Possible errors: org.bluez.Error.InvalidArguments
+
+		void CloseInstance(object path)
+
+			Closes the HDP instance identified by the object path.
+			Also instance will be closed if the process that started
+			leaves the bus. If there is a SDP record associated to
+			this instance it will be removed.
+
+			Possible errors: org.bluez.Error.InvalidArguments
+					org.bluez.Error.NotFound
+
+--------------------------------------------------------------------------------
+
+Service		org.bluez
+Interface	org.bluez.HealthDevice
+Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+
+Methods		array GetHealthInstances()
+
+			Gets the information of the remote instances present
+			in this device and published on its SDP record. The
+			returned data follows this format.
+
+			[{"id": "an instance identification as string",
+			 "data_spec" : data spec,
+			 "end_points":
+				["mdepid": uint8,
+				 "role"  : "source" or "sink" ,
+				 "specs" : [{
+					"dtype"       : uint16,
+					"description" : string, (optional)
+				 }]
+				]
+			}];
+
+--------------------------------------------------------------------------------
+
+Service		org.bluez
+Interface	org.bluez.HealthInstance
+Object path	[variable prefix]/{hci0,hci1,...}/{hdp0,hdp1,...}
+
+		object Connect(remote_instance_id)
+
+			Connects with the remote instance and returns its object
+			path. To get the session ids on a remote device, you
+			must run the GetHealthInstances in the HealthDevice
+			object.
+
+			Possible errors: org.bluez.Error.InvalidArguments
+					org.bluez.Error.HealthError
+
+		void Disconnect(object device, boolean cache)
+
+			Disconnect from the remote device. If chahe is false,
+			state will also be deleted. Otherwise, the state will be
+			kept for allowing future reconnections until the adapter
+			is removed.
+
+			Possible errors: org.bluez.Error.InvalidArguments
+					org.bluez.Error.NotFound
+					org.bluez.Error.HealthError
+
+--------------------------------------------------------------------------------
+
+Service		org.bluez
+Interface	org.bluez.HealthLink
+Object path	[variable prefix]/{hci0,hci1,...}/{hdp0,hdp1,...}/rem_inst_id
+
+		boolean Echo(array{byte})
+
+			Sends an echo petition to the remote intance. Returns
+			True if response matches with the buffer sent. If some
+			error is detected False value is returned and the
+			associated MCL is closed.
+
+		uint16 OpenDataChannel(byte mdepid, byte config)
+
+			Creates a new data channel with the indicated config
+			to the remote MCAP Data End Point (MDEP).
+			The configuration should indicate the channel quality of
+			service. In the current version of HDP, valid values are
+			0x01 for reliable channels and 0x02 for streaming data
+			channel.
+
+			Returns the data channel id.
+
+			Possible errors: org.bluez.Error.InvalidArguments
+					org.bluez.Error.HealthError
+
+		array GetDataChannelFileDescriptor(uint16 mdlid)
+
+			Gets a file descriptor where data can be read or
+			written for receive or sent by the data channel.
+			Returns an array of file descriptors one for write
+			and other for read.
+
+			Possible errors: org.bluez.Error.InvalidArguments
+					org.bluez.Error.NotFound
+					org.bluez.Error.HealthError
+
+		void DeleteDataChannel(uint16 mdlid)
+
+			Deletes a data channel so it will not be available for
+			use.
+
+			Possible errors: org.bluez.Error.InvalidArguments
+					org.bluez.Error.NotFound
+					org.bluez.Error.HealthError
+
+		void DeleteAllDataChannels()
+
+			Deletes all data channels so it will not be available
+			for use. Typically this function is called when the
+			connection with the remote device will be closed
+			permanently
+
+			Possible errors: org.bluez.Error.HealthError
+
+		dict GetDataChannelStatus()
+
+			Return a dictionary with all the data channels that
+			can be used to send data right now. The dictionary
+			is formed like follows:
+			{
+				"reliable": [mdlid_r1, mdlid_r2, ...],
+				"streaming" : [mdlid_s1, mdlid_s2, ...]
+			}
+
+			The fist reliable data channel will always be the first
+			data channel in reliable array.
+
+HealthAgent hierarchy
+==================
+
+(this object is implemented by the HDP client an receives notifications)
+
+Service		unique name
+Interface	org.bluez.HealthAgent
+Object path	freely definable
+
+		void LinkConnected(object path)
+
+			This method is called whenever a new connection
+			has been established over the control channel of the
+			current HDP instance. The object path paremeter contains
+			the object path of the created HealthLink.
+
+		void LinkDisconnected(object path)
+
+			This method is called when a remote device is
+			disconnected definitively. Any future reconnections
+			will fail. Also all data channels associated to this
+			device will be closed.
+
+		void CreatedDataChannel(object path, uint16 mdlid, byte conf)
+
+			This method is called when a new data channel is created
+			The path contains the object path of the HealthLink
+			where the new connection is created, the mdlid is the
+			data channel identificator and conf is the que quality
+			of service of the data channel (0x01 reliable, 0x02
+			streaming).
+
+		void DeletedDataChannel(object path, uint16 mdlid)
+
+			This method is called when a data channel is closed.
+			After this call the data channel will not be valid and
+			can be reused for future created data channels.
