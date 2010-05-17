@@ -1,235 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?iso-8859-1?q?Jos=E9_Antonio_Santos_Cadenas?=
-	<jcaden@libresoft.es>
-Reply-To: jcaden@libresoft.es
-To: linux-bluetooth@vger.kernel.org
-Subject: HDP proposed API(0.5)
-Date: Mon, 17 May 2010 16:54:36 +0200
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201005171654.36923.jcaden@libresoft.es>
+In-Reply-To: <AANLkTin3FNuVegPI013fzLQn7YsHzpfr7ZymnCG1mpt-@mail.gmail.com>
+References: <w2ra6ca4e821005071241w9d7d982ezb78ad0ba4480e73d@mail.gmail.com>
+	 <s2oa6ca4e821005071249tdfd2e197i2595b57ae2ccb705@mail.gmail.com>
+	 <20100507195325.GB4857@vigoh>
+	 <AANLkTilSynGNcpdq8h5YJQVD8e5MMyUDq55WzsB05AA2@mail.gmail.com>
+	 <20100517023917.GI23754@vigoh>
+	 <AANLkTin3FNuVegPI013fzLQn7YsHzpfr7ZymnCG1mpt-@mail.gmail.com>
+Date: Mon, 17 May 2010 17:32:27 +0300
+Message-ID: <AANLkTinnJqmC6pB9pCTPy_YgGsgataba8nun9bsuufJF@mail.gmail.com>
+Subject: Re: Software caused connection abort (103 )
+From: john michelle <jhnmichelle@gmail.com>
+To: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hope the last one :)
+One more Addition
 
-----------------------------
+>> The problem happens when you are already tranfering
+>> SCO data?
 
-BlueZ D-Bus Health API description
-**********************************
+yes,  it happens only during transferring SCO data
 
-	Santiago Carot-Nemesio <sancane@gmail.com>
-	José Antonio Santos-Cadenas <santoscadenas@gmail.com>
-	Elvis Pfützenreuter <epx@signove.com>
+john
 
-Health Device Profile hierarchy
-===============================
 
-Service		org.bluez
-Interface	org.bluez.HealthAdapter
-Object path	[variable prefix]/{hci0,hci1,...}
-
-Methods		object CreateInstance(object path, dict config)
-
-			Returns the path for the new HealthInstance object.
-			The path parameter is the path of the remote object
-			with the callbacks to notify events (see
-			org.bluez.HealthAgent at the end of this document)
-			This petition starts an mcap instance and also register
-			in the SDP if is needed
-			Dict is defined as bellow:
-			{ "data_spec" : The data_spec is the data exchange
-					specification (see section 5.2.10 of
-					the specification document)
-					possible values:
-						0x00 = reserved,
-						0x01 [IEEE 11073-20601],
-						0x02..0xff reserved,
-					(optional)
-			  "end_points" : [{ (optional)
-				"mdepid" : uint8, (optional)
-				"role" : ("source" or "sink"), (mandatory)
-				"specs" :[{ (mandatory)
-					"data_type" : uint16, (mandatory)
-					"description" : string, (optional)
-				}]
-			  }]
-			}
-
-			if "data_spec" is not set, no SDP record will be
-			registered, so all the other data in the dictionary
-			will be ignored
-
-			Instance will be closed by the call or implicitly when
-			the programs leaves the bus.
-
-			Possible errors: org.bluez.Error.InvalidArguments
-
-		void CloseInstance(object path)
-
-			Closes the HDP instance identified by the object path.
-			Also instance will be closed if the process that started
-			leaves the bus. If there is a SDP record associated to
-			this instance it will be removed.
-
-			Possible errors: org.bluez.Error.InvalidArguments
-					org.bluez.Error.NotFound
-
---------------------------------------------------------------------------------
-
-Service		org.bluez
-Interface	org.bluez.HealthDevice
-Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
-
-Methods		array GetHealthInstances()
-
-			Gets the information of the remote instances present
-			in this device and published on its SDP record. The
-			returned data follows this format.
-
-			[{"id": "an instance identification as string",
-			 "data_spec" : data spec,
-			 "end_points":
-				["mdepid": uint8,
-				 "role"  : "source" or "sink" ,
-				 "specs" : [{
-					"dtype"       : uint16,
-					"description" : string, (optional)
-				 }]
-				]
-			}];
-
---------------------------------------------------------------------------------
-
-Service		org.bluez
-Interface	org.bluez.HealthInstance
-Object path	[variable prefix]/{hci0,hci1,...}/{hdp0,hdp1,...}
-
-		object Connect(remote_instance_id)
-
-			Connects with the remote instance and returns its object
-			path. To get the session ids on a remote device, you
-			must run the GetHealthInstances in the HealthDevice
-			object.
-
-			Possible errors: org.bluez.Error.InvalidArguments
-					org.bluez.Error.HealthError
-
-		void Disconnect(object device, boolean cache)
-
-			Disconnect from the remote device. If chahe is false,
-			state will also be deleted. Otherwise, the state will be
-			kept for allowing future reconnections until the adapter
-			is removed.
-
-			Possible errors: org.bluez.Error.InvalidArguments
-					org.bluez.Error.NotFound
-					org.bluez.Error.HealthError
-
---------------------------------------------------------------------------------
-
-Service		org.bluez
-Interface	org.bluez.HealthLink
-Object path	[variable prefix]/{hci0,hci1,...}/{hdp0,hdp1,...}/rem_inst_id
-
-		boolean Echo(array{byte})
-
-			Sends an echo petition to the remote intance. Returns
-			True if response matches with the buffer sent. If some
-			error is detected False value is returned and the
-			associated MCL is closed.
-
-		uint16 OpenDataChannel(byte mdepid, byte config)
-
-			Creates a new data channel with the indicated config
-			to the remote MCAP Data End Point (MDEP).
-			The configuration should indicate the channel quality of
-			service. In the current version of HDP, valid values are
-			0x01 for reliable channels and 0x02 for streaming data
-			channel.
-
-			Returns the data channel id.
-
-			Possible errors: org.bluez.Error.InvalidArguments
-					org.bluez.Error.HealthError
-
-		array GetDataChannelFileDescriptor(uint16 mdlid)
-
-			Gets a file descriptor where data can be read or
-			written for receive or sent by the data channel.
-			Returns an array of file descriptors one for write
-			and other for read.
-
-			Possible errors: org.bluez.Error.InvalidArguments
-					org.bluez.Error.NotFound
-					org.bluez.Error.HealthError
-
-		void DeleteDataChannel(uint16 mdlid)
-
-			Deletes a data channel so it will not be available for
-			use.
-
-			Possible errors: org.bluez.Error.InvalidArguments
-					org.bluez.Error.NotFound
-					org.bluez.Error.HealthError
-
-		void DeleteAllDataChannels()
-
-			Deletes all data channels so it will not be available
-			for use. Typically this function is called when the
-			connection with the remote device will be closed
-			permanently
-
-			Possible errors: org.bluez.Error.HealthError
-
-		dict GetDataChannelStatus()
-
-			Return a dictionary with all the data channels that
-			can be used to send data right now. The dictionary
-			is formed like follows:
-			{
-				"reliable": [mdlid_r1, mdlid_r2, ...],
-				"streaming" : [mdlid_s1, mdlid_s2, ...]
-			}
-
-			The fist reliable data channel will always be the first
-			data channel in reliable array.
-
-HealthAgent hierarchy
-==================
-
-(this object is implemented by the HDP client an receives notifications)
-
-Service		unique name
-Interface	org.bluez.HealthAgent
-Object path	freely definable
-
-		void LinkConnected(object path)
-
-			This method is called whenever a new connection
-			has been established over the control channel of the
-			current HDP instance. The object path paremeter contains
-			the object path of the created HealthLink.
-
-		void LinkDisconnected(object path)
-
-			This method is called when a remote device is
-			disconnected definitively. Any future reconnections
-			will fail. Also all data channels associated to this
-			device will be closed.
-
-		void CreatedDataChannel(object path, uint16 mdlid, byte conf)
-
-			This method is called when a new data channel is created
-			The path contains the object path of the HealthLink
-			where the new connection is created, the mdlid is the
-			data channel identificator and conf is the que quality
-			of service of the data channel (0x01 reliable, 0x02
-			streaming).
-
-		void DeletedDataChannel(object path, uint16 mdlid)
-
-			This method is called when a data channel is closed.
-			After this call the data channel will not be valid and
-			can be reused for future created data channels.
+On Mon, May 17, 2010 at 5:21 PM, john michelle <jhnmichelle@gmail.com> wrote:
+>> Hi Jonh,
+>>
+>> First of all, don't do top posting in this mailing list. ;)
+>>
+>
+> Thanks for the advise , will keep that in mind for future posts.
+>
+>> In which bluez/kernel version the problem started? Any hardware update
+>> during this time? The problem happens when you are already tranfering
+>> SCO data?
+>>
+>
+> I tried bluez versions 3.XX  and kernel 2.6.26(I think) the problem
+> occurs and the kernel panics with no core dumps.then i tried with
+> bluez 4.53-4.62 with
+> Kernel 2.6.31 and 2.6.32. the connection abort problem occurs but the
+> kernel doesn't
+> Panic. regarding the hardware update you mean the dongle or the box.Anyway
+> i changed both and tried different box's, this even happens on a box
+> with 2 giga ram
+> And core2 processor . as for the dongles i am using trust
+>
+> http://www.twenga.co.uk/prices-Bluetooth-2-USB-Adapter-10m-BT-2250p-TRUST-Wireless-network-card-adapter-176178-0
+>
+>  and also using no name dongles all the same problem.
+>
+>> Please post the output of hcidump when the connection abort happens.
+>>
+>
+> well that is going to be a hard one since i have more than one dongle in place
+> And very hard to predict which one will crash.i will work on this and update
+> You as soon as i have the hcidump log.
+>
+>
+>
+>> I tried reproduce this issue in L2CAP but it is a bit hard, lets
+>> say it happen once in a thousand, so it's not easy to track it. I have
+>> to try reproduce that using the SCO, but I'm not used to that layer yet.
+>> ;)
+>
+> I hoped that it happens 1 in 1000 in SCO , but it actually happens 1 in 15
+>
+>
+> John
+>
+>
+>
+>>
+>> Regards,
+>>
+>>>
+>>> John
+>>>
+>>> On Fri, May 7, 2010 at 3:53 PM, Gustavo F. Padovan <gustavo@padovan.org> wrote:
+>>> > * john michelle <jhnmichelle@gmail.com> [2010-05-07 15:49:05 -0400]:
+>>> >
+>>> >> Hi Bluetooth hackers,
+>>> >>
+>>> >> i am having this consistent problem with bluez , from time to time i
+>>> >> get the error Software caused connection abort (103 )
+>>> >> And the bluetooth stick seems to disconnect and reconnects. this
+>>> >> happens during an sco connection and it occurs even
+>>> >> More when i am having the voice stream comming through the internet
+>>> >> rather than the lan.i don't know what exact
+>>> >> Details you need to solve this problem please tell me and i will give
+>>> >> you an immediate reply . i have linux kernel 2.6.33 and bluez 4.62
+>>> >
+>>> > I get the same problem sometimes when testing ERTM with l2test. So the
+>>> > problem is on l2cap too. I didn't have time to debug this yet. Now that
+>>> > someone else have confirmed it too, I'll to take a look at the problem.
+>>> >
+>>> >>
+>>
+>> --
+>> Gustavo F. Padovan
+>> http://padovan.org
+>>
+>
