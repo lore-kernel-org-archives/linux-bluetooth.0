@@ -1,43 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4BF100A6.6070007@greffrath.com>
-Date: Mon, 17 May 2010 10:39:02 +0200
-From: Fabian Greffrath <fabian@greffrath.com>
+Date: Sun, 16 May 2010 23:39:17 -0300
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
+To: john michelle <jhnmichelle@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Software caused connection abort (103 )
+Message-ID: <20100517023917.GI23754@vigoh>
+References: <w2ra6ca4e821005071241w9d7d982ezb78ad0ba4480e73d@mail.gmail.com>
+ <s2oa6ca4e821005071249tdfd2e197i2595b57ae2ccb705@mail.gmail.com>
+ <20100507195325.GB4857@vigoh>
+ <AANLkTilSynGNcpdq8h5YJQVD8e5MMyUDq55WzsB05AA2@mail.gmail.com>
 MIME-Version: 1.0
-To: Stefan Seyfried <stefan.seyfried@googlemail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Instantly fix non-UTF-8 local device names during device
- configuration phase
-References: <4BE14458.1020908@greffrath.com> <4BE14819.4080903@greffrath.com> <20100505170202.3d6b1dcb@susi.home.s3e.de> <1273156964.25110.1.camel@vfrodo> <20100506150228.GA20880@jh-x301>
-In-Reply-To: <20100506150228.GA20880@jh-x301>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <AANLkTilSynGNcpdq8h5YJQVD8e5MMyUDq55WzsB05AA2@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am 06.05.2010 17:03, schrieb Johan Hedberg:
-> BlueZ will (or at least should) set the name for the adapter as follows:
->
-> 1. If there's a name in /var/lib/bluetooth/... use that
-> 2. Else if there's a name in main.conf use that
-> 3. If all else fails set the name to "BlueZ"
+Hi Jonh,
 
-Hm, IIRC it was set to $(hostname)-$(hci-id) last time I established a 
-connection.
+First of all, don't do top posting in this mailing list. ;)
 
-> So I fail to see why this patch is needed at all. It sounds like there's
-> something else wrong in the initialization process which makes the
-> initialzation fail if the adapter contains some invalid default name (we
-> shouldn't as far as I see be trying to read the name at all from the
-> adapter before we've written it ourselves from the host side). I.e. I
-> suspect the patch might be just working around the real issue instead of
-> fixing it.
+* john michelle <jhnmichelle@gmail.com> [2010-05-13 17:39:29 -0400]:
 
-Yes, obviously Bluez fails to set a reasonable device name if the 
-initial device name isn't already valid. However, I believe Bluez 
-shouldn't necessarily be expected to handle invalid device names, as 
-they clearly violate the specs. Instead, if Bluez detects an invalid 
-name, it should convert it into a valid name as soon in the 
-initialization process as possible. This sounds just naturally to me 
-and is exactly what my patch does.
+> Hi Gustavo,
+> 
+> Any update on the software caused connection abort issue, it's happenning more
+> And more making bluez unstable for our application
 
-Cheers,
-Fabian
+In which bluez/kernel version the problem started? Any hardware update
+during this time? The problem happens when you are already tranfering
+SCO data?
+
+Please post the output of hcidump when the connection abort happens.
+
+I tried reproduce this issue in L2CAP but it is a bit hard, lets
+say it happen once in a thousand, so it's not easy to track it. I have
+to try reproduce that using the SCO, but I'm not used to that layer yet.
+;)
+
+Regards,
+
+> 
+> John
+> 
+> On Fri, May 7, 2010 at 3:53 PM, Gustavo F. Padovan <gustavo@padovan.org> wrote:
+> > * john michelle <jhnmichelle@gmail.com> [2010-05-07 15:49:05 -0400]:
+> >
+> >> Hi Bluetooth hackers,
+> >>
+> >> i am having this consistent problem with bluez , from time to time i
+> >> get the error Software caused connection abort (103 )
+> >> And the bluetooth stick seems to disconnect and reconnects. this
+> >> happens during an sco connection and it occurs even
+> >> More when i am having the voice stream comming through the internet
+> >> rather than the lan.i don't know what exact
+> >> Details you need to solve this problem please tell me and i will give
+> >> you an immediate reply . i have linux kernel 2.6.33 and bluez 4.62
+> >
+> > I get the same problem sometimes when testing ERTM with l2test. So the
+> > problem is on l2cap too. I didn't have time to debug this yet. Now that
+> > someone else have confirmed it too, I'll to take a look at the problem.
+> >
+> >>
+
+-- 
+Gustavo F. Padovan
+http://padovan.org
