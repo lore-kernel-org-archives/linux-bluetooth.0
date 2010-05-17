@@ -1,52 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <gfpadovan@gmail.com>
-Date: Mon, 17 May 2010 13:53:53 -0300
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
-To: Marcel Holtmann <marcel@holtmann.org>
+Date: Mon, 17 May 2010 18:06:58 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Add dynamic debug feature
-Message-ID: <20100517164958.GA18835@vigoh>
-References: <1273549901-28856-1-git-send-email-gustavo@padovan.org>
- <1274102952.26613.20.camel@localhost.localdomain>
+Subject: Re: [PATCH] Avoid multiple inclusions of adapter.h
+Message-ID: <20100517160658.GA3788@jh-x301>
+References: <1273747136-8816-1-git-send-email-santoscadenas@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1274102952.26613.20.camel@localhost.localdomain>
+In-Reply-To: <1273747136-8816-1-git-send-email-santoscadenas@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi,
 
-* Marcel Holtmann <marcel@holtmann.org> [2010-05-17 15:29:12 +0200]:
-
-> Hi Gustavo,
+On Thu, May 13, 2010, Jose Antonio Santos Cadenas wrote:
+> ---
+>  src/adapter.h |    5 +++++
+>  1 files changed, 5 insertions(+), 0 deletions(-)
 > 
-> > It is still needed a sed work in the sources to changes debug() to DBG()
-> > 
-> > Thanks, to Vinicius Gomes that helped me sort out a linking issue with
-> > this patch.
-> > ---
-> >  src/logging.c |   64 +++++++++++++++++++++++++++++++++++++++++---------------
-> >  src/logging.h |   28 +++++++++++++++++++++++-
-> >  src/main.c    |   34 ++++++++++++++----------------
-> >  tracer/main.c |   24 +++++----------------
-> >  4 files changed, 95 insertions(+), 55 deletions(-)
-> > 
+> diff --git a/src/adapter.h b/src/adapter.h
+> index 9b4ce10..8812ed8 100644
+> --- a/src/adapter.h
+> +++ b/src/adapter.h
+> @@ -22,6 +22,9 @@
+>   *
+>   */
+>  
+> +#ifndef __ADAPTER_H__
+> +#define __ADAPTER_H__
+> +
+>  #include <bluetooth/bluetooth.h>
+>  #include <dbus/dbus.h>
+>  #include <glib.h>
+> @@ -183,3 +186,5 @@ struct btd_adapter_ops {
+>  int btd_register_adapter_ops(struct btd_adapter_ops *btd_adapter_ops);
+>  void btd_adapter_cleanup_ops(struct btd_adapter_ops *btd_adapter_ops);
+>  int adapter_ops_setup(void);
+> +
+> +#endif /* __ADAPTER_H__ */
 
-...
+Lack of these defines is actually intentional for headsers which aren't
+part of any public library. The intention is to keep the header
+dependencies simple and get errors as soon as there's a circular
+dependency between them.
 
-> 
-> For the tracer lets do syslog manually and not intersect it with the
-> dynamic debug here. You might wanna send this as a separate patch to
-> remove the usage of start_logging first from it.
-
-Thanks for the comments.
-
-> 
-> And then in the end we should rename this to src/log.c of course to make
-> it match with ConnMan and oFono.
-
-Do you have others tasks in mind to make more parts of BlueZ match
-ConnMan and oFono? I can work on them as part of my GSoC. ;)
-
--- 
-Gustavo F. Padovan
-http://padovan.org
+Johan
