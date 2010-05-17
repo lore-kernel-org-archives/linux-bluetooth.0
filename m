@@ -1,67 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 16 May 2010 23:39:17 -0300
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
-To: john michelle <jhnmichelle@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Software caused connection abort (103 )
-Message-ID: <20100517023917.GI23754@vigoh>
-References: <w2ra6ca4e821005071241w9d7d982ezb78ad0ba4480e73d@mail.gmail.com>
- <s2oa6ca4e821005071249tdfd2e197i2595b57ae2ccb705@mail.gmail.com>
- <20100507195325.GB4857@vigoh>
- <AANLkTilSynGNcpdq8h5YJQVD8e5MMyUDq55WzsB05AA2@mail.gmail.com>
+From: "Zhang, Zhenhua" <zhenhua.zhang@intel.com>
+To: "Gustavo F. Padovan" <gustavo@padovan.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 17 May 2010 10:20:16 +0800
+Subject: RE: [PATCH] Dial-up Networking profile API
+Message-ID: <33AB447FBD802F4E932063B962385B351E817236@shsmsx501.ccr.corp.intel.com>
+References: <1273371107-31813-1-git-send-email-gustavo@padovan.org>
+ <33AB447FBD802F4E932063B962385B351E79EBA6@shsmsx501.ccr.corp.intel.com>
+ <20100517021829.GG23754@vigoh>
+In-Reply-To: <20100517021829.GG23754@vigoh>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTilSynGNcpdq8h5YJQVD8e5MMyUDq55WzsB05AA2@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jonh,
+Hi Padovan,
 
-First of all, don't do top posting in this mailing list. ;)
-
-* john michelle <jhnmichelle@gmail.com> [2010-05-13 17:39:29 -0400]:
-
-> Hi Gustavo,
+Gustavo F. Padovan wrote:
+> Hi Zhenhua,
 > 
-> Any update on the software caused connection abort issue, it's happenning more
-> And more making bluez unstable for our application
+> * Zhang, Zhenhua <zhenhua.zhang@intel.com> [2010-05-10 08:41:59
+> +0800]: 
+> 
+> ...
+> 
+>>> +DUNAgent hierarchy
+>>> +===============
+>>> +
+>>> +Service         unique name
+>>> +Interface       org.bluez.DUNAgent
+>>> +Object path     freely definable
+>>> +
+>>> +Methods		void NewConnection(filedescriptor fd)
+>>> +
+>>> +			This method gets called whenever a new DUN
+>>> +			connection has been established.  The objectpath
+>>> +			contains the object path of the remote
+>>> device.  This
+>>> +			method assumes that DBus daemon with
+>>> file descriptor
+>>> +			passing capability is being used.
+>>> +
+>>> +			The agent should only return
+>>> successfully once the
+>>> +			establishment of the data call has been fineshed
+>> 
+>> A typo 'fineshed' should be 'finished'.
+> 
+> Thanks. ;)
+> 
+>> 
+>>> +			without problems.
+>>> +
+>>> +			Possible Errors:
+>>> org.bluez.Error.InvalidArguments
+>>> +					 org.bluez.Error.Failed
+>>> +
+>>> +		void Release()
+>>> +
+>>> +			This method gets called whenever the service daemon
+>>> +			unregisters the agent.
+>> 
+>> Compared with hfp-api.txt, I think we should also add the
+> sentence like "or whenever the Adapter where the DUNAgent
+> registers itself is removed".
+> 
+> Or we can remove that sentence from hfp-api, since when a
+> adapter is removed bluetoothd relaese all agents on that adapter.
+> 
 
-In which bluez/kernel version the problem started? Any hardware update
-during this time? The problem happens when you are already tranfering
-SCO data?
+Well. It's all upon on you. I am fine. :-)
 
-Please post the output of hcidump when the connection abort happens.
-
-I tried reproduce this issue in L2CAP but it is a bit hard, lets
-say it happen once in a thousand, so it's not easy to track it. I have
-to try reproduce that using the SCO, but I'm not used to that layer yet.
-;)
+> Regards,
+> 
+> --
+> Gustavo F. Padovan
+> http://padovan.org
 
 Regards,
+Zhenhua
 
-> 
-> John
-> 
-> On Fri, May 7, 2010 at 3:53 PM, Gustavo F. Padovan <gustavo@padovan.org> wrote:
-> > * john michelle <jhnmichelle@gmail.com> [2010-05-07 15:49:05 -0400]:
-> >
-> >> Hi Bluetooth hackers,
-> >>
-> >> i am having this consistent problem with bluez , from time to time i
-> >> get the error Software caused connection abort (103 )
-> >> And the bluetooth stick seems to disconnect and reconnects. this
-> >> happens during an sco connection and it occurs even
-> >> More when i am having the voice stream comming through the internet
-> >> rather than the lan.i don't know what exact
-> >> Details you need to solve this problem please tell me and i will give
-> >> you an immediate reply . i have linux kernel 2.6.33 and bluez 4.62
-> >
-> > I get the same problem sometimes when testing ERTM with l2test. So the
-> > problem is on l2cap too. I didn't have time to debug this yet. Now that
-> > someone else have confirmed it too, I'll to take a look at the problem.
-> >
-> >>
-
--- 
-Gustavo F. Padovan
-http://padovan.org
