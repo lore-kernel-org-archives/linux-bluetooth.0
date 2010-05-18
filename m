@@ -1,79 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Johan Hedberg <johan.hedberg@nokia.com>
-Subject: [PATCH] Bluetooth: Add debugfs support for showing the blacklist
-Date: Tue, 18 May 2010 13:54:49 +0200
-Message-Id: <1274183689-28238-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCH v5] Add support for the Atheros AR300x Bluetooth Chip
+From: suraj <suraj@atheros.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <marcel@holtmann.org>, <Luis.Rodriguez@Atheros.com>,
+	<Jothikumar.Mothilal@Atheros.com>, <gfpadovan@gmail.com>
+In-Reply-To: <1273566548.7023.2.camel@atheros013-desktop>
+References: <1268629296.21425.23.camel@atheros013-desktop>
+	 <1271758832.6585.33.camel@atheros013-desktop>
+	 <1271845337.15010.1.camel@atheros013-desktop>
+	 <1271927414.1409.3.camel@atheros013-desktop>
+	 <1272279623.11239.1.camel@atheros013-desktop>
+	 <1273062798.19162.6.camel@atheros013-desktop>
+	 <1273566548.7023.2.camel@atheros013-desktop>
+Content-Type: text/plain; charset="UTF-8"
+Date: Tue, 18 May 2010 17:09:12 +0530
+Message-ID: <1274182752.10775.2.camel@atheros013-desktop>
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@nokia.com>
+Hi Marcel,
 
-This patch adds a debugfs blacklist entry for each HCI device which can
-be used to list the current content of the blacklist.
+On Tue, 2010-05-11 at 13:59 +0530, suraj wrote:
+> Hi marcel,
+> 
+> On Wed, 2010-05-05 at 18:03 +0530, suraj wrote:
+> > Hi Marcel,
+> > 
+> > Can you take a look at the patch? Your review has been pending for
+> > sometime.
+> > 
+> > On Mon, 2010-04-26 at 16:30 +0530, suraj wrote:
+> > > Hi marcel,
+> > > 
+> > > On Thu, 2010-04-22 at 14:40 +0530, suraj wrote:
+> > > > This implements the Atheros Bluetooth serial protocol to
+> > > > support the AR300x Bluetooth chipsets.
+> > > > The serial protocol implements enhanced power management
+> > > > features for the AR300x chipsets. 
+> > > > 
+> > > > Reviewed-by: Luis R. Rodriguez <lrodriguez@atheros.com>
+> > > > Reviewed-by: Gustavo F. Padovan <gustavo@padovan.org>
+> > > > Signed-off-by: Suraj <suraj@atheros.com>
+> > > > 
+> > > > ---
+> > > >  drivers/bluetooth/Kconfig     |   14 ++
+> > > >  drivers/bluetooth/Makefile    |    1 +
+> > > >  drivers/bluetooth/hci_ath.c   |  378 +++++++++++++++++++++++++++++++++++++++++
+> > > >  drivers/bluetooth/hci_ldisc.c |    6 +
+> > > >  drivers/bluetooth/hci_uart.h  |    8 +-
+> > > >  5 files changed, 406 insertions(+), 1 deletions(-)
+> > > >  create mode 100755 drivers/bluetooth/hci_ath.c
+> > > > 
+> > > Can you verify the patch let me know your comments? 
+> > > 
+> > > Regards
+> > > Suraj
+> > > 
+> > 
+> > 
+> 
+> your review has been pending for a long time. Please let me know what
+> should be done regarding this.
+> 
+> Regards
+> Suraj
+> 
+> 
+This patch has been pending your approval/disapproval for so much time
+that it runs the risk of being obsolete. Please do let me know if you
+have any plans of doing something about it.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
----
- net/bluetooth/hci_sysfs.c |   38 ++++++++++++++++++++++++++++++++++++++
- 1 files changed, 38 insertions(+), 0 deletions(-)
-
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index 0e8e1a5..4fd47e9 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -444,6 +444,41 @@ static const struct file_operations inquiry_cache_fops = {
- 	.release	= single_release,
- };
- 
-+static int blacklist_show(struct seq_file *f, void *p)
-+{
-+	struct hci_dev *hdev = f->private;
-+	struct bdaddr_list *blacklist = &hdev->blacklist;
-+	struct list_head *l;
-+
-+	hci_dev_lock_bh(hdev);
-+
-+	list_for_each(l, &blacklist->list) {
-+		struct bdaddr_list *b;
-+		bdaddr_t bdaddr;
-+
-+		b = list_entry(l, struct bdaddr_list, list);
-+
-+		baswap(&bdaddr, &b->bdaddr);
-+
-+		seq_printf(f, "%s\n", batostr(&bdaddr));
-+	}
-+
-+	hci_dev_unlock_bh(hdev);
-+
-+	return 0;
-+}
-+
-+static int blacklist_open(struct inode *inode, struct file *file)
-+{
-+	return single_open(file, blacklist_show, inode->i_private);
-+}
-+
-+static const struct file_operations blacklist_fops = {
-+	.open		= blacklist_open,
-+	.read		= seq_read,
-+	.llseek		= seq_lseek,
-+	.release	= single_release,
-+};
- int hci_register_sysfs(struct hci_dev *hdev)
- {
- 	struct device *dev = &hdev->dev;
-@@ -473,6 +508,9 @@ int hci_register_sysfs(struct hci_dev *hdev)
- 	debugfs_create_file("inquiry_cache", 0444, hdev->debugfs,
- 						hdev, &inquiry_cache_fops);
- 
-+	debugfs_create_file("blacklist", 0444, hdev->debugfs,
-+						hdev, &blacklist_fops);
-+
- 	return 0;
- }
- 
--- 
-1.7.0.4
-
+Regards
+Suraj
