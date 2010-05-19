@@ -1,87 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 20 May 2010 11:05:00 +0200
-From: Antonio Ospite <ospite@studenti.unina.it>
-To: linux-input@vger.kernel.org
-Cc: Antonio Ospite <ospite@studenti.unina.it>,
-	Bastien Nocera <hadess@hadess.net>,
-	linux-bluetooth@vger.kernel.org, cbe-oss-dev@lists.ozlabs.org
-Subject: Re: [PATCH 0/2] Groundwork for Sixaxis paring into bluez.
-Message-Id: <20100520110500.2432e545.ospite@studenti.unina.it>
-In-Reply-To: <1272917756-31098-1-git-send-email-ospite@studenti.unina.it>
-References: <1272917756-31098-1-git-send-email-ospite@studenti.unina.it>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA1";
- boundary="Signature=_Thu__20_May_2010_11_05_00_+0200_5icr4hPI0MFodN44"
-Sender: linux-input-owner@vger.kernel.org
+Date: Wed, 19 May 2010 16:10:26 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH v3] Bluetooth: Add blacklist support for incoming
+ connections
+Message-ID: <20100519141026.GA7161@jh-x301>
+References: <1274181632-29873-1-git-send-email-johan.hedberg@gmail.com>
+ <20100519081037.GE6219@vigoh>
+ <20100519082205.GA18772@jh-x301>
+ <20100519084715.GA11110@vigoh>
+ <AANLkTimdw00tjbCHK52SNF9FGJjLVHR35f44dX_bzj__@mail.gmail.com>
+ <20100519140503.GA6822@jh-x301>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20100519140503.GA6822@jh-x301>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---Signature=_Thu__20_May_2010_11_05_00_+0200_5icr4hPI0MFodN44
-Content-Type: text/plain; charset=US-ASCII
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Wed, May 19, 2010, Johan Hedberg wrote:
+> What also happens when you set Blocked to False is that all the device
+> drivers are unloaded for that device. When Blocked goes back to true
+> the drivers get probed again.
 
-On Mon,  3 May 2010 22:15:54 +0200
-Antonio Ospite <ospite@studenti.unina.it> wrote:
+I mixed up True/False there, but you probably realized that :)
 
-> Hi,
->
-
-Ping.
-
-> These changes are in preparation of seamless integration of the Sixaxis
-> pairing procedure into bluez. It was about time :)
->=20
-> The first one cleans up the quirks handling.
->
-
-Even if the second patch in this series is not OK and extending hidraw
-is the way, I still think that the first one can be accepted. Anyone?
-
-> The second one adds a sysfs interface to set and get the device and master
-> bdaddr, this is needed in order to setup the host for pairing. This kernel
-> interface is a mere workaround for the lack of features of hidraw[1], if
-> someone wants to add the missing features to hidraw I will be happy to dr=
-op
-> this one, otherwise consider queuing these for 2.6.35 if it's too late for
-> 2.6.34.
->=20
-> Thanks,
->    Antonio
->=20
-> [1] http://www.spinics.net/lists/linux-input/msg08311.html
->=20
->=20
-> Antonio Ospite (2):
->   hid/hid-sony: Apply sixaxis quirks only to sixaxis
->   hid/hid-sony: get and set Sixaxis bdaddr via sysfs
->=20
->  drivers/hid/hid-sony.c |  170 ++++++++++++++++++++++++++++++++++++++++++=
-+----
->  1 files changed, 155 insertions(+), 15 deletions(-)
->=20
-
---=20
-Antonio Ospite
-http://ao2.it
-
-PGP public key ID: 0x4553B001
-
-A: Because it messes up the order in which people normally read text.
-   See http://en.wikipedia.org/wiki/Posting_style
-Q: Why is top-posting such a bad thing?
-A: Top-posting.
-Q: What is the most annoying thing in e-mail?
-
---Signature=_Thu__20_May_2010_11_05_00_+0200_5icr4hPI0MFodN44
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
-
-iEYEARECAAYFAkv0+zwACgkQ5xr2akVTsAH/SgCfbCjng/H5hT03SnUg8u9DrEJh
-DW0AoJb+QsK4sTcPOuIbNbClYFQZIMlg
-=4JvM
------END PGP SIGNATURE-----
-
---Signature=_Thu__20_May_2010_11_05_00_+0200_5icr4hPI0MFodN44--
+Johan
