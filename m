@@ -1,140 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <AANLkTilyAbXWIHHB1Ae7GP6xlH7zdzd1QZQzYP-NiMjV@mail.gmail.com>
-References: <AANLkTilNBHEMhl7rFK7DemxPQu3LN2QGWSsL7b-e9Yl3@mail.gmail.com>
-	 <20100516083122.GA21819@vigoh>
-	 <AANLkTimyNqIdMoZ6J6InYRzD1JNl1Fsv-CdVpd84pjot@mail.gmail.com>
-	 <20100517190607.GA19907@vigoh>
-	 <AANLkTilyAbXWIHHB1Ae7GP6xlH7zdzd1QZQzYP-NiMjV@mail.gmail.com>
-Date: Thu, 20 May 2010 17:13:55 +0300
-Message-ID: <AANLkTinhPeE2hkL_3j_vwOYmRE_kFauO5EYv0Q9_II0r@mail.gmail.com>
-Subject: Re: [PATCH] Kernel crash when krfcomm is preempted by l2cap tasklet
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: "Gustavo F. Padovan" <gustavo@padovan.org>
-Cc: Bluettooth Linux <linux-bluetooth@vger.kernel.org>, marcel@holtmann.org
-Content-Type: multipart/mixed; boundary=0016364167e7561e470487072f26
+Subject: Re: [PATCH] Fix device_match_pattern function
+From: Santiago Carot-Nemesio <scarot@libresoft.es>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Santiago Carot-Nemesio <sancane@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+In-Reply-To: <AANLkTimoISCAwCfv8zktLF7OxT0aT5glDAXYeFM0mUvF@mail.gmail.com>
+References: <1274350142-19083-1-git-send-email-sancane@gmail.com>
+	 <AANLkTimv6CRgS-lPeadePxKXEmNmhEM7oLx-uTHuZfNF@mail.gmail.com>
+	 <AANLkTimoISCAwCfv8zktLF7OxT0aT5glDAXYeFM0mUvF@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 20 May 2010 16:04:41 +0200
+Message-ID: <1274364281.2018.44.camel@mosquito>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---0016364167e7561e470487072f26
-Content-Type: text/plain; charset=ISO-8859-1
+Hello Luiz,
 
-Hi All,
+El jue, 20-05-2010 a las 15:00 +0200, Luiz Augusto von Dentz escribió:
+> Hi,
+> 
+> On Thu, May 20, 2010 at 2:52 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> > Hi Santiago,
+> >
+> > On Thu, May 20, 2010 at 12:09 PM, Santiago Carot-Nemesio
+> > <sancane@gmail.com> wrote:
+> >> This patch fixes a problem adding uuids to list provided when a
+> >> driver is probed. Without this patch the same uuids were added
+> >> more than once to list and if two or more uuids were in the
+> >> same class id list only the first one was included repeatedly
+> >> ---
+> >>  src/device.c |    2 +-
+> >>  1 files changed, 1 insertions(+), 1 deletions(-)
+> >>
+> >> diff --git a/src/device.c b/src/device.c
+> >> index 6ba1612..d0768ce 100644
+> >> --- a/src/device.c
+> >> +++ b/src/device.c
+> >> @@ -1053,7 +1053,7 @@ static GSList *device_match_pattern(struct btd_device *device,
+> >>                        continue;
+> >>
+> >>                if (record_has_uuid(rec, match_uuid))
+> >> -                       uuids = g_slist_append(uuids, profile_uuid);
+> >> +                       uuids = g_slist_append(uuids, match_uuid);
+> >>        }
+> >>
+> >>        return uuids;
+> >
+> >
+> > It doesn't look right, if we do that the device will be probed by the
+> > matched uuid which would not happen to have a record in the storage.
+> > So in other words the list of uuids you get in the probe may not match
+> > with the one present in the drivers .uuids. Also this would probably
+> > break serial driver, did you tried this before submitting this to the
+> > list?
+> 
+> Ok, I did apply you change to see what it happens, first it didn't
+> compile, but anyway I add cast just to make sure what would gonna
+> happen:
+> 
 
-I have done second  experimental version of the patch.
+Sorry, you are right I sent an erroneous patch, please excuse me that
+was quite a slip-up. I'll revise it more in deep for next time. In any
+case, it seems that there is a problem retrieving the service class ID
+List when there are more than one entry. At current moment only the
+first one is being provided when driver is probed. Please, note that I'm
+speaking about profiles like HDP that can registry one or two entries
+(Sink, Source or both if it is playing a dual role) although other else
+profiles could want to do that too.
 
-Main difference is that when sk is owned by user I do not run
-"l2cap_chan_del" example below:
+I'll revise that issue more in deep if you don't have any objection.
 
-+	/* don't delete l2cap channel if sk is owned by user */
-+	if (sock_owned_by_user(sk)) {
-+		sk->sk_state = BT_DISCONN;
-+		l2cap_sock_clear_timer(sk);
-+		l2cap_sock_set_timer(sk, HZ);
-+		bh_unlock_sock(sk);
-+		return 0;
-+	}
+Sorry for the inconvenience and thank for your time and your attention.
 
-I start timer which will run this function. I do also the same check
-in timer context.
+Best regards.
 
-+	if (sock_owned_by_user(sk)) {
-+		/* sk is owned by user. Try again later */
-+		l2cap_sock_set_timer(sk, HZ * 2);
-+		bh_unlock_sock(sk);
-+		sock_put(sk);
-+		return;
-+	}
-
-Please give me your comments.
-
-Regards,
-Andrei
-
---0016364167e7561e470487072f26
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Bluetooth-Check-sk-is-not-owned-before-freeing-l2cap.patch"
-Content-Disposition: attachment;
-	filename="0001-Bluetooth-Check-sk-is-not-owned-before-freeing-l2cap.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_g9fnu6ar0
-
-RnJvbSBlMGFiNWIzMGQzYzUwNzIyNDA0M2YwNjVjMWMyMjdmNTVhZTI5ODE0IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBBbmRyZWkgRW1lbHRjaGVua28gPGFuZHJlaS5lbWVsdGNoZW5r
-b0Bub2tpYS5jb20+CkRhdGU6IE1vbiwgMTcgTWF5IDIwMTAgMTI6MTA6NDYgKzAzMDAKU3ViamVj
-dDogW1BBVENIdjIgMS8yXSBCbHVldG9vdGg6IENoZWNrIHNrIGlzIG5vdCBvd25lZCBiZWZvcmUg
-ZnJlZWluZyBsMmNhcF9jb25uCgpDaGVjayB0aGF0IHNvY2tldCBzayBpcyBub3QgbG9ja2VkIGlu
-IHVzZXIgcHJvY2VzcyBiZWZvcmUgcmVtb3ZpbmcKbDJjYXAgY29ubmVjdGlvbiBoYW5kbGVyLgoK
-a3JmY29tbWQga2VybmVsIHRocmVhZCBtYXkgYmUgcHJlZW1wdGVkIHdpdGggbDJjYXAgdGFza2xl
-dCB3aGljaCByZW1vdmUKbDJjYXBfY29ubiBzdHJ1Y3R1cmUuIElmIGtyZmNvbW1kIGlzIGluIHBy
-b2Nlc3Mgb2Ygc2VuZGluZyBvZiBSRkNPTU0gcmVwbHkKKGxpa2UgIlJGQ09NTSBVQSIgcmVwbHkg
-dG8gIlJGQ09NTSBESVNDIikgdGhlbiBrZXJuZWwgY3Jhc2ggaGFwcGVucy4KCi4uLgpbICA2OTQu
-MTc1OTMzXSBVbmFibGUgdG8gaGFuZGxlIGtlcm5lbCBOVUxMIHBvaW50ZXIgZGVyZWZlcmVuY2Ug
-YXQgdmlydHVhbCBhZGRyZXNzIDAwMDAwMDAwClsgIDY5NC4xODQ5MzZdIHBnZCA9IGMwMDA0MDAw
-ClsgIDY5NC4xODc2ODNdIFswMDAwMDAwMF0gKnBnZD0wMDAwMDAwMApbICA2OTQuMTkxNzExXSBJ
-bnRlcm5hbCBlcnJvcjogT29wczogNSBbIzFdIFBSRUVNUFQKWyAgNjk0LjE5NjM1MF0gbGFzdCBz
-eXNmcyBmaWxlOiAvc3lzL2RldmljZXMvcGxhdGZvcm0vaGNpX2g0cC9maXJtd2FyZS9oY2lfaDRw
-L2xvYWRpbmcKWyAgNjk0LjI2MDM3NV0gQ1BVOiAwICAgIE5vdCB0YWludGVkICAoMi42LjMyLjEw
-ICMxKQpbICA2OTQuMjY1MTA2XSBQQyBpcyBhdCBsMmNhcF9zb2NrX3NlbmRtc2crMHg0M2MvMHg3
-M2MgW2wyY2FwXQpbICA2OTQuMjcwNzIxXSBMUiBpcyBhdCAweGQ3MDE3MzAzCi4uLgpbICA2OTQu
-NTI1MDg1XSBCYWNrdHJhY2U6ClsgIDY5NC41Mjc1ODddIFs8YmYyNjZiZTA+XSAobDJjYXBfc29j
-a19zZW5kbXNnKzB4MC8weDczYyBbbDJjYXBdKSBmcm9tIFs8YzAyZjJjYzg+XSAoc29ja19zZW5k
-bXNnKzB4YjgvMHhkOCkKWyAgNjk0LjUzNzI5Ml0gWzxjMDJmMmMxMD5dIChzb2NrX3NlbmRtc2cr
-MHgwLzB4ZDgpIGZyb20gWzxjMDJmMzA0ND5dIChrZXJuZWxfc2VuZG1zZysweDQ4LzB4ODApCi4u
-LgoKTW9kaWZpZWQgdmVyc2lvbiBhZnRlciBjb21tZW50cyBvZiBHdXN0YXZvIEYuIFBhZG92YW4g
-PGd1c3Rhdm9AcGFkb3Zhbi5vcmc+CgpTaWduZWQtb2ZmLWJ5OiBBbmRyZWkgRW1lbHRjaGVua28g
-PGFuZHJlaS5lbWVsdGNoZW5rb0Bub2tpYS5jb20+Ci0tLQogbmV0L2JsdWV0b290aC9sMmNhcC5j
-IHwgICAyNSArKysrKysrKysrKysrKysrKysrKysrKysrCiAxIGZpbGVzIGNoYW5nZWQsIDI1IGlu
-c2VydGlvbnMoKyksIDAgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvbmV0L2JsdWV0b290aC9s
-MmNhcC5jIGIvbmV0L2JsdWV0b290aC9sMmNhcC5jCmluZGV4IGJiMDAwMTUuLjExMDYwZDYgMTAw
-NjQ0Ci0tLSBhL25ldC9ibHVldG9vdGgvbDJjYXAuYworKysgYi9uZXQvYmx1ZXRvb3RoL2wyY2Fw
-LmMKQEAgLTI5MjcsNiArMjkyNywxMyBAQCBzdGF0aWMgaW5saW5lIGludCBsMmNhcF9jb25uZWN0
-X3JzcChzdHJ1Y3QgbDJjYXBfY29ubiAqY29ubiwgc3RydWN0IGwyY2FwX2NtZF9oZAogCQlicmVh
-azsKIAogCWRlZmF1bHQ6CisJCS8qIGRvbid0IGRlbGV0ZSBsMmNhcCBjaGFubmVsIGlmIHNrIGlz
-IG93bmVkIGJ5IHVzZXIgKi8KKwkJaWYgKHNvY2tfb3duZWRfYnlfdXNlcihzaykpIHsKKwkJCXNr
-LT5za19zdGF0ZSA9IEJUX0RJU0NPTk47CisJCQlsMmNhcF9zb2NrX2NsZWFyX3RpbWVyKHNrKTsK
-KwkJCWwyY2FwX3NvY2tfc2V0X3RpbWVyKHNrLCBIWik7CisJCQlicmVhazsKKwkJfQogCQlsMmNh
-cF9jaGFuX2RlbChzaywgRUNPTk5SRUZVU0VEKTsKIAkJYnJlYWs7CiAJfQpAQCAtMzEzNSw2ICsz
-MTQyLDE1IEBAIHN0YXRpYyBpbmxpbmUgaW50IGwyY2FwX2Rpc2Nvbm5lY3RfcmVxKHN0cnVjdCBs
-MmNhcF9jb25uICpjb25uLCBzdHJ1Y3QgbDJjYXBfY21kCiAJCWRlbF90aW1lcigmbDJjYXBfcGko
-c2spLT5hY2tfdGltZXIpOwogCX0KIAorCS8qIGRvbid0IGRlbGV0ZSBsMmNhcCBjaGFubmVsIGlm
-IHNrIGlzIG93bmVkIGJ5IHVzZXIgKi8KKwlpZiAoc29ja19vd25lZF9ieV91c2VyKHNrKSkgewor
-CQlzay0+c2tfc3RhdGUgPSBCVF9ESVNDT05OOworCQlsMmNhcF9zb2NrX2NsZWFyX3RpbWVyKHNr
-KTsKKwkJbDJjYXBfc29ja19zZXRfdGltZXIoc2ssIEhaKTsKKwkJYmhfdW5sb2NrX3NvY2soc2sp
-OworCQlyZXR1cm4gMDsKKwl9CisKIAlsMmNhcF9jaGFuX2RlbChzaywgRUNPTk5SRVNFVCk7CiAJ
-YmhfdW5sb2NrX3NvY2soc2spOwogCkBAIC0zMTY3LDYgKzMxODMsMTUgQEAgc3RhdGljIGlubGlu
-ZSBpbnQgbDJjYXBfZGlzY29ubmVjdF9yc3Aoc3RydWN0IGwyY2FwX2Nvbm4gKmNvbm4sIHN0cnVj
-dCBsMmNhcF9jbWQKIAkJZGVsX3RpbWVyKCZsMmNhcF9waShzayktPmFja190aW1lcik7CiAJfQog
-CisJLyogZG9uJ3QgZGVsZXRlIGwyY2FwIGNoYW5uZWwgaWYgc2sgaXMgb3duZWQgYnkgdXNlciAq
-LworCWlmIChzb2NrX293bmVkX2J5X3VzZXIoc2spKSB7CisJCXNrLT5za19zdGF0ZSA9IEJUX0RJ
-U0NPTk47CisJCWwyY2FwX3NvY2tfY2xlYXJfdGltZXIoc2spOworCQlsMmNhcF9zb2NrX3NldF90
-aW1lcihzaywgSFopOworCQliaF91bmxvY2tfc29jayhzayk7CisJCXJldHVybiAwOworCX0KKwog
-CWwyY2FwX2NoYW5fZGVsKHNrLCAwKTsKIAliaF91bmxvY2tfc29jayhzayk7CiAKLS0gCjEuNy4w
-LjQKCg==
---0016364167e7561e470487072f26
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0002-Bluetooth-timer-check-sk-is-not-owned-before-freeing.patch"
-Content-Disposition: attachment;
-	filename="0002-Bluetooth-timer-check-sk-is-not-owned-before-freeing.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_g9fnul9b1
-
-RnJvbSA1YWRmZWU3YTczODgzMTgwZTZiNjA2Y2M0NmI3OTJmYmVmYmI2NzU4IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBBbmRyZWkgRW1lbHRjaGVua28gPGFuZHJlaS5lbWVsdGNoZW5r
-b0Bub2tpYS5jb20+CkRhdGU6IFRodSwgMjAgTWF5IDIwMTAgMTY6NTI6MTkgKzAzMDAKU3ViamVj
-dDogW1BBVENIdjIgMi8yXSBCbHVldG9vdGg6IHRpbWVyIGNoZWNrIHNrIGlzIG5vdCBvd25lZCBi
-ZWZvcmUgZnJlZWluZwoKSW4gdGltZXIgY29udGV4dCB3ZSBtaWdodCBkZWxldGUgbDJjYXAgY2hh
-bm5lbCB1c2VkIGJ5IGtyZmNvbW1kLgpUaGUgY2hlY2sgbWFrZXMgc3VyZSB0aGF0IHNrIGlzIG5v
-dCBvd25lZC4KClNpZ25lZC1vZmYtYnk6IEFuZHJlaSBFbWVsdGNoZW5rbyA8YW5kcmVpLmVtZWx0
-Y2hlbmtvQG5va2lhLmNvbT4KLS0tCiBuZXQvYmx1ZXRvb3RoL2wyY2FwLmMgfCAgICA4ICsrKysr
-KysrCiAxIGZpbGVzIGNoYW5nZWQsIDggaW5zZXJ0aW9ucygrKSwgMCBkZWxldGlvbnMoLSkKCmRp
-ZmYgLS1naXQgYS9uZXQvYmx1ZXRvb3RoL2wyY2FwLmMgYi9uZXQvYmx1ZXRvb3RoL2wyY2FwLmMK
-aW5kZXggMTEwNjBkNi4uMTlkMmZjMSAxMDA2NDQKLS0tIGEvbmV0L2JsdWV0b290aC9sMmNhcC5j
-CisrKyBiL25ldC9ibHVldG9vdGgvbDJjYXAuYwpAQCAtOTMsNiArOTMsMTQgQEAgc3RhdGljIHZv
-aWQgbDJjYXBfc29ja190aW1lb3V0KHVuc2lnbmVkIGxvbmcgYXJnKQogCiAJYmhfbG9ja19zb2Nr
-KHNrKTsKIAorCWlmIChzb2NrX293bmVkX2J5X3VzZXIoc2spKSB7CisJCS8qIHNrIGlzIG93bmVk
-IGJ5IHVzZXIuIFRyeSBhZ2FpbiBsYXRlciAqLworCQlsMmNhcF9zb2NrX3NldF90aW1lcihzaywg
-SFogKiAyKTsKKwkJYmhfdW5sb2NrX3NvY2soc2spOworCQlzb2NrX3B1dChzayk7CisJCXJldHVy
-bjsKKwl9CisKIAlpZiAoc2stPnNrX3N0YXRlID09IEJUX0NPTk5FQ1RFRCB8fCBzay0+c2tfc3Rh
-dGUgPT0gQlRfQ09ORklHKQogCQlyZWFzb24gPSBFQ09OTlJFRlVTRUQ7CiAJZWxzZSBpZiAoc2st
-PnNrX3N0YXRlID09IEJUX0NPTk5FQ1QgJiYKLS0gCjEuNy4wLjQKCg==
---0016364167e7561e470487072f26--
