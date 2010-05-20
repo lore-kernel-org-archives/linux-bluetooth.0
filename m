@@ -1,20 +1,241 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Fri, 21 May 2010 00:04:02 +1100
-Message-ID: <AANLkTimnLyeZqNvNecognr_U9alZiC9bKNUOWjX9H_Hq@mail.gmail.com>
-Subject: [GSoC'10] : New Command Line Tool(s) for bluez
-From: Alexander Orlenko <zxteam@gmail.com>
+From: =?iso-8859-1?q?Jos=E9_Antonio_Santos_Cadenas?=
+	<jcaden@libresoft.es>
+Reply-To: jcaden@libresoft.es
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Subject: HDP API (version 0.6)
+Date: Thu, 20 May 2010 15:01:58 +0200
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <201005201501.59176.jcaden@libresoft.es>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi everyone,
+Hi all,
 
-My name is Alexander Orlenko, I am a GSoC student of this year. I am
-doing a project "bluez-tools",
-http://hostisdown.org/gsoc/projects/bluez-tools (a little more info
-about the project). I need some feedback about what approach should I
-take.
+We tried to fit a little bit more with the BlueZ API reducing the number of 
+objects and centring the connection and disconnection issues in the 
+HealthDevice object. As was suggested previously in the list.
 
-I'm from Russia, Khabarovsk. This is my first GSoC project.
+Regards
+
+------------
+
+BlueZ D-Bus Health API description
+**********************************
+
+	Santiago Carot-Nemesio <sancane@gmail.com>
+	José Antonio Santos-Cadenas <santoscadenas@gmail.com>
+	Elvis Pfützenreuter <epx@signove.com>
+
+Health Device Profile hierarchy
+===============================
+
+Service		org.bluez
+Interface	org.bluez.HealthAdapter
+Object path	[variable prefix]/{hci0,hci1,...}
+
+Methods:
+
+	uint32	CreateInstance(object path, dict config)
+
+		Returns the id of the new created instance. The path parameter
+		is the path of the remote object with the callbacks to notify
+		events (see org.bluez.HealthAgent at the end of this document)
+		This petition starts an mcap instance and also register in the
+		SDP if is needed.
+
+		Dict is defined as bellow:
+		{ "data_spec" : The data_spec is the data exchange specification
+				(see section 5.2.10 of the specification
+				document) possible values:
+					0x00 = reserved,
+					0x01 [IEEE 11073-20601],
+					0x02..0xff reserved,
+				(optional)
+		  "end_points" : [{ (optional)
+			"mdepid" : uint8, (optional)
+			"role" : ("source" or "sink"), (mandatory)
+			"specs" :[{ (mandatory)
+				"data_type" : uint16, (mandatory)
+				"description" : string, (optional)
+			}]
+		  }]
+		}
+
+		if "data_spec" is not set, no SDP record will be registered, so
+		all the other data in the dictionary will be ignored.
+
+		Instance will be closed by the call or implicitly when the
+		programs leaves the bus.
+
+		Possible errors: org.bluez.Error.InvalidArguments
+
+	void	CloseInstance(uint32 )
+
+		Closes the HDP instance identified by the object path. Also
+		instance will be closed if the process that started leaves the
+		bus. If there is a SDP record associated to this instance it
+		will be removed.
+
+		Possible errors: org.bluez.Error.InvalidArguments
+				org.bluez.Error.NotFound
+
+--------------------------------------------------------------------------------
+
+Service		org.bluez
+Interface	org.bluez.HealthDevice
+Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+
+Methods:
+
+	array GetHealthInstances()
+
+		Gets the information of the remote instances present in this
+		device and published on its SDP record. The returned data
+		follows this format.
+
+		[{"id": uint32,
+		  "data_spec" : data spec,
+		  "end_points":
+			["mdepid": uint8,
+			 "role"  : "source" or "sink" ,
+			 "specs" : [{
+				"dtype"       : uint16,
+				"description" : string, (optional)
+			 }]
+			]
+		}];
+
+	object Connect(uint32 local_instance_id, uint32 remote_instance_id)
+
+		Connects the local instance with the remote instance and returns
+		the path of the HealthLink object. You should get the remote
+		instance id running GetHealthInstances.
+
+		Only the bus client that created the local session will be able
+		to create connections using it.
+
+		Possible errors: org.bluez.Error.InvalidArguments
+				org.bluez.Error.HealthError
+
+	void Disconnect(object link, boolean cache)
+
+		Disconnect from the link. If cache is false, state will also be
+		deleted. Otherwise, the state will be kept for allowing future
+		reconnections until the adapter holding the local session is
+		removed.
+
+		Possible errors: org.bluez.Error.InvalidArguments
+				org.bluez.Error.NotFound
+				org.bluez.Error.HealthError
+
+--------------------------------------------------------------------------------
+
+Service		org.bluez
+Interface	org.bluez.HealthLink
+Object path	[variable prefix]/{hci0,hci1,...}/{hdp0,hdp1,...}/rem_inst_id
+
+Methods:
+
+	boolean Echo(array{byte})
+
+		Sends an echo petition to the remote intance. Returns True if
+		response matches with the buffer sent. If some error is detected
+		False value is returned and the associated MCL is closed.
+
+	uint16 OpenDataChannel(byte mdepid, byte config)
+
+		Creates a new data channel with the indicated config to the
+		remote MCAP Data End Point (MDEP).
+		The configuration should indicate the channel quality of
+		service. In the current version of HDP, valid values are 0x01
+		for reliable channels and 0x02 for streaming data channel.
+
+		Returns the data channel id.
+
+		Possible errors: org.bluez.Error.InvalidArguments
+				org.bluez.Error.HealthError
+
+	array GetDataChannelFileDescriptor(uint16 mdlid)
+
+		Gets a file descriptor where data can be read or
+		written for receive or sent by the data channel.
+		Returns an array of file descriptors one for write
+		and other for read.
+
+		Possible errors: org.bluez.Error.InvalidArguments
+				org.bluez.Error.NotFound
+				org.bluez.Error.HealthError
+
+	void DeleteDataChannel(uint16 mdlid)
+
+		Deletes a data channel so it will not be available for
+		use.
+
+		Possible errors: org.bluez.Error.InvalidArguments
+				org.bluez.Error.NotFound
+				org.bluez.Error.HealthError
+
+	void DeleteAllDataChannels()
+
+		Deletes all data channels so it will not be available
+		for use. Typically this function is called when the
+		connection with the remote device will be closed
+		permanently
+
+		Possible errors: org.bluez.Error.HealthError
+
+	dict GetDataChannelStatus()
+
+		Return a dictionary with all the data channels that
+		can be used to send data right now. The dictionary
+		is formed like follows:
+		{
+			"reliable": [mdlid_r1, mdlid_r2, ...],
+			"streaming" : [mdlid_s1, mdlid_s2, ...]
+		}
+
+		The fist reliable data channel will always be the first
+		data channel in reliable array.
+
+HealthAgent hierarchy
+=====================
+
+(this object is implemented by the HDP user in order to receive notifications)
+
+Service		unique name
+Interface	org.bluez.HealthAgent
+Object path	freely definable
+
+Methods:
+
+	void LinkConnected(object path)
+
+		This method is called whenever a new connection has been
+		established over the control channel of the current HDP
+		instance. The object path paremeter contains the object path of
+		the created HealthLink.
+
+	void LinkDisconnected(object path)
+
+		This method is called when a remote device is disconnected
+		definitively. Any future reconnections will fail. Also all data
+		channels associated to this device will be closed.
+
+	void CreatedDataChannel(object path, uint16 mdlid, byte conf)
+
+		This method is called when a new data channel is created
+
+		The path contains the object path of the HealthLink where the
+		new connection is created, the mdlid is the data channel
+		identificator and conf is the que quality of service of the data
+		channel (0x01 reliable, 0x02 streaming).
+
+	void DeletedDataChannel(object path, uint16 mdlid)
+
+		This method is called when a data channel is closed.
+
+		After this call the data channel id will not be valid and can be
+		reused for future created data channels.
