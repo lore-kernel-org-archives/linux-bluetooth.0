@@ -1,63 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH v3] hciattach application support for Atheros AR300x
- Bluetooth Chip
+Subject: Re: use of hci_recv_fragment in HCI UART transport driver
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Suraj Sumangala <suraj@atheros.com>
-Cc: Suraj Sumangala <Suraj.Sumangala@Atheros.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Luis Rodriguez <Luis.Rodriguez@Atheros.com>,
-	Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>
-In-Reply-To: <4BF613AF.2080303@atheros.com>
-References: <1268629296.21425.23.camel@atheros013-desktop>
-	 <1271758832.6585.33.camel@atheros013-desktop>
-	 <1271845337.15010.1.camel@atheros013-desktop>
-	 <1271927414.1409.3.camel@atheros013-desktop>
-	 <1273672059.32536.14.camel@atheros013-desktop>
-	 <1274371256.27220.15.camel@localhost.localdomain>
-	 <4BF613AF.2080303@atheros.com>
+To: suraj <suraj@atheros.com>
+Cc: linux-bluetooth@vger.kernel.org, Luis.Rodriguez@Atheros.com,
+	Jothikumar.Mothilal@Atheros.com
+In-Reply-To: <1274416666.28388.29.camel@atheros013-desktop>
+References: <1274416666.28388.29.camel@atheros013-desktop>
 Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 21 May 2010 09:34:53 +0200
-Message-ID: <1274427293.27220.31.camel@localhost.localdomain>
+Date: Fri, 21 May 2010 09:33:02 +0200
+Message-ID: <1274427182.27220.29.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Suraj,
 
-> >> Implements support for Atheros AR300x Bluetooth chip in hciattach. 
-> >> Adds feature to bring up AR300x Bluetooth chip
-> >> with and without enhanced power management enabled.
-> >>
-> >> Signed-off-by: Suraj <suraj@Atheros.com>
-> > 
-> > not SOBs for BlueZ userspace. That is kernel only.
-> > 
-> >> ---
-> >>  Makefile.tools         |    1 +
-> >>  tools/hciattach.8      |    6 +
-> >>  tools/hciattach.c      |  111 +++++
-> >>  tools/hciattach.h      |    3 +
-> >>  tools/hciattach_ar3k.c | 1223 ++++++++++++++++++++++++++++++++++++++++++++++++
-> >>  5 files changed, 1344 insertions(+), 0 deletions(-)
-> >>  create mode 100755 tools/hciattach_ar3k.c
-> > 
-> > While hciattach is kinda the bad sheep inside BlueZ, I will enforce the
-> > general coding style for it for all new contributions. So could you
-> > please fix that one first. Otherwise it makes no sense for me to go
-> > through such a big patch if I have to complain about the coding style
-> > breakage for every second line. A general rule is if it fails
-> > check-patch.pl from the kernel, then you are doing something wrong.
->
-> I had verified this patch using checkpatch and it did not complain. I 
-> had also verified it manually according to the comments others have 
-> given previously for different patches.
+> The function "hci_recv_fragment()" was designed to avoid messy Bluetooth Rx packet reassembly on the HCI transport driver.
+> It does work well for HCI USB transport driver but it becomes a bit redundant when used on HCI UART transport driver.
 > 
-> If you still see issues, then we can add that check too to checkpatch if 
-> possible.
+> This is basically due to the fact that the function require the caller to provide the HCI Packet type as input parameter.
+> 
+> This is pretty straight forward for a BT USB transport driver as both ACL data and HCI events are received through different callbacks.
+> Which means you will have 2 calls of hci_recv_fragment(). One with HCI_EVENT_PKT as packet type and other with HCI_ACLDATA_PKT, with packet type hard coded.
+> 
+> As far as HCI UART transport driver is concerned, it does not have this luxury. Both event and data are received through the same callback.
+> So, if the driver has to provide the packet type as input to  hci_recv_fragment(), it will have to parse the HCI Rx data to get it in the first place.
+>  
+> This means driver will have to do everything hci_recv_fragment() does minus the memcpy, implementing the same messy code.
+> 
+> I know that we should be able to work around it by checking whether which reassembly buffer is not null and so on. But this is just a hack not a solution.
 
-then maybe checkpatch.pl is not good enough for this. I see way too many
-empty lines, weird if breakages, and many more. So as I said, this needs
-cleanup first.
+I remember why I added the packet type to the function. The reason is
+that events and ACL packets arrive on different USB endpoints and in
+theory they can arrive at exactly the same time or intermix with each
+other. So that needs to be protected.
+
+So I think we need something like hci_recv_packet_fragment and
+hci_recv_stream_fragment.
+
+This would result at least in that we can consolidate all this code
+duplication in the Bluetooth core.
+
+> The second reason is, hci_recv_fragment() implements a certain policy on the driver i.e 
+> 
+> " Whenever HCI Rx data is reassembled it directly has to be sent to host, without the driver interfering".
+> 
+> This robs the driver a chance have a look at the HCI event and do some housekeeping (it is entirely up to the driver what he wants to do then).
+> 
+> This is the one reason why someone would write a custom HCI transport driver protocol. 
+> Other ways he could have used the standard H4 implementation if he just wanted to transfer packets to and from Host.
+
+This is actually fully on purpose. A driver should not interfere with
+HCI event or commands for that matter at all. It should be just a pure
+transport.
+
+If we need to hook something into vendor command/event handling then we
+should find a different way in doing this. The major job of a HCI driver
+is to be a pure, simple and stupid transport driver.
 
 Regards
 
