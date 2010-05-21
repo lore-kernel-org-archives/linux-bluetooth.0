@@ -1,102 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Fix device_match_pattern function
-From: Santiago Carot-Nemesio <scarot@libresoft.es>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Santiago Carot-Nemesio <sancane@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-In-Reply-To: <1274364281.2018.44.camel@mosquito>
-References: <1274350142-19083-1-git-send-email-sancane@gmail.com>
-	 <AANLkTimv6CRgS-lPeadePxKXEmNmhEM7oLx-uTHuZfNF@mail.gmail.com>
-	 <AANLkTimoISCAwCfv8zktLF7OxT0aT5glDAXYeFM0mUvF@mail.gmail.com>
-	 <1274364281.2018.44.camel@mosquito>
-Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 21 May 2010 14:17:09 +0200
-Message-ID: <1274444229.2051.118.camel@mosquito>
-Mime-Version: 1.0
+From: John Frankish <j-frankish@slb.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Fri, 21 May 2010 13:16:22 +0200
+Subject: RE: How to use a2dp avrcp controls
+Message-ID: <6AC5A55546F64545AE996F8200E3AC4E0332D6012A@NL0105EXC01V01.eur.slb.com>
+References: <6AC5A55546F64545AE996F8200E3AC4E032D4EB9A2@NL0105EXC01V01.eur.slb.com>
+ <44EE5C37ADC36343B0625A05DD408C4850DA702DD0@CHEXMB-01.global.atheros.com>
+ <6AC5A55546F64545AE996F8200E3AC4E032D544173@NL0105EXC01V01.eur.slb.com>
+  <6AC5A55546F64545AE996F8200E3AC4E0332918F4C@NL0105EXC01V01.eur.slb.com>
+ <6AC5A55546F64545AE996F8200E3AC4E0332AC0248@NL0105EXC01V01.eur.slb.com>
+In-Reply-To: <6AC5A55546F64545AE996F8200E3AC4E0332AC0248@NL0105EXC01V01.eur.slb.com>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+> > > -----Original Message-----
+> > > From: John Frankish
+> > > Sent: Thursday, 06 May, 2010 12:48
+> > > To: 'linux-bluetooth-owner@vger.kernel.org'
+> > > Subject: RE: How to use a2dp avrcp controls
+> > >
+> > > > >
+> > > > > Although I can pair with and play music to a set of a2dp
+> > > > > headphones without problems, I cannot figure out how to enable the "track skip"
+> > > > > and similar remote controls on the headphones.
+<snip>
+> > > 1. compiling bluez-4.63 did not install /usr/local/etc/bluetooth/audio.conf
+> > > - is this depreciated or is it required to get a2dp/avrcp working?
 
-I would like to take up again this matter to discuss some estrange
-behaviour that we observed when a driver is probed.
+In my testing audio.conf is apparently not required.
 
-> At current moment only the
-> first one is being provided when driver is probed. 
+Since I found the solution to my problem outside of "bluez space", it is not strictly relevant to this list, but I'm posting it here in case others find it of help.
 
-Well, the comment in update_service function is clear when Service Class
-Id list is checked:
+After using "blueman" to pair with my Bluetooth headphones, setting them as trusted and setting them up as an a2dp sink, dmesg shows the following:
 
-/* Extract the first element and skip the remainning */
+input: 00:1B:66:00:31:88 as /devices/virtual/input/input11
 
-I guess that only the first entry is valid to you to get the profile and
-add it to the profile list. We don't know very well why this decision
-was taken. It will very helpul for us if you can provide a brief
-explanation about that. Wouldn't a driver want to know if there are more
-entries in that Service Class ID List when it is probed?. For example a
-driver registering for two uuids and those uuids are present in the same
-Service Class ID List. Please notice that it is may happen in HDP. In
-this scenario only the first entry will appear in the profile list and
-then one uuid is passed to the driver when it is probed, well this is
-not true at all, see below for some abnormal behaviour with repeated
-uuids in the list that is provided to the driver.
+and..
 
-Let's suppose an SDP record like this:
-*Service Class ID List
-	MDPSink
-	MDPSource
-....aditional info not relevant for this example....
+$ sudo evtest /dev/input/event11
+Input driver version is 1.0.0
+Input device ID: bus 0x5 vendor 0x0 product 0x0 version 0x0
+Input device name: "00:1B:66:00:31:88"
+Supported events:
+  Event type 0 (Sync)
+  Event type 1 (Key)
+    Event code 163 (NextSong)
+    Event code 165 (PreviousSong)
+    Event code 166 (StopCD)
+    Event code 168 (Rewind)
+    Event code 200 (PlayCD)
+    Event code 201 (PauseCD)
+    Event code 208 (Fast Forward)
+  Event type 2 (Relative)
+  Event type 20 (Repeat)
+Testing ... (interrupt to exit)
+Event: time 1274200254.037702, type 1 (Key), code 163 (NextSong), value 1
+Event: time 1274200254.037709, -------------- Report Sync ------------
+Event: time 1274200254.092604, type 1 (Key), code 163 (NextSong), value 0
+Event: time 1274200254.092608, -------------- Report Sync
 
-In that scenario, a driver is registered for next uuids:
-00001400-0000-1000-8000-00805F9B34FB -> MDP (Health device profile)
-00001401-0000-1000-8000-00805F9B34FB -> MDPSource
-00001402-0000-1000-8000-00805F9B34FB -> MDPSink
+But..
 
-which is perfectly valid for a HDP driver due that no extra logic is
-required to manage both roles.
+$ xev | sed -n 's/^.*keycode *\([0-9]\+\).*$/keycode \1 = /p' | uniq
+...
+keycode 144 =
 
-In current Bluez implementation only profile MDPSink is taken in count
-due that it appear first in the service class ID list. In addition it
-will have affect to the uuids list provided when driver is probed wich
-will have repeated uuids due to an issue matching the uuid with the
-profiles list: device_match_driver function.
+So, using xev to make up an .Xmodmap that looks like this:
 
-First time that device_match_pattern is executed with uuid
-00001400-0000-1000-8000-00805F9B34FB it will provide a list with the
-uuid 00001402-0000-1000-8000-00805F9B34FB wich is in the profile list
-(MDPSink) and that uuid will be inserted to the uuid list.
+keycode 144 = XF86AudioPrev
+keycode 153 = XF86AudioNext
+keycode 164 = XF86AudioStop
+keycode 168 = XF86AudioPlay
 
-Next iteration it will check next uuid provided in the driver:
-00001401-0000-1000-8000-00805F9B34FB and device_match_pattern will
-return another time a list with 00001402-0000-1000-8000-00805F9B34FB
-uuid wich will be inserted another time in the for loop. Please, notice
-that now we have the same uuid inserted two times in the uuid list.
+i.e. completely different to that reported by evtest...
 
-Next it will check last uuid provided in the driver:
-00001402-0000-1000-8000-00805F9B34FB and skip it because it is already
-inserted from before iteration.
+and using xset to stop the AVRCP key press repeating at warp speed:
 
-You can review the code to check it.
+xset -r 144 -r 153 -r 164 -r 168
 
-Of course we always can get the necessary entries from the remote SDP
-record, but at least the repeated uuids can be avoided by setting a
-check before to insert anything in the uuid list that it will provided
-when the driver is probed:
+then the sequence is:
 
-/* match pattern driver */
-match = device_match_pattern(device, *uuid, profiles);
-for (; match; match = match->next) {
-+	if (!g_slist_find_custom(uuids, match->data,
-+				(GCompareFunc) strcasecmp)) {
-		uuids = g_slist_append(uuids, match->data);
-+	}
-}
+AVRCP signal -> bluetoothd -> uinput -> X -> Xmodmap -> rhythmbox
 
-If you want we can prepare a patch.
-
-Comments from you are welcome.
-
-Thanks in advance.
-
-Best regards.
-
+..and rhythmbox responds correctly to play, stop, next track and previous track when pressed on the remote Bluetooth headphones controls  :)
