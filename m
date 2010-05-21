@@ -1,81 +1,111 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 2/2] Bluetooth: timer check sk is not owned before freeing
-Date: Fri, 21 May 2010 13:04:53 +0300
-Message-Id: <1274436293-15063-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1274436293-15063-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1274436293-15063-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: WRT non-UTF-8 device names
+From: Fabian Greffrath <fabian@greffrath.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="=-zFTd4qfL1RamJNsLrEnb"
+Date: Fri, 21 May 2010 11:01:56 +0200
+Message-ID: <1274432516.4068.29.camel@vfrodo>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 
-In timer context we might delete l2cap channel used by krfcommd.
-The check makes sure that sk is not owned.
+--=-zFTd4qfL1RamJNsLrEnb
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
----
- net/bluetooth/l2cap.c |   32 ++++++++++++++++++++------------
- 1 files changed, 20 insertions(+), 12 deletions(-)
+Dear Bluez list,
 
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 11060d6..1a6c5bb 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -84,6 +84,18 @@ static struct sk_buff *l2cap_build_cmd(struct l2cap_conn *conn,
- 				u8 code, u8 ident, u16 dlen, void *data);
- 
- /* ---- L2CAP timers ---- */
-+static void l2cap_sock_set_timer(struct sock *sk, long timeout)
-+{
-+	BT_DBG("sk %p state %d timeout %ld", sk, sk->sk_state, timeout);
-+	sk_reset_timer(sk, &sk->sk_timer, jiffies + timeout);
-+}
-+
-+static void l2cap_sock_clear_timer(struct sock *sk)
-+{
-+	BT_DBG("sock %p state %d", sk, sk->sk_state);
-+	sk_stop_timer(sk, &sk->sk_timer);
-+}
-+
- static void l2cap_sock_timeout(unsigned long arg)
- {
- 	struct sock *sk = (struct sock *) arg;
-@@ -93,6 +105,14 @@ static void l2cap_sock_timeout(unsigned long arg)
- 
- 	bh_lock_sock(sk);
- 
-+	if (sock_owned_by_user(sk)) {
-+		/* sk is owned by user. Try again later */
-+		l2cap_sock_set_timer(sk, HZ * 2);
-+		bh_unlock_sock(sk);
-+		sock_put(sk);
-+		return;
-+	}
-+
- 	if (sk->sk_state == BT_CONNECTED || sk->sk_state == BT_CONFIG)
- 		reason = ECONNREFUSED;
- 	else if (sk->sk_state == BT_CONNECT &&
-@@ -109,18 +129,6 @@ static void l2cap_sock_timeout(unsigned long arg)
- 	sock_put(sk);
- }
- 
--static void l2cap_sock_set_timer(struct sock *sk, long timeout)
--{
--	BT_DBG("sk %p state %d timeout %ld", sk, sk->sk_state, timeout);
--	sk_reset_timer(sk, &sk->sk_timer, jiffies + timeout);
--}
--
--static void l2cap_sock_clear_timer(struct sock *sk)
--{
--	BT_DBG("sock %p state %d", sk, sk->sk_state);
--	sk_stop_timer(sk, &sk->sk_timer);
--}
--
- /* ---- L2CAP channels ---- */
- static struct sock *__l2cap_get_chan_by_dcid(struct l2cap_chan_list *l, u16 cid)
- {
--- 
-1.7.0.4
+I am experiencing the following issues with the bluez 4.63-2 and
+gnome-bluetooth 2.30.0-1 packages from Debian unstable:
+
+Please find two text files attached. UTF-8.txt contains the string
+"föøbär" in UTF-8 Unicode encoding, whereas non-UTF-8.txt contains the
+same string in ISO-8859 encoding. Now please try the following steps,
+assuming your bluetooth device identifies as hci0 and you have
+bluetooth-applet running (please note that "no bluetooth icon in the
+system" tray also means "it is impossible to establish a connection to
+or from this device at all"):
+
+$ sudo hciconfig hci0 name `cat UTF-8.txt`
+$ sudo hciconfig -a
+[...]
+	Name: 'föøbär'
+
+$ sudo /etc/init.d/bluetooth restart
+Stopping bluetooth: bluetoothd.
+Starting bluetooth: bluetoothd.
+
+[Not necessary here, everything is fine.]
+
+$ sudo hciconfig hci0 name `cat non-UTF-8.txt`
+
+[The bluetooth system tray icon disappears immediately.]
+
+$ sudo hciconfig -a
+[...]
+	Name: 'f��b�r'
+
+[The device name contains non-UTF-8 characters against the spec.]
+
+$ sudo /etc/init.d/bluetooth restart
+Stopping bluetooth: bluetoothd.
+Starting bluetooth: bluetoothd.
+
+[Doesn't bring the icon back.]
+
+$ sudo hciconfig hci0 name `cat UTF-8.txt`
+$ sudo hciconfig -a
+[...]
+Name: 'föøbär'
+
+[Now the name is back to the valid variant, but still no icon.]
+
+$ sudo /etc/init.d/bluetooth restart
+Stopping bluetooth: bluetoothd.
+Starting bluetooth: bluetoothd.
+
+[Finally the icon is back.]
+
+Long story short: If the bluetooth adapter's device name contains
+non-UTF-8 characters (which my dongle does by default), it requires a
+manual device name change and a restart of the daemon (!) to bring the
+device back to life. I have previously posted a patch to this list which
+fixes this issue by instantly converting faulty device names to UTF-8
+and writing them back to the device during the device configuration
+phase:
+
+<http://marc.info/?l=linux-bluetooth&m=127315737929319&w=2>
+
+However, I have been told that my "patch might be just working around
+the real issue instead of fixing it" and that "It sounds like there's
+something else wrong in the initialization process which makes the
+initialzation fail if the adapter contains some invalid default name".
+
+So, please, try the steps I presented above yourself and tell me what is
+wrong so I can attempt to fix the root of the problem. I am really
+itching to get this issue fixed in the short term.
+
+Thank you very much!
+
+Cheers,
+Fabian
+
+
+
+--=-zFTd4qfL1RamJNsLrEnb
+Content-Disposition: attachment; filename="non-UTF-8.txt"
+Content-Type: text/plain; name="non-UTF-8.txt"; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+
+f��b�r
+
+--=-zFTd4qfL1RamJNsLrEnb
+Content-Disposition: attachment; filename="UTF-8.txt"
+Content-Type: text/plain; name="UTF-8.txt"; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+
+föøbär
+
+--=-zFTd4qfL1RamJNsLrEnb--
 
