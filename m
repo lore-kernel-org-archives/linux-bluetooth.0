@@ -1,53 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 24 May 2010 12:56:59 +0200
-From: Christian Birchinger <joker@netswarm.net>
-To: Antonio Ospite <ospite@studenti.unina.it>
+Date: Mon, 24 May 2010 11:31:22 +0200
+From: Antonio Ospite <ospite@studenti.unina.it>
+To: Christian Birchinger <joker@netswarm.net>
 Cc: linux-bluetooth@vger.kernel.org
 Subject: Re: Auto trust entry remove
-Message-ID: <20100524105659.GA19294@netswarm.net>
+Message-Id: <20100524113122.c084d160.ospite@studenti.unina.it>
+In-Reply-To: <20100524085344.GA18433@netswarm.net>
 References: <20100524083330.GA18128@netswarm.net>
- <20100524085344.GA18433@netswarm.net>
- <20100524113122.c084d160.ospite@studenti.unina.it>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20100524113122.c084d160.ospite@studenti.unina.it>
+	<20100524085344.GA18433@netswarm.net>
+Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA1";
+ boundary="Signature=_Mon__24_May_2010_11_31_22_+0200_.B.rp0Va1D=dJDt."
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, May 24, 2010 at 11:31:22AM +0200, Antonio Ospite wrote:
+--Signature=_Mon__24_May_2010_11_31_22_+0200_.B.rp0Va1D=dJDt.
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-First of all i know what prevented the BT HID from being added.
-The netlink plugin was disabled and that's required for this
-to work. Really stupid mistake.
+On Mon, 24 May 2010 10:53:44 +0200
+Christian Birchinger <joker@netswarm.net> wrote:
 
-The device gets added now and for the first time i get input data
-from it.
+> Ok, i copied over the "spd" and "profiles" entries from
+> the previous installation. Now it no longer removes the
+> trust after a reconnect. It's just stuck in a reconnect
+> loop (about 10 times) and then the controller gives up
+> and powers down.
 
-> On Mon, 24 May 2010 10:53:44 +0200
-> Christian Birchinger <joker@netswarm.net> wrote:
-> 
-> Christian, I can only say that it works for me with the kernel patches
-> from http://lists.ozlabs.org/pipermail/cbe-oss-dev/2010-May/007274.html
-> and an updated sixaxis-cable patch which I haven't published yet
-> because it was not final and I didn't want to leave temporary stuff,
-> which could be soon deprecated, archived on the Internet; that may
-> confuse people.
+Christian, I can only say that it works for me with the kernel patches
+from http://lists.ozlabs.org/pipermail/cbe-oss-dev/2010-May/007274.html
+and an updated sixaxis-cable patch which I haven't published yet
+because it was not final and I didn't want to leave temporary stuff,
+which could be soon deprecated, archived on the Internet; that may
+confuse people.
 
-Thanks for the hint, i just patched my kernel an rebooted. This is the
-output when i plug the controller over USB:
+Let me know if you want me to send this updated sixaxis-cable to you
+privately.
 
-sony 0003:054C:0268.0007: input,hiddev96,hidraw3: USB HID v1.11 Joystick [Sony PLAYSTATION(R)3 Controller] on usb-0000:00:1a.0-1.3.4/input0
-sony 0003:054C:0268.0007: Calling sixaxis_set_operational_usb
-sony 0003:054C:0268.0007: Sony PS3 Controller bdaddr: <controller addr>
+Have you tried removing everything from /var/lib/bluetooth ?
 
-So it works fine.
+Regards,
+   Antonio.
 
-> Let me know if you want me to send this updated sixaxis-cable to you
-> privately.
+--=20
+Antonio Ospite
+http://ao2.it
 
-Yes, that would be interesting. Is there some default location to find
-the recent public release of it too? I'm alsways exctracting it from
-the Fedora srpm.
+PGP public key ID: 0x4553B001
 
-Thanks a lot for your help
-Bye, Christian
+A: Because it messes up the order in which people normally read text.
+   See http://en.wikipedia.org/wiki/Posting_style
+Q: Why is top-posting such a bad thing?
+A: Top-posting.
+Q: What is the most annoying thing in e-mail?
+
+--Signature=_Mon__24_May_2010_11_31_22_+0200_.B.rp0Va1D=dJDt.
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAkv6R2oACgkQ5xr2akVTsAFdrwCgjY+bYGyGv5d/WoYRQtBxfKtY
+fooAmwaS4n7zwuNhjiDGtrqcpBZzwG3r
+=W5E4
+-----END PGP SIGNATURE-----
+
+--Signature=_Mon__24_May_2010_11_31_22_+0200_.B.rp0Va1D=dJDt.--
