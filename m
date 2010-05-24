@@ -1,118 +1,113 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20100523023906.GB3385@vigoh>
-References: <1274436293-15063-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <20100523023906.GB3385@vigoh>
-Date: Mon, 24 May 2010 15:14:13 +0300
-Message-ID: <AANLkTikjwu1anyryCcEgqDSeMDZBlSuPrxx-7n7qcJet@mail.gmail.com>
-Subject: Re: [PATCHv2 1/2] Bluetooth: Check sk is not owned before freeing
-	l2cap_conn
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: "Gustavo F. Padovan" <gustavo@padovan.org>
+Date: Mon, 24 May 2010 13:10:10 +0200
+From: Antonio Ospite <ospite@studenti.unina.it>
+To: Christian Birchinger <joker@netswarm.net>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: Auto trust entry remove
+Message-Id: <20100524131010.631647d3.ospite@studenti.unina.it>
+In-Reply-To: <20100524105659.GA19294@netswarm.net>
+References: <20100524083330.GA18128@netswarm.net>
+	<20100524085344.GA18433@netswarm.net>
+	<20100524113122.c084d160.ospite@studenti.unina.it>
+	<20100524105659.GA19294@netswarm.net>
+Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA1";
+ boundary="Signature=_Mon__24_May_2010_13_10_10_+0200_dNi0bddvg5OI+T6W"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo
+--Signature=_Mon__24_May_2010_13_10_10_+0200_dNi0bddvg5OI+T6W
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, May 23, 2010 at 5:39 AM, Gustavo F. Padovan <gustavo@padovan.org> wrote:
-> Hi Andrei,
+On Mon, 24 May 2010 12:56:59 +0200
+Christian Birchinger <joker@netswarm.net> wrote:
+
+> On Mon, May 24, 2010 at 11:31:22AM +0200, Antonio Ospite wrote:
+>=20
+> First of all i know what prevented the BT HID from being added.
+> The netlink plugin was disabled and that's required for this
+> to work. Really stupid mistake.
+>=20
+> The device gets added now and for the first time i get input data
+> from it.
 >
-> * Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2010-05-21 13:04:52 +0300]:
+
+Good.
+
+> > On Mon, 24 May 2010 10:53:44 +0200
+> > Christian Birchinger <joker@netswarm.net> wrote:
+> >=20
+> > Christian, I can only say that it works for me with the kernel patches
+> > from http://lists.ozlabs.org/pipermail/cbe-oss-dev/2010-May/007274.html
+> > and an updated sixaxis-cable patch which I haven't published yet
+> > because it was not final and I didn't want to leave temporary stuff,
+> > which could be soon deprecated, archived on the Internet; that may
+> > confuse people.
+>=20
+> Thanks for the hint, i just patched my kernel an rebooted. This is the
+> output when i plug the controller over USB:
+>=20
+> sony 0003:054C:0268.0007: input,hiddev96,hidraw3: USB HID v1.11 Joystick =
+[Sony PLAYSTATION(R)3 Controller] on usb-0000:00:1a.0-1.3.4/input0
+> sony 0003:054C:0268.0007: Calling sixaxis_set_operational_usb
+> sony 0003:054C:0268.0007: Sony PS3 Controller bdaddr: <controller addr>
+>=20
+> So it works fine.
 >
->> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
->>
->> Check that socket sk is not locked in user process before removing
->> l2cap connection handler.
->>
->> krfcommd kernel thread may be preempted with l2cap tasklet which remove
->> l2cap_conn structure. If krfcommd is in process of sending of RFCOMM reply
->> (like "RFCOMM UA" reply to "RFCOMM DISC") then kernel crash happens.
->>
->> ...
->> [  694.175933] Unable to handle kernel NULL pointer dereference at virtual address 00000000
->> [  694.184936] pgd = c0004000
->> [  694.187683] [00000000] *pgd=00000000
->> [  694.191711] Internal error: Oops: 5 [#1] PREEMPT
->> [  694.196350] last sysfs file: /sys/devices/platform/hci_h4p/firmware/hci_h4p/loading
->> [  694.260375] CPU: 0    Not tainted  (2.6.32.10 #1)
->> [  694.265106] PC is at l2cap_sock_sendmsg+0x43c/0x73c [l2cap]
->> [  694.270721] LR is at 0xd7017303
->> ...
->> [  694.525085] Backtrace:
->> [  694.527587] [<bf266be0>] (l2cap_sock_sendmsg+0x0/0x73c [l2cap]) from [<c02f2cc8>] (sock_sendmsg+0xb8/0xd8)
->> [  694.537292] [<c02f2c10>] (sock_sendmsg+0x0/0xd8) from [<c02f3044>] (kernel_sendmsg+0x48/0x80)
->> ...
->>
->> Modified version after comments of Gustavo F. Padovan <gustavo@padovan.org>
->>
->> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
->> ---
->>  net/bluetooth/l2cap.c |   25 +++++++++++++++++++++++++
->>  1 files changed, 25 insertions(+), 0 deletions(-)
->>
->> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
->> index bb00015..11060d6 100644
->> --- a/net/bluetooth/l2cap.c
->> +++ b/net/bluetooth/l2cap.c
->> @@ -2927,6 +2927,13 @@ static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hd
->>               break;
->>
->>       default:
->> +             /* don't delete l2cap channel if sk is owned by user */
->> +             if (sock_owned_by_user(sk)) {
->> +                     sk->sk_state = BT_DISCONN;
->> +                     l2cap_sock_clear_timer(sk);
->> +                     l2cap_sock_set_timer(sk, HZ);
+
+Yes.
+
+> > Let me know if you want me to send this updated sixaxis-cable to you
+> > privately.
+>=20
+> Yes, that would be interesting. Is there some default location to find
+> the recent public release of it too? I'm alsways exctracting it from
+> the Fedora srpm.
 >
-> Using the sock timer like you are you using looks too hackish, there are
-> kernel struct for such defer works. I still prefer the first solution,
-> that avoids the call to l2cap_chan_del() only.
 
-OK. Then let's go for the first solution.
+The one from Fedora srpm uses libusb and hence has to detach and
+reattach the usbhid driver in order to work. With my patch+my
+sixaxis-cable plugin libusb is not needed anymore, but I am not
+publishing it because I didn't receive feedback on those kernel patches
+from kernel people, and I feel that means extending hidraw should be the
+way, I just haven't found the time to work on it yet. I am sending the
+sixaxis-cable plugin to you in another mail just to show the concept,
+don't distribute it yet, keep in mind that it should be changed to use
+hidraw once I finished with this.
 
-> But we have to solve the problem with the sock_kill() call, I'm
-> wondering if add a check inside l2cap_sock_kill is good idea. So we
-> check if the socket is owned by user and if yes, we just return, however
-> may have problem with socket refcnt doing that.
+> Thanks a lot for your help
+> Bye, Christian
+>=20
 
-I think by just using refcounting (sock_hold / sock_put) we overcome
-the problem.
-No need for extra checks; they looks hackish when we can use proper way.
-
-> Looking to the rfcomm code I found something that could be cause of the
-> problem, there isn't any sock_hold() in the rfcomm code, maybe is it
-> missing? Nevertheless it does the sock_put() without call sock_hold().
-
-Do you mean it is unbalanced? sock_hold is probably executed in some
-function returning sk (which is not the best practice).
-
-> Like you I'm trying to figure out how to fix this issue, I don't know
-> yet how to fix it properly. I advice to take a look on the rfcomm code
-> and check if we really are missing a sock_hold() there.
-
-My first version of the patch adds refcounting to RFCOMM send function.
-
-> Also is not easy to reproduce such sequence of l2cap and rfcomm packets,
-> so I can't test the issue here too.
-
-I guess this is harder to reproduce with desktop system but you can
-add mdelay when sending RFCOMM. This way tasklet has more chances to
-preempt krfcommd process.
-
-@@ -1668,6 +1671,8 @@ static int l2cap_sock_sendmsg(struct kiocb *iocb, struct
-        if (err)
-                goto done;
-
-+       mdelay(100);
-+
-        if (msg->msg_flags & MSG_OOB) {
-                err = -EOPNOTSUPP;
-                goto done;
-
-Could you try adding mdelay? There are reports that reproducing is
-possible with rctest
+You're welcome.
 
 Regards,
-Andrei
+   Antonio
+
+--=20
+Antonio Ospite
+http://ao2.it
+
+PGP public key ID: 0x4553B001
+
+A: Because it messes up the order in which people normally read text.
+   See http://en.wikipedia.org/wiki/Posting_style
+Q: Why is top-posting such a bad thing?
+A: Top-posting.
+Q: What is the most annoying thing in e-mail?
+
+--Signature=_Mon__24_May_2010_13_10_10_+0200_dNi0bddvg5OI+T6W
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAkv6XpIACgkQ5xr2akVTsAEZhwCgocUNmXL8GqObXoEybyat9vtK
+HT8An26srgj/5LKiotttOYG7YowDltQd
+=vTPm
+-----END PGP SIGNATURE-----
+
+--Signature=_Mon__24_May_2010_13_10_10_+0200_dNi0bddvg5OI+T6W--
