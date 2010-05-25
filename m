@@ -1,30 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4BFBB5FA.6000200@greffrath.com>
+Date: Tue, 25 May 2010 13:35:22 +0200
+From: Fabian Greffrath <fabian@greffrath.com>
+MIME-Version: 1.0
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Subject: Re: WRT non-UTF-8 device names
-From: Bastien Nocera <hadess@hadess.net>
-To: Fabian Greffrath <fabian@greffrath.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1274432516.4068.29.camel@vfrodo>
 References: <1274432516.4068.29.camel@vfrodo>
-Content-Type: text/plain; charset="ISO-8859-1"
-Date: Tue, 25 May 2010 13:38:39 +0100
-Message-ID: <1274791119.27274.17718.camel@localhost.localdomain>
-Mime-Version: 1.0
+In-Reply-To: <1274432516.4068.29.camel@vfrodo>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 2010-05-21 at 11:01 +0200, Fabian Greffrath wrote:
-> Dear Bluez list,
-> 
-> I am experiencing the following issues with the bluez 4.63-2 and
-> gnome-bluetooth 2.30.0-1 packages from Debian unstable:
+Dear Bluez developers,
 
-Stupid question, but do you use a UTF-8 locale, or not?
+Am 21.05.2010 11:01, schrieb Fabian Greffrath:
+> Long story short: If the bluetooth adapter's device name contains
+> non-UTF-8 characters (which my dongle does by default), it requires a
+> manual device name change and a restart of the daemon (!) to bring the
+> device back to life. I have previously posted a patch to this list which
+> fixes this issue by instantly converting faulty device names to UTF-8
+> and writing them back to the device during the device configuration
+> phase:
+>
+> <http://marc.info/?l=linux-bluetooth&m=127315737929319&w=2>
+>
+> However, I have been told that my "patch might be just working around
+> the real issue instead of fixing it" and that "It sounds like there's
+> something else wrong in the initialization process which makes the
+> initialzation fail if the adapter contains some invalid default name".
+>
+> So, please, try the steps I presented above yourself and tell me what is
+> wrong so I can attempt to fix the root of the problem. I am really
+> itching to get this issue fixed in the short term.
 
-The output of "locale" as root would probably help.
+this is a real issue (it bites me each and every time I plug in my USB 
+Bluetooth dongle) and it is easily reproducible following the simple 
+steps I have posted earlier. Please give me a hint how to track down 
+this bug and fix it.
 
-My guess is that we make assumptions as to a user entry being valid
-UTF-8 somewhere, when it could be non-UTF-8.
-
-As for your problem, I don't think we want to allow non-UTF-8 device
-names anyhow. They're not valid spec.
-
+Thanks,
+Fabian
