@@ -1,136 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 25 May 2010 17:09:34 -0300
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
+To: Ron Shaffer <rshaffer@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/1] Bluetooth: Synchronize SCO/eSCO connection
+ requests to ACL state
+Message-ID: <20100525200934.GA29898@vigoh>
+References: <4BFAEB65.2060503@codeaurora.org>
+ <20100524215202.GA28028@vigoh>
+ <4BFC0228.8050206@codeaurora.org>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTinnJqmC6pB9pCTPy_YgGsgataba8nun9bsuufJF@mail.gmail.com>
-References: <w2ra6ca4e821005071241w9d7d982ezb78ad0ba4480e73d@mail.gmail.com>
-	 <s2oa6ca4e821005071249tdfd2e197i2595b57ae2ccb705@mail.gmail.com>
-	 <20100507195325.GB4857@vigoh>
-	 <AANLkTilSynGNcpdq8h5YJQVD8e5MMyUDq55WzsB05AA2@mail.gmail.com>
-	 <20100517023917.GI23754@vigoh>
-	 <AANLkTin3FNuVegPI013fzLQn7YsHzpfr7ZymnCG1mpt-@mail.gmail.com>
-	 <AANLkTinnJqmC6pB9pCTPy_YgGsgataba8nun9bsuufJF@mail.gmail.com>
-Date: Wed, 26 May 2010 06:23:03 +0300
-Message-ID: <AANLkTilkMiWSSrGA65-9Z_Xh5WKcG-VhhpJ4lZ0PDopc@mail.gmail.com>
-Subject: Re: Software caused connection abort (103 )
-From: john michelle <jhnmichelle@gmail.com>
-To: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4BFC0228.8050206@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Ron,
 
+* Ron Shaffer <rshaffer@codeaurora.org> [2010-05-25 12:00:24 -0500]:
 
-> I tried reproduce this issue in L2CAP but it is a bit hard, lets
-> say it happen once in a thousand, so it's not easy to track it. I have
-> to try reproduce that using the SCO, but I'm not used to that layer yet.
-> ;)
+> trimmed.
+> 
+> > Hi Ron,
+> > 
+> > * Ron Shaffer <rshaffer@codeaurora.org> [2010-05-24 16:11:01 -0500]:
+> > 
+> >>
+> >> Certain headsets such as the Motorola H350 will reject SCO and eSCO
+> >> connection requests while the ACL is transitioning from sniff mode
+> >> to active mode. Add synchronization so that SCO and eSCO connection
+> >> requests will wait until the ACL has fully transitioned to active mode.
+> >>
+> >> Signed-off-by: Ron Shaffer <rshaffer@codeaurora.org>
+> 
+> > @@ -117,9 +117,18 @@ void hci_add_sco(struct hci_conn *conn, __u16 handle)
+> > >  {
+> > >  	struct hci_dev *hdev = conn->hdev;
+> > >  	struct hci_cp_add_sco cp;
+> > > +	struct hci_conn *acl = conn->link;
+> > >  
+> > >  	BT_DBG("%p", conn);
+> > >  
+> > > +	if (acl->mode == HCI_CM_SNIFF &&
+> > > +		test_bit(HCI_CONN_MODE_CHANGE_PEND, &acl->pend)) {
+> > Wrong indentation here. Add a extra tab for test_bit.
+> 
+> > > +		set_bit(HCI_CONN_SCO_PEND, &conn->pend);
+> > > +		return;
+> > > +	}
+> > > +
+> > > +	clear_bit(HCI_CONN_SCO_PEND, &conn->pend);
+> 
+> > 
+> > 
+> > You already clear the bit on hci_mode_change_evt with
+> > test_and_clear_bit. No need to clear it again here.
+> > The same happens for hci_setup_sync().
+> > 
+> 
+> Clearing the bit and clearing it in hci_change_mode_evt are independent
+> actions for two different scenarios.
+> 
+> Scenario 1:
+> A SCO/eSCO connection is requested and the ACL is in active mode. 
+> 
+> Scenario 2:
+> A SCO/eSCO connection is requested and the ACL is transitioning modes.
+> 
+> For scenario 1, I cleared the bit here because I did not want to assume
+> the bit had been initialized. If it's set, then any future changes to 
+> the ACL mode (sniff, active) requested by the local side would result
+> in a request for a SCO or eSCO connection when one already exists.
+> 
+> For scenario 2, the first conditional is TRUE, and the bit gets set.
+> Later when the mode change event is received, the bit is cleared and
+> the SCO/eSCO connection is requested.
 
+Acked.
 
+> 
+> -- 
+> Ron Shaffer
+> Qualcomm Innovation Center, Inc.
+> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
 
-I think the Bluetooth dongle that i am using might be causing the
-problem since it Automatically disconnects which lead to software
-caused connection abort problem
-Beside i found a new problem and that is from time to time the dongle
-shifts the audio
-Stream which makes it appear as static noise i tried to contact the
-vendor of the dongle
-Trust.com regarding the noise problem they told me " We regret to
-inform you that Trust Doesn't provide any support for Linux for the
-moment." so i guess in order to debug this
-Problem properly i have to change the Bluetooth dongle so what type of
-Bluetooth Dongle do you recommend that has linux support.
-
-john
-
-On Mon, May 17, 2010 at 5:32 PM, john michelle <jhnmichelle@gmail.com> wrote:
-> One more Addition
->
->>> The problem happens when you are already tranfering
->>> SCO data?
->
-> yes,  it happens only during transferring SCO data
->
-> john
->
->
-> On Mon, May 17, 2010 at 5:21 PM, john michelle <jhnmichelle@gmail.com> wrote:
->>> Hi Jonh,
->>>
->>> First of all, don't do top posting in this mailing list. ;)
->>>
->>
->> Thanks for the advise , will keep that in mind for future posts.
->>
->>> In which bluez/kernel version the problem started? Any hardware update
->>> during this time? The problem happens when you are already tranfering
->>> SCO data?
->>>
->>
->> I tried bluez versions 3.XX  and kernel 2.6.26(I think) the problem
->> occurs and the kernel panics with no core dumps.then i tried with
->> bluez 4.53-4.62 with
->> Kernel 2.6.31 and 2.6.32. the connection abort problem occurs but the
->> kernel doesn't
->> Panic. regarding the hardware update you mean the dongle or the box.Anyway
->> i changed both and tried different box's, this even happens on a box
->> with 2 giga ram
->> And core2 processor . as for the dongles i am using trust
->>
->> http://www.twenga.co.uk/prices-Bluetooth-2-USB-Adapter-10m-BT-2250p-TRUST-Wireless-network-card-adapter-176178-0
->>
->>  and also using no name dongles all the same problem.
->>
->>> Please post the output of hcidump when the connection abort happens.
->>>
->>
->> well that is going to be a hard one since i have more than one dongle in place
->> And very hard to predict which one will crash.i will work on this and update
->> You as soon as i have the hcidump log.
->>
->>
->>
->>> I tried reproduce this issue in L2CAP but it is a bit hard, lets
->>> say it happen once in a thousand, so it's not easy to track it. I have
->>> to try reproduce that using the SCO, but I'm not used to that layer yet.
->>> ;)
->>
->> I hoped that it happens 1 in 1000 in SCO , but it actually happens 1 in 15
->>
->>
->> John
->>
->>
->>
->>>
->>> Regards,
->>>
->>>>
->>>> John
->>>>
->>>> On Fri, May 7, 2010 at 3:53 PM, Gustavo F. Padovan <gustavo@padovan.org> wrote:
->>>> > * john michelle <jhnmichelle@gmail.com> [2010-05-07 15:49:05 -0400]:
->>>> >
->>>> >> Hi Bluetooth hackers,
->>>> >>
->>>> >> i am having this consistent problem with bluez , from time to time i
->>>> >> get the error Software caused connection abort (103 )
->>>> >> And the bluetooth stick seems to disconnect and reconnects. this
->>>> >> happens during an sco connection and it occurs even
->>>> >> More when i am having the voice stream comming through the internet
->>>> >> rather than the lan.i don't know what exact
->>>> >> Details you need to solve this problem please tell me and i will give
->>>> >> you an immediate reply . i have linux kernel 2.6.33 and bluez 4.62
->>>> >
->>>> > I get the same problem sometimes when testing ERTM with l2test. So the
->>>> > problem is on l2cap too. I didn't have time to debug this yet. Now that
->>>> > someone else have confirmed it too, I'll to take a look at the problem.
->>>> >
->>>> >>
->>>
->>> --
->>> Gustavo F. Padovan
->>> http://padovan.org
->>>
->>
->
+-- 
+Gustavo F. Padovan
+http://padovan.org
