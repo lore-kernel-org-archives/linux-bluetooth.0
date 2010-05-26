@@ -1,44 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 2/2] Bluetooth: Prevent sk freeing in tasklet using refcount
-Date: Wed, 26 May 2010 17:21:34 +0300
-Message-Id: <1274883694-18120-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1274883694-18120-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1274883694-18120-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH 1/1] Bluetooth: Synchronize SCO/eSCO connection
+ requests to ACL state
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Ron Shaffer <rshaffer@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <4BFAEB65.2060503@codeaurora.org>
+References: <4BFAEB65.2060503@codeaurora.org>
+Content-Type: text/plain; charset="UTF-8"
+Date: Wed, 26 May 2010 10:59:16 +0200
+Message-ID: <1274864356.27220.155.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+Hi Ron,
 
-Socket sk may be freed in tasklet while still be in use in krfcommd
-process. Use refcount to mark sk as used.
+> Certain headsets such as the Motorola H350 will reject SCO and eSCO
+> connection requests while the ACL is transitioning from sniff mode
+> to active mode. Add synchronization so that SCO and eSCO connection
+> requests will wait until the ACL has fully transitioned to active mode.
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
----
- net/bluetooth/l2cap.c |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
+I am not completely happy with this patch. First please split it like
+Gustavo asked since otherwise it becomes pretty hard to review. I don't
+really bother to look into its technical nature before the split and the
+coding style is in place.
 
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 794f2b7..bf762d6 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -1724,6 +1724,7 @@ static int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock, struct ms
- 	if (msg->msg_flags & MSG_OOB)
- 		return -EOPNOTSUPP;
- 
-+	sock_hold(sk);
- 	lock_sock(sk);
- 
- 	if (sk->sk_state != BT_CONNECTED) {
-@@ -1808,6 +1809,7 @@ static int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock, struct ms
- 
- done:
- 	release_sock(sk);
-+	sock_put(sk);
- 	return err;
- }
- 
--- 
-1.7.0.4
+Second, please don't make a special case for sniff mode. If we do this
+then we also do it for park state and hold mode.
+
+And third, I think this needs to be done a little bit more in the way we
+handle attempts for connecting ACL links when the baseband is busy. So
+can you send hcidump -X -V traces for the failure of SCO/eSCO setup when
+sniff is active. I like to see which error codes are returned. Hacking
+this directly into sniff exit handling makes the code pretty hard to
+understand in the future.
+
+Regards
+
+Marcel
+
 
