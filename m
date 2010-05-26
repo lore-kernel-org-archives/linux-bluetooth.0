@@ -1,56 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4BFD307B.6060805@codeaurora.org>
-Date: Wed, 26 May 2010 09:30:19 -0500
-From: Ron Shaffer <rshaffer@codeaurora.org>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/1] Bluetooth: Synchronize SCO/eSCO connection requests
- to ACL state
-References: <4BFAEB65.2060503@codeaurora.org> <1274864356.27220.155.camel@localhost.localdomain>
-In-Reply-To: <1274864356.27220.155.camel@localhost.localdomain>
-Content-Type: text/plain; charset=UTF-8
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv1 1/2] Bluetooth: Check sk is not owned before freeing l2cap_conn
+Date: Wed, 26 May 2010 17:21:33 +0300
+Message-Id: <1274883694-18120-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1274883694-18120-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1274883694-18120-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Marcel:
+From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 
-> Hi Ron,
-> 
->> Certain headsets such as the Motorola H350 will reject SCO and eSCO
->> connection requests while the ACL is transitioning from sniff mode
->> to active mode. Add synchronization so that SCO and eSCO connection
->> requests will wait until the ACL has fully transitioned to active mode.
-> 
-> I am not completely happy with this patch. First please split it like
-> Gustavo asked since otherwise it becomes pretty hard to review. I don't
-> really bother to look into its technical nature before the split and the
-> coding style is in place.
-> 
-> Second, please don't make a special case for sniff mode. If we do this
-> then we also do it for park state and hold mode.
-> 
-> And third, I think this needs to be done a little bit more in the way we
-> handle attempts for connecting ACL links when the baseband is busy. So
-> can you send hcidump -X -V traces for the failure of SCO/eSCO setup when
-> sniff is active. I like to see which error codes are returned. Hacking
-> this directly into sniff exit handling makes the code pretty hard to
-> understand in the future.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
+Check that socket sk is not locked in user process before removing
+l2cap connection handler.
 
-Thanks for the review and comments. 
+krfcommd kernel thread may be preempted with l2cap tasklet which remove
+l2cap_conn structure. If krfcommd is in process of sending of RFCOMM reply
+(like "RFCOMM UA" reply to "RFCOMM DISC") then kernel crash happens.
 
-I'll split the patch into three. No problem. When I resubmit, I'll push
-the hcidump log out as well. Because the failure occurs during eSCO 
-negotiation and SCO request with the remote, most of the interesting 
-stuff is in LMP, so I'll include the FTS sniffer trace as well.
+...
+[  694.175933] Unable to handle kernel NULL pointer dereference at virtual address 00000000
+[  694.184936] pgd = c0004000
+[  694.187683] [00000000] *pgd=00000000
+[  694.191711] Internal error: Oops: 5 [#1] PREEMPT
+[  694.196350] last sysfs file: /sys/devices/platform/hci_h4p/firmware/hci_h4p/loading
+[  694.260375] CPU: 0    Not tainted  (2.6.32.10 #1)
+[  694.265106] PC is at l2cap_sock_sendmsg+0x43c/0x73c [l2cap]
+[  694.270721] LR is at 0xd7017303
+...
+[  694.525085] Backtrace:
+[  694.527587] [<bf266be0>] (l2cap_sock_sendmsg+0x0/0x73c [l2cap]) from [<c02f2cc8>] (sock_sendmsg+0xb8/0xd8)
+[  694.537292] [<c02f2c10>] (sock_sendmsg+0x0/0xd8) from [<c02f3044>] (kernel_sendmsg+0x48/0x80)
+...
 
+Modified version after comments of Gustavo F. Padovan <gustavo@padovan.org>
+
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+---
+ net/bluetooth/l2cap.c |   14 +++++++++++---
+ 1 files changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index bb00015..794f2b7 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -2927,7 +2927,9 @@ static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hd
+ 		break;
+ 
+ 	default:
+-		l2cap_chan_del(sk, ECONNREFUSED);
++		/* delete l2cap channel if sk is not owned by user */
++		if (!sock_owned_by_user(sk))
++			l2cap_chan_del(sk, ECONNREFUSED);
+ 		break;
+ 	}
+ 
+@@ -3135,7 +3137,10 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn, struct l2cap_cmd
+ 		del_timer(&l2cap_pi(sk)->ack_timer);
+ 	}
+ 
+-	l2cap_chan_del(sk, ECONNRESET);
++	/* delete l2cap channel if sk is not owned by user */
++	if (!sock_owned_by_user(sk))
++		l2cap_chan_del(sk, ECONNRESET);
++
+ 	bh_unlock_sock(sk);
+ 
+ 	l2cap_sock_kill(sk);
+@@ -3167,7 +3172,10 @@ static inline int l2cap_disconnect_rsp(struct l2cap_conn *conn, struct l2cap_cmd
+ 		del_timer(&l2cap_pi(sk)->ack_timer);
+ 	}
+ 
+-	l2cap_chan_del(sk, 0);
++	/* delete l2cap channel if sk is not owned by user */
++	if (!sock_owned_by_user(sk))
++		l2cap_chan_del(sk, 0);
++
+ 	bh_unlock_sock(sk);
+ 
+ 	l2cap_sock_kill(sk);
 -- 
-Ron Shaffer
-Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+1.7.0.4
+
