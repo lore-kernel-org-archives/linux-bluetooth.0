@@ -1,42 +1,136 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 1/1] Bluetooth: Synchronize SCO/eSCO connection
- requests to ACL state
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Ron Shaffer <rshaffer@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <4BFAEB65.2060503@codeaurora.org>
-References: <4BFAEB65.2060503@codeaurora.org>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 26 May 2010 10:59:16 +0200
-Message-ID: <1274864356.27220.155.camel@localhost.localdomain>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <AANLkTinnJqmC6pB9pCTPy_YgGsgataba8nun9bsuufJF@mail.gmail.com>
+References: <w2ra6ca4e821005071241w9d7d982ezb78ad0ba4480e73d@mail.gmail.com>
+	 <s2oa6ca4e821005071249tdfd2e197i2595b57ae2ccb705@mail.gmail.com>
+	 <20100507195325.GB4857@vigoh>
+	 <AANLkTilSynGNcpdq8h5YJQVD8e5MMyUDq55WzsB05AA2@mail.gmail.com>
+	 <20100517023917.GI23754@vigoh>
+	 <AANLkTin3FNuVegPI013fzLQn7YsHzpfr7ZymnCG1mpt-@mail.gmail.com>
+	 <AANLkTinnJqmC6pB9pCTPy_YgGsgataba8nun9bsuufJF@mail.gmail.com>
+Date: Wed, 26 May 2010 06:23:03 +0300
+Message-ID: <AANLkTilkMiWSSrGA65-9Z_Xh5WKcG-VhhpJ4lZ0PDopc@mail.gmail.com>
+Subject: Re: Software caused connection abort (103 )
+From: john michelle <jhnmichelle@gmail.com>
+To: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ron,
-
-> Certain headsets such as the Motorola H350 will reject SCO and eSCO
-> connection requests while the ACL is transitioning from sniff mode
-> to active mode. Add synchronization so that SCO and eSCO connection
-> requests will wait until the ACL has fully transitioned to active mode.
-
-I am not completely happy with this patch. First please split it like
-Gustavo asked since otherwise it becomes pretty hard to review. I don't
-really bother to look into its technical nature before the split and the
-coding style is in place.
-
-Second, please don't make a special case for sniff mode. If we do this
-then we also do it for park state and hold mode.
-
-And third, I think this needs to be done a little bit more in the way we
-handle attempts for connecting ACL links when the baseband is busy. So
-can you send hcidump -X -V traces for the failure of SCO/eSCO setup when
-sniff is active. I like to see which error codes are returned. Hacking
-this directly into sniff exit handling makes the code pretty hard to
-understand in the future.
-
-Regards
-
-Marcel
+Hi Gustavo,
 
 
+> I tried reproduce this issue in L2CAP but it is a bit hard, lets
+> say it happen once in a thousand, so it's not easy to track it. I have
+> to try reproduce that using the SCO, but I'm not used to that layer yet.
+> ;)
+
+
+
+I think the Bluetooth dongle that i am using might be causing the
+problem since it Automatically disconnects which lead to software
+caused connection abort problem
+Beside i found a new problem and that is from time to time the dongle
+shifts the audio
+Stream which makes it appear as static noise i tried to contact the
+vendor of the dongle
+Trust.com regarding the noise problem they told me " We regret to
+inform you that Trust Doesn't provide any support for Linux for the
+moment." so i guess in order to debug this
+Problem properly i have to change the Bluetooth dongle so what type of
+Bluetooth Dongle do you recommend that has linux support.
+
+john
+
+On Mon, May 17, 2010 at 5:32 PM, john michelle <jhnmichelle@gmail.com> wrote:
+> One more Addition
+>
+>>> The problem happens when you are already tranfering
+>>> SCO data?
+>
+> yes,  it happens only during transferring SCO data
+>
+> john
+>
+>
+> On Mon, May 17, 2010 at 5:21 PM, john michelle <jhnmichelle@gmail.com> wrote:
+>>> Hi Jonh,
+>>>
+>>> First of all, don't do top posting in this mailing list. ;)
+>>>
+>>
+>> Thanks for the advise , will keep that in mind for future posts.
+>>
+>>> In which bluez/kernel version the problem started? Any hardware update
+>>> during this time? The problem happens when you are already tranfering
+>>> SCO data?
+>>>
+>>
+>> I tried bluez versions 3.XX  and kernel 2.6.26(I think) the problem
+>> occurs and the kernel panics with no core dumps.then i tried with
+>> bluez 4.53-4.62 with
+>> Kernel 2.6.31 and 2.6.32. the connection abort problem occurs but the
+>> kernel doesn't
+>> Panic. regarding the hardware update you mean the dongle or the box.Anyway
+>> i changed both and tried different box's, this even happens on a box
+>> with 2 giga ram
+>> And core2 processor . as for the dongles i am using trust
+>>
+>> http://www.twenga.co.uk/prices-Bluetooth-2-USB-Adapter-10m-BT-2250p-TRUST-Wireless-network-card-adapter-176178-0
+>>
+>>  and also using no name dongles all the same problem.
+>>
+>>> Please post the output of hcidump when the connection abort happens.
+>>>
+>>
+>> well that is going to be a hard one since i have more than one dongle in place
+>> And very hard to predict which one will crash.i will work on this and update
+>> You as soon as i have the hcidump log.
+>>
+>>
+>>
+>>> I tried reproduce this issue in L2CAP but it is a bit hard, lets
+>>> say it happen once in a thousand, so it's not easy to track it. I have
+>>> to try reproduce that using the SCO, but I'm not used to that layer yet.
+>>> ;)
+>>
+>> I hoped that it happens 1 in 1000 in SCO , but it actually happens 1 in 15
+>>
+>>
+>> John
+>>
+>>
+>>
+>>>
+>>> Regards,
+>>>
+>>>>
+>>>> John
+>>>>
+>>>> On Fri, May 7, 2010 at 3:53 PM, Gustavo F. Padovan <gustavo@padovan.org> wrote:
+>>>> > * john michelle <jhnmichelle@gmail.com> [2010-05-07 15:49:05 -0400]:
+>>>> >
+>>>> >> Hi Bluetooth hackers,
+>>>> >>
+>>>> >> i am having this consistent problem with bluez , from time to time i
+>>>> >> get the error Software caused connection abort (103 )
+>>>> >> And the bluetooth stick seems to disconnect and reconnects. this
+>>>> >> happens during an sco connection and it occurs even
+>>>> >> More when i am having the voice stream comming through the internet
+>>>> >> rather than the lan.i don't know what exact
+>>>> >> Details you need to solve this problem please tell me and i will give
+>>>> >> you an immediate reply . i have linux kernel 2.6.33 and bluez 4.62
+>>>> >
+>>>> > I get the same problem sometimes when testing ERTM with l2test. So the
+>>>> > problem is on l2cap too. I didn't have time to debug this yet. Now that
+>>>> > someone else have confirmed it too, I'll to take a look at the problem.
+>>>> >
+>>>> >>
+>>>
+>>> --
+>>> Gustavo F. Padovan
+>>> http://padovan.org
+>>>
+>>
+>
