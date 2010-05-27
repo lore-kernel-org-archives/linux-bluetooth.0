@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4BFEE9CE.2090506@codeaurora.org>
-Date: Thu, 27 May 2010 16:53:18 -0500
+Message-ID: <4BFEE98F.1080203@codeaurora.org>
+Date: Thu, 27 May 2010 16:52:15 -0500
 From: Ron Shaffer <rshaffer@codeaurora.org>
 MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [Patch v2 2/3] Bluetooth-Reassigned-copyright-to-Code-Aurora-Forum.patch
+Subject: Re: [Patch v2 1/3] Bluetooth-Remove-extraneous-white-space.patch
 References: <4BFEE8D0.7010306@codeaurora.org>
 In-Reply-To: <4BFEE8D0.7010306@codeaurora.org>
 Content-Type: text/plain; charset=ISO-8859-1
@@ -12,53 +12,51 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
-Qualcomm, Inc. has reassigned rights to Code Aurora Forum. Accordingly,
-as files are modified by Code Aurora Forum members, the copyright
-statement will be updated.
+Deleted extraneous white space from the end of several lines
 
 Signed-off-by: Ron Shaffer <rshaffer@codeaurora.org>
 ---
- include/net/bluetooth/hci_core.h |    2 +-
- net/bluetooth/hci_conn.c         |    2 +-
- net/bluetooth/hci_event.c        |    2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+ include/net/bluetooth/hci_core.h |   14 +++++++-------
+ 1 files changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 4a664e6..fd53323 100644
+index e42f6ed..4a664e6 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -1,6 +1,6 @@
- /*
+@@ -1,4 +1,4 @@
+-/* 
++/*
     BlueZ - Bluetooth protocol stack for Linux
--   Copyright (C) 2000-2001 Qualcomm Incorporated
-+   Copyright (c) 2000-2001, 2010, Code Aurora Forum. All rights reserved.
+    Copyright (C) 2000-2001 Qualcomm Incorporated
  
-    Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
+@@ -12,13 +12,13 @@
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS.
+    IN NO EVENT SHALL THE COPYRIGHT HOLDER(S) AND AUTHOR(S) BE LIABLE FOR ANY
+-   CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES 
+-   WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN 
+-   ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF 
++   CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES
++   WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
++   ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index b10e3cd..9bf4308 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1,6 +1,6 @@
- /*
-    BlueZ - Bluetooth protocol stack for Linux
--   Copyright (C) 2000-2001 Qualcomm Incorporated
-+   Copyright (c) 2000-2001, 2010, Code Aurora Forum. All rights reserved.
+-   ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS, 
+-   COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS 
++   ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS,
++   COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS
+    SOFTWARE IS DISCLAIMED.
+ */
  
-    Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
+@@ -380,7 +380,7 @@ static inline void __hci_dev_put(struct hci_dev *d)
+ }
  
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 6c57fc7..3af537a 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1,6 +1,6 @@
- /*
-    BlueZ - Bluetooth protocol stack for Linux
--   Copyright (C) 2000-2001 Qualcomm Incorporated
-+   Copyright (c) 2000-2001, 2010, Code Aurora Forum. All rights reserved.
- 
-    Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
- 
+ static inline void hci_dev_put(struct hci_dev *d)
+-{ 
++{
+ 	__hci_dev_put(d);
+ 	module_put(d->owner);
+ }
 -- 
 1.7.0.2
 
