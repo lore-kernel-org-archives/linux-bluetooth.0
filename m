@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4BFEE98F.1080203@codeaurora.org>
-Date: Thu, 27 May 2010 16:52:15 -0500
+Message-ID: <4BFEE93F.3020503@codeaurora.org>
+Date: Thu, 27 May 2010 16:50:55 -0500
 From: Ron Shaffer <rshaffer@codeaurora.org>
 MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [Patch v2 1/3] Bluetooth-Remove-extraneous-white-space.patch
+Subject: Re: [Patch v2 0/3] Bluetooth-Remove-extraneous-white-space.patch
 References: <4BFEE8D0.7010306@codeaurora.org>
 In-Reply-To: <4BFEE8D0.7010306@codeaurora.org>
 Content-Type: text/plain; charset=ISO-8859-1
@@ -59,7 +59,6 @@ index e42f6ed..4a664e6 100644
  }
 -- 
 1.7.0.2
-
 
 -- 
 Ron Shaffer
