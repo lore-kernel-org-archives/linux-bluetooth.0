@@ -1,55 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: jprvita@profusion.mobi, gustavo@padovan.org, marcel@holtmann.org
-Subject: [PATCH 01/13] Bluetooth: Remove max_tx and tx_window modules paramenter from L2CAP
-Date: Mon, 31 May 2010 14:02:40 -0300
-Message-Id: <1275325372-5671-1-git-send-email-padovan@profusion.mobi>
+MIME-Version: 1.0
+In-Reply-To: <1275216282.4706.90.camel@aeonflux.t-mobile.de>
+References: <AANLkTikmq2PK9jA_nl9eWto8Ihfn_4PHoeWwhRLIwo1C@mail.gmail.com>
+	<1275216282.4706.90.camel@aeonflux.t-mobile.de>
+Date: Mon, 31 May 2010 11:33:58 +0300
+Message-ID: <AANLkTil6ytJDwcCOGhLdgE1TlS9Hih8JSUpNuznOyBnb@mail.gmail.com>
+Subject: Re: Race between SCO disconnection and AVDTP Start
+From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
----
- net/bluetooth/l2cap.c |   12 ++----------
- 1 files changed, 2 insertions(+), 10 deletions(-)
+Hi Marcel,
 
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 1b682a5..5c636b3 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -60,8 +60,6 @@ static int enable_ertm = 1;
- #else
- static int enable_ertm = 0;
- #endif
--static int max_transmit = L2CAP_DEFAULT_MAX_TX;
--static int tx_window = L2CAP_DEFAULT_TX_WINDOW;
- 
- static u32 l2cap_feat_mask = L2CAP_FEAT_FIXED_CHAN;
- static u8 l2cap_fixed_chan[8] = { 0x02, };
-@@ -808,9 +806,9 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
- 			pi->mode = L2CAP_MODE_ERTM;
- 		else
- 			pi->mode = L2CAP_MODE_BASIC;
--		pi->max_tx = max_transmit;
-+		pi->max_tx = L2CAP_DEFAULT_MAX_TX;
- 		pi->fcs  = L2CAP_FCS_CRC16;
--		pi->tx_win = tx_window;
-+		pi->tx_win = L2CAP_DEFAULT_TX_WINDOW;
- 		pi->sec_level = BT_SECURITY_LOW;
- 		pi->role_switch = 0;
- 		pi->force_reliable = 0;
-@@ -4674,12 +4672,6 @@ module_exit(l2cap_exit);
- module_param(enable_ertm, bool, 0644);
- MODULE_PARM_DESC(enable_ertm, "Enable enhanced retransmission mode");
- 
--module_param(max_transmit, uint, 0644);
--MODULE_PARM_DESC(max_transmit, "Max transmit value (default = 3)");
--
--module_param(tx_window, uint, 0644);
--MODULE_PARM_DESC(tx_window, "Transmission window size value (default = 63)");
--
- MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
- MODULE_DESCRIPTION("Bluetooth L2CAP ver " VERSION);
- MODULE_VERSION(VERSION);
--- 
-1.6.4.4
+On Sun, May 30, 2010 at 1:44 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
+> Hi Daniel,
+>
+>> If the audio client closes the SCO connection (by disconnecting the
+>> unix socket to bluetoothd) and then immediately tries to open an A2DP
+>> connection, the kernel might not send the SCO disconnect and AVDTP
+>> Start to the remote in the sequence they were requested by bluetoothd.
+>>
+>> Is there a way to preserve the order, so that SCO disc is consistently
+>> sent before AVDTP Start? (some headsets behave better in this case)
+>>
+>> Have tried with the sockopt SO_LINGER on the SCO socket, but it didn't
+>> seem to make any difference [1].
+>>
+>> /Daniel
+>>
+>> [1] Not sure what LINGER really does here. Looking at the code in
+>> sco_sock_shutdown(), it waits for the BT_CLOSED state:
+>>
+>> __sco_sock_close(sk);
+>>
+>> if (sock_flag(sk, SOCK_LINGER) && sk->sk_lingertime)
+>> =A0 =A0 =A0 =A0 err =3D bt_sock_wait_state(sk, BT_CLOSED, sk->sk_lingert=
+ime);
+>>
+>>
+>> However the socket state is set to BT_CLOSED in sco_chan_del() which
+>> is called from __sco_sock_close(), so it looks like it's waiting for a
+>> state that's already set (or maybe I'm just missing something here?).
+>
+> I would agree that we might need to fix the SO_LINGER implementation and
+> actually wait for the HCI_Disconnect event. And that way we should also
+> only send HUP signal when we received the confirmation that the SCO link
+> has been fully terminated.
+>
+> However in the end the SO_LINGER support is not really helping since it
+> will make close() block. You need to poll() the socket for HUP and that
+> should be done properly inside PulseAudio. And only when the kernel
+> signaled that the SCO connection has been closed, it should try to
+> establish the A2DP one.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+
+Thanks for the reply.
+
+Just to clarify, would the Pulseaudio solution work with the current
+kernel implementation?
+If PA can receive the HUP signal before the SCO link disconnect is
+sent to the remote, I think the same situation could potentially
+occur.
+(Although for timing reasons it might be less likely)
+
+In other words, what is the semantics of HUP in terms of the actual BT link=
+?
+
+Regards,
+Daniel
