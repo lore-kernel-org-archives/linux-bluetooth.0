@@ -1,150 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH 3/3] frame reassembly implementation for data from stream
+Subject: [PATCH 2/3] Replace hci_recv_fragment calls
 From: GLOBAL/suraj <suraj@atheros.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <marcel@holtmann.org>, <Luis.Rodriguez@Atheros.com>,
 	<Jothikumar.Mothilal@Atheros.com>
 Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 1 Jun 2010 12:24:17 +0530
-Message-ID: <1275375257.7163.26.camel@atheros013-desktop>
+Date: Tue, 1 Jun 2010 12:24:14 +0530
+Message-ID: <1275375254.7163.25.camel@atheros013-desktop>
 MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Implemented hci_recv_stream_fragment to reassemble HCI packets received from any data stream
-with packet type not known.
+
+Replace all usages of hci_recv_fragment calls with hci_recv_packet_fragment
 
 Signed-off-by: suraj <suraj@Atheros.com>
 ---
- include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/hci_core.c         |  104 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 105 insertions(+), 0 deletions(-)
+ drivers/bluetooth/btusb.c |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 65c3c13..9892c26 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -429,6 +429,7 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
- int hci_recv_frame(struct sk_buff *skb);
- int hci_recv_packet_fragment(struct hci_dev *hdev, int type, void *data,
- 				int count);
-+int hci_recv_stream_fragment(struct hci_dev *hdev, void *data, int count);
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 5d9cc53..50aa8d1 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -211,7 +211,7 @@ static void btusb_intr_complete(struct urb *urb)
+ 	if (urb->status == 0) {
+ 		hdev->stat.byte_rx += urb->actual_length;
  
- int hci_register_sysfs(struct hci_dev *hdev);
- void hci_unregister_sysfs(struct hci_dev *hdev);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index e7ce432..1587dc8 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1033,6 +1033,110 @@ EXPORT_SYMBOL(hci_recv_frame);
- /* Receive packet type fragment */
- #define __reassembly(hdev, type)  ((hdev)->reassembly[(type) - 2])
+-		if (hci_recv_fragment(hdev, HCI_EVENT_PKT,
++		if (hci_recv_packet_fragment(hdev, HCI_EVENT_PKT,
+ 						urb->transfer_buffer,
+ 						urb->actual_length) < 0) {
+ 			BT_ERR("%s corrupted event packet", hdev->name);
+@@ -295,7 +295,7 @@ static void btusb_bulk_complete(struct urb *urb)
+ 	if (urb->status == 0) {
+ 		hdev->stat.byte_rx += urb->actual_length;
  
-+#define __get_max_rx_size(type)					\
-+		(((type) == HCI_ACLDATA_PKT) ?			\
-+		HCI_MAX_FRAME_SIZE :				\
-+		((type) == HCI_EVENT_PKT) ? HCI_MAX_EVENT_SIZE :\
-+		HCI_MAX_SCO_SIZE)
-+
-+#define __get_header_len(type)					\
-+		(((type) == HCI_ACLDATA_PKT) ?			\
-+		HCI_ACL_HDR_SIZE :				\
-+		((type) == HCI_EVENT_PKT) ? HCI_EVENT_HDR_SIZE :\
-+		HCI_SCO_HDR_SIZE)
-+
-+/* Receive fragment from data streams */
-+int hci_recv_stream_fragment(struct hci_dev *hdev, void *data, int count)
-+{
-+	int type;
-+
-+	while (count) {
-+		/*
-+		 * Reuse first pointer from reassembly array
-+		 */
-+		struct sk_buff *skb = __reassembly(hdev, HCI_ACLDATA_PKT);
-+
-+		struct { int expect; int pkt_type; } *scb;
-+		int len = 0;
-+
-+		if (!skb) {
-+			struct { char type; } *pkt;
-+
-+			/* Start of the frame */
-+			pkt = data;
-+			type = pkt->type;
-+
-+			if (type < HCI_ACLDATA_PKT || type > HCI_EVENT_PKT)
-+				return -EILSEQ;
-+
-+			len = __get_max_rx_size(type);
-+
-+			skb = bt_skb_alloc(len, GFP_ATOMIC);
-+			if (!skb)
-+				return -ENOMEM;
-+
-+			scb = (void *) skb->cb;
-+			scb->expect = __get_header_len(type);
-+			scb->pkt_type = type;
-+
-+			skb->dev = (void *) hdev;
-+			__reassembly(hdev, HCI_ACLDATA_PKT) = skb;
-+
-+			data++;
-+			count--;
-+
-+			continue;
-+		} else {
-+			/* Continue of frame */
-+			scb = (void *) skb->cb;
-+			len = min(scb->expect, count);
-+			type = scb->pkt_type;
-+
-+			memcpy(skb_put(skb, len), data, len);
-+
-+			count -= len;
-+			data += len;
-+			scb->expect -= len;
-+		}
-+
-+		switch (type) {
-+		case HCI_EVENT_PKT:
-+			if (skb->len == HCI_EVENT_HDR_SIZE) {
-+				struct hci_event_hdr *h = hci_event_hdr(skb);
-+				scb->expect = h->plen;
-+			}
-+			break;
-+
-+		case HCI_ACLDATA_PKT:
-+			if (skb->len  == HCI_ACL_HDR_SIZE) {
-+				struct hci_acl_hdr *h = hci_acl_hdr(skb);
-+				scb->expect = __le16_to_cpu(h->dlen);
-+			}
-+			break;
-+
-+		case HCI_SCODATA_PKT:
-+			if (skb->len == HCI_SCO_HDR_SIZE) {
-+				struct hci_sco_hdr *h = hci_sco_hdr(skb);
-+				scb->expect = h->dlen;
-+			}
-+			break;
-+		}
-+
-+		if (scb->expect == 0) {
-+			/* Complete frame */
-+
-+			__reassembly(hdev, HCI_ACLDATA_PKT) = NULL;
-+
-+			bt_cb(skb)->pkt_type = type;
-+			hci_recv_frame(skb);
-+		}
-+
-+	}
-+	return 0;
-+}
-+EXPORT_SYMBOL(hci_recv_stream_fragment);
-+
-+/* Receive packet fragment with known packet type */
- int hci_recv_packet_fragment(struct hci_dev *hdev, int type, void *data,
- 				int count)
- {
+-		if (hci_recv_fragment(hdev, HCI_ACLDATA_PKT,
++		if (hci_recv_packet_fragment(hdev, HCI_ACLDATA_PKT,
+ 						urb->transfer_buffer,
+ 						urb->actual_length) < 0) {
+ 			BT_ERR("%s corrupted ACL packet", hdev->name);
+@@ -384,7 +384,7 @@ static void btusb_isoc_complete(struct urb *urb)
+ 
+ 			hdev->stat.byte_rx += length;
+ 
+-			if (hci_recv_fragment(hdev, HCI_SCODATA_PKT,
++			if (hci_recv_packet_fragment(hdev, HCI_SCODATA_PKT,
+ 						urb->transfer_buffer + offset,
+ 								length) < 0) {
+ 				BT_ERR("%s corrupted SCO packet", hdev->name);
 -- 
 1.7.0
