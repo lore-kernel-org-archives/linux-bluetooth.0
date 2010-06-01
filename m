@@ -1,56 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH 2/3] Replace hci_recv_fragment calls
+Subject: [PATCH 1/3] Rename hci_recv_fragment to hci_recv_packet_fragment
 From: suraj <suraj@atheros.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <marcel@holtmann.org>, <Luis.Rodriguez@Atheros.com>,
 	<Jothikumar.Mothilal@Atheros.com>
-In-Reply-To: <1275379440.19477.9.camel@atheros013-desktop>
-References: <1275379440.19477.9.camel@atheros013-desktop>
 Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 1 Jun 2010 13:38:54 +0530
-Message-ID: <1275379734.19477.14.camel@atheros013-desktop>
+Date: Tue, 1 Jun 2010 13:34:00 +0530
+Message-ID: <1275379440.19477.9.camel@atheros013-desktop>
 MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Replace all usages of hci_recv_fragment calls with
-hci_recv_packet_fragment
-
+Renaming hci_recv_fragment to hci_recv_packet_fragment as it will be used 
+only for reassembling HCI fragments with know packet type.
 
 Signed-off-by: suraj <suraj@Atheros.com>
 ---
- drivers/bluetooth/btusb.c |    6 +++---
- 1 files changed, 3 insertions(+), 3 deletions(-)
+ include/net/bluetooth/hci_core.h |    3 ++-
+ net/bluetooth/hci_core.c         |    5 +++--
+ 2 files changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 5d9cc53..50aa8d1 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -211,7 +211,7 @@ static void btusb_intr_complete(struct urb *urb)
- 	if (urb->status == 0) {
- 		hdev->stat.byte_rx += urb->actual_length;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index e42f6ed..65c3c13 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -427,7 +427,8 @@ int hci_inquiry(void __user *arg);
+ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
  
--		if (hci_recv_fragment(hdev, HCI_EVENT_PKT,
-+		if (hci_recv_packet_fragment(hdev, HCI_EVENT_PKT,
- 						urb->transfer_buffer,
- 						urb->actual_length) < 0) {
- 			BT_ERR("%s corrupted event packet", hdev->name);
-@@ -295,7 +295,7 @@ static void btusb_bulk_complete(struct urb *urb)
- 	if (urb->status == 0) {
- 		hdev->stat.byte_rx += urb->actual_length;
+ int hci_recv_frame(struct sk_buff *skb);
+-int hci_recv_fragment(struct hci_dev *hdev, int type, void *data, int count);
++int hci_recv_packet_fragment(struct hci_dev *hdev, int type, void *data,
++				int count);
  
--		if (hci_recv_fragment(hdev, HCI_ACLDATA_PKT,
-+		if (hci_recv_packet_fragment(hdev, HCI_ACLDATA_PKT,
- 						urb->transfer_buffer,
- 						urb->actual_length) < 0) {
- 			BT_ERR("%s corrupted ACL packet", hdev->name);
-@@ -384,7 +384,7 @@ static void btusb_isoc_complete(struct urb *urb)
+ int hci_register_sysfs(struct hci_dev *hdev);
+ void hci_unregister_sysfs(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 5e83f8e..e7ce432 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1033,7 +1033,8 @@ EXPORT_SYMBOL(hci_recv_frame);
+ /* Receive packet type fragment */
+ #define __reassembly(hdev, type)  ((hdev)->reassembly[(type) - 2])
  
- 			hdev->stat.byte_rx += length;
+-int hci_recv_fragment(struct hci_dev *hdev, int type, void *data, int count)
++int hci_recv_packet_fragment(struct hci_dev *hdev, int type, void *data,
++				int count)
+ {
+ 	if (type < HCI_ACLDATA_PKT || type > HCI_EVENT_PKT)
+ 		return -EILSEQ;
+@@ -1112,7 +1113,7 @@ int hci_recv_fragment(struct hci_dev *hdev, int type, void *data, int count)
  
--			if (hci_recv_fragment(hdev, HCI_SCODATA_PKT,
-+			if (hci_recv_packet_fragment(hdev, HCI_SCODATA_PKT,
- 						urb->transfer_buffer + offset,
- 								length) < 0) {
- 				BT_ERR("%s corrupted SCO packet", hdev->name);
+ 	return 0;
+ }
+-EXPORT_SYMBOL(hci_recv_fragment);
++EXPORT_SYMBOL(hci_recv_packet_fragment);
+ 
+ /* ---- Interface to upper protocols ---- */
+ 
 -- 
 1.7.0
