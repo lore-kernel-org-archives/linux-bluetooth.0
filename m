@@ -2,174 +2,457 @@ Return-Path: <cyrus@holtmann.org>
 From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Subject: [PATCH 08/32] Work in getting remote SDP records
-Date: Wed,  2 Jun 2010 15:19:04 +0200
-Message-Id: <1275484768-25838-9-git-send-email-santoscadenas@gmail.com>
-In-Reply-To: <1275484768-25838-8-git-send-email-santoscadenas@gmail.com>
+Subject: [PATCH 03/32] Add functions to resiger health instances in SDP
+Date: Wed,  2 Jun 2010 15:18:59 +0200
+Message-Id: <1275484768-25838-4-git-send-email-santoscadenas@gmail.com>
+In-Reply-To: <1275484768-25838-3-git-send-email-santoscadenas@gmail.com>
 References: <1275484768-25838-1-git-send-email-santoscadenas@gmail.com>
  <1275484768-25838-2-git-send-email-santoscadenas@gmail.com>
  <1275484768-25838-3-git-send-email-santoscadenas@gmail.com>
- <1275484768-25838-4-git-send-email-santoscadenas@gmail.com>
- <1275484768-25838-5-git-send-email-santoscadenas@gmail.com>
- <1275484768-25838-6-git-send-email-santoscadenas@gmail.com>
- <1275484768-25838-7-git-send-email-santoscadenas@gmail.com>
- <1275484768-25838-8-git-send-email-santoscadenas@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- health/hdp.c      |   80 ++++++++++++++++++++++++++++++++++++++++++++--------
- health/hdp_util.c |    5 +++
+ health/hdp.c      |    5 +-
+ health/hdp_util.c |  393 +++++++++++++++++++++++++++++++++++++++++++++++++++++
  health/hdp_util.h |    1 +
- 3 files changed, 73 insertions(+), 13 deletions(-)
+ 3 files changed, 398 insertions(+), 1 deletions(-)
 
 diff --git a/health/hdp.c b/health/hdp.c
-index 9ca2e52..68bd809 100644
+index 281be05..ede4186 100644
 --- a/health/hdp.c
 +++ b/health/hdp.c
-@@ -31,6 +31,8 @@
- #include "hdp_util.h"
- #include "device.h"
+@@ -101,7 +101,10 @@ static DBusMessage *hdp_create_instance(DBusConnection *conn,
  
-+#include "glib-helper.h"
-+
- #include "../src/dbus-common.h"
+ 	/* TODO: Create mcap instance */
  
- #define HEALTH_MANAGER_INTERFACE       "org.bluez.HealthAdapter"
-@@ -39,6 +41,11 @@
- static GSList *adapters = NULL;
- static GSList *devices = NULL;
- 
-+struct instances_aux {
-+	struct hdp_device	*device;
-+	DBusMessage		*msg;
-+};
-+
- static struct hdp_adapter *find_adapter(GSList *list,
- 					struct btd_adapter *btd_adapter)
- {
-@@ -69,27 +76,73 @@ static struct hdp_device *find_device(GSList *devices, struct btd_device *dev)
- 	return NULL;
- }
- 
-+static void sink_health_instances(sdp_list_t *recs, int err, gpointer user_data)
-+{
-+	struct instances_aux *cb_data = user_data;
-+	DBusMessage *msg = cb_data->msg;
-+	struct hdp_device *device = cb_data->device;
-+	DBusMessage *reply;
-+	sdp_record_t *rec;
-+	sdp_list_t *l;
-+	guint8 data_spec;
-+	GSList *end_points;
-+
-+	g_free(cb_data);
-+
-+	if (err != 0) {
-+		error("Error getting sink records");
-+		reply = g_dbus_create_error(msg, ERROR_INTERFACE ".HealthError",
-+					"Error getting remote information");
-+		g_dbus_send_message(device->conn, reply);
-+		return;
+-	/* TODO: Create SDP record if needed. */
++	if (!hdp_register_sdp_record(hdpi)) {
++		return g_dbus_create_error(msg, ERROR_INTERFACE ".HealthError",
++					"Session can't be registered");
 +	}
-+
-+	for (l = recs; l; l = l->next) {
-+		rec = l->data;
-+		debug("Record found 0x%x", rec->handle);
-+		/* TODO: Check record */
-+		if (!hdp_get_data_exchange_spec(rec, &data_spec)) {
-+			error("Error getting data exchange info");
-+			continue;
-+		}
-+		end_points = hdp_get_end_points(rec);
-+		if (!end_points) {
-+			error("Error getting end points");
-+			continue;
-+		}
-+		debug("Get data exchange spec %d", data_spec);
-+	}
-+
-+	reply = g_dbus_create_error(msg, ERROR_INTERFACE ".HealthError",
-+							"Not implemented yet");
-+	g_dbus_send_message(device->conn, reply);
-+}
-+
- static DBusMessage *get_health_instances(DBusConnection *conn,
- 					DBusMessage *msg, void *user_data)
- {
- 	struct hdp_device *device = user_data;
--	const sdp_record_t *rec;
--	guint8 data_spec;
-+	struct btd_adapter *adapter;
-+	struct instances_aux *cb_data;
-+	bdaddr_t src, dst;
-+	uuid_t uuid;
  
--	rec = btd_device_get_record(device->dev, HDP_UUID);
-+	adapter = device_get_adapter(device->dev);
-+	adapter_get_address(adapter, &src);
-+	device_get_address(device->dev, &dst);
- 
--	if (!rec) {
--		debug("No record found");
--		goto error;
--	}
-+	cb_data = g_new0(struct instances_aux, 1);
-+	cb_data->device = device;
-+	cb_data->msg = dbus_message_ref(msg);
- 
--	if (!hdp_get_data_exchange_spec(rec, &data_spec))
--		goto error;
- 
--	debug("Get data exchange spec %d", data_spec);
--error:
-+	bt_string2uuid(&uuid, HDP_UUID);
-+	if (bt_search_service(&src, &dst, &uuid, sink_health_instances,
-+						cb_data, NULL) == 0)
-+		return NULL;
-+
- 	return g_dbus_create_error(msg, ERROR_INTERFACE ".HealthError",
--					"Cannot get the remote SDP record");
-+				"Error getting remote information");
- }
- 
- static void health_device_free(struct hdp_device *device)
-@@ -119,7 +172,8 @@ static void dev_path_unregister(void *data)
- }
- 
- static GDBusMethodTable device_methods[] = {
--	{ "GetHealthInstances",	"",	"a{sv}",	get_health_instances },
-+	{ "GetHealthInstances", "", "a{sv}", get_health_instances,
-+						G_DBUS_METHOD_FLAG_ASYNC },
- 	{ NULL }
- };
- 
+ 	return g_dbus_create_error(msg,
+ 					ERROR_INTERFACE ".HealthError",
 diff --git a/health/hdp_util.c b/health/hdp_util.c
-index 42f28bf..a6d09c5 100644
+index 8f6befc..b386be5 100644
 --- a/health/hdp_util.c
 +++ b/health/hdp_util.c
-@@ -781,6 +781,11 @@ static gboolean register_data_exchange_spec(struct hdp_config *config,
- 	return TRUE;
- }
+@@ -24,8 +24,14 @@
+  */
  
-+GSList *hdp_get_end_points(const sdp_record_t *rec)
+ #include <gdbus.h>
++#include <bluetooth/sdp.h>
++#include <bluetooth/sdp_lib.h>
+ #include "logging.h"
++#include "sdpd.h"
++
+ #include "hdp_types.h"
++#include "hdp_util.h"
++#include "mcap.h"
+ 
+ typedef gboolean (*parse_item_f)(DBusMessageIter *iter, GError **err,
+ 							gpointer user_data);
+@@ -445,3 +451,390 @@ error:
+ 		free_config(config);
+ 	return NULL;
+ }
++
++static gboolean is_session_role(struct hdp_instance *hdps, HdpRole role)
 +{
++	GSList *l;
++	struct hdp_supp_fts *fts;
++
++	if (!hdps->config)
++		return FALSE;
++	for (l = hdps->config->supp_fts; l; l = l->next) {
++		fts = l->data;
++		if (fts->role == role)
++			return TRUE;
++	}
++
++	return FALSE;
++}
++
++static gboolean register_service_protocols(struct hdp_instance *hdps,
++						sdp_record_t *sdp_record)
++{
++	gboolean error = FALSE;
++	uuid_t l2cap_uuid, mcap_c_uuid;
++	sdp_list_t *l2cap_list = NULL,
++	           *proto_list = NULL,
++		   *mcap_list = NULL,
++		   *access_proto_list = NULL;
++	sdp_data_t *psm = NULL,
++		   *mcap_ver = NULL;
++	uint16_t version = MCAP_VERSION;
++
++	// set l2cap information
++	sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
++	l2cap_list = sdp_list_append(NULL, &l2cap_uuid);
++	if (!l2cap_list) {
++		error = TRUE;
++		goto end;
++	}
++	psm = sdp_data_alloc(SDP_UINT16, &hdps->ccpsm);
++	if (!psm) {
++		error = TRUE;
++		goto end;
++	}
++	if (!sdp_list_append(l2cap_list, psm)) {
++		error = TRUE;
++		goto end;
++	}
++	proto_list = sdp_list_append(NULL, l2cap_list);
++	if (!proto_list) {
++		error = TRUE;
++		goto end;
++	}
++
++	// set mcap information
++	sdp_uuid16_create(&mcap_c_uuid, MCAP_CTRL_UUID);
++	mcap_list = sdp_list_append(NULL, &mcap_c_uuid);
++	if (!mcap_list) {
++		error = TRUE;
++		goto end;
++	}
++	mcap_ver = sdp_data_alloc(SDP_UINT16, &version);
++	if (!mcap_ver) {
++		error = TRUE;
++		goto end;
++	}
++	if (!sdp_list_append( mcap_list, mcap_ver)) {
++		error = TRUE;
++		goto end;
++	}
++	if (!sdp_list_append( proto_list, mcap_list)) {
++		error = TRUE;
++		goto end;
++	}
++
++	// attach protocol information to service record
++	access_proto_list = sdp_list_append(NULL, proto_list);
++	if (!access_proto_list) {
++		error = TRUE;
++		goto end;
++	}
++	if (sdp_set_access_protos(sdp_record, access_proto_list) < 0)
++		error = TRUE;
++end:
++	if (l2cap_list)
++		sdp_list_free(l2cap_list, NULL);
++	if (mcap_list)
++		sdp_list_free(mcap_list, NULL);
++	if (proto_list)
++		sdp_list_free(proto_list, NULL);
++	if (access_proto_list)
++		sdp_list_free(access_proto_list, NULL);
++	if (psm)
++		sdp_data_free(psm);
++	if (mcap_ver)
++		sdp_data_free(mcap_ver);
++	return !error;
++}
++
++static gboolean register_service_profiles(sdp_record_t *sdp_record)
++{
++	gboolean error = FALSE;
++	sdp_list_t *profile_list = NULL;
++	sdp_profile_desc_t hdp_profile;
++
++	// set hdp information
++	sdp_uuid16_create( &hdp_profile.uuid, MDP_SVCLASS_ID);
++	hdp_profile.version = HDP_VERSION;
++	profile_list = sdp_list_append(NULL, &hdp_profile);
++	if (!profile_list)
++		return FALSE;
++	// set profile descriptor list
++	if (sdp_set_profile_descs(sdp_record, profile_list) < 0)
++		error = TRUE;
++
++	sdp_list_free(profile_list, NULL);
++	return !error;
++}
++
++static gboolean register_service_aditional_protocols(struct hdp_instance *hdps,
++						sdp_record_t *sdp_record)
++{
++	gboolean error = FALSE;
++	uuid_t l2cap_uuid, mcap_d_uuid;
++	sdp_list_t *l2cap_list = NULL,
++		   *proto_list = NULL,
++		   *mcap_list = NULL,
++		   *access_proto_list = NULL;
++	sdp_data_t *psm = NULL;
++
++	// set l2cap information
++	sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
++	l2cap_list = sdp_list_append(NULL, &l2cap_uuid);
++	if (!l2cap_list) {
++		error = TRUE;
++		goto end;
++	}
++	psm = sdp_data_alloc(SDP_UINT16, &hdps->dcpsm);
++	if (!psm) {
++		error = TRUE;
++		goto end;
++	}
++	if (!sdp_list_append(l2cap_list, psm)) {
++		error = TRUE;
++		goto end;
++	}
++	proto_list = sdp_list_append(NULL, l2cap_list);
++	if (!proto_list) {
++		error = TRUE;
++		goto end;
++	}
++
++	// set mcap information
++	sdp_uuid16_create(&mcap_d_uuid, MCAP_DATA_UUID);
++	mcap_list = sdp_list_append(NULL, &mcap_d_uuid);
++	if (!mcap_list) {
++		error = TRUE;
++		goto end;
++	}
++	if (!sdp_list_append( proto_list, mcap_list)) {
++		error = TRUE;
++		goto end;
++	}
++
++	// attach protocol information to service record
++	access_proto_list = sdp_list_append(NULL, proto_list);
++	if (!access_proto_list) {
++		error = TRUE;
++		goto end;
++	}
++	if (sdp_set_add_access_protos(sdp_record, access_proto_list) < 0)
++		error = TRUE;
++end:
++	if (l2cap_list)
++		sdp_list_free(l2cap_list, NULL);
++	if (mcap_list)
++		sdp_list_free(mcap_list, NULL);
++	if (proto_list)
++		sdp_list_free(proto_list, NULL);
++	if (access_proto_list)
++		sdp_list_free(access_proto_list, NULL);
++	if (psm)
++		sdp_data_free(psm);
++	return !error;
++}
++
++static sdp_list_t *feature_to_sdplist(struct hdp_supp_fts *fts,
++							struct hdp_feature *f)
++{
++	sdp_data_t *mdepid,
++		   *dtype = NULL,
++		   *role = NULL,
++		   *desc = NULL;
++	sdp_list_t *f_list = NULL;
++
++	mdepid = sdp_data_alloc(SDP_UINT8, &fts->mdepid);
++	if (!mdepid)
++		return NULL;
++	dtype = sdp_data_alloc(SDP_UINT16, &f->dtype);
++	if (!dtype)
++		goto error;
++	role = sdp_data_alloc(SDP_UINT8, &fts->role);
++	if (!role)
++		goto error;
++	if (f->dscr) {
++		desc = sdp_data_alloc(SDP_TEXT_STR8, f->dscr);
++		if (!desc)
++			goto error;
++	}
++	f_list = sdp_list_append(NULL, mdepid);
++	if (!f_list)
++		goto error;
++	if (!sdp_list_append(f_list, dtype))
++		goto error;
++	if (!sdp_list_append(f_list, role))
++		goto error;
++	if (desc)
++		if (!sdp_list_append(f_list, desc))
++			goto error;
++	return f_list;
++error:
++	if (f_list)
++		sdp_list_free(f_list, NULL);
++	if (mdepid)
++		sdp_data_free(mdepid);
++	if (dtype)
++		sdp_data_free(dtype);
++	if (role)
++		sdp_data_free(role);
++	if (desc)
++		sdp_data_free(desc);
 +	return NULL;
 +}
 +
- static gboolean register_mcap_features(sdp_record_t *sdp_record)
- {
- 	sdp_data_t *mcap_proc;
++static gboolean register_features(struct hdp_supp_fts *fts,
++						sdp_list_t **sup_features)
++{
++	GSList *l;
++	sdp_list_t *hdp_feature = NULL;
++
++	for (l = fts->features; l; l = l->next){
++		hdp_feature = feature_to_sdplist(fts, l->data);
++		if (!hdp_feature)
++			goto error;
++
++		if (!*sup_features) {
++			*sup_features = sdp_list_append(NULL, hdp_feature);
++			if (!*sup_features)
++				goto error;
++		} else if (!sdp_list_append(*sup_features, hdp_feature))
++				goto error;
++		hdp_feature = NULL;
++	}
++	return TRUE;
++error:
++	if (hdp_feature)
++		sdp_list_free(hdp_feature, (sdp_free_func_t)sdp_data_free);
++	return FALSE;
++}
++
++static void free_hdp_list(void *list)
++{
++	sdp_list_t *hdp_list = list;
++
++	sdp_list_free(hdp_list, (sdp_free_func_t)sdp_data_free);
++}
++
++static gboolean register_service_sup_features(struct hdp_config *config,
++						sdp_record_t *sdp_record)
++{
++	GSList *l;
++	sdp_list_t *sup_features = NULL;
++	for (l = config->supp_fts; l; l = l->next) {
++		if (!register_features(l->data, &sup_features))
++			return FALSE;
++	}
++	if (sdp_set_supp_feat(sdp_record, sup_features) < 0) {
++		sdp_list_free(sup_features, free_hdp_list);
++		return FALSE;
++	}
++	return TRUE;
++}
++
++static gboolean register_data_exchange_spec(struct hdp_config *config,
++							sdp_record_t *record)
++{
++	sdp_data_t *spec;
++
++	spec = sdp_data_alloc(SDP_UINT8, &config->data_spec);
++	if (!spec)
++		return FALSE;
++	if (sdp_attr_add(record, SDP_ATTR_DATA_EXCHANGE_SPEC, spec) < 0) {
++		sdp_data_free(spec);
++		return FALSE;
++	}
++
++	return TRUE;
++}
++
++static gboolean register_mcap_features(sdp_record_t *sdp_record)
++{
++	sdp_data_t *mcap_proc;
++	uint8_t mcap_sup_proc = MCAP_SUP_PROC;
++
++	mcap_proc = sdp_data_alloc(SDP_UINT8, &mcap_sup_proc);
++	if (!mcap_proc)
++		return FALSE;
++	if (sdp_attr_add(sdp_record, SDP_ATTR_MCAP_SUPPORTED_PROCEDURES,
++							mcap_proc) < 0) {
++		sdp_data_free(mcap_proc);
++		return FALSE;
++	}
++	return TRUE;
++}
++
++static gboolean set_sdp_services_uuid(sdp_record_t *record, HdpRole role)
++{
++	uuid_t svc_uuid_source, svc_uuid_sink;
++	sdp_list_t *svc_list = NULL;
++
++	sdp_uuid16_create(&svc_uuid_sink, MDP_SINK_SVCLASS_ID);
++	sdp_uuid16_create(&svc_uuid_source, MDP_SOURCE_SVCLASS_ID);
++
++	sdp_get_service_classes(record, &svc_list);
++
++	if (role == HDP_SOURCE) {
++		if (sdp_list_find(svc_list, &svc_uuid_source, sdp_uuid_cmp) == NULL)
++			svc_list = sdp_list_append(svc_list, &svc_uuid_source);
++	}
++	else if (role == HDP_SINK) {
++		if (sdp_list_find(svc_list, &svc_uuid_sink, sdp_uuid_cmp) == NULL)
++			svc_list = sdp_list_append(svc_list, &svc_uuid_sink);
++	}
++
++	if (sdp_set_service_classes(record, svc_list) < 0) {
++		sdp_list_free(svc_list, NULL);
++		return FALSE;
++	}
++
++	sdp_list_free(svc_list, NULL);
++	return TRUE;
++}
++
++gboolean hdp_register_sdp_record(struct hdp_instance *hdps)
++{
++	sdp_record_t *sdp_record;
++	struct hdp_config *config;
++	bdaddr_t addr;
++
++	if (!hdps->config) /* Record is not needed */
++		return TRUE;
++	config = hdps->config;
++
++	sdp_record = sdp_record_alloc();
++	if (!sdp_record)
++		return FALSE;
++	sdp_record->handle = 0xffffffff; /* Set automatically */
++
++	if (is_session_role(hdps, HDP_SINK))
++		set_sdp_services_uuid(sdp_record, HDP_SINK);
++	if (is_session_role(hdps, HDP_SOURCE))
++		set_sdp_services_uuid(sdp_record, HDP_SOURCE);
++
++	if (!register_service_protocols(hdps, sdp_record))
++		goto error;
++	if (!register_service_profiles(sdp_record))
++		goto error;
++	if (!register_service_aditional_protocols(hdps, sdp_record))
++		goto error;
++	sdp_set_info_attr(sdp_record, config->svc_name, config->svc_prov,
++							config->svc_dsc);
++	if (!register_service_sup_features(config, sdp_record))
++		goto error;
++	if (!register_data_exchange_spec(config, sdp_record))
++		goto error;
++
++	register_mcap_features(sdp_record);
++
++	adapter_get_address(hdps->adapter->btd_adapter, &addr);
++
++	if (add_record_to_server(&addr, sdp_record) < 0)
++		goto error;
++	hdps->sdp_handler = sdp_record->handle;
++	return TRUE;
++error:
++	if (sdp_record)
++		sdp_record_free(sdp_record);
++	return FALSE;
++}
 diff --git a/health/hdp_util.h b/health/hdp_util.h
-index 0fdaaec..beafa00 100644
+index f09e9a6..fb114c7 100644
 --- a/health/hdp_util.h
 +++ b/health/hdp_util.h
-@@ -32,6 +32,7 @@
+@@ -30,5 +30,6 @@
+ #include "hdp_types.h"
+ 
  struct hdp_config *hdp_get_config(DBusMessageIter *iter, GError **err);
- gboolean hdp_register_sdp_record(struct hdp_instance *hdps);
- gboolean hdp_get_data_exchange_spec(const sdp_record_t *rec, guint8 *val);
-+GSList *hdp_get_end_points(const sdp_record_t *rec);
- void hdp_instance_free(struct hdp_instance *hdpi);
++gboolean hdp_register_sdp_record(struct hdp_instance *hdps);
  
  #endif /* __HDP_UTIL_H__ */
 -- 
