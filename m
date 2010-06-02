@@ -2,10 +2,10 @@ Return-Path: <cyrus@holtmann.org>
 From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Subject: [PATCH 09/32] Adds functions to get remote suported features from its SDP record
-Date: Wed,  2 Jun 2010 15:19:05 +0200
-Message-Id: <1275484768-25838-10-git-send-email-santoscadenas@gmail.com>
-In-Reply-To: <1275484768-25838-9-git-send-email-santoscadenas@gmail.com>
+Subject: [PATCH 23/32] Avoid multiple links with the same device
+Date: Wed,  2 Jun 2010 15:19:19 +0200
+Message-Id: <1275484768-25838-24-git-send-email-santoscadenas@gmail.com>
+In-Reply-To: <1275484768-25838-23-git-send-email-santoscadenas@gmail.com>
 References: <1275484768-25838-1-git-send-email-santoscadenas@gmail.com>
  <1275484768-25838-2-git-send-email-santoscadenas@gmail.com>
  <1275484768-25838-3-git-send-email-santoscadenas@gmail.com>
@@ -15,102 +15,109 @@ References: <1275484768-25838-1-git-send-email-santoscadenas@gmail.com>
  <1275484768-25838-7-git-send-email-santoscadenas@gmail.com>
  <1275484768-25838-8-git-send-email-santoscadenas@gmail.com>
  <1275484768-25838-9-git-send-email-santoscadenas@gmail.com>
+ <1275484768-25838-10-git-send-email-santoscadenas@gmail.com>
+ <1275484768-25838-11-git-send-email-santoscadenas@gmail.com>
+ <1275484768-25838-12-git-send-email-santoscadenas@gmail.com>
+ <1275484768-25838-13-git-send-email-santoscadenas@gmail.com>
+ <1275484768-25838-14-git-send-email-santoscadenas@gmail.com>
+ <1275484768-25838-15-git-send-email-santoscadenas@gmail.com>
+ <1275484768-25838-16-git-send-email-santoscadenas@gmail.com>
+ <1275484768-25838-17-git-send-email-santoscadenas@gmail.com>
+ <1275484768-25838-18-git-send-email-santoscadenas@gmail.com>
+ <1275484768-25838-19-git-send-email-santoscadenas@gmail.com>
+ <1275484768-25838-20-git-send-email-santoscadenas@gmail.com>
+ <1275484768-25838-21-git-send-email-santoscadenas@gmail.com>
+ <1275484768-25838-22-git-send-email-santoscadenas@gmail.com>
+ <1275484768-25838-23-git-send-email-santoscadenas@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- health/hdp_util.c |   74 +++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 files changed, 69 insertions(+), 5 deletions(-)
+ health/hdp.c |   42 ++++++++++++++++++++++++++++++++++++++++--
+ 1 files changed, 40 insertions(+), 2 deletions(-)
 
-diff --git a/health/hdp_util.c b/health/hdp_util.c
-index a6d09c5..b59e4e3 100644
---- a/health/hdp_util.c
-+++ b/health/hdp_util.c
-@@ -781,11 +781,6 @@ static gboolean register_data_exchange_spec(struct hdp_config *config,
- 	return TRUE;
+diff --git a/health/hdp.c b/health/hdp.c
+index 10621c4..25a644c 100644
+--- a/health/hdp.c
++++ b/health/hdp.c
+@@ -117,7 +117,8 @@ static int hdp_instance_idcmp(gconstpointer instance, gconstpointer p)
+ 	return -1;
  }
  
--GSList *hdp_get_end_points(const sdp_record_t *rec)
--{
--	return NULL;
--}
--
- static gboolean register_mcap_features(sdp_record_t *sdp_record)
- {
- 	sdp_data_t *mcap_proc;
-@@ -887,3 +882,72 @@ gboolean hdp_get_data_exchange_spec(const sdp_record_t *rec, guint8 *val)
- 	*val = exspec->val.uint8;
- 	return TRUE;
+-static int hdp_link_mcl_cmp(gconstpointer link, gconstpointer mcl){
++static int hdp_link_mcl_cmp(gconstpointer link, gconstpointer mcl)
++{
+ 	const struct hdp_link *hdpl = link;
+ 
+ 	if (hdpl->mcl == mcl)
+@@ -125,6 +126,17 @@ static int hdp_link_mcl_cmp(gconstpointer link, gconstpointer mcl){
+ 	return -1;
  }
-+
-+static gint cmp_feat_mdep(gconstpointer a, gconstpointer b)
+ 
++static int hdp_link_addr_cmp(gconstpointer link, gconstpointer addr)
 +{
-+	const struct hdp_supp_fts *fts = a;
-+	const guint8 *mdep = b;
++	const struct hdp_link *hdpl = link;
++	const bdaddr_t *dst;
++        bdaddr_t mcl_addr;
 +
-+	if (fts->mdepid == *mdep)
-+		return 0;
-+	return -1;
++	dst = addr;
++	mcl_addr = mcap_mcl_get_addr(hdpl->mcl);
++	return bacmp(addr, &mcl_addr);
 +}
 +
-+static GSList *get_feature(GSList *epl, sdp_data_t *feat_seq)
+ static void set_health_link_path(struct hdp_link *hdpl)
+ {
+ 	char path[MAX_PATH_LENGTH + 1];
+@@ -534,12 +546,27 @@ fail:
+ 	g_dbus_send_message(device->conn, reply);
+ }
+ 
++static struct hdp_link *get_health_link(struct hdp_instance *hdpi,
++						struct hdp_device *device)
 +{
-+	struct hdp_supp_fts *fts;
-+	struct hdp_feature *feat;
++	bdaddr_t dst;
 +	GSList *l;
-+	sdp_data_t *mdepid, *dtype, *role, *desc;
 +
-+	mdepid = feat_seq;
-+	if (!mdepid || mdepid->dtd != SDP_UINT8)
-+		return epl;
-+	dtype = mdepid->next;
-+	if (!dtype || dtype->dtd != SDP_UINT16)
-+		return epl;
-+	role = dtype->next;
-+	if (!role || role->dtd != SDP_UINT8)
-+		return epl;
-+	desc = role->next;
-+
-+	l = g_slist_find_custom(epl, &mdepid->val.uint8, cmp_feat_mdep);
-+	if (l) {
-+		fts = l->data;
-+		if (fts->role != role->val.uint8)
-+			return epl;
-+	} else {
-+		fts = g_new0(struct hdp_supp_fts, 1);
-+		fts->mdepid = mdepid->val.uint8;
-+		fts->role = role->val.uint8;
-+		epl = g_slist_prepend(epl, fts);
-+	}
-+
-+	feat = g_new0(struct hdp_feature, 1);
-+	feat->dtype = dtype->val.uint16;
-+	if (desc && desc->dtd == SDP_TEXT_STR8)
-+		feat->dscr = g_strdup(desc->val.str);
-+	fts->features = g_slist_prepend(fts->features, feat);
-+	return epl;
++	device_get_address(device->dev, &dst);
++	l = g_slist_find_custom(hdpi->hlink, &dst, hdp_link_addr_cmp);
++	if (l)
++		return l->data;
++	return NULL;
 +}
 +
-+GSList *hdp_get_end_points(const sdp_record_t *rec)
-+{
-+	GSList *epl = NULL;
-+	sdp_data_t *end_points, *l;
-+
-+	end_points = sdp_data_get(rec, SDP_ATTR_SUPPORTED_FEATURES_LIST);
-+
-+	if (end_points->dtd != SDP_SEQ8)
-+		return NULL;
-+
-+	for (l = end_points->val.dataseq; l; l = l->next) {
-+		if (l->dtd != SDP_SEQ8)
-+			continue;
-+		epl = get_feature(epl, l->val.dataseq);
+ static DBusMessage *hdp_connect(DBusConnection *conn,
+ 					DBusMessage *msg, void *user_data)
+ {
+ 	struct hdp_device *device = user_data;
+ 	struct hdp_connection_cb *cb_data;
+ 	struct btd_adapter *adapter;
++	struct hdp_instance *hdpi;
++	struct hdp_link *hdpl;
+ 	bdaddr_t src, dst;
+ 	uint32_t lid, rid;
+ 	uuid_t uuid;
+@@ -561,9 +588,20 @@ static DBusMessage *hdp_connect(DBusConnection *conn,
+ 					   ERROR_INTERFACE ".InvalidArguments",
+ 					   "Invalid local health instance id");
+ 
++	hdpi = l->data;
++	hdpl = get_health_link(hdpi, device);
++	if (hdpl) {
++		if (hdpl->closed) {
++			debug("Need a reconection");
++			/* TODO: Reconnect */;
++		} else
++			return g_dbus_create_reply(msg, DBUS_TYPE_OBJECT_PATH,
++						&hdpl->path, DBUS_TYPE_INVALID);
 +	}
 +
-+	g_slist_foreach(epl, print_features, NULL);
-+
-+	return epl;
-+}
+ 	cb_data = g_new0(struct hdp_connection_cb, 1);
+ 	cb_data->device = device;
+-	cb_data->hdpi = l->data;
++	cb_data->hdpi = hdpi;
+ 	cb_data->rem_id = rid;
+ 	cb_data->msg = dbus_message_ref(msg);
+ 
 -- 
 1.6.3.3
 
