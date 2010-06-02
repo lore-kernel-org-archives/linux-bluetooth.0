@@ -2,10 +2,10 @@ Return-Path: <cyrus@holtmann.org>
 From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Subject: [PATCH 22/32] Initial work for disconnecting health links
-Date: Wed,  2 Jun 2010 15:19:18 +0200
-Message-Id: <1275484768-25838-23-git-send-email-santoscadenas@gmail.com>
-In-Reply-To: <1275484768-25838-22-git-send-email-santoscadenas@gmail.com>
+Subject: [PATCH 27/32] Change function name when retreiving remote SDP records
+Date: Wed,  2 Jun 2010 15:19:23 +0200
+Message-Id: <1275484768-25838-28-git-send-email-santoscadenas@gmail.com>
+In-Reply-To: <1275484768-25838-27-git-send-email-santoscadenas@gmail.com>
 References: <1275484768-25838-1-git-send-email-santoscadenas@gmail.com>
  <1275484768-25838-2-git-send-email-santoscadenas@gmail.com>
  <1275484768-25838-3-git-send-email-santoscadenas@gmail.com>
@@ -28,79 +28,39 @@ References: <1275484768-25838-1-git-send-email-santoscadenas@gmail.com>
  <1275484768-25838-20-git-send-email-santoscadenas@gmail.com>
  <1275484768-25838-21-git-send-email-santoscadenas@gmail.com>
  <1275484768-25838-22-git-send-email-santoscadenas@gmail.com>
+ <1275484768-25838-23-git-send-email-santoscadenas@gmail.com>
+ <1275484768-25838-24-git-send-email-santoscadenas@gmail.com>
+ <1275484768-25838-25-git-send-email-santoscadenas@gmail.com>
+ <1275484768-25838-26-git-send-email-santoscadenas@gmail.com>
+ <1275484768-25838-27-git-send-email-santoscadenas@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- health/hdp.c |   45 +++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 45 insertions(+), 0 deletions(-)
+ health/hdp.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/health/hdp.c b/health/hdp.c
-index cb05324..10621c4 100644
+index 1d626d7..cd344d0 100644
 --- a/health/hdp.c
 +++ b/health/hdp.c
-@@ -88,6 +88,25 @@ static struct hdp_device *find_device(GSList *devices, struct btd_device *dev)
- 	return NULL;
+@@ -266,7 +266,7 @@ static void fill_up_health_instances(DBusMessageIter *dict, gpointer data)
+ 	}
  }
  
-+static struct hdp_link *find_health_link(struct hdp_adapter *adapter,
-+							const char *link_path)
-+{
-+	struct hdp_instance *hdpi;
-+	struct hdp_link *hdpl;
-+	GSList *l, *ll;
-+
-+	for (l = adapter->instances; l; l = l->next) {
-+		hdpi = l->data;
-+		for (ll = hdpi->hlink; ll; ll = ll->next) {
-+			hdpl = ll->data;
-+			if (!strcmp(hdpl->path, link_path))
-+				return hdpl;
-+		}
-+	}
-+
-+	return NULL;
-+}
-+
- static int hdp_instance_idcmp(gconstpointer instance, gconstpointer p)
+-static void sink_health_instances(sdp_list_t *recs, int err, gpointer user_data)
++static void health_records_found(sdp_list_t *recs, int err, gpointer user_data)
  {
- 	const struct hdp_instance *hdpi = instance;
-@@ -562,10 +581,36 @@ static DBusMessage *hdp_connect(DBusConnection *conn,
- 				   "Error getting remote information");
- }
+ 	struct instances_aux *cb_data = user_data;
+ 	DBusMessage *msg = cb_data->msg;
+@@ -314,7 +314,7 @@ static DBusMessage *get_health_instances(DBusConnection *conn,
  
-+static DBusMessage *hdp_disconnect(DBusConnection *conn,
-+					DBusMessage *msg, void *user_data)
-+{
-+	struct hdp_device *device = user_data;
-+	struct hdp_link *hlink;
-+	const char *path;
-+	const gboolean *del;
-+
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
-+							DBUS_TYPE_BOOLEAN, &del,
-+							DBUS_TYPE_INVALID)){
-+		return g_dbus_create_error(msg,
-+					ERROR_INTERFACE ".InvalidArguments",
-+					"Invalid arguments in method call");
-+	}
-+
-+	hlink = find_health_link(device->hdp_adapter, path);
-+	if (!hlink)
-+		return g_dbus_create_error(msg, ERROR_INTERFACE ".HealthError",
-+						"Health link does not found");
-+
-+	return g_dbus_create_error(msg, ERROR_INTERFACE ".HealthError",
-+							"Not yet implemented");
-+}
-+
- static GDBusMethodTable device_methods[] = {
- 	{ "GetHealthInstances", "", "aa{sv}", get_health_instances,
- 						G_DBUS_METHOD_FLAG_ASYNC },
- 	{ "Connect", "uu", "o", hdp_connect, G_DBUS_METHOD_FLAG_ASYNC },
-+	{ "Diconnect", "ob", "", hdp_disconnect },
- 	{ NULL }
- };
+ 
+ 	bt_string2uuid(&uuid, HDP_UUID);
+-	if (bt_search_service(&src, &dst, &uuid, sink_health_instances,
++	if (bt_search_service(&src, &dst, &uuid, health_records_found,
+ 						cb_data, NULL) == 0)
+ 		return NULL;
  
 -- 
 1.6.3.3
