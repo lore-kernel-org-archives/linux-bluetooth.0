@@ -1,33 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: Zhu Yanhai <yanhai.zhu@linux.intel.com>
+Message-ID: <4C0809EF.1080607@codeaurora.org>
+Date: Thu, 03 Jun 2010 15:00:47 -0500
+From: Ron Shaffer <rshaffer@codeaurora.org>
+MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Cc: Zhu Yanhai <yanhai.zhu@linux.intel.com>
-Subject: [PATCH] gateway_server_remove should unref audio_adapter
-Date: Fri,  4 Jun 2010 16:19:58 +0800
-Message-Id: <1275639598-22048-1-git-send-email-yanhai.zhu@linux.intel.com>
+CC: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH v3 0/3] Don't send SCO/eSCO request during a mode change
+ from sniff to active
+References: <1275062027-27872-1-git-send-email-rshaffer@codeaurora.org>
+In-Reply-To: <1275062027-27872-1-git-send-email-rshaffer@codeaurora.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-gateway_server_remove should unrefer the adapter, not refer it.
+Hi Marcel:
 
-Signed-off-by: Zhu Yanhai <yanhai.zhu@linux.intel.com>
----
- audio/manager.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+> Split original patch in to 3 patches
+> Fix patch subject lines
+> 
 
-diff --git a/audio/manager.c b/audio/manager.c
-index 28fd8af..f6a98cd 100644
---- a/audio/manager.c
-+++ b/audio/manager.c
-@@ -932,7 +932,7 @@ static void gateway_server_remove(struct btd_adapter *adapter)
- 		adp->hfp_hs_server = NULL;
- 	}
- 
--	audio_adapter_ref(adp);
-+	audio_adapter_unref(adp);
- }
- 
- static int a2dp_server_probe(struct btd_adapter *adapter)
+Just a ping on this.
+
 -- 
-1.6.2.2
-
+Ron Shaffer
+Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
