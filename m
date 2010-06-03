@@ -1,28 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4C0809EF.1080607@codeaurora.org>
-Date: Thu, 03 Jun 2010 15:00:47 -0500
-From: Ron Shaffer <rshaffer@codeaurora.org>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-CC: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH v3 0/3] Don't send SCO/eSCO request during a mode change
- from sniff to active
-References: <1275062027-27872-1-git-send-email-rshaffer@codeaurora.org>
-In-Reply-To: <1275062027-27872-1-git-send-email-rshaffer@codeaurora.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH] ath3k: add support for new firmware
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Vikram <vkandukuri@atheros.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1275564023.19511.31.camel@ATH-LT-538>
+References: <1275564023.19511.31.camel@ATH-LT-538>
+Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 03 Jun 2010 10:34:12 -0700
+Message-ID: <1275586452.2182.30.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel:
+Hi Vikram,
 
-> Split original patch in to 3 patches
-> Fix patch subject lines
+> updated new firmware has few critical bug fixes and shared antenna
+> support.
 > 
+> Signed-off-by: Vikram Kandukuri <vkandukuri@atheros.com>
+> ---
+>  drivers/bluetooth/ath3k.c |    9 ++++++---
+>  1 files changed, 6 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+> index 128cae4..7bda549 100644
+> --- a/drivers/bluetooth/ath3k.c
+> +++ b/drivers/bluetooth/ath3k.c
+> @@ -122,9 +122,12 @@ static int ath3k_probe(struct usb_interface *intf,
+>  
+>  	data->udev = udev;
+>  
+> -	if (request_firmware(&firmware, "ath3k-1.fw", &udev->dev) < 0) {
+> -		kfree(data);
+> -		return -EIO;
+> +	if (request_firmware(&firmware, "ath3k-2.fw", &udev->dev) < 0) {
+> +		BT_DBG("requesting old firmware");
+> +		if (request_firmware(&firmware, "ath3k-1.fw", &udev->dev) < 0) {
+> +			kfree(data);
+> +			return -EIO;
+> +		}
+>  	}
+>  
+>  	size = max_t(uint, firmware->size, 4096);
 
-Just a ping on this.
+can we just have a list of supported firmware in a table instead of just
+hardcoding this. I think something similar to what iwlwifi for WiFi has
+beend doing would be nice.
 
--- 
-Ron Shaffer
-Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+Regards
+
+Marcel
+
+
