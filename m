@@ -2,214 +2,202 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 05/26] Save and restore state of MCLs
-Date: Fri,  4 Jun 2010 10:26:58 +0200
-Message-Id: <1275640039-7245-6-git-send-email-sancane@gmail.com>
-In-Reply-To: <1275640039-7245-5-git-send-email-sancane@gmail.com>
+Subject: [PATCH 04/26] Process events over Control Channels
+Date: Fri,  4 Jun 2010 10:26:57 +0200
+Message-Id: <1275640039-7245-5-git-send-email-sancane@gmail.com>
+In-Reply-To: <1275640039-7245-4-git-send-email-sancane@gmail.com>
 References: <1275640039-7245-1-git-send-email-sancane@gmail.com>
  <1275640039-7245-2-git-send-email-sancane@gmail.com>
  <1275640039-7245-3-git-send-email-sancane@gmail.com>
  <1275640039-7245-4-git-send-email-sancane@gmail.com>
- <1275640039-7245-5-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- mcap/mcap.c |  158 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 files changed, 154 insertions(+), 4 deletions(-)
+ mcap/mcap.c |  145 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 144 insertions(+), 1 deletions(-)
 
 diff --git a/mcap/mcap.c b/mcap/mcap.c
-index 7308adc..2acfeed 100644
+index ea92118..7308adc 100644
 --- a/mcap/mcap.c
 +++ b/mcap/mcap.c
-@@ -34,8 +34,16 @@
- #include "mcap_lib.h"
- #include "mcap_internal.h"
+@@ -36,6 +36,17 @@
  
-+#define MAX_CACHED	10	/* 10 devices */
-+
  #define MCAP_ERROR g_quark_from_static_string("mcap-error-quark")
  
-+#define RELEASE_TIMER(__mcl) do {	\
-+	g_source_remove(__mcl->tid);	\
-+	__mcl->tid = 0;			\
-+} while(0)
++/* MCAP finite state machine functions */
++static void proc_req_connected(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t l);
++static void proc_req_pending(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t l);
++static void proc_req_active(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t l);
 +
++static void (*proc_req[])(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len) = {
++	proc_req_connected,
++	proc_req_pending,
++	proc_req_active
++};
 +
- /* MCAP finite state machine functions */
- static void proc_req_connected(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t l);
- static void proc_req_pending(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t l);
-@@ -147,24 +155,166 @@ static struct mcap_mcl *find_mcl(GSList *list, const bdaddr_t *addr)
- 	return NULL;
- }
- 
-+static void shutdown_mdl(struct mcap_mdl *mdl)
-+{
-+	mdl->state = MDL_CLOSED;
-+
-+	g_source_remove(mdl->wid);
-+
-+	if (mdl->dc) {
-+		g_io_channel_shutdown(mdl->dc, TRUE, NULL);
-+		g_io_channel_unref(mdl->dc);
-+		mdl->dc = NULL;
-+	}
-+}
-+
-+static void mcap_free_mdls(struct mcap_mcl *mcl, gboolean save)
-+{
-+	GSList *l;
-+	struct mcap_mdl *mdl;
-+
-+	if (!mcl->mdls)
-+		return;
-+
-+	for (l = mcl->mdls; l; l = l->next) {
-+		mdl = l->data;
-+		shutdown_mdl(mdl);
-+		if (!save)
-+			g_free(mdl);
-+	}
-+
-+	if (!save) {
-+		g_slist_free(mcl->mdls);
-+		mcl->mdls = NULL;
-+	}
-+}
-+
-+static void close_mcl(struct mcap_mcl *mcl, gboolean save)
-+{
-+	gboolean store = ((!(mcl->ctrl & MCAP_CTRL_FREE)) && save);
-+
-+	if (mcl->tid) {
-+		RELEASE_TIMER(mcl);
-+	}
-+
-+	if (mcl->cc) {
-+		g_io_channel_shutdown(mcl->cc, TRUE, NULL);
-+		g_io_channel_unref(mcl->cc);
-+		mcl->cc = NULL;
-+	}
-+
-+	g_source_remove(mcl->wid);
-+	if (mcl->lcmd) {
-+		g_free(mcl->lcmd);
-+		mcl->lcmd = NULL;
-+	}
-+
-+	if (mcl->priv_data) {
-+		g_free(mcl->priv_data);
-+		mcl->priv_data = NULL;
-+	}
-+
-+	mcap_free_mdls(mcl, store);
-+
-+	if (mcl->cb && !store) {
-+		g_free(mcl->cb);
-+		mcl->cb = NULL;
-+	}
-+
-+	mcl->state = MCL_IDLE;
-+
-+	if (store)
-+		return;
-+
-+	g_free(mcl);
-+}
-+
-+static void mcap_mcl_shutdown(struct mcap_mcl *mcl)
-+{
-+	close_mcl(mcl, TRUE);
-+}
-+
- static void mcap_mcl_release(struct mcap_mcl *mcl)
+ static void default_mdl_connected_cb(struct mcap_mdl *mdl, gpointer data)
  {
--	/* TODO */
-+	close_mcl(mcl, FALSE);
+ 	DBG("MCAP Unmanaged mdl connection");
+@@ -86,6 +97,41 @@ static void set_default_cb(struct mcap_mcl *mcl)
+ 	mcl->cb->mdl_reconn_req = default_mdl_reconn_req_cb;
  }
  
- static void mcap_mcl_check_del(struct mcap_mcl *mcl)
- {
--	/* TODO */
-+	if (mcl->ctrl & MCAP_CTRL_CACHED)
-+		mcap_mcl_shutdown(mcl);
-+	else
-+		mcap_mcl_unref(mcl);
- }
- 
- static void mcap_cache_mcl(struct mcap_mcl *mcl)
- {
--	/* TODO */
-+	GSList *l;
-+	struct mcap_mcl *last;
-+	int len;
++int mcap_send_data(int sock, const uint8_t *buf, uint32_t size)
++{
++	uint32_t sent = 0;
 +
-+	if (mcl->ctrl & MCAP_CTRL_CACHED)
-+		return;
-+
-+	mcl->ms->mcls = g_slist_remove(mcl->ms->mcls, mcl);
-+
-+	if ((mcl->ctrl & MCAP_CTRL_NOCACHE) || (mcl->ref < 2)) {
-+		mcap_mcl_unref(mcl);
-+		return;
++	while (sent < size) {
++		int n = send(sock, buf + sent, size - sent, 0);
++		if (n < 0)
++			return -1;
++		sent += n;
 +	}
++	return 0;
++}
 +
-+	DBG("Caching MCL");
++static int send4B_cmd(struct mcap_mcl *mcl, uint8_t oc, uint8_t rc,
++								uint16_t mdl)
++{
++	uint8_t *rsp;
++	mcap4B_rsp *rsp_err;
++	int sent;
 +
-+	len = g_slist_length(mcl->ms->cached);
-+	if (len == MAX_CACHED) {
-+		/* Remove the latest cached mcl */
-+		l = g_slist_last(mcl->ms->cached);
-+		last = l->data;
-+		mcl->ms->cached = g_slist_remove(mcl->ms->cached, last);
-+		last->ctrl &= ~MCAP_CTRL_CACHED;
-+		if (last->ctrl & MCAP_CTRL_CONN) {
-+			/* If connection process is not success this MCL will be
-+			 * freed next time that close_mcl is invoked */
-+			last->ctrl |= MCAP_CTRL_FREE;
-+		} else {
-+			last->ms->mcl_uncached_cb(last, last->ms->user_data);
-+			mcap_mcl_unref(last);
-+		}
-+	}
 +
-+	mcl->ms->cached = g_slist_prepend(mcl->ms->cached, mcl);
-+	mcl->ctrl |= MCAP_CTRL_CACHED;
-+	mcap_mcl_shutdown(mcl);
++	rsp = g_malloc0(sizeof(mcap4B_rsp));
++
++	rsp_err = (mcap4B_rsp *)rsp;
++	rsp_err->op = oc;
++	rsp_err->rc = rc;
++	rsp_err->mdl = htons (mdl);
++
++	sent = mcap_send_data(g_io_channel_unix_get_fd(mcl->cc),
++					rsp,
++					sizeof(mcap4B_rsp));
++	g_free(rsp);
++	return sent;
++}
++
+ static struct mcap_mcl *find_mcl(GSList *list, const bdaddr_t *addr)
+ {
+ 	GSList *l;
+@@ -111,6 +157,11 @@ static void mcap_mcl_check_del(struct mcap_mcl *mcl)
+ 	/* TODO */
  }
  
++static void mcap_cache_mcl(struct mcap_mcl *mcl)
++{
++	/* TODO */
++}
++
  static void mcap_uncache_mcl(struct mcap_mcl *mcl)
  {
--	/* TODO */
-+	if (!(mcl->ctrl & MCAP_CTRL_CACHED))
-+		return;
-+
-+	DBG("Got MCL from cache");
-+
-+	mcl->ms->cached = g_slist_remove(mcl->ms->cached, mcl);
-+	mcl->ms->mcls = g_slist_prepend(mcl->ms->mcls, mcl);
-+	mcl->ctrl &= ~MCAP_CTRL_CACHED;
-+	mcl->ctrl &= ~MCAP_CTRL_FREE;
-+}
-+
-+void mcap_close_mcl(struct mcap_mcl *mcl, gboolean cache)
-+{
-+	if (!mcl)
-+		return;
-+
-+	if (mcl->cc) {
-+		g_io_channel_shutdown(mcl->cc, TRUE, NULL);
-+		g_io_channel_unref(mcl->cc);
-+		mcl->cc = NULL;
-+	}
-+
-+	mcl->state = MCL_IDLE;
-+
-+	if (!cache)
-+		mcl->ctrl |= MCAP_CTRL_NOCACHE;
+ 	/* TODO */
+@@ -137,11 +188,103 @@ void mcap_mcl_unref(struct mcap_mcl *mcl)
+ 	mcap_mcl_release(mcl);
  }
  
- struct mcap_mcl *mcap_mcl_ref(struct mcap_mcl *mcl)
++static void proc_req_connected(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
++{
++	/* TODO */
++}
++
++static void proc_req_pending(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
++{
++	/* TODO */
++}
++
++static void proc_req_active(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
++{
++	/* TODO */
++}
++
++static void proc_response(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
++{
++	/* TODO */
++}
++
++static void rsend_req(struct mcap_mcl *mcl)
++{
++	uint8_t *cmd = mcl->lcmd;
++	int len;
++
++	if (!cmd)
++		return;
++
++	switch (cmd[0]) {
++	case MCAP_MD_RECONNECT_MDL_REQ:
++	case MCAP_MD_ABORT_MDL_REQ:
++	case MCAP_MD_DELETE_MDL_REQ:
++		len = 3;
++		break;
++	case MCAP_MD_CREATE_MDL_REQ:
++		len = 5;
++		break;
++	default:
++		return;
++	}
++
++	mcap_send_data(g_io_channel_unix_get_fd(mcl->cc), cmd, len);
++}
++
++static void proc_cmd(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
++{
++	if ((cmd[0] >= MCAP_MD_SYNC_CAP_REQ) &&
++					(cmd[0] <= MCAP_MD_SYNC_INFO_IND)) {
++		send4B_cmd(mcl, cmd[0], MCAP_REQUEST_NOT_SUPPORTED,
++							MCAP_MDLID_RESERVED);
++		return;
++	}
++
++	if (!(mcl->ctrl & MCAP_CTRL_STD_OP)) {
++		/* In case the remote device doesn't work correctly */
++		error("Remote device does not support opcodes, cmd ignored");
++		return;
++	}
++
++	if (mcl->req == MCL_WAITING_RSP) {
++		if (cmd[0] & 0x01) {
++			/* Request arrived when a response is expected */
++			if (mcl->role == MCL_INITIATOR)
++				/* ignore */
++				return;
++			proc_req[mcl->state](mcl, cmd, len);
++			/* Initiator will ignore our last request => re-send */
++			rsend_req(mcl);
++			return;
++		}
++		proc_response(mcl, cmd, len);
++	} else if (cmd[0] & 0x01)
++		proc_req[mcl->state](mcl, cmd, len);
++}
++
+ static gboolean mcl_control_cb(GIOChannel *chan, GIOCondition cond,
+ 								gpointer data)
+ {
+ 
+-	/* TODO */
++	struct mcap_mcl *mcl = data;
++	int sk, len;
++	uint8_t buf[MCAP_CC_MTU];
++
++	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL))
++		goto fail;
++
++	sk = g_io_channel_unix_get_fd(chan);
++	len = recv(sk, buf, sizeof(buf), 0);
++	if (len < 0)
++		goto fail;
++
++	proc_cmd(mcl, buf, (uint32_t)len);
++	return TRUE;
++fail:
++	if (mcl->state != MCL_IDLE)
++		mcl->ms->mcl_disconnected_cb(mcl, mcl->ms->user_data);
++	mcap_cache_mcl(mcl);
+ 	return FALSE;
+ }
+ 
 -- 
 1.6.3.3
 
