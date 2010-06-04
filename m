@@ -2,10 +2,10 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 20/26] Process md_create_mdl_rsp
-Date: Fri,  4 Jun 2010 10:27:13 +0200
-Message-Id: <1275640039-7245-21-git-send-email-sancane@gmail.com>
-In-Reply-To: <1275640039-7245-20-git-send-email-sancane@gmail.com>
+Subject: [PATCH 23/26] Process md_delete_mdl_rsp
+Date: Fri,  4 Jun 2010 10:27:16 +0200
+Message-Id: <1275640039-7245-24-git-send-email-sancane@gmail.com>
+In-Reply-To: <1275640039-7245-23-git-send-email-sancane@gmail.com>
 References: <1275640039-7245-1-git-send-email-sancane@gmail.com>
  <1275640039-7245-2-git-send-email-sancane@gmail.com>
  <1275640039-7245-3-git-send-email-sancane@gmail.com>
@@ -26,107 +26,90 @@ References: <1275640039-7245-1-git-send-email-sancane@gmail.com>
  <1275640039-7245-18-git-send-email-sancane@gmail.com>
  <1275640039-7245-19-git-send-email-sancane@gmail.com>
  <1275640039-7245-20-git-send-email-sancane@gmail.com>
+ <1275640039-7245-21-git-send-email-sancane@gmail.com>
+ <1275640039-7245-22-git-send-email-sancane@gmail.com>
+ <1275640039-7245-23-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- mcap/mcap.c |   80 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 79 insertions(+), 1 deletions(-)
+ mcap/mcap.c |   60 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 59 insertions(+), 1 deletions(-)
 
 diff --git a/mcap/mcap.c b/mcap/mcap.c
-index cd710da..4708fe7 100644
+index 17f0573..26eb7b9 100644
 --- a/mcap/mcap.c
 +++ b/mcap/mcap.c
-@@ -1171,10 +1171,88 @@ static void proc_req_active(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
- 	}
+@@ -1335,10 +1335,68 @@ static gboolean process_md_abort_mdl_rsp(struct mcap_mcl *mcl,
+ 	return close;
  }
  
-+/* Function used to process replies */
-+static gboolean check_err_rsp(uint16_t rmdl, uint16_t smdl, uint8_t rc,
-+				uint32_t rlen, uint32_t len, GError **gerr)
++static void restore_mdl(gpointer elem, gpointer data)
 +{
-+	gboolean close = FALSE;
-+	char *msg;
-+	gint err = MCAP_ERROR_FAILED;
++	struct mcap_mdl *mdl = elem;
 +
-+	if (rmdl != smdl) {
-+		msg = "MDLID received doesn't match with MDLID sent";
-+		close = TRUE;
-+		goto fail;
-+	}
-+
-+	if ((rc != MCAP_SUCCESS) && (rc <= MCAP_CONFIGURATION_REJECTED)) {
-+		msg = error2str(rc);
-+		err = rc;
-+		goto fail;
-+	}
-+
-+	if (rlen < len) {
-+		msg = "Protocol error";
-+		close = TRUE;
-+		goto fail;
-+	}
-+	return FALSE;
-+fail:
-+	g_set_error(gerr, MCAP_ERROR, err, "%s", msg);
-+	return close;
++	if (mdl->state == MDL_DELETING) {
++		if (mdl->dc)
++			mdl->state = MDL_CONNECTED;
++		else
++			mdl->state = MDL_CLOSED;
++	} else if (mdl->state == MDL_CLOSED)
++		mdl->mcl->cb->mdl_closed(mdl, mdl->mcl->cb->user_data);
 +}
 +
- static gboolean process_md_create_mdl_rsp(struct mcap_mcl *mcl,
- 						uint8_t *cmd, uint32_t len)
+ static gboolean process_md_delete_mdl_rsp(struct mcap_mcl *mcl, uint8_t *cmd,
+ 								uint32_t len)
  {
 -	return FALSE;
-+	struct mcap_mdl_op_cb *conn = mcl->priv_data;
-+	struct mcap_mdl *mdl = conn->mdl;
-+	mcap_mdl_operation_conf_cb connect_cb = conn->cb.op_conf;
-+	gpointer user_data = conn->user_data;
-+	uint16_t mdlid;
-+	mcap5B_rsp *rsp = (mcap5B_rsp *) cmd;
-+	mcap_md_create_mdl_req *cmdlast;
++	struct mcap_mdl_op_cb *del = mcl->priv_data;
++	struct mcap_mdl *mdl = del->mdl;
++	mcap_mdl_del_cb deleted_cb = del->cb.del;
++	gpointer user_data = del->user_data;
++	mcap4B_rsp *rsp = (mcap4B_rsp *) cmd;
++	mcap_md_req *cmdlast = (mcap_md_req *) mcl->lcmd;
++	uint16_t mdlid = ntohs(cmdlast->mdl);
 +	GError *gerr = NULL;
 +	gboolean close = FALSE;
++	gboolean notify = FALSE;
 +
 +	g_free(mcl->priv_data);
 +	mcl->priv_data = NULL;
 +
-+	cmdlast = (mcap_md_create_mdl_req *) mcl->lcmd;
-+	mdlid = ntohs(cmdlast->mdl);
 +	rsp->mdl = ntohs(rsp->mdl);
++
++	close = check_err_rsp(rsp->mdl, mdlid, rsp->rc, len,
++						sizeof(mcap4B_rsp), &gerr);
 +
 +	g_free(mcl->lcmd);
 +	mcl->lcmd = NULL;
 +	mcl->req = MCL_AVAILABLE;
-+	close = check_err_rsp(rsp->mdl, mdlid, rsp->rc, 0, 0, &gerr);
-+
-+	if (gerr)
-+		goto fail;
-+
-+	if (len < 5) {
-+		g_set_error(&gerr, MCAP_ERROR, MCAP_ERROR_FAILED,
-+							"Protocol error");
-+		close = TRUE;
-+		goto fail;
++	if (gerr) {
++		if (mdl)
++			restore_mdl(mdl, NULL);
++		else
++			g_slist_foreach(mcl->mdls, restore_mdl, NULL);
++		deleted_cb(gerr, user_data);
++		g_error_free(gerr);
++		return close;
 +	}
 +
-+	/* Check if preferences changed */
-+	if ((cmdlast->conf != 0x00) && (rsp->param != cmdlast->conf)) {
-+		g_set_error(&gerr, MCAP_ERROR, MCAP_ERROR_FAILED,
-+						"Configuration changed");
-+		close = TRUE;
-+		goto fail;
++	if (mdlid == MCAP_ALL_MDLIDS) {
++		g_slist_foreach(mcl->mdls, mcap_delete_mdl, &notify);
++		g_slist_free(mcl->mdls);
++		mcl->mdls = NULL;
++		mcl->state = MCL_CONNECTED;
++		goto end;
 +	}
 +
-+	connect_cb(mdl, rsp->param, gerr, user_data);
-+	return close;
-+fail:
-+	connect_cb(NULL, 0, gerr, user_data);
 +	mcl->mdls = g_slist_remove(mcl->mdls, mdl);
-+	g_free(mdl);
-+	g_error_free(gerr);
++	update_mcl_state(mcl);
++	mcap_delete_mdl(mdl, &notify);
++end:
++	deleted_cb(gerr, user_data);
 +	return close;
  }
  
- static gboolean process_md_reconnect_mdl_rsp(struct mcap_mcl *mcl,
+ static gboolean check_rsp(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
 -- 
 1.6.3.3
 
