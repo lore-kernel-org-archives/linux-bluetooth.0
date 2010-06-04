@@ -2,10 +2,10 @@ Return-Path: <cyrus@holtmann.org>
 From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Subject: [PATCH 28/32] Changed HEALTH_MANAGER_INTERFACE to HEALTH_MANAGER
-Date: Fri,  4 Jun 2010 10:30:21 +0200
-Message-Id: <1275640225-4186-29-git-send-email-santoscadenas@gmail.com>
-In-Reply-To: <1275640225-4186-28-git-send-email-santoscadenas@gmail.com>
+Subject: [PATCH 18/32] Unify the creation of health links
+Date: Fri,  4 Jun 2010 10:30:11 +0200
+Message-Id: <1275640225-4186-19-git-send-email-santoscadenas@gmail.com>
+In-Reply-To: <1275640225-4186-18-git-send-email-santoscadenas@gmail.com>
 References: <1275640225-4186-1-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-2-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-3-git-send-email-santoscadenas@gmail.com>
@@ -24,69 +24,139 @@ References: <1275640225-4186-1-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-16-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-17-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-18-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-19-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-20-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-21-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-22-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-23-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-24-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-25-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-26-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-27-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-28-git-send-email-santoscadenas@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- health/hdp.c       |    6 +++---
- health/hdp_types.h |    7 ++++---
- 2 files changed, 7 insertions(+), 6 deletions(-)
+ health/hdp.c |   82 ++++++++++++++++++++++++++++++++++++---------------------
+ 1 files changed, 52 insertions(+), 30 deletions(-)
 
 diff --git a/health/hdp.c b/health/hdp.c
-index bb03ffa..58d0394 100644
+index d38aff1..eb673bd 100644
 --- a/health/hdp.c
 +++ b/health/hdp.c
-@@ -964,11 +964,11 @@ int hdp_adapter_register(DBusConnection *conn, struct btd_adapter *btd_adapter)
- 	adapter = g_new0(struct hdp_adapter, 1);
+@@ -369,28 +369,17 @@ static GDBusMethodTable health_link_methods[] = {
+ 	{ NULL }
+ };
  
- 	DBG("HDP init");
--	if (!g_dbus_register_interface(conn, path, HEALTH_MANAGER_INTERFACE,
-+	if (!g_dbus_register_interface(conn, path, HEALTH_MANAGER,
- 					hdp_methods, NULL, NULL,
- 					adapter, hdp_path_unregister)) {
- 		error("Failed to register %s interface to %s",
--						HEALTH_MANAGER_INTERFACE, path);
-+						HEALTH_MANAGER, path);
- 		g_free(adapter);
- 		return -1;
+-static void hdp_mcl_connect_cb(struct mcap_mcl *mcl, GError *err, void *data)
++static struct hdp_link *create_health_link(struct hdp_instance *hdpi,
++					struct mcap_mcl *mcl, GError **err)
+ {
+-	struct hdp_connection_cb *cb_data = data;
+-	struct hdp_device *device = cb_data->device;
+-	struct hdp_instance *hdpi = cb_data->hdpi;
+-	DBusMessage *msg = cb_data->msg;
+-	struct hdp_link *hdpl = NULL;
+-	GError *cberr = NULL;
+-	DBusMessage *reply;
+-
+-	g_free(cb_data);
+-
+-	if (err)
+-		goto fail;
++	struct hdp_link *hdpl;
+ 
+ 	hdpl = g_new0(struct hdp_link, 1);
+ 	hdpl->hdpi = hdpi;
+-	hdpl->dev = device;
+ 	hdpl->mcl = mcap_mcl_ref(mcl);
+ 	set_health_link_path(hdpl);
+ 
+-	mcap_mcl_set_cb(mcl, &cberr, hdpl,
++	mcap_mcl_set_cb(mcl, err, hdpl,
+ 		MCAP_MDL_CB_CONNECTED, hdp_mcap_mdl_connected_cb,
+ 		MCAP_MDL_CB_CLOSED, hdp_mcap_mdl_closed_cb,
+ 		MCAP_MDL_CB_DELETED, hdp_mcap_mdl_deleted_cb,
+@@ -399,16 +388,46 @@ static void hdp_mcl_connect_cb(struct mcap_mcl *mcl, GError *err, void *data)
+ 		MCAP_MDL_CB_REMOTE_RECONN_REQ, hdp_mcap_mdl_reconn_req_cb,
+ 		MCAP_MDL_CB_INVALID);
+ 
+-	if (cberr)
+-		goto fail;
++	if (*err)
++		return NULL;
+ 
+-	if (!g_dbus_register_interface(hdpl->dev->conn, hdpl->path, HEALTH_LINK,
++	if (g_dbus_register_interface(hdpl->dev->conn, hdpl->path, HEALTH_LINK,
+ 					health_link_methods, NULL, NULL,
+-					hdpl, health_link_path_unregister)) {
+-		error("D-Bus failed to register %s interface to %s",
++					hdpl, health_link_path_unregister))
++		return hdpl;
++
++	g_set_error(err, HDP_ERROR, HDP_UNSPECIFIED_ERROR,
++				"Cant register the health link in the bus");
++
++	/* TODO create a function to free health link correctly */
++	/* MCAP will close the MCL and won't cache it if we didn't
++	* increase the MCL reference counter during the callback. */
++	mcap_mcl_unref(hdpl->mcl);
++	g_free(hdpl->path);
++	g_free(hdpl);
++	error("D-Bus failed to register %s interface to %s",
+ 						HEALTH_LINK, hdpl->path);
++	return NULL;
++}
++
++static void hdp_mcl_connect_cb(struct mcap_mcl *mcl, GError *err, void *data)
++{
++	struct hdp_connection_cb *cb_data = data;
++	struct hdp_device *device = cb_data->device;
++	struct hdp_instance *hdpi = cb_data->hdpi;
++	DBusMessage *msg = cb_data->msg;
++	struct hdp_link *hdpl = NULL;
++	GError *gerr = NULL;
++	DBusMessage *reply;
++
++	g_free(cb_data);
++
++	if (err)
++		goto fail;
++
++	hdpl = create_health_link(hdpi, mcl, &gerr);
++	if (gerr)
+ 		goto fail;
+-	}
+ 
+ 	hdpi->hlink = g_slist_prepend(hdpi->hlink, hdpl);
+ 	reply = g_dbus_create_reply(msg, DBUS_TYPE_OBJECT_PATH, &hdpl->path,
+@@ -417,14 +436,9 @@ static void hdp_mcl_connect_cb(struct mcap_mcl *mcl, GError *err, void *data)
+ 	return;
+ fail:
+ 	reply = g_dbus_create_error(msg, ERROR_INTERFACE ".HdpError",
+-					(err ? err->message : cberr->message));
+-	if (cberr) {
+-		/* MCAP will close the MCL and won't cache it if we didn't
+-		* increase the MCL reference counter during the callback. */
+-		mcap_mcl_unref(hdpl->mcl);
+-		g_free(hdpl->path);
+-		g_free(hdpl);
+-		g_error_free(cberr);
++					(err ? err->message : gerr->message));
++	if (gerr) {
++		g_error_free(gerr);
  	}
-@@ -988,7 +988,7 @@ void hdp_adapter_unregister(struct btd_adapter *btd_adapter)
  
- 	g_dbus_unregister_interface(adapter->conn,
- 			adapter_get_path(btd_adapter),
--			HEALTH_MANAGER_INTERFACE);
-+			HEALTH_MANAGER);
- 	dbus_connection_unref(adapter->conn);
- 	btd_adapter_unref(adapter->btd_adapter);
- 	adapters = g_slist_remove(adapters, adapter);
-diff --git a/health/hdp_types.h b/health/hdp_types.h
-index abbfbf3..aff116e 100644
---- a/health/hdp_types.h
-+++ b/health/hdp_types.h
-@@ -42,9 +42,10 @@
+ 	g_dbus_send_message(device->conn, reply);
+@@ -578,8 +592,16 @@ static void client_disconnected(DBusConnection *connection, void *user_data)
  
- #define HDP_ERROR		g_quark_from_static_string("hdp-error-quark")
+ static void mcl_connected(struct mcap_mcl *mcl, gpointer data)
+ {
+-	/* struct hdp_instance *hdpi = data; */
++	struct hdp_instance *hdpi = data;
++	struct hdp_link *hdpl;
++	GError *err = NULL;
++
+ 	DBG("TODO: implement mcl_connected");
++	hdpl = create_health_link(hdpi, mcl, &err);
++	if (err)
++		return;
++	/* TODO: Send the notification to the Agent */
++	hdpi->hlink = g_slist_prepend(hdpi->hlink, hdpl);
+ }
  
--#define HEALTH_MANAGER_INTERFACE	"org.bluez.HealthAdapter"
--#define HEALTH_DEVICE			"org.bluez.HealthDevice"
--#define HEALTH_LINK			"org.bluez.HealthLink"
-+#define HEALTH_MANAGER		"org.bluez.HealthAdapter"
-+#define HEALTH_DEVICE		"org.bluez.HealthDevice"
-+#define HEALTH_LINK		"org.bluez.HealthLink"
-+#define HEALTH_AGENT		"org.bluez.HealthAgent"
- 
- #define HDP_NO_PREFERENCE_DC	0x00
- #define HDP_RELIABLE_DC		0x01
+ static void mcl_reconnected(struct mcap_mcl *mcl, gpointer data)
 -- 
 1.6.3.3
 
