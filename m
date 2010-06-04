@@ -1,325 +1,183 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: =?utf-8?q?Jos=C3=A9=20Antonio=20Santos=20Cadenas?=
-	<santoscadenas@gmail.com>
-Subject: [PATCH 05/32] Register healt_driver interfaces in d-bus
-Date: Fri,  4 Jun 2010 10:29:58 +0200
-Message-Id: <1275640225-4186-6-git-send-email-santoscadenas@gmail.com>
-In-Reply-To: <1275640225-4186-5-git-send-email-santoscadenas@gmail.com>
+Cc: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+Subject: [PATCH 16/32] Register Health link int the bus when MCL is connected
+Date: Fri,  4 Jun 2010 10:30:09 +0200
+Message-Id: <1275640225-4186-17-git-send-email-santoscadenas@gmail.com>
+In-Reply-To: <1275640225-4186-16-git-send-email-santoscadenas@gmail.com>
 References: <1275640225-4186-1-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-2-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-3-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-4-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-5-git-send-email-santoscadenas@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+ <1275640225-4186-6-git-send-email-santoscadenas@gmail.com>
+ <1275640225-4186-7-git-send-email-santoscadenas@gmail.com>
+ <1275640225-4186-8-git-send-email-santoscadenas@gmail.com>
+ <1275640225-4186-9-git-send-email-santoscadenas@gmail.com>
+ <1275640225-4186-10-git-send-email-santoscadenas@gmail.com>
+ <1275640225-4186-11-git-send-email-santoscadenas@gmail.com>
+ <1275640225-4186-12-git-send-email-santoscadenas@gmail.com>
+ <1275640225-4186-13-git-send-email-santoscadenas@gmail.com>
+ <1275640225-4186-14-git-send-email-santoscadenas@gmail.com>
+ <1275640225-4186-15-git-send-email-santoscadenas@gmail.com>
+ <1275640225-4186-16-git-send-email-santoscadenas@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: José Antonio Santos Cadenas <santoscadenas@gmail.com>
-
-Register interface for each hdp_driver plugged
-Unregister driver
-Device_get_health_instances method added
-Add function to get data exchange spec from a remote record
 ---
- health/hdp.c       |  126 +++++++++++++++++++++++++++++++++++++++++++++++++---
- health/hdp.h       |    4 +-
- health/hdp_types.h |   10 ++++
- health/hdp_util.c  |   11 +++++
- health/hdp_util.h  |    2 +
- health/manager.c   |   20 +++-----
- 6 files changed, 151 insertions(+), 22 deletions(-)
+ health/hdp.c       |   64 ++++++++++++++++++++++++++++++++++++++++++++++-----
+ health/hdp_types.h |   12 +++++++++-
+ 2 files changed, 68 insertions(+), 8 deletions(-)
 
 diff --git a/health/hdp.c b/health/hdp.c
-index dbe326e..5b09ab3 100644
+index f5dc107..752714a 100644
 --- a/health/hdp.c
 +++ b/health/hdp.c
-@@ -29,12 +29,16 @@
- 
- #include "hdp_types.h"
- #include "hdp_util.h"
--
--#define HEALTH_MANAGER_INTERFACE 	"org.bluez.HealthAdapter"
-+#include "device.h"
+@@ -37,8 +37,9 @@
  
  #include "../src/dbus-common.h"
  
-+#define HEALTH_MANAGER_INTERFACE       "org.bluez.HealthAdapter"
-+#define HEALTH_INSTANCE_INTERFACE      "org.bluez.HealthInstance"
-+#define HEALTH_DEVICE                  "org.bluez.HealthDevice"
-+
- static GSList *adapters = NULL;
-+static GSList *devices = NULL;
+-#define HEALTH_MANAGER_INTERFACE       "org.bluez.HealthAdapter"
+-#define HEALTH_DEVICE                  "org.bluez.HealthDevice"
++#define HEALTH_MANAGER_INTERFACE	"org.bluez.HealthAdapter"
++#define HEALTH_DEVICE			"org.bluez.HealthDevice"
++#define HEALTH_LINK			"org.bluez.HealthLink"
  
- static struct hdp_adapter *find_adapter(GSList *list,
- 					struct btd_adapter *btd_adapter)
-@@ -51,6 +55,98 @@ static struct hdp_adapter *find_adapter(GSList *list,
- 	return NULL;
+ static GSList *adapters = NULL;
+ static GSList *devices = NULL;
+@@ -101,6 +102,18 @@ static int hdp_instance_idcmp(gconstpointer instance, gconstpointer p)
+ 	return -1;
  }
  
-+static struct hdp_device *find_device(GSList *devices, struct btd_device *dev)
++static void set_health_link_path(struct hdp_link *hdpl)
 +{
-+	GSList *l;
-+	struct hdp_device *device;
++	char path[MAX_PATH_LENGTH + 1];
 +
-+	for (l = devices; l != NULL; l = l->next) {
-+		device = l->data;
++	hdpl->id = hdpl->hdpi->hlc++;
++	snprintf(path, MAX_PATH_LENGTH, "%s/health_link_%d_%d",
++		adapter_get_path(hdpl->hdpi->adapter->btd_adapter),
++		hdpl->hdpi->id, hdpl->id);
 +
-+		if (device->dev == dev)
-+			return device;
-+	}
-+
-+	return NULL;
++	hdpl->path = g_strdup(path);
 +}
 +
-+static DBusMessage *get_health_instances(DBusConnection *conn,
-+					DBusMessage *msg, void *user_data)
+ static void fill_up_one_spec(DBusMessageIter *dict, gpointer data)
+ {
+ 	struct hdp_feature *feature = data;
+@@ -346,12 +359,23 @@ static uint8_t hdp_mcap_mdl_reconn_req_cb(struct mcap_mcl *mcl,
+ 	return MCAP_REQUEST_NOT_SUPPORTED;
+ }
+ 
++static void health_link_path_unregister(void *data)
 +{
-+	struct hdp_device *device = user_data;
-+	const sdp_record_t *rec;
-+	guint8 data_spec;
-+
-+	rec = btd_device_get_record(device->dev, HDP_UUID);
-+
-+	if (!rec) {
-+		DBG("No record found");
-+		goto error;
-+	}
-+
-+	if (!hdp_get_data_exchange_spec(rec, &data_spec))
-+		goto error;
-+
-+	DBG("Get data exchange spec %d", data_spec);
-+error:
-+	return g_dbus_create_error(msg, ERROR_INTERFACE ".HealthError",
-+					"Cannot get the remote SDP record");
++	/* struct hdp_link *hdpl = data */
++	/* TODO: Unregister hdp_link*/
 +}
 +
-+static void health_device_free(struct hdp_device *device)
-+{
-+	if (device->conn) {
-+		dbus_connection_unref(device->conn);
-+		device->conn = NULL;
-+	}
-+
-+	if (device->dev) {
-+		btd_device_unref(device->dev);
-+		device->dev = NULL;
-+	}
-+
-+	g_free(device);
-+}
-+
-+static void dev_path_unregister(void *data)
-+{
-+	struct hdp_device *device = data;
-+
-+
-+	DBG("Unregistered interface %s on path %s", HEALTH_DEVICE,
-+						device_get_path(device->dev));
-+	devices = g_slist_remove(devices, device);
-+	health_device_free(device);
-+}
-+
-+static GDBusMethodTable device_methods[] = {
-+	{ "GetHealthInstances",	"",	"a{sv}",	get_health_instances },
++static GDBusMethodTable health_link_methods[] = {
 +	{ NULL }
 +};
 +
-+static struct hdp_device *create_health_device(DBusConnection *conn,
-+						struct btd_device *device)
-+{
-+	const gchar *path = device_get_path(device);
-+	struct hdp_device *dev;
+ static void hdp_mcl_connect_cb(struct mcap_mcl *mcl, GError *err, void *data)
+ {
+ 	struct hdp_connection_cb *cb_data = data;
+ 	struct hdp_device *device = cb_data->device;
+-	/* struct hdp_instance *hdpi = cb_data->hdpi; */
++	struct hdp_instance *hdpi = cb_data->hdpi;
+ 	DBusMessage *msg = cb_data->msg;
++	struct hdp_link *hdpl = NULL;
+ 	GError *cberr = NULL;
+ 	DBusMessage *reply;
+ 
+@@ -360,8 +384,13 @@ static void hdp_mcl_connect_cb(struct mcap_mcl *mcl, GError *err, void *data)
+ 	if (err)
+ 		goto fail;
+ 
+-	/* Create and Register HealthLink interface */
+-	mcap_mcl_set_cb(mcl, &cberr, NULL /*health_link*/,
++	hdpl = g_new0(struct hdp_link, 1);
++	hdpl->hdpi = hdpi;
++	hdpl->dev = device;
++	hdpl->mcl = mcap_mcl_ref(mcl);
++	set_health_link_path(hdpl);
 +
-+	dev = g_new0(struct hdp_device, 1);
-+	dev->conn = dbus_connection_ref(conn);
-+	dev->dev = btd_device_ref(device);
++	mcap_mcl_set_cb(mcl, &cberr, hdpl,
+ 		MCAP_MDL_CB_CONNECTED, hdp_mcap_mdl_connected_cb,
+ 		MCAP_MDL_CB_CLOSED, hdp_mcap_mdl_closed_cb,
+ 		MCAP_MDL_CB_DELETED, hdp_mcap_mdl_deleted_cb,
+@@ -369,14 +398,35 @@ static void hdp_mcl_connect_cb(struct mcap_mcl *mcl, GError *err, void *data)
+ 		MCAP_MDL_CB_REMOTE_CONN_REQ, hdp_mcap_mdl_conn_req_cb,
+ 		MCAP_MDL_CB_REMOTE_RECONN_REQ, hdp_mcap_mdl_reconn_req_cb,
+ 		MCAP_MDL_CB_INVALID);
 +
-+	if (!g_dbus_register_interface(conn, path,
-+					HEALTH_DEVICE,
-+					device_methods, NULL, NULL,
-+					dev, dev_path_unregister)) {
-+		error("D-Bus failed to register %s interface", HEALTH_DEVICE);
-+		health_device_free(dev);
-+		return NULL;
+ 	if (cberr)
+ 		goto fail;
++
++	if (!g_dbus_register_interface(hdpl->dev->conn, hdpl->path, HEALTH_LINK,
++					health_link_methods, NULL, NULL,
++					hdpl, health_link_path_unregister)) {
++		error("D-Bus failed to register %s interface to %s",
++						HEALTH_LINK, hdpl->path);
++		goto fail;
 +	}
 +
-+	DBG("Registered interface %s on path %s", HEALTH_DEVICE, path);
-+	return dev;
-+}
-+
- static void hdp_set_instance_id(struct hdp_instance *hdpi)
- {
- 	struct hdp_adapter *adapter = hdpi->adapter;
-@@ -59,7 +155,7 @@ static void hdp_set_instance_id(struct hdp_instance *hdpi)
- }
- 
- static DBusMessage *hdp_create_instance(DBusConnection *conn,
--					DBusMessage *msg, void *user_data)
-+				      DBusMessage *msg, void *user_data)
- {
- 	struct hdp_adapter *adapter = user_data;
- 	const char *path, *name;
-@@ -185,13 +281,29 @@ void hdp_adapter_unregister(struct btd_adapter *btd_adapter)
- 	DBG("HDP exit");
- }
- 
--int health_device_register(struct btd_device *device, const char *uuid)
-+int hdp_device_register(DBusConnection *conn, struct btd_device *device)
- {
--	DBG("HDP_DRIVER_PROBE with uuid %s", uuid);
-+	struct hdp_device *hdp_dev;
-+
-+	hdp_dev = find_device(devices, device);
-+	if (!hdp_dev) {
-+		hdp_dev = create_health_device(conn, device);
-+		if (!hdp_dev)
-+			return -1;
-+		devices = g_slist_append(devices, hdp_dev);
++	hdpi->hlink = g_slist_prepend(hdpi->hlink, hdpl);
++	reply = g_dbus_create_reply(msg, DBUS_TYPE_OBJECT_PATH, &hdpl->path,
++							DBUS_TYPE_INVALID);
++	g_dbus_send_message(device->conn, reply);
+ 	return;
+ fail:
+ 	reply = g_dbus_create_error(msg, ERROR_INTERFACE ".HdpError",
+ 					(err ? err->message : cberr->message));
+-	if (!cberr)
++	if (cberr) {
++		/* MCAP will close the MCL and won't cache it if we didn't
++		* increase the MCL reference counter during the callback. */
++		mcap_mcl_unref(hdpl->mcl);
++		g_free(hdpl->path);
++		g_free(hdpl);
+ 		g_error_free(cberr);
 +	}
- 	return 0;
++
+ 	g_dbus_send_message(device->conn, reply);
  }
  
--void health_device_unregister(struct btd_device *device)
-+void hdp_device_unregister(struct btd_device *device)
- {
--	DBG("TODO: Remove device");
-+	struct hdp_device *hdp_dev;
-+	const char *path;
-+
-+	hdp_dev = find_device(devices, device);
-+	if (!hdp_dev)
-+		return;
-+
-+	path = device_get_path(hdp_dev->dev);
-+	g_dbus_unregister_interface(hdp_dev->conn, path, HEALTH_DEVICE);
+@@ -421,8 +471,8 @@ static void connect_health_instance(sdp_list_t *recs, int err, gpointer data)
+ 	reply = g_dbus_create_error(msg, ERROR_INTERFACE ".HealthError",
+ 			"Error getting remote protocol descriptor list");
+ fail:
+-	g_dbus_send_message(device->conn, reply);
+ 	g_free(cb_data);
++	g_dbus_send_message(device->conn, reply);
  }
-diff --git a/health/hdp.h b/health/hdp.h
-index 0aae7b9..edb06a0 100644
---- a/health/hdp.h
-+++ b/health/hdp.h
-@@ -26,5 +26,5 @@
- int hdp_adapter_register(DBusConnection *conn, struct btd_adapter *btd_adapter);
- void hdp_adapter_unregister(struct btd_adapter *btd_adapter);
  
--int health_device_register(struct btd_device *device, const char *uuid);
--void health_device_unregister(struct btd_device *device);
-+int hdp_device_register(DBusConnection *conn, struct btd_device *device);
-+void hdp_device_unregister(struct btd_device *device);
+ static DBusMessage *hdp_connect(DBusConnection *conn,
 diff --git a/health/hdp_types.h b/health/hdp_types.h
-index 2db9adf..171910a 100644
+index 3bab4ea..05bfbfe 100644
 --- a/health/hdp_types.h
 +++ b/health/hdp_types.h
-@@ -30,6 +30,10 @@
- #include <glib.h>
- #include "mcap_lib.h"
- 
-+#define HDP_UUID		"00001400-0000-1000-8000-00805F9B34FB"
-+#define HDP_SOURCE_UUID		"00001401-0000-1000-8000-00805F9B34FB"
-+#define HDP_SINK_UUID		"00001402-0000-1000-8000-00805F9B34FB"
-+
- #define HDP_SERVICE_NAME	"Bluez HDP"
- #define HDP_SERVICE_DSC		"A Bluez health device profile implementation"
- #define HDP_SERVICE_PROVIDER	"Bluez"
-@@ -96,4 +100,10 @@ struct hdp_instance {
+@@ -99,10 +99,20 @@ struct hdp_instance {
+ 	struct hdp_config	*config;	/* Configuration */
  	uint32_t		sdp_handler;	/* SDP record handler */
- };
- 
-+struct hdp_device {
-+	DBusConnection		*conn;		/* for name listener handling */
-+	struct btd_device	*dev;		/* Device reference */
-+	struct hdp_adapter	*hdp_adapter;	/* hdp_adapater */
+ 	guint			dbus_watcher;	/* Client D-Bus conn watcher */
++	uint16_t		hlc;		/* Health link id. counter */
 +};
 +
- #endif /* __HDP_TYPES_H__ */
-diff --git a/health/hdp_util.c b/health/hdp_util.c
-index cc5dc2e..96fa737 100644
---- a/health/hdp_util.c
-+++ b/health/hdp_util.c
-@@ -838,3 +838,14 @@ error:
- 		sdp_record_free(sdp_record);
- 	return FALSE;
- }
-+
-+gboolean hdp_get_data_exchange_spec(const sdp_record_t *rec, guint8 *val)
-+{
-+	sdp_data_t *exspec;
-+
-+	exspec = sdp_data_get(rec, SDP_ATTR_DATA_EXCHANGE_SPEC);
-+	if (exspec->dtd != SDP_UINT8)
-+		return FALSE;
-+	*val = exspec->val.uint8;
-+	return TRUE;
-+}
-diff --git a/health/hdp_util.h b/health/hdp_util.h
-index fb114c7..0fdaaec 100644
---- a/health/hdp_util.h
-+++ b/health/hdp_util.h
-@@ -31,5 +31,7 @@
++struct hdp_link {
++	struct hdp_instance	*hdpi;		/* HDP session */
++	struct hdp_device	*dev;		/* Health Device */
++	struct mcap_mcl 	*mcl;		/* MCAP mcl */
++	GSList			*channels;	/* Data channels */
++	char			*path;		/* HDP link path */
++	uint32_t		id;		/* Health link id */
+ };
  
- struct hdp_config *hdp_get_config(DBusMessageIter *iter, GError **err);
- gboolean hdp_register_sdp_record(struct hdp_instance *hdps);
-+gboolean hdp_get_data_exchange_spec(const sdp_record_t *rec, guint8 *val);
-+void hdp_instance_free(struct hdp_instance *hdpi);
- 
- #endif /* __HDP_UTIL_H__ */
-diff --git a/health/manager.c b/health/manager.c
-index d163545..8b52e93 100644
---- a/health/manager.c
-+++ b/health/manager.c
-@@ -28,20 +28,19 @@
- #endif
- 
- #include <bluetooth/sdp.h>
-+#include <bluetooth/sdp_lib.h>
- 
- #include <glib.h>
- #include <gdbus.h>
- 
--#include "adapter.h"
--#include "device.h"
-+#include "hdp_types.h"
- 
- #include "log.h"
- #include "manager.h"
- #include "hdp.h"
- 
--#define HDP_UUID		"00001400-0000-1000-8000-00805F9B34FB"
--#define HDP_SOURCE_UUID		"00001401-0000-1000-8000-00805F9B34FB"
--#define HDP_SINK_UUID		"00001402-0000-1000-8000-00805F9B34FB"
-+#include "device.h"
-+#include "glib-helper.h"
- 
- static DBusConnection *connection = NULL;
- 
-@@ -63,22 +62,17 @@ static struct btd_adapter_driver hdp_adapter_driver = {
- 
- static int hdp_driver_probe(struct btd_device *device, GSList *uuids)
- {
--	while (uuids) {
--		health_device_register(device, uuids->data);
--		uuids = uuids->next;
--	}
--
--	return 0;
-+	return hdp_device_register(connection, device);
- }
- 
- static void hdp_driver_remove(struct btd_device *device)
- {
--	health_device_unregister(device);
-+	hdp_device_unregister(device);
- }
- 
- static struct btd_device_driver hdp_device_driver = {
- 	.name	= "hdp-device-driver",
--	.uuids	= BTD_UUIDS(HDP_UUID, HDP_SOURCE_UUID, HDP_SINK_UUID),
-+	.uuids	= BTD_UUIDS(HDP_UUID),
- 	.probe	= hdp_driver_probe,
- 	.remove	= hdp_driver_remove,
+ struct hdp_device {
+-	DBusConnection		*conn;		/* for name listener handling */
++	DBusConnection		*conn;		/* For name listener handling */
+ 	struct btd_device	*dev;		/* Device reference */
+ 	struct hdp_adapter	*hdp_adapter;	/* hdp_adapater */
  };
 -- 
 1.6.3.3
