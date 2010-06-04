@@ -2,10 +2,10 @@ Return-Path: <cyrus@holtmann.org>
 From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Subject: [PATCH 14/32] Manage mcap instances
-Date: Fri,  4 Jun 2010 10:30:07 +0200
-Message-Id: <1275640225-4186-15-git-send-email-santoscadenas@gmail.com>
-In-Reply-To: <1275640225-4186-14-git-send-email-santoscadenas@gmail.com>
+Subject: [PATCH 10/32] Insert end_point in array returned by get_health_instances
+Date: Fri,  4 Jun 2010 10:30:03 +0200
+Message-Id: <1275640225-4186-11-git-send-email-santoscadenas@gmail.com>
+In-Reply-To: <1275640225-4186-10-git-send-email-santoscadenas@gmail.com>
 References: <1275640225-4186-1-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-2-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-3-git-send-email-santoscadenas@gmail.com>
@@ -16,145 +16,132 @@ References: <1275640225-4186-1-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-8-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-9-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-10-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-11-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-12-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-13-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-14-git-send-email-santoscadenas@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- health/hdp.c      |   73 ++++++++++++++++++++++++++++++++++++++++------------
- health/hdp_util.c |    3 +-
- 2 files changed, 58 insertions(+), 18 deletions(-)
+ health/hdp.c      |   60 ++++++++++++++++++++++++++++++++++++++++++++++++++--
+ health/hdp_util.c |    2 -
+ 2 files changed, 57 insertions(+), 5 deletions(-)
 
 diff --git a/health/hdp.c b/health/hdp.c
-index b9f637e..e57d64c 100644
+index 4fb9d62..8690f0e 100644
 --- a/health/hdp.c
 +++ b/health/hdp.c
-@@ -457,6 +457,30 @@ static void client_disconnected(DBusConnection *connection, void *user_data)
- 	hdp_instance_free(hdpi);
+@@ -76,6 +76,43 @@ static struct hdp_device *find_device(GSList *devices, struct btd_device *dev)
+ 	return NULL;
  }
  
-+static void mcl_connected(struct mcap_mcl *mcl, gpointer data)
++static void append_dict_features(DBusMessageIter *iter, GSList *end_points)
 +{
-+	/* struct hdp_instance *hdpi = data; */
-+	DBG("TODO: implement mcl_connected");
++	DBusMessageIter entry, array;
++
++	dbus_message_iter_open_container(iter, DBUS_TYPE_DICT_ENTRY,
++								NULL, &entry);
++	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, "end_points");
++
++	dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT,
++			DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_TYPE_ARRAY_AS_STRING
++			DBUS_TYPE_ARRAY_AS_STRING
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &array);
++
++	dbus_message_iter_close_container(&entry, &array);
++	dbus_message_iter_close_container(iter, &entry);
 +}
 +
-+static void mcl_reconnected(struct mcap_mcl *mcl, gpointer data)
++static void append_array_entry(DBusMessageIter *iter, uint32_t *handler,
++					uint8_t *spec, GSList *end_points)
 +{
-+	/* struct hdp_instance *hdpi = data; */
-+	DBG("TODO: implement mcl_reconnected");
++	DBusMessageIter dict;
++
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
++
++	dict_append_entry(&dict, "id", DBUS_TYPE_UINT32, handler);
++	dict_append_entry(&dict, "data_spec", DBUS_TYPE_BYTE, spec);
++	append_dict_features(&dict, end_points);
++
++	dbus_message_iter_close_container(iter, &dict);
 +}
 +
-+static void mcl_disconnected(struct mcap_mcl *mcl, gpointer data)
-+{
-+	/* struct hdp_instance *hdpi = data; */
-+	DBG("TODO: implement mcl_disconnected");
-+}
-+
-+static void mcl_uncached(struct mcap_mcl *mcl, gpointer data)
-+{
-+	/* struct hdp_instance *hdpi = data; */
-+	DBG("TODO: implement mcl_uncached");
-+}
-+
- static DBusMessage *hdp_create_instance(DBusConnection *conn,
- 				      DBusMessage *msg, void *user_data)
+ static void sink_health_instances(sdp_list_t *recs, int err, gpointer user_data)
  {
-@@ -472,17 +496,24 @@ static DBusMessage *hdp_create_instance(DBusConnection *conn,
- 	dbus_message_iter_init(msg, &iter);
- 	ctype = dbus_message_iter_get_arg_type(&iter);
- 	if (ctype != DBUS_TYPE_OBJECT_PATH)
--		goto error;
-+		return g_dbus_create_error(msg,
-+					ERROR_INTERFACE ".InvalidArguments",
-+					"Invalid arguments in method call");
- 	dbus_message_iter_get_basic(&iter, &path);
- 	dbus_message_iter_next(&iter);
- 	config = hdp_get_config(&iter, &err);
--	if (err)
--		goto error;
-+	if (err) {
-+		reply = g_dbus_create_error(msg,
-+					ERROR_INTERFACE ".InvalidArguments",
-+					"Invalid arguments: %s", err->message);
-+		g_error_free(err);
-+		return reply;
-+	}
- 	name = dbus_message_get_sender(msg);
- 	if (!name) {
--		g_set_error(&err, HDP_ERROR, HDP_UNSPECIFIED_ERROR,
--						"Can't get sender name");
--		goto error;
-+		return g_dbus_create_error(msg,
-+					ERROR_INTERFACE ".InvalidArguments",
-+					"Can't get sender name");
+ 	struct instances_aux *cb_data = user_data;
+@@ -86,6 +123,7 @@ static void sink_health_instances(sdp_list_t *recs, int err, gpointer user_data)
+ 	sdp_list_t *l;
+ 	guint8 data_spec;
+ 	GSList *end_points;
++	DBusMessageIter iter, dict;
+ 
+ 	g_free(cb_data);
+ 
+@@ -97,10 +135,22 @@ static void sink_health_instances(sdp_list_t *recs, int err, gpointer user_data)
+ 		return;
  	}
  
- 	hdpi = g_new0(struct hdp_instance, 1);
-@@ -494,7 +525,20 @@ static DBusMessage *hdp_create_instance(DBusConnection *conn,
- 	hdpi->dbus_watcher = g_dbus_add_disconnect_watch(adapter->conn, name,
- 					client_disconnected, hdpi, NULL);
- 
--	/* TODO: Create mcap instance */
-+	hdpi->mi = mcap_create_instance(adapter->btd_adapter, BT_IO_SEC_MEDIUM,
-+					0, 0, &err, mcl_connected,
-+					mcl_reconnected, mcl_disconnected,
-+					mcl_uncached, hdpi);
-+	if (err)
-+		goto error;
++	reply = dbus_message_new_method_return(msg);
++	if (!reply)
++		return;
 +
-+	hdpi->ccpsm = mcap_get_ctrl_psm(hdpi->mi, &err);
-+	if (err)
-+		goto error;
++	dbus_message_iter_init_append(reply, &iter);
 +
-+	hdpi->dcpsm = mcap_get_data_psm(hdpi->mi, &err);
-+	if (err)
-+		goto error;
- 
- 	if (!hdp_register_sdp_record(hdpi)) {
- 		hdp_instance_free(hdpi);
-@@ -503,19 +547,14 @@ static DBusMessage *hdp_create_instance(DBusConnection *conn,
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++			DBUS_TYPE_ARRAY_AS_STRING
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
++
+ 	for (l = recs; l; l = l->next) {
+ 		rec = l->data;
+ 		DBG("Record found 0x%x", rec->handle);
+-		/* TODO: Check record */
++
+ 		if (!hdp_get_data_exchange_spec(rec, &data_spec)) {
+ 			error("Error getting data exchange info");
+ 			continue;
+@@ -110,11 +160,15 @@ static void sink_health_instances(sdp_list_t *recs, int err, gpointer user_data)
+ 			error("Error getting end points");
+ 			continue;
+ 		}
+-		DBG("Get data exchange spec %d", data_spec);
++		append_array_entry(&dict, &rec->handle, &data_spec,
++								end_points);
  	}
  
- 	adapter->instances = g_slist_prepend(adapter->instances, hdpi);
--	info("HDP instance created with path %d", hdpi->id);
-+	DBG("HDP instance created with id %d", hdpi->id);
- 	return g_dbus_create_reply(msg, DBUS_TYPE_UINT32, &hdpi->id,
- 							DBUS_TYPE_INVALID);
- error:
--	if (err) {
--		reply = g_dbus_create_error(msg,
--					ERROR_INTERFACE ".InvalidArguments",
--					"Invalid arguments: %s", err->message);
--		g_error_free(err);
--	} else
--		reply = g_dbus_create_error(msg,
--					ERROR_INTERFACE ".InvalidArguments",
--					"Invalid arguments in method call");
-+	reply = g_dbus_create_error(msg,ERROR_INTERFACE ".HealthError",
-+					err->message);
-+	g_error_free(err);
-+	hdp_instance_free(hdpi);
- 	return reply;
++	dbus_message_iter_close_container(&iter, &dict);
++/*
+ 	reply = g_dbus_create_error(msg, ERROR_INTERFACE ".HealthError",
+ 							"Not implemented yet");
++*/
+ 	g_dbus_send_message(device->conn, reply);
  }
  
+@@ -172,7 +226,7 @@ static void dev_path_unregister(void *data)
+ }
+ 
+ static GDBusMethodTable device_methods[] = {
+-	{ "GetHealthInstances", "", "a{sv}", get_health_instances,
++	{ "GetHealthInstances", "", "aa{sv}", get_health_instances,
+ 						G_DBUS_METHOD_FLAG_ASYNC },
+ 	{ NULL }
+ };
 diff --git a/health/hdp_util.c b/health/hdp_util.c
-index 066147a..a7fc1d5 100644
+index 0b39151..2f09417 100644
 --- a/health/hdp_util.c
 +++ b/health/hdp_util.c
-@@ -123,7 +123,8 @@ void hdp_instance_free(struct hdp_instance *hdpi)
- 		g_dbus_remove_watch(hdpi->adapter->conn, hdpi->dbus_watcher);
- 	if (hdpi->sdp_handler)
- 		remove_record_from_server(hdpi->sdp_handler);
--	/* TODO: stop mcap instance */
-+	if (hdpi->mi)
-+		mcap_release_instance(hdpi->mi);
- 	if (hdpi->apath)
- 		g_free(hdpi->apath);
- 	if (hdpi->aname)
+@@ -947,7 +947,5 @@ GSList *hdp_get_end_points(const sdp_record_t *rec)
+ 		epl = get_feature(epl, l->val.dataseq);
+ 	}
+ 
+-	g_slist_foreach(epl, print_features, NULL);
+-
+ 	return epl;
+ }
 -- 
 1.6.3.3
 
