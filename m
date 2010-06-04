@@ -2,10 +2,10 @@ Return-Path: <cyrus@holtmann.org>
 From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Subject: [PATCH 27/32] Change function name when retreiving remote SDP records
-Date: Fri,  4 Jun 2010 10:30:20 +0200
-Message-Id: <1275640225-4186-28-git-send-email-santoscadenas@gmail.com>
-In-Reply-To: <1275640225-4186-27-git-send-email-santoscadenas@gmail.com>
+Subject: [PATCH 25/32] Create new structure to manage data channels in HDP
+Date: Fri,  4 Jun 2010 10:30:18 +0200
+Message-Id: <1275640225-4186-26-git-send-email-santoscadenas@gmail.com>
+In-Reply-To: <1275640225-4186-25-git-send-email-santoscadenas@gmail.com>
 References: <1275640225-4186-1-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-2-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-3-git-send-email-santoscadenas@gmail.com>
@@ -31,37 +31,31 @@ References: <1275640225-4186-1-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-23-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-24-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-25-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-26-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-27-git-send-email-santoscadenas@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- health/hdp.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+ health/hdp_types.h |    7 +++++++
+ 1 files changed, 7 insertions(+), 0 deletions(-)
 
-diff --git a/health/hdp.c b/health/hdp.c
-index a480b8e..bb03ffa 100644
---- a/health/hdp.c
-+++ b/health/hdp.c
-@@ -266,7 +266,7 @@ static void fill_up_health_instances(DBusMessageIter *dict, gpointer data)
- 	}
- }
+diff --git a/health/hdp_types.h b/health/hdp_types.h
+index 5db8e0d..6d41e2b 100644
+--- a/health/hdp_types.h
++++ b/health/hdp_types.h
+@@ -115,6 +115,13 @@ struct hdp_link {
+ 	uint32_t		id;		/* Health link id */
+ };
  
--static void sink_health_instances(sdp_list_t *recs, int err, gpointer user_data)
-+static void health_records_found(sdp_list_t *recs, int err, gpointer user_data)
- {
- 	struct instances_aux *cb_data = user_data;
- 	DBusMessage *msg = cb_data->msg;
-@@ -314,7 +314,7 @@ static DBusMessage *get_health_instances(DBusConnection *conn,
- 
- 
- 	bt_string2uuid(&uuid, HDP_UUID);
--	if (bt_search_service(&src, &dst, &uuid, sink_health_instances,
-+	if (bt_search_service(&src, &dst, &uuid, health_records_found,
- 						cb_data, NULL) == 0)
- 		return NULL;
- 
++struct hdp_dc {
++	struct hdp_link		*hdpl;		/* Health link */
++	struct mcap_mdl		*mdl;		/* MCAP MDL structure */
++	uint8_t			conf;		/* Requested conf */
++	uint16_t		mdlid;		/* MDL id */
++};
++
+ struct hdp_device {
+ 	DBusConnection		*conn;		/* For name listener handling */
+ 	struct btd_device	*dev;		/* Device reference */
 -- 
 1.6.3.3
 
