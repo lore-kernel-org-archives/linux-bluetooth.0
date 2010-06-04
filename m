@@ -2,10 +2,10 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 25/26] Initial support for clock synchronization protocol
-Date: Fri,  4 Jun 2010 10:27:18 +0200
-Message-Id: <1275640039-7245-26-git-send-email-sancane@gmail.com>
-In-Reply-To: <1275640039-7245-25-git-send-email-sancane@gmail.com>
+Subject: [PATCH 24/26] Enable connection of Data Channel with remote MCAP instances
+Date: Fri,  4 Jun 2010 10:27:17 +0200
+Message-Id: <1275640039-7245-25-git-send-email-sancane@gmail.com>
+In-Reply-To: <1275640039-7245-24-git-send-email-sancane@gmail.com>
 References: <1275640039-7245-1-git-send-email-sancane@gmail.com>
  <1275640039-7245-2-git-send-email-sancane@gmail.com>
  <1275640039-7245-3-git-send-email-sancane@gmail.com>
@@ -30,137 +30,84 @@ References: <1275640039-7245-1-git-send-email-sancane@gmail.com>
  <1275640039-7245-22-git-send-email-sancane@gmail.com>
  <1275640039-7245-23-git-send-email-sancane@gmail.com>
  <1275640039-7245-24-git-send-email-sancane@gmail.com>
- <1275640039-7245-25-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- Makefile.am |    4 +-
- mcap/mcap.c |    3 +-
- mcap/sync.c |   85 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 88 insertions(+), 4 deletions(-)
- create mode 100644 mcap/sync.c
+ mcap/mcap.c |   60 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 60 insertions(+), 0 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index 93566b6..f96d556 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -170,8 +170,8 @@ builtin_sources += plugins/service.c
- endif
- 
- if MCAP
--mcap_sources += mcap/mcap_internal.h	\
--		mcap/mcap_lib.h		\
-+mcap_sources += mcap/mcap_internal.h \
-+		mcap/mcap_lib.h	mcap/sync.c \
- 		mcap/mcap.h mcap/mcap.c
- endif
- 
 diff --git a/mcap/mcap.c b/mcap/mcap.c
-index 656b254..d907eca 100644
+index 26eb7b9..656b254 100644
 --- a/mcap/mcap.c
 +++ b/mcap/mcap.c
-@@ -1511,8 +1511,7 @@ static void proc_cmd(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
- {
- 	if ((cmd[0] >= MCAP_MD_SYNC_CAP_REQ) &&
- 					(cmd[0] <= MCAP_MD_SYNC_INFO_IND)) {
--		send4B_cmd(mcl, cmd[0], MCAP_REQUEST_NOT_SUPPORTED,
--							MCAP_MDLID_RESERVED);
-+		proc_sync_cmd(mcl, cmd, len);
- 		return;
- 	}
+@@ -1558,6 +1558,66 @@ static gboolean mdl_event_cb(GIOChannel *chan, GIOCondition cond, gpointer data)
+ 	return FALSE;
+ }
  
-diff --git a/mcap/sync.c b/mcap/sync.c
-new file mode 100644
-index 0000000..76f1377
---- /dev/null
-+++ b/mcap/sync.c
-@@ -0,0 +1,85 @@
-+/*
-+ *
-+ *  MCAP for BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2010 GSyC/LibreSoft, Universidad Rey Juan Carlos.
-+ *
-+ *  Authors:
-+ *  Santiago Carot-Nemesio <sancane at gmail.com>
-+ *  Jose Antonio Santos-Cadenas <santoscadenas at gmail.com>
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#include <stdint.h>
-+#include <netinet/in.h>
-+
-+#include "log.h"
-+
-+#include "mcap.h"
-+#include "mcap_lib.h"
-+#include "mcap_internal.h"
-+
-+static int send_unsupported_req(struct mcap_mcl *mcl, uint8_t oc)
++static void mcap_connect_mdl_cb(GIOChannel *chan, GError *conn_err,
++							gpointer data)
 +{
-+	uint8_t *rsp;
-+	mcap4B_rsp *rsp_err;
-+	int sent;
++	struct mcap_mdl_op_cb *con = data;
++	struct mcap_mdl *mdl = con->mdl;
++	mcap_mdl_operation_cb cb = con->cb.op;
++	gpointer user_data = con->user_data;
 +
++	g_free(con);
++	DBG("mdl connect callback");
 +
-+	rsp = g_malloc0(sizeof(mcap4B_rsp));
++	if (conn_err) {
++		DBG("ERROR: mdl connect callback");
++		mdl->state = MDL_CLOSED;
++		g_io_channel_unref(mdl->dc);
++		mdl->dc = NULL;
++		cb(mdl, conn_err, user_data);
++		return;
++	}
 +
-+	rsp_err = (mcap4B_rsp *)rsp;
-+	rsp_err->op = oc;
-+	rsp_err->rc = MCAP_REQUEST_NOT_SUPPORTED;
-+	rsp_err->mdl = htons (MCAP_MDLID_RESERVED);
++	mdl->state = MDL_CONNECTED;
++	mdl->wid = g_io_add_watch(mdl->dc, G_IO_ERR | G_IO_HUP | G_IO_NVAL,
++				(GIOFunc) mdl_event_cb, mdl);
 +
-+	sent = mcap_send_data(g_io_channel_unix_get_fd(mcl->cc),
-+					rsp,
-+					sizeof(mcap4B_rsp));
-+	g_free(rsp);
-+	return sent;
++	cb(mdl, conn_err, user_data);
 +}
 +
-+void proc_sync_cmd(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
++void mcap_mdl_connect(struct mcap_mdl *mdl, BtIOType BtType, uint16_t dcpsm,
++	GError **err, mcap_mdl_operation_cb connect_cb, gpointer user_data)
 +{
-+	switch (cmd[0]) {
-+	case MCAP_MD_SYNC_CAP_REQ:
-+		DBG("TODO: received MCAP_MD_SYNC_CAP_REQ: %d",
-+							MCAP_MD_SYNC_CAP_REQ);
-+		/* Not implemented yet. Reply with unsupported request */
-+		send_unsupported_req(mcl, cmd[0]);
-+		break;
-+	case MCAP_MD_SYNC_CAP_RSP:
-+		DBG("TODO: received MCAP_MD_SYNC_CAP_RSP: %d",
-+							MCAP_MD_SYNC_CAP_RSP);
-+		break;
-+	case MCAP_MD_SYNC_SET_REQ:
-+		DBG("TODO: received MCAP_MD_SYNC_SET_REQ: %d",
-+							MCAP_MD_SYNC_SET_REQ);
-+		/* Not implemented yet. Reply with unsupported request */
-+		send_unsupported_req(mcl, cmd[0]);
-+		break;
-+	case MCAP_MD_SYNC_SET_RSP:
-+		DBG("TODO: received MCAP_MD_SYNC_SET_RSP: %d",
-+							MCAP_MD_SYNC_SET_RSP);
-+		break;
-+	case MCAP_MD_SYNC_INFO_IND:
-+		DBG("TODO: received MCAP_MD_SYNC_INFO_IND :%d",
-+							MCAP_MD_SYNC_INFO_IND);
-+		break;
++	struct mcap_mdl_op_cb *con;
++
++	if (mdl->state != MDL_WAITING) {
++		g_set_error(err, MCAP_ERROR, MCAP_ERROR_INVALID_MDL,
++					"%s", error2str(MCAP_INVALID_MDL));
++		return;
++	}
++
++	con = g_new0(struct mcap_mdl_op_cb, 1);
++	con->mdl = mdl;
++	con->cb.op = connect_cb;
++	con->user_data = user_data;
++
++	/* TODO: Check if BtIOType is ERTM or Streaming before continue */
++
++	mdl->dc = bt_io_connect(BtType, mcap_connect_mdl_cb, con,
++				NULL, err,
++				BT_IO_OPT_SOURCE_BDADDR, &mdl->mcl->ms->src,
++				BT_IO_OPT_DEST_BDADDR, &mdl->mcl->addr,
++				BT_IO_OPT_PSM, dcpsm,
++				BT_IO_OPT_MTU, MCAP_DC_MTU,
++				BT_IO_OPT_SEC_LEVEL, mdl->mcl->ms->sec,
++				BT_IO_OPT_INVALID);
++	if (*err) {
++		DBG("MDL Connection error");
++		mdl->state = MDL_CLOSED;
++		g_free(con);
 +	}
 +}
++
+ static gboolean mcl_control_cb(GIOChannel *chan, GIOCondition cond,
+ 								gpointer data)
+ {
 -- 
 1.6.3.3
 
