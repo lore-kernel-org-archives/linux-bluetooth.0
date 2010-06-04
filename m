@@ -2,10 +2,10 @@ Return-Path: <cyrus@holtmann.org>
 From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Subject: [PATCH 32/32] Add support for mcl reconnections
-Date: Fri,  4 Jun 2010 10:30:25 +0200
-Message-Id: <1275640225-4186-33-git-send-email-santoscadenas@gmail.com>
-In-Reply-To: <1275640225-4186-32-git-send-email-santoscadenas@gmail.com>
+Subject: [PATCH 26/32] Implement connect data channel callback
+Date: Fri,  4 Jun 2010 10:30:19 +0200
+Message-Id: <1275640225-4186-27-git-send-email-santoscadenas@gmail.com>
+In-Reply-To: <1275640225-4186-26-git-send-email-santoscadenas@gmail.com>
 References: <1275640225-4186-1-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-2-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-3-git-send-email-santoscadenas@gmail.com>
@@ -32,72 +32,137 @@ References: <1275640225-4186-1-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-24-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-25-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-26-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-27-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-28-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-29-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-30-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-31-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-32-git-send-email-santoscadenas@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- health/hdp.c |   20 ++++++++++++--------
- 1 files changed, 12 insertions(+), 8 deletions(-)
+ health/hdp.c       |   68 +++++++++++++++++++++++++++++++++++++++++++++++----
+ health/hdp_types.h |    5 ++++
+ 2 files changed, 67 insertions(+), 6 deletions(-)
 
 diff --git a/health/hdp.c b/health/hdp.c
-index 6a73e05..8a6a0d4 100644
+index f29a1c5..a480b8e 100644
 --- a/health/hdp.c
 +++ b/health/hdp.c
-@@ -56,6 +56,7 @@ struct hdp_connection_cb {
- 	struct hdp_instance	*hdpi;
- 	uint32_t		rem_id;
- 	DBusMessage		*msg;
-+	struct hdp_link		*hdpl;
+@@ -107,6 +107,13 @@ static struct hdp_link *find_health_link(struct hdp_adapter *adapter,
+ 	return NULL;
+ }
+ 
++static int hdp_supp_fts_mdepcmp(gconstpointer ft, gconstpointer mdepid)
++{
++	const struct hdp_supp_fts *fts = ft;
++
++	return bcmp(&fts->mdepid, mdepid, sizeof(uint8_t));
++}
++
+ static int hdp_instance_idcmp(gconstpointer instance, gconstpointer p)
+ {
+ 	const struct hdp_instance *hdpi = instance;
+@@ -379,19 +386,65 @@ static void hdp_mcap_mdl_closed_cb(struct mcap_mdl *mdl, void *data)
+ 	DBG("TODO: Incomplete callback, mdl closed");
+ }
+ 
+-static uint8_t hdp_mcap_mdl_conn_req_cb(struct mcap_mdl *mdl, void *data)
++static uint8_t hdp_mcap_mdl_reconn_req_cb(struct mcap_mdl *mdl, void *data)
+ {
+ 	/* struct hdp_link *hdpl = data; */
+ 	DBG("TODO: Incomplete callback, mdl connection request");
+ 	return MCAP_REQUEST_NOT_SUPPORTED;
+ }
+ 
+-static uint8_t hdp_mcap_mdl_reconn_req_cb(struct mcap_mcl *mcl,
+-					  uint8_t mdepid, uint16_t mdlid,
+-					  uint8_t *conf, void *data)
++static uint8_t hdp_mcap_mdl_conn_req_cb(struct mcap_mcl *mcl, uint8_t mdepid,
++				uint16_t mdlid, uint8_t *conf, void *data)
+ {
+-	DBG("TODO: Incomplete callback, mdl reconnection request");
+-	return MCAP_REQUEST_NOT_SUPPORTED;
++	struct hdp_link *hdpl = data;
++	struct hdp_supp_fts *f;
++	struct hdp_dc *dc;
++	uint8_t new_conf;
++	GSList *l;
++
++	l = g_slist_find_custom(hdpl->hdpi->config->supp_fts, &mdepid,
++							hdp_supp_fts_mdepcmp);
++	if (!l)
++		return MCAP_INVALID_MDEP;
++	f = l->data;
++
++	/* Check if is the first dc if so,
++	 * only reliable configuration is allowed */
++	switch(*conf) {
++		case HDP_NO_PREFERENCE_DC:
++			if (f->role == HDP_SINK)
++				return MCAP_CONFIGURATION_REJECTED;
++			else
++				new_conf = HDP_RELIABLE_DC;
++			break;
++		case HDP_STREAMING_DC:
++			if (g_slist_length(hdpl->channels) == 0)
++				return MCAP_CONFIGURATION_REJECTED;
++		case HDP_RELIABLE_DC:
++			if (f->role == HDP_SOURCE)
++				return MCAP_CONFIGURATION_REJECTED;
++			new_conf = *conf;
++			break;
++		default:
++			/* Special case defined in HDP spec 3.4. When an invalid
++			 * configuration is received we need close the MCL when
++			 * we are still processing the callback. When MCL is
++			 * closed in a callback the returned value won't be
++			 * proccesed in MCAP */
++			/* TODO: Send MCL disconnection to agent */
++			g_dbus_unregister_interface(hdpl->hdpi->adapter->conn,
++						hdpl->path, HEALTH_LINK);
++			return MCAP_CONFIGURATION_REJECTED; /* not processed */
++	}
++	*conf = new_conf;
++
++	dc = g_new0(struct hdp_dc, 1);
++	dc->hdpl = hdpl;
++	dc->conf = *conf;
++	dc->mdlid = mdlid;
++
++	hdpl->ndc = dc;
++	return MCAP_SUCCESS;
+ }
+ 
+ static void health_link_free(struct hdp_link *hdpl)
+@@ -406,6 +459,9 @@ static void health_link_free(struct hdp_link *hdpl)
+ 	if (hdpl->path)
+ 		g_free(hdpl->path);
+ 
++	if (hdpl->ndc)
++		g_free(hdpl->ndc);
++
+ 	hdpl->hdpi->hlink = g_slist_remove(hdpl->hdpi->hlink, hdpl);
+ 	g_free(hdpl);
+ }
+diff --git a/health/hdp_types.h b/health/hdp_types.h
+index 6d41e2b..abbfbf3 100644
+--- a/health/hdp_types.h
++++ b/health/hdp_types.h
+@@ -46,6 +46,10 @@
+ #define HEALTH_DEVICE			"org.bluez.HealthDevice"
+ #define HEALTH_LINK			"org.bluez.HealthLink"
+ 
++#define HDP_NO_PREFERENCE_DC	0x00
++#define HDP_RELIABLE_DC		0x01
++#define HDP_STREAMING_DC	0x02
++
+ typedef enum {
+ 	HDP_DIC_PARSE_ERROR,
+ 	HDP_DIC_ENTRY_PARSE_ERROR,
+@@ -113,6 +117,7 @@ struct hdp_link {
+ 	GSList			*channels;	/* Data channels */
+ 	char			*path;		/* HDP link path */
+ 	uint32_t		id;		/* Health link id */
++	struct hdp_dc		*ndc;		/* Data channel negotiated */
  };
  
- static struct hdp_adapter *find_adapter(GSList *list,
-@@ -554,11 +555,15 @@ static void hdp_mcl_connect_cb(struct mcap_mcl *mcl, GError *err, void *data)
- 	if (err)
- 		goto fail;
- 
--	hdpl = create_health_link(hdpi, mcl, &gerr);
--	if (gerr)
--		goto fail;
-+	if (cb_data->hdpl)
-+		hdpl = cb_data->hdpl;
-+	else {
-+		hdpl = create_health_link(hdpi, mcl, &gerr);
-+		if (gerr)
-+			goto fail;
-+		hdpi->hlink = g_slist_prepend(hdpi->hlink, hdpl);
-+	}
- 
--	hdpi->hlink = g_slist_prepend(hdpi->hlink, hdpl);
- 	reply = g_dbus_create_reply(msg, DBUS_TYPE_OBJECT_PATH, &hdpl->path,
- 							DBUS_TYPE_INVALID);
- 	g_dbus_send_message(device->conn, reply);
-@@ -664,10 +669,7 @@ static DBusMessage *hdp_connect(DBusConnection *conn,
- 	hdpi = l->data;
- 	hdpl = get_health_link(hdpi, device);
- 	if (hdpl) {
--		if (hdpl->closed) {
--			DBG("Need a reconection");
--			/* TODO: Reconnect */;
--		} else
-+		if (!hdpl->closed)
- 			return g_dbus_create_reply(msg, DBUS_TYPE_OBJECT_PATH,
- 						&hdpl->path, DBUS_TYPE_INVALID);
- 	}
-@@ -677,6 +679,8 @@ static DBusMessage *hdp_connect(DBusConnection *conn,
- 	cb_data->hdpi = hdpi;
- 	cb_data->rem_id = rid;
- 	cb_data->msg = dbus_message_ref(msg);
-+	/* Used for reconnections */
-+	cb_data->hdpl = hdpl;
- 
- 	adapter = device->hdp_adapter->btd_adapter;
- 	adapter_get_address(adapter, &src);
+ struct hdp_dc {
 -- 
 1.6.3.3
 
