@@ -1,26 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 4 Jun 2010 11:27:24 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Elvis =?iso-8859-1?Q?Pf=FCtzenreuter?= <epx@signove.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3] Change MDP profile name and macros to HDP
-Message-ID: <20100604082724.GA2714@jh-x301>
-References: <1275422058-16172-1-git-send-email-epx@signove.com>
+Message-ID: <4C08B86A.70602@linux.intel.com>
+Date: Fri, 04 Jun 2010 16:25:14 +0800
+From: Zhu Yanhai <yanhai.zhu@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1275422058-16172-1-git-send-email-epx@signove.com>
+To: Zhu Yanhai <yanhai.zhu@linux.intel.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] gateway_server_remove should unref audio_adapter
+References: <1275639598-22048-1-git-send-email-yanhai.zhu@linux.intel.com>
+In-Reply-To: <1275639598-22048-1-git-send-email-yanhai.zhu@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Elvis,
-
-On Tue, Jun 01, 2010, Elvis Pfützenreuter wrote:
+On 06/04/2010 04:19 PM, Zhu Yanhai wrote:
+> gateway_server_remove should unrefer the adapter, not refer it.
+>
+> Signed-off-by: Zhu Yanhai<yanhai.zhu@linux.intel.com>
 > ---
->  lib/sdp.c       |    6 +++---
->  lib/sdp.h       |   22 ++++++++++++++++------
->  tools/sdptool.c |    6 +++---
->  3 files changed, 22 insertions(+), 12 deletions(-)
+>   audio/manager.c |    2 +-
+>   1 files changed, 1 insertions(+), 1 deletions(-)
+>
+> diff --git a/audio/manager.c b/audio/manager.c
+> index 28fd8af..f6a98cd 100644
+> --- a/audio/manager.c
+> +++ b/audio/manager.c
+> @@ -932,7 +932,7 @@ static void gateway_server_remove(struct btd_adapter *adapter)
+>   		adp->hfp_hs_server = NULL;
+>   	}
+>
+> -	audio_adapter_ref(adp);
+> +	audio_adapter_unref(adp);
+>   }
+>
+>   static int a2dp_server_probe(struct btd_adapter *adapter)
 
-Thanks for the patch. It has now been pushed upstream.
+The current BlueZ 4.65 can't register itself on DBUS after system 
+resume, as the interface org.bluez.Adapter wasn't unregistered during 
+system suspend due to the non-zero ref numbers.
 
-Johan
+Regards,
+Zhu Yanhai
