@@ -2,115 +2,243 @@ Return-Path: <cyrus@holtmann.org>
 From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Subject: [PATCH 09/32] Adds functions to get remote suported features from its SDP record
-Date: Fri,  4 Jun 2010 10:30:02 +0200
-Message-Id: <1275640225-4186-10-git-send-email-santoscadenas@gmail.com>
-In-Reply-To: <1275640225-4186-9-git-send-email-santoscadenas@gmail.com>
+Subject: [PATCH 01/32] Add Health api description
+Date: Fri,  4 Jun 2010 10:29:54 +0200
+Message-Id: <1275640225-4186-2-git-send-email-santoscadenas@gmail.com>
+In-Reply-To: <1275640225-4186-1-git-send-email-santoscadenas@gmail.com>
 References: <1275640225-4186-1-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-2-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-3-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-4-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-5-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-6-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-7-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-8-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-9-git-send-email-santoscadenas@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This API describes the interface shown by the Health plugin through d-bus
 ---
- health/hdp_util.c |   74 +++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 files changed, 69 insertions(+), 5 deletions(-)
+ doc/health-api.txt |  217 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 217 insertions(+), 0 deletions(-)
+ create mode 100644 doc/health-api.txt
 
-diff --git a/health/hdp_util.c b/health/hdp_util.c
-index 731154b..0b39151 100644
---- a/health/hdp_util.c
-+++ b/health/hdp_util.c
-@@ -781,11 +781,6 @@ static gboolean register_data_exchange_spec(struct hdp_config *config,
- 	return TRUE;
- }
- 
--GSList *hdp_get_end_points(const sdp_record_t *rec)
--{
--	return NULL;
--}
--
- static gboolean register_mcap_features(sdp_record_t *sdp_record)
- {
- 	sdp_data_t *mcap_proc;
-@@ -887,3 +882,72 @@ gboolean hdp_get_data_exchange_spec(const sdp_record_t *rec, guint8 *val)
- 	*val = exspec->val.uint8;
- 	return TRUE;
- }
+diff --git a/doc/health-api.txt b/doc/health-api.txt
+new file mode 100644
+index 0000000..83e29af
+--- /dev/null
++++ b/doc/health-api.txt
+@@ -0,0 +1,217 @@
++BlueZ D-Bus Health API description
++**********************************
 +
-+static gint cmp_feat_mdep(gconstpointer a, gconstpointer b)
-+{
-+	const struct hdp_supp_fts *fts = a;
-+	const guint8 *mdep = b;
++	Santiago Carot-Nemesio <sancane@gmail.com>
++	José Antonio Santos-Cadenas <santoscadenas@gmail.com>
++	Elvis Pfützenreuter <epx@signove.com>
 +
-+	if (fts->mdepid == *mdep)
-+		return 0;
-+	return -1;
-+}
++Health Device Profile hierarchy
++===============================
 +
-+static GSList *get_feature(GSList *epl, sdp_data_t *feat_seq)
-+{
-+	struct hdp_supp_fts *fts;
-+	struct hdp_feature *feat;
-+	GSList *l;
-+	sdp_data_t *mdepid, *dtype, *role, *desc;
++Service		org.bluez
++Interface	org.bluez.HealthAdapter
++Object path	[variable prefix]/{hci0,hci1,...}
 +
-+	mdepid = feat_seq;
-+	if (!mdepid || mdepid->dtd != SDP_UINT8)
-+		return epl;
-+	dtype = mdepid->next;
-+	if (!dtype || dtype->dtd != SDP_UINT16)
-+		return epl;
-+	role = dtype->next;
-+	if (!role || role->dtd != SDP_UINT8)
-+		return epl;
-+	desc = role->next;
++Methods:
 +
-+	l = g_slist_find_custom(epl, &mdepid->val.uint8, cmp_feat_mdep);
-+	if (l) {
-+		fts = l->data;
-+		if (fts->role != role->val.uint8)
-+			return epl;
-+	} else {
-+		fts = g_new0(struct hdp_supp_fts, 1);
-+		fts->mdepid = mdepid->val.uint8;
-+		fts->role = role->val.uint8;
-+		epl = g_slist_prepend(epl, fts);
-+	}
++	uint32	CreateInstance(object path, dict config)
 +
-+	feat = g_new0(struct hdp_feature, 1);
-+	feat->dtype = dtype->val.uint16;
-+	if (desc && desc->dtd == SDP_TEXT_STR8)
-+		feat->dscr = g_strdup(desc->val.str);
-+	fts->features = g_slist_prepend(fts->features, feat);
-+	return epl;
-+}
++		Returns the id of the new created instance. The path parameter
++		is the path of the remote object with the callbacks to notify
++		events (see org.bluez.HealthAgent at the end of this document)
++		This petition starts an mcap instance and also register in the
++		SDP if is needed.
 +
-+GSList *hdp_get_end_points(const sdp_record_t *rec)
-+{
-+	GSList *epl = NULL;
-+	sdp_data_t *end_points, *l;
++		Dict is defined as bellow:
++		{ "data_spec" : The data_spec is the data exchange specification
++				(see section 5.2.10 of the specification
++				document) possible values:
++					0x00 = reserved,
++					0x01 [IEEE 11073-20601],
++					0x02..0xff reserved,
++				(optional)
++		  "end_points" : [{ (optional)
++			"mdepid" : uint8, (optional)
++			"role" : ("source" or "sink"), (mandatory)
++			"specs" :[{ (mandatory)
++				"data_type" : uint16, (mandatory)
++				"description" : string, (optional)
++			}]
++		  }]
++		}
 +
-+	end_points = sdp_data_get(rec, SDP_ATTR_SUPPORTED_FEATURES_LIST);
++		if "data_spec" is not set, no SDP record will be registered, so
++		all the other data in the dictionary will be ignored.
 +
-+	if (end_points->dtd != SDP_SEQ8)
-+		return NULL;
++		Instance will be closed by the call or implicitly when the
++		programs leaves the bus.
 +
-+	for (l = end_points->val.dataseq; l; l = l->next) {
-+		if (l->dtd != SDP_SEQ8)
-+			continue;
-+		epl = get_feature(epl, l->val.dataseq);
-+	}
++		Possible errors: org.bluez.Error.InvalidArguments
 +
-+	g_slist_foreach(epl, print_features, NULL);
++	void	CloseInstance(uint32 )
 +
-+	return epl;
-+}
++		Closes the HDP instance identified by the object path. Also
++		instance will be closed if the process that started leaves the
++		bus. If there is a SDP record associated to this instance it
++		will be removed.
++
++		Possible errors: org.bluez.Error.InvalidArguments
++				org.bluez.Error.NotFound
++
++--------------------------------------------------------------------------------
++
++Service		org.bluez
++Interface	org.bluez.HealthDevice
++Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
++
++Methods:
++
++	array GetHealthInstances()
++
++		Gets the information of the remote instances present in this
++		device and published on its SDP record. The returned data
++		follows this format.
++
++		[{"id": uint32,
++		  "data_spec" : data spec,
++		  "end_points":
++			["mdepid": uint8,
++			 "role"  : "source" or "sink" ,
++			 "specs" : [{
++				"dtype"       : uint16,
++				"description" : string, (optional)
++			 }]
++			]
++		}];
++
++	object Connect(uint32 local_instance_id, uint32 remote_instance_id)
++
++		Connects the local instance with the remote instance and returns
++		the path of the HealthLink object. You should get the remote
++		instance id running GetHealthInstances.
++
++		Only the bus client that created the local session will be able
++		to create connections using it.
++
++		Possible errors: org.bluez.Error.InvalidArguments
++				org.bluez.Error.HealthError
++
++	void Disconnect(object link, boolean cache)
++
++		Disconnect from the link. If cache is false, state will also be
++		deleted. Otherwise, the state will be kept for allowing future
++		reconnections until the adapter holding the local session is
++		removed.
++
++		Possible errors: org.bluez.Error.InvalidArguments
++				org.bluez.Error.NotFound
++				org.bluez.Error.HealthError
++
++--------------------------------------------------------------------------------
++
++Service		org.bluez
++Interface	org.bluez.HealthLink
++Object path	[variable prefix]/{hci0,hci1,...}/{hdp0,hdp1,...}/rem_inst_id
++
++Methods:
++
++	boolean Echo(array{byte})
++
++		Sends an echo petition to the remote intance. Returns True if
++		response matches with the buffer sent. If some error is detected
++		False value is returned and the associated MCL is closed.
++
++	uint16 OpenDataChannel(byte mdepid, byte config)
++
++		Creates a new data channel with the indicated config to the
++		remote MCAP Data End Point (MDEP).
++		The configuration should indicate the channel quality of
++		service. In the current version of HDP, valid values are 0x01
++		for reliable channels and 0x02 for streaming data channel.
++
++		Returns the data channel id.
++
++		Possible errors: org.bluez.Error.InvalidArguments
++				org.bluez.Error.HealthError
++
++	array GetDataChannelFileDescriptor(uint16 mdlid)
++
++		Gets a file descriptor where data can be read or
++		written for receive or sent by the data channel.
++		Returns an array of file descriptors one for write
++		and other for read.
++
++		Possible errors: org.bluez.Error.InvalidArguments
++				org.bluez.Error.NotFound
++				org.bluez.Error.HealthError
++
++	void DeleteDataChannel(uint16 mdlid)
++
++		Deletes a data channel so it will not be available for
++		use.
++
++		Possible errors: org.bluez.Error.InvalidArguments
++				org.bluez.Error.NotFound
++				org.bluez.Error.HealthError
++
++	void DeleteAllDataChannels()
++
++		Deletes all data channels so it will not be available
++		for use. Typically this function is called when the
++		connection with the remote device will be closed
++		permanently
++
++		Possible errors: org.bluez.Error.HealthError
++
++	dict GetDataChannelStatus()
++
++		Return a dictionary with all the data channels that
++		can be used to send data right now. The dictionary
++		is formed like follows:
++		{
++			"reliable": [mdlid_r1, mdlid_r2, ...],
++			"streaming" : [mdlid_s1, mdlid_s2, ...]
++		}
++
++		The fist reliable data channel will always be the first
++		data channel in reliable array.
++
++HealthAgent hierarchy
++=====================
++
++(this object is implemented by the HDP user in order to receive notifications)
++
++Service		unique name
++Interface	org.bluez.HealthAgent
++Object path	freely definable
++
++Methods:
++
++	void LinkConnected(object path)
++
++		This method is called whenever a new connection has been
++		established over the control channel of the current HDP
++		instance. The object path paremeter contains the object path of
++		the created HealthLink.
++
++	void LinkDisconnected(object path)
++
++		This method is called when a remote device is disconnected
++		definitively. Any future reconnections will fail. Also all data
++		channels associated to this device will be closed.
++
++	void CreatedDataChannel(object path, uint16 mdlid, byte conf)
++
++		This method is called when a new data channel is created
++
++		The path contains the object path of the HealthLink where the
++		new connection is created, the mdlid is the data channel
++		identificator and conf is the que quality of service of the data
++		channel (0x01 reliable, 0x02 streaming).
++
++	void DeletedDataChannel(object path, uint16 mdlid)
++
++		This method is called when a data channel is closed.
++
++		After this call the data channel id will not be valid and can be
++		reused for future created data channels.
 -- 
 1.6.3.3
 
