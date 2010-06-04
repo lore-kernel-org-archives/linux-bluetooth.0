@@ -1,110 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
+From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: gustavo@padovan.org
-Subject: [PATCH 1/4] Fix regression with debug via SIGUSR2
-Date: Fri,  4 Jun 2010 07:16:50 -0300
-Message-Id: <1275646613-32639-1-git-send-email-gustavo@padovan.org>
+Cc: =?utf-8?q?Jos=C3=A9=20Antonio=20Santos=20Cadenas?=
+	<santoscadenas@gmail.com>
+Subject: [PATCH 04/32] Initial support for hdp_device_drivers
+Date: Fri,  4 Jun 2010 10:29:57 +0200
+Message-Id: <1275640225-4186-5-git-send-email-santoscadenas@gmail.com>
+In-Reply-To: <1275640225-4186-4-git-send-email-santoscadenas@gmail.com>
+References: <1275640225-4186-1-git-send-email-santoscadenas@gmail.com>
+ <1275640225-4186-2-git-send-email-santoscadenas@gmail.com>
+ <1275640225-4186-3-git-send-email-santoscadenas@gmail.com>
+ <1275640225-4186-4-git-send-email-santoscadenas@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The new dynamic debug feature was not using the SIGUSR2 signal so this was
-causing bluetoothd to crash when one tries to toogle debug via SIGUSR2.
-This patch brings back such compatibility.
----
- src/log.c  |   31 +++++++++++++++++++++++++++++--
- src/log.h  |    1 +
- src/main.c |    8 ++++++++
- 3 files changed, 38 insertions(+), 2 deletions(-)
+From: José Antonio Santos Cadenas <santoscadenas@gmail.com>
 
-diff --git a/src/log.c b/src/log.c
-index 29e2d7d..4ef178a 100644
---- a/src/log.c
-+++ b/src/log.c
-@@ -95,9 +95,8 @@ static gboolean is_enabled(struct btd_debug_desc *desc)
-         return 0;
+---
+ health/hdp.c     |   11 +++++++++++
+ health/hdp.h     |    3 +++
+ health/manager.c |   10 +++++++---
+ 3 files changed, 21 insertions(+), 3 deletions(-)
+
+diff --git a/health/hdp.c b/health/hdp.c
+index 454483d..dbe326e 100644
+--- a/health/hdp.c
++++ b/health/hdp.c
+@@ -184,3 +184,14 @@ void hdp_adapter_unregister(struct btd_adapter *btd_adapter)
+ 
+ 	DBG("HDP exit");
  }
- 
--void __btd_log_init(const char *debug, int detach)
-+static void turn_debug_on(const char *debug)
- {
--	int option = LOG_NDELAY | LOG_PID;
- 	struct btd_debug_desc *desc;
- 	const char *name = NULL, *file = NULL;
- 
-@@ -116,6 +115,34 @@ void __btd_log_init(const char *debug, int detach)
- 		if (is_enabled(desc))
- 			desc->flags |= BTD_DEBUG_FLAG_PRINT;
- 	}
++
++int health_device_register(struct btd_device *device, const char *uuid)
++{
++	DBG("HDP_DRIVER_PROBE with uuid %s", uuid);
++	return 0;
 +}
 +
-+static void turn_debug_off()
++void health_device_unregister(struct btd_device *device)
 +{
-+	struct btd_debug_desc *desc;
++	DBG("TODO: Remove device");
++}
+diff --git a/health/hdp.h b/health/hdp.h
+index 893f745..0aae7b9 100644
+--- a/health/hdp.h
++++ b/health/hdp.h
+@@ -25,3 +25,6 @@
+ 
+ int hdp_adapter_register(DBusConnection *conn, struct btd_adapter *btd_adapter);
+ void hdp_adapter_unregister(struct btd_adapter *btd_adapter);
 +
-+	for (desc = __start___debug; desc < __stop___debug; desc++) {
-+		if (is_enabled(desc))
-+			desc->flags &= ~BTD_DEBUG_FLAG_PRINT;
++int health_device_register(struct btd_device *device, const char *uuid);
++void health_device_unregister(struct btd_device *device);
+diff --git a/health/manager.c b/health/manager.c
+index dc354f8..d163545 100644
+--- a/health/manager.c
++++ b/health/manager.c
+@@ -63,17 +63,21 @@ static struct btd_adapter_driver hdp_adapter_driver = {
+ 
+ static int hdp_driver_probe(struct btd_device *device, GSList *uuids)
+ {
+-	DBG("hdp driver probe");
++	while (uuids) {
++		health_device_register(device, uuids->data);
++		uuids = uuids->next;
 +	}
 +
-+	g_strfreev(enabled);
-+	enabled = NULL;
-+}
-+
-+void __btd_toogle_debug()
-+{
-+	if (enabled == NULL)
-+		turn_debug_on("*");
-+	else
-+		turn_debug_off();
-+}
-+
-+void __btd_log_init(const char *debug, int detach)
-+{
-+	int option = LOG_NDELAY | LOG_PID;
-+
-+	turn_debug_on(debug);
- 
- 	if (!detach)
- 		option |= LOG_PERROR;
-diff --git a/src/log.h b/src/log.h
-index 9af51e7..8c1b937 100644
---- a/src/log.h
-+++ b/src/log.h
-@@ -30,6 +30,7 @@ void debug(const char *format, ...) __attribute__((format(printf, 1, 2)));
- 
- void __btd_log_init(const char *debug, int detach);
- void __btd_log_cleanup(void);
-+void __btd_toogle_debug();
- 
- struct btd_debug_desc {
-         const char *name;
-diff --git a/src/main.c b/src/main.c
-index 3118a34..d6559b5 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -288,6 +288,11 @@ static void sig_term(int sig)
- 	g_main_loop_quit(event_loop);
+ 	return 0;
  }
  
-+static void sig_debug(int sig)
-+{
-+	__btd_toogle_debug();
-+}
-+
- static gchar *option_debug = NULL;
- static gboolean option_detach = TRUE;
- static gboolean option_udev = FALSE;
-@@ -406,6 +411,9 @@ int main(int argc, char *argv[])
- 	sigaction(SIGTERM, &sa, NULL);
- 	sigaction(SIGINT,  &sa, NULL);
+ static void hdp_driver_remove(struct btd_device *device)
+ {
+-	DBG("hdp driver remove");
++	health_device_unregister(device);
+ }
  
-+	sa.sa_handler = sig_debug;
-+	sigaction(SIGUSR2, &sa, NULL);
-+
- 	sa.sa_handler = SIG_IGN;
- 	sigaction(SIGPIPE, &sa, NULL);
- 
+ static struct btd_device_driver hdp_device_driver = {
+-	.name	= "hdp_device-driver",
++	.name	= "hdp-device-driver",
+ 	.uuids	= BTD_UUIDS(HDP_UUID, HDP_SOURCE_UUID, HDP_SINK_UUID),
+ 	.probe	= hdp_driver_probe,
+ 	.remove	= hdp_driver_remove,
 -- 
-1.7.1
+1.6.3.3
 
