@@ -2,10 +2,10 @@ Return-Path: <cyrus@holtmann.org>
 From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Subject: [PATCH 20/32] Release health link resources
-Date: Fri,  4 Jun 2010 10:30:13 +0200
-Message-Id: <1275640225-4186-21-git-send-email-santoscadenas@gmail.com>
-In-Reply-To: <1275640225-4186-20-git-send-email-santoscadenas@gmail.com>
+Subject: [PATCH 12/32] Complete the response dictionary in GetHealthInstances response
+Date: Fri,  4 Jun 2010 10:30:05 +0200
+Message-Id: <1275640225-4186-13-git-send-email-santoscadenas@gmail.com>
+In-Reply-To: <1275640225-4186-12-git-send-email-santoscadenas@gmail.com>
 References: <1275640225-4186-1-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-2-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-3-git-send-email-santoscadenas@gmail.com>
@@ -18,68 +18,323 @@ References: <1275640225-4186-1-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-10-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-11-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-12-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-13-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-14-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-15-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-16-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-17-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-18-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-19-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-20-git-send-email-santoscadenas@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- health/hdp.c |   27 ++++++++++++++++++++++++---
- 1 files changed, 24 insertions(+), 3 deletions(-)
+ health/hdp.c      |  169 ++++++++++++++++++++++++++++++++++-------------------
+ health/hdp_util.c |   56 +++++++++++++++++-
+ health/hdp_util.h |   12 ++++
+ 3 files changed, 175 insertions(+), 62 deletions(-)
 
 diff --git a/health/hdp.c b/health/hdp.c
-index 234109a..4ed0150 100644
+index 8bb6057..840af0f 100644
 --- a/health/hdp.c
 +++ b/health/hdp.c
-@@ -359,10 +359,32 @@ static uint8_t hdp_mcap_mdl_reconn_req_cb(struct mcap_mcl *mcl,
- 	return MCAP_REQUEST_NOT_SUPPORTED;
+@@ -46,6 +46,12 @@ struct instances_aux {
+ 	DBusMessage		*msg;
+ };
+ 
++struct health_instances_aux {
++	guint32		handler;
++	guint8		data_spec;
++	GSList		*end_points;
++};
++
+ static struct hdp_adapter *find_adapter(GSList *list,
+ 					struct btd_adapter *btd_adapter)
+ {
+@@ -86,41 +92,114 @@ static int hdp_instance_idcmp(gconstpointer instance, gconstpointer p)
+ 	return -1;
  }
  
-+static void health_link_free(struct hdp_link *hdpl)
-+{
-+	/*TODO: Release structures related with Data Channels */
+-static void append_dict_features(DBusMessageIter *iter, GSList *end_points)
++static void fill_up_one_spec(DBusMessageIter *dict, gpointer data)
+ {
+-	DBusMessageIter entry, array;
+-
+-	dbus_message_iter_open_container(iter, DBUS_TYPE_DICT_ENTRY,
+-								NULL, &entry);
+-	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, "end_points");
+-
+-	dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT,
+-			DBUS_TYPE_VARIANT_AS_STRING
+-			DBUS_TYPE_ARRAY_AS_STRING
+-			DBUS_TYPE_ARRAY_AS_STRING
+-			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+-			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
+-			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &array);
+-
+-	dbus_message_iter_close_container(&entry, &array);
+-	dbus_message_iter_close_container(iter, &entry);
++	struct hdp_feature *feature = data;
 +
-+	if (hdpl->mcl) {
-+		mcap_close_mcl(hdpl->mcl, FALSE);
-+		mcap_mcl_unref(hdpl->mcl);
-+		hdpl->mcl = NULL;
++	dict_append_entry(dict, "dtype", DBUS_TYPE_UINT16, &feature->dtype);
++	if (feature->dscr)
++		dict_append_entry(dict, "description", DBUS_TYPE_STRING,
++								&feature->dscr);
+ }
+ 
+-static void append_array_entry(DBusMessageIter *iter, uint32_t *handler,
+-					uint8_t *spec, GSList *end_points)
++static void fill_up_specs(DBusMessageIter *dict, gpointer data)
+ {
+-	DBusMessageIter dict;
++	GSList *specs = data;
++	GSList *l;
++	struct hdp_feature *feature;
++
+ 
+-	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+-			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+-			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
+-			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
++	for (l = specs; l; l = l->next) {
++		feature = l->data;
+ 
+-	dict_append_entry(&dict, "id", DBUS_TYPE_UINT32, handler);
+-	dict_append_entry(&dict, "data_spec", DBUS_TYPE_BYTE, spec);
+-	append_dict_features(&dict, end_points);
++		hdp_append_dict(dict, fill_up_one_spec, feature);
 +	}
-+
-+	if (hdpl->path) {
-+		g_free(hdpl->path);
-+		hdpl->path = NULL;
-+	}
-+
-+	hdpl->hdpi->hlink = g_slist_remove(hdpl->hdpi->hlink, hdpl);
-+	g_free(hdpl);
 +}
 +
- static void health_link_path_unregister(void *data)
- {
--	/* struct hdp_link *hdpl = data */
--	/* TODO: Unregister hdp_link*/
-+	struct hdp_link *hdpl = data;
++static void fill_up_specs_array(DBusMessageIter *array, gpointer data)
++{
++	hdp_append_array_of_dicts(array, fill_up_specs, data);
++}
+ 
+-	dbus_message_iter_close_container(iter, &dict);
++static void fill_up_one_end_point(DBusMessageIter *dict, gpointer data)
++{
++	struct hdp_supp_fts *fts = data;
++	const char *role;
 +
-+	DBG("Unregistered interface %s on path %s", HEALTH_LINK, hdpl->path);
++	if (fts->role == HDP_SOURCE)
++		role = HDP_SOURCE_ROLE_AS_STRING;
++	else if (fts->role == HDP_SINK)
++		role = HDP_SINK_ROLE_AS_STRING;
 +
-+	health_link_free(hdpl);
++	dict_append_entry(dict, "mdepid", DBUS_TYPE_BYTE, &fts->mdepid);
++	dict_append_entry(dict, "role", DBUS_TYPE_STRING, &role);
++	hdp_append_variant_array_entry(dict, "specs", fill_up_specs_array,
++								fts->features);
++}
++
++static void fill_up_end_points(DBusMessageIter *dict, gpointer data)
++{
++	GSList *end_points = data;
++	struct hdp_supp_fts *fts;
++	GSList *l;
++
++	for (l = end_points; l; l = l->next) {
++		fts = l->data;
++
++		if (fts->role != HDP_SOURCE && fts->role != HDP_SINK)
++			continue;
++
++		hdp_append_dict(dict, fill_up_one_end_point, fts);
++	}
++}
++
++static void fill_up_end_points_array(DBusMessageIter *iter, gpointer data)
++{
++	hdp_append_array_of_dicts(iter, fill_up_end_points, data);
++}
++
++static void fill_up_instance(DBusMessageIter *entry, gpointer data)
++{
++	struct health_instances_aux *aux = data;
++	guint32 handler = aux->handler;
++	guint8 data_spec = aux->data_spec;
++	GSList *end_points = aux->end_points;
++
++	dict_append_entry(entry, "id", DBUS_TYPE_UINT32, &handler);
++	dict_append_entry(entry, "data_spec", DBUS_TYPE_BYTE, &data_spec);
++	hdp_append_variant_array_entry(entry, "end_points",
++					fill_up_end_points_array, end_points);
++}
++
++static void fill_up_health_instances(DBusMessageIter *dict, gpointer data)
++{
++	sdp_list_t *recs = data;
++	sdp_record_t *rec;
++	sdp_list_t *l;
++	guint8 data_spec;
++	GSList *end_points;
++	struct health_instances_aux *aux;
++
++	for (l = recs; l; l = l->next) {
++		rec = l->data;
++		DBG("Record found 0x%x", rec->handle);
++
++		if (!hdp_get_data_exchange_spec(rec, &data_spec)) {
++			error("Error getting data exchange info");
++			continue;
++		}
++		end_points = hdp_get_end_points(rec);
++		if (!end_points) {
++			error("Error getting end points");
++			continue;
++		}
++		aux = g_new0(struct health_instances_aux, 1);
++		aux->handler = rec->handle;
++		aux->data_spec = data_spec;
++		aux->end_points = end_points;
++		hdp_append_dict(dict, fill_up_instance, aux);
++		g_free(aux);
++	}
  }
  
- static GDBusMethodTable health_link_methods[] = {
-@@ -399,7 +421,6 @@ static struct hdp_link *create_health_link(struct hdp_instance *hdpi,
- 	g_set_error(err, HDP_ERROR, HDP_UNSPECIFIED_ERROR,
- 				"Cant register the health link in the bus");
+ static void sink_health_instances(sdp_list_t *recs, int err, gpointer user_data)
+@@ -129,11 +208,7 @@ static void sink_health_instances(sdp_list_t *recs, int err, gpointer user_data)
+ 	DBusMessage *msg = cb_data->msg;
+ 	struct hdp_device *device = cb_data->device;
+ 	DBusMessage *reply;
+-	sdp_record_t *rec;
+-	sdp_list_t *l;
+-	guint8 data_spec;
+-	GSList *end_points;
+-	DBusMessageIter iter, dict;
++	DBusMessageIter iter;
  
--	/* TODO create a function to free health link correctly */
- 	/* MCAP will close the MCL and won't cache it if we didn't
- 	* increase the MCL reference counter during the callback. */
- 	mcap_mcl_unref(hdpl->mcl);
+ 	g_free(cb_data);
+ 
+@@ -151,34 +226,8 @@ static void sink_health_instances(sdp_list_t *recs, int err, gpointer user_data)
+ 
+ 	dbus_message_iter_init_append(reply, &iter);
+ 
+-	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+-			DBUS_TYPE_ARRAY_AS_STRING
+-			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+-			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
+-			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
+-
+-	for (l = recs; l; l = l->next) {
+-		rec = l->data;
+-		DBG("Record found 0x%x", rec->handle);
++	hdp_append_array_of_dicts(&iter, fill_up_health_instances, recs);
+ 
+-		if (!hdp_get_data_exchange_spec(rec, &data_spec)) {
+-			error("Error getting data exchange info");
+-			continue;
+-		}
+-		end_points = hdp_get_end_points(rec);
+-		if (!end_points) {
+-			error("Error getting end points");
+-			continue;
+-		}
+-		append_array_entry(&dict, &rec->handle, &data_spec,
+-								end_points);
+-	}
+-
+-	dbus_message_iter_close_container(&iter, &dict);
+-/*
+-	reply = g_dbus_create_error(msg, ERROR_INTERFACE ".HealthError",
+-							"Not implemented yet");
+-*/
+ 	g_dbus_send_message(device->conn, reply);
+ }
+ 
+diff --git a/health/hdp_util.c b/health/hdp_util.c
+index 2f09417..921a1e1 100644
+--- a/health/hdp_util.c
++++ b/health/hdp_util.c
+@@ -328,9 +328,9 @@ static gboolean parse_role(DBusMessageIter *iter, GError **err, gpointer data)
+ 	}
+ 
+ 	dbus_message_iter_get_basic(string, &role);
+-	if (g_strcmp0(role, "sink") == 0)
++	if (g_strcmp0(role, HDP_SINK_ROLE_AS_STRING) == 0)
+ 		fts->role = HDP_SINK;
+-	else if (g_strcmp0(role, "source") == 0)
++	else if (g_strcmp0(role, HDP_SOURCE_ROLE_AS_STRING) == 0)
+ 		fts->role = HDP_SOURCE;
+ 	else {
+ 		g_set_error(err, HDP_ERROR, HDP_UNSPECIFIED_ERROR,
+@@ -949,3 +949,55 @@ GSList *hdp_get_end_points(const sdp_record_t *rec)
+ 
+ 	return epl;
+ }
++
++void hdp_append_array_of_dicts(DBusMessageIter *iter, hdp_dbus_fill_up fill_up,
++							gpointer user_data)
++{
++	DBusMessageIter dict;
++
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
++			DBUS_TYPE_ARRAY_AS_STRING
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
++
++	fill_up(&dict, user_data);
++
++	dbus_message_iter_close_container(iter, &dict);
++}
++
++void hdp_append_dict(DBusMessageIter *iter, hdp_dbus_fill_up fill_up,
++							gpointer user_data)
++{
++	DBusMessageIter entry;
++
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &entry);
++
++	fill_up(&entry, user_data);
++
++	dbus_message_iter_close_container(iter, &entry);
++}
++
++void hdp_append_variant_array_entry(DBusMessageIter *iter, char *key,
++				hdp_dbus_fill_up fill_up, gpointer user_data)
++{
++	DBusMessageIter entry, array;
++
++	dbus_message_iter_open_container(iter, DBUS_TYPE_DICT_ENTRY,
++								NULL, &entry);
++	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
++	dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT,
++			DBUS_TYPE_ARRAY_AS_STRING
++			DBUS_TYPE_ARRAY_AS_STRING
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &array);
++
++	fill_up(&array, user_data);
++
++	dbus_message_iter_close_container(&entry, &array);
++	dbus_message_iter_close_container(iter, &entry);
++}
+diff --git a/health/hdp_util.h b/health/hdp_util.h
+index beafa00..08e6471 100644
+--- a/health/hdp_util.h
++++ b/health/hdp_util.h
+@@ -29,10 +29,22 @@
+ #include <gdbus.h>
+ #include "hdp_types.h"
+ 
++#define HDP_SINK_ROLE_AS_STRING	"sink"
++#define HDP_SOURCE_ROLE_AS_STRING	"source"
++
++typedef void (*hdp_dbus_fill_up)(DBusMessageIter *iter, gpointer data);
++
+ struct hdp_config *hdp_get_config(DBusMessageIter *iter, GError **err);
+ gboolean hdp_register_sdp_record(struct hdp_instance *hdps);
+ gboolean hdp_get_data_exchange_spec(const sdp_record_t *rec, guint8 *val);
+ GSList *hdp_get_end_points(const sdp_record_t *rec);
+ void hdp_instance_free(struct hdp_instance *hdpi);
+ 
++void hdp_append_array_of_dicts(DBusMessageIter *iter, hdp_dbus_fill_up fill_up,
++							gpointer user_data);
++void hdp_append_dict(DBusMessageIter *iter, hdp_dbus_fill_up fil_up,
++							gpointer user_data);
++void hdp_append_variant_array_entry(DBusMessageIter *iter, char *key,
++				hdp_dbus_fill_up fill_up, gpointer user_data);
++
+ #endif /* __HDP_UTIL_H__ */
 -- 
 1.6.3.3
 
