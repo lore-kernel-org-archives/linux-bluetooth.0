@@ -2,10 +2,10 @@ Return-Path: <cyrus@holtmann.org>
 From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Subject: [PATCH 30/32] Add a test that creates a simple health agent
-Date: Fri,  4 Jun 2010 10:30:23 +0200
-Message-Id: <1275640225-4186-31-git-send-email-santoscadenas@gmail.com>
-In-Reply-To: <1275640225-4186-30-git-send-email-santoscadenas@gmail.com>
+Subject: [PATCH 27/32] Change function name when retreiving remote SDP records
+Date: Fri,  4 Jun 2010 10:30:20 +0200
+Message-Id: <1275640225-4186-28-git-send-email-santoscadenas@gmail.com>
+In-Reply-To: <1275640225-4186-27-git-send-email-santoscadenas@gmail.com>
 References: <1275640225-4186-1-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-2-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-3-git-send-email-santoscadenas@gmail.com>
@@ -33,84 +33,35 @@ References: <1275640225-4186-1-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-25-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-26-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-27-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-28-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-29-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-30-git-send-email-santoscadenas@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- test/test-health |   61 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 61 insertions(+), 0 deletions(-)
- create mode 100755 test/test-health
+ health/hdp.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/test/test-health b/test/test-health
-new file mode 100755
-index 0000000..2129923
---- /dev/null
-+++ b/test/test-health
-@@ -0,0 +1,61 @@
-+#!/usr/bin/python
-+# -*- coding: utf-8 -*-
-+
-+import dbus
-+import dbus.service
-+import gobject
-+from dbus.mainloop.glib import DBusGMainLoop
-+
-+agent_iface = 'org.bluez.HealthAgent'
-+obj_path = "/org/bluez/test/health/agent"
-+
-+DBusGMainLoop(set_as_default=True)
-+loop = gobject.MainLoop()
-+
-+bus = dbus.SystemBus()
-+manager = dbus.Interface(bus.get_object("org.bluez", "/"),
-+						"org.bluez.Manager")
-+
-+hdp = dbus.Interface(bus.get_object("org.bluez", manager.DefaultAdapter()),
-+						"org.bluez.HealthAdapter")
-+
-+class HDP(dbus.service.Object):
-+	def __init__(self, bus, obj_path):
-+		self.bus = bus
-+		dbus.service.Object.__init__(self, self.bus, obj_path)
-+	@dbus.service.method(agent_iface, in_signature='o', out_signature='',
-+							sender_keyword='sender')
-+	def LinkConnected(self, path, sender=None):
-+		print "Connected new link %s: (sender %s)" % (path, sender)
-+	@dbus.service.method(agent_iface, in_signature='o', out_signature='',
-+							sender_keyword='sender')
-+	def LinkDisconnected(self, path, sender=None):
-+		print "Link %s: disconnected (sender: %s)" % (path, sender)
-+
-+session_id = hdp.CreateInstance(dbus.ObjectPath(obj_path),
-+	{"data_spec": dbus.Byte(1, variant_level=1),
-+        "end_points":dbus.Array([{ "role": dbus.String("sink", variant_level=1),
-+			 "specs": dbus.Array([{
-+				"data_type":
-+					dbus.UInt16(4100, variant_level =1),
-+				"description":
-+					dbus.String("Oximeter",
-+							variant_level = 1),
-+				},{
-+				"data_type":
-+					dbus.UInt16(4103, variant_level =1),
-+				"description":
-+					dbus.String("Blood pressure",
-+							variant_level = 1),
-+				}
-+				], variant_level=1),
-+			},
-+	], variant_level=1)})
-+
-+hdp_obj = HDP(bus, obj_path);
-+
-+try:
-+	print "Waiting for connections, push Ctrl+C to stop"
-+	loop.run()
-+except:
-+	print "Loop interrupted, closing session"
+diff --git a/health/hdp.c b/health/hdp.c
+index a480b8e..bb03ffa 100644
+--- a/health/hdp.c
++++ b/health/hdp.c
+@@ -266,7 +266,7 @@ static void fill_up_health_instances(DBusMessageIter *dict, gpointer data)
+ 	}
+ }
+ 
+-static void sink_health_instances(sdp_list_t *recs, int err, gpointer user_data)
++static void health_records_found(sdp_list_t *recs, int err, gpointer user_data)
+ {
+ 	struct instances_aux *cb_data = user_data;
+ 	DBusMessage *msg = cb_data->msg;
+@@ -314,7 +314,7 @@ static DBusMessage *get_health_instances(DBusConnection *conn,
+ 
+ 
+ 	bt_string2uuid(&uuid, HDP_UUID);
+-	if (bt_search_service(&src, &dst, &uuid, sink_health_instances,
++	if (bt_search_service(&src, &dst, &uuid, health_records_found,
+ 						cb_data, NULL) == 0)
+ 		return NULL;
+ 
 -- 
 1.6.3.3
 
