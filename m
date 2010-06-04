@@ -2,10 +2,10 @@ Return-Path: <cyrus@holtmann.org>
 From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Subject: [PATCH 24/32] Disconnect health link petition
-Date: Fri,  4 Jun 2010 10:30:17 +0200
-Message-Id: <1275640225-4186-25-git-send-email-santoscadenas@gmail.com>
-In-Reply-To: <1275640225-4186-24-git-send-email-santoscadenas@gmail.com>
+Subject: [PATCH 28/32] Changed HEALTH_MANAGER_INTERFACE to HEALTH_MANAGER
+Date: Fri,  4 Jun 2010 10:30:21 +0200
+Message-Id: <1275640225-4186-29-git-send-email-santoscadenas@gmail.com>
+In-Reply-To: <1275640225-4186-28-git-send-email-santoscadenas@gmail.com>
 References: <1275640225-4186-1-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-2-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-3-git-send-email-santoscadenas@gmail.com>
@@ -30,79 +30,63 @@ References: <1275640225-4186-1-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-22-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-23-git-send-email-santoscadenas@gmail.com>
  <1275640225-4186-24-git-send-email-santoscadenas@gmail.com>
+ <1275640225-4186-25-git-send-email-santoscadenas@gmail.com>
+ <1275640225-4186-26-git-send-email-santoscadenas@gmail.com>
+ <1275640225-4186-27-git-send-email-santoscadenas@gmail.com>
+ <1275640225-4186-28-git-send-email-santoscadenas@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- health/hdp.c |   28 +++++++++++++++-------------
- 1 files changed, 15 insertions(+), 13 deletions(-)
+ health/hdp.c       |    6 +++---
+ health/hdp_types.h |    7 ++++---
+ 2 files changed, 7 insertions(+), 6 deletions(-)
 
 diff --git a/health/hdp.c b/health/hdp.c
-index ed26fe5..f29a1c5 100644
+index bb03ffa..58d0394 100644
 --- a/health/hdp.c
 +++ b/health/hdp.c
-@@ -401,13 +401,10 @@ static void health_link_free(struct hdp_link *hdpl)
- 	if (hdpl->mcl) {
- 		mcap_close_mcl(hdpl->mcl, FALSE);
- 		mcap_mcl_unref(hdpl->mcl);
--		hdpl->mcl = NULL;
+@@ -964,11 +964,11 @@ int hdp_adapter_register(DBusConnection *conn, struct btd_adapter *btd_adapter)
+ 	adapter = g_new0(struct hdp_adapter, 1);
+ 
+ 	DBG("HDP init");
+-	if (!g_dbus_register_interface(conn, path, HEALTH_MANAGER_INTERFACE,
++	if (!g_dbus_register_interface(conn, path, HEALTH_MANAGER,
+ 					hdp_methods, NULL, NULL,
+ 					adapter, hdp_path_unregister)) {
+ 		error("Failed to register %s interface to %s",
+-						HEALTH_MANAGER_INTERFACE, path);
++						HEALTH_MANAGER, path);
+ 		g_free(adapter);
+ 		return -1;
  	}
+@@ -988,7 +988,7 @@ void hdp_adapter_unregister(struct btd_adapter *btd_adapter)
  
--	if (hdpl->path) {
-+	if (hdpl->path)
- 		g_free(hdpl->path);
--		hdpl->path = NULL;
--	}
+ 	g_dbus_unregister_interface(adapter->conn,
+ 			adapter_get_path(btd_adapter),
+-			HEALTH_MANAGER_INTERFACE);
++			HEALTH_MANAGER);
+ 	dbus_connection_unref(adapter->conn);
+ 	btd_adapter_unref(adapter->btd_adapter);
+ 	adapters = g_slist_remove(adapters, adapter);
+diff --git a/health/hdp_types.h b/health/hdp_types.h
+index abbfbf3..aff116e 100644
+--- a/health/hdp_types.h
++++ b/health/hdp_types.h
+@@ -42,9 +42,10 @@
  
- 	hdpl->hdpi->hlink = g_slist_remove(hdpl->hdpi->hlink, hdpl);
- 	g_free(hdpl);
-@@ -623,32 +620,37 @@ static DBusMessage *hdp_disconnect(DBusConnection *conn,
- 					DBusMessage *msg, void *user_data)
- {
- 	struct hdp_device *device = user_data;
--	struct hdp_link *hlink;
-+	struct hdp_link *hdpl;
- 	const char *path;
--	const gboolean *del;
-+	gboolean cache;
+ #define HDP_ERROR		g_quark_from_static_string("hdp-error-quark")
  
- 	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
--							DBUS_TYPE_BOOLEAN, &del,
--							DBUS_TYPE_INVALID)){
-+						DBUS_TYPE_BOOLEAN, &cache,
-+						DBUS_TYPE_INVALID)){
- 		return g_dbus_create_error(msg,
- 					ERROR_INTERFACE ".InvalidArguments",
- 					"Invalid arguments in method call");
- 	}
+-#define HEALTH_MANAGER_INTERFACE	"org.bluez.HealthAdapter"
+-#define HEALTH_DEVICE			"org.bluez.HealthDevice"
+-#define HEALTH_LINK			"org.bluez.HealthLink"
++#define HEALTH_MANAGER		"org.bluez.HealthAdapter"
++#define HEALTH_DEVICE		"org.bluez.HealthDevice"
++#define HEALTH_LINK		"org.bluez.HealthLink"
++#define HEALTH_AGENT		"org.bluez.HealthAgent"
  
--	hlink = find_health_link(device->hdp_adapter, path);
--	if (!hlink)
-+	hdpl = find_health_link(device->hdp_adapter, path);
-+	if (!hdpl)
- 		return g_dbus_create_error(msg, ERROR_INTERFACE ".HealthError",
- 						"Health link does not found");
- 
--	return g_dbus_create_error(msg, ERROR_INTERFACE ".HealthError",
--							"Not yet implemented");
-+	if (cache) {
-+		mcap_close_mcl(hdpl->mcl, cache);
-+		hdpl->closed = TRUE;
-+	} else
-+		g_dbus_unregister_interface(conn, hdpl->path, HEALTH_LINK);
-+
-+	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
- }
- 
- static GDBusMethodTable device_methods[] = {
- 	{ "GetHealthInstances", "", "aa{sv}", get_health_instances,
- 						G_DBUS_METHOD_FLAG_ASYNC },
- 	{ "Connect", "uu", "o", hdp_connect, G_DBUS_METHOD_FLAG_ASYNC },
--	{ "Diconnect", "ob", "", hdp_disconnect },
-+	{ "Disconnect", "ob", "", hdp_disconnect },
- 	{ NULL }
- };
- 
+ #define HDP_NO_PREFERENCE_DC	0x00
+ #define HDP_RELIABLE_DC		0x01
 -- 
 1.6.3.3
 
