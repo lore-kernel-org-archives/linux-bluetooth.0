@@ -1,110 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: gustavo@padovan.org
-Subject: [PATCH 1/4] Fix regression with debug via SIGUSR2
-Date: Fri,  4 Jun 2010 23:23:39 -0300
-Message-Id: <1275704622-5917-1-git-send-email-gustavo@padovan.org>
+Date: Fri, 4 Jun 2010 14:34:22 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: "Gustavo F. Padovan" <gustavo@padovan.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/4] Fix regression with debug via SIGUSR2
+Message-ID: <20100604113422.GA6118@jh-x301>
+References: <1275646613-32639-1-git-send-email-gustavo@padovan.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1275646613-32639-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The new dynamic debug feature was not using the SIGUSR2 signal so this was
-causing bluetoothd to crash when one tries to toggle debug via SIGUSR2.
-This patch brings back such compatibility.
----
- src/log.c  |   31 +++++++++++++++++++++++++++++--
- src/log.h  |    1 +
- src/main.c |    8 ++++++++
- 3 files changed, 38 insertions(+), 2 deletions(-)
+Hi Gustavo,
 
-diff --git a/src/log.c b/src/log.c
-index 29e2d7d..1c0f0b9 100644
---- a/src/log.c
-+++ b/src/log.c
-@@ -95,9 +95,8 @@ static gboolean is_enabled(struct btd_debug_desc *desc)
-         return 0;
- }
- 
--void __btd_log_init(const char *debug, int detach)
-+static void debug_on(const char *debug)
- {
--	int option = LOG_NDELAY | LOG_PID;
- 	struct btd_debug_desc *desc;
- 	const char *name = NULL, *file = NULL;
- 
-@@ -116,6 +115,34 @@ void __btd_log_init(const char *debug, int detach)
- 		if (is_enabled(desc))
- 			desc->flags |= BTD_DEBUG_FLAG_PRINT;
- 	}
-+}
-+
-+static void debug_off()
-+{
-+	struct btd_debug_desc *desc;
-+
-+	for (desc = __start___debug; desc < __stop___debug; desc++) {
-+		if (is_enabled(desc))
-+			desc->flags &= ~BTD_DEBUG_FLAG_PRINT;
-+	}
-+
-+	g_strfreev(enabled);
-+	enabled = NULL;
-+}
-+
-+void __btd_toggle_debug()
-+{
-+	if (enabled == NULL)
-+		debug_on("*");
-+	else
-+		debug_off();
-+}
-+
-+void __btd_log_init(const char *debug, int detach)
-+{
-+	int option = LOG_NDELAY | LOG_PID;
-+
-+	debug_on(debug);
- 
- 	if (!detach)
- 		option |= LOG_PERROR;
-diff --git a/src/log.h b/src/log.h
-index 9af51e7..a1530da 100644
---- a/src/log.h
-+++ b/src/log.h
-@@ -30,6 +30,7 @@ void debug(const char *format, ...) __attribute__((format(printf, 1, 2)));
- 
- void __btd_log_init(const char *debug, int detach);
- void __btd_log_cleanup(void);
-+void __btd_toggle_debug();
- 
- struct btd_debug_desc {
-         const char *name;
-diff --git a/src/main.c b/src/main.c
-index 3118a34..ba18523 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -288,6 +288,11 @@ static void sig_term(int sig)
- 	g_main_loop_quit(event_loop);
- }
- 
-+static void sig_debug(int sig)
-+{
-+	__btd_toggle_debug();
-+}
-+
- static gchar *option_debug = NULL;
- static gboolean option_detach = TRUE;
- static gboolean option_udev = FALSE;
-@@ -406,6 +411,9 @@ int main(int argc, char *argv[])
- 	sigaction(SIGTERM, &sa, NULL);
- 	sigaction(SIGINT,  &sa, NULL);
- 
-+	sa.sa_handler = sig_debug;
-+	sigaction(SIGUSR2, &sa, NULL);
-+
- 	sa.sa_handler = SIG_IGN;
- 	sigaction(SIGPIPE, &sa, NULL);
- 
--- 
-1.7.1
+On Fri, Jun 04, 2010, Gustavo F. Padovan wrote:
+> +static void turn_debug_on(const char *debug)
 
+Please call this simply debug_on()
+
+> +static void turn_debug_off()
+
+same here (debug_off)
+
+> +void __btd_toogle_debug()
+
+It's called toggle and not toogle :)
+
+> +	if (enabled == NULL)
+> +		turn_debug_on("*");
+
+I suppose this should restore the previous value and not hard-code "*"?
+
+Johan
