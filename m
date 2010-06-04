@@ -1,88 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: =?utf-8?q?Jos=C3=A9=20Antonio=20Santos=20Cadenas?=
-	<santoscadenas@gmail.com>
-Subject: [PATCH 04/32] Initial support for hdp_device_drivers
-Date: Fri,  4 Jun 2010 10:29:57 +0200
-Message-Id: <1275640225-4186-5-git-send-email-santoscadenas@gmail.com>
-In-Reply-To: <1275640225-4186-4-git-send-email-santoscadenas@gmail.com>
-References: <1275640225-4186-1-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-2-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-3-git-send-email-santoscadenas@gmail.com>
- <1275640225-4186-4-git-send-email-santoscadenas@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Cc: Santiago Carot-Nemesio <sancane@gmail.com>
+Subject: [PATCH 18/26] Implement function to send md_abort_mdl_req
+Date: Fri,  4 Jun 2010 10:27:11 +0200
+Message-Id: <1275640039-7245-19-git-send-email-sancane@gmail.com>
+In-Reply-To: <1275640039-7245-18-git-send-email-sancane@gmail.com>
+References: <1275640039-7245-1-git-send-email-sancane@gmail.com>
+ <1275640039-7245-2-git-send-email-sancane@gmail.com>
+ <1275640039-7245-3-git-send-email-sancane@gmail.com>
+ <1275640039-7245-4-git-send-email-sancane@gmail.com>
+ <1275640039-7245-5-git-send-email-sancane@gmail.com>
+ <1275640039-7245-6-git-send-email-sancane@gmail.com>
+ <1275640039-7245-7-git-send-email-sancane@gmail.com>
+ <1275640039-7245-8-git-send-email-sancane@gmail.com>
+ <1275640039-7245-9-git-send-email-sancane@gmail.com>
+ <1275640039-7245-10-git-send-email-sancane@gmail.com>
+ <1275640039-7245-11-git-send-email-sancane@gmail.com>
+ <1275640039-7245-12-git-send-email-sancane@gmail.com>
+ <1275640039-7245-13-git-send-email-sancane@gmail.com>
+ <1275640039-7245-14-git-send-email-sancane@gmail.com>
+ <1275640039-7245-15-git-send-email-sancane@gmail.com>
+ <1275640039-7245-16-git-send-email-sancane@gmail.com>
+ <1275640039-7245-17-git-send-email-sancane@gmail.com>
+ <1275640039-7245-18-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: José Antonio Santos Cadenas <santoscadenas@gmail.com>
-
 ---
- health/hdp.c     |   11 +++++++++++
- health/hdp.h     |    3 +++
- health/manager.c |   10 +++++++---
- 3 files changed, 21 insertions(+), 3 deletions(-)
+ mcap/mcap.c |   48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 48 insertions(+), 0 deletions(-)
 
-diff --git a/health/hdp.c b/health/hdp.c
-index 454483d..dbe326e 100644
---- a/health/hdp.c
-+++ b/health/hdp.c
-@@ -184,3 +184,14 @@ void hdp_adapter_unregister(struct btd_adapter *btd_adapter)
- 
- 	DBG("HDP exit");
+diff --git a/mcap/mcap.c b/mcap/mcap.c
+index 2c03e83..78b6af8 100644
+--- a/mcap/mcap.c
++++ b/mcap/mcap.c
+@@ -520,6 +520,38 @@ void mcap_req_mdl_deletion(struct mcap_mdl *mdl, GError **err,
+ 		g_free(con);
  }
-+
-+int health_device_register(struct btd_device *device, const char *uuid)
-+{
-+	DBG("HDP_DRIVER_PROBE with uuid %s", uuid);
-+	return 0;
-+}
-+
-+void health_device_unregister(struct btd_device *device)
-+{
-+	DBG("TODO: Remove device");
-+}
-diff --git a/health/hdp.h b/health/hdp.h
-index 893f745..0aae7b9 100644
---- a/health/hdp.h
-+++ b/health/hdp.h
-@@ -25,3 +25,6 @@
  
- int hdp_adapter_register(DBusConnection *conn, struct btd_adapter *btd_adapter);
- void hdp_adapter_unregister(struct btd_adapter *btd_adapter);
++void mcap_mdl_abort(struct mcap_mdl *mdl, GError **err,
++			mcap_mdl_del_cb abort_cb, gpointer user_data)
++{
++	struct mcap_mdl_op_cb *con;
++	struct mcap_mcl *mcl = mdl->mcl;
++	uint8_t *cmd;
 +
-+int health_device_register(struct btd_device *device, const char *uuid);
-+void health_device_unregister(struct btd_device *device);
-diff --git a/health/manager.c b/health/manager.c
-index dc354f8..d163545 100644
---- a/health/manager.c
-+++ b/health/manager.c
-@@ -63,17 +63,21 @@ static struct btd_adapter_driver hdp_adapter_driver = {
- 
- static int hdp_driver_probe(struct btd_device *device, GSList *uuids)
- {
--	DBG("hdp driver probe");
-+	while (uuids) {
-+		health_device_register(device, uuids->data);
-+		uuids = uuids->next;
++	if (mdl->state != MDL_WAITING) {
++		g_set_error(err, MCAP_ERROR, MCAP_ERROR_FAILED,
++							"Mdl in invalid state");
++		return;
 +	}
 +
- 	return 0;
- }
- 
- static void hdp_driver_remove(struct btd_device *device)
++	con = g_new0(struct mcap_mdl_op_cb, 1);
++	cmd = create_req(MCAP_MD_ABORT_MDL_REQ, mdl->mdlid);
++	mcap_send_std_opcode(mcl, cmd, sizeof(mcap_md_req), err);
++	if (*err) {
++		g_free(con);
++		g_free(cmd);
++		return;
++	}
++
++	con->mdl = mdl;
++	con->cb.del = abort_cb;
++	con->user_data = user_data;
++
++	mcl->priv_data = con;
++
++	mcl->tid = g_timeout_add_seconds(RESPONSE_TIMER, wait_response_timer,
++									mcl);
++}
++
+ static void update_mcl_state(struct mcap_mcl *mcl)
  {
--	DBG("hdp driver remove");
-+	health_device_unregister(device);
+ 	GSList *l;
+@@ -555,6 +587,22 @@ static struct mcap_mcl *find_mcl(GSList *list, const bdaddr_t *addr)
+ 	return NULL;
  }
  
- static struct btd_device_driver hdp_device_driver = {
--	.name	= "hdp_device-driver",
-+	.name	= "hdp-device-driver",
- 	.uuids	= BTD_UUIDS(HDP_UUID, HDP_SOURCE_UUID, HDP_SINK_UUID),
- 	.probe	= hdp_driver_probe,
- 	.remove	= hdp_driver_remove,
++int mcap_mdl_get_fd(struct mcap_mdl *mdl)
++{
++	if ((!mdl) || (mdl->state != MDL_CONNECTED))
++		return -1;
++
++	return g_io_channel_unix_get_fd(mdl->dc);
++}
++
++uint16_t mcap_mdl_get_mdlid(struct mcap_mdl *mdl)
++{
++	if (!mdl)
++		return MCAP_MDLID_RESERVED;
++
++	return mdl->mdlid;
++}
++
+ static void shutdown_mdl(struct mcap_mdl *mdl)
+ {
+ 	mdl->state = MDL_CLOSED;
 -- 
 1.6.3.3
 
