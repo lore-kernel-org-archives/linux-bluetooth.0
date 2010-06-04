@@ -2,41 +2,44 @@ Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: gustavo@padovan.org
-Subject: [PATCH 4/4] Adjust define name to the name of the file
-Date: Fri,  4 Jun 2010 07:16:53 -0300
-Message-Id: <1275646613-32639-4-git-send-email-gustavo@padovan.org>
-In-Reply-To: <1275646613-32639-3-git-send-email-gustavo@padovan.org>
+Subject: [PATCH 3/4] log: Remove vinfo function
+Date: Fri,  4 Jun 2010 07:16:52 -0300
+Message-Id: <1275646613-32639-3-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1275646613-32639-2-git-send-email-gustavo@padovan.org>
 References: <1275646613-32639-1-git-send-email-gustavo@padovan.org>
  <1275646613-32639-2-git-send-email-gustavo@padovan.org>
- <1275646613-32639-3-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+It was used only once.
 ---
- src/log.h |    6 +++---
- 1 files changed, 3 insertions(+), 3 deletions(-)
+ src/log.c |    7 +------
+ 1 files changed, 1 insertions(+), 6 deletions(-)
 
-diff --git a/src/log.h b/src/log.h
-index 235430e..7a5942c 100644
---- a/src/log.h
-+++ b/src/log.h
-@@ -21,8 +21,8 @@
-  *
-  */
+diff --git a/src/log.c b/src/log.c
+index 9248c4d..f113fa6 100644
+--- a/src/log.c
++++ b/src/log.c
+@@ -33,18 +33,13 @@
  
--#ifndef __LOGGING_H
--#define __LOGGING_H
-+#ifndef __LOG_H
-+#define __LOG_H
+ #include "log.h"
  
- extern int debug_enabled;
+-static inline void vinfo(const char *format, va_list ap)
+-{
+-	vsyslog(LOG_INFO, format, ap);
+-}
+-
+ void info(const char *format, ...)
+ {
+ 	va_list ap;
  
-@@ -61,4 +61,4 @@ struct btd_debug_desc {
-                                         __FILE__, __FUNCTION__ , ## arg); \
- } while (0)
+ 	va_start(ap, format);
  
--#endif /* __LOGGING_H */
-+#endif /* __LOG_H */
+-	vinfo(format, ap);
++	vsyslog(LOG_INFO, format, ap);
+ 
+ 	va_end(ap);
+ }
 -- 
 1.7.1
 
