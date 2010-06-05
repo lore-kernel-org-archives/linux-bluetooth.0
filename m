@@ -2,41 +2,58 @@ Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: gustavo@padovan.org
-Subject: [PATCH 1/3] log: Remove vinfo function
-Date: Sat,  5 Jun 2010 01:41:24 -0300
-Message-Id: <1275712886-20127-1-git-send-email-gustavo@padovan.org>
+Subject: [PATCH 4/4] Remove ifndef barrier from log.h and btio.h
+Date: Fri,  4 Jun 2010 23:23:42 -0300
+Message-Id: <1275704622-5917-4-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1275704622-5917-3-git-send-email-gustavo@padovan.org>
+References: <1275704622-5917-1-git-send-email-gustavo@padovan.org>
+ <1275704622-5917-2-git-send-email-gustavo@padovan.org>
+ <1275704622-5917-3-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It was used only once.
 ---
- src/log.c |    7 +------
- 1 files changed, 1 insertions(+), 6 deletions(-)
+ src/btio.h |    3 ---
+ src/log.h  |    4 ----
+ 2 files changed, 0 insertions(+), 7 deletions(-)
 
-diff --git a/src/log.c b/src/log.c
-index 29e2d7d..cb02aad 100644
---- a/src/log.c
-+++ b/src/log.c
-@@ -33,18 +33,13 @@
+diff --git a/src/btio.h b/src/btio.h
+index 00d743e..fa6ff69 100644
+--- a/src/btio.h
++++ b/src/btio.h
+@@ -21,8 +21,6 @@
+  *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  *
+  */
+-#ifndef BT_IO_H
+-#define BT_IO_H
  
- #include "log.h"
+ #include <glib.h>
  
--static inline void vinfo(const char *format, va_list ap)
--{
--	vsyslog(LOG_INFO, format, ap);
--}
+@@ -93,4 +91,3 @@ GIOChannel *bt_io_listen(BtIOType type, BtIOConnect connect,
+ 				GDestroyNotify destroy, GError **err,
+ 				BtIOOption opt1, ...);
+ 
+-#endif
+diff --git a/src/log.h b/src/log.h
+index f37929c..94b045c 100644
+--- a/src/log.h
++++ b/src/log.h
+@@ -21,9 +21,6 @@
+  *
+  */
+ 
+-#ifndef __LOGGING_H
+-#define __LOGGING_H
 -
- void info(const char *format, ...)
- {
- 	va_list ap;
+ extern int debug_enabled;
  
- 	va_start(ap, format);
+ void info(const char *format, ...) __attribute__((format(printf, 1, 2)));
+@@ -61,4 +58,3 @@ struct btd_debug_desc {
+                                         __FILE__, __FUNCTION__ , ## arg); \
+ } while (0)
  
--	vinfo(format, ap);
-+	vsyslog(LOG_INFO, format, ap);
- 
- 	va_end(ap);
- }
+-#endif /* __LOGGING_H */
 -- 
 1.7.1
 
