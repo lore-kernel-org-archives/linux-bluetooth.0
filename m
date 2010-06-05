@@ -1,43 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <gfpadovan@gmail.com>
 From: "Gustavo F. Padovan" <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: gustavo@padovan.org,
-	marcel@holtmann.org
-Subject: Pull request: Fixes for the Enhanced Retransmission Mode
-Date: Sat,  5 Jun 2010 04:50:04 -0300
-Message-Id: <1275724218-29453-1-git-send-email-gustavo@padovan.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Cc: gustavo@padovan.org
+Subject: [PATCH 5/5] Document the new Debug and DebugString property
+Date: Sat,  5 Jun 2010 04:25:36 -0300
+Message-Id: <1275722736-28895-5-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1275722736-28895-4-git-send-email-gustavo@padovan.org>
+References: <1275722736-28895-1-git-send-email-gustavo@padovan.org>
+ <1275722736-28895-2-git-send-email-gustavo@padovan.org>
+ <1275722736-28895-3-git-send-email-gustavo@padovan.org>
+ <1275722736-28895-4-git-send-email-gustavo@padovan.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+---
+ doc/manager-api.txt |   19 +++++++++++++++++++
+ 1 files changed, 19 insertions(+), 0 deletions(-)
 
-The following changes since commit 67a3e12b05e055c0415c556a315a3d3eb637e29e:
+diff --git a/doc/manager-api.txt b/doc/manager-api.txt
+index d2c1caf..07d4fde 100644
+--- a/doc/manager-api.txt
++++ b/doc/manager-api.txt
+@@ -22,6 +22,15 @@ Methods		dict GetProperties()
+ 			Possible Errors: org.bluez.Error.DoesNotExist
+ 					 org.bluez.Error.InvalidArguments
+ 
++		void SetProperty(string name, variant value)
++
++			Changes the value of the specified property. Only
++			properties that are listed a read-write are changeable.
++			On success this will emit a PropertyChanged signal.
++
++			Possible Errors: org.bluez.Error.DoesNotExist
++					 org.bluez.Error.InvalidArguments
++
+ 		object DefaultAdapter()
+ 
+ 			Returns object path for the default adapter.
+@@ -72,3 +81,13 @@ Signals		PropertyChanged(string name, variant value)
+ Properties	array{object} Adapters [readonly]
+ 
+ 			List of adapter object paths.
++
++		boolean Debug [readwrite]
++
++			Switch dynamic debug on or off.
++
++		string DebugString [readwrite]
++
++			Change the dynamic debug match string. Use it to
++			restrict debug to specific files. The default value is
++			"*" to debug all files.
+-- 
+1.7.1
 
-  Linux 2.6.35-rc1 (2010-05-30 13:21:02 -0700)
-
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-testing.git for-upstream
-
-Gustavo F. Padovan (13):
-      Bluetooth: Remove max_tx and tx_window modules paramenter from L2CAP
-      Bluetooth: Remove L2CAP Extended Features from Kconfig
-      Bluetooth: Fix drop of packets with invalid req_seq/tx_seq
-      Bluetooth: Check skb_clone return to avoid NULL dereference
-      Bluetooth: Fix ERTM vars increment
-      Bluetooth: Check packet FCS earlier
-      Bluetooth: Only check SAR bits if frame is I-frame
-      Bluetooth: Stop ack_timer if ERTM enters in Local Busy or SREJ_SENT
-      Bluetooth: Fix ERTM channel shutdown
-      Bluetooth: Fix crash when sending frames after connection is closed
-      Bluetooth: Fix handle of received P-bit
-      Bluetooth: Fix l2cap_ertm_send() behavior
-      Bluetooth: Fix missing retransmission action with RR(P=1)
-
-João Paulo Rechi Vita (1):
-      Bluetooth: Fix SREJ_QUEUE corruption
-
- net/bluetooth/Kconfig |   13 ----
- net/bluetooth/l2cap.c |  156 +++++++++++++++++++++++++++++++------------------
- 2 files changed, 99 insertions(+), 70 deletions(-)
