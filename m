@@ -5,10 +5,10 @@ To: linux-bluetooth@vger.kernel.org
 Cc: gustavo@padovan.org,
 	marcel@holtmann.org,
 	"Gustavo F. Padovan" <padovan@profusion.mobi>
-Subject: [PATCH 09/14] Bluetooth: Fix ERTM channel shutdown
-Date: Sat,  5 Jun 2010 04:50:13 -0300
-Message-Id: <1275724218-29453-10-git-send-email-gustavo@padovan.org>
-In-Reply-To: <1275724218-29453-9-git-send-email-gustavo@padovan.org>
+Subject: [PATCH 08/14] Bluetooth: Stop ack_timer if ERTM enters in Local Busy or SREJ_SENT
+Date: Sat,  5 Jun 2010 04:50:12 -0300
+Message-Id: <1275724218-29453-9-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1275724218-29453-8-git-send-email-gustavo@padovan.org>
 References: <1275724218-29453-1-git-send-email-gustavo@padovan.org>
  <1275724218-29453-2-git-send-email-gustavo@padovan.org>
  <1275724218-29453-3-git-send-email-gustavo@padovan.org>
@@ -17,127 +17,42 @@ References: <1275724218-29453-1-git-send-email-gustavo@padovan.org>
  <1275724218-29453-6-git-send-email-gustavo@padovan.org>
  <1275724218-29453-7-git-send-email-gustavo@padovan.org>
  <1275724218-29453-8-git-send-email-gustavo@padovan.org>
- <1275724218-29453-9-git-send-email-gustavo@padovan.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo F. Padovan <padovan@profusion.mobi>
 
-After send a Disconnection Request we shall no send and receive frames
-anymore. So we set it to BT_DISCONN when a Disconnection Request is
-sent then L2CAP will not be able to send or receive any new packet, as
-specified by L2CAP spec.
+The ack_timer is implemation specific, disabling it in such situation
+avoids some potencial errors in the ERTM protocol.
 
 Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 Reviewed-by: João Paulo Rechi Vita <jprvita@profusion.mobi>
 ---
- net/bluetooth/l2cap.c |   50 +++++++++++++++++++++++++++++++++---------------
- 1 files changed, 34 insertions(+), 16 deletions(-)
+ net/bluetooth/l2cap.c |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
 
 diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 35b7791..3db0078 100644
+index 7a8454a..35b7791 100644
 --- a/net/bluetooth/l2cap.c
 +++ b/net/bluetooth/l2cap.c
-@@ -428,14 +428,41 @@ static void l2cap_do_start(struct sock *sk)
+@@ -3632,6 +3632,8 @@ static int l2cap_push_rx_skb(struct sock *sk, struct sk_buff *skb, u16 control)
+ 
+ 	pi->conn_state |= L2CAP_CONN_RNR_SENT;
+ 
++	del_timer(&pi->ack_timer);
++
+ 	queue_work(_busy_wq, &pi->busy_work);
+ 
+ 	return err;
+@@ -3881,6 +3883,8 @@ static inline int l2cap_data_channel_iframe(struct sock *sk, u16 rx_control, str
+ 		pi->conn_state |= L2CAP_CONN_SEND_PBIT;
+ 
+ 		l2cap_send_srejframe(sk, tx_seq);
++
++		del_timer(&pi->ack_timer);
  	}
- }
+ 	return 0;
  
-+static inline void l2cap_ertm_shutdown(struct sock *sk)
-+{
-+	struct srej_list *l, *tmp;
-+
-+	del_timer(&l2cap_pi(sk)->retrans_timer);
-+	del_timer(&l2cap_pi(sk)->monitor_timer);
-+	del_timer(&l2cap_pi(sk)->ack_timer);
-+
-+	skb_queue_purge(SREJ_QUEUE(sk));
-+	skb_queue_purge(BUSY_QUEUE(sk));
-+
-+	list_for_each_entry_safe(l, tmp, SREJ_LIST(sk), list) {
-+		list_del(&l->list);
-+		kfree(l);
-+	}
-+}
-+
- static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct sock *sk)
- {
- 	struct l2cap_disconn_req req;
- 
-+	skb_queue_purge(TX_QUEUE(sk));
-+
-+	if (l2cap_pi(sk)->mode == L2CAP_MODE_ERTM) {
-+		del_timer(&l2cap_pi(sk)->retrans_timer);
-+		del_timer(&l2cap_pi(sk)->monitor_timer);
-+		del_timer(&l2cap_pi(sk)->ack_timer);
-+	}
-+
- 	req.dcid = cpu_to_le16(l2cap_pi(sk)->dcid);
- 	req.scid = cpu_to_le16(l2cap_pi(sk)->scid);
- 	l2cap_send_cmd(conn, l2cap_get_ident(conn),
- 			L2CAP_DISCONN_REQ, sizeof(req), &req);
-+
-+	sk->sk_state = BT_DISCONN;
- }
- 
- /* ---- L2CAP connections ---- */
-@@ -726,7 +753,6 @@ static void __l2cap_sock_close(struct sock *sk, int reason)
- 				sk->sk_type == SOCK_STREAM) {
- 			struct l2cap_conn *conn = l2cap_pi(sk)->conn;
- 
--			sk->sk_state = BT_DISCONN;
- 			l2cap_sock_set_timer(sk, sk->sk_sndtimeo);
- 			l2cap_send_disconn_req(conn, sk);
- 		} else
-@@ -1409,6 +1435,9 @@ static int l2cap_ertm_send(struct sock *sk)
- 	u16 control, fcs;
- 	int nsent = 0;
- 
-+	if (sk->sk_state != BT_CONNECTED)
-+		return -ENOTCONN;
-+
- 	if (pi->conn_state & L2CAP_CONN_WAIT_F)
- 		return 0;
- 
-@@ -3068,7 +3097,6 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 
- 	default:
- 		sk->sk_state = BT_DISCONN;
--		sk->sk_err = ECONNRESET;
- 		l2cap_sock_set_timer(sk, HZ * 5);
- 		l2cap_send_disconn_req(conn, sk);
- 		goto done;
-@@ -3123,13 +3151,8 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn, struct l2cap_cmd
- 
- 	skb_queue_purge(TX_QUEUE(sk));
- 
--	if (l2cap_pi(sk)->mode == L2CAP_MODE_ERTM) {
--		skb_queue_purge(SREJ_QUEUE(sk));
--		skb_queue_purge(BUSY_QUEUE(sk));
--		del_timer(&l2cap_pi(sk)->retrans_timer);
--		del_timer(&l2cap_pi(sk)->monitor_timer);
--		del_timer(&l2cap_pi(sk)->ack_timer);
--	}
-+	if (l2cap_pi(sk)->mode == L2CAP_MODE_ERTM)
-+		l2cap_ertm_shutdown(sk);
- 
- 	l2cap_chan_del(sk, ECONNRESET);
- 	bh_unlock_sock(sk);
-@@ -3155,13 +3178,8 @@ static inline int l2cap_disconnect_rsp(struct l2cap_conn *conn, struct l2cap_cmd
- 
- 	skb_queue_purge(TX_QUEUE(sk));
- 
--	if (l2cap_pi(sk)->mode == L2CAP_MODE_ERTM) {
--		skb_queue_purge(SREJ_QUEUE(sk));
--		skb_queue_purge(BUSY_QUEUE(sk));
--		del_timer(&l2cap_pi(sk)->retrans_timer);
--		del_timer(&l2cap_pi(sk)->monitor_timer);
--		del_timer(&l2cap_pi(sk)->ack_timer);
--	}
-+	if (l2cap_pi(sk)->mode == L2CAP_MODE_ERTM)
-+		l2cap_ertm_shutdown(sk);
- 
- 	l2cap_chan_del(sk, 0);
- 	bh_unlock_sock(sk);
 -- 
 1.7.1
