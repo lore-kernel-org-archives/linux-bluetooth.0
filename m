@@ -1,38 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Sun, 6 Jun 2010 10:42:23 +0530
-Message-ID: <AANLkTimX-ofkv4oekES0kfi7l_y4yLMVAO8A9e0Nx5tg@mail.gmail.com>
-Subject: Inquiry Result with repeated set of MAC addresses - Is it a problem
-	with Bluetooth device ?
-From: Saurabh Thukral <saurabhth@gmail.com>
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Cc: gustavo@padovan.org
+Subject: [PATCH] audio: Fix typo
+Date: Sat,  5 Jun 2010 23:46:43 -0300
+Message-Id: <1275792403-5535-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dear Bluez Team,
+---
+ audio/gateway.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-I am currently testing my bluetooth application using Bluez on Linux
-(Fedora Core 11) and have HP Eltebook laptop that has Broadcom
-bluetooth adaptor. The Bluez version installed is 4.37.
+diff --git a/audio/gateway.c b/audio/gateway.c
+index dfe7145..1dd3f5b 100644
+--- a/audio/gateway.c
++++ b/audio/gateway.c
+@@ -204,7 +204,7 @@ static void newconnection_reply(DBusPendingCall *call, void *data)
+ 
+ 	dbus_error_init(&derr);
+ 	if (!dbus_set_error_from_message(&derr, reply)) {
+-		DBG("Agent reply: file descriptor passed successfuly");
++		DBG("Agent reply: file descriptor passed successfully");
+ 		change_state(dev, GATEWAY_STATE_CONNECTED);
+ 		goto done;
+ 	}
+@@ -234,7 +234,7 @@ static void rfcomm_connect_cb(GIOChannel *chan, GError *err,
+ 	}
+ 
+ 	if (!gw->agent) {
+-		error("Handfree Agent not registered");
++		error("Handsfree Agent not registered");
+ 		goto fail;
+ 	}
+ 
+-- 
+1.7.1
 
-On running <hcitool scan> in one terminal and simultaneously viewing
-results using <hcidump> on the other terminal, I had a very
-interesting observation that has made me quite perplexed. I would
-really like you to help me out.
-
-The observation is that suppose a device(Nokia N73) with MAC address
-M1 is discoverable, the response to Inquiry Request command is often a
-set of multiple Inquiry Result each with the same MAC address M1.
-
-I had expected that only one Inquiry result with MAC address M1 should
-have been returned. But here what we find is that multiple such
-results with the same MAC address are returned.
-
-Please advise if this is an issue with bluetooth adaptor or bluez.
-
-Kindly suggest some workaround.
-
---
-Regards,
-Saurabh Thukral
