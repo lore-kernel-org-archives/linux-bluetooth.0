@@ -1,158 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH] Get IEEE1284 for a single printer
-From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary="=-hPSSxYDqqBeYjI+iFwS3"
-Date: Sun, 06 Jun 2010 19:42:24 +0100
-Message-ID: <1275849744.7994.38.camel@localhost.localdomain>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <AANLkTimX-ofkv4oekES0kfi7l_y4yLMVAO8A9e0Nx5tg@mail.gmail.com>
+References: <AANLkTimX-ofkv4oekES0kfi7l_y4yLMVAO8A9e0Nx5tg@mail.gmail.com>
+From: Manuel Naranjo <manuel@aircable.net>
+Date: Sun, 6 Jun 2010 15:04:38 -0300
+Message-ID: <AANLkTikNPHQ_r3lrQMDE2C-6ZhY5uWZ84OxREiUUgarK@mail.gmail.com>
+Subject: Re: Inquiry Result with repeated set of MAC addresses - Is it a
+	problem with Bluetooth device ?
+To: Saurabh Thukral <saurabhth@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi,
 
---=-hPSSxYDqqBeYjI+iFwS3
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+> On running <hcitool scan> in one terminal and simultaneously viewing
+> results using <hcidump> on the other terminal, I had a very
+> interesting observation that has made me quite perplexed. I would
+> really like you to help me out.
+>r
+> The observation is that suppose a device(Nokia N73) with MAC address
+> M1 is discoverable, the response to Inquiry Request command is often a
+> set of multiple Inquiry Result each with the same MAC address M1.
+This is totally normal! It's related to how bluetooth inquiry process
+works. The device doing the inquiry is jumping at a rate of 1600
+hops/s (If I'm not wrong) over 32 channels and te device in inquiry
+scan is jumpung at a way lower rate. So the radio might, and actually
+will, find the same device multiple times per scan cycle. hcidump
+shows you exactly which information is going on between the radio and
+the stack.
 
-Heya,
+The advantage of getting multiple results are many:
+* RSSI depends on scanning channel: not all the channel have the same
+noise level, so averaging RSSI with multiple results is way more
+accurate than just one rssi value from one only channel.
+* Faster response: hcitool inq will only show you the results once it
+has solved both name and completed scanning, but actually it's getting
+the results way before. I had been able to expermient dicovering a new
+radio in less than 1 second so I could take action, and this can only
+be done if you get multiple results per scan cycle.
 
-Discussed printer setup integration with Tim Waugh, and we came to the
-idea that the current framework for USB printers could be reused for
-Bluetooth ones.
+Off course it requires more inteligence on you side. You need to
+filter which results are new and which are not, but that is damn easy,
+and you would be loose applications if it was otherwise.
 
-The differences would be:
-- add code to fetch a single printer's IEEE1284 device ID to the
-Bluetooth cups backend (the attached patch)
-- add special handling in udev-configure-printer for Bluetooth printers
-(we get the IEEE1284 device ID from the cups backend helper)
-https://fedorahosted.org/system-config-printer/ticket/207
-- Add plugin to bluetoothd to call udev-configure-printer when printers
-are paired, or unpaired (not written yet)
+Manuel
 
-Let me know what you think. The patch below could still be useful for
-debugging (in the worst case).
 
-Cheers
-
---=-hPSSxYDqqBeYjI+iFwS3
-Content-Disposition: attachment; filename="0001-cups-Add-ability-to-print-IEEE1284-device-ID.patch"
-Content-Type: text/x-patch; name="0001-cups-Add-ability-to-print-IEEE1284-device-ID.patch"; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-
->From da8e0589d687cb3f24eab46259d179fd830cd088 Mon Sep 17 00:00:00 2001
-From: Bastien Nocera <hadess@hadess.net>
-Date: Sun, 6 Jun 2010 15:48:26 +0100
-Subject: [PATCH] (cups) Add ability to print IEEE1284 device ID
-
-Add ability to print IEEE1284 device ID for Bluetooth
-printers to allow auto-configuration once paired.
----
- cups/main.c |   78 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 78 insertions(+), 0 deletions(-)
-
-diff --git a/cups/main.c b/cups/main.c
-index 9659a11..00933b6 100644
---- a/cups/main.c
-+++ b/cups/main.c
-@@ -605,6 +605,75 @@ static gboolean list_printers(void)
- 	return TRUE;
- }
- 
-+static gboolean print_ieee1284(const char *bdaddr)
-+{
-+	DBusMessage *message, *reply, *adapter_reply;
-+	DBusMessageIter iter;
-+	char *object_path = NULL;
-+	char *adapter;
-+	char *id;
-+
-+	adapter_reply = NULL;
-+
-+	conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
-+	if (conn == NULL)
-+		return FALSE;
-+
-+	message = dbus_message_new_method_call("org.bluez", "/",
-+					       "org.bluez.Manager",
-+					       "DefaultAdapter");
-+
-+	adapter_reply = dbus_connection_send_with_reply_and_block(conn,
-+								  message, -1, NULL);
-+
-+	dbus_message_unref(message);
-+
-+	if (dbus_message_get_args(adapter_reply, NULL, DBUS_TYPE_OBJECT_PATH, &adapter, DBUS_TYPE_INVALID) == FALSE)
-+		return FALSE;
-+
-+	message = dbus_message_new_method_call("org.bluez", adapter,
-+					       "org.bluez.Adapter",
-+					       "FindDevice");
-+	dbus_message_iter_init_append(message, &iter);
-+	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &bdaddr);
-+
-+	if (adapter_reply != NULL)
-+		dbus_message_unref(adapter_reply);
-+
-+	reply = dbus_connection_send_with_reply_and_block(conn,
-+							message, -1, NULL);
-+
-+	dbus_message_unref(message);
-+
-+	if (!reply) {
-+		message = dbus_message_new_method_call("org.bluez", adapter,
-+						       "org.bluez.Adapter",
-+						       "CreateDevice");
-+		dbus_message_iter_init_append(message, &iter);
-+		dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &bdaddr);
-+
-+		reply = dbus_connection_send_with_reply_and_block(conn,
-+								  message, -1, NULL);
-+
-+		dbus_message_unref(message);
-+
-+		if (!reply)
-+			return FALSE;
-+	}
-+	if (dbus_message_get_args(reply, NULL, DBUS_TYPE_OBJECT_PATH, &object_path,
-+				  DBUS_TYPE_INVALID) == FALSE) {
-+		return FALSE;
-+	}
-+
-+	id = device_get_ieee1284_id(adapter, object_path);
-+	if (id == NULL)
-+		return FALSE;
-+	printf("%s", id);
-+	g_free(id);
-+
-+	return TRUE;
-+}
-+
- /*
-  *  Usage: printer-uri job-id user title copies options [file]
-  *
-@@ -642,10 +711,19 @@ int main(int argc, char *argv[])
- 			return CUPS_BACKEND_OK;
- 		else
- 			return CUPS_BACKEND_FAILED;
-+	} else if (argc == 3 && strcmp(argv[1], "--get-deviceid") == 0) {
-+		if (bachk(argv[2]) < 0) {
-+			fprintf(stderr, "Invalid Bluetooth address '%s'\n", argv[2]);
-+			return CUPS_BACKEND_FAILED;
-+		}
-+		if (print_ieee1284(argv[2]) == FALSE)
-+			return CUPS_BACKEND_FAILED;
-+		return CUPS_BACKEND_OK;
- 	}
- 
- 	if (argc < 6 || argc > 7) {
- 		fprintf(stderr, "Usage: bluetooth job-id user title copies options [file]\n");
-+		fprintf(stderr, "       bluetooth --get-deviceid [bdaddr]\n");
- 		return CUPS_BACKEND_FAILED;
- 	}
- 
 -- 
-1.7.0.1
-
-
---=-hPSSxYDqqBeYjI+iFwS3--
-
+Manuel Francisco Naranjo
+Software Department Argentina
+Wireless Cables Inc
+www.aircable.net
+cel: +5493412010019
+skype: naranjomanuelfrancisco
