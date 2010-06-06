@@ -1,91 +1,158 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4C0C72ED.6050406@Atheros.com>
-Date: Mon, 7 Jun 2010 09:47:49 +0530
-From: Suraj <suraj@Atheros.com>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Suraj Sumangala <Suraj.Sumangala@Atheros.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, "Luis
- Rodriguez" <Luis.Rodriguez@Atheros.com>, Jothikumar Mothilal
-	<Jothikumar.Mothilal@Atheros.com>
-Subject: Re: [PATCH v2] frame reassembly implementation for data stream
-References: <1275467080.13946.3.camel@atheros013-desktop>	 <1275490955.2182.21.camel@localhost.localdomain>	 <4C071A73.70407@Atheros.com> <1275547087.2182.28.camel@localhost.localdomain> <4C0754CD.7020902@Atheros.com>
-In-Reply-To: <4C0754CD.7020902@Atheros.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Subject: [PATCH] Get IEEE1284 for a single printer
+From: Bastien Nocera <hadess@hadess.net>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary="=-hPSSxYDqqBeYjI+iFwS3"
+Date: Sun, 06 Jun 2010 19:42:24 +0100
+Message-ID: <1275849744.7994.38.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
 
-On 6/3/2010 12:37 PM, Suraj wrote:
-> Hi Marcel,
->
-> On 6/3/2010 12:08 PM, Marcel Holtmann wrote:
->> Hi Suraj,
->>
->>>> I don't like this implementation at all. The biggest problem is that you
->>>> are misusing __reassembly(hdev, HCI_ACLDATA_PKT) for getting your SKB. I
->>>> don't wanna intermix this. I am also missing checks for the packet
->>>> length matching or when packets are too big or the header size is not
->>>> matching up.
->>>>
->>>> So in theory both functions do exactly the same. Only minor exception is
->>>> that one knows the packet type up-front, the other has to read it from
->>>> the stream as a 1-byte header. I don't wanna maintain two functions that
->>>> do exactly the same.
->>>>
->>>> Creating an internal helper function that can maintain the current state
->>>> of the reassembly sounds a lot better. Then re-use that function and
->>>> ensure that the reassembly logic is inside the helper.
->>>
->>> I appreciate if you can take a closer look at the patch and compare it
->>> with  hci_recv_fragment implementation.
->>> Eventhough it looks similar, there are major differences on the way data
->>> is reassembled. It would not have worked if I had reused the same code
->>> from  hci_recv_fragment().
->>>
->>> Having a common reassembly helper could work. But I am not sure whether
->>> that would be a better solution.
->>
->> I did have a closer look at it already. I clearly see possibilities to
->> combine them into a more generic helper and not to maintain two
->> different functions that do exactly the same.
->
-> The cases that the reassembly code has to consider are
->
-> 1. We receive only packet type in one fragment
-> 2. packet header is fragmented
-> 3. packet data is fragmented
-> 4. We receive multiple frames in one fragment.
->
-> hci_recv_fragment(), handles only case 3 and 4 as it always knows the
-> packet type and the full packet header in one call itself.
->
-> For stream reassembly we need to take care of all cases 1-4 . This is
-> where both functions differ.
->
-> This actually makes a lot of difference in the way reassembly is done.
->
-> Now regarding having a common helper function. I agree to the fact that
-> it makes sense to have a helper function.
->
-> My points against a common helper function are
->
-> 1. It has to cover all 1-4 cases. This make it bit inefficient for USB
-> as not considering 1 and 2 saves a lot of effort( allocating buffer
-> before knowing the length, trying to verify if we have received the
-> packet header or not etc etc.).
->
-> 2. For case 4: the helper will not know from which context it was called.
-> If it was called from a stream context, it will have to take the first
-> byte of the next frame as packet type and do reassembly accordingly.
-> This involves the caller telling the helper function from what context
-> it was called. Which IMHO makes it less generic
->
-> I understand that these issues can be worked around, but I believe makes
-> the generic implementation kind of "trying to do too many things" helper.
->
-Do let me know if you still think that having a generic function makes 
-more sense, then I can go ahead and implement it.
+--=-hPSSxYDqqBeYjI+iFwS3
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 
-Regards
-Suraj
+Heya,
+
+Discussed printer setup integration with Tim Waugh, and we came to the
+idea that the current framework for USB printers could be reused for
+Bluetooth ones.
+
+The differences would be:
+- add code to fetch a single printer's IEEE1284 device ID to the
+Bluetooth cups backend (the attached patch)
+- add special handling in udev-configure-printer for Bluetooth printers
+(we get the IEEE1284 device ID from the cups backend helper)
+https://fedorahosted.org/system-config-printer/ticket/207
+- Add plugin to bluetoothd to call udev-configure-printer when printers
+are paired, or unpaired (not written yet)
+
+Let me know what you think. The patch below could still be useful for
+debugging (in the worst case).
+
+Cheers
+
+--=-hPSSxYDqqBeYjI+iFwS3
+Content-Disposition: attachment; filename="0001-cups-Add-ability-to-print-IEEE1284-device-ID.patch"
+Content-Type: text/x-patch; name="0001-cups-Add-ability-to-print-IEEE1284-device-ID.patch"; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+
+>From da8e0589d687cb3f24eab46259d179fd830cd088 Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Sun, 6 Jun 2010 15:48:26 +0100
+Subject: [PATCH] (cups) Add ability to print IEEE1284 device ID
+
+Add ability to print IEEE1284 device ID for Bluetooth
+printers to allow auto-configuration once paired.
+---
+ cups/main.c |   78 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 78 insertions(+), 0 deletions(-)
+
+diff --git a/cups/main.c b/cups/main.c
+index 9659a11..00933b6 100644
+--- a/cups/main.c
++++ b/cups/main.c
+@@ -605,6 +605,75 @@ static gboolean list_printers(void)
+ 	return TRUE;
+ }
+ 
++static gboolean print_ieee1284(const char *bdaddr)
++{
++	DBusMessage *message, *reply, *adapter_reply;
++	DBusMessageIter iter;
++	char *object_path = NULL;
++	char *adapter;
++	char *id;
++
++	adapter_reply = NULL;
++
++	conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
++	if (conn == NULL)
++		return FALSE;
++
++	message = dbus_message_new_method_call("org.bluez", "/",
++					       "org.bluez.Manager",
++					       "DefaultAdapter");
++
++	adapter_reply = dbus_connection_send_with_reply_and_block(conn,
++								  message, -1, NULL);
++
++	dbus_message_unref(message);
++
++	if (dbus_message_get_args(adapter_reply, NULL, DBUS_TYPE_OBJECT_PATH, &adapter, DBUS_TYPE_INVALID) == FALSE)
++		return FALSE;
++
++	message = dbus_message_new_method_call("org.bluez", adapter,
++					       "org.bluez.Adapter",
++					       "FindDevice");
++	dbus_message_iter_init_append(message, &iter);
++	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &bdaddr);
++
++	if (adapter_reply != NULL)
++		dbus_message_unref(adapter_reply);
++
++	reply = dbus_connection_send_with_reply_and_block(conn,
++							message, -1, NULL);
++
++	dbus_message_unref(message);
++
++	if (!reply) {
++		message = dbus_message_new_method_call("org.bluez", adapter,
++						       "org.bluez.Adapter",
++						       "CreateDevice");
++		dbus_message_iter_init_append(message, &iter);
++		dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &bdaddr);
++
++		reply = dbus_connection_send_with_reply_and_block(conn,
++								  message, -1, NULL);
++
++		dbus_message_unref(message);
++
++		if (!reply)
++			return FALSE;
++	}
++	if (dbus_message_get_args(reply, NULL, DBUS_TYPE_OBJECT_PATH, &object_path,
++				  DBUS_TYPE_INVALID) == FALSE) {
++		return FALSE;
++	}
++
++	id = device_get_ieee1284_id(adapter, object_path);
++	if (id == NULL)
++		return FALSE;
++	printf("%s", id);
++	g_free(id);
++
++	return TRUE;
++}
++
+ /*
+  *  Usage: printer-uri job-id user title copies options [file]
+  *
+@@ -642,10 +711,19 @@ int main(int argc, char *argv[])
+ 			return CUPS_BACKEND_OK;
+ 		else
+ 			return CUPS_BACKEND_FAILED;
++	} else if (argc == 3 && strcmp(argv[1], "--get-deviceid") == 0) {
++		if (bachk(argv[2]) < 0) {
++			fprintf(stderr, "Invalid Bluetooth address '%s'\n", argv[2]);
++			return CUPS_BACKEND_FAILED;
++		}
++		if (print_ieee1284(argv[2]) == FALSE)
++			return CUPS_BACKEND_FAILED;
++		return CUPS_BACKEND_OK;
+ 	}
+ 
+ 	if (argc < 6 || argc > 7) {
+ 		fprintf(stderr, "Usage: bluetooth job-id user title copies options [file]\n");
++		fprintf(stderr, "       bluetooth --get-deviceid [bdaddr]\n");
+ 		return CUPS_BACKEND_FAILED;
+ 	}
+ 
+-- 
+1.7.0.1
+
+
+--=-hPSSxYDqqBeYjI+iFwS3--
+
