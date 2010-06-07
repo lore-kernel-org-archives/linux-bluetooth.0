@@ -1,48 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 8 Jun 2010 14:19:54 +0800
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: "Gustavo F. Padovan" <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/3] Remove ifndef barrier from log.h and btio.h
-Message-ID: <20100608061954.GA16335@jh-x301>
-References: <1275712886-20127-1-git-send-email-gustavo@padovan.org>
- <1275712886-20127-2-git-send-email-gustavo@padovan.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1275712886-20127-2-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1274883694-18120-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1274883694-18120-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Mon, 7 Jun 2010 17:11:28 +0300
+Message-ID: <AANLkTinfV50-6wEG8ylEc6XTZXtCpcwZDYick-0GcIlO@mail.gmail.com>
+Subject: Re: [PATCHv1 0/2] Don't delete l2cap chan and sk when sk is owned by
+	user
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+On Wed, May 26, 2010 at 5:21 PM, Emeltchenko Andrei
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+>
+> When sk is owned by user we shall not delete l2cap shannel structures and socket sk.
+> The first patch which is less hackish than using timer to delete l2cap channel.
+>
+> Andrei Emeltchenko (2):
+>  Bluetooth: Check sk is not owned before freeing l2cap_conn
+>  Bluetooth: Prevent sk freeing in tasklet using refcount
+>
+>  net/bluetooth/l2cap.c |   16 +++++++++++++---
+>  1 files changed, 13 insertions(+), 3 deletions(-)
 
-On Sat, Jun 05, 2010, Gustavo F. Padovan wrote:
-> ---
->  src/btio.h |    3 ---
->  src/log.h  |    4 +---
->  2 files changed, 1 insertions(+), 6 deletions(-)
-> 
-> diff --git a/src/btio.h b/src/btio.h
-> index 00d743e..fa6ff69 100644
-> --- a/src/btio.h
-> +++ b/src/btio.h
-> @@ -21,8 +21,6 @@
->   *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
->   *
->   */
-> -#ifndef BT_IO_H
-> -#define BT_IO_H
-
-I think it'd be good to leave this for BtIO since it might become a
-public library soon.
-
-> -#ifndef __LOGGING_H
-> -#define __LOGGING_H
-> +extern int debug_enabled;
-
-This doesn't match the commit message. To me it seems like the extern
-int addition should be part of the third patch and not this one. Also,
-Marcel might have had a reason for putting the safeguard for log.h so
-just leave these safeguards as they are (ofono and connman has them
-too).
-
-Johan
+Ping
