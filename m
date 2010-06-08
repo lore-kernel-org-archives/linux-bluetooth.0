@@ -1,67 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: L2CAP ERTM compatibility problem
-From: Nathan Holstein <ngh@isomerica.net>
-Reply-To: ngh@isomerica.net
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain
-Date: Tue, 08 Jun 2010 13:20:37 -0400
-Message-Id: <1276017637.3546.519.camel@strawberry>
-Mime-Version: 1.0
+Date: Tue, 8 Jun 2010 17:26:21 +0800
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Get IEEE1284 for a single printer
+Message-ID: <20100608092621.GA8254@jh-x301>
+References: <1275849744.7994.38.camel@localhost.localdomain>
+ <20100608070935.GA22068@jh-x301>
+ <1275988881.2458.12112.camel@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1275988881.2458.12112.camel@localhost.localdomain>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I'm currently testing an older set of Gustavo's ERTM fixes backported
-onto a 2.6.32 kernel.  I'm seeing a compatibility problem while
-attempting to establish a connection using ERTM.  This appears to be
-caused by commit 277ffbe in Gustavo's testing tree which adds minimum
-length checks to received ERTM and Streaming Mode packets.
+Hi Bastien,
 
-Here's the incoming packet (hcidump -Xt):
+On Tue, Jun 08, 2010, Bastien Nocera wrote:
+> > I have nothing against pushing the patch upstream as long as its coding
+> > style issues are fixed:
+> <snip>
+> > Mixed tabs and spaces.
+> 
+> You do realise that all those are cut'n'paste from another function in
+> the same source file?
 
-        1276011301.453633 > ACL data: handle 12 flags 0x02 dlen 11
-            L2CAP(d): cid 0x0040 len 7 [psm 0]
-              0000: 02 01 07 00 06 2e 0b
+Nope, didn't realize that. So the whole file needs coding style cleanups
+then.
 
-This appears to be a valid packet containing a three byte sequence which
-should be passed up to the application.  However, the check added by
-commit 277ffbe causes the kernel to disconnect the socket since the data
-length is less than 4.
+> > > +			fprintf(stderr, "Invalid Bluetooth address '%s'\n", argv[2]);
+> > 
+> > Too long line.
+> 
+> Right, I'll fix that.
 
-I don't see the point of the minimum length at this point in the code.
-The len variable already subtracts for the control, FCS and SAR fields
-if necessary.  It seems to me that the remaining length of the skb is
-purely socket data, and as such should be passed on to the application.
+Thanks.
 
-Here's my proposed fix:
-
-        @@ -4189,19 +4193,23 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
-         
-         
-                        if (__is_iframe(control)) {
-        -                       if (len < 4) {
-        +                       if (len < 0) {
-                                        l2cap_send_disconn_req(pi->conn, sk);
-                                        goto drop;
-                                }
-        @@ -4222,7 +4230,7 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
-                        if (pi->fcs == L2CAP_FCS_CRC16)
-                                len -= 2;
-         
-        -               if (len > pi->mps || len < 4 || __is_sframe(control))
-        +               if (len > pi->mps || len < 0 || __is_sframe(control))
-                                goto drop;
-         
-                        if (l2cap_check_fcs(pi, skb))
-
-This lowers the minimum-packet length of I-frame and streaming mode
-packets put in place by commit 277ffbe.  It maintains the length check
-for S-frames.  I believe ensuring a non-negative length is necessary,
-but this check may need to be performed prior to the call to
-l2cap_check_fcs().
-
-Thoughts?
-
-
-
-    --nathan
-
+Johan
