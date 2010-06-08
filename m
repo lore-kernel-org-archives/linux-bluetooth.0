@@ -2,49 +2,93 @@ Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: gustavo@padovan.org
-Subject: [PATCH] audio: fix leak on gateway
-Date: Tue,  8 Jun 2010 04:14:39 -0300
-Message-Id: <1275981279-18175-1-git-send-email-gustavo@padovan.org>
+Subject: [PATCH 7/8] Add DebugString Property to Manager
+Date: Tue,  8 Jun 2010 04:11:53 -0300
+Message-Id: <1275981114-18019-7-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1275981114-18019-6-git-send-email-gustavo@padovan.org>
+References: <1275981114-18019-1-git-send-email-gustavo@padovan.org>
+ <1275981114-18019-2-git-send-email-gustavo@padovan.org>
+ <1275981114-18019-3-git-send-email-gustavo@padovan.org>
+ <1275981114-18019-4-git-send-email-gustavo@padovan.org>
+ <1275981114-18019-5-git-send-email-gustavo@padovan.org>
+ <1275981114-18019-6-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- audio/gateway.c |   15 ++++++++++++++-
- 1 files changed, 14 insertions(+), 1 deletions(-)
+ src/manager.c |   38 ++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 38 insertions(+), 0 deletions(-)
 
-diff --git a/audio/gateway.c b/audio/gateway.c
-index 1dd3f5b..07ebdd4 100644
---- a/audio/gateway.c
-+++ b/audio/gateway.c
-@@ -561,6 +561,19 @@ static GDBusSignalTable gateway_signals[] = {
- 	{ NULL, NULL }
- };
+diff --git a/src/manager.c b/src/manager.c
+index 66e1511..220a8fe 100644
+--- a/src/manager.c
++++ b/src/manager.c
+@@ -96,6 +96,31 @@ static DBusMessage *set_debug(DBusConnection *conn, DBusMessage *msg,
+ 	return dbus_message_new_method_return(msg);
+ }
  
-+static void path_unregister(void *data)
++static DBusMessage *set_debug_string(DBusConnection *conn, DBusMessage *msg,
++					const char *debug_string, void *data)
 +{
-+	struct audio_device *dev = data;
++	char *old_string;
 +
-+	DBG("Unregistered interface %s on path %s",
-+		AUDIO_GATEWAY_INTERFACE, dev->path);
++	if (!g_utf8_validate(debug_string, -1, NULL)) {
++		error("DebugString change failed: supplied string "
++							"isn't valid UTF-8");
++		return invalid_args(msg);
++	}
 +
-+	gateway_close(dev);
++	old_string = __btd_get_debug_string();
 +
-+	g_free(dev->gateway);
-+	dev->gateway = NULL;
++	if (strcmp((char *)debug_string, old_string) == 0)
++		return dbus_message_new_method_return(msg);
++
++	if (!__btd_set_debug_string((char *)debug_string))
++		return g_dbus_create_error(msg, ERROR_INTERFACE ".Failed",
++							strerror(ENOMEM));
++	emit_property_changed(connection, "/", MANAGER_INTERFACE,
++				"DebugString", DBUS_TYPE_STRING, &debug_string);
++
++	return dbus_message_new_method_return(msg);
 +}
 +
- void gateway_unregister(struct audio_device *dev)
+ static DBusMessage *default_adapter(DBusConnection *conn,
+ 					DBusMessage *msg, void *data)
  {
- 	if (dev->gateway->agent)
-@@ -578,7 +591,7 @@ struct gateway *gateway_init(struct audio_device *dev)
- 	if (!g_dbus_register_interface(dev->conn, dev->path,
- 					AUDIO_GATEWAY_INTERFACE,
- 					gateway_methods, gateway_signals,
--					NULL, dev, NULL))
-+					NULL, dev, path_unregister))
- 		return NULL;
+@@ -200,6 +225,7 @@ static DBusMessage *get_properties(DBusConnection *conn,
+ 	GSList *list;
+ 	char **array;
+ 	gboolean debug_value;
++	char *debug_string;
+ 	int i;
  
- 	return g_new0(struct gateway, 1);
+ 	reply = dbus_message_new_method_return(msg);
+@@ -228,6 +254,10 @@ static DBusMessage *get_properties(DBusConnection *conn,
+ 	debug_value = __btd_debug_enabled();
+ 	dict_append_entry(&dict, "Debug", DBUS_TYPE_BOOLEAN, &debug_value);
+ 
++	debug_string = __btd_get_debug_string();
++	dict_append_entry(&dict, "DebugString", DBUS_TYPE_STRING,
++							&debug_string);
++
+ 	dbus_message_iter_close_container(&iter, &dict);
+ 
+ 	return reply;
+@@ -262,6 +292,14 @@ static DBusMessage *set_property(DBusConnection *conn,
+ 		dbus_message_iter_get_basic(&sub, &debug);
+ 
+ 		return set_debug(conn, msg, debug, data);
++	} else if (g_str_equal("DebugString", property)) {
++		const char *string;
++
++		if (dbus_message_iter_get_arg_type(&sub) != DBUS_TYPE_STRING)
++			return invalid_args(msg);
++		dbus_message_iter_get_basic(&sub, &string);
++
++		return set_debug_string(conn, msg, string, data);
+ 	}
+ 
+ 	return invalid_args(msg);
 -- 
 1.7.1
 
