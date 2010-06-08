@@ -1,40 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 8 Jun 2010 14:21:16 +0800
+Date: Tue, 8 Jun 2010 14:19:54 +0800
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: "Gustavo F. Padovan" <gustavo@padovan.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] sbc: Fix redundant null check on calling free()
-Message-ID: <20100608062116.GA16634@jh-x301>
-References: <1275732870-15889-1-git-send-email-gustavo@padovan.org>
- <1275732870-15889-2-git-send-email-gustavo@padovan.org>
+Subject: Re: [PATCH 2/3] Remove ifndef barrier from log.h and btio.h
+Message-ID: <20100608061954.GA16335@jh-x301>
+References: <1275712886-20127-1-git-send-email-gustavo@padovan.org>
+ <1275712886-20127-2-git-send-email-gustavo@padovan.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1275732870-15889-2-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1275712886-20127-2-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Gustavo,
 
 On Sat, Jun 05, 2010, Gustavo F. Padovan wrote:
-> Issues found by smatch static check: http://smatch.sourceforge.net/
 > ---
->  sbc/sbc.c    |    3 +--
->  sbc/sbcdec.c |    9 +++------
->  2 files changed, 4 insertions(+), 8 deletions(-)
+>  src/btio.h |    3 ---
+>  src/log.h  |    4 +---
+>  2 files changed, 1 insertions(+), 6 deletions(-)
 > 
-> diff --git a/sbc/sbc.c b/sbc/sbc.c
-> index edd152f..86399dd 100644
-> --- a/sbc/sbc.c
-> +++ b/sbc/sbc.c
-> @@ -1138,8 +1138,7 @@ void sbc_finish(sbc_t *sbc)
->  	if (!sbc)
->  		return;
->  
-> -	if (sbc->priv_alloc_base)
-> -		free(sbc->priv_alloc_base);
-> +	free(sbc->priv_alloc_base);
+> diff --git a/src/btio.h b/src/btio.h
+> index 00d743e..fa6ff69 100644
+> --- a/src/btio.h
+> +++ b/src/btio.h
+> @@ -21,8 +21,6 @@
+>   *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+>   *
+>   */
+> -#ifndef BT_IO_H
+> -#define BT_IO_H
 
-I'm a bit hesitant at removing these NULL checks since older libc
-versions might need them. Any comments from Marcel?
+I think it'd be good to leave this for BtIO since it might become a
+public library soon.
+
+> -#ifndef __LOGGING_H
+> -#define __LOGGING_H
+> +extern int debug_enabled;
+
+This doesn't match the commit message. To me it seems like the extern
+int addition should be part of the third patch and not this one. Also,
+Marcel might have had a reason for putting the safeguard for log.h so
+just leave these safeguards as they are (ofono and connman has them
+too).
 
 Johan
