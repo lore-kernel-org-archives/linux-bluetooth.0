@@ -1,147 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH v3 1/3] Implements hci_reassembly to reassemble Rx packets
-From: suraj <suraj@atheros.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <marcel@holtmann.org>, <Luis.Rodriguez@Atheros.com>,
-	<Jothikumar.Mothilal@Atheros.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 9 Jun 2010 18:35:48 +0530
-Message-ID: <1276088748.31226.6.camel@atheros013-desktop>
+Date: Tue, 8 Jun 2010 14:13:17 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: "Gustavo F. Padovan" <gustavo@padovan.org>
+cc: Nathan Holstein <ngh@isomerica.net>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: L2CAP ERTM compatibility problem
+In-Reply-To: <20100608205125.GA24245@vigoh>
+Message-ID: <alpine.DEB.2.00.1006081406110.31069@linux-sea-02>
+References: <1276017637.3546.519.camel@strawberry> <20100608205125.GA24245@vigoh>
 MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Implements feature to reassemble received HCI frames from any input stream.
 
-Signed-off-by: Suraj Sumangala <suraj@atheros.com>
----
- net/bluetooth/hci_core.c |  115 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 115 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 5e83f8e..631a185 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1030,6 +1030,121 @@ int hci_recv_frame(struct sk_buff *skb)
- }
- EXPORT_SYMBOL(hci_recv_frame);
- 
-+static int hci_reassembly(struct hci_dev *hdev, int type, void *data,
-+			  int count, struct sk_buff **skb_ptr, int *remain)
-+{
-+	int len = 0;
-+	int header_len = 0;
-+	struct sk_buff *skb = *skb_ptr;
-+	struct { __u8 pkt_type; int expect; } *scb;
-+
-+	*remain = count;
-+
-+	if (type < HCI_ACLDATA_PKT || type > HCI_EVENT_PKT)
-+		return -EILSEQ;
-+
-+	if (!skb) {
-+
-+		switch (type) {
-+		case HCI_ACLDATA_PKT:
-+			len = HCI_MAX_FRAME_SIZE;
-+			header_len = HCI_ACL_HDR_SIZE;
-+		break;
-+		case HCI_EVENT_PKT:
-+			len = HCI_MAX_EVENT_SIZE;
-+			header_len = HCI_EVENT_HDR_SIZE;
-+		break;
-+		case HCI_SCODATA_PKT:
-+			len = HCI_MAX_SCO_SIZE;
-+			header_len = HCI_SCO_HDR_SIZE;
-+		break;
-+		}
-+
-+		skb = bt_skb_alloc(len, GFP_ATOMIC);
-+
-+		if (!skb)
-+			return -ENOMEM;
-+
-+		scb = (void *) skb->cb;
-+		scb->expect = header_len;
-+		scb->pkt_type = (__u8)type;
-+
-+		skb->dev = (void *) hdev;
-+		*skb_ptr = skb;
-+
-+	}
-+
-+	while (count) {
-+
-+		scb = (void *) skb->cb;
-+		len = min(scb->expect, count);
-+
-+		memcpy(skb_put(skb, len), data, len);
-+
-+		count -= len;
-+		data += len;
-+		scb->expect -= len;
-+		*remain = count;
-+
-+		switch (type) {
-+		case HCI_EVENT_PKT:
-+			if (skb->len == HCI_EVENT_HDR_SIZE) {
-+				struct hci_event_hdr *h = hci_event_hdr(skb);
-+				scb->expect = h->plen;
-+
-+				if (skb_tailroom(skb) < scb->expect) {
-+					kfree_skb(skb);
-+					*skb_ptr = NULL;
-+
-+					return -ENOMEM;
-+				}
-+			}
-+			break;
-+
-+		case HCI_ACLDATA_PKT:
-+			if (skb->len  == HCI_ACL_HDR_SIZE) {
-+				struct hci_acl_hdr *h = hci_acl_hdr(skb);
-+				scb->expect = __le16_to_cpu(h->dlen);
-+
-+				if (skb_tailroom(skb) < scb->expect) {
-+					kfree_skb(skb);
-+					*skb_ptr = NULL;
-+
-+					return -ENOMEM;
-+				}
-+			}
-+			break;
-+
-+		case HCI_SCODATA_PKT:
-+			if (skb->len == HCI_SCO_HDR_SIZE) {
-+				struct hci_sco_hdr *h = hci_sco_hdr(skb);
-+				scb->expect = h->dlen;
-+
-+				if (skb_tailroom(skb) < scb->expect) {
-+					kfree_skb(skb);
-+					*skb_ptr = NULL;
-+
-+					return -ENOMEM;
-+				}
-+			}
-+			break;
-+		}
-+
-+		if (scb->expect == 0) {
-+
-+			/* Complete frame */
-+			bt_cb(skb)->pkt_type = type;
-+			hci_recv_frame(skb);
-+
-+			*skb_ptr = NULL;
-+
-+			return 0;
-+		}
-+
-+	}
-+
-+	return 0;
-+}
- /* Receive packet type fragment */
- #define __reassembly(hdev, type)  ((hdev)->reassembly[(type) - 2])
- 
+On Tue, 8 Jun 2010, Gustavo F. Padovan wrote:
+
+> Hi Nathan,
+>
+> * Nathan Holstein <ngh@isomerica.net> [2010-06-08 13:20:37 -0400]:
+>
+>> I'm currently testing an older set of Gustavo's ERTM fixes backported
+>> onto a 2.6.32 kernel.  I'm seeing a compatibility problem while
+>> attempting to establish a connection using ERTM.  This appears to be
+>> caused by commit 277ffbe in Gustavo's testing tree which adds minimum
+>> length checks to received ERTM and Streaming Mode packets.
+>>
+>> Here's the incoming packet (hcidump -Xt):
+>>
+>>         1276011301.453633 > ACL data: handle 12 flags 0x02 dlen 11
+>>             L2CAP(d): cid 0x0040 len 7 [psm 0]
+>>               0000: 02 01 07 00 06 2e 0b
+>>
+>> This appears to be a valid packet containing a three byte sequence which
+>> should be passed up to the application.  However, the check added by
+>> commit 277ffbe causes the kernel to disconnect the socket since the data
+>> length is less than 4.
+>>
+>> I don't see the point of the minimum length at this point in the code.
+>> The len variable already subtracts for the control, FCS and SAR fields
+>> if necessary.  It seems to me that the remaining length of the skb is
+>> purely socket data, and as such should be passed on to the application.
+>
+> The checks comes from the section 3.3.7 of the L2CAP spec.
+>
+>>
+>> Here's my proposed fix:
+>>
+>>         @@ -4189,19 +4193,23 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+>>
+>>
+>>                         if (__is_iframe(control)) {
+>>         -                       if (len < 4) {
+>>         +                       if (len < 0) {
+>>                                         l2cap_send_disconn_req(pi->conn, sk);
+>>                                         goto drop;
+>>                                 }
+>>         @@ -4222,7 +4230,7 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+>>                         if (pi->fcs == L2CAP_FCS_CRC16)
+>>                                 len -= 2;
+>>
+>>         -               if (len > pi->mps || len < 4 || __is_sframe(control))
+>>         +               if (len > pi->mps || len < 0 || __is_sframe(control))
+>>                                 goto drop;
+>>
+>>                         if (l2cap_check_fcs(pi, skb))
+>>
+>> This lowers the minimum-packet length of I-frame and streaming mode
+>> packets put in place by commit 277ffbe.  It maintains the length check
+>> for S-frames.  I believe ensuring a non-negative length is necessary,
+>> but this check may need to be performed prior to the call to
+>> l2cap_check_fcs().
+>
+> I agree with you that we should lower the value to 0. Please, send a proper
+> git-formatted patch so I can pick it.
+
+However, len is an unsigned value that will never be less than 0.  The 
+easy fix is probably to make len an int instead of a u16.
+
 -- 
-1.7.0
+Mat Martineau
+Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
