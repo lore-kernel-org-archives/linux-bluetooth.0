@@ -2,93 +2,125 @@ Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: gustavo@padovan.org
-Subject: [PATCH 7/8] Add DebugString Property to Manager
-Date: Tue,  8 Jun 2010 04:11:53 -0300
-Message-Id: <1275981114-18019-7-git-send-email-gustavo@padovan.org>
-In-Reply-To: <1275981114-18019-6-git-send-email-gustavo@padovan.org>
+Subject: [PATCH 6/8] log: Add function to get/set debug_string
+Date: Tue,  8 Jun 2010 04:11:52 -0300
+Message-Id: <1275981114-18019-6-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1275981114-18019-5-git-send-email-gustavo@padovan.org>
 References: <1275981114-18019-1-git-send-email-gustavo@padovan.org>
  <1275981114-18019-2-git-send-email-gustavo@padovan.org>
  <1275981114-18019-3-git-send-email-gustavo@padovan.org>
  <1275981114-18019-4-git-send-email-gustavo@padovan.org>
  <1275981114-18019-5-git-send-email-gustavo@padovan.org>
- <1275981114-18019-6-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/manager.c |   38 ++++++++++++++++++++++++++++++++++++++
- 1 files changed, 38 insertions(+), 0 deletions(-)
+ src/log.c |   56 +++++++++++++++++++++++++++++++++++++++++---------------
+ src/log.h |    2 ++
+ 2 files changed, 43 insertions(+), 15 deletions(-)
 
-diff --git a/src/manager.c b/src/manager.c
-index 66e1511..220a8fe 100644
---- a/src/manager.c
-+++ b/src/manager.c
-@@ -96,6 +96,31 @@ static DBusMessage *set_debug(DBusConnection *conn, DBusMessage *msg,
- 	return dbus_message_new_method_return(msg);
+diff --git a/src/log.c b/src/log.c
+index 4043ee3..f0f2465 100644
+--- a/src/log.c
++++ b/src/log.c
+@@ -72,6 +72,7 @@ extern struct btd_debug_desc __stop___debug[];
+ static gchar **enabled = NULL;
+ 
+ int debug_enabled = FALSE;
++static char *debug_string = NULL;
+ 
+ static gboolean is_enabled(struct btd_debug_desc *desc)
+ {
+@@ -92,6 +93,44 @@ static gboolean is_enabled(struct btd_debug_desc *desc)
+         return 0;
  }
  
-+static DBusMessage *set_debug_string(DBusConnection *conn, DBusMessage *msg,
-+					const char *debug_string, void *data)
++static void debug_on()
 +{
-+	char *old_string;
++	struct btd_debug_desc *desc;
++	const char *name = NULL, *file = NULL;
 +
-+	if (!g_utf8_validate(debug_string, -1, NULL)) {
-+		error("DebugString change failed: supplied string "
-+							"isn't valid UTF-8");
-+		return invalid_args(msg);
++	enabled = g_strsplit_set(debug_string, ":, ", 0);
++
++	for (desc = __start___debug; desc < __stop___debug; desc++) {
++		if (file != NULL || name != NULL) {
++			if (g_strcmp0(desc->file, file) == 0) {
++				if (desc->name == NULL)
++					desc->name = name;
++			} else
++				file = NULL;
++		}
++
++		if (is_enabled(desc))
++			desc->flags |= BTD_DEBUG_FLAG_PRINT;
++		else
++			desc->flags &= ~BTD_DEBUG_FLAG_PRINT;
 +	}
-+
-+	old_string = __btd_get_debug_string();
-+
-+	if (strcmp((char *)debug_string, old_string) == 0)
-+		return dbus_message_new_method_return(msg);
-+
-+	if (!__btd_set_debug_string((char *)debug_string))
-+		return g_dbus_create_error(msg, ERROR_INTERFACE ".Failed",
-+							strerror(ENOMEM));
-+	emit_property_changed(connection, "/", MANAGER_INTERFACE,
-+				"DebugString", DBUS_TYPE_STRING, &debug_string);
-+
-+	return dbus_message_new_method_return(msg);
 +}
 +
- static DBusMessage *default_adapter(DBusConnection *conn,
- 					DBusMessage *msg, void *data)
++char *__btd_get_debug_string()
++{
++	return debug_string;
++}
++
++char *__btd_set_debug_string(char *str)
++{
++	g_free(debug_string);
++	debug_string = g_strdup(str);
++
++	debug_on();
++
++	return debug_string;
++}
++
+ void __btd_toggle_debug()
  {
-@@ -200,6 +225,7 @@ static DBusMessage *get_properties(DBusConnection *conn,
- 	GSList *list;
- 	char **array;
- 	gboolean debug_value;
-+	char *debug_string;
- 	int i;
+ 	debug_enabled = !debug_enabled;
+@@ -105,8 +144,6 @@ int __btd_debug_enabled()
+ void __btd_log_init(const char *debug, int detach)
+ {
+ 	int option = LOG_NDELAY | LOG_PID;
+-	struct btd_debug_desc *desc;
+-	const char *name = NULL, *file = NULL;
  
- 	reply = dbus_message_new_method_return(msg);
-@@ -228,6 +254,10 @@ static DBusMessage *get_properties(DBusConnection *conn,
- 	debug_value = __btd_debug_enabled();
- 	dict_append_entry(&dict, "Debug", DBUS_TYPE_BOOLEAN, &debug_value);
- 
-+	debug_string = __btd_get_debug_string();
-+	dict_append_entry(&dict, "DebugString", DBUS_TYPE_STRING,
-+							&debug_string);
-+
- 	dbus_message_iter_close_container(&iter, &dict);
- 
- 	return reply;
-@@ -262,6 +292,14 @@ static DBusMessage *set_property(DBusConnection *conn,
- 		dbus_message_iter_get_basic(&sub, &debug);
- 
- 		return set_debug(conn, msg, debug, data);
-+	} else if (g_str_equal("DebugString", property)) {
-+		const char *string;
-+
-+		if (dbus_message_iter_get_arg_type(&sub) != DBUS_TYPE_STRING)
-+			return invalid_args(msg);
-+		dbus_message_iter_get_basic(&sub, &string);
-+
-+		return set_debug_string(conn, msg, string, data);
+ 	if (debug != NULL) {
+ 		debug_enabled = TRUE;
+@@ -115,20 +152,9 @@ void __btd_log_init(const char *debug, int detach)
+ 		debug_enabled = FALSE;
  	}
  
- 	return invalid_args(msg);
+-	enabled = g_strsplit_set(debug, ":, ", 0);
+-
+-	for (desc = __start___debug; desc < __stop___debug; desc++) {
+-		if (file != NULL || name != NULL) {
+-			if (g_strcmp0(desc->file, file) == 0) {
+-				if (desc->name == NULL)
+-					desc->name = name;
+-			} else
+-				file = NULL;
+-		}
++	debug_string = (char *)debug;
+ 
+-		if (is_enabled(desc))
+-			desc->flags |= BTD_DEBUG_FLAG_PRINT;
+-	}
++	debug_on();
+ 
+ 	if (!detach)
+ 		option |= LOG_PERROR;
+diff --git a/src/log.h b/src/log.h
+index 5d1db48..81c53df 100644
+--- a/src/log.h
++++ b/src/log.h
+@@ -27,6 +27,8 @@ void debug(const char *format, ...) __attribute__((format(printf, 1, 2)));
+ 
+ void __btd_log_init(const char *debug, int detach);
+ void __btd_log_cleanup(void);
++char *__btd_get_debug_string();
++char *__btd_set_debug_string(char *str);
+ void __btd_toggle_debug();
+ int __btd_debug_enabled();
+ 
 -- 
 1.7.1
 
