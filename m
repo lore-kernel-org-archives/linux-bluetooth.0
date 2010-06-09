@@ -1,59 +1,113 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH] Bluetooth: remove ERTM minimum packet length
-From: Nathan Holstein <nathan@lampreynetworks.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain
-Date: Wed, 09 Jun 2010 15:46:25 -0400
-Message-Id: <1276112785.3546.560.camel@strawberry>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: [PATCH v3 3/3] Implemented HCI frame reassembly for Rx from stream
+From: suraj <suraj@atheros.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <marcel@holtmann.org>, <Luis.Rodriguez@Atheros.com>,
+	<Jothikumar.Mothilal@Atheros.com>
+In-Reply-To: <1276088968.31226.10.camel@atheros013-desktop>
+References: <1276088748.31226.6.camel@atheros013-desktop>
+	 <1276088968.31226.10.camel@atheros013-desktop>
+Content-Type: text/plain; charset="UTF-8"
+Date: Wed, 9 Jun 2010 18:43:18 +0530
+Message-ID: <1276089198.31226.14.camel@atheros013-desktop>
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ERTM and streaming mode L2CAP sockets have no minimum packet length.
-Instead, validate the the packet contained all necessary control, FCS,
-and SAR fields.
+Implemented frame reassembly implementation for reassembling fragments received from stream.
 
-Signed-off-by: Nathan Holstein <ngh@isomerica.net>
+Signed-off-by: Suraj Sumangala <suraj@atheros.com>
 ---
- net/bluetooth/l2cap.c |    8 ++++----
- 1 files changed, 4 insertions(+), 4 deletions(-)
+ include/net/bluetooth/hci_core.h |    2 +
+ net/bluetooth/hci_core.c         |   43 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 45 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 411b1ec..9099e6d 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -4131,9 +4131,9 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
- {
- 	struct sock *sk;
- 	struct l2cap_pinfo *pi;
--	u16 control, len;
-+	u16 control;
- 	u8 tx_seq, req_seq;
--	int next_tx_seq_offset, req_seq_offset;
-+	int len, next_tx_seq_offset, req_seq_offset;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index e42f6ed..cd89d66 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -119,6 +119,7 @@ struct hci_dev {
  
- 	sk = l2cap_get_chan_by_scid(&conn->chan_list, cid);
- 	if (!sk) {
-@@ -4203,7 +4203,7 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
- 		}
+ 	struct sk_buff		*sent_cmd;
+ 	struct sk_buff		*reassembly[3];
++	struct sk_buff		*stream_reassembly;
  
- 		if (__is_iframe(control)) {
--			if (len < 4) {
-+			if (len < 0) {
- 				l2cap_send_disconn_req(pi->conn, sk);
- 				goto drop;
- 			}
-@@ -4234,7 +4234,7 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
- 		if (pi->fcs == L2CAP_FCS_CRC16)
- 			len -= 2;
+ 	struct mutex		req_lock;
+ 	wait_queue_head_t	req_wait_q;
+@@ -428,6 +429,7 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
  
--		if (len > pi->mps || len < 4 || __is_sframe(control))
-+		if (len > pi->mps || len < 0 || __is_sframe(control))
- 			goto drop;
+ int hci_recv_frame(struct sk_buff *skb);
+ int hci_recv_fragment(struct hci_dev *hdev, int type, void *data, int count);
++int hci_recv_stream_fragment(struct hci_dev *hdev, void *data, int count);
  
- 		tx_seq = __get_txseq(control);
+ int hci_register_sysfs(struct hci_dev *hdev);
+ void hci_unregister_sysfs(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 48ef56e..13bb2b9 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -916,6 +916,8 @@ int hci_register_dev(struct hci_dev *hdev)
+ 	for (i = 0; i < 3; i++)
+ 		hdev->reassembly[i] = NULL;
+ 
++	hdev->stream_reassembly = NULL;
++
+ 	init_waitqueue_head(&hdev->req_wait_q);
+ 	mutex_init(&hdev->req_lock);
+ 
+@@ -973,6 +975,8 @@ int hci_unregister_dev(struct hci_dev *hdev)
+ 	for (i = 0; i < 3; i++)
+ 		kfree_skb(hdev->reassembly[i]);
+ 
++	kfree_skb(hdev->stream_reassembly);
++
+ 	hci_notify(hdev, HCI_DEV_UNREG);
+ 
+ 	if (hdev->rfkill) {
+@@ -1145,6 +1149,45 @@ static int hci_reassembly(struct hci_dev *hdev, int type, void *data,
+ 
+ 	return 0;
+ }
++
++#define __stream_reassembly(hdev)  ((hdev)->stream_reassembly)
++
++int hci_recv_stream_fragment(struct hci_dev *hdev, void *data, int count)
++{
++	int type;
++	int remaining = 0;
++	int err = 0;
++
++	do {
++		struct sk_buff *skb = __stream_reassembly(hdev);
++		if (!skb) {
++			struct { char type; } *pkt;
++
++			/* Start of the frame */
++			pkt = data;
++			type = pkt->type;
++
++			data++;
++			count--;
++		} else
++			type = bt_cb(skb)->pkt_type;
++
++		err = hci_reassembly(hdev, type, data, count, &skb, &remaining);
++
++		if (err < 0)
++			return err;
++
++		__stream_reassembly(hdev) = skb;
++
++		data += (count - remaining);
++		count = remaining;
++
++	} while (count);
++
++	return err;
++}
++EXPORT_SYMBOL(hci_recv_stream_fragment);
++
+ /* Receive packet type fragment */
+ #define __reassembly(hdev, type)  ((hdev)->reassembly[(type) - 2])
+ 
 -- 
-1.6.0.4
-
-
-
+1.7.0
