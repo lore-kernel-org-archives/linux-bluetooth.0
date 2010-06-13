@@ -1,66 +1,132 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <g77CuMUl7QI.A.5wF.V5OFMB@chimera>
-References: <g77CuMUl7QI.A.5wF.V5OFMB@chimera>
-From: "Luis R. Rodriguez" <mcgrof@gmail.com>
-Date: Sun, 13 Jun 2010 14:02:23 -0700
-Message-ID: <AANLkTimKVhaBtHujNjbiOxsgj80WF4sar2RCe-AkIU9j@mail.gmail.com>
-Subject: Re: 2.6.35-rc3: Reported regressions 2.6.33 -> 2.6.34
-To: linux-wireless <linux-wireless@vger.kernel.org>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: "Rafael J. Wysocki" <rjw@sisk.pl>,
-	Aeolus Yang <Aeolus.Yang@atheros.com>,
-	David Quan <David.Quan@atheros.com>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <AANLkTin0B-f2i5e2TvDVDLuRZ7eRND-u4lVor1GSIhGT@mail.gmail.com>
+References: <w2ra6ca4e821005071241w9d7d982ezb78ad0ba4480e73d@mail.gmail.com>
+	<s2oa6ca4e821005071249tdfd2e197i2595b57ae2ccb705@mail.gmail.com>
+	<20100507195325.GB4857@vigoh>
+	<AANLkTilSynGNcpdq8h5YJQVD8e5MMyUDq55WzsB05AA2@mail.gmail.com>
+	<20100517023917.GI23754@vigoh>
+	<AANLkTin3FNuVegPI013fzLQn7YsHzpfr7ZymnCG1mpt-@mail.gmail.com>
+	<AANLkTin0B-f2i5e2TvDVDLuRZ7eRND-u4lVor1GSIhGT@mail.gmail.com>
+Date: Sun, 13 Jun 2010 11:53:10 +0300
+Message-ID: <AANLkTilFdW647p4qlzcKtHe9XTj3Cx9t41l_ZcVVB13f@mail.gmail.com>
+Subject: Re: Software caused connection abort (103 )
+From: john michelle <jhnmichelle@gmail.com>
+To: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For your convenience in reading the regression report here's the
-802.11 and Bluetooth ones. There's one PCMCIA one which I left in as I
-think these patches now go through John (?) The other ones are 1
-Bluetooth regression, 1 hostap_pci, 1 iwl3945 and 1 iwlagn regression.
+Any updates on the software caused connection abort issue.
 
-  Luis
+john
 
-On Sun, Jun 13, 2010 at 7:45 AM, Rafael J. Wysocki <rjw@sisk.pl> wrote:
-> Unresolved regressions
-> ----------------------
-
-> Bug-Entry       : http://bugzilla.kernel.org/show_bug.cgi?id=16111
-> Subject         : hostap_pci: infinite registered netdevice wifi0
-> Submitter       : Petr Pisar <petr.pisar@atlas.cz>
-> Date            : 2010-06-02 20:55 (12 days old)
-
-> Bug-Entry       : http://bugzilla.kernel.org/show_bug.cgi?id=16084
-> Subject         : iwl3945 bug in 2.6.34
-> Submitter       : Satish Eerpini <eerpini@gmail.com>
-> Date            : 2010-05-23 6:37 (22 days old)
-> Message-ID      : <AANLkTik_7rxDBc0TKlAfoYyM5S6Cf_Hyxbr4W5ORnTsq@mail.gmail.com>
-> References      : http://marc.info/?l=linux-kernel&m=127459596015626&w=2
-
-> Bug-Entry       : http://bugzilla.kernel.org/show_bug.cgi?id=15862
-> Subject         : 2.6.34-rc4/5: iwlagn unusable until reload
-> Submitter       : Nico Schottelius <nico-linux-20100427@schottelius.org>
-> Date            : 2010-04-27 7:49 (48 days old)
-> Message-ID      : <20100427074934.GB3261@ikn.schottelius.org>
-> References      : http://marc.info/?l=linux-kernel&m=127235784004839&w=2
-
-> Bug-Entry       : http://bugzilla.kernel.org/show_bug.cgi?id=15717
-> Subject         : bluetooth oops
-> Submitter       : Pavel Machek <pavel@ucw.cz>
-> Date            : 2010-03-14 20:14 (92 days old)
-> Message-ID      : <20100314201434.GE22059@elf.ucw.cz>
-> References      : http://marc.info/?l=linux-kernel&m=126859771528426&w=4
-> Handled-By      : Marcel Holtmann <marcel@holtmann.org>
-
-> Regressions with patches
-> ------------------------
-
-> Bug-Entry       : http://bugzilla.kernel.org/show_bug.cgi?id=16138
-> Subject         : PCMCIA regression
-> Submitter       : Mikulas Patocka <mpatocka@redhat.com>
-> Date            : 2010-05-25 20:25 (20 days old)
-> Message-ID      : <Pine.LNX.4.64.1005251619020.12278@hs20-bc2-1.build.redhat.com>
-> References      : http://marc.info/?l=linux-kernel&m=127481913909672&w=2
-> Handled-By      : Dominik Brodowski <linux@brodo.de>
-> Patch           : https://bugzilla.kernel.org/attachment.cgi?id=26685
+On Sun, May 30, 2010 at 1:12 PM, john michelle <jhnmichelle@gmail.com> wrote:
+> Hi Gustavo,
+>
+>>> Please post the output of hcidump when the connection abort happens.
+>>>
+>
+> Below is the output of hcidump the moments the software caused connection abort
+>
+> Dongle 1:
+>> HCI Event: Number of Completed Packets (0x13) plen 5
+> �. * . . .
+> < HCI Command: Reset (0x03|0x0003) plen 0
+> device: disconnected
+>
+> Dongle 2:
+>> HCI Event: Number of Completed Packets (0x13) plen 5
+> �. * . . .
+> < HCI Command: Reset (0x03|0x0003) plen 0
+> device: disconnected
+>
+>
+> I think something triggers hci reset which causes this problem, but what exactly
+> Triggers it i don't know.
+>
+>
+> John
+>
+>
+> On Mon, May 17, 2010 at 5:21 PM, john michelle <jhnmichelle@gmail.com> wrote:
+>>> Hi Jonh,
+>>>
+>>> First of all, don't do top posting in this mailing list. ;)
+>>>
+>>
+>> Thanks for the advise , will keep that in mind for future posts.
+>>
+>>> In which bluez/kernel version the problem started? Any hardware update
+>>> during this time? The problem happens when you are already tranfering
+>>> SCO data?
+>>>
+>>
+>> I tried bluez versions 3.XX �and kernel 2.6.26(I think) the problem
+>> occurs and the kernel panics with no core dumps.then i tried with
+>> bluez 4.53-4.62 with
+>> Kernel 2.6.31 and 2.6.32. the connection abort problem occurs but the
+>> kernel doesn't
+>> Panic. regarding the hardware update you mean the dongle or the box.Anyway
+>> i changed both and tried different box's, this even happens on a box
+>> with 2 giga ram
+>> And core2 processor . as for the dongles i am using trust
+>>
+>> http://www.twenga.co.uk/prices-Bluetooth-2-USB-Adapter-10m-BT-2250p-TRUST-Wireless-network-card-adapter-176178-0
+>>
+>> �and also using no name dongles all the same problem.
+>>
+>>> Please post the output of hcidump when the connection abort happens.
+>>>
+>>
+>> well that is going to be a hard one since i have more than one dongle in place
+>> And very hard to predict which one will crash.i will work on this and update
+>> You as soon as i have the hcidump log.
+>>
+>>
+>>
+>>> I tried reproduce this issue in L2CAP but it is a bit hard, lets
+>>> say it happen once in a thousand, so it's not easy to track it. I have
+>>> to try reproduce that using the SCO, but I'm not used to that layer yet.
+>>> ;)
+>>
+>> I hoped that it happens 1 in 1000 in SCO , but it actually happens 1 in 15
+>>
+>>
+>> John
+>>
+>>
+>>
+>>>
+>>> Regards,
+>>>
+>>>>
+>>>> John
+>>>>
+>>>> On Fri, May 7, 2010 at 3:53 PM, Gustavo F. Padovan <gustavo@padovan.org> wrote:
+>>>> > * john michelle <jhnmichelle@gmail.com> [2010-05-07 15:49:05 -0400]:
+>>>> >
+>>>> >> Hi Bluetooth hackers,
+>>>> >>
+>>>> >> i am having this consistent problem with bluez , from time to time i
+>>>> >> get the error Software caused connection abort (103 )
+>>>> >> And the bluetooth stick seems to disconnect and reconnects. this
+>>>> >> happens during an sco connection and it occurs even
+>>>> >> More when i am having the voice stream comming through the internet
+>>>> >> rather than the lan.i don't know what exact
+>>>> >> Details you need to solve this problem please tell me and i will give
+>>>> >> you an immediate reply . i have linux kernel 2.6.33 and bluez 4.62
+>>>> >
+>>>> > I get the same problem sometimes when testing ERTM with l2test. So the
+>>>> > problem is on l2cap too. I didn't have time to debug this yet. Now that
+>>>> > someone else have confirmed it too, I'll to take a look at the problem.
+>>>> >
+>>>> >>
+>>>
+>>> --
+>>> Gustavo F. Padovan
+>>> http://padovan.org
+>>>
+>>
+>
