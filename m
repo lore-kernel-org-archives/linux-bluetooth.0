@@ -1,129 +1,156 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Counihan, Tom" <tom.counihan@intel.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 14 Jun 2010 09:59:47 +0100
-Subject: Proposed MAP API
-Message-ID: <B09AD526409DF14F8DA79CC5429052C28F7AAA6C@irsmsx505.ger.corp.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+Subject: Re: [PATCH v3 1/3] Implements hci_reassembly to reassemble Rx
+ packets
+From: suraj <suraj@atheros.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <marcel@holtmann.org>, <Luis.Rodriguez@Atheros.com>,
+	<Jothikumar.Mothilal@Atheros.com>
+In-Reply-To: <1276088748.31226.6.camel@atheros013-desktop>
+References: <1276088748.31226.6.camel@atheros013-desktop>
+Content-Type: text/plain; charset="UTF-8"
+Date: Mon, 14 Jun 2010 12:37:36 +0530
+Message-ID: <1276499256.15628.0.camel@atheros013-desktop>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Folks,
+Hi Marcel,
 
-Please find below proposed Bluetooth MAP API, based upon Message Access Profile, ver 10r00. 
-Comments most welcome. 
-Of note below is missing the PushMessage function - Section 5.8 of mentioned spec.
-Reason being, I'm trying to get my head around what should be returned from a GetMessage call below, and conversely what should be passed to a potential PushMessage - bMessage can take on a number of different guises. 
-Any guidance/opinion would be greatly appreciated in this area, or any other suggested improvements.
+On Wed, 2010-06-09 at 18:35 +0530, suraj wrote:
+> Implements feature to reassemble received HCI frames from any input stream.
+> 
+> Signed-off-by: Suraj Sumangala <suraj@atheros.com>
+> ---
+>  net/bluetooth/hci_core.c |  115 ++++++++++++++++++++++++++++++++++++++++++++++
+>  1 files changed, 115 insertions(+), 0 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 5e83f8e..631a185 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -1030,6 +1030,121 @@ int hci_recv_frame(struct sk_buff *skb)
+>  }
+>  EXPORT_SYMBOL(hci_recv_frame);
+>  
+> +static int hci_reassembly(struct hci_dev *hdev, int type, void *data,
+> +			  int count, struct sk_buff **skb_ptr, int *remain)
+> +{
+> +	int len = 0;
+> +	int header_len = 0;
+> +	struct sk_buff *skb = *skb_ptr;
+> +	struct { __u8 pkt_type; int expect; } *scb;
+> +
+> +	*remain = count;
+> +
+> +	if (type < HCI_ACLDATA_PKT || type > HCI_EVENT_PKT)
+> +		return -EILSEQ;
+> +
+> +	if (!skb) {
+> +
+> +		switch (type) {
+> +		case HCI_ACLDATA_PKT:
+> +			len = HCI_MAX_FRAME_SIZE;
+> +			header_len = HCI_ACL_HDR_SIZE;
+> +		break;
+> +		case HCI_EVENT_PKT:
+> +			len = HCI_MAX_EVENT_SIZE;
+> +			header_len = HCI_EVENT_HDR_SIZE;
+> +		break;
+> +		case HCI_SCODATA_PKT:
+> +			len = HCI_MAX_SCO_SIZE;
+> +			header_len = HCI_SCO_HDR_SIZE;
+> +		break;
+> +		}
+> +
+> +		skb = bt_skb_alloc(len, GFP_ATOMIC);
+> +
+> +		if (!skb)
+> +			return -ENOMEM;
+> +
+> +		scb = (void *) skb->cb;
+> +		scb->expect = header_len;
+> +		scb->pkt_type = (__u8)type;
+> +
+> +		skb->dev = (void *) hdev;
+> +		*skb_ptr = skb;
+> +
+> +	}
+> +
+> +	while (count) {
+> +
+> +		scb = (void *) skb->cb;
+> +		len = min(scb->expect, count);
+> +
+> +		memcpy(skb_put(skb, len), data, len);
+> +
+> +		count -= len;
+> +		data += len;
+> +		scb->expect -= len;
+> +		*remain = count;
+> +
+> +		switch (type) {
+> +		case HCI_EVENT_PKT:
+> +			if (skb->len == HCI_EVENT_HDR_SIZE) {
+> +				struct hci_event_hdr *h = hci_event_hdr(skb);
+> +				scb->expect = h->plen;
+> +
+> +				if (skb_tailroom(skb) < scb->expect) {
+> +					kfree_skb(skb);
+> +					*skb_ptr = NULL;
+> +
+> +					return -ENOMEM;
+> +				}
+> +			}
+> +			break;
+> +
+> +		case HCI_ACLDATA_PKT:
+> +			if (skb->len  == HCI_ACL_HDR_SIZE) {
+> +				struct hci_acl_hdr *h = hci_acl_hdr(skb);
+> +				scb->expect = __le16_to_cpu(h->dlen);
+> +
+> +				if (skb_tailroom(skb) < scb->expect) {
+> +					kfree_skb(skb);
+> +					*skb_ptr = NULL;
+> +
+> +					return -ENOMEM;
+> +				}
+> +			}
+> +			break;
+> +
+> +		case HCI_SCODATA_PKT:
+> +			if (skb->len == HCI_SCO_HDR_SIZE) {
+> +				struct hci_sco_hdr *h = hci_sco_hdr(skb);
+> +				scb->expect = h->dlen;
+> +
+> +				if (skb_tailroom(skb) < scb->expect) {
+> +					kfree_skb(skb);
+> +					*skb_ptr = NULL;
+> +
+> +					return -ENOMEM;
+> +				}
+> +			}
+> +			break;
+> +		}
+> +
+> +		if (scb->expect == 0) {
+> +
+> +			/* Complete frame */
+> +			bt_cb(skb)->pkt_type = type;
+> +			hci_recv_frame(skb);
+> +
+> +			*skb_ptr = NULL;
+> +
+> +			return 0;
+> +		}
+> +
+> +	}
+> +
+> +	return 0;
+> +}
+>  /* Receive packet type fragment */
+>  #define __reassembly(hdev, type)  ((hdev)->reassembly[(type) - 2])
+>  
 
-Warm Regards
+Do let me know your comments on the patch.
 
-Tom.
-
-
-------------------------------------------
-Message Access hierarchy
-=======================
-
-Service		org.openobex.client
-Interface	org.openobex.MessageAccess
-Object path	[variable prefix]/{session0,session1,...}
-
-Methods	void SetFolder(string folder)
-
-			Change the current folder of the remote MSE device
-			
-		dict GetProperties()
-
-			Returns all properties for the interface. See the
-			properties section for available properties.
-		
-		array{string} GetFolderListing()
-
-			Returns a Folder-Listing containing information about
-			the current folder content. The return shall not contain
-			message entries.
-			
-		array{dict} GetMessageListing()
-
-			Returns a dictionary containing information about
-			the current folder's Message content.
-
-			The following keys are defined:
-
-			uint64 Handle: Unique handle for message
-			string subject: summary of message
-			string datetime: timestamp in format "YYYMMDDTHHMMSS"
-			string senderName: name of sender
-			string senderAddressing: address info of sender
-			string replytoAddressing: Reply-To info of sender
-			string recipientName: name of recipient 
-			string recipientAddressing: address info of recipient
-			string type: ("EMAIL" | "SMS_GSM" | "SMS_CDMA" | "MMS")
-			string size: Size in bytes of original message
-			string text: ("yes"|"no") - text vs binary content
-			string receptionStatus: reception status on MSE
-			string attachmentSize: size of attachment in bytes
-			string priority: ("yes"|"no") - high or no priority
-			string read: ("yes"|"no") has message been read on MSE
-			string sent: ("yes"|"no") has message been sent 
-			string protected: ("yes"|"no") is all/part DRM protected				
-				
-		string GetMessage(uint64 handle)
-			
-			Retrieves a messages, identified by unique handle from MSE.
-			
-		void UpdateInbox()
-			
-			Trigger the MSE to update its inbox.
-			
-		void SetReadStatus(uint64 handle, string status)
-			
-			Sets the messges's read status on the MSE
-				handle: unique handle for the message
-				status: "yes" sets message status to read
-			     		  "no" sets message status to unread
-						
-		void SetDeletStatus(uint64 handle, string status)
-			
-			Sets the messges's delete status on the MSE
-				handle: unique handle for the message
-				status: "yes" sets message status to delete
-					  "no" sets message status to non-delete
-						
-		void EnableNotification()
-		
-			Request the MSE to send message notification events
-		
-		void DisableNotification()
-		
-			Request the MSE to disable message notifications.
-						
-Signals		MessageEventReport(dict)
-
-			Sent when an event on the MSE affects is message listing.
-			
-			The following keys are defined:
-				string type: ("NewMessage" | " DeliverySuccess" |
-					"SendingSuccess" | "DeliveryFailure" |
-					"SendingFailure" | "MemoryFull" |
-					"MemoryAvailable" | "MessageDeleted" | 						"MessageShifted")
-				uint64 handle: Unique handle for message
-				string folder: name of folder, including path which 							message has been populated on MSE
-				string oldFolder: Facilitates moving msgs between 							folders
-				string msgType: ("EMAIL" | "SMS_GSM" | "SMS_CDMA" | 							"MMS")
-			
-Properties	boolean NotificationEnabled [readonly]
-
-			Reflects if MSE has been directed to send message 				Notification
---------------------------------------------------------------
-Intel Shannon Limited
-Registered in Ireland
-Registered Office: Collinstown Industrial Park, Leixlip, County Kildare
-Registered Number: 308263
-Business address: Dromore House, East Park, Shannon, Co. Clare
-
-This e-mail and any attachments may contain confidential material for the sole use of the intended recipient(s). Any review or distribution by others is strictly prohibited. If you are not the intended recipient, please contact the sender and delete all copies.
-
-
+Regards
+Suraj
