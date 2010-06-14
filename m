@@ -1,46 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Counihan, Tom" <tom.counihan@intel.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 14 Jun 2010 14:21:55 +0100
-Subject: RE: Proposed MAP client D-Bus API (was: Proposed MAP API)
-Message-ID: <B09AD526409DF14F8DA79CC5429052C28F7AAD48@irsmsx505.ger.corp.intel.com>
-References: <B09AD526409DF14F8DA79CC5429052C28F7AAA6C@irsmsx505.ger.corp.intel.com>
- <20100614091849.GA20885@jh-x301>
-In-Reply-To: <20100614091849.GA20885@jh-x301>
-Content-Type: text/plain; charset="us-ascii"
+Message-ID: <4C16163C.4080606@signal11.us>
+Date: Mon, 14 Jun 2010 07:45:00 -0400
+From: Alan Ott <alan@signal11.us>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jiri Kosina <jkosina@suse.cz>, Michael Poole <mdpoole@troilus.org>,
+	Bastien Nocera <hadess@hadess.net>,
+	Eric Dumazet <eric.dumazet@gmail.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 0/1] Bluetooth: hidp: Add support for hidraw HIDIOCGFEATURE  and HIDIOCSFEATURE
+References: <4C155945.1030500@signal11.us>
+In-Reply-To: <4C155945.1030500@signal11.us>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Many thanks for the prompt response Johan,
+On 06/13/2010 06:18 PM, Alan Ott wrote:
+> 3. A blocking, synchronous GET_REPORT transfer was easy when I 
+> implemented this for USB because data is both sent and received as 
+> part of a single control transfer. Because of the nature of Bluetooth 
+> however, where it is viewed more as an asynchronous network device, 
+> and with hidraw allowing multiple handles to a single device to exist, 
+> there could be a race when two handles call the hidp_get_raw_report() 
+> function concurrently, requesting the same report. I've convinced 
+> myself that this is not a problem, because since both callers 
+> requested the same report, the worst that could happen is that one 
+> could get a report which is slightly out of date.
+>
+> Consider the following case:
+>     1. Client 1 requests report (Userspace call to HIDIOCGFEATURE)
+>     2. Client 2 requests report (Userspace call to HIDIOCGFEATURE)
+>     3. Client 1's report is returned, and delivered to BOTH clients
+>     4. Client 2's report is returned (and discarded)
+>
+> Note here that Client 1's report and Client 2's report are the same 
+> report, ie: they reflect the state of the same data on the device, 
+> just at different times. In this case, they are indeed exactly the 
+> same data, but consider this case:
+>     1. Client 1 requests report (Userspace call to HIDIOCGFEATURE)
+>     2. Client 2 SETS report (Userspace call to HIDIOCSFEATURE)
+>     2. Client 2 requests report (Userspace call to HIDIOCGFEATURE)
+>     3. Client 1's report is returned, and delivered to Clients 1 and 2
+>     4. Client 2's report is returned
+>
+> In this case, client 2 receives OLD data (since it set new data, and 
+> the call to write the reports is currently not synchronous). To make 
+> writes synchronous, we'd run into the same problem, of two writes 
+> happening concurrently, and the 2nd one receiving the ACK from the 
+> first one.
+>
+> Alan.
+>
 
-
->It'd have been good to clearly state that you're only talking about the
->client side of MAP (it became clear to me only after noticing that
->you've got org.openobex.client in the D-Bus API). The server side would
->e.g. be implemented through an obexd plugin.
-
-Duly noted, apologies for any confusion. Note, I'm interested in bringing both sides of this interface up, the original was a modest attempt at kick starting myself on this profile.
-
->Are you sure you want to use D-Bus for this? I suspect the required
->bandwidth will be too high to be efficiently handled using D-Bus.
->Wouldn't a MAP specific library on top of OpenOBEX make more sense?
-
-Not sure at all really. I had my suspicion, but wanted to start somewhere. 
-What you suggest makes perfect sense really - back to the drawing board for me :$ - just need to figure out a logical home for this.
-
-On an aside, could the same comment be made regarding PBAP re contact pictures?
-
-Warm Regards
-Tom.
---------------------------------------------------------------
-Intel Shannon Limited
-Registered in Ireland
-Registered Office: Collinstown Industrial Park, Leixlip, County Kildare
-Registered Number: 308263
-Business address: Dromore House, East Park, Shannon, Co. Clare
-
-This e-mail and any attachments may contain confidential material for the sole use of the intended recipient(s). Any review or distribution by others is strictly prohibited. If you are not the intended recipient, please contact the sender and delete all copies.
-
-
+I just remembered to look at the hidraw.c source, to see that the call 
+to the hid_get_raw_report() function pointer (which points to 
+hidp_get_raw_report()) is called with a global mutex held. I believe 
+this will prevent the race mentioned in #3 above in the case that all 
+clients are communicating with the device using hidraw. Of course, the 
+situation above could still occur if one of the clients represents an 
+actual driver (which isn't subject to the hidraw mutex).
