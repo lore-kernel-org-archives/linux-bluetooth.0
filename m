@@ -1,45 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 14 Jun 2010 21:24:49 -0300
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
-To: "Justin P. Mattock" <justinmattock@gmail.com>
-Cc: linux-kernel@vger.kernel.org, reiserfs-devel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, clemens@ladisch.de,
-	debora@linux.vnet.ibm.com, dri-devel@lists.freedesktop.org,
-	linux-i2c@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
-	linux-media@vger.kernel.org
-Subject: Re: [PATCH 2/8]bluetooth/hci_ldisc.c Fix warning: variable 'tty'
- set but not used
-Message-ID: <20100615001444.GC9203@vigoh>
+From: "Justin P. Mattock" <justinmattock@gmail.com>
+To: linux-kernel@vger.kernel.org
+Cc: reiserfs-devel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	clemens@ladisch.de, debora@linux.vnet.ibm.com,
+	dri-devel@lists.freedesktop.org, linux-i2c@vger.kernel.org,
+	linux1394-devel@lists.sourceforge.net, linux-media@vger.kernel.org,
+	"Justin P. Mattock" <justinmattock@gmail.com>
+Subject: [PATCH 2/8]bluetooth/hci_ldisc.c Fix warning: variable 'tty' set but not used
+Date: Mon, 14 Jun 2010 13:26:42 -0700
+Message-Id: <1276547208-26569-3-git-send-email-justinmattock@gmail.com>
+In-Reply-To: <1276547208-26569-1-git-send-email-justinmattock@gmail.com>
 References: <1276547208-26569-1-git-send-email-justinmattock@gmail.com>
- <1276547208-26569-3-git-send-email-justinmattock@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1276547208-26569-3-git-send-email-justinmattock@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Justin,
+Im getting this while building:
+  CC [M]  drivers/bluetooth/hci_ldisc.o
+drivers/bluetooth/hci_ldisc.c: In function 'hci_uart_send_frame':
+drivers/bluetooth/hci_ldisc.c:213:21: warning: variable 'tty' set but not used
 
-* Justin P. Mattock <justinmattock@gmail.com> [2010-06-14 13:26:42 -0700]:
+the below fixed it for me, but am not sure if
+it's correct.
 
-> Im getting this while building:
->   CC [M]  drivers/bluetooth/hci_ldisc.o
-> drivers/bluetooth/hci_ldisc.c: In function 'hci_uart_send_frame':
-> drivers/bluetooth/hci_ldisc.c:213:21: warning: variable 'tty' set but not used
-> 
-> the below fixed it for me, but am not sure if
-> it's correct.
+ Signed-off-by: Justin P. Mattock <justinmattock@gmail.com>
 
+---
+ drivers/bluetooth/hci_ldisc.c |    4 +---
+ 1 files changed, 1 insertions(+), 3 deletions(-)
 
-The fix is correct, you just need to fix the trailing whitespace
-problem and resend it.
-Also we use "Bluetooth:" as part of the commit message on the bluetooth
-subsystem. For example:
-
-"Bluetooth: Remove set but not used varible 'tty' 
-
-Or something like that.
-
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index 76a1abb..f693dfe 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -210,7 +210,6 @@ static int hci_uart_close(struct hci_dev *hdev)
+ static int hci_uart_send_frame(struct sk_buff *skb)
+ {
+ 	struct hci_dev* hdev = (struct hci_dev *) skb->dev;
+-	struct tty_struct *tty;
+ 	struct hci_uart *hu;
+ 
+ 	if (!hdev) {
+@@ -222,8 +221,7 @@ static int hci_uart_send_frame(struct sk_buff *skb)
+ 		return -EBUSY;
+ 
+ 	hu = (struct hci_uart *) hdev->driver_data;
+-	tty = hu->tty;
+-
++	
+ 	BT_DBG("%s: type %d len %d", hdev->name, bt_cb(skb)->pkt_type, skb->len);
+ 
+ 	hu->proto->enqueue(hu, skb);
 -- 
-Gustavo F. Padovan
-http://padovan.org
+1.7.1.rc1.21.gf3bd6
+
