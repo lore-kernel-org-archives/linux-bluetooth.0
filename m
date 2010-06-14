@@ -1,44 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 14 Jun 2010 17:16:05 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: "Counihan, Tom" <tom.counihan@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Proposed MAP client D-Bus API (was: Proposed MAP API)
-Message-ID: <20100614141605.GA27414@jh-x301>
+From: "Counihan, Tom" <tom.counihan@intel.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 14 Jun 2010 14:21:55 +0100
+Subject: RE: Proposed MAP client D-Bus API (was: Proposed MAP API)
+Message-ID: <B09AD526409DF14F8DA79CC5429052C28F7AAD48@irsmsx505.ger.corp.intel.com>
 References: <B09AD526409DF14F8DA79CC5429052C28F7AAA6C@irsmsx505.ger.corp.intel.com>
  <20100614091849.GA20885@jh-x301>
- <B09AD526409DF14F8DA79CC5429052C28F7AAD48@irsmsx505.ger.corp.intel.com>
+In-Reply-To: <20100614091849.GA20885@jh-x301>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <B09AD526409DF14F8DA79CC5429052C28F7AAD48@irsmsx505.ger.corp.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tom,
+Many thanks for the prompt response Johan,
 
-On Mon, Jun 14, 2010, Counihan, Tom wrote:
-> Many thanks for the prompt response Johan,
 
-No problem :)
+>It'd have been good to clearly state that you're only talking about the
+>client side of MAP (it became clear to me only after noticing that
+>you've got org.openobex.client in the D-Bus API). The server side would
+>e.g. be implemented through an obexd plugin.
 
-> Not sure at all really. I had my suspicion, but wanted to start somewhere.
-> What you suggest makes perfect sense really - back to the drawing
-> board for me :$ - just need to figure out a logical home for this.
+Duly noted, apologies for any confusion. Note, I'm interested in bringing both sides of this interface up, the original was a modest attempt at kick starting myself on this profile.
 
-Note that I'm not strictly saying that it can't be D-Bus based. Only
-that there's a considerable risk with that and that you should
-understand the pros and cons of the different alternatives. E.g.
-compared to D-Bus a library would restrict you more in terms of what
-programing languages can be used for the application whereas there's
-quite a plethora of D-Bus bindings out there. You'd also need to
-consider potential multithreading issues and pay close attention in
-designing the API so that it can be conveniently hooked up to whatever
-mainloop the application has, or then simply decide that only one
-mainloop, e.g. the glib one, is supported.
+>Are you sure you want to use D-Bus for this? I suspect the required
+>bandwidth will be too high to be efficiently handled using D-Bus.
+>Wouldn't a MAP specific library on top of OpenOBEX make more sense?
 
-> On an aside, could the same comment be made regarding PBAP re contact
-> pictures?
+Not sure at all really. I had my suspicion, but wanted to start somewhere. 
+What you suggest makes perfect sense really - back to the drawing board for me :$ - just need to figure out a logical home for this.
 
-Yes, I think so.
+On an aside, could the same comment be made regarding PBAP re contact pictures?
 
-Johan
+Warm Regards
+Tom.
+--------------------------------------------------------------
+Intel Shannon Limited
+Registered in Ireland
+Registered Office: Collinstown Industrial Park, Leixlip, County Kildare
+Registered Number: 308263
+Business address: Dromore House, East Park, Shannon, Co. Clare
+
+This e-mail and any attachments may contain confidential material for the sole use of the intended recipient(s). Any review or distribution by others is strictly prohibited. If you are not the intended recipient, please contact the sender and delete all copies.
+
+
