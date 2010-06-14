@@ -1,156 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH v3 1/3] Implements hci_reassembly to reassemble Rx
- packets
-From: suraj <suraj@atheros.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <marcel@holtmann.org>, <Luis.Rodriguez@Atheros.com>,
-	<Jothikumar.Mothilal@Atheros.com>
-In-Reply-To: <1276088748.31226.6.camel@atheros013-desktop>
-References: <1276088748.31226.6.camel@atheros013-desktop>
-Content-Type: text/plain; charset="UTF-8"
-Date: Mon, 14 Jun 2010 12:37:36 +0530
-Message-ID: <1276499256.15628.0.camel@atheros013-desktop>
-MIME-Version: 1.0
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Subject: [PATCH] Bluetooth: Don't accept ConfigReq if we aren't in the BT_CONFIG state
+Date: Mon, 14 Jun 2010 02:26:15 -0300
+Message-Id: <1276493175-9650-1-git-send-email-gustavo@padovan.org>
+In-Reply-To: <20100614005041.GB6390@vigoh>
+References: <20100614005041.GB6390@vigoh>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Gustavo F. Padovan <padovan@profusion.mobi>
 
-On Wed, 2010-06-09 at 18:35 +0530, suraj wrote:
-> Implements feature to reassemble received HCI frames from any input stream.
-> 
-> Signed-off-by: Suraj Sumangala <suraj@atheros.com>
-> ---
->  net/bluetooth/hci_core.c |  115 ++++++++++++++++++++++++++++++++++++++++++++++
->  1 files changed, 115 insertions(+), 0 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 5e83f8e..631a185 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1030,6 +1030,121 @@ int hci_recv_frame(struct sk_buff *skb)
->  }
->  EXPORT_SYMBOL(hci_recv_frame);
->  
-> +static int hci_reassembly(struct hci_dev *hdev, int type, void *data,
-> +			  int count, struct sk_buff **skb_ptr, int *remain)
-> +{
-> +	int len = 0;
-> +	int header_len = 0;
-> +	struct sk_buff *skb = *skb_ptr;
-> +	struct { __u8 pkt_type; int expect; } *scb;
-> +
-> +	*remain = count;
-> +
-> +	if (type < HCI_ACLDATA_PKT || type > HCI_EVENT_PKT)
-> +		return -EILSEQ;
-> +
-> +	if (!skb) {
-> +
-> +		switch (type) {
-> +		case HCI_ACLDATA_PKT:
-> +			len = HCI_MAX_FRAME_SIZE;
-> +			header_len = HCI_ACL_HDR_SIZE;
-> +		break;
-> +		case HCI_EVENT_PKT:
-> +			len = HCI_MAX_EVENT_SIZE;
-> +			header_len = HCI_EVENT_HDR_SIZE;
-> +		break;
-> +		case HCI_SCODATA_PKT:
-> +			len = HCI_MAX_SCO_SIZE;
-> +			header_len = HCI_SCO_HDR_SIZE;
-> +		break;
-> +		}
-> +
-> +		skb = bt_skb_alloc(len, GFP_ATOMIC);
-> +
-> +		if (!skb)
-> +			return -ENOMEM;
-> +
-> +		scb = (void *) skb->cb;
-> +		scb->expect = header_len;
-> +		scb->pkt_type = (__u8)type;
-> +
-> +		skb->dev = (void *) hdev;
-> +		*skb_ptr = skb;
-> +
-> +	}
-> +
-> +	while (count) {
-> +
-> +		scb = (void *) skb->cb;
-> +		len = min(scb->expect, count);
-> +
-> +		memcpy(skb_put(skb, len), data, len);
-> +
-> +		count -= len;
-> +		data += len;
-> +		scb->expect -= len;
-> +		*remain = count;
-> +
-> +		switch (type) {
-> +		case HCI_EVENT_PKT:
-> +			if (skb->len == HCI_EVENT_HDR_SIZE) {
-> +				struct hci_event_hdr *h = hci_event_hdr(skb);
-> +				scb->expect = h->plen;
-> +
-> +				if (skb_tailroom(skb) < scb->expect) {
-> +					kfree_skb(skb);
-> +					*skb_ptr = NULL;
-> +
-> +					return -ENOMEM;
-> +				}
-> +			}
-> +			break;
-> +
-> +		case HCI_ACLDATA_PKT:
-> +			if (skb->len  == HCI_ACL_HDR_SIZE) {
-> +				struct hci_acl_hdr *h = hci_acl_hdr(skb);
-> +				scb->expect = __le16_to_cpu(h->dlen);
-> +
-> +				if (skb_tailroom(skb) < scb->expect) {
-> +					kfree_skb(skb);
-> +					*skb_ptr = NULL;
-> +
-> +					return -ENOMEM;
-> +				}
-> +			}
-> +			break;
-> +
-> +		case HCI_SCODATA_PKT:
-> +			if (skb->len == HCI_SCO_HDR_SIZE) {
-> +				struct hci_sco_hdr *h = hci_sco_hdr(skb);
-> +				scb->expect = h->dlen;
-> +
-> +				if (skb_tailroom(skb) < scb->expect) {
-> +					kfree_skb(skb);
-> +					*skb_ptr = NULL;
-> +
-> +					return -ENOMEM;
-> +				}
-> +			}
-> +			break;
-> +		}
-> +
-> +		if (scb->expect == 0) {
-> +
-> +			/* Complete frame */
-> +			bt_cb(skb)->pkt_type = type;
-> +			hci_recv_frame(skb);
-> +
-> +			*skb_ptr = NULL;
-> +
-> +			return 0;
-> +		}
-> +
-> +	}
-> +
-> +	return 0;
-> +}
->  /* Receive packet type fragment */
->  #define __reassembly(hdev, type)  ((hdev)->reassembly[(type) - 2])
->  
+If such event happens we shall reply with a Command Reject, because we are
+not expecting any configure request.
 
-Do let me know your comments on the patch.
+Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+---
+ net/bluetooth/l2cap.c |    8 +++++++-
+ 1 files changed, 7 insertions(+), 1 deletions(-)
 
-Regards
-Suraj
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index 9753b69..f725fcc 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -2741,8 +2741,14 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 	if (!sk)
+ 		return -ENOENT;
+ 
+-	if (sk->sk_state == BT_DISCONN)
++	if (sk->sk_state != BT_CONFIG) {
++		struct l2cap_cmd_rej rej;
++
++		rej.reason = cpu_to_le16(0x0002);
++		l2cap_send_cmd(conn, cmd.ident, L2CAP_COMMAND_REJ,
++				sizeof(rej), &rej);
+ 		goto unlock;
++	}
+ 
+ 	/* Reject if config buffer is too small. */
+ 	len = cmd_len - sizeof(*req);
+-- 
+1.7.1
+
