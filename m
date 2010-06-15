@@ -1,41 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+From: "Justin P. Mattock" <justinmattock@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Update sec_level and auth_type for already existing connections
-Date: Tue, 15 Jun 2010 15:56:05 +0300
-Message-Id: <1276606565-4381-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: gustavo@padovan.org, linux-kernel@vger.kernel.org,
+	"Justin P. Mattock" <justinmattock@gmail.com>
+Subject: [PATCH 2/8 v2]Bluetooth: Fix warning: variable 'tty' set but not used
+Date: Mon, 14 Jun 2010 18:26:40 -0700
+Message-Id: <1276565200-5583-1-git-send-email-justinmattock@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Ville Tervo <ville.tervo@nokia.com>
+Resend of this patch to fix whitespace issues
+The patch below fixes a warning message
+when using gcc 4.6.0
 
-Update auth level for already existing connections if it is lower
-than required by new connection.
+  CC [M]  drivers/bluetooth/hci_ldisc.o
+drivers/bluetooth/hci_ldisc.c: In function 'hci_uart_send_frame':
+drivers/bluetooth/hci_ldisc.c:213:21: warning: variable 'tty' set but not used
 
-Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
-Reviewed-by: Emeltchenko Andrei <andrei.emeltchenko@nokia.com>
-Signed-off-by: Luciano Coelho <luciano.coelho@nokia.com>
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+
+ Signed-off-by: Justin P. Mattock <justinmattock@gmail.com>
+ Reviewed-By: Gustavo F. Padovan <gustavo@padovan.org>
+
 ---
- net/bluetooth/hci_conn.c |    5 +++++
- 1 files changed, 5 insertions(+), 0 deletions(-)
+ drivers/bluetooth/hci_ldisc.c |    2 --
+ 1 files changed, 0 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index b10e3cd..800b6b9 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -358,6 +358,11 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
- 		acl->sec_level = sec_level;
- 		acl->auth_type = auth_type;
- 		hci_acl_connect(acl);
-+	} else {
-+		if (acl->sec_level < sec_level)
-+			acl->sec_level = sec_level;
-+		if (acl->auth_type < auth_type)
-+			acl->auth_type = auth_type;
- 	}
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index 76a1abb..e8beffe 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -210,7 +210,6 @@ static int hci_uart_close(struct hci_dev *hdev)
+ static int hci_uart_send_frame(struct sk_buff *skb)
+ {
+ 	struct hci_dev* hdev = (struct hci_dev *) skb->dev;
+-	struct tty_struct *tty;
+ 	struct hci_uart *hu;
  
- 	if (type == ACL_LINK)
+ 	if (!hdev) {
+@@ -222,7 +221,6 @@ static int hci_uart_send_frame(struct sk_buff *skb)
+ 		return -EBUSY;
+ 
+ 	hu = (struct hci_uart *) hdev->driver_data;
+-	tty = hu->tty;
+ 
+ 	BT_DBG("%s: type %d len %d", hdev->name, bt_cb(skb)->pkt_type, skb->len);
+ 
 -- 
-1.7.0.4
+1.7.1.rc1.21.gf3bd6
 
