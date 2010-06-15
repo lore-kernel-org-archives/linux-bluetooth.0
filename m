@@ -1,29 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH v3 1/3] Implements hci_reassembly to reassemble Rx
- packets
-From: suraj <suraj@atheros.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <marcel@holtmann.org>, <Luis.Rodriguez@Atheros.com>,
-	<Jothikumar.Mothilal@Atheros.com>
-In-Reply-To: <1276088748.31226.6.camel@atheros013-desktop>
-References: <1276088748.31226.6.camel@atheros013-desktop>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 16 Jun 2010 12:54:35 +0530
-Message-ID: <1276673075.18938.8.camel@atheros013-desktop>
-MIME-Version: 1.0
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Update sec_level and auth_type for already existing connections
+Date: Tue, 15 Jun 2010 15:56:05 +0300
+Message-Id: <1276606565-4381-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Ville Tervo <ville.tervo@nokia.com>
 
-On Wed, 2010-06-09 at 18:35 +0530, suraj wrote:
-> Implements feature to reassemble received HCI frames from any input stream.
-> 
-> Signed-off-by: Suraj Sumangala <suraj@atheros.com>
-> ---
->  net/bluetooth/hci_core.c |  115 ++++++++++++++++++++++++++++++++++++++++++++++
->  1 files changed, 115 insertions(+), 0 deletions(-)
-> 
-Let me know if you have any comments on this implementation
+Update auth level for already existing connections if it is lower
+than required by new connection.
 
-Regards
-Suraj
+Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
+Reviewed-by: Emeltchenko Andrei <andrei.emeltchenko@nokia.com>
+Signed-off-by: Luciano Coelho <luciano.coelho@nokia.com>
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+---
+ net/bluetooth/hci_conn.c |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
+
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index b10e3cd..800b6b9 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -358,6 +358,11 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
+ 		acl->sec_level = sec_level;
+ 		acl->auth_type = auth_type;
+ 		hci_acl_connect(acl);
++	} else {
++		if (acl->sec_level < sec_level)
++			acl->sec_level = sec_level;
++		if (acl->auth_type < auth_type)
++			acl->auth_type = auth_type;
+ 	}
+ 
+ 	if (type == ACL_LINK)
+-- 
+1.7.0.4
+
