@@ -1,53 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 1/2] log: Add function to get/set debug_string
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Gustavo F. Padovan" <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1276673478-9273-1-git-send-email-gustavo@padovan.org>
-References: <1276673478-9273-1-git-send-email-gustavo@padovan.org>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 16 Jun 2010 15:31:35 +0200
-Message-ID: <1276695095.2301.72.camel@localhost.localdomain>
-Mime-Version: 1.0
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: check l2cap pending status before sending l2cap connect request
+Date: Wed, 16 Jun 2010 15:52:05 +0300
+Message-Id: <1276692725-10284-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 
->  src/log.c |   53 +++++++++++++++++++++++++++++++++++++++++------------
->  src/log.h |    2 ++
->  2 files changed, 43 insertions(+), 12 deletions(-)
-> 
-> diff --git a/src/log.c b/src/log.c
-> index ed6e428..f53ace3 100644
-> --- a/src/log.c
-> +++ b/src/log.c
-> @@ -71,6 +71,8 @@ extern struct btd_debug_desc __stop___debug[];
->  
->  static gchar **enabled = NULL;
->  
-> +static char *debug_string = NULL;
-> +
+Due to race condition in L2CAP state machine L2CAP Connection Request
+may be sent twice for SDP with the same source channel id. Problems
+reported connecting to Apple products, some carkit, Blackberry phones.
 
-can you please stop messing around with this so much. This looks all so
-heavily complicated and convoluted. The log.c is not storing the current
-debug command line parameter. It doesn't care about that. So why should
-it bother.
+...
+2010-06-07 21:18:03.651031 < ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 1 scid 0x0040
+2010-06-07 21:18:03.653473 > HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+2010-06-07 21:18:03.653808 > HCI Event: Auth Complete (0x06) plen 3
+    status 0x00 handle 1
+2010-06-07 21:18:03.653869 < ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 1 scid 0x0040
+...
 
-Just have a function __btd_enable_debug(const char *debug) and make that
-work. You can even use that one from the SIGUSR2 with just "*" as
-parameter.
+Patch uses L2CAP_CONF_CONNECT_PEND flag to mark that L2CAP Connection
+Request has been sent.
 
-If the D-Bus API wants to present a read-able value of what is the
-current string, then that is up to the D-Bus manager object and not the
-logging code.
+Modified version of Ville Tervo patch.
 
-Right now I am actually inclined to just say we don't bother with
-changing debug options via D-Bus at all. So I want a simple and clean
-patch or we should just not do it at all.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+---
+ net/bluetooth/l2cap.c |   11 +++++++++--
+ 1 files changed, 9 insertions(+), 2 deletions(-)
 
-Regards
-
-Marcel
-
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index fc81acb..1ed51ad 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -387,13 +387,16 @@ static void l2cap_do_start(struct sock *sk)
+ 		if (!(conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE))
+ 			return;
+ 
+-		if (l2cap_check_security(sk)) {
++		if (l2cap_check_security(sk) &&
++				! l2cap_pi(sk)->conf_state &
++				L2CAP_CONF_CONNECT_PEND) {
+ 			struct l2cap_conn_req req;
+ 			req.scid = cpu_to_le16(l2cap_pi(sk)->scid);
+ 			req.psm  = l2cap_pi(sk)->psm;
+ 
+ 			l2cap_pi(sk)->ident = l2cap_get_ident(conn);
+ 
++			l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
+ 			l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
+ 					L2CAP_CONN_REQ, sizeof(req), &req);
+ 		}
+@@ -441,13 +444,16 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 		}
+ 
+ 		if (sk->sk_state == BT_CONNECT) {
+-			if (l2cap_check_security(sk)) {
++			if (l2cap_check_security(sk) &&
++					! l2cap_pi(sk)->conf_state &
++					L2CAP_CONF_CONNECT_PEND) {
+ 				struct l2cap_conn_req req;
+ 				req.scid = cpu_to_le16(l2cap_pi(sk)->scid);
+ 				req.psm  = l2cap_pi(sk)->psm;
+ 
+ 				l2cap_pi(sk)->ident = l2cap_get_ident(conn);
+ 
++				l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
+ 				l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
+ 					L2CAP_CONN_REQ, sizeof(req), &req);
+ 			}
+@@ -3828,6 +3834,7 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 
+ 				l2cap_pi(sk)->ident = l2cap_get_ident(conn);
+ 
++				l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
+ 				l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
+ 					L2CAP_CONN_REQ, sizeof(req), &req);
+ 			} else {
+-- 
+1.7.0.4
 
