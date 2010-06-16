@@ -1,116 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4C18BDDF.7030002@Atheros.com>
-Date: Wed, 16 Jun 2010 17:34:47 +0530
-From: Suraj <suraj@Atheros.com>
+From: "Counihan, Tom" <tom.counihan@intel.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Wed, 16 Jun 2010 13:02:51 +0100
+Subject: RE: Proposed MAP client D-Bus API (was: Proposed MAP API)
+Message-ID: <B09AD526409DF14F8DA79CC5429052C28F8C023E@irsmsx505.ger.corp.intel.com>
+References: <B09AD526409DF14F8DA79CC5429052C28F7AAA6C@irsmsx505.ger.corp.intel.com>
+ <20100614091849.GA20885@jh-x301>
+ <B09AD526409DF14F8DA79CC5429052C28F7AAD48@irsmsx505.ger.corp.intel.com>
+ <20100614141605.GA27414@jh-x301>
+In-Reply-To: <20100614141605.GA27414@jh-x301>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: Marcel Holtmann <marcel@holtmann.org>,
-	Nick Pelly <npelly@google.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: RFC: Allow Bluez to select flushable or non-flushable ACL packets
- 	with L2CAP_LM_RELIABLE
-References: <35c90d960912081950t135e3f10m8848e54fde1e596f@mail.gmail.com>	<1260335175.2901.20.camel@violet>	<35c90d960912082213s26fb0ebse75ce85d43213d9@mail.gmail.com>	<1260482634.2901.70.camel@violet>	<35c90d960912161359u2b3f9b2fi875288896a7a8478@mail.gmail.com>	<35c90d961003091207u66571bt789461dcc7972693@mail.gmail.com>	<1268167524.3712.61.camel@localhost.localdomain> <AANLkTinOFG0NcADz2ewxyaPWiLpe52MFLP8GCEvFna2a@mail.gmail.com>
-In-Reply-To: <AANLkTinOFG0NcADz2ewxyaPWiLpe52MFLP8GCEvFna2a@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luis,
+Thanks Johan,
 
-On 6/16/2010 5:10 PM, Luiz Augusto von Dentz wrote:
-> Hi,
+I'll attempt to get something kick started on gitorious along the lines of your suggestion.
+
+Warm regards
+Tom.
+
+>-----Original Message-----
+>From: Johan Hedberg [mailto:johan.hedberg@gmail.com]
+>Sent: 14 June 2010 15:16
+>To: Counihan, Tom
+>Cc: linux-bluetooth@vger.kernel.org
+>Subject: Re: Proposed MAP client D-Bus API (was: Proposed MAP API)
 >
-> On Tue, Mar 9, 2010 at 11:45 PM, Marcel Holtmann<marcel@holtmann.org>  wrote:
->> Hi Nick,
->>
->>>>>>>> Right now Bluez always requests flushable ACL packets (but does not
->>>>>>>> set a flush timeout, so effectively they are non-flushable):
->>>>>>>>
->>>>>>>> However it is desirable to use an ACL flush timeout on A2DP packets so
->>>>>>>> that if the ACL packets block for some reason then the LM can flush
->>>>>>>> them to make room for newer packets.
->>>>>>>>
->>>>>>>> Is it reasonable for Bluez to use the 0x00 ACL packet boundary flag by
->>>>>>>> default (non-flushable packet), and let userspace request flushable
->>>>>>>> packets on A2DP L2CAP sockets with the socket option
->>>>>>>> L2CAP_LM_RELIABLE.
->>>>>>>
->>>>>>> the reliable option has a different meaning. It comes back from the old
->>>>>>> Bluetooth 1.1 qualification days where we had to tests on L2CAP that had
->>>>>>> to confirm that we can detect malformed packets and report them. These
->>>>>>> days it is just fine to drop them.
->>>>>>
->>>>>> Got it, how about introducing
->>>>>>
->>>>>> #define L2CAP_LM_FLUSHABLE 0x0040
->>>>>
->>>>> that l2cap_sock_setsockopt_old() sets this didn't give you a hint that
->>>>> we might wanna deprecate this socket options ;)
->>>>>
->>>>> I need to read up on the flushable stuff, but in the end it deserves its
->>>>> own socket option. Also an ioctl() to actually trigger Enhanced flush
->>>>> might be needed.
->>>>>
->>>>>> struct l2cap_pinfo {
->>>>>>     ...
->>>>>>     __u8 flushable;
->>>>>> }
->>>>>
->>>>> Sure. In the long run we need to turn this into a bitmask. We are just
->>>>> wasting memory here.
->>>>
->>>> Attached is an updated patch, that checks the LMP features bitmask
->>>> before using the new non-flushable packet type.
->>>>
->>>> I am still using L2CAP_LM_FLUSHABLE socket option in
->>>> l2cap_sock_setsockopt_old(), which I don't think you are happy with.
->>>> So how about a new option:
->>>>
->>>> SOL_L2CAP, L2CAP_ACL_FLUSH
->>>> which has a default value of 0, and can be set to 1 to make the ACL
->>>> data sent by this L2CAP socket flushable.
->>>>
->>>> In a later commit we would then add
->>>> SOL_ACL, ACL_FLUSH_TIMEOUT
->>>> That is used to set an automatic flush timeout for the ACL link on a
->>>> L2CAP socket. Note that SOL_ACL is new.
->>>>
->>>> But maybe this is not what you had in mind, so I'm looking for your
->>>> advice before I implement this.
->>>
->>> Attached an updated patch for 2.6.32 kernel. We've been using this
->>> patch successfully on production devices.
->>
->> can see anything wrong with that patch. However we need to use
->> SOL_BLUETOOTH for it of course. So we need to come up with something to
->> make this simple.
->>
->> An additional change I like to see is to use flags for booleans like
->> flushable in the structures. Can you work on changing that.
->>
->> Also do we have decoding support for this in hcidump. It might be nice
->> to include some really simple examples in the commit message.
->>
->> Regards
+>Hi Tom,
 >
-> I would like to play a little bit with this, so is there any missing updates?
+>On Mon, Jun 14, 2010, Counihan, Tom wrote:
+>> Many thanks for the prompt response Johan,
 >
-This is not exactly something related to your question, but there is 
-another side effect for the current implementation.
+>No problem :)
+>
+>> Not sure at all really. I had my suspicion, but wanted to start
+>somewhere.
+>> What you suggest makes perfect sense really - back to the drawing
+>> board for me :$ - just need to figure out a logical home for this.
+>
+>Note that I'm not strictly saying that it can't be D-Bus based. Only
+>that there's a considerable risk with that and that you should
+>understand the pros and cons of the different alternatives. E.g.
+>compared to D-Bus a library would restrict you more in terms of what
+>programing languages can be used for the application whereas there's
+>quite a plethora of D-Bus bindings out there. You'd also need to
+>consider potential multithreading issues and pay close attention in
+>designing the API so that it can be conveniently hooked up to whatever
+>mainloop the application has, or then simply decide that only one
+>mainloop, e.g. the glib one, is supported.
+>
+>> On an aside, could the same comment be made regarding PBAP re contact
+>> pictures?
+>
+>Yes, I think so.
+>
+>Johan
+--------------------------------------------------------------
+Intel Shannon Limited
+Registered in Ireland
+Registered Office: Collinstown Industrial Park, Leixlip, County Kildare
+Registered Number: 308263
+Business address: Dromore House, East Park, Shannon, Co. Clare
 
-Assume you have 2 ACL links, FTP and A2DP. A2DP streaming and FTP doing 
-FTP Put.
-When the A2DP packets start blocking, it effectively start blocking the 
-packets available for FTP too. But, the host has no idea about it and 
-keep pumping in A2DP data until all available buffers are blocked. 
-Effectively blocking both A2DP and FTP.
+This e-mail and any attachments may contain confidential material for the sole use of the intended recipient(s). Any review or distribution by others is strictly prohibited. If you are not the intended recipient, please contact the sender and delete all copies.
 
-So at the user level you will see your FTP connection stalling as long 
-your A2DP connection is stalled (out of range). FTP will restart as soon 
-as A2DP comes back in range.
-
-I had raised this issue sometime before, but could not follow it up.
-
-Regards
-Suraj
 
