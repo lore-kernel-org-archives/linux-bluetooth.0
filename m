@@ -1,158 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <4C18BDDF.7030002@Atheros.com>
+In-Reply-To: <AANLkTinOFG0NcADz2ewxyaPWiLpe52MFLP8GCEvFna2a@mail.gmail.com>
 References: <35c90d960912081950t135e3f10m8848e54fde1e596f@mail.gmail.com>
-	<1260335175.2901.20.camel@violet>
-	<35c90d960912082213s26fb0ebse75ce85d43213d9@mail.gmail.com>
-	<1260482634.2901.70.camel@violet>
-	<35c90d960912161359u2b3f9b2fi875288896a7a8478@mail.gmail.com>
+	<1260335175.2901.20.camel@violet> <35c90d960912082213s26fb0ebse75ce85d43213d9@mail.gmail.com>
+	<1260482634.2901.70.camel@violet> <35c90d960912161359u2b3f9b2fi875288896a7a8478@mail.gmail.com>
 	<35c90d961003091207u66571bt789461dcc7972693@mail.gmail.com>
-	<1268167524.3712.61.camel@localhost.localdomain>
-	<AANLkTinOFG0NcADz2ewxyaPWiLpe52MFLP8GCEvFna2a@mail.gmail.com>
-	<4C18BDDF.7030002@Atheros.com>
-Date: Wed, 16 Jun 2010 18:14:56 +0300
-Message-ID: <AANLkTimZB71m9zGxTjmKjTiKNo-hDHsrCLrOLXr1EjyY@mail.gmail.com>
+	<1268167524.3712.61.camel@localhost.localdomain> <AANLkTinOFG0NcADz2ewxyaPWiLpe52MFLP8GCEvFna2a@mail.gmail.com>
+From: Nick Pelly <npelly@google.com>
+Date: Wed, 16 Jun 2010 07:15:10 -0700
+Message-ID: <AANLkTim9qOTdeWhU1H-ove2rPR4MlEyUmQZ3zUeS75K_@mail.gmail.com>
 Subject: Re: RFC: Allow Bluez to select flushable or non-flushable ACL packets
 	with L2CAP_LM_RELIABLE
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Suraj <suraj@atheros.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Nick Pelly <npelly@google.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-On Wed, Jun 16, 2010 at 3:04 PM, Suraj <suraj@atheros.com> wrote:
-> Hi Luis,
+On Wed, Jun 16, 2010 at 4:40 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi,
 >
-> On 6/16/2010 5:10 PM, Luiz Augusto von Dentz wrote:
+> On Tue, Mar 9, 2010 at 11:45 PM, Marcel Holtmann <marcel@holtmann.org> wr=
+ote:
+>> Hi Nick,
 >>
->> Hi,
->>
->> On Tue, Mar 9, 2010 at 11:45 PM, Marcel Holtmann<marcel@holtmann.org>
->> =A0wrote:
->>>
->>> Hi Nick,
->>>
->>>>>>>>> Right now Bluez always requests flushable ACL packets (but does n=
-ot
->>>>>>>>> set a flush timeout, so effectively they are non-flushable):
->>>>>>>>>
->>>>>>>>> However it is desirable to use an ACL flush timeout on A2DP packe=
-ts
->>>>>>>>> so
->>>>>>>>> that if the ACL packets block for some reason then the LM can flu=
-sh
->>>>>>>>> them to make room for newer packets.
->>>>>>>>>
->>>>>>>>> Is it reasonable for Bluez to use the 0x00 ACL packet boundary fl=
-ag
->>>>>>>>> by
->>>>>>>>> default (non-flushable packet), and let userspace request flushab=
-le
->>>>>>>>> packets on A2DP L2CAP sockets with the socket option
->>>>>>>>> L2CAP_LM_RELIABLE.
->>>>>>>>
->>>>>>>> the reliable option has a different meaning. It comes back from th=
-e
->>>>>>>> old
->>>>>>>> Bluetooth 1.1 qualification days where we had to tests on L2CAP th=
+>>> >>> >> Right now Bluez always requests flushable ACL packets (but does =
+not
+>>> >>> >> set a flush timeout, so effectively they are non-flushable):
+>>> >>> >>
+>>> >>> >> However it is desirable to use an ACL flush timeout on A2DP pack=
+ets so
+>>> >>> >> that if the ACL packets block for some reason then the LM can fl=
+ush
+>>> >>> >> them to make room for newer packets.
+>>> >>> >>
+>>> >>> >> Is it reasonable for Bluez to use the 0x00 ACL packet boundary f=
+lag by
+>>> >>> >> default (non-flushable packet), and let userspace request flusha=
+ble
+>>> >>> >> packets on A2DP L2CAP sockets with the socket option
+>>> >>> >> L2CAP_LM_RELIABLE.
+>>> >>> >
+>>> >>> > the reliable option has a different meaning. It comes back from t=
+he old
+>>> >>> > Bluetooth 1.1 qualification days where we had to tests on L2CAP t=
+hat had
+>>> >>> > to confirm that we can detect malformed packets and report them. =
+These
+>>> >>> > days it is just fine to drop them.
+>>> >>>
+>>> >>> Got it, how about introducing
+>>> >>>
+>>> >>> #define L2CAP_LM_FLUSHABLE 0x0040
+>>> >>
+>>> >> that l2cap_sock_setsockopt_old() sets this didn't give you a hint th=
 at
->>>>>>>> had
->>>>>>>> to confirm that we can detect malformed packets and report them.
->>>>>>>> These
->>>>>>>> days it is just fine to drop them.
->>>>>>>
->>>>>>> Got it, how about introducing
->>>>>>>
->>>>>>> #define L2CAP_LM_FLUSHABLE 0x0040
->>>>>>
->>>>>> that l2cap_sock_setsockopt_old() sets this didn't give you a hint th=
-at
->>>>>> we might wanna deprecate this socket options ;)
->>>>>>
->>>>>> I need to read up on the flushable stuff, but in the end it deserves
->>>>>> its
->>>>>> own socket option. Also an ioctl() to actually trigger Enhanced flus=
+>>> >> we might wanna deprecate this socket options ;)
+>>> >>
+>>> >> I need to read up on the flushable stuff, but in the end it deserves=
+ its
+>>> >> own socket option. Also an ioctl() to actually trigger Enhanced flus=
 h
->>>>>> might be needed.
->>>>>>
->>>>>>> struct l2cap_pinfo {
->>>>>>> =A0 =A0...
->>>>>>> =A0 =A0__u8 flushable;
->>>>>>> }
->>>>>>
->>>>>> Sure. In the long run we need to turn this into a bitmask. We are ju=
+>>> >> might be needed.
+>>> >>
+>>> >>> struct l2cap_pinfo {
+>>> >>> =A0 =A0...
+>>> >>> =A0 =A0__u8 flushable;
+>>> >>> }
+>>> >>
+>>> >> Sure. In the long run we need to turn this into a bitmask. We are ju=
 st
->>>>>> wasting memory here.
->>>>>
->>>>> Attached is an updated patch, that checks the LMP features bitmask
->>>>> before using the new non-flushable packet type.
->>>>>
->>>>> I am still using L2CAP_LM_FLUSHABLE socket option in
->>>>> l2cap_sock_setsockopt_old(), which I don't think you are happy with.
->>>>> So how about a new option:
->>>>>
->>>>> SOL_L2CAP, L2CAP_ACL_FLUSH
->>>>> which has a default value of 0, and can be set to 1 to make the ACL
->>>>> data sent by this L2CAP socket flushable.
->>>>>
->>>>> In a later commit we would then add
->>>>> SOL_ACL, ACL_FLUSH_TIMEOUT
->>>>> That is used to set an automatic flush timeout for the ACL link on a
->>>>> L2CAP socket. Note that SOL_ACL is new.
->>>>>
->>>>> But maybe this is not what you had in mind, so I'm looking for your
->>>>> advice before I implement this.
->>>>
->>>> Attached an updated patch for 2.6.32 kernel. We've been using this
->>>> patch successfully on production devices.
+>>> >> wasting memory here.
+>>> >
+>>> > Attached is an updated patch, that checks the LMP features bitmask
+>>> > before using the new non-flushable packet type.
+>>> >
+>>> > I am still using L2CAP_LM_FLUSHABLE socket option in
+>>> > l2cap_sock_setsockopt_old(), which I don't think you are happy with.
+>>> > So how about a new option:
+>>> >
+>>> > SOL_L2CAP, L2CAP_ACL_FLUSH
+>>> > which has a default value of 0, and can be set to 1 to make the ACL
+>>> > data sent by this L2CAP socket flushable.
+>>> >
+>>> > In a later commit we would then add
+>>> > SOL_ACL, ACL_FLUSH_TIMEOUT
+>>> > That is used to set an automatic flush timeout for the ACL link on a
+>>> > L2CAP socket. Note that SOL_ACL is new.
+>>> >
+>>> > But maybe this is not what you had in mind, so I'm looking for your
+>>> > advice before I implement this.
 >>>
->>> can see anything wrong with that patch. However we need to use
->>> SOL_BLUETOOTH for it of course. So we need to come up with something to
->>> make this simple.
->>>
->>> An additional change I like to see is to use flags for booleans like
->>> flushable in the structures. Can you work on changing that.
->>>
->>> Also do we have decoding support for this in hcidump. It might be nice
->>> to include some really simple examples in the commit message.
->>>
->>> Regards
+>>> Attached an updated patch for 2.6.32 kernel. We've been using this
+>>> patch successfully on production devices.
 >>
->> I would like to play a little bit with this, so is there any missing
->> updates?
+>> can see anything wrong with that patch. However we need to use
+>> SOL_BLUETOOTH for it of course. So we need to come up with something to
+>> make this simple.
 >>
-> This is not exactly something related to your question, but there is anot=
-her
-> side effect for the current implementation.
+>> An additional change I like to see is to use flags for booleans like
+>> flushable in the structures. Can you work on changing that.
+>>
+>> Also do we have decoding support for this in hcidump. It might be nice
+>> to include some really simple examples in the commit message.
+>>
+>> Regards
 >
-> Assume you have 2 ACL links, FTP and A2DP. A2DP streaming and FTP doing F=
-TP
-> Put.
-> When the A2DP packets start blocking, it effectively start blocking the
-> packets available for FTP too. But, the host has no idea about it and kee=
-p
-> pumping in A2DP data until all available buffers are blocked. Effectively
-> blocking both A2DP and FTP.
->
-> So at the user level you will see your FTP connection stalling as long yo=
-ur
-> A2DP connection is stalled (out of range). FTP will restart as soon as A2=
-DP
-> comes back in range.
->
-> I had raised this issue sometime before, but could not follow it up.
+> I would like to play a little bit with this, so is there any missing upda=
+tes?
 
-I got the impression that we can still control which packets are
-Automatically-Flushable and which are not, so even thought we set the
-timeout in a per ACL link fashion we can still mark which packets
-should be flushable in a per socket basis.
+Nope, that is our most recent version.
 
-Is that correct, Nick?
-
-
---=20
-Luiz Augusto von Dentz
-Computer Engineer
+Nick
