@@ -1,153 +1,116 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4C18BDDF.7030002@Atheros.com>
+Date: Wed, 16 Jun 2010 17:34:47 +0530
+From: Suraj <suraj@Atheros.com>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTin0B-f2i5e2TvDVDLuRZ7eRND-u4lVor1GSIhGT@mail.gmail.com>
-References: <w2ra6ca4e821005071241w9d7d982ezb78ad0ba4480e73d@mail.gmail.com>
-	<s2oa6ca4e821005071249tdfd2e197i2595b57ae2ccb705@mail.gmail.com>
-	<20100507195325.GB4857@vigoh>
-	<AANLkTilSynGNcpdq8h5YJQVD8e5MMyUDq55WzsB05AA2@mail.gmail.com>
-	<20100517023917.GI23754@vigoh>
-	<AANLkTin3FNuVegPI013fzLQn7YsHzpfr7ZymnCG1mpt-@mail.gmail.com>
-	<AANLkTin0B-f2i5e2TvDVDLuRZ7eRND-u4lVor1GSIhGT@mail.gmail.com>
-Date: Wed, 16 Jun 2010 15:11:03 +0300
-Message-ID: <AANLkTimkZQRzE39WG6Kw9PlYJpXONwA-BvEZxym2J6gi@mail.gmail.com>
-Subject: Re: Software caused connection abort (103 )
-From: john michelle <jhnmichelle@gmail.com>
-To: "Gustavo F. Padovan" <gustavo@padovan.org>, linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org
-Content-Type: text/plain; charset=ISO-8859-1
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+	Nick Pelly <npelly@google.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: RFC: Allow Bluez to select flushable or non-flushable ACL packets
+ 	with L2CAP_LM_RELIABLE
+References: <35c90d960912081950t135e3f10m8848e54fde1e596f@mail.gmail.com>	<1260335175.2901.20.camel@violet>	<35c90d960912082213s26fb0ebse75ce85d43213d9@mail.gmail.com>	<1260482634.2901.70.camel@violet>	<35c90d960912161359u2b3f9b2fi875288896a7a8478@mail.gmail.com>	<35c90d961003091207u66571bt789461dcc7972693@mail.gmail.com>	<1268167524.3712.61.camel@localhost.localdomain> <AANLkTinOFG0NcADz2ewxyaPWiLpe52MFLP8GCEvFna2a@mail.gmail.com>
+In-Reply-To: <AANLkTinOFG0NcADz2ewxyaPWiLpe52MFLP8GCEvFna2a@mail.gmail.com>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, May 30, 2010 at 1:12 PM, john michelle <jhnmichelle@gmail.com> wrot=
-e:
-> Hi Gustavo,
->
->>> Please post the output of hcidump when the connection abort happens.
->>>
->
-> Below is the output of hcidump the moments the software caused connection=
- abort
->
-> Dongle 1:
->> HCI Event: Number of Completed Packets (0x13) plen 5
-> =A0. * . . .
-> < HCI Command: Reset (0x03|0x0003) plen 0
-> device: disconnected
->
-> Dongle 2:
->> HCI Event: Number of Completed Packets (0x13) plen 5
-> =A0. * . . .
-> < HCI Command: Reset (0x03|0x0003) plen 0
-> device: disconnected
->
->
-> I think something triggers hci reset which causes this problem, but what =
-exactly
-> Triggers it i don't know.
->
->
-> John
->
->
+Hi Luis,
 
-
-Hi all,
-
-Is anyone going to give this problem a try, it has been like a month now
-This is a real problem in the bluez stack and someone have to look in this
-Issue.
-
-John
-
-> On Mon, May 17, 2010 at 5:21 PM, john michelle <jhnmichelle@gmail.com> wr=
-ote:
->>> Hi Jonh,
->>>
->>> First of all, don't do top posting in this mailing list. ;)
->>>
+On 6/16/2010 5:10 PM, Luiz Augusto von Dentz wrote:
+> Hi,
+>
+> On Tue, Mar 9, 2010 at 11:45 PM, Marcel Holtmann<marcel@holtmann.org>  wrote:
+>> Hi Nick,
 >>
->> Thanks for the advise , will keep that in mind for future posts.
->>
->>> In which bluez/kernel version the problem started? Any hardware update
->>> during this time? The problem happens when you are already tranfering
->>> SCO data?
->>>
->>
->> I tried bluez versions 3.XX =A0and kernel 2.6.26(I think) the problem
->> occurs and the kernel panics with no core dumps.then i tried with
->> bluez 4.53-4.62 with
->> Kernel 2.6.31 and 2.6.32. the connection abort problem occurs but the
->> kernel doesn't
->> Panic. regarding the hardware update you mean the dongle or the box.Anyw=
-ay
->> i changed both and tried different box's, this even happens on a box
->> with 2 giga ram
->> And core2 processor . as for the dongles i am using trust
->>
->> http://www.twenga.co.uk/prices-Bluetooth-2-USB-Adapter-10m-BT-2250p-TRUS=
-T-Wireless-network-card-adapter-176178-0
->>
->> =A0and also using no name dongles all the same problem.
->>
->>> Please post the output of hcidump when the connection abort happens.
->>>
->>
->> well that is going to be a hard one since i have more than one dongle in=
- place
->> And very hard to predict which one will crash.i will work on this and up=
-date
->> You as soon as i have the hcidump log.
->>
->>
->>
->>> I tried reproduce this issue in L2CAP but it is a bit hard, lets
->>> say it happen once in a thousand, so it's not easy to track it. I have
->>> to try reproduce that using the SCO, but I'm not used to that layer yet=
-.
->>> ;)
->>
->> I hoped that it happens 1 in 1000 in SCO , but it actually happens 1 in =
-15
->>
->>
->> John
->>
->>
->>
->>>
->>> Regards,
->>>
+>>>>>>>> Right now Bluez always requests flushable ACL packets (but does not
+>>>>>>>> set a flush timeout, so effectively they are non-flushable):
+>>>>>>>>
+>>>>>>>> However it is desirable to use an ACL flush timeout on A2DP packets so
+>>>>>>>> that if the ACL packets block for some reason then the LM can flush
+>>>>>>>> them to make room for newer packets.
+>>>>>>>>
+>>>>>>>> Is it reasonable for Bluez to use the 0x00 ACL packet boundary flag by
+>>>>>>>> default (non-flushable packet), and let userspace request flushable
+>>>>>>>> packets on A2DP L2CAP sockets with the socket option
+>>>>>>>> L2CAP_LM_RELIABLE.
+>>>>>>>
+>>>>>>> the reliable option has a different meaning. It comes back from the old
+>>>>>>> Bluetooth 1.1 qualification days where we had to tests on L2CAP that had
+>>>>>>> to confirm that we can detect malformed packets and report them. These
+>>>>>>> days it is just fine to drop them.
+>>>>>>
+>>>>>> Got it, how about introducing
+>>>>>>
+>>>>>> #define L2CAP_LM_FLUSHABLE 0x0040
+>>>>>
+>>>>> that l2cap_sock_setsockopt_old() sets this didn't give you a hint that
+>>>>> we might wanna deprecate this socket options ;)
+>>>>>
+>>>>> I need to read up on the flushable stuff, but in the end it deserves its
+>>>>> own socket option. Also an ioctl() to actually trigger Enhanced flush
+>>>>> might be needed.
+>>>>>
+>>>>>> struct l2cap_pinfo {
+>>>>>>     ...
+>>>>>>     __u8 flushable;
+>>>>>> }
+>>>>>
+>>>>> Sure. In the long run we need to turn this into a bitmask. We are just
+>>>>> wasting memory here.
 >>>>
->>>> John
+>>>> Attached is an updated patch, that checks the LMP features bitmask
+>>>> before using the new non-flushable packet type.
 >>>>
->>>> On Fri, May 7, 2010 at 3:53 PM, Gustavo F. Padovan <gustavo@padovan.or=
-g> wrote:
->>>> > * john michelle <jhnmichelle@gmail.com> [2010-05-07 15:49:05 -0400]:
->>>> >
->>>> >> Hi Bluetooth hackers,
->>>> >>
->>>> >> i am having this consistent problem with bluez , from time to time =
-i
->>>> >> get the error Software caused connection abort (103 )
->>>> >> And the bluetooth stick seems to disconnect and reconnects. this
->>>> >> happens during an sco connection and it occurs even
->>>> >> More when i am having the voice stream comming through the internet
->>>> >> rather than the lan.i don't know what exact
->>>> >> Details you need to solve this problem please tell me and i will gi=
-ve
->>>> >> you an immediate reply . i have linux kernel 2.6.33 and bluez 4.62
->>>> >
->>>> > I get the same problem sometimes when testing ERTM with l2test. So t=
-he
->>>> > problem is on l2cap too. I didn't have time to debug this yet. Now t=
-hat
->>>> > someone else have confirmed it too, I'll to take a look at the probl=
-em.
->>>> >
->>>> >>
+>>>> I am still using L2CAP_LM_FLUSHABLE socket option in
+>>>> l2cap_sock_setsockopt_old(), which I don't think you are happy with.
+>>>> So how about a new option:
+>>>>
+>>>> SOL_L2CAP, L2CAP_ACL_FLUSH
+>>>> which has a default value of 0, and can be set to 1 to make the ACL
+>>>> data sent by this L2CAP socket flushable.
+>>>>
+>>>> In a later commit we would then add
+>>>> SOL_ACL, ACL_FLUSH_TIMEOUT
+>>>> That is used to set an automatic flush timeout for the ACL link on a
+>>>> L2CAP socket. Note that SOL_ACL is new.
+>>>>
+>>>> But maybe this is not what you had in mind, so I'm looking for your
+>>>> advice before I implement this.
 >>>
->>> --
->>> Gustavo F. Padovan
->>> http://padovan.org
->>>
+>>> Attached an updated patch for 2.6.32 kernel. We've been using this
+>>> patch successfully on production devices.
 >>
+>> can see anything wrong with that patch. However we need to use
+>> SOL_BLUETOOTH for it of course. So we need to come up with something to
+>> make this simple.
+>>
+>> An additional change I like to see is to use flags for booleans like
+>> flushable in the structures. Can you work on changing that.
+>>
+>> Also do we have decoding support for this in hcidump. It might be nice
+>> to include some really simple examples in the commit message.
+>>
+>> Regards
 >
+> I would like to play a little bit with this, so is there any missing updates?
+>
+This is not exactly something related to your question, but there is 
+another side effect for the current implementation.
+
+Assume you have 2 ACL links, FTP and A2DP. A2DP streaming and FTP doing 
+FTP Put.
+When the A2DP packets start blocking, it effectively start blocking the 
+packets available for FTP too. But, the host has no idea about it and 
+keep pumping in A2DP data until all available buffers are blocked. 
+Effectively blocking both A2DP and FTP.
+
+So at the user level you will see your FTP connection stalling as long 
+your A2DP connection is stalled (out of range). FTP will restart as soon 
+as A2DP comes back in range.
+
+I had raised this issue sometime before, but could not follow it up.
+
+Regards
+Suraj
+
