@@ -1,112 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
+From: <Waldemar.Rymarkiewicz@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <par-gunnar.p.hjalmdahl@stericsson.com>
+Date: Wed, 16 Jun 2010 11:53:38 +0300
+Subject: [PATCH] Don't handle Changed Combination Link Key for a temporary
+ keys.
+Message-ID: <99B09243E1A5DA4898CDD8B70011144809696FDFB0@EXMB04.eu.tieto.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <1265209673.31341.116.camel@localhost.localdomain>
-References: <272603.59641.qm@web52603.mail.re2.yahoo.com>
-	<1265156906.31341.106.camel@localhost.localdomain>
-	<90704.85857.qm@web52601.mail.re2.yahoo.com>
-	<1265209673.31341.116.camel@localhost.localdomain>
-Date: Wed, 16 Jun 2010 13:21:55 +0300
-Message-ID: <AANLkTikNH3_CC3OottoqMnZEwu4sbqvchFxZ2Q7-GlRZ@mail.gmail.com>
-Subject: Re: double Connect req: psm 1 scid 0x0040 ?
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Ed Tsang <netdesign_98@yahoo.com>,
-	Bluettooth Linux <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Patch on behalf of ST-Ericsson SA
 
-On Wed, Feb 3, 2010 at 6:07 PM, Marcel Holtmann <marcel@holtmann.org> wrote=
-:
->> >> In hcidump I seem to see a problem in #3. After the Encrypt Change th=
-ere seem to be 2 >con. req. psm 1 scid 0x0040
->>
->> >what kernel version is this? I think we fixed that already.
->> It is a ubutunu distribution. 2.6.31-17-generic.
->
-> can you test with a 2.6.33-rc6 vanilla kernel. I really thing this got
-> fixed and you might see a side effect or bad patch here.
+This patch prevents from storing Changed Combination Link Key type
+for temporary keys.  Getting Changed Combination Link Key remote
+auth requirements are already set to 0xff (bonding has finished)
+and that lets the system to store the key type of Changed
+Combination (0x06). For temporary keys we don't have to care about
+Change Link Key event.
+---
+ src/dbus-hci.c |    7 +++++++
+ 1 files changed, 7 insertions(+), 0 deletions(-)
 
-Marcel we are seeing "double L2CAP connect also" when connecting to
-some smartphones using contran profile. What about following patch
-proposal:
-
-The idea is to use existing flag L2CAP_CONF_CONNECT_PEND to mark that
-L2CAP request has been sent.
-
-Currently it is durty hack, I will send modified patch later today.
-
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index fc81acb..27bff6e 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -394,6 +394,12 @@ static void l2cap_do_start(struct sock *sk)
-
-                        l2cap_pi(sk)->ident =3D l2cap_get_ident(conn);
-
-+                       if (l2cap_pi(sk)->conf_state &
-L2CAP_CONF_CONNECT_PEND) {
-+                               printk(KERN_ERR "\n!!! %s: Connection
-pending !!!\n", __FUNCTION__);
-+                               return;
-+                       }
+diff --git a/src/dbus-hci.c b/src/dbus-hci.c
+index 19748a7..a3fd557 100644
+--- a/src/dbus-hci.c
++++ b/src/dbus-hci.c
+@@ -681,12 +681,19 @@ int hcid_dbus_link_key_notify(bdaddr_t *local, bdaddr_t *peer,
+ 			old_key_type = 0x03;
+ 		if (old_key_type != 0xff)
+ 			new_key_type = old_key_type;
++		else
++			/* This is Changed Combination Link Key for
++			 * a temporary link key.*/
++			return 0;
+ 	}
+ 
+ 	get_auth_requirements(local, peer, &local_auth);
+ 	remote_auth = device_get_auth(device);
+ 	bonding = device_is_bonding(device, NULL);
+ 
++	DBG("key type 0x%02x old key type 0x%02x new key type 0x%02x",
++					key_type, old_key_type, new_key_type);
 +
-+                       l2cap_pi(sk)->conf_state |=3D L2CAP_CONF_CONNECT_PE=
-ND;
-                        l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
-                                        L2CAP_CONN_REQ, sizeof(req), &req);
-                }
-@@ -448,6 +454,13 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
-
-                                l2cap_pi(sk)->ident =3D l2cap_get_ident(con=
-n);
-
-+                               if (l2cap_pi(sk)->conf_state &
-L2CAP_CONF_CONNECT_PEND) {
-+                                       printk(KERN_ERR "\n!!! %s:
-Connection pending !!!\n", __FUNCTION__);
-+                                       bh_unlock_sock(sk);
-+                                       continue;
-+                               }
-+
-+                               l2cap_pi(sk)->conf_state |=3D
-L2CAP_CONF_CONNECT_PEND;
-                                l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
-                                        L2CAP_CONN_REQ, sizeof(req), &req);
-                        }
-@@ -3809,6 +3822,7 @@ static int l2cap_security_cfm(struct hci_conn
-*hcon, u8 status, u8 encrypt)
-                bh_lock_sock(sk);
-
-                if (l2cap_pi(sk)->conf_state & L2CAP_CONF_CONNECT_PEND) {
-+                       printk(KERN_ERR "\n!!! %s: Connection pending
-!!!\n", __FUNCTION__);
-                        bh_unlock_sock(sk);
-                        continue;
-                }
-@@ -3828,6 +3842,7 @@ static int l2cap_security_cfm(struct hci_conn
-*hcon, u8 status, u8 encrypt)
-
-                                l2cap_pi(sk)->ident =3D l2cap_get_ident(con=
-n);
-
-+                               l2cap_pi(sk)->conf_state |=3D
-L2CAP_CONF_CONNECT_PEND;
-                                l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
-                                        L2CAP_CONN_REQ, sizeof(req), &req);
-
-
-
->
-> Regards
->
-> Marcel
->
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
->
+ 	DBG("local auth 0x%02x and remote auth 0x%02x",
+ 					local_auth, remote_auth);
+ 
+-- 
+1.7.0.4
+ 
