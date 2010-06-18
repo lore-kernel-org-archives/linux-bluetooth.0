@@ -1,51 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 18 Jun 2010 11:14:07 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Elvis =?iso-8859-1?Q?Pf=FCtzenreuter?= <epx@signove.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fixes sdp_get_supp_feat function
+Message-ID: <20100618081407.GA32314@jh-x301>
+References: <1276705848-22401-1-git-send-email-epx@signove.com>
 MIME-Version: 1.0
-Date: Fri, 18 Jun 2010 15:29:41 +0300
-Message-ID: <AANLkTin25xCMcVDCzbeXO-ZZfxhS4O0foXU8wl4h3tds@mail.gmail.com>
-Subject: hci_scodata_packet: hci1 SCO packet for unknown connection handle 42
-From: Andrei Moraru <andrei.moraru.n@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1276705848-22401-1-git-send-email-epx@signove.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi Elvis,
 
-the machine is running CentOS and Asterisk 1.4.32
+On Wed, Jun 16, 2010, Elvis Pfützenreuter wrote:
+> In case of string data items, value is a pointer by itself.
+> ---
+>  lib/sdp.c |   25 ++++++++++++++++++++++---
+>  1 files changed, 22 insertions(+), 3 deletions(-)
 
-there are installed bluez-4.66 and asterisk module chan_mobile
+The patch is now upstream. Thanks.
 
-The Asterisk crashes sometimes when is using FXO over the bluetooth
-connection via chan_mobile
-
-uname -a:
-2.6.18-164.el5 #1 SMP Thu Sep 3 03:33:56 EDT 2009 i686 athlon i386 GNU/Linux
-
-[root@voip ~]# lsusb
-Bus 001 Device 001: ID 0000:0000
-Bus 003 Device 001: ID 0000:0000
-Bus 002 Device 001: ID 0000:0000
-Bus 004 Device 001: ID 0000:0000
-Bus 004 Device 002: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth
-Dongle (HCI mode)
-Bus 004 Device 003: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth
-Dongle (HCI mode)
-
-the /var/log/messages
-Jun 18 15:14:45 voip kernel: hci_scodata_packet: hci1 SCO packet for unknown
-connection handle 42
-Jun 18 15:14:45 voip kernel: hci_scodata_packet: hci1 SCO packet for unknown
-connection handle 42
-Jun 18 15:21:05 voip kernel: hci_scodata_packet: hci0 SCO packet for unknown
-connection handle 42
-Jun 18 15:21:05 voip last message repeated 2 times
-Jun 18 15:21:21 voip kernel: hci_scodata_packet: hci0 SCO packet for unknown
-connection handle 43
-Jun 18 15:21:21 voip kernel: hci_scodata_packet: hci0 SCO packet for unknown
-connection handle 43
-Jun 18 15:22:02 voip kernel: hci_scodata_packet: hci0 SCO packet for unknown
-connection handle 42
-Jun 18 15:25:16 voip last message repeated 3 times
-
-
-Please suggest your opinion.
+Johan
