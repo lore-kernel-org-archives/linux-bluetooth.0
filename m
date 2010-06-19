@@ -1,59 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Users need to manually run "hid2hci --method dell -v 413c -p
- 8158 --mode hci" even when udev rule is installed
-From: Pacho Ramos <pacho@condmat1.ciencias.uniovi.es>
-Reply-To: pacho@condmat1.ciencias.uniovi.es
-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1272134552.7585.9.camel@localhost.localdomain>
-References: <1272134552.7585.9.camel@localhost.localdomain>
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-6+87IoRFMuaK9XVAz/ma"
-Date: Sat, 19 Jun 2010 17:05:45 +0200
-Message-ID: <1276959945.16187.0.camel@localhost.localdomain>
-Mime-Version: 1.0
+Date: Fri, 18 Jun 2010 21:53:27 -0300
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: check l2cap pending status before sending
+ l2cap connect request
+Message-ID: <20100619005327.GE14514@vigoh>
+References: <1276692725-10284-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1276692725-10284-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Andrei,
 
---=-6+87IoRFMuaK9XVAz/ma
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2010-06-16 15:52:05 +0300]:
 
-El s=C3=A1b, 24-04-2010 a las 20:42 +0200, Pacho Ramos escribi=C3=B3:
-> Hello
->=20
-> I would like to ask for help to try to find where could be the problem
-> causing this:
-> http://bugs.gentoo.org/show_bug.cgi?id=3D315749
->=20
-> Reporter seems to need to manually run:
-> hid2hci --method dell -v 413c -p 8158 --mode hci
->=20
-> to get bluetooth switched to hci mode.
->=20
-> I don't understand why he needs to run it since involved udev rule file
-> seems to be properly installed.
->=20
-> Could anybody help us on this please?
->=20
-> Thanks a lot
+> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> 
+> Due to race condition in L2CAP state machine L2CAP Connection Request
+> may be sent twice for SDP with the same source channel id. Problems
+> reported connecting to Apple products, some carkit, Blackberry phones.
+> 
+> ...
+> 2010-06-07 21:18:03.651031 < ACL data: handle 1 flags 0x02 dlen 12
+>     L2CAP(s): Connect req: psm 1 scid 0x0040
+> 2010-06-07 21:18:03.653473 > HCI Event: Number of Completed Packets (0x13) plen 5
+>     handle 1 packets 1
+> 2010-06-07 21:18:03.653808 > HCI Event: Auth Complete (0x06) plen 3
+>     status 0x00 handle 1
+> 2010-06-07 21:18:03.653869 < ACL data: handle 1 flags 0x02 dlen 12
+>     L2CAP(s): Connect req: psm 1 scid 0x0040
+> ...
+> 
+> Patch uses L2CAP_CONF_CONNECT_PEND flag to mark that L2CAP Connection
+> Request has been sent.
+> 
+> Modified version of Ville Tervo patch.
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> ---
+>  net/bluetooth/l2cap.c |   11 +++++++++--
+>  1 files changed, 9 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> index fc81acb..1ed51ad 100644
+> --- a/net/bluetooth/l2cap.c
+> +++ b/net/bluetooth/l2cap.c
+> @@ -387,13 +387,16 @@ static void l2cap_do_start(struct sock *sk)
+>  		if (!(conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE))
+>  			return;
+>  
+> -		if (l2cap_check_security(sk)) {
+> +		if (l2cap_check_security(sk) &&
+> +				! l2cap_pi(sk)->conf_state &
+> +				L2CAP_CONF_CONNECT_PEND) {
 
-This is still affecting to some users, can anybody help us? At least,
-how could we check if udev is, at least, trying to execute hid2hci from
-97-bluetooth-hid2hci.rules file?
+This is wrong, you have to add parentheses here:
+	!(l2cap_pi(sk)->conf_state & L2CAP_CONF_CONNECT_PEND)
 
-Thanks
+>  			struct l2cap_conn_req req;
+>  			req.scid = cpu_to_le16(l2cap_pi(sk)->scid);
+>  			req.psm  = l2cap_pi(sk)->psm;
+>  
+>  			l2cap_pi(sk)->ident = l2cap_get_ident(conn);
+>  
+> +			l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
+>  			l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
+>  					L2CAP_CONN_REQ, sizeof(req), &req);
+>  		}
+> @@ -441,13 +444,16 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+>  		}
+>  
+>  		if (sk->sk_state == BT_CONNECT) {
+> -			if (l2cap_check_security(sk)) {
+> +			if (l2cap_check_security(sk) &&
+> +					! l2cap_pi(sk)->conf_state &
+> +					L2CAP_CONF_CONNECT_PEND) {
 
---=-6+87IoRFMuaK9XVAz/ma
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
+Here too.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.15 (GNU/Linux)
+>  				struct l2cap_conn_req req;
+>  				req.scid = cpu_to_le16(l2cap_pi(sk)->scid);
+>  				req.psm  = l2cap_pi(sk)->psm;
+>  
+>  				l2cap_pi(sk)->ident = l2cap_get_ident(conn);
+>  
+> +				l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
+>  				l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
+>  					L2CAP_CONN_REQ, sizeof(req), &req);
+>  			}
+> @@ -3828,6 +3834,7 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+>  
+>  				l2cap_pi(sk)->ident = l2cap_get_ident(conn);
+>  
+> +				l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
+>  				l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
+>  					L2CAP_CONN_REQ, sizeof(req), &req);
+>  			} else {
+> -- 
+> 1.7.0.4
 
-iEYEABECAAYFAkwc3MkACgkQCaWpQKGI+9SMggCdEDs+exHRlLkyjQFxTRTODa4M
-bnwAniCfl4ivUJlG1jEhf+tYjyQDBaI9
-=8pG0
------END PGP SIGNATURE-----
+Otherwise the patch seem fine to me.
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
---=-6+87IoRFMuaK9XVAz/ma--
-
+-- 
+Gustavo F. Padovan
+http://padovan.org
