@@ -1,113 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 18 Jun 2010 21:53:27 -0300
+Sender: "Gustavo F. Padovan" <gfpadovan@gmail.com>
+Date: Fri, 18 Jun 2010 21:28:07 -0300
 From: "Gustavo F. Padovan" <gustavo@padovan.org>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: check l2cap pending status before sending
- l2cap connect request
-Message-ID: <20100619005327.GE14514@vigoh>
-References: <1276692725-10284-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	marcel@holtmann.org
+Subject: Re: [PATCH] Bluetooth: Bring back var 'i' increment
+Message-ID: <20100619002807.GD14514@vigoh>
+References: <20100619002213.GC14514@vigoh>
+ <1276907040-23229-1-git-send-email-padovan@profusion.mobi>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1276692725-10284-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1276907040-23229-1-git-send-email-padovan@profusion.mobi>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+* Gustavo F. Padovan <padovan@profusion.mobi> [2010-06-18 21:24:00 -0300]:
 
-* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2010-06-16 15:52:05 +0300]:
-
-> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> commit ff6e2163f28a1094fb5ca5950fe2b43c3cf6bc7a accidentally added a
+> regression on the bnep code. Fixing it.
 > 
-> Due to race condition in L2CAP state machine L2CAP Connection Request
-> may be sent twice for SDP with the same source channel id. Problems
-> reported connecting to Apple products, some carkit, Blackberry phones.
-> 
-> ...
-> 2010-06-07 21:18:03.651031 < ACL data: handle 1 flags 0x02 dlen 12
->     L2CAP(s): Connect req: psm 1 scid 0x0040
-> 2010-06-07 21:18:03.653473 > HCI Event: Number of Completed Packets (0x13) plen 5
->     handle 1 packets 1
-> 2010-06-07 21:18:03.653808 > HCI Event: Auth Complete (0x06) plen 3
->     status 0x00 handle 1
-> 2010-06-07 21:18:03.653869 < ACL data: handle 1 flags 0x02 dlen 12
->     L2CAP(s): Connect req: psm 1 scid 0x0040
-> ...
-> 
-> Patch uses L2CAP_CONF_CONNECT_PEND flag to mark that L2CAP Connection
-> Request has been sent.
-> 
-> Modified version of Ville Tervo patch.
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 > ---
->  net/bluetooth/l2cap.c |   11 +++++++++--
->  1 files changed, 9 insertions(+), 2 deletions(-)
+>  net/bluetooth/bnep/netdev.c |    2 ++
+>  1 files changed, 2 insertions(+), 0 deletions(-)
 > 
-> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-> index fc81acb..1ed51ad 100644
-> --- a/net/bluetooth/l2cap.c
-> +++ b/net/bluetooth/l2cap.c
-> @@ -387,13 +387,16 @@ static void l2cap_do_start(struct sock *sk)
->  		if (!(conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE))
->  			return;
->  
-> -		if (l2cap_check_security(sk)) {
-> +		if (l2cap_check_security(sk) &&
-> +				! l2cap_pi(sk)->conf_state &
-> +				L2CAP_CONF_CONNECT_PEND) {
-
-This is wrong, you have to add parentheses here:
-	!(l2cap_pi(sk)->conf_state & L2CAP_CONF_CONNECT_PEND)
-
->  			struct l2cap_conn_req req;
->  			req.scid = cpu_to_le16(l2cap_pi(sk)->scid);
->  			req.psm  = l2cap_pi(sk)->psm;
->  
->  			l2cap_pi(sk)->ident = l2cap_get_ident(conn);
->  
-> +			l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
->  			l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
->  					L2CAP_CONN_REQ, sizeof(req), &req);
+> diff --git a/net/bluetooth/bnep/netdev.c b/net/bluetooth/bnep/netdev.c
+> index 0faad5c..8c100c9 100644
+> --- a/net/bluetooth/bnep/netdev.c
+> +++ b/net/bluetooth/bnep/netdev.c
+> @@ -104,6 +104,8 @@ static void bnep_net_set_mc_list(struct net_device *dev)
+>  				break;
+>  			memcpy(__skb_put(skb, ETH_ALEN), ha->addr, ETH_ALEN);
+>  			memcpy(__skb_put(skb, ETH_ALEN), ha->addr, ETH_ALEN);
+> +
+> +			i++;
 >  		}
-> @@ -441,13 +444,16 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
->  		}
->  
->  		if (sk->sk_state == BT_CONNECT) {
-> -			if (l2cap_check_security(sk)) {
-> +			if (l2cap_check_security(sk) &&
-> +					! l2cap_pi(sk)->conf_state &
-> +					L2CAP_CONF_CONNECT_PEND) {
-
-Here too.
-
->  				struct l2cap_conn_req req;
->  				req.scid = cpu_to_le16(l2cap_pi(sk)->scid);
->  				req.psm  = l2cap_pi(sk)->psm;
->  
->  				l2cap_pi(sk)->ident = l2cap_get_ident(conn);
->  
-> +				l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
->  				l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
->  					L2CAP_CONN_REQ, sizeof(req), &req);
->  			}
-> @@ -3828,6 +3834,7 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
->  
->  				l2cap_pi(sk)->ident = l2cap_get_ident(conn);
->  
-> +				l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
->  				l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
->  					L2CAP_CONN_REQ, sizeof(req), &req);
->  			} else {
+>  		r->len = htons(skb->len - len);
+>  	}
 > -- 
-> 1.7.0.4
 
-Otherwise the patch seem fine to me.
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Marcel, if you want I can carry the fix on my tree for -next.
 
 -- 
 Gustavo F. Padovan
