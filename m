@@ -1,39 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 20 Jun 2010 01:08:50 -0300
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	Johan Hedberg <johan.hedberg@nokia.com>
-Subject: Re: [PATCH] Bluetooth: Reset the security level after an
- authentication failure
-Message-ID: <20100620040807.GA32372@vigoh>
-References: <1276848536-29895-1-git-send-email-johan.hedberg@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1276848536-29895-1-git-send-email-johan.hedberg@gmail.com>
+Subject: Re: Users need to manually run "hid2hci --method dell -v 413c -p
+ 8158 --mode hci" even when udev rule is installed
+From: Pacho Ramos <pacho@condmat1.ciencias.uniovi.es>
+Reply-To: pacho@condmat1.ciencias.uniovi.es
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1276962936.13559.143.camel@localhost.localdomain>
+References: <1276962936.13559.143.camel@localhost.localdomain>
+Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-pu2IekkYSjcyQOhflCsg"
+Date: Sat, 19 Jun 2010 20:59:24 +0200
+Message-ID: <1276973964.16187.1.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
 
-* johan.hedberg@gmail.com <johan.hedberg@gmail.com> [2010-06-18 11:08:56 +0300]:
+--=-pu2IekkYSjcyQOhflCsg
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> From: Johan Hedberg <johan.hedberg@nokia.com>
-> 
-> When authentication fails for a connection the assumed security level
-> should be set back to BT_SECURITY_LOW so that subsequent connect
-> attempts over the same link don't falsely assume that security is
-> adequate enough.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
-> ---
->  net/bluetooth/hci_event.c |    2 ++
->  1 files changed, 2 insertions(+), 0 deletions(-)
+El s=C3=A1b, 19-06-2010 a las 16:55 +0100, Bastien Nocera escribi=C3=B3:
+> On Sat, 2010-06-19 at 17:05 +0200, Pacho Ramos wrote:
+> > El s=C3=A1b, 24-04-2010 a las 20:42 +0200, Pacho Ramos escribi=C3=B3:
+> > > Hello
+> > >=20
+> > > I would like to ask for help to try to find where could be the proble=
+m
+> > > causing this:
+> > > http://bugs.gentoo.org/show_bug.cgi?id=3D315749
+> > >=20
+> > > Reporter seems to need to manually run:
+> > > hid2hci --method dell -v 413c -p 8158 --mode hci
+> > >=20
+> > > to get bluetooth switched to hci mode.
+> > >=20
+> > > I don't understand why he needs to run it since involved udev rule fi=
+le
+> > > seems to be properly installed.
+> > >=20
+> > > Could anybody help us on this please?
+> > >=20
+> > > Thanks a lot
+> >=20
+> > This is still affecting to some users, can anybody help us? At least,
+> > how could we check if udev is, at least, trying to execute hid2hci from
+> > 97-bluetooth-hid2hci.rules file?
+>=20
+> 2 things.
+>=20
+> This is already fixed in udev upstream, and hid2hci doesn't live in
+> bluez, but in udev now.
+>=20
+> This was also fixed recently in Fedora 14.
+>=20
+> Cheers
+>=20
 
-It works fine to me.
+Really thanks a lot! Seems to solve the problem :-D
 
-Acked-by: Gustavo F. Padovan <padovan@profusion.mobi>
+--=-pu2IekkYSjcyQOhflCsg
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
 
--- 
-Gustavo F. Padovan
-http://padovan.org
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.15 (GNU/Linux)
+
+iEYEABECAAYFAkwdE4wACgkQCaWpQKGI+9RUmgCdGaxMIiDXJxhdFljrLaHnzvZm
+Sn8Ani1nN5PnSpsMyG/Re8l2g74MQbuB
+=JZ2U
+-----END PGP SIGNATURE-----
+
+--=-pu2IekkYSjcyQOhflCsg--
+
