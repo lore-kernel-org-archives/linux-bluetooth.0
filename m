@@ -1,36 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 20 Jun 2010 01:14:59 -0300
+Date: Sun, 20 Jun 2010 01:08:50 -0300
 From: "Gustavo F. Padovan" <gustavo@padovan.org>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Update sec_level and auth_type for already
- existing connections
-Message-ID: <20100620041459.GB32372@vigoh>
-References: <1276606565-4381-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@nokia.com>
+Subject: Re: [PATCH] Bluetooth: Reset the security level after an
+ authentication failure
+Message-ID: <20100620040807.GA32372@vigoh>
+References: <1276848536-29895-1-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1276606565-4381-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1276848536-29895-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Johan,
 
-* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2010-06-15 15:56:05 +0300]:
+* johan.hedberg@gmail.com <johan.hedberg@gmail.com> [2010-06-18 11:08:56 +0300]:
 
-> From: Ville Tervo <ville.tervo@nokia.com>
+> From: Johan Hedberg <johan.hedberg@nokia.com>
 > 
-> Update auth level for already existing connections if it is lower
-> than required by new connection.
+> When authentication fails for a connection the assumed security level
+> should be set back to BT_SECURITY_LOW so that subsequent connect
+> attempts over the same link don't falsely assume that security is
+> adequate enough.
 > 
-> Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
-> Reviewed-by: Emeltchenko Andrei <andrei.emeltchenko@nokia.com>
-> Signed-off-by: Luciano Coelho <luciano.coelho@nokia.com>
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
 > ---
->  net/bluetooth/hci_conn.c |    5 +++++
->  1 files changed, 5 insertions(+), 0 deletions(-)
+>  net/bluetooth/hci_event.c |    2 ++
+>  1 files changed, 2 insertions(+), 0 deletions(-)
 
-What's the use case here? i.e., how do I test your patch?
+It works fine to me.
+
+Acked-by: Gustavo F. Padovan <padovan@profusion.mobi>
 
 -- 
 Gustavo F. Padovan
