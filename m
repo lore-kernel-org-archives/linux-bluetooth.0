@@ -1,106 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <lc60d4toGTL.A.QzD._LpHMB@chimera>
-References: <lc60d4toGTL.A.QzD._LpHMB@chimera>
+In-Reply-To: <g77CuMUl7QI.A.qMH.4ZpHMB@chimera>
+References: <g77CuMUl7QI.A.qMH.4ZpHMB@chimera>
 From: "Luis R. Rodriguez" <mcgrof@gmail.com>
-Date: Mon, 21 Jun 2010 11:49:33 -0700
-Message-ID: <AANLkTikVpTyNyYWf5xIO_3ok4OwbhxoiD40G3PAK8zp8@mail.gmail.com>
-Subject: Re: 2.6.35-rc3: Reported regressions from 2.6.34
+Date: Mon, 21 Jun 2010 11:32:28 -0700
+Message-ID: <AANLkTinRKbRPPzEqhdcexISRJKViBldG01cj9aF0wPx-@mail.gmail.com>
+Subject: Re: 2.6.35-rc3: Reported regressions 2.6.33 -> 2.6.34
 To: linux-wireless <linux-wireless@vger.kernel.org>,
 	linux-bluetooth <linux-bluetooth@vger.kernel.org>
 Cc: "Rafael J. Wysocki" <rjw@sisk.pl>,
-	reinette chatre <reinette.chatre@intel.com>
+	reinette chatre <reinette.chatre@intel.com>, j@w1.fi,
+	adobriyan@gmail.com, tj@kernel.org,
+	Satish Eerpini <eerpini@gmail.com>,
+	Petr Pisar <petr.pisar@atlas.cz>, Pavel Machek <pavel@ucw.cz>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-wireless-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, Jun 20, 2010 at 3:11 PM, Rafael J. Wysocki <rjw@sisk.pl> wrote:
-> This message contains a list of some regressions from 2.6.34,
-> for which there are no fixes in the mainline known to the tracking team.
+On Sun, Jun 20, 2010 at 3:32 PM, Rafael J. Wysocki <rjw@sisk.pl> wrote:
+> This message contains a list of some post-2.6.33 regressions introduced before
+> 2.6.34, for which there are no fixes in the mainline known to the tracking team.
 > If any of them have been fixed already, please let us know.
 >
-> If you know of any other unresolved regressions from 2.6.34, please let us
-> know either and we'll add them to the list.  Also, please let us know
-> if any of the entries below are invalid.
+> If you know of any other unresolved post-2.6.33 regressions, please let us know
+> either and we'll add them to the list.  Also, please let us know if any
+> of the entries below are invalid.
 >
-> Each entry from the list will be sent additionally in an automatic reply
-> to this message with CCs to the people involved in reporting and handling
-> the issue.
+> Each entry from the list will be sent additionally in an automatic reply to
+> this message with CCs to the people involved in reporting and handling the
+> issue.
 >
 >
 > Listed regressions statistics:
 >
 >  Date          Total  Pending  Unresolved
 >  ----------------------------------------
->  2010-06-21       46       37          26
->  2010-06-09       15       13          10
+>  2010-06-21      114       36          28
+>  2010-06-13      111       40          34
+>  2010-05-09       80       27          24
+>  2010-05-04       76       26          22
+>  2010-04-20       64       35          34
+>  2010-04-07       48       35          33
+>  2010-03-21       15       13          10
 
-Leaving only the 802.11, and Bluetooth (none) ones:
+I'm going to just leave in the 802.11, Bluetooth and PCMCIA ones below:
 
 > Unresolved regressions
 > ----------------------
 
 
-> Bug-Entry       : http://bugzilla.kernel.org/show_bug.cgi?id=16235
-> Subject         : [REGRESSION] [IWL3945] Broadcast is broken?
-> Submitter       : Maciej Rutecki <maciej.rutecki@gmail.com>
-> Date            : 2010-06-14 17:24 (7 days old)
-> Message-ID      : <201006141924.24061.maciej.rutecki@gmail.com>
-> References      : http://marc.info/?l=linux-kernel&m=127653628301300&w=2
+> Bug-Entry       : http://bugzilla.kernel.org/show_bug.cgi?id=16111
+> Subject         : hostap_pci: infinite registered netdevice wifi0
+> Submitter       : Petr Pisar <petr.pisar@atlas.cz>
+> Date            : 2010-06-02 20:55 (19 days old)
 
-As noted by Maxim, the fix is in some Intel tree, but not upstream yet
-(if so why ?)
+The last entry on this one says we are not sure how to fix this...
 
-> Bug-Entry       : http://bugzilla.kernel.org/show_bug.cgi?id=16232
-> Subject         : 2.6.35-rc3 - WARNING:iwl_set_dynamic_key
-> Submitter       : Mario Guenterberg <mario.guenterberg@googlemail.com>
-> Date            : 2010-06-14 11:55 (7 days old)
-> Message-ID      : <20100614115510.GA7904@guenti-laptop>
-> References      : http://marc.info/?l=linux-kernel&m=127651695627147&w=2
+> Bug-Entry       : http://bugzilla.kernel.org/show_bug.cgi?id=16084
+> Subject         : iwl3945 bug in 2.6.34
+> Submitter       : Satish Eerpini <eerpini@gmail.com>
+> Date            : 2010-05-23 6:37 (29 days old)
+> Message-ID      : <AANLkTik_7rxDBc0TKlAfoYyM5S6Cf_Hyxbr4W5ORnTsq@mail.gmail.com>
+> References      : http://marc.info/?l=linux-kernel&m=127459596015626&w=2
 
-Rafael, this one actually has a supplied patch by Reinette and she's
-waiting on the user.
+This is getting some love by Reinette.
 
-> Bug-Entry       : http://bugzilla.kernel.org/show_bug.cgi?id=16201
-> Subject         : SIOCGIWFREQ ioctl fails to get frequency info
-> Submitter       : nuh <nuh@mailinator.net>
-> Date            : 2010-06-14 10:45 (7 days old)
+> Bug-Entry       : http://bugzilla.kernel.org/show_bug.cgi?id=15717
+> Subject         : bluetooth oops
+> Submitter       : Pavel Machek <pavel@ucw.cz>
+> Date            : 2010-03-14 20:14 (99 days old)
+> Message-ID      : <20100314201434.GE22059@elf.ucw.cz>
+> References      : http://marc.info/?l=linux-kernel&m=126859771528426&w=4
+> Handled-By      : Marcel Holtmann <marcel@holtmann.org>
 
-John is waiting on some user sample code to reproduce.
-
-> Bug-Entry       : http://bugzilla.kernel.org/show_bug.cgi?id=16176
-> Subject         : Microcode errors with iwl3945
-> Submitter       : Steinar H. Gunderson <sgunderson@bigfoot.com>
-> Date            : 2010-06-10 19:28 (11 days old)
-
-One issue replaced with another, but the microcode issues seems to be
-fixed now on rc3.
+Pavel, is this still happening or was just spurious on 2.6.34-rc1?
 
 > Regressions with patches
 > ------------------------
 
 
-> Bug-Entry       : http://bugzilla.kernel.org/show_bug.cgi?id=16196
-> Subject         : 2.6.35-rc2-git1 - WARNING: at net/wireless/mlme.c:341 cfg80211_send_assoc_timeout+0x107/0x11e [cfg80211]()
-> Submitter       : Miles Lane <miles.lane@gmail.com>
-> Date            : 2010-06-07 19:06 (14 days old)
-> Message-ID      : <AANLkTinmZh9GnrZLzOGi5Q_xHbky8cKdHAkOnsIA6_dZ@mail.gmail.com>
-> References      : http://marc.info/?l=linux-kernel&m=127593758817428&w=2
-> Handled-By      : Johannes Berg <johannes.berg@intel.com>
-> Patch           : http://marc.info/?l=linux-wireless&m=127608099427316&w=2
+> Bug-Entry       : http://bugzilla.kernel.org/show_bug.cgi?id=16138
+> Subject         : PCMCIA regression
+> Submitter       : Mikulas Patocka <mpatocka@redhat.com>
+> Date            : 2010-05-25 20:25 (27 days old)
+> Message-ID      : <Pine.LNX.4.64.1005251619020.12278@hs20-bc2-1.build.redhat.com>
+> References      : http://marc.info/?l=linux-kernel&m=127481913909672&w=2
+> Handled-By      : Dominik Brodowski <linux@brodo.de>
+> Patch           : https://bugzilla.kernel.org/attachment.cgi?id=26685
 
-Patch confirmed to work.
+Linville, are you to get PCMCIA stuff now? Anyway Rafael, please
+remove this, this is fixed.
 
 > For details, please visit the bug entries and follow the links given in
 > references.
 >
 > As you can see, there is a Bugzilla entry for each of the listed regressions.
-> There also is a Bugzilla entry used for tracking the regressions from 2.6.34,
-> unresolved as well as resolved, at:
+> There also is a Bugzilla entry used for tracking the regressions introduced
+> between 2.6.33 and 2.6.34, unresolved as well as resolved, at:
 >
-> http://bugzilla.kernel.org/show_bug.cgi?id=16055
+> http://bugzilla.kernel.org/show_bug.cgi?id=15310
 >
-> Please let the tracking team know if there are any Bugzilla entries that
+> Please let the tracking teak know if there are any Bugzilla entries that
 > should be added to the list in there.
 >
 > Thanks!
