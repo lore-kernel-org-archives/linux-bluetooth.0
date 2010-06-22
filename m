@@ -1,182 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 22 Jun 2010 18:52:04 -0300
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
+To: Nathan Holstein <ngh@isomerica.net>
+Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: panic after shutting down an ERTM socket
+Message-ID: <20100622215204.GB11241@vigoh>
+References: <1277236515.14834.477.camel@strawberry>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTimkZQRzE39WG6Kw9PlYJpXONwA-BvEZxym2J6gi@mail.gmail.com>
-References: <w2ra6ca4e821005071241w9d7d982ezb78ad0ba4480e73d@mail.gmail.com>
-	<s2oa6ca4e821005071249tdfd2e197i2595b57ae2ccb705@mail.gmail.com>
-	<20100507195325.GB4857@vigoh>
-	<AANLkTilSynGNcpdq8h5YJQVD8e5MMyUDq55WzsB05AA2@mail.gmail.com>
-	<20100517023917.GI23754@vigoh>
-	<AANLkTin3FNuVegPI013fzLQn7YsHzpfr7ZymnCG1mpt-@mail.gmail.com>
-	<AANLkTin0B-f2i5e2TvDVDLuRZ7eRND-u4lVor1GSIhGT@mail.gmail.com>
-	<AANLkTimkZQRzE39WG6Kw9PlYJpXONwA-BvEZxym2J6gi@mail.gmail.com>
-Date: Wed, 23 Jun 2010 01:48:10 +0300
-Message-ID: <AANLkTimrGNPtiuzB_coV6VwHmNvb7taZvePNL1QZ555G@mail.gmail.com>
-Subject: Re: Software caused connection abort (103 )
-From: john michelle <jhnmichelle@gmail.com>
-To: "Gustavo F. Padovan" <gustavo@padovan.org>, linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, torvalds@osdl.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1277236515.14834.477.camel@strawberry>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dear Bluetooth community,
+Hi Nathan,
 
-You are committing version after version and have time to add new
-Features and the core stack have a major bug (software Caused
-connection abort) that i
-Have reported on the 7th of may the problem seems to be either in the
-usb part of the
-Kernel or the bluez stack, i am no kernel engineer so i came directly
-to you for reporting
-This problem and my requests to look into this problem are just
-ignored. this is a blocker
-Issue that would prevent and discourage any one from developing
-application that rely on
-Bluez sco capabilities, since during transmission the above mentioned
-error just occurs.
-I hope that my voice is heared and i would get a reply from the bluez commu=
-nity.
+* Nathan Holstein <ngh@isomerica.net> [2010-06-22 15:55:15 -0400]:
 
-John
+> I'm seeing a crash from an ERTM socket after it's been shutdown.  I'm
+> running a back-ported series of patches from 6 weeks ago (commit
+> dfc909b) on a 2.6.32 kernel.
+> 
+> The crash I'm seeing seems to be due to a monitor timeout firing after
+> the parent l2cap_conn has been deleted.  Here's the relevant bits from
+> the crash dump:
+>         [ 2825.234283] l2cap_disconn_cfm (4390): hcon c6895600 reason 8
+>         [ 2825.234771] l2cap_conn_del (612): hcon c6895600 conn c681f540, err 110
+>         [ 2825.235229] l2cap_sock_clear_timer (121): sock c688f800 state 5
+>         [ 2825.235443] l2cap_chan_del (262): sk c688f800, conn c681f540, err 110
+>         [ 2825.235931] l2cap_sock_clear_timer (121): sock c6f7b800 state 1
+>         [ 2825.236175] l2cap_chan_del (262): sk c6f7b800, conn c681f540, err 110
+>         [ 2825.237243] l2cap_sock_release (2189): sock c759a560, sk c688f800
+>         [ 2825.237487] l2cap_sock_shutdown (2162): sock c759a560, sk c688f800
+>         [ 2825.238433] l2cap_sock_release (2189): sock c75a0b60, sk c6f7b800
+>         [ 2825.238677] l2cap_sock_shutdown (2162): sock c75a0b60, sk c6f7b800
+>         [ 2825.239105] l2cap_sock_clear_timer (121): sock c6f7b800 state 9
+>         [ 2825.239349] __l2cap_sock_close (730): sk c6f7b800 state 9 socket c75a0b60
+>         [ 2825.239776] l2cap_sock_kill (720): sk c6f7b800 state 9
+>         [ 2825.243804] l2cap_sock_clear_timer (121): sock c688f800 state 9
+>         [ 2825.244232] __l2cap_sock_close (730): sk c688f800 state 9 socket c759a560
+>         [ 2825.244659] l2cap_sock_kill (720): sk c688f800 state 9
+>         [ 2825.244903] l2cap_sock_destruct (692): sk c688f800
+>         [ 2829.417694] l2cap_send_sframe (366): pi c6f7b800, control 0x10
+>         [ 2829.418365] Unable to handle kernel NULL pointer dereference at virtual address 0000000c
+> 
+>         [ 2829.627502] [<bf002e50>] (l2cap_monitor_timeout+0xc8/0x21c [l2cap]) from [<c005f918>] (run_timer_softirq+0x1a4/0x258)
+>         [ 2829.628143] [<c005f918>] (run_timer_softirq+0x1a4/0x258) from [<c005b380>] (__do_softirq+0x70/0xf8)
+>         [ 2829.628814] [<c005b380>] (__do_softirq+0x70/0xf8) from [<c005b44c>] (irq_exit+0x44/0xa8)
+>         [ 2829.629180] [<c005b44c>] (irq_exit+0x44/0xa8) from [<c002606c>] (asm_do_IRQ+0x6c/0x84)
+>         [ 2829.629821] [<c002606c>] (asm_do_IRQ+0x6c/0x84) from [<c0026a8c>] (__irq_svc+0x4c/0x8c)
+> 
+> The crash occurs when accessing conn->mtu within l2cap_send_sframe.
+> 
+> Looking through the logs, it appears that commit fd24051 might fix this
+> issue.  If not, I'll look into this further.
 
+Yes, it is already fixed.
 
-
-On Wed, Jun 16, 2010 at 3:11 PM, john michelle <jhnmichelle@gmail.com> wrot=
-e:
-> On Sun, May 30, 2010 at 1:12 PM, john michelle <jhnmichelle@gmail.com> wr=
-ote:
->> Hi Gustavo,
->>
->>>> Please post the output of hcidump when the connection abort happens.
->>>>
->>
->> Below is the output of hcidump the moments the software caused connectio=
-n abort
->>
->> Dongle 1:
->>> HCI Event: Number of Completed Packets (0x13) plen 5
->> =A0. * . . .
->> < HCI Command: Reset (0x03|0x0003) plen 0
->> device: disconnected
->>
->> Dongle 2:
->>> HCI Event: Number of Completed Packets (0x13) plen 5
->> =A0. * . . .
->> < HCI Command: Reset (0x03|0x0003) plen 0
->> device: disconnected
->>
->>
->> I think something triggers hci reset which causes this problem, but what=
- exactly
->> Triggers it i don't know.
->>
->>
->> John
->>
->>
->
->
-> Hi all,
->
-> Is anyone going to give this problem a try, it has been like a month now
-> This is a real problem in the bluez stack and someone have to look in thi=
-s
-> Issue.
->
-> John
->
->> On Mon, May 17, 2010 at 5:21 PM, john michelle <jhnmichelle@gmail.com> w=
-rote:
->>>> Hi Jonh,
->>>>
->>>> First of all, don't do top posting in this mailing list. ;)
->>>>
->>>
->>> Thanks for the advise , will keep that in mind for future posts.
->>>
->>>> In which bluez/kernel version the problem started? Any hardware update
->>>> during this time? The problem happens when you are already tranfering
->>>> SCO data?
->>>>
->>>
->>> I tried bluez versions 3.XX =A0and kernel 2.6.26(I think) the problem
->>> occurs and the kernel panics with no core dumps.then i tried with
->>> bluez 4.53-4.62 with
->>> Kernel 2.6.31 and 2.6.32. the connection abort problem occurs but the
->>> kernel doesn't
->>> Panic. regarding the hardware update you mean the dongle or the box.Any=
-way
->>> i changed both and tried different box's, this even happens on a box
->>> with 2 giga ram
->>> And core2 processor . as for the dongles i am using trust
->>>
->>> http://www.twenga.co.uk/prices-Bluetooth-2-USB-Adapter-10m-BT-2250p-TRU=
-ST-Wireless-network-card-adapter-176178-0
->>>
->>> =A0and also using no name dongles all the same problem.
->>>
->>>> Please post the output of hcidump when the connection abort happens.
->>>>
->>>
->>> well that is going to be a hard one since i have more than one dongle i=
-n place
->>> And very hard to predict which one will crash.i will work on this and u=
-pdate
->>> You as soon as i have the hcidump log.
->>>
->>>
->>>
->>>> I tried reproduce this issue in L2CAP but it is a bit hard, lets
->>>> say it happen once in a thousand, so it's not easy to track it. I have
->>>> to try reproduce that using the SCO, but I'm not used to that layer ye=
-t.
->>>> ;)
->>>
->>> I hoped that it happens 1 in 1000 in SCO , but it actually happens 1 in=
- 15
->>>
->>>
->>> John
->>>
->>>
->>>
->>>>
->>>> Regards,
->>>>
->>>>>
->>>>> John
->>>>>
->>>>> On Fri, May 7, 2010 at 3:53 PM, Gustavo F. Padovan <gustavo@padovan.o=
-rg> wrote:
->>>>> > * john michelle <jhnmichelle@gmail.com> [2010-05-07 15:49:05 -0400]=
-:
->>>>> >
->>>>> >> Hi Bluetooth hackers,
->>>>> >>
->>>>> >> i am having this consistent problem with bluez , from time to time=
- i
->>>>> >> get the error Software caused connection abort (103 )
->>>>> >> And the bluetooth stick seems to disconnect and reconnects. this
->>>>> >> happens during an sco connection and it occurs even
->>>>> >> More when i am having the voice stream comming through the interne=
-t
->>>>> >> rather than the lan.i don't know what exact
->>>>> >> Details you need to solve this problem please tell me and i will g=
-ive
->>>>> >> you an immediate reply . i have linux kernel 2.6.33 and bluez 4.62
->>>>> >
->>>>> > I get the same problem sometimes when testing ERTM with l2test. So =
-the
->>>>> > problem is on l2cap too. I didn't have time to debug this yet. Now =
-that
->>>>> > someone else have confirmed it too, I'll to take a look at the prob=
-lem.
->>>>> >
->>>>> >>
->>>>
->>>> --
->>>> Gustavo F. Padovan
->>>> http://padovan.org
->>>>
->>>
->>
->
+-- 
+Gustavo F. Padovan
+http://padovan.org
