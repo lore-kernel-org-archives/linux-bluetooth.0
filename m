@@ -1,54 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: panic after shutting down an ERTM socket
-From: Nathan Holstein <ngh@isomerica.net>
-Reply-To: ngh@isomerica.net
-To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain
-Date: Tue, 22 Jun 2010 15:55:15 -0400
-Message-Id: <1277236515.14834.477.camel@strawberry>
+Subject: Re: obexd: obex_handle_input: poll event HUP ERR
+From: Bastien Nocera <hadess@hadess.net>
+To: Jiri Slaby <jirislaby@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <4C20E1C8.9020409@gmail.com>
+References: <4C206507.40402@gmail.com> <20100622073841.GA13989@jh-x301>
+	 <4C206924.50303@gmail.com> <20100622075833.GA14319@jh-x301>
+	 <4C206E7F.5000604@gmail.com> <20100622081345.GA14746@jh-x301>
+	 <4C20E1C8.9020409@gmail.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Date: Tue, 22 Jun 2010 17:34:50 +0100
+Message-ID: <1277224491.9334.40.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I'm seeing a crash from an ERTM socket after it's been shutdown.  I'm
-running a back-ported series of patches from 6 weeks ago (commit
-dfc909b) on a 2.6.32 kernel.
+On Tue, 2010-06-22 at 18:16 +0200, Jiri Slaby wrote:
+> On 06/22/2010 10:13 AM, Johan Hedberg wrote:
+> > On Tue, Jun 22, 2010, Jiri Slaby wrote:
+> >> Yeah, -a solved the problem. What does it mean to have an agent
+> >> registered? What is agent?
+> > 
+> > If you don't want obexd to go blindly accepting files from random remote
+> > devices you'll probably want some sort of user interaction on the server
+> > side, right? One possibility would be to have a GUI process show a
+> > "Accept file from ..." dialog every time there's an incoming request.
+> > You might also want to choose exactly where on the filesystem obexd
+> > stores the incoming file. Such choices would be made by an agent, i.e.
+> > a process separate from obexd that has through D-Bus told obexd that it
+> > can take care of incoming requests. There's an example command line
+> > agent written in python available at test/simple-agent in the obexd
+> > source tree. The actual D-Bus API of an agent is documented in
+> > doc/agent-api.txt in the same source tree.
+> 
+> I have gnome-bluetooth-2.30, but I guess it was not converted to act
+> also as obexd Agent yet.
 
-The crash I'm seeing seems to be due to a monitor timeout firing after
-the parent l2cap_conn has been deleted.  Here's the relevant bits from
-the crash dump:
-        [ 2825.234283] l2cap_disconn_cfm (4390): hcon c6895600 reason 8
-        [ 2825.234771] l2cap_conn_del (612): hcon c6895600 conn c681f540, err 110
-        [ 2825.235229] l2cap_sock_clear_timer (121): sock c688f800 state 5
-        [ 2825.235443] l2cap_chan_del (262): sk c688f800, conn c681f540, err 110
-        [ 2825.235931] l2cap_sock_clear_timer (121): sock c6f7b800 state 1
-        [ 2825.236175] l2cap_chan_del (262): sk c6f7b800, conn c681f540, err 110
-        [ 2825.237243] l2cap_sock_release (2189): sock c759a560, sk c688f800
-        [ 2825.237487] l2cap_sock_shutdown (2162): sock c759a560, sk c688f800
-        [ 2825.238433] l2cap_sock_release (2189): sock c75a0b60, sk c6f7b800
-        [ 2825.238677] l2cap_sock_shutdown (2162): sock c75a0b60, sk c6f7b800
-        [ 2825.239105] l2cap_sock_clear_timer (121): sock c6f7b800 state 9
-        [ 2825.239349] __l2cap_sock_close (730): sk c6f7b800 state 9 socket c75a0b60
-        [ 2825.239776] l2cap_sock_kill (720): sk c6f7b800 state 9
-        [ 2825.243804] l2cap_sock_clear_timer (121): sock c688f800 state 9
-        [ 2825.244232] __l2cap_sock_close (730): sk c688f800 state 9 socket c759a560
-        [ 2825.244659] l2cap_sock_kill (720): sk c688f800 state 9
-        [ 2825.244903] l2cap_sock_destruct (692): sk c688f800
-        [ 2829.417694] l2cap_send_sframe (366): pi c6f7b800, control 0x10
-        [ 2829.418365] Unable to handle kernel NULL pointer dereference at virtual address 0000000c
+gnome-bluetooth doesn't have any Obex server bits. You'd need to use
+gnome-user-share to have Obex server capabilities, and it doesn't use
+obexd right now, but obex-data-server.
 
-        [ 2829.627502] [<bf002e50>] (l2cap_monitor_timeout+0xc8/0x21c [l2cap]) from [<c005f918>] (run_timer_softirq+0x1a4/0x258)
-        [ 2829.628143] [<c005f918>] (run_timer_softirq+0x1a4/0x258) from [<c005b380>] (__do_softirq+0x70/0xf8)
-        [ 2829.628814] [<c005b380>] (__do_softirq+0x70/0xf8) from [<c005b44c>] (irq_exit+0x44/0xa8)
-        [ 2829.629180] [<c005b44c>] (irq_exit+0x44/0xa8) from [<c002606c>] (asm_do_IRQ+0x6c/0x84)
-        [ 2829.629821] [<c002606c>] (asm_do_IRQ+0x6c/0x84) from [<c0026a8c>] (__irq_svc+0x4c/0x8c)
+Patches welcome :)
 
-The crash occurs when accessing conn->mtu within l2cap_send_sframe.
-
-Looking through the logs, it appears that commit fd24051 might fix this
-issue.  If not, I'll look into this further.
-
-
-
-   --nathan
+Cheers
 
