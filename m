@@ -1,98 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <AANLkTimqxFFOM097G55yebL1VV7ZNOqmeeiEC7kyCu7A@mail.gmail.com>
-References: <AANLkTin25xCMcVDCzbeXO-ZZfxhS4O0foXU8wl4h3tds@mail.gmail.com>
-	<20100618184911.GA14514@vigoh>
-	<AANLkTimqxFFOM097G55yebL1VV7ZNOqmeeiEC7kyCu7A@mail.gmail.com>
-Date: Wed, 23 Jun 2010 20:36:58 +0300
-Message-ID: <AANLkTini1WctunEp2H6bjod1BKdDgLaTsJGreb0JSwC6@mail.gmail.com>
-Subject: Re: hci_scodata_packet: hci1 SCO packet for unknown connection handle
-	42
-From: Andrei Moraru <andrei.moraru.n@gmail.com>
-To: "Gustavo F. Padovan" <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: check l2cap pending status before sending l2cap connect request
+Date: Wed, 23 Jun 2010 10:30:37 +0300
+Message-Id: <1277278237-29377-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Jun 22, 2010 at 1:24 PM, Andrei Moraru
-<andrei.moraru.n@gmail.com> wrote:
-> On Fri, Jun 18, 2010 at 9:49 PM, Gustavo F. Padovan <gustavo@padovan.org> wrote:
->> Hi Andrei,
->>
->> * Andrei Moraru <andrei.moraru.n@gmail.com> [2010-06-18 15:29:41 +0300]:
->>
->>> Hello,
->>>
->>> the machine is running CentOS and Asterisk 1.4.32
->>>
->>> there are installed bluez-4.66 and asterisk module chan_mobile
->>>
->>> The Asterisk crashes sometimes when is using FXO over the bluetooth
->>> connection via chan_mobile
->>>
->>> uname -a:
->>> 2.6.18-164.el5 #1 SMP Thu Sep 3 03:33:56 EDT 2009 i686 athlon i386 GNU/Linux
->>
->> Update your kernel to a 2.6.34 at least and see if you still have this
->> issue.
->>
->> --
->> Gustavo F. Padovan
->> http://padovan.org
->>
->
-> updated the kernel version
-> #uname -a
-> Linux 2.6.34-default #2 SMP Mon Jun 21 17:55:19 EEST 2010 i686 i686
-> i386 GNU/Linux
->
-> for building latest kernel, i used the old config of working 2.6.18 kernel.
->
-> now, the system doesn't recognize any bluetooth adapter. The output of the
-> #hciconfig -a
-> is empty. Also:
-> # hcitool dev
-> Devices:
-> is empty.
->
-> The output of the lsusb:
-> #lsusb
-> Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
-> Bus 002 Device 003: ID 0a12:0001 Cambridge Silicon Radio, Ltd
-> Bluetooth Dongle (HCI mode)
-> Bus 002 Device 002: ID 0a12:0001 Cambridge Silicon Radio, Ltd
-> Bluetooth Dongle (HCI mode)
-> Bus 002 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
->
-> the dbus-daemon is running:
-> # ps ax | grep dbus
-> 22252 ?        Ss     0:00 dbus-daemon --system
->
-> the version of bluez is 4.66, the latest.
->
-> The problem is regarding the kernel config?
->
-> - - - - - - - - - -
-> Andrei Moraru
->
+From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 
-The problem solved this way:
+Due to race condition in L2CAP state machine L2CAP Connection Request
+may be sent twice for SDP with the same source channel id. Problems
+reported connecting to Apple products, some carkit, Blackberry phones.
 
-1) the kernel was rebuilt with HCI USB support, and the problem is
-gone; the command   hciconfig -a    shows connected BT dongles;
-2) also, the 2.6.3x +   kernel has compat-wireless stack  available.
-I've built it, and i've rebuilt the Bluez-4.66
-3) when started compat-wireless, got a lot of
+...
+2010-06-07 21:18:03.651031 < ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 1 scid 0x0040
+2010-06-07 21:18:03.653473 > HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+2010-06-07 21:18:03.653808 > HCI Event: Auth Complete (0x06) plen 3
+    status 0x00 handle 1
+2010-06-07 21:18:03.653869 < ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 1 scid 0x0040
+...
 
-Jun 23 17:16:13 voip kernel: l2cap: Unknown symbol hci_conn_check_link_mode
-Jun 23 17:16:13 voip kernel: l2cap: disagrees about version of symbol
-bt_sock_link
+Patch uses L2CAP_CONF_CONNECT_PEND flag to mark that L2CAP Connection
+Request has been sent.
 
-that means on my system some process used the old libbluetooth.so
-with lsof | grep blue* found that process, killed it, and reloaded the
-compat-wireless
+Modified version of Ville Tervo patch.
 
-Hope it will be usefull for others.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+---
+ net/bluetooth/l2cap.c |   11 +++++++++--
+ 1 files changed, 9 insertions(+), 2 deletions(-)
 
-Andrei Moraru.
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index bb00015..7f82f7b 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -409,13 +409,16 @@ static void l2cap_do_start(struct sock *sk)
+ 		if (!(conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE))
+ 			return;
+ 
+-		if (l2cap_check_security(sk)) {
++		if (l2cap_check_security(sk) &&
++				!(l2cap_pi(sk)->conf_state &
++				L2CAP_CONF_CONNECT_PEND)) {
+ 			struct l2cap_conn_req req;
+ 			req.scid = cpu_to_le16(l2cap_pi(sk)->scid);
+ 			req.psm  = l2cap_pi(sk)->psm;
+ 
+ 			l2cap_pi(sk)->ident = l2cap_get_ident(conn);
+ 
++			l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
+ 			l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
+ 					L2CAP_CONN_REQ, sizeof(req), &req);
+ 		}
+@@ -464,13 +467,16 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 		}
+ 
+ 		if (sk->sk_state == BT_CONNECT) {
+-			if (l2cap_check_security(sk)) {
++			if (l2cap_check_security(sk) &&
++					!(l2cap_pi(sk)->conf_state &
++					L2CAP_CONF_CONNECT_PEND)) {
+ 				struct l2cap_conn_req req;
+ 				req.scid = cpu_to_le16(l2cap_pi(sk)->scid);
+ 				req.psm  = l2cap_pi(sk)->psm;
+ 
+ 				l2cap_pi(sk)->ident = l2cap_get_ident(conn);
+ 
++				l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
+ 				l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
+ 					L2CAP_CONN_REQ, sizeof(req), &req);
+ 			}
+@@ -4407,6 +4413,7 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 
+ 				l2cap_pi(sk)->ident = l2cap_get_ident(conn);
+ 
++				l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
+ 				l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
+ 					L2CAP_CONN_REQ, sizeof(req), &req);
+ 			} else {
+-- 
+1.7.0.4
+
