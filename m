@@ -1,116 +1,97 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTini1WctunEp2H6bjod1BKdDgLaTsJGreb0JSwC6@mail.gmail.com>
-References: <AANLkTin25xCMcVDCzbeXO-ZZfxhS4O0foXU8wl4h3tds@mail.gmail.com>
-	<20100618184911.GA14514@vigoh>
-	<AANLkTimqxFFOM097G55yebL1VV7ZNOqmeeiEC7kyCu7A@mail.gmail.com>
-	<AANLkTini1WctunEp2H6bjod1BKdDgLaTsJGreb0JSwC6@mail.gmail.com>
-Date: Thu, 24 Jun 2010 12:28:46 +0300
-Message-ID: <AANLkTim6WM_Zti-Y-jBeB0VTqigsBW_p9bhuENYCpkvg@mail.gmail.com>
-Subject: Re: hci_scodata_packet: hci1 SCO packet for unknown connection handle
-	42
-From: Andrei Moraru <andrei.moraru.n@gmail.com>
-To: "Gustavo F. Padovan" <gustavo@padovan.org>
+In-Reply-To: <AANLkTikqyXXpC0guYSAZb4L-V6Cg5A_L6MJdcc5ChRpJ@mail.gmail.com>
+References: <1277320206-6969-1-git-send-email-harri.mahonen@gmail.com>
+	<AANLkTikqyXXpC0guYSAZb4L-V6Cg5A_L6MJdcc5ChRpJ@mail.gmail.com>
+Date: Thu, 24 Jun 2010 11:09:47 +0300
+Message-ID: <AANLkTimbLBxcU5nZE9UUQJGkHgMLe5LNnvLt1G0jckVF@mail.gmail.com>
+Subject: Re: [PATCH] audio: fix memory leak with typefinding
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: harri.mahonen@gmail.com
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello
+Hi,
 
-On Wed, Jun 23, 2010 at 8:36 PM, Andrei Moraru
-<andrei.moraru.n@gmail.com> wrote:
-> On Tue, Jun 22, 2010 at 1:24 PM, Andrei Moraru
-> <andrei.moraru.n@gmail.com> wrote:
->> On Fri, Jun 18, 2010 at 9:49 PM, Gustavo F. Padovan <gustavo@padovan.org> wrote:
->>> Hi Andrei,
->>>
->>> * Andrei Moraru <andrei.moraru.n@gmail.com> [2010-06-18 15:29:41 +0300]:
->>>
->>>> Hello,
->>>>
->>>> the machine is running CentOS and Asterisk 1.4.32
->>>>
->>>> there are installed bluez-4.66 and asterisk module chan_mobile
->>>>
->>>> The Asterisk crashes sometimes when is using FXO over the bluetooth
->>>> connection via chan_mobile
->>>>
->>>> uname -a:
->>>> 2.6.18-164.el5 #1 SMP Thu Sep 3 03:33:56 EDT 2009 i686 athlon i386 GNU/Linux
->>>
->>> Update your kernel to a 2.6.34 at least and see if you still have this
->>> issue.
->>>
->>> --
->>> Gustavo F. Padovan
->>> http://padovan.org
->>>
->>
->> updated the kernel version
->> #uname -a
->> Linux 2.6.34-default #2 SMP Mon Jun 21 17:55:19 EEST 2010 i686 i686
->> i386 GNU/Linux
->>
->> for building latest kernel, i used the old config of working 2.6.18 kernel.
->>
->> now, the system doesn't recognize any bluetooth adapter. The output of the
->> #hciconfig -a
->> is empty. Also:
->> # hcitool dev
->> Devices:
->> is empty.
->>
->> The output of the lsusb:
->> #lsusb
->> Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
->> Bus 002 Device 003: ID 0a12:0001 Cambridge Silicon Radio, Ltd
->> Bluetooth Dongle (HCI mode)
->> Bus 002 Device 002: ID 0a12:0001 Cambridge Silicon Radio, Ltd
->> Bluetooth Dongle (HCI mode)
->> Bus 002 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
->>
->> the dbus-daemon is running:
->> # ps ax | grep dbus
->> 22252 ?        Ss     0:00 dbus-daemon --system
->>
->> the version of bluez is 4.66, the latest.
->>
->> The problem is regarding the kernel config?
->>
->> - - - - - - - - - -
->> Andrei Moraru
->>
+On Thu, Jun 24, 2010 at 10:52 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi,
 >
-> The problem solved this way:
+> On Wed, Jun 23, 2010 at 10:10 PM,  <harri.mahonen@gmail.com> wrote:
+>> From: Harri Mahonen <harri.mahonen@gmail.com>
+>>
+>> sbc structure gets leaked each time when there is no data or SBC
+>> syncword, because sbc_finalize is not called. Call sbc_init after
+>> checking the data for syncword.
+>>
+>> Signed-off-by: Harri Mahonen <harri.mahonen@gmail.com>
+>> ---
+>>  audio/gstbluetooth.c |    4 ++--
+>>  1 files changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/audio/gstbluetooth.c b/audio/gstbluetooth.c
+>> index 26dd4a5..11aefd7 100644
+>> --- a/audio/gstbluetooth.c
+>> +++ b/audio/gstbluetooth.c
+>> @@ -50,10 +50,10 @@ static void sbc_typefind(GstTypeFind *tf, gpointer ignore)
+>>        sbc_t sbc;
+>>        guint8 *data = gst_type_find_peek(tf, 0, 32);
+>>
+>> -       if (sbc_init(&sbc, 0) < 0)
+>> +       if (data == NULL || *data != 0x9c)      /* SBC syncword */
+>>                return;
+>>
+>> -       if (data == NULL || *data != 0x9c)      /* SBC syncword */
+>> +       if (sbc_init(&sbc, 0) < 0)
+>>                return;
+>>
+>>        aux = g_new(guint8, 32);
 >
-> 1) the kernel was rebuilt with HCI USB support, and the problem is
-> gone; the command   hciconfig -a    shows connected BT dongles;
-> 2) also, the 2.6.3x +   kernel has compat-wireless stack  available.
-> I've built it, and i've rebuilt the Bluez-4.66
-> 3) when started compat-wireless, got a lot of
->
-> Jun 23 17:16:13 voip kernel: l2cap: Unknown symbol hci_conn_check_link_mode
-> Jun 23 17:16:13 voip kernel: l2cap: disagrees about version of symbol
-> bt_sock_link
->
-> that means on my system some process used the old libbluetooth.so
-> with lsof | grep blue* found that process, killed it, and reloaded the
-> compat-wireless
->
-> Hope it will be usefull for others.
->
-> Andrei Moraru.
->
+> We might want to have this fix inside sbc_init instead since others
+> projects like pulseaudio may run into the same problem, also I guess
+> it is a good practice to free any data allocated when returning an
+> error.
 
-the /var/log/messages are filled with
+Sorry, I misunderstood the problem, it is really gstreamer only issue,
+but I would suggest using the return of sbc_parse so we don't have to
+hardcode sbc sync word detection, something like the following:
 
-hci_scodata_packet: hci1 SCO packet for unknown connection handle 0
-hci_scodata_packet: hci1 SCO packet for unknown connection handle 43
-btusb_isoc_complete: hci1 corrupted SCO packet
-btusb_isoc_complete: hci1 corrupted SCO packet
-hci_scodata_packet: hci1 SCO packet for unknown connection handle 42
+diff --git a/audio/gstbluetooth.c b/audio/gstbluetooth.c
+index 26dd4a5..9930820 100644
+--- a/audio/gstbluetooth.c
++++ b/audio/gstbluetooth.c
+@@ -50,21 +50,24 @@ static void sbc_typefind(GstTypeFind *tf, gpointer ignore)
+        sbc_t sbc;
+        guint8 *data = gst_type_find_peek(tf, 0, 32);
 
+-       if (sbc_init(&sbc, 0) < 0)
++       if (data == NULL)
+                return;
 
+-       if (data == NULL || *data != 0x9c)      /* SBC syncword */
++       if (sbc_init(&sbc, 0) < 0)
+                return;
 
-Andrei Moraru.
+        aux = g_new(guint8, 32);
+        memcpy(aux, data, 32);
+-       sbc_parse(&sbc, aux, 32);
+-       g_free(aux);
+-       caps = gst_sbc_parse_caps_from_sbc(&sbc);
+-       sbc_finish(&sbc);
++       if (sbc_parse(&sbc, aux, 32) < 0)
++               goto done;
+
++       caps = gst_sbc_parse_caps_from_sbc(&sbc);
+        gst_type_find_suggest(tf, GST_TYPE_FIND_POSSIBLE, caps);
+        gst_caps_unref(caps);
++
++done:
++       g_free(aux);
++       sbc_finish(&sbc);
+ }
+
+-- 
+Luiz Augusto von Dentz
+Computer Engineer
