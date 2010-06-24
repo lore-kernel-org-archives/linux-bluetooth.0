@@ -1,59 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Users need to manually run "hid2hci --method dell -v 413c -p
- 8158 --mode hci" even when udev rule is installed
-From: Bastien Nocera <hadess@hadess.net>
-To: pacho@condmat1.ciencias.uniovi.es
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1276973964.16187.1.camel@localhost.localdomain>
-References: <1276962936.13559.143.camel@localhost.localdomain>
-	 <1276973964.16187.1.camel@localhost.localdomain>
-Content-Type: text/plain; charset="ISO-8859-1"
-Date: Thu, 24 Jun 2010 15:34:42 +0100
-Message-ID: <1277390082.9334.129.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCH v3 1/3] Implements hci_reassembly to reassemble Rx
+ packets
+From: suraj <suraj@atheros.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <marcel@holtmann.org>, <Luis.Rodriguez@Atheros.com>,
+	<Jothikumar.Mothilal@Atheros.com>
+In-Reply-To: <1276088748.31226.6.camel@atheros013-desktop>
+References: <1276088748.31226.6.camel@atheros013-desktop>
+Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 24 Jun 2010 15:10:16 +0530
+Message-ID: <1277372416.25709.2.camel@atheros013-desktop>
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, 2010-06-19 at 20:59 +0200, Pacho Ramos wrote:
-> El sáb, 19-06-2010 a las 16:55 +0100, Bastien Nocera escribió:
-> > On Sat, 2010-06-19 at 17:05 +0200, Pacho Ramos wrote:
-> > > El sáb, 24-04-2010 a las 20:42 +0200, Pacho Ramos escribió:
-> > > > Hello
-> > > > 
-> > > > I would like to ask for help to try to find where could be the problem
-> > > > causing this:
-> > > > http://bugs.gentoo.org/show_bug.cgi?id=315749
-> > > > 
-> > > > Reporter seems to need to manually run:
-> > > > hid2hci --method dell -v 413c -p 8158 --mode hci
-> > > > 
-> > > > to get bluetooth switched to hci mode.
-> > > > 
-> > > > I don't understand why he needs to run it since involved udev rule file
-> > > > seems to be properly installed.
-> > > > 
-> > > > Could anybody help us on this please?
-> > > > 
-> > > > Thanks a lot
-> > > 
-> > > This is still affecting to some users, can anybody help us? At least,
-> > > how could we check if udev is, at least, trying to execute hid2hci from
-> > > 97-bluetooth-hid2hci.rules file?
-> > 
-> > 2 things.
-> > 
-> > This is already fixed in udev upstream, and hid2hci doesn't live in
-> > bluez, but in udev now.
-> > 
-> > This was also fixed recently in Fedora 14.
-> > 
-> > Cheers
-> > 
+Hi Marcel,
+
+On Wed, 2010-06-09 at 18:35 +0530, suraj wrote:
+> Implements feature to reassemble received HCI frames from any input stream.
 > 
-> Really thanks a lot! Seems to solve the problem :-D
+> Signed-off-by: Suraj Sumangala <suraj@atheros.com>
+> ---
+>  net/bluetooth/hci_core.c |  115 ++++++++++++++++++++++++++++++++++++++++++++++
+>  1 files changed, 115 insertions(+), 0 deletions(-)
+> 
+Can you please verify this implementation? Or direct me to someone who
+has time to do it?
 
-Was that sarcastic. I hope not, I sent this in good faith, because I
-fixed that exact same bug a couple of days before sending the mail.
-
-Cheers
-
+Regards
+Suraj
