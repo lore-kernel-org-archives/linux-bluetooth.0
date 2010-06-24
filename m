@@ -1,81 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Users need to manually run "hid2hci --method dell -v 413c -p
- 8158 --mode hci" even when udev rule is installed
-From: Pacho Ramos <pacho@condmat1.ciencias.uniovi.es>
-Reply-To: pacho@condmat1.ciencias.uniovi.es
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1277390082.9334.129.camel@localhost.localdomain>
-References: <1277390082.9334.129.camel@localhost.localdomain>
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-+hVD1/4JVaUKpZS5oOcy"
-Date: Thu, 24 Jun 2010 17:01:38 +0200
-Message-ID: <1277391698.25546.37.camel@localhost.localdomain>
-Mime-Version: 1.0
+From: harri.mahonen@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Cc: Harri Mahonen <harri.mahonen@gmail.com>
+Subject: [PATCH v3] audio: fix memory leak with typefinding
+Date: Thu, 24 Jun 2010 18:01:12 +0300
+Message-Id: <1277391672-10563-1-git-send-email-harri.mahonen@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Harri Mahonen <harri.mahonen@gmail.com>
 
---=-+hVD1/4JVaUKpZS5oOcy
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Each time sbc_typefind is called and there is no syncword, sbc_finalize
+never gets called. Instead of hardcoded syncword check, rely on
+sbc_parse to do it properly.
+---
+ audio/gstbluetooth.c |   16 ++++++++++------
+ 1 files changed, 10 insertions(+), 6 deletions(-)
 
-El jue, 24-06-2010 a las 15:34 +0100, Bastien Nocera escribi=C3=B3:
-> > > > This is still affecting to some users, can anybody help us? At leas=
-t,
-> > > > how could we check if udev is, at least, trying to execute hid2hci =
-from
-> > > > 97-bluetooth-hid2hci.rules file?
-> > >=20
-> > > 2 things.
-> > >=20
-> > > This is already fixed in udev upstream, and hid2hci doesn't live in
-> > > bluez, but in udev now.
-> > >=20
-> > > This was also fixed recently in Fedora 14.
-> > >=20
-> > > Cheers
-> > >=20
-> >=20
-> > Really thanks a lot! Seems to solve the problem :-D
->=20
-> Was that sarcastic. I hope not, I sent this in good faith, because I
-> fixed that exact same bug a couple of days before sending the mail.
->=20
-> Cheers
->=20
-?!
-
-NO! It wasn't sarcastic :-O!
-
-Simply take a look on my Changelog entry downstream (sent some days
-ago):
-http://sources.gentoo.org/cgi-bin/viewvc.cgi/gentoo-x86/net-wireless/bluez/=
-ChangeLog?view=3Dmarkup
-*bluez-4.66-r1 (19 Jun 2010)
-
-  19 Jun 2010; Pacho Ramos <pacho@gentoo.org> +bluez-4.66-r1.ebuild:
-  Stop building hid2hci since it's replaced by >=3Dsys-fs/udev-146[extras]
-  provided one. This should fix bug #315749 (reported by Balazs Nemeth,
-  Marcin Kryczek and others). Thanks a lot to Bastien Nocera for the tip
-in
-  linux-bluetooth mailing list.
-
-Sorry if I didn't express myself properly :-/, English is not my mother
-tongue.
-
-Best regards :-)
-
---=-+hVD1/4JVaUKpZS5oOcy
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.15 (GNU/Linux)
-
-iEYEABECAAYFAkwjc1IACgkQCaWpQKGI+9SsNgCfTlGfR9SNJlrfP+lX3rf0AlvM
-mIEAniUi/WY+HLs/Y+Tdy5ibGQBIfDIo
-=cKtx
------END PGP SIGNATURE-----
-
---=-+hVD1/4JVaUKpZS5oOcy--
+diff --git a/audio/gstbluetooth.c b/audio/gstbluetooth.c
+index 26dd4a5..3bc0690 100644
+--- a/audio/gstbluetooth.c
++++ b/audio/gstbluetooth.c
+@@ -50,21 +50,25 @@ static void sbc_typefind(GstTypeFind *tf, gpointer ignore)
+ 	sbc_t sbc;
+ 	guint8 *data = gst_type_find_peek(tf, 0, 32);
+ 
+-	if (sbc_init(&sbc, 0) < 0)
++	if (data == NULL)
+ 		return;
+ 
+-	if (data == NULL || *data != 0x9c)	/* SBC syncword */
++	if (sbc_init(&sbc, 0) < 0)
+ 		return;
+ 
+ 	aux = g_new(guint8, 32);
+ 	memcpy(aux, data, 32);
+-	sbc_parse(&sbc, aux, 32);
+-	g_free(aux);
+-	caps = gst_sbc_parse_caps_from_sbc(&sbc);
+-	sbc_finish(&sbc);
+ 
++	if (sbc_parse(&sbc, aux, 32) < 0)
++		goto done;
++
++	caps = gst_sbc_parse_caps_from_sbc(&sbc);
+ 	gst_type_find_suggest(tf, GST_TYPE_FIND_POSSIBLE, caps);
+ 	gst_caps_unref(caps);
++
++done:
++	g_free(aux);
++	sbc_finish(&sbc);
+ }
+ 
+ static gchar *sbc_exts[] = { "sbc", NULL };
+-- 
+1.7.0.4
 
