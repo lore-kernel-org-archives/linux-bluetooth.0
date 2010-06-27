@@ -1,31 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 27 Jun 2010 03:30:25 -0300
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
-To: Hieu Le Trung <hieuletrung@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: How to programmatically pair device using bluez API
-Message-ID: <20100627063025.GA7825@vigoh>
-References: <1277619176.6618.3.camel@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1277619176.6618.3.camel@localhost.localdomain>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Cody Rester <codyrester@gmail.com>
+To: marcel@holtmann.org
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Cody Rester <codyrester@gmail.com>
+Subject: [PATCH] drivers: bluetooth: bluecard_cs.c: Fixed include error, changed to linux/io.h
+Date: Sun, 27 Jun 2010 02:12:22 -0400
+Message-Id: <1277619142-10751-1-git-send-email-codyrester@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Fixed include error, changed to linux/io.h
 
-* Hieu Le Trung <hieuletrung@gmail.com> [2010-06-27 13:12:56 +0700]:
+Signed-off-by: Cody Rester <codyrester@gmail.com>
+---
+ drivers/bluetooth/bluecard_cs.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-> Hi,
-> 
-> I wonder how can I pair the device using BlueZ API. I've searched on the
-> net but there is no place talk about this.
-
-You can the CreatedPairedDevice() method from the Adapter interface. See
-the doc/ dir inside the sources for more information.
-
-Regards,
-
+diff --git a/drivers/bluetooth/bluecard_cs.c b/drivers/bluetooth/bluecard_cs.c
+index d9bf87c..89a4455 100644
+--- a/drivers/bluetooth/bluecard_cs.c
++++ b/drivers/bluetooth/bluecard_cs.c
+@@ -37,7 +37,7 @@
+ #include <linux/wait.h>
+ 
+ #include <linux/skbuff.h>
+-#include <asm/io.h>
++#include <linux/io.h>
+ 
+ #include <pcmcia/cs_types.h>
+ #include <pcmcia/cs.h>
 -- 
-Gustavo F. Padovan
-http://padovan.org
+1.7.0.4
