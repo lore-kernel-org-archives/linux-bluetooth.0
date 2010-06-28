@@ -1,54 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 28 Jun 2010 13:07:51 -0300
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: Ville Tervo <ville.tervo@iki.fi>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCHv2 1/2] Bluetooth: Check sk is not owned before freeing
- l2cap_conn
-Message-ID: <20100628160751.GA5557@vigoh>
-References: <1274436293-15063-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20100523023906.GB3385@vigoh>
- <AANLkTilQoPjrNgqjtp7xeQF-yzrE6KNgDdagEXrIIGIv@mail.gmail.com>
+Date: Mon, 28 Jun 2010 15:45:24 +0200
+From: clemens fischer <ino-news@spott.ath.cx>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: obexd: cannot object-push certain files (large, w/ logs)
+Message-ID: <20100628134523.GA4527@spotteswoode.de.eu.org>
+References: <20100627151712.GA4427@spotteswoode.de.eu.org>
+ <AANLkTikrwAgP4bi0fkWWd-mqn_HFmfCWPZkQLe0rWttY@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTilQoPjrNgqjtp7xeQF-yzrE6KNgDdagEXrIIGIv@mail.gmail.com>
+In-Reply-To: <AANLkTikrwAgP4bi0fkWWd-mqn_HFmfCWPZkQLe0rWttY@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Luiz Augusto and shy, thanks for your info.
 
-* Ville Tervo <ville.tervo@iki.fi> [2010-05-28 10:14:31 +0300]:
+> Luiz Augusto von Dentz:
 
-> Hi,
+> You can clearly see that obexd respond the connection request with 200
+> (ok) and after that there is no request from the remote device just a
+> clear disconnect:
 > 
-> On Sun, May 23, 2010 at 5:39 AM, Gustavo F. Padovan <gustavo@padovan.org> wrote:
-> 
-> > Using the sock timer like you are you using looks too hackish, there are
-> > kernel struct for such defer works. I still prefer the first solution,
-> > that avoids the call to l2cap_chan_del() only.
-> > But we have to solve the problem with the sock_kill() call, I'm
-> > wondering if add a check inside l2cap_sock_kill is good idea. So we
-> > check if the socket is owned by user and if yes, we just return, however
-> > may have problem with socket refcnt doing that.
-> >
-> > Looking to the rfcomm code I found something that could be cause of the
-> > problem, there isn't any sock_hold() in the rfcomm code, maybe is it
-> > missing? Nevertheless it does the sock_put() without call sock_hold().
-> >
-> > Like you I'm trying to figure out how to fix this issue, I don't know
-> > yet how to fix it properly. I advice to take a look on the rfcomm code
-> > and check if we really are missing a sock_hold() there.
-> 
-> Wouldn't backlogging of destructive operations (l2cap disc rsp and
-> req) solve these issues? All operations cannot be backlogged since
-> they cannot mapped to certain sock.
+> 16:58:37 < ACL data: handle 38 flags 0x02 dlen 15
+> 16:58:37     L2CAP(d): cid 0x012b len 11 [psm 3]
+> 16:58:37       RFCOMM(d): UIH: cr 0 dlci 18 pf 0 ilen 7 fcs 0x14
+> 16:58:37         OBEX: Connect rsp(f): status 200 len 7 version 1.0
+> flags 0 mtu 32767
+> 16:58:37         Status 200 = Success
+> 16:58:37 > HCI Event: Number of Completed Packets (0x13) plen 5
+> 16:58:37     handle 38 packets 1
+> 16:58:37 > HCI Event: Number of Completed Packets (0x13) plen 5
+> 16:58:37     handle 38 packets 1
+> 16:58:37 > ACL data: handle 38 flags 0x02 dlen 8
+> 16:58:37     L2CAP(d): cid 0x0041 len 4 [psm 3]
+> 16:58:37       RFCOMM(s): DISC: cr 1 dlci 18 pf 1 ilen 0 fcs 0xd3
 
-I've been thinking about this issue and now I agree that backlog them is
-the better solution. We're already using backlog queue for ERTM, so you
-will have to extend it only. Check the branch for-next of my tree to see
-how I did that.
+> Have you tried transferring the same file with any other phone/stack?
+> This one seems very unlikely to be a obexd bug since there is not even
+> a request to transfer anything and as the connection itself seems ok,
+> no missing agent apparently, I don't see anything wrong here.
 
--- 
-Gustavo F. Padovan
-http://padovan.org
+This is interesting.  There are files of any size that can reliably be
+transfered and others that cannot, also reliably.  Your interpretation
+of the packet trace seems to indicate that the nokia-3650 firmware
+selects between the two kinds.  I'm glad that I can trust obexd!
+
+I have no other phone, but there's an application letting me at least
+copy those files to a MMC card.  The only trouble is that I have to
+remove both battery and MMC card from the phone, put it into
+a card-reader on the PC, copy any files over and then reassemble that
+phone.  The phone didn't come with a serial cable, the nokia software on
+the CD is window$-only and the linux tools (eg. gnooki, gammu, but also
+a number of applets) either require large dependencies or a GNOME/KDE
+desktop.  But I'm a person with simple needs.  I need backups of the
+contacts, calendar and notes on the phone.  So far I could not find out
+the format of the file Backup/Backup.arc which is the reason for sending
+or copying certain files one by one.
+
+I bet you guys have special setups with command-line tools in scripts
+for testing the differing scenarios a bluetooth device can be used in.
+
+The most basic chain of commands to get push-obex to work was
+('00:XX:XX:XX:XX:XX' being the bluetooth address of the phone):
+
+    bluez-simple-agent hci0 '00:XX:XX:XX:XX:XX' (starts bluetoothd)
+    hciconfig putkey '00:XX:XX:XX:XX:XX' (optional)
+    /l/libexec/obexd -nd -r /tmp/ -a -o
+
+This took me days to find out.  Simple commands like this categorized by
+purpose might be candidates for a FAQ.  Do you have tips where to look
+for CLI commands like this?  What do you use for testing?
+
+
+regards, clemens fischer
