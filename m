@@ -1,40 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 29 Jun 2010 00:12:16 -0700 (PDT)
-Message-Id: <20100629.001216.91341775.davem@davemloft.net>
-To: ospite@studenti.unina.it
-Cc: alan@signal11.us, marcel@holtmann.org, jkosina@suse.cz,
- mdpoole@troilus.org, hadess@hadess.net, eric.dumazet@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: [PATCH 1/1] Bluetooth: hidp: Add support for hidraw
- HIDIOCGFEATURE and HIDIOCSFEATURE
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20100628131437.bde782b6.ospite@studenti.unina.it>
-References: <1276467601-9066-1-git-send-email-alan@signal11.us>
-	<20100628131437.bde782b6.ospite@studenti.unina.it>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Date: Tue, 29 Jun 2010 01:27:38 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Daniel =?iso-8859-1?Q?=D6rstadius?= <daniel.orstadius@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fix unblock removed device
+Message-ID: <20100628222738.GA16898@jh-x301>
+References: <AANLkTil1_LwZYuTuZT0gQgd7Mxjo0CoY2WVI8CW-f-wj@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <AANLkTil1_LwZYuTuZT0gQgd7Mxjo0CoY2WVI8CW-f-wj@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Antonio Ospite <ospite@studenti.unina.it>
-Date: Mon, 28 Jun 2010 13:14:37 +0200
+Hi Daniel,
 
-> On Sun, 13 Jun 2010 18:20:01 -0400
-> Alan Ott <alan@signal11.us> wrote:
-> 
->> This patch adds support or getting and setting feature reports for bluetooth
->> HID devices from HIDRAW.
->> 
->> Signed-off-by: Alan Ott <alan@signal11.us>
->> ---
-> 
-> Ping.
+On Mon, Jun 28, 2010, Daniel Örstadius wrote:
+> This patch unblocks a device when removing it. Adds boolean argument
+> to function device_unblock to only emit property changed signal and
+> probe drivers when unblocking a device if the device is not unblocked
+> as part of being removed.
 
-We effectively don't have a bluetooth maintainer at the current point
-in time.  I've tried to let patches sit for a while hoping the listed
-maintainer would do something, at least occaisionally, but that simply
-isn't happening.
+Thanks for the patch. It has now been pushed upstream with a couple of
+over 80 character line fixes. Please pay attention to that in the
+future.
 
-So I'll just pick patches up directly as I find time to review them,
-but I have to warn that for me it's going to be done in a very low
-priority way because I really don't find bluetooth all that exciting. :-)
+Johan
