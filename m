@@ -1,50 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 5/5]bluetooth:hci_bcsp Fix operation on
- 'bcsp->msgq_txseq' may be undefined
-From: Bernd Petrovitsch <bernd@petrovitsch.priv.at>
-To: David Howells <dhowells@redhat.com>
-Cc: "Justin P. Mattock" <justinmattock@gmail.com>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	linux-kernel@vger.kernel.org, sds@tycho.nsa.gov, lenb@kernel.org,
-	linux-bluetooth@vger.kernel.org
-In-Reply-To: <7323.1277729576@redhat.com>
+From: David Howells <dhowells@redhat.com>
+Subject: [PATCH] Bluetooth: Fix abuse of the preincrement operator
+To: linux-bluetooth@vger.kernel.org
+Cc: justinmattock@gmail.com, dhowells@redhat.com,
+	linux-kernel@vger.kernel.org, gustavo@padovan.org
+Date: Mon, 28 Jun 2010 13:57:52 +0100
+Message-ID: <20100628125752.8945.50572.stgit@warthog.procyon.org.uk>
+In-Reply-To: <1277621246-10960-6-git-send-email-justinmattock@gmail.com>
 References: <1277621246-10960-6-git-send-email-justinmattock@gmail.com>
-	 <1277621246-10960-1-git-send-email-justinmattock@gmail.com>
-	 <7323.1277729576@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Mon, 28 Jun 2010 15:02:38 +0200
-Message-ID: <1277730158.3831.17.camel@thorin>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 2010-06-28 at 13:52 +0100, David Howells wrote:
-> Justin P. Mattock <justinmattock@gmail.com> wrote:
-> 
-> > -		BT_DBG("Sending packet with seqno %u", bcsp->msgq_txseq);
-> > -		bcsp->msgq_txseq = ++(bcsp->msgq_txseq) & 0x07;
-> > +		BT_DBG("Sending packet with seqno %u", bcsp->msgq_txseq | ret);
-> > +		ret = ++(bcsp->msgq_txseq) & 0x07;
-> 
-> I don't know what you're trying to do here, but you seem to be trying to send
-> the computed value back in time.
-> 
-> The problem is that the compiler is confused about why a '++' operator makes
+Fix abuse of the preincrement operator as detected when building with gcc
+4.6.0:
 
-It's even worse as that expression is explicitly undefined (and should
-be fixed anyways and unconditionally).
+	 CC [M]  drivers/bluetooth/hci_bcsp.o
+	drivers/bluetooth/hci_bcsp.c: In function 'bcsp_prepare_pkt':
+	drivers/bluetooth/hci_bcsp.c:247:20: warning: operation on 'bcsp->msgq_txseq' may be undefined
 
-> any sense here.  It doesn't.  It should be a '+ 1' instead.  I think what you
-> want is:
-> 
-> 	-	bcsp->msgq_txseq = ++(bcsp->msgq_txseq) & 0x07;
-> 	+	bcsp->msgq_txseq = (bcsp->msgq_txseq + 1) & 0x07;
+Reported-by: Justin P. Mattock <justinmattock@gmail.com>
+Signed-off-by: David Howells <dhowells@redhat.com>
+---
 
-Yes, that's looks like the most probable intention of it - at least for
-one who doesn't know the bluetooth code.
+ drivers/bluetooth/hci_bcsp.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-	Bernd
--- 
-Bernd Petrovitsch                  Email : bernd@petrovitsch.priv.at
-                     LUGA : http://www.luga.at
+diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
+index 40aec0f..42d69d4 100644
+--- a/drivers/bluetooth/hci_bcsp.c
++++ b/drivers/bluetooth/hci_bcsp.c
+@@ -244,7 +244,7 @@ static struct sk_buff *bcsp_prepare_pkt(struct bcsp_struct *bcsp, u8 *data,
+ 	if (rel) {
+ 		hdr[0] |= 0x80 + bcsp->msgq_txseq;
+ 		BT_DBG("Sending packet with seqno %u", bcsp->msgq_txseq);
+-		bcsp->msgq_txseq = ++(bcsp->msgq_txseq) & 0x07;
++		bcsp->msgq_txseq = (bcsp->msgq_txseq + 1) & 0x07;
+ 	}
+ 
+ 	if (bcsp->use_crc)
 
