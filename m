@@ -1,49 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4C28E23B.7020406@gmail.com>
-Date: Mon, 28 Jun 2010 10:56:11 -0700
-From: "Justin P. Mattock" <justinmattock@gmail.com>
+Date: Mon, 28 Jun 2010 13:07:51 -0300
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: Ville Tervo <ville.tervo@iki.fi>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCHv2 1/2] Bluetooth: Check sk is not owned before freeing
+ l2cap_conn
+Message-ID: <20100628160751.GA5557@vigoh>
+References: <1274436293-15063-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20100523023906.GB3385@vigoh>
+ <AANLkTilQoPjrNgqjtp7xeQF-yzrE6KNgDdagEXrIIGIv@mail.gmail.com>
 MIME-Version: 1.0
-To: David Howells <dhowells@redhat.com>
-CC: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	linux-kernel@vger.kernel.org, sds@tycho.nsa.gov, lenb@kernel.org,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 5/5]bluetooth:hci_bcsp Fix operation on 'bcsp->msgq_txseq'
- may be undefined
-References: <1277621246-10960-6-git-send-email-justinmattock@gmail.com> <1277621246-10960-1-git-send-email-justinmattock@gmail.com> <7323.1277729576@redhat.com>
-In-Reply-To: <7323.1277729576@redhat.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <AANLkTilQoPjrNgqjtp7xeQF-yzrE6KNgDdagEXrIIGIv@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 06/28/2010 05:52 AM, David Howells wrote:
-> Justin P. Mattock<justinmattock@gmail.com>  wrote:
->
->> -		BT_DBG("Sending packet with seqno %u", bcsp->msgq_txseq);
->> -		bcsp->msgq_txseq = ++(bcsp->msgq_txseq)&  0x07;
->> +		BT_DBG("Sending packet with seqno %u", bcsp->msgq_txseq | ret);
->> +		ret = ++(bcsp->msgq_txseq)&  0x07;
->
-> I don't know what you're trying to do here, but you seem to be trying to send
-> the computed value back in time.
->
+Hi Andrei,
 
-I was under the impression that hdr[0] |= 0x80 + bcsp->msgq_txseq;
-is computing a value for BT_DBG then ret = ++(bcsp->msgq_txseq)&  0x07
-computes a value as well i.e.
+* Ville Tervo <ville.tervo@iki.fi> [2010-05-28 10:14:31 +0300]:
 
-BT_DBG("Sending packet with seqno %u", hdr[0] | ret);
+> Hi,
+> 
+> On Sun, May 23, 2010 at 5:39 AM, Gustavo F. Padovan <gustavo@padovan.org> wrote:
+> 
+> > Using the sock timer like you are you using looks too hackish, there are
+> > kernel struct for such defer works. I still prefer the first solution,
+> > that avoids the call to l2cap_chan_del() only.
+> > But we have to solve the problem with the sock_kill() call, I'm
+> > wondering if add a check inside l2cap_sock_kill is good idea. So we
+> > check if the socket is owned by user and if yes, we just return, however
+> > may have problem with socket refcnt doing that.
+> >
+> > Looking to the rfcomm code I found something that could be cause of the
+> > problem, there isn't any sock_hold() in the rfcomm code, maybe is it
+> > missing? Nevertheless it does the sock_put() without call sock_hold().
+> >
+> > Like you I'm trying to figure out how to fix this issue, I don't know
+> > yet how to fix it properly. I advice to take a look on the rfcomm code
+> > and check if we really are missing a sock_hold() there.
+> 
+> Wouldn't backlogging of destructive operations (l2cap disc rsp and
+> req) solve these issues? All operations cannot be backlogged since
+> they cannot mapped to certain sock.
 
-> The problem is that the compiler is confused about why a '++' operator makes
-> any sense here.  It doesn't.  It should be a '+ 1' instead.  I think what you
-> want is:
->
-> 	-	bcsp->msgq_txseq = ++(bcsp->msgq_txseq)&  0x07;
-> 	+	bcsp->msgq_txseq = (bcsp->msgq_txseq + 1)&  0x07;
->
-> David
->
+I've been thinking about this issue and now I agree that backlog them is
+the better solution. We're already using backlog queue for ERTM, so you
+will have to extend it only. Check the branch for-next of my tree to see
+how I did that.
 
-yeah I did play around with the ++ and noticed the compiler would be 
-satisfied if the ++ was not there, but didn't think to just add a + 1
-
-Justin P. Mattock
+-- 
+Gustavo F. Padovan
+http://padovan.org
