@@ -1,53 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 29 Jun 2010 15:04:47 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: harri.mahonen@gmail.com
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3] audio: fix memory leak with typefinding
+Message-ID: <20100629120447.GA9544@jh-x301>
+References: <1277391672-10563-1-git-send-email-harri.mahonen@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20100629.001216.91341775.davem@davemloft.net>
-References: <1276467601-9066-1-git-send-email-alan@signal11.us>
-	<20100628131437.bde782b6.ospite@studenti.unina.it>
-	<20100629.001216.91341775.davem@davemloft.net>
-Date: Tue, 29 Jun 2010 15:40:10 +0300
-Message-ID: <AANLkTiktvYWdZmpQs_k7mJRqMCqgfhy1b0T8tX8emmtU@mail.gmail.com>
-Subject: Re: [PATCH 1/1] Bluetooth: hidp: Add support for hidraw
-	HIDIOCGFEATURE and HIDIOCSFEATURE
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: David Miller <davem@davemloft.net>
-Cc: ospite@studenti.unina.it, alan@signal11.us, marcel@holtmann.org,
-	jkosina@suse.cz, mdpoole@troilus.org, hadess@hadess.net,
-	eric.dumazet@gmail.com, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1277391672-10563-1-git-send-email-harri.mahonen@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Harri,
 
-On Tue, Jun 29, 2010 at 10:12 AM, David Miller <davem@davemloft.net> wrote:
-> From: Antonio Ospite <ospite@studenti.unina.it>
-> Date: Mon, 28 Jun 2010 13:14:37 +0200
->
->> On Sun, 13 Jun 2010 18:20:01 -0400
->> Alan Ott <alan@signal11.us> wrote:
->>
->>> This patch adds support or getting and setting feature reports for blue=
-tooth
->>> HID devices from HIDRAW.
->>>
->>> Signed-off-by: Alan Ott <alan@signal11.us>
->>> ---
->>
->> Ping.
->
-> We effectively don't have a bluetooth maintainer at the current point
-> in time. =A0I've tried to let patches sit for a while hoping the listed
-> maintainer would do something, at least occaisionally, but that simply
-> isn't happening.
-> So I'll just pick patches up directly as I find time to review them,
-> but I have to warn that for me it's going to be done in a very low
-> priority way because I really don't find bluetooth all that exciting. :-)
+On Thu, Jun 24, 2010, harri.mahonen@gmail.com wrote:
+> From: Harri Mahonen <harri.mahonen@gmail.com>
+> 
+> Each time sbc_typefind is called and there is no syncword, sbc_finalize
+> never gets called. Instead of hardcoded syncword check, rely on
+> sbc_parse to do it properly.
+> ---
+>  audio/gstbluetooth.c |   16 ++++++++++------
+>  1 files changed, 10 insertions(+), 6 deletions(-)
 
-This would be good. We have a backlog of bluetooth kernel patches
-waiting for several months.
-This takes too much time to return to them again and again...
+This patch has now been pushed upstream. Thanks.
 
-Please keep this ML informed.
-
-Regards,
-Andrei Emeltchenko
+Johan
