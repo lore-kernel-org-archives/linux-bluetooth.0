@@ -1,36 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 30 Jun 2010 14:46:29 +0300
+Date: Wed, 30 Jun 2010 14:03:31 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Vladimir Davydov <vladimir.davydov@promwad.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Sergey Kovalev <sergey.kovalev@promwad.com>
-Subject: Re: [PATCH] hciattach: Fix the timeout handling code
-Message-ID: <20100630114629.GA5961@jh-x301>
-References: <201006301441.25119.vladimir.davydov@promwad.com>
+To: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	Lennart Poettering <lennart@poettering.net>
+Subject: Re: SBC encoder/decoder API & errors handling
+Message-ID: <20100630110331.GA4258@jh-x301>
+References: <201006291845.53998.siarhei.siamashka@gmail.com>
+ <AANLkTildwDBZR2U6AtxGEiq4Mv-PBnDoqY1xfqHHmzL2@mail.gmail.com>
+ <20100630085347.GA31839@jh-x301>
+ <201006301307.49874.siarhei.siamashka@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <201006301441.25119.vladimir.davydov@promwad.com>
+In-Reply-To: <201006301307.49874.siarhei.siamashka@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vladimir,
+Hi Siarhei,
 
-On Wed, Jun 30, 2010, Vladimir Davydov wrote:
-> From: Vladimir Davydov <vladimir.davydov@promwad.com>
-> 
-> The variable 'retries' should be defined as static, or it will be always 0.
+On Wed, Jun 30, 2010, Siarhei Siamashka wrote:
+> So would it be a good idea to just fix the issues in the bluez SBC
+> code as we feel appropriate and then notify pulseaudio developers
+> about the changes?
 
-The patch doesn't apply cleanly:
-
-Applying: hciattach: Fix the timeout handling code
-fatal: corrupt patch at line 13
-Patch failed at 0001 hciattach: Fix the timeout handling code
-
-Maybe you could try git send-email instead?
-
-> Signed-off-by: Vladimir Davydov <vladimir.davydov@promwad.com>
-
-We don't use Signed-off-by in the userspace part of BlueZ, so please leave it
-away. Otherwise the patch looked fine.
+Yes, I think that's a reasonable way to proceed.
 
 Johan
