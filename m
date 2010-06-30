@@ -1,38 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 30 Jun 2010 11:53:47 +0300
+Date: Wed, 30 Jun 2010 11:44:20 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Siarhei Siamashka <siarhei.siamashka@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	Lennart Poettering <lennart@poettering.net>
-Subject: Re: SBC encoder/decoder API & errors handling
-Message-ID: <20100630085347.GA31839@jh-x301>
-References: <201006291845.53998.siarhei.siamashka@gmail.com>
- <20100630075348.GA23471@jh-x301>
- <AANLkTildwDBZR2U6AtxGEiq4Mv-PBnDoqY1xfqHHmzL2@mail.gmail.com>
+To: "Chanyeol,Park" <chanyeol.park@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Is it valid BlueZ Serail-API ?
+Message-ID: <20100630084420.GA26488@jh-x301>
+References: <AANLkTinBv-1bUF3ccpMMWcpbAlVB9repG2zuluYMBtUR@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTildwDBZR2U6AtxGEiq4Mv-PBnDoqY1xfqHHmzL2@mail.gmail.com>
+In-Reply-To: <AANLkTinBv-1bUF3ccpMMWcpbAlVB9repG2zuluYMBtUR@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi,
 
-On Wed, Jun 30, 2010, Luiz Augusto von Dentz wrote:
-> audio/pcm_bluetooth.c:1060:		encoded = sbc_encode(&a2dp->sbc,
-> data->buffer, a2dp->codesize,
-> audio/pcm_bluetooth.c:1096:		encoded = sbc_encode(&a2dp->sbc, buff,
-> a2dp->codesize,
+On Thu, Jun 24, 2010, Chanyeol,Park wrote:
+> There is a log like the bottom.
+> 
+> Current Code doesn't have the below documents.(serial-api.txt) after
+> the git-log , however their code is still alive.
+> 
+> I am little bit confused.
+> 
+> Could you tell me whethr their API are valid or not?
+> 
+> If you explain why you removed,  it would be helpul.
+> 
+> BR
+> Chanyeol.Park
+> 
+> Remove old serial-api.txt documentation file
+> author	Marcel Holtmann <marcel@holtmann.org>	
+> 	Mon, 22 Dec 2008 07:10:37 +0000 (08:10 +0100)
+> committer	Marcel Holtmann <marcel@holtmann.org>	
+> 	Mon, 22 Dec 2008 07:10:37 +0000 (08:10 +0100)
+> serial/Makefile.am 		patch | blob | history
+> serial/serial-api.txt 	[deleted file] 	patch | blob | history
 
-My patch already contained the fix for these two.
-
-> audio/gstsbcenc.c:391:		consumed = sbc_encode(&enc->sbc, (gpointer) data,
-
-This place actually passes NULL as the output parameter so no issue
-there.
-
-I'll push in a minute the fix in two separate commits (the libsbc
-changes should be in an independent patch so they can easily be exported
-to external copies like pulseaudio).
+I think the API simply got moved to doc/serial-api.txt
 
 Johan
