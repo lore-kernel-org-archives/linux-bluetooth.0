@@ -1,64 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vladimir Davydov <vladimir.davydov@promwad.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] hciattach: Fix the timeout handling code
-Date: Wed, 30 Jun 2010 14:41:24 +0300
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+Date: Wed, 30 Jun 2010 14:46:29 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Vladimir Davydov <vladimir.davydov@promwad.com>
+Cc: linux-bluetooth@vger.kernel.org,
 	Sergey Kovalev <sergey.kovalev@promwad.com>
+Subject: Re: [PATCH] hciattach: Fix the timeout handling code
+Message-ID: <20100630114629.GA5961@jh-x301>
+References: <201006301441.25119.vladimir.davydov@promwad.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="utf-8"
-Message-Id: <201006301441.25119.vladimir.davydov@promwad.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <201006301441.25119.vladimir.davydov@promwad.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Vladimir Davydov <vladimir.davydov@promwad.com>
+Hi Vladimir,
 
-The variable 'retries' should be defined as static, or it will be always 0.
+On Wed, Jun 30, 2010, Vladimir Davydov wrote:
+> From: Vladimir Davydov <vladimir.davydov@promwad.com>
+> 
+> The variable 'retries' should be defined as static, or it will be always 0.
 
-Signed-off-by: Vladimir Davydov <vladimir.davydov@promwad.com>
+The patch doesn't apply cleanly:
 
----
- tools/hciattach.c |    6 ++++--
- 1 files changed, 4 insertions(+), 2 deletions(-)
+Applying: hciattach: Fix the timeout handling code
+fatal: corrupt patch at line 13
+Patch failed at 0001 hciattach: Fix the timeout handling code
 
-diff --git a/tools/hciattach.c b/tools/hciattach.c
-index b13db1b..e772b6f 100644
---- a/tools/hciattach.c
-+++ b/tools/hciattach.c
-@@ -326,7 +326,8 @@ static int bcsp_max_retries = 10;
- static void bcsp_tshy_sig_alarm(int sig)
- {
- 	unsigned char bcsp_sync_pkt[10] = 
-{0xc0,0x00,0x41,0x00,0xbe,0xda,0xdc,0xed,0xed,0xc0};
--	int len, retries = 0;
-+	int len;
-+	static int retries = 0;
- 
- 	if (retries < bcsp_max_retries) {
- 		retries++;
-@@ -343,7 +344,8 @@ static void bcsp_tshy_sig_alarm(int sig)
- static void bcsp_tconf_sig_alarm(int sig)
- {
- 	unsigned char bcsp_conf_pkt[10] = 
-{0xc0,0x00,0x41,0x00,0xbe,0xad,0xef,0xac,0xed,0xc0};
--	int len, retries = 0;
-+	int len;
-+	static int retries = 0;
- 
- 	if (retries < bcsp_max_retries){
- 		retries++;
--- 
-1.6.4.2
+Maybe you could try git send-email instead?
 
--- 
-Vladimir Davydov
-Senior Developer
-Promwad Innovation Company
-Web: www.promwad.com
-22, Olshevskogo St.,
-220073, Minsk,
-BELARUS
-Phone/Fax: +375 (17) 312–1246
-E-mail: vladimir.davydov@promwad.com
-Skype: v_davydov
+> Signed-off-by: Vladimir Davydov <vladimir.davydov@promwad.com>
+
+We don't use Signed-off-by in the userspace part of BlueZ, so please leave it
+away. Otherwise the patch looked fine.
+
+Johan
