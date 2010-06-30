@@ -1,37 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 30 Jun 2010 13:10:24 -0700 (PDT)
-Message-Id: <20100630.131024.190380261.davem@davemloft.net>
-To: gustavo@padovan.org
-Cc: dhowells@redhat.com, linux-bluetooth@vger.kernel.org,
-	justinmattock@gmail.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix abuse of the preincrement operator
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20100628131058.GA25275@vigoh>
-References: <1277621246-10960-6-git-send-email-justinmattock@gmail.com>
-	<20100628125752.8945.50572.stgit@warthog.procyon.org.uk>
-	<20100628131058.GA25275@vigoh>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: linux-kernel-owner@vger.kernel.org
+Date: Wed, 30 Jun 2010 21:54:29 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: =?iso-8859-1?Q?Jo=E3o?= Paulo Rechi Vita <jprvita@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Add udev scripts to gitignore.
+Message-ID: <20100630185429.GA12678@jh-x301>
+References: <1277860131-3285-1-git-send-email-jprvita@gmail.com>
+ <20100630095833.GA2866@jh-x301>
+ <AANLkTinBR8gOf-jsqxf2gUkAm08gprUe_KsGc4p7rxLU@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <AANLkTinBR8gOf-jsqxf2gUkAm08gprUe_KsGc4p7rxLU@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
-Date: Mon, 28 Jun 2010 10:12:30 -0300
-
-> Hi David,
+On Wed, Jun 30, 2010, João Paulo Rechi Vita wrote:
+> 2010/6/30 Johan Hedberg <johan.hedberg@gmail.com>:
+> > Hi,
+> >
+> > On Tue, Jun 29, 2010, João Paulo Rechi Vita wrote:
+> >> +scripts/97-bluetooth.rules
+> >> +scripts/97-bluetooth-hid2hci.rules
+> >
+> > How do these files get created? I've never seen them in my bluez tree.
+> >
 > 
-> * David Howells <dhowells@redhat.com> [2010-06-28 13:57:52 +0100]:
-> 
->> Fix abuse of the preincrement operator as detected when building with gcc
->> 4.6.0:
->> 
->> 	 CC [M]  drivers/bluetooth/hci_bcsp.o
->> 	drivers/bluetooth/hci_bcsp.c: In function 'bcsp_prepare_pkt':
->> 	drivers/bluetooth/hci_bcsp.c:247:20: warning: operation on 'bcsp->msgq_txseq' may be undefined
->> 
->> Reported-by: Justin P. Mattock <justinmattock@gmail.com>
->> Signed-off-by: David Howells <dhowells@redhat.com>
-...
-> Acked-by: Gustavo F. Padovan <padovan@profusion.mobi>
+> You have to enable udevrules during the configure phase. They were
+> probably leftover because most devs use bootstrap-configure script,
+> which pass --disable-udevrules to configure.
 
-Applied, thanks everyone.
+Ok, I now get them with that switch. The patch is now pushed upstream
+with a minor modification of grouping the entries together with
+scripts/bluetooth.rules (which was already in .gitignore).
+
+Johan
