@@ -1,51 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 2 Jul 2010 16:04:09 -0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Siarhei Siamashka <siarhei.siamashka@nokia.com>
+Subject: Re: [PATCH 0/5] SBC encoder optimizations for ARM processors
+Message-ID: <20100702190409.GA20392@jh-x301>
+References: <1278073542-14859-1-git-send-email-siarhei.siamashka@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTik1haoPxJzpRsQ2FPFhOjYCcOqYVtug9eQVNIkc@mail.gmail.com>
-References: <7.0.1.0.2.20100701152541.031ae7c0@gmx.net>
-	<AANLkTik1haoPxJzpRsQ2FPFhOjYCcOqYVtug9eQVNIkc@mail.gmail.com>
-Date: Fri, 2 Jul 2010 23:28:16 +0300
-Message-ID: <AANLkTil6PtRWnbD-oGlVhgRPsHSRUA-B2WqsRPg3Z39E@mail.gmail.com>
-Subject: Re: Bug with Alias
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Vinicius Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1278073542-14859-1-git-send-email-siarhei.siamashka@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Siarhei,
 
-On Fri, Jul 2, 2010 at 4:56 PM, Vinicius Gomes
-<vinicius.gomes@openbossa.org> wrote:
-> Hi Peter,
->
-> On Thu, Jul 1, 2010 at 10:33 AM, Peter Kornatowski <pkorn@gmx.net> wrote:
->> Hello,
->>
->> I have several headsets of the same model, so I set an Alias for each to
->> distinguish them in my own application. But since bluez 4.64 the Alias is
->> bugged. Sometimes after a reboot or after a bluez restart when i read out
->> the Alias through the dbus api, I get the Name instead. I also tried to read
->> it with d-feet or through a dbus-send call (dbus-send --system --print-reply
->> --dest=org.bluez /org/bluez/11344/hci0/dev_00_XX_XX_XX_XX_XX
->> org.bluez.Device.GetProperties) and also got the Name instead of the Alias.
->> But in the aliases file under /var/lib/bluetooth/XX:XX:XX:XX:XX:XX/aliases
->> is the correct Alias. The bug seems to have something to do with the commit
->> 48a2c31cdbc1f2ac2a2bbadbd505976f84a9eaca
->> (http://git.kernel.org/?p=bluetooth/bluez.git;a=commit;h=48a2c31cdbc1f2ac2a2bbadbd505976f84a9eaca).
->
-> Thanks for the bug report.
->
-> I suggested a fix[1], waiting for review.
->
->> I hope someone can resolve this issue.
->>
->> Thanks,
->> Peter
+On Fri, Jul 02, 2010, Siarhei Siamashka wrote:
+> This patch series adds a bunch of ARM assembly optimizations.
+> 
+> Now all the functions from 'sbc_primitives.c' got NEON optimized
+> variants. As benchmarked with the common A2DP case (44100kHz audio
+> with bitpool set to 53, 8 subbands, joint stereo), SBC encoding is
+> now approximately 1.6x faster overall when compared to bluez-4.66.
+> Some more room for improvement still exists though.
+> 
+> For ARMv6 processors, only analysis filter has been implemented
+> (using dual 16-bit multiply-accumulate instructions). But that's
+> the most important optimization and it doubles performance already.
+> And older processors such as ARM11 are much slower, so they
+> definitely benefit more on a relative scale (Nokia N800/N810 users
+> may find this update useful).
+> 
+> All the optimizations are bitexact. Given the same input, they provide
+> the same output as the SBC encoder from the previous bluez versions.
+> 
+> Patches are also available in the branch 'sbc-arm-optimizations' here:
+> git://gitorious.org/system-performance/bluez-sbc.git
+> 
+> Siarhei Siamashka (5):
+>   sbc: ARM NEON optimized joint stereo processing in SBC encoder
+>   sbc: ARM NEON optimizations for input permutation in SBC encoder
+>   sbc: slightly faster 'sbc_calc_scalefactors_neon'
+>   sbc: faster 'sbc_calculate_bits' function
+>   sbc: ARMv6 optimized version of analysis filter for SBC encoder
+> 
+>  Makefile.am                |    3 +-
+>  sbc/sbc.c                  |   43 ++-
+>  sbc/sbc_primitives.c       |    4 +
+>  sbc/sbc_primitives_armv6.c |  299 +++++++++++++++++++++
+>  sbc/sbc_primitives_armv6.h |   52 ++++
+>  sbc/sbc_primitives_neon.c  |  618 ++++++++++++++++++++++++++++++++++++++++++-
+>  6 files changed, 988 insertions(+), 31 deletions(-)
+>  create mode 100644 sbc/sbc_primitives_armv6.c
+>  create mode 100644 sbc/sbc_primitives_armv6.h
 
-Thanks vinicius, that should fix the problem and thanks peter to find
-out about this.
+Thanks for these! They've all been pushed upstream now.
 
--- 
-Luiz Augusto von Dentz
-Computer Engineer
+Johan
