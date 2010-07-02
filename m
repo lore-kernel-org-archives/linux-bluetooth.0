@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Siarhei Siamashka <siarhei.siamashka@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Siarhei Siamashka <siarhei.siamashka@nokia.com>
-Subject: [PATCH 4/5] sbc: faster 'sbc_calculate_bits' function
-Date: Fri,  2 Jul 2010 15:25:41 +0300
-Message-Id: <1278073542-14859-5-git-send-email-siarhei.siamashka@gmail.com>
+Subject: [PATCH 3/5] sbc: slightly faster 'sbc_calc_scalefactors_neon'
+Date: Fri,  2 Jul 2010 15:25:40 +0300
+Message-Id: <1278073542-14859-4-git-send-email-siarhei.siamashka@gmail.com>
 In-Reply-To: <1278073542-14859-1-git-send-email-siarhei.siamashka@gmail.com>
 References: <1278073542-14859-1-git-send-email-siarhei.siamashka@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,200 +12,96 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
 
-By using SBC_ALWAYS_INLINE trick, the implementation of 'sbc_calculate_bits'
-function is split into two branches, each having 'subband' variable value
-known at compile time. It helps the compiler to generate more optimal code
-by saving at least one extra register, and also provides more obvious
-opportunities for loops unrolling.
+Previous variant was basically derived from C and MMX implementations.
+Now new variant makes use of 'vmax' instruction, which is available in
+NEON and can do this job faster. The same method for calculating scale
+factors is also used in 'sbc_calc_scalefactors_j_neon'.
 
-Benchmarked on ARM Cortex-A8:
+Benchmarked without joint stereo on ARM Cortex-A8:
 
 == Before: ==
 
-$ time ./sbcenc -b53 -s8 -j test.au > /dev/null
+$ time ./sbcenc -b53 -s8 test.au > /dev/null
 
-real    0m3.989s
-user    0m3.602s
-sys     0m0.391s
+real    0m3.851s
+user    0m3.375s
+sys     0m0.469s
 
 samples  %        image name               symbol name
-26057    32.6128  sbcenc                   sbc_pack_frame
-20003    25.0357  sbcenc                   sbc_analyze_4b_8s_neon
-14220    17.7977  sbcenc                   sbc_calculate_bits
-8498     10.6361  no-vmlinux               /no-vmlinux
-5300      6.6335  sbcenc                   sbc_calc_scalefactors_j_neon
-3235      4.0489  sbcenc                   sbc_enc_process_input_8s_be_neon
-2172      2.7185  sbcenc                   sbc_encode
+26260    34.2672  sbcenc                   sbc_pack_frame
+20013    26.1154  sbcenc                   sbc_analyze_4b_8s_neon
+13796    18.0027  sbcenc                   sbc_calculate_bits
+8388     10.9457  no-vmlinux               /no-vmlinux
+3229      4.2136  sbcenc                   sbc_enc_process_input_8s_be_neon
+2408      3.1422  sbcenc                   sbc_calc_scalefactors_neon
+2093      2.7312  sbcenc                   sbc_encode
 
 == After: ==
 
-$ time ./sbcenc -b53 -s8 -j test.au > /dev/null
+$ time ./sbcenc -b53 -s8 test.au > /dev/null
 
-real    0m3.652s
-user    0m3.195s
-sys     0m0.445s
+real    0m3.796s
+user    0m3.344s
+sys     0m0.438s
 
 samples  %        image name               symbol name
-26207    36.0095  sbcenc                   sbc_pack_frame
-19820    27.2335  sbcenc                   sbc_analyze_4b_8s_neon
-8629     11.8566  no-vmlinux               /no-vmlinux
-6988      9.6018  sbcenc                   sbc_calculate_bits
-5094      6.9994  sbcenc                   sbc_calc_scalefactors_j_neon
-3351      4.6044  sbcenc                   sbc_enc_process_input_8s_be_neon
-2182      2.9982  sbcenc                   sbc_encode
+26582    34.8726  sbcenc                   sbc_pack_frame
+20032    26.2797  sbcenc                   sbc_analyze_4b_8s_neon
+13808    18.1146  sbcenc                   sbc_calculate_bits
+8374     10.9858  no-vmlinux               /no-vmlinux
+3187      4.1810  sbcenc                   sbc_enc_process_input_8s_be_neon
+2027      2.6592  sbcenc                   sbc_encode
+1766      2.3168  sbcenc                   sbc_calc_scalefactors_neon
 ---
- sbc/sbc.c |   43 ++++++++++++++++++++++++++++---------------
- 1 files changed, 28 insertions(+), 15 deletions(-)
+ sbc/sbc_primitives_neon.c |   25 ++++++++++---------------
+ 1 files changed, 10 insertions(+), 15 deletions(-)
 
-diff --git a/sbc/sbc.c b/sbc/sbc.c
-index 1921585..a6391ae 100644
---- a/sbc/sbc.c
-+++ b/sbc/sbc.c
-@@ -160,7 +160,8 @@ static uint8_t sbc_crc8(const uint8_t *data, size_t len)
-  * Takes a pointer to the frame in question, a pointer to the bits array and
-  * the sampling frequency (as 2 bit integer)
-  */
--static void sbc_calculate_bits(const struct sbc_frame *frame, int (*bits)[8])
-+static SBC_ALWAYS_INLINE void sbc_calculate_bits_internal(
-+		const struct sbc_frame *frame, int (*bits)[8], int subbands)
- {
- 	uint8_t sf = frame->frequency;
- 
-@@ -171,17 +172,17 @@ static void sbc_calculate_bits(const struct sbc_frame *frame, int (*bits)[8])
- 		for (ch = 0; ch < frame->channels; ch++) {
- 			max_bitneed = 0;
- 			if (frame->allocation == SNR) {
--				for (sb = 0; sb < frame->subbands; sb++) {
-+				for (sb = 0; sb < subbands; sb++) {
- 					bitneed[ch][sb] = frame->scale_factor[ch][sb];
- 					if (bitneed[ch][sb] > max_bitneed)
- 						max_bitneed = bitneed[ch][sb];
- 				}
- 			} else {
--				for (sb = 0; sb < frame->subbands; sb++) {
-+				for (sb = 0; sb < subbands; sb++) {
- 					if (frame->scale_factor[ch][sb] == 0)
- 						bitneed[ch][sb] = -5;
- 					else {
--						if (frame->subbands == 4)
-+						if (subbands == 4)
- 							loudness = frame->scale_factor[ch][sb] - sbc_offset4[sf][sb];
- 						else
- 							loudness = frame->scale_factor[ch][sb] - sbc_offset8[sf][sb];
-@@ -202,7 +203,7 @@ static void sbc_calculate_bits(const struct sbc_frame *frame, int (*bits)[8])
- 				bitslice--;
- 				bitcount += slicecount;
- 				slicecount = 0;
--				for (sb = 0; sb < frame->subbands; sb++) {
-+				for (sb = 0; sb < subbands; sb++) {
- 					if ((bitneed[ch][sb] > bitslice + 1) && (bitneed[ch][sb] < bitslice + 16))
- 						slicecount++;
- 					else if (bitneed[ch][sb] == bitslice + 1)
-@@ -215,7 +216,7 @@ static void sbc_calculate_bits(const struct sbc_frame *frame, int (*bits)[8])
- 				bitslice--;
- 			}
- 
--			for (sb = 0; sb < frame->subbands; sb++) {
-+			for (sb = 0; sb < subbands; sb++) {
- 				if (bitneed[ch][sb] < bitslice + 2)
- 					bits[ch][sb] = 0;
- 				else {
-@@ -225,7 +226,8 @@ static void sbc_calculate_bits(const struct sbc_frame *frame, int (*bits)[8])
- 				}
- 			}
- 
--			for (sb = 0; bitcount < frame->bitpool && sb < frame->subbands; sb++) {
-+			for (sb = 0; bitcount < frame->bitpool &&
-+							sb < subbands; sb++) {
- 				if ((bits[ch][sb] >= 2) && (bits[ch][sb] < 16)) {
- 					bits[ch][sb]++;
- 					bitcount++;
-@@ -235,7 +237,8 @@ static void sbc_calculate_bits(const struct sbc_frame *frame, int (*bits)[8])
- 				}
- 			}
- 
--			for (sb = 0; bitcount < frame->bitpool && sb < frame->subbands; sb++) {
-+			for (sb = 0; bitcount < frame->bitpool &&
-+							sb < subbands; sb++) {
- 				if (bits[ch][sb] < 16) {
- 					bits[ch][sb]++;
- 					bitcount++;
-@@ -251,7 +254,7 @@ static void sbc_calculate_bits(const struct sbc_frame *frame, int (*bits)[8])
- 		max_bitneed = 0;
- 		if (frame->allocation == SNR) {
- 			for (ch = 0; ch < 2; ch++) {
--				for (sb = 0; sb < frame->subbands; sb++) {
-+				for (sb = 0; sb < subbands; sb++) {
- 					bitneed[ch][sb] = frame->scale_factor[ch][sb];
- 					if (bitneed[ch][sb] > max_bitneed)
- 						max_bitneed = bitneed[ch][sb];
-@@ -259,11 +262,11 @@ static void sbc_calculate_bits(const struct sbc_frame *frame, int (*bits)[8])
- 			}
- 		} else {
- 			for (ch = 0; ch < 2; ch++) {
--				for (sb = 0; sb < frame->subbands; sb++) {
-+				for (sb = 0; sb < subbands; sb++) {
- 					if (frame->scale_factor[ch][sb] == 0)
- 						bitneed[ch][sb] = -5;
- 					else {
--						if (frame->subbands == 4)
-+						if (subbands == 4)
- 							loudness = frame->scale_factor[ch][sb] - sbc_offset4[sf][sb];
- 						else
- 							loudness = frame->scale_factor[ch][sb] - sbc_offset8[sf][sb];
-@@ -286,7 +289,7 @@ static void sbc_calculate_bits(const struct sbc_frame *frame, int (*bits)[8])
- 			bitcount += slicecount;
- 			slicecount = 0;
- 			for (ch = 0; ch < 2; ch++) {
--				for (sb = 0; sb < frame->subbands; sb++) {
-+				for (sb = 0; sb < subbands; sb++) {
- 					if ((bitneed[ch][sb] > bitslice + 1) && (bitneed[ch][sb] < bitslice + 16))
- 						slicecount++;
- 					else if (bitneed[ch][sb] == bitslice + 1)
-@@ -301,7 +304,7 @@ static void sbc_calculate_bits(const struct sbc_frame *frame, int (*bits)[8])
- 		}
- 
- 		for (ch = 0; ch < 2; ch++) {
--			for (sb = 0; sb < frame->subbands; sb++) {
-+			for (sb = 0; sb < subbands; sb++) {
- 				if (bitneed[ch][sb] < bitslice + 2) {
- 					bits[ch][sb] = 0;
- 				} else {
-@@ -325,7 +328,8 @@ static void sbc_calculate_bits(const struct sbc_frame *frame, int (*bits)[8])
- 			if (ch == 1) {
- 				ch = 0;
- 				sb++;
--				if (sb >= frame->subbands) break;
-+				if (sb >= subbands)
-+					break;
- 			} else
- 				ch = 1;
- 		}
-@@ -340,7 +344,8 @@ static void sbc_calculate_bits(const struct sbc_frame *frame, int (*bits)[8])
- 			if (ch == 1) {
- 				ch = 0;
- 				sb++;
--				if (sb >= frame->subbands) break;
-+				if (sb >= subbands)
-+					break;
- 			} else
- 				ch = 1;
- 		}
-@@ -349,6 +354,14 @@ static void sbc_calculate_bits(const struct sbc_frame *frame, int (*bits)[8])
- 
- }
- 
-+static void sbc_calculate_bits(const struct sbc_frame *frame, int (*bits)[8])
-+{
-+	if (frame->subbands == 4)
-+		sbc_calculate_bits_internal(frame, bits, 4);
-+	else
-+		sbc_calculate_bits_internal(frame, bits, 8);
-+}
-+
- /*
-  * Unpacks a SBC frame at the beginning of the stream in data,
-  * which has at most len bytes into frame.
+diff --git a/sbc/sbc_primitives_neon.c b/sbc/sbc_primitives_neon.c
+index 7713759..0572158 100644
+--- a/sbc/sbc_primitives_neon.c
++++ b/sbc/sbc_primitives_neon.c
+@@ -248,8 +248,11 @@ static void sbc_calc_scalefactors_neon(
+ 			int blk = blocks;
+ 			int32_t *in = &sb_sample_f[0][ch][sb];
+ 			asm volatile (
+-				"vmov.s32  q0, %[c1]\n"
++				"vmov.s32  q0, #0\n"
+ 				"vmov.s32  q1, %[c1]\n"
++				"vmov.s32  q14, #1\n"
++				"vmov.s32  q15, %[c2]\n"
++				"vadd.s32  q1, q1, q14\n"
+ 			"1:\n"
+ 				"vld1.32   {d16, d17}, [%[in], :128], %[inc]\n"
+ 				"vabs.s32  q8,  q8\n"
+@@ -259,22 +262,14 @@ static void sbc_calc_scalefactors_neon(
+ 				"vabs.s32  q10, q10\n"
+ 				"vld1.32   {d22, d23}, [%[in], :128], %[inc]\n"
+ 				"vabs.s32  q11, q11\n"
+-				"vcgt.s32  q12, q8,  #0\n"
+-				"vcgt.s32  q13, q9,  #0\n"
+-				"vcgt.s32  q14, q10, #0\n"
+-				"vcgt.s32  q15, q11, #0\n"
+-				"vadd.s32  q8,  q8,  q12\n"
+-				"vadd.s32  q9,  q9,  q13\n"
+-				"vadd.s32  q10, q10, q14\n"
+-				"vadd.s32  q11, q11, q15\n"
+-				"vorr.s32  q0,  q0,  q8\n"
+-				"vorr.s32  q1,  q1,  q9\n"
+-				"vorr.s32  q0,  q0,  q10\n"
+-				"vorr.s32  q1,  q1,  q11\n"
++				"vmax.s32  q0,  q0,  q8\n"
++				"vmax.s32  q1,  q1,  q9\n"
++				"vmax.s32  q0,  q0,  q10\n"
++				"vmax.s32  q1,  q1,  q11\n"
+ 				"subs      %[blk], %[blk], #4\n"
+ 				"bgt       1b\n"
+-				"vorr.s32  q0,  q0, q1\n"
+-				"vmov.s32  q15, %[c2]\n"
++				"vmax.s32  q0,  q0,  q1\n"
++				"vsub.s32  q0,  q0,  q14\n"
+ 				"vclz.s32  q0,  q0\n"
+ 				"vsub.s32  q0,  q15, q0\n"
+ 				"vst1.32   {d0, d1}, [%[out], :128]\n"
 -- 
 1.6.4.4
 
