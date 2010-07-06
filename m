@@ -1,102 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
+Subject: RE: Modem emulator and DUN server side for oFono and BlueZ
+From: suraj <suraj@atheros.com>
+To: "Zhang, Zhenhua" <zhenhua.zhang@intel.com>
+CC: Suraj Sumangala <Suraj.Sumangala@Atheros.com>,
+	"ofono@ofono.org" <ofono@ofono.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <33AB447FBD802F4E932063B962385B351F6F2256@shsmsx501.ccr.corp.intel.com>
+References: <33AB447FBD802F4E932063B962385B351D9FE1FA@shsmsx501.ccr.corp.intel.com>
+	 <20100430080319.GA11712@vigoh>
+	 <33AB447FBD802F4E932063B962385B351E6578C9@shsmsx501.ccr.corp.intel.com>
+	 <1278405050.4538.5.camel@atheros013-desktop>
+	 <33AB447FBD802F4E932063B962385B351F6F2256@shsmsx501.ccr.corp.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Tue, 6 Jul 2010 15:07:37 +0530
+Message-ID: <1278409057.4538.10.camel@atheros013-desktop>
 MIME-Version: 1.0
-In-Reply-To: <1277278237-29377-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1277278237-29377-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Tue, 6 Jul 2010 13:11:46 +0300
-Message-ID: <AANLkTikvVpsQ5Zuvvwg8NOvgekArmiFT9HxIJPubsP3W@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: check l2cap pending status before sending
-	l2cap connect request
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Jun 23, 2010 at 10:30 AM, Emeltchenko Andrei
-<Andrei.Emeltchenko.news@gmail.com> wrote:
+Hi Zhenhua,
 
-ping
+On Tue, 2010-07-06 at 15:00 +0530, Zhang, Zhenhua wrote:
+> Hi Suraj,
+> 
+> suraj wrote:
+> > Hi Zhenhua,
+> > 
+> > 
+> > On Wed, 2010-05-05 at 06:27 +0530, Zhang, Zhenhua wrote:
+> >> Hi Padovan,
+> >> 
+> >> Gustavo F. Padovan wrote:
+> >>> Hi Zhenhua,
+> >>> 
+> >>> * Zhang, Zhenhua <zhenhua.zhang@intel.com> [2010-04-27 15:53:54
+> >>> +0800]: 
+> >>> 
+> >>>> Hi,
+> >>>> 
+> >>>> I am now working on modem emulator and one usage is for DUN
+> >>> server role. Since Padovan is working on client role, it's
+> >>> good to share my rough thinking for server side
+> >>> implementation. Here are the simple steps I have:
+> >>>> 
+> >>>> 1. Create an oFono emulator atom in oFono. It's the emulator
+> >>> manager that could create DUN, HFP AG or SPP type emulators.
+> >>> It exposes dbus methods like CreateEmulator, DestroyEmulator,
+> >>> GetProperty, etc.
+> >>>> 
+> >>>> 2. DUN agent server in BlueZ watch oFono and call
+> >>> CreateEmulator and pass the file descriptor to oFono. This
+> >>> server could further implement HFP AG and SPP connection.
+> >>> 
+> >>> 
+> >>> Shouldn't the emulator register itself on the BlueZ agent server?
+> >> 
+> >> It's fine to register the emulator like HFP client. In this
+> > way, we might able to share the agent with DUN server as well. Thanks.
+> >> 
+> >>> 
+> >>> --
+> >>> Gustavo F. Padovan
+> >>> http://padovan.org
+> >>> _______________________________________________
+> >>> ofono mailing list
+> >>> ofono@ofono.org
+> >>> http://lists.ofono.org/listinfo/ofono
+> >> 
+> >> 
+> >> 
+> >> Regards,
+> >> Zhenhua
+> >> 
+> >> --
+> >> To unsubscribe from this list: send the line "unsubscribe
+> >> linux-bluetooth" in the body of a message to
+> >> majordomo@vger.kernel.org 
+> >> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> > 
+> > Do you have DUNP server emulator implemented?
+> > I was thinking about implementing the same. But would like to use your
+> > implementation if you have already done it.
+> > 
+> > Regards
+> > Suraj
+> 
+> Yes, I am working DUN server part now. (I assume 'DUNP' you mentioned is 'DUN', dialing up networking). I am trying to submit patches to upstream now. Hope it could be ready asap so you can try it if interested. Thanks.
+> 
+> Regards,
+> Zhenhua
+> 
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
->
-> Due to race condition in L2CAP state machine L2CAP Connection Request
-> may be sent twice for SDP with the same source channel id. Problems
-> reported connecting to Apple products, some carkit, Blackberry phones.
->
-> ...
-> 2010-06-07 21:18:03.651031 < ACL data: handle 1 flags 0x02 dlen 12
->    L2CAP(s): Connect req: psm 1 scid 0x0040
-> 2010-06-07 21:18:03.653473 > HCI Event: Number of Completed Packets (0x13) plen 5
->    handle 1 packets 1
-> 2010-06-07 21:18:03.653808 > HCI Event: Auth Complete (0x06) plen 3
->    status 0x00 handle 1
-> 2010-06-07 21:18:03.653869 < ACL data: handle 1 flags 0x02 dlen 12
->    L2CAP(s): Connect req: psm 1 scid 0x0040
-> ...
->
-> Patch uses L2CAP_CONF_CONNECT_PEND flag to mark that L2CAP Connection
-> Request has been sent.
->
-> Modified version of Ville Tervo patch.
->
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
-> ---
->  net/bluetooth/l2cap.c |   11 +++++++++--
->  1 files changed, 9 insertions(+), 2 deletions(-)
->
-> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-> index bb00015..7f82f7b 100644
-> --- a/net/bluetooth/l2cap.c
-> +++ b/net/bluetooth/l2cap.c
-> @@ -409,13 +409,16 @@ static void l2cap_do_start(struct sock *sk)
->                if (!(conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE))
->                        return;
->
-> -               if (l2cap_check_security(sk)) {
-> +               if (l2cap_check_security(sk) &&
-> +                               !(l2cap_pi(sk)->conf_state &
-> +                               L2CAP_CONF_CONNECT_PEND)) {
->                        struct l2cap_conn_req req;
->                        req.scid = cpu_to_le16(l2cap_pi(sk)->scid);
->                        req.psm  = l2cap_pi(sk)->psm;
->
->                        l2cap_pi(sk)->ident = l2cap_get_ident(conn);
->
-> +                       l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
->                        l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
->                                        L2CAP_CONN_REQ, sizeof(req), &req);
->                }
-> @@ -464,13 +467,16 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
->                }
->
->                if (sk->sk_state == BT_CONNECT) {
-> -                       if (l2cap_check_security(sk)) {
-> +                       if (l2cap_check_security(sk) &&
-> +                                       !(l2cap_pi(sk)->conf_state &
-> +                                       L2CAP_CONF_CONNECT_PEND)) {
->                                struct l2cap_conn_req req;
->                                req.scid = cpu_to_le16(l2cap_pi(sk)->scid);
->                                req.psm  = l2cap_pi(sk)->psm;
->
->                                l2cap_pi(sk)->ident = l2cap_get_ident(conn);
->
-> +                               l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
->                                l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
->                                        L2CAP_CONN_REQ, sizeof(req), &req);
->                        }
-> @@ -4407,6 +4413,7 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
->
->                                l2cap_pi(sk)->ident = l2cap_get_ident(conn);
->
-> +                               l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
->                                l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
->                                        L2CAP_CONN_REQ, sizeof(req), &req);
->                        } else {
-> --
-> 1.7.0.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+Thank you. You are right, I meant DUN server.
+I will use your patches when it is ready.
+
+Regards
+Suraj
+
+
+
