@@ -1,101 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: RE: Modem emulator and DUN server side for oFono and BlueZ
-From: suraj <suraj@atheros.com>
-To: "Zhang, Zhenhua" <zhenhua.zhang@intel.com>
-CC: Suraj Sumangala <Suraj.Sumangala@Atheros.com>,
-	"ofono@ofono.org" <ofono@ofono.org>,
+From: "Zhang, Zhenhua" <zhenhua.zhang@intel.com>
+To: suraj <suraj@atheros.com>
+CC: "ofono@ofono.org" <ofono@ofono.org>,
 	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <33AB447FBD802F4E932063B962385B351F6F2256@shsmsx501.ccr.corp.intel.com>
+Date: Tue, 6 Jul 2010 17:30:22 +0800
+Subject: RE: Modem emulator and DUN server side for oFono and BlueZ
+Message-ID: <33AB447FBD802F4E932063B962385B351F6F2256@shsmsx501.ccr.corp.intel.com>
 References: <33AB447FBD802F4E932063B962385B351D9FE1FA@shsmsx501.ccr.corp.intel.com>
 	 <20100430080319.GA11712@vigoh>
 	 <33AB447FBD802F4E932063B962385B351E6578C9@shsmsx501.ccr.corp.intel.com>
-	 <1278405050.4538.5.camel@atheros013-desktop>
-	 <33AB447FBD802F4E932063B962385B351F6F2256@shsmsx501.ccr.corp.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 6 Jul 2010 15:07:37 +0530
-Message-ID: <1278409057.4538.10.camel@atheros013-desktop>
+ <1278405050.4538.5.camel@atheros013-desktop>
+In-Reply-To: <1278405050.4538.5.camel@atheros013-desktop>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Zhenhua,
-
-On Tue, 2010-07-06 at 15:00 +0530, Zhang, Zhenhua wrote:
-> Hi Suraj,
-> 
-> suraj wrote:
-> > Hi Zhenhua,
-> > 
-> > 
-> > On Wed, 2010-05-05 at 06:27 +0530, Zhang, Zhenhua wrote:
-> >> Hi Padovan,
-> >> 
-> >> Gustavo F. Padovan wrote:
-> >>> Hi Zhenhua,
-> >>> 
-> >>> * Zhang, Zhenhua <zhenhua.zhang@intel.com> [2010-04-27 15:53:54
-> >>> +0800]: 
-> >>> 
-> >>>> Hi,
-> >>>> 
-> >>>> I am now working on modem emulator and one usage is for DUN
-> >>> server role. Since Padovan is working on client role, it's
-> >>> good to share my rough thinking for server side
-> >>> implementation. Here are the simple steps I have:
-> >>>> 
-> >>>> 1. Create an oFono emulator atom in oFono. It's the emulator
-> >>> manager that could create DUN, HFP AG or SPP type emulators.
-> >>> It exposes dbus methods like CreateEmulator, DestroyEmulator,
-> >>> GetProperty, etc.
-> >>>> 
-> >>>> 2. DUN agent server in BlueZ watch oFono and call
-> >>> CreateEmulator and pass the file descriptor to oFono. This
-> >>> server could further implement HFP AG and SPP connection.
-> >>> 
-> >>> 
-> >>> Shouldn't the emulator register itself on the BlueZ agent server?
-> >> 
-> >> It's fine to register the emulator like HFP client. In this
-> > way, we might able to share the agent with DUN server as well. Thanks.
-> >> 
-> >>> 
-> >>> --
-> >>> Gustavo F. Padovan
-> >>> http://padovan.org
-> >>> _______________________________________________
-> >>> ofono mailing list
-> >>> ofono@ofono.org
-> >>> http://lists.ofono.org/listinfo/ofono
-> >> 
-> >> 
-> >> 
-> >> Regards,
-> >> Zhenhua
-> >> 
-> >> --
-> >> To unsubscribe from this list: send the line "unsubscribe
-> >> linux-bluetooth" in the body of a message to
-> >> majordomo@vger.kernel.org 
-> >> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> > 
-> > Do you have DUNP server emulator implemented?
-> > I was thinking about implementing the same. But would like to use your
-> > implementation if you have already done it.
-> > 
-> > Regards
-> > Suraj
-> 
-> Yes, I am working DUN server part now. (I assume 'DUNP' you mentioned is 'DUN', dialing up networking). I am trying to submit patches to upstream now. Hope it could be ready asap so you can try it if interested. Thanks.
-> 
-> Regards,
-> Zhenhua
-> 
-
-Thank you. You are right, I meant DUN server.
-I will use your patches when it is ready.
-
-Regards
-Suraj
-
-
-
+SGkgU3VyYWosDQoNCnN1cmFqIHdyb3RlOg0KPiBIaSBaaGVuaHVhLA0KPiANCj4gDQo+IE9uIFdl
+ZCwgMjAxMC0wNS0wNSBhdCAwNjoyNyArMDUzMCwgWmhhbmcsIFpoZW5odWEgd3JvdGU6DQo+PiBI
+aSBQYWRvdmFuLA0KPj4gDQo+PiBHdXN0YXZvIEYuIFBhZG92YW4gd3JvdGU6DQo+Pj4gSGkgWmhl
+bmh1YSwNCj4+PiANCj4+PiAqIFpoYW5nLCBaaGVuaHVhIDx6aGVuaHVhLnpoYW5nQGludGVsLmNv
+bT4gWzIwMTAtMDQtMjcgMTU6NTM6NTQNCj4+PiArMDgwMF06IA0KPj4+IA0KPj4+PiBIaSwNCj4+
+Pj4gDQo+Pj4+IEkgYW0gbm93IHdvcmtpbmcgb24gbW9kZW0gZW11bGF0b3IgYW5kIG9uZSB1c2Fn
+ZSBpcyBmb3IgRFVODQo+Pj4gc2VydmVyIHJvbGUuIFNpbmNlIFBhZG92YW4gaXMgd29ya2luZyBv
+biBjbGllbnQgcm9sZSwgaXQncw0KPj4+IGdvb2QgdG8gc2hhcmUgbXkgcm91Z2ggdGhpbmtpbmcg
+Zm9yIHNlcnZlciBzaWRlDQo+Pj4gaW1wbGVtZW50YXRpb24uIEhlcmUgYXJlIHRoZSBzaW1wbGUg
+c3RlcHMgSSBoYXZlOg0KPj4+PiANCj4+Pj4gMS4gQ3JlYXRlIGFuIG9Gb25vIGVtdWxhdG9yIGF0
+b20gaW4gb0Zvbm8uIEl0J3MgdGhlIGVtdWxhdG9yDQo+Pj4gbWFuYWdlciB0aGF0IGNvdWxkIGNy
+ZWF0ZSBEVU4sIEhGUCBBRyBvciBTUFAgdHlwZSBlbXVsYXRvcnMuDQo+Pj4gSXQgZXhwb3NlcyBk
+YnVzIG1ldGhvZHMgbGlrZSBDcmVhdGVFbXVsYXRvciwgRGVzdHJveUVtdWxhdG9yLA0KPj4+IEdl
+dFByb3BlcnR5LCBldGMuDQo+Pj4+IA0KPj4+PiAyLiBEVU4gYWdlbnQgc2VydmVyIGluIEJsdWVa
+IHdhdGNoIG9Gb25vIGFuZCBjYWxsDQo+Pj4gQ3JlYXRlRW11bGF0b3IgYW5kIHBhc3MgdGhlIGZp
+bGUgZGVzY3JpcHRvciB0byBvRm9uby4gVGhpcw0KPj4+IHNlcnZlciBjb3VsZCBmdXJ0aGVyIGlt
+cGxlbWVudCBIRlAgQUcgYW5kIFNQUCBjb25uZWN0aW9uLg0KPj4+IA0KPj4+IA0KPj4+IFNob3Vs
+ZG4ndCB0aGUgZW11bGF0b3IgcmVnaXN0ZXIgaXRzZWxmIG9uIHRoZSBCbHVlWiBhZ2VudCBzZXJ2
+ZXI/DQo+PiANCj4+IEl0J3MgZmluZSB0byByZWdpc3RlciB0aGUgZW11bGF0b3IgbGlrZSBIRlAg
+Y2xpZW50LiBJbiB0aGlzDQo+IHdheSwgd2UgbWlnaHQgYWJsZSB0byBzaGFyZSB0aGUgYWdlbnQg
+d2l0aCBEVU4gc2VydmVyIGFzIHdlbGwuIFRoYW5rcy4NCj4+IA0KPj4+IA0KPj4+IC0tDQo+Pj4g
+R3VzdGF2byBGLiBQYWRvdmFuDQo+Pj4gaHR0cDovL3BhZG92YW4ub3JnDQo+Pj4gX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18NCj4+PiBvZm9ubyBtYWlsaW5n
+IGxpc3QNCj4+PiBvZm9ub0BvZm9uby5vcmcNCj4+PiBodHRwOi8vbGlzdHMub2Zvbm8ub3JnL2xp
+c3RpbmZvL29mb25vDQo+PiANCj4+IA0KPj4gDQo+PiBSZWdhcmRzLA0KPj4gWmhlbmh1YQ0KPj4g
+DQo+PiAtLQ0KPj4gVG8gdW5zdWJzY3JpYmUgZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUg
+InVuc3Vic2NyaWJlDQo+PiBsaW51eC1ibHVldG9vdGgiIGluIHRoZSBib2R5IG9mIGEgbWVzc2Fn
+ZSB0bw0KPj4gbWFqb3Jkb21vQHZnZXIua2VybmVsLm9yZyANCj4+IE1vcmUgbWFqb3Jkb21vIGlu
+Zm8gYXQgIGh0dHA6Ly92Z2VyLmtlcm5lbC5vcmcvbWFqb3Jkb21vLWluZm8uaHRtbA0KPiANCj4g
+RG8geW91IGhhdmUgRFVOUCBzZXJ2ZXIgZW11bGF0b3IgaW1wbGVtZW50ZWQ/DQo+IEkgd2FzIHRo
+aW5raW5nIGFib3V0IGltcGxlbWVudGluZyB0aGUgc2FtZS4gQnV0IHdvdWxkIGxpa2UgdG8gdXNl
+IHlvdXINCj4gaW1wbGVtZW50YXRpb24gaWYgeW91IGhhdmUgYWxyZWFkeSBkb25lIGl0Lg0KPiAN
+Cj4gUmVnYXJkcw0KPiBTdXJhag0KDQpZZXMsIEkgYW0gd29ya2luZyBEVU4gc2VydmVyIHBhcnQg
+bm93LiAoSSBhc3N1bWUgJ0RVTlAnIHlvdSBtZW50aW9uZWQgaXMgJ0RVTicsIGRpYWxpbmcgdXAg
+bmV0d29ya2luZykuIEkgYW0gdHJ5aW5nIHRvIHN1Ym1pdCBwYXRjaGVzIHRvIHVwc3RyZWFtIG5v
+dy4gSG9wZSBpdCBjb3VsZCBiZSByZWFkeSBhc2FwIHNvIHlvdSBjYW4gdHJ5IGl0IGlmIGludGVy
+ZXN0ZWQuIFRoYW5rcy4NCg0KUmVnYXJkcywNClpoZW5odWENCg0K
