@@ -1,20 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <250863.34433.qm@web94911.mail.in2.yahoo.com>
-Date: Tue, 6 Jul 2010 17:36:47 +0530 (IST)
-From: Pavan Savoy <pavan_savoy@ti.com>
-Reply-To: pavan_savoy@ti.com
-Subject: using hci0 interface without DEVUP
-To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>, kobile@ti.com,
-  pavan savoy <pavan_savoy@yahoo.co.in>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <AANLkTinfV50-6wEG8ylEc6XTZXtCpcwZDYick-0GcIlO@mail.gmail.com>
+References: <1274883694-18120-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<AANLkTinfV50-6wEG8ylEc6XTZXtCpcwZDYick-0GcIlO@mail.gmail.com>
+Date: Tue, 6 Jul 2010 13:20:00 +0300
+Message-ID: <AANLkTinLcfHaQo7KxTWRIx-XrkqJu8lLA160utihp2SW@mail.gmail.com>
+Subject: Re: [PATCHv1 0/2] Don't delete l2cap chan and sk when sk is owned by
+	user
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,=0A=0AIn certain cases, as in using VS commads to communicate with diffe=
-rent cores on the combo chips (say, BT, FM, GPS) - we would have to use the=
- hci0 interface without it being UP.=0A=0AAs in the hci0 interface still ne=
-eds to be invisible (via dbus/bluetoothd) to the system but to be available=
- to be use.=0A=0AIs there a way we can do this while registering with the h=
-ci ?=0Asay a flag in the struct hci_dev to be by default during registratio=
-n HCI_DEV_DOWN to be default state ?=0A=0A
+On Mon, Jun 7, 2010 at 5:11 PM, Andrei Emeltchenko
+<andrei.emeltchenko.news@gmail.com> wrote:
+> On Wed, May 26, 2010 at 5:21 PM, Emeltchenko Andrei
+> <Andrei.Emeltchenko.news@gmail.com> wrote:
+>> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+>>
+>> When sk is owned by user we shall not delete l2cap shannel structures and socket sk.
+>> The first patch which is less hackish than using timer to delete l2cap channel.
+>>
+>> Andrei Emeltchenko (2):
+>>  Bluetooth: Check sk is not owned before freeing l2cap_conn
+>>  Bluetooth: Prevent sk freeing in tasklet using refcount
+>>
+>>  net/bluetooth/l2cap.c |   16 +++++++++++++---
+>>  1 files changed, 13 insertions(+), 3 deletions(-)
+>
+> Ping
+
+Ping
