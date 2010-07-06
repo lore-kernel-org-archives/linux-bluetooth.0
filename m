@@ -1,56 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCHv1 1/2] Bluetooth: Check sk is not owned before freeing
- l2cap_conn
+Subject: Re: [PATCH] Bluetooth: check l2cap pending status before sending
+ l2cap connect request
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1274883694-18120-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1274883694-18120-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1274883694-18120-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1277278237-29377-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1277278237-29377-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 06 Jul 2010 12:21:02 -0300
-Message-ID: <1278429662.2789.52.camel@localhost.localdomain>
+Date: Tue, 06 Jul 2010 12:14:38 -0300
+Message-ID: <1278429278.2789.48.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-> Check that socket sk is not locked in user process before removing
-> l2cap connection handler.
-> 
-> krfcommd kernel thread may be preempted with l2cap tasklet which remove
-> l2cap_conn structure. If krfcommd is in process of sending of RFCOMM reply
-> (like "RFCOMM UA" reply to "RFCOMM DISC") then kernel crash happens.
+> Due to race condition in L2CAP state machine L2CAP Connection Request
+> may be sent twice for SDP with the same source channel id. Problems
+> reported connecting to Apple products, some carkit, Blackberry phones.
 > 
 > ...
-> [  694.175933] Unable to handle kernel NULL pointer dereference at virtual address 00000000
-> [  694.184936] pgd = c0004000
-> [  694.187683] [00000000] *pgd=00000000
-> [  694.191711] Internal error: Oops: 5 [#1] PREEMPT
-> [  694.196350] last sysfs file: /sys/devices/platform/hci_h4p/firmware/hci_h4p/loading
-> [  694.260375] CPU: 0    Not tainted  (2.6.32.10 #1)
-> [  694.265106] PC is at l2cap_sock_sendmsg+0x43c/0x73c [l2cap]
-> [  694.270721] LR is at 0xd7017303
-> ...
-> [  694.525085] Backtrace:
-> [  694.527587] [<bf266be0>] (l2cap_sock_sendmsg+0x0/0x73c [l2cap]) from [<c02f2cc8>] (sock_sendmsg+0xb8/0xd8)
-> [  694.537292] [<c02f2c10>] (sock_sendmsg+0x0/0xd8) from [<c02f3044>] (kernel_sendmsg+0x48/0x80)
+> 2010-06-07 21:18:03.651031 < ACL data: handle 1 flags 0x02 dlen 12
+>     L2CAP(s): Connect req: psm 1 scid 0x0040
+> 2010-06-07 21:18:03.653473 > HCI Event: Number of Completed Packets (0x13) plen 5
+>     handle 1 packets 1
+> 2010-06-07 21:18:03.653808 > HCI Event: Auth Complete (0x06) plen 3
+>     status 0x00 handle 1
+> 2010-06-07 21:18:03.653869 < ACL data: handle 1 flags 0x02 dlen 12
+>     L2CAP(s): Connect req: psm 1 scid 0x0040
 > ...
 > 
-> Modified version after comments of Gustavo F. Padovan <gustavo@padovan.org>
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> Patch uses L2CAP_CONF_CONNECT_PEND flag to mark that L2CAP Connection
+> Request has been sent.
 
-the patch seems to be fine, but I have some extra questions/concerns.
+patch in general looks fine, but I do have some comments.
 
-Who is now taking care of deleting the channel in this case? I think you
-need to show that the code flow is still valid.
+> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> index bb00015..7f82f7b 100644
+> --- a/net/bluetooth/l2cap.c
+> +++ b/net/bluetooth/l2cap.c
+> @@ -409,13 +409,16 @@ static void l2cap_do_start(struct sock *sk)
+>  		if (!(conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE))
+>  			return;
+>  
+> -		if (l2cap_check_security(sk)) {
+> +		if (l2cap_check_security(sk) &&
+> +				!(l2cap_pi(sk)->conf_state &
+> +				L2CAP_CONF_CONNECT_PEND)) {
 
-Also the question is how RFCOMM can send this UA or DISC with not
-locking the socket. The comment on l2cap_chan_del clearly states that
-the socket must be locked and inside L2CAP we do that. Is RFCOMM maybe
-at fault here?
+I think having some l2cap_check_pending() would be a good idea. This
+high indentation is not easy to read.
+
+>  			struct l2cap_conn_req req;
+>  			req.scid = cpu_to_le16(l2cap_pi(sk)->scid);
+>  			req.psm  = l2cap_pi(sk)->psm;
+>  
+>  			l2cap_pi(sk)->ident = l2cap_get_ident(conn);
+>  
+> +			l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
+>  			l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
+>  					L2CAP_CONN_REQ, sizeof(req), &req);
+
+If we look at the other cases we have done this, then either have an
+empty line between these two commands. Or remove the other empty line.
+
+>  		}
+> @@ -464,13 +467,16 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+>  		}
+>  
+>  		if (sk->sk_state == BT_CONNECT) {
+> -			if (l2cap_check_security(sk)) {
+> +			if (l2cap_check_security(sk) &&
+> +					!(l2cap_pi(sk)->conf_state &
+> +					L2CAP_CONF_CONNECT_PEND)) {
+
+See above.
+
+>  				struct l2cap_conn_req req;
+>  				req.scid = cpu_to_le16(l2cap_pi(sk)->scid);
+>  				req.psm  = l2cap_pi(sk)->psm;
+>  
+>  				l2cap_pi(sk)->ident = l2cap_get_ident(conn);
+>  
+> +				l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
+>  				l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
+>  					L2CAP_CONN_REQ, sizeof(req), &req);
+
+See above.
+
+>  			}
+> @@ -4407,6 +4413,7 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+>  
+>  				l2cap_pi(sk)->ident = l2cap_get_ident(conn);
+>  
+> +				l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
+>  				l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
+>  					L2CAP_CONN_REQ, sizeof(req), &req);
+>  			} else {
+
+See above.
 
 Regards
 
