@@ -1,104 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: check l2cap pending status before sending
- l2cap connect request
+Subject: Re: using hci0 interface without DEVUP
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1277278237-29377-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1277278237-29377-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Pavan Savoy <pavan_savoy@ti.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	"Leibovitch, Kobi" <kobile@ti.com>,
+	pavan savoy <pavan_savoy@yahoo.co.in>
+In-Reply-To: <010f01cb1d12$67fecdc0$LocalHost@minx0099669>
+References: <250863.34433.qm@web94911.mail.in2.yahoo.com>
+	 <1278420904.2789.41.camel@localhost.localdomain>
+	 <010f01cb1d12$67fecdc0$LocalHost@minx0099669>
 Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 06 Jul 2010 12:14:38 -0300
-Message-ID: <1278429278.2789.48.camel@localhost.localdomain>
+Date: Tue, 06 Jul 2010 11:08:37 -0300
+Message-ID: <1278425317.2789.43.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Pavan,
 
-> Due to race condition in L2CAP state machine L2CAP Connection Request
-> may be sent twice for SDP with the same source channel id. Problems
-> reported connecting to Apple products, some carkit, Blackberry phones.
+> >> In certain cases, as in using VS commads to communicate with different cores on the combo chips 
+> >> (say, BT, FM, GPS) - we would have to use the hci0 interface without it being UP.
+> >>
+> >> As in the hci0 interface still needs to be invisible (via dbus/bluetoothd) to the system but to be 
+> >> available to be use.
+> >>
+> >> Is there a way we can do this while registering with the hci ?
+> >> say a flag in the struct hci_dev to be by default during registration HCI_DEV_DOWN to be default 
+> >> state ?
+> >
+> > it is a pretty simple fact that the HCI device has to up. Otherwise it
+> > is not going to work. Same with an Ethernet interface. That is the
+> > proper state for such interfaces.
 > 
-> ...
-> 2010-06-07 21:18:03.651031 < ACL data: handle 1 flags 0x02 dlen 12
->     L2CAP(s): Connect req: psm 1 scid 0x0040
-> 2010-06-07 21:18:03.653473 > HCI Event: Number of Completed Packets (0x13) plen 5
->     handle 1 packets 1
-> 2010-06-07 21:18:03.653808 > HCI Event: Auth Complete (0x06) plen 3
->     status 0x00 handle 1
-> 2010-06-07 21:18:03.653869 < ACL data: handle 1 flags 0x02 dlen 12
->     L2CAP(s): Connect req: psm 1 scid 0x0040
+> device should be UP and RUNNING, I agree, But somehow to hide this from the bluetoothd !! is my 
+> concern,
+> hide this from bluetoothd, and hence hide this from dbus, so as to hide it from rest of the system 
 > ...
 > 
-> Patch uses L2CAP_CONF_CONNECT_PEND flag to mark that L2CAP Connection
-> Request has been sent.
+> > What you want is to set RAW mode on the HCI device before bringing it
+> > up. Then bluetoothd will actually ignore it.
+> 
+> You mean to say HCI_RAW to the hdev->flags ?
+> But that has the same effect even now because our HCI commands are HCI_VS, ogf of 0x3f.
+> 
+> > However I am not sure what you are really trying to achieve here since
+> > every device will be brought up automatically by bluetoothd. And so you
+> > are already to late to the game at that point.
+> 
+> exactly what I am trying to avoid, as in during hci_register_dev, I provide a flag from my hdev, 
+> telling whether
+> hci_notify and hence sock internal notification should happen at all ...
+> Thereby, when I do
+> 
+> set_bit(hdev, NO_NOTIFY);
+> hci_register_dev(hdev);  --> bluetoothd doesn't get notification of a HCI-REG itself.
+> 
+> But the problem would then be, how would I do a DEVUP internally ...
+> Any hints ??
 
-patch in general looks fine, but I do have some comments.
+listen to what I said. If you wanna set this as RAW device from the
+kernel, then that is fine as well. You can do that. Only exception is
+that you can never take this back from userspace:
 
-> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-> index bb00015..7f82f7b 100644
-> --- a/net/bluetooth/l2cap.c
-> +++ b/net/bluetooth/l2cap.c
-> @@ -409,13 +409,16 @@ static void l2cap_do_start(struct sock *sk)
->  		if (!(conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE))
->  			return;
->  
-> -		if (l2cap_check_security(sk)) {
-> +		if (l2cap_check_security(sk) &&
-> +				!(l2cap_pi(sk)->conf_state &
-> +				L2CAP_CONF_CONNECT_PEND)) {
-
-I think having some l2cap_check_pending() would be a good idea. This
-high indentation is not easy to read.
-
->  			struct l2cap_conn_req req;
->  			req.scid = cpu_to_le16(l2cap_pi(sk)->scid);
->  			req.psm  = l2cap_pi(sk)->psm;
->  
->  			l2cap_pi(sk)->ident = l2cap_get_ident(conn);
->  
-> +			l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
->  			l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
->  					L2CAP_CONN_REQ, sizeof(req), &req);
-
-If we look at the other cases we have done this, then either have an
-empty line between these two commands. Or remove the other empty line.
-
->  		}
-> @@ -464,13 +467,16 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
->  		}
->  
->  		if (sk->sk_state == BT_CONNECT) {
-> -			if (l2cap_check_security(sk)) {
-> +			if (l2cap_check_security(sk) &&
-> +					!(l2cap_pi(sk)->conf_state &
-> +					L2CAP_CONF_CONNECT_PEND)) {
-
-See above.
-
->  				struct l2cap_conn_req req;
->  				req.scid = cpu_to_le16(l2cap_pi(sk)->scid);
->  				req.psm  = l2cap_pi(sk)->psm;
->  
->  				l2cap_pi(sk)->ident = l2cap_get_ident(conn);
->  
-> +				l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
->  				l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
->  					L2CAP_CONN_REQ, sizeof(req), &req);
-
-See above.
-
->  			}
-> @@ -4407,6 +4413,7 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
->  
->  				l2cap_pi(sk)->ident = l2cap_get_ident(conn);
->  
-> +				l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
->  				l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
->  					L2CAP_CONN_REQ, sizeof(req), &req);
->  			} else {
-
-See above.
+	set_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks);
 
 Regards
 
