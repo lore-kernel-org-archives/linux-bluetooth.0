@@ -1,77 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
-From: <ext-jablonski.radoslaw@nokia.com>
-To: <linux-bluetooth@vger.kernel.org>
-Date: Wed, 7 Jul 2010 14:45:42 +0200
-Subject: [PATCH] Added empty VCARD N: parameter handling
-Message-ID: <090FE800A758CA439B2752C082AC3DEF037828C920@NOK-EUMSG-06.mgdnok.nokia.com>
-Content-Type: multipart/mixed;
-	boundary="_002_090FE800A758CA439B2752C082AC3DEF037828C920NOKEUMSG06mgd_"
-MIME-Version: 1.0
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2] Bluetooth: Check l2cap pending status before sending l2cap connect request
+Date: Wed,  7 Jul 2010 12:05:43 +0300
+Message-Id: <1278493543-25290-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---_002_090FE800A758CA439B2752C082AC3DEF037828C920NOKEUMSG06mgd_
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 
-Some of the devices are expecting that N: parameter in VCARD is always fill=
-ed (by example Nokia BH-903)
-When this field is empty (N:;;;;) then list of dialed/incoming calls on car=
-kit is useless - carkit then shows only blank lines and it's impossible to =
-determine who made call ( phone number are invisible too in this case)
-   =20
-If none of the contact fields is available, then setting telephone number a=
-s the first attribute for "N:" parameter.
-Carkit will see that number as contact name - it is only used in case when =
-none of more detailed contact information is available on the phone.
+Due to race condition in L2CAP state machine L2CAP Connection Request
+may be sent twice for SDP with the same source channel id. Problems
+reported connecting to Apple products, some carkit, Blackberry phones.
 
-BR,
-Radek
+...
+2010-06-07 21:18:03.651031 < ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 1 scid 0x0040
+2010-06-07 21:18:03.653473 > HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+2010-06-07 21:18:03.653808 > HCI Event: Auth Complete (0x06) plen 3
+    status 0x00 handle 1
+2010-06-07 21:18:03.653869 < ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 1 scid 0x0040
+...
 
---_002_090FE800A758CA439B2752C082AC3DEF037828C920NOKEUMSG06mgd_
-Content-Type: text/x-patch;
-	name="0001-Added-empty-N-parameter-handling-in-VCARD.patch"
-Content-Description: 0001-Added-empty-N-parameter-handling-in-VCARD.patch
-Content-Disposition: attachment;
-	filename="0001-Added-empty-N-parameter-handling-in-VCARD.patch"; size=1946;
-	creation-date="Wed, 07 Jul 2010 14:39:17 GMT";
-	modification-date="Wed, 07 Jul 2010 14:39:17 GMT"
-Content-Transfer-Encoding: base64
+Patch uses L2CAP_CONF_CONNECT_PEND flag to mark that L2CAP Connection
+Request has been sent already.
 
-RnJvbSA2ZDg4ZTNkN2MxYTUwMTRlNjBjYThmNTNmNzE2M2UzYTUxMTQ4NTMwIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBSYWRvc2xhdyBKYWJsb25za2kgPGV4dC1qYWJsb25za2kucmFk
-b3NsYXdAbm9raWEuY29tPgpEYXRlOiBXZWQsIDcgSnVsIDIwMTAgMTU6MDc6NTggKzAzMDAKU3Vi
-amVjdDogW1BBVENIXSBBZGRlZCBlbXB0eSBOOiBwYXJhbWV0ZXIgaGFuZGxpbmcgaW4gVkNBUkQK
-ClNvbWUgb2YgdGhlIGRldmljZXMgYXJlIGV4cGVjdGluZyB0aGF0IE46IHBhcmFtZXRlciBpbiBW
-Q0FSRCBpcyBhbHdheXMgZmlsbGVkIChieSBleGFtcGxlIE5va2lhIEJILTkwMykKV2hlbiB0aGlz
-IGZpZWxkIGlzIGVtcHR5IChOOjs7OzspIHRoZW4gbGlzdCBvZiBkaWFsZWQvaW5jb21pbmcgY2Fs
-bHMgb24gY2Fya2l0IGlzIHVzZWxlc3MuCgpJZiBub25lIG9mIGZpZWxkcyBpcyBhdmFpbGFibGUg
-dGhlbiBzZXR0aW5nIHRlbGVwaG9uZSBudW1iZXIgYXMgdGhlIGZpcnN0IGF0dHJpYnV0ZSBmb3Ig
-Ik46IiBwYXJhbWV0ZXIuCkNhcmtpdCB3aWxsIHNlZSB0aGF0IG51bWJlciBhcyBjb250YWN0IG5h
-bWUgLSBpdCBpcyBvbmx5IHVzZWQgaW4gY2FzZSB3aGVuIG5vbmUgb2YgbW9yZSBkZXRhaWxlZCBj
-b250YWN0IGluZm9ybWF0aW9uIGlzIGF2YWlsYWJsZSBvbiBwaG9uZS4KLS0tCiBwbHVnaW5zL3Zj
-YXJkLmMgfCAgIDE3ICsrKysrKysrKysrKysrLS0tCiAxIGZpbGVzIGNoYW5nZWQsIDE0IGluc2Vy
-dGlvbnMoKyksIDMgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvcGx1Z2lucy92Y2FyZC5jIGIv
-cGx1Z2lucy92Y2FyZC5jCmluZGV4IDU5NDhhNGEuLmIyYWIzMGEgMTAwNjQ0Ci0tLSBhL3BsdWdp
-bnMvdmNhcmQuYworKysgYi9wbHVnaW5zL3ZjYXJkLmMKQEAgLTEzNiw5ICsxMzYsMjAgQEAgc3Rh
-dGljIHZvaWQgdmNhcmRfcHJpbnRmX2JlZ2luKEdTdHJpbmcgKnZjYXJkcywgdWludDhfdCBmb3Jt
-YXQpCiBzdGF0aWMgdm9pZCB2Y2FyZF9wcmludGZfbmFtZShHU3RyaW5nICp2Y2FyZHMsCiAJCQkJ
-CXN0cnVjdCBwaG9uZWJvb2tfY29udGFjdCAqY29udGFjdCkKIHsKLQl2Y2FyZF9wcmludGYodmNh
-cmRzLCAiTjolczslczslczslczslcyIsIGNvbnRhY3QtPmZhbWlseSwKLQkJCQljb250YWN0LT5n
-aXZlbiwgY29udGFjdC0+YWRkaXRpb25hbCwKLQkJCQljb250YWN0LT5wcmVmaXgsIGNvbnRhY3Qt
-PnN1ZmZpeCk7CisJLyogYXQgbGVhc3Qgb25lIG9mIGZpZWxkcyBpcyBwcmVzZW50ICovCisJaWYg
-KChjb250YWN0LT5mYW1pbHkgJiYgc3RybGVuKGNvbnRhY3QtPmZhbWlseSkpIHx8CisJCShjb250
-YWN0LT5naXZlbiAmJiBzdHJsZW4gKGNvbnRhY3QtPmdpdmVuKSkgfHwKKwkJKGNvbnRhY3QtPmFk
-ZGl0aW9uYWwgJiYgc3RybGVuKGNvbnRhY3QtPmFkZGl0aW9uYWwpKSB8fAorCQkoY29udGFjdC0+
-cHJlZml4ICYmIHN0cmxlbiAoY29udGFjdC0+cHJlZml4KSkgfHwKKwkJKGNvbnRhY3QtPnN1ZmZp
-eCAmJiBzdHJsZW4gKGNvbnRhY3QtPnN1ZmZpeCkpKQorCQl2Y2FyZF9wcmludGYodmNhcmRzLCAi
-TjolczslczslczslczslcyIsIGNvbnRhY3QtPmZhbWlseSwKKwkJCQkJCWNvbnRhY3QtPmdpdmVu
-LCBjb250YWN0LT5hZGRpdGlvbmFsLAorCQkJCQkJY29udGFjdC0+cHJlZml4LCBjb250YWN0LT5z
-dWZmaXgpOworCWVsc2UgeworCQkvKiBpZiBhbGwgZmllbGRzIGFyZSBlbXB0eSB3ZSdyZSB1c2lu
-ZyAgZmlyc3QgcGhvbmUgbnVtYmVyIGFzIG5hbWUgKi8KKwkJc3RydWN0IHBob25lYm9va19udW1i
-ZXIgKm51bWJlciA9IGNvbnRhY3QtPm51bWJlcnMtPmRhdGE7CisJCXZjYXJkX3ByaW50Zih2Y2Fy
-ZHMsICJOOiVzOzs7OyIsIG51bWJlci0+dGVsKTsKKwl9CiB9CiAKIHN0YXRpYyB2b2lkIHZjYXJk
-X3ByaW50Zl9mdWxsbmFtZShHU3RyaW5nICp2Y2FyZHMsIGNvbnN0IGNoYXIgKnRleHQpCi0tIAox
-LjYuMC40Cgo=
+Modified version of Ville Tervo patch.
 
---_002_090FE800A758CA439B2752C082AC3DEF037828C920NOKEUMSG06mgd_--
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+---
+ net/bluetooth/l2cap.c |   14 +++++++++++---
+ 1 files changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index bb00015..899cca5 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -401,6 +401,11 @@ static inline void l2cap_send_rr_or_rnr(struct l2cap_pinfo *pi, u16 control)
+ 	l2cap_send_sframe(pi, control);
+ }
+ 
++static inline int l2cap_check_pending(struct sock *sk)
++{
++	return l2cap_pi(sk)->conf_state & L2CAP_CONF_CONNECT_PEND;
++}
++
+ static void l2cap_do_start(struct sock *sk)
+ {
+ 	struct l2cap_conn *conn = l2cap_pi(sk)->conn;
+@@ -409,12 +414,13 @@ static void l2cap_do_start(struct sock *sk)
+ 		if (!(conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE))
+ 			return;
+ 
+-		if (l2cap_check_security(sk)) {
++		if (l2cap_check_security(sk) && !l2cap_check_pending(sk)) {
+ 			struct l2cap_conn_req req;
+ 			req.scid = cpu_to_le16(l2cap_pi(sk)->scid);
+ 			req.psm  = l2cap_pi(sk)->psm;
+ 
+ 			l2cap_pi(sk)->ident = l2cap_get_ident(conn);
++			l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
+ 
+ 			l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
+ 					L2CAP_CONN_REQ, sizeof(req), &req);
+@@ -464,12 +470,14 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 		}
+ 
+ 		if (sk->sk_state == BT_CONNECT) {
+-			if (l2cap_check_security(sk)) {
++			if (l2cap_check_security(sk) &&
++					!l2cap_check_pending(sk)) {
+ 				struct l2cap_conn_req req;
+ 				req.scid = cpu_to_le16(l2cap_pi(sk)->scid);
+ 				req.psm  = l2cap_pi(sk)->psm;
+ 
+ 				l2cap_pi(sk)->ident = l2cap_get_ident(conn);
++				l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
+ 
+ 				l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
+ 					L2CAP_CONN_REQ, sizeof(req), &req);
+@@ -2914,7 +2922,6 @@ static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hd
+ 		l2cap_pi(sk)->ident = 0;
+ 		l2cap_pi(sk)->dcid = dcid;
+ 		l2cap_pi(sk)->conf_state |= L2CAP_CONF_REQ_SENT;
+-
+ 		l2cap_pi(sk)->conf_state &= ~L2CAP_CONF_CONNECT_PEND;
+ 
+ 		l2cap_send_cmd(conn, l2cap_get_ident(conn), L2CAP_CONF_REQ,
+@@ -4406,6 +4413,7 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 				req.psm  = l2cap_pi(sk)->psm;
+ 
+ 				l2cap_pi(sk)->ident = l2cap_get_ident(conn);
++				l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
+ 
+ 				l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
+ 					L2CAP_CONN_REQ, sizeof(req), &req);
+-- 
+1.7.0.4
+
