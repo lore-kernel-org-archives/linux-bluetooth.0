@@ -1,89 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Added empty VCARD N: parameter handling
-From: Marcel Holtmann <marcel@holtmann.org>
-To: ext-jablonski.radoslaw@nokia.com
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <090FE800A758CA439B2752C082AC3DEF037828C920@NOK-EUMSG-06.mgdnok.nokia.com>
-References: <090FE800A758CA439B2752C082AC3DEF037828C920@NOK-EUMSG-06.mgdnok.nokia.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 07 Jul 2010 10:16:53 -0300
-Message-ID: <1278508613.2789.114.camel@localhost.localdomain>
-Mime-Version: 1.0
+From: <ext-jablonski.radoslaw@nokia.com>
+To: <linux-bluetooth@vger.kernel.org>
+Date: Wed, 7 Jul 2010 14:45:42 +0200
+Subject: [PATCH] Added empty VCARD N: parameter handling
+Message-ID: <090FE800A758CA439B2752C082AC3DEF037828C920@NOK-EUMSG-06.mgdnok.nokia.com>
+Content-Type: multipart/mixed;
+	boundary="_002_090FE800A758CA439B2752C082AC3DEF037828C920NOKEUMSG06mgd_"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Radek,
+--_002_090FE800A758CA439B2752C082AC3DEF037828C920NOKEUMSG06mgd_
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-using git send-email would be a bit better here. Then we have the
-patches inline.
+Some of the devices are expecting that N: parameter in VCARD is always fill=
+ed (by example Nokia BH-903)
+When this field is empty (N:;;;;) then list of dialed/incoming calls on car=
+kit is useless - carkit then shows only blank lines and it's impossible to =
+determine who made call ( phone number are invisible too in this case)
+   =20
+If none of the contact fields is available, then setting telephone number a=
+s the first attribute for "N:" parameter.
+Carkit will see that number as contact name - it is only used in case when =
+none of more detailed contact information is available on the phone.
 
-> From 6d88e3d7c1a5014e60ca8f53f7163e3a51148530 Mon Sep 17 00:00:00 2001
-> From: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-> Date: Wed, 7 Jul 2010 15:07:58 +0300
-> Subject: [PATCH] Added empty N: parameter handling in VCARD
-> 
-> Some of the devices are expecting that N: parameter in VCARD is always filled (by example Nokia BH-903)
-> When this field is empty (N:;;;;) then list of dialed/incoming calls on carkit is useless.
-> 
-> If none of fields is available then setting telephone number as the first attribute for "N:" parameter.
-> Carkit will see that number as contact name - it is only used in case when none of more detailed contact information is available on phone.
-> ---
->  plugins/vcard.c |   17 ++++++++++++++---
->  1 files changed, 14 insertions(+), 3 deletions(-)
-> 
-> diff --git a/plugins/vcard.c b/plugins/vcard.c
-> index 5948a4a..b2ab30a 100644
-> --- a/plugins/vcard.c
-> +++ b/plugins/vcard.c
-> @@ -136,9 +136,20 @@ static void vcard_printf_begin(GString *vcards, uint8_t format)
->  static void vcard_printf_name(GString *vcards,
->                                         struct phonebook_contact *contact)
->  {
-> -       vcard_printf(vcards, "N:%s;%s;%s;%s;%s", contact->family,
-> -                               contact->given, contact->additional,
-> -                               contact->prefix, contact->suffix);
-> +       /* at least one of fields is present */
-> +       if ((contact->family && strlen(contact->family)) ||
-> +               (contact->given && strlen (contact->given)) ||
-> +               (contact->additional && strlen(contact->additional)) ||
-> +               (contact->prefix && strlen (contact->prefix)) ||
-> +               (contact->suffix && strlen (contact->suffix)))
-> +               vcard_printf(vcards, "N:%s;%s;%s;%s;%s", contact->family,
-> +                                               contact->given, contact->additional,
-> +                                               contact->prefix, contact->suffix);
+BR,
+Radek
 
-The extra if clauses require two level of indentation. Otherwise you
-can't tell which is part of the if clause and which is code.
+--_002_090FE800A758CA439B2752C082AC3DEF037828C920NOKEUMSG06mgd_
+Content-Type: text/x-patch;
+	name="0001-Added-empty-N-parameter-handling-in-VCARD.patch"
+Content-Description: 0001-Added-empty-N-parameter-handling-in-VCARD.patch
+Content-Disposition: attachment;
+	filename="0001-Added-empty-N-parameter-handling-in-VCARD.patch"; size=1946;
+	creation-date="Wed, 07 Jul 2010 14:39:17 GMT";
+	modification-date="Wed, 07 Jul 2010 14:39:17 GMT"
+Content-Transfer-Encoding: base64
 
-Also it is strlen(...). No extra space.
+RnJvbSA2ZDg4ZTNkN2MxYTUwMTRlNjBjYThmNTNmNzE2M2UzYTUxMTQ4NTMwIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBSYWRvc2xhdyBKYWJsb25za2kgPGV4dC1qYWJsb25za2kucmFk
+b3NsYXdAbm9raWEuY29tPgpEYXRlOiBXZWQsIDcgSnVsIDIwMTAgMTU6MDc6NTggKzAzMDAKU3Vi
+amVjdDogW1BBVENIXSBBZGRlZCBlbXB0eSBOOiBwYXJhbWV0ZXIgaGFuZGxpbmcgaW4gVkNBUkQK
+ClNvbWUgb2YgdGhlIGRldmljZXMgYXJlIGV4cGVjdGluZyB0aGF0IE46IHBhcmFtZXRlciBpbiBW
+Q0FSRCBpcyBhbHdheXMgZmlsbGVkIChieSBleGFtcGxlIE5va2lhIEJILTkwMykKV2hlbiB0aGlz
+IGZpZWxkIGlzIGVtcHR5IChOOjs7OzspIHRoZW4gbGlzdCBvZiBkaWFsZWQvaW5jb21pbmcgY2Fs
+bHMgb24gY2Fya2l0IGlzIHVzZWxlc3MuCgpJZiBub25lIG9mIGZpZWxkcyBpcyBhdmFpbGFibGUg
+dGhlbiBzZXR0aW5nIHRlbGVwaG9uZSBudW1iZXIgYXMgdGhlIGZpcnN0IGF0dHJpYnV0ZSBmb3Ig
+Ik46IiBwYXJhbWV0ZXIuCkNhcmtpdCB3aWxsIHNlZSB0aGF0IG51bWJlciBhcyBjb250YWN0IG5h
+bWUgLSBpdCBpcyBvbmx5IHVzZWQgaW4gY2FzZSB3aGVuIG5vbmUgb2YgbW9yZSBkZXRhaWxlZCBj
+b250YWN0IGluZm9ybWF0aW9uIGlzIGF2YWlsYWJsZSBvbiBwaG9uZS4KLS0tCiBwbHVnaW5zL3Zj
+YXJkLmMgfCAgIDE3ICsrKysrKysrKysrKysrLS0tCiAxIGZpbGVzIGNoYW5nZWQsIDE0IGluc2Vy
+dGlvbnMoKyksIDMgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvcGx1Z2lucy92Y2FyZC5jIGIv
+cGx1Z2lucy92Y2FyZC5jCmluZGV4IDU5NDhhNGEuLmIyYWIzMGEgMTAwNjQ0Ci0tLSBhL3BsdWdp
+bnMvdmNhcmQuYworKysgYi9wbHVnaW5zL3ZjYXJkLmMKQEAgLTEzNiw5ICsxMzYsMjAgQEAgc3Rh
+dGljIHZvaWQgdmNhcmRfcHJpbnRmX2JlZ2luKEdTdHJpbmcgKnZjYXJkcywgdWludDhfdCBmb3Jt
+YXQpCiBzdGF0aWMgdm9pZCB2Y2FyZF9wcmludGZfbmFtZShHU3RyaW5nICp2Y2FyZHMsCiAJCQkJ
+CXN0cnVjdCBwaG9uZWJvb2tfY29udGFjdCAqY29udGFjdCkKIHsKLQl2Y2FyZF9wcmludGYodmNh
+cmRzLCAiTjolczslczslczslczslcyIsIGNvbnRhY3QtPmZhbWlseSwKLQkJCQljb250YWN0LT5n
+aXZlbiwgY29udGFjdC0+YWRkaXRpb25hbCwKLQkJCQljb250YWN0LT5wcmVmaXgsIGNvbnRhY3Qt
+PnN1ZmZpeCk7CisJLyogYXQgbGVhc3Qgb25lIG9mIGZpZWxkcyBpcyBwcmVzZW50ICovCisJaWYg
+KChjb250YWN0LT5mYW1pbHkgJiYgc3RybGVuKGNvbnRhY3QtPmZhbWlseSkpIHx8CisJCShjb250
+YWN0LT5naXZlbiAmJiBzdHJsZW4gKGNvbnRhY3QtPmdpdmVuKSkgfHwKKwkJKGNvbnRhY3QtPmFk
+ZGl0aW9uYWwgJiYgc3RybGVuKGNvbnRhY3QtPmFkZGl0aW9uYWwpKSB8fAorCQkoY29udGFjdC0+
+cHJlZml4ICYmIHN0cmxlbiAoY29udGFjdC0+cHJlZml4KSkgfHwKKwkJKGNvbnRhY3QtPnN1ZmZp
+eCAmJiBzdHJsZW4gKGNvbnRhY3QtPnN1ZmZpeCkpKQorCQl2Y2FyZF9wcmludGYodmNhcmRzLCAi
+TjolczslczslczslczslcyIsIGNvbnRhY3QtPmZhbWlseSwKKwkJCQkJCWNvbnRhY3QtPmdpdmVu
+LCBjb250YWN0LT5hZGRpdGlvbmFsLAorCQkJCQkJY29udGFjdC0+cHJlZml4LCBjb250YWN0LT5z
+dWZmaXgpOworCWVsc2UgeworCQkvKiBpZiBhbGwgZmllbGRzIGFyZSBlbXB0eSB3ZSdyZSB1c2lu
+ZyAgZmlyc3QgcGhvbmUgbnVtYmVyIGFzIG5hbWUgKi8KKwkJc3RydWN0IHBob25lYm9va19udW1i
+ZXIgKm51bWJlciA9IGNvbnRhY3QtPm51bWJlcnMtPmRhdGE7CisJCXZjYXJkX3ByaW50Zih2Y2Fy
+ZHMsICJOOiVzOzs7OyIsIG51bWJlci0+dGVsKTsKKwl9CiB9CiAKIHN0YXRpYyB2b2lkIHZjYXJk
+X3ByaW50Zl9mdWxsbmFtZShHU3RyaW5nICp2Y2FyZHMsIGNvbnN0IGNoYXIgKnRleHQpCi0tIAox
+LjYuMC40Cgo=
 
-And I would prefer to split this into an extra function just doing this
-test. This if clause is too big.
-
-> +       else {
-> +               /* if all fields are empty we're using  first phone number as name */
-> +               struct phonebook_number *number = contact->numbers->data;
-> +               vcard_printf(vcards, "N:%s;;;;", number->tel);
-> +       }
->  }
-
-So I prefer the whole thing like this:
-
-	/* if all fields are empty we're using  first phone number as name */
-	if (required_fields_present(contact) == FALSE) {
-		struct phonebook_number *number = contact->numbers->data;
-		vcard_printf(vcards, "N:%s;;;;", number->tel);
-		return;
-	}
-
-	vcard_printf(vcards, "N:%s;%s;%s;%s;%s", contact->family,
-		...
-
-This way it is a lot easier to read and understand what is the special
-case and what would be the default.
-
-Regards
-
-Marcel
-
-
+--_002_090FE800A758CA439B2752C082AC3DEF037828C920NOKEUMSG06mgd_--
