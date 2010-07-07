@@ -1,157 +1,245 @@
 Return-Path: <cyrus@holtmann.org>
 From: Inga Stotland <ingas@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: johan.hedberg@gmail.com,
-	marcel@holtmann.org,
-	rshaffer@codeaurora.org,
-	Inga Stotland <ingas@codeaurora.org>
-Subject: [PATCH 2/3] Update EIR whenever record is added or removed
-Date: Wed,  7 Jul 2010 15:08:37 -0700
-Message-Id: <1278540518-18620-3-git-send-email-ingas@codeaurora.org>
+Cc: johan.hedberg@gmail.com, marcel@holtmann.org,
+	rshaffer@codeaurora.org, Inga Stotland <ingas@codeaurora.org>
+Subject: [PATCH 1/3] Support for adding UUID128 to extended inquiry response
+Date: Wed,  7 Jul 2010 15:08:36 -0700
+Message-Id: <1278540518-18620-2-git-send-email-ingas@codeaurora.org>
 In-Reply-To: <1278540518-18620-1-git-send-email-ingas@codeaurora.org>
 References: <1278540518-18620-1-git-send-email-ingas@codeaurora.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- plugins/service.c |   19 +++++++++++++++++++
- src/adapter.c     |   24 +++++++++++++++++++++++-
- src/adapter.h     |    2 ++
- 3 files changed, 44 insertions(+), 1 deletions(-)
+ src/sdpd-service.c |  108 ++++++++++++++++++++++++++++++++++++++++++++--------
+ src/sdpd.h         |   12 ++++++
+ 2 files changed, 104 insertions(+), 16 deletions(-)
 
-diff --git a/plugins/service.c b/plugins/service.c
-index 96280bd..8ec4df4 100644
---- a/plugins/service.c
-+++ b/plugins/service.c
-@@ -4,6 +4,7 @@
-  *
-  *  Copyright (C) 2006-2010  Nokia Corporation
-  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+diff --git a/src/sdpd-service.c b/src/sdpd-service.c
+index cdbb4f4..1bb79a7 100644
+--- a/src/sdpd-service.c
++++ b/src/sdpd-service.c
+@@ -6,6 +6,7 @@
+  *  Copyright (C) 2002-2003  Maxim Krasnyansky <maxk@qualcomm.com>
+  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
+  *  Copyright (C) 2002-2003  Stephen Crane <steve.crane@rococosoft.com>
 + *  Copyright (C) 2010, Code Aurora Forum. All rights reserved.
   *
   *
   *  This program is free software; you can redistribute it and/or modify
-@@ -445,6 +446,8 @@ static DBusMessage *update_record(DBusConnection *conn, DBusMessage *msg,
- 				strerror(EIO));
- 	}
+@@ -49,6 +50,8 @@
+ #include "manager.h"
+ #include "adapter.h"
  
-+	adapter_update_ext_inquiry_response(&src);
++#define SIZEOF_UUID128 16
 +
- 	return dbus_message_new_method_return(msg);
+ static sdp_record_t *server = NULL;
+ 
+ static uint16_t did_vendor = 0x0000;
+@@ -174,41 +177,102 @@ static void update_svclass_list(const bdaddr_t *src)
+ 
  }
  
-@@ -516,6 +519,7 @@ static DBusMessage *add_service_record(DBusConnection *conn,
- 	const char *sender, *record;
- 	dbus_uint32_t handle;
- 	int err;
-+	bdaddr_t addr;
- 
- 	if (dbus_message_get_args(msg, NULL,
- 			DBUS_TYPE_STRING, &record, DBUS_TYPE_INVALID) == FALSE)
-@@ -526,6 +530,13 @@ static DBusMessage *add_service_record(DBusConnection *conn,
- 	if (err < 0)
- 		return failed_strerror(msg, err);
- 
-+	if (serv_adapter->adapter)
-+		adapter_get_address(serv_adapter->adapter, &addr);
-+	else
-+		bacpy(&addr, BDADDR_ANY);
-+
-+	adapter_update_ext_inquiry_response(&addr);
-+
- 	reply = dbus_message_new_method_return(msg);
- 	if (!reply)
- 		return NULL;
-@@ -550,6 +561,7 @@ static DBusMessage *remove_service_record(DBusConnection *conn,
- 	struct service_adapter *serv_adapter = data;
- 	dbus_uint32_t handle;
- 	const char *sender;
-+	bdaddr_t addr;
- 
- 	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_UINT32, &handle,
- 						DBUS_TYPE_INVALID) == FALSE)
-@@ -560,6 +572,13 @@ static DBusMessage *remove_service_record(DBusConnection *conn,
- 	if (remove_record(conn, sender, serv_adapter, handle) < 0)
- 		return not_available(msg);
- 
-+	if (serv_adapter->adapter)
-+		adapter_get_address(serv_adapter->adapter, &addr);
-+	else
-+		bacpy(&addr, BDADDR_ANY);
-+
-+	adapter_update_ext_inquiry_response(&addr);
-+
- 	return dbus_message_new_method_return(msg);
- }
- 
-diff --git a/src/adapter.c b/src/adapter.c
-index 2a6ac18..8a05356 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -4,6 +4,7 @@
-  *
-  *  Copyright (C) 2006-2010  Nokia Corporation
-  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *  Copyright (C) 2010, Code Aurora Forum. All rights reserved.
-  *
-  *
-  *  This program is free software; you can redistribute it and/or modify
-@@ -820,7 +821,7 @@ static DBusMessage *set_pairable_timeout(DBusConnection *conn,
- 
- static void update_ext_inquiry_response(struct btd_adapter *adapter)
- {
--	uint8_t fec = 0, data[240];
-+	uint8_t fec = 0, data[EIR_DATA_LENGTH];
- 	struct hci_dev *dev = &adapter->dev;
- 	int dd;
- 
-@@ -846,6 +847,27 @@ static void update_ext_inquiry_response(struct btd_adapter *adapter)
- 	hci_close_dev(dd);
- }
- 
-+void adapter_update_ext_inquiry_response(const bdaddr_t *src)
++static void eir_generate_uuid128(sdp_list_t *list, uint8_t *ptr, uint16_t *eir_len)
 +{
-+	struct btd_adapter *adapter;
-+	GSList *adapters;
++	int i, k, index = 0;
++	uint16_t len = *eir_len;
++	uint8_t *uuid128;
++	gboolean truncated = FALSE;
 +
-+	if (bacmp(src, BDADDR_ANY) != 0) {
-+		adapter = manager_find_adapter(src);
-+		if (adapter)
-+			update_ext_inquiry_response(adapter);
-+		else
-+			error("Updating EIR failed: device not found");
-+	} else {
++	/* Store UUID128 in place, skip 2 bytes to insert type and length later */
++	uuid128 = ptr + 2;
 +
-+		/* Update extended inquiry reponse for ANY adapter */
-+		for (adapters = manager_get_adapters(); adapters; adapters = adapters->next) {
-+			adapter = adapters->data;
-+			update_ext_inquiry_response(adapter);
++	for (; list; list = list->next) {
++		sdp_record_t *rec = (sdp_record_t *) list->data;
++
++		if (rec->svclass.type != SDP_UUID128)
++			continue;
++
++		/* Stop if not enough space to put next UUID128 */
++		if ((len + 2 + SIZEOF_UUID128) > EIR_DATA_LENGTH) {
++			truncated = TRUE;
++			break;
 +		}
++
++		/* Check for duplicates, EIR data is Little Endian */
++		for (i = 0; i < index; i++) {
++			for (k = 0; k < SIZEOF_UUID128; k++) {
++				if (uuid128[i*SIZEOF_UUID128 + k] !=
++					rec->svclass.value.uuid128.data[SIZEOF_UUID128 - k])
++					break;
++			}
++			if (k == SIZEOF_UUID128)
++				break;
++		}
++
++		if (i < index)
++			continue;
++
++		/* EIR data is Little Endian */
++		for (k = 0; k < SIZEOF_UUID128; k++)
++			uuid128[index*SIZEOF_UUID128 + k] =
++				rec->svclass.value.uuid128.data[SIZEOF_UUID128 - 1 - k];
++
++		len += SIZEOF_UUID128;
++		index++;
++	}
++
++	if (index > 0 || truncated) {
++		/* EIR Data length */
++		ptr[0] = (index * SIZEOF_UUID128) + 1;
++		/* EIR Data type */
++		ptr[1] = (truncated) ? EIR_UUID128_SOME : EIR_UUID128_ALL;
++		len += 2;
++		*eir_len = len;
 +	}
 +}
 +
- void adapter_set_class_complete(bdaddr_t *bdaddr, uint8_t status)
+ void create_ext_inquiry_response(const char *name,
+ 					int8_t tx_power, sdp_list_t *services,
+ 					uint8_t *data)
  {
- 	uint8_t class[3];
-diff --git a/src/adapter.h b/src/adapter.h
-index 71d3387..4c3bc04 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -4,6 +4,7 @@
-  *
-  *  Copyright (C) 2006-2010  Nokia Corporation
-  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+ 	sdp_list_t *list = services;
+ 	uint8_t *ptr = data;
+-	uint16_t uuid[24];
++	uint16_t eir_len = 0;
++	uint16_t uuid16[EIR_DATA_LENGTH/2];
+ 	int i, index = 0;
++	gboolean truncated = FALSE;
+ 
+ 	if (name) {
+ 		int len = strlen(name);
+ 
++		/* EIR Data type */
+ 		if (len > 48) {
+ 			len = 48;
+-			ptr[1] = 0x08;
++			ptr[1] = EIR_NAME_SHORT;
+ 		} else
+-			ptr[1] = 0x09;
++			ptr[1] = EIR_NAME_COMPLETE;
+ 
++		/* EIR Data length */
+ 		ptr[0] = len + 1;
+ 
+ 		memcpy(ptr + 2, name, len);
+ 
+-		ptr += len + 2;
++		eir_len += (len + 2);
++		ptr += (len + 2);
+ 	}
+ 
+ 	if (tx_power != 0) {
+ 		*ptr++ = 2;
+-		*ptr++ = 0x0a;
++		*ptr++ = EIR_TX_POWER;
+ 		*ptr++ = (uint8_t) tx_power;
++		eir_len += 3;
+ 	}
+ 
+ 	if (did_vendor != 0x0000) {
+ 		uint16_t source = 0x0002;
+ 		*ptr++ = 9;
+-		*ptr++ = 0x10;
++		*ptr++ = EIR_DEVICE_ID;
+ 		*ptr++ = (source & 0x00ff);
+ 		*ptr++ = (source & 0xff00) >> 8;
+ 		*ptr++ = (did_vendor & 0x00ff);
+@@ -217,10 +281,10 @@ void create_ext_inquiry_response(const char *name,
+ 		*ptr++ = (did_product & 0xff00) >> 8;
+ 		*ptr++ = (did_version & 0x00ff);
+ 		*ptr++ = (did_version & 0xff00) >> 8;
++		eir_len += 10;
+ 	}
+ 
+-	ptr[1] = 0x03;
+-
++	/* Group all UUID16 types */
+ 	for (; list; list = list->next) {
+ 		sdp_record_t *rec = (sdp_record_t *) list->data;
+ 
+@@ -233,30 +297,42 @@ void create_ext_inquiry_response(const char *name,
+ 		if (rec->svclass.value.uuid16 == PNP_INFO_SVCLASS_ID)
+ 			continue;
+ 
+-		if (index > 23) {
+-			ptr[1] = 0x02;
++		/* Stop if not enough space to put next UUID16 */
++		if ((eir_len + 2 + sizeof(uint16_t)) > EIR_DATA_LENGTH) {
++			truncated = TRUE;
+ 			break;
+ 		}
+ 
++		/* Check for duplicates */
+ 		for (i = 0; i < index; i++)
+-			if (uuid[i] == rec->svclass.value.uuid16)
++			if (uuid16[i] == rec->svclass.value.uuid16)
+ 				break;
+ 
+-		if (i == index - 1)
++		if (i < index)
+ 			continue;
+ 
+-		uuid[index++] = rec->svclass.value.uuid16;
++		uuid16[index++] = rec->svclass.value.uuid16;
++		eir_len += sizeof(uint16_t);
+ 	}
+ 
+ 	if (index > 0) {
+-		ptr[0] = (index * 2) + 1;
++		/* EIR Data length */
++		ptr[0] = (index * sizeof(uint16_t)) + 1;
++		/* EIR Data type */
++		ptr[1] = (truncated) ? EIR_UUID16_SOME : EIR_UUID16_ALL;
++
+ 		ptr += 2;
++		eir_len += 2;
+ 
+ 		for (i = 0; i < index; i++) {
+-			*ptr++ = (uuid[i] & 0x00ff);
+-			*ptr++ = (uuid[i] & 0xff00) >> 8;
++			*ptr++ = (uuid16[i] & 0x00ff);
++			*ptr++ = (uuid16[i] & 0xff00) >> 8;
+ 		}
+ 	}
++
++	/* Group all UUID128 types */
++	if (eir_len <= EIR_DATA_LENGTH - 2)
++		eir_generate_uuid128(services, ptr, &eir_len);
+ }
+ 
+ void register_public_browse_group(void)
+diff --git a/src/sdpd.h b/src/sdpd.h
+index e93b0b6..8fd8bbe 100644
+--- a/src/sdpd.h
++++ b/src/sdpd.h
+@@ -6,6 +6,7 @@
+  *  Copyright (C) 2002-2003  Maxim Krasnyansky <maxk@qualcomm.com>
+  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
+  *  Copyright (C) 2002-2003  Stephen Crane <steve.crane@rococosoft.com>
 + *  Copyright (C) 2010, Code Aurora Forum. All rights reserved.
   *
   *
   *  This program is free software; you can redistribute it and/or modify
-@@ -126,6 +127,7 @@ void adapter_service_insert(const bdaddr_t *bdaddr, void *rec);
- void adapter_service_remove(const bdaddr_t *bdaddr, void *rec);
- sdp_list_t *adapter_get_services(struct btd_adapter *adapter);
- void adapter_set_class_complete(bdaddr_t *bdaddr, uint8_t status);
-+void adapter_update_ext_inquiry_response(const bdaddr_t *src);
+@@ -34,6 +35,17 @@
+ #define SDPDBG(fmt...)
+ #endif
  
- struct agent *adapter_get_agent(struct btd_adapter *adapter);
- void adapter_add_connection(struct btd_adapter *adapter,
++#define EIR_DATA_LENGTH  240
++
++#define EIR_UUID16_SOME             0x02  /* 16-bit UUID, more available */
++#define EIR_UUID16_ALL              0x03  /* 16-bit UUID, all listed */
++#define EIR_UUID128_SOME            0x06  /* 128-bit UUID, more available */
++#define EIR_UUID128_ALL             0x07  /* 128-bit UUID, all listed */
++#define EIR_NAME_SHORT              0x08  /* shortened local name */
++#define EIR_NAME_COMPLETE           0x09  /* complete local name */
++#define EIR_DEVICE_ID               0x10  /* device ID */
++#define EIR_TX_POWER                0x0A  /* Transmit power level */
++
+ typedef struct request {
+ 	bdaddr_t device;
+ 	bdaddr_t bdaddr;
 -- 
 1.7.1
 
