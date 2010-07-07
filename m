@@ -1,176 +1,118 @@
 Return-Path: <cyrus@holtmann.org>
-From: <ext-jablonski.radoslaw@nokia.com>
-To: <marcel@holtmann.org>
-CC: <linux-bluetooth@vger.kernel.org>
-Date: Wed, 7 Jul 2010 16:20:16 +0200
-Subject: RE: [PATCH] Added empty VCARD N: parameter handling
-Message-ID: <090FE800A758CA439B2752C082AC3DEF037828C921@NOK-EUMSG-06.mgdnok.nokia.com>
-References: <090FE800A758CA439B2752C082AC3DEF037828C920@NOK-EUMSG-06.mgdnok.nokia.com>,<1278508613.2789.114.camel@localhost.localdomain>
-In-Reply-To: <1278508613.2789.114.camel@localhost.localdomain>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Subject: Re: [PATCHv2] Bluetooth: Check l2cap pending status before sending
+ l2cap connect request
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1278493543-25290-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1278493543-25290-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Wed, 07 Jul 2010 11:10:34 -0300
+Message-ID: <1278511834.2789.127.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
-I've made necessary changes to the code. Now it should look much better:)
-New version of patch is inserted below.
+Hi Andrei,
 
->From 45dfcf8f9dfacd8937a1a1d14146bd0da04eca25 Mon Sep 17 00:00:00 2001
-From: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-Date: Wed, 7 Jul 2010 17:18:31 +0300
-Subject: [PATCH] Added empty VCARD N: parameter handling
-
-Some of the devices are expecting that N: parameter in VCARD is always fill=
-ed (by example Nokia BH-903)
-When this field is empty (N:;;;;) then list of dialed/incoming calls on car=
-kit is useless - carkit then shows only blank lines and it's impossible to =
-determine who made call ( phone number are invisible too in this case)
-
-If none of the contact fields is available, then setting telephone number a=
-s the first attribute for "N:" parameter.
-Carkit will see that number as contact name - it is only used in case when =
-none of more detailed contact information is available on the phone.
----
- plugins/vcard.c |   21 +++++++++++++++++++++
- 1 files changed, 21 insertions(+), 0 deletions(-)
-
-diff --git a/plugins/vcard.c b/plugins/vcard.c
-index 5948a4a..ab1349c 100644
---- a/plugins/vcard.c
-+++ b/plugins/vcard.c
-@@ -123,6 +123,20 @@ static void add_slash(char *dest, const char *src, int=
- len_max, int len)
- 	return;
- }
-=20
-+/* checks if there is at least one present contact field with personal dat=
-a */
-+static gboolean contact_fields_present( struct phonebook_contact * contact=
-)
-+{
-+	if ((contact->family && strlen(contact->family)) ||
-+			(contact->given && strlen(contact->given)) ||
-+			(contact->additional && strlen(contact->additional)) ||
-+			(contact->prefix && strlen(contact->prefix)) ||
-+			(contact->suffix && strlen(contact->suffix)))
-+		return TRUE;
-+
-+	/* none of the personal data fields is present*/
-+	return FALSE;
-+}
-+
- static void vcard_printf_begin(GString *vcards, uint8_t format)
- {
- 	vcard_printf(vcards, "BEGIN:VCARD");
-@@ -136,6 +150,13 @@ static void vcard_printf_begin(GString *vcards, uint8_=
-t format)
- static void vcard_printf_name(GString *vcards,
- 					struct phonebook_contact *contact)
- {
-+	if (contact_fields_present(contact) =3D=3D FALSE) {
-+		/* if all fields are empty we're using first phone number as name */
-+		struct phonebook_number *number =3D contact->numbers->data;
-+		vcard_printf(vcards, "N:%s;;;;", number->tel);
-+		return;
-+	}
-+
- 	vcard_printf(vcards, "N:%s;%s;%s;%s;%s", contact->family,
- 				contact->given, contact->additional,
- 				contact->prefix, contact->suffix);
---=20
-1.6.0.4
-
-
-BR,
-Radek
-________________________________________
-From: ext Marcel Holtmann [marcel@holtmann.org]
-Sent: Wednesday, July 07, 2010 4:16 PM
-To: Radoslaw Jablonski (EXT-Comarch/Helsinki)
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Added empty VCARD N: parameter handling
-
-Hi Radek,
-
-using git send-email would be a bit better here. Then we have the
-patches inline.
-
-> From 6d88e3d7c1a5014e60ca8f53f7163e3a51148530 Mon Sep 17 00:00:00 2001
-> From: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-> Date: Wed, 7 Jul 2010 15:07:58 +0300
-> Subject: [PATCH] Added empty N: parameter handling in VCARD
->
-> Some of the devices are expecting that N: parameter in VCARD is always fi=
-lled (by example Nokia BH-903)
-> When this field is empty (N:;;;;) then list of dialed/incoming calls on c=
-arkit is useless.
->
-> If none of fields is available then setting telephone number as the first=
- attribute for "N:" parameter.
-> Carkit will see that number as contact name - it is only used in case whe=
-n none of more detailed contact information is available on phone.
+> Due to race condition in L2CAP state machine L2CAP Connection Request
+> may be sent twice for SDP with the same source channel id. Problems
+> reported connecting to Apple products, some carkit, Blackberry phones.
+> 
+> ...
+> 2010-06-07 21:18:03.651031 < ACL data: handle 1 flags 0x02 dlen 12
+>     L2CAP(s): Connect req: psm 1 scid 0x0040
+> 2010-06-07 21:18:03.653473 > HCI Event: Number of Completed Packets (0x13) plen 5
+>     handle 1 packets 1
+> 2010-06-07 21:18:03.653808 > HCI Event: Auth Complete (0x06) plen 3
+>     status 0x00 handle 1
+> 2010-06-07 21:18:03.653869 < ACL data: handle 1 flags 0x02 dlen 12
+>     L2CAP(s): Connect req: psm 1 scid 0x0040
+> ...
+> 
+> Patch uses L2CAP_CONF_CONNECT_PEND flag to mark that L2CAP Connection
+> Request has been sent already.
+> 
+> Modified version of Ville Tervo patch.
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 > ---
->  plugins/vcard.c |   17 ++++++++++++++---
->  1 files changed, 14 insertions(+), 3 deletions(-)
->
-> diff --git a/plugins/vcard.c b/plugins/vcard.c
-> index 5948a4a..b2ab30a 100644
-> --- a/plugins/vcard.c
-> +++ b/plugins/vcard.c
-> @@ -136,9 +136,20 @@ static void vcard_printf_begin(GString *vcards, uint=
-8_t format)
->  static void vcard_printf_name(GString *vcards,
->                                         struct phonebook_contact *contact=
-)
->  {
-> -       vcard_printf(vcards, "N:%s;%s;%s;%s;%s", contact->family,
-> -                               contact->given, contact->additional,
-> -                               contact->prefix, contact->suffix);
-> +       /* at least one of fields is present */
-> +       if ((contact->family && strlen(contact->family)) ||
-> +               (contact->given && strlen (contact->given)) ||
-> +               (contact->additional && strlen(contact->additional)) ||
-> +               (contact->prefix && strlen (contact->prefix)) ||
-> +               (contact->suffix && strlen (contact->suffix)))
-> +               vcard_printf(vcards, "N:%s;%s;%s;%s;%s", contact->family,
-> +                                               contact->given, contact->=
-additional,
-> +                                               contact->prefix, contact-=
->suffix);
-
-The extra if clauses require two level of indentation. Otherwise you
-can't tell which is part of the if clause and which is code.
-
-Also it is strlen(...). No extra space.
-
-And I would prefer to split this into an extra function just doing this
-test. This if clause is too big.
-
-> +       else {
-> +               /* if all fields are empty we're using  first phone numbe=
-r as name */
-> +               struct phonebook_number *number =3D contact->numbers->dat=
-a;
-> +               vcard_printf(vcards, "N:%s;;;;", number->tel);
-> +       }
+>  net/bluetooth/l2cap.c |   14 +++++++++++---
+>  1 files changed, 11 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> index bb00015..899cca5 100644
+> --- a/net/bluetooth/l2cap.c
+> +++ b/net/bluetooth/l2cap.c
+> @@ -401,6 +401,11 @@ static inline void l2cap_send_rr_or_rnr(struct l2cap_pinfo *pi, u16 control)
+>  	l2cap_send_sframe(pi, control);
 >  }
+>  
+> +static inline int l2cap_check_pending(struct sock *sk)
+> +{
+> +	return l2cap_pi(sk)->conf_state & L2CAP_CONF_CONNECT_PEND;
+> +}
+> +
 
-So I prefer the whole thing like this:
+I changed my mind about the naming here. It was a bad proposal on my
+side. So something like __no_connect_pend (positive check) as a define
+is better.
 
-        /* if all fields are empty we're using  first phone number as name =
-*/
-        if (required_fields_present(contact) =3D=3D FALSE) {
-                struct phonebook_number *number =3D contact->numbers->data;
-                vcard_printf(vcards, "N:%s;;;;", number->tel);
-                return;
-        }
+>  static void l2cap_do_start(struct sock *sk)
+>  {
+>  	struct l2cap_conn *conn = l2cap_pi(sk)->conn;
+> @@ -409,12 +414,13 @@ static void l2cap_do_start(struct sock *sk)
+>  		if (!(conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE))
+>  			return;
+>  
+> -		if (l2cap_check_security(sk)) {
+> +		if (l2cap_check_security(sk) && !l2cap_check_pending(sk)) {
+>  			struct l2cap_conn_req req;
+>  			req.scid = cpu_to_le16(l2cap_pi(sk)->scid);
+>  			req.psm  = l2cap_pi(sk)->psm;
+>  
+>  			l2cap_pi(sk)->ident = l2cap_get_ident(conn);
+> +			l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
+>  
+>  			l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
+>  					L2CAP_CONN_REQ, sizeof(req), &req);
+> @@ -464,12 +470,14 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+>  		}
+>  
+>  		if (sk->sk_state == BT_CONNECT) {
+> -			if (l2cap_check_security(sk)) {
+> +			if (l2cap_check_security(sk) &&
+> +					!l2cap_check_pending(sk)) {
+>  				struct l2cap_conn_req req;
+>  				req.scid = cpu_to_le16(l2cap_pi(sk)->scid);
+>  				req.psm  = l2cap_pi(sk)->psm;
+>  
+>  				l2cap_pi(sk)->ident = l2cap_get_ident(conn);
+> +				l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
+>  
+>  				l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
+>  					L2CAP_CONN_REQ, sizeof(req), &req);
+> @@ -2914,7 +2922,6 @@ static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hd
+>  		l2cap_pi(sk)->ident = 0;
+>  		l2cap_pi(sk)->dcid = dcid;
+>  		l2cap_pi(sk)->conf_state |= L2CAP_CONF_REQ_SENT;
+> -
+>  		l2cap_pi(sk)->conf_state &= ~L2CAP_CONF_CONNECT_PEND;
+>  
+>  		l2cap_send_cmd(conn, l2cap_get_ident(conn), L2CAP_CONF_REQ,
+> @@ -4406,6 +4413,7 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+>  				req.psm  = l2cap_pi(sk)->psm;
+>  
+>  				l2cap_pi(sk)->ident = l2cap_get_ident(conn);
+> +				l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
+>  
+>  				l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
+>  					L2CAP_CONN_REQ, sizeof(req), &req);
 
-        vcard_printf(vcards, "N:%s;%s;%s;%s;%s", contact->family,
-                ...
-
-This way it is a lot easier to read and understand what is the special
-case and what would be the default.
+Rest looks fine to me.
 
 Regards
 
 Marcel
+
+
