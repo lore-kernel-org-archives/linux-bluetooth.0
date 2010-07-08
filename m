@@ -1,36 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: btmrvl: process interrupt in main thread to
+Subject: Re: [PATCH 1/3] Bluetooth: Remove extraneous white space
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Bing Zhao <bzhao@marvell.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Amitkumar Karwar <akarwar@marvell.com>
-In-Reply-To: <1275003517-18563-1-git-send-email-bzhao@marvell.com>
-References: <1275003517-18563-1-git-send-email-bzhao@marvell.com>
+To: Ron Shaffer <rshaffer@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1275062027-27872-2-git-send-email-rshaffer@codeaurora.org>
+References: <1275062027-27872-1-git-send-email-rshaffer@codeaurora.org>
+	 <1275062027-27872-2-git-send-email-rshaffer@codeaurora.org>
 Content-Type: text/plain; charset="UTF-8"
-Date: Thu, 08 Jul 2010 18:52:22 -0300
-Message-ID: <1278625942.10421.83.camel@localhost.localdomain>
+Date: Thu, 08 Jul 2010 18:49:41 -0300
+Message-ID: <1278625781.10421.82.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bing,
+Hi Ron,
 
-> When driver is sending a command or data and the firmware is also
-> sending a sleep event, sometimes it is observed that driver will
-> continue to send the command/data to firmware right after processing
-> sleep event. Once sleep event is processed driver is not supposed to
-> send anything because firmware is in sleep state after that. Previously
-> interrupt processing was done in SDIO interrupt callback handler.
-> Now it is done in btmrvl driver main thread to solve the
-> cross-sending properly.
+> Deleted extraneous white space from the end of several lines
 > 
-> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
-> Signed-off-by: Bing Zhao <bzhao@marvell.com>
+> Signed-off-by: Ron Shaffer <rshaffer@codeaurora.org>
 > ---
->  drivers/bluetooth/btmrvl_drv.h  |    1 +
->  drivers/bluetooth/btmrvl_main.c |    5 ++-
->  drivers/bluetooth/btmrvl_sdio.c |   97 ++++++++++++++++++++-------------------
->  3 files changed, 55 insertions(+), 48 deletions(-)
+>  include/net/bluetooth/hci_core.h |   14 +++++++-------
+>  1 files changed, 7 insertions(+), 7 deletions(-)
 
 patch has been applied. Thanks.
 
