@@ -1,43 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <70376CA23424B34D86F1C7DE6B997343068C875F67@VSHINMSMBX01.vshodc.lntinfotech.com>
-References: <70376CA23424B34D86F1C7DE6B997343068C875F67@VSHINMSMBX01.vshodc.lntinfotech.com>
-Date: Thu, 8 Jul 2010 14:29:14 +0300
-Message-ID: <AANLkTikuMXwdV8gZegBN_fzY0NzVZcL6GZ7tcM61mWcl@mail.gmail.com>
-Subject: Re: bluetooth data rate vs VDP
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Viral Mehta <Viral.Mehta@lntinfotech.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2] Bluetooth: Check l2cap pending status before sending l2cap connect request
+Date: Thu,  8 Jul 2010 12:14:41 +0300
+Message-Id: <1278580481-11341-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 
-On Thu, Jul 8, 2010 at 9:04 AM, Viral Mehta <Viral.Mehta@lntinfotech.com> wrote:
-> Hi,
-> I am new to bluetooth and sorry if posting at a wrong place.
->
-> I have a very basic question,
-> As I read through documents, Bluetooth 2 can support max data rate of 2Mbps or upto 3Mbps.
+Due to race condition in L2CAP state machine L2CAP Connection Request
+may be sent twice for SDP with the same source channel id. Problems
+reported connecting to Apple products, some carkit, Blackberry phones.
 
-If you mean EDR, yes it is up to 3Mbps, but with Bluetooth 3.0 you can
-much higher data rate.
+...
+2010-06-07 21:18:03.651031 < ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 1 scid 0x0040
+2010-06-07 21:18:03.653473 > HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+2010-06-07 21:18:03.653808 > HCI Event: Auth Complete (0x06) plen 3
+    status 0x00 handle 1
+2010-06-07 21:18:03.653869 < ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 1 scid 0x0040
+...
 
-> Then how can a profile like "Video Distribution Profile" work at such a low speed. If I am not wrong VDP is used for streaming of Video, how can Video streaming be achieved at such a lower data rate ?
+Patch uses L2CAP_CONF_CONNECT_PEND flag to mark that L2CAP Connection
+Request has been sent already.
 
-For low/webcam quality is more than enough I guess, if you think about
-it is not that different from using a phone such as N900/iphone and do
-a video call over 3G , so I don't see any problem in doing it over
-bluetooth, just use the same codec and you will going to get about the
-same thing. Also the think with vdp is that if the device supports the
-same codec as used in the video call you can pretty much sent it as it
-is, no additional encoding/decoding.
+Modified version of Ville Tervo patch.
 
-> Is there something like data rate can be increased with VDP like profile ?
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+---
+ net/bluetooth/l2cap.c |   14 +++++++++++---
+ 1 files changed, 11 insertions(+), 3 deletions(-)
 
-Yes, bluetooth 3.0.
-
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index bb00015..18c3702 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -401,6 +401,11 @@ static inline void l2cap_send_rr_or_rnr(struct l2cap_pinfo *pi, u16 control)
+ 	l2cap_send_sframe(pi, control);
+ }
+ 
++static inline int __l2cap_no_conn_pending(struct sock *sk)
++{
++	return !(l2cap_pi(sk)->conf_state & L2CAP_CONF_CONNECT_PEND);
++}
++
+ static void l2cap_do_start(struct sock *sk)
+ {
+ 	struct l2cap_conn *conn = l2cap_pi(sk)->conn;
+@@ -409,12 +414,13 @@ static void l2cap_do_start(struct sock *sk)
+ 		if (!(conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE))
+ 			return;
+ 
+-		if (l2cap_check_security(sk)) {
++		if (l2cap_check_security(sk) && __l2cap_no_conn_pending(sk)) {
+ 			struct l2cap_conn_req req;
+ 			req.scid = cpu_to_le16(l2cap_pi(sk)->scid);
+ 			req.psm  = l2cap_pi(sk)->psm;
+ 
+ 			l2cap_pi(sk)->ident = l2cap_get_ident(conn);
++			l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
+ 
+ 			l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
+ 					L2CAP_CONN_REQ, sizeof(req), &req);
+@@ -464,12 +470,14 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 		}
+ 
+ 		if (sk->sk_state == BT_CONNECT) {
+-			if (l2cap_check_security(sk)) {
++			if (l2cap_check_security(sk) &&
++					__l2cap_no_conn_pending(sk)) {
+ 				struct l2cap_conn_req req;
+ 				req.scid = cpu_to_le16(l2cap_pi(sk)->scid);
+ 				req.psm  = l2cap_pi(sk)->psm;
+ 
+ 				l2cap_pi(sk)->ident = l2cap_get_ident(conn);
++				l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
+ 
+ 				l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
+ 					L2CAP_CONN_REQ, sizeof(req), &req);
+@@ -2914,7 +2922,6 @@ static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hd
+ 		l2cap_pi(sk)->ident = 0;
+ 		l2cap_pi(sk)->dcid = dcid;
+ 		l2cap_pi(sk)->conf_state |= L2CAP_CONF_REQ_SENT;
+-
+ 		l2cap_pi(sk)->conf_state &= ~L2CAP_CONF_CONNECT_PEND;
+ 
+ 		l2cap_send_cmd(conn, l2cap_get_ident(conn), L2CAP_CONF_REQ,
+@@ -4406,6 +4413,7 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 				req.psm  = l2cap_pi(sk)->psm;
+ 
+ 				l2cap_pi(sk)->ident = l2cap_get_ident(conn);
++				l2cap_pi(sk)->conf_state |= L2CAP_CONF_CONNECT_PEND;
+ 
+ 				l2cap_send_cmd(conn, l2cap_pi(sk)->ident,
+ 					L2CAP_CONN_REQ, sizeof(req), &req);
 -- 
-Luiz Augusto von Dentz
-Computer Engineer
+1.7.0.4
+
