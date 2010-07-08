@@ -1,35 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <70376CA23424B34D86F1C7DE6B997343068C875F6F@VSHINMSMBX01.vshodc.lntinfotech.com>
-References: <70376CA23424B34D86F1C7DE6B997343068C875F67@VSHINMSMBX01.vshodc.lntinfotech.com>
-	<AANLkTikuMXwdV8gZegBN_fzY0NzVZcL6GZ7tcM61mWcl@mail.gmail.com>
-	<70376CA23424B34D86F1C7DE6B997343068C875F6F@VSHINMSMBX01.vshodc.lntinfotech.com>
-Date: Thu, 8 Jul 2010 17:05:50 +0300
-Message-ID: <AANLkTikyO_fjWbef9hIG2MFTWRaU__hbJ_euOTZghVHA@mail.gmail.com>
-Subject: Re: bluetooth data rate vs VDP
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Viral Mehta <Viral.Mehta@lntinfotech.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: RE: [RFC] Bluetooth: Add firmware load infrastructure for BT
+ devices
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Shanmugamkamatchi Balashanmugam
+	<Shanmugamkamatchi.Balashanmugam@Atheros.com>
+Cc: "Perelet, Oleg" <operelet@quicinc.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <44EE5C37ADC36343B0625A05DD408C4850DB2A787C@CHEXMB-01.global.atheros.com>
+References: <44EE5C37ADC36343B0625A05DD408C4850DB2A787C@CHEXMB-01.global.atheros.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 08 Jul 2010 10:42:52 -0300
+Message-ID: <1278596572.10421.25.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Bala,
 
-On Thu, Jul 8, 2010 at 2:49 PM, Viral Mehta <Viral.Mehta@lntinfotech.com> wrote:
-> I want to send RAW video data. For e.g., read from /dev/fb0 and stream it...
-> Is it possible at the first hand? (I guess, in theory, yes)
+> Firmware loading to target RAM needs to be done once when the device is inserted.  Firmware loading will not be required every time 
+> the device goes from DOWN to UP. I think each HCI driver requires
+> a separate firmware loading code as firmware loading is 
+> different for different interfaces.  Please advice if my understanding is wrong.
+> 
+> I initially thought of registration 
+> mechanism with btusb transport driver to load firmware, but before
+> the device is inserted btusb will not be loaded and registering the 
+> firmware load function with btusb was not possible.
+> 
+> Please advice alternate solution to load firmware from transport driver.
 
-Yes, it is possible, but it probably will require a lot more bandwidth
-than something encoded.
+my advise would be to just build devices that change their USB VID/PID
+after the firmware got loaded. That way it is easy to have a firmware
+loading driver and just btusb for real operation. Why is it so hard to
+build just simple hardware that would just work.
 
-> I also had a question whether encoding/decoding is done by VDP profile
-> or I have to write some application on top of VDP profile. ??
+Regards
 
-The profile doesn't do anything, it only defines, but yes you most
-likely will be reading rtp data from bluetooth socket and then you
-have do decode it yourself.
+Marcel
 
--- 
-Luiz Augusto von Dentz
-Computer Engineer
+
