@@ -1,34 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 2/8 v2]Bluetooth: Fix warning: variable 'tty' set but
- not used
+Subject: Re: [PATCH] Adding support for bluetooth controller shipped with
+ iMac i5
 From: Marcel Holtmann <marcel@holtmann.org>
-To: "Justin P. Mattock" <justinmattock@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
-	linux-kernel@vger.kernel.org
-In-Reply-To: <1276565200-5583-1-git-send-email-justinmattock@gmail.com>
-References: <1276565200-5583-1-git-send-email-justinmattock@gmail.com>
+To: "Cyril Lacoux (Yack)" <clacoux@ifeelgood.org>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <201006162028.59280.clacoux@ifeelgood.org>
+References: <201006161443.50587.clacoux@ifeelgood.org>
+	 <1276695209.2301.73.camel@localhost.localdomain>
+	 <201006162028.59280.clacoux@ifeelgood.org>
 Content-Type: text/plain; charset="UTF-8"
-Date: Thu, 08 Jul 2010 18:07:08 -0300
-Message-ID: <1278623228.10421.70.camel@localhost.localdomain>
+Date: Thu, 08 Jul 2010 18:05:33 -0300
+Message-ID: <1278623133.10421.69.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Justin,
+Hi,
 
-> Resend of this patch to fix whitespace issues
-> The patch below fixes a warning message
-> when using gcc 4.6.0
+> > please show the output of /proc/bus/usb/devices or usb-devices script
+> > for this device.
+> > 
+> > And I want a proper kernel patch from git format-patch.
 > 
->   CC [M]  drivers/bluetooth/hci_ldisc.o
-> drivers/bluetooth/hci_ldisc.c: In function 'hci_uart_send_frame':
-> drivers/bluetooth/hci_ldisc.c:213:21: warning: variable 'tty' set but not used
+> Ok, 
 > 
-> 
->  Signed-off-by: Justin P. Mattock <justinmattock@gmail.com>
->  Reviewed-By: Gustavo F. Padovan <gustavo@padovan.org>
+> Here is the output of command `git format-patch -1 --stdout` against current 
+> bluetooth-next-2.6 tree - hope that's ok.
 
-patch has been applied to bluetooth-next-2.6 tree. Thanks.
+please create a proper commit message and include the usb-devices output
+in that message.
+
+Also the HID part in the source code comment makes no sense. Why are you
+using that one. Copy&paste from the previous one?
 
 Regards
 
