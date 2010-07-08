@@ -1,284 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?iso-8859-1?q?Jos=E9_Antonio_Santos_Cadenas?=
-	<santoscadenas@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Proposed API for HDP
-Date: Thu, 8 Jul 2010 19:12:31 +0200
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201007081912.31407.santoscadenas@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1263366291.922.5.camel@localhost.localdomain>
+References: <35c90d960911121639o8b0b0bfxde880af69adc9f95@mail.gmail.com>
+	<1258082098.7715.7.camel@violet>
+	<35c90d960911121931n687a2cd4ie8130f919041ee70@mail.gmail.com>
+	<1258084357.7715.26.camel@violet>
+	<35c90d960911131445w16076c70sa0473e9b459d7d15@mail.gmail.com>
+	<35c90d961001122046o733c7e10nf28bfed9e7f5465@mail.gmail.com>
+	<1263366291.922.5.camel@localhost.localdomain>
+Date: Thu, 8 Jul 2010 18:07:19 +0300
+Message-ID: <AANLkTil8Hloz5I7Gpnp9M-y2W3jkLKeca4wz7dgFKA0V@mail.gmail.com>
+Subject: Re: What is the motivation for conn->power_save
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Nick Pelly <npelly@google.com>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
-
-This is the new design of the HDP API that we designed using the Marcel's recomendations.
-
-Regards.
-
-
-BlueZ D-Bus Health API description
-**********************************
-
-	Santiago Carot-Nemesio <sancane@gmail.com>
-	José Antonio Santos-Cadenas <santoscadenas@gmail.com>
-	Elvis Pfützenreuter <epx@signove.com>
-
-Health Device Profile hierarchy
-===============================
-
-Service		org.bluez
-Interface	org.bluez.HealthAdapter
-Object path	[variable prefix]/{hci0,hci1,...}
-
-Methods:
-
-	path	CreateApplication(object path, dict config)
-
-		Returns the path of the new created application. The path
-		parameter is the path of the object with the callbacks to
-		notify events (see org.bluez.HealthAgent at the end of this
-		document)
-		This petition starts an mcap instance and also register a proper
-		record in the SDP if is needed.
-
-		Dict is defined as bellow:
-		{
-		  "end_points" : [{ (optional)
-			"role" : ("source" or "sink"), (mandatory)
-			"specs" :[{ (mandatory)
-				"data_type" : uint16, (mandatory)
-				"description" : string, (optional)
-			}]
-		  }]
-		}
-
-		Application will be closed by the call or implicitly when the
-		programs leaves the bus.
-
-		Possible errors: org.bluez.Error.InvalidArguments
-
-	void	ReleaseApplication(path application)
-
-		Closes the HDP application identified by the object path. Also
-		application will be closed if the process that started it leaves
-		the bus. If there is a SDP record associated to this application
-		it will be removed.
-
-		Possible errors: org.bluez.Error.InvalidArguments
-				org.bluez.Error.NotFound
-
-	array	GetRemoteApplications(path application)
-
-		This method will return an array with the paths of all the
-		remote instances found in remote devices.
-
-		Possible errors: org.bluez.Error.InvalidArguments
-				org.bluez.Error.NotFound
-
---------------------------------------------------------------------------------
-
-Service		org.bluez
-Interface	org.bluez.HealthDevice
-Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
-
-Methods:
-
-	void Refresh()
-
-		This method searches for HDP applications in the remote device
-		and notifies them to the appropriate agents.
-
---------------------------------------------------------------------------------
-
-Service		org.bluez
-Interface	org.bluez.HealthDeviceApplication
-Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/hdp_YYYY
-
-Methods:
-
-	array GetProperties()
-
-		Gets the information of the remote application published on its
-		SDP record. The returned data format is as follows:
-
-		{
-			"end_points": [
-				"mdepid": uint8,
-				"role"  : "source" or "sink" ,
-				"specs" : [{
-					"dtype"       : uint16,
-					"description" : string, (optional)
-					}]
-				]
-		}
-
-	object Connect(path local_application_id)
-
-		Connects the local application with the remote application.
-
-		Only the bus client that created the local session will be able
-		to create connections using it.
-
-		If the Device is already connected with an other application an
-		org.bluez.Error.AlreadyConnected error will be received.
-
-		Possible errors: org.bluez.Error.InvalidArguments
-				org.bluez.Error.AlreadyConnected
-				org.bluez.Error.HealthError
-
-	void Disconnect()
-
-		Disconnect from the remote application the state will also be
-		deleted. And no future reconnections will be possible. For
-		keeping the state the method Pause of the health link should be
-		used.
-
-		Possible errors: org.bluez.Error.InvalidArguments
-				org.bluez.Error.NotFound
-				org.bluez.Error.HealthError
-
-	boolean Echo(array{byte})
-
-		Sends an echo petition to the remote intance. Returns True if
-		response matches with the buffer sent. If some error is detected
-		False value is returned and the associated MCL is closed.
-
-	path OpenDataChannel(byte mdepid, string conf)
-
-		Creates a new data channel with the indicated config to the
-		remote MCAP Data End Point (MDEP).
-		The configuration should indicate the channel quality of
-		service using one of this values "reliable", "streaming", "any".
-
-		Returns the data channel path.
-
-		Possible errors: org.bluez.Error.InvalidArguments
-				org.bluez.Error.HealthError
-
-	void ReconnectDataChannel(path data_channel)
-
-		Reconnects a previously created data channel indicated by its
-		path.
-
-		Possible errors: org.bluez.Error.InvalidArguments
-				org.bluez.Error.HealthError
-				org.bluez.Error.NotFound
-
-	int GetDataChannelFileDescriptor(path data_channel)
-
-		Gets a file descriptor where data can be read or written.
-
-		Possible errors: org.bluez.Error.InvalidArguments
-				org.bluez.Error.NotFound
-				org.bluez.Error.HealthError
-
-	void DeleteDataChannel(path data_channel)
-
-		Deletes a data channel so it will not be available to use.
-
-		Possible errors: org.bluez.Error.InvalidArguments
-				org.bluez.Error.NotFound
-				org.bluez.Error.HealthError
-
-	void DeleteAllDataChannels()
-
-		Deletes all data channels so they will not be available for
-		future use. Typically this function is called when the
-		connection with the remote device will be closed permanently.
-
-		Possible errors: org.bluez.Error.HealthError
-
-	dict GetDataChannelStatus()
-
-		Return a dictionary with all the data channels that can be used
-		to send data right now. The dictionary is formed like follows:
-
-		{
-			"reliable": [channel_path_r1, channel_path_r2, ...],
-			"streaming" : [channel_path_s1, channel_path_s2, ...]
-		}
-
-		The fist reliable data channel will always be the first data
-		channel in reliable array.
-
-HealthAgent hierarchy
-=====================
-
-(this object is implemented by the HDP user in order to receive notifications)
-
-Service		unique name
-Interface	org.bluez.HealthAgent
-Object path	freely definable
-
-Methods:
-
-	void DeviceApplicationDiscovered(object path)
-
-		This method is called when a device containing an hdp
-		application is connected. The object path is the application
-		path. The method will be called one time for each
-		application.
-
-	void DeviceConnected(object path)
-
-		This method is called whenever a new connection has been
-		established over the control channel of the current HDP
-		application. The object path paremeter contains the object path
-		of the connected HealthDevice.
-
-	void DevicePaused(object path)
-
-		This method is called when a MCL is closed. Future reconnections
-		will be notified using the DeviceRestarted callback.
-		All data channels associated to this device will be closed and
-		a reconnection will be needed before using them again.
-
-	void DeviceResumed(object path)
-
-		This method is called whenever a MCL is reconnected. All data
-		channels associated are still closed but they will be able to be
-		reconnected skipping the configuration process.
-
-	void DeviceDisconnected(object path)
-
-		This method is called when a remote device is disconnected or
-		removed from MCAP cache. Any future reconnections will fail.
-		Also all data channels associated to this device will be closed.
-
-	void CreatedDataChannel(object path, path data_channel, string conf)
-
-		This method is called when a new data channel is created.
-
-		The path contains the object path of the HealthDeviceApplication
-		where the new connection is created, the data_channel is the
-		path for identify the data channel and conf is the quality of
-		service of the data channel ("reliable" or "streaming").
-
-	void DataChannelReconnected(object path, path data_channel, string conf)
-
-		This method is called when a closed data channel is reconnected
-		by the remote device.
-
-		Conf will be "reliable" or "streaming".
-
-		TThe path contains the object path of the
-		HealthDeviceApplication where the new connection is reconnected,
-		the data_channel is the path for identify the data channel and
-		conf is the quality of service of the data channel ("reliable"
-		or "streaming").
-
-	void DeletedDataChannel(object path, path data_channel)
-
-		This method is called when a data channel is deleted.
-
-		After this call the data channel path will not be valid and can
-		be reused for future creation of data channels.
-
-	void DeletedAllDataChannels(object path)
-
-		This method is called when all data channels are deleted.
-
-		The path contains the object path of the HealthDeviceApplication
-		where the data channels are deleted.
+Hi,
+
+On Wed, Jan 13, 2010 at 10:04 AM, Marcel Holtmann <marcel@holtmann.org> wro=
+te:
+> Hi Nick,
+>
+>> >>> >> If I understand correctly, conn->power_save prevents the host sta=
+ck
+>> >>> >> from requesting active mode if it was not the host stack that
+>> >>> >> requested sniff mode.
+>> >>> >>
+>> >>> >> I don't understand the motivation for this. If we have ACL data t=
+o
+>> >>> >> send, then it seems like a good idea for the host stack to explic=
+itly
+>> >>> >> request active mode, regardless of the reason that we entered sni=
+ff
+>> >>> >> mode.
+>> >>> >>
+>> >>> >> We want to enter active mode more aggressively when setting up SC=
+O
+>> >>> >> connections, to avoid a 5 second delay with certain sniff modes. =
+But
+>> >>> >> the conn->power_save code is getting in the way and doesn't appea=
+r to
+>> >>> >> be useful in the first place.
+>> >>> >
+>> >>> > we have discussed this a few times. And if you lock through the co=
+de
+>> >>> > history then you see that initially we just took devices out of sn=
+iff
+>> >>> > mode if we had to send data. However with HID devices this falls f=
+lat on
+>> >>> > its face. They need to stay in control of sniff mode if they initi=
+ated
+>> >>> > it. Some of them crash and others just drain the battery. With sni=
+ff
+>> >>> > mode you can send small amounts of data even while in sniff and fo=
+r HID
+>> >>> > that is sometimes used. So the remote side better not interfere.
+>> >>> >
+>> >>> > What we really need is a socket option where we can control this o=
+n a
+>> >>> > per socket basis if we take devices out of sniff mode. And one ext=
+ra
+>> >>> > case might be when we try to establish a SCO channel, because then=
+ it is
+>> >>> > clearly not an HID device. However even A2DP has this sort of prob=
+lems
+>> >>> > sometimes where the stream setup takes time.
+>> >>>
+>> >>> Makes sense. Thanks for the explanation.
+>> >>
+>> >> this means you will be working on a patch for this :)
+>>
+>> Actually, I want to put a patch together for a socket option to not
+>> use power_save (so that we *always* exit sniff mode when sending ACL
+>> data). We're seeing this problem with the Plantronics Voyager 855
+>> which enters sniff mode during A2DP.
+>>
+>> Given that power_save is just for HID devices, my preferred design is
+>> to disable power_save by default, and have an L2CAP socket option to
+>> turn on power_save that would be used by HID L2CAP sockets.
+>> Unfortunately this would require userspace HID code to use the new
+>> socket option to keep current behavior. But it seems preferable to the
+>> alternative of having every single other L2CAP socket use a new socket
+>> option just to disable power_save for the sake of HID.
+>
+> actually you still mix up the meaning of the power_save option. From the
+> stack side, the automatic sniff mode is off by default. You have to
+> enable via sysfs first. The power_save option is just to control when
+> sniff mode is activated and the remote enters sniff mode, that we are
+> not getting out of it if we have ACL data.
+>
+> In conclusion, I am fine with a socket option that allows to control
+> sniff mode (preferable with interval details) and sniff subrate details
+> so that we can use them for that ACL link.
+>
+> So go ahead and work on this. We can fix userspace easily since a new
+> socket can be detected easily with newer kernels.
+
+We have found that some Nokia BT headsets stop working after idle
+period when they enter
+"power save" mode.
+
+Do we have any solution for this problem? So far I see good enough
+patch :-)) below:
+
+http://android.git.kernel.org/?p=3Dkernel/common.git;a=3Dblobdiff;f=3Dnet/b=
+luetooth/hci_conn.c;h=3Dfa8b412205cd89546b4a325c558c68040eeaf491;hp=3D0cf25=
+114a3f576fc2788a549eb96d0087dd39b44;hb=3Dd8488237646920cd71ef43e5f3ae1001c6=
+f4cf7b;hpb=3D3f68e5050c5ae559f56d5da9202cb88928d42b36
+
+-       if (conn->mode !=3D HCI_CM_SNIFF || !conn->power_save)
++       if (conn->mode !=3D HCI_CM_SNIFF /* || !conn->power_save */)
+
+Nick have you done socket option for "power_save"?
+
+Regards,
+Andrei
