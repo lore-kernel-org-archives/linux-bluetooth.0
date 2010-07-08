@@ -1,37 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Adding support for bluetooth controller shipped with
- iMac i5
+Subject: Re: [PATCH] bluetooth: btmrvl_sdio: silence warning
 From: Marcel Holtmann <marcel@holtmann.org>
-To: "Cyril Lacoux (Yack)" <clacoux@ifeelgood.org>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <201006162028.59280.clacoux@ifeelgood.org>
-References: <201006161443.50587.clacoux@ifeelgood.org>
-	 <1276695209.2301.73.camel@localhost.localdomain>
-	 <201006162028.59280.clacoux@ifeelgood.org>
+To: Kulikov Vasiliy <segooon@gmail.com>
+Cc: Kernel Janitors <kernel-janitors@vger.kernel.org>,
+	Bing Zhao <bzhao@marvell.com>,
+	Ben Hutchings <ben@decadent.org.uk>,
+	=?ISO-8859-1?Q?Andr=E9?= Goddard Rosa <andre.goddard@gmail.com>,
+	Julia Lawall <julia@diku.dk>, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+In-Reply-To: <1278316883-29784-1-git-send-email-segooon@gmail.com>
+References: <1278316883-29784-1-git-send-email-segooon@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Date: Thu, 08 Jul 2010 18:05:33 -0300
-Message-ID: <1278623133.10421.69.camel@localhost.localdomain>
+Date: Thu, 08 Jul 2010 18:02:39 -0300
+Message-ID: <1278622959.10421.68.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Kulikov,
 
-> > please show the output of /proc/bus/usb/devices or usb-devices script
-> > for this device.
-> > 
-> > And I want a proper kernel patch from git format-patch.
+> Clone checking of ret to simplify the code.
 > 
-> Ok, 
+> This patch silences a compiler warning:
+> drivers/bluetooth/btmrvl_sdio.c: In function ‘btmrvl_sdio_verify_fw_download’:
+> drivers/bluetooth/btmrvl_sdio.c:80: warning: ‘fws1’ may be used uninitialized in this function
+> drivers/bluetooth/btmrvl_sdio.c:80: note: ‘fws1’ was declared here
 > 
-> Here is the output of command `git format-patch -1 --stdout` against current 
-> bluetooth-next-2.6 tree - hope that's ok.
+> Signed-off-by: Kulikov Vasiliy <segooon@gmail.com>
 
-please create a proper commit message and include the usb-devices output
-in that message.
-
-Also the HID part in the source code comment makes no sense. Why are you
-using that one. Copy&paste from the previous one?
+patch has been applied to bluetooth-next-2.6 tree. Thanks.
 
 Regards
 
