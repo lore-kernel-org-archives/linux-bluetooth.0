@@ -1,54 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 1/3] Support for adding UUID128 to extended inquiry
- response
+Subject: Re: [PATCH 1/1] Bluetooth: hidp: Add support for hidraw   
+ HIDIOCGFEATURE    and HIDIOCSFEATURE
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Ron Shaffer <rshaffer@codeaurora.org>
-Cc: Inga Stotland <ingas@codeaurora.org>,
-	linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com
-In-Reply-To: <4C375658.10904@codeaurora.org>
-References: <1278540518-18620-1-git-send-email-ingas@codeaurora.org>
-	 <1278540518-18620-2-git-send-email-ingas@codeaurora.org>
-	 <1278609452.10421.31.camel@localhost.localdomain>
-	 <4C375658.10904@codeaurora.org>
+To: Alan Ott <alan@signal11.us>
+Cc: David S Miller <davem@davemloft.net>,
+	Jiri Kosina <jkosina@suse.cz>,
+	Michael Poole <mdpoole@troilus.org>,
+	Bastien Nocera <hadess@hadess.net>,
+	Eric Dumazet <eric.dumazet@gmail.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+In-Reply-To: <4C372CEE.3070109@signal11.us>
+References: <1276467601-9066-1-git-send-email-alan@signal11.us>
+	 <1278623485.10421.73.camel@localhost.localdomain>
+	 <4C369CDC.9080104@signal11.us>
+	 <1278662497.10421.94.camel@localhost.localdomain>
+	 <4C371DE8.9020002@signal11.us>
+	 <1278680790.10421.106.camel@localhost.localdomain>
+	 <4C372CEE.3070109@signal11.us>
 Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 09 Jul 2010 14:35:35 -0300
-Message-ID: <1278696935.10421.139.camel@localhost.localdomain>
+Date: Fri, 09 Jul 2010 14:33:35 -0300
+Message-ID: <1278696815.10421.137.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ron,
+Hi Alan,
 
-> >>  void register_public_browse_group(void)
-> >> diff --git a/src/sdpd.h b/src/sdpd.h
-> >> index e93b0b6..8fd8bbe 100644
-> >> --- a/src/sdpd.h
-> >> +++ b/src/sdpd.h
-> >> @@ -6,6 +6,7 @@
-> >>   *  Copyright (C) 2002-2003  Maxim Krasnyansky <maxk@qualcomm.com>
-> >>   *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-> >>   *  Copyright (C) 2002-2003  Stephen Crane <steve.crane@rococosoft.com>
-> >> + *  Copyright (C) 2010, Code Aurora Forum. All rights reserved.
-> > 
-> > I prefer that we actually see major code contributions that justify a
-> > copyright here before you start adding it. And so let the maintainers
-> > worry about that later on. I don't wanna see just random copyright
-> > additions for obvious fixes or changes that are most likely even derived
-> > from existing code.
-> >  
+> >>>>> I looked at this and I am bit worried that this should not be done in
+> >>>>> this detail in the HIDP driver. Essentially HIDP is a pure transport
+> >>>>> driver. It should not handle all these details. Can we make this a bit
+> >>>>> easier for the transport drivers to support such features?
+> >>>>>
+> >>>>>            
+> >>>> I put these changes (most notably the addition of hidp_get_raw_report())
+> >>>> in hidp because that's where the parallel function
+> >>>> hidp_output_raw_report() was already located. I figured the input should
+> >>>> go with the output. That said, if there's a better place for both of
+> >>>> them (input and output) to go, let me know where you think it should be,
+> >>>> and I'll get them moved into the proper spot.
+> >>>>
+> >>>> I'm not sure what you mean about HIDP being a pure transport driver.
+> >>>>
+> >>>>          
+> >>> what is usb-hid.ko doing here? I would expect a bunch of code
+> >>> duplication with minor difference between USB and Bluetooth.
+> >>>        
+> >> usbhid doesn't have a lot of code for hidraw. Two functions are involved:
+> >>       usbhid_output_raw_report()
+> >>           - calls usb_control_msg() with Get_Report
+> >>       usbhid_get_raw_report()
+> >>           - calls usb_control_msg() with Set_Report
+> >>               OR
+> >>           - calls usb_interrupt_msg() on the Ouput pipe.
+> >>
+> >> This is of course easier than bluetooth because usb_control_msg() is
+> >> synchronous, even when requesting reports, mostly because of the nature
+> >> of USB, where the request and response are part of the same transfer.
+> >>
+> >> For Bluetooth, it's a bit more complicated since the kernel treats it
+> >> more like a networking interface (and indeed it is). My understanding is
+> >> that to make a synchronous transfer in bluetooth, one must:
+> >>       - send the request packet
+> >>       - block (wait_event_*())
+> >>       - when the response is received in the input handler, wake_up_*().
+> >>
+> >> There's not really any code duplication, mostly because initiating
+> >> synchronous USB transfers (input and output) is easy (because of the
+> >> usb_*_msg() functions), while making synchronous Bluetooth transfers
+> >> must be done manually. If there's a nice, convenient, synchronous
+> >> function in Bluetooth similar to usb_control_msg() that I've missed,
+> >> then let me know, as it would simplify this whole thing.
+> >>      
+> > there is not and I don't think we ever get one. My question here was
+> > more in the direction why HID core is doing these synchronously in the
+> > first place. Especially since USB can do everything async as well.
+>
+> I'm open to suggestions. The way I see it is from a user space 
+> perspective. With Get_Feature being on an ioctl(), I don't see any clean 
+> way to do it other than synchronously. Other operating systems (I can 
+> say for sure Windows, Mac OS X, and FreeBSD) handle Get/Set Feature the 
+> same way (synchronously) from user space.
 > 
-> I'm unsure of the reasoning unless the idea is to add copyright markings
-> to show attribution and level of contribution. In our case it's just a
-> legal marking.
-> 
-> If the reasoning for adding or not adding is the former, does this not
-> rise to that level, and for my own education and future reference why not?
+> You seem to be proposing an asynchronous interface. What would that look 
+> like from user space?
 
-we normally automatically add the copyright for companies or individual
-when they make large contributions. Not just small extensions or fixes
-where it is questionable if they are copyrightable anyway.
-
-For just tracking contributions, we have GIT :)
+not necessarily from user space, but at least from HID core to HIDP and
+usb-hid transports. At least that is what I would expect, Jiri?
 
 Regards
 
