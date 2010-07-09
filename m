@@ -1,82 +1,195 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <gfpadovan@gmail.com>
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
+From: =?iso-8859-1?q?Jos=E9_Antonio_Santos_Cadenas?=
+	<santoscadenas@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: gustavo@padovan.org,
-	marcel@holtmann.org,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>
-Subject: [PATCH] Bluetooth: Remove 'sport' field from l2cap_pinfo
-Date: Fri,  9 Jul 2010 15:55:53 -0300
-Message-Id: <1278701753-25682-1-git-send-email-gustavo@padovan.org>
+Subject: Re: Proposed API for HDP (v4)
+Date: Fri, 9 Jul 2010 20:39:33 +0200
+References: <201007081912.31407.santoscadenas@gmail.com>
+In-Reply-To: <201007081912.31407.santoscadenas@gmail.com>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201007092039.34032.santoscadenas@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo F. Padovan <padovan@profusion.mobi>
 
-'sport' is pointless, is always has the value of l2cap_pinfo.psm, so we
-can just use the psm field instead of this one.
+BlueZ D-Bus Health API description
+**********************************
 
-Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
----
- include/net/bluetooth/l2cap.h |    2 --
- net/bluetooth/l2cap.c         |    8 +++-----
- 2 files changed, 3 insertions(+), 7 deletions(-)
+	Santiago Carot-Nemesio <sancane@gmail.com>
+	José Antonio Santos-Cadenas <santoscadenas@gmail.com>
+	Elvis Pfützenreuter <epx@signove.com>
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 7df70e4..6e4a3a6 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -356,8 +356,6 @@ struct l2cap_pinfo {
- 	__u16		remote_mps;
- 	__u16		mps;
- 
--	__le16		sport;
--
- 	struct timer_list	retrans_timer;
- 	struct timer_list	monitor_timer;
- 	struct timer_list	ack_timer;
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index e366be0..9ca3042 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -727,7 +727,7 @@ static struct sock *__l2cap_get_sock_by_addr(__le16 psm, bdaddr_t *src)
- 	struct sock *sk;
- 	struct hlist_node *node;
- 	sk_for_each(sk, node, &l2cap_sk_list.head)
--		if (l2cap_pi(sk)->sport == psm && !bacmp(&bt_sk(sk)->src, src))
-+		if (l2cap_pi(sk)->psm == psm && !bacmp(&bt_sk(sk)->src, src))
- 			goto found;
- 	sk = NULL;
- found:
-@@ -1016,7 +1016,6 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
- 		/* Save source address */
- 		bacpy(&bt_sk(sk)->src, &la.l2_bdaddr);
- 		l2cap_pi(sk)->psm   = la.l2_psm;
--		l2cap_pi(sk)->sport = la.l2_psm;
- 		sk->sk_state = BT_BOUND;
- 
- 		if (__le16_to_cpu(la.l2_psm) == 0x0001 ||
-@@ -1239,7 +1238,6 @@ static int l2cap_sock_listen(struct socket *sock, int backlog)
- 		for (psm = 0x1001; psm < 0x1100; psm += 2)
- 			if (!__l2cap_get_sock_by_addr(cpu_to_le16(psm), src)) {
- 				l2cap_pi(sk)->psm   = cpu_to_le16(psm);
--				l2cap_pi(sk)->sport = cpu_to_le16(psm);
- 				err = 0;
- 				break;
- 			}
-@@ -1325,12 +1323,12 @@ static int l2cap_sock_getname(struct socket *sock, struct sockaddr *addr, int *l
- 	addr->sa_family = AF_BLUETOOTH;
- 	*len = sizeof(struct sockaddr_l2);
- 
-+	la->l2_psm = l2cap_pi(sk)->psm;
-+
- 	if (peer) {
--		la->l2_psm = l2cap_pi(sk)->psm;
- 		bacpy(&la->l2_bdaddr, &bt_sk(sk)->dst);
- 		la->l2_cid = cpu_to_le16(l2cap_pi(sk)->dcid);
- 	} else {
--		la->l2_psm = l2cap_pi(sk)->sport;
- 		bacpy(&la->l2_bdaddr, &bt_sk(sk)->src);
- 		la->l2_cid = cpu_to_le16(l2cap_pi(sk)->scid);
- 	}
--- 
-1.7.1
+Health Device Profile hierarchy
+===============================
+
+Service		org.bluez
+Interface	org.bluez.HealthManager
+Object path	[variable prefix]/
+
+Methods:
+
+	path	RegisterApplication(object agent, dict config)
+
+		Returns the path of the new registered application. The agent
+		parameter is the path of the object with the callbacks to
+		notify events (see org.bluez.HealthAgent at the end of this
+		document)
+		This petition starts an mcap instance on every adapter and also
+		register a proper record in the SDP if is needed.
+
+		Dict is defined as bellow:
+		{
+		  "end_points" : [{ (optional)
+			"role" : ("source" or "sink"), (mandatory)
+			"specs" :[{ (mandatory)
+				"data_type" : uint16, (mandatory)
+				"description" : string, (optional)
+			}]
+		  }]
+		}
+
+		Application will be closed by the call or implicitly when the
+		programs leaves the bus.
+
+		Possible errors: org.bluez.Error.InvalidArguments
+
+	void	UnregisterApplication(object application)
+
+		Closes the HDP application identified by the object path. Also
+		application will be closed if the process that started it leaves
+		the bus. If there is a SDP record associated to this application
+		it will also be removed.
+
+		Possible errors: org.bluez.Error.InvalidArguments
+				org.bluez.Error.NotFound
+
+	void UpdateServices()
+
+		This method searches for HDP applications on the all remote
+		devices and notifies them to the appropriate agents.
+
+Signals:
+
+	void ServiceDiscovered(object service)
+
+		This signal is sent when a device containing an HDP
+		application is paired or when the method Update of the
+		HealthManager is called and new HealthServices are discovered.
+		The object path is the HealthService path. The signal will be
+		launched once for each HealthService.
+
+	void ServiceRemoved(object service)
+
+		This signal is sent if during an Update some HealthServices
+		have disappeared. The signal is launched once for each removed
+		HealthService.
+
+--------------------------------------------------------------------------------
+
+Service		org.bluez
+Interface	org.bluez.HealthService
+Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/hdp_YYYY
+
+Methods:
+
+	array GetProperties()
+
+		Returns all properties for the interface. See the properties
+		section for available properties.
+
+	boolean Echo(array{byte})
+
+		Sends an echo petition to the remote service. Returns True if
+		response matches with the buffer sent. If some error is detected
+		False value is returned and the associated MCL is closed.
+
+	string OpenDataChannel(byte mdepid, string conf)
+
+		Creates a new data channel with the indicated config to the
+		remote MCAP Data End Point (MDEP).
+		The configuration should indicate the channel quality of
+		service using one of this values "Reliable", "Streaming", "Any".
+
+		Returns an string that identifies the data channel.
+
+		Possible errors: org.bluez.Error.InvalidArguments
+				org.bluez.Error.HealthError
+
+	void ReconnectDataChannel(string data_channel)
+
+		Reconnects a previously created data channel.
+
+		Possible errors: org.bluez.Error.InvalidArguments
+				org.bluez.Error.HealthError
+				org.bluez.Error.NotFound
+
+	void DeleteDataChannel(string data_channel)
+
+		Deletes a data channel so it will not be available.
+
+		Possible errors: org.bluez.Error.InvalidArguments
+				org.bluez.Error.NotFound
+				org.bluez.Error.HealthError
+
+	void DeleteAllDataChannels()
+
+		Deletes all data channels so they will not be available for
+		future use.
+
+		Possible errors: org.bluez.Error.HealthError
+
+Properties:
+
+	array EndPoints
+
+		An array with all the end points in this Service. Each one of
+		then has this format.
+
+		{
+			"mdepid": uint8,
+			"role"  : "source" or "sink" ,
+			"specs" : [{
+				"dtype"       : uint16,
+				"description" : string, (optional)
+				}]
+		}
+
+HealthAgent hierarchy
+=====================
+
+(this object is implemented by the HDP user in order to receive notifications)
+
+Service		unique name
+Interface	org.bluez.HealthAgent
+Object path	freely definable
+
+Methods:
+
+	void Release()
+
+		This method gets called when the service daemon unregisters the
+		agent. An agent can use it to do cleanup tasks. There is no need
+		to unregister the agent, because when this method gets called it
+		has already been unregistered.
+
+	void DataChannelCreated(object service, string data_channel,
+			string conf, fd file_descriptor, boolean reconnection)
+
+		This method is called when a new data channel is created.
+
+		The service parameter contains the object path of the
+		HealthService that created the connection, data_channel is
+		the string that identifies the data channel, conf is the quality
+		of service of the data channel ("reliable" or "streaming"),
+		file_descriptor the file descriptor for reading and writing
+		data and reconnection indicates if it is a reconnection or a
+		data channel creation.
+
+	void DataChannelRemoved(object service, string data_channel)
+
+		This method is called when a data channel is deleted.
+
+		After this call the data channel path will not be valid and can
+		be reused for future creation of data channels.
