@@ -1,138 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 9 Jul 2010 14:36:18 -0300
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
-To: =?iso-8859-1?Q?Jos=E9?= Antonio Santos Cadenas
-	<santoscadenas@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Proposed API for HDP
-Message-ID: <20100709173618.GA21080@vigoh>
-References: <201007081912.31407.santoscadenas@gmail.com>
- <201007091549.42621.santoscadenas@gmail.com>
- <20100709165508.GC22985@vigoh>
- <201007091912.44559.santoscadenas@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <201007091912.44559.santoscadenas@gmail.com>
+Subject: Re: [PATCH 1/3] Support for adding UUID128 to extended inquiry
+ response
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Ron Shaffer <rshaffer@codeaurora.org>
+Cc: Inga Stotland <ingas@codeaurora.org>,
+	linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com
+In-Reply-To: <4C375658.10904@codeaurora.org>
+References: <1278540518-18620-1-git-send-email-ingas@codeaurora.org>
+	 <1278540518-18620-2-git-send-email-ingas@codeaurora.org>
+	 <1278609452.10421.31.camel@localhost.localdomain>
+	 <4C375658.10904@codeaurora.org>
+Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 09 Jul 2010 14:35:35 -0300
+Message-ID: <1278696935.10421.139.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* José Antonio Santos Cadenas <santoscadenas@gmail.com> [2010-07-09 19:12:44 +0200]:
+Hi Ron,
 
-> El Friday 09 July 2010 18:55:08 Gustavo F. Padovan escribió:
-> > Hi José,
+> >>  void register_public_browse_group(void)
+> >> diff --git a/src/sdpd.h b/src/sdpd.h
+> >> index e93b0b6..8fd8bbe 100644
+> >> --- a/src/sdpd.h
+> >> +++ b/src/sdpd.h
+> >> @@ -6,6 +6,7 @@
+> >>   *  Copyright (C) 2002-2003  Maxim Krasnyansky <maxk@qualcomm.com>
+> >>   *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
+> >>   *  Copyright (C) 2002-2003  Stephen Crane <steve.crane@rococosoft.com>
+> >> + *  Copyright (C) 2010, Code Aurora Forum. All rights reserved.
 > > 
-> > * José Antonio Santos Cadenas <santoscadenas@gmail.com> [2010-07-09 15:49:42 
-> +0200]:
-> > > I wrote a new API based on the changes suggested in this thread.
-> > > 
-> > > Regards.
-> > > 
-> > > Jose.
-> > > 
-> > > 
-> > > BlueZ D-Bus Health API description
-> > > **********************************
-> > > 
-> > > 	Santiago Carot-Nemesio <sancane@gmail.com>
-> > > 	José Antonio Santos-Cadenas <santoscadenas@gmail.com>
-> > > 	Elvis Pfützenreuter <epx@signove.com>
-> > > 
-> > > Health Device Profile hierarchy
-> > > ===============================
-> > > 
-> > > Service		org.bluez
-> > > Interface	org.bluez.HealthManager
-> > > Object path	[variable prefix]/{hci0,hci1,...}
-> > > 
-> > > Methods:
-> > > 	path	RegisterApplication(object path, dict config)
-> > > 	
-> > > 		Returns the path of the new registered application. The path
-> > > 		parameter is the path of the object with the callbacks to
-> > > 		notify events (see org.bluez.HealthAgent at the end of this
-> > > 		document)
-> > > 		This petition starts an mcap instance on every adapter and also
-> > > 		register a proper record in the SDP if is needed.
-> > > 		
-> > > 		Dict is defined as bellow:
-> > > 		{
-> > > 		
-> > > 		  "end_points" : [{ (optional)
-> > > 			
-> > > 			"role" : ("source" or "sink"), (mandatory)
-> > > 			"specs" :[{ (mandatory)
-> > > 			
-> > > 				"data_type" : uint16, (mandatory)
-> > > 				"description" : string, (optional)
-> > > 			
-> > > 			}]
-> > > 			
-> > > 		  }]
-> > > 		
-> > > 		}
-> > > 		
-> > > 		Application will be closed by the call or implicitly when the
-> > > 		programs leaves the bus.
-> > > 		
-> > > 		Possible errors: org.bluez.Error.InvalidArguments
-> > > 	
-> > > 	void	UnregisterApplication(path application)
-> > > 	
-> > > 		Closes the HDP application identified by the object path. Also
-> > > 		application will be closed if the process that started it leaves
-> > > 		the bus. If there is a SDP record associated to this application
-> > > 		it will also be removed.
-> > > 		
-> > > 		Possible errors: org.bluez.Error.InvalidArguments
-> > > 		
-> > > 				org.bluez.Error.NotFound
-> > > 	
-> > > 	void UpdateServices()
-> > > 	
-> > > 		This method searches for HDP applications on the all remote
-> > > 		devices and notifies them to the appropriate agents.
-> > > 
-> > > -------------------------------------------------------------------------
-> > > -------
-> > > 
-> > > Service		org.bluez
-> > > Interface	org.bluez.HealthService
-> > > Object path	[variable
-> > > prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/hdp_YYYY
-> > > 
-> > > Methods:
-> > > 	array GetProperties()
-> > > 	
-> > > 		Gets the information of the remote application published on its
-> > > 		SDP record. The returned data format is as follows:
-> > > 		
-> > > 		{
-> > > 		
-> > > 			"end_points": [
-> > > 			
-> > > 				"mdepid": uint8,
-> > > 				"role"  : "source" or "sink" ,
-> > > 				"specs" : [{
-> > > 				
-> > > 					"dtype"       : uint16,
-> > > 					"description" : string, (optional)
-> > > 					}]
-> > > 				
-> > > 				]
-> > > 		
-> > > 		}
-> > 
-> > What's the name of this property? See the others APIs, properties need a
-> > name.
+> > I prefer that we actually see major code contributions that justify a
+> > copyright here before you start adding it. And so let the maintainers
+> > worry about that later on. I don't wanna see just random copyright
+> > additions for obvious fixes or changes that are most likely even derived
+> > from existing code.
+> >  
 > 
-> I didn't think about properties here (I'm not used to them) But here yes, a 
-> property fixes better than a method call.
+> I'm unsure of the reasoning unless the idea is to add copyright markings
+> to show attribution and level of contribution. In our case it's just a
+> legal marking.
+> 
+> If the reasoning for adding or not adding is the former, does this not
+> rise to that level, and for my own education and future reference why not?
+
+we normally automatically add the copyright for companies or individual
+when they make large contributions. Not just small extensions or fixes
+where it is questionable if they are copyrightable anyway.
+
+For just tracking contributions, we have GIT :)
+
+Regards
+
+Marcel
 
 
-The method should remain, look the the others APIs. They a have a
-Properties section and GetProperties() show all of them.
-
-
--- 
-Gustavo F. Padovan
-http://padovan.org
