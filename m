@@ -1,51 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Cyril Lacoux (Yack)" <clacoux@ifeelgood.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
- linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Adding support for bluetooth controller shipped with iMac i5
-Date: Fri, 9 Jul 2010 08:34:42 +0400
-References: <201006161443.50587.clacoux@ifeelgood.org> <201006162028.59280.clacoux@ifeelgood.org> <1278623133.10421.69.camel@localhost.localdomain>
-In-Reply-To: <1278623133.10421.69.camel@localhost.localdomain>
+Message-ID: <4C369CDC.9080104@signal11.us>
+Date: Thu, 08 Jul 2010 23:51:56 -0400
+From: Alan Ott <alan@signal11.us>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="utf-8"
-Message-Id: <201007090834.42674.clacoux@ifeelgood.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: David S Miller <davem@davemloft.net>,
+	Jiri Kosina <jkosina@suse.cz>, Michael Poole <mdpoole@troilus.org>,
+	Bastien Nocera <hadess@hadess.net>,
+	Eric Dumazet <eric.dumazet@gmail.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 1/1] Bluetooth: hidp: Add support for hidraw  HIDIOCGFEATURE  and HIDIOCSFEATURE
+References: <1276467601-9066-1-git-send-email-alan@signal11.us> <1278623485.10421.73.camel@localhost.localdomain>
+In-Reply-To: <1278623485.10421.73.camel@localhost.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Le vendredi 09 juillet 2010 01:05:33, vous avez =C3=A9crit :
+On 07/08/2010 05:11 PM, Marcel Holtmann wrote:
+> I looked at this and I am bit worried that this should not be done in
+> this detail in the HIDP driver. Essentially HIDP is a pure transport
+> driver. It should not handle all these details. Can we make this a bit
+> easier for the transport drivers to support such features?
+>
+> Regards
+>
+> Marcel
+>    
 
-Hi,
-=20
-> please create a proper commit message and include the usb-devices output
-> in that message.
+Hi Marcel,
 
-I don't understand, patch and usb-devices output were attached to my previo=
-us=20
-mail. Do you want me to re-send the patch in a separate mail using the git=
-=20
-output as body ?
+I put these changes (most notably the addition of hidp_get_raw_report()) 
+in hidp because that's where the parallel function 
+hidp_output_raw_report() was already located. I figured the input should 
+go with the output. That said, if there's a better place for both of 
+them (input and output) to go, let me know where you think it should be, 
+and I'll get them moved into the proper spot.
 
-> Also the HID part in the source code comment makes no sense. Why are you
-> using that one. Copy&paste from the previous one?
+I'm not sure what you mean about HIDP being a pure transport driver.
 
-Controller has HID capabilities, keyboard and mouse were working (usb-hid) =
-in=20
-restricted mode until I managed to get the controller working with btusb=20
-driver. That's why I copied and paste the previous one.
-
-I filled a bug report[1] on Ubuntu with more explanations. I tried to rever=
-t=20
-it to hid mode using hid2hci, but no luck.
-
-
-[1]: https://bugs.launchpad.net/ubuntu/+source/bluez/+bug/575366
-
-Git and kernel development guidelines are really new to me, thank's to take=
-=20
-the time to fix this.
-
-Regards,
-=2D-=20
-Cyril Lacoux -- BOFH excuse #181:
-
-Atilla the Hub
+Alan.
