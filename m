@@ -3,23 +3,16 @@ From: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
 Subject: [PATCH] Fixed empty 'N:' parameter handling for VCARDs
-Date: Fri,  9 Jul 2010 13:19:22 +0300
-Message-Id: <1278670762-10119-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+Date: Fri,  9 Jul 2010 12:27:01 +0300
+Message-Id: <1278667621-8157-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Bluetooth PBAP specification expects for call history listing,
-that parameter N: shall be empty when we cannot retrieve personal data
-from PSE phone book.
-Some devices(by example BH-903) are having problems when after N: parameter
- unnecessary characters occurs. List of dialed/incoming calls on carkit
-then is useless - carkit shows only blank lines and it's impossible to
-determine who made call.
+Bluetooth PBAP specification expects for call history listing, that parameter N: shall be empty when we cannot retrieve personal data from PSE phone book.
+Some devices(by example BH-903) are having problems when after N: parameter unnecessary characters occurs. List of dialed/incoming calls on carkit then is useless - carkit shows only blank lines and it's impossible to determine who made call.
 
-In previous version unnecessary semicolons were added after N:("N:;;;;")
-to represent empty name.
-Now if none of the contact fields is available, then adding real empty "N:"
-parameter (without semicolons).
+In previous version unnecessary semicolons were added after N: parameter ("N:;;;;") to represent empty name.
+Now if none of the contact fields is available, then adding real empty "N:" parameter (without semicolons).
 ---
  plugins/vcard.c |   27 +++++++++++++++++++++++++++
  1 files changed, 27 insertions(+), 0 deletions(-)
