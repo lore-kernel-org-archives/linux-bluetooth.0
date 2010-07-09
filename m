@@ -1,203 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?iso-8859-1?q?Jos=E9_Antonio_Santos_Cadenas?=
-	<santoscadenas@gmail.com>
-To: "Gustavo F. Padovan" <gustavo@padovan.org>
-Subject: Re: Proposed API for HDP (v3)
-Date: Fri, 9 Jul 2010 20:13:01 +0200
+Subject: Re: [PATCH] Fixed empty 'N:' parameter handling for VCARDs
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
 Cc: linux-bluetooth@vger.kernel.org
-References: <201007081912.31407.santoscadenas@gmail.com> <201007091912.44559.santoscadenas@gmail.com> <20100709173618.GA21080@vigoh>
-In-Reply-To: <20100709173618.GA21080@vigoh>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201007092013.01640.santoscadenas@gmail.com>
+In-Reply-To: <1278686070-7647-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+References: <1278686070-7647-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 09 Jul 2010 14:57:55 -0300
+Message-ID: <1278698276.10421.145.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Again a new version with some modifications
+Hi Radek,
+
+> Bluetooth PBAP specification expects for call history listing,
+> that parameter N: shall be empty when we cannot retrieve personal data
+> from PSE phone book.
+> Some devices(by example BH-903) are having problems when after N: parameter
+>  unnecessary characters occurs. List of dialed/incoming calls on carkit
+> then is useless - carkit shows only blank lines and it's impossible to
+> determine who made call.
+
+please be a bit consistent with your spaces here.
+
+> In previous version unnecessary semicolons were added after N:("N:;;;;")
+> to represent empty name.
+> Now if none of the contact fields is available, then adding real empty "N:"
+> parameter (without semicolons).
+> ---
+>  plugins/vcard.c |   35 +++++++++++++++++++++++++++++++++++
+>  1 files changed, 35 insertions(+), 0 deletions(-)
+> 
+> diff --git a/plugins/vcard.c b/plugins/vcard.c
+> index 5948a4a..108f6bd 100644
+> --- a/plugins/vcard.c
+> +++ b/plugins/vcard.c
+> @@ -133,9 +133,44 @@ static void vcard_printf_begin(GString *vcards, uint8_t format)
+>  		vcard_printf(vcards, "VERSION:2.1");
+>  }
+>  
+> +/* checks if there is at least one present contact field with personal data */
+
+"check if there is at least one contact field with personal data
+present"
+
+> +static gboolean contact_fields_present(struct phonebook_contact * contact)
+> +{
+> +	if (contact->family && strlen(contact->family) > 0)
+> +		return TRUE;
+> +
+> +	if (contact->given && strlen(contact->given) > 0)
+> +		return TRUE;
+> +
+> +	if (contact->additional && strlen(contact->additional) > 0)
+> +		return TRUE;
+> +
+> +	if (contact->prefix && strlen(contact->prefix) > 0)
+> +		return TRUE;
+> +
+> +	if (contact->suffix && strlen(contact->suffix) > 0)
+> +		return TRUE;
+> +
+> +	/* none of the personal data fields is present*/
+
+"none of the personal data fields are present"
+
+> +	return FALSE;
+> +}
+> +
+>  static void vcard_printf_name(GString *vcards,
+>  					struct phonebook_contact *contact)
+>  {
+> +	if (contact_fields_present(contact) == FALSE) {
+> +		/*
+> +		 * If fields are empty, then add only 'N:' as parameter.
+> +		 * This is crucial for some devices ( Nokia BH-903) which
+
+Please be consistent with spaces.
+
+> +		 * have problems with history listings - can't determine
+> +		 * if parameter is really empty if there are unnecessary
+> +		 * characters after'N:' (like 'N:;;;;').
+> +		 * We need to add only'N:' param - without semicolons.
+
+Same here.
+
+> +		 */
+> +		vcard_printf(vcards, "N:");
+> +		return;
+> +	}
+> +
+>  	vcard_printf(vcards, "N:%s;%s;%s;%s;%s", contact->family,
+>  				contact->given, contact->additional,
+>  				contact->prefix, contact->suffix);
+
+Regards
+
+Marcel
 
 
-BlueZ D-Bus Health API description
-**********************************
-
-	Santiago Carot-Nemesio <sancane@gmail.com>
-	José Antonio Santos-Cadenas <santoscadenas@gmail.com>
-	Elvis Pfützenreuter <epx@signove.com>
-
-Health Device Profile hierarchy
-===============================
-
-Service		org.bluez
-Interface	org.bluez.HealthManager
-Object path	[variable prefix]/
-
-Methods:
-
-	path	RegisterApplication(object path, dict config)
-
-		Returns the path of the new registered application. The path
-		parameter is the path of the object with the callbacks to
-		notify events (see org.bluez.HealthAgent at the end of this
-		document)
-		This petition starts an mcap instance on every adapter and also
-		register a proper record in the SDP if is needed.
-
-		Dict is defined as bellow:
-		{
-		  "end_points" : [{ (optional)
-			"role" : ("Source" or "Sink"), (mandatory)
-			"specs" :[{ (mandatory)
-				"data_type" : uint16, (mandatory)
-				"description" : string, (optional)
-			}]
-		  }]
-		}
-
-		Application will be closed by the call or implicitly when the
-		programs leaves the bus.
-
-		Possible errors: org.bluez.Error.InvalidArguments
-
-	void	UnregisterApplication(path application)
-
-		Closes the HDP application identified by the object path. Also
-		application will be closed if the process that started it leaves
-		the bus. If there is a SDP record associated to this application
-		it will also be removed.
-
-		Possible errors: org.bluez.Error.InvalidArguments
-				org.bluez.Error.NotFound
-
-	void UpdateServices()
-
-		This method searches for HDP applications on the all remote
-		devices and notifies them to the appropriate agents.
-
-Signals:
-
-	void ServiceDiscovered(object path)
-
-		This signal is sent when a device containing an HDP
-		application is paired or when the method Update of the
-		HealthManager is called and new HealthServices are discovered.
-		The object path is the HealthService path. The signal will be
-		launched once for each HealthService.
-
-	void ServiceRemoved(object path)
-
-		This signal is sent if during an Update some HealthServices
-		have disappeared. The signal is launched once for each removed
-		HealthService.
-
---------------------------------------------------------------------------------
-
-Service		org.bluez
-Interface	org.bluez.HealthService
-Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/hdp_YYYY
-
-Methods:
-
-	array GetProperties()
-
-		Returns all properties for the interface. See the properties
-		section for available properties.
-
-	boolean Echo(array{byte})
-
-		Sends an echo petition to the remote service. Returns True if
-		response matches with the buffer sent. If some error is detected
-		False value is returned and the associated MCL is closed.
-
-	path OpenDataChannel(byte mdepid, string conf)
-
-		Creates a new data channel with the indicated config to the
-		remote MCAP Data End Point (MDEP).
-		The configuration should indicate the channel quality of
-		service using one of this values "Reliable", "Streaming", "Any".
-
-		Returns the data channel path.
-
-		Possible errors: org.bluez.Error.InvalidArguments
-				org.bluez.Error.HealthError
-
-	void ReconnectDataChannel(path data_channel)
-
-		Reconnects a previously created data channel indicated by its
-		path.
-
-		Possible errors: org.bluez.Error.InvalidArguments
-				org.bluez.Error.HealthError
-				org.bluez.Error.NotFound
-
-	void DeleteDataChannel(path data_channel)
-
-		Deletes a data channel so it will not be available.
-
-		Possible errors: org.bluez.Error.InvalidArguments
-				org.bluez.Error.NotFound
-				org.bluez.Error.HealthError
-
-	void DeleteAllDataChannels()
-
-		Deletes all data channels so they will not be available for
-		future use.
-
-		Possible errors: org.bluez.Error.HealthError
-
-Properties:
-
-	array EndPoints
-
-		An array with all the end points in this Service. Each one of
-		then has this format.
-
-		{
-			"mdepid": uint8,
-			"role"  : "Source" or "Sink" ,
-			"specs" : [{
-				"dtype"       : uint16,
-				"description" : string, (optional)
-				}]
-		}
-
-HealthAgent hierarchy
-=====================
-
-(this object is implemented by the HDP user in order to receive notifications)
-
-Service		unique name
-Interface	org.bluez.HealthAgent
-Object path	freely definable
-
-Methods:
-
-	void DataChannelCreated(object path, path data_channel, string conf,
-							fd file_descriptor)
-
-		This method is called when a new data channel is created.
-
-		The path contains the object path of the HealthService that
-		created the connection, the data_channel is the path that
-		identifies the data channel, conf is the quality of service of
-		the data channel ("reliable" or "streaming") and file_descriptor
-		the file descriptor for reading and writing data.
-
-	void DataChannelReconnected(object path, path data_channel, string conf,
-							fd file_descriptor))
-
-		This method is called when a closed data channel is reconnected
-		by the remote device.
-
-		The path contains the object path of the HealthService that
-		reconnected the channel. data_channel is the path that
-		identifies the data channel, conf is the quality of service of
-		the data channel ("reliable" or "streaming") and file_descriptor
-		is the file descriptor for reading and writing data.
-
-	void DataChannelRemoved(object path, path data_channel)
-
-		This method is called when a data channel is deleted.
-
-		After this call the data channel path will not be valid and can
-		be reused for future creation of data channels. The path is the
-		path of the HealthService that removes the data channel.
