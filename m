@@ -1,151 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH v4 1/3] Implements hci_reassembly to reassemble Rx packets
-From: suraj <suraj@atheros.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <marcel@holtmann.org>, <Luis.Rodriguez@Atheros.com>,
-	<Jothikumar.Mothilal@Atheros.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 9 Jul 2010 16:19:29 +0530
-Message-ID: <1278672569.4048.15.camel@atheros013-desktop>
-MIME-Version: 1.0
+From: Cyril Lacoux <clacoux@ifeelgood.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Cyril Lacoux <clacoux@easter-eggs.com>
+Subject: [PATCH] Added support for bluetooth controller shipped with iMac i5
+Date: Fri,  9 Jul 2010 14:34:49 +0400
+Message-Id: <1278671689-9444-1-git-send-email-clacoux@ifeelgood.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Implements feature to reassemble HCI frames received from an input stream.
+From: Cyril Lacoux <clacoux@easter-eggs.com>
 
-Signed-off-by: Suraj Sumangala <suraj@atheros.com>
+Device class is ff(vend.) instead of e0(wlcon).
+
+Output from command `usb-devices`:
+T:  Bus=01 Lev=03 Prnt=03 Port=00 Cnt=01 Dev#=  6 Spd=12  MxCh= 0
+D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=05ac ProdID=8215 Rev=01.82
+S:  Manufacturer=Apple Inc.
+S:  Product=Bluetooth USB Host Controller
+S:  SerialNumber=7C6D62936607
+C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
 ---
- net/bluetooth/hci_core.c |  115 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 115 insertions(+), 0 deletions(-)
+ drivers/bluetooth/btusb.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 5e83f8e..3eb4c1b 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1030,6 +1030,121 @@ int hci_recv_frame(struct sk_buff *skb)
- }
- EXPORT_SYMBOL(hci_recv_frame);
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 5d9cc53..8eb6be5 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -75,6 +75,9 @@ static struct usb_device_id btusb_table[] = {
+ 	/* Canyon CN-BTU1 with HID interfaces */
+ 	{ USB_DEVICE(0x0c10, 0x0000) },
  
-+static int hci_reassembly(struct hci_dev *hdev, int type, void *data,
-+			  int count, struct sk_buff **skb_ptr, int *remain)
-+{
-+	int len = 0;
-+	int header_len = 0;
-+	struct sk_buff *skb = *skb_ptr;
-+	struct { struct bt_skb_cb cb_info; int expect; } *scb;
++	/* Apple iMac11,1 */
++	{ USB_DEVICE(0x05ac, 0x8215) },
 +
-+	*remain = count;
-+
-+	if (type < HCI_ACLDATA_PKT || type > HCI_EVENT_PKT)
-+		return -EILSEQ;
-+
-+	if (!skb) {
-+
-+		switch (type) {
-+		case HCI_ACLDATA_PKT:
-+			len = HCI_MAX_FRAME_SIZE;
-+			header_len = HCI_ACL_HDR_SIZE;
-+		break;
-+		case HCI_EVENT_PKT:
-+			len = HCI_MAX_EVENT_SIZE;
-+			header_len = HCI_EVENT_HDR_SIZE;
-+		break;
-+		case HCI_SCODATA_PKT:
-+			len = HCI_MAX_SCO_SIZE;
-+			header_len = HCI_SCO_HDR_SIZE;
-+		break;
-+		}
-+
-+		skb = bt_skb_alloc(len, GFP_ATOMIC);
-+
-+		if (!skb)
-+			return -ENOMEM;
-+
-+		scb = (void *) skb->cb;
-+		scb->expect = header_len;
-+		scb->cb_info.pkt_type = (__u8)type;
-+
-+		skb->dev = (void *) hdev;
-+		*skb_ptr = skb;
-+
-+	}
-+
-+	while (count) {
-+
-+		scb = (void *) skb->cb;
-+		len = min(scb->expect, count);
-+
-+		memcpy(skb_put(skb, len), data, len);
-+
-+		count -= len;
-+		data += len;
-+		scb->expect -= len;
-+		*remain = count;
-+
-+		switch (type) {
-+		case HCI_EVENT_PKT:
-+			if (skb->len == HCI_EVENT_HDR_SIZE) {
-+				struct hci_event_hdr *h = hci_event_hdr(skb);
-+				scb->expect = h->plen;
-+
-+				if (skb_tailroom(skb) < scb->expect) {
-+					kfree_skb(skb);
-+					*skb_ptr = NULL;
-+
-+					return -ENOMEM;
-+				}
-+			}
-+			break;
-+
-+		case HCI_ACLDATA_PKT:
-+			if (skb->len  == HCI_ACL_HDR_SIZE) {
-+				struct hci_acl_hdr *h = hci_acl_hdr(skb);
-+				scb->expect = __le16_to_cpu(h->dlen);
-+
-+				if (skb_tailroom(skb) < scb->expect) {
-+					kfree_skb(skb);
-+					*skb_ptr = NULL;
-+
-+					return -ENOMEM;
-+				}
-+			}
-+			break;
-+
-+		case HCI_SCODATA_PKT:
-+			if (skb->len == HCI_SCO_HDR_SIZE) {
-+				struct hci_sco_hdr *h = hci_sco_hdr(skb);
-+				scb->expect = h->dlen;
-+
-+				if (skb_tailroom(skb) < scb->expect) {
-+					kfree_skb(skb);
-+					*skb_ptr = NULL;
-+
-+					return -ENOMEM;
-+				}
-+			}
-+			break;
-+		}
-+
-+		if (scb->expect == 0) {
-+
-+			/* Complete frame */
-+			bt_cb(skb)->pkt_type = type;
-+			hci_recv_frame(skb);
-+
-+			*skb_ptr = NULL;
-+
-+			return 0;
-+		}
-+
-+	}
-+
-+	return 0;
-+}
- /* Receive packet type fragment */
- #define __reassembly(hdev, type)  ((hdev)->reassembly[(type) - 2])
+ 	{ }	/* Terminating entry */
+ };
  
 -- 
-1.7.0.4
-
-
+1.7.1
 
