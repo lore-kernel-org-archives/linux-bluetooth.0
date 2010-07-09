@@ -1,102 +1,138 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Fixed empty 'N:' parameter handling for VCARDs
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+Date: Fri, 9 Jul 2010 14:36:18 -0300
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
+To: =?iso-8859-1?Q?Jos=E9?= Antonio Santos Cadenas
+	<santoscadenas@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1278686070-7647-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
-References: <1278686070-7647-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 09 Jul 2010 14:57:55 -0300
-Message-ID: <1278698276.10421.145.camel@localhost.localdomain>
-Mime-Version: 1.0
+Subject: Re: Proposed API for HDP
+Message-ID: <20100709173618.GA21080@vigoh>
+References: <201007081912.31407.santoscadenas@gmail.com>
+ <201007091549.42621.santoscadenas@gmail.com>
+ <20100709165508.GC22985@vigoh>
+ <201007091912.44559.santoscadenas@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <201007091912.44559.santoscadenas@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Radek,
+* José Antonio Santos Cadenas <santoscadenas@gmail.com> [2010-07-09 19:12:44 +0200]:
 
-> Bluetooth PBAP specification expects for call history listing,
-> that parameter N: shall be empty when we cannot retrieve personal data
-> from PSE phone book.
-> Some devices(by example BH-903) are having problems when after N: parameter
->  unnecessary characters occurs. List of dialed/incoming calls on carkit
-> then is useless - carkit shows only blank lines and it's impossible to
-> determine who made call.
-
-please be a bit consistent with your spaces here.
-
-> In previous version unnecessary semicolons were added after N:("N:;;;;")
-> to represent empty name.
-> Now if none of the contact fields is available, then adding real empty "N:"
-> parameter (without semicolons).
-> ---
->  plugins/vcard.c |   35 +++++++++++++++++++++++++++++++++++
->  1 files changed, 35 insertions(+), 0 deletions(-)
+> El Friday 09 July 2010 18:55:08 Gustavo F. Padovan escribió:
+> > Hi José,
+> > 
+> > * José Antonio Santos Cadenas <santoscadenas@gmail.com> [2010-07-09 15:49:42 
+> +0200]:
+> > > I wrote a new API based on the changes suggested in this thread.
+> > > 
+> > > Regards.
+> > > 
+> > > Jose.
+> > > 
+> > > 
+> > > BlueZ D-Bus Health API description
+> > > **********************************
+> > > 
+> > > 	Santiago Carot-Nemesio <sancane@gmail.com>
+> > > 	José Antonio Santos-Cadenas <santoscadenas@gmail.com>
+> > > 	Elvis Pfützenreuter <epx@signove.com>
+> > > 
+> > > Health Device Profile hierarchy
+> > > ===============================
+> > > 
+> > > Service		org.bluez
+> > > Interface	org.bluez.HealthManager
+> > > Object path	[variable prefix]/{hci0,hci1,...}
+> > > 
+> > > Methods:
+> > > 	path	RegisterApplication(object path, dict config)
+> > > 	
+> > > 		Returns the path of the new registered application. The path
+> > > 		parameter is the path of the object with the callbacks to
+> > > 		notify events (see org.bluez.HealthAgent at the end of this
+> > > 		document)
+> > > 		This petition starts an mcap instance on every adapter and also
+> > > 		register a proper record in the SDP if is needed.
+> > > 		
+> > > 		Dict is defined as bellow:
+> > > 		{
+> > > 		
+> > > 		  "end_points" : [{ (optional)
+> > > 			
+> > > 			"role" : ("source" or "sink"), (mandatory)
+> > > 			"specs" :[{ (mandatory)
+> > > 			
+> > > 				"data_type" : uint16, (mandatory)
+> > > 				"description" : string, (optional)
+> > > 			
+> > > 			}]
+> > > 			
+> > > 		  }]
+> > > 		
+> > > 		}
+> > > 		
+> > > 		Application will be closed by the call or implicitly when the
+> > > 		programs leaves the bus.
+> > > 		
+> > > 		Possible errors: org.bluez.Error.InvalidArguments
+> > > 	
+> > > 	void	UnregisterApplication(path application)
+> > > 	
+> > > 		Closes the HDP application identified by the object path. Also
+> > > 		application will be closed if the process that started it leaves
+> > > 		the bus. If there is a SDP record associated to this application
+> > > 		it will also be removed.
+> > > 		
+> > > 		Possible errors: org.bluez.Error.InvalidArguments
+> > > 		
+> > > 				org.bluez.Error.NotFound
+> > > 	
+> > > 	void UpdateServices()
+> > > 	
+> > > 		This method searches for HDP applications on the all remote
+> > > 		devices and notifies them to the appropriate agents.
+> > > 
+> > > -------------------------------------------------------------------------
+> > > -------
+> > > 
+> > > Service		org.bluez
+> > > Interface	org.bluez.HealthService
+> > > Object path	[variable
+> > > prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/hdp_YYYY
+> > > 
+> > > Methods:
+> > > 	array GetProperties()
+> > > 	
+> > > 		Gets the information of the remote application published on its
+> > > 		SDP record. The returned data format is as follows:
+> > > 		
+> > > 		{
+> > > 		
+> > > 			"end_points": [
+> > > 			
+> > > 				"mdepid": uint8,
+> > > 				"role"  : "source" or "sink" ,
+> > > 				"specs" : [{
+> > > 				
+> > > 					"dtype"       : uint16,
+> > > 					"description" : string, (optional)
+> > > 					}]
+> > > 				
+> > > 				]
+> > > 		
+> > > 		}
+> > 
+> > What's the name of this property? See the others APIs, properties need a
+> > name.
 > 
-> diff --git a/plugins/vcard.c b/plugins/vcard.c
-> index 5948a4a..108f6bd 100644
-> --- a/plugins/vcard.c
-> +++ b/plugins/vcard.c
-> @@ -133,9 +133,44 @@ static void vcard_printf_begin(GString *vcards, uint8_t format)
->  		vcard_printf(vcards, "VERSION:2.1");
->  }
->  
-> +/* checks if there is at least one present contact field with personal data */
-
-"check if there is at least one contact field with personal data
-present"
-
-> +static gboolean contact_fields_present(struct phonebook_contact * contact)
-> +{
-> +	if (contact->family && strlen(contact->family) > 0)
-> +		return TRUE;
-> +
-> +	if (contact->given && strlen(contact->given) > 0)
-> +		return TRUE;
-> +
-> +	if (contact->additional && strlen(contact->additional) > 0)
-> +		return TRUE;
-> +
-> +	if (contact->prefix && strlen(contact->prefix) > 0)
-> +		return TRUE;
-> +
-> +	if (contact->suffix && strlen(contact->suffix) > 0)
-> +		return TRUE;
-> +
-> +	/* none of the personal data fields is present*/
-
-"none of the personal data fields are present"
-
-> +	return FALSE;
-> +}
-> +
->  static void vcard_printf_name(GString *vcards,
->  					struct phonebook_contact *contact)
->  {
-> +	if (contact_fields_present(contact) == FALSE) {
-> +		/*
-> +		 * If fields are empty, then add only 'N:' as parameter.
-> +		 * This is crucial for some devices ( Nokia BH-903) which
-
-Please be consistent with spaces.
-
-> +		 * have problems with history listings - can't determine
-> +		 * if parameter is really empty if there are unnecessary
-> +		 * characters after'N:' (like 'N:;;;;').
-> +		 * We need to add only'N:' param - without semicolons.
-
-Same here.
-
-> +		 */
-> +		vcard_printf(vcards, "N:");
-> +		return;
-> +	}
-> +
->  	vcard_printf(vcards, "N:%s;%s;%s;%s;%s", contact->family,
->  				contact->given, contact->additional,
->  				contact->prefix, contact->suffix);
-
-Regards
-
-Marcel
+> I didn't think about properties here (I'm not used to them) But here yes, a 
+> property fixes better than a method call.
 
 
+The method should remain, look the the others APIs. They a have a
+Properties section and GetProperties() show all of them.
+
+
+-- 
+Gustavo F. Padovan
+http://padovan.org
