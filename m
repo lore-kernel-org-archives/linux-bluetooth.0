@@ -1,200 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?iso-8859-1?q?Jos=E9_Antonio_Santos_Cadenas?=
-	<santoscadenas@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: Proposed API for HDP
-Date: Fri, 9 Jul 2010 15:49:42 +0200
-References: <201007081912.31407.santoscadenas@gmail.com>
-In-Reply-To: <201007081912.31407.santoscadenas@gmail.com>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201007091549.42621.santoscadenas@gmail.com>
+Subject: Re: [PATCH] Added support for bluetooth controller shipped with
+ iMac i5
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Cyril Lacoux <clacoux@ifeelgood.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Cyril Lacoux <clacoux@easter-eggs.com>
+In-Reply-To: <1278671689-9444-1-git-send-email-clacoux@ifeelgood.org>
+References: <1278671689-9444-1-git-send-email-clacoux@ifeelgood.org>
+Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 09 Jul 2010 10:21:18 -0300
+Message-ID: <1278681678.10421.114.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I wrote a new API based on the changes suggested in this thread.
+Hi Cyril,
 
-Regards.
+> Device class is ff(vend.) instead of e0(wlcon).
+> 
+> Output from command `usb-devices`:
+> T:  Bus=01 Lev=03 Prnt=03 Port=00 Cnt=01 Dev#=  6 Spd=12  MxCh= 0
+> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=05ac ProdID=8215 Rev=01.82
+> S:  Manufacturer=Apple Inc.
+> S:  Product=Bluetooth USB Host Controller
+> S:  SerialNumber=7C6D62936607
+> C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+> I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
 
-Jose.
+you need to add a Signed-off-by: line here.
+
+> ---
+>  drivers/bluetooth/btusb.c |    3 +++
+>  1 files changed, 3 insertions(+), 0 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 5d9cc53..8eb6be5 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -75,6 +75,9 @@ static struct usb_device_id btusb_table[] = {
+>  	/* Canyon CN-BTU1 with HID interfaces */
+>  	{ USB_DEVICE(0x0c10, 0x0000) },
+>  
+> +	/* Apple iMac11,1 */
+> +	{ USB_DEVICE(0x05ac, 0x8215) },
+> +
+
+And since this a more likely device since all the other ones that are
+not even sold anymore, just put it after the generic entry and before
+the AVM one.
+
+Regards
+
+Marcel
 
 
-BlueZ D-Bus Health API description
-**********************************
-
-	Santiago Carot-Nemesio <sancane@gmail.com>
-	José Antonio Santos-Cadenas <santoscadenas@gmail.com>
-	Elvis Pfützenreuter <epx@signove.com>
-
-Health Device Profile hierarchy
-===============================
-
-Service		org.bluez
-Interface	org.bluez.HealthManager
-Object path	[variable prefix]/{hci0,hci1,...}
-
-Methods:
-
-	path	RegisterApplication(object path, dict config)
-
-		Returns the path of the new registered application. The path
-		parameter is the path of the object with the callbacks to
-		notify events (see org.bluez.HealthAgent at the end of this
-		document)
-		This petition starts an mcap instance on every adapter and also
-		register a proper record in the SDP if is needed.
-
-		Dict is defined as bellow:
-		{
-		  "end_points" : [{ (optional)
-			"role" : ("source" or "sink"), (mandatory)
-			"specs" :[{ (mandatory)
-				"data_type" : uint16, (mandatory)
-				"description" : string, (optional)
-			}]
-		  }]
-		}
-
-		Application will be closed by the call or implicitly when the
-		programs leaves the bus.
-
-		Possible errors: org.bluez.Error.InvalidArguments
-
-	void	UnregisterApplication(path application)
-
-		Closes the HDP application identified by the object path. Also
-		application will be closed if the process that started it leaves
-		the bus. If there is a SDP record associated to this application
-		it will also be removed.
-
-		Possible errors: org.bluez.Error.InvalidArguments
-				org.bluez.Error.NotFound
-
-	void UpdateServices()
-
-		This method searches for HDP applications on the all remote
-		devices and notifies them to the appropriate agents.
-
---------------------------------------------------------------------------------
-
-Service		org.bluez
-Interface	org.bluez.HealthService
-Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/hdp_YYYY
-
-Methods:
-
-	array GetProperties()
-
-		Gets the information of the remote application published on its
-		SDP record. The returned data format is as follows:
-
-		{
-			"end_points": [
-				"mdepid": uint8,
-				"role"  : "source" or "sink" ,
-				"specs" : [{
-					"dtype"       : uint16,
-					"description" : string, (optional)
-					}]
-				]
-		}
-
-	boolean Echo(array{byte})
-
-		Sends an echo petition to the remote service. Returns True if
-		response matches with the buffer sent. If some error is detected
-		False value is returned and the associated MCL is closed.
-
-	path OpenDataChannel(byte mdepid, string conf)
-
-		Creates a new data channel with the indicated config to the
-		remote MCAP Data End Point (MDEP).
-		The configuration should indicate the channel quality of
-		service using one of this values "reliable", "streaming", "any".
-
-		Returns the data channel path.
-
-		Possible errors: org.bluez.Error.InvalidArguments
-				org.bluez.Error.HealthError
-
-	void ReconnectDataChannel(path data_channel)
-
-		Reconnects a previously created data channel indicated by its
-		path.
-
-		Possible errors: org.bluez.Error.InvalidArguments
-				org.bluez.Error.HealthError
-				org.bluez.Error.NotFound
-
-	void DeleteDataChannel(path data_channel)
-
-		Deletes a data channel so it will not be available.
-
-		Possible errors: org.bluez.Error.InvalidArguments
-				org.bluez.Error.NotFound
-				org.bluez.Error.HealthError
-
-	void DeleteAllDataChannels()
-
-		Deletes all data channels so they will not be available for
-		future use.
-
-		Possible errors: org.bluez.Error.HealthError
-
-HealthAgent hierarchy
-=====================
-
-(this object is implemented by the HDP user in order to receive notifications)
-
-Service		unique name
-Interface	org.bluez.HealthAgent
-Object path	freely definable
-
-Methods:
-
-	void ServiceDiscovered(object path)
-
-		This method is called when a device containing an HDP
-		application is paired or when the method Update of the
-		HealthManager is called and new HealthServices are discovered.
-		The object path is the HealthService path. The method will be
-		called for each HealthService.
-
-(Not shure if this should be added)
-	void ServiceRemoved(object path)
-
-		This method is called if during an Update some HealthServices
-		have disappeared. The method is called once for each removed
-		HealthService.
-
-	void DataChannelCreated(object path, path data_channel, string conf,
-							fd file_descriptor)
-
-		This method is called when a new data channel is created.
-
-		The path contains the object path of the HealthService that
-		created the connection, the data_channel is the path that
-		identifies the data channel, conf is the quality of service of
-		the data channel ("reliable" or "streaming") and file_descriptor
-		the file descriptor for reading and writing data.
-
-	void DataChannelReconnected(object path, path data_channel, string conf,
-							fd file_descriptor))
-
-		This method is called when a closed data channel is reconnected
-		by the remote device.
-
-		The path contains the object path of the HealthService that
-		reconnected the channel. data_channel is the path that
-		identifies the data channel, conf is the quality of service of
-		the data channel ("reliable" or "streaming") and file_descriptor
-		is the file descriptor for reading and writing data.
-
-	void DataChannelRemoved(object path, path data_channel)
-
-		This method is called when a data channel is deleted.
-
-		After this call the data channel path will not be valid and can
-		be reused for future creation of data channels. The path is the
-		path of the HealthService that removes the data channel.
