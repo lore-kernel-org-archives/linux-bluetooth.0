@@ -1,113 +1,155 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
+From: Ron Shaffer <rshaffer@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtman.org, "Gustavo F. Padovan" <padovan@profusion.mobi>
-Subject: [PATCH 1/2] Bluetooth: Add Fixed Channels support to bind syscall.
-Date: Mon, 12 Jul 2010 18:19:04 -0300
-Message-Id: <1278969545-26864-1-git-send-email-gustavo@padovan.org>
+Cc: marcel@holtmann.org, Ron Shaffer <rshaffer@codeaurora.org>
+Subject: Re: [PATCH 3/3] Bluetooth: Synchronize SCO/eSCO connection requests to ACL state
+Date: Mon, 12 Jul 2010 17:06:12 -0400
+Message-Id: <1278968772-29446-1-git-send-email-rshaffer@codeaurora.org>
+In-Reply-To: <1278625779.10421.80.camel@localhost.localdomain>
+References: <1278625779.10421.80.camel@localhost.localdomain>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo F. Padovan <padovan@profusion.mobi>
+Certain headsets such as the Motorola H350 will reject SCO and eSCO
+connection requests while the ACL is transitioning from sniff mode
+to active mode. Add synchronization so that SCO and eSCO connection
+requests will wait until the ACL has fully transitioned to active mode.
 
-L2CAP nows support bind to a fixed channel, this is needed for Low Energy
-and AMP.
-bind returns error if you pass both PSM and CID values.
-
-Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+Signed-off-by: Ron Shaffer <rshaffer@codeaurora.org>
 ---
- net/bluetooth/l2cap.c |   48 +++++++++++++++++++++++++++++++++++-------------
- 1 files changed, 35 insertions(+), 13 deletions(-)
+ include/net/bluetooth/hci_core.h |    1 +
+ net/bluetooth/hci_conn.c         |   18 ++++++++++++++++++
+ net/bluetooth/hci_event.c        |   22 +++++++++++++++++++++-
+ 3 files changed, 40 insertions(+), 1 deletions(-)
 
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 449cbdd..39f047b 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -726,7 +726,7 @@ static inline void l2cap_chan_add(struct l2cap_conn *conn, struct sock *sk, stru
- }
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index fd53323..c4a37fc 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -250,6 +250,7 @@ enum {
+ 	HCI_CONN_ENCRYPT_PEND,
+ 	HCI_CONN_RSWITCH_PEND,
+ 	HCI_CONN_MODE_CHANGE_PEND,
++	HCI_CONN_SCO_PEND,
+ };
  
- /* ---- Socket interface ---- */
--static struct sock *__l2cap_get_sock_by_addr(__le16 psm, bdaddr_t *src)
-+static struct sock *__l2cap_sock_by_psm_addr(__le16 psm, bdaddr_t *src)
+ static inline void hci_conn_hash_init(struct hci_dev *hdev)
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 9bf4308..ffc67ac 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -117,9 +117,18 @@ void hci_add_sco(struct hci_conn *conn, __u16 handle)
  {
- 	struct sock *sk;
- 	struct hlist_node *node;
-@@ -738,6 +738,16 @@ found:
- 	return sk;
+ 	struct hci_dev *hdev = conn->hdev;
+ 	struct hci_cp_add_sco cp;
++	struct hci_conn *acl = conn->link;
+ 
+ 	BT_DBG("%p", conn);
+ 
++	if (acl->mode == HCI_CM_SNIFF &&
++			test_bit(HCI_CONN_MODE_CHANGE_PEND, &acl->pend)) {
++		set_bit(HCI_CONN_SCO_PEND, &conn->pend);
++		return;
++	}
++
++	test_and_clear_bit(HCI_CONN_SCO_PEND, &conn->pend);
++
+ 	conn->state = BT_CONNECT;
+ 	conn->out = 1;
+ 
+@@ -135,9 +144,18 @@ void hci_setup_sync(struct hci_conn *conn, __u16 handle)
+ {
+ 	struct hci_dev *hdev = conn->hdev;
+ 	struct hci_cp_setup_sync_conn cp;
++	struct hci_conn *acl = conn->link;
+ 
+ 	BT_DBG("%p", conn);
+ 
++	if (acl->mode == HCI_CM_SNIFF &&
++			test_bit(HCI_CONN_MODE_CHANGE_PEND, &acl->pend)) {
++		set_bit(HCI_CONN_SCO_PEND, &conn->pend);
++		return;
++	}
++
++	test_and_clear_bit(HCI_CONN_SCO_PEND, &conn->pend);
++
+ 	conn->state = BT_CONNECT;
+ 	conn->out = 1;
+ 
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 3af537a..c3a05e1 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -615,6 +615,7 @@ static void hci_cs_add_sco(struct hci_dev *hdev, __u8 status)
+ 	acl = hci_conn_hash_lookup_handle(hdev, handle);
+ 	if (acl && (sco = acl->link)) {
+ 		sco->state = BT_CLOSED;
++		clear_bit(HCI_CONN_SCO_PEND, &sco->pend);
+ 
+ 		hci_proto_connect_cfm(sco, status);
+ 		hci_conn_del(sco);
+@@ -760,6 +761,7 @@ static void hci_cs_setup_sync_conn(struct hci_dev *hdev, __u8 status)
+ 	acl = hci_conn_hash_lookup_handle(hdev, handle);
+ 	if (acl && (sco = acl->link)) {
+ 		sco->state = BT_CLOSED;
++		clear_bit(HCI_CONN_SCO_PEND, &sco->pend);
+ 
+ 		hci_proto_connect_cfm(sco, status);
+ 		hci_conn_del(sco);
+@@ -795,6 +797,7 @@ static void hci_cs_exit_sniff_mode(struct hci_dev *hdev, __u8 status)
+ {
+ 	struct hci_cp_exit_sniff_mode *cp;
+ 	struct hci_conn *conn;
++	struct hci_conn *sco;
+ 
+ 	BT_DBG("%s status 0x%x", hdev->name, status);
+ 
+@@ -808,9 +811,16 @@ static void hci_cs_exit_sniff_mode(struct hci_dev *hdev, __u8 status)
+ 	hci_dev_lock(hdev);
+ 
+ 	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(cp->handle));
+-	if (conn)
++	if (conn) {
+ 		clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend);
+ 
++		sco = conn->link;
++		if (sco && test_and_clear_bit(HCI_CONN_SCO_PEND, &sco->pend)) {
++				hci_proto_connect_cfm(sco, status);
++				hci_conn_del(sco);
++		}
++	}
++
+ 	hci_dev_unlock(hdev);
  }
  
-+static struct sock *__l2cap_sock_by_cid_addr(__le16 cid, bdaddr_t *src)
-+{
-+	struct sock *sk;
-+	struct hlist_node *node;
-+	sk_for_each(sk, node, &l2cap_sk_list.head)
-+		if (l2cap_pi(sk)->scid == cid && !bacmp(&bt_sk(sk)->src, src))
-+			return sk;
-+	return NULL;
-+}
-+
- /* Find socket with psm and source bdaddr.
-  * Returns closest match.
-  */
-@@ -996,7 +1006,7 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
- 	len = min_t(unsigned int, sizeof(la), alen);
- 	memcpy(&la, addr, len);
+@@ -1463,6 +1473,7 @@ static inline void hci_mode_change_evt(struct hci_dev *hdev, struct sk_buff *skb
+ {
+ 	struct hci_ev_mode_change *ev = (void *) skb->data;
+ 	struct hci_conn *conn;
++	struct hci_conn *sco;
  
--	if (la.l2_cid)
-+	if (la.l2_cid && la.l2_psm)
- 		return -EINVAL;
+ 	BT_DBG("%s status %d", hdev->name, ev->status);
  
- 	lock_sock(sk);
-@@ -1014,18 +1024,30 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
- 
- 	write_lock_bh(&l2cap_sk_list.lock);
- 
--	if (la.l2_psm && __l2cap_get_sock_by_addr(la.l2_psm, &la.l2_bdaddr)) {
--		err = -EADDRINUSE;
--	} else {
--		/* Save source address */
--		bacpy(&bt_sk(sk)->src, &la.l2_bdaddr);
--		l2cap_pi(sk)->psm   = la.l2_psm;
--		l2cap_pi(sk)->sport = la.l2_psm;
--		sk->sk_state = BT_BOUND;
-+	if (la.l2_psm) {
-+		if (__l2cap_sock_by_psm_addr(la.l2_psm, &la.l2_bdaddr)) {
-+			err = -EADDRINUSE;
+@@ -1478,6 +1489,15 @@ static inline void hci_mode_change_evt(struct hci_dev *hdev, struct sk_buff *skb
+ 				conn->power_save = 1;
+ 			else
+ 				conn->power_save = 0;
 +		} else {
-+			/* Save source address */
-+			bacpy(&bt_sk(sk)->src, &la.l2_bdaddr);
-+			l2cap_pi(sk)->psm   = la.l2_psm;
-+			l2cap_pi(sk)->sport = la.l2_psm;
-+			sk->sk_state = BT_BOUND;
- 
--		if (__le16_to_cpu(la.l2_psm) == 0x0001 ||
-+			if (__le16_to_cpu(la.l2_psm) == 0x0001 ||
- 					__le16_to_cpu(la.l2_psm) == 0x0003)
--			l2cap_pi(sk)->sec_level = BT_SECURITY_SDP;
-+				l2cap_pi(sk)->sec_level = BT_SECURITY_SDP;
-+		}
-+	} else if (la.l2_cid) {
-+		/* Save source address */
-+		if (__l2cap_sock_by_cid_addr(la.l2_cid, &la.l2_bdaddr)) {
-+			err = -EADDRINUSE;
-+		} else {
-+			bacpy(&bt_sk(sk)->src, &la.l2_bdaddr);
-+			l2cap_pi(sk)->scid  = la.l2_cid;
-+			l2cap_pi(sk)->sport = la.l2_cid;
-+			sk->sk_state = BT_BOUND;
-+		}
++			sco = conn->link;
++			if (sco && test_and_clear_bit(HCI_CONN_SCO_PEND,
++					&sco->pend)) {
++				if (lmp_esco_capable(hdev))
++					hci_setup_sync(sco, conn->handle);
++				else
++					hci_add_sco(sco, conn->handle);
++			}
+ 		}
  	}
  
- 	write_unlock_bh(&l2cap_sk_list.lock);
-@@ -1241,7 +1263,7 @@ static int l2cap_sock_listen(struct socket *sock, int backlog)
- 		write_lock_bh(&l2cap_sk_list.lock);
- 
- 		for (psm = 0x1001; psm < 0x1100; psm += 2)
--			if (!__l2cap_get_sock_by_addr(cpu_to_le16(psm), src)) {
-+			if (!__l2cap_sock_by_psm_addr(cpu_to_le16(psm), src)) {
- 				l2cap_pi(sk)->psm   = cpu_to_le16(psm);
- 				l2cap_pi(sk)->sport = cpu_to_le16(psm);
- 				err = 0;
 -- 
-1.7.1
+1.7.0.2
 
+--
+Ron Shaffer
+Employee of the Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
