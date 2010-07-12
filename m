@@ -1,192 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Subject: [PATCH] Proposed API for HDP
-Date: Mon, 12 Jul 2010 22:36:53 +0200
-Message-Id: <1278967013-8064-1-git-send-email-santoscadenas@gmail.com>
+Date: Mon, 12 Jul 2010 14:36:44 -0300
+From: "Hedberg Johan (Nokia-D/Helsinki)" <johan.hedberg@gmail.com>
+To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] Code consitency for signal strength in HFP maemo6
+Message-ID: <20100712173644.GB18755@jh-x301>
+References: <1278954361-3876-1-git-send-email-dmitriy.paliy@nokia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1278954361-3876-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/health-api.txt |  168 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 168 insertions(+), 0 deletions(-)
- create mode 100644 doc/health-api.txt
+Hi Dmitriy,
 
-diff --git a/doc/health-api.txt b/doc/health-api.txt
-new file mode 100644
-index 0000000..6b5a485
---- /dev/null
-+++ b/doc/health-api.txt
-@@ -0,0 +1,168 @@
-+BlueZ D-Bus Health API description
-+**********************************
-+
-+	Santiago Carot-Nemesio <sancane@gmail.com>
-+	José Antonio Santos-Cadenas <santoscadenas@gmail.com>
-+	Elvis Pfützenreuter <epx@signove.com>
-+
-+Health Device Profile hierarchy
-+===============================
-+
-+Service		org.bluez
-+Interface	org.bluez.HealthManager
-+Object path	/org/bluez/
-+
-+Methods:
-+
-+	object	RegisterApplication(object agent, dict config)
-+
-+		Returns the path of the new registered application. The agent
-+		parameter is the path of the object with the callbacks to
-+		notify events (see org.bluez.HealthAgent at the end
-+		of this document).
-+
-+		Dict is defined as bellow:
-+		{
-+			"DataType": uint16, (mandatory)
-+			"Role" : ("Source" or "Sink"), (mandatory)
-+			"Description" : string, (optional)
-+			"ChannelType" : ("Reliable" or "Streaming")
-+						(just for Sources, optional)
-+		}
-+
-+		Application will be closed by the call or implicitly when the
-+		programs leaves the bus.
-+
-+		Possible errors: org.bluez.Error.InvalidArguments
-+
-+	void	UnregisterApplication(object application)
-+
-+		Closes the HDP application identified by the object path. Also
-+		application will be closed if the process that started it leaves
-+		the bus.
-+
-+		Possible errors: org.bluez.Error.InvalidArguments
-+				org.bluez.Error.NotFound
-+
-+--------------------------------------------------------------------------------
-+
-+Service		org.bluez
-+Interface	org.bluez.HealthApplication
-+Object path	[variable prefix]/health_app_ZZZZ
-+
-+Methods:
-+
-+	void Echo(object service)
-+
-+		Sends an echo petition to the remote service. Returns True if
-+		response matches with the buffer sent. If some error is detected
-+		False value is returned and the associated MCL is closed.
-+
-+		Possible errors: org.bluez.Error.InvalidArguments
-+				org.bluez.Error.OutOfRange
-+
-+	object CreateChannel(object service, string type)
-+
-+		Creates a new data channel with the indicated config to the
-+		remote Service.
-+		The configuration should indicate the channel quality of
-+		service using one of this values "Reliable", "Streaming", "Any".
-+
-+		Returns the object path that identifies the data channel that
-+		is already connected.
-+
-+		Possible errors: org.bluez.Error.InvalidArguments
-+				org.bluez.Error.HealthError
-+
-+	void DestroyChannel(object channel)
-+
-+		Destroys the data channel object.
-+
-+		Possible errors: org.bluez.Error.InvalidArguments
-+				orb.bluez.Error.NotFound
-+
-+--------------------------------------------------------------------------------
-+
-+Service		org.bluez
-+Interface	org.bluez.HealthService
-+Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/hdp_YYYY
-+
-+--------------------------------------------------------------------------------
-+
-+Service		org.bluez
-+Interface	org.bluez.HealthChannel
-+Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/
-+							hdp_YYYY/channel_ZZ
-+
-+Methods:
-+
-+	dict GetProperties()
-+
-+		Returns all properties for the interface. See the properties
-+		section for available properties.
-+
-+	fd Acquire()
-+
-+		Returns the file descriptor for this data channel. If the data
-+		channel is not connected it will also reconnect.
-+
-+		Possible errors: org.bluez.Error.NotConnected
-+
-+	void Release()
-+
-+		Releases the fd. Application should also need to close() it.
-+
-+Properties:
-+
-+	string Type (read only)
-+
-+		The quality of service of the data channel. ("Reliable" or
-+		"Streaming")
-+
-+	object Service (read only)
-+
-+		Identifies the Remote Service that is connected with. Maps with
-+		a HealthService object.
-+
-+HealthAgent hierarchy
-+=====================
-+
-+(this object is implemented by the HDP user in order to receive notifications)
-+
-+Service		unique name
-+Interface	org.bluez.HealthAgent
-+Object path	freely definable
-+
-+Methods:
-+
-+	void Release()
-+
-+		This method gets called when the service daemon unregisters the
-+		agent. An agent can use it to do cleanup tasks. There is no need
-+		to unregister the agent, because when this method gets called it
-+		has already been unregistered.
-+
-+	void ServiceDiscovered(object service)
-+
-+		This method is called when a device containing an HDP
-+		application is paired or when the method Update of the
-+		HealthManager is called and new HealthServices are discovered.
-+		The method will be called once for each HealthService.
-+
-+	void ServiceRemoved(object service)
-+
-+		This is called if during an Update some HealthServices
-+		have disappeared. The method is called once for each removed
-+		HealthService.
-+
-+	void ChannelConnected(object channel)
-+
-+		This method is called when a new data channel is created or when
-+		a known data channel is reconnected.
-+
-+	void ChannelDeleted(object channel)
-+
-+		This method is called when a data channel is deleted.
-+
-+		After this call the data channel path will not be valid and can
-+		be reused for future creation of data channels.
--- 
-1.7.0.4
+On Mon, Jul 12, 2010, Dmitriy Paliy wrote:
+> This patch simplifies and makes maemo6 telephony driver code consistent
+> with libscnet API regarding SignalBarsChanged. RSSI percents and RSSI
+> dBs are not among the parameters when SignalBarsChanged emited.
+> Therefore, these parameters are removed. Names are changed to reflect
+> libscnet d-bus interface notations. Comments and debug information are
+> updated in places where units or operations are unclear.
+> ---
+>  audio/telephony-maemo6.c |   46 +++++++++++++++++++++++-----------------------
+>  1 files changed, 23 insertions(+), 23 deletions(-)
 
+This patch has also been pushed upstream, but I had to make the
+following manual fixes before that:
+
+> +	 /* Init as 0 meaning inactive mode. In modem power off state */
+> +	 /* can be be -1, but we treat all values as 0s regardless */ 
+> +	 /* inactive or power off. */
+
+All three lines have tabs and spaces for intentation (one tab + one
+space) and the second line has an extra space at the end before the
+newline character.
+
+> +static void update_signal_strength(int32_t signal_strength_bars)
+
+The variable name is unnecessarlily long. Simply signal_bars is better
+imho.
+
+> +	if (signal_strength_bars < 0) {
+> +		DBG("signal strength smaller than expected: %d<0", signal_strength_bars);
+> +		signal_strength_bars = 0;
+> +	} else if (signal_strength_bars > 5) {
+> +		DBG("signal strength greater than expected: %d>5", signal_strength_bars);
+> +		signal_strength_bars = 5;
+
+You're going beyond the 80 character limit here and the extra long
+variable name isn't really helping out with that.
+
+> +	telephony_update_indicator(maemo_indicators, "signal", signal_strength_bars);
+
+Same here.
+
+Normally I'd have asked you to fix these things, but since we're trying
+to get a new release out I went ahead and did it myself. So in the
+future please pay attention to this kind of issues :)
+
+Johan
