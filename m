@@ -1,110 +1,259 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: =?iso-8859-1?q?Jos=E9_Antonio_Santos_Cadenas?=
+	<santoscadenas@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Johan Hedberg <johan.hedberg@nokia.com>
-Subject: [PATCH] Bluetooth: Add HCIUARTSETFLAGS and HCIUARTGETFLAGS ioctls
-Date: Mon, 12 Jul 2010 11:37:04 -0300
-Message-Id: <1278945424-11047-1-git-send-email-johan.hedberg@gmail.com>
+Subject: HDP API
+Date: Mon, 12 Jul 2010 16:25:21 +0200
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201007121625.21802.santoscadenas@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@nokia.com>
+Hi all,
 
-This patch introduces two new ioctls: HCIUARTSETFLAGS and
-HCIUARTGETFLAGS. The only flag available for now is HCI_UART_RAW_DEVICE
-which allows to initialize a UART device into RAW mode from userspace.
-This is particularly useful for experimenting with Bluetooth controllers
-that don't yet have proper support in BlueZ.
+We have been working in a new version of the HDP D-Bus API.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
----
- drivers/bluetooth/hci_ldisc.c |   12 ++++++++++++
- drivers/bluetooth/hci_uart.h  |    7 ++++++-
- fs/compat_ioctl.c             |    2 ++
- 3 files changed, 20 insertions(+), 1 deletions(-)
+It will be great to have your feedback about it, especially in some points:
 
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index e8beffe..a57dbfc 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -395,6 +395,9 @@ static int hci_uart_register_dev(struct hci_uart *hu)
- 	if (!reset)
- 		set_bit(HCI_QUIRK_NO_RESET, &hdev->quirks);
- 
-+	if (test_bit(HCI_UART_RAW_DEVICE, &hu->hdev_flags))
-+		set_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks);
-+
- 	if (hci_register_dev(hdev) < 0) {
- 		BT_ERR("Can't register HCI device");
- 		hci_free_dev(hdev);
-@@ -475,6 +478,15 @@ static int hci_uart_tty_ioctl(struct tty_struct *tty, struct file * file,
- 			return hu->hdev->id;
- 		return -EUNATCH;
- 
-+	case HCIUARTSETFLAGS:
-+		if (test_bit(HCI_UART_PROTO_SET, &hu->flags))
-+			return -EBUSY;
-+		hu->hdev_flags = arg;
-+		break;
-+
-+	case HCIUARTGETFLAGS:
-+		return hu->hdev_flags;
-+
- 	default:
- 		err = n_tty_ioctl_helper(tty, file, cmd, arg);
- 		break;
-diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-index 50113db..9694d9d 100644
---- a/drivers/bluetooth/hci_uart.h
-+++ b/drivers/bluetooth/hci_uart.h
-@@ -31,6 +31,8 @@
- #define HCIUARTSETPROTO		_IOW('U', 200, int)
- #define HCIUARTGETPROTO		_IOR('U', 201, int)
- #define HCIUARTGETDEVICE	_IOR('U', 202, int)
-+#define HCIUARTSETFLAGS		_IOW('U', 203, int)
-+#define HCIUARTGETFLAGS		_IOR('U', 204, int)
- 
- /* UART protocols */
- #define HCI_UART_MAX_PROTO	5
-@@ -41,6 +43,8 @@
- #define HCI_UART_H4DS	3
- #define HCI_UART_LL	4
- 
-+#define HCI_UART_RAW_DEVICE	0
-+
- struct hci_uart;
- 
- struct hci_uart_proto {
-@@ -57,6 +61,7 @@ struct hci_uart {
- 	struct tty_struct	*tty;
- 	struct hci_dev		*hdev;
- 	unsigned long		flags;
-+	unsigned long		hdev_flags;
- 
- 	struct hci_uart_proto	*proto;
- 	void			*priv;
-@@ -66,7 +71,7 @@ struct hci_uart {
- 	spinlock_t		rx_lock;
- };
- 
--/* HCI_UART flag bits */
-+/* HCI_UART proto flag bits */
- #define HCI_UART_PROTO_SET	0
- 
- /* TX states  */
-diff --git a/fs/compat_ioctl.c b/fs/compat_ioctl.c
-index 547452d..8ea5e33 100644
---- a/fs/compat_ioctl.c
-+++ b/fs/compat_ioctl.c
-@@ -604,6 +604,8 @@ static int ioc_settimeout(unsigned int fd, unsigned int cmd,
- #define HCIUARTSETPROTO		_IOW('U', 200, int)
- #define HCIUARTGETPROTO		_IOR('U', 201, int)
- #define HCIUARTGETDEVICE	_IOR('U', 202, int)
-+#define HCIUARTSETFLAGS		_IOW('U', 203, int)
-+#define HCIUARTGETFLAGS		_IOR('U', 204, int)
- 
- #define BNEPCONNADD	_IOW('B', 200, int)
- #define BNEPCONNDEL	_IOW('B', 201, int)
--- 
-1.7.0.4
+	- Two agents classes one for the hole application an other for each end 
+point.
+	- Signals for notifying the remote services and a property for getting 
+them also (Similar to the adapter API)
 
+Regards
+
+
+BlueZ D-Bus Health API description
+**********************************
+
+	Santiago Carot-Nemesio <sancane@gmail.com>
+	José Antonio Santos-Cadenas <santoscadenas@gmail.com>
+	Elvis Pfützenreuter <epx@signove.com>
+
+Health Device Profile hierarchy
+===============================
+
+Service		org.bluez
+Interface	org.bluez.HealthManager
+Object path	[variable prefix]/
+
+Methods:
+
+	path	RegisterApplication(object agent, dict config)
+
+		Returns the path of the new registered application. The agent
+		parameter is the path of the object with the callbacks to
+		notify events (see org.bluez.HealthApplicationAgent at the end
+		of this document)
+		This petition starts an mcap instance on every adapter and also
+		registers a proper record in the SDP if needed.
+
+		Dict is defined as bellow:
+		{
+		  "end_points" : [{ (optional)
+			"agent": path,  (mapped with HealthApplicationAgent)
+			"role" : ("Source" or "Sink"), (mandatory)
+			"specs" :[{ (mandatory)
+				"data_type" : uint16, (mandatory)
+				"description" : string, (optional)
+			"config" : ("Reliable" or "Streaming") (for Sources)
+			}]
+		  }]
+		}
+
+		Application will be closed by the call or implicitly when the
+		programs leaves the bus.
+
+		Possible errors: org.bluez.Error.InvalidArguments
+
+	void	UnregisterApplication(object application)
+
+		Closes the HDP application identified by the object path. Also
+		application will be closed if the process that started it leaves
+		the bus. If there is a SDP record associated to this application
+		it will also be removed.
+
+		Possible errors: org.bluez.Error.InvalidArguments
+				org.bluez.Error.NotFound
+
+	void UpdateServices()
+
+		This method searches for HDP applications on the all remote
+		devices and notifies them to the appropriate agents.
+
+	dict GetProperties()
+
+			Returns all properties for the interface. See the
+			properties section for available properties.
+
+Properties:
+
+	array Services (read only)
+
+		An array with the paths of all the services.
+
+Signals:
+
+	void ServiceDiscovered(object service)
+
+		This signal is sent when a device containing an HDP
+		application is paired or when the method Update of the
+		HealthManager is called and new HealthServices are discovered.
+		The object path is the HealthService path. The signal will be
+		sent once for each HealthService.
+
+	void ServiceRemoved(object service)
+
+		This signal is sent if during an Update some HealthServices
+		have disappeared. The signal is sent once for each removed
+		HealthService.
+
+--------------------------------------------------------------------------------
+
+Service		org.bluez
+Interface	org.bluez.HealthService
+Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/hdp_YYYY
+
+Methods:
+
+	dict GetProperties()
+
+		Returns all properties for the interface. See the properties
+		section for available properties.
+
+	boolean Echo(string app, array{byte})
+
+		Sends an echo petition to the remote service. Returns True if
+		response matches with the buffer sent. If some error is detected
+		False value is returned and the associated MCL is closed.
+
+	object OpenDataChannel(string app, string end_point, string conf)
+
+		Creates a new data channel with the indicated config to the
+		remote MCAP Data End Point.
+		The configuration should indicate the channel quality of
+		service using one of this values "Reliable", "Streaming", "Any".
+
+		Returns the object path that identifies the data channel.
+
+		Possible errors: org.bluez.Error.InvalidArguments
+				org.bluez.Error.HealthError
+
+	void DeleteAllDataChannels(string app)
+
+		Deletes all data channels so they will not be available for
+		future use.
+
+		Possible errors: org.bluez.Error.HealthError
+
+Properties:
+
+	array EndPoints (read only)
+
+		An array with all the end points in this Service. Each one of
+		then has this format.
+
+		{
+			"end_point": string,
+			"role"  : "source" or "sink" ,
+			"specs" : [{
+				"dtype"       : uint16,
+				"description" : string, (optional)
+				}]
+		}
+
+--------------------------------------------------------------------------------
+
+Service		org.bluez
+Interface	org.bluez.HealthDataChannel
+Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/
+							hdp_YYYY/channel_ZZ
+
+Methods:
+
+	dict GetProperties()
+
+		Returns all properties for the interface. See the properties
+		section for available properties.
+
+	fd Acquire()
+
+		Returns the file descriptor for the data channel_ZZ
+
+		Possible errors: org.bluez.Error.NotConnected
+
+	void Remove()
+
+		Closes the data channel and no other future uses will be
+		possible. This object will be also removed.
+
+	void Reconnect()
+
+		Reconnects the data channel.
+
+Properties:
+
+	string QualityOfService (read only)
+
+		The quality of service of the data channel.
+
+	boolean Connected (read only)
+
+		True if the data channel is connected
+
+HealthApplicationAgent hierarchy
+================================
+
+(this object is implemented by the HDP user in order to receive notifications)
+
+Service		unique name
+Interface	org.bluez.HealthApplicationAgent
+Object path	freely definable
+
+Methods:
+
+	void Release()
+
+		This method gets called when the service daemon unregisters the
+		agent. An agent can use it to do cleanup tasks. There is no need
+		to unregister the agent, because when this method gets called it
+		has already been unregistered.
+
+	void DataChannelRemoved(object service, string data_channel)
+
+		This method is called when a data channel is deleted.
+
+		After this call the data channel path will not be valid and can
+		be reused for future creation of data channels.
+
+HealthEndPointAgent hierarchy
+================================
+
+(this object is implemented by the HDP user in order to receive notifications)
+
+Service		unique name
+Interface	org.bluez.HealthEndPointAgent
+Object path	freely definable
+
+Methods:
+
+	void Release()
+
+		This method gets called when the service daemon unregisters the
+		agent. An agent can use it to do cleanup tasks. There is no need
+		to unregister the agent, because when this method gets called it
+		has already been unregistered.
+
+	void DataChannelCreated(string data_channel, boolean reconnection)
+
+		This method is called when a new data channel is created.
+
+		The service parameter contains the object path of the
+		HealthService that created the connection, data_channel is
+		the string that identifies the data channel, conf is the quality
+		of service of the data channel ("reliable" or "streaming"),
+		file_descriptor the file descriptor for reading and writing
+		data and reconnection indicates if it is a reconnection or a
+		data channel creation.
