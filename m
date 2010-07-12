@@ -1,259 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?iso-8859-1?q?Jos=E9_Antonio_Santos_Cadenas?=
-	<santoscadenas@gmail.com>
+Date: Mon, 12 Jul 2010 14:48:27 +0200
+From: Michal 'vorner' Vaner <vorner@ucw.cz>
 To: linux-bluetooth@vger.kernel.org
-Subject: HDP API
-Date: Mon, 12 Jul 2010 16:25:21 +0200
+Subject: Problem connecting headset with bluez >= 4.64
+Message-ID: <20100712124827.GA3012@hydra.kolej.mff.cuni.cz>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201007121625.21802.santoscadenas@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="jI8keyz6grp/JLjh"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
 
-We have been working in a new version of the HDP D-Bus API.
-
-It will be great to have your feedback about it, especially in some points:
-
-	- Two agents classes one for the hole application an other for each end 
-point.
-	- Signals for notifying the remote services and a property for getting 
-them also (Similar to the adapter API)
-
-Regards
-
-
-BlueZ D-Bus Health API description
-**********************************
-
-	Santiago Carot-Nemesio <sancane@gmail.com>
-	José Antonio Santos-Cadenas <santoscadenas@gmail.com>
-	Elvis Pfützenreuter <epx@signove.com>
-
-Health Device Profile hierarchy
-===============================
-
-Service		org.bluez
-Interface	org.bluez.HealthManager
-Object path	[variable prefix]/
-
-Methods:
-
-	path	RegisterApplication(object agent, dict config)
-
-		Returns the path of the new registered application. The agent
-		parameter is the path of the object with the callbacks to
-		notify events (see org.bluez.HealthApplicationAgent at the end
-		of this document)
-		This petition starts an mcap instance on every adapter and also
-		registers a proper record in the SDP if needed.
-
-		Dict is defined as bellow:
-		{
-		  "end_points" : [{ (optional)
-			"agent": path,  (mapped with HealthApplicationAgent)
-			"role" : ("Source" or "Sink"), (mandatory)
-			"specs" :[{ (mandatory)
-				"data_type" : uint16, (mandatory)
-				"description" : string, (optional)
-			"config" : ("Reliable" or "Streaming") (for Sources)
-			}]
-		  }]
-		}
-
-		Application will be closed by the call or implicitly when the
-		programs leaves the bus.
-
-		Possible errors: org.bluez.Error.InvalidArguments
-
-	void	UnregisterApplication(object application)
-
-		Closes the HDP application identified by the object path. Also
-		application will be closed if the process that started it leaves
-		the bus. If there is a SDP record associated to this application
-		it will also be removed.
-
-		Possible errors: org.bluez.Error.InvalidArguments
-				org.bluez.Error.NotFound
-
-	void UpdateServices()
-
-		This method searches for HDP applications on the all remote
-		devices and notifies them to the appropriate agents.
-
-	dict GetProperties()
-
-			Returns all properties for the interface. See the
-			properties section for available properties.
-
-Properties:
-
-	array Services (read only)
-
-		An array with the paths of all the services.
-
-Signals:
-
-	void ServiceDiscovered(object service)
-
-		This signal is sent when a device containing an HDP
-		application is paired or when the method Update of the
-		HealthManager is called and new HealthServices are discovered.
-		The object path is the HealthService path. The signal will be
-		sent once for each HealthService.
-
-	void ServiceRemoved(object service)
-
-		This signal is sent if during an Update some HealthServices
-		have disappeared. The signal is sent once for each removed
-		HealthService.
-
---------------------------------------------------------------------------------
-
-Service		org.bluez
-Interface	org.bluez.HealthService
-Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/hdp_YYYY
-
-Methods:
-
-	dict GetProperties()
-
-		Returns all properties for the interface. See the properties
-		section for available properties.
-
-	boolean Echo(string app, array{byte})
-
-		Sends an echo petition to the remote service. Returns True if
-		response matches with the buffer sent. If some error is detected
-		False value is returned and the associated MCL is closed.
-
-	object OpenDataChannel(string app, string end_point, string conf)
-
-		Creates a new data channel with the indicated config to the
-		remote MCAP Data End Point.
-		The configuration should indicate the channel quality of
-		service using one of this values "Reliable", "Streaming", "Any".
-
-		Returns the object path that identifies the data channel.
-
-		Possible errors: org.bluez.Error.InvalidArguments
-				org.bluez.Error.HealthError
-
-	void DeleteAllDataChannels(string app)
-
-		Deletes all data channels so they will not be available for
-		future use.
-
-		Possible errors: org.bluez.Error.HealthError
-
-Properties:
-
-	array EndPoints (read only)
-
-		An array with all the end points in this Service. Each one of
-		then has this format.
-
-		{
-			"end_point": string,
-			"role"  : "source" or "sink" ,
-			"specs" : [{
-				"dtype"       : uint16,
-				"description" : string, (optional)
-				}]
-		}
-
---------------------------------------------------------------------------------
-
-Service		org.bluez
-Interface	org.bluez.HealthDataChannel
-Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/
-							hdp_YYYY/channel_ZZ
-
-Methods:
-
-	dict GetProperties()
-
-		Returns all properties for the interface. See the properties
-		section for available properties.
-
-	fd Acquire()
-
-		Returns the file descriptor for the data channel_ZZ
-
-		Possible errors: org.bluez.Error.NotConnected
-
-	void Remove()
-
-		Closes the data channel and no other future uses will be
-		possible. This object will be also removed.
-
-	void Reconnect()
-
-		Reconnects the data channel.
-
-Properties:
-
-	string QualityOfService (read only)
-
-		The quality of service of the data channel.
-
-	boolean Connected (read only)
-
-		True if the data channel is connected
-
-HealthApplicationAgent hierarchy
-================================
-
-(this object is implemented by the HDP user in order to receive notifications)
-
-Service		unique name
-Interface	org.bluez.HealthApplicationAgent
-Object path	freely definable
-
-Methods:
-
-	void Release()
-
-		This method gets called when the service daemon unregisters the
-		agent. An agent can use it to do cleanup tasks. There is no need
-		to unregister the agent, because when this method gets called it
-		has already been unregistered.
-
-	void DataChannelRemoved(object service, string data_channel)
-
-		This method is called when a data channel is deleted.
-
-		After this call the data channel path will not be valid and can
-		be reused for future creation of data channels.
-
-HealthEndPointAgent hierarchy
-================================
-
-(this object is implemented by the HDP user in order to receive notifications)
-
-Service		unique name
-Interface	org.bluez.HealthEndPointAgent
-Object path	freely definable
-
-Methods:
-
-	void Release()
-
-		This method gets called when the service daemon unregisters the
-		agent. An agent can use it to do cleanup tasks. There is no need
-		to unregister the agent, because when this method gets called it
-		has already been unregistered.
-
-	void DataChannelCreated(string data_channel, boolean reconnection)
-
-		This method is called when a new data channel is created.
-
-		The service parameter contains the object path of the
-		HealthService that created the connection, data_channel is
-		the string that identifies the data channel, conf is the quality
-		of service of the data channel ("reliable" or "streaming"),
-		file_descriptor the file descriptor for reading and writing
-		data and reconnection indicates if it is a reconnection or a
-		data channel creation.
+--jI8keyz6grp/JLjh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Hello
+
+I have a bluetooth headset/headphones. However, I have a problem to connect=
+ to
+them on one of my machines (while other two machines work well). Downgradin=
+g to
+version 4.63 helps. In that case, bluetooth outputs something like this (th=
+is is
+for the HSP profile, the A2DP acts similarly):
+
+bluetoothd[19610]: State changed /org/bluez/19610/hci0/dev_00_19_7F_1B_E8_B=
+E: HEADSET_STATE_DISCONNECTED -> HEADSET_STATE_CONNECTING
+bluetoothd[19610]: link_key_request (sba=3D00:19:86:00:10:FE, dba=3D00:19:7=
+F:1B:E8:BE)
+bluetoothd[19610]: kernel auth requirements =3D 0x00
+bluetoothd[19610]: stored link key type =3D 0x00
+bluetoothd[19610]: adapter_get_device(00:19:7F:1B:E8:BE)
+bluetoothd[19610]: Discovered Handsfree service on channel 1
+bluetoothd[19610]: /org/bluez/19610/hci0/dev_00_19_7F_1B_E8_BE: Connecting =
+to 00:19:7F:1B:E8:BE channel 1
+bluetoothd[19610]: /org/bluez/19610/hci0/dev_00_19_7F_1B_E8_BE: Connected t=
+o 00:19:7F:1B:E8:BE
+bluetoothd[19610]: Received AT+BRSF=3D24
+bluetoothd[19610]: HFP HF features: "Voice recognition activation" "Remote =
+volume control"
+
+Then, the headphones appear in pulseaudio as a sink and I can hear sound.
+
+While, with 4.64 or anything newer, it outputs this:
+bluetoothd[23165]: State changed /org/bluez/23165/hci0/dev_00_19_7F_1B_E8_B=
+E: HEADSET_STATE_DISCONNECTED -> HEADSET_STATE_CONNECTING
+bluetoothd[23165]: link_key_request (sba=3D00:19:86:00:10:FE, dba=3D00:19:7=
+F:1B:E8:BE)
+bluetoothd[23165]: kernel auth requirements =3D 0x00
+bluetoothd[23165]: stored link key type =3D 0x00
+bluetoothd[23165]: adapter_get_device(00:19:7F:1B:E8:BE)
+bluetoothd[23165]: Discovered Handsfree service on channel 1
+bluetoothd[23165]: /org/bluez/23165/hci0/dev_00_19_7F_1B_E8_BE: Connecting =
+to 00:19:7F:1B:E8:BE channel 1
+bluetoothd[23165]: hcid_dbus_bonding_process_complete: status=3D00
+bluetoothd[23165]: adapter_get_device(00:19:7F:1B:E8:BE)
+bluetoothd[23165]: hcid_dbus_bonding_process_complete: no pending auth requ=
+est # Here is really long pause, 1-2 seconds
+bluetoothd[23165]: Function not implemented (38)
+bluetoothd[23165]: State changed /org/bluez/23165/hci0/dev_00_19_7F_1B_E8_B=
+E: HEADSET_STATE_CONNECTING -> HEADSET_STATE_DISCONNECTED
+
+And nothing appears, no sound, etc.
+
+The string "Function not implemented" is not present anywhere in bluez sour=
+ces,
+so it must come from something else, but I do not know what it is.
+
+I tried bisecting the sources and it seems the problem is introduced in com=
+mit
+aee26b30bbc24cde464ba1a557c2b258ddec6432 "Make BtIO default security level
+MEDIUM". When I compile version with all commits up to master except this o=
+ne,
+it works, so this confirms my problem comes from this commit.
+
+A wild guess is that the machines differ in which adapter they have and that
+this one does not support something needed for the medium level security. T=
+he
+adaptor is "OMEGA MICRO BT140", while the other two computers are laptops a=
+nd
+have some onboard usb connected adaptors (I do not know which ones). Is it
+possible? If so, is there a possibility forcing bluez not using the
+not-implemented function in a cleaner way than omitting the commit?
+
+Thank you
+
+--=20
+Michal 'vorner' Vaner
+
+--jI8keyz6grp/JLjh
+Content-Type: application/pgp-signature
+Content-Disposition: inline
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.15 (GNU/Linux)
+
+iEYEARECAAYFAkw7DxsACgkQ7/oWwynB3bJE5ACfXmXHY3oPCW8yJ/QabdvsGQB8
+zYMAmQEZPQjyGcatYPml6vsUKchtsais
+=gVkc
+-----END PGP SIGNATURE-----
+
+--jI8keyz6grp/JLjh--
