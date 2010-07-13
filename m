@@ -1,30 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Elvis=20Pf=C3=BCtzenreuter?= <epx@signove.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: epx@signove.com
-Subject: [PATCH 1/1] Makes FindAdapter() accept lower-case hex addresses
-Date: Tue, 13 Jul 2010 15:46:22 -0300
-Message-Id: <1279046782-16444-1-git-send-email-epx@signove.com>
+MIME-Version: 1.0
+In-Reply-To: <AANLkTiltwpMN2U3tVry3I-77HDl5-KYsPZHmFqeD58Nl@mail.gmail.com>
+References: <1278969545-26864-1-git-send-email-gustavo@padovan.org>
+	<AANLkTiltwpMN2U3tVry3I-77HDl5-KYsPZHmFqeD58Nl@mail.gmail.com>
+Date: Tue, 13 Jul 2010 14:30:13 -0300
+Message-ID: <AANLkTikS1-1crv118hO40CSjCmgJg-fVYufVYTrcV8rP@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Bluetooth: Add Fixed Channels support to bind
+	syscall.
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: "Gustavo F. Padovan" <gustavo@padovan.org>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtman.org,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/manager.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+On Tue, Jul 13, 2010 at 2:26 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> If sk->sport is always filled with either cid or psm , why not have
+> just a single "__l2cap_sock_addr"  function ?
 
-diff --git a/src/manager.c b/src/manager.c
-index cbbca1e..9b90cab 100644
---- a/src/manager.c
-+++ b/src/manager.c
-@@ -337,7 +337,7 @@ static gint adapter_address_cmp(gconstpointer a, gconstpointer b)
- 	adapter_get_address(adapter, &bdaddr);
- 	ba2str(&bdaddr, addr);
- 
--	return strcmp(addr, address);
-+	return strcasecmp(addr, address);
- }
- 
- struct btd_adapter *manager_find_adapter(const bdaddr_t *sba)
+In other words, my suggestion is to keep __l2cap_get_sock_by_addr() as
+is (as it already checks for sport) and use it both for PSM and CID.
+This could potentially allow a bit of refactoring on the
+l2cap_sock_bind() changes as well.
+
+Regards,
 -- 
-1.7.0.4
-
+Anderson Lizardo
+OpenBossa Labs - INdT
+Manaus - Brazil
