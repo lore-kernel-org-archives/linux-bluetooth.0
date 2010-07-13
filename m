@@ -1,57 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 13 Jul 2010 09:57:51 -0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Pavan Savoy <pavan_savoy@yahoo.co.in>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: ipc-sock/l2cap sock/g_io_fd
-Message-ID: <20100713125751.GA13089@jh-x301>
-References: <996696.28160.qm@web94910.mail.in2.yahoo.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <996696.28160.qm@web94910.mail.in2.yahoo.com>
+Subject: RE: [RFC] Bluetooth: Add firmware load infrastructure for BT
+ devices
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Shanmugamkamatchi Balashanmugam
+	<Shanmugamkamatchi.Balashanmugam@Atheros.com>
+Cc: "Perelet, Oleg" <operelet@quicinc.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <44EE5C37ADC36343B0625A05DD408C4850DB2A8234@CHEXMB-01.global.atheros.com>
+References: <44EE5C37ADC36343B0625A05DD408C4850DB2A8234@CHEXMB-01.global.atheros.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Tue, 13 Jul 2010 09:43:02 -0300
+Message-ID: <1279024982.6282.17.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Pavan,
+Hi Bala,
 
-On Tue, Jul 13, 2010, Pavan Savoy wrote:
-> Marcel,
-
-I don't know why you expect specifically Marcel to have some clue about
-the audio stuff. He hasn't been much involved with the development of it
-so I don't excpect you to get a reply from him ;)
-
-> I am sort of lost among the various sockets that are in the
-> bluez/audio, and trying to get a clear picture on what is what.
+> > > Firmware loading to target RAM needs to be done once when the device is inserted.  Firmware loading will not be required every time 
+> > > the device goes from DOWN to UP. I think each HCI driver requires
+> > > a separate firmware loading code as firmware loading is 
+> > > different for different interfaces.  Please advice if my understanding is wrong.
+> > > 
+> > > I initially thought of registration 
+> > > mechanism with btusb transport driver to load firmware, but before
+> > > the device is inserted btusb will not be loaded and registering the 
+> > > firmware load function with btusb was not possible.
+> > > 
+> > > Please advice alternate solution to load firmware from transport driver.
+> > 
+> > >my advise would be to just build devices that change their USB VID/PID
+> > >after the firmware got loaded. That way it is easy to have a firmware
+> > >loading driver and just btusb for real operation. Why is it so hard to
+> > >build just simple hardware that would just work.
+> > 
+> > Thanks for the suggestion.
+> > This is what is done for some of the devices.
+> > For performance reasons few other devices comes with 
+> > small firmware in flash and the device gets detected as 
+> > generic bluetooth device when plugged in.  So control reaches btusb
+> > once the device is plugged in.  In this case actual firmware
+> > needs to be downloaded to target from btusb transport driver.
 > 
-> find attached the short image on my understanding of the audio
-> structure (currently used by apps which use liba2dp and not the pcm
-> plugins..- namely android..)
-> 
-> Is my understanding  correct ?
-> What does the various sockets represent, as in stream.fd, server.fd -
-> and the fd extracted from the session_io.
-> 
-> I sort of need to know which is which, as in which is communication
-> over local IPC BT_IPC_SOCKET_NAME, which actually corresponds to the
-> l2cap connection which is established in sink.c ?
-> 
-> How does it get into the sesssion->io ? Please help me understand
-> these various sock fd's.
+> is this simple firmware already talking HCI at that point or is it some
+> USB protocol to load the rest of the firmware.
+>
+> Firmware in the flash does not talk to HCI. Yes it supports some USB commands which are required to load the rest of the firmware.
 
-So I'd say there are three key sockets with A2DP. You've got the
-signalling channel for A2DP (I think that's what you mean when you say
-session->io). That socket stays always inside bluetoothd. Then there's a
-local unix socket which is used to communicate with an external audio
-process (alsa, gstreamer, pulseaudio, whatever). I suspect that'd match
-the server.fd which you mentioned. Then, for every A2DP media transport
-channel we transfer the socket over to the external audio process which
-then takes care of writing (and reading in the case of SCO) of it.
-That's what stream.fd is referring to.
+so you are basically saying you created a device with generic USB
+Bluetooth class that is not following the Bluetooth H:2 specification.
+And now you expect the btusb driver to make this work. I think the
+screw-up here is clearly on your side by violating the USB Bluetooth
+specification in the first place.
 
-With BlueZ 5.0 we're gonna scrap the unix socket completely since D-Bus
-nowdays has support for file descriptor transfer from one process to
-another. There's already a prototype patch for it but it hasn't been
-merged upstream yet. Hopefully getting rid of the extra homebrewed IPC
-should help simplify the picture a little bit.
+If your USB descriptors tell you something like this:
 
-Johan
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+
+Then you better support HCI commands (H:2 protocol) at that point.
+
+I could understand if the firmware gets loaded via HCI vendor commands,
+but just a random other USB protocol is pretty much wrong.
+
+Regards
+
+Marcel
+
+
