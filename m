@@ -1,27 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Wed, 14 Jul 2010 10:51:16 +0800
-Message-ID: <AANLkTindKcwRn6tRxdL8ciW3uCA-y42o_IzItvJZyRyu@mail.gmail.com>
-Subject: scotest cause linux 2.6.34.1 memory leak?
-From: manfred Dong <manfred.donn@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH v6 1/4] add one more buffer for stream reassembly
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Gustavo F. Padovan" <gustavo@padovan.org>
+Cc: Suraj Sumangala <suraj@atheros.com>,
+	linux-bluetooth@vger.kernel.org, Jothikumar.Mothilal@Atheros.com
+In-Reply-To: <20100713210104.GA3106@vigoh>
+References: <1279013611-4775-1-git-send-email-suraj@atheros.com>
+	 <1279054151.6282.22.camel@localhost.localdomain>
+	 <20100713210104.GA3106@vigoh>
+Content-Type: text/plain; charset="UTF-8"
+Date: Tue, 13 Jul 2010 18:03:57 -0300
+Message-ID: <1279055037.6282.24.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
-I am trying scotest in bluez on linux-2.6.34.1 with 2 PCs.
-I switched off the bluetooth-udev and remove l2cap and rfcomm modules.
-Then do following commands separately on 2 PCs.
+Hi Gustavo,
 
-1. ./scotest -r
-2. ./scotest -s <BD_ADDR>
+> > And don't forget to modify the __reassembly macro to do -1 instead of -2
+> > now. Since we said we keep the [0] for the stream reassembly.
+> 
+> The __reassembly macro is removed in the following patches.
 
-Then using "free", I found sending PC's free memory decreased fast,
-and never restored even I kill the lt-scotest process.
-Shortly then, Linux can not work normally.
+I know, but I prefer to keep these patches in a bisectable fashion to
+have them make sense by itself.
 
-Did any one meet this ever?
-The data path for me should be scotest-> sco.ko->btusb.ko.
+Regards
 
-Thanks
+Marcel
+
+
+
