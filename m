@@ -1,45 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Added support for bluetooth controller shipped with
- iMac i5
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Cyril Lacoux <clacoux@ifeelgood.org>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1279088967-13430-1-git-send-email-clacoux@ifeelgood.org>
-References: <1278681678.10421.114.camel@localhost.localdomain>
-	 <1279088967-13430-1-git-send-email-clacoux@ifeelgood.org>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 14 Jul 2010 05:00:07 -0300
-Message-ID: <1279094407.6282.27.camel@localhost.localdomain>
-Mime-Version: 1.0
+From: Suraj Sumangala <suraj@atheros.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <Jothikumar.Mothilal@Atheros.com>,
+	Suraj Sumangala <suraj@atheros.com>
+Subject: [PATCH v7 4/4] Implemented HCI frame reassembly for Rx from stream
+Date: Wed, 14 Jul 2010 13:02:19 +0530
+Message-ID: <1279092739-4623-4-git-send-email-suraj@atheros.com>
+In-Reply-To: <1279092739-4623-3-git-send-email-suraj@atheros.com>
+References: <1279092739-4623-1-git-send-email-suraj@atheros.com>
+ <1279092739-4623-2-git-send-email-suraj@atheros.com>
+ <1279092739-4623-3-git-send-email-suraj@atheros.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Cyril,
+Implemented frame reassembly implementation for reassembling fragments
+received from stream.
 
-> Device class is ff(vend.) instead of e0(wlcon).
-> 
-> Output from command `usb-devices`:
-> T:  Bus=01 Lev=03 Prnt=03 Port=00 Cnt=01 Dev#=  6 Spd=12  MxCh= 0
-> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=05ac ProdID=8215 Rev=01.82
-> S:  Manufacturer=Apple Inc.
-> S:  Product=Bluetooth USB Host Controller
-> S:  SerialNumber=7C6D62936607
-> C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-> I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
-> 
-> Signed-off-by: Cyril Lacoux <clacoux@ifeelgood.org>
-> ---
->  drivers/bluetooth/btusb.c |    3 +++
->  1 files changed, 3 insertions(+), 0 deletions(-)
+Signed-off-by: Suraj Sumangala <suraj@atheros.com>
+---
+ include/net/bluetooth/hci_core.h |    1 +
+ net/bluetooth/hci_core.c         |   35 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 36 insertions(+), 0 deletions(-)
 
-patch has been applied. Thanks.
-
-Regards
-
-Marcel
-
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 28e5eee..350b3e6 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -437,6 +437,7 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
+ 
+ int hci_recv_frame(struct sk_buff *skb);
+ int hci_recv_fragment(struct hci_dev *hdev, int type, void *data, int count);
++int hci_recv_stream_fragment(struct hci_dev *hdev, void *data, int count);
+ 
+ int hci_register_sysfs(struct hci_dev *hdev);
+ void hci_unregister_sysfs(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 451e266..995c9f9 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1163,6 +1163,41 @@ int hci_recv_fragment(struct hci_dev *hdev, int type, void *data, int count)
+ }
+ EXPORT_SYMBOL(hci_recv_fragment);
+ 
++#define STREAM_REASSEMBLY 0
++
++int hci_recv_stream_fragment(struct hci_dev *hdev, void *data, int count)
++{
++	int type;
++	int rem = 0;
++
++	do {
++		struct sk_buff *skb = hdev->reassembly[STREAM_REASSEMBLY];
++
++		if (!skb) {
++			struct { char type; } *pkt;
++
++			/* Start of the frame */
++			pkt = data;
++			type = pkt->type;
++
++			data++;
++			count--;
++		} else
++			type = bt_cb(skb)->pkt_type;
++
++		rem = hci_reassembly(hdev, type, data,
++					count, STREAM_REASSEMBLY, GFP_ATOMIC);
++		if (rem < 0)
++			return rem;
++
++		data += (count - rem);
++		count = rem;
++	} while (count);
++
++	return rem;
++}
++EXPORT_SYMBOL(hci_recv_stream_fragment);
++
+ /* ---- Interface to upper protocols ---- */
+ 
+ /* Register/Unregister protocols.
+-- 
+1.7.0.4
 
