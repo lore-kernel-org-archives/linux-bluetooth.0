@@ -1,36 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 14 Jul 2010 14:08:22 -0300
-From: "Hedberg Johan (Nokia-D/Helsinki)" <johan.hedberg@gmail.com>
-To: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Additional handling incoming call indication for HS
-Message-ID: <20100714170822.GA12447@jh-x301>
-References: <1279120839-14050-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1279120839-14050-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+From: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+Subject: [PATCH] Additional handling incoming call indication for HS
+Date: Wed, 14 Jul 2010 18:20:39 +0300
+Message-Id: <1279120839-14050-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Some headsets expect incoming call indication before they can send ATA
+command. In current implementation of telephony we do not send outband
+notyfication about incoming call when call previously was in WAITING
+state. And without that kind of notyfication BH-108 and BackBeat 903
+headset cannot send ATA command - user is unable to answer to that call
+from headset.
 
-On Wed, Jul 14, 2010, Radoslaw Jablonski wrote:
-> Some headsets expect incoming call indication before they can send ATA
-> command. In current implementation of telephony we do not send outband
-> notyfication about incoming call when call previously was in WAITING
-> state. And without that kind of notyfication BH-108 and BackBeat 903
-> headset cannot send ATA command - user is unable to answer to that call
-> from headset.
-> 
-> Added handling for that case in func handle_call_status(). When phone now
-> is in CSD_CALL_STATUS_MT_ALERTING and previously was in
-> CSD_CALL_STATUS_WAITING that means we need to send incoming call
-> notyfication (it was not sent earlier because new call was waiting for end
-> of active call). This will send RING commands to headset if it is needed.
-> ---
->  audio/telephony-maemo6.c |   15 ++++++++++++---
->  1 files changed, 12 insertions(+), 3 deletions(-)
+Added handling for that case in func handle_call_status(). When phone now
+is in CSD_CALL_STATUS_MT_ALERTING and previously was in
+CSD_CALL_STATUS_WAITING that means we need to send incoming call
+notyfication (it was not sent earlier because new call was waiting for end
+of active call). This will send RING commands to headset if it is needed.
+---
+ audio/telephony-maemo6.c |   15 ++++++++++++---
+ 1 files changed, 12 insertions(+), 3 deletions(-)
 
-Thanks. The patch is now pushed upstream.
+diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
+index 046620c..6e5166b 100644
+--- a/audio/telephony-maemo6.c
++++ b/audio/telephony-maemo6.c
+@@ -976,7 +976,7 @@ static void handle_create_requested(DBusMessage *msg)
+ static void handle_call_status(DBusMessage *msg, const char *call_path)
+ {
+ 	struct csd_call *call;
+-	dbus_uint32_t status, cause_type, cause;
++	dbus_uint32_t status, cause_type, cause, prev_status;
+ 	int callheld = telephony_get_indicator(maemo_indicators, "callheld");
+ 
+ 	if (!dbus_message_get_args(msg, NULL,
+@@ -1000,10 +1000,11 @@ static void handle_call_status(DBusMessage *msg, const char *call_path)
+ 		return;
+ 	}
+ 
++	prev_status = call->status;
+ 	DBG("Call %s changed from %s to %s", call_path,
+-		call_status_str[call->status], call_status_str[status]);
++		call_status_str[prev_status], call_status_str[status]);
+ 
+-	if (call->status == (int) status) {
++	if (prev_status == status) {
+ 		DBG("Ignoring CSD Call state change to existing state");
+ 		return;
+ 	}
+@@ -1043,6 +1044,14 @@ static void handle_call_status(DBusMessage *msg, const char *call_path)
+ 						EV_CALLSETUP_ALERTING);
+ 		break;
+ 	case CSD_CALL_STATUS_MT_ALERTING:
++		/* Some headsets expect incoming call notification before they
++		 * can send ATA command. When call changed status from waiting
++		 * to alerting we need to send missing notification. Otherwise
++		 * headsets like Nokia BH-108 or BackBeat 903 are unable to
++		 * answer incoming call that was previously waiting. */
++		if (prev_status == CSD_CALL_STATUS_WAITING)
++			telephony_incoming_call_ind(call->number, number_type(
++					call->number));
+ 		break;
+ 	case CSD_CALL_STATUS_WAITING:
+ 		break;
+-- 
+1.7.0.4
 
-Johan
