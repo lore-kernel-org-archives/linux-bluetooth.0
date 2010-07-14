@@ -1,32 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH v7 1/4] add one more buffer for stream reassembly
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Suraj Sumangala <suraj@atheros.com>
-Cc: linux-bluetooth@vger.kernel.org, Jothikumar.Mothilal@Atheros.com
-In-Reply-To: <1279092739-4623-1-git-send-email-suraj@atheros.com>
-References: <1279092739-4623-1-git-send-email-suraj@atheros.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 14 Jul 2010 09:41:54 -0300
-Message-ID: <1279111314.6282.46.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: "Cyril Lacoux (Yack)" <clacoux@ifeelgood.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH] Added support for bluetooth controller shipped with iMac i5
+Date: Wed, 14 Jul 2010 13:07:02 +0400
+References: <1278681678.10421.114.camel@localhost.localdomain> <1279088967-13430-1-git-send-email-clacoux@ifeelgood.org> <1279094407.6282.27.camel@localhost.localdomain>
+In-Reply-To: <1279094407.6282.27.camel@localhost.localdomain>
+Cc: linux-bluetooth@vger.kernel.org
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="utf-8"
+Message-Id: <201007141307.02399.clacoux@ifeelgood.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Suraj,
+Le mercredi 14 juillet 2010 12:00:07, vous avez =C3=A9crit :
 
-> Additional reassembly buffer to keep track of stream reasembly
-> 
-> Signed-off-by: Suraj Sumangala <suraj@atheros.com>
-> ---
->  include/net/bluetooth/hci_core.h |    4 ++--
->  net/bluetooth/hci_core.c         |    6 +++---
->  2 files changed, 5 insertions(+), 5 deletions(-)
+Marcel,
 
-I am failing to apply this patch against bluetooth-next-2.6 tree. Can
-you please ensure they apply cleanly.
+> patch has been applied. Thanks.
 
-Regards
+Thanks, some users will enjoy 2.6.36 :-)=20
 
-Marcel
+Regards,
+=2D-=20
+Cyril Lacoux -- BOFH excuse #423:
 
-
+It's not RFC-822 compliant.
