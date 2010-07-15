@@ -1,69 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dan Tian <Dan.Tian@Atheros.com>
-To: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Luis Rodriguez <Luis.Rodriguez@Atheros.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Haijun Liu <Haijun.Liu@Atheros.com>,
-	Luis Rodriguez <Luis.Rodriguez@Atheros.com>
-Date: Fri, 16 Jul 2010 10:02:33 +0800
-Subject: RE: [PATCH 1/3] Add BT3 AMP device support, by Atheros Linux BT3
- team.
-Message-ID: <CDAFEDABF718A54BABD0DA5476695307CE8820A4@SHEXMB-01.global.atheros.com>
-References: <CDAFEDABF718A54BABD0DA5476695307CE881EC1@SHEXMB-01.global.atheros.com>
- <20100715150921.GA3188@vigoh> <20100715184308.GF1166@tux>
- <20100715194256.GA4307@vigoh>
-In-Reply-To: <20100715194256.GA4307@vigoh>
-Content-Type: text/plain; charset="gb2312"
+Message-ID: <4C3F7FEE.1040101@codeaurora.org>
+Date: Thu, 15 Jul 2010 16:38:54 -0500
+From: Ron Shaffer <rshaffer@codeaurora.org>
 MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 3/3] Bluetooth: Synchronize SCO/eSCO connection requests
+ to ACL state
+References: <1278625779.10421.80.camel@localhost.localdomain>	 <1278968772-29446-1-git-send-email-rshaffer@codeaurora.org> <1278972477.6282.10.camel@localhost.localdomain>
+In-Reply-To: <1278972477.6282.10.camel@localhost.localdomain>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-T0suIFdlIHdpbGwgZG8gaXQuDQoNCkRhbg0KDQoNCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0t
-LS0NCkZyb206IEd1c3Rhdm8gRi4gUGFkb3ZhbiBbbWFpbHRvOmdmcGFkb3ZhbkBnbWFpbC5jb21d
-IE9uIEJlaGFsZiBPZiBHdXN0YXZvIEYuIFBhZG92YW4NClNlbnQ6IDIwMTDE6jfUwjE2yNUgMzo0
-Mw0KVG86IEx1aXMgUm9kcmlndWV6DQpDYzogRGFuIFRpYW47IGxpbnV4LWJsdWV0b290aEB2Z2Vy
-Lmtlcm5lbC5vcmc7IEhhaWp1biBMaXU7IEx1aXMgUm9kcmlndWV6DQpTdWJqZWN0OiBSZTogW1BB
-VENIIDEvM10gQWRkIEJUMyBBTVAgZGV2aWNlIHN1cHBvcnQsIGJ5IEF0aGVyb3MgTGludXggQlQz
-IHRlYW0uDQoNCkhpIEx1aXMsDQoNCiogTHVpcyBSLiBSb2RyaWd1ZXogPGxyb2RyaWd1ZXpAYXRo
-ZXJvcy5jb20+IFsyMDEwLTA3LTE1IDExOjQzOjA4IC0wNzAwXToNCg0KPiBPbiBUaHUsIEp1bCAx
-NSwgMjAxMCBhdCAwODowOToyMUFNIC0wNzAwLCBHdXN0YXZvIEYuIFBhZG92YW4gd3JvdGU6DQo+
-ID4gSGkgRGFuLA0KPiA+IA0KPiA+ICogRGFuIFRpYW4gPERhbi5UaWFuQEF0aGVyb3MuY29tPiBb
-MjAxMC0wNy0xNSAxNTozNzozMiArMDgwMF06DQo+ID4gDQo+ID4gPiBGcm9tIDQwY2JmYmY1YzFi
-YzkxMDkzNjQ5NzA5NTZkOWI2Zjc0ZjU4NDZjNzAgTW9uIFNlcCAxNyAwMDowMDowMCAyMDAxDQo+
-ID4gPiBGcm9tOiBIYWlqdW4uTGl1IDxIYWlqdW4uTGl1QEF0aGVyb3MuY29tPg0KPiA+ID4gRGF0
-ZTogV2VkLCAxNCBKdWwgMjAxMCAyMjo1MDo1NiArMDgwMA0KPiA+ID4gU3ViamVjdDogW1BBVENI
-IDEvM10gQWRkIEJUMyBBTVAgZGV2aWNlIHN1cHBvcnQsIGJ5IEF0aGVyb3MgTGludXggQlQzIHRl
-YW0uDQo+ID4gPiANCj4gPiA+IA0KPiA+ID4gU2lnbmVkLW9mZi1ieTogSGFpanVuLkxpdSA8SGFp
-anVuLkxpdUBBdGhlcm9zLmNvbT4NCj4gPiA+IC0tLQ0KPiA+ID4gIGluY2x1ZGUvbmV0L2JsdWV0
-b290aC9oY2kuaCAgICAgIHwgIDM0MiArKysrKysrKysrKysrKysrKysrLQ0KPiA+ID4gIGluY2x1
-ZGUvbmV0L2JsdWV0b290aC9oY2lfY29yZS5oIHwgIDI2NCArKysrKysrKysrKysrKy0NCj4gPiA+
-ICBuZXQvYmx1ZXRvb3RoL2NtdHAvY29yZS5jICAgICAgICB8ICAgIDEgKw0KPiA+ID4gIG5ldC9i
-bHVldG9vdGgvaGNpX2Nvbm4uYyAgICAgICAgIHwgIDIwMSArKysrKysrKysrKy0NCj4gPiA+ICBu
-ZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmMgICAgICAgICB8ICAzNDkgKysrKysrKysrKysrKysrKysr
-LS0NCj4gPiA+ICBuZXQvYmx1ZXRvb3RoL2hjaV9ldmVudC5jICAgICAgICB8ICA2OTggKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0NCj4gPiA+ICA2IGZpbGVzIGNoYW5nZWQs
-IDE4MjIgaW5zZXJ0aW9ucygrKSwgMzMgZGVsZXRpb25zKC0pDQo+ID4gDQo+ID4gDQo+ID4gQ291
-bGQgeW91IHNwbGl0IGFsbCB5b3VyIHBhdGNoZXMgaW4gbGl0dGxlIGNodW5rcz8gKzE4ODIgaXMg
-dmVyeSBoYXJkIHRvDQo+ID4gcmV2aWV3LiBBbmQgcGxlYXNlIGJlIG1vcmUgdmVyYm9zZSBvbiB0
-aGUgY29tbWl0IG1lc3NhZ2UsIGl0IGNhbiBoZWxwIHVzDQo+ID4gZmlndXJlIG91dCB3aGF0J3Mg
-aGFwcGVuaW5nLg0KPiANCj4gVGhpcyB1c2VkIHRvIGJlIDEgbGFyZ2UgcGF0Y2gsIGl0IHdhcyBy
-ZWNlbnRseSBzcGxpdCB1cCB0byAzLCBJIGhhdmVudCd0DQo+IGhhZCBhIGNoYW5jZSB5ZXQgdG8g
-cmV2aWV3IGZ1cnRoZXIgYnV0IG15IHVuZGVyc3RhbmRpbmcgaXMgdGhpcyB0aGlzIHdhcw0KPiBz
-cGxpdCB1cCBhcyBtdWNoIGFzIHBvc3NpYmxlIGluIHRoZSBsYXN0IHRyeS4gSWYgeW91IGNhbiBw
-cm92aWRlIHN1Z2dlc3Rpb25zDQo+IGhvdyB0byBzcGxpdCBpdCB1cCBtb3JlIHRoYXQgbWlnaHQg
-YmUgdXNlZnVsLCBidXQgYWdyZWVkLCBpZiBwb3NzaWJsZSBtb3JlDQo+IHNwbGl0dXAgd291bGQg
-aGVscC4NCg0KQnV0IGl0IGlzIHN0aWxsIHRvbyBiaWcuIEkgbG9va2VkIHRvIHBhdGNoIDMvMywg
-aXQgZG9lcyBhIGxvdCBkaWZmZXJlbnQNCnRoaW5ncyBpbiB0aGUgc2FtZSBwYXRjaCB0aGF0IG1h
-a2UgdGhlIHBhdGNoIGltcG9zc2libGUgdG8gYmUgdHJhY2tlZC4NCldlIG5lZWQgYXRvbWljIHBh
-dGNoZXMgZm9yIGF0IGxlYXN0IGVhY2ggY2hhbmdlIGluIHRoZSBFUlRNIGNvZGUsIGVhY2gNCm5l
-dyBzdGF0ZSBhZGRlZCBpbiB0aGUgTDJDQVAgc3RhdGUgbWFjaGluZSwgZWFjaCBuZXcgSFMgZmVh
-dHVyZSwgZXRjLA0KaS5lLiwgd2UgbmVlZCBwcm9wZXIgcGF0Y2hlcyB3aXRoIHByb3BlciBjb21t
-aXQgbWVzc2FnZXMgZXhwbGFpbmluZw0Kd2hhdCdzIGhhcHBlbmluZy4gVGhlIHNhbWUgc2hvdWxk
-IGFwcGx5IHRvIDEvMyBhbmQgMi8zLCBJIGRpZG4ndCBsb29rZWQNCnRvIHRoZW0uDQoNCj4gDQo+
-IERhbiwgY2FuIHlvdSBhbHNvIHBsZWFzZSBkcm9wIHRoZSAiYnkgQXRoZXJvcyBMaW51eCBCVDMg
-dGVhbS4iIG9uIHRoZSBzdWJqZWN0DQo+IG9mIHRoZSBwYXRjaGVzLiBUaGlzIGlzIGFscmVhZHkg
-aW1wbGllZCBieSB0aGUgRnJvbSBhbmQgdGhlIFNpZ25lZC1vZmYtYnkuDQoNCkRhbiwgeW91ciBw
-YXRjaGVzIGRvbid0IGFwcGx5IGNsZWFubHkgdXBzdHJlYW0sIHBsZWFzZSByZWJhc2UgdGhlbQ0K
-YWdhaW5zdCBNYXJjZWwncyBibHVldG9vdGgtbmV4dCB0cmVlIGFuZCBkbyB0aGUgcHJvcGVyIHNw
-bGl0IG9mIHRoZQ0KcGF0Y2hlcy4NCg0KLS0gDQpHdXN0YXZvIEYuIFBhZG92YW4NCmh0dHA6Ly9w
-YWRvdmFuLm9yZw0K
+Marcel:
+
+On 7/12/2010 5:07 PM, Marcel Holtmann wrote:
+> Hi Ron,
+> 
+>> Certain headsets such as the Motorola H350 will reject SCO and eSCO
+>> connection requests while the ACL is transitioning from sniff mode
+>> to active mode. Add synchronization so that SCO and eSCO connection
+>> requests will wait until the ACL has fully transitioned to active mode.
+> 
+> I find your patch actually highly complicated. So I tried to capture
+> your intend the in the attached patch (only compiled test) and it would
+> be good if you can try that.
+> 
+> So in general it makes no difference which mode we are in. If a mode
+> change is pending, then we have to delay the SCO setup. And once we are
+> done we the mode change we just setup the SCO link. So in theory that
+> should be enough. Not sure if that is true. I could have overlooked
+> something since I don't really have tested the patch at all ;)
+> 
+> Regards
+> 
+> Marcel
+> 
+
+Would have been back with you sooner on this but I'm having some
+hardware issues preventing me from testing your code. I'm fairly
+confident it works as you've consolidated the pending check into
+hci_conn which I like.
+
+However, the complicated pieces to which I think you are referring are
+the error handling pieces which we should want want to keep. These make
+sure that we clean up appropriately if:
+
+1. The HW rejects the exit sniff or the SCO/eSCO request for some reason
+i.e. in the case the HW returns a command status with a failure
+2. In the latter case, the user space process is also notified that its
+SCO/eSCO request has failed.
+
+Give the cleanup code some thought. I think you'll see we want this
+there to make the system more reliable.
+
+As soon as I've confirmed your patch I'll get back to you.
+
+In the meantime, I'll talk with Oleg and Matt regarding their responses.
+
+-- 
+Ron Shaffer
+Employee of the Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
