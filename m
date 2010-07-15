@@ -3,2567 +3,2337 @@ From: Dan Tian <Dan.Tian@Atheros.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
 	Haijun Liu <Haijun.Liu@Atheros.com>,
 	Luis Rodriguez <Luis.Rodriguez@Atheros.com>
-Date: Thu, 15 Jul 2010 15:39:17 +0800
-Subject: [PATCH 2/3] Add a2mp protocol/AMP manager, by Atheros Linux BT3
- team.
-Message-ID: <CDAFEDABF718A54BABD0DA5476695307CE881EC3@SHEXMB-01.global.atheros.com>
+Date: Thu, 15 Jul 2010 15:37:32 +0800
+Subject: [PATCH 1/3] Add BT3 AMP device support, by Atheros Linux BT3 team.
+Message-ID: <CDAFEDABF718A54BABD0DA5476695307CE881EC1@SHEXMB-01.global.atheros.com>
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
->From d94973250b15e03cae3299f6828f46d29e19bf33 Mon Sep 17 00:00:00 2001
+>From 40cbfbf5c1bc9109364970956d9b6f74f5846c70 Mon Sep 17 00:00:00 2001
 From: Haijun.Liu <Haijun.Liu@Atheros.com>
-Date: Wed, 14 Jul 2010 22:51:05 +0800
-Subject: [PATCH 2/3] Add a2mp protocol/AMP manager, by Atheros Linux BT3 team.
+Date: Wed, 14 Jul 2010 22:50:56 +0800
+Subject: [PATCH 1/3] Add BT3 AMP device support, by Atheros Linux BT3 team.
 
 
 Signed-off-by: Haijun.Liu <Haijun.Liu@Atheros.com>
 ---
- include/net/bluetooth/ampmgr.h |  309 ++++++
- net/bluetooth/ampmgr.c         | 2217 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 2526 insertions(+), 0 deletions(-)
- create mode 100755 include/net/bluetooth/ampmgr.h
- create mode 100755 net/bluetooth/ampmgr.c
+ include/net/bluetooth/hci.h      |  342 +++++++++++++++++++-
+ include/net/bluetooth/hci_core.h |  264 ++++++++++++++-
+ net/bluetooth/cmtp/core.c        |    1 +
+ net/bluetooth/hci_conn.c         |  201 +++++++++++-
+ net/bluetooth/hci_core.c         |  349 ++++++++++++++++++--
+ net/bluetooth/hci_event.c        |  698 +++++++++++++++++++++++++++++++++++++-
+ 6 files changed, 1822 insertions(+), 33 deletions(-)
 
-diff --git a/include/net/bluetooth/ampmgr.h b/include/net/bluetooth/ampmgr.h
-new file mode 100755
-index 0000000..6fe752a
---- /dev/null
-+++ b/include/net/bluetooth/ampmgr.h
-@@ -0,0 +1,309 @@
-+#ifndef _AMPMGR_H
-+#define _AMPMGR_H
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index ca2518e..702cef5 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -30,6 +30,12 @@
+ #define HCI_MAX_EVENT_SIZE     260
+ #define HCI_MAX_FRAME_SIZE     (HCI_MAX_ACL_SIZE + 4)
+
++#define HCI_MAX_AMP_KEY_SIZE   32
++/* Max80211AMPASSOCLen p1763. */
++#define HCI_MAX_AMP_ASSOC_SIZE 672
 +
-+#define AMP_COMMAND_REJ                0x01
-+#define AMP_DISCOVER_REQ       0x02
-+#define AMP_DISCOVER_RSP       0x03
-+#define AMP_CHANGE_NOTIFY      0x04
-+#define AMP_CHANGE_RSP         0x05
-+#define AMP_INFO_REQ           0x06
-+#define AMP_INFO_RSP           0x07
-+#define AMP_ASSOC_REQ          0x08
-+#define AMP_ASSOC_RSP          0x09
-+#define AMP_CREATE_PHY_LINK_REQ        0x0A
-+#define AMP_CREATE_PHY_LINK_RSP        0x0B
-+#define AMP_DISC_PHY_LINK_REQ  0x0C
-+#define AMP_DISC_PHY_LINK_RSP  0x0D
++#define HCI_MAX_AMP_ASSOC_FRAGMENT     248
 +
-+
-+struct a2mp_cmd_hdr {
-+       __u8       code;
-+       __u8       ident;
-+       __le16     len;
-+} __attribute__ ((packed));
-+
-+#define AMP_CMD_HDR_LENGTH     0x04
-+
-+
-+struct a2mp_cmd_rej {
-+       __le16  reason;
-+} __attribute__ ((packed));
-+
-+#define AMP_DEFAULT_MTU                670
-+#define AMP_DEFAULT_EXT_FEAT_MASK 0
-+
-+struct a2mp_discover_req {
-+       __le16  mtu;
-+       __le16  ext_feature_mask;
-+} __attribute__ ((packed));
-+
-+struct a2mp_discover_rsp {
-+       __le16  mtu;
-+       __le16  ext_feature_mask;
-+       __u8    data[0];
-+} __attribute__ ((packed));
-+
-+struct a2mp_change_notify {
-+       __u8    data[0];
-+} __attribute__ ((packed));
-+
-+struct a2mp_info_req {
-+       __u8    ctrl_id;
-+} __attribute__ ((packed));
-+
-+struct a2mp_info_rsp {
-+       __u8    ctrl_id;
+ /* HCI dev events */
+ #define HCI_DEV_REG                    1
+ #define HCI_DEV_UNREG                  2
+@@ -152,6 +158,7 @@ enum {
+ /* ACL flags */
+ #define ACL_CONT               0x01
+ #define ACL_START              0x02
++#define ACL_COMPLETE   0x03
+ #define ACL_ACTIVE_BCAST       0x04
+ #define ACL_PICO_BCAST         0x08
+
+@@ -281,6 +288,11 @@ struct hci_cp_link_key_reply {
+        __u8     link_key[16];
+ } __attribute__ ((packed));
+
++struct hci_rp_link_key_reply {
 +       __u8    status;
-+       __le32  total_bandwidth;
-+       __le32  max_bandwidth;
-+       __le32  min_latency;
-+       __le16  pal_capability;
-+       __le16  amp_assoc_size;
++       bdaddr_t        bdaddr;
 +} __attribute__ ((packed));
 +
-+struct a2mp_assoc_req {
-+       __u8    ctrl_id;
+ #define HCI_OP_LINK_KEY_NEG_REPLY      0x040c
+ struct hci_cp_link_key_neg_reply {
+        bdaddr_t bdaddr;
+@@ -377,6 +389,75 @@ struct hci_cp_reject_sync_conn_req {
+        __u8     reason;
+ } __attribute__ ((packed));
+
++#define HCI_OP_CREATE_PHYSICAL_LINK    0x0435
++struct hci_cp_create_physical_link {
++       __u8    handle;
++       __u8    key_len;
++       __u8    key_type;
++       __u8    key[HCI_MAX_AMP_KEY_SIZE];
 +} __attribute__ ((packed));
 +
-+struct a2mp_assoc_rsp {
-+       __u8    ctrl_id;
-+       __u8    status;
-+       __u8    assoc[0];
++#define HCI_OP_ACCEPT_PHYSICAL_LINK    0x0436
++struct hci_cp_accept_physical_link {
++       __u8    handle;
++       __u8    key_len;
++       __u8    key_type;
++       __u8    key[HCI_MAX_AMP_KEY_SIZE];
 +} __attribute__ ((packed));
 +
-+struct a2mp_phy_link_req{
-+       __u8    local_ctrl_id;
-+       __u8    remote_ctrl_id;
-+       __u8    assoc[0];
++#define HCI_OP_DISCONN_PHYSICAL_LINK   0x0437
++struct hci_cp_disconn_physical_link {
++       __u8    handle;
++       __u8    reason;
 +} __attribute__ ((packed));
 +
-+struct a2mp_phy_link_rsp{
-+       __u8    local_ctrl_id;
-+       __u8    remote_ctrl_id;
-+       __u8    status;
-+} __attribute__ ((packed));
-+
-+struct a2mp_disc_phy_link_req{
-+       __u8    local_ctrl_id;
-+       __u8    remote_ctrl_id;
-+} __attribute__ ((packed));
-+
-+struct a2mp_disc_phy_link_rsp{
-+       __u8    local_ctrl_id;
-+       __u8    remote_ctrl_id;
-+       __u8    status;
-+} __attribute__ ((packed));
-+
-+
-+#define AMP_STATUS_OK                          0x00
-+#define AMP_STATUS_INVALID_CONTROLLER_ID       0x01
-+#define AMP_STATUS_UNABLE_TO_CREATE_LINK       0x02
-+#define AMP_STATUS_COLLISION_OCCURRED          0x03
-+#define AMP_STATUS_DISC_PACKET_RECV            0x04
-+#define AMP_STATUS_PHYSICAL_LINK_EXIST         0x05
-+#define AMP_STATUS_INSUFFICIENT_SECURITY       0x06
-+
-+/* failure for Disconnect/Cancel Physical Link */
-+#define AMP_STATUS_NO_PHYSICAL_LINK            0x02
-+
-+/* l2cap notify amp cmd define */
-+#define AMP_HS_REQUEST 0x01
-+#define AMP_HS_CANCEL  0x02
-+#define AMP_HS_DISC    0x03
-+
-+/*amp controller available status */
-+#define AMP_CONTR_UNKNOWN      0x00
-+#define AMP_CONTR_AVAIL                0x01
-+#define AMP_CONTR_UNAVAIL      0x02
-+
-+/*amp controller caps status*/
-+#define        AMP_CONTR_POWERED_DOWN          0x00
-+#define AMP_CONTR_ONLY_WORKS_WITH_BT   0x01
-+#define        AMP_CONTR_NO_CAPACITY           0x02
-+#define AMP_CONTR_LOW_CAPACITY         0x03
-+#define AMP_CONTR_MEDIUM_CAPACITY      0x04
-+#define        AMP_CONTR_HIGH_CAPACITY         0x05
-+#define AMP_CONTR_FULL_CAPACITY                0x06
-+#define AMP_CONTR_CAP_UNINITIALIZE     0x07
-+
-+#define DISCOVERY_REQ_SENT     0x01
-+#define DISCOVERY_RSP_RECV     0x02
-+#define DISCOVERY_REQ_RECV     0x04
-+#define DISOCVERY_RSP_SENT     0x08
-+#define CHANGE_NOTIFY_SENT     0x10
-+#define CHANGE_NOTIFY_RECV     0x20
-+
-+#define PHY_LINK_IDLE                  0x00
-+#define PHY_LINK_INFO_REQ_SENT         0x01
-+#define PHY_LINK_ASSOC_REQ_SENT                0x02
-+#define PHY_LINK_CREATE_REQ_SENT       0x03
-+#define PHY_LINK_CREATE_REQ_RECV       0x04
-+#define PHY_LINK_CREATE_RSP_SENT       0x05
-+#define PHY_LINK_CREATE_RSP_RECV       0x06
-+#define PHY_LINK_HCI_CREATE_SENT       0x07
-+#define PHY_LINK_HCI_ACCEPT_SENT       0x08
-+#define PHY_LINK_CONNECTED             0x09
-+#define PHY_LINK_DISC_REQ_SENT         0x0A
-+#define PHY_LINK_DISC_REQ_RECV         0x0B
-+#define PHY_LINK_DISC_RSP_SENT         0x0C
-+#define PHY_LINK_DISC_RSP_RECV         0x0D
-+#define PHY_LINK_HCI_DISC_SENT         0x0E
-+
-+#define PHY_LINK_MAC_READY             0x01
-+
-+#define AMP_ROLE_CREATOR       0x01
-+#define AMP_ROLE_RESPONDER     0x02
-+
-+#define PENDING_LOCAL_COMMAND  0x01
-+#define PENDING_REMOTE_SIGNAL  0x02
-+
-+#define REGENERATE_GAMP_LK     0x01
-+#define        GAMP_LK_VALID           0x02
-+
-+#define AMP_DISCOV_TIMEOUT     (20000) /* 20 seconds */
-+#define AMP_RESPONSE_TIMEOUT   (20000) /* 20 seconds */
-+#define AMP_PHY_LINK_TIMEOUT   (80000) /* 80 seconds */
-+
-+#define GAMP_KEY_ID            0
-+#define PAL_KEY_ID             1
-+#define ECMA_KEY_ID            2
-+
-+#define MAX_PAL_TYPE           3
-+
-+/* amp link key calc in kernel */
-+#define GAMP_KEY_LENGTH                32
-+#define SHA256_DIGEST_LEN      32
-+
-+struct controller_info {
++struct hci_ext_flow_spec_le {
 +       __u8    id;
-+       __u8    type;
++       __u8    service_type;
++       __le16  max_sdu_size;
++       __le32  sdu_inter_time;
++       __le32  access_latency;
++       __le32  flush_timeout;
++} __attribute__ ((packed));
++
++#define HCI_OP_CREATE_LOGICAL_LINK     0x0438
++struct hci_cp_create_logical_link {
++       __u8    handle;
++       struct hci_ext_flow_spec_le     tx_flow_spec;
++       struct hci_ext_flow_spec_le     rx_flow_spec;
++} __attribute__ ((packed));
++
++#define HCI_OP_ACCEPT_LOGICAL_LINK     0x0439
++struct hci_cp_accept_logical_link {
++       __u8    handle;
++       struct hci_ext_flow_spec_le     tx_flow_spec;
++       struct hci_ext_flow_spec_le     rx_flow_spec;
++} __attribute__ ((packed));
++
++#define HCI_OP_DISCONN_LOGICAL_LINK    0x043a
++struct hci_cp_disconn_logical_link {
++       __le16  handle;
++} __attribute__ ((packed));
++
++#define HCI_OP_LOGICAL_LINK_CANCEL     0x043b
++struct hci_cp_logical_link_cancel {
++       __u8    handle;
++       __u8    tx_flow_spec_id;
++} __attribute__ ((packed));
++
++struct hci_rp_logical_link_cancel {
 +       __u8    status;
-+       __u32   total_bandwidth;
-+       __u32   max_bandwidth;
-+       __u32   min_latency;
-+       __u16   pal_capability;
-+       __u16   amp_assoc_size;
++       __u8    handle;
++       __u8    tx_flow_spec_id;
++} __attribute__ ((packed));
++
++#define HCI_OP_FLOW_SPEC_MODIFY                0x043c
++struct hci_cp_flow_spec_modify {
++       __le16  handle;
++       struct hci_ext_flow_spec_le     tx_flow_spec;
++       struct hci_ext_flow_spec_le     rx_flow_spec;
++} __attribute__ ((packed));
++
+ #define HCI_OP_SNIFF_MODE              0x0803
+ struct hci_cp_sniff_mode {
+        __le16   handle;
+@@ -489,7 +570,7 @@ struct hci_rp_read_local_name {
+
+ #define HCI_OP_WRITE_PG_TIMEOUT                0x0c18
+
+-#define HCI_OP_WRITE_SCAN_ENABLE       0x0c1a
++#define HCI_OP_WRITE_SCAN_ENABLE       0x0c1a
+        #define SCAN_DISABLED           0x00
+        #define SCAN_INQUIRY            0x01
+        #define SCAN_PAGE               0x02
+@@ -548,6 +629,107 @@ struct hci_cp_write_ssp_mode {
+        __u8     mode;
+ } __attribute__ ((packed));
+
++#define HCI_OP_READ_LOGICAL_LINK_ACCEPT_TIMEOUT        0x0c61
++struct hci_rp_read_logical_link_accept_timeout {
++       __u8    status;
++       __le16  timeout;
++} __attribute__ ((packed));
++
++#define HCI_OP_WRITE_LOGICAL_LINK_ACCEPT_TIMEOUT 0x0c62
++struct hci_cp_write_logical_link_accept_timeout {
++       __le16  timeout;
++} __attribute__ ((packed));
++
++struct hci_rp_write_logical_link_accept_timeout {
++       __u8    status;
++} __attribute__ ((packed));
++
++#define HCI_OP_SET_EVENT_MASK_PAGE2    0x0c63
++struct hci_cp_set_event_mask_page2 {
++       __u8    evt_mask_page2[8];
++} __attribute__ ((packed));
++
++struct hci_rp_set_event_mask_page2 {
++       __u8    status;
++} __attribute__ ((packed));
++
++struct location_data {
++       __u8    domain_aware;
++       __u8    domain;
++       __u8    domain_option;
++       __u8    option;
++} __attribute__ ((packed));
++
++#define HCI_OP_READ_LOCATION_DATA      0x0c64
++struct hci_rp_read_location_data {
++       __u8    status;
++       struct location_data location;
++} __attribute__ ((packed));
++
++#define HCI_OP_WRITE_LOCATION_DATA     0x0c65
++struct hci_cp_write_location_data {
++       struct location_data location;
++} __attribute__ ((packed));
++
++#define HCI_OP_READ_FLOW_CONTROL_MODE  0x0c66
++struct hci_rp_read_flow_control_mode {
++       __u8    status;
++       __u8    mode;
++} __attribute__ ((packed));
++
++#define HCI_OP_WRITE_FLOW_CONTROL_MODE 0x0c67
++struct hci_cp_write_flow_control_mode {
++       __u8    mode;
++} __attribute__ ((packed));
++
++struct hci_rp_write_flow_control_mode {
++       __u8    status;
++} __attribute__ ((packed));
++
++#define HCI_OP_READ_ETX_POWER_LEVEL    0x0c68
++struct hci_cp_etx_power_level {
++       __le16  handle;
++       __u8    type;
++} __attribute__ ((packed));
++
++struct hci_rp_etx_power_level {
++       __u8    status;
++       __le16  handle;
++       __u8    gfsk;
++       __u8    dqpsk;
++       __u8    eight_dpsk;
++} __attribute__ ((packed));
++
++#define HCI_OP_READ_BEST_EFFORT_FLUSH_TIMEOUT  0x0c69
++struct hci_cp_read_best_effort_flush_timeout {
++       __le16  handle;
++} __attribute__ ((packed));
++
++struct hci_rp_read_best_effort_flush_timeout {
++       __u8    status;
++       __le32  timeout;
++} __attribute__ ((packed));
++
++#define HCI_OP_WRITE_BEST_EFFORT_FlUSH_TIMEOUT 0x0c6a
++struct hci_cp_write_best_effort_flush_timeout {
++       __le16  handle;
++       __le32  timeout;
++} __attribute__ ((packed));
++
++struct hci_rp_write_best_effort_flush_timeout {
++       __u8    status;
++} __attribute__ ((packed));
++
++#define HCI_OP_SHORT_RANGE_MODE                0x0c6b
++struct hci_cp_short_range_mode {
++       __u8    handle;
++       __u8    mode;
++} __attribute__ ((packed));
++
++struct hci_rp_short_range_mode {
++       __u8    status;
++} __attribute__ ((packed));
++
+ #define HCI_OP_READ_LOCAL_VERSION      0x1001
+ struct hci_rp_read_local_version {
+        __u8     status;
+@@ -593,6 +775,67 @@ struct hci_rp_read_bd_addr {
+        bdaddr_t bdaddr;
+ } __attribute__ ((packed));
+
++#define HCI_OP_READ_DATA_BLOCK_SIZE    0x100a
++struct hci_rp_read_data_block_size {
++       __u8    status;
++       __le16  max_pkt_len;
++       __le16  max_blk_len;
++       __le16  num_blks;
++} __attribute__ ((packed));
++
++#define HCI_OP_READ_ENCRYPT_KEY_SIZE   0x1408
++struct hci_cp_read_encrypt_key_size {
++       __le16  handle;
++} __attribute__ ((packed));
++
++struct hci_rp_read_encrypt_key_size {
++       __u8    status;
++       __le16  handle;
++       __u8    key_size;
++} __attribute__ ((packed));
++
++#define HCI_OP_READ_LOCAL_AMP_INFO     0x1409
++struct hci_rp_read_local_amp_info {
++       __u8    status;
++       __u8    amp_status;
++       __le32  total_bandwidth;
++       __le32  max_guaranteed_bandwidth;
++       __le32  min_latency;
++       __le32  max_pdu_size;
++       __u8    controller_type;
++       __le16  pal_caps;
++       __le16  max_amp_assoc_len;
++       __le32  max_flush_timeout;
++       __le32  best_effort_flush_timeout;
++} __attribute__ ((packed));
++
++#define HCI_OP_READ_LOCAL_AMP_ASSOC    0x140a
++struct hci_cp_read_local_amp_assoc {
++       __u8    handle;
++       __le16  len_so_far;
++       __le16  max_remote_amp_assoc_len;
++} __attribute__ ((packed));
++
++struct hci_rp_read_local_amp_assoc {
++       __u8    status;
++       __u8    handle;
++       __le16  amp_assoc_remaining_len;
++       __u8    amp_assoc_fragment[HCI_MAX_AMP_ASSOC_FRAGMENT];
++} __attribute__ ((packed));
++
++#define HCI_OP_WRITE_REMOTE_AMP_ASSOC  0x140b
++struct hci_cp_write_remote_amp_assoc {
++       __u8    handle;
++       __le16  len_so_far;
++       __le16  amp_assoc_remaining_len;
++       __u8    amp_assoc_fragment[HCI_MAX_AMP_ASSOC_FRAGMENT];
++} __attribute__ ((packed));
++
++struct hci_rp_write_remote_amp_assoc {
++       __u8    status;
++       __u8    handle;
++} __attribute__ ((packed));
++
+ /* ---- HCI Events ---- */
+ #define HCI_EV_INQUIRY_COMPLETE                0x01
+
+@@ -698,6 +941,11 @@ struct hci_ev_cmd_status {
+        __le16   opcode;
+ } __attribute__ ((packed));
+
++#define HCI_EV_FLUSH_OCCURRED          0x11
++struct hci_ev_flush_occurred {
++       __u16   handle;
++} __attribute__ ((packed));
++
+ #define HCI_EV_ROLE_CHANGE             0x12
+ struct hci_ev_role_change {
+        __u8     status;
+@@ -845,6 +1093,98 @@ struct hci_ev_remote_host_features {
+        __u8     features[8];
+ } __attribute__ ((packed));
+
++#define HCI_EV_PHYSICAL_LINK_COMPLETE  0x40
++struct hci_ev_physical_link_complete {
++       __u8    status;
++       __u8    handle;
++} __attribute__ ((packed));
++
++#define HCI_EV_CHANNEL_SELECTED                        0x41
++struct hci_ev_channel_selected {
++       __u8    handle;
++} __attribute__ ((packed));
++
++#define HCI_EV_DISCONN_PHYSICAL_LINK_COMPLETE  0x42
++struct hci_ev_disconn_physical_link_complete {
++       __u8    status;
++       __u8    handle;
++       __u8    reason;
++} __attribute__ ((packed));
++
++#define HCI_EV_PHYSICAL_LINK_LOSS_EARLY_WARNING        0x43
++struct hci_ev_physical_link_loss_early_warning {
++       __u8    handle;
++       __u8    reason;
++} __attribute__ ((packed));
++
++#define HCI_EV_PHYSICAL_LINK_RECOVERY          0x44
++struct hci_ev_physical_link_recovery {
++       __u8    status;
++} __attribute__ ((packed));
++
++#define HCI_EV_LOGICAL_LINK_COMPLETE           0x45
++struct hci_ev_logical_link_complete {
++       __u8    status;
++       __le16  logical_link_handle;
++       __u8    physical_link_handle;
++       __u8    tx_flow_spec_id;
++} __attribute__ ((packed));
++
++#define HCI_EV_DISCONN_LOGICAL_LINK_COMPLETE   0x46
++struct hci_ev_disconn_logical_link_complete {
++       __u8    status;
++       __le16  handle;
++       __u8    reason;
++} __attribute__ ((packed));
++
++#define HCI_EV_FLOW_SPEC_MODIFY_COMPLETE       0x47
++struct hci_ev_flow_spec_modify_complete {
++       __u8    status;
++       __le16  handle;
++} __attribute__ ((packed));
++
++#define HCI_EV_NUM_OF_COMPLETED_DATA_BLOCKS    0x48
++struct hci_ev_num_of_completed_data_blocks {
++       __le16  num_data_blocks;
++       __u8    num_handles;
++} __attribute__ ((packed));
++
++#define HCI_EV_SHORT_RANGE_MODE_CHANGE_COMPLETE        0x4c
++struct hci_ev_short_range_mode_change_complete {
++       __u8    status;
++       __u8    handle;
++       __u8    state;
++} __attribute__ ((packed));
++
++#define HCI_EV_AMP_STATUS_CHANGE               0x4d
++struct hci_ev_amp_status_change {
++       __u8    status;
++       __u8    amp_status;
++} __attribute__ ((packed));
++
++#define HCI_EV_AMP_START_TEST                  0x49
++struct hci_ev_amp_start_test {
++       __u8    status;
++       __u8    scenario;
++} __attribute__ ((packed));
++
++#define HCI_EV_AMP_TEST_END                    0x4a
++struct hci_ev_amp_test_end {
++       __u8    status;
++       __u8    scenario;
++} __attribute__ ((packed));
++
++#define HCI_EV_AMP_RECEIVER_REPORT             0x4b
++struct hci_ev_amp_receiver_report {
++       __u8    controller_type;
++       __u8    reason;
++       __u32   evt_type;
++       __le16  num_frames;
++       __le16  num_error_frames;
++       __u32   num_bits;
++       __u32   num_error_bits;
++} __attribute__ ((packed));
++
+ /* Internal events generated by Bluetooth stack */
+ #define HCI_EV_STACK_INTERNAL  0xfd
+ struct hci_ev_stack_internal {
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 600372d..04267a9 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -67,6 +67,40 @@ struct bdaddr_list {
+        bdaddr_t bdaddr;
+ };
+
++struct amp_assoc {
++       __u16   len;
++       __u16   offset;
++       __u8    data[HCI_MAX_AMP_ASSOC_SIZE];
 +};
 +
-+struct controller_array {
-+       __u32                   size;
-+       struct  controller_info contr[0];
++struct amp_info {
++       __u8    amp_status;
++       __le32  total_bandwidth;
++       __le32  max_guaranteed_bandwidth;
++       __le32  min_latency;
++       __le32  max_pdu_size;
++       __u8    ctrl_type;
++       __le16  pal_caps;
++       __le16  max_assoc_len;
++       __le32  max_flush_to;
++       __le32  best_effort_flush_to;
 +};
 +
-+struct amp_phy_link {
-+       struct hci_phy_link     *hci_link;
-+       /*list in a2mp_conn*/
-+       struct list_head        per_conn_list;
-+       /*list in controller*/
-+       struct list_head        per_contr_list;
-+       struct a2mp_conn        *a2mp_conn;
-+       struct amp_controller   *local;
-+       atomic_t                refcnt;
-+       __u8                    local_ctrl_id;
-+       __u8                    remote_ctrl_id;
-+       __u8                    handle;
-+       /*identify to track phy_link when receive rsp signal*/
-+       __u8                    identify;
-+       /*phylink state*/
-+       __u8                    state;
-+       struct timer_list       a2mp_timer;
-+       struct timer_list       timer;
-+       __u8                    flag;
++struct amp_link_key {
++       __u8    key_len;
++       __u8    key_type;
++       __u8    key[HCI_MAX_AMP_KEY_SIZE];
 +};
 +
-+struct amp_phy_link_list {
-+       struct list_head        head;
-+       rwlock_t                lock;
-+       __u8                    num;
++struct ext_flow_spec {
++       __u8    id;
++       __u8    service_type;
++       __u16   max_sdu_size;
++       __u32   sdu_inter_time;
++       __u32   access_latency;
++       __u32   flush_timeout;
++} __attribute__ ((packed));
++
+ struct hci_dev {
+        struct list_head list;
+        spinlock_t      lock;
+@@ -142,6 +176,7 @@ struct hci_dev {
+        void                    *core_data;
+
+        atomic_t                promisc;
++       void                    *amp_controller;
+
+        struct dentry           *debugfs;
+
+@@ -152,6 +187,11 @@ struct hci_dev {
+
+        struct module           *owner;
+
++       struct amp_info         ctrl_info;
++       __u8                    ctrl_id;
++       struct amp_assoc        local_assoc;
++       struct list_head        phy_links;
++
+        int (*open)(struct hci_dev *hdev);
+        int (*close)(struct hci_dev *hdev);
+        int (*flush)(struct hci_dev *hdev);
+@@ -161,6 +201,27 @@ struct hci_dev {
+        int (*ioctl)(struct hci_dev *hdev, unsigned int cmd, unsigned long arg);
+ };
+
++enum {
++       HCI_AMP_ROLE_INITIATOR,
++       HCI_AMP_ROLE_RESPONDER
++};
++struct hci_phy_link {
++       struct list_head list;
++
++       __u8            handle;
++       __u16           state;
++       void            *l2cap_data;
++       __u8            amp_role;
++
++       void            *priv_data;
++       __u16   acl_link_state;
++       struct list_head                log_links;
++       struct hci_dev          *hdev;
++       /* remote amp assoc data. */
++       struct amp_assoc        remote_assoc;
++
 +};
 +
-+struct amp_link_key_wrapper {
-+       __u8                    valid;
-+       struct amp_link_key     key;
-+};
+ struct hci_conn {
+        struct list_head list;
+
+@@ -187,6 +248,9 @@ struct hci_conn {
+        __u16            disc_timeout;
+        unsigned long    pend;
+
++       __u8            link_key[16];
++       __u8            key_type;
 +
-+struct a2mp_conn {
-+       struct l2cap_conn               *conn;
-+       spinlock_t                      lock;
-+       struct list_head                list;
-+       struct controller_array         *remote;
-+       /*phy_link list per conn */
-+       struct amp_phy_link_list        phy_link_list;
-+       atomic_t                        req_cnt;
-+       __u16                           mtu;
-+       __u16                           feat_mask;
-+       /*tx identify*/
-+       __u8                            tx_ident;
-+       /*remote amp contr avail status */
-+       __u8                            contr_state;
-+       __u8                            amp_role;
-+       __u8                            discov_state;
-+       struct timer_list               discov_timer;
-+       __u8                            gamp_lk[GAMP_KEY_LENGTH];
-+       struct amp_link_key_wrapper     dedicated_lk[MAX_PAL_TYPE];
-+       __u8                            status;
-+};
+        unsigned int     sent;
+
+        struct sk_buff_head data_q;
+@@ -205,6 +269,11 @@ struct hci_conn {
+        void            *sco_data;
+        void            *priv;
+
++       __u8    amp_role;
++       /* id value in Tx_Flow_Spec to identify the logical link. */
++       __u8    tx_flow_spec_id;
++       struct hci_phy_link     *phylink;
 +
-+struct cmd_context {
-+       struct list_head        list;
-+       struct a2mp_conn        *a2mp_conn;
-+       __u8                    type;
-+       __u8                    code;
-+       __u8                    identify;
-+       __u16                   cmd;
-+       __u8                    handle;
-+};
+        struct hci_conn *link;
+ };
+
+@@ -215,8 +284,8 @@ extern rwlock_t hci_dev_list_lock;
+ extern rwlock_t hci_cb_list_lock;
+
+ /* ----- Inquiry cache ----- */
+-#define INQUIRY_CACHE_AGE_MAX   (HZ*30)   // 30 seconds
+-#define INQUIRY_ENTRY_AGE_MAX   (HZ*60)   // 60 seconds
++#define INQUIRY_CACHE_AGE_MAX   (HZ*30)   /* 30 seconds        */
++#define INQUIRY_ENTRY_AGE_MAX   (HZ*60)   /* 60 seconds        */
+
+ #define inquiry_cache_lock(c)          spin_lock(&c->lock)
+ #define inquiry_cache_unlock(c)                spin_unlock(&c->lock)
+@@ -287,6 +356,9 @@ static inline void hci_conn_hash_del(struct hci_dev *hdev, struct hci_conn *c)
+                h->sco_num--;
+ }
+
++struct hci_conn *hci_loglink_lookup_handle
++(struct hci_dev *hdev, __u16 log_handle);
 +
-+struct cmd_context_list {
-+       struct list_head head;
-+       rwlock_t        lock;
-+       __u8            num;
-+};
+ static inline struct hci_conn *hci_conn_hash_lookup_handle(struct hci_dev *hdev,
+                                        __u16 handle)
+ {
+@@ -294,10 +366,14 @@ static inline struct hci_conn *hci_conn_hash_lookup_handle(struct hci_dev *hdev,
+        struct list_head *p;
+        struct hci_conn  *c;
+
+-       list_for_each(p, &h->list) {
+-               c = list_entry(p, struct hci_conn, list);
+-               if (c->handle == handle)
+-                       return c;
++       if (hdev->dev_type == HCI_80211) {
++               return hci_loglink_lookup_handle(hdev, handle);
++       } else {
++               list_for_each(p, &h->list) {
++                       c = list_entry(p, struct hci_conn, list);
++                       if (c->handle == handle)
++                               return c;
++               }
+        }
+        return NULL;
+ }
+@@ -362,6 +438,7 @@ static inline void hci_conn_hold(struct hci_conn *conn)
+
+ static inline void hci_conn_put(struct hci_conn *conn)
+ {
++       BT_DBG("put conn:%p, refcnt:%d", conn, atomic_read(&conn->refcnt));
+        if (atomic_dec_and_test(&conn->refcnt)) {
+                unsigned long timeo;
+                if (conn->type == ACL_LINK) {
+@@ -469,6 +546,11 @@ struct hci_proto {
+        int (*recv_acldata)     (struct hci_conn *conn, struct sk_buff *skb, __u16 flags);
+        int (*recv_scodata)     (struct hci_conn *conn, struct sk_buff *skb);
+        int (*security_cfm)     (struct hci_conn *conn, __u8 status, __u8 encrypt);
 +
-+struct amp_controller {
-+       /*amp device*/
-+       struct hci_dev                  *dev;
-+       struct list_head                list;
-+       /*phy_link list per amp controller */
-+       struct amp_phy_link_list        phy_link_list;
-+       struct controller_info          info;
-+       /*pending req context queue to handle in cmd complete*/
-+       struct cmd_context_list         context_q;
-+};
++       int (*loglink_create_cfm) (struct hci_conn *conn, __u8 status);
++       int (*loglink_accept_cfm) (struct hci_conn *conn, __u8 status);
++       int (*loglink_modify_cfm) (struct hci_conn *conn, __u8 status);
++       int (*loglink_put_cfm) (struct hci_conn *conn, __u8 status);
+ };
+
+ static inline int hci_proto_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 type)
+@@ -561,6 +643,45 @@ static inline void hci_proto_encrypt_cfm(struct hci_conn *conn, __u8 status, __u
+                hp->security_cfm(conn, status, encrypt);
+ }
+
++static inline void hci_proto_loglink_create_cfm(struct hci_conn *conn,
++                                               __u8 status)
++{
++       register struct hci_proto *hp;
 +
-+struct amp_controller_list {
-+       struct list_head        head;
-+       rwlock_t                lock;
-+       __u8                    num;
-+};
++       hp = hci_proto[HCI_PROTO_L2CAP];
++       if (hp && hp->loglink_create_cfm)
++               hp->loglink_create_cfm(conn, status);
++}
 +
-+struct amp_a2mp_conn_list {
-+       struct list_head        head;
-+       rwlock_t                lock;
-+       __u8                    num;
-+};
++static inline void hci_proto_loglink_accept_cfm(struct hci_conn *conn,
++                                               __u8 status)
++{
++       register struct hci_proto *hp;
 +
-+struct ampmgr_local {
-+       /*spinlock to protect this global*/
-+       spinlock_t      lock;
-+       /*local amp contr available status*/
-+       __u8    contr_state;
-+       /*list head for local amp controller*/
-+       struct amp_controller_list contr_list;
-+       struct amp_a2mp_conn_list  a2mp_list;
-+       __u8    handle_seed;
-+       spinlock_t      crypt_lock;
-+       struct crypto_shash *tfm;
-+};
++       hp = hci_proto[HCI_PROTO_L2CAP];
++       if (hp && hp->loglink_accept_cfm)
++               hp->loglink_accept_cfm(conn, status);
++}
 +
-+int amp_mgr_init(void);
-+void amp_mgr_exit(void);
-+void amp_notify(struct l2cap_conn *conn, u8 cmd, void * hci_link);
-+int amp_a2mp_channel_init(struct l2cap_conn *conn);
-+void amp_a2mp_channel_exit(struct l2cap_conn *conn);
-+void  amp_a2mp_process(struct l2cap_conn *conn, struct sk_buff *skb);
-+__u8 amp_get_loc_ctrlid_by_phylink(struct l2cap_conn *conn, void * phylink);
-+__u8 amp_get_rem_ctrlid_by_phylink(struct l2cap_conn *conn, void * phylink);
-+void *amp_get_phylink_by_loc_ctrlid(struct l2cap_conn *conn, __u8 ctrlid);
-+void *amp_get_phylink_by_rem_ctrlid(struct l2cap_conn *conn, __u8 ctrlid);
-+#endif
-diff --git a/net/bluetooth/ampmgr.c b/net/bluetooth/ampmgr.c
-new file mode 100755
-index 0000000..fb706e1
---- /dev/null
-+++ b/net/bluetooth/ampmgr.c
-@@ -0,0 +1,2217 @@
-+/* Bluetooth amp-mgr */
-+#include <linux/types.h>
-+#include <linux/interrupt.h>
-+#include <linux/slab.h>
-+#include <linux/list.h>
-+#include <linux/errno.h>
-+#include <net/sock.h>
-+#include <linux/skbuff.h>
-+#include <linux/notifier.h>
-+#include <linux/crypto.h>
-+#include <crypto/hash.h>
-+#include <linux/err.h>
++static inline void hci_proto_loglink_modify_cfm(struct hci_conn *conn,
++                                               __u8 status)
++{
++       register struct hci_proto *hp;
 +
-+#include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/hci.h>
++       hp = hci_proto[HCI_PROTO_L2CAP];
++       if (hp && hp->loglink_modify_cfm)
++               hp->loglink_modify_cfm(conn, status);
++}
++
++static inline void hci_proto_loglink_put_cfm(struct hci_conn *conn, __u8 status)
++{
++       register struct hci_proto *hp;
++
++       hp = hci_proto[HCI_PROTO_L2CAP];
++       if (hp && hp->loglink_put_cfm)
++               hp->loglink_put_cfm(conn, status);
++}
++
+ int hci_register_proto(struct hci_proto *hproto);
+ int hci_unregister_proto(struct hci_proto *hproto);
+
+@@ -573,6 +694,15 @@ struct hci_cb {
+        void (*security_cfm)    (struct hci_conn *conn, __u8 status, __u8 encrypt);
+        void (*key_change_cfm)  (struct hci_conn *conn, __u8 status);
+        void (*role_switch_cfm) (struct hci_conn *conn, __u8 status, __u8 role);
++
++       /* ---- AMP HCI callbacks. ---- */
++       int (*create_physical_link_cfm) (struct hci_dev *hdev, __u8 handle,
++                                        __u8 status);
++       int (*put_physical_link_cfm) (struct hci_dev *hdev, __u8 handle,
++                                       __u8 status, __u8 reason);
++
++       int (*local_assoc_ind) (struct hci_dev *hdev, __u8 status);
++       int (*local_info_ind) (struct hci_dev *hdev, __u8 status);
+ };
+
+ static inline void hci_auth_cfm(struct hci_conn *conn, __u8 status)
+@@ -640,6 +770,69 @@ static inline void hci_role_switch_cfm(struct hci_conn *conn, __u8 status, __u8
+        read_unlock_bh(&hci_cb_list_lock);
+ }
+
++static inline int hci_create_physical_link_cfm(struct hci_dev *hdev,
++                                               __u8 handle, __u8 status)
++{
++       struct list_head *p;
++
++       read_lock_bh(&hci_cb_list_lock);
++       list_for_each(p, &hci_cb_list) {
++               struct hci_cb *cb = list_entry(p, struct hci_cb, list);
++               if (cb->create_physical_link_cfm)
++                       cb->create_physical_link_cfm(hdev, handle, status);
++       }
++       read_unlock_bh(&hci_cb_list_lock);
++
++       return 0;
++}
++
++static inline int hci_put_physical_link_cfm(struct hci_dev *hdev, __u8 handle,
++                                               __u8 status, __u8 reason)
++{
++       struct list_head *p;
++
++       read_lock_bh(&hci_cb_list_lock);
++       list_for_each(p, &hci_cb_list) {
++               struct hci_cb *cb = list_entry(p, struct hci_cb, list);
++               if (cb->put_physical_link_cfm)
++                       cb->put_physical_link_cfm(hdev, handle, status, reason);
++       }
++       read_unlock_bh(&hci_cb_list_lock);
++
++       return 0;
++}
++
++static inline int hci_local_assoc_ind(struct hci_dev *hdev, __u8 status)
++{
++       struct list_head *p;
++
++       read_lock_bh(&hci_cb_list_lock);
++       list_for_each(p, &hci_cb_list) {
++               struct hci_cb *cb = list_entry(p, struct hci_cb, list);
++               if (cb->local_assoc_ind)
++                       cb->local_assoc_ind(hdev, status);
++       }
++       read_unlock_bh(&hci_cb_list_lock);
++
++       return 0;
++}
++
++static inline int hci_local_info_ind(struct hci_dev *hdev, __u8 status)
++{
++       struct list_head *p;
++
++       read_lock_bh(&hci_cb_list_lock);
++       list_for_each(p, &hci_cb_list) {
++               struct hci_cb *cb = list_entry(p, struct hci_cb, list);
++               if (cb->local_info_ind)
++                       cb->local_info_ind(hdev, status);
++       }
++       read_unlock_bh(&hci_cb_list_lock);
++
++       return 0;
++}
++
++
+ int hci_register_cb(struct hci_cb *hcb);
+ int hci_unregister_cb(struct hci_cb *hcb);
+
+@@ -647,8 +840,8 @@ int hci_register_notifier(struct notifier_block *nb);
+ int hci_unregister_notifier(struct notifier_block *nb);
+
+ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param);
+-void hci_send_acl(struct hci_conn *conn, struct sk_buff *skb, __u16 flags);
+-void hci_send_sco(struct hci_conn *conn, struct sk_buff *skb);
++int hci_send_acl(struct hci_conn *conn, struct sk_buff *skb, __u16 flags);
++int hci_send_sco(struct hci_conn *conn, struct sk_buff *skb);
+
+ void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode);
+
+@@ -686,4 +879,59 @@ struct hci_sec_filter {
+
+ void hci_req_complete(struct hci_dev *hdev, int result);
+
++
++
++/* ------ AMP HCI interface for upper layer ----- */
++#define HCI_CREATE_PHYLINK_PEND        0x40
++
++static inline struct hci_phy_link
++*hci_phylink_lookup_handle(struct hci_dev *hdev, __u8 phy_handle)
++{
++       struct hci_phy_link *plink;
++       struct list_head *p;
++
++       list_for_each(p, &hdev->phy_links) {
++               plink = list_entry(p, struct hci_phy_link, list);
++               if (plink->handle == phy_handle)
++                       return plink;
++       }
++       return NULL;
++}
++
++static inline void hci_loglink_hold(struct hci_conn *conn)
++{
++       atomic_inc(&conn->refcnt);
++}
++
++int hci_loglink_del(struct hci_conn *conn);
++
++void hci_loglink_put(struct hci_conn *conn);
++
++struct hci_conn
++*hci_loglink_lookup_tx_flow_spec_id(struct hci_phy_link *plink, __u8 id);
++
++int hci_phylink_del(struct hci_phy_link *plink);
++
++struct hci_phy_link *hci_phylink_create(struct hci_dev *hdev, __u8 phy_handle,
++                                               struct amp_link_key *key,
++                                               __u8 *rem_assoc,
++                                               __u16 assoc_size,
++                                               void *priv_data);
++struct hci_phy_link *hci_phylink_accept(struct hci_dev *hdev, __u8 phy_handle,
++                                               struct amp_link_key *key,
++                                               __u8 *rem_assoc,
++                                               __u16 assoc_size,
++                                               void *priv_data);
++void hci_phylink_put(struct hci_phy_link *phy_link, __u8 reason);
++
++struct hci_conn *hci_loglink_create(void *handle, struct ext_flow_spec *tx,
++                                       struct ext_flow_spec *rx);
++struct hci_conn *hci_loglink_accept(void *handle, struct ext_flow_spec *tx,
++                                       struct ext_flow_spec *rx);
++void hci_loglink_modify(struct hci_conn *hconn, struct ext_flow_spec *tx,
++                                       struct ext_flow_spec *rx);
++void hci_loglink_put(struct hci_conn *hconn);
++void hci_read_local_amp_info(struct hci_dev *hdev);
++void hci_read_local_amp_assoc(struct hci_dev *hdev);
++
+ #endif /* __HCI_CORE_H */
+diff --git a/net/bluetooth/cmtp/core.c b/net/bluetooth/cmtp/core.c
+index d4c6af0..51c4b5c 100644
+--- a/net/bluetooth/cmtp/core.c
++++ b/net/bluetooth/cmtp/core.c
+@@ -40,6 +40,7 @@
+ #include <linux/isdn/capilli.h>
+
+ #include <net/bluetooth/bluetooth.h>
 +#include <net/bluetooth/hci_core.h>
-+#include <net/bluetooth/l2cap.h>
-+#include <net/bluetooth/ampmgr.h>
+ #include <net/bluetooth/l2cap.h>
+
+ #include "cmtp.h"
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index e9fef83..c7f9134 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -161,7 +161,7 @@ static void hci_conn_timeout(unsigned long arg)
+        struct hci_dev *hdev = conn->hdev;
+        __u8 reason;
+
+-       BT_DBG("conn %p state %d", conn, conn->state);
++       BT_DBG("conn %p state %d, refcnt:%d", conn, conn->state, atomic_read(&conn->refcnt));
+
+        if (atomic_read(&conn->refcnt))
+                return;
+@@ -203,6 +203,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
+        BT_DBG("%s dst %s", hdev->name, batostr(dst));
+
+        conn = kzalloc(sizeof(struct hci_conn), GFP_ATOMIC);
++       BT_DBG("kzalloc hci_conn:%p", conn);
+        if (!conn)
+                return NULL;
+
+@@ -708,3 +709,201 @@ int hci_get_auth_info(struct hci_dev *hdev, void __user *arg)
+
+        return copy_to_user(arg, &req, sizeof(req)) ? -EFAULT : 0;
+ }
 +
-+static struct ampmgr_local ampmgr;
-+
-+static inline void amp_contr_list_link(struct amp_controller_list *l,
-+                                               struct amp_controller *contr)
-+{
-+       write_lock_bh(&l->lock);
-+       list_add_tail(&contr->list, &l->head);
-+       l->num++;
-+       write_unlock_bh(&l->lock);
-+}
-+
-+static inline void amp_contr_list_unlink(struct amp_controller_list *l,
-+                                               struct amp_controller *contr)
-+{
-+       write_lock_bh(&l->lock);
-+       list_del(&contr->list);
-+       l->num--;
-+       write_unlock_bh(&l->lock);
-+}
-+
-+static inline void amp_a2mp_phylink_link(struct amp_phy_link_list *l,
-+                                               struct amp_phy_link *phy_link)
-+{
-+       write_lock(&l->lock);
-+       list_add(&phy_link->per_conn_list, &l->head);
-+       write_unlock(&l->lock);
-+}
-+
-+static inline void amp_a2mp_phylink_unlink(struct amp_phy_link_list *l,
-+                                               struct amp_phy_link *phy_link)
++struct hci_conn *hci_loglink_lookup_handle(struct hci_dev *hdev, __u16 log_handle)
 +{
 +
-+       write_lock(&l->lock);
-+       list_del(&phy_link->per_conn_list);
-+       write_unlock(&l->lock);
-+}
-+
-+static inline void amp_a2mp_conn_link(struct amp_a2mp_conn_list *l,
-+                                               struct a2mp_conn *a2mp_conn)
-+{
-+       write_lock(&l->lock);
-+       list_add(&a2mp_conn->list, &l->head);
-+       write_unlock(&l->lock);
-+}
-+
-+static inline void amp_a2mp_conn_unlink(struct amp_a2mp_conn_list *l,
-+                                               struct a2mp_conn *a2mp_conn)
-+{
-+
-+       write_lock_bh(&l->lock);
-+       list_del(&a2mp_conn->list);
-+       write_unlock_bh(&l->lock);
-+}
-+
-+static inline void amp_contr_phylink_link(struct amp_phy_link_list *l,
-+                                               struct amp_phy_link *phy_link)
-+{
-+       write_lock_bh(&l->lock);
-+       list_add(&phy_link->per_contr_list, &l->head);
-+       write_unlock_bh(&l->lock);
-+}
-+
-+static inline void amp_contr_phylink_unlink(struct amp_phy_link_list *l,
-+                                               struct amp_phy_link *phy_link)
-+{
-+
-+       write_lock_bh(&l->lock);
-+       list_del(&phy_link->per_contr_list);
-+       write_unlock_bh(&l->lock);
-+}
-+
-+static inline void amp_ctx_list_link(struct cmd_context_list *l,
-+                                       struct cmd_context *ctx)
-+{
-+       write_lock_bh(&l->lock);
-+       list_add_tail(&ctx->list, &l->head);
-+       write_unlock_bh(&l->lock);
-+}
-+
-+static inline void amp_ctx_list_unlink(struct cmd_context_list *l,
-+                                               struct cmd_context *ctx)
-+{
-+       write_lock_bh(&l->lock);
-+       list_del(&ctx->list);
-+       write_unlock_bh(&l->lock);
-+}
-+
-+/*Fix me*/
-+/* a simple logic to selelct local control for phy link create*/
-+static  u8 amp_select_local_contr_id(void)
-+{
-+       struct amp_controller *amp_contr;
-+
-+       /* maybe we can select the ctrler according to the AMP status */
-+       if (ampmgr.contr_list.num > 0) {
-+               amp_contr = list_first_entry(&ampmgr.contr_list.head,
-+                                               struct amp_controller, list);
-+               return amp_contr->info.id;
-+       } else {
-+               BT_ERR("error in amp_select_remote_contr_id");
-+               return 0;
-+       }
-+}
-+
-+/*Fix me*/
-+/* a simple logic to selelct remote control for phy link create*/
-+static u8 amp_select_remote_contr_id(struct a2mp_conn *a2mp_conn)
-+{
-+       struct controller_array         *remote = a2mp_conn->remote;
-+       /* maybe we can select the ctrler according to the AMP status */
-+       if (remote->size > 0) {
-+               return remote->contr[0].id;
-+       } else {
-+               BT_ERR("error in amp_select_remote_contr_id");
-+               return 0;
-+       }
-+}
-+
-+static struct amp_controller *amp_get_contr_by_id(u8 ctrlid)
-+{
-+       struct amp_controller *amp_contr = NULL;
++       struct hci_conn *conn;
 +       struct list_head *p;
++       struct list_head *p2;
++       struct hci_phy_link *plink;
 +
-+       read_lock(&ampmgr.contr_list.lock);
-+       list_for_each(p, &ampmgr.contr_list.head) {
-+               amp_contr = list_entry(p, struct amp_controller, list);
-+               if (amp_contr->info.id == ctrlid) {
-+                       read_unlock(&ampmgr.contr_list.lock);
-+                       return amp_contr;
++       list_for_each(p, &hdev->phy_links) {
++               plink = list_entry(p, struct hci_phy_link, list);
++               list_for_each(p2, &plink->log_links) {
++                       conn = list_entry(p2, struct hci_conn, list);
++                       if (conn->handle == log_handle)
++                               return conn;
 +               }
 +       }
-+       read_unlock(&ampmgr.contr_list.lock);
++       return NULL;
 +
++}
++
++struct hci_conn *hci_loglink_lookup_tx_flow_spec_id(struct hci_phy_link *plink, __u8 id)
++{
++       struct hci_conn *conn;
++       struct list_head *p;
++
++       list_for_each(p, &plink->log_links) {
++               conn = list_entry(p, struct hci_conn, list);
++               if (conn->tx_flow_spec_id == id)
++                       return conn;
++       }
 +       return NULL;
 +}
 +
-+static struct amp_phy_link *amp_get_phylink_by_ctrlid
-+               (struct a2mp_conn *a2mp_conn,
-+                       u8 local_ctrl_id, u8 remote_ctrl_id)
++static struct hci_conn *hci_loglink_add(struct hci_phy_link *plink, __u8 id, int type, __u8 role)
 +{
-+       struct amp_phy_link *phy_link = NULL;
-+       struct list_head *p;
++       struct hci_conn *conn;
++       struct hci_dev *hdev = plink->hdev;
 +
-+       read_lock(&a2mp_conn->phy_link_list.lock);
++       BT_DBG("phylink:%p", plink);
 +
-+       list_for_each(p, &a2mp_conn->phy_link_list.head) {
-+               phy_link = list_entry(p, struct amp_phy_link, per_conn_list);
-+               if ((phy_link->local_ctrl_id == local_ctrl_id) &&
-+                       (phy_link->remote_ctrl_id == remote_ctrl_id)) {
-+                       read_unlock(&a2mp_conn->phy_link_list.lock);
-+                       return phy_link;
-+               }
-+       }
-+       read_unlock(&a2mp_conn->phy_link_list.lock);
-+
-+       return NULL;
-+}
-+
-+static struct amp_phy_link *amp_get_phylink_by_iden
-+                       (struct a2mp_conn *a2mp_conn, u8 identify)
-+{
-+       struct amp_phy_link *phy_link = NULL;
-+       struct list_head *p;
-+
-+       read_lock(&a2mp_conn->phy_link_list.lock);
-+
-+       list_for_each(p, &a2mp_conn->phy_link_list.head) {
-+               phy_link = list_entry(p, struct amp_phy_link, per_conn_list);
-+               if (phy_link->identify == identify) {
-+                       read_unlock(&a2mp_conn->phy_link_list.lock);
-+                       return phy_link;
-+               }
-+       }
-+       read_unlock(&a2mp_conn->phy_link_list.lock);
-+
-+       return NULL;
-+}
-+
-+static struct amp_phy_link *amp_get_phylink_by_handle
-+                               (struct a2mp_conn *a2mp_conn, u8 handle)
-+{
-+       struct amp_phy_link *phy_link = NULL;
-+       struct list_head *p;
-+
-+       read_lock(&a2mp_conn->phy_link_list.lock);
-+
-+       list_for_each(p, &a2mp_conn->phy_link_list.head) {
-+               phy_link = list_entry(p, struct amp_phy_link, per_conn_list);
-+               if (phy_link->handle == handle) {
-+                       read_unlock(&a2mp_conn->phy_link_list.lock);
-+                       return phy_link;
-+               }
-+       }
-+       read_unlock(&a2mp_conn->phy_link_list.lock);
-+
-+       return NULL;
-+}
-+
-+static struct amp_phy_link *amp_get_creator_progress_phy_link
-+                               (struct a2mp_conn *a2mp_conn)
-+{
-+       struct amp_phy_link *phy_link = NULL;
-+       struct list_head *p;
-+
-+       if (a2mp_conn->amp_role != AMP_ROLE_CREATOR)
++       conn = kzalloc(sizeof(struct hci_conn), GFP_ATOMIC);
++       BT_DBG("kzalloc conn:%p", conn);
++       if (!conn)
 +               return NULL;
 +
-+       read_lock(&a2mp_conn->phy_link_list.lock);
++       conn->hdev = hdev;
++       conn->phylink = plink;
++       conn->type = type;
++       conn->tx_flow_spec_id = id;
++       conn->state = BT_OPEN;
++       conn->amp_role = role;
 +
-+       list_for_each(p, &a2mp_conn->phy_link_list.head) {
-+               phy_link = list_entry(p, struct amp_phy_link, per_conn_list);
-+               if ((phy_link->state == PHY_LINK_INFO_REQ_SENT)
-+                       || (phy_link->state == PHY_LINK_ASSOC_REQ_SENT)
-+                       || (phy_link->state == PHY_LINK_CREATE_REQ_SENT)
-+                       || (phy_link->state == PHY_LINK_HCI_CREATE_SENT)) {
-+                       read_unlock(&a2mp_conn->phy_link_list.lock);
-+                       return phy_link;
-+               }
-+       }
-+       read_unlock(&a2mp_conn->phy_link_list.lock);
++       skb_queue_head_init(&conn->data_q);
 +
-+       return NULL;
++       list_add(&conn->list, &plink->log_links);
++
++       return conn;
++
 +}
 +
-+__u8 amp_get_loc_ctrlid_by_phylink(struct l2cap_conn *conn, void * phylink)
++int hci_loglink_del(struct hci_conn *conn)
 +{
-+       struct a2mp_conn *mgr = (struct a2mp_conn *)conn->amp_handle;
-+       struct amp_phy_link *link;
-+       struct list_head *p;
-+       __u8 any = (phylink == NULL) ? 1 : 0;
++       struct hci_dev *hdev = conn->hdev;
++       /*struct hci_phy_link *plink = conn->phylink;*/
 +
-+       read_lock(&mgr->phy_link_list.lock);
-+       list_for_each(p, &mgr->phy_link_list.head) {
-+               link = list_entry(p, struct amp_phy_link, per_conn_list);
-+               if (any || (link->hci_link == phylink)) {
-+                       read_unlock(&mgr->phy_link_list.lock);
++       BT_DBG("%s conn:%p handle %d", hdev->name, conn, conn->handle);
 +
-+                       return link->local_ctrl_id;
-+               }
-+       }
-+       read_unlock(&mgr->phy_link_list.lock);
++       skb_queue_purge(&conn->data_q);
 +
-+       return CTRL_ID_BREDR;
++       /*hci_phylink_put(plink, 0x13);*/
++       list_del(&conn->list);
++       kfree(conn);
++       return 0;
 +}
 +
-+ __u8 amp_get_rem_ctrlid_by_phylink(struct l2cap_conn *conn, void * phylink)
++static inline void hci_build_ext_flow_spec(struct hci_ext_flow_spec_le *to, struct ext_flow_spec *from)
 +{
-+       struct a2mp_conn *mgr = (struct a2mp_conn *)conn->amp_handle;
-+       struct amp_phy_link *link;
-+       struct list_head *p;
-+       __u8 any = (phylink == NULL) ? 1 : 0;
-+
-+       read_lock(&mgr->phy_link_list.lock);
-+       list_for_each(p, &mgr->phy_link_list.head) {
-+               link = list_entry(p, struct amp_phy_link, per_conn_list);
-+               if (any || (link->hci_link == phylink)) {
-+                       read_unlock(&mgr->phy_link_list.lock);
-+
-+                       return link->remote_ctrl_id;
-+               }
-+       }
-+       read_unlock(&mgr->phy_link_list.lock);
-+
-+       return CTRL_ID_BREDR;
++       to->id = from->id;
++       to->service_type = from->service_type;
++       to->max_sdu_size = cpu_to_le16(from->max_sdu_size);
++       to->sdu_inter_time = cpu_to_le32(from->sdu_inter_time);
++       to->access_latency = cpu_to_le32(from->access_latency);
++       to->flush_timeout = cpu_to_le32(from->flush_timeout);
 +}
 +
-+void *amp_get_phylink_by_loc_ctrlid(struct l2cap_conn *conn, __u8 ctrlid)
++static void hci_loglink_connect(struct hci_conn *conn, __u8 phy_handle, __u8 amp_role,
++                               struct ext_flow_spec *tx, struct ext_flow_spec *rx)
 +{
-+       struct a2mp_conn *mgr = (struct a2mp_conn *)conn->amp_handle;
-+       struct amp_phy_link *link;
-+       struct list_head *p;
++       struct hci_dev *hdev = conn->hdev;
++       struct hci_cp_create_logical_link cp;
 +
-+       if (ctrlid == CTRL_ID_BREDR)
-+               return NULL;
++       BT_DBG("%p", conn);
 +
-+       read_lock(&mgr->phy_link_list.lock);
-+       list_for_each(p, &mgr->phy_link_list.head) {
-+               link = list_entry(p, struct amp_phy_link, per_conn_list);
-+               if (link->local_ctrl_id == ctrlid) {
-+                       read_unlock(&mgr->phy_link_list.lock);
-+                       return (void *)link->hci_link;
-+               }
-+       }
-+       read_unlock(&mgr->phy_link_list.lock);
++       conn->state = BT_CONNECT;
++       conn->out = 1;
 +
-+       return (void *)NULL;
-+}
++       memset(&cp, 0, sizeof(cp));
 +
-+void *amp_get_phylink_by_rem_ctrlid(struct l2cap_conn *conn, __u8 ctrlid)
-+{
-+       struct a2mp_conn *mgr = (struct a2mp_conn *)conn->amp_handle;
-+       struct amp_phy_link *link;
-+       struct list_head *p;
-+
-+       if (ctrlid == CTRL_ID_BREDR)
-+               return NULL;
-+
-+       read_lock(&mgr->phy_link_list.lock);
-+       list_for_each(p, &mgr->phy_link_list.head) {
-+               link = list_entry(p, struct amp_phy_link, per_conn_list);
-+               if (link->remote_ctrl_id == ctrlid) {
-+                       read_unlock(&mgr->phy_link_list.lock);
-+                       return (void *)link->hci_link;
-+               }
-+       }
-+       read_unlock(&mgr->phy_link_list.lock);
-+
-+       return (void *)NULL;
-+}
-+
-+static void amp_set_a2mp_timer(struct amp_phy_link *phy_link, long timeout)
-+{
-+       BT_DBG("phy link state %d, timeout value %ld",
-+                       phy_link->state, timeout);
-+       mod_timer(&phy_link->a2mp_timer, jiffies +
-+                               msecs_to_jiffies(timeout));
-+}
-+
-+static void amp_clear_a2mp_timer(struct amp_phy_link *phy_link)
-+{
-+       BT_DBG("phy link state %d", phy_link->state);
-+       del_timer(&phy_link->a2mp_timer);
-+}
-+
-+static void amp_set_phylink_timer(struct amp_phy_link *phy_link, long timeout)
-+{
-+       BT_DBG("phy link state %d, timeout value %ld",
-+                       phy_link->state, timeout);
-+       mod_timer(&phy_link->timer, jiffies +
-+                               msecs_to_jiffies(timeout));
-+}
-+
-+static void amp_clear_phylink_timer(struct amp_phy_link *phy_link)
-+{
-+       BT_DBG("phy link state %d", phy_link->state);
-+       del_timer(&phy_link->timer);
-+}
-+
-+static inline int amp_collision_resolution(bdaddr_t *local, bdaddr_t *remote)
-+{
-+       int i;
-+
-+       BT_DBG("resolve collison");
-+
-+       for (i = 0; i < 6 && (local->b[i] == remote->b[i]); i++)
-+               ;
-+
-+       return local->b[i] > remote->b[i];
-+}
-+
-+static u8 amp_get_ident(struct a2mp_conn *a2mp_conn)
-+{
-+       u8 id;
-+
-+       spin_lock_bh(&a2mp_conn->lock);
-+
-+       if (++a2mp_conn->tx_ident > 128)
-+               a2mp_conn->tx_ident = 1;
-+
-+       id = a2mp_conn->tx_ident;
-+
-+       spin_unlock_bh(&a2mp_conn->lock);
-+
-+       return id;
-+}
-+
-+static int hmac_sha256(char *key, size_t klen,
-+                       char *data_in, size_t dlen,
-+                       char *hash_out, size_t outlen)
-+{
-+       int rc = 0;
-+       struct crypto_shash *tfm = ampmgr.tfm;
-+       struct {
-+               struct shash_desc shash;
-+               char ctx[crypto_shash_descsize(tfm)]; /* size = sizeof(struct shash_desc) + sizeof(struct sha256_state) */
-+       } desc;
-+
-+       if (IS_ERR(tfm)) {
-+               BT_DBG("hmac_sha256: crypto_alloc_shash failed");
-+               rc = PTR_ERR(tfm);
-+               goto err_tfm;
-+       }
-+       if (crypto_shash_digestsize(tfm) > outlen) {
-+               BT_DBG("hmac_sha256: tfm size > result buffer");
-+               rc = -EINVAL;
-+               goto err_req;
-+       }
-+       crypto_shash_clear_flags(tfm, -0);
-+       rc = crypto_shash_setkey(tfm, key, klen);
-+       if (rc) {
-+               BT_DBG("hmac_sha256: crypto_shash_setkey failed");
-+               goto err_setkey;
-+       }
-+       desc.shash.tfm = tfm;
-+       desc.shash.flags = 0;
-+       rc = crypto_shash_digest(&desc.shash, data_in, dlen, hash_out);
-+err_setkey:
-+err_req:
-+       /* crypto_free_shash(tfm); */
-+err_tfm:
-+       return rc;
-+}
-+
-+static void amp_link_key_h2(u8 *link_key, u8 *digest, u8 key_id)
-+{
-+
-+       u8      tmp[SHA256_DIGEST_LEN];
-+
-+       if (IS_ERR(ampmgr.tfm))
-+               return;
-+
-+       spin_lock_bh(&ampmgr.crypt_lock);
-+
-+       switch (key_id) {
-+       case GAMP_KEY_ID:
-+               hmac_sha256(link_key, GAMP_KEY_LENGTH,
-+                       "gamp", 4, tmp, SHA256_DIGEST_LEN);
-+               break;
-+       case PAL_KEY_ID:
-+               hmac_sha256(link_key, GAMP_KEY_LENGTH,
-+                       "802b", 4, tmp, SHA256_DIGEST_LEN);
-+               break;
-+       case ECMA_KEY_ID:
-+               hmac_sha256(link_key, GAMP_KEY_LENGTH,
-+                       "ecma", 4, tmp, SHA256_DIGEST_LEN);
-+               break;
-+       default:
-+               break;
-+       }
-+       spin_unlock_bh(&ampmgr.crypt_lock);
-+
-+       memcpy(digest, tmp, GAMP_KEY_LENGTH);
-+ }
-+
-+static void amp_create_generic_link_key(u8 *link_key, u8 *gamp_link_key)
-+{
-+       u8      tmp[GAMP_KEY_LENGTH];
-+
-+       memcpy(tmp, link_key, 16);
-+       memcpy(tmp+16, link_key, 16);
-+       amp_link_key_h2(tmp , gamp_link_key, GAMP_KEY_ID);
-+}
-+
-+static void amp_create_dedicated_link_key(u8 *gamp_link_key,
-+                                       u8 key_type, u8 *decidated_link_key)
-+{
-+       if (key_type == 0x03)
-+               memcpy(decidated_link_key, gamp_link_key, GAMP_KEY_LENGTH);
++       cp.handle = phy_handle;
++       hci_build_ext_flow_spec(&cp.tx_flow_spec, tx);
++       hci_build_ext_flow_spec(&cp.rx_flow_spec, rx);
++       if (amp_role == HCI_AMP_ROLE_INITIATOR)
++               hci_send_cmd(hdev, HCI_OP_CREATE_LOGICAL_LINK, sizeof(cp), &cp);
 +       else
-+               amp_link_key_h2(gamp_link_key, decidated_link_key, PAL_KEY_ID);
-+
++               hci_send_cmd(hdev, HCI_OP_ACCEPT_LOGICAL_LINK, sizeof(cp), &cp);
 +}
 +
-+struct l2cap_a2mp_packet *amp_build_cmd(struct a2mp_conn *a2mp_conn,
-+                                               u8 code, u8 ident, u16 len, void *data)
++struct hci_conn *hci_loglink_create(void *handle, struct ext_flow_spec *tx, struct ext_flow_spec *rx)
 +{
-+       struct l2cap_a2mp_packet *send =  kzalloc((AMP_CMD_HDR_LENGTH + len), GFP_ATOMIC);
++       struct hci_phy_link *plink = (void *) handle;
++       struct hci_dev *hdev = plink->hdev;
++       struct hci_conn *conn;
 +
-+       BT_DBG("code 0x%x, ident %d, len %d", code, ident, len);
++       BT_DBG("%s phylink:%p", hdev->name, plink);
 +
-+       if (!send) {
-+               BT_DBG("mm alloc fail in amp_build_cmd");
++       /* acl link over BREDR is in BT_CONNECTED state. */
++       plink->acl_link_state = BT_CONNECTED;
++
++       conn = hci_loglink_add(plink, tx->id, ACL_LINK, HCI_AMP_ROLE_INITIATOR);
++       if (!conn)
 +               return NULL;
-+       }
 +
-+       send->code = code;
-+       send->ident = ident;
-+       send->len = cpu_to_le16(len);
-+       /* Fix me */
-+       /* simple logic, assume len < 670 always */
-+       if (len > 0)
-+               memcpy(send->data, data, len);
-+       return  send;
++       hci_loglink_connect(conn, plink->handle, HCI_AMP_ROLE_INITIATOR, tx, rx);
++       return conn;
 +}
++EXPORT_SYMBOL(hci_loglink_create);
 +
-+static int amp_build_discover_rsp(struct a2mp_conn *a2mp_conn, void *data)
++struct hci_conn *hci_loglink_accept(void *handle, struct ext_flow_spec *tx, struct ext_flow_spec *rx)
 +{
-+       struct a2mp_discover_rsp *rsp = (struct a2mp_discover_rsp *)data;
-+       u8      *ptr = rsp->data;
-+       struct list_head *p;
++       struct hci_phy_link *plink = (void *) handle;
++       struct hci_dev *hdev = plink->hdev;
++       struct hci_conn *conn;
 +
-+       BT_DBG("mtu %d", cpu_to_le16(AMP_DEFAULT_MTU));
++       BT_DBG("%s phylink:%p", hdev->name, plink);
 +
-+       rsp->mtu = cpu_to_le16(AMP_DEFAULT_MTU);
-+       rsp->ext_feature_mask = cpu_to_le16(AMP_DEFAULT_EXT_FEAT_MASK);
++       /* acl link over BREDR is in BT_CONNECTED state. */
++       plink->acl_link_state = BT_CONNECTED;
 +
-+       *ptr = 0x00;
-+       *(ptr+1) = HCI_BREDR;
-+       *(ptr+2) = 1;
-+       ptr += 3;
++       conn = hci_loglink_add(plink, tx->id, ACL_LINK, HCI_AMP_ROLE_RESPONDER);
++       if (!conn)
++               return NULL;
 +
-+       read_lock(&ampmgr.contr_list.lock);
-+       list_for_each(p, &ampmgr.contr_list.head) {
-+               struct amp_controller *amp_contr = list_entry(p, struct amp_controller, list);
-+
-+               BT_DBG("AMP controller id %x, tpye %x, status %x",\
-+                       amp_contr->info.id, amp_contr->info.type, amp_contr->info.status);
-+
-+               *ptr = amp_contr->info.id;
-+               *(ptr + 1) = amp_contr->info.type;
-+#if 1
-+               *(ptr + 2) = AMP_CONTR_FULL_CAPACITY;
-+#else
-+               *(ptr + 2) = amp_contr->info.status;
-+#endif
-+               ptr += 3;
-+       }
-+       read_unlock(&ampmgr.contr_list.lock);
-+
-+       return ptr - (u8 *)data;
-+
++       hci_loglink_connect(conn, plink->handle, HCI_AMP_ROLE_RESPONDER, tx, rx);
++       return conn;
 +}
++EXPORT_SYMBOL(hci_loglink_accept);
 +
-+static int amp_build_change_notify(struct a2mp_conn *a2mp_conn, void *data)
++void hci_loglink_modify(struct hci_conn *hconn, struct ext_flow_spec *tx, struct ext_flow_spec *rx)
 +{
-+       struct a2mp_change_notify *noitfy = (struct a2mp_change_notify *)data;
-+       u8      *ptr = noitfy->data;
-+       struct list_head *p;
++       struct hci_dev *hdev = hconn->hdev;
++       struct hci_cp_flow_spec_modify cp;
 +
-+       BT_DBG("build change notify");
-+
-+       *ptr = 0x00;
-+       *(ptr+1) = HCI_BREDR;
-+       *(ptr+2) = 1;
-+       ptr += 3;
-+
-+       read_lock(&ampmgr.contr_list.lock);
-+       list_for_each(p, &ampmgr.contr_list.head) {
-+               struct amp_controller *amp_contr = list_entry(p, struct amp_controller, list);
-+
-+               BT_DBG("AMP controller id %x, tpye %x, status %x",\
-+                       amp_contr->info.id, amp_contr->info.type, amp_contr->info.status);
-+
-+               *ptr = amp_contr->info.id;
-+               *(ptr + 1) = amp_contr->info.type;
-+#if 1
-+               *(ptr + 2) = AMP_CONTR_FULL_CAPACITY;
-+#else
-+               *(ptr + 2) = amp_contr->info.status;
-+#endif
-+               ptr += 3;
-+       }
-+       read_unlock(&ampmgr.contr_list.lock);
-+
-+       return ptr - (u8 *)data;
-+
-+}
-+
-+static int amp_disc_phy_link(struct a2mp_conn *a2mp_conn, struct amp_phy_link *phy_link)
-+{
-+       struct amp_controller *amp_contr = phy_link->local;
-+       struct cmd_context *ctx;
-+
-+       BT_DBG("disc phy link 0x%p, phy link state %d", phy_link, phy_link->state);
-+
-+       amp_clear_phylink_timer(phy_link);
-+       amp_clear_a2mp_timer(phy_link);
-+
-+       switch (phy_link->state) {
-+       case PHY_LINK_INFO_REQ_SENT:
-+       case PHY_LINK_ASSOC_REQ_SENT:
-+               break;
-+       case PHY_LINK_HCI_CREATE_SENT:
-+       case PHY_LINK_CREATE_REQ_SENT:
-+       case PHY_LINK_CREATE_RSP_RECV:
-+       case PHY_LINK_HCI_ACCEPT_SENT:
-+       case PHY_LINK_CREATE_RSP_SENT:
-+       case PHY_LINK_CONNECTED:
-+       case PHY_LINK_DISC_REQ_SENT:
-+               /* send disc phy link cmd */
-+               ctx = kzalloc(sizeof(struct cmd_context), GFP_ATOMIC);
-+               ctx->type = PENDING_LOCAL_COMMAND;
-+               ctx->code = AMP_CREATE_PHY_LINK_REQ;
-+               ctx->cmd = HCI_OP_DISCONN_PHYSICAL_LINK;
-+               ctx->a2mp_conn = a2mp_conn;
-+               ctx->handle = phy_link->handle;
-+               amp_ctx_list_link(&amp_contr->context_q, ctx);
-+               hci_phylink_put(phy_link->hci_link, 0x13);
-+               break;
-+       default:
-+               break;
-+       }
-+
-+       /* free phy link */
-+       amp_a2mp_phylink_unlink(&a2mp_conn->phy_link_list, phy_link);
-+       amp_contr_phylink_unlink(&amp_contr->phy_link_list, phy_link);
-+       kfree(phy_link);
-+
-+       BT_DBG("exit");
-+
-+       return 0;
-+}
-+
-+static void amp_discov_timeout(unsigned long arg)
-+{
-+       struct a2mp_conn *a2mp_conn = (void *) arg;
-+
-+       BT_DBG("discovery state %d", a2mp_conn->discov_state);
-+}
-+
-+static void amp_a2mp_timeout(unsigned long arg)
-+{
-+       struct amp_phy_link *phy_link = (void *) arg;
-+
-+       BT_DBG("phy_link state %d", phy_link->state);
-+
-+       if (phy_link == amp_get_creator_progress_phy_link(phy_link->a2mp_conn))
-+               phy_link->a2mp_conn->amp_role = AMP_ROLE_RESPONDER;
-+
-+       amp_disc_phy_link(phy_link->a2mp_conn, phy_link);
-+
-+       /* FIXME: per spec, the ACL link shall be disconnected */
-+}
-+
-+static void amp_phylink_timeout(unsigned long arg)
-+{
-+       struct amp_phy_link *phy_link = (void *) arg;
-+
-+       BT_DBG("phy_link state %d", phy_link->state);
-+
-+       if (phy_link == amp_get_creator_progress_phy_link(phy_link->a2mp_conn))
-+               phy_link->a2mp_conn->amp_role = AMP_ROLE_RESPONDER;
-+
-+       amp_disc_phy_link(phy_link->a2mp_conn, phy_link);
-+}
-+
-+static int amp_phy_link_add(struct a2mp_conn *a2mp_conn, u8 local_ctrlid, u8 remote_ctrlid)
-+{
-+       struct amp_phy_link *phy_link;
-+       struct amp_controller *amp_contr;
-+       struct a2mp_info_req req;
-+       struct l2cap_a2mp_packet *send;
-+
-+       BT_DBG("local ctrl id %d, remote ctrl id %d", local_ctrlid, remote_ctrlid);
-+
-+       /* dec hs req ,or else phy_link create req will exists always */
-+#if    0
-+       atomic_dec(&a2mp_conn->req_cnt);
-+#endif
-+
-+       /* only accept one phy link create  simultaneous */
-+       if (a2mp_conn->amp_role == AMP_ROLE_CREATOR) {
-+               BT_DBG("already in phy create progress");
-+               return -1;
-+       }
-+
-+       a2mp_conn->amp_role = AMP_ROLE_CREATOR;
-+
-+       amp_contr = amp_get_contr_by_id(local_ctrlid);
-+       if (!amp_contr)
-+               return 0;
-+
-+       phy_link = kzalloc(sizeof(struct amp_phy_link), GFP_ATOMIC);
-+       if (!phy_link)
-+               return 0;
-+       phy_link->local_ctrl_id = local_ctrlid;
-+       phy_link->remote_ctrl_id = remote_ctrlid;
-+       phy_link->identify = amp_get_ident(a2mp_conn);
-+       phy_link->local = amp_contr;
-+       phy_link->a2mp_conn = a2mp_conn;
-+
-+       setup_timer(&phy_link->a2mp_timer, amp_a2mp_timeout,
-+                                               (unsigned long) phy_link);
-+       setup_timer(&phy_link->timer, amp_phylink_timeout,
-+                                               (unsigned long) phy_link);
-+
-+       amp_a2mp_phylink_link(&a2mp_conn->phy_link_list, phy_link);
-+       amp_contr_phylink_link(&amp_contr->phy_link_list, phy_link);
-+
-+       req.ctrl_id = remote_ctrlid;
-+       send = amp_build_cmd(a2mp_conn, AMP_INFO_REQ, phy_link->identify,
-+                               sizeof(struct a2mp_info_req), &req);
-+       if (!send)
-+               return -1;
-+
-+       l2cap_a2mp_send_cmd(a2mp_conn->conn, send);
-+       kfree(send);
-+
-+       amp_set_a2mp_timer(phy_link, AMP_RESPONSE_TIMEOUT);
-+       amp_set_phylink_timer(phy_link, AMP_PHY_LINK_TIMEOUT);
-+
-+       phy_link->state = PHY_LINK_INFO_REQ_SENT;
-+
-+       return 0;
-+}
-+
-+static int amp_contr_event(struct notifier_block *this, unsigned long event, void *ptr)
-+{
-+       struct amp_controller_list *contr_list = &ampmgr.contr_list;
-+       struct hci_dev *hdev = (struct hci_dev *) ptr;
-+       struct list_head *head = &contr_list->head, *p, *n, *q;
-+       struct amp_controller *amp_contr;
-+       struct a2mp_conn *a2mp_conn;
-+       struct cmd_context *ctx;
-+
-+       BT_DBG("device type %d, event id 0x%x", hdev->dev_type, (int)event);
-+
-+       if (event == HCI_DEV_UP) {
-+               u8 contr_id = 1;
-+
-+               if (hdev->dev_type != HCI_BREDR) {
-+                       write_lock_bh(&contr_list->lock);
-+                       /* find first available amp ctrl id */
-+                       list_for_each(p, &contr_list->head) {
-+                               if (list_entry(p, struct amp_controller, list)->info.id != contr_id)
-+                                       break;
-+                               head = p; contr_id++;
-+                       }
-+                       amp_contr = kzalloc(sizeof(struct amp_controller), GFP_ATOMIC);
-+                       amp_contr->info.id = contr_id;
-+                       amp_contr->info.type = hdev->dev_type;
-+                       amp_contr->info.status = AMP_CONTR_CAP_UNINITIALIZE;
-+                       amp_contr->dev = hdev;
-+                       hdev->amp_controller = amp_contr;
-+                       rwlock_init(&amp_contr->context_q.lock);
-+                       rwlock_init(&amp_contr->phy_link_list.lock);
-+                       INIT_LIST_HEAD(&amp_contr->context_q.head);
-+                       INIT_LIST_HEAD(&amp_contr->phy_link_list.head);
-+                       contr_list->num++;
-+                       list_add(&amp_contr->list, head);
-+                       write_unlock_bh(&contr_list->lock);
-+
-+                       read_lock_bh(&ampmgr.a2mp_list.lock);
-+                       /* only issue phy link create when local controller from unavailable to available*/
-+                       if (ampmgr.contr_state == AMP_CONTR_UNAVAIL) {
-+                               list_for_each(p, &ampmgr.a2mp_list.head) {
-+                                       a2mp_conn = list_entry(p, struct a2mp_conn, list);
-+                                       if ((atomic_read(&a2mp_conn->req_cnt) > 0)
-+                                               && (a2mp_conn->contr_state == AMP_CONTR_AVAIL)) {
-+                                               u8 local_ctrlid, remote_ctrlid;
-+
-+                                               local_ctrlid = amp_select_local_contr_id();
-+                                               remote_ctrlid = amp_select_remote_contr_id(a2mp_conn);
-+                                               amp_phy_link_add(a2mp_conn, local_ctrlid, remote_ctrlid);
-+                                       }
-+                               }
-+                               ampmgr.contr_state = AMP_CONTR_AVAIL;
-+                       }
-+
-+                       list_for_each(p, &ampmgr.a2mp_list.head) {
-+                               a2mp_conn = list_entry(p, struct a2mp_conn, list);
-+                               if (a2mp_conn->discov_state & DISOCVERY_RSP_SENT) {
-+                                       /* need to send change notify if sent discover rsp before*/
-+                                       struct cmd_context *ctx;
-+
-+                                       ctx = kzalloc(sizeof(struct cmd_context), GFP_ATOMIC);
-+                                       ctx->type = PENDING_LOCAL_COMMAND;
-+                                       /* Fix me, local command, mean need send change notify*/
-+                                       ctx->code = AMP_CHANGE_NOTIFY;
-+                                       ctx->identify = amp_get_ident(a2mp_conn);
-+                                       ctx->cmd = HCI_OP_READ_LOCAL_COMMANDS;
-+                                       ctx->a2mp_conn = a2mp_conn;
-+
-+                                       amp_ctx_list_link(&amp_contr->context_q, ctx);
-+                                       hci_read_local_amp_info(amp_contr->dev);
-+                               }
-+                       }
-+
-+                       read_unlock_bh(&ampmgr.a2mp_list.lock);
-+               }
-+       } else if (event == HCI_DEV_DOWN || event == HCI_DEV_UNREG) {
-+               struct l2cap_a2mp_packet *send;
-+
-+               if (hdev->dev_type != HCI_BREDR && hdev->amp_controller) {
-+                       struct amp_phy_link *phy_link;
-+                       amp_contr = (struct amp_controller *)hdev->amp_controller;
-+                       hdev->amp_controller = NULL;
-+
-+                       write_lock_bh(&contr_list->lock);
-+                       list_del(&amp_contr->list);
-+                       if (!--contr_list->num)
-+                               ampmgr.contr_state = AMP_CONTR_UNAVAIL;
-+                       write_unlock_bh(&contr_list->lock);
-+
-+                       /* free phy link in contr */
-+                       write_lock_bh(&amp_contr->phy_link_list.lock);
-+                       list_for_each_safe(p, n, &amp_contr->phy_link_list.head) {
-+                               phy_link = list_entry(p, struct amp_phy_link, per_contr_list);
-+                               if (phy_link->state == PHY_LINK_CONNECTED)
-+                                       l2cap_phylink_update(phy_link->a2mp_conn->conn,
-+                                               L2CAP_PHYLINK_NOAVL, phy_link->hci_link);
-+                               amp_clear_phylink_timer(phy_link);
-+                               amp_clear_a2mp_timer(phy_link);
-+                               list_del(&phy_link->per_conn_list);
-+                               list_del(&phy_link->per_contr_list);
-+                               kfree(phy_link);
-+                       }
-+                       write_unlock_bh(&amp_contr->phy_link_list.lock);
-+
-+                       /* purge contex_q in contr */
-+                       write_lock_bh(&amp_contr->context_q.lock);
-+                       list_for_each_safe(q, n, &amp_contr->context_q.head) {
-+                                       ctx = list_entry(q, struct cmd_context, list);
-+                                       list_del(&ctx->list);
-+                                       kfree(ctx);
-+                       }
-+                       write_unlock_bh(&amp_contr->context_q.lock);
-+
-+                       /* amp_contr_list_unlink(contr_list, amp_contr); */
-+                       kfree(amp_contr);
-+
-+                       /* need to send change notify if sent discover rsp before */
-+                       read_lock_bh(&ampmgr.a2mp_list.lock);
-+
-+                       /*FIXME: can be optimised,
-+                         the build change/cmd are irrelevant with a2mp_conn,
-+                         so can be move out of for loop
-+                       */
-+                       list_for_each(p, &ampmgr.a2mp_list.head) {
-+                               a2mp_conn = list_entry(p, struct a2mp_conn, list);
-+                               if (a2mp_conn->discov_state & DISOCVERY_RSP_SENT) {
-+                                       u8 rsp[64], len;
-+
-+                                       len = amp_build_change_notify(a2mp_conn, rsp);
-+                                       send = amp_build_cmd(a2mp_conn, AMP_CHANGE_NOTIFY,
-+                                                       amp_get_ident(a2mp_conn), len, rsp);
-+                                       l2cap_a2mp_send_cmd(a2mp_conn->conn, send);
-+                                       kfree(send);
-+                               }
-+                       }
-+                       read_unlock_bh(&ampmgr.a2mp_list.lock);
-+               }
-+       }
-+
-+       return NOTIFY_DONE;
-+}
-+
-+static struct notifier_block amp_mgr_nblock = {
-+       .notifier_call = amp_contr_event
-+};
-+
-+static int amp_create_phy_link_cfm(struct hci_dev *hdev, u8 handle, u8 status)
-+{
-+       struct amp_controller *amp_contr = (struct amp_controller *)hdev->amp_controller;
-+       struct list_head *p, *n;
-+       struct cmd_context *ctx;
-+       struct amp_phy_link *phy_link;
-+       struct l2cap_a2mp_packet *send;
-+
-+       BT_DBG("amp_contr %p, phy link handle %d, status 0x%x", amp_contr, handle, status);
-+
-+       if (!amp_contr)
-+               return 0;
-+
-+       write_lock(&amp_contr->context_q.lock);
-+       list_for_each_safe(p, n, &amp_contr->context_q.head) {
-+               ctx = list_entry(p, struct cmd_context, list);
-+               if ((ctx->cmd == HCI_OP_CREATE_PHYSICAL_LINK) && (ctx->handle == handle)) {
-+                       phy_link = amp_get_phylink_by_handle(ctx->a2mp_conn, handle);
-+                       if (!phy_link) {
-+                               BT_ERR("ERROR: dont' exist handle phy_link in amp_create_phy_link");
-+                               list_del(&ctx->list);
-+                               kfree(ctx);
-+                               write_unlock(&amp_contr->context_q.lock);
-+                               return 0;
-+                       }
-+                       BT_DBG("phy_link:%p, phy_link->state:%d", phy_link, phy_link->state);
-+                       if ((status == HCI_CREATE_PHYLINK_PEND)
-+                               && (phy_link->state == PHY_LINK_HCI_CREATE_SENT)) {
-+                               /* fix me */
-+                               /* touch hci device here, need think over lock mechansim */
-+                               struct amp_assoc        *info = &hdev->local_assoc;
-+                               struct a2mp_phy_link_req *req = NULL;
-+                               u16 length;
-+
-+                               BT_DBG("create phy link pend for PHY_LINK_HCI_CREATE_SENT");
-+
-+                               length = sizeof(struct a2mp_phy_link_req) + info->len;
-+                               req = kzalloc(length, GFP_ATOMIC);
-+                               req->local_ctrl_id = phy_link->local_ctrl_id;
-+                               req->remote_ctrl_id = phy_link->remote_ctrl_id;
-+
-+                               memcpy(req->assoc, info->data, info->len);
-+
-+                               phy_link->identify = amp_get_ident(ctx->a2mp_conn);
-+                               send = amp_build_cmd(ctx->a2mp_conn, AMP_CREATE_PHY_LINK_REQ,
-+                                                       phy_link->identify, length, req);
-+                               l2cap_a2mp_send_cmd(ctx->a2mp_conn->conn, send);
-+                               phy_link->state = PHY_LINK_CREATE_REQ_SENT;
-+                               amp_set_a2mp_timer(phy_link, AMP_RESPONSE_TIMEOUT);
-+
-+                               kfree(req);
-+                               kfree(send);
-+                       } else if ((status == HCI_CREATE_PHYLINK_PEND)
-+                                       && (phy_link->state == PHY_LINK_HCI_ACCEPT_SENT)) {
-+                               struct a2mp_phy_link_rsp rsp;
-+
-+                               BT_DBG("create phy link pend for PHY_LINK_HCI_ACCEPT_SENT");
-+
-+                               rsp.local_ctrl_id = amp_contr->info.id;
-+                               rsp.remote_ctrl_id = phy_link->remote_ctrl_id;
-+                               rsp.status = AMP_STATUS_OK;
-+
-+                               send = amp_build_cmd(ctx->a2mp_conn, AMP_CREATE_PHY_LINK_RSP,
-+                                       ctx->identify, sizeof(struct a2mp_phy_link_rsp), &rsp);
-+                               l2cap_a2mp_send_cmd(ctx->a2mp_conn->conn, send);
-+                               phy_link->state = PHY_LINK_CREATE_RSP_SENT;
-+                               kfree(send);
-+                       } else if (!status) {
-+                               /* hci phy link create command complete success status */
-+                               BT_DBG("phy link mac ready");
-+
-+                               if (ctx->a2mp_conn->status & REGENERATE_GAMP_LK) {
-+                                       __u8 amp_type = amp_contr->dev->dev_type;
-+                                       /* regnerate gamp lk */
-+                                       ctx->a2mp_conn->status &= ~REGENERATE_GAMP_LK;
-+                                       amp_link_key_h2(ctx->a2mp_conn->gamp_lk,
-+                                               ctx->a2mp_conn->gamp_lk, GAMP_KEY_ID);
-+                                       ctx->a2mp_conn->dedicated_lk[amp_type-1].valid = 1;
-+                               }
-+                               switch (phy_link->state) {
-+                               case PHY_LINK_CREATE_RSP_RECV:
-+                               case PHY_LINK_CREATE_RSP_SENT:
-+                                       phy_link->state = PHY_LINK_CONNECTED;
-+                                       ctx->a2mp_conn->amp_role = AMP_ROLE_RESPONDER;
-+                                       amp_clear_phylink_timer(phy_link);
-+                                       atomic_dec(&ctx->a2mp_conn->req_cnt);
-+                                       l2cap_phylink_update(ctx->a2mp_conn->conn,
-+                                               L2CAP_PHYLINK_READY, phy_link->hci_link);
-+                                       break;
-+                               case PHY_LINK_CREATE_REQ_SENT:
-+                                       BT_DBG("phy link create cmd complete before a2mp create rsp");
-+                                       phy_link->flag = PHY_LINK_MAC_READY;
-+                                       break;
-+                               default:
-+                                       break;
-+                               }
-+                               list_del(&ctx->list);
-+                               kfree(ctx);
-+                       } else  {
-+                               BT_ERR("amp phy link create fail, status 0x%x", status);
-+                               if (phy_link == amp_get_creator_progress_phy_link(ctx->a2mp_conn))
-+                                       ctx->a2mp_conn->amp_role = AMP_ROLE_RESPONDER;
-+
-+                               if (phy_link->state == PHY_LINK_HCI_ACCEPT_SENT) {
-+                                       struct a2mp_phy_link_rsp rsp;
-+
-+                                       rsp.local_ctrl_id = amp_contr->info.id;
-+                                       rsp.remote_ctrl_id = phy_link->remote_ctrl_id;
-+                                       rsp.status = AMP_STATUS_UNABLE_TO_CREATE_LINK;
-+
-+                                       send = amp_build_cmd(ctx->a2mp_conn, AMP_CREATE_PHY_LINK_RSP,
-+                                               ctx->identify, sizeof(struct a2mp_phy_link_rsp), &rsp);
-+                                       l2cap_a2mp_send_cmd(ctx->a2mp_conn->conn, send);
-+                                       phy_link->state = PHY_LINK_CREATE_RSP_SENT;
-+                                       kfree(send);
-+                               }
-+                               list_del(&ctx->list);
-+                               kfree(ctx);
-+                               amp_clear_phylink_timer(phy_link);
-+                               amp_clear_a2mp_timer(phy_link);
-+                               list_del(&phy_link->per_conn_list);
-+                               list_del(&phy_link->per_contr_list);
-+                               kfree(phy_link);
-+                       }
-+                       break;
-+               }
-+       }
-+       write_unlock(&amp_contr->context_q.lock);
-+
-+       return 0;
-+}
-+
-+static int amp_disc_phy_link_cfm(struct hci_dev *hdev, u8 handle, u8 status, u8 reason)
-+{
-+       struct amp_controller *amp_contr = (struct amp_controller *)hdev->amp_controller;
-+       struct list_head *p, *n;
-+       struct cmd_context *ctx;
-+       struct amp_phy_link *phy_link;
-+
-+       BT_DBG("amp_contr %p, phy link handle %d, status 0x%x", amp_contr, handle, status);
-+
-+       if (amp_contr) {
-+               write_lock(&amp_contr->context_q.lock);
-+               list_for_each_safe(p, n, &amp_contr->context_q.head) {
-+                       ctx = list_entry(p, struct cmd_context, list);
-+                       if ((ctx->cmd == HCI_OP_DISCONN_PHYSICAL_LINK)
-+                                        && (ctx->handle == handle)) {
-+                               /*todo??*/
-+                               list_del(&ctx->list);
-+                               kfree(ctx);
-+                               break;
-+                       }
-+               }
-+               write_unlock(&amp_contr->context_q.lock);
-+       }
-+
-+       read_lock(&ampmgr.a2mp_list.lock);
-+
-+       /* for those disc conn can't found ctx, maybe it need global ampmgr to search a2mp_conn*/
-+       /* search & found in ampmgr */
-+       list_for_each(p, &ampmgr.a2mp_list.head) {
-+               struct a2mp_conn *a2mp_conn;
-+               a2mp_conn = list_entry(p, struct a2mp_conn, list);
-+                       phy_link = amp_get_phylink_by_handle(a2mp_conn, handle);
-+                       if (phy_link) {
-+
-+                               BT_DBG("phy link %p", phy_link);
-+                               l2cap_phylink_update(a2mp_conn->conn,
-+                                        L2CAP_PHYLINK_NOAVL, phy_link->hci_link);
-+                               amp_clear_phylink_timer(phy_link);
-+                               amp_clear_a2mp_timer(phy_link);
-+                               amp_a2mp_phylink_unlink(&a2mp_conn->phy_link_list, phy_link);
-+                               if (amp_contr)
-+                                       amp_contr_phylink_unlink(&amp_contr->phy_link_list, phy_link);
-+                               kfree(phy_link);
-+                       }
-+       }
-+       read_unlock(&ampmgr.a2mp_list.lock);
-+
-+       return 0;
-+}
-+
-+static int amp_local_assoc_ind(struct hci_dev *hdev, u8 status)
-+{
-+       struct amp_controller *amp_contr = (struct amp_controller *)hdev->amp_controller;
-+       struct list_head *p, *n;
-+       struct cmd_context *ctx;
-+
-+       BT_DBG("amp_contr %p, status %d", amp_contr, status);
-+
-+       if (!amp_contr)
-+               return 0;
-+
-+       write_lock(&amp_contr->context_q.lock);
-+       list_for_each_safe(p, n, &amp_contr->context_q.head) {
-+               ctx = list_entry(p, struct cmd_context, list);
-+               if (ctx->cmd == HCI_OP_READ_LOCAL_AMP_ASSOC) {
-+                       struct l2cap_a2mp_packet *send;
-+                       struct a2mp_assoc_rsp *rsp;
-+                       struct amp_assoc                *info = &hdev->local_assoc;
-+                       u16 length;
-+
-+                       BT_DBG("local assoc ind for READ_LOCAL_AMP_ASSOC");
-+
-+                       length = sizeof(struct a2mp_assoc_rsp) + info->len;
-+                       rsp = kzalloc(length, GFP_ATOMIC);
-+                       rsp->ctrl_id = amp_contr->info.id;
-+                       rsp->status = AMP_STATUS_OK;
-+
-+                       memcpy(rsp->assoc, info->data, info->len);
-+
-+                       send = amp_build_cmd(ctx->a2mp_conn, AMP_ASSOC_RSP, ctx->identify,
-+                                               length, rsp);
-+                       l2cap_a2mp_send_cmd(ctx->a2mp_conn->conn, send);
-+                       kfree(send);
-+                       kfree(rsp);
-+                       list_del(&ctx->list);
-+                       kfree(ctx);
-+                       break;
-+               }
-+       }
-+       write_unlock(&amp_contr->context_q.lock);
-+
-+       return 0;
-+}
-+
-+static int amp_local_info_ind(struct hci_dev *hdev, u8 status)
-+{
-+       struct amp_controller *amp_contr = (struct amp_controller *)hdev->amp_controller;
-+       struct list_head *p, *tmp, *n;
-+       struct cmd_context *ctx;
-+       struct l2cap_a2mp_packet *send;
-+
-+       BT_DBG("amp_contr %p, status %d", amp_contr, status);
-+
-+       if (!amp_contr)
-+               return 0;
-+
-+       amp_contr->info.status = hdev->ctrl_info.amp_status;
-+       write_lock(&amp_contr->context_q.lock);
-+       list_for_each_safe(p, n, &amp_contr->context_q.head) {
-+               ctx = list_entry(p, struct cmd_context, list);
-+               if (ctx->cmd == HCI_OP_READ_LOCAL_COMMANDS) {
-+                       if ((ctx->type == PENDING_REMOTE_SIGNAL)
-+                               && (ctx->code == AMP_DISCOVER_REQ)) {
-+                               __u8 i = 0;
-+
-+                               BT_DBG("local info ind for discovery req");
-+                               read_lock(&ampmgr.contr_list.lock);
-+                               list_for_each(tmp, &ampmgr.contr_list.head) {
-+                                       struct amp_controller *contr = list_entry(tmp, struct amp_controller, list);
-+                                       if (contr->info.status == AMP_CONTR_CAP_UNINITIALIZE)
-+                                               i++;
-+                               }
-+                               read_unlock(&ampmgr.contr_list.lock);
-+                               /* send discover rsp after read all contr status */
-+                               if (i == 0) {
-+                                       u8 rsp[64], len;
-+
-+                                       len = amp_build_discover_rsp(ctx->a2mp_conn, rsp);
-+                                       send = amp_build_cmd(ctx->a2mp_conn,
-+                                                       AMP_DISCOVER_RSP, ctx->identify, len, rsp);
-+                                       l2cap_a2mp_send_cmd(ctx->a2mp_conn->conn, send);
-+                                       ctx->a2mp_conn->discov_state |= DISOCVERY_RSP_SENT;
-+                                       kfree(send);
-+                               }
-+                       } else if ((ctx->type == PENDING_REMOTE_SIGNAL)
-+                                       && (ctx->code == AMP_INFO_REQ)) {
-+                               /* fix me*/
-+                               /* touch hci device here,need think over lock mechansim */
-+                               struct amp_info         info = hdev->ctrl_info;
-+                               struct a2mp_info_rsp rsp;
-+
-+                               BT_DBG("local info ind for info req");
-+                               rsp.ctrl_id = amp_contr->info.id;
-+                               rsp.status = AMP_STATUS_OK;
-+                               rsp.total_bandwidth = cpu_to_le32(info.total_bandwidth);
-+                               rsp.max_bandwidth = cpu_to_le32(info.max_guaranteed_bandwidth);
-+                               rsp.min_latency = cpu_to_le32(info.min_latency);
-+                               rsp.pal_capability = cpu_to_le16(info.pal_caps);
-+                               rsp.amp_assoc_size = cpu_to_le16(info.max_assoc_len);
-+                               send = amp_build_cmd(ctx->a2mp_conn, AMP_INFO_RSP, ctx->identify,
-+                                                       sizeof(struct a2mp_info_rsp), &rsp);
-+                               l2cap_a2mp_send_cmd(ctx->a2mp_conn->conn, send);
-+                               kfree(send);
-+                       }  else if ((ctx->type == PENDING_LOCAL_COMMAND)
-+                                       && (ctx->code == AMP_CHANGE_NOTIFY)) {
-+                               u8 rsp[64], len;
-+
-+                               BT_DBG("local info ind for change notify");
-+                               len = amp_build_change_notify(ctx->a2mp_conn, rsp);
-+                               send = amp_build_cmd(ctx->a2mp_conn,
-+                                               AMP_CHANGE_NOTIFY, ctx->identify, len, rsp);
-+                               l2cap_a2mp_send_cmd(ctx->a2mp_conn->conn, send);
-+                               kfree(send);
-+                       }
-+
-+                       list_del(&ctx->list);
-+                       kfree(ctx);
-+                       break;
-+               } else {
-+                       continue;
-+               }
-+       }
-+
-+       write_unlock(&amp_contr->context_q.lock);
-+       return 0;
-+}
-+
-+static struct hci_cb amp_mgr_cb = {
-+       .name                           = "ampmgr",
-+       .create_physical_link_cfm       = amp_create_phy_link_cfm,
-+       .put_physical_link_cfm          = amp_disc_phy_link_cfm,
-+       .local_assoc_ind                = amp_local_assoc_ind,
-+       .local_info_ind                 = amp_local_info_ind
-+};
-+
-+/* Fix me */
-+/* a simple logic to get physical link handle, maybe get duplicate phy_handle after rewind */
-+static u8 amp_get_phy_handle(void)
-+{
-+       u8 id;
-+
-+       spin_lock_bh(&ampmgr.lock);
-+
-+       if (++ampmgr.handle_seed > 256)
-+               ampmgr.handle_seed = 1;
-+       id = ampmgr.handle_seed;
-+       spin_unlock_bh(&ampmgr.lock);
-+       return id;
-+}
-+
-+/* register hci call back interface ,
-+ * register amp controller hotplug notify block,
-+ * collect local amp controller list
-+ * init amp link key h2 function ctx
-+ */
-+int amp_mgr_init(void)
-+{
-+       struct amp_controller *amp_contr;
-+       struct list_head *p;
-+       u8      contr_id = 0;
-+
-+       hci_register_cb(&amp_mgr_cb);
-+
-+       rwlock_init(&ampmgr.contr_list.lock);
-+       rwlock_init(&ampmgr.a2mp_list.lock);
-+       spin_lock_init(&ampmgr.lock);
-+       spin_lock_init(&ampmgr.crypt_lock);
-+
-+       INIT_LIST_HEAD(&ampmgr.contr_list.head);
-+       INIT_LIST_HEAD(&ampmgr.a2mp_list.head);
-+
-+       ampmgr.contr_state = AMP_CONTR_UNAVAIL;
-+
-+       read_lock_bh(&hci_dev_list_lock);
-+       list_for_each(p, &hci_dev_list) {
-+               struct hci_dev *d = list_entry(p, struct hci_dev, list);
-+
-+               if (d->dev_type != HCI_BREDR && test_bit(HCI_UP, &d->flags)) {
-+                       contr_id++;
-+                       /* amp controller exist indicate amp controller available?*/
-+                       /* Fix me*/
-+                       ampmgr.contr_state = AMP_CONTR_AVAIL;
-+
-+                       amp_contr = kzalloc(sizeof(struct amp_controller), GFP_KERNEL);
-+                       if (amp_contr == NULL) {
-+                               read_unlock_bh(&hci_dev_list_lock);
-+                               return -1;
-+                       }
-+                       /* rwlock_init(&amp_contr->lock); */
-+
-+                       amp_contr->info.id = contr_id;
-+                       amp_contr->info.type = d->dev_type;
-+                       /* simplify logic here,need refine */
-+                       amp_contr->info.status = AMP_CONTR_CAP_UNINITIALIZE;
-+                       amp_contr->dev = d;
-+                       /* let hci device pointer back */
-+                       d->amp_controller = amp_contr;
-+                       rwlock_init(&amp_contr->context_q.lock);
-+                       rwlock_init(&amp_contr->phy_link_list.lock);
-+                       amp_contr_list_link(&ampmgr.contr_list, amp_contr);
-+                       INIT_LIST_HEAD(&amp_contr->context_q.head);
-+                       INIT_LIST_HEAD(&amp_contr->phy_link_list.head);
-+
-+               }
-+       }
-+
-+       BT_DBG("amp controller count %d", ampmgr.contr_list.num);
-+       read_unlock_bh(&hci_dev_list_lock);
-+
-+       hci_register_notifier(&amp_mgr_nblock);
-+
-+       ampmgr.tfm = crypto_alloc_shash("hmac(sha256)", 0, 0);
-+       if (IS_ERR(ampmgr.tfm))
-+               return -1;
-+
-+       return 0;
-+}
-+
-+/* call when l2cap module unload */
-+void amp_mgr_exit(void)
-+{
-+       struct list_head *p, *n;
-+       struct amp_controller_list *contr_list = &ampmgr.contr_list;
-+       struct amp_controller *amp_contr;
-+
-+       if (!IS_ERR(ampmgr.tfm))
-+               crypto_free_shash(ampmgr.tfm);
-+
-+       hci_unregister_cb(&amp_mgr_cb);
-+       hci_unregister_notifier(&amp_mgr_nblock);
-+
-+       /*Fix me, maybe phy link list in amp controller exist*/
-+       write_lock_bh(&contr_list->lock);
-+       list_for_each_safe(p, n, &contr_list->head) {
-+               amp_contr = list_entry(p, struct amp_controller, list);
-+               amp_contr->dev->amp_controller = NULL;
-+               list_del(&amp_contr->list);
-+               contr_list->num--;
-+               kfree(amp_contr);
-+       }
-+       write_unlock_bh(&contr_list->lock);
-+
-+       return;
-+}
-+
-+/*init amp_mgr a2mp channel */
-+int amp_a2mp_channel_init(struct l2cap_conn *conn)
-+{
-+       struct a2mp_conn *a2mp_conn;
-+
-+       BT_DBG("l2cap_conn %p", conn);
-+
-+       if (conn->amp_handle)
-+               return 0;
-+       a2mp_conn = kzalloc(sizeof(struct a2mp_conn), GFP_ATOMIC);
-+       if (!a2mp_conn)
-+               return -1;
-+       conn->amp_handle = (void *)a2mp_conn;
-+       a2mp_conn->conn = conn;
-+
-+       rwlock_init(&a2mp_conn->phy_link_list.lock);
-+
-+       spin_lock_init(&a2mp_conn->lock);
-+
-+       INIT_LIST_HEAD(&a2mp_conn->phy_link_list.head);
-+
-+       setup_timer(&a2mp_conn->discov_timer, amp_discov_timeout,
-+                                               (unsigned long) a2mp_conn);
-+
-+       amp_a2mp_conn_link(&ampmgr.a2mp_list, a2mp_conn);
-+
-+       a2mp_conn->contr_state = AMP_CONTR_UNKNOWN;
-+       atomic_set(&a2mp_conn->req_cnt, 0);
-+
-+       return 0;
-+
-+}
-+
-+/*destroy amp_mgr a2mp channel*/
-+void amp_a2mp_channel_exit(struct l2cap_conn *conn)
-+{
-+       struct a2mp_conn *a2mp_conn = (struct a2mp_conn *)conn->amp_handle;
-+       struct list_head *p, *q, *n;
-+       struct amp_phy_link *phy_link;
-+       struct cmd_context *ctx;
-+       struct amp_controller *amp_contr;
-+
-+       BT_DBG("l2cap_conn %p", conn);
-+       if (!a2mp_conn)
++       if (hconn->state != BT_CONNECTED)
 +               return;
 +
-+       /*Fix me, need think over phy link list in amp controller*/
-+       /*need think over how to disc phy link */
-+       write_lock(&a2mp_conn->phy_link_list.lock);
-+       list_for_each_safe(p, n, &a2mp_conn->phy_link_list.head) {
-+               /*disc phy link without wait cfm*/
-+               phy_link = list_entry(p, struct amp_phy_link, per_conn_list);
-+               amp_clear_phylink_timer(phy_link);
-+               amp_clear_a2mp_timer(phy_link);
-+               if (phy_link->hci_link)
-+                       hci_phylink_put(phy_link->hci_link, 0x13);
-+               list_del(&phy_link->per_conn_list);
-+               list_del(&phy_link->per_contr_list);
-+               kfree(phy_link);
++       cp.handle = cpu_to_le16(hconn->handle);
++       hci_build_ext_flow_spec(&cp.tx_flow_spec, tx);
++       hci_build_ext_flow_spec(&cp.rx_flow_spec, rx);
++
++       hci_send_cmd(hdev, HCI_OP_FLOW_SPEC_MODIFY, sizeof(cp), &cp);
++}
++EXPORT_SYMBOL(hci_loglink_modify);
++
++void hci_loglink_put(struct hci_conn *conn)
++{
++       struct hci_dev *hdev = conn->hdev;
++       struct hci_conn *acl_link = conn->phylink->priv_data;
++
++       BT_DBG("%s conn:%p", hdev->name, conn);
++
++       if (!hci_loglink_lookup_tx_flow_spec_id(conn->phylink,  conn->tx_flow_spec_id))
++               return;
++
++       /* save the state of the acl connection over BREDR.*/
++       conn->phylink->acl_link_state = acl_link->state;
++
++       if (conn->state == BT_CONNECTED) {
++               struct hci_cp_disconn_logical_link cp;
++
++               cp.handle = cpu_to_le16(conn->handle);
++               hci_send_cmd(hdev, HCI_OP_DISCONN_LOGICAL_LINK, sizeof(cp), &cp);
++
++       } else if (conn->state == BT_CONNECT) {
++               struct hci_cp_logical_link_cancel cp;
++
++               cp.handle = conn->phylink->handle;
++               cp.tx_flow_spec_id = conn->tx_flow_spec_id;
++
++               hci_send_cmd(hdev, HCI_OP_LOGICAL_LINK_CANCEL, sizeof(cp), &cp);
++       } else {
++               hci_proto_loglink_put_cfm(conn, 0x13);
++               hci_loglink_del(conn);
 +       }
-+       write_unlock(&a2mp_conn->phy_link_list.lock);
 +
-+       if (a2mp_conn->remote)
-+               kfree(a2mp_conn->remote);
++}
++EXPORT_SYMBOL(hci_loglink_put);
 +
-+       /*purge cmd ctx that refer a2mp_conn*/
-+       read_lock(&ampmgr.contr_list.lock);
-+       list_for_each(p, &ampmgr.contr_list.head) {
-+               amp_contr = list_entry(p, struct amp_controller, list);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index aeb2982..712af4b 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -54,16 +54,23 @@ static void hci_cmd_task(unsigned long arg);
+ static void hci_rx_task(unsigned long arg);
+ static void hci_tx_task(unsigned long arg);
+ static void hci_notify(struct hci_dev *hdev, int event);
++static inline void hci_amp_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb);
+
+ static DEFINE_RWLOCK(hci_task_lock);
+
+ /* HCI device list */
+ LIST_HEAD(hci_dev_list);
++EXPORT_SYMBOL(hci_dev_list);
 +
-+               write_lock(&amp_contr->context_q.lock);
-+               list_for_each_safe(q, n, &amp_contr->context_q.head) {
-+                       ctx = list_entry(q, struct cmd_context, list);
-+                       if (ctx->a2mp_conn == a2mp_conn) {
-+                               list_del(&ctx->list);
-+                               kfree(ctx);
+ DEFINE_RWLOCK(hci_dev_list_lock);
++EXPORT_SYMBOL(hci_dev_list_lock);
+
+ /* HCI callback list */
+ LIST_HEAD(hci_cb_list);
++EXPORT_SYMBOL(hci_cb_list);
++
+ DEFINE_RWLOCK(hci_cb_list_lock);
++EXPORT_SYMBOL(hci_cb_list_lock);
+
+ /* HCI protocols */
+ #define HCI_MAX_PROTO  2
+@@ -78,11 +85,13 @@ int hci_register_notifier(struct notifier_block *nb)
+ {
+        return atomic_notifier_chain_register(&hci_notifier, nb);
+ }
++EXPORT_SYMBOL(hci_register_notifier);
+
+ int hci_unregister_notifier(struct notifier_block *nb)
+ {
+        return atomic_notifier_chain_unregister(&hci_notifier, nb);
+ }
++EXPORT_SYMBOL(hci_unregister_notifier);
+
+ static void hci_notify(struct hci_dev *hdev, int event)
+ {
+@@ -215,6 +224,12 @@ static void hci_init_req(struct hci_dev *hdev, unsigned long opt)
+        /* Read Buffer Size (ACL mtu, max pkt, etc.) */
+        hci_send_cmd(hdev, HCI_OP_READ_BUFFER_SIZE, 0, NULL);
+
++       /* 3.0+ HS Read Data Block Size */
++       hci_send_cmd(hdev, HCI_OP_READ_DATA_BLOCK_SIZE, 0, NULL);
++
++       /* 3.0+ HS Read Flow Control Mode */
++       hci_send_cmd(hdev, HCI_OP_READ_FLOW_CONTROL_MODE, 0, NULL);
++
+ #if 0
+        /* Host buffer size */
+        {
+@@ -227,17 +242,20 @@ static void hci_init_req(struct hci_dev *hdev, unsigned long opt)
+        }
+ #endif
+
+-       /* Read BD Address */
+-       hci_send_cmd(hdev, HCI_OP_READ_BD_ADDR, 0, NULL);
++       /*BREDR */
++       if (hdev->dev_type == HCI_BREDR) {
++               /* Read BD Address */
++               hci_send_cmd(hdev, HCI_OP_READ_BD_ADDR, 0, NULL);
+
+-       /* Read Class of Device */
+-       hci_send_cmd(hdev, HCI_OP_READ_CLASS_OF_DEV, 0, NULL);
++               /* Read Class of Device */
++               hci_send_cmd(hdev, HCI_OP_READ_CLASS_OF_DEV, 0, NULL);
+
+-       /* Read Local Name */
+-       hci_send_cmd(hdev, HCI_OP_READ_LOCAL_NAME, 0, NULL);
++               /* Read Local Name */
++               hci_send_cmd(hdev, HCI_OP_READ_LOCAL_NAME, 0, NULL);
+
+-       /* Read Voice Setting */
+-       hci_send_cmd(hdev, HCI_OP_READ_VOICE_SETTING, 0, NULL);
++               /* Read Voice Setting */
++               hci_send_cmd(hdev, HCI_OP_READ_VOICE_SETTING, 0, NULL);
++       }
+
+        /* Optional initialization */
+
+@@ -493,8 +511,10 @@ int hci_dev_open(__u16 dev)
+                set_bit(HCI_RAW, &hdev->flags);
+
+        /* Treat all non BR/EDR controllers as raw devices for now */
++       /*
+        if (hdev->dev_type != HCI_BREDR)
+                set_bit(HCI_RAW, &hdev->flags);
++       */
+
+        if (hdev->open(hdev)) {
+                ret = -EIO;
+@@ -505,7 +525,6 @@ int hci_dev_open(__u16 dev)
+                atomic_set(&hdev->cmd_cnt, 1);
+                set_bit(HCI_INIT, &hdev->flags);
+
+-               //__hci_request(hdev, hci_reset_req, 0, HZ);
+                ret = __hci_request(hdev, hci_init_req, 0,
+                                        msecs_to_jiffies(HCI_INIT_TIMEOUT));
+
+@@ -875,8 +894,8 @@ int hci_register_dev(struct hci_dev *hdev)
+        struct list_head *head = &hci_dev_list, *p;
+        int i, id = 0;
+
+-       BT_DBG("%p name %s bus %d owner %p", hdev, hdev->name,
+-                                               hdev->bus, hdev->owner);
++       BT_DBG("%p name %s bus %d owner %p dev_type %d", hdev, hdev->name,
++                                               hdev->bus, hdev->owner, hdev->dev_type);
+
+        if (!hdev->open || !hdev->close || !hdev->destruct)
+                return -EINVAL;
+@@ -906,7 +925,7 @@ int hci_register_dev(struct hci_dev *hdev)
+        hdev->sniff_max_interval = 800;
+        hdev->sniff_min_interval = 80;
+
+-       tasklet_init(&hdev->cmd_task, hci_cmd_task,(unsigned long) hdev);
++       tasklet_init(&hdev->cmd_task, hci_cmd_task, (unsigned long) hdev);
+        tasklet_init(&hdev->rx_task, hci_rx_task, (unsigned long) hdev);
+        tasklet_init(&hdev->tx_task, hci_tx_task, (unsigned long) hdev);
+
+@@ -925,6 +944,7 @@ int hci_register_dev(struct hci_dev *hdev)
+        hci_conn_hash_init(hdev);
+
+        INIT_LIST_HEAD(&hdev->blacklist.list);
++       INIT_LIST_HEAD(&hdev->phy_links);
+
+        memset(&hdev->stat, 0, sizeof(struct hci_dev_stats));
+
+@@ -1277,7 +1297,7 @@ static void hci_add_acl_hdr(struct sk_buff *skb, __u16 handle, __u16 flags)
+        hdr->dlen   = cpu_to_le16(len);
+ }
+
+-void hci_send_acl(struct hci_conn *conn, struct sk_buff *skb, __u16 flags)
++int hci_send_acl(struct hci_conn *conn, struct sk_buff *skb, __u16 flags)
+ {
+        struct hci_dev *hdev = conn->hdev;
+        struct sk_buff *list;
+@@ -1286,7 +1306,12 @@ void hci_send_acl(struct hci_conn *conn, struct sk_buff *skb, __u16 flags)
+
+        skb->dev = (void *) hdev;
+        bt_cb(skb)->pkt_type = HCI_ACLDATA_PKT;
+-       hci_add_acl_hdr(skb, conn->handle, flags | ACL_START);
++
++       if (hdev->dev_type == HCI_80211) {
++               BT_DBG("conn->handle:0x%x  pkt_len:%d", conn->handle, skb->len);
++               hci_add_acl_hdr(skb, conn->handle, flags | ACL_COMPLETE);
++       } else
++               hci_add_acl_hdr(skb, conn->handle, flags | ACL_START);
+
+        if (!(list = skb_shinfo(skb)->frag_list)) {
+                /* Non fragmented */
+@@ -1308,7 +1333,10 @@ void hci_send_acl(struct hci_conn *conn, struct sk_buff *skb, __u16 flags)
+
+                        skb->dev = (void *) hdev;
+                        bt_cb(skb)->pkt_type = HCI_ACLDATA_PKT;
+-                       hci_add_acl_hdr(skb, conn->handle, flags | ACL_CONT);
++                       if (hdev->dev_type == HCI_80211)
++                               hci_add_acl_hdr(skb, conn->handle, flags | ACL_COMPLETE);
++                       else
++                               hci_add_acl_hdr(skb, conn->handle, flags | ACL_CONT);
+
+                        BT_DBG("%s frag %p len %d", hdev->name, skb, skb->len);
+
+@@ -1319,17 +1347,24 @@ void hci_send_acl(struct hci_conn *conn, struct sk_buff *skb, __u16 flags)
+        }
+
+        tasklet_schedule(&hdev->tx_task);
++
++       return 0;
+ }
+ EXPORT_SYMBOL(hci_send_acl);
+
+ /* Send SCO data */
+-void hci_send_sco(struct hci_conn *conn, struct sk_buff *skb)
++int hci_send_sco(struct hci_conn *conn, struct sk_buff *skb)
+ {
+        struct hci_dev *hdev = conn->hdev;
+        struct hci_sco_hdr hdr;
+
+        BT_DBG("%s len %d", hdev->name, skb->len);
+
++       if (skb->len > hdev->sco_mtu) {
++               kfree_skb(skb);
++               return -EINVAL;
++       }
++
+        hdr.handle = cpu_to_le16(conn->handle);
+        hdr.dlen   = skb->len;
+
+@@ -1342,6 +1377,8 @@ void hci_send_sco(struct hci_conn *conn, struct sk_buff *skb)
+
+        skb_queue_tail(&conn->data_q, skb);
+        tasklet_schedule(&hdev->tx_task);
++
++       return 0;
+ }
+ EXPORT_SYMBOL(hci_send_sco);
+
+@@ -1435,6 +1472,77 @@ static inline void hci_sched_acl(struct hci_dev *hdev)
+        }
+ }
+
++static inline struct hci_conn *hci_amp_low_sent(struct hci_dev *hdev, __u8 type, int *quote)
++{
++
++       struct hci_conn *conn = NULL;
++       struct list_head *p;
++       struct list_head *p2;
++       struct hci_phy_link *plink;
++       int num = 0, min = ~0;
++
++       list_for_each(p, &hdev->phy_links) {
++               plink = list_entry(p, struct hci_phy_link, list);
++               list_for_each(p2, &plink->log_links) {
++                       struct hci_conn *c;
++                       c = list_entry(p2, struct hci_conn, list);
++
++                       if (c->type != type || skb_queue_empty(&c->data_q))
++                               continue;
++
++                       if (c->state != BT_CONNECTED && c->state != BT_CONFIG)
++                               continue;
++
++                       num++;
++
++                       if (c->sent < min) {
++                               min = c->sent;
++                               conn = c;
 +                       }
 +               }
-+               write_unlock(&amp_contr->context_q.lock);
 +       }
-+       read_unlock(&ampmgr.contr_list.lock);
 +
-+       if (a2mp_conn->discov_state & DISCOVERY_REQ_SENT)
-+               del_timer(&a2mp_conn->discov_timer);
++       if (conn) {
++               int cnt = (type == ACL_LINK ? hdev->acl_cnt : hdev->sco_cnt);
++               int q = cnt / num;
++               *quote = q ? q : 1;
++       } else
++               *quote = 0;
 +
-+       amp_a2mp_conn_unlink(&ampmgr.a2mp_list, a2mp_conn);
-+       kfree(a2mp_conn);
-+       conn->amp_handle = NULL;
-+       BT_DBG("exit");
-+       return ;
++       BT_DBG("conn %p quote %d", conn, *quote);
++       return conn;
 +}
 +
-+/* a simple implememt of amp_notify */
-+void amp_notify(struct l2cap_conn *conn, u8 cmd, void * hci_link)
++
++static inline void hci_amp_sched_acl(struct hci_dev *hdev)
 +{
-+       struct a2mp_conn *a2mp_conn = conn->amp_handle;
-+       struct l2cap_a2mp_packet *send;
-+       struct amp_phy_link *phy_link = NULL;
-+       struct list_head *p;
++       struct hci_conn *conn;
++       struct sk_buff *skb;
++       int quote;
 +
-+       BT_DBG("cmd 0x%4.4x", cmd);
++       BT_DBG("%s", hdev->name);
 +
-+       switch (cmd) {
-+       case AMP_HS_REQUEST:
-+               atomic_inc(&a2mp_conn->req_cnt);
-+               if ((atomic_read(&a2mp_conn->req_cnt) > 0)
-+                   && (a2mp_conn->contr_state == AMP_CONTR_AVAIL)
-+                   && (ampmgr.contr_state == AMP_CONTR_AVAIL)) {
-+                       u8 local_ctrlid, remote_ctrlid;
-+
-+                       local_ctrlid = amp_select_local_contr_id();
-+                       remote_ctrlid = amp_select_remote_contr_id(a2mp_conn);
-+                       amp_phy_link_add(a2mp_conn, local_ctrlid, remote_ctrlid);
-+               } else {
-+                       if (a2mp_conn->contr_state == AMP_CONTR_UNKNOWN) {
-+                               struct a2mp_discover_req req;
-+
-+                               req.mtu = cpu_to_le16(AMP_DEFAULT_MTU);
-+                               req.ext_feature_mask = cpu_to_le16(AMP_DEFAULT_EXT_FEAT_MASK);
-+
-+                               mod_timer(&a2mp_conn->discov_timer, jiffies +
-+                                       msecs_to_jiffies(AMP_DISCOV_TIMEOUT));
-+
-+                               a2mp_conn->discov_state |= DISCOVERY_REQ_SENT;
-+
-+                               send = amp_build_cmd(a2mp_conn, AMP_DISCOVER_REQ,
-+                                               amp_get_ident(a2mp_conn), sizeof(struct a2mp_discover_req), &req);
-+                               l2cap_a2mp_send_cmd(a2mp_conn->conn, send);
-+                               kfree(send);
-+                       }
++       if (!test_bit(HCI_RAW, &hdev->flags)) {
++               /* ACL tx timeout must be longer than maximum
++                * link supervision timeout (40.9 seconds) */
++               if (!hdev->acl_cnt && time_after(jiffies, hdev->acl_last_tx + HZ * 45)) {
++                       BT_ERR("%s acl tx timeout", hdev->name);
++                       /*TODO: disconnect logical link connection here. */
++                       /* hci_acl_tx_to(hdev); */
 +               }
-+               break;
-+       case AMP_HS_CANCEL:
-+               /*only exist one phy link in creator progress*/
-+               phy_link = amp_get_creator_progress_phy_link(a2mp_conn);
-+               if (phy_link) {
-+                       a2mp_conn->amp_role = AMP_ROLE_RESPONDER;
-+                       amp_disc_phy_link(a2mp_conn, phy_link);
-+               } else {
-+                       if (a2mp_conn->discov_state & DISCOVERY_REQ_SENT)
-+                               del_timer(&a2mp_conn->discov_timer);
-+                       atomic_dec(&a2mp_conn->req_cnt);
-+               }
-+               break;
-+       case AMP_HS_DISC:
-+               /*this disc notify only receive when phy link connected*/
-+               read_lock(&a2mp_conn->phy_link_list.lock);
-+               list_for_each(p, &a2mp_conn->phy_link_list.head) {
-+                       phy_link = list_entry(p, struct amp_phy_link, per_conn_list);
-+                       if (phy_link->hci_link == hci_link)
-+                               break;
-+               }
-+               read_unlock(&a2mp_conn->phy_link_list.lock);
++       }
 +
-+               if ((!phy_link) || (phy_link->hci_link != hci_link)) {
-+                       BT_ERR("can't find match phy_link with specify notify");
++       while (hdev->acl_cnt && (conn = hci_amp_low_sent(hdev, ACL_LINK, &quote))) {
++               while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
++                       hci_send_frame(skb);
++                       hdev->acl_last_tx = jiffies;
++
++                       hdev->acl_cnt--;
++                       conn->sent++;
++               }
++       }
++}
++
+ /* Schedule SCO */
+ static inline void hci_sched_sco(struct hci_dev *hdev)
+ {
+@@ -1487,12 +1595,15 @@ static void hci_tx_task(unsigned long arg)
+
+        /* Schedule queues and send stuff to HCI driver */
+
+-       hci_sched_acl(hdev);
+-
+-       hci_sched_sco(hdev);
++       if (hdev->dev_type == HCI_80211) {
++               hci_amp_sched_acl(hdev);
++       } else {
++               hci_sched_acl(hdev);
+
+-       hci_sched_esco(hdev);
++               hci_sched_sco(hdev);
+
++               hci_sched_esco(hdev);
++       }
+        /* Send next queued raw (unknown type) packet */
+        while ((skb = skb_dequeue(&hdev->raw_q)))
+                hci_send_frame(skb);
+@@ -1614,12 +1725,19 @@ static void hci_rx_task(unsigned long arg)
+
+                case HCI_ACLDATA_PKT:
+                        BT_DBG("%s ACL data packet", hdev->name);
+-                       hci_acldata_packet(hdev, skb);
++                       if (hdev->dev_type == HCI_80211)
++                               hci_amp_acldata_packet(hdev, skb);
++                       else
++                               hci_acldata_packet(hdev, skb);
++
+                        break;
+
+                case HCI_SCODATA_PKT:
+                        BT_DBG("%s SCO data packet", hdev->name);
+-                       hci_scodata_packet(hdev, skb);
++                       if (hdev->dev_type == HCI_80211)
++                               kfree_skb(skb);
++                       else
++                               hci_scodata_packet(hdev, skb);
+                        break;
+
+                default:
+@@ -1639,6 +1757,10 @@ static void hci_cmd_task(unsigned long arg)
+        BT_DBG("%s cmd %d", hdev->name, atomic_read(&hdev->cmd_cnt));
+
+        if (!atomic_read(&hdev->cmd_cnt) && time_after(jiffies, hdev->cmd_last_tx + HZ)) {
++               if (hdev->sent_cmd) {
++                       struct hci_command_hdr *hdr = (void *) hdev->sent_cmd;
++                       BT_ERR("cmd opcode: 0x%04x", hdr->opcode);
++               }
+                BT_ERR("%s command tx timeout", hdev->name);
+                atomic_set(&hdev->cmd_cnt, 1);
+        }
+@@ -1657,3 +1779,186 @@ static void hci_cmd_task(unsigned long arg)
+                }
+        }
+ }
++
++static struct hci_phy_link *hci_phylink_add(struct hci_dev *hdev, __u8 phy_handle, __u8 amp_role,
++                                                        __u8 *rem_assoc, __u16 assoc_size)
++{
++       struct hci_phy_link *plink;
++
++       BT_DBG("%s handle:%d", hdev->name, phy_handle);
++
++       plink = kzalloc(sizeof(struct hci_phy_link), GFP_ATOMIC);
++       if (!plink)
++               return NULL;
++
++       plink->handle = phy_handle;
++       plink->hdev = hdev;
++       plink->remote_assoc.offset = 0;
++       plink->amp_role = amp_role;
++       if (assoc_size > HCI_MAX_AMP_ASSOC_SIZE)
++               plink->remote_assoc.len = HCI_MAX_AMP_ASSOC_SIZE;
++       else
++               plink->remote_assoc.len = assoc_size;
++
++       BT_DBG("plink->remote_assoc.len:%d", plink->remote_assoc.len);
++       memcpy(plink->remote_assoc.data, rem_assoc, plink->remote_assoc.len);
++       INIT_LIST_HEAD(&plink->log_links);
++
++       plink->state = BT_OPEN;
++
++       list_add(&plink->list, &hdev->phy_links);
++
++       return plink;
++
++}
++
++int hci_phylink_del(struct hci_phy_link *plink)
++{
++       BT_DBG("del phylink:%p", plink);
++       list_del(&plink->list);
++       kfree(plink);
++       return 0;
++}
++
++static inline void hci_amp_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
++{
++       struct hci_acl_hdr *hdr = (void *) skb->data;
++       struct hci_phy_link *plink;
++       __u16 handle, flags;
++
++       skb_pull(skb, HCI_ACL_HDR_SIZE);
++
++       handle = __le16_to_cpu(hdr->handle);
++       flags  = hci_flags(handle);
++       handle = hci_handle(handle);
++
++       BT_DBG("%s len %d handle 0x%x flags 0x%x", hdev->name, skb->len, handle, flags);
++
++       hdev->stat.acl_rx++;
++
++       hci_dev_lock(hdev);
++       plink = hci_phylink_lookup_handle(hdev, handle);
++       hci_dev_unlock(hdev);
++
++       if (plink && plink->priv_data) {
++               register struct hci_proto *hp;
++
++               /* Send to upper protocol */
++               hp = hci_proto[HCI_PROTO_L2CAP];
++               if (hp && hp->recv_acldata
++                       && plink->acl_link_state == BT_CONNECTED) {
++                       hp->recv_acldata(plink->priv_data, skb, flags);
 +                       return;
 +               }
-+
-+               /* Disconnect Physical Link request is an optional request*/
-+#if 0
-+               req.local_ctrl_id = phy_link->local_ctrl_id;
-+               req.remote_ctrl_id = phy_link->remote_ctrl_id;
-+
-+               phy_link->state = PHY_LINK_DISC_REQ_SENT;
-+
-+               amp_set_a2mp_timer(phy_link, AMP_RESPONSE_TIMEOUT);
-+
-+               phy_link->identify = amp_get_ident(a2mp_conn);
-+
-+               send = amp_build_cmd(a2mp_conn, AMP_DISC_PHY_LINK_REQ, phy_link->identify,
-+                                       sizeof(struct a2mp_disc_phy_link_req), &req);
-+               l2cap_a2mp_send_cmd(a2mp_conn->conn, send);
-+               kfree(send);
-+#endif
-+               /* notify l2cap only connected phylink*/
-+               if (phy_link->state == PHY_LINK_CONNECTED)
-+                       l2cap_phylink_update(a2mp_conn->conn, L2CAP_PHYLINK_NOAVL, phy_link->hci_link);
-+               amp_disc_phy_link(a2mp_conn, phy_link);
-+               break;
-+       default:
-+               break;
-+       }
-+
-+       return;
-+}
-+
-+/* nothing to do in cmd rej?? */
-+static int amp_command_rej(struct a2mp_conn *a2mp_conn, struct a2mp_cmd_hdr *cmd, u8 *data)
-+{
-+       BT_DBG("command rej, ident %d", cmd->ident);
-+       return 0;
-+}
-+
-+static int amp_discover_req(struct a2mp_conn *a2mp_conn, struct a2mp_cmd_hdr *cmd, u8 *data)
-+{
-+       struct a2mp_discover_req *req = (struct a2mp_discover_req *)data;
-+       struct list_head *p;
-+       struct amp_controller *amp_contr;
-+       u8  j = 0;
-+       u16 mtu;
-+
-+       mtu = __le16_to_cpu(req->mtu);
-+
-+       BT_DBG("mtu 0x%4.4x", mtu);
-+
-+       if (mtu < AMP_DEFAULT_MTU)
-+               return -1;
-+
-+       a2mp_conn->discov_state |= DISCOVERY_REQ_RECV;
-+       a2mp_conn->mtu = mtu;
-+       a2mp_conn->feat_mask = __le16_to_cpu(req->ext_feature_mask);
-+
-+       read_lock(&ampmgr.contr_list.lock);
-+       list_for_each(p, &ampmgr.contr_list.head) {
-+               amp_contr = list_entry(p, struct amp_controller, list);
-+               if (amp_contr->info.status == AMP_CONTR_CAP_UNINITIALIZE) {
-+                       struct cmd_context *ctx;
-+
-+                       ctx = kzalloc(sizeof(struct cmd_context), GFP_ATOMIC);
-+                       if (!ctx) {
-+                               BT_ERR("mm alloc fail in amp_discover_req");
-+                               read_unlock(&ampmgr.contr_list.lock);
-+                               return 0;
-+                       }
-+                       j++;
-+                       ctx->type = PENDING_REMOTE_SIGNAL;
-+                       ctx->code = AMP_DISCOVER_REQ;
-+                       ctx->identify = cmd->ident;
-+                       ctx->cmd = HCI_OP_READ_LOCAL_COMMANDS;
-+                       ctx->a2mp_conn = a2mp_conn;
-+
-+                       amp_ctx_list_link(&amp_contr->context_q, ctx);
-+                       hci_read_local_amp_info(amp_contr->dev);
-+               }
-+
-+       }
-+       read_unlock(&ampmgr.contr_list.lock);
-+
-+       /*send discover rsp signal, no need to query controller status via HCI command*/
-+       if (j == 0) {
-+               struct l2cap_a2mp_packet *send;
-+               u8 rsp[64], len;
-+
-+               len = amp_build_discover_rsp(a2mp_conn, rsp);
-+               send = amp_build_cmd(a2mp_conn, AMP_DISCOVER_RSP, cmd->ident, len, rsp);
-+               l2cap_a2mp_send_cmd(a2mp_conn->conn, send);
-+               a2mp_conn->discov_state |= DISOCVERY_RSP_SENT;
-+               kfree(send);
-+       }
-+
-+       return 0;
-+}
-+
-+static int amp_discover_rsp(struct a2mp_conn *a2mp_conn, struct a2mp_cmd_hdr *cmd, u8 *data)
-+{
-+       struct a2mp_discover_rsp *rsp = (struct a2mp_discover_rsp *)data;
-+       struct controller_array *remote;
-+       u8 count = 0, i = 0;
-+       u8 *buffer = rsp->data;
-+       u16 mtu;
-+
-+       mtu = __le16_to_cpu(rsp->mtu);
-+       BT_DBG("mtu 0x%4.4x", mtu);
-+
-+       del_timer(&a2mp_conn->discov_timer);
-+       a2mp_conn->discov_state |= DISCOVERY_RSP_RECV;
-+
-+       if (mtu < AMP_DEFAULT_MTU) {
-+               BT_DBG("response mtu < AMP_MTU ");
-+               return -1;
-+       }
-+
-+       a2mp_conn->mtu = mtu;
-+       a2mp_conn->feat_mask = __le16_to_cpu(rsp->ext_feature_mask);
-+       count = (__le16_to_cpu(cmd->len) - sizeof(struct a2mp_discover_rsp))/3;
-+
-+       if (a2mp_conn->remote)
-+               kfree(a2mp_conn->remote);
-+
-+       a2mp_conn->contr_state = AMP_CONTR_UNAVAIL;
-+       remote = kzalloc((sizeof(struct controller_array) + sizeof(struct controller_info)*(count-1)),
-+                               GFP_ATOMIC);
-+
-+       if (!remote)
-+               return 0;
-+       /*skip BR/EDR controller*/
-+       buffer += 3;
-+       remote->size = count-1;
-+       for (i = 0; i < count-1; i++) {
-+               remote->contr[i].id = *buffer;
-+               remote->contr[i].type = *(buffer + 1);
-+               remote->contr[i].status = *(buffer + 2);
-+
-+               if (remote->contr[i].type != HCI_BREDR)
-+                       a2mp_conn->contr_state = AMP_CONTR_AVAIL;
-+
-+               buffer += 3;
-+       }
-+
-+       a2mp_conn->remote = remote;
-+
-+       if ((atomic_read(&a2mp_conn->req_cnt) > 0)
-+               && (a2mp_conn->contr_state == AMP_CONTR_AVAIL)
-+               && (ampmgr.contr_state == AMP_CONTR_AVAIL)) {
-+                       u8 local_ctrlid, remote_ctrlid;
-+
-+                       local_ctrlid = amp_select_local_contr_id();
-+                       remote_ctrlid = amp_select_remote_contr_id(a2mp_conn);
-+                       amp_phy_link_add(a2mp_conn, local_ctrlid, remote_ctrlid);
-+       }
-+
-+       return 0;
-+}
-+
-+static int amp_change_notify(struct a2mp_conn *a2mp_conn, struct a2mp_cmd_hdr *cmd, u8 *data)
-+{
-+       struct a2mp_change_notify *notify = (struct a2mp_change_notify *)data;
-+       struct l2cap_a2mp_packet *send;
-+       struct controller_array *remote;
-+       u8 count = 0, i = 0;
-+       u8 *buffer = notify->data;
-+
-+       count = (__le16_to_cpu(cmd->len) - sizeof(struct a2mp_change_notify))/3;
-+
-+       BT_DBG("contr count include br/edr is %d", count);
-+
-+       if (a2mp_conn->remote)
-+               kfree(a2mp_conn->remote);
-+
-+       a2mp_conn->contr_state = AMP_CONTR_UNAVAIL;
-+       remote = kzalloc((sizeof(struct controller_array) +
-+                               sizeof(struct controller_info)*(count-1)), GFP_ATOMIC);
-+       if (!remote)
-+               return 0;
-+       buffer += 3;
-+       remote->size = count-1;
-+       for (i = 0; i < count-1; i++) {
-+               remote->contr[i].id = *buffer;
-+               remote->contr[i].type = *(buffer + 1);
-+               remote->contr[i].status = *(buffer + 2);
-+
-+               if (remote->contr[i].type != HCI_BREDR) {
-+                       /* fix me, AMP_CONTR_AVAIL means exists amp controller?? */
-+                       a2mp_conn->contr_state = AMP_CONTR_AVAIL;
-+               }
-+               buffer += 3;
-+       }
-+
-+       a2mp_conn->remote = remote;
-+       if ((atomic_read(&a2mp_conn->req_cnt) > 0)
-+               && (a2mp_conn->contr_state == AMP_CONTR_AVAIL)
-+               && (ampmgr.contr_state == AMP_CONTR_AVAIL)) {
-+                       u8 local_ctrlid, remote_ctrlid;
-+
-+                       local_ctrlid = amp_select_local_contr_id();
-+                       remote_ctrlid = amp_select_remote_contr_id(a2mp_conn);
-+                       amp_phy_link_add(a2mp_conn, local_ctrlid, remote_ctrlid);
-+       }
-+
-+       /* send notify rsp*/
-+       send = amp_build_cmd(a2mp_conn, AMP_CHANGE_RSP, cmd->ident, 0, NULL);
-+       l2cap_a2mp_send_cmd(a2mp_conn->conn, send);
-+       kfree(send);
-+
-+       return 0;
-+}
-+
-+/*nothing to do here????*/
-+static int amp_change_rsp(struct a2mp_conn *a2mp_conn, struct a2mp_cmd_hdr *cmd, u8 *data)
-+{
-+       BT_DBG("change rsp");
-+       return 0;
-+}
-+
-+static int amp_info_req(struct a2mp_conn *a2mp_conn, struct a2mp_cmd_hdr *cmd, u8 *data)
-+{
-+       struct a2mp_info_req *req = (struct a2mp_info_req *)data;
-+       struct cmd_context *ctx;
-+       struct amp_controller *amp_contr;
-+
-+       BT_DBG("ctrl id 0x%4.4x", req->ctrl_id);
-+
-+       amp_contr = amp_get_contr_by_id(req->ctrl_id);
-+
-+       if (!amp_contr) {
-+               struct l2cap_a2mp_packet *send;
-+               struct a2mp_info_rsp rsp;
-+
-+               rsp.ctrl_id = req->ctrl_id;
-+               rsp.status = AMP_STATUS_INVALID_CONTROLLER_ID;
-+
-+               send = amp_build_cmd(a2mp_conn, AMP_INFO_RSP, cmd->ident,
-+                                       sizeof(struct a2mp_info_rsp), &rsp);
-+               l2cap_a2mp_send_cmd(a2mp_conn->conn, send);
-+               kfree(send);
-+               goto exit;
-+       }
-+       ctx = kzalloc(sizeof(struct cmd_context), GFP_ATOMIC);
-+       if (!ctx) {
-+               BT_ERR("mm alloc fail in amp_info_req");
-+               return 0;
-+       }
-+
-+       ctx->type = PENDING_REMOTE_SIGNAL;
-+       ctx->code = AMP_INFO_REQ;
-+       ctx->identify = cmd->ident;
-+       ctx->cmd = HCI_OP_READ_LOCAL_COMMANDS;
-+       ctx->a2mp_conn = a2mp_conn;
-+       amp_ctx_list_link(&amp_contr->context_q, ctx);
-+       hci_read_local_amp_info(amp_contr->dev);
-+exit:
-+       return 0;
-+}
-+
-+static int amp_info_rsp(struct a2mp_conn *a2mp_conn, struct a2mp_cmd_hdr *cmd, u8 *data)
-+{
-+       struct a2mp_info_rsp *rsp = (struct a2mp_info_rsp *)data;
-+       struct controller_array *remote = a2mp_conn->remote;
-+       struct amp_phy_link *phy_link;
-+       u8 i;
-+
-+       BT_DBG("ctrl id 0x%x, rsp status 0x%x", rsp->ctrl_id, rsp->status);
-+
-+       phy_link = amp_get_phylink_by_iden(a2mp_conn, cmd->ident);
-+       if (!phy_link) {
-+               BT_DBG("can't find match phylink ");
-+               return 0;
-+       }
-+
-+       amp_clear_a2mp_timer(phy_link);
-+
-+       switch (rsp->status) {
-+       case AMP_STATUS_OK:
-+               for (i = 0; i < remote->size; i++) {
-+                       if (remote->contr[i].id == rsp->ctrl_id) {
-+                               remote->contr[i].total_bandwidth = __le32_to_cpu(rsp->total_bandwidth);
-+                               remote->contr[i].max_bandwidth = __le32_to_cpu(rsp->max_bandwidth);
-+                               remote->contr[i].min_latency = __le32_to_cpu(rsp->min_latency);
-+                               remote->contr[i].pal_capability = __le16_to_cpu(rsp->pal_capability);
-+                               remote->contr[i].amp_assoc_size = __le16_to_cpu(rsp->amp_assoc_size);
-+                               break;
-+                       }
-+               }
-+               if (phy_link->state == PHY_LINK_INFO_REQ_SENT) {
-+                       struct a2mp_assoc_req req;
-+                       struct l2cap_a2mp_packet *send;
-+
-+                       phy_link->identify = amp_get_ident(a2mp_conn);
-+                       req.ctrl_id = rsp->ctrl_id;
-+                       send = amp_build_cmd(a2mp_conn, AMP_ASSOC_REQ, phy_link->identify,
-+                               sizeof(struct a2mp_assoc_req), &req);
-+                       if (!send)
-+                               return 0;
-+                       l2cap_a2mp_send_cmd(a2mp_conn->conn, send);
-+                       kfree(send);
-+                       amp_set_a2mp_timer(phy_link, AMP_RESPONSE_TIMEOUT);
-+                       phy_link->state = PHY_LINK_ASSOC_REQ_SENT;
-+               }
-+               break;
-+       case AMP_STATUS_INVALID_CONTROLLER_ID:
-+               amp_disc_phy_link(a2mp_conn, phy_link);
-+               break;
-+       default:
-+               break;
-+       }
-+
-+       return 0;
-+}
-+
-+static int amp_assoc_req(struct a2mp_conn *a2mp_conn, struct a2mp_cmd_hdr *cmd, u8 *data)
-+{
-+       struct a2mp_assoc_req *req = (struct a2mp_assoc_req *)data;
-+       struct cmd_context *ctx;
-+       struct amp_controller *amp_contr;
-+
-+       BT_DBG("ctrl id 0x%4.4x", req->ctrl_id);
-+
-+       amp_contr = amp_get_contr_by_id(req->ctrl_id);
-+
-+       if (!amp_contr) {
-+               struct l2cap_a2mp_packet *send;
-+               struct a2mp_assoc_rsp rsp;
-+
-+               rsp.ctrl_id = req->ctrl_id;
-+               rsp.status = AMP_STATUS_INVALID_CONTROLLER_ID;
-+
-+               send = amp_build_cmd(a2mp_conn, AMP_ASSOC_RSP, cmd->ident,
-+                                       sizeof(struct a2mp_assoc_rsp), &rsp);
-+               l2cap_a2mp_send_cmd(a2mp_conn->conn, send);
-+               kfree(send);
-+               goto exit;
-+       }
-+
-+       ctx = kzalloc(sizeof(struct cmd_context), GFP_ATOMIC);
-+       if (!ctx) {
-+               BT_ERR("mm alloc fail in amp_assoc_req");
-+               return 0;
-+       }
-+
-+       ctx->type = PENDING_REMOTE_SIGNAL;
-+       ctx->code = AMP_ASSOC_REQ;
-+       ctx->identify = cmd->ident;
-+       ctx->cmd = HCI_OP_READ_LOCAL_AMP_ASSOC;
-+       ctx->a2mp_conn = a2mp_conn;
-+       amp_ctx_list_link(&amp_contr->context_q, ctx);
-+       hci_read_local_amp_assoc(amp_contr->dev);
-+exit:
-+       return 0;
-+}
-+
-+static int amp_assoc_rsp(struct a2mp_conn *a2mp_conn, struct a2mp_cmd_hdr *cmd, u8 *data)
-+{
-+       struct a2mp_assoc_rsp *rsp = (struct a2mp_assoc_rsp *)data;
-+       struct amp_phy_link *phy_link;
-+
-+       BT_DBG("ctrl id 0x%x, rsp status 0x%x", rsp->ctrl_id, rsp->status);
-+       phy_link = amp_get_phylink_by_iden(a2mp_conn, cmd->ident);
-+       if (!phy_link) {
-+               BT_DBG("can't find match phylink ");
-+               return 0;
-+       }
-+       amp_clear_a2mp_timer(phy_link);
-+       switch (rsp->status) {
-+       case AMP_STATUS_OK:
-+               if (phy_link->state == PHY_LINK_ASSOC_REQ_SENT) {
-+                       struct amp_controller *amp_contr = amp_get_contr_by_id(phy_link->local_ctrl_id);
-+                       struct cmd_context *ctx = kzalloc(sizeof(struct cmd_context), GFP_ATOMIC);
-+                       struct amp_link_key dedicated_key = {.key_len = HCI_MAX_AMP_KEY_SIZE};
-+                       struct hci_conn *hcon = a2mp_conn->conn->hcon;
-+                       __u8 amp_type = amp_contr->dev->dev_type;
-+
-+                       phy_link->handle = amp_get_phy_handle();
-+                       if (!ctx) {
-+                               BT_ERR("null pointer in amp_assoc_rsp");
-+                               return 0;
-+                       }
-+                       ctx->type = PENDING_REMOTE_SIGNAL;
-+                       ctx->code = AMP_ASSOC_RSP;
-+                       ctx->identify = cmd->ident;
-+                       ctx->cmd = HCI_OP_CREATE_PHYSICAL_LINK;
-+                       ctx->a2mp_conn = a2mp_conn;
-+                       ctx->handle = phy_link->handle;
-+                       amp_ctx_list_link(&amp_contr->context_q, ctx);
-+
-+                       if (!a2mp_conn->dedicated_lk[amp_type-1].valid) {
-+
-+                               if (!(a2mp_conn->status & GAMP_LK_VALID)) {
-+                                       amp_create_generic_link_key(hcon->link_key,
-+                                                               a2mp_conn->gamp_lk);
-+                                       a2mp_conn->status |= GAMP_LK_VALID;
-+                               }
-+                               dedicated_key.key_type = hcon->key_type;
-+                               amp_create_dedicated_link_key(a2mp_conn->gamp_lk,
-+                                       hcon->key_type, dedicated_key.key);
-+                               a2mp_conn->status |= REGENERATE_GAMP_LK;
-+                               a2mp_conn->dedicated_lk[amp_type-1].key = dedicated_key;
-+                       } else {
-+                               dedicated_key = a2mp_conn->dedicated_lk[amp_type-1].key;
-+                       }
-+
-+                       phy_link->hci_link = hci_phylink_create(amp_contr->dev, phy_link->handle,
-+                                               &dedicated_key, rsp->assoc, (__le16_to_cpu(cmd->len) - 2),
-+                                               hcon);
-+                       phy_link->state = PHY_LINK_HCI_CREATE_SENT;
-+               }
-+               break;
-+       case AMP_STATUS_INVALID_CONTROLLER_ID:
-+               amp_disc_phy_link(a2mp_conn, phy_link);
-+               break;
-+       default:
-+               break;
-+       }
-+
-+       return 0;
-+}
-+
-+static int amp_create_phy_link_req(struct a2mp_conn *a2mp_conn, struct a2mp_cmd_hdr *cmd, u8 *data)
-+{
-+       struct a2mp_phy_link_req *req = (struct a2mp_phy_link_req *)data;
-+       struct amp_link_key dedicated_key = {.key_len = HCI_MAX_AMP_KEY_SIZE};
-+       struct hci_conn *hcon = a2mp_conn->conn->hcon;
-+       struct cmd_context *ctx;
-+       struct amp_phy_link *phy_link = NULL;
-+       struct amp_controller *amp_contr;
-+       struct l2cap_a2mp_packet *send;
-+       struct a2mp_phy_link_rsp rsp;
-+       __u8 amp_type;
-+
-+       BT_DBG("remote id 0x%4.4x,local ctrl id 0x%4.4x",
-+                       req->local_ctrl_id, req->remote_ctrl_id);
-+
-+       amp_contr = amp_get_contr_by_id(req->remote_ctrl_id);
-+       amp_type = amp_contr->dev->dev_type;
-+
-+       if (!amp_contr) {
-+               rsp.local_ctrl_id = req->remote_ctrl_id;
-+               rsp.remote_ctrl_id = req->local_ctrl_id;
-+               rsp.status = AMP_STATUS_INVALID_CONTROLLER_ID;
-+
-+               send = amp_build_cmd(a2mp_conn, AMP_CREATE_PHY_LINK_RSP, cmd->ident,
-+                                       sizeof(struct a2mp_phy_link_rsp), &rsp);
-+               l2cap_a2mp_send_cmd(a2mp_conn->conn, send);
-+               kfree(send);
-+               goto exit;
-+       }
-+
-+       /* collision resolve */
-+       if (a2mp_conn->amp_role == AMP_ROLE_CREATOR) {
-+               if (amp_collision_resolution(a2mp_conn->conn->src, a2mp_conn->conn->dst)) {
-+                       BT_DBG("collison resolve to be winner");
-+                       /* winner to be creator, send collision occured phy link rsp to remote*/
-+                       rsp.local_ctrl_id = req->remote_ctrl_id;
-+                       rsp.remote_ctrl_id = req->local_ctrl_id;
-+                       rsp.status = AMP_STATUS_COLLISION_OCCURRED;
-+
-+                       send = amp_build_cmd(a2mp_conn, AMP_CREATE_PHY_LINK_RSP,
-+                                               cmd->ident, sizeof(struct a2mp_phy_link_rsp), &rsp);
-+                       l2cap_a2mp_send_cmd(a2mp_conn->conn, send);
-+                       kfree(send);
-+                       /* no need to progress*/
-+                       goto exit;
-+               } else {
-+                       /* here lose to be creator, need exit previous creating progress*/
-+                       /*only exist one phy link in creator progress*/
-+                       BT_DBG("collison resolve to be loser");
-+                       phy_link = amp_get_creator_progress_phy_link(a2mp_conn);
-+                       if (phy_link) {
-+                               a2mp_conn->amp_role = AMP_ROLE_RESPONDER;
-+                               amp_disc_phy_link(a2mp_conn, phy_link);
-+                       }
-+               }
-+       }
-+
-+       /*normal flow, respondor receive phy link req, send hci_accept*/
-+       phy_link = kzalloc(sizeof(struct amp_phy_link), GFP_ATOMIC);
-+       if (!phy_link)
-+               return 0;
-+       phy_link->local_ctrl_id = req->remote_ctrl_id;
-+       phy_link->remote_ctrl_id = req->local_ctrl_id;
-+       phy_link->handle = amp_get_phy_handle();
-+       phy_link->a2mp_conn = a2mp_conn;
-+       phy_link->local = amp_contr;
-+
-+       amp_a2mp_phylink_link(&a2mp_conn->phy_link_list, phy_link);
-+       amp_contr_phylink_link(&amp_contr->phy_link_list, phy_link);
-+
-+       setup_timer(&phy_link->a2mp_timer, amp_a2mp_timeout,
-+                                               (unsigned long) phy_link);
-+       setup_timer(&phy_link->timer, amp_phylink_timeout,
-+                                               (unsigned long) phy_link);
-+
-+       amp_set_phylink_timer(phy_link, AMP_PHY_LINK_TIMEOUT);
-+
-+       ctx = kzalloc(sizeof(struct cmd_context), GFP_ATOMIC);
-+       if (!ctx)
-+               return 0;
-+       ctx->type = PENDING_REMOTE_SIGNAL;
-+       ctx->code = AMP_CREATE_PHY_LINK_REQ;
-+       ctx->identify = cmd->ident;
-+       ctx->cmd = HCI_OP_CREATE_PHYSICAL_LINK;
-+       ctx->a2mp_conn = a2mp_conn;
-+       ctx->handle = phy_link->handle;
-+       amp_ctx_list_link(&amp_contr->context_q, ctx);
-+
-+       if (!a2mp_conn->dedicated_lk[amp_type-1].valid) {
-+
-+               if (!(a2mp_conn->status & GAMP_LK_VALID)) {
-+                       amp_create_generic_link_key(hcon->link_key,
-+                                               a2mp_conn->gamp_lk);
-+                       a2mp_conn->status |= GAMP_LK_VALID;
-+               }
-+               dedicated_key.key_type = hcon->key_type;
-+               amp_create_dedicated_link_key(a2mp_conn->gamp_lk,
-+                       hcon->key_type, dedicated_key.key);
-+               a2mp_conn->status |= REGENERATE_GAMP_LK;
-+               a2mp_conn->dedicated_lk[amp_type-1].key = dedicated_key;
 +       } else {
-+               dedicated_key = a2mp_conn->dedicated_lk[amp_type-1].key;
-+       }
-+
-+       phy_link->hci_link = hci_phylink_accept(amp_contr->dev, phy_link->handle, &dedicated_key,
-+                                               req->assoc, (__le16_to_cpu(cmd->len) - 2), hcon);
-+       phy_link->state = PHY_LINK_HCI_ACCEPT_SENT;
-+
-+exit:
-+       return 0;
-+}
-+
-+static int amp_create_phy_link_rsp(struct a2mp_conn *a2mp_conn, struct a2mp_cmd_hdr *cmd, u8 *data)
-+{
-+       struct a2mp_phy_link_rsp *rsp = (struct a2mp_phy_link_rsp *)data;
-+       struct amp_phy_link *phy_link;
-+
-+       BT_DBG("local ctrl id 0x%4.4x,remote id 0x%4.4x, status 0x%4.4x",
-+                       rsp->local_ctrl_id, rsp->remote_ctrl_id, rsp->status);
-+
-+       phy_link = amp_get_phylink_by_iden(a2mp_conn, cmd->ident);
-+
-+       if (!phy_link) {
-+               BT_DBG("can't find match phylink ");
-+               return 0;
-+       }
-+
-+       amp_clear_a2mp_timer(phy_link);
-+
-+       switch (rsp->status) {
-+       case AMP_STATUS_OK:
-+               if (phy_link->state == PHY_LINK_CREATE_REQ_SENT) {
-+                       if (phy_link->flag == PHY_LINK_MAC_READY) {
-+                               phy_link->state = PHY_LINK_CONNECTED;
-+                               a2mp_conn->amp_role = AMP_ROLE_RESPONDER;
-+                               amp_clear_phylink_timer(phy_link);
-+                               atomic_dec(&a2mp_conn->req_cnt);
-+                               l2cap_phylink_update(a2mp_conn->conn,
-+                                       L2CAP_PHYLINK_READY, phy_link->hci_link);
-+                       } else {
-+                               phy_link->state = PHY_LINK_CREATE_RSP_RECV;
-+                       }
-+               }
-+               break;
-+       case AMP_STATUS_INVALID_CONTROLLER_ID:
-+       case AMP_STATUS_UNABLE_TO_CREATE_LINK:
-+       case AMP_STATUS_COLLISION_OCCURRED:
-+       case AMP_STATUS_DISC_PACKET_RECV:
-+       case AMP_STATUS_PHYSICAL_LINK_EXIST:
-+       case AMP_STATUS_INSUFFICIENT_SECURITY:
-+               a2mp_conn->amp_role = AMP_ROLE_RESPONDER;
-+               amp_disc_phy_link(a2mp_conn, phy_link);
-+               break;
-+       default:
-+               break;
-+       }
-+
-+       return 0;
-+}
-+
-+static int amp_disc_phy_link_req(struct a2mp_conn *a2mp_conn, struct a2mp_cmd_hdr *cmd, u8 *data)
-+{
-+       struct a2mp_disc_phy_link_req *req = (struct a2mp_disc_phy_link_req *)data;
-+       struct amp_phy_link *phy_link = NULL;
-+       struct l2cap_a2mp_packet *send;
-+       struct cmd_context *ctx;
-+       struct a2mp_disc_phy_link_rsp rsp;
-+
-+       BT_DBG("remote ctrl id 0x%4.4x,local ctrl id 0x%4.4x", req->local_ctrl_id, req->remote_ctrl_id);
-+
-+       phy_link = amp_get_phylink_by_ctrlid(a2mp_conn, req->remote_ctrl_id, req->local_ctrl_id);
-+       if (!phy_link) {
-+               BT_DBG("can't disc inexist phy link");
-+               rsp.local_ctrl_id = req->remote_ctrl_id;
-+               rsp.remote_ctrl_id = req->local_ctrl_id;
-+               rsp.status = AMP_STATUS_NO_PHYSICAL_LINK;
-+               send = amp_build_cmd(a2mp_conn, AMP_DISC_PHY_LINK_RSP, cmd->ident,
-+                                       sizeof(struct a2mp_disc_phy_link_rsp), &rsp);
-+               l2cap_a2mp_send_cmd(a2mp_conn->conn, send);
-+               kfree(send);
-+               goto exit;
-+       } else {
-+               /* receive a create phy_link req, not send rsp yet, here can send a create phy_link rsp
-+                * with "Failed - AMP Disconnected Physical Link Request packet received"
-+                */
-+               struct amp_controller *amp_contr = phy_link->local;
-+
-+               if (phy_link->state == PHY_LINK_HCI_ACCEPT_SENT) {
-+                       struct list_head *p, *n;
-+
-+                       /* remove queue AMP_CREATE_PHY_LINK_REQ ctx, and send create phy link rsp, with fail*/
-+                       write_lock(&amp_contr->context_q.lock);
-+                       list_for_each_safe(p, n, &amp_contr->context_q.head) {
-+                               ctx = list_entry(p, struct cmd_context, list);
-+                               if ((ctx->code == AMP_CREATE_PHY_LINK_REQ)
-+                                       && (ctx->handle == phy_link->handle)) {
-+                                       struct a2mp_phy_link_rsp rsp;
-+
-+                                       rsp.local_ctrl_id = phy_link->local_ctrl_id;
-+                                       rsp.remote_ctrl_id = phy_link->remote_ctrl_id;
-+                                       rsp.status = AMP_STATUS_DISC_PACKET_RECV;
-+
-+                                       send = amp_build_cmd(ctx->a2mp_conn, AMP_CREATE_PHY_LINK_RSP,
-+                                                       ctx->identify, sizeof(struct a2mp_phy_link_rsp), &rsp);
-+                                       l2cap_a2mp_send_cmd(ctx->a2mp_conn->conn, send);
-+                                       phy_link->state = PHY_LINK_CREATE_RSP_SENT;
-+                                       kfree(send);
-+
-+                                       list_del(&ctx->list);
-+                                       kfree(ctx);
-+                               }
-+                       }
-+                       write_unlock(&amp_contr->context_q.lock);
-+               }
-+
-+               /*send disc phy link rsp here*/
-+               rsp.local_ctrl_id = phy_link->local_ctrl_id;
-+               rsp.remote_ctrl_id = phy_link->remote_ctrl_id;
-+               rsp.status = AMP_STATUS_OK;
-+
-+               send = amp_build_cmd(a2mp_conn, AMP_DISC_PHY_LINK_RSP, cmd->ident,
-+                                       sizeof(struct a2mp_disc_phy_link_rsp), &rsp);
-+               l2cap_a2mp_send_cmd(a2mp_conn->conn, send);
-+               kfree(send);
-+
-+               /* disc phy link*/
-+               l2cap_phylink_update(a2mp_conn->conn, L2CAP_PHYLINK_NOAVL, phy_link->hci_link);
-+               amp_disc_phy_link(a2mp_conn, phy_link);
-+       }
-+exit:
-+       return 0;
-+}
-+
-+static int amp_disc_phy_link_rsp(struct a2mp_conn *a2mp_conn, struct a2mp_cmd_hdr *cmd, u8 *data)
-+{
-+       struct a2mp_disc_phy_link_rsp *rsp = (struct a2mp_disc_phy_link_rsp *)data;
-+       struct amp_phy_link *phy_link;
-+
-+       BT_DBG("ctrl id 0x%4.4x,id 0x%4.4x, rsp status 0x%4.4x",
-+               rsp->local_ctrl_id, rsp->remote_ctrl_id, rsp->status);
-+
-+       phy_link = amp_get_phylink_by_iden(a2mp_conn, cmd->ident);
-+       if (!phy_link) {
-+               BT_DBG("can't find match phylink ");
-+               return 0;
-+       }
-+       amp_clear_a2mp_timer(phy_link);
-+       switch (rsp->status) {
-+       case AMP_STATUS_OK:
-+               if (phy_link->state == PHY_LINK_DISC_REQ_SENT)
-+                       phy_link->state = PHY_LINK_DISC_RSP_RECV;
-+               break;
-+       case AMP_STATUS_INVALID_CONTROLLER_ID:
-+       case AMP_STATUS_NO_PHYSICAL_LINK:
-+               amp_disc_phy_link(a2mp_conn, phy_link);
-+               break;
-+       default:
-+               break;
-+       }
-+
-+       return 0;
-+}
-+
-+void  amp_a2mp_process(struct l2cap_conn *conn, struct sk_buff *skb)
-+{
-+       struct a2mp_conn *a2mp_conn = (struct a2mp_conn *)conn->amp_handle;
-+       struct a2mp_cmd_hdr cmd;
-+       u8 *data = skb->data;
-+       int len = skb->len;
-+       int err = 0;
-+
-+       while (len >= AMP_CMD_HDR_LENGTH) {
-+               u16 cmd_len;
-+               memcpy(&cmd, data, AMP_CMD_HDR_LENGTH);
-+               data += AMP_CMD_HDR_LENGTH;
-+               len  -= AMP_CMD_HDR_LENGTH;
-+
-+               cmd_len = le16_to_cpu(cmd.len);
-+
-+               BT_DBG("code 0x%2.2x len %d id 0x%2.2x", cmd.code, cmd_len, cmd.ident);
-+
-+               if (cmd_len > len || !cmd.ident) {
-+                       BT_DBG("corrupted command");
-+                       break;
-+               }
-+
-+               switch (cmd.code) {
-+               case AMP_COMMAND_REJ:
-+                       amp_command_rej(a2mp_conn, &cmd, data);
-+                       break;
-+
-+               case AMP_DISCOVER_REQ:
-+                       err = amp_discover_req(a2mp_conn, &cmd, data);
-+                       break;
-+
-+               case AMP_DISCOVER_RSP:
-+                       err = amp_discover_rsp(a2mp_conn, &cmd, data);
-+                       break;
-+
-+               case AMP_CHANGE_NOTIFY:
-+                       err = amp_change_notify(a2mp_conn, &cmd, data);
-+                       break;
-+
-+               case AMP_CHANGE_RSP:
-+                       err = amp_change_rsp(a2mp_conn, &cmd, data);
-+                       break;
-+
-+               case AMP_INFO_REQ:
-+                       err = amp_info_req(a2mp_conn, &cmd, data);
-+                       break;
-+
-+               case AMP_INFO_RSP:
-+                       err = amp_info_rsp(a2mp_conn, &cmd, data);
-+                       break;
-+
-+               case AMP_ASSOC_REQ:
-+                       err = amp_assoc_req(a2mp_conn, &cmd, data);
-+                       break;
-+
-+               case AMP_ASSOC_RSP:
-+                       err = amp_assoc_rsp(a2mp_conn, &cmd, data);
-+                       break;
-+
-+               case AMP_CREATE_PHY_LINK_REQ:
-+                       err = amp_create_phy_link_req(a2mp_conn, &cmd, data);
-+                       break;
-+
-+               case AMP_CREATE_PHY_LINK_RSP:
-+                       err = amp_create_phy_link_rsp(a2mp_conn, &cmd, data);
-+                       break;
-+
-+               case AMP_DISC_PHY_LINK_REQ:
-+                       err = amp_disc_phy_link_req(a2mp_conn, &cmd, data);
-+                       break;
-+
-+               case AMP_DISC_PHY_LINK_RSP:
-+                       err = amp_disc_phy_link_rsp(a2mp_conn, &cmd, data);
-+                       break;
-+
-+               default:
-+                       BT_ERR("Unknown signaling command 0x%2.2x", cmd.code);
-+                       err = -EINVAL;
-+                       break;
-+               }
-+
-+               if (err) {
-+                       struct l2cap_a2mp_packet *send;
-+                       struct a2mp_cmd_rej rej;
-+
-+                       rej.reason = cpu_to_le16(0);
-+                       send = amp_build_cmd(a2mp_conn, AMP_COMMAND_REJ, cmd.ident, sizeof(struct a2mp_cmd_rej), &rej);
-+                       l2cap_a2mp_send_cmd(a2mp_conn->conn, send);
-+                       kfree(send);
-+               }
-+
-+               data += cmd_len;
-+               len  -= cmd_len;
++               BT_ERR("%s ACL packet for unknown connection handle %d",
++                       hdev->name, handle);
 +       }
 +
 +       kfree_skb(skb);
-+
-+       return;
 +}
++
++/* ------ AMP HCI interface for upper layer ----- */
++struct hci_phy_link *hci_phylink_create(struct hci_dev *hdev, __u8 phy_handle,
++                               struct amp_link_key *key, __u8 *rem_assoc, __u16 assoc_size, void* priv_data)
++{
++       struct hci_phy_link *plink;
++
++       BT_DBG("%s handle:%d, key_len:%d assoc_size:%d", hdev->name, phy_handle, key->key_len, assoc_size);
++
++       if (!test_bit(HCI_UP, &hdev->flags))
++               return NULL;
++
++       hci_dev_lock(hdev);
++       plink = hci_phylink_lookup_handle(hdev, phy_handle);
++       if (!plink) {
++               plink = hci_phylink_add(hdev, phy_handle, HCI_AMP_ROLE_INITIATOR, rem_assoc, assoc_size);
++               if (!plink) {
++                       hci_dev_unlock(hdev);
++                       return NULL;
++               }
++       }
++       plink->priv_data = priv_data;
++       hci_dev_unlock(hdev);
++
++       if (plink->state == BT_OPEN || plink->state == BT_CLOSED) {
++               struct hci_cp_create_physical_link cp;
++
++               plink->state = BT_CONNECT;
++               cp.handle = phy_handle;
++               cp.key_type = key->key_type;
++
++               cp.key_len = key->key_len > HCI_MAX_AMP_KEY_SIZE ? \
++                            HCI_MAX_AMP_KEY_SIZE : key->key_len;
++
++               BT_DBG("cp.key_len %d, cp.handle %d", cp.key_len, cp.handle);
++               memcpy(cp.key, key->key, cp.key_len);
++               hci_send_cmd(hdev, HCI_OP_CREATE_PHYSICAL_LINK, sizeof(cp), &cp);
++       }
++       BT_DBG("end");
++       return plink;
++
++}
++EXPORT_SYMBOL(hci_phylink_create);
++
++struct hci_phy_link *hci_phylink_accept(struct hci_dev *hdev, __u8 phy_handle,
++                                       struct amp_link_key *key, __u8 *rem_assoc, __u16 assoc_size, void* priv_data)
++{
++       struct hci_phy_link *plink;
++
++       BT_DBG("%s handle:%d, key_len:%d assoc_size:%d", hdev->name, phy_handle, key->key_len, assoc_size);
++
++       hci_dev_lock(hdev);
++       plink = hci_phylink_lookup_handle(hdev, phy_handle);
++       if (!plink) {
++               plink = hci_phylink_add(hdev, phy_handle, HCI_AMP_ROLE_RESPONDER, rem_assoc, assoc_size);
++               if (!plink) {
++                       hci_dev_unlock(hdev);
++                       return NULL;
++               }
++       }
++       plink->priv_data = priv_data;
++       hci_dev_unlock(hdev);
++
++       if (plink->state == BT_OPEN || plink->state == BT_CLOSED) {
++               struct hci_cp_accept_physical_link cp;
++
++               plink->state = BT_CONNECT;
++               cp.handle = phy_handle;
++               cp.key_type = key->key_type;
++               cp.key_len = key->key_len > HCI_MAX_AMP_KEY_SIZE ? HCI_MAX_AMP_KEY_SIZE : key->key_len;
++               BT_DBG("cp.key_len %d, cp.handle %d", cp.key_len, cp.handle);
++               memcpy(cp.key, key->key, cp.key_len);
++               hci_send_cmd(hdev, HCI_OP_ACCEPT_PHYSICAL_LINK, sizeof(cp), &cp);
++       }
++       BT_DBG("end");
++       return plink;
++}
++
++EXPORT_SYMBOL(hci_phylink_accept);
++
++void hci_phylink_put(struct hci_phy_link *phy_link, __u8 reason)
++{
++       struct hci_cp_disconn_physical_link cp;
++
++       BT_DBG("put physical link:%p", phy_link);
++
++       phy_link->state = BT_DISCONN;
++
++       cp.handle = phy_link->handle;
++       cp.reason = reason;
++       hci_send_cmd(phy_link->hdev, HCI_OP_DISCONN_PHYSICAL_LINK, sizeof(cp), &cp);
++
++}
++EXPORT_SYMBOL(hci_phylink_put);
++
++void hci_read_local_amp_info(struct hci_dev *hdev)
++{
++       BT_DBG("%s", hdev->name);
++
++       hci_send_cmd(hdev, HCI_OP_READ_LOCAL_AMP_INFO, 0, NULL);
++}
++EXPORT_SYMBOL(hci_read_local_amp_info);
++
++
++
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index a969800..080f979 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -182,7 +182,17 @@ static void hci_cc_reset(struct hci_dev *hdev, struct sk_buff *skb)
+        __u8 status = *((__u8 *) skb->data);
+
+        BT_DBG("%s status 0x%x", hdev->name, status);
+-
++/*
++       if (hdev->dev_type = HCI_80211) {
++               if (test_and_clear_bit(HCI_INIT, &hdev->flags)) {
++                       if (!status) {
++                               hci_dev_hold(hdev);
++                               set_bit(HCI_UP, &hdev->flags);
++                               hci_notify(hdev, HCI_DEV_UP);
++                       }
++               }
++       }
++*/
+        hci_req_complete(hdev, status);
+ }
+
+@@ -814,6 +824,550 @@ static void hci_cs_exit_sniff_mode(struct hci_dev *hdev, __u8 status)
+        hci_dev_unlock(hdev);
+ }
+
++static void hci_cc_link_key_reply(struct hci_dev *hdev, struct sk_buff *skb)
++{
++       struct hci_rp_link_key_reply *rp = (void *) skb->data;
++
++       BT_DBG("%s status 0x%x", hdev->name, rp->status);
++
++       if (!rp->status) {
++               struct hci_conn *conn;
++               struct hci_cp_link_key_reply *cp = hci_sent_cmd_data(hdev, HCI_OP_LINK_KEY_REPLY);
++
++               if (!cp)
++                       return;
++
++               hci_dev_lock(hdev);
++
++               conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &cp->bdaddr);
++               if (conn) {
++                       hci_conn_hold(conn);
++                       memcpy(conn->link_key, cp->link_key, 16);
++                       conn->key_type =  0x04;
++
++                       hci_conn_put(conn);
++               }
++               hci_dev_unlock(hdev);
++       }
++}
++
++static void hci_write_rmt_assoc(struct hci_dev *hdev, struct hci_phy_link *plink)
++{
++       __u16 len;
++       __u16 remain;
++       struct hci_cp_write_remote_amp_assoc cp;
++       struct amp_assoc *rmt_assoc = &plink->remote_assoc;
++
++       remain = rmt_assoc->len - rmt_assoc->offset;
++       len = min_t(__u16, remain, HCI_MAX_AMP_ASSOC_FRAGMENT);
++
++       cp.handle = plink->handle;
++       cp.amp_assoc_remaining_len = cpu_to_le16(remain);
++       cp.len_so_far = cpu_to_le16(rmt_assoc->offset);
++       memcpy(cp.amp_assoc_fragment, rmt_assoc->data + rmt_assoc->offset, len);
++       rmt_assoc->offset += len;
++       hci_send_cmd(hdev, HCI_OP_WRITE_REMOTE_AMP_ASSOC, sizeof(cp) - HCI_MAX_AMP_ASSOC_FRAGMENT + len, &cp);
++}
++
++static void hci_cc_read_data_block_size(struct hci_dev *hdev, struct sk_buff *skb)
++{
++       struct hci_rp_read_data_block_size *rp = (void *)skb->data;
++       u16 num_blks;
++       u16 blk_size;
++       u16 max_pkt_len;
++
++       BT_DBG("%s status:0x%x", hdev->name, rp->status);
++       if (rp->status)
++               return;
++
++       hci_dev_lock(hdev);
++       num_blks = __le16_to_cpu(rp->num_blks);
++       blk_size = __le16_to_cpu(rp->max_blk_len);
++       max_pkt_len = __le16_to_cpu(rp->max_pkt_len);
++
++       hdev->acl_mtu = max_pkt_len;
++       hdev->acl_pkts = (num_blks * blk_size) / max_pkt_len;
++       hdev->acl_cnt = hdev->acl_pkts;
++       BT_ERR("%s acl mtu %d:%d", hdev->name, hdev->acl_mtu, hdev->acl_pkts);
++       BT_ERR("num_blks %d blk_size %d max_pkt_len %d", num_blks, blk_size, max_pkt_len);
++
++       hci_dev_unlock(hdev);
++
++}
++
++static void hci_cc_read_flow_control_mode(struct hci_dev *hdev, struct sk_buff *skb)
++{
++       struct hci_rp_read_flow_control_mode *rp = (void *)skb->data;
++
++       BT_DBG("%s status:0x%x", hdev->name, rp->status);
++}
++
++static void hci_cc_write_remote_amp_assoc(struct hci_dev *hdev, struct sk_buff *skb)
++{
++       struct hci_rp_write_remote_amp_assoc *rp = (void *)skb->data;
++       struct hci_phy_link *plink;
++
++       BT_DBG("%s status 0x%x", hdev->name, rp->status);
++
++       if (rp->status)
++               return;
++
++       hci_dev_lock(hdev);
++
++       plink = hci_phylink_lookup_handle(hdev, rp->handle);
++       if (plink) {
++               if (plink->remote_assoc.offset < plink->remote_assoc.len)
++                       hci_write_rmt_assoc(hdev, plink);
++               else if (plink->amp_role == HCI_AMP_ROLE_RESPONDER)
++                       hci_create_physical_link_cfm(hdev, rp->handle, HCI_CREATE_PHYLINK_PEND);
++       }
++       hci_dev_unlock(hdev);
++
++}
++
++static void hci_read_loc_assoc(struct hci_dev *hdev, __u8 phy_handle)
++{
++       struct hci_cp_read_local_amp_assoc cp;
++       struct amp_assoc *loc_assoc = &hdev->local_assoc;
++
++       cp.handle = phy_handle;
++       /*TODO: shall set this parameter to the "AMP_ASSOC_Size"
++       value returned from the remote device in the AMP Get Info Response, use A2MP MTU here right now. */
++       cp.max_remote_amp_assoc_len = cpu_to_le16(670);
++       cp.len_so_far = cpu_to_le16(loc_assoc->offset);
++       hci_send_cmd(hdev, HCI_OP_READ_LOCAL_AMP_ASSOC, sizeof(cp), &cp);
++}
++
++static void hci_cc_read_local_amp_assoc(struct hci_dev *hdev, struct sk_buff *skb)
++{
++       struct hci_rp_read_local_amp_assoc *rp = (void *)skb->data;
++       struct amp_assoc *loc_assoc = &hdev->local_assoc;
++       __u16 remain;
++       BT_DBG("%s status 0x%x", hdev->name, rp->status);
++
++       hci_dev_lock(hdev);
++
++       if (!rp->status) {
++               remain = __le16_to_cpu(rp->amp_assoc_remaining_len);
++               if (remain > HCI_MAX_AMP_ASSOC_FRAGMENT) {
++                       memcpy(loc_assoc->data + loc_assoc->offset, rp->amp_assoc_fragment, HCI_MAX_AMP_ASSOC_FRAGMENT);
++                       loc_assoc->offset += HCI_MAX_AMP_ASSOC_FRAGMENT;
++                       hci_read_loc_assoc(hdev, rp->handle);
++               } else {
++                       memcpy(loc_assoc->data + loc_assoc->offset, rp->amp_assoc_fragment, remain);
++                       loc_assoc->len = loc_assoc->offset + remain;
++                       loc_assoc->offset = 0;
++                       if (rp->handle == 0)
++                               hci_local_assoc_ind(hdev, rp->status);
++                       else
++                               hci_create_physical_link_cfm(hdev, rp->handle, HCI_CREATE_PHYLINK_PEND);
++               }
++       }
++
++       hci_dev_unlock(hdev);
++}
++
++static void hci_cc_read_local_amp_info(struct hci_dev *hdev, struct sk_buff *skb)
++{
++       struct hci_rp_read_local_amp_info *rp = (void *)skb->data;
++
++       BT_DBG("%s status:%d", hdev->name, rp->status);
++
++       hci_dev_lock(hdev);
++
++       if (!rp->status) {
++               hdev->ctrl_info.amp_status = rp->amp_status;
++               hdev->ctrl_info.total_bandwidth = __le32_to_cpu(rp->total_bandwidth);
++               hdev->ctrl_info.max_guaranteed_bandwidth = __le32_to_cpu(rp->max_guaranteed_bandwidth);
++               hdev->ctrl_info.min_latency = __le32_to_cpu(rp->min_latency);
++               hdev->ctrl_info.max_pdu_size = __le32_to_cpu(rp->max_pdu_size);
++               hdev->ctrl_info.ctrl_type = rp->controller_type;
++               hdev->ctrl_info.pal_caps = __le16_to_cpu(rp->pal_caps);
++               hdev->ctrl_info.max_assoc_len = __le16_to_cpu(rp->max_amp_assoc_len);
++               hdev->ctrl_info.max_flush_to = __le32_to_cpu(rp->max_flush_timeout);
++               hdev->ctrl_info.best_effort_flush_to = __le32_to_cpu(rp->best_effort_flush_timeout);
++       }
++       hci_local_info_ind(hdev, rp->status);
++
++       hci_dev_unlock(hdev);
++
++}
++
++void hci_read_local_amp_assoc(struct hci_dev *hdev)
++{
++       if (!test_bit(HCI_UP, &hdev->flags))
++               return;
++
++       hdev->local_assoc.len = 0;
++       hdev->local_assoc.offset = 0;
++       hci_read_loc_assoc(hdev, 0x00);
++}
++EXPORT_SYMBOL(hci_read_local_amp_assoc);
++
++static void hci_phylink_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
++{
++       struct hci_ev_physical_link_complete *ev = (void *)skb->data;
++
++       BT_DBG("%s status:%d handle:%d", hdev->name, ev->status, ev->handle);
++
++       hci_dev_lock(hdev);
++
++
++       if (!ev->status) {
++               struct hci_phy_link *plink = hci_phylink_lookup_handle(hdev, ev->handle);
++               if (plink)
++                       plink->state = BT_CONNECTED;
++       }
++
++       hci_create_physical_link_cfm(hdev, ev->handle, ev->status);
++
++       hci_dev_unlock(hdev);
++}
++
++static void hci_disconn_phylink_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
++{
++       struct hci_ev_disconn_physical_link_complete *ev = (void *)skb->data;
++       struct hci_phy_link *plink;
++
++       BT_DBG("%s status %d", hdev->name, ev->status);
++
++       hci_dev_lock(hdev);
++
++       plink = hci_phylink_lookup_handle(hdev, ev->handle);
++       if (plink) {
++               plink->state = BT_CLOSED;
++               hci_put_physical_link_cfm(hdev, ev->handle, ev->status, ev->reason);
++               hci_phylink_del(plink);
++       }
++       hci_dev_unlock(hdev);
++}
++
++static void hci_cs_create_phylink(struct hci_dev *hdev, __u8 status)
++{
++       struct hci_cp_create_physical_link *cp;
++       struct hci_phy_link *plink;
++
++       BT_DBG("%s status 0x%x", hdev->name, status);
++
++       cp = hci_sent_cmd_data(hdev, HCI_OP_CREATE_PHYSICAL_LINK);
++       if (!cp)
++               return;
++
++       hci_dev_lock(hdev);
++
++       plink = hci_phylink_lookup_handle(hdev, cp->handle);
++       if (plink) {
++               if (!status) {
++                       plink->remote_assoc.offset = 0;
++                       hci_write_rmt_assoc(hdev, plink);
++               } else {
++                       hci_create_physical_link_cfm(hdev, plink->handle, status);
++                       hci_phylink_del(plink);
++               }
++       }
++
++       hci_dev_unlock(hdev);
++}
++
++static void hci_cs_accept_phylink(struct hci_dev *hdev, __u8 status)
++{
++       struct hci_cp_accept_physical_link *cp;
++       struct hci_phy_link *plink;
++
++       BT_DBG("%s status 0x%x", hdev->name, status);
++
++       cp = hci_sent_cmd_data(hdev, HCI_OP_ACCEPT_PHYSICAL_LINK);
++       if (!cp)
++               return;
++
++       hci_dev_lock(hdev);
++
++       plink = hci_phylink_lookup_handle(hdev, cp->handle);
++
++       if (status) {
++               hci_create_physical_link_cfm(hdev, cp->handle, status);
++               if (plink)
++                       hci_phylink_del(plink);
++       } else {
++               if (plink) {
++                       plink->remote_assoc.offset = 0;
++                       hci_write_rmt_assoc(hdev, plink);
++               }
++       }
++
++       hci_dev_unlock(hdev);
++}
++
++static void hci_cs_disconn_phylink(struct hci_dev *hdev, __u8 status)
++{
++       struct hci_cp_disconn_physical_link *cp;
++
++       BT_DBG("%s status %d", hdev->name, status);
++
++       cp = hci_sent_cmd_data(hdev, HCI_OP_DISCONN_PHYSICAL_LINK);
++       if (!cp)
++               return;
++
++       hci_dev_lock(hdev);
++
++       if (status) {
++               struct hci_phy_link *plink;
++
++               hci_put_physical_link_cfm(hdev, cp->handle, status, cp->reason);
++               plink = hci_phylink_lookup_handle(hdev, cp->handle);
++               if (plink)
++                       hci_phylink_del(plink);
++       }
++
++       hci_dev_unlock(hdev);
++}
++
++static void hci_loglink_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
++{
++       struct hci_ev_logical_link_complete *ev = (void *)skb->data;
++       struct hci_phy_link *plink;
++       struct hci_conn *conn;
++
++       BT_DBG("%s status:%d", hdev->name, ev->status);
++       hci_dev_lock(hdev);
++
++       plink = hci_phylink_lookup_handle(hdev, ev->physical_link_handle);
++       if (plink) {
++               conn = hci_loglink_lookup_tx_flow_spec_id(plink, ev->tx_flow_spec_id);
++               if (conn) {
++                       if (!ev->status) {
++                               conn->state = BT_CONNECTED;
++                               conn->handle = ev->logical_link_handle;
++                       }
++                       if (conn->amp_role == HCI_AMP_ROLE_INITIATOR)
++                               hci_proto_loglink_create_cfm(conn, ev->status);
++                       else
++                               hci_proto_loglink_accept_cfm(conn, ev->status);
++               }
++       }
++       hci_dev_unlock(hdev);
++}
++
++static void hci_cs_create_loglink(struct hci_dev *hdev, __u8 status)
++{
++       struct hci_cp_create_logical_link *cp;
++
++       BT_DBG("%s status %d", hdev->name, status);
++
++       cp = hci_sent_cmd_data(hdev, HCI_OP_CREATE_LOGICAL_LINK);
++       if (!cp)
++               return;
++
++       hci_dev_lock(hdev);
++
++       if (status) {
++               struct hci_phy_link *plink;
++               struct hci_conn *conn;
++               plink = hci_phylink_lookup_handle(hdev, cp->handle);
++               if (plink) {
++                       conn = hci_loglink_lookup_tx_flow_spec_id(plink, cp->tx_flow_spec.id);
++                       if (conn) {
++                               hci_proto_loglink_create_cfm(conn, status);
++                               hci_loglink_del(conn);
++                       }
++               }
++       }
++
++       hci_dev_unlock(hdev);
++
++}
++
++static void hci_cs_accept_loglink(struct hci_dev *hdev, __u8 status)
++{
++       struct hci_cp_accept_logical_link *cp;
++
++       BT_DBG("%s status %d", hdev->name, status);
++
++       cp = hci_sent_cmd_data(hdev, HCI_OP_ACCEPT_LOGICAL_LINK);
++       if (!cp)
++               return;
++
++       hci_dev_lock(hdev);
++
++       if (status) {
++               struct hci_phy_link *plink;
++               struct hci_conn *conn;
++               plink = hci_phylink_lookup_handle(hdev, cp->handle);
++               if (plink) {
++                       conn = hci_loglink_lookup_tx_flow_spec_id(plink, cp->tx_flow_spec.id);
++                       if (conn) {
++                               hci_proto_loglink_create_cfm(conn, status);
++                               hci_loglink_del(conn);
++                       }
++               }
++       }
++
++       hci_dev_unlock(hdev);
++
++}
++
++static void hci_cs_disconn_loglink(struct hci_dev *hdev, __u8 status)
++{
++       struct hci_cp_disconn_logical_link *cp;
++
++       BT_DBG("%s status %d", hdev->name, status);
++
++       cp = hci_sent_cmd_data(hdev, HCI_OP_DISCONN_LOGICAL_LINK);
++       if (!cp)
++               return;
++
++       hci_dev_lock(hdev);
++       if (status) {
++               struct hci_conn *conn;
++               __u16 handle = __le16_to_cpu(cp->handle);
++               conn = hci_loglink_lookup_handle(hdev, handle);
++               if (conn) {
++                       if (conn->phylink->acl_link_state == BT_CONNECTED)
++                               hci_proto_loglink_put_cfm(conn, status);
++
++                       hci_loglink_del(conn);
++               }
++       }
++       hci_dev_unlock(hdev);
++}
++
++static void hci_loglink_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
++{
++       struct hci_ev_disconn_logical_link_complete *ev = (void *)skb->data;
++       struct hci_conn *conn;
++       __u16 handle;
++
++       BT_DBG("%s status %d", hdev->name, ev->status);
++
++       hci_dev_lock(hdev);
++
++       handle = __le16_to_cpu(ev->handle);
++       conn = hci_loglink_lookup_handle(hdev, handle);
++       if (conn) {
++               if (!ev->status)
++                       conn->state = BT_CLOSED;
++
++               if (conn->phylink->acl_link_state == BT_CONNECTED)
++                       hci_proto_loglink_put_cfm(conn, ev->status);
++
++               hci_loglink_del(conn);
++       }
++
++       hci_dev_unlock(hdev);
++
++}
++
++static void hci_cc_cancel_loglink(struct hci_dev *hdev, struct sk_buff *skb)
++{
++       struct hci_rp_logical_link_cancel *rp = (void *)skb->data;
++       struct hci_phy_link *plink;
++       struct hci_conn *conn;
++
++       BT_DBG("%s status %d", hdev->name,  rp->status);
++
++       hci_dev_lock(hdev);
++
++       plink = hci_phylink_lookup_handle(hdev, rp->handle);
++       if (plink) {
++               conn = hci_loglink_lookup_tx_flow_spec_id(plink, rp->tx_flow_spec_id);
++               if (conn) {
++                       if (!rp->status)
++                               conn->state = BT_CLOSED;
++
++                       if (conn->phylink->acl_link_state == BT_CONNECTED)
++                               hci_proto_loglink_put_cfm(conn, rp->status);
++
++                       hci_loglink_del(conn);
++               }
++       }
++
++       hci_dev_unlock(hdev);
++}
++
++static void hci_cs_flow_spec_modify(struct hci_dev *hdev, __u8 status)
++{
++       struct hci_cp_flow_spec_modify *cp;
++       struct hci_conn *conn;
++       __u16 handle;
++
++       BT_DBG("%s status %d", hdev->name, status);
++
++       cp = hci_sent_cmd_data(hdev, HCI_OP_FLOW_SPEC_MODIFY);
++       if (!cp)
++               return;
++
++       hci_dev_lock(hdev);
++
++       handle = __le16_to_cpu(cp->handle);
++       if (status) {
++               conn = hci_loglink_lookup_handle(hdev, handle);
++               if (conn) {
++                       hci_proto_loglink_modify_cfm(conn, status);
++               }
++       }
++
++       hci_dev_unlock(hdev);
++}
++
++static void hci_flow_spec_modify_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
++{
++       struct hci_ev_flow_spec_modify_complete *ev = (void *)skb->data;
++       struct hci_conn *conn;
++
++       conn = hci_loglink_lookup_handle(hdev, ev->handle);
++       if (conn)
++               hci_proto_loglink_modify_cfm(conn, ev->status);
++}
++
++static void hci_amp_status_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
++{
++       struct hci_ev_amp_status_change *ev = (void *)skb->data;
++       /* TODO: report amp status change event to amp mgr. */
++       (void) ev->status;
++       (void) ev->amp_status;
++       BT_ERR("%s status %d amp status %d", hdev->name, ev->status, ev->amp_status);
++}
++
++static void hci_num_comp_data_blocks_evt(struct hci_dev *hdev, struct sk_buff * skb)
++{
++       struct hci_ev_num_of_completed_data_blocks *ev = (void *)skb->data;
++       __le16 *ptr;
++       int i;
++
++       skb_pull(skb, sizeof(*ev));
++
++       BT_DBG("%s num_hnld %d", hdev->name, ev->num_handles);
++
++       if (skb->len < ev->num_handles * 6) {
++               BT_ERR("%s bad parameters", hdev->name);
++               return;
++       }
++
++       tasklet_disable(&hdev->tx_task);
++
++       for (i = 0, ptr = (__le16 *) skb->data; i < ev->num_handles; i++) {
++               struct hci_conn *conn;
++               __u16 handle, pkt_cnt, blk_cnt;
++
++               handle = get_unaligned_le16(ptr++);
++               pkt_cnt = get_unaligned_le16(ptr++);
++               blk_cnt = get_unaligned_le16(ptr++);
++               conn = hci_conn_hash_lookup_handle(hdev, handle);
++
++               BT_DBG("handle: 0x%x, conn:%p pkt_cnt:%d, blk_cnt:%d", handle,  conn, pkt_cnt, blk_cnt);
++               if (conn) {
++                       conn->sent -= pkt_cnt;
++                       hdev->acl_cnt += pkt_cnt;
++                       if (hdev->acl_cnt > hdev->acl_pkts)
++                               hdev->acl_cnt = hdev->acl_pkts;
++               }
++       }
++
++       tasklet_schedule(&hdev->tx_task);
++       tasklet_enable(&hdev->tx_task);
++
++}
++
+ static inline void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+        __u8 status = *((__u8 *) skb->data);
+@@ -1190,6 +1744,32 @@ static inline void hci_remote_features_evt(struct hci_dev *hdev, struct sk_buff
+        hci_dev_unlock(hdev);
+ }
+
++
++static inline void hci_flush_occurred_evt(struct hci_dev *hdev, struct sk_buff *skb)
++{
++       struct hci_ev_flush_occurred *ev = (void *) skb->data;
++       __u16 handle = __le16_to_cpu(ev->handle);
++
++       BT_DBG("%s handle 0x%x", hdev->name, handle);
++       BT_ERR("%s handle 0x%x", hdev->name, handle);
++
++       if (hdev->dev_type == HCI_80211) {
++               struct hci_conn *conn;
++
++               conn = hci_loglink_lookup_handle(hdev, handle);
++
++               if (!conn)
++                       return;
++
++               tasklet_disable(&hdev->tx_task);
++
++               hdev->acl_cnt = 0;
++
++               tasklet_schedule(&hdev->tx_task);
++               tasklet_enable(&hdev->tx_task);
++       }
++}
++
+ static inline void hci_remote_version_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+        BT_DBG("%s", hdev->name);
+@@ -1218,6 +1798,10 @@ static inline void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *sk
+                hci_cc_exit_periodic_inq(hdev, skb);
+                break;
+
++       case HCI_OP_LINK_KEY_REPLY:
++               hci_cc_link_key_reply(hdev, skb);
++               break;
++
+        case HCI_OP_REMOTE_NAME_REQ_CANCEL:
+                hci_cc_remote_name_req_cancel(hdev, skb);
+                break;
+@@ -1314,6 +1898,31 @@ static inline void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *sk
+                hci_cc_read_bd_addr(hdev, skb);
+                break;
+
++       case HCI_OP_READ_DATA_BLOCK_SIZE:
++               hci_cc_read_data_block_size(hdev, skb);
++               break;
++
++       case HCI_OP_READ_FLOW_CONTROL_MODE:
++               hci_cc_read_flow_control_mode(hdev, skb);
++               break;
++
++       case HCI_OP_WRITE_REMOTE_AMP_ASSOC:
++               hci_cc_write_remote_amp_assoc(hdev, skb);
++               break;
++
++       case HCI_OP_READ_LOCAL_AMP_INFO:
++               hci_cc_read_local_amp_info(hdev, skb);
++               break;
++
++       case HCI_OP_READ_LOCAL_AMP_ASSOC:
++               hci_cc_read_local_amp_assoc(hdev, skb);
++               break;
++
++       case HCI_OP_LOGICAL_LINK_CANCEL:
++               hci_cc_cancel_loglink(hdev, skb);
++               break;
++
++
+        default:
+                BT_DBG("%s opcode 0x%x", hdev->name, opcode);
+                break;
+@@ -1380,6 +1989,34 @@ static inline void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
+                hci_cs_exit_sniff_mode(hdev, ev->status);
+                break;
+
++       case HCI_OP_CREATE_PHYSICAL_LINK:
++               hci_cs_create_phylink(hdev, ev->status);
++               break;
++
++       case HCI_OP_ACCEPT_PHYSICAL_LINK:
++               hci_cs_accept_phylink(hdev, ev->status);
++               break;
++
++       case HCI_OP_DISCONN_PHYSICAL_LINK:
++               hci_cs_disconn_phylink(hdev, ev->status);
++               break;
++
++       case HCI_OP_CREATE_LOGICAL_LINK:
++               hci_cs_create_loglink(hdev, ev->status);
++               break;
++
++       case HCI_OP_ACCEPT_LOGICAL_LINK:
++               hci_cs_accept_loglink(hdev, ev->status);
++               break;
++
++       case HCI_OP_DISCONN_LOGICAL_LINK:
++               hci_cs_disconn_loglink(hdev, ev->status);
++               break;
++
++       case HCI_OP_FLOW_SPEC_MODIFY:
++               hci_cs_flow_spec_modify(hdev, ev->status);
++               break;
++
+        default:
+                BT_DBG("%s opcode 0x%x", hdev->name, opcode);
+                break;
+@@ -1522,7 +2159,11 @@ static inline void hci_link_key_notify_evt(struct hci_dev *hdev, struct sk_buff
+        conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
+        if (conn) {
+                hci_conn_hold(conn);
++
+                conn->disc_timeout = HCI_DISCONN_TIMEOUT;
++               memcpy(conn->link_key, ev->link_key, 16);
++               conn->key_type = ev->key_type;
++
+                hci_conn_put(conn);
+        }
+
+@@ -1822,6 +2463,25 @@ static inline void hci_remote_host_features_evt(struct hci_dev *hdev, struct sk_
+        hci_dev_unlock(hdev);
+ }
+
++static inline void hci_channel_selected_evt(struct hci_dev *hdev, struct sk_buff *skb)
++{
++       struct hci_ev_channel_selected *ev = (void *)skb->data;
++       struct hci_phy_link *plink;
++
++       BT_DBG("%s", hdev->name);
++
++       hci_dev_lock(hdev);
++       plink = hci_phylink_lookup_handle(hdev, ev->handle);
++       if (plink) {
++               hdev->local_assoc.len = 0;
++               hdev->local_assoc.offset = 0;
++
++               hci_read_loc_assoc(hdev, plink->handle);
++               plink->state = BT_CONNECT2;
++       }
++       hci_dev_unlock(hdev);
++}
++
+ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+        struct hci_event_hdr *hdr = (void *) skb->data;
+@@ -1958,6 +2618,42 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+                hci_remote_host_features_evt(hdev, skb);
+                break;
+
++       case HCI_EV_PHYSICAL_LINK_COMPLETE:
++               hci_phylink_complete_evt(hdev, skb);
++               break;
++
++       case HCI_EV_DISCONN_PHYSICAL_LINK_COMPLETE:
++               hci_disconn_phylink_complete_evt(hdev, skb);
++               break;
++
++       case HCI_EV_LOGICAL_LINK_COMPLETE:
++               hci_loglink_complete_evt(hdev, skb);
++               break;
++
++       case HCI_EV_DISCONN_LOGICAL_LINK_COMPLETE:
++               hci_loglink_disconn_complete_evt(hdev, skb);
++               break;
++
++       case HCI_EV_FLOW_SPEC_MODIFY_COMPLETE:
++               hci_flow_spec_modify_complete_evt(hdev, skb);
++               break;
++
++       case HCI_EV_AMP_STATUS_CHANGE:
++               hci_amp_status_change_evt(hdev, skb);
++               break;
++
++       case HCI_EV_NUM_OF_COMPLETED_DATA_BLOCKS:
++               hci_num_comp_data_blocks_evt(hdev, skb);
++               break;
++
++       case HCI_EV_CHANNEL_SELECTED:
++               hci_channel_selected_evt(hdev, skb);
++               break;
++
++       case HCI_EV_FLUSH_OCCURRED:
++               hci_flush_occurred_evt(hdev, skb);
++               break;
++
+        default:
+                BT_DBG("%s event 0x%x", hdev->name, event);
+                break;
 --
 1.6.3.3
 
