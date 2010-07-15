@@ -1,55 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 15 Jul 2010 11:43:08 -0700
-From: "Luis R. Rodriguez" <lrodriguez@atheros.com>
-To: "Gustavo F. Padovan" <gustavo@padovan.org>
-CC: Dan Tian <Dan.Tian@Atheros.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Haijun Liu <Haijun.Liu@Atheros.com>,
-	Luis Rodriguez <Luis.Rodriguez@Atheros.com>
-Subject: Re: [PATCH 1/3] Add BT3 AMP device support, by Atheros Linux BT3
- team.
-Message-ID: <20100715184308.GF1166@tux>
-References: <CDAFEDABF718A54BABD0DA5476695307CE881EC1@SHEXMB-01.global.atheros.com>
- <20100715150921.GA3188@vigoh>
-MIME-Version: 1.0
+From: "Perelet, Oleg" <operelet@quicinc.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Matt Wilson <mtwilson@codeaurora.org>,
+	Ron Shaffer <rshaffer@codeaurora.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 15 Jul 2010 10:23:48 -0700
+Subject: RE: [PATCH 3/3] Bluetooth: Synchronize SCO/eSCO connection requests
+ to ACL state
+Message-ID: <BCDE476F204B134B8B235FB275BC3AD810407AA252@NALASEXMB01.na.qualcomm.com>
+References: <1278625779.10421.80.camel@localhost.localdomain>
+	 <1278968772-29446-1-git-send-email-rshaffer@codeaurora.org>
+	 <1278972477.6282.10.camel@localhost.localdomain>
+	 <BCDE476F204B134B8B235FB275BC3AD810407AA0CD@NALASEXMB01.na.qualcomm.com>
+	 <1279135803.6282.58.camel@localhost.localdomain>
+	 ,<1279141191.5806.1.camel@linux-champ-06.qualcomm.com>
+	 <BCDE476F204B134B8B235FB275BC3AD810408D2A99@NALASEXMB01.na.qualcomm.com>
+ <1279174619.6282.63.camel@localhost.localdomain>
+In-Reply-To: <1279174619.6282.63.camel@localhost.localdomain>
 Content-Type: text/plain; charset="us-ascii"
-In-Reply-To: <20100715150921.GA3188@vigoh>
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Jul 15, 2010 at 08:09:21AM -0700, Gustavo F. Padovan wrote:
-> Hi Dan,
-> 
-> * Dan Tian <Dan.Tian@Atheros.com> [2010-07-15 15:37:32 +0800]:
-> 
-> > From 40cbfbf5c1bc9109364970956d9b6f74f5846c70 Mon Sep 17 00:00:00 2001
-> > From: Haijun.Liu <Haijun.Liu@Atheros.com>
-> > Date: Wed, 14 Jul 2010 22:50:56 +0800
-> > Subject: [PATCH 1/3] Add BT3 AMP device support, by Atheros Linux BT3 team.
-> > 
-> > 
-> > Signed-off-by: Haijun.Liu <Haijun.Liu@Atheros.com>
-> > ---
-> >  include/net/bluetooth/hci.h      |  342 +++++++++++++++++++-
-> >  include/net/bluetooth/hci_core.h |  264 ++++++++++++++-
-> >  net/bluetooth/cmtp/core.c        |    1 +
-> >  net/bluetooth/hci_conn.c         |  201 +++++++++++-
-> >  net/bluetooth/hci_core.c         |  349 ++++++++++++++++++--
-> >  net/bluetooth/hci_event.c        |  698 +++++++++++++++++++++++++++++++++++++-
-> >  6 files changed, 1822 insertions(+), 33 deletions(-)
-> 
-> 
-> Could you split all your patches in little chunks? +1882 is very hard to
-> review. And please be more verbose on the commit message, it can help us
-> figure out what's happening.
+>Also until the SCO setup is completed the SCO socket should
+>never be connected. So userspace can properly detect if SCO setup is in
+>progress and route it to the speaker with a proper audio policy. So I
+>think the emergency call argument is void. 
 
-This used to be 1 large patch, it was recently split up to 3, I havent't
-had a chance yet to review further but my understanding is this this was
-split up as much as possible in the last try. If you can provide suggestions
-how to split it up more that might be useful, but agreed, if possible more
-splitup would help.
+Way it works (most of opensource phone systems) - when phone is "connected" to HS/CarKit with no active Ccall ACL + RFCOMM (for AT commnds) is up, but SCO is down for power savings because there's no active audio. Physically audio is routed to HS all the time while HS ACL is up.
 
-Dan, can you also please drop the "by Atheros Linux BT3 team." on the subject
-of the patches. This is already implied by the From and the Signed-off-by.
+When you enter call state phone will attempt to establish SCO over existing ACL with audio still routed to BT - this is when things get screwed up. 
 
-  Luis
+several seconds later unsniff will fail, ACL will get messed up and disconnected and phone will switch to speaker.
+
+>So userspace can properly detect if SCO setup is in
+>progress and route it to the speaker with a proper audio policy.
+
+So during "normal" SCO setup (which can take up to 2.5 secs) you suggest to route audio back to speaker for 2.5 secs and then put it back to BT?:)
+
+
+Oleg.
