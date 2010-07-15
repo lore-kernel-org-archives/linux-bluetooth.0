@@ -1,67 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <AANLkTimpe_b4IpgRnTHWctF9XcYnb8vVmUCKGdn0_dKO@mail.gmail.com>
-References: <AANLkTinYIezHD8y4D4s9_awxjdqVV2NSp0f6Tmq1FEpa@mail.gmail.com>
-	<AANLkTimpe_b4IpgRnTHWctF9XcYnb8vVmUCKGdn0_dKO@mail.gmail.com>
-Date: Thu, 15 Jul 2010 12:08:42 +0530
-Message-ID: <AANLkTiluu5TW1IqAEJrzH9iO0QbJID1G19pd-7TSZ1sG@mail.gmail.com>
-Subject: Re: SSP Link key storing issue
-From: Prabhakaran Chandrasekara M <prvb86@motorola.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: RE: [PATCH 3/3] Bluetooth: Synchronize SCO/eSCO connection
+ requests to ACL state
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Perelet, Oleg" <operelet@quicinc.com>
+Cc: Matt Wilson <mtwilson@codeaurora.org>,
+	Ron Shaffer <rshaffer@codeaurora.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <BCDE476F204B134B8B235FB275BC3AD810408D2A99@NALASEXMB01.na.qualcomm.com>
+References: <1278625779.10421.80.camel@localhost.localdomain>
+	 <1278968772-29446-1-git-send-email-rshaffer@codeaurora.org>
+	 <1278972477.6282.10.camel@localhost.localdomain>
+	 <BCDE476F204B134B8B235FB275BC3AD810407AA0CD@NALASEXMB01.na.qualcomm.com>
+	 <1279135803.6282.58.camel@localhost.localdomain>
+	 ,<1279141191.5806.1.camel@linux-champ-06.qualcomm.com>
+	 <BCDE476F204B134B8B235FB275BC3AD810408D2A99@NALASEXMB01.na.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 15 Jul 2010 03:16:59 -0300
+Message-ID: <1279174619.6282.63.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Can some body please explain why the below check is considered while
-storing link key.
+Hi Oleg,
+
+> >> is there really a problem? The LMP will send an error via HCI. 
+> >
+> >The attempt to start SCO after the related ACL is no longer present
+> >makes no sense.
+> >
+> >Either after mode change event with no success or disconnection complete
+> >event the result is the same; there is no valid ACL to attempt
+> >SCO/eSCO.
+> >
+> >Error code 0x02 "unknown connection identifier" may apply for the
+> >command status event for setup synchronous connection command but the
+> >spec does not require it.
+> 
+> Security classification that this case fits is partial DOS for voice services, which is 
+> considered to be severe for emergency calls even for few seconds.
+> 
+> Depending on chip - It will take awhile (several seconds) before response will pop  
+> up  and then no matter what we'll still go over sco/esco setup at top of non existing ACL as Matt says.
+> 
+> Because whole thing is in kernel several seconds of audio may get lost before phone(userland) 
+> will realize that SCO failed and route audio to speaker, if ever:)
+> 
+> I'm not big fan of having all of this complication in kernel because of couple of screwed up headsets. 
+> There's no problem doing similar logic in userland with tight control over particular HS and timing. 
+
+this might break for a broken headset, but that is than a problem of the
+headset. Also until the SCO setup is completed the SCO socket should
+never be connected. So userspace can properly detect if SCO setup is in
+progress and route it to the speaker with a proper audio policy. So I
+think the emergency call argument is void. And broken headset is broken
+headset. If it wants to fail, it will fail eventually anyway. The patch
+gives it a chance to et this working without breaking other headsets. So
+disconnect event arriving on the ACL link and SCO setup pending is
+something we need to fix. That is correct. However that is a different
+issues actually. Since this can happen right now as well.
+
+Regards
+
+Marcel
 
 
-On Thu, Jul 15, 2010 at 10:25 AM, Prabhakaran Chandrasekara M
-<prvb86@motorola.com> wrote:
-> Hello All,
->
->  I am facing some problem with SSP pairing.
-> Sometimes Bluez does not store the Authenticated Combination link key
-> generated during pairing process And found the below code in
-> dbus-hci.c
-> hci_dbus_link_key_notify
->
-> /* Only store the link key if one of the following is true:
->      * 1. this is a legacy link key
->      * 2. this is a changed combination key and there was a previously
->      *    stored one
->      * 3. neither local nor remote side had no-bonding as a requirement
->      * 4. the local side had dedicated bonding as a requirement
->      * 5. the remote side is using dedicated bonding since in that case
->      *    also the local requirements are set to dedicated bonding
->      */
->
-> And from the logs found that, Bluez sets the Auth requirement as "no
-> bonding" and remote device sets the auth requirement as "General
-> Bonding", as a result of this pairing process "Authenticated
-> combination key" has been generated but not stored because of the
-> above mentioned check.
- (* 3. neither local nor remote side had no-bonding as a requirement)
-Forgot mention the Check.
->Hence for the reconnection or other profile
-> connections, Bluez would re initiate the pairing process which User
-> would not like.
->
-> Usecase:
-> Remote device was not paired, I initiated a2dp connection through dbus
-> commands to remote device, hence the l2cap security level is low and
-> auth requirement is set as "No Bonding" at kernel.
->
->
-> I could not find Specification points for this behavior.
->
-> Can some body explain why Bluez has this check (based on some
-> specification?) while storing link key.
->
-> Thanks,
-> Prabhakaran.
->
-
-
-Thanks,
-Prabhakaran.
