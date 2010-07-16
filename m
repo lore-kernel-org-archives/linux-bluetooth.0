@@ -1,25 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 16 Jul 2010 14:01:35 -0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Pacho Ramos <pacho@condmat1.ciencias.uniovi.es>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Subject: Re: bluez installs alsa related stuff under /etc/alsa instead of
- /usr/share/alsa
-Message-ID: <20100716170135.GA22166@jh-x301>
-References: <1270898905.5646.29.camel@localhost.localdomain>
- <1279276807.23291.0.camel@localhost.localdomain>
+Date: Fri, 16 Jul 2010 13:54:39 -0300
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Ville Tervo <ville.tervo@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Use default adapter for LE commands
+Message-ID: <20100716165439.GB21721@jh-x301>
+References: <1279274585-17730-1-git-send-email-ville.tervo@nokia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1279276807.23291.0.camel@localhost.localdomain>
+In-Reply-To: <1279274585-17730-1-git-send-email-ville.tervo@nokia.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Jul 16, 2010, Pacho Ramos wrote:
-> Can this be finally committed please? Thanks a lot :-)
+Hi Ville,
 
-It's strange the the patch has gone unnoticed ever since March. Anyway,
-could you please provide a git format-patch version of it since that's
-the convention for all patch submisions. That way I don't need to play
-manual tricks to get the git author name and email correct for the
-commit.
+On Fri, Jul 16, 2010, Ville Tervo wrote:
+> Choose default adapter if device was not specified on command line.
+> ---
+>  tools/hcitool.c |    9 +++++++++
+>  1 files changed, 9 insertions(+), 0 deletions(-)
+
+Thanks for the patch. It's now upstream.
 
 Johan
