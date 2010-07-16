@@ -1,80 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: bluez installs alsa related stuff under /etc/alsa instead of
- /usr/share/alsa
-From: Pacho Ramos <pacho@condmat1.ciencias.uniovi.es>
-Reply-To: pacho@condmat1.ciencias.uniovi.es
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1270898905.5646.29.camel@localhost.localdomain>
-References: <1270898905.5646.29.camel@localhost.localdomain>
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-yGYOE7GLJLK9xHGNEMDE"
-Date: Fri, 16 Jul 2010 12:40:06 +0200
-Message-ID: <1279276807.23291.0.camel@localhost.localdomain>
-Mime-Version: 1.0
+From: Ville Tervo <ville.tervo@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Ville Tervo <ville.tervo@nokia.com>
+Subject: [PATCH] Use default adapter for LE commands
+Date: Fri, 16 Jul 2010 13:03:05 +0300
+Message-Id: <1279274585-17730-1-git-send-email-ville.tervo@nokia.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Choose default adapter if device was not specified
+on command line.
+---
+ tools/hcitool.c |    9 +++++++++
+ 1 files changed, 9 insertions(+), 0 deletions(-)
 
---=-yGYOE7GLJLK9xHGNEMDE
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+diff --git a/tools/hcitool.c b/tools/hcitool.c
+index dfb749d..1a53a38 100644
+--- a/tools/hcitool.c
++++ b/tools/hcitool.c
+@@ -2435,6 +2435,9 @@ static void cmd_lescan(int dev_id, int argc, char **argv)
+ 		}
+ 	}
+ 
++	if (dev_id < 0)
++		dev_id = hci_get_route(NULL);
++
+ 	dd = hci_open_dev(dev_id);
+ 	if (dd < 0) {
+ 		perror("Could not open device");
+@@ -2504,6 +2507,9 @@ static void cmd_lecc(int dev_id, int argc, char **argv)
+ 		return;
+ 	}
+ 
++	if (dev_id < 0)
++		dev_id = hci_get_route(NULL);
++
+ 	dd = hci_open_dev(dev_id);
+ 	if (dd < 0) {
+ 		perror("Could not open device");
+@@ -2569,6 +2575,9 @@ static void cmd_ledc(int dev_id, int argc, char **argv)
+ 		return;
+ 	}
+ 
++	if (dev_id < 0)
++		dev_id = hci_get_route(NULL);
++
+ 	dd = hci_open_dev(dev_id);
+ 	if (dd < 0) {
+ 		perror("Could not open device");
+-- 
+1.7.0.1
 
-El s=C3=A1b, 10-04-2010 a las 13:28 +0200, Pacho Ramos escribi=C3=B3:
-> El vie, 05-03-2010 a las 10:24 +0100, Pacho Ramos escribi=C3=B3:
-> > El vie, 05-03-2010 a las 10:11 +0100, Pacho Ramos escribi=C3=B3:
-> > > El jue, 04-03-2010 a las 17:42 -0800, Marcel Holtmann escribi=C3=B3:
-> > > > Hi Pacho,
-> > > >=20
-> > > > > bluez installs stuff into /etc/alsa and it seems wrong since defa=
-ult
-> > > > > location for alsa stuff seems to be /usr/share/alsa instead. You =
-can
-> > > > > also see that this is been workarounded in ubuntu, gentoo (and pr=
-obably
-> > > > > debian also).
-> > > > >=20
-> > > > > Any reason why using /etc/alsa instead?
-> > > >=20
-> > > > I thought that is the default location. If that is wrong, then plea=
-se
-> > > > quote the ALSA documentation and send a patch to fix it.
-> > > >=20
-> > > > Regards
-> > > >=20
-> > > > Marcel
-> > >=20
-> > > alsa-lib configure.in seems to indicate that /usr/share/alsa is the
-> > > default one:
-> > > dnl ALSA configuration directory
-> > > AC_ARG_WITH(configdir,
-> > >     AS_HELP_STRING([--with-configdir=3Ddir],
-> > >         [path where ALSA config files are stored]),
-> > >     confdir=3D"$withval", confdir=3D"")
-> > > if test -z "$confdir"; then
-> > >     eval dir=3D"$datadir"
-> > >     case "$dir" in
-> > >     /*) ;;
-> > >     *) dir=3D"$prefix/share"
-> > >     esac
-> > >     confdir=3D"$dir/alsa"
-> > > fi
-> > >=20
-> >=20
-> > I forgot the patch, sorry
-> >=20
-
-Can this be finally committed please? Thanks a lot :-)
-
-
---=-yGYOE7GLJLK9xHGNEMDE
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.15 (GNU/Linux)
-
-iEYEABECAAYFAkxANwYACgkQCaWpQKGI+9TBfgCeJq9TIm+ahbvkt3gaCAeBs8qn
-mxgAn1aidXlh8vzwy6lwRf74FxMR1I32
-=/NC1
------END PGP SIGNATURE-----
-
---=-yGYOE7GLJLK9xHGNEMDE--
