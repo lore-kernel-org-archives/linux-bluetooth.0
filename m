@@ -1,29 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: Add Google's copyright to L2CAP
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1279307919-27801-1-git-send-email-padovan@profusion.mobi>
-References: <1279307919-27801-1-git-send-email-padovan@profusion.mobi>
-Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 16 Jul 2010 12:22:14 -0700
-Message-ID: <1279308134.6282.84.camel@localhost.localdomain>
-Mime-Version: 1.0
+Message-ID: <4C40AF95.4080505@gmail.com>
+Date: Fri, 16 Jul 2010 15:14:29 -0400
+From: Tim Bennett <tjbenne@gmail.com>
+MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org
+Subject: Secure Simple Pairing Mode - Setting NoInputNoOutput mode
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Is there a method (programmatic or hciconfig - type) to change the Mode of a
+BT v2.1 dongle to require NoInputNoOutput/JustWorks pairing?
 
-> Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
-> ---
->  include/net/bluetooth/l2cap.h |    1 +
->  net/bluetooth/l2cap.c         |    1 +
->  2 files changed, 2 insertions(+), 0 deletions(-)
+I want to make my box (running linux 2.6.30.2 kernel on an arm processor
+with Bluez 4.67 and a Broadcom v2.1 dongle) pair with another device in the
+"JustWorks" (NoInputNoOutput) mode.
 
-patch has been applied. Thanks.
+1. The SSP mode seems to default to "Numeric Comparison" mode.  I am trying
+to find out how to switch to "Just Works" (NoInputNoOutput mode)
+Can someone point me to a command or code that would switch my adapter into
+the NoInputNoOutput mode?
+Is it something I can configure through hciconfig or through a dbus command?
 
-Regards
+  2. The man page for hciconfig has the command hciconfig hciX sspmode
+[mode].  Is [mode] only valid for 0 or 1?
 
-Marcel
+In looking in hciconfig.c, at the
+hci_read_simple_pairing_mode/hci_write_simple_pairing_mode functions, there
+is no clear indication as to what the accepted values are for [mode}
 
+Tim Bennett
 
