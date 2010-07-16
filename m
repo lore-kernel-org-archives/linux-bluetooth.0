@@ -1,98 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: Haijun Liu <Haijun.Liu@Atheros.com>
+From: Dan Tian <Dan.Tian@Atheros.com>
 To: "Gustavo F. Padovan" <gustavo@padovan.org>,
 	Luis Rodriguez <Luis.Rodriguez@Atheros.com>
-CC: Dan Tian <Dan.Tian@Atheros.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Haijun Liu <Haijun.Liu@Atheros.com>,
 	Luis Rodriguez <Luis.Rodriguez@Atheros.com>
-Date: Fri, 16 Jul 2010 10:14:11 +0800
+Date: Fri, 16 Jul 2010 10:02:33 +0800
 Subject: RE: [PATCH 1/3] Add BT3 AMP device support, by Atheros Linux BT3
  team.
-Message-ID: <6AAC4214B9104E409FF4885ACB62A961B2B4F653@SHEXMB-01.global.atheros.com>
+Message-ID: <CDAFEDABF718A54BABD0DA5476695307CE8820A4@SHEXMB-01.global.atheros.com>
 References: <CDAFEDABF718A54BABD0DA5476695307CE881EC1@SHEXMB-01.global.atheros.com>
  <20100715150921.GA3188@vigoh> <20100715184308.GF1166@tux>
  <20100715194256.GA4307@vigoh>
 In-Reply-To: <20100715194256.GA4307@vigoh>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="gb2312"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
-
-[PATCH 1/3] is adding AMP device hci layer support, even it modify some code, but it doesn't affect BR/EDR original logic, so we can consider it as totally new.
-[PATCH 2/3] is adding AMP manager/A2MP protocol support, it is totally new.
-
-So in my thought these two patches can be considered as atomic patches.
-
-[PATCH 3/3] modify a lot of ERTM/Streaming mode code, but it's hard to split up, since they depends each other, so any comments for how to split is welcome. 
-
-Best Regards
-Haijun
-86-21-61820900 Ext. 6331 Work
-Haijun.Liu@Atheros.com
-Skype: liu.haijun
-
-
------Original Message-----
-From: Gustavo F. Padovan [mailto:gfpadovan@gmail.com] On Behalf Of Gustavo F. Padovan
-Sent: Friday, July 16, 2010 3:43 AM
-To: Luis Rodriguez
-Cc: Dan Tian; linux-bluetooth@vger.kernel.org; Haijun Liu; Luis Rodriguez
-Subject: Re: [PATCH 1/3] Add BT3 AMP device support, by Atheros Linux BT3 team.
-
-Hi Luis,
-
-* Luis R. Rodriguez <lrodriguez@atheros.com> [2010-07-15 11:43:08 -0700]:
-
-> On Thu, Jul 15, 2010 at 08:09:21AM -0700, Gustavo F. Padovan wrote:
-> > Hi Dan,
-> > 
-> > * Dan Tian <Dan.Tian@Atheros.com> [2010-07-15 15:37:32 +0800]:
-> > 
-> > > From 40cbfbf5c1bc9109364970956d9b6f74f5846c70 Mon Sep 17 00:00:00 2001
-> > > From: Haijun.Liu <Haijun.Liu@Atheros.com>
-> > > Date: Wed, 14 Jul 2010 22:50:56 +0800
-> > > Subject: [PATCH 1/3] Add BT3 AMP device support, by Atheros Linux BT3 team.
-> > > 
-> > > 
-> > > Signed-off-by: Haijun.Liu <Haijun.Liu@Atheros.com>
-> > > ---
-> > >  include/net/bluetooth/hci.h      |  342 +++++++++++++++++++-
-> > >  include/net/bluetooth/hci_core.h |  264 ++++++++++++++-
-> > >  net/bluetooth/cmtp/core.c        |    1 +
-> > >  net/bluetooth/hci_conn.c         |  201 +++++++++++-
-> > >  net/bluetooth/hci_core.c         |  349 ++++++++++++++++++--
-> > >  net/bluetooth/hci_event.c        |  698 +++++++++++++++++++++++++++++++++++++-
-> > >  6 files changed, 1822 insertions(+), 33 deletions(-)
-> > 
-> > 
-> > Could you split all your patches in little chunks? +1882 is very hard to
-> > review. And please be more verbose on the commit message, it can help us
-> > figure out what's happening.
-> 
-> This used to be 1 large patch, it was recently split up to 3, I havent't
-> had a chance yet to review further but my understanding is this this was
-> split up as much as possible in the last try. If you can provide suggestions
-> how to split it up more that might be useful, but agreed, if possible more
-> splitup would help.
-
-But it is still too big. I looked to patch 3/3, it does a lot different
-things in the same patch that make the patch impossible to be tracked.
-We need atomic patches for at least each change in the ERTM code, each
-new state added in the L2CAP state machine, each new HS feature, etc,
-i.e., we need proper patches with proper commit messages explaining
-what's happening. The same should apply to 1/3 and 2/3, I didn't looked
-to them.
-
-> 
-> Dan, can you also please drop the "by Atheros Linux BT3 team." on the subject
-> of the patches. This is already implied by the From and the Signed-off-by.
-
-Dan, your patches don't apply cleanly upstream, please rebase them
-against Marcel's bluetooth-next tree and do the proper split of the
-patches.
-
--- 
-Gustavo F. Padovan
-http://padovan.org
+T0suIFdlIHdpbGwgZG8gaXQuDQoNCkRhbg0KDQoNCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0t
+LS0NCkZyb206IEd1c3Rhdm8gRi4gUGFkb3ZhbiBbbWFpbHRvOmdmcGFkb3ZhbkBnbWFpbC5jb21d
+IE9uIEJlaGFsZiBPZiBHdXN0YXZvIEYuIFBhZG92YW4NClNlbnQ6IDIwMTDE6jfUwjE2yNUgMzo0
+Mw0KVG86IEx1aXMgUm9kcmlndWV6DQpDYzogRGFuIFRpYW47IGxpbnV4LWJsdWV0b290aEB2Z2Vy
+Lmtlcm5lbC5vcmc7IEhhaWp1biBMaXU7IEx1aXMgUm9kcmlndWV6DQpTdWJqZWN0OiBSZTogW1BB
+VENIIDEvM10gQWRkIEJUMyBBTVAgZGV2aWNlIHN1cHBvcnQsIGJ5IEF0aGVyb3MgTGludXggQlQz
+IHRlYW0uDQoNCkhpIEx1aXMsDQoNCiogTHVpcyBSLiBSb2RyaWd1ZXogPGxyb2RyaWd1ZXpAYXRo
+ZXJvcy5jb20+IFsyMDEwLTA3LTE1IDExOjQzOjA4IC0wNzAwXToNCg0KPiBPbiBUaHUsIEp1bCAx
+NSwgMjAxMCBhdCAwODowOToyMUFNIC0wNzAwLCBHdXN0YXZvIEYuIFBhZG92YW4gd3JvdGU6DQo+
+ID4gSGkgRGFuLA0KPiA+IA0KPiA+ICogRGFuIFRpYW4gPERhbi5UaWFuQEF0aGVyb3MuY29tPiBb
+MjAxMC0wNy0xNSAxNTozNzozMiArMDgwMF06DQo+ID4gDQo+ID4gPiBGcm9tIDQwY2JmYmY1YzFi
+YzkxMDkzNjQ5NzA5NTZkOWI2Zjc0ZjU4NDZjNzAgTW9uIFNlcCAxNyAwMDowMDowMCAyMDAxDQo+
+ID4gPiBGcm9tOiBIYWlqdW4uTGl1IDxIYWlqdW4uTGl1QEF0aGVyb3MuY29tPg0KPiA+ID4gRGF0
+ZTogV2VkLCAxNCBKdWwgMjAxMCAyMjo1MDo1NiArMDgwMA0KPiA+ID4gU3ViamVjdDogW1BBVENI
+IDEvM10gQWRkIEJUMyBBTVAgZGV2aWNlIHN1cHBvcnQsIGJ5IEF0aGVyb3MgTGludXggQlQzIHRl
+YW0uDQo+ID4gPiANCj4gPiA+IA0KPiA+ID4gU2lnbmVkLW9mZi1ieTogSGFpanVuLkxpdSA8SGFp
+anVuLkxpdUBBdGhlcm9zLmNvbT4NCj4gPiA+IC0tLQ0KPiA+ID4gIGluY2x1ZGUvbmV0L2JsdWV0
+b290aC9oY2kuaCAgICAgIHwgIDM0MiArKysrKysrKysrKysrKysrKysrLQ0KPiA+ID4gIGluY2x1
+ZGUvbmV0L2JsdWV0b290aC9oY2lfY29yZS5oIHwgIDI2NCArKysrKysrKysrKysrKy0NCj4gPiA+
+ICBuZXQvYmx1ZXRvb3RoL2NtdHAvY29yZS5jICAgICAgICB8ICAgIDEgKw0KPiA+ID4gIG5ldC9i
+bHVldG9vdGgvaGNpX2Nvbm4uYyAgICAgICAgIHwgIDIwMSArKysrKysrKysrKy0NCj4gPiA+ICBu
+ZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmMgICAgICAgICB8ICAzNDkgKysrKysrKysrKysrKysrKysr
+LS0NCj4gPiA+ICBuZXQvYmx1ZXRvb3RoL2hjaV9ldmVudC5jICAgICAgICB8ICA2OTggKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0NCj4gPiA+ICA2IGZpbGVzIGNoYW5nZWQs
+IDE4MjIgaW5zZXJ0aW9ucygrKSwgMzMgZGVsZXRpb25zKC0pDQo+ID4gDQo+ID4gDQo+ID4gQ291
+bGQgeW91IHNwbGl0IGFsbCB5b3VyIHBhdGNoZXMgaW4gbGl0dGxlIGNodW5rcz8gKzE4ODIgaXMg
+dmVyeSBoYXJkIHRvDQo+ID4gcmV2aWV3LiBBbmQgcGxlYXNlIGJlIG1vcmUgdmVyYm9zZSBvbiB0
+aGUgY29tbWl0IG1lc3NhZ2UsIGl0IGNhbiBoZWxwIHVzDQo+ID4gZmlndXJlIG91dCB3aGF0J3Mg
+aGFwcGVuaW5nLg0KPiANCj4gVGhpcyB1c2VkIHRvIGJlIDEgbGFyZ2UgcGF0Y2gsIGl0IHdhcyBy
+ZWNlbnRseSBzcGxpdCB1cCB0byAzLCBJIGhhdmVudCd0DQo+IGhhZCBhIGNoYW5jZSB5ZXQgdG8g
+cmV2aWV3IGZ1cnRoZXIgYnV0IG15IHVuZGVyc3RhbmRpbmcgaXMgdGhpcyB0aGlzIHdhcw0KPiBz
+cGxpdCB1cCBhcyBtdWNoIGFzIHBvc3NpYmxlIGluIHRoZSBsYXN0IHRyeS4gSWYgeW91IGNhbiBw
+cm92aWRlIHN1Z2dlc3Rpb25zDQo+IGhvdyB0byBzcGxpdCBpdCB1cCBtb3JlIHRoYXQgbWlnaHQg
+YmUgdXNlZnVsLCBidXQgYWdyZWVkLCBpZiBwb3NzaWJsZSBtb3JlDQo+IHNwbGl0dXAgd291bGQg
+aGVscC4NCg0KQnV0IGl0IGlzIHN0aWxsIHRvbyBiaWcuIEkgbG9va2VkIHRvIHBhdGNoIDMvMywg
+aXQgZG9lcyBhIGxvdCBkaWZmZXJlbnQNCnRoaW5ncyBpbiB0aGUgc2FtZSBwYXRjaCB0aGF0IG1h
+a2UgdGhlIHBhdGNoIGltcG9zc2libGUgdG8gYmUgdHJhY2tlZC4NCldlIG5lZWQgYXRvbWljIHBh
+dGNoZXMgZm9yIGF0IGxlYXN0IGVhY2ggY2hhbmdlIGluIHRoZSBFUlRNIGNvZGUsIGVhY2gNCm5l
+dyBzdGF0ZSBhZGRlZCBpbiB0aGUgTDJDQVAgc3RhdGUgbWFjaGluZSwgZWFjaCBuZXcgSFMgZmVh
+dHVyZSwgZXRjLA0KaS5lLiwgd2UgbmVlZCBwcm9wZXIgcGF0Y2hlcyB3aXRoIHByb3BlciBjb21t
+aXQgbWVzc2FnZXMgZXhwbGFpbmluZw0Kd2hhdCdzIGhhcHBlbmluZy4gVGhlIHNhbWUgc2hvdWxk
+IGFwcGx5IHRvIDEvMyBhbmQgMi8zLCBJIGRpZG4ndCBsb29rZWQNCnRvIHRoZW0uDQoNCj4gDQo+
+IERhbiwgY2FuIHlvdSBhbHNvIHBsZWFzZSBkcm9wIHRoZSAiYnkgQXRoZXJvcyBMaW51eCBCVDMg
+dGVhbS4iIG9uIHRoZSBzdWJqZWN0DQo+IG9mIHRoZSBwYXRjaGVzLiBUaGlzIGlzIGFscmVhZHkg
+aW1wbGllZCBieSB0aGUgRnJvbSBhbmQgdGhlIFNpZ25lZC1vZmYtYnkuDQoNCkRhbiwgeW91ciBw
+YXRjaGVzIGRvbid0IGFwcGx5IGNsZWFubHkgdXBzdHJlYW0sIHBsZWFzZSByZWJhc2UgdGhlbQ0K
+YWdhaW5zdCBNYXJjZWwncyBibHVldG9vdGgtbmV4dCB0cmVlIGFuZCBkbyB0aGUgcHJvcGVyIHNw
+bGl0IG9mIHRoZQ0KcGF0Y2hlcy4NCg0KLS0gDQpHdXN0YXZvIEYuIFBhZG92YW4NCmh0dHA6Ly9w
+YWRvdmFuLm9yZw0K
