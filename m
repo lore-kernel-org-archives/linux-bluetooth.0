@@ -1,48 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: Support for Atheros AR300x serial Bluetooth
- Chip
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Suraj Sumangala <suraj@atheros.com>
-Cc: linux-bluetooth@vger.kernel.org, Jothikumar.Mothilal@Atheros.com,
-	"Luis R. Rodriguez" <lrodriguez@atheros.com>
-In-Reply-To: <1279191250-5923-1-git-send-email-suraj@atheros.com>
-References: <1279191250-5923-1-git-send-email-suraj@atheros.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Sat, 17 Jul 2010 15:18:28 -0700
-Message-ID: <1279405108.6282.90.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: "Gustavo F. Padovan" <gfpadovan@gmail.com>
+Date: Sat, 17 Jul 2010 14:51:40 -0300
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
+To: Dan Carpenter <error27@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+	=?iso-8859-1?Q?Jo=E3o?= Paulo Rechi Vita <jprvita@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [patch] l2cap: fix signedness bugs
+Message-ID: <20100717175139.GF16892@vigoh>
+References: <20100717170548.GH17585@bicker>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20100717170548.GH17585@bicker>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Suraj,
+Hi Dan,
 
-> Implements Atheros AR300x Serial HCI protocol.
-> This protocol extends H4 serial protocol to implement enhanced power management
-> features supported by Atheros AR300x serial Bluetooth chipsets.
+* Dan Carpenter <error27@gmail.com> [2010-07-17 19:05:48 +0200]:
 
-<snip>
+> These variables are only used for math.  They should be from -63 to +63.
+> In the original code instead of being negative they would be largish
+> positive numbers.  I changed them to ints.
+> 
+> Signed-off-by: Dan Carpenter <error27@gmail.com>
+> 
+> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> index 1b682a5..4a13499 100644
+> --- a/net/bluetooth/l2cap.c
+> +++ b/net/bluetooth/l2cap.c
+> @@ -3795,7 +3795,7 @@ static inline int l2cap_data_channel_iframe(struct sock *sk, u16 rx_control, str
+>  	u8 tx_seq = __get_txseq(rx_control);
+>  	u8 req_seq = __get_reqseq(rx_control);
+>  	u8 sar = rx_control >> L2CAP_CTRL_SAR_SHIFT;
+> -	u8 tx_seq_offset, expected_tx_seq_offset;
+> +	int tx_seq_offset, expected_tx_seq_offset;
+>  	int num_to_ack = (pi->tx_win/6) + 1;
+>  	int err = 0;
+>  
+> @@ -4080,7 +4080,7 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+>  	struct sock *sk;
+>  	struct l2cap_pinfo *pi;
+>  	u16 control, len;
+> -	u8 tx_seq, req_seq, next_tx_seq_offset, req_seq_offset;
+> +	int tx_seq, req_seq, next_tx_seq_offset, req_seq_offset;
+>  
+>  	sk = l2cap_get_chan_by_scid(&conn->chan_list, cid);
+>  	if (!sk) {
 
-> +struct ath_struct {
-> +	struct hci_uart *hu;
-> +	unsigned int cur_sleep;
-> +
-> +	spinlock_t hciath_lock;
-> +	struct sk_buff *rx_skb;
-> +	struct sk_buff_head txq;
-> +	wait_queue_head_t wqevt;
-> +	struct work_struct ctxtsw;
-> +};
+I fixed this already. Thanks.
 
-I was going to merge this as it is, but then I did a usage check on your
-variables here and realized that you carry garbage around. I really
-would prefer if you guys start cleaning up your patches before blindly
-submitting them. I am not your janitor.
-
-So hciath_lock, rx_skb and wqevt are unused in the whole driver. Please
-remove them from the patch.
-
-Regards
-
-Marcel
-
-
+-- 
+Gustavo F. Padovan
+http://padovan.org
