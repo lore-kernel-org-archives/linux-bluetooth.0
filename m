@@ -1,49 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 18 Jul 2010 22:04:29 +0200
-From: "Marcel J.E. Mol" <marcel@mesa.nl>
-To: linux-bluetooth@vger.kernel.org
-Subject: obexd TARGET_SIZE question
-Message-ID: <20100718200429.GB17706@joshua.mesa.nl>
+Subject: Re: [PATCH] Bluetooth: Enable L2CAP Extended features by default
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Gustavo F. Padovan" <gustavo@padovan.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>
+In-Reply-To: <1279481154-4354-1-git-send-email-gustavo@padovan.org>
+References: <1279481154-4354-1-git-send-email-gustavo@padovan.org>
+Content-Type: text/plain; charset="UTF-8"
+Date: Sun, 18 Jul 2010 12:48:40 -0700
+Message-ID: <1279482520.4572.4.camel@localhost.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset*=utf-8''%E2%80%9Cus-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, 
+Hi Gustavo,
 
-I'm trying to understand a part of the obexd code, to see if somehow a
-IrMC server can be implemented. Pierre Ossman already started a bit on this.
+> Change the enable_ertm param to disable_ertm and default value to 0. That
+> means that L2CAP Extended features are enabled by default now.
+> 
+> Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+> ---
+>  net/bluetooth/l2cap.c |   18 +++++++++---------
+>  1 files changed, 9 insertions(+), 9 deletions(-)
 
-I am a bit confused about the obex_mime_type driver structure.
-The find_driver() function does a memcmp0(target, driver->target, TARGET_SIZE),
-but it seems not all drivers have target of size TARGET_SIZE.
+patch has been applied. Thanks.
 
-The syncevolution plugin has a target of size 11 (whereas TARGET_SIZE=16).
-So the find_driver() probably fails the memcmp0 for this driver as
-the extra 5 bytes to compare my be undefined...
-A IrMC Sync target will have a target_size of 9.
+> -module_param(enable_ertm, bool, 0644);
+> -MODULE_PARM_DESC(enable_ertm, "Enable enhanced retransmission mode");
+> +module_param(disable_ertm, bool, 0644);
+> +MODULE_PARM_DESC(disable_ertm, "Enable enhanced retransmission mode");
 
-I also noticed the obex_service_driver, which is handled in a similar
-way as the rbex_mime_type_driver. Forrest added a target_size element
-in for this struct (commit b38537e5f12decc4b2444112f4363ff1aa5326c6):
+And I fixed this to say "Disable enhanced ..." ;)
 
-	Forrest Zhao [Mon, 16 Nov 2009 07:17:47 +0000]
-	Introduce target_size to struct obex_service_driver{}
-	Because the OBEX target header length for each OBEX service layer
-	may not be the same.
+Regards
 
-Shouldn't the same happen for the obex_mime_type_driver() ?
-
-(actually Pierre Ossman did this in his local obexd tree to test IrMC
- which also has a different target size, I copied these changes in 
- a clone of obexd 0.29)
+Marcel
 
 
--Marcel
--- 
-     ======--------         Marcel J.E. Mol                MESA Consulting B.V.
-    =======---------        ph. +31-(0)6-54724868          P.O. Box 112
-    =======---------        marcel@mesa.nl                 2630 AC  Nootdorp
-__==== www.mesa.nl ---____U_n_i_x______I_n_t_e_r_n_e_t____ The Netherlands ____
- They couldn't think of a number,           Linux user 1148  --  counter.li.org
-    so they gave me a name!  -- Rupert Hine  --  www.ruperthine.com
