@@ -1,38 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
 Subject: Re: [PATCH 1/3] Add BT3 AMP device support, by Atheros Linux BT3
  team.
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: Dan Tian <Dan.Tian@Atheros.com>, linux-bluetooth@vger.kernel.org,
+From: Bastien Nocera <hadess@hadess.net>
+To: Dan Tian <Dan.Tian@Atheros.com>
+Cc: linux-bluetooth@vger.kernel.org,
 	Haijun Liu <Haijun.Liu@Atheros.com>,
 	Luis Rodriguez <Luis.Rodriguez@Atheros.com>
-In-Reply-To: <1279411461.2424.9.camel@localhost.localdomain>
+In-Reply-To: <CDAFEDABF718A54BABD0DA5476695307CE881EC1@SHEXMB-01.global.atheros.com>
 References: <CDAFEDABF718A54BABD0DA5476695307CE881EC1@SHEXMB-01.global.atheros.com>
-	 <1279411461.2424.9.camel@localhost.localdomain>
-Content-Type: text/plain; charset="UTF-8"
-Date: Sat, 17 Jul 2010 19:00:53 -0700
-Message-ID: <1279418453.6282.93.camel@localhost.localdomain>
+Content-Type: text/plain; charset="ISO-8859-1"
+Date: Sun, 18 Jul 2010 01:04:21 +0100
+Message-ID: <1279411461.2424.9.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+On Thu, 2010-07-15 at 15:37 +0800, Dan Tian wrote:
+> From 40cbfbf5c1bc9109364970956d9b6f74f5846c70 Mon Sep 17 00:00:00 2001
+> From: Haijun.Liu <Haijun.Liu@Atheros.com>
+> Date: Wed, 14 Jul 2010 22:50:56 +0800
+> Subject: [PATCH 1/3] Add BT3 AMP device support, by Atheros Linux BT3 team.
 
-> I'll take this opportunity to ask whether this chip is actually being
-> used in currently sold devices, because I'd quite like to add a BT3
-> device (or 2) to my collection.
+I'll take this opportunity to ask whether this chip is actually being
+used in currently sold devices, because I'd quite like to add a BT3
+device (or 2) to my collection.
 
-so in theory you can use a Bluetooth 2.1 controller and an AMP driven in
-software by mac80211 and you get a Bluetooth 3.0 + HS system.
-
-There are Bluetooth 3.0 controller (note the missing HS), but the
-difference to 2.1 is only an extra HCI command and some unicast support.
-Otherwise they are the same. For a 3.0 + HS system you need a WiFi
-controller that can act as a AMP as well. So essentially you see two HCI
-devices. One will be the BR/EDR the other the AMP.
-
-Regards
-
-Marcel
-
+Cheers
 
