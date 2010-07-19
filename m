@@ -1,55 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: RE: [PATCH 3/3] Bluetooth: Synchronize SCO/eSCO connection
- requests to ACL state
-From: Matt Wilson <mtwilson@codeaurora.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Ron Shaffer <rshaffer@codeaurora.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1279174425.6282.60.camel@localhost.localdomain>
-References: <1278625779.10421.80.camel@localhost.localdomain>
-	 <1278968772-29446-1-git-send-email-rshaffer@codeaurora.org>
-	 <1278972477.6282.10.camel@localhost.localdomain>
-	 <BCDE476F204B134B8B235FB275BC3AD810407AA0CD@NALASEXMB01.na.qualcomm.com>
-	 <1279135803.6282.58.camel@localhost.localdomain>
-	 <1279141191.5806.1.camel@linux-champ-06.qualcomm.com>
-	 <1279174425.6282.60.camel@localhost.localdomain>
-Content-Type: text/plain; charset="ISO-8859-1"
-Date: Mon, 19 Jul 2010 15:07:40 -0700
-Message-ID: <1279577260.16170.54.camel@linux-champ-06.qualcomm.com>
-Mime-Version: 1.0
+Date: Mon, 19 Jul 2010 16:48:53 -0300
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Move bit-field var to data->flags
+Message-ID: <20100719194853.GA14220@vigoh>
+References: <1279311633-12131-1-git-send-email-gustavo@padovan.org>
+ <AANLkTilHzxBXd2KemlUhfJPnqVjDS5eIbkC_JWc-aKwm@mail.gmail.com>
+ <20100719184017.GA13327@vigoh>
+ <AANLkTilbCpi-Dt-Pk1w3o7wahMNiAXIweC4xE1Y-skZ3@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <AANLkTilbCpi-Dt-Pk1w3o7wahMNiAXIweC4xE1Y-skZ3@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Anderson,
 
-> However what is up with the mode change. If that fails, we are still in
-> sniff mode and can just proceed with the SCO setup attempt. With the
-> broken hardware it will fail for sure, but with good behaving LM on the
-> remote side it might just get the device out of sniff mode at that point
-> and SCO setup can succeed.
+* Anderson Lizardo <anderson.lizardo@openbossa.org> [2010-07-19 15:03:33 -0400]:
+
+> On Mon, Jul 19, 2010 at 2:40 PM, Gustavo F. Padovan <gustavo@padovan.org> wrote:
+> >> On Fri, Jul 16, 2010 at 4:20 PM, Gustavo F. Padovan <gustavo@padovan.org> wrote:
+> >> > @@ -810,7 +810,7 @@ static void btusb_work(struct work_struct *work)
+> >> >        int err;
+> >> >
+> >> >        if (hdev->conn_hash.sco_num > 0) {
+> >> > -               if (!data->did_iso_resume) {
+> >> > +               if (!test_bit(BTUSB_DID_ISO_RESUME, &data->flags)) {
+> >> >                        err = usb_autopm_get_interface(data->isoc);
+> >> >                        if (err < 0) {
+> >> >                                clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+> >> > @@ -818,7 +818,7 @@ static void btusb_work(struct work_struct *work)
+> >> >                                return;
+> >> >                        }
+> >> >
+> >> > -                       data->did_iso_resume = 1;
+> >> > +                       set_bit(BTUSB_DID_ISO_RESUME, &data->flags);
+> >> >                }
+> >> >                if (data->isoc_altsetting != 2) {
+> >> >                        clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+> >>
+> >> Just wondering ... could test_and_set_bit() be used here (instead of
+> >> test_bit() + set_bit()) ?
+> >
+> > No, because usb_autopm_get_interface() can return a error. In that case
+> > we shall not set the bit.
 > 
-> Why do you imply that a mode change event with a failure means that the
-> ACL is no longer present?
+> Ok, but in this case looks like there is a clear_bit() already there.
 
-I was thinking the Mode Change event would carry a LMP response timeout
-or link supervision (LS) timeout status when the two devices lose
-synchronization while in sniff just after sending exit sniff LMP PDU
-(only baseband ACK). It is more clear when the LS timeout is greater
-than the 30 second (immutable) LMP response timeout.
+No, the clear_bit() clears the BTUSB_ISOC_RUNNING and not
+BTUSB_DID_ISO_RESUME that we are talking here.
 
-But reading the LMP spec (2.4.1) I conclude that the former cannot occur
-in the exit sniff scenario and the Disconnection Complete event is the
-only required event in the latter.
-
-I agree to wait until we have a clear and real scenario and then discuss
-further with those logs.
-
-Best regards,
-
--Matt
-
-Employee of the Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
-
-
-
+-- 
+Gustavo F. Padovan
+http://padovan.org
