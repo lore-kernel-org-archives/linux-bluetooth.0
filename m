@@ -1,158 +1,231 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Mon, 19 Jul 2010 13:23:18 +0200
-Message-ID: <AANLkTikxtNwbaiSRouqTwB1o7y4hFTRXJ_mejsBFeYKM@mail.gmail.com>
-Subject: Any update on software caused connection abort issue??
-From: john michelle <jhnmichelle@gmail.com>
+Message-Id: <201007190815.o6J8F4ib013820@joshua.mesa.nl>
+From: Marcel Mol <marcel@mesa.nl>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Date: Mon, 19 Jul 2010 09:44:39 +0200
+Subject: [PATCH] add variable target size support in obex_mime_type_driver_find()
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Any update on software caused connection abort issue
+targets for mime type drivers are not always fixed to TARGET_SIZE.
+(ifix started by Pierre Ossman)
 
+Signed-off-by: Marcel Mol <marcel@mesa.nl>
+---
+ plugins/filesystem.c    |    3 +++
+ plugins/nokia-backup.c  |    1 +
+ plugins/pbap.c          |    3 +++
+ plugins/syncevolution.c |    1 +
+ src/mimetype.c          |   14 ++++++++------
+ src/mimetype.h          |    2 ++
+ src/obex.c              |   10 ++++++++--
+ 7 files changed, 26 insertions(+), 8 deletions(-)
 
+diff --git a/plugins/filesystem.c b/plugins/filesystem.c
+index 9fe4f00..f0e5bbe 100644
+--- a/plugins/filesystem.c
++++ b/plugins/filesystem.c
+@@ -550,6 +550,7 @@ static struct obex_mime_type_driver file = {
+ 
+ static struct obex_mime_type_driver capability = {
+ 	.target = FTP_TARGET,
++	.target_size = TARGET_SIZE,
+ 	.mimetype = "x-obex/capability",
+ 	.open = capability_open,
+ 	.close = capability_close,
+@@ -558,6 +559,7 @@ static struct obex_mime_type_driver capability = {
+ 
+ static struct obex_mime_type_driver folder = {
+ 	.target = FTP_TARGET,
++	.target_size = TARGET_SIZE,
+ 	.mimetype = "x-obex/folder-listing",
+ 	.open = folder_open,
+ 	.close = string_free,
+@@ -566,6 +568,7 @@ static struct obex_mime_type_driver folder = {
+ 
+ static struct obex_mime_type_driver pcsuite = {
+ 	.target = FTP_TARGET,
++	.target_size = TARGET_SIZE,
+ 	.who = PCSUITE_WHO,
+ 	.who_size = PCSUITE_WHO_SIZE,
+ 	.mimetype = "x-obex/folder-listing",
+diff --git a/plugins/nokia-backup.c b/plugins/nokia-backup.c
+index dffc5cd..1fe3fc5 100644
+--- a/plugins/nokia-backup.c
++++ b/plugins/nokia-backup.c
+@@ -276,6 +276,7 @@ static ssize_t backup_write(void *object, const void *buf, size_t count)
+ 
+ static struct obex_mime_type_driver backup = {
+ 	.target = FTP_TARGET,
++	.target_size = TARGET_SIZE
+ 	.mimetype = "application/vnd.nokia-backup",
+ 	.open = backup_open,
+ 	.close = backup_close,
+diff --git a/plugins/pbap.c b/plugins/pbap.c
+index 3c8e33e..af4b452 100644
+--- a/plugins/pbap.c
++++ b/plugins/pbap.c
+@@ -861,6 +861,7 @@ static int vobject_close(void *object)
+ 
+ static struct obex_mime_type_driver mime_pull = {
+ 	.target = PBAP_TARGET,
++	.target_size = TARGET_SIZE,
+ 	.mimetype = "x-bt/phonebook",
+ 	.open = vobject_pull_open,
+ 	.close = vobject_close,
+@@ -869,6 +870,7 @@ static struct obex_mime_type_driver mime_pull = {
+ 
+ static struct obex_mime_type_driver mime_list = {
+ 	.target = PBAP_TARGET,
++	.target_size = TARGET_SIZE,
+ 	.mimetype = "x-bt/vcard-listing",
+ 	.open = vobject_list_open,
+ 	.close = vobject_close,
+@@ -877,6 +879,7 @@ static struct obex_mime_type_driver mime_list = {
+ 
+ static struct obex_mime_type_driver mime_vcard = {
+ 	.target = PBAP_TARGET,
++	.target_size = TARGET_SIZE,
+ 	.mimetype = "x-bt/vcard",
+ 	.open = vobject_vcard_open,
+ 	.close = vobject_close,
+diff --git a/plugins/syncevolution.c b/plugins/syncevolution.c
+index 55709df..970ce29 100644
+--- a/plugins/syncevolution.c
++++ b/plugins/syncevolution.c
+@@ -443,6 +443,7 @@ static ssize_t synce_write(void *object, const void *buf, size_t count)
+ 
+ static struct obex_mime_type_driver synce_driver = {
+ 	.target = SYNCML_TARGET,
++	.target_size = SYNCML_TARGET_SIZE,
+ 	.open = synce_open,
+ 	.close = synce_close,
+ 	.read = synce_read,
+diff --git a/src/mimetype.c b/src/mimetype.c
+index 7b96ec2..7df1308 100644
+--- a/src/mimetype.c
++++ b/src/mimetype.c
+@@ -118,6 +118,7 @@ static int set_io_watch(void *object, obex_object_io_func func,
+ }
+ 
+ static struct obex_mime_type_driver *find_driver(const uint8_t *target,
++				unsigned int target_size,
+ 				const char *mimetype, const uint8_t *who,
+ 				unsigned int who_size)
+ {
+@@ -126,7 +127,7 @@ static struct obex_mime_type_driver *find_driver(const uint8_t *target,
+ 	for (l = drivers; l; l = l->next) {
+ 		struct obex_mime_type_driver *driver = l->data;
+ 
+-		if (memcmp0(target, driver->target, TARGET_SIZE))
++		if (memcmp0(target, driver->target, target_size))
+ 			continue;
+ 
+ 		if (memcmp0(who, driver->who, who_size))
+@@ -140,27 +141,28 @@ static struct obex_mime_type_driver *find_driver(const uint8_t *target,
+ }
+ 
+ struct obex_mime_type_driver *obex_mime_type_driver_find(const uint8_t *target,
++				unsigned int target_size,
+ 				const char *mimetype, const uint8_t *who,
+ 				unsigned int who_size)
+ {
+ 	struct obex_mime_type_driver *driver;
+ 
+-	driver = find_driver(target, mimetype, who, who_size);
++	driver = find_driver(target, target_size, mimetype, who, who_size);
+ 	if (driver == NULL) {
+ 		if (who != NULL) {
+ 			/* Fallback to non-who specific */
+-			driver = find_driver(target, mimetype, NULL, 0);
++			driver = find_driver(target, target_size, mimetype, NULL, 0);
+ 			if (driver != NULL)
+ 				return driver;
+ 		}
+ 
+ 		if (mimetype != NULL)
+ 			/* Fallback to target default */
+-			driver = find_driver(target, NULL, NULL, 0);
++			driver = find_driver(target, target_size, NULL, NULL, 0);
+ 
+ 		if (driver == NULL)
+ 			/* Fallback to general default */
+-			driver = find_driver(NULL, NULL, NULL, 0);
++			driver = find_driver(NULL, 0, NULL, NULL, 0);
+ 	}
+ 
+ 	return driver;
+@@ -173,7 +175,7 @@ int obex_mime_type_driver_register(struct obex_mime_type_driver *driver)
+ 		return -EINVAL;
+ 	}
+ 
+-	if (find_driver(driver->target, driver->mimetype,
++	if (find_driver(driver->target, driver->target_size, driver->mimetype,
+ 					driver->who, driver->who_size)) {
+ 		error("Permission denied: %s could not be registered",
+ 				driver->mimetype);
+diff --git a/src/mimetype.h b/src/mimetype.h
+index 4cb3156..200b950 100644
+--- a/src/mimetype.h
++++ b/src/mimetype.h
+@@ -26,6 +26,7 @@ typedef gboolean (*obex_object_io_func) (void *object, int flags, int err,
+ 
+ struct obex_mime_type_driver {
+ 	const uint8_t *target;
++	unsigned int target_size;
+ 	const char *mimetype;
+ 	const uint8_t *who;
+ 	unsigned int who_size;
+@@ -42,6 +43,7 @@ struct obex_mime_type_driver {
+ int obex_mime_type_driver_register(struct obex_mime_type_driver *driver);
+ void obex_mime_type_driver_unregister(struct obex_mime_type_driver *driver);
+ struct obex_mime_type_driver *obex_mime_type_driver_find(const uint8_t *target,
++				unsigned int target_size,
+ 				const char *mimetype, const uint8_t *who,
+ 				unsigned int who_size);
+ 
+diff --git a/src/obex.c b/src/obex.c
+index db04bfd..21788ba 100644
+--- a/src/obex.c
++++ b/src/obex.c
+@@ -763,7 +763,9 @@ static void cmd_get(struct obex_session *os, obex_t *obex, obex_object_t *obj)
+ 			os->type = g_strndup((const char *) hd.bs, hlen);
+ 			DBG("OBEX_HDR_TYPE: %s", os->type);
+ 			os->driver = obex_mime_type_driver_find(
+-						os->service->target, os->type,
++						os->service->target,
++						os->service->target_size,
++						os->type,
+ 						os->service->who,
+ 						os->service->who_size);
+ 			break;
+@@ -772,6 +774,7 @@ static void cmd_get(struct obex_session *os, obex_t *obex, obex_object_t *obj)
+ 
+ 	if (os->type == NULL)
+ 		os->driver = obex_mime_type_driver_find(os->service->target,
++							os->service->target_size,
+ 							NULL,
+ 							os->service->who,
+ 							os->service->who_size);
+@@ -977,7 +980,9 @@ static gboolean check_put(obex_t *obex, obex_object_t *obj)
+ 			os->type = g_strndup((const char *) hd.bs, hlen);
+ 			DBG("OBEX_HDR_TYPE: %s", os->type);
+ 			os->driver = obex_mime_type_driver_find(
+-						os->service->target, os->type,
++						os->service->target,
++						os->service->target_size,
++						os->type,
+ 						os->service->who,
+ 						os->service->who_size);
+ 			break;
+@@ -1001,6 +1006,7 @@ static gboolean check_put(obex_t *obex, obex_object_t *obj)
+ 
+ 	if (os->type == NULL)
+ 		os->driver = obex_mime_type_driver_find(os->service->target,
++							os->service->target_size,
+ 							NULL,
+ 							os->service->who,
+ 							os->service->who_size);
+-- 
+1.7.1.1
 
->On Wed, Jun 23, 2010 at 12:48 AM, john michelle <jhnmichelle@gmail.com> wrote:
-> Dear Bluetooth community,
->
-> You are committing version after version and have time to add new
-> Features and the core stack have a major bug (software Caused
-> connection abort) that i
-> Have reported on the 7th of may the problem seems to be either in the
-> usb part of the
-> Kernel or the bluez stack, i am no kernel engineer so i came directly
-> to you for reporting
-> This problem and my requests to look into this problem are just
-> ignored. this is a blocker
-> Issue that would prevent and discourage any one from developing
-> application that rely on
-> Bluez sco capabilities, since during transmission the above mentioned
-> error just occurs.
-> I hope that my voice is heared and i would get a reply from the bluez community.
->
-> John
->
->
->
-> On Wed, Jun 16, 2010 at 3:11 PM, john michelle <jhnmichelle@gmail.com> wrote:
->> On Sun, May 30, 2010 at 1:12 PM, john michelle <jhnmichelle@gmail.com> wrote:
->>> Hi Gustavo,
->>>
->>>>> Please post the output of hcidump when the connection abort happens.
->>>>>
->>>
->>> Below is the output of hcidump the moments the software caused connection abort
->>>
->>> Dongle 1:
->>>> HCI Event: Number of Completed Packets (0x13) plen 5
->>>  . * . . .
->>> < HCI Command: Reset (0x03|0x0003) plen 0
->>> device: disconnected
->>>
->>> Dongle 2:
->>>> HCI Event: Number of Completed Packets (0x13) plen 5
->>>  . * . . .
->>> < HCI Command: Reset (0x03|0x0003) plen 0
->>> device: disconnected
->>>
->>>
->>> I think something triggers hci reset which causes this problem, but what exactly
->>> Triggers it i don't know.
->>>
->>>
->>> John
->>>
->>>
->>
->>
->> Hi all,
->>
->> Is anyone going to give this problem a try, it has been like a month now
->> This is a real problem in the bluez stack and someone have to look in this
->> Issue.
->>
->> John
->>
->>> On Mon, May 17, 2010 at 5:21 PM, john michelle <jhnmichelle@gmail.com> wrote:
->>>>> Hi Jonh,
->>>>>
->>>>> First of all, don't do top posting in this mailing list. ;)
->>>>>
->>>>
->>>> Thanks for the advise , will keep that in mind for future posts.
->>>>
->>>>> In which bluez/kernel version the problem started? Any hardware update
->>>>> during this time? The problem happens when you are already tranfering
->>>>> SCO data?
->>>>>
->>>>
->>>> I tried bluez versions 3.XX  and kernel 2.6.26(I think) the problem
->>>> occurs and the kernel panics with no core dumps.then i tried with
->>>> bluez 4.53-4.62 with
->>>> Kernel 2.6.31 and 2.6.32. the connection abort problem occurs but the
->>>> kernel doesn't
->>>> Panic. regarding the hardware update you mean the dongle or the box.Anyway
->>>> i changed both and tried different box's, this even happens on a box
->>>> with 2 giga ram
->>>> And core2 processor . as for the dongles i am using trust
->>>>
->>>> http://www.twenga.co.uk/prices-Bluetooth-2-USB-Adapter-10m-BT-2250p-TRUST-Wireless-network-card-adapter-176178-0
->>>>
->>>>  and also using no name dongles all the same problem.
->>>>
->>>>> Please post the output of hcidump when the connection abort happens.
->>>>>
->>>>
->>>> well that is going to be a hard one since i have more than one dongle in place
->>>> And very hard to predict which one will crash.i will work on this and update
->>>> You as soon as i have the hcidump log.
->>>>
->>>>
->>>>
->>>>> I tried reproduce this issue in L2CAP but it is a bit hard, lets
->>>>> say it happen once in a thousand, so it's not easy to track it. I have
->>>>> to try reproduce that using the SCO, but I'm not used to that layer yet.
->>>>> ;)
->>>>
->>>> I hoped that it happens 1 in 1000 in SCO , but it actually happens 1 in 15
->>>>
->>>>
->>>> John
->>>>
->>>>
->>>>
->>>>>
->>>>> Regards,
->>>>>
->>>>>>
->>>>>> John
->>>>>>
->>>>>> On Fri, May 7, 2010 at 3:53 PM, Gustavo F. Padovan <gustavo@padovan.org> wrote:
->>>>>> > * john michelle <jhnmichelle@gmail.com> [2010-05-07 15:49:05 -0400]:
->>>>>> >
->>>>>> >> Hi Bluetooth hackers,
->>>>>> >>
->>>>>> >> i am having this consistent problem with bluez , from time to time i
->>>>>> >> get the error Software caused connection abort (103 )
->>>>>> >> And the bluetooth stick seems to disconnect and reconnects. this
->>>>>> >> happens during an sco connection and it occurs even
->>>>>> >> More when i am having the voice stream comming through the internet
->>>>>> >> rather than the lan.i don't know what exact
->>>>>> >> Details you need to solve this problem please tell me and i will give
->>>>>> >> you an immediate reply . i have linux kernel 2.6.33 and bluez 4.62
->>>>>> >
->>>>>> > I get the same problem sometimes when testing ERTM with l2test. So the
->>>>>> > problem is on l2cap too. I didn't have time to debug this yet. Now that
->>>>>> > someone else have confirmed it too, I'll to take a look at the problem.
->>>>>> >
->>>>>> >>
->>>>>
->>>>> --
->>>>> Gustavo F. Padovan
->>>>> http://padovan.org
->>>>>
->>>>
->>>
->>
->
