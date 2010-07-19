@@ -1,231 +1,357 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <201007190815.o6J8F4ib013820@joshua.mesa.nl>
-From: Marcel Mol <marcel@mesa.nl>
-To: linux-bluetooth@vger.kernel.org
-Date: Mon, 19 Jul 2010 09:44:39 +0200
-Subject: [PATCH] add variable target size support in obex_mime_type_driver_find()
+From: Suraj Sumangala <suraj@atheros.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <Jothikumar.Mothilal@Atheros.com>,
+	Suraj Sumangala <suraj@atheros.com>
+Subject: [PATCH v2] Bluetooth: Support for Atheros AR300x serial Bluetooth Chip
+Date: Mon, 19 Jul 2010 12:34:07 +0530
+Message-ID: <1279523047-4638-1-git-send-email-suraj@atheros.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-targets for mime type drivers are not always fixed to TARGET_SIZE.
-(ifix started by Pierre Ossman)
+Implements Atheros AR300x Serial HCI protocol.
+This protocol extends H4 serial protocol to implement enhanced power management
+features supported by Atheros AR300x serial Bluetooth chipsets.
 
-Signed-off-by: Marcel Mol <marcel@mesa.nl>
+Signed-off-by: Suraj Sumangala <suraj@atheros.com>
 ---
- plugins/filesystem.c    |    3 +++
- plugins/nokia-backup.c  |    1 +
- plugins/pbap.c          |    3 +++
- plugins/syncevolution.c |    1 +
- src/mimetype.c          |   14 ++++++++------
- src/mimetype.h          |    2 ++
- src/obex.c              |   10 ++++++++--
- 7 files changed, 26 insertions(+), 8 deletions(-)
+ drivers/bluetooth/Kconfig     |   12 ++
+ drivers/bluetooth/Makefile    |    1 +
+ drivers/bluetooth/hci_ath.c   |  235 +++++++++++++++++++++++++++++++++++++++++
+ drivers/bluetooth/hci_ldisc.c |    6 +
+ drivers/bluetooth/hci_uart.h  |    8 ++-
+ 5 files changed, 261 insertions(+), 1 deletions(-)
+ create mode 100755 drivers/bluetooth/hci_ath.c
 
-diff --git a/plugins/filesystem.c b/plugins/filesystem.c
-index 9fe4f00..f0e5bbe 100644
---- a/plugins/filesystem.c
-+++ b/plugins/filesystem.c
-@@ -550,6 +550,7 @@ static struct obex_mime_type_driver file = {
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index 058fbcc..c35047f 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -58,6 +58,18 @@ config BT_HCIUART_BCSP
  
- static struct obex_mime_type_driver capability = {
- 	.target = FTP_TARGET,
-+	.target_size = TARGET_SIZE,
- 	.mimetype = "x-obex/capability",
- 	.open = capability_open,
- 	.close = capability_close,
-@@ -558,6 +559,7 @@ static struct obex_mime_type_driver capability = {
+ 	  Say Y here to compile support for HCI BCSP protocol.
  
- static struct obex_mime_type_driver folder = {
- 	.target = FTP_TARGET,
-+	.target_size = TARGET_SIZE,
- 	.mimetype = "x-obex/folder-listing",
- 	.open = folder_open,
- 	.close = string_free,
-@@ -566,6 +568,7 @@ static struct obex_mime_type_driver folder = {
++config BT_HCIUART_ATH3K
++	bool "Atheros AR300x serial Bluetooth support"
++	depends on BT_HCIUART
++	help
++	  HCIATH3K (HCI Atheros AR300x Protocol) is a serial protocol
++	  for communication between host and Atheros AR300x Bluetooth devices.
++	  This protocol enables AR300x Chips to be enabled with
++	  power management support.
++	  Enable this if you have Atheros AR300x serial Bluetooth device.
++
++	  Say Y here to compile support for HCI UART ATH3K protocol.
++
+ config BT_HCIUART_LL
+ 	bool "HCILL protocol support"
+ 	depends on BT_HCIUART
+diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
+index 7e5aed5..71bdf13 100644
+--- a/drivers/bluetooth/Makefile
++++ b/drivers/bluetooth/Makefile
+@@ -26,4 +26,5 @@ hci_uart-y				:= hci_ldisc.o
+ hci_uart-$(CONFIG_BT_HCIUART_H4)	+= hci_h4.o
+ hci_uart-$(CONFIG_BT_HCIUART_BCSP)	+= hci_bcsp.o
+ hci_uart-$(CONFIG_BT_HCIUART_LL)	+= hci_ll.o
++hci_uart-$(CONFIG_BT_HCIUART_ATH3K)	+= hci_ath.o
+ hci_uart-objs				:= $(hci_uart-y)
+diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
+new file mode 100755
+index 0000000..5ab258b
+--- /dev/null
++++ b/drivers/bluetooth/hci_ath.c
+@@ -0,0 +1,235 @@
++/*
++ *  Atheros Communication Bluetooth HCIATH3K UART protocol
++ *
++ *  HCIATH3K (HCI Atheros AR300x Protocol) is a Atheros Communication's
++ *  power management protocol extension to H4 to support AR300x Bluetooth Chip.
++ *
++ *  Copyright (c) 2009-2010 Atheros Communications Inc.
++ *
++ *  Acknowledgements:
++ *  This file is based on hci_h4.c, which was written
++ *  by Maxim Krasnyansky and Marcel Holtmann.
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ *
++ */
++
++#include <linux/module.h>
++#include <linux/kernel.h>
++
++#include <linux/init.h>
++#include <linux/slab.h>
++#include <linux/tty.h>
++#include <linux/errno.h>
++#include <linux/ioctl.h>
++#include <linux/skbuff.h>
++
++#include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci_core.h>
++
++#include "hci_uart.h"
++
++struct ath_struct {
++	struct hci_uart *hu;
++	unsigned int cur_sleep;
++
++	struct sk_buff_head txq;
++	struct work_struct ctxtsw;
++};
++
++static int ath_wakeup_ar3k(struct tty_struct *tty)
++{
++	struct termios settings;
++	int status = tty->driver->ops->tiocmget(tty, NULL);
++
++	if (status & TIOCM_CTS)
++		return status;
++
++	/* Disable Automatic RTSCTS */
++	n_tty_ioctl_helper(tty, NULL, TCGETS, (unsigned long)&settings);
++	settings.c_cflag &= ~CRTSCTS;
++	n_tty_ioctl_helper(tty, NULL, TCSETS, (unsigned long)&settings);
++
++	/* Clear RTS first */
++	status = tty->driver->ops->tiocmget(tty, NULL);
++	tty->driver->ops->tiocmset(tty, NULL, 0x00, TIOCM_RTS);
++	mdelay(20);
++
++	/* Set RTS, wake up board */
++	status = tty->driver->ops->tiocmget(tty, NULL);
++	tty->driver->ops->tiocmset(tty, NULL, TIOCM_RTS, 0x00);
++	mdelay(20);
++
++	status = tty->driver->ops->tiocmget(tty, NULL);
++
++	n_tty_ioctl_helper(tty, NULL, TCGETS, (unsigned long)&settings);
++	settings.c_cflag |= CRTSCTS;
++	n_tty_ioctl_helper(tty, NULL, TCSETS, (unsigned long)&settings);
++
++	return status;
++}
++
++static void ath_hci_uart_work(struct work_struct *work)
++{
++	int status;
++	struct ath_struct *ath;
++	struct hci_uart *hu;
++	struct tty_struct *tty;
++
++	ath = container_of(work, struct ath_struct, ctxtsw);
++
++	hu = ath->hu;
++	tty = hu->tty;
++
++	/* verify and wake up controller */
++	if (ath->cur_sleep) {
++		status = ath_wakeup_ar3k(tty);
++		if (!(status & TIOCM_CTS))
++			return;
++	}
++
++	/* Ready to send Data */
++	clear_bit(HCI_UART_SENDING, &hu->tx_state);
++	hci_uart_tx_wakeup(hu);
++}
++
++/* Initialize protocol */
++static int ath_open(struct hci_uart *hu)
++{
++	struct ath_struct *ath;
++
++	BT_DBG("hu %p", hu);
++
++	ath = kzalloc(sizeof(*ath), GFP_ATOMIC);
++	if (!ath)
++		return -ENOMEM;
++
++	skb_queue_head_init(&ath->txq);
++
++	hu->priv = ath;
++	ath->hu = hu;
++
++	INIT_WORK(&ath->ctxtsw, ath_hci_uart_work);
++
++	return 0;
++}
++
++/* Flush protocol data */
++static int ath_flush(struct hci_uart *hu)
++{
++	struct ath_struct *ath = hu->priv;
++
++	BT_DBG("hu %p", hu);
++
++	skb_queue_purge(&ath->txq);
++
++	return 0;
++}
++
++/* Close protocol */
++static int ath_close(struct hci_uart *hu)
++{
++	struct ath_struct *ath = hu->priv;
++
++	BT_DBG("hu %p", hu);
++
++	skb_queue_purge(&ath->txq);
++
++	cancel_work_sync(&ath->ctxtsw);
++
++	hu->priv = NULL;
++	kfree(ath);
++
++	return 0;
++}
++
++#define HCI_OP_ATH_SLEEP 0xFC04
++
++/* Enqueue frame for transmittion */
++static int ath_enqueue(struct hci_uart *hu, struct sk_buff *skb)
++{
++	struct ath_struct *ath = hu->priv;
++
++	if (bt_cb(skb)->pkt_type == HCI_SCODATA_PKT) {
++		kfree(skb);
++		return 0;
++	}
++
++	/*
++	 * Update power management enable flag with parameters of
++	 * HCI sleep enable vendor specific HCI command.
++	 */
++	if (bt_cb(skb)->pkt_type == HCI_COMMAND_PKT) {
++		struct hci_command_hdr *hdr = (void *)skb->data;
++
++		if (__le16_to_cpu(hdr->opcode) == HCI_OP_ATH_SLEEP)
++			ath->cur_sleep = skb->data[HCI_COMMAND_HDR_SIZE];
++	}
++
++	BT_DBG("hu %p skb %p", hu, skb);
++
++	/* Prepend skb with frame type */
++	memcpy(skb_push(skb, 1), &bt_cb(skb)->pkt_type, 1);
++
++	skb_queue_tail(&ath->txq, skb);
++	set_bit(HCI_UART_SENDING, &hu->tx_state);
++
++	schedule_work(&ath->ctxtsw);
++
++	return 0;
++}
++
++static struct sk_buff *ath_dequeue(struct hci_uart *hu)
++{
++	struct ath_struct *ath = hu->priv;
++
++	return skb_dequeue(&ath->txq);
++}
++
++/* Recv data */
++static int ath_recv(struct hci_uart *hu, void *data, int count)
++{
++	if (hci_recv_stream_fragment(hu->hdev, data, count) < 0)
++		BT_ERR("Frame Reassembly Failed");
++
++	return count;
++}
++
++static struct hci_uart_proto athp = {
++	.id = HCI_UART_ATH3K,
++	.open = ath_open,
++	.close = ath_close,
++	.recv = ath_recv,
++	.enqueue = ath_enqueue,
++	.dequeue = ath_dequeue,
++	.flush = ath_flush,
++};
++
++int ath_init(void)
++{
++	int err = hci_uart_register_proto(&athp);
++
++	if (!err)
++		BT_INFO("HCIATH3K protocol initialized");
++	else
++		BT_ERR("HCIATH3K protocol registration failed");
++
++	return err;
++}
++
++int ath_deinit(void)
++{
++	return hci_uart_unregister_proto(&athp);
++}
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index a57dbfc..998833d 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -552,6 +552,9 @@ static int __init hci_uart_init(void)
+ #ifdef CONFIG_BT_HCIUART_LL
+ 	ll_init();
+ #endif
++#ifdef CONFIG_BT_HCIUART_ATH3K
++	ath_init();
++#endif
  
- static struct obex_mime_type_driver pcsuite = {
- 	.target = FTP_TARGET,
-+	.target_size = TARGET_SIZE,
- 	.who = PCSUITE_WHO,
- 	.who_size = PCSUITE_WHO_SIZE,
- 	.mimetype = "x-obex/folder-listing",
-diff --git a/plugins/nokia-backup.c b/plugins/nokia-backup.c
-index dffc5cd..1fe3fc5 100644
---- a/plugins/nokia-backup.c
-+++ b/plugins/nokia-backup.c
-@@ -276,6 +276,7 @@ static ssize_t backup_write(void *object, const void *buf, size_t count)
- 
- static struct obex_mime_type_driver backup = {
- 	.target = FTP_TARGET,
-+	.target_size = TARGET_SIZE
- 	.mimetype = "application/vnd.nokia-backup",
- 	.open = backup_open,
- 	.close = backup_close,
-diff --git a/plugins/pbap.c b/plugins/pbap.c
-index 3c8e33e..af4b452 100644
---- a/plugins/pbap.c
-+++ b/plugins/pbap.c
-@@ -861,6 +861,7 @@ static int vobject_close(void *object)
- 
- static struct obex_mime_type_driver mime_pull = {
- 	.target = PBAP_TARGET,
-+	.target_size = TARGET_SIZE,
- 	.mimetype = "x-bt/phonebook",
- 	.open = vobject_pull_open,
- 	.close = vobject_close,
-@@ -869,6 +870,7 @@ static struct obex_mime_type_driver mime_pull = {
- 
- static struct obex_mime_type_driver mime_list = {
- 	.target = PBAP_TARGET,
-+	.target_size = TARGET_SIZE,
- 	.mimetype = "x-bt/vcard-listing",
- 	.open = vobject_list_open,
- 	.close = vobject_close,
-@@ -877,6 +879,7 @@ static struct obex_mime_type_driver mime_list = {
- 
- static struct obex_mime_type_driver mime_vcard = {
- 	.target = PBAP_TARGET,
-+	.target_size = TARGET_SIZE,
- 	.mimetype = "x-bt/vcard",
- 	.open = vobject_vcard_open,
- 	.close = vobject_close,
-diff --git a/plugins/syncevolution.c b/plugins/syncevolution.c
-index 55709df..970ce29 100644
---- a/plugins/syncevolution.c
-+++ b/plugins/syncevolution.c
-@@ -443,6 +443,7 @@ static ssize_t synce_write(void *object, const void *buf, size_t count)
- 
- static struct obex_mime_type_driver synce_driver = {
- 	.target = SYNCML_TARGET,
-+	.target_size = SYNCML_TARGET_SIZE,
- 	.open = synce_open,
- 	.close = synce_close,
- 	.read = synce_read,
-diff --git a/src/mimetype.c b/src/mimetype.c
-index 7b96ec2..7df1308 100644
---- a/src/mimetype.c
-+++ b/src/mimetype.c
-@@ -118,6 +118,7 @@ static int set_io_watch(void *object, obex_object_io_func func,
+ 	return 0;
  }
+@@ -569,6 +572,9 @@ static void __exit hci_uart_exit(void)
+ #ifdef CONFIG_BT_HCIUART_LL
+ 	ll_deinit();
+ #endif
++#ifdef CONFIG_BT_HCIUART_ATH3K
++	ath_deinit();
++#endif
  
- static struct obex_mime_type_driver *find_driver(const uint8_t *target,
-+				unsigned int target_size,
- 				const char *mimetype, const uint8_t *who,
- 				unsigned int who_size)
- {
-@@ -126,7 +127,7 @@ static struct obex_mime_type_driver *find_driver(const uint8_t *target,
- 	for (l = drivers; l; l = l->next) {
- 		struct obex_mime_type_driver *driver = l->data;
+ 	/* Release tty registration of line discipline */
+ 	if ((err = tty_unregister_ldisc(N_HCI)))
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index 9694d9d..99fb352 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -35,13 +35,14 @@
+ #define HCIUARTGETFLAGS		_IOR('U', 204, int)
  
--		if (memcmp0(target, driver->target, TARGET_SIZE))
-+		if (memcmp0(target, driver->target, target_size))
- 			continue;
+ /* UART protocols */
+-#define HCI_UART_MAX_PROTO	5
++#define HCI_UART_MAX_PROTO	6
  
- 		if (memcmp0(who, driver->who, who_size))
-@@ -140,27 +141,28 @@ static struct obex_mime_type_driver *find_driver(const uint8_t *target,
- }
+ #define HCI_UART_H4	0
+ #define HCI_UART_BCSP	1
+ #define HCI_UART_3WIRE	2
+ #define HCI_UART_H4DS	3
+ #define HCI_UART_LL	4
++#define HCI_UART_ATH3K	5
  
- struct obex_mime_type_driver *obex_mime_type_driver_find(const uint8_t *target,
-+				unsigned int target_size,
- 				const char *mimetype, const uint8_t *who,
- 				unsigned int who_size)
- {
- 	struct obex_mime_type_driver *driver;
+ #define HCI_UART_RAW_DEVICE	0
  
--	driver = find_driver(target, mimetype, who, who_size);
-+	driver = find_driver(target, target_size, mimetype, who, who_size);
- 	if (driver == NULL) {
- 		if (who != NULL) {
- 			/* Fallback to non-who specific */
--			driver = find_driver(target, mimetype, NULL, 0);
-+			driver = find_driver(target, target_size, mimetype, NULL, 0);
- 			if (driver != NULL)
- 				return driver;
- 		}
- 
- 		if (mimetype != NULL)
- 			/* Fallback to target default */
--			driver = find_driver(target, NULL, NULL, 0);
-+			driver = find_driver(target, target_size, NULL, NULL, 0);
- 
- 		if (driver == NULL)
- 			/* Fallback to general default */
--			driver = find_driver(NULL, NULL, NULL, 0);
-+			driver = find_driver(NULL, 0, NULL, NULL, 0);
- 	}
- 
- 	return driver;
-@@ -173,7 +175,7 @@ int obex_mime_type_driver_register(struct obex_mime_type_driver *driver)
- 		return -EINVAL;
- 	}
- 
--	if (find_driver(driver->target, driver->mimetype,
-+	if (find_driver(driver->target, driver->target_size, driver->mimetype,
- 					driver->who, driver->who_size)) {
- 		error("Permission denied: %s could not be registered",
- 				driver->mimetype);
-diff --git a/src/mimetype.h b/src/mimetype.h
-index 4cb3156..200b950 100644
---- a/src/mimetype.h
-+++ b/src/mimetype.h
-@@ -26,6 +26,7 @@ typedef gboolean (*obex_object_io_func) (void *object, int flags, int err,
- 
- struct obex_mime_type_driver {
- 	const uint8_t *target;
-+	unsigned int target_size;
- 	const char *mimetype;
- 	const uint8_t *who;
- 	unsigned int who_size;
-@@ -42,6 +43,7 @@ struct obex_mime_type_driver {
- int obex_mime_type_driver_register(struct obex_mime_type_driver *driver);
- void obex_mime_type_driver_unregister(struct obex_mime_type_driver *driver);
- struct obex_mime_type_driver *obex_mime_type_driver_find(const uint8_t *target,
-+				unsigned int target_size,
- 				const char *mimetype, const uint8_t *who,
- 				unsigned int who_size);
- 
-diff --git a/src/obex.c b/src/obex.c
-index db04bfd..21788ba 100644
---- a/src/obex.c
-+++ b/src/obex.c
-@@ -763,7 +763,9 @@ static void cmd_get(struct obex_session *os, obex_t *obex, obex_object_t *obj)
- 			os->type = g_strndup((const char *) hd.bs, hlen);
- 			DBG("OBEX_HDR_TYPE: %s", os->type);
- 			os->driver = obex_mime_type_driver_find(
--						os->service->target, os->type,
-+						os->service->target,
-+						os->service->target_size,
-+						os->type,
- 						os->service->who,
- 						os->service->who_size);
- 			break;
-@@ -772,6 +774,7 @@ static void cmd_get(struct obex_session *os, obex_t *obex, obex_object_t *obj)
- 
- 	if (os->type == NULL)
- 		os->driver = obex_mime_type_driver_find(os->service->target,
-+							os->service->target_size,
- 							NULL,
- 							os->service->who,
- 							os->service->who_size);
-@@ -977,7 +980,9 @@ static gboolean check_put(obex_t *obex, obex_object_t *obj)
- 			os->type = g_strndup((const char *) hd.bs, hlen);
- 			DBG("OBEX_HDR_TYPE: %s", os->type);
- 			os->driver = obex_mime_type_driver_find(
--						os->service->target, os->type,
-+						os->service->target,
-+						os->service->target_size,
-+						os->type,
- 						os->service->who,
- 						os->service->who_size);
- 			break;
-@@ -1001,6 +1006,7 @@ static gboolean check_put(obex_t *obex, obex_object_t *obj)
- 
- 	if (os->type == NULL)
- 		os->driver = obex_mime_type_driver_find(os->service->target,
-+							os->service->target_size,
- 							NULL,
- 							os->service->who,
- 							os->service->who_size);
+@@ -96,3 +97,8 @@ int bcsp_deinit(void);
+ int ll_init(void);
+ int ll_deinit(void);
+ #endif
++
++#ifdef CONFIG_BT_HCIUART_ATH3K
++int ath_init(void);
++int ath_deinit(void);
++#endif
 -- 
-1.7.1.1
+1.7.0.4
 
