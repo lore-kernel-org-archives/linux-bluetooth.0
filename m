@@ -1,50 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 19 Jul 2010 15:40:18 -0300
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Move bit-field var to data->flags
-Message-ID: <20100719184017.GA13327@vigoh>
-References: <1279311633-12131-1-git-send-email-gustavo@padovan.org>
- <AANLkTilHzxBXd2KemlUhfJPnqVjDS5eIbkC_JWc-aKwm@mail.gmail.com>
+Message-ID: <305068.42619.qm@web56501.mail.re3.yahoo.com>
+Date: Mon, 19 Jul 2010 11:45:35 -0700 (PDT)
+From: Shreesh Holla <hshreesh@yahoo.com>
+Subject: Re: [HCI Events] Connection Event  Processing
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org
+In-Reply-To: <1279564755.4572.31.camel@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <AANLkTilHzxBXd2KemlUhfJPnqVjDS5eIbkC_JWc-aKwm@mail.gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
 
-* Anderson Lizardo <anderson.lizardo@openbossa.org> [2010-07-19 13:19:52 -0400]:
 
-> Hi Gustavo,
+--- On Mon, 7/19/10, Marcel Holtmann <marcel@holtmann.org> wrote:
+
+> From: Marcel Holtmann <marcel@holtmann.org>
+> Subject: Re: [HCI Events] Connection Event  Processing
+> To: "Shreesh Holla" <hshreesh@yahoo.com>
+> Cc: "Johan Hedberg" <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org
+> Date: Monday, July 19, 2010, 11:39 AM
+> Hi Shreesh,
 > 
-> On Fri, Jul 16, 2010 at 4:20 PM, Gustavo F. Padovan <gustavo@padovan.org> wrote:
-> > @@ -810,7 +810,7 @@ static void btusb_work(struct work_struct *work)
-> >        int err;
-> >
-> >        if (hdev->conn_hash.sco_num > 0) {
-> > -               if (!data->did_iso_resume) {
-> > +               if (!test_bit(BTUSB_DID_ISO_RESUME, &data->flags)) {
-> >                        err = usb_autopm_get_interface(data->isoc);
-> >                        if (err < 0) {
-> >                                clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
-> > @@ -818,7 +818,7 @@ static void btusb_work(struct work_struct *work)
-> >                                return;
-> >                        }
-> >
-> > -                       data->did_iso_resume = 1;
-> > +                       set_bit(BTUSB_DID_ISO_RESUME, &data->flags);
-> >                }
-> >                if (data->isoc_altsetting != 2) {
-> >                        clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+> > Firstly, my intention has not been to be rude etc - I
+> really dont know what top posting is. But, if I have posted
+> something that has offended anyone - please excuse that and
+> as it was not intentional - only trying to figure out the
+> best approach to our issue.
 > 
-> Just wondering ... could test_and_set_bit() be used here (instead of
-> test_bit() + set_bit()) ?
+> and you did it again. Really? Just typing top-posting into
+> Google or
+> Wikipedia would have resulted in proper information:
+> 
+> http://en.wikipedia.org/wiki/Top_Posting
+> 
+> And while at it. Here is another nice read:
+> 
+> http://www.catb.org/~esr/faqs/smart-questions.html
+> 
+> And all of this is linked from bluez.org website:
+> 
+> http://www.bluez.org/development/lists/
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
 
-No, because usb_autopm_get_interface() can return a error. In that case
-we shall not set the bit.
+Marcel,
 
--- 
-Gustavo F. Padovan
-http://padovan.org
+I understand what it is now. I was really just using the default of Yahoo Mail. But shall follow this approach henceforth of bottom posting.
+
+Thanks,
+Shreesh
