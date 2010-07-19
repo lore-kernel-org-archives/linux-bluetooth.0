@@ -1,182 +1,161 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4C446DA6.7070509@aircable.net>
-Date: Mon, 19 Jul 2010 12:22:14 -0300
-From: Manuel Naranjo <manuel@aircable.net>
+From: Oliver Neukum <oneukum@suse.de>
+To: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH] bluetooth: retry reset for devices that fail
+Date: Mon, 19 Jul 2010 14:52:41 +0200
+Cc: linux-bluetooth@vger.kernel.org
+References: <201007151423.23245.oneukum@suse.de> <1279296636.6282.77.camel@localhost.localdomain>
+In-Reply-To: <1279296636.6282.77.camel@localhost.localdomain>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: BlueZ segfault on sdp resolving
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: Text/Plain;
+  charset="utf-8"
+Message-Id: <201007191452.41978.oneukum@suse.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi guys,
+Am Freitag, 16. Juli 2010, 18:10:36 schrieb Marcel Holtmann:
+> Hi Oliver,
+>=20
+> > Some devices fail to reset properly at the first attempt to reset
+> > them under unknown circumstances. Failures can be identified by
+> > an invalid btaddr. Retry in those cases.
+>=20
+> I am not sure about this. Can you provide some examples when this is
+> suppose to be happening. The empty BD_ADDR might not be a good indicator
+> for this.
 
-I had been tracing a BlueZ segfault for a few months all ready, the 
-other day I got an idea, I added some trace to the code just printed 
-which line got called (then I discover |-finstrument-functions from gcc)
+It happens with traces like this:
 
-Anyway, I run the test two times, and both times it died the same way, 
-here's the trace I got:
+ece2d0c0 1582934618 S Ii:2:003:1 -115:1 16 <
+ecd717c0 1582934818 S Bi:2:003:2 -115 1028 <
+f44c0340 1582934828 S Bi:2:003:2 -115 1028 <
+f44c02c0 1582934851 S Co:2:003:0 s 20 00 0000 0000 0003 3 =3D 030c00
+f44c02c0 1582935005 C Co:2:003:0 0 3 >
+ece2d0c0 1582938187 C Ii:2:003:1 0:1 6 =3D 0e040103 0c00
+ece2d0c0 1582938194 S Ii:2:003:1 -115:1 16 <
+ece2d740 1582938207 S Co:2:003:0 s 20 00 0000 0000 0003 3 =3D 031000
+ece2d740 1582938376 C Co:2:003:0 0 3 >
+ece2d0c0 1582940160 C Ii:2:003:1 0:1 14 =3D 0e0c0103 1000ffff 8ffe9bff 7987
+ece2d0c0 1582940163 S Ii:2:003:1 -115:1 16 <
+ecd71a40 1582940171 S Co:2:003:0 s 20 00 0000 0000 0003 3 =3D 011000
+ecd71a40 1582940286 C Co:2:003:0 0 3 >
+ece2d0c0 1582941179 C Ii:2:003:1 0:1 14 =3D 0e0c0101 100005e1 01050f00 0342
+ece2d0c0 1582941186 S Ii:2:003:1 -115:1 16 <
+ece2d1c0 1582941201 S Co:2:003:0 s 20 00 0000 0000 0003 3 =3D 051000
+ece2d1c0 1582941421 C Co:2:003:0 0 3 >
 
-bluetoothd[3551]: ../bluez-4.66/src/device.c:device_free()
-bluetoothd[3551]: ../bluez-4.66/src/device.c:device_free() 
-device_free(0x2cf17e8)
-bluetoothd[3551]: ../bluez-4.66/src/security.c:check_pending_hci_req()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:io_security_event()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:inquiry_complete()
-bluetoothd[3551]: ../bluez-4.66/src/manager.c:manager_find_adapter()
-bluetoothd[3551]: ../bluez-4.66/src/manager.c:adapter_cmp()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:check_pending_hci_req()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:io_security_event()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:cmd_status()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:check_pending_hci_req()
-bluetoothd[3551]: ../bluez-4.66/src/adapter.c:session_unref() 
-session_unref(0x2c99a68): ref=0
-bluetoothd[3551]: ../bluez-4.66/src/adapter.c:session_free() Discovery 
-session 0x2c99a68 with :1.247 deactivated
-bluetoothd[3551]: ../bluez-4.66/src/adapter.c:session_remove() Stopping 
-discovery
-bluetoothd[3551]: Stopping discovery
-bluetoothd[3551]: ../bluez-4.66/src/security.c:io_security_event()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:cmd_complete()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:inquiry_complete()
-bluetoothd[3551]: ../bluez-4.66/src/manager.c:manager_find_adapter()
-bluetoothd[3551]: ../bluez-4.66/src/manager.c:adapter_cmp()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:check_pending_hci_req()
-bluetoothd[3551]: ../bluez-4.66/src/device.c:device_address_cmp()
-....
-bluetoothd[3551]: ../bluez-4.66/src/device.c:device_address_cmp()
-bluetoothd[3551]: ../bluez-4.66/src/adapter.c:create_device() 
-create_device(00:25:E7:98:AB:57)
-bluetoothd[3551]: ../bluez-4.66/src/adapter.c:adapter_create_device() 
-adapter_create_device(00:25:E7:98:AB:57)
-bluetoothd[3551]: ../bluez-4.66/src/device.c:device_create()
-bluetoothd[3551]: ../bluez-4.66/src/device.c:device_create() Creating 
-device /org/bluez/3551/hci0/dev_00_25_E7_98_AB_57
-bluetoothd[3551]: ../bluez-4.66/src/device.c:btd_device_ref() 
-btd_device_ref(0x2cf3938): ref=1
-bluetoothd[3551]: ../bluez-4.66/src/device.c:device_get_path()
-....
-bluetoothd[3551]: ../bluez-4.66/src/device.c:device_get_path()
-bluetoothd[3551]: ../bluez-4.66/src/device.c:device_browse()
-bluetoothd[3551]: ../bluez-4.66/src/device.c:btd_device_ref() 
-btd_device_ref(0x2cf3938): ref=2
-bluetoothd[3551]: ../bluez-4.66/src/device.c:init_browse()
-bluetoothd[3551]: ../bluez-4.66/src/glib-helper.c:bt_search_service()
-bluetoothd[3551]: ../bluez-4.66/src/glib-helper.c:create_search_context()
-bluetoothd[3551]: ../bluez-4.66/src/glib-helper.c:get_sdp_session() new 
-(0x2ce2ce0)
-bluetoothd[3551]: ../bluez-4.66/src/glib-helper.c:search_context_ref() 
-(0x2cdd858) ref=1, src(0x2cdd858), dest(0x2cdd85e)
-bluetoothd[3551]: 
-../bluez-4.66/src/glib-helper.c:create_search_context() (0x2cdd858)
-bluetoothd[3551]: ../bluez-4.66/src/device.c:get_properties()
-bluetoothd[3551]: ../bluez-4.66/src/device.c:device_is_paired()
-bluetoothd[3551]: ../bluez-4.66/src/device.c:device_is_trusted()
-bluetoothd[3551]: ../bluez-4.66/src/device.c:get_properties()
-bluetoothd[3551]: ../bluez-4.66/src/device.c:device_is_paired()
-bluetoothd[3551]: ../bluez-4.66/src/device.c:device_is_trusted()
-bluetoothd[3551]: ../bluez-4.66/src/device.c:get_properties()
-bluetoothd[3551]: ../bluez-4.66/src/device.c:device_is_paired()
-bluetoothd[3551]: ../bluez-4.66/src/device.c:device_is_trusted()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:io_security_event()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:conn_complete()
-bluetoothd[3551]: ../bluez-4.66/src/manager.c:manager_find_adapter()
-bluetoothd[3551]: ../bluez-4.66/src/manager.c:adapter_cmp()
-bluetoothd[3551]: ../bluez-4.66/src/adapter.c:adapter_get_device() 
-adapter_get_device(00:25:E7:98:AB:57)
-bluetoothd[3551]: ../bluez-4.66/src/device.c:device_address_cmp()
-....
-bluetoothd[3551]: ../bluez-4.66/src/device.c:device_address_cmp()
-bluetoothd[3551]: ../bluez-4.66/src/device.c:device_add_connection()
-bluetoothd[3551]: ../bluez-4.66/src/device.c:device_set_connected()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:update_lastused()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:hci_req_data_new()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:hci_req_queue_append()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:hci_req_find_by_devid()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:hci_req_queue_process()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:hci_req_find_by_devid()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:check_pending_hci_req()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:hci_req_find_by_devid()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:io_security_event()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:cmd_status()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:check_pending_hci_req()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:hci_req_find_by_devid()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:io_security_event()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:cmd_status()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:check_pending_hci_req()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:hci_req_find_by_devid()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:io_security_event()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:cmd_status()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:check_pending_hci_req()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:hci_req_find_by_devid()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:io_security_event()
-bluetoothd[3551]: 
-../bluez-4.66/src/security.c:remote_features_information()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:get_bdaddr()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:check_pending_hci_req()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:hci_req_find_by_devid()
-bluetoothd[3551]: Discovery session 0x2cd6958 with :1.247 activated
-bluetoothd[3551]: ../bluez-4.66/src/adapter.c:session_ref() 
-session_ref(0x2cd6958): ref=1
-bluetoothd[3551]: ../bluez-4.66/src/security.c:io_security_event()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:remote_name_information()
-bluetoothd[3551]: ../bluez-4.66/src/manager.c:manager_find_adapter()
-bluetoothd[3551]: ../bluez-4.66/src/manager.c:adapter_cmp()
-bluetoothd[3551]: ../bluez-4.66/src/device.c:device_address_cmp()
-....
-bluetoothd[3551]: ../bluez-4.66/src/device.c:device_set_name()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:check_pending_hci_req()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:hci_req_find_by_devid()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:hci_req_queue_process()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:io_security_event()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:cmd_complete()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:start_inquiry()
-bluetoothd[3551]: ../bluez-4.66/src/manager.c:manager_find_adapter()
-bluetoothd[3551]: ../bluez-4.66/src/manager.c:adapter_cmp()
-bluetoothd[3551]: ../bluez-4.66/src/security.c:check_pending_hci_req()
-bluetoothd[3551]: ../bluez-4.66/src/glib-helper.c:connect_watch()
-bluetoothd[3551]: ../bluez-4.66/src/device.c:browse_cb()
-bluetoothd[3551]: ../bluez-4.66/src/device.c:search_cb()
+Even a second reset doesn't always help. If it works, ou get traces like th=
+is:
 
-Segmentation fault
+f37f35c0 3365799877 S Ii:2:003:1 -115:1 16 <
+ecd76ac0 3365800125 S Bi:2:003:2 -115 1028 <
+ecd76c40 3365800135 S Bi:2:003:2 -115 1028 <
 
-If I read the code then I see device.c gets into search_cb directly from 
-browse_cb in this piece
-/* If we have a valid response and req->search_uuid == 2, then L2CAP
-  * UUID & PNP searching was successful -- we are done */
-  if (err < 0 || (req->search_uuid == 2 && req->records)) {
-     if (err == -ECONNRESET && req->reconnect_attempt < 1) {
-         req->search_uuid--;
-         req->reconnect_attempt++;
-     } else
-         goto done;
-     }
+hci_init_req():
 
-...
-done:
-         search_cb(recs, err, user_data);
+ecd76d40 3365800155 S Co:2:003:0 s 20 00 0000 0000 0003 3 =3D 030c00
+ecd76d40 3365800280 C Co:2:003:0 0 3 >
 
-Problem is that device has been released by when search_cb does:
-if (err < 0) {
-     error("%s: error updating services: %s (%d)",
-           device->path, strerror(-err), -err);
-     goto send_reply;
-}
+HCI_OP_RESET
 
-The solution we found a few months ago was to make a slight change in 
-security.c, tell glib to do resources releasing with low priority:
-chan = g_io_channel_unix_new(dev);
-g_io_channel_set_close_on_unref(chan, TRUE);
-io_data[hdev].watch_id = g_io_add_watch_full(chan, G_PRIORITY_LOW,
-                         G_IO_IN | G_IO_NVAL | G_IO_HUP | G_IO_ERR,
-                         io_security_event, di, (GDestroyNotify) g_free);
+f37f35c0 3365804088 C Ii:2:003:1 0:1 6 =3D 0e040103 0c00
+f37f35c0 3365804097 S Ii:2:003:1 -115:1 16 <
 
 
-Still this is not enough. I think the problem is that the refcount is 
-broken, we're forgeting to do btd_device_ref under some circustances?
+ecd76d40 3365804119 S Co:2:003:0 s 20 00 0000 0000 0003 3 =3D 031000
+ecd76d40 3365804276 C Co:2:003:0 0 3 >
 
-I can mail the log if someone needs it.
+HCI_OP_READ_LOCAL_FEATURES
 
-Manuel
-|
+f37f35c0 3365805026 C Ii:2:003:1 0:1 14 =3D 0e0c0103 1000ffff 8ffe9bff 7987
+f37f35c0 3365805030 S Ii:2:003:1 -115:1 16 <
+
+
+ecd76240 3365805037 S Co:2:003:0 s 20 00 0000 0000 0003 3 =3D 011000
+ecd76240 3365805150 C Co:2:003:0 0 3 >
+
+HCI_OP_READ_LOCAL_VERSION
+
+f37f35c0 3365806027 C Ii:2:003:1 0:1 14 =3D 0e0c0101 100005e1 01050f00 0342
+f37f35c0 3365806030 S Ii:2:003:1 -115:1 16 <
+
+
+f45703c0 3365806037 S Co:2:003:0 s 20 00 0000 0000 0003 3 =3D 051000
+f45703c0 3365806152 C Co:2:003:0 0 3 >
+
+HCI_OP_READ_BUFFER_SIZE - no answer
+
+=2D-----------------------------------------------------------------------
+
+
+ecf40ec0 3395924102 S Co:2:003:0 s 20 00 0000 0000 0003 3 =3D 030c00
+ecf40ec0 3395924297 C Co:2:003:0 0 3 >
+
+Again HCI_OP_RESET <presumably from second command>
+
+f37f35c0 3395925197 C Ii:2:003:1 0:1 13 =3D 0e0b0105 1000fd03 40080001 00
+
+Here's the answer to HCI_OP_READ_BUFFER_SIZE
+
+f37f35c0 3395925204 S Ii:2:003:1 -115:1 16 <
+
+f37f35c0 3395928199 C Ii:2:003:1 0:1 6 =3D 0e040103 0c00
+
+Answer to the reset
+
+f37f35c0 3395928205 S Ii:2:003:1 -115:1 16 <
+
+
+f37f35c0 3395928277 C Ii:2:003:1 -2:1 0
+ecd76c40 3395928447 C Bi:2:003:2 -2 0
+ecd76ac0 3395928555 C Bi:2:003:2 -2 0
+f45709c0 3395928572 S Co:2:002:0 s 23 08 9032 0001 0000 0
+ecd76ac0 3395928601 S Ii:2:003:1 -115:1 16 <
+f45709c0 3395928742 C Co:2:002:0 0 0
+ecd76c40 3395928750 S Bi:2:003:2 -115 1028 <
+f37f35c0 3395928752 S Bi:2:003:2 -115 1028 <
+
+=46rom now on hci_init_req() that works is running:
+
+ecd66440 3395928764 S Co:2:003:0 s 20 00 0000 0000 0003 3 =3D 030c00
+ecd66440 3395929102 C Co:2:003:0 0 3 >
+
+Here's the reset
+HCI_OP_RESET
+
+ecd76ac0 3395932203 C Ii:2:003:1 0:1 6 =3D 0e040103 0c00
+ecd76ac0 3395932209 S Ii:2:003:1 -115:1 16 <
+
+f4578240 3395932223 S Co:2:003:0 s 20 00 0000 0000 0003 3 =3D 031000
+f4578240 3395932406 C Co:2:003:0 0 3 >
+
+HCI_OP_READ_LOCAL_FEATURES
+
+ecd76ac0 3395933198 C Ii:2:003:1 0:1 14 =3D 0e0c0103 1000ffff 8ffe9bff 7987
+ecd76ac0 3395933204 S Ii:2:003:1 -115:1 16 <
+
+ecd66640 3395933215 S Co:2:003:0 s 20 00 0000 0000 0003 3 =3D 011000
+ecd66640 3395933477 C Co:2:003:0 0 3 >
+
+HCI_OP_READ_LOCAL_VERSION
+
+ecd76ac0 3395934203 C Ii:2:003:1 0:1 14 =3D 0e0c0101 100005e1 01050f00 0342
+ecd76ac0 3395934208 S Ii:2:003:1 -115:1 16 <
+
+f4578340 3395934219 S Co:2:003:0 s 20 00 0000 0000 0003 3 =3D 051000
+f4578340 3395934439 C Co:2:003:0 0 3 >
+
+HCI_OP_READ_BUFFER_SIZE
+
+ecd76ac0 3395936200 C Ii:2:003:1 0:1 13 =3D 0e0b0105 1000fd03 40080001 00
+ecd76ac0 3395936206 S Ii:2:003:1 -115:1 16 <
+ecf6d7c0 3395936222 S Co:2:003:0 s 20 00 0000 0000 0003 3 =3D 091000
+ecf6d7c0 3395936452 C Co:2:003:0 0 3 >
+
+HCI_OP_READ_BD_ADDR
+
+ecd76ac0 3395937198 C Ii:2:003:1 0:1 12 =3D 0e0a0109 10004031 63132700
+
+requested bdaddr
+
+	Regards
+		Oliver
