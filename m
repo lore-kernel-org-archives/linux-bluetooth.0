@@ -1,84 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <gfpadovan@gmail.com>
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>
-Subject: [PATCH] Bluetooth: use __packed in drivers/bluetooth
-Date: Mon, 19 Jul 2010 13:54:05 -0300
-Message-Id: <1279558445-9910-1-git-send-email-gustavo@padovan.org>
+Subject: Re: [PATCH v2] Bluetooth: Support for Atheros AR300x serial
+ Bluetooth Chip
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Suraj Sumangala <suraj@atheros.com>
+Cc: linux-bluetooth@vger.kernel.org, Jothikumar.Mothilal@Atheros.com
+In-Reply-To: <1279523047-4638-1-git-send-email-suraj@atheros.com>
+References: <1279523047-4638-1-git-send-email-suraj@atheros.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Mon, 19 Jul 2010 09:44:06 -0700
+Message-ID: <1279557846.4572.20.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo F. Padovan <padovan@profusion.mobi>
+Hi Suraj,
 
-Use the __packed annotation instead of the __attribute__((packed)).
+> Implements Atheros AR300x Serial HCI protocol.
+> This protocol extends H4 serial protocol to implement enhanced power management
+> features supported by Atheros AR300x serial Bluetooth chipsets.
+> 
+> Signed-off-by: Suraj Sumangala <suraj@atheros.com>
+> ---
+>  drivers/bluetooth/Kconfig     |   12 ++
+>  drivers/bluetooth/Makefile    |    1 +
+>  drivers/bluetooth/hci_ath.c   |  235 +++++++++++++++++++++++++++++++++++++++++
+>  drivers/bluetooth/hci_ldisc.c |    6 +
+>  drivers/bluetooth/hci_uart.h  |    8 ++-
+>  5 files changed, 261 insertions(+), 1 deletions(-)
+>  create mode 100755 drivers/bluetooth/hci_ath.c
 
-Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
----
- drivers/bluetooth/bpa10x.c     |    2 +-
- drivers/bluetooth/btmrvl_drv.h |    4 ++--
- drivers/bluetooth/dtl1_cs.c    |    2 +-
- drivers/bluetooth/hci_ll.c     |    2 +-
- 4 files changed, 5 insertions(+), 5 deletions(-)
+patch has been applied. Thanks.
 
-diff --git a/drivers/bluetooth/bpa10x.c b/drivers/bluetooth/bpa10x.c
-index d945cd1..751b338 100644
---- a/drivers/bluetooth/bpa10x.c
-+++ b/drivers/bluetooth/bpa10x.c
-@@ -62,7 +62,7 @@ struct hci_vendor_hdr {
- 	__u8    type;
- 	__le16  snum;
- 	__le16  dlen;
--} __attribute__ ((packed));
-+} __packed;
- 
- static int bpa10x_recv(struct hci_dev *hdev, int queue, void *buf, int count)
- {
-diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
-index 872cb6c..90bda50 100644
---- a/drivers/bluetooth/btmrvl_drv.h
-+++ b/drivers/bluetooth/btmrvl_drv.h
-@@ -119,13 +119,13 @@ struct btmrvl_cmd {
- 	__le16 ocf_ogf;
- 	u8 length;
- 	u8 data[4];
--} __attribute__ ((packed));
-+} __packed;
- 
- struct btmrvl_event {
- 	u8 ec;		/* event counter */
- 	u8 length;
- 	u8 data[4];
--} __attribute__ ((packed));
-+} __packed;
- 
- /* Prototype of global function */
- 
-diff --git a/drivers/bluetooth/dtl1_cs.c b/drivers/bluetooth/dtl1_cs.c
-index ef044d5..cbe9e44 100644
---- a/drivers/bluetooth/dtl1_cs.c
-+++ b/drivers/bluetooth/dtl1_cs.c
-@@ -104,7 +104,7 @@ typedef struct {
- 	u8 type;
- 	u8 zero;
- 	u16 len;
--} __attribute__ ((packed)) nsh_t;	/* Nokia Specific Header */
-+} __packed nsh_t;	/* Nokia Specific Header */
- 
- #define NSHL  4				/* Nokia Specific Header Length */
- 
-diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
-index fb8445c..5744aba 100644
---- a/drivers/bluetooth/hci_ll.c
-+++ b/drivers/bluetooth/hci_ll.c
-@@ -74,7 +74,7 @@ enum hcill_states_e {
- 
- struct hcill_cmd {
- 	u8 cmd;
--} __attribute__((packed));
-+} __packed;
- 
- struct ll_struct {
- 	unsigned long rx_state;
--- 
-1.7.1.1
+Regards
+
+Marcel
+
+
