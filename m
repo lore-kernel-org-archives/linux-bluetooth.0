@@ -1,214 +1,132 @@
 Return-Path: <cyrus@holtmann.org>
 From: Inga Stotland <ingas@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: rshaffer@codeaurora.org,
-	johan.hedberg@gmail.com,
-	marcel@holtmann.org,
-	Inga Stotland <ingas@codeaurora.org>
-Subject: [PATCH 5/5] Extended support for generating dictionary value of service UUIDs
-Date: Tue, 20 Jul 2010 14:56:14 -0700
-Message-Id: <1279662974-16454-6-git-send-email-ingas@codeaurora.org>
+Cc: rshaffer@codeaurora.org, johan.hedberg@gmail.com,
+	marcel@holtmann.org, Inga Stotland <ingas@codeaurora.org>
+Subject: [PATCH 3/5] Update EIR whenever record is added or removed
+Date: Tue, 20 Jul 2010 14:56:12 -0700
+Message-Id: <1279662974-16454-4-git-send-email-ingas@codeaurora.org>
 In-Reply-To: <1279662974-16454-1-git-send-email-ingas@codeaurora.org>
 References: <1279662974-16454-1-git-send-email-ingas@codeaurora.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/adapter.c  |   95 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
- src/adapter.h  |    4 +-
- src/dbus-hci.c |    6 ++--
- 3 files changed, 97 insertions(+), 8 deletions(-)
+ plugins/service.c |   18 ++++++++++++++++++
+ src/adapter.c     |   23 ++++++++++++++++++++++-
+ src/adapter.h     |    1 +
+ 3 files changed, 41 insertions(+), 1 deletions(-)
 
+diff --git a/plugins/service.c b/plugins/service.c
+index 96280bd..ee9176b 100644
+--- a/plugins/service.c
++++ b/plugins/service.c
+@@ -445,6 +445,8 @@ static DBusMessage *update_record(DBusConnection *conn, DBusMessage *msg,
+ 				strerror(EIO));
+ 	}
+ 
++	adapter_update_eir_data(&src);
++
+ 	return dbus_message_new_method_return(msg);
+ }
+ 
+@@ -516,6 +518,7 @@ static DBusMessage *add_service_record(DBusConnection *conn,
+ 	const char *sender, *record;
+ 	dbus_uint32_t handle;
+ 	int err;
++	bdaddr_t bdaddr;
+ 
+ 	if (dbus_message_get_args(msg, NULL,
+ 			DBUS_TYPE_STRING, &record, DBUS_TYPE_INVALID) == FALSE)
+@@ -526,6 +529,13 @@ static DBusMessage *add_service_record(DBusConnection *conn,
+ 	if (err < 0)
+ 		return failed_strerror(msg, err);
+ 
++	if (serv_adapter->adapter)
++		adapter_get_address(serv_adapter->adapter, &bdaddr);
++	else
++		bacpy(&bdaddr, BDADDR_ANY);
++
++	adapter_update_eir_data(&bdaddr);
++
+ 	reply = dbus_message_new_method_return(msg);
+ 	if (!reply)
+ 		return NULL;
+@@ -550,6 +560,7 @@ static DBusMessage *remove_service_record(DBusConnection *conn,
+ 	struct service_adapter *serv_adapter = data;
+ 	dbus_uint32_t handle;
+ 	const char *sender;
++	bdaddr_t bdaddr;
+ 
+ 	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_UINT32, &handle,
+ 						DBUS_TYPE_INVALID) == FALSE)
+@@ -560,6 +571,13 @@ static DBusMessage *remove_service_record(DBusConnection *conn,
+ 	if (remove_record(conn, sender, serv_adapter, handle) < 0)
+ 		return not_available(msg);
+ 
++	if (serv_adapter->adapter)
++		adapter_get_address(serv_adapter->adapter, &bdaddr);
++	else
++		bacpy(&bdaddr, BDADDR_ANY);
++
++	adapter_update_eir_data(&bdaddr);
++
+ 	return dbus_message_new_method_return(msg);
+ }
+ 
 diff --git a/src/adapter.c b/src/adapter.c
-index b22b086..612c3a9 100644
+index 789a196..c1e1768 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -2763,8 +2763,84 @@ static void emit_device_found(const char *path, const char *address,
- 	g_dbus_send_message(connection, signal);
+@@ -820,7 +820,7 @@ static DBusMessage *set_pairable_timeout(DBusConnection *conn,
+ 
+ static void update_ext_inquiry_response(struct btd_adapter *adapter)
+ {
+-	uint8_t fec = 0, data[240];
++	uint8_t fec = 0, data[EIR_DATA_LENGTH];
+ 	struct hci_dev *dev = &adapter->dev;
+ 	int dd;
+ 
+@@ -846,6 +846,27 @@ static void update_ext_inquiry_response(struct btd_adapter *adapter)
+ 	hci_close_dev(dd);
  }
  
-+static int get_uuid_count_eir (uint8_t *eir_data)
++void adapter_update_eir_data(const bdaddr_t *src)
 +{
-+	uint8_t len = 0;
-+	int count = 0;
++	struct btd_adapter *adapter;
++	GSList *adapters;
 +
-+	while (len < EIR_DATA_LENGTH) {
-+		uint8_t type = eir_data[1];
-+		uint8_t field_len = eir_data[0];
-+		if ((type == EIR_UUID16_SOME) || (type == EIR_UUID16_ALL))
-+			count += field_len/2;
-+		else if ((type == EIR_UUID32_SOME) || (type == EIR_UUID32_ALL))
-+			count += field_len/4;
-+		else if ((type == EIR_UUID128_SOME) || (type == EIR_UUID128_ALL))
-+			count += field_len/16;
-+		len += field_len + 1;
-+		eir_data += field_len + 1;
-+	}
++	if (bacmp(src, BDADDR_ANY) != 0) {
++		adapter = manager_find_adapter(src);
++		if (adapter)
++			update_ext_inquiry_response(adapter);
++		else
++			error("Updating EIR failed: device not found");
++	} else {
 +
-+	return count;
-+}
-+
-+static void get_uuids_eir(char **uuids, uint8_t *eir_data)
-+{
-+	uint8_t len = 0;
-+
-+	/* Count UUID16, UUID32 and UUID128 */
-+	while (len < EIR_DATA_LENGTH) {
-+		uint8_t field_len = eir_data[0];
-+		uint8_t type = eir_data[1];
-+		int count;
-+		uuid_t service;
-+		int size;
-+		uint8_t *data = &eir_data[2];
-+		int i, k;
-+
-+		/* Generate uuids in SDP format (EIR data is Little Endian) */
-+		if ((type == EIR_UUID16_SOME) || (type == EIR_UUID16_ALL)) {
-+			size = 2;
-+			count = field_len/size;
-+			service.type = SDP_UUID16;
-+			for (i = 0; i < count; i++) {
-+				uint16_t val16 = data[1];
-+				val16 = (val16<<8) + data[0];
-+				service.value.uuid16 = val16;
-+				*uuids++ = bt_uuid2string(&service);
-+				data += size;
-+			}
-+		} else if ((type == EIR_UUID32_SOME) || (type == EIR_UUID32_ALL)) {
-+			size = 4;
-+			count = field_len/size;
-+			service.type = SDP_UUID32;
-+			for (i = 0; i < count; i++) {
-+				uint32_t val32 = data[3];
-+				for (k = size-2; k >= 0; k--)
-+					val32 = (val32<<8) + data[k];
-+				service.value.uuid32 = val32;
-+				*uuids++ = bt_uuid2string(&service);
-+				data += size;
-+			}
-+		} else if ((type == EIR_UUID128_SOME) || (type == EIR_UUID128_ALL)) {
-+			size = 16;
-+			count = field_len/size;
-+			service.type = SDP_UUID128;
-+			for (i = 0; i < count; i++) {
-+				for (k = 0; k < size; k++)
-+					service.value.uuid128.data[k] = data[size-k-1];
-+				*uuids++ = bt_uuid2string(&service);
-+				data += size;
-+			}
++		/* Update extended inquiry reponse for ANY adapter */
++		for (adapters = manager_get_adapters(); adapters; adapters = adapters->next) {
++			adapter = adapters->data;
++			update_ext_inquiry_response(adapter);
 +		}
-+
-+		len += field_len + 1;
-+		eir_data += field_len + 1;
 +	}
 +}
 +
- void adapter_emit_device_found(struct btd_adapter *adapter,
--				struct remote_dev_info *dev)
-+				struct remote_dev_info *dev, uint8_t *eir_data)
+ void adapter_set_class_complete(bdaddr_t *bdaddr, uint8_t status)
  {
- 	struct btd_device *device;
- 	char peer_addr[18], local_addr[18];
-@@ -2772,6 +2848,8 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
- 	dbus_bool_t paired = FALSE;
- 	dbus_int16_t rssi = dev->rssi;
- 	char *alias;
-+	char **uuids = NULL;
-+	int uuid_count = 0;
- 
- 	ba2str(&dev->bdaddr, peer_addr);
- 	ba2str(&adapter->bdaddr, local_addr);
-@@ -2791,6 +2869,15 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
- 	} else
- 		alias = g_strdup(dev->alias);
- 
-+	/* Extract UUIDs from extended inquiry response if any*/
-+	if (eir_data != NULL)
-+		uuid_count = get_uuid_count_eir(eir_data);
-+
-+	if (uuid_count > 0) {
-+		uuids = g_new0(char *, uuid_count + 1);
-+		get_uuids_eir(uuids, eir_data);
-+	}
-+
- 	emit_device_found(adapter->path, paddr,
- 			"Address", DBUS_TYPE_STRING, &paddr,
- 			"Class", DBUS_TYPE_UINT32, &dev->class,
-@@ -2800,15 +2887,17 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
- 			"Alias", DBUS_TYPE_STRING, &alias,
- 			"LegacyPairing", DBUS_TYPE_BOOLEAN, &dev->legacy,
- 			"Paired", DBUS_TYPE_BOOLEAN, &paired,
-+			"UUIDs", DBUS_TYPE_ARRAY, &uuids, uuid_count,
- 			NULL);
- 
- 	g_free(alias);
-+	g_strfreev(uuids);
- }
- 
- void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
- 				int8_t rssi, uint32_t class, const char *name,
- 				const char *alias, gboolean legacy,
--				name_status_t name_status)
-+				name_status_t name_status, uint8_t *eir_data)
- {
- 	struct remote_dev_info *dev, match;
- 
-@@ -2847,7 +2936,7 @@ done:
- 	adapter->found_devices = g_slist_sort(adapter->found_devices,
- 						(GCompareFunc) dev_rssi_cmp);
- 
--	adapter_emit_device_found(adapter, dev);
-+	adapter_emit_device_found(adapter, dev, eir_data);
- }
- 
- int adapter_remove_found_device(struct btd_adapter *adapter, bdaddr_t *bdaddr)
+ 	uint8_t class[3];
 diff --git a/src/adapter.h b/src/adapter.h
-index f72eb0b..231d2c9 100644
+index 8226514..f72eb0b 100644
 --- a/src/adapter.h
 +++ b/src/adapter.h
-@@ -113,10 +113,10 @@ struct remote_dev_info *adapter_search_found_devices(struct btd_adapter *adapter
- void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
- 				int8_t rssi, uint32_t class, const char *name,
- 				const char *alias, gboolean legacy,
--				name_status_t name_status);
-+				name_status_t name_status, uint8_t *eir_data);
- int adapter_remove_found_device(struct btd_adapter *adapter, bdaddr_t *bdaddr);
- void adapter_emit_device_found(struct btd_adapter *adapter,
--				struct remote_dev_info *dev);
-+				struct remote_dev_info *dev, uint8_t *eir_data);
- void adapter_update_oor_devices(struct btd_adapter *adapter);
- void adapter_mode_changed(struct btd_adapter *adapter, uint8_t scan_mode);
- void adapter_setname_complete(bdaddr_t *local, uint8_t status);
-diff --git a/src/dbus-hci.c b/src/dbus-hci.c
-index b83506f..6d27caa 100644
---- a/src/dbus-hci.c
-+++ b/src/dbus-hci.c
-@@ -515,7 +515,7 @@ void hcid_dbus_inquiry_result(bdaddr_t *local, bdaddr_t *peer, uint32_t class,
- 	if (dev) {
- 		adapter_update_found_devices(adapter, peer, rssi, class,
- 						NULL, NULL, dev->legacy,
--						NAME_NOT_REQUIRED);
-+						NAME_NOT_REQUIRED, data);
- 		return;
- 	}
+@@ -126,6 +126,7 @@ void adapter_service_insert(const bdaddr_t *bdaddr, void *rec);
+ void adapter_service_remove(const bdaddr_t *bdaddr, void *rec);
+ sdp_list_t *adapter_get_services(struct btd_adapter *adapter);
+ void adapter_set_class_complete(bdaddr_t *bdaddr, uint8_t status);
++void adapter_update_eir_data(const bdaddr_t *src);
  
-@@ -566,7 +566,7 @@ void hcid_dbus_inquiry_result(bdaddr_t *local, bdaddr_t *peer, uint32_t class,
- 
- 	/* add in the list to track name sent/pending */
- 	adapter_update_found_devices(adapter, peer, rssi, class, name, alias,
--					legacy, name_status);
-+					legacy, name_status, data);
- 
- 	g_free(name);
- 	g_free(alias);
-@@ -642,7 +642,7 @@ void hcid_dbus_remote_name(bdaddr_t *local, bdaddr_t *peer, uint8_t status,
- 	if (dev_info) {
- 		g_free(dev_info->name);
- 		dev_info->name = g_strdup(name);
--		adapter_emit_device_found(adapter, dev_info);
-+		adapter_emit_device_found(adapter, dev_info, NULL);
- 	}
- 
- 	if (device)
+ struct agent *adapter_get_agent(struct btd_adapter *adapter);
+ void adapter_add_connection(struct btd_adapter *adapter,
 -- 
 1.7.1
 
