@@ -1,83 +1,209 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: Defer SCO setup if mode change is pending
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Ron Shaffer <rshaffer@codeaurora.org>
+MIME-Version: 1.0
+In-Reply-To: <AANLkTimLpLxxSwtUDledlnF3zOIVqtFP67KyoyAMGD_s@mail.gmail.com>
+References: <AANLkTikcX6_SydJf4YRG3ym4Q0GVGQ26WpAh3Mm1uyyQ@mail.gmail.com>
+	<AANLkTilJNclAEoLpJnUDkHHiwpynoSpIXErJnYpHF6aF@mail.gmail.com>
+	<AANLkTiltkfeX0iT2qwmIIlg8t4xO5iqoS2qtvbMZkZCA@mail.gmail.com>
+	<AANLkTimicKT1FS2G3MDtVha5AWLp_wV2rtW35MfHFro6@mail.gmail.com>
+	<AANLkTikk6EAI4TTvm2YJCkDnEiwRDp-4km1TKQ8yomvx@mail.gmail.com>
+	<AANLkTimLpLxxSwtUDledlnF3zOIVqtFP67KyoyAMGD_s@mail.gmail.com>
+Date: Tue, 20 Jul 2010 16:58:31 +0300
+Message-ID: <AANLkTinr0HLVGAkx1wnbSSRQlz6L53pUv83Sr0voYw6V@mail.gmail.com>
+Subject: Re: obex-client: doesn't allways closes socket
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Vitja Makarov <vitja.makarov@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <4C45299D.9060504@codeaurora.org>
-References: <1279562776-12901-1-git-send-email-marcel@holtmann.org>
-	 <4C45299D.9060504@codeaurora.org>
-Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 20 Jul 2010 09:56:01 -0700
-Message-ID: <1279644961.4572.60.camel@localhost.localdomain>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ron,
+Hi,
 
-> > @@ -385,10 +406,13 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
-> >  		acl->power_save = 1;
-> >  		hci_conn_enter_active_mode(acl);
-> >  
-> > -		if (lmp_esco_capable(hdev))
-> > -			hci_setup_sync(sco, acl->handle);
-> > -		else
-> > -			hci_add_sco(sco, acl->handle);
-> > +		if (test_bit(HCI_CONN_MODE_CHANGE_PEND, &acl->pend)) {
-> > +			/* defer SCO setup until mode change completed */
-> > +			set_bit(HCI_CONN_SCO_SETUP_PEND, &acl->pend);
-> > +			return sco;
-> > +		}
-> > +
-> > +		hci_sco_setup(acl, 0x00);
-> >  	}
-> 
-> Not in love with the "fake" status passed here, but the overall change
-> to centralize this functionality provides a nice cleanup from the
-> original patch and makes the code more readable and maintainable.
+On Tue, Jul 20, 2010 at 4:25 PM, Vitja Makarov <vitja.makarov@gmail.com> wrote:
+> 2010/7/20 Vitja Makarov <vitja.makarov@gmail.com>:
+>> 2010/7/20 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
+>>> Hi,
+>>>
+>>> On Tue, Jul 20, 2010 at 2:46 PM, Vitja Makarov <vitja.makarov@gmail.com> wrote:
+>>>> 2010/7/20 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
+>>>>> Hi,
+>>>>>
+>>>>> On Tue, Jul 20, 2010 at 10:12 AM, Vitja Makarov <vitja.makarov@gmail.com> wrote:
+>>>>>> Hi!
+>>>>>>
+>>>>>> Recently I've found that obex client doesn't allways close socket, I
+>>>>>> was using obexd-0.29...
+>>>>>> Even more sometimes it closes same socket twice using
+>>>>>> g_io_channel_unref() and close()
+>>>>>
+>>>>> I guess the real ones are gw_obex_close and close, so both end up
+>>>>> closing the same fd.
+>>>>>
+>>>>>> When it comes to client/session.c:rfcomm_connect() with error,
+>>>>>> session->sock is not set and socket is not closed on
+>>>>>> session_shutdown()
+>>>>>> Don't know why g_io_channel_unref() isn't called for that socket..
+>>>>>
+>>>>> Yep, there is no much point on storing the fd on session->sock in the
+>>>>> other hand the io that bt_io_connect gives is the one causing the
+>>>>> problem here, either we release this reference and then we have to set
+>>>>> not to close the fd or we just keep the io reference and store it on
+>>>>> session so we can actually cancel the connection attempt.
+>>>>>
+>>>>
+>>>> My application does send files using obex-client to all available
+>>>> devices, after 4-5 hours obex client can't create sockets anymore  (it
+>>>> fails with ENFILE, Too many open files), making obex-client absolutely
+>>>> unusable.
+>>>>
+>>>> As workaround I set session->fd even if error was detected, then
+>>>> socket will be properly closed.
+>>>> It seems to me that here is memory leak also.
+>>>>
+>>>> vitja.
+>>>>
+>>>
+>>> Can you check if the patch bellow fix those issues:
+>>>
+>>> diff --git a/client/session.c b/client/session.c
+>>> index 334ade4..d761bfb 100644
+>>> --- a/client/session.c
+>>> +++ b/client/session.c
+>>> @@ -173,8 +173,10 @@ static void session_free(struct session_data *session)
+>>>        if (session->obex != NULL)
+>>>                gw_obex_close(session->obex);
+>>>
+>>> -       if (session->sock > 2)
+>>> -               close(session->sock);
+>>> +       if (session->io != NULL) {
+>>> +               g_io_channel_shutdown(session->io, TRUE, NULL);
+>>> +               g_io_channel_unref(session->io);
+>>> +       }
+>>>
+>>>        if (session->path)
+>>>                session_unregistered(session);
+>>> @@ -215,13 +217,17 @@ static void rfcomm_callback(GIOChannel *io,
+>>> GError *err, gpointer user_data)
+>>>                goto done;
+>>>        }
+>>>
+>>> +       /* do not close when gw_obex is using the fd */
+>>> +       g_io_channel_set_close_on_unref(session->io, FALSE);
+>>> +       g_io_channel_unref(session->io);
+>>> +       session->io = NULL;
+>>> +
+>>>        fd = g_io_channel_unix_get_fd(io);
+>>>
+>>>        obex = gw_obex_setup_fd(fd, session->target,
+>>>                        session->target_len, NULL, NULL);
+>>>
+>>> -       callback->session->sock = fd;
+>>> -       callback->session->obex = obex;
+>>> +       session->obex = obex;
+>>>
+>>>  done:
+>>>        callback->func(callback->session, callback->data);
+>>> @@ -231,9 +237,9 @@ done:
+>>>        g_free(callback);
+>>>  }
+>>>
+>>> -static int rfcomm_connect(const bdaddr_t *src,
+>>> -                               const bdaddr_t *dst, uint8_t channel,
+>>> -                                       BtIOConnect function, gpointer user_data)
+>>> +static GIOChannel *rfcomm_connect(const bdaddr_t *src, const bdaddr_t *dst,
+>>> +                                       uint8_t channel, BtIOConnect function,
+>>> +                                       gpointer user_data)
+>>>  {
+>>>        GIOChannel *io;
+>>>        GError *err = NULL;
+>>> @@ -245,11 +251,11 @@ static int rfcomm_connect(const bdaddr_t *src,
+>>>                                BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+>>>                                BT_IO_OPT_INVALID);
+>>>        if (io != NULL)
+>>> -               return 0;
+>>> +               return io;
+>>>
+>>>        error("%s", err->message);
+>>>        g_error_free(err);
+>>> -       return -EIO;
+>>> +       return NULL;
+>>>  }
+>>>
+>>>  static void search_callback(uint8_t type, uint16_t status,
+>>> @@ -309,8 +315,11 @@ static void search_callback(uint8_t type, uint16_t status,
+>>>
+>>>        callback->session->channel = channel;
+>>>
+>>> -       if (rfcomm_connect(&callback->session->src, &callback->session->dst,
+>>> -                                       channel, rfcomm_callback, callback) == 0) {
+>>> +       callback->session->io = rfcomm_connect(&callback->session->src,
+>>> +                                               &callback->session->dst,
+>>> +                                               channel, rfcomm_callback,
+>>> +                                               callback);
+>>> +       if (callback->session->io != NULL) {
+>>>                sdp_close(callback->sdp);
+>>>                return;
+>>>        }
+>>> @@ -418,7 +427,6 @@ struct session_data *session_create(const char *source,
+>>>                return NULL;
+>>>
+>>>        session->refcount = 1;
+>>> -       session->sock = -1;
+>>>        session->channel = channel;
+>>>
+>>>        session->conn = dbus_bus_get(DBUS_BUS_SESSION, NULL);
+>>> @@ -465,8 +473,11 @@ struct session_data *session_create(const char *source,
+>>>        callback->data = user_data;
+>>>
+>>>        if (session->channel > 0) {
+>>> -               err = rfcomm_connect(&session->src, &session->dst,
+>>> -                               session->channel, rfcomm_callback, callback);
+>>> +               session->io = rfcomm_connect(&session->src, &session->dst,
+>>> +                                                       session->channel,
+>>> +                                                       rfcomm_callback,
+>>> +                                                       callback);
+>>> +               err = (session->io == NULL) ? -EINVAL : 0;
+>>>        } else {
+>>>                callback->sdp = service_connect(&session->src, &session->dst,
+>>>                                                service_callback, callback);
+>>> diff --git a/client/session.h b/client/session.h
+>>> index 73337cd..9451c25 100644
+>>> --- a/client/session.h
+>>> +++ b/client/session.h
+>>> @@ -40,10 +40,10 @@ struct session_data {
+>>>        int target_len;
+>>>        uuid_t uuid;            /* Bluetooth Service Class */
+>>>        gchar *path;            /* Session path */
+>>> -       int sock;
+>>>        DBusConnection *conn;
+>>>        DBusMessage *msg;
+>>>        GwObex *obex;
+>>> +       GIOChannel *io;
+>>>        struct agent_data *agent;
+>>>        struct session_callback *callback;
+>>>        gchar *owner;           /* Session owner */
+>>>
+>>>
+>>>
+>>> --
+>>> Luiz Augusto von Dentz
+>>> Computer Engineer
+>>>
+>>
+>> This seems to work, thanks
+>>
+>
+> One more question can some socket errors (GError) be forwarded to
+> dbus, so on client side I can get connection refused and so on,
+> messages?
+>
+> That should be better than empty  "dbus.exceptions.DBusException:
+> org.openobex.Error.Failed:" message
 
-yeah, the 0x00 looks funny here. We could add a comment explaining it,
-but it does make sense in the end.
-
-> >  	return sco;
-> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > index 2069c3b..461413c 100644
-> > --- a/net/bluetooth/hci_event.c
-> > +++ b/net/bluetooth/hci_event.c
-> > @@ -775,9 +775,6 @@ static void hci_cs_sniff_mode(struct hci_dev *hdev, __u8 status)
-> >  
-> >  	BT_DBG("%s status 0x%x", hdev->name, status);
-> >  
-> > -	if (!status)
-> > -		return;
-> > -
-> >  	cp = hci_sent_cmd_data(hdev, HCI_OP_SNIFF_MODE);
-> >  	if (!cp)
-> >  		return;
-> > @@ -785,8 +782,13 @@ static void hci_cs_sniff_mode(struct hci_dev *hdev, __u8 status)
-> >  	hci_dev_lock(hdev);
-> >  
-> >  	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(cp->handle));
-> > -	if (conn)
-> > -		clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend);
-> > +	if (conn) {
-> > +		if (status)
-> > +			clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend);
-> > +
-> > +		if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND, &conn->pend))
-> > +			hci_sco_setup(conn, status);
-> 
-> Probably the subject for another patch, but has there been any reported
-> issue where idle_timeout is set short enough that the timer expires
-> after exit sniff mode has been requested but before the mode change
-> event has been received?
-
-I see that this could potentially happen. The timer is not suppose to be
-running during that transaction. It should be only started when the mode
-change has been completed. That needs fixing, but not in this patch.
-
-Regards
-
-Marcel
+Sure, that could be done, but lets fix one issue at time. Does the
+previous patch fixed your problem?
 
 
+-- 
+Luiz Augusto von Dentz
+Computer Engineer
