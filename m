@@ -3,130 +3,205 @@ From: Inga Stotland <ingas@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: rshaffer@codeaurora.org, johan.hedberg@gmail.com,
 	marcel@holtmann.org, Inga Stotland <ingas@codeaurora.org>
-Subject: [PATCH 3/5] Update EIR whenever record is added or removed
-Date: Tue, 20 Jul 2010 14:56:12 -0700
-Message-Id: <1279662974-16454-4-git-send-email-ingas@codeaurora.org>
+Subject: [PATCH 2/5] Support for adding UUID128 to extended inquiry response
+Date: Tue, 20 Jul 2010 14:56:11 -0700
+Message-Id: <1279662974-16454-3-git-send-email-ingas@codeaurora.org>
 In-Reply-To: <1279662974-16454-1-git-send-email-ingas@codeaurora.org>
 References: <1279662974-16454-1-git-send-email-ingas@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- plugins/service.c |   18 ++++++++++++++++++
- src/adapter.c     |   23 ++++++++++++++++++++++-
- src/adapter.h     |    1 +
- 3 files changed, 41 insertions(+), 1 deletions(-)
+ src/sdpd-service.c |  108 ++++++++++++++++++++++++++++++++++++++++++++--------
+ 1 files changed, 92 insertions(+), 16 deletions(-)
 
-diff --git a/plugins/service.c b/plugins/service.c
-index 96280bd..ee9176b 100644
---- a/plugins/service.c
-+++ b/plugins/service.c
-@@ -445,6 +445,8 @@ static DBusMessage *update_record(DBusConnection *conn, DBusMessage *msg,
- 				strerror(EIO));
- 	}
+diff --git a/src/sdpd-service.c b/src/sdpd-service.c
+index cdbb4f4..1314ada 100644
+--- a/src/sdpd-service.c
++++ b/src/sdpd-service.c
+@@ -49,6 +49,8 @@
+ #include "manager.h"
+ #include "adapter.h"
  
-+	adapter_update_eir_data(&src);
++#define SIZEOF_UUID128 16
 +
- 	return dbus_message_new_method_return(msg);
+ static sdp_record_t *server = NULL;
+ 
+ static uint16_t did_vendor = 0x0000;
+@@ -174,41 +176,103 @@ static void update_svclass_list(const bdaddr_t *src)
+ 
  }
  
-@@ -516,6 +518,7 @@ static DBusMessage *add_service_record(DBusConnection *conn,
- 	const char *sender, *record;
- 	dbus_uint32_t handle;
- 	int err;
-+	bdaddr_t bdaddr;
- 
- 	if (dbus_message_get_args(msg, NULL,
- 			DBUS_TYPE_STRING, &record, DBUS_TYPE_INVALID) == FALSE)
-@@ -526,6 +529,13 @@ static DBusMessage *add_service_record(DBusConnection *conn,
- 	if (err < 0)
- 		return failed_strerror(msg, err);
- 
-+	if (serv_adapter->adapter)
-+		adapter_get_address(serv_adapter->adapter, &bdaddr);
-+	else
-+		bacpy(&bdaddr, BDADDR_ANY);
-+
-+	adapter_update_eir_data(&bdaddr);
-+
- 	reply = dbus_message_new_method_return(msg);
- 	if (!reply)
- 		return NULL;
-@@ -550,6 +560,7 @@ static DBusMessage *remove_service_record(DBusConnection *conn,
- 	struct service_adapter *serv_adapter = data;
- 	dbus_uint32_t handle;
- 	const char *sender;
-+	bdaddr_t bdaddr;
- 
- 	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_UINT32, &handle,
- 						DBUS_TYPE_INVALID) == FALSE)
-@@ -560,6 +571,13 @@ static DBusMessage *remove_service_record(DBusConnection *conn,
- 	if (remove_record(conn, sender, serv_adapter, handle) < 0)
- 		return not_available(msg);
- 
-+	if (serv_adapter->adapter)
-+		adapter_get_address(serv_adapter->adapter, &bdaddr);
-+	else
-+		bacpy(&bdaddr, BDADDR_ANY);
-+
-+	adapter_update_eir_data(&bdaddr);
-+
- 	return dbus_message_new_method_return(msg);
- }
- 
-diff --git a/src/adapter.c b/src/adapter.c
-index 789a196..c1e1768 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -820,7 +820,7 @@ static DBusMessage *set_pairable_timeout(DBusConnection *conn,
- 
- static void update_ext_inquiry_response(struct btd_adapter *adapter)
- {
--	uint8_t fec = 0, data[240];
-+	uint8_t fec = 0, data[EIR_DATA_LENGTH];
- 	struct hci_dev *dev = &adapter->dev;
- 	int dd;
- 
-@@ -846,6 +846,27 @@ static void update_ext_inquiry_response(struct btd_adapter *adapter)
- 	hci_close_dev(dd);
- }
- 
-+void adapter_update_eir_data(const bdaddr_t *src)
++static void eir_generate_uuid128(sdp_list_t *list,
++					uint8_t *ptr, uint16_t *eir_len)
 +{
-+	struct btd_adapter *adapter;
-+	GSList *adapters;
++	int i, k, index = 0;
++	uint16_t len = *eir_len;
++	uint8_t *uuid128;
++	gboolean truncated = FALSE;
 +
-+	if (bacmp(src, BDADDR_ANY) != 0) {
-+		adapter = manager_find_adapter(src);
-+		if (adapter)
-+			update_ext_inquiry_response(adapter);
-+		else
-+			error("Updating EIR failed: device not found");
-+	} else {
++	/* Store UUID128 in place, skip 2 bytes to insert type and length later */
++	uuid128 = ptr + 2;
 +
-+		/* Update extended inquiry reponse for ANY adapter */
-+		for (adapters = manager_get_adapters(); adapters; adapters = adapters->next) {
-+			adapter = adapters->data;
-+			update_ext_inquiry_response(adapter);
++	for (; list; list = list->next) {
++		sdp_record_t *rec = (sdp_record_t *) list->data;
++
++		if (rec->svclass.type != SDP_UUID128)
++			continue;
++
++		/* Stop if not enough space to put next UUID128 */
++		if ((len + 2 + SIZEOF_UUID128) > EIR_DATA_LENGTH) {
++			truncated = TRUE;
++			break;
 +		}
++
++		/* Check for duplicates, EIR data is Little Endian */
++		for (i = 0; i < index; i++) {
++			for (k = 0; k < SIZEOF_UUID128; k++) {
++				if (uuid128[i*SIZEOF_UUID128 + k] !=
++					rec->svclass.value.uuid128.data[SIZEOF_UUID128 - k])
++					break;
++			}
++			if (k == SIZEOF_UUID128)
++				break;
++		}
++
++		if (i < index)
++			continue;
++
++		/* EIR data is Little Endian */
++		for (k = 0; k < SIZEOF_UUID128; k++)
++			uuid128[index*SIZEOF_UUID128 + k] =
++				rec->svclass.value.uuid128.data[SIZEOF_UUID128 - 1 - k];
++
++		len += SIZEOF_UUID128;
++		index++;
++	}
++
++	if (index > 0 || truncated) {
++		/* EIR Data length */
++		ptr[0] = (index * SIZEOF_UUID128) + 1;
++		/* EIR Data type */
++		ptr[1] = (truncated) ? EIR_UUID128_SOME : EIR_UUID128_ALL;
++		len += 2;
++		*eir_len = len;
 +	}
 +}
 +
- void adapter_set_class_complete(bdaddr_t *bdaddr, uint8_t status)
+ void create_ext_inquiry_response(const char *name,
+ 					int8_t tx_power, sdp_list_t *services,
+ 					uint8_t *data)
  {
- 	uint8_t class[3];
-diff --git a/src/adapter.h b/src/adapter.h
-index 8226514..f72eb0b 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -126,6 +126,7 @@ void adapter_service_insert(const bdaddr_t *bdaddr, void *rec);
- void adapter_service_remove(const bdaddr_t *bdaddr, void *rec);
- sdp_list_t *adapter_get_services(struct btd_adapter *adapter);
- void adapter_set_class_complete(bdaddr_t *bdaddr, uint8_t status);
-+void adapter_update_eir_data(const bdaddr_t *src);
+ 	sdp_list_t *list = services;
+ 	uint8_t *ptr = data;
+-	uint16_t uuid[24];
++	uint16_t eir_len = 0;
++	uint16_t uuid16[EIR_DATA_LENGTH/2];
+ 	int i, index = 0;
++	gboolean truncated = FALSE;
  
- struct agent *adapter_get_agent(struct btd_adapter *adapter);
- void adapter_add_connection(struct btd_adapter *adapter,
+ 	if (name) {
+ 		int len = strlen(name);
+ 
++		/* EIR Data type */
+ 		if (len > 48) {
+ 			len = 48;
+-			ptr[1] = 0x08;
++			ptr[1] = EIR_NAME_SHORT;
+ 		} else
+-			ptr[1] = 0x09;
++			ptr[1] = EIR_NAME_COMPLETE;
+ 
++		/* EIR Data length */
+ 		ptr[0] = len + 1;
+ 
+ 		memcpy(ptr + 2, name, len);
+ 
+-		ptr += len + 2;
++		eir_len += (len + 2);
++		ptr += (len + 2);
+ 	}
+ 
+ 	if (tx_power != 0) {
+ 		*ptr++ = 2;
+-		*ptr++ = 0x0a;
++		*ptr++ = EIR_TX_POWER;
+ 		*ptr++ = (uint8_t) tx_power;
++		eir_len += 3;
+ 	}
+ 
+ 	if (did_vendor != 0x0000) {
+ 		uint16_t source = 0x0002;
+ 		*ptr++ = 9;
+-		*ptr++ = 0x10;
++		*ptr++ = EIR_DEVICE_ID;
+ 		*ptr++ = (source & 0x00ff);
+ 		*ptr++ = (source & 0xff00) >> 8;
+ 		*ptr++ = (did_vendor & 0x00ff);
+@@ -217,10 +281,10 @@ void create_ext_inquiry_response(const char *name,
+ 		*ptr++ = (did_product & 0xff00) >> 8;
+ 		*ptr++ = (did_version & 0x00ff);
+ 		*ptr++ = (did_version & 0xff00) >> 8;
++		eir_len += 10;
+ 	}
+ 
+-	ptr[1] = 0x03;
+-
++	/* Group all UUID16 types */
+ 	for (; list; list = list->next) {
+ 		sdp_record_t *rec = (sdp_record_t *) list->data;
+ 
+@@ -233,30 +297,42 @@ void create_ext_inquiry_response(const char *name,
+ 		if (rec->svclass.value.uuid16 == PNP_INFO_SVCLASS_ID)
+ 			continue;
+ 
+-		if (index > 23) {
+-			ptr[1] = 0x02;
++		/* Stop if not enough space to put next UUID16 */
++		if ((eir_len + 2 + sizeof(uint16_t)) > EIR_DATA_LENGTH) {
++			truncated = TRUE;
+ 			break;
+ 		}
+ 
++		/* Check for duplicates */
+ 		for (i = 0; i < index; i++)
+-			if (uuid[i] == rec->svclass.value.uuid16)
++			if (uuid16[i] == rec->svclass.value.uuid16)
+ 				break;
+ 
+-		if (i == index - 1)
++		if (i < index)
+ 			continue;
+ 
+-		uuid[index++] = rec->svclass.value.uuid16;
++		uuid16[index++] = rec->svclass.value.uuid16;
++		eir_len += sizeof(uint16_t);
+ 	}
+ 
+ 	if (index > 0) {
+-		ptr[0] = (index * 2) + 1;
++		/* EIR Data length */
++		ptr[0] = (index * sizeof(uint16_t)) + 1;
++		/* EIR Data type */
++		ptr[1] = (truncated) ? EIR_UUID16_SOME : EIR_UUID16_ALL;
++
+ 		ptr += 2;
++		eir_len += 2;
+ 
+ 		for (i = 0; i < index; i++) {
+-			*ptr++ = (uuid[i] & 0x00ff);
+-			*ptr++ = (uuid[i] & 0xff00) >> 8;
++			*ptr++ = (uuid16[i] & 0x00ff);
++			*ptr++ = (uuid16[i] & 0xff00) >> 8;
+ 		}
+ 	}
++
++	/* Group all UUID128 types */
++	if (eir_len <= EIR_DATA_LENGTH - 2)
++		eir_generate_uuid128(services, ptr, &eir_len);
+ }
+ 
+ void register_public_browse_group(void)
 -- 
 1.7.1
 
