@@ -1,27 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Tue, 20 Jul 2010 17:30:25 +0800
-Message-ID: <AANLkTimYuaveU7To6oLdtDLlxXIky1KU7QHMTD47Mwwh@mail.gmail.com>
-Subject: Virtual cable unplug not supported in BlueZ?
-From: Liang Bao <tim.bao@gmail.com>
+Date: Tue, 20 Jul 2010 11:12:35 +0400
+Message-ID: <AANLkTikcX6_SydJf4YRG3ym4Q0GVGQ26WpAh3Mm1uyyQ@mail.gmail.com>
+Subject: obex-client: doesn't allways closes socket
+From: Vitja Makarov <vitja.makarov@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi!
 
-I have a question on "Virtual Cable Unplug" in current BlueZ version.
+Recently I've found that obex client doesn't allways close socket, I
+was using obexd-0.29...
+Even more sometimes it closes same socket twice using
+g_io_channel_unref() and close()
 
-Currently BlueZ doesn't expose a D-Bus method in input/device.c for
-virtually unplug cable which is a mandatory requirement to pass
-TC_HOS_HCR_BV_03_I. Actually the support in kernel is already there.
-Can anyone give some insight to why this is not exposed at the DBUS
-API level like Connect/Disconnect/GetProperties? Can I think the
-reason behind this design is we only need one of "Disconnect" and
-"VirtualUnplug" to allow user to disconnect?
+When it comes to client/session.c:rfcomm_connect() with error,
+session->sock is not set and socket is not closed on
+session_shutdown()
+Don't know why g_io_channel_unref() isn't called for that socket..
 
-Thanks.
+test-case:
+./send-files xx:xx:xx:xx:xx xxx.xxx
+ls /proc/`pgrep obexd-client`/fd | wc -l
 
-Regards,
-Liang Bao
+then don't accept incoming connection on your phone, press no
+
+When you press yes to receive file, see strace output obexd-client
+closes socket twice...
+
+vitja.
