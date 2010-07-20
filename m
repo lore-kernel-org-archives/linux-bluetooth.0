@@ -1,99 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1279623875-9870-1-git-send-email-rafal.michalski@comarch.com>
-References: <1279623875-9870-1-git-send-email-rafal.michalski@comarch.com>
-Date: Tue, 20 Jul 2010 14:25:58 +0300
-Message-ID: <AANLkTikJmJjZPHApy4P9eFtS3eqYA7Y-y5SFghRnE4ld@mail.gmail.com>
-Subject: Re: [PATCH] Fixed problem with incoming calls query
+In-Reply-To: <AANLkTikcX6_SydJf4YRG3ym4Q0GVGQ26WpAh3Mm1uyyQ@mail.gmail.com>
+References: <AANLkTikcX6_SydJf4YRG3ym4Q0GVGQ26WpAh3Mm1uyyQ@mail.gmail.com>
+Date: Tue, 20 Jul 2010 14:16:36 +0300
+Message-ID: <AANLkTilJNclAEoLpJnUDkHHiwpynoSpIXErJnYpHF6aF@mail.gmail.com>
+Subject: Re: obex-client: doesn't allways closes socket
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Rafal Michalski <rafal.michalski@comarch.com>
+To: Vitja Makarov <vitja.makarov@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Rafal,
+Hi,
 
-On Tue, Jul 20, 2010 at 2:04 PM, Rafal Michalski
-<rafal.michalski@comarch.com> wrote:
-> From: Rafal Michalski <rafal.michalski@comarch.com>
+On Tue, Jul 20, 2010 at 10:12 AM, Vitja Makarov <vitja.makarov@gmail.com> wrote:
+> Hi!
 >
-> After making some incoming, outgoing, missed calls, history lists of them
-> (ich, och, mch) are stored on device. In current implementation queries
-> towards tracker for incoming calls include also missed calls.
-> So list for incoming calls displayed on paired BT headset/carkit screen
-> (e.g. BH-903, CK-200) also contains numbers from missed calls list.
->
-> To block adding missed calls list numbers to incoming calls there should
-> be added info that incoming call is in fact only answered call. So macros
-> additionally include info: "nmo:isAnswered true ." Without this, missed
-> calls was treated as incoming calls.
-> ---
->  plugins/phonebook-tracker.c |    2 ++
->  1 files changed, 2 insertions(+), 0 deletions(-)
->
-> diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-> index 89c612e..98b6410 100644
-> --- a/plugins/phonebook-tracker.c
-> +++ b/plugins/phonebook-tracker.c
-> @@ -125,6 +125,7 @@
->                "?call a nmo:Call ; "                                   \
->                "nmo:from ?c ; "                                        \
->                "nmo:isSent false . "                                   \
-> +               "nmo:isAnswered true ."                                 \
->                "?c a nco:Contact . "                                   \
->        "OPTIONAL { ?c nco:hasPhoneNumber ?h . } "                      \
->        "OPTIONAL { ?c nco:hasEmailAddress ?e . } "                     \
-> @@ -144,6 +145,7 @@
->                "?call a nmo:Call ; "                                   \
->                "nmo:from ?c ; "                                        \
->                "nmo:isSent false . "                                   \
-> +               "nmo:isAnswered true ."                                 \
->                "?c a nco:Contact . "                                   \
->        "OPTIONAL { ?c nco:hasPhoneNumber ?h . } "                      \
->        "} ORDER BY DESC(nmo:receivedDate(?call))"
-> --
-> 1.6.3.3
->
+> Recently I've found that obex client doesn't allways close socket, I
+> was using obexd-0.29...
+> Even more sometimes it closes same socket twice using
+> g_io_channel_unref() and close()
 
-Actually this is not completely correct, this nmo are a list of
-properties so only the last one will have the . , something like this:
+I guess the real ones are gw_obex_close and close, so both end up
+closing the same fd.
 
-diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index 89c612e..696b544 100644
---- a/plugins/phonebook-tracker.c
-+++ b/plugins/phonebook-tracker.c
-@@ -124,7 +124,8 @@
- 	"WHERE { "							\
- 		"?call a nmo:Call ; "					\
- 		"nmo:from ?c ; "					\
--		"nmo:isSent false . "					\
-+		"nmo:isSent false ; "					\
-+		"nmo:isAnswered true ."					\
- 		"?c a nco:Contact . "					\
- 	"OPTIONAL { ?c nco:hasPhoneNumber ?h . } "			\
- 	"OPTIONAL { ?c nco:hasEmailAddress ?e . } "			\
-@@ -143,7 +144,8 @@
- 	"WHERE { "							\
- 		"?call a nmo:Call ; "					\
- 		"nmo:from ?c ; "					\
--		"nmo:isSent false . "					\
-+		"nmo:isSent false ; "					\
-+		"nmo:isAnswered true ."					\
- 		"?c a nco:Contact . "					\
- 	"OPTIONAL { ?c nco:hasPhoneNumber ?h . } "			\
- 	"} ORDER BY DESC(nmo:receivedDate(?call))"
-@@ -181,7 +183,7 @@
- 		"nmo:to ?c ; "						\
- 		"nmo:isSent true . "					\
- 		"?c a nco:Contact . "					\
--	"OPTIONAL { ?c nco:hasPhoneNumber ?h . } "				\
-+	"OPTIONAL { ?c nco:hasPhoneNumber ?h . } "			\
- 	"} ORDER BY DESC(nmo:sentDate(?call))"
+> When it comes to client/session.c:rfcomm_connect() with error,
+> session->sock is not set and socket is not closed on
+> session_shutdown()
+> Don't know why g_io_channel_unref() isn't called for that socket..
 
- #define COMBINED_CALLS_QUERY						\
--- 
-1.6.1
+Yep, there is no much point on storing the fd on session->sock in the
+other hand the io that bt_io_connect gives is the one causing the
+problem here, either we release this reference and then we have to set
+not to close the fd or we just keep the io reference and store it on
+session so we can actually cancel the connection attempt.
 
 
 -- 
