@@ -1,35 +1,135 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 22 Jul 2010 10:28:48 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lennart Poettering <lennart@poettering.net>
-Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] systemd: install systemd unit files
-Message-ID: <20100722072848.GA10401@jh-x301>
-References: <20100721220828.GA7799@tango.0pointer.de>
+Date: Thu, 22 Jul 2010 00:08:28 +0200
+From: Lennart Poettering <lennart@poettering.net>
+To: marcel@holtmann.org, linux-bluetooth@vger.kernel.org
+Subject: [PATCH] systemd: install systemd unit files
+Message-ID: <20100721220828.GA7799@tango.0pointer.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20100721220828.GA7799@tango.0pointer.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lennart,
+This also enables bus activation for bluetoothd, but only if systemd is
+running. Only if that's the case we can make sure in a race-free fashion
+that bluetoothd is not started twice at the same time.
+---
+ Makefile.am                  |   21 ++++++++++++++++++---
+ configure.ac                 |    9 +++++++++
+ scripts/.gitignore           |    1 +
+ scripts/bluetooth.service.in |   12 ++++++++++++
+ scripts/org.bluez.service    |    5 +++++
+ 5 files changed, 45 insertions(+), 3 deletions(-)
+ create mode 100644 scripts/.gitignore
+ create mode 100644 scripts/bluetooth.service.in
+ create mode 100644 scripts/org.bluez.service
 
-On Thu, Jul 22, 2010, Lennart Poettering wrote:
-> This also enables bus activation for bluetoothd, but only if systemd is
-> running. Only if that's the case we can make sure in a race-free fashion
-> that bluetoothd is not started twice at the same time.
-> ---
->  Makefile.am                  |   21 ++++++++++++++++++---
->  configure.ac                 |    9 +++++++++
->  scripts/.gitignore           |    1 +
->  scripts/bluetooth.service.in |   12 ++++++++++++
->  scripts/org.bluez.service    |    5 +++++
->  5 files changed, 45 insertions(+), 3 deletions(-)
->  create mode 100644 scripts/.gitignore
->  create mode 100644 scripts/bluetooth.service.in
->  create mode 100644 scripts/org.bluez.service
+diff --git a/Makefile.am b/Makefile.am
+index 65d4312..a2b53e8 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -301,7 +301,8 @@ endif
+ CLEANFILES += $(rules_DATA)
+ 
+ EXTRA_DIST += scripts/bluetooth.rules \
+-		scripts/bluetooth-hid2hci.rules scripts/bluetooth-serial.rules
++		scripts/bluetooth-hid2hci.rules scripts/bluetooth-serial.rules \
++		scripts/bluetooth.service.in scripts/org.bluez.service
+ 
+ if PCMCIA
+ udevdir = $(libexecdir)/udev
+@@ -309,6 +310,20 @@ udevdir = $(libexecdir)/udev
+ dist_udev_SCRIPTS = scripts/bluetooth_serial
+ endif
+ 
++if HAVE_SYSTEMD
++systemdsystemunit_DATA = \
++       scripts/bluetooth.service
++
++scripts/bluetooth.service: scripts/bluetooth.service.in
++	@$(SED) -e "s|\@sbindir\@|$(sbindir)|" $< >$@
++
++dbussystemservicesdir = $(datadir)/dbus-1/system-services
++
++dbussystemservices_DATA = \
++	scripts/org.bluez.service
++
++endif
++
+ EXTRA_DIST += doc/manager-api.txt \
+ 		doc/adapter-api.txt doc/device-api.txt \
+ 		doc/service-api.txt doc/agent-api.txt doc/attribute-api.txt \
+@@ -328,9 +343,9 @@ pkgconfigdir = $(libdir)/pkgconfig
+ 
+ pkgconfig_DATA = bluez.pc
+ 
+-DISTCHECK_CONFIGURE_FLAGS = --disable-udevrules
++DISTCHECK_CONFIGURE_FLAGS = --disable-udevrules --with-systemdsystemunitdir=
+ 
+-DISTCLEANFILES = $(pkgconfig_DATA)
++DISTCLEANFILES = $(pkgconfig_DATA) scripts/bluetooth.service
+ 
+ MAINTAINERCLEANFILES = Makefile.in \
+ 	aclocal.m4 configure config.h.in config.sub config.guess \
+diff --git a/configure.ac b/configure.ac
+index b004f6e..86b398f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -64,5 +64,14 @@ if (test "${enable_netlink}" = "yes"); then
+ fi
+ AM_CONDITIONAL(NETLINK, test "${enable_netlink}" = "yes")
+ 
++# systemd
++
++AC_ARG_WITH([systemdsystemunitdir],
++        AS_HELP_STRING([--with-systemdsystemunitdir=DIR], [Directory for systemd service files]),
++        [],
++        [with_systemdsystemunitdir=$($PKG_CONFIG --variable=systemdsystemunitdir systemd)])
++AC_SUBST([systemdsystemunitdir], [$with_systemdsystemunitdir])
++AM_CONDITIONAL(HAVE_SYSTEMD, [test -n "$with_systemdsystemunitdir"])
++
+ AC_OUTPUT(Makefile scripts/bluetooth.rules doc/version.xml
+ 					src/bluetoothd.8 bluez.pc)
+diff --git a/scripts/.gitignore b/scripts/.gitignore
+new file mode 100644
+index 0000000..4b9f765
+--- /dev/null
++++ b/scripts/.gitignore
+@@ -0,0 +1 @@
++bluetooth.service
+diff --git a/scripts/bluetooth.service.in b/scripts/bluetooth.service.in
+new file mode 100644
+index 0000000..f95b0b0
+--- /dev/null
++++ b/scripts/bluetooth.service.in
+@@ -0,0 +1,12 @@
++[Unit]
++Description=Bluetooth Manager
++After=syslog.target
++
++[Service]
++Type=dbus
++BusName=org.bluez
++ExecStart=@sbindir@/bluetoothd -n
++StandardOutput=syslog
++
++[Install]
++WantedBy=bluetooth.target
+diff --git a/scripts/org.bluez.service b/scripts/org.bluez.service
+new file mode 100644
+index 0000000..2a3b057
+--- /dev/null
++++ b/scripts/org.bluez.service
+@@ -0,0 +1,5 @@
++[D-BUS Service]
++Name=org.bluez
++Exec=/bin/false
++User=root
++SystemdService=bluetooth.service
+-- 
+1.7.0.1
 
-Looks fine to me, but I'll let Marcel handle pushing it upstream since
-he had issues with the previous version (on IRC) that I didn't see
-myself.
 
-Johan
+
+Lennart
+
+-- 
+Lennart Poettering - Red Hat, Inc.
