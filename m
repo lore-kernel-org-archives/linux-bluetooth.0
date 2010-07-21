@@ -1,135 +1,188 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 22 Jul 2010 00:08:28 +0200
-From: Lennart Poettering <lennart@poettering.net>
-To: marcel@holtmann.org, linux-bluetooth@vger.kernel.org
-Subject: [PATCH] systemd: install systemd unit files
-Message-ID: <20100721220828.GA7799@tango.0pointer.de>
+From: Lukas <LuHe@gmx.at>
+To: john michelle <jhnmichelle@gmail.com>
+Subject: Re: Any update on software caused connection abort issue??
+Date: Wed, 21 Jul 2010 17:53:26 +0200
+Cc: linux-bluetooth@vger.kernel.org
+References: <AANLkTikxtNwbaiSRouqTwB1o7y4hFTRXJ_mejsBFeYKM@mail.gmail.com> <AANLkTilPI6nA-9SJJx74L1wEIMci7IZ7K_bnGAT2YYTT@mail.gmail.com>
+In-Reply-To: <AANLkTilPI6nA-9SJJx74L1wEIMci7IZ7K_bnGAT2YYTT@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201007211753.26822.LuHe@gmx.at>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This also enables bus activation for bluetoothd, but only if systemd is
-running. Only if that's the case we can make sure in a race-free fashion
-that bluetoothd is not started twice at the same time.
----
- Makefile.am                  |   21 ++++++++++++++++++---
- configure.ac                 |    9 +++++++++
- scripts/.gitignore           |    1 +
- scripts/bluetooth.service.in |   12 ++++++++++++
- scripts/org.bluez.service    |    5 +++++
- 5 files changed, 45 insertions(+), 3 deletions(-)
- create mode 100644 scripts/.gitignore
- create mode 100644 scripts/bluetooth.service.in
- create mode 100644 scripts/org.bluez.service
+Hello,
 
-diff --git a/Makefile.am b/Makefile.am
-index 65d4312..a2b53e8 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -301,7 +301,8 @@ endif
- CLEANFILES += $(rules_DATA)
- 
- EXTRA_DIST += scripts/bluetooth.rules \
--		scripts/bluetooth-hid2hci.rules scripts/bluetooth-serial.rules
-+		scripts/bluetooth-hid2hci.rules scripts/bluetooth-serial.rules \
-+		scripts/bluetooth.service.in scripts/org.bluez.service
- 
- if PCMCIA
- udevdir = $(libexecdir)/udev
-@@ -309,6 +310,20 @@ udevdir = $(libexecdir)/udev
- dist_udev_SCRIPTS = scripts/bluetooth_serial
- endif
- 
-+if HAVE_SYSTEMD
-+systemdsystemunit_DATA = \
-+       scripts/bluetooth.service
-+
-+scripts/bluetooth.service: scripts/bluetooth.service.in
-+	@$(SED) -e "s|\@sbindir\@|$(sbindir)|" $< >$@
-+
-+dbussystemservicesdir = $(datadir)/dbus-1/system-services
-+
-+dbussystemservices_DATA = \
-+	scripts/org.bluez.service
-+
-+endif
-+
- EXTRA_DIST += doc/manager-api.txt \
- 		doc/adapter-api.txt doc/device-api.txt \
- 		doc/service-api.txt doc/agent-api.txt doc/attribute-api.txt \
-@@ -328,9 +343,9 @@ pkgconfigdir = $(libdir)/pkgconfig
- 
- pkgconfig_DATA = bluez.pc
- 
--DISTCHECK_CONFIGURE_FLAGS = --disable-udevrules
-+DISTCHECK_CONFIGURE_FLAGS = --disable-udevrules --with-systemdsystemunitdir=
- 
--DISTCLEANFILES = $(pkgconfig_DATA)
-+DISTCLEANFILES = $(pkgconfig_DATA) scripts/bluetooth.service
- 
- MAINTAINERCLEANFILES = Makefile.in \
- 	aclocal.m4 configure config.h.in config.sub config.guess \
-diff --git a/configure.ac b/configure.ac
-index b004f6e..86b398f 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -64,5 +64,14 @@ if (test "${enable_netlink}" = "yes"); then
- fi
- AM_CONDITIONAL(NETLINK, test "${enable_netlink}" = "yes")
- 
-+# systemd
-+
-+AC_ARG_WITH([systemdsystemunitdir],
-+        AS_HELP_STRING([--with-systemdsystemunitdir=DIR], [Directory for systemd service files]),
-+        [],
-+        [with_systemdsystemunitdir=$($PKG_CONFIG --variable=systemdsystemunitdir systemd)])
-+AC_SUBST([systemdsystemunitdir], [$with_systemdsystemunitdir])
-+AM_CONDITIONAL(HAVE_SYSTEMD, [test -n "$with_systemdsystemunitdir"])
-+
- AC_OUTPUT(Makefile scripts/bluetooth.rules doc/version.xml
- 					src/bluetoothd.8 bluez.pc)
-diff --git a/scripts/.gitignore b/scripts/.gitignore
-new file mode 100644
-index 0000000..4b9f765
---- /dev/null
-+++ b/scripts/.gitignore
-@@ -0,0 +1 @@
-+bluetooth.service
-diff --git a/scripts/bluetooth.service.in b/scripts/bluetooth.service.in
-new file mode 100644
-index 0000000..f95b0b0
---- /dev/null
-+++ b/scripts/bluetooth.service.in
-@@ -0,0 +1,12 @@
-+[Unit]
-+Description=Bluetooth Manager
-+After=syslog.target
-+
-+[Service]
-+Type=dbus
-+BusName=org.bluez
-+ExecStart=@sbindir@/bluetoothd -n
-+StandardOutput=syslog
-+
-+[Install]
-+WantedBy=bluetooth.target
-diff --git a/scripts/org.bluez.service b/scripts/org.bluez.service
-new file mode 100644
-index 0000000..2a3b057
---- /dev/null
-+++ b/scripts/org.bluez.service
-@@ -0,0 +1,5 @@
-+[D-BUS Service]
-+Name=org.bluez
-+Exec=/bin/false
-+User=root
-+SystemdService=bluetooth.service
--- 
-1.7.0.1
+On Wednesday 21 July 2010 17:35:15 john michelle wrote:
+> Any update on software caused connection abort issue
 
+I also noticed this error when I used the software suite Series60-Remote to 
+connect to my mobile phone.
 
+Shortly after the connection establishment is completed I get the error 
+message "software caused connection abort" and the device gets disconnected.
 
-Lennart
+I also see the HCI reset, as described below, when I try to investigate this 
+error using hcidump.
 
--- 
-Lennart Poettering - Red Hat, Inc.
+The software uses the RFCOMM protocol for the connection.
+I use an USB bluetooth adapter from Belkin, lsusb reports the following device 
+id:
+ID 050d:0131 Belkin Components Bluetooth Device with trace filter
+
+This bug happens with the following kernel:
+root@erde ~  #  rpm -q kernel bluez
+kernel-2.6.33.6-147.fc13.x86_64
+bluez-4.64-1.fc13.x86_64
+
+You can also look at this thread in my mailing list for further informations: 
+https://sourceforge.net/mailarchive/forum.php?thread_name=201007192136.27723.LuHe%40gmx.at&forum_name=series60-
+remote-devel
+
+It would be great to see this problem fixed soon, because it's nearly 
+impossible to use bluetooth on my PC.
+
+Thanks,
+Lukas
+
+> >>On Wed, Jun 23, 2010 at 12:48 AM, john michelle <jhnmichelle@gmail.com> 
+wrote:
+> >> Dear Bluetooth community,
+> >> 
+> >> You are committing version after version and have time to add new
+> >> Features and the core stack have a major bug (software Caused
+> >> connection abort) that i
+> >> Have reported on the 7th of may the problem seems to be either in the
+> >> usb part of the
+> >> Kernel or the bluez stack, i am no kernel engineer so i came directly
+> >> to you for reporting
+> >> This problem and my requests to look into this problem are just
+> >> ignored. this is a blocker
+> >> Issue that would prevent and discourage any one from developing
+> >> application that rely on
+> >> Bluez sco capabilities, since during transmission the above mentioned
+> >> error just occurs.
+> >> I hope that my voice is heared and i would get a reply from the bluez
+> >> community.
+> >> 
+> >> John
+> >> 
+> >> On Wed, Jun 16, 2010 at 3:11 PM, john michelle <jhnmichelle@gmail.com> 
+wrote:
+> >>> On Sun, May 30, 2010 at 1:12 PM, john michelle <jhnmichelle@gmail.com> 
+wrote:
+> >>>> Hi Gustavo,
+> >>>> 
+> >>>>>> Please post the output of hcidump when the connection abort happens.
+> >>>> 
+> >>>> Below is the output of hcidump the moments the software caused
+> >>>> connection abort
+> >>>> 
+> >>>> Dongle 1:
+> >>>>> HCI Event: Number of Completed Packets (0x13) plen 5
+> >>>> 
+> >>>>  . * . . .
+> >>>> < HCI Command: Reset (0x03|0x0003) plen 0
+> >>>> device: disconnected
+> >>>> 
+> >>>> Dongle 2:
+> >>>>> HCI Event: Number of Completed Packets (0x13) plen 5
+> >>>> 
+> >>>>  . * . . .
+> >>>> < HCI Command: Reset (0x03|0x0003) plen 0
+> >>>> device: disconnected
+> >>>> 
+> >>>> 
+> >>>> I think something triggers hci reset which causes this problem, but
+> >>>> what exactly Triggers it i don't know.
+> >>>> 
+> >>>> 
+> >>>> John
+> >>> 
+> >>> Hi all,
+> >>> 
+> >>> Is anyone going to give this problem a try, it has been like a month
+> >>> now This is a real problem in the bluez stack and someone have to look
+> >>> in this Issue.
+> >>> 
+> >>> John
+> >>> 
+> >>>> On Mon, May 17, 2010 at 5:21 PM, john michelle <jhnmichelle@gmail.com> 
+wrote:
+> >>>>>> Hi Jonh,
+> >>>>>> 
+> >>>>>> First of all, don't do top posting in this mailing list. ;)
+> >>>>> 
+> >>>>> Thanks for the advise , will keep that in mind for future posts.
+> >>>>> 
+> >>>>>> In which bluez/kernel version the problem started? Any hardware
+> >>>>>> update during this time? The problem happens when you are already
+> >>>>>> tranfering SCO data?
+> >>>>> 
+> >>>>> I tried bluez versions 3.XX  and kernel 2.6.26(I think) the problem
+> >>>>> occurs and the kernel panics with no core dumps.then i tried with
+> >>>>> bluez 4.53-4.62 with
+> >>>>> Kernel 2.6.31 and 2.6.32. the connection abort problem occurs but the
+> >>>>> kernel doesn't
+> >>>>> Panic. regarding the hardware update you mean the dongle or the
+> >>>>> box.Anyway i changed both and tried different box's, this even
+> >>>>> happens on a box with 2 giga ram
+> >>>>> And core2 processor . as for the dongles i am using trust
+> >>>>> 
+> >>>>> http://www.twenga.co.uk/prices-Bluetooth-2-USB-Adapter-10m-BT-2250p-T
+> >>>>> RUST-Wireless-network-card-adapter-176178-0
+> >>>>> 
+> >>>>>  and also using no name dongles all the same problem.
+> >>>>> 
+> >>>>>> Please post the output of hcidump when the connection abort happens.
+> >>>>> 
+> >>>>> well that is going to be a hard one since i have more than one dongle
+> >>>>> in place And very hard to predict which one will crash.i will work
+> >>>>> on this and update You as soon as i have the hcidump log.
+> >>>>> 
+> >>>>>> I tried reproduce this issue in L2CAP but it is a bit hard, lets
+> >>>>>> say it happen once in a thousand, so it's not easy to track it. I
+> >>>>>> have to try reproduce that using the SCO, but I'm not used to that
+> >>>>>> layer yet. ;)
+> >>>>> 
+> >>>>> I hoped that it happens 1 in 1000 in SCO , but it actually happens 1
+> >>>>> in 15
+> >>>>> 
+> >>>>> 
+> >>>>> John
+> >>>>> 
+> >>>>>> Regards,
+> >>>>>> 
+> >>>>>>> John
+> >>>>>>> 
+> >>>>>>> On Fri, May 7, 2010 at 3:53 PM, Gustavo F. Padovan 
+<gustavo@padovan.org> wrote:
+> >>>>>>> > * john michelle <jhnmichelle@gmail.com> [2010-05-07 15:49:05 
+-0400]:
+> >>>>>>> >> Hi Bluetooth hackers,
+> >>>>>>> >> 
+> >>>>>>> >> i am having this consistent problem with bluez , from time to
+> >>>>>>> >> time i get the error Software caused connection abort (103 )
+> >>>>>>> >> And the bluetooth stick seems to disconnect and reconnects. this
+> >>>>>>> >> happens during an sco connection and it occurs even
+> >>>>>>> >> More when i am having the voice stream comming through the
+> >>>>>>> >> internet rather than the lan.i don't know what exact
+> >>>>>>> >> Details you need to solve this problem please tell me and i will
+> >>>>>>> >> give you an immediate reply . i have linux kernel 2.6.33 and
+> >>>>>>> >> bluez 4.62
+> >>>>>>> > 
+> >>>>>>> > I get the same problem sometimes when testing ERTM with l2test.
+> >>>>>>> > So the problem is on l2cap too. I didn't have time to debug this
+> >>>>>>> > yet. Now that someone else have confirmed it too, I'll to take a
+> >>>>>>> > look at the problem.
+> >>>>>> 
+> >>>>>> --
+> >>>>>> Gustavo F. Padovan
+> >>>>>> http://padovan.org
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> in the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
