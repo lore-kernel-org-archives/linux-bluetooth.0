@@ -1,51 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 5/5] Extended support for generating dictionary value
- of service UUIDs
+Subject: Re: [PATCH 1/5] Spec constants for Extended Inqiory Response field
+ types
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Inga Stotland <ingas@codeaurora.org>
 Cc: linux-bluetooth@vger.kernel.org, rshaffer@codeaurora.org,
 	johan.hedberg@gmail.com
-In-Reply-To: <1279662974-16454-6-git-send-email-ingas@codeaurora.org>
+In-Reply-To: <1279662974-16454-2-git-send-email-ingas@codeaurora.org>
 References: <1279662974-16454-1-git-send-email-ingas@codeaurora.org>
-	 <1279662974-16454-6-git-send-email-ingas@codeaurora.org>
+	 <1279662974-16454-2-git-send-email-ingas@codeaurora.org>
 Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 21 Jul 2010 01:46:24 -0700
-Message-ID: <1279701984.3035.2.camel@localhost.localdomain>
+Date: Wed, 21 Jul 2010 01:43:59 -0700
+Message-ID: <1279701839.3035.0.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Inga,
 
->  src/adapter.c  |   95 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
->  src/adapter.h  |    4 +-
->  src/dbus-hci.c |    6 ++--
->  3 files changed, 97 insertions(+), 8 deletions(-)
+>  src/sdpd.h |   13 +++++++++++++
+>  1 files changed, 13 insertions(+), 0 deletions(-)
 > 
-> diff --git a/src/adapter.c b/src/adapter.c
-> index b22b086..612c3a9 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -2763,8 +2763,84 @@ static void emit_device_found(const char *path, const char *address,
->  	g_dbus_send_message(connection, signal);
->  }
+> diff --git a/src/sdpd.h b/src/sdpd.h
+> index e93b0b6..7b0b3be 100644
+> --- a/src/sdpd.h
+> +++ b/src/sdpd.h
+> @@ -34,6 +34,19 @@
+>  #define SDPDBG(fmt...)
+>  #endif
 >  
-> +static int get_uuid_count_eir (uint8_t *eir_data)
-> +{
-
-please get the coding style right. It is count_eir(uint8 ...)
-
-> +	uint8_t len = 0;
-> +	int count = 0;
+> +#define EIR_DATA_LENGTH  240
 > +
-> +	while (len < EIR_DATA_LENGTH) {
-> +		uint8_t type = eir_data[1];
-> +		uint8_t field_len = eir_data[0];
-> +		if ((type == EIR_UUID16_SOME) || (type == EIR_UUID16_ALL))
-> +			count += field_len/2;
+> +#define EIR_UUID16_SOME             0x02  /* 16-bit UUID, more available */
+> +#define EIR_UUID16_ALL              0x03  /* 16-bit UUID, all listed */
+> +#define EIR_UUID32_SOME             0x04  /* 32-bit UUID, more available */
+> +#define EIR_UUID32_ALL              0x05  /* 32-bit UUID, all listed */
+> +#define EIR_UUID128_SOME            0x06  /* 128-bit UUID, more available */
+> +#define EIR_UUID128_ALL             0x07  /* 128-bit UUID, all listed */
+> +#define EIR_NAME_SHORT              0x08  /* shortened local name */
+> +#define EIR_NAME_COMPLETE           0x09  /* complete local name */
+> +#define EIR_DEVICE_ID               0x10  /* device ID */
+> +#define EIR_TX_POWER                0x0A  /* Transmit power level */
+> +
 
-The double ( ) is not needed. So if (type == ... || type == ...). That
-is enough actually.
+I don't wanna be picky, but 0x0A comes before 0x10 actually.
 
 Regards
 
