@@ -3,10 +3,10 @@ From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Jos=C3=A9=20Antonio=20Santos-Cadenas?=
 	<santoscadenas@gmail.com>
-Subject: [PATCH 40/60] Fix memory leak when double deletion happens and response code isn't SUCCESS
-Date: Thu, 22 Jul 2010 10:56:33 +0200
-Message-Id: <1279789001-4587-22-git-send-email-santoscadenas@gmail.com>
-In-Reply-To: <1279789001-4587-21-git-send-email-santoscadenas@gmail.com>
+Subject: [PATCH 38/60] Don't delete aborted MDLS
+Date: Thu, 22 Jul 2010 10:56:31 +0200
+Message-Id: <1279789001-4587-20-git-send-email-santoscadenas@gmail.com>
+In-Reply-To: <1279789001-4587-19-git-send-email-santoscadenas@gmail.com>
 References: <1279788733-2324-19-git-send-email-sancane@gmail.com>
  <1279789001-4587-1-git-send-email-santoscadenas@gmail.com>
  <1279789001-4587-2-git-send-email-santoscadenas@gmail.com>
@@ -27,46 +27,64 @@ References: <1279788733-2324-19-git-send-email-sancane@gmail.com>
  <1279789001-4587-17-git-send-email-santoscadenas@gmail.com>
  <1279789001-4587-18-git-send-email-santoscadenas@gmail.com>
  <1279789001-4587-19-git-send-email-santoscadenas@gmail.com>
- <1279789001-4587-20-git-send-email-santoscadenas@gmail.com>
- <1279789001-4587-21-git-send-email-santoscadenas@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: José Antonio Santos-Cadenas <santoscadenas@gmail.com>
 
+When a request for abort MDL creation fails we shouldn't delete the
+MDL because it may be used for future reconnections.
 ---
- mcap/mcap.c |    9 +++++++--
- 1 files changed, 7 insertions(+), 2 deletions(-)
+ mcap/mcap.c |   14 ++++++--------
+ 1 files changed, 6 insertions(+), 8 deletions(-)
 
 diff --git a/mcap/mcap.c b/mcap/mcap.c
-index 51f0d87..64e76b5 100644
+index 87aa233..d268bf6 100644
 --- a/mcap/mcap.c
 +++ b/mcap/mcap.c
-@@ -1132,7 +1132,7 @@ static void process_md_delete_mdl_req(struct mcap_mcl *mcl, uint8_t *cmd,
- 	notify = TRUE;
- 	if (mdl->state == MDL_DELETING) {
- 		/* Remote deviced requests deleting an MDL that upper profile
--		 * tries to delete, MDL will be freed when reply arrives. */
-+		 * is trying to delete, MDL will be freed when reply arrives. */
- 		mdl->mcl->cb->mdl_deleted(mdl, mdl->mcl->cb->user_data);
- 	} else
- 		mcap_delete_mdl(mdl, &notify);
-@@ -1410,9 +1410,14 @@ static gboolean process_md_delete_mdl_rsp(struct mcap_mcl *mcl, uint8_t *cmd,
- 						(rsp->rc == MCAP_INVALID_MDL)) {
- 			/* Mdl does not exist in remote side */
- 			goto del_mdl;
--		} else {
-+		} else if (g_slist_find(mdl->mcl->mdls, mdl)){
- 			/* this mdl couldn't be deleted */
- 			restore_mdl(mdl, NULL);
-+		} else {
-+			/* MDL deleted request was sent by remote side while an
-+			 * outgoing request for delete it was pending */
-+			shutdown_mdl(mdl);
-+			g_free(mdl);
- 		}
- 		goto end;
+@@ -1042,7 +1042,7 @@ static void process_md_abort_mdl_req(struct mcap_mcl *mcl, uint8_t *cmd,
+ {
+ 	mcap_md_req *req;
+ 	GSList *l;
+-	struct mcap_mdl *mdl, *del;
++	struct mcap_mdl *mdl, *abrt;
+ 	uint16_t mdl_id;
+ 
+ 	if (len != sizeof(mcap_md_req)) {
+@@ -1057,7 +1057,7 @@ static void process_md_abort_mdl_req(struct mcap_mcl *mcl, uint8_t *cmd,
+ 	for (l = mcl->mdls; l; l = l->next) {
+ 		mdl = l->data;
+ 		if ((mdl_id == mdl->mdlid) && (mdl->state == MDL_WAITING)) {
+-			del = mdl;
++			abrt = mdl;
+ 			if (mcl->state != MCL_CONNECTED)
+ 				break;
+ 			continue;
+@@ -1065,20 +1065,18 @@ static void process_md_abort_mdl_req(struct mcap_mcl *mcl, uint8_t *cmd,
+ 		if ((mdl->state == MDL_CONNECTED) && (mcl->state != MCL_ACTIVE))
+ 			mcl->state = MCL_ACTIVE;
+ 
+-		if ((del) && (mcl->state == MCL_ACTIVE))
++		if ((abrt) && (mcl->state == MCL_ACTIVE))
+ 			break;
  	}
+ 
+-	if (!del) {
++	if (!abrt) {
+ 		send4B_cmd(mcl, MCAP_MD_ABORT_MDL_RSP, MCAP_INVALID_MDL,
+ 									mdl_id);
+ 		return;
+ 	}
+ 
+-	mcl->cb->mdl_aborted(del, mcl->cb->user_data);
+-
+-	mcl->mdls = g_slist_remove(mcl->mdls, del);
+-	g_free(del);
++	mcl->cb->mdl_aborted(abrt, mcl->cb->user_data);
++	abrt->state = MDL_CLOSED;
+ 	send4B_cmd(mcl, MCAP_MD_ABORT_MDL_RSP, MCAP_SUCCESS, mdl_id);
+ }
+ 
 -- 
 1.6.3.3
 
