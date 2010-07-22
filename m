@@ -3,10 +3,10 @@ From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Jos=C3=A9=20Antonio=20Santos-Cadenas?=
 	<santoscadenas@gmail.com>
-Subject: [PATCH 46/60] Process received command in base to previous request sent
-Date: Thu, 22 Jul 2010 10:56:39 +0200
-Message-Id: <1279789001-4587-28-git-send-email-santoscadenas@gmail.com>
-In-Reply-To: <1279789001-4587-27-git-send-email-santoscadenas@gmail.com>
+Subject: [PATCH 48/60] Notify MCL closed when there is a pending callback
+Date: Thu, 22 Jul 2010 10:56:41 +0200
+Message-Id: <1279789001-4587-30-git-send-email-santoscadenas@gmail.com>
+In-Reply-To: <1279789001-4587-29-git-send-email-santoscadenas@gmail.com>
 References: <1279788733-2324-19-git-send-email-sancane@gmail.com>
  <1279789001-4587-1-git-send-email-santoscadenas@gmail.com>
  <1279789001-4587-2-git-send-email-santoscadenas@gmail.com>
@@ -35,45 +35,60 @@ References: <1279788733-2324-19-git-send-email-sancane@gmail.com>
  <1279789001-4587-25-git-send-email-santoscadenas@gmail.com>
  <1279789001-4587-26-git-send-email-santoscadenas@gmail.com>
  <1279789001-4587-27-git-send-email-santoscadenas@gmail.com>
+ <1279789001-4587-28-git-send-email-santoscadenas@gmail.com>
+ <1279789001-4587-29-git-send-email-santoscadenas@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: José Antonio Santos-Cadenas <santoscadenas@gmail.com>
 
 ---
- mcap/mcap.c |   12 +++++++-----
- 1 files changed, 7 insertions(+), 5 deletions(-)
+ mcap/mcap.c     |   11 ++++++++++-
+ mcap/mcap_lib.h |    1 +
+ 2 files changed, 11 insertions(+), 1 deletions(-)
 
 diff --git a/mcap/mcap.c b/mcap/mcap.c
-index 18220bc..3f3268b 100644
+index f164e76..434d50f 100644
 --- a/mcap/mcap.c
 +++ b/mcap/mcap.c
-@@ -1254,6 +1254,12 @@ static gboolean check_err_rsp(struct mcap_mcl *mcl, uint8_t *cmd,
- 	mcap4B_rsp *rsp;
- 	char *msg;
+@@ -1643,6 +1643,7 @@ void mcap_mdl_connect(struct mcap_mdl *mdl, BtIOType BtType, uint16_t dcpsm,
+ static gboolean mcl_control_cb(GIOChannel *chan, GIOCondition cond,
+ 								gpointer data)
+ {
++	GError *gerr = NULL;
  
-+	if (cmd[0] == MCAP_ERROR_RSP) {
-+		msg = "MCAP_ERROR_RSP received";
-+		close = TRUE;
-+		goto fail;
+ 	struct mcap_mcl *mcl = data;
+ 	int sk, len;
+@@ -1659,8 +1660,16 @@ static gboolean mcl_control_cb(GIOChannel *chan, GIOCondition cond,
+ 	proc_cmd(mcl, buf, (uint32_t)len);
+ 	return TRUE;
+ fail:
+-	if (mcl->state != MCL_IDLE)
++	if (mcl->state != MCL_IDLE) {
++		if (mcl->req == MCL_WAITING_RSP) {
++			/* notify error in pending callback */
++			g_set_error(&gerr, MCAP_ERROR, MCAP_ERROR_MCL_CLOSED,
++								"MCL closed");
++			mcap_notify_error(mcl, gerr, TRUE);
++			g_error_free(gerr);
++		}
+ 		mcl->ms->mcl_disconnected_cb(mcl, mcl->ms->user_data);
 +	}
-+
- 	/* Check if the response matches with the last request */
- 	if ((rlen < MIN_RSP_LEN) || ((mcl->lcmd[0] + 1) != cmd[0])) {
- 		msg = "Protocol error";
-@@ -1492,11 +1498,7 @@ static void proc_response(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
- 	gboolean close;
- 	RELEASE_TIMER(mcl);
+ 	mcap_cache_mcl(mcl);
+ 	return FALSE;
+ }
+diff --git a/mcap/mcap_lib.h b/mcap/mcap_lib.h
+index 67c2f29..afac8aa 100644
+--- a/mcap/mcap_lib.h
++++ b/mcap/mcap_lib.h
+@@ -52,6 +52,7 @@ typedef enum {
+ 	MCAP_ERROR_INVALID_ARGS,
+ 	MCAP_ERROR_ALREADY_EXISTS,
+ 	MCAP_ERROR_REQ_IGNORED,
++	MCAP_ERROR_MCL_CLOSED,
+ 	MCAP_ERROR_FAILED
+ } McapError;
  
--	switch (cmd[0]) {
--	case MCAP_ERROR_RSP:
--		error("MCAP_ERROR_RSP received");
--		close = TRUE;
--		break;
-+	switch (mcl->lcmd[0] + 1) {
- 	case MCAP_MD_CREATE_MDL_RSP:
- 		close = process_md_create_mdl_rsp(mcl, cmd, len);
- 		break;
 -- 
 1.6.3.3
 
