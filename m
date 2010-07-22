@@ -1,213 +1,146 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ron Shaffer <rshaffer@codeaurora.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	Ron Shaffer <rshaffer@codeaurora.org>
-Subject: [PATCH v2] Bluetooth: Defer SCO setup if mode change is pending
-Date: Thu, 22 Jul 2010 15:45:33 -0400
-Message-Id: <1279827933-4180-1-git-send-email-rshaffer@codeaurora.org>
-In-Reply-To: <1279644961.4572.60.camel@localhost.localdomain>
-References: <1279644961.4572.60.camel@localhost.localdomain>
+Message-ID: <4C4878C2.9000903@signal11.us>
+Date: Thu, 22 Jul 2010 12:58:42 -0400
+From: Alan Ott <alan@signal11.us>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Jiri Kosina <jkosina@suse.cz>,
+	David S Miller <davem@davemloft.net>,
+	Michael Poole <mdpoole@troilus.org>,
+	Bastien Nocera <hadess@hadess.net>,
+	Eric Dumazet <eric.dumazet@gmail.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 1/1] Bluetooth: hidp: Add support for hidraw     HIDIOCGFEATURE  and HIDIOCSFEATURE
+References: <1276467601-9066-1-git-send-email-alan@signal11.us>	 <1278623485.10421.73.camel@localhost.localdomain>	 <4C369CDC.9080104@signal11.us>	 <1278662497.10421.94.camel@localhost.localdomain>	 <4C371DE8.9020002@signal11.us>	 <1278680790.10421.106.camel@localhost.localdomain>	 <4C372CEE.3070109@signal11.us>	 <1278696815.10421.137.camel@localhost.localdomain>	 <alpine.LNX.2.00.1007221612450.4741@pobox.suse.cz> <1279812115.2621.6.camel@localhost.localdomain>
+In-Reply-To: <1279812115.2621.6.camel@localhost.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Marcel Holtmann <marcel@holtmann.org>
+On 07/22/2010 11:21 AM, Marcel Holtmann wrote:
+>>>>>>> what is usb-hid.ko doing here? I would expect a bunch of code
+>>>>>>> duplication with minor difference between USB and Bluetooth.
+>>>>>>>
+>>>>>>>                
+>>>>>> usbhid doesn't have a lot of code for hidraw. Two functions are involved:
+>>>>>>        usbhid_output_raw_report()
+>>>>>>            - calls usb_control_msg() with Get_Report
+>>>>>>        usbhid_get_raw_report()
+>>>>>>            - calls usb_control_msg() with Set_Report
+>>>>>>                OR
+>>>>>>            - calls usb_interrupt_msg() on the Ouput pipe.
+>>>>>>
+>>>>>> This is of course easier than bluetooth because usb_control_msg() is
+>>>>>> synchronous, even when requesting reports, mostly because of the nature
+>>>>>> of USB, where the request and response are part of the same transfer.
+>>>>>>
+>>>>>> For Bluetooth, it's a bit more complicated since the kernel treats it
+>>>>>> more like a networking interface (and indeed it is). My understanding is
+>>>>>> that to make a synchronous transfer in bluetooth, one must:
+>>>>>>        - send the request packet
+>>>>>>        - block (wait_event_*())
+>>>>>>        - when the response is received in the input handler, wake_up_*().
+>>>>>>
+>>>>>> There's not really any code duplication, mostly because initiating
+>>>>>> synchronous USB transfers (input and output) is easy (because of the
+>>>>>> usb_*_msg() functions), while making synchronous Bluetooth transfers
+>>>>>> must be done manually. If there's a nice, convenient, synchronous
+>>>>>> function in Bluetooth similar to usb_control_msg() that I've missed,
+>>>>>> then let me know, as it would simplify this whole thing.
+>>>>>>
+>>>>>>              
+>>>>> there is not and I don't think we ever get one. My question here was
+>>>>> more in the direction why HID core is doing these synchronously in the
+>>>>> first place. Especially since USB can do everything async as well.
+>>>>>            
+>>>> I'm open to suggestions. The way I see it is from a user space
+>>>> perspective. With Get_Feature being on an ioctl(), I don't see any clean
+>>>> way to do it other than synchronously. Other operating systems (I can
+>>>> say for sure Windows, Mac OS X, and FreeBSD) handle Get/Set Feature the
+>>>> same way (synchronously) from user space.
+>>>>
+>>>> You seem to be proposing an asynchronous interface. What would that look
+>>>> like from user space?
+>>>>          
+>>> not necessarily from user space, but at least from HID core to HIDP and
+>>> usb-hid transports. At least that is what I would expect, Jiri?
+>>>        
+>> Sorry for this taking too long (vacations, conferences, you name it) for
+>> me to respond.
+>>
+>> As all the _raw() callbacks are purely intended for userspace interaction
+>> anyway, it's perfectly fine (and in fact desirable) for the low-level
+>> transport drivers to perform these operations synchronously (and that's
+>> what USB implementation does as well).
+>>
+>> Marcel, if your opposition to synchronous interface is strong, we'll have
+>> to think about other aproaches, but from my POV, the patch is fine as-is
+>> for Bluetooth.
+>>      
+> that the ioctl() API is synchronous is fine to me, however pushing that
+> down to the transport drivers seems wrong to me. I think the HID core
+> should be able to handle a fully asynchronous transport driver. I know
+> that with the USB subsystem you are little bit spoiled here, but for
+> Bluetooth it is not the case. And in the end even using the asynchronous
+> USB URB calls would be nice as well.
+>    
 
-Certain headsets such as the Motorola H350 will reject SCO and eSCO
-connection requests while the ACL is transitioning from sniff mode
-to active mode. Add synchronization so that SCO and eSCO connection
-requests will wait until the ACL has fully transitioned to active mode.
+How are the URB calls better than using the synchronous calls? (see below)
 
-< HCI Command: Exit Sniff Mode (0x02|0x0004) plen 2
-    handle 12
-> HCI Event: Command Status (0x0f) plen 4
-    Exit Sniff Mode (0x02|0x0004) status 0x00 ncmd 1
-< HCI Command:  Setup Synchronous Connection (0x01|0x0028) plen 17
-    handle 12 voice setting 0x0040
-> HCI Event: Command Status (0x0f) plen 4
-    Setup Synchronous Connection (0x01|0x0028) status 0x00 ncmd 1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 12 packets 1
-> HCI Event: Mode Change (0x14) plen 6
-    status 0x00 handle 12 mode 0x00 interval 0
-    Mode: Active
-> HCI Event: Synchronous Connect Complete (0x2c) plen 17
-    status 0x10 handle 14 bdaddr 00:1A:0E:50:28:A4 type SCO
-    Error: Connection Accept Timeout Exceeded
+> So why not make the core actually wait for responses from the transport
+> driver.
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-Signed-off-by: Ron Shaffer <rshaffer@codeaurora.org>
----
- include/net/bluetooth/hci_core.h |    2 +
- net/bluetooth/hci_conn.c         |   32 ++++++++++++++++++++++---
- net/bluetooth/hci_event.c        |   47 ++++++++++++++++++-------------------
- 3 files changed, 53 insertions(+), 28 deletions(-)
+Because this makes the USB side a lot more complicated, and it would 
+introduce transport specific code into the core. Further, it would 
+involve the transport driver calling hidraw with _every_ single packet 
+it receives. Further, it would have to call hidraw with HANDSHAKE 
+protocol error packets as well.
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index e42f6ed..edf3dfe 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -250,6 +250,7 @@ enum {
- 	HCI_CONN_ENCRYPT_PEND,
- 	HCI_CONN_RSWITCH_PEND,
- 	HCI_CONN_MODE_CHANGE_PEND,
-+	HCI_CONN_SCO_SETUP_PEND,
- };
- 
- static inline void hci_conn_hash_init(struct hci_dev *hdev)
-@@ -330,6 +331,7 @@ void hci_acl_connect(struct hci_conn *conn);
- void hci_acl_disconn(struct hci_conn *conn, __u8 reason);
- void hci_add_sco(struct hci_conn *conn, __u16 handle);
- void hci_setup_sync(struct hci_conn *conn, __u16 handle);
-+void hci_sco_setup(struct hci_conn *conn, __u8 status);
- 
- struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst);
- int hci_conn_del(struct hci_conn *conn);
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index b10e3cd..805a22c 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -155,6 +155,27 @@ void hci_setup_sync(struct hci_conn *conn, __u16 handle)
- 	hci_send_cmd(hdev, HCI_OP_SETUP_SYNC_CONN, sizeof(cp), &cp);
- }
- 
-+/* Device _must_ be locked */
-+void hci_sco_setup(struct hci_conn *conn, __u8 status)
-+{
-+	struct hci_conn *sco = conn->link;
-+
-+	BT_DBG("%p", conn);
-+
-+	if (!sco)
-+		return;
-+
-+	if (!status) {
-+		if (lmp_esco_capable(conn->hdev))
-+			hci_setup_sync(sco, conn->handle);
-+		else
-+			hci_add_sco(sco, conn->handle);
-+	} else {
-+		hci_proto_connect_cfm(sco, status);
-+		hci_conn_del(sco);
-+	}
-+}
-+
- static void hci_conn_timeout(unsigned long arg)
- {
- 	struct hci_conn *conn = (void *) arg;
-@@ -380,10 +401,13 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
- 		acl->power_save = 1;
- 		hci_conn_enter_active_mode(acl);
- 
--		if (lmp_esco_capable(hdev))
--			hci_setup_sync(sco, acl->handle);
--		else
--			hci_add_sco(sco, acl->handle);
-+		if (test_bit(HCI_CONN_MODE_CHANGE_PEND, &acl->pend)) {
-+			/* defer SCO setup until mode change completed */
-+			set_bit(HCI_CONN_SCO_SETUP_PEND, &acl->pend);
-+			return sco;
-+		}
-+
-+		hci_sco_setup(acl, 0x00);
- 	}
- 
- 	return sco;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 6c57fc7..9aee8c5 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -775,9 +775,6 @@ static void hci_cs_sniff_mode(struct hci_dev *hdev, __u8 status)
- 
- 	BT_DBG("%s status 0x%x", hdev->name, status);
- 
--	if (!status)
--		return;
--
- 	cp = hci_sent_cmd_data(hdev, HCI_OP_SNIFF_MODE);
- 	if (!cp)
- 		return;
-@@ -785,8 +782,15 @@ static void hci_cs_sniff_mode(struct hci_dev *hdev, __u8 status)
- 	hci_dev_lock(hdev);
- 
- 	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(cp->handle));
--	if (conn)
--		clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend);
-+	if (conn) {
-+		if (status) {
-+			clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend);
-+
-+			if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND,
-+					&conn->pend))
-+				hci_sco_setup(conn, status);
-+		}
-+	}
- 
- 	hci_dev_unlock(hdev);
- }
-@@ -798,9 +802,6 @@ static void hci_cs_exit_sniff_mode(struct hci_dev *hdev, __u8 status)
- 
- 	BT_DBG("%s status 0x%x", hdev->name, status);
- 
--	if (!status)
--		return;
--
- 	cp = hci_sent_cmd_data(hdev, HCI_OP_EXIT_SNIFF_MODE);
- 	if (!cp)
- 		return;
-@@ -808,8 +809,15 @@ static void hci_cs_exit_sniff_mode(struct hci_dev *hdev, __u8 status)
- 	hci_dev_lock(hdev);
- 
- 	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(cp->handle));
--	if (conn)
--		clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend);
-+	if (conn) {
-+		if (status) {
-+			clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend);
-+
-+			if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND,
-+					&conn->pend))
-+				hci_sco_setup(conn, status);
-+		}
-+	}
- 
- 	hci_dev_unlock(hdev);
- }
-@@ -915,20 +923,8 @@ static inline void hci_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *s
- 	} else
- 		conn->state = BT_CLOSED;
- 
--	if (conn->type == ACL_LINK) {
--		struct hci_conn *sco = conn->link;
--		if (sco) {
--			if (!ev->status) {
--				if (lmp_esco_capable(hdev))
--					hci_setup_sync(sco, conn->handle);
--				else
--					hci_add_sco(sco, conn->handle);
--			} else {
--				hci_proto_connect_cfm(sco, ev->status);
--				hci_conn_del(sco);
--			}
--		}
--	}
-+	if (conn->type == ACL_LINK)
-+		hci_sco_setup(conn, ev->status);
- 
- 	if (ev->status) {
- 		hci_proto_connect_cfm(conn, ev->status);
-@@ -1478,6 +1474,9 @@ static inline void hci_mode_change_evt(struct hci_dev *hdev, struct sk_buff *skb
- 				conn->power_save = 1;
- 			else
- 				conn->power_save = 0;
-+		} else if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND,
-+				&conn->pend)) {
-+			hci_sco_setup(conn, ev->status);
- 		}
- 	}
- 
--- 
-1.7.0.2
---
-Ron Shaffer
-Employee of the Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
+>   I would make the transport drivers a lot simpler in the long
+> run.
+
+It would make the USB transport driver and drivers/hid/hidraw much more 
+complicated right now, at the expense of making the BT transport driver 
+marginally simpler (and I'm not even convinced whether it would really 
+be simpler). (see below for more)
+
+>   And I know that most likely besides Bluetooth and USB you won't see
+> another, but you never know.
+>
+>    
+
+I just don't understand the objection. In each transport type, the 
+waiting will have to be done in a different way. USB and BT are 
+different enough that this is the case already, without having to 
+imagine future buses which use HID. In BT, you have to check each packet 
+which comes back from the BT network to see whether it is the response 
+packet that hidraw is waiting for. Further, you have to check for 
+HANDSHAKE packets indicating protocol error. Where better for this to be 
+done than in hidp? Further, how can this possibly happen in 
+drivers/hid/hidraw, as it doesn't know about the details of bluetooth to 
+make this determination, and why should it? In my last email ( 
+http://lkml.org/lkml/2010/7/9/231 ) to which I got no response, I laid 
+out how doing the blocking in drivers/hid/hidraw would only make all the 
+parts except bluetooth more complicated (including the core, and the USB 
+side), and would also introduce bluetooth-specific things into the core.
+
+Further, you're saying that using the asynchronous USB URB calls would 
+be a benefit. How is it a benefit to replace a single function call 
+which does exactly what I want, with a set of asynchronous calls and 
+then adding my own blocking to make it do the same thing? This sounds to 
+me like it would be 1: more text, 2: duplication of code, 3: error 
+prone. I can't understand how this is of benefit. Please explain to me 
+what I'm missing.
+
+In theory, what you're saying makes sense. Making common code and logic 
+actually common is always good. In practice though, in this case, I 
+submit that there really isn't any commonality, and the only way for 
+there to be commonality is to do the USB side the hard way. Further, 
+drivers/hid/hidraw can't wait for a bluetooth packet without having code 
+that's bluetooth-specific. It seems just that simple to me.
+
+I'll give it some more thought, and take another look at the code to see 
+if there's something obvious that I'm missing. If you know what I'm 
+missing in my understanding of the problem, please tell me :)
+
+Alan.
