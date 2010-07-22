@@ -2,10 +2,10 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 60/60] Change variable name for MCAP Instances
-Date: Thu, 22 Jul 2010 10:58:17 +0200
-Message-Id: <1279789097-2420-12-git-send-email-sancane@gmail.com>
-In-Reply-To: <1279789097-2420-11-git-send-email-sancane@gmail.com>
+Subject: [PATCH 59/60] Remove "req" word from MCAP API
+Date: Thu, 22 Jul 2010 10:58:16 +0200
+Message-Id: <1279789097-2420-11-git-send-email-sancane@gmail.com>
+In-Reply-To: <1279789097-2420-10-git-send-email-sancane@gmail.com>
 References: <1279789001-4587-30-git-send-email-santoscadenas@gmail.com>
  <1279789097-2420-1-git-send-email-sancane@gmail.com>
  <1279789097-2420-2-git-send-email-sancane@gmail.com>
@@ -17,130 +17,154 @@ References: <1279789001-4587-30-git-send-email-santoscadenas@gmail.com>
  <1279789097-2420-8-git-send-email-sancane@gmail.com>
  <1279789097-2420-9-git-send-email-sancane@gmail.com>
  <1279789097-2420-10-git-send-email-sancane@gmail.com>
- <1279789097-2420-11-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- mcap/mcap.c     |   46 +++++++++++++++++++++++-----------------------
- mcap/mcap_lib.h |    6 +++---
- 2 files changed, 26 insertions(+), 26 deletions(-)
+ mcap/mcap.c     |   24 ++++++++++++------------
+ mcap/mcap_lib.h |   10 +++++-----
+ 2 files changed, 17 insertions(+), 17 deletions(-)
 
 diff --git a/mcap/mcap.c b/mcap/mcap.c
-index 5369328..6155f0a 100644
+index b3017fb..5369328 100644
 --- a/mcap/mcap.c
 +++ b/mcap/mcap.c
-@@ -1987,51 +1987,51 @@ struct mcap_instance *mcap_create_instance(struct btd_adapter *btd_adapter,
- 	return ms;
+@@ -307,8 +307,8 @@ int mcap_send_data(int sock, const uint8_t *buf, uint32_t size)
+ 	return 0;
  }
  
--void mcap_release_instance(struct mcap_instance *ms)
-+void mcap_release_instance(struct mcap_instance *mi)
+-static int mcap_send_cmd(struct mcap_mcl *mcl, uint8_t oc, uint8_t rc, uint16_t mdl,
+-						uint8_t *data, size_t len)
++static int mcap_send_cmd(struct mcap_mcl *mcl, uint8_t oc, uint8_t rc,
++					uint16_t mdl, uint8_t *data, size_t len)
+ {
+ 	mcap_rsp *cmd;
+ 	uint8_t *rsp;
+@@ -427,7 +427,7 @@ static gboolean wait_response_timer(gpointer data)
+ 	return FALSE;
+ }
+ 
+-void mcap_req_mdl_creation(struct mcap_mcl *mcl,
++void mcap_create_mdl(struct mcap_mcl *mcl,
+ 				uint8_t mdepid,
+ 				uint8_t conf,
+ 				mcap_mdl_operation_conf_cb connect_cb,
+@@ -474,7 +474,7 @@ void mcap_req_mdl_creation(struct mcap_mcl *mcl,
+ 									mcl);
+ }
+ 
+-void mcap_req_mdl_reconnect(struct mcap_mdl *mdl,
++void mcap_reconnect_mdl(struct mcap_mdl *mdl,
+ 				mcap_mdl_operation_cb reconnect_cb,
+ 				gpointer user_data,
+ 				GError **err)
+@@ -529,7 +529,7 @@ static void send_delete_req(GError **err, struct mcap_mcl *mcl,
+ 									mcl);
+ }
+ 
+-void mcap_req_mdl_delete_all(struct mcap_mcl *mcl, mcap_mdl_notify_cb delete_cb,
++void mcap_delete_all_mdls(struct mcap_mcl *mcl, mcap_mdl_notify_cb delete_cb,
+ 					gpointer user_data, GError **err)
  {
  	GSList *l;
- 
--	if (!ms)
-+	if (!mi)
- 		return;
- 
--	if (ms->ccio) {
--		g_io_channel_shutdown(ms->ccio, TRUE, NULL);
--		g_io_channel_unref(ms->ccio);
--		ms->ccio = NULL;
-+	if (mi->ccio) {
-+		g_io_channel_shutdown(mi->ccio, TRUE, NULL);
-+		g_io_channel_unref(mi->ccio);
-+		mi->ccio = NULL;
- 	}
- 
--	if (ms->dcio) {
--		g_io_channel_shutdown(ms->dcio, TRUE, NULL);
--		g_io_channel_unref(ms->dcio);
--		ms->dcio = NULL;
-+	if (mi->dcio) {
-+		g_io_channel_shutdown(mi->dcio, TRUE, NULL);
-+		g_io_channel_unref(mi->dcio);
-+		mi->dcio = NULL;
- 	}
- 
--	for (l = ms->mcls; l; l = l->next) {
-+	for (l = mi->mcls; l; l = l->next) {
- 		mcap_mcl_shutdown(l->data);
- 		mcap_mcl_unref(l->data);
- 	}
--	g_slist_free(ms->mcls);
--	ms->mcls = NULL;
-+	g_slist_free(mi->mcls);
-+	mi->mcls = NULL;
- 
--	for (l = ms->cached; l; l = l->next)
-+	for (l = mi->cached; l; l = l->next)
- 		mcap_mcl_unref(l->data);
--	g_slist_free(ms->cached);
--	ms->cached = NULL;
-+	g_slist_free(mi->cached);
-+	mi->cached = NULL;
- 
--	g_free(ms);
-+	g_free(mi);
+@@ -559,7 +559,7 @@ void mcap_req_mdl_delete_all(struct mcap_mcl *mcl, mcap_mdl_notify_cb delete_cb,
+ 		g_free(con);
  }
  
--uint16_t mcap_get_ctrl_psm(struct mcap_instance *ms, GError **err)
-+uint16_t mcap_get_ctrl_psm(struct mcap_instance *mi, GError **err)
+-void mcap_req_mdl_deletion(struct mcap_mdl *mdl, mcap_mdl_notify_cb delete_cb,
++void mcap_delete_mdl(struct mcap_mdl *mdl, mcap_mdl_notify_cb delete_cb,
+ 					gpointer user_data, GError **err)
  {
- 	uint16_t lpsm;
- 
--	if (!(ms && ms->ccio)) {
-+	if (!(mi && mi->ccio)) {
- 		g_set_error(err, MCAP_ERROR, MCAP_ERROR_INVALID_ARGS,
- 			"Invalid MCAP instance");
- 		return 0;
- 	}
- 
--	bt_io_get(ms->ccio, BT_IO_L2CAP, err,
-+	bt_io_get(mi->ccio, BT_IO_L2CAP, err,
- 			BT_IO_OPT_PSM, &lpsm,
- 			BT_IO_OPT_INVALID);
- 	if (*err)
-@@ -2039,17 +2039,17 @@ uint16_t mcap_get_ctrl_psm(struct mcap_instance *ms, GError **err)
- 	return lpsm;
+ 	struct mcap_mcl *mcl= mdl->mcl;
+@@ -915,7 +915,7 @@ void mcap_mcl_get_addr(struct mcap_mcl *mcl, bdaddr_t *addr)
+ 	bacpy(addr, &mcl->addr);
  }
  
--uint16_t mcap_get_data_psm(struct mcap_instance *ms, GError **err)
-+uint16_t mcap_get_data_psm(struct mcap_instance *mi, GError **err)
+-static void mcap_delete_mdl(gpointer elem, gpointer user_data)
++static void mcap_del_mdl(gpointer elem, gpointer user_data)
  {
- 	uint16_t lpsm;
+ 	struct mcap_mdl *mdl = elem;
+ 	gboolean notify = *(gboolean *)user_data;
+@@ -1127,7 +1127,7 @@ static void process_md_delete_mdl_req(struct mcap_mcl *mcl, uint8_t *cmd,
+ 	mdlid = ntohs(req->mdl);
+ 	if (mdlid == MCAP_ALL_MDLIDS) {
+ 		notify = FALSE;
+-		g_slist_foreach(mcl->mdls, mcap_delete_mdl, &notify);
++		g_slist_foreach(mcl->mdls, mcap_del_mdl, &notify);
+ 		g_slist_free(mcl->mdls);
+ 		mcl->mdls = NULL;
+ 		mcl->state = MCL_CONNECTED;
+@@ -1158,7 +1158,7 @@ static void process_md_delete_mdl_req(struct mcap_mcl *mcl, uint8_t *cmd,
+ 	mcl->mdls = g_slist_remove(mcl->mdls, mdl);
+ 	update_mcl_state(mcl);
+ 	notify = TRUE;
+-	mcap_delete_mdl(mdl, &notify);
++	mcap_del_mdl(mdl, &notify);
  
--	if (!(ms && ms->dcio)) {
-+	if (!(mi && mi->dcio)) {
- 		g_set_error(err, MCAP_ERROR, MCAP_ERROR_INVALID_ARGS,
- 			"Invalid MCAP instance");
- 		return 0;
+ resp:
+ 	mcap_send_cmd(mcl, MCAP_MD_DELETE_MDL_RSP, MCAP_SUCCESS, mdlid,
+@@ -1456,7 +1456,7 @@ static gboolean process_md_delete_mdl_rsp(struct mcap_mcl *mcl, uint8_t *cmd,
  	}
  
--	bt_io_get(ms->dcio, BT_IO_L2CAP, err,
-+	bt_io_get(mi->dcio, BT_IO_L2CAP, err,
- 			BT_IO_OPT_PSM, &lpsm,
- 			BT_IO_OPT_INVALID);
- 	if (*err)
+ 	if (mdlid == MCAP_ALL_MDLIDS) {
+-		g_slist_foreach(mcl->mdls, mcap_delete_mdl, &notify);
++		g_slist_foreach(mcl->mdls, mcap_del_mdl, &notify);
+ 		g_slist_free(mcl->mdls);
+ 		mcl->mdls = NULL;
+ 		mcl->state = MCL_CONNECTED;
+@@ -1465,7 +1465,7 @@ static gboolean process_md_delete_mdl_rsp(struct mcap_mcl *mcl, uint8_t *cmd,
+ 
+ 	mcl->mdls = g_slist_remove(mcl->mdls, mdl);
+ 	update_mcl_state(mcl);
+-	mcap_delete_mdl(mdl, &notify);
++	mcap_del_mdl(mdl, &notify);
+ end:
+ 	deleted_cb(gerr, user_data);
+ 	return close;
+@@ -1594,7 +1594,7 @@ static void mcap_connect_mdl_cb(GIOChannel *chan, GError *conn_err,
+ 	cb(mdl, conn_err, user_data);
+ }
+ 
+-void mcap_mdl_connect(struct mcap_mdl *mdl, BtIOType BtType, uint16_t dcpsm,
++void mcap_connect_mdl(struct mcap_mdl *mdl, BtIOType BtType, uint16_t dcpsm,
+ 	mcap_mdl_operation_cb connect_cb, gpointer user_data, GError **err)
+ {
+ 	struct mcap_mdl_op_cb *con;
 diff --git a/mcap/mcap_lib.h b/mcap/mcap_lib.h
-index fa62cbe..b6286a1 100644
+index 7b8fcfd..fa62cbe 100644
 --- a/mcap/mcap_lib.h
 +++ b/mcap/mcap_lib.h
-@@ -158,10 +158,10 @@ struct mcap_instance *mcap_create_instance(struct btd_adapter *btd_adapter,
- 					gpointer user_data,
- 					GError **gerr);
+@@ -98,25 +98,25 @@ typedef void (* mcap_mcl_connect_cb) (struct mcap_mcl *mcl, GError *err,
  
--void mcap_release_instance(struct mcap_instance *ms);
-+void mcap_release_instance(struct mcap_instance *mi);
+ /* Mdl operations*/
  
--uint16_t mcap_get_ctrl_psm(struct mcap_instance *ms, GError **err);
--uint16_t mcap_get_data_psm(struct mcap_instance *ms, GError **err);
-+uint16_t mcap_get_ctrl_psm(struct mcap_instance *mi, GError **err);
-+uint16_t mcap_get_data_psm(struct mcap_instance *mi, GError **err);
- 
- #ifdef __cplusplus
- }
+-void mcap_req_mdl_creation(struct mcap_mcl *mcl,
++void mcap_create_mdl(struct mcap_mcl *mcl,
+ 				uint8_t mdepid,
+ 				uint8_t conf,
+ 				mcap_mdl_operation_conf_cb connect_cb,
+ 				gpointer user_data,
+ 				GError **err);
+-void mcap_req_mdl_reconnect(struct mcap_mdl *mdl,
++void mcap_reconnect_mdl(struct mcap_mdl *mdl,
+ 				mcap_mdl_operation_cb reconnect_cb,
+ 				gpointer user_data,
+ 				GError **err);
+-void mcap_req_mdl_delete_all(struct mcap_mcl *mcl,
++void mcap_delete_all_mdls(struct mcap_mcl *mcl,
+ 				mcap_mdl_notify_cb delete_cb,
+ 				gpointer user_data,
+ 				GError **err);
+-void mcap_req_mdl_deletion(struct mcap_mdl *mdl,
++void mcap_delete_mdl(struct mcap_mdl *mdl,
+ 				mcap_mdl_notify_cb delete_cb,
+ 				gpointer user_data,
+ 				GError **err);
+-void mcap_mdl_connect(struct mcap_mdl *mdl,
++void mcap_connect_mdl(struct mcap_mdl *mdl,
+ 				BtIOType BtType,
+ 				uint16_t dcpsm,
+ 				mcap_mdl_operation_cb connect_cb,
 -- 
 1.6.3.3
 
