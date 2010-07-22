@@ -1,31 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 22 Jul 2010 20:36:06 -0300
+Date: Thu, 22 Jul 2010 20:31:07 -0300
 From: "Gustavo F. Padovan" <gustavo@padovan.org>
-To: Santiago Carot-Nemesio <sancane@gmail.com>
+To: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: MCAP Patches
-Message-ID: <20100722233606.GB2620@vigoh>
-References: <1279788733-2324-1-git-send-email-sancane@gmail.com>
+Subject: Re: [PATCH 27/60] Fix wrong response code rejecting reconnections
+Message-ID: <20100722233107.GA2620@vigoh>
+References: <1279788733-2324-19-git-send-email-sancane@gmail.com>
+ <1279789001-4587-1-git-send-email-santoscadenas@gmail.com>
+ <1279789001-4587-2-git-send-email-santoscadenas@gmail.com>
+ <1279789001-4587-3-git-send-email-santoscadenas@gmail.com>
+ <1279789001-4587-4-git-send-email-santoscadenas@gmail.com>
+ <1279789001-4587-5-git-send-email-santoscadenas@gmail.com>
+ <1279789001-4587-6-git-send-email-santoscadenas@gmail.com>
+ <1279789001-4587-7-git-send-email-santoscadenas@gmail.com>
+ <1279789001-4587-8-git-send-email-santoscadenas@gmail.com>
+ <1279789001-4587-9-git-send-email-santoscadenas@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1279788733-2324-1-git-send-email-sancane@gmail.com>
+In-Reply-To: <1279789001-4587-9-git-send-email-santoscadenas@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Santiago,
+Hi Jose,
 
-* Santiago Carot-Nemesio <sancane@gmail.com> [2010-07-22 10:51:55 +0200]:
+* Jose Antonio Santos Cadenas <santoscadenas@gmail.com> [2010-07-22 10:56:20 +0200]:
 
-> Hello,
+> From: José Antonio Santos-Cadenas <santoscadenas@gmail.com>
 > 
-> Next you are MCAP patches that José Antonio Santos Cadenas and me have generated for BlueZ.
-> We still believe that MCAP should be an independent library from HDP because other profiles
-> non health related may want to use it in the future, if we set this health dependency we will
-> force to import health features in plugins that only require MCAP.
-> Nevertheless, as we accorded last week in Brazil we are sending a last patch to set MCAP
-> into health directory with HDP. We leave in your hands upload it as health plugin or not.
+> ---
+>  mcap/mcap.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/mcap/mcap.c b/mcap/mcap.c
+> index 43b215b..7098a8d 100644
+> --- a/mcap/mcap.c
+> +++ b/mcap/mcap.c
+> @@ -1024,7 +1024,7 @@ static void process_md_reconnect_mdl_req(struct mcap_mcl *mcl, uint8_t *cmd,
+>  		return;
+>  
+>  	if (rsp != MCAP_SUCCESS) {
+> -		send4B_cmd(mcl, MCAP_MD_CREATE_MDL_RSP, rsp, mdl_id);
+> +		send4B_cmd(mcl, MCAP_MD_RECONNECT_MDL_RSP, rsp, mdl_id);
+>  		return;
+>  	}
 
-Please provide a git tree link for theses patches too. Thanks. 
+As we do not merged any patches for MCAP this fix could be amended with
+the patch the implements process_md_reconnect_mdl_req().
 
 -- 
 Gustavo F. Padovan
