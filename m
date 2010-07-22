@@ -2,10 +2,10 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 12/60] Managing connection of Data Channels
-Date: Thu, 22 Jul 2010 10:52:07 +0200
-Message-Id: <1279788733-2324-13-git-send-email-sancane@gmail.com>
-In-Reply-To: <1279788733-2324-12-git-send-email-sancane@gmail.com>
+Subject: [PATCH 11/60] Process commands in ACTIVE state
+Date: Thu, 22 Jul 2010 10:52:06 +0200
+Message-Id: <1279788733-2324-12-git-send-email-sancane@gmail.com>
+In-Reply-To: <1279788733-2324-11-git-send-email-sancane@gmail.com>
 References: <1279788733-2324-1-git-send-email-sancane@gmail.com>
  <1279788733-2324-2-git-send-email-sancane@gmail.com>
  <1279788733-2324-3-git-send-email-sancane@gmail.com>
@@ -17,105 +17,38 @@ References: <1279788733-2324-1-git-send-email-sancane@gmail.com>
  <1279788733-2324-9-git-send-email-sancane@gmail.com>
  <1279788733-2324-10-git-send-email-sancane@gmail.com>
  <1279788733-2324-11-git-send-email-sancane@gmail.com>
- <1279788733-2324-12-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- mcap/mcap.c |   71 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 70 insertions(+), 1 deletions(-)
+ mcap/mcap.c |   14 +++++++++++++-
+ 1 files changed, 13 insertions(+), 1 deletions(-)
 
 diff --git a/mcap/mcap.c b/mcap/mcap.c
-index cf44472..1d86c51 100644
+index 9f41c6b..cf44472 100644
 --- a/mcap/mcap.c
 +++ b/mcap/mcap.c
-@@ -754,6 +754,27 @@ static void proc_cmd(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
- 		proc_req[mcl->state](mcl, cmd, len);
- }
+@@ -679,7 +679,19 @@ static void proc_req_pending(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
  
-+static gboolean mdl_event_cb(GIOChannel *chan, GIOCondition cond, gpointer data)
-+{
-+
-+	struct mcap_mdl *mdl = data;
-+	gboolean notify;
-+
-+	DBG("Close MDL %d", mdl->mdlid);
-+
-+	notify = (mdl->state == MDL_CONNECTED);
-+	shutdown_mdl(mdl);
-+
-+	update_mcl_state(mdl->mcl);
-+
-+	if (notify) {
-+		/*Callback to upper layer */
-+		mdl->mcl->cb->mdl_closed(mdl, mdl->mcl->cb->user_data);
-+	}
-+
-+	return FALSE;
-+}
-+
- static gboolean mcl_control_cb(GIOChannel *chan, GIOCondition cond,
- 								gpointer data)
- {
-@@ -779,9 +800,57 @@ fail:
- 	return FALSE;
- }
- 
-+static void connect_dc_event_cb(GIOChannel *chan, GError *err,
-+							gpointer user_data)
-+{
-+	struct mcap_mdl *mdl = user_data;
-+	struct mcap_mcl *mcl = mdl->mcl;
-+
-+	mdl->state = MDL_CONNECTED;
-+	mdl->dc = g_io_channel_ref(chan);
-+	mdl->wid = g_io_add_watch(mdl->dc, G_IO_ERR | G_IO_HUP | G_IO_NVAL,
-+						(GIOFunc) mdl_event_cb, mdl);
-+
-+	mcl->state = MCL_ACTIVE;
-+	mcl->cb->mdl_connected(mdl, mcl->cb->user_data);
-+}
-+
- static void confirm_dc_event_cb(GIOChannel *chan, gpointer user_data)
+ static void proc_req_active(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
  {
 -	/* TODO */
-+	struct mcap_instance *ms = user_data;
-+	struct mcap_mcl *mcl;
-+	struct mcap_mdl *mdl;
-+	GError *err = NULL;
-+	bdaddr_t dst;
-+	GSList *l;
-+
-+	bt_io_get(chan, BT_IO_L2CAP, &err,
-+			BT_IO_OPT_DEST_BDADDR, &dst,
-+			BT_IO_OPT_INVALID);
-+	if (err) {
-+		error("%s", err->message);
-+		g_error_free(err);
-+		goto drop;
++	switch (cmd[0]) {
++	case MCAP_MD_CREATE_MDL_REQ:
++		process_md_create_mdl_req(mcl, cmd, len);
++		break;
++	case MCAP_MD_RECONNECT_MDL_REQ:
++		process_md_reconnect_mdl_req(mcl, cmd, len);
++		break;
++	case MCAP_MD_DELETE_MDL_REQ:
++		process_md_delete_mdl_req(mcl, cmd, len);
++		break;
++	default:
++		error_cmd_rsp(mcl, cmd, len);
 +	}
-+
-+	mcl = find_mcl(ms->mcls, &dst);
-+	if (!mcl || (mcl->state != MCL_PENDING))
-+		goto drop;
-+
-+	for (l = mcl->mdls; l; l = l->next) {
-+		mdl = l->data;
-+		if (mdl->state == MDL_WAITING) {
-+			if (!bt_io_accept(chan, connect_dc_event_cb, mdl, NULL,
-+									&err)) {
-+				error("MDL accept error %s", err->message);
-+				g_error_free(err);
-+				goto drop;
-+			}
-+			return;
-+		}
-+	}
-+drop:
-+	g_io_channel_shutdown(chan, TRUE, NULL);
  }
  
- static void connect_mcl_event_cb(GIOChannel *chan, GError *err,
+ static void proc_response(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
 -- 
 1.6.3.3
 
