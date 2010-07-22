@@ -1,60 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 22 Jul 2010 20:40:08 -0300
+Date: Thu, 22 Jul 2010 20:47:24 -0300
 From: "Gustavo F. Padovan" <gustavo@padovan.org>
-To: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+To: Santiago Carot-Nemesio <sancane@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 29/60] Fix missed state transition in MCAP
-Message-ID: <20100722234008.GD2620@vigoh>
-References: <1279789001-4587-3-git-send-email-santoscadenas@gmail.com>
- <1279789001-4587-4-git-send-email-santoscadenas@gmail.com>
- <1279789001-4587-5-git-send-email-santoscadenas@gmail.com>
- <1279789001-4587-6-git-send-email-santoscadenas@gmail.com>
- <1279789001-4587-7-git-send-email-santoscadenas@gmail.com>
- <1279789001-4587-8-git-send-email-santoscadenas@gmail.com>
- <1279789001-4587-9-git-send-email-santoscadenas@gmail.com>
- <1279789001-4587-10-git-send-email-santoscadenas@gmail.com>
- <1279789001-4587-11-git-send-email-santoscadenas@gmail.com>
- <20100722233722.GC2620@vigoh>
+Subject: Re: [PATCH 16/60] Implement function to send md_reconnect_mdl_req
+Message-ID: <20100722234724.GE2620@vigoh>
+References: <1279788733-2324-8-git-send-email-sancane@gmail.com>
+ <1279788733-2324-9-git-send-email-sancane@gmail.com>
+ <1279788733-2324-10-git-send-email-sancane@gmail.com>
+ <1279788733-2324-11-git-send-email-sancane@gmail.com>
+ <1279788733-2324-12-git-send-email-sancane@gmail.com>
+ <1279788733-2324-13-git-send-email-sancane@gmail.com>
+ <1279788733-2324-14-git-send-email-sancane@gmail.com>
+ <1279788733-2324-15-git-send-email-sancane@gmail.com>
+ <1279788733-2324-16-git-send-email-sancane@gmail.com>
+ <1279788733-2324-17-git-send-email-sancane@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20100722233722.GC2620@vigoh>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1279788733-2324-17-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jose,
+* Santiago Carot-Nemesio <sancane@gmail.com> [2010-07-22 10:52:11 +0200]:
 
-* Gustavo F. Padovan <gustavo@padovan.org> [2010-07-22 20:37:22 -0300]:
+> ---
+>  mcap/mcap.c |   51 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 files changed, 51 insertions(+), 0 deletions(-)
+> 
+> diff --git a/mcap/mcap.c b/mcap/mcap.c
+> index dc55cda..a0f00af 100644
+> --- a/mcap/mcap.c
+> +++ b/mcap/mcap.c
+> @@ -261,6 +261,20 @@ static uint16_t generate_mdlid(struct mcap_mcl *mcl)
+>  	return mdlid;
+>  }
+>  
+> +static uint8_t *create_req(uint8_t op, uint16_t mdl_id)
+> +{
+> +	uint8_t *req;
+> +	mcap_md_req *req_cmd;
+> +
+> +	req = g_malloc0(sizeof(mcap_md_req));
+> +
+> +	req_cmd = (mcap_md_req *)req;
+> +	req_cmd->op = op;
+> +	req_cmd->mdl = htons(mdl_id);
+> +
+> +	return req;
+> +}
 
-> Hi Jose,
-> 
-> * Jose Antonio Santos Cadenas <santoscadenas@gmail.com> [2010-07-22 10:56:22 +0200]:
-> 
-> > From: José Antonio Santos-Cadenas <santoscadenas@gmail.com>
-> > 
-> > MCL should transite to properly state when a create_mdl_req is
-> > not SUCCESS
-> > ---
-> >  mcap/mcap.c |    1 +
-> >  1 files changed, 1 insertions(+), 0 deletions(-)
-> > 
-> > diff --git a/mcap/mcap.c b/mcap/mcap.c
-> > index cf92368..1dfe083 100644
-> > --- a/mcap/mcap.c
-> > +++ b/mcap/mcap.c
-> > @@ -1260,6 +1260,7 @@ fail:
-> >  	mcl->mdls = g_slist_remove(mcl->mdls, mdl);
-> >  	g_free(mdl);
-> >  	g_error_free(gerr);
-> > +	update_mcl_state(mcl);
-> >  	return close;
-> >  }
-> 
-> The same should apply here. Can you merge this with the original commit
-> that implemented create_mdl_req(), can't you?
+Why are you casting here? I would expect  mcap_md_req * as return type
+here. If the problem is with mcap_send_std_opcode() you can used "void *" as
+parameter type there.
 
-There should be another patches here in the same situation, I'm not
-checking all of them for this. Please check them and fix into the
-original commits when possible. That can make the review easier. ;)
+> +
+>  static uint8_t *create_mdl_req(uint16_t mdl_id, uint8_t mdep, uint8_t conf)
+>  {
+>  	uint8_t *req;
+> @@ -356,6 +370,43 @@ void mcap_req_mdl_creation(struct mcap_mcl *mcl,
+>  									mcl);
+>  }
+>  
+> +void mcap_req_mdl_reconnect(struct mcap_mdl *mdl,
+> +				GError **err,
+> +				mcap_mdl_operation_cb reconnect_cb,
+> +				gpointer user_data)
+> +{
+> +	struct mcap_mdl_op_cb *con;
+> +	struct mcap_mcl *mcl = mdl->mcl;
+> +	uint8_t *cmd;
+> +
+> +	if (mdl->state != MDL_CLOSED) {
+> +		g_set_error(err, MCAP_ERROR, MCAP_ERROR_FAILED,
+> +					"MDL is not closed");
+> +		return;
+> +	}
+> +	con = g_new0(struct mcap_mdl_op_cb, 1);
+> +
+> +	cmd = create_req(MCAP_MD_RECONNECT_MDL_REQ, mdl->mdlid);
+> +	mcap_send_std_opcode(mcl, cmd, sizeof(mcap_md_req), err);
+> +	if (*err) {
+> +		g_free(con);
+> +		g_free(cmd);
+> +		return;
+> +	}
+> +
+> +	mdl->state = MDL_WAITING;
+> +
+> +	con->mdl = mdl;
+> +	con->cb.op = reconnect_cb;
+> +	con->user_data = user_data;
+> +
+> +	mcl->state = MCL_ACTIVE;
+> +	mcl->priv_data = con;
+> +
+> +	mcl->tid = g_timeout_add_seconds(RESPONSE_TIMER, wait_response_timer,
+> +									mcl);
+> +}
+> +
+>  static void update_mcl_state(struct mcap_mcl *mcl)
+>  {
+>  	GSList *l;
 
 -- 
 Gustavo F. Padovan
