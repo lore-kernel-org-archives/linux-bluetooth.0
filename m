@@ -2,10 +2,10 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 14/60] Implement set callbacks operation over MCLs
-Date: Thu, 22 Jul 2010 10:52:09 +0200
-Message-Id: <1279788733-2324-15-git-send-email-sancane@gmail.com>
-In-Reply-To: <1279788733-2324-14-git-send-email-sancane@gmail.com>
+Subject: [PATCH 13/60] Enable connect operation to a remote MCAP instances
+Date: Thu, 22 Jul 2010 10:52:08 +0200
+Message-Id: <1279788733-2324-14-git-send-email-sancane@gmail.com>
+In-Reply-To: <1279788733-2324-13-git-send-email-sancane@gmail.com>
 References: <1279788733-2324-1-git-send-email-sancane@gmail.com>
  <1279788733-2324-2-git-send-email-sancane@gmail.com>
  <1279788733-2324-3-git-send-email-sancane@gmail.com>
@@ -19,107 +19,154 @@ References: <1279788733-2324-1-git-send-email-sancane@gmail.com>
  <1279788733-2324-11-git-send-email-sancane@gmail.com>
  <1279788733-2324-12-git-send-email-sancane@gmail.com>
  <1279788733-2324-13-git-send-email-sancane@gmail.com>
- <1279788733-2324-14-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- mcap/mcap.c |   82 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 82 insertions(+), 0 deletions(-)
+ mcap/mcap.c |  116 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 116 insertions(+), 0 deletions(-)
 
 diff --git a/mcap/mcap.c b/mcap/mcap.c
-index 201f42c..aaac709 100644
+index 1d86c51..201f42c 100644
 --- a/mcap/mcap.c
 +++ b/mcap/mcap.c
-@@ -397,6 +397,88 @@ void mcap_mcl_unref(struct mcap_mcl *mcl)
- 	mcap_mcl_release(mcl);
+@@ -42,6 +42,12 @@
+ 	__mcl->tid = 0;			\
+ } while(0)
+ 
++struct connect_mcl {
++	struct mcap_mcl		*mcl;		/* MCL for this operation */
++	mcap_mcl_connect_cb	connect_cb;	/* Connect callback */
++	gpointer		user_data;	/* Callback user data */
++};
++
+ 
+ /* MCAP finite state machine functions */
+ static void proc_req_connected(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t l);
+@@ -800,6 +806,66 @@ fail:
+ 	return FALSE;
  }
  
-+static gboolean parse_set_opts(struct mcap_mdl_cb *mdl_cb, GError **err,
-+						McapMclCb cb1, va_list args)
++static void mcap_connect_mcl_cb(GIOChannel *chan, GError *conn_err,
++							gpointer user_data)
 +{
-+	McapMclCb cb = cb1;
-+	struct mcap_mdl_cb *c;
++	char dstaddr[18];
++	struct connect_mcl *con = user_data;
++	struct mcap_mcl *aux, *mcl = con->mcl;
++	mcap_mcl_connect_cb connect_cb = con->connect_cb;
++	gpointer data = con->user_data;
++	GError *gerr = NULL;
 +
-+	c = g_new0(struct mcap_mdl_cb, 1);
++	g_free(con);
 +
-+	while (cb != MCAP_MDL_CB_INVALID) {
-+		switch (cb) {
-+		case MCAP_MDL_CB_CONNECTED:
-+			c->mdl_connected = va_arg(args,
-+				mcap_mdl_event_cb);
-+			break;
-+		case MCAP_MDL_CB_CLOSED:
-+			c->mdl_closed = va_arg(args,
-+				mcap_mdl_event_cb);
-+			break;
-+		case MCAP_MDL_CB_DELETED:
-+			c->mdl_deleted = va_arg(args,
-+				mcap_mdl_event_cb);
-+			break;
-+		case MCAP_MDL_CB_ABORTED:
-+			c->mdl_aborted = va_arg(args,
-+				mcap_mdl_event_cb);
-+			break;
-+		case MCAP_MDL_CB_REMOTE_CONN_REQ:
-+			c->mdl_conn_req = va_arg(args,
-+				mcap_remote_mdl_conn_req_cb);
-+			break;
-+		case MCAP_MDL_CB_REMOTE_RECONN_REQ:
-+			c->mdl_reconn_req = va_arg(args,
-+				mcap_remote_mdl_reconn_req_cb);
-+			break;
-+		default:
-+			g_set_error(err, MCAP_ERROR, MCAP_ERROR_INVALID_ARGS,
-+						"Unknown option %d", cb);
-+			return FALSE;
-+		}
-+		cb = va_arg(args, int);
++	mcl->ctrl &= ~MCAP_CTRL_CONN;
++
++	if (conn_err) {
++		if (mcl->ctrl & MCAP_CTRL_FREE)
++			mcl->ms->mcl_uncached_cb(mcl, mcl->ms->user_data);
++		mcap_mcl_check_del(mcl);
++		connect_cb(NULL, conn_err, data);
++		return;
 +	}
 +
-+	/* Set new callbacks */
-+	if (c->mdl_connected)
-+		mdl_cb->mdl_connected = c->mdl_connected;
-+	if (c->mdl_closed)
-+		mdl_cb->mdl_closed = c->mdl_closed;
-+	if (c->mdl_deleted)
-+		mdl_cb->mdl_deleted = c->mdl_deleted;
-+	if (c->mdl_aborted)
-+		mdl_cb->mdl_aborted = c->mdl_aborted;
-+	if (c->mdl_conn_req)
-+		mdl_cb->mdl_conn_req = c->mdl_conn_req;
-+	if (c->mdl_reconn_req)
-+		mdl_cb->mdl_reconn_req = c->mdl_reconn_req;
++	ba2str(&mcl->addr, dstaddr);
 +
-+	g_free(c);
-+	return TRUE;
-+}
-+
-+void mcap_mcl_set_cb(struct mcap_mcl *mcl, GError **gerr,
-+					gpointer user_data, McapMclCb cb1, ...)
-+{
-+	va_list args;
-+	gboolean ret;
-+
-+	va_start(args, cb1);
-+	ret = parse_set_opts(mcl->cb, gerr, cb1, args);
-+	va_end(args);
-+
-+	if (!ret)
++	aux = find_mcl(mcl->ms->mcls, &mcl->addr);
++	if (aux) {
++		/* Double MCL connection case */
++		if (aux != mcl) {
++			/* This MCL was not in cache */
++			mcap_mcl_unref(mcl);
++		}
++		error("MCL error: Device %s is already connected", dstaddr);
++		g_set_error(&gerr, MCAP_ERROR, MCAP_ERROR_ALREADY_EXISTS,
++				"MCL %s is already connected", dstaddr);
++		connect_cb(NULL, gerr, data);
++		g_error_free(gerr);
 +		return;
++	}
 +
-+	mcl->cb->user_data = user_data;
-+	return;
++	mcl->state = MCL_CONNECTED;
++	mcl->role = MCL_INITIATOR;
++	mcl->req = MCL_AVAILABLE;
++	mcl->ctrl |= MCAP_CTRL_STD_OP;
++
++	if (mcl->ctrl & MCAP_CTRL_CACHED)
++		mcap_uncache_mcl(mcl);
++	else
++		mcl->ms->mcls = g_slist_prepend(mcl->ms->mcls, mcl);
++
++	mcl->wid = g_io_add_watch(mcl->cc,
++				G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
++				(GIOFunc) mcl_control_cb, mcl);
++	connect_cb(mcl, gerr, data);
++
++	if (mcl->ref == 1) {
++		mcl->ms->mcls = g_slist_remove(mcl->ms->mcls, mcl);
++		mcap_mcl_unref(mcl);
++	}
 +}
 +
-+bdaddr_t mcap_mcl_get_addr(struct mcap_mcl *mcl)
-+{
-+	return mcl->addr;
-+}
-+
- static void error_cmd_rsp(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
+ static void connect_dc_event_cb(GIOChannel *chan, GError *err,
+ 							gpointer user_data)
  {
- 	uint16_t mdlr;
+@@ -815,6 +881,56 @@ static void connect_dc_event_cb(GIOChannel *chan, GError *err,
+ 	mcl->cb->mdl_connected(mdl, mcl->cb->user_data);
+ }
+ 
++void mcap_create_mcl(struct mcap_instance *ms,
++				const bdaddr_t *addr,
++				uint16_t ccpsm,
++				GError **err,
++				mcap_mcl_connect_cb connect_cb,
++				gpointer user_data)
++{
++	struct mcap_mcl *mcl;
++	struct connect_mcl *con;
++
++	mcl = find_mcl(ms->mcls, addr);
++	if (mcl) {
++		g_set_error(err, MCAP_ERROR, MCAP_ERROR_ALREADY_EXISTS,
++					"MCL is already connected.");
++		return;
++	}
++
++	mcl = find_mcl(ms->cached, addr);
++	if (!mcl) {
++		mcl = g_new0(struct mcap_mcl, 1);
++		mcl->ms = ms;
++		mcl->state = MCL_IDLE;
++		bacpy(&mcl->addr, addr);
++		set_default_cb(mcl);
++		mcl = mcap_mcl_ref(mcl);
++	} else
++		mcl->ctrl |= MCAP_CTRL_CONN;
++
++	con = g_new0(struct connect_mcl, 1);
++	con->mcl = mcl;
++	con->connect_cb = connect_cb;
++	con->user_data = user_data;
++
++	mcl->cc = bt_io_connect(BT_IO_L2CAP, mcap_connect_mcl_cb, con,
++				NULL, err,
++				BT_IO_OPT_SOURCE_BDADDR, &ms->src,
++				BT_IO_OPT_DEST_BDADDR, addr,
++				BT_IO_OPT_PSM, ccpsm,
++				BT_IO_OPT_MTU, MCAP_CC_MTU,
++				BT_IO_OPT_SEC_LEVEL, ms->sec,
++				BT_IO_OPT_INVALID);
++	if (*err) {
++		g_free(con);
++		mcl->ctrl &= ~MCAP_CTRL_CONN;
++		if (mcl->ctrl & MCAP_CTRL_FREE)
++			mcl->ms->mcl_uncached_cb(mcl, mcl->ms->user_data);
++		mcap_mcl_check_del(mcl);
++	}
++}
++
+ static void confirm_dc_event_cb(GIOChannel *chan, gpointer user_data)
+ {
+ 	struct mcap_instance *ms = user_data;
 -- 
 1.6.3.3
 
