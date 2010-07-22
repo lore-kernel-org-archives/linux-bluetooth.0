@@ -3,10 +3,10 @@ From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Jos=C3=A9=20Antonio=20Santos-Cadenas?=
 	<santoscadenas@gmail.com>
-Subject: [PATCH 34/60] Add macro to get minimum command length for respones
-Date: Thu, 22 Jul 2010 10:56:27 +0200
-Message-Id: <1279789001-4587-16-git-send-email-santoscadenas@gmail.com>
-In-Reply-To: <1279789001-4587-15-git-send-email-santoscadenas@gmail.com>
+Subject: [PATCH 32/60] Fix MCL transitions when responses are not success
+Date: Thu, 22 Jul 2010 10:56:25 +0200
+Message-Id: <1279789001-4587-14-git-send-email-santoscadenas@gmail.com>
+In-Reply-To: <1279789001-4587-13-git-send-email-santoscadenas@gmail.com>
 References: <1279788733-2324-19-git-send-email-sancane@gmail.com>
  <1279789001-4587-1-git-send-email-santoscadenas@gmail.com>
  <1279789001-4587-2-git-send-email-santoscadenas@gmail.com>
@@ -21,49 +21,68 @@ References: <1279788733-2324-19-git-send-email-sancane@gmail.com>
  <1279789001-4587-11-git-send-email-santoscadenas@gmail.com>
  <1279789001-4587-12-git-send-email-santoscadenas@gmail.com>
  <1279789001-4587-13-git-send-email-santoscadenas@gmail.com>
- <1279789001-4587-14-git-send-email-santoscadenas@gmail.com>
- <1279789001-4587-15-git-send-email-santoscadenas@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: José Antonio Santos-Cadenas <santoscadenas@gmail.com>
 
-Minimum length responses are provided using a new macro to avoid using
-magic numbers in source code.
 ---
- mcap/mcap.c |    5 +++--
- 1 files changed, 3 insertions(+), 2 deletions(-)
+ mcap/mcap.c |   18 ++++++++++--------
+ 1 files changed, 10 insertions(+), 8 deletions(-)
 
 diff --git a/mcap/mcap.c b/mcap/mcap.c
-index 6031bd4..d3c92dc 100644
+index d20b3d5..73abb90 100644
 --- a/mcap/mcap.c
 +++ b/mcap/mcap.c
-@@ -35,6 +35,7 @@
+@@ -1315,6 +1315,7 @@ static gboolean process_md_reconnect_mdl_rsp(struct mcap_mcl *mcl,
  
- #define RESPONSE_TIMER	2	/* seconds */
- #define MAX_CACHED	10	/* 10 devices */
-+#define MIN_RSP_LEN	4	/* 4 Bytes */
+ 	g_error_free(gerr);
+ 	shutdown_mdl(mdl);
++	update_mcl_state(mcl);
  
- #define MCAP_ERROR g_quark_from_static_string("mcap-error-quark")
+ 	if (rsp->rc != MCAP_INVALID_MDL)
+ 		return close;
+@@ -1323,7 +1324,6 @@ static gboolean process_md_reconnect_mdl_rsp(struct mcap_mcl *mcl,
+ 	mcl->mdls = g_slist_remove(mcl->mdls, mdl);
+ 	mcl->cb->mdl_deleted(mdl, mcl->cb->user_data);
+ 	g_free(mdl);
+-	update_mcl_state(mcl);
  
-@@ -1191,7 +1192,7 @@ static gboolean check_err_rsp(struct mcap_mcl *mcl, uint8_t *cmd,
- 	char *msg;
+ 	return close;
+ }
+@@ -1335,6 +1335,7 @@ static gboolean process_md_abort_mdl_rsp(struct mcap_mcl *mcl,
+ 	mcap_mdl_del_cb abrt_cb = abrt->cb.del;
+ 	gpointer user_data = abrt->user_data;
+ 	struct mcap_mdl *mdl = abrt->mdl;
++	mcap4B_rsp *rsp = (mcap4B_rsp *)cmd;
+ 	GError *gerr = NULL;
+ 	gboolean close = FALSE;
  
- 	/* Check if the response matches with the last request */
--	if ((rlen < 4) || ((mcl->lcmd[0] + 1) != cmd[0])) {
-+	if ((rlen < MIN_RSP_LEN) || ((mcl->lcmd[0] + 1) != cmd[0])) {
- 		msg = "Protocol error";
- 		close = TRUE;
- 		goto fail;
-@@ -1349,7 +1350,7 @@ static gboolean process_md_abort_mdl_rsp(struct mcap_mcl *mcl,
+@@ -1347,16 +1348,17 @@ static gboolean process_md_abort_mdl_rsp(struct mcap_mcl *mcl,
+ 	mcl->lcmd = NULL;
+ 	mcl->req = MCL_AVAILABLE;
  
- 	abrt_cb(gerr, user_data);
- 
--	if ((len >= 4) && (rsp->rc == MCAP_INVALID_MDL)) {
-+	if ((len >= MIN_RSP_LEN) && (rsp->rc == MCAP_INVALID_MDL)) {
- 		mcl->mdls = g_slist_remove(mcl->mdls, mdl);
- 		g_free(mdl);
+-	if (gerr) {
+-		abrt_cb(gerr, user_data);
+-		g_error_free(gerr);
+-		return close;
++	abrt_cb(gerr, user_data);
++
++	if ((len >= 4) && (rsp->rc == MCAP_INVALID_MDL)) {
++		mcl->mdls = g_slist_remove(mcl->mdls, mdl);
++		g_free(mdl);
  	}
+ 
+-	mcl->mdls = g_slist_remove(mcl->mdls, mdl);
+-	g_free(mdl);
++	if (!gerr)
++		g_error_free(gerr);
++
+ 	update_mcl_state(mcl);
+-	abrt_cb(gerr, user_data);
+ 	return close;
+ }
+ 
 -- 
 1.6.3.3
 
