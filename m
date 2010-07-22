@@ -2,110 +2,202 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 02/60] Initial work to create MCAP instances
-Date: Thu, 22 Jul 2010 10:51:57 +0200
-Message-Id: <1279788733-2324-3-git-send-email-sancane@gmail.com>
-In-Reply-To: <1279788733-2324-2-git-send-email-sancane@gmail.com>
+Subject: [PATCH 04/60] Process events over Control Channels
+Date: Thu, 22 Jul 2010 10:51:59 +0200
+Message-Id: <1279788733-2324-5-git-send-email-sancane@gmail.com>
+In-Reply-To: <1279788733-2324-4-git-send-email-sancane@gmail.com>
 References: <1279788733-2324-1-git-send-email-sancane@gmail.com>
  <1279788733-2324-2-git-send-email-sancane@gmail.com>
+ <1279788733-2324-3-git-send-email-sancane@gmail.com>
+ <1279788733-2324-4-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- mcap/mcap.c |   73 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 71 insertions(+), 2 deletions(-)
+ mcap/mcap.c |  145 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 144 insertions(+), 1 deletions(-)
 
 diff --git a/mcap/mcap.c b/mcap/mcap.c
-index 8bd2ad2..d47b451 100644
+index ea00d73..5197fde 100644
 --- a/mcap/mcap.c
 +++ b/mcap/mcap.c
-@@ -33,6 +33,18 @@
- #include "mcap_lib.h"
- #include "mcap_internal.h"
+@@ -35,6 +35,17 @@
  
-+#define MCAP_ERROR g_quark_from_static_string("mcap-error-quark")
+ #define MCAP_ERROR g_quark_from_static_string("mcap-error-quark")
+ 
++/* MCAP finite state machine functions */
++static void proc_req_connected(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t l);
++static void proc_req_pending(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t l);
++static void proc_req_active(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t l);
 +
-+static void confirm_dc_event_cb(GIOChannel *chan, gpointer user_data)
-+{
-+	/* TODO */
-+}
++static void (*proc_req[])(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len) = {
++	proc_req_connected,
++	proc_req_pending,
++	proc_req_active
++};
 +
-+static void confirm_mcl_event_cb(GIOChannel *chan, gpointer user_data)
-+{
-+	/* TODO */
-+}
-+
- struct mcap_instance *mcap_create_instance(struct btd_adapter *btd_adapter,
- 					BtIOSecLevel sec,
- 					uint16_t ccpsm,
-@@ -44,8 +56,65 @@ struct mcap_instance *mcap_create_instance(struct btd_adapter *btd_adapter,
- 					mcap_mcl_event_cb mcl_uncached,
- 					gpointer user_data)
+ static void default_mdl_connected_cb(struct mcap_mdl *mdl, gpointer data)
  {
--	/* TODO */
--	return NULL;
-+	struct mcap_instance *ms;
-+
-+	if (sec < BT_IO_SEC_MEDIUM) {
-+		g_set_error(gerr, MCAP_ERROR, MCAP_ERROR_INVALID_ARGS,
-+				"Security level can't be minor of %d",
-+				BT_IO_SEC_MEDIUM);
-+		return NULL;
-+	}
-+
-+	if (!(mcl_connected && mcl_reconnected &&
-+			mcl_disconnected && mcl_uncached)) {
-+		g_set_error(gerr, MCAP_ERROR, MCAP_ERROR_INVALID_ARGS,
-+				"The callbacks can't be null");
-+		return NULL;
-+	}
-+
-+	ms = g_new0(struct mcap_instance, 1);
-+
-+	adapter_get_address(btd_adapter, &ms->src);
-+
-+	ms->sec = sec;
-+	ms->mcl_connected_cb = mcl_connected;
-+	ms->mcl_reconnected_cb = mcl_reconnected;
-+	ms->mcl_disconnected_cb = mcl_disconnected;
-+	ms->mcl_uncached_cb = mcl_uncached;
-+	ms->user_data = user_data;
-+
-+	/* Listen incoming connections in control channel */
-+	ms->ccio = bt_io_listen(BT_IO_L2CAP, NULL, confirm_mcl_event_cb, ms,
-+				NULL, gerr,
-+				BT_IO_OPT_SOURCE_BDADDR, &ms->src,
-+				BT_IO_OPT_PSM, ccpsm,
-+				BT_IO_OPT_MTU, MCAP_CC_MTU,
-+				BT_IO_OPT_SEC_LEVEL, sec,
-+				BT_IO_OPT_INVALID);
-+	if (!ms->ccio) {
-+		error("%s", (*gerr)->message);
-+		g_free(ms);
-+		return NULL;
-+	}
-+
-+	/* Listen incoming connections in data channels */
-+	ms->dcio = bt_io_listen(BT_IO_L2CAP, NULL, confirm_dc_event_cb, ms,
-+				NULL, gerr,
-+				BT_IO_OPT_SOURCE_BDADDR, &ms->src,
-+				BT_IO_OPT_PSM, dcpsm,
-+				BT_IO_OPT_MTU, MCAP_DC_MTU,
-+				BT_IO_OPT_SEC_LEVEL, sec,
-+				BT_IO_OPT_INVALID);
-+	if (!ms->dcio) {
-+		g_io_channel_shutdown(ms->ccio, TRUE, NULL);
-+		g_io_channel_unref(ms->ccio);
-+		ms->ccio = NULL;
-+		error("%s", (*gerr)->message);
-+		g_free(ms);
-+		return NULL;
-+	}
-+
-+	return ms;
+ 	DBG("MCAP Unmanaged mdl connection");
+@@ -85,6 +96,41 @@ static void set_default_cb(struct mcap_mcl *mcl)
+ 	mcl->cb->mdl_reconn_req = default_mdl_reconn_req_cb;
  }
  
- void mcap_release_instance(struct mcap_instance *ms)
++int mcap_send_data(int sock, const uint8_t *buf, uint32_t size)
++{
++	uint32_t sent = 0;
++
++	while (sent < size) {
++		int n = send(sock, buf + sent, size - sent, 0);
++		if (n < 0)
++			return -1;
++		sent += n;
++	}
++	return 0;
++}
++
++static int send4B_cmd(struct mcap_mcl *mcl, uint8_t oc, uint8_t rc,
++								uint16_t mdl)
++{
++	uint8_t *rsp;
++	mcap4B_rsp *rsp_err;
++	int sent;
++
++
++	rsp = g_malloc0(sizeof(mcap4B_rsp));
++
++	rsp_err = (mcap4B_rsp *)rsp;
++	rsp_err->op = oc;
++	rsp_err->rc = rc;
++	rsp_err->mdl = htons (mdl);
++
++	sent = mcap_send_data(g_io_channel_unix_get_fd(mcl->cc),
++					rsp,
++					sizeof(mcap4B_rsp));
++	g_free(rsp);
++	return sent;
++}
++
+ static struct mcap_mcl *find_mcl(GSList *list, const bdaddr_t *addr)
+ {
+ 	GSList *l;
+@@ -110,6 +156,11 @@ static void mcap_mcl_check_del(struct mcap_mcl *mcl)
+ 	/* TODO */
+ }
+ 
++static void mcap_cache_mcl(struct mcap_mcl *mcl)
++{
++	/* TODO */
++}
++
+ static void mcap_uncache_mcl(struct mcap_mcl *mcl)
+ {
+ 	/* TODO */
+@@ -136,11 +187,103 @@ void mcap_mcl_unref(struct mcap_mcl *mcl)
+ 	mcap_mcl_release(mcl);
+ }
+ 
++static void proc_req_connected(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
++{
++	/* TODO */
++}
++
++static void proc_req_pending(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
++{
++	/* TODO */
++}
++
++static void proc_req_active(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
++{
++	/* TODO */
++}
++
++static void proc_response(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
++{
++	/* TODO */
++}
++
++static void rsend_req(struct mcap_mcl *mcl)
++{
++	uint8_t *cmd = mcl->lcmd;
++	int len;
++
++	if (!cmd)
++		return;
++
++	switch (cmd[0]) {
++	case MCAP_MD_RECONNECT_MDL_REQ:
++	case MCAP_MD_ABORT_MDL_REQ:
++	case MCAP_MD_DELETE_MDL_REQ:
++		len = 3;
++		break;
++	case MCAP_MD_CREATE_MDL_REQ:
++		len = 5;
++		break;
++	default:
++		return;
++	}
++
++	mcap_send_data(g_io_channel_unix_get_fd(mcl->cc), cmd, len);
++}
++
++static void proc_cmd(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
++{
++	if ((cmd[0] >= MCAP_MD_SYNC_CAP_REQ) &&
++					(cmd[0] <= MCAP_MD_SYNC_INFO_IND)) {
++		send4B_cmd(mcl, cmd[0], MCAP_REQUEST_NOT_SUPPORTED,
++							MCAP_MDLID_RESERVED);
++		return;
++	}
++
++	if (!(mcl->ctrl & MCAP_CTRL_STD_OP)) {
++		/* In case the remote device doesn't work correctly */
++		error("Remote device does not support opcodes, cmd ignored");
++		return;
++	}
++
++	if (mcl->req == MCL_WAITING_RSP) {
++		if (cmd[0] & 0x01) {
++			/* Request arrived when a response is expected */
++			if (mcl->role == MCL_INITIATOR)
++				/* ignore */
++				return;
++			proc_req[mcl->state](mcl, cmd, len);
++			/* Initiator will ignore our last request => re-send */
++			rsend_req(mcl);
++			return;
++		}
++		proc_response(mcl, cmd, len);
++	} else if (cmd[0] & 0x01)
++		proc_req[mcl->state](mcl, cmd, len);
++}
++
+ static gboolean mcl_control_cb(GIOChannel *chan, GIOCondition cond,
+ 								gpointer data)
+ {
+ 
+-	/* TODO */
++	struct mcap_mcl *mcl = data;
++	int sk, len;
++	uint8_t buf[MCAP_CC_MTU];
++
++	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL))
++		goto fail;
++
++	sk = g_io_channel_unix_get_fd(chan);
++	len = recv(sk, buf, sizeof(buf), 0);
++	if (len < 0)
++		goto fail;
++
++	proc_cmd(mcl, buf, (uint32_t)len);
++	return TRUE;
++fail:
++	if (mcl->state != MCL_IDLE)
++		mcl->ms->mcl_disconnected_cb(mcl, mcl->ms->user_data);
++	mcap_cache_mcl(mcl);
+ 	return FALSE;
+ }
+ 
 -- 
 1.6.3.3
 
