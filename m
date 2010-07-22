@@ -1,11 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Subject: [PATCH 41/60] Solve a bug when both sides request a creation of data channel with the same mdlid
-Date: Thu, 22 Jul 2010 10:56:34 +0200
-Message-Id: <1279789001-4587-23-git-send-email-santoscadenas@gmail.com>
-In-Reply-To: <1279789001-4587-22-git-send-email-santoscadenas@gmail.com>
+Cc: =?UTF-8?q?Jos=C3=A9=20Antonio=20Santos-Cadenas?=
+	<santoscadenas@gmail.com>
+Subject: [PATCH 40/60] Fix memory leak when double deletion happens and response code isn't SUCCESS
+Date: Thu, 22 Jul 2010 10:56:33 +0200
+Message-Id: <1279789001-4587-22-git-send-email-santoscadenas@gmail.com>
+In-Reply-To: <1279789001-4587-21-git-send-email-santoscadenas@gmail.com>
 References: <1279788733-2324-19-git-send-email-sancane@gmail.com>
  <1279789001-4587-1-git-send-email-santoscadenas@gmail.com>
  <1279789001-4587-2-git-send-email-santoscadenas@gmail.com>
@@ -28,42 +29,44 @@ References: <1279788733-2324-19-git-send-email-sancane@gmail.com>
  <1279789001-4587-19-git-send-email-santoscadenas@gmail.com>
  <1279789001-4587-20-git-send-email-santoscadenas@gmail.com>
  <1279789001-4587-21-git-send-email-santoscadenas@gmail.com>
- <1279789001-4587-22-git-send-email-santoscadenas@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: José Antonio Santos-Cadenas <santoscadenas@gmail.com>
+
 ---
- mcap/mcap.c |   10 +++++++++-
- 1 files changed, 9 insertions(+), 1 deletions(-)
+ mcap/mcap.c |    9 +++++++--
+ 1 files changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/mcap/mcap.c b/mcap/mcap.c
-index 64e76b5..1d33452 100644
+index 51f0d87..64e76b5 100644
 --- a/mcap/mcap.c
 +++ b/mcap/mcap.c
-@@ -956,6 +956,14 @@ static void process_md_create_mdl_req(struct mcap_mcl *mcl, uint8_t *cmd,
+@@ -1132,7 +1132,7 @@ static void process_md_delete_mdl_req(struct mcap_mcl *mcl, uint8_t *cmd,
+ 	notify = TRUE;
+ 	if (mdl->state == MDL_DELETING) {
+ 		/* Remote deviced requests deleting an MDL that upper profile
+-		 * tries to delete, MDL will be freed when reply arrives. */
++		 * is trying to delete, MDL will be freed when reply arrives. */
+ 		mdl->mcl->cb->mdl_deleted(mdl, mdl->mcl->cb->user_data);
+ 	} else
+ 		mcap_delete_mdl(mdl, &notify);
+@@ -1410,9 +1410,14 @@ static gboolean process_md_delete_mdl_rsp(struct mcap_mcl *mcl, uint8_t *cmd,
+ 						(rsp->rc == MCAP_INVALID_MDL)) {
+ 			/* Mdl does not exist in remote side */
+ 			goto del_mdl;
+-		} else {
++		} else if (g_slist_find(mdl->mcl->mdls, mdl)){
+ 			/* this mdl couldn't be deleted */
+ 			restore_mdl(mdl, NULL);
++		} else {
++			/* MDL deleted request was sent by remote side while an
++			 * outgoing request for delete it was pending */
++			shutdown_mdl(mdl);
++			g_free(mdl);
+ 		}
+ 		goto end;
  	}
- 
- 	cfga = conf = req->conf;
-+
-+	mdl = get_mdl(mcl, mdl_id);
-+	if (mdl && mdl->state == MDL_WAITING) {
-+		/* A remote petition is also triying to connect this mdl_id
-+		 * so the petition is rejected by the moment */
-+		send4B_cmd(mcl, MCAP_MD_CREATE_MDL_RSP, MCAP_MDL_BUSY, mdl_id);
-+		return;
-+	}
- 	/* Callback to upper layer */
- 	rsp = mcl->cb->mdl_conn_req(mcl, mdep_id, mdl_id, &conf,
- 							mcl->cb->user_data);
-@@ -977,7 +985,7 @@ static void process_md_create_mdl_req(struct mcap_mcl *mcl, uint8_t *cmd,
- 		return;
- 	}
- 
--	mdl = get_mdl(mcl, mdl_id);
-+
- 	if (!mdl) {
- 		mdl = g_malloc0(sizeof(struct mcap_mdl));
- 		mdl->mcl = mcl;
 -- 
 1.6.3.3
 
