@@ -1,41 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?iso-8859-1?q?Jos=E9_Antonio_Santos_Cadenas?=
-	<santoscadenas@gmail.com>
-To: "Gustavo F. Padovan" <gustavo@padovan.org>
-Subject: Re: MCAP Patches
-Date: Fri, 23 Jul 2010 10:25:28 +0200
-Cc: "Santiago Carot-Nemesio" <sancane@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-References: <1279788733-2324-1-git-send-email-sancane@gmail.com> <20100722233606.GB2620@vigoh>
-In-Reply-To: <20100722233606.GB2620@vigoh>
+Date: Fri, 23 Jul 2010 11:20:45 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Inga Stotland <ingas@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, rshaffer@codeaurora.org,
+	marcel@holtmann.org
+Subject: Re: [PATCH v4 0/5] Enhanced support for extended inquiry response
+Message-ID: <20100723082045.GA1600@jh-x301>
+References: <1279814780-29673-1-git-send-email-ingas@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201007231025.29101.santoscadenas@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1279814780-29673-1-git-send-email-ingas@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Inga,
 
-El Friday 23 July 2010 01:36:06 Gustavo F. Padovan escribió:
-> Hi Santiago,
-> 
-> * Santiago Carot-Nemesio <sancane@gmail.com> [2010-07-22 10:51:55 +0200]:
-> > Hello,
-> > 
-> > Next you are MCAP patches that José Antonio Santos Cadenas and me have
-> > generated for BlueZ. We still believe that MCAP should be an independent
-> > library from HDP because other profiles non health related may want to
-> > use it in the future, if we set this health dependency we will force to
-> > import health features in plugins that only require MCAP. Nevertheless,
-> > as we accorded last week in Brazil we are sending a last patch to set
-> > MCAP into health directory with HDP. We leave in your hands upload it as
-> > health plugin or not.
-> 
-> Please provide a git tree link for theses patches too. Thanks.
+On Thu, Jul 22, 2010, Inga Stotland wrote:
+> EIR is updated whenever local SDP record database changes.
 
-You have a copy of this changes in the follow git at branch mcap.
+Could you explain to me why this is needed. With the current git
+(without your patches) the local EIR data seems to be correctly updated
+whenever the SDP database changes. Are there some scenarios when this
+doesn't happen? I did a quick test with sdptool add/del while bluetoothd
+was running and I could see the appropriate "Write Extended Inquiry
+Response" commands with hcidump.
 
-git://gitorious.org/bluez-mcap-hdp/mcap-hdp.git
-
-Regards.
+Johan
