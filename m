@@ -1,29 +1,22 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 23 Jul 2010 12:11:04 +0200
-From: Dan Carpenter <error27@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Suraj Sumangala <suraj@atheros.com>, linux-bluetooth@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: [patch -next] bluetooth/hci_ath: kfree() => kfree_skb()
-Message-ID: <20100723101104.GD26313@bicker>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Yuri Kululin <ext-yuri.kululin@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: ext-yuri.kululin@nokia.com
+Subject: [PATCH 0/1] Bluetooth: RPN negotiation fix
+Date: Fri, 23 Jul 2010 13:57:11 +0400
+Message-Id: <1279879032-27955-1-git-send-email-ext-yuri.kululin@nokia.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-sk_buffs have to be freed with kfree_skb() instead of kfree().
+RFCOMM port settings can be changed by using RPN command.
+If the bit rate 115200 bit/s (which is not default according to
+the ETSI 3GPP TS 07.10) is not supported by sender of RPN command
+sender and receiver will never find an agreement. Currently RFCOMM accepts
+115200 bit/s only.
 
-Signed-off-by: Dan Carpenter <error27@gmail.com>
+This patch fixes this issue.
 
-diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
-index 5ab258b..74a8f61 100755
---- a/drivers/bluetooth/hci_ath.c
-+++ b/drivers/bluetooth/hci_ath.c
-@@ -163,7 +163,7 @@ static int ath_enqueue(struct hci_uart *hu, struct sk_buff *skb)
- 	struct ath_struct *ath = hu->priv;
- 
- 	if (bt_cb(skb)->pkt_type == HCI_SCODATA_PKT) {
--		kfree(skb);
-+		kfree_skb(skb);
- 		return 0;
- 	}
- 
+Please review.
+
+Best regards,
+Yuri Kululin
