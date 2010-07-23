@@ -1,51 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: Yuri Kululin <ext-yuri.kululin@nokia.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: ext-yuri.kululin@nokia.com
-Subject: [PATCH 1/1] Bluetooth: RPN negotiation fix
-Date: Fri, 23 Jul 2010 13:57:12 +0400
-Message-Id: <6a577b5627b8388489a21fd49f5c9d2b85a2bbef.1279866739.git.ext-yuri.kululin@nokia.com>
-In-Reply-To: <1279879032-27955-1-git-send-email-ext-yuri.kululin@nokia.com>
-References: <1279879032-27955-1-git-send-email-ext-yuri.kululin@nokia.com>
+Date: Fri, 23 Jul 2010 12:58:13 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Santiago Carot-Nemesio <scarot@libresoft.es>
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Santiago Carot-Nemesio <sancane@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 16/60] Implement function to send md_reconnect_mdl_req
+Message-ID: <20100723095813.GA17429@jh-x301>
+References: <1279788733-2324-10-git-send-email-sancane@gmail.com>
+ <1279788733-2324-11-git-send-email-sancane@gmail.com>
+ <1279788733-2324-12-git-send-email-sancane@gmail.com>
+ <1279788733-2324-13-git-send-email-sancane@gmail.com>
+ <1279788733-2324-14-git-send-email-sancane@gmail.com>
+ <1279788733-2324-15-git-send-email-sancane@gmail.com>
+ <1279788733-2324-16-git-send-email-sancane@gmail.com>
+ <1279788733-2324-17-git-send-email-sancane@gmail.com>
+ <20100722234724.GE2620@vigoh>
+ <4C49658D.4090906@libresoft.es>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4C49658D.4090906@libresoft.es>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-According to the ETSI 3GPP TS 07.10 the default bit rate value for RFCOMM
-is 9600 bit/s. Return this bit rate in case of RPN request and accept other
-sane bit rates proposed by the sender in RPM command.
+Hi,
 
-Signed-off-by: Yuri Kululin <ext-yuri.kululin@nokia.com>
----
- net/bluetooth/rfcomm/core.c |    8 ++++----
- 1 files changed, 4 insertions(+), 4 deletions(-)
+On Fri, Jul 23, 2010, Santiago Carot-Nemesio wrote:
+> >>+static uint8_t *create_req(uint8_t op, uint16_t mdl_id)
+> >>+{
+> >>+	uint8_t *req;
+> >>+	mcap_md_req *req_cmd;
+> >>+
+> >>+	req = g_malloc0(sizeof(mcap_md_req));
+> >>+
+> >>+	req_cmd = (mcap_md_req *)req;
+> >>+	req_cmd->op = op;
+> >>+	req_cmd->mdl = htons(mdl_id);
+> >>+
+> >>+	return req;
+> >>+}
+> >Why are you casting here? I would expect  mcap_md_req * as return type
+> >here. If the problem is with mcap_send_std_opcode() you can used "void *" as
+> >parameter type there.
+> >
+> I don't see why is better doing it as you say.
+> In fact I did it to make the code similar to other bluez modules
+> like sdp. You can see the sdp_send_req_w4_rsp and the sdp_send_req
+> functions in sdp.c to find similarities with my code.
 
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index 7dca91b..16b79f3 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -1415,8 +1415,8 @@ static int rfcomm_recv_rpn(struct rfcomm_session *s, int cr, int len, struct sk_
- 		return 0;
- 
- 	if (len == 1) {
--		/* This is a request, return default settings */
--		bit_rate  = RFCOMM_RPN_BR_115200;
-+		/* This is a request, return default (according to ETSI TS 07.10) settings */
-+		bit_rate  = RFCOMM_RPN_BR_9600;
- 		data_bits = RFCOMM_RPN_DATA_8;
- 		stop_bits = RFCOMM_RPN_STOP_1;
- 		parity    = RFCOMM_RPN_PARITY_NONE;
-@@ -1431,9 +1431,9 @@ static int rfcomm_recv_rpn(struct rfcomm_session *s, int cr, int len, struct sk_
- 
- 	if (rpn->param_mask & cpu_to_le16(RFCOMM_RPN_PM_BITRATE)) {
- 		bit_rate = rpn->bit_rate;
--		if (bit_rate != RFCOMM_RPN_BR_115200) {
-+		if (bit_rate > RFCOMM_RPN_BR_230400) {
- 			BT_DBG("RPN bit rate mismatch 0x%x", bit_rate);
--			bit_rate = RFCOMM_RPN_BR_115200;
-+			bit_rate = RFCOMM_RPN_BR_9600;
- 			rpn_mask ^= RFCOMM_RPN_PM_BITRATE;
- 		}
- 	}
--- 
-1.7.1.1
+The SDP code in libbluetooth is probably the absolute worst place to
+look for good examples. In this case the second variable in the function
+is completely unnecessary. Just assign the malloc return directly to the
+mcap_md_req pointer and get rid of the uint8_t* variable.
 
+Btw, I'd like to understand why we should use different acceptance
+criteria for your patches compared to everything else that gets
+submitted to BlueZ. The convention (which I'm sure you've noticed if you
+follow the list) is that when issues are found in submitted patches the
+submitter is requested to fix the issue in the patch and resubmit a new
+version of the patch. You're essentially requesting for buggy patches to
+be accepted as such and only fix the issues through new patches on top
+of the buggy ones.
+
+Johan
