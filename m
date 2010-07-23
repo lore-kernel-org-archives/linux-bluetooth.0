@@ -1,196 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 22 Jul 2010 21:09:44 -0300
+Date: Thu, 22 Jul 2010 21:07:09 -0300
 From: "Gustavo F. Padovan" <gustavo@padovan.org>
-To: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+To: Santiago Carot-Nemesio <sancane@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 19/60] Process response to std. op. codes
-Message-ID: <20100723000944.GJ2620@vigoh>
-References: <1279788733-2324-19-git-send-email-sancane@gmail.com>
- <1279789001-4587-1-git-send-email-santoscadenas@gmail.com>
+Subject: Re: [PATCH 18/60] Implement function to send md_abort_mdl_req
+Message-ID: <20100723000709.GI2620@vigoh>
+References: <1279788733-2324-10-git-send-email-sancane@gmail.com>
+ <1279788733-2324-11-git-send-email-sancane@gmail.com>
+ <1279788733-2324-12-git-send-email-sancane@gmail.com>
+ <1279788733-2324-13-git-send-email-sancane@gmail.com>
+ <1279788733-2324-14-git-send-email-sancane@gmail.com>
+ <1279788733-2324-15-git-send-email-sancane@gmail.com>
+ <1279788733-2324-16-git-send-email-sancane@gmail.com>
+ <1279788733-2324-17-git-send-email-sancane@gmail.com>
+ <1279788733-2324-18-git-send-email-sancane@gmail.com>
+ <1279788733-2324-19-git-send-email-sancane@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1279789001-4587-1-git-send-email-santoscadenas@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1279788733-2324-19-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jose,
+Hi Santiago,
 
-* Jose Antonio Santos Cadenas <santoscadenas@gmail.com> [2010-07-22 10:56:12 +0200]:
+* Santiago Carot-Nemesio <sancane@gmail.com> [2010-07-22 10:52:13 +0200]:
 
-> From: José Antonio Santos-Cadenas <santoscadenas@gmail.com>
-> 
 > ---
->  mcap/mcap.c |  141 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
->  1 files changed, 140 insertions(+), 1 deletions(-)
+>  mcap/mcap.c |   48 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 files changed, 48 insertions(+), 0 deletions(-)
 > 
 > diff --git a/mcap/mcap.c b/mcap/mcap.c
-> index 6f6e08a..c775501 100644
+> index 5419d54..6f6e08a 100644
 > --- a/mcap/mcap.c
 > +++ b/mcap/mcap.c
-> @@ -1170,9 +1170,112 @@ static void proc_req_active(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
->  	}
+> @@ -519,6 +519,38 @@ void mcap_req_mdl_deletion(struct mcap_mdl *mdl, GError **err,
+>  		g_free(con);
 >  }
 >  
-> +static gboolean process_md_create_mdl_rsp(struct mcap_mcl *mcl,
-> +						uint8_t *cmd, uint32_t len)
+> +void mcap_mdl_abort(struct mcap_mdl *mdl, GError **err,
+> +			mcap_mdl_del_cb abort_cb, gpointer user_data)
 > +{
-> +	return FALSE;
-> +}
+> +	struct mcap_mdl_op_cb *con;
+> +	struct mcap_mcl *mcl = mdl->mcl;
+> +	uint8_t *cmd;
 > +
-> +static gboolean process_md_reconnect_mdl_rsp(struct mcap_mcl *mcl,
-> +						uint8_t *cmd, uint32_t len)
-> +{
-> +	return FALSE;
-> +}
-> +
-> +static gboolean process_md_abort_mdl_rsp(struct mcap_mcl *mcl,
-> +						uint8_t *cmd, uint32_t len)
-> +{
-> +	return FALSE;
-> +}
-> +
-> +static gboolean process_md_delete_mdl_rsp(struct mcap_mcl *mcl, uint8_t *cmd,
-> +								uint32_t len)
-> +{
-> +	return FALSE;
-> +}
-> +
-> +static gboolean check_rsp(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
-> +{
-> +	mcap4B_rsp *rsp;
-> +	GError *gerr = NULL;
-> +
-> +	/* Check if the response matches with the last request */
-> +	if ((cmd[0] != MCAP_ERROR_RSP) && ((mcl->lcmd[0] + 1) != cmd[0]))
-> +		goto close_mcl;
-> +
-> +	if (len < 4)
-> +		goto close_mcl;
-> +
-> +	rsp = (mcap4B_rsp *)cmd;
-> +
-> +	if (rsp->rc == MCAP_REQUEST_NOT_SUPPORTED) {
-> +		DBG("Remote does not support opcodes");
-> +		g_set_error(&gerr, MCAP_ERROR, MCAP_ERROR_REQUEST_NOT_SUPPORTED,
-> +						"%s", error2str(rsp->rc));
-> +		mcap_notify_error(mcl, gerr);
-> +		g_error_free(gerr);
-> +
-> +		g_free(mcl->lcmd);
-> +		mcl->lcmd = NULL;
-> +		mcl->ctrl &= ~MCAP_CTRL_STD_OP;
-> +		mcl->req = MCL_AVAILABLE;
-> +		update_mcl_state(mcl);
-> +		return FALSE;
-> +	}
-> +
-> +	if (rsp->rc == MCAP_UNSPECIFIED_ERROR)
-> +		goto close_mcl;
-> +
-> +	return TRUE;
-> +close_mcl:
-
-Always put a blank line before labels.
-
-> +	if (rsp->rc == MCAP_UNSPECIFIED_ERROR)
-> +		g_set_error(&gerr, MCAP_ERROR, MCAP_ERROR_UNSPECIFIED_ERROR,
-> +						"%s", error2str(rsp->rc));
-> +	else
-> +		g_set_error(&gerr, MCAP_ERROR, MCAP_ERROR_FAILED,
-> +						"Protocol error");
-> +	mcap_notify_error(mcl, gerr);
-> +	g_error_free(gerr);
-> +	mcl->ms->mcl_disconnected_cb(mcl, mcl->ms->user_data);
-> +	mcap_cache_mcl(mcl);
-> +	return FALSE;
-> +}
-> +
->  static void proc_response(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
->  {
-> -	/* TODO */
-> +	gboolean close;
-> +	RELEASE_TIMER(mcl);
-> +
-> +	if (!check_rsp(mcl, cmd, len))
+> +	if (mdl->state != MDL_WAITING) {
+> +		g_set_error(err, MCAP_ERROR, MCAP_ERROR_FAILED,
+> +							"Mdl in invalid state");
 > +		return;
-> +
-> +	switch (cmd[0]) {
-> +	case MCAP_ERROR_RSP:
-> +		error("MCAP_ERROR_RSP received");
-> +		close = TRUE;
-> +		break;
-> +	case MCAP_MD_CREATE_MDL_RSP:
-> +		close = process_md_create_mdl_rsp(mcl, cmd, len);
-> +		break;
-> +	case MCAP_MD_RECONNECT_MDL_RSP:
-> +		close = process_md_reconnect_mdl_rsp(mcl, cmd, len);
-> +		break;
-> +	case MCAP_MD_ABORT_MDL_RSP:
-> +		close = process_md_abort_mdl_rsp(mcl, cmd, len);
-> +		break;
-> +	case MCAP_MD_DELETE_MDL_RSP:
-> +		close = process_md_delete_mdl_rsp(mcl, cmd, len);
-> +		break;
-> +	default:
-> +		DBG("Unknown cmd response received (op code = %d)",cmd[0]);
-> +		close = TRUE;
-> +		break;
 > +	}
 > +
-> +	if (close) {
-> +		mcl->ms->mcl_disconnected_cb(mcl, mcl->ms->user_data);
-> +		mcap_cache_mcl(mcl);
-> +	}
->  }
->  
->  static void rsend_req(struct mcap_mcl *mcl)
-> @@ -1631,3 +1734,39 @@ void mcap_release_instance(struct mcap_instance *ms)
->  
->  	g_free(ms);
->  }
-> +
-> +uint16_t mcap_get_ctrl_psm(struct mcap_instance *ms, GError **err)
-> +{
-> +	uint16_t lpsm;
-> +
-> +	if (!(ms && ms->ccio)) {
-> +		g_set_error(err, MCAP_ERROR, MCAP_ERROR_INVALID_ARGS,
-> +			"Invalid MCAP instance");
-> +		return 0;
+> +	con = g_new0(struct mcap_mdl_op_cb, 1);
+> +	cmd = create_req(MCAP_MD_ABORT_MDL_REQ, mdl->mdlid);
+> +	mcap_send_std_opcode(mcl, cmd, sizeof(mcap_md_req), err);
+> +	if (*err) {
+> +		g_free(con);
+> +		g_free(cmd);
+> +		return;
 > +	}
 > +
-> +	bt_io_get(ms->ccio, BT_IO_L2CAP, err,
-> +			BT_IO_OPT_PSM, &lpsm,
-> +			BT_IO_OPT_INVALID);
-> +	if (*err)
-> +		return 0;
-> +	return lpsm;
+> +	con->mdl = mdl;
+> +	con->cb.del = abort_cb;
+> +	con->user_data = user_data;
+> +
+> +	mcl->priv_data = con;
+> +
+> +	mcl->tid = g_timeout_add_seconds(RESPONSE_TIMER, wait_response_timer,
+> +									mcl);
 > +}
 > +
-> +uint16_t mcap_get_data_psm(struct mcap_instance *ms, GError **err)
+>  static void update_mcl_state(struct mcap_mcl *mcl)
+>  {
+>  	GSList *l;
+> @@ -554,6 +586,22 @@ static struct mcap_mcl *find_mcl(GSList *list, const bdaddr_t *addr)
+>  	return NULL;
+>  }
+>  
+> +int mcap_mdl_get_fd(struct mcap_mdl *mdl)
 > +{
-> +	uint16_t lpsm;
+> +	if ((!mdl) || (mdl->state != MDL_CONNECTED))
+> +		return -1;
+
+A proper Unix error is better than -1 here.
+
 > +
-> +	if (!(ms && ms->dcio)) {
-> +		g_set_error(err, MCAP_ERROR, MCAP_ERROR_INVALID_ARGS,
-> +			"Invalid MCAP instance");
-> +		return 0;
-> +	}
-> +
-> +	bt_io_get(ms->dcio, BT_IO_L2CAP, err,
-> +			BT_IO_OPT_PSM, &lpsm,
-> +			BT_IO_OPT_INVALID);
-> +	if (*err)
-> +		return 0;
-> +	return lpsm;
+> +	return g_io_channel_unix_get_fd(mdl->dc);
 > +}
-> -- 
-> 1.6.3.3
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> +
+> +uint16_t mcap_mdl_get_mdlid(struct mcap_mdl *mdl)
+> +{
+> +	if (!mdl)
+> +		return MCAP_MDLID_RESERVED;
+> +
+> +	return mdl->mdlid;
+> +}
+> +
+>  static void shutdown_mdl(struct mcap_mdl *mdl)
+>  {
+>  	mdl->state = MDL_CLOSED;
 
 -- 
 Gustavo F. Padovan
