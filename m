@@ -1,41 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4C495200.2070103@Atheros.com>
-Date: Fri, 23 Jul 2010 13:55:36 +0530
-From: Suraj <suraj@Atheros.com>
+From: =?iso-8859-1?q?Jos=E9_Antonio_Santos_Cadenas?=
+	<santoscadenas@gmail.com>
+To: "Gustavo F. Padovan" <gustavo@padovan.org>
+Subject: Re: MCAP Patches
+Date: Fri, 23 Jul 2010 10:25:28 +0200
+Cc: "Santiago Carot-Nemesio" <sancane@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+References: <1279788733-2324-1-git-send-email-sancane@gmail.com> <20100722233606.GB2620@vigoh>
+In-Reply-To: <20100722233606.GB2620@vigoh>
 MIME-Version: 1.0
-To: Pavan Savoy <pavan_savoy@sify.com>
-CC: Suraj Sumangala <Suraj.Sumangala@Atheros.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: SAP profile implementation
-References: <4C493F90.10008@Atheros.com> <AANLkTimWft8QE5ZG2sYnANOBEkV3n5kGgsdQDYOqrw1k@mail.gmail.com>
-In-Reply-To: <AANLkTimWft8QE5ZG2sYnANOBEkV3n5kGgsdQDYOqrw1k@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201007231025.29101.santoscadenas@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Pavan,
+Hi,
 
-On 7/23/2010 12:58 PM, Pavan Savoy wrote:
-> i saw a bluez-sap project recently on gitorious ..
->
-> On 7/23/10, Suraj<suraj@atheros.com>  wrote:
->> Hi,
->>
->> Is there anyone currently working on SAP profile?
->> I know that Claudio Takahasi was working on the SAP Client implementation.
->>
->> Regards
->> Suraj
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
->> in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
+El Friday 23 July 2010 01:36:06 Gustavo F. Padovan escribió:
+> Hi Santiago,
+> 
+> * Santiago Carot-Nemesio <sancane@gmail.com> [2010-07-22 10:51:55 +0200]:
+> > Hello,
+> > 
+> > Next you are MCAP patches that José Antonio Santos Cadenas and me have
+> > generated for BlueZ. We still believe that MCAP should be an independent
+> > library from HDP because other profiles non health related may want to
+> > use it in the future, if we set this health dependency we will force to
+> > import health features in plugins that only require MCAP. Nevertheless,
+> > as we accorded last week in Brazil we are sending a last patch to set
+> > MCAP into health directory with HDP. We leave in your hands upload it as
+> > health plugin or not.
+> 
+> Please provide a git tree link for theses patches too. Thanks.
 
-If I am not mistaken, it was created by Claudio Takahasi and he had 
-removed it sometime later.
+You have a copy of this changes in the follow git at branch mcap.
 
-Regards
-Suraj
+git://gitorious.org/bluez-mcap-hdp/mcap-hdp.git
 
+Regards.
