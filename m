@@ -1,37 +1,197 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 22 Jul 2010 21:09:44 -0300
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
+To: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 19/60] Process response to std. op. codes
+Message-ID: <20100723000944.GJ2620@vigoh>
+References: <1279788733-2324-19-git-send-email-sancane@gmail.com>
+ <1279789001-4587-1-git-send-email-santoscadenas@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20100720093732.GA3210@jh-x301>
-References: <AANLkTimYuaveU7To6oLdtDLlxXIky1KU7QHMTD47Mwwh@mail.gmail.com>
-	<20100720093732.GA3210@jh-x301>
-Date: Fri, 23 Jul 2010 10:03:25 +0800
-Message-ID: <AANLkTikYDIOyiXLTst3R3K-TC81pMFfvtbPpmRwJqVan@mail.gmail.com>
-Subject: Re: Virtual cable unplug not supported in BlueZ?
-From: Liang Bao <tim.bao@gmail.com>
-To: Liang Bao <tim.bao@gmail.com>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1279789001-4587-1-git-send-email-santoscadenas@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adapter.RemoveDevice() also removes the pair information according to
-the document doc/adapter-api.txt. However, unplug a virtual cable in
-HID spec doesn't mean unpair. Anyway, let me check the source once
-again. Thanks.
+Hi Jose,
 
-2010/7/20 Johan Hedberg <johan.hedberg@gmail.com>:
-> Hi,
->
-> On Tue, Jul 20, 2010, Liang Bao wrote:
->> I have a question on "Virtual Cable Unplug" in current BlueZ version.
->>
->> Currently BlueZ doesn't expose a D-Bus method in input/device.c for
->> virtually unplug cable which is a mandatory requirement to pass
->> TC_HOS_HCR_BV_03_I. Actually the support in kernel is already there.
->> Can anyone give some insight to why this is not exposed at the DBUS
->> API level like Connect/Disconnect/GetProperties? Can I think the
->> reason behind this design is we only need one of "Disconnect" and
->> "VirtualUnplug" to allow user to disconnect?
->
-> AFAIK the unplug should be sent when you do Adapter.RemoveDevice()
->
-> Johan
->
+* Jose Antonio Santos Cadenas <santoscadenas@gmail.com> [2010-07-22 10:56:12 +0200]:
+
+> From: José Antonio Santos-Cadenas <santoscadenas@gmail.com>
+> 
+> ---
+>  mcap/mcap.c |  141 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 files changed, 140 insertions(+), 1 deletions(-)
+> 
+> diff --git a/mcap/mcap.c b/mcap/mcap.c
+> index 6f6e08a..c775501 100644
+> --- a/mcap/mcap.c
+> +++ b/mcap/mcap.c
+> @@ -1170,9 +1170,112 @@ static void proc_req_active(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
+>  	}
+>  }
+>  
+> +static gboolean process_md_create_mdl_rsp(struct mcap_mcl *mcl,
+> +						uint8_t *cmd, uint32_t len)
+> +{
+> +	return FALSE;
+> +}
+> +
+> +static gboolean process_md_reconnect_mdl_rsp(struct mcap_mcl *mcl,
+> +						uint8_t *cmd, uint32_t len)
+> +{
+> +	return FALSE;
+> +}
+> +
+> +static gboolean process_md_abort_mdl_rsp(struct mcap_mcl *mcl,
+> +						uint8_t *cmd, uint32_t len)
+> +{
+> +	return FALSE;
+> +}
+> +
+> +static gboolean process_md_delete_mdl_rsp(struct mcap_mcl *mcl, uint8_t *cmd,
+> +								uint32_t len)
+> +{
+> +	return FALSE;
+> +}
+> +
+> +static gboolean check_rsp(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
+> +{
+> +	mcap4B_rsp *rsp;
+> +	GError *gerr = NULL;
+> +
+> +	/* Check if the response matches with the last request */
+> +	if ((cmd[0] != MCAP_ERROR_RSP) && ((mcl->lcmd[0] + 1) != cmd[0]))
+> +		goto close_mcl;
+> +
+> +	if (len < 4)
+> +		goto close_mcl;
+> +
+> +	rsp = (mcap4B_rsp *)cmd;
+> +
+> +	if (rsp->rc == MCAP_REQUEST_NOT_SUPPORTED) {
+> +		DBG("Remote does not support opcodes");
+> +		g_set_error(&gerr, MCAP_ERROR, MCAP_ERROR_REQUEST_NOT_SUPPORTED,
+> +						"%s", error2str(rsp->rc));
+> +		mcap_notify_error(mcl, gerr);
+> +		g_error_free(gerr);
+> +
+> +		g_free(mcl->lcmd);
+> +		mcl->lcmd = NULL;
+> +		mcl->ctrl &= ~MCAP_CTRL_STD_OP;
+> +		mcl->req = MCL_AVAILABLE;
+> +		update_mcl_state(mcl);
+> +		return FALSE;
+> +	}
+> +
+> +	if (rsp->rc == MCAP_UNSPECIFIED_ERROR)
+> +		goto close_mcl;
+> +
+> +	return TRUE;
+> +close_mcl:
+
+Always put a blank line before labels.
+
+> +	if (rsp->rc == MCAP_UNSPECIFIED_ERROR)
+> +		g_set_error(&gerr, MCAP_ERROR, MCAP_ERROR_UNSPECIFIED_ERROR,
+> +						"%s", error2str(rsp->rc));
+> +	else
+> +		g_set_error(&gerr, MCAP_ERROR, MCAP_ERROR_FAILED,
+> +						"Protocol error");
+> +	mcap_notify_error(mcl, gerr);
+> +	g_error_free(gerr);
+> +	mcl->ms->mcl_disconnected_cb(mcl, mcl->ms->user_data);
+> +	mcap_cache_mcl(mcl);
+> +	return FALSE;
+> +}
+> +
+>  static void proc_response(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
+>  {
+> -	/* TODO */
+> +	gboolean close;
+> +	RELEASE_TIMER(mcl);
+> +
+> +	if (!check_rsp(mcl, cmd, len))
+> +		return;
+> +
+> +	switch (cmd[0]) {
+> +	case MCAP_ERROR_RSP:
+> +		error("MCAP_ERROR_RSP received");
+> +		close = TRUE;
+> +		break;
+> +	case MCAP_MD_CREATE_MDL_RSP:
+> +		close = process_md_create_mdl_rsp(mcl, cmd, len);
+> +		break;
+> +	case MCAP_MD_RECONNECT_MDL_RSP:
+> +		close = process_md_reconnect_mdl_rsp(mcl, cmd, len);
+> +		break;
+> +	case MCAP_MD_ABORT_MDL_RSP:
+> +		close = process_md_abort_mdl_rsp(mcl, cmd, len);
+> +		break;
+> +	case MCAP_MD_DELETE_MDL_RSP:
+> +		close = process_md_delete_mdl_rsp(mcl, cmd, len);
+> +		break;
+> +	default:
+> +		DBG("Unknown cmd response received (op code = %d)",cmd[0]);
+> +		close = TRUE;
+> +		break;
+> +	}
+> +
+> +	if (close) {
+> +		mcl->ms->mcl_disconnected_cb(mcl, mcl->ms->user_data);
+> +		mcap_cache_mcl(mcl);
+> +	}
+>  }
+>  
+>  static void rsend_req(struct mcap_mcl *mcl)
+> @@ -1631,3 +1734,39 @@ void mcap_release_instance(struct mcap_instance *ms)
+>  
+>  	g_free(ms);
+>  }
+> +
+> +uint16_t mcap_get_ctrl_psm(struct mcap_instance *ms, GError **err)
+> +{
+> +	uint16_t lpsm;
+> +
+> +	if (!(ms && ms->ccio)) {
+> +		g_set_error(err, MCAP_ERROR, MCAP_ERROR_INVALID_ARGS,
+> +			"Invalid MCAP instance");
+> +		return 0;
+> +	}
+> +
+> +	bt_io_get(ms->ccio, BT_IO_L2CAP, err,
+> +			BT_IO_OPT_PSM, &lpsm,
+> +			BT_IO_OPT_INVALID);
+> +	if (*err)
+> +		return 0;
+> +	return lpsm;
+> +}
+> +
+> +uint16_t mcap_get_data_psm(struct mcap_instance *ms, GError **err)
+> +{
+> +	uint16_t lpsm;
+> +
+> +	if (!(ms && ms->dcio)) {
+> +		g_set_error(err, MCAP_ERROR, MCAP_ERROR_INVALID_ARGS,
+> +			"Invalid MCAP instance");
+> +		return 0;
+> +	}
+> +
+> +	bt_io_get(ms->dcio, BT_IO_L2CAP, err,
+> +			BT_IO_OPT_PSM, &lpsm,
+> +			BT_IO_OPT_INVALID);
+> +	if (*err)
+> +		return 0;
+> +	return lpsm;
+> +}
+> -- 
+> 1.6.3.3
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+-- 
+Gustavo F. Padovan
+http://padovan.org
