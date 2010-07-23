@@ -1,81 +1,157 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4C49CEB5.60600@libresoft.es>
-Date: Fri, 23 Jul 2010 19:17:41 +0200
-From: Santiago Carot-Nemesio <scarot@libresoft.es>
+Message-ID: <4C49B7B5.9040802@codeaurora.org>
+Date: Fri, 23 Jul 2010 10:39:33 -0500
+From: Ron Shaffer <rshaffer@codeaurora.org>
 MIME-Version: 1.0
-To: =?ISO-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
-CC: =?ISO-8859-1?Q?Jos=E9_Antonio_Santos_Cadenas?=
-	<santoscadenas@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	Santiago Carot-Nemesio <sancane@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 16/60] Implement function to send md_reconnect_mdl_req
-References: <1279788733-2324-10-git-send-email-sancane@gmail.com> <20100723095813.GA17429@jh-x301> <AANLkTikCYPQ-e45YeUa4KCBAnfdX2Eofjq0YuVQMwpxL@mail.gmail.com> <201007231244.42402.santoscadenas@gmail.com> <91F64B18-B10E-4A87-879C-7EF07BC34194@signove.com>
-In-Reply-To: <91F64B18-B10E-4A87-879C-7EF07BC34194@signove.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] Bluetooth: Defer SCO setup if mode change is pending
+References: <1279644961.4572.60.camel@localhost.localdomain>	 <1279827933-4180-1-git-send-email-rshaffer@codeaurora.org> <1279853339.2621.14.camel@localhost.localdomain>
+In-Reply-To: <1279853339.2621.14.camel@localhost.localdomain>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-On 07/23/10 13:30, Elvis Pfützenreuter wrote:
-> On 23/07/2010, at 07:44, José Antonio Santos Cadenas wrote:
->
->    
->> Hi,
->>
->> El Friday 23 July 2010 12:31:03 Luiz Augusto von Dentz escribió:
->>      
->>> Hi,
->>>
->>> On Fri, Jul 23, 2010 at 12:58 PM, Johan Hedberg<johan.hedberg@gmail.com>
->>>        
->> wrote:
->>      
->>>> The SDP code in libbluetooth is probably the absolute worst place to
->>>> look for good examples. In this case the second variable in the function
->>>> is completely unnecessary. Just assign the malloc return directly to the
->>>> mcap_md_req pointer and get rid of the uint8_t* variable.
->>>>
->>>> Btw, I'd like to understand why we should use different acceptance
->>>> criteria for your patches compared to everything else that gets
->>>> submitted to BlueZ. The convention (which I'm sure you've noticed if you
->>>> follow the list) is that when issues are found in submitted patches the
->>>> submitter is requested to fix the issue in the patch and resubmit a new
->>>> version of the patch. You're essentially requesting for buggy patches to
->>>> be accepted as such and only fix the issues through new patches on top
->>>> of the buggy ones.
->>>>          
->>> I completely agree with this, one of the reason for this convention is
->>> that we don't want this changes split apart because they probably
->>> cannot be reverted individually. Another point is the history will be
->>> completely disorganized if we start to accept those fixes separately,
->>> it worth mention that this can eventually happen with patches already
->>> upstream, but then it is normally a regression fix and as such we
->>> normally mention the original commit which has caused it. I would
->>> understand if we were in the old days of cvs, but with git it is
->>> pretty simple to rearrange the changes, just use git rebase -i + git
->>> reset or whatever other form to get this fixed in place.
->>>        
->> We agree with you two. This is the complete development history that we have
->> now. We sent it like this because we understood that keeping the history will
->> be better. We don't care sending a different history with all the bug
->> corrections amended.
->>
->> About the use of git rebase, it is not the first time that we do this and
->> because of this we know that rebase some commits will make some of the
->> following commits not compile. It will be a long and hard work to fix this, so
->> it will be better and easier to create a new "virtual" history that splits the
->> whole implementation in smaller patches.
->>      
-> In this line, it is better to put MCAP files inside health/ as Marcel asked.
-Don't worry. I will set MCAP into health directory. I don't try to 
-explain anymore that MCAP is not only a health focused specification. It 
-is like I want to make program that only requires TCP to work and you 
-are forcing to me to import HTTP libraries, change HTTP by HDP and TCP 
-by MCAP and you will get the analogy.
-I just hope that nobody get surprised if in the coming years are new 
-non-health related profiles that require use MCAP and you need import 
-Health to implement it.
+Marcel:
 
-Regards.
+> Hi Ron,
+> 
+>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+>> index 6c57fc7..9aee8c5 100644
+>> --- a/net/bluetooth/hci_event.c
+>> +++ b/net/bluetooth/hci_event.c
+>> @@ -775,9 +775,6 @@ static void hci_cs_sniff_mode(struct hci_dev *hdev, __u8 status)
+>>  
+>>  	BT_DBG("%s status 0x%x", hdev->name, status);
+>>  
+>> -	if (!status)
+>> -		return;
+>> -
+>>  	cp = hci_sent_cmd_data(hdev, HCI_OP_SNIFF_MODE);
+>>  	if (!cp)
+>>  		return;
+>> @@ -785,8 +782,15 @@ static void hci_cs_sniff_mode(struct hci_dev *hdev, __u8 status)
+>>  	hci_dev_lock(hdev);
+>>  
+>>  	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(cp->handle));
+>> -	if (conn)
+>> -		clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend);
+>> +	if (conn) {
+>> +		if (status) {
+>> +			clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend);
+>> +
+>> +			if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND,
+>> +					&conn->pend))
+>> +				hci_sco_setup(conn, status);
+>> +		}
+>> +	}
+>>  
+>>  	hci_dev_unlock(hdev);
+>>  }
+> 
+> this change now makes it worse, please revert to initial
+> 
+> 	if (!status)
+> 		return;
+> 
+> check at the top and the just do
+> 
+> 	if (conn) {
+> 		clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend);
+> 
+> 		if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND, &conn->pend))
+> 			hci_sco_setup(conn, status);
+> 	}
+> 
+> The only reason why I moved the status check down, because I was not
+> thinking straight and overlooked that in case of success we don't wanna
+> do a single thing here.
+
+Makes sense. Done.
+
+> 
+>> @@ -798,9 +802,6 @@ static void hci_cs_exit_sniff_mode(struct hci_dev *hdev, __u8 status)
+>>  
+>>  	BT_DBG("%s status 0x%x", hdev->name, status);
+>>  
+>> -	if (!status)
+>> -		return;
+>> -
+>>  	cp = hci_sent_cmd_data(hdev, HCI_OP_EXIT_SNIFF_MODE);
+>>  	if (!cp)
+>>  		return;
+>> @@ -808,8 +809,15 @@ static void hci_cs_exit_sniff_mode(struct hci_dev *hdev, __u8 status)
+>>  	hci_dev_lock(hdev);
+>>  
+>>  	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(cp->handle));
+>> -	if (conn)
+>> -		clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend);
+>> +	if (conn) {
+>> +		if (status) {
+>> +			clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend);
+>> +
+>> +			if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND,
+>> +					&conn->pend))
+>> +				hci_sco_setup(conn, status);
+>> +		}
+>> +	}
+>>  
+>>  	hci_dev_unlock(hdev);
+>>  }
+> 
+> Same applies here btw.
+
+Same. Done.
+
+> 
+>> @@ -915,20 +923,8 @@ static inline void hci_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *s
+>>  	} else
+>>  		conn->state = BT_CLOSED;
+>>  
+>> -	if (conn->type == ACL_LINK) {
+>> -		struct hci_conn *sco = conn->link;
+>> -		if (sco) {
+>> -			if (!ev->status) {
+>> -				if (lmp_esco_capable(hdev))
+>> -					hci_setup_sync(sco, conn->handle);
+>> -				else
+>> -					hci_add_sco(sco, conn->handle);
+>> -			} else {
+>> -				hci_proto_connect_cfm(sco, ev->status);
+>> -				hci_conn_del(sco);
+>> -			}
+>> -		}
+>> -	}
+>> +	if (conn->type == ACL_LINK)
+>> +		hci_sco_setup(conn, ev->status);
+>>  
+>>  	if (ev->status) {
+>>  		hci_proto_connect_cfm(conn, ev->status);
+>> @@ -1478,6 +1474,9 @@ static inline void hci_mode_change_evt(struct hci_dev *hdev, struct sk_buff *skb
+>>  				conn->power_save = 1;
+>>  			else
+>>  				conn->power_save = 0;
+>> +		} else if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND,
+>> +				&conn->pend)) {
+>> +			hci_sco_setup(conn, ev->status);
+>>  		}
+>>  	}
+> 
+> Please don't do else if here. Just add a separate check like I had in my
+> initial patch. We don't wanna depend on two flags pending flags set
+> here. If the SCO setup is pending, then we execute it. No matter how we
+> reached that point. It is important that even if we receive a mode
+> change without us triggering it, that we clear any potential SCO pending
+> flag.
+
+Hmmm. I know I found a bug here, but I can't remember how it manifested
+itself. Today, I can't reproduce it, so either I was seeing things or
+I'm losing it.
+
+I'll revert it back, and if I run across the issue again, we can fix it
+later.
+
+-- 
+Ron Shaffer
+Employee of the Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
