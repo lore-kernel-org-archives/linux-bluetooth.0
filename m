@@ -1,99 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 23 Jul 2010 15:07:30 -0300
+Date: Fri, 23 Jul 2010 15:05:05 -0300
 From: "Gustavo F. Padovan" <gustavo@padovan.org>
 To: Santiago Carot-Nemesio <scarot@libresoft.es>
-Cc: Santiago Carot-Nemesio <sancane@gmail.com>,
+Cc: Elvis =?iso-8859-1?Q?Pf=FCtzenreuter?= <epx@signove.com>,
+	=?iso-8859-1?Q?Jos=E9?= Antonio Santos Cadenas
+	<santoscadenas@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Santiago Carot-Nemesio <sancane@gmail.com>,
 	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 18/60] Implement function to send md_abort_mdl_req
-Message-ID: <20100723180730.GM2620@vigoh>
-References: <1279788733-2324-12-git-send-email-sancane@gmail.com>
- <1279788733-2324-13-git-send-email-sancane@gmail.com>
- <1279788733-2324-14-git-send-email-sancane@gmail.com>
- <1279788733-2324-15-git-send-email-sancane@gmail.com>
- <1279788733-2324-16-git-send-email-sancane@gmail.com>
- <1279788733-2324-17-git-send-email-sancane@gmail.com>
- <1279788733-2324-18-git-send-email-sancane@gmail.com>
- <1279788733-2324-19-git-send-email-sancane@gmail.com>
- <20100723000709.GI2620@vigoh>
- <4C495FE9.7010802@libresoft.es>
+Subject: Re: [PATCH 16/60] Implement function to send md_reconnect_mdl_req
+Message-ID: <20100723180505.GL2620@vigoh>
+References: <1279788733-2324-10-git-send-email-sancane@gmail.com>
+ <20100723095813.GA17429@jh-x301>
+ <AANLkTikCYPQ-e45YeUa4KCBAnfdX2Eofjq0YuVQMwpxL@mail.gmail.com>
+ <201007231244.42402.santoscadenas@gmail.com>
+ <91F64B18-B10E-4A87-879C-7EF07BC34194@signove.com>
+ <4C49CEB5.60600@libresoft.es>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4C495FE9.7010802@libresoft.es>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <4C49CEB5.60600@libresoft.es>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Santiago,
 
-* Santiago Carot-Nemesio <scarot@libresoft.es> [2010-07-23 11:24:57 +0200]:
+* Santiago Carot-Nemesio <scarot@libresoft.es> [2010-07-23 19:17:41 +0200]:
 
 > Hi,
-> On 07/23/10 02:07, Gustavo F. Padovan wrote:
-> > Hi Santiago,
-> >
-> > * Santiago Carot-Nemesio<sancane@gmail.com>  [2010-07-22 10:52:13 +0200]:
+> On 07/23/10 13:30, Elvis Pfützenreuter wrote:
+> > On 23/07/2010, at 07:44, José Antonio Santos Cadenas wrote:
 > >
 > >    
-> >> ---
-> >>   mcap/mcap.c |   48 ++++++++++++++++++++++++++++++++++++++++++++++++
-> >>   1 files changed, 48 insertions(+), 0 deletions(-)
+> >> Hi,
 > >>
-> >> diff --git a/mcap/mcap.c b/mcap/mcap.c
-> >> index 5419d54..6f6e08a 100644
-> >> --- a/mcap/mcap.c
-> >> +++ b/mcap/mcap.c
-> >> @@ -519,6 +519,38 @@ void mcap_req_mdl_deletion(struct mcap_mdl *mdl, GError **err,
-> >>   		g_free(con);
-> >>   }
-> >>
-> >> +void mcap_mdl_abort(struct mcap_mdl *mdl, GError **err,
-> >> +			mcap_mdl_del_cb abort_cb, gpointer user_data)
-> >> +{
-> >> +	struct mcap_mdl_op_cb *con;
-> >> +	struct mcap_mcl *mcl = mdl->mcl;
-> >> +	uint8_t *cmd;
-> >> +
-> >> +	if (mdl->state != MDL_WAITING) {
-> >> +		g_set_error(err, MCAP_ERROR, MCAP_ERROR_FAILED,
-> >> +							"Mdl in invalid state");
-> >> +		return;
-> >> +	}
-> >> +
-> >> +	con = g_new0(struct mcap_mdl_op_cb, 1);
-> >> +	cmd = create_req(MCAP_MD_ABORT_MDL_REQ, mdl->mdlid);
-> >> +	mcap_send_std_opcode(mcl, cmd, sizeof(mcap_md_req), err);
-> >> +	if (*err) {
-> >> +		g_free(con);
-> >> +		g_free(cmd);
-> >> +		return;
-> >> +	}
-> >> +
-> >> +	con->mdl = mdl;
-> >> +	con->cb.del = abort_cb;
-> >> +	con->user_data = user_data;
-> >> +
-> >> +	mcl->priv_data = con;
-> >> +
-> >> +	mcl->tid = g_timeout_add_seconds(RESPONSE_TIMER, wait_response_timer,
-> >> +									mcl);
-> >> +}
-> >> +
-> >>   static void update_mcl_state(struct mcap_mcl *mcl)
-> >>   {
-> >>   	GSList *l;
-> >> @@ -554,6 +586,22 @@ static struct mcap_mcl *find_mcl(GSList *list, const bdaddr_t *addr)
-> >>   	return NULL;
-> >>   }
-> >>
-> >> +int mcap_mdl_get_fd(struct mcap_mdl *mdl)
-> >> +{
-> >> +	if ((!mdl) || (mdl->state != MDL_CONNECTED))
-> >> +		return -1;
+> >> El Friday 23 July 2010 12:31:03 Luiz Augusto von Dentz escribió:
 > >>      
-> > A proper Unix error is better than -1 here.
-> >    
-> Patch 58 fix that.
+> >>> Hi,
+> >>>
+> >>> On Fri, Jul 23, 2010 at 12:58 PM, Johan Hedberg<johan.hedberg@gmail.com>
+> >>>        
+> >> wrote:
+> >>      
+> >>>> The SDP code in libbluetooth is probably the absolute worst place to
+> >>>> look for good examples. In this case the second variable in the function
+> >>>> is completely unnecessary. Just assign the malloc return directly to the
+> >>>> mcap_md_req pointer and get rid of the uint8_t* variable.
+> >>>>
+> >>>> Btw, I'd like to understand why we should use different acceptance
+> >>>> criteria for your patches compared to everything else that gets
+> >>>> submitted to BlueZ. The convention (which I'm sure you've noticed if you
+> >>>> follow the list) is that when issues are found in submitted patches the
+> >>>> submitter is requested to fix the issue in the patch and resubmit a new
+> >>>> version of the patch. You're essentially requesting for buggy patches to
+> >>>> be accepted as such and only fix the issues through new patches on top
+> >>>> of the buggy ones.
+> >>>>          
+> >>> I completely agree with this, one of the reason for this convention is
+> >>> that we don't want this changes split apart because they probably
+> >>> cannot be reverted individually. Another point is the history will be
+> >>> completely disorganized if we start to accept those fixes separately,
+> >>> it worth mention that this can eventually happen with patches already
+> >>> upstream, but then it is normally a regression fix and as such we
+> >>> normally mention the original commit which has caused it. I would
+> >>> understand if we were in the old days of cvs, but with git it is
+> >>> pretty simple to rearrange the changes, just use git rebase -i + git
+> >>> reset or whatever other form to get this fixed in place.
+> >>>        
+> >> We agree with you two. This is the complete development history that we have
+> >> now. We sent it like this because we understood that keeping the history will
+> >> be better. We don't care sending a different history with all the bug
+> >> corrections amended.
+> >>
+> >> About the use of git rebase, it is not the first time that we do this and
+> >> because of this we know that rebase some commits will make some of the
+> >> following commits not compile. It will be a long and hard work to fix this, so
+> >> it will be better and easier to create a new "virtual" history that splits the
+> >> whole implementation in smaller patches.
+> >>      
+> > In this line, it is better to put MCAP files inside health/ as Marcel asked.
+> Don't worry. I will set MCAP into health directory. I don't try to 
+> explain anymore that MCAP is not only a health focused specification. It 
+> is like I want to make program that only requires TCP to work and you 
+> are forcing to me to import HTTP libraries, change HTTP by HDP and TCP 
+> by MCAP and you will get the analogy.
+> I just hope that nobody get surprised if in the coming years are new 
+> non-health related profiles that require use MCAP and you need import 
+> Health to implement it.
 
-So merge 58 into this one.. ;)
+If that happens we can move to new 'mcap' directory. For now only HDP
+uses it, so makes sense keep iut inside health/
 
 -- 
 Gustavo F. Padovan
