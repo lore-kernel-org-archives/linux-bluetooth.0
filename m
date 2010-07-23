@@ -1,157 +1,138 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4C49B7B5.9040802@codeaurora.org>
-Date: Fri, 23 Jul 2010 10:39:33 -0500
-From: Ron Shaffer <rshaffer@codeaurora.org>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: Defer SCO setup if mode change is pending
-References: <1279644961.4572.60.camel@localhost.localdomain>	 <1279827933-4180-1-git-send-email-rshaffer@codeaurora.org> <1279853339.2621.14.camel@localhost.localdomain>
-In-Reply-To: <1279853339.2621.14.camel@localhost.localdomain>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCH 6/6] pcmcia: remove cs_types.h
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Dominik Brodowski <linux@dominikbrodowski.net>
+Cc: linux-pcmcia@lists.infradead.org, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-usb@vger.kernel.org, laforge@gnumonks.org,
+	linux-mtd@lists.infradead.org, linux-bluetooth@vger.kernel.org,
+	alsa-devel@alsa-project.org, linux-serial@vger.kernel.org
+In-Reply-To: <1279874305-21191-6-git-send-email-linux@dominikbrodowski.net>
+References: <20100723083726.GA20947@comet.dominikbrodowski.net>
+	 <1279874305-21191-6-git-send-email-linux@dominikbrodowski.net>
+Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 23 Jul 2010 08:28:08 -0700
+Message-ID: <1279898888.2621.18.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Marcel:
+Hi Dominik,
 
-> Hi Ron,
+> Remove cs_types.h which is no longer needed: Most definitions aren't
+> used at all, a few can be made away with, and two remaining definitions
+> (typedefs, unfortunatley) may be moved to more specific places.
 > 
->> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->> index 6c57fc7..9aee8c5 100644
->> --- a/net/bluetooth/hci_event.c
->> +++ b/net/bluetooth/hci_event.c
->> @@ -775,9 +775,6 @@ static void hci_cs_sniff_mode(struct hci_dev *hdev, __u8 status)
->>  
->>  	BT_DBG("%s status 0x%x", hdev->name, status);
->>  
->> -	if (!status)
->> -		return;
->> -
->>  	cp = hci_sent_cmd_data(hdev, HCI_OP_SNIFF_MODE);
->>  	if (!cp)
->>  		return;
->> @@ -785,8 +782,15 @@ static void hci_cs_sniff_mode(struct hci_dev *hdev, __u8 status)
->>  	hci_dev_lock(hdev);
->>  
->>  	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(cp->handle));
->> -	if (conn)
->> -		clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend);
->> +	if (conn) {
->> +		if (status) {
->> +			clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend);
->> +
->> +			if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND,
->> +					&conn->pend))
->> +				hci_sco_setup(conn, status);
->> +		}
->> +	}
->>  
->>  	hci_dev_unlock(hdev);
->>  }
-> 
-> this change now makes it worse, please revert to initial
-> 
-> 	if (!status)
-> 		return;
-> 
-> check at the top and the just do
-> 
-> 	if (conn) {
-> 		clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend);
-> 
-> 		if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND, &conn->pend))
-> 			hci_sco_setup(conn, status);
-> 	}
-> 
-> The only reason why I moved the status check down, because I was not
-> thinking straight and overlooked that in case of success we don't wanna
-> do a single thing here.
+> CC: netdev@vger.kernel.org
+> CC: linux-wireless@vger.kernel.org
+> CC: linux-ide@vger.kernel.org
+> CC: linux-usb@vger.kernel.org
+> CC: laforge@gnumonks.org
+> CC: linux-mtd@lists.infradead.org
+> CC: linux-bluetooth@vger.kernel.org
+> CC: alsa-devel@alsa-project.org
+> CC: linux-serial@vger.kernel.org
+> Signed-off-by: Dominik Brodowski <linux@dominikbrodowski.net>
+> ---
+>  Documentation/pcmcia/driver-changes.txt          |    5 +++
+>  drivers/ata/pata_pcmcia.c                        |    1 -
+>  drivers/bluetooth/bluecard_cs.c                  |    1 -
+>  drivers/bluetooth/bt3c_cs.c                      |    1 -
+>  drivers/bluetooth/btuart_cs.c                    |    1 -
+>  drivers/bluetooth/dtl1_cs.c                      |    1 -
+>  drivers/char/pcmcia/cm4000_cs.c                  |    1 -
+>  drivers/char/pcmcia/cm4040_cs.c                  |    1 -
+>  drivers/char/pcmcia/ipwireless/main.h            |    1 -
+>  drivers/char/pcmcia/ipwireless/tty.h             |    1 -
+>  drivers/char/pcmcia/synclink_cs.c                |    1 -
+>  drivers/ide/ide-cs.c                             |    1 -
+>  drivers/isdn/hardware/avm/avm_cs.c               |    1 -
+>  drivers/isdn/hisax/avma1_cs.c                    |    1 -
+>  drivers/isdn/hisax/elsa_cs.c                     |    1 -
+>  drivers/isdn/hisax/sedlbauer_cs.c                |    1 -
+>  drivers/isdn/hisax/teles_cs.c                    |    1 -
+>  drivers/mmc/host/sdricoh_cs.c                    |    1 -
+>  drivers/mtd/maps/pcmciamtd.c                     |    1 -
+>  drivers/net/pcmcia/3c574_cs.c                    |    1 -
+>  drivers/net/pcmcia/3c589_cs.c                    |    1 -
+>  drivers/net/pcmcia/axnet_cs.c                    |    1 -
+>  drivers/net/pcmcia/com20020_cs.c                 |    1 -
+>  drivers/net/pcmcia/fmvj18x_cs.c                  |    1 -
+>  drivers/net/pcmcia/ibmtr_cs.c                    |    1 -
+>  drivers/net/pcmcia/nmclan_cs.c                   |    1 -
+>  drivers/net/pcmcia/pcnet_cs.c                    |    5 +--
+>  drivers/net/pcmcia/smc91c92_cs.c                 |    1 -
+>  drivers/net/pcmcia/xirc2ps_cs.c                  |    1 -
+>  drivers/net/wireless/airo_cs.c                   |    1 -
+>  drivers/net/wireless/atmel_cs.c                  |    1 -
+>  drivers/net/wireless/b43/pcmcia.c                |    1 -
+>  drivers/net/wireless/hostap/hostap_cs.c          |    3 +-
+>  drivers/net/wireless/libertas/if_cs.c            |    1 -
+>  drivers/net/wireless/orinoco/orinoco_cs.c        |    1 -
+>  drivers/net/wireless/orinoco/spectrum_cs.c       |    1 -
+>  drivers/net/wireless/ray_cs.c                    |    1 -
+>  drivers/net/wireless/wl3501_cs.c                 |   10 +-----
+>  drivers/parport/parport_cs.c                     |    1 -
+>  drivers/pcmcia/au1000_generic.h                  |    1 -
+>  drivers/pcmcia/au1000_pb1x00.c                   |    2 -
+>  drivers/pcmcia/cistpl.c                          |    1 -
+>  drivers/pcmcia/cs.c                              |    1 -
+>  drivers/pcmcia/db1xxx_ss.c                       |    1 -
+>  drivers/pcmcia/ds.c                              |    1 -
+>  drivers/pcmcia/i82092.c                          |    1 -
+>  drivers/pcmcia/i82365.c                          |    1 -
+>  drivers/pcmcia/m32r_cfc.c                        |    1 -
+>  drivers/pcmcia/m32r_pcc.c                        |    1 -
+>  drivers/pcmcia/m8xx_pcmcia.c                     |    1 -
+>  drivers/pcmcia/pcmcia_cis.c                      |    1 -
+>  drivers/pcmcia/pcmcia_resource.c                 |    1 -
+>  drivers/pcmcia/pd6729.c                          |    1 -
+>  drivers/pcmcia/pxa2xx_base.c                     |    1 -
+>  drivers/pcmcia/rsrc_iodyn.c                      |    1 -
+>  drivers/pcmcia/rsrc_mgr.c                        |    1 -
+>  drivers/pcmcia/rsrc_nonstatic.c                  |    1 -
+>  drivers/pcmcia/sa1100_generic.c                  |    1 -
+>  drivers/pcmcia/soc_common.h                      |    1 -
+>  drivers/pcmcia/socket_sysfs.c                    |    1 -
+>  drivers/pcmcia/tcic.c                            |    1 -
+>  drivers/pcmcia/xxs1500_ss.c                      |    1 -
+>  drivers/pcmcia/yenta_socket.c                    |    1 -
+>  drivers/scsi/pcmcia/aha152x_stub.c               |    1 -
+>  drivers/scsi/pcmcia/fdomain_stub.c               |    1 -
+>  drivers/scsi/pcmcia/nsp_cs.c                     |    1 -
+>  drivers/scsi/pcmcia/qlogic_stub.c                |    1 -
+>  drivers/scsi/pcmcia/sym53c500_cs.c               |    1 -
+>  drivers/serial/serial_cs.c                       |    1 -
+>  drivers/ssb/main.c                               |    1 -
+>  drivers/ssb/pcmcia.c                             |    1 -
+>  drivers/ssb/scan.c                               |    1 -
+>  drivers/staging/comedi/drivers/cb_das16_cs.c     |    1 -
+>  drivers/staging/comedi/drivers/das08_cs.c        |    1 -
+>  drivers/staging/comedi/drivers/ni_daq_700.c      |    1 -
+>  drivers/staging/comedi/drivers/ni_daq_dio24.c    |    1 -
+>  drivers/staging/comedi/drivers/ni_labpc_cs.c     |    1 -
+>  drivers/staging/comedi/drivers/ni_mio_cs.c       |    1 -
+>  drivers/staging/comedi/drivers/quatech_daqp_cs.c |    1 -
+>  drivers/staging/wlags49_h2/wl_cs.c               |    1 -
+>  drivers/staging/wlags49_h2/wl_internal.h         |    1 -
+>  drivers/telephony/ixj_pcmcia.c                   |    1 -
+>  drivers/usb/host/sl811_cs.c                      |    5 +--
+>  include/pcmcia/cistpl.h                          |    2 +
+>  include/pcmcia/cs.h                              |   10 +-----
+>  include/pcmcia/cs_types.h                        |   40 ----------------------
+>  include/pcmcia/ds.h                              |    3 +-
+>  include/pcmcia/ss.h                              |    1 -
+>  sound/pcmcia/pdaudiocf/pdaudiocf.h               |    1 -
+>  sound/pcmcia/vx/vxpocket.h                       |    1 -
+>  90 files changed, 14 insertions(+), 151 deletions(-)
+>  delete mode 100644 include/pcmcia/cs_types.h
 
-Makes sense. Done.
+for drivers/bluetooth/
 
-> 
->> @@ -798,9 +802,6 @@ static void hci_cs_exit_sniff_mode(struct hci_dev *hdev, __u8 status)
->>  
->>  	BT_DBG("%s status 0x%x", hdev->name, status);
->>  
->> -	if (!status)
->> -		return;
->> -
->>  	cp = hci_sent_cmd_data(hdev, HCI_OP_EXIT_SNIFF_MODE);
->>  	if (!cp)
->>  		return;
->> @@ -808,8 +809,15 @@ static void hci_cs_exit_sniff_mode(struct hci_dev *hdev, __u8 status)
->>  	hci_dev_lock(hdev);
->>  
->>  	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(cp->handle));
->> -	if (conn)
->> -		clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend);
->> +	if (conn) {
->> +		if (status) {
->> +			clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend);
->> +
->> +			if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND,
->> +					&conn->pend))
->> +				hci_sco_setup(conn, status);
->> +		}
->> +	}
->>  
->>  	hci_dev_unlock(hdev);
->>  }
-> 
-> Same applies here btw.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-Same. Done.
+Regards
 
-> 
->> @@ -915,20 +923,8 @@ static inline void hci_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *s
->>  	} else
->>  		conn->state = BT_CLOSED;
->>  
->> -	if (conn->type == ACL_LINK) {
->> -		struct hci_conn *sco = conn->link;
->> -		if (sco) {
->> -			if (!ev->status) {
->> -				if (lmp_esco_capable(hdev))
->> -					hci_setup_sync(sco, conn->handle);
->> -				else
->> -					hci_add_sco(sco, conn->handle);
->> -			} else {
->> -				hci_proto_connect_cfm(sco, ev->status);
->> -				hci_conn_del(sco);
->> -			}
->> -		}
->> -	}
->> +	if (conn->type == ACL_LINK)
->> +		hci_sco_setup(conn, ev->status);
->>  
->>  	if (ev->status) {
->>  		hci_proto_connect_cfm(conn, ev->status);
->> @@ -1478,6 +1474,9 @@ static inline void hci_mode_change_evt(struct hci_dev *hdev, struct sk_buff *skb
->>  				conn->power_save = 1;
->>  			else
->>  				conn->power_save = 0;
->> +		} else if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND,
->> +				&conn->pend)) {
->> +			hci_sco_setup(conn, ev->status);
->>  		}
->>  	}
-> 
-> Please don't do else if here. Just add a separate check like I had in my
-> initial patch. We don't wanna depend on two flags pending flags set
-> here. If the SCO setup is pending, then we execute it. No matter how we
-> reached that point. It is important that even if we receive a mode
-> change without us triggering it, that we clear any potential SCO pending
-> flag.
+Marcel
 
-Hmmm. I know I found a bug here, but I can't remember how it manifested
-itself. Today, I can't reproduce it, so either I was seeing things or
-I'm losing it.
 
-I'll revert it back, and if I run across the issue again, we can fix it
-later.
-
--- 
-Ron Shaffer
-Employee of the Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
