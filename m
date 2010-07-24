@@ -4,110 +4,59 @@ From: "Gustavo F. Padovan" <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	"Gustavo F. Padovan" <padovan@profusion.mobi>
-Subject: [PATCH 1/2] Bluetooth: Add __init and __exit marks to UART drivers
-Date: Sat, 24 Jul 2010 02:04:44 -0300
-Message-Id: <1279947885-19304-1-git-send-email-gustavo@padovan.org>
+Subject: [PATCH 2/2] Bluetooth: Add __init and __exit marks to RFCOMM
+Date: Sat, 24 Jul 2010 02:04:45 -0300
+Message-Id: <1279947885-19304-2-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1279947885-19304-1-git-send-email-gustavo@padovan.org>
+References: <1279947885-19304-1-git-send-email-gustavo@padovan.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo F. Padovan <padovan@profusion.mobi>
 
-Those marks are useful to save space in the binary and in the memory.
+Those annotation save memory and space on the binary. __init code is
+discarded just after execute and __exit code is discarded if the module is
+built into the kernel image or unload of modules is not allowed.
 
 Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 ---
- drivers/bluetooth/hci_ath.c  |    4 ++--
- drivers/bluetooth/hci_bcsp.c |    4 ++--
- drivers/bluetooth/hci_h4.c   |    4 ++--
- drivers/bluetooth/hci_ll.c   |    4 ++--
- 4 files changed, 8 insertions(+), 8 deletions(-)
+ net/bluetooth/rfcomm/sock.c |    2 +-
+ net/bluetooth/rfcomm/tty.c  |    4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
-index 5ab258b..b941dd5 100644
---- a/drivers/bluetooth/hci_ath.c
-+++ b/drivers/bluetooth/hci_ath.c
-@@ -217,7 +217,7 @@ static struct hci_uart_proto athp = {
- 	.flush = ath_flush,
- };
- 
--int ath_init(void)
-+int __init ath_init(void)
- {
- 	int err = hci_uart_register_proto(&athp);
- 
-@@ -229,7 +229,7 @@ int ath_init(void)
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index 43fbf6b..44a6232 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -1152,7 +1152,7 @@ error:
  	return err;
  }
  
--int ath_deinit(void)
-+int __exit ath_deinit(void)
+-void rfcomm_cleanup_sockets(void)
++void __exit rfcomm_cleanup_sockets(void)
  {
- 	return hci_uart_unregister_proto(&athp);
- }
-diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
-index 42d69d4..9c5b2dc 100644
---- a/drivers/bluetooth/hci_bcsp.c
-+++ b/drivers/bluetooth/hci_bcsp.c
-@@ -739,7 +739,7 @@ static struct hci_uart_proto bcsp = {
- 	.flush		= bcsp_flush
+ 	debugfs_remove(rfcomm_sock_debugfs);
+ 
+diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+index 309b6c2..026205c 100644
+--- a/net/bluetooth/rfcomm/tty.c
++++ b/net/bluetooth/rfcomm/tty.c
+@@ -1153,7 +1153,7 @@ static const struct tty_operations rfcomm_ops = {
+ 	.tiocmset		= rfcomm_tty_tiocmset,
  };
  
--int bcsp_init(void)
-+int __init bcsp_init(void)
+-int rfcomm_init_ttys(void)
++int __init rfcomm_init_ttys(void)
  {
- 	int err = hci_uart_register_proto(&bcsp);
- 
-@@ -751,7 +751,7 @@ int bcsp_init(void)
- 	return err;
+ 	rfcomm_tty_driver = alloc_tty_driver(RFCOMM_TTY_PORTS);
+ 	if (!rfcomm_tty_driver)
+@@ -1183,7 +1183,7 @@ int rfcomm_init_ttys(void)
+ 	return 0;
  }
  
--int bcsp_deinit(void)
-+int __exit bcsp_deinit(void)
+-void rfcomm_cleanup_ttys(void)
++void __exit rfcomm_cleanup_ttys(void)
  {
- 	return hci_uart_unregister_proto(&bcsp);
- }
-diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
-index b2cf50e..7b8ad93 100644
---- a/drivers/bluetooth/hci_h4.c
-+++ b/drivers/bluetooth/hci_h4.c
-@@ -173,7 +173,7 @@ static struct hci_uart_proto h4p = {
- 	.flush		= h4_flush,
- };
- 
--int h4_init(void)
-+int __init h4_init(void)
- {
- 	int err = hci_uart_register_proto(&h4p);
- 
-@@ -185,7 +185,7 @@ int h4_init(void)
- 	return err;
- }
- 
--int h4_deinit(void)
-+int __exit h4_deinit(void)
- {
- 	return hci_uart_unregister_proto(&h4p);
- }
-diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
-index 5744aba..38595e7 100644
---- a/drivers/bluetooth/hci_ll.c
-+++ b/drivers/bluetooth/hci_ll.c
-@@ -517,7 +517,7 @@ static struct hci_uart_proto llp = {
- 	.flush		= ll_flush,
- };
- 
--int ll_init(void)
-+int __init ll_init(void)
- {
- 	int err = hci_uart_register_proto(&llp);
- 
-@@ -529,7 +529,7 @@ int ll_init(void)
- 	return err;
- }
- 
--int ll_deinit(void)
-+int __exit ll_deinit(void)
- {
- 	return hci_uart_unregister_proto(&llp);
- }
+ 	tty_unregister_driver(rfcomm_tty_driver);
+ 	put_tty_driver(rfcomm_tty_driver);
 -- 
 1.7.1.1
