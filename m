@@ -1,41 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Zhenhua Zhang <zhenhua.zhang@intel.com>
+Sender: "Gustavo F. Padovan" <gfpadovan@gmail.com>
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] watch: Free service data in service_reply
-Date: Sat, 24 Jul 2010 17:46:27 +0800
-Message-Id: <1279964787-3989-1-git-send-email-zhenhua.zhang@intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: marcel@holtmann.org,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>
+Subject: [PATCH] Bluetooth: Update L2CAP version after enable ERTM by default
+Date: Sat, 24 Jul 2010 02:37:17 -0300
+Message-Id: <1279949837-19944-1-git-send-email-gustavo@padovan.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Avoid the memory leak of server_data.
+From: Gustavo F. Padovan <padovan@profusion.mobi>
+
+Enable ERTM by default is a big change in the code, so changing the
+version here.
+
+Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 ---
- gdbus/watch.c |    5 ++++-
- 1 files changed, 4 insertions(+), 1 deletions(-)
+ net/bluetooth/l2cap.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/gdbus/watch.c b/gdbus/watch.c
-index 1d479fa..ccdbb64 100644
---- a/gdbus/watch.c
-+++ b/gdbus/watch.c
-@@ -468,8 +468,10 @@ static void service_reply(DBusPendingCall *call, void *user_data)
- 	dbus_bool_t has_owner;
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index 9ba1e8e..273aba9 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -55,7 +55,7 @@
+ #include <net/bluetooth/hci_core.h>
+ #include <net/bluetooth/l2cap.h>
  
- 	reply = dbus_pending_call_steal_reply(call);
--	if (reply == NULL)
-+	if (reply == NULL) {
-+		g_free(data);
- 		return;
-+	}
+-#define VERSION "2.15"
++#define VERSION "2.16"
  
- 	dbus_error_init(&error);
+ static int disable_ertm = 0;
  
-@@ -490,6 +492,7 @@ static void service_reply(DBusPendingCall *call, void *user_data)
- 
- done:
- 	dbus_message_unref(reply);
-+	g_free(data);
- }
- 
- static void check_service(DBusConnection *connection, const char *name,
 -- 
-1.7.0.4
-
+1.7.1.1
