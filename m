@@ -1,62 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <gfpadovan@gmail.com>
 From: "Gustavo F. Padovan" <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
+Cc: marcel@holtman.org, suraj@atheros.com,
 	"Gustavo F. Padovan" <padovan@profusion.mobi>
-Subject: [PATCH] Bluetooth: Test 'count' value before enter the loop
-Date: Sat, 24 Jul 2010 01:34:54 -0300
-Message-Id: <1279946094-17478-1-git-send-email-gustavo@padovan.org>
+Subject: [PATCH] Bluetooth: Fix permission of hci_ath.c
+Date: Sat, 24 Jul 2010 01:06:05 -0300
+Message-Id: <1279944365-15821-1-git-send-email-gustavo@padovan.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo F. Padovan <padovan@profusion.mobi>
 
-Testing first we avoid enter the loop when count = 0.
+.c file shall not have the 'x' permission.
 
 Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 ---
- net/bluetooth/hci_core.c |    8 ++++----
- 1 files changed, 4 insertions(+), 4 deletions(-)
+ 0 files changed, 0 insertions(+), 0 deletions(-)
+ mode change 100755 => 100644 drivers/bluetooth/hci_ath.c
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 995c9f9..8303f1c 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1149,7 +1149,7 @@ int hci_recv_fragment(struct hci_dev *hdev, int type, void *data, int count)
- 	if (type < HCI_ACLDATA_PKT || type > HCI_EVENT_PKT)
- 		return -EILSEQ;
- 
--	do {
-+	while (count) {
- 		rem = hci_reassembly(hdev, type, data, count,
- 						type - 1, GFP_ATOMIC);
- 		if (rem < 0)
-@@ -1157,7 +1157,7 @@ int hci_recv_fragment(struct hci_dev *hdev, int type, void *data, int count)
- 
- 		data += (count - rem);
- 		count = rem;
--	} while (count);
-+	};
- 
- 	return rem;
- }
-@@ -1170,7 +1170,7 @@ int hci_recv_stream_fragment(struct hci_dev *hdev, void *data, int count)
- 	int type;
- 	int rem = 0;
- 
--	do {
-+	while (count) {
- 		struct sk_buff *skb = hdev->reassembly[STREAM_REASSEMBLY];
- 
- 		if (!skb) {
-@@ -1192,7 +1192,7 @@ int hci_recv_stream_fragment(struct hci_dev *hdev, void *data, int count)
- 
- 		data += (count - rem);
- 		count = rem;
--	} while (count);
-+	};
- 
- 	return rem;
- }
+diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
+old mode 100755
+new mode 100644
 -- 
 1.7.1.1
+
