@@ -1,161 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH v2] Bluetooth: Defer SCO setup if mode change is pending
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Ron Shaffer <rshaffer@codeaurora.org>
+MIME-Version: 1.0
+In-Reply-To: <AANLkTikgDEY67+bvfd78gD1EV2AigDti-3MQ3FeSgYsE@mail.gmail.com>
+References: <AANLkTimYuaveU7To6oLdtDLlxXIky1KU7QHMTD47Mwwh@mail.gmail.com>
+	<20100720093732.GA3210@jh-x301>
+	<AANLkTikYDIOyiXLTst3R3K-TC81pMFfvtbPpmRwJqVan@mail.gmail.com>
+	<AANLkTikgDEY67+bvfd78gD1EV2AigDti-3MQ3FeSgYsE@mail.gmail.com>
+Date: Sun, 25 Jul 2010 22:53:59 +0800
+Message-ID: <AANLkTikBut-2r8xzi9n8bQXcdLgxq04H-EHprTQVg2JT@mail.gmail.com>
+Subject: Re: Virtual cable unplug not supported in BlueZ?
+From: Liang Bao <tim.bao@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <4C49B7B5.9040802@codeaurora.org>
-References: <1279644961.4572.60.camel@localhost.localdomain>
-	 <1279827933-4180-1-git-send-email-rshaffer@codeaurora.org>
-	 <1279853339.2621.14.camel@localhost.localdomain>
-	 <4C49B7B5.9040802@codeaurora.org>
-Content-Type: text/plain; charset="UTF-8"
-Date: Sun, 25 Jul 2010 11:41:56 -0700
-Message-ID: <1280083316.2621.24.camel@localhost.localdomain>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ron,
-
-> >> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> >> index 6c57fc7..9aee8c5 100644
-> >> --- a/net/bluetooth/hci_event.c
-> >> +++ b/net/bluetooth/hci_event.c
-> >> @@ -775,9 +775,6 @@ static void hci_cs_sniff_mode(struct hci_dev *hdev, __u8 status)
-> >>  
-> >>  	BT_DBG("%s status 0x%x", hdev->name, status);
-> >>  
-> >> -	if (!status)
-> >> -		return;
-> >> -
-> >>  	cp = hci_sent_cmd_data(hdev, HCI_OP_SNIFF_MODE);
-> >>  	if (!cp)
-> >>  		return;
-> >> @@ -785,8 +782,15 @@ static void hci_cs_sniff_mode(struct hci_dev *hdev, __u8 status)
-> >>  	hci_dev_lock(hdev);
-> >>  
-> >>  	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(cp->handle));
-> >> -	if (conn)
-> >> -		clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend);
-> >> +	if (conn) {
-> >> +		if (status) {
-> >> +			clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend);
-> >> +
-> >> +			if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND,
-> >> +					&conn->pend))
-> >> +				hci_sco_setup(conn, status);
-> >> +		}
-> >> +	}
-> >>  
-> >>  	hci_dev_unlock(hdev);
-> >>  }
-> > 
-> > this change now makes it worse, please revert to initial
-> > 
-> > 	if (!status)
-> > 		return;
-> > 
-> > check at the top and the just do
-> > 
-> > 	if (conn) {
-> > 		clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend);
-> > 
-> > 		if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND, &conn->pend))
-> > 			hci_sco_setup(conn, status);
-> > 	}
-> > 
-> > The only reason why I moved the status check down, because I was not
-> > thinking straight and overlooked that in case of success we don't wanna
-> > do a single thing here.
-> 
-> Makes sense. Done.
-> 
-> > 
-> >> @@ -798,9 +802,6 @@ static void hci_cs_exit_sniff_mode(struct hci_dev *hdev, __u8 status)
-> >>  
-> >>  	BT_DBG("%s status 0x%x", hdev->name, status);
-> >>  
-> >> -	if (!status)
-> >> -		return;
-> >> -
-> >>  	cp = hci_sent_cmd_data(hdev, HCI_OP_EXIT_SNIFF_MODE);
-> >>  	if (!cp)
-> >>  		return;
-> >> @@ -808,8 +809,15 @@ static void hci_cs_exit_sniff_mode(struct hci_dev *hdev, __u8 status)
-> >>  	hci_dev_lock(hdev);
-> >>  
-> >>  	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(cp->handle));
-> >> -	if (conn)
-> >> -		clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend);
-> >> +	if (conn) {
-> >> +		if (status) {
-> >> +			clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend);
-> >> +
-> >> +			if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND,
-> >> +					&conn->pend))
-> >> +				hci_sco_setup(conn, status);
-> >> +		}
-> >> +	}
-> >>  
-> >>  	hci_dev_unlock(hdev);
-> >>  }
-> > 
-> > Same applies here btw.
-> 
-> Same. Done.
-> 
-> > 
-> >> @@ -915,20 +923,8 @@ static inline void hci_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *s
-> >>  	} else
-> >>  		conn->state = BT_CLOSED;
-> >>  
-> >> -	if (conn->type == ACL_LINK) {
-> >> -		struct hci_conn *sco = conn->link;
-> >> -		if (sco) {
-> >> -			if (!ev->status) {
-> >> -				if (lmp_esco_capable(hdev))
-> >> -					hci_setup_sync(sco, conn->handle);
-> >> -				else
-> >> -					hci_add_sco(sco, conn->handle);
-> >> -			} else {
-> >> -				hci_proto_connect_cfm(sco, ev->status);
-> >> -				hci_conn_del(sco);
-> >> -			}
-> >> -		}
-> >> -	}
-> >> +	if (conn->type == ACL_LINK)
-> >> +		hci_sco_setup(conn, ev->status);
-> >>  
-> >>  	if (ev->status) {
-> >>  		hci_proto_connect_cfm(conn, ev->status);
-> >> @@ -1478,6 +1474,9 @@ static inline void hci_mode_change_evt(struct hci_dev *hdev, struct sk_buff *skb
-> >>  				conn->power_save = 1;
-> >>  			else
-> >>  				conn->power_save = 0;
-> >> +		} else if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND,
-> >> +				&conn->pend)) {
-> >> +			hci_sco_setup(conn, ev->status);
-> >>  		}
-> >>  	}
-> > 
-> > Please don't do else if here. Just add a separate check like I had in my
-> > initial patch. We don't wanna depend on two flags pending flags set
-> > here. If the SCO setup is pending, then we execute it. No matter how we
-> > reached that point. It is important that even if we receive a mode
-> > change without us triggering it, that we clear any potential SCO pending
-> > flag.
-> 
-> Hmmm. I know I found a bug here, but I can't remember how it manifested
-> itself. Today, I can't reproduce it, so either I was seeing things or
-> I'm losing it.
-> 
-> I'll revert it back, and if I run across the issue again, we can fix it
-> later.
-
-please send v3 of this patch then.
-
-Regards
-
-Marcel
-
-
+2010/7/23 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
+> Hi,
+>
+> On Fri, Jul 23, 2010 at 5:03 AM, Liang Bao <tim.bao@gmail.com> wrote:
+>> Adapter.RemoveDevice() also removes the pair information according to
+>> the document doc/adapter-api.txt. However, unplug a virtual cable in
+>> HID spec doesn't mean unpair. Anyway, let me check the source once
+>> again. Thanks.
+>
+> The question is, why do you want to use virtual cable unplug manually?
+> There doesn't seems to be any useful use case for that, there is no
+> "Virtual Cable Plug" either so if we do export virtual cable unplug
+> feature how we plug it again?
+Yes, I agree with that virtual plug looks like something hard to
+understand to an end-user. User will be happy as long as he can
+connect and disconnect. However, virtual plug is defined by the HID
+spec as a mandatory requirement for HID host role.By my understanding,
+this is just to gracefully to remove the 1:1 relationship between the
+HID device and host. Because unplug doesn't mean unpair, the
+reconnection procedure still work and then they "plug" again. Maybe we
+can do a unplug using hidd in command line..?
+>
+> --
+> Luiz Augusto von Dentz
+> Computer Engineer
+>
