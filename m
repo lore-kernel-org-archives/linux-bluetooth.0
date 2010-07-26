@@ -1,46 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 26 Jul 2010 12:44:44 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: ingas@codeaurora.org
-Cc: linux-bluetooth@vger.kernel.org, rshaffer@codeaurora.org,
-	marcel@holtmann.org
-Subject: Re: [PATCH v4 0/5] Enhanced support for extended inquiry response
-Message-ID: <20100726094444.GB20357@jh-x301>
-References: <1279814780-29673-1-git-send-email-ingas@codeaurora.org>
- <20100723082045.GA1600@jh-x301>
- <20100723082754.GA12563@jh-x301>
- <20100723084300.GA14443@jh-x301>
- <b622ef9ae078ace2da7a8a6748823d2f.squirrel@www.codeaurora.org>
+From: "Zhang, Zhenhua" <zhenhua.zhang@intel.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 26 Jul 2010 17:38:06 +0800
+Subject: RE: [PATCH v2] watch: Free service data in service_reply
+Message-ID: <33AB447FBD802F4E932063B962385B352780CFF7@shsmsx501.ccr.corp.intel.com>
+References: <1280106672-4796-1-git-send-email-zhenhua.zhang@intel.com>
+ <20100726093354.GA20357@jh-x301>
+In-Reply-To: <20100726093354.GA20357@jh-x301>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <b622ef9ae078ace2da7a8a6748823d2f.squirrel@www.codeaurora.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Inga,
+Hi Johan,
 
-On Sun, Jul 25, 2010, ingas@codeaurora.org wrote:
-> It seems my comment for this patch submisiion was not specific enough (my
-> apologies). The extended support for EIR update was meant for the cases
-> when d-bus methods "AddRecord", "RemoveRecord" and "Update Record" were
-> called. I did verify the problems that you indicated in EIR update when
-> using sdptool. However, this is a pre-existing condition not related to
-> the extensions that I submitted. sdptool uses different mechanism for EIR
-> update that was not affected by my changes. That needs to be fixed in a
-> separate patch set, IMO.
+Johan Hedberg wrote:
+> Hi,
+> 
+> On Mon, Jul 26, 2010, Zhenhua Zhang wrote:
+>> Avoid the memory leak of server_data.
+>> ---
+>>  gdbus/watch.c |    2 +-
+>>  1 files changed, 1 insertions(+), 1 deletions(-)
+>> 
+>> diff --git a/gdbus/watch.c b/gdbus/watch.c
+>> index 1d479fa..29f23e2 100644
+>> --- a/gdbus/watch.c
+>> +++ b/gdbus/watch.c
+>> @@ -533,7 +533,7 @@ static void check_service(DBusConnection
+>>  	*connection, const char *name,  		goto done; }
+>> 
+>> -	dbus_pending_call_set_notify(call, service_reply, data, NULL);
+>> +	dbus_pending_call_set_notify(call, service_reply, data, g_free);
+>> 
+>>  	dbus_pending_call_unref(call);
+> 
+> Thanks for the updated patch. It has now been pushed both to bluez and
+> obexd upstream trees with a fixed commit message (e.g. your summary
+> line was not truthful anymore since the data isn't being freed in
+> service_reply but by libdbus itself.
+> 
+> Johan
 
-Both the D-Bus interface as well as sdptool trigger the same code paths
-in src/sdpd-service.c. I.e. it doesn't make sense to solve this twice
-when it can be solved once by targetting the common lower layer. We
-already do this for the service class bits with update_svclass_list() in
-sdpd-service.c. The need to update the EIR data is very similar to the
-need to update the service class bits so the existing code is probably a
-good place to take example of.
+Thanks. Will pay attention to the commit title next time.
 
-And yes, please make your commit messages more verbose. It's far less of
-a crime to have too verbose messages than not having them descriptive
-enough: it doesn't just help the reviewers right now in understanding
-the purpose of the patches but will also help anybody looking through
-the commit history a few years from now when the details of the matter
-have been forgotten.
-
-Johan
+Regards,
+Zhenhua
