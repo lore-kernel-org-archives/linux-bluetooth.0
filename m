@@ -1,11 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] test-serial: fix service value attribution
-Date: Mon, 26 Jul 2010 15:21:00 -0300
-Message-Id: <1280168460-18374-2-git-send-email-gustavo@padovan.org>
-In-Reply-To: <1280168460-18374-1-git-send-email-gustavo@padovan.org>
-References: <1280168460-18374-1-git-send-email-gustavo@padovan.org>
+Subject: [PATCH 1/2] test-serial: fix position  of the address argument
+Date: Mon, 26 Jul 2010 15:20:59 -0300
+Message-Id: <1280168460-18374-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -14,18 +12,18 @@ List-ID: <linux-bluetooth.vger.kernel.org>
  1 files changed, 1 insertions(+), 1 deletions(-)
 
 diff --git a/test/test-serial b/test/test-serial
-index 1c7078c..fd55b81 100755
+index ed151dc..1c7078c 100755
 --- a/test/test-serial
 +++ b/test/test-serial
-@@ -34,7 +34,7 @@ address = sys.argv[1]
+@@ -29,7 +29,7 @@ if (len(args) < 1):
+ 	print "Usage: %s <address> [service]" % (sys.argv[0])
+ 	sys.exit(1)
+ 
+-address = sys.argv[0]
++address = sys.argv[1]
+ 
  if (len(args) < 2):
  	service = "spp"
- else:
--	service = args[1]
-+	service = sys.argv[2]
- 
- path = adapter.FindDevice(address)
- 
 -- 
 1.7.1.1
 
