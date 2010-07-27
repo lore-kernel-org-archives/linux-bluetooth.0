@@ -1,41 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] De-register pbap drivers on init failure scenarios
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: "Counihan, Tom" <tom.counihan@intel.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <20100727123129.GA6483@jh-x301>
-References: <B09AD526409DF14F8DA79CC5429052C299EE0FC7@irsmsx505.ger.corp.intel.com>
-	 <20100727123129.GA6483@jh-x301>
-Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 27 Jul 2010 08:41:27 -0700
-Message-ID: <1280245287.2621.78.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <4C4EFCF2.6090108@Atheros.com>
+Date: Tue, 27 Jul 2010 21:06:18 +0530
+From: Suraj <suraj@Atheros.com>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Suraj Sumangala <Suraj.Sumangala@Atheros.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>
+Subject: Re: [RFC v2] Bluetooth: Provide access to reassembled Rx packets
+References: <1280126094-18004-1-git-send-email-suraj@atheros.com>	 <1280157203.2621.48.camel@localhost.localdomain>	 <4C4DD292.60001@Atheros.com>	 <1280184169.2621.63.camel@localhost.localdomain>	 <4C4E650D.4080806@Atheros.com> <1280207657.2621.74.camel@localhost.localdomain>
+In-Reply-To: <1280207657.2621.74.camel@localhost.localdomain>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Marcel,
 
-> > Unwind the driver registration/phonebook initialization stack on pbap plugin init failure scenarios.
-> > 
-> > 
-> > ---
-> >  plugins/pbap.c |   25 ++++++++++++++++++++-----
-> >  1 files changed, 20 insertions(+), 5 deletions(-)
-> 
-> Thanks for the patch! It's now upstream. In the future please pay
-> attention to your commit message line length. It shouldn't exceed 74
-> characters (or so) in order to be nicely viewable on a 80-character wide
-> terminal using git log. I fixed it this time for you manually.
+On 7/27/2010 10:44 AM, Marcel Holtmann wrote:
+> Hi Suraj,
+>
+>>> So first of all, lets make something perfectly clear. All Bluetooth
+>>> drivers are _transport_ drivers. They don't need to know what they are
+>>> transporting. And in addition you should not look into the packets that
+>>> you are sending or receiving. The Bluetooth core does that HCI packet
+>>> parsing.
+>>>
+>>> This is how I want it and how this is going to stay. Everything else is
+>>> an insane approach and cost every single driver overhead. In addition
+>>> the lifetime rules of SKBs become more and more complicated. That is a
+>>> pretty bad thing. It will result in excessive memory usage and will
+>>> cause problems.
+>>
+>> I understand the point that you are making. But If I am not mistaken,
+>> HCI transport driver is the only part of the system that could be vendor
+>> specific ( HCI ATH3K, HCI LL etc). So a vendor specific command or event
+>> makes more sense to a transport driver than anybody else.
+>>
+>> Is there anyway this requirement can be sufficed without causing the
+>> issues you have mentioned above?
+>
+> so you might be able to convince me if you implement something proper
+> for handling vendor commands. The basic assumption is still that a HCI
+> driver is a pure transport driver.
 
-please pay attention to Outlook/Exchange users where the the firstname,
-lastname thing is reversed :(
+My requirement is basically to use the command complete event of 
+HCI_RESET to trigger a vendor specific command and verify its status by 
+checking the status of the VSC.
 
-Tom, Ensure that patches have a proper From: line first with the correct
-name in the correct order.
+So, does it makes sense to register a callback with HCI core with 
+required Event ID so that HCI core can call the callback when it 
+receives the corresponding Event? This would still make sure that HCI 
+packets are handled by HCI core and "driver/whoever registers the 
+callback" will be notified by the HCI core as and when required.
+
+Not sure this would address the concern you have raised.
+
+>
+> However you have access to hci_dev. So if you create some functions to
+> execute vendor commands and retrieve the results then this might be a
+> way. The core already processes vendor commands and events. But keep in
+> mind that there is no requirement to get a command status or command
+> complete event for vendor commands. For example CSR doesn't send them
+> for their vendor commands.
+
+Thanks,
+
+>
+> Regards
+>
+> Marcel
+>
+>
 
 Regards
-
-Marcel
-
-
+Suraj
