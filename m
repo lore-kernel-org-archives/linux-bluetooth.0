@@ -1,44 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [patch -next] bluetooth/hci_ath: kfree() => kfree_skb()
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Gustavo F. Padovan" <gustavo@padovan.org>
-Cc: Dan Carpenter <error27@gmail.com>,
-	Suraj Sumangala <suraj@atheros.com>,
-	linux-bluetooth@vger.kernel.org, kernel-janitors@vger.kernel.org
-In-Reply-To: <20100723181053.GN2620@vigoh>
-References: <20100723101104.GD26313@bicker>  <20100723181053.GN2620@vigoh>
-Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 27 Jul 2010 15:28:58 -0700
-Message-ID: <1280269738.2621.94.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <94b1ecb27a99150d2cc0cae8fe6607af.squirrel@www.codeaurora.org>
+In-Reply-To: <AANLkTi=nW-E8S3ccyutn_LYafmhSXiGY62PVZJ6L2QnX@mail.gmail.com>
+References: <1279814780-29673-1-git-send-email-ingas@codeaurora.org>
+    <1279814780-29673-3-git-send-email-ingas@codeaurora.org>
+    <AANLkTi=nW-E8S3ccyutn_LYafmhSXiGY62PVZJ6L2QnX@mail.gmail.com>
+Date: Tue, 27 Jul 2010 13:08:02 -0700 (PDT)
+Subject: Re: [PATCH 2/5] Support for adding UUID128 to extended inquiry  
+     response
+From: ingas@codeaurora.org
+To: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+Cc: "Inga Stotland" <ingas@codeaurora.org>,
+ linux-bluetooth@vger.kernel.org,
+ rshaffer@codeaurora.org,
+ marcel@holtmann.org,
+ johan.hedberg@gmail.com
+MIME-Version: 1.0
+Content-Type: text/plain;charset=iso-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dan,
+Hi Luiz,
 
-> > sk_buffs have to be freed with kfree_skb() instead of kfree().
-> > 
-> > Signed-off-by: Dan Carpenter <error27@gmail.com>
-> > 
-> > diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
-> > index 5ab258b..74a8f61 100755
-> > --- a/drivers/bluetooth/hci_ath.c
-> > +++ b/drivers/bluetooth/hci_ath.c
-> > @@ -163,7 +163,7 @@ static int ath_enqueue(struct hci_uart *hu, struct sk_buff *skb)
-> >  	struct ath_struct *ath = hu->priv;
-> >  
-> >  	if (bt_cb(skb)->pkt_type == HCI_SCODATA_PKT) {
-> > -		kfree(skb);
-> > +		kfree_skb(skb);
-> >  		return 0;
-> >  	}
-> 
-> Acked-by: Gustavo F. Padovan <padovan@profusion.mobi>
+> Hi,
+>
+> On Thu, Jul 22, 2010 at 7:06 PM, Inga Stotland <ingas@codeaurora.org>
+> wrote:
+>> ---
+>>  src/sdpd-service.c |  108
+>> ++++++++++++++++++++++++++++++++++++++++++++--------
+>>  1 files changed, 92 insertions(+), 16 deletions(-)
+>>
+>> diff --git a/src/sdpd-service.c b/src/sdpd-service.c
+>> index cdbb4f4..1314ada 100644
+>> --- a/src/sdpd-service.c
+>> +++ b/src/sdpd-service.c
+>> @@ -49,6 +49,8 @@
+>>  #include "manager.h"
+>>  #include "adapter.h"
+>
+>> +
+>
+> I think you should probably split this in two parts, first update with
+> the cleanups and then add the code to handle uuid 128.
+>
 
-patch has been applied. Thanks.
+Sure, I can split this in more patches.
 
-Regards
+>>  void create_ext_inquiry_response(const char *name,
+>>                                        int8_t tx_power, sdp_list_t
+>> *services,
+>>                                        uint8_t *data)
+>>
+>> +               /* Check for duplicates */
+>>                for (i = 0; i < index; i++)
+>> -                       if (uuid[i] == rec->svclass.value.uuid16)
+>> +                       if (uuid16[i] == rec->svclass.value.uuid16)
+>>                                break;
+>>
+>> -               if (i == index - 1)
+>> +               if (i < index)
+>>                        continue;
+>>
 
-Marcel
+>
+> Also this checks for duplicates looks suspicious, does it really need
+> to check that in place and every time, I think it might be more
+> efficient if we do that before generating the EIR data avoiding
+> comparing data with different endianess or maybe it just make more
+> sense to not allow duplicates in the database then we don't have to do
+> this at all.
+>
 
+This check for duplicates was in place prior to my modifications. I merely
+added a comment and fixed an existing problem.
 
+If you examine the patch closely, you might notice that the previous
+"check for duplicates" implementation was doing the following:
+- cycling through the list of so far accumulated UUIDs in EIR and
+comparing them to the current one. If duplicate is found, break out of
+this cycling loop. Notice, that in the case of a duplicate, (i <
+index)condition will be true, where index is the number of accumulated
+UUIDs.
+- the current implementation performs check for (i == index -1). Well, we
+did not need to cycle through the whole array to cmpare to the last item
+:) But if my reading of the original intent is correct, we don't want to
+put a duplicate UUID in EIR, and, therefore, should go to next iteration
+if a duplicate is found. Hence, the check should be (i < index).
+
+Maybe it's a better idea to submit this fix separately.
+
+I do not disagree that it would be better to check for duplicate records
+elsewhere, but this  is outside the scope of this patch.
+
+Regards,
+
+Inga
