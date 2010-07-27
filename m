@@ -1,41 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <4C4EC2B5.2030204@hschmitt.de>
-References: <4C4EC2B5.2030204@hschmitt.de>
-Date: Tue, 27 Jul 2010 16:03:39 +0300
-Message-ID: <AANLkTi=WSgMe86k-h=_HdzsPTZ=rK5ab5O9mYf8C6jnc@mail.gmail.com>
-Subject: Re: obexd 0.29 and N900 PC Suite
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Harald Schmitt <linux@hschmitt.de>
+Date: Tue, 27 Jul 2010 15:31:29 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: "Counihan, Tom" <tom.counihan@intel.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH] De-register pbap drivers on init failure scenarios
+Message-ID: <20100727123129.GA6483@jh-x301>
+References: <B09AD526409DF14F8DA79CC5429052C299EE0FC7@irsmsx505.ger.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <B09AD526409DF14F8DA79CC5429052C299EE0FC7@irsmsx505.ger.corp.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Tom,
 
-On Tue, Jul 27, 2010 at 2:27 PM, Harald Schmitt <linux@hschmitt.de> wrote:
-> Hi,
->
-> there are several users who test obexd 0.29 on the Nokia N900 running Maemo
-> in order to have PBAP support. There are success reports with PBAP, but at
-> the same time they cannot usb sync via Nokia PC Suite anymore. Is there any
-> chance to get PC Suite working again in a future obexd version or does this
-> depend on a non free Nokia code?
-> Can you give any hints where to look at?
-> In a forum a user posted success (with 0.19) and failure (with 0.29) logs:
-> http://talk.maemo.org/showthread.php?p=763550#post763550
+On Tue, Jul 27, 2010, Counihan, Tom wrote:
+> Unwind the driver registration/phonebook initialization stack on pbap plugin init failure scenarios.
+> 
+> 
+> ---
+>  plugins/pbap.c |   25 ++++++++++++++++++++-----
+>  1 files changed, 20 insertions(+), 5 deletions(-)
 
-First thanks a lot for this feedback, I wasn't aware that there were
-somebody trying to use newer version of obexd in N900, I will take a
-look how I can make usb compatible with N900, actually it should be
-just as bluetooth and work no matter which platform you are using but
-we are not there yet :(
+Thanks for the patch! It's now upstream. In the future please pay
+attention to your commit message line length. It shouldn't exceed 74
+characters (or so) in order to be nicely viewable on a 80-character wide
+terminal using git log. I fixed it this time for you manually.
 
-In the meantime you can try reverting the patch bellow and see if it helps:
-
-http://git.kernel.org/?p=bluetooth/obexd.git;a=commitdiff;h=6f56a4355585eb29535782f977ba545cc41dd382
-
--- 
-Luiz Augusto von Dentz
-Computer Engineer
+Johan
