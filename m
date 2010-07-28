@@ -2,319 +2,320 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 06/16] Send MCAP request mcap_md_create_mdl_req
-Date: Wed, 28 Jul 2010 10:00:15 +0200
-Message-Id: <1280304015-9230-7-git-send-email-sancane@gmail.com>
-In-Reply-To: <1280304015-9230-6-git-send-email-sancane@gmail.com>
+Subject: [PATCH 05/16] Prepare FSM functions for processing comands
+Date: Wed, 28 Jul 2010 10:00:14 +0200
+Message-Id: <1280304015-9230-6-git-send-email-sancane@gmail.com>
+In-Reply-To: <1280304015-9230-5-git-send-email-sancane@gmail.com>
 References: <1280304015-9230-1-git-send-email-sancane@gmail.com>
  <1280304015-9230-2-git-send-email-sancane@gmail.com>
  <1280304015-9230-3-git-send-email-sancane@gmail.com>
  <1280304015-9230-4-git-send-email-sancane@gmail.com>
  <1280304015-9230-5-git-send-email-sancane@gmail.com>
- <1280304015-9230-6-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- health/mcap.c          |  178 ++++++++++++++++++++++++++++++++++++++++++++++++
- health/mcap.h          |   11 +++
- health/mcap_internal.h |   16 ++++
- health/mcap_lib.h      |    9 +++
- 4 files changed, 214 insertions(+), 0 deletions(-)
+ health/mcap.c          |  192 +++++++++++++++++++++++++++++++++++++++++++++++-
+ health/mcap.h          |   29 +++++++
+ health/mcap_internal.h |    4 +
+ 3 files changed, 224 insertions(+), 1 deletions(-)
 
 diff --git a/health/mcap.c b/health/mcap.c
-index 73562c3..7366c66 100644
+index ba2b2ad..73562c3 100644
 --- a/health/mcap.c
 +++ b/health/mcap.c
-@@ -35,6 +35,7 @@
+@@ -35,6 +35,8 @@
  #include "mcap_lib.h"
  #include "mcap_internal.h"
  
-+#define RESPONSE_TIMER	2	/* seconds */
- #define MAX_CACHED	10	/* 10 devices */
- 
++#define MAX_CACHED	10	/* 10 devices */
++
  #define MCAP_ERROR g_quark_from_static_string("mcap-error-quark")
-@@ -50,6 +51,18 @@ struct connect_mcl {
+ 
+ #define RELEASE_TIMER(__mcl) do {	\
+@@ -48,6 +50,17 @@ struct connect_mcl {
  	gpointer		user_data;	/* Callback user data */
  };
  
-+typedef union {
-+	mcap_mdl_operation_cb 		op;
-+	mcap_mdl_operation_conf_cb	op_conf;
-+	mcap_mdl_notify_cb		notify;
-+} mcap_cb_type;
++/* MCAP finite state machine functions */
++static void proc_req_connected(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t l);
++static void proc_req_pending(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t l);
++static void proc_req_active(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t l);
 +
-+struct mcap_mdl_op_cb {
-+	struct mcap_mdl		*mdl;		/* MDL for this operation */
-+	mcap_cb_type		cb;		/* Operation callback */
-+	gpointer		user_data;	/* Callback user data */
++static void (*proc_req[])(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len) = {
++	proc_req_connected,
++	proc_req_pending,
++	proc_req_active
 +};
-+
- /* MCAP finite state machine functions */
- static void proc_req_connected(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t l);
- static void proc_req_pending(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t l);
-@@ -61,6 +74,8 @@ static void (*proc_req[])(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len) = {
- 	proc_req_active
- };
- 
-+static void mcap_cache_mcl(struct mcap_mcl *mcl);
 +
  static void default_mdl_connected_cb(struct mcap_mdl *mdl, gpointer data)
  {
  	DBG("MCAP Unmanaged mdl connection");
-@@ -111,6 +126,43 @@ static void set_default_cb(struct mcap_mcl *mcl)
+@@ -98,6 +111,50 @@ static void set_default_cb(struct mcap_mcl *mcl)
  	mcl->cb->mdl_reconn_req = default_mdl_reconn_req_cb;
  }
  
-+static void mcap_send_std_opcode(struct mcap_mcl *mcl, void *cmd,
-+						uint32_t size, GError **err)
++static void mcap_notify_error(struct mcap_mcl *mcl, GError *err)
 +{
-+	if (mcl->state == MCL_IDLE) {
-+		g_set_error(err, MCAP_ERROR, MCAP_ERROR_FAILED,
-+			"MCL is not connected");
-+		return;
-+	}
-+
-+	if (mcl->req != MCL_AVAILABLE) {
-+		g_set_error(err, MCAP_ERROR, MCAP_ERROR_RESOURCE_UNAVAILABLE,
-+					"Pending request");
-+		return;
-+	}
-+
-+	if (!(mcl->ctrl & MCAP_CTRL_STD_OP)) {
-+		g_set_error(err, MCAP_ERROR, MCAP_ERROR_REQUEST_NOT_SUPPORTED,
-+				    "Remote does not support standard opcodes");
-+		return;
-+	}
-+
-+	if (mcl->state == MCL_PENDING) {
-+		g_set_error(err, MCAP_ERROR, MCAP_ERROR_INVALID_OPERATION,
-+			"Not Std Op. Codes can be sent in PENDING State");
-+		return;
-+	}
-+
-+	if (mcap_send_data(g_io_channel_unix_get_fd(mcl->cc), cmd, size) < 0) {
-+		g_set_error(err, MCAP_ERROR, MCAP_ERROR_FAILED,
-+				    "Command can't be sent, write error");
-+		return;
-+	}
-+
-+	mcl->lcmd = cmd;
-+	mcl->req = MCL_WAITING_RSP;
++	/* TODO: implement mcap_notify_error */
 +}
 +
- static void mcap_notify_error(struct mcap_mcl *mcl, GError *err)
- {
- 	/* TODO: implement mcap_notify_error */
-@@ -155,6 +207,132 @@ static int mcap_send_cmd(struct mcap_mcl *mcl, uint8_t oc, uint8_t rc,
- 	return sent;
- }
- 
-+static struct mcap_mdl *get_mdl(struct mcap_mcl *mcl, uint16_t mdlid)
++int mcap_send_data(int sock, const uint8_t *buf, uint32_t size)
 +{
-+	GSList *l;
-+	struct mcap_mdl *mdl;
++	uint32_t sent = 0;
 +
-+	for (l = mcl->mdls; l; l = l->next) {
-+		mdl = l->data;
-+		if (mdlid == mdl->mdlid)
-+			return mdl;
++	while (sent < size) {
++		int n = send(sock, buf + sent, size - sent, 0);
++		if (n < 0)
++			return -1;
++		sent += n;
 +	}
-+
-+	return NULL;
-+}
-+
-+static uint16_t generate_mdlid(struct mcap_mcl *mcl)
-+{
-+	uint16_t mdlid = mcl->next_mdl;
-+	struct mcap_mdl *mdl;
-+
-+	do {
-+		mdl = get_mdl(mcl, mdlid);
-+		if (!mdl) {
-+			mcl->next_mdl = (mdlid % MCAP_MDLID_FINAL) + 1;
-+			return mdlid;
-+		} else
-+			mdlid = (mdlid % MCAP_MDLID_FINAL) + 1;
-+	} while (mdlid != mcl->next_mdl);
-+
-+	/* No more mdlids availables */
 +	return 0;
 +}
 +
-+static mcap_md_create_mdl_req *create_mdl_req(uint16_t mdl_id, uint8_t mdep,
-+								uint8_t conf)
++static int mcap_send_cmd(struct mcap_mcl *mcl, uint8_t oc, uint8_t rc,
++					uint16_t mdl, uint8_t *data, size_t len)
 +{
-+	mcap_md_create_mdl_req *req_mdl;
++	mcap_rsp *cmd;
++	uint8_t *rsp;
++	int sock, sent;
 +
-+	req_mdl = g_malloc0(sizeof(mcap_md_create_mdl_req));
-+
-+	req_mdl->op = MCAP_MD_CREATE_MDL_REQ;
-+	req_mdl->mdl = htons(mdl_id);
-+	req_mdl->mdep = mdep;
-+	req_mdl->conf = conf;
-+
-+	return req_mdl;
-+}
-+
-+static gint compare_mdl(gconstpointer a, gconstpointer b)
-+{
-+	const struct mcap_mdl *mdla = a;
-+	const struct mcap_mdl *mdlb = b;
-+
-+	if (mdla->mdlid == mdlb->mdlid)
-+		return 0;
-+	else if (mdla->mdlid < mdlb->mdlid)
++	if (mcl->cc == NULL)
 +		return -1;
-+	else
-+		return 1;
-+}
 +
-+static gboolean wait_response_timer(gpointer data)
-+{
-+	struct mcap_mcl *mcl = data;
++	sock = g_io_channel_unix_get_fd(mcl->cc);
 +
-+	GError *gerr = NULL;
++	rsp = g_malloc(sizeof(mcap_rsp) + len);
++	cmd = (mcap_rsp *)rsp;
++	cmd->op = oc;
++	cmd->rc = rc;
++	cmd->mdl = htons(mdl);
 +
-+	RELEASE_TIMER(mcl);
++	if (data && len > 0)
++		memcpy(rsp + sizeof(mcap_rsp), data, len);
 +
-+	g_set_error(&gerr, MCAP_ERROR, MCAP_ERROR_FAILED,
-+					"Timeout waiting response");
-+
-+	mcap_notify_error(mcl, gerr);
-+
-+	g_error_free(gerr);
-+	mcl->ms->mcl_disconnected_cb(mcl, mcl->ms->user_data);
-+	mcap_cache_mcl(mcl);
-+	return FALSE;
-+}
-+
-+void mcap_create_mdl(struct mcap_mcl *mcl,
-+				uint8_t mdepid,
-+				uint8_t conf,
-+				mcap_mdl_operation_conf_cb connect_cb,
-+				gpointer user_data,
-+				GError **err)
-+{
-+	struct mcap_mdl *mdl;
-+	struct mcap_mdl_op_cb *con;
-+	mcap_md_create_mdl_req *cmd;
-+	uint16_t id;
-+
-+	id = generate_mdlid(mcl);
-+	if (!id) {
-+		g_set_error(err, MCAP_ERROR, MCAP_ERROR_FAILED,
-+					"Not more mdlids available");
-+		return;
-+	}
-+
-+	mdl = g_new0(struct mcap_mdl, 1);
-+	mdl->mcl = mcl;
-+	mdl->mdlid = id;
-+	mdl->mdep_id = mdepid;
-+	mdl->state = MDL_WAITING;
-+
-+	con = g_new0(struct mcap_mdl_op_cb, 1);
-+	con->mdl = mdl;
-+	con->cb.op_conf = connect_cb;
-+	con->user_data = user_data;
-+
-+	cmd = create_mdl_req(id, mdepid, conf);
-+	mcap_send_std_opcode(mcl, cmd, sizeof(mcap_md_create_mdl_req), err);
-+	if (*err) {
-+		g_free(mdl);
-+		g_free(con);
-+		g_free(cmd);
-+		return;
-+	}
-+
-+	mcl->state = MCL_ACTIVE;
-+	mcl->priv_data = con;
-+
-+	mcl->mdls = g_slist_insert_sorted(mcl->mdls, mdl, compare_mdl);
-+	mcl->tid = g_timeout_add_seconds(RESPONSE_TIMER, wait_response_timer,
-+									mcl);
++	sent = mcap_send_data(sock, rsp, sizeof(mcap_rsp) + len);
++	g_free(rsp);
++	return sent;
 +}
 +
  static struct mcap_mcl *find_mcl(GSList *list, const bdaddr_t *addr)
  {
  	GSList *l;
+@@ -176,6 +233,46 @@ static void mcap_mcl_check_del(struct mcap_mcl *mcl)
+ 		mcap_mcl_unref(mcl);
+ }
+ 
++static void mcap_cache_mcl(struct mcap_mcl *mcl)
++{
++	GSList *l;
++	struct mcap_mcl *last;
++	int len;
++
++	if (mcl->ctrl & MCAP_CTRL_CACHED)
++		return;
++
++	mcl->ms->mcls = g_slist_remove(mcl->ms->mcls, mcl);
++
++	if ((mcl->ctrl & MCAP_CTRL_NOCACHE) || (mcl->ref < 2)) {
++		mcap_mcl_unref(mcl);
++		return;
++	}
++
++	DBG("Caching MCL");
++
++	len = g_slist_length(mcl->ms->cached);
++	if (len == MAX_CACHED) {
++		/* Remove the latest cached mcl */
++		l = g_slist_last(mcl->ms->cached);
++		last = l->data;
++		mcl->ms->cached = g_slist_remove(mcl->ms->cached, last);
++		last->ctrl &= ~MCAP_CTRL_CACHED;
++		if (last->ctrl & MCAP_CTRL_CONN) {
++			/* If connection process is not success this MCL will be
++			 * freed next time that close_mcl is invoked */
++			last->ctrl |= MCAP_CTRL_FREE;
++		} else {
++			last->ms->mcl_uncached_cb(last, last->ms->user_data);
++			mcap_mcl_unref(last);
++		}
++	}
++
++	mcl->ms->cached = g_slist_prepend(mcl->ms->cached, mcl);
++	mcl->ctrl |= MCAP_CTRL_CACHED;
++	mcap_mcl_shutdown(mcl);
++}
++
+ static void mcap_uncache_mcl(struct mcap_mcl *mcl)
+ {
+ 	if (!(mcl->ctrl & MCAP_CTRL_CACHED))
+@@ -318,10 +415,103 @@ void mcap_mcl_get_addr(struct mcap_mcl *mcl, bdaddr_t *addr)
+ 	bacpy(addr, &mcl->addr);
+ }
+ 
++/* Function used to process commands depending of MCL state */
++static void proc_req_connected(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
++{
++	/* TODO: Implement proc_req_connected */
++}
++
++static void proc_req_pending(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
++{
++	/* TODO: Implement proc_req_pending */
++}
++
++static void proc_req_active(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
++{
++	/* TODO: Implement proc_req_active */
++}
++
++static void proc_response(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
++{
++	/* TODO: Implement proc_response */
++}
++
++static void proc_cmd(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
++{
++	GError *gerr = NULL;
++
++	if (cmd[0] > MCAP_MD_SYNC_INFO_IND ||
++					(cmd[0] > MCAP_MD_DELETE_MDL_RSP &&
++					cmd[0] < MCAP_MD_SYNC_CAP_REQ)) {
++		error("Unknown cmd received (op code = %d)", cmd[0]);
++		mcap_send_cmd(mcl, MCAP_ERROR_RSP, MCAP_INVALID_OP_CODE,
++						MCAP_MDLID_RESERVED, NULL, 0);
++		return;
++	}
++
++	if (cmd[0] >= MCAP_MD_SYNC_CAP_REQ &&
++					cmd[0] <= MCAP_MD_SYNC_INFO_IND) {
++		/* TODO: proc_sync_cmd(mcl, cmd, len);*/
++		return;
++	}
++
++	if (!(mcl->ctrl & MCAP_CTRL_STD_OP)) {
++		/* In case the remote device doesn't work correctly */
++		error("Remote device does not support opcodes, cmd ignored");
++		return;
++	}
++
++	if (mcl->req == MCL_WAITING_RSP) {
++		if (cmd[0] & 0x01) {
++			/* Request arrived when a response is expected */
++			if (mcl->role == MCL_INITIATOR)
++				/* ignore */
++				return;
++			/* Initiator will ignore our last request */
++			proc_req[mcl->state](mcl, cmd, len);
++			RELEASE_TIMER(mcl);
++			mcl->req = MCL_AVAILABLE;
++			g_set_error(&gerr, MCAP_ERROR, MCAP_ERROR_REQ_IGNORED,
++				"Initiator sent a request with more priority");
++			mcap_notify_error(mcl, gerr);
++			return;
++		}
++		proc_response(mcl, cmd, len);
++	} else if (cmd[0] & 0x01)
++		proc_req[mcl->state](mcl, cmd, len);
++}
++
+ static gboolean mcl_control_cb(GIOChannel *chan, GIOCondition cond,
+ 								gpointer data)
+ {
+-	/* TODO: Create mcl_control_cb */
++	GError *gerr = NULL;
++
++	struct mcap_mcl *mcl = data;
++	int sk, len;
++	uint8_t buf[MCAP_CC_MTU];
++
++	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL))
++		goto fail;
++
++	sk = g_io_channel_unix_get_fd(chan);
++	len = recv(sk, buf, sizeof(buf), 0);
++	if (len < 0)
++		goto fail;
++
++	proc_cmd(mcl, buf, (uint32_t)len);
++	return TRUE;
++fail:
++	if (mcl->state != MCL_IDLE) {
++		if (mcl->req == MCL_WAITING_RSP) {
++			/* notify error in pending callback */
++			g_set_error(&gerr, MCAP_ERROR, MCAP_ERROR_MCL_CLOSED,
++								"MCL closed");
++			mcap_notify_error(mcl, gerr);
++			g_error_free(gerr);
++		}
++		mcl->ms->mcl_disconnected_cb(mcl, mcl->ms->user_data);
++	}
++	mcap_cache_mcl(mcl);
+ 	return FALSE;
+ }
+ 
 diff --git a/health/mcap.h b/health/mcap.h
-index 523be90..8c3679f 100644
+index a45cc8a..523be90 100644
 --- a/health/mcap.h
 +++ b/health/mcap.h
-@@ -75,6 +75,17 @@ extern "C" {
+@@ -35,6 +35,25 @@ extern "C" {
+ #define MCAP_CC_MTU	48
+ #define MCAP_DC_MTU	L2CAP_DEFAULT_MTU
+ 
++
++/* MCAP Standard Op Codes */
++#define MCAP_ERROR_RSP			0x00
++#define MCAP_MD_CREATE_MDL_REQ		0x01
++#define MCAP_MD_CREATE_MDL_RSP		0x02
++#define MCAP_MD_RECONNECT_MDL_REQ	0x03
++#define MCAP_MD_RECONNECT_MDL_RSP	0x04
++#define MCAP_MD_ABORT_MDL_REQ		0x05
++#define MCAP_MD_ABORT_MDL_RSP		0x06
++#define MCAP_MD_DELETE_MDL_REQ		0x07
++#define MCAP_MD_DELETE_MDL_RSP		0x08
++
++/* MCAP Clock Sync Op Codes */
++#define MCAP_MD_SYNC_CAP_REQ		0x11
++#define MCAP_MD_SYNC_CAP_RSP		0x12
++#define MCAP_MD_SYNC_SET_REQ		0x13
++#define MCAP_MD_SYNC_SET_RSP            0x14
++#define MCAP_MD_SYNC_INFO_IND		0x15
++
+ /* MCAP Response codes */
+ #define MCAP_SUCCESS			0x00
+ #define MCAP_INVALID_OP_CODE		0x01
+@@ -55,6 +74,16 @@ extern "C" {
+ #define MCAP_MDLID_FINAL		0xFEFF
  #define MCAP_ALL_MDLIDS			0xFFFF
  
- /*
-+ * MCAP Request Packet Format
++/*
++ * MCAP Response Packet Format
 + */
 +
 +typedef struct {
 +	uint8_t         op;
-+        uint16_t	mdl;
-+	uint8_t		mdep;
-+	uint8_t		conf;
-+} __attribute__ ((packed)) mcap_md_create_mdl_req;
++	uint8_t         rc;
++	uint16_t        mdl;
++} __attribute__ ((packed)) mcap_rsp;
 +
-+/*
-  * MCAP Response Packet Format
-  */
  
+ #ifdef __cplusplus
+ }
 diff --git a/health/mcap_internal.h b/health/mcap_internal.h
-index cc81692..d639cdb 100644
+index aab9e06..cc81692 100644
 --- a/health/mcap_internal.h
 +++ b/health/mcap_internal.h
-@@ -48,6 +48,13 @@ typedef enum {
- 	MCL_WAITING_RSP
- } MCAPCtrl;
- 
-+typedef enum {
-+	MDL_WAITING,
-+	MDL_CONNECTED,
-+	MDL_DELETING,
-+	MDL_CLOSED
-+} MDLState;
-+
- struct mcap_mdl_cb {
- 	mcap_mdl_event_cb 		mdl_connected;	/* Remote device has created a MDL */
- 	mcap_mdl_event_cb 		mdl_closed;	/* Remote device has closed a MDL */
-@@ -97,6 +104,15 @@ struct mcap_mcl {
+@@ -97,6 +97,10 @@ struct mcap_mcl {
  #define	MCAP_CTRL_FREE		0x10	/* MCL is marked as releasable */
  #define	MCAP_CTRL_NOCACHE	0x20	/* MCL is marked as not cacheable */
  
-+struct mcap_mdl {
-+	struct mcap_mcl		*mcl;		/* MCL where this MDL belongs */
-+	GIOChannel		*dc;		/* MCAP Data Channel IO */
-+	guint			wid;		/* MDL Watcher id */
-+	uint16_t		mdlid;		/* MDL id */
-+	uint8_t			mdep_id;	/* MCAP Data End Point */
-+	MDLState		state;		/* MDL state */
-+};
++int mcap_send_data(int sock, const uint8_t *buf, uint32_t size);
 +
- int mcap_send_data(int sock, const uint8_t *buf, uint32_t size);
- 
- void proc_sync_cmd(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len);
-diff --git a/health/mcap_lib.h b/health/mcap_lib.h
-index b4e9c16..d8fb863 100644
---- a/health/mcap_lib.h
-+++ b/health/mcap_lib.h
-@@ -96,6 +96,15 @@ typedef void (* mcap_mcl_connect_cb) (struct mcap_mcl *mcl, GError *err,
- 
- /************ Operations ************/
- 
-+/* Mdl operations*/
++void proc_sync_cmd(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len);
 +
-+void mcap_create_mdl(struct mcap_mcl *mcl,
-+				uint8_t mdepid,
-+				uint8_t conf,
-+				mcap_mdl_operation_conf_cb connect_cb,
-+				gpointer user_data,
-+				GError **err);
-+
- /* Mcl operations*/
- 
- void mcap_create_mcl(struct mcap_instance *ms,
+ #ifdef __cplusplus
+ }
+ #endif
 -- 
 1.6.3.3
 
