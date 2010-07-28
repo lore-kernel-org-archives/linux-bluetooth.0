@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 28 Jul 2010 01:16:14 -0300
+Date: Wed, 28 Jul 2010 00:32:25 -0300
 From: "Gustavo F. Padovan" <gustavo@padovan.org>
 To: Ville Tervo <ville.tervo@nokia.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
 	"Gustavo F. Padovan" <padovan@profusion.mobi>
 Subject: Re: L2CAP unknown options
-Message-ID: <20100728041614.GC22156@vigoh>
+Message-ID: <20100728033225.GB22156@vigoh>
 References: <4C4EA1CB.2050406@nokia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -24,6 +24,15 @@ Hi Ville,
 > Kernel disconnects if remote device replies with "unknown options"
 > result code. I guess in that case a new config req should be sent
 > without unknown option. I didn't check the spec yet.
+
+It's a regression introduced by this commit 
+625477523b4e656fbcc5ec2a8ca7a1beb39b1caf
+
+It adds the RFC when requesting Basic Mode, this is a PTS requirement.
+A possible fix should be send a new Config Req without RFC or do not
+send the RFC in the first request when the other side doesn't support
+Info Req.
+
 > 
 > The remote device is Nokia 9300.
 > 
@@ -68,11 +77,6 @@ Hi Ville,
 >     L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 3 clen 5
 >       Failure - unknown options
 >       RFC QoS 0f 00 42
-
-Actually the 9300 stack is broken here, it should only send the unknown
-options that were in the ConfiqReq, i.e, only the RFC. But that doesn't
-change the fact that we have a regression.
-
 > 2010-07-27 11:44:07.682843 < ACL data: handle 11 flags 0x02 dlen 12
 >     L2CAP(s): Disconn req: dcid 0x0042 scid 0x0040
 > 2010-07-27 11:44:07.693823 > ACL data: handle 11 flags 0x02 dlen 12
