@@ -1,118 +1,127 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <feb3c412e1be4c1b7b42efdbc581aabb.squirrel@www.codeaurora.org>
-In-Reply-To: <20100726094444.GB20357@jh-x301>
-References: <1279814780-29673-1-git-send-email-ingas@codeaurora.org>
-    <20100723082045.GA1600@jh-x301> <20100723082754.GA12563@jh-x301>
-    <20100723084300.GA14443@jh-x301>
-    <b622ef9ae078ace2da7a8a6748823d2f.squirrel@www.codeaurora.org>
-    <20100726094444.GB20357@jh-x301>
-Date: Wed, 28 Jul 2010 13:08:09 -0700 (PDT)
-Subject: Re: [PATCH v4 0/5] Enhanced support for extended inquiry response
-From: ingas@codeaurora.org
-To: johan.hedberg@gmail.com
-Cc: ingas@codeaurora.org, linux-bluetooth@vger.kernel.org,
-	rshaffer@codeaurora.org, marcel@holtmann.org
 MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
+In-Reply-To: <4C505806.3040508@aircable.net>
+References: <4C46324D.5070800@aircable.net>
+	<20100721101934.GA12188@jh-x301>
+	<4C470E2D.7000607@aircable.net>
+	<AANLkTi=8=BUThjVdc4EN_8uupGKmdgHQzGOe560Cv+pm@mail.gmail.com>
+	<AANLkTi=jzZScnCK6rFpKjBJesnw=71y5hNG3kDBhxv1u@mail.gmail.com>
+	<4C505806.3040508@aircable.net>
+Date: Wed, 28 Jul 2010 15:46:21 -0300
+Message-ID: <AANLkTikRQfhAKm-UW+on+ZeEp709z_ku_NDjeVD_US1b@mail.gmail.com>
+Subject: Re: [PATCH][RFC] Fix SDP resolving segfault
+From: Manuel Naranjo <manuel@aircable.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	BlueZ <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Luiz,
 
->
-> Both the D-Bus interface as well as sdptool trigger the same code paths
-> in src/sdpd-service.c. I.e. it doesn't make sense to solve this twice
-> when it can be solved once by targetting the common lower layer. We
-> already do this for the service class bits with update_svclass_list() in
-> sdpd-service.c. The need to update the EIR data is very similar to the
-> need to update the service class bits so the existing code is probably a
-> good place to take example of.
->
->
-
-My original intent when creating this patch set was no to perturb the code
-that is already  in place too much.  Hence the changes were done only to
-D-Bus methods. Sure, I can change the EIR write bot happen deeper down the
-pipeline. However, before I invest your and my time in generating and
-reviewing more patches , let’s agree on the solution first.
-
-In the current implementation,  EIR write is keyed off HCI Command
-Complete events for a set of commands (in security.c).
- - When first registering an OPP service with sdptool, the
-update_svcclass_list()  (sdpd-service.c) calls manager_update_svc()
-(manager.c) which in turn calls adapter_update()  (adapter.c).  BTW, why
-this level of indirection, since manager_update_svc() is called only from
-one place in the code and calling adapter_update()  is all it does? 
-Probably some earlier architectural decision I am not aware of…
-
-- Anyway, as a result, HCI command to write service class is done, returns
-Command Complete event (processed in , calls back into adapter layer
-adapter_set_class_complete() which invokes  invokes
-update_ext_inquiry_response() and (voilà!) EIR is written. So far so good.
-
-- When consequently another OBEX based service like FTP is added using
-sdptool, service class of the device does not change, adapter_update()
-does nothing, and ultimately EIR is not updated with FTP uuid. This is the
-problem that you observed when testing with sdptool.  While showing either
-only  OPP or only FTP might be considered not a big deal, skipping UUID in
-EIR for  another OBEX-based service like PBAP in EIR might not be so
-great, since those services are very different…
-
-The current implementation may be extended as following:
-Since update_svcclass_list() is being called throughout sdpd-service.c in
-all the places where EIR needs to be updated as well, I propose to modify
-the corresponding function  adapter_set_service_classes() (adapter.c) :
-
-**********************
-Before:
-/* If we already have the CoD we want or the cache is enabled or an
-* existing CoD write is in progress just bail out */
-if (adapter->current_cod == adapter->wanted_cod ||
-	adapter->cache_enable || adapter->pending_cod)
-return 0;
+Bad news it doesn't work, it keeps doing the same. This is the output
+of bluetoothd -n -d:
+bluetoothd[3572]: audio/manager.c:handle_uuid() server not enabled for
+0000110a-0000-1000-8000-00805f9b34fb (0x110a)
+bluetoothd[3572]: audio/manager.c:handle_uuid() Found AV Target
+bluetoothd[3572]: audio/control.c:control_init() Registered interface
+org.bluez.Control on path /org/bluez/3572/hci0/dev_00_24_91_E4_E9_05
+bluetoothd[3572]: audio/manager.c:handle_uuid() Found AV Target
+bluetoothd[3572]: src/device.c:btd_device_unref() 0x90f9e08: ref=2
+bluetoothd[3572]: src/device.c:btd_device_ref() 0x90f9e08: ref=3
+bluetoothd[3572]: src/device.c:search_cb()
+/org/bluez/3572/hci0/dev_00_24_91_E4_E9_05: No service update
+bluetoothd[3572]: src/device.c:btd_device_unref() 0x90f9e08: ref=2
+bluetoothd[3572]: src/adapter.c:session_unref() 0x90b2790: ref=0
+bluetoothd[3572]: src/adapter.c:session_remove() Discovery session
+0x90b2790 with :1.81 deactivated
+bluetoothd[3572]: src/adapter.c:session_remove() Stopping discovery
+bluetoothd[3572]: Stopping discovery
+bluetoothd[3572]: src/device.c:btd_device_ref() 0x90adfd0: ref=2
+bluetoothd[3572]: Discovery session 0x90fe178 with :1.81 activated
+bluetoothd[3572]: src/adapter.c:session_ref() 0x90fe178: ref=1
+bluetoothd[3572]: src/adapter.c:adapter_remove_connection() Removing
+temporary device /org/bluez/3572/hci0/dev_C8_7E_75_DC_1E_86
+bluetoothd[3572]: src/device.c:device_remove() Removing device
+/org/bluez/3572/hci0/dev_C8_7E_75_DC_1E_86
+bluetoothd[3572]: src/device.c:btd_device_unref() 0x90fc080: ref=1
+bluetoothd[3572]: src/device.c:btd_device_unref() 0x90fc080: ref=0
+bluetoothd[3572]: src/device.c:device_free() 0x90fc080
+bluetoothd[3572]: src/adapter.c:adapter_get_device() 00:05:4F:63:5A:E0
+bluetoothd[3572]: src/adapter.c:session_unref() 0x90fe178: ref=0
+bluetoothd[3572]: src/adapter.c:session_remove() Discovery session
+0x90fe178 with :1.81 deactivated
+bluetoothd[3572]: src/adapter.c:session_remove() Stopping discovery
+bluetoothd[3572]: Stopping discovery
+bluetoothd[3572]: Discovery session 0x90b1e00 with :1.81 activated
+bluetoothd[3572]: src/adapter.c:session_ref() 0x90b1e00: ref=1
+bluetoothd[3572]: <27>Jul 28 14:26:36 bluetoothd[3572]: : error
+updating services: Host is down (112)
 
 
-***********************
-
-After:
-/* If we already have the CoD we want or the cache is enabled or an
-* existing CoD write is in progress just bail out */
-if (adapter->cache_enable || adapter->pending_cod)
-return 0;
-
-/* If we already have the CoD we want, update EIR and return */
-if (adapter->current_cod == adapter->wanted_cod ) {
-	update_ext_inquiry_response(adapter);
-	return 0;
-}
-
-**********************
-Will that be acceptable? I tested this modification and it’s working with
-both d-bus methods and sdptool.
-
-Of course, it might be possible to cache the EIR currently written down,
-compare the update, and decide whether the EIR needs to be updated. But
-this is more involved, not entirely safe, as we might run into coherency
-issues.
-
-As a side note, in future it might be a good idea to expose EIR writes to
-an application layer providing external API. The intent of EIR is to allow
-quick scan of the surroundings to find a particular service that a device
-is interested at the moment (and in turn, exposing the services that the
-device choses to expose at the moment) without actually going into full
-blown connection mode.   EIR space is at a premium for sophisticated
-devices with multiple services. Not every single service needs to be
-exposed in EIR. It would be nice to be able to pick which one to add. For
-example, if a device supports both headset and handsfree profiles (as all
-of the phones do), it might not be necessary to advertise headset uuid in
-EIR since the headsets  out there are mostly legacy devices that cannot
-perform EIR anyway… Also, as more new services that use uuid128 are
-introduced, the EIR buffer pretty quickly if every single one of them is
-added without discretion. Just something to throw out there :)
+And this is the call trace during the crash:
+	+  4 0x80ac636 (from 0x80a9a28)      device_remove_connection():
+/home/manuel/bluez/src/device.c:908
+	+  5 0x80ac4ca (from 0x80ac753)       device_set_connected():
+/home/manuel/bluez/src/device.c:875
+	+  6 0x80b0d08 (from 0x80ac517)        emit_property_changed():
+/home/manuel/bluez/src/dbus-common.c:266
+	+  7 0x80b0a31 (from 0x80b0da4)         append_variant():
+/home/manuel/bluez/src/dbus-common.c:195
+	+  7 0x805005d (from 0x80b0db6)         g_dbus_send_message():
+/home/manuel/bluez/gdbus/object.c:615
+	+  4 0x80ae60e (from 0x80a9a55)      device_get_address():
+/home/manuel/bluez/src/device.c:1654
+	+  5 0x80aa5a4 (from 0x80ae639)       bacpy():
+/home/manuel/bluez/./lib/bluetooth/bluetooth.h:132
+	+  4 0x808a77f (from 0x80a9a6d)      hci_req_queue_remove():
+/home/manuel/bluez/src/security.c:169
+	+  4 0x80affea (from 0x80a9a78)      device_is_authenticating():
+/home/manuel/bluez/src/device.c:2339
+	+  4 0x80ae749 (from 0x80a9a9a)      device_is_temporary():
+/home/manuel/bluez/src/device.c:1683
+	+  1 0x808a82f (from 0x808cdb4)   check_pending_hci_req():
+/home/manuel/bluez/src/security.c:186
+	+  0 0x8094781 (from 0x2cddab)  connect_cb(): /home/manuel/bluez/src/btio.c:138
+	+  1 0x8094628 (from 0x80947be)   check_nval():
+/home/manuel/bluez/src/btio.c:103
+	+  1 0x8097b6e (from 0x8094849)   bt_io_error_quark():
+/home/manuel/bluez/src/btio.c:1296
+	+  1 0x8099523 (from 0x80948c1)   connect_watch():
+/home/manuel/bluez/src/glib-helper.c:283
+	+  2 0x80ae1c5 (from 0x809966f)    browse_cb():
+/home/manuel/bluez/src/device.c:1540
+	+  3 0x80adf2f (from 0x80ae312)     search_cb():
+/home/manuel/bluez/src/device.c:1476
+	+  4 0x8089ef6 (from 0x80adf90)      error(): /home/manuel/bluez/src/log.c:47
 
 
-Regards,
+If you go through the code it fails in the line:
+static void search_cb(sdp_list_t *recs, int err, gpointer user_data)
+{
+	struct browse_req *req = user_data;
+	struct btd_device *device = req->device;
 
-Inga
+	if (err < 0) {
+		error("%s: error updating services: %s (%d)",
+				device->path, strerror(-err), -err);
+		goto send_reply;
+	}
 
 
+It fails because device->path is not valid.
+
+My patch even though than ugly it worked. I know this is not the best
+for upstream, but at least is something to start with. For some reason
+either user_data or device is invalid when that callback gets.
+
+Manuel
+
+-- 
+Manuel Francisco Naranjo
+Software Department Argentina
+Wireless Cables Inc
+www.aircable.net
+cel: +5493412010019
+skype: naranjomanuelfrancisco
