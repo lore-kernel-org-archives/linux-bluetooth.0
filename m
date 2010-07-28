@@ -1,44 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 28 Jul 2010 17:59:04 +0100
+From: Tim Renouf <tpraplix.vger@botech.co.uk>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: add dbus api to set class of device?
+Message-ID: <20100728165904.GA9840@aplixcorp.com>
+References: <20100728153323.GA9410@aplixcorp.com>
+ <1280335558.2621.97.camel@localhost.localdomain>
 MIME-Version: 1.0
-Date: Wed, 28 Jul 2010 19:02:13 +0200
-Message-ID: <AANLkTi=LHJF7-ymBrchWWy_QyM1qThYkigr3Hx=M6e7n@mail.gmail.com>
-Subject: Headset problem
-From: Josu Lazkano <josu.lazkano@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1280335558.2621.97.camel@localhost.localdomain>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello, I have a Debian Squeeze laptop, I am using the same OS on other
-laptop and I can use a bluetooth headset to speak with PulseAudio.
-When I connect
-(pairing) the headset I can select the bluetooth device on PulseAudio
-and I can use it, but
-not with the other laptop.
+Hi Marcel
 
-This is my bt device info:
+> I did mention before that JSR82 is the most stupid Bluetooth API that I
+> have seen so far, didn't I? Personally I wouldn't even bother with JSR82
+> and give up right away. It is really a pointless API.
 
-# hciconfig features
-hci0:   Type: BR/EDR  Bus: USB
-       BD Address: 00:10:C6:xx:xx:xx  ACL MTU: 377:10  SCO MTU: 16:0
-       UP RUNNING PSCAN ISCAN
-       RX bytes:5691 acl:77 sco:51 events:125 errors:2
-       TX bytes:2239 acl:81 sco:0 commands:43 errors:0
+Unfortunately I have to bother with it as our customers are device
+manufacturers who are willing to pay for MIDP with JSR82 support. :-(
 
-I use Gnome bluetooth preference to pair the devices. I don't know
-what info put here, can you help with this?
+> In BlueZ the services bits of the class of device settings are modified
+> dynamically based on the registered SDP service records. So you don't
+> have to do anything. Just register the right SDP service record with the
+> proper UUID and it will take care of this automatically.
 
-This is the bluetooth device that works:
+Yes, I saw that in update_adapter_svclass_list. I guess the problem is
+that JSR82 lets an app decide to set the "wrong" bit, and the
+conformance tests test that functionality.
 
-# hciconfig features
-hci0:	Type: BR/EDR  Bus: USB
-	BD Address: 00:21:85:xx:xx:xx  ACL MTU: 310:10  SCO MTU: 64:8
-	UP RUNNING PSCAN
-	RX bytes:312623 acl:19325 sco:0 events:302 errors:0
-	TX bytes:2074 acl:11 sco:0 commands:41 errors:0
+So if I did a patch along the lines I was suggesting, and submitted it
+here, would it be rejected on the grounds that it is not needed for any
+"sensible" functionality ?
 
+Thanks.
 
-Thanks for all.
-
--- 
-Josu Lazkano
+-tpr
