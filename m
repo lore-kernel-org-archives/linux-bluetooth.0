@@ -1,54 +1,167 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 28 Jul 2010 16:33:23 +0100
-From: Tim Renouf <tpraplix.vger@botech.co.uk>
-To: linux-bluetooth@vger.kernel.org
-Subject: add dbus api to set class of device?
-Message-ID: <20100728153323.GA9410@aplixcorp.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <AANLkTi=8=BUThjVdc4EN_8uupGKmdgHQzGOe560Cv+pm@mail.gmail.com>
+References: <4C46324D.5070800@aircable.net>
+	<20100721101934.GA12188@jh-x301>
+	<4C470E2D.7000607@aircable.net>
+	<AANLkTi=8=BUThjVdc4EN_8uupGKmdgHQzGOe560Cv+pm@mail.gmail.com>
+Date: Wed, 28 Jul 2010 17:55:35 +0300
+Message-ID: <AANLkTi=jzZScnCK6rFpKjBJesnw=71y5hNG3kDBhxv1u@mail.gmail.com>
+Subject: Re: [PATCH][RFC] Fix SDP resolving segfault
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Manuel Naranjo <manuel@aircable.net>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	BlueZ <linux-bluetooth@vger.kernel.org>
+Content-Type: multipart/mixed; boundary=00163646ba4e616a5a048c73cfa0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all
+--00163646ba4e616a5a048c73cfa0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-I am putting a JSR82 implementation on an Android device that uses
-BlueZ, accessing BlueZ via the dbus api.
+Hi Manuel,
 
-JSR82 has an API where you can set service class bits for a particular
-service you have registered. So the JSR82 implementation needs to be
-able to set the class of device in some way. I would like to add a dbus
-method to do this, and I'd like to know the opinion of BlueZ developers
-on this:
+On Fri, Jul 23, 2010 at 11:37 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi,
+>
+> On Wed, Jul 21, 2010 at 6:11 PM, Manuel Naranjo <manuel@aircable.net> wro=
+te:
+>> I think this is the one that really fix the problem. I see connect_watch
+>> getting called and then getting into the crash. I have a nice log with t=
+he
+>> tracing feature I sent the other day, here's the end of it (the hole thi=
+ng
+>> is almost 40 megs if someone wants just ask for it).
+>
+> I just figure out that our connect_watch in glib_helper.c is not quite
+> right, it should be something similar as we have btio.c, specially
+> this one is particular important:
+>
+> =A0 =A0 =A0 =A0/* If the user aborted this connect attempt */
+> =A0 =A0 =A0 =A0if ((cond & G_IO_NVAL) || check_nval(io))
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return FALSE;
+>
+> It is probably because of not having this check that the cb is still
+> called after bt_cancel_discovery. Of course this doesn't invalidate
+> your fix to bt_cancel_discovery itself, but I guess this should also
+> be included to safe that the callback is not called after cancelling
+> the discovery.
 
-1. Is this a reasonable thing to do and submit a patch for ?
+Can you try the patch attached to this email?
 
-2. What would be a good approach, out of the following (or any other
-possibility I have missed) ?
 
-2a. Add a dbus method to set service class bits for a registered
-service. This would set a new field in sdp_record_t. The existing
-function update_adapter_svclass_list in sdpd-service.c would read this
-new field in every service record when determining the service class
-bits to set. The setting gets cleared automatically when the service is
-removed. This seems like the cleanest solution.
+--=20
+Luiz Augusto von Dentz
+Computer Engineer
 
-2b. Add a dbus method to set service class bits, or all device class
-bits, globally for the dbus connection. There would have to be a list of
-dbus connections, each storing the connection's requested class.
-manager_update_svc would scan that list. The setting gets cleared
-automatically when the dbus connection is lost.
+--00163646ba4e616a5a048c73cfa0
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-core-fix-not-handling-sdp-connection-errors-properly.patch"
+Content-Disposition: attachment;
+	filename="0001-core-fix-not-handling-sdp-connection-errors-properly.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gc6ah1jv0
 
-2c. Add a dbus method to set service class bits, or all device class
-bits, globally. This can just call the BlueZ internal method directly.
-The problems with this are (i) it doesn't work if multiple apps are
-trying to use it; (ii) the setting gets lost next time a service gets
-registered or removed, so the app needs to be aware of this and reapply
-its setting, and (iii) the setting remains if the app exits or crashes
-without removing it.
-
-I note that Bluecove-on-BlueZ does not implement this, therefore it
-fails the same conformance test that I am looking at.
-
-Thanks.
-
--tpr
+RnJvbSAyODk1M2Y1YjQxOTY5M2Q4MjgxZjA1NzA1NWEzNGQ5YmMzZTQ0NDJlIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IDxsdWl6LmRlbnR6LXZv
+bkBub2tpYS5jb20+CkRhdGU6IFdlZCwgMjggSnVsIDIwMTAgMTY6NDE6MTIgKzAzMDAKU3ViamVj
+dDogW1BBVENIXSBjb3JlOiBmaXggbm90IGhhbmRsaW5nIHNkcCBjb25uZWN0aW9uIGVycm9ycyBw
+cm9wZXJseQoKLS0tCiBzcmMvZ2xpYi1oZWxwZXIuYyB8ICAxNDUgKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0KIDEgZmlsZXMgY2hhbmdlZCwgMTAx
+IGluc2VydGlvbnMoKyksIDQ0IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL3NyYy9nbGliLWhl
+bHBlci5jIGIvc3JjL2dsaWItaGVscGVyLmMKaW5kZXggNDFmNWUzYy4uYWZkNjY0ZSAxMDA2NDQK
+LS0tIGEvc3JjL2dsaWItaGVscGVyLmMKKysrIGIvc3JjL2dsaWItaGVscGVyLmMKQEAgLTQ0LDYg
+KzQ0LDggQEAKICNpbmNsdWRlIDxnbGliLmg+CiAKICNpbmNsdWRlICJnbGliLWhlbHBlci5oIgor
+I2luY2x1ZGUgImJ0aW8uaCIKKyNpbmNsdWRlICJsb2cuaCIKIAogLyogTnVtYmVyIG9mIHNlY29u
+ZHMgdG8ga2VlcCBhIHNkcF9zZXNzaW9uX3QgaW4gdGhlIGNhY2hlICovCiAjZGVmaW5lIENBQ0hF
+X1RJTUVPVVQgMgpAQCAtOTgsNyArMTAwLDcgQEAgc3RhdGljIHNkcF9zZXNzaW9uX3QgKmdldF9z
+ZHBfc2Vzc2lvbihjb25zdCBiZGFkZHJfdCAqc3JjLCBjb25zdCBiZGFkZHJfdCAqZHN0KQogCQly
+ZXR1cm4gc2Vzc2lvbjsKIAl9CiAKLQlyZXR1cm4gc2RwX2Nvbm5lY3Qoc3JjLCBkc3QsIFNEUF9O
+T05fQkxPQ0tJTkcpOworCXJldHVybiBOVUxMOwogfQogCiBzdGF0aWMgdm9pZCBjYWNoZV9zZHBf
+c2Vzc2lvbihiZGFkZHJfdCAqc3JjLCBiZGFkZHJfdCAqZHN0LApAQCAtMTQzLDYgKzE0NSw3IEBA
+IHN0cnVjdCBzZWFyY2hfY29udGV4dCB7CiAJYmRhZGRyX3QJCXNyYzsKIAliZGFkZHJfdAkJZHN0
+OwogCXNkcF9zZXNzaW9uX3QJCSpzZXNzaW9uOworCUdJT0NoYW5uZWwJCSppbzsKIAlidF9jYWxs
+YmFja190CQljYjsKIAlidF9kZXN0cm95X3QJCWRlc3Ryb3k7CiAJZ3BvaW50ZXIJCXVzZXJfZGF0
+YTsKQEAgLTI0NSw1NiArMjQ4LDk5IEBAIGZhaWxlZDoKIAlyZXR1cm4gRkFMU0U7CiB9CiAKLXN0
+YXRpYyBnYm9vbGVhbiBjb25uZWN0X3dhdGNoKEdJT0NoYW5uZWwgKmNoYW4sIEdJT0NvbmRpdGlv
+biBjb25kLCBncG9pbnRlciB1c2VyX2RhdGEpCitzdGF0aWMgaW50IHNkcF9zZWFyY2goc3RydWN0
+IHNlYXJjaF9jb250ZXh0ICpjdHh0KQogewotCXN0cnVjdCBzZWFyY2hfY29udGV4dCAqY3R4dCA9
+IHVzZXJfZGF0YTsKKwlHSU9DaGFubmVsICpjaGFuOwogCXNkcF9saXN0X3QgKnNlYXJjaCwgKmF0
+dHJpZHM7CiAJdWludDMyX3QgcmFuZ2UgPSAweDAwMDBmZmZmOwotCXNvY2tsZW5fdCBsZW47Ci0J
+aW50IHNrLCBlcnIgPSAwOwotCi0Jc2sgPSBnX2lvX2NoYW5uZWxfdW5peF9nZXRfZmQoY2hhbik7
+Ci0JY3R4dC0+aW9faWQgPSAwOworCWludCBlcnIsIHNrOwogCi0JbGVuID0gc2l6ZW9mKGVycik7
+Ci0JaWYgKGdldHNvY2tvcHQoc2ssIFNPTF9TT0NLRVQsIFNPX0VSUk9SLCAmZXJyLCAmbGVuKSA8
+IDApIHsKLQkJZXJyID0gZXJybm87Ci0JCWdvdG8gZmFpbGVkOwotCX0KLQotCWlmIChlcnIgIT0g
+MCkKLQkJZ290byBmYWlsZWQ7Ci0KLQlpZiAoc2RwX3NldF9ub3RpZnkoY3R4dC0+c2Vzc2lvbiwg
+c2VhcmNoX2NvbXBsZXRlZF9jYiwgY3R4dCkgPCAwKSB7Ci0JCWVyciA9IEVJTzsKLQkJZ290byBm
+YWlsZWQ7Ci0JfQorCWVyciA9IHNkcF9zZXRfbm90aWZ5KGN0eHQtPnNlc3Npb24sIHNlYXJjaF9j
+b21wbGV0ZWRfY2IsIGN0eHQpOworCWlmIChlcnIgPCAwKQorCQlyZXR1cm4gZXJyOwogCiAJc2Vh
+cmNoID0gc2RwX2xpc3RfYXBwZW5kKE5VTEwsICZjdHh0LT51dWlkKTsKIAlhdHRyaWRzID0gc2Rw
+X2xpc3RfYXBwZW5kKE5VTEwsICZyYW5nZSk7Ci0JaWYgKHNkcF9zZXJ2aWNlX3NlYXJjaF9hdHRy
+X2FzeW5jKGN0eHQtPnNlc3Npb24sCi0JCQkJc2VhcmNoLCBTRFBfQVRUUl9SRVFfUkFOR0UsIGF0
+dHJpZHMpIDwgMCkgewotCQlzZHBfbGlzdF9mcmVlKGF0dHJpZHMsIE5VTEwpOwotCQlzZHBfbGlz
+dF9mcmVlKHNlYXJjaCwgTlVMTCk7Ci0JCWVyciA9IEVJTzsKLQkJZ290byBmYWlsZWQ7Ci0JfQog
+CisJZXJyID0gc2RwX3NlcnZpY2Vfc2VhcmNoX2F0dHJfYXN5bmMoY3R4dC0+c2Vzc2lvbiwgc2Vh
+cmNoLAorCQkJCQkJU0RQX0FUVFJfUkVRX1JBTkdFLCBhdHRyaWRzKTsKIAlzZHBfbGlzdF9mcmVl
+KGF0dHJpZHMsIE5VTEwpOwogCXNkcF9saXN0X2ZyZWUoc2VhcmNoLCBOVUxMKTsKKwlpZiAoZXJy
+IDwgMCkKKwkJcmV0dXJuIGVycjsKKworCXNrID0gc2RwX2dldF9zb2NrZXQoY3R4dC0+c2Vzc2lv
+bik7CisJY2hhbiA9IGdfaW9fY2hhbm5lbF91bml4X25ldyhzayk7CiAKIAkvKiBTZXQgY2FsbGJh
+Y2sgcmVzcG9uc2libGUgZm9yIHVwZGF0ZSB0aGUgaW50ZXJuYWwgU0RQIHRyYW5zYWN0aW9uICov
+CiAJY3R4dC0+aW9faWQgPSBnX2lvX2FkZF93YXRjaChjaGFuLAogCQkJCUdfSU9fSU4gfCBHX0lP
+X0hVUCB8IEdfSU9fRVJSIHwgR19JT19OVkFMLAogCQkJCXNlYXJjaF9wcm9jZXNzX2NiLCBjdHh0
+KTsKLQlyZXR1cm4gRkFMU0U7CisKKwlyZXR1cm4gMDsKK30KKworc3RhdGljIHZvaWQgY29ubmVj
+dF93YXRjaChHSU9DaGFubmVsICpjaGFuLCBHRXJyb3IgKmdlcnIsIGdwb2ludGVyIHVzZXJfZGF0
+YSkKK3sKKwlzdHJ1Y3Qgc2VhcmNoX2NvbnRleHQgKmN0eHQgPSB1c2VyX2RhdGE7CisJaW50IHNr
+LCBlcnIgPSAwOworCisJaWYgKGdlcnIpIHsKKwkJZXJyID0gLUVIT1NURE9XTjsKKwkJZ290byBm
+YWlsZWQ7CisJfQorCisJZ19pb19jaGFubmVsX3NldF9jbG9zZV9vbl91bnJlZihjdHh0LT5pbywg
+RkFMU0UpOworCWdfaW9fY2hhbm5lbF91bnJlZihjdHh0LT5pbyk7CisJY3R4dC0+aW8gPSBOVUxM
+OworCisJc2sgPSBnX2lvX2NoYW5uZWxfdW5peF9nZXRfZmQoY2hhbik7CisJY3R4dC0+c2Vzc2lv
+biA9IHNkcF9jcmVhdGUoc2ssIFNEUF9OT05fQkxPQ0tJTkcpOworCWlmIChjdHh0LT5zZXNzaW9u
+ID09IE5VTEwpIHsKKwkJZXJyID0gLUVOT01FTTsKKwkJZ290byBmYWlsZWQ7CisJfQorCisJZXJy
+ID0gc2RwX3NlYXJjaChjdHh0KTsKKwlpZiAoZXJyIDwgMCkKKwkJZ290byBmYWlsZWQ7CisKKwly
+ZXR1cm47CiAKIGZhaWxlZDoKKwlpZiAoY3R4dC0+c2Vzc2lvbikgeworCQlzZHBfY2xvc2UoY3R4
+dC0+c2Vzc2lvbik7CisJCWN0eHQtPnNlc3Npb24gPSBOVUxMOworCX0KKworCWlmIChjdHh0LT5p
+bykgeworCQlnX2lvX2NoYW5uZWxfc2h1dGRvd24oY3R4dC0+aW8sIFRSVUUsIE5VTEwpOworCQln
+X2lvX2NoYW5uZWxfdW5yZWYoY3R4dC0+aW8pOworCQljdHh0LT5pbyA9IE5VTEw7CisJfQorCisJ
+aWYgKGN0eHQtPmNiKQorCQljdHh0LT5jYihOVUxMLCBlcnIsIGN0eHQtPnVzZXJfZGF0YSk7CisK
+KwlzZWFyY2hfY29udGV4dF9jbGVhbnVwKGN0eHQpOworfQorCitzdGF0aWMgZ2Jvb2xlYW4gc2Rw
+X3Jlc3VtZShncG9pbnRlciBkYXRhKQoreworCXN0cnVjdCBzZWFyY2hfY29udGV4dCAqY3R4dCA9
+IGRhdGE7CisJaW50IGVycjsKKworCWN0eHQtPmlvX2lkID0gMDsKKworCWVyciA9IHNkcF9zZWFy
+Y2goY3R4dCk7CisJaWYgKGVyciA9PSAwKQorCQlyZXR1cm4gRkFMU0U7CisKIAlzZHBfY2xvc2Uo
+Y3R4dC0+c2Vzc2lvbik7CiAJY3R4dC0+c2Vzc2lvbiA9IE5VTEw7CiAKIAlpZiAoY3R4dC0+Y2Ip
+Ci0JCWN0eHQtPmNiKE5VTEwsIC1lcnIsIGN0eHQtPnVzZXJfZGF0YSk7CisJCWN0eHQtPmNiKE5V
+TEwsIGVyciwgY3R4dC0+dXNlcl9kYXRhKTsKIAogCXNlYXJjaF9jb250ZXh0X2NsZWFudXAoY3R4
+dCk7CiAKQEAgLTMwNiwxNSArMzUyLDExIEBAIHN0YXRpYyBpbnQgY3JlYXRlX3NlYXJjaF9jb250
+ZXh0KHN0cnVjdCBzZWFyY2hfY29udGV4dCAqKmN0eHQsCiAJCQkJdXVpZF90ICp1dWlkKQogewog
+CXNkcF9zZXNzaW9uX3QgKnM7Ci0JR0lPQ2hhbm5lbCAqY2hhbjsKKwlHRXJyb3IgKmVyciA9IE5V
+TEw7CiAKIAlpZiAoIWN0eHQpCiAJCXJldHVybiAtRUlOVkFMOwogCi0JcyA9IGdldF9zZHBfc2Vz
+c2lvbihzcmMsIGRzdCk7Ci0JaWYgKCFzKQotCQlyZXR1cm4gLWVycm5vOwotCiAJKmN0eHQgPSBn
+X3RyeV9tYWxsb2MwKHNpemVvZihzdHJ1Y3Qgc2VhcmNoX2NvbnRleHQpKTsKIAlpZiAoISpjdHh0
+KSB7CiAJCXNkcF9jbG9zZShzKTsKQEAgLTMyMywxNCArMzY1LDI3IEBAIHN0YXRpYyBpbnQgY3Jl
+YXRlX3NlYXJjaF9jb250ZXh0KHN0cnVjdCBzZWFyY2hfY29udGV4dCAqKmN0eHQsCiAKIAliYWNw
+eSgmKCpjdHh0KS0+c3JjLCBzcmMpOwogCWJhY3B5KCYoKmN0eHQpLT5kc3QsIGRzdCk7Ci0JKCpj
+dHh0KS0+c2Vzc2lvbiA9IHM7CiAJKCpjdHh0KS0+dXVpZCA9ICp1dWlkOwogCi0JY2hhbiA9IGdf
+aW9fY2hhbm5lbF91bml4X25ldyhzZHBfZ2V0X3NvY2tldChzKSk7Ci0JKCpjdHh0KS0+aW9faWQg
+PSBnX2lvX2FkZF93YXRjaChjaGFuLAotCQkJCUdfSU9fT1VUIHwgR19JT19IVVAgfCBHX0lPX0VS
+UiB8IEdfSU9fTlZBTCwKLQkJCQljb25uZWN0X3dhdGNoLCAqY3R4dCk7Ci0JZ19pb19jaGFubmVs
+X3VucmVmKGNoYW4pOworCXMgPSBnZXRfc2RwX3Nlc3Npb24oc3JjLCBkc3QpOworCWlmIChzICE9
+IE5VTEwpIHsKKwkJKCpjdHh0KS0+c2Vzc2lvbiA9IHM7CisJCSgqY3R4dCktPmlvX2lkID0gZ19p
+ZGxlX2FkZChzZHBfcmVzdW1lLCAqY3R4dCk7CisJCXJldHVybiAwOworCX0KKworCSgqY3R4dCkt
+PmlvID0gYnRfaW9fY29ubmVjdChCVF9JT19MMkNBUCwgY29ubmVjdF93YXRjaCwgKmN0eHQsCisJ
+CQkJCU5VTEwsICZlcnIsCisJCQkJCUJUX0lPX09QVF9TT1VSQ0VfQkRBRERSLCBzcmMsCisJCQkJ
+CUJUX0lPX09QVF9ERVNUX0JEQUREUiwgZHN0LAorCQkJCQlCVF9JT19PUFRfUFNNLCBTRFBfUFNN
+LAorCQkJCQlCVF9JT19PUFRfU0VDX0xFVkVMLCBCVF9JT19TRUNfU0RQLAorCQkJCQlCVF9JT19P
+UFRfSU5WQUxJRCk7CisJaWYgKCgqY3R4dCktPmlvID09IE5VTEwpIHsKKwkJZ19lcnJvcl9mcmVl
+KGVycik7CisJCXNlYXJjaF9jb250ZXh0X2NsZWFudXAoKmN0eHQpOworCQlyZXR1cm4gLUVJTlZB
+TDsKKwl9CiAKIAlyZXR1cm4gMDsKIH0KQEAgLTM5MSwxNSArNDQ2LDE3IEBAIGludCBidF9jYW5j
+ZWxfZGlzY292ZXJ5KGNvbnN0IGJkYWRkcl90ICpzcmMsIGNvbnN0IGJkYWRkcl90ICpkc3QpCiAJ
+CXJldHVybiAtRU5PREFUQTsKIAogCWN0eHQgPSBtYXRjaC0+ZGF0YTsKLQlpZiAoIWN0eHQtPnNl
+c3Npb24pCi0JCXJldHVybiAtRU5PVENPTk47Ci0KIAlpZiAoY3R4dC0+aW9faWQpCiAJCWdfc291
+cmNlX3JlbW92ZShjdHh0LT5pb19pZCk7CiAKIAlpZiAoY3R4dC0+c2Vzc2lvbikKIAkJc2RwX2Ns
+b3NlKGN0eHQtPnNlc3Npb24pOwogCisJaWYgKGN0eHQtPmlvKSB7CisJCWdfaW9fY2hhbm5lbF9z
+aHV0ZG93bihjdHh0LT5pbywgVFJVRSwgTlVMTCk7CisJCWdfaW9fY2hhbm5lbF91bnJlZihjdHh0
+LT5pbyk7CisJfQorCiAJc2VhcmNoX2NvbnRleHRfY2xlYW51cChjdHh0KTsKIAlyZXR1cm4gMDsK
+IH0KLS0gCjEuNy4wLjQKCg==
+--00163646ba4e616a5a048c73cfa0--
