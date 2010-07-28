@@ -1,51 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-From: Haijun Liu <Haijun.Liu@Atheros.com>
-To: David Vrabel <david.vrabel@csr.com>,
-	Dan Tian <Dan.Tian@Atheros.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Luis Rodriguez <Luis.Rodriguez@Atheros.com>
-Date: Wed, 28 Jul 2010 13:39:50 +0800
-Subject: RE: [PATCH 1/3] Add BT3 AMP device support, by Atheros Linux BT3
- team.
-Message-ID: <6AAC4214B9104E409FF4885ACB62A961B3A9C892@SHEXMB-01.global.atheros.com>
-References: <CDAFEDABF718A54BABD0DA5476695307CE881EC1@SHEXMB-01.global.atheros.com>
- <4C4ECA72.50602@csr.com>
-In-Reply-To: <4C4ECA72.50602@csr.com>
-Content-Type: text/plain; charset="us-ascii"
+Date: Wed, 28 Jul 2010 01:16:14 -0300
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
+To: Ville Tervo <ville.tervo@nokia.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>
+Subject: Re: L2CAP unknown options
+Message-ID: <20100728041614.GC22156@vigoh>
+References: <4C4EA1CB.2050406@nokia.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4C4EA1CB.2050406@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> -----Original Message-----
-> From: David Vrabel [mailto:david.vrabel@csr.com]
-> Sent: Tuesday, July 27, 2010 8:01 PM
-> To: Dan Tian
-> Cc: linux-bluetooth@vger.kernel.org; Haijun Liu; Luis Rodriguez
-> Subject: Re: [PATCH 1/3] Add BT3 AMP device support, by Atheros Linux
-> BT3 team.
-> 
-> What kernel were these diffed against?  I'd like to try them out but
-> they don't apply to mainline.
-> 
-> David
-> --
-> David Vrabel, Senior Software Engineer, Drivers
-> CSR, Churchill House, Cambridge Business Park,  Tel: +44 (0)1223 692562
-> Cowley Road, Cambridge, CB4 0WZ                 http://www.csr.com/
-> 
-> 
-> Member of the CSR plc group of companies. CSR plc registered in England
-> and Wales, registered number 4187346, registered office Churchill House,
-> Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United
-> Kingdom
+Hi Ville,
 
+* Ville Tervo <ville.tervo@nokia.com> [2010-07-27 12:07:23 +0300]:
 
-The branch is bluetooth-testing. 
-Commit is 53a4bb8b3de6f74b6e1b8e684fba5cd6f60c0bfc
+> Hi,
+> 
+> I found following problem with bluetooth-next-2.6.
+> 
+> Kernel disconnects if remote device replies with "unknown options"
+> result code. I guess in that case a new config req should be sent
+> without unknown option. I didn't check the spec yet.
+> 
+> The remote device is Nokia 9300.
+> 
+> 2010-07-27 11:44:07.364827 < ACL data: handle 11 flags 0x02 dlen 10
+>     L2CAP(s): Info req: type 2
+> 2010-07-27 11:44:07.365337 < HCI Command: Remote Name Request
+> (0x01|0x0019) plen 10
+>     bdaddr 00:12:37:F0:F1:77 mode 2 clkoffset 0x0000
+> 2010-07-27 11:44:07.367793 > HCI Event: Command Status (0x0f) plen 4
+>     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+> 2010-07-27 11:44:07.384797 > HCI Event: Max Slots Change (0x1b) plen 3
+>     handle 11 slots 5
+> 2010-07-27 11:44:07.406820 > ACL data: handle 11 flags 0x02 dlen 12
+>     L2CAP(s): Info rsp: type 2 result 1
+>       Not supported
+> 2010-07-27 11:44:07.406849 < ACL data: handle 11 flags 0x02 dlen 12
+>     L2CAP(s): Connect req: psm 1 scid 0x0040
+> 2010-07-27 11:44:07.431790 > HCI Event: Remote Name Req Complete
+> (0x07) plen 255
+>     status 0x00 bdaddr 00:12:37:F0:F1:77 name 'vt-m'
+> 2010-07-27 11:44:07.433780 > HCI Event: Number of Completed Packets
+> (0x13) plen 5
+>     handle 11 packets 2
+> 2010-07-27 11:44:07.474801 > ACL data: handle 11 flags 0x02 dlen 16
+>     L2CAP(s): Connect rsp: dcid 0x0042 scid 0x0040 result 1 status 2
+>       Connection pending - Authorization pending
+> 2010-07-27 11:44:07.668818 > ACL data: handle 11 flags 0x02 dlen 16
+>     L2CAP(s): Connect rsp: dcid 0x0042 scid 0x0040 result 0 status 0
+>       Connection successful
+> 2010-07-27 11:44:07.668851 < ACL data: handle 11 flags 0x02 dlen 23
+>     L2CAP(s): Config req: dcid 0x0042 flags 0x00 clen 11
+>       RFC 0x00 (Basic)
+> 2010-07-27 11:44:07.669814 > ACL data: handle 11 flags 0x02 dlen 12
+>     L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
+> 2010-07-27 11:44:07.669840 < ACL data: handle 11 flags 0x02 dlen 18
+>     L2CAP(s): Config rsp: scid 0x0042 flags 0x00 result 0 clen 4
+>       MTU 672
+> 2010-07-27 11:44:07.675794 > HCI Event: Number of Completed Packets
+> (0x13) plen 5
+>     handle 11 packets 2
+> 2010-07-27 11:44:07.682822 > ACL data: handle 11 flags 0x02 dlen 19
+>     L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 3 clen 5
+>       Failure - unknown options
+>       RFC QoS 0f 00 42
 
-Best Regards
-Haijun
-86-21-61820900 Ext. 6331 Work
-Haijun.Liu@Atheros.com
-Skype: liu.haijun
+Actually the 9300 stack is broken here, it should only send the unknown
+options that were in the ConfiqReq, i.e, only the RFC. But that doesn't
+change the fact that we have a regression.
 
+> 2010-07-27 11:44:07.682843 < ACL data: handle 11 flags 0x02 dlen 12
+>     L2CAP(s): Disconn req: dcid 0x0042 scid 0x0040
+> 2010-07-27 11:44:07.693823 > ACL data: handle 11 flags 0x02 dlen 12
+>     L2CAP(s): Disconn rsp: dcid 0x0042 scid 0x0040
+
+-- 
+Gustavo F. Padovan
+http://padovan.org
