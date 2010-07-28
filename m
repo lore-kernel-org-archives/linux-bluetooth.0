@@ -1,48 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
+From: Haijun Liu <Haijun.Liu@Atheros.com>
+To: David Vrabel <david.vrabel@csr.com>,
+	Dan Tian <Dan.Tian@Atheros.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Luis Rodriguez <Luis.Rodriguez@Atheros.com>
+Date: Wed, 28 Jul 2010 13:39:50 +0800
+Subject: RE: [PATCH 1/3] Add BT3 AMP device support, by Atheros Linux BT3
+ team.
+Message-ID: <6AAC4214B9104E409FF4885ACB62A961B3A9C892@SHEXMB-01.global.atheros.com>
+References: <CDAFEDABF718A54BABD0DA5476695307CE881EC1@SHEXMB-01.global.atheros.com>
+ <4C4ECA72.50602@csr.com>
+In-Reply-To: <4C4ECA72.50602@csr.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <94b1ecb27a99150d2cc0cae8fe6607af.squirrel@www.codeaurora.org>
-References: <1279814780-29673-1-git-send-email-ingas@codeaurora.org>
-	<1279814780-29673-3-git-send-email-ingas@codeaurora.org>
-	<AANLkTi=nW-E8S3ccyutn_LYafmhSXiGY62PVZJ6L2QnX@mail.gmail.com>
-	<94b1ecb27a99150d2cc0cae8fe6607af.squirrel@www.codeaurora.org>
-Date: Wed, 28 Jul 2010 08:59:03 +0300
-Message-ID: <AANLkTimXNgHxzqFdFJLhWdr8b-ELKc9rLJoj6L8s5+oC@mail.gmail.com>
-Subject: Re: [PATCH 2/5] Support for adding UUID128 to extended inquiry
-	response
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: ingas@codeaurora.org
-Cc: linux-bluetooth@vger.kernel.org, rshaffer@codeaurora.org,
-	marcel@holtmann.org, johan.hedberg@gmail.com
-Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+> -----Original Message-----
+> From: David Vrabel [mailto:david.vrabel@csr.com]
+> Sent: Tuesday, July 27, 2010 8:01 PM
+> To: Dan Tian
+> Cc: linux-bluetooth@vger.kernel.org; Haijun Liu; Luis Rodriguez
+> Subject: Re: [PATCH 1/3] Add BT3 AMP device support, by Atheros Linux
+> BT3 team.
+> 
+> What kernel were these diffed against?  I'd like to try them out but
+> they don't apply to mainline.
+> 
+> David
+> --
+> David Vrabel, Senior Software Engineer, Drivers
+> CSR, Churchill House, Cambridge Business Park,  Tel: +44 (0)1223 692562
+> Cowley Road, Cambridge, CB4 0WZ                 http://www.csr.com/
+> 
+> 
+> Member of the CSR plc group of companies. CSR plc registered in England
+> and Wales, registered number 4187346, registered office Churchill House,
+> Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United
+> Kingdom
 
-On Tue, Jul 27, 2010 at 11:08 PM,  <ingas@codeaurora.org> wrote:
-> If you examine the patch closely, you might notice that the previous
-> "check for duplicates" implementation was doing the following:
-> - cycling through the list of so far accumulated UUIDs in EIR and
-> comparing them to the current one. If duplicate is found, break out of
-> this cycling loop. Notice, that in the case of a duplicate, (i <
-> index)condition will be true, where index is the number of accumulated
-> UUIDs.
-> - the current implementation performs check for (i =3D=3D index -1). Well=
-, we
-> did not need to cycle through the whole array to cmpare to the last item
-> :) But if my reading of the original intent is correct, we don't want to
-> put a duplicate UUID in EIR, and, therefore, should go to next iteration
-> if a duplicate is found. Hence, the check should be (i < index).
 
-Yep, the check was already there before you touch it.
+The branch is bluetooth-testing. 
+Commit is 53a4bb8b3de6f74b6e1b8e684fba5cd6f60c0bfc
 
-> Maybe it's a better idea to submit this fix separately.
->
-> I do not disagree that it would be better to check for duplicate records
-> elsewhere, but this =A0is outside the scope of this patch.
+Best Regards
+Haijun
+86-21-61820900 Ext. 6331 Work
+Haijun.Liu@Atheros.com
+Skype: liu.haijun
 
-No problem, the other patches seems to be in good shape to be push
-upstream, so lets try to do it this week.
-
---=20
-Luiz Augusto von Dentz
-Computer Engineer
