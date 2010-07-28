@@ -1,56 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: add dbus api to set class of device?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Tim Renouf <tpraplix.vger@botech.co.uk>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20100728165904.GA9840@aplixcorp.com>
-References: <20100728153323.GA9410@aplixcorp.com>
-	 <1280335558.2621.97.camel@localhost.localdomain>
-	 <20100728165904.GA9840@aplixcorp.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 28 Jul 2010 10:40:12 -0700
-Message-ID: <1280338812.2621.102.camel@localhost.localdomain>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Date: Wed, 28 Jul 2010 19:02:13 +0200
+Message-ID: <AANLkTi=LHJF7-ymBrchWWy_QyM1qThYkigr3Hx=M6e7n@mail.gmail.com>
+Subject: Headset problem
+From: Josu Lazkano <josu.lazkano@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tim,
+Hello, I have a Debian Squeeze laptop, I am using the same OS on other
+laptop and I can use a bluetooth headset to speak with PulseAudio.
+When I connect
+(pairing) the headset I can select the bluetooth device on PulseAudio
+and I can use it, but
+not with the other laptop.
 
-> > I did mention before that JSR82 is the most stupid Bluetooth API that I
-> > have seen so far, didn't I? Personally I wouldn't even bother with JSR82
-> > and give up right away. It is really a pointless API.
-> 
-> Unfortunately I have to bother with it as our customers are device
-> manufacturers who are willing to pay for MIDP with JSR82 support. :-(
-> 
-> > In BlueZ the services bits of the class of device settings are modified
-> > dynamically based on the registered SDP service records. So you don't
-> > have to do anything. Just register the right SDP service record with the
-> > proper UUID and it will take care of this automatically.
-> 
-> Yes, I saw that in update_adapter_svclass_list. I guess the problem is
-> that JSR82 lets an app decide to set the "wrong" bit, and the
-> conformance tests test that functionality.
+This is my bt device info:
 
-fake the conformance test with just adding and removing the right SDP
-records ;)
+# hciconfig features
+hci0:   Type: BR/EDR  Bus: USB
+       BD Address: 00:10:C6:xx:xx:xx  ACL MTU: 377:10  SCO MTU: 16:0
+       UP RUNNING PSCAN ISCAN
+       RX bytes:5691 acl:77 sco:51 events:125 errors:2
+       TX bytes:2239 acl:81 sco:0 commands:43 errors:0
 
-As I said, JSR82 is the most stupid API I have ever seen. It seems these
-guys had no clue about Bluetooth when specifying it. And this is besides
-that fact that every application has to implement SDP parsing by itself.
+I use Gnome bluetooth preference to pair the devices. I don't know
+what info put here, can you help with this?
 
-> So if I did a patch along the lines I was suggesting, and submitted it
-> here, would it be rejected on the grounds that it is not needed for any
-> "sensible" functionality ?
+This is the bluetooth device that works:
 
-I think you just answered this by yourself. I makes no sense to add such
-an API since it has the exact problems that you mentioned earlier. Once
-you have two applications this gets messy. And it will not work properly
-at all. So for us such an extra API will introduce problems instead of
-solving anything.
-
-Regards
-
-Marcel
+# hciconfig features
+hci0:	Type: BR/EDR  Bus: USB
+	BD Address: 00:21:85:xx:xx:xx  ACL MTU: 310:10  SCO MTU: 64:8
+	UP RUNNING PSCAN
+	RX bytes:312623 acl:19325 sco:0 events:302 errors:0
+	TX bytes:2074 acl:11 sco:0 commands:41 errors:0
 
 
+Thanks for all.
+
+-- 
+Josu Lazkano
