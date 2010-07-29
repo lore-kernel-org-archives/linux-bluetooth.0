@@ -1,81 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Subject: [PATCH] Bluetooth: Don't send RFC for Basic Mode if only it is supported
-Date: Thu, 29 Jul 2010 15:00:44 -0300
-Message-Id: <1280426444-20469-1-git-send-email-gustavo@padovan.org>
-In-Reply-To: <4C5020D7.7080005@nokia.com>
-References: <4C5020D7.7080005@nokia.com>
+Message-ID: <4C51A010.3050500@hschmitt.de>
+Date: Thu, 29 Jul 2010 17:36:48 +0200
+From: Harald Schmitt <linux@hschmitt.de>
+MIME-Version: 1.0
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: obexd 0.29 and N900 PC Suite
+References: <4C4EC2B5.2030204@hschmitt.de> <AANLkTi=WSgMe86k-h=_HdzsPTZ=rK5ab5O9mYf8C6jnc@mail.gmail.com>
+In-Reply-To: <AANLkTi=WSgMe86k-h=_HdzsPTZ=rK5ab5O9mYf8C6jnc@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo F. Padovan <padovan@profusion.mobi>
+Hi,
 
-If the remote side doesn't support Enhanced Retransmission Mode neither
-Streaming Mode, we shall not send the RFC option.
-Some devices that only supports Basic Mode do not understanding the RFC
-option. This patch fix the regression found with that devices.
+Am 27.07.2010 15:03, schrieb Luiz Augusto von Dentz:
+> Hi,
+>
+> On Tue, Jul 27, 2010 at 2:27 PM, Harald Schmitt<linux@hschmitt.de>  wrote:
+>> Hi,
+>>
+>> there are several users who test obexd 0.29 on the Nokia N900 running Maemo
+>> in order to have PBAP support. There are success reports with PBAP, but at
+>> the same time they cannot usb sync via Nokia PC Suite anymore. Is there any
+>> chance to get PC Suite working again in a future obexd version or does this
+>> depend on a non free Nokia code?
+>> Can you give any hints where to look at?
+>> In a forum a user posted success (with 0.19) and failure (with 0.29) logs:
+>> http://talk.maemo.org/showthread.php?p=763550#post763550
+>
+> First thanks a lot for this feedback, I wasn't aware that there were
+> somebody trying to use newer version of obexd in N900, I will take a
+> look how I can make usb compatible with N900, actually it should be
+> just as bluetooth and work no matter which platform you are using but
+> we are not there yet :(
+>
+> In the meantime you can try reverting the patch bellow and see if it helps:
+>
+> http://git.kernel.org/?p=bluetooth/obexd.git;a=commitdiff;h=6f56a4355585eb29535782f977ba545cc41dd382
+>
 
-Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
----
- net/bluetooth/l2cap.c |   15 ++++++++++++---
- 1 files changed, 12 insertions(+), 3 deletions(-)
+Thanks for the hint. I built a package from 0.29, the patches from 
+meego.gitorious.org and the reverted patch. Some from the community 
+tested it and PC Suite via USB did work. Of course obexd had to be 
+started with the added option "--capability 
+!/usr/bin/gen-obex-capability.sh".
 
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 9ba1e8e..0f34e12 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -2527,6 +2527,10 @@ done:
- 		if (pi->imtu != L2CAP_DEFAULT_MTU)
- 			l2cap_add_conf_opt(&ptr, L2CAP_CONF_MTU, 2, pi->imtu);
- 
-+		if (!(pi->conn->feat_mask & L2CAP_FEAT_ERTM) &&
-+				!(pi->conn->feat_mask & L2CAP_FEAT_STREAMING))
-+			break;
-+
- 		rfc.mode            = L2CAP_MODE_BASIC;
- 		rfc.txwin_size      = 0;
- 		rfc.max_transmit    = 0;
-@@ -2534,6 +2538,8 @@ done:
- 		rfc.monitor_timeout = 0;
- 		rfc.max_pdu_size    = 0;
- 
-+		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
-+							(unsigned long) &rfc);
- 		break;
- 
- 	case L2CAP_MODE_ERTM:
-@@ -2546,6 +2552,9 @@ done:
- 		if (L2CAP_DEFAULT_MAX_PDU_SIZE > pi->conn->mtu - 10)
- 			rfc.max_pdu_size = cpu_to_le16(pi->conn->mtu - 10);
- 
-+		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
-+							(unsigned long) &rfc);
-+
- 		if (!(pi->conn->feat_mask & L2CAP_FEAT_FCS))
- 			break;
- 
-@@ -2566,6 +2575,9 @@ done:
- 		if (L2CAP_DEFAULT_MAX_PDU_SIZE > pi->conn->mtu - 10)
- 			rfc.max_pdu_size = cpu_to_le16(pi->conn->mtu - 10);
- 
-+		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
-+							(unsigned long) &rfc);
-+
- 		if (!(pi->conn->feat_mask & L2CAP_FEAT_FCS))
- 			break;
- 
-@@ -2577,9 +2589,6 @@ done:
- 		break;
- 	}
- 
--	l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
--						(unsigned long) &rfc);
--
- 	/* FIXME: Need actual value of the flush timeout */
- 	//if (flush_to != L2CAP_DEFAULT_FLUSH_TO)
- 	//   l2cap_add_conf_opt(&ptr, L2CAP_CONF_FLUSH_TO, 2, pi->flush_to);
--- 
-1.7.1.1
-
+--
+Harald Schmitt
