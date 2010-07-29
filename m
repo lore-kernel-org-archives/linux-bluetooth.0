@@ -1,63 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 29 Jul 2010 20:16:49 +0200
-From: "Marcel J.E. Mol" <marcel@mesa.nl>
+Date: Thu, 29 Jul 2010 15:04:02 -0300
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: obexd 0.29 and N900 PC Suite
-Message-ID: <20100729181649.GA9339@joshua.mesa.nl>
-References: <4C4EC2B5.2030204@xxxxxxxxxxx> <AANLkTi=WSgMe86k-h=_HdzsPTZ=rK5ab5O9mYf8C6jnc@xxxxxxxxxxxxxx>
-Mime-Version: 1.0
-Content-Type: text/plain; charset*=utf-8''%E2%80%9Cus-ascii
+Cc: ville.tervo@nokia.com
+Subject: Re: [PATCH] Bluetooth: Don't send RFC for Basic Mode if only it is
+ supported
+Message-ID: <20100729180402.GB17509@vigoh>
+References: <4C5020D7.7080005@nokia.com>
+ <1280426444-20469-1-git-send-email-gustavo@padovan.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1280426444-20469-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Jul 29, 2010 at 05:36:48PM +0200, Harald Schmitt wrote:
-> Hi,
-> 
-> Am 27.07.2010 15:03, schrieb Luiz Augusto von Dentz:
-> 
->     Hi,
-> 
->     On Tue, Jul 27, 2010 at 2:27 PM, Harald Schmitt<linux@xxxxxxxxxxx>  wrote:
-> 
->         Hi,
-> 
->         there are several users who test obexd 0.29 on the Nokia N900 running Maemo
->         in order to have PBAP support. There are success reports with PBAP, but at
->         the same time they cannot usb sync via Nokia PC Suite anymore. Is there any
->         chance to get PC Suite working again in a future obexd version or does this
->         depend on a non free Nokia code?
->         Can you give any hints where to look at?
->         In a forum a user posted success (with 0.19) and failure (with 0.29) logs:
->         http://talk.maemo.org/showthread.php?p=763550#post763550
-> 
->     First thanks a lot for this feedback, I wasn't aware that there were
->     somebody trying to use newer version of obexd in N900, I will take a
->     look how I can make usb compatible with N900, actually it should be
->     just as bluetooth and work no matter which platform you are using but
->     we are not there yet :(
-> 
->     In the meantime you can try reverting the patch bellow and see if it helps:
-> 
->     http://git.kernel.org/?p=bluetooth/obexd.git;a=commitdiff;h=6f56a4355585eb29535782f977ba545cc41dd382
-> 
-> Thanks for the hint. I built a package from 0.29, the patches from meego.gitorious.org and the reverted patch. Some from the community tested it and PC Suite via USB did work. Of course obexd had to be started with the added option "--capability !/usr/bin/gen-obex-capability.sh".
-> 
-> --
-> Harald Schmitt
+Hi Ville,
 
-It seems the patch revert a conversion from unix signaling to dbus signaling.
-The pcsuite-enable.sh script uses a unix signal to tell obexd a pcsuite
-connection is requested.
-Apperantly in meego this will be done using dbus..
+* Gustavo F. Padovan <gustavo@padovan.org> [2010-07-29 15:00:44 -0300]:
 
-Can't we convert pcsuite-enable.sh to also use dbus instead of reverting
-the patch?  Can you help us out her Luiz?
+> From: Gustavo F. Padovan <padovan@profusion.mobi>
+> 
+> If the remote side doesn't support Enhanced Retransmission Mode neither
+> Streaming Mode, we shall not send the RFC option.
+> Some devices that only supports Basic Mode do not understanding the RFC
+> option. This patch fix the regression found with that devices.
+> 
+> Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+> ---
+>  net/bluetooth/l2cap.c |   15 ++++++++++++---
+>  1 files changed, 12 insertions(+), 3 deletions(-)
 
--Marcel
+
+Could you please test this patch, I'm pretty sure that it fixes the
+issue with Nokia 9300.
+
+> 
+> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> index 9ba1e8e..0f34e12 100644
+> --- a/net/bluetooth/l2cap.c
+> +++ b/net/bluetooth/l2cap.c
+> @@ -2527,6 +2527,10 @@ done:
+>  		if (pi->imtu != L2CAP_DEFAULT_MTU)
+>  			l2cap_add_conf_opt(&ptr, L2CAP_CONF_MTU, 2, pi->imtu);
+>  
+> +		if (!(pi->conn->feat_mask & L2CAP_FEAT_ERTM) &&
+> +				!(pi->conn->feat_mask & L2CAP_FEAT_STREAMING))
+> +			break;
+> +
+>  		rfc.mode            = L2CAP_MODE_BASIC;
+>  		rfc.txwin_size      = 0;
+>  		rfc.max_transmit    = 0;
+> @@ -2534,6 +2538,8 @@ done:
+>  		rfc.monitor_timeout = 0;
+>  		rfc.max_pdu_size    = 0;
+>  
+> +		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
+> +							(unsigned long) &rfc);
+>  		break;
+>  
+>  	case L2CAP_MODE_ERTM:
+> @@ -2546,6 +2552,9 @@ done:
+>  		if (L2CAP_DEFAULT_MAX_PDU_SIZE > pi->conn->mtu - 10)
+>  			rfc.max_pdu_size = cpu_to_le16(pi->conn->mtu - 10);
+>  
+> +		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
+> +							(unsigned long) &rfc);
+> +
+>  		if (!(pi->conn->feat_mask & L2CAP_FEAT_FCS))
+>  			break;
+>  
+> @@ -2566,6 +2575,9 @@ done:
+>  		if (L2CAP_DEFAULT_MAX_PDU_SIZE > pi->conn->mtu - 10)
+>  			rfc.max_pdu_size = cpu_to_le16(pi->conn->mtu - 10);
+>  
+> +		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
+> +							(unsigned long) &rfc);
+> +
+>  		if (!(pi->conn->feat_mask & L2CAP_FEAT_FCS))
+>  			break;
+>  
+> @@ -2577,9 +2589,6 @@ done:
+>  		break;
+>  	}
+>  
+> -	l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
+> -						(unsigned long) &rfc);
+> -
+>  	/* FIXME: Need actual value of the flush timeout */
+>  	//if (flush_to != L2CAP_DEFAULT_FLUSH_TO)
+>  	//   l2cap_add_conf_opt(&ptr, L2CAP_CONF_FLUSH_TO, 2, pi->flush_to);
+> -- 
+> 1.7.1.1
+> 
+
 -- 
-     ======--------         Marcel J.E. Mol                MESA Consulting B.V.
-    =======---------        ph. +31-(0)6-54724868          P.O. Box 112
-    =======---------        marcel@mesa.nl                 2630 AC  Nootdorp
-__==== www.mesa.nl ---____U_n_i_x______I_n_t_e_r_n_e_t____ The Netherlands ____
- They couldn't think of a number,           Linux user 1148  --  counter.li.org
-    so they gave me a name!  -- Rupert Hine  --  www.ruperthine.com
+Gustavo F. Padovan
+http://padovan.org
