@@ -1,50 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4C51A010.3050500@hschmitt.de>
-Date: Thu, 29 Jul 2010 17:36:48 +0200
-From: Harald Schmitt <linux@hschmitt.de>
+Message-ID: <4C518373.6000706@aircable.net>
+Date: Thu, 29 Jul 2010 10:34:43 -0300
+From: Manuel Naranjo <manuel@aircable.net>
 MIME-Version: 1.0
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: obexd 0.29 and N900 PC Suite
-References: <4C4EC2B5.2030204@hschmitt.de> <AANLkTi=WSgMe86k-h=_HdzsPTZ=rK5ab5O9mYf8C6jnc@mail.gmail.com>
-In-Reply-To: <AANLkTi=WSgMe86k-h=_HdzsPTZ=rK5ab5O9mYf8C6jnc@mail.gmail.com>
+CC: Johan Hedberg <johan.hedberg@gmail.com>,
+	BlueZ <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH][RFC] Fix SDP resolving segfault
+References: <4C46324D.5070800@aircable.net>	<20100721101934.GA12188@jh-x301>	<4C470E2D.7000607@aircable.net>	<AANLkTi=8=BUThjVdc4EN_8uupGKmdgHQzGOe560Cv+pm@mail.gmail.com>	<AANLkTi=jzZScnCK6rFpKjBJesnw=71y5hNG3kDBhxv1u@mail.gmail.com>	<4C505806.3040508@aircable.net>	<AANLkTikRQfhAKm-UW+on+ZeEp709z_ku_NDjeVD_US1b@mail.gmail.com> <AANLkTi=9Top+9kRwtZj-nZw8szQU4ff9CTSNSGuexmEL@mail.gmail.com>
+In-Reply-To: <AANLkTi=9Top+9kRwtZj-nZw8szQU4ff9CTSNSGuexmEL@mail.gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Luiz,
+> I guess I finally figure out what could be the source of your
+> problems, we are not removing the watches when caching the session and
+> since the context is already freed bt_cancel_discovery doesn't work.
+>
+> The attached patch should fix this problem, Im also reseting the
+> internal data of the session by doing sdp_set_notify so if we are not
+> closing the session it will then reset the callback and data to NULL.
+>    
 
-Am 27.07.2010 15:03, schrieb Luiz Augusto von Dentz:
-> Hi,
->
-> On Tue, Jul 27, 2010 at 2:27 PM, Harald Schmitt<linux@hschmitt.de>  wrote:
->> Hi,
->>
->> there are several users who test obexd 0.29 on the Nokia N900 running Maemo
->> in order to have PBAP support. There are success reports with PBAP, but at
->> the same time they cannot usb sync via Nokia PC Suite anymore. Is there any
->> chance to get PC Suite working again in a future obexd version or does this
->> depend on a non free Nokia code?
->> Can you give any hints where to look at?
->> In a forum a user posted success (with 0.19) and failure (with 0.29) logs:
->> http://talk.maemo.org/showthread.php?p=763550#post763550
->
-> First thanks a lot for this feedback, I wasn't aware that there were
-> somebody trying to use newer version of obexd in N900, I will take a
-> look how I can make usb compatible with N900, actually it should be
-> just as bluetooth and work no matter which platform you are using but
-> we are not there yet :(
->
-> In the meantime you can try reverting the patch bellow and see if it helps:
->
-> http://git.kernel.org/?p=bluetooth/obexd.git;a=commitdiff;h=6f56a4355585eb29535782f977ba545cc41dd382
->
+Looks like a possible fix nice work thanks!.
 
-Thanks for the hint. I built a package from 0.29, the patches from 
-meego.gitorious.org and the reverted patch. Some from the community 
-tested it and PC Suite via USB did work. Of course obexd had to be 
-started with the added option "--capability 
-!/usr/bin/gen-obex-capability.sh".
+Unfortunately I will not be able to test until next week. I let you know 
+when I get some results, I got my netbook today in a mall with some more 
+debug messages, I added a few calls to error in the search_cb that 
+prints all the pointer numbers when it gets called, that will get some 
+more information. I could fix the problem this way as well, but this is 
+working on the simpthon not on the cause like yours.
 
---
-Harald Schmitt
+You think the hole problem is because of the cache? Wow I never thought 
+it that way. But it makes sense. It also makes sense to move cleanup 
+processes inside the cleanup function.
+
+I will give this a try and let you know. Maybe I can results before the 
+Tuesday, but I doubt it.
+
+Manuel
+
