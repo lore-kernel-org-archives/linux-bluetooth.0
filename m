@@ -1,78 +1,186 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 30 Jul 2010 13:39:47 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: gustavo@padovan.org
-cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-    padovan@profusion.mobi
-Subject: Re: [PATCH 2/2] Bluetooth: Add __init and __exit marks to RFCOMM
-In-Reply-To: <1279947885-19304-2-git-send-email-gustavo@padovan.org>
-Message-ID: <alpine.DEB.2.00.1007301330030.5809@linux-sea-02>
-References: <1279947885-19304-1-git-send-email-gustavo@padovan.org> <1279947885-19304-2-git-send-email-gustavo@padovan.org>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
+From: Inga Stotland <ingas@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: rshaffer@codeaurora.org, johan.hedberg@gmail.com,
+	marcel@holtmann.org, Inga Stotland <ingas@codeaurora.org>
+Subject: [PATCH 4/4] Allow changing AMP vs BR/EDR preference from stdin when connection is up.
+Date: Fri, 30 Jul 2010 11:30:26 -0700
+Message-Id: <1280514626-22559-5-git-send-email-ingas@codeaurora.org>
+In-Reply-To: <1280514626-22559-1-git-send-email-ingas@codeaurora.org>
+References: <1280514626-22559-1-git-send-email-ingas@codeaurora.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Use the following keys:
 
-Gustavo -
+"a", "A" - prefer AMP;
+"b", "B" - prefer BR/EDR;
+"r", "R" - require BR/EDR
+---
+ test/l2test.c |   87 +++++++++++++++++++++++++++++++++++++++++++++++++-------
+ 1 files changed, 76 insertions(+), 11 deletions(-)
 
-On Sat, 24 Jul 2010, Gustavo F. Padovan wrote:
-
-> From: Gustavo F. Padovan <padovan@profusion.mobi>
->
-> Those annotation save memory and space on the binary. __init code is
-> discarded just after execute and __exit code is discarded if the module is
-> built into the kernel image or unload of modules is not allowed.
->
-> Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
-> ---
-> net/bluetooth/rfcomm/sock.c |    2 +-
-> net/bluetooth/rfcomm/tty.c  |    4 ++--
-> 2 files changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-> index 43fbf6b..44a6232 100644
-> --- a/net/bluetooth/rfcomm/sock.c
-> +++ b/net/bluetooth/rfcomm/sock.c
-> @@ -1152,7 +1152,7 @@ error:
-> 	return err;
-> }
->
-> -void rfcomm_cleanup_sockets(void)
-> +void __exit rfcomm_cleanup_sockets(void)
-> {
-> 	debugfs_remove(rfcomm_sock_debugfs);
->
-> diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-> index 309b6c2..026205c 100644
-> --- a/net/bluetooth/rfcomm/tty.c
-> +++ b/net/bluetooth/rfcomm/tty.c
-> @@ -1153,7 +1153,7 @@ static const struct tty_operations rfcomm_ops = {
-> 	.tiocmset		= rfcomm_tty_tiocmset,
-> };
->
-> -int rfcomm_init_ttys(void)
-> +int __init rfcomm_init_ttys(void)
-> {
-> 	rfcomm_tty_driver = alloc_tty_driver(RFCOMM_TTY_PORTS);
-> 	if (!rfcomm_tty_driver)
-> @@ -1183,7 +1183,7 @@ int rfcomm_init_ttys(void)
-> 	return 0;
-> }
->
-> -void rfcomm_cleanup_ttys(void)
-> +void __exit rfcomm_cleanup_ttys(void)
-> {
-> 	tty_unregister_driver(rfcomm_tty_driver);
-> 	put_tty_driver(rfcomm_tty_driver);
-
-The change to rfcomm_cleanup_ttys() causes a warning:
-
-WARNING: modpost: Found 1 section mismatch(es).
-
-rfcomm_cleanup_ttys() is also called by rfcomm_init, so it should not 
-be marked with __exit.
+diff --git a/test/l2test.c b/test/l2test.c
+index 377c12e..1f627a7 100644
+--- a/test/l2test.c
++++ b/test/l2test.c
+@@ -191,6 +191,46 @@ static void hexdump(unsigned char *s, unsigned long l)
+ 	}
+ }
+ 
++static void do_keys(int sk)
++{
++	struct pollfd p;
++	int len;
++	char c;
++	int old_amp_pref = amp_pref;
++
++	p.fd = 0;
++	p.events = POLLIN;
++
++	if (poll(&p, 1, 0)) {
++		len = read(0, &c, 1);
++		if (len < 0)
++			return;
++
++		switch (c) {
++		case 'A':
++		case 'a':
++			amp_pref = L2CAP_AMP_PREFER_AMP;
++			break;
++		case 'B':
++		case 'b':
++			amp_pref = L2CAP_AMP_PREFER_BR_EDR;
++			break;
++		case 'R':
++		case 'r':
++			amp_pref = L2CAP_AMP_REQUIRE_BR_EDR;
++			break;
++		default:
++			return;
++		}
++
++		setsockopt(sk, SOL_L2CAP, L2CAP_AMP, &amp_pref, sizeof(amp_pref));
++		syslog(LOG_INFO, "AMP preference updated to %d (previously %d)",
++			amp_pref, old_amp_pref);
++	}
++
++	return;
++}
++
+ static int do_connect(char *svr)
+ {
+ 	struct sockaddr_l2 addr;
+@@ -584,11 +624,17 @@ static void dump_mode(int sk)
+ 		fd_set rset;
+ 
+ 		FD_ZERO(&rset);
++		FD_SET(0, &rset);
+ 		FD_SET(sk, &rset);
+ 
+ 		if (select(sk + 1, &rset, NULL, NULL, NULL) < 0)
+ 			return;
+ 
++		if (FD_ISSET(0, &rset)) {
++			do_keys(sk);
++			continue;
++		}
++
+ 		if (!FD_ISSET(sk, &rset))
+ 			continue;
+ 
+@@ -620,7 +666,7 @@ static void dump_mode(int sk)
+ static void recv_mode(int sk)
+ {
+ 	struct timeval tv_beg, tv_end, tv_diff;
+-	struct pollfd p;
++	struct pollfd p[2];
+ 	char ts[30];
+ 	long total;
+ 	uint32_t seq;
+@@ -643,8 +689,11 @@ static void recv_mode(int sk)
+ 
+ 	memset(ts, 0, sizeof(ts));
+ 
+-	p.fd = sk;
+-	p.events = POLLIN | POLLERR | POLLHUP;
++	p[0].fd = sk;
++	p[0].events = POLLIN | POLLERR | POLLHUP;
++
++	p[1].fd = 0;
++	p[1].events = POLLIN;
+ 
+ 	seq = 0;
+ 	while (1) {
+@@ -655,13 +704,19 @@ static void recv_mode(int sk)
+ 			uint16_t l;
+ 			int i;
+ 
+-			p.revents = 0;
+-			if (poll(&p, 1, -1) <= 0)
++			p[0].revents = 0;
++			p[1].revents = 0;
++			if (poll(p, 2, -1) <= 0)
+ 				return;
+ 
+-			if (p.revents & (POLLERR | POLLHUP))
++			if (p[0].revents & (POLLERR | POLLHUP))
+ 				return;
+ 
++			if (p[1].revents & POLLIN) {
++				do_keys(sk);
++				continue;
++			}
++
+ 			len = recv(sk, buf, data_size, 0);
+ 			if (len < 0) {
+ 				if (reliable && (errno == ECOMM)) {
+@@ -780,6 +835,8 @@ static void do_send(int sk)
+ 
+ 			sent += len;
+ 			size -= len;
++
++			do_keys(sk);
+ 		}
+ 
+ 		if (num_frames && delay && count && !(seq % count))
+@@ -831,19 +888,27 @@ static void reconnect_mode(char *svr)
+ 
+ static void connect_mode(char *svr)
+ {
+-	struct pollfd p;
++	struct pollfd p[2];
+ 	int sk;
+ 
+ 	if ((sk = do_connect(svr)) < 0)
+ 		exit(1);
+ 
+-	p.fd = sk;
+-	p.events = POLLERR | POLLHUP;
++	p[0].fd = sk;
++	p[0].events = POLLERR | POLLHUP;
++
++	p[1].fd = 0;
++	p[1].events = POLLIN;
+ 
+ 	while (1) {
+-		p.revents = 0;
+-		if (poll(&p, 1, 500))
++		p[0].revents = 0;
++		p[1].revents = 0;
++		if (poll(p, 2, 500) < 0)
++			break;
++		if (p[0].revents & (POLLERR | POLLHUP))
+ 			break;
++		if (p[1].revents & POLLIN)
++			do_keys(sk);
+ 	}
+ 
+ 	syslog(LOG_INFO, "Disconnected");
+-- 
+1.7.2
 
 --
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+Inga Stotland
+Sent by an employee of the Qualcomm Innovation Center, Inc.
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
