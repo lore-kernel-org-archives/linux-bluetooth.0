@@ -3,99 +3,57 @@ From: Inga Stotland <ingas@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: rshaffer@codeaurora.org, johan.hedberg@gmail.com,
 	marcel@holtmann.org, Inga Stotland <ingas@codeaurora.org>
-Subject: [PATCH 3/4] Added command argument "-J" to indicate preference of using AMP vs BR/EDR.
-Date: Fri, 30 Jul 2010 11:30:25 -0700
-Message-Id: <1280514626-22559-4-git-send-email-ingas@codeaurora.org>
+Subject: [PATCH 2/4] Use defines for the default values of txwin_size and max_transmit.
+Date: Fri, 30 Jul 2010 11:30:24 -0700
+Message-Id: <1280514626-22559-3-git-send-email-ingas@codeaurora.org>
 In-Reply-To: <1280514626-22559-1-git-send-email-ingas@codeaurora.org>
 References: <1280514626-22559-1-git-send-email-ingas@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Possible values: "require_br_edr", "prefer_amp", "prefer_br_edr"
 ---
- test/l2test.c |   34 +++++++++++++++++++++++++++++++++-
- 1 files changed, 33 insertions(+), 1 deletions(-)
+ test/l2test.c |   13 +++++++------
+ 1 files changed, 7 insertions(+), 6 deletions(-)
 
 diff --git a/test/l2test.c b/test/l2test.c
-index 361f80c..377c12e 100644
+index 0bb46f3..361f80c 100644
 --- a/test/l2test.c
 +++ b/test/l2test.c
-@@ -81,6 +81,9 @@ static int txwin_size = L2CAP_DEFAULT_TX_WINDOW;
- /* Default Max Transmission (number of retries per packet) */
- static int max_transmit = L2CAP_DEFAULT_MAX_TX;
+@@ -76,10 +76,10 @@ static int omtu = 0;
+ static int fcs = 0x01;
  
-+/* Default AMP preference */
-+static int amp_pref = L2CAP_AMP_REQUIRE_BR_EDR;
-+
+ /* Default Transmission Window */
+-static int txwin_size = 63;
++static int txwin_size = L2CAP_DEFAULT_TX_WINDOW;
+ 
+-/* Default Max Transmission */
+-static int max_transmit = 3;
++/* Default Max Transmission (number of retries per packet) */
++static int max_transmit = L2CAP_DEFAULT_MAX_TX;
+ 
  /* Default data size */
  static long data_size = -1;
- static long buffer_size = 2048;
-@@ -295,6 +298,14 @@ static int do_connect(char *svr)
- 		goto error;
- 	}
- 
-+	/* Set AMP preference */
-+	if ((rfcmode == L2CAP_MODE_ERTM || rfcmode == L2CAP_MODE_STREAMING) &&
-+		setsockopt(sk, SOL_L2CAP, L2CAP_AMP, &amp_pref, sizeof(amp_pref)) < 0) {
-+		syslog(LOG_ERR, "Can't set L2CAP AMP preference: %s (%d)",
-+							strerror(errno), errno);
-+		goto error;
-+	}
-+
- 	/* Get current options */
- 	memset(&opts, 0, sizeof(opts));
- 	optlen = sizeof(opts);
-@@ -458,6 +469,14 @@ static void do_listen(void (*handler)(int sk))
- 		/* Child */
- 		close(sk);
- 
-+		/* Set AMP preference */
-+		if ((rfcmode == L2CAP_MODE_ERTM || rfcmode == L2CAP_MODE_STREAMING) &&
-+			setsockopt(nsk, SOL_L2CAP, L2CAP_AMP, &amp_pref, sizeof(amp_pref)) < 0) {
-+			syslog(LOG_ERR, "Can't set L2CAP AMP preference: %s (%d)",
-+				   strerror(errno), errno);
-+			goto error;
-+		}
-+
- 		/* Get current options */
- 		memset(&opts, 0, sizeof(opts));
- 		optlen = sizeof(opts);
-@@ -1075,6 +1094,8 @@ static void usage(void)
+@@ -1073,8 +1073,8 @@ static void usage(void)
+ 		"\t[-D milliseconds] delay after sending num frames (default = 0)\n"
+ 		"\t[-X mode] select retransmission/flow-control mode\n"
  		"\t[-F fcs] use CRC16 check (default = 1)\n"
- 		"\t[-Q num] Max Transmit value (default = %d)\n"
- 		"\t[-Z size] Transmission Window size (default = %d)\n"
-+		"\t[-J amp] declare amp preference\n"
-+		"\t         (require_br_edr, prefer_amp, prefer_br_edr)\n"
+-		"\t[-Q num] Max Transmit value (default = 3)\n"
+-		"\t[-Z size] Transmission Window size (default = 63)\n"
++		"\t[-Q num] Max Transmit value (default = %d)\n"
++		"\t[-Z size] Transmission Window size (default = %d)\n"
  		"\t[-R] reliable mode\n"
  		"\t[-G] use connectionless channel (datagram)\n"
  		"\t[-U] use sock stream\n"
-@@ -1093,7 +1114,7 @@ int main(int argc, char *argv[])
+@@ -1082,7 +1082,8 @@ static void usage(void)
+ 		"\t[-E] request encryption\n"
+ 		"\t[-S] secure connection\n"
+ 		"\t[-M] become master\n"
+-		"\t[-T] enable timestamps\n");
++		"\t[-T] enable timestamps\n",
++		L2CAP_DEFAULT_MAX_TX, L2CAP_DEFAULT_TX_WINDOW);
+ }
  
- 	bacpy(&bdaddr, BDADDR_ANY);
- 
--	while ((opt=getopt(argc,argv,"rdscuwmntqxyzpb:i:P:I:O:B:N:L:W:C:D:X:F:Q:Z:RUGAESMT")) != EOF) {
-+	while ((opt=getopt(argc,argv,"rdscuwmntqxyzpb:i:P:I:O:B:N:L:W:C:D:X:F:Q:Z:J:RUGAESMT")) != EOF) {
- 		switch(opt) {
- 		case 'r':
- 			mode = RECV;
-@@ -1217,6 +1238,17 @@ int main(int argc, char *argv[])
- 			fcs = atoi(optarg);
- 			break;
- 
-+		case 'J':
-+			if (strcasecmp(optarg, "require_br_edr") == 0)
-+				amp_pref = L2CAP_AMP_REQUIRE_BR_EDR;
-+			else if (strcasecmp(optarg, "prefer_amp") == 0)
-+				amp_pref = L2CAP_AMP_PREFER_AMP;
-+			else if (strcasecmp(optarg, "prefer_br_edr") == 0)
-+				amp_pref = L2CAP_AMP_PREFER_BR_EDR;
-+			else
-+				perror("Bad AMP preference");
-+			break;
-+
- 		case 'R':
- 			reliable = 1;
- 			break;
+ int main(int argc, char *argv[])
 -- 
 1.7.2
 
