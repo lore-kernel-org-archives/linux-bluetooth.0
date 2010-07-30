@@ -1,49 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 30 Jul 2010 22:49:43 +0200
-From: "Marcel J.E. Mol" <marcel@mesa.nl>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Harald Schmitt <linux@hschmitt.de>, linux-bluetooth@vger.kernel.org
-Subject: Re: obexd 0.29 and N900 PC Suite
-Message-ID: <20100730204943.GA15065@joshua.mesa.nl>
-References: <4C4EC2B5.2030204@xxxxxxxxxxx> <AANLkTi=WSgMe86k-h=_HdzsPTZ=rK5ab5O9mYf8C6jnc@xxxxxxxxxxxxxx> <20100729181649.GA9339@joshua.mesa.nl> <4C52A995.8080205@hschmitt.de> <AANLkTimKLcbg2d5Ev5AVBhQqRRrgV-aKKkTRfRzOFAK=@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset*=utf-8''%E2%80%9Cus-ascii
-In-Reply-To: <AANLkTimKLcbg2d5Ev5AVBhQqRRrgV-aKKkTRfRzOFAK=@mail.gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 30 Jul 2010 13:39:47 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: gustavo@padovan.org
+cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+    padovan@profusion.mobi
+Subject: Re: [PATCH 2/2] Bluetooth: Add __init and __exit marks to RFCOMM
+In-Reply-To: <1279947885-19304-2-git-send-email-gustavo@padovan.org>
+Message-ID: <alpine.DEB.2.00.1007301330030.5809@linux-sea-02>
+References: <1279947885-19304-1-git-send-email-gustavo@padovan.org> <1279947885-19304-2-git-send-email-gustavo@padovan.org>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Jul 30, 2010 at 06:08:23PM +0300, Luiz Augusto von Dentz wrote:
-> Hi,
-> 
-> On Fri, Jul 30, 2010 at 1:29 PM, Harald Schmitt <linux@hschmitt.de> wrote:
-> > I have testes following command and it seems to work:
-> > dbus-send --system --type=signal / com.meego.usb_moded.sig_usb_state_ind
-> > string:'ovi_suite'
-> > If one would just add this line to pcsuite-enable.sh under the SIGUSR1 then
-> > both types of obexd would work?
-> > Luiz could you confirm this? Do we also need a dbus-command for disconnect
-> > with string:'USB disconnected' in pcsuite-disable.sh?
-> 
-> Hmm it may work with that but I would first just revert the patch I
-> suggest other day since without that part there could be some other
-> components still sending SIGUSR1 to obexd which might kill it, maybe I
-> can just reintroduce SIGUSR1 and then have a config option saying
-> which method to use for usb cable detection. What do you guys think?
 
-Well, I just tested the dbus method on the n900 with an obexd 0.29 
-(including the updates I already posted here plus a few other updates
-including a basic IRMC server implementation) and pcsuite seems to 
-work fine. But I did not test extensively (contact/calendar download
-work file and file browsing too).
+Gustavo -
 
-I don't know if there are other tools using signalling to obexd, maybe
-people from the nokia n900/maemo group can tell...
+On Sat, 24 Jul 2010, Gustavo F. Padovan wrote:
 
--Marcel
--- 
-     ======--------         Marcel J.E. Mol                MESA Consulting B.V.
-    =======---------        ph. +31-(0)6-54724868          P.O. Box 112
-    =======---------        marcel@mesa.nl                 2630 AC  Nootdorp
-__==== www.mesa.nl ---____U_n_i_x______I_n_t_e_r_n_e_t____ The Netherlands ____
- They couldn't think of a number,           Linux user 1148  --  counter.li.org
-    so they gave me a name!  -- Rupert Hine  --  www.ruperthine.com
+> From: Gustavo F. Padovan <padovan@profusion.mobi>
+>
+> Those annotation save memory and space on the binary. __init code is
+> discarded just after execute and __exit code is discarded if the module is
+> built into the kernel image or unload of modules is not allowed.
+>
+> Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+> ---
+> net/bluetooth/rfcomm/sock.c |    2 +-
+> net/bluetooth/rfcomm/tty.c  |    4 ++--
+> 2 files changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+> index 43fbf6b..44a6232 100644
+> --- a/net/bluetooth/rfcomm/sock.c
+> +++ b/net/bluetooth/rfcomm/sock.c
+> @@ -1152,7 +1152,7 @@ error:
+> 	return err;
+> }
+>
+> -void rfcomm_cleanup_sockets(void)
+> +void __exit rfcomm_cleanup_sockets(void)
+> {
+> 	debugfs_remove(rfcomm_sock_debugfs);
+>
+> diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+> index 309b6c2..026205c 100644
+> --- a/net/bluetooth/rfcomm/tty.c
+> +++ b/net/bluetooth/rfcomm/tty.c
+> @@ -1153,7 +1153,7 @@ static const struct tty_operations rfcomm_ops = {
+> 	.tiocmset		= rfcomm_tty_tiocmset,
+> };
+>
+> -int rfcomm_init_ttys(void)
+> +int __init rfcomm_init_ttys(void)
+> {
+> 	rfcomm_tty_driver = alloc_tty_driver(RFCOMM_TTY_PORTS);
+> 	if (!rfcomm_tty_driver)
+> @@ -1183,7 +1183,7 @@ int rfcomm_init_ttys(void)
+> 	return 0;
+> }
+>
+> -void rfcomm_cleanup_ttys(void)
+> +void __exit rfcomm_cleanup_ttys(void)
+> {
+> 	tty_unregister_driver(rfcomm_tty_driver);
+> 	put_tty_driver(rfcomm_tty_driver);
+
+The change to rfcomm_cleanup_ttys() causes a warning:
+
+WARNING: modpost: Found 1 section mismatch(es).
+
+rfcomm_cleanup_ttys() is also called by rfcomm_init, so it should not 
+be marked with __exit.
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
