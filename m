@@ -1,40 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 30 Jul 2010 16:01:02 +0200
+From: Michal 'vorner' Vaner <vorner@ucw.cz>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: Problem connecting headset with bluez >= 4.64
+Message-ID: <20100730140102.GA5018@hydra.kolej.mff.cuni.cz>
+References: <20100712124827.GA3012@hydra.kolej.mff.cuni.cz>
 MIME-Version: 1.0
-In-Reply-To: <4C52A995.8080205@hschmitt.de>
-References: <4C4EC2B5.2030204@xxxxxxxxxxx>
-	<AANLkTi=WSgMe86k-h=_HdzsPTZ=rK5ab5O9mYf8C6jnc@xxxxxxxxxxxxxx>
-	<20100729181649.GA9339@joshua.mesa.nl>
-	<4C52A995.8080205@hschmitt.de>
-Date: Fri, 30 Jul 2010 18:08:23 +0300
-Message-ID: <AANLkTimKLcbg2d5Ev5AVBhQqRRrgV-aKKkTRfRzOFAK=@mail.gmail.com>
-Subject: Re: obexd 0.29 and N900 PC Suite
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Harald Schmitt <linux@hschmitt.de>
-Cc: "Marcel J.E. Mol" <marcel@mesa.nl>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20100712124827.GA3012@hydra.kolej.mff.cuni.cz>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hello
 
-On Fri, Jul 30, 2010 at 1:29 PM, Harald Schmitt <linux@hschmitt.de> wrote:
-> I have testes following command and it seems to work:
-> dbus-send --system --type=signal / com.meego.usb_moded.sig_usb_state_ind
-> string:'ovi_suite'
-> If one would just add this line to pcsuite-enable.sh under the SIGUSR1 then
-> both types of obexd would work?
-> Luiz could you confirm this? Do we also need a dbus-command for disconnect
-> with string:'USB disconnected' in pcsuite-disable.sh?
+On Mon, Jul 12, 2010 at 02:48:27PM +0200, Michal 'vorner' Vaner wrote:
+> I have a bluetooth headset/headphones. However, I have a problem to connect to
+> them on one of my machines (while other two machines work well). Downgrading to
+> version 4.63 helps. In that case, bluetooth outputs something like this (this is
+> for the HSP profile, the A2DP acts similarly):
+>
+> [ .... Deleted logs .... ]
+> 
+> I tried bisecting the sources and it seems the problem is introduced in commit
+> aee26b30bbc24cde464ba1a557c2b258ddec6432 "Make BtIO default security level
+> MEDIUM". When I compile version with all commits up to master except this one,
+> it works, so this confirms my problem comes from this commit.
+> 
+> A wild guess is that the machines differ in which adapter they have and that
+> this one does not support something needed for the medium level security. The
+> adaptor is "OMEGA MICRO BT140", while the other two computers are laptops and
+> have some onboard usb connected adaptors (I do not know which ones). Is it
+> possible? If so, is there a possibility forcing bluez not using the
+> not-implemented function in a cleaner way than omitting the commit?
 
-Hmm it may work with that but I would first just revert the patch I
-suggest other day since without that part there could be some other
-components still sending SIGUSR1 to obexd which might kill it, maybe I
-can just reintroduce SIGUSR1 and then have a config option saying
-which method to use for usb cable detection. What do you guys think?
+I found out that it works with different dongle on the same computer. Is it bug
+in the dongle or something that could be fixed in software too?
 
-In future I really want a standard way to do the cable detection, I
-guess udev + libusb could be a better alternative.
+Thanks
 
 -- 
-Luiz Augusto von Dentz
-Computer Engineer
+I've already told you more than I know.
+
+Michal 'vorner' Vaner
