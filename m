@@ -1,44 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 30 Jul 2010 16:01:02 +0200
-From: Michal 'vorner' Vaner <vorner@ucw.cz>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: Problem connecting headset with bluez >= 4.64
-Message-ID: <20100730140102.GA5018@hydra.kolej.mff.cuni.cz>
-References: <20100712124827.GA3012@hydra.kolej.mff.cuni.cz>
+Message-ID: <4C52CFDC.9070907@nokia.com>
+Date: Fri, 30 Jul 2010 16:13:00 +0300
+From: Ville Tervo <ville.tervo@nokia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20100712124827.GA3012@hydra.kolej.mff.cuni.cz>
+To: "ext Gustavo F. Padovan" <gustavo@padovan.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>
+Subject: Re: [PATCH] Bluetooth: Don't send RFC for Basic Mode if only it is
+ supported
+References: <4C5020D7.7080005@nokia.com> <1280426444-20469-1-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1280426444-20469-1-git-send-email-gustavo@padovan.org>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello
+Hi,
 
-On Mon, Jul 12, 2010 at 02:48:27PM +0200, Michal 'vorner' Vaner wrote:
-> I have a bluetooth headset/headphones. However, I have a problem to connect to
-> them on one of my machines (while other two machines work well). Downgrading to
-> version 4.63 helps. In that case, bluetooth outputs something like this (this is
-> for the HSP profile, the A2DP acts similarly):
+On 07/29/2010 09:00 PM, ext Gustavo F. Padovan wrote:
+> From: Gustavo F. Padovan<padovan@profusion.mobi>
 >
-> [ .... Deleted logs .... ]
-> 
-> I tried bisecting the sources and it seems the problem is introduced in commit
-> aee26b30bbc24cde464ba1a557c2b258ddec6432 "Make BtIO default security level
-> MEDIUM". When I compile version with all commits up to master except this one,
-> it works, so this confirms my problem comes from this commit.
-> 
-> A wild guess is that the machines differ in which adapter they have and that
-> this one does not support something needed for the medium level security. The
-> adaptor is "OMEGA MICRO BT140", while the other two computers are laptops and
-> have some onboard usb connected adaptors (I do not know which ones). Is it
-> possible? If so, is there a possibility forcing bluez not using the
-> not-implemented function in a cleaner way than omitting the commit?
+> If the remote side doesn't support Enhanced Retransmission Mode neither
+> Streaming Mode, we shall not send the RFC option.
+> Some devices that only supports Basic Mode do not understanding the RFC
+> option. This patch fix the regression found with that devices.
 
-I found out that it works with different dongle on the same computer. Is it bug
-in the dongle or something that could be fixed in software too?
 
-Thanks
+Yes this is better. After some research i found out that quite many old 
+devices are not handling properly unknown options.
+
+However I found another regression. And this kind of patch is needed 
+also. Otherwise the info rsp code is reading feat_mask from failed 
+response (and does invalid memory access).
+
+
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index 0f34e12..1e174a4 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -3348,6 +3348,13 @@ static inline int l2cap_information_rsp(struct 
+l2cap_conn *conn, struct l2cap_cm
+
+         del_timer(&conn->info_timer);
+
++       if (result != L2CAP_IR_SUCCESS) {
++               conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_DONE;
++               conn->info_ident = 0;
++               l2cap_conn_start(conn);
++               return 0;
++       }
++
+         if (type == L2CAP_IT_FEAT_MASK) {
+                 conn->feat_mask = get_unaligned_le32(rsp->data);
+
+
 
 -- 
-I've already told you more than I know.
-
-Michal 'vorner' Vaner
+Ville
