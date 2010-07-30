@@ -1,109 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: seeking debug advice for a hanging serial device
-From: Steve Castellotti <sc@puzzlebox.info>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 30 Jul 2010 13:19:36 -0700
-Message-ID: <1280521176.2338.45.camel@localhost>
+Date: Fri, 30 Jul 2010 22:49:43 +0200
+From: "Marcel J.E. Mol" <marcel@mesa.nl>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Harald Schmitt <linux@hschmitt.de>, linux-bluetooth@vger.kernel.org
+Subject: Re: obexd 0.29 and N900 PC Suite
+Message-ID: <20100730204943.GA15065@joshua.mesa.nl>
+References: <4C4EC2B5.2030204@xxxxxxxxxxx> <AANLkTi=WSgMe86k-h=_HdzsPTZ=rK5ab5O9mYf8C6jnc@xxxxxxxxxxxxxx> <20100729181649.GA9339@joshua.mesa.nl> <4C52A995.8080205@hschmitt.de> <AANLkTimKLcbg2d5Ev5AVBhQqRRrgV-aKKkTRfRzOFAK=@mail.gmail.com>
 Mime-Version: 1.0
+Content-Type: text/plain; charset*=utf-8''%E2%80%9Cus-ascii
+In-Reply-To: <AANLkTimKLcbg2d5Ev5AVBhQqRRrgV-aKKkTRfRzOFAK=@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello all-
+On Fri, Jul 30, 2010 at 06:08:23PM +0300, Luiz Augusto von Dentz wrote:
+> Hi,
+> 
+> On Fri, Jul 30, 2010 at 1:29 PM, Harald Schmitt <linux@hschmitt.de> wrote:
+> > I have testes following command and it seems to work:
+> > dbus-send --system --type=signal / com.meego.usb_moded.sig_usb_state_ind
+> > string:'ovi_suite'
+> > If one would just add this line to pcsuite-enable.sh under the SIGUSR1 then
+> > both types of obexd would work?
+> > Luiz could you confirm this? Do we also need a dbus-command for disconnect
+> > with string:'USB disconnected' in pcsuite-disable.sh?
+> 
+> Hmm it may work with that but I would first just revert the patch I
+> suggest other day since without that part there could be some other
+> components still sending SIGUSR1 to obexd which might kill it, maybe I
+> can just reintroduce SIGUSR1 and then have a config option saying
+> which method to use for usb cable detection. What do you guys think?
 
-    I am in the process of writing a device driver for a consumer-grade
-Bluetooth EEG headset which presents packets of information through a
-serial protocol, transmitting data packets at 512 Hz. The code is being
-written in Python using the Pyserial module and has been verified to
-work reliably when executed on the Windows platform.
+Well, I just tested the dbus method on the n900 with an obexd 0.29 
+(including the updates I already posted here plus a few other updates
+including a basic IRMC server implementation) and pcsuite seems to 
+work fine. But I did not test extensively (contact/calendar download
+work file and file browsing too).
 
-    However under Linux, the device frequently hangs within 5 seconds of
-attempting to read the data stream.
+I don't know if there are other tools using signalling to obexd, maybe
+people from the nokia n900/maemo group can tell...
 
-    This occurs whether through my code (which is platform agnostic) or
-simply cat'ing the RFCOMM device from a console (both in normal and raw
-mode).
-
-    I have tested this hardware using three different Bluetooth adapters
-on six different systems running three different Linux distributions on
-two different processor architectures, all with the same results:
-
-Windows XP: Works without error
-
-Windows Vista: Works without error
-
-Fedora 12 (x86): Fails on two different systems running the same/latest
-software updates available
-    bluez-4.58-1.fc12.i686
-    kernel 2.6.32.16-141.fc12.i686.PAE
-
-Fedora 13 (x86): Fails
-    bluez-4.64.1.fc13.i686
-    kernel 2.6.33.6-147.fc13.i686.PAE
-
-Maemo 5 (ARM): Fails
-    bluez 4.60-0maemo1.5+0m5
-    kernel 2.6.28-omap1
-
-
-    Under Linux, I am connecting to my device with the following
-command:
-
-rfcomm connect rfcomm0 XX:XX:XX:XX:XX:XX 3
-
-
-    I connect on the third channel because the first channel is also a
-serial port but is used for operating the headset as a hands-free device
-for connecting to a mobile phone or VOIP application. The second channel
-does not respond.
-
-
-    If I simply run:
-
-cat /dev/rfcomm0
-
-
-    I will get packet bytes dumped to the console for 2 seconds or so,
-then the device hangs until I disconnect (sometimes requiring "rfcomm
-release /dev/rfcomm0" or power cycling the device).
-
-    When running through my code I am careful to set the baud rate and
-similar parameters exactly as described in the device documentation. The
-portion of the code which reads from the device executes in a separate
-thread from the processing of the data within the packets, so there
-should be no issues regards a buffer under-run or similar (and I have
-also tested code which simple reads from the device and prints bytes to
-the console as the sole process in the main thread). The same result
-occurs however, I might receive packets for 2-5 seconds, then the device
-(or at least the Bluetooth connection) hangs.
-
-    If I connect to the device using rfcomm in "raw" mode ("-r") then
-the system itself will actually hang along with the device, requiring a
-complete power-cycle of my test machine as well to fully recover.
-
-    On very rare occasions I have managed to access the stream past the
-first several seconds, in which case the device will continue to operate
-quite happily for an hour or more without interruption. This is without
-changes to code or connection procedure.
-
-
-    I am at a complete loss as to how to proceed next with further
-debugging. Granted I am coding in Python which is perhaps one layer
-removed from the hardware versus coding in C, but the identical code and
-modules work without issue under Windows on multiple systems.
-
-    Can anyone please offer me some pointers or directions to explore?
-
-    I am happy to produce any sort of relevant kernel or Bluetooth
-device debug logs if they might prove relevant (though I would
-appreciate a link to a document or procedure explaining a preferred
-method for collecting such data).
-
-
-Cheers
-
-
-Steve Castellotti
-
-
-
+-Marcel
+-- 
+     ======--------         Marcel J.E. Mol                MESA Consulting B.V.
+    =======---------        ph. +31-(0)6-54724868          P.O. Box 112
+    =======---------        marcel@mesa.nl                 2630 AC  Nootdorp
+__==== www.mesa.nl ---____U_n_i_x______I_n_t_e_r_n_e_t____ The Netherlands ____
+ They couldn't think of a number,           Linux user 1148  --  counter.li.org
+    so they gave me a name!  -- Rupert Hine  --  www.ruperthine.com
