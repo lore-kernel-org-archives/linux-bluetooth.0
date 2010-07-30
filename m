@@ -1,58 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4C52CFDC.9070907@nokia.com>
-Date: Fri, 30 Jul 2010 16:13:00 +0300
-From: Ville Tervo <ville.tervo@nokia.com>
+Message-ID: <4C52A995.8080205@hschmitt.de>
+Date: Fri, 30 Jul 2010 12:29:41 +0200
+From: Harald Schmitt <linux@hschmitt.de>
 MIME-Version: 1.0
-To: "ext Gustavo F. Padovan" <gustavo@padovan.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>
-Subject: Re: [PATCH] Bluetooth: Don't send RFC for Basic Mode if only it is
- supported
-References: <4C5020D7.7080005@nokia.com> <1280426444-20469-1-git-send-email-gustavo@padovan.org>
-In-Reply-To: <1280426444-20469-1-git-send-email-gustavo@padovan.org>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+To: "Marcel J.E. Mol" <marcel@mesa.nl>
+CC: linux-bluetooth@vger.kernel.org,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: Re: obexd 0.29 and N900 PC Suite
+References: <4C4EC2B5.2030204@xxxxxxxxxxx> <AANLkTi=WSgMe86k-h=_HdzsPTZ=rK5ab5O9mYf8C6jnc@xxxxxxxxxxxxxx> <20100729181649.GA9339@joshua.mesa.nl>
+In-Reply-To: <20100729181649.GA9339@joshua.mesa.nl>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-On 07/29/2010 09:00 PM, ext Gustavo F. Padovan wrote:
-> From: Gustavo F. Padovan<padovan@profusion.mobi>
+Am 29.07.2010 20:16, schrieb Marcel J.E. Mol:
+> On Thu, Jul 29, 2010 at 05:36:48PM +0200, Harald Schmitt wrote:
+>> Hi,
+>>
+>> Am 27.07.2010 15:03, schrieb Luiz Augusto von Dentz:
+>>
+>>      Hi,
+>>
+>>      On Tue, Jul 27, 2010 at 2:27 PM, Harald Schmitt<linux@xxxxxxxxxxx>   wrote:
+>>
+>>          Hi,
+>>
+>>          there are several users who test obexd 0.29 on the Nokia N900 running Maemo
+>>          in order to have PBAP support. There are success reports with PBAP, but at
+>>          the same time they cannot usb sync via Nokia PC Suite anymore. Is there any
+>>          chance to get PC Suite working again in a future obexd version or does this
+>>          depend on a non free Nokia code?
+>>          Can you give any hints where to look at?
+>>          In a forum a user posted success (with 0.19) and failure (with 0.29) logs:
+>>          http://talk.maemo.org/showthread.php?p=763550#post763550
+>>
+>>      First thanks a lot for this feedback, I wasn't aware that there were
+>>      somebody trying to use newer version of obexd in N900, I will take a
+>>      look how I can make usb compatible with N900, actually it should be
+>>      just as bluetooth and work no matter which platform you are using but
+>>      we are not there yet :(
+>>
+>>      In the meantime you can try reverting the patch bellow and see if it helps:
+>>
+>>      http://git.kernel.org/?p=bluetooth/obexd.git;a=commitdiff;h=6f56a4355585eb29535782f977ba545cc41dd382
+>>
+>> Thanks for the hint. I built a package from 0.29, the patches from meego.gitorious.org and the reverted patch. Some from the community tested it and PC Suite via USB did work. Of course obexd had to be started with the added option "--capability !/usr/bin/gen-obex-capability.sh".
+>>
 >
-> If the remote side doesn't support Enhanced Retransmission Mode neither
-> Streaming Mode, we shall not send the RFC option.
-> Some devices that only supports Basic Mode do not understanding the RFC
-> option. This patch fix the regression found with that devices.
+> It seems the patch revert a conversion from unix signaling to dbus signaling.
+> The pcsuite-enable.sh script uses a unix signal to tell obexd a pcsuite
+> connection is requested.
+> Apperantly in meego this will be done using dbus..
+>
+> Can't we convert pcsuite-enable.sh to also use dbus instead of reverting
+> the patch?  Can you help us out her Luiz?
+>
+I have testes following command and it seems to work:
+dbus-send --system --type=signal / com.meego.usb_moded.sig_usb_state_ind 
+string:'ovi_suite'
+If one would just add this line to pcsuite-enable.sh under the SIGUSR1 
+then both types of obexd would work?
+Luiz could you confirm this? Do we also need a dbus-command for 
+disconnect with string:'USB disconnected' in pcsuite-disable.sh?
 
-
-Yes this is better. After some research i found out that quite many old 
-devices are not handling properly unknown options.
-
-However I found another regression. And this kind of patch is needed 
-also. Otherwise the info rsp code is reading feat_mask from failed 
-response (and does invalid memory access).
-
-
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 0f34e12..1e174a4 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -3348,6 +3348,13 @@ static inline int l2cap_information_rsp(struct 
-l2cap_conn *conn, struct l2cap_cm
-
-         del_timer(&conn->info_timer);
-
-+       if (result != L2CAP_IR_SUCCESS) {
-+               conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_DONE;
-+               conn->info_ident = 0;
-+               l2cap_conn_start(conn);
-+               return 0;
-+       }
-+
-         if (type == L2CAP_IT_FEAT_MASK) {
-                 conn->feat_mask = get_unaligned_le32(rsp->data);
-
-
-
--- 
-Ville
+--
+Harald
