@@ -3,57 +3,57 @@ From: Inga Stotland <ingas@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: rshaffer@codeaurora.org, johan.hedberg@gmail.com,
 	marcel@holtmann.org, Inga Stotland <ingas@codeaurora.org>
-Subject: [PATCH 2/4] Use defines for the default values of txwin_size and max_transmit.
-Date: Fri, 30 Jul 2010 11:30:24 -0700
-Message-Id: <1280514626-22559-3-git-send-email-ingas@codeaurora.org>
+Subject: [PATCH 1/4] Constants for L2CAP and AMP extensions
+Date: Fri, 30 Jul 2010 11:30:23 -0700
+Message-Id: <1280514626-22559-2-git-send-email-ingas@codeaurora.org>
 In-Reply-To: <1280514626-22559-1-git-send-email-ingas@codeaurora.org>
 References: <1280514626-22559-1-git-send-email-ingas@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- test/l2test.c |   13 +++++++------
- 1 files changed, 7 insertions(+), 6 deletions(-)
+ lib/l2cap.h |   14 ++++++++++++++
+ 1 files changed, 14 insertions(+), 0 deletions(-)
 
-diff --git a/test/l2test.c b/test/l2test.c
-index 0bb46f3..361f80c 100644
---- a/test/l2test.c
-+++ b/test/l2test.c
-@@ -76,10 +76,10 @@ static int omtu = 0;
- static int fcs = 0x01;
+diff --git a/lib/l2cap.h b/lib/l2cap.h
+index e59cfdd..2f1084c 100644
+--- a/lib/l2cap.h
++++ b/lib/l2cap.h
+@@ -35,6 +35,8 @@ extern "C" {
+ /* L2CAP defaults */
+ #define L2CAP_DEFAULT_MTU	672
+ #define L2CAP_DEFAULT_FLUSH_TO	0xFFFF
++#define L2CAP_DEFAULT_TX_WINDOW	63
++#define L2CAP_DEFAULT_MAX_TX	3
  
- /* Default Transmission Window */
--static int txwin_size = 63;
-+static int txwin_size = L2CAP_DEFAULT_TX_WINDOW;
+ /* L2CAP socket address */
+ struct sockaddr_l2 {
+@@ -44,6 +46,12 @@ struct sockaddr_l2 {
+ 	unsigned short	l2_cid;
+ };
  
--/* Default Max Transmission */
--static int max_transmit = 3;
-+/* Default Max Transmission (number of retries per packet) */
-+static int max_transmit = L2CAP_DEFAULT_MAX_TX;
++/* L2CAP fixed channel CIDs */
++#define L2CAP_SIGNAL_CHAN_CID		0x0001
++#define L2CAP_CONNECTIONLESS_CID	0x0002
++#define L2CAP_AMP_MGR_CID		0x0003
++#define L2CAP_AMP_TEST_CID		0x003F
++
+ /* L2CAP socket options */
+ #define L2CAP_OPTIONS	0x01
+ struct l2cap_options {
+@@ -69,6 +77,12 @@ struct l2cap_conninfo {
+ #define L2CAP_LM_TRUSTED	0x0008
+ #define L2CAP_LM_RELIABLE	0x0010
+ #define L2CAP_LM_SECURE		0x0020
++#define L2CAP_LM_FLUSHABLE	0x0040
++
++#define L2CAP_AMP	0x04
++#define L2CAP_AMP_REQUIRE_BR_EDR	0x01
++#define L2CAP_AMP_PREFER_AMP		0x02
++#define L2CAP_AMP_PREFER_BR_EDR	0x03
  
- /* Default data size */
- static long data_size = -1;
-@@ -1073,8 +1073,8 @@ static void usage(void)
- 		"\t[-D milliseconds] delay after sending num frames (default = 0)\n"
- 		"\t[-X mode] select retransmission/flow-control mode\n"
- 		"\t[-F fcs] use CRC16 check (default = 1)\n"
--		"\t[-Q num] Max Transmit value (default = 3)\n"
--		"\t[-Z size] Transmission Window size (default = 63)\n"
-+		"\t[-Q num] Max Transmit value (default = %d)\n"
-+		"\t[-Z size] Transmission Window size (default = %d)\n"
- 		"\t[-R] reliable mode\n"
- 		"\t[-G] use connectionless channel (datagram)\n"
- 		"\t[-U] use sock stream\n"
-@@ -1082,7 +1082,8 @@ static void usage(void)
- 		"\t[-E] request encryption\n"
- 		"\t[-S] secure connection\n"
- 		"\t[-M] become master\n"
--		"\t[-T] enable timestamps\n");
-+		"\t[-T] enable timestamps\n",
-+		L2CAP_DEFAULT_MAX_TX, L2CAP_DEFAULT_TX_WINDOW);
- }
- 
- int main(int argc, char *argv[])
+ /* L2CAP command codes */
+ #define L2CAP_COMMAND_REJ	0x01
 -- 
 1.7.2
 
