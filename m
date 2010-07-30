@@ -3,180 +3,99 @@ From: Inga Stotland <ingas@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: rshaffer@codeaurora.org, johan.hedberg@gmail.com,
 	marcel@holtmann.org, Inga Stotland <ingas@codeaurora.org>
-Subject: [PATCH 4/4] Allow changing AMP vs BR/EDR preference from stdin when connection is up.
-Date: Fri, 30 Jul 2010 11:30:26 -0700
-Message-Id: <1280514626-22559-5-git-send-email-ingas@codeaurora.org>
+Subject: [PATCH 3/4] Added command argument "-J" to indicate preference of using AMP vs BR/EDR.
+Date: Fri, 30 Jul 2010 11:30:25 -0700
+Message-Id: <1280514626-22559-4-git-send-email-ingas@codeaurora.org>
 In-Reply-To: <1280514626-22559-1-git-send-email-ingas@codeaurora.org>
 References: <1280514626-22559-1-git-send-email-ingas@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use the following keys:
-
-"a", "A" - prefer AMP;
-"b", "B" - prefer BR/EDR;
-"r", "R" - require BR/EDR
+Possible values: "require_br_edr", "prefer_amp", "prefer_br_edr"
 ---
- test/l2test.c |   87 +++++++++++++++++++++++++++++++++++++++++++++++++-------
- 1 files changed, 76 insertions(+), 11 deletions(-)
+ test/l2test.c |   34 +++++++++++++++++++++++++++++++++-
+ 1 files changed, 33 insertions(+), 1 deletions(-)
 
 diff --git a/test/l2test.c b/test/l2test.c
-index 377c12e..1f627a7 100644
+index 361f80c..377c12e 100644
 --- a/test/l2test.c
 +++ b/test/l2test.c
-@@ -191,6 +191,46 @@ static void hexdump(unsigned char *s, unsigned long l)
- 	}
- }
+@@ -81,6 +81,9 @@ static int txwin_size = L2CAP_DEFAULT_TX_WINDOW;
+ /* Default Max Transmission (number of retries per packet) */
+ static int max_transmit = L2CAP_DEFAULT_MAX_TX;
  
-+static void do_keys(int sk)
-+{
-+	struct pollfd p;
-+	int len;
-+	char c;
-+	int old_amp_pref = amp_pref;
++/* Default AMP preference */
++static int amp_pref = L2CAP_AMP_REQUIRE_BR_EDR;
 +
-+	p.fd = 0;
-+	p.events = POLLIN;
-+
-+	if (poll(&p, 1, 0)) {
-+		len = read(0, &c, 1);
-+		if (len < 0)
-+			return;
-+
-+		switch (c) {
-+		case 'A':
-+		case 'a':
-+			amp_pref = L2CAP_AMP_PREFER_AMP;
-+			break;
-+		case 'B':
-+		case 'b':
-+			amp_pref = L2CAP_AMP_PREFER_BR_EDR;
-+			break;
-+		case 'R':
-+		case 'r':
-+			amp_pref = L2CAP_AMP_REQUIRE_BR_EDR;
-+			break;
-+		default:
-+			return;
-+		}
-+
-+		setsockopt(sk, SOL_L2CAP, L2CAP_AMP, &amp_pref, sizeof(amp_pref));
-+		syslog(LOG_INFO, "AMP preference updated to %d (previously %d)",
-+			amp_pref, old_amp_pref);
+ /* Default data size */
+ static long data_size = -1;
+ static long buffer_size = 2048;
+@@ -295,6 +298,14 @@ static int do_connect(char *svr)
+ 		goto error;
+ 	}
+ 
++	/* Set AMP preference */
++	if ((rfcmode == L2CAP_MODE_ERTM || rfcmode == L2CAP_MODE_STREAMING) &&
++		setsockopt(sk, SOL_L2CAP, L2CAP_AMP, &amp_pref, sizeof(amp_pref)) < 0) {
++		syslog(LOG_ERR, "Can't set L2CAP AMP preference: %s (%d)",
++							strerror(errno), errno);
++		goto error;
 +	}
 +
-+	return;
-+}
-+
- static int do_connect(char *svr)
- {
- 	struct sockaddr_l2 addr;
-@@ -584,11 +624,17 @@ static void dump_mode(int sk)
- 		fd_set rset;
+ 	/* Get current options */
+ 	memset(&opts, 0, sizeof(opts));
+ 	optlen = sizeof(opts);
+@@ -458,6 +469,14 @@ static void do_listen(void (*handler)(int sk))
+ 		/* Child */
+ 		close(sk);
  
- 		FD_ZERO(&rset);
-+		FD_SET(0, &rset);
- 		FD_SET(sk, &rset);
- 
- 		if (select(sk + 1, &rset, NULL, NULL, NULL) < 0)
- 			return;
- 
-+		if (FD_ISSET(0, &rset)) {
-+			do_keys(sk);
-+			continue;
++		/* Set AMP preference */
++		if ((rfcmode == L2CAP_MODE_ERTM || rfcmode == L2CAP_MODE_STREAMING) &&
++			setsockopt(nsk, SOL_L2CAP, L2CAP_AMP, &amp_pref, sizeof(amp_pref)) < 0) {
++			syslog(LOG_ERR, "Can't set L2CAP AMP preference: %s (%d)",
++				   strerror(errno), errno);
++			goto error;
 +		}
 +
- 		if (!FD_ISSET(sk, &rset))
- 			continue;
+ 		/* Get current options */
+ 		memset(&opts, 0, sizeof(opts));
+ 		optlen = sizeof(opts);
+@@ -1075,6 +1094,8 @@ static void usage(void)
+ 		"\t[-F fcs] use CRC16 check (default = 1)\n"
+ 		"\t[-Q num] Max Transmit value (default = %d)\n"
+ 		"\t[-Z size] Transmission Window size (default = %d)\n"
++		"\t[-J amp] declare amp preference\n"
++		"\t         (require_br_edr, prefer_amp, prefer_br_edr)\n"
+ 		"\t[-R] reliable mode\n"
+ 		"\t[-G] use connectionless channel (datagram)\n"
+ 		"\t[-U] use sock stream\n"
+@@ -1093,7 +1114,7 @@ int main(int argc, char *argv[])
  
-@@ -620,7 +666,7 @@ static void dump_mode(int sk)
- static void recv_mode(int sk)
- {
- 	struct timeval tv_beg, tv_end, tv_diff;
--	struct pollfd p;
-+	struct pollfd p[2];
- 	char ts[30];
- 	long total;
- 	uint32_t seq;
-@@ -643,8 +689,11 @@ static void recv_mode(int sk)
+ 	bacpy(&bdaddr, BDADDR_ANY);
  
- 	memset(ts, 0, sizeof(ts));
- 
--	p.fd = sk;
--	p.events = POLLIN | POLLERR | POLLHUP;
-+	p[0].fd = sk;
-+	p[0].events = POLLIN | POLLERR | POLLHUP;
-+
-+	p[1].fd = 0;
-+	p[1].events = POLLIN;
- 
- 	seq = 0;
- 	while (1) {
-@@ -655,13 +704,19 @@ static void recv_mode(int sk)
- 			uint16_t l;
- 			int i;
- 
--			p.revents = 0;
--			if (poll(&p, 1, -1) <= 0)
-+			p[0].revents = 0;
-+			p[1].revents = 0;
-+			if (poll(p, 2, -1) <= 0)
- 				return;
- 
--			if (p.revents & (POLLERR | POLLHUP))
-+			if (p[0].revents & (POLLERR | POLLHUP))
- 				return;
- 
-+			if (p[1].revents & POLLIN) {
-+				do_keys(sk);
-+				continue;
-+			}
-+
- 			len = recv(sk, buf, data_size, 0);
- 			if (len < 0) {
- 				if (reliable && (errno == ECOMM)) {
-@@ -780,6 +835,8 @@ static void do_send(int sk)
- 
- 			sent += len;
- 			size -= len;
-+
-+			do_keys(sk);
- 		}
- 
- 		if (num_frames && delay && count && !(seq % count))
-@@ -831,19 +888,27 @@ static void reconnect_mode(char *svr)
- 
- static void connect_mode(char *svr)
- {
--	struct pollfd p;
-+	struct pollfd p[2];
- 	int sk;
- 
- 	if ((sk = do_connect(svr)) < 0)
- 		exit(1);
- 
--	p.fd = sk;
--	p.events = POLLERR | POLLHUP;
-+	p[0].fd = sk;
-+	p[0].events = POLLERR | POLLHUP;
-+
-+	p[1].fd = 0;
-+	p[1].events = POLLIN;
- 
- 	while (1) {
--		p.revents = 0;
--		if (poll(&p, 1, 500))
-+		p[0].revents = 0;
-+		p[1].revents = 0;
-+		if (poll(p, 2, 500) < 0)
-+			break;
-+		if (p[0].revents & (POLLERR | POLLHUP))
+-	while ((opt=getopt(argc,argv,"rdscuwmntqxyzpb:i:P:I:O:B:N:L:W:C:D:X:F:Q:Z:RUGAESMT")) != EOF) {
++	while ((opt=getopt(argc,argv,"rdscuwmntqxyzpb:i:P:I:O:B:N:L:W:C:D:X:F:Q:Z:J:RUGAESMT")) != EOF) {
+ 		switch(opt) {
+ 		case 'r':
+ 			mode = RECV;
+@@ -1217,6 +1238,17 @@ int main(int argc, char *argv[])
+ 			fcs = atoi(optarg);
  			break;
-+		if (p[1].revents & POLLIN)
-+			do_keys(sk);
- 	}
  
- 	syslog(LOG_INFO, "Disconnected");
++		case 'J':
++			if (strcasecmp(optarg, "require_br_edr") == 0)
++				amp_pref = L2CAP_AMP_REQUIRE_BR_EDR;
++			else if (strcasecmp(optarg, "prefer_amp") == 0)
++				amp_pref = L2CAP_AMP_PREFER_AMP;
++			else if (strcasecmp(optarg, "prefer_br_edr") == 0)
++				amp_pref = L2CAP_AMP_PREFER_BR_EDR;
++			else
++				perror("Bad AMP preference");
++			break;
++
+ 		case 'R':
+ 			reliable = 1;
+ 			break;
 -- 
 1.7.2
 
