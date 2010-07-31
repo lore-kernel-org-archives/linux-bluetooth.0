@@ -1,46 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] bluetooth: Use list_head for hci blacklist head.
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: David Miller <davem@davemloft.net>, linux-bluetooth@vger.kernel.org
-In-Reply-To: <20100731173259.GA1661@jh-x301>
-References: <20100730.215449.226772568.davem@davemloft.net>
-	 <1280592977.12579.1.camel@localhost.localdomain>
-	 <20100731173259.GA1661@jh-x301>
-Content-Type: text/plain; charset="UTF-8"
-Date: Sat, 31 Jul 2010 16:08:34 -0700
-Message-ID: <1280617714.12579.2.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: "Gustavo F. Padovan" <gfpadovan@gmail.com>
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>
+Subject: [PATCH] Bluetooth: Remove __exit from rfcomm_cleanup_ttys()
+Date: Sat, 31 Jul 2010 19:57:05 -0300
+Message-Id: <1280617025-4001-1-git-send-email-gustavo@padovan.org>
+In-Reply-To: <alpine.DEB.2.00.1007301330030.5809@linux-sea-02>
+References: <alpine.DEB.2.00.1007301330030.5809@linux-sea-02>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Gustavo F. Padovan <padovan@profusion.mobi>
 
-> > > The bdaddr in the list root is completely unused and just
-> > > taking up space.
-> > > 
-> > > Signed-off-by: David S. Miller <davem@davemloft.net>
-> > 
-> > looks fine to me.
-> > 
-> > Acked-by: Marcel Holtmann <marcel@holtmann.org>
-> > 
-> > in case you wanna add it directly to net-next-2.6 tree.
-> > 
-> > Johan, wanna do a quick test-run of this patch and add Tested-by.
-> 
-> Seems to work fine.
-> 
-> Tested-by: Johan Hedberg <johan.hedberg@nokia.com>
+rfcomm_cleanup_ttys() is also called from rfcomm_init(), so it can't have
+__exit.
 
-thanks.
+Reported-by: Mat Martineau <mathewm@codeaurora.org>
+Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+---
+ net/bluetooth/rfcomm/tty.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-Dave, I have put the patch into my tree now and will send it to John
-shortly. I think it is better that way for the Bluetooth 3.0 guys that
-are rebasing against wireless-next-2.6.
-
-Regards
-
-Marcel
-
-
+diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+index 026205c..befc3a5 100644
+--- a/net/bluetooth/rfcomm/tty.c
++++ b/net/bluetooth/rfcomm/tty.c
+@@ -1183,7 +1183,7 @@ int __init rfcomm_init_ttys(void)
+ 	return 0;
+ }
+ 
+-void __exit rfcomm_cleanup_ttys(void)
++void rfcomm_cleanup_ttys(void)
+ {
+ 	tty_unregister_driver(rfcomm_tty_driver);
+ 	put_tty_driver(rfcomm_tty_driver);
+-- 
+1.7.1.1
