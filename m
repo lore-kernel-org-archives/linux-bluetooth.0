@@ -1,31 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: Remove __exit from rfcomm_cleanup_ttys()
+Subject: Re: [PATCH] bluetooth: Use list_head for hci blacklist head.
 From: Marcel Holtmann <marcel@holtmann.org>
-To: "Gustavo F. Padovan" <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>
-In-Reply-To: <1280617025-4001-1-git-send-email-gustavo@padovan.org>
-References: <alpine.DEB.2.00.1007301330030.5809@linux-sea-02>
-	 <1280617025-4001-1-git-send-email-gustavo@padovan.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: David Miller <davem@davemloft.net>, linux-bluetooth@vger.kernel.org
+In-Reply-To: <20100731173259.GA1661@jh-x301>
+References: <20100730.215449.226772568.davem@davemloft.net>
+	 <1280592977.12579.1.camel@localhost.localdomain>
+	 <20100731173259.GA1661@jh-x301>
 Content-Type: text/plain; charset="UTF-8"
-Date: Sat, 31 Jul 2010 16:10:06 -0700
-Message-ID: <1280617806.12579.3.camel@localhost.localdomain>
+Date: Sat, 31 Jul 2010 16:08:34 -0700
+Message-ID: <1280617714.12579.2.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Johan,
 
-> rfcomm_cleanup_ttys() is also called from rfcomm_init(), so it can't have
-> __exit.
+> > > The bdaddr in the list root is completely unused and just
+> > > taking up space.
+> > > 
+> > > Signed-off-by: David S. Miller <davem@davemloft.net>
+> > 
+> > looks fine to me.
+> > 
+> > Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> > 
+> > in case you wanna add it directly to net-next-2.6 tree.
+> > 
+> > Johan, wanna do a quick test-run of this patch and add Tested-by.
 > 
-> Reported-by: Mat Martineau <mathewm@codeaurora.org>
-> Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
-> ---
->  net/bluetooth/rfcomm/tty.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+> Seems to work fine.
+> 
+> Tested-by: Johan Hedberg <johan.hedberg@nokia.com>
 
-patch has been applied. Thanks.
+thanks.
+
+Dave, I have put the patch into my tree now and will send it to John
+shortly. I think it is better that way for the Bluetooth 3.0 guys that
+are rebasing against wireless-next-2.6.
 
 Regards
 
