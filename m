@@ -1,30 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-From: Inga Stotland <ingas@codeaurora.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: rshaffer@codeaurora.org,
-	johan.hedberg@gmail.com,
-	marcel@holtmann.org
-Subject: [PATCH v5 0/6] Enhanced support for extended inquiry response 
-Date: Sat, 31 Jul 2010 04:45:06 -0700
-Message-Id: <1280576713-1398-1-git-send-email-ingas@codeaurora.org>
+Date: Sat, 31 Jul 2010 19:24:14 -0700 (PDT)
+Message-Id: <20100731.192414.116389214.davem@davemloft.net>
+To: marcel@holtmann.org
+Cc: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] bluetooth: Use list_head for hci blacklist head.
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <1280617714.12579.2.camel@localhost.localdomain>
+References: <1280592977.12579.1.camel@localhost.localdomain>
+	<20100731173259.GA1661@jh-x301>
+	<1280617714.12579.2.camel@localhost.localdomain>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-EIR needs to be updated whenever local SDP record database changes.
-Previously, when an SDP record was added/removed/updated, EIR would 
-be written in callback fired off HCI "Command Complete" event set off by
-"Write Class Of Device" command. However, if the class of device did not
-need to be updated, the EIR write was not happening either. This
-implementation has been augmented to write new EIR when modification
-in SDP database does not lead to updating of class of device.
+From: Marcel Holtmann <marcel@holtmann.org>
+Date: Sat, 31 Jul 2010 16:08:34 -0700
 
-Added support for UUID128 service descriptors in local EIR. 
+> Dave, I have put the patch into my tree now and will send it to John
+> shortly. I think it is better that way for the Bluetooth 3.0 guys that
+> are rebasing against wireless-next-2.6.
 
-Service UUIDs are written to "device properties" dictionary  when emitting
-"Device Found" signal. This allows peek at available services offered by 
-a remote device without establishing SDP connection.
-
-
--- 
-Inga Stotland
-Sent by an employee of the Qualcomm Innovation Center, Inc.
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
+Sounds great.
