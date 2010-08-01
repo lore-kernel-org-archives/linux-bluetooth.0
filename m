@@ -1,5 +1,5 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 04/11] pcmcia: do not use io_req_t after call to
+Subject: Re: [PATCH 05/11] pcmcia: do not use io_req_t when calling
  pcmcia_request_io()
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Dominik Brodowski <linux@dominikbrodowski.net>
@@ -7,21 +7,25 @@ Cc: linux-pcmcia@lists.infradead.org, netdev@vger.kernel.org,
 	linux-wireless@vger.kernel.org, linux-ide@vger.kernel.org,
 	linux-usb@vger.kernel.org, laforge@gnumonks.org,
 	linux-mtd@lists.infradead.org, linux-bluetooth@vger.kernel.org,
-	alsa-devel@alsa-project.org, linux-serial@vger.kernel.org
-In-Reply-To: <1280667550-3040-4-git-send-email-linux@dominikbrodowski.net>
+	alsa-devel@alsa-project.org, linux-serial@vger.kernel.org,
+	Michael Buesch <mb@bu3sch.de>
+In-Reply-To: <1280667550-3040-5-git-send-email-linux@dominikbrodowski.net>
 References: <20100801125749.GA2564@comet.dominikbrodowski.net>
-	 <1280667550-3040-4-git-send-email-linux@dominikbrodowski.net>
+	 <1280667550-3040-5-git-send-email-linux@dominikbrodowski.net>
 Content-Type: text/plain; charset="UTF-8"
-Date: Sun, 01 Aug 2010 11:04:43 -0700
-Message-ID: <1280685883.12579.8.camel@localhost.localdomain>
+Date: Sun, 01 Aug 2010 11:04:37 -0700
+Message-ID: <1280685877.12579.7.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Dominik,
 
-> After pcmcia_request_io(), do not make use of the values stored in
-> io_req_t, but instead use those found in struct pcmcia_device->resource[].
+> Instead of io_req_t, drivers are now requested to fill out
+> struct pcmcia_device *p_dev->resource[0,1] for up to two ioport
+> ranges. After a call to pcmcia_request_io(), the ports found there
+> are reserved, after calling pcmcia_request_configuration(), they may
+> be used.
 > 
 > CC: netdev@vger.kernel.org
 > CC: linux-wireless@vger.kernel.org
@@ -32,6 +36,7 @@ Hi Dominik,
 > CC: linux-bluetooth@vger.kernel.org
 > CC: alsa-devel@alsa-project.org
 > CC: linux-serial@vger.kernel.org
+> CC: Michael Buesch <mb@bu3sch.de>
 > Signed-off-by: Dominik Brodowski <linux@dominikbrodowski.net>
 
 for the drivers/bluetooth/ pieces.
