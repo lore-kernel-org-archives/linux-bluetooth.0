@@ -1,58 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-From: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
-Date: Mon, 2 Aug 2010 06:23:22 +0900
-Message-ID: <AANLkTimcf8nmrad8BP8aLw4OefAr1vNZANNRf7rPMrrG@mail.gmail.com>
-Subject: [PATCH] bluetooth: Add support Bluetooth controller of Macbook Pro
-	6,2 and 7,1
-To: linux-bluetooth@vger.kernel.org
-Cc: stable@kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCH 04/11] pcmcia: do not use io_req_t after call to
+ pcmcia_request_io()
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Dominik Brodowski <linux@dominikbrodowski.net>
+Cc: linux-pcmcia@lists.infradead.org, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-usb@vger.kernel.org, laforge@gnumonks.org,
+	linux-mtd@lists.infradead.org, linux-bluetooth@vger.kernel.org,
+	alsa-devel@alsa-project.org, linux-serial@vger.kernel.org
+In-Reply-To: <1280667550-3040-4-git-send-email-linux@dominikbrodowski.net>
+References: <20100801125749.GA2564@comet.dominikbrodowski.net>
+	 <1280667550-3040-4-git-send-email-linux@dominikbrodowski.net>
+Content-Type: text/plain; charset="UTF-8"
+Date: Sun, 01 Aug 2010 11:04:43 -0700
+Message-ID: <1280685883.12579.8.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Bluetooth controller of Macbook Pro 6,2 and 7,1 does not work.
-Because Device Class of these controllers was set 255 (Vendor Sepecific Class).
+Hi Dominik,
 
-Macbook Pro 7,1 :
-Bus 004 Device 005: ID 05ac:8213 Apple, Inc.
-Device Descriptor:
-  bLength                18
-  bDescriptorType         1
-  bcdUSB               2.00
-  bDeviceClass          255 Vendor Specific Class
-  bDeviceSubClass         1
-  bDeviceProtocol         1
-  bMaxPacketSize0        64
-  idVendor           0x05ac Apple, Inc.
-  idProduct          0x8213
-  bcdDevice            1.86
-  iManufacturer           1 Apple Inc.
-  iProduct                2 Bluetooth USB Host Controller
-  iSerial                 3 5C5948C81B99
-  bNumConfigurations      1
+> After pcmcia_request_io(), do not make use of the values stored in
+> io_req_t, but instead use those found in struct pcmcia_device->resource[].
+> 
+> CC: netdev@vger.kernel.org
+> CC: linux-wireless@vger.kernel.org
+> CC: linux-ide@vger.kernel.org
+> CC: linux-usb@vger.kernel.org
+> CC: laforge@gnumonks.org
+> CC: linux-mtd@lists.infradead.org
+> CC: linux-bluetooth@vger.kernel.org
+> CC: alsa-devel@alsa-project.org
+> CC: linux-serial@vger.kernel.org
+> Signed-off-by: Dominik Brodowski <linux@dominikbrodowski.net>
 
-Signed-off-by: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
----
- drivers/bluetooth/btusb.c |    6 ++++++
- 1 files changed, 6 insertions(+), 0 deletions(-)
+for the drivers/bluetooth/ pieces.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 5d9cc53..00a6639 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -75,6 +75,12 @@ static struct usb_device_id btusb_table[] = {
- 	/* Canyon CN-BTU1 with HID interfaces */
- 	{ USB_DEVICE(0x0c10, 0x0000) },
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-+	/* Apple MacBookPro 6,2 */
-+	{ USB_DEVICE(0x05ac, 0x8218) },
-+
-+	/* Apple MacBookPro 7,2 */
-+	{ USB_DEVICE(0x05ac, 0x8213) },
-+
- 	{ }	/* Terminating entry */
- };
+Regards
 
--- 
-1.7.1
+Marcel
+
+
