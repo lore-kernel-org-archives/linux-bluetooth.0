@@ -1,158 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Zhang, Zhenhua" <zhenhua.zhang@intel.com>
-To: "Gustavo F. Padovan" <gustavo@padovan.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 2 Aug 2010 08:20:56 +0800
-Subject: RE: [PATCH 1/6] bluetooth: Add reference count for bluetooth utils
-Message-ID: <33AB447FBD802F4E932063B962385B3528D47C25@shsmsx501.ccr.corp.intel.com>
-References: <1280387901-8581-1-git-send-email-zhenhua.zhang@intel.com>
- <1280387901-8581-2-git-send-email-zhenhua.zhang@intel.com>
- <20100731232506.GC29039@vigoh>
-In-Reply-To: <20100731232506.GC29039@vigoh>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Subject: Re: [PATCH] bluetooth: Add support Bluetooth controller of Macbook
+ Pro  6,2 and 7,1
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
+Cc: linux-bluetooth@vger.kernel.org, stable@kernel.org
+In-Reply-To: <AANLkTimcf8nmrad8BP8aLw4OefAr1vNZANNRf7rPMrrG@mail.gmail.com>
+References: <AANLkTimcf8nmrad8BP8aLw4OefAr1vNZANNRf7rPMrrG@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Sun, 01 Aug 2010 16:47:46 -0700
+Message-ID: <1280706466.12579.11.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Padovan,
+Hi Nobuhiro,
 
-Gustavo F. Padovan wrote:
-> Hi Zhenhua,
+> Bluetooth controller of Macbook Pro 6,2 and 7,1 does not work.
+> Because Device Class of these controllers was set 255 (Vendor Sepecific Class).
 > 
-> * Zhenhua Zhang <zhenhua.zhang@intel.com> [2010-07-29 15:18:16 +0800]:
+> Macbook Pro 7,1 :
+> Bus 004 Device 005: ID 05ac:8213 Apple, Inc.
+> Device Descriptor:
+>   bLength                18
+>   bDescriptorType         1
+>   bcdUSB               2.00
+>   bDeviceClass          255 Vendor Specific Class
+>   bDeviceSubClass         1
+>   bDeviceProtocol         1
+>   bMaxPacketSize0        64
+>   idVendor           0x05ac Apple, Inc.
+>   idProduct          0x8213
+>   bcdDevice            1.86
+>   iManufacturer           1 Apple Inc.
+>   iProduct                2 Bluetooth USB Host Controller
+>   iSerial                 3 5C5948C81B99
+>   bNumConfigurations      1
+
+I prefer the details of /proc/bus/usb/devices or usb-devices.sh script.
+And I do prefer one patch with it for each MacBook.
+
+> Signed-off-by: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
+> ---
+>  drivers/bluetooth/btusb.c |    6 ++++++
+>  1 files changed, 6 insertions(+), 0 deletions(-)
 > 
->> Add bluetooth_ref()/bluetooth_unref() to support reference count in
->> bluetooth utils.
->> ---
->>  plugins/bluetooth.c |   62
->>  +++++++++++++++++++++++++++++++++++++-------------- 1 files
->> changed, 45 insertions(+), 17 deletions(-) 
->> 
->> diff --git a/plugins/bluetooth.c b/plugins/bluetooth.c
->> index 5a85eaa..10cc49d 100644
->> --- a/plugins/bluetooth.c
->> +++ b/plugins/bluetooth.c
->> @@ -39,6 +39,7 @@
->>  static DBusConnection *connection;
->>  static GHashTable *uuid_hash = NULL;
->>  static GHashTable *adapter_address_hash = NULL;
->> +static gint ref_count;
->> 
->>  void bluetooth_create_path(const char *dev_addr, const char
->> *adapter_addr,  				char *buf, int size) @@ -503,13 +504,10 @@
->>  static guint adapter_added_watch; static guint
->>  adapter_removed_watch; static guint property_watch;
->> 
->> -int bluetooth_register_uuid(const char *uuid, struct
->>  bluetooth_profile *profile) +static int bluetooth_init() {
->>  	int err;
->> 
->> -	if (uuid_hash)
->> -		goto done;
->> -
->>  	connection = ofono_dbus_get_connection();
->> 
->>  	bluetooth_watch = g_dbus_add_service_watch(connection,
->> BLUEZ_SERVICE, @@ -542,13 +540,6 @@ int
->>  	bluetooth_register_uuid(const char *uuid, struct bluetooth_profile
->> *profile) adapter_address_hash = g_hash_table_new_full(g_str_hash,
->> g_str_equal,  						g_free, g_free);  
->> 
->> -done:
->> -	g_hash_table_insert(uuid_hash, g_strdup(uuid), profile); -
->> -	bluetooth_send_with_reply("/", BLUEZ_MANAGER_INTERFACE,
->> "GetProperties", 
->> -				manager_properties_cb, NULL, NULL, -1,
->> -				DBUS_TYPE_INVALID);
->> -
->>  	return 0;
->> 
->>  remove:
->> @@ -556,14 +547,27 @@ remove:
->>  	g_dbus_remove_watch(connection, adapter_added_watch);
->>  	g_dbus_remove_watch(connection, adapter_removed_watch);
->>  	g_dbus_remove_watch(connection, property_watch);
->> +
->>  	return err;
->>  }
->> 
->> -void bluetooth_unregister_uuid(const char *uuid)
->> +static int bluetooth_ref()
->>  {
->> -	g_hash_table_remove(uuid_hash, uuid);
->> +	g_atomic_int_inc(&ref_count);
->> +
->> +	if (ref_count > 1)
->> +		return 0;
->> +
->> +	return bluetooth_init();
->> +}
->> +
->> +static void bluetooth_unref()
->> +{
->> +	gboolean is_zero;
->> +
->> +	is_zero = g_atomic_int_dec_and_test(&ref_count);
->> 
->> -	if (g_hash_table_size(uuid_hash))
->> +	if (is_zero == FALSE)
->>  		return;
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 5d9cc53..00a6639 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -75,6 +75,12 @@ static struct usb_device_id btusb_table[] = {
+>  	/* Canyon CN-BTU1 with HID interfaces */
+>  	{ USB_DEVICE(0x0c10, 0x0000) },
 > 
-> We can remove the is_zero variable, and test
-> g_atomic_int_dec_and_test() directly. What do you think?
+> +	/* Apple MacBookPro 6,2 */
+> +	{ USB_DEVICE(0x05ac, 0x8218) },
+> +
+> +	/* Apple MacBookPro 7,2 */
+> +	{ USB_DEVICE(0x05ac, 0x8213) },
+> +
+>  	{ }	/* Terminating entry */
+>  };
 
-Actually I think it's ok to keep this variable. We also have it in gatchat and gatppp.
+Please sort them along the entry for the iMac11,1 and make sure it is
+smaller PID first.
 
-Thanks,
-Zhenhua
+Regards
 
->> 
->>  	g_dbus_remove_watch(connection, bluetooth_watch);
->> @@ -571,9 +575,33 @@ void bluetooth_unregister_uuid(const char *uuid)
->>  	g_dbus_remove_watch(connection, adapter_removed_watch);
->>  	g_dbus_remove_watch(connection, property_watch);
->> 
->> -	g_hash_table_destroy(uuid_hash);
->> -	g_hash_table_destroy(adapter_address_hash);
->> -	uuid_hash = NULL;
->> +	if (uuid_hash)
->> +		g_hash_table_destroy(uuid_hash);
->> +
->> +	if (adapter_address_hash)
->> +		g_hash_table_destroy(adapter_address_hash);
->> +}
->> +
->> +int bluetooth_register_uuid(const char *uuid, struct
->> bluetooth_profile *profile) +{ +	int err = bluetooth_ref();
->> +
->> +	if (err != 0)
->> +		return err;
->> +
->> +	g_hash_table_insert(uuid_hash, g_strdup(uuid), profile); +
->> +	bluetooth_send_with_reply("/", BLUEZ_MANAGER_INTERFACE,
->> "GetProperties", +				manager_properties_cb, NULL, NULL, -1,
->> +				DBUS_TYPE_INVALID);
->> +	return 0;
->> +}
->> +
->> +void bluetooth_unregister_uuid(const char *uuid)
->> +{
->> +	g_hash_table_remove(uuid_hash, uuid);
->> +
->> +	bluetooth_unref();
->>  }
->> 
->>  OFONO_PLUGIN_DEFINE(bluetooth, "Bluetooth Utils Plugins", VERSION,
->> -- 
->> 1.7.0.4
->> 
->> --
->> To unsubscribe from this list: send the line "unsubscribe
->> linux-bluetooth" in 
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Marcel
 
 
-
-Regards,
-Zhenhua
