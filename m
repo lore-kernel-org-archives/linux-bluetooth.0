@@ -1,92 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Getting link quality or RSSI
+Subject: Re: [PATCH 0/8] Bluetooth: L2CAP updates for PSM validation and
+ ERTM.
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Davide Pesavento <davidepesa@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <AANLkTimrcSXZ-wTz7nmKCYtXjTEHY8FiPSiubRyfusxY@mail.gmail.com>
-References: <AANLkTimA4dnDeoZVX1N4c=2sR1JkgAFWb4d0-0K+8S1C@mail.gmail.com>
-	 <1280764595.12579.19.camel@localhost.localdomain>
-	 <AANLkTimQeQ-XoM5yuWQYx5_1-xWf1H0ax_J=BbtDfG2T@mail.gmail.com>
-	 <1280775482.12579.34.camel@localhost.localdomain>
-	 <AANLkTimrcSXZ-wTz7nmKCYtXjTEHY8FiPSiubRyfusxY@mail.gmail.com>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
+	rshaffer@codeaurora.org, linux-arm-msm@vger.kernel.org
+In-Reply-To: <alpine.DEB.2.00.1008021450290.18432@linux-sea-02>
+References: <1280776810-18213-1-git-send-email-mathewm@codeaurora.org>
+	 <1280778649.12579.50.camel@localhost.localdomain>
+	 <alpine.DEB.2.00.1008021450290.18432@linux-sea-02>
 Content-Type: text/plain; charset="UTF-8"
-Date: Mon, 02 Aug 2010 15:09:49 -0700
-Message-ID: <1280786989.12579.58.camel@localhost.localdomain>
+Date: Mon, 02 Aug 2010 15:09:00 -0700
+Message-ID: <1280786940.12579.57.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Davide,
+Hi Mat,
 
-> >> >> I'm writing an application to retrieve the current link quality (or
-> >> >> RSSI) between my laptop's Bluetooth adapter and a specific remote
-> >> >> device (my mobile phone). In order to do that I'm of course using the
-> >> >> latest version of BlueZ, but I've encountered several issues so far.
-> >> >>
-> >> >> The dbus API exposed by bluetoothd doesn't have any GetRSSI or
-> >> >> GetLinkQuality methods. Would it be possible to export these methods
-> >> >> in the public API?
-> >> >
-> >> > the link quality is vendor specific according to the specification and
-> >> > the RSSI of an existing connection is rather useless. So we don't bother
-> >> > to export those.
-> >> >
-> >>
-> >> Does this mean you're going to reject a patch which adds those methods
-> >> to the dbus API?
+> >> This is a collection of ERTM-related patches, including some L2CAP
+> >> configuration fixes and allowing partial-frame reads from L2CAP
+> >> SOCK_STREAM sockets.  PSM validation is also included, although that
+> >> is not restricted to ERTM.
 > >
-> > constantly polling them via D-Bus, yes I would reject such a patch. To
-> > make this proper you would need a kernel patch first that polls the RSSI
-> > and/or link quality when a ACL is established and not in power saving
-> > mode. Then you need to use this data to send async signals via D-Bus.
-> >
-> > I have done both, let me assure you that some chips don't provide proper
-> > RSSI values. Then link quality is vendor specific and we can't do
-> > anything real useful with it (except it is a CSR chip). So I have don't
-> > the whole exercise and figured out that it is rather useless feature of
-> > Bluetooth.
-> >
-> >> >> Then I looked at the bluetooth HCI library that comes with bluez.
-> >> >> First of all, is there any reasons why it's totally undocumented?
-> >> >> Anyway, I noticed hci_read_link_quality() and hci_read_rssi() in
-> >> >> hci_lib.h and tried using them. Since they seem to require an
-> >> >> established connection, I also used hci_create_connection(). However I
-> >> >> soon discovered that creating a connection requires root privileges,
-> >> >> is that right or did I do something wrong?
-> >> >>
-> >> >> Furthermore, even when running the program as root, the connection
-> >> >> gets established only for a few seconds and then it disconnects from
-> >> >> the remote device. Is this behaviour intended? How can I specify to
-> >> >> keep the connection alive indefinitely?
-> >> >
-> >> > If you don't have an active connection that is used, the kernel will
-> >> > terminate any idle ones. So using hcitool for this is rather pointless
-> >> > unless you have a profile already using that connection.
-> >> >
-> >>
-> >> "using a connection" means pushing some traffic over it?
-> >> Is there no other way to prevent the kernel from terminating idle connections?
-> >
-> > You don't need to transfer data, but you need a reference count on the
-> > ACL link. And that can only happen by opening a L2CAP socket.
-> >
-> >> By the way, I've read in the Bluetooth specs that there exists an
-> >> extended inquiry mode which allows the host to gather the RSSI of
-> >> available devices too. How can I perform such kind of inquiry from my
-> >> application using bluez?
-> >
-> > Nice idea, but RSSI from inquiry result and RSSI from an ACL are not the
-> > same. You can't compare them properly to make sense out of them. I tried
-> > that as well. Please read the specification again to see their
-> > difference when it comes to power control on the low level baseband.
-> >
+> > so the merge window for 2.6.36 is basically closed and these patches
+> > came in too late. If they fix a bug, I like you to explain that in
+> > detail in the commit message so I can pick them out and include them for
+> > submission to John.
 > 
-> Well, that's a non-issue. If I decide to go that way, I'll only use
-> RSSI from inquiry results so I don't need to compare RSSI values
-> coming from different sources.
-> How could I trigger an inquiry with RSSI reporting?
+> I'll fix up my commit messages and make the other changes you 
+> recommended.  I don't have a specific need for these to be in 2.6.36, 
+> but with more detail on the bug fixes you can decide if they're urgent 
+> enough.
 
-that is one by default if the hardware supports it.
+since 2.6.36 will be the first kernel we enable ERTM by default, I
+prefer that we have known bugs/regressions actually fixed.
 
 Regards
 
