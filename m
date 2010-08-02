@@ -1,65 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Radoslaw Jablonski <ext-jablonski.radoslaw@Nokia.com>
+MIME-Version: 1.0
+Date: Mon, 2 Aug 2010 16:51:22 +0200
+Message-ID: <AANLkTimA4dnDeoZVX1N4c=2sR1JkgAFWb4d0-0K+8S1C@mail.gmail.com>
+Subject: Getting link quality or RSSI
+From: Davide Pesavento <davidepesa@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Radoslaw Jablonski <ext-jablonski.radoslaw@Nokia.com>
-Subject: [PATCH] Add NULL checking for name param
-Date: Mon,  2 Aug 2010 17:24:06 +0300
-Message-Id: <1280759046-11571-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added NULL checking for "name" param in pbap_open_* functions. If on
-this level this variable will be NULL, then setting -EBADR error code
-and ending function. This fixes many obexd crashes.
----
- plugins/pbap.c |   13 +++++++++++--
- 1 files changed, 11 insertions(+), 2 deletions(-)
+Hello,
 
-diff --git a/plugins/pbap.c b/plugins/pbap.c
-index af4b452..8742a87 100644
---- a/plugins/pbap.c
-+++ b/plugins/pbap.c
-@@ -555,7 +555,7 @@ static int pbap_get(struct obex_session *os, obex_object_t *obj,
- 
- 	DBG("name %s type %s pbap %p", name, type, pbap);
- 
--	if (type == NULL)
-+	if (type == NULL || name == NULL)
- 		return -EBADR;
- 
- 	rsize = obex_aparam_read(os, obj, &buffer);
-@@ -689,6 +689,11 @@ static void *vobject_pull_open(const char *name, int oflag, mode_t mode,
- 		goto fail;
- 	}
- 
-+	if (name == NULL) {
-+		ret = -EBADR;
-+		goto fail;
-+	}
-+
- 	if (pbap->params->maxlistcount == 0)
- 		cb = phonebook_size_result;
- 	else
-@@ -720,6 +725,10 @@ static void *vobject_list_open(const char *name, int oflag, mode_t mode,
- 		goto fail;
- 	}
- 
-+	if (name == NULL) {
-+		ret = -EBADR;
-+		goto fail;
-+	}
- 	/* PullvCardListing always get the contacts from the cache */
- 
- 	if (pbap->cache.valid) {
-@@ -758,7 +767,7 @@ static void *vobject_vcard_open(const char *name, int oflag, mode_t mode,
- 		goto fail;
- 	}
- 
--	if (sscanf(name, "%u.vcf", &handle) != 1) {
-+	if (name == NULL || sscanf(name, "%u.vcf", &handle) != 1) {
- 		ret = -EBADR;
- 		goto fail;
- 	}
--- 
-1.7.0.4
+I'm writing an application to retrieve the current link quality (or
+RSSI) between my laptop's Bluetooth adapter and a specific remote
+device (my mobile phone). In order to do that I'm of course using the
+latest version of BlueZ, but I've encountered several issues so far.
 
+The dbus API exposed by bluetoothd doesn't have any GetRSSI or
+GetLinkQuality methods. Would it be possible to export these methods
+in the public API?
+
+Then I looked at the bluetooth HCI library that comes with bluez.
+First of all, is there any reasons why it's totally undocumented?
+Anyway, I noticed hci_read_link_quality() and hci_read_rssi() in
+hci_lib.h and tried using them. Since they seem to require an
+established connection, I also used hci_create_connection(). However I
+soon discovered that creating a connection requires root privileges,
+is that right or did I do something wrong?
+
+Furthermore, even when running the program as root, the connection
+gets established only for a few seconds and then it disconnects from
+the remote device. Is this behaviour intended? How can I specify to
+keep the connection alive indefinitely?
+
+Thanks a lot in advance for any help!
+
+Regards,
+Davide
