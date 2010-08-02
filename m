@@ -6,9 +6,9 @@ Cc: marcel@holtmann.org,
 	rshaffer@codeaurora.org,
 	linux-arm-msm@vger.kernel.org,
 	Mat Martineau <mathewm@codeaurora.org>
-Subject: [PATCH 8/8] Bluetooth:  Use 3-DH5 payload size for default ERTM max PDU size.
-Date: Mon,  2 Aug 2010 12:20:10 -0700
-Message-Id: <1280776810-18213-9-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCH 7/8] Bluetooth:  Use a stream-oriented recvmsg with SOCK_STREAM L2CAP sockets.
+Date: Mon,  2 Aug 2010 12:20:09 -0700
+Message-Id: <1280776810-18213-8-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1280776810-18213-1-git-send-email-mathewm@codeaurora.org>
 References: <1280776810-18213-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -16,22 +16,36 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- include/net/bluetooth/l2cap.h |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ net/bluetooth/l2cap.c |    9 ++++++++-
+ 1 files changed, 8 insertions(+), 1 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 16e412f..93aba17 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -35,7 +35,7 @@
- #define L2CAP_DEFAULT_MAX_TX		3
- #define L2CAP_DEFAULT_RETRANS_TO	2000    /* 2 seconds */
- #define L2CAP_DEFAULT_MONITOR_TO	12000   /* 12 seconds */
--#define L2CAP_DEFAULT_MAX_PDU_SIZE	672
-+#define L2CAP_DEFAULT_MAX_PDU_SIZE	1011    /* Sized for 3-DH5 packet */
- #define L2CAP_DEFAULT_ACK_TO		200
- #define L2CAP_LOCAL_BUSY_TRIES		12
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index 582975b..8e9fa51 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -1923,6 +1923,7 @@ done:
+ static int l2cap_sock_recvmsg(struct kiocb *iocb, struct socket *sock, struct msghdr *msg, size_t len, int flags)
+ {
+ 	struct sock *sk = sock->sk;
++	int len_or_err;
  
+ 	lock_sock(sk);
+ 
+@@ -1956,7 +1957,13 @@ static int l2cap_sock_recvmsg(struct kiocb *iocb, struct socket *sock, struct ms
+ 
+ 	release_sock(sk);
+ 
+-	return bt_sock_recvmsg(iocb, sock, msg, len, flags);
++	if (sock->type == SOCK_STREAM)
++		len_or_err = bt_sock_stream_recvmsg(iocb, sock, msg, len,
++						flags);
++	else
++		len_or_err = bt_sock_recvmsg(iocb, sock, msg, len, flags);
++
++	return len_or_err;
+ }
+ 
+ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname, char __user *optval, unsigned int optlen)
 -- 
 1.7.1
 
