@@ -1,55 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <AANLkTimExH027cpFPmMS8vd7be9HkBWzok9tzWqNJFeP@mail.gmail.com>
-References: <AANLkTimA4dnDeoZVX1N4c=2sR1JkgAFWb4d0-0K+8S1C@mail.gmail.com>
-	<1280764595.12579.19.camel@localhost.localdomain>
-	<AANLkTimQeQ-XoM5yuWQYx5_1-xWf1H0ax_J=BbtDfG2T@mail.gmail.com>
-	<AANLkTimExH027cpFPmMS8vd7be9HkBWzok9tzWqNJFeP@mail.gmail.com>
-Date: Mon, 2 Aug 2010 23:55:19 +0200
-Message-ID: <AANLkTinyONY41Dm77VgUJy9dZa=5E5iO+4zBc6EDePHt@mail.gmail.com>
-Subject: Re: Getting link quality or RSSI
-From: Davide Pesavento <davidepesa@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Message-Id: <201008022131.o72LVpuL011014@joshua.mesa.nl>
+From: Marcel Mol <marcel@mesa.nl>
+Date: Mon, 2 Aug 2010 23:29:56 +0200
+Subject: [PATCH] obexd: ebook backend: return all TEL attribs from vcard in string
+To: linux-bluetooth@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Aug 2, 2010 at 20:12, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi,
->
-> On Mon, Aug 2, 2010 at 7:34 PM, Davide Pesavento <davidepesa@gmail.com> wrote:
->> "using a connection" means pushing some traffic over it?
->> Is there no other way to prevent the kernel from terminating idle connections?
->
-> You should really think twice if you are creating a connection just to
-> see the link quality, it really doesn't worth.
->
+evcard_to_string() only took one TEL attrib from a vcard. But
+multiple TEL attribs are supported. This patch will convert
+all TEL attribs to strings.
+---
+ plugins/phonebook-ebook.c |   22 +++++++++++++---------
+ 1 files changed, 13 insertions(+), 9 deletions(-)
 
-OK, thanks for the advice.
+diff --git a/plugins/phonebook-ebook.c b/plugins/phonebook-ebook.c
+index 089b956..d2482c0 100644
+--- a/plugins/phonebook-ebook.c
++++ b/plugins/phonebook-ebook.c
+@@ -97,6 +97,7 @@ static char *evcard_to_string(EVCard *evcard, unsigned int format,
+ 							uint64_t filter)
+ {
+ 	EVCard *evcard2;
++	GList *l;
+ 	char *vcard;
+ 	unsigned int i;
+ 
+@@ -109,18 +110,21 @@ static char *evcard_to_string(EVCard *evcard, unsigned int format,
+ 	 */
+ 	filter = format == EVC_FORMAT_VCARD_30 ? filter | 0x87: filter | 0x85;
+ 
++	l = e_vcard_get_attributes(evcard);
+ 	evcard2 = e_vcard_new();
+-	for (i = 0; i < 29; i++) {
+-		EVCardAttribute *attrib;
+-
+-		if (!(filter & (1 << i)))
+-			continue;
+-
+-		attrib = e_vcard_get_attribute(evcard, attribute_mask[i]);
++	for (; l; l = g_list_next(l)) {
++		EVCardAttribute *attrib = l->data;
+ 		if (!attrib)
+ 			continue;
+-
+-		e_vcard_add_attribute(evcard2, e_vcard_attribute_copy(attrib));
++		const char *name = e_vcard_attribute_get_name(attrib);
++		for (i = 0; attribute_mask[i] != NULL; i++) {
++			if (!(filter & (1 << i)))
++				continue;
++			if (g_strcmp(name, attribute_mask[i]) != 0)
++				continue;
++			e_vcard_add_attribute(evcard2,
++						e_vcard_attribute_copy(attrib));
++		}
+ 	}
+ 
+ 	vcard = e_vcard_to_string(evcard2, format);
+-- 
+1.7.2
 
->> By the way, I've read in the Bluetooth specs that there exists an
->> extended inquiry mode which allows the host to gather the RSSI of
->> available devices too. How can I perform such kind of inquiry from my
->> application using bluez?
->
-> We do expose the RSSI when doing the device discovery, take a look at
-> DeviceFound documentation under doc/adapter-api.txt, as for link
-> quality maybe it can be made as a Property of device object, but as
-> Marcel said this is vendor specific so the use cases are very limited.
-> In the other hand it would be very nice if ui could show the link
-> quality and we could possible use it to route the audio back to the
-> speaker if the connection quality is too low.
->
-
-What I'm trying to accomplish is indeed similar to that: I'd like to
-re-route some audio streams based on RSSI or link quality.
-
->
-> --
-> Luiz Augusto von Dentz
-> Computer Engineer
->
-
-Regards,
-Davide
