@@ -1,62 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <201008022131.o72LVpuL011014@joshua.mesa.nl>
-From: Marcel Mol <marcel@mesa.nl>
-Date: Mon, 2 Aug 2010 23:29:56 +0200
-Subject: [PATCH] obexd: ebook backend: return all TEL attribs from vcard in string
-To: linux-bluetooth@vger.kernel.org
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: "Gustavo F. Padovan" <gfpadovan@gmail.com>
+Date: Mon, 2 Aug 2010 18:24:51 -0300
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Mat Martineau <mathewm@codeaurora.org>, linux-bluetooth@vger.kernel.org,
+	rshaffer@codeaurora.org, linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH 3/8] Bluetooth:  Validate PSM values in calls to
+ connect() and bind().
+Message-ID: <20100802212451.GC20149@vigoh>
+References: <1280776810-18213-1-git-send-email-mathewm@codeaurora.org>
+ <1280776810-18213-4-git-send-email-mathewm@codeaurora.org>
+ <1280777991.12579.39.camel@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1280777991.12579.39.camel@localhost.localdomain>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-evcard_to_string() only took one TEL attrib from a vcard. But
-multiple TEL attribs are supported. This patch will convert
-all TEL attribs to strings.
----
- plugins/phonebook-ebook.c |   22 +++++++++++++---------
- 1 files changed, 13 insertions(+), 9 deletions(-)
+Hi Mat,
 
-diff --git a/plugins/phonebook-ebook.c b/plugins/phonebook-ebook.c
-index 089b956..d2482c0 100644
---- a/plugins/phonebook-ebook.c
-+++ b/plugins/phonebook-ebook.c
-@@ -97,6 +97,7 @@ static char *evcard_to_string(EVCard *evcard, unsigned int format,
- 							uint64_t filter)
- {
- 	EVCard *evcard2;
-+	GList *l;
- 	char *vcard;
- 	unsigned int i;
- 
-@@ -109,18 +110,21 @@ static char *evcard_to_string(EVCard *evcard, unsigned int format,
- 	 */
- 	filter = format == EVC_FORMAT_VCARD_30 ? filter | 0x87: filter | 0x85;
- 
-+	l = e_vcard_get_attributes(evcard);
- 	evcard2 = e_vcard_new();
--	for (i = 0; i < 29; i++) {
--		EVCardAttribute *attrib;
--
--		if (!(filter & (1 << i)))
--			continue;
--
--		attrib = e_vcard_get_attribute(evcard, attribute_mask[i]);
-+	for (; l; l = g_list_next(l)) {
-+		EVCardAttribute *attrib = l->data;
- 		if (!attrib)
- 			continue;
--
--		e_vcard_add_attribute(evcard2, e_vcard_attribute_copy(attrib));
-+		const char *name = e_vcard_attribute_get_name(attrib);
-+		for (i = 0; attribute_mask[i] != NULL; i++) {
-+			if (!(filter & (1 << i)))
-+				continue;
-+			if (g_strcmp(name, attribute_mask[i]) != 0)
-+				continue;
-+			e_vcard_add_attribute(evcard2,
-+						e_vcard_attribute_copy(attrib));
-+		}
- 	}
- 
- 	vcard = e_vcard_to_string(evcard2, format);
+* Marcel Holtmann <marcel@holtmann.org> [2010-08-02 12:39:51 -0700]:
+
+> Hi Mat,
+> 
+> > Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> > ---
+> >  net/bluetooth/l2cap.c |   12 ++++++++++++
+> >  1 files changed, 12 insertions(+), 0 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> > index aed72f2..44bc6ee 100644
+> > --- a/net/bluetooth/l2cap.c
+> > +++ b/net/bluetooth/l2cap.c
+> > @@ -1008,6 +1008,12 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
+> >  		goto done;
+> >  	}
+> >  
+> > +	/* If specified, PSM must be odd and lsb of upper byte must be 0 */
+> > +	if (la.l2_psm && (__le16_to_cpu(la.l2_psm) & 0x0101) != 0x0001) {
+> > +		err = -EINVAL;
+> > +		goto done;
+> > +	}
+> > +
+> 
+> this was a nice feature of L2CAP in BlueZ actually ;)
+
+And please add a commit message for this patch.
+
+
 -- 
-1.7.2
-
+Gustavo F. Padovan
+http://padovan.org
