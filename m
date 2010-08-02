@@ -1,46 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 3 Aug 2010 00:57:12 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Mol <marcel@mesa.nl>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] obexd: ebook backend: return all TEL attribs from
- vcard in string
-Message-ID: <20100802215712.GA3392@jh-x301>
-References: <201008022131.o72LVpuL011014@joshua.mesa.nl>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <201008022131.o72LVpuL011014@joshua.mesa.nl>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <AANLkTimExH027cpFPmMS8vd7be9HkBWzok9tzWqNJFeP@mail.gmail.com>
+References: <AANLkTimA4dnDeoZVX1N4c=2sR1JkgAFWb4d0-0K+8S1C@mail.gmail.com>
+	<1280764595.12579.19.camel@localhost.localdomain>
+	<AANLkTimQeQ-XoM5yuWQYx5_1-xWf1H0ax_J=BbtDfG2T@mail.gmail.com>
+	<AANLkTimExH027cpFPmMS8vd7be9HkBWzok9tzWqNJFeP@mail.gmail.com>
+Date: Mon, 2 Aug 2010 23:55:19 +0200
+Message-ID: <AANLkTinyONY41Dm77VgUJy9dZa=5E5iO+4zBc6EDePHt@mail.gmail.com>
+Subject: Re: Getting link quality or RSSI
+From: Davide Pesavento <davidepesa@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Aug 02, 2010, Marcel Mol wrote:
-> +	for (; l; l = g_list_next(l)) {
-> +		EVCardAttribute *attrib = l->data;
->  		if (!attrib)
->  			continue;
+On Mon, Aug 2, 2010 at 20:12, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi,
+>
+> On Mon, Aug 2, 2010 at 7:34 PM, Davide Pesavento <davidepesa@gmail.com> wrote:
+>> "using a connection" means pushing some traffic over it?
+>> Is there no other way to prevent the kernel from terminating idle connections?
+>
+> You should really think twice if you are creating a connection just to
+> see the link quality, it really doesn't worth.
+>
 
-Add an empty line after variable declarations.
+OK, thanks for the advice.
 
-> -
-> -		e_vcard_add_attribute(evcard2, e_vcard_attribute_copy(attrib));
-> +		const char *name = e_vcard_attribute_get_name(attrib);
+>> By the way, I've read in the Bluetooth specs that there exists an
+>> extended inquiry mode which allows the host to gather the RSSI of
+>> available devices too. How can I perform such kind of inquiry from my
+>> application using bluez?
+>
+> We do expose the RSSI when doing the device discovery, take a look at
+> DeviceFound documentation under doc/adapter-api.txt, as for link
+> quality maybe it can be made as a Property of device object, but as
+> Marcel said this is vendor specific so the use cases are very limited.
+> In the other hand it would be very nice if ui could show the link
+> quality and we could possible use it to route the audio back to the
+> speaker if the connection quality is too low.
+>
 
-plugins/phonebook.c: In function ‘evcard_to_string’:
-plugins/phonebook.c:119: error: ISO C90 forbids mixed declarations and code
-make[1]: *** [plugins/phonebook.o] Error 1
-make: *** [all] Error 2
+What I'm trying to accomplish is indeed similar to that: I'd like to
+re-route some audio streams based on RSSI or link quality.
 
-> +		for (i = 0; attribute_mask[i] != NULL; i++) {
-> +			if (!(filter & (1 << i)))
-> +				continue;
-> +			if (g_strcmp(name, attribute_mask[i]) != 0)
+>
+> --
+> Luiz Augusto von Dentz
+> Computer Engineer
+>
 
-plugins/phonebook.c:123: error: implicit declaration of function ‘g_strcmp’
-
-Probably some missing include. Furthermore, use g_strcmp0 if there's a
-risk that one of the inputs might be NULL.
-
-Always compile test with ./bootstrap-configure (in this case
---with-phonebook=ebook) before submitting patches.
-
-Johan
+Regards,
+Davide
