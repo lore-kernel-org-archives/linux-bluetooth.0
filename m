@@ -1,43 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 0/8] Bluetooth: L2CAP updates for PSM validation and
- ERTM.
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
-	rshaffer@codeaurora.org, linux-arm-msm@vger.kernel.org
-In-Reply-To: <alpine.DEB.2.00.1008021450290.18432@linux-sea-02>
-References: <1280776810-18213-1-git-send-email-mathewm@codeaurora.org>
-	 <1280778649.12579.50.camel@localhost.localdomain>
-	 <alpine.DEB.2.00.1008021450290.18432@linux-sea-02>
-Content-Type: text/plain; charset="UTF-8"
-Date: Mon, 02 Aug 2010 15:09:00 -0700
-Message-ID: <1280786940.12579.57.camel@localhost.localdomain>
-Mime-Version: 1.0
+Message-Id: <201008022209.o72M94DV017676@joshua.mesa.nl>
+From: Marcel Mol <marcel@mesa.nl>
+Date: Tue, 3 Aug 2010 00:08:15 +0200
+Subject: [PATCH] obexd: ebook backend: return all TEL attribs from vcard in string
+To: linux-bluetooth@vger.kernel.org
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+evcard_to_string() only took one TEL attrib from a vcard. But
+multiple TEL attribs are supported. This patch will convert
+all TEL attribs to strings.
+---
+ plugins/phonebook-ebook.c |   22 ++++++++++++++--------
+ 1 files changed, 14 insertions(+), 8 deletions(-)
 
-> >> This is a collection of ERTM-related patches, including some L2CAP
-> >> configuration fixes and allowing partial-frame reads from L2CAP
-> >> SOCK_STREAM sockets.  PSM validation is also included, although that
-> >> is not restricted to ERTM.
-> >
-> > so the merge window for 2.6.36 is basically closed and these patches
-> > came in too late. If they fix a bug, I like you to explain that in
-> > detail in the commit message so I can pick them out and include them for
-> > submission to John.
-> 
-> I'll fix up my commit messages and make the other changes you 
-> recommended.  I don't have a specific need for these to be in 2.6.36, 
-> but with more detail on the bug fixes you can decide if they're urgent 
-> enough.
-
-since 2.6.36 will be the first kernel we enable ERTM by default, I
-prefer that we have known bugs/regressions actually fixed.
-
-Regards
-
-Marcel
-
+diff --git a/plugins/phonebook-ebook.c b/plugins/phonebook-ebook.c
+index 089b956..e80f797 100644
+--- a/plugins/phonebook-ebook.c
++++ b/plugins/phonebook-ebook.c
+@@ -97,6 +97,7 @@ static char *evcard_to_string(EVCard *evcard, unsigned int format,
+ 							uint64_t filter)
+ {
+ 	EVCard *evcard2;
++	GList *l;
+ 	char *vcard;
+ 	unsigned int i;
+ 
+@@ -109,18 +110,23 @@ static char *evcard_to_string(EVCard *evcard, unsigned int format,
+ 	 */
+ 	filter = format == EVC_FORMAT_VCARD_30 ? filter | 0x87: filter | 0x85;
+ 
++	l = e_vcard_get_attributes(evcard);
+ 	evcard2 = e_vcard_new();
+-	for (i = 0; i < 29; i++) {
+-		EVCardAttribute *attrib;
+-
+-		if (!(filter & (1 << i)))
+-			continue;
++	for (; l; l = g_list_next(l)) {
++		EVCardAttribute *attrib = l->data;
++		const char *name;
+ 
+-		attrib = e_vcard_get_attribute(evcard, attribute_mask[i]);
+ 		if (!attrib)
+ 			continue;
+-
+-		e_vcard_add_attribute(evcard2, e_vcard_attribute_copy(attrib));
++		name = e_vcard_attribute_get_name(attrib);
++		for (i = 0; attribute_mask[i] != NULL; i++) {
++			if (!(filter & (1 << i)))
++				continue;
++			if (g_strcmp0(name, attribute_mask[i]) != 0)
++				continue;
++			e_vcard_add_attribute(evcard2,
++						e_vcard_attribute_copy(attrib));
++		}
+ 	}
+ 
+ 	vcard = e_vcard_to_string(evcard2, format);
+-- 
+1.7.2
 
