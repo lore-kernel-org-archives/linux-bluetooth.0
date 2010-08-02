@@ -1,88 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 2 Aug 2010 15:13:16 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
-	rshaffer@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH 6/8] Bluetooth: Move stream-oriented recvmsg code so it
- can be used by L2CAP.
-In-Reply-To: <1280778398.12579.46.camel@localhost.localdomain>
-Message-ID: <alpine.DEB.2.00.1008021502560.18432@linux-sea-02>
-References: <1280776810-18213-1-git-send-email-mathewm@codeaurora.org>  <1280776810-18213-7-git-send-email-mathewm@codeaurora.org> <1280778398.12579.46.camel@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Subject: Re: Getting link quality or RSSI
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Davide Pesavento <davidepesa@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <AANLkTimrcSXZ-wTz7nmKCYtXjTEHY8FiPSiubRyfusxY@mail.gmail.com>
+References: <AANLkTimA4dnDeoZVX1N4c=2sR1JkgAFWb4d0-0K+8S1C@mail.gmail.com>
+	 <1280764595.12579.19.camel@localhost.localdomain>
+	 <AANLkTimQeQ-XoM5yuWQYx5_1-xWf1H0ax_J=BbtDfG2T@mail.gmail.com>
+	 <1280775482.12579.34.camel@localhost.localdomain>
+	 <AANLkTimrcSXZ-wTz7nmKCYtXjTEHY8FiPSiubRyfusxY@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Mon, 02 Aug 2010 15:09:49 -0700
+Message-ID: <1280786989.12579.58.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Davide,
 
-Marcel,
+> >> >> I'm writing an application to retrieve the current link quality (or
+> >> >> RSSI) between my laptop's Bluetooth adapter and a specific remote
+> >> >> device (my mobile phone). In order to do that I'm of course using the
+> >> >> latest version of BlueZ, but I've encountered several issues so far.
+> >> >>
+> >> >> The dbus API exposed by bluetoothd doesn't have any GetRSSI or
+> >> >> GetLinkQuality methods. Would it be possible to export these methods
+> >> >> in the public API?
+> >> >
+> >> > the link quality is vendor specific according to the specification and
+> >> > the RSSI of an existing connection is rather useless. So we don't bother
+> >> > to export those.
+> >> >
+> >>
+> >> Does this mean you're going to reject a patch which adds those methods
+> >> to the dbus API?
+> >
+> > constantly polling them via D-Bus, yes I would reject such a patch. To
+> > make this proper you would need a kernel patch first that polls the RSSI
+> > and/or link quality when a ACL is established and not in power saving
+> > mode. Then you need to use this data to send async signals via D-Bus.
+> >
+> > I have done both, let me assure you that some chips don't provide proper
+> > RSSI values. Then link quality is vendor specific and we can't do
+> > anything real useful with it (except it is a CSR chip). So I have don't
+> > the whole exercise and figured out that it is rather useless feature of
+> > Bluetooth.
+> >
+> >> >> Then I looked at the bluetooth HCI library that comes with bluez.
+> >> >> First of all, is there any reasons why it's totally undocumented?
+> >> >> Anyway, I noticed hci_read_link_quality() and hci_read_rssi() in
+> >> >> hci_lib.h and tried using them. Since they seem to require an
+> >> >> established connection, I also used hci_create_connection(). However I
+> >> >> soon discovered that creating a connection requires root privileges,
+> >> >> is that right or did I do something wrong?
+> >> >>
+> >> >> Furthermore, even when running the program as root, the connection
+> >> >> gets established only for a few seconds and then it disconnects from
+> >> >> the remote device. Is this behaviour intended? How can I specify to
+> >> >> keep the connection alive indefinitely?
+> >> >
+> >> > If you don't have an active connection that is used, the kernel will
+> >> > terminate any idle ones. So using hcitool for this is rather pointless
+> >> > unless you have a profile already using that connection.
+> >> >
+> >>
+> >> "using a connection" means pushing some traffic over it?
+> >> Is there no other way to prevent the kernel from terminating idle connections?
+> >
+> > You don't need to transfer data, but you need a reference count on the
+> > ACL link. And that can only happen by opening a L2CAP socket.
+> >
+> >> By the way, I've read in the Bluetooth specs that there exists an
+> >> extended inquiry mode which allows the host to gather the RSSI of
+> >> available devices too. How can I perform such kind of inquiry from my
+> >> application using bluez?
+> >
+> > Nice idea, but RSSI from inquiry result and RSSI from an ACL are not the
+> > same. You can't compare them properly to make sense out of them. I tried
+> > that as well. Please read the specification again to see their
+> > difference when it comes to power control on the low level baseband.
+> >
+> 
+> Well, that's a non-issue. If I decide to go that way, I'll only use
+> RSSI from inquiry results so I don't need to compare RSSI values
+> coming from different sources.
+> How could I trigger an inquiry with RSSI reporting?
 
-On Mon, 2 Aug 2010, Marcel Holtmann wrote:
+that is one by default if the hardware supports it.
 
-> Hi Mat,
->
->> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
->> ---
->>  include/net/bluetooth/bluetooth.h |    2 +
->>  net/bluetooth/af_bluetooth.c      |  107 +++++++++++++++++++++++++++++++++++++
->>  net/bluetooth/rfcomm/sock.c       |  104 ++---------------------------------
->>  3 files changed, 115 insertions(+), 98 deletions(-)
->
-> looks all like a good idea, but I really have to insist that the commit
-> message explain everything in detail. Give a reason why the code is
-> similar or the same and why this makes sense.
->
-> Also splitting these into two or more patches makes sense. One adding
-> the stream receive and the other modifying L2CAP and RFCOMM to use it.
+Regards
 
-Agreed.
+Marcel
 
-
->> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
->> index 27a902d..08b6c2a 100644
->> --- a/include/net/bluetooth/bluetooth.h
->> +++ b/include/net/bluetooth/bluetooth.h
->> @@ -126,6 +126,8 @@ int  bt_sock_unregister(int proto);
->>  void bt_sock_link(struct bt_sock_list *l, struct sock *s);
->>  void bt_sock_unlink(struct bt_sock_list *l, struct sock *s);
->>  int  bt_sock_recvmsg(struct kiocb *iocb, struct socket *sock, struct msghdr *msg, size_t len, int flags);
->> +int  bt_sock_stream_recvmsg(struct kiocb *iocb, struct socket *sock,
->> +			struct msghdr *msg, size_t len, int flags);
->>  uint bt_sock_poll(struct file * file, struct socket *sock, poll_table *wait);
->>  int  bt_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg);
->>  int  bt_sock_wait_state(struct sock *sk, int state, unsigned long timeo);
->> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
->> index 421c45b..73047f5 100644
->> --- a/net/bluetooth/af_bluetooth.c
->> +++ b/net/bluetooth/af_bluetooth.c
->> @@ -265,6 +265,113 @@ int bt_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
->>  }
->>  EXPORT_SYMBOL(bt_sock_recvmsg);
->>
->> +static long bt_sock_data_wait(struct sock *sk, long timeo)
->> +{
->> +	DECLARE_WAITQUEUE(wait, current);
->> +
->> +	add_wait_queue(sk_sleep(sk), &wait);
->> +	for (;;) {
->> +		set_current_state(TASK_INTERRUPTIBLE);
->> +
->> +		if (!skb_queue_empty(&sk->sk_receive_queue) ||
->> +		    sk->sk_err ||
->> +		    (sk->sk_shutdown & RCV_SHUTDOWN) ||
->> +		    signal_pending(current) ||
->> +		    !timeo)
->> +			break;
->
-> This makes my brain hurt. Please lets do this readable and with proper
-> coding style and/or a helper function.
-
-That's unchanged code from rfcomm_sock_data_wait() in rfcomm/sock.c - 
-but I'll go ahead and break it up using multiple 'if' statements.
-
-
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
 
