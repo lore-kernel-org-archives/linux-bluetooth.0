@@ -1,56 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <gfpadovan@gmail.com>
-Date: Mon, 2 Aug 2010 18:20:14 -0300
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Mat Martineau <mathewm@codeaurora.org>, linux-bluetooth@vger.kernel.org,
-	rshaffer@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH 1/8] Bluetooth:  Make sure the L2CAP FCS is only
- enabled for ERTM or streaming.
-Message-ID: <20100802212014.GB20149@vigoh>
-References: <1280776810-18213-1-git-send-email-mathewm@codeaurora.org>
- <1280776810-18213-2-git-send-email-mathewm@codeaurora.org>
- <1280777912.12579.37.camel@localhost.localdomain>
+Date: Mon, 2 Aug 2010 23:06:40 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Mol <marcel@mesa.nl>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] ebook backend: return all TEL attribs from vcard
+ in string
+Message-ID: <20100802200640.GA525@jh-x301>
+References: <201007281324.o6SDO9YB010621@joshua.mesa.nl>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1280777912.12579.37.camel@localhost.localdomain>
+In-Reply-To: <201007281324.o6SDO9YB010621@joshua.mesa.nl>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Hi,
 
-* Marcel Holtmann <marcel@holtmann.org> [2010-08-02 12:38:32 -0700]:
-
-> Hi Mat,
+On Wed, Jul 28, 2010, Marcel Mol wrote:
+> evcard_to_string() only took one TEL attrib from a vcard. But
+> multiple TEL attribs are supported. This patch will convert
+> all TEL attribs to strings.
+> ---
+>  plugins/phonebook-ebook.c |   24 +++++++++++++-----------
+>  1 files changed, 13 insertions(+), 11 deletions(-)
 > 
-> > Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> > ---
-> >  net/bluetooth/l2cap.c |   12 ++++++++----
-> >  1 files changed, 8 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-> > index 9ba1e8e..aed72f2 100644
-> > --- a/net/bluetooth/l2cap.c
-> > +++ b/net/bluetooth/l2cap.c
-> > @@ -3127,8 +3127,10 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
-> >  		goto unlock;
-> >  
-> >  	if (l2cap_pi(sk)->conf_state & L2CAP_CONF_INPUT_DONE) {
-> > -		if (!(l2cap_pi(sk)->conf_state & L2CAP_CONF_NO_FCS_RECV) ||
-> > -		    l2cap_pi(sk)->fcs != L2CAP_FCS_NONE)
-> > +		if ((l2cap_pi(sk)->mode == L2CAP_MODE_ERTM ||
-> > +			l2cap_pi(sk)->mode == L2CAP_MODE_STREAMING) &&
-> > +			(!(l2cap_pi(sk)->conf_state & L2CAP_CONF_NO_FCS_RECV) ||
-> > +			l2cap_pi(sk)->fcs != L2CAP_FCS_NONE))
-> >  			l2cap_pi(sk)->fcs = L2CAP_FCS_CRC16;
-> 
-> this becomes unreadable and my brain starts to throw a core dump. So it
-> clearly needs to be put into a helper inline function.
+> diff --git a/plugins/phonebook-ebook.c b/plugins/phonebook-ebook.c
+> index 089b956..04b7900 100644
+> --- a/plugins/phonebook-ebook.c
+> +++ b/plugins/phonebook-ebook.c
+> @@ -97,6 +97,7 @@ static char *evcard_to_string(EVCard *evcard, unsigned int format,
+>  							uint64_t filter)
+>  {
+>  	EVCard *evcard2;
+> +	GList *l;
+>  	char *vcard;
+>  	unsigned int i;
+>  
+> @@ -109,18 +110,19 @@ static char *evcard_to_string(EVCard *evcard, unsigned int format,
+>  	 */
+>  	filter = format == EVC_FORMAT_VCARD_30 ? filter | 0x87: filter | 0x85;
+>  
+> +	l = e_vcard_get_attributes(evcard);
+>  	evcard2 = e_vcard_new();
+> -	for (i = 0; i < 29; i++) {
+> -		EVCardAttribute *attrib;
+> -
+> -		if (!(filter & (1 << i)))
+> -			continue;
+> -
+> -		attrib = e_vcard_get_attribute(evcard, attribute_mask[i]);
+> -		if (!attrib)
+> -			continue;
+> -
+> -		e_vcard_add_attribute(evcard2, e_vcard_attribute_copy(attrib));
+> +	for (; l; l = g_list_next(l)) {
+> +		EVCardAttribute *attrib = l->data;
+> +		if (attrib) {
+> +			const char *name = e_vcard_attribute_get_name(attrib);
+> +			for (i = 0; i < 29; i++) {
+> +				if (!(filter & (1 << i)))
+> +					continue;
+> +				if (!strcmp(name, attribute_mask[i]))
+> +					e_vcard_add_attribute(evcard2, e_vcard_attribute_copy(attrib));
+> +			}
+> +		}
+>  	}
 
-Actually we don't need that, since the code that deals with Basic Mode
-never check  and use the l2cap_pi(sk)->fcs. So we don't care about FCS
-value in the Basic Mode.
+This needs to be cleaned up a bit in order not to be so deeply nested
+which additionally causes you problems with producing over 80-character
+long lines. You can avoid that with keeping the same
+	if (!attrib)
+		continue;
+trick as the original code had as well as
+	if (g_strcmp0(name, attribute_mask[i]) != 0)
+		continue;
 
-
--- 
-Gustavo F. Padovan
-http://padovan.org
+Johan
