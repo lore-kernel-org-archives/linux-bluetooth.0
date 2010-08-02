@@ -1,85 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Getting link quality or RSSI
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Davide Pesavento <davidepesa@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <AANLkTimQeQ-XoM5yuWQYx5_1-xWf1H0ax_J=BbtDfG2T@mail.gmail.com>
-References: <AANLkTimA4dnDeoZVX1N4c=2sR1JkgAFWb4d0-0K+8S1C@mail.gmail.com>
-	 <1280764595.12579.19.camel@localhost.localdomain>
-	 <AANLkTimQeQ-XoM5yuWQYx5_1-xWf1H0ax_J=BbtDfG2T@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Mon, 02 Aug 2010 11:58:02 -0700
-Message-ID: <1280775482.12579.34.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 2 Aug 2010 21:55:42 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: ingas@codeaurora.org
+Cc: linux-bluetooth@vger.kernel.org, rshaffer@codeaurora.org,
+	marcel@holtmann.org
+Subject: Re: [PATCH v4 0/5] Enhanced support for extended inquiry response
+Message-ID: <20100802185542.GA28641@jh-x301>
+References: <1279814780-29673-1-git-send-email-ingas@codeaurora.org>
+ <20100723082045.GA1600@jh-x301>
+ <20100723082754.GA12563@jh-x301>
+ <20100723084300.GA14443@jh-x301>
+ <b622ef9ae078ace2da7a8a6748823d2f.squirrel@www.codeaurora.org>
+ <20100726094444.GB20357@jh-x301>
+ <feb3c412e1be4c1b7b42efdbc581aabb.squirrel@www.codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <feb3c412e1be4c1b7b42efdbc581aabb.squirrel@www.codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Davide,
+Hi Inga,
 
-> >> I'm writing an application to retrieve the current link quality (or
-> >> RSSI) between my laptop's Bluetooth adapter and a specific remote
-> >> device (my mobile phone). In order to do that I'm of course using the
-> >> latest version of BlueZ, but I've encountered several issues so far.
-> >>
-> >> The dbus API exposed by bluetoothd doesn't have any GetRSSI or
-> >> GetLinkQuality methods. Would it be possible to export these methods
-> >> in the public API?
-> >
-> > the link quality is vendor specific according to the specification and
-> > the RSSI of an existing connection is rather useless. So we don't bother
-> > to export those.
-> >
+First of all, sorry for the slight delay in my reply. I've been on
+holiday last week with quite limted email processing capability.
+
+On Wed, Jul 28, 2010, ingas@codeaurora.org wrote:
+> In the current implementation,  EIR write is keyed off HCI Command
+> Complete events for a set of commands (in security.c).
+>  - When first registering an OPP service with sdptool, the
+> update_svcclass_list()  (sdpd-service.c) calls manager_update_svc()
+> (manager.c) which in turn calls adapter_update()  (adapter.c).  BTW, why
+> this level of indirection, since manager_update_svc() is called only from
+> one place in the code and calling adapter_update()  is all it does? 
+> Probably some earlier architectural decision I am not aware of…
+
+That looks pretty stupid to me too. Might be some historical artifact.
+Anyway, feel free to send a patch to remove this indirection (i.e. call
+adapter_update directly).
+
+> The current implementation may be extended as following:
+> Since update_svcclass_list() is being called throughout sdpd-service.c in
+> all the places where EIR needs to be updated as well, I propose to modify
+> the corresponding function  adapter_set_service_classes() (adapter.c) :
 > 
-> Does this mean you're going to reject a patch which adds those methods
-> to the dbus API?
-
-constantly polling them via D-Bus, yes I would reject such a patch. To
-make this proper you would need a kernel patch first that polls the RSSI
-and/or link quality when a ACL is established and not in power saving
-mode. Then you need to use this data to send async signals via D-Bus.
-
-I have done both, let me assure you that some chips don't provide proper
-RSSI values. Then link quality is vendor specific and we can't do
-anything real useful with it (except it is a CSR chip). So I have don't
-the whole exercise and figured out that it is rather useless feature of
-Bluetooth.
-
-> >> Then I looked at the bluetooth HCI library that comes with bluez.
-> >> First of all, is there any reasons why it's totally undocumented?
-> >> Anyway, I noticed hci_read_link_quality() and hci_read_rssi() in
-> >> hci_lib.h and tried using them. Since they seem to require an
-> >> established connection, I also used hci_create_connection(). However I
-> >> soon discovered that creating a connection requires root privileges,
-> >> is that right or did I do something wrong?
-> >>
-> >> Furthermore, even when running the program as root, the connection
-> >> gets established only for a few seconds and then it disconnects from
-> >> the remote device. Is this behaviour intended? How can I specify to
-> >> keep the connection alive indefinitely?
-> >
-> > If you don't have an active connection that is used, the kernel will
-> > terminate any idle ones. So using hcitool for this is rather pointless
-> > unless you have a profile already using that connection.
-> >
+> **********************
+> Before:
+> /* If we already have the CoD we want or the cache is enabled or an
+> * existing CoD write is in progress just bail out */
+> if (adapter->current_cod == adapter->wanted_cod ||
+> 	adapter->cache_enable || adapter->pending_cod)
+> return 0;
 > 
-> "using a connection" means pushing some traffic over it?
-> Is there no other way to prevent the kernel from terminating idle connections?
+> 
+> ***********************
+> 
+> After:
+> /* If we already have the CoD we want or the cache is enabled or an
+> * existing CoD write is in progress just bail out */
+> if (adapter->cache_enable || adapter->pending_cod)
+> return 0;
+> 
+> /* If we already have the CoD we want, update EIR and return */
+> if (adapter->current_cod == adapter->wanted_cod ) {
+> 	update_ext_inquiry_response(adapter);
+> 	return 0;
+> }
+> 
+> **********************
+> Will that be acceptable? I tested this modification and it’s working with
+> both d-bus methods and sdptool.
 
-You don't need to transfer data, but you need a reference count on the
-ACL link. And that can only happen by opening a L2CAP socket.
+Seems good to me.
 
-> By the way, I've read in the Bluetooth specs that there exists an
-> extended inquiry mode which allows the host to gather the RSSI of
-> available devices too. How can I perform such kind of inquiry from my
-> application using bluez?
+> As a side note, in future it might be a good idea to expose EIR writes to
+> an application layer providing external API. The intent of EIR is to allow
+> quick scan of the surroundings to find a particular service that a device
+> is interested at the moment (and in turn, exposing the services that the
+> device choses to expose at the moment) without actually going into full
+> blown connection mode.   EIR space is at a premium for sophisticated
+> devices with multiple services. Not every single service needs to be
+> exposed in EIR. It would be nice to be able to pick which one to add. For
+> example, if a device supports both headset and handsfree profiles (as all
+> of the phones do), it might not be necessary to advertise headset uuid in
+> EIR since the headsets  out there are mostly legacy devices that cannot
+> perform EIR anyway… Also, as more new services that use uuid128 are
+> introduced, the EIR buffer pretty quickly if every single one of them is
+> added without discretion. Just something to throw out there :)
 
-Nice idea, but RSSI from inquiry result and RSSI from an ACL are not the
-same. You can't compare them properly to make sense out of them. I tried
-that as well. Please read the specification again to see their
-difference when it comes to power control on the low level baseband.
+Good point (not that any concrete examples of such a device/situation
+would have come accross yet). One possibility to solve the issue without
+directly exposing this to applications would be to have a (rather
+static) setting in main.conf of UUIDs to be prioritized over others in
+the EIR data.
 
-Regards
-
-Marcel
-
-
+Johan
