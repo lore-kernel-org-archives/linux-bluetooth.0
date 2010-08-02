@@ -1,114 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-From: Kevin Hayes <kevin@Atheros.com>
-To: Marcel Holtmann <marcel@holtmann.org>, "tmonahan@codeaurora.org"
-	<tmonahan@codeaurora.org>
-CC: David Vrabel <david.vrabel@csr.com>, Inga Stotland <ingas@codeaurora.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"rshaffer@codeaurora.org" <rshaffer@codeaurora.org>,
-	"johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
-Date: Mon, 2 Aug 2010 15:41:33 -0700
-Subject: RE: Enhancements to allow l2cap channel to use either AMP or BR/EDR
-Message-ID: <B7132A25476D334D9130FE7532F2A56310A0B0896E@SC1EXMB-MBCL.global.atheros.com>
-References: <8bfb018fa669b6ace6840881379a1a01.squirrel@www.codeaurora.org>
- <1280775200.12579.30.camel@localhost.localdomain>
-In-Reply-To: <1280775200.12579.30.camel@localhost.localdomain>
-Content-Type: text/plain; charset="utf-8"
+Date: Mon, 2 Aug 2010 15:40:52 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: "Gustavo F. Padovan" <gustavo@padovan.org>
+cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
+    rshaffer@codeaurora.org
+Subject: Re: [PATCH 1/8] Bluetooth: Make sure the L2CAP FCS is only enabled
+ for ERTM or streaming.
+In-Reply-To: <20100802212014.GB20149@vigoh>
+Message-ID: <alpine.DEB.2.00.1008021519430.18432@linux-sea-02>
+References: <1280776810-18213-1-git-send-email-mathewm@codeaurora.org> <1280776810-18213-2-git-send-email-mathewm@codeaurora.org> <1280777912.12579.37.camel@localhost.localdomain> <20100802212014.GB20149@vigoh>
 MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTWFyY2VsLA0KDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogbGlu
-dXgtYmx1ZXRvb3RoLW93bmVyQHZnZXIua2VybmVsLm9yZyBbbWFpbHRvOmxpbnV4LWJsdWV0b290
-aC0NCj4gb3duZXJAdmdlci5rZXJuZWwub3JnXSBPbiBCZWhhbGYgT2YgTWFyY2VsIEhvbHRtYW5u
-DQo+IFNlbnQ6IE1vbmRheSwgQXVndXN0IDAyLCAyMDEwIDExOjUzIEFNDQo+IFRvOiB0bW9uYWhh
-bkBjb2RlYXVyb3JhLm9yZw0KPiBTdWJqZWN0OiBSZTogRW5oYW5jZW1lbnRzIHRvIGFsbG93IGwy
-Y2FwIGNoYW5uZWwgdG8gdXNlIGVpdGhlciBBTVAgb3INCj4gQlIvRURSDQo+IA0KPiBIaSBUaW0s
-DQo+IA0KPiBwbGVhc2UgZml4IHlvdXIgbWFpbCBjbGllbnQgdG8gTk9UIGJyZWFrIHRocmVhZGlu
-Zy4NCj4gDQo+ID4gPj4gQU1QIHZzIEJSL0VEUiBwcmVmZXJlbmNlIGZvciBMMkNBUCBjaGFubmVs
-IGNhbiBiZSBjb25maWd1cmVkIGFzDQo+IGNvbW1hbmQNCj4gPiBsaW5lIGFyZ3VtZW50IHVzaW5n
-IG5ldyBvcHRpb24gIi1KIi4gUG9zc2libGUgdmFsdWVzOg0KPiA+ID4+ICAgICAgICAgICAgICAg
-ICAgInJlcXVpcmVfYnJfZWRyIiwNCj4gPiA+PiAgICAgICAgICAgICAgICAgICJwcmVmZXJfYW1w
-IiwNCj4gPiA+PiAgICAgICAgICAgICAgICAgICJwcmVmZXJfYnJfZWRyIg0KPiA+ID4+IElmIG5v
-IHByZWZlcmVuY2UgaW5kaWNhdGVkLCB0aGUgZGVmYXVsdCBpcyBzZXQgdG8gcmVxdWlyZSBCUi9F
-RFIuDQo+ID4gPg0KPiA+ID4gSSB0aGluayBhbiBleHBsaWNpdCBjaGFubmVsIG1vdmUgY29tbWFu
-ZCBhbmQgYSBjaGFubmVsIG1vdmUNCj4gY29tcGxldGUNCj4gPiBldmVudCBhcmUgd2hhdCBtYW55
-IGFwcGxpY2F0aW9ucy9wcm9maWxlcyB3aWxsIG5lZWQgdG8gYmUgYWJsZSB0byB1c2UNCj4gYW4N
-Cj4gPiBBTVAgZWZmZWN0aXZlbHkuDQo+ID4NCj4gPiBBIGZ1dHVyZSBBTVAgcG9saWN5IHNldHRp
-bmcgb2YgIm1hbnVhbCIgY291bGQgY2VydGFpbmx5IGdpdmUgZWFjaA0KPiA+IGFwcGxpY2F0aW9u
-IHRoZSBmcmVlZG9tIHRvIG1vdmUgYW4gbDJjYXAgY2hhbm5lbCBhdCB3aWxsLCBhZnRlcg0KPiBh
-cHBseWluZw0KPiA+IGl0cyBvd24gZGVjaXNpb24gbWFraW5nIHByb2Nlc3MuIEhvd2V2ZXIsIHdp
-dGggdGhhdCBmcmVlZG9tIGNvbWVzIHRoZQ0KPiA+IHJlc3BvbnNpYmlsaXR5IG9mIHByb2Nlc3Np
-bmcgdGhlIEFNUCByZWxhdGVkIGV2ZW50cyBhbmQgaW5pdGlhdGluZw0KPiB0aGUgQU1QDQo+ID4g
-Y29tbWFuZHMgdG8gbWFrZSB0aGUgZGVjaXNpb24uIEZvciBleGFtcGxlLCB0aGUgYXBwbGljYXRp
-b24gbmVlZHMgdG8NCj4ga25vdw0KPiA+IGlmIEFNUCBjb250cm9sbGVycyBhcmUgYXZhaWxhYmxl
-IGJvdGggbG9jYWxseSBhbmQgcmVtb3RlbHksIHdoaWNoIGluDQo+IHR1cm4NCj4gPiByZXF1aXJl
-cyBpbml0aWF0aW5nIHRoZSBBTVAgZGlzY292ZXJ5IHByb2Nlc3MgYW5kIGxvb2tpbmcgb3ZlciB0
-aGUNCj4gPiBhdmFpbGFibGUgbG9jYWwgSENJIGRldmljZXM7IGEgbG9zcyBvZiB0aGUgcGh5c2lj
-YWwgbGluayBldmVudCBtZWFucw0KPiB0aGUNCj4gPiBhcHBsaWNhdGlvbiBtdXN0IG1vdmUgdGhl
-IGxpbmsgYmFjayB0byBCUi9FRFIsIGV0Yy4gQWxsIG9mIHRoZQ0KPiBhZGRpdGlvbmFsDQo+ID4g
-bWFjaGluZXJ5IHRvIGFjY29tcGxpc2ggdGhhdCBjb3VsZCBpbmRlZWQgYmUgZXhwb3NlZCBmb3Ig
-dXNlIGJ5DQo+ID4gYXBwbGljYXRpb25zLiBJIHRoaW5rIHN1Y2ggYW4gYXBwcm9hY2gsIGlmIHJl
-YWxseSBuZWVkZWQsIHdvdWxkIG5vdA0KPiA+IGNvbmZsaWN0IHdpdGggdGhlc2UgcHJvcG9zZWQg
-cG9saWNpZXMgdGhhdCBoaWRlIGFsbCBvZiB0aGF0IHdpdGhpbg0KPiB0aGUNCj4gPiBrZXJuZWwu
-DQo+ID4NCj4gPiBUbyBpbGx1c3RyYXRlIGhvdyB0aGVzZSBwb2xpY2llcyBzaW1wbGlmeSBhcHBs
-aWNhdGlvbnMsIGNvbnNpZGVyDQo+IE9CRVguIEFuDQo+ID4gT0JFWCBzZXJ2ZXIgYXBwbGljYXRp
-b24gd291bGQgY2hvb3NlICJwcmVmZXJfYnJfZWRyIiwgdGh1cyBsZWF2aW5nDQo+IHRoZQ0KPiA+
-IHJlbW90ZSBPQkVYIGNsaWVudCB0byBkZWNpZGUgYW5kIGluaXRpYXRlIHRoZSBjaGFubmVsIG1v
-dmUgdG8gYW4gQU1QLA0KPiBhbmQNCj4gPiB0aHVzIGdyYW50aW5nIGFkdmFuY2UgcGVybWlzc2lv
-biB0byB0aGUga2VybmVsIGZvciB0aGUgbW92ZSB0byB0YWtlDQo+IHBsYWNlLg0KPiA+IFRoZSBP
-QkVYIGNsaWVudCBjb3VsZCBleGFtaW5lIHRoZSBzaXplIG9mIGFuIHVwY29taW5nIHRyYW5zZmVy
-IGFuZA0KPiBjaG9vc2UNCj4gPiAicHJlZmVyX2FtcCIsIHRoZXJlYnkgaW5zdHJ1Y3RpbmcgdGhl
-IGtlcm5lbCB0byBpbml0aWF0ZSB0aGUgbW92ZSB0bw0KPiBhbg0KPiA+IEFNUCBpZiBhbGwgbG9j
-YWwgYW5kIHJlbW90ZSBjb25kaXRpb25zIGFsbG93IGl0LiBUaHVzLCB0aGUgT0JFWA0KPiBjbGll
-bnQgYW5kDQo+ID4gc2VydmVyIGFwcGxpY2F0aW9ucyBtYWtlIHNpbXBsaXN0aWMgZGVjaXNpb25z
-IHRvIHNldCB1cCBBTVAsIGFuZCBjYW4NCj4gZm9jdXMNCj4gPiBvbiBtb3ZpbmcgZGF0YSBvdmVy
-IHRoZSBsMmNhcCBjaGFubmVsLCBsZWF2aW5nIHRoZSBtYW5hZ2VtZW50IG9mIHdoYXQNCj4gPiBt
-ZWRpdW0gdGhlIGRhdGEgZmxvd3Mgb3ZlciB1cCB0byB0aGUga2VybmVsLCB3aG8ga2VlcHMgaXQN
-Cj4gdHJhbnNwYXJlbnQuIEluDQo+ID4gdGhpcyB3YXksIHdvcmsgdG8gbWFrZSBhbiBleGlzdGlu
-ZyBwcm9maWxlICJBTVAgYXdhcmUiIGlzIGFsc28NCj4gbWluaW1hbC4NCj4gPg0KPiA+IEluIHRo
-ZSBkaXNjdXNzaW9uIHdpdGggTWFyY2VsIHJlZ2FyZGluZyBvdXIgQU1QIHByb3Bvc2FsIGluIE1h
-cmNoDQo+ICgiUkZDOg0KPiA+IFF1SUMncyBBTVAgKyBlTDJDQVAgVGVjaG5pY2FsIFBsYW5zIiks
-IHdoZXJlIHdlIGhhZCBsaXN0ZWQgdGhlc2UgQU1QDQo+ID4gY29udHJvbCBwb2xpY2llcywgaGUg
-c2VlbWVkIHRvIGluZGljYXRlIHRoYXQgdGhlc2UgcG9saWNpZXMgd291bGQNCj4gPiBhdXRvbWF0
-aWNhbGx5IHRyaWdnZXIgQU1QIGRpc2NvdmVyeSB3aXRoaW4gdGhlIGtlcm5lbCwgd2hpY2ggaXQg
-d2lsbC4NCj4gQXMNCj4gPiBoZSBzYWlkLCAiTGVzcyBvcHRpb25zIGFyZSBsZXNzIGNvbmZ1c2lu
-ZyBmb3IgdXNlcnMiIChhcG9sb2dpZXMgaW4NCj4gYWR2YW5jZQ0KPiA+IGlmIEkgbWlzaW50ZXJw
-cmV0ZWQgaGlzIGFuc3dlcikuDQo+IA0KPiBteSBjdXJyZW50IGFwcHJvYWNoIGhlcmUgaXMgc3Rp
-bGwgdGhhdCB3ZSB3YW5uYSBkbyB0aGlzIGF1dG9tYXRpY2FsbHkNCj4gaW4NCj4gdGhlIGJhY2tn
-cm91bmQgZm9yIHRoZSBwcm9maWxlcy4gSSB0aGluayBhdCBtb3N0IHRoZSBwcm9maWxlcyBzaG91
-bGQNCj4ganVzdCBwcm92aWRlIGEgdGhyZXNob2xkIGZvciBlaXRoZXIgYSkgc3RheWluZyBvbiBC
-Ui9FRFIgb3IgYikgbW92aW5nDQo+IG92ZXIgdG8gQU1QLg0KPiANCj4gSSBrbm93IHRoYXQgdGhl
-IEJsdWV0b290aCBTSUcgdHJpZXMgdG8gZGVmaW5lIHN1Y2ggcG9saWNpZXMgYXMgcGFydCBvZg0K
-PiB0aGUgcHJvZmlsZXMgKGxpa2UgRlRQIGZvciBleGFtcGxlKSwgYnV0IEkgdGhpbmsgdGhpcyBt
-YWtlcyBzZW5zZS4gSQ0KPiBkb3VidCB0aGUgcmVhbCB1c2FnZSBvZiBtYWtpbmcgdGhpcyBtYW51
-YWwuIEEgcHJvZmlsZS9hcHBsaWNhdGlvbg0KPiBzaG91bGQNCj4ganVzdCBnaXZlIGl0cyBwcmVm
-ZXJlbmNlIG9yIGludGVudCBhbmQgdGhlbiB3ZSB0cnkgdG8gYWNjb21tb2RhdGUgdGhlbQ0KPiBh
-cyBiZXN0IGFzIHBvc3NpYmxlLg0KDQpBZ3JlZSB0aGF0IGl0IHNob3VsZCBiZSBkb25lICJpbiBi
-YWNrZ3JvdW5kIiBhbmQgdGhhdCBhIHNpemUgdGhyZXNob2xkIHdvdWxkIGJlIHVzZWZ1bC4gIEJ1
-dCB3aG8gZXZhbHVhdGVzIHRoYXQgdGhyZXNob2xkPyAgVGhlIGJsdWV6IGtlcm5lbCBjb21wb25l
-bnRzLCB3aGljaCBlc3NlbnRpYWxseSBpbXBsZW1lbnQgYSB0cmFuc3BvcnQgZHJpdmVyLCBzaG91
-bGQgbm90IGJlIGV4YW1pbmluZyBvYmplY3RzIChmaWxlcywgcGhvbmVib29rcywgZXRjKSBzaXpl
-IHRvIHNlZSBpZiB0aGlzIHRocmVzaG9sZCBpcyBtZXQuICBUaGVyZWZvcmUsIGl0IHdvdWxkIHNl
-ZW0gVGltJ3Mgc3VnZ2VzdGlvbiBvZiBoYXZpbmcgdGhlIHByb2ZpbGUgc2VuZCBhICdwcmVmZXJf
-YW1wJyBiaXQgd291bGQgYmUgdXNlZnVsLCByaWdodD8NCg0KPiANCj4gVGhlIG90aGVyIHByb2Js
-ZW0gaGVyZSBpcyBhbHNvIHRoYXQgYmVzaWRlcyB3aGF0ZXZlciB0aGUgcHJvZmlsZXMNCj4gd2Fu
-dHMsDQo+IGl0IG1pZ2h0IGhhcHBlbiB0aGF0IHRoZSBXaUZpIHBvbGljeSBpcyBzdHJvbmdlciBh
-bmQgb25seSBhbGxvd3MgdXNpbmcNCj4gdGhlIFdpRmkgZGV2aWNlIGFzIFdpRmkgb3IgYXMgQU1Q
-LiBBbmQgaWYgV2lGaSB3aW5zLCB0aGVuIHdlIGhhdmUgdG8NCj4gcmlwDQo+IHRoZSBBTVAgb3V0
-IG9mIHRoZSBzeXN0ZW0uIEF0IHRoYXQgcG9pbnQgd2hhdGV2ZXIgdGhlIEJsdWV0b290aA0KPiBw
-cm9maWxlcw0KPiB3YW50ZWQgaXMgcG9pbnRsZXNzIHNpbmNlIHRoZSBBTVAgY29udHJvbGxlciBp
-cyBnb25lIGFueXdheS4NCg0KV2VsbCwgSSB0aGluayB0aGlzIGlzIGJlc3QgbWFuYWdlZCBieSBo
-YXZpbmcgdGhlIFBBTCBhbm5vdW5jZSBpdHMgYXZhaWxhYmlsaXR5IChhbmQgdW5hdmFpbGFiaWxp
-dHkpIHRvIEEyTVAsIHVzaW5nIHRoZSBzcGVjJ3MgSENJIGV2ZW50cyBmb3IgdGhpcyBwdXJwb3Nl
-LiAgQTJNUCBjYW4gdGhlbiBiZSB0aGUgYWdlbnQgdG8gbW92ZSB0aGUgY2hhbm5lbCB0byBBTVAg
-b3Igbm90LCBhY2NvcmRpbmdseS4gIEZvciBleGFtcGxlLCBpdCBtaWdodCBiZSB0aGF0IHRoZSA4
-MDIuMTEgZGV2aWNlIGlzIGJlaW5nIHVzZWQgZm9yIGFuIGluZnJhc3RydWN0dXJlIGxpbmssIGFu
-ZCB0aGVuIHRoYXQgbGluayBnb2VzIGF3YXkuICBUaGUgUEFMIHdvdWxkIHRoZW4gYW5ub3VuY2Ug
-aXRzIGF2YWlsYWJpbGl0eSB0byB0aGUgQlQgc3RhY2sgKEEyTVApLCBhbmQgQTJNUCB3b3VsZCB0
-aGVuIG1vdmUgdGhlIGNoYW5uZWwgdG8gQU1QLg0KDQo+IA0KPiBUaGF0IHNhaWQsIG5vdGhpbmcg
-c3RvcHMgdXMgZnJvbSBhbGxvd2luZyB0byBtYWtlIG91ciBBTVAgcG9saWNlcw0KPiBkeW5hbWlj
-IGFuZCBhbGxvdyB0aGUgYXBwbGljYXRpb24gdG8gY2hhbmdlIGl0IHRocmVzaG9sZCBkdXJpbmcN
-Cj4gbGlmZXRpbWUuIEZvciBleGFtcGxlIGl0IHN0YXJ0cyBvdXQgYXMgQlIvRURSIG9ubHkgYW5k
-IHRoZW4gZHVyaW5nIHRoZQ0KPiB1c2FnZSBvZiB0aGUgbGluayBpdCBkZWNpZGVzIHRoYXQgbm93
-IEFNUCBwcmVmZXJyZWQgd291bGQgbWFrZSBzZW5zZS4NCj4gSW4NCj4gdGhhdCBzZW5zZSB5b3Ug
-d291bGQgaGF2ZSBtYW51YWwgc3dpdGNoaW5nIHRvIHNvbWUgbGV2ZWwuDQoNClRoZSBvbmx5IHVz
-ZSBjYXNlIEkgc2VlIGZvciBtYW51YWwgc3dpdGNoaW5nIGlzIGRlYnVnZ2luZy4NCg0KCUsrKw0K
+
+Hi Gustavo -
+
+On Mon, 2 Aug 2010, Gustavo F. Padovan wrote:
+
+> Hi Mat,
+>
+> * Marcel Holtmann <marcel@holtmann.org> [2010-08-02 12:38:32 -0700]:
+>
+>> Hi Mat,
+>>
+>>> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+>>> ---
+>>>  net/bluetooth/l2cap.c |   12 ++++++++----
+>>>  1 files changed, 8 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+>>> index 9ba1e8e..aed72f2 100644
+>>> --- a/net/bluetooth/l2cap.c
+>>> +++ b/net/bluetooth/l2cap.c
+>>> @@ -3127,8 +3127,10 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+>>>  		goto unlock;
+>>>
+>>>  	if (l2cap_pi(sk)->conf_state & L2CAP_CONF_INPUT_DONE) {
+>>> -		if (!(l2cap_pi(sk)->conf_state & L2CAP_CONF_NO_FCS_RECV) ||
+>>> -		    l2cap_pi(sk)->fcs != L2CAP_FCS_NONE)
+>>> +		if ((l2cap_pi(sk)->mode == L2CAP_MODE_ERTM ||
+>>> +			l2cap_pi(sk)->mode == L2CAP_MODE_STREAMING) &&
+>>> +			(!(l2cap_pi(sk)->conf_state & L2CAP_CONF_NO_FCS_RECV) ||
+>>> +			l2cap_pi(sk)->fcs != L2CAP_FCS_NONE))
+>>>  			l2cap_pi(sk)->fcs = L2CAP_FCS_CRC16;
+>>
+>> this becomes unreadable and my brain starts to throw a core dump. So it
+>> clearly needs to be put into a helper inline function.
+>
+> Actually we don't need that, since the code that deals with Basic Mode
+> never check  and use the l2cap_pi(sk)->fcs. So we don't care about FCS
+> value in the Basic Mode.
+
+There isn't currently any Basic Mode code that triggers this latent 
+bug, but I have a patch coming up that does require this fix.
+
+As it stands, getsockopt() on a connected basic mode socket shows FCS 
+enabled, so this bug is visible from userspace.
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
