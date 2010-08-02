@@ -6,9 +6,9 @@ Cc: marcel@holtmann.org,
 	rshaffer@codeaurora.org,
 	linux-arm-msm@vger.kernel.org,
 	Mat Martineau <mathewm@codeaurora.org>
-Subject: [PATCH 5/8] Bluetooth:  Don't modify remote_tx_win when receiving a config response. Only config requests should set remote_tx_win.
-Date: Mon,  2 Aug 2010 12:20:07 -0700
-Message-Id: <1280776810-18213-6-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCH 4/8] Bluetooth:  Do endianness conversion on MPS configuration value before doing comparisons.
+Date: Mon,  2 Aug 2010 12:20:06 -0700
+Message-Id: <1280776810-18213-5-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1280776810-18213-1-git-send-email-mathewm@codeaurora.org>
 References: <1280776810-18213-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -16,21 +16,39 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/l2cap.c |    1 -
- 1 files changed, 0 insertions(+), 1 deletions(-)
+ net/bluetooth/l2cap.c |    9 ++++-----
+ 1 files changed, 4 insertions(+), 5 deletions(-)
 
 diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 9780ab0..582975b 100644
+index 44bc6ee..9780ab0 100644
 --- a/net/bluetooth/l2cap.c
 +++ b/net/bluetooth/l2cap.c
-@@ -2808,7 +2808,6 @@ static int l2cap_parse_conf_rsp(struct sock *sk, void *rsp, int len, void *data,
- 	if (*result == L2CAP_CONF_SUCCESS) {
- 		switch (rfc.mode) {
+@@ -2708,10 +2708,10 @@ done:
  		case L2CAP_MODE_ERTM:
--			pi->remote_tx_win   = rfc.txwin_size;
- 			pi->retrans_timeout = le16_to_cpu(rfc.retrans_timeout);
- 			pi->monitor_timeout = le16_to_cpu(rfc.monitor_timeout);
- 			pi->mps    = le16_to_cpu(rfc.max_pdu_size);
+ 			pi->remote_tx_win = rfc.txwin_size;
+ 			pi->remote_max_tx = rfc.max_transmit;
+-			if (rfc.max_pdu_size > pi->conn->mtu - 10)
+-				rfc.max_pdu_size = le16_to_cpu(pi->conn->mtu - 10);
+ 
+ 			pi->remote_mps = le16_to_cpu(rfc.max_pdu_size);
++			if (pi->remote_mps > pi->conn->mtu - 10)
++				pi->remote_mps = pi->conn->mtu - 10;
+ 
+ 			rfc.retrans_timeout =
+ 				le16_to_cpu(L2CAP_DEFAULT_RETRANS_TO);
+@@ -2726,10 +2726,9 @@ done:
+ 			break;
+ 
+ 		case L2CAP_MODE_STREAMING:
+-			if (rfc.max_pdu_size > pi->conn->mtu - 10)
+-				rfc.max_pdu_size = le16_to_cpu(pi->conn->mtu - 10);
+-
+ 			pi->remote_mps = le16_to_cpu(rfc.max_pdu_size);
++			if (pi->remote_mps > pi->conn->mtu - 10)
++				pi->remote_mps = pi->conn->mtu - 10;
+ 
+ 			pi->conf_state |= L2CAP_CONF_MODE_DONE;
+ 
 -- 
 1.7.1
 
