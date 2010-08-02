@@ -1,95 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 2 Aug 2010 21:55:42 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: ingas@codeaurora.org
-Cc: linux-bluetooth@vger.kernel.org, rshaffer@codeaurora.org,
-	marcel@holtmann.org
-Subject: Re: [PATCH v4 0/5] Enhanced support for extended inquiry response
-Message-ID: <20100802185542.GA28641@jh-x301>
-References: <1279814780-29673-1-git-send-email-ingas@codeaurora.org>
- <20100723082045.GA1600@jh-x301>
- <20100723082754.GA12563@jh-x301>
- <20100723084300.GA14443@jh-x301>
- <b622ef9ae078ace2da7a8a6748823d2f.squirrel@www.codeaurora.org>
- <20100726094444.GB20357@jh-x301>
- <feb3c412e1be4c1b7b42efdbc581aabb.squirrel@www.codeaurora.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <feb3c412e1be4c1b7b42efdbc581aabb.squirrel@www.codeaurora.org>
+Subject: Re: Enhancements to allow l2cap channel to use either AMP or BR/EDR
+From: Marcel Holtmann <marcel@holtmann.org>
+To: tmonahan@codeaurora.org
+Cc: David Vrabel <david.vrabel@csr.com>,
+	Inga Stotland <ingas@codeaurora.org>,
+	linux-bluetooth@vger.kernel.org, rshaffer@codeaurora.org,
+	johan.hedberg@gmail.com
+In-Reply-To: <8bfb018fa669b6ace6840881379a1a01.squirrel@www.codeaurora.org>
+References: <8bfb018fa669b6ace6840881379a1a01.squirrel@www.codeaurora.org>
+Content-Type: text/plain; charset="UTF-8"
+Date: Mon, 02 Aug 2010 11:53:20 -0700
+Message-ID: <1280775200.12579.30.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Inga,
+Hi Tim,
 
-First of all, sorry for the slight delay in my reply. I've been on
-holiday last week with quite limted email processing capability.
+please fix your mail client to NOT break threading.
 
-On Wed, Jul 28, 2010, ingas@codeaurora.org wrote:
-> In the current implementation,  EIR write is keyed off HCI Command
-> Complete events for a set of commands (in security.c).
->  - When first registering an OPP service with sdptool, the
-> update_svcclass_list()  (sdpd-service.c) calls manager_update_svc()
-> (manager.c) which in turn calls adapter_update()  (adapter.c).  BTW, why
-> this level of indirection, since manager_update_svc() is called only from
-> one place in the code and calling adapter_update()  is all it does? 
-> Probably some earlier architectural decision I am not aware of…
-
-That looks pretty stupid to me too. Might be some historical artifact.
-Anyway, feel free to send a patch to remove this indirection (i.e. call
-adapter_update directly).
-
-> The current implementation may be extended as following:
-> Since update_svcclass_list() is being called throughout sdpd-service.c in
-> all the places where EIR needs to be updated as well, I propose to modify
-> the corresponding function  adapter_set_service_classes() (adapter.c) :
+> >> AMP vs BR/EDR preference for L2CAP channel can be configured as command
+> line argument using new option "-J". Possible values:
+> >>                  "require_br_edr",
+> >>                  "prefer_amp",
+> >>                  "prefer_br_edr"
+> >> If no preference indicated, the default is set to require BR/EDR.
+> >
+> > I think an explicit channel move command and a channel move complete
+> event are what many applications/profiles will need to be able to use an
+> AMP effectively.
 > 
-> **********************
-> Before:
-> /* If we already have the CoD we want or the cache is enabled or an
-> * existing CoD write is in progress just bail out */
-> if (adapter->current_cod == adapter->wanted_cod ||
-> 	adapter->cache_enable || adapter->pending_cod)
-> return 0;
+> A future AMP policy setting of "manual" could certainly give each
+> application the freedom to move an l2cap channel at will, after applying
+> its own decision making process. However, with that freedom comes the
+> responsibility of processing the AMP related events and initiating the AMP
+> commands to make the decision. For example, the application needs to know
+> if AMP controllers are available both locally and remotely, which in turn
+> requires initiating the AMP discovery process and looking over the
+> available local HCI devices; a loss of the physical link event means the
+> application must move the link back to BR/EDR, etc. All of the additional
+> machinery to accomplish that could indeed be exposed for use by
+> applications. I think such an approach, if really needed, would not
+> conflict with these proposed policies that hide all of that within the
+> kernel.
 > 
+> To illustrate how these policies simplify applications, consider OBEX. An
+> OBEX server application would choose "prefer_br_edr", thus leaving the
+> remote OBEX client to decide and initiate the channel move to an AMP, and
+> thus granting advance permission to the kernel for the move to take place.
+> The OBEX client could examine the size of an upcoming transfer and choose
+> "prefer_amp", thereby instructing the kernel to initiate the move to an
+> AMP if all local and remote conditions allow it. Thus, the OBEX client and
+> server applications make simplistic decisions to set up AMP, and can focus
+> on moving data over the l2cap channel, leaving the management of what
+> medium the data flows over up to the kernel, who keeps it transparent. In
+> this way, work to make an existing profile "AMP aware" is also minimal.
 > 
-> ***********************
-> 
-> After:
-> /* If we already have the CoD we want or the cache is enabled or an
-> * existing CoD write is in progress just bail out */
-> if (adapter->cache_enable || adapter->pending_cod)
-> return 0;
-> 
-> /* If we already have the CoD we want, update EIR and return */
-> if (adapter->current_cod == adapter->wanted_cod ) {
-> 	update_ext_inquiry_response(adapter);
-> 	return 0;
-> }
-> 
-> **********************
-> Will that be acceptable? I tested this modification and it’s working with
-> both d-bus methods and sdptool.
+> In the discussion with Marcel regarding our AMP proposal in March ("RFC:
+> QuIC's AMP + eL2CAP Technical Plans"), where we had listed these AMP
+> control policies, he seemed to indicate that these policies would
+> automatically trigger AMP discovery within the kernel, which it will. As
+> he said, "Less options are less confusing for users" (apologies in advance
+> if I misinterpreted his answer).
 
-Seems good to me.
+my current approach here is still that we wanna do this automatically in
+the background for the profiles. I think at most the profiles should
+just provide a threshold for either a) staying on BR/EDR or b) moving
+over to AMP.
 
-> As a side note, in future it might be a good idea to expose EIR writes to
-> an application layer providing external API. The intent of EIR is to allow
-> quick scan of the surroundings to find a particular service that a device
-> is interested at the moment (and in turn, exposing the services that the
-> device choses to expose at the moment) without actually going into full
-> blown connection mode.   EIR space is at a premium for sophisticated
-> devices with multiple services. Not every single service needs to be
-> exposed in EIR. It would be nice to be able to pick which one to add. For
-> example, if a device supports both headset and handsfree profiles (as all
-> of the phones do), it might not be necessary to advertise headset uuid in
-> EIR since the headsets  out there are mostly legacy devices that cannot
-> perform EIR anyway… Also, as more new services that use uuid128 are
-> introduced, the EIR buffer pretty quickly if every single one of them is
-> added without discretion. Just something to throw out there :)
+I know that the Bluetooth SIG tries to define such policies as part of
+the profiles (like FTP for example), but I think this makes sense. I
+doubt the real usage of making this manual. A profile/application should
+just give its preference or intent and then we try to accommodate them
+as best as possible.
 
-Good point (not that any concrete examples of such a device/situation
-would have come accross yet). One possibility to solve the issue without
-directly exposing this to applications would be to have a (rather
-static) setting in main.conf of UUIDs to be prioritized over others in
-the EIR data.
+The other problem here is also that besides whatever the profiles wants,
+it might happen that the WiFi policy is stronger and only allows using
+the WiFi device as WiFi or as AMP. And if WiFi wins, then we have to rip
+the AMP out of the system. At that point whatever the Bluetooth profiles
+wanted is pointless since the AMP controller is gone anyway.
 
-Johan
+That said, nothing stops us from allowing to make our AMP polices
+dynamic and allow the application to change it threshold during
+lifetime. For example it starts out as BR/EDR only and then during the
+usage of the link it decides that now AMP preferred would make sense. In
+that sense you would have manual switching to some level.
+
+Regards
+
+Marcel
+
+
