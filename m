@@ -1,28 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 2 Aug 2010 22:45:06 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Mol <marcel@mesa.nl>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Fix vcard filter setting
-Message-ID: <20100802194506.GA29596@jh-x301>
-References: <201007281324.o6SDO2oH010611@joshua.mesa.nl>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <201007281324.o6SDO2oH010611@joshua.mesa.nl>
+Subject: Re: [PATCH 4/8] Bluetooth:  Do endianness conversion on MPS
+ configuration value before doing comparisons.
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
+	rshaffer@codeaurora.org, linux-arm-msm@vger.kernel.org
+In-Reply-To: <1280776810-18213-5-git-send-email-mathewm@codeaurora.org>
+References: <1280776810-18213-1-git-send-email-mathewm@codeaurora.org>
+	 <1280776810-18213-5-git-send-email-mathewm@codeaurora.org>
+Content-Type: text/plain; charset="UTF-8"
+Date: Mon, 02 Aug 2010 12:41:46 -0700
+Message-ID: <1280778106.12579.41.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Mat,
 
-On Tue, Jul 27, 2010, Marcel Mol wrote:
-> The bits for VCARD version 2.1 and version 3.0 were wrong:
-> oin case of 2.1 the FN bit was on and for 3.0 it is off.
-> The comment state that 3.0 needs FN while 2.1 does not.
-> This patch fixes that.
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 > ---
->  plugins/phonebook-ebook.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+>  net/bluetooth/l2cap.c |    9 ++++-----
+>  1 files changed, 4 insertions(+), 5 deletions(-)
 
-Thanks for the patch. It's now in the upstream obexd tree.
+same for subject line vs commit message. And please explain why and if
+this fixes a bug.
 
-Johan
+Regards
+
+Marcel
+
+
