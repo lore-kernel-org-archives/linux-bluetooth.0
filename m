@@ -1,77 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-From: Kevin Hayes <kevin@Atheros.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "tmonahan@codeaurora.org" <tmonahan@codeaurora.org>,
-	David Vrabel <david.vrabel@csr.com>,
-	Inga Stotland <ingas@codeaurora.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"rshaffer@codeaurora.org" <rshaffer@codeaurora.org>,
-	"johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
-Date: Mon, 2 Aug 2010 17:51:48 -0700
-Subject: RE: Enhancements to allow l2cap channel to use either AMP or BR/EDR
-Message-ID: <B7132A25476D334D9130FE7532F2A56310A0B08A61@SC1EXMB-MBCL.global.atheros.com>
-References: <8bfb018fa669b6ace6840881379a1a01.squirrel@www.codeaurora.org>
-	 <1280775200.12579.30.camel@localhost.localdomain>
-	 <B7132A25476D334D9130FE7532F2A56310A0B0896E@SC1EXMB-MBCL.global.atheros.com>
- <1280789882.12579.66.camel@localhost.localdomain>
-In-Reply-To: <1280789882.12579.66.camel@localhost.localdomain>
-Content-Type: text/plain; charset="utf-8"
+Date: Mon, 2 Aug 2010 16:56:53 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Marcel Holtmann <marcel@holtmann.org>, gustavo@padovan.org
+cc: linux-bluetooth@vger.kernel.org, rshaffer@codeaurora.org
+Subject: ERTM known bugs/regressions (was Re: [PATCH 0/8] ...)
+In-Reply-To: <1280786940.12579.57.camel@localhost.localdomain>
+Message-ID: <alpine.DEB.2.00.1008021517040.18432@linux-sea-02>
+References: <1280776810-18213-1-git-send-email-mathewm@codeaurora.org>  <1280778649.12579.50.camel@localhost.localdomain>  <alpine.DEB.2.00.1008021450290.18432@linux-sea-02> <1280786940.12579.57.camel@localhost.localdomain>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTWFyY2VsLA0KDQo+ID4NCj4gPiBBZ3JlZSB0aGF0IGl0IHNob3VsZCBiZSBkb25lICJpbiBi
-YWNrZ3JvdW5kIiBhbmQgdGhhdCBhIHNpemUNCj4gdGhyZXNob2xkIHdvdWxkIGJlIHVzZWZ1bC4g
-IEJ1dCB3aG8gZXZhbHVhdGVzIHRoYXQgdGhyZXNob2xkPyAgVGhlDQo+IGJsdWV6IGtlcm5lbCBj
-b21wb25lbnRzLCB3aGljaCBlc3NlbnRpYWxseSBpbXBsZW1lbnQgYSB0cmFuc3BvcnQNCj4gZHJp
-dmVyLCBzaG91bGQgbm90IGJlIGV4YW1pbmluZyBvYmplY3RzIChmaWxlcywgcGhvbmVib29rcywg
-ZXRjKSBzaXplDQo+IHRvIHNlZSBpZiB0aGlzIHRocmVzaG9sZCBpcyBtZXQuICBUaGVyZWZvcmUs
-IGl0IHdvdWxkIHNlZW0gVGltJ3MNCj4gc3VnZ2VzdGlvbiBvZiBoYXZpbmcgdGhlIHByb2ZpbGUg
-c2VuZCBhICdwcmVmZXJfYW1wJyBiaXQgd291bGQgYmUNCj4gdXNlZnVsLCByaWdodD8NCj4gDQo+
-IEkgd291bGQgZG8gc29tZXRoaW5nIGxpa2UgInByZWZlcl9hbXAgd2hlbiBvdmVyIDEwMGtiIiBv
-ciBzb21ldGhpbmcuDQo+IEFuZA0KPiB0aGVuIHRoZSBrZXJuZWwgbmVlZHMgdG8gY291bnQuIE1l
-YW5pbmcgdGhlIEwyQ0FQIGxheWVyIGNvdWxkIGVhc2lseQ0KPiBjb3VudCB0aGlzIGJ5IGl0c2Vs
-Zi4NCg0KV2hhdD8gIExldCdzIHNheSB0aGUgZWZmZWN0IHdlIHdhbnQgaXMgdGhhdCBpZiB0aGUg
-b2JqZWN0IGlzIGdyZWF0ZXIgdGhhbiwgc2F5LCAxMCBtZWdhYnl0ZXMsIHRoZW4gd2Ugd2FudCB0
-byB1c2UgQU1QIGZvciB0aGUgdHJhbnNmZXIuICBXaXRoIHlvdXIgc2NoZW1lLCB5b3Ugd2FudCB0
-aGUga2VybmVsIHRvIGNvdW50IHVwIHRvIDEwIG1lZ2FieXRlcywgVEhFTiBzd2l0Y2ggb3ZlciB0
-byBBTVA/DQpObywgeW91IGRvbid0LCBoZSBzYXlzIHJoZXRvcmljYWxseS4gIDopICANCg0KPiAN
-Cj4gQWxzbyBqdXN0IHN0YXJ0aW5nIHdpdGggc2V0c29ja29wdChicmVkcl9vbmx5KSBhbmQgdGhl
-biBsYXRlciBvbiBqdXN0DQo+IGRvaW5nIHNldHNvY2tvcHQocHJlZmVyX2FtcCkgdGhlIHVzZXJz
-cGFjZSBhcHBsaWNhdGlvbiB3b3VsZCBoYXZlDQo+IGNvbnRyb2wgb3ZlciBzd2l0Y2hpbmcgbWFu
-dWFsbHkuDQoNCkhvdyBpcyB0aGlzIHJlYWxseSBkaWZmZXJlbnQgZnJvbSB5b3VyIGlvY3RsKHN3
-aXRjaF9ub3dfdG9fYW1wKSBiZWxvdywgd2hpY2ggbG9va3MgdmVyeSB3cm9uZz8NCg0KPiANCj4g
-U2luY2UgdGhlIHBvbGljZXMgYXJlIG9uIGEgcGVyIHNvY2tldCBiYXNpcywgSSBkb24ndCBzZWUg
-YSBiaWcgcHJvYmxlbQ0KPiB3aXRoIGRvaW5nIGl0IGxpa2UgdGhpcy4NCj4gDQo+IFRoZSBvbmx5
-IHRoaW5nIHRoYXQgSSBkb24ndCB3YW50IGlzIGEgaW9jdGwoc3dpdGNoX25vd190b19hbXApIHNp
-bmNlDQo+IHRoYXQgbG9va3MgdmVyeSB3cm9uZyB0byBtZS4NCkFncmVlZC4NCg0KPiANCj4gPiA+
-IFRoZSBvdGhlciBwcm9ibGVtIGhlcmUgaXMgYWxzbyB0aGF0IGJlc2lkZXMgd2hhdGV2ZXIgdGhl
-IHByb2ZpbGVzDQo+ID4gPiB3YW50cywNCj4gPiA+IGl0IG1pZ2h0IGhhcHBlbiB0aGF0IHRoZSBX
-aUZpIHBvbGljeSBpcyBzdHJvbmdlciBhbmQgb25seSBhbGxvd3MNCj4gdXNpbmcNCj4gPiA+IHRo
-ZSBXaUZpIGRldmljZSBhcyBXaUZpIG9yIGFzIEFNUC4gQW5kIGlmIFdpRmkgd2lucywgdGhlbiB3
-ZSBoYXZlDQo+IHRvDQo+ID4gPiByaXANCj4gPiA+IHRoZSBBTVAgb3V0IG9mIHRoZSBzeXN0ZW0u
-IEF0IHRoYXQgcG9pbnQgd2hhdGV2ZXIgdGhlIEJsdWV0b290aA0KPiA+ID4gcHJvZmlsZXMNCj4g
-PiA+IHdhbnRlZCBpcyBwb2ludGxlc3Mgc2luY2UgdGhlIEFNUCBjb250cm9sbGVyIGlzIGdvbmUg
-YW55d2F5Lg0KPiA+DQo+ID4gV2VsbCwgSSB0aGluayB0aGlzIGlzIGJlc3QgbWFuYWdlZCBieSBo
-YXZpbmcgdGhlIFBBTCBhbm5vdW5jZSBpdHMNCj4gYXZhaWxhYmlsaXR5IChhbmQgdW5hdmFpbGFi
-aWxpdHkpIHRvIEEyTVAsIHVzaW5nIHRoZSBzcGVjJ3MgSENJIGV2ZW50cw0KPiBmb3IgdGhpcyBw
-dXJwb3NlLiAgQTJNUCBjYW4gdGhlbiBiZSB0aGUgYWdlbnQgdG8gbW92ZSB0aGUgY2hhbm5lbCB0
-bw0KPiBBTVAgb3Igbm90LCBhY2NvcmRpbmdseS4gIEZvciBleGFtcGxlLCBpdCBtaWdodCBiZSB0
-aGF0IHRoZSA4MDIuMTENCj4gZGV2aWNlIGlzIGJlaW5nIHVzZWQgZm9yIGFuIGluZnJhc3RydWN0
-dXJlIGxpbmssIGFuZCB0aGVuIHRoYXQgbGluaw0KPiBnb2VzIGF3YXkuICBUaGUgUEFMIHdvdWxk
-IHRoZW4gYW5ub3VuY2UgaXRzIGF2YWlsYWJpbGl0eSB0byB0aGUgQlQNCj4gc3RhY2sgKEEyTVAp
-LCBhbmQgQTJNUCB3b3VsZCB0aGVuIG1vdmUgdGhlIGNoYW5uZWwgdG8gQU1QLg0KPiANCj4gQWdy
-ZWVkLiBNeSBwb2ludCB3YXMganVzdCB0aGF0IGFwcGxpY2F0aW9uIGNhbiBvbmx5IHNldCBhIHBv
-bGljeS4gVGhleQ0KPiBjYW4ndCBzd2l0Y2ggbWFudWFsbHkuIElmIGFwcGxpY2F0aW9uIHdvdWxk
-IHN3aXRjaCBtYW51YWxseSB0aGVuIHRoZXkNCj4gbmVlZCB0byBjaGVjayBQQUwgYXZhaWxhYmls
-aXR5IGV0Yy4gSSBkb24ndCB3YW50IHRoYXQgY29tcGxleGl0eSBpbnNpZGUNCj4gdGhlIGFwcGxp
-Y2F0aW9ucy4NCj4gDQo+ID4gPiBUaGF0IHNhaWQsIG5vdGhpbmcgc3RvcHMgdXMgZnJvbSBhbGxv
-d2luZyB0byBtYWtlIG91ciBBTVAgcG9saWNlcw0KPiA+ID4gZHluYW1pYyBhbmQgYWxsb3cgdGhl
-IGFwcGxpY2F0aW9uIHRvIGNoYW5nZSBpdCB0aHJlc2hvbGQgZHVyaW5nDQo+ID4gPiBsaWZldGlt
-ZS4gRm9yIGV4YW1wbGUgaXQgc3RhcnRzIG91dCBhcyBCUi9FRFIgb25seSBhbmQgdGhlbiBkdXJp
-bmcNCj4gdGhlDQo+ID4gPiB1c2FnZSBvZiB0aGUgbGluayBpdCBkZWNpZGVzIHRoYXQgbm93IEFN
-UCBwcmVmZXJyZWQgd291bGQgbWFrZQ0KPiBzZW5zZS4NCj4gPiA+IEluDQo+ID4gPiB0aGF0IHNl
-bnNlIHlvdSB3b3VsZCBoYXZlIG1hbnVhbCBzd2l0Y2hpbmcgdG8gc29tZSBsZXZlbC4NCj4gPg0K
-PiA+IFRoZSBvbmx5IHVzZSBjYXNlIEkgc2VlIGZvciBtYW51YWwgc3dpdGNoaW5nIGlzIGRlYnVn
-Z2luZy4NCj4gDQo+IFRoYXQgaXMgZmluZS4gV2UgY2FuIGRvIHRoYXQgdmlhIGRlYnVnZnMuDQo+
-IA0KPiBSZWdhcmRzDQo+IA0KPiBNYXJjZWwNCj4gDQoNCg==
+
+Marcel & Gustavo -
+
+On Mon, 2 Aug 2010, Marcel Holtmann wrote:
+
+> Hi Mat,
+
+<snip>
+
+> since 2.6.36 will be the first kernel we enable ERTM by default, I
+> prefer that we have known bugs/regressions actually fixed.
+
+
+Gustavo has done a lot of great work to get ERTM ready to be turned on 
+by default, but there is one potential issue I see with ERTM that I'd 
+like to discuss: locking.
+
+Kernel timers are used for the ack, retransmit, and monitor timeouts. 
+The handler functions for these timers use bh_lock_sock() and 
+bh_unlock_sock() to protect socket state.  While this does protect 
+against simultaneous timeouts, or access in tasklet context for 
+incoming HCI data, it doesn't protect against access in user context.
+
+Here's a scenario:
+
+  * Application calls send()
+  * lock_sock() is called in l2cap_sock_sendmsg()
+  * L2CAP code starts to modify l2cap_pinfo(sk) state in user context
+  * Timer fires, preempting l2cap_sock_sendmsg() or on another CPU
+  * Timer does not spin on bh_lock_sock()
+  * Timer handler changes l2cap_pinfo(sk) state
+  * Timer calls bh_unlock_sock() and finishes
+  * Code called by l2cap_sock_sendmsg() continues running, but
+    l2cap_pinfo(sk) was changed by the timer.
+  * release_sock() is called and l2cap_sock_sendmsg() returns.
+
+It doesn't look like this would lead to a kernel panic, but can
+cause data coherency problems in l2cap_pinfo(sk) (especially 
+l2cap_pinfo(sk)->conn_state).  The most likely symptom would be 
+spurious disconnects when the other end of the ERTM connection sees 
+some odd behavior.
+
+
+One solution is to use a workqueue for these timeouts, and then use 
+lock_sock() and release_sock() to protect l2cap_pinfo(sk) in the 
+workqueue handlers.  There's a big catch, though:  the socket might be 
+locked for a while if bt_skb_send_alloc() blocks and ERTM is not 
+sending data from the TX queue (it might be retransmitting frames 
+instead).  As long as the lock is held, all the incoming data is put 
+in the socket backlog and any ack/retrans/monitor timers that fire on 
+the workqueue will block everything on that queue.  The ERTM 
+connection can stall.
+
+I think the ERTM code would need to either release the socket lock 
+when calling bt_skb_send_alloc(), or another spinlock is needed to 
+protect l2cap_pi(sk).  Per-socket workqueues might be a good idea too, 
+so one locked socket can't block timeouts on other sockets.
+
+This is a non-issue in basic mode, because no socket state is changed 
+when data is sent or received.
+
+
+Do you agree that there's an ERTM issue here to be addressed?  Any 
+ideas regarding the workqueue solution?
+
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
