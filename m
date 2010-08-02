@@ -1,42 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4C56B430.4040901@csr.com>
+Date: Mon, 02 Aug 2010 13:04:00 +0100
+From: David Vrabel <david.vrabel@csr.com>
 MIME-Version: 1.0
-In-Reply-To: <1280130927-4137-2-git-send-email-santoscadenas@gmail.com>
-References: <1280130927-4137-1-git-send-email-santoscadenas@gmail.com>
-	<1280130927-4137-2-git-send-email-santoscadenas@gmail.com>
-Date: Mon, 2 Aug 2010 17:39:18 +0300
-Message-ID: <AANLkTin1khXOxvZTdazRYFbb3VZCf39YFYaZnwa3cbmN@mail.gmail.com>
-Subject: Re: [PATCH] Notify to device drivers when the SDP records change
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+To: Inga Stotland <ingas@codeaurora.org>
+CC: linux-bluetooth@vger.kernel.org, rshaffer@codeaurora.org,
+        johan.hedberg@gmail.com, marcel@holtmann.org
+Subject: Re: Enhancements to allow l2cap channel to use either AMP or BR/EDR
+References: <1280514626-22559-1-git-send-email-ingas@codeaurora.org>
+In-Reply-To: <1280514626-22559-1-git-send-email-ingas@codeaurora.org>
 Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Inga Stotland wrote:
+> AMP vs BR/EDR preference for L2CAP channel can be configured as 
+> command line argument using new option "-J". Possible values: 
+>                  "require_br_edr", 
+>                  "prefer_amp", 
+>                  "prefer_br_edr"
+> If no preference indicated, the default is set to require BR/EDR. 
 
-On Mon, Jul 26, 2010 at 10:55 AM, Jose Antonio Santos Cadenas
-<santoscadenas@gmail.com> wrote:
-> When the remote SDP records that make a driver to be loaded change
-> (added, remove, or updated) And the driver is not going to be
-> removed, a notification is sent to the device driver. This
-> notification is optional annnd does not fail  if the driver does
-> not implemment it.
+I think an explicit channel move command and a channel move complete
+event are what many applications/profiles will need to be able to use an
+AMP effectively.
 
-How this is supposed to work? If does seems to me that you guys are
-planning to keep polling the services records to update the drivers
-which IMO is not a good idea, DiscoverServices is not meant to update
-the drivers either it is basically a replacement to sdptool to so
-application can do it over dbus. Also if you take a closer look in the
-plugins that use rfcomm channel, which can be changed at any point,
-they basically fetch the record when attempting to connect, avdtp also
-work in a similar way, we have to do the discover + get capabilities
-every time we want to connect to a sink/source since there is no way
-to keep this information updated locally.
-
-In the other hand, this can be useful for LE which we can subscribe to
-changes, but for sdp I don't see the point.
-
+David
 -- 
-Luiz Augusto von Dentz
-Computer Engineer
+David Vrabel, Senior Software Engineer, Drivers
+CSR, Churchill House, Cambridge Business Park,  Tel: +44 (0)1223 692562
+Cowley Road, Cambridge, CB4 0WZ                 http://www.csr.com/
+
+
+Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
