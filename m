@@ -1,96 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <85686e0eb8df90f1f64a36832e1afb98.squirrel@www.codeaurora.org>
-In-Reply-To: <20100802185542.GA28641@jh-x301>
-References: <1279814780-29673-1-git-send-email-ingas@codeaurora.org>
-    <20100723082045.GA1600@jh-x301> <20100723082754.GA12563@jh-x301>
-    <20100723084300.GA14443@jh-x301>
-    <b622ef9ae078ace2da7a8a6748823d2f.squirrel@www.codeaurora.org>
-    <20100726094444.GB20357@jh-x301>
-    <feb3c412e1be4c1b7b42efdbc581aabb.squirrel@www.codeaurora.org>
-    <20100802185542.GA28641@jh-x301>
-Date: Mon, 2 Aug 2010 14:24:09 -0700 (PDT)
-Subject: Re: [PATCH v4 0/5] Enhanced support for extended inquiry response
-From: ingas@codeaurora.org
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org
+Sender: "Gustavo F. Padovan" <gfpadovan@gmail.com>
+Date: Mon, 2 Aug 2010 18:20:14 -0300
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Mat Martineau <mathewm@codeaurora.org>, linux-bluetooth@vger.kernel.org,
+	rshaffer@codeaurora.org, linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH 1/8] Bluetooth:  Make sure the L2CAP FCS is only
+ enabled for ERTM or streaming.
+Message-ID: <20100802212014.GB20149@vigoh>
+References: <1280776810-18213-1-git-send-email-mathewm@codeaurora.org>
+ <1280776810-18213-2-git-send-email-mathewm@codeaurora.org>
+ <1280777912.12579.37.camel@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1280777912.12579.37.camel@localhost.localdomain>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Mat,
 
-Thanks for your reply.
+* Marcel Holtmann <marcel@holtmann.org> [2010-08-02 12:38:32 -0700]:
 
-> Hi Inga,
->
-> First of all, sorry for the slight delay in my reply. I've been on
-> holiday last week with quite limted email processing capability.
->
-> On Wed, Jul 28, 2010, ingas@codeaurora.org wrote:
->> In the current implementation,  EIR write is keyed off HCI Command
->> Complete events for a set of commands (in security.c).
->>  - When first registering an OPP service with sdptool, the
->> update_svcclass_list()  (sdpd-service.c) calls manager_update_svc()
->> (manager.c) which in turn calls adapter_update()  (adapter.c).  BTW, why
->> this level of indirection, since manager_update_svc() is called only
->> from
->> one place in the code and calling adapter_update()  is all it does?
->> Probably some earlier architectural decision I am not aware of…
->
-> That looks pretty stupid to me too. Might be some historical artifact.
-> Anyway, feel free to send a patch to remove this indirection (i.e. call
-> adapter_update directly).
->
+> Hi Mat,
+> 
+> > Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> > ---
+> >  net/bluetooth/l2cap.c |   12 ++++++++----
+> >  1 files changed, 8 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> > index 9ba1e8e..aed72f2 100644
+> > --- a/net/bluetooth/l2cap.c
+> > +++ b/net/bluetooth/l2cap.c
+> > @@ -3127,8 +3127,10 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+> >  		goto unlock;
+> >  
+> >  	if (l2cap_pi(sk)->conf_state & L2CAP_CONF_INPUT_DONE) {
+> > -		if (!(l2cap_pi(sk)->conf_state & L2CAP_CONF_NO_FCS_RECV) ||
+> > -		    l2cap_pi(sk)->fcs != L2CAP_FCS_NONE)
+> > +		if ((l2cap_pi(sk)->mode == L2CAP_MODE_ERTM ||
+> > +			l2cap_pi(sk)->mode == L2CAP_MODE_STREAMING) &&
+> > +			(!(l2cap_pi(sk)->conf_state & L2CAP_CONF_NO_FCS_RECV) ||
+> > +			l2cap_pi(sk)->fcs != L2CAP_FCS_NONE))
+> >  			l2cap_pi(sk)->fcs = L2CAP_FCS_CRC16;
+> 
+> this becomes unreadable and my brain starts to throw a core dump. So it
+> clearly needs to be put into a helper inline function.
 
-Will do once i get through the initial submission.
-
-
->> The current implementation may be extended as following:
->> Since update_svcclass_list() is being called throughout sdpd-service.c
->> in
->> all the places where EIR needs to be updated as well, I propose to
->> modify
->> the corresponding function  adapter_set_service_classes() (adapter.c) :
->>
->> **********************
->> Before:
->> /* If we already have the CoD we want or the cache is enabled or an
->> * existing CoD write is in progress just bail out */
->> if (adapter->current_cod == adapter->wanted_cod ||
->> 	adapter->cache_enable || adapter->pending_cod)
->> return 0;
->>
->>
->> ***********************
->>
->> After:
->> /* If we already have the CoD we want or the cache is enabled or an
->> * existing CoD write is in progress just bail out */
->> if (adapter->cache_enable || adapter->pending_cod)
->> return 0;
->>
->> /* If we already have the CoD we want, update EIR and return */
->> if (adapter->current_cod == adapter->wanted_cod ) {
->> 	update_ext_inquiry_response(adapter);
->> 	return 0;
->> }
->>
->> **********************
->> Will that be acceptable? I tested this modification and it’s working
->> with
->> both d-bus methods and sdptool.
->
-> Seems good to me.
->
+Actually we don't need that, since the code that deals with Basic Mode
+never check  and use the l2cap_pi(sk)->fcs. So we don't care about FCS
+value in the Basic Mode.
 
 
-I just submitted an updated patch set for EIR (hopefully, not messing up
-my tabs an spaces in the process). This is certainly a learning process
-and your patience is appreciated :)
-
-Regards,
-
-Inga
-
-
+-- 
+Gustavo F. Padovan
+http://padovan.org
