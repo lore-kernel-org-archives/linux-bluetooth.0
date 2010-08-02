@@ -1,45 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 2 Aug 2010 15:02:30 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
-	rshaffer@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH 0/8] Bluetooth: L2CAP updates for PSM validation and
- ERTM.
-In-Reply-To: <1280778649.12579.50.camel@localhost.localdomain>
-Message-ID: <alpine.DEB.2.00.1008021450290.18432@linux-sea-02>
-References: <1280776810-18213-1-git-send-email-mathewm@codeaurora.org> <1280778649.12579.50.camel@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
+Message-Id: <201008022157.o72LvLf5015732@joshua.mesa.nl>
+From: Marcel Mol <marcel@mesa.nl>
+Date: Mon, 2 Aug 2010 23:29:56 +0200
+Subject: [PATCH] obexd: ebook backend: return all TEL attribs from vcard in string
+To: linux-bluetooth@vger.kernel.org
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+evcard_to_string() only took one TEL attrib from a vcard. But
+multiple TEL attribs are supported. This patch will convert
+all TEL attribs to strings.
+---
+ plugins/phonebook-ebook.c |   22 +++++++++++++---------
+ 1 files changed, 13 insertions(+), 9 deletions(-)
 
-On Mon, 2 Aug 2010, Marcel Holtmann wrote:
-
-> Hi Mat,
->
->> This is a collection of ERTM-related patches, including some L2CAP
->> configuration fixes and allowing partial-frame reads from L2CAP
->> SOCK_STREAM sockets.  PSM validation is also included, although that
->> is not restricted to ERTM.
->
-> so the merge window for 2.6.36 is basically closed and these patches
-> came in too late. If they fix a bug, I like you to explain that in
-> detail in the commit message so I can pick them out and include them for
-> submission to John.
-
-Marcel -
-
-I'll fix up my commit messages and make the other changes you 
-recommended.  I don't have a specific need for these to be in 2.6.36, 
-but with more detail on the bug fixes you can decide if they're urgent 
-enough.
-
-Thanks for the feedback.
-
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+diff --git a/plugins/phonebook-ebook.c b/plugins/phonebook-ebook.c
+index 089b956..d2482c0 100644
+--- a/plugins/phonebook-ebook.c
++++ b/plugins/phonebook-ebook.c
+@@ -97,6 +97,7 @@ static char *evcard_to_string(EVCard *evcard, unsigned int format,
+ 							uint64_t filter)
+ {
+ 	EVCard *evcard2;
++	GList *l;
+ 	char *vcard;
+ 	unsigned int i;
+ 
+@@ -109,18 +110,21 @@ static char *evcard_to_string(EVCard *evcard, unsigned int format,
+ 	 */
+ 	filter = format == EVC_FORMAT_VCARD_30 ? filter | 0x87: filter | 0x85;
+ 
++	l = e_vcard_get_attributes(evcard);
+ 	evcard2 = e_vcard_new();
+-	for (i = 0; i < 29; i++) {
+-		EVCardAttribute *attrib;
+-
+-		if (!(filter & (1 << i)))
+-			continue;
+-
+-		attrib = e_vcard_get_attribute(evcard, attribute_mask[i]);
++	for (; l; l = g_list_next(l)) {
++		EVCardAttribute *attrib = l->data;
+ 		if (!attrib)
+ 			continue;
+-
+-		e_vcard_add_attribute(evcard2, e_vcard_attribute_copy(attrib));
++		const char *name = e_vcard_attribute_get_name(attrib);
++		for (i = 0; attribute_mask[i] != NULL; i++) {
++			if (!(filter & (1 << i)))
++				continue;
++			if (g_strcmp0(name, attribute_mask[i]) != 0)
++				continue;
++			e_vcard_add_attribute(evcard2,
++						e_vcard_attribute_copy(attrib));
++		}
+ 	}
+ 
+ 	vcard = e_vcard_to_string(evcard2, format);
+-- 
+1.7.2
 
