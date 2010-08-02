@@ -1,48 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 1/8] Bluetooth:  Make sure the L2CAP FCS is only
- enabled for ERTM or streaming.
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
-	rshaffer@codeaurora.org, linux-arm-msm@vger.kernel.org
-In-Reply-To: <1280776810-18213-2-git-send-email-mathewm@codeaurora.org>
+From: Mat Martineau <mathewm@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org,
+	gustavo@padovan.org,
+	rshaffer@codeaurora.org,
+	linux-arm-msm@vger.kernel.org,
+	Mat Martineau <mathewm@codeaurora.org>
+Subject: [PATCH 8/8] Bluetooth:  Use 3-DH5 payload size for default ERTM max PDU size.
+Date: Mon,  2 Aug 2010 12:20:10 -0700
+Message-Id: <1280776810-18213-9-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <1280776810-18213-1-git-send-email-mathewm@codeaurora.org>
 References: <1280776810-18213-1-git-send-email-mathewm@codeaurora.org>
-	 <1280776810-18213-2-git-send-email-mathewm@codeaurora.org>
-Content-Type: text/plain; charset="UTF-8"
-Date: Mon, 02 Aug 2010 12:38:32 -0700
-Message-ID: <1280777912.12579.37.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> ---
->  net/bluetooth/l2cap.c |   12 ++++++++----
->  1 files changed, 8 insertions(+), 4 deletions(-)
-> 
-> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-> index 9ba1e8e..aed72f2 100644
-> --- a/net/bluetooth/l2cap.c
-> +++ b/net/bluetooth/l2cap.c
-> @@ -3127,8 +3127,10 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
->  		goto unlock;
->  
->  	if (l2cap_pi(sk)->conf_state & L2CAP_CONF_INPUT_DONE) {
-> -		if (!(l2cap_pi(sk)->conf_state & L2CAP_CONF_NO_FCS_RECV) ||
-> -		    l2cap_pi(sk)->fcs != L2CAP_FCS_NONE)
-> +		if ((l2cap_pi(sk)->mode == L2CAP_MODE_ERTM ||
-> +			l2cap_pi(sk)->mode == L2CAP_MODE_STREAMING) &&
-> +			(!(l2cap_pi(sk)->conf_state & L2CAP_CONF_NO_FCS_RECV) ||
-> +			l2cap_pi(sk)->fcs != L2CAP_FCS_NONE))
->  			l2cap_pi(sk)->fcs = L2CAP_FCS_CRC16;
+Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+---
+ include/net/bluetooth/l2cap.h |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-this becomes unreadable and my brain starts to throw a core dump. So it
-clearly needs to be put into a helper inline function.
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 16e412f..93aba17 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -35,7 +35,7 @@
+ #define L2CAP_DEFAULT_MAX_TX		3
+ #define L2CAP_DEFAULT_RETRANS_TO	2000    /* 2 seconds */
+ #define L2CAP_DEFAULT_MONITOR_TO	12000   /* 12 seconds */
+-#define L2CAP_DEFAULT_MAX_PDU_SIZE	672
++#define L2CAP_DEFAULT_MAX_PDU_SIZE	1011    /* Sized for 3-DH5 packet */
+ #define L2CAP_DEFAULT_ACK_TO		200
+ #define L2CAP_LOCAL_BUSY_TRIES		12
+ 
+-- 
+1.7.1
 
-Regards
-
-Marcel
-
-
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
