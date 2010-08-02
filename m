@@ -1,33 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 5/8] Bluetooth:  Don't modify remote_tx_win when
- receiving a config response. Only config requests should set remote_tx_win.
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
-	rshaffer@codeaurora.org, linux-arm-msm@vger.kernel.org
-In-Reply-To: <1280776810-18213-6-git-send-email-mathewm@codeaurora.org>
-References: <1280776810-18213-1-git-send-email-mathewm@codeaurora.org>
-	 <1280776810-18213-6-git-send-email-mathewm@codeaurora.org>
-Content-Type: text/plain; charset="UTF-8"
-Date: Mon, 02 Aug 2010 12:42:46 -0700
-Message-ID: <1280778166.12579.42.camel@localhost.localdomain>
-Mime-Version: 1.0
+Date: Mon, 2 Aug 2010 22:45:06 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Mol <marcel@mesa.nl>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] Fix vcard filter setting
+Message-ID: <20100802194506.GA29596@jh-x301>
+References: <201007281324.o6SDO2oH010611@joshua.mesa.nl>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <201007281324.o6SDO2oH010611@joshua.mesa.nl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Hi,
 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+On Tue, Jul 27, 2010, Marcel Mol wrote:
+> The bits for VCARD version 2.1 and version 3.0 were wrong:
+> oin case of 2.1 the FN bit was on and for 3.0 it is off.
+> The comment state that 3.0 needs FN while 2.1 does not.
+> This patch fixes that.
 > ---
->  net/bluetooth/l2cap.c |    1 -
->  1 files changed, 0 insertions(+), 1 deletions(-)
+>  plugins/phonebook-ebook.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
-please write a proper commit message. Your subject is not meant to be
-used for explaining what is wrong and what is right and how you did it.
-It is called a SUBJECT.
+Thanks for the patch. It's now in the upstream obexd tree.
 
-Regards
-
-Marcel
-
-
+Johan
