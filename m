@@ -3,16 +3,18 @@ From: =?iso-8859-1?q?Jos=E9_Antonio_Santos_Cadenas?=
 	<santoscadenas@gmail.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Subject: Re: [PATCH] Notify to device drivers when the SDP records change
-Date: Tue, 3 Aug 2010 14:43:16 +0200
+Date: Tue, 3 Aug 2010 14:33:31 +0200
 Cc: linux-bluetooth@vger.kernel.org
 References: <1280130927-4137-1-git-send-email-santoscadenas@gmail.com> <201008031112.11556.santoscadenas@gmail.com> <AANLkTin9WnU0v2NqS5cAjRxyhipJCBYX0=KWponiCk14@mail.gmail.com>
 In-Reply-To: <AANLkTin9WnU0v2NqS5cAjRxyhipJCBYX0=KWponiCk14@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: Text/Plain;
   charset="iso-8859-1"
-Message-Id: <201008031443.16245.santoscadenas@gmail.com>
+Message-Id: <201008031433.31891.santoscadenas@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
+
+Hi, 
 
 El Tuesday 03 August 2010 13:42:15 Luiz Augusto von Dentz escribió:
 > Hi,
@@ -45,23 +47,19 @@ El Tuesday 03 August 2010 13:42:15 Luiz Augusto von Dentz escribió:
 > the application knows the about HealthService, so the only way make
 > this to work is that the HealthApplication and HealthAgent leaves in
 > the same process but this defeats the point of having them separated.
-
-Yes, this only works in the same process. It is a way for receiving callbacks 
-from the daemon.
-
 > So either we have the applications and services being announced to
 > everyone and then anyone can do the matching or we don't announce them
 > at all and make bluetoothd do the matching itself, I guess the latter
 > is better so we don't have to split the logic in many place (with
 > potential code duplication + bugs).
-
-At this point, I have the same opinion, Services can be notified using 
-signals. But Marcel thought that it will be better and will let the 
-programmers make less mistakes if only the services related to the application 
-are notified, that is why this information is send through the agent instead 
-of sending signals. Of course this can be changed if we think that is better.
-
 > 
 > Another important thing is that dbus introspection does not have any
 > way to notify changes, so it really need to be signal to notify
 > applications about new services.
+
+Can we have an IRC session to talk about the API and continuing this 
+discussion? I think that this thread is changing too much from its original 
+topic.
+
+
+Regards.
