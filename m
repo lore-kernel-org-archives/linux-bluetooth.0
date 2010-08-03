@@ -1,74 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <b93d3fcab246c34ed104129b0850495d.squirrel@www.codeaurora.org>
-In-Reply-To: <20100803080719.GD20149@vigoh>
-References: <8bfb018fa669b6ace6840881379a1a01.squirrel@www.codeaurora.org>
-    <1280775200.12579.30.camel@localhost.localdomain>
-    <B7132A25476D334D9130FE7532F2A56310A0B0896E@SC1EXMB-MBCL.global.atheros.com>
-    <1280789882.12579.66.camel@localhost.localdomain>
-    <B7132A25476D334D9130FE7532F2A56310A0B08A61@SC1EXMB-MBCL.global.atheros.com>
-    <3e0b0d621e7c3dcee98b2a16c6e1f23b.squirrel@www.codeaurora.org>
-    <20100803080719.GD20149@vigoh>
-Date: Tue, 3 Aug 2010 08:40:57 -0500 (CDT)
-Subject: Re: Enhancements to allow l2cap channel to use either AMP or BR/EDR
-From: "Tim Monahan-Mitchell" <tmonahan@codeaurora.org>
-To: "Gustavo F. Padovan" <gustavo@padovan.org>
-Cc: "Peter Krystad" <pkrystad@codeaurora.org>,
- "Kevin Hayes" <kevin@atheros.com>,
- "Marcel Holtmann" <marcel@holtmann.org>,
- "tmonahan@codeaurora.org" <tmonahan@codeaurora.org>,
- "David Vrabel" <david.vrabel@csr.com>,
- "Inga Stotland" <ingas@codeaurora.org>,
- "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
- "rshaffer@codeaurora.org" <rshaffer@codeaurora.org>,
- "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
-Reply-To: tmonahan@codeaurora.org
 MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
+In-Reply-To: <4C518373.6000706@aircable.net>
+References: <4C46324D.5070800@aircable.net> <20100721101934.GA12188@jh-x301>
+	<4C470E2D.7000607@aircable.net> <AANLkTi=8=BUThjVdc4EN_8uupGKmdgHQzGOe560Cv+pm@mail.gmail.com>
+	<AANLkTi=jzZScnCK6rFpKjBJesnw=71y5hNG3kDBhxv1u@mail.gmail.com>
+	<4C505806.3040508@aircable.net> <AANLkTikRQfhAKm-UW+on+ZeEp709z_ku_NDjeVD_US1b@mail.gmail.com>
+	<AANLkTi=9Top+9kRwtZj-nZw8szQU4ff9CTSNSGuexmEL@mail.gmail.com>
+	<4C518373.6000706@aircable.net>
+From: Manuel Naranjo <manuel@aircable.net>
+Date: Tue, 3 Aug 2010 10:21:23 -0300
+Message-ID: <AANLkTi=i8MhyC80qis9TjZBmtNUJDBMNw5g2rjKPQvdj@mail.gmail.com>
+Subject: Re: [PATCH][RFC] Fix SDP resolving segfault
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	BlueZ <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, Gustavo and Marcel,
+> I will give this a try and let you know. Maybe I can results before the
+> Tuesday, but I doubt it.
 
-> Hi Peter,
->
-> * Peter Krystad <pkrystad@codeaurora.org> [2010-08-02 18:30:34 -0700]:
->
->>
->> Hi Marcel and Kevin,
->>
->> >> >
->> >> > Agree that it should be done "in background" and that a size
->> >> threshold would be useful.  But who evaluates that threshold?  The
->> >> bluez kernel components, which essentially implement a transport
->> >> driver, should not be examining objects (files, phonebooks, etc) size
->> >> to see if this threshold is met.  Therefore, it would seem Tim's
->> >> suggestion of having the profile send a 'prefer_amp' bit would be
->> >> useful, right?
->> >>
->> >> I would do something like "prefer_amp when over 100kb" or something.
->> >> And
->> >> then the kernel needs to count. Meaning the L2CAP layer could easily
->> >> count this by itself.
->> >
->> > What?  Let's say the effect we want is that if the object is greater
->> > than, say, 10 megabytes, then we want to use AMP for the transfer.
->> > With your scheme, you want the kernel to count up to 10 megabytes,
->> > THEN switch over to AMP?
->> > No, you don't, he says rhetorically.  :)
->>
->> If the policy was defined as "prefer_amp after n seconds" we would get
->> the desired effect without having to do any counting in the kernel.
->
-> In both cases we have to take in account the total size of the file, or
-> the estimated time of transfer, so we can avoid to move to AMP when the
-> transfer is about to end.
+As I said on IRC it keeps crashing. Here's the log, as you can see the
+crash happened in a different place now.
 
-Right! Don't want to switch to AMP just to push those last 100 bytes :)
+bluetoothd[1842]: src/device.c:btd_device_ref() 0x9411de0: ref=1
+bluetoothd[1842]: src/device.c:btd_device_ref() 0x9411de0: ref=2
+bluetoothd[1842]: src/device.c:btd_device_ref() 0x9409570: ref=2
+bluetoothd[1842]: src/device.c:btd_device_ref() 0x9408b60: ref=2
+bluetoothd[1842]: src/adapter.c:create_device() C8:7E:75:D6:B3:B0
+bluetoothd[1842]: src/adapter.c:adapter_create_device() C8:7E:75:D6:B3:B0
+bluetoothd[1842]: src/device.c:device_create() Creating device
+/org/bluez/1842/hci0/dev_C8_7E_75_D6_B3_B0
+bluetoothd[1842]: src/device.c:btd_device_ref() 0x93fd258: ref=1
+bluetoothd[1842]: src/device.c:btd_device_ref() 0x93fd258: ref=2
+bluetoothd[1842]: src/device.c:btd_device_ref() 0x9404dc0: ref=3
+bluetoothd[1842]: Discovery session 0x93fb658 with :1.58 activated
+bluetoothd[1842]: src/adapter.c:session_ref() 0x93fb658: ref=1
+bluetoothd[1842]: src/adapter.c:adapter_get_device() 00:25:47:2D:20:98
+bluetoothd[1842]: src/adapter.c:session_unref() 0x93fb658: ref=0
+bluetoothd[1842]: src/adapter.c:session_remove() Discovery session
+0x93fb658 with :1.58 deactivated
+bluetoothd[1842]: src/adapter.c:session_remove() Stopping discovery
+bluetoothd[1842]: Stopping discovery
+bluetoothd[1842]: /org/bluez/1842/hci0/dev_C8_7E_75_D6_B3_B0: error
+updating services: Device or resource busy (16)
+bluetoothd[1842]: src/device.c:btd_device_unref() 0x93fd258: ref=1
+bluetoothd[1842]: Discovery session 0x93fd4b0 with :1.58 activated
+bluetoothd[1842]: src/adapter.c:session_ref() 0x93fd4b0: ref=1
+bluetoothd[1842]: /org/bluez/1842/hci0/dev_00_26_E2_3C_5E_05: error
+updating services: Host is down (112)
+bluetoothd[1842]: src/device.c:btd_device_unref() 0x9404dc0: ref=2
+bluetoothd[1842]: src/adapter.c:adapter_get_device() 00:26:E2:3C:5E:05
+bluetoothd[1842]: src/adapter.c:session_unref() 0x93fd4b0: ref=0
+bluetoothd[1842]: src/adapter.c:session_remove() Discovery session
+0x93fd4b0 with :1.58 deactivated
+bluetoothd[1842]: src/adapter.c:session_remove() Stopping discovery
+bluetoothd[1842]: Stopping discovery
+bluetoothd[1842]: /org/bluez/1842/hci0/dev_00_1C_D6_B1_58_1B: error
+updating services: Device or resource busy (16)
+bluetoothd[1842]: src/device.c:btd_device_unref() 0x9409570: ref=1
+bluetoothd[1842]: Discovery session 0x93f9f80 with :1.58 activated
+bluetoothd[1842]: src/adapter.c:session_ref() 0x93f9f80: ref=1
+bluetoothd[1842]: src/adapter.c:adapter_remove_connection() Removing
+temporary device /org/bluez/1842/hci0/dev_00_25_47_2D_20_98
+bluetoothd[1842]: src/device.c:device_remove() Removing device
+/org/bluez/1842/hci0/dev_00_25_47_2D_20_98
+bluetoothd[1842]: src/device.c:btd_device_unref() 0x9411120: ref=1
+bluetoothd[1842]: src/device.c:btd_device_unref() 0x9411120: ref=0
+bluetoothd[1842]: src/device.c:device_free() 0x9411120
+bluetoothd[1842]: src/adapter.c:adapter_get_device() 00:17:D5:65:D0:3D
+bluetoothd[1842]: src/adapter.c:session_unref() 0x93f9f80: ref=0
+bluetoothd[1842]: src/adapter.c:session_remove() Discovery session
+0x93f9f80 with :1.58 deactivated
+bluetoothd[1842]: src/adapter.c:session_remove() Stopping discovery
+bluetoothd[1842]: Stopping discovery
+bluetoothd[1842]: Discovery session 0x9410560 with :1.58 activated
+bluetoothd[1842]: src/adapter.c:session_ref() 0x9410560: ref=1
+bluetoothd[1842]: src/device.c:device_probe_drivers() Probe drivers
+for /org/bluez/1842/hci0/dev_00_17_D5_65_D0_3D
+bluetoothd[1842]: serial/manager.c:serial_probe() path
+/org/bluez/1842/hci0/dev_00_17_D5_65_D0_3D:
+00001105-0000-1000-8000-00805f9b34fb
+bluetoothd[1842]: serial/port.c:create_serial_device() Registered
+interface org.bluez.Serial on path
+/org/bluez/1842/hci0/dev_00_17_D5_65_D0_3D
+bluetoothd[1842]: src/device.c:btd_device_unref() 0x9408b60: ref=1
+Segmentation fault
 
-Since the kernel does not know the total object size to be transferred,
-(right?), I've yet to come up with any 'threshold' ideas the kernel can
-make. Note that the transfer could be one huge file or many small ones.
 
---
-Tim Monahan-Mitchell
-Employee of Qualcomm Innovation Center, Inc.
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
+-- 
+Manuel Francisco Naranjo
+Software Department Argentina
+Wireless Cables Inc
+www.aircable.net
+cel: +5493412010019
+skype: naranjomanuelfrancisco
