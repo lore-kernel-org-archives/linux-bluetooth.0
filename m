@@ -1,98 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 3 Aug 2010 08:58:57 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-    linux-bluetooth@vger.kernel.org, rshaffer@codeaurora.org
-Subject: Re: [PATCH 1/8] Bluetooth: Make sure the L2CAP FCS is only enabled
- for ERTM or streaming.
-In-Reply-To: <1280789488.12579.60.camel@localhost.localdomain>
-Message-ID: <alpine.DEB.2.00.1008030814570.19861@linux-sea-02>
-References: <1280776810-18213-1-git-send-email-mathewm@codeaurora.org>  <1280776810-18213-2-git-send-email-mathewm@codeaurora.org>  <1280777912.12579.37.camel@localhost.localdomain>  <20100802212014.GB20149@vigoh>  <alpine.DEB.2.00.1008021519430.18432@linux-sea-02>
- <1280789488.12579.60.camel@localhost.localdomain>
+Message-ID: <c830f11e501a70291cd4b5b3bde2f4a9.squirrel@www.codeaurora.org>
+In-Reply-To: <20100803081258.GA5831@jh-x301>
+References: <1280576713-1398-1-git-send-email-ingas@codeaurora.org>
+    <1280576713-1398-3-git-send-email-ingas@codeaurora.org>
+    <20100803081258.GA5831@jh-x301>
+Date: Tue, 3 Aug 2010 08:37:05 -0700 (PDT)
+Subject: Re: [PATCH 2/6] Clean up code that generates extended inquiry
+     response.
+From: ingas@codeaurora.org
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Content-Type: text/plain; charset=US-ASCII
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Johan,
 
-On Mon, 2 Aug 2010, Marcel Holtmann wrote:
-
-> Hi Mat,
+>> ---
+>>  src/sdpd-service.c |   46
+>> ++++++++++++++++++++++++++++++----------------
+>>  1 files changed, 30 insertions(+), 16 deletions(-)
 >
->>> * Marcel Holtmann <marcel@holtmann.org> [2010-08-02 12:38:32 -0700]:
->>>
->>>> Hi Mat,
->>>>
->>>>> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
->>>>> ---
->>>>>  net/bluetooth/l2cap.c |   12 ++++++++----
->>>>>  1 files changed, 8 insertions(+), 4 deletions(-)
->>>>>
->>>>> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
->>>>> index 9ba1e8e..aed72f2 100644
->>>>> --- a/net/bluetooth/l2cap.c
->>>>> +++ b/net/bluetooth/l2cap.c
->>>>> @@ -3127,8 +3127,10 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
->>>>>  		goto unlock;
->>>>>
->>>>>  	if (l2cap_pi(sk)->conf_state & L2CAP_CONF_INPUT_DONE) {
->>>>> -		if (!(l2cap_pi(sk)->conf_state & L2CAP_CONF_NO_FCS_RECV) ||
->>>>> -		    l2cap_pi(sk)->fcs != L2CAP_FCS_NONE)
->>>>> +		if ((l2cap_pi(sk)->mode == L2CAP_MODE_ERTM ||
->>>>> +			l2cap_pi(sk)->mode == L2CAP_MODE_STREAMING) &&
->>>>> +			(!(l2cap_pi(sk)->conf_state & L2CAP_CONF_NO_FCS_RECV) ||
->>>>> +			l2cap_pi(sk)->fcs != L2CAP_FCS_NONE))
->>>>>  			l2cap_pi(sk)->fcs = L2CAP_FCS_CRC16;
->>>>
->>>> this becomes unreadable and my brain starts to throw a core dump. So it
->>>> clearly needs to be put into a helper inline function.
->>>
->>> Actually we don't need that, since the code that deals with Basic Mode
->>> never check  and use the l2cap_pi(sk)->fcs. So we don't care about FCS
->>> value in the Basic Mode.
->>
->> There isn't currently any Basic Mode code that triggers this latent
->> bug, but I have a patch coming up that does require this fix.
->>
->> As it stands, getsockopt() on a connected basic mode socket shows FCS
->> enabled, so this bug is visible from userspace.
+> So your commit message says two things: "Clean up code..." and "Minor
+> fix..". Cleanups and fixes should be in separate patches. Don't be
+> afraid of "too small" or trivial patches. As long as a patch contains a
+> single logically independent change it's fine.
 >
-> can we just fail the setsockopt() when trying to set basic mode and FCS
-> off.
 
-It definitely makes sense to have more validation of L2CAP_OPTIONS 
-passed to setsockopt().
+Just a clarification. I will still have to have the "clean up" patch as a
+part of this patch set since it relies on the header file with defines
+(getting rid of magic numbers). Not sure, if you want me to cut the "fix"
+one to be separate patch submission altogether...
 
-> And also in case fallback to basic mode happens, then FCS should be set
-> to be enabled. Since for FCS and basic mode we always have to use FCS.
-> So that seems just fine to me.
+Thanks,
 
-The spec says "The FCS option shall only be used when the mode is 
-being, or is already configured to Enhanced Retransmission mode or 
-Streaming mode."  FCS is never used in basic mode (fallback or not).
+Inga
 
-(Maybe I've misunderstood your point)
-
-> Maybe you need to explain a bit more in detail what you are trying to
-> achieve in conjunction with userspace API.
-
-My goal is to only have l2cap_pi(sk)->fcs == L2CAP_FCS_CRC16 when the 
-FCS option is actually in use.  Otherwise, any logic checking for FCS 
-also has to check the L2CAP mode.  Might as well check the mode once 
-and set fcs accordingly -- which is what my patch does.
-
-Gustavo is correct that l2cap_pi(sk)->fcs is currently only checked on 
-code paths used with ERTM and streaming mode.  However, future code 
-(including a patch I'll be posting soon) will depend on the fcs value 
-being accurate in all modes.
-
-I only mentioned getsockopt() to show that this issue is not 
-completely invisible, and is worth patching.
+Sent by an employee of the Qualcomm Innovation Center, Inc.
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
 
 
-Regards,
 
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
