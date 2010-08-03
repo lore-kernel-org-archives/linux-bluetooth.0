@@ -1,68 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] bluetooth: fix not setting security level when creating a rfcomm session
-Date: Tue,  3 Aug 2010 10:26:23 +0300
-Message-Id: <1280820383-10029-1-git-send-email-luiz.dentz@gmail.com>
+From: Kevin Hayes <kevin@Atheros.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "tmonahan@codeaurora.org" <tmonahan@codeaurora.org>,
+	David Vrabel <david.vrabel@csr.com>,
+	Inga Stotland <ingas@codeaurora.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"rshaffer@codeaurora.org" <rshaffer@codeaurora.org>,
+	"johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
+Date: Mon, 2 Aug 2010 21:47:27 -0700
+Subject: RE: Enhancements to allow l2cap channel to use either AMP or BR/EDR
+Message-ID: <B7132A25476D334D9130FE7532F2A56310A0B08B1F@SC1EXMB-MBCL.global.atheros.com>
+References: <8bfb018fa669b6ace6840881379a1a01.squirrel@www.codeaurora.org>
+	 <1280775200.12579.30.camel@localhost.localdomain>
+	 <B7132A25476D334D9130FE7532F2A56310A0B0896E@SC1EXMB-MBCL.global.atheros.com>
+	 <1280789882.12579.66.camel@localhost.localdomain>
+	 <B7132A25476D334D9130FE7532F2A56310A0B08A61@SC1EXMB-MBCL.global.atheros.com>
+ <1280800744.12579.71.camel@localhost.localdomain>
+In-Reply-To: <1280800744.12579.71.camel@localhost.localdomain>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
-
-This cause 'No Bonding' to be used if userspace has not yet been paired
-with remote device since the l2cap socket used to create the rfcomm
-session does not have any security level set.
-
-Signed-off-by: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
----
- net/bluetooth/rfcomm/core.c |   13 ++++++++++---
- 1 files changed, 10 insertions(+), 3 deletions(-)
-
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index 7dca91b..08f5757 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -79,7 +79,10 @@ static void rfcomm_make_uih(struct sk_buff *skb, u8 addr);
- 
- static void rfcomm_process_connect(struct rfcomm_session *s);
- 
--static struct rfcomm_session *rfcomm_session_create(bdaddr_t *src, bdaddr_t *dst, int *err);
-+static struct rfcomm_session *rfcomm_session_create(bdaddr_t *src,
-+							bdaddr_t *dst,
-+							u8 sec_level,
-+							int *err);
- static struct rfcomm_session *rfcomm_session_get(bdaddr_t *src, bdaddr_t *dst);
- static void rfcomm_session_del(struct rfcomm_session *s);
- 
-@@ -402,7 +405,7 @@ static int __rfcomm_dlc_open(struct rfcomm_dlc *d, bdaddr_t *src, bdaddr_t *dst,
- 
- 	s = rfcomm_session_get(src, dst);
- 	if (!s) {
--		s = rfcomm_session_create(src, dst, &err);
-+		s = rfcomm_session_create(src, dst, d->sec_level, &err);
- 		if (!s)
- 			return err;
- 	}
-@@ -680,7 +683,10 @@ static void rfcomm_session_close(struct rfcomm_session *s, int err)
- 	rfcomm_session_put(s);
- }
- 
--static struct rfcomm_session *rfcomm_session_create(bdaddr_t *src, bdaddr_t *dst, int *err)
-+static struct rfcomm_session *rfcomm_session_create(bdaddr_t *src,
-+							bdaddr_t *dst,
-+							u8 sec_level,
-+							int *err)
- {
- 	struct rfcomm_session *s = NULL;
- 	struct sockaddr_l2 addr;
-@@ -705,6 +711,7 @@ static struct rfcomm_session *rfcomm_session_create(bdaddr_t *src, bdaddr_t *dst
- 	sk = sock->sk;
- 	lock_sock(sk);
- 	l2cap_pi(sk)->imtu = l2cap_mtu;
-+	l2cap_pi(sk)->sec_level = sec_level;
- 	if (l2cap_ertm)
- 		l2cap_pi(sk)->mode = L2CAP_MODE_ERTM;
- 	release_sock(sk);
--- 
-1.7.0.4
-
+SGkgYWdhaW4gTWFyY2VsLA0KDQo+IEhvd2V2ZXIgd2l0aCBPQkVYIGl0IG1pZ2h0IGJlIHRoYXQg
+eW91IHdhbm5hIHJlYWQgdGhlIGZpcnN0IHBhY2thZ2UNCj4gZmlyc3Qgd2l0aCBCUi9FRFIgb25s
+eSBhbmQgb25seSBhZnRlciBrbm93aW5nIHRoZSBmaWxlIHNpemUgbWFrZSBhDQo+IGRlY2lzaW9u
+IHRvIHByZWZlciBBTVAgb3Igbm90Lg0KDQpFeGFjdGx5LiAgRm9yIE9QUCwgUEJBUCwgQklQLCBG
+VFAsIHlvdSBrbm93IHRoZSBmaWxlIHNpemUgcHJldHR5IHF1aWNrbHksIG5vIGNvdW50aW5nIHJl
+cXVpcmVkLg0KQW5kIGlmIHlvdSBoYXZlIGEgcG9saWN5IG9mICJ1c2UgQU1QIGlmIG9iamVjdCBi
+aWdnZXIgdGhhbiBYIiwgdGhlbiB5b3UgZG9uJ3Qgd2FudCB0byBzcGVuZCBjeWNsZXMgdXNpbmcg
+QlIvRURSIGlmIHlvdSBuZWVkIHRvIHhmZXIgYW4gb2JqZWN0IGV2ZW4gb25lIHNpbmdsZSBvY3Rl
+dCBiaWdnZXIgdGhhbiBYLiAgQU1QIGVhcmx5LCBBTVAgb2Z0ZW4uICA6KQ0KDQo+IA0KPiBXZSB3
+aWxsIHNlZSB3aGF0IHdvcmtzIG91dCBiZXN0Lg0KUG9saWN5IGlzIGEgd29uZGVyZnVsIHRoYW5n
+LiAgOikNCg0KCUsrKw0KDQoNCg0K
