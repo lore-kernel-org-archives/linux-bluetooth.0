@@ -1,46 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4C58129E.3080306@csr.com>
-Date: Tue, 03 Aug 2010 13:59:10 +0100
-From: David Vrabel <david.vrabel@csr.com>
+From: =?iso-8859-1?q?Jos=E9_Antonio_Santos_Cadenas?=
+	<santoscadenas@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: Re: [PATCH] Notify to device drivers when the SDP records change
+Date: Tue, 3 Aug 2010 14:43:16 +0200
+Cc: linux-bluetooth@vger.kernel.org
+References: <1280130927-4137-1-git-send-email-santoscadenas@gmail.com> <201008031112.11556.santoscadenas@gmail.com> <AANLkTin9WnU0v2NqS5cAjRxyhipJCBYX0=KWponiCk14@mail.gmail.com>
+In-Reply-To: <AANLkTin9WnU0v2NqS5cAjRxyhipJCBYX0=KWponiCk14@mail.gmail.com>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: tmonahan@codeaurora.org, Inga Stotland <ingas@codeaurora.org>,
-        linux-bluetooth@vger.kernel.org, rshaffer@codeaurora.org,
-        johan.hedberg@gmail.com
-Subject: Re: Enhancements to allow l2cap channel to use either AMP or BR/EDR
-References: <8bfb018fa669b6ace6840881379a1a01.squirrel@www.codeaurora.org> <1280775200.12579.30.camel@localhost.localdomain>
-In-Reply-To: <1280775200.12579.30.camel@localhost.localdomain>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201008031443.16245.santoscadenas@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Marcel Holtmann wrote:
+El Tuesday 03 August 2010 13:42:15 Luiz Augusto von Dentz escribió:
+> Hi,
 > 
-> That said, nothing stops us from allowing to make our AMP polices
-> dynamic and allow the application to change it threshold during
-> lifetime. For example it starts out as BR/EDR only and then during the
-> usage of the link it decides that now AMP preferred would make sense. In
-> that sense you would have manual switching to some level.
+> On Tue, Aug 3, 2010 at 12:12 PM, José Antonio Santos Cadenas
+> 
+> <santoscadenas@gmail.com> wrote:
+> > The different with a2dp is that the application will decide the end point
+> > to connect to, because there can be more than one matching the source.
+> > This end point is represented by a path that is passed to the
+> > HealthAgent when is discovered. If the remote record changes it is
+> > possible that new end points are available so the application needs
+> > something to discover the available end points. That is why I think that
+> > we need something like this.
+> 
+> I guess we already suggest you guys to take a look in the
+> MediaEndpoint interface, which can be found here:
+> 
+> http://gitorious.org/~vudentz/bluez/vudentzs-clone/commit/2af3d2821f0aaafae
+> 12be10522c82dea6a701688.patch
+> 
+> It doesn't expose the remote endpoints it basically do the best
+> matching, if the application requesting the connection has local
+> endpoint they have priority, and then the 'agent' or in case of audio
+> the endpoint will be notified with the remote endpoint capabilities.
+> 
+> Also while looking the health API it seems you guys missed a very
+> important point, HealthAgent only knows about the remote services
+> since there is no signal for announcing a new HealthApplication nor
+> the application knows the about HealthService, so the only way make
+> this to work is that the HealthApplication and HealthAgent leaves in
+> the same process but this defeats the point of having them separated.
 
-If the policy is dynamic throughout the lifetime of the connection then
-that's okay for best effort links.
+Yes, this only works in the same process. It is a way for receiving callbacks 
+from the daemon.
 
-I think applications (especially those that stream real-time data at
-high rates) will need to know the currently available bandwidth.  This
-will be useful for even simple file transfer profiles -- if that file
-transfer is going to take 100x as long the user probably want to know
-about this so they can (for example) turn HS mode on the other device.
+> So either we have the applications and services being announced to
+> everyone and then anyone can do the matching or we don't announce them
+> at all and make bluetoothd do the matching itself, I guess the latter
+> is better so we don't have to split the logic in many place (with
+> potential code duplication + bugs).
 
-This information could be conveyed in some sort of "channel move
-complete" event or a more generic "available bandwidth changed" event.
+At this point, I have the same opinion, Services can be notified using 
+signals. But Marcel thought that it will be better and will let the 
+programmers make less mistakes if only the services related to the application 
+are notified, that is why this information is send through the agent instead 
+of sending signals. Of course this can be changed if we think that is better.
 
-Applications requiring guaranteed links will need some way of supplying
-extended flow specifications.
-
-David
--- 
-David Vrabel, Senior Software Engineer, Drivers
-CSR, Churchill House, Cambridge Business Park,  Tel: +44 (0)1223 692562
-Cowley Road, Cambridge, CB4 0WZ                 http://www.csr.com/
-
-
-Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
+> 
+> Another important thing is that dbus introspection does not have any
+> way to notify changes, so it really need to be signal to notify
+> applications about new services.
