@@ -1,106 +1,112 @@
 Return-Path: <cyrus@holtmann.org>
+Sender: "Gustavo F. Padovan" <gfpadovan@gmail.com>
+Date: Tue, 3 Aug 2010 15:44:15 -0300
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
+	rshaffer@codeaurora.org
+Subject: Re: [PATCH 1/8] Bluetooth: Make sure the L2CAP FCS is only enabled
+ for ERTM or streaming.
+Message-ID: <20100803184415.GA25933@vigoh>
+References: <1280776810-18213-1-git-send-email-mathewm@codeaurora.org>
+ <1280776810-18213-2-git-send-email-mathewm@codeaurora.org>
+ <1280777912.12579.37.camel@localhost.localdomain>
+ <20100802212014.GB20149@vigoh>
+ <alpine.DEB.2.00.1008021519430.18432@linux-sea-02>
+ <1280789488.12579.60.camel@localhost.localdomain>
+ <alpine.DEB.2.00.1008030814570.19861@linux-sea-02>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTi=i8MhyC80qis9TjZBmtNUJDBMNw5g2rjKPQvdj@mail.gmail.com>
-References: <4C46324D.5070800@aircable.net>
-	<20100721101934.GA12188@jh-x301>
-	<4C470E2D.7000607@aircable.net>
-	<AANLkTi=8=BUThjVdc4EN_8uupGKmdgHQzGOe560Cv+pm@mail.gmail.com>
-	<AANLkTi=jzZScnCK6rFpKjBJesnw=71y5hNG3kDBhxv1u@mail.gmail.com>
-	<4C505806.3040508@aircable.net>
-	<AANLkTikRQfhAKm-UW+on+ZeEp709z_ku_NDjeVD_US1b@mail.gmail.com>
-	<AANLkTi=9Top+9kRwtZj-nZw8szQU4ff9CTSNSGuexmEL@mail.gmail.com>
-	<4C518373.6000706@aircable.net>
-	<AANLkTi=i8MhyC80qis9TjZBmtNUJDBMNw5g2rjKPQvdj@mail.gmail.com>
-Date: Tue, 3 Aug 2010 23:17:41 +0300
-Message-ID: <AANLkTinYN=KDban-WsF4wZw-ZZDU7fQ0SFnAWdofbokd@mail.gmail.com>
-Subject: Re: [PATCH][RFC] Fix SDP resolving segfault
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Manuel Naranjo <manuel@aircable.net>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	BlueZ <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <alpine.DEB.2.00.1008030814570.19861@linux-sea-02>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Manuel,
+Hi Mat,
 
-On Tue, Aug 3, 2010 at 4:21 PM, Manuel Naranjo <manuel@aircable.net> wrote:
->> I will give this a try and let you know. Maybe I can results before the
->> Tuesday, but I doubt it.
->
-> As I said on IRC it keeps crashing. Here's the log, as you can see the
-> crash happened in a different place now.
->
-> bluetoothd[1842]: src/device.c:btd_device_ref() 0x9411de0: ref=1
-> bluetoothd[1842]: src/device.c:btd_device_ref() 0x9411de0: ref=2
-> bluetoothd[1842]: src/device.c:btd_device_ref() 0x9409570: ref=2
-> bluetoothd[1842]: src/device.c:btd_device_ref() 0x9408b60: ref=2
-> bluetoothd[1842]: src/adapter.c:create_device() C8:7E:75:D6:B3:B0
-> bluetoothd[1842]: src/adapter.c:adapter_create_device() C8:7E:75:D6:B3:B0
-> bluetoothd[1842]: src/device.c:device_create() Creating device
-> /org/bluez/1842/hci0/dev_C8_7E_75_D6_B3_B0
-> bluetoothd[1842]: src/device.c:btd_device_ref() 0x93fd258: ref=1
-> bluetoothd[1842]: src/device.c:btd_device_ref() 0x93fd258: ref=2
-> bluetoothd[1842]: src/device.c:btd_device_ref() 0x9404dc0: ref=3
-> bluetoothd[1842]: Discovery session 0x93fb658 with :1.58 activated
-> bluetoothd[1842]: src/adapter.c:session_ref() 0x93fb658: ref=1
-> bluetoothd[1842]: src/adapter.c:adapter_get_device() 00:25:47:2D:20:98
-> bluetoothd[1842]: src/adapter.c:session_unref() 0x93fb658: ref=0
-> bluetoothd[1842]: src/adapter.c:session_remove() Discovery session
-> 0x93fb658 with :1.58 deactivated
-> bluetoothd[1842]: src/adapter.c:session_remove() Stopping discovery
-> bluetoothd[1842]: Stopping discovery
-> bluetoothd[1842]: /org/bluez/1842/hci0/dev_C8_7E_75_D6_B3_B0: error
-> updating services: Device or resource busy (16)
-> bluetoothd[1842]: src/device.c:btd_device_unref() 0x93fd258: ref=1
-> bluetoothd[1842]: Discovery session 0x93fd4b0 with :1.58 activated
-> bluetoothd[1842]: src/adapter.c:session_ref() 0x93fd4b0: ref=1
-> bluetoothd[1842]: /org/bluez/1842/hci0/dev_00_26_E2_3C_5E_05: error
-> updating services: Host is down (112)
-> bluetoothd[1842]: src/device.c:btd_device_unref() 0x9404dc0: ref=2
-> bluetoothd[1842]: src/adapter.c:adapter_get_device() 00:26:E2:3C:5E:05
-> bluetoothd[1842]: src/adapter.c:session_unref() 0x93fd4b0: ref=0
-> bluetoothd[1842]: src/adapter.c:session_remove() Discovery session
-> 0x93fd4b0 with :1.58 deactivated
-> bluetoothd[1842]: src/adapter.c:session_remove() Stopping discovery
-> bluetoothd[1842]: Stopping discovery
-> bluetoothd[1842]: /org/bluez/1842/hci0/dev_00_1C_D6_B1_58_1B: error
-> updating services: Device or resource busy (16)
-> bluetoothd[1842]: src/device.c:btd_device_unref() 0x9409570: ref=1
-> bluetoothd[1842]: Discovery session 0x93f9f80 with :1.58 activated
-> bluetoothd[1842]: src/adapter.c:session_ref() 0x93f9f80: ref=1
-> bluetoothd[1842]: src/adapter.c:adapter_remove_connection() Removing
-> temporary device /org/bluez/1842/hci0/dev_00_25_47_2D_20_98
-> bluetoothd[1842]: src/device.c:device_remove() Removing device
-> /org/bluez/1842/hci0/dev_00_25_47_2D_20_98
-> bluetoothd[1842]: src/device.c:btd_device_unref() 0x9411120: ref=1
-> bluetoothd[1842]: src/device.c:btd_device_unref() 0x9411120: ref=0
-> bluetoothd[1842]: src/device.c:device_free() 0x9411120
-> bluetoothd[1842]: src/adapter.c:adapter_get_device() 00:17:D5:65:D0:3D
-> bluetoothd[1842]: src/adapter.c:session_unref() 0x93f9f80: ref=0
-> bluetoothd[1842]: src/adapter.c:session_remove() Discovery session
-> 0x93f9f80 with :1.58 deactivated
-> bluetoothd[1842]: src/adapter.c:session_remove() Stopping discovery
-> bluetoothd[1842]: Stopping discovery
-> bluetoothd[1842]: Discovery session 0x9410560 with :1.58 activated
-> bluetoothd[1842]: src/adapter.c:session_ref() 0x9410560: ref=1
-> bluetoothd[1842]: src/device.c:device_probe_drivers() Probe drivers
-> for /org/bluez/1842/hci0/dev_00_17_D5_65_D0_3D
-> bluetoothd[1842]: serial/manager.c:serial_probe() path
-> /org/bluez/1842/hci0/dev_00_17_D5_65_D0_3D:
-> 00001105-0000-1000-8000-00805f9b34fb
-> bluetoothd[1842]: serial/port.c:create_serial_device() Registered
-> interface org.bluez.Serial on path
-> /org/bluez/1842/hci0/dev_00_17_D5_65_D0_3D
-> bluetoothd[1842]: src/device.c:btd_device_unref() 0x9408b60: ref=1
-> Segmentation fault
+* Mat Martineau <mathewm@codeaurora.org> [2010-08-03 08:58:57 -0700]:
 
-This looks like a different issue, at least it doesn't seems to crash
-in the same point, so I assume the patch does fix something but
-uncover another problem. But we have to find out where exactly is this
-other problem because btd_device_unref doesn't seems to be the place,
-can't you get any core dumps from the tests you did?
+> 
+> On Mon, 2 Aug 2010, Marcel Holtmann wrote:
+> 
+> >Hi Mat,
+> >
+> >>>* Marcel Holtmann <marcel@holtmann.org> [2010-08-02 12:38:32 -0700]:
+> >>>
+> >>>>Hi Mat,
+> >>>>
+> >>>>>Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> >>>>>---
+> >>>>> net/bluetooth/l2cap.c |   12 ++++++++----
+> >>>>> 1 files changed, 8 insertions(+), 4 deletions(-)
+> >>>>>
+> >>>>>diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> >>>>>index 9ba1e8e..aed72f2 100644
+> >>>>>--- a/net/bluetooth/l2cap.c
+> >>>>>+++ b/net/bluetooth/l2cap.c
+> >>>>>@@ -3127,8 +3127,10 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+> >>>>> 		goto unlock;
+> >>>>>
+> >>>>> 	if (l2cap_pi(sk)->conf_state & L2CAP_CONF_INPUT_DONE) {
+> >>>>>-		if (!(l2cap_pi(sk)->conf_state & L2CAP_CONF_NO_FCS_RECV) ||
+> >>>>>-		    l2cap_pi(sk)->fcs != L2CAP_FCS_NONE)
+> >>>>>+		if ((l2cap_pi(sk)->mode == L2CAP_MODE_ERTM ||
+> >>>>>+			l2cap_pi(sk)->mode == L2CAP_MODE_STREAMING) &&
+> >>>>>+			(!(l2cap_pi(sk)->conf_state & L2CAP_CONF_NO_FCS_RECV) ||
+> >>>>>+			l2cap_pi(sk)->fcs != L2CAP_FCS_NONE))
+> >>>>> 			l2cap_pi(sk)->fcs = L2CAP_FCS_CRC16;
+> >>>>
+> >>>>this becomes unreadable and my brain starts to throw a core dump. So it
+> >>>>clearly needs to be put into a helper inline function.
+> >>>
+> >>>Actually we don't need that, since the code that deals with Basic Mode
+> >>>never check  and use the l2cap_pi(sk)->fcs. So we don't care about FCS
+> >>>value in the Basic Mode.
+> >>
+> >>There isn't currently any Basic Mode code that triggers this latent
+> >>bug, but I have a patch coming up that does require this fix.
+> >>
+> >>As it stands, getsockopt() on a connected basic mode socket shows FCS
+> >>enabled, so this bug is visible from userspace.
+> >
+> >can we just fail the setsockopt() when trying to set basic mode and FCS
+> >off.
+> 
+> It definitely makes sense to have more validation of L2CAP_OPTIONS
+> passed to setsockopt().
+> 
+> >And also in case fallback to basic mode happens, then FCS should be set
+> >to be enabled. Since for FCS and basic mode we always have to use FCS.
+> >So that seems just fine to me.
+> 
+> The spec says "The FCS option shall only be used when the mode is
+> being, or is already configured to Enhanced Retransmission mode or
+> Streaming mode."  FCS is never used in basic mode (fallback or not).
+> 
+> (Maybe I've misunderstood your point)
+> 
+> >Maybe you need to explain a bit more in detail what you are trying to
+> >achieve in conjunction with userspace API.
+> 
+> My goal is to only have l2cap_pi(sk)->fcs == L2CAP_FCS_CRC16 when
+> the FCS option is actually in use.  Otherwise, any logic checking
+> for FCS also has to check the L2CAP mode.  Might as well check the
+> mode once and set fcs accordingly -- which is what my patch does.
+> 
+> Gustavo is correct that l2cap_pi(sk)->fcs is currently only checked
+> on code paths used with ERTM and streaming mode.  However, future
+> code (including a patch I'll be posting soon) will depend on the fcs
+> value being accurate in all modes.
+
+So queue this togheter with the one you are going to send soon. It will
+be easy the real need for the checks you are doing here.
+
+> 
+> I only mentioned getsockopt() to show that this issue is not
+> completely invisible, and is worth patching.
+
+You can also set l2cap_pi(sk)->fcs to NOFCS when the mode configured
+is Basic Mode.
+
 
 -- 
-Luiz Augusto von Dentz
-Computer Engineer
+Gustavo F. Padovan
+http://padovan.org
