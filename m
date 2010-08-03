@@ -1,122 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <3e0b0d621e7c3dcee98b2a16c6e1f23b.squirrel@www.codeaurora.org>
-In-Reply-To: 
-     <B7132A25476D334D9130FE7532F2A56310A0B08A61@SC1EXMB-MBCL.global.athero
-     s.com>
-References: <8bfb018fa669b6ace6840881379a1a01.squirrel@www.codeaurora.org>
-    <1280775200.12579.30.camel@localhost.localdomain>
-    <B7132A25476D334D9130FE7532F2A56310A0B0896E@SC1EXMB-MBCL.global.atheros.com>
-    <1280789882.12579.66.camel@localhost.localdomain>
-    <B7132A25476D334D9130FE7532F2A56310A0B08A61@SC1EXMB-MBCL.global.atheros.com>
-Date: Mon, 2 Aug 2010 18:30:34 -0700 (PDT)
+From: Kevin Hayes <kevin@Atheros.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "tmonahan@codeaurora.org" <tmonahan@codeaurora.org>,
+	David Vrabel <david.vrabel@csr.com>,
+	Inga Stotland <ingas@codeaurora.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"rshaffer@codeaurora.org" <rshaffer@codeaurora.org>,
+	"johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
+Date: Mon, 2 Aug 2010 17:51:48 -0700
 Subject: RE: Enhancements to allow l2cap channel to use either AMP or BR/EDR
-From: "Peter Krystad" <pkrystad@codeaurora.org>
-To: "Kevin Hayes" <kevin@Atheros.com>
-Cc: "Marcel Holtmann" <marcel@holtmann.org>,
- "tmonahan@codeaurora.org" <tmonahan@codeaurora.org>,
- "David Vrabel" <david.vrabel@csr.com>,
- "Inga Stotland" <ingas@codeaurora.org>,
- "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
- "rshaffer@codeaurora.org" <rshaffer@codeaurora.org>,
- "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
+Message-ID: <B7132A25476D334D9130FE7532F2A56310A0B08A61@SC1EXMB-MBCL.global.atheros.com>
+References: <8bfb018fa669b6ace6840881379a1a01.squirrel@www.codeaurora.org>
+	 <1280775200.12579.30.camel@localhost.localdomain>
+	 <B7132A25476D334D9130FE7532F2A56310A0B0896E@SC1EXMB-MBCL.global.atheros.com>
+ <1280789882.12579.66.camel@localhost.localdomain>
+In-Reply-To: <1280789882.12579.66.camel@localhost.localdomain>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
-Hi Marcel and Kevin,
-
->> >
->> > Agree that it should be done "in background" and that a size
->> threshold would be useful.  But who evaluates that threshold?  The
->> bluez kernel components, which essentially implement a transport
->> driver, should not be examining objects (files, phonebooks, etc) size
->> to see if this threshold is met.  Therefore, it would seem Tim's
->> suggestion of having the profile send a 'prefer_amp' bit would be
->> useful, right?
->>
->> I would do something like "prefer_amp when over 100kb" or something.
->> And
->> then the kernel needs to count. Meaning the L2CAP layer could easily
->> count this by itself.
->
-> What?  Let's say the effect we want is that if the object is greater than,
-> say, 10 megabytes, then we want to use AMP for the transfer.  With your
-> scheme, you want the kernel to count up to 10 megabytes, THEN switch over
-> to AMP?
-> No, you don't, he says rhetorically.  :)
-
-If the policy was defined as "prefer_amp after n seconds" we would get the
-desired effect without having to do any counting in the kernel.
-
->>
->> Also just starting with setsockopt(bredr_only) and then later on just
->> doing setsockopt(prefer_amp) the userspace application would have
->> control over switching manually.
->
-> How is this really different from your ioctl(switch_now_to_amp) below,
-> which looks very wrong?
->
->>
->> Since the polices are on a per socket basis, I don't see a big problem
->> with doing it like this.
->>
->> The only thing that I don't want is a ioctl(switch_now_to_amp) since
->> that looks very wrong to me.
-> Agreed.
->
->>
->> > > The other problem here is also that besides whatever the profiles
->> > > wants,
->> > > it might happen that the WiFi policy is stronger and only allows
->> using
->> > > the WiFi device as WiFi or as AMP. And if WiFi wins, then we have
->> to
->> > > rip
->> > > the AMP out of the system. At that point whatever the Bluetooth
->> > > profiles
->> > > wanted is pointless since the AMP controller is gone anyway.
->> >
->> > Well, I think this is best managed by having the PAL announce its
->> availability (and unavailability) to A2MP, using the spec's HCI events
->> for this purpose.  A2MP can then be the agent to move the channel to
->> AMP or not, accordingly.  For example, it might be that the 802.11
->> device is being used for an infrastructure link, and then that link
->> goes away.  The PAL would then announce its availability to the BT
->> stack (A2MP), and A2MP would then move the channel to AMP.
->>
->> Agreed. My point was just that application can only set a policy. They
->> can't switch manually. If application would switch manually then they
->> need to check PAL availability etc. I don't want that complexity inside
->> the applications.
->>
->> > > That said, nothing stops us from allowing to make our AMP polices
->> > > dynamic and allow the application to change it threshold during
->> > > lifetime. For example it starts out as BR/EDR only and then during
->> the
->> > > usage of the link it decides that now AMP preferred would make
->> sense.
->> > > In
->> > > that sense you would have manual switching to some level.
->> >
->> > The only use case I see for manual switching is debugging.
->>
->> That is fine. We can do that via debugfs.
->>
->> Regards
->>
->> Marcel
->>
->
-> Ë∫{.n«+â∑üÆâ≠Ü+%äÀlzwmÖÈbùÎß≤ÊÏr∏õzXßªÂπÎh¢ÿbûÿ^nár°ˆ¶zÀÅÎhô®Ë≠⁄&¢¯ÆG´ùÈhÆ(≠Èöéä›¢j"ù˙∂mßˇÔÅÍ‰zπﬁñä‡˛f£¢∑höàß~àmö
-
-Regards,
-
-Peter.
-
--- 
-
-Peter Krystad
-
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+SGkgTWFyY2VsLA0KDQo+ID4NCj4gPiBBZ3JlZSB0aGF0IGl0IHNob3VsZCBiZSBkb25lICJpbiBi
+YWNrZ3JvdW5kIiBhbmQgdGhhdCBhIHNpemUNCj4gdGhyZXNob2xkIHdvdWxkIGJlIHVzZWZ1bC4g
+IEJ1dCB3aG8gZXZhbHVhdGVzIHRoYXQgdGhyZXNob2xkPyAgVGhlDQo+IGJsdWV6IGtlcm5lbCBj
+b21wb25lbnRzLCB3aGljaCBlc3NlbnRpYWxseSBpbXBsZW1lbnQgYSB0cmFuc3BvcnQNCj4gZHJp
+dmVyLCBzaG91bGQgbm90IGJlIGV4YW1pbmluZyBvYmplY3RzIChmaWxlcywgcGhvbmVib29rcywg
+ZXRjKSBzaXplDQo+IHRvIHNlZSBpZiB0aGlzIHRocmVzaG9sZCBpcyBtZXQuICBUaGVyZWZvcmUs
+IGl0IHdvdWxkIHNlZW0gVGltJ3MNCj4gc3VnZ2VzdGlvbiBvZiBoYXZpbmcgdGhlIHByb2ZpbGUg
+c2VuZCBhICdwcmVmZXJfYW1wJyBiaXQgd291bGQgYmUNCj4gdXNlZnVsLCByaWdodD8NCj4gDQo+
+IEkgd291bGQgZG8gc29tZXRoaW5nIGxpa2UgInByZWZlcl9hbXAgd2hlbiBvdmVyIDEwMGtiIiBv
+ciBzb21ldGhpbmcuDQo+IEFuZA0KPiB0aGVuIHRoZSBrZXJuZWwgbmVlZHMgdG8gY291bnQuIE1l
+YW5pbmcgdGhlIEwyQ0FQIGxheWVyIGNvdWxkIGVhc2lseQ0KPiBjb3VudCB0aGlzIGJ5IGl0c2Vs
+Zi4NCg0KV2hhdD8gIExldCdzIHNheSB0aGUgZWZmZWN0IHdlIHdhbnQgaXMgdGhhdCBpZiB0aGUg
+b2JqZWN0IGlzIGdyZWF0ZXIgdGhhbiwgc2F5LCAxMCBtZWdhYnl0ZXMsIHRoZW4gd2Ugd2FudCB0
+byB1c2UgQU1QIGZvciB0aGUgdHJhbnNmZXIuICBXaXRoIHlvdXIgc2NoZW1lLCB5b3Ugd2FudCB0
+aGUga2VybmVsIHRvIGNvdW50IHVwIHRvIDEwIG1lZ2FieXRlcywgVEhFTiBzd2l0Y2ggb3ZlciB0
+byBBTVA/DQpObywgeW91IGRvbid0LCBoZSBzYXlzIHJoZXRvcmljYWxseS4gIDopICANCg0KPiAN
+Cj4gQWxzbyBqdXN0IHN0YXJ0aW5nIHdpdGggc2V0c29ja29wdChicmVkcl9vbmx5KSBhbmQgdGhl
+biBsYXRlciBvbiBqdXN0DQo+IGRvaW5nIHNldHNvY2tvcHQocHJlZmVyX2FtcCkgdGhlIHVzZXJz
+cGFjZSBhcHBsaWNhdGlvbiB3b3VsZCBoYXZlDQo+IGNvbnRyb2wgb3ZlciBzd2l0Y2hpbmcgbWFu
+dWFsbHkuDQoNCkhvdyBpcyB0aGlzIHJlYWxseSBkaWZmZXJlbnQgZnJvbSB5b3VyIGlvY3RsKHN3
+aXRjaF9ub3dfdG9fYW1wKSBiZWxvdywgd2hpY2ggbG9va3MgdmVyeSB3cm9uZz8NCg0KPiANCj4g
+U2luY2UgdGhlIHBvbGljZXMgYXJlIG9uIGEgcGVyIHNvY2tldCBiYXNpcywgSSBkb24ndCBzZWUg
+YSBiaWcgcHJvYmxlbQ0KPiB3aXRoIGRvaW5nIGl0IGxpa2UgdGhpcy4NCj4gDQo+IFRoZSBvbmx5
+IHRoaW5nIHRoYXQgSSBkb24ndCB3YW50IGlzIGEgaW9jdGwoc3dpdGNoX25vd190b19hbXApIHNp
+bmNlDQo+IHRoYXQgbG9va3MgdmVyeSB3cm9uZyB0byBtZS4NCkFncmVlZC4NCg0KPiANCj4gPiA+
+IFRoZSBvdGhlciBwcm9ibGVtIGhlcmUgaXMgYWxzbyB0aGF0IGJlc2lkZXMgd2hhdGV2ZXIgdGhl
+IHByb2ZpbGVzDQo+ID4gPiB3YW50cywNCj4gPiA+IGl0IG1pZ2h0IGhhcHBlbiB0aGF0IHRoZSBX
+aUZpIHBvbGljeSBpcyBzdHJvbmdlciBhbmQgb25seSBhbGxvd3MNCj4gdXNpbmcNCj4gPiA+IHRo
+ZSBXaUZpIGRldmljZSBhcyBXaUZpIG9yIGFzIEFNUC4gQW5kIGlmIFdpRmkgd2lucywgdGhlbiB3
+ZSBoYXZlDQo+IHRvDQo+ID4gPiByaXANCj4gPiA+IHRoZSBBTVAgb3V0IG9mIHRoZSBzeXN0ZW0u
+IEF0IHRoYXQgcG9pbnQgd2hhdGV2ZXIgdGhlIEJsdWV0b290aA0KPiA+ID4gcHJvZmlsZXMNCj4g
+PiA+IHdhbnRlZCBpcyBwb2ludGxlc3Mgc2luY2UgdGhlIEFNUCBjb250cm9sbGVyIGlzIGdvbmUg
+YW55d2F5Lg0KPiA+DQo+ID4gV2VsbCwgSSB0aGluayB0aGlzIGlzIGJlc3QgbWFuYWdlZCBieSBo
+YXZpbmcgdGhlIFBBTCBhbm5vdW5jZSBpdHMNCj4gYXZhaWxhYmlsaXR5IChhbmQgdW5hdmFpbGFi
+aWxpdHkpIHRvIEEyTVAsIHVzaW5nIHRoZSBzcGVjJ3MgSENJIGV2ZW50cw0KPiBmb3IgdGhpcyBw
+dXJwb3NlLiAgQTJNUCBjYW4gdGhlbiBiZSB0aGUgYWdlbnQgdG8gbW92ZSB0aGUgY2hhbm5lbCB0
+bw0KPiBBTVAgb3Igbm90LCBhY2NvcmRpbmdseS4gIEZvciBleGFtcGxlLCBpdCBtaWdodCBiZSB0
+aGF0IHRoZSA4MDIuMTENCj4gZGV2aWNlIGlzIGJlaW5nIHVzZWQgZm9yIGFuIGluZnJhc3RydWN0
+dXJlIGxpbmssIGFuZCB0aGVuIHRoYXQgbGluaw0KPiBnb2VzIGF3YXkuICBUaGUgUEFMIHdvdWxk
+IHRoZW4gYW5ub3VuY2UgaXRzIGF2YWlsYWJpbGl0eSB0byB0aGUgQlQNCj4gc3RhY2sgKEEyTVAp
+LCBhbmQgQTJNUCB3b3VsZCB0aGVuIG1vdmUgdGhlIGNoYW5uZWwgdG8gQU1QLg0KPiANCj4gQWdy
+ZWVkLiBNeSBwb2ludCB3YXMganVzdCB0aGF0IGFwcGxpY2F0aW9uIGNhbiBvbmx5IHNldCBhIHBv
+bGljeS4gVGhleQ0KPiBjYW4ndCBzd2l0Y2ggbWFudWFsbHkuIElmIGFwcGxpY2F0aW9uIHdvdWxk
+IHN3aXRjaCBtYW51YWxseSB0aGVuIHRoZXkNCj4gbmVlZCB0byBjaGVjayBQQUwgYXZhaWxhYmls
+aXR5IGV0Yy4gSSBkb24ndCB3YW50IHRoYXQgY29tcGxleGl0eSBpbnNpZGUNCj4gdGhlIGFwcGxp
+Y2F0aW9ucy4NCj4gDQo+ID4gPiBUaGF0IHNhaWQsIG5vdGhpbmcgc3RvcHMgdXMgZnJvbSBhbGxv
+d2luZyB0byBtYWtlIG91ciBBTVAgcG9saWNlcw0KPiA+ID4gZHluYW1pYyBhbmQgYWxsb3cgdGhl
+IGFwcGxpY2F0aW9uIHRvIGNoYW5nZSBpdCB0aHJlc2hvbGQgZHVyaW5nDQo+ID4gPiBsaWZldGlt
+ZS4gRm9yIGV4YW1wbGUgaXQgc3RhcnRzIG91dCBhcyBCUi9FRFIgb25seSBhbmQgdGhlbiBkdXJp
+bmcNCj4gdGhlDQo+ID4gPiB1c2FnZSBvZiB0aGUgbGluayBpdCBkZWNpZGVzIHRoYXQgbm93IEFN
+UCBwcmVmZXJyZWQgd291bGQgbWFrZQ0KPiBzZW5zZS4NCj4gPiA+IEluDQo+ID4gPiB0aGF0IHNl
+bnNlIHlvdSB3b3VsZCBoYXZlIG1hbnVhbCBzd2l0Y2hpbmcgdG8gc29tZSBsZXZlbC4NCj4gPg0K
+PiA+IFRoZSBvbmx5IHVzZSBjYXNlIEkgc2VlIGZvciBtYW51YWwgc3dpdGNoaW5nIGlzIGRlYnVn
+Z2luZy4NCj4gDQo+IFRoYXQgaXMgZmluZS4gV2UgY2FuIGRvIHRoYXQgdmlhIGRlYnVnZnMuDQo+
+IA0KPiBSZWdhcmRzDQo+IA0KPiBNYXJjZWwNCj4gDQoNCg==
