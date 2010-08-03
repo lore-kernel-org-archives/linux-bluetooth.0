@@ -1,62 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <gfpadovan@gmail.com>
-Date: Tue, 3 Aug 2010 05:07:19 -0300
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
-To: Peter Krystad <pkrystad@codeaurora.org>
-Cc: Kevin Hayes <kevin@Atheros.com>, Marcel Holtmann <marcel@holtmann.org>,
-	"tmonahan@codeaurora.org" <tmonahan@codeaurora.org>,
-	David Vrabel <david.vrabel@csr.com>,
-	Inga Stotland <ingas@codeaurora.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"rshaffer@codeaurora.org" <rshaffer@codeaurora.org>,
-	"johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
-Subject: Re: Enhancements to allow l2cap channel to use either AMP or BR/EDR
-Message-ID: <20100803080719.GD20149@vigoh>
-References: <8bfb018fa669b6ace6840881379a1a01.squirrel@www.codeaurora.org>
- <1280775200.12579.30.camel@localhost.localdomain>
- <B7132A25476D334D9130FE7532F2A56310A0B0896E@SC1EXMB-MBCL.global.atheros.com>
- <1280789882.12579.66.camel@localhost.localdomain>
- <B7132A25476D334D9130FE7532F2A56310A0B08A61@SC1EXMB-MBCL.global.atheros.com>
- <3e0b0d621e7c3dcee98b2a16c6e1f23b.squirrel@www.codeaurora.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <3e0b0d621e7c3dcee98b2a16c6e1f23b.squirrel@www.codeaurora.org>
+Subject: Re: [PATCH] bluetooth: fix not setting security level when
+ creating a rfcomm session
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1280820383-10029-1-git-send-email-luiz.dentz@gmail.com>
+References: <1280820383-10029-1-git-send-email-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Tue, 03 Aug 2010 00:59:56 -0700
+Message-ID: <1280822396.12579.80.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Peter,
+Hi Luiz,
 
-* Peter Krystad <pkrystad@codeaurora.org> [2010-08-02 18:30:34 -0700]:
-
+> This cause 'No Bonding' to be used if userspace has not yet been paired
+> with remote device since the l2cap socket used to create the rfcomm
+> session does not have any security level set.
 > 
-> Hi Marcel and Kevin,
+> Signed-off-by: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+> ---
+>  net/bluetooth/rfcomm/core.c |   13 ++++++++++---
+>  1 files changed, 10 insertions(+), 3 deletions(-)
 > 
-> >> >
-> >> > Agree that it should be done "in background" and that a size
-> >> threshold would be useful.  But who evaluates that threshold?  The
-> >> bluez kernel components, which essentially implement a transport
-> >> driver, should not be examining objects (files, phonebooks, etc) size
-> >> to see if this threshold is met.  Therefore, it would seem Tim's
-> >> suggestion of having the profile send a 'prefer_amp' bit would be
-> >> useful, right?
-> >>
-> >> I would do something like "prefer_amp when over 100kb" or something.
-> >> And
-> >> then the kernel needs to count. Meaning the L2CAP layer could easily
-> >> count this by itself.
-> >
-> > What?  Let's say the effect we want is that if the object is greater than,
-> > say, 10 megabytes, then we want to use AMP for the transfer.  With your
-> > scheme, you want the kernel to count up to 10 megabytes, THEN switch over
-> > to AMP?
-> > No, you don't, he says rhetorically.  :)
-> 
-> If the policy was defined as "prefer_amp after n seconds" we would get the
-> desired effect without having to do any counting in the kernel.
+> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+> index 7dca91b..08f5757 100644
+> --- a/net/bluetooth/rfcomm/core.c
+> +++ b/net/bluetooth/rfcomm/core.c
+> @@ -79,7 +79,10 @@ static void rfcomm_make_uih(struct sk_buff *skb, u8 addr);
+>  
+>  static void rfcomm_process_connect(struct rfcomm_session *s);
+>  
+> -static struct rfcomm_session *rfcomm_session_create(bdaddr_t *src, bdaddr_t *dst, int *err);
+> +static struct rfcomm_session *rfcomm_session_create(bdaddr_t *src,
+> +							bdaddr_t *dst,
+> +							u8 sec_level,
+> +							int *err);
+>  static struct rfcomm_session *rfcomm_session_get(bdaddr_t *src, bdaddr_t *dst);
+>  static void rfcomm_session_del(struct rfcomm_session *s);
+>  
+> @@ -402,7 +405,7 @@ static int __rfcomm_dlc_open(struct rfcomm_dlc *d, bdaddr_t *src, bdaddr_t *dst,
+>  
+>  	s = rfcomm_session_get(src, dst);
+>  	if (!s) {
+> -		s = rfcomm_session_create(src, dst, &err);
+> +		s = rfcomm_session_create(src, dst, d->sec_level, &err);
+>  		if (!s)
+>  			return err;
+>  	}
+> @@ -680,7 +683,10 @@ static void rfcomm_session_close(struct rfcomm_session *s, int err)
+>  	rfcomm_session_put(s);
+>  }
+>  
+> -static struct rfcomm_session *rfcomm_session_create(bdaddr_t *src, bdaddr_t *dst, int *err)
+> +static struct rfcomm_session *rfcomm_session_create(bdaddr_t *src,
+> +							bdaddr_t *dst,
+> +							u8 sec_level,
+> +							int *err)
+>  {
+>  	struct rfcomm_session *s = NULL;
+>  	struct sockaddr_l2 addr;
+> @@ -705,6 +711,7 @@ static struct rfcomm_session *rfcomm_session_create(bdaddr_t *src, bdaddr_t *dst
+>  	sk = sock->sk;
+>  	lock_sock(sk);
+>  	l2cap_pi(sk)->imtu = l2cap_mtu;
+> +	l2cap_pi(sk)->sec_level = sec_level;
+>  	if (l2cap_ertm)
+>  		l2cap_pi(sk)->mode = L2CAP_MODE_ERTM;
+>  	release_sock(sk);
 
-In both cases we have to take in account the total size of the file, or
-the estimated time of transfer, so we can avoid to move to AMP when the
-transfer is about to end.
+I see what you are trying to do here, but why is this needed? Shouldn't
+it be already correctly set for PSM 3?
 
--- 
-Gustavo F. Padovan
-http://padovan.org
+Regards
+
+Marcel
+
+
