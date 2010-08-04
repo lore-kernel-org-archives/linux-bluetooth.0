@@ -1,47 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
 From: Inga Stotland <ingas@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: rshaffer@codeaurora.org, johan.hedberg@gmail.com,
-	marcel@holtmann.org, Inga Stotland <ingas@codeaurora.org>
-Subject: [PATCH 6/7] Handle arrays in device properties dictionary.
-Date: Wed,  4 Aug 2010 10:07:34 -0700
-Message-Id: <1280941655-14313-7-git-send-email-ingas@codeaurora.org>
+Cc: rshaffer@codeaurora.org,
+	johan.hedberg@gmail.com,
+	marcel@holtmann.org
+Subject: [PATCH 4/7] Support for adding UUID128 to extended inquiry response
+Date: Wed,  4 Aug 2010 10:07:33 -0700
+Message-Id: <1280941655-14313-6-git-send-email-ingas@codeaurora.org>
 In-Reply-To: <1280941655-14313-1-git-send-email-ingas@codeaurora.org>
 References: <1280941655-14313-1-git-send-email-ingas@codeaurora.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Whenever SDP service record is added/deleted/modified check for whether
+class of device needs to be updated as well. If the update is
+needed, proceed as before: new EIR will be written subsequently.
+If the class of device is already present, just update EIR and return.
 ---
- src/adapter.c |    9 ++++++++-
- 1 files changed, 8 insertions(+), 1 deletions(-)
+ src/adapter.c |   69 ++++++++++++++++++++++++++++++--------------------------
+ 1 files changed, 37 insertions(+), 32 deletions(-)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index b735bdd..c142a4a 100644
+index 4615326..b735bdd 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -2700,6 +2700,7 @@ static void append_dict_valist(DBusMessageIter *iter,
- 	DBusMessageIter dict;
- 	const char *key;
- 	int type;
-+	int n_elements;
- 	void *val;
+@@ -206,6 +206,34 @@ void clear_found_devices_list(struct btd_adapter *adapter)
+ 	adapter->found_devices = NULL;
+ }
  
- 	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-@@ -2711,7 +2712,13 @@ static void append_dict_valist(DBusMessageIter *iter,
- 	while (key) {
- 		type = va_arg(var_args, int);
- 		val = va_arg(var_args, void *);
--		dict_append_entry(&dict, key, type, val);
-+		if (type == DBUS_TYPE_ARRAY) {
-+			n_elements = va_arg(var_args, int);
-+			if (n_elements > 0)
-+				dict_append_array(&dict, key, DBUS_TYPE_STRING,
-+						val, n_elements);
-+		} else
-+			dict_append_entry(&dict, key, type, val);
- 		key = va_arg(var_args, char *);
- 	}
++static void update_ext_inquiry_response(struct btd_adapter *adapter)
++{
++	uint8_t fec = 0, data[240];
++	struct hci_dev *dev = &adapter->dev;
++	int dd;
++
++	if (!(dev->features[6] & LMP_EXT_INQ))
++		return;
++
++	memset(data, 0, sizeof(data));
++
++	dd = hci_open_dev(adapter->dev_id);
++	if (dd < 0)
++		return;
++
++	if (dev->ssp_mode > 0)
++		create_ext_inquiry_response((char *) dev->name,
++						adapter->tx_power,
++						adapter->services, data);
++
++	if (hci_write_ext_inquiry_response(dd, fec, data,
++						HCI_REQ_TIMEOUT) < 0)
++		error("Can't write extended inquiry response: %s (%d)",
++						strerror(errno), errno);
++
++	hci_close_dev(dd);
++}
++
+ static int adapter_set_service_classes(struct btd_adapter *adapter,
+ 							uint8_t value)
+ {
+@@ -216,11 +244,16 @@ static int adapter_set_service_classes(struct btd_adapter *adapter,
+ 	adapter->wanted_cod &= 0x00ffff;
+ 	adapter->wanted_cod |= (value << 16);
  
+-	/* If we already have the CoD we want or the cache is enabled or an
+-	 * existing CoD write is in progress just bail out */
+-	if (adapter->current_cod == adapter->wanted_cod ||
+-			adapter->cache_enable || adapter->pending_cod)
++	/* If the cache is enabled or an existing CoD write is in progress
++	 * just bail out */
++	if (adapter->cache_enable || adapter->pending_cod)
++		return 0;
++
++	/* If we already have the CoD we want, update EIR and return */
++	if (adapter->current_cod == adapter->wanted_cod) {
++		update_ext_inquiry_response(adapter);
+ 		return 0;
++	}
+ 
+ 	DBG("Changing service classes to 0x%06x", adapter->wanted_cod);
+ 
+@@ -818,34 +851,6 @@ static DBusMessage *set_pairable_timeout(DBusConnection *conn,
+ 	return dbus_message_new_method_return(msg);
+ }
+ 
+-static void update_ext_inquiry_response(struct btd_adapter *adapter)
+-{
+-	uint8_t fec = 0, data[240];
+-	struct hci_dev *dev = &adapter->dev;
+-	int dd;
+-
+-	if (!(dev->features[6] & LMP_EXT_INQ))
+-		return;
+-
+-	memset(data, 0, sizeof(data));
+-
+-	dd = hci_open_dev(adapter->dev_id);
+-	if (dd < 0)
+-		return;
+-
+-	if (dev->ssp_mode > 0)
+-		create_ext_inquiry_response((char *) dev->name,
+-						adapter->tx_power,
+-						adapter->services, data);
+-
+-	if (hci_write_ext_inquiry_response(dd, fec, data,
+-						HCI_REQ_TIMEOUT) < 0)
+-		error("Can't write extended inquiry response: %s (%d)",
+-						strerror(errno), errno);
+-
+-	hci_close_dev(dd);
+-}
+-
+ void adapter_set_class_complete(bdaddr_t *bdaddr, uint8_t status)
+ {
+ 	uint8_t class[3];
 -- 
 1.7.2
 
