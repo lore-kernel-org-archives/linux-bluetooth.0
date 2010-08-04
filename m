@@ -1,50 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <gfpadovan@gmail.com>
-Date: Thu, 5 Aug 2010 00:29:03 -0300
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	rshaffer@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH 2/9] Bluetooth:  Change default ERTM retransmit timeout.
-Message-ID: <20100805032903.GD7870@vigoh>
-References: <1280962146-22604-1-git-send-email-mathewm@codeaurora.org>
- <1280962146-22604-3-git-send-email-mathewm@codeaurora.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1280962146-22604-3-git-send-email-mathewm@codeaurora.org>
+From: Inga Stotland <ingas@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: rshaffer@codeaurora.org,
+	johan.hedberg@gmail.com,
+	marcel@holtmann.org,
+	Inga Stotland <ingas@codeaurora.org>
+Subject: [PATCH 6/7] Handle arrays in device properties dictionary.
+Date: Wed,  4 Aug 2010 16:00:30 -0700
+Message-Id: <1280962831-18147-7-git-send-email-ingas@codeaurora.org>
+In-Reply-To: <1280962831-18147-1-git-send-email-ingas@codeaurora.org>
+References: <1280962831-18147-1-git-send-email-ingas@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+---
+ src/adapter.c |    9 ++++++++-
+ 1 files changed, 8 insertions(+), 1 deletions(-)
 
-* Mat Martineau <mathewm@codeaurora.org> [2010-08-04 15:48:59 -0700]:
-
-> The L2CAP spec requires that the ERTM retransmit timeout be at least 2
-> seconds for BR/EDR connections.
-> 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> ---
->  include/net/bluetooth/l2cap.h |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index 636724b..16e412f 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -33,7 +33,7 @@
->  #define L2CAP_DEFAULT_FLUSH_TO		0xffff
->  #define L2CAP_DEFAULT_TX_WINDOW		63
->  #define L2CAP_DEFAULT_MAX_TX		3
-> -#define L2CAP_DEFAULT_RETRANS_TO	1000    /* 1 second */
-> +#define L2CAP_DEFAULT_RETRANS_TO	2000    /* 2 seconds */
->  #define L2CAP_DEFAULT_MONITOR_TO	12000   /* 12 seconds */
->  #define L2CAP_DEFAULT_MAX_PDU_SIZE	672
->  #define L2CAP_DEFAULT_ACK_TO		200
-
-The spec says that a 2 seconds retransmission timeout shall be used
-after a move channel operation in a BR/EDR radio. (section 8.6.2.3)
-For a normal ACL connection the default value is 1 second(section
-8.6.2.1), so I prefer to keep L2CAP_DEFAULT_RETRANS_TO set to 1000.
+diff --git a/src/adapter.c b/src/adapter.c
+index b735bdd..c142a4a 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2700,6 +2700,7 @@ static void append_dict_valist(DBusMessageIter *iter,
+ 	DBusMessageIter dict;
+ 	const char *key;
+ 	int type;
++	int n_elements;
+ 	void *val;
+ 
+ 	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+@@ -2711,7 +2712,13 @@ static void append_dict_valist(DBusMessageIter *iter,
+ 	while (key) {
+ 		type = va_arg(var_args, int);
+ 		val = va_arg(var_args, void *);
+-		dict_append_entry(&dict, key, type, val);
++		if (type == DBUS_TYPE_ARRAY) {
++			n_elements = va_arg(var_args, int);
++			if (n_elements > 0)
++				dict_append_array(&dict, key, DBUS_TYPE_STRING,
++						val, n_elements);
++		} else
++			dict_append_entry(&dict, key, type, val);
+ 		key = va_arg(var_args, char *);
+ 	}
+ 
+-- 
+1.7.2
 
 -- 
-Gustavo F. Padovan
-http://padovan.org
+Inga Stotland
+Sent by an employee of the Qualcomm Innovation Center, Inc.
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
