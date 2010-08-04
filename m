@@ -1,27 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: Check result code for l2cap info rsp
+Subject: Re: [PATCH] Bluetooth: Don't send RFC for Basic Mode if only it is
+ supported
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Ville Tervo <ville.tervo@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
-In-Reply-To: <1280904213-2097-1-git-send-email-ville.tervo@nokia.com>
-References: <1280904213-2097-1-git-send-email-ville.tervo@nokia.com>
+To: "Gustavo F. Padovan" <gustavo@padovan.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>
+In-Reply-To: <1280890169-8880-1-git-send-email-gustavo@padovan.org>
+References: <1280890169-8880-1-git-send-email-gustavo@padovan.org>
 Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 04 Aug 2010 07:27:45 -0700
-Message-ID: <1280932065.12579.110.camel@localhost.localdomain>
+Date: Wed, 04 Aug 2010 07:27:24 -0700
+Message-ID: <1280932044.12579.109.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ville,
+Hi Gustavo,
 
-> Check result code in l2cap information response. Othervise
-> the response code would read invalid feature mask and access
-> invalid memory.
+> If the remote side doesn't support Enhanced Retransmission Mode neither
+> Streaming Mode, we shall not send the RFC option.
+> Some devices that only supports Basic Mode do not understanding the RFC
+> option. This patch fix the regression found with that devices.
 > 
-> Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
+> Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 > ---
->  net/bluetooth/l2cap.c |    9 +++++++++
->  1 files changed, 9 insertions(+), 0 deletions(-)
+>  net/bluetooth/l2cap.c |   15 ++++++++++++---
+>  1 files changed, 12 insertions(+), 3 deletions(-)
 
 patch has been applied. Thanks.
 
