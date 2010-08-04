@@ -1,29 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+From: Ville Tervo <ville.tervo@nokia.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Changes in HDP API 
-Date: Wed,  4 Aug 2010 09:49:11 +0200
-Message-Id: <1280908152-3743-1-git-send-email-santoscadenas@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: padovan@profusion.mobi, marcel@holtmann.org,
+        Ville Tervo <ville.tervo@nokia.com>
+Subject: [PATCH] Bluetooth: Check result code for l2cap info rsp
+Date: Wed,  4 Aug 2010 09:43:33 +0300
+Message-Id: <1280904213-2097-1-git-send-email-ville.tervo@nokia.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch makes some changes in the HDP API based in the conversation that I
-had yesterday with Luiz and Elvis.
+Check result code in l2cap information response. Othervise
+the response code would read invalid feature mask and access
+invalid memory.
 
-I still have a doubt about the notification of devices in the agent. Luiz
-commented that with this API the Agent and the Application could not be in
-different processes, is this a problem?
+Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
+---
+ net/bluetooth/l2cap.c |    9 +++++++++
+ 1 files changed, 9 insertions(+), 0 deletions(-)
 
-An other open issue is: if we notify when a device is discovered and suitable
-for connect with an application and when a devices is removed (or becomes not
-suitable for connect). I think that we already need something like the patch
-that we start discussing yesterday, something that can be called by the user
-in order to force a new service discovery and notifies the driver that will
-notify the agent. Of course we can avoid this not notifying the suitable
-devices and just letting to try the connection against all the devices (if
-there is no matching service it will fail). What do you think?
-
-Regards.
-
-Jose.
-
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index 0f34e12..3e3cd9d 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -3348,6 +3348,15 @@ static inline int l2cap_information_rsp(struct l2cap_conn *conn, struct l2cap_cm
+ 
+ 	del_timer(&conn->info_timer);
+ 
++	if (result != L2CAP_IR_SUCCESS) {
++		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_DONE;
++		conn->info_ident = 0;
++
++		l2cap_conn_start(conn);
++
++		return 0;
++	}
++
+ 	if (type == L2CAP_IT_FEAT_MASK) {
+ 		conn->feat_mask = get_unaligned_le32(rsp->data);
+ 
+-- 
+1.7.1
