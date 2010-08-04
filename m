@@ -1,35 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: Don't send RFC for Basic Mode if only it is
- supported
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Gustavo F. Padovan" <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>
-In-Reply-To: <1280890169-8880-1-git-send-email-gustavo@padovan.org>
-References: <1280890169-8880-1-git-send-email-gustavo@padovan.org>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 04 Aug 2010 07:27:24 -0700
-Message-ID: <1280932044.12579.109.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 4 Aug 2010 17:09:49 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Inga Stotland <ingas@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, rshaffer@codeaurora.org,
+	marcel@holtmann.org
+Subject: Re: [PATCH 5/7] Fix in logic to write EIR when SDP records are
+ changed.
+Message-ID: <20100804140949.GC14996@jh-x301>
+References: <1280880237-2296-1-git-send-email-ingas@codeaurora.org>
+ <1280880237-2296-6-git-send-email-ingas@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1280880237-2296-6-git-send-email-ingas@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Inga,
 
-> If the remote side doesn't support Enhanced Retransmission Mode neither
-> Streaming Mode, we shall not send the RFC option.
-> Some devices that only supports Basic Mode do not understanding the RFC
-> option. This patch fix the regression found with that devices.
-> 
-> Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
-> ---
->  net/bluetooth/l2cap.c |   15 ++++++++++++---
->  1 files changed, 12 insertions(+), 3 deletions(-)
+On Tue, Aug 03, 2010, Inga Stotland wrote:
+> +static void update_ext_inquiry_response(struct btd_adapter *adapter);
 
-patch has been applied. Thanks.
+Is this forward declaration really necessary? Would it be possible to
+get rid of it by rearranging the static functions in this file (i.e.
+move update_ext_inquiry_response higher up in the file)?
 
-Regards
-
-Marcel
-
-
+Johan
