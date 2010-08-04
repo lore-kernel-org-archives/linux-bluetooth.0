@@ -3,117 +3,107 @@ From: Inga Stotland <ingas@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: rshaffer@codeaurora.org,
 	johan.hedberg@gmail.com,
-	marcel@holtmann.org
+	marcel@holtmann.org,
+	Inga Stotland <ingas@codeaurora.org>
 Subject: [PATCH 4/7] Support for adding UUID128 to extended inquiry response
-Date: Wed,  4 Aug 2010 10:07:33 -0700
-Message-Id: <1280941655-14313-6-git-send-email-ingas@codeaurora.org>
+Date: Wed,  4 Aug 2010 10:07:32 -0700
+Message-Id: <1280941655-14313-5-git-send-email-ingas@codeaurora.org>
 In-Reply-To: <1280941655-14313-1-git-send-email-ingas@codeaurora.org>
 References: <1280941655-14313-1-git-send-email-ingas@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Whenever SDP service record is added/deleted/modified check for whether
-class of device needs to be updated as well. If the update is
-needed, proceed as before: new EIR will be written subsequently.
-If the class of device is already present, just update EIR and return.
 ---
- src/adapter.c |   69 ++++++++++++++++++++++++++++++--------------------------
- 1 files changed, 37 insertions(+), 32 deletions(-)
+ src/sdpd-service.c |   63 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 63 insertions(+), 0 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 4615326..b735bdd 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -206,6 +206,34 @@ void clear_found_devices_list(struct btd_adapter *adapter)
- 	adapter->found_devices = NULL;
+diff --git a/src/sdpd-service.c b/src/sdpd-service.c
+index 5c56e2d..26ab9a5 100644
+--- a/src/sdpd-service.c
++++ b/src/sdpd-service.c
+@@ -49,6 +49,8 @@
+ #include "manager.h"
+ #include "adapter.h"
+ 
++#define SIZEOF_UUID128 16
++
+ static sdp_record_t *server = NULL;
+ 
+ static uint16_t did_vendor = 0x0000;
+@@ -174,6 +176,63 @@ static void update_svclass_list(const bdaddr_t *src)
+ 
  }
  
-+static void update_ext_inquiry_response(struct btd_adapter *adapter)
++static void eir_generate_uuid128(sdp_list_t *list,
++					uint8_t *ptr, uint16_t *eir_len)
 +{
-+	uint8_t fec = 0, data[240];
-+	struct hci_dev *dev = &adapter->dev;
-+	int dd;
++	int i, k, index = 0;
++	uint16_t len = *eir_len;
++	uint8_t *uuid128;
++	gboolean truncated = FALSE;
 +
-+	if (!(dev->features[6] & LMP_EXT_INQ))
-+		return;
++	/* Store UUIDs in place, skip 2 bytes to write type and length later */
++	uuid128 = ptr + 2;
 +
-+	memset(data, 0, sizeof(data));
++	for (; list; list = list->next) {
++		sdp_record_t *rec = (sdp_record_t *) list->data;
++		uint8_t *uuid128_data = rec->svclass.value.uuid128.data;
 +
-+	dd = hci_open_dev(adapter->dev_id);
-+	if (dd < 0)
-+		return;
++		if (rec->svclass.type != SDP_UUID128)
++			continue;
 +
-+	if (dev->ssp_mode > 0)
-+		create_ext_inquiry_response((char *) dev->name,
-+						adapter->tx_power,
-+						adapter->services, data);
++		/* Stop if not enough space to put next UUID128 */
++		if ((len + 2 + SIZEOF_UUID128) > EIR_DATA_LENGTH) {
++			truncated = TRUE;
++			break;
++		}
 +
-+	if (hci_write_ext_inquiry_response(dd, fec, data,
-+						HCI_REQ_TIMEOUT) < 0)
-+		error("Can't write extended inquiry response: %s (%d)",
-+						strerror(errno), errno);
++		/* Check for duplicates, EIR data is Little Endian */
++		for (i = 0; i < index; i++) {
++			for (k = 0; k < SIZEOF_UUID128; k++) {
++				if (uuid128[i * SIZEOF_UUID128 + k] !=
++					uuid128_data[SIZEOF_UUID128 - k])
++					break;
++			}
++			if (k == SIZEOF_UUID128)
++				break;
++		}
 +
-+	hci_close_dev(dd);
++		if (i < index)
++			continue;
++
++		/* EIR data is Little Endian */
++		for (k = 0; k < SIZEOF_UUID128; k++)
++			uuid128[index * SIZEOF_UUID128 + k] =
++				uuid128_data[SIZEOF_UUID128 - 1 - k];
++
++		len += SIZEOF_UUID128;
++		index++;
++	}
++
++	if (index > 0 || truncated) {
++		/* EIR Data length */
++		ptr[0] = (index * SIZEOF_UUID128) + 1;
++		/* EIR Data type */
++		ptr[1] = truncated ? EIR_UUID128_SOME : EIR_UUID128_ALL;
++		len += 2;
++		*eir_len = len;
++	}
 +}
 +
- static int adapter_set_service_classes(struct btd_adapter *adapter,
- 							uint8_t value)
- {
-@@ -216,11 +244,16 @@ static int adapter_set_service_classes(struct btd_adapter *adapter,
- 	adapter->wanted_cod &= 0x00ffff;
- 	adapter->wanted_cod |= (value << 16);
- 
--	/* If we already have the CoD we want or the cache is enabled or an
--	 * existing CoD write is in progress just bail out */
--	if (adapter->current_cod == adapter->wanted_cod ||
--			adapter->cache_enable || adapter->pending_cod)
-+	/* If the cache is enabled or an existing CoD write is in progress
-+	 * just bail out */
-+	if (adapter->cache_enable || adapter->pending_cod)
-+		return 0;
+ void create_ext_inquiry_response(const char *name,
+ 					int8_t tx_power, sdp_list_t *services,
+ 					uint8_t *data)
+@@ -271,6 +330,10 @@ void create_ext_inquiry_response(const char *name,
+ 			*ptr++ = (uuid16[i] & 0xff00) >> 8;
+ 		}
+ 	}
 +
-+	/* If we already have the CoD we want, update EIR and return */
-+	if (adapter->current_cod == adapter->wanted_cod) {
-+		update_ext_inquiry_response(adapter);
- 		return 0;
-+	}
- 
- 	DBG("Changing service classes to 0x%06x", adapter->wanted_cod);
- 
-@@ -818,34 +851,6 @@ static DBusMessage *set_pairable_timeout(DBusConnection *conn,
- 	return dbus_message_new_method_return(msg);
++	/* Group all UUID128 types */
++	if (eir_len <= EIR_DATA_LENGTH - 2)
++		eir_generate_uuid128(services, ptr, &eir_len);
  }
  
--static void update_ext_inquiry_response(struct btd_adapter *adapter)
--{
--	uint8_t fec = 0, data[240];
--	struct hci_dev *dev = &adapter->dev;
--	int dd;
--
--	if (!(dev->features[6] & LMP_EXT_INQ))
--		return;
--
--	memset(data, 0, sizeof(data));
--
--	dd = hci_open_dev(adapter->dev_id);
--	if (dd < 0)
--		return;
--
--	if (dev->ssp_mode > 0)
--		create_ext_inquiry_response((char *) dev->name,
--						adapter->tx_power,
--						adapter->services, data);
--
--	if (hci_write_ext_inquiry_response(dd, fec, data,
--						HCI_REQ_TIMEOUT) < 0)
--		error("Can't write extended inquiry response: %s (%d)",
--						strerror(errno), errno);
--
--	hci_close_dev(dd);
--}
--
- void adapter_set_class_complete(bdaddr_t *bdaddr, uint8_t status)
- {
- 	uint8_t class[3];
+ void register_public_browse_group(void)
 -- 
 1.7.2
 
