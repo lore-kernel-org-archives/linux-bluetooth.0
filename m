@@ -1,39 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mat Martineau <mathewm@codeaurora.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	rshaffer@codeaurora.org,
-	Mat Martineau <mathewm@codeaurora.org>
-Subject: [PATCH] Use a valid PSM as the default in l2test.
-Date: Wed,  4 Aug 2010 15:31:13 -0700
-Message-Id: <1280961073-22296-1-git-send-email-mathewm@codeaurora.org>
+Message-ID: <8cfd94862359adebf060791e833af08e.squirrel@www.codeaurora.org>
+In-Reply-To: <20100804190439.GA18786@jh-x301>
+References: <1280941655-14313-1-git-send-email-ingas@codeaurora.org>
+    <20100804190439.GA18786@jh-x301>
+Date: Wed, 4 Aug 2010 13:59:02 -0700 (PDT)
+Subject: Re: [PATCH v7 0/7] Enhanced support for extended inquiry response
+From: ingas@codeaurora.org
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Bluetooth spec requires PSMs to be odd numbers, with the least
-significant bit of the most significant byte set to 0.  This
-change is a prerequisite for PSM validation in the kernel.
----
- test/l2test.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+Hi Johan,
 
-diff --git a/test/l2test.c b/test/l2test.c
-index 0bb46f3..32cd27a 100644
---- a/test/l2test.c
-+++ b/test/l2test.c
-@@ -87,7 +87,7 @@ static long buffer_size = 2048;
- 
- /* Default addr and psm */
- static bdaddr_t bdaddr;
--static unsigned short psm = 10;
-+static unsigned short psm = 0x1001;
- 
- /* Default number of frames to send (-1 = infinite) */
- static int num_frames = -1;
--- 
-1.7.1
+>
+> There seems to be two "4/7" patches with the same summary line but
+> different content. What's going on? The patches apply cleanly but the
+> commit messages should match the content before I can push upstream.
+> Other than that and one other minor thing (I'll send another email about
+> it) the patches are starting to look like upstreamable quality. Thanks
+> for bearing with me and doing all the requested fixes (which I imagine
+> can feel overly pedantic at times) :)
 
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+Something happened in the process of mailing the patches (not sure what
+since it's a semi automatic process). Anyway, I will resubmit yet again
+with the fix for the last patch. Version 8 :)
+
+Regards,
+
+Inga
+
+
