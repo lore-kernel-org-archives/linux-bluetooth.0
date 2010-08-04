@@ -5,30 +5,41 @@ Cc: rshaffer@codeaurora.org,
 	johan.hedberg@gmail.com,
 	marcel@holtmann.org,
 	Inga Stotland <ingas@codeaurora.org>
-Subject: [PATCH 2/7] Minor fix when skipping duplicate UUID16 from EIR.
-Date: Wed,  4 Aug 2010 16:00:26 -0700
-Message-Id: <1280962831-18147-3-git-send-email-ingas@codeaurora.org>
+Subject: [PATCH 1/7] Spec constants for Extended Inquiry Response field types
+Date: Wed,  4 Aug 2010 16:00:25 -0700
+Message-Id: <1280962831-18147-2-git-send-email-ingas@codeaurora.org>
 In-Reply-To: <1280962831-18147-1-git-send-email-ingas@codeaurora.org>
 References: <1280962831-18147-1-git-send-email-ingas@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/sdpd-service.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ src/sdpd.h |   13 +++++++++++++
+ 1 files changed, 13 insertions(+), 0 deletions(-)
 
-diff --git a/src/sdpd-service.c b/src/sdpd-service.c
-index cdbb4f4..35e333d 100644
---- a/src/sdpd-service.c
-+++ b/src/sdpd-service.c
-@@ -242,7 +242,7 @@ void create_ext_inquiry_response(const char *name,
- 			if (uuid[i] == rec->svclass.value.uuid16)
- 				break;
+diff --git a/src/sdpd.h b/src/sdpd.h
+index e93b0b6..5bab869 100644
+--- a/src/sdpd.h
++++ b/src/sdpd.h
+@@ -34,6 +34,19 @@
+ #define SDPDBG(fmt...)
+ #endif
  
--		if (i == index - 1)
-+		if (i < index)
- 			continue;
- 
- 		uuid[index++] = rec->svclass.value.uuid16;
++#define EIR_DATA_LENGTH  240
++
++#define EIR_UUID16_SOME             0x02  /* 16-bit UUID, more available */
++#define EIR_UUID16_ALL              0x03  /* 16-bit UUID, all listed */
++#define EIR_UUID32_SOME             0x04  /* 32-bit UUID, more available */
++#define EIR_UUID32_ALL              0x05  /* 32-bit UUID, all listed */
++#define EIR_UUID128_SOME            0x06  /* 128-bit UUID, more available */
++#define EIR_UUID128_ALL             0x07  /* 128-bit UUID, all listed */
++#define EIR_NAME_SHORT              0x08  /* shortened local name */
++#define EIR_NAME_COMPLETE           0x09  /* complete local name */
++#define EIR_TX_POWER                0x0A  /* transmit power level */
++#define EIR_DEVICE_ID               0x10  /* device ID */
++
+ typedef struct request {
+ 	bdaddr_t device;
+ 	bdaddr_t bdaddr;
 -- 
 1.7.2
 
