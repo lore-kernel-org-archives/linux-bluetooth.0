@@ -1,40 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 4 Aug 2010 22:04:39 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Inga Stotland <ingas@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, rshaffer@codeaurora.org,
-	marcel@holtmann.org
-Subject: Re: [PATCH v7 0/7] Enhanced support for extended inquiry response
-Message-ID: <20100804190439.GA18786@jh-x301>
-References: <1280941655-14313-1-git-send-email-ingas@codeaurora.org>
-MIME-Version: 1.0
+Subject: Re: Changes in HDP API
+Mime-Version: 1.0 (Apple Message framework v1081)
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1280941655-14313-1-git-send-email-ingas@codeaurora.org>
+From: =?iso-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
+In-Reply-To: <1280908152-3743-1-git-send-email-santoscadenas@gmail.com>
+Date: Wed, 4 Aug 2010 15:22:29 -0300
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <0AEF6BD1-2A78-47E2-9445-87D78E4C85F8@signove.com>
+References: <1280908152-3743-1-git-send-email-santoscadenas@gmail.com>
+To: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Inga,
 
-On Wed, Aug 04, 2010, Inga Stotland wrote:
-> EIR needs to be updated whenever local SDP record database changes.
-> Previously, when an SDP record was added/removed/updated, EIR would 
-> be written in callback fired off HCI "Command Complete" event set off by
-> "Write Class Of Device" command. However, if the class of device did not
-> need to be updated, the EIR write was not happening either. This
-> implementation has been augmented to write new EIR when modification
-> in SDP database does not lead to updating of class of device.
+On 04/08/2010, at 04:49, Jose Antonio Santos Cadenas wrote:
+
+> This patch makes some changes in the HDP API based in the conversation that I
+> had yesterday with Luiz and Elvis.
 > 
-> Added support for UUID128 service descriptors in local EIR. 
-> 
-> Service UUIDs are written to "device properties" dictionary  when emitting
-> "Device Found" signal. This allows peek at available services offered by 
-> a remote device without establishing SDP connection.
+> I still have a doubt about the notification of devices in the agent. Luiz
+> commented that with this API the Agent and the Application could not be in
+> different processes, is this a problem?
 
-There seems to be two "4/7" patches with the same summary line but
-different content. What's going on? The patches apply cleanly but the
-commit messages should match the content before I can push upstream.
-Other than that and one other minor thing (I'll send another email about
-it) the patches are starting to look like upstreamable quality. Thanks
-for bearing with me and doing all the requested fixes (which I imagine
-can feel overly pedantic at times) :)
+Is not a problem and IMHO it does not make sense at all. The Agent in HDP API context is as a mere vehicle for callbacks, because signals are seen by every process while the nature of health devices demands some privacy/secrecy (I have a faint memory about privacy being a general requirement for IEEE protocol as well as Continua certification.)
 
-Johan
+The agent is always coupled with an application. The most typical usage of BlueZ HDP is as sink role, which means the application creates the application, which publishes the role via SDP, and sits idle until some source connects, which is notified via the agent.
