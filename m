@@ -1,28 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 4 Aug 2010 17:08:37 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Inga Stotland <ingas@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, rshaffer@codeaurora.org,
+	marcel@holtmann.org
+Subject: Re: [PATCH 4/7] Support for adding UUID128 to extended inquiry
+ response
+Message-ID: <20100804140837.GB14996@jh-x301>
+References: <1280880237-2296-1-git-send-email-ingas@codeaurora.org>
+ <1280880237-2296-5-git-send-email-ingas@codeaurora.org>
 MIME-Version: 1.0
-Date: Wed, 4 Aug 2010 19:38:51 +0530
-Message-ID: <AANLkTimAktDFG+abbsMpgKfkNtmX3tqqhwXd-OZwgRWj@mail.gmail.com>
-Subject: Reg: L2cap Security And Role Switch
-From: "Prabhakaran M.C" <mcprabhakaran@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1280880237-2296-5-git-send-email-ingas@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello All,
+Hi Inga,
 
- Whenever L2cap security is HIGH and remote device does role switch,
-Bluez accepts the Role switch and L2cap disconnects the channel
-because of HIGH security.
+On Tue, Aug 03, 2010, Inga Stotland wrote:
+> -		ptr[1] = (truncated) ? EIR_UUID16_SOME : EIR_UUID16_ALL;
+> +		ptr[1] = truncated ? EIR_UUID16_SOME : EIR_UUID16_ALL;
 
- For PAN profile, I would like to keep the L2cap security to HIGH
-since it involves internet browsing but the Widcomm stack always does
-a role switch in PAN connection and Bluez disconnects l2cap channel.
+And here's the fix I mentioned in the previous email that shouldn't be
+needed to begin with.
 
- Can someone please point in specification about the l2cap security
-level and Role switch relation. I tried to find out this but I could
-not get this behavior described in specification. Please provide your
-comments and inputs. Thanks in Advance.
-
-Thanks,
-Prabhakaran.
+Johan
