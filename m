@@ -5,114 +5,30 @@ Cc: rshaffer@codeaurora.org,
 	johan.hedberg@gmail.com,
 	marcel@holtmann.org,
 	Inga Stotland <ingas@codeaurora.org>
-Subject: [PATCH 4/7] Support for adding UUID128 to extended inquiry response
-Date: Tue,  3 Aug 2010 17:03:54 -0700
-Message-Id: <1280880237-2296-5-git-send-email-ingas@codeaurora.org>
+Subject: [PATCH 2/7] Minor fix when skipping duplicate UUID16 from EIR.
+Date: Tue,  3 Aug 2010 17:03:52 -0700
+Message-Id: <1280880237-2296-3-git-send-email-ingas@codeaurora.org>
 In-Reply-To: <1280880237-2296-1-git-send-email-ingas@codeaurora.org>
 References: <1280880237-2296-1-git-send-email-ingas@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/sdpd-service.c |   65 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 64 insertions(+), 1 deletions(-)
+ src/sdpd-service.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
 diff --git a/src/sdpd-service.c b/src/sdpd-service.c
-index 50c0a97..651e24c 100644
+index cdbb4f4..35e333d 100644
 --- a/src/sdpd-service.c
 +++ b/src/sdpd-service.c
-@@ -49,6 +49,8 @@
- #include "manager.h"
- #include "adapter.h"
+@@ -242,7 +242,7 @@ void create_ext_inquiry_response(const char *name,
+ 			if (uuid[i] == rec->svclass.value.uuid16)
+ 				break;
  
-+#define SIZEOF_UUID128 16
-+
- static sdp_record_t *server = NULL;
- 
- static uint16_t did_vendor = 0x0000;
-@@ -174,6 +176,63 @@ static void update_svclass_list(const bdaddr_t *src)
- 
- }
- 
-+static void eir_generate_uuid128(sdp_list_t *list,
-+					uint8_t *ptr, uint16_t *eir_len)
-+{
-+	int i, k, index = 0;
-+	uint16_t len = *eir_len;
-+	uint8_t *uuid128;
-+	gboolean truncated = FALSE;
-+
-+	/* Store UUID128 in place, skip 2 bytes to insert type and length later */
-+	uuid128 = ptr + 2;
-+
-+	for (; list; list = list->next) {
-+		sdp_record_t *rec = (sdp_record_t *) list->data;
-+		uint8_t *uuid128_data = rec->svclass.value.uuid128.data;
-+
-+		if (rec->svclass.type != SDP_UUID128)
-+			continue;
-+
-+		/* Stop if not enough space to put next UUID128 */
-+		if ((len + 2 + SIZEOF_UUID128) > EIR_DATA_LENGTH) {
-+			truncated = TRUE;
-+			break;
-+		}
-+
-+		/* Check for duplicates, EIR data is Little Endian */
-+		for (i = 0; i < index; i++) {
-+			for (k = 0; k < SIZEOF_UUID128; k++) {
-+				if (uuid128[i * SIZEOF_UUID128 + k] !=
-+					uuid128_data[SIZEOF_UUID128 - k])
-+					break;
-+			}
-+			if (k == SIZEOF_UUID128)
-+				break;
-+		}
-+
+-		if (i == index - 1)
 +		if (i < index)
-+			continue;
-+
-+		/* EIR data is Little Endian */
-+		for (k = 0; k < SIZEOF_UUID128; k++)
-+			uuid128[index * SIZEOF_UUID128 + k] =
-+				uuid128_data[SIZEOF_UUID128 - 1 - k];
-+
-+		len += SIZEOF_UUID128;
-+		index++;
-+	}
-+
-+	if (index > 0 || truncated) {
-+		/* EIR Data length */
-+		ptr[0] = (index * SIZEOF_UUID128) + 1;
-+		/* EIR Data type */
-+		ptr[1] = truncated ? EIR_UUID128_SOME : EIR_UUID128_ALL;
-+		len += 2;
-+		*eir_len = len;
-+	}
-+}
-+
- void create_ext_inquiry_response(const char *name,
- 					int8_t tx_power, sdp_list_t *services,
- 					uint8_t *data)
-@@ -261,7 +320,7 @@ void create_ext_inquiry_response(const char *name,
- 		/* EIR Data length */
- 		ptr[0] = (index * sizeof(uint16_t)) + 1;
- 		/* EIR Data type */
--		ptr[1] = (truncated) ? EIR_UUID16_SOME : EIR_UUID16_ALL;
-+		ptr[1] = truncated ? EIR_UUID16_SOME : EIR_UUID16_ALL;
+ 			continue;
  
- 		ptr += 2;
- 		eir_len += 2;
-@@ -271,6 +330,10 @@ void create_ext_inquiry_response(const char *name,
- 			*ptr++ = (uuid16[i] & 0xff00) >> 8;
- 		}
- 	}
-+
-+	/* Group all UUID128 types */
-+	if (eir_len <= EIR_DATA_LENGTH - 2)
-+		eir_generate_uuid128(services, ptr, &eir_len);
- }
- 
- void register_public_browse_group(void)
+ 		uuid[index++] = rec->svclass.value.uuid16;
 -- 
 1.7.2
 
