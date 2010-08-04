@@ -5,56 +5,114 @@ Cc: rshaffer@codeaurora.org,
 	johan.hedberg@gmail.com,
 	marcel@holtmann.org,
 	Inga Stotland <ingas@codeaurora.org>
-Subject: [PATCH 5/7] Fix in logic to write EIR when SDP records are changed.
-Date: Tue,  3 Aug 2010 17:03:55 -0700
-Message-Id: <1280880237-2296-6-git-send-email-ingas@codeaurora.org>
+Subject: [PATCH 4/7] Support for adding UUID128 to extended inquiry response
+Date: Tue,  3 Aug 2010 17:03:54 -0700
+Message-Id: <1280880237-2296-5-git-send-email-ingas@codeaurora.org>
 In-Reply-To: <1280880237-2296-1-git-send-email-ingas@codeaurora.org>
 References: <1280880237-2296-1-git-send-email-ingas@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Whenever SDP service record is added/deleted/modified check for whether
-class of device needs to be updated as well. If the update is
-needed, proceed as before: new EIR will be written subsequently.
-If the class of device is already present, just update EIR and return.
 ---
- src/adapter.c |   15 +++++++++++----
- 1 files changed, 11 insertions(+), 4 deletions(-)
+ src/sdpd-service.c |   65 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 64 insertions(+), 1 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 4615326..e1f3051 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -137,6 +137,8 @@ struct btd_adapter {
- 	gint ref;
- };
+diff --git a/src/sdpd-service.c b/src/sdpd-service.c
+index 50c0a97..651e24c 100644
+--- a/src/sdpd-service.c
++++ b/src/sdpd-service.c
+@@ -49,6 +49,8 @@
+ #include "manager.h"
+ #include "adapter.h"
  
-+static void update_ext_inquiry_response(struct btd_adapter *adapter);
++#define SIZEOF_UUID128 16
 +
- static void adapter_set_pairable_timeout(struct btd_adapter *adapter,
- 					guint interval);
+ static sdp_record_t *server = NULL;
  
-@@ -216,12 +218,17 @@ static int adapter_set_service_classes(struct btd_adapter *adapter,
- 	adapter->wanted_cod &= 0x00ffff;
- 	adapter->wanted_cod |= (value << 16);
+ static uint16_t did_vendor = 0x0000;
+@@ -174,6 +176,63 @@ static void update_svclass_list(const bdaddr_t *src)
  
--	/* If we already have the CoD we want or the cache is enabled or an
--	 * existing CoD write is in progress just bail out */
--	if (adapter->current_cod == adapter->wanted_cod ||
--			adapter->cache_enable || adapter->pending_cod)
-+	/* If the cache is enabled or an existing CoD write is in progress
-+	 * just bail out */
-+	if (adapter->cache_enable || adapter->pending_cod)
- 		return 0;
+ }
  
-+	/* If we already have the CoD we want, update EIR and return */
-+	if (adapter->current_cod == adapter->wanted_cod) {
-+		update_ext_inquiry_response(adapter);
-+		return 0;
++static void eir_generate_uuid128(sdp_list_t *list,
++					uint8_t *ptr, uint16_t *eir_len)
++{
++	int i, k, index = 0;
++	uint16_t len = *eir_len;
++	uint8_t *uuid128;
++	gboolean truncated = FALSE;
++
++	/* Store UUID128 in place, skip 2 bytes to insert type and length later */
++	uuid128 = ptr + 2;
++
++	for (; list; list = list->next) {
++		sdp_record_t *rec = (sdp_record_t *) list->data;
++		uint8_t *uuid128_data = rec->svclass.value.uuid128.data;
++
++		if (rec->svclass.type != SDP_UUID128)
++			continue;
++
++		/* Stop if not enough space to put next UUID128 */
++		if ((len + 2 + SIZEOF_UUID128) > EIR_DATA_LENGTH) {
++			truncated = TRUE;
++			break;
++		}
++
++		/* Check for duplicates, EIR data is Little Endian */
++		for (i = 0; i < index; i++) {
++			for (k = 0; k < SIZEOF_UUID128; k++) {
++				if (uuid128[i * SIZEOF_UUID128 + k] !=
++					uuid128_data[SIZEOF_UUID128 - k])
++					break;
++			}
++			if (k == SIZEOF_UUID128)
++				break;
++		}
++
++		if (i < index)
++			continue;
++
++		/* EIR data is Little Endian */
++		for (k = 0; k < SIZEOF_UUID128; k++)
++			uuid128[index * SIZEOF_UUID128 + k] =
++				uuid128_data[SIZEOF_UUID128 - 1 - k];
++
++		len += SIZEOF_UUID128;
++		index++;
 +	}
 +
- 	DBG("Changing service classes to 0x%06x", adapter->wanted_cod);
++	if (index > 0 || truncated) {
++		/* EIR Data length */
++		ptr[0] = (index * SIZEOF_UUID128) + 1;
++		/* EIR Data type */
++		ptr[1] = truncated ? EIR_UUID128_SOME : EIR_UUID128_ALL;
++		len += 2;
++		*eir_len = len;
++	}
++}
++
+ void create_ext_inquiry_response(const char *name,
+ 					int8_t tx_power, sdp_list_t *services,
+ 					uint8_t *data)
+@@ -261,7 +320,7 @@ void create_ext_inquiry_response(const char *name,
+ 		/* EIR Data length */
+ 		ptr[0] = (index * sizeof(uint16_t)) + 1;
+ 		/* EIR Data type */
+-		ptr[1] = (truncated) ? EIR_UUID16_SOME : EIR_UUID16_ALL;
++		ptr[1] = truncated ? EIR_UUID16_SOME : EIR_UUID16_ALL;
  
- 	err = adapter_ops->set_class(adapter->dev_id, adapter->wanted_cod);
+ 		ptr += 2;
+ 		eir_len += 2;
+@@ -271,6 +330,10 @@ void create_ext_inquiry_response(const char *name,
+ 			*ptr++ = (uuid16[i] & 0xff00) >> 8;
+ 		}
+ 	}
++
++	/* Group all UUID128 types */
++	if (eir_len <= EIR_DATA_LENGTH - 2)
++		eir_generate_uuid128(services, ptr, &eir_len);
+ }
+ 
+ void register_public_browse_group(void)
 -- 
 1.7.2
 
