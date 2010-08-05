@@ -1,193 +1,229 @@
 Return-Path: <cyrus@holtmann.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Fix not deleting stored keys when a new one is created
+Date: Thu,  5 Aug 2010 16:58:06 +0300
+Message-Id: <1281016686-20512-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <4C587AFF.7060402@aircable.net>
-References: <4C46324D.5070800@aircable.net> <20100721101934.GA12188@jh-x301>
-	<4C470E2D.7000607@aircable.net> <AANLkTi=8=BUThjVdc4EN_8uupGKmdgHQzGOe560Cv+pm@mail.gmail.com>
-	<AANLkTi=jzZScnCK6rFpKjBJesnw=71y5hNG3kDBhxv1u@mail.gmail.com>
-	<4C505806.3040508@aircable.net> <AANLkTikRQfhAKm-UW+on+ZeEp709z_ku_NDjeVD_US1b@mail.gmail.com>
-	<AANLkTi=9Top+9kRwtZj-nZw8szQU4ff9CTSNSGuexmEL@mail.gmail.com>
-	<4C518373.6000706@aircable.net> <AANLkTi=i8MhyC80qis9TjZBmtNUJDBMNw5g2rjKPQvdj@mail.gmail.com>
-	<AANLkTinYN=KDban-WsF4wZw-ZZDU7fQ0SFnAWdofbokd@mail.gmail.com>
-	<4C587AFF.7060402@aircable.net>
-From: Manuel Naranjo <manuel@aircable.net>
-Date: Thu, 5 Aug 2010 11:48:26 -0300
-Message-ID: <AANLkTimLaDPPqwhr0jPaAQcOA+wkiFmj11bmp_d5EvHd@mail.gmail.com>
-Subject: Re: [PATCH][RFC] Fix SDP resolving segfault
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	BlueZ <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Luiz,
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
->> This looks like a different issue, at least it doesn't seems to crash
->> in the same point, so I assume the patch does fix something but
->> uncover another problem. But we have to find out where exactly is this
->> other problem because btd_device_unref doesn't seems to be the place,
->> can't you get any core dumps from the tests you did?
->>
->
-> I agree it looks like it triggered another issue, I will try to get logs
-> tomorrow.
->
+When a new link key is created but it doesn't match any criteria to be
+stored any previouly one should be removed from filesystem.
 
-Here's the call trace, unfortunately I don't have bluetoothd debug
-messages, just this
-	+  0 0x804e4ea (from 0x7e0dab)  watch_func():
-/home/manuel/bluez/gdbus/mainloop.c:94
-	+  1 0x804ea3b (from 0x7140dd)   dispatch_status():
-/home/manuel/bluez/gdbus/mainloop.c:244
-	+  2 0x804e49b (from 0x804ea7d)    queue_dispatch():
-/home/manuel/bluez/gdbus/mainloop.c:87
-	+  0 0x804e436 (from 0x7aa53c)  message_dispatch():
-/home/manuel/bluez/gdbus/mainloop.c:73
-	+  1 0x8050fa1 (from 0x716c8d)   message_filter():
-/home/manuel/bluez/gdbus/watch.c:408
-	+  1 0x804f506 (from 0x723f13)   generic_message():
-/home/manuel/bluez/gdbus/object.c:236
-	+  2 0x804f483 (from 0x804f549)    find_interface():
-/home/manuel/bluez/gdbus/object.c:219
-	+  2 0x80a4d46 (from 0x804f5cb)    adapter_start_discovery():
-/home/manuel/bluez/src/adapter.c:1215
-	+  3 0x80a354c (from 0x80a4da5)     find_session():
-/home/manuel/bluez/src/adapter.c:621
-	+  3 0x80a4cce (from 0x80a4dfa)     adapter_start_inquiry():
-/home/manuel/bluez/src/adapter.c:1203
-	+  4 0x80a2744 (from 0x80a4d0c)      pending_remote_name_cancel():
-/home/manuel/bluez/src/adapter.c:263
-	+  5 0x80a208d (from 0x80a27aa)       bacpy():
-/home/manuel/bluez/./lib/bluetooth/bluetooth.h:132
-	+  5 0x80a8b8e (from 0x80a27c3)       adapter_search_found_devices():
-/home/manuel/bluez/src/adapter.c:2667
-	+  4 0x808831a (from 0x80a4d29)      hciops_start_discovery():
-/home/manuel/bluez/plugins/hciops.c:570
-	+  3 0x80a2de5 (from 0x80a4e45)     create_session():
-/home/manuel/bluez/src/adapter.c:425
-	+  4 0x80514c7 (from 0x80a2ea9)      g_dbus_add_disconnect_watch():
-/home/manuel/bluez/gdbus/watch.c:572
-	+  5 0x80513cc (from 0x8051510)       g_dbus_add_service_watch():
-/home/manuel/bluez/gdbus/watch.c:544
-	+  6 0x8050753 (from 0x8051430)        filter_data_get():
-/home/manuel/bluez/gdbus/watch.c:177
-	+  7 0x80502a8 (from 0x80507a0)         filter_data_find():
-/home/manuel/bluez/gdbus/watch.c:69
-	+  7 0x80502a8 (from 0x8050803)         filter_data_find():
-/home/manuel/bluez/gdbus/watch.c:69
-	+  7 0x8050572 (from 0x80508a4)         add_match():
-/home/manuel/bluez/gdbus/watch.c:134
-	+  8 0x8050402 (from 0x80505cc)          format_rule():
-/home/manuel/bluez/gdbus/watch.c:111
-	+  8 0x804e8bd (from 0x729783)          add_timeout():
-/home/manuel/bluez/gdbus/mainloop.c:207
-	+  8 0x804ea3b (from 0x7140dd)          dispatch_status():
-/home/manuel/bluez/gdbus/mainloop.c:244
-	+  9 0x804e49b (from 0x804ea7d)           queue_dispatch():
-/home/manuel/bluez/gdbus/mainloop.c:87
-	+  8 0x804e96c (from 0x7296ff)          remove_timeout():
-/home/manuel/bluez/gdbus/mainloop.c:227
-	+  8 0x804e85f (from 0x729469)          timeout_handler_free():
-/home/manuel/bluez/gdbus/mainloop.c:195
-	+  6 0x8050af5 (from 0x8051470)        filter_data_add_callback():
-/home/manuel/bluez/gdbus/watch.c:272
-	+  4 0x8089ea8 (from 0x80a2ee4)      info(): /home/manuel/bluez/src/log.c:36
-	+  4 0x80a2d65 (from 0x80a2eef)      session_ref():
-/home/manuel/bluez/src/adapter.c:416
-	+  5 0x8089f44 (from 0x80a2dc7)       btd_debug():
-/home/manuel/bluez/src/log.c:58
-	+  0 0x808c945 (from 0x7e0dab)  io_security_event():
-/home/manuel/bluez/src/security.c:967
-	+  1 0x808a32d (from 0x808caa9)   hci_test_bit():
-/home/manuel/bluez/./lib/bluetooth/hci_lib.h:167
-	+  1 0x808bc97 (from 0x808cb24)   cmd_complete():
-/home/manuel/bluez/src/security.c:690
-	+  2 0x808b951 (from 0x808bd70)    start_inquiry():
-/home/manuel/bluez/src/security.c:570
-	+  3 0x80a1a5d (from 0x808b9a0)     manager_find_adapter():
-/home/manuel/bluez/src/manager.c:343
-	+  4 0x80a1955 (from 0x7c947e)      adapter_cmp():
-/home/manuel/bluez/src/manager.c:319
-	+  5 0x80a89ca (from 0x80a198d)       adapter_get_address():
-/home/manuel/bluez/src/adapter.c:2625
-	+  6 0x80a208d (from 0x80a89f8)        bacpy():
-/home/manuel/bluez/./lib/bluetooth/bluetooth.h:132
-	+  5 0x80a1000 (from 0x80a199f)       bacmp():
-/home/manuel/bluez/./lib/bluetooth/bluetooth.h:128
-	+  3 0x80a8b15 (from 0x808b9ca)     adapter_get_state():
-/home/manuel/bluez/src/adapter.c:2657
-	+  3 0x80a995b (from 0x808b9d8)     adapter_has_discov_sessions():
-/home/manuel/bluez/src/adapter.c:3021
-	+  3 0x80a8a0d (from 0x808b9fc)     adapter_set_state():
-/home/manuel/bluez/src/adapter.c:2630
-	+  4 0x80b0b44 (from 0x80a8aeb)      emit_property_changed():
-/home/manuel/bluez/src/dbus-common.c:266
-	+  5 0x80b086d (from 0x80b0be0)       append_variant():
-/home/manuel/bluez/src/dbus-common.c:195
-	+  5 0x805005d (from 0x80b0bf2)       g_dbus_send_message():
-/home/manuel/bluez/gdbus/object.c:615
-	+  1 0x808a82f (from 0x808cdb4)   check_pending_hci_req():
-/home/manuel/bluez/src/security.c:186
-	+  0 0x808c945 (from 0x7e0dab)  io_security_event():
-/home/manuel/bluez/src/security.c:967
-	+  1 0x808a32d (from 0x808caa9)   hci_test_bit():
-/home/manuel/bluez/./lib/bluetooth/hci_lib.h:167
-	+  1 0x808bc30 (from 0x808cafa)   cmd_status():
-/home/manuel/bluez/src/security.c:681
-	+  1 0x808a82f (from 0x808cdb4)   check_pending_hci_req():
-/home/manuel/bluez/src/security.c:186
-	+  0 0x808c945 (from 0x7e0dab)  io_security_event():
-/home/manuel/bluez/src/security.c:967
-	+  1 0x808a32d (from 0x808caa9)   hci_test_bit():
-/home/manuel/bluez/./lib/bluetooth/hci_lib.h:167
-	+  1 0x808c6e1 (from 0x808cd1b)   disconn_complete():
-/home/manuel/bluez/src/security.c:916
-	+  2 0x80b2947 (from 0x808c734)    hcid_dbus_disconn_complete():
-/home/manuel/bluez/src/dbus-hci.c:779
-	+  3 0x80a1a5d (from 0x80b29a3)     manager_find_adapter():
-/home/manuel/bluez/src/manager.c:343
-	+  4 0x80a1955 (from 0x7c947e)      adapter_cmp():
-/home/manuel/bluez/src/manager.c:319
-	+  5 0x80a89ca (from 0x80a198d)       adapter_get_address():
-/home/manuel/bluez/src/adapter.c:2625
-	+  6 0x80a208d (from 0x80a89f8)        bacpy():
-/home/manuel/bluez/./lib/bluetooth/bluetooth.h:132
-	+  5 0x80a1000 (from 0x80a199f)       bacmp():
-/home/manuel/bluez/./lib/bluetooth/bluetooth.h:128
-	+  3 0x80a45fd (from 0x80b29d2)     adapter_find_connection():
-/home/manuel/bluez/src/adapter.c:1025
-	+  4 0x80ac5b0 (from 0x80a4644)      device_has_connection():
-/home/manuel/bluez/src/device.c:934
-	+  3 0x80a97f0 (from 0x80b2a2c)     adapter_remove_connection():
-/home/manuel/bluez/src/adapter.c:2992
-	+  4 0x80ac472 (from 0x80a9864)      device_remove_connection():
-/home/manuel/bluez/src/device.c:908
-	+  5 0x80ac306 (from 0x80ac58f)       device_set_connected():
-/home/manuel/bluez/src/device.c:875
-	+  6 0x80b0b44 (from 0x80ac353)        emit_property_changed():
-/home/manuel/bluez/src/dbus-common.c:266
-	+  7 0x80b086d (from 0x80b0be0)         append_variant():
-/home/manuel/bluez/src/dbus-common.c:195
-	+  7 0x805005d (from 0x80b0bf2)         g_dbus_send_message():
-/home/manuel/bluez/gdbus/object.c:615
-	+  4 0x80ae44a (from 0x80a9891)      device_get_address():
-/home/manuel/bluez/src/device.c:1654
-	+  5 0x80aa3e0 (from 0x80ae475)       bacpy():
-/home/manuel/bluez/./lib/bluetooth/bluetooth.h:132
-	+  4 0x808a77f (from 0x80a98a9)      hci_req_queue_remove():
-/home/manuel/bluez/src/security.c:169
-	+  4 0x80afe26 (from 0x80a98b4)      device_is_authenticating():
-/home/manuel/bluez/src/device.c:2339
-	+  4 0x80ae585 (from 0x80a98d6)      device_is_temporary():
-/home/manuel/bluez/src/device.c:1683
-	+  1 0x808a82f (from 0x808cdb4)   check_pending_hci_req():
-/home/manuel/bluez/src/security.c:186
-	+  0 0x8099459 (from 0x7e0dab)  connect_watch():
-/home/manuel/bluez/src/glib-helper.c:257
-	+  1 0x80ae001 (from 0x809963a)   browse_cb():
-/home/manuel/bluez/src/device.c:1540
+This can be reproduced by the following steps:
 
-I think it keeps crashing the same way, when browse_cb gets called
-user_data points to non valid data.
+1. Pair devices normally so that a valid link key is stored
+2. Remove link key on remote device
+3. Attempt to do a rfcomm connection with security level higher than low
 
-Manuel
+This can be triggered in some other ways but right now this is the
+easiest since kernel will switch the authentication requirements in this
+case, here is the hcidump output:
+
+< HCI Command: IO Capability Request Reply (0x01|0x002b) plen 9
+  bdaddr xx:xx:xx:xx:xx:xx capability 0x01 oob 0x00 auth 0x00
+  Capability: DisplayYesNo (OOB data not present)
+  Authentication: No Bonding (No MITM Protection)
+...
+> HCI Event: Link Key Notification (0x18) plen 23
+  bdaddr xx:xx:xx:xx:xx:xx key 26D32FBEF7B7CBD7923CA391A2DE600F type 4
+  Type: Unauthenticated Combination Key
+...
+< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
+  bdaddr xx:xx:xx:xx:xx:xx key 38E2BC10B26148FBC264E0DBA2535F1B
+> HCI Event: Auth Complete (0x06) plen 3
+  status 0x05 handle 1
+Error: Authentication Failure
+
+Note that the reason this is reproducible with a single rfcomm connection
+might be a bug in kernel, but there is clearly a problem in the daemon
+too since link keys doesn't match.
+
+So link keys information should be available while connected even in
+cases where bonding is not required, to fix this everytime there is a new
+link key the old one is clear, to make sure this actually work with those
+keys that are not stored persistently all keys are cached in memory so
+they are always accessible via device object as long the object exists,
+this changes should also enable the code path bellow:
+
+	/* Don't use unauthenticated combination keys if MITM is
+	 * required */
+	if (type == 0x04 && req.type != 0xff && (req.type & 0x01))
+
+and follow the recommendation of the simple pairing white paper which
+says:
+
+	"Bonding is defined as the connection process where the link key
+	and connection information are stored in non-volatile memory.
+	Thus bonding implies that the device’s link information is
+	available after the current connection ceases. If the link key
+	and current connection information are not stored, then the
+	connection process uses “Pairing”"
+
+Devices which link key is not permanently stored are currently being
+marked as temporary so their information will be lost once the connection
+ceases.
+---
+ src/dbus-hci.c |   23 +++++++++++------------
+ src/device.c   |   31 ++++++++++++++++---------------
+ src/device.h   |    5 +++--
+ src/security.c |    5 ++---
+ 4 files changed, 32 insertions(+), 32 deletions(-)
+
+diff --git a/src/dbus-hci.c b/src/dbus-hci.c
+index b83506f..c8b2ad6 100644
+--- a/src/dbus-hci.c
++++ b/src/dbus-hci.c
+@@ -674,11 +674,12 @@ int hcid_dbus_link_key_notify(bdaddr_t *local, bdaddr_t *peer,
+ 	if (!get_adapter_and_device(local, peer, &adapter, &device, TRUE))
+ 		return -ENODEV;
+ 
++	/* Check if there is a key cached in memory */
++	device_get_key(device, NULL, &old_key_type);
++
+ 	new_key_type = key_type;
+ 
+ 	if (key_type == 0x06) {
+-		if (device_get_debug_key(device, NULL))
+-			old_key_type = 0x03;
+ 		if (old_key_type != 0xff)
+ 			new_key_type = old_key_type;
+ 		else
+@@ -697,12 +698,11 @@ int hcid_dbus_link_key_notify(bdaddr_t *local, bdaddr_t *peer,
+ 	DBG("local auth 0x%02x and remote auth 0x%02x",
+ 					local_auth, remote_auth);
+ 
+-	/* Clear any previous debug key */
+-	device_set_debug_key(device, NULL);
++	/* Cache new link key */
++	device_set_key(device, key, new_key_type);
+ 
+-	/* Store the link key only in runtime memory if it's a debug
+-	 * key, else store the link key persistently if one of the
+-	 * following is true:
++	/* Link key are ALWAYS stored in runtime memory, they are also stored
++	 * in filesystem persistently if one of the following is true:
+ 	 * 1. this is a legacy link key
+ 	 * 2. this is a changed combination key and there was a previously
+ 	 *    stored one
+@@ -710,13 +710,12 @@ int hcid_dbus_link_key_notify(bdaddr_t *local, bdaddr_t *peer,
+ 	 * 4. the local side had dedicated bonding as a requirement
+ 	 * 5. the remote side is using dedicated bonding since in that case
+ 	 *    also the local requirements are set to dedicated bonding
+-	 * If none of the above match only keep the link key around for
++	 * If none of the above match and only keep the link key around for
+ 	 * this connection and set the temporary flag for the device.
+ 	 */
+-	if (new_key_type == 0x03) {
+-		DBG("Storing debug key in runtime memory");
+-		device_set_debug_key(device, key);
+-	} else if (key_type < 0x03 ||
++	if (new_key_type == 0x03)
++		temporary = FALSE;
++	else if (key_type < 0x03 ||
+ 				(key_type == 0x06 && old_key_type != 0xff) ||
+ 				(local_auth > 0x01 && remote_auth > 0x01) ||
+ 				(local_auth == 0x02 || local_auth == 0x03) ||
+diff --git a/src/device.c b/src/device.c
+index 6af76d1..059aec3 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -143,8 +143,8 @@ struct btd_device {
+ 	gboolean	authorizing;
+ 	gint		ref;
+ 
+-	gboolean	has_debug_key;
+-	uint8_t		debug_key[16];
++	uint8_t		key[16];
++	uint8_t		key_type;
+ };
+ 
+ static uint16_t uuid_list[] = {
+@@ -1024,7 +1024,8 @@ struct btd_device *device_create(DBusConnection *conn,
+ 
+ 	device->auth = 0xff;
+ 
+-	if (read_link_key(&src, &device->bdaddr, NULL, NULL) == 0)
++	if (read_link_key(&src, &device->bdaddr, device->key,
++						&device->key_type) == 0)
+ 		device->paired = TRUE;
+ 
+ 	return btd_device_ref(device);
+@@ -2399,26 +2400,26 @@ const sdp_record_t *btd_device_get_record(struct btd_device *device,
+ 	return find_record_in_list(device->tmp_records, uuid);
+ }
+ 
+-gboolean device_set_debug_key(struct btd_device *device, uint8_t *key)
++void device_set_key(struct btd_device *device, uint8_t *key, uint8_t type)
+ {
+-	if (key == NULL) {
+-		device->has_debug_key = FALSE;
+-		return TRUE;
+-	}
+-
+-	memcpy(device->debug_key, key, 16);
+-	device->has_debug_key = TRUE;
++	/* Clear any previous key */
++	if (device->paired)
++		device_remove_bonding(device);
+ 
+-	return TRUE;
++	memcpy(device->key, key, 16);
++	device->key_type = type;
+ }
+ 
+-gboolean device_get_debug_key(struct btd_device *device, uint8_t *key)
++gboolean device_get_key(struct btd_device *device, uint8_t *key, uint8_t *type)
+ {
+-	if (!device->has_debug_key)
++	if (!device->paired)
+ 		return FALSE;
+ 
+ 	if (key != NULL)
+-		memcpy(key, device->debug_key, 16);
++		memcpy(key, device->key, 16);
++
++	if (type != NULL)
++		*type = device->key_type;
+ 
+ 	return TRUE;
+ }
+diff --git a/src/device.h b/src/device.h
+index 5f75e61..229bc9e 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -79,8 +79,9 @@ gboolean device_is_authenticating(struct btd_device *device);
+ gboolean device_is_authorizing(struct btd_device *device);
+ void device_set_authorizing(struct btd_device *device, gboolean auth);
+ void device_set_renewed_key(struct btd_device *device, gboolean renewed);
+-gboolean device_set_debug_key(struct btd_device *device, uint8_t *key);
+-gboolean device_get_debug_key(struct btd_device *device, uint8_t *key);
++void device_set_key(struct btd_device *device, uint8_t *key, uint8_t type);
++gboolean device_get_key(struct btd_device *device, uint8_t *key,
++								uint8_t *type);
+ void device_add_connection(struct btd_device *device, DBusConnection *conn,
+ 				uint16_t handle);
+ void device_remove_connection(struct btd_device *device, DBusConnection *conn,
+diff --git a/src/security.c b/src/security.c
+index ca394e1..9d9e26f 100644
+--- a/src/security.c
++++ b/src/security.c
+@@ -329,9 +329,8 @@ static void link_key_request(int dev, bdaddr_t *sba, bdaddr_t *dba)
+ 
+ 	DBG("kernel auth requirements = 0x%02x", req.type);
+ 
+-	if (main_opts.debug_keys && device && device_get_debug_key(device, key))
+-		type = 0x03;
+-	else if (read_link_key(sba, dba, key, &type) < 0 || type == 0x03) {
++	if (device_get_key(device, key, &type) == FALSE ||
++			(type == 0x03 && main_opts.debug_keys == FALSE)) {
+ 		/* Link key not found */
+ 		hci_send_cmd(dev, OGF_LINK_CTL, OCF_LINK_KEY_NEG_REPLY, 6, dba);
+ 		return;
+-- 
+1.7.0.4
+
