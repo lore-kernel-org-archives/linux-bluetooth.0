@@ -1,14 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 5 Aug 2010 09:54:24 -0700 (PDT)
+Date: Thu, 5 Aug 2010 09:50:35 -0700 (PDT)
 From: Mat Martineau <mathewm@codeaurora.org>
 To: "Gustavo F. Padovan" <gustavo@padovan.org>
 cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
     rshaffer@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH 5/9] Bluetooth: Fix incorrect setting of remote_tx_win
- for L2CAP ERTM.
-In-Reply-To: <20100805042013.GH7870@vigoh>
-Message-ID: <alpine.DEB.2.00.1008050953230.27235@linux-sea-02>
-References: <1280962146-22604-1-git-send-email-mathewm@codeaurora.org> <1280962146-22604-6-git-send-email-mathewm@codeaurora.org> <20100805042013.GH7870@vigoh>
+Subject: Re: [PATCH 4/9] Bluetooth: Fix endianness issue with L2CAP MPS
+ configuration.
+In-Reply-To: <20100805040018.GG7870@vigoh>
+Message-ID: <alpine.DEB.2.00.1008050940430.27235@linux-sea-02>
+References: <1280962146-22604-1-git-send-email-mathewm@codeaurora.org> <1280962146-22604-5-git-send-email-mathewm@codeaurora.org> <20100805040018.GG7870@vigoh>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -20,44 +20,93 @@ On Thu, 5 Aug 2010, Gustavo F. Padovan wrote:
 
 > Hi Mat,
 >
-> * Mat Martineau <mathewm@codeaurora.org> [2010-08-04 15:49:02 -0700]:
+> * Mat Martineau <mathewm@codeaurora.org> [2010-08-04 15:49:01 -0700]:
 >
->> remote_tx_win is intended to be set on receipt of an L2CAP
->> configuration request.  The value is used to determine the size of the
->> transmit window on the remote side of an ERTM connection, so L2CAP
->> can stop sending frames when that remote window is full.
->>
->> An incorrect remote_tx_win value will cause the stack to not fully
->> utilize the tx window (performance impact), or to overfill the remote
->> tx window (causing dropped frames or a disconnect).
->>
->> This patch removes an extra setting of remote_tx_win when a
->> configuration response is received.  The transmit window has a
->> different meaning in a response - it is an informational value
->> less than or equal to the local tx_win.
+>> Incoming configuration values must be converted to native CPU order
+>> before use.  This fixes a bug where a little-endian MPS value is
+>> compared to a native CPU value.  On big-endian processors, this
+>> can cause ERTM and streaming mode segmentation to produce PDUs
+>> that are larger than the remote stack is expecting, or that would
+>> produce fragmented skbs that the current FCS code cannot handle.
 >>
 >> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 >> ---
->>  net/bluetooth/l2cap.c |    1 -
->>  1 files changed, 0 insertions(+), 1 deletions(-)
+>>  net/bluetooth/l2cap.c |    9 ++++-----
+>>  1 files changed, 4 insertions(+), 5 deletions(-)
 >>
 >> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
->> index 8cf9569..f0f3c7c 100644
+>> index 920a53f..8cf9569 100644
 >> --- a/net/bluetooth/l2cap.c
 >> +++ b/net/bluetooth/l2cap.c
->> @@ -2808,7 +2808,6 @@ static int l2cap_parse_conf_rsp(struct sock *sk, void *rsp, int len, void *data,
->>  	if (*result == L2CAP_CONF_SUCCESS) {
->>  		switch (rfc.mode) {
+>> @@ -2708,10 +2708,10 @@ done:
 >>  		case L2CAP_MODE_ERTM:
->> -			pi->remote_tx_win   = rfc.txwin_size;
->>  			pi->retrans_timeout = le16_to_cpu(rfc.retrans_timeout);
->>  			pi->monitor_timeout = le16_to_cpu(rfc.monitor_timeout);
->>  			pi->mps    = le16_to_cpu(rfc.max_pdu_size);
+>>  			pi->remote_tx_win = rfc.txwin_size;
+>>  			pi->remote_max_tx = rfc.max_transmit;
+>> -			if (rfc.max_pdu_size > pi->conn->mtu - 10)
+>> -				rfc.max_pdu_size = le16_to_cpu(pi->conn->mtu - 10);
+>>
+>>  			pi->remote_mps = le16_to_cpu(rfc.max_pdu_size);
+>> +			if (pi->remote_mps > pi->conn->mtu - 10)
+>> +				pi->remote_mps = pi->conn->mtu - 10;
 >
-> I agree. But you may also want to remove the same check inside
-> l2cap_conf_rfc_get()
+>
+> What happened with thte "rfc.max_pdu_size =" attribution. We have the
+> send the value to through the RFC option.
 
-I'll do that.
+You're right - I didn't see that the rfc struct was used for both the 
+response and reply.
+
+> So what I do propose here is:
+>
+> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> index 0f34e12..11d4405 100644
+> --- a/net/bluetooth/l2cap.c
+> +++ b/net/bluetooth/l2cap.c
+> @@ -2705,7 +2705,7 @@ done:
+>                case L2CAP_MODE_ERTM:
+>                        pi->remote_tx_win = rfc.txwin_size;
+>                        pi->remote_max_tx = rfc.max_transmit;
+> -                       if (rfc.max_pdu_size > pi->conn->mtu - 10)
+> +                       if (le16_to_cpu(rfc.max_pdu_size) > pi->conn->mtu - 10)
+>                                rfc.max_pdu_size = le16_to_cpu(pi->conn->mtu - 10);
+>
+>                        pi->remote_mps = le16_to_cpu(rfc.max_pdu_size);
+
+Sure.  I'll change it to "cpu_to_le16(pi->conn->mtu - 10)" (even 
+though they're functionally equivalent, it is definitely a conversion 
+to le16).
+
+> @@ -2723,7 +2723,7 @@ done:
+>                        break;
+>
+>                case L2CAP_MODE_STREAMING:
+> -                       if (rfc.max_pdu_size > pi->conn->mtu - 10)
+> +                       if (le16_to_cpu(rfc.max_pdu_size) > pi->conn->mtu - 10)
+>                                rfc.max_pdu_size = le16_to_cpu(pi->conn->mtu - 10);
+
+Same thing - cpu_to_le16() instead.
+
+>                        pi->remote_mps = le16_to_cpu(rfc.max_pdu_size);
+>
+>
+>
+>>
+>>  			rfc.retrans_timeout =
+>>  				le16_to_cpu(L2CAP_DEFAULT_RETRANS_TO);
+>> @@ -2726,10 +2726,9 @@ done:
+>>  			break;
+>>
+>>  		case L2CAP_MODE_STREAMING:
+>> -			if (rfc.max_pdu_size > pi->conn->mtu - 10)
+>> -				rfc.max_pdu_size = le16_to_cpu(pi->conn->mtu - 10);
+>> -
+>>  			pi->remote_mps = le16_to_cpu(rfc.max_pdu_size);
+>> +			if (pi->remote_mps > pi->conn->mtu - 10)
+>> +				pi->remote_mps = pi->conn->mtu - 10;
+>>
+>>  			pi->conf_state |= L2CAP_CONF_MODE_DONE;
+
+
 
 --
 Mat Martineau
