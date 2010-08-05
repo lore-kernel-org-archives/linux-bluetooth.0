@@ -6,51 +6,63 @@ Cc: marcel@holtmann.org,
 	rshaffer@codeaurora.org,
 	linux-arm-msm@vger.kernel.org,
 	Mat Martineau <mathewm@codeaurora.org>
-Subject: [PATCH 3/9] Bluetooth: Validate PSM values in calls to connect() and bind().
-Date: Thu,  5 Aug 2010 15:54:21 -0700
-Message-Id: <1281048867-32630-4-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCH 1/9] Bluetooth: Only enable for L2CAP FCS for ERTM or streaming.
+Date: Thu,  5 Aug 2010 15:54:19 -0700
+Message-Id: <1281048867-32630-2-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1281048867-32630-1-git-send-email-mathewm@codeaurora.org>
 References: <1281048867-32630-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Valid L2CAP PSMs are odd numbers, and the least significant bit of the
-most significant byte must be 0.
+This fixes a bug which caused the FCS setting to show L2CAP_FCS_CRC16
+with L2CAP modes other than ERTM or streaming.  At present, this only
+affects the FCS value shown with getsockopt() for basic mode.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/l2cap.c |   12 ++++++++++++
- 1 files changed, 12 insertions(+), 0 deletions(-)
+ net/bluetooth/l2cap.c |   16 ++++++++++++----
+ 1 files changed, 12 insertions(+), 4 deletions(-)
 
 diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index bc10be8..77ba106 100644
+index 3e3cd9d..bc10be8 100644
 --- a/net/bluetooth/l2cap.c
 +++ b/net/bluetooth/l2cap.c
-@@ -1008,6 +1008,12 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
- 		goto done;
- 	}
+@@ -3072,6 +3072,16 @@ static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hd
+ 	return 0;
+ }
  
-+	/* If specified, PSM must be odd and lsb of upper byte must be 0 */
-+	if (la.l2_psm && (__le16_to_cpu(la.l2_psm) & 0x0101) != 0x0001) {
-+		err = -EINVAL;
-+		goto done;
-+	}
++static inline int l2cap_fcs_needed(struct l2cap_pinfo *pi)
++{
++	if (pi->mode != L2CAP_MODE_ERTM && pi->mode != L2CAP_MODE_STREAMING)
++		return 0;
 +
- 	if (la.l2_psm && __le16_to_cpu(la.l2_psm) < 0x1001 &&
- 				!capable(CAP_NET_BIND_SERVICE)) {
- 		err = -EACCES;
-@@ -1190,6 +1196,12 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
- 		goto done;
- 	}
++	/* FCS is enabled if one or both sides request it. */
++	return !(pi->conf_state & L2CAP_CONF_NO_FCS_RECV) ||
++		pi->fcs == L2CAP_FCS_CRC16;
++}
++
+ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd, u16 cmd_len, u8 *data)
+ {
+ 	struct l2cap_conf_req *req = (struct l2cap_conf_req *) data;
+@@ -3136,8 +3146,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 		goto unlock;
  
-+	/* PSM must be odd and lsb of upper byte must be 0 */
-+	if ((__le16_to_cpu(la.l2_psm) & 0x0101) != 0x0001) {
-+		err = -EINVAL;
-+		goto done;
-+	}
-+
- 	/* Set destination address and psm */
- 	bacpy(&bt_sk(sk)->dst, &la.l2_bdaddr);
- 	l2cap_pi(sk)->psm = la.l2_psm;
+ 	if (l2cap_pi(sk)->conf_state & L2CAP_CONF_INPUT_DONE) {
+-		if (!(l2cap_pi(sk)->conf_state & L2CAP_CONF_NO_FCS_RECV) ||
+-		    l2cap_pi(sk)->fcs != L2CAP_FCS_NONE)
++		if (l2cap_fcs_needed(l2cap_pi(sk)))
+ 			l2cap_pi(sk)->fcs = L2CAP_FCS_CRC16;
+ 
+ 		sk->sk_state = BT_CONNECTED;
+@@ -3226,8 +3235,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 	l2cap_pi(sk)->conf_state |= L2CAP_CONF_INPUT_DONE;
+ 
+ 	if (l2cap_pi(sk)->conf_state & L2CAP_CONF_OUTPUT_DONE) {
+-		if (!(l2cap_pi(sk)->conf_state & L2CAP_CONF_NO_FCS_RECV) ||
+-		    l2cap_pi(sk)->fcs != L2CAP_FCS_NONE)
++		if (l2cap_fcs_needed(l2cap_pi(sk)))
+ 			l2cap_pi(sk)->fcs = L2CAP_FCS_CRC16;
+ 
+ 		sk->sk_state = BT_CONNECTED;
 -- 
 1.7.1
 
