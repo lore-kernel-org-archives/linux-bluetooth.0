@@ -1,52 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Handling HID Connections for certain devices externally
-From: Carl =?ISO-8859-1?Q?=D6nnheim?= <carl@onnheim.se>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 06 Aug 2010 00:15:56 +0200
-Message-ID: <1281046556.26788.29.camel@knazboll>
-Mime-Version: 1.0
+Message-ID: <70400021c330cb81dde63d07727bb7c1.squirrel@www.codeaurora.org>
+In-Reply-To: <20100805102513.GA7221@jh-x301>
+References: <1280962831-18147-1-git-send-email-ingas@codeaurora.org>
+    <1280962831-18147-8-git-send-email-ingas@codeaurora.org>
+    <20100805102513.GA7221@jh-x301>
+Date: Thu, 5 Aug 2010 14:26:31 -0700 (PDT)
+Subject: Re: [PATCH 7/7] Add service UUIDs from EIR to device properties in
+     "Device Found" signal.
+From: ingas@codeaurora.org
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Johan,
 
-I am working on a project to integrate the Sony PS3 Remote to LIRC.
-BlueZ supports the use of this device by translating key presses to
-keyboard events. It is possible for me to read these translated keyboard
-events to figure out what happens on the remote, but the application is
-more stable if I can get hold of the raw data stream from the remote
-directly. This ability would also allow for separate development for
-other special devices that communicate as HID devices (e.g. the
-WII-remotes).
+> I've pushed the six other patches upstream, but I'm still a bit
+> concerned with this one.
+>
 
-I have not been able to get a hold of that datastream (except by
-stopping bluez and then listening directly on the relevant PSM's, but
-since bluez need to run for all other purposes that is not really an
-option). So my question is:
+Thanks :)
 
-1. Is there a possibility that I have missed for a separate user-space
-program to "steal" the interrupt and control channels from BlueZ for a
-specific HID Device?
+>
+> Then, a more general concern about this function. It will receive data
+> as input that any nearby device that's discoverable has declared in
+> their EIR data. I.e. we need to be super strict about checking the
+> validity of the data and not make any assumptions about the correctness
+> of encoded field lengths etc. in order not to do buffer overflows. Have
+> you taken this into account when designing the function? Looking at it
+> it seems it might be possible to give it data that will cause some
+> buffer overflows (by e.g. placing a uuid list at the very end of the EIR
+> data with an invalid field length value).
+>
 
-2. If not, will you consider adding this possibility? I have
-experimented with one option; the fake_hid functionality is extended so
-that when a HID device connects it tries to connect to a unix socket
-with a predefined name
-(e.g. /var/run/bluez/fakehid_<vendor_id>_<product_id>). If a program
-listens on that socket, the data channels will be passed over. If not,
-bluez will continue as usual.
+I agree. Adding few more checks there. Will send a new patch today.
 
-I have a patch that does this more or less ready to go, and I would be
-happy to contribute further if I can. Other options can of course be
-considered (e.g. exposing new DBus methods). But I wanted to check your
-initial views before going into more details. You can see all details
-about the project I am working on at
-http://sourceforge.net/projects/sonyps3remote/.
-
-The patch can be found in the svn tree there as well:
-http://sonyps3remote.svn.sourceforge.net/viewvc/sonyps3remote/bluez/patches/bluez-4.69-sonyps3.diff.gz?view=log
-
-Thanks in advance
-//Carl
+Inga
 
