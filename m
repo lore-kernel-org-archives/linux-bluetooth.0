@@ -1,63 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?iso-8859-1?q?Jos=E9_Antonio_Santos_Cadenas?=
-	<santoscadenas@gmail.com>
-To: Elvis =?iso-8859-1?q?Pf=FCtzenreuter?= <epx@signove.com>
-Subject: Re: Changes in HDP API
-Date: Thu, 5 Aug 2010 11:29:34 +0200
-Cc: linux-bluetooth@vger.kernel.org
-References: <1280908152-3743-1-git-send-email-santoscadenas@gmail.com> <0AEF6BD1-2A78-47E2-9445-87D78E4C85F8@signove.com>
-In-Reply-To: <0AEF6BD1-2A78-47E2-9445-87D78E4C85F8@signove.com>
+Sender: "Gustavo F. Padovan" <gfpadovan@gmail.com>
+Date: Thu, 5 Aug 2010 01:20:13 -0300
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+	rshaffer@codeaurora.org, linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH 5/9] Bluetooth:  Fix incorrect setting of remote_tx_win
+ for L2CAP ERTM.
+Message-ID: <20100805042013.GH7870@vigoh>
+References: <1280962146-22604-1-git-send-email-mathewm@codeaurora.org>
+ <1280962146-22604-6-git-send-email-mathewm@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201008051129.38119.santoscadenas@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1280962146-22604-6-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-El Wednesday 04 August 2010 20:22:29 Elvis Pfützenreuter escribió:
-> On 04/08/2010, at 04:49, Jose Antonio Santos Cadenas wrote:
-> > This patch makes some changes in the HDP API based in the conversation
-> > that I had yesterday with Luiz and Elvis.
-> > 
-> > I still have a doubt about the notification of devices in the agent. Luiz
-> > commented that with this API the Agent and the Application could not be
-> > in different processes, is this a problem?
+Hi Mat,
+
+* Mat Martineau <mathewm@codeaurora.org> [2010-08-04 15:49:02 -0700]:
+
+> remote_tx_win is intended to be set on receipt of an L2CAP
+> configuration request.  The value is used to determine the size of the
+> transmit window on the remote side of an ERTM connection, so L2CAP
+> can stop sending frames when that remote window is full.
 > 
-> Is not a problem and IMHO it does not make sense at all. The Agent in HDP
-> API context is as a mere vehicle for callbacks, because signals are seen
-> by every process while the nature of health devices demands some
-> privacy/secrecy (I have a faint memory about privacy being a general
-> requirement for IEEE protocol as well as Continua certification.)
-
-I've been thinking about this issue and I'm changing my opinion about this a 
-little bit. I will expose my "new" view and later today I will send a new API 
-proposal if you think this approach is OK.
-
-In fact the privacy issue should concern to the data that is being transmitted 
-over the data channel, not the creation and destruction of the data channel. 
-If we start from that point. Sending new channel events as signals will not be 
-a privacy problem if we protect the data channel itself.
-
-The DataChannel object (as is defined in the current API) could be protected 
-and only reply to method calls from the process owner of the application that 
-waited for this data channel (if it was opened by the remote side) or from the 
-creator of the data channel (if it was opened by the local side). This way 
-only this process will be able to get the file descriptor (what means get 
-access to the data) and to manage the connection closing, reconnecting or 
-deleting the data channel. So in this way the privacy of the data is 
-guaranteed.
-
-An other thing to take into account is that all the application will be 
-bothered with signals of data channel creation an deletion even when they 
-could not use them. But I thing that this is not too much extra load because 
-in a typical scenario only one or two application will be interested in health 
-data channels.
-
+> An incorrect remote_tx_win value will cause the stack to not fully
+> utilize the tx window (performance impact), or to overfill the remote
+> tx window (causing dropped frames or a disconnect).
 > 
-> The agent is always coupled with an application. The most typical usage of
-> BlueZ HDP is as sink role, which means the application creates the
-> application, which publishes the role via SDP, and sits idle until some
-> source connects, which is notified via the agent.
+> This patch removes an extra setting of remote_tx_win when a
+> configuration response is received.  The transmit window has a
+> different meaning in a response - it is an informational value
+> less than or equal to the local tx_win.
+> 
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> ---
+>  net/bluetooth/l2cap.c |    1 -
+>  1 files changed, 0 insertions(+), 1 deletions(-)
+> 
+> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> index 8cf9569..f0f3c7c 100644
+> --- a/net/bluetooth/l2cap.c
+> +++ b/net/bluetooth/l2cap.c
+> @@ -2808,7 +2808,6 @@ static int l2cap_parse_conf_rsp(struct sock *sk, void *rsp, int len, void *data,
+>  	if (*result == L2CAP_CONF_SUCCESS) {
+>  		switch (rfc.mode) {
+>  		case L2CAP_MODE_ERTM:
+> -			pi->remote_tx_win   = rfc.txwin_size;
+>  			pi->retrans_timeout = le16_to_cpu(rfc.retrans_timeout);
+>  			pi->monitor_timeout = le16_to_cpu(rfc.monitor_timeout);
+>  			pi->mps    = le16_to_cpu(rfc.max_pdu_size);
 
+I agree. But you may also want to remove the same check inside
+l2cap_conf_rfc_get() 
 
-Regards.
+-- 
+Gustavo F. Padovan
+http://padovan.org
