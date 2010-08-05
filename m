@@ -1,23 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4C5B25E4.4000609@aircable.net>
-Date: Thu, 05 Aug 2010 17:58:12 -0300
-From: Manuel Naranjo <manuel@aircable.net>
-MIME-Version: 1.0
-To: BlueZ <linux-bluetooth@vger.kernel.org>
+Date: Thu, 5 Aug 2010 22:53:14 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Manuel Naranjo <manuel@aircable.net>
+Cc: BlueZ <linux-bluetooth@vger.kernel.org>
 Subject: Re: NoInputNoOutput and legacy pairing?
-References: <4C5B0884.2040805@aircable.net> <20100805195314.GA13190@jh-x301>
-In-Reply-To: <20100805195314.GA13190@jh-x301>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Message-ID: <20100805195314.GA13190@jh-x301>
+References: <4C5B0884.2040805@aircable.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4C5B0884.2040805@aircable.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Manuel,
 
->> >  I have a question regarding the NoInputNoOutput mode for registering
->> >  agents for BlueZ. What happens when there's a legacy pin request and
->> >  the mode is NoInputNoOutput? Will it fallback to standard pin code
->> >  pairing?
->>      
-Great thanks. I know how to go on now.
+On Thu, Aug 05, 2010, Manuel Naranjo wrote:
+> I have a question regarding the NoInputNoOutput mode for registering
+> agents for BlueZ. What happens when there's a legacy pin request and
+> the mode is NoInputNoOutput? Will it fallback to standard pin code
+> pairing?
 
-BTW what happened to the wiki? This are the kind of things that would be 
-easy to address by just looking at it.
+Yes. The IO capability is only relevant for Secure Simple Pairing. It
+doesn't matter what capability you give for legacy pairing since you'll
+always get a pin request then.
+
+Johan
