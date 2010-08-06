@@ -1,23 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Fri, 6 Aug 2010 21:14:51 +0530
-Message-ID: <AANLkTimiBsL60-8w4MPoP=g8Fo_+U-SrSBTa9--aqEK4@mail.gmail.com>
-Subject: Question about BlueZ licenses (LGPL and Apache)
-From: Madhavi Manchala <madhavi.linux@gmail.com>
+From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?=
+	<u.kleine-koenig@pengutronix.de>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Date: Fri,  6 Aug 2010 16:20:00 +0200
+Message-Id: <1281104400-9019-1-git-send-email-u.kleine-koenig@pengutronix.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Subject: [PATCH] add mailing list as bug report address to configure.ac
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dear All,
+Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+---
+ configure.ac |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-I am trying to implement a custom voice codec on the android bluetooth
-platform by linking it, into the A2DP module. I have heard different
-versions from different people regarding the licenses (like LGPL and
-Apache License). So, before starting my work, I would like to know if
-I would be forced to reveal my source code, once I implement my codec
-on BlueZ stack. Please let me know, so that I can choose my platform,
-before starting my work.
+diff --git a/configure.ac b/configure.ac
+index b004f6e..2804d29 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1,5 +1,5 @@
+ AC_PREREQ(2.60)
+-AC_INIT(bluez, 4.69)
++AC_INIT(bluez, 4.69, [linux-bluetooth@vger.kernel.org])
+ 
+ AM_INIT_AUTOMAKE([foreign subdir-objects])
+ AM_CONFIG_HEADER(config.h)
+-- 
+1.7.1
 
-Regards,
-Madhavi.
