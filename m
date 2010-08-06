@@ -1,50 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?=
-	<u.kleine-koenig@pengutronix.de>
-To: linux-bluetooth@vger.kernel.org
-Date: Fri,  6 Aug 2010 16:18:02 +0200
-Message-Id: <1281104283-8792-1-git-send-email-u.kleine-koenig@pengutronix.de>
+Date: Fri, 6 Aug 2010 10:58:48 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Inga Stotland <ingas@codeaurora.org>, linux-bluetooth@vger.kernel.org,
+	marcel@holtmann.org, rshaffer@codeaurora.org
+Subject: Re: [PATCH 7/7] Add service UUIDs from EIR to device properties in
+ "Device Found" signal.
+Message-ID: <20100806075848.GA22383@jh-x301>
+References: <20100805102513.GA7221@jh-x301>
+ <1281047801-4044-1-git-send-email-ingas@codeaurora.org>
+ <20100806075552.GA22150@jh-x301>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Subject: [PATCH 1/2] list api docs alphabetically and one per line in EXTRA_DIST
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20100806075552.GA22150@jh-x301>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This makes further changes to the list easier to review
+Hi,
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
----
- Makefile.am |   17 ++++++++++++-----
- 1 files changed, 12 insertions(+), 5 deletions(-)
+On Fri, Aug 06, 2010, Johan Hedberg wrote:
+> 		/* Bail out if field_len claims to reach beyond the EIR
+> 		 * data end */
+> 		if (len + field_len + 1 >= EIR_DATA_LENGTH)
+> 			break;
 
-diff --git a/Makefile.am b/Makefile.am
-index 65d4312..4bb82fe 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -309,11 +309,18 @@ udevdir = $(libexecdir)/udev
- dist_udev_SCRIPTS = scripts/bluetooth_serial
- endif
- 
--EXTRA_DIST += doc/manager-api.txt \
--		doc/adapter-api.txt doc/device-api.txt \
--		doc/service-api.txt doc/agent-api.txt doc/attribute-api.txt \
--		doc/serial-api.txt doc/network-api.txt \
--		doc/input-api.txt doc/audio-api.txt doc/control-api.txt
-+EXTRA_DIST += \
-+	      doc/adapter-api.txt \
-+	      doc/agent-api.txt \
-+	      doc/attribute-api.txt \
-+	      doc/audio-api.txt \
-+	      doc/control-api.txt \
-+	      doc/device-api.txt \
-+	      doc/input-api.txt \
-+	      doc/manager-api.txt \
-+	      doc/network-api.txt \
-+	      doc/serial-api.txt \
-+	      doc/service-api.txt \
- 
- AM_YFLAGS = -d
- 
--- 
-1.7.1
+Sorry, that should actually be > and not >= since it's fine if the end
+of the field coincides with the end of EIR data.
 
+Johan
