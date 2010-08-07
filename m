@@ -1,26 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4C5D5FB8.9040006@aircable.net>
-Date: Sat, 07 Aug 2010 10:29:28 -0300
-From: Manuel Naranjo <manuel@aircable.net>
 MIME-Version: 1.0
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: Next BlueZ developer meeting
-References: <1278363322.2789.23.camel@localhost.localdomain>	 <1278379702.2789.27.camel@localhost.localdomain>	 <1278555742.10421.11.camel@localhost.localdomain>	 <4C5C8A7A.8060301@codeaurora.org>	 <1281157965.12579.163.camel@localhost.localdomain>	 <4C5CF3C7.8020503@codeaurora.org> <1281186114.12579.165.camel@localhost.localdomain>
-In-Reply-To: <1281186114.12579.165.camel@localhost.localdomain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-To: unlisted-recipients:; (no To-header on input)
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1281157620.12579.157.camel@localhost.localdomain>
+References: <AANLkTimiBsL60-8w4MPoP=g8Fo_+U-SrSBTa9--aqEK4@mail.gmail.com>
+	<1281157620.12579.157.camel@localhost.localdomain>
+Date: Sat, 7 Aug 2010 10:28:10 -0300
+Message-ID: <AANLkTimLW5SUmx4OvzY4M51HjV3mf3=pbBtAgHoeiReZ@mail.gmail.com>
+Subject: Re: Question about BlueZ licenses (LGPL and Apache)
+From: Alan Carvalho de Assis <acassis@gmail.com>
+To: Madhavi Manchala <madhavi.linux@gmail.com>, linux-bluetooth@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi guys,
-> this is what I've been told. So I hope that someone does registration as
-> well on Sunday. Otherwise just go directly to the room. If something
-> goes wrong or is missing we will sort it out Sunday morning. As I said,
-> no stress. I myself will only arrive later tonight so we just have to
-> see ;)
->    
-I envy you :D. Hey any chance to have a stream or something about it? I 
-saw LinuxCon is going to stream but the BlueZ one is not included. I 
-wouldn't mind paying to get access if it's available, but I would like 
-to see it.
-Manuel
+Hi Madhavi,
+
+On 8/7/10, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Madhavi,
+>
+>> I am trying to implement a custom voice codec on the android bluetooth
+>> platform by linking it, into the A2DP module. I have heard different
+>> versions from different people regarding the licenses (like LGPL and
+>> Apache License). So, before starting my work, I would like to know if
+>> I would be forced to reveal my source code, once I implement my codec
+>> on BlueZ stack. Please let me know, so that I can choose my platform,
+>> before starting my work.
+
+As you asked this same question in Android mailing list I suggest you
+to forward Marcel reply to here as well. This way many other people in
+that list will be aware of it.
+
+Best Regards,
+
+Alan
