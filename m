@@ -1,88 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 1/9] Bluetooth: Only enable for L2CAP FCS for ERTM or
- streaming.
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
-	rshaffer@codeaurora.org, linux-arm-msm@vger.kernel.org
-In-Reply-To: <1281048867-32630-2-git-send-email-mathewm@codeaurora.org>
-References: <1281048867-32630-1-git-send-email-mathewm@codeaurora.org>
-	 <1281048867-32630-2-git-send-email-mathewm@codeaurora.org>
-Content-Type: text/plain; charset="UTF-8"
-Date: Sun, 08 Aug 2010 22:43:00 -0400
-Message-ID: <1281321780.12579.184.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: "Gustavo F. Padovan" <gfpadovan@gmail.com>
+Date: Sun, 8 Aug 2010 15:24:15 -0300
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
+To: Santosh Shilimkar <santosh.shilimkar@ti.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-omap@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH] net: bluetooth: Fix build error from rfcomm/tty.c
+Message-ID: <20100808182414.GB9339@vigoh>
+References: <1281258478-17335-1-git-send-email-santosh.shilimkar@ti.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1281258478-17335-1-git-send-email-santosh.shilimkar@ti.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Hi Santosh,
 
-> This fixes a bug which caused the FCS setting to show L2CAP_FCS_CRC16
-> with L2CAP modes other than ERTM or streaming.  At present, this only
-> affects the FCS value shown with getsockopt() for basic mode.
+* Santosh Shilimkar <santosh.shilimkar@ti.com> [2010-08-08 14:37:58 +0530]:
+
+> The build error is as follows:
+> `rfcomm_cleanup_ttys' referenced in section `.init.text' of net/built-in.o:
+> defined in discarded section `.exit.text' of net/built-in.o
+> make: *** [.tmp_vmlinux1] Error 1
 > 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> This patch fixes by removing __exit from fucntion 'rfcomm_cleanup_ttys'
+> to avoid section mismatch
+> 
+> Signed-off-by: Santosh Shilimkar <santosh.shilimkar@ti.com>
+> Cc: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  net/bluetooth/l2cap.c |   16 ++++++++++++----
->  1 files changed, 12 insertions(+), 4 deletions(-)
+>  net/bluetooth/rfcomm/tty.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 > 
-> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-> index 3e3cd9d..bc10be8 100644
-> --- a/net/bluetooth/l2cap.c
-> +++ b/net/bluetooth/l2cap.c
-> @@ -3072,6 +3072,16 @@ static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hd
->  	return 0;
->  }
->  
-> +static inline int l2cap_fcs_needed(struct l2cap_pinfo *pi)
-> +{
-> +	if (pi->mode != L2CAP_MODE_ERTM && pi->mode != L2CAP_MODE_STREAMING)
-> +		return 0;
-> +
-> +	/* FCS is enabled if one or both sides request it. */
-> +	return !(pi->conf_state & L2CAP_CONF_NO_FCS_RECV) ||
-> +		pi->fcs == L2CAP_FCS_CRC16;
-> +}
 
-so I think a switch statement is easier to read:
+We have fixed that already, thanks anyway. ;)
 
-	switch (pi->mode) {
-	case L2CAP_MODE_ERTM:
-	case L2CAP_MODE_STREAMING:
-		return !(pi->conf_state & L2CAP_CONF_NO_FCS_RECV) ||
-					pi->fcs == L2CAP_FCS_CRC16;
-	}
-
-	return 0;
-
->  static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd, u16 cmd_len, u8 *data)
->  {
->  	struct l2cap_conf_req *req = (struct l2cap_conf_req *) data;
-> @@ -3136,8 +3146,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
->  		goto unlock;
->  
->  	if (l2cap_pi(sk)->conf_state & L2CAP_CONF_INPUT_DONE) {
-> -		if (!(l2cap_pi(sk)->conf_state & L2CAP_CONF_NO_FCS_RECV) ||
-> -		    l2cap_pi(sk)->fcs != L2CAP_FCS_NONE)
-> +		if (l2cap_fcs_needed(l2cap_pi(sk)))
->  			l2cap_pi(sk)->fcs = L2CAP_FCS_CRC16;
-
-While this is just fine, I think we might should make this a lot
-simpler:
-
-	if (l2cap_pi(sk)->conf_state & L2CAP_CONF_INPUT_DONE) {
-		set_default_fcs(pi);
-
-		...
-	}
-
-With then set_default_fcs() doing all the checks etc. and setting either
-FCS_NONE or FCS_CRC16.
-
-Would this work or do we have to deal with some funny default behavior?
-
-Regards
-
-Marcel
-
-
+-- 
+Gustavo F. Padovan
+http://padovan.org
