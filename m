@@ -1,57 +1,130 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4fed618ae82fc803133cc742bbd2eeb6.squirrel@www.codeaurora.org>
-In-Reply-To: <1268072572.3712.24.camel@localhost.localdomain>
-References: <5a628eb7dc7c4773fbc9478499fde70b.squirrel@www.codeaurora.org>
-    <1267753300.29510.25.camel@localhost.localdomain>
-    <4B94E5FA.1020202@csr.com>
-    <1268072572.3712.24.camel@localhost.localdomain>
-Date: Mon, 9 Aug 2010 16:30:05 -0500 (CDT)
-Subject: Re: RFC: QuIC's AMP + eL2CAP Technical Plans
-From: "Tim Monahan-Mitchell" <tmonahan@codeaurora.org>
-To: "Marcel Holtmann" <marcel@holtmann.org>
-Cc: "David Vrabel" <david.vrabel@csr.com>,
- tmonahan@codeaurora.org,
- linux-bluetooth@vger.kernel.org
-Reply-To: tmonahan@codeaurora.org
-MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
+From: David Scherba <dscherba@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: johan.hedberg@gmail.com, marcel@holtmann.org,
+	rshaffer@codeaurora.org, David Scherba <dscherba@codeaurora.org>
+Subject: [PATCH 2/2] Use HCI device type to gate BR/EDR-specific HCI commands
+Date: Mon,  9 Aug 2010 17:07:39 -0400
+Message-Id: <1281388059-15945-3-git-send-email-dscherba@codeaurora.org>
+In-Reply-To: <1281388059-15945-1-git-send-email-dscherba@codeaurora.org>
+References: <1281388059-15945-1-git-send-email-dscherba@codeaurora.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David and Marcel,
+Use the hci_dev_info structure member 'type' to classify whether a HCI device
+is BR/EDR, or not.  If not, gate BR/EDR-specific HCI commands.
+---
+ lib/hci_lib.h    |    5 +++++
+ plugins/hciops.c |   23 +++++++++++++++--------
+ src/adapter.c    |    3 ++-
+ src/security.c   |    6 ++++--
+ 4 files changed, 26 insertions(+), 11 deletions(-)
 
-I added on to this thread in regards to today's patch of "Bluetooth: HCI
-devices are either BR/EDR or AMP radios" (09-Aug-2010).
-
->> > The block-based flow control is a missing piece, but the AMP type
->> > extension has been merged upstream. We can create HCI_BREDR and
->> > HCI_80211 controllers now. The AMP controllers are for now forced to
->> be
->> > raw devices, but that can be changed easily once we have the
->> controller
->> > init for AMP up and ready.
->>
->> Why HCI_80211 and not HCI_AMP?  The stack shouldn't care what the AMP's
->> radio actually is and with some devices (e.g., standard SDIO ones) it's
->> not even possible to tell what the radio is.
->
-> we will be adding a HCI_UWB once that specification gets ratified. And
-> the controller type is an official piece of information inside the AMP
-> manager. That part needs to know which type of AMP it is. Also the
-> driver actually should know what type of AMP it is.
->
-> I see your point that for fully generic HCI transports they might not
-> know the type upfront and we need to handle that. We will cross that
-> bridge when we come to it. Right now we just got started.
->
-> Regards
->
-> Marcel
-
-If the HCI_80211 symbol in hci.h is changed instead to HCI_AMP, where
-should the 0x01 value for '802.11 AMP Controller' (listed in
-Bluetooth.org's Assigned Number listing for Controller_Type) go?
-
-Thanks,
-Tim Monahan-Mitchell
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
+diff --git a/lib/hci_lib.h b/lib/hci_lib.h
+index b63a2a4..c0786ab 100644
+--- a/lib/hci_lib.h
++++ b/lib/hci_lib.h
+@@ -169,6 +169,11 @@ static inline int hci_test_bit(int nr, void *addr)
+ 	return *((uint32_t *) addr + (nr >> 5)) & (1 << (nr & 31));
+ }
+ 
++static inline int is_bredr_hci_device_type(uint8_t type)
++{
++  return (type >> 4) == HCI_BREDR;
++}
++
+ /* HCI filter tools */
+ static inline void hci_filter_clear(struct hci_filter *f)
+ {
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index b38c056..705e9dd 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -85,7 +85,8 @@ static void device_devup_setup(int index)
+ 	if (hci_devinfo(index, &di) < 0)
+ 		return;
+ 
+-	if (hci_test_bit(HCI_RAW, &di.flags))
++	if (!is_bredr_hci_device_type(di.type) ||
++	    hci_test_bit(HCI_RAW, &di.flags))
+ 		return;
+ 
+ 	dd = hci_open_dev(index);
+@@ -160,12 +161,17 @@ static void init_device(int index)
+ 					index, strerror(err), err);
+ 	}
+ 
+-	/* Set link policy */
+-	dr.dev_opt = main_opts.link_policy;
+-	if (ioctl(dd, HCISETLINKPOL, (unsigned long) &dr) < 0 &&
+-							errno != ENETDOWN) {
+-		error("Can't set link policy on hci%d: %s (%d)",
+-					index, strerror(errno), errno);
++	/* Set link policy for BR/EDR HCI devices */
++	if (hci_devinfo(index, &di) < 0)
++		goto fail;
++
++	if (is_bredr_hci_device_type(di.type)) {
++		dr.dev_opt = main_opts.link_policy;
++		if (ioctl(dd, HCISETLINKPOL, (unsigned long) &dr) < 0 &&
++								errno != ENETDOWN) {
++			error("Can't set link policy on hci%d: %s (%d)",
++						index, strerror(errno), errno);
++		}
+ 	}
+ 
+ 	/* Start HCI device */
+@@ -198,7 +204,8 @@ static void device_devreg_setup(int index)
+ 
+ 	devup = hci_test_bit(HCI_UP, &di.flags);
+ 
+-	if (!hci_test_bit(HCI_RAW, &di.flags))
++	if (is_bredr_hci_device_type(di.type) &&
++	    !hci_test_bit(HCI_RAW, &di.flags))
+ 		manager_register_adapter(index, devup);
+ }
+ 
+diff --git a/src/adapter.c b/src/adapter.c
+index 7d0e34d..acc1068 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2314,7 +2314,8 @@ int adapter_start(struct btd_adapter *adapter)
+ 	if (hci_devinfo(adapter->dev_id, &di) < 0)
+ 		return -errno;
+ 
+-	if (hci_test_bit(HCI_RAW, &di.flags)) {
++	if (!is_bredr_hci_device_type(di.type) ||
++	    hci_test_bit(HCI_RAW, &di.flags)) {
+ 		dev->ignore = 1;
+ 		return -1;
+ 	}
+diff --git a/src/security.c b/src/security.c
+index ca394e1..6d07d86 100644
+--- a/src/security.c
++++ b/src/security.c
+@@ -999,7 +999,8 @@ static gboolean io_security_event(GIOChannel *chan, GIOCondition cond,
+ 
+ 	ioctl(dev, HCIGETDEVINFO, (void *) di);
+ 
+-	if (hci_test_bit(HCI_RAW, &di->flags))
++	if (!is_bredr_hci_device_type(di->type) ||
++	    hci_test_bit(HCI_RAW, &di->flags))
+ 		return TRUE;
+ 
+ 	switch (eh->evt) {
+@@ -1185,7 +1186,8 @@ void start_security_manager(int hdev)
+ 	io_data[hdev].channel = chan;
+ 	io_data[hdev].pin_length = -1;
+ 
+-	if (hci_test_bit(HCI_RAW, &di->flags))
++	if (!is_bredr_hci_device_type(di->type) ||
++	    hci_test_bit(HCI_RAW, &di->flags))
+ 		return;
+ 
+ 	bacpy(&cp.bdaddr, BDADDR_ANY);
+-- 
+1.7.0
+-- 
+David Scherba
+Sent by an employee of the Qualcomm Innovation Center, Inc.
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
