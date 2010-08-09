@@ -1,30 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4C607B43.2050207@csr.com>
-Date: Mon, 09 Aug 2010 23:03:47 +0100
-From: David Vrabel <david.vrabel@csr.com>
+Date: Mon, 9 Aug 2010 17:59:13 -0400
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: David Scherba <dscherba@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+	rshaffer@codeaurora.org
+Subject: Re: [PATCH 2/2] Use HCI device type to gate BR/EDR-specific HCI
+ commands
+Message-ID: <20100809215913.GB25488@jh-x301>
+References: <1281388059-15945-1-git-send-email-dscherba@codeaurora.org>
+ <1281388059-15945-3-git-send-email-dscherba@codeaurora.org>
 MIME-Version: 1.0
-To: tmonahan@codeaurora.org
-CC: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Subject: Re: RFC: QuIC's AMP + eL2CAP Technical Plans
-References: <5a628eb7dc7c4773fbc9478499fde70b.squirrel@www.codeaurora.org>    <1267753300.29510.25.camel@localhost.localdomain>    <4B94E5FA.1020202@csr.com>    <1268072572.3712.24.camel@localhost.localdomain> <4fed618ae82fc803133cc742bbd2eeb6.squirrel@www.codeaurora.org>
-In-Reply-To: <4fed618ae82fc803133cc742bbd2eeb6.squirrel@www.codeaurora.org>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1281388059-15945-3-git-send-email-dscherba@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Tim Monahan-Mitchell wrote:
-> 
-> If the HCI_80211 symbol in hci.h is changed instead to HCI_AMP, where
-> should the 0x01 value for '802.11 AMP Controller' (listed in
-> Bluetooth.org's Assigned Number listing for Controller_Type) go?e
+Hi David,
 
-I don't think it needs to go anywhere, the actual values aren't 
-important from the point of view of the AMP manager.
+On Mon, Aug 09, 2010, David Scherba wrote:
+> +static inline int is_bredr_hci_device_type(uint8_t type)
 
-David
--- 
-David Vrabel, Senior Software Engineer, Drivers
-CSR, Churchill House, Cambridge Business Park,  Tel: +44 (0)1223 692562
-Cowley Road, Cambridge, CB4 0WZ                 http://www.csr.com/
+Could you just call this ignore_device() which combines the AMP and RAW
+checks.
 
+> +{
+> +  return (type >> 4) == HCI_BREDR;
+> +}
 
-Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
+Looks like the indentation is wrong inside the function (two spaces
+instead of a tab).
+
+> -	if (hci_test_bit(HCI_RAW, &di.flags))
+> +	if (!is_bredr_hci_device_type(di.type) ||
+> +	    hci_test_bit(HCI_RAW, &di.flags))
+
+No spaces+tabs mixed indentation please. The second line should be
+indented by at least two tabs more than the line above it (as many tabs
+as you can as long as the line doesn't go beyond 79 characters). OTOH,
+the second line goes away completely if you do the ignore_device
+simplification as proposed above.
+
+> -	if (!hci_test_bit(HCI_RAW, &di.flags))
+> +	if (is_bredr_hci_device_type(di.type) &&
+> +	    !hci_test_bit(HCI_RAW, &di.flags))
+
+Same here.
+
+> -	if (hci_test_bit(HCI_RAW, &di.flags)) {
+> +	if (!is_bredr_hci_device_type(di.type) ||
+> +	    hci_test_bit(HCI_RAW, &di.flags)) {
+
+And here.
+
+> -	if (hci_test_bit(HCI_RAW, &di->flags))
+> +	if (!is_bredr_hci_device_type(di->type) ||
+> +	    hci_test_bit(HCI_RAW, &di->flags))
+
+And here.
+
+> -	if (hci_test_bit(HCI_RAW, &di->flags))
+> +	if (!is_bredr_hci_device_type(di->type) ||
+> +	    hci_test_bit(HCI_RAW, &di->flags))
+
+And here.
+
+Johan
