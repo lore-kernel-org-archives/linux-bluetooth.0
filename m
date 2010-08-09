@@ -1,68 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4C604FAD.40801@csr.com>
+Date: Mon, 09 Aug 2010 19:57:49 +0100
+From: David Vrabel <david.vrabel@csr.com>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTinUKu+GrAnJvZoZmhcb9=6ZOxhTBZhRv5i5NKBs@mail.gmail.com>
-References: <AANLkTimiBsL60-8w4MPoP=g8Fo_+U-SrSBTa9--aqEK4@mail.gmail.com>
-	<AANLkTinUKu+GrAnJvZoZmhcb9=6ZOxhTBZhRv5i5NKBs@mail.gmail.com>
-Date: Mon, 9 Aug 2010 14:37:11 -0500
-Message-ID: <AANLkTikFQiEEVKA=9UnxzeunAPEviWQnjYcH=q6rfhjA@mail.gmail.com>
-Subject: Re: Question about BlueZ licenses (LGPL and Apache)
-From: Pavan Savoy <pavan_savoy@sify.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Madhavi Manchala <madhavi.linux@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: linux-bluetooth@vger.kernel.org
+CC: Marcel Holtmann <marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Support SDIO devices that are AMP controllers
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-As long as we are updating, can the liba2dp be abstracted out of not
-only the sbc encoding part but also the sending over UART part (as in
-transport ...)
+Signed-off-by: David Vrabel <david.vrabel@csr.com>
+---
+  drivers/bluetooth/btsdio.c   |    4 ++++
+  include/linux/mmc/sdio_ids.h |    1 +
+  2 files changed, 5 insertions(+), 0 deletions(-)
 
-chips are getting smarter and the sbc codecs are moving to either a
-co-processor/dsp or even inside the BT chip itself, so we might have
-to send the PCM raw data somewhere else for the dsp to encode to sbc
-and send it over the air ...
+diff --git a/drivers/bluetooth/btsdio.c b/drivers/bluetooth/btsdio.c
+index 76e5127..061e0a4 100644
+--- a/drivers/bluetooth/btsdio.c
++++ b/drivers/bluetooth/btsdio.c
+@@ -46,6 +46,9 @@ static const struct sdio_device_id btsdio_table[] = {
+  	/* Generic Bluetooth Type-B SDIO device */
+  	{ SDIO_DEVICE_CLASS(SDIO_CLASS_BT_B) },
 
-currently the data (sbc/pcm) and the control (connection
-establishment) is too tightly sort of coded in together.. isn't it ?
++	/* Generic Bluetooth AMP controller */
++	{ SDIO_DEVICE_CLASS(SDIO_CLASS_BT_AMP) },
++
+  	{ }	/* Terminating entry */
+  };
 
-for something like the above to happen our liba2dp had to be almost
-re-written ...
+@@ -327,6 +330,7 @@ static int btsdio_probe(struct sdio_func *func,
+  	}
 
-On 8/9/10, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
-> Hi,
->
-> On Fri, Aug 6, 2010 at 6:44 PM, Madhavi Manchala
-> <madhavi.linux@gmail.com> wrote:
->> Dear All,
->>
->> I am trying to implement a custom voice codec on the android bluetooth
->> platform by linking it, into the A2DP module. I have heard different
->> versions from different people regarding the licenses (like LGPL and
->> Apache License). So, before starting my work, I would like to know if
->> I would be forced to reveal my source code, once I implement my codec
->> on BlueZ stack. Please let me know, so that I can choose my platform,
->> before starting my work.
->
-> If you are just implementing a new codec then you might have to link
-> to GPL code which basically makes your code GPL too, but we have plans
-> to support this over dbus which wouldn't require you to link to any
-> GPL, instead you register an endpoint which will be used to configure
-> streams.
->
-> This code can be found here:
->
-> http://gitorious.org/~vudentz/bluez/vudentzs-clone/commits/endpoint
->
-> This depend on dbus 1.3.1 and latter which will probably only reach
-> upstream once we have a dbus 1.4 release.
->
-> --
-> Luiz Augusto von Dentz
-> Computer Engineer
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+  	hdev->bus = HCI_SDIO;
++	hdev->dev_type = (id->class == SDIO_CLASS_BT_AMP) ? HCI_AMP : HCI_BREDR;
+  	hdev->driver_data = data;
+
+  	data->hdev = hdev;
+diff --git a/include/linux/mmc/sdio_ids.h b/include/linux/mmc/sdio_ids.h
+index 33b2ea0..a36ab3b 100644
+--- a/include/linux/mmc/sdio_ids.h
++++ b/include/linux/mmc/sdio_ids.h
+@@ -18,6 +18,7 @@
+  #define SDIO_CLASS_PHS		0x06	/* PHS standard interface */
+  #define SDIO_CLASS_WLAN		0x07	/* WLAN interface */
+  #define SDIO_CLASS_ATA		0x08	/* Embedded SDIO-ATA std interface */
++#define SDIO_CLASS_BT_AMP	0x09	/* Type-A Bluetooth AMP interface */
+
+  /*
+   * Vendors and devices.  Sort key: vendor first, device next.
+-- 
+1.5.4.3
+
+-- 
+David Vrabel, Senior Software Engineer, Drivers
+CSR, Churchill House, Cambridge Business Park,  Tel: +44 (0)1223 692562
+Cowley Road, Cambridge, CB4 0WZ                 http://www.csr.com/
+
+
+Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
