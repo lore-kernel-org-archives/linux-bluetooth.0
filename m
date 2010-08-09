@@ -1,57 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4C604FAD.40801@csr.com>
-Date: Mon, 09 Aug 2010 19:57:49 +0100
+Message-ID: <4C604F37.4020706@csr.com>
+Date: Mon, 09 Aug 2010 19:55:51 +0100
 From: David Vrabel <david.vrabel@csr.com>
 MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
 CC: Marcel Holtmann <marcel@holtmann.org>
-Subject: [PATCH] Bluetooth: Support SDIO devices that are AMP controllers
+Subject: [PATCH] Bluetooth: HCI devices are either BR/EDR or AMP radios
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+HCI transport drivers may not know what type of radio an AMP device has
+so only say whether they're BR/EDR or AMP devices.
+
 Signed-off-by: David Vrabel <david.vrabel@csr.com>
 ---
-  drivers/bluetooth/btsdio.c   |    4 ++++
-  include/linux/mmc/sdio_ids.h |    1 +
-  2 files changed, 5 insertions(+), 0 deletions(-)
+  include/net/bluetooth/hci.h |    2 +-
+  net/bluetooth/hci_sysfs.c   |    4 ++--
+  2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/bluetooth/btsdio.c b/drivers/bluetooth/btsdio.c
-index 76e5127..061e0a4 100644
---- a/drivers/bluetooth/btsdio.c
-+++ b/drivers/bluetooth/btsdio.c
-@@ -46,6 +46,9 @@ static const struct sdio_device_id btsdio_table[] = {
-  	/* Generic Bluetooth Type-B SDIO device */
-  	{ SDIO_DEVICE_CLASS(SDIO_CLASS_BT_B) },
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index ca2518e..cc14731 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -54,7 +54,7 @@
 
-+	/* Generic Bluetooth AMP controller */
-+	{ SDIO_DEVICE_CLASS(SDIO_CLASS_BT_AMP) },
-+
-  	{ }	/* Terminating entry */
-  };
+  /* HCI controller types */
+  #define HCI_BREDR	0x00
+-#define HCI_80211	0x01
++#define HCI_AMP		0x01
 
-@@ -327,6 +330,7 @@ static int btsdio_probe(struct sdio_func *func,
+  /* HCI device quirks */
+  enum {
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index ce44c47..4e9ca9b 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -196,8 +196,8 @@ static inline char *host_typetostr(int type)
+  	switch (type) {
+  	case HCI_BREDR:
+  		return "BR/EDR";
+-	case HCI_80211:
+-		return "802.11";
++	case HCI_AMP:
++		return "AMP";
+  	default:
+  		return "UNKNOWN";
   	}
-
-  	hdev->bus = HCI_SDIO;
-+	hdev->dev_type = (id->class == SDIO_CLASS_BT_AMP) ? HCI_AMP : HCI_BREDR;
-  	hdev->driver_data = data;
-
-  	data->hdev = hdev;
-diff --git a/include/linux/mmc/sdio_ids.h b/include/linux/mmc/sdio_ids.h
-index 33b2ea0..a36ab3b 100644
---- a/include/linux/mmc/sdio_ids.h
-+++ b/include/linux/mmc/sdio_ids.h
-@@ -18,6 +18,7 @@
-  #define SDIO_CLASS_PHS		0x06	/* PHS standard interface */
-  #define SDIO_CLASS_WLAN		0x07	/* WLAN interface */
-  #define SDIO_CLASS_ATA		0x08	/* Embedded SDIO-ATA std interface */
-+#define SDIO_CLASS_BT_AMP	0x09	/* Type-A Bluetooth AMP interface */
-
-  /*
-   * Vendors and devices.  Sort key: vendor first, device next.
 -- 
 1.5.4.3
-
 -- 
 David Vrabel, Senior Software Engineer, Drivers
 CSR, Churchill House, Cambridge Business Park,  Tel: +44 (0)1223 692562
