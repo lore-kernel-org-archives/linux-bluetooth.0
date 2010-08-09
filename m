@@ -1,50 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Workaround for buggy BT dongles
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-Cc: Bluettooth Linux <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <AANLkTimt4CN6Oegrnf3Z5mhb0L7QLiiaPdHCSdp=rLTw@mail.gmail.com>
-References: <AANLkTimt4CN6Oegrnf3Z5mhb0L7QLiiaPdHCSdp=rLTw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Mon, 09 Aug 2010 09:36:59 -0400
-Message-ID: <1281361019.12579.198.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: "Gustavo F. Padovan" <gfpadovan@gmail.com>
+Date: Mon, 9 Aug 2010 10:12:54 -0300
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Mat Martineau <mathewm@codeaurora.org>, linux-bluetooth@vger.kernel.org,
+	rshaffer@codeaurora.org, linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH 1/9] Bluetooth: Only enable for L2CAP FCS for ERTM or
+ streaming.
+Message-ID: <20100809131254.GB3817@vigoh>
+References: <1281048867-32630-1-git-send-email-mathewm@codeaurora.org>
+ <1281048867-32630-2-git-send-email-mathewm@codeaurora.org>
+ <1281321780.12579.184.camel@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1281321780.12579.184.camel@localhost.localdomain>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Marcel,
 
-> We have experienced L2CAP disconnections with A-Link BT dongles (lsusb
-> shows Broadcom Corp. BCM2046B1 chip).
+* Marcel Holtmann <marcel@holtmann.org> [2010-08-08 22:43:00 -0400]:
+
+> Hi Mat,
 > 
-> There is race condition in a controller so that sometimes "L2CAP
-> Connect Req" is received after "HCI Encryption Change":
-> ...
-> 2308 *REF*                                                   HCI_EVT
-> Simple Pairing Complete
-> 2309 0.089720                                                HCI_EVT
-> Link Key Notification
-> 2310 0.126607                                                L2CAP
-> Rcvd Connection Request
-> 2311 0.126721                                                L2CAP
-> Sent Connection Response
-> 2312 0.127278                                                HCI_EVT
-> Encrypt Change
-> ...
+> > This fixes a bug which caused the FCS setting to show L2CAP_FCS_CRC16
+> > with L2CAP modes other than ERTM or streaming.  At present, this only
+> > affects the FCS value shown with getsockopt() for basic mode.
+> > 
+> > Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> > ---
+> >  net/bluetooth/l2cap.c |   16 ++++++++++++----
+> >  1 files changed, 12 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> > index 3e3cd9d..bc10be8 100644
+> > --- a/net/bluetooth/l2cap.c
+> > +++ b/net/bluetooth/l2cap.c
+> > @@ -3072,6 +3072,16 @@ static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hd
+> >  	return 0;
+> >  }
+> >  
+> > +static inline int l2cap_fcs_needed(struct l2cap_pinfo *pi)
+> > +{
+> > +	if (pi->mode != L2CAP_MODE_ERTM && pi->mode != L2CAP_MODE_STREAMING)
+> > +		return 0;
+> > +
+> > +	/* FCS is enabled if one or both sides request it. */
+> > +	return !(pi->conf_state & L2CAP_CONF_NO_FCS_RECV) ||
+> > +		pi->fcs == L2CAP_FCS_CRC16;
+> > +}
 > 
-> This is correct behavior since all non-SDP connections shall be
-> encrypted for SSP devices.
+> so I think a switch statement is easier to read:
 > 
-> If we send "L2CAP Connect Request" with a little delay the problem
-> disappears (this is of course too hackish way).
+> 	switch (pi->mode) {
+> 	case L2CAP_MODE_ERTM:
+> 	case L2CAP_MODE_STREAMING:
+> 		return !(pi->conf_state & L2CAP_CONF_NO_FCS_RECV) ||
+> 					pi->fcs == L2CAP_FCS_CRC16;
+> 	}
 > 
-> Shall we address this problem? I do not see good way of dealing with the chip.
+> 	return 0;
+> 
+> >  static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd, u16 cmd_len, u8 *data)
+> >  {
+> >  	struct l2cap_conf_req *req = (struct l2cap_conf_req *) data;
+> > @@ -3136,8 +3146,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+> >  		goto unlock;
+> >  
+> >  	if (l2cap_pi(sk)->conf_state & L2CAP_CONF_INPUT_DONE) {
+> > -		if (!(l2cap_pi(sk)->conf_state & L2CAP_CONF_NO_FCS_RECV) ||
+> > -		    l2cap_pi(sk)->fcs != L2CAP_FCS_NONE)
+> > +		if (l2cap_fcs_needed(l2cap_pi(sk)))
+> >  			l2cap_pi(sk)->fcs = L2CAP_FCS_CRC16;
+> 
+> While this is just fine, I think we might should make this a lot
+> simpler:
+> 
+> 	if (l2cap_pi(sk)->conf_state & L2CAP_CONF_INPUT_DONE) {
+> 		set_default_fcs(pi);
+> 
+> 		...
+> 	}
+> 
+> With then set_default_fcs() doing all the checks etc. and setting either
+> FCS_NONE or FCS_CRC16.
+> 
+> Would this work or do we have to deal with some funny default behavior?
 
-I would prefer to address this problem as follows. Open your window and
-through the dongle out that same window ;)
+That will work. ;)
 
-Regards
-
-Marcel
-
-
+-- 
+Gustavo F. Padovan
+http://padovan.org
