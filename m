@@ -1,45 +1,136 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <AANLkTimLW5SUmx4OvzY4M51HjV3mf3=pbBtAgHoeiReZ@mail.gmail.com>
-References: <AANLkTimiBsL60-8w4MPoP=g8Fo_+U-SrSBTa9--aqEK4@mail.gmail.com>
-	<1281157620.12579.157.camel@localhost.localdomain>
-	<AANLkTimLW5SUmx4OvzY4M51HjV3mf3=pbBtAgHoeiReZ@mail.gmail.com>
-Date: Mon, 9 Aug 2010 13:08:17 +0530
-Message-ID: <AANLkTi=fSfwijpK-OR-6yTr30USFQbcgknrd1FaU99oH@mail.gmail.com>
-Subject: Re: Question about BlueZ licenses (LGPL and Apache)
-From: Madhavi Manchala <madhavi.linux@gmail.com>
-To: Alan Carvalho de Assis <acassis@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Use controller workqueue to create sysfs entries for links
+Date: Sun,  8 Aug 2010 23:07:31 -0400
+Message-Id: <1281323251-31010-1-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, Aug 7, 2010 at 6:58 PM, Alan Carvalho de Assis
-<acassis@gmail.com> wrote:
-> Hi Madhavi,
->
-> On 8/7/10, Marcel Holtmann <marcel@holtmann.org> wrote:
->> Hi Madhavi,
->>
->>> I am trying to implement a custom voice codec on the android bluetooth
->>> platform by linking it, into the A2DP module. I have heard different
->>> versions from different people regarding the licenses (like LGPL and
->>> Apache License). So, before starting my work, I would like to know if
->>> I would be forced to reveal my source code, once I implement my codec
->>> on BlueZ stack. Please let me know, so that I can choose my platform,
->>> before starting my work.
->
-> As you asked this same question in Android mailing list I suggest you
-> to forward Marcel reply to here as well. This way many other people in
-> that list will be aware of it.
->
-> Best Regards,
->
-> Alan
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/hci_core.h |    3 --
+ net/bluetooth/hci_sysfs.c        |   73 +++++++++++++++-----------------------
+ 2 files changed, 29 insertions(+), 47 deletions(-)
 
-Thanks to Marcel and Alan.
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 005f9ce..cd039c9 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -190,9 +190,6 @@ struct hci_conn {
+ 	struct timer_list disc_timer;
+ 	struct timer_list idle_timer;
+ 
+-	struct work_struct work_add;
+-	struct work_struct work_del;
+-
+ 	struct device	dev;
+ 	atomic_t	devref;
+ 
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index 95a8038..78c9614 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -87,11 +87,35 @@ static struct device_type bt_link = {
+ 	.release = bt_link_release,
+ };
+ 
+-static void add_conn(struct work_struct *work)
++/*
++ * The rfcomm tty device will possibly retain even when conn
++ * is down, and sysfs doesn't support move zombie device,
++ * so we should move the device before conn device is destroyed.
++ */
++static int __match_tty(struct device *dev, void *data)
++{
++	return !strncmp(dev_name(dev), "rfcomm", 6);
++}
++
++void hci_conn_init_sysfs(struct hci_conn *conn)
+ {
+-	struct hci_conn *conn = container_of(work, struct hci_conn, work_add);
+ 	struct hci_dev *hdev = conn->hdev;
+ 
++	BT_DBG("conn %p", conn);
++
++	conn->dev.type = &bt_link;
++	conn->dev.class = bt_class;
++	conn->dev.parent = &hdev->dev;
++
++	device_initialize(&conn->dev);
++}
++
++void hci_conn_add_sysfs(struct hci_conn *conn)
++{
++	struct hci_dev *hdev = conn->hdev;
++
++	BT_DBG("conn %p", conn);
++
+ 	dev_set_name(&conn->dev, "%s:%d", hdev->name, conn->handle);
+ 
+ 	dev_set_drvdata(&conn->dev, conn);
+@@ -104,21 +128,12 @@ static void add_conn(struct work_struct *work)
+ 	hci_dev_hold(hdev);
+ }
+ 
+-/*
+- * The rfcomm tty device will possibly retain even when conn
+- * is down, and sysfs doesn't support move zombie device,
+- * so we should move the device before conn device is destroyed.
+- */
+-static int __match_tty(struct device *dev, void *data)
+-{
+-	return !strncmp(dev_name(dev), "rfcomm", 6);
+-}
+-
+-static void del_conn(struct work_struct *work)
++void hci_conn_del_sysfs(struct hci_conn *conn)
+ {
+-	struct hci_conn *conn = container_of(work, struct hci_conn, work_del);
+ 	struct hci_dev *hdev = conn->hdev;
+ 
++	BT_DBG("conn %p", conn);
++
+ 	if (!device_is_registered(&conn->dev))
+ 		return;
+ 
+@@ -138,36 +153,6 @@ static void del_conn(struct work_struct *work)
+ 	hci_dev_put(hdev);
+ }
+ 
+-void hci_conn_init_sysfs(struct hci_conn *conn)
+-{
+-	struct hci_dev *hdev = conn->hdev;
+-
+-	BT_DBG("conn %p", conn);
+-
+-	conn->dev.type = &bt_link;
+-	conn->dev.class = bt_class;
+-	conn->dev.parent = &hdev->dev;
+-
+-	device_initialize(&conn->dev);
+-
+-	INIT_WORK(&conn->work_add, add_conn);
+-	INIT_WORK(&conn->work_del, del_conn);
+-}
+-
+-void hci_conn_add_sysfs(struct hci_conn *conn)
+-{
+-	BT_DBG("conn %p", conn);
+-
+-	queue_work(conn->hdev->workqueue, &conn->work_add);
+-}
+-
+-void hci_conn_del_sysfs(struct hci_conn *conn)
+-{
+-	BT_DBG("conn %p", conn);
+-
+-	queue_work(conn->hdev->workqueue, &conn->work_del);
+-}
+-
+ static inline char *host_bustostr(int bus)
+ {
+ 	switch (bus) {
+-- 
+1.6.6.1
 
-By the way, please let me clarify one thing. I think, the input for
-the SBC module is the RAW stream. Am I correct?
-
-Thanks and Regards,
-Madhavi M.
