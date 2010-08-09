@@ -1,39 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <201008091102.28980.siarhei.siamashka@gmail.com>
-References: <AANLkTimiBsL60-8w4MPoP=g8Fo_+U-SrSBTa9--aqEK4@mail.gmail.com>
-	<AANLkTimLW5SUmx4OvzY4M51HjV3mf3=pbBtAgHoeiReZ@mail.gmail.com>
-	<AANLkTi=fSfwijpK-OR-6yTr30USFQbcgknrd1FaU99oH@mail.gmail.com>
-	<201008091102.28980.siarhei.siamashka@gmail.com>
-Date: Mon, 9 Aug 2010 14:58:24 +0530
-Message-ID: <AANLkTimPOt5Lh3MaN6zR02H91u9kHbgja50dmTDVUTHs@mail.gmail.com>
-Subject: Re: Question about BlueZ licenses (LGPL and Apache)
-From: Madhavi Manchala <madhavi.linux@gmail.com>
-To: Siarhei Siamashka <siarhei.siamashka@gmail.com>
-Cc: Alan Carvalho de Assis <acassis@gmail.com>, linux-bluetooth@vger.kernel.org,
-	Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH 9/9] Bluetooth: Use 3-DH5 payload size for default ERTM
+ max PDU size.
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
+	rshaffer@codeaurora.org, linux-arm-msm@vger.kernel.org
+In-Reply-To: <1281048867-32630-10-git-send-email-mathewm@codeaurora.org>
+References: <1281048867-32630-1-git-send-email-mathewm@codeaurora.org>
+	 <1281048867-32630-10-git-send-email-mathewm@codeaurora.org>
+Content-Type: text/plain; charset="UTF-8"
+Date: Mon, 09 Aug 2010 04:44:06 -0400
+Message-ID: <1281343446.12579.193.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Aug 9, 2010 at 4:32 PM, Siarhei Siamashka
-<siarhei.siamashka@gmail.com> wrote:
-> On Monday 09 August 2010 07:38:17 Madhavi Manchala wrote:
->> By the way, please let me clarify one thing. I think, the input for
->> the SBC module is the RAW stream. Am I correct?
->
-> As I understand it, you are not happy about something in bluez so that you are
-> considering to hook in your own SBC implementation. Could you please share your
-> concerns? Do you have problems with sound quality? Performance in general?
-> Performance on some particular hardware? Anything else? Are you interested in
-> SBC encoder or decoder?
+Hi Mat,
 
-Actually, I am not trying to hook a new SBC implementation. I am
-trying to work on a new custom codec, and in case the SINK devices do
-not support my custom codec, I want the src to reroute the stream
-through the SBC encoder, so that all the SINK devices will work
-without any problem. Since SBC is mandatory in the A2DP
-implementation, I thought about using SBC as the alternate codec.
-Please let me know if I am missing something.
+> The previous value of 672 for L2CAP_DEFAULT_MAX_PDU_SIZE is based on
+> the default L2CAP MTU.  That default MTU is calculated from the size
+> of two DH5 packets, minus ACL and L2CAP b-frame header overhead.
+> 
+> ERTM is used with newer basebands that typically support larger 3-DH5
+> packets, and i-frames and s-frames have more header overhead.  With
+> clean RF conditions, basebands will typically attempt to use 1021-byte
+> 3-DH5 packets for maximum throughput.  Adjusting for 2 bytes of ACL
+> headers plus 10 bytes of worst-case L2CAP headers yields 1009 bytes
+> of payload.
+> 
+> This PDU size imposes less overhead for header bytes and gives the
+> baseband the option to choose 3-DH5 packets, but is small enough for
+> ERTM traffic to interleave well with other L2CAP or SCO data.
+> 672-byte payloads do not allow the most efficient over-the-air
+> packet choice, and cannot achieve maximum throughput over BR/EDR.
+> 
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> ---
+>  include/net/bluetooth/l2cap.h |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
-Thanks and Regards,
-Madhavi M.
+patch has been applied. Thanks.
+
+Regards
+
+Marcel
+
+
