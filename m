@@ -1,57 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4C604F37.4020706@csr.com>
-Date: Mon, 09 Aug 2010 19:55:51 +0100
-From: David Vrabel <david.vrabel@csr.com>
+Date: Mon, 9 Aug 2010 09:50:17 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Marcel Holtmann <marcel@holtmann.org>
+cc: linux-bluetooth@vger.kernel.org, rshaffer@codeaurora.org,
+	linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH 1/9] Bluetooth: Only enable for L2CAP FCS for ERTM or
+ streaming.
+In-Reply-To: <20100809131254.GB3817@vigoh>
+Message-ID: <alpine.DEB.2.00.1008090948580.26961@linux-sea-02>
+References: <1281048867-32630-1-git-send-email-mathewm@codeaurora.org> <1281048867-32630-2-git-send-email-mathewm@codeaurora.org> <1281321780.12579.184.camel@localhost.localdomain> <20100809131254.GB3817@vigoh>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-CC: Marcel Holtmann <marcel@holtmann.org>
-Subject: [PATCH] Bluetooth: HCI devices are either BR/EDR or AMP radios
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-HCI transport drivers may not know what type of radio an AMP device has
-so only say whether they're BR/EDR or AMP devices.
 
-Signed-off-by: David Vrabel <david.vrabel@csr.com>
----
-  include/net/bluetooth/hci.h |    2 +-
-  net/bluetooth/hci_sysfs.c   |    4 ++--
-  2 files changed, 3 insertions(+), 3 deletions(-)
+On Mon, 9 Aug 2010, Gustavo F. Padovan wrote:
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index ca2518e..cc14731 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -54,7 +54,7 @@
+> Hi Marcel,
+>
+> * Marcel Holtmann <marcel@holtmann.org> [2010-08-08 22:43:00 -0400]:
+>
+>> Hi Mat,
+>>
+>>> This fixes a bug which caused the FCS setting to show L2CAP_FCS_CRC16
+>>> with L2CAP modes other than ERTM or streaming.  At present, this only
+>>> affects the FCS value shown with getsockopt() for basic mode.
+>>>
+>>> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+>>> ---
+>>>  net/bluetooth/l2cap.c |   16 ++++++++++++----
+>>>  1 files changed, 12 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+>>> index 3e3cd9d..bc10be8 100644
+>>> --- a/net/bluetooth/l2cap.c
+>>> +++ b/net/bluetooth/l2cap.c
+>>> @@ -3072,6 +3072,16 @@ static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hd
+>>>  	return 0;
+>>>  }
+>>>
+>>> +static inline int l2cap_fcs_needed(struct l2cap_pinfo *pi)
+>>> +{
+>>> +	if (pi->mode != L2CAP_MODE_ERTM && pi->mode != L2CAP_MODE_STREAMING)
+>>> +		return 0;
+>>> +
+>>> +	/* FCS is enabled if one or both sides request it. */
+>>> +	return !(pi->conf_state & L2CAP_CONF_NO_FCS_RECV) ||
+>>> +		pi->fcs == L2CAP_FCS_CRC16;
+>>> +}
+>>
+>> so I think a switch statement is easier to read:
+>>
+>> 	switch (pi->mode) {
+>> 	case L2CAP_MODE_ERTM:
+>> 	case L2CAP_MODE_STREAMING:
+>> 		return !(pi->conf_state & L2CAP_CONF_NO_FCS_RECV) ||
+>> 					pi->fcs == L2CAP_FCS_CRC16;
+>> 	}
+>>
+>> 	return 0;
+>>
+>>>  static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd, u16 cmd_len, u8 *data)
+>>>  {
+>>>  	struct l2cap_conf_req *req = (struct l2cap_conf_req *) data;
+>>> @@ -3136,8 +3146,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+>>>  		goto unlock;
+>>>
+>>>  	if (l2cap_pi(sk)->conf_state & L2CAP_CONF_INPUT_DONE) {
+>>> -		if (!(l2cap_pi(sk)->conf_state & L2CAP_CONF_NO_FCS_RECV) ||
+>>> -		    l2cap_pi(sk)->fcs != L2CAP_FCS_NONE)
+>>> +		if (l2cap_fcs_needed(l2cap_pi(sk)))
+>>>  			l2cap_pi(sk)->fcs = L2CAP_FCS_CRC16;
+>>
+>> While this is just fine, I think we might should make this a lot
+>> simpler:
+>>
+>> 	if (l2cap_pi(sk)->conf_state & L2CAP_CONF_INPUT_DONE) {
+>> 		set_default_fcs(pi);
+>>
+>> 		...
+>> 	}
+>>
+>> With then set_default_fcs() doing all the checks etc. and setting either
+>> FCS_NONE or FCS_CRC16.
+>>
+>> Would this work or do we have to deal with some funny default behavior?
+>
+> That will work. ;)
 
-  /* HCI controller types */
-  #define HCI_BREDR	0x00
--#define HCI_80211	0x01
-+#define HCI_AMP		0x01
+Agreed - that's much more readable.
 
-  /* HCI device quirks */
-  enum {
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index ce44c47..4e9ca9b 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -196,8 +196,8 @@ static inline char *host_typetostr(int type)
-  	switch (type) {
-  	case HCI_BREDR:
-  		return "BR/EDR";
--	case HCI_80211:
--		return "802.11";
-+	case HCI_AMP:
-+		return "AMP";
-  	default:
-  		return "UNKNOWN";
-  	}
--- 
-1.5.4.3
--- 
-David Vrabel, Senior Software Engineer, Drivers
-CSR, Churchill House, Cambridge Business Park,  Tel: +44 (0)1223 692562
-Cowley Road, Cambridge, CB4 0WZ                 http://www.csr.com/
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
 
-
-Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
