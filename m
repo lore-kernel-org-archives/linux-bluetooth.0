@@ -1,44 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTimiBsL60-8w4MPoP=g8Fo_+U-SrSBTa9--aqEK4@mail.gmail.com>
+In-Reply-To: <201008091102.28980.siarhei.siamashka@gmail.com>
 References: <AANLkTimiBsL60-8w4MPoP=g8Fo_+U-SrSBTa9--aqEK4@mail.gmail.com>
-Date: Mon, 9 Aug 2010 12:31:46 +0300
-Message-ID: <AANLkTinUKu+GrAnJvZoZmhcb9=6ZOxhTBZhRv5i5NKBs@mail.gmail.com>
+	<AANLkTimLW5SUmx4OvzY4M51HjV3mf3=pbBtAgHoeiReZ@mail.gmail.com>
+	<AANLkTi=fSfwijpK-OR-6yTr30USFQbcgknrd1FaU99oH@mail.gmail.com>
+	<201008091102.28980.siarhei.siamashka@gmail.com>
+Date: Mon, 9 Aug 2010 14:58:24 +0530
+Message-ID: <AANLkTimPOt5Lh3MaN6zR02H91u9kHbgja50dmTDVUTHs@mail.gmail.com>
 Subject: Re: Question about BlueZ licenses (LGPL and Apache)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Madhavi Manchala <madhavi.linux@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+From: Madhavi Manchala <madhavi.linux@gmail.com>
+To: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+Cc: Alan Carvalho de Assis <acassis@gmail.com>, linux-bluetooth@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>
 Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-On Fri, Aug 6, 2010 at 6:44 PM, Madhavi Manchala
-<madhavi.linux@gmail.com> wrote:
-> Dear All,
+On Mon, Aug 9, 2010 at 4:32 PM, Siarhei Siamashka
+<siarhei.siamashka@gmail.com> wrote:
+> On Monday 09 August 2010 07:38:17 Madhavi Manchala wrote:
+>> By the way, please let me clarify one thing. I think, the input for
+>> the SBC module is the RAW stream. Am I correct?
 >
-> I am trying to implement a custom voice codec on the android bluetooth
-> platform by linking it, into the A2DP module. I have heard different
-> versions from different people regarding the licenses (like LGPL and
-> Apache License). So, before starting my work, I would like to know if
-> I would be forced to reveal my source code, once I implement my codec
-> on BlueZ stack. Please let me know, so that I can choose my platform,
-> before starting my work.
+> As I understand it, you are not happy about something in bluez so that you are
+> considering to hook in your own SBC implementation. Could you please share your
+> concerns? Do you have problems with sound quality? Performance in general?
+> Performance on some particular hardware? Anything else? Are you interested in
+> SBC encoder or decoder?
 
-If you are just implementing a new codec then you might have to link
-to GPL code which basically makes your code GPL too, but we have plans
-to support this over dbus which wouldn't require you to link to any
-GPL, instead you register an endpoint which will be used to configure
-streams.
+Actually, I am not trying to hook a new SBC implementation. I am
+trying to work on a new custom codec, and in case the SINK devices do
+not support my custom codec, I want the src to reroute the stream
+through the SBC encoder, so that all the SINK devices will work
+without any problem. Since SBC is mandatory in the A2DP
+implementation, I thought about using SBC as the alternate codec.
+Please let me know if I am missing something.
 
-This code can be found here:
-
-http://gitorious.org/~vudentz/bluez/vudentzs-clone/commits/endpoint
-
-This depend on dbus 1.3.1 and latter which will probably only reach
-upstream once we have a dbus 1.4 release.
-
--- 
-Luiz Augusto von Dentz
-Computer Engineer
+Thanks and Regards,
+Madhavi M.
