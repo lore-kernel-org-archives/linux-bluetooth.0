@@ -1,30 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: btmrvl: devices are either BR/EDR or AMPs
+Subject: Re: [PATCH] Bluetooth: Process HCI events in a workqueue instead
+ of a tasklet
 From: Marcel Holtmann <marcel@holtmann.org>
-To: David Vrabel <david.vrabel@csr.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <4C607688.9050608@csr.com>
-References: <4C607688.9050608@csr.com>
+To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1281323213-30907-1-git-send-email-marcel@holtmann.org>
+References: <1281323213-30907-1-git-send-email-marcel@holtmann.org>
 Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 10 Aug 2010 08:13:27 -0400
-Message-ID: <1281442407.12579.207.camel@localhost.localdomain>
+Date: Tue, 10 Aug 2010 08:15:19 -0400
+Message-ID: <1281442519.12579.209.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hi everybody,
 
-> From 5d16a92e61d8457077d0235d6b7006b824ff6891 Mon Sep 17 00:00:00 2001
-> From: David Vrabel <dv02@dv02-laptop.(none)>
-> Date: Mon, 9 Aug 2010 22:39:43 +0100
-> Subject: [PATCH] Bluetooth: btmrvl: devices are either BR/EDR or AMPs
-> 
-> Signed-off-by: David Vrabel <david.vrabel@csr.com>
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  drivers/bluetooth/btmrvl_main.c |    4 ++--
->  1 files changed, 2 insertions(+), 2 deletions(-)
+>  include/net/bluetooth/hci_core.h |    2 +
+>  net/bluetooth/hci_core.c         |   58 ++++++++++++++++++++++++++++++++-----
+>  2 files changed, 52 insertions(+), 8 deletions(-)
 
-I fixed this up in your original patch.
+so I stuffed this now into bluetooth-testing tree and would like to see
+some extra testing exposure. So far this has only been tested by myself.
+
+If there are no regression then this should make a lot of HCI and L2CAP
+handling a lot simpler.
 
 Regards
 
