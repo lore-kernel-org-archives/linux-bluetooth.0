@@ -1,39 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4C616C59.9040401@codeaurora.org>
-Date: Tue, 10 Aug 2010 10:12:25 -0500
-From: David Scherba <dscherba@codeaurora.org>
+Message-ID: <4C6161D7.7070507@csr.com>
+Date: Tue, 10 Aug 2010 15:27:35 +0100
+From: David Vrabel <david.vrabel@csr.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-CC: marcel@holtmann.org, rshaffer@codeaurora.org
-Subject: Re: [PATCH 1/2] Remove non-functional hci_devinfo calls in init_device()
-References: <1281388059-15945-1-git-send-email-dscherba@codeaurora.org> <1281388059-15945-2-git-send-email-dscherba@codeaurora.org> <20100809215149.GA25488@jh-x301>
-In-Reply-To: <20100809215149.GA25488@jh-x301>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Process HCI events in a workqueue instead
+ of a tasklet
+References: <1281323213-30907-1-git-send-email-marcel@holtmann.org>	 <1281442519.12579.209.camel@localhost.localdomain>	 <4C614B01.6030000@csr.com> <1281446085.12579.212.camel@localhost.localdomain>
+In-Reply-To: <1281446085.12579.212.camel@localhost.localdomain>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 8/9/2010 4:51 PM, Johan Hedberg wrote:
+Marcel Holtmann wrote:
+> Hi David,
+> 
+>>>> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+>>>> ---
+>>>>  include/net/bluetooth/hci_core.h |    2 +
+>>>>  net/bluetooth/hci_core.c         |   58 ++++++++++++++++++++++++++++++++-----
+>>>>  2 files changed, 52 insertions(+), 8 deletions(-)
+>>> so I stuffed this now into bluetooth-testing tree and would like to see
+>>> some extra testing exposure. So far this has only been tested by myself.
+>>>
+>>> If there are no regression then this should make a lot of HCI and L2CAP
+>>> handling a lot simple.
+>> This may result in packets being processed in a different order to that 
+>> which they were received in.
+>>
+>> e.g., what happens to an ACL packet processed before the connection 
+>> complete event for that connection?
+> 
+> good point. So we would either a) need to disable the RX tasklet when we
+> receive an event and schedule it for processing or b) process the ACL
+> data also in a workqueue.
 
-> Nice catch, but that's not quite enough:
->
-> plugins/hciops.c: In function ‘init_device’:
-> plugins/hciops.c:178: error: label ‘done’ defined but not used
-> plugins/hciops.c:125: error: unused variable ‘di’
->
-> Always check that your patch compiles cleanly with ./bootstrap-configure
-> before submitting upstream.
+I think my preferred solution would be for the rx function called by the 
+HCI transport drivers to be called in a thread context.  There should be 
+a helper function that is callable in atomic context that queues the 
+packets to be processed in a workqueue.
 
-Johan--
+Our UWB drivers already process packets in a thread so would prefer to 
+avoid another thread context switch.
 
-Thanks for the tips--I had split-up a combined patch and neglected to 
-ensure clean compilation and spacing after the split :-(.
+Shall I prepare a patch?
 
-New patch versions coming your way...
-
-Cheers,
 David
-
 -- 
-David Scherba
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+David Vrabel, Senior Software Engineer, Drivers
+CSR, Churchill House, Cambridge Business Park,  Tel: +44 (0)1223 692562
+Cowley Road, Cambridge, CB4 0WZ                 http://www.csr.com/
+
+
+Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
