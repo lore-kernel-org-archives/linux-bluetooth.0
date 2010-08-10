@@ -6,48 +6,168 @@ Cc: marcel@holtmann.org,
 	rshaffer@codeaurora.org,
 	linux-arm-msm@vger.kernel.org,
 	Mat Martineau <mathewm@codeaurora.org>
-Subject: [PATCH 5/5] Bluetooth: Use a stream-oriented recvmsg with SOCK_STREAM L2CAP sockets.
-Date: Tue, 10 Aug 2010 12:00:50 -0700
-Message-Id: <1281466850-5297-6-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCH 3/5] Bluetooth: Add common code for stream-oriented recvmsg()
+Date: Tue, 10 Aug 2010 12:00:48 -0700
+Message-Id: <1281466850-5297-4-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1281466850-5297-1-git-send-email-mathewm@codeaurora.org>
 References: <1281466850-5297-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-L2CAP ERTM sockets can be opened with the SOCK_STREAM socket type,
-which is a mandatory request for ERTM mode.
+This commit adds a bt_sock_stream_recvmsg() function for use by any
+Bluetooth code that uses SOCK_STREAM sockets.  This code is copied
+from rfcomm_sock_recvmsg() with minimal modifications to remove
+RFCOMM-specific functionality and improve readability.
 
-However, these sockets still have SOCK_SEQPACKET read semantics when
-bt_sock_recvmsg() is used to pull data from the receive queue.  If the
-application is only reading part of a frame, then the unread portion
-of the frame is discarded.  If the application requests more bytes
-than are in the current frame, only the current frame's data is
-returned.
+L2CAP (with the SOCK_STREAM socket type) and RFCOMM have common needs
+when it comes to reading data.  Proper stream read semantics require
+that applications can read from a stream one byte at a time and not
+lose any data.  The RFCOMM code already operated on and pulled data
+from the underlying L2CAP socket, so very few changes were required to
+make the code more generic for use with non-RFCOMM data over L2CAP.
 
-This patch utilizes common code derived from RFCOMM's recvmsg()
-function to make L2CAP SOCK_STREAM reads behave like RFCOMM reads (and
-other SOCK_STREAM sockets in general).  The application may read one
-byte at a time from the input stream and not lose any data, and may
-also read across L2CAP frame boundaries.
+Applications that need more awareness of L2CAP frame boundaries are
+still free to use SOCK_SEQPACKET sockets, and may verify that they
+connection did not fall back to basic mode by calling getsockopt().
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/l2cap.c |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+ include/net/bluetooth/bluetooth.h |    2 +
+ net/bluetooth/af_bluetooth.c      |  109 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 111 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 61aa961..8d362d7 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -1959,6 +1959,9 @@ static int l2cap_sock_recvmsg(struct kiocb *iocb, struct socket *sock, struct ms
- 
- 	release_sock(sk);
- 
-+	if (sock->type == SOCK_STREAM)
-+		return bt_sock_stream_recvmsg(iocb, sock, msg, len, flags);
-+
- 	return bt_sock_recvmsg(iocb, sock, msg, len, flags);
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 27a902d..08b6c2a 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -126,6 +126,8 @@ int  bt_sock_unregister(int proto);
+ void bt_sock_link(struct bt_sock_list *l, struct sock *s);
+ void bt_sock_unlink(struct bt_sock_list *l, struct sock *s);
+ int  bt_sock_recvmsg(struct kiocb *iocb, struct socket *sock, struct msghdr *msg, size_t len, int flags);
++int  bt_sock_stream_recvmsg(struct kiocb *iocb, struct socket *sock,
++			struct msghdr *msg, size_t len, int flags);
+ uint bt_sock_poll(struct file * file, struct socket *sock, poll_table *wait);
+ int  bt_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg);
+ int  bt_sock_wait_state(struct sock *sk, int state, unsigned long timeo);
+diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+index 421c45b..77a26fe 100644
+--- a/net/bluetooth/af_bluetooth.c
++++ b/net/bluetooth/af_bluetooth.c
+@@ -265,6 +265,115 @@ int bt_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
  }
+ EXPORT_SYMBOL(bt_sock_recvmsg);
  
++static long bt_sock_data_wait(struct sock *sk, long timeo)
++{
++	DECLARE_WAITQUEUE(wait, current);
++
++	add_wait_queue(sk_sleep(sk), &wait);
++	for (;;) {
++		set_current_state(TASK_INTERRUPTIBLE);
++
++		if (!skb_queue_empty(&sk->sk_receive_queue))
++			break;
++
++		if (sk->sk_err || (sk->sk_shutdown & RCV_SHUTDOWN))
++			break;
++
++		if (signal_pending(current) || !timeo)
++			break;
++
++		set_bit(SOCK_ASYNC_WAITDATA, &sk->sk_socket->flags);
++		release_sock(sk);
++		timeo = schedule_timeout(timeo);
++		lock_sock(sk);
++		clear_bit(SOCK_ASYNC_WAITDATA, &sk->sk_socket->flags);
++	}
++
++	__set_current_state(TASK_RUNNING);
++	remove_wait_queue(sk_sleep(sk), &wait);
++	return timeo;
++}
++
++int bt_sock_stream_recvmsg(struct kiocb *iocb, struct socket *sock,
++			       struct msghdr *msg, size_t size, int flags)
++{
++	struct sock *sk = sock->sk;
++	int err = 0;
++	size_t target, copied = 0;
++	long timeo;
++
++	if (flags & MSG_OOB)
++		return -EOPNOTSUPP;
++
++	msg->msg_namelen = 0;
++
++	BT_DBG("sk %p size %zu", sk, size);
++
++	lock_sock(sk);
++
++	target = sock_rcvlowat(sk, flags & MSG_WAITALL, size);
++	timeo  = sock_rcvtimeo(sk, flags & MSG_DONTWAIT);
++
++	do {
++		struct sk_buff *skb;
++		int chunk;
++
++		skb = skb_dequeue(&sk->sk_receive_queue);
++		if (!skb) {
++			if (copied >= target)
++				break;
++
++			if ((err = sock_error(sk)) != 0)
++				break;
++			if (sk->sk_shutdown & RCV_SHUTDOWN)
++				break;
++
++			err = -EAGAIN;
++			if (!timeo)
++				break;
++
++			timeo = bt_sock_data_wait(sk, timeo);
++
++			if (signal_pending(current)) {
++				err = sock_intr_errno(timeo);
++				goto out;
++			}
++			continue;
++		}
++
++		chunk = min_t(unsigned int, skb->len, size);
++		if (memcpy_toiovec(msg->msg_iov, skb->data, chunk)) {
++			skb_queue_head(&sk->sk_receive_queue, skb);
++			if (!copied)
++				copied = -EFAULT;
++			break;
++		}
++		copied += chunk;
++		size   -= chunk;
++
++		sock_recv_ts_and_drops(msg, sk, skb);
++
++		if (!(flags & MSG_PEEK)) {
++			skb_pull(skb, chunk);
++			if (skb->len) {
++				skb_queue_head(&sk->sk_receive_queue, skb);
++				break;
++			}
++			kfree_skb(skb);
++
++		} else {
++			/* put message back and return */
++			skb_queue_head(&sk->sk_receive_queue, skb);
++			break;
++		}
++	} while (size);
++
++out:
++	release_sock(sk);
++	return copied ? : err;
++}
++EXPORT_SYMBOL(bt_sock_stream_recvmsg);
++
+ static inline unsigned int bt_accept_poll(struct sock *parent)
+ {
+ 	struct list_head *p, *n;
 -- 
 1.7.1
 
