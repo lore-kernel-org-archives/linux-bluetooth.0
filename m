@@ -1,46 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <gfpadovan@gmail.com>
-Date: Tue, 10 Aug 2010 18:57:37 -0300
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	rshaffer@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [RFC 1/7] Bluetooth: Calculate L2CAP FCS on fragmented skbuffs.
-Message-ID: <20100810215737.GA3203@vigoh>
-References: <1281467704-5378-1-git-send-email-mathewm@codeaurora.org>
- <1281467704-5378-2-git-send-email-mathewm@codeaurora.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1281467704-5378-2-git-send-email-mathewm@codeaurora.org>
+Subject: Re: [PATCH] Bluetooth: Process HCI events in a workqueue instead
+ of a tasklet
+From: Marcel Holtmann <marcel@holtmann.org>
+To: David Vrabel <david.vrabel@csr.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <4C6161D7.7070507@csr.com>
+References: <1281323213-30907-1-git-send-email-marcel@holtmann.org>
+	 <1281442519.12579.209.camel@localhost.localdomain>
+	 <4C614B01.6030000@csr.com>
+	 <1281446085.12579.212.camel@localhost.localdomain>
+	 <4C6161D7.7070507@csr.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Tue, 10 Aug 2010 17:41:35 -0400
+Message-ID: <1281476495.12579.232.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Hi David,
 
-* Mat Martineau <mathewm@codeaurora.org> [2010-08-10 12:14:58 -0700]:
-
-> When L2CAP PDUs are longer than the HCI MTU, they are stored in
-> fragmented skbuffs.  This adds a function to calculate the FCS
-> on any skbuff (fragmented or not), and replaces direct calls
-> to crc16 with calls to the new apply_fcs() function.
+> >>>> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> >>>> ---
+> >>>>  include/net/bluetooth/hci_core.h |    2 +
+> >>>>  net/bluetooth/hci_core.c         |   58 ++++++++++++++++++++++++++++++++-----
+> >>>>  2 files changed, 52 insertions(+), 8 deletions(-)
+> >>> so I stuffed this now into bluetooth-testing tree and would like to see
+> >>> some extra testing exposure. So far this has only been tested by myself.
+> >>>
+> >>> If there are no regression then this should make a lot of HCI and L2CAP
+> >>> handling a lot simple.
+> >> This may result in packets being processed in a different order to that 
+> >> which they were received in.
+> >>
+> >> e.g., what happens to an ACL packet processed before the connection 
+> >> complete event for that connection?
+> > 
+> > good point. So we would either a) need to disable the RX tasklet when we
+> > receive an event and schedule it for processing or b) process the ACL
+> > data also in a workqueue.
 > 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> ---
->  net/bluetooth/l2cap.c |   57 ++++++++++++++++++++++++++++++++----------------
->  1 files changed, 38 insertions(+), 19 deletions(-)
+> I think my preferred solution would be for the rx function called by the 
+> HCI transport drivers to be called in a thread context.  There should be 
+> a helper function that is callable in atomic context that queues the 
+> packets to be processed in a workqueue.
 > 
-> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-> index 8d362d7..5e78c18 100644
-> --- a/net/bluetooth/l2cap.c
-> +++ b/net/bluetooth/l2cap.c
-> @@ -351,6 +351,33 @@ static inline u8 l2cap_get_ident(struct l2cap_conn *conn)
->  	return id;
->  }
->  
-> +static void apply_fcs(struct sk_buff *skb)
+> Our UWB drivers already process packets in a thread so would prefer to 
+> avoid another thread context switch.
+> 
+> Shall I prepare a patch?
 
-I would call this l2cap_apply_fcs().
+yes please. I need something to make the event handling simpler.
+Otherwise every single subcomponent creates "hundreds" of workqueues to
+solve exactly the same problem.
+
+Regards
+
+Marcel
 
 
--- 
-Gustavo F. Padovan
-http://padovan.org
