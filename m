@@ -1,57 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: Process HCI events in a workqueue instead
- of a tasklet
+Subject: Re: [RFC 2/7] Bluetooth: Use enhanced L2CAP header structure and
+ symbolic values.
 From: Marcel Holtmann <marcel@holtmann.org>
-To: David Vrabel <david.vrabel@csr.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <4C6161D7.7070507@csr.com>
-References: <1281323213-30907-1-git-send-email-marcel@holtmann.org>
-	 <1281442519.12579.209.camel@localhost.localdomain>
-	 <4C614B01.6030000@csr.com>
-	 <1281446085.12579.212.camel@localhost.localdomain>
-	 <4C6161D7.7070507@csr.com>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
+	rshaffer@codeaurora.org, linux-arm-msm@vger.kernel.org
+In-Reply-To: <1281467704-5378-3-git-send-email-mathewm@codeaurora.org>
+References: <1281467704-5378-1-git-send-email-mathewm@codeaurora.org>
+	 <1281467704-5378-3-git-send-email-mathewm@codeaurora.org>
 Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 10 Aug 2010 17:41:35 -0400
-Message-ID: <1281476495.12579.232.camel@localhost.localdomain>
+Date: Tue, 10 Aug 2010 17:39:17 -0400
+Message-ID: <1281476357.12579.230.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hi Mat,
 
-> >>>> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> >>>> ---
-> >>>>  include/net/bluetooth/hci_core.h |    2 +
-> >>>>  net/bluetooth/hci_core.c         |   58 ++++++++++++++++++++++++++++++++-----
-> >>>>  2 files changed, 52 insertions(+), 8 deletions(-)
-> >>> so I stuffed this now into bluetooth-testing tree and would like to see
-> >>> some extra testing exposure. So far this has only been tested by myself.
-> >>>
-> >>> If there are no regression then this should make a lot of HCI and L2CAP
-> >>> handling a lot simple.
-> >> This may result in packets being processed in a different order to that 
-> >> which they were received in.
-> >>
-> >> e.g., what happens to an ACL packet processed before the connection 
-> >> complete event for that connection?
-> > 
-> > good point. So we would either a) need to disable the RX tasklet when we
-> > receive an event and schedule it for processing or b) process the ACL
-> > data also in a workqueue.
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> ---
+>  net/bluetooth/l2cap.c |   23 +++++++++++++----------
+>  1 files changed, 13 insertions(+), 10 deletions(-)
 > 
-> I think my preferred solution would be for the rx function called by the 
-> HCI transport drivers to be called in a thread context.  There should be 
-> a helper function that is callable in atomic context that queues the 
-> packets to be processed in a workqueue.
-> 
-> Our UWB drivers already process packets in a thread so would prefer to 
-> avoid another thread context switch.
-> 
-> Shall I prepare a patch?
+> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> index 5e78c18..aa69c84 100644
+> --- a/net/bluetooth/l2cap.c
+> +++ b/net/bluetooth/l2cap.c
+> @@ -1753,33 +1753,36 @@ static struct sk_buff *l2cap_create_iframe_pdu(struct sock *sk, struct msghdr *m
+>  {
+>  	struct l2cap_conn *conn = l2cap_pi(sk)->conn;
+>  	struct sk_buff *skb;
+> -	int err, count, hlen = L2CAP_HDR_SIZE + 2;
+> -	struct l2cap_hdr *lh;
+> +	int err, count, hlen = L2CAP_ENHANCED_HDR_SIZE;
+> +	struct l2cap_enhanced_hdr *lh;
 
-yes please. I need something to make the event handling simpler.
-Otherwise every single subcomponent creates "hundreds" of workqueues to
-solve exactly the same problem.
+so where is that patch that actually introduces L2CAP_ENHANCED_HDR_SIZE
+etc. I can't see that.
 
 Regards
 
