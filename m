@@ -4,31 +4,54 @@ To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	gustavo@padovan.org,
 	rshaffer@codeaurora.org,
-	linux-arm-msm@vger.kernel.org
-Subject: [RFC 0/7] L2CAP fragmentation changes
-Date: Tue, 10 Aug 2010 12:14:57 -0700
-Message-Id: <1281467704-5378-1-git-send-email-mathewm@codeaurora.org>
+	linux-arm-msm@vger.kernel.org,
+	Mat Martineau <mathewm@codeaurora.org>
+Subject: [PATCH 5/5] Bluetooth: Use a stream-oriented recvmsg with SOCK_STREAM L2CAP sockets.
+Date: Tue, 10 Aug 2010 12:00:50 -0700
+Message-Id: <1281466850-5297-6-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <1281466850-5297-1-git-send-email-mathewm@codeaurora.org>
+References: <1281466850-5297-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since the previous L2CAP patch set has not been fully merged, I'm only
-posting these patches for review at this time.
+L2CAP ERTM sockets can be opened with the SOCK_STREAM socket type,
+which is a mandatory request for ERTM mode.
 
-ERTM and streaming mode currently have a limitation where the
-trasmitted PDU size cannot exceed the HCI MTU.  This is a problem with
-some basebands with small HCI MTU values (some are around 300 bytes),
-since it is not possible to use larger BR/EDR packets over the air
-when the PDUs are too small.  Bandwidth is also wasted with extra
-L2CAP header overhead.  Patches 1-3 add the capability to calculate
-checksums on PDUs that have HCI continuation fragments.
+However, these sockets still have SOCK_SEQPACKET read semantics when
+bt_sock_recvmsg() is used to pull data from the receive queue.  If the
+application is only reading part of a frame, then the unread portion
+of the frame is discarded.  If the application requests more bytes
+than are in the current frame, only the current frame's data is
+returned.
 
-Patches 4-6 change the way ERTM PDUs are reassembled, to avoid 
-extra data copying at receive time.  At higher AMP data rates,
-this efficiency improvement becomes more important.  Each PDU
-is linked together using skbuff fragments, similar to the way
-outgoing data uses skbuff frag_lists for HCI continuations.  This 
-way, L2CAP must only copy the data to a linear buffer when it
-is copied out to userspace.
+This patch utilizes common code derived from RFCOMM's recvmsg()
+function to make L2CAP SOCK_STREAM reads behave like RFCOMM reads (and
+other SOCK_STREAM sockets in general).  The application may read one
+byte at a time from the input stream and not lose any data, and may
+also read across L2CAP frame boundaries.
 
-Patch 7 changes the max PDU size configuration to allow larger PDU
-sizes to be set up, enabling ERTM and streaming mode to send larger
-PDUs.
+Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+---
+ net/bluetooth/l2cap.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
+
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index 61aa961..8d362d7 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -1959,6 +1959,9 @@ static int l2cap_sock_recvmsg(struct kiocb *iocb, struct socket *sock, struct ms
+ 
+ 	release_sock(sk);
+ 
++	if (sock->type == SOCK_STREAM)
++		return bt_sock_stream_recvmsg(iocb, sock, msg, len, flags);
++
+ 	return bt_sock_recvmsg(iocb, sock, msg, len, flags);
+ }
+ 
+-- 
+1.7.1
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
