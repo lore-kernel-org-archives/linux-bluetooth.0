@@ -1,37 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 10 Aug 2010 15:16:16 -0400
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: David Scherba <dscherba@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	rshaffer@codeaurora.org
-Subject: Re: [PATCH 2/2] Use HCI device type to gate BR/EDR-specific HCI
- commands
-Message-ID: <20100810191616.GA26091@jh-x301>
-References: <4C6173CA.8060308@codeaurora.org>
- <1281455145-1777-1-git-send-email-dscherba@codeaurora.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1281455145-1777-1-git-send-email-dscherba@codeaurora.org>
+From: Mat Martineau <mathewm@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org,
+	gustavo@padovan.org,
+	rshaffer@codeaurora.org,
+	linux-arm-msm@vger.kernel.org,
+	Mat Martineau <mathewm@codeaurora.org>
+Subject: [RFC 7/7] Bluetooth: Do not limit enhanced L2CAP max PDU size to HCI MTU.
+Date: Tue, 10 Aug 2010 12:15:04 -0700
+Message-Id: <1281467704-5378-8-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <1281467704-5378-1-git-send-email-mathewm@codeaurora.org>
+References: <1281467704-5378-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+HCI MTU and PDU size have no relationship, since ERTM and streaming PDUs
+can be fragmented over HCI just like other L2CAP frames.  The only
+applicable limit for PDU size is the L2CAP MTU, which is now checked
+during L2CAP configuration.
 
-On Tue, Aug 10, 2010, David Scherba wrote:
-> --- a/lib/hci_lib.h
-> +++ b/lib/hci_lib.h
-> @@ -169,6 +169,11 @@ static inline int hci_test_bit(int nr, void *addr)
->  	return *((uint32_t *) addr + (nr >> 5)) & (1 << (nr & 31));
->  }
->  
-> +static inline int ignore_device(struct hci_dev_info *di)
-> +{
-> +	return hci_test_bit(HCI_RAW, &di->flags) || di->type >> 4 != HCI_BREDR;
-> +}
+Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+---
+ net/bluetooth/l2cap.c |   16 ++++++++--------
+ 1 files changed, 8 insertions(+), 8 deletions(-)
 
-Since this is hci_lib.h (something I didn't realize in the previous
-review) the function should follow the same namespace as all other
-functions in the header file, i.e. hci_*. However, does the function
-really need to be exported in this public library header file, i.e.
-isn't there some private header file that could be used instead?
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index 0212035..15fbb1d 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -2621,8 +2621,8 @@ done:
+ 		rfc.retrans_timeout = 0;
+ 		rfc.monitor_timeout = 0;
+ 		rfc.max_pdu_size    = cpu_to_le16(L2CAP_DEFAULT_MAX_PDU_SIZE);
+-		if (L2CAP_DEFAULT_MAX_PDU_SIZE > pi->conn->mtu - 10)
+-			rfc.max_pdu_size = cpu_to_le16(pi->conn->mtu - 10);
++		if (L2CAP_DEFAULT_MAX_PDU_SIZE > pi->imtu)
++			rfc.max_pdu_size = cpu_to_le16(pi->imtu);
+ 
+ 		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
+ 							(unsigned long) &rfc);
+@@ -2644,8 +2644,8 @@ done:
+ 		rfc.retrans_timeout = 0;
+ 		rfc.monitor_timeout = 0;
+ 		rfc.max_pdu_size    = cpu_to_le16(L2CAP_DEFAULT_MAX_PDU_SIZE);
+-		if (L2CAP_DEFAULT_MAX_PDU_SIZE > pi->conn->mtu - 10)
+-			rfc.max_pdu_size = cpu_to_le16(pi->conn->mtu - 10);
++		if (L2CAP_DEFAULT_MAX_PDU_SIZE > pi->imtu)
++			rfc.max_pdu_size = cpu_to_le16(pi->imtu);
+ 
+ 		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
+ 							(unsigned long) &rfc);
+@@ -2778,8 +2778,8 @@ done:
+ 			pi->remote_tx_win = rfc.txwin_size;
+ 			pi->remote_max_tx = rfc.max_transmit;
+ 
+-			if (le16_to_cpu(rfc.max_pdu_size) > pi->conn->mtu - 10)
+-				rfc.max_pdu_size = cpu_to_le16(pi->conn->mtu - 10);
++			if (le16_to_cpu(rfc.max_pdu_size) > pi->omtu)
++				rfc.max_pdu_size = cpu_to_le16(pi->omtu);
+ 
+ 			pi->remote_mps = le16_to_cpu(rfc.max_pdu_size);
+ 
+@@ -2796,8 +2796,8 @@ done:
+ 			break;
+ 
+ 		case L2CAP_MODE_STREAMING:
+-			if (le16_to_cpu(rfc.max_pdu_size) > pi->conn->mtu - 10)
+-				rfc.max_pdu_size = cpu_to_le16(pi->conn->mtu - 10);
++			if (le16_to_cpu(rfc.max_pdu_size) > pi->omtu)
++				rfc.max_pdu_size = cpu_to_le16(pi->omtu);
+ 
+ 			pi->remote_mps = le16_to_cpu(rfc.max_pdu_size);
+ 
+-- 
+1.7.1
 
-Johan
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
