@@ -1,208 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
-From: suraj Sumangala <suraj@atheros.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <Jothikumar.Mothilal@Atheros.com>,
-	suraj Sumangala <suraj@atheros.com>
-Subject: [RFC] Bluetooth: Option to enable power management from host
-Date: Wed, 11 Aug 2010 10:16:15 +0530
-Message-ID: <1281501975-14425-1-git-send-email-suraj@atheros.com>
+Sender: "Gustavo F. Padovan" <gfpadovan@gmail.com>
+Date: Wed, 11 Aug 2010 01:25:43 -0300
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+	rshaffer@codeaurora.org, linux-arm-msm@vger.kernel.org
+Subject: Re: [RFC 5/7] Bluetooth: Handle fragmented skbs in
+ bt_sock_stream_recvmsg()
+Message-ID: <20100811042543.GA9428@vigoh>
+References: <1281467704-5378-1-git-send-email-mathewm@codeaurora.org>
+ <1281467704-5378-6-git-send-email-mathewm@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1281467704-5378-6-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This provides a new option to enable advanced power management from
-Host. This option by default will be disabled for existing devices.
+Hi Mat,
 
----
- tools/hciattach.8 |   12 +++++++
- tools/hciattach.c |   88 ++++++++++++++++++++++++++++++++++++++---------------
- 2 files changed, 75 insertions(+), 25 deletions(-)
+* Mat Martineau <mathewm@codeaurora.org> [2010-08-10 12:15:02 -0700]:
 
-diff --git a/tools/hciattach.8 b/tools/hciattach.8
-index 9bd1538..1375905 100644
---- a/tools/hciattach.8
-+++ b/tools/hciattach.8
-@@ -122,7 +122,19 @@ the serial link (
- set by default. To force no flow control use
- .B noflow
- instead.
-+.TP
-+.I sleep
-+If the keyword
-+.I sleep
-+is appended to the list of options then power management is enabled
-+on the controller. All above mentioned device types have
-+.B nosleep
-+set by default. To enable this feature use
-+.B sleep
-+instead.
- 
-+Note: This option will only be valid for hardware which support
-+this feature.
- .TP
- .I bdaddr
- The
-diff --git a/tools/hciattach.c b/tools/hciattach.c
-index 81aea7b..8616899 100644
---- a/tools/hciattach.c
-+++ b/tools/hciattach.c
-@@ -63,12 +63,15 @@ struct uart_t {
- 	int  init_speed;
- 	int  speed;
- 	int  flags;
-+	int  pm;
- 	char *bdaddr;
- 	int  (*init) (int fd, struct uart_t *u, struct termios *ti);
- 	int  (*post) (int fd, struct uart_t *u, struct termios *ti);
- };
- 
- #define FLOW_CTL	0x0001
-+#define ENABLE_PM	1
-+#define DISABLE_PM	0
- 
- static volatile sig_atomic_t __io_canceled = 0;
- 
-@@ -1006,72 +1009,100 @@ static int bcm2035(int fd, struct uart_t *u, struct termios *ti)
- }
- 
- struct uart_t uart[] = {
--	{ "any",        0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, NULL     },
--	{ "ericsson",   0x0000, 0x0000, HCI_UART_H4,   57600,  115200, FLOW_CTL, NULL, ericsson },
--	{ "digi",       0x0000, 0x0000, HCI_UART_H4,   9600,   115200, FLOW_CTL, NULL, digi     },
-+	{ "any",        0x0000, 0x0000, HCI_UART_H4,   115200, 115200,
-+				FLOW_CTL, DISABLE_PM, NULL, NULL     },
- 
--	{ "bcsp",       0x0000, 0x0000, HCI_UART_BCSP, 115200, 115200, 0,        NULL, bcsp     },
-+	{ "ericsson",   0x0000, 0x0000, HCI_UART_H4,   57600,  115200,
-+				FLOW_CTL, DISABLE_PM, NULL, ericsson },
-+
-+	{ "digi",       0x0000, 0x0000, HCI_UART_H4,   9600,   115200,
-+				FLOW_CTL, DISABLE_PM, NULL, digi     },
-+
-+	{ "bcsp",       0x0000, 0x0000, HCI_UART_BCSP, 115200, 115200,
-+				0, DISABLE_PM, NULL, bcsp     },
- 
- 	/* Xircom PCMCIA cards: Credit Card Adapter and Real Port Adapter */
--	{ "xircom",     0x0105, 0x080a, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, NULL     },
-+	{ "xircom",     0x0105, 0x080a, HCI_UART_H4,   115200, 115200,
-+				FLOW_CTL, DISABLE_PM,  NULL, NULL     },
- 
- 	/* CSR Casira serial adapter or BrainBoxes serial dongle (BL642) */
--	{ "csr",        0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, csr      },
-+	{ "csr",        0x0000, 0x0000, HCI_UART_H4,   115200, 115200,
-+				FLOW_CTL, DISABLE_PM, NULL, csr      },
- 
- 	/* BrainBoxes PCMCIA card (BL620) */
--	{ "bboxes",     0x0160, 0x0002, HCI_UART_H4,   115200, 460800, FLOW_CTL, NULL, csr      },
-+	{ "bboxes",     0x0160, 0x0002, HCI_UART_H4,   115200, 460800,
-+				FLOW_CTL, DISABLE_PM, NULL, csr      },
- 
- 	/* Silicon Wave kits */
--	{ "swave",      0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, swave    },
-+	{ "swave",      0x0000, 0x0000, HCI_UART_H4,   115200, 115200,
-+				FLOW_CTL, DISABLE_PM, NULL, swave    },
- 
- 	/* Texas Instruments Bluelink (BRF) modules */
--	{ "texas",      0x0000, 0x0000, HCI_UART_LL,   115200, 115200, FLOW_CTL, NULL, texas,    texas2 },
--	{ "texasalt",   0x0000, 0x0000, HCI_UART_LL,   115200, 115200, FLOW_CTL, NULL, texasalt, NULL   },
-+	{ "texas",      0x0000, 0x0000, HCI_UART_LL,   115200, 115200,
-+				FLOW_CTL, DISABLE_PM, NULL, texas,    texas2 },
-+
-+	{ "texasalt",   0x0000, 0x0000, HCI_UART_LL,   115200, 115200,
-+				FLOW_CTL, DISABLE_PM, NULL, texasalt, NULL   },
- 
- 	/* ST Microelectronics minikits based on STLC2410/STLC2415 */
--	{ "st",         0x0000, 0x0000, HCI_UART_H4,    57600, 115200, FLOW_CTL, NULL, st       },
-+	{ "st",         0x0000, 0x0000, HCI_UART_H4,    57600, 115200,
-+				FLOW_CTL, DISABLE_PM,  NULL, st       },
- 
- 	/* ST Microelectronics minikits based on STLC2500 */
--	{ "stlc2500",   0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, "00:80:E1:00:AB:BA", stlc2500 },
-+	{ "stlc2500",   0x0000, 0x0000, HCI_UART_H4, 115200, 115200,
-+			FLOW_CTL, DISABLE_PM, "00:80:E1:00:AB:BA", stlc2500 },
- 
- 	/* Philips generic Ericsson IP core based */
--	{ "philips",    0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, NULL     },
-+	{ "philips",    0x0000, 0x0000, HCI_UART_H4,   115200, 115200,
-+				FLOW_CTL, DISABLE_PM, NULL, NULL     },
- 
- 	/* Philips BGB2xx Module */
--	{ "bgb2xx",    0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, "BD:B2:10:00:AB:BA", bgb2xx },
-+	{ "bgb2xx",    0x0000, 0x0000, HCI_UART_H4,   115200, 115200,
-+			FLOW_CTL, DISABLE_PM, "BD:B2:10:00:AB:BA", bgb2xx },
- 
- 	/* Sphinx Electronics PICO Card */
--	{ "picocard",   0x025e, 0x1000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, NULL     },
-+	{ "picocard",   0x025e, 0x1000, HCI_UART_H4, 115200, 115200,
-+				FLOW_CTL, DISABLE_PM, NULL, NULL     },
- 
- 	/* Inventel BlueBird Module */
--	{ "inventel",   0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, NULL     },
-+	{ "inventel",   0x0000, 0x0000, HCI_UART_H4, 115200, 115200,
-+				FLOW_CTL, DISABLE_PM, NULL, NULL     },
- 
- 	/* COM One Platinium Bluetooth PC Card */
--	{ "comone",     0xffff, 0x0101, HCI_UART_BCSP, 115200, 115200, 0,        NULL, bcsp     },
-+	{ "comone",     0xffff, 0x0101, HCI_UART_BCSP, 115200, 115200,
-+				0, DISABLE_PM,  NULL, bcsp     },
- 
- 	/* TDK Bluetooth PC Card and IBM Bluetooth PC Card II */
--	{ "tdk",        0x0105, 0x4254, HCI_UART_BCSP, 115200, 115200, 0,        NULL, bcsp     },
-+	{ "tdk",        0x0105, 0x4254, HCI_UART_BCSP, 115200, 115200,
-+				0, DISABLE_PM, NULL, bcsp     },
- 
- 	/* Socket Bluetooth CF Card (Rev G) */
--	{ "socket",     0x0104, 0x0096, HCI_UART_BCSP, 230400, 230400, 0,        NULL, bcsp     },
-+	{ "socket",     0x0104, 0x0096, HCI_UART_BCSP, 230400, 230400,
-+				0, DISABLE_PM, NULL, bcsp     },
- 
- 	/* 3Com Bluetooth Card (Version 3.0) */
--	{ "3com",       0x0101, 0x0041, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, csr      },
-+	{ "3com",       0x0101, 0x0041, HCI_UART_H4,   115200, 115200,
-+				FLOW_CTL, DISABLE_PM, NULL, csr      },
- 
- 	/* AmbiCom BT2000C Bluetooth PC/CF Card */
--	{ "bt2000c",    0x022d, 0x2000, HCI_UART_H4,    57600, 460800, FLOW_CTL, NULL, csr      },
-+	{ "bt2000c",    0x022d, 0x2000, HCI_UART_H4,    57600, 460800,
-+				FLOW_CTL, DISABLE_PM, NULL, csr      },
- 
- 	/* Zoom Bluetooth PCMCIA Card */
--	{ "zoom",       0x0279, 0x950b, HCI_UART_BCSP, 115200, 115200, 0,        NULL, bcsp     },
-+	{ "zoom",       0x0279, 0x950b, HCI_UART_BCSP, 115200, 115200,
-+				0, DISABLE_PM, NULL, bcsp     },
- 
- 	/* Sitecom CN-504 PCMCIA Card */
--	{ "sitecom",    0x0279, 0x950b, HCI_UART_BCSP, 115200, 115200, 0,        NULL, bcsp     },
-+	{ "sitecom",    0x0279, 0x950b, HCI_UART_BCSP, 115200, 115200,
-+				0, DISABLE_PM, NULL, bcsp     },
- 
- 	/* Billionton PCBTC1 PCMCIA Card */
--	{ "billionton", 0x0279, 0x950b, HCI_UART_BCSP, 115200, 115200, 0,        NULL, bcsp     },
-+	{ "billionton", 0x0279, 0x950b, HCI_UART_BCSP, 115200, 115200,
-+				0, DISABLE_PM, NULL, bcsp     },
- 
- 	/* Broadcom BCM2035 */
--	{ "bcm2035",    0x0A5C, 0x2035, HCI_UART_H4,   115200, 460800, FLOW_CTL, NULL, bcm2035  },
-+	{ "bcm2035",    0x0A5C, 0x2035, HCI_UART_H4,   115200, 460800,
-+				FLOW_CTL, DISABLE_PM, NULL, bcm2035  },
- 
- 	{ NULL, 0 }
- };
-@@ -1290,6 +1321,13 @@ int main(int argc, char *argv[])
- 			break;
- 
- 		case 4:
-+			if (!strcmp("sleep", argv[optind]))
-+				u->pm = ENABLE_PM;
-+			else
-+				u->pm = DISABLE_PM;
-+			break;
-+
-+		case 5:
- 			u->bdaddr = argv[optind];
- 			break;
- 		}
+> When reading L2CAP skbuffs, add the ability to copy from
+> fragmented skbuffs generated during ERTM or streaming mode
+> reassembly.  This defers extra copying of L2CAP payloads
+> until the final, unavoidable copy to userspace.
+> 
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> ---
+>  net/bluetooth/af_bluetooth.c |   30 ++++++++++++++++++++++++++++--
+>  1 files changed, 28 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+> index 77a26fe..5e0375b 100644
+> --- a/net/bluetooth/af_bluetooth.c
+> +++ b/net/bluetooth/af_bluetooth.c
+> @@ -342,7 +342,7 @@ int bt_sock_stream_recvmsg(struct kiocb *iocb, struct socket *sock,
+>  		}
+>  
+>  		chunk = min_t(unsigned int, skb->len, size);
+> -		if (memcpy_toiovec(msg->msg_iov, skb->data, chunk)) {
+> +		if (skb_copy_datagram_iovec(skb, 0, msg->msg_iov, chunk)) {
+>  			skb_queue_head(&sk->sk_receive_queue, skb);
+>  			if (!copied)
+>  				copied = -EFAULT;
+> @@ -354,7 +354,33 @@ int bt_sock_stream_recvmsg(struct kiocb *iocb, struct socket *sock,
+>  		sock_recv_ts_and_drops(msg, sk, skb);
+>  
+>  		if (!(flags & MSG_PEEK)) {
+> -			skb_pull(skb, chunk);
+> +			int skb_len = skb_headlen(skb);
+
+Why are you using the header length here?
+
+> +
+> +			if (chunk <= skb_len) {
+> +				__skb_pull(skb, chunk);
+> +			} else {
+> +				struct sk_buff *frag;
+> +
+> +				__skb_pull(skb, skb_len);
+> +				chunk -= skb_len;
+
+Why do we have this __skb_pull() here? I think skb_walk_frags() can
+handle everything.
+
+> +
+> +				skb_walk_frags(skb, frag) {
+> +					if (chunk <= frag->len) {
+> +						/* Pulling partial data */
+> +						skb->len -= chunk;
+> +						skb->data_len -= chunk;
+> +						__skb_pull(frag, chunk);
+> +						break;
+
+If we break here what will happen whit the rest of the data to be
+pulled.
+
+> +					} else if (frag->len) {
+> +						/* Pulling all frag data */
+> +						chunk -= frag->len;
+> +						skb->len -= frag->len;
+> +						skb->data_len -= frag->len;
+> +						__skb_pull(frag, frag->len);
+> +					}
+> +				}
+> +			}
+> +
+>  			if (skb->len) {
+>  				skb_queue_head(&sk->sk_receive_queue, skb);
+>  				break;
+> -- 
+> 1.7.1
+> 
+> --
+> Mat Martineau
+> Employee of Qualcomm Innovation Center, Inc.
+> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+
 -- 
-1.7.0.4
-
+Gustavo F. Padovan
+http://padovan.org
