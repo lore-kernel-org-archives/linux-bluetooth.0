@@ -1,197 +1,133 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 10 Aug 2010 19:55:34 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: "Gustavo F. Padovan" <gustavo@padovan.org>
-cc: Ron Shaffer <rshaffer@codeaurora.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: QuiC AMP development
-In-Reply-To: <20100810220238.GB3203@vigoh>
-Message-ID: <alpine.DEB.2.00.1008101925000.6276@linux-sea-02>
-References: <4C5F6B58.6000702@codeaurora.org> <20100810220238.GB3203@vigoh>
+Message-ID: <4C620A8A.9030707@codeaurora.org>
+Date: Tue, 10 Aug 2010 22:27:22 -0400
+From: Ron Shaffer <rshaffer@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com
+Subject: Re: patch for firmware download to Qualcomm Bluetooth chip
+References: <4C619FA6.8030606@codeaurora.org> <1281474848.12579.218.camel@localhost.localdomain>
+In-Reply-To: <1281474848.12579.218.camel@localhost.localdomain>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
-Gustavo -
-
-On Tue, 10 Aug 2010, Gustavo F. Padovan wrote:
-
-> Hi all,
->
-> * Ron Shaffer <rshaffer@codeaurora.org> [2010-08-08 21:43:36 -0500]:
->
->> As requested in today's summit discussions, here's a link that can be
->> used to inspect the code we've done to add AMP support on the latest
->> next tree.
+On 8/10/2010 5:14 PM, Marcel Holtmann wrote:
+> Hi Ron,
+> 
+>> Here's the a ping regarding the patch submitted by Matt back in March? I
+>> believe. For you convenience I've included the patch again. Please take
+>> a look, and provide your general comments. I'm sure there are changes
+>> that need to be made.
 >>
->> https://www.codeaurora.org/gitweb/quic/bluetooth/?p=bluetooth-next-2.6.git;a=summary
->> branch pk-upstream
->
->
-> I'll put here some comments I have about some L2CAP patches:
+>> Fyi. sorry about the column wrap in the patch. Don't feel like fixing it
+>> for just a quick review.
+>>
+>> From 76d0bdd82a0a4e5b3b9544bb864c31888f20cea1 Mon Sep 17 00:00:00 2001
+>> From: Wilson, Matt <mtwilson@codeaurora.org>
+>> Date: Thu, 11 Feb 2010 11:53:29 -0600
+>> Subject: [PATCH] Firmware download for Qualcomm Bluetooth devices
+>>
+>> ---
+>>  Makefile.tools             |    3 +-
+>>  tools/hciattach.c          |    9 ++
+>>  tools/hciattach.h          |    4 +
+>>  tools/hciattach_qualcomm.c |  279
+>> ++++++++++++++++++++++++++++++++++++++++++++
+>>  4 files changed, 294 insertions(+), 1 deletions(-)
+>>  create mode 100644 tools/hciattach_qualcomm.c
+>>
+>> diff --git a/Makefile.tools b/Makefile.tools
+>> index 2735d68..7b92c8f 100644
+>> --- a/Makefile.tools
+>> +++ b/Makefile.tools
+>> @@ -23,7 +23,8 @@ tools_l2ping_LDADD = lib/libbluetooth.la
+>>  tools_hciattach_SOURCES = tools/hciattach.c tools/hciattach.h \
+>>  						tools/hciattach_st.c \
+>>  						tools/hciattach_ti.c \
+>> -						tools/hciattach_tialt.c
+>> +						tools/hciattach_tialt.c \
+>> +						tools/hciattach_qualcomm.c
+>>  tools_hciattach_LDADD = lib/libbluetooth.la
+>>
+>>  tools_hciconfig_SOURCES = tools/hciconfig.c tools/csr.h tools/csr.c \
+>> diff --git a/tools/hciattach.c b/tools/hciattach.c
+>> index 364c5ff..d6aafbe 100644
+>> --- a/tools/hciattach.c
+>> +++ b/tools/hciattach.c
+>> @@ -5,6 +5,7 @@
+>>   *  Copyright (C) 2000-2001  Qualcomm Incorporated
+>>   *  Copyright (C) 2002-2003  Maxim Krasnyansky <maxk@qualcomm.com>
+>>   *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
+>> + *  Copyright (C) 2010, Code Aurora Forum. All rights reserved.
+>>   *
+>>   *
+>>   *  This program is free software; you can redistribute it and/or modify
+>> @@ -299,6 +300,11 @@ static int texasalt(int fd, struct uart_t *u, struct
+>> termios *ti)
+>>  	return texasalt_init(fd, u->speed, ti);
+>>  }
+>>
+>> +static int qualcomm(int fd, struct uart_t *u, struct termios *ti)
+>> +{
+>> +	return qualcomm_init(fd, u->speed, ti, u->bdaddr);
+>> +}
+>> +
+>>  static int read_check(int fd, void *buf, int count)
+>>  {
+>>  	int res;
+>> @@ -1071,6 +1077,9 @@ struct uart_t uart[] = {
+>>  	/* Broadcom BCM2035 */
+>>  	{ "bcm2035",    0x0A5C, 0x2035, HCI_UART_H4,   115200, 460800, FLOW_CTL,
+>> NULL, bcm2035  },
+>>
+>> +	/* QUALCOMM BTS */
+>> +	{ "qualcomm",   0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL,
+>> NULL, qualcomm },
+>> +
+>>  	{ NULL, 0 }
+>>  };
+>>
+>> diff --git a/tools/hciattach.h b/tools/hciattach.h
+>> index 867563b..5c89013 100644
+>> --- a/tools/hciattach.h
+>> +++ b/tools/hciattach.h
+>> @@ -3,6 +3,7 @@
+>>   *  BlueZ - Bluetooth protocol stack for Linux
+>>   *
+>>   *  Copyright (C) 2003-2010  Marcel Holtmann <marcel@holtmann.org>
+>> + *  Copyright (c) 2010, Code Aurora Forum. All rights reserved.
+>>   *
+>>   *
+>>   *  This program is free software; you can redistribute it and/or modify
+>> @@ -45,3 +46,6 @@ int texas_post(int fd, struct termios *ti);
+>>  int texasalt_init(int fd, int speed, struct termios *ti);
+>>  int stlc2500_init(int fd, bdaddr_t *bdaddr);
+>>  int bgb2xx_init(int dd, bdaddr_t *bdaddr);
+>> +int qualcomm_init(int fd, int speed, struct termios *ti, const char
+>> *bdaddr);
+>> +
+>> +
+> 
+> I am actually fine with this. Except strip it from claiming copyright on
+> hciattach.c and hciattach.h since these changes are not really anything
+> new. They are just wrapping code.
+> 
+> So fix this and submit a new clean patch.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
 
-Thanks for taking the time to look over all these changes!
+Yes, will do.
 
->
->
-> +static int l2cap_seq_list_init(struct l2cap_seq_list *seq_list, u16 size)
-> +{
-> +       u16 allocSize;
->
-> No capital letter here. Do alloc_size. Check the rest of your code for similar
-> stuff.
-
-Yes, someone caught that in our internal code review too.  I think 
-this was the only one.
-
->
->
->        u8 event;
->        struct sk_buff *skb;
-> };
-> +
-> #endif /* __AMP_H */
-> diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
-> index f43d7d8..16e74f6 100644
-> --- a/net/bluetooth/amp.c
-> +++ b/net/bluetooth/amp.c
-> @@ -40,6 +40,7 @@ static struct workqueue_struct *amp_workqueue;
-> LIST_HEAD(amp_mgr_list);
-> DEFINE_RWLOCK(amp_mgr_list_lock);
->
-> +
-> static void remove_amp_mgr(struct amp_mgr *rem)
-> {
->        struct amp_mgr *mgr = NULL;
->
-> Do not add new lines random places into your patch. Check you code for others
-> things like that. Also check for lines overstepping the column 80.
-
-We definitely know we have work to do to clean up these patches and 
-add proper commit messages.  Please be assured that we'll have these 
-more tidied up before posting patches to linux-bluetooth.
-
->
->
-> +struct l2cap_enhanced_hdr {
-> +       __le16     len;
-> +       __le16     cid;
-> +       __le16     control;
-> +} __attribute__ ((packed));
-> +#define L2CAP_ENHANCED_HDR_SIZE                6
->
-> Get ride off this struct, that actually doesn't help. We tried that before and
-> Marcel and I agreed that it does not help.
-
-If you guys don't like it, I'll take it out.
-
->
-> -               if (memcpy_fromiovec(skb_put(*frag, count), msg->msg_iov, count))
-> +
-> +               if (memcpy_fromiovec(skb_put(*frag, count),
-> +                               msg->msg_iov, count))
->                        return -EFAULT;
->
-> Avoid changes like that in your patches, you are just breaking a line here. If
-> you want to do that do in a separeted patch.
->
->
->
-> +/* L2CAP ERTM / Streaming extra field lengths */
-> +#define L2CAP_FCS_SIZE          2
->
-> Separated patch for that, so then you replace 2 for L2CAP_FCS_SIZE in one
-> patch, instead of doing that in many patches like you are doing now. The same
-> goes for L2CAP_SDULEN_SIZE.
-
-Yes, I already split that commit up to send the "RFC" patch set 
-earlier today.  Unfortunately I missed that commit when generating my 
-patches :(
-
-
-> -/* L2CAP Supervisory Function */
-> +/* L2CAP Supervisory Frame Types */
-> +#define L2CAP_SFRAME_RR            0x00
-> +#define L2CAP_SFRAME_REJ           0x01
-> +#define L2CAP_SFRAME_RNR           0x02
-> +#define L2CAP_SFRAME_SREJ          0x03
-> #define L2CAP_SUPER_RCV_READY           0x0000
-> #define L2CAP_SUPER_REJECT              0x0004
-> #define L2CAP_SUPER_RCV_NOT_READY       0x0008
-> #define L2CAP_SUPER_SELECT_REJECT       0x000C
->
-> /* L2CAP Segmentation and Reassembly */
-> +#define L2CAP_SAR_UNSEGMENTED      0x00
-> +#define L2CAP_SAR_START            0x01
-> +#define L2CAP_SAR_END              0x02
-> +#define L2CAP_SAR_CONTINUE         0x03
-> #define L2CAP_SDU_UNSEGMENTED       0x0000
-> #define L2CAP_SDU_START             0x4000
-> #define L2CAP_SDU_END               0x8000
->
-> What is that? we already have such defines.
-
-I was trying to not break existing code, while also creating constants 
-that were useful for modified code that will work with either extended 
-or enhanced headers.  The new values are important, but I agree that 
-this is not the way to introduce the changes.  See below for more 
-detail.
-
-> commit 162e6de6d5c11b8ffea91a9fa2d597340afdeb6e
-> Author: Mat Martineau <mathewm@codeaurora.org>
-> Date:   Thu Aug 5 16:59:46 2010 -0700
->
->    Bluetooth: Remove unused L2CAP code.
->
-> net/bluetooth/l2cap.c | 1104 +------------------------------------------------
-> 1 files changed, 15 insertions(+), 1089 deletions(-)
->
-> That's not acceptable, we have to modify the existent base code and make it
-> work with the new features, instead writing a new one and then switch to it.
-
-When setting up the commits for this git branch, I had to pick between 
-two approaches:
-
-  * Build up a modified state machine in parallel, so the switchover 
-could happen in one patch.  The code would compile and run after every 
-patch.
-
-  * Or, start modifying the state machine piece by piece.  Until all of 
-the modifications were done, ERTM would not work.
-
-I don't think my approach worked out well (mostly because it doesn't 
-preserve history adequately, and doesn't make it clear where code has 
-been modified instead of newly written).  However, it's what we had to 
-share coming in to the Bluetooth summit, and we felt it was very 
-important to share it.  I want to refine the approach to these patches 
-to put them in some acceptable form, so lets talk about the best way 
-to do that.
-
-
-> commit 09850f68219572288fe62a59235fda3d2629c7b2
-> Author: Peter Krystad <pkrystad@codeaurora.org>
-> Date:   Wed Aug 4 16:55:11 2010 -0700
->
->    Rename l2cap.c to el2cap.c.
->
->    Necessary before additional files can be added to l2cap module.
->    A module cannot contain a file with the same name as the module.
->
-> We don't neeed that. We might split l2cap.c into smaller chunks before merge
-> all the AMP stuff into it, so we won't have the module name problem anymore.
-
-There is a technical reason for this.  We changed the Makefile to 
-create l2cap.ko from two source files - one for L2CAP and one for AMP. 
-However, the build system fails if you try to link l2cap.c and amp.c 
-in to l2cap.ko.  We had to come up with some other name for l2cap.c in 
-order to keep the module name the same.  There's probably a better 
-choice than el2cap.c - any suggestions are welcome.
-
-
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-
+-- 
+Ron Shaffer
+Employee of the Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
