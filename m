@@ -1,116 +1,208 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <gfpadovan@gmail.com>
-Date: Wed, 11 Aug 2010 02:24:33 -0300
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	rshaffer@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [RFC 6/7] Bluetooth: Reassemble enhanced L2CAP PDUs using skb
- fragments.
-Message-ID: <20100811052433.GA10773@vigoh>
-References: <1281467704-5378-1-git-send-email-mathewm@codeaurora.org>
- <1281467704-5378-7-git-send-email-mathewm@codeaurora.org>
+From: suraj Sumangala <suraj@atheros.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <Jothikumar.Mothilal@Atheros.com>,
+	suraj Sumangala <suraj@atheros.com>
+Subject: [RFC] Bluetooth: Option to enable power management from host
+Date: Wed, 11 Aug 2010 10:16:15 +0530
+Message-ID: <1281501975-14425-1-git-send-email-suraj@atheros.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1281467704-5378-7-git-send-email-mathewm@codeaurora.org>
+Content-Type: text/plain
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+This provides a new option to enable advanced power management from
+Host. This option by default will be disabled for existing devices.
 
-* Mat Martineau <mathewm@codeaurora.org> [2010-08-10 12:15:03 -0700]:
+---
+ tools/hciattach.8 |   12 +++++++
+ tools/hciattach.c |   88 ++++++++++++++++++++++++++++++++++++++---------------
+ 2 files changed, 75 insertions(+), 25 deletions(-)
 
-> As enhanced L2CAP PDUs arrive, it is not necessary to copy them
-> in to a separate skbuff.  Instead, the skbuffs can be linked
-> together as fragments, only being copied in to a linear buffer
-> when the data is copied to userspace.  This avoids the need
-> to allocate additional buffers for incoming data, and
-> eliminates copying of data payloads during SDU reassembly.
-> This is of greater concern with high-speed AMP links than
-> with BR/EDR.
-> 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> ---
->  include/net/bluetooth/l2cap.h |    1 +
->  net/bluetooth/l2cap.c         |   66 +++++++++++++++++++++-------------------
->  2 files changed, 36 insertions(+), 31 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index 2f3222f..9384e87 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -357,6 +357,7 @@ struct l2cap_pinfo {
->  	__u16		sdu_len;
->  	__u16		partial_sdu_len;
->  	struct sk_buff	*sdu;
-> +	struct sk_buff	*sdu_last_frag;
->  
->  	__u8		ident;
->  
-> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-> index b485c4a..0212035 100644
-> --- a/net/bluetooth/l2cap.c
-> +++ b/net/bluetooth/l2cap.c
-> @@ -290,6 +290,9 @@ static void l2cap_chan_del(struct sock *sk, int err)
->  		skb_queue_purge(SREJ_QUEUE(sk));
->  		skb_queue_purge(BUSY_QUEUE(sk));
->  
-> +		if (l2cap_pi(sk)->sdu)
-> +			kfree_skb(l2cap_pi(sk)->sdu);
-> +
->  		list_for_each_entry_safe(l, tmp, SREJ_LIST(sk), list) {
->  			list_del(&l->list);
->  			kfree(l);
-> @@ -3635,6 +3638,27 @@ static int l2cap_add_to_srej_queue(struct sock *sk, struct sk_buff *skb, u8 tx_s
->  	return 0;
->  }
->  
-> +static inline void append_skb_frag(struct sk_buff *skb,
-> +			struct sk_buff *new_frag, struct sk_buff **last_frag)
-
-Call this l2cap_append_skb_frag()
-
-> +{
-> +	/* skb->len reflects data in skb as well as all fragments
-> +	   skb->data_len reflects only data in fragments
-> +	 */
-> +	BT_DBG("skb %p, new_frag %p, *last_frag %p", skb, new_frag, *last_frag);
-> +
-> +	if (!skb_has_frags(skb))
-> +		skb_shinfo(skb)->frag_list = new_frag;
-> +
-> +	new_frag->next = NULL;
-> +
-> +	(*last_frag)->next = new_frag;
-> +	*last_frag = new_frag;
-> +
-> +	skb->len += new_frag->len;
-> +	skb->data_len += new_frag->len;
-> +	skb->truesize += new_frag->truesize;
-> +}
-> +
-
-Wondering if it is possible to do that append more simple, but I looked
-through the kernel code it's not possible, we have to keep last frag
-pointer.
-
-This change should go to l2cap_streaming_reassembly_sdu() as well, then
-you can get ride of partial_sdu_len in the struct l2cap_pinfo.
-
->  static int l2cap_ertm_reassembly_sdu(struct sock *sk, struct sk_buff *skb, u16 control)
->  {
->  	struct l2cap_pinfo *pi = l2cap_pi(sk);
-> @@ -3643,7 +3667,7 @@ static int l2cap_ertm_reassembly_sdu(struct sock *sk, struct sk_buff *skb, u16 c
->  
->  	switch (control & L2CAP_CTRL_SAR) {
->  	case L2CAP_SDU_UNSEGMENTED:
-> -		if (pi->conn_state & L2CAP_CONN_SAR_SDU)
-> +		if (pi->sdu)
-
-pi->sdu can do the work work of pi->conn_state & L2CAP_CONN_SAR_SDU, so
-a separated patch for that change sounds better (you can change that for
-the Streaming mode at the same time, it's a similar code, but more simple).
-
-
+diff --git a/tools/hciattach.8 b/tools/hciattach.8
+index 9bd1538..1375905 100644
+--- a/tools/hciattach.8
++++ b/tools/hciattach.8
+@@ -122,7 +122,19 @@ the serial link (
+ set by default. To force no flow control use
+ .B noflow
+ instead.
++.TP
++.I sleep
++If the keyword
++.I sleep
++is appended to the list of options then power management is enabled
++on the controller. All above mentioned device types have
++.B nosleep
++set by default. To enable this feature use
++.B sleep
++instead.
+ 
++Note: This option will only be valid for hardware which support
++this feature.
+ .TP
+ .I bdaddr
+ The
+diff --git a/tools/hciattach.c b/tools/hciattach.c
+index 81aea7b..8616899 100644
+--- a/tools/hciattach.c
++++ b/tools/hciattach.c
+@@ -63,12 +63,15 @@ struct uart_t {
+ 	int  init_speed;
+ 	int  speed;
+ 	int  flags;
++	int  pm;
+ 	char *bdaddr;
+ 	int  (*init) (int fd, struct uart_t *u, struct termios *ti);
+ 	int  (*post) (int fd, struct uart_t *u, struct termios *ti);
+ };
+ 
+ #define FLOW_CTL	0x0001
++#define ENABLE_PM	1
++#define DISABLE_PM	0
+ 
+ static volatile sig_atomic_t __io_canceled = 0;
+ 
+@@ -1006,72 +1009,100 @@ static int bcm2035(int fd, struct uart_t *u, struct termios *ti)
+ }
+ 
+ struct uart_t uart[] = {
+-	{ "any",        0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, NULL     },
+-	{ "ericsson",   0x0000, 0x0000, HCI_UART_H4,   57600,  115200, FLOW_CTL, NULL, ericsson },
+-	{ "digi",       0x0000, 0x0000, HCI_UART_H4,   9600,   115200, FLOW_CTL, NULL, digi     },
++	{ "any",        0x0000, 0x0000, HCI_UART_H4,   115200, 115200,
++				FLOW_CTL, DISABLE_PM, NULL, NULL     },
+ 
+-	{ "bcsp",       0x0000, 0x0000, HCI_UART_BCSP, 115200, 115200, 0,        NULL, bcsp     },
++	{ "ericsson",   0x0000, 0x0000, HCI_UART_H4,   57600,  115200,
++				FLOW_CTL, DISABLE_PM, NULL, ericsson },
++
++	{ "digi",       0x0000, 0x0000, HCI_UART_H4,   9600,   115200,
++				FLOW_CTL, DISABLE_PM, NULL, digi     },
++
++	{ "bcsp",       0x0000, 0x0000, HCI_UART_BCSP, 115200, 115200,
++				0, DISABLE_PM, NULL, bcsp     },
+ 
+ 	/* Xircom PCMCIA cards: Credit Card Adapter and Real Port Adapter */
+-	{ "xircom",     0x0105, 0x080a, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, NULL     },
++	{ "xircom",     0x0105, 0x080a, HCI_UART_H4,   115200, 115200,
++				FLOW_CTL, DISABLE_PM,  NULL, NULL     },
+ 
+ 	/* CSR Casira serial adapter or BrainBoxes serial dongle (BL642) */
+-	{ "csr",        0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, csr      },
++	{ "csr",        0x0000, 0x0000, HCI_UART_H4,   115200, 115200,
++				FLOW_CTL, DISABLE_PM, NULL, csr      },
+ 
+ 	/* BrainBoxes PCMCIA card (BL620) */
+-	{ "bboxes",     0x0160, 0x0002, HCI_UART_H4,   115200, 460800, FLOW_CTL, NULL, csr      },
++	{ "bboxes",     0x0160, 0x0002, HCI_UART_H4,   115200, 460800,
++				FLOW_CTL, DISABLE_PM, NULL, csr      },
+ 
+ 	/* Silicon Wave kits */
+-	{ "swave",      0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, swave    },
++	{ "swave",      0x0000, 0x0000, HCI_UART_H4,   115200, 115200,
++				FLOW_CTL, DISABLE_PM, NULL, swave    },
+ 
+ 	/* Texas Instruments Bluelink (BRF) modules */
+-	{ "texas",      0x0000, 0x0000, HCI_UART_LL,   115200, 115200, FLOW_CTL, NULL, texas,    texas2 },
+-	{ "texasalt",   0x0000, 0x0000, HCI_UART_LL,   115200, 115200, FLOW_CTL, NULL, texasalt, NULL   },
++	{ "texas",      0x0000, 0x0000, HCI_UART_LL,   115200, 115200,
++				FLOW_CTL, DISABLE_PM, NULL, texas,    texas2 },
++
++	{ "texasalt",   0x0000, 0x0000, HCI_UART_LL,   115200, 115200,
++				FLOW_CTL, DISABLE_PM, NULL, texasalt, NULL   },
+ 
+ 	/* ST Microelectronics minikits based on STLC2410/STLC2415 */
+-	{ "st",         0x0000, 0x0000, HCI_UART_H4,    57600, 115200, FLOW_CTL, NULL, st       },
++	{ "st",         0x0000, 0x0000, HCI_UART_H4,    57600, 115200,
++				FLOW_CTL, DISABLE_PM,  NULL, st       },
+ 
+ 	/* ST Microelectronics minikits based on STLC2500 */
+-	{ "stlc2500",   0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, "00:80:E1:00:AB:BA", stlc2500 },
++	{ "stlc2500",   0x0000, 0x0000, HCI_UART_H4, 115200, 115200,
++			FLOW_CTL, DISABLE_PM, "00:80:E1:00:AB:BA", stlc2500 },
+ 
+ 	/* Philips generic Ericsson IP core based */
+-	{ "philips",    0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, NULL     },
++	{ "philips",    0x0000, 0x0000, HCI_UART_H4,   115200, 115200,
++				FLOW_CTL, DISABLE_PM, NULL, NULL     },
+ 
+ 	/* Philips BGB2xx Module */
+-	{ "bgb2xx",    0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, "BD:B2:10:00:AB:BA", bgb2xx },
++	{ "bgb2xx",    0x0000, 0x0000, HCI_UART_H4,   115200, 115200,
++			FLOW_CTL, DISABLE_PM, "BD:B2:10:00:AB:BA", bgb2xx },
+ 
+ 	/* Sphinx Electronics PICO Card */
+-	{ "picocard",   0x025e, 0x1000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, NULL     },
++	{ "picocard",   0x025e, 0x1000, HCI_UART_H4, 115200, 115200,
++				FLOW_CTL, DISABLE_PM, NULL, NULL     },
+ 
+ 	/* Inventel BlueBird Module */
+-	{ "inventel",   0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, NULL     },
++	{ "inventel",   0x0000, 0x0000, HCI_UART_H4, 115200, 115200,
++				FLOW_CTL, DISABLE_PM, NULL, NULL     },
+ 
+ 	/* COM One Platinium Bluetooth PC Card */
+-	{ "comone",     0xffff, 0x0101, HCI_UART_BCSP, 115200, 115200, 0,        NULL, bcsp     },
++	{ "comone",     0xffff, 0x0101, HCI_UART_BCSP, 115200, 115200,
++				0, DISABLE_PM,  NULL, bcsp     },
+ 
+ 	/* TDK Bluetooth PC Card and IBM Bluetooth PC Card II */
+-	{ "tdk",        0x0105, 0x4254, HCI_UART_BCSP, 115200, 115200, 0,        NULL, bcsp     },
++	{ "tdk",        0x0105, 0x4254, HCI_UART_BCSP, 115200, 115200,
++				0, DISABLE_PM, NULL, bcsp     },
+ 
+ 	/* Socket Bluetooth CF Card (Rev G) */
+-	{ "socket",     0x0104, 0x0096, HCI_UART_BCSP, 230400, 230400, 0,        NULL, bcsp     },
++	{ "socket",     0x0104, 0x0096, HCI_UART_BCSP, 230400, 230400,
++				0, DISABLE_PM, NULL, bcsp     },
+ 
+ 	/* 3Com Bluetooth Card (Version 3.0) */
+-	{ "3com",       0x0101, 0x0041, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, csr      },
++	{ "3com",       0x0101, 0x0041, HCI_UART_H4,   115200, 115200,
++				FLOW_CTL, DISABLE_PM, NULL, csr      },
+ 
+ 	/* AmbiCom BT2000C Bluetooth PC/CF Card */
+-	{ "bt2000c",    0x022d, 0x2000, HCI_UART_H4,    57600, 460800, FLOW_CTL, NULL, csr      },
++	{ "bt2000c",    0x022d, 0x2000, HCI_UART_H4,    57600, 460800,
++				FLOW_CTL, DISABLE_PM, NULL, csr      },
+ 
+ 	/* Zoom Bluetooth PCMCIA Card */
+-	{ "zoom",       0x0279, 0x950b, HCI_UART_BCSP, 115200, 115200, 0,        NULL, bcsp     },
++	{ "zoom",       0x0279, 0x950b, HCI_UART_BCSP, 115200, 115200,
++				0, DISABLE_PM, NULL, bcsp     },
+ 
+ 	/* Sitecom CN-504 PCMCIA Card */
+-	{ "sitecom",    0x0279, 0x950b, HCI_UART_BCSP, 115200, 115200, 0,        NULL, bcsp     },
++	{ "sitecom",    0x0279, 0x950b, HCI_UART_BCSP, 115200, 115200,
++				0, DISABLE_PM, NULL, bcsp     },
+ 
+ 	/* Billionton PCBTC1 PCMCIA Card */
+-	{ "billionton", 0x0279, 0x950b, HCI_UART_BCSP, 115200, 115200, 0,        NULL, bcsp     },
++	{ "billionton", 0x0279, 0x950b, HCI_UART_BCSP, 115200, 115200,
++				0, DISABLE_PM, NULL, bcsp     },
+ 
+ 	/* Broadcom BCM2035 */
+-	{ "bcm2035",    0x0A5C, 0x2035, HCI_UART_H4,   115200, 460800, FLOW_CTL, NULL, bcm2035  },
++	{ "bcm2035",    0x0A5C, 0x2035, HCI_UART_H4,   115200, 460800,
++				FLOW_CTL, DISABLE_PM, NULL, bcm2035  },
+ 
+ 	{ NULL, 0 }
+ };
+@@ -1290,6 +1321,13 @@ int main(int argc, char *argv[])
+ 			break;
+ 
+ 		case 4:
++			if (!strcmp("sleep", argv[optind]))
++				u->pm = ENABLE_PM;
++			else
++				u->pm = DISABLE_PM;
++			break;
++
++		case 5:
+ 			u->bdaddr = argv[optind];
+ 			break;
+ 		}
 -- 
-Gustavo F. Padovan
-http://padovan.org
+1.7.0.4
+
