@@ -1,33 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 1/1] Bluetooth: RPN negotiation fix
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Yuri Kululin <ext-yuri.kululin@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <6a577b5627b8388489a21fd49f5c9d2b85a2bbef.1279866739.git.ext-yuri.kululin@nokia.com>
-References: <1279879032-27955-1-git-send-email-ext-yuri.kululin@nokia.com>
-	 <6a577b5627b8388489a21fd49f5c9d2b85a2bbef.1279866739.git.ext-yuri.kululin@nokia.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 11 Aug 2010 13:31:57 -0400
-Message-ID: <1281547917.12579.239.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1cd8783b41babbf611228c34a1fb5451.squirrel@www.codeaurora.org>
+In-Reply-To: <1281485576-32715-1-git-send-email-ingas@codeaurora.org>
+References: <1281485576-32715-1-git-send-email-ingas@codeaurora.org>
+Date: Wed, 11 Aug 2010 09:26:49 -0700 (PDT)
+Subject: Re: Support for HCI commands and events related to AMP
+     functionality
+From: ingas@codeaurora.org
+To: linux-bluetooth@vger.kernel.org
+Cc: rshaffer@codeaurora.org,
+ johan.hedberg@gmail.com,
+ marcel@holtmann.org
+MIME-Version: 1.0
+Content-Type: text/plain;charset=iso-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Yuri,
+Just a clarification
 
-> According to the ETSI 3GPP TS 07.10 the default bit rate value for RFCOMM
-> is 9600 bit/s. Return this bit rate in case of RPN request and accept other
-> sane bit rates proposed by the sender in RPM command.
-> 
-> Signed-off-by: Yuri Kululin <ext-yuri.kululin@nokia.com>
-> ---
->  net/bluetooth/rfcomm/core.c |    8 ++++----
->  1 files changed, 4 insertions(+), 4 deletions(-)
+> Added new HCI commands and events constructs for AMP related development.
+> Will be used in updated testing tools for AMP.
+>
+>
+> --
+> Inga Stotland
+> Sent by an employee of the Qualcomm Innovation Center, Inc.
+> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
 
-patch has been applied. Thanks.
+These changes are needed first in hcidump tool (patches will come next) to
+enable parsing of AMP commands. Even though these constructs are not going
+to be used elsewhere in bluez git tree (at least initially), I felt that
+for the sake of consistency they should live in hci.h
+The subsequent updates to hcidump will depend on this patch set in bluez.
 
-Regards
+Inga
 
-Marcel
-
-
+--
+Sent by an employee of the Qualcomm Innovation Center, Inc.
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
