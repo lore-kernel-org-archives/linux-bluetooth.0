@@ -1,130 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
 Sender: "Gustavo F. Padovan" <gfpadovan@gmail.com>
-Date: Wed, 11 Aug 2010 00:35:41 -0300
+Date: Wed, 11 Aug 2010 00:23:17 -0300
 From: "Gustavo F. Padovan" <gustavo@padovan.org>
 To: Mat Martineau <mathewm@codeaurora.org>
 Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
 	rshaffer@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [RFC 3/7] Bluetooth: Add FCS awareness to L2CAP HCI
- fragmentation.
-Message-ID: <20100811033540.GA9151@vigoh>
+Subject: Re: [RFC 2/7] Bluetooth: Use enhanced L2CAP header structure and
+ symbolic values.
+Message-ID: <20100811032316.GA9130@vigoh>
 References: <1281467704-5378-1-git-send-email-mathewm@codeaurora.org>
- <1281467704-5378-4-git-send-email-mathewm@codeaurora.org>
+ <1281467704-5378-3-git-send-email-mathewm@codeaurora.org>
+ <20100810220712.GC3203@vigoh>
+ <alpine.DEB.2.00.1008101916090.6276@linux-sea-02>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1281467704-5378-4-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <alpine.DEB.2.00.1008101916090.6276@linux-sea-02>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Mat Martineau <mathewm@codeaurora.org> [2010-08-10 12:15:00 -0700]:
+Hi Mat,
 
-> In order to not limit ERTM and streaming mode PDUs to the HCI MTU
-> size, L2CAP must be able to split PDUs in to multple HCI fragments.
-> This is done by allocating space for the FCS in the last fragment.
+* Mat Martineau <mathewm@codeaurora.org> [2010-08-10 19:24:20 -0700]:
+
 > 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> ---
->  net/bluetooth/l2cap.c |   39 ++++++++++++++++++++++++++++++++++-----
->  1 files changed, 34 insertions(+), 5 deletions(-)
 > 
-> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-> index aa69c84..b485c4a 100644
-> --- a/net/bluetooth/l2cap.c
-> +++ b/net/bluetooth/l2cap.c
-> @@ -1664,31 +1664,63 @@ static inline int l2cap_skbuff_fromiovec(struct sock *sk, struct msghdr *msg, in
->  {
->  	struct l2cap_conn *conn = l2cap_pi(sk)->conn;
->  	struct sk_buff **frag;
-> +	struct sk_buff *final;
->  	int err, sent = 0;
->  
-> +	BT_DBG("sk %p, msg %p, len %d, count %d, skb %p", sk,
-> +		msg, (int)len, (int)count, skb);
-> +
->  	if (memcpy_fromiovec(skb_put(skb, count), msg->msg_iov, count))
->  		return -EFAULT;
->  
->  	sent += count;
->  	len  -= count;
-> +	final = skb;
->  
->  	/* Continuation fragments (no L2CAP header) */
->  	frag = &skb_shinfo(skb)->frag_list;
->  	while (len) {
-> +		int skblen;
->  		count = min_t(unsigned int, conn->mtu, len);
->  
-> -		*frag = bt_skb_send_alloc(sk, count, msg->msg_flags & MSG_DONTWAIT, &err);
-> +		/* Add room for the FCS if it fits */
-> +		if (l2cap_pi(sk)->fcs == L2CAP_FCS_CRC16 &&
-> +		    len + L2CAP_FCS_SIZE <= conn->mtu)
-
-You don't need to check for (len + L2CAP_FCS_SIZE <= conn=mtu) here.
-Section 5.1 point that: 
-
-"Unlike the B-Frame length field, the I-frame length field may be greater
-than the configured MTU because it includes the octet lengths of the
-Control, L2CAP SDU Length (when present), and frame check sequence
-fields as well as the Information octets."
-
->From that I understand "len <=" and not "len + L2CAP_FCS_SIZE <="
-
-
-> +			skblen = count + L2CAP_FCS_SIZE;
-> +		else
-> +			skblen = count;
-> +
-> +		*frag = bt_skb_send_alloc(sk, skblen,
-> +					msg->msg_flags & MSG_DONTWAIT, &err);
->  		if (!*frag)
->  			return -EFAULT;
-> -		if (memcpy_fromiovec(skb_put(*frag, count), msg->msg_iov, count))
-> +
-> +		if (memcpy_fromiovec(skb_put(*frag, count),
-> +				msg->msg_iov, count))
->  			return -EFAULT;
->  
->  		sent += count;
->  		len  -= count;
->  
-> +		final = *frag;
-> +
->  		frag = &(*frag)->next;
->  	}
->  
-> +	if (l2cap_pi(sk)->fcs == L2CAP_FCS_CRC16) {
-> +		if (skb_tailroom(final) < L2CAP_FCS_SIZE) {
-> +			*frag = bt_skb_send_alloc(sk, L2CAP_FCS_SIZE,
-> +						msg->msg_flags & MSG_DONTWAIT,
-> +						&err);
-> +			if (!*frag)
-> +				return -EFAULT;
-> +
-> +			final = *frag;
-> +		}
-> +
-> +		skb_put(final, L2CAP_FCS_SIZE);
-> +	}
-> +
->  	return sent;
->  }
->  
-> @@ -1790,9 +1822,6 @@ static struct sk_buff *l2cap_create_iframe_pdu(struct sock *sk, struct msghdr *m
->  		return ERR_PTR(err);
->  	}
->  
-> -	if (l2cap_pi(sk)->fcs == L2CAP_FCS_CRC16)
-> -		put_unaligned_le16(0, skb_put(skb, 2));
-> -
->  	bt_cb(skb)->retries = 0;
->  	return skb;
->  }
-> -- 
-> 1.7.1
+> Gustavo -
 > 
-> --
-> Mat Martineau
-> Employee of Qualcomm Innovation Center, Inc.
-> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+> On Tue, 10 Aug 2010, Gustavo F. Padovan wrote:
+> 
+> >Hi Mat,
+> >
+> >* Mat Martineau <mathewm@codeaurora.org> [2010-08-10 12:14:59 -0700]:
+> >
+> >>
+> >>Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> >>---
+> >> net/bluetooth/l2cap.c |   23 +++++++++++++----------
+> >> 1 files changed, 13 insertions(+), 10 deletions(-)
+> >>
+> >>diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> >>index 5e78c18..aa69c84 100644
+> >>--- a/net/bluetooth/l2cap.c
+> >>+++ b/net/bluetooth/l2cap.c
+> >>@@ -1753,33 +1753,36 @@ static struct sk_buff *l2cap_create_iframe_pdu(struct sock *sk, struct msghdr *m
+> >> {
+> >> 	struct l2cap_conn *conn = l2cap_pi(sk)->conn;
+> >> 	struct sk_buff *skb;
+> >>-	int err, count, hlen = L2CAP_HDR_SIZE + 2;
+> >>-	struct l2cap_hdr *lh;
+> >>+	int err, count, hlen = L2CAP_ENHANCED_HDR_SIZE;
+> >>+	struct l2cap_enhanced_hdr *lh;
+> >
+> >This patch shouldn't even compile. Since there no definition for
+> >struct l2cap_enhanced_hdr. Anyway we should not have that struct, keep
+> >the code to handle this as it is.
+> >We'll have to change this code again to add the extended control bit
+> >field.
+> 
+> Sorry about that - I did my git format-patch starting one commit too
+> late.
+> 
+> I also have an l2cap_extended_hdr struct to add later, but it sounds
+> like you don't want that one either.
+
+Get rid of that one too. It's better do not have that extra
+complication.
+
+By the way, I think we can hide the handle of extended and enhanced
+control fields inside the macros to get control bit fields. So we won't
+have to care about that in the code. We still have to talk about that.
+
+> 
+> >
+> >>
+> >>-	BT_DBG("sk %p len %d", sk, (int)len);
+> >>+	BT_DBG("sk %p, msg %p, len %d, control %x, sdulen %d",
+> >>+		sk, msg, (int)len, control, (int)sdulen);
+> >>
+> >> 	if (!conn)
+> >> 		return ERR_PTR(-ENOTCONN);
+> >>
+> >> 	if (sdulen)
+> >>-		hlen += 2;
+> >>+		hlen += L2CAP_SDULEN_SIZE;
+> >
+> >Separated patch to add L2CAP_SDULEN_SIZE
+> 
+> Ok.
+> 
+> >>
+> >> 	if (l2cap_pi(sk)->fcs == L2CAP_FCS_CRC16)
+> >>-		hlen += 2;
+> >>+		hlen += L2CAP_FCS_SIZE;
+> >
+> >Separated patch to ad L2CAP_FCS_SIZE
+> 
+> Ok.  Does this need to be separate from the L2CAP_SDULEN_SIZE patch?
+
+It depends. If we have few occurrence of that macros, they could be in
+same patch.
+
 
 -- 
 Gustavo F. Padovan
