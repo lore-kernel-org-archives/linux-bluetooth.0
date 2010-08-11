@@ -1,30 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Subject: [PATCH] Solve compilation warning usin gcc 4.5.0
-Date: Wed, 11 Aug 2010 11:09:26 +0200
-Message-Id: <1281517766-5612-1-git-send-email-santoscadenas@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: "Gustavo F. Padovan" <gfpadovan@gmail.com>
+Date: Wed, 11 Aug 2010 02:25:42 -0300
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+	rshaffer@codeaurora.org, linux-arm-msm@vger.kernel.org
+Subject: Re: [RFC 7/7] Bluetooth: Do not limit enhanced L2CAP max PDU size
+ to HCI MTU.
+Message-ID: <20100811052542.GB10773@vigoh>
+References: <1281467704-5378-1-git-send-email-mathewm@codeaurora.org>
+ <1281467704-5378-8-git-send-email-mathewm@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1281467704-5378-8-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- audio/control.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+Hi Mat,
 
-diff --git a/audio/control.c b/audio/control.c
-index c8aba53..daa01ef 100644
---- a/audio/control.c
-+++ b/audio/control.c
-@@ -446,7 +446,7 @@ static void avctp_set_state(struct control *control, avctp_state_t new_state)
- 
- 		avctp_disconnected(control->dev);
- 
--		if (old_state != AVCTP_STATE_CONNECTED)
-+		if (old_state != AVDTP_SESSION_STATE_CONNECTED)
- 			break;
- 
- 		value = FALSE;
+* Mat Martineau <mathewm@codeaurora.org> [2010-08-10 12:15:04 -0700]:
+
+> HCI MTU and PDU size have no relationship, since ERTM and streaming PDUs
+> can be fragmented over HCI just like other L2CAP frames.  The only
+> applicable limit for PDU size is the L2CAP MTU, which is now checked
+> during L2CAP configuration.
+> 
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> ---
+>  net/bluetooth/l2cap.c |   16 ++++++++--------
+>  1 files changed, 8 insertions(+), 8 deletions(-)
+
+This one is fine after the changes in the previous patches.
+
 -- 
-1.7.2
-
+Gustavo F. Padovan
+http://padovan.org
