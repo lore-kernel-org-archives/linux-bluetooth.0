@@ -1,37 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <201008121026.o7CAQDVU005280@joshua.mesa.nl>
+Message-Id: <201008121026.o7CAQ00K005274@joshua.mesa.nl>
 From: Marcel Mol <marcel@mesa.nl>
-Date: Thu, 12 Aug 2010 12:20:46 +0200
-Subject: [PATCH] ebook backend: separate concatenated vcards with \r\n.
+Date: Thu, 12 Aug 2010 12:17:10 +0200
+Subject: [PATCH] Cosmetic: fix comment typos/indents
 To: linux-bluetooth@vger.kernel.org
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The END:VCARD is not ended with \r\n for single vcards.
-In a phonebook pull request vcards are concatenated as one
-big blob. Carkits seem to choke on the fact that an END:VCARD
-is directly followed by BEGIN:VCARD without \r\n separation.
-(as observed by many n900 users).
 ---
- plugins/phonebook-ebook.c |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+ plugins/pbap.c            |    2 +-
+ plugins/phonebook-ebook.c |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/plugins/pbap.c b/plugins/pbap.c
+index c008e95..948f9df 100644
+--- a/plugins/pbap.c
++++ b/plugins/pbap.c
+@@ -921,7 +921,7 @@ static int pbap_init(void)
+ 
+ 	err = obex_service_driver_register(&pbap);
+ 	if (err < 0)
+-			goto fail_pbap_reg;
++		goto fail_pbap_reg;
+ 
+ 	return 0;
+ 
 diff --git a/plugins/phonebook-ebook.c b/plugins/phonebook-ebook.c
-index ad40be3..da68ac0 100644
+index 1598d5f..ad40be3 100644
 --- a/plugins/phonebook-ebook.c
 +++ b/plugins/phonebook-ebook.c
-@@ -175,8 +175,11 @@ static void ebookpull_cb(EBook *book, EBookStatus estatus, GList *contacts,
- 						data->params->filter);
- 
- 		string = g_string_append(string, vcard);
-+		string = g_string_append(string, "\r\n");
- 		g_free(vcard);
+@@ -152,7 +152,7 @@ static void ebookpull_cb(EBook *book, EBookStatus estatus, GList *contacts,
  	}
-+	DBG("collected %d vcards", count);
-+
  
- done:
- 	data->cb(string->str, string->len, count, 0, data->user_data);
+ 	/*
+-	 * When MaxListCount s zero, PCE wants to know the number of used
++	 * When MaxListCount is zero, PCE wants to know the number of used
+ 	 * indexes in the phonebook of interest. All other parameters that
+ 	 * may be present in the request shall be ignored.
+ 	 */
 -- 
 1.7.2
 
