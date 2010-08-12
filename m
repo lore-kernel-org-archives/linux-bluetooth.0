@@ -1,76 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <4C63F363.4000400@nokia.com>
-References: <4C63F363.4000400@nokia.com>
-Date: Thu, 12 Aug 2010 14:59:54 -0300
-Message-ID: <AANLkTimdRHPtwqPcnVkfgYwC47H5XgXLC8xo7nLNmgRk@mail.gmail.com>
-Subject: Re: Question about phonebook_add_contact
-From: Vinicius Gomes <vinicius.gomes@openbossa.org>
-To: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Date: Thu, 12 Aug 2010 17:39:35 +0200
+From: "Marcel J.E. Mol" <marcel@mesa.nl>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] IrMC sync server support
+Message-ID: <20100812153935.GE7345@joshua.mesa.nl>
+References: <201008121013.o7CADR8r004125@joshua.mesa.nl> <AANLkTikoUKpDtT5CU7hP+QZBkbc9-p_YymXGPUbJVB+s@mail.gmail.com> <20100812121212.GA16738@joshua.mesa.nl> <20100812145703.GD7345@joshua.mesa.nl>
+Mime-Version: 1.0
+Content-Type: text/plain; charset*=utf-8''%E2%80%9Cus-ascii
+In-Reply-To: <20100812145703.GD7345@joshua.mesa.nl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Radek,
+On Thu, Aug 12, 2010 at 04:57:03PM +0200, Luiz Augusto von Dentz wrote:
+> Hi Marcel,
+> 
+> On Thu, Aug 12, 2010 at 3:12 PM, Marcel J.E. Mol <marcel@mesa.nl> wrote:
+> > abstracting it made de irmc_open() more clean (e.g. no buffer fills in
+> > irmc_open()) and more readable in my opinion.
+> > The specs for devinfo.txt contain many more attributes but the currrent
+> > set seems to be enough. In future this may need to be extended and
+> > supporting scripts may be needed for getting the info. The current
+> > values are actually not correct I think as the will be the same for any
+> > device now... (hence the hint for using x-obex/capabilities in
+> > irmc_connect().)
+> 
+> It doesn't look like we can use x-obex/capabilities for this
+> devinfo.txt, afaik they are not the same thing, thats why I suggested
+> open it as any regular file so the platforms has some way to customize
+> it. Executing scripts is always tricky since you have to depend on
+> async io to suspend the request while the script is running and resume
+> when finished. Of course if there is no file called devinfo.txt then
+> we can think about a default value, what does the spec says in this
+> regard, is devinfo.txt mandatory? If not then we can just fail as we
+> do for x-obex/capabilities when not set.
 
-On Thu, Aug 12, 2010 at 10:13 AM, Radoslaw Jablonski
-<ext-jablonski.radoslaw@nokia.com> wrote:
->
->  Hi!
-> I've got question about this part of code from beginning
->  phonebook_add_contact func:
->
-> if ((contact->numbers == NULL && (contact->fullname == NULL ||
->                        contact->fullname[0] == '\0')))
->        return;
->
-> Is this checking really needed in that place? It is possible to have
-> contacts data
-> in phonebook that have all data except phone set (by example: email
-> addresses,
-> main address etc). In that condition when we want to pull target vcard
-> entry, then
-> empty string will be returned even if user send ATTRIBUTE_MASK to include
-> all fields
-> in the result.
->
+I don;t know how diffenent capbilities is from the things devinfo.txt
+needs. On the n900 the capabilities script seems to provide what is needed
+for devinfo.txt so I was lead by that...
 
-That piece of code is a legacy from simpler times, when we supported
-less types of contact information.
+I'm not suere how mandatory devinfo.txt is. My carkit did ask for it but
+when I returned some data to it it never asked again... It probably will 
+when I remove my phones configuration from the carkit.
 
-> I'm asking because I have problem with "0.vcf" vcard (this is responsible
-> for personal
-> information of device owner). This entry by default does not have any
-> phone's data
-> filled in address book but it is mandatory to put this in vcard-listing.
-> Actually, I am forced to initialize contact->numbers list with empty number
-> even if
-> none of number is available to return correct result for "0.vcf."(in
-> phonebook-tracker)...
->
-> Can this 'contact->numbers' checking be removed from there or maybe other
-> phonebooks
-> rely on this behaviour?
+I never checked the specs again for it as it all seems to work fine with
+the code as it is now. It also works for other n900 owners so i did not
+bother any more.
 
->From what I know, the Tracker backend is the only thing that relies on
-that, so I think that check could be removed with little to no
-problem. In fact, as you are already dealing with the empty numbers
-list case, the problem is already solved.
+I think the code seems to be in a reasonable state to be usefull now so
+that is why I released it here. There is probably lots of extra work to be
+done to be fully specs complient. But by releasing it other people can jump 
+in and improve...
 
->
-> BR,
-> Radek
->
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+Thanks,
 
-
-Cheers,
+-Marcel
 -- 
-Vinicius
+     ======--------         Marcel J.E. Mol                MESA Consulting B.V.
+    =======---------        ph. +31-(0)6-54724868          P.O. Box 112
+    =======---------        marcel@mesa.nl                 2630 AC  Nootdorp
+__==== www.mesa.nl ---____U_n_i_x______I_n_t_e_r_n_e_t____ The Netherlands ____
+ They couldn't think of a number,           Linux user 1148  --  counter.li.org
+    so they gave me a name!  -- Rupert Hine  --  www.ruperthine.com
