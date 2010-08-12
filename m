@@ -1,117 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Oliver Neukum <oneukum@suse.de>
-To: Marcel Holtmann <marcel@holtmann.org>
-Subject: resending patch to retry reset in case it failed
-Date: Thu, 12 Aug 2010 09:44:48 +0200
-Cc: linux-bluetooth@vger.kernel.org, linux-usb@vger.kernel.org
+Date: Wed, 11 Aug 2010 23:07:07 -0400
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Pavan Savoy <pavan_savoy@sify.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	marcel@holtmann.org
+Subject: Re: why is hciops a plugin ?
+Message-ID: <20100812030707.GA17784@jh-x301>
+References: <AANLkTino39jMNvdcV=EiekN33vrfNXLyJVNsHcHtq5wz@mail.gmail.com>
+ <20100811021610.GA8306@jh-x301>
+ <AANLkTimku3Obrb=4KFjD5mapWpYQ0__4UZmzbfadu3WM@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <201008120944.49044.oneukum@suse.de>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <AANLkTimku3Obrb=4KFjD5mapWpYQ0__4UZmzbfadu3WM@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi,
 
-may I ask what happened to this patch?
-Do you take it, want modifications or reject it?
+On Wed, Aug 11, 2010, Pavan Savoy wrote:
+> When you say raw HCI access do you mean doing the
+> socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI) and bind/ioctl, writev+poll/read
+> lacks few things ?
+> but all of these are in lib/hci isn't it ?
 
-	Regards
-		Oliver
+Yes, that's the type of socket that I meant. Direct access to the HCI
+messages would largely go away from the userspace side. Those
+libbluetooth functions you're referring to are just convenience wrappers
+for sending HCI commands through raw HCI sockets.
 
-=46rom af61f0663f095599003290b13ad6fadee1d4fb25 Mon Sep 17 00:00:00 2001
-=46rom: Oliver Neukum <oliver@neukum.org>
-Date: Tue, 6 Jul 2010 08:08:42 +0200
-Subject: [PATCH] bluetooth: retry reset for devices that fail
+> So even if it was netlink only something like hci_open_dev() would
+> have changed to socket(PF_NETLINK, SOCK_RAW, BT_NETLINK ); or
+> something right ?
 
-Some devices fail to reset properly at the first attempt to reset
-them under unknown circumstances. Failures can be identified by
-an invalid btaddr. Retry in those cases.
+I'm not really familiar enough with netlink to comment on this. Marcel
+(whose idea it originally was) would have to comment.
 
-Signed-off-by: Oliver Neukum <oneukum@suse.de>
-=2D--
- net/bluetooth/hci_core.c |   48 ++++++++++++++++++++++++++----------------=
-=2D--
- 1 files changed, 28 insertions(+), 20 deletions(-)
+> any pointers out there ? references for such things ?
+> I am just curious, don;t want anything specific ...
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 2f768de..c47f73d 100644
-=2D-- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -180,11 +180,17 @@ static void hci_reset_req(struct hci_dev *hdev, unsig=
-ned long opt)
- 	hci_send_cmd(hdev, HCI_OP_RESET, 0, NULL);
- }
-=20
-+static int verify_valid_bdaddr(struct hci_dev *hdev)
-+{
-+	return !bacmp(&hdev->bdaddr, BDADDR_ANY);
-+}
-+
- static void hci_init_req(struct hci_dev *hdev, unsigned long opt)
- {
- 	struct sk_buff *skb;
- 	__le16 param;
- 	__u8 flt_type;
-+	int retries =3D 4;
-=20
- 	BT_DBG("%s %ld", hdev->name, opt);
-=20
-@@ -202,33 +208,35 @@ static void hci_init_req(struct hci_dev *hdev, unsign=
-ed long opt)
-=20
- 	/* Mandatory initialization */
-=20
-=2D	/* Reset */
-=2D	if (!test_bit(HCI_QUIRK_NO_RESET, &hdev->quirks))
-=2D			hci_send_cmd(hdev, HCI_OP_RESET, 0, NULL);
-+	do {
-+		/* Reset */
-+		if (!test_bit(HCI_QUIRK_NO_RESET, &hdev->quirks))
-+				hci_send_cmd(hdev, HCI_OP_RESET, 0, NULL);
-=20
-=2D	/* Read Local Supported Features */
-=2D	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_FEATURES, 0, NULL);
-+		/* Read Local Supported Features */
-+		hci_send_cmd(hdev, HCI_OP_READ_LOCAL_FEATURES, 0, NULL);
-=20
-=2D	/* Read Local Version */
-=2D	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL);
-+		/* Read Local Version */
-+		hci_send_cmd(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL);
-=20
-=2D	/* Read Buffer Size (ACL mtu, max pkt, etc.) */
-=2D	hci_send_cmd(hdev, HCI_OP_READ_BUFFER_SIZE, 0, NULL);
-+		/* Read Buffer Size (ACL mtu, max pkt, etc.) */
-+		hci_send_cmd(hdev, HCI_OP_READ_BUFFER_SIZE, 0, NULL);
-=20
- #if 0
-=2D	/* Host buffer size */
-=2D	{
-=2D		struct hci_cp_host_buffer_size cp;
-=2D		cp.acl_mtu =3D cpu_to_le16(HCI_MAX_ACL_SIZE);
-=2D		cp.sco_mtu =3D HCI_MAX_SCO_SIZE;
-=2D		cp.acl_max_pkt =3D cpu_to_le16(0xffff);
-=2D		cp.sco_max_pkt =3D cpu_to_le16(0xffff);
-=2D		hci_send_cmd(hdev, HCI_OP_HOST_BUFFER_SIZE, sizeof(cp), &cp);
-=2D	}
-+		/* Host buffer size */
-+		{
-+			struct hci_cp_host_buffer_size cp;
-+			cp.acl_mtu =3D cpu_to_le16(HCI_MAX_ACL_SIZE);
-+			cp.sco_mtu =3D HCI_MAX_SCO_SIZE;
-+			cp.acl_max_pkt =3D cpu_to_le16(0xffff);
-+			cp.sco_max_pkt =3D cpu_to_le16(0xffff);
-+			hci_send_cmd(hdev, HCI_OP_HOST_BUFFER_SIZE, sizeof(cp), &cp);
-+		}
- #endif
-=20
-=2D	/* Read BD Address */
-=2D	hci_send_cmd(hdev, HCI_OP_READ_BD_ADDR, 0, NULL);
-+		/* Read BD Address */
-+		hci_send_cmd(hdev, HCI_OP_READ_BD_ADDR, 0, NULL);
-+	} while(!verify_valid_bdaddr(hdev) && retries--);
-=20
- 	/* Read Class of Device */
- 	hci_send_cmd(hdev, HCI_OP_READ_CLASS_OF_DEV, 0, NULL);
-=2D-=20
-1.7.1
+Right now, not really. The only stack internal messages there are at the
+moment are things like HCI_DEV_REG, HCI_DEV_UNREG, HCI_DEV_UP and
+HCI_DEV_DOWN and they only go one way (kernel->userspace). This category
+of messages will grow in the future and it'll be possible to send them
+both ways.
+
+Some HCI messages for which it's already clear now that there will be a
+benefit from a higher level abstraction on the userspace side are things
+like name resolving and pairing related requests. Also, if I understood
+correctly from Marcel, removing userspace processing of HCI events will
+result in a considreable reduction of context switches since there wont
+anymore be a promiscuous userspace-side socket that needs to
+handle/filter all HCI data (Marcel, please correct me if this is
+inaccurate or wrong).
+
+Johan
