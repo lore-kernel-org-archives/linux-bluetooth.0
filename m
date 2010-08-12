@@ -1,84 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <ac7ff8702ceb37a52f2c389f5156d8e5.squirrel@www.codeaurora.org>
-In-Reply-To: <AANLkTiny5zM=1vEPyn6iE9cJqi0v_o_i12GOUg=n=Dc7@mail.gmail.com>
-References: <4C5F6B58.6000702@codeaurora.org> <20100810220238.GB3203@vigoh>
-    <alpine.DEB.2.00.1008101925000.6276@linux-sea-02>
-    <20100811031551.GA8985@vigoh>
-    <AANLkTiny5zM=1vEPyn6iE9cJqi0v_o_i12GOUg=n=Dc7@mail.gmail.com>
-Date: Thu, 12 Aug 2010 12:53:25 -0700 (PDT)
-Subject: Re: QuiC AMP development
-From: "Peter Krystad" <pkrystad@codeaurora.org>
-To: "sober song" <sobersong2001@gmail.com>
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	"Mat Martineau" <mathewm@codeaurora.org>,
-	"Ron Shaffer" <rshaffer@codeaurora.org>,
-	linux-bluetooth@vger.kernel.org
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <4C63F363.4000400@nokia.com>
+References: <4C63F363.4000400@nokia.com>
+Date: Thu, 12 Aug 2010 14:59:54 -0300
+Message-ID: <AANLkTimdRHPtwqPcnVkfgYwC47H5XgXLC8xo7nLNmgRk@mail.gmail.com>
+Subject: Re: Question about phonebook_add_contact
+From: Vinicius Gomes <vinicius.gomes@openbossa.org>
+To: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Radek,
 
-Hi Sober,
-
-Be careful not to top-post on this mailing list.
-
-> Hi Shaffer/Peter
+On Thu, Aug 12, 2010 at 10:13 AM, Radoslaw Jablonski
+<ext-jablonski.radoslaw@nokia.com> wrote:
 >
-> static inline int send_a2mp_cmd(struct amp_mgr *mgr, u8 ident, u8
-> code, u16 len, void *data) {
-> 	struct a2mp_cmd_hdr *hdr;
-> 	int plen;
-> 	u8 *buf;
+>  Hi!
+> I've got question about this part of code from beginning
+>  phonebook_add_contact func:
 >
-> 	BT_DBG("ident %d code %d", ident, code);
-> 	plen = sizeof(*hdr) + len;
-> 	buf = kzalloc(plen, GFP_ATOMIC);
-> 	if (!buf)
-> 		return -ENOMEM;
-> 	hdr = (struct a2mp_cmd_hdr *) buf;
-> 	hdr->code  = code;
-> 	hdr->ident = ident;
-> 	hdr->len   = cpu_to_le16(len);
-> 	buf += sizeof(*hdr);
-> 	memcpy(buf, data, len);
-> 	return send_a2mp(mgr->a2mp_sock, (u8 *) hdr, plen);
-> }
+> if ((contact->numbers == NULL && (contact->fullname == NULL ||
+>                        contact->fullname[0] == '\0')))
+>        return;
 >
-> I see that here have a malloc, but i don't see free, doesn't it cause
-> memleak?
+> Is this checking really needed in that place? It is possible to have
+> contacts data
+> in phonebook that have all data except phone set (by example: email
+> addresses,
+> main address etc). In that condition when we want to pull target vcard
+> entry, then
+> empty string will be returned even if user send ATTRIBUTE_MASK to include
+> all fields
+> in the result.
 >
 
-Looks like it, thanks. As Mat and I explained to Kevin and Dan at the
-mini-summit the git repo we posted is a snapshot of our development tree,
-and was provided so interested parties could review our approach. As we
-post patches to the mailing list your review will be much appreciated.
+That piece of code is a legacy from simpler times, when we supported
+less types of contact information.
 
-> Regards
-> sober
+> I'm asking because I have problem with "0.vcf" vcard (this is responsible
+> for personal
+> information of device owner). This entry by default does not have any
+> phone's data
+> filled in address book but it is mandatory to put this in vcard-listing.
+> Actually, I am forced to initialize contact->numbers list with empty number
+> even if
+> none of number is available to return correct result for "0.vcf."(in
+> phonebook-tracker)...
+>
+> Can this 'contact->numbers' checking be removed from there or maybe other
+> phonebooks
+> rely on this behaviour?
+
+>From what I know, the Tracker backend is the only thing that relies on
+that, so I think that check could be removed with little to no
+problem. In fact, as you are already dealing with the empty numbers
+list case, the problem is already solved.
+
+>
+> BR,
+> Radek
 >
 >
-
->>> >
->>> >* Ron Shaffer <rshaffer@codeaurora.org> [2010-08-08 21:43:36 -0500]:
->>> >
->>> >>As requested in today's summit discussions, here's a link that can be
->>> >>used to inspect the code we've done to add AMP support on the latest
->>> >>next tree.
->>> >>
->>> >>https://www.codeaurora.org/gitweb/quic/bluetooth/?p=bluetooth-next-2.6.git;a=summary
->>> >>branch pk-upstream
->>> >
->>> >
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
 
 
-Peter.
-
+Cheers,
 -- 
-
-Peter Krystad
-
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-
-
+Vinicius
