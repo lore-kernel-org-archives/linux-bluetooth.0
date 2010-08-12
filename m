@@ -1,219 +1,150 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Subject: [PATCH] Changes in HDP API.
-Date: Thu, 12 Aug 2010 15:11:34 +0200
-Message-Id: <1281618694-10320-1-git-send-email-santoscadenas@gmail.com>
+Subject: Re: [PATCHv2] Bluetooth: new sockopt to enter active state when
+ sending data
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <AANLkTinp-wXzgUU3dSNteSGdBmgtcB8S+sWZZ-9b0BnD@mail.gmail.com>
+References: <1281448112-2944-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1281612715.12579.257.camel@localhost.localdomain>
+	 <AANLkTinp-wXzgUU3dSNteSGdBmgtcB8S+sWZZ-9b0BnD@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 12 Aug 2010 09:07:26 -0400
+Message-ID: <1281618447.12579.273.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Now the connection is made directly to a device and bluetoothd daemon
-guess the PSM connection and the MDEPID based on the data get from the
-SDP record.
+Hi Andrei,
 
-Also a property that indicates the MainChannel is added to the
-HealthDevice object.
----
- doc/health-api.txt |  119 +++++++++++++++++++++++-----------------------------
- 1 files changed, 53 insertions(+), 66 deletions(-)
+> >> Patch adds new socket option to enter active state when sending
+> >> data. Modified version of Fabien Chevalier patch (Sep/2008).
+> >> Discussions:
+> >> http://www.spinics.net/lists/bluez-devel/msg00567.html
+> >> http://www.spinics.net/lists/linux-bluetooth/msg03765.html
+> >>
+> >> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> >> ---
+> >>  include/net/bluetooth/hci_core.h |    1 +
+> >>  include/net/bluetooth/l2cap.h    |    2 ++
+> >>  net/bluetooth/hci_conn.c         |    7 ++++++-
+> >>  net/bluetooth/l2cap.c            |   15 +++++++++++++++
+> >>  4 files changed, 24 insertions(+), 1 deletions(-)
+> >>
+> >> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> >> index e42f6ed..477a492 100644
+> >> --- a/include/net/bluetooth/hci_core.h
+> >> +++ b/include/net/bluetooth/hci_core.h
+> >> @@ -178,6 +178,7 @@ struct hci_conn {
+> >>       __u8             auth_type;
+> >>       __u8             sec_level;
+> >>       __u8             power_save;
+> >> +     __u8             force_active;
+> >>       __u16            disc_timeout;
+> >>       unsigned long    pend;
+> >>
+> >> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> >> index 7c695bf..540cca7 100644
+> >> --- a/include/net/bluetooth/l2cap.h
+> >> +++ b/include/net/bluetooth/l2cap.h
+> >> @@ -74,6 +74,8 @@ struct l2cap_conninfo {
+> >>  #define L2CAP_LM_RELIABLE    0x0010
+> >>  #define L2CAP_LM_SECURE              0x0020
+> >>
+> >> +#define L2CAP_FORCE_ACTIVE_MODE      0x04
+> >> +
+> >>  /* L2CAP command codes */
+> >>  #define L2CAP_COMMAND_REJ    0x01
+> >>  #define L2CAP_CONN_REQ               0x02
+> >> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> >> index 800b6b9..11fc44a 100644
+> >> --- a/net/bluetooth/hci_conn.c
+> >> +++ b/net/bluetooth/hci_conn.c
+> >> @@ -214,6 +214,8 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
+> >>       conn->auth_type = HCI_AT_GENERAL_BONDING;
+> >>
+> >>       conn->power_save = 1;
+> >> +     /* Do not enter active state by default */
+> >> +     conn->force_active = 0;
+> >>       conn->disc_timeout = HCI_DISCONN_TIMEOUT;
+> >>
+> >>       switch (type) {
+> >> @@ -505,7 +507,10 @@ void hci_conn_enter_active_mode(struct hci_conn *conn)
+> >>       if (test_bit(HCI_RAW, &hdev->flags))
+> >>               return;
+> >>
+> >> -     if (conn->mode != HCI_CM_SNIFF || !conn->power_save)
+> >> +     if (conn->mode != HCI_CM_SNIFF)
+> >> +             goto timer;
+> >> +
+> >> +     if (!conn->power_save && !conn->force_active)
+> >>               goto timer;
+> >>
+> >>       if (!test_and_set_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend)) {
+> >> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> >> index cf3c407..5328e82 100644
+> >> --- a/net/bluetooth/l2cap.c
+> >> +++ b/net/bluetooth/l2cap.c
+> >> @@ -1909,6 +1909,15 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname, char __us
+> >>               l2cap_pi(sk)->force_reliable = (opt & L2CAP_LM_RELIABLE);
+> >>               break;
+> >>
+> >> +     case L2CAP_FORCE_ACTIVE_MODE:
+> >> +             if (get_user(opt, (u32 __user *) optval)) {
+> >> +                     err = -EFAULT;
+> >> +                     break;
+> >> +             }
+> >> +
+> >> +             l2cap_pi(sk)->conn->hcon->force_active = opt;
+> >> +             break;
+> >> +
+> >>       default:
+> >>               err = -ENOPROTOOPT;
+> >>               break;
+> >> @@ -2058,6 +2067,12 @@ static int l2cap_sock_getsockopt_old(struct socket *sock, int optname, char __us
+> >>
+> >>               break;
+> >>
+> >> +     case L2CAP_FORCE_ACTIVE_MODE:
+> >> +             if (put_user(l2cap_pi(sk)->conn->hcon->force_active,
+> >> +                                     (u32 __user *) optval))
+> >> +                     err = -EFAULT;
+> >> +             break;
+> >> +
+> >>       default:
+> >>               err = -ENOPROTOOPT;
+> >>               break;
+> >
+> > I think that I said this before. Why do you think that adding a new
+> > socket option to something called _old is a good idea? I made it pretty
+> > clear in the code that it is an OLD interface.
+> >
+> > I want this on the SOL_BLUETOOTH level with a proper new socket option.
+> > And we might even consider doing it like BT_SECURITY where create the
+> > struct to potentially add other flags later.
+> 
+> This can be done.
+> 
+> > So why not doing BT_POWER or something like that.
+> >
+> > And in addition you need to store these values on a per L2CAP or RFCOMM
+> > socket. You can not just go ahead and mess inside hci_conn via an L2CAP
+> > socket option.
+> 
+> I felt that Sniff Mode is a property of ACL link and not L2CAP or RFCOMM socket.
+> 
+> There is already code in the same functions which use the same
+> technique to access
+> following hci_conn fields:
+> 
+> l2cap_pi(sk)->conn->hcon->handle
+> l2cap_pi(sk)->conn->hcon->dev_class
 
-diff --git a/doc/health-api.txt b/doc/health-api.txt
-index f469df3..0a7ae73 100644
---- a/doc/health-api.txt
-+++ b/doc/health-api.txt
-@@ -14,12 +14,9 @@ Object path	/org/bluez/
- 
- Methods:
- 
--	object	CreateApplication(dict config, object agent)
-+	object	CreateApplication(dict config)
- 
--		Returns the path of the new registered application. The agent
--		parameter is the path of the object with the callbacks to
--		notify events (see org.bluez.HealthAgent at the end
--		of this document).
-+		Returns the path of the new registered application.
- 
- 		Dict is defined as bellow:
- 		{
-@@ -39,32 +36,33 @@ Methods:
- 
- 		Closes the HDP application identified by the object path. Also
- 		application will be closed if the process that started it leaves
--		the bus.
-+		the bus. Only the creator of the application will be able to
-+		destroy it.
- 
- 		Possible errors: org.bluez.Error.InvalidArguments
- 				org.bluez.Error.NotFound
-+				org.bluez.Error.NotAllowed
- 
- --------------------------------------------------------------------------------
- 
- Service		org.bluez
--Interface	org.bluez.HealthApplication
--Object path	[variable prefix]/health_app_ZZZZ
-+Interface	org.bluez.HealthDevice
-+Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
- 
- Methods:
- 
--	void Echo(object service)
-+	Boolean Echo()
- 
- 		Sends an echo petition to the remote service. Returns True if
- 		response matches with the buffer sent. If some error is detected
--		False value is returned and the associated MCL is closed.
-+		False value is returned.
- 
- 		Possible errors: org.bluez.Error.InvalidArguments
- 				org.bluez.Error.OutOfRange
- 
--	object CreateChannel(object service, string type)
-+	object CreateChannel(object application, string configuration)
- 
--		Creates a new data channel with the indicated config to the
--		remote Service.
-+		Creates a new data channel.
- 		The configuration should indicate the channel quality of
- 		service using one of this values "Reliable", "Streaming", "Any".
- 
-@@ -76,16 +74,39 @@ Methods:
- 
- 	void DestroyChannel(object channel)
- 
--		Destroys the data channel object.
-+		Destroys the data channel object. Only the creator of the
-+		channel or the creator of the HealtApplication that received the
-+		data channel will be able to destroy it
- 
- 		Possible errors: org.bluez.Error.InvalidArguments
--				orb.bluez.Error.NotFound
-+				org.bluez.Error.NotFound
-+				org.bluez.Error.NotAllowed
- 
----------------------------------------------------------------------------------
-+Signals:
- 
--Service		org.bluez
--Interface	org.bluez.HealthService
--Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/hdp_YYYY
-+	void ChannelConnected(object channel)
-+
-+		This signal is launched when a new data channel is created or
-+		when a known data channel is reconnected.
-+
-+	void ChannelDeleted(object channel)
-+
-+		This signal is launched when a data channel is deleted.
-+
-+		After this signal the data channel path will not be valid and
-+		its path can be reused for future data channels.
-+
-+	void PropertyChanged(string name, variant value)
-+
-+		This signal indicates a changed value of the given property.
-+
-+Properties:
-+
-+	object MainChannel [readonly]
-+
-+		The first reliable channel opened. It is needed by upper
-+		applications in order to send specific protocol data units. The
-+		first reliable can change after a reconnection.
- 
- --------------------------------------------------------------------------------
- 
-@@ -94,6 +115,9 @@ Interface	org.bluez.HealthChannel
- Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/
- 							hdp_YYYY/channel_ZZ
- 
-+Only the process that created the data channel or the creator of the
-+HealthApplication that received it will be able to call this methods.
-+
- Methods:
- 
- 	dict GetProperties()
-@@ -101,68 +125,31 @@ Methods:
- 		Returns all properties for the interface. See the properties
- 		section for available properties.
- 
-+		Posible errors: org.bluez.Error.NotAllowed
-+
- 	fd Acquire()
- 
- 		Returns the file descriptor for this data channel. If the data
- 		channel is not connected it will also reconnect.
- 
- 		Possible errors: org.bluez.Error.NotConnected
-+				org.bluez.Error.NotAllowed
- 
- 	void Release()
- 
- 		Releases the fd. Application should also need to close() it.
- 
-+		Possible errors: org.bluez.Error.NotAcquired
-+				org.bluez.Error.NotAllowed
-+
- Properties:
- 
--	string Type (read only)
-+	string Type [readonly]
- 
- 		The quality of service of the data channel. ("Reliable" or
- 		"Streaming")
- 
--	object Service (read only)
--
--		Identifies the Remote Service that is connected with. Maps with
--		a HealthService object.
--
--HealthAgent hierarchy
--=====================
--
--(this object is implemented by the HDP user in order to receive notifications)
--
--Service		unique name
--Interface	org.bluez.HealthAgent
--Object path	freely definable
--
--Methods:
--
--	void Release()
--
--		This method gets called when the service daemon unregisters the
--		agent. An agent can use it to do cleanup tasks. There is no need
--		to unregister the agent, because when this method gets called it
--		has already been unregistered.
--
--	void ServiceDiscovered(object service)
--
--		This method is called when a device containing an HDP
--		application is paired or when the method Update of the
--		HealthManager is called and new HealthServices are discovered.
--		The method will be called once for each HealthService.
--
--	void ServiceRemoved(object service)
--
--		This is called if during an Update some HealthServices
--		have disappeared. The method is called once for each removed
--		HealthService.
--
--	void ChannelConnected(object channel)
--
--		This method is called when a new data channel is created or when
--		a known data channel is reconnected.
--
--	void ChannelDeleted(object channel)
--
--		This method is called when a data channel is deleted.
-+	object Device [readonly]
- 
--		After this call the data channel path will not be valid and can
--		be reused for future creation of data channels.
-+		Identifies the Remote Device that is connected with. Maps with
-+		a HealthDevice object.
--- 
-1.7.0.4
+that is for pure read-only access. If multiple L2CAP sockets are open
+you have to be smart about the policy you put onto your ACL link.
+
+Regards
+
+Marcel
+
 
