@@ -1,25 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 12 Aug 2010 07:15:31 -0400
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Mol <marcel@mesa.nl>
+Date: Thu, 12 Aug 2010 07:13:28 -0400
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Cosmetic: fix comment typos/indents
-Message-ID: <20100812111531.GA19780@jh-x301>
-References: <201008121026.o7CAQ00K005274@joshua.mesa.nl>
+Subject: Re: [PATCH] Use enum from vcard.h for phone types
+Message-ID: <20100812111328.GA19296@jh-x301>
+References: <1281599353-27811-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <201008121026.o7CAQ00K005274@joshua.mesa.nl>
+In-Reply-To: <1281599353-27811-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Radek,
 
-On Thu, Aug 12, 2010, Marcel Mol wrote:
+On Thu, Aug 12, 2010, Radoslaw Jablonski wrote:
+> Removed redundant declarations for phone types. Now using values from
+> phonebook_number_type declared in vcard.h.
 > ---
->  plugins/pbap.c            |    2 +-
->  plugins/phonebook-ebook.c |    2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+>  plugins/phonebook-tracker.c |    6 ++----
+>  1 files changed, 2 insertions(+), 4 deletions(-)
 
-Thanks. The patch is now upstream.
+The patch has been applied and pushed upstream. Thanks.
 
 Johan
