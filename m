@@ -1,136 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 12 Aug 2010 16:26:27 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: "Gustavo F. Padovan" <gustavo@padovan.org>
-cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	rshaffer@codeaurora.org
-Subject: Re: [RFC 3/7] Bluetooth: Add FCS awareness to L2CAP HCI
- fragmentation.
-In-Reply-To: <20100811033540.GA9151@vigoh>
-Message-ID: <alpine.DEB.2.00.1008121623480.8460@linux-sea-02>
-References: <1281467704-5378-1-git-send-email-mathewm@codeaurora.org> <1281467704-5378-4-git-send-email-mathewm@codeaurora.org> <20100811033540.GA9151@vigoh>
+Message-ID: <4C647391.2090607@csr.com>
+Date: Thu, 12 Aug 2010 23:20:01 +0100
+From: David Vrabel <david.vrabel@csr.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Process HCI events in a workqueue instead
+ of a tasklet
+References: <1281323213-30907-1-git-send-email-marcel@holtmann.org>	 <1281442519.12579.209.camel@localhost.localdomain>	 <4C614B01.6030000@csr.com> <1281446085.12579.212.camel@localhost.localdomain>
+In-Reply-To: <1281446085.12579.212.camel@localhost.localdomain>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Marcel Holtmann wrote:
+> Hi David,
+> 
+>>>> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+>>>> ---
+>>>>  include/net/bluetooth/hci_core.h |    2 +
+>>>>  net/bluetooth/hci_core.c         |   58 ++++++++++++++++++++++++++++++++-----
+>>>>  2 files changed, 52 insertions(+), 8 deletions(-)
+>>> so I stuffed this now into bluetooth-testing tree and would like to see
+>>> some extra testing exposure. So far this has only been tested by myself.
+>>>
+>>> If there are no regression then this should make a lot of HCI and L2CAP
+>>> handling a lot simple.
+>> This may result in packets being processed in a different order to that 
+>> which they were received in.
+>>
+>> e.g., what happens to an ACL packet processed before the connection 
+>> complete event for that connection?
+> 
+> good point. So we would either a) need to disable the RX tasklet when we
+> receive an event and schedule it for processing or b) process the ACL
+> data also in a workqueue.
+
+I've thought some more about this and I'm not sure disabling the tasklet
+is sufficient to prevent packets being reordered.  Consider a transport
+that submits (in the same interrupt handler call) an ACL packet and an
+HCI event.  The tasklet will be scheduled and then disabled until the
+event is processed in the workqueue.
+
+On the other hand, USB transports do not ensure any ordering between HCI
+event and ACL packets because they're received on different USB
+endpoints which could be processed in any order.
+
+David
+-- 
+David Vrabel, Senior Software Engineer, Drivers
+CSR, Churchill House, Cambridge Business Park,  Tel: +44 (0)1223 692562
+Cowley Road, Cambridge, CB4 0WZ                 http://www.csr.com/
 
 
-On Wed, 11 Aug 2010, Gustavo F. Padovan wrote:
-
-> * Mat Martineau <mathewm@codeaurora.org> [2010-08-10 12:15:00 -0700]:
->
->> In order to not limit ERTM and streaming mode PDUs to the HCI MTU
->> size, L2CAP must be able to split PDUs in to multple HCI fragments.
->> This is done by allocating space for the FCS in the last fragment.
->>
->> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
->> ---
->>  net/bluetooth/l2cap.c |   39 ++++++++++++++++++++++++++++++++++-----
->>  1 files changed, 34 insertions(+), 5 deletions(-)
->>
->> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
->> index aa69c84..b485c4a 100644
->> --- a/net/bluetooth/l2cap.c
->> +++ b/net/bluetooth/l2cap.c
->> @@ -1664,31 +1664,63 @@ static inline int l2cap_skbuff_fromiovec(struct sock *sk, struct msghdr *msg, in
->>  {
->>  	struct l2cap_conn *conn = l2cap_pi(sk)->conn;
->>  	struct sk_buff **frag;
->> +	struct sk_buff *final;
->>  	int err, sent = 0;
->>
->> +	BT_DBG("sk %p, msg %p, len %d, count %d, skb %p", sk,
->> +		msg, (int)len, (int)count, skb);
->> +
->>  	if (memcpy_fromiovec(skb_put(skb, count), msg->msg_iov, count))
->>  		return -EFAULT;
->>
->>  	sent += count;
->>  	len  -= count;
->> +	final = skb;
->>
->>  	/* Continuation fragments (no L2CAP header) */
->>  	frag = &skb_shinfo(skb)->frag_list;
->>  	while (len) {
->> +		int skblen;
->>  		count = min_t(unsigned int, conn->mtu, len);
->>
->> -		*frag = bt_skb_send_alloc(sk, count, msg->msg_flags & MSG_DONTWAIT, &err);
->> +		/* Add room for the FCS if it fits */
->> +		if (l2cap_pi(sk)->fcs == L2CAP_FCS_CRC16 &&
->> +		    len + L2CAP_FCS_SIZE <= conn->mtu)
->
-> You don't need to check for (len + L2CAP_FCS_SIZE <= conn=mtu) here.
-> Section 5.1 point that:
->
-> "Unlike the B-Frame length field, the I-frame length field may be greater
-> than the configured MTU because it includes the octet lengths of the
-> Control, L2CAP SDU Length (when present), and frame check sequence
-> fields as well as the Information octets."
->
-> From that I understand "len <=" and not "len + L2CAP_FCS_SIZE <="
-
-This is checking against the HCI MTU, not the L2CAP MTU.  Any L2CAP 
-payload (headers, data, or FCS) needs to fit in the HCI fragment. 
-The idea here is to see if len is short enough that the FCS can be 
-included in this HCI fragment after the L2CAP data.
-
->> +			skblen = count + L2CAP_FCS_SIZE;
->> +		else
->> +			skblen = count;
->> +
->> +		*frag = bt_skb_send_alloc(sk, skblen,
->> +					msg->msg_flags & MSG_DONTWAIT, &err);
->>  		if (!*frag)
->>  			return -EFAULT;
->> -		if (memcpy_fromiovec(skb_put(*frag, count), msg->msg_iov, count))
->> +
->> +		if (memcpy_fromiovec(skb_put(*frag, count),
->> +				msg->msg_iov, count))
->>  			return -EFAULT;
->>
->>  		sent += count;
->>  		len  -= count;
->>
->> +		final = *frag;
->> +
->>  		frag = &(*frag)->next;
->>  	}
->>
->> +	if (l2cap_pi(sk)->fcs == L2CAP_FCS_CRC16) {
->> +		if (skb_tailroom(final) < L2CAP_FCS_SIZE) {
->> +			*frag = bt_skb_send_alloc(sk, L2CAP_FCS_SIZE,
->> +						msg->msg_flags & MSG_DONTWAIT,
->> +						&err);
->> +			if (!*frag)
->> +				return -EFAULT;
->> +
->> +			final = *frag;
->> +		}
->> +
->> +		skb_put(final, L2CAP_FCS_SIZE);
->> +	}
->> +
->>  	return sent;
->>  }
->>
->> @@ -1790,9 +1822,6 @@ static struct sk_buff *l2cap_create_iframe_pdu(struct sock *sk, struct msghdr *m
->>  		return ERR_PTR(err);
->>  	}
->>
->> -	if (l2cap_pi(sk)->fcs == L2CAP_FCS_CRC16)
->> -		put_unaligned_le16(0, skb_put(skb, 2));
->> -
->>  	bt_cb(skb)->retries = 0;
->>  	return skb;
->>  }
->> --
->> 1.7.1
-
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-
-
+Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
