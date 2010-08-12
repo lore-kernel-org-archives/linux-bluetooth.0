@@ -1,135 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCHv2] Bluetooth: new sockopt to enter active state when
- sending data
+Subject: Re: [PATCHv1 1/2] Bluetooth: Check sk is not owned before freeing
+ l2cap_conn
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1281448112-2944-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1281448112-2944-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <AANLkTi=GB-QCBmB-2dKoZPrpDU_ZfQupjgD3p0ygv486@mail.gmail.com>
+References: <1274883694-18120-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1274883694-18120-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1278429662.2789.52.camel@localhost.localdomain>
+	 <AANLkTi=GB-QCBmB-2dKoZPrpDU_ZfQupjgD3p0ygv486@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Date: Thu, 12 Aug 2010 07:31:55 -0400
-Message-ID: <1281612715.12579.257.camel@localhost.localdomain>
+Date: Thu, 12 Aug 2010 07:27:05 -0400
+Message-ID: <1281612425.12579.253.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-> Patch adds new socket option to enter active state when sending
-> data. Modified version of Fabien Chevalier patch (Sep/2008).
-> Discussions:
-> http://www.spinics.net/lists/bluez-devel/msg00567.html
-> http://www.spinics.net/lists/linux-bluetooth/msg03765.html
+> >> Check that socket sk is not locked in user process before removing
+> >> l2cap connection handler.
+> >>
+> >> krfcommd kernel thread may be preempted with l2cap tasklet which remove
+> >> l2cap_conn structure. If krfcommd is in process of sending of RFCOMM reply
+> >> (like "RFCOMM UA" reply to "RFCOMM DISC") then kernel crash happens.
+> >>
+> >> ...
+> >> [  694.175933] Unable to handle kernel NULL pointer dereference at virtual address 00000000
+> >> [  694.184936] pgd = c0004000
+> >> [  694.187683] [00000000] *pgd=00000000
+> >> [  694.191711] Internal error: Oops: 5 [#1] PREEMPT
+> >> [  694.196350] last sysfs file: /sys/devices/platform/hci_h4p/firmware/hci_h4p/loading
+> >> [  694.260375] CPU: 0    Not tainted  (2.6.32.10 #1)
+> >> [  694.265106] PC is at l2cap_sock_sendmsg+0x43c/0x73c [l2cap]
+> >> [  694.270721] LR is at 0xd7017303
+> >> ...
+> >> [  694.525085] Backtrace:
+> >> [  694.527587] [<bf266be0>] (l2cap_sock_sendmsg+0x0/0x73c [l2cap]) from [<c02f2cc8>] (sock_sendmsg+0xb8/0xd8)
+> >> [  694.537292] [<c02f2c10>] (sock_sendmsg+0x0/0xd8) from [<c02f3044>] (kernel_sendmsg+0x48/0x80)
+> >> ...
+> >>
+> >> Modified version after comments of Gustavo F. Padovan <gustavo@padovan.org>
+> >>
+> >> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> >
+> > the patch seems to be fine, but I have some extra questions/concerns.
+> >
+> > Who is now taking care of deleting the channel in this case? I think you
+> > need to show that the code flow is still valid.
 > 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
-> ---
->  include/net/bluetooth/hci_core.h |    1 +
->  include/net/bluetooth/l2cap.h    |    2 ++
->  net/bluetooth/hci_conn.c         |    7 ++++++-
->  net/bluetooth/l2cap.c            |   15 +++++++++++++++
->  4 files changed, 24 insertions(+), 1 deletions(-)
+> I have the other version of the I have sent already to ML where I use
+> standard l2cap
+> timer which will delete channel like the code below:
 > 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index e42f6ed..477a492 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -178,6 +178,7 @@ struct hci_conn {
->  	__u8             auth_type;
->  	__u8             sec_level;
->  	__u8             power_save;
-> +	__u8             force_active;
->  	__u16            disc_timeout;
->  	unsigned long	 pend;
->  
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index 7c695bf..540cca7 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -74,6 +74,8 @@ struct l2cap_conninfo {
->  #define L2CAP_LM_RELIABLE	0x0010
->  #define L2CAP_LM_SECURE		0x0020
->  
-> +#define L2CAP_FORCE_ACTIVE_MODE	0x04
-> +
->  /* L2CAP command codes */
->  #define L2CAP_COMMAND_REJ	0x01
->  #define L2CAP_CONN_REQ		0x02
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 800b6b9..11fc44a 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -214,6 +214,8 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
->  	conn->auth_type = HCI_AT_GENERAL_BONDING;
->  
->  	conn->power_save = 1;
-> +	/* Do not enter active state by default */ 
-> +	conn->force_active = 0;
->  	conn->disc_timeout = HCI_DISCONN_TIMEOUT;
->  
->  	switch (type) {
-> @@ -505,7 +507,10 @@ void hci_conn_enter_active_mode(struct hci_conn *conn)
->  	if (test_bit(HCI_RAW, &hdev->flags))
->  		return;
->  
-> -	if (conn->mode != HCI_CM_SNIFF || !conn->power_save)
-> +	if (conn->mode != HCI_CM_SNIFF)
-> +		goto timer;
-> +
-> +	if (!conn->power_save && !conn->force_active)
->  		goto timer;
->  
->  	if (!test_and_set_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend)) {
-> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-> index cf3c407..5328e82 100644
-> --- a/net/bluetooth/l2cap.c
-> +++ b/net/bluetooth/l2cap.c
-> @@ -1909,6 +1909,15 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname, char __us
->  		l2cap_pi(sk)->force_reliable = (opt & L2CAP_LM_RELIABLE);
->  		break;
->  
-> +	case L2CAP_FORCE_ACTIVE_MODE:
-> +		if (get_user(opt, (u32 __user *) optval)) {
-> +			err = -EFAULT;
-> +			break;
-> +		}
-> +		
-> +		l2cap_pi(sk)->conn->hcon->force_active = opt;
-> +		break;
-> +
->  	default:
->  		err = -ENOPROTOOPT;
->  		break;
-> @@ -2058,6 +2067,12 @@ static int l2cap_sock_getsockopt_old(struct socket *sock, int optname, char __us
->  
->  		break;
->  
-> +	case L2CAP_FORCE_ACTIVE_MODE:
-> +		if (put_user(l2cap_pi(sk)->conn->hcon->force_active,
-> +					(u32 __user *) optval))
-> +			err = -EFAULT;
-> +		break;
-> +
->  	default:
->  		err = -ENOPROTOOPT;
->  		break;
+> +       /* don't delete l2cap channel if sk is owned by user */
+> +       if (sock_owned_by_user(sk)) {
+> +               sk->sk_state = BT_DISCONN;
+> +               l2cap_sock_clear_timer(sk);
+> +               l2cap_sock_set_timer(sk, HZ);
+> +               bh_unlock_sock(sk);
+> +               return 0;
+> +       }
+> 
+> > Also the question is how RFCOMM can send this UA or DISC with not
+> > locking the socket. The comment on l2cap_chan_del clearly states that
+> > the socket must be locked and inside L2CAP we do that. Is RFCOMM maybe
+> > at fault here?
+> 
+> when RFCOMM send packets it lock_sock which marks sk as owned
+> sk->sk_lock.owned = 1;
+> and then can be preempted.
 
-I think that I said this before. Why do you think that adding a new
-socket option to something called _old is a good idea? I made it pretty
-clear in the code that it is an OLD interface.
-
-I want this on the SOL_BLUETOOTH level with a proper new socket option.
-And we might even consider doing it like BT_SECURITY where create the
-struct to potentially add other flags later.
-
-So why not doing BT_POWER or something like that.
-
-And in addition you need to store these values on a per L2CAP or RFCOMM
-socket. You can not just go ahead and mess inside hci_conn via an L2CAP
-socket option.
+I need a new patch with a proper and most likely lengthy commit message
+explaining every single detail here. Since right now you lost me.
 
 Regards
 
 Marcel
-
 
 
