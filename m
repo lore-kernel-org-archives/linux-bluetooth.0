@@ -1,17 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 12 Aug 2010 17:07:46 -0700 (PDT)
+Date: Thu, 12 Aug 2010 16:36:57 -0700 (PDT)
 From: Mat Martineau <mathewm@codeaurora.org>
 To: "Gustavo F. Padovan" <gustavo@padovan.org>
 cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	rshaffer@codeaurora.org
-Subject: Re: [RFC 5/7] Bluetooth: Handle fragmented skbs in
- bt_sock_stream_recvmsg()
-In-Reply-To: <20100811042543.GA9428@vigoh>
-Message-ID: <alpine.DEB.2.00.1008121643480.8460@linux-sea-02>
-References: <1281467704-5378-1-git-send-email-mathewm@codeaurora.org> <1281467704-5378-6-git-send-email-mathewm@codeaurora.org> <20100811042543.GA9428@vigoh>
+    rshaffer@codeaurora.org
+Subject: Re: [RFC 3/7] Bluetooth: Add FCS awareness to L2CAP HCI
+ fragmentation.
+In-Reply-To: <20100811035654.GA9293@vigoh>
+Message-ID: <alpine.DEB.2.00.1008121626340.8460@linux-sea-02>
+References: <1281467704-5378-1-git-send-email-mathewm@codeaurora.org> <1281467704-5378-4-git-send-email-mathewm@codeaurora.org> <20100811033540.GA9151@vigoh> <20100811035654.GA9293@vigoh>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
@@ -20,115 +19,112 @@ On Wed, 11 Aug 2010, Gustavo F. Padovan wrote:
 
 > Hi Mat,
 >
-> * Mat Martineau <mathewm@codeaurora.org> [2010-08-10 12:15:02 -0700]:
+> * Gustavo F. Padovan <gustavo@padovan.org> [2010-08-11 00:35:41 -0300]:
 >
->> When reading L2CAP skbuffs, add the ability to copy from
->> fragmented skbuffs generated during ERTM or streaming mode
->> reassembly.  This defers extra copying of L2CAP payloads
->> until the final, unavoidable copy to userspace.
+>> * Mat Martineau <mathewm@codeaurora.org> [2010-08-10 12:15:00 -0700]:
 >>
->> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
->> ---
->>  net/bluetooth/af_bluetooth.c |   30 ++++++++++++++++++++++++++++--
->>  1 files changed, 28 insertions(+), 2 deletions(-)
+>>> In order to not limit ERTM and streaming mode PDUs to the HCI MTU
+>>> size, L2CAP must be able to split PDUs in to multple HCI fragments.
+>>> This is done by allocating space for the FCS in the last fragment.
+>>>
+>>> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+>>> ---
+>>>  net/bluetooth/l2cap.c |   39 ++++++++++++++++++++++++++++++++++-----
+>>>  1 files changed, 34 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+>>> index aa69c84..b485c4a 100644
+>>> --- a/net/bluetooth/l2cap.c
+>>> +++ b/net/bluetooth/l2cap.c
+>>> @@ -1664,31 +1664,63 @@ static inline int l2cap_skbuff_fromiovec(struct sock *sk, struct msghdr *msg, in
+>>>  {
+>>>  	struct l2cap_conn *conn = l2cap_pi(sk)->conn;
+>>>  	struct sk_buff **frag;
+>>> +	struct sk_buff *final;
+>>>  	int err, sent = 0;
+>>>
+>>> +	BT_DBG("sk %p, msg %p, len %d, count %d, skb %p", sk,
+>>> +		msg, (int)len, (int)count, skb);
+>>> +
+>>>  	if (memcpy_fromiovec(skb_put(skb, count), msg->msg_iov, count))
+>>>  		return -EFAULT;
+>>>
+>>>  	sent += count;
+>>>  	len  -= count;
+>>> +	final = skb;
+>>>
+>>>  	/* Continuation fragments (no L2CAP header) */
+>>>  	frag = &skb_shinfo(skb)->frag_list;
+>>>  	while (len) {
+>>> +		int skblen;
+>>>  		count = min_t(unsigned int, conn->mtu, len);
+>>>
+>>> -		*frag = bt_skb_send_alloc(sk, count, msg->msg_flags & MSG_DONTWAIT, &err);
+>>> +		/* Add room for the FCS if it fits */
+>>> +		if (l2cap_pi(sk)->fcs == L2CAP_FCS_CRC16 &&
+>>> +		    len + L2CAP_FCS_SIZE <= conn->mtu)
 >>
->> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
->> index 77a26fe..5e0375b 100644
->> --- a/net/bluetooth/af_bluetooth.c
->> +++ b/net/bluetooth/af_bluetooth.c
->> @@ -342,7 +342,7 @@ int bt_sock_stream_recvmsg(struct kiocb *iocb, struct socket *sock,
->>  		}
+>> You don't need to check for (len + L2CAP_FCS_SIZE <= conn=mtu) here.
+>> Section 5.1 point that:
 >>
->>  		chunk = min_t(unsigned int, skb->len, size);
->> -		if (memcpy_toiovec(msg->msg_iov, skb->data, chunk)) {
->> +		if (skb_copy_datagram_iovec(skb, 0, msg->msg_iov, chunk)) {
->>  			skb_queue_head(&sk->sk_receive_queue, skb);
->>  			if (!copied)
->>  				copied = -EFAULT;
->> @@ -354,7 +354,33 @@ int bt_sock_stream_recvmsg(struct kiocb *iocb, struct socket *sock,
->>  		sock_recv_ts_and_drops(msg, sk, skb);
+>> "Unlike the B-Frame length field, the I-frame length field may be greater
+>> than the configured MTU because it includes the octet lengths of the
+>> Control, L2CAP SDU Length (when present), and frame check sequence
+>> fields as well as the Information octets."
 >>
->>  		if (!(flags & MSG_PEEK)) {
->> -			skb_pull(skb, chunk);
->> +			int skb_len = skb_headlen(skb);
+>> From that I understand "len <=" and not "len + L2CAP_FCS_SIZE <="
 >
-> Why are you using the header length here?
+> So here you might want to the check if we support FCS, and then add 2 to
+> skblen.
 
-skb_headlen() returns the length of the first fragment.
+That's what the code does, without violating the HCI MTU.
 
-
->> +
->> +			if (chunk <= skb_len) {
->> +				__skb_pull(skb, chunk);
->> +			} else {
->> +				struct sk_buff *frag;
->> +
->> +				__skb_pull(skb, skb_len);
->> +				chunk -= skb_len;
+>>> +			skblen = count + L2CAP_FCS_SIZE;
+>>> +		else
+>>> +			skblen = count;
+>>> +
+>>> +		*frag = bt_skb_send_alloc(sk, skblen,
+>>> +					msg->msg_flags & MSG_DONTWAIT, &err);
+>>>  		if (!*frag)
+>>>  			return -EFAULT;
+>>> -		if (memcpy_fromiovec(skb_put(*frag, count), msg->msg_iov, count))
+>>> +
+>>> +		if (memcpy_fromiovec(skb_put(*frag, count),
+>>> +				msg->msg_iov, count))
+>>>  			return -EFAULT;
+>>>
+>>>  		sent += count;
+>>>  		len  -= count;
+>>>
+>>> +		final = *frag;
+>>> +
+>>>  		frag = &(*frag)->next;
+>>>  	}
+>>>
+>>> +	if (l2cap_pi(sk)->fcs == L2CAP_FCS_CRC16) {
+>>> +		if (skb_tailroom(final) < L2CAP_FCS_SIZE) {
+>>> +			*frag = bt_skb_send_alloc(sk, L2CAP_FCS_SIZE,
+>>> +						msg->msg_flags & MSG_DONTWAIT,
+>>> +						&err);
 >
-> Why do we have this __skb_pull() here? I think skb_walk_frags() can
-> handle everything.
-
-That first __skb_pull() is necessary to deal with data in the first 
-skbuff, and the skb_walk_frags() deals with anything in 
-skb_shinfo(skb)->frag_list.  The linked skb list looks roughly like 
-this:
-
-skb
-  unsigned char *data -> (L2CAP data)
-  struct sk_buff *frag_list -> 2nd frag
-                                 unsigned char *data -> (more data)
-                                 struct sk_buff *next -> 3rd frag
-                                                           (etc.)
-
-So the first frag is special - the pointer to the fragment is 
-frag_list.  Each linked fragment after that uses the "next" pointer in 
-the sk_buff struct.  The skb_walk_frags() macro starts with the 
-sk_buff pointed to by frag_list, then follows the "next" links.
-
-
-
->> +
->> +				skb_walk_frags(skb, frag) {
->> +					if (chunk <= frag->len) {
->> +						/* Pulling partial data */
->> +						skb->len -= chunk;
->> +						skb->data_len -= chunk;
->> +						__skb_pull(frag, chunk);
->> +						break;
+> Why do we need to check for FCS again? We already added it required
+> space to the last fragment.
 >
-> If we break here what will happen whit the rest of the data to be
-> pulled.
 
-The data is left to be pulled later.  The skb is not freed until all 
-the fragments are empty, and this is handled by existing code.  I've 
-added the next couple of lines of context below to help explain.
+If there was room in the HCI fragment, count+2 bytes were allocated 
+with bt_skb_send_alloc.  However, only count bytes were used by 
+skb_put.
 
->
->> +					} else if (frag->len) {
->> +						/* Pulling all frag data */
->> +						chunk -= frag->len;
->> +						skb->len -= frag->len;
->> +						skb->data_len -= frag->len;
->> +						__skb_pull(frag, frag->len);
->> +					}
->> +				}
->> +			}
->> +
->>  			if (skb->len) {
->>  				skb_queue_head(&sk->sk_receive_queue, skb);
->>  				break;
-                         }
-                         kfree_skb(skb);
+This final block of code is doing two things:
 
-If the skb is not empty, it's pushed back on the head of the receive 
-queue.  If it is empty, it's freed.
+  1. Allocating a final HCI fragment for the FCS if there was not room 
+for the FCS in the last data fragment.
 
-I based this approach on some code I found in the SCTP protocol.
+  2. Doing the skb_put for the FCS bytes.
+
+I will add some comments to this code to help clarify what's going on.
 
 --
 Mat Martineau
 Employee of Qualcomm Innovation Center, Inc.
 Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-
-
