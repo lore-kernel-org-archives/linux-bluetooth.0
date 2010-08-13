@@ -1,37 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: bluetooth profile source code
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Viral Mehta <Viral.Mehta@lntinfotech.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <70376CA23424B34D86F1C7DE6B99734306D4C3CC13@VSHINMSMBX01.vshodc.lntinfotech.com>
-References: <70376CA23424B34D86F1C7DE6B99734306D4C3CC13@VSHINMSMBX01.vshodc.lntinfotech.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 13 Aug 2010 14:20:06 +0200
-Message-ID: <1281702006.12579.438.camel@localhost.localdomain>
-Mime-Version: 1.0
+Date: Fri, 13 Aug 2010 08:19:15 -0400
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Add support for FAX number in phonebook-tracker.c
+Message-ID: <20100813121915.GB2819@jh-x301>
+References: <1281697117-23072-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1281697117-23072-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Viral,
+Hi Radek,
 
-> I am looking for some BT profile source code.
-> I was able to find out for OBEX source code,
-> 
-> But, I could not find any source cod for
-> Headset Profile
-> A2DP profile
-> HandsFree Profile
-> 
-> Surprisingly, is there no open source code for all these profiles ?
-> Or I am just not able to google properly !!??
+On Fri, Aug 13, 2010, Radoslaw Jablonski wrote:
+> Previously all fax numbers were treated as home phone numbers. Now
+> fetching fax field as additional column in tracker query. Data from this
+> column is filled as phone number with FAX type set. All pull queries are
+> modified that way to suport fax number type.
+> ---
+>  plugins/phonebook-tracker.c |  129 +++++++++++++++++++++++++++++++++---------
+>  1 files changed, 101 insertions(+), 28 deletions(-)
 
-seems your Google Mojo is not high enough:
+Thanks. This patch is now also upstream.
 
-http://git.kernel.org/?p=bluetooth/bluez.git;a=summary
-http://git.kernel.org/?p=bluetooth/obexd.git;a=summary
-
-Regards
-
-Marcel
-
-
+Johan
