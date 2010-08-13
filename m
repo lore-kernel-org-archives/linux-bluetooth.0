@@ -1,72 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
-From: Oliver Neukum <oneukum@suse.de>
-To: Ville Tervo <ville.tervo@iki.fi>
-Subject: Re: resending patch to retry reset in case it failed
-Date: Fri, 13 Aug 2010 15:56:22 +0200
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"linux-bluetooth" <linux-bluetooth@vger.kernel.org>,
-	"linux-usb" <linux-usb@vger.kernel.org>
-References: <201008120944.49044.oneukum@suse.de> <201008121416.31808.oneukum@suse.de> <AANLkTi=odMckPT4pAOiQJm+1NWbk0diL=-9=yKBfj66W@mail.gmail.com>
-In-Reply-To: <AANLkTi=odMckPT4pAOiQJm+1NWbk0diL=-9=yKBfj66W@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201008131556.22623.oneukum@suse.de>
+In-Reply-To: <20100813124102.GA3546@jh-x301>
+References: <AANLkTi=Jh5fsqye6-Ry+VSNWftufDFCdyNEn6fcNrW84@mail.gmail.com>
+	<20100813124102.GA3546@jh-x301>
+Date: Fri, 13 Aug 2010 16:43:33 +0300
+Message-ID: <AANLkTi=afUGqbZy1fRmHsPFQQyFWkEUwi+4tYT22N2az@mail.gmail.com>
+Subject: Re: [PATCH 1/3] Add mode callback to btd_adapter
+From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=00c09f88d37041e4fc048db4abd0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am Freitag, 13. August 2010, 15:20:08 schrieb Ville Tervo:
-> On Thu, Aug 12, 2010 at 8:16 AM, Oliver Neukum <oneukum@suse.de> wrote:
-> > Am Donnerstag, 12. August 2010, 13:25:23 schrieb Marcel Holtmann:
-> >> Hi Oliver,
-> >>
-> >> > may I ask what happened to this patch?
-> >> > Do you take it, want modifications or reject it?
-> >> >
-> >> >     Regards
-> >> >             Oliver
-> >> >
-> >> > From af61f0663f095599003290b13ad6fadee1d4fb25 Mon Sep 17 00:00:00 2001
-> >> > From: Oliver Neukum <oliver@neukum.org>
-> >> > Date: Tue, 6 Jul 2010 08:08:42 +0200
-> >> > Subject: [PATCH] bluetooth: retry reset for devices that fail
-> >> >
-> >> > Some devices fail to reset properly at the first attempt to reset
-> >> > them under unknown circumstances. Failures can be identified by
-> >> > an invalid btaddr. Retry in those cases.
-> >>
-> >> I was pondering about it and haven't really made up my mind with this
-> >> stuff. To be honest, I don't like the patch a little bit. I can see your
-> >> point why you want it, but the patch is a bit too ugly for my taste.
-> >
-> > I am very open to alternatives. But without that it is needed to make the
-> > hardware work.
-> >
-> >> Tell me which device is causing this and I might be able to reproduce
-> >> this and find small less ugly fix.
-> >
-> >
-> > I happens with this hardware from Broadcom. There may be others I don't
-> > know about. It is an internal dongle. I don't know whether it can be found in
-> > external hardware.
-> >
-> 
-> Could you share also "hciconfig hci0 revision" and "hciconfig hci0
-> version" info. And laptop model you have the chip build in.
+--00c09f88d37041e4fc048db4abd0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-The device reported:
+On Fri, Aug 13, 2010 at 3:41 PM, Johan Hedberg <johan.hedberg@gmail.com> wr=
+ote:
+> On Fri, Aug 13, 2010, Daniel =D6rstadius wrote:
+>> +typedef void (*btd_adapter_mode_cb) (struct btd_adapter *adapter,
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0 =A0 =A0 =A0 gboolean powered);
+>> +void btd_adapter_register_mode_callback(struct btd_adapter *adapter,
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0 =A0 =A0 =A0 btd_adapter_mode_cb cb);
+>
+> In general this seems fine, but I think for completeness there should
+> also be a unregister function. Also, since we've traditionally used the
+> term mode to include also the discoverable state the name should
+> probably be something like btd_adapter_register_powered_callback and
+> btd_adapter_powered_cb.
+>
 
-localhost:/tmp # hciconfig hci0 version
-hci0:	Type: USB
-	BD Address: 00:27:13:98:49:7E ACL MTU: 1021:8 SCO MTU: 64:1
-	HCI Ver: 3.0 (0x5) HCI Rev: 0x1e1 LMP Ver: 3.0 (0x5) LMP Subver: 0x4203
-	Manufacturer: Broadcom Corporation (15)
-localhost:/tmp # hciconfig hci0 revision
-hci0:	Type: USB
-	BD Address: 00:27:13:98:49:7E ACL MTU: 1021:8 SCO MTU: 64:1
-	Firmware 225.66 / 3
+Thanks for the feedback. Replaced 'mode' with 'powered' and added the
+unregister function.
 
-The laptop is a prototype. All laptops it was installed in showed the same
-problem.
+/Daniel
 
-	Regards
-		Oliver
+--00c09f88d37041e4fc048db4abd0
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-Add-powered-callback-to-btd_adapter.patch"
+Content-Disposition: attachment;
+	filename="0001-Add-powered-callback-to-btd_adapter.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gct3918w0
+
+RnJvbSBlYWQxMjRiYWJjZTQwN2M0ZWMyNWNkY2UwNzNiNDU2OTc5ZTVkNDMxIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
+a2lhLmNvbT4KRGF0ZTogRnJpLCAxMyBBdWcgMjAxMCAxNjozODowOCArMDMwMApTdWJqZWN0OiBb
+UEFUQ0hdIEFkZCBwb3dlcmVkIGNhbGxiYWNrIHRvIGJ0ZF9hZGFwdGVyCgpXaXRoIHRoaXMgcGF0
+Y2ggY2FsbGJhY2sgZnVuY3Rpb25zIGNhbiBiZSByZWdpc3RlcmVkIHRvIHRoZQpidGRfYWRhcHRl
+ciBzdHJ1Y3QuIFRoZSBmdW5jdGlvbnMgYXJlIHRoZW4gY2FsbGVkIHdoZW4gdGhlIHBvd2VyZWQK
+c3RhdGUgb2YgdGhlIGFkYXB0ZXIgY2hhbmdlcywgd2l0aCBhIGJvb2xlYW4gYXJndW1lbnQgaW5k
+aWNhdGluZwp0aGUgbmV3IHN0YXRlLiBUaGUgcmVhc29uIGZvciBhZGRpbmcgdGhlIGZ1bmN0aW9u
+YWxpdHkgaXMgdGhhdCB0aGUKTWFlbW82IE1DRSBwbHVnaW4gbmVlZHMgdG8gYmUgbm90aWZpZWQg
+d2hlbiB0aGUgYWRhcHRlciBpcyBwb3dlcmVkCm9uIG9yIG9mZi4KLS0tCiBzcmMvYWRhcHRlci5j
+IHwgICAzMiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKwogc3JjL2FkYXB0ZXIuaCB8
+ICAgIDcgKysrKysrKwogMiBmaWxlcyBjaGFuZ2VkLCAzOSBpbnNlcnRpb25zKCspLCAwIGRlbGV0
+aW9ucygtKQoKZGlmZiAtLWdpdCBhL3NyYy9hZGFwdGVyLmMgYi9zcmMvYWRhcHRlci5jCmluZGV4
+IGZjMWUxMjMuLjRhZDQxNjUgMTAwNjQ0Ci0tLSBhL3NyYy9hZGFwdGVyLmMKKysrIGIvc3JjL2Fk
+YXB0ZXIuYwpAQCAtMTM1LDYgKzEzNSw4IEBAIHN0cnVjdCBidGRfYWRhcHRlciB7CiAJZ2Jvb2xl
+YW4gY2FjaGVfZW5hYmxlOwogCiAJZ2ludCByZWY7CisKKwlHU0xpc3QgKnBvd2VyZWRfY2FsbGJh
+Y2tzOwogfTsKIAogc3RhdGljIHZvaWQgYWRhcHRlcl9zZXRfcGFpcmFibGVfdGltZW91dChzdHJ1
+Y3QgYnRkX2FkYXB0ZXIgKmFkYXB0ZXIsCkBAIC0yMjAzLDYgKzIyMDUsMTggQEAgc3RhdGljIHZv
+aWQgYWRhcHRlcl9kaXNhYmxlX2NvZF9jYWNoZShzdHJ1Y3QgYnRkX2FkYXB0ZXIgKmFkYXB0ZXIp
+CiAJCWFkYXB0ZXItPnBlbmRpbmdfY29kID0gYWRhcHRlci0+d2FudGVkX2NvZDsKIH0KIAorc3Rh
+dGljIHZvaWQgY2FsbF9hZGFwdGVyX3Bvd2VyZWRfY2FsbGJhY2tzKHN0cnVjdCBidGRfYWRhcHRl
+ciAqYWRhcHRlciwKKwkJCQkJCWdib29sZWFuIHBvd2VyZWQpCit7CisJR1NMaXN0ICpsOworCisJ
+Zm9yIChsID0gYWRhcHRlci0+cG93ZXJlZF9jYWxsYmFja3M7IGw7IGwgPSBsLT5uZXh0KSB7CisJ
+CWJ0ZF9hZGFwdGVyX3Bvd2VyZWRfY2IgY2IgPSBsLT5kYXRhOworCisJCWNiKGFkYXB0ZXIsIHBv
+d2VyZWQpOworICAgICAgIH0KK30KKwogc3RhdGljIGludCBhZGFwdGVyX3VwKHN0cnVjdCBidGRf
+YWRhcHRlciAqYWRhcHRlciwgY29uc3QgY2hhciAqbW9kZSkKIHsKIAljaGFyIHNyY2FkZHJbMThd
+OwpAQCAtMjI4Myw2ICsyMjk3LDggQEAgcHJvY2VlZDoKIAkJCQkJQURBUFRFUl9JTlRFUkZBQ0Us
+ICJQb3dlcmVkIiwKIAkJCQkJREJVU19UWVBFX0JPT0xFQU4sICZwb3dlcmVkKTsKIAorCWNhbGxf
+YWRhcHRlcl9wb3dlcmVkX2NhbGxiYWNrcyhhZGFwdGVyLCBUUlVFKTsKKwogCWFkYXB0ZXJfZGlz
+YWJsZV9jb2RfY2FjaGUoYWRhcHRlcik7CiAKIAlyZXR1cm4gMDsKQEAgLTI0ODcsNiArMjUwMyw4
+IEBAIGludCBhZGFwdGVyX3N0b3Aoc3RydWN0IGJ0ZF9hZGFwdGVyICphZGFwdGVyKQogCWFkYXB0
+ZXItPmNhY2hlX2VuYWJsZSA9IFRSVUU7CiAJYWRhcHRlci0+cGVuZGluZ19jb2QgPSAwOwogCisJ
+Y2FsbF9hZGFwdGVyX3Bvd2VyZWRfY2FsbGJhY2tzKGFkYXB0ZXIsIEZBTFNFKTsKKwogCWluZm8o
+IkFkYXB0ZXIgJXMgaGFzIGJlZW4gZGlzYWJsZWQiLCBhZGFwdGVyLT5wYXRoKTsKIAogCXJldHVy
+biAwOwpAQCAtMzQyMiwzICszNDQwLDE3IEBAIGludCBhZGFwdGVyX29wc19zZXR1cCh2b2lkKQog
+CiAJcmV0dXJuIGFkYXB0ZXJfb3BzLT5zZXR1cCgpOwogfQorCit2b2lkIGJ0ZF9hZGFwdGVyX3Jl
+Z2lzdGVyX3Bvd2VyZWRfY2FsbGJhY2soc3RydWN0IGJ0ZF9hZGFwdGVyICphZGFwdGVyLAorCQkJ
+CQkJYnRkX2FkYXB0ZXJfcG93ZXJlZF9jYiBjYikKK3sKKwlhZGFwdGVyLT5wb3dlcmVkX2NhbGxi
+YWNrcyA9CisJCQlnX3NsaXN0X2FwcGVuZChhZGFwdGVyLT5wb3dlcmVkX2NhbGxiYWNrcywgY2Ip
+OworfQorCit2b2lkIGJ0ZF9hZGFwdGVyX3VucmVnaXN0ZXJfcG93ZXJlZF9jYWxsYmFjayhzdHJ1
+Y3QgYnRkX2FkYXB0ZXIgKmFkYXB0ZXIsCisJCQkJCQlidGRfYWRhcHRlcl9wb3dlcmVkX2NiIGNi
+KQoreworCWFkYXB0ZXItPnBvd2VyZWRfY2FsbGJhY2tzID0KKwkJCWdfc2xpc3RfcmVtb3ZlKGFk
+YXB0ZXItPnBvd2VyZWRfY2FsbGJhY2tzLCBjYik7Cit9CmRpZmYgLS1naXQgYS9zcmMvYWRhcHRl
+ci5oIGIvc3JjL2FkYXB0ZXIuaAppbmRleCBhN2VjYTBlLi41ODg1M2FjIDEwMDY0NAotLS0gYS9z
+cmMvYWRhcHRlci5oCisrKyBiL3NyYy9hZGFwdGVyLmgKQEAgLTE4OCwzICsxODgsMTAgQEAgc3Ry
+dWN0IGJ0ZF9hZGFwdGVyX29wcyB7CiBpbnQgYnRkX3JlZ2lzdGVyX2FkYXB0ZXJfb3BzKHN0cnVj
+dCBidGRfYWRhcHRlcl9vcHMgKmJ0ZF9hZGFwdGVyX29wcyk7CiB2b2lkIGJ0ZF9hZGFwdGVyX2Ns
+ZWFudXBfb3BzKHN0cnVjdCBidGRfYWRhcHRlcl9vcHMgKmJ0ZF9hZGFwdGVyX29wcyk7CiBpbnQg
+YWRhcHRlcl9vcHNfc2V0dXAodm9pZCk7CisKK3R5cGVkZWYgdm9pZCAoKmJ0ZF9hZGFwdGVyX3Bv
+d2VyZWRfY2IpIChzdHJ1Y3QgYnRkX2FkYXB0ZXIgKmFkYXB0ZXIsCisJCQkJCQlnYm9vbGVhbiBw
+b3dlcmVkKTsKK3ZvaWQgYnRkX2FkYXB0ZXJfcmVnaXN0ZXJfcG93ZXJlZF9jYWxsYmFjayhzdHJ1
+Y3QgYnRkX2FkYXB0ZXIgKmFkYXB0ZXIsCisJCQkJCQlidGRfYWRhcHRlcl9wb3dlcmVkX2NiIGNi
+KTsKK3ZvaWQgYnRkX2FkYXB0ZXJfdW5yZWdpc3Rlcl9wb3dlcmVkX2NhbGxiYWNrKHN0cnVjdCBi
+dGRfYWRhcHRlciAqYWRhcHRlciwKKwkJCQkJCWJ0ZF9hZGFwdGVyX3Bvd2VyZWRfY2IgY2IpOwot
+LSAKMS42LjAuNAoK
+--00c09f88d37041e4fc048db4abd0--
