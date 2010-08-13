@@ -1,34 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-Subject: [PATCH] Fix unnecessary checking for empty phones list
-Date: Fri, 13 Aug 2010 09:35:11 +0300
-Message-Id: <1281681311-17074-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+From: Viral Mehta <Viral.Mehta@lntinfotech.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Fri, 13 Aug 2010 10:04:47 +0530
+Subject: bluetooth profile source code
+Message-ID: <70376CA23424B34D86F1C7DE6B99734306D4C3CC13@VSHINMSMBX01.vshodc.lntinfotech.com>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Removed not needed anymore checking for empty list of phone numbers.
----
- plugins/vcard.c |    5 -----
- 1 files changed, 0 insertions(+), 5 deletions(-)
+Hi,
 
-diff --git a/plugins/vcard.c b/plugins/vcard.c
-index 9beb62a..80f8265 100644
---- a/plugins/vcard.c
-+++ b/plugins/vcard.c
-@@ -295,11 +295,6 @@ static void vcard_printf_end(GString *vcards)
- void phonebook_add_contact(GString *vcards, struct phonebook_contact *contact,
- 					uint64_t filter, uint8_t format)
- {
--	/* There's really nothing to do */
--	if ((contact->numbers == NULL && (contact->fullname == NULL ||
--						contact->fullname[0] == '\0')))
--		return;
--
- 	if (format == FORMAT_VCARD30)
- 		filter |= (FILTER_VERSION | FILTER_FN | FILTER_N | FILTER_TEL);
- 	else if (format == FORMAT_VCARD21)
--- 
-1.7.0.4
+I am looking for some BT profile source code.
+I was able to find out for OBEX source code,
 
+But, I could not find any source cod for
+Headset Profile
+A2DP profile
+HandsFree Profile
+
+Surprisingly, is there no open source code for all these profiles ?
+Or I am just not able to google properly !!??
+
+Thanks,
+Viral
+
+This Email may contain confidential or privileged information for the intended recipient (s) If you are not the intended recipient, please do not use or disseminate the information, notify the sender and delete it from your system.
+
+______________________________________________________________________
