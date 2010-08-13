@@ -1,29 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 13 Aug 2010 08:41:02 -0400
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Daniel =?iso-8859-1?Q?=D6rstadius?= <daniel.orstadius@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] Add mode callback to btd_adapter
-Message-ID: <20100813124102.GA3546@jh-x301>
-References: <AANLkTi=Jh5fsqye6-Ry+VSNWftufDFCdyNEn6fcNrW84@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <AANLkTi=Jh5fsqye6-Ry+VSNWftufDFCdyNEn6fcNrW84@mail.gmail.com>
+Subject: Re: bluetooth profile source code
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Viral Mehta <Viral.Mehta@lntinfotech.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <70376CA23424B34D86F1C7DE6B99734306D4C3CC13@VSHINMSMBX01.vshodc.lntinfotech.com>
+References: <70376CA23424B34D86F1C7DE6B99734306D4C3CC13@VSHINMSMBX01.vshodc.lntinfotech.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 13 Aug 2010 14:20:06 +0200
+Message-ID: <1281702006.12579.438.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Daniel,
+Hi Viral,
 
-On Fri, Aug 13, 2010, Daniel Örstadius wrote:
-> +typedef void (*btd_adapter_mode_cb) (struct btd_adapter *adapter,
-> +						gboolean powered);
-> +void btd_adapter_register_mode_callback(struct btd_adapter *adapter,
-> +						btd_adapter_mode_cb cb);
+> I am looking for some BT profile source code.
+> I was able to find out for OBEX source code,
+> 
+> But, I could not find any source cod for
+> Headset Profile
+> A2DP profile
+> HandsFree Profile
+> 
+> Surprisingly, is there no open source code for all these profiles ?
+> Or I am just not able to google properly !!??
 
-In general this seems fine, but I think for completeness there should
-also be a unregister function. Also, since we've traditionally used the
-term mode to include also the discoverable state the name should
-probably be something like btd_adapter_register_powered_callback and
-btd_adapter_powered_cb.
+seems your Google Mojo is not high enough:
 
-Johan
+http://git.kernel.org/?p=bluetooth/bluez.git;a=summary
+http://git.kernel.org/?p=bluetooth/obexd.git;a=summary
+
+Regards
+
+Marcel
+
+
