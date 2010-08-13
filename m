@@ -1,615 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <201008130943.o7D9hdjn021600@joshua.mesa.nl>
-From: Marcel Mol <marcel@mesa.nl>
-Date: Thu, 12 Aug 2010 23:09:46 +0200
-Subject: [PATCH 3th version] IrMC sync server support
+MIME-Version: 1.0
+Date: Fri, 13 Aug 2010 12:19:26 +0300
+Message-ID: <AANLkTikOj==zpA90bNAY0wVgXwQs1=a279RY8MNuz_KF@mail.gmail.com>
+Subject: [PATCH 3/3] Maemo6 MCE: handle race condition at startup
+From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
 To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=0015175ca866b5d1bc048db0fae9
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-A reasonable working IrMC SYNC server (only full phonebook sync support)
-Support for cal and note by just returning nothing.
----
- Makefile.am    |    3 +
- plugins/irmc.c |  515 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/main.c     |   10 +-
- src/obex.h     |    3 +-
- 4 files changed, 529 insertions(+), 2 deletions(-)
- create mode 100644 plugins/irmc.c
+--0015175ca866b5d1bc048db0fae9
+Content-Type: text/plain; charset=ISO-8859-1
 
-diff --git a/Makefile.am b/Makefile.am
-index 73e2f28..07fc27d 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -55,6 +55,9 @@ builtin_modules += pbap
- builtin_sources += plugins/pbap.c plugins/phonebook.h \
- 			plugins/vcard.h plugins/vcard.c
- 
-+builtin_modules += irmc
-+builtin_sources += plugins/irmc.c
-+
- builtin_modules += syncevolution
- builtin_sources += plugins/syncevolution.c
- 
-diff --git a/plugins/irmc.c b/plugins/irmc.c
-new file mode 100644
-index 0000000..056a3b9
---- /dev/null
-+++ b/plugins/irmc.c
-@@ -0,0 +1,515 @@
-+/*
-+ *
-+ *  OBEX IrMC Sync Server
-+ *
-+ *  Copyright (C) 2010  Marcel Mol <marcel@mesa.nl>
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdio.h>
-+#include <string.h>
-+#include <errno.h>
-+#include <glib.h>
-+#include <stdlib.h>
-+#include <unistd.h>
-+#include <arpa/inet.h>
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+#include <fcntl.h>
-+
-+#include <openobex/obex.h>
-+#include <openobex/obex_const.h>
-+
-+#include "plugin.h"
-+#include "log.h"
-+#include "obex.h"
-+#include "service.h"
-+#include "phonebook.h"
-+#include "mimetype.h"
-+#include "filesystem.h"
-+#include "dbus.h"
-+
-+#define IRMC_CHANNEL	17
-+
-+#define IRMC_RECORD "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>	\
-+<record>								\
-+  <attribute id=\"0x0001\">						\
-+    <sequence>								\
-+      <uuid value=\"0x1104\"/>						\
-+    </sequence>								\
-+  </attribute>								\
-+									\
-+  <attribute id=\"0x0004\">						\
-+    <sequence>								\
-+      <sequence>							\
-+        <uuid value=\"0x0100\"/>					\
-+      </sequence>							\
-+      <sequence>							\
-+        <uuid value=\"0x0003\"/>					\
-+        <uint8 value=\"%u\" name=\"channel\"/>				\
-+      </sequence>							\
-+      <sequence>							\
-+        <uuid value=\"0x0008\"/>					\
-+      </sequence>							\
-+    </sequence>								\
-+  </attribute>								\
-+									\
-+  <attribute id=\"0x0009\">						\
-+    <sequence>								\
-+      <sequence>							\
-+        <uuid value=\"0x1104\"/>					\
-+        <uint16 value=\"0x0100\" name=\"version\"/>			\
-+      </sequence>							\
-+    </sequence>								\
-+  </attribute>								\
-+									\
-+  <attribute id=\"0x0100\">						\
-+    <text value=\"%s\" name=\"name\"/>					\
-+  </attribute>								\
-+									\
-+  <attribute id=\"0x0301\">						\
-+    <sequence>								\
-+      <uint8 value=\"0x01\"/>						\
-+    </sequence>								\
-+  </attribute>								\
-+</record>"
-+
-+
-+struct aparam_header {
-+	uint8_t tag;
-+	uint8_t len;
-+	uint8_t val[0];
-+} __attribute__ ((packed));
-+
-+#define DID_LEN 18
-+
-+struct irmc_session {
-+	struct obex_session *os;
-+	struct apparam_field *params;
-+	uint16_t entries;
-+	GString *buffer;
-+	char sn[DID_LEN];
-+	char did[DID_LEN];
-+	char manu[DID_LEN];
-+	char model[DID_LEN];
-+};
-+
-+#define IRMC_TARGET_SIZE 9
-+
-+static const guint8 IRMC_TARGET[IRMC_TARGET_SIZE] = {
-+			0x49, 0x52, 0x4d, 0x43,  0x2d, 0x53, 0x59, 0x4e, 0x43 };
-+
-+/*
-+ * FIXME:
-+ * the IrMC specs state the first vcard should be the owner
-+ * vcard. As there is no simple way to collect ownerdetails
-+ * just create an empty vcard (which is allowed according to the
-+ * specs).
-+ */
-+static const char *owner_vcard =
-+		"BEGIN:VCARD\r\n"
-+		"VERSION:2.1\r\n"
-+		"N:\r\n"
-+		"TEL:\r\n"
-+		"X-IRMX-LUID:0\r\n"
-+		"END:VCARD\r\n";
-+
-+static void phonebook_size_result(const char *buffer, size_t bufsize,
-+				int vcards, int missed, void *user_data)
-+{
-+	struct irmc_session *irmc = user_data;
-+
-+	DBG("vcards %d", vcards);
-+
-+	irmc->params->maxlistcount = vcards;
-+}
-+
-+static void query_result(const char *buffer, size_t bufsize, int vcards,
-+					int missed, void *user_data)
-+{
-+	struct irmc_session *irmc = user_data;
-+	const char *s, *t;
-+
-+	DBG("bufsize %d vcards %d missed %d", bufsize, vcards, missed);
-+
-+	/* first add a 'owner' vcard */
-+	if (!irmc->buffer)
-+		irmc->buffer = g_string_new(owner_vcard);
-+	else
-+		irmc->buffer = g_string_append(irmc->buffer, owner_vcard);
-+
-+	/* loop around buffer and add X-IRMC-LUID attribs */
-+	s = buffer;
-+	while ((t = strstr(s, "UID:")) != NULL) {
-+		/* add upto UID: into buffer */
-+		irmc->buffer = g_string_append_len(irmc->buffer, s, t-s);
-+		/*
-+		 * add UID: line into buffer
-+		 * Not sure if UID is still needed if X-IRMC-LUID is there
-+		 */
-+		s = t;
-+		t = strstr(s, "\r\n");
-+		t += 2;
-+		irmc->buffer = g_string_append_len(irmc->buffer, s, t-s);
-+		/* add X-IRMC-LUID with same number as UID */
-+		irmc->buffer = g_string_append_len(irmc->buffer,
-+							"X-IRMC-LUID:", 12);
-+		s += 4; /* point to uid number */
-+		irmc->buffer = g_string_append_len(irmc->buffer, s, t-s);
-+		s = t;
-+	}
-+	/* add remaining bit of buffer */
-+	irmc->buffer = g_string_append(irmc->buffer, s);
-+
-+	obex_object_set_io_flags(irmc, G_IO_IN, 0);
-+}
-+
-+static void *irmc_connect(struct obex_session *os, int *err)
-+{
-+	struct irmc_session *irmc;
-+	struct apparam_field *param;
-+
-+	DBG("");
-+
-+	manager_register_session(os);
-+
-+	irmc = g_new0(struct irmc_session, 1);
-+	irmc->os = os;
-+
-+	/*
-+	 * FIXME:
-+	 * Ideally get capabilities info here and use that to define
-+	 * IrMC DID and SN etc parameters.
-+	 * For now lets used hostname and some 'random' value
-+	 */
-+	gethostname(irmc->did, DID_LEN);
-+	strncpy(irmc->sn, "12345", DID_LEN);
-+	strncpy(irmc->manu, "obex", DID_LEN);
-+	strncpy(irmc->model, "mymodel", DID_LEN);
-+
-+	/*
-+         *  We need to know the number of contact/cal/nt entries
-+         *  somewhere so why not do it now.
-+         */
-+	param = g_new0(struct apparam_field, 1);
-+	param->maxlistcount = 0; /* to count the number of vcards... */
-+	param->filter = 0x200085; /* UID TEL N VERSION */
-+	irmc->params = param;
-+	phonebook_pull("telecom/pb.vcf", irmc->params, phonebook_size_result,
-+									irmc);
-+
-+	if (err)
-+		*err = 0;
-+
-+	return irmc;
-+}
-+
-+static int irmc_get(struct obex_session *os, obex_object_t *obj,
-+		gboolean *stream, void *user_data)
-+{
-+	struct irmc_session *irmc = user_data;
-+	const char *type = obex_get_type(os);
-+	const char *name = obex_get_name(os);
-+	char *path;
-+	int ret;
-+
-+	DBG("name %s type %s irmc %p", name, type ? type : "NA", irmc);
-+
-+	path = g_strdup(name);
-+	*stream = TRUE;
-+
-+	ret = obex_get_stream_start(os, path);
-+
-+	g_free(path);
-+
-+	return ret;
-+}
-+
-+static void irmc_disconnect(struct obex_session *os, void *user_data)
-+{
-+	struct irmc_session *irmc = user_data;
-+
-+	DBG("");
-+
-+	manager_unregister_session(os);
-+
-+        if (irmc->params) {
-+                if (irmc->params->searchval)
-+			g_free(irmc->params->searchval);
-+                g_free(irmc->params);
-+        }
-+	if (irmc->buffer) {
-+		string_free(irmc->buffer);
-+		irmc->buffer = NULL;
-+	}
-+
-+	g_free(irmc);
-+}
-+
-+static int irmc_chkput(struct obex_session *os, void *user_data)
-+{
-+	DBG("");
-+	/* Reject all PUTs */
-+	return -EBADR;
-+}
-+
-+static void *irmc_open_devinfo(struct irmc_session *irmc, int *err)
-+{
-+	if (!irmc->buffer)
-+		irmc->buffer = g_string_new("");
-+
-+	g_string_append_printf(irmc->buffer,
-+				"MANU:%s\r\n"
-+				"MOD:%s\r\n"
-+				"SN:%s\r\n"
-+				"IRMC-VERSION:1.1\r\n"
-+				"PB-TYPE-TX:VCARD2.1\r\n"
-+				"PB-TYPE-RX:NONE\r\n"
-+				"CAL-TYPE-TX:NONE\r\n"
-+				"CAL-TYPE-RX:NONE\r\n"
-+				"MSG-TYPE-TX:NONE\r\n"
-+				"MSG-TYPE-RX:NONE\r\n"
-+				"NOTE-TYPE-TX:NONE\r\n"
-+				"NOTE-TYPE-RX:NONE\r\n",
-+				irmc->manu, irmc->model, irmc->sn);
-+
-+	return irmc;
-+}
-+
-+static void *irmc_open_pb(const char *name,
-+		 struct irmc_session *irmc, int *err)
-+{
-+	GString *mybuf;
-+	int ret;
-+
-+	if (!g_strcmp0(name, ".vcf")) {
-+		/* how can we tell if the vcard count call already finished? */
-+		ret = phonebook_pull("telecom/pb.vcf", irmc->params,
-+							query_result, irmc);
-+		if (ret < 0) {
-+			DBG("phonebook_pull failed...");
-+			goto fail;
-+		}
-+		return irmc;
-+	}
-+
-+	if (!g_strcmp0(name, "/info.log")) {
-+		mybuf = g_string_new("");
-+		g_string_printf(mybuf, "Total-Records:%d\r\n"
-+				"Maximum-Records:%d\r\n"
-+				"IEL:2\r\n"
-+				"DID:%s\r\n",
-+				irmc->params->maxlistcount,
-+				irmc->params->maxlistcount, irmc->did);
-+	}
-+	else if (!strncmp(name, "/luid/", 6)) {
-+		name += 6;
-+		if (!g_strcmp0(name, "cc.log")) {
-+			mybuf = g_string_new("");
-+			g_string_printf(mybuf, "%d\r\n", irmc->params->maxlistcount);
-+		}
-+		else {
-+			int l = strlen(name);
-+			/* FIXME:
-+			 * Reply the same to any *.log so we hopefully force a
-+			 * full phonebook dump.
-+			 * Is IEL:2 ok?
-+			 */
-+			if (l > 4 && !g_strcmp0(name + l - 4, ".log")) {
-+				DBG("changelog request, force whole book");
-+				mybuf = g_string_new("");
-+				g_string_printf(mybuf, "SN:%s\r\n"
-+							"DID:%s\r\n"
-+							"Total-Records:%d\r\n"
-+							"Maximum-Records:%d\r\n"
-+							"*\r\n",
-+						irmc->sn, irmc->did,
-+						irmc->params->maxlistcount,
-+						irmc->params->maxlistcount);
-+			}
-+			else {
-+				ret = -EBADR;
-+				goto fail;
-+			}
-+		}
-+	}
-+	else {
-+		ret = -EBADR;
-+		goto fail;
-+	}
-+
-+	if (!irmc->buffer)
-+		irmc->buffer = mybuf;
-+	else {
-+		irmc->buffer = g_string_append(irmc->buffer, mybuf->str);
-+		string_free(mybuf);
-+	}
-+
-+	return irmc;
-+
-+fail:
-+	if (err)
-+		*err = ret;
-+
-+	return NULL;
-+}
-+
-+static void *irmc_open_cal(const char *name,
-+		 struct irmc_session *irmc, int *err)
-+{
-+	/* no suport yet. Just return an empty buffer. cal.vcs */
-+	DBG("unsupported, returning empty buffer");
-+	if (!irmc->buffer)
-+		irmc->buffer = g_string_new("");
-+
-+	return irmc;
-+}
-+
-+static void *irmc_open_nt(const char *name,
-+		 struct irmc_session *irmc, int *err)
-+{
-+	/* no suport yet. Just return an empty buffer. nt.vnt */
-+	DBG("unsupported, returning empty buffer");
-+	if (!irmc->buffer)
-+		irmc->buffer = g_string_new("");
-+
-+	return irmc;
-+}
-+
-+static void *irmc_open(const char *name, int oflag, mode_t mode,
-+		void *context, size_t *size, int *err)
-+{
-+	struct irmc_session *irmc = context;
-+	int ret;
-+	const char *p;
-+
-+	DBG("name %s context %p", name, context);
-+	if (oflag != O_RDONLY) {
-+		ret = -EPERM;
-+		goto fail;
-+	}
-+	if (name == NULL || strncmp(name, "telecom/", 8) != 0) {
-+		ret = -EBADR;
-+		goto fail;
-+	}
-+
-+	p = name + 8;
-+	if (!g_strcmp0(p, "devinfo.txt"))
-+		return irmc_open_devinfo(irmc, err);
-+	else if (!strncmp(p, "pb", 2))
-+		return irmc_open_pb(p+2, irmc, err);
-+	else if (!strncmp(p, "cal", 3))
-+		return irmc_open_cal(p+3, irmc, err);
-+	else if (!strncmp(p, "nt", 2))
-+		return irmc_open_nt(p+2, irmc, err);
-+
-+fail:
-+	if (err)
-+		*err = ret;
-+
-+	return NULL;
-+}
-+
-+static int irmc_close(void *object)
-+{
-+	struct irmc_session *irmc = object;
-+
-+	DBG("");
-+	if (irmc->buffer) {
-+		string_free(irmc->buffer);
-+		irmc->buffer = NULL;
-+	}
-+
-+	return 0;
-+}
-+
-+static ssize_t irmc_read(void *object, void *buf, size_t count, uint8_t *hi)
-+{
-+	struct irmc_session *irmc = object;
-+        int len;
-+
-+	DBG("buffer %p count %d", irmc->buffer, count);
-+	if (!irmc->buffer)
-+                return -EAGAIN;
-+
-+	*hi = OBEX_HDR_BODY;
-+	len = string_read(irmc->buffer, buf, count);
-+	DBG("returning %d bytes", len);
-+	return len;
-+}
-+
-+static struct obex_mime_type_driver irmc_driver = {
-+	.target = IRMC_TARGET,
-+	.target_size = IRMC_TARGET_SIZE,
-+	.open = irmc_open,
-+	.close = irmc_close,
-+	.read = irmc_read,
-+};
-+
-+static struct obex_service_driver irmc = {
-+	.name = "IRMC Sync server",
-+	.service = OBEX_IRMC,
-+	.channel = IRMC_CHANNEL,
-+	.record = IRMC_RECORD,
-+	.target = IRMC_TARGET,
-+	.target_size = IRMC_TARGET_SIZE,
-+	.connect = irmc_connect,
-+	.get = irmc_get,
-+	.disconnect = irmc_disconnect,
-+	.chkput = irmc_chkput
-+};
-+
-+static int irmc_init(void)
-+{
-+	int err;
-+
-+	DBG("");
-+	err = phonebook_init();
-+	if (err < 0)
-+		goto fail_pb_init;
-+
-+	err = obex_mime_type_driver_register(&irmc_driver);
-+	if (err < 0)
-+                goto fail_mime_irmc;
-+
-+	err = obex_service_driver_register(&irmc);
-+	if (err < 0)
-+		goto fail_irmc_reg;
-+
-+	return 0;
-+
-+fail_irmc_reg:
-+	obex_mime_type_driver_unregister(&irmc_driver);
-+fail_mime_irmc:
-+	phonebook_exit();
-+fail_pb_init:
-+	return err;
-+}
-+
-+static void irmc_exit(void)
-+{
-+	DBG("");
-+	obex_service_driver_unregister(&irmc);
-+	obex_mime_type_driver_unregister(&irmc_driver);
-+	phonebook_exit();
-+}
-+
-+OBEX_PLUGIN_DEFINE(irmc, irmc_init, irmc_exit)
-diff --git a/src/main.c b/src/main.c
-index 649acf9..ef894cf 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -80,6 +80,7 @@ static gboolean option_autoaccept = FALSE;
- static gboolean option_opp = FALSE;
- static gboolean option_ftp = FALSE;
- static gboolean option_pbap = FALSE;
-+static gboolean option_irmc = FALSE;
- static gboolean option_pcsuite = FALSE;
- static gboolean option_symlinks = FALSE;
- static gboolean option_syncevolution = FALSE;
-@@ -120,6 +121,8 @@ static GOptionEntry options[] = {
- 				"Enable Phonebook Access server" },
- 	{ "pcsuite", 's', 0, G_OPTION_ARG_NONE, &option_pcsuite,
- 				"Enable PC Suite Services server" },
-+	{ "irmc", 'i', 0, G_OPTION_ARG_NONE, &option_irmc,
-+				"Enable IrMCSync server" },
- 	{ "syncevolution", 'e', 0, G_OPTION_ARG_NONE, &option_syncevolution,
- 				"Enable OBEX server for SyncEvolution" },
- 	{ NULL },
-@@ -208,9 +211,10 @@ int main(int argc, char *argv[])
- 
- 	if (option_opp == FALSE && option_ftp == FALSE &&
- 				option_pbap == FALSE &&
-+				option_irmc == FALSE &&
- 				option_syncevolution == FALSE) {
- 		fprintf(stderr, "No server selected (use either "
--				"--opp, --ftp, --pbap or --syncevolution)\n");
-+				"--opp, --ftp, --pbap, --irmc or --syncevolution)\n");
- 		exit(EXIT_FAILURE);
- 	}
- 
-@@ -266,6 +270,10 @@ int main(int argc, char *argv[])
- 				option_autoaccept, option_symlinks,
- 				option_capability);
- 
-+	if (option_irmc == TRUE)
-+		obex_server_init(OBEX_IRMC, NULL, TRUE, FALSE, FALSE,
-+				option_capability);
-+
- 	if (option_syncevolution == TRUE)
- 		obex_server_init(OBEX_SYNCEVOLUTION, NULL, TRUE, FALSE,
- 							FALSE, NULL);
-diff --git a/src/obex.h b/src/obex.h
-index 9424b6b..35723ca 100644
---- a/src/obex.h
-+++ b/src/obex.h
-@@ -34,7 +34,8 @@
- #define OBEX_BIP	(1 << 3)
- #define OBEX_PBAP	(1 << 4)
- #define OBEX_PCSUITE	(1 << 5)
--#define OBEX_SYNCEVOLUTION	(1 << 6)
-+#define OBEX_IRMC	(1 << 6)
-+#define OBEX_SYNCEVOLUTION	(1 << 7)
- 
- #define TARGET_SIZE 16
- 
--- 
-1.7.2
+Since bluetoothd power cycles the adapter at startup, it is possible
+that the plugin gets a reply from reading the state of the MCE and
+tries to power the adapter before it is down. The patch checks for
+that situation and if it occurs postpones powering the adapter to
+the mode change callback. The off_requested member of btd_adapter
+is used for the check, so it is set to FALSE when the adapter is
+down.
 
+/Daniel
+
+--0015175ca866b5d1bc048db0fae9
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-Maemo6-MCE-handle-race-condition-at-startup.patch"
+Content-Disposition: attachment;
+	filename="0001-Maemo6-MCE-handle-race-condition-at-startup.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gcstumjr0
+
+RnJvbSAxNjQ1NWFhNDMzNjk4NTNmMjcyNGQxNjc1MWE0MTcyNGRmOWE0ZmQ1IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
+a2lhLmNvbT4KRGF0ZTogRnJpLCAxMyBBdWcgMjAxMCAxMTo0MTozNyArMDMwMApTdWJqZWN0OiBb
+UEFUQ0hdIE1hZW1vNiBNQ0U6IGhhbmRsZSByYWNlIGNvbmRpdGlvbiBhdCBzdGFydHVwCgpTaW5j
+ZSBibHVldG9vdGhkIHBvd2VyIGN5Y2xlcyB0aGUgYWRhcHRlciBhdCBzdGFydHVwLCBpdCBpcyBw
+b3NzaWJsZQp0aGF0IHRoZSBwbHVnaW4gZ2V0cyBhIHJlcGx5IGZyb20gcmVhZGluZyB0aGUgc3Rh
+dGUgb2YgdGhlIE1DRSBhbmQKdHJpZXMgdG8gcG93ZXIgdGhlIGFkYXB0ZXIgYmVmb3JlIGl0IGlz
+IGRvd24uIFRoZSBwYXRjaCBjaGVja3MgZm9yCnRoYXQgc2l0dWF0aW9uIGFuZCBpZiBpdCBvY2N1
+cnMgcG9zdHBvbmVzIHBvd2VyaW5nIHRoZSBhZGFwdGVyIHRvCnRoZSBtb2RlIGNoYW5nZSBjYWxs
+YmFjay4gVGhlIG9mZl9yZXF1ZXN0ZWQgbWVtYmVyIG9mIGJ0ZF9hZGFwdGVyCmlzIHVzZWQgZm9y
+IHRoZSBjaGVjaywgc28gaXQgaXMgc2V0IHRvIEZBTFNFIHdoZW4gdGhlIGFkYXB0ZXIgaXMKZG93
+bi4KLS0tCiBwbHVnaW5zL21hZW1vNi5jIHwgICAyNCArKysrKysrKysrKysrKysrKysrKysrKysK
+IHNyYy9hZGFwdGVyLmMgICAgfCAgICAxICsKIDIgZmlsZXMgY2hhbmdlZCwgMjUgaW5zZXJ0aW9u
+cygrKSwgMCBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9wbHVnaW5zL21hZW1vNi5jIGIvcGx1
+Z2lucy9tYWVtbzYuYwppbmRleCAyMGU1YzAwLi40YTA0ZmE5IDEwMDY0NAotLS0gYS9wbHVnaW5z
+L21hZW1vNi5jCisrKyBiL3BsdWdpbnMvbWFlbW82LmMKQEAgLTUwLDYgKzUwLDcgQEAKIHN0YXRp
+YyBndWludCB3YXRjaF9pZDsKIHN0YXRpYyBEQnVzQ29ubmVjdGlvbiAqY29ubiA9IE5VTEw7CiBz
+dGF0aWMgZ2Jvb2xlYW4gbWNlX2J0X3NldCA9IEZBTFNFOworc3RhdGljIGdib29sZWFuIGNvbGxp
+c2lvbiA9IEZBTFNFOwogCiBzdGF0aWMgZ2Jvb2xlYW4gbWNlX3NpZ25hbF9jYWxsYmFjayhEQnVz
+Q29ubmVjdGlvbiAqY29ubmVjdGlvbiwKIAkJCQkJREJ1c01lc3NhZ2UgKm1lc3NhZ2UsIHZvaWQg
+KnVzZXJfZGF0YSkKQEAgLTExMiw2ICsxMTMsMTQgQEAgc3RhdGljIHZvaWQgcmVhZF9yYWRpb19z
+dGF0ZXNfY2IoREJ1c1BlbmRpbmdDYWxsICpjYWxsLCB2b2lkICp1c2VyX2RhdGEpCiAKIAltY2Vf
+YnRfc2V0ID0gcmFkaW9fc3RhdGVzICYgTUNFX1JBRElPX1NUQVRFX0JMVUVUT09USDsKIAorCS8q
+IGNoZWNrIGlmIHRoZSBhZGFwdGVyIGhhcyBub3QgY29tcGxldGVkIHRoZSBpbml0aWFsIHBvd2Vy
+CisJICAgY3ljbGUsIGlmIHNvIGRlbGF5IGFjdGlvbiB0byBtY2Vfbm90aWZ5X3Bvd2VyZWQgKi8K
+KworCWNvbGxpc2lvbiA9IGFkYXB0ZXJfcG93ZXJpbmdfZG93bihhZGFwdGVyKTsKKworCWlmIChj
+b2xsaXNpb24pCisJCWdvdG8gZG9uZTsKKwogCWlmIChtY2VfYnRfc2V0KQogCQlidGRfYWRhcHRl
+cl9zd2l0Y2hfb25saW5lKGFkYXB0ZXIpOwogCWVsc2UKQEAgLTEzMyw2ICsxNDIsMjEgQEAgc3Rh
+dGljIHZvaWQgYWRhcHRlcl9tb2RlX2NoYW5nZShzdHJ1Y3QgYnRkX2FkYXB0ZXIgKmFkYXB0ZXIs
+IGdib29sZWFuIHBvd2VyZWQpCiAJaWYgKG1jZV9idF9zZXQgPT0gcG93ZXJlZCkKIAkJcmV0dXJu
+OwogCisJLyogY2hlY2sgaWYgdGhlIHBsdWdpbiBnb3QgdGhlIHJlcGx5IGZyb20gdGhlIG1jZSB3
+aGVuIHRoZQorCSAgIGFkYXB0ZXIgd2FzIG5vdCB5ZXQgZG93biBkdXJpbmcgdGhlIHBvd2VyIGN5
+Y2xpbmcgd2hlbgorCSAgIGJsdWV0b290aGQgaXMgc3RhcnRlZCAqLworCWlmIChjb2xsaXNpb24p
+IHsKKwkJZXJyb3IoIm1hZW1vNjogY29sbGlzaW9uIik7CisJCWNvbGxpc2lvbiA9IEZBTFNFOwor
+CisJCWlmIChtY2VfYnRfc2V0KQorCQkJYnRkX2FkYXB0ZXJfc3dpdGNoX29ubGluZShhZGFwdGVy
+KTsKKwkJZWxzZQorCQkJYnRkX2FkYXB0ZXJfc3dpdGNoX29mZmxpbmUoYWRhcHRlcik7CisKKwkJ
+cmV0dXJuOworCX0KKwogCS8qIHNldCB0aGUgbWNlIHZhbHVlIGFjY29yZGluZyB0byB0aGUgc3Rh
+dGUgb2YgdGhlIGFkYXB0ZXIgKi8KIAltc2cgPSBkYnVzX21lc3NhZ2VfbmV3X21ldGhvZF9jYWxs
+KE1DRV9TRVJWSUNFLCBNQ0VfUkVRVUVTVF9QQVRILAogCQkJCU1DRV9SRVFVRVNUX0lGLCBNQ0Vf
+UkFESU9fU1RBVEVTX0NIQU5HRV9SRVEpOwpkaWZmIC0tZ2l0IGEvc3JjL2FkYXB0ZXIuYyBiL3Ny
+Yy9hZGFwdGVyLmMKaW5kZXggZmY3ODUzOS4uNzEyY2EwOCAxMDA2NDQKLS0tIGEvc3JjL2FkYXB0
+ZXIuYworKysgYi9zcmMvYWRhcHRlci5jCkBAIC0yNTAyLDYgKzI1MDIsNyBAQCBpbnQgYWRhcHRl
+cl9zdG9wKHN0cnVjdCBidGRfYWRhcHRlciAqYWRhcHRlcikKIAlhZGFwdGVyLT5zdGF0ZSA9IERJ
+U0NPVkVSX1RZUEVfTk9ORTsKIAlhZGFwdGVyLT5jYWNoZV9lbmFibGUgPSBUUlVFOwogCWFkYXB0
+ZXItPnBlbmRpbmdfY29kID0gMDsKKwlhZGFwdGVyLT5vZmZfcmVxdWVzdGVkID0gRkFMU0U7CiAK
+IAlhZGFwdGVyX21vZGVfY2FsbGJhY2tzKGFkYXB0ZXIsIEZBTFNFKTsKIAotLSAKMS42LjAuNAoK
+--0015175ca866b5d1bc048db0fae9--
