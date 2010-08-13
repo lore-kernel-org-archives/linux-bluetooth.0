@@ -1,130 +1,134 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 12 Aug 2010 17:11:02 -0700 (PDT)
+Date: Thu, 12 Aug 2010 17:07:46 -0700 (PDT)
 From: Mat Martineau <mathewm@codeaurora.org>
 To: "Gustavo F. Padovan" <gustavo@padovan.org>
 cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-    rshaffer@codeaurora.org
-Subject: Re: [RFC 6/7] Bluetooth: Reassemble enhanced L2CAP PDUs using skb
- fragments.
-In-Reply-To: <20100811052433.GA10773@vigoh>
-Message-ID: <alpine.DEB.2.00.1008121708130.8460@linux-sea-02>
-References: <1281467704-5378-1-git-send-email-mathewm@codeaurora.org> <1281467704-5378-7-git-send-email-mathewm@codeaurora.org> <20100811052433.GA10773@vigoh>
+	rshaffer@codeaurora.org
+Subject: Re: [RFC 5/7] Bluetooth: Handle fragmented skbs in
+ bt_sock_stream_recvmsg()
+In-Reply-To: <20100811042543.GA9428@vigoh>
+Message-ID: <alpine.DEB.2.00.1008121643480.8460@linux-sea-02>
+References: <1281467704-5378-1-git-send-email-mathewm@codeaurora.org> <1281467704-5378-6-git-send-email-mathewm@codeaurora.org> <20100811042543.GA9428@vigoh>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
-Gustavo -
 
 On Wed, 11 Aug 2010, Gustavo F. Padovan wrote:
 
 > Hi Mat,
 >
-> * Mat Martineau <mathewm@codeaurora.org> [2010-08-10 12:15:03 -0700]:
+> * Mat Martineau <mathewm@codeaurora.org> [2010-08-10 12:15:02 -0700]:
 >
->> As enhanced L2CAP PDUs arrive, it is not necessary to copy them
->> in to a separate skbuff.  Instead, the skbuffs can be linked
->> together as fragments, only being copied in to a linear buffer
->> when the data is copied to userspace.  This avoids the need
->> to allocate additional buffers for incoming data, and
->> eliminates copying of data payloads during SDU reassembly.
->> This is of greater concern with high-speed AMP links than
->> with BR/EDR.
+>> When reading L2CAP skbuffs, add the ability to copy from
+>> fragmented skbuffs generated during ERTM or streaming mode
+>> reassembly.  This defers extra copying of L2CAP payloads
+>> until the final, unavoidable copy to userspace.
 >>
 >> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 >> ---
->>  include/net/bluetooth/l2cap.h |    1 +
->>  net/bluetooth/l2cap.c         |   66 +++++++++++++++++++++-------------------
->>  2 files changed, 36 insertions(+), 31 deletions(-)
+>>  net/bluetooth/af_bluetooth.c |   30 ++++++++++++++++++++++++++++--
+>>  1 files changed, 28 insertions(+), 2 deletions(-)
 >>
->> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
->> index 2f3222f..9384e87 100644
->> --- a/include/net/bluetooth/l2cap.h
->> +++ b/include/net/bluetooth/l2cap.h
->> @@ -357,6 +357,7 @@ struct l2cap_pinfo {
->>  	__u16		sdu_len;
->>  	__u16		partial_sdu_len;
->>  	struct sk_buff	*sdu;
->> +	struct sk_buff	*sdu_last_frag;
+>> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+>> index 77a26fe..5e0375b 100644
+>> --- a/net/bluetooth/af_bluetooth.c
+>> +++ b/net/bluetooth/af_bluetooth.c
+>> @@ -342,7 +342,7 @@ int bt_sock_stream_recvmsg(struct kiocb *iocb, struct socket *sock,
+>>  		}
 >>
->>  	__u8		ident;
+>>  		chunk = min_t(unsigned int, skb->len, size);
+>> -		if (memcpy_toiovec(msg->msg_iov, skb->data, chunk)) {
+>> +		if (skb_copy_datagram_iovec(skb, 0, msg->msg_iov, chunk)) {
+>>  			skb_queue_head(&sk->sk_receive_queue, skb);
+>>  			if (!copied)
+>>  				copied = -EFAULT;
+>> @@ -354,7 +354,33 @@ int bt_sock_stream_recvmsg(struct kiocb *iocb, struct socket *sock,
+>>  		sock_recv_ts_and_drops(msg, sk, skb);
 >>
->> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
->> index b485c4a..0212035 100644
->> --- a/net/bluetooth/l2cap.c
->> +++ b/net/bluetooth/l2cap.c
->> @@ -290,6 +290,9 @@ static void l2cap_chan_del(struct sock *sk, int err)
->>  		skb_queue_purge(SREJ_QUEUE(sk));
->>  		skb_queue_purge(BUSY_QUEUE(sk));
->>
->> +		if (l2cap_pi(sk)->sdu)
->> +			kfree_skb(l2cap_pi(sk)->sdu);
->> +
->>  		list_for_each_entry_safe(l, tmp, SREJ_LIST(sk), list) {
->>  			list_del(&l->list);
->>  			kfree(l);
->> @@ -3635,6 +3638,27 @@ static int l2cap_add_to_srej_queue(struct sock *sk, struct sk_buff *skb, u8 tx_s
->>  	return 0;
->>  }
->>
->> +static inline void append_skb_frag(struct sk_buff *skb,
->> +			struct sk_buff *new_frag, struct sk_buff **last_frag)
+>>  		if (!(flags & MSG_PEEK)) {
+>> -			skb_pull(skb, chunk);
+>> +			int skb_len = skb_headlen(skb);
 >
-> Call this l2cap_append_skb_frag()
+> Why are you using the header length here?
 
-Ok.
+skb_headlen() returns the length of the first fragment.
+
+
+>> +
+>> +			if (chunk <= skb_len) {
+>> +				__skb_pull(skb, chunk);
+>> +			} else {
+>> +				struct sk_buff *frag;
+>> +
+>> +				__skb_pull(skb, skb_len);
+>> +				chunk -= skb_len;
+>
+> Why do we have this __skb_pull() here? I think skb_walk_frags() can
+> handle everything.
+
+That first __skb_pull() is necessary to deal with data in the first 
+skbuff, and the skb_walk_frags() deals with anything in 
+skb_shinfo(skb)->frag_list.  The linked skb list looks roughly like 
+this:
+
+skb
+  unsigned char *data -> (L2CAP data)
+  struct sk_buff *frag_list -> 2nd frag
+                                 unsigned char *data -> (more data)
+                                 struct sk_buff *next -> 3rd frag
+                                                           (etc.)
+
+So the first frag is special - the pointer to the fragment is 
+frag_list.  Each linked fragment after that uses the "next" pointer in 
+the sk_buff struct.  The skb_walk_frags() macro starts with the 
+sk_buff pointed to by frag_list, then follows the "next" links.
+
+
+
+>> +
+>> +				skb_walk_frags(skb, frag) {
+>> +					if (chunk <= frag->len) {
+>> +						/* Pulling partial data */
+>> +						skb->len -= chunk;
+>> +						skb->data_len -= chunk;
+>> +						__skb_pull(frag, chunk);
+>> +						break;
+>
+> If we break here what will happen whit the rest of the data to be
+> pulled.
+
+The data is left to be pulled later.  The skb is not freed until all 
+the fragments are empty, and this is handled by existing code.  I've 
+added the next couple of lines of context below to help explain.
 
 >
->> +{
->> +	/* skb->len reflects data in skb as well as all fragments
->> +	   skb->data_len reflects only data in fragments
->> +	 */
->> +	BT_DBG("skb %p, new_frag %p, *last_frag %p", skb, new_frag, *last_frag);
+>> +					} else if (frag->len) {
+>> +						/* Pulling all frag data */
+>> +						chunk -= frag->len;
+>> +						skb->len -= frag->len;
+>> +						skb->data_len -= frag->len;
+>> +						__skb_pull(frag, frag->len);
+>> +					}
+>> +				}
+>> +			}
 >> +
->> +	if (!skb_has_frags(skb))
->> +		skb_shinfo(skb)->frag_list = new_frag;
->> +
->> +	new_frag->next = NULL;
->> +
->> +	(*last_frag)->next = new_frag;
->> +	*last_frag = new_frag;
->> +
->> +	skb->len += new_frag->len;
->> +	skb->data_len += new_frag->len;
->> +	skb->truesize += new_frag->truesize;
->> +}
->> +
->
-> Wondering if it is possible to do that append more simple, but I looked
-> through the kernel code it's not possible, we have to keep last frag
-> pointer.
->
-> This change should go to l2cap_streaming_reassembly_sdu() as well, then
-> you can get ride of partial_sdu_len in the struct l2cap_pinfo.
+>>  			if (skb->len) {
+>>  				skb_queue_head(&sk->sk_receive_queue, skb);
+>>  				break;
+                         }
+                         kfree_skb(skb);
 
-I haven't had a chance to test streaming mode, so I was avoiding 
-changes to it so far.  I agree that the same technique can be applied 
-there.
+If the skb is not empty, it's pushed back on the head of the receive 
+queue.  If it is empty, it's freed.
 
->
->>  static int l2cap_ertm_reassembly_sdu(struct sock *sk, struct sk_buff *skb, u16 control)
->>  {
->>  	struct l2cap_pinfo *pi = l2cap_pi(sk);
->> @@ -3643,7 +3667,7 @@ static int l2cap_ertm_reassembly_sdu(struct sock *sk, struct sk_buff *skb, u16 c
->>
->>  	switch (control & L2CAP_CTRL_SAR) {
->>  	case L2CAP_SDU_UNSEGMENTED:
->> -		if (pi->conn_state & L2CAP_CONN_SAR_SDU)
->> +		if (pi->sdu)
->
-> pi->sdu can do the work work of pi->conn_state & L2CAP_CONN_SAR_SDU, so
-> a separated patch for that change sounds better (you can change that for
-> the Streaming mode at the same time, it's a similar code, but more simple).
->
-
-Ok.
+I based this approach on some code I found in the SCTP protocol.
 
 --
 Mat Martineau
 Employee of Qualcomm Innovation Center, Inc.
 Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+
+
