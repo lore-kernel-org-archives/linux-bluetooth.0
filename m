@@ -1,115 +1,146 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <gfpadovan@gmail.com>
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
+From: Anderson Briglia <anderson.briglia@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>
-Subject: [PATCH] Bluetooth: Fix inconsistent lock state with RFCOMM
-Date: Sat, 14 Aug 2010 11:46:53 -0300
-Message-Id: <1281797213-10940-1-git-send-email-gustavo@padovan.org>
+Cc: Anderson Briglia <anderson.briglia@openbossa.org>
+Subject: [PATCH] Bluetooth: Implement LE Set Advertise Enable cmd
+Date: Fri, 13 Aug 2010 17:01:28 -0400
+Message-Id: <1281733288-11184-1-git-send-email-anderson.briglia@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo F. Padovan <padovan@profusion.mobi>
+This patch implements LE Set Advertise Enable command for dual mode and
+Low Energy hci controllers.
 
-When receiving a rfcomm connection with the old dund deamon the following
-inconsistent lock state happens:
-
-[  811.702999] =================================
-[  811.702999] [ INFO: inconsistent lock state ]
-[  811.702999] 2.6.35-rc1-01743-g41069ad-dirty #1
-[  811.702999] ---------------------------------
-[  811.702999] inconsistent {IN-SOFTIRQ-W} -> {SOFTIRQ-ON-W} usage.
-[  811.702999] krfcommd/3892 [HC0[0]:SC0[0]:HE1:SE1] takes:
-[  811.702999]  (slock-AF_BLUETOOTH){+.?...}, at: [<ffffffffa0189b56>] rfcomm_sk_state_change+0x46/0x170 [rfcomm]
-[  811.702999] {IN-SOFTIRQ-W} state was registered at:
-[  811.702999]   [<ffffffff8108dfa6>] __lock_acquire+0x5b6/0x1560
-[  811.702999]   [<ffffffff8108efaa>] lock_acquire+0x5a/0x70
-[  811.702999]   [<ffffffff81387b2c>] _raw_spin_lock+0x2c/0x40
-[  811.702999]   [<ffffffffa0043092>] 0xffffffffa0043092
-[  811.702999]   [<ffffffffa0044a3f>] 0xffffffffa0044a3f
-[  811.702999]   [<ffffffffa0047183>] 0xffffffffa0047183
-[  811.702999]   [<ffffffffa004798b>] 0xffffffffa004798b
-[  811.702999]   [<ffffffffa000db4b>] 0xffffffffa000db4b
-[  811.702999]   [<ffffffff81067efb>] tasklet_action+0xcb/0xe0
-[  811.702999]   [<ffffffff810685ee>] __do_softirq+0xae/0x150
-[  811.702999]   [<ffffffff81029c0c>] call_softirq+0x1c/0x30
-[  811.702999]   [<ffffffff8102bd75>] do_softirq+0x75/0xb0
-[  811.702999]   [<ffffffff8106823d>] irq_exit+0x8d/0xa0
-[  811.702999]   [<ffffffff8102b330>] do_IRQ+0x70/0xf0
-[  811.702999]   [<ffffffff81388513>] ret_from_intr+0x0/0xf
-[  811.702999]   [<ffffffff81027dfa>] cpu_idle+0x5a/0xb0
-[  811.702999]   [<ffffffff81382934>] start_secondary+0x211/0x254
-[  811.702999] irq event stamp: 411
-[  811.702999] hardirqs last  enabled at (411): [<ffffffff81068432>] local_bh_enable_ip+0x82/0xe0
-[  811.702999] hardirqs last disabled at (409): [<ffffffff8106860e>] __do_softirq+0xce/0x150
-[  811.702999] softirqs last  enabled at (410): [<ffffffff8106863e>] __do_softirq+0xfe/0x150
-[  811.702999] softirqs last disabled at (391): [<ffffffff81029c0c>] call_softirq+0x1c/0x30
-[  811.702999]
-[  811.702999] other info that might help us debug this:
-[  811.702999] 2 locks held by krfcommd/3892:
-[  811.702999]  #0:  (rfcomm_mutex){+.+.+.}, at: [<ffffffffa0188744>] rfcomm_run+0x174/0xb20 [rfcomm]
-[  811.702999]  #1:  (&(&d->lock)->rlock){+.+...}, at: [<ffffffffa0186223>] rfcomm_dlc_accept+0x53/0x100 [rfcomm]
-[  811.702999]
-[  811.702999] stack backtrace:
-[  811.702999] Pid: 3892, comm: krfcommd Tainted: G        W   2.6.35-rc1-01743-g41069ad-dirty #1
-[  811.702999] Call Trace:
-[  811.702999]  [<ffffffff8108c541>] print_usage_bug+0x171/0x180
-[  811.702999]  [<ffffffff8108d323>] mark_lock+0x333/0x400
-[  811.702999]  [<ffffffff8108e02a>] __lock_acquire+0x63a/0x1560
-[  811.702999]  [<ffffffff8108e515>] ? __lock_acquire+0xb25/0x1560
-[  811.702999]  [<ffffffff8108efaa>] lock_acquire+0x5a/0x70
-[  811.702999]  [<ffffffffa0189b56>] ? rfcomm_sk_state_change+0x46/0x170 [rfcomm]
-[  811.702999]  [<ffffffff81387b2c>] _raw_spin_lock+0x2c/0x40
-[  811.702999]  [<ffffffffa0189b56>] ? rfcomm_sk_state_change+0x46/0x170 [rfcomm]
-[  811.702999]  [<ffffffffa0189b56>] rfcomm_sk_state_change+0x46/0x170 [rfcomm]
-[  811.702999]  [<ffffffffa0186239>] rfcomm_dlc_accept+0x69/0x100 [rfcomm]
-[  811.702999]  [<ffffffffa0186a49>] rfcomm_check_accept+0x59/0xd0 [rfcomm]
-[  811.702999]  [<ffffffffa0187cab>] rfcomm_recv_frame+0x9fb/0x1320 [rfcomm]
-[  811.702999]  [<ffffffff8138827b>] ? _raw_spin_unlock_irqrestore+0x3b/0x60
-[  811.702999]  [<ffffffff8108d72d>] ? trace_hardirqs_on_caller+0x13d/0x180
-[  811.702999]  [<ffffffff8108d77d>] ? trace_hardirqs_on+0xd/0x10
-[  811.702999]  [<ffffffffa01887f1>] rfcomm_run+0x221/0xb20 [rfcomm]
-[  811.702999]  [<ffffffff81385667>] ? schedule+0x267/0x5d0
-[  811.702999]  [<ffffffffa01885d0>] ? rfcomm_run+0x0/0xb20 [rfcomm]
-[  811.702999]  [<ffffffff8107afae>] kthread+0x8e/0xa0
-[  811.702999]  [<ffffffff81029b14>] kernel_thread_helper+0x4/0x10
-[  811.702999]  [<ffffffff813885bc>] ? restore_args+0x0/0x30
-[  811.702999]  [<ffffffff8107af20>] ? kthread+0x0/0xa0
-[  811.702999]  [<ffffffff81029b10>] ? kernel_thread_helper+0x0/0x10
-
-Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
 ---
- net/bluetooth/rfcomm/sock.c |    6 ++++--
- 1 files changed, 4 insertions(+), 2 deletions(-)
+ include/net/bluetooth/hci.h |    7 +++++++
+ net/bluetooth/hci_core.c    |   15 +++++++++++++++
+ net/bluetooth/hci_event.c   |   27 +++++++++++++++++++++++++++
+ net/bluetooth/hci_sock.c    |    1 +
+ 4 files changed, 50 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-index 44a6232..30cd80b 100644
---- a/net/bluetooth/rfcomm/sock.c
-+++ b/net/bluetooth/rfcomm/sock.c
-@@ -82,12 +82,14 @@ static void rfcomm_sk_data_ready(struct rfcomm_dlc *d, struct sk_buff *skb)
- static void rfcomm_sk_state_change(struct rfcomm_dlc *d, int err)
- {
- 	struct sock *sk = d->owner, *parent;
-+	unsigned long flags;
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index bcbdd6d..1713849 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -76,6 +76,7 @@ enum {
+ 	HCI_INQUIRY,
+ 
+ 	HCI_RAW,
++	HCI_LE_ADV,
+ };
+ 
+ /* HCI ioctl defines */
+@@ -104,6 +105,7 @@ enum {
+ #define HCIUNBLOCKADDR	_IOW('H', 231, int)
+ 
+ #define HCIINQUIRY	_IOR('H', 240, int)
++#define HCILESETADV	_IOR('H', 241, int)
+ 
+ /* HCI timeouts */
+ #define HCI_CONNECT_TIMEOUT	(40000)	/* 40 seconds */
+@@ -593,6 +595,11 @@ struct hci_rp_read_bd_addr {
+ 	bdaddr_t bdaddr;
+ } __packed;
+ 
++/* --- HCI LE Commands --- */
++#define HCI_OP_LE_SET_ADVERTISE_ENABLE	0x200a
++	#define ADVERTISE_ENABLED	0x01
++	#define ADVERTISE_DISABLED	0x00
 +
- 	if (!sk)
- 		return;
+ /* ---- HCI Events ---- */
+ #define HCI_EV_INQUIRY_COMPLETE		0x01
  
- 	BT_DBG("dlc %p state %ld err %d", d, d->state, err);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index c52f091..2bdb954 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -294,6 +294,16 @@ static void hci_linkpol_req(struct hci_dev *hdev, unsigned long opt)
+ 	hci_send_cmd(hdev, HCI_OP_WRITE_DEF_LINK_POLICY, 2, &policy);
+ }
  
--	bh_lock_sock(sk);
-+	spin_lock_irqsave(&sk->sk_lock.slock, flags);
++static void hci_le_advertise_req(struct hci_dev *hdev, unsigned long opt)
++{
++	__u8 leadv = opt;
++
++	BT_DBG("%s %x", hdev->name, leadv);
++
++	/* LE Advertising mode */
++	hci_send_cmd(hdev, HCI_OP_LE_SET_ADVERTISE_ENABLE, 1, &leadv);
++}
++
+ /* Get HCI device by index.
+  * Device is held on return. */
+ struct hci_dev *hci_dev_get(int index)
+@@ -739,6 +749,11 @@ int hci_dev_cmd(unsigned int cmd, void __user *arg)
+ 		hdev->sco_pkts = *((__u16 *) &dr.dev_opt + 0);
+ 		break;
  
- 	if (err)
- 		sk->sk_err = err;
-@@ -107,7 +109,7 @@ static void rfcomm_sk_state_change(struct rfcomm_dlc *d, int err)
- 		sk->sk_state_change(sk);
- 	}
++	case HCILESETADV:
++		err = hci_request(hdev, hci_le_advertise_req, dr.dev_opt,
++					msecs_to_jiffies(HCI_INIT_TIMEOUT));
++		break;
++
+ 	default:
+ 		err = -EINVAL;
+ 		break;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index bfef5ba..c86c655 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -822,6 +822,29 @@ static void hci_cs_exit_sniff_mode(struct hci_dev *hdev, __u8 status)
+ 	hci_dev_unlock(hdev);
+ }
  
--	bh_unlock_sock(sk);
-+	spin_unlock_irqrestore(&sk->sk_lock.slock, flags);
++static void hci_cc_le_set_advertise(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	__u8 status = *((__u8 *) skb->data);
++	void *sent;
++
++	BT_DBG("%s status 0x%x", hdev->name, status);
++
++	sent = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_ADVERTISE_ENABLE);
++	if (!sent)
++		return;
++
++	if (!status) {
++		__u8 param = *((__u8 *) sent);
++
++		clear_bit(HCI_LE_ADV, &hdev->flags);
++
++		if (param & ADVERTISE_ENABLED)
++			set_bit(HCI_LE_ADV, &hdev->flags);
++	}
++
++	hci_req_complete(hdev, status);
++}
++
+ static inline void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	__u8 status = *((__u8 *) skb->data);
+@@ -1310,6 +1333,10 @@ static inline void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *sk
+ 		hci_cc_read_bd_addr(hdev, skb);
+ 		break;
  
- 	if (parent && sock_flag(sk, SOCK_ZAPPED)) {
- 		/* We have to drop DLC lock here, otherwise
++	case HCI_OP_LE_SET_ADVERTISE_ENABLE:
++		hci_cc_le_set_advertise(hdev, skb);
++		break;
++
+ 	default:
+ 		BT_DBG("%s opcode 0x%x", hdev->name, opcode);
+ 		break;
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 83acd16..0286d32 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -335,6 +335,7 @@ static int hci_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long a
+ 	case HCISETLINKMODE:
+ 	case HCISETACLMTU:
+ 	case HCISETSCOMTU:
++	case HCILESETADV:
+ 		if (!capable(CAP_NET_ADMIN))
+ 			return -EACCES;
+ 		return hci_dev_cmd(cmd, argp);
 -- 
-1.7.1.1
+1.7.0.4
+
