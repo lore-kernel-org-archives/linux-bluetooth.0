@@ -1,74 +1,130 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 12 Aug 2010 17:11:02 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: "Gustavo F. Padovan" <gustavo@padovan.org>
+cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+    rshaffer@codeaurora.org
+Subject: Re: [RFC 6/7] Bluetooth: Reassemble enhanced L2CAP PDUs using skb
+ fragments.
+In-Reply-To: <20100811052433.GA10773@vigoh>
+Message-ID: <alpine.DEB.2.00.1008121708130.8460@linux-sea-02>
+References: <1281467704-5378-1-git-send-email-mathewm@codeaurora.org> <1281467704-5378-7-git-send-email-mathewm@codeaurora.org> <20100811052433.GA10773@vigoh>
 MIME-Version: 1.0
-In-Reply-To: <1281613392.12579.267.camel@localhost.localdomain>
-References: <AANLkTino39jMNvdcV=EiekN33vrfNXLyJVNsHcHtq5wz@mail.gmail.com>
-	<20100811021610.GA8306@jh-x301>
-	<AANLkTimku3Obrb=4KFjD5mapWpYQ0__4UZmzbfadu3WM@mail.gmail.com>
-	<20100812030707.GA17784@jh-x301>
-	<1281613392.12579.267.camel@localhost.localdomain>
-Date: Fri, 13 Aug 2010 06:05:12 +0530
-Message-ID: <AANLkTikX4JoPR3qOoc1MtHheGXKZzNPhfDgp5VUFO=ha@mail.gmail.com>
-Subject: Re: why is hciops a plugin ?
-From: Pavan Savoy <pavan_savoy@sify.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Marcel, Johan,
 
-On Thu, Aug 12, 2010 at 5:13 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Johan,
->
->> > When you say raw HCI access do you mean doing the
->> > socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI) and bind/ioctl, writev+poll/read
->> > lacks few things ?
->> > but all of these are in lib/hci isn't it ?
->>
->> Yes, that's the type of socket that I meant. Direct access to the HCI
->> messages would largely go away from the userspace side. Those
->> libbluetooth functions you're referring to are just convenience wrappers
->> for sending HCI commands through raw HCI sockets.
->>
->> > So even if it was netlink only something like hci_open_dev() would
->> > have changed to socket(PF_NETLINK, SOCK_RAW, BT_NETLINK ); or
->> > something right ?
->>
->> I'm not really familiar enough with netlink to comment on this. Marcel
->> (whose idea it originally was) would have to comment.
->>
->> > any pointers out there ? references for such things ?
->> > I am just curious, don;t want anything specific ...
->>
->> Right now, not really. The only stack internal messages there are at the
->> moment are things like HCI_DEV_REG, HCI_DEV_UNREG, HCI_DEV_UP and
->> HCI_DEV_DOWN and they only go one way (kernel->userspace). This category
->> of messages will grow in the future and it'll be possible to send them
->> both ways.
+Gustavo -
 
-Yes, this explains why hciops is a a plugin now, thanks...
+On Wed, 11 Aug 2010, Gustavo F. Padovan wrote:
 
->> Some HCI messages for which it's already clear now that there will be a
->> benefit from a higher level abstraction on the userspace side are things
->> like name resolving and pairing related requests. Also, if I understood
->> correctly from Marcel, removing userspace processing of HCI events will
->> result in a considreable reduction of context switches since there wont
->> anymore be a promiscuous userspace-side socket that needs to
->> handle/filter all HCI data (Marcel, please correct me if this is
->> inaccurate or wrong).
+> Hi Mat,
 >
-> this is correct. We will not require userspace to do HCI event
-> processing and filtering anymore. It will be a dedicated side channel.
+> * Mat Martineau <mathewm@codeaurora.org> [2010-08-10 12:15:03 -0700]:
+>
+>> As enhanced L2CAP PDUs arrive, it is not necessary to copy them
+>> in to a separate skbuff.  Instead, the skbuffs can be linked
+>> together as fragments, only being copied in to a linear buffer
+>> when the data is copied to userspace.  This avoids the need
+>> to allocate additional buffers for incoming data, and
+>> eliminates copying of data payloads during SDU reassembly.
+>> This is of greater concern with high-speed AMP links than
+>> with BR/EDR.
+>>
+>> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+>> ---
+>>  include/net/bluetooth/l2cap.h |    1 +
+>>  net/bluetooth/l2cap.c         |   66 +++++++++++++++++++++-------------------
+>>  2 files changed, 36 insertions(+), 31 deletions(-)
+>>
+>> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+>> index 2f3222f..9384e87 100644
+>> --- a/include/net/bluetooth/l2cap.h
+>> +++ b/include/net/bluetooth/l2cap.h
+>> @@ -357,6 +357,7 @@ struct l2cap_pinfo {
+>>  	__u16		sdu_len;
+>>  	__u16		partial_sdu_len;
+>>  	struct sk_buff	*sdu;
+>> +	struct sk_buff	*sdu_last_frag;
+>>
+>>  	__u8		ident;
+>>
+>> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+>> index b485c4a..0212035 100644
+>> --- a/net/bluetooth/l2cap.c
+>> +++ b/net/bluetooth/l2cap.c
+>> @@ -290,6 +290,9 @@ static void l2cap_chan_del(struct sock *sk, int err)
+>>  		skb_queue_purge(SREJ_QUEUE(sk));
+>>  		skb_queue_purge(BUSY_QUEUE(sk));
+>>
+>> +		if (l2cap_pi(sk)->sdu)
+>> +			kfree_skb(l2cap_pi(sk)->sdu);
+>> +
+>>  		list_for_each_entry_safe(l, tmp, SREJ_LIST(sk), list) {
+>>  			list_del(&l->list);
+>>  			kfree(l);
+>> @@ -3635,6 +3638,27 @@ static int l2cap_add_to_srej_queue(struct sock *sk, struct sk_buff *skb, u8 tx_s
+>>  	return 0;
+>>  }
+>>
+>> +static inline void append_skb_frag(struct sk_buff *skb,
+>> +			struct sk_buff *new_frag, struct sk_buff **last_frag)
+>
+> Call this l2cap_append_skb_frag()
 
-Side channel ? But there would still be some way to bring out events
-onto user-space right ?
-As in application which do and ONLY do HCI-VS commands, and are
-interested in HCI-VS events...
+Ok.
 
-> Regards
 >
-> Marcel
+>> +{
+>> +	/* skb->len reflects data in skb as well as all fragments
+>> +	   skb->data_len reflects only data in fragments
+>> +	 */
+>> +	BT_DBG("skb %p, new_frag %p, *last_frag %p", skb, new_frag, *last_frag);
+>> +
+>> +	if (!skb_has_frags(skb))
+>> +		skb_shinfo(skb)->frag_list = new_frag;
+>> +
+>> +	new_frag->next = NULL;
+>> +
+>> +	(*last_frag)->next = new_frag;
+>> +	*last_frag = new_frag;
+>> +
+>> +	skb->len += new_frag->len;
+>> +	skb->data_len += new_frag->len;
+>> +	skb->truesize += new_frag->truesize;
+>> +}
+>> +
 >
+> Wondering if it is possible to do that append more simple, but I looked
+> through the kernel code it's not possible, we have to keep last frag
+> pointer.
 >
+> This change should go to l2cap_streaming_reassembly_sdu() as well, then
+> you can get ride of partial_sdu_len in the struct l2cap_pinfo.
+
+I haven't had a chance to test streaming mode, so I was avoiding 
+changes to it so far.  I agree that the same technique can be applied 
+there.
+
 >
+>>  static int l2cap_ertm_reassembly_sdu(struct sock *sk, struct sk_buff *skb, u16 control)
+>>  {
+>>  	struct l2cap_pinfo *pi = l2cap_pi(sk);
+>> @@ -3643,7 +3667,7 @@ static int l2cap_ertm_reassembly_sdu(struct sock *sk, struct sk_buff *skb, u16 c
+>>
+>>  	switch (control & L2CAP_CTRL_SAR) {
+>>  	case L2CAP_SDU_UNSEGMENTED:
+>> -		if (pi->conn_state & L2CAP_CONN_SAR_SDU)
+>> +		if (pi->sdu)
+>
+> pi->sdu can do the work work of pi->conn_state & L2CAP_CONN_SAR_SDU, so
+> a separated patch for that change sounds better (you can change that for
+> the Streaming mode at the same time, it's a similar code, but more simple).
+>
+
+Ok.
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
