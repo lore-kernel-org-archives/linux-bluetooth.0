@@ -1,98 +1,465 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: Process HCI events in a workqueue instead
- of a tasklet
-From: Marcel Holtmann <marcel@holtmann.org>
-To: David Vrabel <david.vrabel@csr.com>
+MIME-Version: 1.0
+In-Reply-To: <201008122116.o7CLGo4p017361@joshua.mesa.nl>
+References: <201008122116.o7CLGo4p017361@joshua.mesa.nl>
+Date: Fri, 13 Aug 2010 10:03:35 +0300
+Message-ID: <AANLkTimSBnkvoN1x-Ak3Vgk8GNHFjTxoRJmQTV+3ZRys@mail.gmail.com>
+Subject: Re: [PATCH 2nd version] IrMC sync server support
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcel Mol <marcel@mesa.nl>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <4C647391.2090607@csr.com>
-References: <1281323213-30907-1-git-send-email-marcel@holtmann.org>
-	 <1281442519.12579.209.camel@localhost.localdomain>
-	 <4C614B01.6030000@csr.com>
-	 <1281446085.12579.212.camel@localhost.localdomain>
-	 <4C647391.2090607@csr.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 13 Aug 2010 10:35:04 +0200
-Message-ID: <1281688504.12579.436.camel@localhost.localdomain>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hi Marcel,
 
-> >>> so I stuffed this now into bluetooth-testing tree and would like to see
-> >>> some extra testing exposure. So far this has only been tested by myself.
-> >>>
-> >>> If there are no regression then this should make a lot of HCI and L2CAP
-> >>> handling a lot simple.
-> >> This may result in packets being processed in a different order to that 
-> >> which they were received in.
-> >>
-> >> e.g., what happens to an ACL packet processed before the connection 
-> >> complete event for that connection?
-> > 
-> > good point. So we would either a) need to disable the RX tasklet when we
-> > receive an event and schedule it for processing or b) process the ACL
-> > data also in a workqueue.
-> 
-> I've thought some more about this and I'm not sure disabling the tasklet
-> is sufficient to prevent packets being reordered.  Consider a transport
-> that submits (in the same interrupt handler call) an ACL packet and an
-> HCI event.  The tasklet will be scheduled and then disabled until the
-> event is processed in the workqueue.
-> 
-> On the other hand, USB transports do not ensure any ordering between HCI
-> event and ACL packets because they're received on different USB
-> endpoints which could be processed in any order.
+On Fri, Aug 13, 2010 at 12:09 AM, Marcel Mol <marcel@mesa.nl> wrote:
+> A reasonable working IrMC SYNC server (only full phonebook sync support)
+> Support for cal and note by just returning nothing.
+> ---
+>  Makefile.am    |    3 +
+>  plugins/irmc.c |  507 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  src/main.c     |   10 +-
+>  src/obex.h     |    3 +-
+>  4 files changed, 521 insertions(+), 2 deletions(-)
+>  create mode 100644 plugins/irmc.c
+>
+> diff --git a/Makefile.am b/Makefile.am
+> index 73e2f28..a2873f9 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -55,6 +55,9 @@ builtin_modules += pbap
+>  builtin_sources += plugins/pbap.c plugins/phonebook.h \
+>                        plugins/vcard.h plugins/vcard.c
+>
+> +builtin_modules += irmc
+> +builtin_sources += plugins/irmc.c plugins/phonebook.h
+> +
 
-so lets see here. We expect that hci_recv_frame receives the events and
-data packets in proper order. If it happens that the USB controller does
-a different order, then it is the USB controllers problem. We just can't
-fix that in the Bluetooth core since we don't know the expected order.
-So we must assume whatever gets received via hci_recv_frame is the
-correct order.
+I guess we don't need phonebook.h, it is already listed in
+builtin-sources before.
 
-        switch (bt_cb(skb)->pkt_type) {
-        case HCI_EVENT_PKT:
-                /* Queue frame for event processing */
-                skb_queue_tail(&hdev->evt_q, skb);
-                queue_work(hdev->workqueue, &hdev->evt_work);
-                break;
+>  builtin_modules += syncevolution
+>  builtin_sources += plugins/syncevolution.c
+>
+> diff --git a/plugins/irmc.c b/plugins/irmc.c
+> new file mode 100644
+> index 0000000..fa7f91d
+> --- /dev/null
+> +++ b/plugins/irmc.c
+> @@ -0,0 +1,507 @@
+> +/*
+> + *
+> + *  OBEX IrMC Sync Server
+> + *
+> + *  Copyright (C) 2010  Marcel Mol <marcel@mesa.nl>
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+> + *
+> + */
+> +
+> +#ifdef HAVE_CONFIG_H
+> +#include <config.h>
+> +#endif
+> +
+> +#include <stdio.h>
+> +#include <string.h>
+> +#include <errno.h>
+> +#include <glib.h>
+> +#include <stdlib.h>
+> +#include <unistd.h>
+> +#include <arpa/inet.h>
+> +#include <sys/types.h>
+> +#include <sys/stat.h>
+> +#include <fcntl.h>
+> +
+> +#include <openobex/obex.h>
+> +#include <openobex/obex_const.h>
+> +
+> +#include "plugin.h"
+> +#include "log.h"
+> +#include "obex.h"
+> +#include "service.h"
+> +#include "phonebook.h"
+> +#include "mimetype.h"
+> +#include "filesystem.h"
+> +#include "dbus.h"
+> +
+> +#define IRMC_CHANNEL   17
+> +
+> +#define IRMC_RECORD "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>       \
+> +<record>                                                               \
+> +  <attribute id=\"0x0001\">                                            \
+> +    <sequence>                                                         \
+> +      <uuid value=\"0x1104\"/>                                         \
+> +    </sequence>                                                                \
+> +  </attribute>                                                         \
+> +                                                                       \
+> +  <attribute id=\"0x0004\">                                            \
+> +    <sequence>                                                         \
+> +      <sequence>                                                       \
+> +        <uuid value=\"0x0100\"/>                                       \
+> +      </sequence>                                                      \
+> +      <sequence>                                                       \
+> +        <uuid value=\"0x0003\"/>                                       \
+> +        <uint8 value=\"%u\" name=\"channel\"/>                         \
+> +      </sequence>                                                      \
+> +      <sequence>                                                       \
+> +        <uuid value=\"0x0008\"/>                                       \
+> +      </sequence>                                                      \
+> +    </sequence>                                                                \
+> +  </attribute>                                                         \
+> +                                                                       \
+> +  <attribute id=\"0x0009\">                                            \
+> +    <sequence>                                                         \
+> +      <sequence>                                                       \
+> +        <uuid value=\"0x1104\"/>                                       \
+> +        <uint16 value=\"0x0100\" name=\"version\"/>                    \
+> +      </sequence>                                                      \
+> +    </sequence>                                                                \
+> +  </attribute>                                                         \
+> +                                                                       \
+> +  <attribute id=\"0x0100\">                                            \
+> +    <text value=\"%s\" name=\"name\"/>                                 \
+> +  </attribute>                                                         \
+> +                                                                       \
+> +  <attribute id=\"0x0301\">                                            \
+> +    <sequence>                                                         \
+> +      <uint8 value=\"0x01\"/>                                          \
+> +    </sequence>                                                                \
+> +  </attribute>                                                         \
+> +</record>"
+> +
+> +
+> +struct aparam_header {
+> +       uint8_t tag;
+> +       uint8_t len;
+> +       uint8_t val[0];
+> +} __attribute__ ((packed));
+> +
+> +#define DID_LEN 18
+> +
+> +struct irmc_session {
+> +       struct obex_session *os;
+> +       struct apparam_field *params;
+> +       uint16_t entries;
+> +       GString *buffer;
+> +       char sn[DID_LEN];
+> +       char did[DID_LEN];
+> +       char manu[DID_LEN];
+> +       char model[DID_LEN];
+> +};
+> +
+> +#define IRMC_TARGET_SIZE 9
+> +
+> +static const guint8 IRMC_TARGET[IRMC_TARGET_SIZE] = {
+> +                       0x49, 0x52, 0x4d, 0x43,  0x2d, 0x53, 0x59, 0x4e, 0x43 };
+> +
+> +/*
+> + * FIXME:
+> + * the IrMC specs state the first vcard should be the owner
+> + * vcard. As there is no simple way to collect ownerdetails
+> + * just create an empty vcard (which is allowed according to the
+> + * specs).
+> + */
+> +static const char *owner_vcard =
+> +               "BEGIN:VCARD\r\n"
+> +               "VERSION:2.1\r\n"
+> +               "N:\r\n"
+> +               "TEL:\r\n"
+> +               "X-IRMX-LUID:0\r\n"
+> +               "END:VCARD\r\n";
+> +
+> +static void phonebook_size_result(const char *buffer, size_t bufsize,
+> +                               int vcards, int missed, void *user_data)
+> +{
+> +       struct irmc_session *irmc = user_data;
+> +
+> +       DBG("vcards %d", vcards);
+> +
+> +       irmc->params->maxlistcount = vcards;
+> +}
+> +
+> +static void query_result(const char *buffer, size_t bufsize, int vcards,
+> +                                       int missed, void *user_data)
+> +{
+> +       struct irmc_session *irmc = user_data;
+> +       const char *s, *t;
+> +
+> +       DBG("bufsize %d vcards %d missed %d", bufsize, vcards, missed);
+> +
+> +       /* first add a 'owner' vcard */
+> +       if (!irmc->buffer)
+> +               irmc->buffer = g_string_new(owner_vcard);
+> +       else
+> +               irmc->buffer = g_string_append(irmc->buffer, owner_vcard);
+> +
+> +       /* loop around buffer and add X-IRMC-LUID attribs */
+> +       s = buffer;
+> +       while ((t = strstr(s, "UID:")) != NULL) {
+> +               /* add upto UID: into buffer */
+> +               irmc->buffer = g_string_append_len(irmc->buffer, s, t-s);
+> +               /*
+> +                * add UID: line into buffer
+> +                * Not sure if UID is still needed if X-IRMC-LUID is there
+> +                */
+> +               s = t;
+> +               t = strstr(s, "\r\n");
+> +               t += 2;
+> +               irmc->buffer = g_string_append_len(irmc->buffer, s, t-s);
+> +               /* add X-IRMC-LUID with same number as UID */
+> +               irmc->buffer = g_string_append_len(irmc->buffer,
+> +                                                       "X-IRMC-LUID:", 12);
+> +               s += 4; /* point to uid number */
+> +               irmc->buffer = g_string_append_len(irmc->buffer, s, t-s);
+> +               s = t;
+> +       }
+> +       /* add remaining bit of buffer */
+> +       irmc->buffer = g_string_append(irmc->buffer, s);
+> +
+> +       obex_object_set_io_flags(irmc, G_IO_IN, 0);
+> +}
+> +
+> +static void *irmc_connect(struct obex_session *os, int *err)
+> +{
+> +       struct irmc_session *irmc;
+> +       struct apparam_field *param;
+> +
+> +       DBG("");
+> +
+> +       manager_register_session(os);
+> +
+> +       irmc = g_new0(struct irmc_session, 1);
+> +       irmc->os = os;
+> +
+> +       /*
+> +        * FIXME:
+> +        * Ideally get capabilities info here and use that to define
+> +        * IrMC DID and SN etc parameters.
+> +        * For now lets used hostname and some 'random' value
+> +        */
+> +       gethostname(irmc->did, DID_LEN);
+> +       strncpy(irmc->sn, "12345", DID_LEN);
+> +       strncpy(irmc->manu, "obex", DID_LEN);
+> +       strncpy(irmc->model, "mymodel", DID_LEN);
+> +
+> +       /*
+> +         *  We need to know the number of contact/cal/nt entries
+> +         *  somewhere so why not do it now.
+> +         */
+> +       param = g_new0(struct apparam_field, 1);
+> +       param->maxlistcount = 0; /* to count the number of vcards... */
+> +       param->filter = 0x200085; /* UID TEL N VERSION */
+> +       irmc->params = param;
+> +       phonebook_pull("telecom/pb.vcf", irmc->params, phonebook_size_result,
+> +                                                                       irmc);
+> +
+> +       if (err)
+> +               *err = 0;
+> +
+> +       return irmc;
+> +}
+> +
+> +static int irmc_get(struct obex_session *os, obex_object_t *obj,
+> +               gboolean *stream, void *user_data)
+> +{
+> +       struct irmc_session *irmc = user_data;
+> +       const char *type = obex_get_type(os);
+> +       const char *name = obex_get_name(os);
+> +       char *path;
+> +       int ret;
+> +
+> +       DBG("name %s type %s irmc %p", name, type ? type : "NA", irmc);
+> +
+> +       path = g_strdup(name);
+> +       *stream = TRUE;
+> +
+> +       ret = obex_get_stream_start(os, path);
+> +
+> +       g_free(path);
+> +
+> +       return ret;
+> +}
+> +
+> +static void irmc_disconnect(struct obex_session *os, void *user_data)
+> +{
+> +       struct irmc_session *irmc = user_data;
+> +
+> +       DBG("");
+> +
+> +       manager_unregister_session(os);
+> +
+> +        if (irmc->params) {
+> +                if (irmc->params->searchval)
+> +                       g_free(irmc->params->searchval);
+> +                g_free(irmc->params);
+> +        }
+> +       if (irmc->buffer) {
+> +               string_free(irmc->buffer);
+> +               irmc->buffer = NULL;
+> +       }
+> +
+> +       g_free(irmc);
+> +}
+> +
+> +static int irmc_chkput(struct obex_session *os, void *user_data)
+> +{
+> +       DBG("");
+> +       /* Reject all PUTs */
+> +       return -EBADR;
+> +}
+> +
+> +static void *irmc_open_devinfo(struct irmc_session *irmc, int *err)
+> +{
+> +       if (!irmc->buffer)
+> +               irmc->buffer = g_string_new("");
+> +
+> +       g_string_append_printf(irmc->buffer,
+> +                               "MANU:%s\r\n"
+> +                               "MOD:%s\r\n"
+> +                               "SN:%s\r\n"
+> +                               "PB-TYPE-TX:VCARD2.1\r\n",
+> +                               irmc->manu, irmc->model, irmc->sn);
+> +
+> +       return irmc;
+> +}
+> +
+> +static void *irmc_open_pb(const char *name,
+> +                struct irmc_session *irmc, int *err)
+> +{
+> +       GString *mybuf;
+> +       int ret;
+> +
+> +       if (!g_strcmp0(name, ".vcf")) {
+> +               /* how can we tell if the vcard count call already finished? */
+> +               ret = phonebook_pull("telecom/pb.vcf", irmc->params,
+> +                                                       query_result, irmc);
+> +               if (ret < 0) {
+> +                       DBG("phonebook_pull failed...");
+> +                       goto fail;
+> +               }
+> +               return irmc;
+> +       }
+> +
+> +       if (!g_strcmp0(name, "/info.log")) {
+> +               mybuf = g_string_new("");
+> +               g_string_printf(mybuf, "Total-Records:%d\r\n"
+> +                               "Maximum-Records:%d\r\n"
+> +                               "DID:%s\r\n",
+> +                               irmc->params->maxlistcount,
+> +                               irmc->params->maxlistcount, irmc->did);
+> +       }
+> +       else if (!strncmp(name, "/luid/", 6)) {
+> +               name += 6;
+> +               if (!g_strcmp0(name, "cc.log")) {
+> +                       mybuf = g_string_new("");
+> +                       g_string_printf(mybuf, "%d\r\n", irmc->params->maxlistcount);
+> +               }
+> +               else {
+> +                       int l = strlen(name);
+> +                       /* FIXME:
+> +                        * Reply the same to any *.log so we hopefully force a
+> +                        * full phonebook dump.
+> +                        * Is IEL:2 ok?
+> +                        */
+> +                       if (l > 4 && !g_strcmp0(name + l - 4, ".log")) {
+> +                               DBG("changelog request, force whole book");
+> +                               mybuf = g_string_new("");
+> +                               g_string_printf(mybuf, "SN:%s\r\n"
+> +                                                       "IEL:2\r\n"
+> +                                                       "DID:%s\r\n"
+> +                                                       "Total-Records:%d\r\n"
+> +                                                       "Maximum-Records:%d\r\n"
+> +                                                       "*\r\n",
+> +                                               irmc->sn, irmc->did,
+> +                                               irmc->params->maxlistcount,
+> +                                               irmc->params->maxlistcount);
+> +                       }
+> +                       else {
+> +                               ret = -EBADR;
+> +                               goto fail;
+> +                       }
+> +               }
+> +       }
+> +       else {
+> +               ret = -EBADR;
+> +               goto fail;
+> +       }
+> +
+> +       if (!irmc->buffer)
+> +               irmc->buffer = mybuf;
+> +       else {
+> +               irmc->buffer = g_string_append(irmc->buffer, mybuf->str);
+> +               string_free(mybuf);
+> +       }
+> +
+> +       return irmc;
+> +
+> +fail:
+> +       if (err)
+> +               *err = ret;
+> +
+> +       return NULL;
+> +}
+> +
+> +static void *irmc_open_cal(const char *name,
+> +                struct irmc_session *irmc, int *err)
+> +{
+> +       /* no suport yet. Just return an empty buffer. cal.vcs */
+> +       DBG("unsupported, returning empty buffer");
+> +       if (!irmc->buffer)
+> +               irmc->buffer = g_string_new("");
+> +
+> +       return irmc;
+> +}
+> +
+> +static void *irmc_open_nt(const char *name,
+> +                struct irmc_session *irmc, int *err)
+> +{
+> +       /* no suport yet. Just return an empty buffer. nt.vnt */
+> +       DBG("unsupported, returning empty buffer");
+> +       if (!irmc->buffer)
+> +               irmc->buffer = g_string_new("");
+> +
+> +       return irmc;
+> +}
+> +
+> +static void *irmc_open(const char *name, int oflag, mode_t mode,
+> +               void *context, size_t *size, int *err)
+> +{
+> +       struct irmc_session *irmc = context;
+> +       int ret;
+> +       const char *p;
+> +
+> +       DBG("name %s context %p", name, context);
+> +       if (oflag != O_RDONLY) {
+> +               ret = -EPERM;
+> +               goto fail;
+> +       }
 
-        default:
-                /* Queue frame for rx task */
-                skb_queue_tail(&hdev->rx_q, skb);
-                tasklet_schedule(&hdev->rx_task);
-                break;
-        }
+Since Ive seen this many times we better put a check for NULL name
+here otherwise it may crash in the following line.
 
-If we now disable the rx_task before scheduling the evt_work, then the
-rx_task gets scheduled, but only run after we enable rx_task again. And
-we enable the rx_task after hci_event_packet. So after we have created
-any structure to handle the ACL and SCO data packets correctly.
-
-I am not seeing your concern. At least not in the Bluetooth core. There
-might be a few driver issues when the controller doesn't send us things
-in order, but that is really a controller or driver issue at that point.
-
-Coming to think about this, we might even go one step further here and
-only enable the rx_task when we have an ACL link. That way if the
-controller sends us an ACL packet before the Connection Complete event
-we just queue it up. That would potentially solve issues that we have
-seen with Broadcom controllers where the first ACL packet arrives too
-early and BlueZ is just too fast.
-
-We could even go one step further with this and only enable the RX task
-when we have switched on encryption (for 2.1 with SSP). This might fix
-some issues with the stupid controllers sending ACL packets before
-notifying us that the link has switched on encryption.
-
-Anyway, I am really open for suggestions here. I just think that moving
-all RX and TX processing into a workqueue might be a bit overkill. And
-keep processing events in a tasklet will create code complexity in the
-future when adding AMP support.
-
-Regards
-
-Marcel
+> +       if (strncmp(name, "telecom/", 8) != 0) {
+> +               ret = -EBADR;
+> +               goto fail;
+> +       }
 
 
+
+-- 
+Luiz Augusto von Dentz
+Computer Engineer
