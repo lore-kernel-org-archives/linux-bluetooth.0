@@ -1,63 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 16 Aug 2010 16:23:23 +0300
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fix empty contact in missed calls problem
+Message-ID: <20100816132323.GA17617@jh-x301>
+References: <1281963827-20375-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTimPuCLfU5Xq8vH4+w3Ketf35RXN0P=Z0X50v6V8@mail.gmail.com>
-References: <AANLkTimnLyeZqNvNecognr_U9alZiC9bKNUOWjX9H_Hq@mail.gmail.com>
-	<1274360918.27274.3302.camel@localhost.localdomain>
-	<AANLkTik3d0rY2QNrhevwzPz28VQwKuj7A5s-9l152H4Y@mail.gmail.com>
-	<AANLkTimW1SmfZ+j=F7kTSwosdz=kh+g9ofcqdTeGE7CB@mail.gmail.com>
-	<1281951653.9775.7.camel@localhost.localdomain>
-	<AANLkTimPuCLfU5Xq8vH4+w3Ketf35RXN0P=Z0X50v6V8@mail.gmail.com>
-Date: Mon, 16 Aug 2010 19:05:09 +0530
-Message-ID: <AANLkTik=F2+8_PcCJgN4F0AHxLHqeMM+pEuy8CK=32Hs@mail.gmail.com>
-Subject: Re: [GSoC'10] : New Command Line Tool(s) for bluez
-From: alok barsode <alokbarsode@gmail.com>
-To: Alexander Orlenko <zxteam@gmail.com>
-Cc: Bastien Nocera <hadess@hadess.net>,
-	Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1281963827-20375-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alexander,
+Hi Radek,
 
-On Mon, Aug 16, 2010 at 5:36 PM, Alexander Orlenko <zxteam@gmail.com> wrote:
->> Shame, but I won't hold you against that :)
+On Mon, Aug 16, 2010, Radoslaw Jablonski wrote:
+> Fixed problem with tracker queries for calls history - previously call
+> without contact in phonebook was missing in some scenario for pull
+> requests.
+> ---
+>  plugins/phonebook-tracker.c |   28 ++++------------------------
+>  1 files changed, 4 insertions(+), 24 deletions(-)
 
-Its a lil joke ;) Bastien maintains (iirc) the gnome-bluetooth project.
-No hard feelings ( I hope:) )
+Thanks. The patch is now upstream.
 
-> Why? I wrote tool to generate gobjects from bluez/obexd doc api files.
-> And my implementation has methods for easy properties access and
-> supports properties caching (for example), and some others features.
->
-> On 16 August 2010 20:40, Bastien Nocera <hadess@hadess.net> wrote:
->> On Mon, 2010-08-16 at 10:24 +1100, Alexander Orlenko wrote:
->>> Hi everyone,
->>>
->>> I updated project info page at http://hostisdown.org/gsoc/projects/bluez-tools
->>> Created project home page: http://code.google.com/p/bluez-tools
->>> Current release available for download: 0.1.18-6432
->>>
->>> Code of my project does not based on non-GTK parts of
->>> libgnome-bluetooth. I wrote glib gobjects for all bluez dbus
->>> interfaces.
->>
->> Shame, but I won't hold you against that :)
->>
->>> I will continue developing my project after end of GSoC.
->>
->> Hopefully people will package it for distributions so we don't get as
->> many requests for command-line pairing agents :)
->>
->> Cheers
->>
->>
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-
-Cheers,
-Alok.
+Johan
