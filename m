@@ -1,63 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Pawlik <lucas.pawlik@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Pawlik <lucas.pawlik@gmail.com>
-Subject: [PATCH] Fix problem with filling ADR with unneeded semicolons
-Date: Mon, 16 Aug 2010 17:38:10 +0300
-Message-Id: <1281969490-22315-1-git-send-email-lucas.pawlik@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <AANLkTimPuCLfU5Xq8vH4+w3Ketf35RXN0P=Z0X50v6V8@mail.gmail.com>
+References: <AANLkTimnLyeZqNvNecognr_U9alZiC9bKNUOWjX9H_Hq@mail.gmail.com>
+	<1274360918.27274.3302.camel@localhost.localdomain>
+	<AANLkTik3d0rY2QNrhevwzPz28VQwKuj7A5s-9l152H4Y@mail.gmail.com>
+	<AANLkTimW1SmfZ+j=F7kTSwosdz=kh+g9ofcqdTeGE7CB@mail.gmail.com>
+	<1281951653.9775.7.camel@localhost.localdomain>
+	<AANLkTimPuCLfU5Xq8vH4+w3Ketf35RXN0P=Z0X50v6V8@mail.gmail.com>
+Date: Mon, 16 Aug 2010 19:05:09 +0530
+Message-ID: <AANLkTik=F2+8_PcCJgN4F0AHxLHqeMM+pEuy8CK=32Hs@mail.gmail.com>
+Subject: Re: [GSoC'10] : New Command Line Tool(s) for bluez
+From: alok barsode <alokbarsode@gmail.com>
+To: Alexander Orlenko <zxteam@gmail.com>
+Cc: Bastien Nocera <hadess@hadess.net>,
+	Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Previously in a phonebook pull request ADR was filled with six
-semicolons when contact address entry was empty in phonebook. This
-patch fixes this problem. Address is send as an empty string.
----
- plugins/vcard.c |   25 +++++++++++++++++++++++++
- 1 files changed, 25 insertions(+), 0 deletions(-)
+Hi Alexander,
 
-diff --git a/plugins/vcard.c b/plugins/vcard.c
-index 80f8265..7333a68 100644
---- a/plugins/vcard.c
-+++ b/plugins/vcard.c
-@@ -155,6 +155,26 @@ static gboolean contact_fields_present(struct phonebook_contact * contact)
- 	return FALSE;
- }
- 
-+static gboolean address_fields_present(struct phonebook_contact * contact)
-+{
-+	if (contact->pobox && strlen(contact->pobox))
-+		return TRUE;
-+	if (contact->extended && strlen(contact->extended))
-+		return TRUE;
-+	if (contact->street && strlen(contact->street))
-+		return TRUE;
-+	if (contact->locality && strlen(contact->locality))
-+		return TRUE;
-+	if (contact->region && strlen(contact->region))
-+		return TRUE;
-+	if (contact->postal && strlen(contact->postal))
-+		return TRUE;
-+	if (contact->country && strlen(contact->country))
-+		return TRUE;
-+	
-+	return FALSE;
-+}
-+
- static void vcard_printf_name(GString *vcards,
- 					struct phonebook_contact *contact)
- {
-@@ -253,6 +273,11 @@ static void vcard_printf_email(GString *vcards, const char *email)
- 
- static void vcard_printf_adr(GString *vcards, struct phonebook_contact *contact)
- {
-+	if (address_fields_present(contact) == FALSE) {
-+		vcard_printf(vcards, "ADR:");
-+		return;		
-+	}
-+	
- 	vcard_printf(vcards, "ADR:%s;%s;%s;%s;%s;%s;%s", contact->pobox,
- 					contact->extended, contact->street,
- 					contact->locality, contact->region,
--- 
-1.7.0.4
+On Mon, Aug 16, 2010 at 5:36 PM, Alexander Orlenko <zxteam@gmail.com> wrote:
+>> Shame, but I won't hold you against that :)
 
+Its a lil joke ;) Bastien maintains (iirc) the gnome-bluetooth project.
+No hard feelings ( I hope:) )
+
+> Why? I wrote tool to generate gobjects from bluez/obexd doc api files.
+> And my implementation has methods for easy properties access and
+> supports properties caching (for example), and some others features.
+>
+> On 16 August 2010 20:40, Bastien Nocera <hadess@hadess.net> wrote:
+>> On Mon, 2010-08-16 at 10:24 +1100, Alexander Orlenko wrote:
+>>> Hi everyone,
+>>>
+>>> I updated project info page at http://hostisdown.org/gsoc/projects/bluez-tools
+>>> Created project home page: http://code.google.com/p/bluez-tools
+>>> Current release available for download: 0.1.18-6432
+>>>
+>>> Code of my project does not based on non-GTK parts of
+>>> libgnome-bluetooth. I wrote glib gobjects for all bluez dbus
+>>> interfaces.
+>>
+>> Shame, but I won't hold you against that :)
+>>
+>>> I will continue developing my project after end of GSoC.
+>>
+>> Hopefully people will package it for distributions so we don't get as
+>> many requests for command-line pairing agents :)
+>>
+>> Cheers
+>>
+>>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+
+Cheers,
+Alok.
