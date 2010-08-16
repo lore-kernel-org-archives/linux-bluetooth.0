@@ -1,71 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 16 Aug 2010 19:22:38 +0200
-From: "Marcel J.E. Mol" <marcel@mesa.nl>
-To: Marcel Holtmann <marcel@holtmann.org>
+Date: Mon, 16 Aug 2010 18:16:06 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Lukasz Pawlik <lucas.pawlik@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] IrMC sync server support
-Message-ID: <20100816172238.GA27814@joshua.mesa.nl>
-References: <201008121013.o7CADR8r004125@joshua.mesa.nl> <1281613299.12579.266.camel@localhost.localdomain>
-Mime-Version: 1.0
-Content-Type: text/plain; charset*=utf-8''%E2%80%9Cus-ascii
-In-Reply-To: <1281613299.12579.266.camel@localhost.localdomain>
+Subject: Re: [PATCH] Fix problem with filling ADR with unneeded semicolons
+Message-ID: <20100816151606.GA20356@jh-x301>
+References: <1281969490-22315-1-git-send-email-lucas.pawlik@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1281969490-22315-1-git-send-email-lucas.pawlik@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Aug 12, 2010 at 07:41:39AM -0400, Marcel Holtmann wrote:
-> Hi Marcel,
-> 
-> > A reasonable working IrMC SYNC server (only full phonebook sync support)
-> > Support for cal and note by just returning nothing.
-> > ---
-> >  Makefile.am    |    3 +
-> >  plugins/irmc.c |  488 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  src/main.c     |   12 ++-
-> >  src/obex.h     |    1 +
-> >  4 files changed, 502 insertions(+), 2 deletions(-)
-> >  create mode 100644 plugins/irmc.c
-> > 
-> > diff --git a/Makefile.am b/Makefile.am
-> > index 73e2f28..ce8c675 100644
-> > --- a/Makefile.am
-> > +++ b/Makefile.am
-> > @@ -58,6 +58,9 @@ builtin_sources += plugins/pbap.c plugins/phonebook.h \
-> >  builtin_modules += syncevolution
-> >  builtin_sources += plugins/syncevolution.c
-> >  
-> > +builtin_modules += irmc
-> > +builtin_sources += plugins/irmc.c plugins/phonebook.h
-> > +
-> >  builtin_nodist += plugins/phonebook.c
-> >  
-> >  libexec_PROGRAMS += src/obexd
-> > diff --git a/plugins/irmc.c b/plugins/irmc.c
-> > new file mode 100644
-> > index 0000000..96fd807
-> > --- /dev/null
-> > +++ b/plugins/irmc.c
-> > @@ -0,0 +1,488 @@
-> > +/*
-> > + *
-> > + *  OBEX IrMC Sync Server
-> > ...
-> > +#include "dbus.h"
-> > +
-> > +#define IRMC_CHANNEL	17
-> 
-> we did have a list of defined RFCOMM channels for various protocols, but
-> just don't remember where it is.
-> 
-> Johan, we should put that into the doc/ directory actually. Can you dig
-> up that list and commit it as text file.
-> 
+Hi Lucasz,
 
-Any news on this one? Is 17 the correct channel for IrMC?
+On Mon, Aug 16, 2010, Lukasz Pawlik wrote:
+> Previously in a phonebook pull request ADR was filled with six
+> semicolons when contact address entry was empty in phonebook. This
+> patch fixes this problem. Address is send as an empty string.
+> ---
+>  plugins/vcard.c |   25 +++++++++++++++++++++++++
+>  1 files changed, 25 insertions(+), 0 deletions(-)
 
--Marcel
--- 
-     ======--------         Marcel J.E. Mol                MESA Consulting B.V.
-    =======---------        ph. +31-(0)6-54724868          P.O. Box 112
-    =======---------        marcel@mesa.nl                 2630 AC  Nootdorp
-__==== www.mesa.nl ---____U_n_i_x______I_n_t_e_r_n_e_t____ The Netherlands ____
- They couldn't think of a number,           Linux user 1148  --  counter.li.org
-    so they gave me a name!  -- Rupert Hine  --  www.ruperthine.com
+Thanks for the patch, but it'll need some coding style cleanup before
+going upstream:
+
+> +static gboolean address_fields_present(struct phonebook_contact * contact)
+
+No space after *
+
+> +	if (contact->country && strlen(contact->country))
+> +		return TRUE;
+> +	
+
+The last line isn't really empty byt has an extra tab. Please remove it.
+
+> +	if (address_fields_present(contact) == FALSE) {
+> +		vcard_printf(vcards, "ADR:");
+> +		return;		
+
+There's an extra tab at the end of the line. Please remove it.
+
+> +	}
+> +	
+
+Same here.
+
+Johan
