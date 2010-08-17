@@ -1,29 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 17 Aug 2010 17:30:43 +0300
+Date: Tue, 17 Aug 2010 17:26:55 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Suraj Sumangala <suraj@atheros.com>
-Cc: linux-bluetooth@vger.kernel.org, Jothikumar.Mothilal@Atheros.com
-Subject: Re: [PATCH v2 1/2] Bluetooth: Option to enable power management
- from host
-Message-ID: <20100817143043.GA19862@jh-x301>
-References: <1281681408-27376-1-git-send-email-suraj@atheros.com>
+To: Inga Stotland <ingas@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, rshaffer@codeaurora.org,
+	marcel@holtmann.org
+Subject: Re: Support for HCI commands and events related to AMP
+ functionality
+Message-ID: <20100817142655.GA19841@jh-x301>
+References: <1281485576-32715-1-git-send-email-ingas@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1281681408-27376-1-git-send-email-suraj@atheros.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1281485576-32715-1-git-send-email-ingas@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Inga,
 
-On Fri, Aug 13, 2010, Suraj Sumangala wrote:
-> This provides a new option for hciattach to enable hardware specific
-> power management from host.
-> This option by default will be disabled for existing devices
-> ---
->  tools/hciattach.8 |   13 ++++++++
->  tools/hciattach.c |   88 ++++++++++++++++++++++++++++++++++++++---------------
->  2 files changed, 76 insertions(+), 25 deletions(-)
+On Tue, Aug 10, 2010, Inga Stotland wrote:
+> Added new HCI commands and events constructs for AMP related development.
+> Will be used in updated testing tools for AMP.
 
-This patch has been pushed upstream. Thanks.
+Both patches have been pushed upstream. Thanks.
 
 Johan
