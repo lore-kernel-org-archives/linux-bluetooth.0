@@ -2,93 +2,88 @@ Return-Path: <cyrus@holtmann.org>
 From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH 5/5] Add fast connectable support to HFP
-Date: Tue, 17 Aug 2010 17:05:34 +0300
-Message-Id: <1282053934-19445-6-git-send-email-dmitriy.paliy@nokia.com>
+Subject: [PATCH 2/5] Add fast connectable to hciops
+Date: Tue, 17 Aug 2010 17:05:31 +0300
+Message-Id: <1282053934-19445-3-git-send-email-dmitriy.paliy@nokia.com>
 In-Reply-To: <1282053934-19445-1-git-send-email-dmitriy.paliy@nokia.com>
 References: <1282053934-19445-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Audio.conf is updated to support fast connectable mode. Set
-FastConnectable to true to enable and to false to disable. Headset
-initialization and call indicators are updated respectively. It is
-disabled by default.
+Fast connectable switches between two sets of parameters to enable
+or disable fast page scan mode. Page scan interval and page scan
+type are changed to speed up connectabily when needed. When
+disabled it sets default values. List of btd_adapter_ops is updated
+respectively.
 ---
- audio/audio.conf |    7 +++++++
- audio/headset.c  |   20 ++++++++++++++++++++
- 2 files changed, 27 insertions(+), 0 deletions(-)
+ plugins/hciops.c |   34 ++++++++++++++++++++++++++++++++++
+ src/adapter.h    |    1 +
+ 2 files changed, 35 insertions(+), 0 deletions(-)
 
-diff --git a/audio/audio.conf b/audio/audio.conf
-index a64fb66..302e046 100644
---- a/audio/audio.conf
-+++ b/audio/audio.conf
-@@ -32,6 +32,13 @@ HFP=true
- # Maximum number of connected HSP/HFP devices per adapter. Defaults to 1
- MaxConnected=1
- 
-+# Set to true to enable use of fast connectable mode (faster page scanning)
-+# for HFP when incomming call starts. Default settings are restored after
-+# call is answered or rejected. Page scan interval is much shorter and page
-+# scan type changed to interlaced. Such allows faster connection initiated
-+# by a headset.
-+FastConnectable=false
-+
- # Just an example of potential config options for the other interfaces
- #[A2DP]
- #SBCSources=1
-diff --git a/audio/headset.c b/audio/headset.c
-index 99d4c7a..cdb3370 100644
---- a/audio/headset.c
-+++ b/audio/headset.c
-@@ -95,6 +95,7 @@ static struct {
- };
- 
- static gboolean sco_hci = TRUE;
-+static gboolean fast_connectable = FALSE;
- 
- static GSList *active_devices = NULL;
- 
-@@ -2262,6 +2263,19 @@ uint32_t headset_config_init(GKeyFile *config)
- 		g_free(str);
- 	}
- 
-+	/* Init fast connectable option */
-+	str = g_key_file_get_string(config, "Headset", "FastConnectable",
-+					&err);
-+	if (err) {
-+		DBG("audio.conf: %s", err->message);
-+		g_clear_error(&err);
-+	} else {
-+		fast_connectable = strcmp(str, "true") == 0;
-+		if (fast_connectable)
-+			manager_set_fast_connectable(FALSE);
-+		g_free(str);
-+	}
-+
- 	return ag.features;
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index 9c97c5a..652830a 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -716,6 +716,39 @@ static int hciops_cancel_resolve_name(int index, bdaddr_t *bdaddr)
+ 	return err;
  }
  
-@@ -2743,6 +2757,9 @@ int telephony_incoming_call_ind(const char *number, int type)
- 	struct headset *hs;
- 	struct headset_slc *slc;
- 
-+	if (fast_connectable)
-+		manager_set_fast_connectable(TRUE);
++static int hciops_fast_connectable(int index, gboolean enable)
++{
++	int dd, err = 0;
++	write_page_activity_cp cp;
++	uint8_t type;
 +
- 	if (!active_devices)
- 		return -ENODEV;
- 
-@@ -2782,6 +2799,9 @@ int telephony_calling_stopped_ind(void)
- {
- 	struct audio_device *dev;
- 
-+	if (fast_connectable)
-+		manager_set_fast_connectable(FALSE);
++	if (enable) {
++		type = PAGE_SCAN_TYPE_INTERLACED;
++		cp.interval = 0x0024;	/* 22.5 msec page scan interval */
++	} else {
++		type = PAGE_SCAN_TYPE_STANDARD;	/* default */
++		cp.interval = 0x0800;	/* default 1.28 sec page scan */
++	}
 +
- 	if (ag.ring_timer) {
- 		g_source_remove(ag.ring_timer);
- 		ag.ring_timer = 0;
++	cp.window = 0x0012;	/* default 11.25 msec page scan window */
++
++	dd = hci_open_dev(index);
++	if (dd < 0)
++		return -EIO;
++
++	if ( hci_send_cmd(dd, OGF_HOST_CTL, OCF_WRITE_PAGE_ACTIVITY,
++				WRITE_PAGE_ACTIVITY_CP_SIZE, &cp) < 0 ) {
++		err = -errno;
++	} else if ( hci_send_cmd(dd, OGF_HOST_CTL, OCF_WRITE_PAGE_SCAN_TYPE,
++							1, &type) < 0 ) {
++		err = -errno;
++	}
++
++	hci_close_dev(dd);
++
++	return err;
++}
++
+ static struct btd_adapter_ops hci_ops = {
+ 	.setup = hciops_setup,
+ 	.cleanup = hciops_cleanup,
+@@ -732,6 +765,7 @@ static struct btd_adapter_ops hci_ops = {
+ 	.set_name = hciops_set_name,
+ 	.read_name = hciops_read_name,
+ 	.set_class = hciops_set_class,
++	.set_fast_connectable = hciops_fast_connectable,
+ };
+ 
+ static int hciops_init(void)
+diff --git a/src/adapter.h b/src/adapter.h
+index 58853ac..657e035 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -183,6 +183,7 @@ struct btd_adapter_ops {
+ 	int (*set_name) (int index, const char *name);
+ 	int (*read_name) (int index);
+ 	int (*set_class) (int index, uint32_t class);
++	int (*set_fast_connectable) (int index, gboolean enable);
+ };
+ 
+ int btd_register_adapter_ops(struct btd_adapter_ops *btd_adapter_ops);
 -- 
 1.7.0.4
 
