@@ -1,142 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
+From: Oliver Neukum <oneukum@suse.de>
+To: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: resending patch to retry reset in case it failed
+Date: Tue, 17 Aug 2010 14:41:32 +0200
+Cc: linux-bluetooth@vger.kernel.org, linux-usb@vger.kernel.org
+References: <201008120944.49044.oneukum@suse.de> <1281612323.12579.252.camel@localhost.localdomain>
+In-Reply-To: <1281612323.12579.252.camel@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20100817103051.GA29845@jh-x301>
-References: <AANLkTim2ni6aE3-9Rx+HGeFFmmG-by6PMh4zgrJFnk-m@mail.gmail.com>
-	<AANLkTimpogcSN1eKO9A2aWB1aB7YNZSRD7f-vGMvma9q@mail.gmail.com>
-	<20100817103051.GA29845@jh-x301>
-Date: Tue, 17 Aug 2010 15:54:40 +0300
-Message-ID: <AANLkTikfG3Beawf-kguknYcz-T8WXL9hk9H_D9N35=SS@mail.gmail.com>
-Subject: Re: [PATCH 2/3] Maemo6 MCE: listen to adapter mode changes
-From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=000feae9a993c72e11048e0473ae
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: Text/Plain;
+  charset="utf-8"
+Message-Id: <201008171441.32885.oneukum@suse.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---000feae9a993c72e11048e0473ae
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+Am Donnerstag, 12. August 2010, 13:25:23 schrieb Marcel Holtmann:
+> Hi Oliver,
+> 
+> > may I ask what happened to this patch?
+> > Do you take it, want modifications or reject it?
+> > 
+> > 	Regards
+> > 		Oliver
+> > 
+> > From af61f0663f095599003290b13ad6fadee1d4fb25 Mon Sep 17 00:00:00 2001
+> > From: Oliver Neukum <oliver@neukum.org>
+> > Date: Tue, 6 Jul 2010 08:08:42 +0200
+> > Subject: [PATCH] bluetooth: retry reset for devices that fail
+> > 
+> > Some devices fail to reset properly at the first attempt to reset
+> > them under unknown circumstances. Failures can be identified by
+> > an invalid btaddr. Retry in those cases.
+> 
+> I was pondering about it and haven't really made up my mind with this
+> stuff. To be honest, I don't like the patch a little bit. I can see your
+> point why you want it, but the patch is a bit too ugly for my taste.
 
-On Tue, Aug 17, 2010 at 1:30 PM, Johan Hedberg <johan.hedberg@gmail.com> wr=
-ote:
->
-> A couple of issues I noticed:
->
->> + =A0 =A0 DBG("adapter_powered called with %d", (int) powered);
->
-> I don't think the int cast is necessary here. Or do you get a warning
-> otherwise?
->
->> + =A0 =A0 dbus_message_append_args(msg, DBUS_TYPE_UINT32, &radio_states,
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 DBUS_TYPE_UINT=
-32, &radio_mask);
->
-> DBUS_TYPE_INVALID is missing from the end of the arguments list.
->
->> +}
->> +
->> +
->> =A0static int mce_probe(struct btd_adapter *adapter)
->
-> Why the two consecutive empty lines? Please remove one.
->
->> @@ -132,6 +173,9 @@ static int mce_probe(struct btd_adapter *adapter)
->> =A0 =A0 =A0 watch_id =3D g_dbus_add_signal_watch(conn, NULL, MCE_SIGNAL_=
-PATH,
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
-=A0 MCE_SIGNAL_IF, MCE_RADIO_STATES_SIG,
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
-=A0 mce_signal_callback, adapter, NULL);
->> +
->> + =A0 =A0 btd_adapter_register_powered_callback(adapter, adapter_powered=
-);
->> +
->> =A0 =A0 =A0 return 0;
->> =A0}
->>
->
-> It seems you're missing the corresponding unregister_powered_callback
-> call in mce_remove().
->
+Do you have any suggestion how to beautify it?
+To me the patch shows the quality of simplicity at least.
 
-Corrected in the attached patch.
+> Tell me which device is causing this and I might be able to reproduce
+> this and find small less ugly fix. Also keep in mind that the init
+> routine needs changing to accommodate AMP and LE devices. So we have to
+> be really careful here.
 
-/Daniel
+In the non-error case the patch changes nothing.
 
---000feae9a993c72e11048e0473ae
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Maemo6-MCE-listen-to-adapter-powered-state.patch"
-Content-Disposition: attachment;
-	filename="0001-Maemo6-MCE-listen-to-adapter-powered-state.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_gcyraw4n0
-
-RnJvbSAyNjNmNTNmZTljZGRkOWZlOWM4YzhkNGU4MjY1Y2ZiYmUzZjhjMzdlIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
-a2lhLmNvbT4KRGF0ZTogVHVlLCAxNyBBdWcgMjAxMCAxNTo0ODo0NSArMDMwMApTdWJqZWN0OiBb
-UEFUQ0hdIE1hZW1vNiBNQ0U6IGxpc3RlbiB0byBhZGFwdGVyIHBvd2VyZWQgc3RhdGUKClJlZ2lz
-dGVycyBhIGNhbGxiYWNrIHRvIGJ0ZF9hZGFwdGVyIHRvIGdldCBub3RpZmllZCB3aGVuIHRoZQpw
-b3dlcmVkIHN0YXRlIG9mIHRoZSBhZGFwdGVyIGlzIGNoYW5nZWQuIFRoaXMgaXMgbmVlZGVkIHRv
-IHVwZGF0ZQp0aGUgc3RhdGUgc3RvcmVkIGluIHRoZSBNQ0UgaWYgdGhlIGFkYXB0ZXIgaXMgcG93
-ZXJlZCBvbiBvciBvZmYKdXNpbmcgZm9yIGV4YW1wbGUgU2V0UHJvcGVydHkoUG93ZXJlZCkuIFRo
-ZSBjdXJyZW50IHNldHRpbmcgb2YKdGhlIE1DRSBpcyBzYXZlZCBpbiBhIHZhcmlhYmxlIGFuZCBp
-ZiB0aGUgbm90aWZpY2F0aW9uIHRvIHRoZQpwbHVnaW4gZG9lcyBub3QgbWF0Y2ggdGhpcyB2YWx1
-ZSB0aGUgTUNFIGlzIHVwZGF0ZWQgYWNjb3JkaW5nbHkKdXNpbmcgaXRzIERCdXMgbWV0aG9kIGZv
-ciBzZXR0aW5nIHJhZGlvIHN0YXRlcy4KLS0tCiBwbHVnaW5zL21hZW1vNi5jIHwgICA1MCArKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLQogMSBmaWxlcyBj
-aGFuZ2VkLCA0OCBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL3Bs
-dWdpbnMvbWFlbW82LmMgYi9wbHVnaW5zL21hZW1vNi5jCmluZGV4IDJlZDVmMTIuLjU1ZWE1MDgg
-MTAwNjQ0Ci0tLSBhL3BsdWdpbnMvbWFlbW82LmMKKysrIGIvcGx1Z2lucy9tYWVtbzYuYwpAQCAt
-NDMsMTEgKzQzLDEzIEBACiAjZGVmaW5lIE1DRV9TSUdOQUxfSUYJCQkiY29tLm5va2lhLm1jZS5z
-aWduYWwiCiAjZGVmaW5lIE1DRV9SRVFVRVNUX1BBVEgJCSIvY29tL25va2lhL21jZS9yZXF1ZXN0
-IgogI2RlZmluZSBNQ0VfU0lHTkFMX1BBVEgJCQkiL2NvbS9ub2tpYS9tY2Uvc2lnbmFsIgorI2Rl
-ZmluZSBNQ0VfUkFESU9fU1RBVEVTX0NIQU5HRV9SRVEJInJlcV9yYWRpb19zdGF0ZXNfY2hhbmdl
-IgogI2RlZmluZSBNQ0VfUkFESU9fU1RBVEVTX0dFVAkJImdldF9yYWRpb19zdGF0ZXMiCiAjZGVm
-aW5lIE1DRV9SQURJT19TVEFURVNfU0lHCQkicmFkaW9fc3RhdGVzX2luZCIKIAogc3RhdGljIGd1
-aW50IHdhdGNoX2lkOwogc3RhdGljIERCdXNDb25uZWN0aW9uICpjb25uID0gTlVMTDsKK3N0YXRp
-YyBnYm9vbGVhbiBtY2VfYnRfc2V0ID0gRkFMU0U7CiAKIHN0YXRpYyBnYm9vbGVhbiBtY2Vfc2ln
-bmFsX2NhbGxiYWNrKERCdXNDb25uZWN0aW9uICpjb25uZWN0aW9uLAogCQkJCQlEQnVzTWVzc2Fn
-ZSAqbWVzc2FnZSwgdm9pZCAqdXNlcl9kYXRhKQpAQCAtNjYsNyArNjgsMTEgQEAgc3RhdGljIGdi
-b29sZWFuIG1jZV9zaWduYWxfY2FsbGJhY2soREJ1c0Nvbm5lY3Rpb24gKmNvbm5lY3Rpb24sCiAJ
-CWRidXNfbWVzc2FnZV9pdGVyX2dldF9iYXNpYygmYXJncywgJnNpZ3ZhbHVlKTsKIAkJREJHKCJn
-b3Qgc2lnbmFsIHdpdGggdmFsdWUgJXUiLCBzaWd2YWx1ZSk7CiAKLQkJaWYgKHNpZ3ZhbHVlICYg
-TUNFX1JBRElPX1NUQVRFX0JMVUVUT09USCkKKwkJLyogc2V0IHRoZSBhZGFwdGVyIGFjY29yZGlu
-ZyB0byB0aGUgbWNlIHNpZ25hbAorCQkgICBhbmQgcmVtZW1iZXIgdGhlIHZhbHVlICovCisJCW1j
-ZV9idF9zZXQgPSBzaWd2YWx1ZSAmIE1DRV9SQURJT19TVEFURV9CTFVFVE9PVEg7CisKKwkJaWYg
-KG1jZV9idF9zZXQpCiAJCQlidGRfYWRhcHRlcl9zd2l0Y2hfb25saW5lKGFkYXB0ZXIpOwogCQll
-bHNlCiAJCQlidGRfYWRhcHRlcl9zd2l0Y2hfb2ZmbGluZShhZGFwdGVyKTsKQEAgLTEwMiwxMyAr
-MTA4LDQ4IEBAIHN0YXRpYyB2b2lkIHJlYWRfcmFkaW9fc3RhdGVzX2NiKERCdXNQZW5kaW5nQ2Fs
-bCAqY2FsbCwgdm9pZCAqdXNlcl9kYXRhKQogCQlnb3RvIGRvbmU7CiAJfQogCi0JaWYgKHJhZGlv
-X3N0YXRlcyAmIE1DRV9SQURJT19TVEFURV9CTFVFVE9PVEgpCisJREJHKCJyYWRpb19zdGF0ZXM6
-ICVkIiwgcmFkaW9fc3RhdGVzKTsKKworCW1jZV9idF9zZXQgPSByYWRpb19zdGF0ZXMgJiBNQ0Vf
-UkFESU9fU1RBVEVfQkxVRVRPT1RIOworCisJaWYgKG1jZV9idF9zZXQpCiAJCWJ0ZF9hZGFwdGVy
-X3N3aXRjaF9vbmxpbmUoYWRhcHRlcik7CisJZWxzZQorCQlidGRfYWRhcHRlcl9zd2l0Y2hfb2Zm
-bGluZShhZGFwdGVyKTsKIAogZG9uZToKIAlkYnVzX21lc3NhZ2VfdW5yZWYocmVwbHkpOwogfQog
-CitzdGF0aWMgdm9pZCBhZGFwdGVyX3Bvd2VyZWQoc3RydWN0IGJ0ZF9hZGFwdGVyICphZGFwdGVy
-LCBnYm9vbGVhbiBwb3dlcmVkKQoreworCURCdXNNZXNzYWdlICptc2c7CisJZGJ1c191aW50MzJf
-dCByYWRpb19zdGF0ZXMgPSAwOworCWRidXNfdWludDMyX3QgcmFkaW9fbWFzayA9IE1DRV9SQURJ
-T19TVEFURV9CTFVFVE9PVEg7CisKKwlEQkcoImFkYXB0ZXJfcG93ZXJlZCBjYWxsZWQgd2l0aCAl
-ZCIsIHBvd2VyZWQpOworCisJLyogbm90aGluZyB0byBkbyBpZiB0aGUgc3RhdGVzIG1hdGNoICov
-CisJaWYgKG1jZV9idF9zZXQgPT0gcG93ZXJlZCkKKwkJcmV0dXJuOworCisJLyogc2V0IHRoZSBt
-Y2UgdmFsdWUgYWNjb3JkaW5nIHRvIHRoZSBzdGF0ZSBvZiB0aGUgYWRhcHRlciAqLworCW1zZyA9
-IGRidXNfbWVzc2FnZV9uZXdfbWV0aG9kX2NhbGwoTUNFX1NFUlZJQ0UsIE1DRV9SRVFVRVNUX1BB
-VEgsCisJCQkJTUNFX1JFUVVFU1RfSUYsIE1DRV9SQURJT19TVEFURVNfQ0hBTkdFX1JFUSk7CisK
-KwlpZiAocG93ZXJlZCkKKwkJcmFkaW9fc3RhdGVzID0gTUNFX1JBRElPX1NUQVRFX0JMVUVUT09U
-SDsKKworCWRidXNfbWVzc2FnZV9hcHBlbmRfYXJncyhtc2csIERCVVNfVFlQRV9VSU5UMzIsICZy
-YWRpb19zdGF0ZXMsCisJCQkJREJVU19UWVBFX1VJTlQzMiwgJnJhZGlvX21hc2ssCisJCQkJREJV
-U19UWVBFX0lOVkFMSUQpOworCisJaWYgKCFkYnVzX2Nvbm5lY3Rpb25fc2VuZChjb25uLCBtc2cs
-IE5VTEwpKQorCQllcnJvcigiY2FsbGluZyAlcyBmYWlsZWQiLCBNQ0VfUkFESU9fU1RBVEVTX0NI
-QU5HRV9SRVEpOworCisJZGJ1c19tZXNzYWdlX3VucmVmKG1zZyk7Cit9CisKIHN0YXRpYyBpbnQg
-bWNlX3Byb2JlKHN0cnVjdCBidGRfYWRhcHRlciAqYWRhcHRlcikKIHsKIAlEQnVzTWVzc2FnZSAq
-bXNnOwpAQCAtMTMyLDYgKzE3Myw5IEBAIHN0YXRpYyBpbnQgbWNlX3Byb2JlKHN0cnVjdCBidGRf
-YWRhcHRlciAqYWRhcHRlcikKIAl3YXRjaF9pZCA9IGdfZGJ1c19hZGRfc2lnbmFsX3dhdGNoKGNv
-bm4sIE5VTEwsIE1DRV9TSUdOQUxfUEFUSCwKIAkJCQkJTUNFX1NJR05BTF9JRiwgTUNFX1JBRElP
-X1NUQVRFU19TSUcsCiAJCQkJCW1jZV9zaWduYWxfY2FsbGJhY2ssIGFkYXB0ZXIsIE5VTEwpOwor
-CisJYnRkX2FkYXB0ZXJfcmVnaXN0ZXJfcG93ZXJlZF9jYWxsYmFjayhhZGFwdGVyLCBhZGFwdGVy
-X3Bvd2VyZWQpOworCiAJcmV0dXJuIDA7CiB9CiAKQEAgLTE0MSw2ICsxODUsOCBAQCBzdGF0aWMg
-dm9pZCBtY2VfcmVtb3ZlKHN0cnVjdCBidGRfYWRhcHRlciAqYWRhcHRlcikKIAogCWlmICh3YXRj
-aF9pZCA+IDApCiAJCWdfZGJ1c19yZW1vdmVfd2F0Y2goY29ubiwgd2F0Y2hfaWQpOworCisJYnRk
-X2FkYXB0ZXJfdW5yZWdpc3Rlcl9wb3dlcmVkX2NhbGxiYWNrKGFkYXB0ZXIsIGFkYXB0ZXJfcG93
-ZXJlZCk7CiB9CiAKIHN0YXRpYyBzdHJ1Y3QgYnRkX2FkYXB0ZXJfZHJpdmVyIG1jZV9kcml2ZXIg
-PSB7Ci0tIAoxLjYuMC40Cgo=
---000feae9a993c72e11048e0473ae--
+	Regards
+		Oliver
