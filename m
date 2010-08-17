@@ -1,69 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4C6B6E03.7080600@Atheros.com>
-Date: Wed, 18 Aug 2010 10:52:11 +0530
-From: Suraj <suraj@Atheros.com>
-MIME-Version: 1.0
-To: <linux-bluetooth@vger.kernel.org>,
-	<Jothikumar.Mothilal@Atheros.com>
-Subject: Re: [PATCH v2 2/2] Bluetooth: host level Support for Atheros AR300x
- device
-References: <1281681408-27376-1-git-send-email-suraj@atheros.com> <1281681408-27376-2-git-send-email-suraj@atheros.com> <20100817143236.GB19862@jh-x301>
-In-Reply-To: <20100817143236.GB19862@jh-x301>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Mat Martineau <mathewm@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org,
+	rshaffer@codeaurora.org,
+	linux-arm-msm@vger.kernel.org,
+	Mat Martineau <mathewm@codeaurora.org>
+Subject: [PATCH 1/1] Bluetooth:  Add socket option definitions for AMP
+Date: Tue, 17 Aug 2010 16:07:06 -0700
+Message-Id: <1282086426-8423-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+This adds a new BT_AMP socket option to control the use of AMP channels.
+It is for use with the SOL_BLUETOOTH option level on L2CAP sockets.
 
-On 8/17/2010 8:02 PM, Johan Hedberg wrote:
-> Hi,
->
-> On Fri, Aug 13, 2010, Suraj Sumangala wrote:
->> Implements support for Atheros AR300x Bluetooth chip in
->> hciattach application. Supports configuration download
->> and power management configure feature.
->> ---
->>   Makefile.tools         |    7 +-
->>   tools/hciattach.8      |    3 +
->>   tools/hciattach.c      |  105 ++++++
->>   tools/hciattach.h      |    3 +
->>   tools/hciattach_ar3k.c |  859 ++++++++++++++++++++++++++++++++++++++++++++++++
->>   5 files changed, 974 insertions(+), 3 deletions(-)
->>   create mode 100644 tools/hciattach_ar3k.c
->
-> This patch produces several errors:
->
-> tools/hciattach_ar3k.c: In function ‘write_ps_cmd’:
-> tools/hciattach_ar3k.c:196: error: comparison between signed and unsigned integer expressions
-> tools/hciattach_ar3k.c: In function ‘get_ps_file_name’:
-> tools/hciattach_ar3k.c:536: error: comparison between signed and unsigned integer expressions
-> tools/hciattach_ar3k.c: In function ‘get_patch_file_name’:
-> tools/hciattach_ar3k.c:552: error: comparison between signed and unsigned integer expressions
-> tools/hciattach_ar3k.c:552: error: comparison between signed and unsigned integer expressions
-> make[1]: *** [tools/hciattach_ar3k.o] Error 1
->
-> Please fix those and always check that your patches compile cleanly with
-> ./bootstrap-configure before sending them upstream. Thanks.
->
-> Johan
+Available option values are defined as:
 
-Sorry about that,
+BT_AMP_REQUIRE_BR_EDR
+ * Default
+ * AMP controllers cannot be used
+ * Channel move requests from the remote device are denied
+ * If the L2CAP channel is currently using AMP, move the channel to
+   BR/EDR
 
-I did do a fresh
+BT_AMP_PREFER_AMP
+ * Allow use of AMP controllers
+ * If the L2CAP channel is currently on BR/EDR and AMP controller
+   resources are available, initiate a channel move to AMP
+ * Channel move requests from the remote device are allowed
+ * If the L2CAP socket has not been connected yet, try to create
+   and configure the channel directly on an AMP controller rather
+   than BR/EDR
 
-./bootstrap-configure
-./configure
-make
+BT_AMP_PREFER_BR_EDR
+ * Allow use of AMP controllers
+ * If the L2CAP channel is currently on AMP, move it to BR/EDR
+ * Channel move requests from the remote device are allowed
 
-and strangely my compiler did not catch anyone of these and it compiled 
-without any warning.
+Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+---
+ include/net/bluetooth/bluetooth.h |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
 
-Is there any flag I have to enable for this?
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 27a902d..0d41b99 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -64,6 +64,11 @@ struct bt_security {
+ 
+ #define BT_DEFER_SETUP	7
+ 
++#define BT_AMP		8
++#define BT_AMP_REQUIRE_BR_EDR	0
++#define BT_AMP_PREFER_AMP	1
++#define BT_AMP_PREFER_BR_EDR	2
++
+ #define BT_INFO(fmt, arg...) printk(KERN_INFO "Bluetooth: " fmt "\n" , ## arg)
+ #define BT_ERR(fmt, arg...)  printk(KERN_ERR "%s: " fmt "\n" , __func__ , ## arg)
+ #define BT_DBG(fmt, arg...)  pr_debug("%s: " fmt "\n" , __func__ , ## arg)
+-- 
+1.7.1
 
-My gcc version says,
-
-gcc 4.4.3
-
-Regards
-Suraj
-
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
