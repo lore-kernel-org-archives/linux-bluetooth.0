@@ -2,57 +2,56 @@ Return-Path: <cyrus@holtmann.org>
 From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH 4/5] Add set fast connectable to audio manager
-Date: Tue, 17 Aug 2010 17:05:33 +0300
-Message-Id: <1282053934-19445-5-git-send-email-dmitriy.paliy@nokia.com>
+Subject: [PATCH 3/5] Add set fast connectable to adapter
+Date: Tue, 17 Aug 2010 17:05:32 +0300
+Message-Id: <1282053934-19445-4-git-send-email-dmitriy.paliy@nokia.com>
 In-Reply-To: <1282053934-19445-1-git-send-email-dmitriy.paliy@nokia.com>
 References: <1282053934-19445-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Set fast connectable added to audio manager interface. Enables
-fast connectable mode for all audio adapters or sets respective
-values to default when disabled. It does not interfere with any
-other audio manager's interfaces, modes, or states.
+Set fast connectable added to adapter interface. Enables or disables
+faster page scanning. It does not interfere with any other adapter's
+interfaces.
 ---
- audio/manager.c |   14 ++++++++++++++
- audio/manager.h |    4 ++++
+ src/adapter.c |   12 ++++++++++++
+ src/adapter.h |    6 ++++++
  2 files changed, 18 insertions(+), 0 deletions(-)
 
-diff --git a/audio/manager.c b/audio/manager.c
-index 6dd0f87..b885929 100644
---- a/audio/manager.c
-+++ b/audio/manager.c
-@@ -1290,3 +1290,17 @@ gboolean manager_allow_headset_connection(struct audio_device *device)
- 
- 	return TRUE;
+diff --git a/src/adapter.c b/src/adapter.c
+index 4ad4165..b023c01 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -3454,3 +3454,15 @@ void btd_adapter_unregister_powered_callback(struct btd_adapter *adapter,
+ 	adapter->powered_callbacks =
+ 			g_slist_remove(adapter->powered_callbacks, cb);
  }
 +
-+void manager_set_fast_connectable(gboolean enable)
++int btd_adapter_set_fast_connectable(struct btd_adapter *adapter,
++							gboolean enable)
 +{
-+	GSList *l;
++	if (!adapter_ops)
++		return -EINVAL;
 +
-+	for (l = adapters; l != NULL; l = l->next) {
-+		struct audio_adapter *adapter = l->data;
++	if (!adapter->up)
++		return -EINVAL;
 +
-+		if ( btd_adapter_set_fast_connectable(adapter->btd_adapter,
-+								enable) )
-+			error("Changing fast connectable for hci%d failed",
-+				adapter_get_dev_id(adapter->btd_adapter) );
-+	}
++	return adapter_ops->set_fast_connectable(adapter->dev_id, enable);
 +}
-diff --git a/audio/manager.h b/audio/manager.h
-index 8e1abf4..90fe6f0 100644
---- a/audio/manager.h
-+++ b/audio/manager.h
-@@ -48,3 +48,7 @@ struct audio_device *manager_get_device(const bdaddr_t *src,
- 					gboolean create);
- 
- gboolean manager_allow_headset_connection(struct audio_device *device);
+diff --git a/src/adapter.h b/src/adapter.h
+index 657e035..5352731 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -196,3 +196,9 @@ void btd_adapter_register_powered_callback(struct btd_adapter *adapter,
+ 						btd_adapter_powered_cb cb);
+ void btd_adapter_unregister_powered_callback(struct btd_adapter *adapter,
+ 						btd_adapter_powered_cb cb);
 +
-+/* TRUE to enable fast connectable and FALSE to disable fast connectable for all
-+ * audio adapters. */
-+void manager_set_fast_connectable(gboolean enable);
++/* If TRUE, enables fast connectabe, i.e. reduces page scan interval and changes
++ * type. If FALSE, disables fast connectable, i.e. sets page scan interval and
++ * type to default values. Valid for both connectable and discoverable modes. */
++int btd_adapter_set_fast_connectable(struct btd_adapter *adapter,
++							gboolean enable);
 -- 
 1.7.0.4
 
