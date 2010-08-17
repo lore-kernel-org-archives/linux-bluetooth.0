@@ -1,66 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 17 Aug 2010 13:30:51 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Daniel =?iso-8859-1?Q?=D6rstadius?= <daniel.orstadius@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/3] Maemo6 MCE: listen to adapter mode changes
-Message-ID: <20100817103051.GA29845@jh-x301>
-References: <AANLkTim2ni6aE3-9Rx+HGeFFmmG-by6PMh4zgrJFnk-m@mail.gmail.com>
- <AANLkTimpogcSN1eKO9A2aWB1aB7YNZSRD7f-vGMvma9q@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTimpogcSN1eKO9A2aWB1aB7YNZSRD7f-vGMvma9q@mail.gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 17 Aug 2010 10:48:50 +0200
+From: "Marcel J.E. Mol" <marcel@mesa.nl>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] IrMC sync server support
+Message-ID: <20100817084850.GA16821@joshua.mesa.nl>
+References: <201008121013.o7CADR8r004125@joshua.mesa.nl> <1281613299.12579.266.camel@localhost.localdomain> <20100816172238.GA27814@joshua.mesa.nl> <AANLkTi=p5WD+WELPNo=URLVTnpaKQ4xFk9Efu2HiviYE@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <AANLkTi=p5WD+WELPNo=URLVTnpaKQ4xFk9Efu2HiviYE@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Daniel,
+Hi,
 
-> From: Daniel Orstadius <daniel.orstadius@nokia.com>
-> Date: Tue, 17 Aug 2010 11:41:33 +0300
-> Subject: [PATCH] Maemo6 MCE: listen to adapter powered state
+On Mon, Aug 16, 2010 at 10:47:08PM +0300, Luiz Augusto von Dentz wrote:
+> Hi,
 > 
-> Registers a callback in btd_adapter to get notified when the
-> powered state of the adapter is changed. This is needed to update
-> the state stored in the MCE if the adapter is powered on or off
-> using for example SetProperty(Powered). The current setting of
-> the MCE is saved in a variable and if the notification to the
-> plugin does not match this value the MCE is updated accordingly
-> using its DBus method for setting radio states.
-> ---
->  plugins/maemo6.c |   48 ++++++++++++++++++++++++++++++++++++++++++++++--
->  1 files changed, 46 insertions(+), 2 deletions(-)
+> On Mon, Aug 16, 2010 at 8:22 PM, Marcel J.E. Mol <marcel@mesa.nl> wrote:
+> > On Thu, Aug 12, 2010 at 07:41:39AM -0400, Marcel Holtmann wrote:
+> >> Hi Marcel,
+> >>
+> >> > A reasonable working IrMC SYNC server (only full phonebook sync support)
+> >> > Support for cal and note by just returning nothing.
+> >> > ---
+> >> >  Makefile.am    |    3 +
+> >> >  plugins/irmc.c |  488 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >> >  src/main.c     |   12 ++-
+> >> >  src/obex.h     |    1 +
+> >> >  4 files changed, 502 insertions(+), 2 deletions(-)
+> >> >  create mode 100644 plugins/irmc.c
+> >> >
+> >> > diff --git a/Makefile.am b/Makefile.am
+> >> > index 73e2f28..ce8c675 100644
+> >> > --- a/Makefile.am
+> >> > +++ b/Makefile.am
+> >> > @@ -58,6 +58,9 @@ builtin_sources += plugins/pbap.c plugins/phonebook.h \
+> >> >  builtin_modules += syncevolution
+> >> >  builtin_sources += plugins/syncevolution.c
+> >> >
+> >> > +builtin_modules += irmc
+> >> > +builtin_sources += plugins/irmc.c plugins/phonebook.h
+> >> > +
+> >> >  builtin_nodist += plugins/phonebook.c
+> >> >
+> >> >  libexec_PROGRAMS += src/obexd
+> >> > diff --git a/plugins/irmc.c b/plugins/irmc.c
+> >> > new file mode 100644
+> >> > index 0000000..96fd807
+> >> > --- /dev/null
+> >> > +++ b/plugins/irmc.c
+> >> > @@ -0,0 +1,488 @@
+> >> > +/*
+> >> > + *
+> >> > + *  OBEX IrMC Sync Server
+> >> > ...
+> >> > +#include "dbus.h"
+> >> > +
+> >> > +#define IRMC_CHANNEL       17
+> >>
+> >> we did have a list of defined RFCOMM channels for various protocols, but
+> >> just don't remember where it is.
+> >>
+> >> Johan, we should put that into the doc/ directory actually. Can you dig
+> >> up that list and commit it as text file.
+> >>
+> >
+> > Any news on this one? Is 17 the correct channel for IrMC?
+> 
+> I just took a look in the spec, it just say that the channel 'varies',
+> which is not very revealing and it does not suggest anything. The only
+> record that I found was using channel 11 which apparently we are not
+> using too.
 
-A couple of issues I noticed:
+Ok, then 17 is just fine for IrMC then. I posted a 3th version at the end of
+last week. Are there any new comments I have to take care of? Or can it  be
+considere for inclusion in the main tree now?
 
-> +	DBG("adapter_powered called with %d", (int) powered);
 
-I don't think the int cast is necessary here. Or do you get a warning
-otherwise?
+On the other hand, if the channel 'varies' it might be better to let the
+plugin manager select a channel number for each service instead of allocating
+a fixed one in the specific plugin code.
 
-> +	dbus_message_append_args(msg, DBUS_TYPE_UINT32, &radio_states,
-> +				DBUS_TYPE_UINT32, &radio_mask);
+What did you found about channel 11 then? On my nokia 7710 channel 11 is used for
+"OBEX File Transfer" (serivce 0x1106). 
 
-DBUS_TYPE_INVALID is missing from the end of the arguments list.
-
-> +}
-> +
-> +
->  static int mce_probe(struct btd_adapter *adapter)
-
-Why the two consecutive empty lines? Please remove one.
-
-> @@ -132,6 +173,9 @@ static int mce_probe(struct btd_adapter *adapter)
->  	watch_id = g_dbus_add_signal_watch(conn, NULL, MCE_SIGNAL_PATH,
->  					MCE_SIGNAL_IF, MCE_RADIO_STATES_SIG,
->  					mce_signal_callback, adapter, NULL);
-> +
-> +	btd_adapter_register_powered_callback(adapter, adapter_powered);
-> +
->  	return 0;
->  }
->  
-
-It seems you're missing the corresponding unregister_powered_callback
-call in mce_remove().
-
-Johan
+-Marcel
+-- 
+     ======--------         Marcel J.E. Mol                MESA Consulting B.V.
+    =======---------        ph. +31-(0)6-54724868          P.O. Box 112
+    =======---------        marcel@mesa.nl                 2630 AC  Nootdorp
+__==== www.mesa.nl ---____U_n_i_x______I_n_t_e_r_n_e_t____ The Netherlands ____
+ They couldn't think of a number,           Linux user 1148  --  counter.li.org
+    so they gave me a name!  -- Rupert Hine  --  www.ruperthine.com
