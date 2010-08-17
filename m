@@ -1,30 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 17 Aug 2010 17:41:32 +0300
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/5] Add fast connectable to hciops
-Message-ID: <20100817144132.GA22079@jh-x301>
-References: <1282053934-19445-1-git-send-email-dmitriy.paliy@nokia.com>
- <1282053934-19445-3-git-send-email-dmitriy.paliy@nokia.com>
+Date: Tue, 17 Aug 2010 17:32:36 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Suraj Sumangala <suraj@atheros.com>
+Cc: linux-bluetooth@vger.kernel.org, Jothikumar.Mothilal@Atheros.com
+Subject: Re: [PATCH v2 2/2] Bluetooth: host level Support for Atheros
+ AR300x device
+Message-ID: <20100817143236.GB19862@jh-x301>
+References: <1281681408-27376-1-git-send-email-suraj@atheros.com>
+ <1281681408-27376-2-git-send-email-suraj@atheros.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1282053934-19445-3-git-send-email-dmitriy.paliy@nokia.com>
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1281681408-27376-2-git-send-email-suraj@atheros.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitry,
+Hi,
 
-On Tue, Aug 17, 2010, Dmitriy Paliy wrote:
-> +	if ( hci_send_cmd(dd, OGF_HOST_CTL, OCF_WRITE_PAGE_ACTIVITY,
-> +				WRITE_PAGE_ACTIVITY_CP_SIZE, &cp) < 0 ) {
-> +		err = -errno;
-> +	} else if ( hci_send_cmd(dd, OGF_HOST_CTL, OCF_WRITE_PAGE_SCAN_TYPE,
-> +							1, &type) < 0 ) {
-> +		err = -errno;
-> +	}
+On Fri, Aug 13, 2010, Suraj Sumangala wrote:
+> Implements support for Atheros AR300x Bluetooth chip in
+> hciattach application. Supports configuration download
+> and power management configure feature.
+> ---
+>  Makefile.tools         |    7 +-
+>  tools/hciattach.8      |    3 +
+>  tools/hciattach.c      |  105 ++++++
+>  tools/hciattach.h      |    3 +
+>  tools/hciattach_ar3k.c |  859 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  5 files changed, 974 insertions(+), 3 deletions(-)
+>  create mode 100644 tools/hciattach_ar3k.c
 
-A few coding style issues: no braces for one-line if-statements and
-remove the spaces after ( and before ) should be removed.
+This patch produces several errors:
+
+tools/hciattach_ar3k.c: In function ‘write_ps_cmd’:
+tools/hciattach_ar3k.c:196: error: comparison between signed and unsigned integer expressions
+tools/hciattach_ar3k.c: In function ‘get_ps_file_name’:
+tools/hciattach_ar3k.c:536: error: comparison between signed and unsigned integer expressions
+tools/hciattach_ar3k.c: In function ‘get_patch_file_name’:
+tools/hciattach_ar3k.c:552: error: comparison between signed and unsigned integer expressions
+tools/hciattach_ar3k.c:552: error: comparison between signed and unsigned integer expressions
+make[1]: *** [tools/hciattach_ar3k.o] Error 1
+
+Please fix those and always check that your patches compile cleanly with
+./bootstrap-configure before sending them upstream. Thanks.
 
 Johan
