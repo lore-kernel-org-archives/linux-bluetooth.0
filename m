@@ -1,34 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
 From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH 1/5] Add STANDARD and INTERLACED page scan definitions
-Date: Tue, 17 Aug 2010 17:05:30 +0300
-Message-Id: <1282053934-19445-2-git-send-email-dmitriy.paliy@nokia.com>
-In-Reply-To: <1282053934-19445-1-git-send-email-dmitriy.paliy@nokia.com>
-References: <1282053934-19445-1-git-send-email-dmitriy.paliy@nokia.com>
+Subject: [PATCH 0/5] Fast connectable mode for HFP
+Date: Tue, 17 Aug 2010 17:05:29 +0300
+Message-Id: <1282053934-19445-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added standard and interlaced page scan type definitions. Used for
-both read and write page scan type HCI commands.
----
- lib/hci.h |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
+Hi,
 
-diff --git a/lib/hci.h b/lib/hci.h
-index f31918d..0369ee2 100644
---- a/lib/hci.h
-+++ b/lib/hci.h
-@@ -992,6 +992,8 @@ typedef struct {
- #define OCF_READ_PAGE_SCAN_TYPE		0x0046
- 
- #define OCF_WRITE_PAGE_SCAN_TYPE	0x0047
-+	#define PAGE_SCAN_TYPE_STANDARD		0x00
-+	#define PAGE_SCAN_TYPE_INTERLACED	0x01
- 
- #define OCF_READ_AFH_MODE		0x0048
- typedef struct {
--- 
-1.7.0.4
+The following patches are implementation of fast connectable mode for HFP.
+Such mode means significantly shorter page scan interval and interlaced
+page scan type. As a result, HFP connection typically is created much faster.
+The fast connectable mode can be activated by incomming call indicator and
+deactivated by answer or reject call indicator. Such speeds up connectability
+of a headset when there is an incomming call. Retransmisions in eSCO are
+possible to be paused for in-band ring tone when the mode is enabled during
+given above period of time. eSCO is not affected during call since page scan
+settings are returned to their default values immidiately after call is
+accepted (or rejected).
+
+Use of the mode can be enabled by changing FastConnectable in audio.conf
+configuration file. It is disabled by default. Also, it doesn't affect and
+doesn't change any other interfaces.
+
+Br,
+Dmitriy
 
