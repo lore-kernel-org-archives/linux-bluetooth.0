@@ -2,56 +2,93 @@ Return-Path: <cyrus@holtmann.org>
 From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH 3/5] Add set fast connectable to adapter
-Date: Tue, 17 Aug 2010 17:05:32 +0300
-Message-Id: <1282053934-19445-4-git-send-email-dmitriy.paliy@nokia.com>
+Subject: [PATCH 5/5] Add fast connectable support to HFP
+Date: Tue, 17 Aug 2010 17:05:34 +0300
+Message-Id: <1282053934-19445-6-git-send-email-dmitriy.paliy@nokia.com>
 In-Reply-To: <1282053934-19445-1-git-send-email-dmitriy.paliy@nokia.com>
 References: <1282053934-19445-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Set fast connectable added to adapter interface. Enables or disables
-faster page scanning. It does not interfere with any other adapter's
-interfaces.
+Audio.conf is updated to support fast connectable mode. Set
+FastConnectable to true to enable and to false to disable. Headset
+initialization and call indicators are updated respectively. It is
+disabled by default.
 ---
- src/adapter.c |   12 ++++++++++++
- src/adapter.h |    6 ++++++
- 2 files changed, 18 insertions(+), 0 deletions(-)
+ audio/audio.conf |    7 +++++++
+ audio/headset.c  |   20 ++++++++++++++++++++
+ 2 files changed, 27 insertions(+), 0 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 4ad4165..b023c01 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -3454,3 +3454,15 @@ void btd_adapter_unregister_powered_callback(struct btd_adapter *adapter,
- 	adapter->powered_callbacks =
- 			g_slist_remove(adapter->powered_callbacks, cb);
+diff --git a/audio/audio.conf b/audio/audio.conf
+index a64fb66..302e046 100644
+--- a/audio/audio.conf
++++ b/audio/audio.conf
+@@ -32,6 +32,13 @@ HFP=true
+ # Maximum number of connected HSP/HFP devices per adapter. Defaults to 1
+ MaxConnected=1
+ 
++# Set to true to enable use of fast connectable mode (faster page scanning)
++# for HFP when incomming call starts. Default settings are restored after
++# call is answered or rejected. Page scan interval is much shorter and page
++# scan type changed to interlaced. Such allows faster connection initiated
++# by a headset.
++FastConnectable=false
++
+ # Just an example of potential config options for the other interfaces
+ #[A2DP]
+ #SBCSources=1
+diff --git a/audio/headset.c b/audio/headset.c
+index 99d4c7a..cdb3370 100644
+--- a/audio/headset.c
++++ b/audio/headset.c
+@@ -95,6 +95,7 @@ static struct {
+ };
+ 
+ static gboolean sco_hci = TRUE;
++static gboolean fast_connectable = FALSE;
+ 
+ static GSList *active_devices = NULL;
+ 
+@@ -2262,6 +2263,19 @@ uint32_t headset_config_init(GKeyFile *config)
+ 		g_free(str);
+ 	}
+ 
++	/* Init fast connectable option */
++	str = g_key_file_get_string(config, "Headset", "FastConnectable",
++					&err);
++	if (err) {
++		DBG("audio.conf: %s", err->message);
++		g_clear_error(&err);
++	} else {
++		fast_connectable = strcmp(str, "true") == 0;
++		if (fast_connectable)
++			manager_set_fast_connectable(FALSE);
++		g_free(str);
++	}
++
+ 	return ag.features;
  }
+ 
+@@ -2743,6 +2757,9 @@ int telephony_incoming_call_ind(const char *number, int type)
+ 	struct headset *hs;
+ 	struct headset_slc *slc;
+ 
++	if (fast_connectable)
++		manager_set_fast_connectable(TRUE);
 +
-+int btd_adapter_set_fast_connectable(struct btd_adapter *adapter,
-+							gboolean enable)
-+{
-+	if (!adapter_ops)
-+		return -EINVAL;
+ 	if (!active_devices)
+ 		return -ENODEV;
+ 
+@@ -2782,6 +2799,9 @@ int telephony_calling_stopped_ind(void)
+ {
+ 	struct audio_device *dev;
+ 
++	if (fast_connectable)
++		manager_set_fast_connectable(FALSE);
 +
-+	if (!adapter->up)
-+		return -EINVAL;
-+
-+	return adapter_ops->set_fast_connectable(adapter->dev_id, enable);
-+}
-diff --git a/src/adapter.h b/src/adapter.h
-index 657e035..5352731 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -196,3 +196,9 @@ void btd_adapter_register_powered_callback(struct btd_adapter *adapter,
- 						btd_adapter_powered_cb cb);
- void btd_adapter_unregister_powered_callback(struct btd_adapter *adapter,
- 						btd_adapter_powered_cb cb);
-+
-+/* If TRUE, enables fast connectabe, i.e. reduces page scan interval and changes
-+ * type. If FALSE, disables fast connectable, i.e. sets page scan interval and
-+ * type to default values. Valid for both connectable and discoverable modes. */
-+int btd_adapter_set_fast_connectable(struct btd_adapter *adapter,
-+							gboolean enable);
+ 	if (ag.ring_timer) {
+ 		g_source_remove(ag.ring_timer);
+ 		ag.ring_timer = 0;
 -- 
 1.7.0.4
 
