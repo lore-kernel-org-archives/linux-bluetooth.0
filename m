@@ -1,94 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 17 Aug 2010 10:48:50 +0200
-From: "Marcel J.E. Mol" <marcel@mesa.nl>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] IrMC sync server support
-Message-ID: <20100817084850.GA16821@joshua.mesa.nl>
-References: <201008121013.o7CADR8r004125@joshua.mesa.nl> <1281613299.12579.266.camel@localhost.localdomain> <20100816172238.GA27814@joshua.mesa.nl> <AANLkTi=p5WD+WELPNo=URLVTnpaKQ4xFk9Efu2HiviYE@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <AANLkTi=p5WD+WELPNo=URLVTnpaKQ4xFk9Efu2HiviYE@mail.gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <AANLkTim2ni6aE3-9Rx+HGeFFmmG-by6PMh4zgrJFnk-m@mail.gmail.com>
+References: <AANLkTim2ni6aE3-9Rx+HGeFFmmG-by6PMh4zgrJFnk-m@mail.gmail.com>
+Date: Tue, 17 Aug 2010 11:46:36 +0300
+Message-ID: <AANLkTimpogcSN1eKO9A2aWB1aB7YNZSRD7f-vGMvma9q@mail.gmail.com>
+Subject: Re: [PATCH 2/3] Maemo6 MCE: listen to adapter mode changes
+From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=00c09f88cee7a2a594048e00fc1a
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+--00c09f88cee7a2a594048e00fc1a
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 16, 2010 at 10:47:08PM +0300, Luiz Augusto von Dentz wrote:
-> Hi,
-> 
-> On Mon, Aug 16, 2010 at 8:22 PM, Marcel J.E. Mol <marcel@mesa.nl> wrote:
-> > On Thu, Aug 12, 2010 at 07:41:39AM -0400, Marcel Holtmann wrote:
-> >> Hi Marcel,
-> >>
-> >> > A reasonable working IrMC SYNC server (only full phonebook sync support)
-> >> > Support for cal and note by just returning nothing.
-> >> > ---
-> >> >  Makefile.am    |    3 +
-> >> >  plugins/irmc.c |  488 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >> >  src/main.c     |   12 ++-
-> >> >  src/obex.h     |    1 +
-> >> >  4 files changed, 502 insertions(+), 2 deletions(-)
-> >> >  create mode 100644 plugins/irmc.c
-> >> >
-> >> > diff --git a/Makefile.am b/Makefile.am
-> >> > index 73e2f28..ce8c675 100644
-> >> > --- a/Makefile.am
-> >> > +++ b/Makefile.am
-> >> > @@ -58,6 +58,9 @@ builtin_sources += plugins/pbap.c plugins/phonebook.h \
-> >> >  builtin_modules += syncevolution
-> >> >  builtin_sources += plugins/syncevolution.c
-> >> >
-> >> > +builtin_modules += irmc
-> >> > +builtin_sources += plugins/irmc.c plugins/phonebook.h
-> >> > +
-> >> >  builtin_nodist += plugins/phonebook.c
-> >> >
-> >> >  libexec_PROGRAMS += src/obexd
-> >> > diff --git a/plugins/irmc.c b/plugins/irmc.c
-> >> > new file mode 100644
-> >> > index 0000000..96fd807
-> >> > --- /dev/null
-> >> > +++ b/plugins/irmc.c
-> >> > @@ -0,0 +1,488 @@
-> >> > +/*
-> >> > + *
-> >> > + *  OBEX IrMC Sync Server
-> >> > ...
-> >> > +#include "dbus.h"
-> >> > +
-> >> > +#define IRMC_CHANNEL       17
-> >>
-> >> we did have a list of defined RFCOMM channels for various protocols, but
-> >> just don't remember where it is.
-> >>
-> >> Johan, we should put that into the doc/ directory actually. Can you dig
-> >> up that list and commit it as text file.
-> >>
-> >
-> > Any news on this one? Is 17 the correct channel for IrMC?
-> 
-> I just took a look in the spec, it just say that the channel 'varies',
-> which is not very revealing and it does not suggest anything. The only
-> record that I found was using channel 11 which apparently we are not
-> using too.
+On Fri, Aug 13, 2010 at 12:19 PM, Daniel =D6rstadius
+<daniel.orstadius@gmail.com> wrote:
+> Registers a callback in btd_adapter to get notified when
+> the powered state of the adapter is changed. This is needed
+> to update the state stored in the MCE if the adapter is powered
+> on or off using for example SetProperty(Powered). The current
+> setting of the MCE is saved in a variable and if the notification
+> to the plugin does not match this value the MCE is updated
+> accordingly using its DBus method for setting radio states.
+>
 
-Ok, then 17 is just fine for IrMC then. I posted a 3th version at the end of
-last week. Are there any new comments I have to take care of? Or can it  be
-considere for inclusion in the main tree now?
+Attaching updated patch.
 
+/Daniel
 
-On the other hand, if the channel 'varies' it might be better to let the
-plugin manager select a channel number for each service instead of allocating
-a fixed one in the specific plugin code.
+--00c09f88cee7a2a594048e00fc1a
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-Maemo6-MCE-listen-to-adapter-powered-state.patch"
+Content-Disposition: attachment;
+	filename="0001-Maemo6-MCE-listen-to-adapter-powered-state.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gcyigbo81
 
-What did you found about channel 11 then? On my nokia 7710 channel 11 is used for
-"OBEX File Transfer" (serivce 0x1106). 
-
--Marcel
--- 
-     ======--------         Marcel J.E. Mol                MESA Consulting B.V.
-    =======---------        ph. +31-(0)6-54724868          P.O. Box 112
-    =======---------        marcel@mesa.nl                 2630 AC  Nootdorp
-__==== www.mesa.nl ---____U_n_i_x______I_n_t_e_r_n_e_t____ The Netherlands ____
- They couldn't think of a number,           Linux user 1148  --  counter.li.org
-    so they gave me a name!  -- Rupert Hine  --  www.ruperthine.com
+RnJvbSAxZDcyYjE1YTgyZDhkOWZkZmIxOTRiOTZkZmFkMGQzYzljYjc5YTNhIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
+a2lhLmNvbT4KRGF0ZTogVHVlLCAxNyBBdWcgMjAxMCAxMTo0MTozMyArMDMwMApTdWJqZWN0OiBb
+UEFUQ0hdIE1hZW1vNiBNQ0U6IGxpc3RlbiB0byBhZGFwdGVyIHBvd2VyZWQgc3RhdGUKClJlZ2lz
+dGVycyBhIGNhbGxiYWNrIGluIGJ0ZF9hZGFwdGVyIHRvIGdldCBub3RpZmllZCB3aGVuIHRoZQpw
+b3dlcmVkIHN0YXRlIG9mIHRoZSBhZGFwdGVyIGlzIGNoYW5nZWQuIFRoaXMgaXMgbmVlZGVkIHRv
+IHVwZGF0ZQp0aGUgc3RhdGUgc3RvcmVkIGluIHRoZSBNQ0UgaWYgdGhlIGFkYXB0ZXIgaXMgcG93
+ZXJlZCBvbiBvciBvZmYKdXNpbmcgZm9yIGV4YW1wbGUgU2V0UHJvcGVydHkoUG93ZXJlZCkuIFRo
+ZSBjdXJyZW50IHNldHRpbmcgb2YKdGhlIE1DRSBpcyBzYXZlZCBpbiBhIHZhcmlhYmxlIGFuZCBp
+ZiB0aGUgbm90aWZpY2F0aW9uIHRvIHRoZQpwbHVnaW4gZG9lcyBub3QgbWF0Y2ggdGhpcyB2YWx1
+ZSB0aGUgTUNFIGlzIHVwZGF0ZWQgYWNjb3JkaW5nbHkKdXNpbmcgaXRzIERCdXMgbWV0aG9kIGZv
+ciBzZXR0aW5nIHJhZGlvIHN0YXRlcy4KLS0tCiBwbHVnaW5zL21hZW1vNi5jIHwgICA0OCArKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0KIDEgZmlsZXMgY2hh
+bmdlZCwgNDYgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9wbHVn
+aW5zL21hZW1vNi5jIGIvcGx1Z2lucy9tYWVtbzYuYwppbmRleCAyZWQ1ZjEyLi5mOWQ5YzFmIDEw
+MDY0NAotLS0gYS9wbHVnaW5zL21hZW1vNi5jCisrKyBiL3BsdWdpbnMvbWFlbW82LmMKQEAgLTQz
+LDExICs0MywxMyBAQAogI2RlZmluZSBNQ0VfU0lHTkFMX0lGCQkJImNvbS5ub2tpYS5tY2Uuc2ln
+bmFsIgogI2RlZmluZSBNQ0VfUkVRVUVTVF9QQVRICQkiL2NvbS9ub2tpYS9tY2UvcmVxdWVzdCIK
+ICNkZWZpbmUgTUNFX1NJR05BTF9QQVRICQkJIi9jb20vbm9raWEvbWNlL3NpZ25hbCIKKyNkZWZp
+bmUgTUNFX1JBRElPX1NUQVRFU19DSEFOR0VfUkVRCSJyZXFfcmFkaW9fc3RhdGVzX2NoYW5nZSIK
+ICNkZWZpbmUgTUNFX1JBRElPX1NUQVRFU19HRVQJCSJnZXRfcmFkaW9fc3RhdGVzIgogI2RlZmlu
+ZSBNQ0VfUkFESU9fU1RBVEVTX1NJRwkJInJhZGlvX3N0YXRlc19pbmQiCiAKIHN0YXRpYyBndWlu
+dCB3YXRjaF9pZDsKIHN0YXRpYyBEQnVzQ29ubmVjdGlvbiAqY29ubiA9IE5VTEw7CitzdGF0aWMg
+Z2Jvb2xlYW4gbWNlX2J0X3NldCA9IEZBTFNFOwogCiBzdGF0aWMgZ2Jvb2xlYW4gbWNlX3NpZ25h
+bF9jYWxsYmFjayhEQnVzQ29ubmVjdGlvbiAqY29ubmVjdGlvbiwKIAkJCQkJREJ1c01lc3NhZ2Ug
+Km1lc3NhZ2UsIHZvaWQgKnVzZXJfZGF0YSkKQEAgLTY2LDcgKzY4LDExIEBAIHN0YXRpYyBnYm9v
+bGVhbiBtY2Vfc2lnbmFsX2NhbGxiYWNrKERCdXNDb25uZWN0aW9uICpjb25uZWN0aW9uLAogCQlk
+YnVzX21lc3NhZ2VfaXRlcl9nZXRfYmFzaWMoJmFyZ3MsICZzaWd2YWx1ZSk7CiAJCURCRygiZ290
+IHNpZ25hbCB3aXRoIHZhbHVlICV1Iiwgc2lndmFsdWUpOwogCi0JCWlmIChzaWd2YWx1ZSAmIE1D
+RV9SQURJT19TVEFURV9CTFVFVE9PVEgpCisJCS8qIHNldCB0aGUgYWRhcHRlciBhY2NvcmRpbmcg
+dG8gdGhlIG1jZSBzaWduYWwKKwkJICAgYW5kIHJlbWVtYmVyIHRoZSB2YWx1ZSAqLworCQltY2Vf
+YnRfc2V0ID0gc2lndmFsdWUgJiBNQ0VfUkFESU9fU1RBVEVfQkxVRVRPT1RIOworCisJCWlmICht
+Y2VfYnRfc2V0KQogCQkJYnRkX2FkYXB0ZXJfc3dpdGNoX29ubGluZShhZGFwdGVyKTsKIAkJZWxz
+ZQogCQkJYnRkX2FkYXB0ZXJfc3dpdGNoX29mZmxpbmUoYWRhcHRlcik7CkBAIC0xMDIsMTMgKzEw
+OCw0OCBAQCBzdGF0aWMgdm9pZCByZWFkX3JhZGlvX3N0YXRlc19jYihEQnVzUGVuZGluZ0NhbGwg
+KmNhbGwsIHZvaWQgKnVzZXJfZGF0YSkKIAkJZ290byBkb25lOwogCX0KIAotCWlmIChyYWRpb19z
+dGF0ZXMgJiBNQ0VfUkFESU9fU1RBVEVfQkxVRVRPT1RIKQorCURCRygicmFkaW9fc3RhdGVzOiAl
+ZCIsIHJhZGlvX3N0YXRlcyk7CisKKwltY2VfYnRfc2V0ID0gcmFkaW9fc3RhdGVzICYgTUNFX1JB
+RElPX1NUQVRFX0JMVUVUT09USDsKKworCWlmIChtY2VfYnRfc2V0KQogCQlidGRfYWRhcHRlcl9z
+d2l0Y2hfb25saW5lKGFkYXB0ZXIpOworCWVsc2UKKwkJYnRkX2FkYXB0ZXJfc3dpdGNoX29mZmxp
+bmUoYWRhcHRlcik7CiAKIGRvbmU6CiAJZGJ1c19tZXNzYWdlX3VucmVmKHJlcGx5KTsKIH0KIAor
+c3RhdGljIHZvaWQgYWRhcHRlcl9wb3dlcmVkKHN0cnVjdCBidGRfYWRhcHRlciAqYWRhcHRlciwg
+Z2Jvb2xlYW4gcG93ZXJlZCkKK3sKKwlEQnVzTWVzc2FnZSAqbXNnOworCWRidXNfdWludDMyX3Qg
+cmFkaW9fc3RhdGVzID0gMDsKKwlkYnVzX3VpbnQzMl90IHJhZGlvX21hc2sgPSBNQ0VfUkFESU9f
+U1RBVEVfQkxVRVRPT1RIOworCisJREJHKCJhZGFwdGVyX3Bvd2VyZWQgY2FsbGVkIHdpdGggJWQi
+LCAoaW50KSBwb3dlcmVkKTsKKworCS8qIG5vdGhpbmcgdG8gZG8gaWYgdGhlIHN0YXRlcyBtYXRj
+aCAqLworCWlmIChtY2VfYnRfc2V0ID09IHBvd2VyZWQpCisJCXJldHVybjsKKworCS8qIHNldCB0
+aGUgbWNlIHZhbHVlIGFjY29yZGluZyB0byB0aGUgc3RhdGUgb2YgdGhlIGFkYXB0ZXIgKi8KKwlt
+c2cgPSBkYnVzX21lc3NhZ2VfbmV3X21ldGhvZF9jYWxsKE1DRV9TRVJWSUNFLCBNQ0VfUkVRVUVT
+VF9QQVRILAorCQkJCU1DRV9SRVFVRVNUX0lGLCBNQ0VfUkFESU9fU1RBVEVTX0NIQU5HRV9SRVEp
+OworCisJaWYgKHBvd2VyZWQpCisJCXJhZGlvX3N0YXRlcyA9IE1DRV9SQURJT19TVEFURV9CTFVF
+VE9PVEg7CisKKwlkYnVzX21lc3NhZ2VfYXBwZW5kX2FyZ3MobXNnLCBEQlVTX1RZUEVfVUlOVDMy
+LCAmcmFkaW9fc3RhdGVzLAorCQkJCURCVVNfVFlQRV9VSU5UMzIsICZyYWRpb19tYXNrKTsKKwor
+CWlmICghZGJ1c19jb25uZWN0aW9uX3NlbmQoY29ubiwgbXNnLCBOVUxMKSkKKwkJZXJyb3IoImNh
+bGxpbmcgJXMgZmFpbGVkIiwgTUNFX1JBRElPX1NUQVRFU19DSEFOR0VfUkVRKTsKKworCWRidXNf
+bWVzc2FnZV91bnJlZihtc2cpOworfQorCisKIHN0YXRpYyBpbnQgbWNlX3Byb2JlKHN0cnVjdCBi
+dGRfYWRhcHRlciAqYWRhcHRlcikKIHsKIAlEQnVzTWVzc2FnZSAqbXNnOwpAQCAtMTMyLDYgKzE3
+Myw5IEBAIHN0YXRpYyBpbnQgbWNlX3Byb2JlKHN0cnVjdCBidGRfYWRhcHRlciAqYWRhcHRlcikK
+IAl3YXRjaF9pZCA9IGdfZGJ1c19hZGRfc2lnbmFsX3dhdGNoKGNvbm4sIE5VTEwsIE1DRV9TSUdO
+QUxfUEFUSCwKIAkJCQkJTUNFX1NJR05BTF9JRiwgTUNFX1JBRElPX1NUQVRFU19TSUcsCiAJCQkJ
+CW1jZV9zaWduYWxfY2FsbGJhY2ssIGFkYXB0ZXIsIE5VTEwpOworCisJYnRkX2FkYXB0ZXJfcmVn
+aXN0ZXJfcG93ZXJlZF9jYWxsYmFjayhhZGFwdGVyLCBhZGFwdGVyX3Bvd2VyZWQpOworCiAJcmV0
+dXJuIDA7CiB9CiAKLS0gCjEuNi4wLjQKCg==
+--00c09f88cee7a2a594048e00fc1a--
