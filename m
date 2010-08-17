@@ -1,31 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 17 Aug 2010 17:18:41 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Fix aborting capability scripts making them
- zombies processes
-Message-ID: <20100817141841.GA16071@jh-x301>
-References: <1282053510-18102-1-git-send-email-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1282053510-18102-1-git-send-email-luiz.dentz@gmail.com>
+From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH 4/5] Add set fast connectable to audio manager
+Date: Tue, 17 Aug 2010 17:05:33 +0300
+Message-Id: <1282053934-19445-5-git-send-email-dmitriy.paliy@nokia.com>
+In-Reply-To: <1282053934-19445-1-git-send-email-dmitriy.paliy@nokia.com>
+References: <1282053934-19445-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Set fast connectable added to audio manager interface. Enables
+fast connectable mode for all audio adapters or sets respective
+values to default when disabled. It does not interfere with any
+other audio manager's interfaces, modes, or states.
+---
+ audio/manager.c |   14 ++++++++++++++
+ audio/manager.h |    4 ++++
+ 2 files changed, 18 insertions(+), 0 deletions(-)
 
-On Tue, Aug 17, 2010, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
-> 
-> When using G_SPAWN_DO_NOT_REAP_CHILD the watch cannot be removed since it
-> basically replaces the use of waitpid which does prevent the child
-> process to became 'zombie' when terminated, a more detailed explanation
-> can be found in waitpid manpage.
-> ---
->  plugins/filesystem.c |   28 ++++++++++++++++++----------
->  1 files changed, 18 insertions(+), 10 deletions(-)
+diff --git a/audio/manager.c b/audio/manager.c
+index 6dd0f87..b885929 100644
+--- a/audio/manager.c
++++ b/audio/manager.c
+@@ -1290,3 +1290,17 @@ gboolean manager_allow_headset_connection(struct audio_device *device)
+ 
+ 	return TRUE;
+ }
++
++void manager_set_fast_connectable(gboolean enable)
++{
++	GSList *l;
++
++	for (l = adapters; l != NULL; l = l->next) {
++		struct audio_adapter *adapter = l->data;
++
++		if ( btd_adapter_set_fast_connectable(adapter->btd_adapter,
++								enable) )
++			error("Changing fast connectable for hci%d failed",
++				adapter_get_dev_id(adapter->btd_adapter) );
++	}
++}
+diff --git a/audio/manager.h b/audio/manager.h
+index 8e1abf4..90fe6f0 100644
+--- a/audio/manager.h
++++ b/audio/manager.h
+@@ -48,3 +48,7 @@ struct audio_device *manager_get_device(const bdaddr_t *src,
+ 					gboolean create);
+ 
+ gboolean manager_allow_headset_connection(struct audio_device *device);
++
++/* TRUE to enable fast connectable and FALSE to disable fast connectable for all
++ * audio adapters. */
++void manager_set_fast_connectable(gboolean enable);
+-- 
+1.7.0.4
 
-Thanks. The patch is now upstream.
-
-Johan
