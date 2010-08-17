@@ -1,41 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 17 Aug 2010 00:59:21 -0300
+Date: Tue, 17 Aug 2010 00:27:09 -0300
 From: "Gustavo F. Padovan" <gustavo@padovan.org>
-To: Alexander Orlenko <zxteam@gmail.com>
-Cc: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	Bastien Nocera <hadess@hadess.net>,
+To: Bastien Nocera <hadess@hadess.net>
+Cc: Alexander Orlenko <zxteam@gmail.com>,
+	Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
 	linux-bluetooth@vger.kernel.org
 Subject: Re: [GSoC'10] : New Command Line Tool(s) for bluez
-Message-ID: <20100817035921.GA5900@vigoh>
+Message-ID: <20100817032709.GA5523@vigoh>
 References: <AANLkTimnLyeZqNvNecognr_U9alZiC9bKNUOWjX9H_Hq@mail.gmail.com>
  <1274360918.27274.3302.camel@localhost.localdomain>
  <AANLkTik3d0rY2QNrhevwzPz28VQwKuj7A5s-9l152H4Y@mail.gmail.com>
  <AANLkTimW1SmfZ+j=F7kTSwosdz=kh+g9ofcqdTeGE7CB@mail.gmail.com>
+ <1281951653.9775.7.camel@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTimW1SmfZ+j=F7kTSwosdz=kh+g9ofcqdTeGE7CB@mail.gmail.com>
+In-Reply-To: <1281951653.9775.7.camel@localhost.localdomain>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alexander,
+Hi,
 
-* Alexander Orlenko <zxteam@gmail.com> [2010-08-16 10:24:23 +1100]:
+* Bastien Nocera <hadess@hadess.net> [2010-08-16 10:40:53 +0100]:
 
-> Hi everyone,
+> On Mon, 2010-08-16 at 10:24 +1100, Alexander Orlenko wrote:
+> > Hi everyone,
+> > 
+> > I updated project info page at http://hostisdown.org/gsoc/projects/bluez-tools
+> > Created project home page: http://code.google.com/p/bluez-tools
+> > Current release available for download: 0.1.18-6432
+> > 
+> > Code of my project does not based on non-GTK parts of
+> > libgnome-bluetooth. I wrote glib gobjects for all bluez dbus
+> > interfaces.
 > 
-> I updated project info page at http://hostisdown.org/gsoc/projects/bluez-tools
-> Created project home page: http://code.google.com/p/bluez-tools
-> Current release available for download: 0.1.18-6432
+> Shame, but I won't hold you against that :)
 > 
-> Code of my project does not based on non-GTK parts of
-> libgnome-bluetooth. I wrote glib gobjects for all bluez dbus
-> interfaces.
-> I will continue developing my project after end of GSoC.
+> > I will continue developing my project after end of GSoC.
+> 
+> Hopefully people will package it for distributions so we don't get as
+> many requests for command-line pairing agents :)
 
-Why have you decided to write a binary for each functionality? What do
-you think about have them all in only one binary? (or at least the
-bluetoothd related ones)
-
+What about put this inside the bluez source instead of keeping it
+separated? I think it's a good a idea ship this together with
+bluetoothd.
 
 -- 
 Gustavo F. Padovan
