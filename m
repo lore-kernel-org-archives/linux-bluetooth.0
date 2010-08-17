@@ -1,104 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 17 Aug 2010 11:28:18 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Daniel =?iso-8859-1?Q?=D6rstadius?= <daniel.orstadius@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/3] Add mode callback to btd_adapter
+Message-ID: <20100817082818.GA19380@jh-x301>
+References: <AANLkTi=Jh5fsqye6-Ry+VSNWftufDFCdyNEn6fcNrW84@mail.gmail.com>
+ <20100813124102.GA3546@jh-x301>
+ <AANLkTi=afUGqbZy1fRmHsPFQQyFWkEUwi+4tYT22N2az@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTim2ni6aE3-9Rx+HGeFFmmG-by6PMh4zgrJFnk-m@mail.gmail.com>
-References: <AANLkTim2ni6aE3-9Rx+HGeFFmmG-by6PMh4zgrJFnk-m@mail.gmail.com>
-Date: Tue, 17 Aug 2010 11:46:36 +0300
-Message-ID: <AANLkTimpogcSN1eKO9A2aWB1aB7YNZSRD7f-vGMvma9q@mail.gmail.com>
-Subject: Re: [PATCH 2/3] Maemo6 MCE: listen to adapter mode changes
-From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=00c09f88cee7a2a594048e00fc1a
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <AANLkTi=afUGqbZy1fRmHsPFQQyFWkEUwi+4tYT22N2az@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---00c09f88cee7a2a594048e00fc1a
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+Hi Daniel,
 
-On Fri, Aug 13, 2010 at 12:19 PM, Daniel =D6rstadius
-<daniel.orstadius@gmail.com> wrote:
-> Registers a callback in btd_adapter to get notified when
-> the powered state of the adapter is changed. This is needed
-> to update the state stored in the MCE if the adapter is powered
-> on or off using for example SetProperty(Powered). The current
-> setting of the MCE is saved in a variable and if the notification
-> to the plugin does not match this value the MCE is updated
-> accordingly using its DBus method for setting radio states.
->
+On Fri, Aug 13, 2010, Daniel Örstadius wrote:
+> From: Daniel Orstadius <daniel.orstadius@nokia.com>
+> Date: Fri, 13 Aug 2010 16:38:08 +0300
+> Subject: [PATCH] Add powered callback to btd_adapter
+> 
+> With this patch callback functions can be registered to the
+> btd_adapter struct. The functions are then called when the powered
+> state of the adapter changes, with a boolean argument indicating
+> the new state. The reason for adding the functionality is that the
+> Maemo6 MCE plugin needs to be notified when the adapter is powered
+> on or off.
+> ---
+>  src/adapter.c |   32 ++++++++++++++++++++++++++++++++
+>  src/adapter.h |    7 +++++++
+>  2 files changed, 39 insertions(+), 0 deletions(-)
 
-Attaching updated patch.
+Thanks. This patch is now pushed upstream.
 
-/Daniel
-
---00c09f88cee7a2a594048e00fc1a
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Maemo6-MCE-listen-to-adapter-powered-state.patch"
-Content-Disposition: attachment;
-	filename="0001-Maemo6-MCE-listen-to-adapter-powered-state.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_gcyigbo81
-
-RnJvbSAxZDcyYjE1YTgyZDhkOWZkZmIxOTRiOTZkZmFkMGQzYzljYjc5YTNhIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
-a2lhLmNvbT4KRGF0ZTogVHVlLCAxNyBBdWcgMjAxMCAxMTo0MTozMyArMDMwMApTdWJqZWN0OiBb
-UEFUQ0hdIE1hZW1vNiBNQ0U6IGxpc3RlbiB0byBhZGFwdGVyIHBvd2VyZWQgc3RhdGUKClJlZ2lz
-dGVycyBhIGNhbGxiYWNrIGluIGJ0ZF9hZGFwdGVyIHRvIGdldCBub3RpZmllZCB3aGVuIHRoZQpw
-b3dlcmVkIHN0YXRlIG9mIHRoZSBhZGFwdGVyIGlzIGNoYW5nZWQuIFRoaXMgaXMgbmVlZGVkIHRv
-IHVwZGF0ZQp0aGUgc3RhdGUgc3RvcmVkIGluIHRoZSBNQ0UgaWYgdGhlIGFkYXB0ZXIgaXMgcG93
-ZXJlZCBvbiBvciBvZmYKdXNpbmcgZm9yIGV4YW1wbGUgU2V0UHJvcGVydHkoUG93ZXJlZCkuIFRo
-ZSBjdXJyZW50IHNldHRpbmcgb2YKdGhlIE1DRSBpcyBzYXZlZCBpbiBhIHZhcmlhYmxlIGFuZCBp
-ZiB0aGUgbm90aWZpY2F0aW9uIHRvIHRoZQpwbHVnaW4gZG9lcyBub3QgbWF0Y2ggdGhpcyB2YWx1
-ZSB0aGUgTUNFIGlzIHVwZGF0ZWQgYWNjb3JkaW5nbHkKdXNpbmcgaXRzIERCdXMgbWV0aG9kIGZv
-ciBzZXR0aW5nIHJhZGlvIHN0YXRlcy4KLS0tCiBwbHVnaW5zL21hZW1vNi5jIHwgICA0OCArKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0KIDEgZmlsZXMgY2hh
-bmdlZCwgNDYgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9wbHVn
-aW5zL21hZW1vNi5jIGIvcGx1Z2lucy9tYWVtbzYuYwppbmRleCAyZWQ1ZjEyLi5mOWQ5YzFmIDEw
-MDY0NAotLS0gYS9wbHVnaW5zL21hZW1vNi5jCisrKyBiL3BsdWdpbnMvbWFlbW82LmMKQEAgLTQz
-LDExICs0MywxMyBAQAogI2RlZmluZSBNQ0VfU0lHTkFMX0lGCQkJImNvbS5ub2tpYS5tY2Uuc2ln
-bmFsIgogI2RlZmluZSBNQ0VfUkVRVUVTVF9QQVRICQkiL2NvbS9ub2tpYS9tY2UvcmVxdWVzdCIK
-ICNkZWZpbmUgTUNFX1NJR05BTF9QQVRICQkJIi9jb20vbm9raWEvbWNlL3NpZ25hbCIKKyNkZWZp
-bmUgTUNFX1JBRElPX1NUQVRFU19DSEFOR0VfUkVRCSJyZXFfcmFkaW9fc3RhdGVzX2NoYW5nZSIK
-ICNkZWZpbmUgTUNFX1JBRElPX1NUQVRFU19HRVQJCSJnZXRfcmFkaW9fc3RhdGVzIgogI2RlZmlu
-ZSBNQ0VfUkFESU9fU1RBVEVTX1NJRwkJInJhZGlvX3N0YXRlc19pbmQiCiAKIHN0YXRpYyBndWlu
-dCB3YXRjaF9pZDsKIHN0YXRpYyBEQnVzQ29ubmVjdGlvbiAqY29ubiA9IE5VTEw7CitzdGF0aWMg
-Z2Jvb2xlYW4gbWNlX2J0X3NldCA9IEZBTFNFOwogCiBzdGF0aWMgZ2Jvb2xlYW4gbWNlX3NpZ25h
-bF9jYWxsYmFjayhEQnVzQ29ubmVjdGlvbiAqY29ubmVjdGlvbiwKIAkJCQkJREJ1c01lc3NhZ2Ug
-Km1lc3NhZ2UsIHZvaWQgKnVzZXJfZGF0YSkKQEAgLTY2LDcgKzY4LDExIEBAIHN0YXRpYyBnYm9v
-bGVhbiBtY2Vfc2lnbmFsX2NhbGxiYWNrKERCdXNDb25uZWN0aW9uICpjb25uZWN0aW9uLAogCQlk
-YnVzX21lc3NhZ2VfaXRlcl9nZXRfYmFzaWMoJmFyZ3MsICZzaWd2YWx1ZSk7CiAJCURCRygiZ290
-IHNpZ25hbCB3aXRoIHZhbHVlICV1Iiwgc2lndmFsdWUpOwogCi0JCWlmIChzaWd2YWx1ZSAmIE1D
-RV9SQURJT19TVEFURV9CTFVFVE9PVEgpCisJCS8qIHNldCB0aGUgYWRhcHRlciBhY2NvcmRpbmcg
-dG8gdGhlIG1jZSBzaWduYWwKKwkJICAgYW5kIHJlbWVtYmVyIHRoZSB2YWx1ZSAqLworCQltY2Vf
-YnRfc2V0ID0gc2lndmFsdWUgJiBNQ0VfUkFESU9fU1RBVEVfQkxVRVRPT1RIOworCisJCWlmICht
-Y2VfYnRfc2V0KQogCQkJYnRkX2FkYXB0ZXJfc3dpdGNoX29ubGluZShhZGFwdGVyKTsKIAkJZWxz
-ZQogCQkJYnRkX2FkYXB0ZXJfc3dpdGNoX29mZmxpbmUoYWRhcHRlcik7CkBAIC0xMDIsMTMgKzEw
-OCw0OCBAQCBzdGF0aWMgdm9pZCByZWFkX3JhZGlvX3N0YXRlc19jYihEQnVzUGVuZGluZ0NhbGwg
-KmNhbGwsIHZvaWQgKnVzZXJfZGF0YSkKIAkJZ290byBkb25lOwogCX0KIAotCWlmIChyYWRpb19z
-dGF0ZXMgJiBNQ0VfUkFESU9fU1RBVEVfQkxVRVRPT1RIKQorCURCRygicmFkaW9fc3RhdGVzOiAl
-ZCIsIHJhZGlvX3N0YXRlcyk7CisKKwltY2VfYnRfc2V0ID0gcmFkaW9fc3RhdGVzICYgTUNFX1JB
-RElPX1NUQVRFX0JMVUVUT09USDsKKworCWlmIChtY2VfYnRfc2V0KQogCQlidGRfYWRhcHRlcl9z
-d2l0Y2hfb25saW5lKGFkYXB0ZXIpOworCWVsc2UKKwkJYnRkX2FkYXB0ZXJfc3dpdGNoX29mZmxp
-bmUoYWRhcHRlcik7CiAKIGRvbmU6CiAJZGJ1c19tZXNzYWdlX3VucmVmKHJlcGx5KTsKIH0KIAor
-c3RhdGljIHZvaWQgYWRhcHRlcl9wb3dlcmVkKHN0cnVjdCBidGRfYWRhcHRlciAqYWRhcHRlciwg
-Z2Jvb2xlYW4gcG93ZXJlZCkKK3sKKwlEQnVzTWVzc2FnZSAqbXNnOworCWRidXNfdWludDMyX3Qg
-cmFkaW9fc3RhdGVzID0gMDsKKwlkYnVzX3VpbnQzMl90IHJhZGlvX21hc2sgPSBNQ0VfUkFESU9f
-U1RBVEVfQkxVRVRPT1RIOworCisJREJHKCJhZGFwdGVyX3Bvd2VyZWQgY2FsbGVkIHdpdGggJWQi
-LCAoaW50KSBwb3dlcmVkKTsKKworCS8qIG5vdGhpbmcgdG8gZG8gaWYgdGhlIHN0YXRlcyBtYXRj
-aCAqLworCWlmIChtY2VfYnRfc2V0ID09IHBvd2VyZWQpCisJCXJldHVybjsKKworCS8qIHNldCB0
-aGUgbWNlIHZhbHVlIGFjY29yZGluZyB0byB0aGUgc3RhdGUgb2YgdGhlIGFkYXB0ZXIgKi8KKwlt
-c2cgPSBkYnVzX21lc3NhZ2VfbmV3X21ldGhvZF9jYWxsKE1DRV9TRVJWSUNFLCBNQ0VfUkVRVUVT
-VF9QQVRILAorCQkJCU1DRV9SRVFVRVNUX0lGLCBNQ0VfUkFESU9fU1RBVEVTX0NIQU5HRV9SRVEp
-OworCisJaWYgKHBvd2VyZWQpCisJCXJhZGlvX3N0YXRlcyA9IE1DRV9SQURJT19TVEFURV9CTFVF
-VE9PVEg7CisKKwlkYnVzX21lc3NhZ2VfYXBwZW5kX2FyZ3MobXNnLCBEQlVTX1RZUEVfVUlOVDMy
-LCAmcmFkaW9fc3RhdGVzLAorCQkJCURCVVNfVFlQRV9VSU5UMzIsICZyYWRpb19tYXNrKTsKKwor
-CWlmICghZGJ1c19jb25uZWN0aW9uX3NlbmQoY29ubiwgbXNnLCBOVUxMKSkKKwkJZXJyb3IoImNh
-bGxpbmcgJXMgZmFpbGVkIiwgTUNFX1JBRElPX1NUQVRFU19DSEFOR0VfUkVRKTsKKworCWRidXNf
-bWVzc2FnZV91bnJlZihtc2cpOworfQorCisKIHN0YXRpYyBpbnQgbWNlX3Byb2JlKHN0cnVjdCBi
-dGRfYWRhcHRlciAqYWRhcHRlcikKIHsKIAlEQnVzTWVzc2FnZSAqbXNnOwpAQCAtMTMyLDYgKzE3
-Myw5IEBAIHN0YXRpYyBpbnQgbWNlX3Byb2JlKHN0cnVjdCBidGRfYWRhcHRlciAqYWRhcHRlcikK
-IAl3YXRjaF9pZCA9IGdfZGJ1c19hZGRfc2lnbmFsX3dhdGNoKGNvbm4sIE5VTEwsIE1DRV9TSUdO
-QUxfUEFUSCwKIAkJCQkJTUNFX1NJR05BTF9JRiwgTUNFX1JBRElPX1NUQVRFU19TSUcsCiAJCQkJ
-CW1jZV9zaWduYWxfY2FsbGJhY2ssIGFkYXB0ZXIsIE5VTEwpOworCisJYnRkX2FkYXB0ZXJfcmVn
-aXN0ZXJfcG93ZXJlZF9jYWxsYmFjayhhZGFwdGVyLCBhZGFwdGVyX3Bvd2VyZWQpOworCiAJcmV0
-dXJuIDA7CiB9CiAKLS0gCjEuNi4wLjQKCg==
---00c09f88cee7a2a594048e00fc1a--
+Johan
