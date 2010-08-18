@@ -1,32 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 18 Aug 2010 16:16:55 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Daniel =?iso-8859-1?Q?=D6rstadius?= <daniel.orstadius@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Clear the off_requested flag
-Message-ID: <20100818131655.GA6341@jh-x301>
-References: <AANLkTimJAT2+gxQCOXwBmyF7a_9BU2FQW2uQn0KiLcgx@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <AANLkTimJAT2+gxQCOXwBmyF7a_9BU2FQW2uQn0KiLcgx@mail.gmail.com>
+Date: Wed, 18 Aug 2010 15:54:02 +0300
+Message-ID: <AANLkTimJAT2+gxQCOXwBmyF7a_9BU2FQW2uQn0KiLcgx@mail.gmail.com>
+Subject: [PATCH] Clear the off_requested flag
+From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=00c09f9db1b0603b95048e188f13
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Daniel,
+--00c09f9db1b0603b95048e188f13
+Content-Type: text/plain; charset=ISO-8859-1
 
-On Wed, Aug 18, 2010, Daniel Örstadius wrote:
-> From: Daniel Orstadius <daniel.orstadius@nokia.com>
-> Date: Wed, 18 Aug 2010 15:46:11 +0300
-> Subject: [PATCH] Clear the off_requested flag
-> 
-> Set the off_requested flag in struct btd_adapter to false when
-> receiving confirmation that the adapter is off. The flag is used
-> to indicate that the adapter is in the powering down state and
-> should be cleared when it is actually down.
-> ---
->  src/adapter.c |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
+Set the off_requested flag in struct btd_adapter to false when
+receiving confirmation that the adapter is off. The flag is used
+to indicate that the adapter is in the powering down state and
+should be cleared when it is actually down.
 
-Thanks. The patch is now upstream.
+/Daniel
 
-Johan
+--00c09f9db1b0603b95048e188f13
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-Clear-the-off_requested-flag.patch"
+Content-Disposition: attachment;
+	filename="0001-Clear-the-off_requested-flag.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gd06oe2p0
+
+RnJvbSBmODYzNTI4ZTRkMTJlYWEzYjUwNGViNzM5ZDE1Y2RmMDRlNDEyMTc5IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
+a2lhLmNvbT4KRGF0ZTogV2VkLCAxOCBBdWcgMjAxMCAxNTo0NjoxMSArMDMwMApTdWJqZWN0OiBb
+UEFUQ0hdIENsZWFyIHRoZSBvZmZfcmVxdWVzdGVkIGZsYWcKClNldCB0aGUgb2ZmX3JlcXVlc3Rl
+ZCBmbGFnIGluIHN0cnVjdCBidGRfYWRhcHRlciB0byBmYWxzZSB3aGVuCnJlY2VpdmluZyBjb25m
+aXJtYXRpb24gdGhhdCB0aGUgYWRhcHRlciBpcyBvZmYuIFRoZSBmbGFnIGlzIHVzZWQKdG8gaW5k
+aWNhdGUgdGhhdCB0aGUgYWRhcHRlciBpcyBpbiB0aGUgcG93ZXJpbmcgZG93biBzdGF0ZSBhbmQK
+c2hvdWxkIGJlIGNsZWFyZWQgd2hlbiBpdCBpcyBhY3R1YWxseSBkb3duLgotLS0KIHNyYy9hZGFw
+dGVyLmMgfCAgICAxICsKIDEgZmlsZXMgY2hhbmdlZCwgMSBpbnNlcnRpb25zKCspLCAwIGRlbGV0
+aW9ucygtKQoKZGlmZiAtLWdpdCBhL3NyYy9hZGFwdGVyLmMgYi9zcmMvYWRhcHRlci5jCmluZGV4
+IGIwMjNjMDEuLmQ1NTc0ZTggMTAwNjQ0Ci0tLSBhL3NyYy9hZGFwdGVyLmMKKysrIGIvc3JjL2Fk
+YXB0ZXIuYwpAQCAtMjUwMiw2ICsyNTAyLDcgQEAgaW50IGFkYXB0ZXJfc3RvcChzdHJ1Y3QgYnRk
+X2FkYXB0ZXIgKmFkYXB0ZXIpCiAJYWRhcHRlci0+c3RhdGUgPSBESVNDT1ZFUl9UWVBFX05PTkU7
+CiAJYWRhcHRlci0+Y2FjaGVfZW5hYmxlID0gVFJVRTsKIAlhZGFwdGVyLT5wZW5kaW5nX2NvZCA9
+IDA7CisJYWRhcHRlci0+b2ZmX3JlcXVlc3RlZCA9IEZBTFNFOwogCiAJY2FsbF9hZGFwdGVyX3Bv
+d2VyZWRfY2FsbGJhY2tzKGFkYXB0ZXIsIEZBTFNFKTsKIAotLSAKMS42LjAuNAoK
+--00c09f9db1b0603b95048e188f13--
