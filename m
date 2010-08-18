@@ -1,46 +1,107 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Wed, 18 Aug 2010 15:54:02 +0300
-Message-ID: <AANLkTimJAT2+gxQCOXwBmyF7a_9BU2FQW2uQn0KiLcgx@mail.gmail.com>
-Subject: [PATCH] Clear the off_requested flag
-From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=00c09f9db1b0603b95048e188f13
+Subject: Re: [PATCH] sdp: Remove sdp_general_inquiry API
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Zhenhua Zhang <zhenhua.zhang@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1282126410-6157-1-git-send-email-zhenhua.zhang@intel.com>
+References: <1282126410-6157-1-git-send-email-zhenhua.zhang@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Wed, 18 Aug 2010 13:59:07 +0200
+Message-ID: <1282132747.23399.138.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---00c09f9db1b0603b95048e188f13
-Content-Type: text/plain; charset=ISO-8859-1
+Hi Zhenhua,
 
-Set the off_requested flag in struct btd_adapter to false when
-receiving confirmation that the adapter is off. The flag is used
-to indicate that the adapter is in the powering down state and
-should be cleared when it is actually down.
+> So that sdp.c won't include hci.h and hci_lib.h. The inquiry operation
+> could be done by simply invoking hci_inquiry().
+> ---
+>  lib/sdp.c       |   16 ----------------
+>  lib/sdp_lib.h   |    5 -----
+>  tools/sdptool.c |    6 ++++--
+>  3 files changed, 4 insertions(+), 23 deletions(-)
+> 
+> diff --git a/lib/sdp.c b/lib/sdp.c
+> index 8a31b55..76695af 100644
+> --- a/lib/sdp.c
+> +++ b/lib/sdp.c
+> @@ -43,8 +43,6 @@
+>  #include <netinet/in.h>
+>  
+>  #include "bluetooth.h"
+> -#include "hci.h"
+> -#include "hci_lib.h"
+>  #include "l2cap.h"
+>  #include "sdp.h"
+>  #include "sdp_lib.h"
+> @@ -4523,20 +4521,6 @@ end:
+>  	return status;
+>  }
+>  
+> -/*
+> - * Find devices in the piconet.
+> - */
+> -int sdp_general_inquiry(inquiry_info *ii, int num_dev, int duration, uint8_t *found)
+> -{
+> -	int n = hci_inquiry(-1, 10, num_dev, NULL, &ii, 0);
+> -	if (n < 0) {
+> -		SDPERR("Inquiry failed:%s", strerror(errno));
+> -		return -1;
+> -	}
+> -	*found = n;
+> -	return 0;
+> -}
+> -
 
-/Daniel
+this breaks API and ABI compatibility. Even if most likely nobody in the
+world uses this function, we should keep it for now.
 
---00c09f9db1b0603b95048e188f13
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Clear-the-off_requested-flag.patch"
-Content-Disposition: attachment;
-	filename="0001-Clear-the-off_requested-flag.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_gd06oe2p0
+>  int sdp_close(sdp_session_t *session)
+>  {
+>  	struct sdp_transaction *t;
+> diff --git a/lib/sdp_lib.h b/lib/sdp_lib.h
+> index e506ac1..5ad4b56 100644
+> --- a/lib/sdp_lib.h
+> +++ b/lib/sdp_lib.h
+> @@ -146,11 +146,6 @@ int sdp_service_search_attr_async(sdp_session_t *session, const sdp_list_t *sear
+>  
+>  uint16_t sdp_gen_tid(sdp_session_t *session);
+>  
+> -/*
+> - * find all devices in the piconet
+> - */
+> -int sdp_general_inquiry(inquiry_info *ii, int dev_num, int duration, uint8_t *found);
+> -
+>  /* flexible extraction of basic attributes - Jean II */
+>  int sdp_get_int_attr(const sdp_record_t *rec, uint16_t attr, int *value);
+>  int sdp_get_string_attr(const sdp_record_t *rec, uint16_t attr, char *value, int valuelen);
+> diff --git a/tools/sdptool.c b/tools/sdptool.c
+> index d06b159..3ce0fc3 100644
+> --- a/tools/sdptool.c
+> +++ b/tools/sdptool.c
+> @@ -3733,11 +3733,13 @@ static int cmd_del(int argc, char **argv)
+>  static void inquiry(handler_t handler, void *arg)
+>  {
+>  	inquiry_info ii[20];
+> -	uint8_t count = 0;
+> +	int count = 0;
+>  	int i;
+>  
+>  	printf("Inquiring ...\n");
+> -	if (sdp_general_inquiry(ii, 20, 8, &count) < 0) {
+> +
+> +	count = hci_inquiry(-1, 10, 20, NULL, (inquiry_info **) &ii, 0);
+> +	if (count < 0) {
+>  		printf("Inquiry failed\n");
+>  		return;
+>  	}
 
-RnJvbSBmODYzNTI4ZTRkMTJlYWEzYjUwNGViNzM5ZDE1Y2RmMDRlNDEyMTc5IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
-a2lhLmNvbT4KRGF0ZTogV2VkLCAxOCBBdWcgMjAxMCAxNTo0NjoxMSArMDMwMApTdWJqZWN0OiBb
-UEFUQ0hdIENsZWFyIHRoZSBvZmZfcmVxdWVzdGVkIGZsYWcKClNldCB0aGUgb2ZmX3JlcXVlc3Rl
-ZCBmbGFnIGluIHN0cnVjdCBidGRfYWRhcHRlciB0byBmYWxzZSB3aGVuCnJlY2VpdmluZyBjb25m
-aXJtYXRpb24gdGhhdCB0aGUgYWRhcHRlciBpcyBvZmYuIFRoZSBmbGFnIGlzIHVzZWQKdG8gaW5k
-aWNhdGUgdGhhdCB0aGUgYWRhcHRlciBpcyBpbiB0aGUgcG93ZXJpbmcgZG93biBzdGF0ZSBhbmQK
-c2hvdWxkIGJlIGNsZWFyZWQgd2hlbiBpdCBpcyBhY3R1YWxseSBkb3duLgotLS0KIHNyYy9hZGFw
-dGVyLmMgfCAgICAxICsKIDEgZmlsZXMgY2hhbmdlZCwgMSBpbnNlcnRpb25zKCspLCAwIGRlbGV0
-aW9ucygtKQoKZGlmZiAtLWdpdCBhL3NyYy9hZGFwdGVyLmMgYi9zcmMvYWRhcHRlci5jCmluZGV4
-IGIwMjNjMDEuLmQ1NTc0ZTggMTAwNjQ0Ci0tLSBhL3NyYy9hZGFwdGVyLmMKKysrIGIvc3JjL2Fk
-YXB0ZXIuYwpAQCAtMjUwMiw2ICsyNTAyLDcgQEAgaW50IGFkYXB0ZXJfc3RvcChzdHJ1Y3QgYnRk
-X2FkYXB0ZXIgKmFkYXB0ZXIpCiAJYWRhcHRlci0+c3RhdGUgPSBESVNDT1ZFUl9UWVBFX05PTkU7
-CiAJYWRhcHRlci0+Y2FjaGVfZW5hYmxlID0gVFJVRTsKIAlhZGFwdGVyLT5wZW5kaW5nX2NvZCA9
-IDA7CisJYWRhcHRlci0+b2ZmX3JlcXVlc3RlZCA9IEZBTFNFOwogCiAJY2FsbF9hZGFwdGVyX3Bv
-d2VyZWRfY2FsbGJhY2tzKGFkYXB0ZXIsIEZBTFNFKTsKIAotLSAKMS42LjAuNAoK
---00c09f9db1b0603b95048e188f13--
+This change is fine btw. Send a separate patch for this.
+
+Regards
+
+Marcel
+
+
+
