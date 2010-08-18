@@ -1,107 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] sdp: Remove sdp_general_inquiry API
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Zhenhua Zhang <zhenhua.zhang@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1282126410-6157-1-git-send-email-zhenhua.zhang@intel.com>
-References: <1282126410-6157-1-git-send-email-zhenhua.zhang@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 18 Aug 2010 13:59:07 +0200
-Message-ID: <1282132747.23399.138.camel@localhost.localdomain>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <AANLkTikOj==zpA90bNAY0wVgXwQs1=a279RY8MNuz_KF@mail.gmail.com>
+References: <AANLkTikOj==zpA90bNAY0wVgXwQs1=a279RY8MNuz_KF@mail.gmail.com>
+Date: Wed, 18 Aug 2010 14:25:17 +0300
+Message-ID: <AANLkTimfQxLOTFVW64qrQLHYVjwsmDkxvuBkL-_eBKHR@mail.gmail.com>
+Subject: Re: [PATCH 3/3] Maemo6 MCE: handle race condition at startup
+From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=00c09f905ca3f64ac5048e175139
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Zhenhua,
+--00c09f905ca3f64ac5048e175139
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-> So that sdp.c won't include hci.h and hci_lib.h. The inquiry operation
-> could be done by simply invoking hci_inquiry().
-> ---
->  lib/sdp.c       |   16 ----------------
->  lib/sdp_lib.h   |    5 -----
->  tools/sdptool.c |    6 ++++--
->  3 files changed, 4 insertions(+), 23 deletions(-)
-> 
-> diff --git a/lib/sdp.c b/lib/sdp.c
-> index 8a31b55..76695af 100644
-> --- a/lib/sdp.c
-> +++ b/lib/sdp.c
-> @@ -43,8 +43,6 @@
->  #include <netinet/in.h>
->  
->  #include "bluetooth.h"
-> -#include "hci.h"
-> -#include "hci_lib.h"
->  #include "l2cap.h"
->  #include "sdp.h"
->  #include "sdp_lib.h"
-> @@ -4523,20 +4521,6 @@ end:
->  	return status;
->  }
->  
-> -/*
-> - * Find devices in the piconet.
-> - */
-> -int sdp_general_inquiry(inquiry_info *ii, int num_dev, int duration, uint8_t *found)
-> -{
-> -	int n = hci_inquiry(-1, 10, num_dev, NULL, &ii, 0);
-> -	if (n < 0) {
-> -		SDPERR("Inquiry failed:%s", strerror(errno));
-> -		return -1;
-> -	}
-> -	*found = n;
-> -	return 0;
-> -}
-> -
+On Fri, Aug 13, 2010 at 12:19 PM, Daniel =D6rstadius
+<daniel.orstadius@gmail.com> wrote:
+> Since bluetoothd power cycles the adapter at startup, it is possible
+> that the plugin gets a reply from reading the state of the MCE and
+> tries to power the adapter before it is down. The patch checks for
+> that situation and if it occurs postpones powering the adapter to
+> the mode change callback. The off_requested member of btd_adapter
+> is used for the check, so it is set to FALSE when the adapter is
+> down.
+>
 
-this breaks API and ABI compatibility. Even if most likely nobody in the
-world uses this function, we should keep it for now.
+Attaching updated patch.
 
->  int sdp_close(sdp_session_t *session)
->  {
->  	struct sdp_transaction *t;
-> diff --git a/lib/sdp_lib.h b/lib/sdp_lib.h
-> index e506ac1..5ad4b56 100644
-> --- a/lib/sdp_lib.h
-> +++ b/lib/sdp_lib.h
-> @@ -146,11 +146,6 @@ int sdp_service_search_attr_async(sdp_session_t *session, const sdp_list_t *sear
->  
->  uint16_t sdp_gen_tid(sdp_session_t *session);
->  
-> -/*
-> - * find all devices in the piconet
-> - */
-> -int sdp_general_inquiry(inquiry_info *ii, int dev_num, int duration, uint8_t *found);
-> -
->  /* flexible extraction of basic attributes - Jean II */
->  int sdp_get_int_attr(const sdp_record_t *rec, uint16_t attr, int *value);
->  int sdp_get_string_attr(const sdp_record_t *rec, uint16_t attr, char *value, int valuelen);
-> diff --git a/tools/sdptool.c b/tools/sdptool.c
-> index d06b159..3ce0fc3 100644
-> --- a/tools/sdptool.c
-> +++ b/tools/sdptool.c
-> @@ -3733,11 +3733,13 @@ static int cmd_del(int argc, char **argv)
->  static void inquiry(handler_t handler, void *arg)
->  {
->  	inquiry_info ii[20];
-> -	uint8_t count = 0;
-> +	int count = 0;
->  	int i;
->  
->  	printf("Inquiring ...\n");
-> -	if (sdp_general_inquiry(ii, 20, 8, &count) < 0) {
-> +
-> +	count = hci_inquiry(-1, 10, 20, NULL, (inquiry_info **) &ii, 0);
-> +	if (count < 0) {
->  		printf("Inquiry failed\n");
->  		return;
->  	}
+/Daniel
 
-This change is fine btw. Send a separate patch for this.
+--00c09f905ca3f64ac5048e175139
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-Maemo6-MCE-handle-race-condition-at-startup.patch"
+Content-Disposition: attachment;
+	filename="0001-Maemo6-MCE-handle-race-condition-at-startup.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gd03hatq1
 
-Regards
-
-Marcel
-
-
-
+RnJvbSBhYjEyNDlmNTA2NzNkNmRhMjI2YzFkOGY0OTBiOTYyZDk5OWZkODkwIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
+a2lhLmNvbT4KRGF0ZTogV2VkLCAxOCBBdWcgMjAxMCAxNDoyMjozMSArMDMwMApTdWJqZWN0OiBb
+UEFUQ0hdIE1hZW1vNiBNQ0U6IGhhbmRsZSByYWNlIGNvbmRpdGlvbiBhdCBzdGFydHVwCgpTaW5j
+ZSBibHVldG9vdGhkIHBvd2VyIGN5Y2xlcyB0aGUgYWRhcHRlciBhdCBzdGFydHVwLCBpdCBpcyBw
+b3NzaWJsZQp0aGF0IHRoZSBwbHVnaW4gZ2V0cyBhIHJlcGx5IGZyb20gcmVhZGluZyB0aGUgc3Rh
+dGUgb2YgdGhlIE1DRSBhbmQKdHJpZXMgdG8gcG93ZXIgdGhlIGFkYXB0ZXIgYmVmb3JlIGl0IGlz
+IGRvd24uIFRoZSBwYXRjaCBjaGVja3MgZm9yCnRoYXQgc2l0dWF0aW9uIGFuZCBpZiBpdCBvY2N1
+cnMgcG9zdHBvbmVzIHBvd2VyaW5nIHRoZSBhZGFwdGVyIHRvCnRoZSBwb3dlcmVkIHN0YXRlIGNh
+bGxiYWNrLiBUaGUgb2ZmX3JlcXVlc3RlZCBtZW1iZXIgb2YgYnRkX2FkYXB0ZXIKaXMgdXNlZCBm
+b3IgdGhlIGNoZWNrLCBzbyBpdCBpcyBzZXQgdG8gRkFMU0Ugd2hlbiB0aGUgYWRhcHRlciBpcwpk
+b3duLgotLS0KIHBsdWdpbnMvbWFlbW82LmMgfCAgIDIyICsrKysrKysrKysrKysrKysrKysrKysK
+IHNyYy9hZGFwdGVyLmMgICAgfCAgICAxICsKIDIgZmlsZXMgY2hhbmdlZCwgMjMgaW5zZXJ0aW9u
+cygrKSwgMCBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9wbHVnaW5zL21hZW1vNi5jIGIvcGx1
+Z2lucy9tYWVtbzYuYwppbmRleCA1NWVhNTA4Li5hZDg2YzMwIDEwMDY0NAotLS0gYS9wbHVnaW5z
+L21hZW1vNi5jCisrKyBiL3BsdWdpbnMvbWFlbW82LmMKQEAgLTUwLDYgKzUwLDcgQEAKIHN0YXRp
+YyBndWludCB3YXRjaF9pZDsKIHN0YXRpYyBEQnVzQ29ubmVjdGlvbiAqY29ubiA9IE5VTEw7CiBz
+dGF0aWMgZ2Jvb2xlYW4gbWNlX2J0X3NldCA9IEZBTFNFOworc3RhdGljIGdib29sZWFuIGNvbGxp
+c2lvbiA9IEZBTFNFOwogCiBzdGF0aWMgZ2Jvb2xlYW4gbWNlX3NpZ25hbF9jYWxsYmFjayhEQnVz
+Q29ubmVjdGlvbiAqY29ubmVjdGlvbiwKIAkJCQkJREJ1c01lc3NhZ2UgKm1lc3NhZ2UsIHZvaWQg
+KnVzZXJfZGF0YSkKQEAgLTExMiw2ICsxMTMsMTQgQEAgc3RhdGljIHZvaWQgcmVhZF9yYWRpb19z
+dGF0ZXNfY2IoREJ1c1BlbmRpbmdDYWxsICpjYWxsLCB2b2lkICp1c2VyX2RhdGEpCiAKIAltY2Vf
+YnRfc2V0ID0gcmFkaW9fc3RhdGVzICYgTUNFX1JBRElPX1NUQVRFX0JMVUVUT09USDsKIAorCS8q
+IGNoZWNrIGlmIHRoZSBhZGFwdGVyIGhhcyBub3QgY29tcGxldGVkIHRoZSBpbml0aWFsIHBvd2Vy
+CisJICAgY3ljbGUsIGlmIHNvIGRlbGF5IGFjdGlvbiB0byBtY2Vfbm90aWZ5X3Bvd2VyZWQgKi8K
+KworCWNvbGxpc2lvbiA9IG1jZV9idF9zZXQgJiYgYWRhcHRlcl9wb3dlcmluZ19kb3duKGFkYXB0
+ZXIpOworCisJaWYgKGNvbGxpc2lvbikKKwkJZ290byBkb25lOworCiAJaWYgKG1jZV9idF9zZXQp
+CiAJCWJ0ZF9hZGFwdGVyX3N3aXRjaF9vbmxpbmUoYWRhcHRlcik7CiAJZWxzZQpAQCAtMTI5LDYg
+KzEzOCwxOSBAQCBzdGF0aWMgdm9pZCBhZGFwdGVyX3Bvd2VyZWQoc3RydWN0IGJ0ZF9hZGFwdGVy
+ICphZGFwdGVyLCBnYm9vbGVhbiBwb3dlcmVkKQogCiAJREJHKCJhZGFwdGVyX3Bvd2VyZWQgY2Fs
+bGVkIHdpdGggJWQiLCBwb3dlcmVkKTsKIAorCS8qIGNoZWNrIGlmIHRoZSBwbHVnaW4gZ290IHRo
+ZSBnZXRfcmFkaW9fc3RhdGVzIHJlcGx5IGZyb20gdGhlCisJICAgbWNlIHdoZW4gdGhlIGFkYXB0
+ZXIgd2FzIG5vdCB5ZXQgZG93biBkdXJpbmcgdGhlIHBvd2VyCisJICAgY3ljbGluZyB3aGVuIGJs
+dWV0b290aGQgaXMgc3RhcnRlZCAqLworCWlmIChjb2xsaXNpb24pIHsKKwkJZXJyb3IoIm1hZW1v
+NjogcG93ZXJlZCBzdGF0ZSBjb2xsaXNpb24iKTsKKwkJY29sbGlzaW9uID0gRkFMU0U7CisKKwkJ
+aWYgKG1jZV9idF9zZXQpCisJCQlidGRfYWRhcHRlcl9zd2l0Y2hfb25saW5lKGFkYXB0ZXIpOwor
+CisJCXJldHVybjsKKwl9CisKIAkvKiBub3RoaW5nIHRvIGRvIGlmIHRoZSBzdGF0ZXMgbWF0Y2gg
+Ki8KIAlpZiAobWNlX2J0X3NldCA9PSBwb3dlcmVkKQogCQlyZXR1cm47CmRpZmYgLS1naXQgYS9z
+cmMvYWRhcHRlci5jIGIvc3JjL2FkYXB0ZXIuYwppbmRleCA0YWQ0MTY1Li45OGRiMmQ1IDEwMDY0
+NAotLS0gYS9zcmMvYWRhcHRlci5jCisrKyBiL3NyYy9hZGFwdGVyLmMKQEAgLTI1MDIsNiArMjUw
+Miw3IEBAIGludCBhZGFwdGVyX3N0b3Aoc3RydWN0IGJ0ZF9hZGFwdGVyICphZGFwdGVyKQogCWFk
+YXB0ZXItPnN0YXRlID0gRElTQ09WRVJfVFlQRV9OT05FOwogCWFkYXB0ZXItPmNhY2hlX2VuYWJs
+ZSA9IFRSVUU7CiAJYWRhcHRlci0+cGVuZGluZ19jb2QgPSAwOworCWFkYXB0ZXItPm9mZl9yZXF1
+ZXN0ZWQgPSBGQUxTRTsKIAogCWNhbGxfYWRhcHRlcl9wb3dlcmVkX2NhbGxiYWNrcyhhZGFwdGVy
+LCBGQUxTRSk7CiAKLS0gCjEuNi4wLjQKCg==
+--00c09f905ca3f64ac5048e175139--
