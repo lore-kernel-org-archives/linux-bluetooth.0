@@ -4,14 +4,14 @@ To: linux-bluetooth@vger.kernel.org
 Cc: rshaffer@codeaurora.org,
 	johan.hedberg@gmail.com,
 	marcel@holtmann.org
-Subject: [PATCH 0/3] Parsing of AMP related HCI commands and events 
-Date: Wed, 18 Aug 2010 16:38:51 -0700
-Message-Id: <1282174734-1314-1-git-send-email-ingas@codeaurora.org>
+Subject: [PATCH 0/3] Parsing of AMP related HCI commands and events
+Date: Tue, 17 Aug 2010 20:55:25 -0700
+Message-Id: <1282103728-32483-1-git-send-email-ingas@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Added support for interpreting of the following HCI commands:
 
-Create Physical Link,
+ Create Physical Link,
 Accept Physical Link,
 Disconnect Physical Link,
 Create Logical Link,
@@ -34,7 +34,7 @@ Logical Link Complete,
 Disconnect Logical Link Complete,
 Flow Spec Modify Complete
 
- 
+
 -- 
 Inga Stotland
 Sent by an employee of the Qualcomm Innovation Center, Inc.
