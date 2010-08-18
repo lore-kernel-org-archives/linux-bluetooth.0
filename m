@@ -2,33 +2,87 @@ Return-Path: <cyrus@holtmann.org>
 From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH 1/5] Add STANDARD and INTERLACED page scan definitions
-Date: Wed, 18 Aug 2010 13:35:56 +0300
-Message-Id: <1282127760-12655-2-git-send-email-dmitriy.paliy@nokia.com>
+Subject: [PATCH 2/5] Add fast connectable to hciops
+Date: Wed, 18 Aug 2010 13:35:57 +0300
+Message-Id: <1282127760-12655-3-git-send-email-dmitriy.paliy@nokia.com>
 In-Reply-To: <1282127760-12655-1-git-send-email-dmitriy.paliy@nokia.com>
 References: <1282127760-12655-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added standard and interlaced page scan type definitions. Used for
-both read and write page scan type HCI commands.
+Fast connectable switches between two sets of parameters to enable
+or disable fast page scan mode. Page scan interval and page scan
+type are changed to speed up connectabily when needed. When
+disabled it sets default values. List of btd_adapter_ops is updated
+respectively.
 ---
- lib/hci.h |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
+ plugins/hciops.c |   33 +++++++++++++++++++++++++++++++++
+ src/adapter.h    |    1 +
+ 2 files changed, 34 insertions(+), 0 deletions(-)
 
-diff --git a/lib/hci.h b/lib/hci.h
-index f31918d..0369ee2 100644
---- a/lib/hci.h
-+++ b/lib/hci.h
-@@ -992,6 +992,8 @@ typedef struct {
- #define OCF_READ_PAGE_SCAN_TYPE		0x0046
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index 9c97c5a..f1e9f69 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -716,6 +716,38 @@ static int hciops_cancel_resolve_name(int index, bdaddr_t *bdaddr)
+ 	return err;
+ }
  
- #define OCF_WRITE_PAGE_SCAN_TYPE	0x0047
-+	#define PAGE_SCAN_TYPE_STANDARD		0x00
-+	#define PAGE_SCAN_TYPE_INTERLACED	0x01
++static int hciops_fast_connectable(int index, gboolean enable)
++{
++	int dd, err = 0;
++	write_page_activity_cp cp;
++	uint8_t type;
++
++	if (enable) {
++		type = PAGE_SCAN_TYPE_INTERLACED;
++		cp.interval = 0x0024;	/* 22.5 msec page scan interval */
++	} else {
++		type = PAGE_SCAN_TYPE_STANDARD;	/* default */
++		cp.interval = 0x0800;	/* default 1.28 sec page scan */
++	}
++
++	cp.window = 0x0012;	/* default 11.25 msec page scan window */
++
++	dd = hci_open_dev(index);
++	if (dd < 0)
++		return -EIO;
++
++	if (hci_send_cmd(dd, OGF_HOST_CTL, OCF_WRITE_PAGE_ACTIVITY,
++					WRITE_PAGE_ACTIVITY_CP_SIZE, &cp) < 0)
++		err = -errno;
++	else if (hci_send_cmd(dd, OGF_HOST_CTL, OCF_WRITE_PAGE_SCAN_TYPE,
++								1, &type) < 0)
++		err = -errno;
++
++	hci_close_dev(dd);
++
++	return err;
++}
++
+ static struct btd_adapter_ops hci_ops = {
+ 	.setup = hciops_setup,
+ 	.cleanup = hciops_cleanup,
+@@ -732,6 +764,7 @@ static struct btd_adapter_ops hci_ops = {
+ 	.set_name = hciops_set_name,
+ 	.read_name = hciops_read_name,
+ 	.set_class = hciops_set_class,
++	.set_fast_connectable = hciops_fast_connectable,
+ };
  
- #define OCF_READ_AFH_MODE		0x0048
- typedef struct {
+ static int hciops_init(void)
+diff --git a/src/adapter.h b/src/adapter.h
+index 58853ac..657e035 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -183,6 +183,7 @@ struct btd_adapter_ops {
+ 	int (*set_name) (int index, const char *name);
+ 	int (*read_name) (int index);
+ 	int (*set_class) (int index, uint32_t class);
++	int (*set_fast_connectable) (int index, gboolean enable);
+ };
+ 
+ int btd_register_adapter_ops(struct btd_adapter_ops *btd_adapter_ops);
 -- 
 1.7.0.4
 
