@@ -1,44 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4C6BE410.1020505@csr.com>
-Date: Wed, 18 Aug 2010 14:45:52 +0100
-From: David Vrabel <david.vrabel@csr.com>
+Date: Wed, 18 Aug 2010 16:33:32 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Daniel =?iso-8859-1?Q?=D6rstadius?= <daniel.orstadius@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 3/3] Maemo6 MCE: handle race condition at startup
+Message-ID: <20100818133332.GA7018@jh-x301>
+References: <AANLkTikOj==zpA90bNAY0wVgXwQs1=a279RY8MNuz_KF@mail.gmail.com>
+ <AANLkTimfQxLOTFVW64qrQLHYVjwsmDkxvuBkL-_eBKHR@mail.gmail.com>
+ <AANLkTinmYUw=_BuaOE5MgEMvF9qU3Kr-=X52cQ5v-bfy@mail.gmail.com>
 MIME-Version: 1.0
-To: Mat Martineau <mathewm@codeaurora.org>
-CC: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        rshaffer@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH 1/1] Bluetooth:  Add socket option definitions for AMP
-References: <1282086426-8423-1-git-send-email-mathewm@codeaurora.org>
-In-Reply-To: <1282086426-8423-1-git-send-email-mathewm@codeaurora.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <AANLkTinmYUw=_BuaOE5MgEMvF9qU3Kr-=X52cQ5v-bfy@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Mat Martineau wrote:
-> This adds a new BT_AMP socket option to control the use of AMP channels.
-> It is for use with the SOL_BLUETOOTH option level on L2CAP sockets.
+Hi Daniel,
+
+On Wed, Aug 18, 2010, Daniel Örstadius wrote:
+> Patch without the off_requested part.
 > 
-> Available option values are defined as:
+> /Daniel
+>
+> From 3160d36371fe7c95ecd5a4eb3e167ac374dbc4d4 Mon Sep 17 00:00:00 2001
+> From: Daniel Orstadius <daniel.orstadius@nokia.com>
+> Date: Wed, 18 Aug 2010 15:48:28 +0300
+> Subject: [PATCH] Maemo6 MCE: handle race condition at startup
 > 
-> [lots of nice documentation]
+> Since bluetoothd power cycles the adapter at startup, it is possible
+> that the plugin gets a reply from reading the state of the MCE and
+> tries to power the adapter before it is down. The patch checks for
+> that situation and if it occurs postpones powering the adapter to
+> the powered state callback.
+> ---
+>  plugins/maemo6.c |   22 ++++++++++++++++++++++
+>  1 files changed, 22 insertions(+), 0 deletions(-)
 
-Why is none of this documentation in the code?
+Thanks. This one is now also upstream.
 
-I believe we also agreed that this policy could be changed at any point
-in the life time of the channel so this should be documented as well.
-
-> +#define BT_AMP		8
-
-Suggest BT_AMP_POLICY, BT_AMP_POLICY_REQUIRE_BR_EDR etc.  Just in case
-there are other AMP related socket options in the future.
-
-> +#define BT_AMP_REQUIRE_BR_EDR	0
-> +#define BT_AMP_PREFER_AMP	1
-> +#define BT_AMP_PREFER_BR_EDR	2
-
-David
--- 
-David Vrabel, Senior Software Engineer, Drivers
-CSR, Churchill House, Cambridge Business Park,  Tel: +44 (0)1223 692562
-Cowley Road, Cambridge, CB4 0WZ                 http://www.csr.com/
-
-
-Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
+Johan
