@@ -1,86 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 18 Aug 2010 14:15:16 +0300
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 0/5] Fast connectable mode for HFP (update)
+Message-ID: <20100818111516.GA2910@jh-x301>
+References: <1282127760-12655-1-git-send-email-dmitriy.paliy@nokia.com>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTikOj==zpA90bNAY0wVgXwQs1=a279RY8MNuz_KF@mail.gmail.com>
-References: <AANLkTikOj==zpA90bNAY0wVgXwQs1=a279RY8MNuz_KF@mail.gmail.com>
-Date: Wed, 18 Aug 2010 14:25:17 +0300
-Message-ID: <AANLkTimfQxLOTFVW64qrQLHYVjwsmDkxvuBkL-_eBKHR@mail.gmail.com>
-Subject: Re: [PATCH 3/3] Maemo6 MCE: handle race condition at startup
-From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=00c09f905ca3f64ac5048e175139
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1282127760-12655-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---00c09f905ca3f64ac5048e175139
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+Hi Dmitry,
 
-On Fri, Aug 13, 2010 at 12:19 PM, Daniel =D6rstadius
-<daniel.orstadius@gmail.com> wrote:
-> Since bluetoothd power cycles the adapter at startup, it is possible
-> that the plugin gets a reply from reading the state of the MCE and
-> tries to power the adapter before it is down. The patch checks for
-> that situation and if it occurs postpones powering the adapter to
-> the mode change callback. The off_requested member of btd_adapter
-> is used for the check, so it is set to FALSE when the adapter is
-> down.
->
+On Wed, Aug 18, 2010, Dmitriy Paliy wrote:
+> The following patches are implementation of fast connectable mode for HFP.
+> Such mode means significantly shorter page scan interval and interlaced
+> page scan type. As a result, HFP connection typically is created much faster.
+> The fast connectable mode can be activated by incomming call indicator and
+> deactivated by answer or reject call indicator. Such speeds up connectability
+> of a headset when there is an incomming call. Retransmisions in eSCO are
+> possiblle to be paused for in-band ring tone when the mode is enabled during
+> given above period of time. eSCO is not affected during call since page scan
+> settings are returned to their default values immidiately after call is
+> accepted (or rejected).
+> 
+> Use of the mode can be enabled by changing FastConnectable in audio.conf
+> configuration file. It is disabled by default. Also, it doesn't affect and
+> doesn't change any other interfaces.
 
-Attaching updated patch.
+Thanks for the patches. They've all been pushed upstream.
 
-/Daniel
+One thing that still needs discussing/consideration is the safeguard for
+setting the correct mode if bluetoothd crashed while we were in the fast
+connectable mode. Right now your patches take care of this in the audio
+plugin but in the future if other users of this new core daemon API come
+up the proper intialization should (imho) be inside the core daemon. We
+already do this for things like periodic inquiry where bluetoothd always
+sends the HCI_Exit_Periodic_Inquiry_Mode command when it starts up (in
+case bluetoothd previously crashed while discovering devices).
 
---00c09f905ca3f64ac5048e175139
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Maemo6-MCE-handle-race-condition-at-startup.patch"
-Content-Disposition: attachment;
-	filename="0001-Maemo6-MCE-handle-race-condition-at-startup.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_gd03hatq1
-
-RnJvbSBhYjEyNDlmNTA2NzNkNmRhMjI2YzFkOGY0OTBiOTYyZDk5OWZkODkwIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
-a2lhLmNvbT4KRGF0ZTogV2VkLCAxOCBBdWcgMjAxMCAxNDoyMjozMSArMDMwMApTdWJqZWN0OiBb
-UEFUQ0hdIE1hZW1vNiBNQ0U6IGhhbmRsZSByYWNlIGNvbmRpdGlvbiBhdCBzdGFydHVwCgpTaW5j
-ZSBibHVldG9vdGhkIHBvd2VyIGN5Y2xlcyB0aGUgYWRhcHRlciBhdCBzdGFydHVwLCBpdCBpcyBw
-b3NzaWJsZQp0aGF0IHRoZSBwbHVnaW4gZ2V0cyBhIHJlcGx5IGZyb20gcmVhZGluZyB0aGUgc3Rh
-dGUgb2YgdGhlIE1DRSBhbmQKdHJpZXMgdG8gcG93ZXIgdGhlIGFkYXB0ZXIgYmVmb3JlIGl0IGlz
-IGRvd24uIFRoZSBwYXRjaCBjaGVja3MgZm9yCnRoYXQgc2l0dWF0aW9uIGFuZCBpZiBpdCBvY2N1
-cnMgcG9zdHBvbmVzIHBvd2VyaW5nIHRoZSBhZGFwdGVyIHRvCnRoZSBwb3dlcmVkIHN0YXRlIGNh
-bGxiYWNrLiBUaGUgb2ZmX3JlcXVlc3RlZCBtZW1iZXIgb2YgYnRkX2FkYXB0ZXIKaXMgdXNlZCBm
-b3IgdGhlIGNoZWNrLCBzbyBpdCBpcyBzZXQgdG8gRkFMU0Ugd2hlbiB0aGUgYWRhcHRlciBpcwpk
-b3duLgotLS0KIHBsdWdpbnMvbWFlbW82LmMgfCAgIDIyICsrKysrKysrKysrKysrKysrKysrKysK
-IHNyYy9hZGFwdGVyLmMgICAgfCAgICAxICsKIDIgZmlsZXMgY2hhbmdlZCwgMjMgaW5zZXJ0aW9u
-cygrKSwgMCBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9wbHVnaW5zL21hZW1vNi5jIGIvcGx1
-Z2lucy9tYWVtbzYuYwppbmRleCA1NWVhNTA4Li5hZDg2YzMwIDEwMDY0NAotLS0gYS9wbHVnaW5z
-L21hZW1vNi5jCisrKyBiL3BsdWdpbnMvbWFlbW82LmMKQEAgLTUwLDYgKzUwLDcgQEAKIHN0YXRp
-YyBndWludCB3YXRjaF9pZDsKIHN0YXRpYyBEQnVzQ29ubmVjdGlvbiAqY29ubiA9IE5VTEw7CiBz
-dGF0aWMgZ2Jvb2xlYW4gbWNlX2J0X3NldCA9IEZBTFNFOworc3RhdGljIGdib29sZWFuIGNvbGxp
-c2lvbiA9IEZBTFNFOwogCiBzdGF0aWMgZ2Jvb2xlYW4gbWNlX3NpZ25hbF9jYWxsYmFjayhEQnVz
-Q29ubmVjdGlvbiAqY29ubmVjdGlvbiwKIAkJCQkJREJ1c01lc3NhZ2UgKm1lc3NhZ2UsIHZvaWQg
-KnVzZXJfZGF0YSkKQEAgLTExMiw2ICsxMTMsMTQgQEAgc3RhdGljIHZvaWQgcmVhZF9yYWRpb19z
-dGF0ZXNfY2IoREJ1c1BlbmRpbmdDYWxsICpjYWxsLCB2b2lkICp1c2VyX2RhdGEpCiAKIAltY2Vf
-YnRfc2V0ID0gcmFkaW9fc3RhdGVzICYgTUNFX1JBRElPX1NUQVRFX0JMVUVUT09USDsKIAorCS8q
-IGNoZWNrIGlmIHRoZSBhZGFwdGVyIGhhcyBub3QgY29tcGxldGVkIHRoZSBpbml0aWFsIHBvd2Vy
-CisJICAgY3ljbGUsIGlmIHNvIGRlbGF5IGFjdGlvbiB0byBtY2Vfbm90aWZ5X3Bvd2VyZWQgKi8K
-KworCWNvbGxpc2lvbiA9IG1jZV9idF9zZXQgJiYgYWRhcHRlcl9wb3dlcmluZ19kb3duKGFkYXB0
-ZXIpOworCisJaWYgKGNvbGxpc2lvbikKKwkJZ290byBkb25lOworCiAJaWYgKG1jZV9idF9zZXQp
-CiAJCWJ0ZF9hZGFwdGVyX3N3aXRjaF9vbmxpbmUoYWRhcHRlcik7CiAJZWxzZQpAQCAtMTI5LDYg
-KzEzOCwxOSBAQCBzdGF0aWMgdm9pZCBhZGFwdGVyX3Bvd2VyZWQoc3RydWN0IGJ0ZF9hZGFwdGVy
-ICphZGFwdGVyLCBnYm9vbGVhbiBwb3dlcmVkKQogCiAJREJHKCJhZGFwdGVyX3Bvd2VyZWQgY2Fs
-bGVkIHdpdGggJWQiLCBwb3dlcmVkKTsKIAorCS8qIGNoZWNrIGlmIHRoZSBwbHVnaW4gZ290IHRo
-ZSBnZXRfcmFkaW9fc3RhdGVzIHJlcGx5IGZyb20gdGhlCisJICAgbWNlIHdoZW4gdGhlIGFkYXB0
-ZXIgd2FzIG5vdCB5ZXQgZG93biBkdXJpbmcgdGhlIHBvd2VyCisJICAgY3ljbGluZyB3aGVuIGJs
-dWV0b290aGQgaXMgc3RhcnRlZCAqLworCWlmIChjb2xsaXNpb24pIHsKKwkJZXJyb3IoIm1hZW1v
-NjogcG93ZXJlZCBzdGF0ZSBjb2xsaXNpb24iKTsKKwkJY29sbGlzaW9uID0gRkFMU0U7CisKKwkJ
-aWYgKG1jZV9idF9zZXQpCisJCQlidGRfYWRhcHRlcl9zd2l0Y2hfb25saW5lKGFkYXB0ZXIpOwor
-CisJCXJldHVybjsKKwl9CisKIAkvKiBub3RoaW5nIHRvIGRvIGlmIHRoZSBzdGF0ZXMgbWF0Y2gg
-Ki8KIAlpZiAobWNlX2J0X3NldCA9PSBwb3dlcmVkKQogCQlyZXR1cm47CmRpZmYgLS1naXQgYS9z
-cmMvYWRhcHRlci5jIGIvc3JjL2FkYXB0ZXIuYwppbmRleCA0YWQ0MTY1Li45OGRiMmQ1IDEwMDY0
-NAotLS0gYS9zcmMvYWRhcHRlci5jCisrKyBiL3NyYy9hZGFwdGVyLmMKQEAgLTI1MDIsNiArMjUw
-Miw3IEBAIGludCBhZGFwdGVyX3N0b3Aoc3RydWN0IGJ0ZF9hZGFwdGVyICphZGFwdGVyKQogCWFk
-YXB0ZXItPnN0YXRlID0gRElTQ09WRVJfVFlQRV9OT05FOwogCWFkYXB0ZXItPmNhY2hlX2VuYWJs
-ZSA9IFRSVUU7CiAJYWRhcHRlci0+cGVuZGluZ19jb2QgPSAwOworCWFkYXB0ZXItPm9mZl9yZXF1
-ZXN0ZWQgPSBGQUxTRTsKIAogCWNhbGxfYWRhcHRlcl9wb3dlcmVkX2NhbGxiYWNrcyhhZGFwdGVy
-LCBGQUxTRSk7CiAKLS0gCjEuNi4wLjQKCg==
---00c09f905ca3f64ac5048e175139--
+Johan
