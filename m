@@ -1,83 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 18 Aug 2010 16:16:55 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Daniel =?iso-8859-1?Q?=D6rstadius?= <daniel.orstadius@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Clear the off_requested flag
+Message-ID: <20100818131655.GA6341@jh-x301>
+References: <AANLkTimJAT2+gxQCOXwBmyF7a_9BU2FQW2uQn0KiLcgx@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTimfQxLOTFVW64qrQLHYVjwsmDkxvuBkL-_eBKHR@mail.gmail.com>
-References: <AANLkTikOj==zpA90bNAY0wVgXwQs1=a279RY8MNuz_KF@mail.gmail.com>
-	<AANLkTimfQxLOTFVW64qrQLHYVjwsmDkxvuBkL-_eBKHR@mail.gmail.com>
-Date: Wed, 18 Aug 2010 16:20:49 +0300
-Message-ID: <AANLkTinmYUw=_BuaOE5MgEMvF9qU3Kr-=X52cQ5v-bfy@mail.gmail.com>
-Subject: Re: [PATCH 3/3] Maemo6 MCE: handle race condition at startup
-From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=001485f9a7542d7816048e18ef07
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <AANLkTimJAT2+gxQCOXwBmyF7a_9BU2FQW2uQn0KiLcgx@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---001485f9a7542d7816048e18ef07
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+Hi Daniel,
 
-On Wed, Aug 18, 2010 at 2:25 PM, Daniel =D6rstadius
-<daniel.orstadius@gmail.com> wrote:
-> On Fri, Aug 13, 2010 at 12:19 PM, Daniel =D6rstadius
-> <daniel.orstadius@gmail.com> wrote:
->> Since bluetoothd power cycles the adapter at startup, it is possible
->> that the plugin gets a reply from reading the state of the MCE and
->> tries to power the adapter before it is down. The patch checks for
->> that situation and if it occurs postpones powering the adapter to
->> the mode change callback. The off_requested member of btd_adapter
->> is used for the check, so it is set to FALSE when the adapter is
->> down.
->>
->
-> Attaching updated patch.
->
+On Wed, Aug 18, 2010, Daniel Örstadius wrote:
+> From: Daniel Orstadius <daniel.orstadius@nokia.com>
+> Date: Wed, 18 Aug 2010 15:46:11 +0300
+> Subject: [PATCH] Clear the off_requested flag
+> 
+> Set the off_requested flag in struct btd_adapter to false when
+> receiving confirmation that the adapter is off. The flag is used
+> to indicate that the adapter is in the powering down state and
+> should be cleared when it is actually down.
+> ---
+>  src/adapter.c |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
 
-Patch without the off_requested part.
+Thanks. The patch is now upstream.
 
-/Daniel
-
---001485f9a7542d7816048e18ef07
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Maemo6-MCE-handle-race-condition-at-startup.patch"
-Content-Disposition: attachment;
-	filename="0001-Maemo6-MCE-handle-race-condition-at-startup.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_gd07mmr21
-
-RnJvbSAzMTYwZDM2MzcxZmU3Yzk1ZWNkNWE0ZWIzZTE2N2FjMzc0ZGJjNGQ0IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
-a2lhLmNvbT4KRGF0ZTogV2VkLCAxOCBBdWcgMjAxMCAxNTo0ODoyOCArMDMwMApTdWJqZWN0OiBb
-UEFUQ0hdIE1hZW1vNiBNQ0U6IGhhbmRsZSByYWNlIGNvbmRpdGlvbiBhdCBzdGFydHVwCgpTaW5j
-ZSBibHVldG9vdGhkIHBvd2VyIGN5Y2xlcyB0aGUgYWRhcHRlciBhdCBzdGFydHVwLCBpdCBpcyBw
-b3NzaWJsZQp0aGF0IHRoZSBwbHVnaW4gZ2V0cyBhIHJlcGx5IGZyb20gcmVhZGluZyB0aGUgc3Rh
-dGUgb2YgdGhlIE1DRSBhbmQKdHJpZXMgdG8gcG93ZXIgdGhlIGFkYXB0ZXIgYmVmb3JlIGl0IGlz
-IGRvd24uIFRoZSBwYXRjaCBjaGVja3MgZm9yCnRoYXQgc2l0dWF0aW9uIGFuZCBpZiBpdCBvY2N1
-cnMgcG9zdHBvbmVzIHBvd2VyaW5nIHRoZSBhZGFwdGVyIHRvCnRoZSBwb3dlcmVkIHN0YXRlIGNh
-bGxiYWNrLgotLS0KIHBsdWdpbnMvbWFlbW82LmMgfCAgIDIyICsrKysrKysrKysrKysrKysrKysr
-KysKIDEgZmlsZXMgY2hhbmdlZCwgMjIgaW5zZXJ0aW9ucygrKSwgMCBkZWxldGlvbnMoLSkKCmRp
-ZmYgLS1naXQgYS9wbHVnaW5zL21hZW1vNi5jIGIvcGx1Z2lucy9tYWVtbzYuYwppbmRleCA1NWVh
-NTA4Li5hZDg2YzMwIDEwMDY0NAotLS0gYS9wbHVnaW5zL21hZW1vNi5jCisrKyBiL3BsdWdpbnMv
-bWFlbW82LmMKQEAgLTUwLDYgKzUwLDcgQEAKIHN0YXRpYyBndWludCB3YXRjaF9pZDsKIHN0YXRp
-YyBEQnVzQ29ubmVjdGlvbiAqY29ubiA9IE5VTEw7CiBzdGF0aWMgZ2Jvb2xlYW4gbWNlX2J0X3Nl
-dCA9IEZBTFNFOworc3RhdGljIGdib29sZWFuIGNvbGxpc2lvbiA9IEZBTFNFOwogCiBzdGF0aWMg
-Z2Jvb2xlYW4gbWNlX3NpZ25hbF9jYWxsYmFjayhEQnVzQ29ubmVjdGlvbiAqY29ubmVjdGlvbiwK
-IAkJCQkJREJ1c01lc3NhZ2UgKm1lc3NhZ2UsIHZvaWQgKnVzZXJfZGF0YSkKQEAgLTExMiw2ICsx
-MTMsMTQgQEAgc3RhdGljIHZvaWQgcmVhZF9yYWRpb19zdGF0ZXNfY2IoREJ1c1BlbmRpbmdDYWxs
-ICpjYWxsLCB2b2lkICp1c2VyX2RhdGEpCiAKIAltY2VfYnRfc2V0ID0gcmFkaW9fc3RhdGVzICYg
-TUNFX1JBRElPX1NUQVRFX0JMVUVUT09USDsKIAorCS8qIGNoZWNrIGlmIHRoZSBhZGFwdGVyIGhh
-cyBub3QgY29tcGxldGVkIHRoZSBpbml0aWFsIHBvd2VyCisJICAgY3ljbGUsIGlmIHNvIGRlbGF5
-IGFjdGlvbiB0byBtY2Vfbm90aWZ5X3Bvd2VyZWQgKi8KKworCWNvbGxpc2lvbiA9IG1jZV9idF9z
-ZXQgJiYgYWRhcHRlcl9wb3dlcmluZ19kb3duKGFkYXB0ZXIpOworCisJaWYgKGNvbGxpc2lvbikK
-KwkJZ290byBkb25lOworCiAJaWYgKG1jZV9idF9zZXQpCiAJCWJ0ZF9hZGFwdGVyX3N3aXRjaF9v
-bmxpbmUoYWRhcHRlcik7CiAJZWxzZQpAQCAtMTI5LDYgKzEzOCwxOSBAQCBzdGF0aWMgdm9pZCBh
-ZGFwdGVyX3Bvd2VyZWQoc3RydWN0IGJ0ZF9hZGFwdGVyICphZGFwdGVyLCBnYm9vbGVhbiBwb3dl
-cmVkKQogCiAJREJHKCJhZGFwdGVyX3Bvd2VyZWQgY2FsbGVkIHdpdGggJWQiLCBwb3dlcmVkKTsK
-IAorCS8qIGNoZWNrIGlmIHRoZSBwbHVnaW4gZ290IHRoZSBnZXRfcmFkaW9fc3RhdGVzIHJlcGx5
-IGZyb20gdGhlCisJICAgbWNlIHdoZW4gdGhlIGFkYXB0ZXIgd2FzIG5vdCB5ZXQgZG93biBkdXJp
-bmcgdGhlIHBvd2VyCisJICAgY3ljbGluZyB3aGVuIGJsdWV0b290aGQgaXMgc3RhcnRlZCAqLwor
-CWlmIChjb2xsaXNpb24pIHsKKwkJZXJyb3IoIm1hZW1vNjogcG93ZXJlZCBzdGF0ZSBjb2xsaXNp
-b24iKTsKKwkJY29sbGlzaW9uID0gRkFMU0U7CisKKwkJaWYgKG1jZV9idF9zZXQpCisJCQlidGRf
-YWRhcHRlcl9zd2l0Y2hfb25saW5lKGFkYXB0ZXIpOworCisJCXJldHVybjsKKwl9CisKIAkvKiBu
-b3RoaW5nIHRvIGRvIGlmIHRoZSBzdGF0ZXMgbWF0Y2ggKi8KIAlpZiAobWNlX2J0X3NldCA9PSBw
-b3dlcmVkKQogCQlyZXR1cm47Ci0tIAoxLjYuMC40Cgo=
---001485f9a7542d7816048e18ef07--
+Johan
