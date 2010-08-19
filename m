@@ -1,40 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 19 Aug 2010 18:02:10 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "Marcel J.E. Mol" <marcel@mesa.nl>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] IrMC sync server support
-Message-ID: <20100819150210.GA19066@jh-x301>
-References: <201008121013.o7CADR8r004125@joshua.mesa.nl>
- <1281613299.12579.266.camel@localhost.localdomain>
- <20100816172238.GA27814@joshua.mesa.nl>
- <AANLkTi=p5WD+WELPNo=URLVTnpaKQ4xFk9Efu2HiviYE@mail.gmail.com>
- <20100817084850.GA16821@joshua.mesa.nl>
- <AANLkTinD_KNBBpxwXZ8gB5p2o+NA_ThfbmspXe-5NGEc@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTinD_KNBBpxwXZ8gB5p2o+NA_ThfbmspXe-5NGEc@mail.gmail.com>
+From: Zhenhua Zhang <zhenhua.zhang@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 8/8] btio: Remove libbluetooth dependence for obexd
+Date: Thu, 19 Aug 2010 22:21:16 +0800
+Message-Id: <1282227676-15381-9-git-send-email-zhenhua.zhang@intel.com>
+In-Reply-To: <1282227676-15381-1-git-send-email-zhenhua.zhang@intel.com>
+References: <1282227676-15381-1-git-send-email-zhenhua.zhang@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Remove libbluetooth dependence for obex server daemon. obex-test and
+obex-client still require libbluetooth because of sdp related
+dependence.
+---
+ Makefile.am |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-On Thu, Aug 19, 2010, Luiz Augusto von Dentz wrote:
-> We decided to use 14, also Johan pushed a complete list of bluez
-> assigned number to:
-> 
-> http://git.kernel.org/?p=bluetooth/bluez.git;a=commitdiff;h=fbeff4fd303b43fa7f6c27e95fb6f023e80720a9;hp=0627552640140e1d986d36bb4770ccc4b3206b03
-> 
-> Could you please update your changes to use 14? Also there seems to be
-> some white spaces that doesn't follow our code styling, could you
-> please fix those?
+diff --git a/Makefile.am b/Makefile.am
+index f77fa27..05755a8 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -75,7 +75,7 @@ src_obexd_SOURCES = $(gdbus_sources) $(builtin_sources) $(btio_sources) \
+ 
+ src_obexd_LDADD = @DBUS_LIBS@ @GLIB_LIBS@ @GTHREAD_LIBS@ \
+ 					@EBOOK_LIBS@ @OPENOBEX_LIBS@ \
+-					@BLUEZ_LIBS@ @LIBICAL_LIBS@ -ldl
++					@LIBICAL_LIBS@ -ldl
+ 
+ src_obexd_LDFLAGS = -Wl,--export-dynamic
+ 
+-- 
+1.7.0.4
 
-Since Luiz didn't send an update here about the status I'll do it to
-avoid duplicate work at your end. Luiz went ahead and did the cleanups
-himself (and I added a few more on top of that) and the resulting patch
-is now pushed upstream. Btw, it'd proabably be a good idea for you to
-hang out on the #obexd channel on freenode since that's where many of
-these quick interactions and decisions seem to be happening now days.
-
-Johan
