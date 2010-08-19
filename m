@@ -1,38 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20100819074920.GA5401@jh-x301>
-References: <AANLkTikEHVwEXQg=0ahqwDOANa-VPLjd11xC2ri2N8d5@mail.gmail.com>
-	<20100819074920.GA5401@jh-x301>
-Date: Thu, 19 Aug 2010 19:25:48 +1100
-Message-ID: <AANLkTindRBGJtWuE8OX+fAEAQOSQHzEgLdGdUUHfOKKT@mail.gmail.com>
-Subject: Re: its possible to make a streaming video whith bluez?
-From: Alexander Orlenko <zxteam@gmail.com>
-To: Lorenzo Brito Morales <lorenzo.brito@gmail.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH 1/2] bluetooth: Add support Bluetooth controller of
+ MacbookPro 6,2
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
+Cc: linux-bluetooth@vger.kernel.org, stable@kernel.org
+In-Reply-To: <1282197259-16609-1-git-send-email-iwamatsu@nigauri.org>
+References: <1282197259-16609-1-git-send-email-iwamatsu@nigauri.org>
+Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 19 Aug 2010 10:11:10 +0200
+Message-ID: <1282205470.23399.156.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> Do you have plans to implement this for BlueZ?
-It's a GSoC'10 project. http://hostisdown.org/gsoc/projects/vdp
+Hi Nobuhiro.
 
-On 19 August 2010 18:49, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi,
->
-> On Thu, Aug 19, 2010, Lorenzo Brito Morales wrote:
->> its possible to make a streaming video whith bluez?
->
-> Not right now.
->
->> if not, are there plans to implementing?
->
-> Nothing concrete, but at least the first requirement would be for there
-> to exist some devices on the market that support VDP. Do you know any?
-> Do you have plans to implement this for BlueZ?
->
-> Johan
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+> Bluetooth controller of MacbookPro 6,2 does not work.
+> Because Device Class of these controllers was set 255 (Vendor Sepecific Class).
+> 
+> Signed-off-by: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
+
+it would be nice if you include the output from /proc/bus/usb/devices or
+usb-devices.sh script to proof the different device class.
+
+Regards
+
+Marcel
+
+
