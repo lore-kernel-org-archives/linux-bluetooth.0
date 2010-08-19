@@ -1,30 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 1/2] bluetooth: Add support Bluetooth controller of
- MacbookPro 6,2
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
-Cc: linux-bluetooth@vger.kernel.org, stable@kernel.org
-In-Reply-To: <1282197259-16609-1-git-send-email-iwamatsu@nigauri.org>
-References: <1282197259-16609-1-git-send-email-iwamatsu@nigauri.org>
-Content-Type: text/plain; charset="UTF-8"
-Date: Thu, 19 Aug 2010 10:11:10 +0200
-Message-ID: <1282205470.23399.156.camel@localhost.localdomain>
-Mime-Version: 1.0
+Date: Thu, 19 Aug 2010 11:03:24 +0300
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fix problem with multiple emails in vcard
+Message-ID: <20100819080323.GA6125@jh-x301>
+References: <1282200587-5475-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1282200587-5475-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nobuhiro.
+Hi Radek,
 
-> Bluetooth controller of MacbookPro 6,2 does not work.
-> Because Device Class of these controllers was set 255 (Vendor Sepecific Class).
-> 
-> Signed-off-by: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
+On Thu, Aug 19, 2010, Radoslaw Jablonski wrote:
+> Previously only one email appeared in generated vcard, even if contact
+> had defined multiple email addresses in contact data.
+> Changed vcard struct and phonebook-tracker pull_contacts func to support
+> multiple emails.
+> ---
+>  plugins/phonebook-tracker.c |   99 +++++++++++++++++++++++++++++-------------
+>  plugins/vcard.c             |   12 ++++-
+>  plugins/vcard.h             |    2 +-
+>  3 files changed, 78 insertions(+), 35 deletions(-)
 
-it would be nice if you include the output from /proc/bus/usb/devices or
-usb-devices.sh script to proof the different device class.
+Thanks. The patch is now upstream.
 
-Regards
-
-Marcel
-
-
+Johan
