@@ -2,38 +2,28 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Briglia <anderson.briglia@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Briglia <anderson.briglia@openbossa.org>
-Subject: [PATCH] hciconfig: add LE_SET_ADVERTISE_ENABLE cmd
-Date: Thu, 19 Aug 2010 11:43:07 -0400
-Message-Id: <1282232587-14551-1-git-send-email-anderson.briglia@openbossa.org>
+Subject: [PATCH v2] Bluetooth: Implement LE Set Advertise Enable cmd
+Date: Thu, 19 Aug 2010 11:42:38 -0400
+Message-Id: <1282232558-14472-1-git-send-email-anderson.briglia@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch implements two new hciconfig commands: leadv and noleadv.
-These new hciconfig flags are responsible to LE_SET_ADVERTISE_ENABLE
-command implementation.
----
- lib/hci.c         |    1 +
- lib/hci.h         |    1 +
- tools/hciconfig.c |   46 ++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 48 insertions(+), 0 deletions(-)
+This patch implements LE Set Advertise Enable command for dual mode and
+Low Energy hci controllers. It also adds new HCI flags in order to
+indicate the Advertising state for userland applications and kernel
+itself.
 
-diff --git a/lib/hci.c b/lib/hci.c
-index 3304daa..64ac5f2 100644
---- a/lib/hci.c
-+++ b/lib/hci.c
-@@ -188,6 +188,7 @@ static hci_map dev_flags_map[] = {
- 	{ "INQUIRY", HCI_INQUIRY },
- 	{ "AUTH",    HCI_AUTH    },
- 	{ "ENCRYPT", HCI_ENCRYPT },
-+	{ "LEADV",   HCI_LE_ADV	 },
- 	{ NULL }
- };
- 
-diff --git a/lib/hci.h b/lib/hci.h
-index 512dab9..8b9d33f 100644
---- a/lib/hci.h
-+++ b/lib/hci.h
-@@ -73,6 +73,7 @@ enum {
+Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
+---
+ include/net/bluetooth/hci.h |    6 ++++++
+ net/bluetooth/hci_event.c   |   27 +++++++++++++++++++++++++++
+ 2 files changed, 33 insertions(+), 0 deletions(-)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index bcbdd6d..cae1816 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -76,6 +76,7 @@ enum {
  	HCI_INQUIRY,
  
  	HCI_RAW,
@@ -41,70 +31,63 @@ index 512dab9..8b9d33f 100644
  };
  
  /* HCI ioctl defines */
-diff --git a/tools/hciconfig.c b/tools/hciconfig.c
-index 87dd127..ba12a8a 100644
---- a/tools/hciconfig.c
-+++ b/tools/hciconfig.c
-@@ -149,6 +149,50 @@ static void cmd_scan(int ctl, int hdev, char *opt)
- 	}
+@@ -593,6 +594,11 @@ struct hci_rp_read_bd_addr {
+ 	bdaddr_t bdaddr;
+ } __packed;
+ 
++/* --- HCI LE Commands --- */
++#define HCI_OP_LE_SET_ADVERTISE_ENABLE	0x200a
++	#define ADVERTISE_ENABLED	0x01
++	#define ADVERTISE_DISABLED	0x00
++
+ /* ---- HCI Events ---- */
+ #define HCI_EV_INQUIRY_COMPLETE		0x01
+ 
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index bfef5ba..c86c655 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -822,6 +822,29 @@ static void hci_cs_exit_sniff_mode(struct hci_dev *hdev, __u8 status)
+ 	hci_dev_unlock(hdev);
  }
  
-+static void cmd_le_adv(int ctl, int hdev, char *opt)
++static void hci_cc_le_set_advertise(struct hci_dev *hdev, struct sk_buff *skb)
 +{
++	__u8 status = *((__u8 *) skb->data);
++	void *sent;
 +
-+	struct hci_request rq;
-+	le_set_advertise_enable_cp advertise_cp;
-+	uint8_t status;
-+	uint8_t enable;
-+	int dd, ret;
++	BT_DBG("%s status 0x%x", hdev->name, status);
 +
-+	if (hdev < 0)
-+		hdev = hci_get_route(NULL);
++	sent = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_ADVERTISE_ENABLE);
++	if (!sent)
++		return;
 +
-+	dd = hci_open_dev(hdev);
-+	if (dd < 0) {
-+		perror("Could not open device");
-+		exit(1);
++	if (!status) {
++		__u8 param = *((__u8 *) sent);
++
++		clear_bit(HCI_LE_ADV, &hdev->flags);
++
++		if (param & ADVERTISE_ENABLED)
++			set_bit(HCI_LE_ADV, &hdev->flags);
 +	}
 +
-+	enable = 0x01;
-+	if (!strcmp(opt, "noleadv"))
-+		enable = 0x00;
-+
-+	memset(&advertise_cp, 0, sizeof(advertise_cp));
-+	advertise_cp.enable = enable;
-+
-+	memset(&rq, 0, sizeof(rq));
-+	rq.ogf = OGF_LE_CTL;
-+	rq.ocf = OCF_LE_SET_ADVERTISE_ENABLE;
-+	rq.cparam = &advertise_cp;
-+	rq.clen = LE_SET_ADVERTISE_ENABLE_CP_SIZE;
-+	rq.rparam = &status;
-+	rq.rlen = 1;
-+
-+	ret = hci_send_req(dd, &rq, 100);
-+
-+	if (status || ret < 0) {
-+		errno = EIO;
-+		fprintf(stderr, "Can't set advertise mode on hci%d: %s (%d)\n",
-+						hdev, strerror(errno), errno);
-+	}
-+
-+	hci_close_dev(dd);
++	hci_req_complete(hdev, status);
 +}
 +
- static void cmd_iac(int ctl, int hdev, char *opt)
+ static inline void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
  {
- 	int s = hci_open_dev(hdev);
-@@ -1728,6 +1772,8 @@ static struct {
- 	{ "revision",	cmd_revision,	0,		"Display revision information" },
- 	{ "block",	cmd_block,	"<bdaddr>",	"Add a device to the blacklist" },
- 	{ "unblock",	cmd_unblock,	"<bdaddr>",	"Remove a device from the blacklist" },
-+	{ "leadv",	cmd_le_adv,	0,		"Enable LE advertising" },
-+	{ "noleadv",	cmd_le_adv,	0,		"Disable LE advertising" },
- 	{ NULL, NULL, 0 }
- };
+ 	__u8 status = *((__u8 *) skb->data);
+@@ -1310,6 +1333,10 @@ static inline void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *sk
+ 		hci_cc_read_bd_addr(hdev, skb);
+ 		break;
  
++	case HCI_OP_LE_SET_ADVERTISE_ENABLE:
++		hci_cc_le_set_advertise(hdev, skb);
++		break;
++
+ 	default:
+ 		BT_DBG("%s opcode 0x%x", hdev->name, opcode);
+ 		break;
 -- 
 1.7.0.4
 
