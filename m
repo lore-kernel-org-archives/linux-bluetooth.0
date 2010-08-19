@@ -1,93 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Briglia <anderson.briglia@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Briglia <anderson.briglia@openbossa.org>
-Subject: [PATCH v2] Bluetooth: Implement LE Set Advertise Enable cmd
-Date: Thu, 19 Aug 2010 11:42:38 -0400
-Message-Id: <1282232558-14472-1-git-send-email-anderson.briglia@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 19 Aug 2010 18:02:10 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "Marcel J.E. Mol" <marcel@mesa.nl>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] IrMC sync server support
+Message-ID: <20100819150210.GA19066@jh-x301>
+References: <201008121013.o7CADR8r004125@joshua.mesa.nl>
+ <1281613299.12579.266.camel@localhost.localdomain>
+ <20100816172238.GA27814@joshua.mesa.nl>
+ <AANLkTi=p5WD+WELPNo=URLVTnpaKQ4xFk9Efu2HiviYE@mail.gmail.com>
+ <20100817084850.GA16821@joshua.mesa.nl>
+ <AANLkTinD_KNBBpxwXZ8gB5p2o+NA_ThfbmspXe-5NGEc@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <AANLkTinD_KNBBpxwXZ8gB5p2o+NA_ThfbmspXe-5NGEc@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch implements LE Set Advertise Enable command for dual mode and
-Low Energy hci controllers. It also adds new HCI flags in order to
-indicate the Advertising state for userland applications and kernel
-itself.
+Hi,
 
-Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
----
- include/net/bluetooth/hci.h |    6 ++++++
- net/bluetooth/hci_event.c   |   27 +++++++++++++++++++++++++++
- 2 files changed, 33 insertions(+), 0 deletions(-)
+On Thu, Aug 19, 2010, Luiz Augusto von Dentz wrote:
+> We decided to use 14, also Johan pushed a complete list of bluez
+> assigned number to:
+> 
+> http://git.kernel.org/?p=bluetooth/bluez.git;a=commitdiff;h=fbeff4fd303b43fa7f6c27e95fb6f023e80720a9;hp=0627552640140e1d986d36bb4770ccc4b3206b03
+> 
+> Could you please update your changes to use 14? Also there seems to be
+> some white spaces that doesn't follow our code styling, could you
+> please fix those?
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index bcbdd6d..cae1816 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -76,6 +76,7 @@ enum {
- 	HCI_INQUIRY,
- 
- 	HCI_RAW,
-+	HCI_LE_ADV,
- };
- 
- /* HCI ioctl defines */
-@@ -593,6 +594,11 @@ struct hci_rp_read_bd_addr {
- 	bdaddr_t bdaddr;
- } __packed;
- 
-+/* --- HCI LE Commands --- */
-+#define HCI_OP_LE_SET_ADVERTISE_ENABLE	0x200a
-+	#define ADVERTISE_ENABLED	0x01
-+	#define ADVERTISE_DISABLED	0x00
-+
- /* ---- HCI Events ---- */
- #define HCI_EV_INQUIRY_COMPLETE		0x01
- 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index bfef5ba..c86c655 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -822,6 +822,29 @@ static void hci_cs_exit_sniff_mode(struct hci_dev *hdev, __u8 status)
- 	hci_dev_unlock(hdev);
- }
- 
-+static void hci_cc_le_set_advertise(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	__u8 status = *((__u8 *) skb->data);
-+	void *sent;
-+
-+	BT_DBG("%s status 0x%x", hdev->name, status);
-+
-+	sent = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_ADVERTISE_ENABLE);
-+	if (!sent)
-+		return;
-+
-+	if (!status) {
-+		__u8 param = *((__u8 *) sent);
-+
-+		clear_bit(HCI_LE_ADV, &hdev->flags);
-+
-+		if (param & ADVERTISE_ENABLED)
-+			set_bit(HCI_LE_ADV, &hdev->flags);
-+	}
-+
-+	hci_req_complete(hdev, status);
-+}
-+
- static inline void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	__u8 status = *((__u8 *) skb->data);
-@@ -1310,6 +1333,10 @@ static inline void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *sk
- 		hci_cc_read_bd_addr(hdev, skb);
- 		break;
- 
-+	case HCI_OP_LE_SET_ADVERTISE_ENABLE:
-+		hci_cc_le_set_advertise(hdev, skb);
-+		break;
-+
- 	default:
- 		BT_DBG("%s opcode 0x%x", hdev->name, opcode);
- 		break;
--- 
-1.7.0.4
+Since Luiz didn't send an update here about the status I'll do it to
+avoid duplicate work at your end. Luiz went ahead and did the cleanups
+himself (and I added a few more on top of that) and the resulting patch
+is now pushed upstream. Btw, it'd proabably be a good idea for you to
+hang out on the #obexd channel on freenode since that's where many of
+these quick interactions and decisions seem to be happening now days.
 
+Johan
