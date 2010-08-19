@@ -1,30 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 19 Aug 2010 11:03:24 +0300
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix problem with multiple emails in vcard
-Message-ID: <20100819080323.GA6125@jh-x301>
-References: <1282200587-5475-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+Date: Thu, 19 Aug 2010 10:49:20 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Lorenzo Brito Morales <lorenzo.brito@gmail.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: its possible to make a streaming video whith bluez?
+Message-ID: <20100819074920.GA5401@jh-x301>
+References: <AANLkTikEHVwEXQg=0ahqwDOANa-VPLjd11xC2ri2N8d5@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1282200587-5475-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+In-Reply-To: <AANLkTikEHVwEXQg=0ahqwDOANa-VPLjd11xC2ri2N8d5@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Radek,
+Hi,
 
-On Thu, Aug 19, 2010, Radoslaw Jablonski wrote:
-> Previously only one email appeared in generated vcard, even if contact
-> had defined multiple email addresses in contact data.
-> Changed vcard struct and phonebook-tracker pull_contacts func to support
-> multiple emails.
-> ---
->  plugins/phonebook-tracker.c |   99 +++++++++++++++++++++++++++++-------------
->  plugins/vcard.c             |   12 ++++-
->  plugins/vcard.h             |    2 +-
->  3 files changed, 78 insertions(+), 35 deletions(-)
+On Thu, Aug 19, 2010, Lorenzo Brito Morales wrote:
+> its possible to make a streaming video whith bluez?
 
-Thanks. The patch is now upstream.
+Not right now.
+
+> if not, are there plans to implementing?
+
+Nothing concrete, but at least the first requirement would be for there
+to exist some devices on the market that support VDP. Do you know any?
+Do you have plans to implement this for BlueZ?
 
 Johan
