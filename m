@@ -1,30 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 19 Aug 2010 11:33:23 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Alexander Orlenko <zxteam@gmail.com>
+Cc: Lorenzo Brito Morales <lorenzo.brito@gmail.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: its possible to make a streaming video whith bluez?
+Message-ID: <20100819083323.GA7327@jh-x301>
+References: <AANLkTikEHVwEXQg=0ahqwDOANa-VPLjd11xC2ri2N8d5@mail.gmail.com>
+ <20100819074920.GA5401@jh-x301>
+ <AANLkTindRBGJtWuE8OX+fAEAQOSQHzEgLdGdUUHfOKKT@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTimXDqAej=LAVDvDgspKuH_SAKivp9eL8R9tXPJc@mail.gmail.com>
-References: <AANLkTimXDqAej=LAVDvDgspKuH_SAKivp9eL8R9tXPJc@mail.gmail.com>
-Date: Thu, 19 Aug 2010 11:49:52 +0300
-Message-ID: <AANLkTi=qrkSSmDNcVNpFm=3=5mSzs9Se08h8JDryDcOu@mail.gmail.com>
-Subject: Re: BlueZ's A2DP sink role
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Pavan Savoy <pavan_savoy@sify.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <AANLkTindRBGJtWuE8OX+fAEAQOSQHzEgLdGdUUHfOKKT@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Pavan,
+On Thu, Aug 19, 2010, Alexander Orlenko wrote:
+> > Do you have plans to implement this for BlueZ?
+> It's a GSoC'10 project. http://hostisdown.org/gsoc/projects/vdp
 
-On Wed, Aug 18, 2010 at 11:22 PM, Pavan Savoy <pavan_savoy@sify.com> wrote:
-> As I understand, the A2DP sink role is @ audio/source.c and A2DP
-> source role is at sink.c ? (or what is called as the interfaces?..)
-> Also How do I test out a2dp sink role in BlueZ, any test audio-server
-> I can run ?
+Ha. Seems I've missed that one completely (though not really a surprise
+since there doesn't seem to have been any communication about it here on
+the mailing list).
 
-You can use PA as explained in Joao Paulo's blog:
-
-http://jprvita.wordpress.com/2009/12/15/1-2-3-4-a2dp-stream/
-
-
--- 
-Luiz Augusto von Dentz
-Computer Engineer
+Johan
