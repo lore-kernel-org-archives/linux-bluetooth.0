@@ -1,49 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <201008201635.o7KGZLs1009991@joshua.mesa.nl>
-From: Marcel Mol <marcel@mesa.nl>
-Date: Fri, 20 Aug 2010 18:32:05 +0200
-Subject: [PATCH] Makefile.am fixes
-To: linux-bluetooth@vger.kernel.org
+Date: Fri, 20 Aug 2010 18:58:57 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Tom Counihan <tomcounihan@googlemail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Remove dup VCard2.1 SDP format for OPP
+Message-ID: <20100820155857.GA19398@jh-x301>
+References: <AANLkTin+CRVwKgC+UaDK6q4PRrw9eGi3c7++PSxWODcu@mail.gmail.com>
+ <20100820125948.GA16376@jh-x301>
+ <AANLkTi=YeYGdojmXt-0gRdXPafsupP6CZc4r7dj2ufAg@mail.gmail.com>
+ <AANLkTim9y59pMzPGSkZi431oTAjEjdiEtQHnt_-D2z85@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <AANLkTim9y59pMzPGSkZi431oTAjEjdiEtQHnt_-D2z85@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-phonebook.h should not be under _nodist.
-vcard.[ch] is not related to pbap, but to phonebook backend
----
- Makefile.am |    6 +++---
- 1 files changed, 3 insertions(+), 3 deletions(-)
+Hi Tom,
 
-diff --git a/Makefile.am b/Makefile.am
-index 07fc27d..fdc4f7e 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -52,8 +52,7 @@ builtin_modules += ftp
- builtin_sources += plugins/ftp.c
- 
- builtin_modules += pbap
--builtin_sources += plugins/pbap.c plugins/phonebook.h \
--			plugins/vcard.h plugins/vcard.c
-+builtin_sources += plugins/pbap.c
- 
- builtin_modules += irmc
- builtin_sources += plugins/irmc.c
-@@ -61,6 +60,8 @@ builtin_sources += plugins/irmc.c
- builtin_modules += syncevolution
- builtin_sources += plugins/syncevolution.c
- 
-+builtin_sources += plugins/phonebook.h plugins/vcard.h plugins/vcard.c
-+
- builtin_nodist += plugins/phonebook.c
- 
- libexec_PROGRAMS += src/obexd
-@@ -99,7 +100,6 @@ src/plugin.$(OBJEXT): src/builtin.h
- 
- src/builtin.h: src/genbuiltin $(builtin_sources)
- 	$(AM_V_GEN)$(srcdir)/src/genbuiltin $(builtin_modules) > $@
--
- endif
- 
- if CLIENT
--- 
-1.7.2.1
+On Fri, Aug 20, 2010, Tom Counihan wrote:
+> Attaching patch as an attachment - hopefully all should be fine now.
 
+Yes, it was fine. The patch is now upstream. Thanks.
+
+Johan
