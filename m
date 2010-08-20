@@ -1,59 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <AANLkTik5Q0CpUu=wpz_X8An1h6ShTku19xUff3O39Bkx@mail.gmail.com>
-References: <AANLkTikW-OW+Rib6+d6J2vvLeGeTjhR26X2m4Rjnh0fr@mail.gmail.com>
-	<AANLkTi=8KS=_z05WgXJLf1Kc0WJqzrWX104eZmQaqJ+B@mail.gmail.com>
-	<AANLkTik5Q0CpUu=wpz_X8An1h6ShTku19xUff3O39Bkx@mail.gmail.com>
-Date: Fri, 20 Aug 2010 09:50:20 -0700
-Message-ID: <AANLkTi=-ZyBUa-QBGoH0N69W5Pa=vz2=s2qSwoLfpu-=@mail.gmail.com>
-Subject: Re: PAN performance
-From: Han <keepsimple@gmail.com>
-To: Arun Kumar <arunkat@gmail.com>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Message-Id: <201008201635.o7KGZLs1009991@joshua.mesa.nl>
+From: Marcel Mol <marcel@mesa.nl>
+Date: Fri, 20 Aug 2010 18:32:05 +0200
+Subject: [PATCH] Makefile.am fixes
+To: linux-bluetooth@vger.kernel.org
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arun,
-I was able to transfer pictures and file over BT in fair good speed. I
-yet to test the actual bps though.  I will check out the
-configurations...
-thanks
-Han
+phonebook.h should not be under _nodist.
+vcard.[ch] is not related to pbap, but to phonebook backend
+---
+ Makefile.am |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
 
-On Thu, Aug 19, 2010 at 10:55 PM, Arun Kumar <arunkat@gmail.com> wrote:
-> Hello Han,
->
-> just curious--are you able to get good performance[upto 3 Mbps] with non-pan
-> bluez profiles? as BT speeds depend on HCI transports too used below viz.
-> UARTS. They may not be configured optimally for BR/EDR high speeds...
->
-> --
-> Best Regards,
-> Arun Kumar Singh
->
->
->> On Fri, Aug 20, 2010 at 9:27 AM, Han <keepsimple@gmail.com> wrote:
->>>
->>> Hi,
->>> I have been using bluetooth PAN to run some personal programs. One
->>> thing I noticed is that PAN seems to be very slow (i.e. not up to
->>> 3Mbps for BT 2.0). I have bluetooth 2.0 adapters on my laptops and I
->>> do SSH over PAN.  Whenever I run a GUI application (on sshd server), i
->>> see the GUI response is very slow.  It is not video or anything so I
->>> don't think it needs up to 3Mbps. Is this slowness over PAN expected?
->>>
->>> Thanks.
->>> Han
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe
->>> linux-bluetooth" in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->>
->>
->>
->>
->
->
->
+diff --git a/Makefile.am b/Makefile.am
+index 07fc27d..fdc4f7e 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -52,8 +52,7 @@ builtin_modules += ftp
+ builtin_sources += plugins/ftp.c
+ 
+ builtin_modules += pbap
+-builtin_sources += plugins/pbap.c plugins/phonebook.h \
+-			plugins/vcard.h plugins/vcard.c
++builtin_sources += plugins/pbap.c
+ 
+ builtin_modules += irmc
+ builtin_sources += plugins/irmc.c
+@@ -61,6 +60,8 @@ builtin_sources += plugins/irmc.c
+ builtin_modules += syncevolution
+ builtin_sources += plugins/syncevolution.c
+ 
++builtin_sources += plugins/phonebook.h plugins/vcard.h plugins/vcard.c
++
+ builtin_nodist += plugins/phonebook.c
+ 
+ libexec_PROGRAMS += src/obexd
+@@ -99,7 +100,6 @@ src/plugin.$(OBJEXT): src/builtin.h
+ 
+ src/builtin.h: src/genbuiltin $(builtin_sources)
+ 	$(AM_V_GEN)$(srcdir)/src/genbuiltin $(builtin_modules) > $@
+-
+ endif
+ 
+ if CLIENT
+-- 
+1.7.2.1
+
