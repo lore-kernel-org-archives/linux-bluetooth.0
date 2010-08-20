@@ -1,46 +1,21 @@
 Return-Path: <cyrus@holtmann.org>
-From: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
+MIME-Version: 1.0
+Date: Thu, 19 Aug 2010 20:57:42 -0700
+Message-ID: <AANLkTikW-OW+Rib6+d6J2vvLeGeTjhR26X2m4Rjnh0fr@mail.gmail.com>
+Subject: PAN performance
+From: Han <keepsimple@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
-Subject: [PATCH 1/2 v3] bluetooth: Add support Bluetooth controller of MacbookPro 6,2
-Date: Fri, 20 Aug 2010 16:24:06 +0900
-Message-Id: <1282289047-21444-1-git-send-email-iwamatsu@nigauri.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Bluetooth controller of MacbookPro 6,2 does not work.
-Because Device Class of these controllers was set 255 (Vendor Sepecific Class).
+Hi,
+I have been using bluetooth PAN to run some personal programs. One
+thing I noticed is that PAN seems to be very slow (i.e. not up to
+3Mbps for BT 2.0). I have bluetooth 2.0 adapters on my laptops and I
+do SSH over PAN.  Whenever I run a GUI application (on sshd server), i
+see the GUI response is very slow.  It is not video or anything so I
+don't think it needs up to 3Mbps. Is this slowness over PAN expected?
 
-T:  Bus=01 Lev=03 Prnt=03 Port=02 Cnt=03 Dev#=  8 Spd=12  MxCh= 0
-D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=05ac ProdID=8218 Rev=00.22
-S:  Manufacturer=Apple Inc.
-S:  Product=Bluetooth USB Host Controller
-C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
-
-Signed-off-by: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
----
- drivers/bluetooth/btusb.c |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index d22ce3c..9fb8635 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -62,6 +62,9 @@ static struct usb_device_id btusb_table[] = {
- 	/* Apple iMac11,1 */
- 	{ USB_DEVICE(0x05ac, 0x8215) },
- 
-+	/* Apple MacBookPro6,2 */
-+	{ USB_DEVICE(0x05ac, 0x8218) },
-+
- 	/* AVM BlueFRITZ! USB v2.0 */
- 	{ USB_DEVICE(0x057c, 0x3800) },
- 
--- 
-1.7.1
-
+Thanks.
+Han
