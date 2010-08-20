@@ -1,41 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 20 Aug 2010 13:55:39 +0300
+From: Ville Tervo <ville.tervo@nokia.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] bluetooth: fix not setting security level when
+ creating a rfcomm session
+Message-ID: <20100820105539.GB1835@null.mobile.lnx.nokia.com>
+References: <1282215970-32758-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1282227676-15381-1-git-send-email-zhenhua.zhang@intel.com>
-References: <1282227676-15381-1-git-send-email-zhenhua.zhang@intel.com>
-Date: Fri, 20 Aug 2010 14:39:06 +0300
-Message-ID: <AANLkTi=B=GoXrymjfKAnXuRDiTe7Uxqdiqs831nsWRb-@mail.gmail.com>
-Subject: Re: [PATCH 0/8] Clean up Obex btio.[ch] and make it self contained
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Zhenhua Zhang <zhenhua.zhang@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1282215970-32758-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Thu, Aug 19, 2010 at 01:06:10PM +0200, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+> 
+> This cause 'No Bonding' to be used if userspace has not yet been paired
+> with remote device since the l2cap socket used to create the rfcomm
+> session does not have any security level set.
 
-On Thu, Aug 19, 2010 at 5:21 PM, Zhenhua Zhang <zhenhua.zhang@intel.com> wrote:
-> Hi,
->
-> This series of patches is to seperate btio.[ch] from src to btio directory. To make btio.[ch] self contained for obexd, there're some cleanup work:
+Looks good.
 
-Sounds good, this should make it easier to maintain those in sync with
-other projects using it.
+> Signed-off-by: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-> 1. remove unused bt_io_set(). It is neither used by bluez or obexd.
-> 2. remove unused SCO/L2RAW related code for Obexd. Note: BlueZ code requires SCO/L2RAW related functions. We may consider to add them back later.
-
-Im not so sure if we want to have this code removed, obviously after
-that in case of changes/fixes they may not apply cleanly in all
-projects, so keeping them in sync won't be as easy anymore.
-
-> 3. replace void *userdata with gpointer userdata. To make it consistent with bluez btio.c
-> 4. refactor hci_devba into devid2ba. Remove dependence with hci*.h
-> 5. Remove libbluetooth dependence for obexd.
-
-This is fine as long as the other copies have this changes too.
-
+Acked-by: Ville Tervo <ville.tervo@nokia.com>
 
 -- 
-Luiz Augusto von Dentz
-Computer Engineer
+Ville
