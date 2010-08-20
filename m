@@ -1,113 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 21 Aug 2010 01:37:57 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Matthew Wilson <mtwilson@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	rshaffer@codeaurora.org
-Subject: Re: [PATCH v3] Firmware download for Qualcomm Bluetooth devices
-Message-ID: <20100820223757.GA23924@jh-x301>
-References: <4C6BFF05.5040506@codeaurora.org>
- <1282340251-10676-1-git-send-email-mtwilson@codeaurora.org>
+From: "Cayetanot, Sebastien" <sebastien.cayetanot@intel.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Fri, 20 Aug 2010 23:15:44 +0100
+Subject: HCIConfig - BD Address not updated automatically
+Message-ID: <79C392C3A040A44895195AED5DB296F7AC3F2A46@irsmsx502.ger.corp.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1282340251-10676-1-git-send-email-mtwilson@codeaurora.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Matt,
+All,
 
-On Fri, Aug 20, 2010, Matthew Wilson wrote:
-> Configures device address from hciattach parameter.
-> UART speed limited to 115200.
-> Requires separate device specific firmware.
-> ---
->  Makefile.tools             |    3 +-
->  tools/hciattach.c          |   10 ++
->  tools/hciattach.h          |    1 +
->  tools/hciattach_qualcomm.c |  279 ++++++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 292 insertions(+), 1 deletions(-)
->  create mode 100644 tools/hciattach_qualcomm.c
+I'm currently facing an issue regarding the command hciconfig.
 
-Thanks, the patch applies cleanly now. However, I spotted a couple of
-whitespace/coding style issues that would be good to get fixed before
-pushing this upstream:
+On my device :
 
-> +#define FAILIF(x, args...) do {   \
-> +	if (x) {					  \
-> +		fprintf(stderr, ##args);  \
-> +		return -1;				  \
-> +	}							  \
-> +} while(0)
+I have run hciconfig hci0 in order to check if the hci interface is up and to get the BD_Addr.
 
-Before each \ at the end of the line you use a mix of tabs and spaces.
-Please just use tabs.
+I sent an hcitool cmd to change the BD_Addr. The command is accepted.
 
-> +typedef struct {
-> +	uint8_t uart_prefix;
-> +	hci_event_hdr hci_hdr;
-> +	evt_cmd_complete cmd_complete;
-> +	uint8_t status;
-> +	uint8_t data[16];
-> +} __attribute__((packed)) command_complete_t;
-> +
-> +
+Just after I run the Ifconfig command but the BD_Addr is not changed it still the old one.
 
-Why the two consecutive empty lines? Please remove one.
+If I use a linux laptop to scan BT device, the device is seen with changed BD_Addr.
 
-> +static int read_command_complete(int fd, unsigned short opcode, unsigned char len) {
+I have sent the hci command manually to read th BD_Addr on my device and the BD_Addr return is the one modified.
 
-This one looks like it goes beyond 80 columns. Please split it. Also,
-the coding style is to put the opening brace of a function on its own
-line.
+Just after by running Ifconfig, the BD_Addr is updated.
 
-> +	FAILIF(resp.hci_hdr.evt != EVT_CMD_COMPLETE, /* event must be event-complete */
-> +		   "Error in response: not a cmd-complete event, "
-> +		   "but 0x%02x!\n", resp.hci_hdr.evt);
+Is it normal that hciconfig never read the BD_Addr automatically ? even if I do a HIC reset.
 
-Mixed tabs and spaces for indentation. Please just use tabs.
+My feeling is that the BD_Addr is read one time at the beginning and never updated until we manually read the BD_Addr using the hci command.
 
-> +	FAILIF(resp.hci_hdr.plen < 4, /* plen >= 4 for EVT_CMD_COMPLETE */
-> +		   "Error in response: plen is not >= 4, but 0x%02x!\n",
-> +		   resp.hci_hdr.plen);
+Any idea? 
 
-Same here.
+Regards
+---------------------------------------------------------------------
+Intel Corporation SAS (French simplified joint stock company)
+Registered headquarters: "Les Montalets"- 2, rue de Paris, 
+92196 Meudon Cedex, France
+Registration Number:  302 456 199 R.C.S. NANTERRE
+Capital: 4,572,000 Euros
 
-> +
-> +	/* cmd-complete event: opcode */
-> +	FAILIF(resp.cmd_complete.opcode != 0,
-> +		   "Error in response: opcode is 0x%04x, not 0!",
-> +		   resp.cmd_complete.opcode);
+This e-mail and any attachments may contain confidential material for
+the sole use of the intended recipient(s). Any review or distribution
+by others is strictly prohibited. If you are not the intended
+recipient, please contact the sender and delete all copies.
 
-And here.
-
-> +static int qualcomm_load_firmware(int fd, const char *firmware, const char *bdaddr_s) {
-
-This one goes beyond 80 columns too and the opening brace should be on
-its own line.
-
-> +	FAILIF(fw < 0,
-> +		   "Could not open firmware file %s: %s (%d).\n",
-> +		   firmware, strerror(errno), errno);
-
-Mixed tabs and spaces for indentation.
-
-> +		FAILIF(read(fw, data, cmd->plen) != cmd->plen,
-> +			   "Could not read %d bytes of data for command with opcode %04x!\n",
-> +			   cmd->plen,
-> +			   cmd->opcode);
-
-Same here.
-
-> +			FAILIF(nw != (int) sizeof(cmdp) + cmd->plen,
-> +				   "Could not send entire command (sent only %d bytes)!\n",
-> +				   nw);
-
-And here.
-
-> +		if (read_command_complete(fd,
-> +					  cmd->opcode,
-> +					  cmd->plen) < 0) {
-
-And here. Why do you split it into three lines when it all fits within
-80 columns?
-
-Johan
