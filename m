@@ -1,59 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 23 Aug 2010 23:50:44 +0300
+Date: Mon, 23 Aug 2010 23:41:07 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lukasz Pawlik <lucas.pawlik@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix issues with emails category
-Message-ID: <20100823205044.GA10600@jh-x301>
-References: <AANLkTi=KpD_dtVVe7tSBT-+Kv11QsXf-WbtanAe3ur9-@mail.gmail.com>
+To: Matthew Wilson <mtwilson@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+	rshaffer@codeaurora.org
+Subject: Re: [PATCH v4] Firmware download for Qualcomm Bluetooth devices
+Message-ID: <20100823204107.GA7225@jh-x301>
+References: <20100820223757.GA23924@jh-x301>
+ <1282580267-2146-1-git-send-email-mtwilson@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTi=KpD_dtVVe7tSBT-+Kv11QsXf-WbtanAe3ur9-@mail.gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1282580267-2146-1-git-send-email-mtwilson@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+Hi Matt,
 
-On Mon, Aug 23, 2010, Lukasz Pawlik wrote:
-> From: Lukasz Pawlik <lucas.pawlik@gmail.com>
-> Date: Mon, 23 Aug 2010 15:25:20 +0200
-> Subject: [PATCH] Fix issues with emails category
-> 
-> Previously all emails sent during phonebook pull had the same
-> category INTERNET. Now email are sent with valid category name
-> (INTERNET;HOME or INTERNET;WORK)
+On Mon, Aug 23, 2010, Matthew Wilson wrote:
+> Configures device address from hciattach parameter.
+> UART speed limited to 115200.
+> Requires separate device specific firmware.
 > ---
->  plugins/phonebook-tracker.c |   31 +++++++++++++++++--------
->  plugins/vcard.c             |   53 ++++++++++++++++++++++++++++++++++---------
->  plugins/vcard.h             |   11 +++++++++
->  3 files changed, 74 insertions(+), 21 deletions(-)
+>  Makefile.tools             |    3 +-
+>  tools/hciattach.c          |   10 ++
+>  tools/hciattach.h          |    1 +
+>  tools/hciattach_qualcomm.c |  279 ++++++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 292 insertions(+), 1 deletions(-)
+>  create mode 100644 tools/hciattach_qualcomm.c
 
-Thanks. The patch is now pushed upstream, but I had to make a few coding
-style fixes before that:
-
-> +static struct phonebook_email *find_email(GSList *emails, const char *address,
-> +										int type)
-
-Over 80 column line.
-
-> +	for (l = emails; l; l = l->next) {
-> +		struct phonebook_email *email;
-> +		email = l->data;
-
-You don't really need the variable definition and assignment on
-different lines here.
-
-> +static void add_email(struct phonebook_contact *contact, const char *address,
-> +						int type)
-
-The continuation line should be indented as much as possible as long as
-you don't go beyond 80 columns. (not sure if this is a kernel coding
-style thingie but at least Marcel wants it that way).
-
-> +static void vcard_printf_email(GString *vcards, uint8_t format,
-> +								const char *address,
-> +								enum phonebook_email_type category)
-
-Way over 80 column lines. Are you using some other tab-width than 8?
+Thanks. The patch is now pushed upstream with a few more cosmetic
+(coding style) changes. Take a look at the upstream tree if you're
+interested in the details.
 
 Johan
