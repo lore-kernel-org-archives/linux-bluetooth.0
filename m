@@ -1,127 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 23 Aug 2010 15:00:14 +0200 (CEST)
+From: Jiri Kosina <jkosina@suse.cz>
+To: Alan Ott <alan@signal11.us>
+Cc: Stefan Achatz <erazor_de@users.sourceforge.net>,
+	Antonio Ospite <ospite@studenti.unina.it>,
+	Alexey Dobriyan <adobriyan@gmail.com>, Tejun Heo <tj@kernel.org>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	Greg Kroah-Hartman <gregkh@suse.de>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Stephane Chatty <chatty@enac.fr>,
+	Michael Poole <mdpoole@troilus.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Bastien Nocera <hadess@hadess.net>,
+	Eric Dumazet <eric.dumazet@gmail.com>, linux-input@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v4 0/2] Get and Set Feature Reports on HIDRAW (USB and
+ Bluetooth)
+In-Reply-To: <1281990059-3562-1-git-send-email-alan@signal11.us>
+Message-ID: <alpine.LNX.2.00.1008231459370.1019@pobox.suse.cz>
+References: <1281442367.12579.206.camel@localhost.localdomain> <1281990059-3562-1-git-send-email-alan@signal11.us>
 MIME-Version: 1.0
-Date: Mon, 23 Aug 2010 15:45:25 +0200
-Message-ID: <AANLkTi=KpD_dtVVe7tSBT-+Kv11QsXf-WbtanAe3ur9-@mail.gmail.com>
-Subject: [PATCH] Fix issues with emails category
-From: Lukasz Pawlik <lucas.pawlik@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=001485f5afa855139a048e7ddcd2
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---001485f5afa855139a048e7ddcd2
-Content-Type: text/plain; charset=ISO-8859-1
+On Mon, 16 Aug 2010, Alan Ott wrote:
 
+> This is version 4. Built against 2.6.35+ revision 320b2b8de12698 .
+> 
+> Alan Ott (2):
+>   HID: Add Support for Setting and Getting Feature Reports from hidraw
+>   Bluetooth: hidp: Add support for hidraw  HIDIOCGFEATURE  and
+>     HIDIOCSFEATURE
+> 
+>  drivers/hid/hidraw.c          |  105 ++++++++++++++++++++++++++++++++++++--
+>  drivers/hid/usbhid/hid-core.c |   37 +++++++++++++-
+>  include/linux/hid.h           |    3 +
+>  include/linux/hidraw.h        |    3 +
+>  net/bluetooth/hidp/core.c     |  114 +++++++++++++++++++++++++++++++++++++++--
+>  net/bluetooth/hidp/hidp.h     |    8 +++
+>  6 files changed, 260 insertions(+), 10 deletions(-)
 
+Marcel, as per our previous discussion -- what is your word on this? I'd 
+be glad taking it once you Ack the bluetooth bits (which, as far as I 
+understood from your last mail, don't have strong objections against any 
+more).
 
---001485f5afa855139a048e7ddcd2
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Fix-issues-with-emails-category.patch"
-Content-Disposition: attachment;
-	filename="0001-Fix-issues-with-emails-category.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_gd7dm4kk0
+Thanks,
 
-RnJvbSAzNWU2YmVhZWE3YTIwYzQyYzNiZDEzYWY5YjE4ZTA4ODNkZDMzZjY2IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBMdWthc3ogUGF3bGlrIDxsdWNhcy5wYXdsaWtAZ21haWwuY29t
-PgpEYXRlOiBNb24sIDIzIEF1ZyAyMDEwIDE1OjI1OjIwICswMjAwClN1YmplY3Q6IFtQQVRDSF0g
-Rml4IGlzc3VlcyB3aXRoIGVtYWlscyBjYXRlZ29yeQoKUHJldmlvdXNseSBhbGwgZW1haWxzIHNl
-bnQgZHVyaW5nIHBob25lYm9vayBwdWxsIGhhZCB0aGUgc2FtZQpjYXRlZ29yeSBJTlRFUk5FVC4g
-Tm93IGVtYWlsIGFyZSBzZW50IHdpdGggdmFsaWQgY2F0ZWdvcnkgbmFtZQooSU5URVJORVQ7SE9N
-RSBvciBJTlRFUk5FVDtXT1JLKQotLS0KIHBsdWdpbnMvcGhvbmVib29rLXRyYWNrZXIuYyB8ICAg
-MzEgKysrKysrKysrKysrKysrKystLS0tLS0tLQogcGx1Z2lucy92Y2FyZC5jICAgICAgICAgICAg
-IHwgICA1MyArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tCiBwbHVn
-aW5zL3ZjYXJkLmggICAgICAgICAgICAgfCAgIDExICsrKysrKysrKwogMyBmaWxlcyBjaGFuZ2Vk
-LCA3NCBpbnNlcnRpb25zKCspLCAyMSBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9wbHVnaW5z
-L3Bob25lYm9vay10cmFja2VyLmMgYi9wbHVnaW5zL3Bob25lYm9vay10cmFja2VyLmMKaW5kZXgg
-M2Y2M2RjYi4uMzU3NDJiNiAxMDA2NDQKLS0tIGEvcGx1Z2lucy9waG9uZWJvb2stdHJhY2tlci5j
-CisrKyBiL3BsdWdpbnMvcGhvbmVib29rLXRyYWNrZXIuYwpAQCAtNjg3LDI3ICs2ODcsMzggQEAg
-c3RhdGljIHZvaWQgYWRkX3Bob25lX251bWJlcihzdHJ1Y3QgcGhvbmVib29rX2NvbnRhY3QgKmNv
-bnRhY3QsCiAJY29udGFjdC0+bnVtYmVycyA9IGdfc2xpc3RfYXBwZW5kKGNvbnRhY3QtPm51bWJl
-cnMsIG51bWJlcik7CiB9CiAKLXN0YXRpYyBnY2hhciAqZmluZF9lbWFpbChHU0xpc3QgKmVtYWls
-cywgY29uc3QgY2hhciAqZW1haWwpCitzdGF0aWMgc3RydWN0IHBob25lYm9va19lbWFpbCAqZmlu
-ZF9lbWFpbChHU0xpc3QgKmVtYWlscywgY29uc3QgY2hhciAqYWRkcmVzcywKKwkJCQkJCQkJCQlp
-bnQgdHlwZSkKIHsKIAlHU0xpc3QgKmw7CiAKLQlmb3IgKGwgPSBlbWFpbHM7IGw7IGwgPSBsLT5u
-ZXh0KQotCQlpZiAoZ19zdHJjbXAwKGwtPmRhdGEsIGVtYWlsKSA9PSAwKQotCQkJcmV0dXJuIGwt
-PmRhdGE7CisJZm9yIChsID0gZW1haWxzOyBsOyBsID0gbC0+bmV4dCkgeworCQlzdHJ1Y3QgcGhv
-bmVib29rX2VtYWlsICplbWFpbDsKKwkJZW1haWwgPSBsLT5kYXRhOworCQlpZiAoZ19zdHJjbXAw
-KGVtYWlsLT5hZGRyZXNzLCBhZGRyZXNzKSA9PSAwICYmCisJCQkJCWVtYWlsLT50eXBlID09IHR5
-cGUpCisJCQlyZXR1cm4gZW1haWw7CisJfQogCiAJcmV0dXJuIE5VTEw7CiB9CiAKLXN0YXRpYyB2
-b2lkIGFkZF9lbWFpbChzdHJ1Y3QgcGhvbmVib29rX2NvbnRhY3QgKmNvbnRhY3QsIGNvbnN0IGNo
-YXIgKmVtYWlsKQorc3RhdGljIHZvaWQgYWRkX2VtYWlsKHN0cnVjdCBwaG9uZWJvb2tfY29udGFj
-dCAqY29udGFjdCwgY29uc3QgY2hhciAqYWRkcmVzcywKKwkJCQkJCWludCB0eXBlKQogewotCWlm
-IChlbWFpbCA9PSBOVUxMIHx8IHN0cmxlbihlbWFpbCkgPT0gMCkKKwlzdHJ1Y3QgcGhvbmVib29r
-X2VtYWlsICplbWFpbDsKKwlpZiAoYWRkcmVzcyA9PSBOVUxMIHx8IHN0cmxlbihhZGRyZXNzKSA9
-PSAwKQogCQlyZXR1cm47CiAKIAkvKiBOb3QgYWRkaW5nIGVtYWlsIGlmIHRoZXJlIGlzIGFscmVh
-ZHkgYWRkZWQgd2l0aCB0aGUgc2FtZSB2YWx1ZSAqLwotCWlmIChmaW5kX2VtYWlsKGNvbnRhY3Qt
-PmVtYWlscywgZW1haWwpKQorCWlmIChmaW5kX2VtYWlsKGNvbnRhY3QtPmVtYWlscywgYWRkcmVz
-cywgdHlwZSkpCiAJCXJldHVybjsKIAotCWNvbnRhY3QtPmVtYWlscyA9IGdfc2xpc3RfYXBwZW5k
-KGNvbnRhY3QtPmVtYWlscywgZ19zdHJkdXAoZW1haWwpKTsKKwllbWFpbCA9IGdfbmV3MChzdHJ1
-Y3QgcGhvbmVib29rX2VtYWlsLCAxKTsKKwllbWFpbC0+YWRkcmVzcyA9IGdfc3RyZHVwKGFkZHJl
-c3MpOworCWVtYWlsLT50eXBlID0gdHlwZTsKKworCWNvbnRhY3QtPmVtYWlscyA9IGdfc2xpc3Rf
-YXBwZW5kKGNvbnRhY3QtPmVtYWlscywgZW1haWwpOwogfQogCiBzdGF0aWMgR1N0cmluZyAqZ2Vu
-X3ZjYXJkcyhHU0xpc3QgKmNvbnRhY3RzLApAQCAtODE3LDggKzgyOCw4IEBAIGFkZF9udW1iZXJz
-OgogCWFkZF9waG9uZV9udW1iZXIoY29udGFjdCwgcmVwbHlbQ09MX0ZBWF9OVU1CRVJdLCBURUxf
-VFlQRV9GQVgpOwogCiAJLyogQWRkaW5nIGVtYWlscyAqLwotCWFkZF9lbWFpbChjb250YWN0LCBy
-ZXBseVtDT0xfSE9NRV9FTUFJTF0pOwotCWFkZF9lbWFpbChjb250YWN0LCByZXBseVtDT0xfV09S
-S19FTUFJTF0pOworCWFkZF9lbWFpbChjb250YWN0LCByZXBseVtDT0xfSE9NRV9FTUFJTF0sIEVN
-QUlMX1RZUEVfSE9NRSk7CisJYWRkX2VtYWlsKGNvbnRhY3QsIHJlcGx5W0NPTF9XT1JLX0VNQUlM
-XSwgRU1BSUxfVFlQRV9XT1JLKTsKIAogCURCRygiY29udGFjdCAlcCIsIGNvbnRhY3QpOwogCmRp
-ZmYgLS1naXQgYS9wbHVnaW5zL3ZjYXJkLmMgYi9wbHVnaW5zL3ZjYXJkLmMKaW5kZXggMGVlZDhh
-ZS4uM2I2NzUzNSAxMDA2NDQKLS0tIGEvcGx1Z2lucy92Y2FyZC5jCisrKyBiL3BsdWdpbnMvdmNh
-cmQuYwpAQCAtMzA2LDE5ICszMDYsMzkgQEAgc3RhdGljIHZvaWQgdmNhcmRfcHJpbnRmX3NsYXNo
-X3RhZyhHU3RyaW5nICp2Y2FyZHMsIGNvbnN0IGNoYXIgKnRhZywKIAl2Y2FyZF9wcmludGYodmNh
-cmRzLCAiJXM6JXMiLCBidWYsIGZpZWxkKTsKIH0KIAotc3RhdGljIHZvaWQgdmNhcmRfcHJpbnRm
-X2VtYWlsKEdTdHJpbmcgKnZjYXJkcywgY29uc3QgY2hhciAqZW1haWwpCitzdGF0aWMgdm9pZCB2
-Y2FyZF9wcmludGZfZW1haWwoR1N0cmluZyAqdmNhcmRzLCB1aW50OF90IGZvcm1hdCwKKwkJCQkJ
-CQkJY29uc3QgY2hhciAqYWRkcmVzcywKKwkJCQkJCQkJZW51bSBwaG9uZWJvb2tfZW1haWxfdHlw
-ZSBjYXRlZ29yeSkKIHsKKwljb25zdCBjaGFyICpjYXRlZ29yeV9zdHJpbmcgPSAiIjsKKwljaGFy
-IGZpZWxkW0xFTl9NQVhdOwogCWludCBsZW4gPSAwOwogCi0JaWYgKGVtYWlsKQotCQlsZW4gPSBz
-dHJsZW4oZW1haWwpOworCWlmICghYWRkcmVzcyB8fCAhKGxlbiA9IHN0cmxlbihhZGRyZXNzKSkp
-CisJCXJldHVybjsKIAotCWlmIChsZW4pIHsKLQkJY2hhciBmaWVsZFtMRU5fTUFYXTsKLQkJYWRk
-X3NsYXNoKGZpZWxkLCBlbWFpbCwgTEVOX01BWCwgbGVuKTsKLQkJdmNhcmRfcHJpbnRmKHZjYXJk
-cywKLQkJCQkiRU1BSUw7VFlQRT1JTlRFUk5FVDolcyIsIGZpZWxkKTsKKwlzd2l0Y2ggKGNhdGVn
-b3J5KXsKKwljYXNlIEVNQUlMX1RZUEVfSE9NRToKKwkJaWYgKGZvcm1hdCA9PSBGT1JNQVRfVkNB
-UkQyMSkKKwkJCWNhdGVnb3J5X3N0cmluZyA9ICJJTlRFUk5FVDtIT01FIjsKKwkJZWxzZSBpZiAo
-Zm9ybWF0ID09IEZPUk1BVF9WQ0FSRDMwKQorCQkJY2F0ZWdvcnlfc3RyaW5nID0gIlRZUEU9SU5U
-RVJORVQ7VFlQRT1IT01FIjsKKwkJYnJlYWs7CisJY2FzZSBFTUFJTF9UWVBFX1dPUks6CisJCWlm
-IChmb3JtYXQgPT0gRk9STUFUX1ZDQVJEMjEpCisJCQljYXRlZ29yeV9zdHJpbmcgPSAiSU5URVJO
-RVQ7V09SSyI7CisJCWVsc2UgaWYgKGZvcm1hdCA9PSBGT1JNQVRfVkNBUkQzMCkKKwkJCWNhdGVn
-b3J5X3N0cmluZyA9ICJUWVBFPUlOVEVSTkVUO1RZUEU9V09SSyI7CisJCWJyZWFrOworCWRlZmF1
-bHQ6CisJCWlmIChmb3JtYXQgPT0gRk9STUFUX1ZDQVJEMjEpCisJCQljYXRlZ29yeV9zdHJpbmcg
-PSAiSU5URVJORVQiOworCQllbHNlIGlmIChmb3JtYXQgPT0gRk9STUFUX1ZDQVJEMzApCisJCQlj
-YXRlZ29yeV9zdHJpbmcgPSAiVFlQRT1JTlRFUk5FVCI7CiAJfQorCisJYWRkX3NsYXNoKGZpZWxk
-LCBhZGRyZXNzLCBMRU5fTUFYLCBsZW4pOworCXZjYXJkX3ByaW50Zih2Y2FyZHMsIkVNQUlMOyVz
-OiVzIiwgY2F0ZWdvcnlfc3RyaW5nLCBmaWVsZCk7CiB9CiAKIHN0YXRpYyBnYm9vbGVhbiBvcmdf
-ZmllbGRzX3ByZXNlbnQoc3RydWN0IHBob25lYm9va19jb250YWN0ICpjb250YWN0KQpAQCAtNDIx
-LDggKzQ0MSwxMSBAQCB2b2lkIHBob25lYm9va19hZGRfY29udGFjdChHU3RyaW5nICp2Y2FyZHMs
-IHN0cnVjdCBwaG9uZWJvb2tfY29udGFjdCAqY29udGFjdCwKIAlpZiAoZmlsdGVyICYgRklMVEVS
-X0VNQUlMKSB7CiAJCUdTTGlzdCAqbDsKIAotCQlmb3IgKGwgPSBjb250YWN0LT5lbWFpbHM7IGw7
-IGwgPSBsLT5uZXh0KQotCQkJdmNhcmRfcHJpbnRmX2VtYWlsKHZjYXJkcywgbC0+ZGF0YSk7CisJ
-CWZvciAobCA9IGNvbnRhY3QtPmVtYWlsczsgbDsgbCA9IGwtPm5leHQpeworCQkJc3RydWN0IHBo
-b25lYm9va19lbWFpbCAqZW1haWwgPSBsLT5kYXRhOworCisJCQl2Y2FyZF9wcmludGZfZW1haWwo
-dmNhcmRzLCBmb3JtYXQsIGVtYWlsLT5hZGRyZXNzLCBlbWFpbC0+dHlwZSk7CisJCX0KIAl9CiAK
-IAlpZiAoZmlsdGVyICYgRklMVEVSX0FEUikKQEAgLTQ1OSw2ICs0ODIsMTQgQEAgc3RhdGljIHZv
-aWQgbnVtYmVyX2ZyZWUoZ3BvaW50ZXIgZGF0YSwgZ3BvaW50ZXIgdXNlcl9kYXRhKQogCWdfZnJl
-ZShudW1iZXIpOwogfQogCitzdGF0aWMgdm9pZCBlbWFpbF9mcmVlKGdwb2ludGVyIGRhdGEsIGdw
-b2ludGVyIHVzZXJfZGF0YSkKK3sKKwlzdHJ1Y3QgcGhvbmVib29rX2VtYWlsICplbWFpbCA9IGRh
-dGE7CisKKwlnX2ZyZWUoZW1haWwtPmFkZHJlc3MpOworCWdfZnJlZShlbWFpbCk7Cit9CisKIHZv
-aWQgcGhvbmVib29rX2NvbnRhY3RfZnJlZShzdHJ1Y3QgcGhvbmVib29rX2NvbnRhY3QgKmNvbnRh
-Y3QpCiB7CiAJaWYgKGNvbnRhY3QgPT0gTlVMTCkKQEAgLTQ2Nyw3ICs0OTgsNyBAQCB2b2lkIHBo
-b25lYm9va19jb250YWN0X2ZyZWUoc3RydWN0IHBob25lYm9va19jb250YWN0ICpjb250YWN0KQog
-CWdfc2xpc3RfZm9yZWFjaChjb250YWN0LT5udW1iZXJzLCBudW1iZXJfZnJlZSwgTlVMTCk7CiAJ
-Z19zbGlzdF9mcmVlKGNvbnRhY3QtPm51bWJlcnMpOwogCi0JZ19zbGlzdF9mb3JlYWNoKGNvbnRh
-Y3QtPmVtYWlscywgKEdGdW5jKSBnX2ZyZWUsIE5VTEwpOworCWdfc2xpc3RfZm9yZWFjaChjb250
-YWN0LT5lbWFpbHMsIGVtYWlsX2ZyZWUsIE5VTEwpOwogCWdfc2xpc3RfZnJlZShjb250YWN0LT5l
-bWFpbHMpOwogCiAJZ19mcmVlKGNvbnRhY3QtPmZ1bGxuYW1lKTsKZGlmZiAtLWdpdCBhL3BsdWdp
-bnMvdmNhcmQuaCBiL3BsdWdpbnMvdmNhcmQuaAppbmRleCAwZjUyNDI1Li5hMjJkZmMxIDEwMDY0
-NAotLS0gYS9wbHVnaW5zL3ZjYXJkLmgKKysrIGIvcGx1Z2lucy92Y2FyZC5oCkBAIC0yNyw2ICsy
-NywxMiBAQCBlbnVtIHBob25lYm9va19udW1iZXJfdHlwZSB7CiAJVEVMX1RZUEVfT1RIRVIsCiB9
-OwogCitlbnVtIHBob25lYm9va19lbWFpbF90eXBlIHsKKwlFTUFJTF9UWVBFX0hPTUUsCisJRU1B
-SUxfVFlQRV9XT1JLLAorCUVNQUlMX1RZUEVfT1RIRVIsCit9OworCiBlbnVtIHBob25lYm9va19j
-YWxsX3R5cGUgewogCUNBTExfVFlQRV9OT1RfQV9DQUxMLAogCUNBTExfVFlQRV9NSVNTRUQsCkBA
-IC0zOSw2ICs0NSwxMSBAQCBzdHJ1Y3QgcGhvbmVib29rX251bWJlciB7CiAJaW50IHR5cGU7CiB9
-OwogCitzdHJ1Y3QgcGhvbmVib29rX2VtYWlsIHsKKwljaGFyICphZGRyZXNzOworCWludCAgdHlw
-ZTsKK307CisKIHN0cnVjdCBwaG9uZWJvb2tfY29udGFjdCB7CiAJY2hhciAqZnVsbG5hbWU7CiAJ
-Y2hhciAqZ2l2ZW47Ci0tIAoxLjcuMC40Cgo=
---001485f5afa855139a048e7ddcd2--
+-- 
+Jiri Kosina
+SUSE Labs, Novell Inc.
