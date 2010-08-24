@@ -1,45 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 24 Aug 2010 11:44:42 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Inga Stotland <ingas@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, rshaffer@codeaurora.org,
-	marcel@holtmann.org
-Subject: Re: [PATCH 0/3] Parsing of AMP related HCI commands and events
-Message-ID: <20100824084442.GA28463@jh-x301>
-References: <1282174734-1314-1-git-send-email-ingas@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1282174734-1314-1-git-send-email-ingas@codeaurora.org>
+Date: Mon, 23 Aug 2010 23:06:17 -0700
+Message-ID: <AANLkTimS=j0vMv84Xc9MjED254Kn9g9n59qWCmotvDhF@mail.gmail.com>
+Subject: ping slowness over bluetooth PAN
+From: Han <keepsimple@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Inga,
+Hi,
 
-On Wed, Aug 18, 2010, Inga Stotland wrote:
-> Added support for interpreting of the following HCI commands:
-> 
-> Create Physical Link,
-> Accept Physical Link,
-> Disconnect Physical Link,
-> Create Logical Link,
-> Accept Logical Link,
-> Disconnect Logical Link,
-> Logical Link Cancel,
-> Flow Spec Modify,
-> Read Encryption Key Size,
-> Read Local AMP Info,
-> Read Local AMP ASSOC,
-> Write Remote AMP ASSOC
-> 
-> and HCI events:
-> 
-> Physical Link Complete,
-> Disconnect Physical Link Complete,
-> Physical Link Loss Early Warning,
-> Physical Link Recovery,
-> Logical Link Complete,
-> Disconnect Logical Link Complete,
-> Flow Spec Modify Complete
+I noticed that ping is much more slow over bluetooth PAN connection
+than a typical WiFI LAN:
 
-Thanks. All three patches have been pushed upstream.
+especially the first packet:  (Ubuntu 9.10)
 
-Johan
+PAN:
+
+64 bytes from 10.0.0.1: icmp_seq=1 ttl=64 time=365 ms
+
+WLAN:
+
+64 bytes from Amelie (192.168.1.71): icmp_seq=1 ttl=128 time=3.53 ms
+
+The WLAN case is 100 times faster on the first ping!  Is this
+expected?  (I don't think this is due to the absolute bandwidth).  Any
+insight is appreciated.
+
+Han
