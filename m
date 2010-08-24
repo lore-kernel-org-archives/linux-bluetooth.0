@@ -1,19 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Angela Bartholomaus <angelab@codeaurora.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: rshaffer@codeaurora.org,
-	marcel@holtmann.org,
-	johan.hedberg@gmail.com
-Subject: [PATCH 0/4] Fix error reporting for SDP Requests 
-Date: Tue, 24 Aug 2010 15:14:16 -0700
-Message-Id: <1282688060-10727-1-git-send-email-angelab@codeaurora.org>
+Date: Tue, 24 Aug 2010 11:44:42 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Inga Stotland <ingas@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, rshaffer@codeaurora.org,
+	marcel@holtmann.org
+Subject: Re: [PATCH 0/3] Parsing of AMP related HCI commands and events
+Message-ID: <20100824084442.GA28463@jh-x301>
+References: <1282174734-1314-1-git-send-email-ingas@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1282174734-1314-1-git-send-email-ingas@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fixed the following issues revealed while performing bluez qualification: 
-- Incorrect error code was being reported for requests with invalid PDU size;
-- No error was being reported if a request less than 0x07 was received.
+Hi Inga,
 
+On Wed, Aug 18, 2010, Inga Stotland wrote:
+> Added support for interpreting of the following HCI commands:
+> 
+> Create Physical Link,
+> Accept Physical Link,
+> Disconnect Physical Link,
+> Create Logical Link,
+> Accept Logical Link,
+> Disconnect Logical Link,
+> Logical Link Cancel,
+> Flow Spec Modify,
+> Read Encryption Key Size,
+> Read Local AMP Info,
+> Read Local AMP ASSOC,
+> Write Remote AMP ASSOC
+> 
+> and HCI events:
+> 
+> Physical Link Complete,
+> Disconnect Physical Link Complete,
+> Physical Link Loss Early Warning,
+> Physical Link Recovery,
+> Logical Link Complete,
+> Disconnect Logical Link Complete,
+> Flow Spec Modify Complete
 
-Angela Bartholomaus
-Sent by an employee of the Qualcomm Innovation Center, Inc.
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
+Thanks. All three patches have been pushed upstream.
+
+Johan
