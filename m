@@ -5,31 +5,38 @@ Cc: rshaffer@codeaurora.org,
 	marcel@holtmann.org,
 	johan.hedberg@gmail.com,
 	Angela Bartholomaus <angelab@codeaurora.org>
-Subject: [PATCH 3/4] Send an Invalid PDU Size Error Resp for Service Attr Search Req
-Date: Tue, 24 Aug 2010 15:14:19 -0700
-Message-Id: <1282688060-10727-4-git-send-email-angelab@codeaurora.org>
+Subject: [PATCH 4/4] Send Invalid Syntax Error if Resp Size Less Than 0x07
+Date: Tue, 24 Aug 2010 15:14:20 -0700
+Message-Id: <1282688060-10727-5-git-send-email-angelab@codeaurora.org>
 In-Reply-To: <1282688060-10727-1-git-send-email-angelab@codeaurora.org>
 References: <1282688060-10727-1-git-send-email-angelab@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Send error code for an SDP request received with an invalid PDU size
+Added in error catching, when a badly formed request comes in
 ---
- src/sdpd-request.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ src/sdpd-request.c |    9 +++++++++
+ 1 files changed, 9 insertions(+), 0 deletions(-)
 
 diff --git a/src/sdpd-request.c b/src/sdpd-request.c
-index ccbd920..8547939 100644
+index 8547939..205b27b 100644
 --- a/src/sdpd-request.c
 +++ b/src/sdpd-request.c
-@@ -818,7 +818,7 @@ static int service_search_attr_req(sdp_req_t *req, sdp_buf_t *buf)
+@@ -684,6 +684,15 @@ static int service_attr_req(sdp_req_t *req, sdp_buf_t *buf)
+ 	SDPDBG("max_rsp_size : %d", max_rsp_size);
  
- 	plen = ntohs(((sdp_pdu_hdr_t *)(req->buf))->plen);
- 	if (plen < totscanned || plen != totscanned + *(uint8_t *)pdata) {
--		status = SDP_INVALID_SYNTAX;
-+		status = SDP_INVALID_PDU_SIZE;
- 		goto done;
- 	}
- 
+ 	/*
++	 * Check that max_rsp_size is within valid range
++	 * a minimum size of 0x0007 has to be used for data field
++	 */
++	if (max_rsp_size < 0x0007) {
++		status = SDP_INVALID_SYNTAX;
++		goto done;
++	}
++
++	/*
+ 	 * Calculate Attribute size acording to MTU
+ 	 * We can send only (MTU - sizeof(sdp_pdu_hdr_t) - sizeof(sdp_cont_state_t))
+ 	 */
 -- 
 1.7.0.2
 --
