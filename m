@@ -6,48 +6,156 @@ Cc: marcel@holtmann.org,
 	rshaffer@codeaurora.org,
 	linux-arm-msm@vger.kernel.org,
 	Mat Martineau <mathewm@codeaurora.org>
-Subject: [PATCH 5/5] Bluetooth: Use a stream-oriented recvmsg with SOCK_STREAM L2CAP sockets.
-Date: Tue, 24 Aug 2010 15:35:46 -0700
-Message-Id: <1282689346-20371-6-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCH 4/5] Bluetooth: Use common SOCK_STREAM receive code in RFCOMM
+Date: Tue, 24 Aug 2010 15:35:45 -0700
+Message-Id: <1282689346-20371-5-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1282689346-20371-1-git-send-email-mathewm@codeaurora.org>
 References: <1282689346-20371-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-L2CAP ERTM sockets can be opened with the SOCK_STREAM socket type,
-which is a mandatory request for ERTM mode.
-
-However, these sockets still have SOCK_SEQPACKET read semantics when
-bt_sock_recvmsg() is used to pull data from the receive queue.  If the
-application is only reading part of a frame, then the unread portion
-of the frame is discarded.  If the application requests more bytes
-than are in the current frame, only the current frame's data is
-returned.
-
-This patch utilizes common code derived from RFCOMM's recvmsg()
-function to make L2CAP SOCK_STREAM reads behave like RFCOMM reads (and
-other SOCK_STREAM sockets in general).  The application may read one
-byte at a time from the input stream and not lose any data, and may
-also read across L2CAP frame boundaries.
+To reduce code duplication, have rfcomm_sock_recvmsg() call
+bt_sock_stream_recvmsg().  The common bt_sock_stream_recvmsg()
+code is nearly identical, with the RFCOMM-specific functionality
+for deferred setup and connection unthrottling left in
+rfcomm_sock_recvmsg().
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/l2cap.c |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+ net/bluetooth/rfcomm/sock.c |  104 +++----------------------------------------
+ 1 files changed, 6 insertions(+), 98 deletions(-)
 
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 1f1fa3c..05db244 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -1960,6 +1960,9 @@ static int l2cap_sock_recvmsg(struct kiocb *iocb, struct socket *sock, struct ms
- 
- 	release_sock(sk);
- 
-+	if (sock->type == SOCK_STREAM)
-+		return bt_sock_stream_recvmsg(iocb, sock, msg, len, flags);
-+
- 	return bt_sock_recvmsg(iocb, sock, msg, len, flags);
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index 44a6232..4396f47 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -617,121 +617,29 @@ static int rfcomm_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
+ 	return sent;
  }
  
+-static long rfcomm_sock_data_wait(struct sock *sk, long timeo)
+-{
+-	DECLARE_WAITQUEUE(wait, current);
+-
+-	add_wait_queue(sk_sleep(sk), &wait);
+-	for (;;) {
+-		set_current_state(TASK_INTERRUPTIBLE);
+-
+-		if (!skb_queue_empty(&sk->sk_receive_queue) ||
+-		    sk->sk_err ||
+-		    (sk->sk_shutdown & RCV_SHUTDOWN) ||
+-		    signal_pending(current) ||
+-		    !timeo)
+-			break;
+-
+-		set_bit(SOCK_ASYNC_WAITDATA, &sk->sk_socket->flags);
+-		release_sock(sk);
+-		timeo = schedule_timeout(timeo);
+-		lock_sock(sk);
+-		clear_bit(SOCK_ASYNC_WAITDATA, &sk->sk_socket->flags);
+-	}
+-
+-	__set_current_state(TASK_RUNNING);
+-	remove_wait_queue(sk_sleep(sk), &wait);
+-	return timeo;
+-}
+-
+ static int rfcomm_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
+ 			       struct msghdr *msg, size_t size, int flags)
+ {
+ 	struct sock *sk = sock->sk;
+ 	struct rfcomm_dlc *d = rfcomm_pi(sk)->dlc;
+-	int err = 0;
+-	size_t target, copied = 0;
+-	long timeo;
++	int len;
+ 
+ 	if (test_and_clear_bit(RFCOMM_DEFER_SETUP, &d->flags)) {
+ 		rfcomm_dlc_accept(d);
+ 		return 0;
+ 	}
+ 
+-	if (flags & MSG_OOB)
+-		return -EOPNOTSUPP;
+-
+-	msg->msg_namelen = 0;
+-
+-	BT_DBG("sk %p size %zu", sk, size);
++	len = bt_sock_stream_recvmsg(iocb, sock, msg, size, flags);
+ 
+ 	lock_sock(sk);
++	if (!(flags & MSG_PEEK) && len > 0)
++		atomic_sub(len, &sk->sk_rmem_alloc);
+ 
+-	target = sock_rcvlowat(sk, flags & MSG_WAITALL, size);
+-	timeo  = sock_rcvtimeo(sk, flags & MSG_DONTWAIT);
+-
+-	do {
+-		struct sk_buff *skb;
+-		int chunk;
+-
+-		skb = skb_dequeue(&sk->sk_receive_queue);
+-		if (!skb) {
+-			if (copied >= target)
+-				break;
+-
+-			if ((err = sock_error(sk)) != 0)
+-				break;
+-			if (sk->sk_shutdown & RCV_SHUTDOWN)
+-				break;
+-
+-			err = -EAGAIN;
+-			if (!timeo)
+-				break;
+-
+-			timeo = rfcomm_sock_data_wait(sk, timeo);
+-
+-			if (signal_pending(current)) {
+-				err = sock_intr_errno(timeo);
+-				goto out;
+-			}
+-			continue;
+-		}
+-
+-		chunk = min_t(unsigned int, skb->len, size);
+-		if (memcpy_toiovec(msg->msg_iov, skb->data, chunk)) {
+-			skb_queue_head(&sk->sk_receive_queue, skb);
+-			if (!copied)
+-				copied = -EFAULT;
+-			break;
+-		}
+-		copied += chunk;
+-		size   -= chunk;
+-
+-		sock_recv_ts_and_drops(msg, sk, skb);
+-
+-		if (!(flags & MSG_PEEK)) {
+-			atomic_sub(chunk, &sk->sk_rmem_alloc);
+-
+-			skb_pull(skb, chunk);
+-			if (skb->len) {
+-				skb_queue_head(&sk->sk_receive_queue, skb);
+-				break;
+-			}
+-			kfree_skb(skb);
+-
+-		} else {
+-			/* put message back and return */
+-			skb_queue_head(&sk->sk_receive_queue, skb);
+-			break;
+-		}
+-	} while (size);
+-
+-out:
+ 	if (atomic_read(&sk->sk_rmem_alloc) <= (sk->sk_rcvbuf >> 2))
+ 		rfcomm_dlc_unthrottle(rfcomm_pi(sk)->dlc);
+-
+ 	release_sock(sk);
+-	return copied ? : err;
++
++	return len;
+ }
+ 
+ static int rfcomm_sock_setsockopt_old(struct socket *sock, int optname, char __user *optval, unsigned int optlen)
 -- 
 1.7.1
 
