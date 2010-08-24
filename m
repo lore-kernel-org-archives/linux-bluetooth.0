@@ -1,29 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 0/4] Fix error reporting for SDP Requests
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Angela Bartholomaus <angelab@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, rshaffer@codeaurora.org,
-	johan.hedberg@gmail.com
+From: Angela Bartholomaus <angelab@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: rshaffer@codeaurora.org,
+	marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	Angela Bartholomaus <angelab@codeaurora.org>
+Subject: [PATCH 3/4] Send an Invalid PDU Size Error Resp for Service Attr Search Req
+Date: Tue, 24 Aug 2010 15:14:19 -0700
+Message-Id: <1282688060-10727-4-git-send-email-angelab@codeaurora.org>
 In-Reply-To: <1282688060-10727-1-git-send-email-angelab@codeaurora.org>
 References: <1282688060-10727-1-git-send-email-angelab@codeaurora.org>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 25 Aug 2010 00:21:28 +0200
-Message-ID: <1282688488.6841.34.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Angela,
+Send error code for an SDP request received with an invalid PDU size
+---
+ src/sdpd-request.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-> Fixed the following issues revealed while performing bluez qualification: 
-> - Incorrect error code was being reported for requests with invalid PDU size;
-> - No error was being reported if a request less than 0x07 was received.
-
-I never needed any of these fixes when doing qualification. So why do
-you? Please mention the test case numbers.
-
-Regards
-
-Marcel
-
-
+diff --git a/src/sdpd-request.c b/src/sdpd-request.c
+index ccbd920..8547939 100644
+--- a/src/sdpd-request.c
++++ b/src/sdpd-request.c
+@@ -818,7 +818,7 @@ static int service_search_attr_req(sdp_req_t *req, sdp_buf_t *buf)
+ 
+ 	plen = ntohs(((sdp_pdu_hdr_t *)(req->buf))->plen);
+ 	if (plen < totscanned || plen != totscanned + *(uint8_t *)pdata) {
+-		status = SDP_INVALID_SYNTAX;
++		status = SDP_INVALID_PDU_SIZE;
+ 		goto done;
+ 	}
+ 
+-- 
+1.7.0.2
+--
+Angela Bartholomaus
+Sent by an employee of the Qualcomm Innovation Center, Inc.
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
