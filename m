@@ -1,24 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 25 Aug 2010 20:11:30 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Angela Bartholomaus <angelab@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, rshaffer@codeaurora.org,
-	marcel@holtmann.org
-Subject: Re: [PATCH v2 0/4] Fix error reporting for SDP Requests
-Message-ID: <20100825171130.GA30326@jh-x301>
-References: <1282755705-28400-1-git-send-email-angelab@codeaurora.org>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Wed, 25 Aug 2010 14:11:16 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+	gustavo@padovan.org, rshaffer@codeaurora.org,
+	linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH 1/5] Bluetooth: Only enable for L2CAP FCS for ERTM or
+ streaming
+Message-ID: <20100825171116.GA13872@vigoh>
+References: <1282689346-20371-1-git-send-email-mathewm@codeaurora.org>
+ <1282689346-20371-2-git-send-email-mathewm@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1282755705-28400-1-git-send-email-angelab@codeaurora.org>
+In-Reply-To: <1282689346-20371-2-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Angela,
+Hi Mat,
 
-On Wed, Aug 25, 2010, Angela Bartholomaus wrote:
-> Fixed the following issues revealed while performing bluez qualification: 
-> - Incorrect error code was being reported for requests with invalid PDU size;
-> - No error was being reported if a request less than 0x07 was received.
+* Mat Martineau <mathewm@codeaurora.org> [2010-08-24 15:35:42 -0700]:
 
-Thanks. All four patches have been pushed upstream.
+> This fixes a bug which caused the FCS setting to show L2CAP_FCS_CRC16
+> with L2CAP modes other than ERTM or streaming.  At present, this only
+> affects the FCS value shown with getsockopt() for basic mode.
+> 
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> ---
+>  net/bluetooth/l2cap.c |   19 +++++++++++++------
+>  1 files changed, 13 insertions(+), 6 deletions(-)
 
-Johan
+This one is on bluetooth-testing, but Marcel should move it to
+bluetooth-2.6 as this patch is planned to go into 2.6.36
+
+-- 
+Gustavo F. Padovan
+ProFUSION embedded systems - http://profusion.mobi
