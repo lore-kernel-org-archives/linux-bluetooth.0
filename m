@@ -1,37 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Wed, 25 Aug 2010 14:11:16 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	gustavo@padovan.org, rshaffer@codeaurora.org,
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH 1/5] Bluetooth: Only enable for L2CAP FCS for ERTM or
- streaming
-Message-ID: <20100825171116.GA13872@vigoh>
-References: <1282689346-20371-1-git-send-email-mathewm@codeaurora.org>
- <1282689346-20371-2-git-send-email-mathewm@codeaurora.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1282689346-20371-2-git-send-email-mathewm@codeaurora.org>
+From: Angela Bartholomaus <angelab@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: rshaffer@codeaurora.org, johan.hedberg@gmail.com,
+	marcel@holtmann.org, Angela Bartholomaus <angelab@codeaurora.org>
+Subject: [PATCH 4/4] Bluetooth: Send Invalid Syntax Error if Resp Size Less Than 0x07
+Date: Wed, 25 Aug 2010 10:01:45 -0700
+Message-Id: <1282755705-28400-5-git-send-email-angelab@codeaurora.org>
+In-Reply-To: <1282755705-28400-1-git-send-email-angelab@codeaurora.org>
+References: <1282755705-28400-1-git-send-email-angelab@codeaurora.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Byte cnt range min 0x07 per Core v2.1, sec 4.61 for TP/SERVER/SA/BI-02-C
+---
+ src/sdpd-request.c |    9 +++++++++
+ 1 files changed, 9 insertions(+), 0 deletions(-)
 
-* Mat Martineau <mathewm@codeaurora.org> [2010-08-24 15:35:42 -0700]:
-
-> This fixes a bug which caused the FCS setting to show L2CAP_FCS_CRC16
-> with L2CAP modes other than ERTM or streaming.  At present, this only
-> affects the FCS value shown with getsockopt() for basic mode.
-> 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> ---
->  net/bluetooth/l2cap.c |   19 +++++++++++++------
->  1 files changed, 13 insertions(+), 6 deletions(-)
-
-This one is on bluetooth-testing, but Marcel should move it to
-bluetooth-2.6 as this patch is planned to go into 2.6.36
-
+diff --git a/src/sdpd-request.c b/src/sdpd-request.c
+index 8547939..205b27b 100644
+--- a/src/sdpd-request.c
++++ b/src/sdpd-request.c
+@@ -684,6 +684,15 @@ static int service_attr_req(sdp_req_t *req, sdp_buf_t *buf)
+ 	SDPDBG("max_rsp_size : %d", max_rsp_size);
+ 
+ 	/*
++	 * Check that max_rsp_size is within valid range
++	 * a minimum size of 0x0007 has to be used for data field
++	 */
++	if (max_rsp_size < 0x0007) {
++		status = SDP_INVALID_SYNTAX;
++		goto done;
++	}
++
++	/*
+ 	 * Calculate Attribute size acording to MTU
+ 	 * We can send only (MTU - sizeof(sdp_pdu_hdr_t) - sizeof(sdp_cont_state_t))
+ 	 */
 -- 
-Gustavo F. Padovan
-ProFUSION embedded systems - http://profusion.mobi
+1.7.2.2
+--
+Angela Bartholomaus
+Sent by an employee of the Qualcomm Innovation Center, Inc.
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
