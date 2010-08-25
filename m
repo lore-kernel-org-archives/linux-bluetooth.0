@@ -1,38 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 25 Aug 2010 10:54:54 +0200
-From: Colin Didier <didier@archos.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] An interrupted syscall is not an error when returning from
- poll() in audio/pcm_bluetooth.c
-Message-ID: <20100825085454.GB27072@cybione.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <131634.48135.qm@web56506.mail.re3.yahoo.com>
+References: <131634.48135.qm@web56506.mail.re3.yahoo.com>
+Date: Tue, 24 Aug 2010 23:00:11 -0400
+Message-ID: <AANLkTi=j6ch9_oQwb0xK9xPZ5btMUSqoHx4D8N8YM6nt@mail.gmail.com>
+Subject: Re: [RFCOMM] Cannot complete connections into Ubuntu
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Shreesh Holla <hshreesh@yahoo.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi,
 
-An interrupted syscall is not an error when returning from poll() at
-line 240 of audio/pcm_bluetooth.c. So no need to freak out.
+On Mon, Aug 23, 2010 at 3:22 AM, Shreesh Holla <hshreesh@yahoo.com> wrote:
+> Hi,
+>
+> I'm running Ubuntu with 2.6.32.24 kernel.
+> I have a simple RFCOMM program running on Windows Mobile which would connect
+> into the Ubuntu machine. Of course I have the corresponding service running on
+> the Ubuntu machine. The RFCOMM port numbers do match up.
+>
+> This was working a few days back and now with no changes(i.e. the same
+> executable), it refuses to work anymore.
+>
+> So is there some configuration needed  now?
+>
+> I have the dongle running in Ubuntu as : hciconfig hci0 noauth noencrypt pscan
 
-Here is a patch to fix this.
+Had you tried the latest bluez, I did some changes to pair that solve
+some problem with RFCOMM and ssp. If that doesn't help maybe you
+should try to produce some logs of the so we can take a look.
 
-Cheers,
-  Colin DIDIER
+Regards,
 
---- a/audio/pcm_bluetooth.c	2010-08-25 10:08:37.000000000 +0200
-+++ b/audio/pcm_bluetooth.c	2010-08-25 10:08:59.000000000 +0200
-@@ -237,9 +237,11 @@
- 		ret = poll(fds, 2, poll_timeout);
- 
- 		if (ret < 0) {
--			SNDERR("poll error: %s (%d)", strerror(errno), errno);
--			if (errno != EINTR)
-+			if (errno != EINTR) {
-+				SNDERR("poll error: %s (%d)", strerror(errno),
-+								errno);
- 				break;
-+			}
- 		} else if (ret > 0) {
- 			ret = (fds[0].revents) ? 0 : 1;
- 			SNDERR("poll fd %d revents %d", ret, fds[ret].revents);
+-- 
+Luiz Augusto von Dentz
+Computer Engineer
