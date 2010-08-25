@@ -1,9 +1,8 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Thu, 26 Aug 2010 06:38:27 +0800
-Message-ID: <AANLkTinaFobBK5OiFaV+fGsEe3JRTy7_dT-FFLjSt-Rq@mail.gmail.com>
-Subject: [PATCH 17/22] Add parameter enable_highspeed to control highspeed
- code in running phase
+Date: Thu, 26 Aug 2010 06:37:57 +0800
+Message-ID: <AANLkTi=cXHJJMa-58aYz5E7XU8a3wrgCJePrbkffPS9e@mail.gmail.com>
+Subject: Add parameter enable_highspeed to control highspeed code in running phase
 From: haijun liu <liuhaijun.er@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
