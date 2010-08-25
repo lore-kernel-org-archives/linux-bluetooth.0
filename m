@@ -1,68 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Thu, 26 Aug 2010 06:40:37 +0800
-Message-ID: <AANLkTimFzgWZ-HdOUK22xbV6pVTG4spm4FJhYMH5rj1N@mail.gmail.com>
-Subject: [PATCH 21/22] Parse EFS & EWS parameters for in l2cap_parse_conf_req
+Date: Thu, 26 Aug 2010 06:40:11 +0800
+Message-ID: <AANLkTinEjo0WvHYaamqX_XY-HSY3nKA1voj-MkYDkyv6@mail.gmail.com>
+Subject: [PATCH 20/22] Add EFS & EWS config parameters for ERTM & Streaming
+ modes in l2cap_build_conf_req
 From: haijun liu <liuhaijun.er@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
->From c3c9a97f3dfda527da2f9c4893302cde56e24198 Mon Sep 17 00:00:00 2001
+>From 74b6581d7fdb0d3e5c0cd9546b15d58357c3758c Mon Sep 17 00:00:00 2001
 From: haijun.liu <haijun.liu@atheros.com>
-Date: Wed, 25 Aug 2010 21:59:19 +0800
-Subject: [PATCH 21/22] Parse EFS & EWS parameters for in l2cap_parse_conf_req.
+Date: Tue, 24 Aug 2010 15:52:49 +0800
+Subject: [PATCH 20/22] Add EFS & EWS config parameters for ERTM &
+Streaming modes in l2cap_build_conf_req.
 
 ---
- net/bluetooth/l2cap.c |  100 +++++++++++++++++++++++++++++++++++++++++++++---
- 1 files changed, 93 insertions(+), 7 deletions(-)
+ net/bluetooth/l2cap.c |   67 ++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 files changed, 64 insertions(+), 3 deletions(-)
 
 diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 73142ae..d66d923 100644
+index e7f7067..73142ae 100644
 --- a/net/bluetooth/l2cap.c
 +++ b/net/bluetooth/l2cap.c
-@@ -2660,6 +2660,9 @@ static int l2cap_parse_conf_req(struct sock *sk,
+@@ -2500,6 +2500,7 @@ static int l2cap_build_conf_req(struct sock *sk,
 void *data)
- 	unsigned long val;
- 	struct l2cap_conf_rfc rfc = { .mode = L2CAP_MODE_BASIC };
- 	u16 mtu = L2CAP_DEFAULT_MTU;
+ 	struct l2cap_pinfo *pi = l2cap_pi(sk);
+ 	struct l2cap_conf_req *req = data;
+ 	struct l2cap_conf_rfc rfc = { .mode = pi->mode };
 +	struct l2cap_conf_efs efs = { .service_type = L2CAP_SERVTYPE_BESTEFFORT };
-+	u8 ext_flowspec_enable = 0;
-+	u16 extwin_size = 0;
- 	u16 result = L2CAP_CONF_SUCCESS;
+ 	void *ptr = req->data;
 
  	BT_DBG("sk %p", sk);
-@@ -2693,6 +2696,17 @@ static int l2cap_parse_conf_req(struct sock
-*sk, void *data)
-
- 			break;
-
-+		case L2CAP_CONF_EFS:
-+			/* handle the extended flow spec mode */
-+			ext_flowspec_enable = 1;
-+			if (olen == sizeof(efs))
-+				memcpy(&efs, (void *) val, olen);
-+			break;
-+
-+		case L2CAP_CONF_EWS:
-+			extwin_size = val;
-+			break;
-+
- 		default:
- 			if (hint)
- 				break;
-@@ -2709,16 +2723,29 @@ static int l2cap_parse_conf_req(struct sock
+@@ -2510,10 +2511,25 @@ static int l2cap_build_conf_req(struct sock
 *sk, void *data)
  	switch (pi->mode) {
  	case L2CAP_MODE_STREAMING:
  	case L2CAP_MODE_ERTM:
--		if (!(pi->conf_state & L2CAP_CONF_STATE2_DEVICE)) {
--			pi->mode = l2cap_select_mode(rfc.mode,
--					pi->conn->feat_mask);
+-		if (pi->conf_state & L2CAP_CONF_STATE2_DEVICE)
 -			break;
 +		pi->conf_state |= L2CAP_CONF_STATE2_DEVICE;
-+		if (enable_highspeed && ext_flowspec_enable && pi->hschan_req) {
+
+-		/* fall through */
++		if (enable_highspeed && pi->hschan_req) {
 +			pi->ext_flowspec_enable = 1;
 +
 +			pi->loc_efs.service_type = (!pi->guaranteed) ?
@@ -75,103 +56,71 @@ void *data)
 +		if (enable_highspeed && (pi->conn->feat_mask & L2CAP_FEAT_EXT_WINSIZE)) {
 +			pi->extwin_enable = 1;
 +			pi->extwin_size = L2CAP_DEFAULT_EXT_WINSIZE;
- 		}
-
--		if (pi->mode != rfc.mode)
++		}
 +		if (!l2cap_mode_supported(pi->mode, pi->conn->feat_mask))
- 			return -ECONNREFUSED;
-
- 		break;
-+	default:
-+		pi->mode = l2cap_select_mode(sk, rfc.mode, pi->conn->feat_mask);
++			l2cap_send_disconn_req(pi->conn, sk, ECONNRESET);
 +		break;
- 	}
+ 	default:
+ 		pi->mode = l2cap_select_mode(rfc.mode, pi->conn->feat_mask);
+ 		break;
+@@ -2552,6 +2568,33 @@ done:
+ 			pi->fcs = L2CAP_FCS_NONE;
+ 			l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1, pi->fcs);
+ 		}
++
++		if (pi->ext_flowspec_enable) {
++			efs.service_type = pi->loc_efs.service_type;
++			efs.max_sdu_size = cpu_to_le16(pi->loc_efs.max_sdu_size);
++			efs.sdu_inter_time = cpu_to_le32(pi->loc_efs.sdu_inter_time);
++			if (pi->loc_efs.service_type == L2CAP_SERVTYPE_BESTEFFORT) {
++				pi->loc_efs.id = 1;
++				efs.id = pi->loc_efs.id;
++				efs.access_latency = cpu_to_le32(0xFFFFFFFF);
++				efs.flush_timeout = cpu_to_le32(0xFFFFFFFF);
++			} else {
++				/* As spec, the ident shall be unique within
++				   the scope of a physical link.
++				*/
++				pi->loc_efs.id = l2cap_flowspec_ident(l2cap_pi(sk)->conn);
++				efs.id = pi->loc_efs.id;
++				efs.access_latency = cpu_to_le32(pi->loc_efs.access_latency);
++				efs.flush_timeout = cpu_to_le32(pi->loc_efs.flush_timeout);
++			}
++			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS,
++						sizeof(efs), (unsigned long) &efs);
++		}
++
++		if (pi->extwin_enable) {
++			pi->extwin_size = max_t(__u16, pi->extwin_size, 0x01);
++			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EWS, 4, pi->extwin_size);
++		}
+ 		break;
 
- done:
-@@ -2733,8 +2760,36 @@ done:
- 					sizeof(rfc), (unsigned long) &rfc);
- 	}
-
-+	/*
-+		Add the ext flow spec and ext win size option parameters check here.
-+	*/
+ 	case L2CAP_MODE_STREAMING:
+@@ -2572,6 +2615,24 @@ done:
+ 			pi->fcs = L2CAP_FCS_NONE;
+ 			l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1, pi->fcs);
+ 		}
 +
-+	if (result == L2CAP_CONF_SUCCESS && ext_flowspec_enable) {
-+		if (!pi->ext_flowspec_enable) {
-+			/* remote support , local not support, refused */
-+
-+			result = L2CAP_CONF_REJECT;
-+			return -ECONNREFUSED;
-+		} else if (pi->loc_efs.service_type != L2CAP_SERVTYPE_NOTRAFIC &&
-+			efs.service_type != L2CAP_SERVTYPE_NOTRAFIC &&
-+			efs.service_type != pi->loc_efs.service_type) {
-+
-+			result = L2CAP_CONF_UNACCEPT;
-+
-+			if (pi->num_conf_req >= 1)
-+				return -ECONNREFUSED;
++		if (pi->ext_flowspec_enable) {
++			efs.id = 1;
++			efs.service_type = L2CAP_SERVTYPE_BESTEFFORT;
++			efs.max_sdu_size = cpu_to_le16(pi->loc_efs.max_sdu_size);
++			efs.sdu_inter_time = cpu_to_le32(pi->loc_efs.sdu_inter_time);
++			efs.access_latency = 0;
++			efs.flush_timeout = 0;
 +
 +			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS,
-+				sizeof(efs), (unsigned long) &efs);
-+
-+		} else {
-+			result = L2CAP_CONF_PENDING;
-+			pi->conf_state |= L2CAP_CONF_LOCAL_PEND;
++						sizeof(efs), (unsigned long) &efs);
 +		}
-+	}
-
--	if (result == L2CAP_CONF_SUCCESS) {
 +
-+	if (result == L2CAP_CONF_SUCCESS || result == L2CAP_CONF_PENDING) {
- 		/* Configure output options and let the other side know
- 		 * which ones we don't like. */
++		if (pi->extwin_enable) {
++			pi->extwin_enable = 1;
++			pi->extwin_size = 0;
++			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EWS, 4, pi->extwin_size);
++		}
+ 		break;
+ 	}
 
-@@ -2770,6 +2825,22 @@ done:
- 			l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC,
- 					sizeof(rfc), (unsigned long) &rfc);
-
-+			if (pi->ext_flowspec_enable) {
-+				/* record the extend flow spec parameters */
-+				pi->rem_efs.id = efs.id;
-+				pi->rem_efs.service_type = efs.service_type;
-+				pi->rem_efs.max_sdu_size = le16_to_cpu(efs.max_sdu_size);
-+				pi->rem_efs.flush_timeout = le16_to_cpu(efs.flush_timeout);
-+				pi->rem_efs.access_latency = le16_to_cpu(efs.access_latency);
-+				pi->rem_efs.sdu_inter_time = le16_to_cpu(efs.sdu_inter_time);
-+				l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS,
-+						sizeof(efs), (unsigned long) &efs);
-+			}
-+			if (extwin_size > 0) {
-+				pi->rem_extwin_enable = 1;
-+				pi->rem_extwin_size = extwin_size;
-+				pi->conf_state |= L2CAP_CONF_EXTWINSIZE_DONE;
-+			}
- 			break;
-
- 		case L2CAP_MODE_STREAMING:
-@@ -2782,7 +2853,22 @@ done:
-
- 			l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC,
- 					sizeof(rfc), (unsigned long) &rfc);
--
-+			if (pi->ext_flowspec_enable) {
-+				/* record the extend flow spec parameters */
-+				pi->rem_efs.id = efs.id;
-+				pi->rem_efs.service_type = efs.service_type;
-+				pi->rem_efs.max_sdu_size = le16_to_cpu(efs.max_sdu_size);
-+				pi->rem_efs.flush_timeout = le16_to_cpu(efs.flush_timeout);
-+				pi->rem_efs.access_latency = le16_to_cpu(efs.access_latency);
-+				pi->rem_efs.sdu_inter_time = le16_to_cpu(efs.sdu_inter_time);
-+				l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS,
-+						sizeof(efs), (unsigned long) &efs);
-+			}
-+			if (extwin_size == 0) {
-+				pi->rem_extwin_enable = 1;
-+				pi->rem_extwin_size = extwin_size;
-+				pi->conf_state |= L2CAP_CONF_EXTWINSIZE_DONE;
-+			}
- 			break;
-
- 		default:
 -- 
 1.6.3.3
