@@ -1,42 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 25 Aug 2010 14:26:36 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Colin Didier <didier@archos.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix left overs handling in bluetooth_a2dp_write() of
+Date: Wed, 25 Aug 2010 10:49:33 +0200
+From: Colin Didier <didier@archos.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Fix left overs handling in bluetooth_a2dp_write() of
  audio/pcm_bluetooth.c
-Message-ID: <20100825112636.GA23943@jh-x301>
-References: <20100825084932.GA27072@cybione.org>
+Message-ID: <20100825084932.GA27072@cybione.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <20100825084932.GA27072@cybione.org>
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Colin,
+Hello,
 
-On Wed, Aug 25, 2010, Colin Didier wrote:
-> If for some reason there is not enough data provided to the function
-> bluetooth_a2dp_write() and there are left overs to handle, the ALSA
-> module will segfault.
-> 
-> The test at the line 1053 of audio/pcm_bluetooth.c is wrong because it
-> compares unsigned integers and will lead to an unsigned integer overflow
-> if bytes_left is inferior to a2dp->codesize - data->count.
-> 
-> Here is a patch to fix this issue.
+If for some reason there is not enough data provided to the function
+bluetooth_a2dp_write() and there are left overs to handle, the ALSA
+module will segfault.
 
-Thanks for the patch, however it doesn't compile cleanly:
+The test at the line 1053 of audio/pcm_bluetooth.c is wrong because it
+compares unsigned integers and will lead to an unsigned integer overflow
+if bytes_left is inferior to a2dp->codesize - data->count.
 
-audio/pcm_bluetooth.c: In function ‘bluetooth_a2dp_write’:
-audio/pcm_bluetooth.c:1055: error: comparison between signed and unsigned integer expressions
-make[1]: *** [audio/audio_libasound_module_pcm_bluetooth_la-pcm_bluetooth.lo] Error 1
-make: *** [all] Error 2
+Here is a patch to fix this issue.
 
-Always make sure that patches compile cleanly with
-./bootstrap-configure. Also, could you please use git format-patch to
-create the patches and make sure they have properly formated commit
-messages (fits within an 80-column terminal with git log, not formated
-like an email, etc). Thanks.
+Cheers,
+  Colin DIDIER
 
-Johan
+
+--- a/audio/pcm_bluetooth.c	2010-08-25 09:35:28.000000000 +0200
++++ b/audio/pcm_bluetooth.c	2010-08-25 09:37:47.000000000 +0200
+@@ -1050,8 +1050,10 @@
+ 	}
+ 
+ 	/* Check if we have any left over data from the last write */
+-	if (data->count > 0 && (bytes_left - data->count) >= a2dp->codesize) {
+-		int additional_bytes_needed = a2dp->codesize - data->count;
++        if (data->count > 0) {
++                int additional_bytes_needed = a2dp->codesize - data->count;
++                if (additional_bytes_needed > bytes_left)
++                        goto out;
+ 
+ 		memcpy(data->buffer + data->count, buff,
+ 						additional_bytes_needed);
+@@ -1122,6 +1124,7 @@
+ 		}
+ 	}
+ 
++out:
+ 	/* Copy the extra to our temp buffer for the next write */
+ 	if (bytes_left > 0) {
+ 		memcpy(data->buffer + data->count, buff, bytes_left);
