@@ -1,42 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Thu, 26 Aug 2010 06:37:30 +0800
-Message-ID: <AANLkTimnW0jk19cDG+r64Q+-HxdH2qdTBirTMB7ikr1W@mail.gmail.com>
-Subject: [PATCH 16/22] Store new configuration values in l2cap_pinfo
+Date: Thu, 26 Aug 2010 06:36:57 +0800
+Message-ID: <AANLkTi=Cp0pe2r9bQ7zpw21_BF=K+df824-6AoMvPH3Q@mail.gmail.com>
+Subject: [PATCH 15/22] Enlarge value scope of conf_state in l2cap_pinfo to
+ hold new states for lock step configuration
 From: haijun liu <liuhaijun.er@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
->From d093975dde6d85c824a5aaac943d676100810010 Mon Sep 17 00:00:00 2001
+>From ff97115044570dae7e88dd665a0e82d6b542da5b Mon Sep 17 00:00:00 2001
 From: haijun.liu <haijun.liu@atheros.com>
-Date: Mon, 23 Aug 2010 00:09:56 +0800
-Subject: [PATCH 16/22] Store new configuration values in l2cap_pinfo.
+Date: Mon, 23 Aug 2010 00:05:43 +0800
+Subject: [PATCH 15/22] Enlarge value scope of conf_state in
+l2cap_pinfo to hold new states for lock step configuration.
 
 ---
- include/net/bluetooth/l2cap.h |    9 +++++++++
- 1 files changed, 9 insertions(+), 0 deletions(-)
+ include/net/bluetooth/l2cap.h |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 2d864d4..f2dd65d 100644
+index 7a9bec4..2d864d4 100644
 --- a/include/net/bluetooth/l2cap.h
 +++ b/include/net/bluetooth/l2cap.h
-@@ -406,6 +406,15 @@ struct l2cap_pinfo {
- 	__u16		remote_mps;
- 	__u16		mps;
+@@ -378,7 +378,7 @@ struct l2cap_pinfo {
 
-+	__u8		ext_flowspec_enable;
-+	struct ext_flow_spec	loc_efs;
-+	struct ext_flow_spec	rem_efs;
-+
-+	__u8		extwin_enable;
-+	__u16		extwin_size;
-+	__u8		rem_extwin_enable;
-+	__u16		rem_extwin_size;
-+
- 	__le16		sport;
+ 	__u8		conf_req[64];
+ 	__u8		conf_len;
+-	__u8		conf_state;
++	__u16		conf_state;
+ 	__u16		conn_state;
 
- 	struct timer_list	retrans_timer;
+ 	__u8		next_tx_seq;
 -- 
 1.6.3.3
