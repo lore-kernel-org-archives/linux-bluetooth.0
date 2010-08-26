@@ -1,60 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 26 Aug 2010 11:15:38 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lukasz Pawlik <lucas.pawlik@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix handling empty fields in VCARDs
-Message-ID: <20100826081454.GA8970@jh-x301>
-References: <AANLkTimB9Tvxt6zZKzfHwhGc_j8MnGTo1DbeH-pYoQpe@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTimB9Tvxt6zZKzfHwhGc_j8MnGTo1DbeH-pYoQpe@mail.gmail.com>
+Date: Thu, 26 Aug 2010 09:45:37 +0200
+Message-ID: <AANLkTimB9Tvxt6zZKzfHwhGc_j8MnGTo1DbeH-pYoQpe@mail.gmail.com>
+Subject: [PATCH] Fix handling empty fields in VCARDs
+From: Lukasz Pawlik <lucas.pawlik@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=001485e98b2218780a048eb52f25
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+--001485e98b2218780a048eb52f25
+Content-Type: text/plain; charset=ISO-8859-1
 
-> From 4bb29cdaf4a9923ab62973c38914ebb67f718d64 Mon Sep 17 00:00:00 2001
-> From: Lukasz Pawlik <lucas.pawlik@gmail.com>
-> Date: Thu, 26 Aug 2010 09:10:26 +0200
-> Subject: [PATCH] Fix handling empty fields in VCARDs
-> 
-> Previously even mandatory TEL field was not printed in VCARD if it was
-> empty. This patch fix this. Now tag TEL will be printed if phone number
-> is not set in phonebook. This patch also fix handling category string
-> for VCARDs in version 2.1 for url field.
-> ---
->  plugins/vcard.c |   51 ++++++++++++++++++++++++++++++++-------------------
->  1 files changed, 32 insertions(+), 19 deletions(-)
 
-In general the patch seems fine, but you need to fix your editor
-settings when dealing with BlueZ code. It seems like you're using spaces
-for indentation when the coding style is tabs-only:
 
-> -		for (l = contact->numbers; l; l = l->next) {
-> +                if (g_slist_length(l) == 0)
-> +                        vcard_printf_number(vcards, format, NULL, 1,
-> +                                                        TEL_TYPE_OTHER);
+--001485e98b2218780a048eb52f25
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-Fix-handling-empty-fields-in-VCARDs.patch"
+Content-Disposition: attachment;
+	filename="0001-Fix-handling-empty-fields-in-VCARDs.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gdbb5nii0
 
-All of the above three added lines are indented with spaces.
-
-> +		for (; l; l = l->next) {
-
-This added line is indented with tabs. How did you manage to get your
-editor to produce such mixed results?
-
-> +		if (g_slist_length(l) == 0)
-> +                        vcard_printf_email(vcards, format, NULL,
-> +                                                        EMAIL_TYPE_OTHER);
-
-The first line is tabs but the two others use spaces!?
-
-> -		for (l = contact->emails; l; l = l->next){
-> +                for (; l; l = l->next){
-
-Again spaces here.
-
-Please enable whitespace visualization and use proper editor settings to
-avoid these issues in the future. Thanks.
-
-Johan
+RnJvbSA0YmIyOWNkYWY0YTk5MjNhYjYyOTczYzM4OTE0ZWJiNjdmNzE4ZDY0IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBMdWthc3ogUGF3bGlrIDxsdWNhcy5wYXdsaWtAZ21haWwuY29t
+PgpEYXRlOiBUaHUsIDI2IEF1ZyAyMDEwIDA5OjEwOjI2ICswMjAwClN1YmplY3Q6IFtQQVRDSF0g
+Rml4IGhhbmRsaW5nIGVtcHR5IGZpZWxkcyBpbiBWQ0FSRHMKClByZXZpb3VzbHkgZXZlbiBtYW5k
+YXRvcnkgVEVMIGZpZWxkIHdhcyBub3QgcHJpbnRlZCBpbiBWQ0FSRCBpZiBpdCB3YXMKZW1wdHku
+IFRoaXMgcGF0Y2ggZml4IHRoaXMuIE5vdyB0YWcgVEVMIHdpbGwgYmUgcHJpbnRlZCBpZiBwaG9u
+ZSBudW1iZXIKaXMgbm90IHNldCBpbiBwaG9uZWJvb2suIFRoaXMgcGF0Y2ggYWxzbyBmaXggaGFu
+ZGxpbmcgY2F0ZWdvcnkgc3RyaW5nCmZvciBWQ0FSRHMgaW4gdmVyc2lvbiAyLjEgZm9yIHVybCBm
+aWVsZC4KLS0tCiBwbHVnaW5zL3ZjYXJkLmMgfCAgIDUxICsrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0tLQogMSBmaWxlcyBjaGFuZ2VkLCAzMiBpbnNlcnRp
+b25zKCspLCAxOSBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9wbHVnaW5zL3ZjYXJkLmMgYi9w
+bHVnaW5zL3ZjYXJkLmMKaW5kZXggYTIwYWI0ZC4uYTE2M2QxYiAxMDA2NDQKLS0tIGEvcGx1Z2lu
+cy92Y2FyZC5jCisrKyBiL3BsdWdpbnMvdmNhcmQuYwpAQCAtMjU2LDcgKzI1Niw3IEBAIHN0YXRp
+YyB2b2lkIHZjYXJkX3ByaW50Zl9udW1iZXIoR1N0cmluZyAqdmNhcmRzLCB1aW50OF90IGZvcm1h
+dCwKIAl2Y2FyZF9wcmludGYodmNhcmRzLCBidWYsIG51bWJlcik7CiB9CiAKLXN0YXRpYyB2b2lk
+IHZjYXJkX3ByaW50Zl90YWcoR1N0cmluZyAqdmNhcmRzLCBjb25zdCBjaGFyICp0YWcsCitzdGF0
+aWMgdm9pZCB2Y2FyZF9wcmludGZfdGFnKEdTdHJpbmcgKnZjYXJkcywgdWludDhfdCBmb3JtYXQs
+IGNvbnN0IGNoYXIgKnRhZywKIAkJCQkJY29uc3QgY2hhciAqY2F0ZWdvcnksIGNvbnN0IGNoYXIg
+KmZsZCkKIHsKIAljaGFyICpzZXBhcmF0b3IgPSAiIiwgKnR5cGUgPSAiIjsKQEAgLTI2NSw5ICsy
+NjUsMTAgQEAgc3RhdGljIHZvaWQgdmNhcmRfcHJpbnRmX3RhZyhHU3RyaW5nICp2Y2FyZHMsIGNv
+bnN0IGNoYXIgKnRhZywKIAlpZiAodGFnID09IE5VTEwgfHwgc3RybGVuKHRhZykgPT0gMCkKIAkJ
+cmV0dXJuOwogCi0JaWYgKGZsZCA9PSBOVUxMIHx8IHN0cmxlbihmbGQpID09IDApCisJaWYgKGZs
+ZCA9PSBOVUxMIHx8IHN0cmxlbihmbGQpID09IDApeworCQl2Y2FyZF9wcmludGYodmNhcmRzLCAi
+JXM6IiwgdGFnKTsKIAkJcmV0dXJuOwotCisJfQogCWlmIChjYXRlZ29yeSAmJiBzdHJsZW4oY2F0
+ZWdvcnkpKSB7CiAJCXNlcGFyYXRvciA9ICI7IjsKIAkJdHlwZSA9ICJUWVBFPSI7CkBAIC0yODAs
+OCArMjgxLDkgQEAgc3RhdGljIHZvaWQgdmNhcmRfcHJpbnRmX3RhZyhHU3RyaW5nICp2Y2FyZHMs
+IGNvbnN0IGNoYXIgKnRhZywKIAl2Y2FyZF9wcmludGYodmNhcmRzLCAiJXM6JXMiLCBidWYsIGZs
+ZCk7CiB9CiAKLXN0YXRpYyB2b2lkIHZjYXJkX3ByaW50Zl9zbGFzaF90YWcoR1N0cmluZyAqdmNh
+cmRzLCBjb25zdCBjaGFyICp0YWcsCi0JCQkJCWNvbnN0IGNoYXIgKmNhdGVnb3J5LCBjb25zdCBj
+aGFyICpmbGQpCitzdGF0aWMgdm9pZCB2Y2FyZF9wcmludGZfc2xhc2hfdGFnKEdTdHJpbmcgKnZj
+YXJkcywgdWludDhfdCBmb3JtYXQsCisJCQkJCWNvbnN0IGNoYXIgKnRhZywgY29uc3QgY2hhciAq
+Y2F0ZWdvcnksCisJCQkJCWNvbnN0IGNoYXIgKmZsZCkKIHsKIAlpbnQgbGVuOwogCWNoYXIgKnNl
+cGFyYXRvciA9ICIiLCAqdHlwZSA9ICIiOwpAQCAtMjkwLDkgKzI5MiwxMCBAQCBzdGF0aWMgdm9p
+ZCB2Y2FyZF9wcmludGZfc2xhc2hfdGFnKEdTdHJpbmcgKnZjYXJkcywgY29uc3QgY2hhciAqdGFn
+LAogCWlmICh0YWcgPT0gTlVMTCB8fCBzdHJsZW4odGFnKSA9PSAwKQogCQlyZXR1cm47CiAKLQlp
+ZiAoZmxkID09IE5VTEwgfHwgKGxlbiA9IHN0cmxlbihmbGQpKSA9PSAwKQorCWlmIChmbGQgPT0g
+TlVMTCB8fCAobGVuID0gc3RybGVuKGZsZCkpID09IDApeworCQl2Y2FyZF9wcmludGYodmNhcmRz
+LCAiJXM6IiwgdGFnKTsKIAkJcmV0dXJuOwotCisJfQogCWlmIChjYXRlZ29yeSAmJiBzdHJsZW4o
+Y2F0ZWdvcnkpKSB7CiAJCXNlcGFyYXRvciA9ICI7IjsKIAkJdHlwZSA9ICJUWVBFPSI7CkBAIC0z
+MTQsOSArMzE3LDEwIEBAIHN0YXRpYyB2b2lkIHZjYXJkX3ByaW50Zl9lbWFpbChHU3RyaW5nICp2
+Y2FyZHMsIHVpbnQ4X3QgZm9ybWF0LAogCWNoYXIgZmllbGRbTEVOX01BWF07CiAJaW50IGxlbiA9
+IDA7CiAKLQlpZiAoIWFkZHJlc3MgfHwgIShsZW4gPSBzdHJsZW4oYWRkcmVzcykpKQorCWlmICgh
+YWRkcmVzcyB8fCAhKGxlbiA9IHN0cmxlbihhZGRyZXNzKSkpeworCQl2Y2FyZF9wcmludGYodmNh
+cmRzLCAiRU1BSUw6Iik7CiAJCXJldHVybjsKLQorCX0KIAlzd2l0Y2ggKGNhdGVnb3J5KXsKIAlj
+YXNlIEVNQUlMX1RZUEVfSE9NRToKIAkJaWYgKGZvcm1hdCA9PSBGT1JNQVRfVkNBUkQyMSkKQEAg
+LTM1OCw5ICszNjIsMTAgQEAgc3RhdGljIGdib29sZWFuIG9yZ19maWVsZHNfcHJlc2VudChzdHJ1
+Y3QgcGhvbmVib29rX2NvbnRhY3QgKmNvbnRhY3QpCiBzdGF0aWMgdm9pZCB2Y2FyZF9wcmludGZf
+b3JnKEdTdHJpbmcgKnZjYXJkcywKIAkJCQkJc3RydWN0IHBob25lYm9va19jb250YWN0ICpjb250
+YWN0KQogewotCWlmIChvcmdfZmllbGRzX3ByZXNlbnQoY29udGFjdCkgPT0gRkFMU0UpCisJaWYg
+KG9yZ19maWVsZHNfcHJlc2VudChjb250YWN0KSA9PSBGQUxTRSl7CisJCXZjYXJkX3ByaW50Zih2
+Y2FyZHMsICJPUkc6Iik7CiAJCXJldHVybjsKLQorCX0KIAl2Y2FyZF9wcmludGYodmNhcmRzLCAi
+T1JHOiVzOyVzOyVzIiwgY29udGFjdC0+Y29tcGFueSwKIAkJCQljb250YWN0LT5kZXBhcnRtZW50
+LCBjb250YWN0LT50aXRsZSk7CiB9CkBAIC00MjgsOSArNDMzLDEzIEBAIHZvaWQgcGhvbmVib29r
+X2FkZF9jb250YWN0KEdTdHJpbmcgKnZjYXJkcywgc3RydWN0IHBob25lYm9va19jb250YWN0ICpj
+b250YWN0LAogCQl2Y2FyZF9wcmludGZfZnVsbG5hbWUodmNhcmRzLCBjb250YWN0LT5mdWxsbmFt
+ZSk7CiAKIAlpZiAoZmlsdGVyICYgRklMVEVSX1RFTCkgewotCQlHU0xpc3QgKmw7CisJCUdTTGlz
+dCAqbCA9IGNvbnRhY3QtPm51bWJlcnM7CiAKLQkJZm9yIChsID0gY29udGFjdC0+bnVtYmVyczsg
+bDsgbCA9IGwtPm5leHQpIHsKKyAgICAgICAgICAgICAgICBpZiAoZ19zbGlzdF9sZW5ndGgobCkg
+PT0gMCkKKyAgICAgICAgICAgICAgICAgICAgICAgIHZjYXJkX3ByaW50Zl9udW1iZXIodmNhcmRz
+LCBmb3JtYXQsIE5VTEwsIDEsCisgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIFRFTF9UWVBFX09USEVSKTsKKworCQlmb3IgKDsgbDsgbCA9IGwt
+Pm5leHQpIHsKIAkJCXN0cnVjdCBwaG9uZWJvb2tfbnVtYmVyICpudW1iZXIgPSBsLT5kYXRhOwog
+CiAJCQl2Y2FyZF9wcmludGZfbnVtYmVyKHZjYXJkcywgZm9ybWF0LCBudW1iZXItPnRlbCwgMSwK
+QEAgLTQzOSw5ICs0NDgsMTMgQEAgdm9pZCBwaG9uZWJvb2tfYWRkX2NvbnRhY3QoR1N0cmluZyAq
+dmNhcmRzLCBzdHJ1Y3QgcGhvbmVib29rX2NvbnRhY3QgKmNvbnRhY3QsCiAJfQogCiAJaWYgKGZp
+bHRlciAmIEZJTFRFUl9FTUFJTCkgewotCQlHU0xpc3QgKmw7CisJCUdTTGlzdCAqbCA9IGNvbnRh
+Y3QtPmVtYWlsczsKKworCQlpZiAoZ19zbGlzdF9sZW5ndGgobCkgPT0gMCkKKyAgICAgICAgICAg
+ICAgICAgICAgICAgIHZjYXJkX3ByaW50Zl9lbWFpbCh2Y2FyZHMsIGZvcm1hdCwgTlVMTCwKKyAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgRU1B
+SUxfVFlQRV9PVEhFUik7CiAKLQkJZm9yIChsID0gY29udGFjdC0+ZW1haWxzOyBsOyBsID0gbC0+
+bmV4dCl7CisgICAgICAgICAgICAgICAgZm9yICg7IGw7IGwgPSBsLT5uZXh0KXsKIAkJCXN0cnVj
+dCBwaG9uZWJvb2tfZW1haWwgKmVtYWlsID0gbC0+ZGF0YTsKIAogCQkJdmNhcmRfcHJpbnRmX2Vt
+YWlsKHZjYXJkcywgZm9ybWF0LCBlbWFpbC0+YWRkcmVzcywgZW1haWwtPnR5cGUpOwpAQCAtNDUy
+LDE4ICs0NjUsMTggQEAgdm9pZCBwaG9uZWJvb2tfYWRkX2NvbnRhY3QoR1N0cmluZyAqdmNhcmRz
+LCBzdHJ1Y3QgcGhvbmVib29rX2NvbnRhY3QgKmNvbnRhY3QsCiAJCXZjYXJkX3ByaW50Zl9hZHIo
+dmNhcmRzLCBjb250YWN0KTsKIAogCWlmIChmaWx0ZXIgJiBGSUxURVJfQkRBWSkKLQkJdmNhcmRf
+cHJpbnRmX3RhZyh2Y2FyZHMsICJCREFZIiwgTlVMTCwgY29udGFjdC0+YmlydGhkYXkpOworCQl2
+Y2FyZF9wcmludGZfdGFnKHZjYXJkcywgZm9ybWF0LCAiQkRBWSIsIE5VTEwsIGNvbnRhY3QtPmJp
+cnRoZGF5KTsKIAogCWlmIChmaWx0ZXIgJiBGSUxURVJfTklDS05BTUUpCi0JCXZjYXJkX3ByaW50
+Zl9zbGFzaF90YWcodmNhcmRzLCAiTklDS05BTUUiLCBOVUxMLAorCQl2Y2FyZF9wcmludGZfc2xh
+c2hfdGFnKHZjYXJkcywgZm9ybWF0LCAiTklDS05BTUUiLCBOVUxMLAogCQkJCQkJCWNvbnRhY3Qt
+Pm5pY2tuYW1lKTsKIAogCWlmIChmaWx0ZXIgJiBGSUxURVJfVVJMKQotCQl2Y2FyZF9wcmludGZf
+c2xhc2hfdGFnKHZjYXJkcywgIlVSTCIsICJJTlRFUk5FVCIsCisJCXZjYXJkX3ByaW50Zl9zbGFz
+aF90YWcodmNhcmRzLCBmb3JtYXQsICJVUkwiLCAiSU5URVJORVQiLAogCQkJCQkJCWNvbnRhY3Qt
+PndlYnNpdGUpOwogCiAJaWYgKGZpbHRlciAmIEZJTFRFUl9QSE9UTykKLQkJdmNhcmRfcHJpbnRm
+X3RhZyh2Y2FyZHMsICJQSE9UTyIsIE5VTEwsIGNvbnRhY3QtPnBob3RvKTsKKwkJdmNhcmRfcHJp
+bnRmX3RhZyh2Y2FyZHMsIGZvcm1hdCwgIlBIT1RPIiwgTlVMTCwgY29udGFjdC0+cGhvdG8pOwog
+CiAJaWYgKGZpbHRlciAmIEZJTFRFUl9PUkcpCiAJCXZjYXJkX3ByaW50Zl9vcmcodmNhcmRzLCBj
+b250YWN0KTsKLS0gCjEuNy4wLjQKCg==
+--001485e98b2218780a048eb52f25--
