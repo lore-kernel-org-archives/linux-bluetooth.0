@@ -1,43 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 25 Aug 2010 22:04:30 -0300
+Date: Wed, 25 Aug 2010 22:01:16 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: haijun liu <liuhaijun.er@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 12/22] Add some default values for configuration process
-Message-ID: <20100826010430.GD16062@vigoh>
-References: <AANLkTikAZBO6dka+yN3tFTZekm9+1nzo3=OZEoxZ1Eab@mail.gmail.com>
+Subject: Re: [PATCH 02/22] Add eL2cap new features macro definition
+Message-ID: <20100826010116.GC16062@vigoh>
+References: <AANLkTi=qOgovmY3s3PcS4tGb59HUhxx-Qydr2NyNs9Me@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTikAZBO6dka+yN3tFTZekm9+1nzo3=OZEoxZ1Eab@mail.gmail.com>
+In-Reply-To: <AANLkTi=qOgovmY3s3PcS4tGb59HUhxx-Qydr2NyNs9Me@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Haijun,
 
-* haijun liu <liuhaijun.er@gmail.com> [2010-08-26 06:35:34 +0800]:
+* haijun liu <liuhaijun.er@gmail.com> [2010-08-26 06:27:35 +0800]:
 
-> From 2d21459fa52b754ce0f666ccefc0175bc7f04420 Mon Sep 17 00:00:00 2001
+> From fb2a4d17435dbd6d8787e6928c1da4f12a839265 Mon Sep 17 00:00:00 2001
 > From: haijun.liu <haijun.liu@atheros.com>
-> Date: Sun, 22 Aug 2010 23:57:09 +0800
-> Subject: [PATCH 12/22] Add some default values for configuration process.
+> Date: Wed, 18 Aug 2010 22:33:22 +0800
+> Subject: [PATCH 02/22] Add eL2cap new features macro definition.
 > 
 > ---
->  include/net/bluetooth/l2cap.h |    5 +++++
->  1 files changed, 5 insertions(+), 0 deletions(-)
+>  include/net/bluetooth/l2cap.h |    4 ++++
+>  1 files changed, 4 insertions(+), 0 deletions(-)
 > 
 > diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index fe411e2..d0ae9f5 100644
+> index bf0ea10..2e782d0 100644
 > --- a/include/net/bluetooth/l2cap.h
 > +++ b/include/net/bluetooth/l2cap.h
-> @@ -36,6 +36,11 @@
->  #define L2CAP_DEFAULT_MAX_PDU_SIZE	672
->  #define L2CAP_DEFAULT_ACK_TO		200
->  #define L2CAP_LOCAL_BUSY_TRIES		12
-> +#define L2CAP_DEFAULT_MAX_SDU_SIZE	0xFFFF
-> +#define L2CAP_DEFAULT_SDU_ARRIVAL_TIME	0xFFFFFFFF
-> +#define L2CAP_DEFAULT_FLUSH_TIMEOUT	0xFFFFFFFF
+> @@ -99,7 +99,11 @@ struct l2cap_conninfo {
+>  #define L2CAP_FEAT_ERTM		0x00000008
+>  #define L2CAP_FEAT_STREAMING	0x00000010
+>  #define L2CAP_FEAT_FCS		0x00000020
+> +#define L2CAP_FEAT_EFS_BREDR	0x00000040
+>  #define L2CAP_FEAT_FIXED_CHAN	0x00000080
+> +#define L2CAP_FEAT_EXT_WINSIZE	0x00000100
+> +#define L2CAP_FEAT_UCDR		0x00000200
+> +#define L2CAP_FEAT_RESERVED	0x80000000
 
-We already have L2CAP_DEFAULT_FLUSH_TO with the same value.
+We don't need the L2CAP_FEAT_RESERVED here.
 
 -- 
 Gustavo F. Padovan
