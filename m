@@ -1,61 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 27 Aug 2010 21:45:17 +0200
-From: Antonio Ospite <ospite@studenti.unina.it>
-To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Cc: <linux-bluetooth@vger.kernel.org>,
-	<par-gunnar.p.hjalmdahl@stericsson.com>,
-	<joakim.xj.ceder@stericsson.com>, <johan.hedberg@gmail.com>
-Subject: Re: [PATCH] Bluetooth: BT_SECURITY_HIGH requires 16 digit pin code
-Message-Id: <20100827214517.e80a7a0c.ospite@studenti.unina.it>
-In-Reply-To: <1282909460-19337-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
-References: <1282909460-19337-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA1";
- boundary="Signature=_Fri__27_Aug_2010_21_45_18_+0200_YTptj70fw05Wv/CU"
+Date: Fri, 27 Aug 2010 11:06:15 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: David Vrabel <david.vrabel@csr.com>
+cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+	rshaffer@codeaurora.org, linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH 1/1] Bluetooth: Add socket option definitions for AMP
+In-Reply-To: <4C6BE410.1020505@csr.com>
+Message-ID: <alpine.DEB.2.00.1008271105050.22778@linux-sea-02>
+References: <1282086426-8423-1-git-send-email-mathewm@codeaurora.org> <4C6BE410.1020505@csr.com>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---Signature=_Fri__27_Aug_2010_21_45_18_+0200_YTptj70fw05Wv/CU
-Content-Type: text/plain; charset=US-ASCII
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, 27 Aug 2010 13:44:20 +0200
-Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com> wrote:
+David -
 
-> The security level BT_SECURITY_HIGH expects secure connection
-> and a minimum 16 digit pin code used for bonding. It's requitred by the
+On Wed, 18 Aug 2010, David Vrabel wrote:
 
-typo:
-s/requitred/required/
+> Mat Martineau wrote:
+>> This adds a new BT_AMP socket option to control the use of AMP channels.
+>> It is for use with the SOL_BLUETOOTH option level on L2CAP sockets.
+>>
+>> Available option values are defined as:
+>>
+>> [lots of nice documentation]
+>
+> Why is none of this documentation in the code?
+>
+> I believe we also agreed that this policy could be changed at any point
+> in the life time of the channel so this should be documented as well.
+>
+>> +#define BT_AMP		8
+>
+> Suggest BT_AMP_POLICY, BT_AMP_POLICY_REQUIRE_BR_EDR etc.  Just in case
+> there are other AMP related socket options in the future.
+>
+>> +#define BT_AMP_REQUIRE_BR_EDR	0
+>> +#define BT_AMP_PREFER_AMP	1
+>> +#define BT_AMP_PREFER_BR_EDR	2
 
-> Sim Access Profile.
->=20
-> Patch on behalf of ST-Ericsson SA.
->=20
-> Signed-off-by: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-[...]
+Thanks for the helpful feedback - I'll add the documentation, adjust 
+the names, and repost.
 
---=20
-Antonio Ospite
-http://ao2.it
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
 
-PGP public key ID: 0x4553B001
-
-A: Because it messes up the order in which people normally read text.
-   See http://en.wikipedia.org/wiki/Posting_style
-Q: Why is top-posting such a bad thing?
-
---Signature=_Fri__27_Aug_2010_21_45_18_+0200_YTptj70fw05Wv/CU
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
-
-iEYEARECAAYFAkx4Fc4ACgkQ5xr2akVTsAGUuQCgohjbLy/Bg8P0g7RAzr2sVl93
-GVMAn04KOXcA23Ifb6WpTPyjTDrdfluO
-=cbMD
------END PGP SIGNATURE-----
-
---Signature=_Fri__27_Aug_2010_21_45_18_+0200_YTptj70fw05Wv/CU--
