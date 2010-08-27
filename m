@@ -1,50 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 27 Aug 2010 11:06:15 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: David Vrabel <david.vrabel@csr.com>
-cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	rshaffer@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH 1/1] Bluetooth: Add socket option definitions for AMP
-In-Reply-To: <4C6BE410.1020505@csr.com>
-Message-ID: <alpine.DEB.2.00.1008271105050.22778@linux-sea-02>
-References: <1282086426-8423-1-git-send-email-mathewm@codeaurora.org> <4C6BE410.1020505@csr.com>
+From: <Waldemar.Rymarkiewicz@tieto.com>
+To: <johan.hedberg@gmail.com>
+CC: <hadess@hadess.net>, <linux-bluetooth@vger.kernel.org>,
+	<par-gunnar.p.hjalmdahl@stericsson.com>,
+	<joakim.xj.ceder@stericsson.com>, <arunkr.singh@stericsson.com>
+Date: Fri, 27 Aug 2010 16:32:18 +0300
+Subject: RE: [PATCH] BT_SECURITY_HIGH requires 16 digit pin code
+Message-ID: <99B09243E1A5DA4898CDD8B7001114480976E15A78@EXMB04.eu.tieto.com>
+References: <1282909526-19374-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+ <1282911133.835.30.camel@localhost.localdomain>
+ <99B09243E1A5DA4898CDD8B7001114480976E15A2C@EXMB04.eu.tieto.com>
+ <20100827124524.GA9484@jh-x301>
+In-Reply-To: <20100827124524.GA9484@jh-x301>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Johan, 
 
-David -
-
-On Wed, 18 Aug 2010, David Vrabel wrote:
-
-> Mat Martineau wrote:
->> This adds a new BT_AMP socket option to control the use of AMP channels.
->> It is for use with the SOL_BLUETOOTH option level on L2CAP sockets.
->>
->> Available option values are defined as:
->>
->> [lots of nice documentation]
+>-----Original Message-----
+>From: Johan Hedberg [mailto:johan.hedberg@gmail.com] 
+>Sent: Friday, August 27, 2010 2:45 PM
+>Hi Waldemar,
 >
-> Why is none of this documentation in the code?
+>On Fri, Aug 27, 2010, Waldemar.Rymarkiewicz@tieto.com wrote:
+>> I assume that user will know that the 16 digit pin is requred, so 
+>> should be enough to let the user type 16 digit in an agent I guess.
+>> Usually a service that requires high security will generate 
+>right pin 
+>> code.
 >
-> I believe we also agreed that this policy could be changed at any point
-> in the life time of the channel so this should be documented as well.
->
->> +#define BT_AMP		8
->
-> Suggest BT_AMP_POLICY, BT_AMP_POLICY_REQUIRE_BR_EDR etc.  Just in case
-> there are other AMP related socket options in the future.
->
->> +#define BT_AMP_REQUIRE_BR_EDR	0
->> +#define BT_AMP_PREFER_AMP	1
->> +#define BT_AMP_PREFER_BR_EDR	2
+>I don't think "the user should know" is enough here, so we may 
+>need to think about ways that we could relay this info to the 
+>agent (maybe a special adapter property or an extra parameter 
+>in the PIN request agent callback).
 
-Thanks for the helpful feedback - I'll add the documentation, adjust 
-the names, and repost.
+I agree and I guess adding a new property is more convenient then braking existing agen api.
 
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
 
+>> Originaly the high security level was planned to require max 
+>pin code 
+>> lenght as I know.
+>
+>That's correct, however the UI side hasn't really been 
+>considered so far.
+>
+>In general about the patches, I suspect it'll take a bit 
+>longer than usual to get them in since the code you're 
+>touching is one of the most sensitive ones with respect to 
+>breakage. We've finetuned it multiple times over the last few 
+>years to get rid of IOP issues, security vulnerabilities and 
+>to make sure all qualification tests pass. Another reason for 
+>an expected delay is that you're introducing changes to the 
+>kernel interface and that always requires some extra reviewing.
+
+I'm aware of that and I actually expected delay. Sending those patches I have been rather more interesting in starting some disscution on this topic, then get it up streamed now.
+
+>So how well have you tested the patches? I.e. how confident 
+>are you that you're not introducing any regressions? Scenarios 
+>that would need to be tested before an upstream merge are (and 
+>I'm probably forgetting several of them):
+>
+>- legacy pairing acceptor & initiator
+>- security mode 3 acceptor & initiator
+>- ssp acceptor & initiator
+>- renewed link key handling for both debug and normal keys
+>- security level upgrading (i.e. connect first to a low security socket
+>  and then over the same ACL to a higher security socket)
+>- complete and partial failure scenarios for all of the above
+>
+>Additionally all these test should be done against several 
+>different controllers due to differences in HCI interface 
+>behavior (event ordering, error codes, etc). In that list I'd 
+>include at least one CSR, and one Broadcom adapter and any 
+>other adapters from other manufacturers that you can get hold of.
+>
+
+>So how many of these tests do you already have covered? I'm 
+>not very comfortable with pushing the patches upstream before 
+>most of the above scenarios have been tested and verified not 
+>to introduce any regressions.
+>
+>Johan
+>
+
+To be honest, I did not check all mentioned use cases. I did tests against lagacy and ssp parring and security level upgrading.
+So, I will put more effort into testing to be sure.
+
+However, I would appreciate any comments to the changes as I'm not sure what was originally assumed for the high security level.  What's more, I'am not happy that the link key request and the pin code request are handled in bluez. It makes that bluez need to pass it to the kernel as it's needed there. I used ioctl for that. Some comments on this?
+
+Thanks,
+/Waldek 
