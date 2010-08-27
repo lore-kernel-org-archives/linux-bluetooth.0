@@ -1,56 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 27 Aug 2010 23:11:32 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Waldemar.Rymarkiewicz@tieto.com
-Cc: hadess@hadess.net, linux-bluetooth@vger.kernel.org,
+Date: Fri, 27 Aug 2010 16:55:50 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org,
 	par-gunnar.p.hjalmdahl@stericsson.com,
-	joakim.xj.ceder@stericsson.com, arunkr.singh@stericsson.com
-Subject: Re: [PATCH] BT_SECURITY_HIGH requires 16 digit pin code
-Message-ID: <20100827201132.GA14223@jh-x301>
-References: <1282909526-19374-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
- <1282911133.835.30.camel@localhost.localdomain>
- <99B09243E1A5DA4898CDD8B7001114480976E15A2C@EXMB04.eu.tieto.com>
- <20100827124524.GA9484@jh-x301>
- <99B09243E1A5DA4898CDD8B7001114480976E15A78@EXMB04.eu.tieto.com>
+	joakim.xj.ceder@stericsson.com, johan.hedberg@gmail.com
+Subject: Re: [PATCH] Bluetooth: BT_SECURITY_HIGH requires 16 digit pin code
+Message-ID: <20100827195550.GA11191@vigoh>
+References: <1282909460-19337-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <99B09243E1A5DA4898CDD8B7001114480976E15A78@EXMB04.eu.tieto.com>
+In-Reply-To: <1282909460-19337-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Waldek,
+Hi Waldemar,
 
-On Fri, Aug 27, 2010, Waldemar.Rymarkiewicz@tieto.com wrote:
-> However, I would appreciate any comments to the changes as I'm not
-> sure what was originally assumed for the high security level.
+* Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com> [2010-08-27 13:44:20 +0200]:
 
-Your assumptions were more or less correct. Additionally there should be
-the check for encryption key size (to fulfill SAP requirements), though
-that'd require at least a 3.0 capable controller if for the standardized
-HCI command.
+> The security level BT_SECURITY_HIGH expects secure connection
+> and a minimum 16 digit pin code used for bonding. It's requitred by the
+> Sim Access Profile.
+> 
+> Patch on behalf of ST-Ericsson SA.
+> 
+> Signed-off-by: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+> ---
+>  include/net/bluetooth/hci.h      |   17 +++++++
+>  include/net/bluetooth/hci_core.h |    4 ++
+>  net/bluetooth/hci_conn.c         |   97 +++++++++++++++++++++++++++++++-------
+>  net/bluetooth/hci_event.c        |    4 ++
+>  net/bluetooth/hci_sock.c         |    3 +
+>  net/bluetooth/rfcomm/core.c      |   10 ++++-
+>  6 files changed, 116 insertions(+), 19 deletions(-)
+>  mode change 100644 => 100755 include/net/bluetooth/hci.h
+>  mode change 100644 => 100755 include/net/bluetooth/hci_core.h
+>  mode change 100644 => 100755 net/bluetooth/hci_conn.c
+>  mode change 100644 => 100755 net/bluetooth/hci_event.c
+>  mode change 100644 => 100755 net/bluetooth/rfcomm/core.c
 
-> What's more, I'am not happy that the link key request and the pin code
-> request are handled in bluez. It makes that bluez need to pass it to
-> the kernel as it's needed there. I used ioctl for that. Some comments
-> on this?
+You are changing the files modes. Don't do that.
 
-I'm not happy with it either. In fact, the arbitrary split of security
-logic between kernel and userspace has caused us lots of grief,
-especially with SSP. Because of this, the plan for BlueZ 5.x is to move
-most security related logic to the kernel side. The only thing remaining
-in userspace is security policy requiring user interaction (e.g.
-answering user confirmation requests) and persistent link key storage
-(runtime storage will be added to the kernel side). The promiscuous HCI
-socket will go away from bluetoothd so the daemon doesn't always wake up
-when there's some HCI traffic.
-
-To make all this possible we're designing a new protocol between kernel
-and userspace. Hopefully we'll get the first bits, at least a
-preliminary specification, upstream within the next month or so. Because
-of this I'm wondering if the new ioctl that you're adding is really
-worth it. Maybe we should just wait for BlueZ 5.x with this. That'd also
-give us the possibility of adding a new parameter to
-Agent.RequestPinCode since we need to break the agent API anyway (e.g.
-add an incoming just-works pairing callback).
-
-Johan
+-- 
+Gustavo F. Padovan
+ProFUSION embedded systems - http://profusion.mobi
