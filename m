@@ -1,69 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: <Waldemar.Rymarkiewicz@tieto.com>
-To: <padovan@profusion.mobi>
-CC: <linux-bluetooth@vger.kernel.org>
-Date: Mon, 30 Aug 2010 09:58:36 +0300
-Subject: RE: [PATCH] Bluetooth: BT_SECURITY_HIGH requires 16 digit pin code
-Message-ID: <99B09243E1A5DA4898CDD8B7001114480977FD6D9C@EXMB04.eu.tieto.com>
-References: <1282909460-19337-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
- <20100827195550.GA11191@vigoh>
-In-Reply-To: <20100827195550.GA11191@vigoh>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20100829101959.GA10891@jh-x301>
+References: <CF9C39F99A89134C9CF9C4CCB68B8DDF25AB2D2864@orsmsx501.amr.corp.intel.com>
+	<20100828082256.GA23228@jh-x301>
+	<CF9C39F99A89134C9CF9C4CCB68B8DDF25AB2D28E0@orsmsx501.amr.corp.intel.com>
+	<AANLkTi=K6rdg+Pck7FjbDP-LTn=5sXrLVX9Nz8RPqi0v@mail.gmail.com>
+	<20100829101959.GA10891@jh-x301>
+Date: Sun, 29 Aug 2010 19:28:29 +0530
+Message-ID: <AANLkTinHLGYkji4Eoxu_QReDQCHndB7r319jB-2butVT@mail.gmail.com>
+Subject: Re: Cannot build BlueZ Release 4.70...
+From: alok barsode <alokbarsode@gmail.com>
+To: alok barsode <alokbarsode@gmail.com>, "Ho, Albert O" <albert.o.ho@intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"marcel@holtmann.org" <marcel@holtmann.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Oops, I missed that. It was done automatically somehow. It wasn't my intention of doing this.
-Will fix it.
+Hi Johan,
 
-Thanks,
+On Sun, Aug 29, 2010 at 3:49 PM, Johan Hedberg <johan.hedberg@gmail.com> wr=
+ote:
+> Hi,
+>
+> On Sun, Aug 29, 2010, alok barsode wrote:
+>> > The configure line invocation is taken from README file. =A0Below are
+>> > copy-paste exact errors.
+>>
+>> I tried building using bootstrap-configure and it built fine. =A0But
+>> when I tried building with ./bootstrap and ./configure =A0it gave the
+>> same errors as mentioned.
+>> Maybe we missed some configure option ?
+>
+> I still can't seem to reproduce this. I just tried "./bootstrap &&
+> ./configure && make" with a clean git tree and it compiles fine.
+> Downloading the official tarball for 4.70 and doing "./configure &&
+> make" works fine too. I wonder if the autotools or gcc version has
+> something to do with this?
 
-/Waldek 
+I dont think this is a autotools issue.(my autoconf ver is 2.64 and
+automake ver is 1.11
+gcc version is 4.4.1. which are fairly new).
 
->-----Original Message-----
->From: Gustavo F. Padovan [mailto:pao@profusion.mobi] On Behalf 
->Of Gustavo F. Padovan
->Sent: Friday, August 27, 2010 9:56 PM
->To: Rymarkiewicz Waldemar
->Cc: linux-bluetooth@vger.kernel.org; 
->par-gunnar.p.hjalmdahl@stericsson.com; 
->joakim.xj.ceder@stericsson.com; johan.hedberg@gmail.com
->Subject: Re: [PATCH] Bluetooth: BT_SECURITY_HIGH requires 16 
->digit pin code
+If I give "--enable-alsa" option to configure it builds fine.
+acinclude.m4 sets the SBC variable  if either alsa or gstreamer or
+test are enabled via configure.
+
+ In Makefile.am , the attrib_sources are put under SBC conditional.
+
+I dont have much idea about attrib, maybe put the attrib_sources under
+a ATTRIBPLUGIN conditional might solve this issue?
+
+Cheers,
+Alok.
 >
->Hi Waldemar,
->
->* Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com> 
->[2010-08-27 13:44:20 +0200]:
->
->> The security level BT_SECURITY_HIGH expects secure connection and a 
->> minimum 16 digit pin code used for bonding. It's requitred 
->by the Sim 
->> Access Profile.
->> 
->> Patch on behalf of ST-Ericsson SA.
->> 
->> Signed-off-by: Waldemar Rymarkiewicz 
-><waldemar.rymarkiewicz@tieto.com>
->> ---
->>  include/net/bluetooth/hci.h      |   17 +++++++
->>  include/net/bluetooth/hci_core.h |    4 ++
->>  net/bluetooth/hci_conn.c         |   97 
->+++++++++++++++++++++++++++++++-------
->>  net/bluetooth/hci_event.c        |    4 ++
->>  net/bluetooth/hci_sock.c         |    3 +
->>  net/bluetooth/rfcomm/core.c      |   10 ++++-
->>  6 files changed, 116 insertions(+), 19 deletions(-)  mode change 
->> 100644 => 100755 include/net/bluetooth/hci.h  mode change 100644 => 
->> 100755 include/net/bluetooth/hci_core.h  mode change 100644 
->=> 100755 
->> net/bluetooth/hci_conn.c  mode change 100644 => 100755 
->> net/bluetooth/hci_event.c  mode change 100644 => 100755 
->> net/bluetooth/rfcomm/core.c
->
->You are changing the files modes. Don't do that.
->
->--
->Gustavo F. Padovan
->ProFUSION embedded systems - http://profusion.mobi
+> Johan
 >
