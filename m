@@ -1,109 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Use simpler error callbacks for GDBus security hooks
-Date: Sun, 29 Aug 2010 06:32:26 -0400
-Message-Id: <1283077946-27472-1-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Sun, 29 Aug 2010 13:19:59 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: alok barsode <alokbarsode@gmail.com>
+Cc: "Ho, Albert O" <albert.o.ho@intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"marcel@holtmann.org" <marcel@holtmann.org>
+Subject: Re: Cannot build BlueZ Release 4.70...
+Message-ID: <20100829101959.GA10891@jh-x301>
+References: <CF9C39F99A89134C9CF9C4CCB68B8DDF25AB2D2864@orsmsx501.amr.corp.intel.com>
+ <20100828082256.GA23228@jh-x301>
+ <CF9C39F99A89134C9CF9C4CCB68B8DDF25AB2D28E0@orsmsx501.amr.corp.intel.com>
+ <AANLkTi=K6rdg+Pck7FjbDP-LTn=5sXrLVX9Nz8RPqi0v@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <AANLkTi=K6rdg+Pck7FjbDP-LTn=5sXrLVX9Nz8RPqi0v@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- gdbus/gdbus.h  |    9 +++++++--
- gdbus/object.c |   29 +++++++++++++++++++++++------
- 2 files changed, 30 insertions(+), 8 deletions(-)
+Hi,
 
-diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
-index 42d4f73..553918c 100644
---- a/gdbus/gdbus.h
-+++ b/gdbus/gdbus.h
-@@ -58,7 +58,7 @@ typedef DBusMessage * (* GDBusMethodFunction) (DBusConnection *connection,
- typedef guint32 GDBusPendingReply;
- 
- typedef void (* GDBusSecurityFunction) (DBusConnection *connection,
--			DBusMessage *message, GDBusPendingReply pending);
-+						GDBusPendingReply pending);
- 
- typedef enum {
- 	G_DBUS_METHOD_FLAG_DEPRECATED = (1 << 0),
-@@ -116,7 +116,12 @@ gboolean g_dbus_unregister_security(const GDBusSecurityTable *security);
- void g_dbus_pending_success(DBusConnection *connection,
- 					GDBusPendingReply pending);
- void g_dbus_pending_error(DBusConnection *connection,
--				GDBusPendingReply pending, DBusMessage *error);
-+				GDBusPendingReply pending,
-+				const char *name, const char *format, ...)
-+					__attribute__((format(printf, 4, 5)));
-+void g_dbus_pending_error_valist(DBusConnection *connection,
-+				GDBusPendingReply pending, const char *name,
-+					const char *format, va_list args);
- 
- DBusMessage *g_dbus_create_error(DBusMessage *message, const char *name,
- 						const char *format, ...)
-diff --git a/gdbus/object.c b/gdbus/object.c
-index a367f93..48530f2 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -271,22 +271,26 @@ void g_dbus_pending_success(DBusConnection *connection,
-         }
- }
- 
--void g_dbus_pending_error(DBusConnection *connection,
--				GDBusPendingReply pending, DBusMessage *error)
-+void g_dbus_pending_error_valist(DBusConnection *connection,
-+				GDBusPendingReply pending, const char *name,
-+					const char *format, va_list args)
- {
- 	GSList *list;
- 
-         for (list = pending_security; list; list = list->next) {
- 		struct security_data *secdata = list->data;
-+		DBusMessage *reply;
- 
- 		if (secdata->pending != pending)
- 			continue;
- 
- 		pending_security = g_slist_remove(pending_security, secdata);
- 
--		if (error != NULL) {
--			dbus_connection_send(connection, error, NULL);
--			dbus_message_unref(error);
-+		reply = g_dbus_create_error_valist(secdata->message,
-+							name, format, args);
-+		if (reply != NULL) {
-+			dbus_connection_send(connection, reply, NULL);
-+			dbus_message_unref(reply);
- 		}
- 
- 		dbus_message_unref(secdata->message);
-@@ -295,6 +299,19 @@ void g_dbus_pending_error(DBusConnection *connection,
-         }
- }
- 
-+void g_dbus_pending_error(DBusConnection *connection,
-+				GDBusPendingReply pending,
-+				const char *name, const char *format, ...)
-+{
-+	va_list args;
-+
-+	va_start(args, format);
-+
-+	g_dbus_pending_error_valist(connection, pending, name, format, args);
-+
-+	va_end(args);
-+}
-+
- static gboolean check_privilege(DBusConnection *conn, DBusMessage *msg,
- 			const GDBusMethodTable *method, void *iface_user_data)
- {
-@@ -315,7 +332,7 @@ static gboolean check_privilege(DBusConnection *conn, DBusMessage *msg,
- 
- 		pending_security = g_slist_prepend(pending_security, secdata);
- 
--		security->function(conn, secdata->message, secdata->pending);
-+		security->function(conn, secdata->pending);
- 
- 		return TRUE;
- 	}
--- 
-1.7.2.2
+On Sun, Aug 29, 2010, alok barsode wrote:
+> > The configure line invocation is taken from README file.  Below are
+> > copy-paste exact errors.
+> 
+> I tried building using bootstrap-configure and it built fine.  But
+> when I tried building with ./bootstrap and ./configure  it gave the
+> same errors as mentioned.
+> Maybe we missed some configure option ?
 
+I still can't seem to reproduce this. I just tried "./bootstrap &&
+./configure && make" with a clean git tree and it compiles fine.
+Downloading the official tarball for 4.70 and doing "./configure &&
+make" works fine too. I wonder if the autotools or gcc version has
+something to do with this?
+
+Johan
