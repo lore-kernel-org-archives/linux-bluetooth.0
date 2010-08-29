@@ -1,47 +1,109 @@
 Return-Path: <cyrus@holtmann.org>
-From: Toralf =?iso-8859-15?q?F=F6rster?= <toralf.foerster@gmx.de>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: new kmemleak in kernel 2.6.35.4
-Date: Sun, 29 Aug 2010 13:20:18 +0200
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-15"
-Message-Id: <201008291320.19762.toralf.foerster@gmx.de>
+Subject: [PATCH] Use simpler error callbacks for GDBus security hooks
+Date: Sun, 29 Aug 2010 06:32:26 -0400
+Message-Id: <1283077946-27472-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello
+---
+ gdbus/gdbus.h  |    9 +++++++--
+ gdbus/object.c |   29 +++++++++++++++++++++++------
+ 2 files changed, 30 insertions(+), 8 deletions(-)
 
-with this version I observed this kmemleak which seems to be new since 2.6.34 
-at my ThinkPad T400 at an almost stable Gentoo Linux (which however might be 
-rather related to suspend2ram) :
-
-unreferenced object 0xf5333e00 (size 192):
-  comm "async/29", pid 2911, jiffies 43041559 (age 24568.685s)
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 02 c7 34 65 e4 26 ce 11  ..........4e.&..
-    00 00 00 00 00 58 f0 f5 01 00 00 00 00 00 00 00  .....X..........
-  backtrace:
-    [<c122f8d7>] kmemleak_alloc+0x27/0x50
-    [<c109c34f>] kmem_cache_alloc+0x9f/0xe0
-    [<c11d393f>] __alloc_skb+0x2f/0x100
-    [<f9b4ab0c>] hci_send_cmd+0x2c/0xf0 [bluetooth]
-    [<f9b4abe9>] hci_reset_req+0x19/0x20 [bluetooth]
-    [<f9b4b170>] __hci_request+0x70/0xe0 [bluetooth]
-    [<f9b4b338>] hci_dev_do_close+0x158/0x1b0 [bluetooth]
-    [<f9b4b3cb>] hci_unregister_dev+0x3b/0xa0 [bluetooth]
-    [<f9cc1a8c>] btusb_disconnect+0x4c/0xa0 [btusb]
-    [<f863839b>] usb_unbind_interface+0x3b/0x160 [usbcore]
-    [<c118902c>] __device_release_driver+0x4c/0xa0
-    [<c1189130>] device_release_driver+0x20/0x30
-    [<f86386ef>] usb_driver_release_interface+0x6f/0x80 [usbcore]
-    [<f8638722>] usb_rebind_intf+0x22/0x80 [usbcore]
-    [<f86387fd>] do_unbind_rebind+0x5d/0x90 [usbcore]
-    [<f86388e3>] usb_resume+0xb3/0xc0 [usbcore]
-
+diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
+index 42d4f73..553918c 100644
+--- a/gdbus/gdbus.h
++++ b/gdbus/gdbus.h
+@@ -58,7 +58,7 @@ typedef DBusMessage * (* GDBusMethodFunction) (DBusConnection *connection,
+ typedef guint32 GDBusPendingReply;
+ 
+ typedef void (* GDBusSecurityFunction) (DBusConnection *connection,
+-			DBusMessage *message, GDBusPendingReply pending);
++						GDBusPendingReply pending);
+ 
+ typedef enum {
+ 	G_DBUS_METHOD_FLAG_DEPRECATED = (1 << 0),
+@@ -116,7 +116,12 @@ gboolean g_dbus_unregister_security(const GDBusSecurityTable *security);
+ void g_dbus_pending_success(DBusConnection *connection,
+ 					GDBusPendingReply pending);
+ void g_dbus_pending_error(DBusConnection *connection,
+-				GDBusPendingReply pending, DBusMessage *error);
++				GDBusPendingReply pending,
++				const char *name, const char *format, ...)
++					__attribute__((format(printf, 4, 5)));
++void g_dbus_pending_error_valist(DBusConnection *connection,
++				GDBusPendingReply pending, const char *name,
++					const char *format, va_list args);
+ 
+ DBusMessage *g_dbus_create_error(DBusMessage *message, const char *name,
+ 						const char *format, ...)
+diff --git a/gdbus/object.c b/gdbus/object.c
+index a367f93..48530f2 100644
+--- a/gdbus/object.c
++++ b/gdbus/object.c
+@@ -271,22 +271,26 @@ void g_dbus_pending_success(DBusConnection *connection,
+         }
+ }
+ 
+-void g_dbus_pending_error(DBusConnection *connection,
+-				GDBusPendingReply pending, DBusMessage *error)
++void g_dbus_pending_error_valist(DBusConnection *connection,
++				GDBusPendingReply pending, const char *name,
++					const char *format, va_list args)
+ {
+ 	GSList *list;
+ 
+         for (list = pending_security; list; list = list->next) {
+ 		struct security_data *secdata = list->data;
++		DBusMessage *reply;
+ 
+ 		if (secdata->pending != pending)
+ 			continue;
+ 
+ 		pending_security = g_slist_remove(pending_security, secdata);
+ 
+-		if (error != NULL) {
+-			dbus_connection_send(connection, error, NULL);
+-			dbus_message_unref(error);
++		reply = g_dbus_create_error_valist(secdata->message,
++							name, format, args);
++		if (reply != NULL) {
++			dbus_connection_send(connection, reply, NULL);
++			dbus_message_unref(reply);
+ 		}
+ 
+ 		dbus_message_unref(secdata->message);
+@@ -295,6 +299,19 @@ void g_dbus_pending_error(DBusConnection *connection,
+         }
+ }
+ 
++void g_dbus_pending_error(DBusConnection *connection,
++				GDBusPendingReply pending,
++				const char *name, const char *format, ...)
++{
++	va_list args;
++
++	va_start(args, format);
++
++	g_dbus_pending_error_valist(connection, pending, name, format, args);
++
++	va_end(args);
++}
++
+ static gboolean check_privilege(DBusConnection *conn, DBusMessage *msg,
+ 			const GDBusMethodTable *method, void *iface_user_data)
+ {
+@@ -315,7 +332,7 @@ static gboolean check_privilege(DBusConnection *conn, DBusMessage *msg,
+ 
+ 		pending_security = g_slist_prepend(pending_security, secdata);
+ 
+-		security->function(conn, secdata->message, secdata->pending);
++		security->function(conn, secdata->pending);
+ 
+ 		return TRUE;
+ 	}
 -- 
-MfG/Kind regards
-Toralf Förster
-
-pgp finger print: 7B1A 07F4 EC82 0F90 D4C2 8936 872A E508 7DB6 9DA3
+1.7.2.2
 
