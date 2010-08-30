@@ -1,84 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <287015.9937.qm@web56502.mail.re3.yahoo.com>
+References: <131634.48135.qm@web56506.mail.re3.yahoo.com> <AANLkTi=j6ch9_oQwb0xK9xPZ5btMUSqoHx4D8N8YM6nt@mail.gmail.com>
+Date: Sun, 29 Aug 2010 23:53:33 -0700 (PDT)
+From: Shreesh Holla <hshreesh@yahoo.com>
+Subject: Re: [RFCOMM] Cannot complete connections into Ubuntu
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <AANLkTi=j6ch9_oQwb0xK9xPZ5btMUSqoHx4D8N8YM6nt@mail.gmail.com>
 MIME-Version: 1.0
-Date: Mon, 30 Aug 2010 17:35:00 +0300
-Message-ID: <AANLkTi=KFGw_HQjUAb=s1Vf+tSW0BuFQWNwHrWBO7Wdq@mail.gmail.com>
-Subject: [PATCH] Store new local name before writing it to HCI
-From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=0016363b8b88945eed048f0b5e8f
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---0016363b8b88945eed048f0b5e8f
-Content-Type: text/plain; charset=ISO-8859-1
 
-Store new local name to the filesystem and emit property changed
-before actually writing the name to the chip. Avoids writing the
-name twice by using a boolean variable in the btd_adapter struct.
-The flag is needed since the name is read immediately after setting
-it and since the name could be changed by using for example
-hciconfig (in which case the flag would not be set).
 
-/Daniel
 
---0016363b8b88945eed048f0b5e8f
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Store-new-local-name-before-writing-it-to-HCI.patch"
-Content-Disposition: attachment;
-	filename="0001-Store-new-local-name-before-writing-it-to-HCI.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_gdhfjmzi0
 
-RnJvbSAxNDBkNGQ3ZjE5NGM1ZGEyZmJmNjU4NGQ4ZGUzY2RmZjY4YjcwZmVjIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
-a2lhLmNvbT4KRGF0ZTogTW9uLCAzMCBBdWcgMjAxMCAxNjo1NDowOSArMDMwMApTdWJqZWN0OiBb
-UEFUQ0hdIFN0b3JlIG5ldyBsb2NhbCBuYW1lIGJlZm9yZSB3cml0aW5nIGl0IHRvIEhDSQoKU3Rv
-cmUgbmV3IGxvY2FsIG5hbWUgdG8gdGhlIGZpbGVzeXN0ZW0gYW5kIGVtaXQgcHJvcGVydHkgY2hh
-bmdlZApiZWZvcmUgYWN0dWFsbHkgd3JpdGluZyB0aGUgbmFtZSB0byB0aGUgY2hpcC4gQXZvaWRz
-IHdyaXRpbmcgdGhlCm5hbWUgdHdpY2UgYnkgdXNpbmcgYSBib29sZWFuIHZhcmlhYmxlIGluIHRo
-ZSBidGRfYWRhcHRlciBzdHJ1Y3QuClRoZSBmbGFnIGlzIG5lZWRlZCBzaW5jZSB0aGUgbmFtZSBp
-cyByZWFkIGltbWVkaWF0ZWx5IGFmdGVyIHNldHRpbmcKaXQgYW5kIHNpbmNlIHRoZSBuYW1lIGNv
-dWxkIGJlIGNoYW5nZWQgYnkgdXNpbmcgZm9yIGV4YW1wbGUKaGNpY29uZmlnIChpbiB3aGljaCBj
-YXNlIHRoZSBmbGFnIHdvdWxkIG5vdCBiZSBzZXQpLgotLS0KIHNyYy9hZGFwdGVyLmMgfCAgIDM1
-ICsrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tCiAxIGZpbGVzIGNoYW5nZWQsIDIy
-IGluc2VydGlvbnMoKyksIDEzIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL3NyYy9hZGFwdGVy
-LmMgYi9zcmMvYWRhcHRlci5jCmluZGV4IDM3N2JhY2MuLjBkYmIyOTUgMTAwNjQ0Ci0tLSBhL3Ny
-Yy9hZGFwdGVyLmMKKysrIGIvc3JjL2FkYXB0ZXIuYwpAQCAtMTM3LDYgKzEzNyw4IEBAIHN0cnVj
-dCBidGRfYWRhcHRlciB7CiAJZ2ludCByZWY7CiAKIAlHU0xpc3QgKnBvd2VyZWRfY2FsbGJhY2tz
-OworCisJZ2Jvb2xlYW4gbmFtZV9zdG9yZWQ7CiB9OwogCiBzdGF0aWMgdm9pZCBhZGFwdGVyX3Nl
-dF9wYWlyYWJsZV90aW1lb3V0KHN0cnVjdCBidGRfYWRhcHRlciAqYWRhcHRlciwKQEAgLTk1MCwx
-NyArOTUyLDIxIEBAIHZvaWQgYWRhcHRlcl91cGRhdGVfbG9jYWxfbmFtZShiZGFkZHJfdCAqYmRh
-ZGRyLCB1aW50OF90IHN0YXR1cywgdm9pZCAqcHRyKQogCiAJc3RybmNweSgoY2hhciAqKSBkZXYt
-Pm5hbWUsIChjaGFyICopIHJwLm5hbWUsIE1BWF9OQU1FX0xFTkdUSCk7CiAKLQl3cml0ZV9sb2Nh
-bF9uYW1lKGJkYWRkciwgKGNoYXIgKikgZGV2LT5uYW1lKTsKKwlpZiAoIWFkYXB0ZXItPm5hbWVf
-c3RvcmVkKSB7CisJCXdyaXRlX2xvY2FsX25hbWUoYmRhZGRyLCAoY2hhciAqKSBkZXYtPm5hbWUp
-OwogCi0JdXBkYXRlX2V4dF9pbnF1aXJ5X3Jlc3BvbnNlKGFkYXB0ZXIpOworCQluYW1lID0gZ19z
-dHJkdXAoKGNoYXIgKikgZGV2LT5uYW1lKTsKIAotCW5hbWUgPSBnX3N0cmR1cCgoY2hhciAqKSBk
-ZXYtPm5hbWUpOworCQlpZiAoY29ubmVjdGlvbikKKwkJCWVtaXRfcHJvcGVydHlfY2hhbmdlZChj
-b25uZWN0aW9uLCBhZGFwdGVyLT5wYXRoLAorCQkJCQkJQURBUFRFUl9JTlRFUkZBQ0UsICJOYW1l
-IiwKKwkJCQkJCURCVVNfVFlQRV9TVFJJTkcsICZuYW1lKTsKKwkJZ19mcmVlKG5hbWUpOworCX0K
-IAotCWlmIChjb25uZWN0aW9uKQotCQllbWl0X3Byb3BlcnR5X2NoYW5nZWQoY29ubmVjdGlvbiwg
-YWRhcHRlci0+cGF0aCwKLQkJCQkJQURBUFRFUl9JTlRFUkZBQ0UsICJOYW1lIiwKLQkJCQkJREJV
-U19UWVBFX1NUUklORywgJm5hbWUpOwotCWdfZnJlZShuYW1lKTsKKwlhZGFwdGVyLT5uYW1lX3N0
-b3JlZCA9IEZBTFNFOworCisJdXBkYXRlX2V4dF9pbnF1aXJ5X3Jlc3BvbnNlKGFkYXB0ZXIpOwog
-fQogCiB2b2lkIGFkYXB0ZXJfc2V0bmFtZV9jb21wbGV0ZShiZGFkZHJfdCAqbG9jYWwsIHVpbnQ4
-X3Qgc3RhdHVzKQpAQCAtOTk4LDE2ICsxMDA0LDE4IEBAIHN0YXRpYyBEQnVzTWVzc2FnZSAqc2V0
-X25hbWUoREJ1c0Nvbm5lY3Rpb24gKmNvbm4sIERCdXNNZXNzYWdlICptc2csCiAJaWYgKHN0cm5j
-bXAobmFtZSwgKGNoYXIgKikgZGV2LT5uYW1lLCBNQVhfTkFNRV9MRU5HVEgpID09IDApCiAJCWdv
-dG8gZG9uZTsKIAotCWlmICghYWRhcHRlci0+dXApIHsKLQkJc3RybmNweSgoY2hhciAqKSBhZGFw
-dGVyLT5kZXYubmFtZSwgbmFtZSwgTUFYX05BTUVfTEVOR1RIKTsKLQkJd3JpdGVfbG9jYWxfbmFt
-ZSgmYWRhcHRlci0+YmRhZGRyLCBuYW1lKTsKLQkJZW1pdF9wcm9wZXJ0eV9jaGFuZ2VkKGNvbm5l
-Y3Rpb24sIGFkYXB0ZXItPnBhdGgsCisJc3RybmNweSgoY2hhciAqKSBhZGFwdGVyLT5kZXYubmFt
-ZSwgbmFtZSwgTUFYX05BTUVfTEVOR1RIKTsKKwl3cml0ZV9sb2NhbF9uYW1lKCZhZGFwdGVyLT5i
-ZGFkZHIsIG5hbWUpOworCWVtaXRfcHJvcGVydHlfY2hhbmdlZChjb25uZWN0aW9uLCBhZGFwdGVy
-LT5wYXRoLAogCQkJCQlBREFQVEVSX0lOVEVSRkFDRSwgIk5hbWUiLAogCQkJCQlEQlVTX1RZUEVf
-U1RSSU5HLCAmbmFtZSk7Ci0JfSBlbHNlIHsKKworCWlmIChhZGFwdGVyLT51cCkgewogCQlpbnQg
-ZXJyID0gYWRhcHRlcl9vcHMtPnNldF9uYW1lKGFkYXB0ZXItPmRldl9pZCwgbmFtZSk7CiAJCWlm
-IChlcnIgPCAwKQogCQkJcmV0dXJuIGZhaWxlZF9zdHJlcnJvcihtc2csIGVycik7CisKKwkJYWRh
-cHRlci0+bmFtZV9zdG9yZWQgPSBUUlVFOwogCX0KIAogZG9uZToKQEAgLTI1MDQsNiArMjUxMiw3
-IEBAIGludCBhZGFwdGVyX3N0b3Aoc3RydWN0IGJ0ZF9hZGFwdGVyICphZGFwdGVyKQogCWFkYXB0
-ZXItPmNhY2hlX2VuYWJsZSA9IFRSVUU7CiAJYWRhcHRlci0+cGVuZGluZ19jb2QgPSAwOwogCWFk
-YXB0ZXItPm9mZl9yZXF1ZXN0ZWQgPSBGQUxTRTsKKwlhZGFwdGVyLT5uYW1lX3N0b3JlZCA9IEZB
-TFNFOwogCiAJY2FsbF9hZGFwdGVyX3Bvd2VyZWRfY2FsbGJhY2tzKGFkYXB0ZXIsIEZBTFNFKTsK
-IAotLSAKMS42LjAuNAoK
---0016363b8b88945eed048f0b5e8f--
+----- Original Message ----
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Shreesh Holla <hshreesh@yahoo.com>
+Cc: linux-bluetooth@vger.kernel.org
+Sent: Tue, August 24, 2010 8:00:11 PM
+Subject: Re: [RFCOMM] Cannot complete connections into Ubuntu
+
+Hi,
+
+On Mon, Aug 23, 2010 at 3:22 AM, Shreesh Holla <hshreesh@yahoo.com> wrote:
+> Hi,
+>
+> I'm running Ubuntu with 2.6.32.24 kernel.
+> I have a simple RFCOMM program running on Windows Mobile which would connect
+> into the Ubuntu machine. Of course I have the corresponding service running on
+> the Ubuntu machine. The RFCOMM port numbers do match up.
+>
+> This was working a few days back and now with no changes(i.e. the same
+> executable), it refuses to work anymore.
+>
+> So is there some configuration needed  now?
+>
+> I have the dongle running in Ubuntu as : hciconfig hci0 noauth noencrypt pscan
+ ------ Luis says:
+>>Had you tried the latest bluez, I did some changes to pair that solve
+>>some problem with RFCOMM and ssp. If that doesn't help maybe you
+>>should try to produce some logs of the so we can take a look.
+
+>>Regards,
+
+>>-- 
+>>Luiz Augusto von Dentz
+>>Computer Engineer
+
+Luis,
+
+It seems the problem is in aborting an open RFCOMM connection. And this seems to 
+be an issue even with the 2.6.29 kernel. If I do abort a connection i.e. not 
+gracefully i.e. by killing the applications then this is what I see:
+- The connection is refused until reboot
+- I tried to reset by doing a hciconfig hci0 reset AND also hciconfig hci0 
+up/down
+- When I do a reset actually the VM hangs completely i.e. the only way is to 
+power off and restart the VM
+- I do have two Bluetooth dongles - but I dont think that could be any issue.
+
+So, fundamentally as long as I do a graceful shutdown of the RFCOMM connections 
+all seems to be fine. This issue happens sometimes on the first abort. But 
+definitely within three attempts. This is what I have been able to figure out 
+since my last e-mail.
+
+Do let me know if this helps. If you would need more details such as the hcidump 
+logs or dmesg logs - I ca send that too.
+
+Thanks,
+Shreesh
+
+
