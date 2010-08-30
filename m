@@ -1,76 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <287015.9937.qm@web56502.mail.re3.yahoo.com>
-References: <131634.48135.qm@web56506.mail.re3.yahoo.com> <AANLkTi=j6ch9_oQwb0xK9xPZ5btMUSqoHx4D8N8YM6nt@mail.gmail.com>
-Date: Sun, 29 Aug 2010 23:53:33 -0700 (PDT)
-From: Shreesh Holla <hshreesh@yahoo.com>
-Subject: Re: [RFCOMM] Cannot complete connections into Ubuntu
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <AANLkTi=j6ch9_oQwb0xK9xPZ5btMUSqoHx4D8N8YM6nt@mail.gmail.com>
+From: <Waldemar.Rymarkiewicz@tieto.com>
+To: <padovan@profusion.mobi>
+CC: <linux-bluetooth@vger.kernel.org>
+Date: Mon, 30 Aug 2010 09:58:36 +0300
+Subject: RE: [PATCH] Bluetooth: BT_SECURITY_HIGH requires 16 digit pin code
+Message-ID: <99B09243E1A5DA4898CDD8B7001114480977FD6D9C@EXMB04.eu.tieto.com>
+References: <1282909460-19337-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+ <20100827195550.GA11191@vigoh>
+In-Reply-To: <20100827195550.GA11191@vigoh>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
-
-
-
------ Original Message ----
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Shreesh Holla <hshreesh@yahoo.com>
-Cc: linux-bluetooth@vger.kernel.org
-Sent: Tue, August 24, 2010 8:00:11 PM
-Subject: Re: [RFCOMM] Cannot complete connections into Ubuntu
-
-Hi,
-
-On Mon, Aug 23, 2010 at 3:22 AM, Shreesh Holla <hshreesh@yahoo.com> wrote:
-> Hi,
->
-> I'm running Ubuntu with 2.6.32.24 kernel.
-> I have a simple RFCOMM program running on Windows Mobile which would connect
-> into the Ubuntu machine. Of course I have the corresponding service running on
-> the Ubuntu machine. The RFCOMM port numbers do match up.
->
-> This was working a few days back and now with no changes(i.e. the same
-> executable), it refuses to work anymore.
->
-> So is there some configuration needed  now?
->
-> I have the dongle running in Ubuntu as : hciconfig hci0 noauth noencrypt pscan
- ------ Luis says:
->>Had you tried the latest bluez, I did some changes to pair that solve
->>some problem with RFCOMM and ssp. If that doesn't help maybe you
->>should try to produce some logs of the so we can take a look.
-
->>Regards,
-
->>-- 
->>Luiz Augusto von Dentz
->>Computer Engineer
-
-Luis,
-
-It seems the problem is in aborting an open RFCOMM connection. And this seems to 
-be an issue even with the 2.6.29 kernel. If I do abort a connection i.e. not 
-gracefully i.e. by killing the applications then this is what I see:
-- The connection is refused until reboot
-- I tried to reset by doing a hciconfig hci0 reset AND also hciconfig hci0 
-up/down
-- When I do a reset actually the VM hangs completely i.e. the only way is to 
-power off and restart the VM
-- I do have two Bluetooth dongles - but I dont think that could be any issue.
-
-So, fundamentally as long as I do a graceful shutdown of the RFCOMM connections 
-all seems to be fine. This issue happens sometimes on the first abort. But 
-definitely within three attempts. This is what I have been able to figure out 
-since my last e-mail.
-
-Do let me know if this helps. If you would need more details such as the hcidump 
-logs or dmesg logs - I ca send that too.
+Oops, I missed that. It was done automatically somehow. It wasn't my intention of doing this.
+Will fix it.
 
 Thanks,
-Shreesh
 
+/Waldek 
 
+>-----Original Message-----
+>From: Gustavo F. Padovan [mailto:pao@profusion.mobi] On Behalf 
+>Of Gustavo F. Padovan
+>Sent: Friday, August 27, 2010 9:56 PM
+>To: Rymarkiewicz Waldemar
+>Cc: linux-bluetooth@vger.kernel.org; 
+>par-gunnar.p.hjalmdahl@stericsson.com; 
+>joakim.xj.ceder@stericsson.com; johan.hedberg@gmail.com
+>Subject: Re: [PATCH] Bluetooth: BT_SECURITY_HIGH requires 16 
+>digit pin code
+>
+>Hi Waldemar,
+>
+>* Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com> 
+>[2010-08-27 13:44:20 +0200]:
+>
+>> The security level BT_SECURITY_HIGH expects secure connection and a 
+>> minimum 16 digit pin code used for bonding. It's requitred 
+>by the Sim 
+>> Access Profile.
+>> 
+>> Patch on behalf of ST-Ericsson SA.
+>> 
+>> Signed-off-by: Waldemar Rymarkiewicz 
+><waldemar.rymarkiewicz@tieto.com>
+>> ---
+>>  include/net/bluetooth/hci.h      |   17 +++++++
+>>  include/net/bluetooth/hci_core.h |    4 ++
+>>  net/bluetooth/hci_conn.c         |   97 
+>+++++++++++++++++++++++++++++++-------
+>>  net/bluetooth/hci_event.c        |    4 ++
+>>  net/bluetooth/hci_sock.c         |    3 +
+>>  net/bluetooth/rfcomm/core.c      |   10 ++++-
+>>  6 files changed, 116 insertions(+), 19 deletions(-)  mode change 
+>> 100644 => 100755 include/net/bluetooth/hci.h  mode change 100644 => 
+>> 100755 include/net/bluetooth/hci_core.h  mode change 100644 
+>=> 100755 
+>> net/bluetooth/hci_conn.c  mode change 100644 => 100755 
+>> net/bluetooth/hci_event.c  mode change 100644 => 100755 
+>> net/bluetooth/rfcomm/core.c
+>
+>You are changing the files modes. Don't do that.
+>
+>--
+>Gustavo F. Padovan
+>ProFUSION embedded systems - http://profusion.mobi
+>
