@@ -1,78 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+MIME-Version: 1.0
+Date: Mon, 30 Aug 2010 17:35:00 +0300
+Message-ID: <AANLkTi=KFGw_HQjUAb=s1Vf+tSW0BuFQWNwHrWBO7Wdq@mail.gmail.com>
+Subject: [PATCH] Store new local name before writing it to HCI
+From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	marcel@holtmann.org
-Subject: [PATCH] Bluetooth: Simplify L2CAP Streaming mode sending
-Date: Mon, 30 Aug 2010 20:04:22 -0300
-Message-Id: <1283209462-8572-1-git-send-email-padovan@profusion.mobi>
+Content-Type: multipart/mixed; boundary=0016363b8b88945eed048f0b5e8f
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-As we don't have any error control on the Streaming mode, i.e., we don't
-need to keep a copy of the skb for later resending we don't need to
-call skb_clone() on it.
-Then we can go one further here, and dequeue the skb before sending it,
-that also means we don't need to look to sk->sk_send_head anymore.
+--0016363b8b88945eed048f0b5e8f
+Content-Type: text/plain; charset=ISO-8859-1
 
-This patch fixes a bug in Streaming mode sending procedure, the call to
-skb_clone() was making the system run into OOM condition. I never got
-that before 2.6.36, so I'm think that we acctually have regression
-there.
+Store new local name to the filesystem and emit property changed
+before actually writing the name to the chip. Avoids writing the
+name twice by using a boolean variable in the btd_adapter struct.
+The flag is needed since the name is read immediately after setting
+it and since the name could be changed by using for example
+hciconfig (in which case the flag would not be set).
 
-Anyway, the patch saves memory and time when sending Streaming mode
-data, so it is good to mainline.
+/Daniel
 
-Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
----
- net/bluetooth/l2cap.c |   24 +++++++-----------------
- 1 files changed, 7 insertions(+), 17 deletions(-)
+--0016363b8b88945eed048f0b5e8f
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-Store-new-local-name-before-writing-it-to-HCI.patch"
+Content-Disposition: attachment;
+	filename="0001-Store-new-local-name-before-writing-it-to-HCI.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gdhfjmzi0
 
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index fadf26b..80e98cd 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -1441,33 +1441,23 @@ static inline void l2cap_do_send(struct sock *sk, struct sk_buff *skb)
- 
- static void l2cap_streaming_send(struct sock *sk)
- {
--	struct sk_buff *skb, *tx_skb;
-+	struct sk_buff *skb;
- 	struct l2cap_pinfo *pi = l2cap_pi(sk);
- 	u16 control, fcs;
- 
--	while ((skb = sk->sk_send_head)) {
--		tx_skb = skb_clone(skb, GFP_ATOMIC);
--
--		control = get_unaligned_le16(tx_skb->data + L2CAP_HDR_SIZE);
-+	while ((skb = skb_dequeue(TX_QUEUE(sk)))) {
-+		control = get_unaligned_le16(skb->data + L2CAP_HDR_SIZE);
- 		control |= pi->next_tx_seq << L2CAP_CTRL_TXSEQ_SHIFT;
--		put_unaligned_le16(control, tx_skb->data + L2CAP_HDR_SIZE);
-+		put_unaligned_le16(control, skb->data + L2CAP_HDR_SIZE);
- 
- 		if (pi->fcs == L2CAP_FCS_CRC16) {
--			fcs = crc16(0, (u8 *)tx_skb->data, tx_skb->len - 2);
--			put_unaligned_le16(fcs, tx_skb->data + tx_skb->len - 2);
-+			fcs = crc16(0, (u8 *)skb->data, skb->len - 2);
-+			put_unaligned_le16(fcs, skb->data + skb->len - 2);
- 		}
- 
--		l2cap_do_send(sk, tx_skb);
-+		l2cap_do_send(sk, skb);
- 
- 		pi->next_tx_seq = (pi->next_tx_seq + 1) % 64;
--
--		if (skb_queue_is_last(TX_QUEUE(sk), skb))
--			sk->sk_send_head = NULL;
--		else
--			sk->sk_send_head = skb_queue_next(TX_QUEUE(sk), skb);
--
--		skb = skb_dequeue(TX_QUEUE(sk));
--		kfree_skb(skb);
- 	}
- }
- 
--- 
-1.7.2.2
+RnJvbSAxNDBkNGQ3ZjE5NGM1ZGEyZmJmNjU4NGQ4ZGUzY2RmZjY4YjcwZmVjIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
+a2lhLmNvbT4KRGF0ZTogTW9uLCAzMCBBdWcgMjAxMCAxNjo1NDowOSArMDMwMApTdWJqZWN0OiBb
+UEFUQ0hdIFN0b3JlIG5ldyBsb2NhbCBuYW1lIGJlZm9yZSB3cml0aW5nIGl0IHRvIEhDSQoKU3Rv
+cmUgbmV3IGxvY2FsIG5hbWUgdG8gdGhlIGZpbGVzeXN0ZW0gYW5kIGVtaXQgcHJvcGVydHkgY2hh
+bmdlZApiZWZvcmUgYWN0dWFsbHkgd3JpdGluZyB0aGUgbmFtZSB0byB0aGUgY2hpcC4gQXZvaWRz
+IHdyaXRpbmcgdGhlCm5hbWUgdHdpY2UgYnkgdXNpbmcgYSBib29sZWFuIHZhcmlhYmxlIGluIHRo
+ZSBidGRfYWRhcHRlciBzdHJ1Y3QuClRoZSBmbGFnIGlzIG5lZWRlZCBzaW5jZSB0aGUgbmFtZSBp
+cyByZWFkIGltbWVkaWF0ZWx5IGFmdGVyIHNldHRpbmcKaXQgYW5kIHNpbmNlIHRoZSBuYW1lIGNv
+dWxkIGJlIGNoYW5nZWQgYnkgdXNpbmcgZm9yIGV4YW1wbGUKaGNpY29uZmlnIChpbiB3aGljaCBj
+YXNlIHRoZSBmbGFnIHdvdWxkIG5vdCBiZSBzZXQpLgotLS0KIHNyYy9hZGFwdGVyLmMgfCAgIDM1
+ICsrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tCiAxIGZpbGVzIGNoYW5nZWQsIDIy
+IGluc2VydGlvbnMoKyksIDEzIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL3NyYy9hZGFwdGVy
+LmMgYi9zcmMvYWRhcHRlci5jCmluZGV4IDM3N2JhY2MuLjBkYmIyOTUgMTAwNjQ0Ci0tLSBhL3Ny
+Yy9hZGFwdGVyLmMKKysrIGIvc3JjL2FkYXB0ZXIuYwpAQCAtMTM3LDYgKzEzNyw4IEBAIHN0cnVj
+dCBidGRfYWRhcHRlciB7CiAJZ2ludCByZWY7CiAKIAlHU0xpc3QgKnBvd2VyZWRfY2FsbGJhY2tz
+OworCisJZ2Jvb2xlYW4gbmFtZV9zdG9yZWQ7CiB9OwogCiBzdGF0aWMgdm9pZCBhZGFwdGVyX3Nl
+dF9wYWlyYWJsZV90aW1lb3V0KHN0cnVjdCBidGRfYWRhcHRlciAqYWRhcHRlciwKQEAgLTk1MCwx
+NyArOTUyLDIxIEBAIHZvaWQgYWRhcHRlcl91cGRhdGVfbG9jYWxfbmFtZShiZGFkZHJfdCAqYmRh
+ZGRyLCB1aW50OF90IHN0YXR1cywgdm9pZCAqcHRyKQogCiAJc3RybmNweSgoY2hhciAqKSBkZXYt
+Pm5hbWUsIChjaGFyICopIHJwLm5hbWUsIE1BWF9OQU1FX0xFTkdUSCk7CiAKLQl3cml0ZV9sb2Nh
+bF9uYW1lKGJkYWRkciwgKGNoYXIgKikgZGV2LT5uYW1lKTsKKwlpZiAoIWFkYXB0ZXItPm5hbWVf
+c3RvcmVkKSB7CisJCXdyaXRlX2xvY2FsX25hbWUoYmRhZGRyLCAoY2hhciAqKSBkZXYtPm5hbWUp
+OwogCi0JdXBkYXRlX2V4dF9pbnF1aXJ5X3Jlc3BvbnNlKGFkYXB0ZXIpOworCQluYW1lID0gZ19z
+dHJkdXAoKGNoYXIgKikgZGV2LT5uYW1lKTsKIAotCW5hbWUgPSBnX3N0cmR1cCgoY2hhciAqKSBk
+ZXYtPm5hbWUpOworCQlpZiAoY29ubmVjdGlvbikKKwkJCWVtaXRfcHJvcGVydHlfY2hhbmdlZChj
+b25uZWN0aW9uLCBhZGFwdGVyLT5wYXRoLAorCQkJCQkJQURBUFRFUl9JTlRFUkZBQ0UsICJOYW1l
+IiwKKwkJCQkJCURCVVNfVFlQRV9TVFJJTkcsICZuYW1lKTsKKwkJZ19mcmVlKG5hbWUpOworCX0K
+IAotCWlmIChjb25uZWN0aW9uKQotCQllbWl0X3Byb3BlcnR5X2NoYW5nZWQoY29ubmVjdGlvbiwg
+YWRhcHRlci0+cGF0aCwKLQkJCQkJQURBUFRFUl9JTlRFUkZBQ0UsICJOYW1lIiwKLQkJCQkJREJV
+U19UWVBFX1NUUklORywgJm5hbWUpOwotCWdfZnJlZShuYW1lKTsKKwlhZGFwdGVyLT5uYW1lX3N0
+b3JlZCA9IEZBTFNFOworCisJdXBkYXRlX2V4dF9pbnF1aXJ5X3Jlc3BvbnNlKGFkYXB0ZXIpOwog
+fQogCiB2b2lkIGFkYXB0ZXJfc2V0bmFtZV9jb21wbGV0ZShiZGFkZHJfdCAqbG9jYWwsIHVpbnQ4
+X3Qgc3RhdHVzKQpAQCAtOTk4LDE2ICsxMDA0LDE4IEBAIHN0YXRpYyBEQnVzTWVzc2FnZSAqc2V0
+X25hbWUoREJ1c0Nvbm5lY3Rpb24gKmNvbm4sIERCdXNNZXNzYWdlICptc2csCiAJaWYgKHN0cm5j
+bXAobmFtZSwgKGNoYXIgKikgZGV2LT5uYW1lLCBNQVhfTkFNRV9MRU5HVEgpID09IDApCiAJCWdv
+dG8gZG9uZTsKIAotCWlmICghYWRhcHRlci0+dXApIHsKLQkJc3RybmNweSgoY2hhciAqKSBhZGFw
+dGVyLT5kZXYubmFtZSwgbmFtZSwgTUFYX05BTUVfTEVOR1RIKTsKLQkJd3JpdGVfbG9jYWxfbmFt
+ZSgmYWRhcHRlci0+YmRhZGRyLCBuYW1lKTsKLQkJZW1pdF9wcm9wZXJ0eV9jaGFuZ2VkKGNvbm5l
+Y3Rpb24sIGFkYXB0ZXItPnBhdGgsCisJc3RybmNweSgoY2hhciAqKSBhZGFwdGVyLT5kZXYubmFt
+ZSwgbmFtZSwgTUFYX05BTUVfTEVOR1RIKTsKKwl3cml0ZV9sb2NhbF9uYW1lKCZhZGFwdGVyLT5i
+ZGFkZHIsIG5hbWUpOworCWVtaXRfcHJvcGVydHlfY2hhbmdlZChjb25uZWN0aW9uLCBhZGFwdGVy
+LT5wYXRoLAogCQkJCQlBREFQVEVSX0lOVEVSRkFDRSwgIk5hbWUiLAogCQkJCQlEQlVTX1RZUEVf
+U1RSSU5HLCAmbmFtZSk7Ci0JfSBlbHNlIHsKKworCWlmIChhZGFwdGVyLT51cCkgewogCQlpbnQg
+ZXJyID0gYWRhcHRlcl9vcHMtPnNldF9uYW1lKGFkYXB0ZXItPmRldl9pZCwgbmFtZSk7CiAJCWlm
+IChlcnIgPCAwKQogCQkJcmV0dXJuIGZhaWxlZF9zdHJlcnJvcihtc2csIGVycik7CisKKwkJYWRh
+cHRlci0+bmFtZV9zdG9yZWQgPSBUUlVFOwogCX0KIAogZG9uZToKQEAgLTI1MDQsNiArMjUxMiw3
+IEBAIGludCBhZGFwdGVyX3N0b3Aoc3RydWN0IGJ0ZF9hZGFwdGVyICphZGFwdGVyKQogCWFkYXB0
+ZXItPmNhY2hlX2VuYWJsZSA9IFRSVUU7CiAJYWRhcHRlci0+cGVuZGluZ19jb2QgPSAwOwogCWFk
+YXB0ZXItPm9mZl9yZXF1ZXN0ZWQgPSBGQUxTRTsKKwlhZGFwdGVyLT5uYW1lX3N0b3JlZCA9IEZB
+TFNFOwogCiAJY2FsbF9hZGFwdGVyX3Bvd2VyZWRfY2FsbGJhY2tzKGFkYXB0ZXIsIEZBTFNFKTsK
+IAotLSAKMS42LjAuNAoK
+--0016363b8b88945eed048f0b5e8f--
