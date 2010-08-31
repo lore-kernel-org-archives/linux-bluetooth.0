@@ -1,42 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <AANLkTi=qrkSSmDNcVNpFm=3=5mSzs9Se08h8JDryDcOu@mail.gmail.com>
-References: <AANLkTimXDqAej=LAVDvDgspKuH_SAKivp9eL8R9tXPJc@mail.gmail.com>
-	<AANLkTi=qrkSSmDNcVNpFm=3=5mSzs9Se08h8JDryDcOu@mail.gmail.com>
-Date: Tue, 31 Aug 2010 10:15:58 -0500
-Message-ID: <AANLkTi=NqwG-DRHPe-SQ0Dca1CDgQuDnqW28yFCByHhW@mail.gmail.com>
-Subject: Re: BlueZ's A2DP sink role
-From: Pavan Savoy <pavan_savoy@sify.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+Subject: [PATCH] Solve compilation problem when SBC variable is not active
+Date: Tue, 31 Aug 2010 16:50:11 +0200
+Message-Id: <1283266211-15798-1-git-send-email-santoscadenas@gmail.com>
+In-Reply-To: <AANLkTinHLGYkji4Eoxu_QReDQCHndB7r319jB-2butVT@mail.gmail.com>
+References: <AANLkTinHLGYkji4Eoxu_QReDQCHndB7r319jB-2butVT@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Aug 19, 2010 at 3:49 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Pavan,
->
-> On Wed, Aug 18, 2010 at 11:22 PM, Pavan Savoy <pavan_savoy@sify.com> wrote:
->> As I understand, the A2DP sink role is @ audio/source.c and A2DP
->> source role is at sink.c ? (or what is called as the interfaces?..)
->> Also How do I test out a2dp sink role in BlueZ, any test audio-server
->> I can run ?
->
-> You can use PA as explained in Joao Paulo's blog:
->
-> http://jprvita.wordpress.com/2009/12/15/1-2-3-4-a2dp-stream/
->
+The inclusion of src/attrib-server.c file by default in the daemon
+source needs also to compile by default attrib_sources, not only
+when SBC is active.
+---
+ Makefile.am |    5 ++---
+ 1 files changed, 2 insertions(+), 3 deletions(-)
 
-Thanks....
-Something regarding AVRCP target and controller role, So Just saying
-Enable=Control,Source
-gets me both AVRCP TG and AVRCP CT why? isn't there specific option for it?
+diff --git a/Makefile.am b/Makefile.am
+index 47478c2..5684e99 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -79,9 +79,6 @@ sbc_sbcdec_LDADD = sbc/libsbc.la
+ sbc_sbcenc_SOURCES = sbc/sbcenc.c sbc/formats.h
+ sbc_sbcenc_LDADD = sbc/libsbc.la
+ 
+-attrib_sources = attrib/att.h attrib/att.c attrib/gatt.h attrib/gatt.c \
+-		attrib/gattrib.h attrib/gattrib.c
+-
+ if SNDFILE
+ noinst_PROGRAMS += sbc/sbctester
+ 
+@@ -90,6 +87,8 @@ sbc_sbctest_CFLAGS = @SNDFILE_CFLAGS@
+ endif
+ endif
+ 
++attrib_sources = attrib/att.h attrib/att.c attrib/gatt.h attrib/gatt.c \
++		attrib/gattrib.h attrib/gattrib.c
+ 
+ if NETLINK
+ plugin_LTLIBRARIES += plugins/netlink.la
+-- 
+1.7.0.4
 
-Also is there a man page/wiki for audio.conf which gets updated now
-and then? with all these new options...
-
-> --
-> Luiz Augusto von Dentz
-> Computer Engineer
->
