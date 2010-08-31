@@ -1,33 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 31 Aug 2010 03:04:29 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Jonathan Haug <jonathanhaug@wolke7.net>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Check for connections and disable bluetooth in shell
-Message-ID: <20100831060429.GA15844@vigoh>
-References: <1283234299.1702.12.camel@josua>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1283234299.1702.12.camel@josua>
+Subject: Check for connections and disable bluetooth in shell
+From: Jonathan Haug <jonathanhaug@wolke7.net>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Date: Tue, 31 Aug 2010 07:58:19 +0200
+Message-ID: <1283234299.1702.12.camel@josua>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jonathan,
 
-* Jonathan Haug <jonathanhaug@wolke7.net> [2010-08-31 07:58:19 +0200]:
+Dear bluetooth-experts,
 
-> 
-> Dear bluetooth-experts,
-> 
-> I want to disable bluetooth on my system (via commandline), if there is
-> no active bluetooth connection -- without being root.
-> 
-> Therefor I need a way to
-> 
-> 1.  check if there is an active bluetooth connection
+I want to disable bluetooth on my system (via commandline), if there is
+no active bluetooth connection -- without being root.
 
-'hcitool conn' can show that to you.
+Therefor I need a way to
 
--- 
-Gustavo F. Padovan
-ProFUSION embedded systems - http://profusion.mobi
+1.  check if there is an active bluetooth connection
+
+2.  disable bluetooth without being root
+
+
+For the second part I found
+
+dbus-send --system --type=method_call --dest=org.bluez $(dbus-send
+--system --print-reply --dest=org.bluez / org.bluez.Manager.ListAdapters
+| awk -F'"' '/at/ {print $2}') org.bluez.Adapter.SetProperty
+string:Powered variant:boolean:false
+
+but this doesn't really disable bluetooth: I'm still able to deactivate
+bluetooth in the panel.
+
+For the first part I could not find a solution so far.
+
+I'm running Ubuntu 10.04.
+
+Thanks for your help!
+
+Jonathan Haug
+
+
