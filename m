@@ -1,42 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 1 Sep 2010 21:49:02 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Get IEEE1284 for a single printer
-Message-ID: <20100901184902.GA30041@jh-x301>
-References: <1275849744.7994.38.camel@localhost.localdomain>
- <20100608070935.GA22068@jh-x301>
- <1275988881.2458.12112.camel@localhost.localdomain>
- <20100608092621.GA8254@jh-x301>
- <1283351741.2361.19.camel@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1283351741.2361.19.camel@localhost.localdomain>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCH 2/2] hid/hid-sony: get and set Sixaxis bdaddr via sysfs
+From: Bastien Nocera <hadess@hadess.net>
+To: Antonio Ospite <ospite@studenti.unina.it>
+Cc: linux-input@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	cbe-oss-dev@lists.ozlabs.org, Jiri Kosina <jkosina@suse.cz>
+In-Reply-To: <20100901192854.9370c605.ospite@studenti.unina.it>
+References: <1272917756-31098-1-git-send-email-ospite@studenti.unina.it>
+	 <1272917756-31098-3-git-send-email-ospite@studenti.unina.it>
+	 <1283357874.2361.24.camel@localhost.localdomain>
+	 <20100901192854.9370c605.ospite@studenti.unina.it>
+Content-Type: text/plain; charset="ISO-8859-1"
+Date: Wed, 01 Sep 2010 18:41:46 +0100
+Message-ID: <1283362906.2361.25.camel@localhost.localdomain>
+Mime-Version: 1.0
+Sender: linux-input-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
-
-On Wed, Sep 01, 2010, Bastien Nocera wrote:
-> From: Bastien Nocera <hadess@hadess.net>
-> Date: Sun, 6 Jun 2010 15:48:26 +0100
-> Subject: [PATCH] (cups) Add ability to print IEEE1284 device ID
+On Wed, 2010-09-01 at 19:28 +0200, Antonio Ospite wrote:
+> On Wed, 01 Sep 2010 17:17:54 +0100
+> Bastien Nocera <hadess@hadess.net> wrote:
 > 
-> Add ability to print IEEE1284 device ID for Bluetooth
-> printers to allow auto-configuration once paired.
-> ---
->  cups/main.c |   83 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 files changed, 83 insertions(+), 0 deletions(-)
+> > On Mon, 2010-05-03 at 22:15 +0200, Antonio Ospite wrote:
+> > > Expose to userspace a simple way to get device bdaddr, and get/set master
+> > > bdaddr on Sixaxis controller.
+> > > 
+> > > Right now userspace softwares which manage pairing the controller with a
+> > > bluetooth adapter, rely on libusb and hence have to detach and reattach
+> > > usbhid, which is not very nice.
+> > > 
+> > > Signed-off-by: Antonio Ospite <ospite@studenti.unina.it>
+> > > ---
+> > > 
+> > > As said, ideally this should be done with an interface such as hidraw, but its
+> > > limitations prevent us from doing it the right way; and I am not going to
+> > > touch hidraw myself anytime soon.
+> > 
+> > Rest looks alright to me. Thanks!
+> 
+> Bastien, Jiri, this patch can be DISCARDED. The hidraw work from Alan
+> Ott (waiting for Marcel to ACK the bluetooth part) will make this kernel
+> approach overkill.
+> 
+> I already have some bluez patches based on Alan's work, but I am waiting
+> for the needed changes to land into linus tree before submitting them.
+> 
+> Sorry for making you wasting some time reviewing this one, I told you on
+> IRC it could be discarded, but we know: "IRCs volant, emails manent".
 
-Thanks for the updated patch. It's now pushed upstream.
+Given the time it took me to review it, it's my own damn fault anyway ;)
 
-> I've only fixed the style problems in the patch itself. I'm happy to do
-> the rest of the file, if you have a "indent" magic incantation for it.
-
-In my experience indent can produce quite a mess compared to fixing
-style issues manually. Anyway, I went ahead and did the cleanup myself
-for the issues that I could quickly spot and pushed the fixes as a
-separate patch upstream.
-
-Johan
