@@ -1,43 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 1 Sep 2010 21:57:29 +0300
+Date: Wed, 1 Sep 2010 21:49:02 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Sander van Grieken <sander@outrightsolutions.nl>
+To: Bastien Nocera <hadess@hadess.net>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: AVRCP future
-Message-ID: <20100901185729.GB30041@jh-x301>
-References: <201009011603.02153.sander@outrightsolutions.nl>
+Subject: Re: [PATCH] Get IEEE1284 for a single printer
+Message-ID: <20100901184902.GA30041@jh-x301>
+References: <1275849744.7994.38.camel@localhost.localdomain>
+ <20100608070935.GA22068@jh-x301>
+ <1275988881.2458.12112.camel@localhost.localdomain>
+ <20100608092621.GA8254@jh-x301>
+ <1283351741.2361.19.camel@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <201009011603.02153.sander@outrightsolutions.nl>
+In-Reply-To: <1283351741.2361.19.camel@localhost.localdomain>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sander,
+Hi Bastien,
 
-On Wed, Sep 01, 2010, Sander van Grieken wrote:
-> - Is anyone working on AVRCP, besides jprvita?
+On Wed, Sep 01, 2010, Bastien Nocera wrote:
+> From: Bastien Nocera <hadess@hadess.net>
+> Date: Sun, 6 Jun 2010 15:48:26 +0100
+> Subject: [PATCH] (cups) Add ability to print IEEE1284 device ID
+> 
+> Add ability to print IEEE1284 device ID for Bluetooth
+> printers to allow auto-configuration once paired.
+> ---
+>  cups/main.c |   83 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 files changed, 83 insertions(+), 0 deletions(-)
 
-Maybe, but nothing I'm aware of.
+Thanks for the updated patch. It's now pushed upstream.
 
-> - Aside from the proposed D-Bus API in doc/control-api.txt, has anyone
-> done some research how an AVRCP1.4 interface should look?
+> I've only fixed the style problems in the patch itself. I'm happy to do
+> the rest of the file, if you have a "indent" magic incantation for it.
 
-Mostly just ideas that haven't really been written down. It'd be easier
-if we talked about specific features though than about a profile version
-since different features will require different design solutions and
-API's. E.g. in the MeeGo case we'd probably be talking to tracker in
-order to implement media browsing, however other platforms might have a
-different storage backend which means that we'll need some sort of
-backend driver abstraction (we have a similar situation already in obexd
-PBAP and contact storage).
-
-> - Are there objections to conforming to section 2.3.2, i.e. untying
-> the AVRCP connection from the A2DP connection?
-
-If by that you mean adding Connect() and Disconnect() method calls to
-the org.bluez.Control D-Bus interface, then I'd be happy to accept
-patches for it. However, the automated connecting of AVRCP as triggered
-by an A2DP connection should stay in order to keep good interoperability
-and make things easy for the user interface code.
+In my experience indent can produce quite a mess compared to fixing
+style issues manually. Anyway, I went ahead and did the cleanup myself
+for the issues that I could quickly spot and pushed the fixes as a
+separate patch upstream.
 
 Johan
