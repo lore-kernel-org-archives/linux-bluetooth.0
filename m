@@ -1,62 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 1 Sep 2010 21:57:29 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Sander van Grieken <sander@outrightsolutions.nl>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: AVRCP future
+Message-ID: <20100901185729.GB30041@jh-x301>
+References: <201009011603.02153.sander@outrightsolutions.nl>
 MIME-Version: 1.0
-Date: Thu, 2 Sep 2010 09:04:45 +0200
-Message-ID: <AANLkTi=nEVCDx3L3B5d0Xet7uJU0XXpBqgCYf0AQ5fz9@mail.gmail.com>
-Subject: [PATCH] Add handling of UID contact's field in vCard
-From: =?ISO-8859-2?Q?Rafa=B3_Michalski?= <michalski.raf@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?ISO-8859-2?Q?Rafa=B3_Michalski?= <michalski.raf@gmail.com>
-Content-Type: multipart/mixed; boundary=0015174c1c48d35454048f416df1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <201009011603.02153.sander@outrightsolutions.nl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---0015174c1c48d35454048f416df1
-Content-Type: text/plain; charset=ISO-8859-1
+Hi Sander,
 
+On Wed, Sep 01, 2010, Sander van Grieken wrote:
+> - Is anyone working on AVRCP, besides jprvita?
 
+Maybe, but nothing I'm aware of.
 
---0015174c1c48d35454048f416df1
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Add-handling-of-UID-contact-s-field-in-vCard.patch"
-Content-Disposition: attachment;
-	filename="0001-Add-handling-of-UID-contact-s-field-in-vCard.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_gdl9sj090
+> - Aside from the proposed D-Bus API in doc/control-api.txt, has anyone
+> done some research how an AVRCP1.4 interface should look?
 
-RnJvbSA0YzNlZTA0NTVlYTA2NmI1ZmQ0Y2IwN2E1NGMwYmM2ZTAwMTJkODQ4IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBSYWZhbCBNaWNoYWxza2kgPG1pY2hhbHNraS5yYWZAZ21haWwu
-Y29tPgpEYXRlOiBXZWQsIDEgU2VwIDIwMTAgMTY6MDg6MzUgKzAyMDAKU3ViamVjdDogW1BBVENI
-XSBBZGQgaGFuZGxpbmcgb2YgVUlEIGNvbnRhY3QncyBmaWVsZCBpbiB2Q2FyZAoKQWZ0ZXIgcHVs
-bGluZyBjb250YWN0cyB0aGlzIGZpZWxkIHdhc24ndCBwcmVzZW50ZWQgaW4gZG93bmxvYWRlZCB2
-Q2FyZApzdHJ1Y3R1cmUgaW4gc3BpdGUgb2YgdGhhdCBpdCBleGlzdGVkIChub3QgZW1wdHkpLiBO
-b3cgaXQgc2hvd3MgZG93bmxvYWRlZApVSUQgKHVzaW5nIGRhdGFiYXNlIHF1ZXJ5KS4KLS0tCiBw
-bHVnaW5zL3Bob25lYm9vay10cmFja2VyLmMgfCAgICAxICsKIHBsdWdpbnMvdmNhcmQuYyAgICAg
-ICAgICAgICB8ICAgIDQgKysrKwogcGx1Z2lucy92Y2FyZC5oICAgICAgICAgICAgIHwgICAgMSAr
-CiAzIGZpbGVzIGNoYW5nZWQsIDYgaW5zZXJ0aW9ucygrKSwgMCBkZWxldGlvbnMoLSkKCmRpZmYg
-LS1naXQgYS9wbHVnaW5zL3Bob25lYm9vay10cmFja2VyLmMgYi9wbHVnaW5zL3Bob25lYm9vay10
-cmFja2VyLmMKaW5kZXggMTkzMjI2Zi4uYmRkOTU4NyAxMDA2NDQKLS0tIGEvcGx1Z2lucy9waG9u
-ZWJvb2stdHJhY2tlci5jCisrKyBiL3BsdWdpbnMvcGhvbmVib29rLXRyYWNrZXIuYwpAQCAtODY2
-LDYgKzg2Niw3IEBAIGFkZF9lbnRyeToKIAljb250YWN0LT5jb21wYW55ID0gZ19zdHJkdXAocmVw
-bHlbMjJdKTsKIAljb250YWN0LT5kZXBhcnRtZW50ID0gZ19zdHJkdXAocmVwbHlbMjNdKTsKIAlj
-b250YWN0LT50aXRsZSA9IGdfc3RyZHVwKHJlcGx5WzI0XSk7CisJY29udGFjdC0+dWlkID0gZ19z
-dHJkdXAocmVwbHlbQ09OVEFDVFNfSURfQ09MXSk7CiAKIAlzZXRfY2FsbF90eXBlKGNvbnRhY3Qs
-IHJlcGx5W0NPTF9EQVRFXSwgcmVwbHlbQ09MX1NFTlRdLAogCQkJcmVwbHlbQ09MX0FOU1dFUkVE
-XSk7CmRpZmYgLS1naXQgYS9wbHVnaW5zL3ZjYXJkLmMgYi9wbHVnaW5zL3ZjYXJkLmMKaW5kZXgg
-NmQ3NGUwNi4uNGE3N2ViMyAxMDA2NDQKLS0tIGEvcGx1Z2lucy92Y2FyZC5jCisrKyBiL3BsdWdp
-bnMvdmNhcmQuYwpAQCAtNDY4LDYgKzQ2OCw5IEBAIHZvaWQgcGhvbmVib29rX2FkZF9jb250YWN0
-KEdTdHJpbmcgKnZjYXJkcywgc3RydWN0IHBob25lYm9va19jb250YWN0ICpjb250YWN0LAogCiAJ
-dmNhcmRfcHJpbnRmX2JlZ2luKHZjYXJkcywgZm9ybWF0KTsKIAorCWlmIChmaWx0ZXIgJiBGSUxU
-RVJfVUlEKQorCQl2Y2FyZF9wcmludGZfdGFnKHZjYXJkcywgZm9ybWF0LCAiVUlEIiwgTlVMTCwg
-Y29udGFjdC0+dWlkKTsKKwogCWlmIChmaWx0ZXIgJiBGSUxURVJfTikKIAkJdmNhcmRfcHJpbnRm
-X25hbWUodmNhcmRzLCBjb250YWN0KTsKIApAQCAtNTgwLDYgKzU4Myw3IEBAIHZvaWQgcGhvbmVi
-b29rX2NvbnRhY3RfZnJlZShzdHJ1Y3QgcGhvbmVib29rX2NvbnRhY3QgKmNvbnRhY3QpCiAJZ19z
-bGlzdF9mb3JlYWNoKGNvbnRhY3QtPmFkZHJlc3NlcywgYWRkcmVzc19mcmVlLCBOVUxMKTsKIAln
-X3NsaXN0X2ZyZWUoY29udGFjdC0+YWRkcmVzc2VzKTsKIAorCWdfZnJlZShjb250YWN0LT51aWQp
-OwogCWdfZnJlZShjb250YWN0LT5mdWxsbmFtZSk7CiAJZ19mcmVlKGNvbnRhY3QtPmdpdmVuKTsK
-IAlnX2ZyZWUoY29udGFjdC0+ZmFtaWx5KTsKZGlmZiAtLWdpdCBhL3BsdWdpbnMvdmNhcmQuaCBi
-L3BsdWdpbnMvdmNhcmQuaAppbmRleCBkMDEyMTA2Li40ZDEzNGMyIDEwMDY0NAotLS0gYS9wbHVn
-aW5zL3ZjYXJkLmgKKysrIGIvcGx1Z2lucy92Y2FyZC5oCkBAIC02Miw2ICs2Miw3IEBAIHN0cnVj
-dCBwaG9uZWJvb2tfYWRkcmVzcyB7CiB9OwogCiBzdHJ1Y3QgcGhvbmVib29rX2NvbnRhY3Qgewor
-CWNoYXIgKnVpZDsKIAljaGFyICpmdWxsbmFtZTsKIAljaGFyICpnaXZlbjsKIAljaGFyICpmYW1p
-bHk7Ci0tIAoxLjYuMy4zCgo=
---0015174c1c48d35454048f416df1--
+Mostly just ideas that haven't really been written down. It'd be easier
+if we talked about specific features though than about a profile version
+since different features will require different design solutions and
+API's. E.g. in the MeeGo case we'd probably be talking to tracker in
+order to implement media browsing, however other platforms might have a
+different storage backend which means that we'll need some sort of
+backend driver abstraction (we have a similar situation already in obexd
+PBAP and contact storage).
+
+> - Are there objections to conforming to section 2.3.2, i.e. untying
+> the AVRCP connection from the A2DP connection?
+
+If by that you mean adding Connect() and Disconnect() method calls to
+the org.bluez.Control D-Bus interface, then I'd be happy to accept
+patches for it. However, the automated connecting of AVRCP as triggered
+by an A2DP connection should stay in order to keep good interoperability
+and make things easy for the user interface code.
+
+Johan
