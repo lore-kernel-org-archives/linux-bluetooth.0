@@ -1,62 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 2 Sep 2010 16:53:11 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org
+cc: marcel@holtmann.org, gustavo@padovan.org, rshaffer@codeaurora.org
+Subject: Re: [PATCH 2/5] Bluetooth: Validate PSM values in calls to connect()
+ and bind()
+In-Reply-To: <1282689346-20371-3-git-send-email-mathewm@codeaurora.org>
+Message-ID: <alpine.DEB.2.00.1009021641160.23752@linux-sea-02>
+References: <1282689346-20371-1-git-send-email-mathewm@codeaurora.org> <1282689346-20371-3-git-send-email-mathewm@codeaurora.org>
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.00.1009021430120.17665@linux-sea-02>
-References: <AANLkTi=8xVks--xcLXEQ_=sHfP3fY+Wvyctu5K_kMDG-@mail.gmail.com>
-	<alpine.DEB.2.00.1009021430120.17665@linux-sea-02>
-Date: Fri, 3 Sep 2010 09:19:52 +0800
-Message-ID: <AANLkTikwV_OuKXy05L5BLZE=hKruA4HOVMY_fhjN=aHJ@mail.gmail.com>
-Subject: Re: [PATCH 13/22] Add three new options for l2cap_options which used
- in setsockopt & getsockopt
-From: haijun liu <liuhaijun.er@gmail.com>
-To: Mat Martineau <mathewm@codeaurora.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Sep 3, 2010 at 5:41 AM, Mat Martineau <mathewm@codeaurora.org> wrote:
->
-> On Thu, 26 Aug 2010, haijun liu wrote:
->
->> From 897b281d14ba4cf9a5fbbf5ba65b84c85e688737 Mon Sep 17 00:00:00 2001
->> From: haijun.liu <haijun.liu@atheros.com>
->> Date: Mon, 23 Aug 2010 00:00:26 +0800
->> Subject: [PATCH 13/22] Add three new options for l2cap_options which
->> used in setsockopt & getsockopt.
->>
->> ---
->> include/net/bluetooth/l2cap.h |    3 +++
->> 1 files changed, 3 insertions(+), 0 deletions(-)
->>
->> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
->> index d0ae9f5..4f87aec 100644
->> --- a/include/net/bluetooth/l2cap.h
->> +++ b/include/net/bluetooth/l2cap.h
->> @@ -65,6 +65,9 @@ struct l2cap_options {
->>        __u8  fcs;
->>        __u8  max_tx;
->>        __u16 txwin_size;
->> +       __u8  hschan_req;
->> +       __u8  guaranteed;
->> +       __u8  reconfig;
->> };
->>
->> #define L2CAP_CONNINFO  0x02
->
-> How are each of these new options used?
->
-> Are any of the new options changeable after the socket is connected?
->
-> --
-> Mat Martineau
-> Employee of Qualcomm Innovation Center, Inc.
-> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
->
->
 
-I accept David suggestion, I am waiting your patch merged.
+On Tue, 24 Aug 2010, Mat Martineau wrote:
 
-Yes, these are changeable.
+> Valid L2CAP PSMs are odd numbers, and the least significant bit of the
+> most significant byte must be 0.
+>
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> ---
+> net/bluetooth/l2cap.c |   24 ++++++++++++++++++++----
+> 1 files changed, 20 insertions(+), 4 deletions(-)
+>
+> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> index c784703..1f1fa3c 100644
+> --- a/net/bluetooth/l2cap.c
+> +++ b/net/bluetooth/l2cap.c
+> @@ -1008,10 +1008,20 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
+> 		goto done;
+> 	}
+>
+> -	if (la.l2_psm && __le16_to_cpu(la.l2_psm) < 0x1001 &&
+> -				!capable(CAP_NET_BIND_SERVICE)) {
+> -		err = -EACCES;
+> -		goto done;
+> +	if (la.l2_psm) {
+> +		__u16 psm = __le16_to_cpu(la.l2_psm);
+> +
+> +		/* PSM must be odd and lsb of upper byte must be 0 */
+> +		if ((psm & 0x0101) != 0x0001) {
+> +			err = -EINVAL;
+> +			goto done;
+> +		}
+> +
+> +		/* Restrict usage of well-known PSMs */
+> +		if (psm < 0x1001 && !capable(CAP_NET_BIND_SERVICE)) {
+> +			err = -EACCES;
+> +			goto done;
+> +		}
+> 	}
+>
+> 	write_lock_bh(&l2cap_sk_list.lock);
+> @@ -1190,6 +1200,12 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
+> 		goto done;
+> 	}
+>
+> +	/* PSM must be odd and lsb of upper byte must be 0 */
+> +	if ((__le16_to_cpu(la.l2_psm) & 0x0101) != 0x0001) {
+> +		err = -EINVAL;
+> +		goto done;
+> +	}
+> +
+> 	/* Set destination address and psm */
+> 	bacpy(&bt_sk(sk)->dst, &la.l2_bdaddr);
+> 	l2cap_pi(sk)->psm = la.l2_psm;
 
--- 
-Haijun Liu
+This patch should not be merged - PSM 0 needs to be allowed when 
+connecting to SOCK_RAW sockets, so bonding works right.
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
