@@ -1,24 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 2 Sep 2010 23:16:28 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
-	rufferson@gmail.com
-Subject: Re: [PATCH] Remember fake devices for the daemon's lifetime
-Message-ID: <20100902201628.GA7671@jh-x301>
-References: <1283446547.2361.68.camel@localhost.localdomain>
+Date: Thu, 2 Sep 2010 16:49:19 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: fix MTU L2CAP configuration parameter
+Message-ID: <20100902194919.GC11191@vigoh>
+References: <1283343445-9328-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1283446547.2361.68.camel@localhost.localdomain>
+In-Reply-To: <1283343445-9328-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2010-09-01 15:17:25 +0300]:
 
-On Thu, Sep 02, 2010, Bastien Nocera wrote:
-> Here's a rework of Ruslan's patch. This should make PS3 BD remotes
-> faster to reconnect, by not having to setup uinput every time.
+> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> 
+> When receiving L2CAP negative configuration response with respect
+> to MTU parameter we modify wrong field. MTU here means proposed
+> value of MTU that the remote device intends to transmit. So for local
+> L2CAP socket it is pi->imtu.
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> ---
+>  net/bluetooth/l2cap.c |    6 +++---
+>  1 files changed, 3 insertions(+), 3 deletions(-)
 
-Thanks. This one has also been pushed upstream.
+Acked-by: Gustavo F. Padovan <padovan@profusion.mobi>
 
-Johan
+-- 
+Gustavo F. Padovan
+ProFUSION embedded systems - http://profusion.mobi
