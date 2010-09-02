@@ -1,46 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: <Waldemar.Rymarkiewicz@tieto.com>
-To: <johan.hedberg@gmail.com>
-CC: <hadess@hadess.net>, <linux-bluetooth@vger.kernel.org>,
-	<par-gunnar.p.hjalmdahl@stericsson.com>,
-	<joakim.xj.ceder@stericsson.com>, <arunkr.singh@stericsson.com>
-Date: Thu, 2 Sep 2010 18:30:38 +0300
-Subject: RE: [PATCH] BT_SECURITY_HIGH requires 16 digit pin code
-Message-ID: <99B09243E1A5DA4898CDD8B70011144809792196AD@EXMB04.eu.tieto.com>
-References: <1282909526-19374-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
- <1282911133.835.30.camel@localhost.localdomain>
- <99B09243E1A5DA4898CDD8B7001114480976E15A2C@EXMB04.eu.tieto.com>
- <20100827124524.GA9484@jh-x301>
- <99B09243E1A5DA4898CDD8B7001114480979219655@EXMB04.eu.tieto.com>
- <20100902135108.GA30759@jh-x301>
-In-Reply-To: <20100902135108.GA30759@jh-x301>
-Content-Type: text/plain; charset="us-ascii"
+Date: Thu, 2 Sep 2010 17:25:18 +0200 (CEST)
+From: Jiri Kosina <jkosina@suse.cz>
+To: Alan Ott <alan@signal11.us>,
+	Marcel Holtmann <marcel@holtmann.org>
+Cc: Stefan Achatz <erazor_de@users.sourceforge.net>,
+	Antonio Ospite <ospite@studenti.unina.it>,
+	Alexey Dobriyan <adobriyan@gmail.com>, Tejun Heo <tj@kernel.org>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	Greg Kroah-Hartman <gregkh@suse.de>,
+	Stephane Chatty <chatty@enac.fr>,
+	Michael Poole <mdpoole@troilus.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Bastien Nocera <hadess@hadess.net>,
+	Eric Dumazet <eric.dumazet@gmail.com>, linux-input@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v4 0/2] Get and Set Feature Reports on HIDRAW (USB and
+ Bluetooth)
+In-Reply-To: <alpine.LNX.2.00.1008231459370.1019@pobox.suse.cz>
+Message-ID: <alpine.LNX.2.00.1009021724480.26813@pobox.suse.cz>
+References: <1281442367.12579.206.camel@localhost.localdomain> <1281990059-3562-1-git-send-email-alan@signal11.us> <alpine.LNX.2.00.1008231459370.1019@pobox.suse.cz>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+On Mon, 23 Aug 2010, Jiri Kosina wrote:
 
->From: Johan Hedberg [mailto:johan.hedberg@gmail.com] 
->Sent: Thursday, September 02, 2010 3:51 PM
->
->
->Thanks. However, the kernel patch and new ioctl will need 
->comments at least from Marcel. Once we add an ioctl we're 
->stuck with it for quite some time and have to maintain it, no 
->matter what kind of newer/better kernel-userspace interfaces 
->we come up with. So the choice of accepting a new ioctl isn't so easy.
+> > This is version 4. Built against 2.6.35+ revision 320b2b8de12698 .
+> > 
+> > Alan Ott (2):
+> >   HID: Add Support for Setting and Getting Feature Reports from hidraw
+> >   Bluetooth: hidp: Add support for hidraw  HIDIOCGFEATURE  and
+> >     HIDIOCSFEATURE
+> > 
+> >  drivers/hid/hidraw.c          |  105 ++++++++++++++++++++++++++++++++++++--
+> >  drivers/hid/usbhid/hid-core.c |   37 +++++++++++++-
+> >  include/linux/hid.h           |    3 +
+> >  include/linux/hidraw.h        |    3 +
+> >  net/bluetooth/hidp/core.c     |  114 +++++++++++++++++++++++++++++++++++++++--
+> >  net/bluetooth/hidp/hidp.h     |    8 +++
+> >  6 files changed, 260 insertions(+), 10 deletions(-)
+> 
+> Marcel, as per our previous discussion -- what is your word on this? I'd 
+> be glad taking it once you Ack the bluetooth bits (which, as far as I 
+> understood from your last mail, don't have strong objections against any 
+> more).
 
-Ok. Let's wait for Marcel's comment.
+... Marcel?
 
->One thing that you'd definitely need to fix in your patches is 
->to keep at least the same level of support that the current 
->BlueZ has with kernels that don't have the new ioctl. Right 
->now your patch would make legacy pairing fail in such cases 
->which is not acceptable. Only with a major version change 
->(5.x) would it be possible to consider requiring a newer 
->kernel version in order to have essential functionality in place.
+I'd really like not to miss 2.6.37 merge window with this.
 
-Right. Will fix this.
+Thanks,
 
-/Waldek
+-- 
+Jiri Kosina
+SUSE Labs, Novell Inc.
