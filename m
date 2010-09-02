@@ -1,57 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 2 Sep 2010 12:34:54 +0300
-From: Ville Tervo <ville.tervo@nokia.com>
-To: ext Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Bluetooth: fix MTU L2CAP configuration parameter
-Message-ID: <20100902093454.GC2041@null>
-References: <1283343445-9328-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Sander van Grieken <sander@outrightsolutions.nl>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Subject: Re: AVRCP future
+Date: Thu, 2 Sep 2010 10:20:50 +0200
+Cc: linux-bluetooth@vger.kernel.org
+References: <201009011603.02153.sander@outrightsolutions.nl> <20100901185729.GB30041@jh-x301>
+In-Reply-To: <20100901185729.GB30041@jh-x301>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1283343445-9328-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Message-Id: <201009021020.50162.sander@outrightsolutions.nl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Sep 01, 2010 at 02:17:25PM +0200, ext Emeltchenko Andrei wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+Hi Johan, 
+
+Thanks for your feedback.
+
+On Wednesday 01 September 2010 20:57:29 Johan Hedberg wrote:
+> Hi Sander,
 > 
-> When receiving L2CAP negative configuration response with respect
-> to MTU parameter we modify wrong field. MTU here means proposed
-> value of MTU that the remote device intends to transmit. So for local
-> L2CAP socket it is pi->imtu.
+> On Wed, Sep 01, 2010, Sander van Grieken wrote:
+> > - Is anyone working on AVRCP, besides jprvita?
 > 
-
-Yes imtu is negotiated in this phase.
-
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
-
-Acked-by: Ville Tervo <ville.tervo@nokia.com>
-
-> ---
->  net/bluetooth/l2cap.c |    6 +++---
->  1 files changed, 3 insertions(+), 3 deletions(-)
+> Maybe, but nothing I'm aware of.
 > 
-> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-> index c784703..9fad312 100644
-> --- a/net/bluetooth/l2cap.c
-> +++ b/net/bluetooth/l2cap.c
-> @@ -2771,10 +2771,10 @@ static int l2cap_parse_conf_rsp(struct sock *sk, void *rsp, int len, void *data,
->  		case L2CAP_CONF_MTU:
->  			if (val < L2CAP_DEFAULT_MIN_MTU) {
->  				*result = L2CAP_CONF_UNACCEPT;
-> -				pi->omtu = L2CAP_DEFAULT_MIN_MTU;
-> +				pi->imtu = L2CAP_DEFAULT_MIN_MTU;
->  			} else
-> -				pi->omtu = val;
-> -			l2cap_add_conf_opt(&ptr, L2CAP_CONF_MTU, 2, pi->omtu);
-> +				pi->imtu = val;
-> +			l2cap_add_conf_opt(&ptr, L2CAP_CONF_MTU, 2, pi->imtu);
->  			break;
->  
->  		case L2CAP_CONF_FLUSH_TO:
-> -- 
-> 1.7.0.4
+> > - Aside from the proposed D-Bus API in doc/control-api.txt, has anyone
+> > done some research how an AVRCP1.4 interface should look?
+> 
+> Mostly just ideas that haven't really been written down. 
 
+Argh, there a wiki would come in handy ;) It has probably gone over the list a few times, 
+but I just joined the list and the web archives are.. cumbersome, and google didn't find 
+much of avrcp in the list.
 
--- 
-Ville
+> It'd be easier
+> if we talked about specific features though than about a profile version
+> since different features will require different design solutions and
+> API's. E.g. in the MeeGo case we'd probably be talking to tracker in
+> order to implement media browsing, however other platforms might have a
+> different storage backend which means that we'll need some sort of
+> backend driver abstraction (we have a similar situation already in obexd
+> PBAP and contact storage).
+
+I'm not in favor of having (multiple) storage plugins. Simply because a storage backend is 
+not a player. This distinction is important. MeeGo/tracker is a semantic index, so in 
+theory you could browse the media through it, but the player might have 'smart' playlist, 
+or is only able to play media of a certain kind. Also the current playlist is a player-
+only thing (and is also a browsable item). So I think browsing should go _through_ the 
+player.
+
+I was more thinking of exposing a dbus interface that allows a player (or any TG) to 
+register itself as a TG, then acting on signals/sending events/responses.
+
+> > - Are there objections to conforming to section 2.3.2, i.e. untying
+> > the AVRCP connection from the A2DP connection?
+> 
+> If by that you mean adding Connect() and Disconnect() method calls to
+> the org.bluez.Control D-Bus interface, then I'd be happy to accept
+> patches for it. However, the automated connecting of AVRCP as triggered
+> by an A2DP connection should stay in order to keep good interoperability
+> and make things easy for the user interface code.
+
+Agreed.
+
+> 
+> Johan
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
