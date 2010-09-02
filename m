@@ -1,61 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <201009021020.50162.sander@outrightsolutions.nl>
-References: <201009011603.02153.sander@outrightsolutions.nl>
-	<20100901185729.GB30041@jh-x301>
-	<201009021020.50162.sander@outrightsolutions.nl>
-Date: Thu, 2 Sep 2010 15:56:10 +0300
-Message-ID: <AANLkTin8XEU2TQLSWYnP2SBrwXVe3Oj3YqX1nUBcfCn5@mail.gmail.com>
-Subject: Re: AVRCP future
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Sander van Grieken <sander@outrightsolutions.nl>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH] Get IEEE1284 for a single printer
+From: Bastien Nocera <hadess@hadess.net>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20100901184902.GA30041@jh-x301>
+References: <1275849744.7994.38.camel@localhost.localdomain>
+	 <20100608070935.GA22068@jh-x301>
+	 <1275988881.2458.12112.camel@localhost.localdomain>
+	 <20100608092621.GA8254@jh-x301>
+	 <1283351741.2361.19.camel@localhost.localdomain>
+	 <20100901184902.GA30041@jh-x301>
+Content-Type: text/plain; charset="ISO-8859-1"
+Date: Thu, 02 Sep 2010 11:07:26 +0100
+Message-ID: <1283422046.2361.32.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Wed, 2010-09-01 at 21:49 +0300, Johan Hedberg wrote:
+> Hi Bastien,
+> 
+> On Wed, Sep 01, 2010, Bastien Nocera wrote:
+> > From: Bastien Nocera <hadess@hadess.net>
+> > Date: Sun, 6 Jun 2010 15:48:26 +0100
+> > Subject: [PATCH] (cups) Add ability to print IEEE1284 device ID
+> > 
+> > Add ability to print IEEE1284 device ID for Bluetooth
+> > printers to allow auto-configuration once paired.
+> > ---
+> >  cups/main.c |   83 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  1 files changed, 83 insertions(+), 0 deletions(-)
+> 
+> Thanks for the updated patch. It's now pushed upstream.
 
-On Thu, Sep 2, 2010 at 11:20 AM, Sander van Grieken
-<sander@outrightsolutions.nl> wrote:
-> I'm not in favor of having (multiple) storage plugins. Simply because a storage backend is
-> not a player. This distinction is important. MeeGo/tracker is a semantic index, so in
-> theory you could browse the media through it, but the player might have 'smart' playlist,
-> or is only able to play media of a certain kind. Also the current playlist is a player-
-> only thing (and is also a browsable item). So I think browsing should go _through_ the
-> player.
->
-> I was more thinking of exposing a dbus interface that allows a player (or any TG) to
-> register itself as a TG, then acting on signals/sending events/responses.
+Thanks.
 
-That could be done, actually this is a similar idea as we are planning
-to have[1] for replacing our audio ipc, but for things like progress
-we would really need to cache it since most device Ive seem keep
-polling this. Another possibility is to use MPRIS and PulseAudio
-together, but the spec of MPRIS need some work right now the player
-assume some name with a prefix e.g: org.freedesktop.MPRIS which is not
-that nice, perhaps making MPRIS a separate daemon would make more
-sense.
+> > I've only fixed the style problems in the patch itself. I'm happy to do
+> > the rest of the file, if you have a "indent" magic incantation for it.
+> 
+> In my experience indent can produce quite a mess compared to fixing
+> style issues manually. Anyway, I went ahead and did the cleanup myself
+> for the issues that I could quickly spot and pushed the fixes as a
+> separate patch upstream.
 
-This means that for freedesktop we have:
+OK. Indent should be able to do this without making a mess as long as
+you know the exact parameters. Mind, some of the restrictions feel like
+they're from COBOL days (79 characters line width?).
 
-    BlueZ <-> PulseAudio <-> MPRIS
+I prefer readable code to mashed-up code that looks that way because of
+hard constraints.
 
-For the rest:
-
-    BlueZ <-> Player/whatever
-
-If that is done in PulseAudio we could probably associate the metadata
-directly with the stream using MPRIS, if it is up to the player then
-we don't care they can set this information directly via some D-Bus
-API that is yet to be defined, which wouldn't require player to
-implement MPRIS spec. Joao Paulo has something already so I guess we
-can start from there[2].
-
-[1] http://gitorious.org/~vudentz/bluez/vudentzs-clone/commits/endpoint
-[2] http://git.profusion.mobi/cgit.cgi/jprvita/bluez/log/?h=avrcp_metadata
-
--- 
-Luiz Augusto von Dentz
-Computer Engineer
