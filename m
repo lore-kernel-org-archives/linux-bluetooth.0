@@ -1,64 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sander van Grieken <sander@outrightsolutions.nl>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: AVRCP future
-Date: Thu, 2 Sep 2010 23:18:04 +0200
-References: <201009011603.02153.sander@outrightsolutions.nl> <201009021020.50162.sander@outrightsolutions.nl> <AANLkTin8XEU2TQLSWYnP2SBrwXVe3Oj3YqX1nUBcfCn5@mail.gmail.com>
-In-Reply-To: <AANLkTin8XEU2TQLSWYnP2SBrwXVe3Oj3YqX1nUBcfCn5@mail.gmail.com>
+Date: Thu, 2 Sep 2010 23:40:22 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Elvis =?iso-8859-1?Q?Pf=FCtzenreuter?= <epx@signove.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: CSP implementation for MCAP
+Message-ID: <20100902204022.GA18957@jh-x301>
+References: <4A11989E-5448-43B7-887F-217C54977E22@epx.com.br>
+ <20100902202806.GA8391@jh-x301>
+ <FC6865EA-F6F4-459A-9962-7215F8B0509C@signove.com>
 MIME-Version: 1.0
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201009022318.04177.sander@outrightsolutions.nl>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <FC6865EA-F6F4-459A-9962-7215F8B0509C@signove.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thursday 02 September 2010 14:56:10 you wrote:
-> On Thu, Sep 2, 2010 at 11:20 AM, Sander van Grieken
-> > I was more thinking of exposing a dbus interface that allows a player (or any TG) to
-> > register itself as a TG, then acting on signals/sending events/responses.
-> 
-> That could be done, actually this is a similar idea as we are planning
-> to have[1] for replacing our audio ipc, but for things like progress
-> we would really need to cache it since most device Ive seem keep
-> polling this.
-> Another possibility is to use MPRIS and PulseAudio
-> together, but the spec of MPRIS need some work right now the player
-> assume some name with a prefix e.g: org.freedesktop.MPRIS which is not
-> that nice, perhaps making MPRIS a separate daemon would make more
-> sense.
-> 
-> This means that for freedesktop we have:
-> 
->     BlueZ <-> PulseAudio <-> MPRIS
-> 
-> For the rest:
-> 
->     BlueZ <-> Player/whatever
-> 
-> If that is done in PulseAudio we could probably associate the metadata
-> directly with the stream using MPRIS, if it is up to the player then
-> we don't care they can set this information directly via some D-Bus
-> API that is yet to be defined, which wouldn't require player to
-> implement MPRIS spec. Joao Paulo has something already so I guess we
-> can start from there[2].
-> 
-> [1] http://gitorious.org/~vudentz/bluez/vudentzs-clone/commits/endpoint
-> [2] http://git.profusion.mobi/cgit.cgi/jprvita/bluez/log/?h=avrcp_metadata
+Hi Elvis,
 
-Thanks Luiz,
+On Thu, Sep 02, 2010, Elvis Pfützenreuter wrote:
+> > - I'm not so happy about all the ifdefs in the code and the way that
+> >  they are used. So this may need some rethinking. Probably we could
+> >  have the code always compiled in and have a runtime variable to
+> >  disable its use.
+> 
+> Such variable already exists, and starts turned off. So could I remove
+> the --enable-mcap-csp flag altogether?
 
-I'm aware of João's work. In fact I've already merged his work into my branch, he exposed 
-much of the AVRCP controls.
+Yes, I think a single --enable-mcap that covers also csp should be
+enough.
 
-I see the benefit of MPRIS+PulseAudio for AVRCP 1.3, but for 1.4 MPRIS is just too 
-limited. Also, it's only for audio players [1], while AVRCP also specifies (TV) menu 
-controls and such, so it exceeds the scope of MPRIS.
-
-Your git looks interesting! Added to remotes :)
-
-grtz,
-Sander
-
-
-[1] http://xmms2.org/wiki/Media_Player_Interfaces#Overview
+Johan
