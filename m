@@ -1,64 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 2 Sep 2010 16:02:04 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: haijun liu <liuhaijun.er@gmail.com>
-cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 16/22] Store new configuration values in l2cap_pinfo
-In-Reply-To: <AANLkTimnW0jk19cDG+r64Q+-HxdH2qdTBirTMB7ikr1W@mail.gmail.com>
-Message-ID: <alpine.DEB.2.00.1009021441390.17665@linux-sea-02>
-References: <AANLkTimnW0jk19cDG+r64Q+-HxdH2qdTBirTMB7ikr1W@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Subject: Re: CSP implementation for MCAP
+Mime-Version: 1.0 (Apple Message framework v1081)
+Content-Type: text/plain; charset=iso-8859-1
+From: =?iso-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
+In-Reply-To: <20100902204022.GA18957@jh-x301>
+Date: Thu, 2 Sep 2010 18:49:27 -0300
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <7120005A-6C60-4A79-990D-DF4937855EF7@signove.com>
+References: <4A11989E-5448-43B7-887F-217C54977E22@epx.com.br> <20100902202806.GA8391@jh-x301> <FC6865EA-F6F4-459A-9962-7215F8B0509C@signove.com> <20100902204022.GA18957@jh-x301>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
-On Thu, 26 Aug 2010, haijun liu wrote:
+On Sep 2, 2010, at 5:40 PM, Johan Hedberg wrote:
 
-> From d093975dde6d85c824a5aaac943d676100810010 Mon Sep 17 00:00:00 2001
-> From: haijun.liu <haijun.liu@atheros.com>
-> Date: Mon, 23 Aug 2010 00:09:56 +0800
-> Subject: [PATCH 16/22] Store new configuration values in l2cap_pinfo.
->
-> ---
-> include/net/bluetooth/l2cap.h |    9 +++++++++
-> 1 files changed, 9 insertions(+), 0 deletions(-)
->
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index 2d864d4..f2dd65d 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -406,6 +406,15 @@ struct l2cap_pinfo {
-> 	__u16		remote_mps;
-> 	__u16		mps;
->
-> +	__u8		ext_flowspec_enable;
-> +	struct ext_flow_spec	loc_efs;
-> +	struct ext_flow_spec	rem_efs;
-> +
-> +	__u8		extwin_enable;
-> +	__u16		extwin_size;
-> +	__u8		rem_extwin_enable;
-> +	__u16		rem_extwin_size;
-> +
-> 	__le16		sport;
->
-> 	struct timer_list	retrans_timer;
+> Hi Elvis,
+> 
+> On Thu, Sep 02, 2010, Elvis Pfützenreuter wrote:
+>>> - I'm not so happy about all the ifdefs in the code and the way that
+>>> they are used. So this may need some rethinking. Probably we could
+>>> have the code always compiled in and have a runtime variable to
+>>> disable its use.
+>> 
+>> Such variable already exists, and starts turned off. So could I remove
+>> the --enable-mcap-csp flag altogether?
+> 
+> Yes, I think a single --enable-mcap that covers also csp should be
+> enough.
 
-Regarding the new "extwin" structure members, have you considered 
-changing the existing tx_win and remote_tx_win members to __u16 and 
-using them with both standard and extended window sizes?
-
-The spec also requires that both directions of the link use the same 
-type of control field (standard or extended).  After L2CAP 
-configuration is done, all the information required for the transmit 
-window is the control field type, tx_win, and remote_tx_win.  The 
-control field would be set to 'extended' if a successful configuration 
-response is sent or received for the extended window size option.
-
-
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-
+Ok, those first changes have been made and tested. Waiting for the next round.
