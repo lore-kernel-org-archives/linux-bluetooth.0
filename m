@@ -1,43 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 2 Sep 2010 09:41:29 +0200 (CEST)
-From: Jiri Kosina <jkosina@suse.cz>
-To: Antonio Ospite <ospite@studenti.unina.it>
-Cc: Bastien Nocera <hadess@hadess.net>, linux-input@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, cbe-oss-dev@lists.ozlabs.org
-Subject: Re: [PATCH 1/2] hid/hid-sony: Apply sixaxis quirks only to sixaxis
-In-Reply-To: <20100901192055.2f23c8c7.ospite@studenti.unina.it>
-Message-ID: <alpine.LNX.2.00.1009020941120.26813@pobox.suse.cz>
-References: <1272917756-31098-1-git-send-email-ospite@studenti.unina.it> <1272917756-31098-2-git-send-email-ospite@studenti.unina.it> <1283357615.2361.20.camel@localhost.localdomain> <20100901192055.2f23c8c7.ospite@studenti.unina.it>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Sender: linux-input-owner@vger.kernel.org
+Date: Thu, 2 Sep 2010 09:04:45 +0200
+Message-ID: <AANLkTi=nEVCDx3L3B5d0Xet7uJU0XXpBqgCYf0AQ5fz9@mail.gmail.com>
+Subject: [PATCH] Add handling of UID contact's field in vCard
+From: =?ISO-8859-2?Q?Rafa=B3_Michalski?= <michalski.raf@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: =?ISO-8859-2?Q?Rafa=B3_Michalski?= <michalski.raf@gmail.com>
+Content-Type: multipart/mixed; boundary=0015174c1c48d35454048f416df1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 1 Sep 2010, Antonio Ospite wrote:
+--0015174c1c48d35454048f416df1
+Content-Type: text/plain; charset=ISO-8859-1
 
-> > > Be more explicit and avoid calling sony_set_operational_usb() when we
-> > > have USB_DEVICE_ID_SONY_VAIO_VGX_MOUSE.
-> > > 
-> > > While at it, rename the sony_set_operational routines to
-> > > sixaxis_set_operational as they are sixaxis specific.
-> > > 
-> > > This is also in preparation for the sysfs interface to set and get bdaddr
-> > > over usb and for some other Sixaxis report fixup.
-> > > 
-> > > Signed-off-by: Antonio Ospite <ospite@studenti.unina.it>
-> > 
-> > Signed-off-by: Bastien Nocera <hadess@hadess.net>
-> >
-> 
-> Thanks Bastien for bringing this up again, I was going to repost
-> this patch sometime this month.
-> 
-> Added Jiri to CC as I forgot to do that back then.
 
-Thanks, I have missed that one on linux-input@.
 
-Applied now.
+--0015174c1c48d35454048f416df1
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-Add-handling-of-UID-contact-s-field-in-vCard.patch"
+Content-Disposition: attachment;
+	filename="0001-Add-handling-of-UID-contact-s-field-in-vCard.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gdl9sj090
 
--- 
-Jiri Kosina
-SUSE Labs, Novell Inc.
+RnJvbSA0YzNlZTA0NTVlYTA2NmI1ZmQ0Y2IwN2E1NGMwYmM2ZTAwMTJkODQ4IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBSYWZhbCBNaWNoYWxza2kgPG1pY2hhbHNraS5yYWZAZ21haWwu
+Y29tPgpEYXRlOiBXZWQsIDEgU2VwIDIwMTAgMTY6MDg6MzUgKzAyMDAKU3ViamVjdDogW1BBVENI
+XSBBZGQgaGFuZGxpbmcgb2YgVUlEIGNvbnRhY3QncyBmaWVsZCBpbiB2Q2FyZAoKQWZ0ZXIgcHVs
+bGluZyBjb250YWN0cyB0aGlzIGZpZWxkIHdhc24ndCBwcmVzZW50ZWQgaW4gZG93bmxvYWRlZCB2
+Q2FyZApzdHJ1Y3R1cmUgaW4gc3BpdGUgb2YgdGhhdCBpdCBleGlzdGVkIChub3QgZW1wdHkpLiBO
+b3cgaXQgc2hvd3MgZG93bmxvYWRlZApVSUQgKHVzaW5nIGRhdGFiYXNlIHF1ZXJ5KS4KLS0tCiBw
+bHVnaW5zL3Bob25lYm9vay10cmFja2VyLmMgfCAgICAxICsKIHBsdWdpbnMvdmNhcmQuYyAgICAg
+ICAgICAgICB8ICAgIDQgKysrKwogcGx1Z2lucy92Y2FyZC5oICAgICAgICAgICAgIHwgICAgMSAr
+CiAzIGZpbGVzIGNoYW5nZWQsIDYgaW5zZXJ0aW9ucygrKSwgMCBkZWxldGlvbnMoLSkKCmRpZmYg
+LS1naXQgYS9wbHVnaW5zL3Bob25lYm9vay10cmFja2VyLmMgYi9wbHVnaW5zL3Bob25lYm9vay10
+cmFja2VyLmMKaW5kZXggMTkzMjI2Zi4uYmRkOTU4NyAxMDA2NDQKLS0tIGEvcGx1Z2lucy9waG9u
+ZWJvb2stdHJhY2tlci5jCisrKyBiL3BsdWdpbnMvcGhvbmVib29rLXRyYWNrZXIuYwpAQCAtODY2
+LDYgKzg2Niw3IEBAIGFkZF9lbnRyeToKIAljb250YWN0LT5jb21wYW55ID0gZ19zdHJkdXAocmVw
+bHlbMjJdKTsKIAljb250YWN0LT5kZXBhcnRtZW50ID0gZ19zdHJkdXAocmVwbHlbMjNdKTsKIAlj
+b250YWN0LT50aXRsZSA9IGdfc3RyZHVwKHJlcGx5WzI0XSk7CisJY29udGFjdC0+dWlkID0gZ19z
+dHJkdXAocmVwbHlbQ09OVEFDVFNfSURfQ09MXSk7CiAKIAlzZXRfY2FsbF90eXBlKGNvbnRhY3Qs
+IHJlcGx5W0NPTF9EQVRFXSwgcmVwbHlbQ09MX1NFTlRdLAogCQkJcmVwbHlbQ09MX0FOU1dFUkVE
+XSk7CmRpZmYgLS1naXQgYS9wbHVnaW5zL3ZjYXJkLmMgYi9wbHVnaW5zL3ZjYXJkLmMKaW5kZXgg
+NmQ3NGUwNi4uNGE3N2ViMyAxMDA2NDQKLS0tIGEvcGx1Z2lucy92Y2FyZC5jCisrKyBiL3BsdWdp
+bnMvdmNhcmQuYwpAQCAtNDY4LDYgKzQ2OCw5IEBAIHZvaWQgcGhvbmVib29rX2FkZF9jb250YWN0
+KEdTdHJpbmcgKnZjYXJkcywgc3RydWN0IHBob25lYm9va19jb250YWN0ICpjb250YWN0LAogCiAJ
+dmNhcmRfcHJpbnRmX2JlZ2luKHZjYXJkcywgZm9ybWF0KTsKIAorCWlmIChmaWx0ZXIgJiBGSUxU
+RVJfVUlEKQorCQl2Y2FyZF9wcmludGZfdGFnKHZjYXJkcywgZm9ybWF0LCAiVUlEIiwgTlVMTCwg
+Y29udGFjdC0+dWlkKTsKKwogCWlmIChmaWx0ZXIgJiBGSUxURVJfTikKIAkJdmNhcmRfcHJpbnRm
+X25hbWUodmNhcmRzLCBjb250YWN0KTsKIApAQCAtNTgwLDYgKzU4Myw3IEBAIHZvaWQgcGhvbmVi
+b29rX2NvbnRhY3RfZnJlZShzdHJ1Y3QgcGhvbmVib29rX2NvbnRhY3QgKmNvbnRhY3QpCiAJZ19z
+bGlzdF9mb3JlYWNoKGNvbnRhY3QtPmFkZHJlc3NlcywgYWRkcmVzc19mcmVlLCBOVUxMKTsKIAln
+X3NsaXN0X2ZyZWUoY29udGFjdC0+YWRkcmVzc2VzKTsKIAorCWdfZnJlZShjb250YWN0LT51aWQp
+OwogCWdfZnJlZShjb250YWN0LT5mdWxsbmFtZSk7CiAJZ19mcmVlKGNvbnRhY3QtPmdpdmVuKTsK
+IAlnX2ZyZWUoY29udGFjdC0+ZmFtaWx5KTsKZGlmZiAtLWdpdCBhL3BsdWdpbnMvdmNhcmQuaCBi
+L3BsdWdpbnMvdmNhcmQuaAppbmRleCBkMDEyMTA2Li40ZDEzNGMyIDEwMDY0NAotLS0gYS9wbHVn
+aW5zL3ZjYXJkLmgKKysrIGIvcGx1Z2lucy92Y2FyZC5oCkBAIC02Miw2ICs2Miw3IEBAIHN0cnVj
+dCBwaG9uZWJvb2tfYWRkcmVzcyB7CiB9OwogCiBzdHJ1Y3QgcGhvbmVib29rX2NvbnRhY3Qgewor
+CWNoYXIgKnVpZDsKIAljaGFyICpmdWxsbmFtZTsKIAljaGFyICpnaXZlbjsKIAljaGFyICpmYW1p
+bHk7Ci0tIAoxLjYuMy4zCgo=
+--0015174c1c48d35454048f416df1--
