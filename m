@@ -1,53 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 2 Sep 2010 14:29:55 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: haijun liu <liuhaijun.er@gmail.com>
-cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 12/22] Add some default values for configuration
- process
-In-Reply-To: <AANLkTikAZBO6dka+yN3tFTZekm9+1nzo3=OZEoxZ1Eab@mail.gmail.com>
-Message-ID: <alpine.DEB.2.00.1009021422570.17665@linux-sea-02>
-References: <AANLkTikAZBO6dka+yN3tFTZekm9+1nzo3=OZEoxZ1Eab@mail.gmail.com>
+From: Sander van Grieken <sander@outrightsolutions.nl>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: AVRCP future
+Date: Thu, 2 Sep 2010 23:18:04 +0200
+References: <201009011603.02153.sander@outrightsolutions.nl> <201009021020.50162.sander@outrightsolutions.nl> <AANLkTin8XEU2TQLSWYnP2SBrwXVe3Oj3YqX1nUBcfCn5@mail.gmail.com>
+In-Reply-To: <AANLkTin8XEU2TQLSWYnP2SBrwXVe3Oj3YqX1nUBcfCn5@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201009022318.04177.sander@outrightsolutions.nl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Thursday 02 September 2010 14:56:10 you wrote:
+> On Thu, Sep 2, 2010 at 11:20 AM, Sander van Grieken
+> > I was more thinking of exposing a dbus interface that allows a player (or any TG) to
+> > register itself as a TG, then acting on signals/sending events/responses.
+> 
+> That could be done, actually this is a similar idea as we are planning
+> to have[1] for replacing our audio ipc, but for things like progress
+> we would really need to cache it since most device Ive seem keep
+> polling this.
+> Another possibility is to use MPRIS and PulseAudio
+> together, but the spec of MPRIS need some work right now the player
+> assume some name with a prefix e.g: org.freedesktop.MPRIS which is not
+> that nice, perhaps making MPRIS a separate daemon would make more
+> sense.
+> 
+> This means that for freedesktop we have:
+> 
+>     BlueZ <-> PulseAudio <-> MPRIS
+> 
+> For the rest:
+> 
+>     BlueZ <-> Player/whatever
+> 
+> If that is done in PulseAudio we could probably associate the metadata
+> directly with the stream using MPRIS, if it is up to the player then
+> we don't care they can set this information directly via some D-Bus
+> API that is yet to be defined, which wouldn't require player to
+> implement MPRIS spec. Joao Paulo has something already so I guess we
+> can start from there[2].
+> 
+> [1] http://gitorious.org/~vudentz/bluez/vudentzs-clone/commits/endpoint
+> [2] http://git.profusion.mobi/cgit.cgi/jprvita/bluez/log/?h=avrcp_metadata
 
-On Thu, 26 Aug 2010, haijun liu wrote:
+Thanks Luiz,
 
-> From 2d21459fa52b754ce0f666ccefc0175bc7f04420 Mon Sep 17 00:00:00 2001
-> From: haijun.liu <haijun.liu@atheros.com>
-> Date: Sun, 22 Aug 2010 23:57:09 +0800
-> Subject: [PATCH 12/22] Add some default values for configuration process.
->
-> ---
-> include/net/bluetooth/l2cap.h |    5 +++++
-> 1 files changed, 5 insertions(+), 0 deletions(-)
->
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index fe411e2..d0ae9f5 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -36,6 +36,11 @@
-> #define L2CAP_DEFAULT_MAX_PDU_SIZE	672
-> #define L2CAP_DEFAULT_ACK_TO		200
-> #define L2CAP_LOCAL_BUSY_TRIES		12
-> +#define L2CAP_DEFAULT_MAX_SDU_SIZE	0xFFFF
-> +#define L2CAP_DEFAULT_SDU_ARRIVAL_TIME	0xFFFFFFFF
-> +#define L2CAP_DEFAULT_FLUSH_TIMEOUT	0xFFFFFFFF
-> +#define L2CAP_DEFAULT_ACCESS_LATENCY	0xFFFFFFFF
-> +#define L2CAP_DEFAULT_EXT_WINSIZE	1024
+I'm aware of João's work. In fact I've already merged his work into my branch, he exposed 
+much of the AVRCP controls.
 
-This seems like a large window size for a default - why 1024?
+I see the benefit of MPRIS+PulseAudio for AVRCP 1.3, but for 1.4 MPRIS is just too 
+limited. Also, it's only for audio players [1], while AVRCP also specifies (TV) menu 
+controls and such, so it exceeds the scope of MPRIS.
 
->
-> #define L2CAP_CONN_TIMEOUT	(40000) /* 40 seconds */
-> #define L2CAP_CONFIG_TIMEOUT	(40000) /* 40 seconds */
+Your git looks interesting! Added to remotes :)
+
+grtz,
+Sander
 
 
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-
+[1] http://xmms2.org/wiki/Media_Player_Interfaces#Overview
