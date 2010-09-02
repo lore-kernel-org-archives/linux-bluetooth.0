@@ -1,52 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Get IEEE1284 for a single printer
-From: Bastien Nocera <hadess@hadess.net>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20100901184902.GA30041@jh-x301>
-References: <1275849744.7994.38.camel@localhost.localdomain>
-	 <20100608070935.GA22068@jh-x301>
-	 <1275988881.2458.12112.camel@localhost.localdomain>
-	 <20100608092621.GA8254@jh-x301>
-	 <1283351741.2361.19.camel@localhost.localdomain>
-	 <20100901184902.GA30041@jh-x301>
-Content-Type: text/plain; charset="ISO-8859-1"
-Date: Thu, 02 Sep 2010 11:07:26 +0100
-Message-ID: <1283422046.2361.32.camel@localhost.localdomain>
-Mime-Version: 1.0
+Date: Thu, 2 Sep 2010 12:34:54 +0300
+From: Ville Tervo <ville.tervo@nokia.com>
+To: ext Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth: fix MTU L2CAP configuration parameter
+Message-ID: <20100902093454.GC2041@null>
+References: <1283343445-9328-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1283343445-9328-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2010-09-01 at 21:49 +0300, Johan Hedberg wrote:
-> Hi Bastien,
+On Wed, Sep 01, 2010 at 02:17:25PM +0200, ext Emeltchenko Andrei wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 > 
-> On Wed, Sep 01, 2010, Bastien Nocera wrote:
-> > From: Bastien Nocera <hadess@hadess.net>
-> > Date: Sun, 6 Jun 2010 15:48:26 +0100
-> > Subject: [PATCH] (cups) Add ability to print IEEE1284 device ID
-> > 
-> > Add ability to print IEEE1284 device ID for Bluetooth
-> > printers to allow auto-configuration once paired.
-> > ---
-> >  cups/main.c |   83 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  1 files changed, 83 insertions(+), 0 deletions(-)
+> When receiving L2CAP negative configuration response with respect
+> to MTU parameter we modify wrong field. MTU here means proposed
+> value of MTU that the remote device intends to transmit. So for local
+> L2CAP socket it is pi->imtu.
 > 
-> Thanks for the updated patch. It's now pushed upstream.
 
-Thanks.
+Yes imtu is negotiated in this phase.
 
-> > I've only fixed the style problems in the patch itself. I'm happy to do
-> > the rest of the file, if you have a "indent" magic incantation for it.
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+
+Acked-by: Ville Tervo <ville.tervo@nokia.com>
+
+> ---
+>  net/bluetooth/l2cap.c |    6 +++---
+>  1 files changed, 3 insertions(+), 3 deletions(-)
 > 
-> In my experience indent can produce quite a mess compared to fixing
-> style issues manually. Anyway, I went ahead and did the cleanup myself
-> for the issues that I could quickly spot and pushed the fixes as a
-> separate patch upstream.
+> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> index c784703..9fad312 100644
+> --- a/net/bluetooth/l2cap.c
+> +++ b/net/bluetooth/l2cap.c
+> @@ -2771,10 +2771,10 @@ static int l2cap_parse_conf_rsp(struct sock *sk, void *rsp, int len, void *data,
+>  		case L2CAP_CONF_MTU:
+>  			if (val < L2CAP_DEFAULT_MIN_MTU) {
+>  				*result = L2CAP_CONF_UNACCEPT;
+> -				pi->omtu = L2CAP_DEFAULT_MIN_MTU;
+> +				pi->imtu = L2CAP_DEFAULT_MIN_MTU;
+>  			} else
+> -				pi->omtu = val;
+> -			l2cap_add_conf_opt(&ptr, L2CAP_CONF_MTU, 2, pi->omtu);
+> +				pi->imtu = val;
+> +			l2cap_add_conf_opt(&ptr, L2CAP_CONF_MTU, 2, pi->imtu);
+>  			break;
+>  
+>  		case L2CAP_CONF_FLUSH_TO:
+> -- 
+> 1.7.0.4
 
-OK. Indent should be able to do this without making a mess as long as
-you know the exact parameters. Mind, some of the restrictions feel like
-they're from COBOL days (79 characters line width?).
 
-I prefer readable code to mashed-up code that looks that way because of
-hard constraints.
-
+-- 
+Ville
