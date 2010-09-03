@@ -1,137 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 3 Sep 2010 19:38:01 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Dominik Brodowski <linux@dominikbrodowski.net>
+Cc: linux-pcmcia@lists.infradead.org, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-usb@vger.kernel.org, laforge@gnumonks.org,
+	linux-mtd@lists.infradead.org, linux-bluetooth@vger.kernel.org,
+	alsa-devel@alsa-project.org, linux-serial@vger.kernel.org,
+	Jiri Kosina <jkosina@suse.cz>, linux-scsi@vger.kernel.org
+Subject: Re: [PATCH 10/15] pcmcia: introduce autoconfiguration feature
+Message-ID: <20100903223801.GG16973@vigoh>
+References: <20100903105628.GA21255@comet.dominikbrodowski.net>
+ <1283511434-21620-10-git-send-email-linux@dominikbrodowski.net>
 MIME-Version: 1.0
-Date: Sat, 4 Sep 2010 16:52:43 +0800
-Message-ID: <AANLkTi=_Yt6MXe5JpCHu0TXy-YGvi=GoTwLVKnPV0aTJ@mail.gmail.com>
-Subject: Btio.[ch] cleanup related issue
-From: =?GB2312?B?1fG7qtXF?= <zhenhua2000@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: zhenhua.zhang@intel.com
-Content-Type: multipart/mixed; boundary=e0cb4e887ee9a4685b048f6b2b54
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1283511434-21620-10-git-send-email-linux@dominikbrodowski.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---e0cb4e887ee9a4685b048f6b2b54
-Content-Type: text/plain; charset=ISO-8859-1
+* Dominik Brodowski <linux@dominikbrodowski.net> [2010-09-03 12:57:09 +0200]:
 
-Hi,
+> Introduce an autoconfiguration feature to set certain values in
+> pcmcia_loop_config(), instead of copying the same code over and over
+> in each PCMCIA driver. At first, introduce the following options:
+> 
+> CONF_AUTO_CHECK_VCC	check or matching Vcc entry
+> CONF_AUTO_SET_VPP	set Vpp
+> CONF_AUTO_AUDIO		enable the speaker line
+> 
+> CC: netdev@vger.kernel.org
+> CC: linux-wireless@vger.kernel.org
+> CC: linux-ide@vger.kernel.org
+> CC: linux-usb@vger.kernel.org
+> CC: laforge@gnumonks.org
+> CC: linux-mtd@lists.infradead.org
+> CC: linux-bluetooth@vger.kernel.org
+> CC: alsa-devel@alsa-project.org
+> CC: linux-serial@vger.kernel.org
+> CC: Jiri Kosina <jkosina@suse.cz>
+> CC: linux-scsi@vger.kernel.org
+> Signed-off-by: Dominik Brodowski <linux@dominikbrodowski.net>
+> ---
+>  drivers/ata/pata_pcmcia.c                        |   23 +----
+>  drivers/bluetooth/bt3c_cs.c                      |    7 +-
+>  drivers/bluetooth/btuart_cs.c                    |    7 +-
+>  drivers/bluetooth/dtl1_cs.c                      |    1 -
+>  drivers/char/pcmcia/cm4000_cs.c                  |    1 -
+>  drivers/char/pcmcia/cm4040_cs.c                  |    1 -
+>  drivers/char/pcmcia/ipwireless/main.c            |    1 -
+>  drivers/char/pcmcia/synclink_cs.c                |    1 -
+>  drivers/ide/ide-cs.c                             |   23 +----
+>  drivers/isdn/hardware/avm/avm_cs.c               |    1 -
+>  drivers/isdn/hisax/avma1_cs.c                    |    1 -
+>  drivers/isdn/hisax/elsa_cs.c                     |    1 -
+>  drivers/isdn/hisax/sedlbauer_cs.c                |   25 +-----
+>  drivers/isdn/hisax/teles_cs.c                    |    1 -
+>  drivers/net/pcmcia/axnet_cs.c                    |    1 -
+>  drivers/net/pcmcia/fmvj18x_cs.c                  |    1 -
+>  drivers/net/pcmcia/pcnet_cs.c                    |    1 -
+>  drivers/net/pcmcia/smc91c92_cs.c                 |    2 -
+>  drivers/net/pcmcia/xirc2ps_cs.c                  |    5 +-
+>  drivers/net/wireless/airo_cs.c                   |   17 +---
+>  drivers/net/wireless/atmel_cs.c                  |   17 +---
+>  drivers/net/wireless/hostap/hostap_cs.c          |   27 +-----
+>  drivers/net/wireless/libertas/if_cs.c            |    1 -
+>  drivers/net/wireless/orinoco/orinoco_cs.c        |   31 +------
+>  drivers/net/wireless/orinoco/spectrum_cs.c       |   24 +----
+>  drivers/parport/parport_cs.c                     |    1 -
+>  drivers/pcmcia/pcmcia_cis.c                      |   36 ++++++-
+>  drivers/scsi/pcmcia/aha152x_stub.c               |    1 -
+>  drivers/scsi/pcmcia/fdomain_stub.c               |    1 -
+>  drivers/scsi/pcmcia/nsp_cs.c                     |  110 ++++++++-------------
+>  drivers/scsi/pcmcia/qlogic_stub.c                |    1 -
+>  drivers/scsi/pcmcia/sym53c500_cs.c               |    1 -
+>  drivers/serial/serial_cs.c                       |   10 +--
+>  drivers/staging/comedi/drivers/cb_das16_cs.c     |    1 -
+>  drivers/staging/comedi/drivers/das08_cs.c        |    1 -
+>  drivers/staging/comedi/drivers/ni_daq_700.c      |   10 +--
+>  drivers/staging/comedi/drivers/ni_daq_dio24.c    |   10 +--
+>  drivers/staging/comedi/drivers/ni_labpc_cs.c     |   11 +--
+>  drivers/staging/comedi/drivers/ni_mio_cs.c       |    1 -
+>  drivers/staging/comedi/drivers/quatech_daqp_cs.c |    1 -
+>  drivers/telephony/ixj_pcmcia.c                   |    1 -
+>  drivers/usb/host/sl811_cs.c                      |   24 +----
+>  include/pcmcia/ds.h                              |    7 +-
+>  43 files changed, 120 insertions(+), 329 deletions(-)
 
-I am taking the task to clean up the src/btio.[ch] files in order to
-share them among BlueZ, OBEX and oFono. And yes, it's easy to make
-them as identical but harder to make it self contained by removing the
-'dependence' with libbluetooth. So I post the shared structure between
-btio.[ch] and libbluetooth to get your comments. Now I have some small
-patches that do the cleanup with depends on libbluetooth. I suggest we
-could first make the btio.[ch] having the same look&feel and remove
-the libbluetooth dependence later. One reason is that the potential
-changes to libbluetooth code could only happen in BlueZ 5.x version.
+For drivers/bluetooth
 
-Below are the data structure that btio.[ch] depends on libbluetooth. I
-don't count L2RAW and L2SCO yet. So there will be more from sco.h and
-etc. A detailed copy of 'faked' btio/bluetooth.h is attach.
+Acked-by: Gustavo F. Padovan <padovan@profusion.mobi>
 
-/* rfcomm.h */
-struct sockaddr_rc;
-struct rfcomm_conninfo;
-
-/* L2CAP socket options */
-struct l2cap_options;
-struct l2cap_conninfo;
-
-#define L2CAP_LM_XXX
-#define L2CAP_MODE_XXX
-
-/* hci.h */
-enum { HCI_XXX };
-
-struct hci_dev_stats;
-struct hci_dev_info;
-
-
-Regards,
-Zhenhua
-
---e0cb4e887ee9a4685b048f6b2b54
-Content-Type: text/x-chdr; charset=US-ASCII; name="bluetooth.h"
-Content-Disposition: attachment; filename="bluetooth.h"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_gdo8izgt0
-
-LyoKICoKICogIEJsdWVaIC0gQmx1ZXRvb3RoIHByb3RvY29sIHN0YWNrIGZvciBMaW51eAogKgog
-KiAgQ29weXJpZ2h0IChDKSAyMDA5LTIwMTAgIE1hcmNlbCBIb2x0bWFubiA8bWFyY2VsQGhvbHRt
-YW5uLm9yZz4KICogIENvcHlyaWdodCAoQykgMjAwOS0yMDEwICBOb2tpYSBDb3Jwb3JhdGlvbgog
-KiAgQ29weXJpZ2h0IChDKSAyMDEwICBJbnRlbCBDb3Jwb3JhdGlvbgogKgogKgogKiAgVGhpcyBw
-cm9ncmFtIGlzIGZyZWUgc29mdHdhcmU7IHlvdSBjYW4gcmVkaXN0cmlidXRlIGl0IGFuZC9vciBt
-b2RpZnkKICogIGl0IHVuZGVyIHRoZSB0ZXJtcyBvZiB0aGUgR05VIEdlbmVyYWwgUHVibGljIExp
-Y2Vuc2UgYXMgcHVibGlzaGVkIGJ5CiAqICB0aGUgRnJlZSBTb2Z0d2FyZSBGb3VuZGF0aW9uOyBl
-aXRoZXIgdmVyc2lvbiAyIG9mIHRoZSBMaWNlbnNlLCBvcgogKiAgKGF0IHlvdXIgb3B0aW9uKSBh
-bnkgbGF0ZXIgdmVyc2lvbi4KICoKICogIFRoaXMgcHJvZ3JhbSBpcyBkaXN0cmlidXRlZCBpbiB0
-aGUgaG9wZSB0aGF0IGl0IHdpbGwgYmUgdXNlZnVsLAogKiAgYnV0IFdJVEhPVVQgQU5ZIFdBUlJB
-TlRZOyB3aXRob3V0IGV2ZW4gdGhlIGltcGxpZWQgd2FycmFudHkgb2YKICogIE1FUkNIQU5UQUJJ
-TElUWSBvciBGSVRORVNTIEZPUiBBIFBBUlRJQ1VMQVIgUFVSUE9TRS4gIFNlZSB0aGUKICogIEdO
-VSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlIGZvciBtb3JlIGRldGFpbHMuCiAqCiAqICBZb3Ugc2hv
-dWxkIGhhdmUgcmVjZWl2ZWQgYSBjb3B5IG9mIHRoZSBHTlUgR2VuZXJhbCBQdWJsaWMgTGljZW5z
-ZQogKiAgYWxvbmcgd2l0aCB0aGlzIHByb2dyYW07IGlmIG5vdCwgd3JpdGUgdG8gdGhlIEZyZWUg
-U29mdHdhcmUKICogIEZvdW5kYXRpb24sIEluYy4sIDUxIEZyYW5rbGluIFN0LCBGaWZ0aCBGbG9v
-ciwgQm9zdG9uLCBNQSAgMDIxMTAtMTMwMSAgVVNBCiAqCiAqLwojaWZuZGVmIEJMVUVUT09USF9I
-CiNkZWZpbmUgQkxVRVRPT1RIX0gKCiNpbmNsdWRlIDxzdGRpbnQuaD4KI2luY2x1ZGUgPHN0cmlu
-Zy5oPgojaW5jbHVkZSA8ZW5kaWFuLmg+CiNpbmNsdWRlIDxieXRlc3dhcC5oPgojaW5jbHVkZSA8
-c3lzL3NvY2tldC5oPgoKI2luY2x1ZGUgPGdsaWIuaD4KCiNkZWZpbmUgQlRQUk9UT19MMkNBUAkJ
-MAojZGVmaW5lIEJUUFJPVE9fSENJCQkxCiNkZWZpbmUgQlRQUk9UT19SRkNPTU0JCTMKCiNkZWZp
-bmUgU09MX0hDSQkJMAojZGVmaW5lIFNPTF9MMkNBUAk2CiNkZWZpbmUgU09MX1JGQ09NTQkxOAoK
-I2lmbmRlZiBTT0xfQkxVRVRPT1RICiNkZWZpbmUgU09MX0JMVUVUT09USAkyNzQKI2VuZGlmCgoj
-ZGVmaW5lIEJUX1NFQ1VSSVRZCTQKc3RydWN0IGJ0X3NlY3VyaXR5IHsKCXVpbnQ4X3QgbGV2ZWw7
-Cn07CiNkZWZpbmUgQlRfU0VDVVJJVFlfU0RQCQkwCiNkZWZpbmUgQlRfU0VDVVJJVFlfTE9XCQkx
-CiNkZWZpbmUgQlRfU0VDVVJJVFlfTUVESVVNCTIKI2RlZmluZSBCVF9TRUNVUklUWV9ISUdICTMK
-CiNkZWZpbmUgQlRfREVGRVJfU0VUVVAJNwoKLyogQnl0ZSBvcmRlciBjb252ZXJzaW9ucyAqLwoj
-aWYgX19CWVRFX09SREVSID09IF9fTElUVExFX0VORElBTgojZGVmaW5lIGh0b2JzKGQpICAoZCkK
-I2RlZmluZSBodG9ibChkKSAgKGQpCiNkZWZpbmUgYnRvaHMoZCkgIChkKQojZGVmaW5lIGJ0b2hs
-KGQpICAoZCkKI2VsaWYgX19CWVRFX09SREVSID09IF9fQklHX0VORElBTgojZGVmaW5lIGh0b2Jz
-KGQpICBic3dhcF8xNihkKQojZGVmaW5lIGh0b2JsKGQpICBic3dhcF8zMihkKQojZGVmaW5lIGJ0
-b2hzKGQpICBic3dhcF8xNihkKQojZGVmaW5lIGJ0b2hsKGQpICBic3dhcF8zMihkKQojZWxzZQoj
-ZXJyb3IgIlVua25vd24gYnl0ZSBvcmRlciIKI2VuZGlmCgovKiBCRCBBZGRyZXNzICovCnR5cGVk
-ZWYgc3RydWN0IHsKCXVpbnQ4X3QgYls2XTsKfSBfX2F0dHJpYnV0ZV9fKChwYWNrZWQpKSBiZGFk
-ZHJfdDsKCi8qIENvcHksIHN3YXAsIGNvbnZlcnQgQkQgQWRkcmVzcyAqLwpzdGF0aWMgaW5saW5l
-IGludCBiYWNtcChjb25zdCBiZGFkZHJfdCAqYmExLCBjb25zdCBiZGFkZHJfdCAqYmEyKQp7Cgly
-ZXR1cm4gbWVtY21wKGJhMSwgYmEyLCBzaXplb2YoYmRhZGRyX3QpKTsKfQoKc3RhdGljIGlubGlu
-ZSB2b2lkIGJhY3B5KGJkYWRkcl90ICpkc3QsIGNvbnN0IGJkYWRkcl90ICpzcmMpCnsKCW1lbWNw
-eShkc3QsIHNyYywgc2l6ZW9mKGJkYWRkcl90KSk7Cn0KCi8qIFJGQ09NTSBzb2NrZXQgYWRkcmVz
-cyAqLwpzdHJ1Y3Qgc29ja2FkZHJfcmMgewoJc2FfZmFtaWx5X3QJcmNfZmFtaWx5OwoJYmRhZGRy
-X3QJcmNfYmRhZGRyOwoJdWludDhfdAkJcmNfY2hhbm5lbDsKfTsKCi8qIFJGQ09NTSBzb2NrZXQg
-b3B0aW9ucyAqLwojZGVmaW5lIFJGQ09NTV9DT05OSU5GTwkweDAyCnN0cnVjdCByZmNvbW1fY29u
-bmluZm8gewoJdWludDE2X3QJaGNpX2hhbmRsZTsKCXVpbnQ4X3QJCWRldl9jbGFzc1szXTsKfTsK
-CiNkZWZpbmUgUkZDT01NX0xNCTB4MDMKI2RlZmluZSBSRkNPTU1fTE1fTUFTVEVSCTB4MDAwMQoj
-ZGVmaW5lIFJGQ09NTV9MTV9BVVRICQkweDAwMDIKI2RlZmluZSBSRkNPTU1fTE1fRU5DUllQVAkw
-eDAwMDQKI2RlZmluZSBSRkNPTU1fTE1fVFJVU1RFRAkweDAwMDgKI2RlZmluZSBSRkNPTU1fTE1f
-UkVMSUFCTEUJMHgwMDEwCiNkZWZpbmUgUkZDT01NX0xNX1NFQ1VSRQkweDAwMjAKCi8qIEwyQ0FQ
-IHNvY2tldCBhZGRyZXNzICovCnN0cnVjdCBzb2NrYWRkcl9sMiB7CglzYV9mYW1pbHlfdAlsMl9m
-YW1pbHk7Cgl1bnNpZ25lZCBzaG9ydAlsMl9wc207CgliZGFkZHJfdAlsMl9iZGFkZHI7Cgl1bnNp
-Z25lZCBzaG9ydAlsMl9jaWQ7Cn07CgovKiBMMkNBUCBzb2NrZXQgb3B0aW9ucyAqLwojZGVmaW5l
-IEwyQ0FQX09QVElPTlMJMHgwMQpzdHJ1Y3QgbDJjYXBfb3B0aW9ucyB7Cgl1aW50MTZfdAlvbXR1
-OwoJdWludDE2X3QJaW10dTsKCXVpbnQxNl90CWZsdXNoX3RvOwoJdWludDhfdAkJbW9kZTsKCXVp
-bnQ4X3QJCWZjczsKfTsKCiNkZWZpbmUgTDJDQVBfQ09OTklORk8JMHgwMgpzdHJ1Y3QgbDJjYXBf
-Y29ubmluZm8gewoJdWludDE2X3QJaGNpX2hhbmRsZTsKCXVpbnQ4X3QJCWRldl9jbGFzc1szXTsK
-fTsKCiNkZWZpbmUgTDJDQVBfTE0JMHgwMwojZGVmaW5lIEwyQ0FQX0xNX01BU1RFUgkJMHgwMDAx
-CiNkZWZpbmUgTDJDQVBfTE1fQVVUSAkJMHgwMDAyCiNkZWZpbmUgTDJDQVBfTE1fRU5DUllQVAkw
-eDAwMDQKI2RlZmluZSBMMkNBUF9MTV9UUlVTVEVECTB4MDAwOAojZGVmaW5lIEwyQ0FQX0xNX1JF
-TElBQkxFCTB4MDAxMAojZGVmaW5lIEwyQ0FQX0xNX1NFQ1VSRQkJMHgwMDIwCgojZGVmaW5lIEwy
-Q0FQX01PREVfQkFTSUMJMHgwMAojZGVmaW5lIEwyQ0FQX01PREVfUkVUUkFOUwkweDAxCiNkZWZp
-bmUgTDJDQVBfTU9ERV9GTE9XQ1RMCTB4MDIKI2RlZmluZSBMMkNBUF9NT0RFX0VSVE0JCTB4MDMK
-I2RlZmluZSBMMkNBUF9NT0RFX1NUUkVBTUlORwkweDA0CgovKiBoY2kuaCAqLwoKLyogSENJIGRl
-dmljZSBmbGFncyAqLwplbnVtIHsKCUhDSV9VUCwKCUhDSV9JTklULAoJSENJX1JVTk5JTkcsCgoJ
-SENJX1BTQ0FOLAoJSENJX0lTQ0FOLAoJSENJX0FVVEgsCglIQ0lfRU5DUllQVCwKCUhDSV9JTlFV
-SVJZLAoKCUhDSV9SQVcsCn07CgojZGVmaW5lIEhDSUdFVERFVklORk8JX0lPUignSCcsIDIxMSwg
-aW50KQoKLyogSW9jdGwgcmVxdWVzdHMgc3RydWN0dXJlcyAqLwpzdHJ1Y3QgaGNpX2Rldl9zdGF0
-cyB7Cgl1aW50MzJfdCBlcnJfcng7Cgl1aW50MzJfdCBlcnJfdHg7Cgl1aW50MzJfdCBjbWRfdHg7
-Cgl1aW50MzJfdCBldnRfcng7Cgl1aW50MzJfdCBhY2xfdHg7Cgl1aW50MzJfdCBhY2xfcng7Cgl1
-aW50MzJfdCBzY29fdHg7Cgl1aW50MzJfdCBzY29fcng7Cgl1aW50MzJfdCBieXRlX3J4OwoJdWlu
-dDMyX3QgYnl0ZV90eDsKfTsKCnN0cnVjdCBoY2lfZGV2X2luZm8gewoJdWludDE2X3QgZGV2X2lk
-OwoJY2hhciAgICAgbmFtZVs4XTsKCgliZGFkZHJfdCBiZGFkZHI7CgoJdWludDMyX3QgZmxhZ3M7
-Cgl1aW50OF90ICB0eXBlOwoKCXVpbnQ4X3QgIGZlYXR1cmVzWzhdOwoKCXVpbnQzMl90IHBrdF90
-eXBlOwoJdWludDMyX3QgbGlua19wb2xpY3k7Cgl1aW50MzJfdCBsaW5rX21vZGU7CgoJdWludDE2
-X3QgYWNsX210dTsKCXVpbnQxNl90IGFjbF9wa3RzOwoJdWludDE2X3Qgc2NvX210dTsKCXVpbnQx
-Nl90IHNjb19wa3RzOwoKCXN0cnVjdCAgIGhjaV9kZXZfc3RhdHMgc3RhdDsKfTsKCmludCBkZXZp
-ZDJiYShpbnQgZGV2X2lkLCBiZGFkZHJfdCAqYmRhZGRyKTsKdm9pZCBiYXN3YXAoYmRhZGRyX3Qg
-KmRzdCwgY29uc3QgYmRhZGRyX3QgKnNyYyk7CmludCBiYTJzdHIoY29uc3QgYmRhZGRyX3QgKmJh
-LCBjaGFyICpzdHIpOwppbnQgc3RyMmJhKGNvbnN0IGNoYXIgKnN0ciwgYmRhZGRyX3QgKmJhKTsK
-CiNlbmRpZgo=
---e0cb4e887ee9a4685b048f6b2b54--
+-- 
+Gustavo F. Padovan
+ProFUSION embedded systems - http://profusion.mobi
