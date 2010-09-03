@@ -1,22 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Bluetooth braille readers
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="ISO-8859-1"
-Date: Fri, 03 Sep 2010 16:51:57 +0100
-Message-ID: <1283529118.2361.97.camel@localhost.localdomain>
-Mime-Version: 1.0
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: check L2CAP length in first ACL fragment
+Date: Fri,  3 Sep 2010 16:07:20 +0300
+Message-Id: <1283519240-1235-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Heya,
+From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 
-I wanted to know whether anyone had experience with Bluetooth braille
-readers. Do you know if they all use different proprietary protocols, or
-whether there is a specific profile for it?
+Current Bluetooth code assembles fragments of big L2CAP packets
+in l2cap_recv_acldata and then checks allowed L2CAP size in
+assembled L2CAP packet (pi->imtu < skb->len).
 
-I'd get one to test with, but at around $2000 a pop for the cheapest
-one, it's hard to justify short-term.
+The patch moves allowed L2CAP size check to the early stage when
+we receive the first fragment of L2CAP packet. First fragment has
+already L2CAP header including length.
 
-Cheers
+Trace below is received when using stress tools sending big
+fragmented L2CAP packets.
+...
+[ 1712.798492] swapper: page allocation failure. order:4, mode:0x4020
+[ 1712.804809] [<c0031870>] (unwind_backtrace+0x0/0xdc) from [<c00a1f70>]
+(__alloc_pages_nodemask+0x4)
+[ 1712.814666] [<c00a1f70>] (__alloc_pages_nodemask+0x47c/0x4d4) from
+[<c00a1fd8>] (__get_free_pages+)
+[ 1712.824645] [<c00a1fd8>] (__get_free_pages+0x10/0x3c) from [<c026eb5c>]
+(__alloc_skb+0x4c/0xfc)
+[ 1712.833465] [<c026eb5c>] (__alloc_skb+0x4c/0xfc) from [<bf28c738>]
+(l2cap_recv_acldata+0xf0/0x1f8 )
+[ 1712.843322] [<bf28c738>] (l2cap_recv_acldata+0xf0/0x1f8 [l2cap]) from
+[<bf0094ac>] (hci_rx_task+0x)
+...
+
+After applying patch dmesg looks like:
+...
+l2cap_recv_acldata: Frame exceeding recv MTU (len 64182, MTU 1013)
+l2cap_recv_acldata: Unexpected continuation frame (len 34)
+...
+
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+---
+ net/bluetooth/l2cap.c |   11 +++++++++++
+ 1 files changed, 11 insertions(+), 0 deletions(-)
+
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index 9fad312..21824d7 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -4654,6 +4654,8 @@ static int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 fl
+ 
+ 	if (flags & ACL_START) {
+ 		struct l2cap_hdr *hdr;
++		struct sock *sk;
++		u16 cid;
+ 		int len;
+ 
+ 		if (conn->rx_len) {
+@@ -4672,6 +4674,7 @@ static int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 fl
+ 
+ 		hdr = (struct l2cap_hdr *) skb->data;
+ 		len = __le16_to_cpu(hdr->len) + L2CAP_HDR_SIZE;
++		cid = __le16_to_cpu(hdr->cid);
+ 
+ 		if (len == skb->len) {
+ 			/* Complete frame received */
+@@ -4688,6 +4691,14 @@ static int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 fl
+ 			goto drop;
+ 		}
+ 
++		sk = l2cap_get_chan_by_scid(&conn->chan_list, cid);
++		if (l2cap_pi(sk)->imtu < len) {
++			BT_ERR("Frame exceeding recv MTU (len %d, MTU %d)",
++					len, l2cap_pi(sk)->imtu);
++			conn->rx_len = 0; /* needed? */
++			goto drop;
++		}
++
+ 		/* Allocate skb for the complete frame (with header) */
+ 		conn->rx_skb = bt_skb_alloc(len, GFP_ATOMIC);
+ 		if (!conn->rx_skb)
+-- 
+1.7.0.4
 
