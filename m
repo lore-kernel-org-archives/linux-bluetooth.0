@@ -1,94 +1,142 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 3 Sep 2010 19:32:56 -0300
+Date: Fri, 3 Sep 2010 18:49:56 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Dominik Brodowski <linux@dominikbrodowski.net>
-Cc: linux-pcmcia@lists.infradead.org, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, linux-ide@vger.kernel.org,
-	linux-usb@vger.kernel.org, laforge@gnumonks.org,
-	linux-mtd@lists.infradead.org, linux-bluetooth@vger.kernel.org,
-	alsa-devel@alsa-project.org, linux-serial@vger.kernel.org,
-	Jiri Kosina <jkosina@suse.cz>, linux-scsi@vger.kernel.org
-Subject: Re: [PATCH 07/15] pcmcia: move config_{base,index,regs} to struct
- pcmcia_device
-Message-ID: <20100903223256.GC16973@vigoh>
-References: <20100903105628.GA21255@comet.dominikbrodowski.net>
- <1283511434-21620-7-git-send-email-linux@dominikbrodowski.net>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: haijun liu <liuhaijun.er@gmail.com>,
+	"haijun.liu" <haijun.liu@atheros.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 16/22] Store new configuration values in l2cap_pinfo
+Message-ID: <20100903214956.GB16973@vigoh>
+References: <AANLkTimnW0jk19cDG+r64Q+-HxdH2qdTBirTMB7ikr1W@mail.gmail.com>
+ <alpine.DEB.2.00.1009021441390.17665@linux-sea-02>
+ <AANLkTinrqQ0gbR0aQyojZHzFu6kSe6tuHTYFD7hdT=Qa@mail.gmail.com>
+ <alpine.DEB.2.00.1009031337410.26179@linux-sea-02>
+ <20100903210432.GA16973@vigoh>
+ <alpine.DEB.2.00.1009031440530.26179@linux-sea-02>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1283511434-21620-7-git-send-email-linux@dominikbrodowski.net>
-Sender: linux-usb-owner@vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <alpine.DEB.2.00.1009031440530.26179@linux-sea-02>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Dominik Brodowski <linux@dominikbrodowski.net> [2010-09-03 12:57:06 +0200]:
+Hi Mat,
 
-> Several drivers prefer to explicitly set config_{base,index,regs},
-> formerly known as ConfigBase, ConfigIndex and Present. Instead of
-> passing these values inside config_req_t, store it in struct
-> pcmcia_device.
+* Mat Martineau <mathewm@codeaurora.org> [2010-09-03 14:46:58 -0700]:
+
 > 
-> CC: netdev@vger.kernel.org
-> CC: linux-wireless@vger.kernel.org
-> CC: linux-ide@vger.kernel.org
-> CC: linux-usb@vger.kernel.org
-> CC: laforge@gnumonks.org
-> CC: linux-mtd@lists.infradead.org
-> CC: linux-bluetooth@vger.kernel.org
-> CC: alsa-devel@alsa-project.org
-> CC: linux-serial@vger.kernel.org
-> CC: Jiri Kosina <jkosina@suse.cz>
-> CC: linux-scsi@vger.kernel.org
-> Signed-off-by: Dominik Brodowski <linux@dominikbrodowski.net>
-> ---
->  drivers/bluetooth/bluecard_cs.c                  |    2 +-
->  drivers/char/pcmcia/ipwireless/main.c            |    2 +-
->  drivers/char/pcmcia/synclink_cs.c                |    6 ++--
->  drivers/ide/ide-cs.c                             |    3 +-
->  drivers/isdn/hardware/avm/avm_cs.c               |    4 +-
->  drivers/isdn/hisax/avma1_cs.c                    |    4 +-
->  drivers/isdn/hisax/elsa_cs.c                     |    2 +-
->  drivers/isdn/hisax/sedlbauer_cs.c                |    2 +-
->  drivers/isdn/hisax/teles_cs.c                    |    2 +-
->  drivers/mtd/maps/pcmciamtd.c                     |    2 +-
->  drivers/net/pcmcia/3c574_cs.c                    |    2 +-
->  drivers/net/pcmcia/3c589_cs.c                    |    2 +-
->  drivers/net/pcmcia/axnet_cs.c                    |    6 ++--
->  drivers/net/pcmcia/fmvj18x_cs.c                  |   22 ++++++------
->  drivers/net/pcmcia/ibmtr_cs.c                    |    4 +-
->  drivers/net/pcmcia/nmclan_cs.c                   |    4 +-
->  drivers/net/pcmcia/pcnet_cs.c                    |    6 ++--
->  drivers/net/pcmcia/smc91c92_cs.c                 |   10 +++---
->  drivers/net/pcmcia/xirc2ps_cs.c                  |    2 +-
->  drivers/net/wireless/airo_cs.c                   |    2 +-
->  drivers/net/wireless/hostap/hostap_cs.c          |    2 +-
->  drivers/net/wireless/ray_cs.c                    |    2 +-
->  drivers/net/wireless/wl3501_cs.c                 |    2 +-
->  drivers/parport/parport_cs.c                     |    2 +-
->  drivers/pcmcia/cs_internal.h                     |    3 --
->  drivers/pcmcia/ds.c                              |    8 ++--
->  drivers/pcmcia/pcmcia_cis.c                      |    2 +-
->  drivers/pcmcia/pcmcia_resource.c                 |   38 +++++++++++-----------
->  drivers/scsi/pcmcia/aha152x_stub.c               |    2 +-
->  drivers/scsi/pcmcia/fdomain_stub.c               |    2 +-
->  drivers/scsi/pcmcia/nsp_cs.c                     |    2 +-
->  drivers/scsi/pcmcia/qlogic_stub.c                |    2 +-
->  drivers/serial/serial_cs.c                       |    6 ++--
->  drivers/staging/comedi/drivers/cb_das16_cs.c     |    2 +-
->  drivers/staging/comedi/drivers/das08_cs.c        |    2 +-
->  drivers/staging/comedi/drivers/ni_daq_700.c      |    2 +-
->  drivers/staging/comedi/drivers/ni_daq_dio24.c    |    2 +-
->  drivers/staging/comedi/drivers/ni_labpc_cs.c     |    2 +-
->  drivers/staging/comedi/drivers/quatech_daqp_cs.c |    2 +-
->  drivers/staging/wlags49_h2/wl_cs.c               |    4 +-
->  drivers/usb/host/sl811_cs.c                      |    2 +-
->  include/pcmcia/cs.h                              |   15 --------
->  include/pcmcia/ds.h                              |   14 ++++++++
->  sound/pcmcia/pdaudiocf/pdaudiocf.c               |    6 ++--
->  sound/pcmcia/vx/vxpocket.c                       |    4 +-
->  45 files changed, 107 insertions(+), 112 deletions(-)
+> Gustavo -
+> 
+> On Fri, 3 Sep 2010, Gustavo F. Padovan wrote:
+> 
+> > Hi Mat,
+> >
+> > * Mat Martineau <mathewm@codeaurora.org> [2010-09-03 13:58:46 -0700]:
+> >
+> >>
+> >> On Fri, 3 Sep 2010, haijun liu wrote:
+> >>
+> >>> On Fri, Sep 3, 2010 at 7:02 AM, Mat Martineau <mathewm@codeaurora.org> wrote:
+> >>>>
+> >>>> On Thu, 26 Aug 2010, haijun liu wrote:
+> >>>>
+> >>>>> From d093975dde6d85c824a5aaac943d676100810010 Mon Sep 17 00:00:00 2001
+> >>>>> From: haijun.liu <haijun.liu@atheros.com>
+> >>>>> Date: Mon, 23 Aug 2010 00:09:56 +0800
+> >>>>> Subject: [PATCH 16/22] Store new configuration values in l2cap_pinfo.
+> >>>>>
+> >>>>> ---
+> >>>>> include/net/bluetooth/l2cap.h |    9 +++++++++
+> >>>>> 1 files changed, 9 insertions(+), 0 deletions(-)
+> >>>>>
+> >>>>> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> >>>>> index 2d864d4..f2dd65d 100644
+> >>>>> --- a/include/net/bluetooth/l2cap.h
+> >>>>> +++ b/include/net/bluetooth/l2cap.h
+> >>>>> @@ -406,6 +406,15 @@ struct l2cap_pinfo {
+> >>>>>        __u16           remote_mps;
+> >>>>>        __u16           mps;
+> >>>>>
+> >>>>> +       __u8            ext_flowspec_enable;
+> >>>>> +       struct ext_flow_spec    loc_efs;
+> >>>>> +       struct ext_flow_spec    rem_efs;
+> >>>>> +
+> >>>>> +       __u8            extwin_enable;
+> >>>>> +       __u16           extwin_size;
+> >>>>> +       __u8            rem_extwin_enable;
+> >>>>> +       __u16           rem_extwin_size;
+> >>>>> +
+> >>>>>        __le16          sport;
+> >>>>>
+> >>>>>        struct timer_list       retrans_timer;
+> >>>>
+> >>>> Regarding the new "extwin" structure members, have you considered changing
+> >>>> the existing tx_win and remote_tx_win members to __u16 and using them with
+> >>>> both standard and extended window sizes?
+> >>>>
+> >>>> The spec also requires that both directions of the link use the same type of
+> >>>> control field (standard or extended).  After L2CAP configuration is done,
+> >>>> all the information required for the transmit window is the control field
+> >>>> type, tx_win, and remote_tx_win.  The control field would be set to
+> >>>> 'extended' if a successful configuration response is sent or received for
+> >>>> the extended window size option.
+> >>>
+> >>> Yes, we do, please look into the patch, we use __u16 for extwin_size &
+> >>> rem_extwin_size
+> >>> +       __u8            extwin_enable;
+> >>> +       __u16           extwin_size;
+> >>> +       __u8            rem_extwin_enable;
+> >>> +       __u16           rem_extwin_size;
+> >>>
+> >>> You are exactly right, in our implementation, choosing standard or
+> >>> extended window, it depends whether successful configuration
+> >>> response contain the extended window size option.
+> >>
+> >> Haijin -
+> >>
+> >> Thank you for your explanation.  I was trying to suggest something
+> >> different - sorry I did not explain myself well.
+> >>
+> >> I think that extwin_enable, extwin_size, rem_extwin_enable, and
+> >> rem_extwin_size are not needed in l2cap_pinfo.  Instead, I suggest
+> >> this:
+> >>
+> >> @@ -349,15 +349,17 @@ struct l2cap_pinfo {
+> >>
+> >>          __u8            ident;
+> >>
+> >> -       __u8            tx_win;
+> >> +       __u16           tx_win;
+> >>          __u8            max_tx;
+> >> -       __u8            remote_tx_win;
+> >> +       __u16           remote_tx_win;
+> >>          __u8            remote_max_tx;
+> >>          __u16           retrans_timeout;
+> >>          __u16           monitor_timeout;
+> >>          __u16           remote_mps;
+> >>          __u16           mps;
+> >>
+> >> +       __u8            extended_control;
+> >> +
+> >>          __le16          sport;
+> >>
+> >>          struct timer_list       retrans_timer;
+> >>
+> >> Here, tx_win and remote_tx_win are always used to record the window
+> >> size, whether extended or standard.  extended_control is used to
+> >> specify standard or extended control fields.
+> >
+> > Then you don't need extended_control here, a bit in the conf_state field
+> > should be enough.
+> 
+> It looks like conf_state is not currently used once the connection is 
+> made.  The extended_control information is accessed when parsing 
+> headers in every incoming PDU and generating every outgoing PDU. 
+> Usage is a lot like l2cap_pinfo.fcs
+> 
+> If you still want to squeeze this extended control bit in an existing 
+> l2cap_pinfo member, would conn_state be better?
 
-For drivers/bluetooth
-
-Acked-by: Gustavo F. Padovan <padovan@profusion.mobi>
+Yes, this one is better.
 
 -- 
 Gustavo F. Padovan
