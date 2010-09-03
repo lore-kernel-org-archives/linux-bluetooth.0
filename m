@@ -1,90 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTi=KFGw_HQjUAb=s1Vf+tSW0BuFQWNwHrWBO7Wdq@mail.gmail.com>
-References: <AANLkTi=KFGw_HQjUAb=s1Vf+tSW0BuFQWNwHrWBO7Wdq@mail.gmail.com>
-Date: Fri, 3 Sep 2010 10:37:06 +0300
-Message-ID: <AANLkTi=avFuiQjApV=Wm01KjVL4LmwJFQb6=iJostpGW@mail.gmail.com>
-Subject: Re: [PATCH] Store new local name before writing it to HCI
-From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=0015175cb4086a20db048f55ff47
+In-Reply-To: <4C804F5B.3010108@aircable.net>
+References: <1283436253-9850-1-git-send-email-luiz.dentz@gmail.com>
+	<4C804F5B.3010108@aircable.net>
+Date: Fri, 3 Sep 2010 10:18:46 +0300
+Message-ID: <AANLkTi=gHZVsfLbg2E4ZLCDZFqf0mGU7BC8pCfPAw4DT@mail.gmail.com>
+Subject: Re: [PATCH] Make sure discovery don't interfere with bonding
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Manuel Naranjo <manuel@aircable.net>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---0015175cb4086a20db048f55ff47
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+Hi Manuel,
 
-On Mon, Aug 30, 2010 at 5:35 PM, Daniel =D6rstadius
-<daniel.orstadius@gmail.com> wrote:
-> Store new local name to the filesystem and emit property changed
-> before actually writing the name to the chip.
+On Fri, Sep 3, 2010 at 4:28 AM, Manuel Naranjo <manuel@aircable.net> wrote:
+>  Luiz,
+>>
+>> In situation where the user application keep a discovery session while
+>> bonding with a device it may cause a delay, or even timeout, due to the
+>> number of the inquiry responses that the controller has to process.
+>>
+>> Since the discovery can be shared between many applications it may not be
+>> possible to simple require to each application to stop their discovery
+>> before trying to pair with a device, so to fix this bluetoothd now
+>> suspends the discovery while bonding, resuming when completed.
+>
+> Stupid question but... Any way this is related to my seg faults during sdp
+> resolving problems? I haven't tried to fix it in a while, so far I'm ok with
+> a stupid cron rule which revives bluetoothd if it crashes, but I would
+> prefer a better solution.
 
-Resending with amended commit message.
+I don't think it fixes your problem, but you better check if
+bluetoothd is still crashing as before, apparently nobody else is
+having the same problem so it is quite tricky to resolve it.
 
---0015175cb4086a20db048f55ff47
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Store-new-local-name-before-writing-it-to-adapter.patch"
-Content-Disposition: attachment;
-	filename="0001-Store-new-local-name-before-writing-it-to-adapter.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_gdmqffv72
+Regards,
 
-RnJvbSBhMTBiNTE3MGYzYmE2OWQ4ODBhOGE5Y2Q4NzM3ZDA1NDVlOTViMDRiIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
-a2lhLmNvbT4KRGF0ZTogTW9uLCAzMCBBdWcgMjAxMCAxNjo1NDowOSArMDMwMApTdWJqZWN0OiBb
-UEFUQ0hdIFN0b3JlIG5ldyBsb2NhbCBuYW1lIGJlZm9yZSB3cml0aW5nIGl0IHRvIGFkYXB0ZXIK
-ClN0b3JlIG5ldyBsb2NhbCBuYW1lIHRvIHRoZSBmaWxlIHN5c3RlbSBhbmQgZW1pdCBwcm9wZXJ0
-eSBjaGFuZ2VkCmJlZm9yZSBhY3R1YWxseSB3cml0aW5nIHRoZSBuYW1lIHRvIHRoZSBhZGFwdGVy
-LgoKVGhlIHJlYXNvbiBmb3IgdGhlIHBhdGNoIGlzIHRoZSBzY2VuYXJpbyB3ZXJlIGFuIGFwcGxp
-Y2F0aW9uIHNldHMKdGhlIG5hbWUgYW5kIHRoZW4gaW1tZWRpYXRlbHkgdHVybnMgb2ZmIHRoZSBh
-ZGFwdGVyLiBQcmV2aW91c2x5IHRoZQpyZXF1ZXN0ZWQgbmFtZSBjaGFuZ2UgbWlnaHQgbm90IGhh
-dmUgYmVlbiBwcm9wZXJseSBhcHBsaWVkIGluIHRoYXQKY2FzZS4gVGhlIG5ldyBuYW1lIHdhcyBu
-b3Qgd3JpdHRlbiB0byBzdG9yYWdlIHVudGlsIGl0IGhhZCBiZWVuCnJlYWQgZnJvbSB0aGUgYWRh
-cHRlciBhbmQgdGhlIGFkYXB0ZXIgY291bGQgaGF2ZSBiZWVuIHR1cm5lZCBvZmYKYmVmb3JlIHRo
-ZSByZWFkIGNvbW1hbmQgd2FzIGNvbXBsZXRlZC4KCkF2b2lkcyB3cml0aW5nIHRoZSBuYW1lIHR3
-aWNlIGJ5IHVzaW5nIGEgYm9vbGVhbiB2YXJpYWJsZSBpbiB0aGUKYnRkX2FkYXB0ZXIgc3RydWN0
-LiBUaGUgbmFtZSBtYXkgYmUgY2hhbmdlZCBieSB1c2luZyBmb3IgZXhhbXBsZQpoY2ljb25maWcg
-YW5kIGluIHRoYXQgY2FzZSB0aGUgbmFtZSBuZWVkcyB0byBiZSB1cGRhdGVkIHRvIHN0b3JhZ2UK
-YWZ0ZXIgcmVhZGluZy4KLS0tCiBzcmMvYWRhcHRlci5jIHwgICAzNSArKysrKysrKysrKysrKysr
-KysrKysrLS0tLS0tLS0tLS0tLQogMSBmaWxlcyBjaGFuZ2VkLCAyMiBpbnNlcnRpb25zKCspLCAx
-MyBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9zcmMvYWRhcHRlci5jIGIvc3JjL2FkYXB0ZXIu
-YwppbmRleCAzNzdiYWNjLi4wZGJiMjk1IDEwMDY0NAotLS0gYS9zcmMvYWRhcHRlci5jCisrKyBi
-L3NyYy9hZGFwdGVyLmMKQEAgLTEzNyw2ICsxMzcsOCBAQCBzdHJ1Y3QgYnRkX2FkYXB0ZXIgewog
-CWdpbnQgcmVmOwogCiAJR1NMaXN0ICpwb3dlcmVkX2NhbGxiYWNrczsKKworCWdib29sZWFuIG5h
-bWVfc3RvcmVkOwogfTsKIAogc3RhdGljIHZvaWQgYWRhcHRlcl9zZXRfcGFpcmFibGVfdGltZW91
-dChzdHJ1Y3QgYnRkX2FkYXB0ZXIgKmFkYXB0ZXIsCkBAIC05NTAsMTcgKzk1MiwyMSBAQCB2b2lk
-IGFkYXB0ZXJfdXBkYXRlX2xvY2FsX25hbWUoYmRhZGRyX3QgKmJkYWRkciwgdWludDhfdCBzdGF0
-dXMsIHZvaWQgKnB0cikKIAogCXN0cm5jcHkoKGNoYXIgKikgZGV2LT5uYW1lLCAoY2hhciAqKSBy
-cC5uYW1lLCBNQVhfTkFNRV9MRU5HVEgpOwogCi0Jd3JpdGVfbG9jYWxfbmFtZShiZGFkZHIsIChj
-aGFyICopIGRldi0+bmFtZSk7CisJaWYgKCFhZGFwdGVyLT5uYW1lX3N0b3JlZCkgeworCQl3cml0
-ZV9sb2NhbF9uYW1lKGJkYWRkciwgKGNoYXIgKikgZGV2LT5uYW1lKTsKIAotCXVwZGF0ZV9leHRf
-aW5xdWlyeV9yZXNwb25zZShhZGFwdGVyKTsKKwkJbmFtZSA9IGdfc3RyZHVwKChjaGFyICopIGRl
-di0+bmFtZSk7CiAKLQluYW1lID0gZ19zdHJkdXAoKGNoYXIgKikgZGV2LT5uYW1lKTsKKwkJaWYg
-KGNvbm5lY3Rpb24pCisJCQllbWl0X3Byb3BlcnR5X2NoYW5nZWQoY29ubmVjdGlvbiwgYWRhcHRl
-ci0+cGF0aCwKKwkJCQkJCUFEQVBURVJfSU5URVJGQUNFLCAiTmFtZSIsCisJCQkJCQlEQlVTX1RZ
-UEVfU1RSSU5HLCAmbmFtZSk7CisJCWdfZnJlZShuYW1lKTsKKwl9CiAKLQlpZiAoY29ubmVjdGlv
-bikKLQkJZW1pdF9wcm9wZXJ0eV9jaGFuZ2VkKGNvbm5lY3Rpb24sIGFkYXB0ZXItPnBhdGgsCi0J
-CQkJCUFEQVBURVJfSU5URVJGQUNFLCAiTmFtZSIsCi0JCQkJCURCVVNfVFlQRV9TVFJJTkcsICZu
-YW1lKTsKLQlnX2ZyZWUobmFtZSk7CisJYWRhcHRlci0+bmFtZV9zdG9yZWQgPSBGQUxTRTsKKwor
-CXVwZGF0ZV9leHRfaW5xdWlyeV9yZXNwb25zZShhZGFwdGVyKTsKIH0KIAogdm9pZCBhZGFwdGVy
-X3NldG5hbWVfY29tcGxldGUoYmRhZGRyX3QgKmxvY2FsLCB1aW50OF90IHN0YXR1cykKQEAgLTk5
-OCwxNiArMTAwNCwxOCBAQCBzdGF0aWMgREJ1c01lc3NhZ2UgKnNldF9uYW1lKERCdXNDb25uZWN0
-aW9uICpjb25uLCBEQnVzTWVzc2FnZSAqbXNnLAogCWlmIChzdHJuY21wKG5hbWUsIChjaGFyICop
-IGRldi0+bmFtZSwgTUFYX05BTUVfTEVOR1RIKSA9PSAwKQogCQlnb3RvIGRvbmU7CiAKLQlpZiAo
-IWFkYXB0ZXItPnVwKSB7Ci0JCXN0cm5jcHkoKGNoYXIgKikgYWRhcHRlci0+ZGV2Lm5hbWUsIG5h
-bWUsIE1BWF9OQU1FX0xFTkdUSCk7Ci0JCXdyaXRlX2xvY2FsX25hbWUoJmFkYXB0ZXItPmJkYWRk
-ciwgbmFtZSk7Ci0JCWVtaXRfcHJvcGVydHlfY2hhbmdlZChjb25uZWN0aW9uLCBhZGFwdGVyLT5w
-YXRoLAorCXN0cm5jcHkoKGNoYXIgKikgYWRhcHRlci0+ZGV2Lm5hbWUsIG5hbWUsIE1BWF9OQU1F
-X0xFTkdUSCk7CisJd3JpdGVfbG9jYWxfbmFtZSgmYWRhcHRlci0+YmRhZGRyLCBuYW1lKTsKKwll
-bWl0X3Byb3BlcnR5X2NoYW5nZWQoY29ubmVjdGlvbiwgYWRhcHRlci0+cGF0aCwKIAkJCQkJQURB
-UFRFUl9JTlRFUkZBQ0UsICJOYW1lIiwKIAkJCQkJREJVU19UWVBFX1NUUklORywgJm5hbWUpOwot
-CX0gZWxzZSB7CisKKwlpZiAoYWRhcHRlci0+dXApIHsKIAkJaW50IGVyciA9IGFkYXB0ZXJfb3Bz
-LT5zZXRfbmFtZShhZGFwdGVyLT5kZXZfaWQsIG5hbWUpOwogCQlpZiAoZXJyIDwgMCkKIAkJCXJl
-dHVybiBmYWlsZWRfc3RyZXJyb3IobXNnLCBlcnIpOworCisJCWFkYXB0ZXItPm5hbWVfc3RvcmVk
-ID0gVFJVRTsKIAl9CiAKIGRvbmU6CkBAIC0yNTA0LDYgKzI1MTIsNyBAQCBpbnQgYWRhcHRlcl9z
-dG9wKHN0cnVjdCBidGRfYWRhcHRlciAqYWRhcHRlcikKIAlhZGFwdGVyLT5jYWNoZV9lbmFibGUg
-PSBUUlVFOwogCWFkYXB0ZXItPnBlbmRpbmdfY29kID0gMDsKIAlhZGFwdGVyLT5vZmZfcmVxdWVz
-dGVkID0gRkFMU0U7CisJYWRhcHRlci0+bmFtZV9zdG9yZWQgPSBGQUxTRTsKIAogCWNhbGxfYWRh
-cHRlcl9wb3dlcmVkX2NhbGxiYWNrcyhhZGFwdGVyLCBGQUxTRSk7CiAKLS0gCjEuNi4wLjQKCg==
---0015175cb4086a20db048f55ff47--
+-- 
+Luiz Augusto von Dentz
+Computer Engineer
