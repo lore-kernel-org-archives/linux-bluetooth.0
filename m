@@ -1,43 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <4C804F5B.3010108@aircable.net>
-References: <1283436253-9850-1-git-send-email-luiz.dentz@gmail.com>
-	<4C804F5B.3010108@aircable.net>
-Date: Fri, 3 Sep 2010 10:18:46 +0300
-Message-ID: <AANLkTi=gHZVsfLbg2E4ZLCDZFqf0mGU7BC8pCfPAw4DT@mail.gmail.com>
-Subject: Re: [PATCH] Make sure discovery don't interfere with bonding
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Manuel Naranjo <manuel@aircable.net>
-Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <alpine.DEB.2.00.1009021441390.17665@linux-sea-02>
+References: <AANLkTimnW0jk19cDG+r64Q+-HxdH2qdTBirTMB7ikr1W@mail.gmail.com>
+	<alpine.DEB.2.00.1009021441390.17665@linux-sea-02>
+Date: Fri, 3 Sep 2010 09:30:33 +0800
+Message-ID: <AANLkTinrqQ0gbR0aQyojZHzFu6kSe6tuHTYFD7hdT=Qa@mail.gmail.com>
+Subject: Re: [PATCH 16/22] Store new configuration values in l2cap_pinfo
+From: haijun liu <liuhaijun.er@gmail.com>
+To: Mat Martineau <mathewm@codeaurora.org>,
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Manuel,
-
-On Fri, Sep 3, 2010 at 4:28 AM, Manuel Naranjo <manuel@aircable.net> wrote:
->  Luiz,
->>
->> In situation where the user application keep a discovery session while
->> bonding with a device it may cause a delay, or even timeout, due to the
->> number of the inquiry responses that the controller has to process.
->>
->> Since the discovery can be shared between many applications it may not be
->> possible to simple require to each application to stop their discovery
->> before trying to pair with a device, so to fix this bluetoothd now
->> suspends the discovery while bonding, resuming when completed.
+On Fri, Sep 3, 2010 at 7:02 AM, Mat Martineau <mathewm@codeaurora.org> wrote:
 >
-> Stupid question but... Any way this is related to my seg faults during sdp
-> resolving problems? I haven't tried to fix it in a while, so far I'm ok with
-> a stupid cron rule which revives bluetoothd if it crashes, but I would
-> prefer a better solution.
+> On Thu, 26 Aug 2010, haijun liu wrote:
+>
+>> From d093975dde6d85c824a5aaac943d676100810010 Mon Sep 17 00:00:00 2001
+>> From: haijun.liu <haijun.liu@atheros.com>
+>> Date: Mon, 23 Aug 2010 00:09:56 +0800
+>> Subject: [PATCH 16/22] Store new configuration values in l2cap_pinfo.
+>>
+>> ---
+>> include/net/bluetooth/l2cap.h |    9 +++++++++
+>> 1 files changed, 9 insertions(+), 0 deletions(-)
+>>
+>> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+>> index 2d864d4..f2dd65d 100644
+>> --- a/include/net/bluetooth/l2cap.h
+>> +++ b/include/net/bluetooth/l2cap.h
+>> @@ -406,6 +406,15 @@ struct l2cap_pinfo {
+>>        __u16           remote_mps;
+>>        __u16           mps;
+>>
+>> +       __u8            ext_flowspec_enable;
+>> +       struct ext_flow_spec    loc_efs;
+>> +       struct ext_flow_spec    rem_efs;
+>> +
+>> +       __u8            extwin_enable;
+>> +       __u16           extwin_size;
+>> +       __u8            rem_extwin_enable;
+>> +       __u16           rem_extwin_size;
+>> +
+>>        __le16          sport;
+>>
+>>        struct timer_list       retrans_timer;
+>
+> Regarding the new "extwin" structure members, have you considered changing
+> the existing tx_win and remote_tx_win members to __u16 and using them with
+> both standard and extended window sizes?
+>
+> The spec also requires that both directions of the link use the same type of
+> control field (standard or extended).  After L2CAP configuration is done,
+> all the information required for the transmit window is the control field
+> type, tx_win, and remote_tx_win.  The control field would be set to
+> 'extended' if a successful configuration response is sent or received for
+> the extended window size option.
+>
+>
+> --
+> Mat Martineau
+> Employee of Qualcomm Innovation Center, Inc.
+> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+>
+>
 
-I don't think it fixes your problem, but you better check if
-bluetoothd is still crashing as before, apparently nobody else is
-having the same problem so it is quite tricky to resolve it.
+Yes, we do, please look into the patch, we use __u16 for extwin_size &
+rem_extwin_size
++       __u8            extwin_enable;
++       __u16           extwin_size;
++       __u8            rem_extwin_enable;
++       __u16           rem_extwin_size;
 
-Regards,
+You are exactly right, in our implementation, choosing standard or
+extended window,
+it depends whether successful configuration response contain the
+extended window size option.
 
 -- 
-Luiz Augusto von Dentz
-Computer Engineer
+Haijun Liu
