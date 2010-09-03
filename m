@@ -1,53 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4C80CE3E.8020004@linux.intel.com>
-Date: Fri, 03 Sep 2010 12:30:22 +0200
-From: Sebastien Cayetanot <sebastien.cayetanot@linux.intel.com>
-MIME-Version: 1.0
+From: Lukasz Pawlik <lucas.pawlik@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: BD address changed but pairing failed
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Cc: Lukasz Pawlik <lucas.pawlik@gmail.com>
+Subject: [PATCH] Fix problem with phonebook size
+Date: Fri,  3 Sep 2010 12:21:51 +0200
+Message-Id: <1283509311-3965-1-git-send-email-lucas.pawlik@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-  All,
+This patch fix problem with phonebook size during phonebook
+pull request. Now obexd "combine" the raw results from tracker DB
+to match with that what phonebook pull returns.
+---
+ plugins/phonebook-tracker.c |   13 ++++++-------
+ 1 files changed, 6 insertions(+), 7 deletions(-)
 
-I'm currently facing an issue regarding the pairing of BT devices after 
-having change the BD_Addr.
+diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
+index bdd9587..2bb5c4f 100644
+--- a/plugins/phonebook-tracker.c
++++ b/plugins/phonebook-tracker.c
+@@ -842,13 +842,11 @@ static void pull_contacts(char **reply, int num_fields, void *user_data)
+ 
+ 	data->index++;
+ 
+-	/* Just interested in knowing the phonebook size */
+-	if (!data->vcardentry && params->maxlistcount == 0)
+-		return;
+-
+ 	last_index = params->liststartoffset + params->maxlistcount;
+ 
+-	if (data->index <= params->liststartoffset || data->index > last_index)
++	if ((data->index <= params->liststartoffset ||
++			data->index > last_index) &&
++			params->maxlistcount > 0)
+ 		return;
+ 
+ add_entry:
+@@ -910,8 +908,9 @@ done:
+ 	vcards = gen_vcards(data->contacts, params);
+ 
+ 	if (num_fields == 0)
+-		data->cb(vcards->str, vcards->len, data->index, 0,
+-							data->user_data);
++		data->cb(vcards->str, vcards->len,
++				g_slist_length(data->contacts), 0,
++				data->user_data);
+ 
+ 	g_slist_free(data->contacts);
+ 	g_string_free(vcards, TRUE);
+-- 
+1.7.0.4
 
-
-I use a TI chip and also use hci command or bdaddr script to modify the 
-bd_addr
-
-I'm also using the bluez-4.69
-
-I change the BD_Addr using the bdaddr scripts provided into the bluez src.
-
-When other devices scan me, the new address is seen but hciconfig still 
-show the old BD address.
-
-I have sent the hcitool cmd to read the bd_addr and after the hciconfig 
-return the one.
-
-I'm discoverable with the new BD address.
-
-But When I try to pair an A2DP headset or BT Keyboard/Mouse it failed 
-since BD_Addr change.
-
-I have try to use directly the hcitool cmd using the vendor specific 
-command but I got the same result.
-
-I have tried to kill bluetooth daemon and restart it after having change 
-the bd_addr. Still failing.
-
-I have tried to kill bluetooth daemon before changing the BD adress and 
-start it after the change it still fail.
-
-I have also tried to power on/off interface. still the issue
-
-I think that something is "broken" is bluez when the BD_Addr is changed.
-
-Is someone already seen this issue ?
-
-Regards
-
-Seb
