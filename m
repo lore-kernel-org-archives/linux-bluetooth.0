@@ -1,68 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4C80ABE8.9080309@gmail.com>
-Date: Fri, 03 Sep 2010 10:03:52 +0200
-From: Santiago Carot-Nemesio <sancane@gmail.com>
+Date: Fri, 3 Sep 2010 10:58:17 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Daniel =?iso-8859-1?Q?=D6rstadius?= <daniel.orstadius@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Store new local name before writing it to HCI
+Message-ID: <20100903075817.GA1917@jh-x301>
+References: <AANLkTi=KFGw_HQjUAb=s1Vf+tSW0BuFQWNwHrWBO7Wdq@mail.gmail.com>
+ <AANLkTi=avFuiQjApV=Wm01KjVL4LmwJFQb6=iJostpGW@mail.gmail.com>
 MIME-Version: 1.0
-To: =?ISO-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@epx.com.br>
-CC: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org
-Subject: Re: CSP implementation for MCAP
-References: <4A11989E-5448-43B7-887F-217C54977E22@epx.com.br>
-In-Reply-To: <4A11989E-5448-43B7-887F-217C54977E22@epx.com.br>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <AANLkTi=avFuiQjApV=Wm01KjVL4LmwJFQb6=iJostpGW@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Elvis,
+Hi Daniel,
 
-On 09/02/10 20:58, Elvis Pfützenreuter wrote:
-> This is the repository for the CSP implementation, rebased over the recently accepted MCAP, for your appreciation:
->
-> git://gitorious.org/bluez-epx/bluez-epx.git csp
->
+On Fri, Sep 03, 2010, Daniel Örstadius wrote:
+> From: Daniel Orstadius <daniel.orstadius@nokia.com>
+> Date: Mon, 30 Aug 2010 16:54:09 +0300
+> Subject: [PATCH] Store new local name before writing it to adapter
+> 
+> Store new local name to the file system and emit property changed
+> before actually writing the name to the adapter.
+> 
+> The reason for the patch is the scenario were an application sets
+> the name and then immediately turns off the adapter. Previously the
+> requested name change might not have been properly applied in that
+> case. The new name was not written to storage until it had been
+> read from the adapter and the adapter could have been turned off
+> before the read command was completed.
+> 
+> Avoids writing the name twice by using a boolean variable in the
+> btd_adapter struct. The name may be changed by using for example
+> hciconfig and in that case the name needs to be updated to storage
+> after reading.
+> ---
+>  src/adapter.c |   35 ++++++++++++++++++++++-------------
+>  1 files changed, 22 insertions(+), 13 deletions(-)
 
-I have been divin in CSP code and at first look I found some issues that 
-I would like discuss with you.
+Thanks for the patch. It's now in the upstream tree.
 
-The call to function mcap_sync_stop(mcl) it's only neccesary in static 
-close_mcl function. You can remove the second call in line 799 when user 
-closes explicitly the mcl due that first sync_stop will be called from 
-watcher set in control channel when its socket is closed.
-
-Second thing is related to code structure. Because standard op codes and 
-close synchronization protocol have separate logic, it may better put 
-csp parameters away from mcl in a separate structure to avoid mess all 
-protocol logic in a big mcl structure, I was thinking in something like 
-this:
-
-struct mcap_mcl {
-	/* Op code parameters */
-	....
-	struct	mcap_csp	*csp;
-}
-
-struct mcap_csp {
-	uint64_t	base_tmstamp;
-	struct timespec	base_time;
-	guint		local_caps;
-	guint		remote_caps;
-	guint		rem_req_acc;
-	guint		ind_expected;
-	MCAPCtrl	csp_req;
-	guint		ind_timer;
-	guint		set_timer;
-	void		*set_data;
-	gint		dev_id;
-	gint		dev_hci_fd;
-	void		*csp_priv_data;
-};
-
-Because CSP is optional we can reserve memory for csp only when we will 
-use Clock Synchronization protocol.
-Of course, I know that it depends on invidivual taste, but I would like 
-to comment this issue.
-
-Comments are welcome.
-
-Regards.
-
-
+Johan
