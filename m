@@ -1,43 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 3 Sep 2010 10:58:17 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Daniel =?iso-8859-1?Q?=D6rstadius?= <daniel.orstadius@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Store new local name before writing it to HCI
-Message-ID: <20100903075817.GA1917@jh-x301>
-References: <AANLkTi=KFGw_HQjUAb=s1Vf+tSW0BuFQWNwHrWBO7Wdq@mail.gmail.com>
- <AANLkTi=avFuiQjApV=Wm01KjVL4LmwJFQb6=iJostpGW@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <AANLkTi=avFuiQjApV=Wm01KjVL4LmwJFQb6=iJostpGW@mail.gmail.com>
+In-Reply-To: <AANLkTi=KFGw_HQjUAb=s1Vf+tSW0BuFQWNwHrWBO7Wdq@mail.gmail.com>
+References: <AANLkTi=KFGw_HQjUAb=s1Vf+tSW0BuFQWNwHrWBO7Wdq@mail.gmail.com>
+Date: Fri, 3 Sep 2010 10:37:06 +0300
+Message-ID: <AANLkTi=avFuiQjApV=Wm01KjVL4LmwJFQb6=iJostpGW@mail.gmail.com>
+Subject: Re: [PATCH] Store new local name before writing it to HCI
+From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=0015175cb4086a20db048f55ff47
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Daniel,
+--0015175cb4086a20db048f55ff47
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 03, 2010, Daniel Örstadius wrote:
-> From: Daniel Orstadius <daniel.orstadius@nokia.com>
-> Date: Mon, 30 Aug 2010 16:54:09 +0300
-> Subject: [PATCH] Store new local name before writing it to adapter
-> 
-> Store new local name to the file system and emit property changed
-> before actually writing the name to the adapter.
-> 
-> The reason for the patch is the scenario were an application sets
-> the name and then immediately turns off the adapter. Previously the
-> requested name change might not have been properly applied in that
-> case. The new name was not written to storage until it had been
-> read from the adapter and the adapter could have been turned off
-> before the read command was completed.
-> 
-> Avoids writing the name twice by using a boolean variable in the
-> btd_adapter struct. The name may be changed by using for example
-> hciconfig and in that case the name needs to be updated to storage
-> after reading.
-> ---
->  src/adapter.c |   35 ++++++++++++++++++++++-------------
->  1 files changed, 22 insertions(+), 13 deletions(-)
+On Mon, Aug 30, 2010 at 5:35 PM, Daniel =D6rstadius
+<daniel.orstadius@gmail.com> wrote:
+> Store new local name to the filesystem and emit property changed
+> before actually writing the name to the chip.
 
-Thanks for the patch. It's now in the upstream tree.
+Resending with amended commit message.
 
-Johan
+--0015175cb4086a20db048f55ff47
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-Store-new-local-name-before-writing-it-to-adapter.patch"
+Content-Disposition: attachment;
+	filename="0001-Store-new-local-name-before-writing-it-to-adapter.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gdmqffv72
+
+RnJvbSBhMTBiNTE3MGYzYmE2OWQ4ODBhOGE5Y2Q4NzM3ZDA1NDVlOTViMDRiIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
+a2lhLmNvbT4KRGF0ZTogTW9uLCAzMCBBdWcgMjAxMCAxNjo1NDowOSArMDMwMApTdWJqZWN0OiBb
+UEFUQ0hdIFN0b3JlIG5ldyBsb2NhbCBuYW1lIGJlZm9yZSB3cml0aW5nIGl0IHRvIGFkYXB0ZXIK
+ClN0b3JlIG5ldyBsb2NhbCBuYW1lIHRvIHRoZSBmaWxlIHN5c3RlbSBhbmQgZW1pdCBwcm9wZXJ0
+eSBjaGFuZ2VkCmJlZm9yZSBhY3R1YWxseSB3cml0aW5nIHRoZSBuYW1lIHRvIHRoZSBhZGFwdGVy
+LgoKVGhlIHJlYXNvbiBmb3IgdGhlIHBhdGNoIGlzIHRoZSBzY2VuYXJpbyB3ZXJlIGFuIGFwcGxp
+Y2F0aW9uIHNldHMKdGhlIG5hbWUgYW5kIHRoZW4gaW1tZWRpYXRlbHkgdHVybnMgb2ZmIHRoZSBh
+ZGFwdGVyLiBQcmV2aW91c2x5IHRoZQpyZXF1ZXN0ZWQgbmFtZSBjaGFuZ2UgbWlnaHQgbm90IGhh
+dmUgYmVlbiBwcm9wZXJseSBhcHBsaWVkIGluIHRoYXQKY2FzZS4gVGhlIG5ldyBuYW1lIHdhcyBu
+b3Qgd3JpdHRlbiB0byBzdG9yYWdlIHVudGlsIGl0IGhhZCBiZWVuCnJlYWQgZnJvbSB0aGUgYWRh
+cHRlciBhbmQgdGhlIGFkYXB0ZXIgY291bGQgaGF2ZSBiZWVuIHR1cm5lZCBvZmYKYmVmb3JlIHRo
+ZSByZWFkIGNvbW1hbmQgd2FzIGNvbXBsZXRlZC4KCkF2b2lkcyB3cml0aW5nIHRoZSBuYW1lIHR3
+aWNlIGJ5IHVzaW5nIGEgYm9vbGVhbiB2YXJpYWJsZSBpbiB0aGUKYnRkX2FkYXB0ZXIgc3RydWN0
+LiBUaGUgbmFtZSBtYXkgYmUgY2hhbmdlZCBieSB1c2luZyBmb3IgZXhhbXBsZQpoY2ljb25maWcg
+YW5kIGluIHRoYXQgY2FzZSB0aGUgbmFtZSBuZWVkcyB0byBiZSB1cGRhdGVkIHRvIHN0b3JhZ2UK
+YWZ0ZXIgcmVhZGluZy4KLS0tCiBzcmMvYWRhcHRlci5jIHwgICAzNSArKysrKysrKysrKysrKysr
+KysrKysrLS0tLS0tLS0tLS0tLQogMSBmaWxlcyBjaGFuZ2VkLCAyMiBpbnNlcnRpb25zKCspLCAx
+MyBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9zcmMvYWRhcHRlci5jIGIvc3JjL2FkYXB0ZXIu
+YwppbmRleCAzNzdiYWNjLi4wZGJiMjk1IDEwMDY0NAotLS0gYS9zcmMvYWRhcHRlci5jCisrKyBi
+L3NyYy9hZGFwdGVyLmMKQEAgLTEzNyw2ICsxMzcsOCBAQCBzdHJ1Y3QgYnRkX2FkYXB0ZXIgewog
+CWdpbnQgcmVmOwogCiAJR1NMaXN0ICpwb3dlcmVkX2NhbGxiYWNrczsKKworCWdib29sZWFuIG5h
+bWVfc3RvcmVkOwogfTsKIAogc3RhdGljIHZvaWQgYWRhcHRlcl9zZXRfcGFpcmFibGVfdGltZW91
+dChzdHJ1Y3QgYnRkX2FkYXB0ZXIgKmFkYXB0ZXIsCkBAIC05NTAsMTcgKzk1MiwyMSBAQCB2b2lk
+IGFkYXB0ZXJfdXBkYXRlX2xvY2FsX25hbWUoYmRhZGRyX3QgKmJkYWRkciwgdWludDhfdCBzdGF0
+dXMsIHZvaWQgKnB0cikKIAogCXN0cm5jcHkoKGNoYXIgKikgZGV2LT5uYW1lLCAoY2hhciAqKSBy
+cC5uYW1lLCBNQVhfTkFNRV9MRU5HVEgpOwogCi0Jd3JpdGVfbG9jYWxfbmFtZShiZGFkZHIsIChj
+aGFyICopIGRldi0+bmFtZSk7CisJaWYgKCFhZGFwdGVyLT5uYW1lX3N0b3JlZCkgeworCQl3cml0
+ZV9sb2NhbF9uYW1lKGJkYWRkciwgKGNoYXIgKikgZGV2LT5uYW1lKTsKIAotCXVwZGF0ZV9leHRf
+aW5xdWlyeV9yZXNwb25zZShhZGFwdGVyKTsKKwkJbmFtZSA9IGdfc3RyZHVwKChjaGFyICopIGRl
+di0+bmFtZSk7CiAKLQluYW1lID0gZ19zdHJkdXAoKGNoYXIgKikgZGV2LT5uYW1lKTsKKwkJaWYg
+KGNvbm5lY3Rpb24pCisJCQllbWl0X3Byb3BlcnR5X2NoYW5nZWQoY29ubmVjdGlvbiwgYWRhcHRl
+ci0+cGF0aCwKKwkJCQkJCUFEQVBURVJfSU5URVJGQUNFLCAiTmFtZSIsCisJCQkJCQlEQlVTX1RZ
+UEVfU1RSSU5HLCAmbmFtZSk7CisJCWdfZnJlZShuYW1lKTsKKwl9CiAKLQlpZiAoY29ubmVjdGlv
+bikKLQkJZW1pdF9wcm9wZXJ0eV9jaGFuZ2VkKGNvbm5lY3Rpb24sIGFkYXB0ZXItPnBhdGgsCi0J
+CQkJCUFEQVBURVJfSU5URVJGQUNFLCAiTmFtZSIsCi0JCQkJCURCVVNfVFlQRV9TVFJJTkcsICZu
+YW1lKTsKLQlnX2ZyZWUobmFtZSk7CisJYWRhcHRlci0+bmFtZV9zdG9yZWQgPSBGQUxTRTsKKwor
+CXVwZGF0ZV9leHRfaW5xdWlyeV9yZXNwb25zZShhZGFwdGVyKTsKIH0KIAogdm9pZCBhZGFwdGVy
+X3NldG5hbWVfY29tcGxldGUoYmRhZGRyX3QgKmxvY2FsLCB1aW50OF90IHN0YXR1cykKQEAgLTk5
+OCwxNiArMTAwNCwxOCBAQCBzdGF0aWMgREJ1c01lc3NhZ2UgKnNldF9uYW1lKERCdXNDb25uZWN0
+aW9uICpjb25uLCBEQnVzTWVzc2FnZSAqbXNnLAogCWlmIChzdHJuY21wKG5hbWUsIChjaGFyICop
+IGRldi0+bmFtZSwgTUFYX05BTUVfTEVOR1RIKSA9PSAwKQogCQlnb3RvIGRvbmU7CiAKLQlpZiAo
+IWFkYXB0ZXItPnVwKSB7Ci0JCXN0cm5jcHkoKGNoYXIgKikgYWRhcHRlci0+ZGV2Lm5hbWUsIG5h
+bWUsIE1BWF9OQU1FX0xFTkdUSCk7Ci0JCXdyaXRlX2xvY2FsX25hbWUoJmFkYXB0ZXItPmJkYWRk
+ciwgbmFtZSk7Ci0JCWVtaXRfcHJvcGVydHlfY2hhbmdlZChjb25uZWN0aW9uLCBhZGFwdGVyLT5w
+YXRoLAorCXN0cm5jcHkoKGNoYXIgKikgYWRhcHRlci0+ZGV2Lm5hbWUsIG5hbWUsIE1BWF9OQU1F
+X0xFTkdUSCk7CisJd3JpdGVfbG9jYWxfbmFtZSgmYWRhcHRlci0+YmRhZGRyLCBuYW1lKTsKKwll
+bWl0X3Byb3BlcnR5X2NoYW5nZWQoY29ubmVjdGlvbiwgYWRhcHRlci0+cGF0aCwKIAkJCQkJQURB
+UFRFUl9JTlRFUkZBQ0UsICJOYW1lIiwKIAkJCQkJREJVU19UWVBFX1NUUklORywgJm5hbWUpOwot
+CX0gZWxzZSB7CisKKwlpZiAoYWRhcHRlci0+dXApIHsKIAkJaW50IGVyciA9IGFkYXB0ZXJfb3Bz
+LT5zZXRfbmFtZShhZGFwdGVyLT5kZXZfaWQsIG5hbWUpOwogCQlpZiAoZXJyIDwgMCkKIAkJCXJl
+dHVybiBmYWlsZWRfc3RyZXJyb3IobXNnLCBlcnIpOworCisJCWFkYXB0ZXItPm5hbWVfc3RvcmVk
+ID0gVFJVRTsKIAl9CiAKIGRvbmU6CkBAIC0yNTA0LDYgKzI1MTIsNyBAQCBpbnQgYWRhcHRlcl9z
+dG9wKHN0cnVjdCBidGRfYWRhcHRlciAqYWRhcHRlcikKIAlhZGFwdGVyLT5jYWNoZV9lbmFibGUg
+PSBUUlVFOwogCWFkYXB0ZXItPnBlbmRpbmdfY29kID0gMDsKIAlhZGFwdGVyLT5vZmZfcmVxdWVz
+dGVkID0gRkFMU0U7CisJYWRhcHRlci0+bmFtZV9zdG9yZWQgPSBGQUxTRTsKIAogCWNhbGxfYWRh
+cHRlcl9wb3dlcmVkX2NhbGxiYWNrcyhhZGFwdGVyLCBGQUxTRSk7CiAKLS0gCjEuNi4wLjQKCg==
+--0015175cb4086a20db048f55ff47--
