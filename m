@@ -1,85 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: check L2CAP length in first ACL fragment
-Date: Fri,  3 Sep 2010 16:07:20 +0300
-Message-Id: <1283519240-1235-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: CSP implementation for MCAP
+Mime-Version: 1.0 (Apple Message framework v1081)
+Content-Type: text/plain; charset=iso-8859-1
+From: =?iso-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
+In-Reply-To: <4C80ABE8.9080309@gmail.com>
+Date: Fri, 3 Sep 2010 09:53:18 -0300
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <4EB76459-A7E4-4501-81A1-A12110648919@signove.com>
+References: <4A11989E-5448-43B7-887F-217C54977E22@epx.com.br> <4C80ABE8.9080309@gmail.com>
+To: Santiago Carot-Nemesio <sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 
-Current Bluetooth code assembles fragments of big L2CAP packets
-in l2cap_recv_acldata and then checks allowed L2CAP size in
-assembled L2CAP packet (pi->imtu < skb->len).
+On Sep 3, 2010, at 5:03 AM, Santiago Carot-Nemesio wrote:
 
-The patch moves allowed L2CAP size check to the early stage when
-we receive the first fragment of L2CAP packet. First fragment has
-already L2CAP header including length.
+> Hi Elvis,
+> 
+> On 09/02/10 20:58, Elvis Pfützenreuter wrote:
+>> This is the repository for the CSP implementation, rebased over the recently accepted MCAP, for your appreciation:
+>> 
+>> git://gitorious.org/bluez-epx/bluez-epx.git csp
+>> 
+> 
+> I have been divin in CSP code and at first look I found some issues that I would like discuss with you.
+> 
+> The call to function mcap_sync_stop(mcl) it's only neccesary in static close_mcl function. You can remove the second call in line 799 when user closes explicitly the mcl due that first sync_stop will be called from watcher set in control channel when its socket is closed.
+> 
+> Second thing is related to code structure. Because standard op codes and close synchronization protocol have separate logic, it may better put csp parameters away from mcl in a separate structure to avoid mess all protocol logic in a big mcl structure, I was thinking in something like this:
+> 
+> struct mcap_mcl {
+> 	/* Op code parameters */
+> 	....
+> 	struct	mcap_csp	*csp;
+> }
+> 
+> struct mcap_csp {
+> 	uint64_t	base_tmstamp;
+> 	struct timespec	base_time;
+> 	guint		local_caps;
+> 	guint		remote_caps;
+> 	guint		rem_req_acc;
+> 	guint		ind_expected;
+> 	MCAPCtrl	csp_req;
+> 	guint		ind_timer;
+> 	guint		set_timer;
+> 	void		*set_data;
+> 	gint		dev_id;
+> 	gint		dev_hci_fd;
+> 	void		*csp_priv_data;
+> };
+> 
+> Because CSP is optional we can reserve memory for csp only when we will use Clock Synchronization protocol.
+> Of course, I know that it depends on invidivual taste, but I would like to comment this issue.
 
-Trace below is received when using stress tools sending big
-fragmented L2CAP packets.
-...
-[ 1712.798492] swapper: page allocation failure. order:4, mode:0x4020
-[ 1712.804809] [<c0031870>] (unwind_backtrace+0x0/0xdc) from [<c00a1f70>]
-(__alloc_pages_nodemask+0x4)
-[ 1712.814666] [<c00a1f70>] (__alloc_pages_nodemask+0x47c/0x4d4) from
-[<c00a1fd8>] (__get_free_pages+)
-[ 1712.824645] [<c00a1fd8>] (__get_free_pages+0x10/0x3c) from [<c026eb5c>]
-(__alloc_skb+0x4c/0xfc)
-[ 1712.833465] [<c026eb5c>] (__alloc_skb+0x4c/0xfc) from [<bf28c738>]
-(l2cap_recv_acldata+0xf0/0x1f8 )
-[ 1712.843322] [<bf28c738>] (l2cap_recv_acldata+0xf0/0x1f8 [l2cap]) from
-[<bf0094ac>] (hci_rx_task+0x)
-...
+Sounds sensible.
 
-After applying patch dmesg looks like:
-...
-l2cap_recv_acldata: Frame exceeding recv MTU (len 64182, MTU 1013)
-l2cap_recv_acldata: Unexpected continuation frame (len 34)
-...
-
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
----
- net/bluetooth/l2cap.c |   11 +++++++++++
- 1 files changed, 11 insertions(+), 0 deletions(-)
-
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 9fad312..21824d7 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -4654,6 +4654,8 @@ static int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 fl
- 
- 	if (flags & ACL_START) {
- 		struct l2cap_hdr *hdr;
-+		struct sock *sk;
-+		u16 cid;
- 		int len;
- 
- 		if (conn->rx_len) {
-@@ -4672,6 +4674,7 @@ static int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 fl
- 
- 		hdr = (struct l2cap_hdr *) skb->data;
- 		len = __le16_to_cpu(hdr->len) + L2CAP_HDR_SIZE;
-+		cid = __le16_to_cpu(hdr->cid);
- 
- 		if (len == skb->len) {
- 			/* Complete frame received */
-@@ -4688,6 +4691,14 @@ static int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 fl
- 			goto drop;
- 		}
- 
-+		sk = l2cap_get_chan_by_scid(&conn->chan_list, cid);
-+		if (l2cap_pi(sk)->imtu < len) {
-+			BT_ERR("Frame exceeding recv MTU (len %d, MTU %d)",
-+					len, l2cap_pi(sk)->imtu);
-+			conn->rx_len = 0; /* needed? */
-+			goto drop;
-+		}
-+
- 		/* Allocate skb for the complete frame (with header) */
- 		conn->rx_skb = bt_skb_alloc(len, GFP_ATOMIC);
- 		if (!conn->rx_skb)
--- 
-1.7.0.4
+> 
+> Comments are welcome.
+> 
+> Regards.
+> 
+> 
 
