@@ -1,29 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4C804F5B.3010108@aircable.net>
-Date: Thu, 02 Sep 2010 22:28:59 -0300
-From: Manuel Naranjo <manuel@aircable.net>
 MIME-Version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Make sure discovery don't interfere with bonding
-References: <1283436253-9850-1-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1283436253-9850-1-git-send-email-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <alpine.DEB.2.00.1009021430120.17665@linux-sea-02>
+References: <AANLkTi=8xVks--xcLXEQ_=sHfP3fY+Wvyctu5K_kMDG-@mail.gmail.com>
+	<alpine.DEB.2.00.1009021430120.17665@linux-sea-02>
+Date: Fri, 3 Sep 2010 09:19:52 +0800
+Message-ID: <AANLkTikwV_OuKXy05L5BLZE=hKruA4HOVMY_fhjN=aHJ@mail.gmail.com>
+Subject: Re: [PATCH 13/22] Add three new options for l2cap_options which used
+ in setsockopt & getsockopt
+From: haijun liu <liuhaijun.er@gmail.com>
+To: Mat Martineau <mathewm@codeaurora.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-  Luiz,
-> In situation where the user application keep a discovery session while
-> bonding with a device it may cause a delay, or even timeout, due to the
-> number of the inquiry responses that the controller has to process.
+On Fri, Sep 3, 2010 at 5:41 AM, Mat Martineau <mathewm@codeaurora.org> wrote:
 >
-> Since the discovery can be shared between many applications it may not be
-> possible to simple require to each application to stop their discovery
-> before trying to pair with a device, so to fix this bluetoothd now
-> suspends the discovery while bonding, resuming when completed.
-Stupid question but... Any way this is related to my seg faults during 
-sdp resolving problems? I haven't tried to fix it in a while, so far I'm 
-ok with a stupid cron rule which revives bluetoothd if it crashes, but I 
-would prefer a better solution.
+> On Thu, 26 Aug 2010, haijun liu wrote:
+>
+>> From 897b281d14ba4cf9a5fbbf5ba65b84c85e688737 Mon Sep 17 00:00:00 2001
+>> From: haijun.liu <haijun.liu@atheros.com>
+>> Date: Mon, 23 Aug 2010 00:00:26 +0800
+>> Subject: [PATCH 13/22] Add three new options for l2cap_options which
+>> used in setsockopt & getsockopt.
+>>
+>> ---
+>> include/net/bluetooth/l2cap.h |    3 +++
+>> 1 files changed, 3 insertions(+), 0 deletions(-)
+>>
+>> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+>> index d0ae9f5..4f87aec 100644
+>> --- a/include/net/bluetooth/l2cap.h
+>> +++ b/include/net/bluetooth/l2cap.h
+>> @@ -65,6 +65,9 @@ struct l2cap_options {
+>>        __u8  fcs;
+>>        __u8  max_tx;
+>>        __u16 txwin_size;
+>> +       __u8  hschan_req;
+>> +       __u8  guaranteed;
+>> +       __u8  reconfig;
+>> };
+>>
+>> #define L2CAP_CONNINFO  0x02
+>
+> How are each of these new options used?
+>
+> Are any of the new options changeable after the socket is connected?
+>
+> --
+> Mat Martineau
+> Employee of Qualcomm Innovation Center, Inc.
+> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+>
+>
 
-Manuel
+I accept David suggestion, I am waiting your patch merged.
+
+Yes, these are changeable.
+
+-- 
+Haijun Liu
