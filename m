@@ -1,16 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Sat, 4 Sep 2010 16:55:24 +0800
-Message-ID: <AANLkTimh9W7HE6382oin6gmSV1mox=+bTy8mEWC2T98v@mail.gmail.com>
+Date: Sat, 4 Sep 2010 16:52:43 +0800
+Message-ID: <AANLkTi=_Yt6MXe5JpCHu0TXy-YGvi=GoTwLVKnPV0aTJ@mail.gmail.com>
 Subject: Btio.[ch] cleanup related issue
 From: =?GB2312?B?1fG7qtXF?= <zhenhua2000@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: zhenhua.zhang@intel.com
-Content-Type: multipart/mixed; boundary=0016e68f9c8441ba68048f6b3501
+Content-Type: multipart/mixed; boundary=e0cb4e887ee9a4685b048f6b2b54
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---0016e68f9c8441ba68048f6b3501
+--e0cb4e887ee9a4685b048f6b2b54
 Content-Type: text/plain; charset=ISO-8859-1
 
 Hi,
@@ -50,11 +50,11 @@ struct hci_dev_info;
 Regards,
 Zhenhua
 
---0016e68f9c8441ba68048f6b3501
+--e0cb4e887ee9a4685b048f6b2b54
 Content-Type: text/x-chdr; charset=US-ASCII; name="bluetooth.h"
 Content-Disposition: attachment; filename="bluetooth.h"
 Content-Transfer-Encoding: base64
-X-Attachment-Id: f_gdo8n9rz0
+X-Attachment-Id: f_gdo8izgt0
 
 LyoKICoKICogIEJsdWVaIC0gQmx1ZXRvb3RoIHByb3RvY29sIHN0YWNrIGZvciBMaW51eAogKgog
 KiAgQ29weXJpZ2h0IChDKSAyMDA5LTIwMTAgIE1hcmNlbCBIb2x0bWFubiA8bWFyY2VsQGhvbHRt
@@ -134,4 +134,4 @@ ZDJiYShpbnQgZGV2X2lkLCBiZGFkZHJfdCAqYmRhZGRyKTsKdm9pZCBiYXN3YXAoYmRhZGRyX3Qg
 KmRzdCwgY29uc3QgYmRhZGRyX3QgKnNyYyk7CmludCBiYTJzdHIoY29uc3QgYmRhZGRyX3QgKmJh
 LCBjaGFyICpzdHIpOwppbnQgc3RyMmJhKGNvbnN0IGNoYXIgKnN0ciwgYmRhZGRyX3QgKmJhKTsK
 CiNlbmRpZgo=
---0016e68f9c8441ba68048f6b3501--
+--e0cb4e887ee9a4685b048f6b2b54--
