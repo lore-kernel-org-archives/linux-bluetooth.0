@@ -1,61 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Sat, 4 Sep 2010 19:18:18 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Subject: Re: [PATCH bluetooth-next-2.6 2/2] Bluetooth: Initial move of
- L2CAP socket to l2cap_sock.c
-Message-ID: <20100904221818.GA9795@vigoh>
-References: <1283591900-31504-1-git-send-email-gustavo@padovan.org>
- <1283591900-31504-2-git-send-email-gustavo@padovan.org>
- <AANLkTinHsLbqaoFh_XXceb-aY0weOoDrRcbU1QLi3dfU@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <AANLkTinHsLbqaoFh_XXceb-aY0weOoDrRcbU1QLi3dfU@mail.gmail.com>
+In-Reply-To: <4C80CE3E.8020004@linux.intel.com>
+References: <4C80CE3E.8020004@linux.intel.com>
+Date: Sat, 4 Sep 2010 22:07:40 +0300
+Message-ID: <AANLkTi=9HR+iTm=baVdefQcd-Nb8Gchx3LN6q-CycMcq@mail.gmail.com>
+Subject: Re: BD address changed but pairing failed
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Sebastien Cayetanot <sebastien.cayetanot@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Anderson Lizardo <anderson.lizardo@openbossa.org> [2010-09-04 09:14:56 -0=
-400]:
+Hi,
 
-> On Sat, Sep 4, 2010 at 5:18 AM, Gustavo F. Padovan <gustavo@padovan.org> =
-wrote:
-> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> > index f2062aa..1f6d448 100644
-> > --- a/net/bluetooth/l2cap_core.c
-> > +++ b/net/bluetooth/l2cap_core.c
-> > @@ -57,24 +57,21 @@
-> >
-> > =A0#define VERSION "2.15"
-> >
-> > -static int disable_ertm =3D 0;
-> > +int disable_ertm =3D 0;
-> >
-> > =A0static u32 l2cap_feat_mask =3D L2CAP_FEAT_FIXED_CHAN;
-> > =A0static u8 l2cap_fixed_chan[8] =3D { 0x02, };
-> >
-> > -static const struct proto_ops l2cap_sock_ops;
-> > -
-> > =A0static struct workqueue_struct *_busy_wq;
-> >
-> > -static struct bt_sock_list l2cap_sk_list =3D {
-> > +struct bt_sock_list l2cap_sk_list =3D {
-> > =A0 =A0 =A0 =A0.lock =3D __RW_LOCK_UNLOCKED(l2cap_sk_list.lock)
-> > =A0};
-> >
-> > =A0static void l2cap_busy_work(struct work_struct *work);
-> >
-> > -static void __l2cap_sock_close(struct sock *sk, int reason);
-> > =A0static void l2cap_sock_close(struct sock *sk);
-> > -static void l2cap_sock_kill(struct sock *sk);
-> > +void l2cap_sock_kill(struct sock *sk);
->=20
-> If l2cap_core.c includes net/bluetooth/l2cap.h, you don't need the
-> declaration above.
+On Fri, Sep 3, 2010 at 1:30 PM, Sebastien Cayetanot
+<sebastien.cayetanot@linux.intel.com> wrote:
+>  All,
+>
+> I'm currently facing an issue regarding the pairing of BT devices after
+> having change the BD_Addr.
+>
+>
+> I use a TI chip and also use hci command or bdaddr script to modify the
+> bd_addr
+>
+> I'm also using the bluez-4.69
+>
+> I change the BD_Addr using the bdaddr scripts provided into the bluez src.
+>
+> When other devices scan me, the new address is seen but hciconfig still show
+> the old BD address.
+>
+> I have sent the hcitool cmd to read the bd_addr and after the hciconfig
+> return the one.
+>
+> I'm discoverable with the new BD address.
+>
+> But When I try to pair an A2DP headset or BT Keyboard/Mouse it failed since
+> BD_Addr change.
+>
+> I have try to use directly the hcitool cmd using the vendor specific command
+> but I got the same result.
+>
+> I have tried to kill bluetooth daemon and restart it after having change the
+> bd_addr. Still failing.
+>
+> I have tried to kill bluetooth daemon before changing the BD adress and
+> start it after the change it still fail.
+>
+> I have also tried to power on/off interface. still the issue
+>
+> I think that something is "broken" is bluez when the BD_Addr is changed.
+>
+> Is someone already seen this issue ?
 
-Yes, you are right. Thanks for the review.
+I don't think you are suppose to change the address like that, it is
+supposed to be done once in the chip initialization and then keep it
+like that forever, so I guess there is something wrong if the chip is
+already initialize with the wrong address. What are you trying achieve
+with this?
 
---=20
-Gustavo F. Padovan
-ProFUSION embedded systems - http://profusion.mobi
+-- 
+Luiz Augusto von Dentz
+Computer Engineer
