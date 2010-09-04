@@ -1,123 +1,137 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <gfpadovan@gmail.com>
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
+MIME-Version: 1.0
+Date: Sat, 4 Sep 2010 16:55:24 +0800
+Message-ID: <AANLkTimh9W7HE6382oin6gmSV1mox=+bTy8mEWC2T98v@mail.gmail.com>
+Subject: Btio.[ch] cleanup related issue
+From: =?GB2312?B?1fG7qtXF?= <zhenhua2000@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>
-Subject: [PATCH bluetooth-2.6] Bluetooth: Fix inconsistent lock state with RFCOMM
-Date: Sat,  4 Sep 2010 06:16:21 -0300
-Message-Id: <1283591781-31412-1-git-send-email-gustavo@padovan.org>
+Cc: zhenhua.zhang@intel.com
+Content-Type: multipart/mixed; boundary=0016e68f9c8441ba68048f6b3501
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo F. Padovan <padovan@profusion.mobi>
+--0016e68f9c8441ba68048f6b3501
+Content-Type: text/plain; charset=ISO-8859-1
 
-When receiving a rfcomm connection with the old dund deamon a
-inconsistent lock state happens. That's because interrupts were already
-disabled by l2cap_conn_start() when rfcomm_sk_state_change() try to lock
-the spin_lock.
+Hi,
 
-As result we may have a inconsistent lock state for l2cap_conn_start()
-after rfcomm_sk_state_change() calls bh_lock_sock() and disable interrupts
-as well.
+I am taking the task to clean up the src/btio.[ch] files in order to
+share them among BlueZ, OBEX and oFono. And yes, it's easy to make
+them as identical but harder to make it self contained by removing the
+'dependence' with libbluetooth. So I post the shared structure between
+btio.[ch] and libbluetooth to get your comments. Now I have some small
+patches that do the cleanup with depends on libbluetooth. I suggest we
+could first make the btio.[ch] having the same look&feel and remove
+the libbluetooth dependence later. One reason is that the potential
+changes to libbluetooth code could only happen in BlueZ 5.x version.
 
-[ 2833.151999]
-[ 2833.151999] =================================
-[ 2833.151999] [ INFO: inconsistent lock state ]
-[ 2833.151999] 2.6.36-rc3 #2
-[ 2833.151999] ---------------------------------
-[ 2833.151999] inconsistent {IN-SOFTIRQ-W} -> {SOFTIRQ-ON-W} usage.
-[ 2833.151999] krfcommd/2306 [HC0[0]:SC0[0]:HE1:SE1] takes:
-[ 2833.151999]  (slock-AF_BLUETOOTH){+.?...}, at: [<ffffffffa00bcb56>] rfcomm_sk_state_change+0x46/0x170 [rfcomm]
-[ 2833.151999] {IN-SOFTIRQ-W} state was registered at:
-[ 2833.151999]   [<ffffffff81094346>] __lock_acquire+0x5b6/0x1560
-[ 2833.151999]   [<ffffffff8109534a>] lock_acquire+0x5a/0x70
-[ 2833.151999]   [<ffffffff81392b6c>] _raw_spin_lock+0x2c/0x40
-[ 2833.151999]   [<ffffffffa00a5092>] l2cap_conn_start+0x92/0x640 [l2cap]
-[ 2833.151999]   [<ffffffffa00a6a3f>] l2cap_sig_channel+0x6bf/0x1320 [l2cap]
-[ 2833.151999]   [<ffffffffa00a9173>] l2cap_recv_frame+0x133/0x770 [l2cap]
-[ 2833.151999]   [<ffffffffa00a997b>] l2cap_recv_acldata+0x1cb/0x390 [l2cap]
-[ 2833.151999]   [<ffffffffa000db4b>] hci_rx_task+0x2ab/0x450 [bluetooth]
-[ 2833.151999]   [<ffffffff8106b22b>] tasklet_action+0xcb/0xe0
-[ 2833.151999]   [<ffffffff8106b91e>] __do_softirq+0xae/0x150
-[ 2833.151999]   [<ffffffff8102bc0c>] call_softirq+0x1c/0x30
-[ 2833.151999]   [<ffffffff8102ddb5>] do_softirq+0x75/0xb0
-[ 2833.151999]   [<ffffffff8106b56d>] irq_exit+0x8d/0xa0
-[ 2833.151999]   [<ffffffff8104484b>] smp_apic_timer_interrupt+0x6b/0xa0
-[ 2833.151999]   [<ffffffff8102b6d3>] apic_timer_interrupt+0x13/0x20
-[ 2833.151999]   [<ffffffff81029dfa>] cpu_idle+0x5a/0xb0
-[ 2833.151999]   [<ffffffff81381ded>] rest_init+0xad/0xc0
-[ 2833.151999]   [<ffffffff817ebc4d>] start_kernel+0x2dd/0x2e8
-[ 2833.151999]   [<ffffffff817eb2e6>] x86_64_start_reservations+0xf6/0xfa
-[ 2833.151999]   [<ffffffff817eb3ce>] x86_64_start_kernel+0xe4/0xeb
-[ 2833.151999] irq event stamp: 731
-[ 2833.151999] hardirqs last  enabled at (731): [<ffffffff8106b762>] local_bh_enable_ip+0x82/0xe0
-[ 2833.151999] hardirqs last disabled at (729): [<ffffffff8106b93e>] __do_softirq+0xce/0x150
-[ 2833.151999] softirqs last  enabled at (730): [<ffffffff8106b96e>] __do_softirq+0xfe/0x150
-[ 2833.151999] softirqs last disabled at (711): [<ffffffff8102bc0c>] call_softirq+0x1c/0x30
-[ 2833.151999]
-[ 2833.151999] other info that might help us debug this:
-[ 2833.151999] 2 locks held by krfcommd/2306:
-[ 2833.151999]  #0:  (rfcomm_mutex){+.+.+.}, at: [<ffffffffa00bb744>] rfcomm_run+0x174/0xb20 [rfcomm]
-[ 2833.151999]  #1:  (&(&d->lock)->rlock){+.+...}, at: [<ffffffffa00b9223>] rfcomm_dlc_accept+0x53/0x100 [rfcomm]
-[ 2833.151999]
-[ 2833.151999] stack backtrace:
-[ 2833.151999] Pid: 2306, comm: krfcommd Tainted: G        W   2.6.36-rc3 #2
-[ 2833.151999] Call Trace:
-[ 2833.151999]  [<ffffffff810928e1>] print_usage_bug+0x171/0x180
-[ 2833.151999]  [<ffffffff810936c3>] mark_lock+0x333/0x400
-[ 2833.151999]  [<ffffffff810943ca>] __lock_acquire+0x63a/0x1560
-[ 2833.151999]  [<ffffffff810948b5>] ? __lock_acquire+0xb25/0x1560
-[ 2833.151999]  [<ffffffff8109534a>] lock_acquire+0x5a/0x70
-[ 2833.151999]  [<ffffffffa00bcb56>] ? rfcomm_sk_state_change+0x46/0x170 [rfcomm]
-[ 2833.151999]  [<ffffffff81392b6c>] _raw_spin_lock+0x2c/0x40
-[ 2833.151999]  [<ffffffffa00bcb56>] ? rfcomm_sk_state_change+0x46/0x170 [rfcomm]
-[ 2833.151999]  [<ffffffffa00bcb56>] rfcomm_sk_state_change+0x46/0x170 [rfcomm]
-[ 2833.151999]  [<ffffffffa00b9239>] rfcomm_dlc_accept+0x69/0x100 [rfcomm]
-[ 2833.151999]  [<ffffffffa00b9a49>] rfcomm_check_accept+0x59/0xd0 [rfcomm]
-[ 2833.151999]  [<ffffffffa00bacab>] rfcomm_recv_frame+0x9fb/0x1320 [rfcomm]
-[ 2833.151999]  [<ffffffff813932bb>] ? _raw_spin_unlock_irqrestore+0x3b/0x60
-[ 2833.151999]  [<ffffffff81093acd>] ? trace_hardirqs_on_caller+0x13d/0x180
-[ 2833.151999]  [<ffffffff81093b1d>] ? trace_hardirqs_on+0xd/0x10
-[ 2833.151999]  [<ffffffffa00bb7f1>] rfcomm_run+0x221/0xb20 [rfcomm]
-[ 2833.151999]  [<ffffffff813905e7>] ? schedule+0x287/0x780
-[ 2833.151999]  [<ffffffffa00bb5d0>] ? rfcomm_run+0x0/0xb20 [rfcomm]
-[ 2833.151999]  [<ffffffff81081026>] kthread+0x96/0xa0
-[ 2833.151999]  [<ffffffff8102bb14>] kernel_thread_helper+0x4/0x10
-[ 2833.151999]  [<ffffffff813936bc>] ? restore_args+0x0/0x30
-[ 2833.151999]  [<ffffffff81080f90>] ? kthread+0x0/0xa0
-[ 2833.151999]  [<ffffffff8102bb10>] ? kernel_thread_helper+0x0/0x10
+Below are the data structure that btio.[ch] depends on libbluetooth. I
+don't count L2RAW and L2SCO yet. So there will be more from sco.h and
+etc. A detailed copy of 'faked' btio/bluetooth.h is attach.
 
-Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
----
- net/bluetooth/rfcomm/sock.c |    4 ++++
- 1 files changed, 4 insertions(+), 0 deletions(-)
+/* rfcomm.h */
+struct sockaddr_rc;
+struct rfcomm_conninfo;
 
-diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-index 44a6232..194b3a0 100644
---- a/net/bluetooth/rfcomm/sock.c
-+++ b/net/bluetooth/rfcomm/sock.c
-@@ -82,11 +82,14 @@ static void rfcomm_sk_data_ready(struct rfcomm_dlc *d, struct sk_buff *skb)
- static void rfcomm_sk_state_change(struct rfcomm_dlc *d, int err)
- {
- 	struct sock *sk = d->owner, *parent;
-+	unsigned long flags;
-+
- 	if (!sk)
- 		return;
- 
- 	BT_DBG("dlc %p state %ld err %d", d, d->state, err);
- 
-+	local_irq_save(flags);
- 	bh_lock_sock(sk);
- 
- 	if (err)
-@@ -108,6 +111,7 @@ static void rfcomm_sk_state_change(struct rfcomm_dlc *d, int err)
- 	}
- 
- 	bh_unlock_sock(sk);
-+	local_irq_restore(flags);
- 
- 	if (parent && sock_flag(sk, SOCK_ZAPPED)) {
- 		/* We have to drop DLC lock here, otherwise
--- 
-1.7.1.1
+/* L2CAP socket options */
+struct l2cap_options;
+struct l2cap_conninfo;
+
+#define L2CAP_LM_XXX
+#define L2CAP_MODE_XXX
+
+/* hci.h */
+enum { HCI_XXX };
+
+struct hci_dev_stats;
+struct hci_dev_info;
+
+
+Regards,
+Zhenhua
+
+--0016e68f9c8441ba68048f6b3501
+Content-Type: text/x-chdr; charset=US-ASCII; name="bluetooth.h"
+Content-Disposition: attachment; filename="bluetooth.h"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gdo8n9rz0
+
+LyoKICoKICogIEJsdWVaIC0gQmx1ZXRvb3RoIHByb3RvY29sIHN0YWNrIGZvciBMaW51eAogKgog
+KiAgQ29weXJpZ2h0IChDKSAyMDA5LTIwMTAgIE1hcmNlbCBIb2x0bWFubiA8bWFyY2VsQGhvbHRt
+YW5uLm9yZz4KICogIENvcHlyaWdodCAoQykgMjAwOS0yMDEwICBOb2tpYSBDb3Jwb3JhdGlvbgog
+KiAgQ29weXJpZ2h0IChDKSAyMDEwICBJbnRlbCBDb3Jwb3JhdGlvbgogKgogKgogKiAgVGhpcyBw
+cm9ncmFtIGlzIGZyZWUgc29mdHdhcmU7IHlvdSBjYW4gcmVkaXN0cmlidXRlIGl0IGFuZC9vciBt
+b2RpZnkKICogIGl0IHVuZGVyIHRoZSB0ZXJtcyBvZiB0aGUgR05VIEdlbmVyYWwgUHVibGljIExp
+Y2Vuc2UgYXMgcHVibGlzaGVkIGJ5CiAqICB0aGUgRnJlZSBTb2Z0d2FyZSBGb3VuZGF0aW9uOyBl
+aXRoZXIgdmVyc2lvbiAyIG9mIHRoZSBMaWNlbnNlLCBvcgogKiAgKGF0IHlvdXIgb3B0aW9uKSBh
+bnkgbGF0ZXIgdmVyc2lvbi4KICoKICogIFRoaXMgcHJvZ3JhbSBpcyBkaXN0cmlidXRlZCBpbiB0
+aGUgaG9wZSB0aGF0IGl0IHdpbGwgYmUgdXNlZnVsLAogKiAgYnV0IFdJVEhPVVQgQU5ZIFdBUlJB
+TlRZOyB3aXRob3V0IGV2ZW4gdGhlIGltcGxpZWQgd2FycmFudHkgb2YKICogIE1FUkNIQU5UQUJJ
+TElUWSBvciBGSVRORVNTIEZPUiBBIFBBUlRJQ1VMQVIgUFVSUE9TRS4gIFNlZSB0aGUKICogIEdO
+VSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlIGZvciBtb3JlIGRldGFpbHMuCiAqCiAqICBZb3Ugc2hv
+dWxkIGhhdmUgcmVjZWl2ZWQgYSBjb3B5IG9mIHRoZSBHTlUgR2VuZXJhbCBQdWJsaWMgTGljZW5z
+ZQogKiAgYWxvbmcgd2l0aCB0aGlzIHByb2dyYW07IGlmIG5vdCwgd3JpdGUgdG8gdGhlIEZyZWUg
+U29mdHdhcmUKICogIEZvdW5kYXRpb24sIEluYy4sIDUxIEZyYW5rbGluIFN0LCBGaWZ0aCBGbG9v
+ciwgQm9zdG9uLCBNQSAgMDIxMTAtMTMwMSAgVVNBCiAqCiAqLwojaWZuZGVmIEJMVUVUT09USF9I
+CiNkZWZpbmUgQkxVRVRPT1RIX0gKCiNpbmNsdWRlIDxzdGRpbnQuaD4KI2luY2x1ZGUgPHN0cmlu
+Zy5oPgojaW5jbHVkZSA8ZW5kaWFuLmg+CiNpbmNsdWRlIDxieXRlc3dhcC5oPgojaW5jbHVkZSA8
+c3lzL3NvY2tldC5oPgoKI2luY2x1ZGUgPGdsaWIuaD4KCiNkZWZpbmUgQlRQUk9UT19MMkNBUAkJ
+MAojZGVmaW5lIEJUUFJPVE9fSENJCQkxCiNkZWZpbmUgQlRQUk9UT19SRkNPTU0JCTMKCiNkZWZp
+bmUgU09MX0hDSQkJMAojZGVmaW5lIFNPTF9MMkNBUAk2CiNkZWZpbmUgU09MX1JGQ09NTQkxOAoK
+I2lmbmRlZiBTT0xfQkxVRVRPT1RICiNkZWZpbmUgU09MX0JMVUVUT09USAkyNzQKI2VuZGlmCgoj
+ZGVmaW5lIEJUX1NFQ1VSSVRZCTQKc3RydWN0IGJ0X3NlY3VyaXR5IHsKCXVpbnQ4X3QgbGV2ZWw7
+Cn07CiNkZWZpbmUgQlRfU0VDVVJJVFlfU0RQCQkwCiNkZWZpbmUgQlRfU0VDVVJJVFlfTE9XCQkx
+CiNkZWZpbmUgQlRfU0VDVVJJVFlfTUVESVVNCTIKI2RlZmluZSBCVF9TRUNVUklUWV9ISUdICTMK
+CiNkZWZpbmUgQlRfREVGRVJfU0VUVVAJNwoKLyogQnl0ZSBvcmRlciBjb252ZXJzaW9ucyAqLwoj
+aWYgX19CWVRFX09SREVSID09IF9fTElUVExFX0VORElBTgojZGVmaW5lIGh0b2JzKGQpICAoZCkK
+I2RlZmluZSBodG9ibChkKSAgKGQpCiNkZWZpbmUgYnRvaHMoZCkgIChkKQojZGVmaW5lIGJ0b2hs
+KGQpICAoZCkKI2VsaWYgX19CWVRFX09SREVSID09IF9fQklHX0VORElBTgojZGVmaW5lIGh0b2Jz
+KGQpICBic3dhcF8xNihkKQojZGVmaW5lIGh0b2JsKGQpICBic3dhcF8zMihkKQojZGVmaW5lIGJ0
+b2hzKGQpICBic3dhcF8xNihkKQojZGVmaW5lIGJ0b2hsKGQpICBic3dhcF8zMihkKQojZWxzZQoj
+ZXJyb3IgIlVua25vd24gYnl0ZSBvcmRlciIKI2VuZGlmCgovKiBCRCBBZGRyZXNzICovCnR5cGVk
+ZWYgc3RydWN0IHsKCXVpbnQ4X3QgYls2XTsKfSBfX2F0dHJpYnV0ZV9fKChwYWNrZWQpKSBiZGFk
+ZHJfdDsKCi8qIENvcHksIHN3YXAsIGNvbnZlcnQgQkQgQWRkcmVzcyAqLwpzdGF0aWMgaW5saW5l
+IGludCBiYWNtcChjb25zdCBiZGFkZHJfdCAqYmExLCBjb25zdCBiZGFkZHJfdCAqYmEyKQp7Cgly
+ZXR1cm4gbWVtY21wKGJhMSwgYmEyLCBzaXplb2YoYmRhZGRyX3QpKTsKfQoKc3RhdGljIGlubGlu
+ZSB2b2lkIGJhY3B5KGJkYWRkcl90ICpkc3QsIGNvbnN0IGJkYWRkcl90ICpzcmMpCnsKCW1lbWNw
+eShkc3QsIHNyYywgc2l6ZW9mKGJkYWRkcl90KSk7Cn0KCi8qIFJGQ09NTSBzb2NrZXQgYWRkcmVz
+cyAqLwpzdHJ1Y3Qgc29ja2FkZHJfcmMgewoJc2FfZmFtaWx5X3QJcmNfZmFtaWx5OwoJYmRhZGRy
+X3QJcmNfYmRhZGRyOwoJdWludDhfdAkJcmNfY2hhbm5lbDsKfTsKCi8qIFJGQ09NTSBzb2NrZXQg
+b3B0aW9ucyAqLwojZGVmaW5lIFJGQ09NTV9DT05OSU5GTwkweDAyCnN0cnVjdCByZmNvbW1fY29u
+bmluZm8gewoJdWludDE2X3QJaGNpX2hhbmRsZTsKCXVpbnQ4X3QJCWRldl9jbGFzc1szXTsKfTsK
+CiNkZWZpbmUgUkZDT01NX0xNCTB4MDMKI2RlZmluZSBSRkNPTU1fTE1fTUFTVEVSCTB4MDAwMQoj
+ZGVmaW5lIFJGQ09NTV9MTV9BVVRICQkweDAwMDIKI2RlZmluZSBSRkNPTU1fTE1fRU5DUllQVAkw
+eDAwMDQKI2RlZmluZSBSRkNPTU1fTE1fVFJVU1RFRAkweDAwMDgKI2RlZmluZSBSRkNPTU1fTE1f
+UkVMSUFCTEUJMHgwMDEwCiNkZWZpbmUgUkZDT01NX0xNX1NFQ1VSRQkweDAwMjAKCi8qIEwyQ0FQ
+IHNvY2tldCBhZGRyZXNzICovCnN0cnVjdCBzb2NrYWRkcl9sMiB7CglzYV9mYW1pbHlfdAlsMl9m
+YW1pbHk7Cgl1bnNpZ25lZCBzaG9ydAlsMl9wc207CgliZGFkZHJfdAlsMl9iZGFkZHI7Cgl1bnNp
+Z25lZCBzaG9ydAlsMl9jaWQ7Cn07CgovKiBMMkNBUCBzb2NrZXQgb3B0aW9ucyAqLwojZGVmaW5l
+IEwyQ0FQX09QVElPTlMJMHgwMQpzdHJ1Y3QgbDJjYXBfb3B0aW9ucyB7Cgl1aW50MTZfdAlvbXR1
+OwoJdWludDE2X3QJaW10dTsKCXVpbnQxNl90CWZsdXNoX3RvOwoJdWludDhfdAkJbW9kZTsKCXVp
+bnQ4X3QJCWZjczsKfTsKCiNkZWZpbmUgTDJDQVBfQ09OTklORk8JMHgwMgpzdHJ1Y3QgbDJjYXBf
+Y29ubmluZm8gewoJdWludDE2X3QJaGNpX2hhbmRsZTsKCXVpbnQ4X3QJCWRldl9jbGFzc1szXTsK
+fTsKCiNkZWZpbmUgTDJDQVBfTE0JMHgwMwojZGVmaW5lIEwyQ0FQX0xNX01BU1RFUgkJMHgwMDAx
+CiNkZWZpbmUgTDJDQVBfTE1fQVVUSAkJMHgwMDAyCiNkZWZpbmUgTDJDQVBfTE1fRU5DUllQVAkw
+eDAwMDQKI2RlZmluZSBMMkNBUF9MTV9UUlVTVEVECTB4MDAwOAojZGVmaW5lIEwyQ0FQX0xNX1JF
+TElBQkxFCTB4MDAxMAojZGVmaW5lIEwyQ0FQX0xNX1NFQ1VSRQkJMHgwMDIwCgojZGVmaW5lIEwy
+Q0FQX01PREVfQkFTSUMJMHgwMAojZGVmaW5lIEwyQ0FQX01PREVfUkVUUkFOUwkweDAxCiNkZWZp
+bmUgTDJDQVBfTU9ERV9GTE9XQ1RMCTB4MDIKI2RlZmluZSBMMkNBUF9NT0RFX0VSVE0JCTB4MDMK
+I2RlZmluZSBMMkNBUF9NT0RFX1NUUkVBTUlORwkweDA0CgovKiBoY2kuaCAqLwoKLyogSENJIGRl
+dmljZSBmbGFncyAqLwplbnVtIHsKCUhDSV9VUCwKCUhDSV9JTklULAoJSENJX1JVTk5JTkcsCgoJ
+SENJX1BTQ0FOLAoJSENJX0lTQ0FOLAoJSENJX0FVVEgsCglIQ0lfRU5DUllQVCwKCUhDSV9JTlFV
+SVJZLAoKCUhDSV9SQVcsCn07CgojZGVmaW5lIEhDSUdFVERFVklORk8JX0lPUignSCcsIDIxMSwg
+aW50KQoKLyogSW9jdGwgcmVxdWVzdHMgc3RydWN0dXJlcyAqLwpzdHJ1Y3QgaGNpX2Rldl9zdGF0
+cyB7Cgl1aW50MzJfdCBlcnJfcng7Cgl1aW50MzJfdCBlcnJfdHg7Cgl1aW50MzJfdCBjbWRfdHg7
+Cgl1aW50MzJfdCBldnRfcng7Cgl1aW50MzJfdCBhY2xfdHg7Cgl1aW50MzJfdCBhY2xfcng7Cgl1
+aW50MzJfdCBzY29fdHg7Cgl1aW50MzJfdCBzY29fcng7Cgl1aW50MzJfdCBieXRlX3J4OwoJdWlu
+dDMyX3QgYnl0ZV90eDsKfTsKCnN0cnVjdCBoY2lfZGV2X2luZm8gewoJdWludDE2X3QgZGV2X2lk
+OwoJY2hhciAgICAgbmFtZVs4XTsKCgliZGFkZHJfdCBiZGFkZHI7CgoJdWludDMyX3QgZmxhZ3M7
+Cgl1aW50OF90ICB0eXBlOwoKCXVpbnQ4X3QgIGZlYXR1cmVzWzhdOwoKCXVpbnQzMl90IHBrdF90
+eXBlOwoJdWludDMyX3QgbGlua19wb2xpY3k7Cgl1aW50MzJfdCBsaW5rX21vZGU7CgoJdWludDE2
+X3QgYWNsX210dTsKCXVpbnQxNl90IGFjbF9wa3RzOwoJdWludDE2X3Qgc2NvX210dTsKCXVpbnQx
+Nl90IHNjb19wa3RzOwoKCXN0cnVjdCAgIGhjaV9kZXZfc3RhdHMgc3RhdDsKfTsKCmludCBkZXZp
+ZDJiYShpbnQgZGV2X2lkLCBiZGFkZHJfdCAqYmRhZGRyKTsKdm9pZCBiYXN3YXAoYmRhZGRyX3Qg
+KmRzdCwgY29uc3QgYmRhZGRyX3QgKnNyYyk7CmludCBiYTJzdHIoY29uc3QgYmRhZGRyX3QgKmJh
+LCBjaGFyICpzdHIpOwppbnQgc3RyMmJhKGNvbnN0IGNoYXIgKnN0ciwgYmRhZGRyX3QgKmJhKTsK
+CiNlbmRpZgo=
+--0016e68f9c8441ba68048f6b3501--
