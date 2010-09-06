@@ -4,45 +4,42 @@ From: Pacho Ramos <pacho@condmat1.ciencias.uniovi.es>
 Reply-To: pacho@condmat1.ciencias.uniovi.es
 To: Bastien Nocera <hadess@hadess.net>
 Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1283784432.7529.24.camel@localhost.localdomain>
-References: <1283784432.7529.24.camel@localhost.localdomain>
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-B2dFO020huj8CzVgXwbF"
-Date: Mon, 06 Sep 2010 17:12:56 +0200
-Message-ID: <1283785976.28657.1.camel@localhost.localdomain>
+In-Reply-To: <1283786557.7529.26.camel@localhost.localdomain>
+References: <1283786557.7529.26.camel@localhost.localdomain>
+Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-qYnwk4jvW6WPCACc5F5b"
+Date: Mon, 06 Sep 2010 17:38:21 +0200
+Message-ID: <1283787501.28657.6.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
---=-B2dFO020huj8CzVgXwbF
+--=-qYnwk4jvW6WPCACc5F5b
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-El lun, 06-09-2010 a las 15:47 +0100, Bastien Nocera escribi=C3=B3:
-> Heya,
+El lun, 06-09-2010 a las 16:22 +0100, Bastien Nocera escribi=C3=B3:
+> > OK, thanks, I asked it because under Gentoo no package is currently
+> > providing it and a user suggested to supply it with bluez... but I
+> > haven't made any decision about this yet
 >=20
-> We've been carrying a similar (but hard-coded) patch in Fedora for a
-> long while, and it would be nice if we could do this properly upstream
-> instead.
+> That's probably a good enough way to ship it. Various distributions seem
+> to have a different idea on where it should be.
 >=20
-> Patch attached with explanations.
->=20
-> Cheers
 
-What is the proper package to ship oui.txt file? Thanks a lot for the
-information :-)
+Great, I will probably follow your recommendation, thanks a lot :-)
 
---=-B2dFO020huj8CzVgXwbF
+--=-qYnwk4jvW6WPCACc5F5b
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: This is a digitally signed message part
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2.0.16 (GNU/Linux)
 
-iEYEABECAAYFAkyFBPgACgkQCaWpQKGI+9QPxACcC/GgrWQmWhtxzhVJ6IdjyOdo
-2DUAn0FA0VIru48mjM2qk7toQiLlRuFG
-=FQTg
+iEYEABECAAYFAkyFCu0ACgkQCaWpQKGI+9RnCACeNCaxBBDzUUBuMItAMVRuOXKb
+0R8AnApheZoq6zUoHkpniQFsJ21sbBTn
+=T/5c
 -----END PGP SIGNATURE-----
 
---=-B2dFO020huj8CzVgXwbF--
+--=-qYnwk4jvW6WPCACc5F5b--
 
