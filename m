@@ -1,203 +1,183 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1283768782-4283-3-git-send-email-luiz.dentz@gmail.com>
-References: <1283768782-4283-1-git-send-email-luiz.dentz@gmail.com>
-	<1283768782-4283-3-git-send-email-luiz.dentz@gmail.com>
-Date: Mon, 6 Sep 2010 16:39:25 +0300
-Message-ID: <AANLkTimrPVRMKbKYboxkaV+vsv4D8SynhaYo_QH+L=JS@mail.gmail.com>
-Subject: Re: [PATCH 3/4] Fix calling watch callbacks after it has been removed
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <AANLkTi=bRRKPODUuoKepCRpH_SAJt3nSv=jWUBvDdJi0@mail.gmail.com>
+References: <1283519240-1235-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<alpine.DEB.2.00.1009030837330.26179@linux-sea-02>
+	<AANLkTi=bRRKPODUuoKepCRpH_SAJt3nSv=jWUBvDdJi0@mail.gmail.com>
+Date: Mon, 6 Sep 2010 16:25:19 +0300
+Message-ID: <AANLkTinZ6AYd1g0URdYxStfA-4-yd3-5ESagzYLpX4xR@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: check L2CAP length in first ACL fragment
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This one is broken, I will resubmit.
+Hi,
 
-On Mon, Sep 6, 2010 at 1:26 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto Von Dentz <luiz.dentz-von@nokia.com>
+On Mon, Sep 6, 2010 at 2:32 PM, Andrei Emeltchenko
+<andrei.emeltchenko.news@gmail.com> wrote:
+> Hi,
 >
-> Pending call should be removed if the watch is removed since the
-> application no longer expect that to be reached and may already freed the
-> data associated with it.
-> ---
->  gdbus/watch.c |   75 ++++++++++++++++++++++++++++++++++++--------------------
->  1 files changed, 48 insertions(+), 27 deletions(-)
+> On Fri, Sep 3, 2010 at 7:26 PM, Mat Martineau <mathewm@codeaurora.org> wrote:
+>>> Trace below is received when using stress tools sending big
+>>> fragmented L2CAP packets.
+>>> ...
+>>> [ 1712.798492] swapper: page allocation failure. order:4, mode:0x4020
+>>> [ 1712.804809] [<c0031870>] (unwind_backtrace+0x0/0xdc) from [<c00a1f70>]
+>>> (__alloc_pages_nodemask+0x4)
+>>> [ 1712.814666] [<c00a1f70>] (__alloc_pages_nodemask+0x47c/0x4d4) from
+>>> [<c00a1fd8>] (__get_free_pages+)
+>>> [ 1712.824645] [<c00a1fd8>] (__get_free_pages+0x10/0x3c) from [<c026eb5c>]
+>>> (__alloc_skb+0x4c/0xfc)
+>>> [ 1712.833465] [<c026eb5c>] (__alloc_skb+0x4c/0xfc) from [<bf28c738>]
+>>> (l2cap_recv_acldata+0xf0/0x1f8 )
+>>> [ 1712.843322] [<bf28c738>] (l2cap_recv_acldata+0xf0/0x1f8 [l2cap]) from
+>>> [<bf0094ac>] (hci_rx_task+0x)
+>>> ...
+>>
+>> What is logged right before this allocation failure?  There should be a
+>> "Start: total len %d, frag len %d" line.  Actually, all log messages from
+>> l2cap_recv_acldata leading up to the failure would be helpful.
 >
-> diff --git a/gdbus/watch.c b/gdbus/watch.c
-> index 8ad4815..249d927 100644
-> --- a/gdbus/watch.c
-> +++ b/gdbus/watch.c
-> @@ -43,11 +43,21 @@ static DBusHandlerResult message_filter(DBusConnection *connection,
->  static guint listener_id = 0;
->  static GSList *listeners = NULL;
+> When I enable logs system behave differently because of huge traffic
+> to syslog :-)
 >
-> +struct service_data {
-> +       DBusConnection *conn;
-> +       DBusPendingCall *call;
-> +       char *name;
-> +       const char *owner;
-> +       guint id;
-> +       struct filter_callback *callback;
-> +};
-> +
->  struct filter_callback {
->        GDBusWatchFunction conn_func;
->        GDBusWatchFunction disc_func;
->        GDBusSignalFunction signal_func;
->        GDBusDestroyFunction destroy_func;
-> +       struct service_data *data;
->        void *user_data;
->        guint id;
->  };
-> @@ -302,7 +312,7 @@ static struct filter_callback *filter_data_add_callback(
->  {
->        struct filter_callback *cb = NULL;
+>>> After applying patch dmesg looks like:
+>>> ...
+>>> l2cap_recv_acldata: Frame exceeding recv MTU (len 64182, MTU 1013)
+>>> l2cap_recv_acldata: Unexpected continuation frame (len 34)
+>>> ...
+>>>
+>>> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+>>> ---
+>>> net/bluetooth/l2cap.c |   11 +++++++++++
+>>> 1 files changed, 11 insertions(+), 0 deletions(-)
+>>>
+>>> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+>>> index 9fad312..21824d7 100644
+>>> --- a/net/bluetooth/l2cap.c
+>>> +++ b/net/bluetooth/l2cap.c
+>>> @@ -4654,6 +4654,8 @@ static int l2cap_recv_acldata(struct hci_conn *hcon,
+>>> struct sk_buff *skb, u16 fl
+>>>
+>>>        if (flags & ACL_START) {
+>>>                struct l2cap_hdr *hdr;
+>>> +               struct sock *sk;
+>>> +               u16 cid;
+>>>                int len;
+>>>
+>>>                if (conn->rx_len) {
+>>> @@ -4672,6 +4674,7 @@ static int l2cap_recv_acldata(struct hci_conn *hcon,
+>>> struct sk_buff *skb, u16 fl
+>>> d
+>>>                hdr = (struct l2cap_hdr *) skb->data;
+>>>                len = __le16_to_cpu(hdr->len) + L2CAP_HDR_SIZE;
+>>> +               cid = __le16_to_cpu(hdr->cid);
+>>
+>> Some stress tools also send L2CAP data one byte at a time - the start
+>> fragment may not have all four header bytes.  l2cap_recv_acldata() currently
+>> allows short start fragments with two or three bytes, which would not
+>> contain a valid CID.
 >
-> -       cb = g_new(struct filter_callback, 1);
-> +       cb = g_new0(struct filter_callback, 1);
+> Yes currently we allow 2 bytes in start fragment and check hdr->len.
+> What about following change (require 4 bytes in start fragment)
 >
->        cb->conn_func = connect;
->        cb->disc_func = disconnect;
-> @@ -319,6 +329,24 @@ static struct filter_callback *filter_data_add_callback(
->        return cb;
->  }
->
-> +static void service_data_free(struct service_data *data)
-> +{
-> +       struct filter_callback *callback = data->callback;
-> +
-> +       dbus_connection_unref(data->conn);
-> +
-> +       if (data->call)
-> +               dbus_pending_call_unref(data->call);
-> +
-> +       if (data->id)
-> +               g_source_remove(data->id);
-> +
-> +       g_free(data->name);
-> +       g_free(data);
-> +
-> +       callback->data = NULL;
-> +}
-> +
->  static gboolean filter_data_remove_callback(struct filter_data *data,
->                                                struct filter_callback *cb)
->  {
-> @@ -327,6 +355,13 @@ static gboolean filter_data_remove_callback(struct filter_data *data,
->        data->callbacks = g_slist_remove(data->callbacks, cb);
->        data->processed = g_slist_remove(data->processed, cb);
->
-> +       /* Cancel pending operations */
-> +       if (cb->data) {
-> +               if (cb->data->call)
-> +                       dbus_pending_call_cancel(cb->data->call);
-> +               service_data_free(cb->data);
-> +       }
-> +
->        if (cb->destroy_func)
->                cb->destroy_func(cb->user_data);
->
-> @@ -515,28 +550,14 @@ static DBusHandlerResult message_filter(DBusConnection *connection,
->        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
->  }
->
-> -struct service_data {
-> -       DBusConnection *conn;
-> -       char *name;
-> -       const char *owner;
-> -       GDBusWatchFunction conn_func;
-> -       void *user_data;
-> -};
-> -
-> -static void service_data_free(struct service_data *data)
-> -{
-> -       dbus_connection_unref(data->conn);
-> -       g_free(data->name);
-> -       g_free(data);
-> -}
-> -
->  static gboolean update_service(void *user_data)
->  {
->        struct service_data *data = user_data;
-> +       struct filter_callback *cb = data->callback;
->
->        update_name_cache(data->name, data->owner);
-> -       if (data->conn_func)
-> -               data->conn_func(data->conn, data->user_data);
-> +       if (cb->conn_func)
-> +               cb->conn_func(data->conn, cb->user_data);
->
->        service_data_free(data);
->
-> @@ -575,11 +596,11 @@ done:
->        dbus_message_unref(reply);
->  }
->
-> -static void check_service(DBusConnection *connection, const char *name,
-> -                               GDBusWatchFunction connect, void *user_data)
-> +static void check_service(DBusConnection *connection,
-> +                                       const char *name,
-> +                                       struct filter_callback *callback)
->  {
->        DBusMessage *message;
-> -       DBusPendingCall *call;
->        struct service_data *data;
->
->        data = g_try_malloc0(sizeof(*data));
-> @@ -590,12 +611,12 @@ static void check_service(DBusConnection *connection, const char *name,
->
->        data->conn = dbus_connection_ref(connection);
->        data->name = g_strdup(name);
-> -       data->conn_func = connect;
-> -       data->user_data = user_data;
-> +       data->callback = callback;
-> +       callback->data = data;
->
->        data->owner = check_name_cache(name);
->        if (data->owner != NULL) {
-> -               g_idle_add(update_service, data);
-> +               data->id = g_idle_add(update_service, data);
->                return;
->        }
->
-> @@ -611,13 +632,13 @@ static void check_service(DBusConnection *connection, const char *name,
->                                                        DBUS_TYPE_INVALID);
->
->        if (dbus_connection_send_with_reply(connection, message,
-> -                                                       &call, -1) == FALSE) {
-> +                                                       &data->call, -1) == FALSE) {
->                error("Failed to execute method call");
->                g_free(data);
->                goto done;
->        }
->
-> -       if (call == NULL) {
-> +       if (data->call == NULL) {
->                error("D-Bus connection not available");
->                g_free(data);
->                goto done;
-> @@ -654,7 +675,7 @@ guint g_dbus_add_service_watch(DBusConnection *connection, const char *name,
->                return 0;
->
->        if (connect)
-> -               check_service(connection, name, connect, user_data);
-> +               check_service(connection, name, cb);
->
->        return cb->id;
->  }
-> --
-> 1.7.0.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+> ---------------------------------------------
+> -               if (skb->len < 2) {
+> +               if (skb->len < L2CAP_HDR_SIZE) {
+>                        BT_ERR("Frame is too short (len %d)", skb->len);
+>                        l2cap_conn_unreliable(conn, ECOMM);
+>                        goto drop;
+> ---------------------------------------------
+
+I have found in "BLUETOOTH SPECIFICATION Version 4.0 [Vol 3] page 36"
+
+"Note: Start Fragments always begin with the Basic L2CAP header of a
+PDU." So the statement above is correct.
+
+Regards,
+Andrei
 
 
-
--- 
-Luiz Augusto von Dentz
-Computer Engineer
+>
+>>>                if (len == skb->len) {
+>>>                        /* Complete frame received */
+>>> @@ -4688,6 +4691,14 @@ static int l2cap_recv_acldata(struct hci_conn
+>>> *hcon, struct sk_buff *skb, u16 fl
+>>>                        goto drop;
+>>>                }
+>>>
+>>> +               sk = l2cap_get_chan_by_scid(&conn->chan_list, cid);
+>>
+>> There are several issues here.
+>>
+>> l2cap_get_chan_by_scid() might return NULL, which will definitely happen
+>> with signaling or connectionless data frames.
+>>
+>> l2cap_get_chan_by_scid() also calls bh_lock_sock() if a channel is found,
+>> and I don't see that you added a matching call to bh_unlock_sock() if
+>> l2cap_get_chan_by_scid() returns a non-NULL value.
+>
+> My mistake here. What about following check:
+>
+> ---------------------------------------
+> @@ -3916,6 +3919,19 @@ static int l2cap_recv_acldata(struct hci_conn
+> *hcon, struct sk_buff *skb,
+>                        goto drop;
+>                }
+>
+> +               sk = l2cap_get_chan_by_scid(&conn->chan_list, cid);
+> +               if (!sk)
+> +                       goto drop;
+> +
+> +               if (l2cap_pi(sk)->imtu < len) {
+> +                       BT_ERR("Frame exceeding recv MTU (len %d, MTU %d)",
+> +                                       len, l2cap_pi(sk)->imtu);
+> +                       conn->rx_len = 0; /* needed? */
+> +                       bh_unlock_sock(sk);
+> +                       goto drop;
+> +               } else
+> +                       bh_unlock_sock(sk);
+> +
+>                /* Allocate skb for the complete frame (with header) */
+>                conn->rx_skb = bt_skb_alloc(len, GFP_ATOMIC);
+>                if (!conn->rx_skb)
+>
+> --------------------------------------
+>
+>>
+>>> +               if (l2cap_pi(sk)->imtu < len) {
+>>> +                       BT_ERR("Frame exceeding recv MTU (len %d, MTU
+>>> %d)",
+>>> +                                       len, l2cap_pi(sk)->imtu);
+>>> +                       conn->rx_len = 0; /* needed? */
+>>> +                       goto drop;
+>>> +               }
+>>> +
+>>>                /* Allocate skb for the complete frame (with header) */
+>>>                conn->rx_skb = bt_skb_alloc(len, GFP_ATOMIC);
+>>>                if (!conn->rx_skb)
+>>
+>> In general, this approach adds an extra channel lookup and an extra
+>> lock/unlock on every ACL start frame.
+>
+> Yes this adds extra lock/unlock but only if the frame is not complete. There
+> shouldn't be many fragmented L2CAP packets.
+>
+>>  Even if the MTU is known to be
+>> exceeded on with the start frame, no more than 64k is ever allocated (which
+>> shouldn't cause problems in itself).
+>
+> I think that for the mobile device this can be a problem since this
+> shall be contiguous
+> memory.
+>
+>> The root of the problem may be heap
+>> corruption due to a buffer overrun, which seems possible due to the crash
+>> deep in the memory allocator.
+>
+> Regards,
+> Andrei
+>
