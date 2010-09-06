@@ -1,78 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Briglia <anderson.briglia@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Briglia <anderson.briglia@openbossa.org>
-Subject: [PATCH v3] hciconfig: add LE_SET_ADVERTISE_ENABLE cmd
-Date: Mon,  6 Sep 2010 11:18:16 -0400
-Message-Id: <1283786296-16211-1-git-send-email-anderson.briglia@openbossa.org>
+Subject: Re: [PATCH] Make the path to oui.txt a compile-time option
+From: Bastien Nocera <hadess@hadess.net>
+To: pacho@condmat1.ciencias.uniovi.es
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1283785976.28657.1.camel@localhost.localdomain>
+References: <1283784432.7529.24.camel@localhost.localdomain>
+	 <1283785976.28657.1.camel@localhost.localdomain>
+Content-Type: text/plain; charset="ISO-8859-1"
+Date: Mon, 06 Sep 2010 16:15:14 +0100
+Message-ID: <1283786114.7529.25.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch implements two new hciconfig commands: leadv and noleadv.
-These new hciconfig flags are responsible to LE_SET_ADVERTISE_ENABLE
-command implementation.
----
- tools/hciconfig.c |   40 ++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 40 insertions(+), 0 deletions(-)
+On Mon, 2010-09-06 at 17:12 +0200, Pacho Ramos wrote:
+> El lun, 06-09-2010 a las 15:47 +0100, Bastien Nocera escribió:
+> > Heya,
+> > 
+> > We've been carrying a similar (but hard-coded) patch in Fedora for a
+> > long while, and it would be nice if we could do this properly upstream
+> > instead.
+> > 
+> > Patch attached with explanations.
+> > 
+> > Cheers
+> 
+> What is the proper package to ship oui.txt file? Thanks a lot for the
+> information :-)
 
-diff --git a/tools/hciconfig.c b/tools/hciconfig.c
-index 87dd127..3627b7c 100644
---- a/tools/hciconfig.c
-+++ b/tools/hciconfig.c
-@@ -149,6 +149,44 @@ static void cmd_scan(int ctl, int hdev, char *opt)
- 	}
- }
- 
-+static void cmd_le_adv(int ctl, int hdev, char *opt)
-+{
-+	struct hci_request rq;
-+	le_set_advertise_enable_cp advertise_cp;
-+	uint8_t status;
-+	int dd, ret;
-+
-+	if (hdev < 0)
-+		hdev = hci_get_route(NULL);
-+
-+	dd = hci_open_dev(hdev);
-+	if (dd < 0) {
-+		perror("Could not open device");
-+		exit(1);
-+	}
-+
-+	memset(&advertise_cp, 0, sizeof(advertise_cp));
-+	if (strcmp(opt, "noleadv") == 0)
-+		advertise_cp.enable = 0x00;
-+	else
-+		advertise_cp.enable = 0x01;
-+
-+	memset(&rq, 0, sizeof(rq));
-+	rq.ogf = OGF_LE_CTL;
-+	rq.ocf = OCF_LE_SET_ADVERTISE_ENABLE;
-+	rq.cparam = &advertise_cp;
-+	rq.clen = LE_SET_ADVERTISE_ENABLE_CP_SIZE;
-+	rq.rparam = &status;
-+	rq.rlen = 1;
-+
-+	ret = hci_send_req(dd, &rq, 100);
-+	if (status || ret < 0)
-+		fprintf(stderr, "Can't set advertise mode on hci%d: %s (%d)\n",
-+						hdev, strerror(errno), errno);
-+
-+	hci_close_dev(dd);
-+}
-+
- static void cmd_iac(int ctl, int hdev, char *opt)
- {
- 	int s = hci_open_dev(hdev);
-@@ -1728,6 +1766,8 @@ static struct {
- 	{ "revision",	cmd_revision,	0,		"Display revision information" },
- 	{ "block",	cmd_block,	"<bdaddr>",	"Add a device to the blacklist" },
- 	{ "unblock",	cmd_unblock,	"<bdaddr>",	"Remove a device from the blacklist" },
-+	{ "leadv",	cmd_le_adv,	0,		"Enable LE advertising" },
-+	{ "noleadv",	cmd_le_adv,	0,		"Disable LE advertising" },
- 	{ NULL, NULL, 0 }
- };
- 
--- 
-1.7.0.4
+No idea. In Fedora we ship it in hwdata. No idea where it lives for
+Debian-based distributions, or others.
 
