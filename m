@@ -1,76 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4C84BFB2.3000802@linux.intel.com>
-Date: Mon, 06 Sep 2010 12:17:22 +0200
-From: Sebastien Cayetanot <sebastien.cayetanot@linux.intel.com>
-MIME-Version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: BD address changed but pairing failed
-References: <4C80CE3E.8020004@linux.intel.com> <AANLkTi=9HR+iTm=baVdefQcd-Nb8Gchx3LN6q-CycMcq@mail.gmail.com>
-In-Reply-To: <AANLkTi=9HR+iTm=baVdefQcd-Nb8Gchx3LN6q-CycMcq@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Running "putkey" for keyboards and mice
+From: Bastien Nocera <hadess@hadess.net>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="ISO-8859-1"
+Date: Mon, 06 Sep 2010 11:06:53 +0100
+Message-ID: <1283767613.7529.6.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-  Le 9/4/2010 9:07 PM, Luiz Augusto von Dentz a écrit :
-> Hi,
->
-> On Fri, Sep 3, 2010 at 1:30 PM, Sebastien Cayetanot
-> <sebastien.cayetanot@linux.intel.com>  wrote:
->>   All,
->>
->> I'm currently facing an issue regarding the pairing of BT devices after
->> having change the BD_Addr.
->>
->>
->> I use a TI chip and also use hci command or bdaddr script to modify the
->> bd_addr
->>
->> I'm also using the bluez-4.69
->>
->> I change the BD_Addr using the bdaddr scripts provided into the bluez src.
->>
->> When other devices scan me, the new address is seen but hciconfig still show
->> the old BD address.
->>
->> I have sent the hcitool cmd to read the bd_addr and after the hciconfig
->> return the one.
->>
->> I'm discoverable with the new BD address.
->>
->> But When I try to pair an A2DP headset or BT Keyboard/Mouse it failed since
->> BD_Addr change.
->>
->> I have try to use directly the hcitool cmd using the vendor specific command
->> but I got the same result.
->>
->> I have tried to kill bluetooth daemon and restart it after having change the
->> bd_addr. Still failing.
->>
->> I have tried to kill bluetooth daemon before changing the BD adress and
->> start it after the change it still fail.
->>
->> I have also tried to power on/off interface. still the issue
->>
->> I think that something is "broken" is bluez when the BD_Addr is changed.
->>
->> Is someone already seen this issue ?
-> I don't think you are suppose to change the address like that, it is
-> supposed to be done once in the chip initialization and then keep it
-> like that forever, so I guess there is something wrong if the chip is
-> already initialize with the wrong address. What are you trying achieve
-> with this?
->
-Surely not but regarding some tests scripts I have seen on bluez, I 
-suppose that's possible. Perhaps, some chips support and other don't.
+Heya,
 
-I have tried to change the BD_Address during the BT initialization and 
-prior any HCI command sent to the chip and it works.
+Did a small test this week-end on my Macbook, and running "hciconfig"
+with putkey works, adding the just paired keyboards' linkkey into the
+Bluetooth adapter.
 
-I expected the same behavior than observed on WLAN :  I have changed the 
-WLAN MAC address after and everything works fine.
+This meant that even though I paired the device in Linux, it was still
+available in MacOS X, without any more pairing.
 
+My question is whether we should, for all the adapters listed in the
+hid2hci rules, copy the linkkeys for keyboards and (paired) mice[1] to
+the adapter itself.
 
-Regards.
+How would you like to see this implemented? Would a device plugin be
+good enough to track newly paired devices?
 
-Sebastien
+Cheers
+
+[1]: Just the mice that would require pairing, obviously, such as the
+Apple mice
+
