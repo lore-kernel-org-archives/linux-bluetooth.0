@@ -1,32 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Running "putkey" for keyboards and mice
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="ISO-8859-1"
-Date: Mon, 06 Sep 2010 11:06:53 +0100
-Message-ID: <1283767613.7529.6.camel@localhost.localdomain>
-Mime-Version: 1.0
+From: Santiago Carot-Nemesio <sancane@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Santiago Carot-Nemesio <sancane@gmail.com>
+Subject: [PATCH] Check source_id before to call to g_source_remove function
+Date: Mon,  6 Sep 2010 10:19:32 +0200
+Message-Id: <1283761172-7384-1-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Heya,
+---
+ health/mcap.c |   23 +++++++++++++++--------
+ 1 files changed, 15 insertions(+), 8 deletions(-)
 
-Did a small test this week-end on my Macbook, and running "hciconfig"
-with putkey works, adding the just paired keyboards' linkkey into the
-Bluetooth adapter.
-
-This meant that even though I paired the device in Linux, it was still
-available in MacOS X, without any more pairing.
-
-My question is whether we should, for all the adapters listed in the
-hid2hci rules, copy the linkkeys for keyboards and (paired) mice[1] to
-the adapter itself.
-
-How would you like to see this implemented? Would a device plugin be
-good enough to track newly paired devices?
-
-Cheers
-
-[1]: Just the mice that would require pairing, obviously, such as the
-Apple mice
+diff --git a/health/mcap.c b/health/mcap.c
+index 17e16d8..7dc06ba 100644
+--- a/health/mcap.c
++++ b/health/mcap.c
+@@ -44,9 +44,11 @@
+ 
+ #define MCAP_ERROR g_quark_from_static_string("mcap-error-quark")
+ 
+-#define RELEASE_TIMER(__mcl) do {	\
+-	g_source_remove(__mcl->tid);	\
+-	__mcl->tid = 0;			\
++#define RELEASE_TIMER(__mcl) do {		\
++	if (__mcl->tid)	{			\
++		g_source_remove(__mcl->tid);	\
++		__mcl->tid = 0;			\
++	}					\
+ } while(0)
+ 
+ struct connect_mcl {
+@@ -227,7 +229,10 @@ static void shutdown_mdl(struct mcap_mdl *mdl)
+ {
+ 	mdl->state = MDL_CLOSED;
+ 
+-	g_source_remove(mdl->wid);
++	if (mdl->wid) {
++		g_source_remove(mdl->wid);
++		mdl->wid = 0;
++	}
+ 
+ 	if (mdl->dc) {
+ 		g_io_channel_shutdown(mdl->dc, TRUE, NULL);
+@@ -678,9 +683,7 @@ static void close_mcl(struct mcap_mcl *mcl, gboolean cache_requested)
+ {
+ 	gboolean save = ((!(mcl->ctrl & MCAP_CTRL_FREE)) && cache_requested);
+ 
+-	if (mcl->tid) {
+-		RELEASE_TIMER(mcl);
+-	}
++	RELEASE_TIMER(mcl);
+ 
+ 	if (mcl->cc) {
+ 		g_io_channel_shutdown(mcl->cc, TRUE, NULL);
+@@ -688,7 +691,11 @@ static void close_mcl(struct mcap_mcl *mcl, gboolean cache_requested)
+ 		mcl->cc = NULL;
+ 	}
+ 
+-	g_source_remove(mcl->wid);
++	if (mcl->wid) {
++		g_source_remove(mcl->wid);
++		mcl->wid = 0;
++	}
++
+ 	if (mcl->lcmd) {
+ 		g_free(mcl->lcmd);
+ 		mcl->lcmd = NULL;
+-- 
+1.7.0.4
 
