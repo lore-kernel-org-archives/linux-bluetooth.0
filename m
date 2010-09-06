@@ -1,34 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 6 Sep 2010 19:10:57 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
+Subject: Re: [PATCH] Make the path to oui.txt a compile-time option
+From: Pacho Ramos <pacho@condmat1.ciencias.uniovi.es>
+Reply-To: pacho@condmat1.ciencias.uniovi.es
 To: Bastien Nocera <hadess@hadess.net>
 Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Make the path to oui.txt a compile-time option
-Message-ID: <20100906161057.GA25826@jh-x301>
-References: <1283784432.7529.24.camel@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <1283784432.7529.24.camel@localhost.localdomain>
+References: <1283784432.7529.24.camel@localhost.localdomain>
+Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-B2dFO020huj8CzVgXwbF"
+Date: Mon, 06 Sep 2010 17:12:56 +0200
+Message-ID: <1283785976.28657.1.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
 
-On Mon, Sep 06, 2010, Bastien Nocera wrote:
-> From b96d9394aa850be86ca368aeaeec3bc24c00bce1 Mon Sep 17 00:00:00 2001
-> From: Bastien Nocera <hadess@hadess.net>
-> Date: Mon, 6 Sep 2010 15:43:48 +0100
-> Subject: [PATCH] Make the path to oui.txt a compile-time option
-> 
-> This avoids bluetoothd trying to load oui.txt from multiple locations
-> and cause SELinux AVC denials by accessing files it's not supposed
-> to touch.
-> ---
->  acinclude.m4 |    8 ++++++++
->  configure.ac |    1 +
->  src/oui.c    |   14 +++-----------
->  3 files changed, 12 insertions(+), 11 deletions(-)
+--=-B2dFO020huj8CzVgXwbF
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Seems like a good idea. The patch is now upstream.
+El lun, 06-09-2010 a las 15:47 +0100, Bastien Nocera escribi=C3=B3:
+> Heya,
+>=20
+> We've been carrying a similar (but hard-coded) patch in Fedora for a
+> long while, and it would be nice if we could do this properly upstream
+> instead.
+>=20
+> Patch attached with explanations.
+>=20
+> Cheers
 
-Johan
+What is the proper package to ship oui.txt file? Thanks a lot for the
+information :-)
+
+--=-B2dFO020huj8CzVgXwbF
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.16 (GNU/Linux)
+
+iEYEABECAAYFAkyFBPgACgkQCaWpQKGI+9QPxACcC/GgrWQmWhtxzhVJ6IdjyOdo
+2DUAn0FA0VIru48mjM2qk7toQiLlRuFG
+=FQTg
+-----END PGP SIGNATURE-----
+
+--=-B2dFO020huj8CzVgXwbF--
+
