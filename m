@@ -1,231 +1,377 @@
 Return-Path: <cyrus@holtmann.org>
-From: Suraj Sumangala <suraj@atheros.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <Jothikumar.Mothilal@Atheros.com>,
-	<joakim.xj.ceder@stericsson.com>, <claudio.takahasi@gmail.com>,
-	<Waldemar.Rymarkiewicz@tieto.com>, <Arkadiusz.Lichwa@tieto.com>,
-	Suraj Sumangala <suraj@atheros.com>
-Subject: [RFC] Sim Access Profile API doc
-Date: Tue, 7 Sep 2010 11:32:55 +0530
-Message-ID: <1283839375-20033-1-git-send-email-suraj@atheros.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Subject: Re: Running "putkey" for keyboards and mice
+From: Bastien Nocera <hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1283775595.7529.21.camel@localhost.localdomain>
+References: <1283767613.7529.6.camel@localhost.localdomain>
+	 <AANLkTim3SSZhhJOB0DfaOsxMEzsaNKe-dkEf59p-7UQv@mail.gmail.com>
+	 <1283775595.7529.21.camel@localhost.localdomain>
+Content-Type: multipart/mixed; boundary="=-hWCE1jTu6/mYdU1MyzCQ"
+Date: Mon, 06 Sep 2010 17:42:39 +0100
+Message-ID: <1283791359.7529.28.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This RFC proposes the interface exposed by
-Sim Access Profile Server role.
 
-Please let me know your comments.
+--=-hWCE1jTu6/mYdU1MyzCQ
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
 
+On Mon, 2010-09-06 at 13:19 +0100, Bastien Nocera wrote:
+<snip>
+> Johan mentioned that we could implement this using a boolean property
+> for whether to store the linkkey on the device or not. When TRUE, should
+> we store the linkkey on both the device and on the local filesystem, or
+> just on the device?
+> 
+> hci_read_stored_link_key() is not currently used in the code at all, so
+> it's possible that a device will be paired, but not marked as such in
+> the interface.
+
+I was wrongly reading the code, and it already does that.
+
+Patch attached to add the "KeyOnAdapter" property to devices.
+
+Note that I did not test this thoroughly yet. I'm more looking for
+comments right now.
+
+Cheers
+
+--=-hWCE1jTu6/mYdU1MyzCQ
+Content-Disposition: attachment; filename="0001-Add-KeyOnAdapter-property-to-devices.patch"
+Content-Type: text/x-patch; name="0001-Add-KeyOnAdapter-property-to-devices.patch"; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+
+>From f387bbee64306db9096e28316160fe547388c6c3 Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Mon, 6 Sep 2010 17:21:30 +0100
+Subject: [PATCH] Add KeyOnAdapter property to devices
+
+The KeyOnAdapter property will be true if the linkkey comes from
+the adapter storage, rather than the local filesystem storage.
+
+This makes it possible for front-ends to add linkkeys to the
+adapter itself for keyboard and mice to automatically work
+when dual-booting under other OSes.
 ---
- doc/sap-api.txt |  197 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 197 insertions(+), 0 deletions(-)
- create mode 100644 doc/sap-api.txt
+ doc/device-api.txt |   16 ++++++++
+ plugins/hciops.c   |   32 ++++++++++++++++
+ src/adapter.c      |   22 +++++++++++
+ src/adapter.h      |    6 +++
+ src/dbus-hci.c     |    1 +
+ src/device.c       |  106 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/device.h       |    1 +
+ 7 files changed, 184 insertions(+), 0 deletions(-)
 
-diff --git a/doc/sap-api.txt b/doc/sap-api.txt
-new file mode 100644
-index 0000000..719cff6
---- /dev/null
-+++ b/doc/sap-api.txt
-@@ -0,0 +1,197 @@
-+BlueZ D-Bus Adapter API description
-+***********************************
+diff --git a/doc/device-api.txt b/doc/device-api.txt
+index b818299..c4f633b 100644
+--- a/doc/device-api.txt
++++ b/doc/device-api.txt
+@@ -161,6 +161,22 @@ Properties	string Address [readonly]
+ 			drivers will also be removed and no new ones will
+ 			be probed as long as the device is blocked.
+ 
++		boolean KeyOnAdapter [readwrite]
 +
-+Copyright (C) 2009-2010  Atheros Communication Ltd
++			Whether the linkkey for the device is available
++			on the adapter. This will be FALSE if the device
++			is not paired, or the key is not available on
++			the adapter (and just on the filesystem).
 +
++			Setting this to TRUE, will write the key to the
++			adapter, returning an error if the adapter
++			does not support this.
 +
-+Sim Access Server hierarchy
-+===========================
++			Note that the key is not removed from the local
++			filesystem storage, as, once on the adapter, it
++			will lack linkkey type information, which is
++			required for Bluetooth 2.1 devices.
 +
-+Service		org.bluez
-+Interface	org.bluez.SimAccessServer
-+Object path	[variable prefix]/{hci0,hci1,...}
+ 		string Alias [readwrite]
+ 
+ 			The name alias for the remote device. The alias can
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index f1e9f69..0a87f3e 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -748,6 +748,36 @@ static int hciops_fast_connectable(int index, gboolean enable)
+ 	return err;
+ }
+ 
++static int hciops_put_key (int index, bdaddr_t bdaddr, uint8_t *key)
++{
++	int dd, err;
 +
-+This interface is available for devices which can function in the
-+Server role of the Sim Access profiles.
-+It is intended to be used with external stacks / handlers of the Sim Access
-+protocol.
++	dd = hci_open_dev(index);
++	if (dd < 0)
++		return -EIO;
 +
++	err = hci_write_stored_link_key(dd, &bdaddr, key, HCI_REQ_TIMEOUT);
 +
-+Methods		void RegisterAgent(object agent)
++	hci_close_dev(dd);
 +
-+			This registers the Sim Access adapter agent.
-+			This also registers the profile with the service
-+			Databse and start waiting for an RFCOMM connection
-+			on the SAP server channel.
++	return -err;
++}
 +
-+			The object path defines the path the of the agent.
++static int hciops_del_key (int index, bdaddr_t bdaddr)
++{
++	int dd, err;
 +
-+			If an application disconnects from the bus all
-+			of its registered agents will be removed.
++	dd = hci_open_dev(index);
++	if (dd < 0)
++		return -EIO;
 +
-+			Possible errors: org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.AlreadyExists
-+					 org.bluez.Error.Failed
++	err = hci_delete_stored_link_key(dd, &bdaddr, 0, HCI_REQ_TIMEOUT);
 +
-+		void UnregisterAgent(object agent)
++	hci_close_dev(dd);
 +
-+			This unregisters the agent that has been previously
-+			registered. The object path parameter must match the
-+			same value that has been used on registration.
++	return -err;
++}
 +
-+			Possible errors: org.bluez.Error.DoesNotExist
-+					 org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.Failed
+ static struct btd_adapter_ops hci_ops = {
+ 	.setup = hciops_setup,
+ 	.cleanup = hciops_cleanup,
+@@ -765,6 +795,8 @@ static struct btd_adapter_ops hci_ops = {
+ 	.read_name = hciops_read_name,
+ 	.set_class = hciops_set_class,
+ 	.set_fast_connectable = hciops_fast_connectable,
++	.put_key = hciops_put_key,
++	.del_key = hciops_del_key,
+ };
+ 
+ static int hciops_init(void)
+diff --git a/src/adapter.c b/src/adapter.c
+index fd4cf99..fcd8aae 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -3519,3 +3519,25 @@ int btd_adapter_set_fast_connectable(struct btd_adapter *adapter,
+ 
+ 	return adapter_ops->set_fast_connectable(adapter->dev_id, enable);
+ }
 +
-+		void Response(string command, string result, object response)
++int btd_adapter_put_key (struct btd_adapter *adapter, bdaddr_t bdaddr, uint8_t *key)
++{
++	if (!adapter_ops)
++		return -EINVAL;
 +
-+			This sends a response to a received SAP command.
++	if (!adapter->up)
++		return -EINVAL;
 +
-+			The command parameter specifies the SAP command for
-+			which response has to be sent.
++	return adapter_ops->put_key(adapter->dev_id, bdaddr, key);
++}
 +
-+			The result parameter specifies the ResultCode for the
-+			operation.
++int btd_adapter_del_key (struct btd_adapter *adapter, bdaddr_t bdaddr)
++{
++	if (!adapter_ops)
++		return -EINVAL;
 +
-+			The object response specifies the response packet to
-+			be sent if any.
++	if (!adapter->up)
++		return -EINVAL;
 +
-+			Below mentioned are the parameters and possible value.
++	return adapter_ops->del_key(adapter->dev_id, bdaddr);
++}
+diff --git a/src/adapter.h b/src/adapter.h
+index fb52b34..86c9eb2 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -187,6 +187,8 @@ struct btd_adapter_ops {
+ 	int (*read_name) (int index);
+ 	int (*set_class) (int index, uint32_t class);
+ 	int (*set_fast_connectable) (int index, gboolean enable);
++	int (*put_key) (int index, bdaddr_t bdaddr, uint8_t *key);
++	int (*del_key) (int index, bdaddr_t bdaddr);
+ };
+ 
+ int btd_register_adapter_ops(struct btd_adapter_ops *btd_adapter_ops);
+@@ -205,3 +207,7 @@ void btd_adapter_unregister_powered_callback(struct btd_adapter *adapter,
+  * type to default values. Valid for both connectable and discoverable modes. */
+ int btd_adapter_set_fast_connectable(struct btd_adapter *adapter,
+ 							gboolean enable);
++int btd_adapter_put_key (struct btd_adapter *adapter,
++					bdaddr_t bdaddr,
++					uint8_t *key);
++int btd_adapter_del_key (struct btd_adapter *adapter, bdaddr_t bdaddr);
+diff --git a/src/dbus-hci.c b/src/dbus-hci.c
+index 9055ffe..f266409 100644
+--- a/src/dbus-hci.c
++++ b/src/dbus-hci.c
+@@ -903,6 +903,7 @@ void hcid_dbus_returned_link_key(bdaddr_t *local, bdaddr_t *peer)
+ 		return;
+ 
+ 	device_set_paired(device, TRUE);
++	device_set_key_on_adapter(device, TRUE);
+ }
+ 
+ int hcid_dbus_get_io_cap(bdaddr_t *local, bdaddr_t *remote,
+diff --git a/src/device.c b/src/device.c
+index 9055eca..df89656 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -139,6 +139,7 @@ struct btd_device {
+ 	gboolean	paired;
+ 	gboolean	blocked;
+ 	gboolean	renewed_key;
++	gboolean	key_on_adapter;
+ 
+ 	gboolean	authorizing;
+ 	gint		ref;
+@@ -256,6 +257,11 @@ gboolean device_is_paired(struct btd_device *device)
+ 	return device->paired;
+ }
+ 
++gboolean device_linkkey_is_on_adapter(struct btd_device *device)
++{
++	return device->key_on_adapter;
++}
 +
-+			command     	  result	    	response
-+			----------------------------------------------------
+ gboolean device_is_trusted(struct btd_device *device)
+ {
+ 	return device->trusted;
+@@ -329,6 +335,10 @@ static DBusMessage *get_properties(DBusConnection *conn,
+ 	boolean = device_is_paired(device);
+ 	dict_append_entry(&dict, "Paired", DBUS_TYPE_BOOLEAN, &boolean);
+ 
++	/* KeyOnAdapter */
++	boolean = device_linkkey_is_on_adapter(device);
++	dict_append_entry(&dict, "KeyOnAdapter", DBUS_TYPE_BOOLEAN, &boolean);
 +
-+			Connect		  OkSuccess		NA
-+  					  ConnectFailed
-+				  	  OkOngoingCall
+ 	/* Trusted */
+ 	boolean = device_is_trusted(device);
+ 	dict_append_entry(&dict, "Trusted", DBUS_TYPE_BOOLEAN, &boolean);
+@@ -570,6 +580,80 @@ static DBusMessage *set_blocked(DBusConnection *conn, DBusMessage *msg,
+ 	}
+ }
+ 
++static int device_put_key_on_adapter(DBusConnection *conn, struct btd_device *device)
++{
++	int err;
++	bdaddr_t src;
++	unsigned char linkkey[16];
 +
-+			APDU		  OkSuccess		array{uint8}
-+					  NoReason
-+					  CardNotAccessible
-+					  CardPoweredOff
-+					  CardRemoved
++	if (device->key_on_adapter)
++		return 0;
++	if (!device->paired)
++		return 0;
 +
-+			APDU7816	  OkSuccess		array{uint8}
-+					  NoReason
-+					  CardNotAccessible
-+					  CardPoweredOff
-+					  CardRemoved
++	adapter_get_address(device->adapter, &src);
++	if (read_link_key(&src, &device->bdaddr, linkkey, NULL) < 0)
++		return -ENOKEY;
 +
-+			ATR		  OkSuccess		array{uint8}
-+					  NoReason
-+					  CardPoweredOff
-+					  CardRemoved
-+					  DataNotAvailable
++	err = btd_adapter_put_key(device->adapter, device->bdaddr, linkkey);
++	if (err < 0)
++		return -err;
 +
-+			SimPowerOn	  OkSuccess		NA
-+					  NoReason
-+					  CardNotAccessible
-+					  CardRemoved
-+					  CardPoweredOn
++	device->key_on_adapter = TRUE;
 +
-+			SimPowerOff	  OkSuccess		NA
-+					  NoReason
-+					  CardPoweredOff
-+					  CardRemoved
++	emit_property_changed(conn, device->path, DEVICE_INTERFACE, "KeyOnAdapter",
++					DBUS_TYPE_BOOLEAN, &device->key_on_adapter);
 +
-+			Reset		  OkSuccess		NA
-+					  NoReason
-+					  CardNotAccessible
-+					  CardPoweredOff
-+					  CardRemoved
++	return 0;
++}
 +
-+			CardReaderStatus  OkSuccess		uint8
-+					  NoReason
-+					  DataNotAvailable
++static int device_del_key_on_adapter(DBusConnection *conn, struct btd_device *device)
++{
++	int err;
 +
-+			TransportProtocol OkSuccess		NA
-+					  NotSupported
++	if (!device->key_on_adapter)
++		return 0;
 +
-+			Disconnect	  NA	 		NA
++	err = btd_adapter_del_key(device->adapter, device->bdaddr);
++	if (err < 0)
++		return err;
 +
-+			Possible errors: org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.Failed
++	device->key_on_adapter = FALSE;
 +
-+		void Disconnect(string type)
++	emit_property_changed(conn, device->path, DEVICE_INTERFACE, "KeyOnAdapter",
++					DBUS_TYPE_BOOLEAN, &device->key_on_adapter);
 +
-+			This initiates a SAP disconnection from SAP server.
++	return 0;
++}
 +
-+			The type parameter specifies the type of disconnection.
++static DBusMessage *set_key_on_adapter(DBusConnection *conn, DBusMessage *msg,
++						gboolean value, void *data)
++{
++	struct btd_device *device = data;
++	int err;
 +
-+			"Graceful"  -> lets the SAP client initiate a
-+			garceful disconnection.
++	if (value)
++		err = device_put_key_on_adapter(conn, device);
++	else
++		err = device_del_key_on_adapter(conn, device);
 +
-+			"Immediate" -> disconnects the connection
-+			immediately from the server.
++	switch (-err) {
++	case 0:
++		return dbus_message_new_method_return(msg);
++	case EINVAL:
++		return g_dbus_create_error(msg,
++					ERROR_INTERFACE ".NotSupported",
++					"Adapter lacks storage support");
++	case ENOKEY:
++		return g_dbus_create_error(msg,
++					ERROR_INTERFACE ".Failed",
++					"Device is paired but link key is not available");
++	default:
++		return g_dbus_create_error(msg, ERROR_INTERFACE ".Failed",
++						"%s", strerror(-err));
++	}
++}
 +
-+		void SetProperty(string name, variant value)
+ static inline DBusMessage *invalid_args(DBusMessage *msg)
+ {
+ 	return g_dbus_create_error(msg, ERROR_INTERFACE ".InvalidArguments",
+@@ -620,6 +704,15 @@ static DBusMessage *set_property(DBusConnection *conn,
+ 		dbus_message_iter_get_basic(&sub, &value);
+ 
+ 		return set_blocked(conn, msg, value, data);
++	} else if (g_str_equal("KeyOnAdapter", property)) {
++		dbus_bool_t value;
 +
-+			Changes the value of the specified property. Only
-+			properties that are listed a read-write are changeable.
-+			On success this will emit a PropertyChanged signal.
++		if (dbus_message_iter_get_arg_type(&sub) != DBUS_TYPE_BOOLEAN)
++			return invalid_args(msg);
 +
-+			Possible Errors: org.bluez.Error.DoesNotExist
-+					 org.bluez.Error.InvalidArguments
++		dbus_message_iter_get_basic(&sub, &value);
 +
-+		dict GetProperties()
++		return set_key_on_adapter(conn, msg, value, data);
+ 	}
+ 
+ 	return invalid_args(msg);
+@@ -1836,6 +1929,19 @@ void device_set_paired(struct btd_device *device, gboolean value)
+ 				DBUS_TYPE_BOOLEAN, &value);
+ }
+ 
++void device_set_key_on_adapter(struct btd_device *device, gboolean value)
++{
++	DBusConnection *conn = get_dbus_connection();
 +
-+			Returns all properties for the interface. See the
-+			properties section for available properties.
++	if (device->key_on_adapter == value)
++		return;
 +
-+			Possible Errors: org.bluez.Error.InvalidArguments
++	device->key_on_adapter = value;
 +
-+Signals		Request(string command, variant value)
++	emit_property_changed(conn, device->path, DEVICE_INTERFACE, "KeyOnAdapter",
++				DBUS_TYPE_BOOLEAN, &value);
++}
 +
-+			This signal indicates a SAP command received from
-+			SAP client.
-+
-+			The command parameter specifies the SAP command
-+			received.
-+
-+			The value parameter specifies the command parameter
-+			packet received from SAP client.
-+
-+			Below mentioned is the parameters and possible value.
-+
-+			command     	  	value
-+			----------------------------------------------------
-+
-+			Connect		  	NA
-+			APDU		  	Aarray{uint8}
-+			APDU7816	  	Aarray{uint8}
-+			ATR		  	NA
-+			SimPowerOn	  	NA
-+			SimPowerOff	  	NA
-+			Reset		  	NA
-+			CardReaderStatus  	NA
-+			TransportProtocol 	uint8
-+			Disconnect		NA
-+
-+		PropertyChanged(string name, variant value)
-+
-+			This signal indicates a changed value of the given
-+			property.
-+
-+Properties	string SimStatus [readwrite]
-+
-+			Specifies the availability of the SIM.
-+
-+			The possible value are
-+
-+			"UnknownError"
-+			"CardReset"
-+			"CardNotAccesible"
-+			"CardRemoved"
-+			"CardInsterted"
-+			"CardRecovered"
-+
-+		uint16 MaxMessageSize [readwrite]
-+
-+			The maximum possible message size supported by
-+			SAP server.
-+
-+		uint16 MessageSize [readonly]
-+
-+			The negotiated message size for the current connection.
-+			This is valid only when there is an active
-+			SAP connection.
+ static void device_agent_removed(struct agent *agent, void *user_data)
+ {
+ 	struct btd_device *device = user_data;
+diff --git a/src/device.h b/src/device.h
+index 21f67d0..6f57b37 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -55,6 +55,7 @@ gboolean device_is_temporary(struct btd_device *device);
+ gboolean device_is_paired(struct btd_device *device);
+ gboolean device_is_trusted(struct btd_device *device);
+ void device_set_paired(struct btd_device *device, gboolean paired);
++void device_set_key_on_adapter(struct btd_device *device, gboolean key_on_adapter);
+ void device_set_temporary(struct btd_device *device, gboolean temporary);
+ void device_set_cap(struct btd_device *device, uint8_t cap);
+ uint8_t device_get_cap(struct btd_device *device);
 -- 
-1.7.0.4
+1.7.0.1
+
+
+--=-hWCE1jTu6/mYdU1MyzCQ--
 
