@@ -1,57 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 7 Sep 2010 12:29:27 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Suraj Sumangala <suraj@atheros.com>
-Cc: linux-bluetooth@vger.kernel.org, Jothikumar.Mothilal@Atheros.com,
-	joakim.xj.ceder@stericsson.com, claudio.takahasi@gmail.com,
-	Waldemar.Rymarkiewicz@tieto.com, Arkadiusz.Lichwa@tieto.com
-Subject: Re: [RFC] Sim Access Profile API doc
-Message-ID: <20100907092927.GA28640@jh-x301>
-References: <1283839375-20033-1-git-send-email-suraj@atheros.com>
+Message-ID: <4C8605A4.3020300@Atheros.com>
+Date: Tue, 7 Sep 2010 14:58:04 +0530
+From: Suraj Sumangala <suraj@Atheros.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1283839375-20033-1-git-send-email-suraj@atheros.com>
+To: "Waldemar.Rymarkiewicz@tieto.com" <Waldemar.Rymarkiewicz@tieto.com>
+CC: Suraj Sumangala <Suraj.Sumangala@Atheros.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>,
+	"joakim.xj.ceder@stericsson.com" <joakim.xj.ceder@stericsson.com>,
+	"claudio.takahasi@gmail.com" <claudio.takahasi@gmail.com>,
+	"Arkadiusz.Lichwa@tieto.com" <Arkadiusz.Lichwa@tieto.com>
+Subject: Re: [RFC] Sim Access Profile API doc
+References: <1283839375-20033-1-git-send-email-suraj@atheros.com> <99B09243E1A5DA4898CDD8B7001114480979581239@EXMB04.eu.tieto.com>
+In-Reply-To: <99B09243E1A5DA4898CDD8B7001114480979581239@EXMB04.eu.tieto.com>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Suraj,
+Hi Waldek,
 
-On Tue, Sep 07, 2010, Suraj Sumangala wrote:
-> +Methods		void RegisterAgent(object agent)
-> +
-> +			This registers the Sim Access adapter agent.
-> +			This also registers the profile with the service
-> +			Databse and start waiting for an RFCOMM connection
-> +			on the SAP server channel.
-> +
-> +			The object path defines the path the of the agent.
-> +
-> +			If an application disconnects from the bus all
-> +			of its registered agents will be removed.
-> +
-> +			Possible errors: org.bluez.Error.InvalidArguments
-> +					 org.bluez.Error.AlreadyExists
-> +					 org.bluez.Error.Failed
-> +
-> +		void UnregisterAgent(object agent)
-> +
-> +			This unregisters the agent that has been previously
-> +			registered. The object path parameter must match the
-> +			same value that has been used on registration.
-> +
-> +			Possible errors: org.bluez.Error.DoesNotExist
-> +					 org.bluez.Error.InvalidArguments
-> +					 org.bluez.Error.Failed
+On 9/7/2010 2:06 PM, Waldemar.Rymarkiewicz@tieto.com wrote:
+> Hi Suraj,
+>
+>> From: Suraj Sumangala [mailto:suraj@atheros.com]
+>> Sent: Tuesday, September 07, 2010 8:03 AM
+>
+>> +
+>> +		void Disconnect(string type)
+>> +
+>> +			This initiates a SAP disconnection from
+>> SAP server.
+>> +
+>> +			The type parameter specifies the type
+>> of disconnection.
+>> +
+>> +			"Graceful"  ->  lets the SAP client initiate a
+>> +			garceful disconnection.
+>> +
+>> +			"Immediate" ->  disconnects the connection
+>> +			immediately from the server.
+>> +
+>
+> In my view, the disconnection should be initiates by the sap server, not by the agent. In a typical use case the agent will communicate sim state change (card removed or not accessible) to sap server. Based on that, the sap server should make a decision whether disconnect or not. What's more the disconnect procedure is defined in the SAP spec, and would be nice to keep all those procedures in the sap server, not in the agent which will be specific for a sim provider.  Therefore, I would remove this method call from the api.  I would add the Disconnect signal instead.
+>
+> Signal:
+> Disconnect()
+>        This signal will be send when SAP connectionis successfully removed.
+>
+> In case of graceful  disconnection sap server sends signal to the agent REQUEST(disconnect) and wait till  SIM free its stuff and send back RESPONSE(disconnect). In case  of immediate disconnection sap server will send Disconnect() signal to the agent.
 
-So you have these nice agent registration methods, however where's the
-definition of the agent interface? And if you're going to use an agent
-for this (which seems like a good idea) the SAP commands should map to
-D-Bus method calls to the agent and the D-Bus method replies from the
-agent should map to the SAP replies. I.e. please get rid of the D-Bus
-signals and methods you currently have for this.
+Ok, In which all situations should the SAP server decide that the SAP 
+connection has to be disconnected (you have mentioned Sim Status change 
+as one candidate)?
 
-Btw, I'm not 100% convinced that this is the most sensible architecture
-for implementing SAP, but assuming that it is the above comments apply
-:)
+Also, based on what should the server decide to initiate a "Graceful" or 
+"Immediate" disconnection?
 
-Johan
+>
+> Thanks,
+> /Waldek
+
+Regards
+Suraj
+
