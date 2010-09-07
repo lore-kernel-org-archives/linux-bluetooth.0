@@ -1,42 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4C8635FA.5010108@Atheros.com>
-Date: Tue, 7 Sep 2010 18:24:18 +0530
-From: Suraj Sumangala <suraj@Atheros.com>
-MIME-Version: 1.0
-To: <linux-bluetooth@vger.kernel.org>,
-	<Jothikumar.Mothilal@Atheros.com>,
-	<joakim.xj.ceder@stericsson.com>, <claudio.takahasi@gmail.com>,
-	<Waldemar.Rymarkiewicz@tieto.com>, <Arkadiusz.Lichwa@tieto.com>
-Subject: Re: [RFC] Sim Access Profile API doc
-References: <1283839375-20033-1-git-send-email-suraj@atheros.com> <20100907092927.GA28640@jh-x301> <4C860CBE.8060808@Atheros.com> <20100907101230.GA6309@jh-x301>
-In-Reply-To: <20100907101230.GA6309@jh-x301>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+Subject: Re: Patch to improve cupsdir detection
+From: Bastien Nocera <hadess@hadess.net>
+To: Pacho Ramos <pachoramos@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1283854723.24491.3.camel@localhost.localdomain>
+References: <1283854723.24491.3.camel@localhost.localdomain>
+Content-Type: text/plain; charset="ISO-8859-1"
+Date: Tue, 07 Sep 2010 13:48:17 +0100
+Message-ID: <1283863697.7529.42.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+On Tue, 2010-09-07 at 12:18 +0200, Pacho Ramos wrote:
+> Hello
+> 
+> Since really a lot of time we are shipping in Gentoo attached patch to
+> adapt cupsdir to our cups installations (that uses /usr/libexec/cups
+> instead of /usr/lib) :
+> diff --git a/Makefile.tools b/Makefile.tools
+> index d9a2425..a382e05 100644
+> --- a/Makefile.tools
+> +++ b/Makefile.tools
+> @@ -122,7 +122,7 @@ EXTRA_DIST += tools/dfubabel.1 tools/avctrl.8
+>  
+> 
+>  if CUPS
+> -cupsdir = $(libdir)/cups/backend
+> +cupsdir = `cups-config --serverbin`/backend
+>  
+>  cups_PROGRAMS = cups/bluetooth
+> 
+> I send this to inform you about it and, if possible, get it
+> upstreamed :-)
 
-On 9/7/2010 3:42 PM, Johan Hedberg wrote:
-> We're defining an API here, not implementation specific details, so I
-> don't quite understand your concern. What's the point of defining an
-> agent object if it will not receive any method calls? The RegisterAgent
-> might as well be called EnableServer in that case and not contain any
-> object path parameter at all.
->
-> Having a proper agent interface and methods in it corresponding to SAP
-> commands makes much more sense imho than emiting signals for SAP
-> commands and receiving method calls for the SAP replies. It also doesn't
-> in any way restrict the agent side implementation details. A D-Bus
-> method call-method reply pair is a more intuitive mapping to a
-> SAP-command-SAP-response pair compared to a D-Bus signal + method call
-> which don't have any tight API level association (anybody can catch the
-> signal and anybody can send the method call).
->
+Given that the cups backend doesn't actually require the cups headers or
+development packages, you'd need to check for cups-config existing, and
+then use a nice default if not present.
 
-Got your point, Thanks.
-Also, do let me know if you have any other suggestion regarding the 
-interface.
+This should be done in acinclude.m4, with a new macro, which will get
+added to the generated configure.
 
-Regards
-Suraj
+Cheers
 
