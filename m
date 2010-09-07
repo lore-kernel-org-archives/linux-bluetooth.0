@@ -1,87 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
-From: <Waldemar.Rymarkiewicz@tieto.com>
-To: <suraj@Atheros.com>
-CC: <Suraj.Sumangala@Atheros.com>, <linux-bluetooth@vger.kernel.org>,
-	<Jothikumar.Mothilal@Atheros.com>,
-	<joakim.xj.ceder@stericsson.com>, <claudio.takahasi@gmail.com>,
-	<Arkadiusz.Lichwa@tieto.com>
-Date: Tue, 7 Sep 2010 15:24:27 +0300
-Subject: RE: [RFC] Sim Access Profile API doc
-Message-ID: <99B09243E1A5DA4898CDD8B700111448097958141C@EXMB04.eu.tieto.com>
-References: <1283839375-20033-1-git-send-email-suraj@atheros.com>
- <99B09243E1A5DA4898CDD8B7001114480979581239@EXMB04.eu.tieto.com>
- <4C8605A4.3020300@Atheros.com>
-In-Reply-To: <4C8605A4.3020300@Atheros.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+From: Santiago Carot-Nemesio <sancane@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Santiago Carot-Nemesio <sancane@gmail.com>
+Subject: [PATCH] Avoid possible memory leak in mcap_create_mcl function
+Date: Tue,  7 Sep 2010 12:36:42 +0200
+Message-Id: <1283855802-8548-1-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
- Hi Suraj,
+---
+ health/mcap.c |   39 ++++++++++++++++++++++++++++++++++-----
+ 1 files changed, 34 insertions(+), 5 deletions(-)
 
->-----Original Message-----
->From: Suraj Sumangala [mailto:suraj@Atheros.com] 
->Sent: Tuesday, September 07, 2010 11:28 AM
-
->Hi Waldek,
->
->On 9/7/2010 2:06 PM, Waldemar.Rymarkiewicz@tieto.com wrote:
->> Hi Suraj,
->>
->>> From: Suraj Sumangala [mailto:suraj@atheros.com]
->>> Sent: Tuesday, September 07, 2010 8:03 AM
->>
->>> +
->>> +		void Disconnect(string type)
->>> +
->>> +			This initiates a SAP disconnection from
->>> SAP server.
->>> +
->>> +			The type parameter specifies the type
->>> of disconnection.
->>> +
->>> +			"Graceful"  ->  lets the SAP client initiate a
->>> +			garceful disconnection.
->>> +
->>> +			"Immediate" ->  disconnects the connection
->>> +			immediately from the server.
->>> +
->>
->> In my view, the disconnection should be initiates by the sap 
->server, not by the agent. In a typical use case the agent will 
->communicate sim state change (card removed or not accessible) 
->to sap server. Based on that, the sap server should make a 
->decision whether disconnect or not. What's more the disconnect 
->procedure is defined in the SAP spec, and would be nice to 
->keep all those procedures in the sap server, not in the agent 
->which will be specific for a sim provider.  Therefore, I would 
->remove this method call from the api.  I would add the 
->Disconnect signal instead.
->>
->> Signal:
->> Disconnect()
->>        This signal will be send when SAP connectionis 
->successfully removed.
->>
->> In case of graceful  disconnection sap server sends signal 
->to the agent REQUEST(disconnect) and wait till  SIM free its 
->stuff and send back RESPONSE(disconnect). In case  of 
->immediate disconnection sap server will send Disconnect() 
->signal to the agent.
->
->Ok, In which all situations should the SAP server decide that 
->the SAP connection has to be disconnected (you have mentioned 
->Sim Status change as one candidate)?
->Also, based on what should the server decide to initiate a 
->"Graceful" or "Immediate" disconnection?
-
-Well, I thought this over and in case of sim state change sap should propagate this change to sap client, not disconnect. The only place when sap sever uses immediate disconnection imho are problems on the connection with agent (dbus errors), and the graceful disconnection should be used in case when the user want to stop sap server. In this point  Enable/Disable methods are missing to let the User chance to stop/run sap server.
-
-/Waldek
-
-
-
-
-
-
+diff --git a/health/mcap.c b/health/mcap.c
+index 6f1e565..a9a1190 100644
+--- a/health/mcap.c
++++ b/health/mcap.c
+@@ -783,6 +783,17 @@ static void mcap_uncache_mcl(struct mcap_mcl *mcl)
+ 	mcl->ctrl &= ~MCAP_CTRL_FREE;
+ }
+ 
++static void close_connecting_mcl(struct mcap_mcl *mcl)
++{
++	mcl->ctrl &= ~MCAP_CTRL_CONN;
++
++	if (mcl->ctrl & MCAP_CTRL_FREE) {
++		/* We have closed an MCL marked as releseable */
++		/* while it was in connecting process */
++		mcl->ms->mcl_uncached_cb(mcl, mcl->ms->user_data);
++	}
++}
++
+ void mcap_close_mcl(struct mcap_mcl *mcl, gboolean cache)
+ {
+ 	if (!mcl)
+@@ -792,6 +803,9 @@ void mcap_close_mcl(struct mcap_mcl *mcl, gboolean cache)
+ 		g_io_channel_shutdown(mcl->cc, TRUE, NULL);
+ 		g_io_channel_unref(mcl->cc);
+ 		mcl->cc = NULL;
++
++		if (mcl->ctrl & MCAP_CTRL_CONN)
++			close_connecting_mcl(mcl);
+ 	}
+ 
+ 	mcl->state = MCL_IDLE;
+@@ -1674,8 +1688,6 @@ static void mcap_connect_mcl_cb(GIOChannel *chan, GError *conn_err,
+ 	gpointer data = con->user_data;
+ 	GError *gerr = NULL;
+ 
+-	g_free(con);
+-
+ 	mcl->ctrl &= ~MCAP_CTRL_CONN;
+ 
+ 	if (conn_err) {
+@@ -1739,6 +1751,21 @@ static void connect_dc_event_cb(GIOChannel *chan, GError *err,
+ 	mcl->cb->mdl_connected(mdl, mcl->cb->user_data);
+ }
+ 
++static void mcl_io_destroy(gpointer data)
++{
++	struct connect_mcl *con = data;
++	struct mcap_mcl *mcl = con->mcl;
++
++	g_free(con);
++
++	if ((mcl->state != MCL_IDLE) || (mcl->ctrl & MCAP_CTRL_CACHED))
++		return;
++
++	/* This is a new MCL or another MCL removed */
++	/* from MCAP cache so we have to release it */
++	mcap_mcl_unref(mcl);
++}
++
+ gboolean mcap_create_mcl(struct mcap_instance *ms,
+ 				const bdaddr_t *addr,
+ 				uint16_t ccpsm,
+@@ -1765,8 +1792,9 @@ gboolean mcap_create_mcl(struct mcap_instance *ms,
+ 		set_default_cb(mcl);
+ 		mcl->next_mdl = (rand() % MCAP_MDLID_FINAL) + 1;
+ 		mcl = mcap_mcl_ref(mcl);
+-	} else
+-		mcl->ctrl |= MCAP_CTRL_CONN;
++	}
++
++	mcl->ctrl |= MCAP_CTRL_CONN;
+ 
+ 	con = g_new0(struct connect_mcl, 1);
+ 	con->mcl = mcl;
+@@ -1774,13 +1802,14 @@ gboolean mcap_create_mcl(struct mcap_instance *ms,
+ 	con->user_data = user_data;
+ 
+ 	mcl->cc = bt_io_connect(BT_IO_L2CAP, mcap_connect_mcl_cb, con,
+-				NULL, err,
++				mcl_io_destroy, err,
+ 				BT_IO_OPT_SOURCE_BDADDR, &ms->src,
+ 				BT_IO_OPT_DEST_BDADDR, addr,
+ 				BT_IO_OPT_PSM, ccpsm,
+ 				BT_IO_OPT_MTU, MCAP_CC_MTU,
+ 				BT_IO_OPT_SEC_LEVEL, ms->sec,
+ 				BT_IO_OPT_INVALID);
++
+ 	if (!mcl->cc) {
+ 		g_free(con);
+ 		mcl->ctrl &= ~MCAP_CTRL_CONN;
+-- 
+1.7.0.4
 
