@@ -1,26 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 7 Sep 2010 12:47:10 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Waldemar.Rymarkiewicz@tieto.com
-Cc: u.kleine-koenig@pengutronix.de, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix clean-local target
-Message-ID: <20100907094710.GA5680@jh-x301>
-References: <1283513613-6860-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
- <20100903191937.GA29821@pengutronix.de>
- <99B09243E1A5DA4898CDD8B700111448097958128E@EXMB04.eu.tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <99B09243E1A5DA4898CDD8B700111448097958128E@EXMB04.eu.tieto.com>
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2 2/3] Bluetooth: check for l2cap header in start fragment
+Date: Tue,  7 Sep 2010 11:57:46 +0300
+Message-Id: <1283849867-916-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1283849867-916-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1283849867-916-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Waldek,
+From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 
-On Tue, Sep 07, 2010, Waldemar.Rymarkiewicz@tieto.com wrote:
-> @Johan:  Will you consider to push it to upstream ?
+BLUETOOTH SPECIFICATION Version 4.0 [Vol 3] page 36 mentioned
+"Note: Start Fragments always begin with the Basic L2CAP header
+of a PDU."
 
-Yes, it's now upstream. I was waiting for a comment from Marcel since he
-quite often has something to say about autotools file changes, but since
-the patch seems quite trivial I went ahead and pushed it.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+---
+ net/bluetooth/l2cap.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-Johan
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index 9fad312..774e134 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -4664,7 +4664,7 @@ static int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 fl
+ 			l2cap_conn_unreliable(conn, ECOMM);
+ 		}
+ 
+-		if (skb->len < 2) {
++		if (skb->len < L2CAP_HDR_SIZE) {
+ 			BT_ERR("Frame is too short (len %d)", skb->len);
+ 			l2cap_conn_unreliable(conn, ECOMM);
+ 			goto drop;
+-- 
+1.7.0.4
+
