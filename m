@@ -4,83 +4,54 @@ To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	gustavo@padovan.org,
 	rshaffer@codeaurora.org,
-	haijun.liu@atheros.com,
 	linux-arm-msm@vger.kernel.org,
 	Mat Martineau <mathewm@codeaurora.org>
-Subject: [PATCH v3] Bluetooth: Add socket option definitions for AMP
-Date: Wed,  8 Sep 2010 10:16:33 -0700
-Message-Id: <1283966193-17831-1-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCH 4/4] Bluetooth: Use a stream-oriented recvmsg with SOCK_STREAM L2CAP sockets.
+Date: Wed,  8 Sep 2010 10:05:29 -0700
+Message-Id: <1283965529-17068-5-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <1283965529-17068-1-git-send-email-mathewm@codeaurora.org>
+References: <1283965529-17068-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds a new BT_AMP socket option to control the use of AMP channels.
-It is for use with the SOL_BLUETOOTH option level on L2CAP sockets.
+L2CAP ERTM sockets can be opened with the SOCK_STREAM socket type,
+which is a mandatory request for ERTM mode.
 
-Available option values are defined as:
+However, these sockets still have SOCK_SEQPACKET read semantics when
+bt_sock_recvmsg() is used to pull data from the receive queue.  If the
+application is only reading part of a frame, then the unread portion
+of the frame is discarded.  If the application requests more bytes
+than are in the current frame, only the current frame's data is
+returned.
 
-BT_AMP_REQUIRE_BR_EDR
- * Default
- * AMP controllers cannot be used
- * Channel move requests from the remote device are denied
- * If the L2CAP channel is currently using AMP, move the channel to
-   BR/EDR
-
-BT_AMP_PREFER_AMP
- * Allow use of AMP controllers
- * If the L2CAP channel is currently on BR/EDR and AMP controller
-   resources are available, initiate a channel move to AMP
- * Channel move requests from the remote device are allowed
- * If the L2CAP socket has not been connected yet, try to create
-   and configure the channel directly on an AMP controller rather
-   than BR/EDR
-
-BT_AMP_PREFER_BR_EDR
- * Allow use of AMP controllers
- * If the L2CAP channel is currently on AMP, move it to BR/EDR
- * Channel move requests from the remote device are allowed
+This patch utilizes common code derived from RFCOMM's recvmsg()
+function to make L2CAP SOCK_STREAM reads behave like RFCOMM reads (and
+other SOCK_STREAM sockets in general).  The application may read one
+byte at a time from the input stream and not lose any data, and may
+also read across L2CAP frame boundaries.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- include/net/bluetooth/bluetooth.h |   28 ++++++++++++++++++++++++++++
- 1 files changed, 28 insertions(+), 0 deletions(-)
+ net/bluetooth/l2cap.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 27a902d..d2c62dc 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -64,6 +64,34 @@ struct bt_security {
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index b5eff42..38aa78c 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -1961,6 +1961,9 @@ static int l2cap_sock_recvmsg(struct kiocb *iocb, struct socket *sock, struct ms
  
- #define BT_DEFER_SETUP	7
+ 	release_sock(sk);
  
++	if (sock->type == SOCK_STREAM)
++		return bt_sock_stream_recvmsg(iocb, sock, msg, len, flags);
 +
-+#define BT_AMP_POLICY		8
-+
-+/* Require BR/EDR (default policy)
-+ *   AMP controllers cannot be used
-+ *   Channel move requests from the remote device are denied
-+ *   If the L2CAP channel is currently using AMP, move the channel to BR/EDR
-+ */
-+#define BT_AMP_POLICY_REQUIRE_BR_EDR	0
-+
-+/* Prefer AMP
-+ *   Allow use of AMP controllers
-+ *   If the L2CAP channel is currently on BR/EDR and AMP controller
-+ *     resources are available, initiate a channel move to AMP
-+ *   Channel move requests from the remote device are allowed
-+ *   If the L2CAP socket has not been connected yet, try to create
-+ *     and configure the channel directly on an AMP controller rather
-+ *     than BR/EDR
-+ */
-+#define BT_AMP_POLICY_PREFER_AMP	1
-+
-+/* Prefer BR/EDR
-+ *   Allow use of AMP controllers
-+ *   If the L2CAP channel is currently on AMP, move it to BR/EDR
-+ *   Channel move requests from the remote device are allowed
-+ */
-+#define BT_AMP_POLICY_PREFER_BR_EDR	2
-+
- #define BT_INFO(fmt, arg...) printk(KERN_INFO "Bluetooth: " fmt "\n" , ## arg)
- #define BT_ERR(fmt, arg...)  printk(KERN_ERR "%s: " fmt "\n" , __func__ , ## arg)
- #define BT_DBG(fmt, arg...)  pr_debug("%s: " fmt "\n" , __func__ , ## arg)
+ 	return bt_sock_recvmsg(iocb, sock, msg, len, flags);
+ }
+ 
 -- 
 1.7.1
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
