@@ -1,73 +1,107 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mat Martineau <mathewm@codeaurora.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	gustavo@padovan.org,
-	rshaffer@codeaurora.org,
-	linux-arm-msm@vger.kernel.org,
-	Mat Martineau <mathewm@codeaurora.org>
-Subject: [PATCH 1/4] Bluetooth: Validate PSM values in calls to connect() and bind()
-Date: Wed,  8 Sep 2010 10:05:26 -0700
-Message-Id: <1283965529-17068-2-git-send-email-mathewm@codeaurora.org>
-In-Reply-To: <1283965529-17068-1-git-send-email-mathewm@codeaurora.org>
-References: <1283965529-17068-1-git-send-email-mathewm@codeaurora.org>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Wed, 8 Sep 2010 13:58:44 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+	rshaffer@codeaurora.org, haijun.liu@atheros.com,
+	linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v2] Bluetooth:  Add socket option definitions for AMP
+Message-ID: <20100908165844.GH16973@vigoh>
+References: <1283964374-16885-1-git-send-email-mathewm@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1283964374-16885-1-git-send-email-mathewm@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Valid L2CAP PSMs are odd numbers, and the least significant bit of the
-most significant byte must be 0.
+Hi Mat,
 
-Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
----
- net/bluetooth/l2cap.c |   25 +++++++++++++++++++++----
- 1 files changed, 21 insertions(+), 4 deletions(-)
+* Mat Martineau <mathewm@codeaurora.org> [2010-09-08 09:46:14 -0700]:
 
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index c784703..b5eff42 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -1008,10 +1008,20 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
- 		goto done;
- 	}
- 
--	if (la.l2_psm && __le16_to_cpu(la.l2_psm) < 0x1001 &&
--				!capable(CAP_NET_BIND_SERVICE)) {
--		err = -EACCES;
--		goto done;
-+	if (la.l2_psm) {
-+		__u16 psm = __le16_to_cpu(la.l2_psm);
-+
-+		/* PSM must be odd and lsb of upper byte must be 0 */
-+		if ((psm & 0x0101) != 0x0001) {
-+			err = -EINVAL;
-+			goto done;
-+		}
-+
-+		/* Restrict usage of well-known PSMs */
-+		if (psm < 0x1001 && !capable(CAP_NET_BIND_SERVICE)) {
-+			err = -EACCES;
-+			goto done;
-+		}
- 	}
- 
- 	write_lock_bh(&l2cap_sk_list.lock);
-@@ -1190,6 +1200,13 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
- 		goto done;
- 	}
- 
-+	/* PSM must be odd and lsb of upper byte must be 0 */
-+	if ((__le16_to_cpu(la.l2_psm) & 0x0101) != 0x0001 &&
-+		sk->sk_type != SOCK_RAW) {
-+		err = -EINVAL;
-+		goto done;
-+	}
-+
- 	/* Set destination address and psm */
- 	bacpy(&bt_sk(sk)->dst, &la.l2_bdaddr);
- 	l2cap_pi(sk)->psm = la.l2_psm;
+> This adds a new BT_AMP socket option to control the use of AMP channels.
+> It is for use with the SOL_BLUETOOTH option level on L2CAP sockets.
+> 
+> Available option values are defined as:
+> 
+> BT_AMP_REQUIRE_BR_EDR
+>  * Default
+>  * AMP controllers cannot be used
+>  * Channel move requests from the remote device are denied
+>  * If the L2CAP channel is currently using AMP, move the channel to
+>    BR/EDR
+> 
+> BT_AMP_PREFER_AMP
+>  * Allow use of AMP controllers
+>  * If the L2CAP channel is currently on BR/EDR and AMP controller
+>    resources are available, initiate a channel move to AMP
+>  * Channel move requests from the remote device are allowed
+>  * If the L2CAP socket has not been connected yet, try to create
+>    and configure the channel directly on an AMP controller rather
+>    than BR/EDR
+> 
+> BT_AMP_PREFER_BR_EDR
+>  * Allow use of AMP controllers
+>  * If the L2CAP channel is currently on AMP, move it to BR/EDR
+>  * Channel move requests from the remote device are allowed
+> 
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> ---
+>  include/net/bluetooth/bluetooth.h |   25 +++++++++++++++++++++++++
+>  1 files changed, 25 insertions(+), 0 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+> index 27a902d..5e8b6c3 100644
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -64,6 +64,31 @@ struct bt_security {
+>  
+>  #define BT_DEFER_SETUP	7
+>  
+> +
+> +#define BT_AMP_POLICY		8
+
+Please add a empty line here.
+
+> +/* Require BR/EDR (default policy)
+> + *   AMP controllers cannot be used
+> + *   Channel move requests from the remote device are denied
+> + *   If the L2CAP channel is currently using AMP, move the channel to BR/EDR
+> + */
+> +#define BT_AMP_POLICY_REQUIRE_BR_EDR	0
+
+And here.
+
+> +/* Prefer AMP
+> + *   Allow use of AMP controllers
+> + *   If the L2CAP channel is currently on BR/EDR and AMP controller
+> + *     resources are available, initiate a channel move to AMP
+> + *   Channel move requests from the remote device are allowed
+> + *   If the L2CAP socket has not been connected yet, try to create
+> + *     and configure the channel directly on an AMP controller rather
+> + *     than BR/EDR
+> + */
+> +#define BT_AMP_POLICY_PREFER_AMP	1
+
+And here.
+
+> +/* Prefer BR/EDR
+> + *   Allow use of AMP controllers
+> + *   If the L2CAP channel is currently on AMP, move it to BR/EDR
+> + *   Channel move requests from the remote device are allowed
+> + */
+> +#define BT_AMP_POLICY_PREFER_BR_EDR	2
+> +
+>  #define BT_INFO(fmt, arg...) printk(KERN_INFO "Bluetooth: " fmt "\n" , ## arg)
+>  #define BT_ERR(fmt, arg...)  printk(KERN_ERR "%s: " fmt "\n" , __func__ , ## arg)
+>  #define BT_DBG(fmt, arg...)  pr_debug("%s: " fmt "\n" , __func__ , ## arg)
+> -- 
+> 1.7.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
 -- 
-1.7.1
-
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+Gustavo F. Padovan
+roFUSION embedded systems - http://profusion.mobi
