@@ -1,34 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Fix closing stream of locked sep when reconfiguring
-Date: Wed,  8 Sep 2010 18:13:43 +0300
-Message-Id: <1283958823-4811-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH] Bluetooth: remove extra newline from debug output
+Date: Wed,  8 Sep 2010 16:26:53 +0300
+Message-Id: <1283952413-22791-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 
-Stream should only be closed if sep is unlocked otherwise there is a
-possibility that sep reconfiguration is triggered although the sep is in
-use by the user application.
+
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 ---
- audio/a2dp.c |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
+ net/bluetooth/rfcomm/core.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/audio/a2dp.c b/audio/a2dp.c
-index b062aed..ef0df17 100644
---- a/audio/a2dp.c
-+++ b/audio/a2dp.c
-@@ -1393,6 +1393,8 @@ unsigned int a2dp_config(struct avdtp *session, struct a2dp_sep *sep,
- 		}
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index 16b79f3..a7e4f2d 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -1698,7 +1698,7 @@ static int rfcomm_recv_frame(struct rfcomm_session *s, struct sk_buff *skb)
+ 		break;
  
- 		if (l != NULL) {
-+			if (a2dp_sep_get_lock(tmp))
-+				goto failed;
- 			setup->reconfigure = TRUE;
- 			if (avdtp_close(session, tmp->stream, FALSE) < 0) {
- 				error("avdtp_close failed");
+ 	default:
+-		BT_ERR("Unknown packet type 0x%02x\n", type);
++		BT_ERR("Unknown packet type 0x%02x", type);
+ 		break;
+ 	}
+ 	kfree_skb(skb);
 -- 
 1.7.0.4
 
