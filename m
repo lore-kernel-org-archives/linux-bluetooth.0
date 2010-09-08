@@ -1,32 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 08 Sep 2010 11:38:48 +0900
-From: =?ks_c_5601-1987?B?udrC+b+t?= <chanyeol.park@samsung.com>
-Subject: RE: MP3 over A2DP issue
-In-reply-to: <AANLkTi=Q=E2uUBXuyBuOdrxiyWU+meiFLkaef3xvwQ1=@mail.gmail.com>
-To: 'pl bossart' <bossart.nospam@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Message-id: <001301cb4efe$f723f660$e56be320$%park@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=ks_c_5601-1987
-References: <AANLkTi=Q=E2uUBXuyBuOdrxiyWU+meiFLkaef3xvwQ1=@mail.gmail.com>
+MIME-Version: 1.0
+Date: Tue, 7 Sep 2010 20:35:20 -0500
+Message-ID: <AANLkTi=Q=E2uUBXuyBuOdrxiyWU+meiFLkaef3xvwQ1=@mail.gmail.com>
+Subject: MP3 over A2DP issue
+From: pl bossart <bossart.nospam@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
-
-Hi
-
-Could you send me "bluetoothd" log?
-
-Thanks
-Chanyeol,Park
-
-
-
------Original Message-----
-From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-owner@vger.kernel.org] On Behalf Of pl bossart
-Sent: Wednesday, September 08, 2010 10:35 AM
-To: linux-bluetooth@vger.kernel.org
-Subject: MP3 over A2DP issue
 
 Hi,
 I have been doing some experiments to extend PulseAudio to support
@@ -41,8 +22,7 @@ some reason the BT_OPEN request fails. Here's the log I am getting.
 
 D: module-bluetooth-device.c: Connected to the bluetooth audio service
 D: module-bluetooth-device.c: Sending BT_REQUEST -> BT_GET_CAPABILITIES
-D: module-bluetooth-device.c: Trying to receive message from audio
-service...
+D: module-bluetooth-device.c: Trying to receive message from audio service...
 D: module-bluetooth-device.c: Received BT_RESPONSE <- BT_GET_CAPABILITIES
 D: module-bluetooth-device.c: Payload size is 26 6
 E: module-bluetooth-device.c: BT Codec: seid 1 transport 0 type 1
@@ -60,8 +40,7 @@ max_bitpool 51
 E: module-bluetooth-device.c: sbc seid 1
 D: module-bluetooth-device.c: Got device capabilities
 D: module-bluetooth-device.c: Sending BT_REQUEST -> BT_OPEN
-D: module-bluetooth-device.c: Trying to receive message from audio
-service...
+D: module-bluetooth-device.c: Trying to receive message from audio service...
 D: module-bluetooth-device.c: Received BT_ERROR <- BT_OPEN
 E: module-bluetooth-device.c: Received error condition: Invalid argument
 E: module-bluetooth-device.c: BT_OPEN expect failed
@@ -114,9 +93,3 @@ Bear with me, I am far from my audio comfort zone here. Any pointers
 would be appreciated.
 Thanks,
 -Pierre
---
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
