@@ -1,38 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Wed, 8 Sep 2010 12:42:44 +0530
-Message-ID: <AANLkTikqcStDkjZT4DcvKC24OuJyY3x-mqXXkFztX6=p@mail.gmail.com>
-Subject: To support APM 6658
-From: Zaahir Khan <kn.zahirkhan@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <AANLkTim9LjKjVgw-aSbjTrH0wZsvzHV=W3p4gadau4t3@mail.gmail.com>
+References: <AANLkTim7WPm4nyKVwU36ASMDTF_5N=eB8AnfutcODMv9@mail.gmail.com>
+	<AANLkTikfGdrt2gL0gVnjA6gPYw1i+PXpbyWw0kFEf6gz@mail.gmail.com>
+	<AANLkTim9LjKjVgw-aSbjTrH0wZsvzHV=W3p4gadau4t3@mail.gmail.com>
+Date: Wed, 8 Sep 2010 11:39:30 +0530
+Message-ID: <AANLkTikwdYr_xcOEaaJGfHxR86o=zE+Gw0s4J5_HnmTE@mail.gmail.com>
+Subject: Re: Why is l2cap_connect re-implemented in gattool instead of using
+ btio wrappers?
+From: Arun Kumar <arunkat@gmail.com>
+To: Vinicius Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hello Vinicius
 
-We are going to use APM 6658 combo WiFi and BT chip.
-Our requirement is to Print through BT over UART.
-We are using freescale iMX257 PDK board and
-linux kenel 2.6.31 which got the support for Bluez-libs-2.25,
-Bluez-utils-2.25 and kernel modules.
-But your forum suggest Bluez-libs-2.25 and Bluez-utils-2.25 are obsolete.
+Thanks for the reply. However I am referring to latest Bluez 4.70 file
+gatttool.c which implements its own version l2cap_
+connect(void) rather than an old version of gatttool.c.
 
-And latest packages are as follows
-bluez-4.70.tar.gz
-bluez-firmware-1.2.tar.gz
-bluez-hcidump-1.4.2.tar.gz
-obexd-0.30.tar.gz
+Do you mean to say that this l2cap_connect() would get deprecated and
+btio routines be used instead in later bluez versions?
 
-For our requirement, do we need go for above all four packages or else
-please suggest??
-As we understand bluez-4.70.tar.gz will be containing Bluez-libs-2.25
-and Bluez-utils-2.25.
-and obexd-0.30.tar.gz for object exchange.
+-- 
+Best Regards,
+Arun Kumar Singh
+www.crazydaks.com
 
-Do we need bluez-firmware-1.2.tar.gz and bluez-hcidump-1.4.2.tar.gz also ??
-Any help highly appretiaed
 
-Thanks & regards,
-
-Zaahir Khan
+On Wed, Sep 8, 2010 at 5:43 AM, Vinicius Gomes
+<vinicius.gomes@openbossa.org> wrote:
+> Hi Arun,
+>
+> On Tue, Sep 7, 2010 at 3:06 PM, Arun Kumar <arunkat@gmail.com> wrote:
+>> Hi,
+>>
+>>  Just trying to understand the need for a separate l2cap_connect
+>>  re-implemention in gatttool.c instead of using bt_io_connect( ) wrapper
+>>  from
+>>  btio.c? Since current GATT implementation tries to work on existing BR/EDR,
+>>  cant btio wrapper suffice for this initial step...
+>>
+>
+> An initial version of gatttool used to have support for ATT/GATT over
+> Unix sockets, we did not use btio because it allowed us to reuse most
+> of the connection code.
+>
+> Now that the Unix socket support was removed, there's no real reason
+> not use the btio functions.
+>
+>> Best regards,
+>> Arun
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>
+>
+> Cheers,
+> --
+> Vinicius
+>
