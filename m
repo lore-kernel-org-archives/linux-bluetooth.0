@@ -1,33 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 9 Sep 2010 13:38:42 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Zhenhua Zhang <zhenhua.zhang@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/4] btio: Remove unused bt_io_set function
-Message-ID: <20100909101901.GA16324@jh-x301>
-References: <1284025283-3773-1-git-send-email-zhenhua.zhang@intel.com>
- <1284025283-3773-4-git-send-email-zhenhua.zhang@intel.com>
+Message-ID: <4C88B61E.8040303@csr.com>
+Date: Thu, 09 Sep 2010 11:25:34 +0100
+From: David Vrabel <david.vrabel@csr.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1284025283-3773-4-git-send-email-zhenhua.zhang@intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Mat Martineau <mathewm@codeaurora.org>
+CC: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, gustavo@padovan.org,
+        rshaffer@codeaurora.org, haijun.liu@atheros.com,
+        linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v3] Bluetooth: Add socket option definitions for AMP
+References: <1283966193-17831-1-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <1283966193-17831-1-git-send-email-mathewm@codeaurora.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Mat Martineau wrote:
+> This adds a new BT_AMP socket option to control the use of AMP channels.
+> It is for use with the SOL_BLUETOOTH option level on L2CAP sockets.
 
-On Thu, Sep 09, 2010, Zhenhua Zhang wrote:
-> It is not used by either obex or bluez.
-> ---
->  btio/btio.c |   33 ---------------------------------
->  btio/btio.h |    3 ---
->  2 files changed, 0 insertions(+), 36 deletions(-)
+Looks good.
 
-I don't think removing this feature is a good idea. Even though there
-aren't any current users of bt_io_set doesn't mean that there wont be in
-the future. I remember e.g. discussions regarding AMP about applications
-needing the ability to request a switch from BR/EDR to WLAN for an
-active connection. This could e.g. be accomplished through a setsockopt
-call. Other uses for setsockopt while a connection is open, or even
-changing settings for an existing server socket might exist too.
+David
+-- 
+David Vrabel, Senior Software Engineer, Drivers
+CSR, Churchill House, Cambridge Business Park,  Tel: +44 (0)1223 692562
+Cowley Road, Cambridge, CB4 0WZ                 http://www.csr.com/
 
-Johan
+
+Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
