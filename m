@@ -1,29 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4C88B61E.8040303@csr.com>
-Date: Thu, 09 Sep 2010 11:25:34 +0100
-From: David Vrabel <david.vrabel@csr.com>
-MIME-Version: 1.0
-To: Mat Martineau <mathewm@codeaurora.org>
-CC: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, gustavo@padovan.org,
-        rshaffer@codeaurora.org, haijun.liu@atheros.com,
-        linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v3] Bluetooth: Add socket option definitions for AMP
-References: <1283966193-17831-1-git-send-email-mathewm@codeaurora.org>
-In-Reply-To: <1283966193-17831-1-git-send-email-mathewm@codeaurora.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Zhenhua Zhang <zhenhua.zhang@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 4/4] btio: Add ifndef/endif guard for btio.h
+Date: Thu,  9 Sep 2010 17:43:08 +0800
+Message-Id: <1284025388-3831-5-git-send-email-zhenhua.zhang@intel.com>
+In-Reply-To: <1284025388-3831-1-git-send-email-zhenhua.zhang@intel.com>
+References: <1284025388-3831-1-git-send-email-zhenhua.zhang@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Mat Martineau wrote:
-> This adds a new BT_AMP socket option to control the use of AMP channels.
-> It is for use with the SOL_BLUETOOTH option level on L2CAP sockets.
+To avoid circular inclusion of include file.
+---
+ btio/btio.h |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
-Looks good.
-
-David
+diff --git a/btio/btio.h b/btio/btio.h
+index 89d3d08..5f2911a 100644
+--- a/btio/btio.h
++++ b/btio/btio.h
+@@ -21,6 +21,8 @@
+  *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  *
+  */
++#ifndef BT_IO_H
++#define BT_IO_H
+ 
+ #include <glib.h>
+ 
+@@ -89,3 +91,4 @@ GIOChannel *bt_io_listen(BtIOType type, BtIOConnect connect,
+ 				GDestroyNotify destroy, GError **err,
+ 				BtIOOption opt1, ...);
+ 
++#endif
 -- 
-David Vrabel, Senior Software Engineer, Drivers
-CSR, Churchill House, Cambridge Business Park,  Tel: +44 (0)1223 692562
-Cowley Road, Cambridge, CB4 0WZ                 http://www.csr.com/
+1.7.0.4
 
-
-Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
