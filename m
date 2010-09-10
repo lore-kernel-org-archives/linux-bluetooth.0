@@ -1,55 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <4C8A3537.2010606@openbossa.org>
-References: <AANLkTikJFwwjs53_2F6NuBd-e00p1AnYahPMwYNgrveE@mail.gmail.com>
-	<4C8A3537.2010606@openbossa.org>
-Date: Fri, 10 Sep 2010 11:53:08 -0500
-Message-ID: <AANLkTin02sOL89MuUhWe1_nOg4umytfJKRfc=Z_dhpRq@mail.gmail.com>
-Subject: Re: set LE advertise not working...
-From: Pavan Savoy <pavan_savoy@sify.com>
-To: Anderson Briglia <anderson.briglia@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+From: Anderson Briglia <anderson.briglia@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Briglia <anderson.briglia@openbossa.org>
+Subject: [PATCH v2 2/2] Bluetooth: Implement LE Set Scan Enable cmd
+Date: Fri, 10 Sep 2010 11:14:56 -0400
+Message-Id: <1284131696-26117-2-git-send-email-anderson.briglia@openbossa.org>
+In-Reply-To: <1284131696-26117-1-git-send-email-anderson.briglia@openbossa.org>
+References: <1284131696-26117-1-git-send-email-anderson.briglia@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Nope, I haven't applied the kernel patches...
-But my kernel diff to the latest kernel is only regarding the "block"
-and "unblock" to black list devices....
+This patch implements LE Set Scan Enable command for dual
+mode and Low Energy hci controllers. It also adds new HCI flags
+in order to indicate the LE Scanning state for userland applications
+and kernel itself.
 
-do I need some patches in kernel for enabling/disabling BLE too ?
-I thought it just sends out the commands to controller...
+Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
+---
+ include/net/bluetooth/hci.h |    5 +++++
+ net/bluetooth/hci_event.c   |   27 +++++++++++++++++++++++++++
+ 2 files changed, 32 insertions(+), 0 deletions(-)
 
-On Fri, Sep 10, 2010 at 8:40 AM, Anderson Briglia
-<anderson.briglia@openbossa.org> wrote:
-> Hi Pavan,
->
-> Try to make a hciconfig reset before setting leadv.
-> Are you using that kernel patches I send before, right?
->
-> Regards,
->
-> Anderson Briglia
->
-> On 09/09/2010 03:58 PM, Pavan Savoy wrote:
->>
->> I have an LE enabled BT controller, and I happened to send across a
->> simple "leadv" from the recently updated hciconfig
->> I got back the following data
->> "4 e 5 1 a 20 c 3a" and hence
->> "Can't set advertise mode on hci0: Success (0)"
->> and 0xC I guess by the BT spec means the command is disallowed (for
->> reasons unknown?....)
->>
->> So I'm just wondering, am I supposed to run some HCI-VS commands to
->> enable LE? I mean I should ask my vendor I agree, but anyone who has
->> got it working.. do they run some VS commands before enabling LE
->> advertising?
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
->> in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->
->
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index a28e92b..752c942 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -78,6 +78,7 @@ enum {
+ 	HCI_RAW,
+ 
+ 	HCI_LE_ADV,
++	HCI_LE_SCAN,
+ };
+ 
+ /* HCI ioctl defines */
+@@ -600,6 +601,10 @@ struct hci_rp_read_bd_addr {
+ 	#define ADVERTISE_ENABLED	0x01
+ 	#define ADVERTISE_DISABLED	0x00
+ 
++#define HCI_OP_LE_SET_SCAN_ENABLE	0x200c
++	#define LE_SCAN_ENABLED		0x01
++	#define LE_SCAN_DISABLED	0x00
++
+ /* ---- HCI Events ---- */
+ #define HCI_EV_INQUIRY_COMPLETE		0x01
+ 
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 51e2776..c4bfbdc 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -845,6 +845,29 @@ static void hci_cc_le_set_advertise(struct hci_dev *hdev, struct sk_buff *skb)
+ 	hci_req_complete(hdev, status);
+ }
+ 
++static void hci_cc_le_set_scan(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	__u8 status = *((__u8 *) skb->data);
++	void *sent;
++
++	BT_DBG("%s status 0x%x", hdev->name, status);
++
++	sent = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_SCAN_ENABLE);
++	if (!sent)
++		return;
++
++	if (!status) {
++		__u8 param = *((__u8 *) sent);
++
++		if (param & LE_SCAN_ENABLED)
++			set_bit(HCI_LE_SCAN, &hdev->flags);
++		else
++			clear_bit(HCI_LE_SCAN, &hdev->flags);
++	}
++
++	hci_req_complete(hdev, status);
++}
++
+ static inline void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	__u8 status = *((__u8 *) skb->data);
+@@ -1337,6 +1360,10 @@ static inline void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *sk
+ 		hci_cc_le_set_advertise(hdev, skb);
+ 		break;
+ 
++	case HCI_OP_LE_SET_SCAN_ENABLE:
++		hci_cc_le_set_scan(hdev, skb);
++		break;
++
+ 	default:
+ 		BT_DBG("%s opcode 0x%x", hdev->name, opcode);
+ 		break;
+-- 
+1.7.0.4
+
