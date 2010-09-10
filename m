@@ -2,82 +2,84 @@ Return-Path: <cyrus@holtmann.org>
 From: Zhenhua Zhang <zhenhua.zhang@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Subject: [PATCH 2/3] btio: Seperate btio.[ch] into btio directory
-Date: Fri, 10 Sep 2010 10:49:43 +0800
-Message-Id: <1284086984-17072-3-git-send-email-zhenhua.zhang@intel.com>
-In-Reply-To: <1284086984-17072-1-git-send-email-zhenhua.zhang@intel.com>
-References: <1284086984-17072-1-git-send-email-zhenhua.zhang@intel.com>
+Date: Fri, 10 Sep 2010 10:47:26 +0800
+Message-Id: <1284086847-16429-3-git-send-email-zhenhua.zhang@intel.com>
+In-Reply-To: <1284086847-16429-1-git-send-email-zhenhua.zhang@intel.com>
+References: <1284086847-16429-1-git-send-email-zhenhua.zhang@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Seperate btio.[ch] from src directory to btio sub-folder.
 ---
- Makefile.am    |    8 +-
- Makefile.tools |    2 +-
- btio/btio.c    | 1299 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- btio/btio.h    |   94 ++++
- src/btio.c     | 1299 --------------------------------------------------------
- src/btio.h     |   94 ----
- 6 files changed, 1399 insertions(+), 1397 deletions(-)
+ Makefile.am |   19 +-
+ btio/btio.c | 1299 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ btio/btio.h |   97 +++++
+ src/btio.c  | 1299 -----------------------------------------------------------
+ src/btio.h  |   97 -----
+ 5 files changed, 1406 insertions(+), 1405 deletions(-)
  create mode 100644 btio/btio.c
  create mode 100644 btio/btio.h
  delete mode 100644 src/btio.c
  delete mode 100644 src/btio.h
 
 diff --git a/Makefile.am b/Makefile.am
-index 7895be2..a8829d9 100644
+index e6940bc..175747c 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -102,6 +102,8 @@ endif
- gdbus_sources = gdbus/gdbus.h gdbus/mainloop.c gdbus/watch.c \
- 					gdbus/object.c gdbus/polkit.c
+@@ -19,6 +19,8 @@ gwobex_sources = gwobex/gw-obex.h gwobex/gw-obex.c \
+ 			gwobex/obex-xfer.h gwobex/obex-xfer.c \
+ 			gwobex/utils.h gwobex/utils.c gwobex/log.h
  
 +btio_sources = btio/btio.h btio/btio.c
 +
- builtin_modules =
- builtin_sources =
- builtin_nodist =
-@@ -216,14 +218,14 @@ endif
- sbin_PROGRAMS += src/bluetoothd
+ libexec_PROGRAMS =
  
- src_bluetoothd_SOURCES = $(gdbus_sources) $(builtin_sources) \
--			$(attrib_sources) \
-+			$(attrib_sources) $(btio_sources) \
- 			$(mcap_sources) \
- 			src/main.c src/log.h src/log.c \
- 			src/security.c src/rfkill.c src/hcid.h src/sdpd.h \
- 			src/sdpd-server.c src/sdpd-request.c \
- 			src/sdpd-service.c src/sdpd-database.c \
- 			src/attrib-server.h src/attrib-server.c \
--			src/sdp-xml.h src/sdp-xml.c src/btio.h src/btio.c \
-+			src/sdp-xml.h src/sdp-xml.c \
- 			src/textfile.h src/textfile.c \
- 			src/glib-helper.h src/glib-helper.c \
- 			src/oui.h src/oui.c src/uinput.h src/ppoll.h \
-@@ -357,7 +359,7 @@ AM_CFLAGS = @DBUS_CFLAGS@ @GLIB_CFLAGS@ @CAPNG_CFLAGS@ \
+ if SERVER
+@@ -66,11 +68,10 @@ builtin_nodist += plugins/phonebook.c
  
- INCLUDES = -I$(builddir)/lib -I$(builddir)/src -I$(srcdir)/src \
- 			-I$(srcdir)/audio -I$(srcdir)/sbc -I$(srcdir)/gdbus \
--			-I$(srcdir)/attrib
-+			-I$(srcdir)/attrib -I$(srcdir)/btio
+ libexec_PROGRAMS += src/obexd
  
- if MCAP
- 	INCLUDES += -I$(builddir)/health
-diff --git a/Makefile.tools b/Makefile.tools
-index 1c46542..14ecf31 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -170,7 +170,7 @@ test_bdaddr_LDADD = lib/libbluetooth.la
+-src_obexd_SOURCES = $(gdbus_sources) $(builtin_sources) \
++src_obexd_SOURCES = $(gdbus_sources) $(builtin_sources) $(btio_sources) \
+ 			src/main.c src/obexd.h src/plugin.h src/plugin.c \
+-			src/log.h src/log.c src/btio.h src/btio.c \
+-			src/dbus.h src/manager.c src/obex.h src/obex.c \
+-			src/obex-priv.h \
++			src/log.h src/log.c src/dbus.h src/manager.c \
++			src/obex.h src/obex.c src/obex-priv.h \
+ 			src/mimetype.h src/mimetype.c \
+ 			src/service.h src/service.c \
+ 			src/transport.h src/transport.c \
+@@ -108,13 +109,12 @@ service_in_files += client/obex-client.service.in
  
- test_agent_LDADD = @DBUS_LIBS@
+ libexec_PROGRAMS += client/obex-client
  
--test_btiotest_SOURCES = test/btiotest.c src/btio.h src/btio.c
-+test_btiotest_SOURCES = test/btiotest.c btio/btio.h btio/btio.c
- test_btiotest_LDADD = @GLIB_LIBS@ lib/libbluetooth.la
+-client_obex_client_SOURCES = $(gdbus_sources) $(gwobex_sources) client/main.c \
+-				client/session.h client/session.c \
++client_obex_client_SOURCES = $(gdbus_sources) $(gwobex_sources) $(btio_sources) \
++				client/main.c client/session.h client/session.c \
+ 				src/log.h src/log.c \
+ 				client/pbap.h client/pbap.c \
+ 				client/sync.h client/sync.c \
+-				client/transfer.h client/transfer.c \
+-				src/btio.c src/btio.h
++				client/transfer.h client/transfer.c
  
- test_test_textfile_SOURCES = test/test-textfile.c src/textfile.h src/textfile.c
+ client_obex_client_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ @OPENOBEX_LIBS@ @BLUEZ_LIBS@
+ endif
+@@ -127,7 +127,8 @@ AM_CFLAGS = @OPENOBEX_CFLAGS@ @BLUEZ_CFLAGS@ @EBOOK_CFLAGS@ \
+ 			-DOBEX_PLUGIN_BUILTIN -DPLUGINDIR=\""$(plugindir)"\"
+ 
+ INCLUDES = -I$(builddir)/src -I$(srcdir)/src -I$(srcdir)/plugins \
+-				-I$(srcdir)/gdbus -I$(srcdir)/gwobex
++				-I$(srcdir)/gdbus -I$(srcdir)/gwobex \
++				-I$(srcdir)/btio
+ 
+ CLEANFILES = $(service_DATA) $(builtin_files)
+ 
 diff --git a/btio/btio.c b/btio/btio.c
 new file mode 100644
-index 0000000..8b273ca
+index 0000000..42a3bcd
 --- /dev/null
 +++ b/btio/btio.c
 @@ -0,0 +1,1299 @@
@@ -145,20 +147,20 @@ index 0000000..8b273ca
 +
 +struct connect {
 +	BtIOConnect connect;
-+	gpointer user_data;
++	void *user_data;
 +	GDestroyNotify destroy;
 +};
 +
 +struct accept {
 +	BtIOConnect connect;
-+	gpointer user_data;
++	void *user_data;
 +	GDestroyNotify destroy;
 +};
 +
 +struct server {
 +	BtIOConnect connect;
 +	BtIOConfirm confirm;
-+	gpointer user_data;
++	void *user_data;
 +	GDestroyNotify destroy;
 +};
 +
@@ -198,7 +200,7 @@ index 0000000..8b273ca
 +}
 +
 +static gboolean accept_cb(GIOChannel *io, GIOCondition cond,
-+							gpointer user_data)
++							void *user_data)
 +{
 +	struct accept *accept = user_data;
 +	GError *err = NULL;
@@ -219,7 +221,7 @@ index 0000000..8b273ca
 +}
 +
 +static gboolean connect_cb(GIOChannel *io, GIOCondition cond,
-+							gpointer user_data)
++							void *user_data)
 +{
 +	struct connect *conn = user_data;
 +	GError *gerr = NULL;
@@ -252,7 +254,7 @@ index 0000000..8b273ca
 +}
 +
 +static gboolean server_cb(GIOChannel *io, GIOCondition cond,
-+							gpointer user_data)
++							void *user_data)
 +{
 +	struct server *server = user_data;
 +	int srv_sock, cli_sock;
@@ -284,7 +286,7 @@ index 0000000..8b273ca
 +}
 +
 +static void server_add(GIOChannel *io, BtIOConnect connect,
-+				BtIOConfirm confirm, gpointer user_data,
++				BtIOConfirm confirm, void *user_data,
 +				GDestroyNotify destroy)
 +{
 +	struct server *server;
@@ -302,7 +304,7 @@ index 0000000..8b273ca
 +}
 +
 +static void connect_add(GIOChannel *io, BtIOConnect connect,
-+				gpointer user_data, GDestroyNotify destroy)
++				void *user_data, GDestroyNotify destroy)
 +{
 +	struct connect *conn;
 +	GIOCondition cond;
@@ -317,7 +319,7 @@ index 0000000..8b273ca
 +					(GDestroyNotify) connect_remove);
 +}
 +
-+static void accept_add(GIOChannel *io, BtIOConnect connect, gpointer user_data,
++static void accept_add(GIOChannel *io, BtIOConnect connect, void *user_data,
 +							GDestroyNotify destroy)
 +{
 +	struct accept *accept;
@@ -1129,7 +1131,7 @@ index 0000000..8b273ca
 +	return FALSE;
 +}
 +
-+gboolean bt_io_accept(GIOChannel *io, BtIOConnect connect, gpointer user_data,
++gboolean bt_io_accept(GIOChannel *io, BtIOConnect connect, void *user_data,
 +					GDestroyNotify destroy, GError **err)
 +{
 +	int sock;
@@ -1278,7 +1280,7 @@ index 0000000..8b273ca
 +}
 +
 +GIOChannel *bt_io_connect(BtIOType type, BtIOConnect connect,
-+				gpointer user_data, GDestroyNotify destroy,
++				void *user_data, GDestroyNotify destroy,
 +				GError **gerr, BtIOOption opt1, ...)
 +{
 +	GIOChannel *io;
@@ -1332,7 +1334,7 @@ index 0000000..8b273ca
 +}
 +
 +GIOChannel *bt_io_listen(BtIOType type, BtIOConnect connect,
-+				BtIOConfirm confirm, gpointer user_data,
++				BtIOConfirm confirm, void *user_data,
 +				GDestroyNotify destroy, GError **err,
 +				BtIOOption opt1, ...)
 +{
@@ -1382,10 +1384,10 @@ index 0000000..8b273ca
 +}
 diff --git a/btio/btio.h b/btio/btio.h
 new file mode 100644
-index 0000000..81fda8e
+index 0000000..e9dcc9f
 --- /dev/null
 +++ b/btio/btio.h
-@@ -0,0 +1,94 @@
+@@ -0,0 +1,97 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
@@ -1409,6 +1411,8 @@ index 0000000..81fda8e
 + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 + *
 + */
++#ifndef BT_IO_H
++#define BT_IO_H
 +
 +#include <glib.h>
 +
@@ -1458,11 +1462,11 @@ index 0000000..81fda8e
 +	BT_IO_SEC_HIGH,
 +} BtIOSecLevel;
 +
-+typedef void (*BtIOConfirm)(GIOChannel *io, gpointer user_data);
++typedef void (*BtIOConfirm)(GIOChannel *io, void *user_data);
 +
-+typedef void (*BtIOConnect)(GIOChannel *io, GError *err, gpointer user_data);
++typedef void (*BtIOConnect)(GIOChannel *io, GError *err, void *user_data);
 +
-+gboolean bt_io_accept(GIOChannel *io, BtIOConnect connect, gpointer user_data,
++gboolean bt_io_accept(GIOChannel *io, BtIOConnect connect, void *user_data,
 +					GDestroyNotify destroy, GError **err);
 +
 +gboolean bt_io_set(GIOChannel *io, BtIOType type, GError **err,
@@ -1472,17 +1476,18 @@ index 0000000..81fda8e
 +						BtIOOption opt1, ...);
 +
 +GIOChannel *bt_io_connect(BtIOType type, BtIOConnect connect,
-+				gpointer user_data, GDestroyNotify destroy,
++				void *user_data, GDestroyNotify destroy,
 +				GError **err, BtIOOption opt1, ...);
 +
 +GIOChannel *bt_io_listen(BtIOType type, BtIOConnect connect,
-+				BtIOConfirm confirm, gpointer user_data,
++				BtIOConfirm confirm, void *user_data,
 +				GDestroyNotify destroy, GError **err,
 +				BtIOOption opt1, ...);
 +
++#endif
 diff --git a/src/btio.c b/src/btio.c
 deleted file mode 100644
-index 8b273ca..0000000
+index 42a3bcd..0000000
 --- a/src/btio.c
 +++ /dev/null
 @@ -1,1299 +0,0 @@
@@ -1550,20 +1555,20 @@ index 8b273ca..0000000
 -
 -struct connect {
 -	BtIOConnect connect;
--	gpointer user_data;
+-	void *user_data;
 -	GDestroyNotify destroy;
 -};
 -
 -struct accept {
 -	BtIOConnect connect;
--	gpointer user_data;
+-	void *user_data;
 -	GDestroyNotify destroy;
 -};
 -
 -struct server {
 -	BtIOConnect connect;
 -	BtIOConfirm confirm;
--	gpointer user_data;
+-	void *user_data;
 -	GDestroyNotify destroy;
 -};
 -
@@ -1603,7 +1608,7 @@ index 8b273ca..0000000
 -}
 -
 -static gboolean accept_cb(GIOChannel *io, GIOCondition cond,
--							gpointer user_data)
+-							void *user_data)
 -{
 -	struct accept *accept = user_data;
 -	GError *err = NULL;
@@ -1624,7 +1629,7 @@ index 8b273ca..0000000
 -}
 -
 -static gboolean connect_cb(GIOChannel *io, GIOCondition cond,
--							gpointer user_data)
+-							void *user_data)
 -{
 -	struct connect *conn = user_data;
 -	GError *gerr = NULL;
@@ -1657,7 +1662,7 @@ index 8b273ca..0000000
 -}
 -
 -static gboolean server_cb(GIOChannel *io, GIOCondition cond,
--							gpointer user_data)
+-							void *user_data)
 -{
 -	struct server *server = user_data;
 -	int srv_sock, cli_sock;
@@ -1689,7 +1694,7 @@ index 8b273ca..0000000
 -}
 -
 -static void server_add(GIOChannel *io, BtIOConnect connect,
--				BtIOConfirm confirm, gpointer user_data,
+-				BtIOConfirm confirm, void *user_data,
 -				GDestroyNotify destroy)
 -{
 -	struct server *server;
@@ -1707,7 +1712,7 @@ index 8b273ca..0000000
 -}
 -
 -static void connect_add(GIOChannel *io, BtIOConnect connect,
--				gpointer user_data, GDestroyNotify destroy)
+-				void *user_data, GDestroyNotify destroy)
 -{
 -	struct connect *conn;
 -	GIOCondition cond;
@@ -1722,7 +1727,7 @@ index 8b273ca..0000000
 -					(GDestroyNotify) connect_remove);
 -}
 -
--static void accept_add(GIOChannel *io, BtIOConnect connect, gpointer user_data,
+-static void accept_add(GIOChannel *io, BtIOConnect connect, void *user_data,
 -							GDestroyNotify destroy)
 -{
 -	struct accept *accept;
@@ -2534,7 +2539,7 @@ index 8b273ca..0000000
 -	return FALSE;
 -}
 -
--gboolean bt_io_accept(GIOChannel *io, BtIOConnect connect, gpointer user_data,
+-gboolean bt_io_accept(GIOChannel *io, BtIOConnect connect, void *user_data,
 -					GDestroyNotify destroy, GError **err)
 -{
 -	int sock;
@@ -2683,7 +2688,7 @@ index 8b273ca..0000000
 -}
 -
 -GIOChannel *bt_io_connect(BtIOType type, BtIOConnect connect,
--				gpointer user_data, GDestroyNotify destroy,
+-				void *user_data, GDestroyNotify destroy,
 -				GError **gerr, BtIOOption opt1, ...)
 -{
 -	GIOChannel *io;
@@ -2737,7 +2742,7 @@ index 8b273ca..0000000
 -}
 -
 -GIOChannel *bt_io_listen(BtIOType type, BtIOConnect connect,
--				BtIOConfirm confirm, gpointer user_data,
+-				BtIOConfirm confirm, void *user_data,
 -				GDestroyNotify destroy, GError **err,
 -				BtIOOption opt1, ...)
 -{
@@ -2787,10 +2792,10 @@ index 8b273ca..0000000
 -}
 diff --git a/src/btio.h b/src/btio.h
 deleted file mode 100644
-index 81fda8e..0000000
+index e9dcc9f..0000000
 --- a/src/btio.h
 +++ /dev/null
-@@ -1,94 +0,0 @@
+@@ -1,97 +0,0 @@
 -/*
 - *
 - *  BlueZ - Bluetooth protocol stack for Linux
@@ -2814,6 +2819,8 @@ index 81fda8e..0000000
 - *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 - *
 - */
+-#ifndef BT_IO_H
+-#define BT_IO_H
 -
 -#include <glib.h>
 -
@@ -2863,11 +2870,11 @@ index 81fda8e..0000000
 -	BT_IO_SEC_HIGH,
 -} BtIOSecLevel;
 -
--typedef void (*BtIOConfirm)(GIOChannel *io, gpointer user_data);
+-typedef void (*BtIOConfirm)(GIOChannel *io, void *user_data);
 -
--typedef void (*BtIOConnect)(GIOChannel *io, GError *err, gpointer user_data);
+-typedef void (*BtIOConnect)(GIOChannel *io, GError *err, void *user_data);
 -
--gboolean bt_io_accept(GIOChannel *io, BtIOConnect connect, gpointer user_data,
+-gboolean bt_io_accept(GIOChannel *io, BtIOConnect connect, void *user_data,
 -					GDestroyNotify destroy, GError **err);
 -
 -gboolean bt_io_set(GIOChannel *io, BtIOType type, GError **err,
@@ -2877,14 +2884,15 @@ index 81fda8e..0000000
 -						BtIOOption opt1, ...);
 -
 -GIOChannel *bt_io_connect(BtIOType type, BtIOConnect connect,
--				gpointer user_data, GDestroyNotify destroy,
+-				void *user_data, GDestroyNotify destroy,
 -				GError **err, BtIOOption opt1, ...);
 -
 -GIOChannel *bt_io_listen(BtIOType type, BtIOConnect connect,
--				BtIOConfirm confirm, gpointer user_data,
+-				BtIOConfirm confirm, void *user_data,
 -				GDestroyNotify destroy, GError **err,
 -				BtIOOption opt1, ...);
 -
+-#endif
 -- 
 1.7.0.4
 
