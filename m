@@ -1,94 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Briglia <anderson.briglia@openbossa.org>
+From: Rafal Michalski <michalski.raf@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Briglia <anderson.briglia@openbossa.org>
-Subject: [PATCH v2 1/2] Bluetooth: Implement LE Set Advertise Enable cmd
-Date: Fri, 10 Sep 2010 11:14:55 -0400
-Message-Id: <1284131696-26117-1-git-send-email-anderson.briglia@openbossa.org>
+Cc: Rafal Michalski <michalski.raf@gmail.com>
+Subject: [PATCH] Removing role field from ORG tag
+Date: Fri, 10 Sep 2010 16:12:54 +0200
+Message-Id: <1284127974-8230-1-git-send-email-michalski.raf@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch implements LE Set Advertise Enable command for dual mode and
-Low Energy hci controllers. It also adds new HCI flags in order to
-indicate the Advertising state for userland applications and kernel
-itself.
-
-Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
+Previously role field was under ORG tag. Now it's single field under
+ROLE tag.
 ---
- include/net/bluetooth/hci.h |    7 +++++++
- net/bluetooth/hci_event.c   |   27 +++++++++++++++++++++++++++
- 2 files changed, 34 insertions(+), 0 deletions(-)
+ plugins/phonebook-tracker.c |    2 +-
+ plugins/vcard.c             |   12 ++++++------
+ plugins/vcard.h             |    2 +-
+ 3 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index bcbdd6d..a28e92b 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -76,6 +76,8 @@ enum {
- 	HCI_INQUIRY,
+diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
+index 41df840..43c2e28 100644
+--- a/plugins/phonebook-tracker.c
++++ b/plugins/phonebook-tracker.c
+@@ -863,7 +863,7 @@ add_entry:
+ 	contact->photo = g_strdup(reply[21]);
+ 	contact->company = g_strdup(reply[22]);
+ 	contact->department = g_strdup(reply[23]);
+-	contact->title = g_strdup(reply[24]);
++	contact->role = g_strdup(reply[24]);
+ 	contact->uid = g_strdup(reply[32]);
  
- 	HCI_RAW,
-+
-+	HCI_LE_ADV,
- };
+ 	set_call_type(contact, reply[COL_DATE], reply[COL_SENT],
+diff --git a/plugins/vcard.c b/plugins/vcard.c
+index 4a77eb3..e277ced 100644
+--- a/plugins/vcard.c
++++ b/plugins/vcard.c
+@@ -357,9 +357,6 @@ static gboolean org_fields_present(struct phonebook_contact *contact)
+ 	if (contact->department && strlen(contact->department))
+ 		return TRUE;
  
- /* HCI ioctl defines */
-@@ -593,6 +595,11 @@ struct hci_rp_read_bd_addr {
- 	bdaddr_t bdaddr;
- } __packed;
- 
-+/* --- HCI LE Commands --- */
-+#define HCI_OP_LE_SET_ADVERTISE_ENABLE	0x200a
-+	#define ADVERTISE_ENABLED	0x01
-+	#define ADVERTISE_DISABLED	0x00
-+
- /* ---- HCI Events ---- */
- #define HCI_EV_INQUIRY_COMPLETE		0x01
- 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index bfef5ba..51e2776 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -822,6 +822,29 @@ static void hci_cs_exit_sniff_mode(struct hci_dev *hdev, __u8 status)
- 	hci_dev_unlock(hdev);
+-	if (contact->title && strlen(contact->title))
+-		return TRUE;
+-
+ 	return FALSE;
  }
  
-+static void hci_cc_le_set_advertise(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	__u8 status = *((__u8 *) skb->data);
-+	void *sent;
-+
-+	BT_DBG("%s status 0x%x", hdev->name, status);
-+
-+	sent = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_ADVERTISE_ENABLE);
-+	if (!sent)
-+		return;
-+
-+	if (!status) {
-+		__u8 param = *((__u8 *) sent);
-+
-+		if (param & ADVERTISE_ENABLED)
-+			set_bit(HCI_LE_ADV, &hdev->flags);
-+		else
-+			clear_bit(HCI_LE_ADV, &hdev->flags);
-+	}
-+
-+	hci_req_complete(hdev, status);
-+}
-+
- static inline void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	__u8 status = *((__u8 *) skb->data);
-@@ -1310,6 +1333,10 @@ static inline void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *sk
- 		hci_cc_read_bd_addr(hdev, skb);
- 		break;
+@@ -371,8 +368,8 @@ static void vcard_printf_org(GString *vcards,
+ 		return;
+ 	}
  
-+	case HCI_OP_LE_SET_ADVERTISE_ENABLE:
-+		hci_cc_le_set_advertise(hdev, skb);
-+		break;
+-	vcard_printf(vcards, "ORG:%s;%s;%s", contact->company,
+-				contact->department, contact->title);
++	vcard_printf(vcards, "ORG:%s;%s", contact->company,
++				contact->department);
+ }
+ 
+ static void vcard_printf_address(GString *vcards, uint8_t format,
+@@ -539,6 +536,9 @@ void phonebook_add_contact(GString *vcards, struct phonebook_contact *contact,
+ 	if (filter & FILTER_ORG)
+ 		vcard_printf_org(vcards, contact);
+ 
++	if (filter & FILTER_ROLE)
++		vcard_printf_tag(vcards, format, "ROLE", NULL, contact->role);
 +
- 	default:
- 		BT_DBG("%s opcode 0x%x", hdev->name, opcode);
- 		break;
+ 	if (filter & FILTER_X_IRMC_CALL_DATETIME)
+ 		vcard_printf_datetime(vcards, contact);
+ 
+@@ -596,7 +596,7 @@ void phonebook_contact_free(struct phonebook_contact *contact)
+ 	g_free(contact->photo);
+ 	g_free(contact->company);
+ 	g_free(contact->department);
+-	g_free(contact->title);
++	g_free(contact->role);
+ 	g_free(contact->datetime);
+ 	g_free(contact);
+ }
+diff --git a/plugins/vcard.h b/plugins/vcard.h
+index 4d134c2..0ed51b9 100644
+--- a/plugins/vcard.h
++++ b/plugins/vcard.h
+@@ -78,7 +78,7 @@ struct phonebook_contact {
+ 	char *photo;
+ 	char *company;
+ 	char *department;
+-	char *title;
++	char *role;
+ 	char *datetime;
+ 	int calltype;
+ };
 -- 
-1.7.0.4
+1.6.3.3
 
