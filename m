@@ -1,45 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Fri, 10 Sep 2010 16:45:09 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, marcel@holtmann.org,
+	davem@davemloft.net
+Subject: Re: Possible regression with skb_clone() in 2.6.36
+Message-ID: <20100910194509.GC19693@vigoh>
+References: <1283988727-1456-1-git-send-email-padovan@profusion.mobi>
+ <alpine.DEB.2.00.1009100920270.14322@linux-sea-02>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTi=v3ZbVv2PkgCnSKxMRBPmbZCM5JA+bBXfDEd5x@mail.gmail.com>
-References: <AANLkTikJFwwjs53_2F6NuBd-e00p1AnYahPMwYNgrveE@mail.gmail.com>
-	<4C8A3537.2010606@openbossa.org>
-	<AANLkTin02sOL89MuUhWe1_nOg4umytfJKRfc=Z_dhpRq@mail.gmail.com>
-	<4C8A758B.1060708@openbossa.org>
-	<AANLkTi=v3ZbVv2PkgCnSKxMRBPmbZCM5JA+bBXfDEd5x@mail.gmail.com>
-Date: Fri, 10 Sep 2010 16:35:20 -0400
-Message-ID: <AANLkTi=8nM_nh_4riZaCj77LLzaqRie0dPjGswqpSFz-@mail.gmail.com>
-Subject: Re: set LE advertise not working...
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Pavan Savoy <pavan_savoy@sify.com>
-Cc: Anderson Briglia <anderson.briglia@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <alpine.DEB.2.00.1009100920270.14322@linux-sea-02>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Sep 10, 2010 at 3:01 PM, Pavan Savoy <pavan_savoy@sify.com> wrote:
-> No, I don't suppose my controller was in a advertising state.. even if
-> it was why the return 0x0c? (command disallowed ..)
->
-> I wanted to know whether you have some HCI-VS commands which sort of
-> enable the LE (AMP/radio/controller) ?
-> Is it only then the leadv command works? Or does it just works right-away.
-> I have one of those all in 1 chips.. bt/fm-rx-tx/gps so I am wondering
-> should I do something to enable BLE and is it some sort of un-spoken
-> standard?
+Hi Mat,
 
-Does LE scan work for this same hardware?
+* Mat Martineau <mathewm@codeaurora.org> [2010-09-10 09:53:31 -0700]:
 
-Do you have some windows software to test this hardware ? if so, you
-can try putting one device in advertise mode there , then attempt
-lescan on the other (from linux)... If it works, most probably the
-hardware might require some initialization...
+> 
+> Gustavo -
+> 
+> I'm not sure why the streaming code used to work, but this does not 
+> look like an skb_clone() problem.  Your patch to remove the 
+> skb_clone() call in l2cap_streaming_send() addresses the root cause of 
+> this crash.
+> 
+> On Wed, 8 Sep 2010, Gustavo F. Padovan wrote:
+> 
+> > I've been experiencing some problems when running the L2CAP Streaming mode in
+> > 2.6.36. The system quickly runs in an Out Of Memory condition and crash. That
+> > wasn't happening before, so I think we may have a regression here (I didn't
+> > find where yet). The crash log is below.
+> >
+> > The following patch does not fix the regression, but shows that removing the
+> > skb_clone() call from l2cap_streaming_send() we workaround the problem. The
+> > patch is good anyway because it saves memory and time.
+> >
+> > By now I have no idea on how to fix this.
+> >
+> > <snip>
+> 
+> This has to do with the sk->sk_wmem_alloc accounting that controls the 
+> amount of write buffer space used on the socket.
+> 
+> When the L2CAP streaming mode socket segments its data, it allocates 
+> memory using sock_alloc_send_skb() (via bt_skb_send_alloc()).  Before 
+> that allocation call returns, skb_set_owner_w() is called on the new 
+> skb.  This adds to sk->sk_wmem_alloc and sets skb->destructor so that 
+> sk->sk_wmem_alloc is correctly updated when the skb is freed.
+> 
+> When that skb is cloned, the clone is not "owned" by the write buffer. 
+> The clone's destructor is set to NULL in __skb_clone().  The version 
+> of l2cap_streaming_send() that runs out of memory is passing the 
+> non-owned skb clone down to the HCI layer.  The original skb (the one 
+> that's "owned by w") is immediately freed, which adjusts 
+> sk->sk_wmem_alloc back down - the socket thinks it has unlimited write 
+> buffer space.  As a result, bt_skb_send_alloc() never blocks waiting 
+> for buffer space (or returns EAGAIN for nonblocking writes) and the 
+> HCI send queue keeps growing.
 
-At least some hardware requires firmware upload and vendor specific
-one-time initialization which (I think) is out of scope for hciconfig.
+If the problem is what you are saying, add a skb_set_owner_w(skb, sk) on
+the cloned skb should solve the problem, but it doesn't. That's exactly
+what tcp_transmit_skb() does. Also that just appeared in 2.6.36, is was
+working fine before, i.e, we have a regression here. 
 
-Regards,
+> 
+> This isn't a problem for the ERTM sends, because the original skbs are 
+> kept in the ERTM tx queue until they are acked.  Once they're acked, 
+> the write buffer space is freed and additional skbs can be allocated.
+
+It affects ERTM as well, but in that case the kernel doesn't crash
+because ERTM block on sending trying to allocate memory. Then we are not
+able to receive any ack (everything stays queued in sk_backlog_queue as
+the sk is owned by the user) and ERTM stalls.
+
 -- 
-Anderson Lizardo
-OpenBossa Labs - INdT
-Manaus - Brazil
+Gustavo F. Padovan
+ProFUSION embedded systems - http://profusion.mobi
