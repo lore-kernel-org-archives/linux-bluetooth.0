@@ -1,162 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: Zhenhua Zhang <zhenhua.zhang@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH V2 1/2] btio: Replace void * with gpointer
-Date: Mon, 13 Sep 2010 16:04:01 +0800
-Message-Id: <1284365042-7526-2-git-send-email-zhenhua.zhang@intel.com>
-In-Reply-To: <1284365042-7526-1-git-send-email-zhenhua.zhang@intel.com>
-References: <1284365042-7526-1-git-send-email-zhenhua.zhang@intel.com>
+Subject: Re: dund
+From: Bastien Nocera <hadess@hadess.net>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: Ivan Baidakou <the.dmol@gmail.com>
+In-Reply-To: <20100912163714.09aac1e3@vaio.site>
+References: <20100911214553.0d8bc6f0@gmail.com>
+	 <16C0AC8E-F3CC-41A8-BE7D-C1BCB7F10CCC@hadess.net>
+	 <20100912114411.2678ffbe@gmail.com>  <20100912163714.09aac1e3@vaio.site>
+Content-Type: text/plain; charset="ISO-8859-1"
+Date: Sun, 12 Sep 2010 15:45:59 +0100
+Message-ID: <1284302759.5776.21.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-To make it consistent with bluez btio.c.
----
- src/btio.c |   24 ++++++++++++------------
- src/btio.h |   10 +++++-----
- 2 files changed, 17 insertions(+), 17 deletions(-)
+On Sun, 2010-09-12 at 16:37 +0200, Vladimir Botka wrote:
+> On Sun, 12 Sep 2010 11:44:11 +0300
+> Ivan Baidakou <the.dmol@gmail.com> wrote:
+> 
+> > You haven't real experience, right?
+> 
+> I have.
 
-diff --git a/src/btio.c b/src/btio.c
-index 42a3bcd..8b273ca 100644
---- a/src/btio.c
-+++ b/src/btio.c
-@@ -62,20 +62,20 @@ struct set_opts {
- 
- struct connect {
- 	BtIOConnect connect;
--	void *user_data;
-+	gpointer user_data;
- 	GDestroyNotify destroy;
- };
- 
- struct accept {
- 	BtIOConnect connect;
--	void *user_data;
-+	gpointer user_data;
- 	GDestroyNotify destroy;
- };
- 
- struct server {
- 	BtIOConnect connect;
- 	BtIOConfirm confirm;
--	void *user_data;
-+	gpointer user_data;
- 	GDestroyNotify destroy;
- };
- 
-@@ -115,7 +115,7 @@ static gboolean check_nval(GIOChannel *io)
- }
- 
- static gboolean accept_cb(GIOChannel *io, GIOCondition cond,
--							void *user_data)
-+							gpointer user_data)
- {
- 	struct accept *accept = user_data;
- 	GError *err = NULL;
-@@ -136,7 +136,7 @@ static gboolean accept_cb(GIOChannel *io, GIOCondition cond,
- }
- 
- static gboolean connect_cb(GIOChannel *io, GIOCondition cond,
--							void *user_data)
-+							gpointer user_data)
- {
- 	struct connect *conn = user_data;
- 	GError *gerr = NULL;
-@@ -169,7 +169,7 @@ static gboolean connect_cb(GIOChannel *io, GIOCondition cond,
- }
- 
- static gboolean server_cb(GIOChannel *io, GIOCondition cond,
--							void *user_data)
-+							gpointer user_data)
- {
- 	struct server *server = user_data;
- 	int srv_sock, cli_sock;
-@@ -201,7 +201,7 @@ static gboolean server_cb(GIOChannel *io, GIOCondition cond,
- }
- 
- static void server_add(GIOChannel *io, BtIOConnect connect,
--				BtIOConfirm confirm, void *user_data,
-+				BtIOConfirm confirm, gpointer user_data,
- 				GDestroyNotify destroy)
- {
- 	struct server *server;
-@@ -219,7 +219,7 @@ static void server_add(GIOChannel *io, BtIOConnect connect,
- }
- 
- static void connect_add(GIOChannel *io, BtIOConnect connect,
--				void *user_data, GDestroyNotify destroy)
-+				gpointer user_data, GDestroyNotify destroy)
- {
- 	struct connect *conn;
- 	GIOCondition cond;
-@@ -234,7 +234,7 @@ static void connect_add(GIOChannel *io, BtIOConnect connect,
- 					(GDestroyNotify) connect_remove);
- }
- 
--static void accept_add(GIOChannel *io, BtIOConnect connect, void *user_data,
-+static void accept_add(GIOChannel *io, BtIOConnect connect, gpointer user_data,
- 							GDestroyNotify destroy)
- {
- 	struct accept *accept;
-@@ -1046,7 +1046,7 @@ static gboolean get_valist(GIOChannel *io, BtIOType type, GError **err,
- 	return FALSE;
- }
- 
--gboolean bt_io_accept(GIOChannel *io, BtIOConnect connect, void *user_data,
-+gboolean bt_io_accept(GIOChannel *io, BtIOConnect connect, gpointer user_data,
- 					GDestroyNotify destroy, GError **err)
- {
- 	int sock;
-@@ -1195,7 +1195,7 @@ failed:
- }
- 
- GIOChannel *bt_io_connect(BtIOType type, BtIOConnect connect,
--				void *user_data, GDestroyNotify destroy,
-+				gpointer user_data, GDestroyNotify destroy,
- 				GError **gerr, BtIOOption opt1, ...)
- {
- 	GIOChannel *io;
-@@ -1249,7 +1249,7 @@ GIOChannel *bt_io_connect(BtIOType type, BtIOConnect connect,
- }
- 
- GIOChannel *bt_io_listen(BtIOType type, BtIOConnect connect,
--				BtIOConfirm confirm, void *user_data,
-+				BtIOConfirm confirm, gpointer user_data,
- 				GDestroyNotify destroy, GError **err,
- 				BtIOOption opt1, ...)
- {
-diff --git a/src/btio.h b/src/btio.h
-index e9dcc9f..d373ed1 100644
---- a/src/btio.h
-+++ b/src/btio.h
-@@ -72,11 +72,11 @@ typedef enum {
- 	BT_IO_SEC_HIGH,
- } BtIOSecLevel;
- 
--typedef void (*BtIOConfirm)(GIOChannel *io, void *user_data);
-+typedef void (*BtIOConfirm)(GIOChannel *io, gpointer user_data);
- 
--typedef void (*BtIOConnect)(GIOChannel *io, GError *err, void *user_data);
-+typedef void (*BtIOConnect)(GIOChannel *io, GError *err, gpointer user_data);
- 
--gboolean bt_io_accept(GIOChannel *io, BtIOConnect connect, void *user_data,
-+gboolean bt_io_accept(GIOChannel *io, BtIOConnect connect, gpointer user_data,
- 					GDestroyNotify destroy, GError **err);
- 
- gboolean bt_io_set(GIOChannel *io, BtIOType type, GError **err,
-@@ -86,11 +86,11 @@ gboolean bt_io_get(GIOChannel *io, BtIOType type, GError **err,
- 						BtIOOption opt1, ...);
- 
- GIOChannel *bt_io_connect(BtIOType type, BtIOConnect connect,
--				void *user_data, GDestroyNotify destroy,
-+				gpointer user_data, GDestroyNotify destroy,
- 				GError **err, BtIOOption opt1, ...);
- 
- GIOChannel *bt_io_listen(BtIOType type, BtIOConnect connect,
--				BtIOConfirm confirm, void *user_data,
-+				BtIOConfirm confirm, gpointer user_data,
- 				GDestroyNotify destroy, GError **err,
- 				BtIOOption opt1, ...);
- 
--- 
-1.7.0.4
+And so have I, I got the patch upstream into pilot-link, and helped get
+the gnome-pilot support integrated.
 
