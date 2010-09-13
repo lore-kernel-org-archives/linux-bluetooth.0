@@ -1,45 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 13 Sep 2010 19:47:18 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Suraj Sumangala <suraj@Atheros.com>
-Cc: linux-bluetooth@vger.kernel.org, Jothikumar.Mothilal@Atheros.com
-Subject: Re: [RFC] BlueZ D-Bus Sim Access Profile Server API description
-Message-ID: <20100913164718.GA9448@jh-x301>
-References: <1284374584-12282-1-git-send-email-suraj@atheros.com>
- <20100913105932.GA3566@jh-x301>
- <4C8E0BA3.1010308@Atheros.com>
- <20100913132014.GA5539@jh-x301>
- <4C8E40B5.8080701@Atheros.com>
+Message-ID: <4C8E426B.2090308@Atheros.com>
+Date: Mon, 13 Sep 2010 20:55:31 +0530
+From: Suraj Sumangala <suraj@Atheros.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4C8E40B5.8080701@Atheros.com>
+To: "Waldemar.Rymarkiewicz@tieto.com" <Waldemar.Rymarkiewicz@tieto.com>
+CC: Suraj Sumangala <Suraj.Sumangala@Atheros.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>
+Subject: Re: [RFC] BlueZ D-Bus Sim Access Profile Server API description
+References: <1284374584-12282-1-git-send-email-suraj@atheros.com> <99B09243E1A5DA4898CDD8B700111448097968E653@EXMB04.eu.tieto.com> <4C8E1942.40805@Atheros.com> <99B09243E1A5DA4898CDD8B700111448097968E69F@EXMB04.eu.tieto.com>
+In-Reply-To: <99B09243E1A5DA4898CDD8B700111448097968E69F@EXMB04.eu.tieto.com>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Waldek,
 
-On Mon, Sep 13, 2010, Suraj Sumangala wrote:
-> The "array{uint8}" is just the ATR response from the card reader. it
-> is not a complete Bluetoth SAP response packet. We need to
-> encapsulate ATR packet to form a Bluetooth SAP response packet. The
-> packet will be roughly.
-> 
-> |Response code|Param1|Param data ( ResultCode )|param2|param data (ATR)|
-> 
-> The ResultCode will have to be mapped as 1 byte result code in the
-> SAP response packet sent to the client.
+On 9/13/2010 6:17 PM, Waldemar.Rymarkiewicz@tieto.com wrote:
+>   Hi Suraj,
+>
+>> The agent will be in a better position to take this decision
+>> as it will be interfacing between actual card reader and SAP server.
+>>
+>> For example, if the agent is connected to an external card
+>> reader and it has lost connection with the reader. It can ask
+>> for an Immediate disconnection.
+>
+> What will happen when dbus connection will be lost?  SAP server will start immediate disconnection. Right?
+Yes,
+>
+>> If disconnection was triggered by a user action, it can decide
+>> to call this API with Graceful as the parameter.
+>
+> What exactly do you mean "triggerd by a user" ? Does agent interact with the user somehow?  In which way, any API for that?
+Here we only specifies the interface required by the Agent using SAP 
+server. The agent implementation will depend on the actual system which 
+uses SAP server.
 
-Why would you want to expose these extra SAP profile details to the
-Agent? The bluetoothd side should take care of all details like this
-whenever possible. The only relevant data that needs to be transmitted
-from the Agent to bluetoothd in this case is the ATR and bluetoothd can
-then proceed with creating a proper SAP response packet based on that.
+For example, if we have use ofono. The agent will be implemented as part 
+of ofono's implementation. This will be similar to the way Handsfree 
+Gateway is implemented.
 
-> How do we map the D-Bus error return to the ResultCode?
+>
+>> One candidate would be when the MessageSize is changed.
+>> Another one will be with the "SimStatus" property. It makes
+>> sense to raise his signal after the server sends the STATUS
+>> IND response successfully.
+>>
+>> But, it is a fact that most of the Properties are set by the
+>> Agent itself. So agent will know that they have changed.
+>
+> Exactly.
+>
+> Thanks,
+> /Waldek
 
-You'd need to define some sort of mapping table yourself. The list of
-possible result codes is quite short (8 in SAP 1.1) so this shouldn't be
-too hard. E.g. "Error, card not accessible" (0x02) could map to the
-D-Bus error org.bluez.SapError.CardNotAccessible.
+Regards
+Suraj
 
-Johan
