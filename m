@@ -1,264 +1,227 @@
 Return-Path: <cyrus@holtmann.org>
-From: Suraj Sumangala <suraj@atheros.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <Jothikumar.Mothilal@Atheros.com>,
-	Suraj Sumangala <suraj@atheros.com>
-Subject: [RFC] BlueZ D-Bus Sim Access Profile Server API description
-Date: Mon, 13 Sep 2010 16:13:04 +0530
-Message-ID: <1284374584-12282-1-git-send-email-suraj@atheros.com>
+From: "Counihan, Tom" <tom.counihan@intel.com>
+To: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 13 Sep 2010 11:11:02 +0100
+Subject: RE: MAP implementation status
+Message-ID: <B09AD526409DF14F8DA79CC5429052C29C8FF50D@irsmsx505.ger.corp.intel.com>
+References: <4C88D729.7050803@nokia.com>
+In-Reply-To: <4C88D729.7050803@nokia.com>
+Content-Type: multipart/mixed;
+	boundary="_002_B09AD526409DF14F8DA79CC5429052C29C8FF50Dirsmsx505gercor_"
 MIME-Version: 1.0
-Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+--_002_B09AD526409DF14F8DA79CC5429052C29C8FF50Dirsmsx505gercor_
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-Below is the Sim Access Profile server role API discription.
-Please let me know your comments.
+Hi Radoslaw,
+
+>-----Original Message-----
+>From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+>owner@vger.kernel.org] On Behalf Of Radoslaw Jablonski
+>Sent: 09 September 2010 13:47
+>To: linux-bluetooth@vger.kernel.org
+>Subject: MAP implementation status
+>
+>
+>  Hi all,
+>We plan to start implementation of Message Access Profile Server as
+>obexd plugin. Before we start with coding part I need to check if
+>someone else started implementing MAP Server, MNS Server of Map client.
+>If some code is already available, then we could combine our forces to
+>add MAP support for OBEXD.
+
+
+This is something I've been focusing on recently.
+Attached is my modest start to this.
+My initial strategy - even though its IVI client side I'm most interested i=
+n - was to tackle server side, essentially bring up both sides of the inter=
+face incrementally.
+I was going to employ a strategy of, instead of doing it in big bulk, dropp=
+ing small unobtrusive patches into the trunk, so interested people could se=
+e and contribute to the activity.
+I'm struggling in defining the right level of patch to upstream - maybe fol=
+ks here can comment on the attached - is it of acceptable substance or woul=
+d more meat be require to make it a meaningful contribution?
+
+I've taken on board the suggestion from Marcel and Johan to focus on SMS da=
+ta first. That makes sense to me.=20
+Hope the above and attached is of use.
+
+Looking forward to hearing from you - any thoughts/insights/criticism are m=
+ost welcome.
 
 Regards
-Suraj
----
- Makefile.am     |    2 +-
- doc/sap-api.txt |  216 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 217 insertions(+), 1 deletions(-)
- create mode 100644 doc/sap-api.txt
+Tom
+--------------------------------------------------------------
+Intel Shannon Limited
+Registered in Ireland
+Registered Office: Collinstown Industrial Park, Leixlip, County Kildare
+Registered Number: 308263
+Business address: Dromore House, East Park, Shannon, Co. Clare
 
-diff --git a/Makefile.am b/Makefile.am
-index a8829d9..52537bc 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -350,7 +350,7 @@ EXTRA_DIST += doc/manager-api.txt \
- 		doc/service-api.txt doc/agent-api.txt doc/attribute-api.txt \
- 		doc/serial-api.txt doc/network-api.txt \
- 		doc/input-api.txt doc/audio-api.txt doc/control-api.txt \
--		doc/hfp-api.txt doc/assigned-numbers.txt
-+		doc/hfp-api.txt doc/assigned-numbers.txt doc/sap-api.txt
- 
- AM_YFLAGS = -d
- 
-diff --git a/doc/sap-api.txt b/doc/sap-api.txt
-new file mode 100644
-index 0000000..9a684fa
---- /dev/null
-+++ b/doc/sap-api.txt
-@@ -0,0 +1,216 @@
-+BlueZ D-Bus Sim Access Profile API description
-+**********************************************
-+
-+Copyright (C) 2009-2010  Atheros Communication Ltd
-+
-+
-+Sim Access Server hierarchy
-+===========================
-+
-+Service	org.bluez
-+Interface	org.bluez.SAPServer
-+Object path	[variable prefix]/{hci0,hci1,...}
-+
-+This interface is available for devices which can function as the
-+Server role of the Sim Access profiles.
-+It is intended to be used with external stacks / handlers of the Sim Access
-+protocol.
-+
-+
-+Methods	void RegisterAgent(object agent)
-+
-+			This registers the Sim Access server agent.
-+			This also registers the profile with the service
-+			databse and start waiting for an RFCOMM connection
-+			on the SAP server channel.
-+
-+			The object path defines the path the of the agent.
-+
-+			If an application disconnects from the bus all
-+			of its registered agents will be removed.
-+
-+			Possible errors: org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.AlreadyExists
-+					 org.bluez.Error.Failed
-+
-+		void UnregisterAgent(object agent)
-+
-+			This unregisters the agent that has been previously
-+			registered. The object path parameter must match the
-+			same value that has been used on registration.
-+
-+			Possible errors: org.bluez.Error.DoesNotExist
-+					 org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.Failed
-+
-+		void Response(string command, string result, object response)
-+
-+			This sends a SAP response packet to a SAP sequest.
-+
-+			The command parameter specifies the SAP command for
-+			which response is being sent.
-+
-+			The result parameter specifies the ResultCode for the
-+			operation.
-+
-+			The object response specifies the response packet to
-+			be sent if any.
-+
-+			Below mentioned are the parameters and possible value.
-+
-+			command     	  result	    	response
-+			----------------------------------------------------
-+
-+			Connect		  OkSuccess		NA
-+					  ConnectFailed
-+				  	  OkOngoingCall
-+
-+			APDU		  OkSuccess		array{uint8}
-+					  NoReason
-+					  CardNotAccessible
-+					  CardPoweredOff
-+					  CardRemoved
-+
-+			APDU7816	  OkSuccess		array{uint8}
-+					  NoReason
-+					  CardNotAccessible
-+					  CardPoweredOff
-+					  CardRemoved
-+
-+			ATR		  OkSuccess		array{uint8}
-+					  NoReason
-+					  CardPoweredOff
-+					  CardRemoved
-+					  DataNotAvailable
-+
-+			SimPowerOn	  OkSuccess		NA
-+					  NoReason
-+					  CardNotAccessible
-+					  CardRemoved
-+					  CardPoweredOn
-+
-+			SimPowerOff	  OkSuccess		NA
-+					  NoReason
-+					  CardPoweredOff
-+					  CardRemoved
-+
-+			Reset		  OkSuccess		NA
-+					  NoReason
-+					  CardNotAccessible
-+					  CardPoweredOff
-+					  CardRemoved
-+
-+			CardReaderStatus  OkSuccess		uint8
-+					  NoReason
-+					  DataNotAvailable
-+
-+			TransportProtocol OkSuccess		NA
-+					  NotSupported
-+
-+			Disconnect	  NA	 		NA
-+
-+			Possible errors: org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.Failed
-+
-+		void Disconnect(string type)
-+
-+			This initiates a SAP disconnection from SAP server.
-+
-+			The type parameter specifies the type of disconnection.
-+
-+			"Graceful"  -> lets the SAP client initiate a
-+			garceful disconnection.
-+
-+			"Immediate" -> disconnects the connection
-+			immediately from the server.
-+
-+		void SetProperty(string name, variant value)
-+
-+			Changes the value of the specified property. Only
-+			properties that are listed a read-write are changeable.
-+			On success this will emit a PropertyChanged signal.
-+
-+			Possible Errors: org.bluez.Error.DoesNotExist
-+					 org.bluez.Error.InvalidArguments
-+
-+		dict GetProperties()
-+
-+			Returns all properties for the interface. See the
-+			properties section for available properties.
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+
-+Signals		PropertyChanged(string name, variant value)
-+
-+			This signal indicates a changed value of the given
-+			property.
-+
-+Properties	string SimStatus [readwrite]
-+
-+			Specifies the availability of the SIM.
-+
-+			The possible value are
-+
-+			"UnknownError"
-+			"CardReset"
-+			"CardNotAccesible"
-+			"CardRemoved"
-+			"CardInsterted"
-+			"CardRecovered"
-+
-+		uint16 MaxMessageSize [readwrite]
-+
-+			The maximum possible message size supported by
-+			SAP server.
-+
-+		uint16 MinMessageSize [readwrite]
-+
-+			The minimum possible message size supported by
-+			SAP server.
-+
-+		uint16 MessageSize [readonly]
-+
-+			The negotiated message size for the current connection.
-+			This is valid only when there is an active
-+			SAP connection.
-+
-+Sim Access Server Agent hierarchy
-+=================================
-+
-+Service         unique name
-+Interface       org.bluez.SAPServerAgent
-+Object path     freely definable
-+
-+Methods		Request(string command, object param)
-+
-+			This method gets called whenever a SAP request is received
-+			from SAP client. This will help deliver the
-+			SAP request to the Agent.
-+
-+			The command parameter specifies the SAP request type
-+			received.
-+
-+			The param parameter specifies the command parameter
-+			packet received from SAP client.
-+
-+			Below mentioned is the parameters and possible value.
-+
-+			command     	  	parameter
-+			----------------------------------------------------
-+
-+			Connect		  	NA
-+			APDU		  	array{uint8}
-+			APDU7816	  	array{uint8}
-+			ATR		  	NA
-+			SimPowerOn	  	NA
-+			SimPowerOff	  	NA
-+			Reset		  	NA
-+			CardReaderStatus  	NA
-+			TransportProtocol 	uint8
-+			Disconnect		NA
-+
-+		void Release()
-+
-+			This method gets called whenever the service daemon
-+			unregisters the agent or whenever the Adapter where
-+			the SimAccessServerAgent registers itself is removed.
--- 
-1.7.0.4
+This e-mail and any attachments may contain confidential material for the s=
+ole use of the intended recipient(s). Any review or distribution by others =
+is strictly prohibited. If you are not the intended recipient, please conta=
+ct the sender and delete all copies.
+
+
+--_002_B09AD526409DF14F8DA79CC5429052C29C8FF50Dirsmsx505gercor_
+Content-Type: application/octet-stream;
+	name="0001-Initial-intro-for-MAP.patch"
+Content-Description: 0001-Initial-intro-for-MAP.patch
+Content-Disposition: attachment;
+	filename="0001-Initial-intro-for-MAP.patch"; size=8107;
+	creation-date="Sun, 05 Sep 2010 15:14:00 GMT";
+	modification-date="Sun, 05 Sep 2010 15:14:00 GMT"
+Content-Transfer-Encoding: base64
+
+RnJvbSA2NmI0MmYzYTNlMTUyMGQ4Y2RiMmI3NTQ5MjE1MjI0ZDBhYmRlNjA2IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBUb20gQ291bmloYW4gPHRvbS5jb3VuaWhhbkBpbnRlbC5jb20+
+CkRhdGU6IFN1biwgNSBTZXAgMjAxMCAxNTowMTozNCArMDEwMApTdWJqZWN0OiBbUEFUQ0hdIElu
+aXRpYWwgaW50cm8gZm9yIE1BUAoKQm9vdHN0cmFwaW5nIE1BUCBpbXBsZW1lbnRhdGlvbgotLS0K
+IHBsdWdpbnMvbWFwLmMgfCAgMjMyICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKwogcGx1Z2lucy9zbXMuaCB8ICAgNDkgKysrKysrKysrKysr
+CiAyIGZpbGVzIGNoYW5nZWQsIDI4MSBpbnNlcnRpb25zKCspLCAwIGRlbGV0aW9ucygtKQogY3Jl
+YXRlIG1vZGUgMTAwNjQ0IHBsdWdpbnMvbWFwLmMKIGNyZWF0ZSBtb2RlIDEwMDY0NCBwbHVnaW5z
+L3Ntcy5oCgpkaWZmIC0tZ2l0IGEvcGx1Z2lucy9tYXAuYyBiL3BsdWdpbnMvbWFwLmMKbmV3IGZp
+bGUgbW9kZSAxMDA2NDQKaW5kZXggMDAwMDAwMC4uMmE0ODNlNwotLS0gL2Rldi9udWxsCisrKyBi
+L3BsdWdpbnMvbWFwLmMKQEAgLTAsMCArMSwyMzIgQEAKKy8qCisgKiBPQkVYIFNlcnZlcgorICoK
+KyAqIENvcHlyaWdodCAoQykgMjAwOS0yMDEwIEludGVsIENvcnBvcmF0aW9uLiBBbGwgcmlnaHRz
+IHJlc2VydmVkLgorICoKKyAqIFRoaXMgcHJvZ3JhbSBpcyBmcmVlIHNvZnR3YXJlOyB5b3UgY2Fu
+IHJlZGlzdHJpYnV0ZSBpdCBhbmQvb3IKKyAqIG1vZGlmeSBpdCB1bmRlciB0aGUgdGVybXMgb2Yg
+dGhlIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlIHZlcnNpb24KKyAqIDIgYXMgcHVibGlzaGVk
+IGJ5IHRoZSBGcmVlIFNvZnR3YXJlIEZvdW5kYXRpb24uCisgKgorICogVGhpcyBwcm9ncmFtIGlz
+IGRpc3RyaWJ1dGVkIGluIHRoZSBob3BlIHRoYXQgaXQgd2lsbCBiZSB1c2VmdWwsCisgKiBidXQg
+V0lUSE9VVCBBTlkgV0FSUkFOVFk7IHdpdGhvdXQgZXZlbiB0aGUgaW1wbGllZCB3YXJyYW50eSBv
+ZgorICogTUVSQ0hBTlRBQklMSVRZIG9yIEZJVE5FU1MgRk9SIEEgUEFSVElDVUxBUiBQVVJQT1NF
+LiAgU2VlIHRoZQorICogR05VIEdlbmVyYWwgUHVibGljIExpY2Vuc2UgZm9yIG1vcmUgZGV0YWls
+cy4KKyAqCisgKiBZb3Ugc2hvdWxkIGhhdmUgcmVjZWl2ZWQgYSBjb3B5IG9mIHRoZSBHTlUgR2Vu
+ZXJhbCBQdWJsaWMgTGljZW5zZQorICogYWxvbmcgd2l0aCB0aGlzIHByb2dyYW07IGlmIG5vdCwg
+d3JpdGUgdG8gdGhlIEZyZWUgU29mdHdhcmUKKyAqIEZvdW5kYXRpb24sIEluYy4sIDUxIEZyYW5r
+bGluIFN0cmVldCwgRmlmdGggRmxvb3IsIEJvc3RvbiwgTUEKKyAqIDAyMTEwLTEzMDEsIFVTQS4K
+KyAqCisgKgorICogQXV0aG9yIE5hbWUgPHRvbS5jb3VuaWhhbkBpbnRlbC5jb20+CisgKiAgLSBG
+SVhNRTogU2hvcnQgbG9nIG9mIGNoYW5nZXMKKyAqCisgKgorICogRklYTUU6IERPQ1VNRU5UQVRJ
+T046IGVudHJ5IHBvaW50cyBhbmQgY29kZSByb2FkbWFwLiBXaGF0IGRvZXMKKyAqIGl0IGRvLCBo
+b3cgZG9lcyBpdCB3b3JrLCBldGMuCisgKiAJLSBQb3N0cG9uZSBOb3RpZmljYXRpb24gZmVhdHVy
+ZSB1bnRpbCBydWRpbWVudGFyeSBmdW5jdGlvbmFsaXR5IHVwCisgKi8KKworI2lmZGVmIEhBVkVf
+Q09ORklHX0gKKyNpbmNsdWRlIDxjb25maWcuaD4KKyNlbmRpZgorCisjaW5jbHVkZSA8c3RkaW8u
+aD4KKyNpbmNsdWRlIDxzdHJpbmcuaD4KKyNpbmNsdWRlIDxlcnJuby5oPgorI2luY2x1ZGUgPGds
+aWIuaD4KKyNpbmNsdWRlIDxzdGRsaWIuaD4KKyNpbmNsdWRlIDx1bmlzdGQuaD4KKyNpbmNsdWRl
+IDxhcnBhL2luZXQuaD4KKyNpbmNsdWRlIDxzeXMvdHlwZXMuaD4KKyNpbmNsdWRlIDxzeXMvc3Rh
+dC5oPgorI2luY2x1ZGUgPGZjbnRsLmg+CisKKyNpbmNsdWRlIDxvcGVub2JleC9vYmV4Lmg+Cisj
+aW5jbHVkZSA8b3Blbm9iZXgvb2JleF9jb25zdC5oPgorCisjaW5jbHVkZSAicGx1Z2luLmgiCisj
+aW5jbHVkZSAibG9nLmgiCisjaW5jbHVkZSAib2JleC5oIgorI2luY2x1ZGUgInNlcnZpY2UuaCIK
+KworI2RlZmluZSBNQVBfQ0hBTk5FTAkxNgorCisjZGVmaW5lIE1BWExJU1RDT1VOVF9UQUcJMHgw
+MQorI2RlZmluZSBTVEFSVE9GRlNFVF9UQUcJMHgwMgorI2RlZmluZSBGSUxURVJNRVNTQUdFVFlQ
+RV9UQUcJMHgwMworI2RlZmluZSBGSUxURVJCRUdJTlBFUklPRF9UQUcJMHgwNAorI2RlZmluZSBF
+TkRGSUxURVJQRVJJT0RFTkRfVEFHCTB4MDUKKyNkZWZpbmUgRklMVEVSUkVBRFNUQVRVU19UQUcJ
+MHgwNgorI2RlZmluZSBGSUxURVJSRUNJUElFTlRfVEFHCTB4MDcKKyNkZWZpbmUgRklMVEVST1JJ
+R0lOQVRPUl9UQUcJMHgwOAorI2RlZmluZSBGSUxURVJQUklPUklUWV9UQUcJMHgwOQorI2RlZmlu
+ZSBBVFRBQ0hFTUVOVF9UQUcJMHgwQQorI2RlZmluZSBUUkFOU1BBUkVOVF9UQUcgMHgwQgorI2Rl
+ZmluZSBSRVRSWV9UQUcJMHgwQworI2RlZmluZSBORVdNRVNTQUdFX1RBRwkweDBECisjZGVmaW5l
+IE5PVElGSUNBVElPTlNUQVRVU19UQUcJMHgwRQorI2RlZmluZSBNQVNJTlNUQU5DRUlEX1RBRwkw
+eDBGCisjZGVmaW5lIFBBUkFNRVRFUk1BU0tfVEFHCTB4MTAKKyNkZWZpbmUgRk9MREVSTElTVElO
+R1NJWkVfVEFHCTB4MTEKKyNkZWZpbmUgTUVTU0FHRUxJU1RJTkdTSVpFX1RBRwkweDEyCisjZGVm
+aW5lIFNVQkpFQ1RMRU5HVEhfVEFHIDB4MTMKKyNkZWZpbmUgQ0hBUlNFVF9UQUcgMHgxNAorI2Rl
+ZmluZSBGUkFDVElPTlJFUVVFU1RfVEFHCTB4MTUKKyNkZWZpbmUgRlJBQ1RJT05ERUxJVkVSRURf
+VEFHCTB4MTYKKyNkZWZpbmUgU1RBVFVTSU5ESUNBVE9SX1RBRwkweDE3CisjZGVmaW5lIFNUQVRV
+U1ZBTFVFX1RBRwkweDE4CisjZGVmaW5lIE1TRVRJTUVfVEFHCTB4MTkKKworLyogVGhlIGZvbGxv
+d2luZyBsZW5ndGggaXMgaW4gdGhlIHVuaXQgb2YgYnl0ZSAqLworI2RlZmluZSBNQVhMSVNUQ09V
+TlRfTEVOCTIKKyNkZWZpbmUgU1RBUlRPRkZTRVRfTEVOCTIKKyNkZWZpbmUgRklMVEVSTUVTU0FH
+RVRZUEVfTEVOCTEKKyNkZWZpbmUgRklMVEVSUkVBRFNUQVRVU19MRU4JMQorI2RlZmluZSBGSUxU
+RVJQUklPUklUWV9MRU4JMQorI2RlZmluZSBBVFRBQ0hFTUVOVF9MRU4JMQorI2RlZmluZSBUUkFO
+U1BBUkVOVF9MRU4gMQorI2RlZmluZSBSRVRSWV9MRU4JMQorI2RlZmluZSBORVdNRVNTQUdFX0xF
+TgkxCisjZGVmaW5lIE5PVElGSUNBVElPTlNUQVRVU19MRU4JMQorI2RlZmluZSBNQVNJTlNUQU5D
+RUlEX0xFTgkxCisjZGVmaW5lIFBBUkFNRVRFUk1BU0tfTEVOCTQKKyNkZWZpbmUgRk9MREVSTElT
+VElOR1NJWkVfTEVOCTIKKyNkZWZpbmUgTUVTU0FHRUxJU1RJTkdTSVpFX0xFTgkyCisjZGVmaW5l
+IFNVQkpFQ1RMRU5HVEhfTEVOIDEKKyNkZWZpbmUgQ0hBUlNFVF9MRU4gMQorI2RlZmluZSBGUkFD
+VElPTlJFUVVFU1RfTEVOCTEKKyNkZWZpbmUgRlJBQ1RJT05ERUxJVkVSRURfTEVOCTEKKyNkZWZp
+bmUgU1RBVFVTSU5ESUNBVE9SX0xFTgkxCisjZGVmaW5lIFNUQVRVU1ZBTFVFX0xFTgkxCisKKyNk
+ZWZpbmUgTUFQX1JFQ09SRCAiPD94bWwgdmVyc2lvbj1cIjEuMFwiIGVuY29kaW5nPVwiVVRGLThc
+IiA/PglcCis8cmVjb3JkPgkJCQkJCQkJXAorICA8YXR0cmlidXRlIGlkPVwiMHgwMDAxXCI+CQkJ
+CQkJXAorICAgIDxzZXF1ZW5jZT4JCQkJCQkJCVwKKyAgICAgIDx1dWlkIHZhbHVlPVwiMHgxMTMy
+XCIvPgkJCQkJCVwKKyAgICA8L3NlcXVlbmNlPgkJCQkJCQkJXAorICA8L2F0dHJpYnV0ZT4JCQkJ
+CQkJCVwKKwkJCQkJCQkJCVwKKyAgPGF0dHJpYnV0ZSBpZD1cIjB4MDAwNFwiPgkJCQkJCVwKKyAg
+ICA8c2VxdWVuY2U+CQkJCQkJCQlcCisgICAgICA8c2VxdWVuY2U+CQkJCQkJCVwKKyAgICAgICAg
+PHV1aWQgdmFsdWU9XCIweDAxMDBcIi8+CQkJCQlcCisgICAgICA8L3NlcXVlbmNlPgkJCQkJCQlc
+CisgICAgICA8c2VxdWVuY2U+CQkJCQkJCVwKKyAgICAgICAgPHV1aWQgdmFsdWU9XCIweDAwMDNc
+Ii8+CQkJCQlcCisgICAgICAgIDx1aW50OCB2YWx1ZT1cIiV1XCIgbmFtZT1cImNoYW5uZWxcIi8+
+CQkJCVwKKyAgICAgIDwvc2VxdWVuY2U+CQkJCQkJCVwKKyAgICAgIDxzZXF1ZW5jZT4JCQkJCQkJ
+XAorICAgICAgICA8dXVpZCB2YWx1ZT1cIjB4MDAwOFwiLz4JCQkJCVwKKyAgICAgIDwvc2VxdWVu
+Y2U+CQkJCQkJCVwKKyAgICA8L3NlcXVlbmNlPgkJCQkJCQkJXAorICA8L2F0dHJpYnV0ZT4JCQkJ
+CQkJCVwKKwkJCQkJCQkJCVwKKyAgPGF0dHJpYnV0ZSBpZD1cIjB4MDAwOVwiPgkJCQkJCVwKKyAg
+ICA8c2VxdWVuY2U+CQkJCQkJCQlcCisgICAgICA8c2VxdWVuY2U+CQkJCQkJCVwKKyAgICAgICAg
+PHV1aWQgdmFsdWU9XCIweDExMzRcIi8+CQkJCQlcCisgICAgICAgIDx1aW50MTYgdmFsdWU9XCIw
+eDAxMDBcIiBuYW1lPVwidmVyc2lvblwiLz4JCQlcCisgICAgICA8L3NlcXVlbmNlPgkJCQkJCQlc
+CisgICAgPC9zZXF1ZW5jZT4JCQkJCQkJCVwKKyAgPC9hdHRyaWJ1dGU+CQkJCQkJCQlcCisJCQkJ
+CQkJCQlcCisgIDxhdHRyaWJ1dGUgaWQ9XCIweDAxMDBcIj4JCQkJCQlcCisgICAgPHRleHQgdmFs
+dWU9XCIlc1wiIG5hbWU9XCJuYW1lXCIvPgkJCQkJXAorICA8L2F0dHJpYnV0ZT4JCQkJCQkJCVwK
+KwkJCQkJCQkJCVwKKyAgPGF0dHJpYnV0ZSBpZD1cIjB4MDMxNlwiPgkJCQkJCVwKKyAgICA8dWlu
+dDggdmFsdWU9XCIweDAyXCIvPgkJCQkJCVwKKyAgPC9hdHRyaWJ1dGU+CQkJCQkJCQlcCis8L3Jl
+Y29yZD4iCisKKworc3RhdGljIGNvbnN0IHVpbnQ4X3QgTUFQX1RBUkdFVFtUQVJHRVRfU0laRV0g
+PSB7CisJCQkweEJCLCAweDU4LCAweDJCLCAweDQwLCAgMHg0MiwgMHgwQywgMHgxMSwgMHhEQiwK
+KwkJCTB4QjAsIDB4REUsIDB4MDgsIDB4MDAsICAweDIwLCAweDBDLCAweDlBLCAweDY2IH07CisK
+K3N0cnVjdCBtYXBfc2Vzc2lvbiB7CisJc3RydWN0IGFwcGFyYW1fZmllbGQgKnBhcmFtczsKKwlj
+aGFyICpmb2xkZXI7CisJdWludDMyX3QgZmluZF9oYW5kbGU7CisJR1N0cmluZyAqYnVmZmVyOwor
+fTsKKworLyogVE9ETyBGaXggdGhpcyBlbnRyeSAqLworc3RydWN0IGNhY2hlX2VudHJ5IHsKKwl1
+aW50NjRfdCBoYW5kbGU7CisJY2hhciAqaWQ7CisJY2hhciAqbmFtZTsKKwljaGFyICpzb3VuZDsK
+KwljaGFyICp0ZWw7Cit9OworCisKK3N0YXRpYyB2b2lkICptYXBfY29ubmVjdChzdHJ1Y3Qgb2Jl
+eF9zZXNzaW9uICpvcywgaW50ICplcnIpCit7CisJLyogUmVqZWN0cyBhbGwgY29ubmVjdHMgZm9y
+IHRoZSBtb21lbnQgKi8KKwlzdHJ1Y3QgbWFwX3Nlc3Npb24gKm1hcDsKKworCW1hcCA9IGdfbmV3
+MChzdHJ1Y3QgbWFwX3Nlc3Npb24sIDEpOworCisJcmV0dXJuIG1hcDsKK30KKworc3RhdGljIGlu
+dCBtYXBfZ2V0KHN0cnVjdCBvYmV4X3Nlc3Npb24gKm9zLCBvYmV4X29iamVjdF90ICpvYmosCisJ
+CQkJCWdib29sZWFuICpzdHJlYW0sIHZvaWQgKnVzZXJfZGF0YSkKK3sKKwkvKiBSZWplY3RzIGFs
+bCBnZXRzIGZvciB0aGUgbW9tZW50ICovCisJcmV0dXJuIC1FQkFEUjsKK30KKworc3RhdGljIGlu
+dCBtYXBfc2V0cGF0aChzdHJ1Y3Qgb2JleF9zZXNzaW9uICpvcywgb2JleF9vYmplY3RfdCAqb2Jq
+LAorCQl2b2lkICp1c2VyX2RhdGEpCit7CisJLyogUmVqZWN0cyBhbGwgc2V0IHBhdGhzIGZvciB0
+aGUgbW9tZW50ICovCisJcmV0dXJuIC1FQkFEUjsKK30KKworc3RhdGljIHZvaWQgbWFwX2Rpc2Nv
+bm5lY3Qoc3RydWN0IG9iZXhfc2Vzc2lvbiAqb3MsIHZvaWQgKnVzZXJfZGF0YSkKK3sKKwkvKiBS
+ZWplY3RzIGFsbCBkaXNjb25uZWN0IGZvciB0aGUgbW9tZW50ICovCisKK30KKworc3RhdGljIGlu
+dCBtYXBfY2hrcHV0KHN0cnVjdCBvYmV4X3Nlc3Npb24gKm9zLCB2b2lkICp1c2VyX2RhdGEpCit7
+CisJLyogUmVqZWN0cyBhbGwgUFVUcyAqLworCXJldHVybiAtRUJBRFI7Cit9CisKKworc3RhdGlj
+IHN0cnVjdCBvYmV4X3NlcnZpY2VfZHJpdmVyIG1hcCA9IHsKKwkubmFtZSA9ICJNZXNzYWdlIEFj
+Y2VzcyBzZXJ2ZXIiLAorCS5zZXJ2aWNlID0gT0JFWF9NQVAsCisJLmNoYW5uZWwgPSBNQVBfQ0hB
+Tk5FTCwKKwkucmVjb3JkID0gTUFQX1JFQ09SRCwKKwkudGFyZ2V0ID0gTUFQX1RBUkdFVCwKKwku
+dGFyZ2V0X3NpemUgPSBUQVJHRVRfU0laRSwKKwkuY29ubmVjdCA9IG1hcF9jb25uZWN0LAorCS5n
+ZXQgPSBtYXBfZ2V0LAorCS5zZXRwYXRoID0gbWFwX3NldHBhdGgsCisJLmRpc2Nvbm5lY3QgPSBt
+YXBfZGlzY29ubmVjdCwKKwkuY2hrcHV0ID0gbWFwX2Noa3B1dAorfTsKKworc3RhdGljIGludCBt
+YXBfaW5pdCh2b2lkKQoreworCWludCBlcnI7CisKKworCXJldHVybiAwOworCisJcmV0dXJuIGVy
+cjsKK30KK3N0YXRpYyB2b2lkIG1hcF9leGl0KHZvaWQpCit7CisJb2JleF9zZXJ2aWNlX2RyaXZl
+cl91bnJlZ2lzdGVyKCZtYXApOworCit9CisKK09CRVhfUExVR0lOX0RFRklORShtYXAsIG1hcF9p
+bml0LCBtYXBfZXhpdCkKZGlmZiAtLWdpdCBhL3BsdWdpbnMvc21zLmggYi9wbHVnaW5zL3Ntcy5o
+Cm5ldyBmaWxlIG1vZGUgMTAwNjQ0CmluZGV4IDAwMDAwMDAuLjhjYzlhMzAKLS0tIC9kZXYvbnVs
+bAorKysgYi9wbHVnaW5zL3Ntcy5oCkBAIC0wLDAgKzEsNDkgQEAKKy8qCisgKiBPQkVYIFNlcnZl
+cgorICoKKyAqIENvcHlyaWdodCAoQykgMjAwOS0yMDEwIEludGVsIENvcnBvcmF0aW9uLiBBbGwg
+cmlnaHRzIHJlc2VydmVkLgorICoKKyAqIFRoaXMgcHJvZ3JhbSBpcyBmcmVlIHNvZnR3YXJlOyB5
+b3UgY2FuIHJlZGlzdHJpYnV0ZSBpdCBhbmQvb3IKKyAqIG1vZGlmeSBpdCB1bmRlciB0aGUgdGVy
+bXMgb2YgdGhlIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlIHZlcnNpb24KKyAqIDIgYXMgcHVi
+bGlzaGVkIGJ5IHRoZSBGcmVlIFNvZnR3YXJlIEZvdW5kYXRpb24uCisgKgorICogVGhpcyBwcm9n
+cmFtIGlzIGRpc3RyaWJ1dGVkIGluIHRoZSBob3BlIHRoYXQgaXQgd2lsbCBiZSB1c2VmdWwsCisg
+KiBidXQgV0lUSE9VVCBBTlkgV0FSUkFOVFk7IHdpdGhvdXQgZXZlbiB0aGUgaW1wbGllZCB3YXJy
+YW50eSBvZgorICogTUVSQ0hBTlRBQklMSVRZIG9yIEZJVE5FU1MgRk9SIEEgUEFSVElDVUxBUiBQ
+VVJQT1NFLiAgU2VlIHRoZQorICogR05VIEdlbmVyYWwgUHVibGljIExpY2Vuc2UgZm9yIG1vcmUg
+ZGV0YWlscy4KKyAqCisgKiBZb3Ugc2hvdWxkIGhhdmUgcmVjZWl2ZWQgYSBjb3B5IG9mIHRoZSBH
+TlUgR2VuZXJhbCBQdWJsaWMgTGljZW5zZQorICogYWxvbmcgd2l0aCB0aGlzIHByb2dyYW07IGlm
+IG5vdCwgd3JpdGUgdG8gdGhlIEZyZWUgU29mdHdhcmUKKyAqIEZvdW5kYXRpb24sIEluYy4sIDUx
+IEZyYW5rbGluIFN0cmVldCwgRmlmdGggRmxvb3IsIEJvc3RvbiwgTUEKKyAqIDAyMTEwLTEzMDEs
+IFVTQS4KKyAqCisgKgorICogQXV0aG9yIE5hbWUgPHRvbS5jb3VuaWhhbkBpbnRlbC5jb20+Cisg
+KiAgLSBGSVhNRTogU2hvcnQgbG9nIG9mIGNoYW5nZXMKKyAqCisgKgorICogRklYTUU6IERPQ1VN
+RU5UQVRJT046IGVudHJ5IHBvaW50cyBhbmQgY29kZSByb2FkbWFwLiBXaGF0IGRvZXMKKyAqIGl0
+IGRvLCBob3cgZG9lcyBpdCB3b3JrLCBldGMuCisgKi8KKworc3RydWN0IGFwcGFyYW1fZmllbGQg
+eworCS8qIEZvbGRlckxpc3RpbmcgYW5kIE1lc3NhZ2VMaXN0aW5nIGF0dHJpYnV0ZXMgKi8KKwl1
+aW50MTZfdCBtYXhsaXN0Y291bnQ7CisJdWludDE2X3QgbGlzdHN0YXJ0b2Zmc2V0OworCisJLyog
+TWVzc2FnZUxpc3RpbmcgYXR0cmlidXRlcyBvbmx5ICovCisJdWludDhfdCBzdWJqZWN0bGVuZ3Ro
+OworCXVpbnQzMl90IHBhcmFtZXRlcm1hc2s7CisJdWludDhfdCBmaWx0ZXJtZXNzYWdldHlwZTsK
+Kwl1aW50OF90ICpmaWx0ZXJwZXJpb2RiZWdpbjsKKwl1aW50OF90ICpmaWx0ZXJwZXJpb2RlbmQ7
+CisJdWludDhfdCBmaWx0ZXJyZWFkc3RhdHVzOworCXVpbnQ4X3QgKmZpbHRlcnJlY2lwaWVudDsK
+Kwl1aW50OF90ICpmaWx0ZXJvcmlnaW5hdG9yOworCXVpbnQ4X3QgZmlsdGVycHJpb3JpdHk7CisK
+KwkvKiBNZXNzYWdlIGZ1bmN0aW9uIGF0dHJpYnV0ZXMgb25seSAqLworCXVpbnQ4X3QgYXR0YWNo
+ZW1lbnQ7CisJdWludDhfdCBjaGFyc2V0OworCXVpbnQ4X3QgZnJhY3Rpb25yZXF1ZXN0OworfTsK
+LS0gCjEuNy4xLjEKCg==
+
+--_002_B09AD526409DF14F8DA79CC5429052C29C8FF50Dirsmsx505gercor_--
 
