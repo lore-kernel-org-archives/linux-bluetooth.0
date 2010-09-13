@@ -1,32 +1,199 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 02/10] Add rule to enabling talking to org.bluez.MediaEndpoint
-Date: Mon, 13 Sep 2010 17:15:29 +0300
-Message-Id: <1284387337-18822-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH 01/10] Add media API documentation
+Date: Mon, 13 Sep 2010 17:15:28 +0300
+Message-Id: <1284387337-18822-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1284387337-18822-1-git-send-email-luiz.dentz@gmail.com>
 References: <1284387337-18822-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto Von Dentz <luiz.dentz-von@nokia.com>
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
+Media API is a replacement for the internal audio IPC which is no longer
+necessary as DBus 1.3 and newer are capable of transfering file
+descriptors.
 ---
- src/bluetooth.conf |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+ doc/media-api.txt |  169 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 169 insertions(+), 0 deletions(-)
+ create mode 100644 doc/media-api.txt
 
-diff --git a/src/bluetooth.conf b/src/bluetooth.conf
-index 56e7a83..354e5e0 100644
---- a/src/bluetooth.conf
-+++ b/src/bluetooth.conf
-@@ -12,6 +12,7 @@
-     <allow send_destination="org.bluez"/>
-     <allow send_interface="org.bluez.Agent"/>
-     <allow send_interface="org.bluez.HandsfreeAgent"/>
-+    <allow send_interface="org.bluez.MediaEndpoint"/>
-   </policy>
- 
-   <policy at_console="true">
+diff --git a/doc/media-api.txt b/doc/media-api.txt
+new file mode 100644
+index 0000000..94fc62f
+--- /dev/null
++++ b/doc/media-api.txt
+@@ -0,0 +1,169 @@
++BlueZ D-Bus Media API description
++*********************************
++
++Media hierarchy
++===============
++
++Service		org.bluez
++Interface	org.bluez.Media
++Object path	[variable prefix]/{hci0,hci1,...}
++
++Methods		void RegisterEndpoint(object endpoint, dict properties)
++
++			Register a local end point to sender, the sender can
++			register as many end points as it likes.
++
++			Note: If the sender disconnects the end points are
++			automatically unregistered.
++
++			possible properties:
++
++				string UUID:
++
++					UUID of the profile which the endpoint
++					is for.
++
++				byte Codec:
++
++					Assigned mumber of codec that the
++					endpoint implements. The values should
++					match the profile specification which
++					is indicated by the UUID.
++
++				array{byte} Capabilities:
++
++					Capabilities blob, it is used as it is
++					so the size and byte order must match.
++
++		void UnregisterEndpoint(object endpoint)
++
++			Unregister sender end point.
++
++MediaEndpoint hierarchy
++=======================
++
++Service		unique name
++Interface	org.bluez.MediaEndpoint
++Object path	freely definable
++
++Methods		void SetConfiguration(object transport, array{byte} configuration)
++
++			Set configuration for the transport.
++
++		array{byte} SelectConfiguration(array{byte} capabilities)
++
++			Select preferable configuration from the supported
++			capabilities.
++
++			Returns a configuration which can be used to setup
++			a transport.
++
++			Note: There is no need to cache the selected
++			configuration since on success the configuration is
++			send back as parameter of SetConfiguration.
++
++		void ClearConfiguration()
++
++			Clear any configuration set.
++
++		void Release()
++
++			This method gets called when the service daemon
++			unregisters the endpoint. An endpoint can use it to do
++			cleanup tasks. There is no need to unregister the
++			endpoint, because when this method gets called it has
++			already been unregistered.
++
++MediaTransport hierarchy
++========================
++
++Service		org.bluez
++Interface	org.bluez.MediaTransport
++Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/fdX
++
++Methods		dict GetProperties()
++
++			Returns all properties for the interface. See the
++			properties section for available properties.
++
++		fd Acquire(string accesstype)
++
++			Acquire transport file descriptor.
++
++			possible accesstype:
++
++				"r" : Read only access
++
++				"w" : Write only access
++
++				"rw": Read and write access
++
++		void Release(string accesstype)
++
++			Releases file descriptor.
++
++		void SetProperty(string name, variant value)
++
++			Changes the value of the specified property. Only
++			properties that are listed a read-write can be changed.
++
++			On success this will emit a PropertyChanged signal.
++
++Signals		void PropertyChanged(string name, variant value)
++
++			This signal indicates a changed value of the given
++			property.
++
++Properties	object Device [readonly]
++
++			Device object which the transport is connected to.
++
++		boolean ReadLock [readonly]
++
++			Transport read lock.
++
++		boolean WriteLock [readonly]
++
++			Transport read lock.
++
++		uint16 IMTU [readonly]
++
++			Transport input MTU.
++
++		uint16 OMTU [readonly]
++
++			Transport output MTU.
++
++		string UUID [readonly]
++
++			UUID of the profile which the transport is for.
++
++		byte Codec [readonly]
++
++			Assigned mumber of codec that the transport support.
++			The values should match the profile specification which
++			is indicated by the UUID.
++
++		array{byte} Configuration [readonly]
++
++			Configuration blob, it is used as it is so the size and
++			byte order must match.
++
++		uint16 Delay [readwrite]
++
++			Optional. Transport delay in 1/10 of milisecond, this
++			property is only writeable when the transport was
++			acquired by the sender.
++
++		boolean NREC [readwrite]
++
++			Optional. Indicates if echo cancelling and noise
++			reduction functions are active in the transport, this
++			property is only writeable when the transport was
++			acquired by the sender.
++
++		boolean InbandRingtone [readwrite]
++
++			Optional. Indicates if the transport support sending
++			ringtones, this property is only writeable when the
++			transport was acquired by the sender.
 -- 
 1.7.1
 
