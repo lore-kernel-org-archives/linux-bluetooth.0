@@ -1,143 +1,133 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 08/10] Update a2dp transport delay when it changes
-Date: Mon, 13 Sep 2010 17:15:35 +0300
-Message-Id: <1284387337-18822-9-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH 03/10] Add option to enable/disable unix ipc via audio.conf
+Date: Mon, 13 Sep 2010 17:15:30 +0300
+Message-Id: <1284387337-18822-4-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1284387337-18822-1-git-send-email-luiz.dentz@gmail.com>
 References: <1284387337-18822-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+From: Luiz Augusto Von Dentz <luiz.dentz-von@nokia.com>
 
 ---
- audio/a2dp.c      |   31 +++++++++++++++++++++++++++----
- audio/media.c     |    6 ++++++
- audio/media.h     |    2 ++
- audio/transport.c |   14 ++++++++++++++
- audio/transport.h |    2 ++
- 5 files changed, 51 insertions(+), 4 deletions(-)
+ audio/main.c    |    9 ---------
+ audio/manager.c |   12 ++++++++++++
+ audio/manager.h |    1 +
+ 3 files changed, 13 insertions(+), 9 deletions(-)
 
-diff --git a/audio/a2dp.c b/audio/a2dp.c
-index e6daf3b..7d3f25f 100644
---- a/audio/a2dp.c
-+++ b/audio/a2dp.c
-@@ -44,6 +44,7 @@
- #include "source.h"
- #include "unix.h"
- #include "media.h"
-+#include "transport.h"
- #include "a2dp.h"
+diff --git a/audio/main.c b/audio/main.c
+index 9d316ec..745c307 100644
+--- a/audio/main.c
++++ b/audio/main.c
+@@ -42,7 +42,6 @@
+ #include "plugin.h"
+ #include "log.h"
+ #include "device.h"
+-#include "unix.h"
+ #include "headset.h"
+ #include "manager.h"
+ #include "gateway.h"
+@@ -151,11 +150,6 @@ static int audio_init(void)
+ 
+ 	config = load_config_file(CONFIGDIR "/audio.conf");
+ 
+-	if (unix_init() < 0) {
+-		error("Unable to setup unix socket");
+-		goto failed;
+-	}
+-
+ 	if (audio_manager_init(connection, config, &enable_sco) < 0)
+ 		goto failed;
+ 
+@@ -174,7 +168,6 @@ static int audio_init(void)
+ 
+ failed:
+ 	audio_manager_exit();
+-	unix_exit();
+ 
+ 	if (connection) {
+ 		dbus_connection_unref(connection);
+@@ -194,8 +187,6 @@ static void audio_exit(void)
+ 
+ 	audio_manager_exit();
+ 
+-	unix_exit();
+-
+ 	dbus_connection_unref(connection);
+ }
+ 
+diff --git a/audio/manager.c b/audio/manager.c
+index 3db5987..87e7a2a 100644
+--- a/audio/manager.c
++++ b/audio/manager.c
+@@ -70,6 +70,7 @@
+ #include "manager.h"
  #include "sdpd.h"
+ #include "telephony.h"
++#include "unix.h"
  
-@@ -600,9 +601,9 @@ static gboolean endpoint_setconf_ind(struct avdtp *session,
- }
- 
- static gboolean endpoint_getcap_ind(struct avdtp *session,
--				struct avdtp_local_sep *sep,
--				gboolean get_all,
--				GSList **caps, uint8_t *err, void *user_data)
-+					struct avdtp_local_sep *sep,
-+					gboolean get_all, GSList **caps,
-+					uint8_t *err, void *user_data)
- {
- 	struct a2dp_sep *a2dp_sep = user_data;
- 	struct avdtp_service_capability *media_transport, *media_codec;
-@@ -1031,6 +1032,28 @@ static gboolean delayreport_ind(struct avdtp *session,
- 	return TRUE;
- }
- 
-+static gboolean endpoint_delayreport_ind(struct avdtp *session,
-+						struct avdtp_local_sep *sep,
-+						uint8_t rseid, uint16_t delay,
-+						uint8_t *err, void *user_data)
-+{
-+	struct a2dp_sep *a2dp_sep = user_data;
-+	struct media_transport *transport;
-+
-+	if (a2dp_sep->type == AVDTP_SEP_TYPE_SINK)
-+		DBG("Sink %p: DelayReport_Ind", sep);
-+	else
-+		DBG("Source %p: DelayReport_Ind", sep);
-+
-+	transport = media_endpoint_get_transport(a2dp_sep->endpoint);
-+	if (transport == NULL)
-+		return FALSE;
-+
-+	media_transport_update_delay(transport, delay);
-+
-+	return TRUE;
-+}
-+
- static void reconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
- 			struct avdtp_stream *stream, struct avdtp_error *err,
- 			void *user_data)
-@@ -1115,7 +1138,7 @@ static struct avdtp_sep_ind endpoint_ind = {
- 	.close			= close_ind,
- 	.abort			= abort_ind,
- 	.reconfigure		= reconf_ind,
--	.delayreport		= delayreport_ind,
-+	.delayreport		= endpoint_delayreport_ind,
+ typedef enum {
+ 	HEADSET	= 1 << 0,
+@@ -113,6 +114,7 @@ static struct enabled_interfaces enabled = {
+ 	.sink		= TRUE,
+ 	.source		= FALSE,
+ 	.control	= TRUE,
++	.socket		= TRUE,
  };
  
- static sdp_record_t *a2dp_record(uint8_t type, uint16_t avdtp_ver)
-diff --git a/audio/media.c b/audio/media.c
-index da9d3ae..19ba1c4 100644
---- a/audio/media.c
-+++ b/audio/media.c
-@@ -681,3 +681,9 @@ uint8_t media_endpoint_get_codec(struct media_endpoint *endpoint)
- {
- 	return endpoint->codec;
- }
-+
-+struct media_transport *media_endpoint_get_transport(
-+					struct media_endpoint *endpoint)
-+{
-+	return endpoint->transport;
-+}
-diff --git a/audio/media.h b/audio/media.h
-index f6d144c..d089103 100644
---- a/audio/media.h
-+++ b/audio/media.h
-@@ -50,3 +50,5 @@ void media_endpoint_release(struct media_endpoint *endpoint);
- struct a2dp_sep *media_endpoint_get_sep(struct media_endpoint *endpoint);
- const char *media_endpoint_get_uuid(struct media_endpoint *endpoint);
- uint8_t media_endpoint_get_codec(struct media_endpoint *endpoint);
-+struct media_transport *media_endpoint_get_transport(
-+					struct media_endpoint *endpoint);
-diff --git a/audio/transport.c b/audio/transport.c
-index c4d78a4..0da99e8 100644
---- a/audio/transport.c
-+++ b/audio/transport.c
-@@ -669,3 +669,17 @@ const char *media_transport_get_path(struct media_transport *transport)
- {
- 	return transport->path;
- }
-+
-+void media_transport_update_delay(struct media_transport *transport,
-+							uint16_t delay)
-+{
-+	/* Check if delay really changed */
-+	if (transport->delay == delay)
-+		return;
-+
-+	transport->delay = delay;
-+
-+	emit_property_changed(transport->conn, transport->path,
-+				MEDIA_TRANSPORT_INTERFACE, "Delay",
-+				DBUS_TYPE_UINT16, &transport->delay);
-+}
-diff --git a/audio/transport.h b/audio/transport.h
-index a7594f0..f2eb37b 100644
---- a/audio/transport.h
-+++ b/audio/transport.h
-@@ -32,3 +32,5 @@ struct media_transport *media_transport_create(DBusConnection *conn,
+ static struct audio_adapter *find_adapter(GSList *list,
+@@ -1074,6 +1076,8 @@ int audio_manager_init(DBusConnection *conn, GKeyFile *conf,
+ 			enabled.source = TRUE;
+ 		else if (g_str_equal(list[i], "Control"))
+ 			enabled.control = TRUE;
++		else if (g_str_equal(list[i], "Socket"))
++			enabled.socket = TRUE;
+ 	}
+ 	g_strfreev(list);
  
- void media_transport_remove(struct media_transport *transport);
- const char *media_transport_get_path(struct media_transport *transport);
-+void media_transport_update_delay(struct media_transport *transport,
-+							uint16_t delay);
+@@ -1090,6 +1094,8 @@ int audio_manager_init(DBusConnection *conn, GKeyFile *conf,
+ 			enabled.source = FALSE;
+ 		else if (g_str_equal(list[i], "Control"))
+ 			enabled.control = FALSE;
++		else if (g_str_equal(list[i], "Socket"))
++			enabled.socket = FALSE;
+ 	}
+ 	g_strfreev(list);
+ 
+@@ -1117,6 +1123,9 @@ int audio_manager_init(DBusConnection *conn, GKeyFile *conf,
+ 		max_connected_headsets = i;
+ 
+ proceed:
++	if (enabled.socket)
++		unix_init();
++
+ 	if (enabled.headset) {
+ 		telephony_init();
+ 		btd_register_adapter_driver(&headset_server_driver);
+@@ -1152,6 +1161,9 @@ void audio_manager_exit(void)
+ 		config = NULL;
+ 	}
+ 
++	if (enabled.socket)
++		unix_exit();
++
+ 	if (enabled.headset) {
+ 		btd_unregister_adapter_driver(&headset_server_driver);
+ 		telephony_exit();
+diff --git a/audio/manager.h b/audio/manager.h
+index 90fe6f0..c79b761 100644
+--- a/audio/manager.h
++++ b/audio/manager.h
+@@ -29,6 +29,7 @@ struct enabled_interfaces {
+ 	gboolean sink;
+ 	gboolean source;
+ 	gboolean control;
++	gboolean socket;
+ };
+ 
+ int audio_manager_init(DBusConnection *conn, GKeyFile *config,
 -- 
 1.7.1
 
