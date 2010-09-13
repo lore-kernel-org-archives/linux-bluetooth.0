@@ -1,24 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
+From: <Waldemar.Rymarkiewicz@tieto.com>
+To: <suraj@atheros.com>, <linux-bluetooth@vger.kernel.org>
+CC: <Jothikumar.Mothilal@Atheros.com>
+Date: Mon, 13 Sep 2010 15:11:49 +0300
+Subject: RE: [RFC] BlueZ D-Bus Sim Access Profile Server API description
+Message-ID: <99B09243E1A5DA4898CDD8B700111448097968E653@EXMB04.eu.tieto.com>
+References: <1284374584-12282-1-git-send-email-suraj@atheros.com>
+In-Reply-To: <1284374584-12282-1-git-send-email-suraj@atheros.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Date: Mon, 13 Sep 2010 17:54:17 +0530
-Message-ID: <AANLkTimhWzTkEnwR-VFTc8X9DZsyOVj1oFHYUmBGpfFR@mail.gmail.com>
-Subject: Printing over BT without OBEX-BPP
-From: Zaahir Khan <kn.zahirkhan@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dear All,
+Hi Suraj, 
 
-We are having APM BT over UART.
+>+		void Disconnect(string type)
+>+
+>+			This initiates a SAP disconnection from 
+>SAP server.
+>+
+>+			The type parameter specifies the type 
+>of disconnection.
+>+
+>+			"Graceful"  -> lets the SAP client initiate a
+>+			garceful disconnection.
+>+
+>+			"Immediate" -> disconnects the connection
+>+			immediately from the server.
 
-Our object is to print over BT.
+How agent will use this method? I mean when it is supposed to use gracefull and when immediate disconnection?
 
-Is it possible to print without using OBEX-BPP?
+>+Signals		PropertyChanged(string name, variant value)
+>+
+>+			This signal indicates a changed value 
+>of the given
+>+			property.
 
-Any help highly appreciated.
+Is the signal really needed?  Who is interested in keeping track on properties?
 
-Thanks & regards,
 
-Zaahir Khan
+Thanks,
+/Waldek
