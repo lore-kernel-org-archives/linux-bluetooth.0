@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 10/10] Add proper checks for MediaTransport.SetProperty
-Date: Mon, 13 Sep 2010 17:15:37 +0300
-Message-Id: <1284387337-18822-11-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH 05/10] Add simple-endpoint test script
+Date: Mon, 13 Sep 2010 17:15:32 +0300
+Message-Id: <1284387337-18822-6-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1284387337-18822-1-git-send-email-luiz.dentz@gmail.com>
 References: <1284387337-18822-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,177 +12,142 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
 ---
- audio/transport.c |  116 +++++++++++++++++++++++++++++++++++++++++++----------
- 1 files changed, 94 insertions(+), 22 deletions(-)
+ test/simple-endpoint |  126 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 126 insertions(+), 0 deletions(-)
+ create mode 100755 test/simple-endpoint
 
-diff --git a/audio/transport.c b/audio/transport.c
-index 6d08677..7387818 100644
---- a/audio/transport.c
-+++ b/audio/transport.c
-@@ -83,12 +83,23 @@ struct media_transport {
- 	void			(*get_properties) (
- 					struct media_transport *transport,
- 					DBusMessageIter *dict);
--	DBusMessage		*(*set_property) (
-+	int			(*set_property) (
- 					struct media_transport *transport,
--					DBusConnection *conn,
--					DBusMessage *msg);
-+					const char *property,
-+					DBusMessageIter *value);
- };
- 
-+static inline DBusMessage *invalid_args(DBusMessage *msg)
-+{
-+	return g_dbus_create_error(msg, ERROR_INTERFACE ".InvalidArguments",
-+					"Invalid arguments in method call");
-+}
+diff --git a/test/simple-endpoint b/test/simple-endpoint
+new file mode 100755
+index 0000000..e09a528
+--- /dev/null
++++ b/test/simple-endpoint
+@@ -0,0 +1,126 @@
++#!/usr/bin/python
 +
-+static inline DBusMessage *error_failed(DBusMessage *msg, const char *desc)
-+{
-+	return g_dbus_create_error(msg, ERROR_INTERFACE ".Failed", "%s", desc);
-+}
++import sys
++import dbus
++import dbus.service
++import dbus.mainloop.glib
++import gobject
 +
- void media_transport_remove(struct media_transport *transport)
- {
- 	char *path;
-@@ -434,14 +445,10 @@ static DBusMessage *acquire(DBusConnection *conn, DBusMessage *msg,
- 
- 	renderer = media_transport_find_renderer(transport, sender);
- 	if (renderer != NULL)
--		return g_dbus_create_error(msg, ERROR_INTERFACE
--						".Failed",
--						"Permission denied");
-+		return error_failed(msg, strerror(EPERM));
- 
- 	if (media_transport_acquire(transport, accesstype) == FALSE)
--		return g_dbus_create_error(msg, ERROR_INTERFACE
--						".Failed",
--						"Permission denied");
-+		return error_failed(msg, strerror(EPERM));
- 
- 	renderer = media_renderer_create(transport, msg, accesstype);
- 	req = g_new0(struct acquire_request, 1);
-@@ -471,9 +478,7 @@ static DBusMessage *release(DBusConnection *conn, DBusMessage *msg,
- 
- 	renderer = media_transport_find_renderer(transport, sender);
- 	if (renderer == NULL)
--		return g_dbus_create_error(msg, ERROR_INTERFACE
--						".Failed",
--						"Permission denied");
-+		return error_failed(msg, strerror(EPERM));
- 
- 	if (g_strcmp0(renderer->accesstype, accesstype) == 0)
- 		media_renderer_remove(renderer);
-@@ -481,31 +486,98 @@ static DBusMessage *release(DBusConnection *conn, DBusMessage *msg,
- 		media_transport_release(transport, accesstype);
- 		g_strdelimit(renderer->accesstype, accesstype, ' ');
- 	} else
--		return g_dbus_create_error(msg, ERROR_INTERFACE
--						".Failed",
--						"Permission denied");
-+		return error_failed(msg, strerror(EPERM));
- 
- 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
- }
- 
--static DBusMessage *set_property_a2dp(struct media_transport *transport,
--					DBusConnection *conn, DBusMessage *msg)
-+static int set_property_a2dp(struct media_transport *transport,
-+						const char *property,
-+						DBusMessageIter *value)
- {
--	return NULL;
-+	if (g_strcmp0(property, "Delay") == 0) {
-+		if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_UINT16)
-+			return -EINVAL;
-+		dbus_message_iter_get_basic(value, &transport->delay);
++A2DP_SOURCE_UUID = "0000110A-0000-1000-8000-00805F9B34FB"
++A2DP_SINK_UUID = "0000110B-0000-1000-8000-00805F9B34FB"
++HFP_AG_UUID = "0000111F-0000-1000-8000-00805F9B34FB"
++HSP_AG_UUID = "00001112-0000-1000-8000-00805F9B34FB"
 +
-+		/* FIXME: send new delay */
-+		return 0;
-+	}
++SBC_CODEC = dbus.Byte(0x00)
++#Channel Modes: Mono DualChannel Stereo JointStereo
++#Frequencies: 16Khz 32Khz 44.1Khz 48Khz
++#Subbands: 4 8
++#Blocks: 4 8 12 16
++#Bitpool Range: 2-64
++SBC_CAPABILITIES = dbus.Array([dbus.Byte(0xff), dbus.Byte(0xff), dbus.Byte(2), dbus.Byte(64)])
++# JointStereo 44.1Khz Subbands: Blocks: 16 Bitpool Range: 2-32
++SBC_CONFIGURATION = dbus.Array([dbus.Byte(0x21), dbus.Byte(0x15), dbus.Byte(2), dbus.Byte(32)])
 +
-+	return -EINVAL;
- }
- 
--static DBusMessage *set_property_headset(struct media_transport *transport,
--					DBusConnection *conn, DBusMessage *msg)
-+static int set_property_headset(struct media_transport *transport,
-+						const char *property,
-+						DBusMessageIter *value)
- {
--	return NULL;
-+	if (g_strcmp0(property, "NREC") == 0) {
-+		gboolean nrec;
++MP3_CODEC = dbus.Byte(0x01)
++#Channel Modes: Mono DualChannel Stereo JointStereo
++#Frequencies: 32Khz 44.1Khz 48Khz
++#CRC: YES
++#Layer: 3
++#Bit Rate: All except Free format
++#VBR: Yes
++#Payload Format: RFC-2250
++MP3_CAPABILITIES = dbus.Array([dbus.Byte(0x3f), dbus.Byte(0x07), dbus.Byte(0xff), dbus.Byte(0xfe)])
++# JointStereo 44.1Khz Layer: 3 Bit Rate: VBR Format: RFC-2250
++MP3_CONFIGURATION = dbus.Array([dbus.Byte(0x21), dbus.Byte(0x02), dbus.Byte(0x00), dbus.Byte(0x80)])
 +
-+		if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_BOOLEAN)
-+			return -EINVAL;
-+		dbus_message_iter_get_basic(value, &nrec);
++PCM_CODEC = dbus.Byte(0x00)
++PCM_CONFIGURATION = dbus.Array([], signature="ay")
 +
-+		/* FIXME: set new nrec */
-+		return 0;
-+	} else if (g_strcmp0(property, "InbandRingtone") == 0) {
-+		gboolean inband;
++class Rejected(dbus.DBusException):
++	_dbus_error_name = "org.bluez.Error.Rejected"
 +
-+		if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_BOOLEAN)
-+			return -EINVAL;
-+		dbus_message_iter_get_basic(value, &inband);
++class Endpoint(dbus.service.Object):
++	exit_on_release = True
++	configuration = SBC_CONFIGURATION
 +
-+		/* FIXME: set new inband */
-+		return 0;
-+	}
++	def set_exit_on_release(self, exit_on_release):
++		self.exit_on_release = exit_on_release
 +
-+	return -EINVAL;
- }
- 
- static DBusMessage *set_property(DBusConnection *conn, DBusMessage *msg,
- 								void *data)
- {
- 	struct media_transport *transport = data;
-+	DBusMessageIter iter;
-+	DBusMessageIter value;
-+	const char *property, *sender;
-+	GSList *l;
-+	int err;
++	def default_configuration(self, configuration):
++		self.configuration = configuration
 +
-+	if (!dbus_message_iter_init(msg, &iter))
-+		return invalid_args(msg);
++	@dbus.service.method("org.bluez.MediaEndpoint",
++					in_signature="", out_signature="")
++	def Release(self):
++		print "Release"
++		if self.exit_on_release:
++			mainloop.quit()
 +
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
-+		return invalid_args(msg);
++	@dbus.service.method("org.bluez.MediaEndpoint",
++					in_signature="", out_signature="")
++	def ClearConfiguration(self):
++		print "ClearConfiguration"
 +
-+	dbus_message_iter_get_basic(&iter, &property);
-+	dbus_message_iter_next(&iter);
++	@dbus.service.method("org.bluez.MediaEndpoint",
++					in_signature="oay", out_signature="")
++	def SetConfiguration(self, transport, config):
++		print "SetConfiguration (%s, %s)" % (transport, config)
++		return
 +
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_VARIANT)
-+		return invalid_args(msg);
-+	dbus_message_iter_recurse(&iter, &value);
++	@dbus.service.method("org.bluez.MediaEndpoint",
++					in_signature="ay", out_signature="ay")
++	def SelectConfiguration(self, caps):
++		print "SelectConfiguration (%s)" % (caps)
++		return self.configuration
 +
-+	sender = dbus_message_get_sender(msg);
-+	err = -EINVAL;
- 
--	return transport->set_property(transport, conn, msg);
-+	/* Check if sender has acquired the transport */
-+	for (l = transport->renderers; l; l = l->next) {
-+		struct media_renderer *renderer = l->data;
++if __name__ == '__main__':
++	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 +
-+		if (g_strcmp0(renderer->name, sender) == 0) {
-+			err = transport->set_property(transport, property,
-+								&value);
-+			break;
-+		}
-+	}
++	bus = dbus.SystemBus()
++	manager = dbus.Interface(bus.get_object("org.bluez", "/"),
++						"org.bluez.Manager")
 +
-+	if (err < 0) {
-+		if (err == -EINVAL)
-+			return invalid_args(msg);
-+		return error_failed(msg, strerror(-err));
-+	}
++	if len(sys.argv) > 1:
++		path = manager.FindAdapter(sys.argv[1])
++	else:
++		path = manager.DefaultAdapter()
 +
-+	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
- }
- 
- static void get_properties_a2dp(struct media_transport *transport,
++	media = dbus.Interface(bus.get_object("org.bluez", path),
++						"org.bluez.Media")
++
++	path = "/test/endpoint"
++	endpoint = Endpoint(bus, path)
++	mainloop = gobject.MainLoop()
++
++	properties = dbus.Dictionary({ "UUID" : A2DP_SOURCE_UUID,
++					"Codec" : SBC_CODEC,
++					"DelayReporting" : True,
++					"Capabilities" : SBC_CAPABILITIES })
++
++	if len(sys.argv) > 2:
++		if sys.argv[2] == "sbcsink":
++			properties = dbus.Dictionary({ "UUID" : A2DP_SINK_UUID,
++							"Codec" : SBC_CODEC,
++							"DelayReporting" : True,
++							"Capabilities" : SBC_CAPABILITIES })
++		if sys.argv[2] == "mp3source":
++			properties = dbus.Dictionary({ "UUID" : A2DP_SOURCE_UUID,
++							"Codec" : MP3_CODEC,
++							"Capabilities" : MP3_CAPABILITIES })
++			endpoint.default_configuration(MP3_CONFIGURATION)
++		if sys.argv[2] == "mp3sink":
++			properties = dbus.Dictionary({ "UUID" : A2DP_SINK_UUID,
++							"Codec" : MP3_CODEC,
++							"Capabilities" : MP3_CAPABILITIES })
++			endpoint.default_configuration(MP3_CONFIGURATION)
++		if sys.argv[2] == "hfpag" or sys.argv[2] == "hspag":
++			properties = dbus.Dictionary({ "UUID" : HFP_AG_UUID,
++							"Codec" : PCM_CODEC,
++							"Capabilities" :  PCM_CONFIGURATION })
++			endpoint.default_configuration(dbus.Array([]))
++
++	print properties
++
++	media.RegisterEndpoint(path, properties)
++
++	mainloop.run()
 -- 
 1.7.1
 
