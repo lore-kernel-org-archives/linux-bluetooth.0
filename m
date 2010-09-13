@@ -1,94 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Briglia <anderson.briglia@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Briglia <anderson.briglia@openbossa.org>
-Subject: [PATCH v3 1/2] Bluetooth: Implement LE Set Advertise Enable cmd
-Date: Mon, 13 Sep 2010 09:22:01 -0400
-Message-Id: <1284384122-8393-1-git-send-email-anderson.briglia@openbossa.org>
+Date: Mon, 13 Sep 2010 16:21:16 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fix crash on gstreamer plugin if device doesn't
+ support sbc
+Message-ID: <20100913132116.GA6381@jh-x301>
+References: <1284381611-17203-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1284381611-17203-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch implements LE Set Advertise Enable command for dual mode and
-Low Energy hci controllers. It also adds new HCI flags in order to
-indicate the Advertising state for userland applications and kernel
-itself.
+Hi Luiz,
 
-Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
----
- include/net/bluetooth/hci.h |    7 +++++++
- net/bluetooth/hci_event.c   |   27 +++++++++++++++++++++++++++
- 2 files changed, 34 insertions(+), 0 deletions(-)
+On Mon, Sep 13, 2010, Luiz Augusto von Dentz wrote:
+>  audio/gstavdtpsink.c |    3 +++
+>  1 files changed, 3 insertions(+), 0 deletions(-)
+> 
+> diff --git a/audio/gstavdtpsink.c b/audio/gstavdtpsink.c
+> index f0e5b76..b8c8832 100644
+> --- a/audio/gstavdtpsink.c
+> +++ b/audio/gstavdtpsink.c
+> @@ -448,6 +448,9 @@ static GstStructure *gst_avdtp_sink_parse_sbc_caps(
+>  	GValue *list;
+>  	gboolean mono, stereo;
+>  
+> +	if (sbc == NULL)
+> +		return NULL;
+> +
+>  	structure = gst_structure_empty_new("audio/x-sbc");
+>  	value = g_value_init(g_new0(GValue, 1), G_TYPE_STRING);
+>  
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index bcbdd6d..20ef99a 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -76,6 +76,8 @@ enum {
- 	HCI_INQUIRY,
- 
- 	HCI_RAW,
-+
-+	HCI_LE_ADV,
- };
- 
- /* HCI ioctl defines */
-@@ -593,6 +595,11 @@ struct hci_rp_read_bd_addr {
- 	bdaddr_t bdaddr;
- } __packed;
- 
-+/* --- HCI LE Commands --- */
-+#define HCI_OP_LE_SET_ADVERTISE_ENABLE	0x200a
-+	#define LE_ADVERTISE_ENABLED	0x01
-+	#define LE_ADVERTISE_DISABLED	0x00
-+
- /* ---- HCI Events ---- */
- #define HCI_EV_INQUIRY_COMPLETE		0x01
- 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index bfef5ba..262a5b3 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -822,6 +822,29 @@ static void hci_cs_exit_sniff_mode(struct hci_dev *hdev, __u8 status)
- 	hci_dev_unlock(hdev);
- }
- 
-+static void hci_cc_le_set_advertise(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	__u8 status = *((__u8 *) skb->data);
-+	void *sent;
-+
-+	BT_DBG("%s status 0x%x", hdev->name, status);
-+
-+	sent = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_ADVERTISE_ENABLE);
-+	if (!sent)
-+		return;
-+
-+	if (!status) {
-+		__u8 param = *((__u8 *) sent);
-+
-+		if (param & LE_ADVERTISE_ENABLED)
-+			set_bit(HCI_LE_ADV, &hdev->flags);
-+		else
-+			clear_bit(HCI_LE_ADV, &hdev->flags);
-+	}
-+
-+	hci_req_complete(hdev, status);
-+}
-+
- static inline void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	__u8 status = *((__u8 *) skb->data);
-@@ -1310,6 +1333,10 @@ static inline void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *sk
- 		hci_cc_read_bd_addr(hdev, skb);
- 		break;
- 
-+	case HCI_OP_LE_SET_ADVERTISE_ENABLE:
-+		hci_cc_le_set_advertise(hdev, skb);
-+		break;
-+
- 	default:
- 		BT_DBG("%s opcode 0x%x", hdev->name, opcode);
- 		break;
--- 
-1.7.0.4
+The patch has been pushed upstream. Thanks.
 
+Johan
