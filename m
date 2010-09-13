@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 05/10] Add simple-endpoint test script
-Date: Mon, 13 Sep 2010 17:15:32 +0300
-Message-Id: <1284387337-18822-6-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH 07/10] Introduce headset_get_inband
+Date: Mon, 13 Sep 2010 17:15:34 +0300
+Message-Id: <1284387337-18822-8-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1284387337-18822-1-git-send-email-luiz.dentz@gmail.com>
 References: <1284387337-18822-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,142 +12,43 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
 ---
- test/simple-endpoint |  126 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 126 insertions(+), 0 deletions(-)
- create mode 100755 test/simple-endpoint
+ audio/headset.c |   10 ++++++++++
+ audio/headset.h |    1 +
+ 2 files changed, 11 insertions(+), 0 deletions(-)
 
-diff --git a/test/simple-endpoint b/test/simple-endpoint
-new file mode 100755
-index 0000000..e09a528
---- /dev/null
-+++ b/test/simple-endpoint
-@@ -0,0 +1,126 @@
-+#!/usr/bin/python
+diff --git a/audio/headset.c b/audio/headset.c
+index cdb3370..dad0716 100644
+--- a/audio/headset.c
++++ b/audio/headset.c
+@@ -2701,6 +2701,16 @@ gboolean headset_get_nrec(struct audio_device *dev)
+ 	return hs->slc->nrec;
+ }
+ 
++gboolean headset_get_inband(struct audio_device *dev)
++{
++	struct headset *hs = dev->headset;
 +
-+import sys
-+import dbus
-+import dbus.service
-+import dbus.mainloop.glib
-+import gobject
++	if (!hs->slc)
++		return TRUE;
 +
-+A2DP_SOURCE_UUID = "0000110A-0000-1000-8000-00805F9B34FB"
-+A2DP_SINK_UUID = "0000110B-0000-1000-8000-00805F9B34FB"
-+HFP_AG_UUID = "0000111F-0000-1000-8000-00805F9B34FB"
-+HSP_AG_UUID = "00001112-0000-1000-8000-00805F9B34FB"
++	return hs->slc->inband_ring;
++}
 +
-+SBC_CODEC = dbus.Byte(0x00)
-+#Channel Modes: Mono DualChannel Stereo JointStereo
-+#Frequencies: 16Khz 32Khz 44.1Khz 48Khz
-+#Subbands: 4 8
-+#Blocks: 4 8 12 16
-+#Bitpool Range: 2-64
-+SBC_CAPABILITIES = dbus.Array([dbus.Byte(0xff), dbus.Byte(0xff), dbus.Byte(2), dbus.Byte(64)])
-+# JointStereo 44.1Khz Subbands: Blocks: 16 Bitpool Range: 2-32
-+SBC_CONFIGURATION = dbus.Array([dbus.Byte(0x21), dbus.Byte(0x15), dbus.Byte(2), dbus.Byte(32)])
-+
-+MP3_CODEC = dbus.Byte(0x01)
-+#Channel Modes: Mono DualChannel Stereo JointStereo
-+#Frequencies: 32Khz 44.1Khz 48Khz
-+#CRC: YES
-+#Layer: 3
-+#Bit Rate: All except Free format
-+#VBR: Yes
-+#Payload Format: RFC-2250
-+MP3_CAPABILITIES = dbus.Array([dbus.Byte(0x3f), dbus.Byte(0x07), dbus.Byte(0xff), dbus.Byte(0xfe)])
-+# JointStereo 44.1Khz Layer: 3 Bit Rate: VBR Format: RFC-2250
-+MP3_CONFIGURATION = dbus.Array([dbus.Byte(0x21), dbus.Byte(0x02), dbus.Byte(0x00), dbus.Byte(0x80)])
-+
-+PCM_CODEC = dbus.Byte(0x00)
-+PCM_CONFIGURATION = dbus.Array([], signature="ay")
-+
-+class Rejected(dbus.DBusException):
-+	_dbus_error_name = "org.bluez.Error.Rejected"
-+
-+class Endpoint(dbus.service.Object):
-+	exit_on_release = True
-+	configuration = SBC_CONFIGURATION
-+
-+	def set_exit_on_release(self, exit_on_release):
-+		self.exit_on_release = exit_on_release
-+
-+	def default_configuration(self, configuration):
-+		self.configuration = configuration
-+
-+	@dbus.service.method("org.bluez.MediaEndpoint",
-+					in_signature="", out_signature="")
-+	def Release(self):
-+		print "Release"
-+		if self.exit_on_release:
-+			mainloop.quit()
-+
-+	@dbus.service.method("org.bluez.MediaEndpoint",
-+					in_signature="", out_signature="")
-+	def ClearConfiguration(self):
-+		print "ClearConfiguration"
-+
-+	@dbus.service.method("org.bluez.MediaEndpoint",
-+					in_signature="oay", out_signature="")
-+	def SetConfiguration(self, transport, config):
-+		print "SetConfiguration (%s, %s)" % (transport, config)
-+		return
-+
-+	@dbus.service.method("org.bluez.MediaEndpoint",
-+					in_signature="ay", out_signature="ay")
-+	def SelectConfiguration(self, caps):
-+		print "SelectConfiguration (%s)" % (caps)
-+		return self.configuration
-+
-+if __name__ == '__main__':
-+	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-+
-+	bus = dbus.SystemBus()
-+	manager = dbus.Interface(bus.get_object("org.bluez", "/"),
-+						"org.bluez.Manager")
-+
-+	if len(sys.argv) > 1:
-+		path = manager.FindAdapter(sys.argv[1])
-+	else:
-+		path = manager.DefaultAdapter()
-+
-+	media = dbus.Interface(bus.get_object("org.bluez", path),
-+						"org.bluez.Media")
-+
-+	path = "/test/endpoint"
-+	endpoint = Endpoint(bus, path)
-+	mainloop = gobject.MainLoop()
-+
-+	properties = dbus.Dictionary({ "UUID" : A2DP_SOURCE_UUID,
-+					"Codec" : SBC_CODEC,
-+					"DelayReporting" : True,
-+					"Capabilities" : SBC_CAPABILITIES })
-+
-+	if len(sys.argv) > 2:
-+		if sys.argv[2] == "sbcsink":
-+			properties = dbus.Dictionary({ "UUID" : A2DP_SINK_UUID,
-+							"Codec" : SBC_CODEC,
-+							"DelayReporting" : True,
-+							"Capabilities" : SBC_CAPABILITIES })
-+		if sys.argv[2] == "mp3source":
-+			properties = dbus.Dictionary({ "UUID" : A2DP_SOURCE_UUID,
-+							"Codec" : MP3_CODEC,
-+							"Capabilities" : MP3_CAPABILITIES })
-+			endpoint.default_configuration(MP3_CONFIGURATION)
-+		if sys.argv[2] == "mp3sink":
-+			properties = dbus.Dictionary({ "UUID" : A2DP_SINK_UUID,
-+							"Codec" : MP3_CODEC,
-+							"Capabilities" : MP3_CAPABILITIES })
-+			endpoint.default_configuration(MP3_CONFIGURATION)
-+		if sys.argv[2] == "hfpag" or sys.argv[2] == "hspag":
-+			properties = dbus.Dictionary({ "UUID" : HFP_AG_UUID,
-+							"Codec" : PCM_CODEC,
-+							"Capabilities" :  PCM_CONFIGURATION })
-+			endpoint.default_configuration(dbus.Array([]))
-+
-+	print properties
-+
-+	media.RegisterEndpoint(path, properties)
-+
-+	mainloop.run()
+ gboolean headset_get_sco_hci(struct audio_device *dev)
+ {
+ 	return sco_hci;
+diff --git a/audio/headset.h b/audio/headset.h
+index 8b7c738..29dc02c 100644
+--- a/audio/headset.h
++++ b/audio/headset.h
+@@ -90,6 +90,7 @@ int headset_get_channel(struct audio_device *dev);
+ 
+ int headset_get_sco_fd(struct audio_device *dev);
+ gboolean headset_get_nrec(struct audio_device *dev);
++gboolean headset_get_inband(struct audio_device *dev);
+ gboolean headset_get_sco_hci(struct audio_device *dev);
+ 
+ gboolean headset_is_active(struct audio_device *dev);
 -- 
 1.7.1
 
