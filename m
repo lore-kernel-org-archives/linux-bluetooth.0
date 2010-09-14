@@ -1,78 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [RFC] BlueZ D-Bus Sim Access Profile Server API description
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Suraj Sumangala <suraj@Atheros.com>
-Cc: Suraj Sumangala <Suraj.Sumangala@Atheros.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>
-In-Reply-To: <4C8F160B.4010401@Atheros.com>
-References: <1284374584-12282-1-git-send-email-suraj@atheros.com>
-	 <1284442946.2405.50.camel@localhost.localdomain>
-	 <4C8F160B.4010401@Atheros.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 15 Sep 2010 12:44:24 +0900
-Message-ID: <1284522264.2405.89.camel@localhost.localdomain>
-Mime-Version: 1.0
+Date: Tue, 14 Sep 2010 15:21:47 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv3 3/3] Bluetooth: check L2CAP length in first ACL
+ fragment
+Message-ID: <20100914182147.GB5398@vigoh>
+References: <1284018181-29928-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1284018181-29928-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1284018181-29928-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Suraj,
+Hi Andrei,
 
-> >> Below is the Sim Access Profile server role API discription.
-> >> Please let me know your comments.
-> >
-> > my obvious question is why do we wanna do this over D-Bus and not
-> > connect it directly to the hardware via a plugin?
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2010-09-09 10:43:01 +0300]:
+
+> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 > 
-> You meant creating something like a tty device and let the hardware 
-> connect directly to this?
+> Current Bluetooth code assembles fragments of big L2CAP packets
+> in l2cap_recv_acldata and then checks allowed L2CAP size in
+> assemled L2CAP packet (pi->imtu < skb->len).
 > 
-> The initial plan was to use a D-Bus file descriptor and transfer the SAP 
-> packets to the agent over it.
+> The patch moves allowed L2CAP size check to the early stage when
+> we receive the first fragment of L2CAP packet. We do not need to
+> reserve and keep L2CAP fragments for bad packets.
 > 
-> The problem was the SAP packet format is specified by the Bluetooth SAP 
-> spec. I could not relate it to any generic packet format ( Like HF, HS, 
-> DUN can be mapped to an AT parser).
+> Updated version after comments from Mat Martineau <mathewm@codeaurora.org>
 > 
-> I am not sure if any existing card reader implementation could parse it 
-> to extract SIM card related data (APDU) without additional support for it.
+> Trace below is received when using stress tools sending big
+> fragmented L2CAP packets.
+> ...
+> [ 1712.798492] swapper: page allocation failure. order:4, mode:0x4020
+> [ 1712.804809] [<c0031870>] (unwind_backtrace+0x0/0xdc) from [<c00a1f70>]
+> (__alloc_pages_nodemask+0x4)
+> [ 1712.814666] [<c00a1f70>] (__alloc_pages_nodemask+0x47c/0x4d4) from
+> [<c00a1fd8>] (__get_free_pages+)
+> [ 1712.824645] [<c00a1fd8>] (__get_free_pages+0x10/0x3c) from [<c026eb5c>]
+> (__alloc_skb+0x4c/0xfc)
+> [ 1712.833465] [<c026eb5c>] (__alloc_skb+0x4c/0xfc) from [<bf28c738>]
+> (l2cap_recv_acldata+0xf0/0x1f8 )
+> [ 1712.843322] [<bf28c738>] (l2cap_recv_acldata+0xf0/0x1f8 [l2cap]) from
+> [<bf0094ac>] (hci_rx_task+0x)
+> ...
 > 
-> Another reason I thought about D-Bus was because, most of the SAP 
-> operations are Request/Response type like Reset, SimOn etc.
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> ---
+>  net/bluetooth/l2cap.c |   17 +++++++++++++++++
+>  1 files changed, 17 insertions(+), 0 deletions(-)
 > 
-> It mapped better with a Method/Signal communication than packet transfer.
-> 
-> Some of the card reader implementation I checked had proprietary packet 
-> format. So not sure how we could interface with them.
-> >
-> > Remember that SIM transaction are timing critical and just relaying them
-> > over D-Bus doesn't sound the right approach right now. While of course
-> > even bluetoothd can't guarantee and response time, it is clearly better
-> > than over D-Bus.
-> >
-> 
-> I would really appreciate if you can give me any idea about working 
-> around the above mentioned issues.
+> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> index ce8f5e4..c95fbd8 100644
+> --- a/net/bluetooth/l2cap.c
+> +++ b/net/bluetooth/l2cap.c
+> @@ -4654,6 +4654,8 @@ static int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 fl
+>  
+>  	if (flags & ACL_START) {
+>  		struct l2cap_hdr *hdr;
+> +		struct sock *sk;
+> +		u16 cid;
+>  		int len;
+>  
+>  		if (conn->rx_len) {
+> @@ -4673,6 +4675,7 @@ static int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 fl
+>  
+>  		hdr = (struct l2cap_hdr *) skb->data;
+>  		len = __le16_to_cpu(hdr->len) + L2CAP_HDR_SIZE;
+> +		cid = __le16_to_cpu(hdr->cid);
+>  
+>  		if (len == skb->len) {
+>  			/* Complete frame received */
+> @@ -4689,6 +4692,20 @@ static int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 fl
+>  			goto drop;
+>  		}
+>  
+> +		sk = l2cap_get_chan_by_scid(&conn->chan_list, cid);
+> +
+> +		if (sk && l2cap_pi(sk)->imtu < len) {
+> +			BT_ERR("Frame exceeding recv MTU (len %d, MTU %d)",
+> +					len, l2cap_pi(sk)->imtu);
 
-if we talk about the SAP server role found in a mobile phone, then that
-support clearly needs to interact with the telephony stack. Since when
-SAP is active the telephony stack needs to be suspended and all SIM
-transaction being forwarded.
+I think you have to check if the imtu is less than (len -
+L2CAP_HDR_SIZE) because we don't count the header in the MTU.
 
-Currently I would be thinking that the SAP implementation should be done
-inside oFono actually. Since then you have direct access to the
-hardware. The D-Bus approach just doesn't sound correct to me. I could
-be of course wrong, but I can't wrap my mind around on how you can make
-this work.
+> +			conn->rx_len = 0; /* needed? */
 
-Even with file descriptor passing this doesn't look like the right
-approach. If we need a hardware abstraction than we either use oFono or
-we have to create some SAP hardware access abstraction.
-
-The SAP client role found a carkit is obviously a different story.
-
-Regards
-
-Marcel
+It's not needed. rx_len is always zero here.
 
 
+-- 
+Gustavo F. Padovan
+ProFUSION embedded systems - http://profusion.mobi
