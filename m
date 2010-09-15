@@ -1,67 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 15 Sep 2010 21:53:40 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: jaikumar Ganesh <jaikumarg@gmail.com>
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>,
-	linux-bluetooth@vger.kernel.org,
-	par-gunnar.p.hjalmdahl@stericsson.com
-Subject: Re: [RFC] D-Bus API for out of band association model
-Message-ID: <20100915185340.GA2804@jh-x301>
-References: <1284537527-22783-1-git-send-email-andrzej.kaczmarek@tieto.com>
- <20100915081047.GA15065@jh-x301>
- <AANLkTimm++uSFQmkKHF+vHzp=Kc0tYpzb+xqq=eG6jnW@mail.gmail.com>
- <AANLkTikryj2AeaCWpVKQhkMznfAF-d15QpJF6=BgyGsY@mail.gmail.com>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Wed, 15 Sep 2010 15:42:35 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, marcel@holtmann.org,
+	davem@davemloft.net
+Subject: Re: Possible regression with skb_clone() in 2.6.36
+Message-ID: <20100915184235.GA31685@vigoh>
+References: <1283988727-1456-1-git-send-email-padovan@profusion.mobi>
+ <alpine.DEB.2.00.1009100920270.14322@linux-sea-02>
+ <20100910194509.GC19693@vigoh>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTikryj2AeaCWpVKQhkMznfAF-d15QpJF6=BgyGsY@mail.gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20100910194509.GC19693@vigoh>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaikumar,
+Hi Mat,
 
-On Wed, Sep 15, 2010, jaikumar Ganesh wrote:
-> We started to work on this API too last week. Not complete yet to post
-> to the mailing list.
-> The approach we took was this:
+* Gustavo F. Padovan <padovan@profusion.mobi> [2010-09-10 16:45:09 -0300]:
+
+> Hi Mat,
 > 
->  a) Since OOB authentication is just another means of authentication
-> compared to Passkey, Pin entry,
->       we added an agent API (similar to the lines of other
-> authentication mechanisms) that will ask for the Out Of Band data.
-> b) We added an API to the adapter to get the local Out of Band Data
-> c) Currently, RegisterAgent is called to register with the
-> capabilities. Since OOB is part of the capabilities data structure, we
-> added OOB to agent structure which already has the capabilities.
-> d) We added an API variant of createPairedDevice which will be used
-> for OutOfBand Pairing. When the device agent is created, the OOB field
->     in agent is updated.
-> e) When a capability request comes from the remote side the agent OOB
-> field is checked. It will be set if the pairing is initiated locally
-> through d).
->     For incoming pairing requests if the Agent has OOB field set but
-> there is no device specific agent, we need to make an Agent API call
-> asking if
->     there is OOB data for this remote device.
+> * Mat Martineau <mathewm@codeaurora.org> [2010-09-10 09:53:31 -0700]:
 > 
-> We left it to the users of the API - regarding the OOB channel to use.
-> It can be NFC or any other trusted channel.
+> > 
+> > Gustavo -
+> > 
+> > I'm not sure why the streaming code used to work, but this does not 
+> > look like an skb_clone() problem.  Your patch to remove the 
+> > skb_clone() call in l2cap_streaming_send() addresses the root cause of 
+> > this crash.
+> > 
+> > On Wed, 8 Sep 2010, Gustavo F. Padovan wrote:
+> > 
+> > > I've been experiencing some problems when running the L2CAP Streaming mode in
+> > > 2.6.36. The system quickly runs in an Out Of Memory condition and crash. That
+> > > wasn't happening before, so I think we may have a regression here (I didn't
+> > > find where yet). The crash log is below.
+> > >
+> > > The following patch does not fix the regression, but shows that removing the
+> > > skb_clone() call from l2cap_streaming_send() we workaround the problem. The
+> > > patch is good anyway because it saves memory and time.
+> > >
+> > > By now I have no idea on how to fix this.
+> > >
+> > > <snip>
+> > 
+> > This has to do with the sk->sk_wmem_alloc accounting that controls the 
+> > amount of write buffer space used on the socket.
+> > 
+> > When the L2CAP streaming mode socket segments its data, it allocates 
+> > memory using sock_alloc_send_skb() (via bt_skb_send_alloc()).  Before 
+> > that allocation call returns, skb_set_owner_w() is called on the new 
+> > skb.  This adds to sk->sk_wmem_alloc and sets skb->destructor so that 
+> > sk->sk_wmem_alloc is correctly updated when the skb is freed.
+> > 
+> > When that skb is cloned, the clone is not "owned" by the write buffer. 
+> > The clone's destructor is set to NULL in __skb_clone().  The version 
+> > of l2cap_streaming_send() that runs out of memory is passing the 
+> > non-owned skb clone down to the HCI layer.  The original skb (the one 
+> > that's "owned by w") is immediately freed, which adjusts 
+> > sk->sk_wmem_alloc back down - the socket thinks it has unlimited write 
+> > buffer space.  As a result, bt_skb_send_alloc() never blocks waiting 
+> > for buffer space (or returns EAGAIN for nonblocking writes) and the 
+> > HCI send queue keeps growing.
 > 
-> Comments ?
+> If the problem is what you are saying, add a skb_set_owner_w(skb, sk) on
+> the cloned skb should solve the problem, but it doesn't. That's exactly
+> what tcp_transmit_skb() does. Also that just appeared in 2.6.36, is was
+> working fine before, i.e, we have a regression here. 
 
-I'm still not convinced that the Agent is the right place for this. The
-agent is typically representing the UI whereas in most cases (like NFC)
-the OOB data will be coming from below bluetoothd in the software stack
-and not from above it (which is where the agent resides). Also, the
-presence of OOB data isn't really agent specific. It's something that
-can come and go during the lifetime of an agent.
+I've run some other tests and what you said also fixes the problem for
+Streaming Mode. If I use skb_set_owner_w() on the cloned skb, everything
+works fine. But we still have the problem for ERTM as I described.
+send() blocks wainting for memory. The regression is there yet.
+:(
 
-My idea has been to add a a plugin interface through which a hardware
-specific plugin could notify the core daemon about the existence of OOB
-data. bluetoothd would then take care of setting the right flag when it
-gets a IO capability request. This doesn't of course rule out the
-possibility of having part of the work done in another process since the
-plugin could simply export a service over D-Bus or talk to another D-Bus
-service.
+> 
+> > 
+> > This isn't a problem for the ERTM sends, because the original skbs are 
+> > kept in the ERTM tx queue until they are acked.  Once they're acked, 
+> > the write buffer space is freed and additional skbs can be allocated.
+> 
+> It affects ERTM as well, but in that case the kernel doesn't crash
+> because ERTM block on sending trying to allocate memory. Then we are not
+> able to receive any ack (everything stays queued in sk_backlog_queue as
+> the sk is owned by the user) and ERTM stalls.
+> 
 
-Johan
+-- 
+Gustavo F. Padovan
+ProFUSION embedded systems - http://profusion.mobi
