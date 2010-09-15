@@ -1,51 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 15 Sep 2010 12:49:09 +0300
-From: Ville Tervo <ville.tervo@nokia.com>
-To: "ext johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"Hedberg Johan (Nokia-MS/Helsinki)" <Johan.Hedberg@nokia.com>
-Subject: Re: [PATCH] Bluetooth: Don't clear the blacklist when closing the
- HCI device
-Message-ID: <20100915094909.GB14330@null>
-References: <1284017559-13510-1-git-send-email-johan.hedberg@gmail.com>
+From: <Waldemar.Rymarkiewicz@tieto.com>
+To: <marcel@holtmann.org>, <suraj@Atheros.com>
+CC: <Suraj.Sumangala@Atheros.com>, <linux-bluetooth@vger.kernel.org>,
+	<Jothikumar.Mothilal@Atheros.com>
+Date: Wed, 15 Sep 2010 12:18:54 +0300
+Subject: RE: [RFC] BlueZ D-Bus Sim Access Profile Server API description
+Message-ID: <99B09243E1A5DA4898CDD8B700111448097968EDE3@EXMB04.eu.tieto.com>
+References: <1284374584-12282-1-git-send-email-suraj@atheros.com>
+	 <1284442946.2405.50.camel@localhost.localdomain>
+	 <4C8F160B.4010401@Atheros.com>
+ <1284522264.2405.89.camel@localhost.localdomain>
+In-Reply-To: <1284522264.2405.89.camel@localhost.localdomain>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1284017559-13510-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Sep 09, 2010 at 09:32:39AM +0200, ext johan.hedberg@gmail.com wrote:
-> From: Johan Hedberg <johan.hedberg@nokia.com>
-> 
-> Clearing the blacklist in hci_dev_do_close() would mean that user space
-> needs to do extra work to re-block devices after a DEVDOWN-DEVUP cycle.
-> This patch removes the clearing of the blacklist in this case and
-> thereby saves user space from the extra work.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
+Hi Marcel,=20
 
-Acked-by: Ville Tervo <ville.tervo@nokia.com>
+>if we talk about the SAP server role found in a mobile phone,=20
+>then that support clearly needs to interact with the telephony=20
+>stack. Since when SAP is active the telephony stack needs to=20
+>be suspended and all SIM transaction being forwarded.
 
-> ---
->  net/bluetooth/hci_core.c |    1 -
->  1 files changed, 0 insertions(+), 1 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index c52f091..bc2a052 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -562,7 +562,6 @@ static int hci_dev_do_close(struct hci_dev *hdev)
->  	hci_dev_lock_bh(hdev);
->  	inquiry_cache_flush(hdev);
->  	hci_conn_hash_flush(hdev);
-> -	hci_blacklist_clear(hdev);
->  	hci_dev_unlock_bh(hdev);
->  
->  	hci_notify(hdev, HCI_DEV_DOWN);
-> -- 
-> 1.7.0.4
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+I agree, but a telephony stack needs to care about its state when SAP is ac=
+tive. Not all linux based mobile platforms use ofono.
+
+>Currently I would be thinking that the SAP implementation=20
+>should be done inside oFono actually. Since then you have=20
+>direct access to the hardware. The D-Bus approach just doesn't=20
+>sound correct to me. I could be of course wrong, but I can't=20
+>wrap my mind around on how you can make this work.
+
+I assume that ofono should handle sap transactions (as it's kind of hardwar=
+e abstraction for bluez) and expose SAP APDU interfaces as i.e Nokia did fo=
+r sap transactions in spec (http://www.wirelessmodemapi.com/), and not impl=
+ement sap profile itself.  Again, not all use ofono as telephony stack.
+
+Sorry, I don't know ofono well. What's the interface between ofono and blue=
+z?=20
+
+>Even with file descriptor passing this doesn't look like the=20
+>right approach. If we need a hardware abstraction than we=20
+>either use oFono or we have to create some SAP hardware access=20
+>abstraction.
+
+I agree with this too. I prefere to have a sap implementation as bluez plug=
+in, but we need to define api for sim operations which could be implemented=
+ in ofono or other proprietary stacks. I guess dbus was intended to be kind=
+ of hw abstraction api.
+Some time ago Claudio sent proposal implementation of sap server where he d=
+efined api for a driver to sim.
+
+Regards,
+/Waldek=
