@@ -1,117 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Wed, 15 Sep 2010 12:18:08 +0200
-Message-ID: <AANLkTikjKRY_ZBjNeyJrsSObb4qVNfNgdpdUzghmYrD8@mail.gmail.com>
-Subject: [PATCH] Add handling of TITLE contact's field in vCard
-From: =?ISO-8859-2?Q?Rafa=B3_Michalski?= <michalski.raf@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?ISO-8859-2?Q?Rafa=B3_Michalski?= <michalski.raf@gmail.com>
-Content-Type: multipart/mixed; boundary=0016e6434b7e65e915049049a5ee
+Reply-To: pghatwork@gmail.com
+In-Reply-To: <AANLkTinctyN3d4o8vq-8pAH67FaoAXOiX3=kobWkNTms@mail.gmail.com>
+References: <AANLkTikTBdr4U1bPtfXWhgLgdvWDMPJrFjBCktPL40dg@mail.gmail.com>
+	<20100910143813.4af0a3ce@lxorguk.ukuu.org.uk>
+	<AANLkTikXFmaZs+XzrOWjWoLPhyUy0CEXfOQMqP=Xp1cO@mail.gmail.com>
+	<AANLkTinctyN3d4o8vq-8pAH67FaoAXOiX3=kobWkNTms@mail.gmail.com>
+Date: Wed, 15 Sep 2010 12:14:17 +0200
+Message-ID: <AANLkTi=CNdDYVGNmx17miVBXfPgnWY0X59Ao1pRQDN=S@mail.gmail.com>
+Subject: Re: Request for input regarding new driver in MFD for
+ GPS_Bluetooth_FM controller CG2900
+From: Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
+To: Pavan Savoy <pavan_savoy@sify.com>
+Cc: Alan Cox <alan@lxorguk.ukuu.org.uk>, linus.walleij@stericsson.com,
+	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---0016e6434b7e65e915049049a5ee
-Content-Type: text/plain; charset=ISO-8859-1
+Hi Pavan,
 
+Thanks for your comments and sorry for me taking time to answer your mail.
+See below for answers.
 
+>
+> ok bit more of information ....
+> We don;t use the hciattach, instead we have our own daemon which opens
+> up the UART and installs the line discipline (not N_HCI, but similar
+> one called N_SHARED) when the hciconfig hci0 up happens or even when
+> /dev/radio0 (FM V4L2 device) happens or when generic GPS character
+> device (/dev/tigps) happens...
 
---0016e6434b7e65e915049049a5ee
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Add-handling-of-TITLE-contact-s-field-in-vCard.patch"
-Content-Disposition: attachment;
-	filename="0001-Add-handling-of-TITLE-contact-s-field-in-vCard.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_ge41f6dz0
+:-) We also have our own user space application for opening the UART
+and setting the line disc since we don't  want to depend completely on
+hciattach, which contains more than we need, and also misses stuff
+that we want to do towards our specific controller. I just used it as
+an example since that is the common BlueZ way to open the Bluetooth
+transport.
 
-RnJvbSBmZmZkZTc1ZmI4NzRiOWRiNGFmYmI1MWRjMGQ4ZDdhNzJlZDA0ZWYwIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBSYWZhbCBNaWNoYWxza2kgPG1pY2hhbHNraS5yYWZAZ21haWwu
-Y29tPgpEYXRlOiBXZWQsIDE1IFNlcCAyMDEwIDA5OjE2OjExICswMjAwClN1YmplY3Q6IFtQQVRD
-SF0gQWRkIGhhbmRsaW5nIG9mIFRJVExFIGNvbnRhY3QncyBmaWVsZCBpbiB2Q2FyZAoKQWZ0ZXIg
-cHVsbGluZyBjb250YWN0cyB0aGlzIGZpZWxkIHdhc24ndCBwcmVzZW50ZWQgaW4gZG93bmxvYWRl
-ZCB2Q2FyZApzdHJ1Y3R1cmUgaW4gc3BpdGUgb2YgdGhhdCBpdCBleGlzdGVkIChub3QgZW1wdHkp
-LiBOb3cgaXQgc2hvd3MgZG93bmxvYWRlZApUSVRMRSBmaWVsZCAodXNpbmcgZGF0YWJhc2UgcXVl
-cnkpLgotLS0KIHBsdWdpbnMvcGhvbmVib29rLXRyYWNrZXIuYyB8ICAgMjMgKysrKysrKysrKysr
-LS0tLS0tLS0tLS0KIHBsdWdpbnMvdmNhcmQuYyAgICAgICAgICAgICB8ICAgIDQgKysrKwogcGx1
-Z2lucy92Y2FyZC5oICAgICAgICAgICAgIHwgICAgMSArCiAzIGZpbGVzIGNoYW5nZWQsIDE3IGlu
-c2VydGlvbnMoKyksIDExIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL3BsdWdpbnMvcGhvbmVi
-b29rLXRyYWNrZXIuYyBiL3BsdWdpbnMvcGhvbmVib29rLXRyYWNrZXIuYwppbmRleCA0M2MyZTI4
-Li4zMTYxOTI3IDEwMDY0NAotLS0gYS9wbHVnaW5zL3Bob25lYm9vay10cmFja2VyLmMKKysrIGIv
-cGx1Z2lucy9waG9uZWJvb2stdHJhY2tlci5jCkBAIC00MywxNiArNDMsMTYgQEAKICNkZWZpbmUg
-VFJBQ0tFUl9SRVNPVVJDRVNfSU5URVJGQUNFICJvcmcuZnJlZWRlc2t0b3AuVHJhY2tlcjEuUmVz
-b3VyY2VzIgogCiAjZGVmaW5lIFRSQUNLRVJfREVGQVVMVF9DT05UQUNUX01FICJodHRwOi8vd3d3
-LnNlbWFudGljZGVza3RvcC5vcmcvb250b2xvZ2llcy8yMDA3LzAzLzIyL25jbyNkZWZhdWx0LWNv
-bnRhY3QtbWUiCi0jZGVmaW5lIENPTlRBQ1RTX0lEX0NPTCAzNgotI2RlZmluZSBQVUxMX1FVRVJZ
-X0NPTF9BTU9VTlQgMzcKKyNkZWZpbmUgQ09OVEFDVFNfSURfQ09MIDM3CisjZGVmaW5lIFBVTExf
-UVVFUllfQ09MX0FNT1VOVCAzOAogI2RlZmluZSBDT0xfSE9NRV9OVU1CRVIgMAogI2RlZmluZSBD
-T0xfSE9NRV9FTUFJTCA3CiAjZGVmaW5lIENPTF9XT1JLX05VTUJFUiA4CiAjZGVmaW5lIENPTF9G
-QVhfTlVNQkVSIDE2CiAjZGVmaW5lIENPTF9XT1JLX0VNQUlMIDE3Ci0jZGVmaW5lIENPTF9EQVRF
-IDMzCi0jZGVmaW5lIENPTF9TRU5UIDM0Ci0jZGVmaW5lIENPTF9BTlNXRVJFRCAzNQorI2RlZmlu
-ZSBDT0xfREFURSAzNAorI2RlZmluZSBDT0xfU0VOVCAzNQorI2RlZmluZSBDT0xfQU5TV0VSRUQg
-MzYKICNkZWZpbmUgQUREUl9GSUVMRF9BTU9VTlQgNwogCiAjZGVmaW5lIENPTlRBQ1RTX1FVRVJZ
-X0FMTAkJCQkJCVwKQEAgLTY4LDcgKzY4LDcgQEAKIAkibmNvOnJvbGUoP2EpIG5jbzpwb2JveCg/
-cHcpIG5jbzpleHRlbmRlZEFkZHJlc3MoP3B3KSAiCQlcCiAJIm5jbzpzdHJlZXRBZGRyZXNzKD9w
-dykgbmNvOmxvY2FsaXR5KD9wdykgbmNvOnJlZ2lvbig/cHcpICIJXAogCSJuY286cG9zdGFsY29k
-ZSg/cHcpIG5jbzpjb3VudHJ5KD9wdykgbmNvOmNvbnRhY3RVSUQoP2MpICIJXAotCSJcIk5PVEFD
-QUxMXCIgXCJmYWxzZVwiIFwiZmFsc2VcIiA/YyAiCQkJCVwKKwkibmNvOnRpdGxlKD9hKSBcIk5P
-VEFDQUxMXCIgXCJmYWxzZVwiIFwiZmFsc2VcIiA/YyAiCQlcCiAJIldIRVJFIHsgIgkJCQkJCQlc
-CiAJCSI/YyBhIG5jbzpQZXJzb25Db250YWN0IC4gIgkJCQlcCiAJIk9QVElPTkFMIHsgP2MgbmNv
-Omhhc1Bob25lTnVtYmVyID9oIC4gCQkJCVwKQEAgLTExOSw3ICsxMTksNyBAQAogCSJuY286cm9s
-ZSg/YSkgbmNvOnBvYm94KD9wdykgbmNvOmV4dGVuZGVkQWRkcmVzcyg/cHcpICIJCVwKIAkibmNv
-OnN0cmVldEFkZHJlc3MoP3B3KSBuY286bG9jYWxpdHkoP3B3KSBuY286cmVnaW9uKD9wdykgIglc
-CiAJIm5jbzpwb3N0YWxjb2RlKD9wdykgbmNvOmNvdW50cnkoP3B3KSBuY286Y29udGFjdFVJRCg/
-YykgIglcCi0JIm5tbzpyZWNlaXZlZERhdGUoP2NhbGwpICIJCQkJCVwKKwkibmNvOnRpdGxlKD9h
-KSBubW86cmVjZWl2ZWREYXRlKD9jYWxsKSAiCQkJXAogCSJubW86aXNTZW50KD9jYWxsKSBubW86
-aXNBbnN3ZXJlZCg/Y2FsbCkgP2MgIgkJCVwKIAkiV0hFUkUgeyAiCQkJCQkJCVwKIAkJIj9jYWxs
-IGEgbm1vOkNhbGwgOyAiCQkJCQlcCkBAIC0xNzEsNyArMTcxLDcgQEAKIAkibmNvOnJvbGUoP2Ep
-IG5jbzpwb2JveCg/cHcpIG5jbzpleHRlbmRlZEFkZHJlc3MoP3B3KSAiCQlcCiAJIm5jbzpzdHJl
-ZXRBZGRyZXNzKD9wdykgbmNvOmxvY2FsaXR5KD9wdykgbmNvOnJlZ2lvbig/cHcpICIJXAogCSJu
-Y286cG9zdGFsY29kZSg/cHcpIG5jbzpjb3VudHJ5KD9wdykgbmNvOmNvbnRhY3RVSUQoP2MpICIJ
-XAotCSJubW86cmVjZWl2ZWREYXRlKD9jYWxsKSAiCQkJCQlcCisJIm5jbzp0aXRsZSg/YSkgbm1v
-OnJlY2VpdmVkRGF0ZSg/Y2FsbCkgIgkJCVwKIAkibm1vOmlzU2VudCg/Y2FsbCkgbm1vOmlzQW5z
-d2VyZWQoP2NhbGwpID9jICIJCQlcCiAJIldIRVJFIHsgIgkJCQkJCQlcCiAJCSI/Y2FsbCBhIG5t
-bzpDYWxsIDsgIgkJCQkJXApAQCAtMjIzLDcgKzIyMyw3IEBACiAJIm5jbzpyb2xlKD9hKSBuY286
-cG9ib3goP3B3KSBuY286ZXh0ZW5kZWRBZGRyZXNzKD9wdykgIgkJXAogCSJuY286c3RyZWV0QWRk
-cmVzcyg/cHcpIG5jbzpsb2NhbGl0eSg/cHcpIG5jbzpyZWdpb24oP3B3KSAiCVwKIAkibmNvOnBv
-c3RhbGNvZGUoP3B3KSBuY286Y291bnRyeSg/cHcpIG5jbzpjb250YWN0VUlEKD9jKSAiCVwKLQki
-bm1vOnJlY2VpdmVkRGF0ZSg/Y2FsbCkgIgkJCQkJXAorCSJuY286dGl0bGUoP2EpIG5tbzpyZWNl
-aXZlZERhdGUoP2NhbGwpICIJCQlcCiAJIm5tbzppc1NlbnQoP2NhbGwpIG5tbzppc0Fuc3dlcmVk
-KD9jYWxsKSA/YyAiCQkJXAogCSJXSEVSRSB7ICIJCQkJCQkJXAogCQkiP2NhbGwgYSBubW86Q2Fs
-bCA7ICIJCQkJCVwKQEAgLTI3Myw3ICsyNzMsNyBAQAogCSJuY286cm9sZSg/YSkgbmNvOnBvYm94
-KD9wdykgbmNvOmV4dGVuZGVkQWRkcmVzcyg/cHcpICIJCVwKIAkibmNvOnN0cmVldEFkZHJlc3Mo
-P3B3KSBuY286bG9jYWxpdHkoP3B3KSBuY286cmVnaW9uKD9wdykgIglcCiAJIm5jbzpwb3N0YWxj
-b2RlKD9wdykgbmNvOmNvdW50cnkoP3B3KSBuY286Y29udGFjdFVJRCg/YykgIglcCi0JIm5tbzpy
-ZWNlaXZlZERhdGUoP2NhbGwpICIJCQkJCVwKKwkibmNvOnRpdGxlKD9hKSBubW86cmVjZWl2ZWRE
-YXRlKD9jYWxsKSAiCQkJXAogCSJubW86aXNTZW50KD9jYWxsKSBubW86aXNBbnN3ZXJlZCg/Y2Fs
-bCkgP2MgIgkJCVwKIAkiV0hFUkUgeyAiCQkJCQkJCVwKIAkieyAiCQkJCQkJCQlcCkBAIC0zNDks
-NyArMzQ5LDcgQEAKIAkibmNvOnJvbGUoP2EpIG5jbzpwb2JveCg/cHcpIG5jbzpleHRlbmRlZEFk
-ZHJlc3MoP3B3KSAiCQlcCiAJIm5jbzpzdHJlZXRBZGRyZXNzKD9wdykgbmNvOmxvY2FsaXR5KD9w
-dykgbmNvOnJlZ2lvbig/cHcpICIJXAogCSJuY286cG9zdGFsY29kZSg/cHcpIG5jbzpjb3VudHJ5
-KD9wdykgbmNvOmNvbnRhY3RVSUQoPCVzPikgIglcCi0JIlwiTk9UQUNBTExcIiBcImZhbHNlXCIg
-XCJmYWxzZVwiIDwlcz4gIgkJCVwKKwkibmNvOnRpdGxlKD9hKSBcIk5PVEFDQUxMXCIgXCJmYWxz
-ZVwiIFwiZmFsc2VcIiA8JXM+ICIJCVwKIAkiV0hFUkUgeyAiCQkJCQkJCVwKIAkJIjwlcz4gYSBu
-Y286Q29udGFjdCAuICIJCQkJCVwKIAkiT1BUSU9OQUwgeyA8JXM+IG5jbzpoYXNQaG9uZU51bWJl
-ciA/aCAuIAkJCVwKQEAgLTg2NSw2ICs4NjUsNyBAQCBhZGRfZW50cnk6CiAJY29udGFjdC0+ZGVw
-YXJ0bWVudCA9IGdfc3RyZHVwKHJlcGx5WzIzXSk7CiAJY29udGFjdC0+cm9sZSA9IGdfc3RyZHVw
-KHJlcGx5WzI0XSk7CiAJY29udGFjdC0+dWlkID0gZ19zdHJkdXAocmVwbHlbMzJdKTsKKwljb250
-YWN0LT50aXRsZSA9IGdfc3RyZHVwKHJlcGx5WzMzXSk7CiAKIAlzZXRfY2FsbF90eXBlKGNvbnRh
-Y3QsIHJlcGx5W0NPTF9EQVRFXSwgcmVwbHlbQ09MX1NFTlRdLAogCQkJcmVwbHlbQ09MX0FOU1dF
-UkVEXSk7CmRpZmYgLS1naXQgYS9wbHVnaW5zL3ZjYXJkLmMgYi9wbHVnaW5zL3ZjYXJkLmMKaW5k
-ZXggZTI3N2NlZC4uYmMyMjE3NyAxMDA2NDQKLS0tIGEvcGx1Z2lucy92Y2FyZC5jCisrKyBiL3Bs
-dWdpbnMvdmNhcmQuYwpAQCAtNTM5LDYgKzUzOSw5IEBAIHZvaWQgcGhvbmVib29rX2FkZF9jb250
-YWN0KEdTdHJpbmcgKnZjYXJkcywgc3RydWN0IHBob25lYm9va19jb250YWN0ICpjb250YWN0LAog
-CWlmIChmaWx0ZXIgJiBGSUxURVJfUk9MRSkKIAkJdmNhcmRfcHJpbnRmX3RhZyh2Y2FyZHMsIGZv
-cm1hdCwgIlJPTEUiLCBOVUxMLCBjb250YWN0LT5yb2xlKTsKIAorCWlmIChmaWx0ZXIgJiBGSUxU
-RVJfVElUTEUpCisJCXZjYXJkX3ByaW50Zl90YWcodmNhcmRzLCBmb3JtYXQsICJUSVRMRSIsIE5V
-TEwsIGNvbnRhY3QtPnRpdGxlKTsKKwogCWlmIChmaWx0ZXIgJiBGSUxURVJfWF9JUk1DX0NBTExf
-REFURVRJTUUpCiAJCXZjYXJkX3ByaW50Zl9kYXRldGltZSh2Y2FyZHMsIGNvbnRhY3QpOwogCkBA
-IC01OTcsNiArNjAwLDcgQEAgdm9pZCBwaG9uZWJvb2tfY29udGFjdF9mcmVlKHN0cnVjdCBwaG9u
-ZWJvb2tfY29udGFjdCAqY29udGFjdCkKIAlnX2ZyZWUoY29udGFjdC0+Y29tcGFueSk7CiAJZ19m
-cmVlKGNvbnRhY3QtPmRlcGFydG1lbnQpOwogCWdfZnJlZShjb250YWN0LT5yb2xlKTsKKwlnX2Zy
-ZWUoY29udGFjdC0+dGl0bGUpOwogCWdfZnJlZShjb250YWN0LT5kYXRldGltZSk7CiAJZ19mcmVl
-KGNvbnRhY3QpOwogfQpkaWZmIC0tZ2l0IGEvcGx1Z2lucy92Y2FyZC5oIGIvcGx1Z2lucy92Y2Fy
-ZC5oCmluZGV4IDBlZDUxYjkuLmQxYzIyNWUgMTAwNjQ0Ci0tLSBhL3BsdWdpbnMvdmNhcmQuaAor
-KysgYi9wbHVnaW5zL3ZjYXJkLmgKQEAgLTc5LDYgKzc5LDcgQEAgc3RydWN0IHBob25lYm9va19j
-b250YWN0IHsKIAljaGFyICpjb21wYW55OwogCWNoYXIgKmRlcGFydG1lbnQ7CiAJY2hhciAqcm9s
-ZTsKKwljaGFyICp0aXRsZTsKIAljaGFyICpkYXRldGltZTsKIAlpbnQgY2FsbHR5cGU7CiB9Owot
-LSAKMS42LjMuMwoK
---0016e6434b7e65e915049049a5ee--
+>
+> There is non-mailine driver which gets modified to get into mainline @
+> http://git.omapzoom.org/?p=kernel/omap.git;a=tree;f=drivers/misc/ti-
+> st;h=028ff4a739d7b59b94d0c613b5ef510ff338b65d;hb=refs/heads/p-android-
+> omap-2.6.32
+>
+> feel free to have a look at it...
+> Yes our solution too works with BlueZ and non-exactly a MFD driver but
+> it is a simple platform device driver .. by looks of things the driver
+> can run as is for your chip too .. (except for the firmware search and
+> download part .. may be...).
+
+Your code is in a lot of ways similar to ours (which is not so strange
+since you address the same market with your chip as we do with ours),
+but there are several differences that would at least for now make it
+impossible for us to use your driver. When we post our first patches
+(which will hopefully be in a few days) you can see for yourself. But
+I don't think there is a simple way for us to re-use your driver.
+
+>
+> and note when we would want to support SPI transport for the same, we
+> plan a SPI-TTY driver ('ala usb-serial) where-in we can install this
+> N_TI_WL line discipline on that /dev/ttySPI0 device, and the SPI
+> related stuff to be handled by the spi-tty.c which registers itself as
+> a tty_device and a tty_driver ....
+
+Our SPI usage will be a bit different, where we don't use TTY for our
+driver. We will use the SPI directly instead.
+
+>
+> regards,
+> Pavan
+>
+> On Fri, Sep 10, 2010 at 2:07 PM, Pavan Savoy <pavan_savoy@sify.com>
+> wrote:
+> > Can you directly make use of the ti-st driver which is currently
+> staged?
+> > It has _EXACTLY_ the same thing.... which is REALLY REALLY surprising
+> !!!
+
+:-) As I said earlier this is quite natural since both TI and
+ST-Ericsson address the same market segments.
+
+/P-G
