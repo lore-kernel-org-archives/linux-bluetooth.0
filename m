@@ -1,100 +1,110 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTi=CNdDYVGNmx17miVBXfPgnWY0X59Ao1pRQDN=S@mail.gmail.com>
-References: <AANLkTikTBdr4U1bPtfXWhgLgdvWDMPJrFjBCktPL40dg@mail.gmail.com>
-	<20100910143813.4af0a3ce@lxorguk.ukuu.org.uk>
-	<AANLkTikXFmaZs+XzrOWjWoLPhyUy0CEXfOQMqP=Xp1cO@mail.gmail.com>
-	<AANLkTinctyN3d4o8vq-8pAH67FaoAXOiX3=kobWkNTms@mail.gmail.com>
-	<AANLkTi=CNdDYVGNmx17miVBXfPgnWY0X59Ao1pRQDN=S@mail.gmail.com>
-Date: Wed, 15 Sep 2010 15:57:40 -0500
-Message-ID: <AANLkTikrfwTaa5h1QoATs2kcdySWiy1XXQXcY+Bj+tf6@mail.gmail.com>
-Subject: Re: Request for input regarding new driver in MFD for
- GPS_Bluetooth_FM controller CG2900
-From: Pavan Savoy <pavan_savoy@sify.com>
-To: pghatwork@gmail.com
-Cc: Alan Cox <alan@lxorguk.ukuu.org.uk>, linus.walleij@stericsson.com,
-	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20100915185340.GA2804@jh-x301>
+References: <1284537527-22783-1-git-send-email-andrzej.kaczmarek@tieto.com>
+ <20100915081047.GA15065@jh-x301> <AANLkTimm++uSFQmkKHF+vHzp=Kc0tYpzb+xqq=eG6jnW@mail.gmail.com>
+ <AANLkTikryj2AeaCWpVKQhkMznfAF-d15QpJF6=BgyGsY@mail.gmail.com> <20100915185340.GA2804@jh-x301>
+From: jaikumar Ganesh <jaikumarg@gmail.com>
+Date: Wed, 15 Sep 2010 12:13:01 -0700
+Message-ID: <AANLkTik7mTPK4DurfowHEggyrxEzGKuip203m3NqYdCN@mail.gmail.com>
+Subject: Re: [RFC] D-Bus API for out of band association model
+To: jaikumar Ganesh <jaikumarg@gmail.com>,
+	Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>,
+	linux-bluetooth@vger.kernel.org,
+	par-gunnar.p.hjalmdahl@stericsson.com
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Johan:
 
-On Wed, Sep 15, 2010 at 5:14 AM, Par-Gunnar Hjalmdahl
-<par-gunnar.p.hjalmdahl@stericsson.com> wrote:
-> Hi Pavan,
+On Wed, Sep 15, 2010 at 11:53 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Jaikumar,
 >
-> Thanks for your comments and sorry for me taking time to answer your mail.
-> See below for answers.
->
+> On Wed, Sep 15, 2010, jaikumar Ganesh wrote:
+>> We started to work on this API too last week. Not complete yet to post
+>> to the mailing list.
+>> The approach we took was this:
 >>
->> ok bit more of information ....
->> We don;t use the hciattach, instead we have our own daemon which opens
->> up the UART and installs the line discipline (not N_HCI, but similar
->> one called N_SHARED) when the hciconfig hci0 up happens or even when
->> /dev/radio0 (FM V4L2 device) happens or when generic GPS character
->> device (/dev/tigps) happens...
->
-> :-) We also have our own user space application for opening the UART
-> and setting the line disc since we don't Â want to depend completely on
-> hciattach, which contains more than we need, and also misses stuff
-> that we want to do towards our specific controller. I just used it as
-> an example since that is the common BlueZ way to open the Bluetooth
-> transport.
-
-Ok, yes currently we communicate with user-space daemon over rfkill,
-we can probably use UDEV events to communicate opening/installation of
-ldisc or closing of UART.
-
+>>  a) Since OOB authentication is just another means of authentication
+>> compared to Passkey, Pin entry,
+>>       we added an agent API (similar to the lines of other
+>> authentication mechanisms) that will ask for the Out Of Band data.
+>> b) We added an API to the adapter to get the local Out of Band Data
+>> c) Currently, RegisterAgent is called to register with the
+>> capabilities. Since OOB is part of the capabilities data structure, we
+>> added OOB to agent structure which already has the capabilities.
+>> d) We added an API variant of createPairedDevice which will be used
+>> for OutOfBand Pairing. When the device agent is created, the OOB field
+>>     in agent is updated.
+>> e) When a capability request comes from the remote side the agent OOB
+>> field is checked. It will be set if the pairing is initiated locally
+>> through d).
+>>     For incoming pairing requests if the Agent has OOB field set but
+>> there is no device specific agent, we need to make an Agent API call
+>> asking if
+>>     there is OOB data for this remote device.
 >>
->> There is non-mailine driver which gets modified to get into mainline @
->> http://git.omapzoom.org/?p=kernel/omap.git;a=tree;f=drivers/misc/ti-
->> st;h=028ff4a739d7b59b94d0c613b5ef510ff338b65d;hb=refs/heads/p-android-
->> omap-2.6.32
+>> We left it to the users of the API - regarding the OOB channel to use.
+>> It can be NFC or any other trusted channel.
 >>
->> feel free to have a look at it...
->> Yes our solution too works with BlueZ and non-exactly a MFD driver but
->> it is a simple platform device driver .. by looks of things the driver
->> can run as is for your chip too .. (except for the firmware search and
->> download part .. may be...).
+>> Comments ?
 >
-> Your code is in a lot of ways similar to ours (which is not so strange
-> since you address the same market with your chip as we do with ours),
-> but there are several differences that would at least for now make it
-> impossible for us to use your driver. When we post our first patches
-> (which will hopefully be in a few days) you can see for yourself. But
-> I don't think there is a simple way for us to re-use your driver.
+> I'm still not convinced that the Agent is the right place for this. The
+> agent is typically representing the UI whereas in most cases (like NFC)
+> the OOB data will be coming from below bluetoothd in the software stack
+> and not from above it (which is where the agent resides). Also, the
+> presence of OOB data isn't really agent specific. It's something that
+> can come and go during the lifetime of an agent.
 
-Humn, I kind of thought may be we can have a same driver for 2
-different types of chips.
+Consider a case where there is a third party app residing on the device.
+This wants to initiate pairing and has OOB data. (here OOB data comes
+from above bluetoothd)
 
->>
->> and note when we would want to support SPI transport for the same, we
->> plan a SPI-TTY driver ('ala usb-serial) where-in we can install this
->> N_TI_WL line discipline on that /dev/ttySPI0 device, and the SPI
->> related stuff to be handled by the spi-tty.c which registers itself as
->> a tty_device and a tty_driver ....
+When the remote request OOB data comes, bluetoothd asks the app for
+the OOB data.
+
+Depending on the implementation either the app can show a UI to the user
+asking permission to pair when the OOB data Agent API is called. This is again
+similar to what we have for the passkey mechanism.
+
+This need of the UI and the fact that OOB data can come from above
+bluetoothd (similar to pin entry)
+is what made us go with the agent approach.
+
+The device agent is removed when the device is unpaired. So next time
+when pairing
+happens depending upon the API used we can again have OOB pairing or
+non OOB pairing.
+
+Yes OOB data can come and go during the life of an agent. Hence we put
+this burden on the users
+of bluetoothd to supply bluetoothd if the OOB data. We not storing any
+OOB data of the remote device
+in bluetoothd
+
+
+> My idea has been to add a a plugin interface through which a hardware
+> specific plugin could notify the core daemon about the existence of OOB
+> data. bluetoothd would then take care of setting the right flag when it
+> gets a IO capability request. This doesn't of course rule out the
+> possibility of having part of the work done in another process since the
+> plugin could simply export a service over D-Bus or talk to another D-Bus
+> service.
+
+If I understand correctly, hardware specific plugin works well for
+things like NFC.
+
+What about cases where the trusted channel is say something like an
+app running on
+both the computer and the device. That channel is trusted using some
+other authentication mechanism
+The apps communicate to exchange OOB data.
+
+For example, you can use the browser to device messaging mechanism
+(Cloud to device messaging using Chrome).
+
 >
-> Our SPI usage will be a bit different, where we don't use TTY for our
-> driver. We will use the SPI directly instead.
->
-
-Ok, I was intending towards the SPI usage of our driver when we move to SPI.
-
->> regards,
->> Pavan
->>
->> On Fri, Sep 10, 2010 at 2:07 PM, Pavan Savoy <pavan_savoy@sify.com>
->> wrote:
->> > Can you directly make use of the ti-st driver which is currently
->> staged?
->> > It has _EXACTLY_ the same thing.... which is REALLY REALLY surprising
->> !!!
->
-> :-) As I said earlier this is quite natural since both TI and
-> ST-Ericsson address the same market segments.
-
-yes...
-
-> /P-G
+> Johan
 >
