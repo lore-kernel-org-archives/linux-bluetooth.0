@@ -1,94 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Wed, 15 Sep 2010 15:42:35 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, marcel@holtmann.org,
-	davem@davemloft.net
-Subject: Re: Possible regression with skb_clone() in 2.6.36
-Message-ID: <20100915184235.GA31685@vigoh>
-References: <1283988727-1456-1-git-send-email-padovan@profusion.mobi>
- <alpine.DEB.2.00.1009100920270.14322@linux-sea-02>
- <20100910194509.GC19693@vigoh>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20100910194509.GC19693@vigoh>
+In-Reply-To: <AANLkTimm++uSFQmkKHF+vHzp=Kc0tYpzb+xqq=eG6jnW@mail.gmail.com>
+References: <1284537527-22783-1-git-send-email-andrzej.kaczmarek@tieto.com>
+ <20100915081047.GA15065@jh-x301> <AANLkTimm++uSFQmkKHF+vHzp=Kc0tYpzb+xqq=eG6jnW@mail.gmail.com>
+From: jaikumar Ganesh <jaikumarg@gmail.com>
+Date: Wed, 15 Sep 2010 10:13:06 -0700
+Message-ID: <AANLkTikryj2AeaCWpVKQhkMznfAF-d15QpJF6=BgyGsY@mail.gmail.com>
+Subject: Re: [RFC] D-Bus API for out of band association model
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>,
+	linux-bluetooth@vger.kernel.org,
+	par-gunnar.p.hjalmdahl@stericsson.com
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Hi,
 
-* Gustavo F. Padovan <padovan@profusion.mobi> [2010-09-10 16:45:09 -0300]:
+On Wed, Sep 15, 2010 at 6:30 AM, Claudio Takahasi
+<claudio.takahasi@openbossa.org> wrote:
+> On Wed, Sep 15, 2010 at 5:10 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+>> Hi Andrzej,
+>>
+>> On Wed, Sep 15, 2010, Andrzej Kaczmarek wrote:
+>>> On behalf of ST-Ericsson SA, below is our proposal of API for out of band
+>>> association model. To give you a bit more overview how this will be integrated
+>>> into BlueZ:
+>>>
+>>> .RequestRemoteOobData should be called from hcid_dbus_request_io_cap to
+>>> check if any data was exchange/retrieved from remote device. Returned data
+>>> will be stored (if any) and used to reply with proper IO capabilities as well
+>>> as to to return retrieved data. This will involve some changes in flow from
+>>> io_capa_request onwards.
+>>>
+>>> Please let me know if you have any comments. Implementation will follow.
+>>
+>> I'd prefer to do this completely internally in bluetoothd through a
+>> plugin. Do you see any reasons why not to do it that way? We still need
+>> some UI to call CreatePairedDevice but a plugin that knows about local
+>> platform specific OOB mechanisms (e.g. NFC) could provide the core
+>> daemon with enough info to set the IO capabilities correctly and provide
+>> the necessary OOB values.
+>>
+>> Johan
+>> --
+>
+> Hi Andrzej,
+>
+> I did some testing with OOB last year.
+> See my branch git://git.infradead.org/users/cktakahasi/bluez.git
+> oob-displayyesno
+>
+> About the API changes. MAYBE, Hash and Randomizer could be only
+> adapter properties.
+> For the remote Hash and Randomizer still not clear to me what is the
+> best way to allow external apps to set those values, but in my opinion
+> BlueZ should not know the OOB mechanism, only the capability is
+> enough.
 
-> Hi Mat,
-> 
-> * Mat Martineau <mathewm@codeaurora.org> [2010-09-10 09:53:31 -0700]:
-> 
-> > 
-> > Gustavo -
-> > 
-> > I'm not sure why the streaming code used to work, but this does not 
-> > look like an skb_clone() problem.  Your patch to remove the 
-> > skb_clone() call in l2cap_streaming_send() addresses the root cause of 
-> > this crash.
-> > 
-> > On Wed, 8 Sep 2010, Gustavo F. Padovan wrote:
-> > 
-> > > I've been experiencing some problems when running the L2CAP Streaming mode in
-> > > 2.6.36. The system quickly runs in an Out Of Memory condition and crash. That
-> > > wasn't happening before, so I think we may have a regression here (I didn't
-> > > find where yet). The crash log is below.
-> > >
-> > > The following patch does not fix the regression, but shows that removing the
-> > > skb_clone() call from l2cap_streaming_send() we workaround the problem. The
-> > > patch is good anyway because it saves memory and time.
-> > >
-> > > By now I have no idea on how to fix this.
-> > >
-> > > <snip>
-> > 
-> > This has to do with the sk->sk_wmem_alloc accounting that controls the 
-> > amount of write buffer space used on the socket.
-> > 
-> > When the L2CAP streaming mode socket segments its data, it allocates 
-> > memory using sock_alloc_send_skb() (via bt_skb_send_alloc()).  Before 
-> > that allocation call returns, skb_set_owner_w() is called on the new 
-> > skb.  This adds to sk->sk_wmem_alloc and sets skb->destructor so that 
-> > sk->sk_wmem_alloc is correctly updated when the skb is freed.
-> > 
-> > When that skb is cloned, the clone is not "owned" by the write buffer. 
-> > The clone's destructor is set to NULL in __skb_clone().  The version 
-> > of l2cap_streaming_send() that runs out of memory is passing the 
-> > non-owned skb clone down to the HCI layer.  The original skb (the one 
-> > that's "owned by w") is immediately freed, which adjusts 
-> > sk->sk_wmem_alloc back down - the socket thinks it has unlimited write 
-> > buffer space.  As a result, bt_skb_send_alloc() never blocks waiting 
-> > for buffer space (or returns EAGAIN for nonblocking writes) and the 
-> > HCI send queue keeps growing.
-> 
-> If the problem is what you are saying, add a skb_set_owner_w(skb, sk) on
-> the cloned skb should solve the problem, but it doesn't. That's exactly
-> what tcp_transmit_skb() does. Also that just appeared in 2.6.36, is was
-> working fine before, i.e, we have a regression here. 
 
-I've run some other tests and what you said also fixes the problem for
-Streaming Mode. If I use skb_set_owner_w() on the cloned skb, everything
-works fine. But we still have the problem for ERTM as I described.
-send() blocks wainting for memory. The regression is there yet.
-:(
+[Resending, because the mail to linux-bluetooth bounced. Sorry if some
+folks got it twice]
 
-> 
-> > 
-> > This isn't a problem for the ERTM sends, because the original skbs are 
-> > kept in the ERTM tx queue until they are acked.  Once they're acked, 
-> > the write buffer space is freed and additional skbs can be allocated.
-> 
-> It affects ERTM as well, but in that case the kernel doesn't crash
-> because ERTM block on sending trying to allocate memory. Then we are not
-> able to receive any ack (everything stays queued in sk_backlog_queue as
-> the sk is owned by the user) and ERTM stalls.
-> 
+We started to work on this API too last week. Not complete yet to post
+to the mailing list.
+The approach we took was this:
 
--- 
-Gustavo F. Padovan
-ProFUSION embedded systems - http://profusion.mobi
+ a) Since OOB authentication is just another means of authentication
+compared to Passkey, Pin entry,
+      we added an agent API (similar to the lines of other
+authentication mechanisms) that will ask for the Out Of Band data.
+b) We added an API to the adapter to get the local Out of Band Data
+c) Currently, RegisterAgent is called to register with the
+capabilities. Since OOB is part of the capabilities data structure, we
+added OOB to agent structure which already has the capabilities.
+d) We added an API variant of createPairedDevice which will be used
+for OutOfBand Pairing. When the device agent is created, the OOB field
+    in agent is updated.
+e) When a capability request comes from the remote side the agent OOB
+field is checked. It will be set if the pairing is initiated locally
+through d).
+    For incoming pairing requests if the Agent has OOB field set but
+there is no device specific agent, we need to make an Agent API call
+asking if
+    there is OOB data for this remote device.
+
+We left it to the users of the API - regarding the OOB channel to use.
+It can be NFC or any other trusted channel.
+
+Comments ?
+
+Regards,
+Jaikumar
+>
+> Regards,
+> Claudio
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
