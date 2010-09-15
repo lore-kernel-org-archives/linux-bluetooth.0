@@ -1,38 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4C9082C8.9030502@Atheros.com>
-Date: Wed, 15 Sep 2010 13:54:40 +0530
-From: Suraj Sumangala <suraj@Atheros.com>
+Date: Wed, 15 Sep 2010 11:10:48 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	par-gunnar.p.hjalmdahl@stericsson.com
+Subject: Re: [RFC] D-Bus API for out of band association model
+Message-ID: <20100915081047.GA15065@jh-x301>
+References: <1284537527-22783-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-To: Nicolas GUILBAUD <nicolas.guilbaud.wj@rdf.renesas.com>
-CC: Suraj Sumangala <Suraj.Sumangala@Atheros.com>, Marcel Holtmann
-	<marcel@holtmann.org>, "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>, Jothikumar Mothilal
-	<Jothikumar.Mothilal@Atheros.com>
-Subject: Re: [RFC] BlueZ D-Bus Sim Access Profile Server API description
-References: <1284374584-12282-1-git-send-email-suraj@atheros.com>	 <1284442946.2405.50.camel@localhost.localdomain>	 <4C8F160B.4010401@Atheros.com> <1284522264.2405.89.camel@localhost.localdomain> <4C906430.90900@Atheros.com> <A9AC1023FCA4654D92AC24C2A8F6A09201A2B923@renesas4bis.renesas-rdf.local>
-In-Reply-To: <A9AC1023FCA4654D92AC24C2A8F6A09201A2B923@renesas4bis.renesas-rdf.local>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1284537527-22783-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nicolas,
+Hi Andrzej,
 
-On 9/15/2010 1:02 PM, Nicolas GUILBAUD wrote:
-> Hello Marcel and Suraj,
->
-> I agree with Marcel, because in standard Mobile phone implementation, the SIM card is directly connected to the Modem. To access the SIM card, AT command (or proprietary commands) are needed, oFono implements both of them to access SIM card in Modem side, but in my understanding there is no possibilities to disconnect modem (in oFono) due to SIM SAP.
->
-> In the case where SIM card is connected to the Application processor (Linux side), it's missing the SIM stack (APDU server...). I don't find any SIM implementation in Linux, may be we have to specify it.
->
-Other than transferring APDUs, SAP profile also specifies operations on 
-the SIM cards like SIM Reset, SIM power on/off, Getting Card reader 
-status etc.
+On Wed, Sep 15, 2010, Andrzej Kaczmarek wrote:
+> On behalf of ST-Ericsson SA, below is our proposal of API for out of band
+> association model. To give you a bit more overview how this will be integrated
+> into BlueZ:
+> 
+> .RequestRemoteOobData should be called from hcid_dbus_request_io_cap to
+> check if any data was exchange/retrieved from remote device. Returned data
+> will be stored (if any) and used to reply with proper IO capabilities as well
+> as to to return retrieved data. This will involve some changes in flow from
+> io_capa_request onwards.
+> 
+> Please let me know if you have any comments. Implementation will follow.
 
-How do we do these operations case of mobile phones?
+I'd prefer to do this completely internally in bluetoothd through a
+plugin. Do you see any reasons why not to do it that way? We still need
+some UI to call CreatePairedDevice but a plugin that knows about local
+platform specific OOB mechanisms (e.g. NFC) could provide the core
+daemon with enough info to set the IO capabilities correctly and provide
+the necessary OOB values.
 
->
-> Best Regards,
->
-> Nicolas.
-
-Regards
-Suraj
+Johan
