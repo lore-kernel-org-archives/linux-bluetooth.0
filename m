@@ -1,68 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 15 Sep 2010 16:35:23 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 00/10] Media API
-Message-ID: <20100915133523.GA30074@jh-x301>
-References: <1284387337-18822-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1284387337-18822-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <20100915081047.GA15065@jh-x301>
+References: <1284537527-22783-1-git-send-email-andrzej.kaczmarek@tieto.com>
+	<20100915081047.GA15065@jh-x301>
+Date: Wed, 15 Sep 2010 10:30:35 -0300
+Message-ID: <AANLkTimm++uSFQmkKHF+vHzp=Kc0tYpzb+xqq=eG6jnW@mail.gmail.com>
+Subject: Re: [RFC] D-Bus API for out of band association model
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>,
+	linux-bluetooth@vger.kernel.org,
+	par-gunnar.p.hjalmdahl@stericsson.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+On Wed, Sep 15, 2010 at 5:10 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Andrzej,
+>
+> On Wed, Sep 15, 2010, Andrzej Kaczmarek wrote:
+>> On behalf of ST-Ericsson SA, below is our proposal of API for out of band
+>> association model. To give you a bit more overview how this will be integrated
+>> into BlueZ:
+>>
+>> .RequestRemoteOobData should be called from hcid_dbus_request_io_cap to
+>> check if any data was exchange/retrieved from remote device. Returned data
+>> will be stored (if any) and used to reply with proper IO capabilities as well
+>> as to to return retrieved data. This will involve some changes in flow from
+>> io_capa_request onwards.
+>>
+>> Please let me know if you have any comments. Implementation will follow.
+>
+> I'd prefer to do this completely internally in bluetoothd through a
+> plugin. Do you see any reasons why not to do it that way? We still need
+> some UI to call CreatePairedDevice but a plugin that knows about local
+> platform specific OOB mechanisms (e.g. NFC) could provide the core
+> daemon with enough info to set the IO capabilities correctly and provide
+> the necessary OOB values.
+>
+> Johan
+> --
 
-On Mon, Sep 13, 2010, Luiz Augusto von Dentz wrote:
-> Luiz Augusto von Dentz (10):
->   Add media API documentation
->   Add rule to enabling talking to org.bluez.MediaEndpoint
->   Add option to enable/disable unix ipc via audio.conf
->   Add support for media transport in gstreamer plugin
->   Add simple-endpoint test script
->   Add initial implementation of org.bluez.Media spec
->   Introduce headset_get_inband
->   Update a2dp transport delay when it changes
->   Remove local cache for nrec and inband
->   Add proper checks for MediaTransport.SetProperty
-> 
->  Makefile.am          |    6 +-
->  audio/a2dp-codecs.h  |  116 ++++++++
->  audio/a2dp.c         |  749 +++++++++++++++++++++++++++++++++++++++++--------
->  audio/a2dp.h         |   15 +
->  audio/avdtp.c        |   88 +++----
->  audio/avdtp.h        |    5 +-
->  audio/gsta2dpsink.c  |   33 ++-
->  audio/gsta2dpsink.h  |    1 +
->  audio/gstavdtpsink.c |  609 +++++++++++++++++++++++++++++++++++++++-
->  audio/gstavdtpsink.h |    6 +
->  audio/headset.c      |   10 +
->  audio/headset.h      |    1 +
->  audio/main.c         |    9 -
->  audio/manager.c      |   66 +++++
->  audio/manager.h      |    2 +
->  audio/media.c        |  689 +++++++++++++++++++++++++++++++++++++++++++++
->  audio/media.h        |   54 ++++
->  audio/sink.c         |  179 ++-----------
->  audio/source.c       |  174 ++----------
->  audio/transport.c    |  758 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  audio/transport.h    |   36 +++
->  audio/unix.c         |    1 +
->  doc/media-api.txt    |  169 +++++++++++
->  src/bluetooth.conf   |    1 +
->  test/simple-endpoint |  126 +++++++++
->  25 files changed, 3395 insertions(+), 508 deletions(-)
->  create mode 100644 audio/a2dp-codecs.h
->  create mode 100644 audio/media.c
->  create mode 100644 audio/media.h
->  create mode 100644 audio/transport.c
->  create mode 100644 audio/transport.h
->  create mode 100644 doc/media-api.txt
->  create mode 100755 test/simple-endpoint
+Hi Andrzej,
 
-All patches have been pushed upstream now (with the few minor changes
-that we discussed). Next step: talk to PulseAudio guys and get this
-merged there too.
+I did some testing with OOB last year.
+See my branch git://git.infradead.org/users/cktakahasi/bluez.git
+oob-displayyesno
 
-Johan
+About the API changes. MAYBE, Hash and Randomizer could be only
+adapter properties.
+For the remote Hash and Randomizer still not clear to me what is the
+best way to allow external apps to set those values, but in my opinion
+BlueZ should not know the OOB mechanism, only the capability is
+enough.
+
+Regards,
+Claudio
