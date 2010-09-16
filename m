@@ -1,58 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 16 Sep 2010 18:03:17 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Elvis =?iso-8859-1?Q?Pf=FCtzenreuter?= <epx@signove.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: CSP implementation for MCAP
-Message-ID: <20100916150317.GA23529@jh-x301>
-References: <4A11989E-5448-43B7-887F-217C54977E22@epx.com.br>
- <1FA1AF09-53BA-4187-81B3-78E2E5C82852@signove.com>
- <20100916123900.GA20869@jh-x301>
- <F9784FEC-442D-4448-9BA1-234AA9963ECE@signove.com>
+Date: Thu, 16 Sep 2010 11:16:54 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: haijun liu <liuhaijun.er@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mat Martineau <mathewm@codeaurora.org>,
+	"dantian.ip" <dantian.ip@gmail.com>
+Subject: Re: [PATCH] Bluetooth: Replace hard code of fixed channels bit mask
+Message-ID: <20100916141654.GB15000@vigoh>
+References: <AANLkTi=86t=osr8YUfUfU3QLHiHXgp8SCuwqOE_GoPgp@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <F9784FEC-442D-4448-9BA1-234AA9963ECE@signove.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <AANLkTi=86t=osr8YUfUfU3QLHiHXgp8SCuwqOE_GoPgp@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Elvis,
+Hi Haijun,
 
-On Thu, Sep 16, 2010, Elvis Pfützenreuter wrote:
-> > On Wed, Sep 15, 2010, Elvis Pfützenreuter wrote:
-> >>> This is the repository for the CSP implementation, rebased over the
-> >>> recently accepted MCAP, for your appreciation:
-> >>> 
-> >>> git://gitorious.org/bluez-epx/bluez-epx.git csp
-> >>> 
-> >>> or
-> >>> 
-> >>> http://www.gitorious.org/bluez-epx/bluez-epx/commits/csp--
-> >> 
-> >> And I am happy to announce that this CSP implementation passed on PTS
-> >> :) Fixes are on topmost patch of the repository.
-> > 
-> > Good to hear about the progress with the PTS :)
-> > 
-> > Unfortunately you'll need to rebase again since I pushed some cleanups
-> > to the MCAP code. Could you also get rid of the unnecessary
-> > double-pointers and type casts which aren't needed anymore now that
-> > mcap_send_data accepts void *.
+* haijun liu <liuhaijun.er@gmail.com> [2010-09-16 15:15:18 +0800]:
+
+> This patch add fixed channels bit mask definition for
+>  		L2CAP_FIXCHAN_NULLID
+>  		L2CAP_FIXCHAN_SIGNAL
+>  		L2CAP_FIXCHAN_CONNLESS
+>  		L2CAP_FIXCHAN_A2MP
+> And replace hard code in source file with the macro.
 > 
-> It's done, and tested.
+> Signed-off-by: Haijun.Liu <Haijun.Liu@Atheros.com>
+> ---
+>  include/net/bluetooth/l2cap.h |    6 ++++++
+>  net/bluetooth/l2cap.c         |    2 +-
+>  2 files changed, 7 insertions(+), 1 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> index 6c24144..e4fe2c7 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -97,6 +97,12 @@ struct l2cap_conninfo {
+>  #define L2CAP_FEAT_FCS		0x00000020
+>  #define L2CAP_FEAT_FIXED_CHAN	0x00000080
+> 
+> +/* L2CAP fixed channel bitmask */
+> +#define L2CAP_FIXCHAN_NULLID	0x00
+> +#define L2CAP_FIXCHAN_SIGNAL	0x02
+> +#define L2CAP_FIXCHAN_CONNLESS	0x04
+> +#define L2CAP_FIXCHAN_A2MP	0x08
 
-Thanks. I still had to do quite a lot of coding style fixes as well as
-plug a memory leak, but the patches are now pushed upstream.
+That's wrong, signaling channel is 0x01, connless is 0x02 and A2MP is
+0x03. And if you haven't noted we already have macros for the signaling
+and connectionless channels:
 
-Next steps:
+#define L2CAP_CID_SIGNALING     0x0001
+#define L2CAP_CID_CONN_LESS     0x0002
 
-- Get rid of the forward declarations of static functions
-  wherever possible. It looked like you could accomplish that
-  with a simple reordering of the functions.
-
-- Get rid of raw HCI access (hci_open_dev). bluetoothd shouldn't use
-  this type of sockets in the future at all. You'll need to add a proper
-  callback to the adapter_opts and a function to plugins/hciopts.c and
-  use that instead. Then export a function like btd_adapter_read_clock
-  for the plugin to use.
-
-Johan
+-- 
+Gustavo F. Padovan
+ProFUSION embedded systems - http://profusion.mobi
