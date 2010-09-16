@@ -1,68 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <AANLkTik244A2zNFL-yL7CvBKdf3UZDDKq1Ap7HR5+aCR@mail.gmail.com>
-References: <AANLkTi=86t=osr8YUfUfU3QLHiHXgp8SCuwqOE_GoPgp@mail.gmail.com>
-	<20100916141654.GB15000@vigoh>
-	<AANLkTik244A2zNFL-yL7CvBKdf3UZDDKq1Ap7HR5+aCR@mail.gmail.com>
-Date: Fri, 17 Sep 2010 09:08:13 +0800
-Message-ID: <AANLkTikkpc4ere4uiyDJ=YFEg89CKdARQLxE1ZOdpiDF@mail.gmail.com>
-Subject: Fwd: [PATCH] Bluetooth: Replace hard code of fixed channels bit mask
-From: haijun liu <liuhaijun.er@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: RE: [RFC] BlueZ D-Bus Sim Access Profile Server API description
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Waldemar.Rymarkiewicz@tieto.com
+Cc: suraj@Atheros.com, Suraj.Sumangala@Atheros.com,
+	linux-bluetooth@vger.kernel.org, Jothikumar.Mothilal@Atheros.com
+In-Reply-To: <99B09243E1A5DA4898CDD8B700111448097968EDE3@EXMB04.eu.tieto.com>
+References: <1284374584-12282-1-git-send-email-suraj@atheros.com>
+	 <1284442946.2405.50.camel@localhost.localdomain>
+	 <4C8F160B.4010401@Atheros.com>
+	 <1284522264.2405.89.camel@localhost.localdomain>
+	 <99B09243E1A5DA4898CDD8B700111448097968EDE3@EXMB04.eu.tieto.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 17 Sep 2010 08:04:30 +0900
+Message-ID: <1284678270.2405.148.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Waldemar,
 
-On Thu, Sep 16, 2010 at 10:16 PM, Gustavo F. Padovan
-<padovan@profusion.mobi> wrote:
-> Hi Haijun,
->
-> * haijun liu <liuhaijun.er@gmail.com> [2010-09-16 15:15:18 +0800]:
->
->> This patch add fixed channels bit mask definition for
->>               L2CAP_FIXCHAN_NULLID
->>               L2CAP_FIXCHAN_SIGNAL
->>               L2CAP_FIXCHAN_CONNLESS
->>               L2CAP_FIXCHAN_A2MP
->> And replace hard code in source file with the macro.
->>
->> Signed-off-by: Haijun.Liu <Haijun.Liu@Atheros.com>
->> ---
->>  include/net/bluetooth/l2cap.h |    6 ++++++
->>  net/bluetooth/l2cap.c         |    2 +-
->>  2 files changed, 7 insertions(+), 1 deletions(-)
->>
->> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
->> index 6c24144..e4fe2c7 100644
->> --- a/include/net/bluetooth/l2cap.h
->> +++ b/include/net/bluetooth/l2cap.h
->> @@ -97,6 +97,12 @@ struct l2cap_conninfo {
->>  #define L2CAP_FEAT_FCS               0x00000020
->>  #define L2CAP_FEAT_FIXED_CHAN        0x00000080
->>
->> +/* L2CAP fixed channel bitmask */
->> +#define L2CAP_FIXCHAN_NULLID 0x00
->> +#define L2CAP_FIXCHAN_SIGNAL 0x02
->> +#define L2CAP_FIXCHAN_CONNLESS       0x04
->> +#define L2CAP_FIXCHAN_A2MP   0x08
->
-> That's wrong, signaling channel is 0x01, connless is 0x02 and A2MP is
-> 0x03. And if you haven't noted we already have macros for the signaling
-> and connectionless channels:
->
-> #define L2CAP_CID_SIGNALING     0x0001
-> #define L2CAP_CID_CONN_LESS     0x0002
->
-> --
-> Gustavo F. Padovan
-> ProFUSION embedded systems - http://profusion.mobi
->
+> >if we talk about the SAP server role found in a mobile phone, 
+> >then that support clearly needs to interact with the telephony 
+> >stack. Since when SAP is active the telephony stack needs to 
+> >be suspended and all SIM transaction being forwarded.
+> 
+> I agree, but a telephony stack needs to care about its state when SAP is active. Not all linux based mobile platforms use ofono.
 
-These are not channel id definition, these are feature bit mask values.
-And they are used in information exchange process to present FIXED
-CHANNELS SUPPORTED.
+I think they should use oFono of course since that is the only way to be
+modem hardware agnostic in the long run.
 
---
-Haijun Liu
+> >Currently I would be thinking that the SAP implementation 
+> >should be done inside oFono actually. Since then you have 
+> >direct access to the hardware. The D-Bus approach just doesn't 
+> >sound correct to me. I could be of course wrong, but I can't 
+> >wrap my mind around on how you can make this work.
+> 
+> I assume that ofono should handle sap transactions (as it's kind of hardware abstraction for bluez) and expose SAP APDU interfaces as i.e Nokia did for sap transactions in spec (http://www.wirelessmodemapi.com/), and not implement sap profile itself.  Again, not all use ofono as telephony stack.
+> 
+> Sorry, I don't know ofono well. What's the interface between ofono and bluez? 
+
+In this case there will be no direct interface besides oFono registering
+the SDP records for SAP.
+
+> >Even with file descriptor passing this doesn't look like the 
+> >right approach. If we need a hardware abstraction than we 
+> >either use oFono or we have to create some SAP hardware access 
+> >abstraction.
+> 
+> I agree with this too. I prefere to have a sap implementation as bluez plugin, but we need to define api for sim operations which could be implemented in ofono or other proprietary stacks. I guess dbus was intended to be kind of hw abstraction api.
+> Some time ago Claudio sent proposal implementation of sap server where he defined api for a driver to sim.
+
+I still don't see this as a really good idea. We want modem abstraction
+inside oFono and not all over the place.
+
+Regards
+
+Marcel
+
+
