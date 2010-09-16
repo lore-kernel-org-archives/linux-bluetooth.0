@@ -1,64 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Thu, 16 Sep 2010 17:21:40 +0800
-Message-ID: <AANLkTi=mS2212wTd3nu_ENJ8ySyNSVMWgTmc-MT0421c@mail.gmail.com>
-Subject: [PATCH] Bluetooth: Replace hard code of configuration continuation flag.
-From: haijun liu <liuhaijun.er@gmail.com>
-To: linux-bluetooth@vger.kernel.org,
-	Mat Martineau <mathewm@codeaurora.org>,
-	"dantian.ip" <dantian.ip@gmail.com>
+In-Reply-To: <AANLkTi=JEhr6nO7WqBm2=bGrpCxuc6daG_hMGMd_-hxY@mail.gmail.com>
+References: <AANLkTi=JEhr6nO7WqBm2=bGrpCxuc6daG_hMGMd_-hxY@mail.gmail.com>
+Date: Thu, 16 Sep 2010 12:00:50 +0300
+Message-ID: <AANLkTingGbnYQuyQvjPcK-=zSvo-RCpq2tGioysEMYNk@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Fix bug in l2cap_parse_conf_rsp()
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: haijun liu <liuhaijun.er@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	"dantian.ip" <dantian.ip@gmail.com>,
+	Mat Martineau <mathewm@codeaurora.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Replace hard code of configuration continuation flag with self-comment macro.
+Hi,
 
-Signed-off-by: Haijun.Liu <Haijun.Liu@Atheros.com>
----
- include/net/bluetooth/l2cap.h |    2 ++
- net/bluetooth/l2cap.c         |    4 ++--
- 2 files changed, 4 insertions(+), 2 deletions(-)
+Duplicated:
+http://www.spinics.net/lists/linux-bluetooth/msg07366.html
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index e4fe2c7..a37b266 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -199,6 +199,8 @@ struct l2cap_conf_rsp {
- #define L2CAP_CONF_REJECT	0x0002
- #define L2CAP_CONF_UNKNOWN	0x0003
+BTW: How long will it tale to get the patch in?
 
-+#define L2CAP_CONF_FLAG_CONT	0x0001
-+
- struct l2cap_conf_opt {
- 	__u8       type;
- 	__u8       len;
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 1797277..725744b 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -3121,7 +3121,7 @@ static inline int l2cap_config_req(struct
-l2cap_conn *conn, struct l2cap_cmd_hdr
- 	memcpy(l2cap_pi(sk)->conf_req + l2cap_pi(sk)->conf_len, req->data, len);
- 	l2cap_pi(sk)->conf_len += len;
-
--	if (flags & 0x0001) {
-+	if (flags & L2CAP_CONF_FLAG_CONT) {
- 		/* Incomplete config. Send empty response. */
- 		l2cap_send_cmd(conn, cmd->ident, L2CAP_CONF_RSP,
- 				l2cap_build_conf_rsp(sk, rsp,
-@@ -3228,7 +3228,7 @@ static inline int l2cap_config_rsp(struct
-l2cap_conn *conn, struct l2cap_cmd_hdr
- 		goto done;
- 	}
-
--	if (flags & 0x01)
-+	if (flags & L2CAP_CONF_FLAG_CONT)
- 		goto done;
-
- 	l2cap_pi(sk)->conf_state |= L2CAP_CONF_INPUT_DONE;
--- 
-1.6.3.3
-
-
--- 
-Haijun Liu
+On Thu, Sep 16, 2010 at 11:26 AM, haijun liu <liuhaijun.er@gmail.com> wrote:
+>  Acording bluetooth spec [Host Volume] chapter, section
+>  of "7.1.2 Response path", in l2cap_parse_conf_rsp(), MTU should be
+>  incoming mtu, not outgoing mtu.
+>
+> Signed-off-by: Haijun.Liu <Haijun.Liu@Atheros.com>
+> ---
+>  net/bluetooth/l2cap.c |    6 +++---
+>  1 files changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> index 23e487e..1797277 100644
+> --- a/net/bluetooth/l2cap.c
+> +++ b/net/bluetooth/l2cap.c
+> @@ -2771,10 +2771,10 @@ static int l2cap_parse_conf_rsp(struct sock
+> *sk, void *rsp, int len, void *data,
+>                case L2CAP_CONF_MTU:
+>                        if (val < L2CAP_DEFAULT_MIN_MTU) {
+>                                *result = L2CAP_CONF_UNACCEPT;
+> -                               pi->omtu = L2CAP_DEFAULT_MIN_MTU;
+> +                               pi->imtu = L2CAP_DEFAULT_MIN_MTU;
+>                        } else
+> -                               pi->omtu = val;
+> -                       l2cap_add_conf_opt(&ptr, L2CAP_CONF_MTU, 2, pi->omtu);
+> +                               pi->imtu = val;
+> +                       l2cap_add_conf_opt(&ptr, L2CAP_CONF_MTU, 2, pi->imtu);
+>                        break;
+>
+>                case L2CAP_CONF_FLUSH_TO:
+> --
+> 1.6.3.3
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
