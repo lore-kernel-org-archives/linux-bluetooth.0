@@ -3,63 +3,85 @@ From: Matthew Garrett <mjg@redhat.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: linux-usb@vger.kernel.org, marcel@holtmann.org,
         Matthew Garrett <mjg@redhat.com>
-Subject: [PATCH 2/3] bluetooth: Remove some unnecessary error messages
-Date: Thu, 16 Sep 2010 13:58:14 -0400
-Message-Id: <1284659895-27984-2-git-send-email-mjg@redhat.com>
-In-Reply-To: <1284659895-27984-1-git-send-email-mjg@redhat.com>
-References: <1284659895-27984-1-git-send-email-mjg@redhat.com>
+Subject: [PATCH 1/3] bluetooth: Take a runtime pm reference on hid connections
+Date: Thu, 16 Sep 2010 13:58:13 -0400
+Message-Id: <1284659895-27984-1-git-send-email-mjg@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The main reason for these urbs to error out on submission is that runtime
-pm has kicked in, which is unnecessary noise. Let's just drop them.
+Bluetooth runtime PM interacts badly with input devices - the connection
+will be dropped if the device becomes idle, resulting in noticable lag when
+the user interacts with the input device again. Bump the pm runtime count
+when the device is associated and release it when it's disassociated in
+order to avoid this.
 
 Signed-off-by: Matthew Garrett <mjg@redhat.com>
 ---
- drivers/bluetooth/btusb.c |   15 +++------------
- 1 files changed, 3 insertions(+), 12 deletions(-)
+ net/bluetooth/hidp/core.c |   18 ++++++++++++++++++
+ 1 files changed, 18 insertions(+), 0 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index d22ce3c..3ace025 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -229,11 +229,8 @@ static void btusb_intr_complete(struct urb *urb)
- 	usb_anchor_urb(urb, &data->intr_anchor);
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index bfe641b..a4489a7 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -36,6 +36,7 @@
+ #include <linux/file.h>
+ #include <linux/init.h>
+ #include <linux/wait.h>
++#include <linux/pm_runtime.h>
+ #include <net/sock.h>
  
- 	err = usb_submit_urb(urb, GFP_ATOMIC);
--	if (err < 0) {
--		BT_ERR("%s urb %p failed to resubmit (%d)",
--						hdev->name, urb, -err);
-+	if (err < 0)
- 		usb_unanchor_urb(urb);
--	}
+ #include <linux/input.h>
+@@ -622,6 +623,14 @@ static int hidp_session(void *arg)
+ 	return 0;
  }
  
- static int btusb_submit_intr_urb(struct hci_dev *hdev, gfp_t mem_flags)
-@@ -313,11 +310,8 @@ static void btusb_bulk_complete(struct urb *urb)
- 	usb_mark_last_busy(data->udev);
++static struct hci_dev *hidp_get_hci(struct hidp_session *session)
++{
++	bdaddr_t *src = &bt_sk(session->ctrl_sock->sk)->src;
++	bdaddr_t *dst = &bt_sk(session->ctrl_sock->sk)->dst;
++
++	return hci_get_route(dst, src);
++}
++
+ static struct device *hidp_get_device(struct hidp_session *session)
+ {
+ 	bdaddr_t *src = &bt_sk(session->ctrl_sock->sk)->src;
+@@ -819,6 +828,7 @@ fault:
+ int hidp_add_connection(struct hidp_connadd_req *req, struct socket *ctrl_sock, struct socket *intr_sock)
+ {
+ 	struct hidp_session *session, *s;
++	struct hci_dev *hdev;
+ 	int err;
  
- 	err = usb_submit_urb(urb, GFP_ATOMIC);
--	if (err < 0) {
--		BT_ERR("%s urb %p failed to resubmit (%d)",
--						hdev->name, urb, -err);
-+	if (err < 0)
- 		usb_unanchor_urb(urb);
--	}
+ 	BT_DBG("");
+@@ -889,6 +899,10 @@ int hidp_add_connection(struct hidp_connadd_req *req, struct socket *ctrl_sock,
+ 		hidp_input_event(session->input, EV_LED, 0, 0);
+ 	}
+ 
++	hdev = hidp_get_hci(session);
++	pm_runtime_get(hdev->parent);
++	hci_dev_put(hdev);
++
+ 	up_write(&hidp_session_sem);
+ 	return 0;
+ 
+@@ -925,6 +939,7 @@ failed:
+ int hidp_del_connection(struct hidp_conndel_req *req)
+ {
+ 	struct hidp_session *session;
++	struct hci_dev *hdev;
+ 	int err = 0;
+ 
+ 	BT_DBG("");
+@@ -952,6 +967,9 @@ int hidp_del_connection(struct hidp_conndel_req *req)
+ 	} else
+ 		err = -ENOENT;
+ 
++	hdev = hidp_get_hci(session);
++	pm_runtime_put(hdev->parent);
++	hci_dev_put(hdev);
+ 	up_read(&hidp_session_sem);
+ 	return err;
  }
- 
- static int btusb_submit_bulk_urb(struct hci_dev *hdev, gfp_t mem_flags)
-@@ -402,11 +396,8 @@ static void btusb_isoc_complete(struct urb *urb)
- 	usb_anchor_urb(urb, &data->isoc_anchor);
- 
- 	err = usb_submit_urb(urb, GFP_ATOMIC);
--	if (err < 0) {
--		BT_ERR("%s urb %p failed to resubmit (%d)",
--						hdev->name, urb, -err);
-+	if (err < 0)
- 		usb_unanchor_urb(urb);
--	}
- }
- 
- static void inline __fill_isoc_descriptor(struct urb *urb, int len, int mtu)
 -- 
 1.7.2.3
