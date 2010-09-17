@@ -1,74 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 17 Sep 2010 15:34:40 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, marcel@holtmann.org
-Subject: Re: Possible regression with skb_clone() in 2.6.36
-Message-Id: <20100917153440.474b93e4.akpm@linux-foundation.org>
-In-Reply-To: <1283209824-8795-1-git-send-email-padovan@profusion.mobi>
-References: <1283209824-8795-1-git-send-email-padovan@profusion.mobi>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+From: Will Woods <wwoods@redhat.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org, kernel@lists.fedoraproject.org,
+        Will Woods <wwoods@redhat.com>
+Subject: [PATCH 2/2] bluetooth: add support for controller in MacBookPro6,2
+Date: Fri, 17 Sep 2010 17:09:21 -0400
+Message-Id: <1284757761-11994-3-git-send-email-wwoods@redhat.com>
+In-Reply-To: <1284757761-11994-1-git-send-email-wwoods@redhat.com>
+References: <1284757761-11994-1-git-send-email-wwoods@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 30 Aug 2010 20:10:23 -0300
-"Gustavo F. Padovan" <padovan@profusion.mobi> wrote:
+Once again the device class is ff(vend.) instead of e0(wlcon).
 
-> I've been experiencing some problems when running the L2CAP Streaming mode in
-> 2.6.36. The system quickly runs in an Out Of Memory condition and crash. That
-> wasn't happening before, so I think we may have a regression here (I didn't find
-> where yet). The crash log is below.
+output from 'usb-devices':
+T:  Bus=01 Lev=03 Prnt=03 Port=02 Cnt=03 Dev#=  8 Spd=12  MxCh= 0
+D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=05ac ProdID=8218 Rev=00.22
+S:  Manufacturer=Apple Inc.
+S:  Product=Bluetooth USB Host Controller
+C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
 
-So 2.6.35 was OK?
+Signed-off-by: Will Woods <wwoods@redhat.com>
+---
+ drivers/bluetooth/btusb.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
-> The following patch does not fix the regression, but shows that removing the
-> skb_clone() call from l2cap_streaming_send() makes the problem goes away. The
-> patch is good anyway since it saves memory and time when sending Streaming mode
-> packets.
-
-How does "make it go away" differ from "fix the regression" :)
-
-But yes, if we don't understand the source of the bug then it may well
-still be there.  Did you make any progress in understanding the cause?
-
-> 
-> [ 5066.137533] Bluetooth: L2CAP ver 2.15
-> [ 5066.137873] Bluetooth: L2CAP socket layer initialized
-> [ 5066.545179] Bluetooth: RFCOMM TTY layer initialized
-> [ 5066.545879] Bluetooth: RFCOMM socket layer initialized
-> [ 5066.546582] Bluetooth: RFCOMM ver 1.11
-> [ 5092.268021] l2test invoked oom-killer: gfp_mask=0x4d0, order=0, oom_adj=0, oom_score_adj=0
-> [ 5092.268872] Pid: 3897, comm: l2test Not tainted 2.6.36-rc3 #5
-> [ 5092.269863] Call Trace:
-> [ 5092.270265]  [<ffffffff8138b6a6>] ? _raw_spin_unlock+0x26/0x30
-> [ 5092.270878]  [<ffffffff810c0827>] T.427+0x77/0x1e0
-> [ 5092.271874]  [<ffffffff811b85e7>] ? security_real_capable_noaudit+0x37/0x60
-> [ 5092.272956]  [<ffffffff810c0e3a>] out_of_memory+0x2ca/0x2f0
-> [ 5092.273894]  [<ffffffff810c3d43>] __alloc_pages_nodemask+0x693/0x6b0
-> [ 5092.274871]  [<ffffffff810ea3e6>] cache_alloc_refill+0x2d6/0x5c0
-> [ 5092.275864]  [<ffffffff810ea805>] __kmalloc+0x135/0x150
-> [ 5092.276876]  [<ffffffff8130f2ae>] __alloc_skb+0x6e/0x150
-> [ 5092.277865]  [<ffffffff810d3a00>] ? might_fault+0x40/0x90
-> [ 5092.278652]  [<ffffffff8130ace2>] sock_alloc_send_pskb+0x1c2/0x320
-> [ 5092.278927]  [<ffffffff810d3a00>] ? might_fault+0x40/0x90
-> [ 5092.279864]  [<ffffffff81312add>] ? memcpy_fromiovec+0x6d/0x90
-> [ 5092.280864]  [<ffffffff8130ae50>] sock_alloc_send_skb+0x10/0x20
-> [ 5092.281867]  [<ffffffffa00e600f>] l2cap_create_iframe_pdu+0x9f/0x2c0 [l2cap]
-> [ 5092.282865]  [<ffffffffa00e84b9>] l2cap_sock_sendmsg+0x5d9/0x910 [l2cap]
-> [ 5092.283932]  [<ffffffff8138ba3c>] ? restore_args+0x0/0x30
-> [ 5092.284865]  [<ffffffff8130725b>] sock_sendmsg+0xdb/0x100
-> [ 5092.285652]  [<ffffffff8138ba3c>] ? restore_args+0x0/0x30
-> [ 5092.285864]  [<ffffffff8138ba3c>] ? restore_args+0x0/0x30
-> [ 5092.286864]  [<ffffffff813073c0>] sys_sendto+0xf0/0x130
-> [ 5092.287864]  [<ffffffff8138b60b>] ? _raw_spin_unlock_irq+0x2b/0x40
-> [ 5092.288872]  [<ffffffff81093cfd>] ? trace_hardirqs_on_caller+0x13d/0x180
-> [ 5092.289927]  [<ffffffff81093d4d>] ? trace_hardirqs_on+0xd/0x10
-> [ 5092.290864]  [<ffffffff810d3a00>] ? might_fault+0x40/0x90
-> [ 5092.291649]  [<ffffffff810d3a00>] ? might_fault+0x40/0x90
-> [ 5092.291864]  [<ffffffff810d3a00>] ? might_fault+0x40/0x90
-> [ 5092.292864]  [<ffffffff8130740f>] sys_send+0xf/0x20
-> [ 5092.293870]  [<ffffffff8132ccd6>] compat_sys_socketcall+0x146/0x1f0
-> [ 5092.294875]  [<ffffffff81053ee4>] sysenter_dispatch+0x7/0x30
-
-That's a pretty serious regression.
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index eac44e4..320e798 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -65,6 +65,9 @@ static struct usb_device_id btusb_table[] = {
+ 	/* Apple iMac11,1 */
+ 	{ USB_DEVICE(0x05ac, 0x8215) },
+ 
++	/* Apple MacBookPro6,2 */
++	{ USB_DEVICE(0x05ac, 0x8218) },
++
+ 	/* AVM BlueFRITZ! USB v2.0 */
+ 	{ USB_DEVICE(0x057c, 0x3800) },
+ 
+-- 
+1.7.2.3
