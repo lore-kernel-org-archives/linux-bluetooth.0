@@ -1,67 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 17 Sep 2010 11:50:47 +0300
-From: Ville Tervo <ville.tervo@nokia.com>
-To: "ext Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: haijun liu <liuhaijun.er@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Mat Martineau <mathewm@codeaurora.org>,
-	"dantian.ip" <dantian.ip@gmail.com>
-Subject: Re: [PATCH] Bluetooth: Replace hard code of fixed channels bit mask
-Message-ID: <20100917085047.GN14330@null>
-References: <AANLkTi=86t=osr8YUfUfU3QLHiHXgp8SCuwqOE_GoPgp@mail.gmail.com>
- <20100916141654.GB15000@vigoh>
+From: Oliver Neukum <oneukum@suse.de>
+To: Matthew Garrett <mjg@redhat.com>
+Subject: Re: [PATCH 1/3] bluetooth: Take a runtime pm reference on hid connections
+Date: Fri, 17 Sep 2010 10:39:54 +0200
+Cc: linux-bluetooth@vger.kernel.org, linux-usb@vger.kernel.org,
+	marcel@holtmann.org
+References: <1284659895-27984-1-git-send-email-mjg@redhat.com>
+In-Reply-To: <1284659895-27984-1-git-send-email-mjg@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20100916141654.GB15000@vigoh>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: Text/Plain;
+  charset="iso-8859-15"
+Message-Id: <201009171039.54110.oneukum@suse.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Am Donnerstag, 16. September 2010, 19:58:13 schrieb Matthew Garrett:
+> Bluetooth runtime PM interacts badly with input devices - the connection
+> will be dropped if the device becomes idle, resulting in noticable lag when
+> the user interacts with the input device again. Bump the pm runtime count
+> when the device is associated and release it when it's disassociated in
+> order to avoid this.
 
-On Thu, Sep 16, 2010 at 04:16:54PM +0200, ext Gustavo F. Padovan wrote:
-> Hi Haijun,
-> 
-> * haijun liu <liuhaijun.er@gmail.com> [2010-09-16 15:15:18 +0800]:
-> 
-> > This patch add fixed channels bit mask definition for
-> >  		L2CAP_FIXCHAN_NULLID
-> >  		L2CAP_FIXCHAN_SIGNAL
-> >  		L2CAP_FIXCHAN_CONNLESS
-> >  		L2CAP_FIXCHAN_A2MP
-> > And replace hard code in source file with the macro.
-> > 
-> > Signed-off-by: Haijun.Liu <Haijun.Liu@Atheros.com>
-> > ---
-> >  include/net/bluetooth/l2cap.h |    6 ++++++
-> >  net/bluetooth/l2cap.c         |    2 +-
-> >  2 files changed, 7 insertions(+), 1 deletions(-)
-> > 
-> > diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> > index 6c24144..e4fe2c7 100644
-> > --- a/include/net/bluetooth/l2cap.h
-> > +++ b/include/net/bluetooth/l2cap.h
-> > @@ -97,6 +97,12 @@ struct l2cap_conninfo {
-> >  #define L2CAP_FEAT_FCS		0x00000020
-> >  #define L2CAP_FEAT_FIXED_CHAN	0x00000080
-> > 
-> > +/* L2CAP fixed channel bitmask */
-> > +#define L2CAP_FIXCHAN_NULLID	0x00
-> > +#define L2CAP_FIXCHAN_SIGNAL	0x02
-> > +#define L2CAP_FIXCHAN_CONNLESS	0x04
-> > +#define L2CAP_FIXCHAN_A2MP	0x08
-> 
-> That's wrong, signaling channel is 0x01, connless is 0x02 and A2MP is
-> 0x03. And if you haven't noted we already have macros for the signaling
-> and connectionless channels:
+What is the effect on battery live of the external devices?
 
-But these are bit masks and looks ok to me except L2CAP_FIXCHAN_A2MP which I
-could not find from the list.. Check Vol 3 Part A 4.13.
-
-> #define L2CAP_CID_SIGNALING     0x0001
-> #define L2CAP_CID_CONN_LESS     0x0002
-
-These are channel ids.
-
-
--- 
-Ville
+	Regards
+		Oliver
