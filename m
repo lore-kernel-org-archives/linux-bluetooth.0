@@ -1,48 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-From: Santiago Carot-Nemesio <sancane@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1283149112-22164-1-git-send-email-realmz6@gmail.com>
+References: <1283149112-22164-1-git-send-email-realmz6@gmail.com>
+Date: Fri, 17 Sep 2010 11:13:40 +0800
+Message-ID: <AANLkTikYNnNk0LrxtB=Y0guGUxgW0tjmU=Q2k=GKmY6A@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Fix unaligned access to l2cap conf data
+From: real mz <realmz6@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH] Change the for loop to read blutooth clock in MCAP CSP
-Date: Fri, 17 Sep 2010 09:52:30 +0200
-Message-Id: <1284709950-5302-1-git-send-email-sancane@gmail.com>
+Cc: linux-kernel-commits@blackfin.uclinux.org,
+	realmz <realmz6@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is only a cosmetic change. Using a do..while loop
-we avoid direct manipulation of counter loop variable
-when error happens reading the BT clock.
----
- health/mcap_sync.c |   10 +++++-----
- 1 files changed, 5 insertions(+), 5 deletions(-)
+ping
 
-diff --git a/health/mcap_sync.c b/health/mcap_sync.c
-index bc1ffcd..78cb163 100644
---- a/health/mcap_sync.c
-+++ b/health/mcap_sync.c
-@@ -406,18 +406,18 @@ static void initialize_caps(struct mcap_mcl *mcl)
- 
- 	/* Do clock read a number of times and measure latency */
- 	avg = 0;
--	for (i = 0; i < 20; ++i) {
-+	i = 0;
-+	do {
- 		clock_gettime(CLK, &t1);
--		if (!read_btclock(mcl, &btclock, &btaccuracy)) {
--			--i;
-+		if (!read_btclock(mcl, &btclock, &btaccuracy))
- 			continue;
--		}
- 		clock_gettime(CLK, &t2);
- 
- 		latency = time_us(&t2) - time_us(&t1);
- 		latencies[i] = latency;
- 		avg += latency;
--	}
-+		i++;
-+	} while (i < 20);
- 	avg /= 20;
- 
- 	/* Calculate deviation */
--- 
-1.7.2.3
-
+On Mon, Aug 30, 2010 at 2:18 PM, steven.miao <realmz6@gmail.com> wrote:
+> From: realmz <realmz6@gmail.com>
+>
+> In function l2cap_get_conf_opt() and l2cap_add_conf_opt() the address of
+> opt->val sometimes is not at the edge of 2-bytes/4-bytes, so 2-bytes/4 bytes
+> access will cause data misalignment exeception. Use get_unaligned_le16/32
+> and put_unaligned_le16/32 function to avoid data misalignment execption.
+> ---
+>  net/bluetooth/l2cap.c |    8 ++++----
+>  1 files changed, 4 insertions(+), 4 deletions(-)
+>
+> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> index fadf26b..a07dad8 100644
+> --- a/net/bluetooth/l2cap.c
+> +++ b/net/bluetooth/l2cap.c
+> @@ -2406,11 +2406,11 @@ static inline int l2cap_get_conf_opt(void **ptr, int *type, int *olen, unsigned
+>                break;
+>
+>        case 2:
+> -               *val = __le16_to_cpu(*((__le16 *) opt->val));
+> +               *val = get_unaligned_le16(opt->val);
+>                break;
+>
+>        case 4:
+> -               *val = __le32_to_cpu(*((__le32 *) opt->val));
+> +               *val = get_unaligned_le32(opt->val);
+>                break;
+>
+>        default:
+> @@ -2437,11 +2437,11 @@ static void l2cap_add_conf_opt(void **ptr, u8 type, u8 len, unsigned long val)
+>                break;
+>
+>        case 2:
+> -               *((__le16 *) opt->val) = cpu_to_le16(val);
+> +               put_unaligned_le16(cpu_to_le16(val), opt->val);
+>                break;
+>
+>        case 4:
+> -               *((__le32 *) opt->val) = cpu_to_le32(val);
+> +               put_unaligned_le32(cpu_to_le32(val), opt->val);
+>                break;
+>
+>        default:
+> --
+> 1.5.6.5
+>
+>
