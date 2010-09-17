@@ -3,26 +3,27 @@ From: Will Woods <wwoods@redhat.com>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org, kernel@lists.fedoraproject.org,
         Will Woods <wwoods@redhat.com>
-Subject: [PATCH 2/2] bluetooth: add support for controller in MacBookPro6,2
-Date: Fri, 17 Sep 2010 17:09:21 -0400
-Message-Id: <1284757761-11994-3-git-send-email-wwoods@redhat.com>
+Subject: [PATCH 1/2] bluetooth: add support for controller in MacBookPro7,1
+Date: Fri, 17 Sep 2010 17:09:20 -0400
+Message-Id: <1284757761-11994-2-git-send-email-wwoods@redhat.com>
 In-Reply-To: <1284757761-11994-1-git-send-email-wwoods@redhat.com>
 References: <1284757761-11994-1-git-send-email-wwoods@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Once again the device class is ff(vend.) instead of e0(wlcon).
+As with iMac11,1 the device class is ff(vend.) instead of e0(wlcon).
 
 output from 'usb-devices':
-T:  Bus=01 Lev=03 Prnt=03 Port=02 Cnt=03 Dev#=  8 Spd=12  MxCh= 0
+T:  Bus=04 Lev=02 Prnt=04 Port=00 Cnt=01 Dev#=  5 Spd=12  MxCh= 0
 D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=05ac ProdID=8218 Rev=00.22
+P:  Vendor=05ac ProdID=8213 Rev=01.86
 S:  Manufacturer=Apple Inc.
 S:  Product=Bluetooth USB Host Controller
+S:  SerialNumber=58B0359C28ED
 C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
 I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
 
 Signed-off-by: Will Woods <wwoods@redhat.com>
 ---
@@ -30,18 +31,18 @@ Signed-off-by: Will Woods <wwoods@redhat.com>
  1 files changed, 3 insertions(+), 0 deletions(-)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index eac44e4..320e798 100644
+index d22ce3c..eac44e4 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -65,6 +65,9 @@ static struct usb_device_id btusb_table[] = {
+@@ -59,6 +59,9 @@ static struct usb_device_id btusb_table[] = {
+ 	/* Generic Bluetooth USB device */
+ 	{ USB_DEVICE_INFO(0xe0, 0x01, 0x01) },
+ 
++	/* Apple MacBookPro7,1 */
++	{ USB_DEVICE(0x05ac, 0x8213) },
++
  	/* Apple iMac11,1 */
  	{ USB_DEVICE(0x05ac, 0x8215) },
- 
-+	/* Apple MacBookPro6,2 */
-+	{ USB_DEVICE(0x05ac, 0x8218) },
-+
- 	/* AVM BlueFRITZ! USB v2.0 */
- 	{ USB_DEVICE(0x057c, 0x3800) },
  
 -- 
 1.7.2.3
