@@ -1,76 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: RE: [RFC] BlueZ D-Bus Sim Access Profile Server API description
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Nicolas GUILBAUD <nicolas.guilbaud.wj@rdf.renesas.com>
-Cc: Suraj Sumangala <suraj@Atheros.com>,
-	Suraj Sumangala <Suraj.Sumangala@Atheros.com>,
-	linux-bluetooth@vger.kernel.org,
-	Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>
-In-Reply-To: <A9AC1023FCA4654D92AC24C2A8F6A09201AA816C@renesas4bis.renesas-rdf.local>
-References: <1284374584-12282-1-git-send-email-suraj@atheros.com>
-	 <1284442946.2405.50.camel@localhost.localdomain>
-	 <4C8F160B.4010401@Atheros.com>
-	 <1284522264.2405.89.camel@localhost.localdomain>
-	 <4C906430.90900@Atheros.com>
-	 <A9AC1023FCA4654D92AC24C2A8F6A09201A2B923@renesas4bis.renesas-rdf.local>
-	 <1284678016.2405.145.camel@localhost.localdomain>
-	 <A9AC1023FCA4654D92AC24C2A8F6A09201AA816C@renesas4bis.renesas-rdf.local>
-Content-Type: text/plain; charset="UTF-8"
-Date: Sat, 18 Sep 2010 09:16:16 +0900
-Message-ID: <1284768976.2405.236.camel@localhost.localdomain>
+Date: Fri, 17 Sep 2010 15:34:40 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, marcel@holtmann.org
+Subject: Re: Possible regression with skb_clone() in 2.6.36
+Message-Id: <20100917153440.474b93e4.akpm@linux-foundation.org>
+In-Reply-To: <1283209824-8795-1-git-send-email-padovan@profusion.mobi>
+References: <1283209824-8795-1-git-send-email-padovan@profusion.mobi>
 Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nicolas,
+On Mon, 30 Aug 2010 20:10:23 -0300
+"Gustavo F. Padovan" <padovan@profusion.mobi> wrote:
 
-> >>that is just because we haven't gotten there yet. Of course if SAP takes
-> over we have to shutdown oFono's handling of the modem. This could be
-> done similar to the support for Lockdown we have in the oFono TODO list.
+> I've been experiencing some problems when running the L2CAP Streaming mode in
+> 2.6.36. The system quickly runs in an Out Of Memory condition and crash. That
+> wasn't happening before, so I think we may have a regression here (I didn't find
+> where yet). The crash log is below.
+
+So 2.6.35 was OK?
+
+> The following patch does not fix the regression, but shows that removing the
+> skb_clone() call from l2cap_streaming_send() makes the problem goes away. The
+> patch is good anyway since it saves memory and time when sending Streaming mode
+> packets.
+
+How does "make it go away" differ from "fix the regression" :)
+
+But yes, if we don't understand the source of the bug then it may well
+still be there.  Did you make any progress in understanding the cause?
+
 > 
-> Do you have information about the release date of this feature? And about the interface to lockdown, is it a D-BUS message? 
+> [ 5066.137533] Bluetooth: L2CAP ver 2.15
+> [ 5066.137873] Bluetooth: L2CAP socket layer initialized
+> [ 5066.545179] Bluetooth: RFCOMM TTY layer initialized
+> [ 5066.545879] Bluetooth: RFCOMM socket layer initialized
+> [ 5066.546582] Bluetooth: RFCOMM ver 1.11
+> [ 5092.268021] l2test invoked oom-killer: gfp_mask=0x4d0, order=0, oom_adj=0, oom_score_adj=0
+> [ 5092.268872] Pid: 3897, comm: l2test Not tainted 2.6.36-rc3 #5
+> [ 5092.269863] Call Trace:
+> [ 5092.270265]  [<ffffffff8138b6a6>] ? _raw_spin_unlock+0x26/0x30
+> [ 5092.270878]  [<ffffffff810c0827>] T.427+0x77/0x1e0
+> [ 5092.271874]  [<ffffffff811b85e7>] ? security_real_capable_noaudit+0x37/0x60
+> [ 5092.272956]  [<ffffffff810c0e3a>] out_of_memory+0x2ca/0x2f0
+> [ 5092.273894]  [<ffffffff810c3d43>] __alloc_pages_nodemask+0x693/0x6b0
+> [ 5092.274871]  [<ffffffff810ea3e6>] cache_alloc_refill+0x2d6/0x5c0
+> [ 5092.275864]  [<ffffffff810ea805>] __kmalloc+0x135/0x150
+> [ 5092.276876]  [<ffffffff8130f2ae>] __alloc_skb+0x6e/0x150
+> [ 5092.277865]  [<ffffffff810d3a00>] ? might_fault+0x40/0x90
+> [ 5092.278652]  [<ffffffff8130ace2>] sock_alloc_send_pskb+0x1c2/0x320
+> [ 5092.278927]  [<ffffffff810d3a00>] ? might_fault+0x40/0x90
+> [ 5092.279864]  [<ffffffff81312add>] ? memcpy_fromiovec+0x6d/0x90
+> [ 5092.280864]  [<ffffffff8130ae50>] sock_alloc_send_skb+0x10/0x20
+> [ 5092.281867]  [<ffffffffa00e600f>] l2cap_create_iframe_pdu+0x9f/0x2c0 [l2cap]
+> [ 5092.282865]  [<ffffffffa00e84b9>] l2cap_sock_sendmsg+0x5d9/0x910 [l2cap]
+> [ 5092.283932]  [<ffffffff8138ba3c>] ? restore_args+0x0/0x30
+> [ 5092.284865]  [<ffffffff8130725b>] sock_sendmsg+0xdb/0x100
+> [ 5092.285652]  [<ffffffff8138ba3c>] ? restore_args+0x0/0x30
+> [ 5092.285864]  [<ffffffff8138ba3c>] ? restore_args+0x0/0x30
+> [ 5092.286864]  [<ffffffff813073c0>] sys_sendto+0xf0/0x130
+> [ 5092.287864]  [<ffffffff8138b60b>] ? _raw_spin_unlock_irq+0x2b/0x40
+> [ 5092.288872]  [<ffffffff81093cfd>] ? trace_hardirqs_on_caller+0x13d/0x180
+> [ 5092.289927]  [<ffffffff81093d4d>] ? trace_hardirqs_on+0xd/0x10
+> [ 5092.290864]  [<ffffffff810d3a00>] ? might_fault+0x40/0x90
+> [ 5092.291649]  [<ffffffff810d3a00>] ? might_fault+0x40/0x90
+> [ 5092.291864]  [<ffffffff810d3a00>] ? might_fault+0x40/0x90
+> [ 5092.292864]  [<ffffffff8130740f>] sys_send+0xf/0x20
+> [ 5092.293870]  [<ffffffff8132ccd6>] compat_sys_socketcall+0x146/0x1f0
+> [ 5092.294875]  [<ffffffff81053ee4>] sysenter_dispatch+0x7/0x30
 
-good one ;)
-
-We know that we need such or similar feature for firmware updates where
-we have to essentially shutdown oFono from driving the modem for a
-period of time. The details are not 100% clear. For firmware updates
-this has to be a D-Bus method, actually D-Bus property on the modem
-interface.
-
-In theory we can even extend this to do this internally as well. So that
-an oFono plugin could lock down the modem. Things we clearly have to
-figure out at some point.
-
-> >There is a framework for card services in general, but I think that is
-> just pure overhead for this.
-> 
-> >And to be honest, my current thinking is that even for pure SIM card
-> readers with APDU mode, we might wanna support them via oFono anyway.
-> Having to add SAP support in multiple levels is a bad idea.
-> 
-> Yes but an APDU interface is needed in the SIM driver of oFono, I don't see any interface of this kind in the source code.
-
-Because we haven't had any hardware that does this so far. You will only
-see code in oFono once we had hardware in our hands that is able of
-doing this and we know how to drive it.
-
-> Maybe it's not the good place to speak about that.
-
-Essentially the oFono mailing list is a better place for such a
-discussion.
-
-> >However in the end this all depends on the hardware and right now I have
-> not had access to SAP capable hardware. Or maybe I did and I didn't know
-> it yet. Do we have any target hardware in mind?
-> 
-> Yes we have, it's Renesas Modem solution.
-
-Any chance you guys could add Renesas Modem support to oFono and then us
-some samples?
-
-Regards
-
-Marcel
-
-
+That's a pretty serious regression.
