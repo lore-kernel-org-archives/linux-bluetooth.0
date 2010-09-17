@@ -1,43 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-From: Oliver Neukum <oneukum@suse.de>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-Subject: Re: [PATCH 2/3] bluetooth: Remove some unnecessary error messages
-Date: Fri, 17 Sep 2010 10:59:06 +0200
-Cc: Matthew Garrett <mjg@redhat.com>,
-	linux-bluetooth@vger.kernel.org, linux-usb@vger.kernel.org,
-	marcel@holtmann.org
-References: <1284659895-27984-1-git-send-email-mjg@redhat.com> <1284659895-27984-2-git-send-email-mjg@redhat.com> <AANLkTi=NBrb70ZvafQxZMnLZZcmuGEPeon4Vqq4vkpce@mail.gmail.com>
-In-Reply-To: <AANLkTi=NBrb70ZvafQxZMnLZZcmuGEPeon4Vqq4vkpce@mail.gmail.com>
+Date: Fri, 17 Sep 2010 11:50:47 +0300
+From: Ville Tervo <ville.tervo@nokia.com>
+To: "ext Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: haijun liu <liuhaijun.er@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Mat Martineau <mathewm@codeaurora.org>,
+	"dantian.ip" <dantian.ip@gmail.com>
+Subject: Re: [PATCH] Bluetooth: Replace hard code of fixed channels bit mask
+Message-ID: <20100917085047.GN14330@null>
+References: <AANLkTi=86t=osr8YUfUfU3QLHiHXgp8SCuwqOE_GoPgp@mail.gmail.com>
+ <20100916141654.GB15000@vigoh>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201009171059.06486.oneukum@suse.de>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20100916141654.GB15000@vigoh>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am Freitag, 17. September 2010, 10:33:30 schrieb Andrei Emeltchenko:
-> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > index d22ce3c..3ace025 100644
-> > --- a/drivers/bluetooth/btusb.c
-> > +++ b/drivers/bluetooth/btusb.c
-> > @@ -229,11 +229,8 @@ static void btusb_intr_complete(struct urb *urb)
-> >        usb_anchor_urb(urb, &data->intr_anchor);
-> >
-> >        err = usb_submit_urb(urb, GFP_ATOMIC);
-> > -       if (err < 0) {
-> > -               BT_ERR("%s urb %p failed to resubmit (%d)",
-> > -                                               hdev->name, urb, -err);
-> > +       if (err < 0)
-> >                usb_unanchor_urb(urb);
-> > -       }
-> >  }
-> >
+Hi Gustavo,
+
+On Thu, Sep 16, 2010 at 04:16:54PM +0200, ext Gustavo F. Padovan wrote:
+> Hi Haijun,
 > 
-> I do not get the point here. Cannot you just undef BT_ERR if you
-> enabled debug? I believe this is standard behavior.
+> * haijun liu <liuhaijun.er@gmail.com> [2010-09-16 15:15:18 +0800]:
+> 
+> > This patch add fixed channels bit mask definition for
+> >  		L2CAP_FIXCHAN_NULLID
+> >  		L2CAP_FIXCHAN_SIGNAL
+> >  		L2CAP_FIXCHAN_CONNLESS
+> >  		L2CAP_FIXCHAN_A2MP
+> > And replace hard code in source file with the macro.
+> > 
+> > Signed-off-by: Haijun.Liu <Haijun.Liu@Atheros.com>
+> > ---
+> >  include/net/bluetooth/l2cap.h |    6 ++++++
+> >  net/bluetooth/l2cap.c         |    2 +-
+> >  2 files changed, 7 insertions(+), 1 deletions(-)
+> > 
+> > diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> > index 6c24144..e4fe2c7 100644
+> > --- a/include/net/bluetooth/l2cap.h
+> > +++ b/include/net/bluetooth/l2cap.h
+> > @@ -97,6 +97,12 @@ struct l2cap_conninfo {
+> >  #define L2CAP_FEAT_FCS		0x00000020
+> >  #define L2CAP_FEAT_FIXED_CHAN	0x00000080
+> > 
+> > +/* L2CAP fixed channel bitmask */
+> > +#define L2CAP_FIXCHAN_NULLID	0x00
+> > +#define L2CAP_FIXCHAN_SIGNAL	0x02
+> > +#define L2CAP_FIXCHAN_CONNLESS	0x04
+> > +#define L2CAP_FIXCHAN_A2MP	0x08
+> 
+> That's wrong, signaling channel is 0x01, connless is 0x02 and A2MP is
+> 0x03. And if you haven't noted we already have macros for the signaling
+> and connectionless channels:
 
-You can undefine BT_ERR, but then you'll miss error reports.
-This message may indicate an error, but usually doesn't if
-you use runtime pm.
+But these are bit masks and looks ok to me except L2CAP_FIXCHAN_A2MP which I
+could not find from the list.. Check Vol 3 Part A 4.13.
 
-	Regards
-		Oliver
+> #define L2CAP_CID_SIGNALING     0x0001
+> #define L2CAP_CID_CONN_LESS     0x0002
+
+These are channel ids.
+
+
+-- 
+Ville
