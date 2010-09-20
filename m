@@ -1,94 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4C97CE71.8030507@codeaurora.org>
-Date: Mon, 20 Sep 2010 16:13:21 -0500
-From: Ron Shaffer <rshaffer@codeaurora.org>
+Date: Mon, 20 Sep 2010 21:49:43 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Pacho Ramos <pacho@condmat1.ciencias.uniovi.es>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: >net-wireless/bluez-4.63 unable to connect audio streams due
+ commit
+Message-ID: <20100920184943.GA22968@jh-x301>
+References: <1285006436.15378.2.camel@localhost.localdomain>
 MIME-Version: 1.0
-To: Mat Martineau <mathewm@codeaurora.org>
-CC: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	gustavo@padovan.org, haijun.liu@atheros.com,
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v3] Bluetooth: Add socket option definitions for AMP
-References: <1283966193-17831-1-git-send-email-mathewm@codeaurora.org>
-In-Reply-To: <1283966193-17831-1-git-send-email-mathewm@codeaurora.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1285006436.15378.2.camel@localhost.localdomain>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 9/8/2010 12:16 PM, Mat Martineau wrote:
-> This adds a new BT_AMP socket option to control the use of AMP channels.
-> It is for use with the SOL_BLUETOOTH option level on L2CAP sockets.
-> 
-> Available option values are defined as:
-> 
-> BT_AMP_REQUIRE_BR_EDR
->  * Default
->  * AMP controllers cannot be used
->  * Channel move requests from the remote device are denied
->  * If the L2CAP channel is currently using AMP, move the channel to
->    BR/EDR
-> 
-> BT_AMP_PREFER_AMP
->  * Allow use of AMP controllers
->  * If the L2CAP channel is currently on BR/EDR and AMP controller
->    resources are available, initiate a channel move to AMP
->  * Channel move requests from the remote device are allowed
->  * If the L2CAP socket has not been connected yet, try to create
->    and configure the channel directly on an AMP controller rather
->    than BR/EDR
-> 
-> BT_AMP_PREFER_BR_EDR
->  * Allow use of AMP controllers
->  * If the L2CAP channel is currently on AMP, move it to BR/EDR
->  * Channel move requests from the remote device are allowed
-> 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> ---
->  include/net/bluetooth/bluetooth.h |   28 ++++++++++++++++++++++++++++
->  1 files changed, 28 insertions(+), 0 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-> index 27a902d..d2c62dc 100644
-> --- a/include/net/bluetooth/bluetooth.h
-> +++ b/include/net/bluetooth/bluetooth.h
-> @@ -64,6 +64,34 @@ struct bt_security {
->  
->  #define BT_DEFER_SETUP	7
->  
-> +
-> +#define BT_AMP_POLICY		8
-> +
-> +/* Require BR/EDR (default policy)
-> + *   AMP controllers cannot be used
-> + *   Channel move requests from the remote device are denied
-> + *   If the L2CAP channel is currently using AMP, move the channel to BR/EDR
-> + */
-> +#define BT_AMP_POLICY_REQUIRE_BR_EDR	0
-> +
-> +/* Prefer AMP
-> + *   Allow use of AMP controllers
-> + *   If the L2CAP channel is currently on BR/EDR and AMP controller
-> + *     resources are available, initiate a channel move to AMP
-> + *   Channel move requests from the remote device are allowed
-> + *   If the L2CAP socket has not been connected yet, try to create
-> + *     and configure the channel directly on an AMP controller rather
-> + *     than BR/EDR
-> + */
-> +#define BT_AMP_POLICY_PREFER_AMP	1
-> +
-> +/* Prefer BR/EDR
-> + *   Allow use of AMP controllers
-> + *   If the L2CAP channel is currently on AMP, move it to BR/EDR
-> + *   Channel move requests from the remote device are allowed
-> + */
-> +#define BT_AMP_POLICY_PREFER_BR_EDR	2
-> +
->  #define BT_INFO(fmt, arg...) printk(KERN_INFO "Bluetooth: " fmt "\n" , ## arg)
->  #define BT_ERR(fmt, arg...)  printk(KERN_ERR "%s: " fmt "\n" , __func__ , ## arg)
->  #define BT_DBG(fmt, arg...)  pr_debug("%s: " fmt "\n" , __func__ , ## arg)
+Hi,
 
-Ping
+On Mon, Sep 20, 2010, Pacho Ramos wrote:
+> Reporter found that the problem with his dongle was introduced in commit
+> aee26b30bbc24cde464ba1a557c2b258ddec6432 "Make BtIO default security
+> level MEDIUM", he asked here, on upstream mailing list, but didn't get
+> any reply clarifying this:
+> http://marc.info/?l=linux-bluetooth&m=127893935109510&w=2
 
--- 
-Ron Shaffer
-Employee of the Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
+The important piece of info missing here is an HCI trace of the failure
+(i.e. output of hcidump). There was a similar issue reported on IRC a
+few days back and the hcidump there revealed a LMP response timeout
+after BlueZ issues a HCI_Set_Connection_Encryption command. This would
+seem to indicate a bug either in the local adapter or the remote device
+(headset). Only an airtrace would really reveal what's going on.
+However, I suspect it might be possible to work around this by looking
+into possibilities of changing the ordering and timing of when the
+kernel sends the encryption request.
+
+Johan
