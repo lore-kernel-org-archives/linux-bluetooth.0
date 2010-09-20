@@ -1,43 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 20 Sep 2010 14:17:16 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Santiago Carot-Nemesio <sancane@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] Fix potential NULL pointer access in MCAP CSP code
+Message-ID: <20100920111716.GB15583@jh-x301>
+References: <1284971729-20509-1-git-send-email-sancane@gmail.com>
+ <1284971729-20509-2-git-send-email-sancane@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1284980866-3974-4-git-send-email-johan.hedberg@gmail.com>
-References: <1284980866-3974-1-git-send-email-johan.hedberg@gmail.com>
-	<1284980866-3974-4-git-send-email-johan.hedberg@gmail.com>
-Date: Mon, 20 Sep 2010 09:13:13 -0400
-Message-ID: <AANLkTi=xM5RSqZJ=bG-PfphpZ8awYKjSY+sB3ey4eu_P@mail.gmail.com>
-Subject: Re: [PATCH 3/3] Add hcimgmt command line test tool
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	Johan Hedberg <johan.hedberg@nokia.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1284971729-20509-2-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Sep 20, 2010 at 7:07 AM,  <johan.hedberg@gmail.com> wrote:
-> +static void usage(void)
-> +{
-> +       int i;
-> +
-> +       printf("hcictl - HCI Control ver %s\n", VERSION);
+Hi,
 
-hcictl -> hcimgmt
+On Mon, Sep 20, 2010, Santiago Carot-Nemesio wrote:
+> NULL pointer acces may hapen when an attemp to send a
+> synchronization command happens over a closed MCL.
+> ---
+>  health/mcap_sync.c |   43 ++++++++++++++++++++++---------------------
+>  1 files changed, 22 insertions(+), 21 deletions(-)
 
-> +       printf("Usage:\n"
-> +               "\thcictl [options] <command> [command parameters]\n");
-> +       printf("Options:\n"
-> +               "\t--help\tDisplay help\n"
-> +               "\t-i dev\tHCI device\n");
-> +       printf("Commands:\n");
-> +       for (i = 0; command[i].cmd; i++)
-> +               printf("\t%-4s\t%s\n", command[i].cmd,
-> +               command[i].doc);
-> +       printf("\n"
-> +               "For more information on the usage of each command use:\n"
-> +               "\thcictl <command> --help\n" );
-> +}
+Thanks. This patch is also now upstream.
 
--- 
-Anderson Lizardo
-OpenBossa Labs - INdT
-Manaus - Brazil
+Johan
