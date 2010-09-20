@@ -1,65 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] Bluetooth Management Interface
-Date: Mon, 20 Sep 2010 14:07:43 +0300
-Message-Id: <1284980866-3974-1-git-send-email-johan.hedberg@gmail.com>
+Date: Mon, 20 Sep 2010 12:19:42 +0300
+From: Ville Tervo <ville.tervo@nokia.com>
+To: ext haijun liu <liuhaijun.er@gmail.com>
+Cc: "ext Gustavo F. Padovan" <padovan@profusion.mobi>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Mat Martineau <mathewm@codeaurora.org>,
+	"dantian.ip" <dantian.ip@gmail.com>
+Subject: Re: [PATCH] Bluetooth: Replace hard code of fixed channels bit mask
+Message-ID: <20100920091942.GQ14330@null>
+References: <AANLkTi=86t=osr8YUfUfU3QLHiHXgp8SCuwqOE_GoPgp@mail.gmail.com>
+ <20100916141654.GB15000@vigoh>
+ <20100917085047.GN14330@null>
+ <AANLkTi=L3TC8Hy29xjDH-0aCMQ9RiLZ_-JtNfno97cas@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <AANLkTi=L3TC8Hy29xjDH-0aCMQ9RiLZ_-JtNfno97cas@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Fri, Sep 17, 2010 at 01:39:30PM +0200, ext haijun liu wrote:
+> Hi Ville,
+> 
+> On Fri, Sep 17, 2010 at 4:50 PM, Ville Tervo <ville.tervo@nokia.com> wrote:
+> > Hi Gustavo,
+> >
+> > On Thu, Sep 16, 2010 at 04:16:54PM +0200, ext Gustavo F. Padovan wrote:
+> >> Hi Haijun,
+> >>
+> >> * haijun liu <liuhaijun.er@gmail.com> [2010-09-16 15:15:18 +0800]:
+> >>
+> >> > This patch add fixed channels bit mask definition for
+> >> >             L2CAP_FIXCHAN_NULLID
+> >> >             L2CAP_FIXCHAN_SIGNAL
+> >> >             L2CAP_FIXCHAN_CONNLESS
+> >> >             L2CAP_FIXCHAN_A2MP
+> >> > And replace hard code in source file with the macro.
+> >> >
+> >> > Signed-off-by: Haijun.Liu <Haijun.Liu@Atheros.com>
+> >> > ---
+> >> >  include/net/bluetooth/l2cap.h |    6 ++++++
+> >> >  net/bluetooth/l2cap.c         |    2 +-
+> >> >  2 files changed, 7 insertions(+), 1 deletions(-)
+> >> >
+> >> > diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> >> > index 6c24144..e4fe2c7 100644
+> >> > --- a/include/net/bluetooth/l2cap.h
+> >> > +++ b/include/net/bluetooth/l2cap.h
+> >> > @@ -97,6 +97,12 @@ struct l2cap_conninfo {
+> >> >  #define L2CAP_FEAT_FCS             0x00000020
+> >> >  #define L2CAP_FEAT_FIXED_CHAN      0x00000080
+> >> >
+> >> > +/* L2CAP fixed channel bitmask */
+> >> > +#define L2CAP_FIXCHAN_NULLID       0x00
+> >> > +#define L2CAP_FIXCHAN_SIGNAL       0x02
+> >> > +#define L2CAP_FIXCHAN_CONNLESS     0x04
+> >> > +#define L2CAP_FIXCHAN_A2MP 0x08
+> >>
+> >> That's wrong, signaling channel is 0x01, connless is 0x02 and A2MP is
+> >> 0x03. And if you haven't noted we already have macros for the signaling
+> >> and connectionless channels:
+> >
+> > But these are bit masks and looks ok to me except L2CAP_FIXCHAN_A2MP which I
+> > could not find from the list.. Check Vol 3 Part A 4.13.
+> >
+> >> #define L2CAP_CID_SIGNALING     0x0001
+> >> #define L2CAP_CID_CONN_LESS     0x0002
+> >
+> > These are channel ids.
+> >
+> >
+> > --
+> > Ville
+> >
+> 
+> A2MP means AMP Manager Protocol, it's from <<Core_V3.0 + HS.pdf>>
 
-Here's a initial set of patches to get the Bluetooth Management
-interface work started. As I've mentioned in previous emails the idea of
-this interface is to replace all current HCI level access in bluetoothd.
-Many things, e.g. SSP logic and name resolving, will be moved to the
-kernel side so there wont be a one-to-one mapping from the new
-interface to the current HCI messages that bluetoothd handles.
+ok. I am a little bit lost with all AMP acromyns.
 
-The patches here just add the initial header file definitions and a
-command line test tool. The kernel side patches can be found from my
-kernel.org git tree:
-http://git.kernel.org/?p=linux/kernel/git/jh/linux-2.6.git;a=summary
-
-Access to the new kernel interface is done with the help of a new
-hci_channel member of the HCI socket address. Only channel 1 is defined
-for now for the new messages, but I've understood Marcel has plans to
-enable some sort of special tracing support through a second channel.
-Messages with hci_channel == 1 from userspace get routed to the
-callbacks defined in net/bluetooth/hci_mgmt.c.
-
-So far I haven't made many changes to the initial draft API doc from
-Marcel (doc/mgmt-api.txt). The general idea is to try to mimic standard
-HCI messaging concepts whenever possible. One of the changes that I did
-do is removal of the Num_Command_Packets parameters from the command
-status and command complete events since I don't think it makes sense to
-require userspace to do command queuing.
-
-Next steps that need to be done for bluetoothd:
-
-- Move all HCI socket access to hciops.c
-  - All ioctl and hci_* calls
-  - HCI event processing (mostly src/security.c)
-- Create a new mgmtops.c for the new API which can ultimately replace
-  hciops.c
-- Figure out exactly which features are needed in the new API and fill
-  in doc/mgmt-api.txt accordingly.
-
-Next steps for the kernel side:
-
-- Define structs for each message. Not sure if this is needed/wanted but
-  it would surely improve the readability of the current code that
-  accesses the byte array directly. Since the new protocol and the
-  format of the messages is still largely open I haven't bothered with
-  these structs yet.
-- Implement handling of events (right now only commands and direct
-  responses to them are supported)
-- Implement handling of commands that require sleeping (currently all
-  implemented commands imediately write the response to the socket)
-
-Any feedback is welcome about these plans and the code. It's my first
-attempt at more serious kernel side coding so there might well be issues
-needing fixing/polishing in the code.
-
-Johan
+-- 
+Ville
 
