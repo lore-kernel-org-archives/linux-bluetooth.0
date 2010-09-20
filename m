@@ -1,206 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Cc: Johan Hedberg <johan.hedberg@nokia.com>
-Subject: [PATCH 1/3] Add initial Bluetooth Management API doc
-Date: Mon, 20 Sep 2010 14:07:44 +0300
-Message-Id: <1284980866-3974-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1284980866-3974-1-git-send-email-johan.hedberg@gmail.com>
-References: <1284980866-3974-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [RFC] Bluetooth Management Interface
+Date: Mon, 20 Sep 2010 14:07:43 +0300
+Message-Id: <1284980866-3974-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@nokia.com>
+Hi,
 
----
- doc/mgmt-api.txt |  178 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 178 insertions(+), 0 deletions(-)
- create mode 100644 doc/mgmt-api.txt
+Here's a initial set of patches to get the Bluetooth Management
+interface work started. As I've mentioned in previous emails the idea of
+this interface is to replace all current HCI level access in bluetoothd.
+Many things, e.g. SSP logic and name resolving, will be moved to the
+kernel side so there wont be a one-to-one mapping from the new
+interface to the current HCI messages that bluetoothd handles.
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-new file mode 100644
-index 0000000..9281103
---- /dev/null
-+++ b/doc/mgmt-api.txt
-@@ -0,0 +1,178 @@
-+Bluetooth Management API
-+*************************
-+
-+Copyright (C) 2008-2009  Marcel Holtmann <marcel@holtmann.org>
-+
-+
-+Packet Structures
-+=================
-+
-+	Commands:
-+
-+	0       4       8      12      16      202     24      28    31
-+	+-------------------------------+-----------------------------+
-+	|  Command Code                 |  Parameter Total Length     |
-+        +-------------------------------+-----------------------------+
-+	|                                                             |
-+
-+	Events:
-+
-+	0       4       8      12      16      202     24      28    31
-+	+-------------------------------+-----------------------------+
-+	|  Event Code                   |  Parameter Total Length     |
-+        +-------------------------------+-----------------------------+
-+	|                                                             |
-+
-+
-+Read Management Version Information Command
-+===========================================
-+
-+	Command Code:		0x0001
-+	Command Parameters:
-+	Return Parameters:	Status (1 Octet)
-+				Version (1 Octets
-+				Revision (2 Octets)
-+
-+Read Management Supported Features Command
-+==========================================
-+
-+	Command Code:		0x0002
-+	Command Parameters:
-+	Return Parameters:	Status (1 Octet)
-+				Features (8 Octets)
-+
-+		Feature Bit 0:	Controller Support
-+		Feature Bit 1:	Tracing Support
-+
-+Read Controller Index List Command
-+==================================
-+
-+	Command Code:		0x0003
-+	Command Parameters:
-+	Return Paramters:	Status (1 Octet)
-+				Num_Controllers (2 Octets)
-+				Controller_Index[i] (2 Octets)
-+
-+Read Controller Information Command
-+===================================
-+
-+	Command Code:		0x0004
-+	Command Parameters:	Controller_Index (2 Octets)
-+	Return Parameters:	Status (1 Octet)
-+				Controller_Index (2 Octets)
-+				Controller_Type (1 Octet)
-+				BD_ADDR (6 Octets)
-+				Supported_Features (8 Octets)
-+
-+		Controller_Type:0x00 Reserved
-+				0x01 Bluetooth (BR/EDR)
-+				0x02 802.11 (AMP)
-+
-+Read Controller Statistics Command
-+==================================
-+
-+	Command Code:		0x0005
-+	Command Parameters:	Controller_Index (2 Octets)
-+	Return Paramters:	Status (1 Octet)
-+				Controller_Index (2 Octets)
-+				....
-+
-+Read Controller Mode Command
-+============================
-+
-+	Command Code:		0x0006
-+	Command Parameters:	Controller_Index (2 Octets)
-+	Return Paramters:	Status (1 Octect)
-+				Controller_Index (2 Octets)
-+				Enabled (1 Octet)
-+				Mode (1 Octet)
-+
-+		Enabled:	0x00 Powered off
-+				0x01 Controller Enabled
-+
-+		Mode:		0x00 Reserved
-+				0x01 Connectable (pairing forbidden)
-+				0x02 Connectable (pairing allowed)
-+				0x03 Discoverable (pairing forbidden)
-+				0x04 Discoverable (pairing allowed)
-+
-+Write Controller Mode Command
-+=============================
-+
-+	Command Code:		0x0007
-+	Command Parameters:	Controller_Index (2 Octets)
-+				...
-+	Return Parameters:	Status (1 Octet)
-+				Controller_Index (2 Octets)
-+
-+
-+Read Tracing Buffer Size Command
-+================================
-+
-+	Command Code:		0x0004
-+	Command Parameters:
-+	Return Parameters:	Status (1 Octet)
-+				Buffer_Size (2 Octets)
-+
-+		Buffer Size in Kilobytes
-+
-+Write Tracing Buffer Size Command
-+=================================
-+
-+	Command Code:		0x0005
-+	Command Parameters:	Buffer_Size (2 Octets)
-+	Return Parameters:	Status (1 Octet)
-+
-+		Buffer Size in Kilobytes
-+
-+Read Controller Tracing Filter Command
-+=======================================
-+
-+	Command Code:		0x0011
-+	Command Parameters:	Controller_Index (2 Octects)
-+	Return Parameters:	Status (1 Octet)
-+				Controller_Index (2 Octets)
-+				Tracing_Enable (1 Octect)
-+				Num_Filters (2 Octect)
-+				Protocol_UUID[i] (16 Octets)
-+				Protocol_Identifier[i] (16 Octets)
-+
-+		Tracing_Enable:	0x00 Tracing disabled
-+				0x01 Command and Event tracing
-+				0x02 Command, Event and ACL tracing
-+				0x03 Command, Event, ACL and SCO tracing
-+
-+Write Controller Tracing Filter Command
-+=======================================
-+
-+	Command Code:		0x0012 (Group 0x0)
-+	Command Parameters:	Controller_Index (2 Octects)
-+				Tracing_Enable (1 Octect)
-+				Num_Filters (2 Octect)
-+				Protocol_UUID[i] (16 Octets)
-+				Protocol_Identifier[i] (16 Octets)
-+	Return Paramters:	Status (1 Octet)
-+				Controller_Index (2 Octets)
-+
-+
-+
-+Command Complete Event
-+======================
-+
-+Event Code		0x0001
-+Event Parameters	Command_Opcode
-+			Return_Parameters
-+
-+
-+Command Status Event
-+====================
-+
-+Event Code		0x0002
-+Event Parameters	Status
-+			Command_Opcode
-+
-+Controller Error Event
-+======================
-+
-+Event Code		0x0003
-+Event Parameters	Error_Code
--- 
-1.7.0.4
+The patches here just add the initial header file definitions and a
+command line test tool. The kernel side patches can be found from my
+kernel.org git tree:
+http://git.kernel.org/?p=linux/kernel/git/jh/linux-2.6.git;a=summary
+
+Access to the new kernel interface is done with the help of a new
+hci_channel member of the HCI socket address. Only channel 1 is defined
+for now for the new messages, but I've understood Marcel has plans to
+enable some sort of special tracing support through a second channel.
+Messages with hci_channel == 1 from userspace get routed to the
+callbacks defined in net/bluetooth/hci_mgmt.c.
+
+So far I haven't made many changes to the initial draft API doc from
+Marcel (doc/mgmt-api.txt). The general idea is to try to mimic standard
+HCI messaging concepts whenever possible. One of the changes that I did
+do is removal of the Num_Command_Packets parameters from the command
+status and command complete events since I don't think it makes sense to
+require userspace to do command queuing.
+
+Next steps that need to be done for bluetoothd:
+
+- Move all HCI socket access to hciops.c
+  - All ioctl and hci_* calls
+  - HCI event processing (mostly src/security.c)
+- Create a new mgmtops.c for the new API which can ultimately replace
+  hciops.c
+- Figure out exactly which features are needed in the new API and fill
+  in doc/mgmt-api.txt accordingly.
+
+Next steps for the kernel side:
+
+- Define structs for each message. Not sure if this is needed/wanted but
+  it would surely improve the readability of the current code that
+  accesses the byte array directly. Since the new protocol and the
+  format of the messages is still largely open I haven't bothered with
+  these structs yet.
+- Implement handling of events (right now only commands and direct
+  responses to them are supported)
+- Implement handling of commands that require sleeping (currently all
+  implemented commands imediately write the response to the socket)
+
+Any feedback is welcome about these plans and the code. It's my first
+attempt at more serious kernel side coding so there might well be issues
+needing fixing/polishing in the code.
+
+Johan
 
