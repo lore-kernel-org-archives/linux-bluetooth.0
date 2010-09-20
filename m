@@ -1,82 +1,165 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 20 Sep 2010 12:19:42 +0300
-From: Ville Tervo <ville.tervo@nokia.com>
-To: ext haijun liu <liuhaijun.er@gmail.com>
-Cc: "ext Gustavo F. Padovan" <padovan@profusion.mobi>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Mat Martineau <mathewm@codeaurora.org>,
-	"dantian.ip" <dantian.ip@gmail.com>
-Subject: Re: [PATCH] Bluetooth: Replace hard code of fixed channels bit mask
-Message-ID: <20100920091942.GQ14330@null>
-References: <AANLkTi=86t=osr8YUfUfU3QLHiHXgp8SCuwqOE_GoPgp@mail.gmail.com>
- <20100916141654.GB15000@vigoh>
- <20100917085047.GN14330@null>
- <AANLkTi=L3TC8Hy29xjDH-0aCMQ9RiLZ_-JtNfno97cas@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <AANLkTi=L3TC8Hy29xjDH-0aCMQ9RiLZ_-JtNfno97cas@mail.gmail.com>
+From: Santiago Carot-Nemesio <sancane@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Santiago Carot-Nemesio <sancane@gmail.com>
+Subject: [PATCH 2/2] Fix potential NULL pointer access in MCAP CSP code
+Date: Mon, 20 Sep 2010 10:35:29 +0200
+Message-Id: <1284971729-20509-2-git-send-email-sancane@gmail.com>
+In-Reply-To: <1284971729-20509-1-git-send-email-sancane@gmail.com>
+References: <1284971729-20509-1-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Sep 17, 2010 at 01:39:30PM +0200, ext haijun liu wrote:
-> Hi Ville,
-> 
-> On Fri, Sep 17, 2010 at 4:50 PM, Ville Tervo <ville.tervo@nokia.com> wrote:
-> > Hi Gustavo,
-> >
-> > On Thu, Sep 16, 2010 at 04:16:54PM +0200, ext Gustavo F. Padovan wrote:
-> >> Hi Haijun,
-> >>
-> >> * haijun liu <liuhaijun.er@gmail.com> [2010-09-16 15:15:18 +0800]:
-> >>
-> >> > This patch add fixed channels bit mask definition for
-> >> >             L2CAP_FIXCHAN_NULLID
-> >> >             L2CAP_FIXCHAN_SIGNAL
-> >> >             L2CAP_FIXCHAN_CONNLESS
-> >> >             L2CAP_FIXCHAN_A2MP
-> >> > And replace hard code in source file with the macro.
-> >> >
-> >> > Signed-off-by: Haijun.Liu <Haijun.Liu@Atheros.com>
-> >> > ---
-> >> >  include/net/bluetooth/l2cap.h |    6 ++++++
-> >> >  net/bluetooth/l2cap.c         |    2 +-
-> >> >  2 files changed, 7 insertions(+), 1 deletions(-)
-> >> >
-> >> > diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> >> > index 6c24144..e4fe2c7 100644
-> >> > --- a/include/net/bluetooth/l2cap.h
-> >> > +++ b/include/net/bluetooth/l2cap.h
-> >> > @@ -97,6 +97,12 @@ struct l2cap_conninfo {
-> >> >  #define L2CAP_FEAT_FCS             0x00000020
-> >> >  #define L2CAP_FEAT_FIXED_CHAN      0x00000080
-> >> >
-> >> > +/* L2CAP fixed channel bitmask */
-> >> > +#define L2CAP_FIXCHAN_NULLID       0x00
-> >> > +#define L2CAP_FIXCHAN_SIGNAL       0x02
-> >> > +#define L2CAP_FIXCHAN_CONNLESS     0x04
-> >> > +#define L2CAP_FIXCHAN_A2MP 0x08
-> >>
-> >> That's wrong, signaling channel is 0x01, connless is 0x02 and A2MP is
-> >> 0x03. And if you haven't noted we already have macros for the signaling
-> >> and connectionless channels:
-> >
-> > But these are bit masks and looks ok to me except L2CAP_FIXCHAN_A2MP which I
-> > could not find from the list.. Check Vol 3 Part A 4.13.
-> >
-> >> #define L2CAP_CID_SIGNALING     0x0001
-> >> #define L2CAP_CID_CONN_LESS     0x0002
-> >
-> > These are channel ids.
-> >
-> >
-> > --
-> > Ville
-> >
-> 
-> A2MP means AMP Manager Protocol, it's from <<Core_V3.0 + HS.pdf>>
+NULL pointer acces may hapen when an attemp to send a
+synchronization command happens over a closed MCL.
+---
+ health/mcap_sync.c |   43 ++++++++++++++++++++++---------------------
+ 1 files changed, 22 insertions(+), 21 deletions(-)
 
-ok. I am a little bit lost with all AMP acromyns.
-
+diff --git a/health/mcap_sync.c b/health/mcap_sync.c
+index ae7ab5b..260cd71 100644
+--- a/health/mcap_sync.c
++++ b/health/mcap_sync.c
+@@ -80,17 +80,27 @@ static inline uint64_t ntoh64(uint64_t n)
+ 
+ #define hton64(x)     ntoh64(x)
+ 
++static int send_sync_cmd(struct mcap_mcl *mcl, const void *buf, uint32_t size)
++{
++	int sock;
++
++	if (mcl->cc == NULL)
++		return -1;
++
++	sock = g_io_channel_unix_get_fd(mcl->cc);
++	return mcap_send_data(sock, buf, size);
++}
++
+ static int send_unsupported_cap_req(struct mcap_mcl *mcl)
+ {
+ 	mcap_md_sync_cap_rsp *cmd;
+-	int sock, sent;
++	int sent;
+ 
+ 	cmd = g_new0(mcap_md_sync_cap_rsp, 1);
+ 	cmd->op = MCAP_MD_SYNC_CAP_RSP;
+ 	cmd->rc = MCAP_REQUEST_NOT_SUPPORTED;
+ 
+-	sock = g_io_channel_unix_get_fd(mcl->cc);
+-	sent = mcap_send_data(sock, cmd, sizeof(*cmd));
++	sent = send_sync_cmd(mcl, cmd, sizeof(*cmd));
+ 	g_free(cmd);
+ 
+ 	return sent;
+@@ -99,14 +109,13 @@ static int send_unsupported_cap_req(struct mcap_mcl *mcl)
+ static int send_unsupported_set_req(struct mcap_mcl *mcl)
+ {
+ 	mcap_md_sync_set_rsp *cmd;
+-	int sock, sent;
++	int sent;
+ 
+ 	cmd = g_new0(mcap_md_sync_set_rsp, 1);
+ 	cmd->op = MCAP_MD_SYNC_SET_RSP;
+ 	cmd->rc = MCAP_REQUEST_NOT_SUPPORTED;
+ 
+-	sock = g_io_channel_unix_get_fd(mcl->cc);
+-	sent = mcap_send_data(sock, cmd, sizeof(*cmd));
++	sent = send_sync_cmd(mcl, cmd, sizeof(*cmd));
+ 	g_free(cmd);
+ 
+ 	return sent;
+@@ -457,7 +466,6 @@ static int send_sync_cap_rsp(struct mcap_mcl *mcl, uint8_t rspcode,
+ {
+ 	mcap_md_sync_cap_rsp *rsp;
+ 	int sent;
+-	int sock;
+ 
+ 	rsp = g_new0(mcap_md_sync_cap_rsp, 1);
+ 
+@@ -469,8 +477,7 @@ static int send_sync_cap_rsp(struct mcap_mcl *mcl, uint8_t rspcode,
+ 	rsp->timestnr = htons(tmstampres);
+ 	rsp->timestna = htons(tmstampacc);
+ 
+-	sock = g_io_channel_unix_get_fd(mcl->cc);
+-	sent = mcap_send_data(sock, rsp, sizeof(*rsp));
++	sent = send_sync_cmd(mcl, rsp, sizeof(*rsp));
+ 	g_free(rsp);
+ 
+ 	return sent;
+@@ -519,7 +526,7 @@ static int send_sync_set_rsp(struct mcap_mcl *mcl, uint8_t rspcode,
+ 			uint16_t tmstampres)
+ {
+ 	mcap_md_sync_set_rsp *rsp;
+-	int sock, sent;
++	int sent;
+ 
+ 	rsp = g_new0(mcap_md_sync_set_rsp, 1);
+ 
+@@ -529,8 +536,7 @@ static int send_sync_set_rsp(struct mcap_mcl *mcl, uint8_t rspcode,
+ 	rsp->timestst = hton64(timestamp);
+ 	rsp->timestsa = htons(tmstampres);
+ 
+-	sock = g_io_channel_unix_get_fd(mcl->cc);
+-	sent = mcap_send_data(sock, rsp, sizeof(*rsp));
++	sent = send_sync_cmd(mcl, rsp, sizeof(*rsp));
+ 	g_free(rsp);
+ 
+ 	return sent;
+@@ -786,7 +792,7 @@ static gboolean sync_send_indication(gpointer user_data)
+ 	uint32_t btclock;
+ 	uint64_t tmstamp;
+ 	struct timespec base_time;
+-	int sock, sent;
++	int sent;
+ 
+ 	if (!user_data)
+ 		return FALSE;
+@@ -803,8 +809,7 @@ static gboolean sync_send_indication(gpointer user_data)
+ 	cmd->timestst = hton64(tmstamp);
+ 	cmd->timestsa = htons(caps(mcl)->latency);
+ 
+-	sock = g_io_channel_unix_get_fd(mcl->cc);
+-	sent = mcap_send_data(sock, cmd, sizeof(*cmd));
++	sent = send_sync_cmd(mcl, cmd, sizeof(*cmd));
+ 	g_free(cmd);
+ 
+ 	return !sent;
+@@ -940,7 +945,6 @@ void mcap_sync_cap_req(struct mcap_mcl *mcl, uint16_t reqacc,
+ {
+ 	struct mcap_sync_cap_cbdata *cbdata;
+ 	mcap_md_sync_cap_req *cmd;
+-	int sock;
+ 
+ 	if (!mcl->ms->csp_enabled || !mcl->csp) {
+ 		g_set_error(err,
+@@ -969,8 +973,7 @@ void mcap_sync_cap_req(struct mcap_mcl *mcl, uint16_t reqacc,
+ 	cbdata->user_data = user_data;
+ 	mcl->csp->csp_priv_data = cbdata;
+ 
+-	sock = g_io_channel_unix_get_fd(mcl->cc);
+-	mcap_send_data(sock, cmd, sizeof(*cmd));
++	send_sync_cmd(mcl, cmd, sizeof(*cmd));
+ 
+ 	g_free(cmd);
+ }
+@@ -981,7 +984,6 @@ void mcap_sync_set_req(struct mcap_mcl *mcl, uint8_t update, uint32_t btclock,
+ {
+ 	mcap_md_sync_set_req *cmd;
+ 	struct mcap_sync_set_cbdata *cbdata;
+-	int sock;
+ 
+ 	if (!mcl->ms->csp_enabled || !mcl->csp) {
+ 		g_set_error(err,
+@@ -1022,8 +1024,7 @@ void mcap_sync_set_req(struct mcap_mcl *mcl, uint8_t update, uint32_t btclock,
+ 	cbdata->user_data = user_data;
+ 	mcl->csp->csp_priv_data = cbdata;
+ 
+-	sock = g_io_channel_unix_get_fd(mcl->cc);
+-	mcap_send_data(sock, cmd, sizeof(*cmd));
++	send_sync_cmd(mcl, cmd, sizeof(*cmd));
+ 
+ 	g_free(cmd);
+ }
 -- 
-Ville
+1.7.0.4
 
