@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
 Cc: Johan Hedberg <johan.hedberg@nokia.com>
-Subject: [PATCH 2/3] Add initial definitions for Bluetooth Management API
-Date: Mon, 20 Sep 2010 14:07:45 +0300
-Message-Id: <1284980866-3974-3-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/3] Add initial Bluetooth Management API doc
+Date: Mon, 20 Sep 2010 14:07:44 +0300
+Message-Id: <1284980866-3974-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1284980866-3974-1-git-send-email-johan.hedberg@gmail.com>
 References: <1284980866-3974-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,51 +13,194 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Johan Hedberg <johan.hedberg@nokia.com>
 
 ---
- lib/hci.h |   21 +++++++++++++++++++++
- 1 files changed, 21 insertions(+), 0 deletions(-)
+ doc/mgmt-api.txt |  178 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 178 insertions(+), 0 deletions(-)
+ create mode 100644 doc/mgmt-api.txt
 
-diff --git a/lib/hci.h b/lib/hci.h
-index 512dab9..1ac153f 100644
---- a/lib/hci.h
-+++ b/lib/hci.h
-@@ -2232,6 +2232,24 @@ typedef struct {
- 
- #endif /* _NO_HCI_DEFS */
- 
-+struct hci_mgmt_hdr {
-+	uint16_t opcode;
-+	uint16_t len;
-+} __packed;
-+#define HCI_MGMT_HDR_SIZE	4
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+new file mode 100644
+index 0000000..9281103
+--- /dev/null
++++ b/doc/mgmt-api.txt
+@@ -0,0 +1,178 @@
++Bluetooth Management API
++*************************
 +
-+#define HCI_MGMT_OP_READ_VERSION	0x0001
-+#define HCI_MGMT_OP_READ_FEATURES	0x0002
-+#define HCI_MGMT_OP_READ_INDEX_LIST	0x0003
-+#define HCI_MGMT_OP_READ_INFO		0x0004
-+#define HCI_MGMT_OP_READ_STATISTICS	0x0005
-+#define HCI_MGMT_OP_READ_MODE		0x0006
-+#define HCI_MGMT_OP_WRITE_MODE		0x0007
++Copyright (C) 2008-2009  Marcel Holtmann <marcel@holtmann.org>
 +
-+#define HCI_MGMT_EV_CMD_COMPLETE	0x0001
-+#define HCI_MGMT_EV_CMD_STATUS		0x0002
-+#define HCI_MGMT_EV_CONTROLLER_ERROR	0x0003
 +
- /* HCI Socket options */
- #define HCI_DATA_DIR	1
- #define HCI_FILTER	2
-@@ -2244,9 +2262,12 @@ typedef struct {
- struct sockaddr_hci {
- 	sa_family_t	hci_family;
- 	unsigned short	hci_dev;
-+	unsigned short  hci_channel;
- };
- #define HCI_DEV_NONE	0xffff
- 
-+#define HCI_CHANNEL_CONTROL 1
++Packet Structures
++=================
 +
- struct hci_filter {
- 	uint32_t type_mask;
- 	uint32_t event_mask[2];
++	Commands:
++
++	0       4       8      12      16      202     24      28    31
++	+-------------------------------+-----------------------------+
++	|  Command Code                 |  Parameter Total Length     |
++        +-------------------------------+-----------------------------+
++	|                                                             |
++
++	Events:
++
++	0       4       8      12      16      202     24      28    31
++	+-------------------------------+-----------------------------+
++	|  Event Code                   |  Parameter Total Length     |
++        +-------------------------------+-----------------------------+
++	|                                                             |
++
++
++Read Management Version Information Command
++===========================================
++
++	Command Code:		0x0001
++	Command Parameters:
++	Return Parameters:	Status (1 Octet)
++				Version (1 Octets
++				Revision (2 Octets)
++
++Read Management Supported Features Command
++==========================================
++
++	Command Code:		0x0002
++	Command Parameters:
++	Return Parameters:	Status (1 Octet)
++				Features (8 Octets)
++
++		Feature Bit 0:	Controller Support
++		Feature Bit 1:	Tracing Support
++
++Read Controller Index List Command
++==================================
++
++	Command Code:		0x0003
++	Command Parameters:
++	Return Paramters:	Status (1 Octet)
++				Num_Controllers (2 Octets)
++				Controller_Index[i] (2 Octets)
++
++Read Controller Information Command
++===================================
++
++	Command Code:		0x0004
++	Command Parameters:	Controller_Index (2 Octets)
++	Return Parameters:	Status (1 Octet)
++				Controller_Index (2 Octets)
++				Controller_Type (1 Octet)
++				BD_ADDR (6 Octets)
++				Supported_Features (8 Octets)
++
++		Controller_Type:0x00 Reserved
++				0x01 Bluetooth (BR/EDR)
++				0x02 802.11 (AMP)
++
++Read Controller Statistics Command
++==================================
++
++	Command Code:		0x0005
++	Command Parameters:	Controller_Index (2 Octets)
++	Return Paramters:	Status (1 Octet)
++				Controller_Index (2 Octets)
++				....
++
++Read Controller Mode Command
++============================
++
++	Command Code:		0x0006
++	Command Parameters:	Controller_Index (2 Octets)
++	Return Paramters:	Status (1 Octect)
++				Controller_Index (2 Octets)
++				Enabled (1 Octet)
++				Mode (1 Octet)
++
++		Enabled:	0x00 Powered off
++				0x01 Controller Enabled
++
++		Mode:		0x00 Reserved
++				0x01 Connectable (pairing forbidden)
++				0x02 Connectable (pairing allowed)
++				0x03 Discoverable (pairing forbidden)
++				0x04 Discoverable (pairing allowed)
++
++Write Controller Mode Command
++=============================
++
++	Command Code:		0x0007
++	Command Parameters:	Controller_Index (2 Octets)
++				...
++	Return Parameters:	Status (1 Octet)
++				Controller_Index (2 Octets)
++
++
++Read Tracing Buffer Size Command
++================================
++
++	Command Code:		0x0004
++	Command Parameters:
++	Return Parameters:	Status (1 Octet)
++				Buffer_Size (2 Octets)
++
++		Buffer Size in Kilobytes
++
++Write Tracing Buffer Size Command
++=================================
++
++	Command Code:		0x0005
++	Command Parameters:	Buffer_Size (2 Octets)
++	Return Parameters:	Status (1 Octet)
++
++		Buffer Size in Kilobytes
++
++Read Controller Tracing Filter Command
++=======================================
++
++	Command Code:		0x0011
++	Command Parameters:	Controller_Index (2 Octects)
++	Return Parameters:	Status (1 Octet)
++				Controller_Index (2 Octets)
++				Tracing_Enable (1 Octect)
++				Num_Filters (2 Octect)
++				Protocol_UUID[i] (16 Octets)
++				Protocol_Identifier[i] (16 Octets)
++
++		Tracing_Enable:	0x00 Tracing disabled
++				0x01 Command and Event tracing
++				0x02 Command, Event and ACL tracing
++				0x03 Command, Event, ACL and SCO tracing
++
++Write Controller Tracing Filter Command
++=======================================
++
++	Command Code:		0x0012 (Group 0x0)
++	Command Parameters:	Controller_Index (2 Octects)
++				Tracing_Enable (1 Octect)
++				Num_Filters (2 Octect)
++				Protocol_UUID[i] (16 Octets)
++				Protocol_Identifier[i] (16 Octets)
++	Return Paramters:	Status (1 Octet)
++				Controller_Index (2 Octets)
++
++
++
++Command Complete Event
++======================
++
++Event Code		0x0001
++Event Parameters	Command_Opcode
++			Return_Parameters
++
++
++Command Status Event
++====================
++
++Event Code		0x0002
++Event Parameters	Status
++			Command_Opcode
++
++Controller Error Event
++======================
++
++Event Code		0x0003
++Event Parameters	Error_Code
 -- 
 1.7.0.4
 
