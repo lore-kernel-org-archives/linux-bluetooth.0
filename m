@@ -1,70 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: >net-wireless/bluez-4.63 unable to connect audio streams due commit
-From: Pacho Ramos <pacho@condmat1.ciencias.uniovi.es>
-Reply-To: pacho@condmat1.ciencias.uniovi.es
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-jZsM0v1/wih3NvW/zMc1"
-Date: Mon, 20 Sep 2010 20:13:56 +0200
-Message-ID: <1285006436.15378.2.camel@localhost.localdomain>
-Mime-Version: 1.0
+Date: Mon, 20 Sep 2010 16:28:09 +0300
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 3/3] Add hcimgmt command line test tool
+Message-ID: <20100920132809.GA17403@jh-x301>
+References: <1284980866-3974-1-git-send-email-johan.hedberg@gmail.com>
+ <1284980866-3974-4-git-send-email-johan.hedberg@gmail.com>
+ <AANLkTi=xM5RSqZJ=bG-PfphpZ8awYKjSY+sB3ey4eu_P@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <AANLkTi=xM5RSqZJ=bG-PfphpZ8awYKjSY+sB3ey4eu_P@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Anderson,
 
---=-jZsM0v1/wih3NvW/zMc1
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Mon, Sep 20, 2010, Anderson Lizardo wrote:
+> On Mon, Sep 20, 2010 at 7:07 AM,  <johan.hedberg@gmail.com> wrote:
+> > +static void usage(void)
+> > +{
+> > +       int i;
+> > +
+> > +       printf("hcictl - HCI Control ver %s\n", VERSION);
+> 
+> hcictl -> hcimgmt
 
-Hello
+Thanks. I used to call the interface "HCI Control interface" originally
+and have forgotten to change all places to match the new "Management"
+term.
 
-This is an "old" issue that was reported downstream some time ago at:
-http://bugs.gentoo.org/show_bug.cgi?id=3D327705
-
-Getting errors like:
-
-bluetoothd[23165]: State
-changed /org/bluez/23165/hci0/dev_00_19_7F_1B_E8_BE: \
-HEADSET_STATE_DISCONNECTED -> HEADSET_STATE_CONNECTING
-bluetoothd[23165]: \
-link_key_request (sba=3D00:19:86:00:10:FE, dba=3D00:19:7F:1B:E8:BE)
-bluetoothd[23165]: \
-kernel auth requirements =3D 0x00 bluetoothd[23165]: stored link key type
-=3D 0x00
-bluetoothd[23165]: adapter_get_device(00:19:7F:1B:E8:BE)
-bluetoothd[23165]: Discovered Handsfree service on channel 1
-bluetoothd[23165]: /org/bluez/23165/hci0/dev_00_19_7F_1B_E8_BE:
-Connecting to \
-00:19:7F:1B:E8:BE channel 1 bluetoothd[23165]:
-hcid_dbus_bonding_process_complete: \
-status=3D00 bluetoothd[23165]: adapter_get_device(00:19:7F:1B:E8:BE)
-bluetoothd[23165]: hcid_dbus_bonding_process_complete: no pending auth
-request # Here \
-is really long pause, 1-2 seconds bluetoothd[23165]: Function not
-implemented (38)
-bluetoothd[23165]: State
-changed /org/bluez/23165/hci0/dev_00_19_7F_1B_E8_BE: \
-HEADSET_STATE_CONNECTING -> HEADSET_STATE_DISCONNECTED
-
-
-Reporter found that the problem with his dongle was introduced in commit
-aee26b30bbc24cde464ba1a557c2b258ddec6432 "Make BtIO default security
-level MEDIUM", he asked here, on upstream mailing list, but didn't get
-any reply clarifying this:
-http://marc.info/?l=3Dlinux-bluetooth&m=3D127893935109510&w=3D2
-
-Thanks a lot for your help :-)
-
---=-jZsM0v1/wih3NvW/zMc1
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.16 (GNU/Linux)
-
-iEYEABECAAYFAkyXpGQACgkQCaWpQKGI+9RI6ACcCDgE+ZUuqIGamnUp678UOPOv
-wscAn2bndKC3SFr92ZCHDYxkmW8dRADi
-=v8Cs
------END PGP SIGNATURE-----
-
---=-jZsM0v1/wih3NvW/zMc1--
-
+Johan
