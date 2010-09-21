@@ -1,50 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 21 Sep 2010 08:41:12 +0300
-From: Ville Tervo <ville.tervo@nokia.com>
-To: ext haijun liu <liuhaijun.er@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"dantian.ip" <dantian.ip@gmail.com>
-Subject: Re: [PATCH 1/2] Bluetooth: Remove duplicate code.
-Message-ID: <20100921054112.GC17820@null>
-References: <AANLkTim_N7sA6NqmNqWsrW2dQmnwkm-NSGuFz191SQCT@mail.gmail.com>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Tue, 21 Sep 2010 01:10:39 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, marcel@holtmann.org
+Subject: Re: Possible regression with skb_clone() in 2.6.36
+Message-ID: <20100921041039.GA8978@vigoh>
+References: <1283209824-8795-1-git-send-email-padovan@profusion.mobi>
+ <20100917153440.474b93e4.akpm@linux-foundation.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTim_N7sA6NqmNqWsrW2dQmnwkm-NSGuFz191SQCT@mail.gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20100917153440.474b93e4.akpm@linux-foundation.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Sep 20, 2010 at 03:26:14AM +0200, ext haijun liu wrote:
-> Remove duplicate code, it's already in l2cap_send_disconn_req().
-> 
-> 
-> Signed-off-by: Haijun.Liu <Haijun.Liu@Atheros.com>
+* Andrew Morton <akpm@linux-foundation.org> [2010-09-17 15:34:40 -0700]:
 
-Acked-by: Ville Tervo <ville.tervo@nokia.com>
+> On Mon, 30 Aug 2010 20:10:23 -0300
+> "Gustavo F. Padovan" <padovan@profusion.mobi> wrote:
+> 
+> > I've been experiencing some problems when running the L2CAP Streaming mode in
+> > 2.6.36. The system quickly runs in an Out Of Memory condition and crash. That
+> > wasn't happening before, so I think we may have a regression here (I didn't find
+> > where yet). The crash log is below.
+> 
+> So 2.6.35 was OK?
+> 
+> > The following patch does not fix the regression, but shows that removing the
+> > skb_clone() call from l2cap_streaming_send() makes the problem goes away. The
+> > patch is good anyway since it saves memory and time when sending Streaming mode
+> > packets.
+> 
+> How does "make it go away" differ from "fix the regression" :)
+> 
+> But yes, if we don't understand the source of the bug then it may well
+> still be there.  Did you make any progress in understanding the cause?
 
-> ---
->  net/bluetooth/l2cap.c |    1 -
->  1 files changed, 0 insertions(+), 1 deletions(-)
-> 
-> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-> index 725744b..076d1af 100644
-> --- a/net/bluetooth/l2cap.c
-> +++ b/net/bluetooth/l2cap.c
-> @@ -3222,7 +3222,6 @@ static inline int l2cap_config_rsp(struct
-> l2cap_conn *conn, struct l2cap_cmd_hdr
->  		}
-> 
->  	default:
-> -		sk->sk_err = ECONNRESET;
->  		l2cap_sock_set_timer(sk, HZ * 5);
->  		l2cap_send_disconn_req(conn, sk, ECONNRESET);
->  		goto done;
-> -- 
-> 1.6.3.3
-> 
-> 
-> -- 
-> Haijun Liu
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+I did some progress and found that this really fix the bug. We are fine
+here then. :)
+
+-- 
+Gustavo F. Padovan
+ProFUSION embedded systems - http://profusion.mobi
