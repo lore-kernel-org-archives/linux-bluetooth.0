@@ -1,44 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Tue, 21 Sep 2010 01:10:39 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, marcel@holtmann.org
-Subject: Re: Possible regression with skb_clone() in 2.6.36
-Message-ID: <20100921041039.GA8978@vigoh>
-References: <1283209824-8795-1-git-send-email-padovan@profusion.mobi>
- <20100917153440.474b93e4.akpm@linux-foundation.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20100917153440.474b93e4.akpm@linux-foundation.org>
+In-Reply-To: <AANLkTi=hD_U-19oPnQzQemt5wBgAqip3h7esJZpgkr4e@mail.gmail.com>
+References: <7866937.1285030222002.JavaMail.root@elwamui-darkeyed.atl.sa.earthlink.net>
+	<AANLkTi=hD_U-19oPnQzQemt5wBgAqip3h7esJZpgkr4e@mail.gmail.com>
+Date: Tue, 21 Sep 2010 09:26:19 +0530
+Message-ID: <AANLkTi=gRJgyFD2uC-UsjzjQCU11326SSsN4+nsTxk9-@mail.gmail.com>
+Subject: Re: Need complete docs on PAN and DUN with bluez 4.66
+From: Arun Kumar <arunkat@gmail.com>
+To: Mumia W <mumia.w.18.spam@earthlink.net>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Andrew Morton <akpm@linux-foundation.org> [2010-09-17 15:34:40 -0700]:
+Depends on what role you want to use pand for ...pand is launched as a
+daemon via command line with set of options you may want to use it for
+your requirements ...
+...
+Best Regards,
+Arun Kumar Singh
+www.crazydaks.com
 
-> On Mon, 30 Aug 2010 20:10:23 -0300
-> "Gustavo F. Padovan" <padovan@profusion.mobi> wrote:
-> 
-> > I've been experiencing some problems when running the L2CAP Streaming mode in
-> > 2.6.36. The system quickly runs in an Out Of Memory condition and crash. That
-> > wasn't happening before, so I think we may have a regression here (I didn't find
-> > where yet). The crash log is below.
-> 
-> So 2.6.35 was OK?
-> 
-> > The following patch does not fix the regression, but shows that removing the
-> > skb_clone() call from l2cap_streaming_send() makes the problem goes away. The
-> > patch is good anyway since it saves memory and time when sending Streaming mode
-> > packets.
-> 
-> How does "make it go away" differ from "fix the regression" :)
-> 
-> But yes, if we don't understand the source of the bug then it may well
-> still be there.  Did you make any progress in understanding the cause?
+> On Tue, Sep 21, 2010 at 6:20 AM, Mumia W <mumia.w.18.spam@earthlink.net> wrote:
+>>>From: Mumia W <mumia.w.18.spam@earthlink.net>
+>>>Sent: Sep 19, 2010 4:49 PM
+>>>To: linux-bluetooth@vger.kernel.org
+>>>Subject: Need complete docs on PAN and DUN with bluez 4.66
+>>>
+>>>Where is the documentation on how to use PAN and DUN
+>>>with bluez 4.66 (without using the legacy drivers)?
+>>>
+>>>
+>>
+>> Evidently the documents do not exist.
+>>
+>> Does anyone have any advice on how I use PAN with bluez 4.66?
+>>
+>>
+>> --
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>
+>
+>
+> --
+>
 
-I did some progress and found that this really fix the bug. We are fine
-here then. :)
+
 
 -- 
-Gustavo F. Padovan
-ProFUSION embedded systems - http://profusion.mobi
+Best Regards,
+Arun Kumar Singh
+www.crazydaks.com
