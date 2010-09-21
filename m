@@ -1,55 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Suraj Sumangala <suraj@atheros.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <Jothikumar.Mothilal@Atheros.com>,
-	Suraj Sumangala <suraj@atheros.com>
-Subject: [PATCH 1/2] Bluetooth: hci open callback for hci UART transport driver
-Date: Tue, 21 Sep 2010 19:03:00 +0530
-Message-ID: <1285075981-8941-1-git-send-email-suraj@atheros.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20100921110529.GA10156@jh-x301>
+References: <1285056861-10099-1-git-send-email-santoscadenas@gmail.com> <20100921110529.GA10156@jh-x301>
+From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+Date: Tue, 21 Sep 2010 13:07:49 +0200
+Message-ID: <AANLkTi=L_iB7Evf9OdRxhVH+-dwdH8sdJ79Mu5tab8Oj@mail.gmail.com>
+Subject: Re: [PATCH] Some code reordering in mcap_sync
+To: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch provides option for hci transport driver protocol implementation
-to have a callback for hci open.
+2010/9/21 Johan Hedberg <johan.hedberg@gmail.com>:
+> Hi,
+>
+> On Tue, Sep 21, 2010, Jose Antonio Santos Cadenas wrote:
+>> Declaration, defines and struct definitions are moved to the begining
+>> of the file. Just for make the code more readable.
+>> ---
+>>  health/mcap_sync.c |   86 +++++++++++++++++++++++++--------------------------
+>>  1 files changed, 42 insertions(+), 44 deletions(-)
+>
+> Thanks, the patch is now upstream. While you're at it, please also
+> remove any unnecessary forward declarations, like these:
 
-Signed-off-by: Suraj Sumangala <suraj@atheros.com>
----
- drivers/bluetooth/hci_ldisc.c |    5 ++++-
- drivers/bluetooth/hci_uart.h  |    1 +
- 2 files changed, 5 insertions(+), 1 deletions(-)
+Ok, I'll work on it.
 
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 998833d..5e02501 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -162,9 +162,12 @@ restart:
- /* Initialize device */
- static int hci_uart_open(struct hci_dev *hdev)
- {
-+	struct hci_uart *hu  = (struct hci_uart *) hdev->driver_data;
-+
- 	BT_DBG("%s %p", hdev->name, hdev);
- 
--	/* Nothing to do for UART driver */
-+	if (hu->proto->hci_open)
-+		hu->proto->hci_open(hu);
- 
- 	set_bit(HCI_RUNNING, &hdev->flags);
- 
-diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-index 99fb352..d0198ec 100644
---- a/drivers/bluetooth/hci_uart.h
-+++ b/drivers/bluetooth/hci_uart.h
-@@ -51,6 +51,7 @@ struct hci_uart;
- struct hci_uart_proto {
- 	unsigned int id;
- 	int (*open)(struct hci_uart *hu);
-+	int (*hci_open)(struct hci_uart *hu);
- 	int (*close)(struct hci_uart *hu);
- 	int (*flush)(struct hci_uart *hu);
- 	int (*recv)(struct hci_uart *hu, void *data, int len);
--- 
-1.7.0.4
-
+>
+>> +static void proc_sync_cap_req(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len);
+>> +static void proc_sync_set_req(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len);
+>> +static void proc_sync_cap_rsp(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len);
+>> +static void proc_sync_set_rsp(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len);
+>> +static void proc_sync_info_ind(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len);
+>
+> Only in very rare cases are forward declarations needed. Whenever
+> possible order the functions so that the dependencies of a function are
+> defined above the function in the C file.
+>
+>> +static gboolean sync_send_indication(gpointer user_data);
+>> +static gboolean proc_sync_set_req_phase2(gpointer user_data);
+>
+> Same here.
+>
+> Johan
+>
