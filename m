@@ -3,116 +3,53 @@ From: Suraj Sumangala <suraj@atheros.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <Jothikumar.Mothilal@Atheros.com>,
 	Suraj Sumangala <suraj@atheros.com>
-Subject: [PATCH 2/2] Bluetooth: support to send power management enable during hci open
-Date: Tue, 21 Sep 2010 19:03:01 +0530
-Message-ID: <1285075981-8941-2-git-send-email-suraj@atheros.com>
-In-Reply-To: <1285075981-8941-1-git-send-email-suraj@atheros.com>
-References: <1285075981-8941-1-git-send-email-suraj@atheros.com>
+Subject: [PATCH 1/2] Bluetooth: hci open callback for hci UART transport driver
+Date: Tue, 21 Sep 2010 19:03:00 +0530
+Message-ID: <1285075981-8941-1-git-send-email-suraj@atheros.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch enables HCI_UART_ATH3K transport driver to support
-sending Vendor specific hci commands during hci open
-to enable or disable power management feature.
+This patch provides option for hci transport driver protocol implementation
+to have a callback for hci open.
 
 Signed-off-by: Suraj Sumangala <suraj@atheros.com>
 ---
- drivers/bluetooth/hci_ath.c |   59 +++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 59 insertions(+), 0 deletions(-)
+ drivers/bluetooth/hci_ldisc.c |    5 ++++-
+ drivers/bluetooth/hci_uart.h  |    1 +
+ 2 files changed, 5 insertions(+), 1 deletions(-)
 
-diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
-index 6a160c1..d4b0653 100644
---- a/drivers/bluetooth/hci_ath.c
-+++ b/drivers/bluetooth/hci_ath.c
-@@ -49,6 +49,37 @@ struct ath_struct {
- 	struct work_struct ctxtsw;
- };
- 
-+/* Form HCI command */
-+static struct sk_buff *form_hci_cmd(struct hci_dev *hdev, __u16 opcode,
-+						 __u32 plen, void *param)
-+{
-+	int len = HCI_COMMAND_HDR_SIZE + plen;
-+	struct hci_command_hdr *hdr;
-+	struct sk_buff *skb;
-+
-+	BT_DBG("%s opcode 0x%x plen %d", hdev->name, opcode, plen);
-+
-+	skb = bt_skb_alloc(len, GFP_ATOMIC);
-+	if (!skb) {
-+		BT_ERR("%s no memory for command", hdev->name);
-+		return NULL;
-+	}
-+
-+	hdr = (struct hci_command_hdr *) skb_put(skb, HCI_COMMAND_HDR_SIZE);
-+	hdr->opcode = cpu_to_le16(opcode);
-+	hdr->plen   = plen;
-+
-+	if (plen)
-+		memcpy(skb_put(skb, plen), param, plen);
-+
-+	BT_DBG("skb len %d", skb->len);
-+
-+	bt_cb(skb)->pkt_type = HCI_COMMAND_PKT;
-+	skb->dev = (void *) hdev;
-+
-+	return skb;
-+}
-+
- static int ath_wakeup_ar3k(struct tty_struct *tty)
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index 998833d..5e02501 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -162,9 +162,12 @@ restart:
+ /* Initialize device */
+ static int hci_uart_open(struct hci_dev *hdev)
  {
- 	struct termios settings;
-@@ -81,6 +112,26 @@ static int ath_wakeup_ar3k(struct tty_struct *tty)
- 	return status;
- }
++	struct hci_uart *hu  = (struct hci_uart *) hdev->driver_data;
++
+ 	BT_DBG("%s %p", hdev->name, hdev);
  
-+#define HCI_OP_SLEEP_SET			0xFC04
-+static void ath_hci_init_driver(struct hci_uart *hu)
-+{
-+	struct ath_struct *ath = hu->priv;
-+	struct hci_dev *hdev = hu->hdev;
-+	struct sk_buff *skb;
-+
-+	if (!hdev)
-+		return;
-+
-+	if (!ath)
-+		return;
-+
-+	skb = form_hci_cmd(hdev, HCI_OP_SLEEP_SET, 1, &ath->cur_sleep);
-+	if (!skb)
-+		return;
-+
-+	skb_queue_head(&hdev->driver_init, skb);
-+}
-+
- static void ath_hci_uart_work(struct work_struct *work)
- {
- 	int status;
-@@ -126,6 +177,13 @@ static int ath_open(struct hci_uart *hu)
- 	return 0;
- }
+-	/* Nothing to do for UART driver */
++	if (hu->proto->hci_open)
++		hu->proto->hci_open(hu);
  
-+static int ath_hci_open(struct hci_uart *hu)
-+{
-+	ath_hci_init_driver(hu);
-+
-+	return 0;
-+}
-+
- /* Flush protocol data */
- static int ath_flush(struct hci_uart *hu)
- {
-@@ -210,6 +268,7 @@ static int ath_recv(struct hci_uart *hu, void *data, int count)
- static struct hci_uart_proto athp = {
- 	.id = HCI_UART_ATH3K,
- 	.open = ath_open,
-+	.hci_open = ath_hci_open,
- 	.close = ath_close,
- 	.recv = ath_recv,
- 	.enqueue = ath_enqueue,
+ 	set_bit(HCI_RUNNING, &hdev->flags);
+ 
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index 99fb352..d0198ec 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -51,6 +51,7 @@ struct hci_uart;
+ struct hci_uart_proto {
+ 	unsigned int id;
+ 	int (*open)(struct hci_uart *hu);
++	int (*hci_open)(struct hci_uart *hu);
+ 	int (*close)(struct hci_uart *hu);
+ 	int (*flush)(struct hci_uart *hu);
+ 	int (*recv)(struct hci_uart *hu, void *data, int len);
 -- 
 1.7.0.4
 
