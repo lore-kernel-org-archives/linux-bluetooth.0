@@ -1,95 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: barbieri@profusion.mobi,
-	Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH] Simplify linker script
-Date: Tue, 21 Sep 2010 15:46:56 -0300
-Message-Id: <1285094816-1683-1-git-send-email-lucas.demarchi@profusion.mobi>
+MIME-Version: 1.0
+In-Reply-To: <AANLkTikwvCiCLj4Hvr=zSQHOm33e059z2W6MA0T5C2ZO@mail.gmail.com>
+References: <7866937.1285030222002.JavaMail.root@elwamui-darkeyed.atl.sa.earthlink.net>
+	<AANLkTi=hD_U-19oPnQzQemt5wBgAqip3h7esJZpgkr4e@mail.gmail.com>
+	<AANLkTi=gRJgyFD2uC-UsjzjQCU11326SSsN4+nsTxk9-@mail.gmail.com>
+	<AANLkTikwvCiCLj4Hvr=zSQHOm33e059z2W6MA0T5C2ZO@mail.gmail.com>
+Date: Tue, 21 Sep 2010 23:46:10 +0530
+Message-ID: <AANLkTimf-VQuF3DuGxA8TmEVDE27nyXSQoHTGU0cGxTO@mail.gmail.com>
+Subject: Re: Need complete docs on PAN and DUN with bluez 4.66
+From: Arun Kumar <arunkat@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Mumia W <mumia.w.18.spam@earthlink.net>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Version linker scripts support function names and globs, so there's no
-need to rely on nm tool to gather the exported symbols.
----
- .gitignore           |    1 -
- Makefile.am          |   14 +-------------
- configure.ac         |    2 +-
- src/bluetooth.ver.in |   10 ++++++++++
- 4 files changed, 12 insertions(+), 15 deletions(-)
- create mode 100644 src/bluetooth.ver.in
+Hi,
 
-diff --git a/.gitignore b/.gitignore
-index e12508e..db6c3f3 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -34,7 +34,6 @@ bluez.pc
- lib/bluetooth
- src/builtin.h
- src/bluetoothd
--src/bluetooth.exp
- src/bluetooth.ver
- audio/telephony.c
- scripts/bluetooth.rules
-diff --git a/Makefile.am b/Makefile.am
-index 05bc8fc..1c70e5d 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -258,7 +258,7 @@ builtin_files = src/builtin.h $(builtin_nodist)
- 
- nodist_src_bluetoothd_SOURCES = $(builtin_files)
- 
--CLEANFILES += src/bluetooth.ver src/bluetooth.exp $(builtin_files)
-+CLEANFILES += $(builtin_files)
- 
- man_MANS = src/bluetoothd.8
- 
-@@ -392,18 +392,6 @@ src/plugin.$(OBJEXT): src/builtin.h
- src/builtin.h: src/genbuiltin $(builtin_sources)
- 	$(AM_V_GEN)$(srcdir)/src/genbuiltin $(builtin_modules) > $@
- 
--src/bluetooth.exp: $(src_bluetoothd_OBJECTS)
--	$(AM_V_GEN)$(NM) $^ | $(AWK) '{ print $$3 }' | sort -u | \
--				$(EGREP) -e '^btd_' -e '^g_dbus_' > $@
--	$(AM_V_at)echo -e "info" >> $@
--	$(AM_V_at)echo -e "error" >> $@
--	$(AM_V_at)echo -e "debug" >> $@
--
--src/bluetooth.ver: src/bluetooth.exp
--	$(AM_V_at)echo "{ global:" > $@
--	$(AM_V_GEN)$(SED) -e "s/\(.*\)/\1;/" $< >> $@
--	$(AM_V_at)echo "local: *; };" >> $@
--
- audio/telephony.c: audio/@TELEPHONY_DRIVER@
- 	$(AM_V_GEN)$(LN_S) $(abs_top_srcdir)/$< $@
- 
-diff --git a/configure.ac b/configure.ac
-index 6fda7fe..08f4877 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -65,5 +65,5 @@ if (test "${enable_netlink}" = "yes"); then
- fi
- AM_CONDITIONAL(NETLINK, test "${enable_netlink}" = "yes")
- 
--AC_OUTPUT(Makefile scripts/bluetooth.rules doc/version.xml
-+AC_OUTPUT(Makefile scripts/bluetooth.rules doc/version.xml src/bluetooth.ver
- 					src/bluetoothd.8 bluez.pc)
-diff --git a/src/bluetooth.ver.in b/src/bluetooth.ver.in
-new file mode 100644
-index 0000000..b71c70d
---- /dev/null
-+++ b/src/bluetooth.ver.in
-@@ -0,0 +1,10 @@
-+{
-+	global:
-+		btd_*;
-+		g_dbus_*;
-+		info;
-+		error;
-+		debug;
-+	local:
-+		*;
-+};
--- 
-1.7.2.3
+> Hi,
+>
+> On Tue, Sep 21, 2010 at 6:56 AM, Arun Kumar <arunkat@gmail.com> wrote:
+>> Depends on what role you want to use pand for ...pand is launched as a
+>> daemon via command line with set of options you may want to use it for
+>> your requirements ...
+>
+> I wouldn't suggest using pand nor dund because they are deprecated.
 
+I understand that dun and its apis are deprecated from bluez but not
+sure on pan. I guess its api's are still exported on dbus as network
+api's- unless there are plans to deprecate it too in near future...
+
+> PAN is really dead simple, Network.Connect() returns the network
+> interface in case of success
+
+isnt it what Network.Connect() is supposed to return?
+
+>and both NetworkManager and connman
+> should be able to use them, in fact I think both already have specif
+> PAN support to connect from their ui.
+
+Well its entirely upto to the use-case & sub-system above d-bus on how
+to use network api's and implement pan. In case of Meego and ui based
+PAN use case, it may be true, but there are still platforms and
+subsystems that use vanilla pand to setup pan as GN/nap etc via a
+daemon process.
+
+> Both Network and Serial interface are documented in doc/ diretory,
+> there is also test-network and test-serial under test/ that can be
+> used to manually connect to those profiles.
+
+True. Alternatively if the use case is to simply set up the device in
+nap role with bluez, for instance,
+pand -s -r NAP  -M -n could well be used. It would set up the device
+in NAP role after auto registering same with SDP.
+
+
+> Luiz Augusto von Dentz
+> Computer Engineer
+>
+
+Best Regards,
+Arun Kumar Singh
+www.crazydaks.com
