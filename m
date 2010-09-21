@@ -1,157 +1,428 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Elvis=20Pf=C3=BCtzenreuter?= <epx@signove.com>
+From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: epx@signove.com
-Subject: [PATCH] Fixes potential lockup while finding latency
-Date: Tue, 21 Sep 2010 13:45:53 -0300
-Message-Id: <1285087553-11868-1-git-send-email-epx@signove.com>
+Cc: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+Subject: [PATCH] Code reorganization to avoid unnecessary forward declarations
+Date: Tue, 21 Sep 2010 17:32:32 +0200
+Message-Id: <1285083152-27170-1-git-send-email-santoscadenas@gmail.com>
+In-Reply-To: <AANLkTi=L_iB7Evf9OdRxhVH+-dwdH8sdJ79Mu5tab8Oj@mail.gmail.com>
+References: <AANLkTi=L_iB7Evf9OdRxhVH+-dwdH8sdJ79Mu5tab8Oj@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-(To be applied after Jose reorganization patch)
-
-This patch fixes a potential infinite loop while finding the
-BT/system clock read latency. If the adapter is removed exactly
-at that moment, BT clock simply can't be read and it must quit.
-This is handled as a temporary failure (if a new connection is
-made, adapter is probably in place again).
 ---
- health/mcap_sync.c |   46 ++++++++++++++++++++++++++++++++++++++++------
- 1 files changed, 40 insertions(+), 6 deletions(-)
+ health/mcap_sync.c |  355 +++++++++++++++++++++++++---------------------------
+ 1 files changed, 173 insertions(+), 182 deletions(-)
 
 diff --git a/health/mcap_sync.c b/health/mcap_sync.c
-index 0943e41..670260b 100644
+index 25fc2d4..0943e41 100644
 --- a/health/mcap_sync.c
 +++ b/health/mcap_sync.c
-@@ -360,7 +360,7 @@ uint32_t mcap_get_btclock(struct mcap_mcl *mcl)
- 	return btclock;
- }
+@@ -111,15 +111,6 @@ static inline uint64_t ntoh64(uint64_t n)
+ static gboolean csp_caps_initialized = FALSE;
+ struct csp_caps _caps;
  
--static void initialize_caps(struct mcap_mcl *mcl)
-+static gboolean initialize_caps(struct mcap_mcl *mcl)
+-static void proc_sync_cap_req(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len);
+-static void proc_sync_set_req(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len);
+-static void proc_sync_cap_rsp(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len);
+-static void proc_sync_set_rsp(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len);
+-static void proc_sync_info_ind(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len);
+-
+-static gboolean sync_send_indication(gpointer user_data);
+-static gboolean proc_sync_set_req_phase2(gpointer user_data);
+-
+ static int send_sync_cmd(struct mcap_mcl *mcl, const void *buf, uint32_t size)
  {
- 	struct timespec t1, t2;
- 	int latencies[20];
-@@ -368,6 +368,7 @@ static void initialize_caps(struct mcap_mcl *mcl)
- 	uint32_t btclock;
- 	uint16_t btaccuracy;
- 	int i;
-+	int retries;
- 
- 	clock_getres(CLK, &t1);
- 
-@@ -383,10 +384,12 @@ static void initialize_caps(struct mcap_mcl *mcl)
- 
- 	/* Do clock read a number of times and measure latency */
- 	avg = 0;
--	for (i = 0; i < 20; ++i) {
-+	retries = 10;
-+	for (i = 0; i < 20 && retries > 0; ++i) {
- 		clock_gettime(CLK, &t1);
- 		if (!read_btclock(mcl, &btclock, &btaccuracy)) {
- 			--i;
-+			--retries;
- 			continue;
- 		}
- 		clock_gettime(CLK, &t2);
-@@ -395,9 +398,12 @@ static void initialize_caps(struct mcap_mcl *mcl)
- 		latencies[i] = latency;
- 		avg += latency;
- 	}
--	avg /= 20;
- 
--	/* Calculate deviation */
-+	if (retries <= 0)
-+		return FALSE;
-+
-+	/* Calculate average and deviation */
-+	avg /= 20;
- 	dev = 0;
- 	for (i = 0; i < 20; ++i)
- 		dev += abs(latencies[i] - avg);
-@@ -418,12 +424,16 @@ static void initialize_caps(struct mcap_mcl *mcl)
- 	_caps.syncleadtime_ms = latency * 50 / 1000;
- 
- 	csp_caps_initialized = TRUE;
-+	return TRUE;
+ 	int sock;
+@@ -161,39 +152,6 @@ static int send_unsupported_set_req(struct mcap_mcl *mcl)
+ 	return sent;
  }
  
- static struct csp_caps *caps(struct mcap_mcl *mcl)
+-void proc_sync_cmd(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
+-{
+-	if (!mcl->ms->csp_enabled || !mcl->csp) {
+-		switch (cmd[0]) {
+-		case MCAP_MD_SYNC_CAP_REQ:
+-			send_unsupported_cap_req(mcl);
+-			break;
+-		case MCAP_MD_SYNC_SET_REQ:
+-			send_unsupported_set_req(mcl);
+-			break;
+-		}
+-		return;
+-	}
+-
+-	switch (cmd[0]) {
+-	case MCAP_MD_SYNC_CAP_REQ:
+-		proc_sync_cap_req(mcl, cmd, len);
+-		break;
+-	case MCAP_MD_SYNC_CAP_RSP:
+-		proc_sync_cap_rsp(mcl, cmd, len);
+-		break;
+-	case MCAP_MD_SYNC_SET_REQ:
+-		proc_sync_set_req(mcl, cmd, len);
+-		break;
+-	case MCAP_MD_SYNC_SET_RSP:
+-		proc_sync_set_rsp(mcl, cmd, len);
+-		break;
+-	case MCAP_MD_SYNC_INFO_IND:
+-		proc_sync_info_ind(mcl, cmd, len);
+-		break;
+-	}
+-}
+-
+ static void reset_tmstamp(struct mcap_csp *csp, struct timespec *base_time,
+ 				uint64_t new_tmstamp)
  {
- 	if (!csp_caps_initialized)
--		initialize_caps(mcl);
-+		if (!initialize_caps(mcl)) {
-+			/* Temporary failure in reading BT clock */
-+			return NULL;
-+		}
- 
- 	return &_caps;
+@@ -552,126 +510,6 @@ static int send_sync_set_rsp(struct mcap_mcl *mcl, uint8_t rspcode,
+ 	return sent;
  }
-@@ -465,6 +475,12 @@ static void proc_sync_cap_req(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
- 		return;
- 	}
  
-+	if (!caps(mcl)) {
-+		send_sync_cap_rsp(mcl, MCAP_RESOURCE_UNAVAILABLE,
-+					0, 0, 0, 0);
-+		return;
-+	}
-+
- 	req = (mcap_md_sync_cap_req *) cmd;
- 	required_accuracy = ntohs(req->timest);
- 	our_accuracy = caps(mcl)->ts_acc;
-@@ -514,11 +530,16 @@ static gboolean get_all_clocks(struct mcap_mcl *mcl, uint32_t *btclock,
+-static void proc_sync_set_req(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
+-{
+-	mcap_md_sync_set_req *req;
+-	uint32_t sched_btclock, cur_btclock;
+-	uint16_t btres;
+-	uint8_t update;
+-	uint64_t timestamp;
+-	struct sync_set_data *set_data;
+-	int phase2_delay, ind_freq, when;
+-
+-	if (len != sizeof(mcap_md_sync_set_req)) {
+-		send_sync_set_rsp(mcl, MCAP_INVALID_PARAM_VALUE, 0, 0, 0);
+-		return;
+-	}
+-
+-	req = (mcap_md_sync_set_req *) cmd;
+-	sched_btclock = ntohl(req->btclock);
+-	update = req->timestui;
+-	timestamp = ntoh64(req->timestst);
+-
+-	if (sched_btclock != MCAP_BTCLOCK_IMMEDIATE &&
+-			!valid_btclock(sched_btclock)) {
+-		send_sync_set_rsp(mcl, MCAP_INVALID_PARAM_VALUE, 0, 0, 0);
+-		return;
+-	}
+-
+-	if (update > 1) {
+-		send_sync_set_rsp(mcl, MCAP_INVALID_PARAM_VALUE, 0, 0, 0);
+-		return;
+-	}
+-
+-	if (!mcl->csp->remote_caps) {
+-		/* Remote side did not ask our capabilities yet */
+-		send_sync_set_rsp(mcl, MCAP_INVALID_PARAM_VALUE, 0, 0, 0);
+-		return;
+-	}
+-
+-	if (!read_btclock_retry(mcl, &cur_btclock, &btres)) {
+-		send_sync_set_rsp(mcl, MCAP_UNSPECIFIED_ERROR, 0, 0, 0);
+-		return;
+-	}
+-
+-	if (sched_btclock == MCAP_BTCLOCK_IMMEDIATE)
+-		phase2_delay = 0;
+-	else {
+-		phase2_delay = btdiff(cur_btclock, sched_btclock);
+-
+-		if (phase2_delay < 0) {
+-			/* can not reset in the past tense */
+-			send_sync_set_rsp(mcl, MCAP_INVALID_PARAM_VALUE,
+-						0, 0, 0);
+-			return;
+-		}
+-
+-		/* Convert to miliseconds */
+-		phase2_delay = bt2ms(phase2_delay);
+-
+-		if (phase2_delay > 61*1000) {
+-			/* More than 60 seconds in the future */
+-			send_sync_set_rsp(mcl, MCAP_INVALID_PARAM_VALUE,
+-						0, 0, 0);
+-			return;
+-		} else if (phase2_delay < caps(mcl)->latency / 1000) {
+-			/* Too fast for us to do in time */
+-			send_sync_set_rsp(mcl, MCAP_INVALID_PARAM_VALUE,
+-						0, 0, 0);
+-			return;
+-		}
+-	}
+-
+-	if (update) {
+-		/* Indication frequency: required accuracy divided by ours */
+-		/* Converted to milisseconds */
+-		ind_freq = (1000 * mcl->csp->rem_req_acc) / caps(mcl)->ts_acc;
+-
+-		if (ind_freq < MAX(caps(mcl)->latency * 2 / 1000, 100)) {
+-			/* Too frequent, we can't handle */
+-			send_sync_set_rsp(mcl, MCAP_INVALID_PARAM_VALUE,
+-						0, 0, 0);
+-			return;
+-		}
+-
+-		DBG("CSP: indication every %dms", ind_freq);
+-	} else
+-		ind_freq = 0;
+-
+-	if (mcl->csp->ind_timer) {
+-		/* Old indications are no longer sent */
+-		g_source_remove(mcl->csp->ind_timer);
+-		mcl->csp->ind_timer = 0;
+-	}
+-
+-	if (!mcl->csp->set_data)
+-		mcl->csp->set_data = g_new0(struct sync_set_data, 1);
+-
+-	set_data = (struct sync_set_data *) mcl->csp->set_data;
+-
+-	set_data->update = update;
+-	set_data->sched_btclock = sched_btclock;
+-	set_data->timestamp = timestamp;
+-	set_data->ind_freq = ind_freq;
+-	set_data->role = get_btrole(mcl);
+-
+-	/* TODO is there some way to schedule a call based directly on
+-	 * a BT clock value, instead of this estimation that uses
+-	 * the SO clock? */
+-
+-	if (phase2_delay > 0) {
+-		when = phase2_delay + caps(mcl)->syncleadtime_ms;
+-		mcl->csp->set_timer = g_timeout_add(when,
+-						proc_sync_set_req_phase2,
+-						mcl);
+-	} else
+-		proc_sync_set_req_phase2(mcl);
+-
+-	/* First indication is immediate */
+-	if (update)
+-		sync_send_indication(mcl);
+-}
+-
+ static gboolean get_all_clocks(struct mcap_mcl *mcl, uint32_t *btclock,
  				struct timespec *base_time,
  				uint64_t *timestamp)
+@@ -701,6 +539,36 @@ static gboolean get_all_clocks(struct mcap_mcl *mcl, uint32_t *btclock,
+ 	return TRUE;
+ }
+ 
++static gboolean sync_send_indication(gpointer user_data)
++{
++	struct mcap_mcl *mcl;
++	mcap_md_sync_info_ind *cmd;
++	uint32_t btclock;
++	uint64_t tmstamp;
++	struct timespec base_time;
++	int sent;
++
++	if (!user_data)
++		return FALSE;
++
++	mcl = user_data;
++
++	if (!get_all_clocks(mcl, &btclock, &base_time, &tmstamp))
++		return FALSE;
++
++	cmd = g_new0(mcap_md_sync_info_ind, 1);
++
++	cmd->op = MCAP_MD_SYNC_INFO_IND;
++	cmd->btclock = htonl(btclock);
++	cmd->timestst = hton64(tmstamp);
++	cmd->timestsa = htons(caps(mcl)->latency);
++
++	sent = send_sync_cmd(mcl, cmd, sizeof(*cmd));
++	g_free(cmd);
++
++	return !sent;
++}
++
+ static gboolean proc_sync_set_req_phase2(gpointer user_data)
  {
--	int latency = caps(mcl)->preempt_thresh + 1;
-+	int latency;
- 	int retry = 5;
- 	uint16_t btres;
- 	struct timespec t0;
+ 	struct mcap_mcl *mcl;
+@@ -783,34 +651,124 @@ static gboolean proc_sync_set_req_phase2(gpointer user_data)
+ 	return FALSE;
+ }
  
-+	if (!caps(mcl))
-+		return FALSE;
-+
-+	latency = caps(mcl)->preempt_thresh + 1;
-+
- 	while (latency > caps(mcl)->preempt_thresh && --retry >= 0) {
+-static gboolean sync_send_indication(gpointer user_data)
++static void proc_sync_set_req(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
+ {
+-	struct mcap_mcl *mcl;
+-	mcap_md_sync_info_ind *cmd;
+-	uint32_t btclock;
+-	uint64_t tmstamp;
+-	struct timespec base_time;
+-	int sent;
++	mcap_md_sync_set_req *req;
++	uint32_t sched_btclock, cur_btclock;
++	uint16_t btres;
++	uint8_t update;
++	uint64_t timestamp;
++	struct sync_set_data *set_data;
++	int phase2_delay, ind_freq, when;
  
- 		clock_gettime(CLK, &t0);
-@@ -553,6 +574,9 @@ static gboolean sync_send_indication(gpointer user_data)
- 
- 	mcl = user_data;
- 
-+	if (!caps(mcl))
-+		return FALSE;
-+
- 	if (!get_all_clocks(mcl, &btclock, &base_time, &tmstamp))
- 		return FALSE;
- 
-@@ -600,6 +624,11 @@ static gboolean proc_sync_set_req_phase2(gpointer user_data)
- 	ind_freq = data->ind_freq;
- 	role = data->role;
- 
-+	if (!caps(mcl)) {
-+		send_sync_set_rsp(mcl, MCAP_UNSPECIFIED_ERROR, 0, 0, 0);
-+		return FALSE;
+-	if (!user_data)
+-		return FALSE;
++	if (len != sizeof(mcap_md_sync_set_req)) {
++		send_sync_set_rsp(mcl, MCAP_INVALID_PARAM_VALUE, 0, 0, 0);
++		return;
 +	}
-+
- 	if (!get_all_clocks(mcl, &btclock, &base_time, &tmstamp)) {
- 		send_sync_set_rsp(mcl, MCAP_UNSPECIFIED_ERROR, 0, 0, 0);
- 		return FALSE;
-@@ -688,6 +717,11 @@ static void proc_sync_set_req(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
- 		return;
- 	}
  
-+	if (!caps(mcl)) {
+-	mcl = user_data;
++	req = (mcap_md_sync_set_req *) cmd;
++	sched_btclock = ntohl(req->btclock);
++	update = req->timestui;
++	timestamp = ntoh64(req->timestst);
+ 
+-	if (!get_all_clocks(mcl, &btclock, &base_time, &tmstamp))
+-		return FALSE;
++	if (sched_btclock != MCAP_BTCLOCK_IMMEDIATE &&
++			!valid_btclock(sched_btclock)) {
++		send_sync_set_rsp(mcl, MCAP_INVALID_PARAM_VALUE, 0, 0, 0);
++		return;
++	}
+ 
+-	cmd = g_new0(mcap_md_sync_info_ind, 1);
++	if (update > 1) {
++		send_sync_set_rsp(mcl, MCAP_INVALID_PARAM_VALUE, 0, 0, 0);
++		return;
++	}
+ 
+-	cmd->op = MCAP_MD_SYNC_INFO_IND;
+-	cmd->btclock = htonl(btclock);
+-	cmd->timestst = hton64(tmstamp);
+-	cmd->timestsa = htons(caps(mcl)->latency);
++	if (!mcl->csp->remote_caps) {
++		/* Remote side did not ask our capabilities yet */
++		send_sync_set_rsp(mcl, MCAP_INVALID_PARAM_VALUE, 0, 0, 0);
++		return;
++	}
+ 
+-	sent = send_sync_cmd(mcl, cmd, sizeof(*cmd));
+-	g_free(cmd);
++	if (!read_btclock_retry(mcl, &cur_btclock, &btres)) {
 +		send_sync_set_rsp(mcl, MCAP_UNSPECIFIED_ERROR, 0, 0, 0);
 +		return;
 +	}
+ 
+-	return !sent;
++	if (sched_btclock == MCAP_BTCLOCK_IMMEDIATE)
++		phase2_delay = 0;
++	else {
++		phase2_delay = btdiff(cur_btclock, sched_btclock);
 +
- 	if (!read_btclock_retry(mcl, &cur_btclock, &btres)) {
- 		send_sync_set_rsp(mcl, MCAP_UNSPECIFIED_ERROR, 0, 0, 0);
- 		return;
++		if (phase2_delay < 0) {
++			/* can not reset in the past tense */
++			send_sync_set_rsp(mcl, MCAP_INVALID_PARAM_VALUE,
++						0, 0, 0);
++			return;
++		}
++
++		/* Convert to miliseconds */
++		phase2_delay = bt2ms(phase2_delay);
++
++		if (phase2_delay > 61*1000) {
++			/* More than 60 seconds in the future */
++			send_sync_set_rsp(mcl, MCAP_INVALID_PARAM_VALUE,
++						0, 0, 0);
++			return;
++		} else if (phase2_delay < caps(mcl)->latency / 1000) {
++			/* Too fast for us to do in time */
++			send_sync_set_rsp(mcl, MCAP_INVALID_PARAM_VALUE,
++						0, 0, 0);
++			return;
++		}
++	}
++
++	if (update) {
++		/* Indication frequency: required accuracy divided by ours */
++		/* Converted to milisseconds */
++		ind_freq = (1000 * mcl->csp->rem_req_acc) / caps(mcl)->ts_acc;
++
++		if (ind_freq < MAX(caps(mcl)->latency * 2 / 1000, 100)) {
++			/* Too frequent, we can't handle */
++			send_sync_set_rsp(mcl, MCAP_INVALID_PARAM_VALUE,
++						0, 0, 0);
++			return;
++		}
++
++		DBG("CSP: indication every %dms", ind_freq);
++	} else
++		ind_freq = 0;
++
++	if (mcl->csp->ind_timer) {
++		/* Old indications are no longer sent */
++		g_source_remove(mcl->csp->ind_timer);
++		mcl->csp->ind_timer = 0;
++	}
++
++	if (!mcl->csp->set_data)
++		mcl->csp->set_data = g_new0(struct sync_set_data, 1);
++
++	set_data = (struct sync_set_data *) mcl->csp->set_data;
++
++	set_data->update = update;
++	set_data->sched_btclock = sched_btclock;
++	set_data->timestamp = timestamp;
++	set_data->ind_freq = ind_freq;
++	set_data->role = get_btrole(mcl);
++
++	/* TODO is there some way to schedule a call based directly on
++	 * a BT clock value, instead of this estimation that uses
++	 * the SO clock? */
++
++	if (phase2_delay > 0) {
++		when = phase2_delay + caps(mcl)->syncleadtime_ms;
++		mcl->csp->set_timer = g_timeout_add(when,
++						proc_sync_set_req_phase2,
++						mcl);
++	} else
++		proc_sync_set_req_phase2(mcl);
++
++	/* First indication is immediate */
++	if (update)
++		sync_send_indication(mcl);
+ }
+ 
+ static void proc_sync_cap_rsp(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
+@@ -937,6 +895,39 @@ static void proc_sync_info_ind(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
+ 		mcl->ms->mcl_sync_infoind_cb(mcl, &data);
+ }
+ 
++void proc_sync_cmd(struct mcap_mcl *mcl, uint8_t *cmd, uint32_t len)
++{
++	if (!mcl->ms->csp_enabled || !mcl->csp) {
++		switch (cmd[0]) {
++		case MCAP_MD_SYNC_CAP_REQ:
++			send_unsupported_cap_req(mcl);
++			break;
++		case MCAP_MD_SYNC_SET_REQ:
++			send_unsupported_set_req(mcl);
++			break;
++		}
++		return;
++	}
++
++	switch (cmd[0]) {
++	case MCAP_MD_SYNC_CAP_REQ:
++		proc_sync_cap_req(mcl, cmd, len);
++		break;
++	case MCAP_MD_SYNC_CAP_RSP:
++		proc_sync_cap_rsp(mcl, cmd, len);
++		break;
++	case MCAP_MD_SYNC_SET_REQ:
++		proc_sync_set_req(mcl, cmd, len);
++		break;
++	case MCAP_MD_SYNC_SET_RSP:
++		proc_sync_set_rsp(mcl, cmd, len);
++		break;
++	case MCAP_MD_SYNC_INFO_IND:
++		proc_sync_info_ind(mcl, cmd, len);
++		break;
++	}
++}
++
+ void mcap_sync_cap_req(struct mcap_mcl *mcl, uint16_t reqacc,
+ 			mcap_sync_cap_cb cb, gpointer user_data,
+ 			GError **err)
 -- 
 1.7.0.4
 
