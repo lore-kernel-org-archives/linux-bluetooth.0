@@ -1,51 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 22 Sep 2010 22:25:40 +0300
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fix wrong parameter name in device.h
+Message-ID: <20100922192540.GC20756@jh-x301>
+References: <1285173226-15713-1-git-send-email-santoscadenas@gmail.com>
 MIME-Version: 1.0
-Date: Wed, 22 Sep 2010 15:25:53 -0400
-Message-ID: <AANLkTikcG2XRNDKSiq5b==JXo+YtPVJy9y4QWkBR9zdR@mail.gmail.com>
-Subject: Pull request: git://gitorious.org/~lizardo/bluez/lizardo-bluez.git for-upstream
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1285173226-15713-1-git-send-email-santoscadenas@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The following changes since commit ec901c2428324ea2fe7d1bc2a2f3171ac5ed1950:
-  Johan Hedberg (1):
-        Fix reading local name from command complete event
+Hi,
 
-are available in the git repository at:
+On Wed, Sep 22, 2010, Jose Antonio Santos Cadenas wrote:
+> ---
+>  src/device.h |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/src/device.h b/src/device.h
+> index 21f67d0..2b45223 100644
+> --- a/src/device.h
+> +++ b/src/device.h
+> @@ -47,7 +47,7 @@ const sdp_record_t *btd_device_get_record(struct btd_device *device,
+>  						const char *uuid);
+>  void btd_device_add_uuid(struct btd_device *device, const char *uuid);
+>  struct btd_adapter *device_get_adapter(struct btd_device *device);
+> -void device_get_address(struct btd_device *adapter, bdaddr_t *bdaddr);
+> +void device_get_address(struct btd_device *device, bdaddr_t *bdaddr);
+>  const gchar *device_get_path(struct btd_device *device);
+>  struct agent *device_get_agent(struct btd_device *device);
+>  gboolean device_is_busy(struct btd_device *device);
 
-  git://gitorious.org/~lizardo/bluez/lizardo-bluez.git for-upstream
+Nice catch. The patch is now pushed upstream.
 
-Claudio Takahasi (9):
-      Update characteristic value when a notification is received
-      Return an error if the path doesn't exist when registering a watcher
-      Add watcher's characteristic path verification before notify changes
-      Watchers don't need to reply for characteristic value updates
-      Change notification/indication output formating on gatttool
-      Report attribute changes for the Battery Service
-      Add missing response for handle value indication on attribute client
-      Remove forward declaration on gattrib source
-      Fix uninitialised value warning
-
-Vinicius Costa Gomes (6):
-      Add encoders/decoders for Indication/Confirmation
-      Add support to the server to sending Indications
-      Add support for Indications to gatttool
-      Add support for Indications to the client
-      Add support for actively updating the watcher
-      Add a way to unregister GAttrib events
-
- attrib/att.c        |   50 +++++++++++++++++
- attrib/att.h        |    3 +
- attrib/client.c     |  113 +++++++++++++++++++++++++++++++++++++--
- attrib/example.c    |   19 +++----
- attrib/gattrib.c    |  150 ++++++++++++++++++++++++++++++++-------------------
- attrib/gatttool.c   |   40 +++++++++-----
- src/attrib-server.c |   28 ++++++++++
- 7 files changed, 320 insertions(+), 83 deletions(-)
-
--- 
-Anderson Lizardo
-OpenBossa Labs - INdT
-Manaus - Brazil
+Johan
