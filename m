@@ -1,38 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 22 Sep 2010 22:25:40 +0300
+Date: Wed, 22 Sep 2010 22:24:36 +0300
 From: Johan Hedberg <johan.hedberg@nokia.com>
-To: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix wrong parameter name in device.h
-Message-ID: <20100922192540.GC20756@jh-x301>
-References: <1285173226-15713-1-git-send-email-santoscadenas@gmail.com>
+Subject: Re: Pull request:
+ git://gitorious.org/~vudentz/bluez/vudentzs-clone.git for-upstream
+Message-ID: <20100922192436.GB20756@jh-x301>
+References: <AANLkTikKc3E3wPkkP3U+mbZUa6UyqCAeRoPhEhwY0AAb@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1285173226-15713-1-git-send-email-santoscadenas@gmail.com>
+In-Reply-To: <AANLkTikKc3E3wPkkP3U+mbZUa6UyqCAeRoPhEhwY0AAb@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Luiz,
 
-On Wed, Sep 22, 2010, Jose Antonio Santos Cadenas wrote:
-> ---
->  src/device.h |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+On Wed, Sep 22, 2010, Luiz Augusto von Dentz wrote:
+> The following changes since commit cca89b3d5c78c29065a88ce099dea36137bea225:
 > 
-> diff --git a/src/device.h b/src/device.h
-> index 21f67d0..2b45223 100644
-> --- a/src/device.h
-> +++ b/src/device.h
-> @@ -47,7 +47,7 @@ const sdp_record_t *btd_device_get_record(struct btd_device *device,
->  						const char *uuid);
->  void btd_device_add_uuid(struct btd_device *device, const char *uuid);
->  struct btd_adapter *device_get_adapter(struct btd_device *device);
-> -void device_get_address(struct btd_device *adapter, bdaddr_t *bdaddr);
-> +void device_get_address(struct btd_device *device, bdaddr_t *bdaddr);
->  const gchar *device_get_path(struct btd_device *device);
->  struct agent *device_get_agent(struct btd_device *device);
->  gboolean device_is_busy(struct btd_device *device);
+>   Release 4.72 (2010-09-22 19:48:34 +0900)
+> 
+> are available in the git repository at:
+>   git://gitorious.org/~vudentz/bluez/vudentzs-clone.git for-upstream
+> 
+> Luiz Augusto von Dentz (5):
+>       Fix registering local endpoints when Socket interface is disabled
+>       Remove ReadLock and WriteLock from MediaTransport properties
+>       Replace use of term 'Renderer' with 'Owner'
+>       Make MediaEndpoint.SetConfiguration to take all transport properties
+>       Make MediaEndpoint.ClearConfiguration to take transport path
+> 
+>  audio/a2dp.c      |   13 ++++++++++++-
+>  audio/media.c     |   22 ++++++++++++++--------
+>  audio/transport.c |   43 ++++++++++++++++++++++---------------------
+>  audio/transport.h |    2 ++
+>  doc/media-api.txt |    6 +++---
+>  5 files changed, 53 insertions(+), 33 deletions(-)
 
-Nice catch. The patch is now pushed upstream.
+Thanks. All patches have been pushed upstream.
 
 Johan
