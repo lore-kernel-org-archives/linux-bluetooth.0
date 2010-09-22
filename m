@@ -1,53 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 22 Sep 2010 22:39:49 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Pull request:
+ git://gitorious.org/~lizardo/bluez/lizardo-bluez.git for-upstream
+Message-ID: <20100922193949.GA21903@jh-x301>
+References: <AANLkTikcG2XRNDKSiq5b==JXo+YtPVJy9y4QWkBR9zdR@mail.gmail.com>
 MIME-Version: 1.0
-Date: Wed, 22 Sep 2010 16:37:15 -0400
-Message-ID: <AANLkTimxWsv_6809nrodxcPkhwdcuc8kVFCWM5JcYv68@mail.gmail.com>
-Subject: Pull request: git://gitorious.org/~lizardo/bluez/lizardo-bluez.git for-upstream
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <AANLkTikcG2XRNDKSiq5b==JXo+YtPVJy9y4QWkBR9zdR@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The following changes since commit a5e1be914ba5480f9eae7ab9dc31e30524f74182:
-  Claudio Takahasi (1):
-        Fix uninitialised value warning
+Hi Anderson,
 
-are available in the git repository at:
+On Wed, Sep 22, 2010, Anderson Lizardo wrote:
+> The following changes since commit ec901c2428324ea2fe7d1bc2a2f3171ac5ed1950:
+>   Johan Hedberg (1):
+>         Fix reading local name from command complete event
+> 
+> are available in the git repository at:
+> 
+>   git://gitorious.org/~lizardo/bluez/lizardo-bluez.git for-upstream
+> 
+> Claudio Takahasi (9):
+>       Update characteristic value when a notification is received
+>       Return an error if the path doesn't exist when registering a watcher
+>       Add watcher's characteristic path verification before notify changes
+>       Watchers don't need to reply for characteristic value updates
+>       Change notification/indication output formating on gatttool
+>       Report attribute changes for the Battery Service
+>       Add missing response for handle value indication on attribute client
+>       Remove forward declaration on gattrib source
+>       Fix uninitialised value warning
+> 
+> Vinicius Costa Gomes (6):
+>       Add encoders/decoders for Indication/Confirmation
+>       Add support to the server to sending Indications
+>       Add support for Indications to gatttool
+>       Add support for Indications to the client
+>       Add support for actively updating the watcher
+>       Add a way to unregister GAttrib events
+> 
+>  attrib/att.c        |   50 +++++++++++++++++
+>  attrib/att.h        |    3 +
+>  attrib/client.c     |  113 +++++++++++++++++++++++++++++++++++++--
+>  attrib/example.c    |   19 +++----
+>  attrib/gattrib.c    |  150 ++++++++++++++++++++++++++++++++-------------------
+>  attrib/gatttool.c   |   40 +++++++++-----
+>  src/attrib-server.c |   28 ++++++++++
+>  7 files changed, 320 insertions(+), 83 deletions(-)
 
-  git://gitorious.org/~lizardo/bluez/lizardo-bluez.git for-upstream
+Thanks. All patches have been merged upstream.
 
-Claudio Takahasi (13):
-      Add g_attrib_set_destroy_function in gattrib
-      Use the destroy function to reset the GAttrib reference
-      Increment GAttrib reference for each GATT/ATT request
-      Fix disconnection when multiple watchers are registered
-      Fix seg fault if the watcher exit before the connection complete
-      Add UnregisterCharacteristicsWatcher implementation
-      Unregister the primary and characteristic objects
-      Fix memory leak of characteristic and primary service lists
-      Remove the timeout source function when the example server exits
-      Delete all stored data related to GATT/ATT when the device is removed
-      Fix wrong D-Bus object path for Device Service
-      Add a new property "Services" on the Device object
-      Fix coding style issues in attribute client code
-
- attrib/client.c       |  278 +++++++++++++++++++++++++++++++------------------
- attrib/example.c      |    9 ++-
- attrib/example.h      |    1 +
- attrib/gattrib.c      |   35 ++++--
- attrib/gattrib.h      |    3 +
- attrib/manager.c      |    1 +
- doc/attribute-api.txt |    3 +-
- doc/device-api.txt    |    4 +
- src/attrib-server.c   |   11 ++-
- src/device.c          |    1 +
- src/storage.c         |   68 ++++++++++++
- src/storage.h         |    1 +
- 12 files changed, 297 insertions(+), 118 deletions(-)
-
-Regards,
--- 
-Anderson Lizardo
-OpenBossa Labs - INdT
-Manaus - Brazil
+Johan
