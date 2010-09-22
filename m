@@ -1,58 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 22 Sep 2010 22:22:58 +0300
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/4] Fix headset disconnecting via device disconnect
-Message-ID: <20100922192258.GA20756@jh-x301>
-References: <1285162521-21997-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1285162521-21997-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+Subject: [PATCH] Fix wrong parameter name in device.h
+Date: Wed, 22 Sep 2010 18:33:46 +0200
+Message-Id: <1285173226-15713-1-git-send-email-santoscadenas@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Radek,
+---
+ src/device.h |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-On Wed, Sep 22, 2010, Radoslaw Jablonski wrote:
-> +static void disconnect_cb(struct btd_device *btd_dev, gboolean removal,
-> +				void *user_data)
-> +{
-> +	struct audio_device *dev = user_data;
-> +	struct dev_priv *priv = dev->priv;
-> +
-> +	if (priv->state == AUDIO_STATE_DISCONNECTED)
-> +		return;
-> +
-> +	if (priv->disconnecting)
-> +		return;
-> +
-> +	priv->disconnecting = TRUE;
-> +
-> +	if (dev->control) {
-> +		device_remove_control_timer(dev);
-> +		avrcp_disconnect(dev);
-> +	}
-> +
-> +	if (dev->sink && priv->sink_state != SINK_STATE_DISCONNECTED)
-> +		sink_shutdown(dev->sink);
-> +
-> +	if (priv->hs_state != HEADSET_STATE_DISCONNECTED)
-> +		headset_shutdown(dev);
-> +
-> +	priv->disconnecting = FALSE;
-> +}
+diff --git a/src/device.h b/src/device.h
+index 21f67d0..2b45223 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -47,7 +47,7 @@ const sdp_record_t *btd_device_get_record(struct btd_device *device,
+ 						const char *uuid);
+ void btd_device_add_uuid(struct btd_device *device, const char *uuid);
+ struct btd_adapter *device_get_adapter(struct btd_device *device);
+-void device_get_address(struct btd_device *adapter, bdaddr_t *bdaddr);
++void device_get_address(struct btd_device *device, bdaddr_t *bdaddr);
+ const gchar *device_get_path(struct btd_device *device);
+ struct agent *device_get_agent(struct btd_device *device);
+ gboolean device_is_busy(struct btd_device *device);
+-- 
+1.7.0.4
 
-I'd prefer if you keep the behaviour of disconnect_cb roughly the same
-as dev_disconnect. I.e. set the flag, disconnect either HFP or A2DP and
-then let the state callbacks do the right thing. The way you're using
-the new priv->disconnecting flag doesn't seem to make sense here. The
-idea of having a flag would be to do the right thing in the asynchronous
-state callbacks but you're setting it back to FALSE before returning
-from the function which seems to defeat that purpose.
-
-About the other patches, since the existing profile specific callbacks
-could mess up the logic together with the new callback I'm fine with a
-single patch which adds the new and removes the old callbacks.
-
-Johan
