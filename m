@@ -1,57 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 22 Sep 2010 22:39:49 +0300
+Date: Wed, 22 Sep 2010 22:28:19 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Pull request:
- git://gitorious.org/~lizardo/bluez/lizardo-bluez.git for-upstream
-Message-ID: <20100922193949.GA21903@jh-x301>
-References: <AANLkTikcG2XRNDKSiq5b==JXo+YtPVJy9y4QWkBR9zdR@mail.gmail.com>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: Fix bluetoothd not starting on cold boot
+Message-ID: <20100922192819.GA21611@jh-x301>
+References: <1285155481.13582.99.camel@cookie.hadess.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTikcG2XRNDKSiq5b==JXo+YtPVJy9y4QWkBR9zdR@mail.gmail.com>
+In-Reply-To: <1285155481.13582.99.camel@cookie.hadess.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+Hi Bastien,
 
-On Wed, Sep 22, 2010, Anderson Lizardo wrote:
-> The following changes since commit ec901c2428324ea2fe7d1bc2a2f3171ac5ed1950:
->   Johan Hedberg (1):
->         Fix reading local name from command complete event
+On Wed, Sep 22, 2010, Bastien Nocera wrote:
+> Subject: [PATCH] Also run bluetoothd on udev change events
 > 
-> are available in the git repository at:
+> Fixes bluetoothd not starting on cold boot with newer versions
+> of udev. See:
+> https://bugzilla.redhat.com/show_bug.cgi?id=634205
+> ---
+>  scripts/bluetooth.rules.in |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
 > 
->   git://gitorious.org/~lizardo/bluez/lizardo-bluez.git for-upstream
-> 
-> Claudio Takahasi (9):
->       Update characteristic value when a notification is received
->       Return an error if the path doesn't exist when registering a watcher
->       Add watcher's characteristic path verification before notify changes
->       Watchers don't need to reply for characteristic value updates
->       Change notification/indication output formating on gatttool
->       Report attribute changes for the Battery Service
->       Add missing response for handle value indication on attribute client
->       Remove forward declaration on gattrib source
->       Fix uninitialised value warning
-> 
-> Vinicius Costa Gomes (6):
->       Add encoders/decoders for Indication/Confirmation
->       Add support to the server to sending Indications
->       Add support for Indications to gatttool
->       Add support for Indications to the client
->       Add support for actively updating the watcher
->       Add a way to unregister GAttrib events
-> 
->  attrib/att.c        |   50 +++++++++++++++++
->  attrib/att.h        |    3 +
->  attrib/client.c     |  113 +++++++++++++++++++++++++++++++++++++--
->  attrib/example.c    |   19 +++----
->  attrib/gattrib.c    |  150 ++++++++++++++++++++++++++++++++-------------------
->  attrib/gatttool.c   |   40 +++++++++-----
->  src/attrib-server.c |   28 ++++++++++
->  7 files changed, 320 insertions(+), 83 deletions(-)
+> diff --git a/scripts/bluetooth.rules.in b/scripts/bluetooth.rules.in
+> index 6809e9d..64df69d 100644
+> --- a/scripts/bluetooth.rules.in
+> +++ b/scripts/bluetooth.rules.in
+> @@ -1,3 +1,4 @@
+>  # Run helper every time a Bluetooth device appears
+>  # On remove actions, bluetoothd should go away by itself
+>  ACTION=="add", SUBSYSTEM=="bluetooth", RUN+="@prefix@/sbin/bluetoothd --udev"
+> +ACTION=="change", SUBSYSTEM=="bluetooth", RUN+="@prefix@/sbin/bluetoothd --udev"
 
-Thanks. All patches have been merged upstream.
+Thanks. The patch has been pushed upstream.
 
 Johan
