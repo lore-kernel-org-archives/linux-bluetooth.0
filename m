@@ -1,30 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+MIME-Version: 1.0
+Date: Wed, 22 Sep 2010 16:45:15 +0300
+Message-ID: <AANLkTikKc3E3wPkkP3U+mbZUa6UyqCAeRoPhEhwY0AAb@mail.gmail.com>
+Subject: Pull request: git://gitorious.org/~vudentz/bluez/vudentzs-clone.git for-upstream
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Subject: [PATCH] Fix wrong parameter name in device.h
-Date: Wed, 22 Sep 2010 18:33:46 +0200
-Message-Id: <1285173226-15713-1-git-send-email-santoscadenas@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/device.h |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+The following changes since commit cca89b3d5c78c29065a88ce099dea36137bea225:
 
-diff --git a/src/device.h b/src/device.h
-index 21f67d0..2b45223 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -47,7 +47,7 @@ const sdp_record_t *btd_device_get_record(struct btd_device *device,
- 						const char *uuid);
- void btd_device_add_uuid(struct btd_device *device, const char *uuid);
- struct btd_adapter *device_get_adapter(struct btd_device *device);
--void device_get_address(struct btd_device *adapter, bdaddr_t *bdaddr);
-+void device_get_address(struct btd_device *device, bdaddr_t *bdaddr);
- const gchar *device_get_path(struct btd_device *device);
- struct agent *device_get_agent(struct btd_device *device);
- gboolean device_is_busy(struct btd_device *device);
+  Release 4.72 (2010-09-22 19:48:34 +0900)
+
+are available in the git repository at:
+  git://gitorious.org/~vudentz/bluez/vudentzs-clone.git for-upstream
+
+Luiz Augusto von Dentz (5):
+      Fix registering local endpoints when Socket interface is disabled
+      Remove ReadLock and WriteLock from MediaTransport properties
+      Replace use of term 'Renderer' with 'Owner'
+      Make MediaEndpoint.SetConfiguration to take all transport properties
+      Make MediaEndpoint.ClearConfiguration to take transport path
+
+ audio/a2dp.c      |   13 ++++++++++++-
+ audio/media.c     |   22 ++++++++++++++--------
+ audio/transport.c |   43 ++++++++++++++++++++++---------------------
+ audio/transport.h |    2 ++
+ doc/media-api.txt |    6 +++---
+ 5 files changed, 53 insertions(+), 33 deletions(-)
+
 -- 
-1.7.0.4
-
+Luiz Augusto von Dentz
+Computer Engineer
