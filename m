@@ -1,39 +1,145 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 23 Sep 2010 14:51:08 +0300
+From: Ville Tervo <ville.tervo@nokia.com>
+To: ext Alan Ott <alan@signal11.us>
+Cc: Jiri Kosina <jkosina@suse.cz>,
+        Stefan Achatz <erazor_de@users.sourceforge.net>,
+        Antonio Ospite <ospite@studenti.unina.it>,
+        Alexey Dobriyan <adobriyan@gmail.com>, Tejun Heo <tj@kernel.org>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        Greg Kroah-Hartman <gregkh@suse.de>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Stephane Chatty <chatty@enac.fr>, Michael Poole <mdpoole@troilus.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Bastien Nocera <hadess@hadess.net>,
+        Eric Dumazet <eric.dumazet@gmail.com>,
+        "linux-input@vger.kernel.org" <linux-input@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH v4 2/2] Bluetooth: hidp: Add support for hidraw
+ HIDIOCGFEATURE  and HIDIOCSFEATURE
+Message-ID: <20100923115108.GC2379@null>
+References: <1281442367.12579.206.camel@localhost.localdomain>
+ <1281990059-3562-3-git-send-email-alan@signal11.us>
 MIME-Version: 1.0
-Date: Thu, 23 Sep 2010 14:06:53 +0200
-Message-ID: <AANLkTinyQbC30-11CgVtjAhcnbykatBFJJ7rxC4v019L@mail.gmail.com>
-Subject: Where "destroying" function definition is ?
-From: =?ISO-8859-2?Q?Rafa=B3_Michalski?= <michalski.raf@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-2
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1281990059-3562-3-git-send-email-alan@signal11.us>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
+Hi Alan,
 
-Does anybody know where "destroying" function is ? - pointer to this function is
-stored in "destroy" field of agent_request structure, but I can't find
-definition
-of this function and place where this pointer (non-NULL) is passed.
-This pointer is used as below - this is a piece of code from BlueZ
-(release 4.71)
-- src/agent.c file.
+One comment.
 
-static void agent_request_free(struct agent_request *req, gboolean destroy)
-{
-	if (req->msg)
-		dbus_message_unref(req->msg);
-	if (req->call)
-		dbus_pending_call_unref(req->call);
-	if (req->agent && req->agent->request)
-		req->agent->request = NULL;
-	if (destroy && req->destroy)
-		req->destroy(req->user_data);
-			/* where is the function that destroy points to ??? */
-	g_free(req);
-}
+On Mon, Aug 16, 2010 at 10:20:59PM +0200, ext Alan Ott wrote:
+> This patch adds support or getting and setting feature reports for bluetooth
+> HID devices from HIDRAW.
+> 
+> Signed-off-by: Alan Ott <alan@signal11.us>
+> ---
+>  net/bluetooth/hidp/core.c |  114 +++++++++++++++++++++++++++++++++++++++++++--
+>  net/bluetooth/hidp/hidp.h |    8 +++
+>  2 files changed, 118 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+> index bfe641b..0e4880e 100644
+> --- a/net/bluetooth/hidp/core.c
+> +++ b/net/bluetooth/hidp/core.c
+> @@ -36,6 +36,7 @@
+>  #include <linux/file.h>
+>  #include <linux/init.h>
+>  #include <linux/wait.h>
+> +#include <linux/mutex.h>
+>  #include <net/sock.h>
+>  
+>  #include <linux/input.h>
+> @@ -313,6 +314,86 @@ static int hidp_send_report(struct hidp_session *session, struct hid_report *rep
+>  	return hidp_queue_report(session, buf, rsize);
+>  }
+>  
+> +static int hidp_get_raw_report(struct hid_device *hid,
+> +		unsigned char report_number,
+> +		unsigned char *data, size_t count,
+> +		unsigned char report_type)
+> +{
+> +	struct hidp_session *session = hid->driver_data;
+> +	struct sk_buff *skb;
+> +	size_t len;
+> +	int numbered_reports = hid->report_enum[report_type].numbered;
+> +
+> +	switch (report_type) {
+> +	case HID_FEATURE_REPORT:
+> +		report_type = HIDP_TRANS_GET_REPORT | HIDP_DATA_RTYPE_FEATURE;
+> +		break;
+> +	case HID_INPUT_REPORT:
+> +		report_type = HIDP_TRANS_GET_REPORT | HIDP_DATA_RTYPE_INPUT;
+> +		break;
+> +	case HID_OUTPUT_REPORT:
+> +		report_type = HIDP_TRANS_GET_REPORT | HIDP_DATA_RTYPE_OUPUT;
+> +		break;
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (mutex_lock_interruptible(&session->report_mutex))
+> +		return -ERESTARTSYS;
+> +
+> +	/* Set up our wait, and send the report request to the device. */
+> +	session->waiting_report_type = report_type & HIDP_DATA_RTYPE_MASK;
+> +	session->waiting_report_number = numbered_reports ? report_number : -1;
+> +	set_bit(HIDP_WAITING_FOR_RETURN, &session->flags);
+> +	data[0] = report_number;
+> +	if (hidp_send_ctrl_message(hid->driver_data, report_type, data, 1))
+> +		goto err_eio;
+> +
+> +	/* Wait for the return of the report. The returned report
+> +	   gets put in session->report_return.  */
+> +	while (test_bit(HIDP_WAITING_FOR_RETURN, &session->flags)) {
+> +		int res;
+> +
+> +		res = wait_event_interruptible_timeout(session->report_queue,
+> +			!test_bit(HIDP_WAITING_FOR_RETURN, &session->flags),
+> +			5*HZ);
+> +		if (res == 0) {
+> +			/* timeout */
+> +			goto err_eio;
+> +		}
+> +		if (res < 0) {
+> +			/* signal */
+> +			goto err_restartsys;
+> +		}
+> +	}
+> +
+> +	skb = session->report_return;
+> +	if (skb) {
+> +		len = skb->len < count ? skb->len : count;
+> +		memcpy(data, skb->data, len);
+> +
+> +		kfree_skb(skb);
+> +		session->report_return = NULL;
+> +	} else {
+> +		/* Device returned a HANDSHAKE, indicating  protocol error. */
+> +		len = -EIO;
+> +	}
+> +
+> +	clear_bit(HIDP_WAITING_FOR_RETURN, &session->flags);
+> +	mutex_unlock(&session->report_mutex);
+> +
+> +	return len;
+> +
+> +err_restartsys:
+> +	clear_bit(HIDP_WAITING_FOR_RETURN, &session->flags);
+> +	mutex_unlock(&session->report_mutex);
+> +	return -ERESTARTSYS;
+> +err_eio:
+> +	clear_bit(HIDP_WAITING_FOR_RETURN, &session->flags);
+> +	mutex_unlock(&session->report_mutex);
+> +	return -EIO;
+> +}
 
-Thanks for any help.
+How about a variable called ret and using that to return len or errno? It
+would eliminate code dublication.
 
-Best regards
-Rafa³ Michalski
+-- 
+Ville
