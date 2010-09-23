@@ -1,85 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 23 Sep 2010 19:25:21 +0300
-From: Ville Tervo <ville.tervo@nokia.com>
-To: ext Alan Ott <alan@signal11.us>
-Cc: Jiri Kosina <jkosina@suse.cz>,
-        Stefan Achatz <erazor_de@users.sourceforge.net>,
-        Antonio Ospite <ospite@studenti.unina.it>,
-        Alexey Dobriyan <adobriyan@gmail.com>, Tejun Heo <tj@kernel.org>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Greg Kroah-Hartman <gregkh@suse.de>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Stephane Chatty <chatty@enac.fr>, Michael Poole <mdpoole@troilus.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Bastien Nocera <hadess@hadess.net>,
-        Eric Dumazet <eric.dumazet@gmail.com>,
-        "linux-input@vger.kernel.org" <linux-input@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH v4 0/2] Get and Set Feature Reports on HIDRAW (USB and
- Bluetooth)
-Message-ID: <20100923162521.GA15641@null>
-References: <1281442367.12579.206.camel@localhost.localdomain>
- <1281990059-3562-1-git-send-email-alan@signal11.us>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1281990059-3562-1-git-send-email-alan@signal11.us>
+Date: Thu, 23 Sep 2010 13:19:42 -0300
+Message-ID: <AANLkTindKFz1fx9cJMu9aSpehG5LaUHHO7TkgWqMzqj=@mail.gmail.com>
+Subject: Pull request: git://git.infradead.org/users/cktakahasi/bluez.git for-upstream
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alan,
+The following changes since commit e7b1d878d15c0eb1bc0109c19cbdf5f84a29394d:
 
-On Mon, Aug 16, 2010 at 10:20:57PM +0200, ext Alan Ott wrote:
-> This is version 4. Built against 2.6.35+ revision 320b2b8de12698 .
+  Fix coding style issues in attribute client code (2010-09-22 16:33:15 -0400)
 
+are available in the git repository at:
+  git://git.infradead.org/users/cktakahasi/bluez.git for-upstream
 
-I gave a try to to this patch using your test tool [1] and very old BT
-keyboard. I don't have anything else ATM to test with. Is there some BT hid
-devices which support setting and getting features?
+Claudio Takahasi (23):
+      Add LE start and stop scanning
+      Remove RSSI field from the advertising report event
+      Decoding the RSSI parameter from the advertising report event
+      Send Discovering property "FALSE" when the interleave finishes
+      Add length argument on hciops start discovery function
+      Stop inquiry using the length parameter
+      Fix remote name resolution for interleave discovery
+      Add Write LE host supported function
+      Set the LE host supported and disable simultaneous LE and BR/EDR flags
+      Add extended feature mask constants definition
+      Read the local extended features
+      Stop LE scanning when discovery is suspended
+      Rename hciops {start, stop}_discovery to {start, stop}_inquiry
+      Don't enter on interleave mode if there isn't active sessions
+      Code cleanup: improving inquiry logic
+      Clear the remote device found list in the state transition
+      Fix periodic inquiry signals
+      Fixing DeviceDisappeared signal
+      Postpone discovery if still resolving names
+      Add adapter discovery type function
+      Do not send another Discovering TRUE signal if still resolving names
+      Forcing periodic inquiry exit
+      Fix interleave scanning
 
-Shouldn't HIDIOCSFEATURE's bt version have similar wait as HIDIOCGFEATURE to
-get report status back from the device? or is there even any status coming back
-in successful case? Sorry I'm a newbie with HID and trying to understand how
-this should work.
+Vinicius Costa Gomes (1):
+      Add BR/EDR LE interleaved discovery
 
-Now it just returns num of send bytes even if the remote device returned some
-error. Which one is the expected behavior?
-
-Other problem is that Get report is getting now handshake from set report.
-
-
-2010-09-23 17:55:46.680612 < ACL data: handle 38 flags 0x02 dlen 9
-    L2CAP(d): cid 0x008b len 5 [psm 17]
-      HIDP: Set report: Feature report
-      0000: 09 ff ff ff                                       ....
-2010-09-23 17:55:46.680653 < ACL data: handle 38 flags 0x02 dlen 6
-    L2CAP(d): cid 0x008b len 2 [psm 17]
-      HIDP: Get report: Feature report
-      0000: 09                                                .
-2010-09-23 17:55:46.697577 > HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 38 packets 1
-2010-09-23 17:55:46.698579 > HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 38 packets 1
-2010-09-23 17:55:46.776827 > ACL data: handle 38 flags 0x02 dlen 5
-    L2CAP(d): cid 0x0040 len 1 [psm 17]
-      HIDP: Handshake: Invalid parameter
-2010-09-23 17:55:46.777069 < ACL data: handle 38 flags 0x02 dlen 7
-    L2CAP(d): cid 0x008b len 3 [psm 17]
-      HIDP: Data: Output report
-      0000: 01 77                                             .w
-2010-09-23 17:55:46.797577 > HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 38 packets 1
-2010-09-23 17:55:46.816826 > ACL data: handle 38 flags 0x02 dlen 5
-    L2CAP(d): cid 0x0040 len 1 [psm 17]
-      HIDP: Handshake: Invalid parameter
-2010-09-23 17:55:46.856828 > ACL data: handle 38 flags 0x02 dlen 5
-    L2CAP(d): cid 0x0040 len 1 [psm 17]
-      HIDP: Handshake: Unsupported request
+ lib/hci.c        |   29 +++++
+ lib/hci.h        |   17 +++-
+ lib/hci_lib.h    |    1 +
+ plugins/hciops.c |   53 +++++++++-
+ src/adapter.c    |  302 +++++++++++++++++++++++++++++++++++++-----------------
+ src/adapter.h    |   37 ++++---
+ src/dbus-hci.c   |   45 +++++++--
+ src/dbus-hci.h   |    1 +
+ src/security.c   |  133 ++++++++++++++----------
+ 9 files changed, 436 insertions(+), 182 deletions(-)
 
 
+Implements interleave discovery for dual mode adapters(LE and BR/EDR).
+Now, the behavior is:
+1) for single mode: LE scanning for 5.12 seconds every DiscoverSchedulerInterval
+2) for BR/EDR only: still the same
+3) for dual mode: inquiry(5.12) sec, LE scanning(5.12) sec, resolve
+names. The next discovery interval is controlled by
+DiscoverSchedulerInterval.
 
-[1] http://lkml.org/lkml/2010/6/17/414
+Signals still the same, the idea is try to hide from the users/apps
+the discovery internals. No mater the adapter type(LE only, BR/EDR or
+Dual Mode)
+PropertyChanged("Discovering", TRUE/FALSE) is sent to notify when a
+new discovery "session" starts/finishes. Found LE devices are reported
+using DeviceFound() signals.
 
+Regards,
+Claudio
 -- 
-Ville the HID newbie
+--
+Claudio Takahasi
+Instituto Nokia de Tecnologia
+Recife - Pernambuco - Brasil
++55 81 30879999
