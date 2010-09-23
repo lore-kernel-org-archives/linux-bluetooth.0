@@ -1,439 +1,190 @@
 Return-Path: <cyrus@holtmann.org>
-From: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+MIME-Version: 1.0
+Date: Thu, 23 Sep 2010 00:46:55 -0700
+Message-ID: <AANLkTi=QaWXz2BEsUJPpXQjvGuGm8CtctJ_q-7WNC=VH@mail.gmail.com>
+Subject: Bluez simple-agent vs agent
+From: Viswanathan Sankararam <developervishwa@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-Subject: [PATCH] Fix headset disconnecting via device disconnect
-Date: Thu, 23 Sep 2010 13:32:31 +0300
-Message-Id: <1285237951-4271-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Headsets for proper disconnecting need to disconnect profiles in specified
-order(by ex. disconnect a2dp, then sink and hfp at the end). Instead of
-adding separate callbacks for disconnecting each profile, now adding only
-one callback in audio/device.c for calling audio disconnect functions in
-correct order. New disconnect callback works similarly to dev_disconnect
-from audio/device.c
----
- audio/device.c  |  138 +++++++++++++++++++++++++++++++++++++------------------
- audio/headset.c |   19 --------
- audio/sink.c    |   29 ------------
- audio/source.c  |   33 -------------
- 4 files changed, 93 insertions(+), 126 deletions(-)
+All,
 
-diff --git a/audio/device.c b/audio/device.c
-index b30590e..eec67be 100644
---- a/audio/device.c
-+++ b/audio/device.c
-@@ -91,7 +91,9 @@ struct dev_priv {
- 	guint control_timer;
- 	guint avdtp_timer;
- 	guint headset_timer;
-+	guint dc_id;
- 
-+	gboolean disconnecting;
- 	gboolean authorized;
- 	guint auth_idle_id;
- };
-@@ -123,6 +125,9 @@ static void device_free(struct audio_device *dev)
- 			dbus_message_unref(priv->dc_req);
- 		if (priv->conn_req)
- 			dbus_message_unref(priv->conn_req);
-+		if (priv->dc_id)
-+			device_remove_disconnect_watch(dev->btd_dev,
-+							priv->dc_id);
- 		g_free(priv);
- 	}
- 
-@@ -145,6 +150,69 @@ static const char *state2str(audio_state_t state)
- 	}
- }
- 
-+static gboolean control_connect_timeout(gpointer user_data)
-+{
-+	struct audio_device *dev = user_data;
-+
-+	dev->priv->control_timer = 0;
-+
-+	if (dev->control)
-+		avrcp_connect(dev);
-+
-+	return FALSE;
-+}
-+
-+static gboolean device_set_control_timer(struct audio_device *dev)
-+{
-+	struct dev_priv *priv = dev->priv;
-+
-+	if (!dev->control)
-+		return FALSE;
-+
-+	if (priv->control_timer)
-+		return FALSE;
-+
-+	priv->control_timer = g_timeout_add_seconds(CONTROL_CONNECT_TIMEOUT,
-+							control_connect_timeout,
-+							dev);
-+
-+	return TRUE;
-+}
-+
-+static void device_remove_control_timer(struct audio_device *dev)
-+{
-+	if (dev->priv->control_timer)
-+		g_source_remove(dev->priv->control_timer);
-+	dev->priv->control_timer = 0;
-+}
-+
-+static void disconnect_cb(struct btd_device *btd_dev, gboolean removal,
-+				void *user_data)
-+{
-+	struct audio_device *dev = user_data;
-+	struct dev_priv *priv = dev->priv;
-+
-+	if (priv->state == AUDIO_STATE_DISCONNECTED)
-+		return;
-+
-+	if (priv->disconnecting)
-+		return;
-+
-+	priv->disconnecting = TRUE;
-+
-+	if (dev->control) {
-+		device_remove_control_timer(dev);
-+		avrcp_disconnect(dev);
-+	}
-+
-+	if (dev->sink && priv->sink_state != SINK_STATE_DISCONNECTED)
-+		sink_shutdown(dev->sink);
-+	else if (priv->hs_state != HEADSET_STATE_DISCONNECTED)
-+		headset_shutdown(dev);
-+	else
-+		priv->disconnecting = FALSE;
-+}
-+
- static void device_set_state(struct audio_device *dev, audio_state_t new_state)
- {
- 	struct dev_priv *priv = dev->priv;
-@@ -155,9 +223,21 @@ static void device_set_state(struct audio_device *dev, audio_state_t new_state)
- 	if (!state_str)
- 		return;
- 
--	if (new_state == AUDIO_STATE_DISCONNECTED)
-+	if (new_state == AUDIO_STATE_DISCONNECTED) {
- 		priv->authorized = FALSE;
- 
-+		if (priv->dc_id) {
-+			device_remove_disconnect_watch(dev->btd_dev,
-+							priv->dc_id);
-+			priv->dc_id = 0;
-+		}
-+	}
-+	else if (new_state == AUDIO_STATE_CONNECTED) {
-+		priv->disconnecting = FALSE;
-+		priv->dc_id = device_add_disconnect_watch(dev->btd_dev,
-+						disconnect_cb, dev, NULL);
-+	}
-+
- 	if (dev->priv->state == new_state) {
- 		DBG("state change attempted from %s to %s",
- 							state_str, state_str);
-@@ -166,11 +246,15 @@ static void device_set_state(struct audio_device *dev, audio_state_t new_state)
- 
- 	dev->priv->state = new_state;
- 
--	if (priv->dc_req && new_state == AUDIO_STATE_DISCONNECTED) {
--		reply = dbus_message_new_method_return(priv->dc_req);
--		dbus_message_unref(priv->dc_req);
--		priv->dc_req = NULL;
--		g_dbus_send_message(dev->conn, reply);
-+	if (new_state == AUDIO_STATE_DISCONNECTED) {
-+		if (priv->dc_req) {
-+			reply = dbus_message_new_method_return(priv->dc_req);
-+			dbus_message_unref(priv->dc_req);
-+			priv->dc_req = NULL;
-+			g_dbus_send_message(dev->conn, reply);
-+		}
-+		else if (priv->disconnecting)
-+			priv->disconnecting = FALSE;
- 	}
- 
- 	if (priv->conn_req && new_state != AUDIO_STATE_CONNECTING) {
-@@ -191,42 +275,6 @@ static void device_set_state(struct audio_device *dev, audio_state_t new_state)
- 				DBUS_TYPE_STRING, &state_str);
- }
- 
--static gboolean control_connect_timeout(gpointer user_data)
--{
--	struct audio_device *dev = user_data;
--
--	dev->priv->control_timer = 0;
--
--	if (dev->control)
--		avrcp_connect(dev);
--
--	return FALSE;
--}
--
--static gboolean device_set_control_timer(struct audio_device *dev)
--{
--	struct dev_priv *priv = dev->priv;
--
--	if (!dev->control)
--		return FALSE;
--
--	if (priv->control_timer)
--		return FALSE;
--
--	priv->control_timer = g_timeout_add_seconds(CONTROL_CONNECT_TIMEOUT,
--							control_connect_timeout,
--							dev);
--
--	return TRUE;
--}
--
--static void device_remove_control_timer(struct audio_device *dev)
--{
--	if (dev->priv->control_timer)
--		g_source_remove(dev->priv->control_timer);
--	dev->priv->control_timer = 0;
--}
--
- static gboolean avdtp_connect_timeout(gpointer user_data)
- {
- 	struct audio_device *dev = user_data;
-@@ -348,7 +396,7 @@ static void device_sink_cb(struct audio_device *dev,
- 			avrcp_disconnect(dev);
- 		}
- 		if (priv->hs_state != HEADSET_STATE_DISCONNECTED &&
--								priv->dc_req) {
-+				(priv->dc_req || priv->disconnecting)) {
- 			headset_shutdown(dev);
- 			break;
- 		}
-@@ -427,8 +475,8 @@ static void device_headset_cb(struct audio_device *dev,
- 	switch (new_state) {
- 	case HEADSET_STATE_DISCONNECTED:
- 		device_remove_avdtp_timer(dev);
--		if (priv->sink_state != SINK_STATE_DISCONNECTED &&
--						dev->sink && priv->dc_req) {
-+		if (priv->sink_state != SINK_STATE_DISCONNECTED && dev->sink &&
-+				(priv->dc_req || priv->disconnecting)) {
- 			sink_shutdown(dev->sink);
- 			break;
- 		}
-diff --git a/audio/headset.c b/audio/headset.c
-index dad0716..9955d4b 100644
---- a/audio/headset.c
-+++ b/audio/headset.c
-@@ -158,7 +158,6 @@ struct headset {
- 	GIOChannel *tmp_rfcomm;
- 	GIOChannel *sco;
- 	guint sco_id;
--	guint dc_id;
- 
- 	gboolean auto_dc;
- 
-@@ -2162,9 +2161,6 @@ static void headset_free(struct audio_device *dev)
- 		hs->dc_timer = 0;
- 	}
- 
--	if (hs->dc_id)
--		device_remove_disconnect_watch(dev->btd_dev, hs->dc_id);
--
- 	close_sco(dev);
- 
- 	headset_close_rfcomm(dev);
-@@ -2477,16 +2473,6 @@ int headset_connect_sco(struct audio_device *dev, GIOChannel *io)
- 	return 0;
- }
- 
--static void disconnect_cb(struct btd_device *btd_dev, gboolean removal,
--				void *user_data)
--{
--	struct audio_device *device = user_data;
--
--	info("Headset: disconnect %s", device->path);
--
--	headset_shutdown(device);
--}
--
- void headset_set_state(struct audio_device *dev, headset_state_t state)
- {
- 	struct headset *hs = dev->headset;
-@@ -2520,8 +2506,6 @@ void headset_set_state(struct audio_device *dev, headset_state_t state)
- 			telephony_device_disconnected(dev);
- 		}
- 		active_devices = g_slist_remove(active_devices, dev);
--		device_remove_disconnect_watch(dev->btd_dev, hs->dc_id);
--		hs->dc_id = 0;
- 		break;
- 	case HEADSET_STATE_CONNECTING:
- 		emit_property_changed(dev->conn, dev->path,
-@@ -2550,9 +2534,6 @@ void headset_set_state(struct audio_device *dev, headset_state_t state)
- 						DBUS_TYPE_BOOLEAN, &value);
- 			active_devices = g_slist_append(active_devices, dev);
- 			telephony_device_connected(dev);
--			hs->dc_id = device_add_disconnect_watch(dev->btd_dev,
--								disconnect_cb,
--								dev, NULL);
- 		} else if (hs->state == HEADSET_STATE_PLAYING) {
- 			value = FALSE;
- 			g_dbus_emit_signal(dev->conn, dev->path,
-diff --git a/audio/sink.c b/audio/sink.c
-index 67cffee..eb90c21 100644
---- a/audio/sink.c
-+++ b/audio/sink.c
-@@ -61,7 +61,6 @@ struct sink {
- 	struct avdtp *session;
- 	struct avdtp_stream *stream;
- 	unsigned int cb_id;
--	guint dc_id;
- 	guint retry_id;
- 	avdtp_session_state_t session_state;
- 	avdtp_state_t stream_state;
-@@ -140,11 +139,6 @@ static void avdtp_state_callback(struct audio_device *dev,
- 			emit_property_changed(dev->conn, dev->path,
- 					AUDIO_SINK_INTERFACE, "Connected",
- 					DBUS_TYPE_BOOLEAN, &value);
--			if (sink->dc_id) {
--				device_remove_disconnect_watch(dev->btd_dev,
--								sink->dc_id);
--				sink->dc_id = 0;
--			}
- 		}
- 		sink_set_state(dev, SINK_STATE_DISCONNECTED);
- 		break;
-@@ -171,17 +165,6 @@ static void pending_request_free(struct audio_device *dev,
- 	g_free(pending);
- }
- 
--static void disconnect_cb(struct btd_device *btd_dev, gboolean removal,
--				void *user_data)
--{
--	struct audio_device *device = user_data;
--	struct sink *sink = device->sink;
--
--	DBG("Sink: disconnect %s", device->path);
--
--	avdtp_close(sink->session, sink->stream, TRUE);
--}
--
- static void stream_state_changed(struct avdtp_stream *stream,
- 					avdtp_state_t old_state,
- 					avdtp_state_t new_state,
-@@ -209,12 +192,6 @@ static void stream_state_changed(struct avdtp_stream *stream,
- 			pending_request_free(dev, p);
- 		}
- 
--		if (sink->dc_id) {
--			device_remove_disconnect_watch(dev->btd_dev,
--							sink->dc_id);
--			sink->dc_id = 0;
--		}
--
- 		if (sink->session) {
- 			avdtp_unref(sink->session);
- 			sink->session = NULL;
-@@ -234,9 +211,6 @@ static void stream_state_changed(struct avdtp_stream *stream,
- 						AUDIO_SINK_INTERFACE,
- 						"Connected",
- 						DBUS_TYPE_BOOLEAN, &value);
--			sink->dc_id = device_add_disconnect_watch(dev->btd_dev,
--								disconnect_cb,
--								dev, NULL);
- 		} else if (old_state == AVDTP_STATE_STREAMING) {
- 			value = FALSE;
- 			g_dbus_emit_signal(dev->conn, dev->path,
-@@ -601,9 +575,6 @@ static void sink_free(struct audio_device *dev)
- 		avdtp_stream_remove_cb(sink->session, sink->stream,
- 					sink->cb_id);
- 
--	if (sink->dc_id)
--		device_remove_disconnect_watch(dev->btd_dev, sink->dc_id);
--
- 	if (sink->session)
- 		avdtp_unref(sink->session);
- 
-diff --git a/audio/source.c b/audio/source.c
-index 01173f5..e8671ed 100644
---- a/audio/source.c
-+++ b/audio/source.c
-@@ -62,7 +62,6 @@ struct source {
- 	struct avdtp *session;
- 	struct avdtp_stream *stream;
- 	unsigned int cb_id;
--	guint dc_id;
- 	guint retry_id;
- 	avdtp_session_state_t session_state;
- 	avdtp_state_t stream_state;
-@@ -133,12 +132,6 @@ static void avdtp_state_callback(struct audio_device *dev,
- 
- 	switch (new_state) {
- 	case AVDTP_SESSION_STATE_DISCONNECTED:
--		if (source->state != SOURCE_STATE_CONNECTING &&
--				source->dc_id) {
--			device_remove_disconnect_watch(dev->btd_dev,
--							source->dc_id);
--			source->dc_id = 0;
--		}
- 		source_set_state(dev, SOURCE_STATE_DISCONNECTED);
- 		break;
- 	case AVDTP_SESSION_STATE_CONNECTING:
-@@ -164,17 +157,6 @@ static void pending_request_free(struct audio_device *dev,
- 	g_free(pending);
- }
- 
--static void disconnect_cb(struct btd_device *btd_dev, gboolean removal,
--				void *user_data)
--{
--	struct audio_device *device = user_data;
--	struct source *source = device->source;
--
--	DBG("Source: disconnect %s", device->path);
--
--	avdtp_close(source->session, source->stream, TRUE);
--}
--
- static void stream_state_changed(struct avdtp_stream *stream,
- 					avdtp_state_t old_state,
- 					avdtp_state_t new_state,
-@@ -201,12 +183,6 @@ static void stream_state_changed(struct avdtp_stream *stream,
- 			pending_request_free(dev, p);
- 		}
- 
--		if (source->dc_id) {
--			device_remove_disconnect_watch(dev->btd_dev,
--							source->dc_id);
--			source->dc_id = 0;
--		}
--
- 		if (source->session) {
- 			avdtp_unref(source->session);
- 			source->session = NULL;
-@@ -215,12 +191,6 @@ static void stream_state_changed(struct avdtp_stream *stream,
- 		source->cb_id = 0;
- 		break;
- 	case AVDTP_STATE_OPEN:
--		if (old_state == AVDTP_STATE_CONFIGURED &&
--				source->state == SOURCE_STATE_CONNECTING) {
--			source->dc_id = device_add_disconnect_watch(dev->btd_dev,
--								disconnect_cb,
--								dev, NULL);
--		}
- 		source_set_state(dev, SOURCE_STATE_CONNECTED);
- 		break;
- 	case AVDTP_STATE_STREAMING:
-@@ -536,9 +506,6 @@ static void source_free(struct audio_device *dev)
- 		avdtp_stream_remove_cb(source->session, source->stream,
- 					source->cb_id);
- 
--	if (source->dc_id)
--		device_remove_disconnect_watch(dev->btd_dev, source->dc_id);
--
- 	if (source->session)
- 		avdtp_unref(source->session);
- 
--- 
-1.7.0.4
+I am new to bluetooth and bluez. I am having problems pairing my
+bluetooth keyboard to my target that does not have python and so in
+order to pair, I have compiled the agent application. My target has
+Bluez 4.47. But I have not been able to get it to pair. After running
 
+agent -a hci0 1234 00:1F:20:06:47:65
+
+I get asked to enter the pin on the bt keyboard and then it says Agent
+is released. When I list devices using
+
+dbus-send --system --dest=org.bluez --print-reply $BTADAPTER
+org.bluez.Adapter.ListDevices
+
+I see it in the list and when I repeat the command, it disappears.
+
+When I log on to my gentoo machine to pair the bt keyboard, I am able
+to pair with the simple-agent python script but not the agent
+application. The way the agent application behaves is the same as it
+behaves when I use it on the target.My gentoo system uses Bluez 4.69.
+Below is the log when I run bluetoothd with the -d option for the
+simple-agent case and the agent C program case. As you can see, in the
+simple-agent case, the device_probe_drivers gets called but in the
+agent.c case, discover_services_req_exit gets called. This is the
+place where they diverge. Also, I am not sure why the dbus system
+daemon is rejecting a message from agent to org.bluez. I am nto sure
+if its related. I am not able to proceed from here. Has any one faced
+this kind of issue? Please advice me on how to proceed. I would really
+appreciate it.
+
+Thanks
+Vishwa
+
+simple-agent:
+
+Sep 22 22:59:40 Zatoichi
+bluetoothd[7042]:src/adapter.c:adapter_get_device() 00:1F:20:06:47:65
+Sep 22 22:59:40 Zatoichi bluetoothd[7042]:
+src/adapter.c:adapter_create_device() 00:1F:20:06:47:65
+Sep 22 22:59:40 Zatoichi bluetoothd[7042]:
+src/device.c:device_create() Creating device
+/org/bluez/7041/hci0/dev_00_1F_20_06_47_65
+Sep 22 22:59:40 Zatoichi bluetoothd[7042]:
+src/device.c:btd_device_ref() 0xb899f6b8: ref=1
+Sep 22 22:59:40 Zatoichi bluetoothd[7042]:
+src/device.c:bonding_request_new()
+/org/bluez/7041/hci0/dev_00_1F_20_06_47_65: requesting bonding
+Sep 22 22:59:40 Zatoichi bluetoothd[7042]:
+src/device.c:bonding_request_new() Temporary agent registered for
+/org/bluez/7041/hci0/dev_00_1F_20_06_47_65 at :1.29:/test/agent
+Sep 22 22:59:41 Zatoichi bluetoothd[7042]:
+src/adapter.c:adapter_get_device() 00:1F:20:06:47:65
+Sep 22 22:59:41 Zatoichi bluetoothd[7042]: Authentication requested
+Sep 22 22:59:41 Zatoichi bluetoothd[7042]: link_key_request
+(sba=40:61:86:A5:0E:E1, dba=00:1F:20:06:47:65)
+Sep 22 22:59:41 Zatoichi bluetoothd[7042]:
+src/security.c:link_key_request() kernel auth requirements = 0x03
+Sep 22 22:59:41 Zatoichi bluetoothd[7042]: pin_code_request
+(sba=40:61:86:A5:0E:E1, dba=00:1F:20:06:47:65)
+Sep 22 22:59:41 Zatoichi bluetoothd[7042]:
+src/adapter.c:adapter_get_device() 00:1F:20:06:47:65
+Sep 22 22:59:41 Zatoichi bluetoothd[7042]:
+src/device.c:device_request_authentication()
+/org/bluez/7041/hci0/dev_00_1F_20_06_47_65: requesting agent
+authentication
+Sep 22 22:59:47 Zatoichi bluetoothd[7042]: link_key_notify
+(sba=40:61:86:A5:0E:E1, dba=00:1F:20:06:47:65, type=0)
+Sep 22 22:59:47 Zatoichi bluetoothd[7042]:
+src/adapter.c:adapter_get_device() 00:1F:20:06:47:65
+Sep 22 22:59:47 Zatoichi bluetoothd[7042]:
+src/dbus-hci.c:hcid_dbus_link_key_notify() key type 0x00 old key type
+0xff new key type 0x00
+Sep 22 22:59:47 Zatoichi bluetoothd[7042]:
+src/dbus-hci.c:hcid_dbus_link_key_notify() local auth 0x03 and remote
+auth 0xff
+Sep 22 22:59:47 Zatoichi bluetoothd[7042]:
+src/dbus-hci.c:hcid_dbus_link_key_notify() storing link key of type
+0x00
+Sep 22 22:59:47 Zatoichi bluetoothd[7042]:
+src/dbus-hci.c:hcid_dbus_bonding_process_complete() status=00
+Sep 22 22:59:47 Zatoichi bluetoothd[7042]:
+src/adapter.c:adapter_get_device() 00:1F:20:06:47:65
+Sep 22 22:59:47 Zatoichi bluetoothd[7042]:
+src/device.c:btd_device_ref() 0xb899f6b8: ref=2
+Sep 22 22:59:47 Zatoichi bluetoothd[7042]: src/agent.c:agent_release()
+Releasing agent :1.29, /test/agent
+Sep 22 22:59:47 Zatoichi dbus-daemon: [system] Rejected send message,
+1 matched rules; type="method_return", sender=":1.29" (uid=0 pid=7790
+comm="/usr/bin/python2.6) interface="(unset)" member="(unset)" error
+name="(unset)" requested_reply=0 destination=":1.12" (uid=0 pid=7041
+comm="/usr/sbin/bluetoothd))
+Sep 22 22:59:48 Zatoichi bluetoothd[7042]:
+src/device.c:device_probe_drivers() Probe drivers for
+/org/bluez/7041/hci0/dev_00_1F_20_06_47_65
+Sep 22 22:59:48 Zatoichi bluetoothd[7042]:
+input/manager.c:hid_device_probe() path
+/org/bluez/7041/hci0/dev_00_1F_20_06_47_65
+Sep 22 22:59:48 Zatoichi bluetoothd[7042]:
+src/device.c:btd_device_ref() 0xb899f6b8: ref=3
+Sep 22 22:59:48 Zatoichi bluetoothd[7042]:
+input/device.c:input_device_new() Registered interface org.bluez.Input
+on path /org/bluez/7041/hci0/dev_00_1F_20_06_47_65
+Sep 22 22:59:48 Zatoichi bluetoothd[7042]:
+src/device.c:btd_device_unref() 0xb899f6b8: ref=2
+
+agent.c:
+
+Sep 23 00:14:34 Zatoichi bluetoothd[7042]:
+src/adapter.c:adapter_get_device() 00:1F:20:06:47:65
+Sep 23 00:14:34 Zatoichi bluetoothd[7042]:
+src/adapter.c:adapter_create_device() 00:1F:20:06:47:65
+Sep 23 00:14:34 Zatoichi bluetoothd[7042]:
+src/device.c:device_create() Creating device
+/org/bluez/7041/hci0/dev_00_1F_20_06_47_65
+Sep 23 00:14:34 Zatoichi bluetoothd[7042]:
+src/device.c:btd_device_ref() 0xb899f6b8: ref=1
+Sep 23 00:14:34 Zatoichi bluetoothd[7042]:
+src/device.c:bonding_request_new()
+/org/bluez/7041/hci0/dev_00_1F_20_06_47_65: requesting bonding
+Sep 23 00:14:34 Zatoichi bluetoothd[7042]:
+src/device.c:bonding_request_new() Temporary agent registered for
+/org/bluez/7041/hci0/dev_00_1F_20_06_47_65 at
+:1.35:/org/bluez/agent_8004
+Sep 23 00:14:35 Zatoichi bluetoothd[7042]:
+src/adapter.c:adapter_get_device() 00:1F:20:06:47:65
+Sep 23 00:14:35 Zatoichi bluetoothd[7042]: Authentication requested
+Sep 23 00:14:35 Zatoichi bluetoothd[7042]: link_key_request
+(sba=40:61:86:A5:0E:E1, dba=00:1F:20:06:47:65)
+Sep 23 00:14:35 Zatoichi bluetoothd[7042]:
+src/security.c:link_key_request() kernel auth requirements = 0x03
+Sep 23 00:14:35 Zatoichi bluetoothd[7042]: pin_code_request
+(sba=40:61:86:A5:0E:E1, dba=00:1F:20:06:47:65)
+Sep 23 00:14:35 Zatoichi bluetoothd[7042]:
+src/adapter.c:adapter_get_device() 00:1F:20:06:47:65
+Sep 23 00:14:35 Zatoichi bluetoothd[7042]:
+src/device.c:device_request_authentication()
+/org/bluez/7041/hci0/dev_00_1F_20_06_47_65: requesting agent
+authentication
+Sep 23 00:14:38 Zatoichi bluetoothd[7042]: link_key_notify
+(sba=40:61:86:A5:0E:E1, dba=00:1F:20:06:47:65, type=0)
+Sep 23 00:14:38 Zatoichi bluetoothd[7042]:
+src/adapter.c:adapter_get_device() 00:1F:20:06:47:65
+Sep 23 00:14:38 Zatoichi bluetoothd[7042]:
+src/dbus-hci.c:hcid_dbus_link_key_notify() key type 0x00 old key type
+0xff new key type 0x00
+Sep 23 00:14:38 Zatoichi bluetoothd[7042]:
+src/dbus-hci.c:hcid_dbus_link_key_notify() local auth 0x03 and remote
+auth 0xff
+Sep 23 00:14:38 Zatoichi bluetoothd[7042]:
+src/dbus-hci.c:hcid_dbus_link_key_notify() storing link key of type
+0x00
+Sep 23 00:14:38 Zatoichi bluetoothd[7042]:
+src/dbus-hci.c:hcid_dbus_bonding_process_complete() status=00
+Sep 23 00:14:38 Zatoichi bluetoothd[7042]:
+src/adapter.c:adapter_get_device() 00:1F:20:06:47:65
+Sep 23 00:14:38 Zatoichi bluetoothd[7042]:
+src/device.c:btd_device_ref() 0xb899f6b8: ref=2
+Sep 23 00:14:38 Zatoichi bluetoothd[7042]: src/agent.c:agent_release()
+Releasing agent :1.35, /org/bluez/agent_8004
+Sep 23 00:14:38 Zatoichi dbus-daemon: [system] Rejected send message,
+1 matched rules; type="method_return", sender=":1.35" (uid=1000
+pid=8004 comm="./agent) interface="(unset)" member="(unset)" error
+name="(unset)" requested_reply=0 destination=":1.12" (uid=0 pid=7041
+comm="/usr/sbin/bluetoothd))
+Sep 23 00:14:38 Zatoichi bluetoothd[7042]:
+src/device.c:discover_services_req_exit() DiscoverServices requestor
+exited
+Sep 23 00:14:38 Zatoichi bluetoothd[7042]:
+src/device.c:btd_device_unref() 0xb899f6b8: ref=1
+Sep 23 00:14:40 Zatoichi bluetoothd[7042]:
+src/adapter.c:adapter_remove_connection() Removing temporary device
+/org/bluez/7041/hci0/dev_00_1F_20_06_47_65
+Sep 23 00:14:40 Zatoichi bluetoothd[7042]:
+src/device.c:device_remove() Removing device
+/org/bluez/7041/hci0/dev_00_1F_20_06_47_65
+Sep 23 00:14:40 Zatoichi bluetoothd[7042]:
+src/device.c:btd_device_unref() 0xb899f6b8: ref=0
+Sep 23 00:14:40 Zatoichi bluetoothd[7042]: src/device.c:device_free() 0xb899f6b8
