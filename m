@@ -1,220 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <AANLkTikS2-eKiEP2ngqz6rW5JB-+eudtffw9QHykhbqq@mail.gmail.com>
-References: <AANLkTi=QaWXz2BEsUJPpXQjvGuGm8CtctJ_q-7WNC=VH@mail.gmail.com>
-	<AANLkTikS2-eKiEP2ngqz6rW5JB-+eudtffw9QHykhbqq@mail.gmail.com>
-Date: Thu, 23 Sep 2010 06:36:13 -0700
-Message-ID: <AANLkTikAHAKe2WDMuAKEvCXh6jxGXFYYhfWPJkCGXUSp@mail.gmail.com>
-Subject: Fwd: Bluez simple-agent vs agent
-From: Paul Matz <paul@osterhoutgroup.com>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH] Add test/test-attrib for testing Attribute API
+Date: Thu, 23 Sep 2010 09:35:24 -0400
+Message-Id: <1285248924-12834-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a script that will allow us to generate the proper dbus
-messages for the pin exchange.  I'm not really sure how it works since
-I haven't read much about the dbus IPC protocol.  Interestingly
-enough, it's checked into the linux kernel tree.  Could this be the
-source to the simple-agent binary in the  bluez tar file?
-http://git.kernel.org/?p=bluetooth/bluez.git;a=blob_plain;f=test/simple-agent;hb=HEAD
+This is an initial version. Watcher registration is not working properly
+yet. For now it will list all characteristics and its properties.
+---
+ test/test-attrib |   93 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 93 insertions(+), 0 deletions(-)
+ create mode 100755 test/test-attrib
 
-This is the python library that is required by the simple-agent script.
-http://dbus.freedesktop.org/releases/dbus-python/
+diff --git a/test/test-attrib b/test/test-attrib
+new file mode 100755
+index 0000000..bf3334b
+--- /dev/null
++++ b/test/test-attrib
+@@ -0,0 +1,93 @@
++#!/usr/bin/python
++import sys
++from optparse import OptionParser
++from xml.etree import ElementTree as ET
++from binascii import hexlify
++
++#import gobject
++import dbus
++#import dbus.service
++#import dbus.mainloop.glib
++
++#TEMPERATURE_UUID = "0000a006-0000-1000-8000-00805f9b34fb"
++
++def command_parse():
++    """Parse command line options."""
++
++    usage = """
++    Usage: %s [options]"""
++    parser = OptionParser(usage=usage)
++    parser.add_option("-i", "--adapter", action="store", type="string",
++            dest="adapter", help="Specify local adapter interface")
++    return parser.parse_args()
++
++# FIXME: implement a better way of discovering GATT services
++def gatt_services(device_path):
++    """Get GATT services for a given device."""
++
++    intro = dbus.Interface(bus.get_object("org.bluez", device_path),
++            "org.freedesktop.DBus.Introspectable")
++    tree = ET.fromstring(intro.Introspect())
++    services = [n.attrib["name"] for n in tree.getiterator("node")]
++    services = filter(lambda x: x.startswith("service"), services)
++    services = map(lambda x: device_path + "/" + x, services)
++
++    return services
++
++def characteristics(service_path):
++    """Get characteristics for a given GATT service."""
++
++    char = dbus.Interface(bus.get_object("org.bluez", service_path),
++            "org.bluez.Characteristic")
++
++    return char.GetCharacteristics()
++
++def dbus_type_str(d):
++    """Convert a D-Bus array to a hexdump."""
++
++    if isinstance(d, dbus.Array):
++        return hexlify("".join([str(x) for x in d]))
++    else:
++        return str(d)
++
++#class Watcher(dbus.service.Object):
++#    @dbus.service.method("org.bluez.Watcher", in_signature="oay", out_signature="")
++#    def ValueChanged(self, char, newvalue):
++#        print "XXX: new value for %s: %s" % (char, newvalue)
++
++if __name__ == "__main__":
++    #dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
++    bus = dbus.SystemBus()
++    manager = dbus.Interface(bus.get_object("org.bluez", "/"),
++            "org.bluez.Manager")
++
++    (options, args) = command_parse()
++
++    if options.adapter:
++        path = manager.FindAdapter(options.adapter)
++    else:
++        path = manager.DefaultAdapter()
++
++    adapter = dbus.Interface(bus.get_object("org.bluez", path),
++            "org.bluez.Adapter")
++
++    #watcher = None
++
++    for d in adapter.GetProperties()["Devices"]:
++        for s in gatt_services(d):
++            for (path, props) in characteristics(s).iteritems():
++                ret = "Characteristic: %s\nProperties:\n" % path
++                for (k, v) in props.iteritems():
++                    # FIXME: Watcher registration not working properly. We
++                    # still need to figure out how to properly create the
++                    # Object whose ValueChanged() method will be called
++                    #if (k, v) == ["UUID", TEMPERATURE_UUID]:
++                    #    char = dbus.Interface(bus.get_object("org.bluez", s),
++                    #            "org.bluez.Characteristic")
++                    #    watcher = Watcher(bus, path)
++                    #    char.RegisterCharacteristicsWatcher(path)
++                    ret += "\t%s: %s\n" % (k, dbus_type_str(v))
++                print ret
++
++    #mainloop = gobject.MainLoop()
++    #mainloop.run()
+-- 
+1.7.0.4
 
-This works on a desktop, but we have an embedded system we are working
-on that does not have the python stuff installed.
-What I'm trying to figure out is how to create an agent that does what
-the python script does.
-One other problem I've got is that I can't get bluetoothd to generate
-debug output.  Starting it with -d, where does it write it's debug
-output?  /var/log/messages?  Doesn't seem to.
-
--PEM
-
-On Thu, Sep 23, 2010 at 12:46 AM, Viswanathan Sankararam
-<developervishwa@gmail.com> wrote:
->
-> All,
->
-> I am new to bluetooth and bluez. I am having problems pairing my
-> bluetooth keyboard to my target that does not have python and so in
-> order to pair, I have compiled the agent application. My target has
-> Bluez 4.47. But I have not been able to get it to pair. After running
->
-> agent -a hci0 1234 00:1F:20:06:47:65
->
-> I get asked to enter the pin on the bt keyboard and then it says Agent
-> is released. When I list devices using
->
-> dbus-send --system --dest=org.bluez --print-reply $BTADAPTER
-> org.bluez.Adapter.ListDevices
->
-> I see it in the list and when I repeat the command, it disappears.
->
-> When I log on to my gentoo machine to pair the bt keyboard, I am able
-> to pair with the simple-agent python script but not the agent
-> application. The way the agent application behaves is the same as it
-> behaves when I use it on the target.My gentoo system uses Bluez 4.69.
-> Below is the log when I run bluetoothd with the -d option for the
-> simple-agent case and the agent C program case. As you can see, in the
-> simple-agent case, the device_probe_drivers gets called but in the
-> agent.c case, discover_services_req_exit gets called. This is the
-> place where they diverge. Also, I am not sure why the dbus system
-> daemon is rejecting a message from agent to org.bluez. I am nto sure
-> if its related. I am not able to proceed from here. Has any one faced
-> this kind of issue? Please advice me on how to proceed. I would really
-> appreciate it.
->
-> Thanks
-> Vishwa
->
-> simple-agent:
->
-> Sep 22 22:59:40 Zatoichi
-> bluetoothd[7042]:src/adapter.c:adapter_get_device() 00:1F:20:06:47:65
-> Sep 22 22:59:40 Zatoichi bluetoothd[7042]:
-> src/adapter.c:adapter_create_device() 00:1F:20:06:47:65
-> Sep 22 22:59:40 Zatoichi bluetoothd[7042]:
-> src/device.c:device_create() Creating device
-> /org/bluez/7041/hci0/dev_00_1F_20_06_47_65
-> Sep 22 22:59:40 Zatoichi bluetoothd[7042]:
-> src/device.c:btd_device_ref() 0xb899f6b8: ref=1
-> Sep 22 22:59:40 Zatoichi bluetoothd[7042]:
-> src/device.c:bonding_request_new()
-> /org/bluez/7041/hci0/dev_00_1F_20_06_47_65: requesting bonding
-> Sep 22 22:59:40 Zatoichi bluetoothd[7042]:
-> src/device.c:bonding_request_new() Temporary agent registered for
-> /org/bluez/7041/hci0/dev_00_1F_20_06_47_65 at :1.29:/test/agent
-> Sep 22 22:59:41 Zatoichi bluetoothd[7042]:
-> src/adapter.c:adapter_get_device() 00:1F:20:06:47:65
-> Sep 22 22:59:41 Zatoichi bluetoothd[7042]: Authentication requested
-> Sep 22 22:59:41 Zatoichi bluetoothd[7042]: link_key_request
-> (sba=40:61:86:A5:0E:E1, dba=00:1F:20:06:47:65)
-> Sep 22 22:59:41 Zatoichi bluetoothd[7042]:
-> src/security.c:link_key_request() kernel auth requirements = 0x03
-> Sep 22 22:59:41 Zatoichi bluetoothd[7042]: pin_code_request
-> (sba=40:61:86:A5:0E:E1, dba=00:1F:20:06:47:65)
-> Sep 22 22:59:41 Zatoichi bluetoothd[7042]:
-> src/adapter.c:adapter_get_device() 00:1F:20:06:47:65
-> Sep 22 22:59:41 Zatoichi bluetoothd[7042]:
-> src/device.c:device_request_authentication()
-> /org/bluez/7041/hci0/dev_00_1F_20_06_47_65: requesting agent
-> authentication
-> Sep 22 22:59:47 Zatoichi bluetoothd[7042]: link_key_notify
-> (sba=40:61:86:A5:0E:E1, dba=00:1F:20:06:47:65, type=0)
-> Sep 22 22:59:47 Zatoichi bluetoothd[7042]:
-> src/adapter.c:adapter_get_device() 00:1F:20:06:47:65
-> Sep 22 22:59:47 Zatoichi bluetoothd[7042]:
-> src/dbus-hci.c:hcid_dbus_link_key_notify() key type 0x00 old key type
-> 0xff new key type 0x00
-> Sep 22 22:59:47 Zatoichi bluetoothd[7042]:
-> src/dbus-hci.c:hcid_dbus_link_key_notify() local auth 0x03 and remote
-> auth 0xff
-> Sep 22 22:59:47 Zatoichi bluetoothd[7042]:
-> src/dbus-hci.c:hcid_dbus_link_key_notify() storing link key of type
-> 0x00
-> Sep 22 22:59:47 Zatoichi bluetoothd[7042]:
-> src/dbus-hci.c:hcid_dbus_bonding_process_complete() status=00
-> Sep 22 22:59:47 Zatoichi bluetoothd[7042]:
-> src/adapter.c:adapter_get_device() 00:1F:20:06:47:65
-> Sep 22 22:59:47 Zatoichi bluetoothd[7042]:
-> src/device.c:btd_device_ref() 0xb899f6b8: ref=2
-> Sep 22 22:59:47 Zatoichi bluetoothd[7042]: src/agent.c:agent_release()
-> Releasing agent :1.29, /test/agent
-> Sep 22 22:59:47 Zatoichi dbus-daemon: [system] Rejected send message,
-> 1 matched rules; type="method_return", sender=":1.29" (uid=0 pid=7790
-> comm="/usr/bin/python2.6) interface="(unset)" member="(unset)" error
-> name="(unset)" requested_reply=0 destination=":1.12" (uid=0 pid=7041
-> comm="/usr/sbin/bluetoothd))
-> Sep 22 22:59:48 Zatoichi bluetoothd[7042]:
-> src/device.c:device_probe_drivers() Probe drivers for
-> /org/bluez/7041/hci0/dev_00_1F_20_06_47_65
-> Sep 22 22:59:48 Zatoichi bluetoothd[7042]:
-> input/manager.c:hid_device_probe() path
-> /org/bluez/7041/hci0/dev_00_1F_20_06_47_65
-> Sep 22 22:59:48 Zatoichi bluetoothd[7042]:
-> src/device.c:btd_device_ref() 0xb899f6b8: ref=3
-> Sep 22 22:59:48 Zatoichi bluetoothd[7042]:
-> input/device.c:input_device_new() Registered interface org.bluez.Input
-> on path /org/bluez/7041/hci0/dev_00_1F_20_06_47_65
-> Sep 22 22:59:48 Zatoichi bluetoothd[7042]:
-> src/device.c:btd_device_unref() 0xb899f6b8: ref=2
->
-> agent.c:
->
-> Sep 23 00:14:34 Zatoichi bluetoothd[7042]:
-> src/adapter.c:adapter_get_device() 00:1F:20:06:47:65
-> Sep 23 00:14:34 Zatoichi bluetoothd[7042]:
-> src/adapter.c:adapter_create_device() 00:1F:20:06:47:65
-> Sep 23 00:14:34 Zatoichi bluetoothd[7042]:
-> src/device.c:device_create() Creating device
-> /org/bluez/7041/hci0/dev_00_1F_20_06_47_65
-> Sep 23 00:14:34 Zatoichi bluetoothd[7042]:
-> src/device.c:btd_device_ref() 0xb899f6b8: ref=1
-> Sep 23 00:14:34 Zatoichi bluetoothd[7042]:
-> src/device.c:bonding_request_new()
-> /org/bluez/7041/hci0/dev_00_1F_20_06_47_65: requesting bonding
-> Sep 23 00:14:34 Zatoichi bluetoothd[7042]:
-> src/device.c:bonding_request_new() Temporary agent registered for
-> /org/bluez/7041/hci0/dev_00_1F_20_06_47_65 at
-> :1.35:/org/bluez/agent_8004
-> Sep 23 00:14:35 Zatoichi bluetoothd[7042]:
-> src/adapter.c:adapter_get_device() 00:1F:20:06:47:65
-> Sep 23 00:14:35 Zatoichi bluetoothd[7042]: Authentication requested
-> Sep 23 00:14:35 Zatoichi bluetoothd[7042]: link_key_request
-> (sba=40:61:86:A5:0E:E1, dba=00:1F:20:06:47:65)
-> Sep 23 00:14:35 Zatoichi bluetoothd[7042]:
-> src/security.c:link_key_request() kernel auth requirements = 0x03
-> Sep 23 00:14:35 Zatoichi bluetoothd[7042]: pin_code_request
-> (sba=40:61:86:A5:0E:E1, dba=00:1F:20:06:47:65)
-> Sep 23 00:14:35 Zatoichi bluetoothd[7042]:
-> src/adapter.c:adapter_get_device() 00:1F:20:06:47:65
-> Sep 23 00:14:35 Zatoichi bluetoothd[7042]:
-> src/device.c:device_request_authentication()
-> /org/bluez/7041/hci0/dev_00_1F_20_06_47_65: requesting agent
-> authentication
-> Sep 23 00:14:38 Zatoichi bluetoothd[7042]: link_key_notify
-> (sba=40:61:86:A5:0E:E1, dba=00:1F:20:06:47:65, type=0)
-> Sep 23 00:14:38 Zatoichi bluetoothd[7042]:
-> src/adapter.c:adapter_get_device() 00:1F:20:06:47:65
-> Sep 23 00:14:38 Zatoichi bluetoothd[7042]:
-> src/dbus-hci.c:hcid_dbus_link_key_notify() key type 0x00 old key type
-> 0xff new key type 0x00
-> Sep 23 00:14:38 Zatoichi bluetoothd[7042]:
-> src/dbus-hci.c:hcid_dbus_link_key_notify() local auth 0x03 and remote
-> auth 0xff
-> Sep 23 00:14:38 Zatoichi bluetoothd[7042]:
-> src/dbus-hci.c:hcid_dbus_link_key_notify() storing link key of type
-> 0x00
-> Sep 23 00:14:38 Zatoichi bluetoothd[7042]:
-> src/dbus-hci.c:hcid_dbus_bonding_process_complete() status=00
-> Sep 23 00:14:38 Zatoichi bluetoothd[7042]:
-> src/adapter.c:adapter_get_device() 00:1F:20:06:47:65
-> Sep 23 00:14:38 Zatoichi bluetoothd[7042]:
-> src/device.c:btd_device_ref() 0xb899f6b8: ref=2
-> Sep 23 00:14:38 Zatoichi bluetoothd[7042]: src/agent.c:agent_release()
-> Releasing agent :1.35, /org/bluez/agent_8004
-> Sep 23 00:14:38 Zatoichi dbus-daemon: [system] Rejected send message,
-> 1 matched rules; type="method_return", sender=":1.35" (uid=1000
-> pid=8004 comm="./agent) interface="(unset)" member="(unset)" error
-> name="(unset)" requested_reply=0 destination=":1.12" (uid=0 pid=7041
-> comm="/usr/sbin/bluetoothd))
-> Sep 23 00:14:38 Zatoichi bluetoothd[7042]:
-> src/device.c:discover_services_req_exit() DiscoverServices requestor
-> exited
-> Sep 23 00:14:38 Zatoichi bluetoothd[7042]:
-> src/device.c:btd_device_unref() 0xb899f6b8: ref=1
-> Sep 23 00:14:40 Zatoichi bluetoothd[7042]:
-> src/adapter.c:adapter_remove_connection() Removing temporary device
-> /org/bluez/7041/hci0/dev_00_1F_20_06_47_65
-> Sep 23 00:14:40 Zatoichi bluetoothd[7042]:
-> src/device.c:device_remove() Removing device
-> /org/bluez/7041/hci0/dev_00_1F_20_06_47_65
-> Sep 23 00:14:40 Zatoichi bluetoothd[7042]:
-> src/device.c:btd_device_unref() 0xb899f6b8: ref=0
-> Sep 23 00:14:40 Zatoichi bluetoothd[7042]: src/device.c:device_free() 0xb899f6b8
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
