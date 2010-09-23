@@ -1,145 +1,439 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 23 Sep 2010 14:51:08 +0300
-From: Ville Tervo <ville.tervo@nokia.com>
-To: ext Alan Ott <alan@signal11.us>
-Cc: Jiri Kosina <jkosina@suse.cz>,
-        Stefan Achatz <erazor_de@users.sourceforge.net>,
-        Antonio Ospite <ospite@studenti.unina.it>,
-        Alexey Dobriyan <adobriyan@gmail.com>, Tejun Heo <tj@kernel.org>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Greg Kroah-Hartman <gregkh@suse.de>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Stephane Chatty <chatty@enac.fr>, Michael Poole <mdpoole@troilus.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Bastien Nocera <hadess@hadess.net>,
-        Eric Dumazet <eric.dumazet@gmail.com>,
-        "linux-input@vger.kernel.org" <linux-input@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH v4 2/2] Bluetooth: hidp: Add support for hidraw
- HIDIOCGFEATURE  and HIDIOCSFEATURE
-Message-ID: <20100923115108.GC2379@null>
-References: <1281442367.12579.206.camel@localhost.localdomain>
- <1281990059-3562-3-git-send-email-alan@signal11.us>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1281990059-3562-3-git-send-email-alan@signal11.us>
+From: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+Subject: [PATCH] Fix headset disconnecting via device disconnect
+Date: Thu, 23 Sep 2010 13:32:31 +0300
+Message-Id: <1285237951-4271-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alan,
+Headsets for proper disconnecting need to disconnect profiles in specified
+order(by ex. disconnect a2dp, then sink and hfp at the end). Instead of
+adding separate callbacks for disconnecting each profile, now adding only
+one callback in audio/device.c for calling audio disconnect functions in
+correct order. New disconnect callback works similarly to dev_disconnect
+from audio/device.c
+---
+ audio/device.c  |  138 +++++++++++++++++++++++++++++++++++++------------------
+ audio/headset.c |   19 --------
+ audio/sink.c    |   29 ------------
+ audio/source.c  |   33 -------------
+ 4 files changed, 93 insertions(+), 126 deletions(-)
 
-One comment.
-
-On Mon, Aug 16, 2010 at 10:20:59PM +0200, ext Alan Ott wrote:
-> This patch adds support or getting and setting feature reports for bluetooth
-> HID devices from HIDRAW.
-> 
-> Signed-off-by: Alan Ott <alan@signal11.us>
-> ---
->  net/bluetooth/hidp/core.c |  114 +++++++++++++++++++++++++++++++++++++++++++--
->  net/bluetooth/hidp/hidp.h |    8 +++
->  2 files changed, 118 insertions(+), 4 deletions(-)
-> 
-> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-> index bfe641b..0e4880e 100644
-> --- a/net/bluetooth/hidp/core.c
-> +++ b/net/bluetooth/hidp/core.c
-> @@ -36,6 +36,7 @@
->  #include <linux/file.h>
->  #include <linux/init.h>
->  #include <linux/wait.h>
-> +#include <linux/mutex.h>
->  #include <net/sock.h>
->  
->  #include <linux/input.h>
-> @@ -313,6 +314,86 @@ static int hidp_send_report(struct hidp_session *session, struct hid_report *rep
->  	return hidp_queue_report(session, buf, rsize);
->  }
->  
-> +static int hidp_get_raw_report(struct hid_device *hid,
-> +		unsigned char report_number,
-> +		unsigned char *data, size_t count,
-> +		unsigned char report_type)
-> +{
-> +	struct hidp_session *session = hid->driver_data;
-> +	struct sk_buff *skb;
-> +	size_t len;
-> +	int numbered_reports = hid->report_enum[report_type].numbered;
-> +
-> +	switch (report_type) {
-> +	case HID_FEATURE_REPORT:
-> +		report_type = HIDP_TRANS_GET_REPORT | HIDP_DATA_RTYPE_FEATURE;
-> +		break;
-> +	case HID_INPUT_REPORT:
-> +		report_type = HIDP_TRANS_GET_REPORT | HIDP_DATA_RTYPE_INPUT;
-> +		break;
-> +	case HID_OUTPUT_REPORT:
-> +		report_type = HIDP_TRANS_GET_REPORT | HIDP_DATA_RTYPE_OUPUT;
-> +		break;
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +
-> +	if (mutex_lock_interruptible(&session->report_mutex))
-> +		return -ERESTARTSYS;
-> +
-> +	/* Set up our wait, and send the report request to the device. */
-> +	session->waiting_report_type = report_type & HIDP_DATA_RTYPE_MASK;
-> +	session->waiting_report_number = numbered_reports ? report_number : -1;
-> +	set_bit(HIDP_WAITING_FOR_RETURN, &session->flags);
-> +	data[0] = report_number;
-> +	if (hidp_send_ctrl_message(hid->driver_data, report_type, data, 1))
-> +		goto err_eio;
-> +
-> +	/* Wait for the return of the report. The returned report
-> +	   gets put in session->report_return.  */
-> +	while (test_bit(HIDP_WAITING_FOR_RETURN, &session->flags)) {
-> +		int res;
-> +
-> +		res = wait_event_interruptible_timeout(session->report_queue,
-> +			!test_bit(HIDP_WAITING_FOR_RETURN, &session->flags),
-> +			5*HZ);
-> +		if (res == 0) {
-> +			/* timeout */
-> +			goto err_eio;
-> +		}
-> +		if (res < 0) {
-> +			/* signal */
-> +			goto err_restartsys;
-> +		}
-> +	}
-> +
-> +	skb = session->report_return;
-> +	if (skb) {
-> +		len = skb->len < count ? skb->len : count;
-> +		memcpy(data, skb->data, len);
-> +
-> +		kfree_skb(skb);
-> +		session->report_return = NULL;
-> +	} else {
-> +		/* Device returned a HANDSHAKE, indicating  protocol error. */
-> +		len = -EIO;
-> +	}
-> +
-> +	clear_bit(HIDP_WAITING_FOR_RETURN, &session->flags);
-> +	mutex_unlock(&session->report_mutex);
-> +
-> +	return len;
-> +
-> +err_restartsys:
-> +	clear_bit(HIDP_WAITING_FOR_RETURN, &session->flags);
-> +	mutex_unlock(&session->report_mutex);
-> +	return -ERESTARTSYS;
-> +err_eio:
-> +	clear_bit(HIDP_WAITING_FOR_RETURN, &session->flags);
-> +	mutex_unlock(&session->report_mutex);
-> +	return -EIO;
-> +}
-
-How about a variable called ret and using that to return len or errno? It
-would eliminate code dublication.
-
+diff --git a/audio/device.c b/audio/device.c
+index b30590e..eec67be 100644
+--- a/audio/device.c
++++ b/audio/device.c
+@@ -91,7 +91,9 @@ struct dev_priv {
+ 	guint control_timer;
+ 	guint avdtp_timer;
+ 	guint headset_timer;
++	guint dc_id;
+ 
++	gboolean disconnecting;
+ 	gboolean authorized;
+ 	guint auth_idle_id;
+ };
+@@ -123,6 +125,9 @@ static void device_free(struct audio_device *dev)
+ 			dbus_message_unref(priv->dc_req);
+ 		if (priv->conn_req)
+ 			dbus_message_unref(priv->conn_req);
++		if (priv->dc_id)
++			device_remove_disconnect_watch(dev->btd_dev,
++							priv->dc_id);
+ 		g_free(priv);
+ 	}
+ 
+@@ -145,6 +150,69 @@ static const char *state2str(audio_state_t state)
+ 	}
+ }
+ 
++static gboolean control_connect_timeout(gpointer user_data)
++{
++	struct audio_device *dev = user_data;
++
++	dev->priv->control_timer = 0;
++
++	if (dev->control)
++		avrcp_connect(dev);
++
++	return FALSE;
++}
++
++static gboolean device_set_control_timer(struct audio_device *dev)
++{
++	struct dev_priv *priv = dev->priv;
++
++	if (!dev->control)
++		return FALSE;
++
++	if (priv->control_timer)
++		return FALSE;
++
++	priv->control_timer = g_timeout_add_seconds(CONTROL_CONNECT_TIMEOUT,
++							control_connect_timeout,
++							dev);
++
++	return TRUE;
++}
++
++static void device_remove_control_timer(struct audio_device *dev)
++{
++	if (dev->priv->control_timer)
++		g_source_remove(dev->priv->control_timer);
++	dev->priv->control_timer = 0;
++}
++
++static void disconnect_cb(struct btd_device *btd_dev, gboolean removal,
++				void *user_data)
++{
++	struct audio_device *dev = user_data;
++	struct dev_priv *priv = dev->priv;
++
++	if (priv->state == AUDIO_STATE_DISCONNECTED)
++		return;
++
++	if (priv->disconnecting)
++		return;
++
++	priv->disconnecting = TRUE;
++
++	if (dev->control) {
++		device_remove_control_timer(dev);
++		avrcp_disconnect(dev);
++	}
++
++	if (dev->sink && priv->sink_state != SINK_STATE_DISCONNECTED)
++		sink_shutdown(dev->sink);
++	else if (priv->hs_state != HEADSET_STATE_DISCONNECTED)
++		headset_shutdown(dev);
++	else
++		priv->disconnecting = FALSE;
++}
++
+ static void device_set_state(struct audio_device *dev, audio_state_t new_state)
+ {
+ 	struct dev_priv *priv = dev->priv;
+@@ -155,9 +223,21 @@ static void device_set_state(struct audio_device *dev, audio_state_t new_state)
+ 	if (!state_str)
+ 		return;
+ 
+-	if (new_state == AUDIO_STATE_DISCONNECTED)
++	if (new_state == AUDIO_STATE_DISCONNECTED) {
+ 		priv->authorized = FALSE;
+ 
++		if (priv->dc_id) {
++			device_remove_disconnect_watch(dev->btd_dev,
++							priv->dc_id);
++			priv->dc_id = 0;
++		}
++	}
++	else if (new_state == AUDIO_STATE_CONNECTED) {
++		priv->disconnecting = FALSE;
++		priv->dc_id = device_add_disconnect_watch(dev->btd_dev,
++						disconnect_cb, dev, NULL);
++	}
++
+ 	if (dev->priv->state == new_state) {
+ 		DBG("state change attempted from %s to %s",
+ 							state_str, state_str);
+@@ -166,11 +246,15 @@ static void device_set_state(struct audio_device *dev, audio_state_t new_state)
+ 
+ 	dev->priv->state = new_state;
+ 
+-	if (priv->dc_req && new_state == AUDIO_STATE_DISCONNECTED) {
+-		reply = dbus_message_new_method_return(priv->dc_req);
+-		dbus_message_unref(priv->dc_req);
+-		priv->dc_req = NULL;
+-		g_dbus_send_message(dev->conn, reply);
++	if (new_state == AUDIO_STATE_DISCONNECTED) {
++		if (priv->dc_req) {
++			reply = dbus_message_new_method_return(priv->dc_req);
++			dbus_message_unref(priv->dc_req);
++			priv->dc_req = NULL;
++			g_dbus_send_message(dev->conn, reply);
++		}
++		else if (priv->disconnecting)
++			priv->disconnecting = FALSE;
+ 	}
+ 
+ 	if (priv->conn_req && new_state != AUDIO_STATE_CONNECTING) {
+@@ -191,42 +275,6 @@ static void device_set_state(struct audio_device *dev, audio_state_t new_state)
+ 				DBUS_TYPE_STRING, &state_str);
+ }
+ 
+-static gboolean control_connect_timeout(gpointer user_data)
+-{
+-	struct audio_device *dev = user_data;
+-
+-	dev->priv->control_timer = 0;
+-
+-	if (dev->control)
+-		avrcp_connect(dev);
+-
+-	return FALSE;
+-}
+-
+-static gboolean device_set_control_timer(struct audio_device *dev)
+-{
+-	struct dev_priv *priv = dev->priv;
+-
+-	if (!dev->control)
+-		return FALSE;
+-
+-	if (priv->control_timer)
+-		return FALSE;
+-
+-	priv->control_timer = g_timeout_add_seconds(CONTROL_CONNECT_TIMEOUT,
+-							control_connect_timeout,
+-							dev);
+-
+-	return TRUE;
+-}
+-
+-static void device_remove_control_timer(struct audio_device *dev)
+-{
+-	if (dev->priv->control_timer)
+-		g_source_remove(dev->priv->control_timer);
+-	dev->priv->control_timer = 0;
+-}
+-
+ static gboolean avdtp_connect_timeout(gpointer user_data)
+ {
+ 	struct audio_device *dev = user_data;
+@@ -348,7 +396,7 @@ static void device_sink_cb(struct audio_device *dev,
+ 			avrcp_disconnect(dev);
+ 		}
+ 		if (priv->hs_state != HEADSET_STATE_DISCONNECTED &&
+-								priv->dc_req) {
++				(priv->dc_req || priv->disconnecting)) {
+ 			headset_shutdown(dev);
+ 			break;
+ 		}
+@@ -427,8 +475,8 @@ static void device_headset_cb(struct audio_device *dev,
+ 	switch (new_state) {
+ 	case HEADSET_STATE_DISCONNECTED:
+ 		device_remove_avdtp_timer(dev);
+-		if (priv->sink_state != SINK_STATE_DISCONNECTED &&
+-						dev->sink && priv->dc_req) {
++		if (priv->sink_state != SINK_STATE_DISCONNECTED && dev->sink &&
++				(priv->dc_req || priv->disconnecting)) {
+ 			sink_shutdown(dev->sink);
+ 			break;
+ 		}
+diff --git a/audio/headset.c b/audio/headset.c
+index dad0716..9955d4b 100644
+--- a/audio/headset.c
++++ b/audio/headset.c
+@@ -158,7 +158,6 @@ struct headset {
+ 	GIOChannel *tmp_rfcomm;
+ 	GIOChannel *sco;
+ 	guint sco_id;
+-	guint dc_id;
+ 
+ 	gboolean auto_dc;
+ 
+@@ -2162,9 +2161,6 @@ static void headset_free(struct audio_device *dev)
+ 		hs->dc_timer = 0;
+ 	}
+ 
+-	if (hs->dc_id)
+-		device_remove_disconnect_watch(dev->btd_dev, hs->dc_id);
+-
+ 	close_sco(dev);
+ 
+ 	headset_close_rfcomm(dev);
+@@ -2477,16 +2473,6 @@ int headset_connect_sco(struct audio_device *dev, GIOChannel *io)
+ 	return 0;
+ }
+ 
+-static void disconnect_cb(struct btd_device *btd_dev, gboolean removal,
+-				void *user_data)
+-{
+-	struct audio_device *device = user_data;
+-
+-	info("Headset: disconnect %s", device->path);
+-
+-	headset_shutdown(device);
+-}
+-
+ void headset_set_state(struct audio_device *dev, headset_state_t state)
+ {
+ 	struct headset *hs = dev->headset;
+@@ -2520,8 +2506,6 @@ void headset_set_state(struct audio_device *dev, headset_state_t state)
+ 			telephony_device_disconnected(dev);
+ 		}
+ 		active_devices = g_slist_remove(active_devices, dev);
+-		device_remove_disconnect_watch(dev->btd_dev, hs->dc_id);
+-		hs->dc_id = 0;
+ 		break;
+ 	case HEADSET_STATE_CONNECTING:
+ 		emit_property_changed(dev->conn, dev->path,
+@@ -2550,9 +2534,6 @@ void headset_set_state(struct audio_device *dev, headset_state_t state)
+ 						DBUS_TYPE_BOOLEAN, &value);
+ 			active_devices = g_slist_append(active_devices, dev);
+ 			telephony_device_connected(dev);
+-			hs->dc_id = device_add_disconnect_watch(dev->btd_dev,
+-								disconnect_cb,
+-								dev, NULL);
+ 		} else if (hs->state == HEADSET_STATE_PLAYING) {
+ 			value = FALSE;
+ 			g_dbus_emit_signal(dev->conn, dev->path,
+diff --git a/audio/sink.c b/audio/sink.c
+index 67cffee..eb90c21 100644
+--- a/audio/sink.c
++++ b/audio/sink.c
+@@ -61,7 +61,6 @@ struct sink {
+ 	struct avdtp *session;
+ 	struct avdtp_stream *stream;
+ 	unsigned int cb_id;
+-	guint dc_id;
+ 	guint retry_id;
+ 	avdtp_session_state_t session_state;
+ 	avdtp_state_t stream_state;
+@@ -140,11 +139,6 @@ static void avdtp_state_callback(struct audio_device *dev,
+ 			emit_property_changed(dev->conn, dev->path,
+ 					AUDIO_SINK_INTERFACE, "Connected",
+ 					DBUS_TYPE_BOOLEAN, &value);
+-			if (sink->dc_id) {
+-				device_remove_disconnect_watch(dev->btd_dev,
+-								sink->dc_id);
+-				sink->dc_id = 0;
+-			}
+ 		}
+ 		sink_set_state(dev, SINK_STATE_DISCONNECTED);
+ 		break;
+@@ -171,17 +165,6 @@ static void pending_request_free(struct audio_device *dev,
+ 	g_free(pending);
+ }
+ 
+-static void disconnect_cb(struct btd_device *btd_dev, gboolean removal,
+-				void *user_data)
+-{
+-	struct audio_device *device = user_data;
+-	struct sink *sink = device->sink;
+-
+-	DBG("Sink: disconnect %s", device->path);
+-
+-	avdtp_close(sink->session, sink->stream, TRUE);
+-}
+-
+ static void stream_state_changed(struct avdtp_stream *stream,
+ 					avdtp_state_t old_state,
+ 					avdtp_state_t new_state,
+@@ -209,12 +192,6 @@ static void stream_state_changed(struct avdtp_stream *stream,
+ 			pending_request_free(dev, p);
+ 		}
+ 
+-		if (sink->dc_id) {
+-			device_remove_disconnect_watch(dev->btd_dev,
+-							sink->dc_id);
+-			sink->dc_id = 0;
+-		}
+-
+ 		if (sink->session) {
+ 			avdtp_unref(sink->session);
+ 			sink->session = NULL;
+@@ -234,9 +211,6 @@ static void stream_state_changed(struct avdtp_stream *stream,
+ 						AUDIO_SINK_INTERFACE,
+ 						"Connected",
+ 						DBUS_TYPE_BOOLEAN, &value);
+-			sink->dc_id = device_add_disconnect_watch(dev->btd_dev,
+-								disconnect_cb,
+-								dev, NULL);
+ 		} else if (old_state == AVDTP_STATE_STREAMING) {
+ 			value = FALSE;
+ 			g_dbus_emit_signal(dev->conn, dev->path,
+@@ -601,9 +575,6 @@ static void sink_free(struct audio_device *dev)
+ 		avdtp_stream_remove_cb(sink->session, sink->stream,
+ 					sink->cb_id);
+ 
+-	if (sink->dc_id)
+-		device_remove_disconnect_watch(dev->btd_dev, sink->dc_id);
+-
+ 	if (sink->session)
+ 		avdtp_unref(sink->session);
+ 
+diff --git a/audio/source.c b/audio/source.c
+index 01173f5..e8671ed 100644
+--- a/audio/source.c
++++ b/audio/source.c
+@@ -62,7 +62,6 @@ struct source {
+ 	struct avdtp *session;
+ 	struct avdtp_stream *stream;
+ 	unsigned int cb_id;
+-	guint dc_id;
+ 	guint retry_id;
+ 	avdtp_session_state_t session_state;
+ 	avdtp_state_t stream_state;
+@@ -133,12 +132,6 @@ static void avdtp_state_callback(struct audio_device *dev,
+ 
+ 	switch (new_state) {
+ 	case AVDTP_SESSION_STATE_DISCONNECTED:
+-		if (source->state != SOURCE_STATE_CONNECTING &&
+-				source->dc_id) {
+-			device_remove_disconnect_watch(dev->btd_dev,
+-							source->dc_id);
+-			source->dc_id = 0;
+-		}
+ 		source_set_state(dev, SOURCE_STATE_DISCONNECTED);
+ 		break;
+ 	case AVDTP_SESSION_STATE_CONNECTING:
+@@ -164,17 +157,6 @@ static void pending_request_free(struct audio_device *dev,
+ 	g_free(pending);
+ }
+ 
+-static void disconnect_cb(struct btd_device *btd_dev, gboolean removal,
+-				void *user_data)
+-{
+-	struct audio_device *device = user_data;
+-	struct source *source = device->source;
+-
+-	DBG("Source: disconnect %s", device->path);
+-
+-	avdtp_close(source->session, source->stream, TRUE);
+-}
+-
+ static void stream_state_changed(struct avdtp_stream *stream,
+ 					avdtp_state_t old_state,
+ 					avdtp_state_t new_state,
+@@ -201,12 +183,6 @@ static void stream_state_changed(struct avdtp_stream *stream,
+ 			pending_request_free(dev, p);
+ 		}
+ 
+-		if (source->dc_id) {
+-			device_remove_disconnect_watch(dev->btd_dev,
+-							source->dc_id);
+-			source->dc_id = 0;
+-		}
+-
+ 		if (source->session) {
+ 			avdtp_unref(source->session);
+ 			source->session = NULL;
+@@ -215,12 +191,6 @@ static void stream_state_changed(struct avdtp_stream *stream,
+ 		source->cb_id = 0;
+ 		break;
+ 	case AVDTP_STATE_OPEN:
+-		if (old_state == AVDTP_STATE_CONFIGURED &&
+-				source->state == SOURCE_STATE_CONNECTING) {
+-			source->dc_id = device_add_disconnect_watch(dev->btd_dev,
+-								disconnect_cb,
+-								dev, NULL);
+-		}
+ 		source_set_state(dev, SOURCE_STATE_CONNECTED);
+ 		break;
+ 	case AVDTP_STATE_STREAMING:
+@@ -536,9 +506,6 @@ static void source_free(struct audio_device *dev)
+ 		avdtp_stream_remove_cb(source->session, source->stream,
+ 					source->cb_id);
+ 
+-	if (source->dc_id)
+-		device_remove_disconnect_watch(dev->btd_dev, source->dc_id);
+-
+ 	if (source->session)
+ 		avdtp_unref(source->session);
+ 
 -- 
-Ville
+1.7.0.4
+
