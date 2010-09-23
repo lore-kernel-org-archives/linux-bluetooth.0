@@ -1,81 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Thu, 23 Sep 2010 13:19:42 -0300
-Message-ID: <AANLkTindKFz1fx9cJMu9aSpehG5LaUHHO7TkgWqMzqj=@mail.gmail.com>
-Subject: Pull request: git://git.infradead.org/users/cktakahasi/bluez.git for-upstream
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Date: Thu, 23 Sep 2010 16:53:58 +0200
+Message-ID: <AANLkTi=6ORUZLTY28iHn4q6gAi1mMZjqb=Nt7B6zQN2R@mail.gmail.com>
+Subject: [PATCH] Fix problem with EIR data when setting the name
+From: Lukasz Pawlik <lucas.pawlik@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=001636e1fca39124340490ee6ea6
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The following changes since commit e7b1d878d15c0eb1bc0109c19cbdf5f84a29394d:
-
-  Fix coding style issues in attribute client code (2010-09-22 16:33:15 -0400)
-
-are available in the git repository at:
-  git://git.infradead.org/users/cktakahasi/bluez.git for-upstream
-
-Claudio Takahasi (23):
-      Add LE start and stop scanning
-      Remove RSSI field from the advertising report event
-      Decoding the RSSI parameter from the advertising report event
-      Send Discovering property "FALSE" when the interleave finishes
-      Add length argument on hciops start discovery function
-      Stop inquiry using the length parameter
-      Fix remote name resolution for interleave discovery
-      Add Write LE host supported function
-      Set the LE host supported and disable simultaneous LE and BR/EDR flags
-      Add extended feature mask constants definition
-      Read the local extended features
-      Stop LE scanning when discovery is suspended
-      Rename hciops {start, stop}_discovery to {start, stop}_inquiry
-      Don't enter on interleave mode if there isn't active sessions
-      Code cleanup: improving inquiry logic
-      Clear the remote device found list in the state transition
-      Fix periodic inquiry signals
-      Fixing DeviceDisappeared signal
-      Postpone discovery if still resolving names
-      Add adapter discovery type function
-      Do not send another Discovering TRUE signal if still resolving names
-      Forcing periodic inquiry exit
-      Fix interleave scanning
-
-Vinicius Costa Gomes (1):
-      Add BR/EDR LE interleaved discovery
-
- lib/hci.c        |   29 +++++
- lib/hci.h        |   17 +++-
- lib/hci_lib.h    |    1 +
- plugins/hciops.c |   53 +++++++++-
- src/adapter.c    |  302 +++++++++++++++++++++++++++++++++++++-----------------
- src/adapter.h    |   37 ++++---
- src/dbus-hci.c   |   45 +++++++--
- src/dbus-hci.h   |    1 +
- src/security.c   |  133 ++++++++++++++----------
- 9 files changed, 436 insertions(+), 182 deletions(-)
+--001636e1fca39124340490ee6ea6
+Content-Type: text/plain; charset=ISO-8859-1
 
 
-Implements interleave discovery for dual mode adapters(LE and BR/EDR).
-Now, the behavior is:
-1) for single mode: LE scanning for 5.12 seconds every DiscoverSchedulerInterval
-2) for BR/EDR only: still the same
-3) for dual mode: inquiry(5.12) sec, LE scanning(5.12) sec, resolve
-names. The next discovery interval is controlled by
-DiscoverSchedulerInterval.
 
-Signals still the same, the idea is try to hide from the users/apps
-the discovery internals. No mater the adapter type(LE only, BR/EDR or
-Dual Mode)
-PropertyChanged("Discovering", TRUE/FALSE) is sent to notify when a
-new discovery "session" starts/finishes. Found LE devices are reported
-using DeviceFound() signals.
+--001636e1fca39124340490ee6ea6
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-Fix-problem-with-EIR-data-when-setting-the-name.patch"
+Content-Disposition: attachment;
+	filename="0001-Fix-problem-with-EIR-data-when-setting-the-name.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gefqso9u0
 
-Regards,
-Claudio
--- 
---
-Claudio Takahasi
-Instituto Nokia de Tecnologia
-Recife - Pernambuco - Brasil
-+55 81 30879999
+RnJvbSAzMmMzMTA4Y2M4YTA3MzRmM2VlMTE4N2U5MzI2ZGM3Yjg0YTMzMmQ3IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBMdWthc3ogUGF3bGlrIDxsdWNhcy5wYXdsaWtAZ21haWwuY29t
+PgpEYXRlOiBUaHUsIDIzIFNlcCAyMDEwIDE2OjI3OjM5ICswMjAwClN1YmplY3Q6IFtQQVRDSF0g
+Rml4IHByb2JsZW0gd2l0aCBFSVIgZGF0YSB3aGVuIHNldHRpbmcgdGhlIG5hbWUKClByZXZpb3Vz
+bHkgY2hhbmdlZCBCVCBmaWVuZGx5IG5hbWUgd2FzIG5vdCByZWZsZWN0ZWQgdW50aWwgQlQgYWRh
+cHRlciByZWJvb3QuClRoaXMgcGF0Y2ggZml4IHRoaXMgcHJvYmxlbS4gTm93IGNoYW5nZWQgbmFt
+ZSBpcyByZWZsZWN0ZWQgd2l0aG91dCBuZWVkIG9mCnJlYm9vdGluZyBhZGFwdGVyLgotLS0KIHNy
+Yy9hZGFwdGVyLmMgfCAgICAxICsKIDEgZmlsZXMgY2hhbmdlZCwgMSBpbnNlcnRpb25zKCspLCAw
+IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL3NyYy9hZGFwdGVyLmMgYi9zcmMvYWRhcHRlci5j
+CmluZGV4IDliNjM4Y2YuLjBlOWJlNWYgMTAwNjQ0Ci0tLSBhL3NyYy9hZGFwdGVyLmMKKysrIGIv
+c3JjL2FkYXB0ZXIuYwpAQCAtMTAzMSw2ICsxMDMxLDcgQEAgc3RhdGljIERCdXNNZXNzYWdlICpz
+ZXRfbmFtZShEQnVzQ29ubmVjdGlvbiAqY29ubiwgREJ1c01lc3NhZ2UgKm1zZywKIAkJCXJldHVy
+biBmYWlsZWRfc3RyZXJyb3IobXNnLCBlcnIpOwogCiAJCWFkYXB0ZXItPm5hbWVfc3RvcmVkID0g
+VFJVRTsKKwkJdXBkYXRlX2V4dF9pbnF1aXJ5X3Jlc3BvbnNlKGFkYXB0ZXIpOwogCX0KIAogZG9u
+ZToKLS0gCjEuNy4wLjQKCg==
+--001636e1fca39124340490ee6ea6--
