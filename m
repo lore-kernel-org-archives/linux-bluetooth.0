@@ -1,59 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: <Waldemar.Rymarkiewicz@tieto.com>
-To: <michalski.raf@gmail.com>, <linux-bluetooth@vger.kernel.org>
-Date: Thu, 23 Sep 2010 17:32:12 +0300
-Subject: RE: Where "destroying" function definition is ?
-Message-ID: <99B09243E1A5DA4898CDD8B700111448097CE2C502@EXMB04.eu.tieto.com>
-References: <AANLkTinyQbC30-11CgVtjAhcnbykatBFJJ7rxC4v019L@mail.gmail.com>
-In-Reply-To: <AANLkTinyQbC30-11CgVtjAhcnbykatBFJJ7rxC4v019L@mail.gmail.com>
-Content-Type: text/plain; charset="iso-8859-2"
-MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: Jiri Kosina <jkosina@suse.cz>,
+	Stefan Achatz <erazor_de@users.sourceforge.net>,
+	Antonio Ospite <ospite@studenti.unina.it>,
+	Alexey Dobriyan <adobriyan@gmail.com>, Tejun Heo <tj@kernel.org>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	Greg Kroah-Hartman <gregkh@suse.de>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Stephane Chatty <chatty@enac.fr>,
+	Michael Poole <mdpoole@troilus.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Bastien Nocera <hadess@hadess.net>,
+	Eric Dumazet <eric.dumazet@gmail.com>,
+	"linux-input@vger.kernel.org" <linux-input@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Message-Id: <89BCFDE1-0D39-4248-84B2-E02C1480E067@signal11.us>
+From: Alan Ott <alan@signal11.us>
+To: Ville Tervo <ville.tervo@nokia.com>
+In-Reply-To: <20100923115108.GC2379@null>
+Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
+Mime-Version: 1.0 (Apple Message framework v936)
+Subject: Re: [PATCH v4 2/2] Bluetooth: hidp: Add support for hidraw  HIDIOCGFEATURE  and HIDIOCSFEATURE
+Date: Thu, 23 Sep 2010 10:16:43 -0400
+References: <1281442367.12579.206.camel@localhost.localdomain> <1281990059-3562-3-git-send-email-alan@signal11.us> <20100923115108.GC2379@null>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Robert,
 
->-----Original Message-----
->From: linux-bluetooth-owner@vger.kernel.org 
->[mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of 
->Rafa³ Michalski
->Sent: Thursday, September 23, 2010 2:07 PM
->To: linux-bluetooth@vger.kernel.org
->Subject: Where "destroying" function definition is ?
->
->Hi
->
->Does anybody know where "destroying" function is ? - pointer 
->to this function is stored in "destroy" field of agent_request 
->structure, but I can't find definition of this function and 
->place where this pointer (non-NULL) is passed.
->This pointer is used as below - this is a piece of code from 
->BlueZ (release 4.71)
->- src/agent.c file.
->
->static void agent_request_free(struct agent_request *req, 
->gboolean destroy) {
->	if (req->msg)
->		dbus_message_unref(req->msg);
->	if (req->call)
->		dbus_pending_call_unref(req->call);
->	if (req->agent && req->agent->request)
->		req->agent->request = NULL;
->	if (destroy && req->destroy)
->		req->destroy(req->user_data);
->			/* where is the function that destroy 
->points to ??? */
->	g_free(req);
->}
->
->Thanks for any help.
->
->Best regards
->Rafa³ Michalski
+On Sep 23, 2010, at 7:51 AM, Ville Tervo wrote:
 
-I'm not pretty sure but this feature seems be not used :) 
-In device.c  function device_request_authentication() calls agent_request_*  with NULL as the last param which is fact is a pointer to "distroying" function.
+> Hi Alan,
+>
+> One comment.
+>
+> How about a variable called ret and using that to return len or  
+> errno? It
+> would eliminate code dublication.
+>
 
+Hi Ville,
 
-Regards,
-/Waldek
+Where specifically? In which function? I've gone through it a couple  
+of times and failed to find return statements which are superfluous.  
+Maybe I'm missing something fundamental?
+
+Alan.
