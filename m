@@ -1,67 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 24 Sep 2010 15:10:46 +0100
-From: Mark Brown <broonie@opensource.wolfsonmicro.com>
-To: pghatwork@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linus.walleij@stericsson.com, Pavan Savoy <pavan_savoy@sify.com>
-Subject: Re: [PATCH 1/6] This patch adds support for the ST-Ericsson CG2900
-Message-ID: <20100924141046.GA26454@sirena.org.uk>
-References: <AANLkTin9Qji_bdyd3yqrP_-ti5xRT9jJ4je2fPM=uHFX@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTin9Qji_bdyd3yqrP_-ti5xRT9jJ4je2fPM=uHFX@mail.gmail.com>
+Date: Fri, 24 Sep 2010 08:00:43 -0600
+Message-ID: <AANLkTingVh3OaAGQzsxWJQddqrPwgFssMeOq5Rp_DbS6@mail.gmail.com>
+Subject: a2dp, myth, pulse
+From: Brad Midgley <bmidgley@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Sep 24, 2010 at 03:46:44PM +0200, Par-Gunnar Hjalmdahl wrote:
+Hey
 
-> +#ifndef PIN_INPUT_PULLUP
-> +#define PIN_INPUT_PULLUP		(PIN_DIR_INPUT | PIN_PULL_UP)
-> +#endif
-> +
-> +#ifndef GPIO_LOW
-> +#define GPIO_LOW			0
-> +#endif
-> +
-> +#ifndef GPIO_HIGH
-> +#define GPIO_HIGH			1
-> +#endif
-> +
-> +#ifndef GPIO_TO_IRQ
-> +#define GPIO_TO_IRQ			NOMADIK_GPIO_TO_IRQ
-> +#endif
+I've been away from this for a bit... I've just gotten my mythtv set
+top with an a2dp headset*
 
-None of this looks like things that should be added in driver code -
-there should be standard ways of doing this stuff that you should use
-and if there aren't and they are useful they should be added in generic
-code so that other code can use them.
+can avrcp be used to drive mythtv? I've got a setup where the myth
+frontend is rarely the foreground app, so it wouldn't work to deliver
+keystrokes to the foreground app. I'm not sure how lirc does this but
+it delivers messages to myth even if it doesn't have x11 focus.
 
-> +/** BT_ENABLE_GPIO - GPIO to enable/disable the BT module.
-> + */
-> +#define BT_ENABLE_GPIO			170
+Is there anything in place to fix latency automatically? Can I
+calibrate the delay for a headset and have pulse fix it for me? The
+wired audio sync also needs to be adjusted fwiw... pulse delivers
+audio about 300ms too soon in the wired case.
 
-This sort of thing should be passed in from the board configuration
-normallly.
+* for the record, what I had to do under ubuntu 10.04 was tell myth to
+use the pulse device and add this line to /etc/pulse/default.pa:
 
-> +void cg2900_devices_enable_chip(void)
-> +{
-> +	gpio_set_value(GBF_ENA_RESET_GPIO, GPIO_HIGH);
-> +}
-> +EXPORT_SYMBOL(cg2900_devices_enable_chip);
+load-module module-alsa-sink device=plug:dmix
 
-This looks like something that the driver should be organising rather
-than something that should be exported for some random code to pick up?
-In general most of the code in here looks like it should have more
-device model usage and make more use of standard kernel infrastructure.
+then I click the headset button to connect it and use pavucontrol to
+move the myth stream over to the headset (a bit of a pain)
 
-> +static irqreturn_t cg2900_devices_interrupt(int irq, void *dev_id)
-> +{
-> +	disable_irq_nosync(irq);
-> +	if (cg2900_dev_callback && cg2900_dev_callback->interrupt_cb)
-> +		cg2900_dev_callback->interrupt_cb();
-> +
-> +	return IRQ_HANDLED;
-> +}
-
-Why is there this callback mechanism - I'd expect the users of this code
-to just be using the standard IRQ infrastructure?
+-- 
+Brad Midgley
