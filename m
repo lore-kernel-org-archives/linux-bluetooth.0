@@ -1,39 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 24 Sep 2010 16:07:31 -0700
+From: "Luis R. Rodriguez" <lrodriguez@atheros.com>
+To: Marcel Holtmann <holtmann@linux.intel.com>
+CC: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
+	Deepak Dhamdhere <Deepak.Dhamdhere@Atheros.com>,
+	Sree Durbha <Sree.Durbha@Atheros.com>
+Subject: RFC: btusb firmware load help
+Message-ID: <20100924230730.GB6566@tux>
 MIME-Version: 1.0
-In-Reply-To: <20100924151552.GG4061@null>
-References: <AANLkTi=QaWXz2BEsUJPpXQjvGuGm8CtctJ_q-7WNC=VH@mail.gmail.com>
-	<AANLkTikS2-eKiEP2ngqz6rW5JB-+eudtffw9QHykhbqq@mail.gmail.com>
-	<AANLkTikAHAKe2WDMuAKEvCXh6jxGXFYYhfWPJkCGXUSp@mail.gmail.com>
-	<AANLkTi=9o+9KFNTGcYBZd0z+kYVwBj-Z1LxwdPsjTSfw@mail.gmail.com>
-	<AANLkTikE91qpOgsio9WRaunaAyX3JDWXX0Oz4DvUvspU@mail.gmail.com>
-	<20100924081642.GA30391@null>
-	<AANLkTi=8QV8n1c2cghbbyNv1pZKbHPPRzbv0zVZ_5Vk8@mail.gmail.com>
-	<20100924151552.GG4061@null>
-Date: Fri, 24 Sep 2010 18:11:32 -0700
-Message-ID: <AANLkTik_cwho9JNBPFhCDx0EGFcLN2+VTG8LT-D_Hw_3@mail.gmail.com>
-Subject: Re: Bluez simple-agent vs agent
-From: Viswanathan Sankararam <developervishwa@gmail.com>
-To: Ville Tervo <ville.tervo@nokia.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Thanks Ville for letting me know about this. Is there a possibility to
-back port? Can I just blindly copy the net/bluetooth drivers to a
-linux-2.6.23 kernel and compile?
+Marcel, I was just poked about this thread:
 
-On Fri, Sep 24, 2010 at 8:15 AM, Ville Tervo <ville.tervo@nokia.com> wrote:
-> Hi,
->
-> On Fri, Sep 24, 2010 at 04:09:08PM +0200, ext Viswanathan Sankararam wrote:
->> Im using linux2.6.23... by todays standard, this is old I guess but
->> could it be the cause?
->
-> Yes that ioctl was introduced in 2.6.27.
->
-> And please don't remove mailing list from discussion.
->
-> --
-> Ville
->
+http://www.spinics.net/lists/linux-bluetooth/msg06087.html
+
+The hack is required because our BT hardware does not accept HCI commands
+when the device is plugged in. If I understood your position you did not
+want to accept the patch because our BT USB devices are violating the
+specification by not acceping HCI commands and yet claiming to be BT
+devices, is that right?
+
+This position seems perfectly reasonable, and if it is violating the
+specification this needs to be fixed in hardware for future devices. But
+what is done is done, an dwe need to support existing customers with
+current hardware, can you provide some recommendation as to an alternative
+approach to resolve this upstream?
+
+Without a patch like the one suggested Atheros' Bluetooth USB devices are
+essentially not functional at all. I am in hopes we can come to some agreement
+how to deal with a hardware quirk for now while we nag at our hardware team
+to consider changing the way our devices work.
+
+Someone from the Atheros BT team: can you send me the same patch to be
+applied into compat-wireless under the linux-next-pending/ directory ?
+That is, send me a patch which will apply onto compat-wireless.
+This way we can actually get our hardware functional to customers while
+we try to look for a better alternative directly upstream. You will
+also need to document this issue on the wiki. I recommend you document
+this here:
+
+http://wireless.kernel.org/en/users/Drivers/ath3k
+
+That is, create a new wiki page there for the driver and the things
+needed for it. Once I get the patch into compat-wireless we can
+refer users/customers to the compat-wireless stable releases with
+the linux-next-pending/ patch you give to me applied.
+
+Someone from the Atheros BT team: does the patch currently handle
+suspend/resume?
+
+  Luis
