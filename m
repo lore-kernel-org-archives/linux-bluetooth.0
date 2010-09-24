@@ -1,55 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 24 Sep 2010 16:07:31 -0700
-From: "Luis R. Rodriguez" <lrodriguez@atheros.com>
-To: Marcel Holtmann <holtmann@linux.intel.com>
-CC: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
-	Deepak Dhamdhere <Deepak.Dhamdhere@Atheros.com>,
-	Sree Durbha <Sree.Durbha@Atheros.com>
-Subject: RFC: btusb firmware load help
-Message-ID: <20100924230730.GB6566@tux>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <20100924141046.GA26454@sirena.org.uk>
+References: <AANLkTin9Qji_bdyd3yqrP_-ti5xRT9jJ4je2fPM=uHFX@mail.gmail.com>
+	<20100924141046.GA26454@sirena.org.uk>
+Date: Fri, 24 Sep 2010 16:44:46 +0200
+Message-ID: <AANLkTinfUWiWza8vyqfn0nCA7P24nBJSKY6Zr=aFgVQu@mail.gmail.com>
+Subject: Re: [PATCH 1/6] This patch adds support for the ST-Ericsson CG2900
+From: Par-Gunnar Hjalmdahl <pghatwork@gmail.com>
+To: Mark Brown <broonie@opensource.wolfsonmicro.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linus.walleij@stericsson.com, Pavan Savoy <pavan_savoy@sify.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Marcel, I was just poked about this thread:
+Hi Mark,
 
-http://www.spinics.net/lists/linux-bluetooth/msg06087.html
+Thanks for your comments.
 
-The hack is required because our BT hardware does not accept HCI commands
-when the device is plugged in. If I understood your position you did not
-want to accept the patch because our BT USB devices are violating the
-specification by not acceping HCI commands and yet claiming to be BT
-devices, is that right?
+2010/9/24 Mark Brown <broonie@opensource.wolfsonmicro.com>:
+> On Fri, Sep 24, 2010 at 03:46:44PM +0200, Par-Gunnar Hjalmdahl wrote:
+>
+>> +#ifndef PIN_INPUT_PULLUP
+>> +#define PIN_INPUT_PULLUP             (PIN_DIR_INPUT | PIN_PULL_UP)
+>> +#endif
+>> +
+>> +#ifndef GPIO_LOW
+>> +#define GPIO_LOW                     0
+>> +#endif
+>> +
+>> +#ifndef GPIO_HIGH
+>> +#define GPIO_HIGH                    1
+>> +#endif
+>> +
+>> +#ifndef GPIO_TO_IRQ
+>> +#define GPIO_TO_IRQ                  NOMADIK_GPIO_TO_IRQ
+>> +#endif
+>
+> None of this looks like things that should be added in driver code -
+> there should be standard ways of doing this stuff that you should use
+> and if there aren't and they are useful they should be added in generic
+> code so that other code can use them.
 
-This position seems perfectly reasonable, and if it is violating the
-specification this needs to be fixed in hardware for future devices. But
-what is done is done, an dwe need to support existing customers with
-current hardware, can you provide some recommendation as to an alternative
-approach to resolve this upstream?
+You are absolutely correct in this. As I wrote in the "cover letter"
+[PATCH 0/6] we are already planning changes to this driver where we
+instead register as platform driver and will use normal Kernel
+methodology to implement this. As you can see in the patch these
+comments are regarding a file located in arch/arm/mach-ux500 and the
+driver therefore has a dependency to the Board configuration which
+isn't particularly nice. This will be corrected. These type of defines
+should of course not be located in a C-file either.
 
-Without a patch like the one suggested Atheros' Bluetooth USB devices are
-essentially not functional at all. I am in hopes we can come to some agreement
-how to deal with a hardware quirk for now while we nag at our hardware team
-to consider changing the way our devices work.
+>
+>> +/** BT_ENABLE_GPIO - GPIO to enable/disable the BT module.
+>> + */
+>> +#define BT_ENABLE_GPIO                       170
+>
+> This sort of thing should be passed in from the board configuration
+> normallly.
 
-Someone from the Atheros BT team: can you send me the same patch to be
-applied into compat-wireless under the linux-next-pending/ directory ?
-That is, send me a patch which will apply onto compat-wireless.
-This way we can actually get our hardware functional to customers while
-we try to look for a better alternative directly upstream. You will
-also need to document this issue on the wiki. I recommend you document
-this here:
+See answer above.
 
-http://wireless.kernel.org/en/users/Drivers/ath3k
+>
+>> +void cg2900_devices_enable_chip(void)
+>> +{
+>> +     gpio_set_value(GBF_ENA_RESET_GPIO, GPIO_HIGH);
+>> +}
+>> +EXPORT_SYMBOL(cg2900_devices_enable_chip);
+>
+> This looks like something that the driver should be organising rather
+> than something that should be exported for some random code to pick up?
+> In general most of the code in here looks like it should have more
+> device model usage and make more use of standard kernel infrastructure.
 
-That is, create a new wiki page there for the driver and the things
-needed for it. Once I get the patch into compat-wireless we can
-refer users/customers to the compat-wireless stable releases with
-the linux-next-pending/ patch you give to me applied.
+See answer above. Will be a callback function in a driver data struct.
 
-Someone from the Atheros BT team: does the patch currently handle
-suspend/resume?
+>
+>> +static irqreturn_t cg2900_devices_interrupt(int irq, void *dev_id)
+>> +{
+>> +     disable_irq_nosync(irq);
+>> +     if (cg2900_dev_callback && cg2900_dev_callback->interrupt_cb)
+>> +             cg2900_dev_callback->interrupt_cb();
+>> +
+>> +     return IRQ_HANDLED;
+>> +}
+>
+> Why is there this callback mechanism - I'd expect the users of this code
+> to just be using the standard IRQ infrastructure?
+>
 
-  Luis
+I will have to get back to you regarding this. I did not implement
+that specific part and the guy who did is back on Monday.
+
+
+/P-G
