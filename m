@@ -1,96 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20100924141046.GA26454@sirena.org.uk>
-References: <AANLkTin9Qji_bdyd3yqrP_-ti5xRT9jJ4je2fPM=uHFX@mail.gmail.com>
-	<20100924141046.GA26454@sirena.org.uk>
-Date: Fri, 24 Sep 2010 16:44:46 +0200
-Message-ID: <AANLkTinfUWiWza8vyqfn0nCA7P24nBJSKY6Zr=aFgVQu@mail.gmail.com>
-Subject: Re: [PATCH 1/6] This patch adds support for the ST-Ericsson CG2900
-From: Par-Gunnar Hjalmdahl <pghatwork@gmail.com>
-To: Mark Brown <broonie@opensource.wolfsonmicro.com>
+Date: Fri, 24 Sep 2010 15:10:46 +0100
+From: Mark Brown <broonie@opensource.wolfsonmicro.com>
+To: pghatwork@gmail.com
 Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linus.walleij@stericsson.com, Pavan Savoy <pavan_savoy@sify.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH 1/6] This patch adds support for the ST-Ericsson CG2900
+Message-ID: <20100924141046.GA26454@sirena.org.uk>
+References: <AANLkTin9Qji_bdyd3yqrP_-ti5xRT9jJ4je2fPM=uHFX@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <AANLkTin9Qji_bdyd3yqrP_-ti5xRT9jJ4je2fPM=uHFX@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mark,
+On Fri, Sep 24, 2010 at 03:46:44PM +0200, Par-Gunnar Hjalmdahl wrote:
 
-Thanks for your comments.
+> +#ifndef PIN_INPUT_PULLUP
+> +#define PIN_INPUT_PULLUP		(PIN_DIR_INPUT | PIN_PULL_UP)
+> +#endif
+> +
+> +#ifndef GPIO_LOW
+> +#define GPIO_LOW			0
+> +#endif
+> +
+> +#ifndef GPIO_HIGH
+> +#define GPIO_HIGH			1
+> +#endif
+> +
+> +#ifndef GPIO_TO_IRQ
+> +#define GPIO_TO_IRQ			NOMADIK_GPIO_TO_IRQ
+> +#endif
 
-2010/9/24 Mark Brown <broonie@opensource.wolfsonmicro.com>:
-> On Fri, Sep 24, 2010 at 03:46:44PM +0200, Par-Gunnar Hjalmdahl wrote:
->
->> +#ifndef PIN_INPUT_PULLUP
->> +#define PIN_INPUT_PULLUP             (PIN_DIR_INPUT | PIN_PULL_UP)
->> +#endif
->> +
->> +#ifndef GPIO_LOW
->> +#define GPIO_LOW                     0
->> +#endif
->> +
->> +#ifndef GPIO_HIGH
->> +#define GPIO_HIGH                    1
->> +#endif
->> +
->> +#ifndef GPIO_TO_IRQ
->> +#define GPIO_TO_IRQ                  NOMADIK_GPIO_TO_IRQ
->> +#endif
->
-> None of this looks like things that should be added in driver code -
-> there should be standard ways of doing this stuff that you should use
-> and if there aren't and they are useful they should be added in generic
-> code so that other code can use them.
+None of this looks like things that should be added in driver code -
+there should be standard ways of doing this stuff that you should use
+and if there aren't and they are useful they should be added in generic
+code so that other code can use them.
 
-You are absolutely correct in this. As I wrote in the "cover letter"
-[PATCH 0/6] we are already planning changes to this driver where we
-instead register as platform driver and will use normal Kernel
-methodology to implement this. As you can see in the patch these
-comments are regarding a file located in arch/arm/mach-ux500 and the
-driver therefore has a dependency to the Board configuration which
-isn't particularly nice. This will be corrected. These type of defines
-should of course not be located in a C-file either.
+> +/** BT_ENABLE_GPIO - GPIO to enable/disable the BT module.
+> + */
+> +#define BT_ENABLE_GPIO			170
 
->
->> +/** BT_ENABLE_GPIO - GPIO to enable/disable the BT module.
->> + */
->> +#define BT_ENABLE_GPIO                       170
->
-> This sort of thing should be passed in from the board configuration
-> normallly.
+This sort of thing should be passed in from the board configuration
+normallly.
 
-See answer above.
+> +void cg2900_devices_enable_chip(void)
+> +{
+> +	gpio_set_value(GBF_ENA_RESET_GPIO, GPIO_HIGH);
+> +}
+> +EXPORT_SYMBOL(cg2900_devices_enable_chip);
 
->
->> +void cg2900_devices_enable_chip(void)
->> +{
->> +     gpio_set_value(GBF_ENA_RESET_GPIO, GPIO_HIGH);
->> +}
->> +EXPORT_SYMBOL(cg2900_devices_enable_chip);
->
-> This looks like something that the driver should be organising rather
-> than something that should be exported for some random code to pick up?
-> In general most of the code in here looks like it should have more
-> device model usage and make more use of standard kernel infrastructure.
+This looks like something that the driver should be organising rather
+than something that should be exported for some random code to pick up?
+In general most of the code in here looks like it should have more
+device model usage and make more use of standard kernel infrastructure.
 
-See answer above. Will be a callback function in a driver data struct.
+> +static irqreturn_t cg2900_devices_interrupt(int irq, void *dev_id)
+> +{
+> +	disable_irq_nosync(irq);
+> +	if (cg2900_dev_callback && cg2900_dev_callback->interrupt_cb)
+> +		cg2900_dev_callback->interrupt_cb();
+> +
+> +	return IRQ_HANDLED;
+> +}
 
->
->> +static irqreturn_t cg2900_devices_interrupt(int irq, void *dev_id)
->> +{
->> +     disable_irq_nosync(irq);
->> +     if (cg2900_dev_callback && cg2900_dev_callback->interrupt_cb)
->> +             cg2900_dev_callback->interrupt_cb();
->> +
->> +     return IRQ_HANDLED;
->> +}
->
-> Why is there this callback mechanism - I'd expect the users of this code
-> to just be using the standard IRQ infrastructure?
->
-
-I will have to get back to you regarding this. I did not implement
-that specific part and the guy who did is back on Monday.
-
-
-/P-G
+Why is there this callback mechanism - I'd expect the users of this code
+to just be using the standard IRQ infrastructure?
