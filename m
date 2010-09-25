@@ -1,41 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gustavo F. Padovan" <gustavo@padovan.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: Pull resquest review to 2.6.36-rc5
-Date: Fri, 24 Sep 2010 22:01:38 -0300
-Message-Id: <1285376504-3541-1-git-send-email-gustavo@padovan.org>
+MIME-Version: 1.0
+In-Reply-To: <20100924151552.GG4061@null>
+References: <AANLkTi=QaWXz2BEsUJPpXQjvGuGm8CtctJ_q-7WNC=VH@mail.gmail.com>
+	<AANLkTikS2-eKiEP2ngqz6rW5JB-+eudtffw9QHykhbqq@mail.gmail.com>
+	<AANLkTikAHAKe2WDMuAKEvCXh6jxGXFYYhfWPJkCGXUSp@mail.gmail.com>
+	<AANLkTi=9o+9KFNTGcYBZd0z+kYVwBj-Z1LxwdPsjTSfw@mail.gmail.com>
+	<AANLkTikE91qpOgsio9WRaunaAyX3JDWXX0Oz4DvUvspU@mail.gmail.com>
+	<20100924081642.GA30391@null>
+	<AANLkTi=8QV8n1c2cghbbyNv1pZKbHPPRzbv0zVZ_5Vk8@mail.gmail.com>
+	<20100924151552.GG4061@null>
+Date: Fri, 24 Sep 2010 18:11:32 -0700
+Message-ID: <AANLkTik_cwho9JNBPFhCDx0EGFcLN2+VTG8LT-D_Hw_3@mail.gmail.com>
+Subject: Re: Bluez simple-agent vs agent
+From: Viswanathan Sankararam <developervishwa@gmail.com>
+To: Ville Tervo <ville.tervo@nokia.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Thanks Ville for letting me know about this. Is there a possibility to
+back port? Can I just blindly copy the net/bluetooth drivers to a
+linux-2.6.23 kernel and compile?
 
-These are the patches we have queued for the Bluetooth subsystem intended to be
-pushed into 2.6.36. We are bit late already, please make any comment as soon as
-possible then  we can hurry and pull those to wireless-2.6 on Monday maybe.
-
-
-The following changes since commit b30a3f6257ed2105259b404d419b4964e363928c:
-
-  Linux 2.6.36-rc5 (2010-09-20 16:56:53 -0700)
-
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git master
-
-Andrei Emeltchenko (1):
-      Bluetooth: fix MTU L2CAP configuration parameter
-
-Gustavo F. Padovan (4):
-      Bluetooth: Simplify L2CAP Streaming mode sending
-      Bluetooth: Fix inconsistent lock state with RFCOMM
-      Revert "Bluetooth: Don't accept ConfigReq if we aren't in the BT_CONFIG state"
-      Bluetooth: Fix deadlock in the ERTM logic
-
-Mat Martineau (1):
-      Bluetooth: Only enable for L2CAP FCS for ERTM or streaming
-
- include/net/bluetooth/bluetooth.h |   11 +++++++
- net/bluetooth/l2cap.c             |   57 +++++++++++++++---------------------
- net/bluetooth/rfcomm/sock.c       |    4 ++
- 3 files changed, 39 insertions(+), 33 deletions(-)
-
-
+On Fri, Sep 24, 2010 at 8:15 AM, Ville Tervo <ville.tervo@nokia.com> wrote:
+> Hi,
+>
+> On Fri, Sep 24, 2010 at 04:09:08PM +0200, ext Viswanathan Sankararam wrote:
+>> Im using linux2.6.23... by todays standard, this is old I guess but
+>> could it be the cause?
+>
+> Yes that ioctl was introduced in 2.6.27.
+>
+> And please don't remove mailing list from discussion.
+>
+> --
+> Ville
+>
