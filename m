@@ -1,99 +1,185 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4CA0E800.4000000@sergej.pp.ru>
-Date: Mon, 27 Sep 2010 22:52:48 +0400
-From: Sergej Pupykin <ml@sergej.pp.ru>
+Date: Mon, 27 Sep 2010 13:45:02 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: pghatwork@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linus.walleij@stericsson.com, Pavan Savoy <pavan_savoy@sify.com>
+Subject: Re: [PATCH 6/6] This patch adds support for using the ST-Ericsson
+ CG2900
+Message-ID: <20100927164502.GB30310@vigoh>
+References: <AANLkTimOai9_92VuJUZMo26es9Wsu_6d+z36Sv_Q4i+L@mail.gmail.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Another "hci0 command tx timeout"
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <AANLkTimOai9_92VuJUZMo26es9Wsu_6d+z36Sv_Q4i+L@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-  Hello, All.
+Hi Par-Gunnar,
 
-How can I help to debug this issue? BT works without userspace, but does 
-not work if I enable it in udev rules (ACTION=="add", 
-SUBSYSTEM=="bluetooth", RUN+="/usr/sbin/bluetoothd --udev") or do 
-"/etc/rc.d/bluetooth start".
+* Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com> [2010-09-24 15:52:16 +0200]:
 
-(Probably related to
-https://bugzilla.redhat.com/show_bug.cgi?id=519176
-and
-https://bugs.launchpad.net/linux/+bug/268502)
+> This patch adds support for using the ST-Ericsson CG2900
+>  connectivity controller as a driver for the BlueZ Bluetooth
+>  stack.
+>  This patch registers as a driver into the BlueZ framework and, when
+>  opened by BlueZ, it registers as user for bt_cmd, bt_acl, and bt_evt
+>  channels.
 
-Packages:
-kernel26 2.6.35.5-1
-bluez 4.72-1
+First of all your your commit message and subject should be improved.
+The subject should bee something like:
 
-Devices:
-Bus 007 Device 005: ID 0a5c:3503 Broadcom Corp.
-Bus 007 Device 004: ID 0a5c:3502 Broadcom Corp.
-Bus 007 Device 003: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth 
-Dongle (HCI mode)
-Bus 007 Device 002: ID 0a5c:3500 Broadcom Corp.
+"Bluetooth: Add support for ST-Ericsson CG2900"
 
-Without userspace:
-HCI sniffer - Bluetooth packet analyzer ver 1.42
-device: hci0 snap_len: 1028 filter: 0xffffffffffffffff
-< HCI Command: Read Local Supported Features (0x04|0x0003) plen 0
- > HCI Event: Command Complete (0x0e) plen 12
-< HCI Command: Read Local Version Information (0x04|0x0001) plen 0
- > HCI Event: Command Complete (0x0e) plen 12
-< HCI Command: Read Buffer Size (0x04|0x0005) plen 0
- > HCI Event: Command Complete (0x0e) plen 11
-< HCI Command: Read BD ADDR (0x04|0x0009) plen 0
- > HCI Event: Command Complete (0x0e) plen 10
-< HCI Command: Read Class of Device (0x03|0x0023) plen 0
- > HCI Event: Command Complete (0x0e) plen 7
-< HCI Command: Read Local Name (0x03|0x0014) plen 0
- > HCI Event: Command Complete (0x0e) plen 252
-< HCI Command: Read Voice Setting (0x03|0x0025) plen 0
- > HCI Event: Command Complete (0x0e) plen 6
-< HCI Command: Set Event Filter (0x03|0x0005) plen 1
- > HCI Event: Command Complete (0x0e) plen 4
-< HCI Command: Write Page Timeout (0x03|0x0018) plen 2
- > HCI Event: Command Complete (0x0e) plen 4
-< HCI Command: Write Connection Accept Timeout (0x03|0x0016) plen 2
- > HCI Event: Command Complete (0x0e) plen 4
-< HCI Command: Inquiry (0x01|0x0001) plen 5
- > HCI Event: Command Status (0x0f) plen 4
- > HCI Event: Inquiry Result (0x02) plen 15
- > HCI Event: Inquiry Complete (0x01) plen 1
+and in the commit message you explain the details of the patch.
+And normally we do not use the BlueZ word in kernelspace.
 
+> 
+> Signed-off-by: Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
+> ---
+>  drivers/bluetooth/Kconfig      |    7 +
+>  drivers/bluetooth/Makefile     |    2 +
+>  drivers/bluetooth/cg2900_hci.c |  896 ++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 905 insertions(+), 0 deletions(-)
+>  create mode 100644 drivers/bluetooth/cg2900_hci.c
 
-With userspace:
-HCI sniffer - Bluetooth packet analyzer ver 1.42
-device: hci0 snap_len: 1028 filter: 0xffffffffffffffff
-< HCI Command: Read Local Supported Features (0x04|0x0003) plen 0
- > HCI Event: Command Complete (0x0e) plen 12
-< HCI Command: Read Local Version Information (0x04|0x0001) plen 0
- > HCI Event: Command Complete (0x0e) plen 12
-< HCI Command: Read Buffer Size (0x04|0x0005) plen 0
- > HCI Event: Command Complete (0x0e) plen 11
-< HCI Command: Read BD ADDR (0x04|0x0009) plen 0
- > HCI Event: Command Complete (0x0e) plen 10
-< HCI Command: Read Class of Device (0x03|0x0023) plen 0
- > HCI Event: Command Complete (0x0e) plen 7
-< HCI Command: Read Local Name (0x03|0x0014) plen 0
- > HCI Event: Command Complete (0x0e) plen 252
-< HCI Command: Read Voice Setting (0x03|0x0025) plen 0
- > HCI Event: Command Complete (0x0e) plen 6
-< HCI Command: Set Event Filter (0x03|0x0005) plen 1
- > HCI Event: Command Complete (0x0e) plen 4
-< HCI Command: Write Page Timeout (0x03|0x0018) plen 2
- > HCI Event: Command Complete (0x0e) plen 4
-< HCI Command: Write Connection Accept Timeout (0x03|0x0016) plen 2
- > HCI Event: Command Complete (0x0e) plen 4
-< HCI Command: Write Page Timeout (0x03|0x0018) plen 2
- > HCI Event: Command Complete (0x0e) plen 4
-< HCI Command: Write Default Link Policy Settings (0x02|0x000f) plen 2
- > HCI Event: Command Complete (0x0e) plen 4
-< HCI Command: Read Stored Link Key (0x03|0x000d) plen 7
- > HCI Event: Command Complete (0x0e) plen 8
-< HCI Command: Read Local Version Information (0x04|0x0001) plen 0
- > HCI Event: Command Complete (0x0e) plen 12
-< HCI Command: Read Local Supported Features (0x04|0x0003) plen 0
- > HCI Event: Command Complete (0x0e) plen 12
-< HCI Command: Read Default Link Policy Settings (0x02|0x000e) plen 0
-< HCI Command: Write Scan Enable (0x03|0x001a) plen 1
+Your patch looks a way complicated to a UART driver. Look at the others
+drivers at drivers/bluetooth/ and see how we implemented other UART
+drivers.
 
+> 
+> diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+> index 02deef4..9ca8d69 100644
+> --- a/drivers/bluetooth/Kconfig
+> +++ b/drivers/bluetooth/Kconfig
+> @@ -219,4 +219,11 @@ config BT_ATH3K
+>  	  Say Y here to compile support for "Atheros firmware download driver"
+>  	  into the kernel or say M to compile it as module (ath3k).
+> 
+> +config BT_CG2900
+> +	tristate "ST-Ericsson CG2900 driver"
+> +	depends on MFD_CG2900 && BT
+> +	help
+> +	  Select if ST-Ericsson CG2900 Connectivity controller shall be used as
+> +	  Bluetooth controller for BlueZ.
+> +
+>  endmenu
+> diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
+> index 71bdf13..a479c16 100644
+> --- a/drivers/bluetooth/Makefile
+> +++ b/drivers/bluetooth/Makefile
+> @@ -19,6 +19,8 @@ obj-$(CONFIG_BT_ATH3K)		+= ath3k.o
+>  obj-$(CONFIG_BT_MRVL)		+= btmrvl.o
+>  obj-$(CONFIG_BT_MRVL_SDIO)	+= btmrvl_sdio.o
+> 
+> +obj-$(CONFIG_BT_CG2900)		+= cg2900_hci.o
+> +
+>  btmrvl-y			:= btmrvl_main.o
+>  btmrvl-$(CONFIG_DEBUG_FS)	+= btmrvl_debugfs.o
+> 
+> diff --git a/drivers/bluetooth/cg2900_hci.c b/drivers/bluetooth/cg2900_hci.c
+> new file mode 100644
+> index 0000000..de1ada8
+> --- /dev/null
+> +++ b/drivers/bluetooth/cg2900_hci.c
+> @@ -0,0 +1,896 @@
+> +/*
+> + * drivers/bluetooth/cg2900_hci.c
+> + *
+> + * Copyright (C) ST-Ericsson SA 2010
+> + * Authors:
+> + * Par-Gunnar Hjalmdahl (par-gunnar.p.hjalmdahl@stericsson.com) for
+> ST-Ericsson.
+> + * Henrik Possung (henrik.possung@stericsson.com) for ST-Ericsson.
+> + * Josef Kindberg (josef.kindberg@stericsson.com) for ST-Ericsson.
+> + * Dariusz Szymszak (dariusz.xd.szymczak@stericsson.com) for ST-Ericsson.
+> + * Kjell Andersson (kjell.k.andersson@stericsson.com) for ST-Ericsson.
+> + * License terms:  GNU General Public License (GPL), version 2
+> + *
+> + * Linux Bluetooth HCI H:4 Driver for ST-Ericsson CG2900 connectivity
+> controller
+> + * towards the BlueZ Bluetooth stack.
+> + */
+> +
+> +#include <linux/module.h>
+> +#include <linux/types.h>
+> +#include <linux/skbuff.h>
+> +#include <asm/byteorder.h>
+> +#include <net/bluetooth/bluetooth.h>
+> +#include <net/bluetooth/hci.h>
+> +#include <net/bluetooth/hci_core.h>
+> +
+> +#include <linux/workqueue.h>
+> +#include <linux/wait.h>
+> +#include <linux/time.h>
+> +#include <linux/jiffies.h>
+> +#include <linux/sched.h>
+> +#include <linux/timer.h>
+> +
+> +#include <linux/mfd/cg2900.h>
+> +#include <mach/cg2900_devices.h>
+> +
+> +/* module_param declared in cg2900_core.c */
+> +extern int cg2900_debug_level;
+
+You don't need that, just use dynamic debug instead 
+
+> +
+> +#define NAME			"CG2900 HCI"
+> +
+> +/* Debug defines */
+> +#define CG2900_DBG_DATA(fmt, arg...)				\
+> +do {								\
+> +	if (cg2900_debug_level >= 25)				\
+> +		printk(KERN_DEBUG NAME " %s: " fmt "\n" , __func__ , ## arg); \
+> +} while (0)
+> +
+> +#define CG2900_DBG(fmt, arg...)				\
+> +do {								\
+> +	if (cg2900_debug_level >= 20)				\
+> +		printk(KERN_DEBUG NAME " %s: " fmt "\n" , __func__ , ## arg); \
+> +} while (0)
+> +
+> +#define CG2900_INFO(fmt, arg...)				\
+> +do {								\
+> +	if (cg2900_debug_level >= 10)				\
+> +		printk(KERN_INFO NAME ": " fmt "\n" , ## arg); \
+> +} while (0)
+> +
+> +#define CG2900_ERR(fmt, arg...)					\
+> +do {								\
+> +	if (cg2900_debug_level >= 1)				\
+> +		printk(KERN_ERR NAME " %s: " fmt "\n" , __func__ , ## arg); \
+> +} while (0)i
+
+and BT_DBG, BT_INFO, BT_ERR instead of these macros.
+
+> +
+> +#define CG2900_SET_STATE(__name, __var, __new_state)			\
+> +do {									\
+> +	CG2900_DBG("New %s: 0x%X", __name, (uint32_t)__new_state);	\
+> +	__var = __new_state;						\
+> +} while (0)
+
+Don't hide your operation with a macro, that is a simple attribution, so
+no need for a macro for that.
+
+> +
+> +/* HCI device type */
+> +#define HCI_CG2900		HCI_VIRTUAL
+> +
+> +/* Wait for 5 seconds for a response to our requests */
+> +#define RESP_TIMEOUT		5000
+> +
+> +/* State-setting defines */
+> +#define SET_RESET_STATE(__hci_reset_new_state) \
+> +	CG2900_SET_STATE("reset_state", hci_info->reset_state, \
+> +			 __hci_reset_new_state)
+> +#define SET_ENABLE_STATE(__hci_enable_new_state) \
+> +	CG2900_SET_STATE("enable_state", hci_info->enable_state, \
+> +			 __hci_enable_new_state)
+
+Same here.
+
+-- 
+Gustavo F. Padovan
+ProFUSION embedded systems - http://profusion.mobi
