@@ -1,42 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 27 Sep 2010 18:18:21 -0300
+Date: Mon, 27 Sep 2010 17:51:33 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
+To: Anderson Briglia <anderson.briglia@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2 v3] bluetooth: Add support Bluetooth controller of
- MacbookPro 7,1
-Message-ID: <20100927211821.GH5489@vigoh>
-References: <1282289047-21444-1-git-send-email-iwamatsu@nigauri.org>
- <1282289047-21444-2-git-send-email-iwamatsu@nigauri.org>
+Subject: Re: [PATCH v3 2/2] Bluetooth: Implement LE Set Scan Enable cmd
+Message-ID: <20100927205133.GG5489@vigoh>
+References: <1284384122-8393-1-git-send-email-anderson.briglia@openbossa.org>
+ <1284384122-8393-2-git-send-email-anderson.briglia@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1282289047-21444-2-git-send-email-iwamatsu@nigauri.org>
+In-Reply-To: <1284384122-8393-2-git-send-email-anderson.briglia@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nobuhiro,
+Hi Anderson,
 
-* Nobuhiro Iwamatsu <iwamatsu@nigauri.org> [2010-08-20 16:24:07 +0900]:
+* Anderson Briglia <anderson.briglia@openbossa.org> [2010-09-13 09:22:02 -0400]:
 
-> Bluetooth controller of MacbookPro 7,1 does not work.
-> Because Device Class of these controllers was set 255 (Vendor Sepecific Class).
+> This patch implements LE Set Scan Enable command for dual
+> mode and Low Energy hci controllers. It also adds new HCI flags
+> in order to indicate the LE Scanning state for userland applications
+> and kernel itself.
 > 
-> T:  Bus=04 Lev=02 Prnt=04 Port=00 Cnt=01 Dev#=  5 Spd=12  MxCh= 0
-> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=05ac ProdID=8213 Rev=01.86
-> S:  Manufacturer=Apple Inc.
-> S:  Product=Bluetooth USB Host Controller
-> S:  SerialNumber=5C5948C81B99
-> C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-> I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
-> 
-> Signed-off-by: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
+> Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
 > ---
->  drivers/bluetooth/btusb.c |    3 +++
->  1 files changed, 3 insertions(+), 0 deletions(-)
+>  include/net/bluetooth/hci.h |    5 +++++
+>  net/bluetooth/hci_event.c   |   27 +++++++++++++++++++++++++++
+>  2 files changed, 32 insertions(+), 0 deletions(-)
 
 Both patches have been applied to my bluetooth-next-2.6 tree.
 
