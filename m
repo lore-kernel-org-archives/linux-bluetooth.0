@@ -1,36 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4CA0F1FE.8040006@sergej.pp.ru>
-Date: Mon, 27 Sep 2010 23:35:26 +0400
-From: Sergej Pupykin <ml@sergej.pp.ru>
-MIME-Version: 1.0
-CC: linux-bluetooth@vger.kernel.org
+Date: Mon, 27 Sep 2010 16:21:08 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Sergej Pupykin <ml@sergej.pp.ru>
+Cc: linux-bluetooth@vger.kernel.org
 Subject: Re: Another "hci0 command tx timeout"
-References: <4CA0E800.4000000@sergej.pp.ru> <20100927192108.GA5489@vigoh>
-In-Reply-To: <20100927192108.GA5489@vigoh>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-To: unlisted-recipients:; (no To-header on input)
+Message-ID: <20100927192108.GA5489@vigoh>
+References: <4CA0E800.4000000@sergej.pp.ru>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4CA0E800.4000000@sergej.pp.ru>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-  On 27.09.2010 23:21, Gustavo F. Padovan wrote:
->
-> What do you mean by "works without userspace"
-I try to do following:
+Hi Sergej,
 
-1. ensure that userspace does not work (stop bluetoothd and comment udev 
-bluetooth rule)
-2. modprobe btusb
-3. hciconfig hci0 up
-4. hcitool inq
+* Sergej Pupykin <ml@sergej.pp.ru> [2010-09-27 22:52:48 +0400]:
 
-then remove btusb, uncomment udev rules, start bluetoothd and do 2-4 again.
+>   Hello, All.
+> 
+> How can I help to debug this issue? BT works without userspace, but does 
+> not work if I enable it in udev rules (ACTION=="add", 
+> SUBSYSTEM=="bluetooth", RUN+="/usr/sbin/bluetoothd --udev") or do 
+> "/etc/rc.d/bluetooth start".
 
-With userspace I got
+What do you mean by "works without userspace"?
 
-$ hcitool inq
-Inquiring ...
-Inquiry failed.: Connection timed out
-
-and subj error in dmesg.
-
-Also I see that hcidump with userspace does not catch inquiry command.
+-- 
+Gustavo F. Padovan
+ProFUSION embedded systems - http://profusion.mobi
