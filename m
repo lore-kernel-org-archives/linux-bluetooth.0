@@ -1,79 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 27 Sep 2010 14:22:07 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Bluetooth: set sk_sndbuf and sk_rcvbuf properly in
- ERTM
-In-Reply-To: <1285618609-11499-1-git-send-email-padovan@profusion.mobi>
-Message-ID: <alpine.DEB.2.00.1009271355090.27215@linux-sea-02>
-References: <1285618609-11499-1-git-send-email-padovan@profusion.mobi>
+Date: Mon, 27 Sep 2010 18:18:21 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2 v3] bluetooth: Add support Bluetooth controller of
+ MacbookPro 7,1
+Message-ID: <20100927211821.GH5489@vigoh>
+References: <1282289047-21444-1-git-send-email-iwamatsu@nigauri.org>
+ <1282289047-21444-2-git-send-email-iwamatsu@nigauri.org>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1282289047-21444-2-git-send-email-iwamatsu@nigauri.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Nobuhiro,
 
-Gustavo -
+* Nobuhiro Iwamatsu <iwamatsu@nigauri.org> [2010-08-20 16:24:07 +0900]:
 
-On Mon, 27 Sep 2010, Gustavo F. Padovan wrote:
-
-> Setting both this value to MPS * TxWin * 1.2 guarantees that we are
-> reserving space to fit the whole txwindow in the memory, and that
-> sendmsg() will block when the transmission window is full avoid
-> overloading the system memory.
-> I don't have a strong reason about the 1.2 constant in the account, we
-> can do another tests in the future and change that value.
->
-> Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+> Bluetooth controller of MacbookPro 7,1 does not work.
+> Because Device Class of these controllers was set 255 (Vendor Sepecific Class).
+> 
+> T:  Bus=04 Lev=02 Prnt=04 Port=00 Cnt=01 Dev#=  5 Spd=12  MxCh= 0
+> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=05ac ProdID=8213 Rev=01.86
+> S:  Manufacturer=Apple Inc.
+> S:  Product=Bluetooth USB Host Controller
+> S:  SerialNumber=5C5948C81B99
+> C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+> I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
+> 
+> Signed-off-by: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
 > ---
-> net/bluetooth/l2cap_core.c |   10 +++++++++-
-> 1 files changed, 9 insertions(+), 1 deletions(-)
->
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 44aa034..1e2ab05 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -3129,9 +3129,17 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
-> 		l2cap_pi(sk)->next_tx_seq = 0;
-> 		l2cap_pi(sk)->expected_tx_seq = 0;
-> 		__skb_queue_head_init(TX_QUEUE(sk));
-> -		if (l2cap_pi(sk)->mode ==  L2CAP_MODE_ERTM)
-> +		if (l2cap_pi(sk)->mode ==  L2CAP_MODE_ERTM) {
-> 			l2cap_ertm_init(sk);
->
-> +			sk->sk_sndbuf = (l2cap_pi(sk)->remote_tx_win * 1.2 *
-> +						(sizeof(struct l2cap_pinfo) +
-> +						l2cap_pi(sk)->mps));
-> +			sk->sk_rcvbuf = (l2cap_pi(sk)->tx_win * 1.2 *
-> +						(sizeof(struct l2cap_pinfo) +
-> +						l2cap_pi(sk)->remote_mps));
-> +		}
-> +
-> 		l2cap_chan_ready(sk);
-> 	}
->
-> -- 
-> 1.7.3
+>  drivers/bluetooth/btusb.c |    3 +++
+>  1 files changed, 3 insertions(+), 0 deletions(-)
 
-I think sizeof(struct sk_buff) would be better than
-sizeof(struct l2cap_pinfo), since these limits apply to data buffers, 
-not per-socket overhead.
+Both patches have been applied to my bluetooth-next-2.6 tree.
 
-The 1.2 constant would need to be increased if we allow ERTM MPS
-bigger than the HCI MTU, since there would be multiple sk_buffs per 
-PDU.  However, the calculation could be updated when those MPS changes 
-are made.
-
-It would also help to enforce some limits:
-SOCK_MIN_SNDBUF < sk->sk_sndbuf < sysctl_wmem_max
-SOCK_MIN_RCVBUF < sk->sk_rcvbuf < sysctl_rmem_max
-
-
-Regards,
-
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-
+-- 
+Gustavo F. Padovan
+ProFUSION embedded systems - http://profusion.mobi
