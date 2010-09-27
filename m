@@ -1,47 +1,20 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Message-ID: <4CA0FA3D.9040100@sergej.pp.ru>
+Date: Tue, 28 Sep 2010 00:10:37 +0400
+From: Sergej Pupykin <ml@sergej.pp.ru>
+MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: set sk_sndbuf and sk_rcvbuf properly in ERTM
-Date: Mon, 27 Sep 2010 17:16:48 -0300
-Message-Id: <1285618609-11499-1-git-send-email-padovan@profusion.mobi>
+Subject: Re: Another "hci0 command tx timeout"
+References: <4CA0E800.4000000@sergej.pp.ru> <20100927192108.GA5489@vigoh> <4CA0F1FE.8040006@sergej.pp.ru> <20100927194650.GB5489@vigoh>
+In-Reply-To: <20100927194650.GB5489@vigoh>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Setting both this value to MPS * TxWin * 1.2 guarantees that we are
-reserving space to fit the whole txwindow in the memory, and that
-sendmsg() will block when the transmission window is full avoid
-overloading the system memory.
-I don't have a strong reason about the 1.2 constant in the account, we
-can do another tests in the future and change that value.
-
-Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
----
- net/bluetooth/l2cap_core.c |   10 +++++++++-
- 1 files changed, 9 insertions(+), 1 deletions(-)
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 44aa034..1e2ab05 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -3129,9 +3129,17 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 		l2cap_pi(sk)->next_tx_seq = 0;
- 		l2cap_pi(sk)->expected_tx_seq = 0;
- 		__skb_queue_head_init(TX_QUEUE(sk));
--		if (l2cap_pi(sk)->mode ==  L2CAP_MODE_ERTM)
-+		if (l2cap_pi(sk)->mode ==  L2CAP_MODE_ERTM) {
- 			l2cap_ertm_init(sk);
- 
-+			sk->sk_sndbuf = (l2cap_pi(sk)->remote_tx_win * 1.2 *
-+						(sizeof(struct l2cap_pinfo) +
-+						l2cap_pi(sk)->mps));
-+			sk->sk_rcvbuf = (l2cap_pi(sk)->tx_win * 1.2 *
-+						(sizeof(struct l2cap_pinfo) +
-+						l2cap_pi(sk)->remote_mps));
-+		}
-+
- 		l2cap_chan_ready(sk);
- 	}
- 
--- 
-1.7.3
-
+  On 27.09.2010 23:46, Gustavo F. Padovan wrote:
+>
+> So that is the problem, you are removing btusb.
+>
+Do you mean that removing/inserting back btusb can damage something? I 
+repeat it many times and it always works if bluetoothd stopped and 
+always does not work if bluetoothd is running.
