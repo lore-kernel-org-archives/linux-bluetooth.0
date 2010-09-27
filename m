@@ -1,49 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Mon, 27 Sep 2010 10:52:28 +0300
-Message-ID: <AANLkTikrQ2fAHDZwMncOpNRadjm=tdobvDoas=v5eyxH@mail.gmail.com>
-Subject: Spurious authentication request?
-From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <AANLkTi=aX_XQqEwa3q=1krNfpYxGFbkc2V4wEGcT9oHA@mail.gmail.com>
+References: <AANLkTinQOKoBCXgh1=wb9Z7w8A4w7vYFkSCoZvkspyYo@mail.gmail.com> <AANLkTi=aX_XQqEwa3q=1krNfpYxGFbkc2V4wEGcT9oHA@mail.gmail.com>
+From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+Date: Mon, 27 Sep 2010 09:04:32 +0200
+Message-ID: <AANLkTi==cFMZfr-achvT=5HNpR5p_36mC7=ybHTYcQc=@mail.gmail.com>
+Subject: Re: Support for Device ID profile
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: steven bluez <steven.bluez@gmail.com>,
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-Occasionally when pairing with a headset BlueZ issues what looks
-to be an unnecessary "Authentication Requested" after
-receiving "Auth Complete" and "Simple Pairing Complete".
+2010/9/24 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
+> Hi Steven,
+>
+> Yes, you can use DeviceID on main.conf to add that, but as you see it
+> is pretty limited so we are planning to have a better support for
+> this, perhaps extend adapter driver interface where you can write a
+> plugin to fill this information.
 
-2010-09-22 11:23:45.282348 > HCI Event: Auth Complete (0x06) plen 3
-    status 0x00 handle 2
-2010-09-22 11:23:45.282378 < HCI Command: Set Connection Encryption
-(0x01|0x0013) plen 3
-    handle 2 encrypt 0x01
-[..]
-2010-09-22 11:23:45.363646 < HCI Command: Authentication Requested
-(0x01|0x0011) plen 2
-    handle 2
+Is anyone working on this plugin now. I'd like to work on it if nobody
+is working yet.
 
-This request is coming from bonding_connect_cb and occurs if that
-callback happens to be executed before the function
-hcid_dbus_bonding_process_complete (triggered by the auth complete
-event). The order between those functions might have been affected
-by this patch
+Regards.
 
-http://git.kernel.org/?p=bluetooth/bluez.git;a=commit;h=be35d00671519b8d92361c2caad9abeedda151f8
-
-The request for authentication seems to be used for legacy pairing and
-should probably not be made for simple pairing. Also, it might be
-inconsistent that the kernel issues "Authentication Requested" for
-simple pairing, but bluetoothd does it for legacy?
-
-I guess enclosing the call in a check for legacy pairing would
-work, if that information is or can be made available to
-bluetoothd.
-
-Have I understood the situation correctly and if so, what would
-be a good way to fix this issue?
-
-Thanks,
-Daniel
+>
+> Regards,
+>
+> On Fri, Sep 24, 2010 at 11:54 AM, steven bluez <steven.bluez@gmail.com> wrote:
+>> Hi all,
+>>       Is there any support for Device ID Profile in Bluez 4.XX? versions ?\
+>>
+>> Regards,
+>> Steven
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
+> Computer Engineer
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
