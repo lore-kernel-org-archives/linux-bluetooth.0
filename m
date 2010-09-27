@@ -1,185 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 27 Sep 2010 13:45:02 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: pghatwork@gmail.com
+Date: Mon, 27 Sep 2010 08:15:50 -0700
+From: Mark Brown <broonie@opensource.wolfsonmicro.com>
+To: Par-Gunnar Hjalmdahl <pghatwork@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linus.walleij@stericsson.com, Pavan Savoy <pavan_savoy@sify.com>
-Subject: Re: [PATCH 6/6] This patch adds support for using the ST-Ericsson
- CG2900
-Message-ID: <20100927164502.GB30310@vigoh>
-References: <AANLkTimOai9_92VuJUZMo26es9Wsu_6d+z36Sv_Q4i+L@mail.gmail.com>
+Subject: Re: [PATCH 1/6] This patch adds support for the ST-Ericsson CG2900
+Message-ID: <20100927151550.GC13754@opensource.wolfsonmicro.com>
+References: <AANLkTin9Qji_bdyd3yqrP_-ti5xRT9jJ4je2fPM=uHFX@mail.gmail.com>
+ <20100924141046.GA26454@sirena.org.uk>
+ <AANLkTin=PPfgnD5tKBPR1QXf2OeBKBH-kXtoT+s-KPhk@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTimOai9_92VuJUZMo26es9Wsu_6d+z36Sv_Q4i+L@mail.gmail.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <AANLkTin=PPfgnD5tKBPR1QXf2OeBKBH-kXtoT+s-KPhk@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Par-Gunnar,
+On Mon, Sep 27, 2010 at 10:16:11AM +0200, Par-Gunnar Hjalmdahl wrote:
+> 2010/9/24 Mark Brown <broonie@opensource.wolfsonmicro.com>:
+> > On Fri, Sep 24, 2010 at 03:46:44PM +0200, Par-Gunnar Hjalmdahl wrote:
 
-* Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com> [2010-09-24 15:52:16 +0200]:
+> >> +static irqreturn_t cg2900_devices_interrupt(int irq, void *dev_id)
+> >> +{
+> >> +     disable_irq_nosync(irq);
+> >> +     if (cg2900_dev_callback && cg2900_dev_callback->interrupt_cb)
+> >> +             cg2900_dev_callback->interrupt_cb();
+> >> +
+> >> +     return IRQ_HANDLED;
+> >> +}
 
-> This patch adds support for using the ST-Ericsson CG2900
->  connectivity controller as a driver for the BlueZ Bluetooth
->  stack.
->  This patch registers as a driver into the BlueZ framework and, when
->  opened by BlueZ, it registers as user for bt_cmd, bt_acl, and bt_evt
->  channels.
+> > Why is there this callback mechanism - I'd expect the users of this code
+> > to just be using the standard IRQ infrastructure?
 
-First of all your your commit message and subject should be improved.
-The subject should bee something like:
+> This is our local IRQ which is handled in cg2900_uart.c by creating a work:
 
-"Bluetooth: Add support for ST-Ericsson CG2900"
+I can tell it's an IRQ - that's my point; the kernel has an interrupt
+handling subsystem which this isn't using.
 
-and in the commit message you explain the details of the patch.
-And normally we do not use the BlueZ word in kernelspace.
+> I understand your concern that client implementing the
+> cg2900_dev_callback->interrupt_cb();
+> might not know realized that this is irq context which might cause problems.
 
-> 
-> Signed-off-by: Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
-> ---
->  drivers/bluetooth/Kconfig      |    7 +
->  drivers/bluetooth/Makefile     |    2 +
->  drivers/bluetooth/cg2900_hci.c |  896 ++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 905 insertions(+), 0 deletions(-)
->  create mode 100644 drivers/bluetooth/cg2900_hci.c
+No, you're misunderstanding my point.  The kernel has facilities for
+representing interrupt controllers which this is not using.
 
-Your patch looks a way complicated to a UART driver. Look at the others
-drivers at drivers/bluetooth/ and see how we implemented other UART
-drivers.
+> If not then suggest what is expected way of handling it ? eg. moving
+> workqueue down to cg2900_devices
+> or other solution?
 
-> 
-> diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-> index 02deef4..9ca8d69 100644
-> --- a/drivers/bluetooth/Kconfig
-> +++ b/drivers/bluetooth/Kconfig
-> @@ -219,4 +219,11 @@ config BT_ATH3K
->  	  Say Y here to compile support for "Atheros firmware download driver"
->  	  into the kernel or say M to compile it as module (ath3k).
-> 
-> +config BT_CG2900
-> +	tristate "ST-Ericsson CG2900 driver"
-> +	depends on MFD_CG2900 && BT
-> +	help
-> +	  Select if ST-Ericsson CG2900 Connectivity controller shall be used as
-> +	  Bluetooth controller for BlueZ.
-> +
->  endmenu
-> diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
-> index 71bdf13..a479c16 100644
-> --- a/drivers/bluetooth/Makefile
-> +++ b/drivers/bluetooth/Makefile
-> @@ -19,6 +19,8 @@ obj-$(CONFIG_BT_ATH3K)		+= ath3k.o
->  obj-$(CONFIG_BT_MRVL)		+= btmrvl.o
->  obj-$(CONFIG_BT_MRVL_SDIO)	+= btmrvl_sdio.o
-> 
-> +obj-$(CONFIG_BT_CG2900)		+= cg2900_hci.o
-> +
->  btmrvl-y			:= btmrvl_main.o
->  btmrvl-$(CONFIG_DEBUG_FS)	+= btmrvl_debugfs.o
-> 
-> diff --git a/drivers/bluetooth/cg2900_hci.c b/drivers/bluetooth/cg2900_hci.c
-> new file mode 100644
-> index 0000000..de1ada8
-> --- /dev/null
-> +++ b/drivers/bluetooth/cg2900_hci.c
-> @@ -0,0 +1,896 @@
-> +/*
-> + * drivers/bluetooth/cg2900_hci.c
-> + *
-> + * Copyright (C) ST-Ericsson SA 2010
-> + * Authors:
-> + * Par-Gunnar Hjalmdahl (par-gunnar.p.hjalmdahl@stericsson.com) for
-> ST-Ericsson.
-> + * Henrik Possung (henrik.possung@stericsson.com) for ST-Ericsson.
-> + * Josef Kindberg (josef.kindberg@stericsson.com) for ST-Ericsson.
-> + * Dariusz Szymszak (dariusz.xd.szymczak@stericsson.com) for ST-Ericsson.
-> + * Kjell Andersson (kjell.k.andersson@stericsson.com) for ST-Ericsson.
-> + * License terms:  GNU General Public License (GPL), version 2
-> + *
-> + * Linux Bluetooth HCI H:4 Driver for ST-Ericsson CG2900 connectivity
-> controller
-> + * towards the BlueZ Bluetooth stack.
-> + */
-> +
-> +#include <linux/module.h>
-> +#include <linux/types.h>
-> +#include <linux/skbuff.h>
-> +#include <asm/byteorder.h>
-> +#include <net/bluetooth/bluetooth.h>
-> +#include <net/bluetooth/hci.h>
-> +#include <net/bluetooth/hci_core.h>
-> +
-> +#include <linux/workqueue.h>
-> +#include <linux/wait.h>
-> +#include <linux/time.h>
-> +#include <linux/jiffies.h>
-> +#include <linux/sched.h>
-> +#include <linux/timer.h>
-> +
-> +#include <linux/mfd/cg2900.h>
-> +#include <mach/cg2900_devices.h>
-> +
-> +/* module_param declared in cg2900_core.c */
-> +extern int cg2900_debug_level;
-
-You don't need that, just use dynamic debug instead 
-
-> +
-> +#define NAME			"CG2900 HCI"
-> +
-> +/* Debug defines */
-> +#define CG2900_DBG_DATA(fmt, arg...)				\
-> +do {								\
-> +	if (cg2900_debug_level >= 25)				\
-> +		printk(KERN_DEBUG NAME " %s: " fmt "\n" , __func__ , ## arg); \
-> +} while (0)
-> +
-> +#define CG2900_DBG(fmt, arg...)				\
-> +do {								\
-> +	if (cg2900_debug_level >= 20)				\
-> +		printk(KERN_DEBUG NAME " %s: " fmt "\n" , __func__ , ## arg); \
-> +} while (0)
-> +
-> +#define CG2900_INFO(fmt, arg...)				\
-> +do {								\
-> +	if (cg2900_debug_level >= 10)				\
-> +		printk(KERN_INFO NAME ": " fmt "\n" , ## arg); \
-> +} while (0)
-> +
-> +#define CG2900_ERR(fmt, arg...)					\
-> +do {								\
-> +	if (cg2900_debug_level >= 1)				\
-> +		printk(KERN_ERR NAME " %s: " fmt "\n" , __func__ , ## arg); \
-> +} while (0)i
-
-and BT_DBG, BT_INFO, BT_ERR instead of these macros.
-
-> +
-> +#define CG2900_SET_STATE(__name, __var, __new_state)			\
-> +do {									\
-> +	CG2900_DBG("New %s: 0x%X", __name, (uint32_t)__new_state);	\
-> +	__var = __new_state;						\
-> +} while (0)
-
-Don't hide your operation with a macro, that is a simple attribution, so
-no need for a macro for that.
-
-> +
-> +/* HCI device type */
-> +#define HCI_CG2900		HCI_VIRTUAL
-> +
-> +/* Wait for 5 seconds for a response to our requests */
-> +#define RESP_TIMEOUT		5000
-> +
-> +/* State-setting defines */
-> +#define SET_RESET_STATE(__hci_reset_new_state) \
-> +	CG2900_SET_STATE("reset_state", hci_info->reset_state, \
-> +			 __hci_reset_new_state)
-> +#define SET_ENABLE_STATE(__hci_enable_new_state) \
-> +	CG2900_SET_STATE("enable_state", hci_info->enable_state, \
-> +			 __hci_enable_new_state)
-
-Same here.
-
--- 
-Gustavo F. Padovan
-ProFUSION embedded systems - http://profusion.mobi
+Use the standard kernel IRQ framework to report interrupts to the
+clients - there's quite a few examples of using this in the drivers/mfd
+code.  This will make your code more idiomatic and give you access to
+all the diagnostic infrastructure the kernel provides for interrupts.
