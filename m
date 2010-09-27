@@ -1,38 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 27 Sep 2010 17:49:30 -0300
+Date: Mon, 27 Sep 2010 17:45:28 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: Ville Tervo <ville.tervo@nokia.com>
-Cc: "ext johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"Hedberg Johan (Nokia-MS/Helsinki)" <Johan.Hedberg@nokia.com>
-Subject: Re: [PATCH] Bluetooth: Don't clear the blacklist when closing the
- HCI device
-Message-ID: <20100927204930.GF5489@vigoh>
-References: <1284017559-13510-1-git-send-email-johan.hedberg@gmail.com>
- <20100915094909.GB14330@null>
+Cc: ext Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth: remove extra newline from debug output
+Message-ID: <20100927204528.GE5489@vigoh>
+References: <1283952413-22791-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20100915102952.GD14330@null>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20100915094909.GB14330@null>
+In-Reply-To: <20100915102952.GD14330@null>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Andrei,
 
-* Ville Tervo <ville.tervo@nokia.com> [2010-09-15 12:49:09 +0300]:
+* Ville Tervo <ville.tervo@nokia.com> [2010-09-15 13:29:53 +0300]:
 
-> On Thu, Sep 09, 2010 at 09:32:39AM +0200, ext johan.hedberg@gmail.com wrote:
-> > From: Johan Hedberg <johan.hedberg@nokia.com>
+> Hi Andrei,
+> 
+> On Wed, Sep 08, 2010 at 03:26:53PM +0200, ext Emeltchenko Andrei wrote:
+> > From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 > > 
-> > Clearing the blacklist in hci_dev_do_close() would mean that user space
-> > needs to do extra work to re-block devices after a DEVDOWN-DEVUP cycle.
-> > This patch removes the clearing of the blacklist in this case and
-> > thereby saves user space from the extra work.
 > > 
-> > Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
+> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 > 
 > Acked-by: Ville Tervo <ville.tervo@nokia.com>
 
-Patch has been applied to my bluetooth-next-2.6 tree to later merge in 
+Patch has been applied to my bluetooth-next-2.6 tree to later merge in
 wireless-next-2.6
 
 -- 
