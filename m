@@ -1,60 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 27 Sep 2010 11:00:28 +0300
+From: Ville Tervo <ville.tervo@nokia.com>
+To: ext Viswanathan Sankararam <developervishwa@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Bluez simple-agent vs agent
+Message-ID: <20100927080028.GH4061@null>
+References: <AANLkTi=QaWXz2BEsUJPpXQjvGuGm8CtctJ_q-7WNC=VH@mail.gmail.com>
+ <AANLkTikS2-eKiEP2ngqz6rW5JB-+eudtffw9QHykhbqq@mail.gmail.com>
+ <AANLkTikAHAKe2WDMuAKEvCXh6jxGXFYYhfWPJkCGXUSp@mail.gmail.com>
+ <AANLkTi=9o+9KFNTGcYBZd0z+kYVwBj-Z1LxwdPsjTSfw@mail.gmail.com>
+ <AANLkTikE91qpOgsio9WRaunaAyX3JDWXX0Oz4DvUvspU@mail.gmail.com>
+ <20100924081642.GA30391@null>
+ <AANLkTi=8QV8n1c2cghbbyNv1pZKbHPPRzbv0zVZ_5Vk8@mail.gmail.com>
+ <20100924151552.GG4061@null>
+ <AANLkTik_cwho9JNBPFhCDx0EGFcLN2+VTG8LT-D_Hw_3@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20100924141046.GA26454@sirena.org.uk>
-References: <AANLkTin9Qji_bdyd3yqrP_-ti5xRT9jJ4je2fPM=uHFX@mail.gmail.com>
-	<20100924141046.GA26454@sirena.org.uk>
-Date: Mon, 27 Sep 2010 10:16:11 +0200
-Message-ID: <AANLkTin=PPfgnD5tKBPR1QXf2OeBKBH-kXtoT+s-KPhk@mail.gmail.com>
-Subject: Re: [PATCH 1/6] This patch adds support for the ST-Ericsson CG2900
-From: Par-Gunnar Hjalmdahl <pghatwork@gmail.com>
-To: Mark Brown <broonie@opensource.wolfsonmicro.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linus.walleij@stericsson.com, Pavan Savoy <pavan_savoy@sify.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <AANLkTik_cwho9JNBPFhCDx0EGFcLN2+VTG8LT-D_Hw_3@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi again Mark,
+Hi,
 
-I've not got an answer from the developer of the particular piece of code.
+On Sat, Sep 25, 2010 at 03:11:32AM +0200, ext Viswanathan Sankararam wrote:
+> Thanks Ville for letting me know about this. Is there a possibility to
+> back port? Can I just blindly copy the net/bluetooth drivers to a
+> linux-2.6.23 kernel and compile?
 
-2010/9/24 Mark Brown <broonie@opensource.wolfsonmicro.com>:
-> On Fri, Sep 24, 2010 at 03:46:44PM +0200, Par-Gunnar Hjalmdahl wrote:
->
->> +static irqreturn_t cg2900_devices_interrupt(int irq, void *dev_id)
->> +{
->> +     disable_irq_nosync(irq);
->> +     if (cg2900_dev_callback && cg2900_dev_callback->interrupt_cb)
->> +             cg2900_dev_callback->interrupt_cb();
->> +
->> +     return IRQ_HANDLED;
->> +}
->
-> Why is there this callback mechanism - I'd expect the users of this code
-> to just be using the standard IRQ infrastructure?
->
+It won't work directly most probably.
 
-This is our local IRQ which is handled in cg2900_uart.c by creating a work:
-
-static void cg2900_devices_irq_cb(void)
-{
- /* Create work and leave irq context. */
- (void)create_work_item(uart_info->wq, handle_cts_irq, NULL);
-}
-
-
-I understand your concern that client implementing the
-cg2900_dev_callback->interrupt_cb();
-might not know realized that this is irq context which might cause problems.
-
-My motivation for doing like this that we do not expect other clients
-of this code, so there
-is no such risk. We create work in cg2900_uart and leave function.
-
-Let me know if it is ok.
-If not then suggest what is expected way of handling it ? eg. moving
-workqueue down to cg2900_devices
-or other solution?
-
-Best regards,
-/Lukasz via P-G
+-- 
+Ville
