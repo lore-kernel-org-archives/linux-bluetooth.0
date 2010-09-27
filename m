@@ -1,34 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 27 Sep 2010 17:51:33 -0300
+Date: Mon, 27 Sep 2010 17:49:30 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Anderson Briglia <anderson.briglia@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 2/2] Bluetooth: Implement LE Set Scan Enable cmd
-Message-ID: <20100927205133.GG5489@vigoh>
-References: <1284384122-8393-1-git-send-email-anderson.briglia@openbossa.org>
- <1284384122-8393-2-git-send-email-anderson.briglia@openbossa.org>
+To: Ville Tervo <ville.tervo@nokia.com>
+Cc: "ext johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"Hedberg Johan (Nokia-MS/Helsinki)" <Johan.Hedberg@nokia.com>
+Subject: Re: [PATCH] Bluetooth: Don't clear the blacklist when closing the
+ HCI device
+Message-ID: <20100927204930.GF5489@vigoh>
+References: <1284017559-13510-1-git-send-email-johan.hedberg@gmail.com>
+ <20100915094909.GB14330@null>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1284384122-8393-2-git-send-email-anderson.briglia@openbossa.org>
+In-Reply-To: <20100915094909.GB14330@null>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+Hi Johan,
 
-* Anderson Briglia <anderson.briglia@openbossa.org> [2010-09-13 09:22:02 -0400]:
+* Ville Tervo <ville.tervo@nokia.com> [2010-09-15 12:49:09 +0300]:
 
-> This patch implements LE Set Scan Enable command for dual
-> mode and Low Energy hci controllers. It also adds new HCI flags
-> in order to indicate the LE Scanning state for userland applications
-> and kernel itself.
+> On Thu, Sep 09, 2010 at 09:32:39AM +0200, ext johan.hedberg@gmail.com wrote:
+> > From: Johan Hedberg <johan.hedberg@nokia.com>
+> > 
+> > Clearing the blacklist in hci_dev_do_close() would mean that user space
+> > needs to do extra work to re-block devices after a DEVDOWN-DEVUP cycle.
+> > This patch removes the clearing of the blacklist in this case and
+> > thereby saves user space from the extra work.
+> > 
+> > Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
 > 
-> Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
-> ---
->  include/net/bluetooth/hci.h |    5 +++++
->  net/bluetooth/hci_event.c   |   27 +++++++++++++++++++++++++++
->  2 files changed, 32 insertions(+), 0 deletions(-)
+> Acked-by: Ville Tervo <ville.tervo@nokia.com>
 
-Both patches have been applied to my bluetooth-next-2.6 tree.
+Patch has been applied to my bluetooth-next-2.6 tree to later merge in 
+wireless-next-2.6
 
 -- 
 Gustavo F. Padovan
