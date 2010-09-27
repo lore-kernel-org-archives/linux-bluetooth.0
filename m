@@ -1,62 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: Use the proper error value from bt_skb_send_alloc()
-Date: Mon, 27 Sep 2010 17:16:49 -0300
-Message-Id: <1285618609-11499-2-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1285618609-11499-1-git-send-email-padovan@profusion.mobi>
-References: <1285618609-11499-1-git-send-email-padovan@profusion.mobi>
+Subject: [PATCH 1/2] Bluetooth: set sk_sndbuf and sk_rcvbuf properly in ERTM
+Date: Mon, 27 Sep 2010 17:16:48 -0300
+Message-Id: <1285618609-11499-1-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-&err points to the proper error set by bt_skb_send_alloc() when it
-fails.
+Setting both this value to MPS * TxWin * 1.2 guarantees that we are
+reserving space to fit the whole txwindow in the memory, and that
+sendmsg() will block when the transmission window is full avoid
+overloading the system memory.
+I don't have a strong reason about the 1.2 constant in the account, we
+can do another tests in the future and change that value.
 
 Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 ---
- net/bluetooth/l2cap_core.c |    8 ++++----
- 1 files changed, 4 insertions(+), 4 deletions(-)
+ net/bluetooth/l2cap_core.c |   10 +++++++++-
+ 1 files changed, 9 insertions(+), 1 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 1e2ab05..1510812 100644
+index 44aa034..1e2ab05 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -1537,7 +1537,7 @@ static inline int l2cap_skbuff_fromiovec(struct sock *sk, struct msghdr *msg, in
+@@ -3129,9 +3129,17 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 		l2cap_pi(sk)->next_tx_seq = 0;
+ 		l2cap_pi(sk)->expected_tx_seq = 0;
+ 		__skb_queue_head_init(TX_QUEUE(sk));
+-		if (l2cap_pi(sk)->mode ==  L2CAP_MODE_ERTM)
++		if (l2cap_pi(sk)->mode ==  L2CAP_MODE_ERTM) {
+ 			l2cap_ertm_init(sk);
  
- 		*frag = bt_skb_send_alloc(sk, count, msg->msg_flags & MSG_DONTWAIT, &err);
- 		if (!*frag)
--			return -EFAULT;
-+			return err;
- 		if (memcpy_fromiovec(skb_put(*frag, count), msg->msg_iov, count))
- 			return -EFAULT;
++			sk->sk_sndbuf = (l2cap_pi(sk)->remote_tx_win * 1.2 *
++						(sizeof(struct l2cap_pinfo) +
++						l2cap_pi(sk)->mps));
++			sk->sk_rcvbuf = (l2cap_pi(sk)->tx_win * 1.2 *
++						(sizeof(struct l2cap_pinfo) +
++						l2cap_pi(sk)->remote_mps));
++		}
++
+ 		l2cap_chan_ready(sk);
+ 	}
  
-@@ -1563,7 +1563,7 @@ static struct sk_buff *l2cap_create_connless_pdu(struct sock *sk, struct msghdr
- 	skb = bt_skb_send_alloc(sk, count + hlen,
- 			msg->msg_flags & MSG_DONTWAIT, &err);
- 	if (!skb)
--		return ERR_PTR(-ENOMEM);
-+		return ERR_PTR(err);
- 
- 	/* Create L2CAP header */
- 	lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
-@@ -1592,7 +1592,7 @@ static struct sk_buff *l2cap_create_basic_pdu(struct sock *sk, struct msghdr *ms
- 	skb = bt_skb_send_alloc(sk, count + hlen,
- 			msg->msg_flags & MSG_DONTWAIT, &err);
- 	if (!skb)
--		return ERR_PTR(-ENOMEM);
-+		return ERR_PTR(err);
- 
- 	/* Create L2CAP header */
- 	lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
-@@ -1629,7 +1629,7 @@ static struct sk_buff *l2cap_create_iframe_pdu(struct sock *sk, struct msghdr *m
- 	skb = bt_skb_send_alloc(sk, count + hlen,
- 			msg->msg_flags & MSG_DONTWAIT, &err);
- 	if (!skb)
--		return ERR_PTR(-ENOMEM);
-+		return ERR_PTR(err);
- 
- 	/* Create L2CAP header */
- 	lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
 -- 
 1.7.3
 
