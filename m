@@ -1,32 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 27 Sep 2010 20:00:16 -0700 (PDT)
-Message-Id: <20100927.200016.226762808.davem@davemloft.net>
-To: padovan@profusion.mobi
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Mon, 27 Sep 2010 23:30:35 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: davem@davemloft.net
 Cc: linville@tuxdriver.com, marcel@holtmann.org,
- linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: pull-request: bluetooth-2.6 2010-09-27
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20100928023035.GA3033@vigoh>
-References: <20100928023035.GA3033@vigoh>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: pull-request: bluetooth-2.6 2010-09-27
+Message-ID: <20100928023035.GA3033@vigoh>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Date: Mon, 27 Sep 2010 23:30:35 -0300
+Hi David,
 
-> And a fix for a deadlock issue between the sk_sndbuf and the backlog
-> queue in ERTM. The rest are also needed bug fixes.
+These are the Bluetooth fixes for 2.6.36, you are used to see Marcel doing this
+job, but he has been busy lately so I'm taking the job of the pull request this
+time. Since we are a bit late on the pull request I'm skipping the
+wireless-2.6 step, tell me if you (including John here) disagree.
 
-This fix is still under discussion.
+In this patch set we have two fixes for regressions in L2CAP due to ERTM code
+we added in L2CAP for 2.6.36, a bugfix in the L2CAP Streaming Mode that was
+making the kernel crash. And a fix for a deadlock issue between the sk_sndbuf
+and the backlog queue in ERTM. The rest are also needed bug fixes.
 
-That change effects quite a few code paths.  And when I looked
-at them, I was not at all convinced that dropping the socket
-lock like that is safe.
+Please tell me any problem you have pulling this.
 
-Are you sure there are no pieces of socket or socket related state
-that might change under us while we drop that lock, which would thus
-make the operation suddenly invalid or cause a state corruption or
-crash?
+PS: Considering that these patches do not go immediately to net-next how do I
+run the Bluetooth pull request to net-next? Currently my -next tree is rebased
+on net-next but before the bluetooth-next patches I put the bluetooth patches
+I have in my bluetooth-2.6 tree, i.e., when making the pull request I have to be
+sure that the -next patches will be on top of the patches I'm submitting now
+for 2.6.36. Any help on that is welcome. :)
 
-You really need to audit this.
+Regards,
+
+
+---
+
+The following changes since commit b30a3f6257ed2105259b404d419b4964e363928c:
+
+  Linux 2.6.36-rc5 (2010-09-20 16:56:53 -0700)
+
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git master
+
+Andrei Emeltchenko (1):
+      Bluetooth: fix MTU L2CAP configuration parameter
+
+Gustavo F. Padovan (4):
+      Bluetooth: Simplify L2CAP Streaming mode sending
+      Bluetooth: Fix inconsistent lock state with RFCOMM
+      Revert "Bluetooth: Don't accept ConfigReq if we aren't in the BT_CONFIG state"
+      Bluetooth: Fix deadlock in the ERTM logic
+
+Mat Martineau (1):
+      Bluetooth: Only enable L2CAP FCS for ERTM or streaming
+
+ include/net/bluetooth/bluetooth.h |   11 +++++++
+ net/bluetooth/l2cap.c             |   57 +++++++++++++++---------------------
+ net/bluetooth/rfcomm/sock.c       |    4 ++
+ 3 files changed, 39 insertions(+), 33 deletions(-)
+
+-- 
+Gustavo F. Padovan
+ProFUSION embedded systems - http://profusion.mobi
