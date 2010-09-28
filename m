@@ -1,42 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 28 Sep 2010 10:53:49 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lukasz Pawlik <lucas.pawlik@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix problem with EIR data when setting the name
-Message-ID: <20100928075349.GB16571@jh-x301>
-References: <AANLkTi=6ORUZLTY28iHn4q6gAi1mMZjqb=Nt7B6zQN2R@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTi=6ORUZLTY28iHn4q6gAi1mMZjqb=Nt7B6zQN2R@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Fix not detecting errors when transferring the last part of the buffer
+Date: Tue, 28 Sep 2010 10:52:25 +0300
+Message-Id: <1285660345-1819-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-On Thu, Sep 23, 2010, Lukasz Pawlik wrote:
-> Subject: [PATCH] Fix problem with EIR data when setting the name
-> 
-> Previously changed BT fiendly name was not reflected until BT adapter reboot.
-> This patch fix this problem. Now changed name is reflected without need of
-> rebooting adapter.
-> ---
->  src/adapter.c |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
-> 
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 9b638cf..0e9be5f 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -1031,6 +1031,7 @@ static DBusMessage *set_name(DBusConnection *conn, DBusMessage *msg,
->  			return failed_strerror(msg, err);
->  
->  		adapter->name_stored = TRUE;
-> +		update_ext_inquiry_response(adapter);
->  	}
->  
->  done:
+The last part has to be flushed in order to sent the remaining buffer as
+a obex packet and detect possible errors.
+---
+ client/transfer.c |    4 +++-
+ 1 files changed, 3 insertions(+), 1 deletions(-)
 
-Thanks for the patch. It has now been pushed upstream.
+diff --git a/client/transfer.c b/client/transfer.c
+index 58ac265..8ceb36f 100644
+--- a/client/transfer.c
++++ b/client/transfer.c
+@@ -379,8 +379,10 @@ static void put_xfer_progress(GwObexXfer *xfer, gpointer user_data)
+ 
+ 		transfer->filled += len;
+ 
+-		if (transfer->filled == 0)
++		if (transfer->filled == 0) {
++			gw_obex_xfer_flush(xfer, &err);
+ 			goto done;
++		}
+ 
+ 		if (gw_obex_xfer_write(xfer, transfer->buffer,
+ 					transfer->filled,
+-- 
+1.7.1
 
-Johan
