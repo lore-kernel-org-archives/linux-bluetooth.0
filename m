@@ -1,21 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 28 Sep 2010 14:25:24 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?utf-8?B?UmFmYcWC?= Michalski <michalski.raf@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/6] Changing default type of call from call log
-Message-ID: <20100928112524.GA25581@jh-x301>
-References: <AANLkTikPZSD64x_Cvz3EDG9ippUwYwA4zFQBOmaU7DK-@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTikPZSD64x_Cvz3EDG9ippUwYwA4zFQBOmaU7DK-@mail.gmail.com>
+In-Reply-To: <4CA1C01A.3040403@comarch.com>
+References: <4CA1C01A.3040403@comarch.com>
+Date: Tue, 28 Sep 2010 14:25:24 +0300
+Message-ID: <AANLkTinV-E_GOw1ppN5WJ+KzOvgnY-tiAABLWvZ91ANg@mail.gmail.com>
+Subject: Re: How to send stream via obexd without ending request
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lukasz Pawlik <lukasz.pawlik@comarch.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Rafal,
+Hi Lukasz,
 
-All six patches have been pushed upstream. Please try keep the commit
-messages consistent format in the future. I now had to change
-Changing->Change and Binding->Bind for you.
+On Tue, Sep 28, 2010 at 1:14 PM, Lukasz Pawlik
+<lukasz.pawlik@comarch.com> wrote:
+> Hi,
+>
+> I want to stream data immediately after they appear and wait for next part.
+> So far I didn't manage to find a way how to do this properly. Returning
+> error EAGAIN from my read function leads to canceling request and this is
+> something I don't want to do. The other way I was able to find is returning
+> value > 0 from read function until last part of data appear. Obexd will
+> stream data when buffer exceed allocated memory chunk and return to read
+> more data. This is no solution because it forces obexd to send empty
+> streams. Does anyone knows how to solve this problem ?
 
-Johan
+You should probably handle -EAGAIN to handle_async_io in src/obex.c,
+so that it doesn't cancel the request for this specific error, also it
+should return TRUE so that the callback doesn't get automatically
+unregistered.
+
+-- 
+Luiz Augusto von Dentz
+Computer Engineer
