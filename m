@@ -1,61 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTingVh3OaAGQzsxWJQddqrPwgFssMeOq5Rp_DbS6@mail.gmail.com>
-References: <AANLkTingVh3OaAGQzsxWJQddqrPwgFssMeOq5Rp_DbS6@mail.gmail.com>
-Date: Tue, 28 Sep 2010 01:05:18 -0600
-Message-ID: <AANLkTim27JkfgsumEwd3jK+n1DzYvTYWJGCLGreuw7y3@mail.gmail.com>
-Subject: Re: a2dp, myth, pulse
-From: Brad Midgley <bmidgley@gmail.com>
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <AANLkTimVPFppVjbdmJSmcjeeNn7jwRf+uvLVC67xPjav@mail.gmail.com>
+References: <AANLkTinQOKoBCXgh1=wb9Z7w8A4w7vYFkSCoZvkspyYo@mail.gmail.com>
+ <AANLkTi=aX_XQqEwa3q=1krNfpYxGFbkc2V4wEGcT9oHA@mail.gmail.com>
+ <AANLkTi==cFMZfr-achvT=5HNpR5p_36mC7=ybHTYcQc=@mail.gmail.com> <AANLkTimVPFppVjbdmJSmcjeeNn7jwRf+uvLVC67xPjav@mail.gmail.com>
+From: Rahul Ruikar <rahul.ruikar@gmail.com>
+Date: Tue, 28 Sep 2010 11:09:37 +0530
+Message-ID: <AANLkTi=pFRQHOvTXSUuWSCEDxbL+4ET9JFJct6BWK2Lh@mail.gmail.com>
+Subject: Re: Support for Device ID profile
+To: steven bluez <steven.bluez@gmail.com>,
+	Jose Antonio Santos Cadenas <santoscadenas@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hey
+Hi All,
 
-> can avrcp be used to drive mythtv? I've got a setup where the myth
-> frontend is rarely the foreground app
+Could you please tell me some pointers in code/document where I can
+know about various profiles
+we support here or about profiles for which support is not added yet.
 
-So if avrcp were to present events in a /dev/input/eventX device, I
-could use inputlircd to connect those events to lirc clients. It might
-make it easier if a udev rule created something like /dev/input/avrcp0
-so we could find it more easily for the inputlircd config.
+I would like to contribute towards adding support of profiles.
+http://www.bluetooth.com/English/Technology/Works/Pages/Profiles_Overview.aspx
 
-And I see now that it is by virtue of the use of liblirc that myth can
-get remote events even if it's not the foreground app.
-
-Control is enabled by default in 4.60, is there anything I can check
-to see why I don't see any log messages about avrcp, no input device
-appear, nothing logged, etc? The main connection is initiated by the
-headset and the audio connection is initiated by the computer. If I
-remember tinkering with this stuff, bluez would need to initiate the
-control connection in this case.
-
-hcidump -X -V shows messages going across when I tap avrcp buttons...
+Thanks
+ Rahul Ruikar
 
 
-> ACL data: handle 42 flags 0x02 dlen 12
-    L2CAP(d): cid 0x0043 len 8 [psm 0]
-      0000: a0 11 0e 00 48 7c 4b 00                           ....H|K.
-< ACL data: handle 42 flags 0x02 dlen 12
-    L2CAP(d): cid 0x0053 len 8 [psm 0]
-      0000: a2 11 0e 09 48 7c 4b 00                           ....H|K.
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 42 packets 1
-> HCI Event: Mode Change (0x14) plen 6
-    status 0x00 handle 42 mode 0x00 interval 0
-    Mode: Active
-> ACL data: handle 42 flags 0x02 dlen 12
-    L2CAP(d): cid 0x0043 len 8 [psm 0]
-      0000: b0 11 0e 00 48 7c cb 00                           ....H|..
-< ACL data: handle 42 flags 0x02 dlen 12
-    L2CAP(d): cid 0x0053 len 8 [psm 0]
-      0000: b2 11 0e 09 48 7c cb 00                           ....H|..
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 42 packets 1
-> HCI Event: Mode Change (0x14) plen 6
-    status 0x00 handle 42 mode 0x02 interval 200
-    Mode: Sniff
 
--- 
-Brad Midgley
+
+
+On 28 September 2010 10:23, steven bluez <steven.bluez@gmail.com> wrote:
+> Hi Jose,
+>> Hi,
+>>
+>> 2010/9/24 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
+>>> Hi Steven,
+>>>
+>>> Yes, you can use DeviceID on main.conf to add that, but as you see it
+>>> is pretty limited so we are planning to have a better support for
+>>> this, perhaps extend adapter driver interface where you can write a
+>>> plugin to fill this information.
+>>
+>
+> I have started to work on it thats why I cleared up my doubts.
+>> Is anyone working on this plugin now. I'd like to work on it if nobody
+>> is working yet.
+>>
+>> Regards.
+>>
+>>>
+>>> Regards,
+>>>
+>>> On Fri, Sep 24, 2010 at 11:54 AM, steven bluez <steven.bluez@gmail.com> wrote:
+>>>> Hi all,
+>>>>       Is there any support for Device ID Profile in Bluez 4.XX? versions ?\
+>>>>
+>>>> Regards,
+>>>> Steven
+>>>> --
+>>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>>> the body of a message to majordomo@vger.kernel.org
+>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>>>
+>>>
+>>>
+>>>
+>>> --
+>>> Luiz Augusto von Dentz
+>>> Computer Engineer
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>>
+>>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
