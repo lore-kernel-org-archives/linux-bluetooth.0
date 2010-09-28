@@ -1,36 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <AANLkTinV-E_GOw1ppN5WJ+KzOvgnY-tiAABLWvZ91ANg@mail.gmail.com>
+References: <4CA1C01A.3040403@comarch.com>
+	<AANLkTinV-E_GOw1ppN5WJ+KzOvgnY-tiAABLWvZ91ANg@mail.gmail.com>
+Date: Tue, 28 Sep 2010 16:06:22 +0300
+Message-ID: <AANLkTinOnbgP+QN0+5V6KvHsHtgnFC-44HmR+az5i2ck@mail.gmail.com>
+Subject: Re: How to send stream via obexd without ending request
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Fix emitting TransferCompleted twice
-Date: Tue, 28 Sep 2010 16:19:22 +0300
-Message-Id: <1285679962-10367-1-git-send-email-luiz.dentz@gmail.com>
+To: Lukasz Pawlik <lukasz.pawlik@comarch.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+Hi,
 
-This is caused by REQDONE and latter disconnect generating duplicate
-signals in case of opp.
+On Tue, Sep 28, 2010 at 2:25 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Lukasz,
+>
+> On Tue, Sep 28, 2010 at 1:14 PM, Lukasz Pawlik
+> <lukasz.pawlik@comarch.com> wrote:
+>> Hi,
+>>
+>> I want to stream data immediately after they appear and wait for next part.
+>> So far I didn't manage to find a way how to do this properly. Returning
+>> error EAGAIN from my read function leads to canceling request and this is
+>> something I don't want to do. The other way I was able to find is returning
+>> value > 0 from read function until last part of data appear. Obexd will
+>> stream data when buffer exceed allocated memory chunk and return to read
+>> more data. This is no solution because it forces obexd to send empty
+>> streams. Does anyone knows how to solve this problem ?
+>
+> You should probably handle -EAGAIN to handle_async_io in src/obex.c,
+> so that it doesn't cancel the request for this specific error, also it
+> should return TRUE so that the callback doesn't get automatically
+> unregistered.
 
-To fix this now we check if the object is valid before proceeding.
----
- src/manager.c |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
+Actually this doesn't work, if we do fetch all the data in a single
+query than a lot of memory is already allocated for that, in
+DBusMessage, so this only fix the extra buffer for translating tracker
+contacts to vcards, so we probably need to fix the way we fetch the
+data from tracker before changing anything in core. Also it is good to
+notice that read takes the amount of data available in core buffer,
+which is probably what is left to fill a packet, so when the driver
+asks to resume it is suppose to to have enough data to fill that or it
+is the end of the stream.
 
-diff --git a/src/manager.c b/src/manager.c
-index 78a329c..80140b6 100644
---- a/src/manager.c
-+++ b/src/manager.c
-@@ -648,7 +648,8 @@ void manager_emit_transfer_progress(struct obex_session *os)
- 
- void manager_emit_transfer_completed(struct obex_session *os)
- {
--	emit_transfer_completed(os->cid, !os->aborted);
-+	if (os->object)
-+		emit_transfer_completed(os->cid, !os->aborted);
- }
- 
- DBusConnection *obex_dbus_get_connection(void)
 -- 
-1.7.1
-
+Luiz Augusto von Dentz
+Computer Engineer
