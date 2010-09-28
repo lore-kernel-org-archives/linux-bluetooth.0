@@ -1,71 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH 2/4] Add GetProperties method in the Device service hierarchy
-Date: Tue, 28 Sep 2010 14:49:13 -0300
-Message-Id: <1285696155-32766-2-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1285696155-32766-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1285696155-32766-1-git-send-email-claudio.takahasi@openbossa.org>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH 1/4] Add the Attribute interface to the API
+Date: Tue, 28 Sep 2010 14:49:12 -0300
+Message-Id: <1285696155-32766-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Changes the attribute API to become compliant with other BlueZ
-APIs. Characteristics properties can be retrieved using GetProperties
-method of the Device Characteristic hierarchy. This patch also removes
-unneeded characteristic properties description which is already
-explained in the next section.
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+
+For now the Attribute API will allow users to list all the GATT
+services that a device has.
 ---
- doc/attribute-api.txt |   28 +++-------------------------
- 1 files changed, 3 insertions(+), 25 deletions(-)
+ doc/attribute-api.txt |   19 +++++++++++++++++++
+ doc/device-api.txt    |    4 ----
+ 2 files changed, 19 insertions(+), 4 deletions(-)
 
 diff --git a/doc/attribute-api.txt b/doc/attribute-api.txt
-index 0989099..a5e475b 100644
+index 011691e..0989099 100644
 --- a/doc/attribute-api.txt
 +++ b/doc/attribute-api.txt
-@@ -64,15 +64,10 @@ Interface	org.bluez.Characteristic
- Object path	[prefix]/{hci0}/{device0}/{service0, service1, ...}
- 		[prefix]/{hci0}/{device1}/{service0, service1, ...}
+@@ -37,6 +37,25 @@ Methods
+ Properties
  
--Methods		array[(object, dict)] GetCharacteristics()
-+Methods 	dict GetProperties()
  
--			Array of tuples with object path as identifier. An
--			alternative is doing dict of dict since the object
--			path is unique and the order of characteristics is
--			irrelevant. However it might be good to actually
--			present an order here.
--
--			See Characteristics properties for dictionary details.
++Attribute Protocol hierarchy
++============================
++
++Service		org.bluez
++Interface	org.bluez.Attribute
++Object path	[prefix]/{hci0}/{device0}
++
++
++Methods		dict GetProperties()
++
 +			Returns all properties for the interface. See the
-+			Properties section for the available properties.
++			properties section for available properties.
++
++Properties	array{object} Services
++
++			List of all the Primary Services that this device
++			implements.
++
++
+ Device Service hierarchy
+ ========================
  
- 		RegisterCharacteristicsWatcher(object path)
+diff --git a/doc/device-api.txt b/doc/device-api.txt
+index 95b5b22..b818299 100644
+--- a/doc/device-api.txt
++++ b/doc/device-api.txt
+@@ -139,10 +139,6 @@ Properties	string Address [readonly]
+ 			List of 128-bit UUIDs that represents the available
+ 			remote services.
  
-@@ -109,23 +104,6 @@ Properties	string Name (mandatory) [readonly]
- 			includes. That way no complicated service includes array
- 			is needed.
+-		array{object} Services [readonly]
+-
+-			List of characteristics based services.
+-
+ 		boolean Paired [readonly]
  
--			string UUID
--			string Name
--			string Description
--			struct Format (type, name, exponet etc.)
--
--			array{byte} Value
--			string Representation (of the binary Value)
--
--			object Service (the original service in case of includes)
--
--			At this point only GetProperties() method call should be
--			supported for simplicity. Changing characteristics is up
--			to future support.
--
--			The object path of the characteristics might be split
--			over multiple service objects, because of includes.
--
- 
- Device Characteristic hierarchy
- ===============================
+ 			Indicates if the remote device is paired.
 -- 
 1.7.3
 
