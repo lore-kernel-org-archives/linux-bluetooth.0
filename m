@@ -1,29 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 28 Sep 2010 14:18:47 +0300
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Add checking for agent reply state in adapter
-Message-ID: <20100928111847.GA25553@jh-x301>
-References: <1285665470-5261-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1285665470-5261-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+Date: Tue, 28 Sep 2010 13:09:00 +0200
+Message-ID: <AANLkTi=UzRDr6E3ApmJXB-ZnT_0gdM=MFcaQ+nC5kGjk@mail.gmail.com>
+Subject: [PATCH 6/6] Fix problem with double numer in call log
+From: =?ISO-8859-2?Q?Rafa=B3_Michalski?= <michalski.raf@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: =?ISO-8859-2?Q?Rafa=B3_Michalski?= <michalski.raf@gmail.com>
+Content-Type: multipart/mixed; boundary=000e0cd48dd838818204914fdf3c
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Radek,
+--000e0cd48dd838818204914fdf3c
+Content-Type: text/plain; charset=ISO-8859-1
 
-On Tue, Sep 28, 2010, Radoslaw Jablonski wrote:
-> Added checking for agent reply state before cancelling agent in
-> session_free(..). This check is needed to ensure that memory for
-> agent request will be freed only once (In that case, free on this
-> request is called later in the end of agent_reply func)
-> ---
->  src/adapter.c |    6 +++++-
->  1 files changed, 5 insertions(+), 1 deletions(-)
 
-Thanks. The patch has been pushed upstream with s/is_reply/got_reply/
-which is more intuitive imho.
 
-Johan
+--000e0cd48dd838818204914fdf3c
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0006-Fix-problem-with-double-number-in-call-log.patch"
+Content-Disposition: attachment;
+	filename="0006-Fix-problem-with-double-number-in-call-log.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gemnyw9x0
+
+RnJvbSBiZTBhNmVmOGFmZmJjM2MxZDBiMWZiZDk0YjFlNzhjZDJjOTRmMTdjIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBSYWZhbCBNaWNoYWxza2kgPG1pY2hhbHNraS5yYWZAZ21haWwu
+Y29tPgpEYXRlOiBUdWUsIDI4IFNlcCAyMDEwIDExOjA3OjQ4ICswMjAwClN1YmplY3Q6IFtQQVRD
+SCA2LzZdIEZpeCBwcm9ibGVtIHdpdGggZG91YmxlIG51bWJlciBpbiBjYWxsIGxvZwoKUHJldmlv
+dXNseSBhZnRlciBkb3dubG9hZGluZyBjYWxsIGxvZyB0aGVyZSB3YXMgdHdvIHRpbWVzIHRoZSBz
+YW1lIG51bWJlcgpmb3IgY2FsbCBiaW5kZWQgd2l0aCBwaG9uZWJvb2sgLSBvbmUgSE9NRS9XT1JL
+IHR5cGUgYW5kIHNlY29uZCBPVEhFUiB0eXBlCmluIGRvd25sb2FkZWQgdkNhcmQgc3RydWN0dXJl
+LiBOb3cgdGhlcmUgaXMgb25seSBvbmUgbnVtYmVyIHdpdGggcHJvcGVyCnR5cGUgKEhPTUUgb3Ig
+V09SSykuCi0tLQogcGx1Z2lucy9waG9uZWJvb2stdHJhY2tlci5jIHwgICAxOCArKysrKysrKysr
+KysrKysrLS0KIHBsdWdpbnMvdmNhcmQuYyAgICAgICAgICAgICB8ICAgIDEgLQogMiBmaWxlcyBj
+aGFuZ2VkLCAxNiBpbnNlcnRpb25zKCspLCAzIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL3Bs
+dWdpbnMvcGhvbmVib29rLXRyYWNrZXIuYyBiL3BsdWdpbnMvcGhvbmVib29rLXRyYWNrZXIuYwpp
+bmRleCBhYjg3NGU1Li4yZDk0YmM2IDEwMDY0NAotLS0gYS9wbHVnaW5zL3Bob25lYm9vay10cmFj
+a2VyLmMKKysrIGIvcGx1Z2lucy9waG9uZWJvb2stdHJhY2tlci5jCkBAIC03NzQsMTAgKzc3NCwy
+NCBAQCBzdGF0aWMgc3RydWN0IHBob25lYm9va19jb250YWN0ICpmaW5kX2NvbnRhY3QoR1NMaXN0
+ICpjb250YWN0cywgY29uc3QgY2hhciAqaWQpCiBzdGF0aWMgc3RydWN0IHBob25lYm9va19udW1i
+ZXIgKmZpbmRfcGhvbmUoR1NMaXN0ICpudW1iZXJzLCBjb25zdCBjaGFyICpwaG9uZSwKIAkJCQkJ
+CQkJaW50IHR5cGUpCiB7Ci0JR1NMaXN0ICpsOworCUdTTGlzdCAqbCA9IG51bWJlcnM7CiAJc3Ry
+dWN0IHBob25lYm9va19udW1iZXIgKnBiX251bTsKIAotCWZvciAobCA9IG51bWJlcnM7IGw7IGwg
+PSBsLT5uZXh0KSB7CisJaWYgKGdfc2xpc3RfbGVuZ3RoKGwpID09IDEgJiYgKHBiX251bSA9IGwt
+PmRhdGEpICYmCisJCQkJCWdfc3RyY21wMChwYl9udW0tPnRlbCwgcGhvbmUpID09IDApIHsKKwor
+CQlpZiAoKHR5cGUgPT0gVEVMX1RZUEVfSE9NRSB8fCB0eXBlID09IFRFTF9UWVBFX1dPUkspICYm
+CisJCQkJCXBiX251bS0+dHlwZSA9PSBURUxfVFlQRV9PVEhFUikJeworCQkJcGJfbnVtLT50eXBl
+ID0gdHlwZTsKKwkJCXJldHVybiBwYl9udW07CisJCX0KKworCQlpZiAodHlwZSA9PSBURUxfVFlQ
+RV9PVEhFUiAmJiAocGJfbnVtLT50eXBlID09IFRFTF9UWVBFX0hPTUUgfHwKKwkJCQkJcGJfbnVt
+LT50eXBlID09IFRFTF9UWVBFX1dPUkspKQorCQkJcmV0dXJuIHBiX251bTsKKwl9CisKKwlmb3Ig
+KDsgbDsgbCA9IGwtPm5leHQpIHsKIAkJcGJfbnVtID0gbC0+ZGF0YTsKIAkJLyogUmV0dXJuaW5n
+IHBob25lYm9vayBudW1iZXIgaWYgcGhvbmUgdmFsdWVzIGFuZCB0eXBlIHZhbHVlcwogCQkgKiBh
+cmUgZXF1YWwgKi8KZGlmZiAtLWdpdCBhL3BsdWdpbnMvdmNhcmQuYyBiL3BsdWdpbnMvdmNhcmQu
+YwppbmRleCBjNzIwOTU0Li40MWY5ZmJkIDEwMDY0NAotLS0gYS9wbHVnaW5zL3ZjYXJkLmMKKysr
+IGIvcGx1Z2lucy92Y2FyZC5jCkBAIC00NTIsNyArNDUyLDYgQEAgc3RhdGljIHZvaWQgdmNhcmRf
+cHJpbnRmX2RhdGV0aW1lKEdTdHJpbmcgKnZjYXJkcywKIHN0YXRpYyB2b2lkIHZjYXJkX3ByaW50
+Zl9lbmQoR1N0cmluZyAqdmNhcmRzKQogewogCXZjYXJkX3ByaW50Zih2Y2FyZHMsICJFTkQ6VkNB
+UkQiKTsKLQl2Y2FyZF9wcmludGYodmNhcmRzLCAiIik7CiB9CiAKIHZvaWQgcGhvbmVib29rX2Fk
+ZF9jb250YWN0KEdTdHJpbmcgKnZjYXJkcywgc3RydWN0IHBob25lYm9va19jb250YWN0ICpjb250
+YWN0LAotLSAKMS42LjMuMwoK
+--000e0cd48dd838818204914fdf3c--
