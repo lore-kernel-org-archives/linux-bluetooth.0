@@ -1,37 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <4CA1C01A.3040403@comarch.com>
-References: <4CA1C01A.3040403@comarch.com>
-Date: Tue, 28 Sep 2010 14:25:24 +0300
-Message-ID: <AANLkTinV-E_GOw1ppN5WJ+KzOvgnY-tiAABLWvZ91ANg@mail.gmail.com>
-Subject: Re: How to send stream via obexd without ending request
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Lukasz Pawlik <lukasz.pawlik@comarch.com>
+Date: Tue, 28 Sep 2010 14:18:47 +0300
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH] Add checking for agent reply state in adapter
+Message-ID: <20100928111847.GA25553@jh-x301>
+References: <1285665470-5261-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1285665470-5261-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+Hi Radek,
 
-On Tue, Sep 28, 2010 at 1:14 PM, Lukasz Pawlik
-<lukasz.pawlik@comarch.com> wrote:
-> Hi,
->
-> I want to stream data immediately after they appear and wait for next part.
-> So far I didn't manage to find a way how to do this properly. Returning
-> error EAGAIN from my read function leads to canceling request and this is
-> something I don't want to do. The other way I was able to find is returning
-> value > 0 from read function until last part of data appear. Obexd will
-> stream data when buffer exceed allocated memory chunk and return to read
-> more data. This is no solution because it forces obexd to send empty
-> streams. Does anyone knows how to solve this problem ?
+On Tue, Sep 28, 2010, Radoslaw Jablonski wrote:
+> Added checking for agent reply state before cancelling agent in
+> session_free(..). This check is needed to ensure that memory for
+> agent request will be freed only once (In that case, free on this
+> request is called later in the end of agent_reply func)
+> ---
+>  src/adapter.c |    6 +++++-
+>  1 files changed, 5 insertions(+), 1 deletions(-)
 
-You should probably handle -EAGAIN to handle_async_io in src/obex.c,
-so that it doesn't cancel the request for this specific error, also it
-should return TRUE so that the callback doesn't get automatically
-unregistered.
+Thanks. The patch has been pushed upstream with s/is_reply/got_reply/
+which is more intuitive imho.
 
--- 
-Luiz Augusto von Dentz
-Computer Engineer
+Johan
