@@ -1,36 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-From: "Luis R. Rodriguez" <mcgrof@gmail.com>
-Date: Wed, 29 Sep 2010 13:05:30 -0700
-Message-ID: <AANLkTim=dHyuS=WP0LY6eZUr71J4kLqEtkrsM5fPS6C+@mail.gmail.com>
-Subject: [ANN] Atheros Linux Bluetooth drivers home page
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: linux-wireless <linux-wireless@vger.kernel.org>,
-	linux-kernel@vger.kernel.org, Ken Steck <Ken.Steck@atheros.com>,
-	Shanmugamkamatchi Balashanmugam
-	<Shanmugamkamatchi.Balashanmugam@atheros.com>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <AANLkTi=1hKSL+2-DJ4SJkZJ+TaAzP1BUSh4FbiT=xg4g@mail.gmail.com>
+References: <1285696155-32766-1-git-send-email-claudio.takahasi@openbossa.org>
+	<20100929134908.GB19362@jh-x301>
+	<AANLkTi=1hKSL+2-DJ4SJkZJ+TaAzP1BUSh4FbiT=xg4g@mail.gmail.com>
+Date: Wed, 29 Sep 2010 23:00:57 +0300
+Message-ID: <AANLkTinp8bmy9y-GrQsFPDxdJkPK7n5dixaKsVZtJv0h@mail.gmail.com>
+Subject: Re: [PATCH 1/4] Add the Attribute interface to the API
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I noted a while ago Bluetooth seemed to lack a wiki-based home and if
-we can just borrow the existing wiki on wireless.kernel.org and saw no
-opposition so started adding some related Bluetooth documentation like
-Bluetooth-Coexistance [1]. I now found a need to document some pending
-patches for ath3k [2] so started a Linux Atheros Bluetooth drivers
-page [3] with just one reference to ath3k [4]. Goal is also to
-motivate and welcome more developers to document more of the Bluetooth
-subsystem and drivers on wireless.kernel.org. If you have a Bluetooth
-drivers you'd like to document please feel free to add it to the
-Bluetooth Drivers section [5] BT3.0 stuff might be a really good
-candidate to be documented here. I tried modifying the site a bit to
-add Bluetooth Specific navigation bar but failed, will wait on
-Johannes to figure that stuff out.
+Hi,
 
-  Luis
+On Wed, Sep 29, 2010 at 5:52 PM, Claudio Takahasi
+<claudio.takahasi@openbossa.org> wrote:
+>>
+>> What's the motivation of moving this into its own D-Bus interface? I
+>> thought the plan was to abstract both traditional SDP and ATT behind the
+>> same API in which case having this in the Device interface makes more
+>> sense imho.
+>>
+>> Johan
+>>
+>
+> Hi Johan,
+>
+> we forgot the SDP integration plan. Forget this patch.
+>
+> From the implementation point of view, implement inside the attrib
+> client plugin was the easiest way, if we keep this property inside the
+> Device interface a new function needs to be created in device.h to
+> register the available primary services object paths.
 
-[1] http://wireless.kernel.org/en/users/Documentation/Bluetooth-coexistence
-[2] http://marc.info/?l=linux-bluetooth&m=128536965702436&w=2
-[3] http://wireless.kernel.org/en/users/Drivers/Atheros-BT
-[4] http://wireless.kernel.org/en/users/Drivers/ath3k
-[5] http://wireless.kernel.org/en/users/Drivers-bluetooth
+Well there is a more complicated way, which is to add support for
+user_data per method/property, so a plugin could directly register
+their methods and properties in e.g. Adapter and Device interfaces. Of
+course this has drawbacks since the API could really became a mess
+with plugins doing there thing carelessly, but in the other hand it
+can greatly simplify the interfaces like Device.Disconnect()
+propagation.
+
+Just a crazy idea I had late in the night :D
+
+-- 
+Luiz Augusto von Dentz
+Computer Engineer
