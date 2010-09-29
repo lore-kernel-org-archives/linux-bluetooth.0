@@ -1,50 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Fix not detecting errors on small files
-Date: Wed, 29 Sep 2010 17:27:36 +0300
-Message-Id: <1285770456-8457-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20100929134521.GA19362@jh-x301>
+References: <AANLkTindKFz1fx9cJMu9aSpehG5LaUHHO7TkgWqMzqj=@mail.gmail.com>
+	<20100929134521.GA19362@jh-x301>
+Date: Wed, 29 Sep 2010 11:05:46 -0300
+Message-ID: <AANLkTimvvp=D+X+TcP3Ji7WuGaMZF7+LA+8BWZiQCStr@mail.gmail.com>
+Subject: Re: Pull request: git://git.infradead.org/users/cktakahasi/bluez.git for-upstream
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+On Wed, Sep 29, 2010 at 10:45 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Claudio,
+>
+> On Thu, Sep 23, 2010, Claudio Takahasi wrote:
+>>       Rename hciops {start, stop}_discovery to {start, stop}_inquiry
+>
+> I'm not sure about this patch. Wasn't the idea to hide the device
+> discovery details from the higher layers? I.e. the method could be
+> called discovery and it'd take care of both BR/EDR and LE discovery
+> methods.
+>
+> Johan
+>
 
-When flushing the last part of buffer/file we have to wait for response
-since that can contain errors.
+Hi Johan,
 
-To fix this gw_obex_xfer_close is called in order to force gwobex to
-resume the request and return any error related to it.
----
- client/transfer.c |    9 +++++++--
- 1 files changed, 7 insertions(+), 2 deletions(-)
+StartDiscovery() triggers all the process. The adapter type: BR/EDR
+only/LE only or dual mode is hidden from the higher layers.
+So, your suggestion it try to hide all discovery details inside the
+hciops as much as possible? I am not sure at the moment if it is
+possible, but we can try. We need to clean the code anyway in order to
+have a "smooth" migration to the new Bluetooth Management Interface.
 
-diff --git a/client/transfer.c b/client/transfer.c
-index 8ceb36f..e5fcfcc 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -360,7 +360,7 @@ static void put_xfer_progress(GwObexXfer *xfer, gpointer user_data)
- {
- 	struct transfer_data *transfer = user_data;
- 	struct transfer_callback *callback = transfer->callback;
--	gint written, err = 0;
-+	gint written = 0, err = 0;
- 
- 	if (transfer->buffer_len == 0) {
- 		transfer->buffer_len = DEFAULT_BUFFER_SIZE;
-@@ -380,7 +380,12 @@ static void put_xfer_progress(GwObexXfer *xfer, gpointer user_data)
- 		transfer->filled += len;
- 
- 		if (transfer->filled == 0) {
--			gw_obex_xfer_flush(xfer, &err);
-+			if (written > 0) {
-+				gw_obex_xfer_flush(xfer, &err);
-+				return;
-+			}
-+
-+			gw_obex_xfer_close(xfer, &err);
- 			goto done;
- 		}
- 
--- 
-1.7.1
-
+Regards,
+Claudio
