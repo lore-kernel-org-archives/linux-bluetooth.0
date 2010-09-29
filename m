@@ -1,41 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ville Tervo <ville.tervo@nokia.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ville Tervo <ville.tervo@nokia.com>
-Subject: [PATCH 2/2] Fix missing comma in cmd_le_str
-Date: Wed, 29 Sep 2010 16:56:21 +0300
-Message-Id: <1285768581-19654-2-git-send-email-ville.tervo@nokia.com>
-In-Reply-To: <1285768581-19654-1-git-send-email-ville.tervo@nokia.com>
-References: <1285768581-19654-1-git-send-email-ville.tervo@nokia.com>
+Date: Wed, 29 Sep 2010 16:49:08 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: Re: [PATCH 1/4] Add the Attribute interface to the API
+Message-ID: <20100929134908.GB19362@jh-x301>
+References: <1285696155-32766-1-git-send-email-claudio.takahasi@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1285696155-32766-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- parser/hci.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+Hi,
 
-diff --git a/parser/hci.c b/parser/hci.c
-index 7f23605..863afd9 100644
---- a/parser/hci.c
-+++ b/parser/hci.c
-@@ -381,7 +381,7 @@ static char *cmd_testing_str[CMD_TESTING_NUM + 1] = {
- 	"Unknown",
- };
- 
--#define CMD_LE_NUM 30
-+#define CMD_LE_NUM 31
- static char *cmd_le_str[CMD_LE_NUM + 1] = {
- 	"Unknown",
- 	"LE Set Event Mask",
-@@ -403,7 +403,7 @@ static char *cmd_le_str[CMD_LE_NUM + 1] = {
- 	"LE Add Device To White List",
- 	"LE Remove Device From White List",
- 	"LE Connection Update",
--	"LE Set Host Channel Classification"
-+	"LE Set Host Channel Classification",
- 	"LE Read Channel Map",
- 	"LE Read Remote Used Features",
- 	"LE Encrypt",
--- 
-1.7.1
+On Tue, Sep 28, 2010, Claudio Takahasi wrote:
+> +Attribute Protocol hierarchy
+> +============================
+> +
+> +Service		org.bluez
+> +Interface	org.bluez.Attribute
+> +Object path	[prefix]/{hci0}/{device0}
+> +
+> +
+> +Methods		dict GetProperties()
+> +
+> +			Returns all properties for the interface. See the
+> +			properties section for available properties.
+> +
+> +Properties	array{object} Services
+> +
+> +			List of all the Primary Services that this device
+> +			implements.
+> +
+> +
+>  Device Service hierarchy
+>  ========================
+>  
+> diff --git a/doc/device-api.txt b/doc/device-api.txt
+> index 95b5b22..b818299 100644
+> --- a/doc/device-api.txt
+> +++ b/doc/device-api.txt
+> @@ -139,10 +139,6 @@ Properties	string Address [readonly]
+>  			List of 128-bit UUIDs that represents the available
+>  			remote services.
+>  
+> -		array{object} Services [readonly]
+> -
+> -			List of characteristics based services.
+> -
+>  		boolean Paired [readonly]
+>  
+>  			Indicates if the remote device is paired.
 
+What's the motivation of moving this into its own D-Bus interface? I
+thought the plan was to abstract both traditional SDP and ATT behind the
+same API in which case having this in the Device interface makes more
+sense imho.
+
+Johan
