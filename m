@@ -1,76 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20100924230730.GB6566@tux>
-References: <20100924230730.GB6566@tux>
-From: "Luis R. Rodriguez" <lrodriguez@atheros.com>
-Date: Wed, 29 Sep 2010 12:40:23 -0700
-Message-ID: <AANLkTin3QqukxP8M_L9nWgkrv6bGsnGx1JFNtOY1jXtp@mail.gmail.com>
-Subject: Re: RFC: btusb firmware load help
-To: Marcel Holtmann <holtmann@linux.intel.com>,
-	Ken Steck <Ken.Steck@atheros.com>,
-	Shanmugamkamatchi Balashanmugam
-	<Shanmugamkamatchi.Balashanmugam@atheros.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-	Deepak Dhamdhere <Deepak.Dhamdhere@atheros.com>,
-	Sree Durbha <Sree.Durbha@atheros.com>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-wireless-owner@vger.kernel.org
+In-Reply-To: <AANLkTinZS1EbbW7XGYVHMdA0M5tMss8RuYwtiNoM5m_M@mail.gmail.com>
+References: <AANLkTinZS1EbbW7XGYVHMdA0M5tMss8RuYwtiNoM5m_M@mail.gmail.com>
+Date: Wed, 29 Sep 2010 18:27:08 +0200
+Message-ID: <AANLkTinBcH0smvZ_Yd7d+TqwufSLBjmM+TROUN6iTzAq@mail.gmail.com>
+Subject: SCO Socket input connection.
+From: Pepe Aracil <pepe.aracil.gomez@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Sep 24, 2010 at 4:07 PM, Luis R. Rodriguez
-<lrodriguez@atheros.com> wrote:
-> Marcel, I was just poked about this thread:
->
-> http://www.spinics.net/lists/linux-bluetooth/msg06087.html
->
-> The hack is required because our BT hardware does not accept HCI commands
-> when the device is plugged in. If I understood your position you did not
-> want to accept the patch because our BT USB devices are violating the
-> specification by not acceping HCI commands and yet claiming to be BT
-> devices, is that right?
->
-> This position seems perfectly reasonable, and if it is violating the
-> specification this needs to be fixed in hardware for future devices. But
-> what is done is done, and we need to support existing customers with
-> current hardware, can you provide some recommendation as to an alternative
-> approach to resolve this upstream?
+Hello.
 
-Marcel some attention to this would be greatly appreciated.
+I'm developing embedded alarm system with hands free bluetooth profile.
 
-> Without a patch like the one suggested Atheros' Bluetooth USB devices are
-> essentially not functional at all. I am in hopes we can come to some agreement
-> how to deal with a hardware quirk for now while we nag at our hardware team
-> to consider changing the way our devices work.
+Some months ago this code in python was working OK. (i don't remember
+bluez version)
 
-I have gotten clarifications from Ken Steck that this issue is only
-present on AR3011 chips used in the SFLASH configuration. AR3012 will
-not have this issue.
+self.sco = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_SEQPACKET,
+socket.BTPROTO_SCO)
+print "socket SCO opened."
+self.sco.bind("00:00:00:00:00:00")
+self.sco.listen(1)
+sck, mac = self.sco.accept()
 
-> Someone from the Atheros BT team: can you send me the same patch to be
-> applied into compat-wireless under the linux-next-pending/ directory ?
-> That is, send me a patch which will apply onto compat-wireless.
-> This way we can actually get our hardware functional to customers while
-> we try to look for a better alternative directly upstream. You will
-> also need to document this issue on the wiki. I recommend you document
-> this here:
->
-> http://wireless.kernel.org/en/users/Drivers/ath3k
->
-> That is, create a new wiki page there for the driver and the things
-> needed for it. Once I get the patch into compat-wireless we can
-> refer users/customers to the compat-wireless stable releases with
-> the linux-next-pending/ patch you give to me applied.
+When receiving a call on my cell phone and took down (via rfcomm HF
+connecton) , SCO connection was produced from the phone to pc.
 
-I saw no takers on this.. so I just created the page myself.
+Now this connection fails.
 
-> Someone from the Atheros BT team: does the patch currently handle
-> suspend/resume?
+I added to audio.conf   Disable=Headset,Control,Gateway    to disable
+SCO Listening from bluetoothd but with no result :(
 
-Shanmugamkamatchi has noted to me he will be sending me this patch
-soon and it also supports suspend/resume properly, however, I would
-like to resolve this upstream.
+The only thing that works is to launch this python code before bluetoothd.
+Some thing is touched by bluetoothd  that blocks SCO incoming
+connections for other apps. ¿What?
 
-Marcel, please let us know what path you recommend we take for this.
+I try  compile with --disable-audio with no results.
 
-  Luis
+Thanks. and sorry for may horrible English.
