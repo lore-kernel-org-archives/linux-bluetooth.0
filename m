@@ -1,42 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <AANLkTinZS1EbbW7XGYVHMdA0M5tMss8RuYwtiNoM5m_M@mail.gmail.com>
-References: <AANLkTinZS1EbbW7XGYVHMdA0M5tMss8RuYwtiNoM5m_M@mail.gmail.com>
-Date: Wed, 29 Sep 2010 18:27:08 +0200
-Message-ID: <AANLkTinBcH0smvZ_Yd7d+TqwufSLBjmM+TROUN6iTzAq@mail.gmail.com>
-Subject: SCO Socket input connection.
-From: Pepe Aracil <pepe.aracil.gomez@gmail.com>
+From: Sander van Grieken <sander@outrightsolutions.nl>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: a2dp, myth, pulse
+Date: Wed, 29 Sep 2010 17:08:00 +0200
+References: <AANLkTingVh3OaAGQzsxWJQddqrPwgFssMeOq5Rp_DbS6@mail.gmail.com> <201009291337.40197.sander@outrightsolutions.nl> <AANLkTi=voJHxhTa4VXNnhUBm2v8ouX6cQNWgToip=wVi@mail.gmail.com>
+In-Reply-To: <AANLkTi=voJHxhTa4VXNnhUBm2v8ouX6cQNWgToip=wVi@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Message-Id: <201009291708.01026.sander@outrightsolutions.nl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello.
+On Wednesday 29 September 2010 17:01:06 Brad Midgley wrote:
+> Sander,
+> 
+> >> Control is enabled by default in 4.60, is there anything I can check
+> >> to see why I don't see any log messages about avrcp, no input device
+> >> appear, nothing logged, etc?
+> >
+> > Currently there is support in bluez to act as a AVRCP target, and it will deliver 
+these
+> > events through the input layer. No new input device will appear, it will go through
+> > /dev/uinput (which I think you can open for reading then)
+> 
+> Thanks for the tip. I didn't have /dev/uinput or /dev/input/uinput so
+> I mknod'd it temporarily (mknod /dev/input/uinput c 10 233). Trying to
+> get anything out of it while streaming gives me "No such device". 
 
-I'm developing embedded alarm system with hands free bluetooth profile.
+I suppose this has to be enabled in the kernel, or loaded as a module, then udev will pick 
+it up. On my Ubuntu 10.10 it is enabled in the kernel.
 
-Some months ago this code in python was working OK. (i don't remember
-bluez version)
-
-self.sco = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_SEQPACKET,
-socket.BTPROTO_SCO)
-print "socket SCO opened."
-self.sco.bind("00:00:00:00:00:00")
-self.sco.listen(1)
-sck, mac = self.sco.accept()
-
-When receiving a call on my cell phone and took down (via rfcomm HF
-connecton) , SCO connection was produced from the phone to pc.
-
-Now this connection fails.
-
-I added to audio.conf   Disable=Headset,Control,Gateway    to disable
-SCO Listening from bluetoothd but with no result :(
-
-The only thing that works is to launch this python code before bluetoothd.
-Some thing is touched by bluetoothd  that blocks SCO incoming
-connections for other apps. ¿What?
-
-I try  compile with --disable-audio with no results.
-
-Thanks. and sorry for may horrible English.
+--
+Sander
