@@ -1,44 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 30 Sep 2010 04:23:29 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: haijun liu <liuhaijun.er@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"dantian.ip" <dantian.ip@gmail.com>
-Subject: Re: [PATCH 2/2] Bluetooth: Update conf_state before send
- config_req out.
-Message-ID: <20100930072329.GA3048@vigoh>
-References: <AANLkTimQtkORjmsiO3wPULRErNXORBtHATbBvdCEsY27@mail.gmail.com>
- <20100928234934.GC8518@vigoh>
- <AANLkTikz3VTGtL5PY2nAXKO1z_XD4ROEZyUV3JXsrstn@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTikz3VTGtL5PY2nAXKO1z_XD4ROEZyUV3JXsrstn@mail.gmail.com>
+In-Reply-To: <201009291708.01026.sander@outrightsolutions.nl>
+References: <AANLkTingVh3OaAGQzsxWJQddqrPwgFssMeOq5Rp_DbS6@mail.gmail.com>
+	<201009291337.40197.sander@outrightsolutions.nl>
+	<AANLkTi=voJHxhTa4VXNnhUBm2v8ouX6cQNWgToip=wVi@mail.gmail.com>
+	<201009291708.01026.sander@outrightsolutions.nl>
+Date: Wed, 29 Sep 2010 14:50:28 -0600
+Message-ID: <AANLkTi=bx1Bv1GD9SuMGbYcE-NNK5e0x5N3Oz-FkH-Zm@mail.gmail.com>
+Subject: Re: a2dp, myth, pulse
+From: Brad Midgley <bmidgley@gmail.com>
+To: Sander van Grieken <sander@outrightsolutions.nl>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Haijun,
+Sander
 
-* haijun liu <liuhaijun.er@gmail.com> [2010-09-29 19:11:29 +0800]:
+> I suppose this has to be enabled in the kernel, or loaded as a module, then udev will pick
+> it up. On my Ubuntu 10.10 it is enabled in the kernel.
 
->  Update conf_state with L2CAP_CONF_REQ_SENT before send
->  config_req out in l2cap_config_req().
-> 
-> 
-> Signed-off-by: Haijun.Liu <haijun.liu@atheros.com>
-> ---
->  net/bluetooth/l2cap_core.c |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
+ok, so this is a bug in ubuntu before 10.10. for now I put uinput in
+/etc/modules. see
+https://bugs.launchpad.net/ubuntu/+source/bluez/+bug/584812
 
-Still corrupted:
+the key names coming through now as reported by irw:
 
-Applying: Bluetooth: Update conf_state before send config_req out.
-fatal: corrupt patch at line 10
-Patch failed at 0001 Bluetooth: Update conf_state before send config_req
-out.
+a3 0 KEY_NEXTSONG event9
+a5 0 KEY_PREVIOUSSONG event9
+c9 0 KEY_PAUSECD event9
+c8 0 KEY_PLAYCD event9
 
-Make sure you can apply your patches sent with git send-email before
-sending them to the mailing list. Thanks.
+unfortunately there isn't a clear way to merge a udp/hdhomerun remote
+coming in on lircd with avrcp events from inputlircd. I'll take it up
+with the lirc folks and summarize here later. There is also eventlirc
+that can deal with dynamic devices better but it still can't do udp.
+Wouldn't it be nice if lirc simply used d-bus?
 
 -- 
-Gustavo F. Padovan
-ProFUSION embedded systems - http://profusion.mobi
+Brad Midgley
