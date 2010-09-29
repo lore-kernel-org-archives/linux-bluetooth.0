@@ -1,48 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sander van Grieken <sander@outrightsolutions.nl>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: a2dp, myth, pulse
-Date: Wed, 29 Sep 2010 13:37:39 +0200
-References: <AANLkTingVh3OaAGQzsxWJQddqrPwgFssMeOq5Rp_DbS6@mail.gmail.com> <AANLkTim27JkfgsumEwd3jK+n1DzYvTYWJGCLGreuw7y3@mail.gmail.com>
-In-Reply-To: <AANLkTim27JkfgsumEwd3jK+n1DzYvTYWJGCLGreuw7y3@mail.gmail.com>
+Date: Wed, 29 Sep 2010 14:36:15 +0300
+From: Ville Tervo <ville.tervo@nokia.com>
+To: ext haijun liu <liuhaijun.er@gmail.com>
+Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Mat Martineau <mathewm@codeaurora.org>,
+	"dantian.ip" <dantian.ip@gmail.com>
+Subject: Re: [PATCH] Bluetooth: Replace hard code of configuration
+ continuation flag.
+Message-ID: <20100929113615.GH1931@null>
+References: <AANLkTi=mS2212wTd3nu_ENJ8ySyNSVMWgTmc-MT0421c@mail.gmail.com>
+ <20100928234820.GB8518@vigoh>
+ <AANLkTi=EVEwuKy3QwNJ1sVpe2_EJCkQQ3iGutKQQRneU@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Message-Id: <201009291337.40197.sander@outrightsolutions.nl>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <AANLkTi=EVEwuKy3QwNJ1sVpe2_EJCkQQ3iGutKQQRneU@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tuesday 28 September 2010 09:05:18 Brad Midgley wrote:
-> Hey
+Hi,
+
+Patch is ok but just one comment. See below.
+
+On Wed, Sep 29, 2010 at 01:12:39PM +0200, haijun liu wrote:
 > 
-> > can avrcp be used to drive mythtv? I've got a setup where the myth
-> > frontend is rarely the foreground app
+>  Replace hard code of configuration continuation flag with self-comment macro.
 > 
-> So if avrcp were to present events in a /dev/input/eventX device, I
-> could use inputlircd to connect those events to lirc clients. It might
-> make it easier if a udev rule created something like /dev/input/avrcp0
-> so we could find it more easily for the inputlircd config.
-> 
-> And I see now that it is by virtue of the use of liblirc that myth can
-> get remote events even if it's not the foreground app.
-> 
-> Control is enabled by default in 4.60, is there anything I can check
-> to see why I don't see any log messages about avrcp, no input device
-> appear, nothing logged, etc? The main connection is initiated by the
-> headset and the audio connection is initiated by the computer. If I
-> remember tinkering with this stuff, bluez would need to initiate the
-> control connection in this case.
+> -	if (flags & 0x0001) {
+> +	if (flags & L2CAP_CONF_FLAG_CONT) {
+>  		/* Incomplete config. Send empty response. */
+>  		l2cap_send_cmd(conn, cmd->ident, L2CAP_CONF_RSP,
+>  				l2cap_build_conf_rsp(sk, rsp,
 
-Currently there is support in bluez to act as a AVRCP target, and it will deliver these 
-events through the input layer. No new input device will appear, it will go through 
-/dev/uinput (which I think you can open for reading then)
+Maybe you could use L2CAP_CONF_FLAG_CONT also in l2cap_build_conf_rsp()?
 
-
-The Control connection is ONLY (implicitly) established when an audio connection 
-(HS,HF,A2DP) is succesfully started, so you should be able to control myth (through lirc 
-perhaps) with a headset that has some controls. If this is done, you should be able to see 
-some debug logging w.r.t. RCP. You probably need to run bluetoothd using -d -n.
-
-
---
-Sander
+-- 
+Ville
