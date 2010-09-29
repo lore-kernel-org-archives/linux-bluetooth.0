@@ -1,40 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20100929134521.GA19362@jh-x301>
-References: <AANLkTindKFz1fx9cJMu9aSpehG5LaUHHO7TkgWqMzqj=@mail.gmail.com>
-	<20100929134521.GA19362@jh-x301>
-Date: Wed, 29 Sep 2010 11:05:46 -0300
-Message-ID: <AANLkTimvvp=D+X+TcP3Ji7WuGaMZF7+LA+8BWZiQCStr@mail.gmail.com>
-Subject: Re: Pull request: git://git.infradead.org/users/cktakahasi/bluez.git for-upstream
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Ville Tervo <ville.tervo@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Ville Tervo <ville.tervo@nokia.com>
+Subject: [PATCH 1/2] Add master/slave parsing for le_conn_complete event
+Date: Wed, 29 Sep 2010 16:56:20 +0300
+Message-Id: <1285768581-19654-1-git-send-email-ville.tervo@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Sep 29, 2010 at 10:45 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Claudio,
->
-> On Thu, Sep 23, 2010, Claudio Takahasi wrote:
->>       Rename hciops {start, stop}_discovery to {start, stop}_inquiry
->
-> I'm not sure about this patch. Wasn't the idea to hide the device
-> discovery details from the higher layers? I.e. the method could be
-> called discovery and it'd take care of both BR/EDR and LE discovery
-> methods.
->
-> Johan
->
+---
+ parser/hci.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
-Hi Johan,
+diff --git a/parser/hci.c b/parser/hci.c
+index 250ba58..7f23605 100644
+--- a/parser/hci.c
++++ b/parser/hci.c
+@@ -3239,7 +3239,8 @@ static inline void evt_le_conn_complete_dump(int level, struct frame *frm)
+ 	evt_le_connection_complete *evt = frm->ptr;
+ 
+ 	p_indent(level, frm);
+-	printf("status 0x%2.2x handle %d\n", evt->status, btohs(evt->handle));
++	printf("status 0x%2.2x handle %d, role %s\n",
++		evt->status, btohs(evt->handle), evt->role?"slave":"master");
+ }
+ 
+ static inline void le_meta_ev_dump(int level, struct frame *frm)
+-- 
+1.7.1
 
-StartDiscovery() triggers all the process. The adapter type: BR/EDR
-only/LE only or dual mode is hidden from the higher layers.
-So, your suggestion it try to hide all discovery details inside the
-hciops as much as possible? I am not sure at the moment if it is
-possible, but we can try. We need to clean the code anyway in order to
-have a "smooth" migration to the new Bluetooth Management Interface.
-
-Regards,
-Claudio
