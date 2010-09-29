@@ -1,62 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 29 Sep 2010 16:49:08 +0300
+Date: Wed, 29 Sep 2010 16:45:21 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: Re: [PATCH 1/4] Add the Attribute interface to the API
-Message-ID: <20100929134908.GB19362@jh-x301>
-References: <1285696155-32766-1-git-send-email-claudio.takahasi@openbossa.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: Pull request:
+ git://git.infradead.org/users/cktakahasi/bluez.git for-upstream
+Message-ID: <20100929134521.GA19362@jh-x301>
+References: <AANLkTindKFz1fx9cJMu9aSpehG5LaUHHO7TkgWqMzqj=@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1285696155-32766-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <AANLkTindKFz1fx9cJMu9aSpehG5LaUHHO7TkgWqMzqj=@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Claudio,
 
-On Tue, Sep 28, 2010, Claudio Takahasi wrote:
-> +Attribute Protocol hierarchy
-> +============================
-> +
-> +Service		org.bluez
-> +Interface	org.bluez.Attribute
-> +Object path	[prefix]/{hci0}/{device0}
-> +
-> +
-> +Methods		dict GetProperties()
-> +
-> +			Returns all properties for the interface. See the
-> +			properties section for available properties.
-> +
-> +Properties	array{object} Services
-> +
-> +			List of all the Primary Services that this device
-> +			implements.
-> +
-> +
->  Device Service hierarchy
->  ========================
->  
-> diff --git a/doc/device-api.txt b/doc/device-api.txt
-> index 95b5b22..b818299 100644
-> --- a/doc/device-api.txt
-> +++ b/doc/device-api.txt
-> @@ -139,10 +139,6 @@ Properties	string Address [readonly]
->  			List of 128-bit UUIDs that represents the available
->  			remote services.
->  
-> -		array{object} Services [readonly]
-> -
-> -			List of characteristics based services.
-> -
->  		boolean Paired [readonly]
->  
->  			Indicates if the remote device is paired.
+On Thu, Sep 23, 2010, Claudio Takahasi wrote:
+>       Rename hciops {start, stop}_discovery to {start, stop}_inquiry
 
-What's the motivation of moving this into its own D-Bus interface? I
-thought the plan was to abstract both traditional SDP and ATT behind the
-same API in which case having this in the Device interface makes more
-sense imho.
+I'm not sure about this patch. Wasn't the idea to hide the device
+discovery details from the higher layers? I.e. the method could be
+called discovery and it'd take care of both BR/EDR and LE discovery
+methods.
 
 Johan
