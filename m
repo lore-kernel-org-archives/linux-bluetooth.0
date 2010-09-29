@@ -1,52 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTi=1hKSL+2-DJ4SJkZJ+TaAzP1BUSh4FbiT=xg4g@mail.gmail.com>
-References: <1285696155-32766-1-git-send-email-claudio.takahasi@openbossa.org>
-	<20100929134908.GB19362@jh-x301>
-	<AANLkTi=1hKSL+2-DJ4SJkZJ+TaAzP1BUSh4FbiT=xg4g@mail.gmail.com>
-Date: Wed, 29 Sep 2010 23:00:57 +0300
-Message-ID: <AANLkTinp8bmy9y-GrQsFPDxdJkPK7n5dixaKsVZtJv0h@mail.gmail.com>
-Subject: Re: [PATCH 1/4] Add the Attribute interface to the API
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20100924230730.GB6566@tux>
+References: <20100924230730.GB6566@tux>
+From: "Luis R. Rodriguez" <lrodriguez@atheros.com>
+Date: Wed, 29 Sep 2010 12:40:23 -0700
+Message-ID: <AANLkTin3QqukxP8M_L9nWgkrv6bGsnGx1JFNtOY1jXtp@mail.gmail.com>
+Subject: Re: RFC: btusb firmware load help
+To: Marcel Holtmann <holtmann@linux.intel.com>,
+	Ken Steck <Ken.Steck@atheros.com>,
+	Shanmugamkamatchi Balashanmugam
+	<Shanmugamkamatchi.Balashanmugam@atheros.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+	Deepak Dhamdhere <Deepak.Dhamdhere@atheros.com>,
+	Sree Durbha <Sree.Durbha@atheros.com>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-On Wed, Sep 29, 2010 at 5:52 PM, Claudio Takahasi
-<claudio.takahasi@openbossa.org> wrote:
->>
->> What's the motivation of moving this into its own D-Bus interface? I
->> thought the plan was to abstract both traditional SDP and ATT behind the
->> same API in which case having this in the Device interface makes more
->> sense imho.
->>
->> Johan
->>
+On Fri, Sep 24, 2010 at 4:07 PM, Luis R. Rodriguez
+<lrodriguez@atheros.com> wrote:
+> Marcel, I was just poked about this thread:
 >
-> Hi Johan,
+> http://www.spinics.net/lists/linux-bluetooth/msg06087.html
 >
-> we forgot the SDP integration plan. Forget this patch.
+> The hack is required because our BT hardware does not accept HCI commands
+> when the device is plugged in. If I understood your position you did not
+> want to accept the patch because our BT USB devices are violating the
+> specification by not acceping HCI commands and yet claiming to be BT
+> devices, is that right?
 >
-> From the implementation point of view, implement inside the attrib
-> client plugin was the easiest way, if we keep this property inside the
-> Device interface a new function needs to be created in device.h to
-> register the available primary services object paths.
+> This position seems perfectly reasonable, and if it is violating the
+> specification this needs to be fixed in hardware for future devices. But
+> what is done is done, and we need to support existing customers with
+> current hardware, can you provide some recommendation as to an alternative
+> approach to resolve this upstream?
 
-Well there is a more complicated way, which is to add support for
-user_data per method/property, so a plugin could directly register
-their methods and properties in e.g. Adapter and Device interfaces. Of
-course this has drawbacks since the API could really became a mess
-with plugins doing there thing carelessly, but in the other hand it
-can greatly simplify the interfaces like Device.Disconnect()
-propagation.
+Marcel some attention to this would be greatly appreciated.
 
-Just a crazy idea I had late in the night :D
+> Without a patch like the one suggested Atheros' Bluetooth USB devices are
+> essentially not functional at all. I am in hopes we can come to some agreement
+> how to deal with a hardware quirk for now while we nag at our hardware team
+> to consider changing the way our devices work.
 
--- 
-Luiz Augusto von Dentz
-Computer Engineer
+I have gotten clarifications from Ken Steck that this issue is only
+present on AR3011 chips used in the SFLASH configuration. AR3012 will
+not have this issue.
+
+> Someone from the Atheros BT team: can you send me the same patch to be
+> applied into compat-wireless under the linux-next-pending/ directory ?
+> That is, send me a patch which will apply onto compat-wireless.
+> This way we can actually get our hardware functional to customers while
+> we try to look for a better alternative directly upstream. You will
+> also need to document this issue on the wiki. I recommend you document
+> this here:
+>
+> http://wireless.kernel.org/en/users/Drivers/ath3k
+>
+> That is, create a new wiki page there for the driver and the things
+> needed for it. Once I get the patch into compat-wireless we can
+> refer users/customers to the compat-wireless stable releases with
+> the linux-next-pending/ patch you give to me applied.
+
+I saw no takers on this.. so I just created the page myself.
+
+> Someone from the Atheros BT team: does the patch currently handle
+> suspend/resume?
+
+Shanmugamkamatchi has noted to me he will be sending me this patch
+soon and it also supports suspend/resume properly, however, I would
+like to resolve this upstream.
+
+Marcel, please let us know what path you recommend we take for this.
+
+  Luis
