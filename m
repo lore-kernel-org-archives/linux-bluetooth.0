@@ -1,30 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 30 Sep 2010 10:31:03 +0300
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: Ville Tervo <ville.tervo@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Add master/slave parsing for le_conn_complete event
-Message-ID: <20100930073103.GA6687@jh-x301>
-References: <1285768581-19654-1-git-send-email-ville.tervo@nokia.com>
+Date: Thu, 30 Sep 2010 04:24:05 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: haijun liu <liuhaijun.er@gmail.com>
+Cc: Ville Tervo <ville.tervo@nokia.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Mat Martineau <mathewm@codeaurora.org>,
+	"dantian.ip" <dantian.ip@gmail.com>
+Subject: Re: [PATCH] Bluetooth: Replace hard code of configuration
+ continuation flag.
+Message-ID: <20100930072405.GB3048@vigoh>
+References: <AANLkTi=mS2212wTd3nu_ENJ8ySyNSVMWgTmc-MT0421c@mail.gmail.com>
+ <20100928234820.GB8518@vigoh>
+ <AANLkTi=EVEwuKy3QwNJ1sVpe2_EJCkQQ3iGutKQQRneU@mail.gmail.com>
+ <20100929113615.GH1931@null>
+ <AANLkTi=tyZ4rsn8QtqV8b04=f=1QA9qwJW03PQzroJ7O@mail.gmail.com>
+ <20100929131229.GK1931@null>
+ <AANLkTin8muojCiTZ+1MZL7GLDs45MwsZBErmvzVaZy4a@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1285768581-19654-1-git-send-email-ville.tervo@nokia.com>
+In-Reply-To: <AANLkTin8muojCiTZ+1MZL7GLDs45MwsZBErmvzVaZy4a@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ville,
+* haijun liu <liuhaijun.er@gmail.com> [2010-09-29 21:33:09 +0800]:
 
-On Wed, Sep 29, 2010, Ville Tervo wrote:
+> Replace hard code of configuration continuation flag with self-comment macro.
+> 
+> 
+> Signed-off-by: Haijun.Liu <haijun.liu@atheros.com>
 > ---
->  parser/hci.c |    3 ++-
->  1 files changed, 2 insertions(+), 1 deletions(-)
+>  net/bluetooth/l2cap_core.c |    6 +++---
+>  1 files changed, 3 insertions(+), 3 deletions(-)
 
-Thanks for the patch. I've pushed it to the upstream hcidump tree with
-the following whitespace fix:
+This one is also corrupted.
 
-> +		evt->status, btohs(evt->handle), evt->role?"slave":"master");
-
-It should be 'evt->role ? "slave" : "master"' i.e. you've got some
-missing spaces there.
-
-Johan
+-- 
+Gustavo F. Padovan
+ProFUSION embedded systems - http://profusion.mobi
