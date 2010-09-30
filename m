@@ -1,38 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 30 Sep 2010 04:24:05 -0300
+Date: Thu, 30 Sep 2010 04:23:29 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: haijun liu <liuhaijun.er@gmail.com>
-Cc: Ville Tervo <ville.tervo@nokia.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Mat Martineau <mathewm@codeaurora.org>,
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
 	"dantian.ip" <dantian.ip@gmail.com>
-Subject: Re: [PATCH] Bluetooth: Replace hard code of configuration
- continuation flag.
-Message-ID: <20100930072405.GB3048@vigoh>
-References: <AANLkTi=mS2212wTd3nu_ENJ8ySyNSVMWgTmc-MT0421c@mail.gmail.com>
- <20100928234820.GB8518@vigoh>
- <AANLkTi=EVEwuKy3QwNJ1sVpe2_EJCkQQ3iGutKQQRneU@mail.gmail.com>
- <20100929113615.GH1931@null>
- <AANLkTi=tyZ4rsn8QtqV8b04=f=1QA9qwJW03PQzroJ7O@mail.gmail.com>
- <20100929131229.GK1931@null>
- <AANLkTin8muojCiTZ+1MZL7GLDs45MwsZBErmvzVaZy4a@mail.gmail.com>
+Subject: Re: [PATCH 2/2] Bluetooth: Update conf_state before send
+ config_req out.
+Message-ID: <20100930072329.GA3048@vigoh>
+References: <AANLkTimQtkORjmsiO3wPULRErNXORBtHATbBvdCEsY27@mail.gmail.com>
+ <20100928234934.GC8518@vigoh>
+ <AANLkTikz3VTGtL5PY2nAXKO1z_XD4ROEZyUV3JXsrstn@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTin8muojCiTZ+1MZL7GLDs45MwsZBErmvzVaZy4a@mail.gmail.com>
+In-Reply-To: <AANLkTikz3VTGtL5PY2nAXKO1z_XD4ROEZyUV3JXsrstn@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* haijun liu <liuhaijun.er@gmail.com> [2010-09-29 21:33:09 +0800]:
+Hi Haijun,
 
-> Replace hard code of configuration continuation flag with self-comment macro.
+* haijun liu <liuhaijun.er@gmail.com> [2010-09-29 19:11:29 +0800]:
+
+>  Update conf_state with L2CAP_CONF_REQ_SENT before send
+>  config_req out in l2cap_config_req().
 > 
 > 
 > Signed-off-by: Haijun.Liu <haijun.liu@atheros.com>
 > ---
->  net/bluetooth/l2cap_core.c |    6 +++---
->  1 files changed, 3 insertions(+), 3 deletions(-)
+>  net/bluetooth/l2cap_core.c |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
 
-This one is also corrupted.
+Still corrupted:
+
+Applying: Bluetooth: Update conf_state before send config_req out.
+fatal: corrupt patch at line 10
+Patch failed at 0001 Bluetooth: Update conf_state before send config_req
+out.
+
+Make sure you can apply your patches sent with git send-email before
+sending them to the mailing list. Thanks.
 
 -- 
 Gustavo F. Padovan
