@@ -1,30 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 30 Sep 2010 17:26:57 -0700 (PDT)
-Message-Id: <20100930.172657.123994559.davem@davemloft.net>
-To: padovan@profusion.mobi
-Cc: linville@tuxdriver.com, marcel@holtmann.org,
- linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: pull-request: bluetooth-2.6 2010-09-27
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20100928224941.GA19409@vigoh>
-References: <20100928023035.GA3033@vigoh>
-	<20100927.200016.226762808.davem@davemloft.net>
-	<20100928224941.GA19409@vigoh>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+MIME-Version: 1.0
+Date: Thu, 30 Sep 2010 18:57:47 -0300
+Message-ID: <AANLkTinH3aXNZNiK-u-wL01SxCH9aPU+PRr6BTRPedjb@mail.gmail.com>
+Subject: Pull request: git://git.infradead.org/users/cktakahasi/bluez.git for-upstream-doc
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Cc: CLAUDIO TAKAHASI <CLAUDIO.TAKAHASI@openbossa.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Date: Tue, 28 Sep 2010 19:49:41 -0300
+The following changes since commit 3a8386d428e385d97b95a890623362321a7e3a19:
 
-> Actually sk_stream_wait_memory is another point why it's safe to release
-> the lock and block waiting for memory. We've been doing that safely in
-> protocols like TCP, SCTP and DCCP for a long time.
+  Fix left open socket warning for attribute server (2010-09-30 17:26:55 -0300)
 
-Do you notice what TCP does when sk_stream_wait_memory() returns?
+are available in the git repository at:
+  git://git.infradead.org/users/cktakahasi/bluez.git for-upstream-doc
 
-It reloads all volatile state that might have changed in the socket
-while the lock was dropped.
+Claudio Takahasi (3):
+      Add GetProperties method in the Device service hierarchy
+      Add SetProperty in the Device characteristic hierarchy
+      Fix object path in the register watcher method
 
-For example, TCP will reload the current MSS that can change
-asynchronously while we don't have the socket lock.
+ doc/attribute-api.txt |   46 ++++++++++++++--------------------------------
+ 1 files changed, 14 insertions(+), 32 deletions(-)
