@@ -1,77 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Rafal Michalski <michalski.raf@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Rafal Michalski <michalski.raf@gmail.com>
-Subject: [PATCH] Change "websiteUrl" query field to more general
-Date: Thu, 30 Sep 2010 15:41:53 +0200
-Message-Id: <1285854113-13649-1-git-send-email-michalski.raf@gmail.com>
+Date: Thu, 30 Sep 2010 13:49:53 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Rafal Michalski <michalski.raf@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fix handlig for gboolean mce_bt_set field
+Message-ID: <20100930104953.GA13544@jh-x301>
+References: <1285842160-4127-1-git-send-email-michalski.raf@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1285842160-4127-1-git-send-email-michalski.raf@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-"websiteUrl" query field is replaced by more general "url" because
-previously web address wasn't downloaded in each case.
----
- plugins/phonebook-tracker.c |   12 ++++++------
- 1 files changed, 6 insertions(+), 6 deletions(-)
+Hi Rafal,
 
-diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index 2d94bc6..c10491d 100644
---- a/plugins/phonebook-tracker.c
-+++ b/plugins/phonebook-tracker.c
-@@ -64,7 +64,7 @@
- 	"nco:phoneNumber(?w) nco:pobox(?p) nco:extendedAddress(?p) "	\
- 	"nco:streetAddress(?p) nco:locality(?p) nco:region(?p) "	\
- 	"nco:postalcode(?p) nco:country(?p) ?f nco:emailAddress(?ew) "	\
--	"nco:birthDate(?c) nco:nickname(?c) nco:websiteUrl(?c) "	\
-+	"nco:birthDate(?c) nco:nickname(?c) nco:url(?c) "		\
- 	"nco:photo(?c) nco:fullname(?o) nco:department(?a) "		\
- 	"nco:role(?a) nco:pobox(?pw) nco:extendedAddress(?pw) "		\
- 	"nco:streetAddress(?pw) nco:locality(?pw) nco:region(?pw) "	\
-@@ -116,7 +116,7 @@
- 	"nco:phoneNumber(?w) nco:pobox(?p) nco:extendedAddress(?p) "	\
- 	"nco:streetAddress(?p) nco:locality(?p) nco:region(?p) "	\
- 	"nco:postalcode(?p) nco:country(?p) \"\" nco:emailAddress(?ew) "\
--	"nco:birthDate(?c) nco:nickname(?c) nco:websiteUrl(?c) "	\
-+	"nco:birthDate(?c) nco:nickname(?c) nco:url(?c) "		\
- 	"nco:photo(?c) nco:fullname(?o) nco:department(?a) "		\
- 	"nco:role(?a) nco:pobox(?pw) nco:extendedAddress(?pw) "		\
- 	"nco:streetAddress(?pw) nco:locality(?pw) nco:region(?pw) "	\
-@@ -188,7 +188,7 @@
- 	"nco:phoneNumber(?w) nco:pobox(?p) nco:extendedAddress(?p) "	\
- 	"nco:streetAddress(?p) nco:locality(?p) nco:region(?p) "	\
- 	"nco:postalcode(?p) nco:country(?p) \"\" nco:emailAddress(?ew) "\
--	"nco:birthDate(?c) nco:nickname(?c) nco:websiteUrl(?c) "	\
-+	"nco:birthDate(?c) nco:nickname(?c) nco:url(?c) "		\
- 	"nco:photo(?c) nco:fullname(?o) nco:department(?a) "		\
- 	"nco:role(?a) nco:pobox(?pw) nco:extendedAddress(?pw) "		\
- 	"nco:streetAddress(?pw) nco:locality(?pw) nco:region(?pw) "	\
-@@ -260,7 +260,7 @@
- 	"nco:phoneNumber(?w) nco:pobox(?p) nco:extendedAddress(?p) "	\
- 	"nco:streetAddress(?p) nco:locality(?p) nco:region(?p) "	\
- 	"nco:postalcode(?p) nco:country(?p) \"\" nco:emailAddress(?ew)"	\
--	"nco:birthDate(?c) nco:nickname(?c) nco:websiteUrl(?c) "	\
-+	"nco:birthDate(?c) nco:nickname(?c) nco:url(?c) "		\
- 	"nco:photo(?c) nco:fullname(?o) nco:department(?a) "		\
- 	"nco:role(?a) nco:pobox(?pw) nco:extendedAddress(?pw) "		\
- 	"nco:streetAddress(?pw) nco:locality(?pw) nco:region(?pw) "	\
-@@ -328,7 +328,7 @@
- 	"nco:phoneNumber(?w) nco:pobox(?p) nco:extendedAddress(?p) "	\
- 	"nco:streetAddress(?p) nco:locality(?p) nco:region(?p) "	\
- 	"nco:postalcode(?p) nco:country(?p) \"\" nco:emailAddress(?ew) "\
--	"nco:birthDate(?c) nco:nickname(?c) nco:websiteUrl(?c) "	\
-+	"nco:birthDate(?c) nco:nickname(?c) nco:url(?c) "		\
- 	"nco:photo(?c) nco:fullname(?o) nco:department(?a) "		\
- 	"nco:role(?a) nco:pobox(?pw) nco:extendedAddress(?pw) "		\
- 	"nco:streetAddress(?pw) nco:locality(?pw) nco:region(?pw) "	\
-@@ -443,7 +443,7 @@
- 	"nco:phoneNumber(?w) nco:pobox(?p) nco:extendedAddress(?p) "	\
- 	"nco:streetAddress(?p) nco:locality(?p) nco:region(?p) "	\
- 	"nco:postalcode(?p) nco:country(?p) ?f  nco:emailAddress(?ew)"	\
--	"nco:birthDate(<%s>) nco:nickname(<%s>) nco:websiteUrl(<%s>) "	\
-+	"nco:birthDate(<%s>) nco:nickname(<%s>) nco:url(<%s>) "		\
- 	"nco:photo(<%s>) nco:fullname(?o) nco:department(?a) "		\
- 	"nco:role(?a) nco:pobox(?pw) nco:extendedAddress(?pw) "		\
- 	"nco:streetAddress(?pw) nco:locality(?pw) nco:region(?pw) "	\
--- 
-1.6.3.3
+On Thu, Sep 30, 2010, Rafal Michalski wrote:
+> Expression (sigvalue & MCE_RADIO_STATE_BLUETOOTH) is invalid because it makes
+> wrong assumption about that it evaluates to TRUE, when bit
+> MCE_RADIO_STATE_BLUETOOTH is set. In this case, assignment
+> mce_bt_set = (sigvalue & MCE_RADIO_STATE_BLUETOOTH) makes that gboolean
+> "mce_bt_set" receives value equal 8 instead of TRUE (equal 1). So condition in
+> "if (mce_bt_set == powered)" statement will never evaluate to true because
+> gboolean "powered" receives only TRUE (equal 1) or FALSE (equal 0) value.
+> We should remember that gboolean type is not bool type in C++ sense.
+> It's simply typedef of gint (int), so assignmnet:
+> mce_bt_set = (sigvalue & MCE_RADIO_STATE_BLUETOOTH) is valid for compiler but
+> in our case it makes a bug. So normalization (double negation) in assignment:
+> mce_bt_set = !!(sigvalue & MCE_RADIO_STATE_BLUETOOTH) preserves that
+> "mce_bt_set" will receive only TRUE or FALSE value.
+> ---
+>  plugins/maemo6.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
+Thanks. The patch has been pushed upstream with a much simplified commit
+message (the above is really quite complicated to read compared to the
+simplicity of the actual fix).
+
+Johan
