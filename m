@@ -1,106 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTikADcqHYfOjmRQVEDdPuU9mrGVvAVGNUdRTsQcd@mail.gmail.com>
-References: <AANLkTindKFz1fx9cJMu9aSpehG5LaUHHO7TkgWqMzqj=@mail.gmail.com>
-	<20100929134521.GA19362@jh-x301>
-	<AANLkTimvvp=D+X+TcP3Ji7WuGaMZF7+LA+8BWZiQCStr@mail.gmail.com>
-	<20100930073938.GA6964@jh-x301>
-	<AANLkTikADcqHYfOjmRQVEDdPuU9mrGVvAVGNUdRTsQcd@mail.gmail.com>
-Date: Thu, 30 Sep 2010 18:51:40 -0300
-Message-ID: <AANLkTin5RWCfX07xRUfVvkq+C47AOJXCCRpMVa-vqrRA@mail.gmail.com>
-Subject: Re: Pull request: git://git.infradead.org/users/cktakahasi/bluez.git for-upstream
+In-Reply-To: <AANLkTinG4Bpq7uo7v8OrSLjozjJG4XOviGuTnaSbS_Nz@mail.gmail.com>
+References: <AANLkTinG4Bpq7uo7v8OrSLjozjJG4XOviGuTnaSbS_Nz@mail.gmail.com>
+Date: Thu, 30 Sep 2010 17:34:43 -0300
+Message-ID: <AANLkTi=m3MrgF=mJ54wMVH+0b5O9jwciw-HcChpF7HiG@mail.gmail.com>
+Subject: Re: Pull request: git://git.infradead.org/users/cktakahasi/bluez.git for-upstream-attrib
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Cc: CLAUDIO TAKAHASI <CLAUDIO.TAKAHASI@openbossa.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Sep 30, 2010 at 11:28 AM, Claudio Takahasi
+On Thu, Sep 30, 2010 at 11:24 AM, Claudio Takahasi
 <claudio.takahasi@openbossa.org> wrote:
-> On Thu, Sep 30, 2010 at 4:39 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
->> Hi Claudio,
->>
->> On Wed, Sep 29, 2010, Claudio Takahasi wrote:
->>> StartDiscovery() triggers all the process. The adapter type: BR/EDR
->>> only/LE only or dual mode is hidden from the higher layers.
->>> So, your suggestion it try to hide all discovery details inside the
->>> hciops as much as possible?
->>
->> That was the idea yes, but I'm not 100% sure that it's the best
->> approach. Another question is also how do we want to represent this with
->> the new management interface. Should the kernel do it "all" through a
->> single request from userspace or should userspace control the separate
->> BR/EDR and LE discoveries. If it's the former, then having a single
->> adapter_ops callback makes sense. If it's the later then we should
->> probably have two separate ones. Either way I now realize that to
->> implement this with a single callback we'd need to have the HCI event
->> processing moved over to hciops and that's not something that will
->> happen very quickly. So maybe it's better to have these as two separate
->> adapter_ops callbacks for now.
->>
->> Johan
->>
+> The following changes since commit b5c556ef59a9a8318b239453c3d4a8aad951689f:
 >
-> Another point is: scanning needs to be disabled "actively", it is not
-> possible to inform a scanning length like inquiry, it is necessary to
-> create a timeout to disable the scanning. Joining inquiry and scanning
-> inside a single adapter_ops callback will be hard to control the
-> discovery procedure "states". So for now, I prefer two separate
-> callbacks due the scanning timeout and HCI events processing.
+>  Move adapter address reading to hciops (2010-09-29 16:34:55 +0300)
 >
-> However, for the new management interface, one single request seems to
-> be more appropriate but extra requests will be necessary to setup the
-> scan and inquiry parameters.
+> are available in the git repository at:
+>  git://git.infradead.org/users/cktakahasi/bluez.git for-upstream-attrib
 >
-> Claudio
+> Bruna Moreira (1):
+>      Use bt_io_connect in gatttool
+>
+> Claudio Takahasi (4):
+>      Add L2CAP fixed channels support for BTIO
+>      Add characteristic SetProperty implementation
+>      Fix invalid read and memory leak in the attribute server
+>      Fix left open socket warning for attribute server
+>
+> Gustavo F. Padovan (1):
+>      l2test: add support to the fixed channels
+>
+> Vinicius Costa Gomes (5):
+>      Fix filtering out LE events
+>      Add support for LE connections to gatttool
+>      Add support for LE connections to the GATT server
+>      Fix ValueChanged not being called on registered agents
+>      Add "Services" property in the org.bluez.Device interface
+>
+>  Makefile.am         |    2 +-
+>  attrib/client.c     |  122 +++++++++++++++++++++++++++++++++++++++------------
+>  attrib/client.h     |    5 +-
+>  attrib/gatttool.c   |  121 +++++++++++++++-----------------------------------
+>  attrib/manager.c    |   12 +----
+>  btio/btio.c         |   37 +++++++++++----
+>  btio/btio.h         |    1 +
+>  src/adapter.c       |    3 +
+>  src/attrib-server.c |   29 ++++++++++--
+>  src/device.c        |   29 ++++++++++--
+>  src/device.h        |    1 +
+>  src/security.c      |    1 +
+>  test/l2test.c       |   26 +++++++++--
+>  13 files changed, 238 insertions(+), 151 deletions(-)
 >
 
-New pull request! Patches rebased and a new hciops callback function
-has been added to export the write LE host supported command.
+New pull request, patches rebased!
 
-The following changes since commit 3a8386d428e385d97b95a890623362321a7e3a19:
+The following changes since commit f7b4b3fcd1190d231b864730c821b98fb945e439:
 
-  Fix left open socket warning for attribute server (2010-09-30 17:26:55 -0300)
+  Move connection list fetching to hciops (2010-09-30 22:12:37 +0300)
 
 are available in the git repository at:
-  git://git.infradead.org/users/cktakahasi/bluez.git for-upstream
+  git://git.infradead.org/users/cktakahasi/bluez.git for-upstream-attrib
 
-Claudio Takahasi (23):
-      Add LE start and stop scanning
-      Remove RSSI field from the advertising report event
-      Decoding the RSSI parameter from the advertising report event
-      Send Discovering property "FALSE" when the interleave finishes
-      Add length argument on hciops start discovery function
-      Stop inquiry using the length parameter
-      Fix remote name resolution for interleave discovery
-      Add Write LE host supported function
-      Set the LE host supported and disable simultaneous LE and BR/EDR flags
-      Add extended feature mask constants definition
-      Read the local extended features
-      Stop LE scanning when discovery is suspended
-      Rename hciops {start, stop}_discovery to {start, stop}_inquiry
-      Don't enter on interleave mode if there isn't active sessions
-      Code cleanup: improving inquiry logic
-      Clear the remote device found list in the state transition
-      Fix periodic inquiry signals
-      Fixing DeviceDisappeared signal
-      Postpone discovery if still resolving names
-      Add adapter discovery type function
-      Do not send another Discovering TRUE signal if still resolving names
-      Forcing periodic inquiry exit
-      Fix interleave scanning
+Bruna Moreira (1):
+      Use bt_io_connect in gatttool
 
-Vinicius Costa Gomes (1):
-      Add BR/EDR LE interleaved discovery
+Claudio Takahasi (4):
+      Add L2CAP fixed channels support for BTIO
+      Add characteristic SetProperty implementation
+      Fix invalid read and memory leak in the attribute server
+      Fix left open socket warning for attribute server
 
- lib/hci.c        |   29 +++++
- lib/hci.h        |   17 +++-
- lib/hci_lib.h    |    1 +
- plugins/hciops.c |   69 +++++++++++-
- src/adapter.c    |  301 +++++++++++++++++++++++++++++++++++++-----------------
- src/adapter.h    |   38 ++++---
- src/dbus-hci.c   |   45 +++++++--
- src/dbus-hci.h   |    1 +
- src/security.c   |  131 ++++++++++++++----------
- 9 files changed, 449 insertions(+), 183 deletions(-)
+Gustavo F. Padovan (1):
+      l2test: add support to the fixed channels
+
+Vinicius Costa Gomes (5):
+      Fix filtering out LE events
+      Add support for LE connections to gatttool
+      Add support for LE connections to the GATT server
+      Fix ValueChanged not being called on registered agents
+      Add "Services" property in the org.bluez.Device interface
+
+ Makefile.am         |    2 +-
+ attrib/client.c     |  122 +++++++++++++++++++++++++++++++++++++++------------
+ attrib/client.h     |    5 +-
+ attrib/gatttool.c   |  121 +++++++++++++++-----------------------------------
+ attrib/manager.c    |   12 +----
+ btio/btio.c         |   37 +++++++++++----
+ btio/btio.h         |    1 +
+ src/adapter.c       |    3 +
+ src/attrib-server.c |   29 ++++++++++--
+ src/device.c        |   29 ++++++++++--
+ src/device.h        |    1 +
+ src/security.c      |    1 +
+ test/l2test.c       |   26 +++++++++--
+ 13 files changed, 238 insertions(+), 151 deletions(-)
