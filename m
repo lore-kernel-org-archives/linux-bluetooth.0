@@ -1,87 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 1 Oct 2010 15:30:21 +0200 (CEST)
-From: Jiri Kosina <jkosina@suse.cz>
-To: Antonio Ospite <ospite@studenti.unina.it>
-Cc: Alan Ott <alan@signal11.us>,
-	Stefan Achatz <erazor_de@users.sourceforge.net>,
-	Alexey Dobriyan <adobriyan@gmail.com>, Tejun Heo <tj@kernel.org>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Greg Kroah-Hartman <gregkh@suse.de>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Stephane Chatty <chatty@enac.fr>,
-	Michael Poole <mdpoole@troilus.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Bastien Nocera <hadess@hadess.net>,
-	Eric Dumazet <eric.dumazet@gmail.com>, linux-input@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v4 1/2] HID: Add Support for Setting and Getting Feature
- Reports from hidraw
-In-Reply-To: <20100928153011.32750e5d.ospite@studenti.unina.it>
-Message-ID: <alpine.LNX.2.00.1010011529460.29535@pobox.suse.cz>
-References: <1281442367.12579.206.camel@localhost.localdomain> <1281990059-3562-2-git-send-email-alan@signal11.us> <20100928153011.32750e5d.ospite@studenti.unina.it>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+In-Reply-To: <1285937230-547-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1285937230-547-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Fri, 1 Oct 2010 15:50:15 +0300
+Message-ID: <AANLkTi=nmkLgBMM4_1RWEcPY=iOysG-LB00k54USLbxn@mail.gmail.com>
+Subject: Re: [PATCHv1 0/5] Bluetooth: experimental support for pm_limits
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 28 Sep 2010, Antonio Ospite wrote:
+On Fri, Oct 1, 2010 at 3:47 PM, Emeltchenko Andrei
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+>
+> First version of using power constraints interface to achieve
+> maximum bluetooth transfer speed. Otherwise HW goes to idle mode
+> and speed decreases 3 times.
+>
+> Use empirical power management analyzer (TM) to define amount
+> of time device set high power constraints for.
+>
+> May include hacks :-)
+>
+> Andrei Emeltchenko (5):
+>  Bluetooth: board support for pm_limits
+>  Bluetooth: rm581: pm constraints support
+>  Bluetooth: rm680: pm constraints support
+>  Bluetooth: rm696: pm constraints support
+>  Bluetooth: pm constraints in bt transfer mode
+>
+>  arch/arm/mach-omap2/board-rm581-peripherals.c |    8 ++
+>  arch/arm/mach-omap2/board-rm680-peripherals.c |    8 ++
+>  arch/arm/mach-omap2/board-rm696-peripherals.c |    8 ++
+>  arch/arm/plat-omap/include/plat/board-nokia.h |    1 +
+>  drivers/bluetooth/hci_h4p/core.c              |   92 ++++++++++++++++++++++++-
+>  drivers/bluetooth/hci_h4p/hci_h4p.h           |    1 +
+>  6 files changed, 117 insertions(+), 1 deletions(-)
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
 
-> Hi Alan, I am doing some stress testing on hidraw, if I have a loop with
-> HIDIOCGFEATURE on a given report and I disconnect the device while the
-> loop is running I get this:
-> 
-> BUG: unable to handle kernel NULL pointer dereference at 0000000000000028
-> IP: [<ffffffffa02c66b4>] hidraw_ioctl+0xfc/0x32c [hid]
-> 
-> Full log attached along with the test program, the device is a Sony PS3
-> Controller (sixaxis).
-> 
-> If my objdump analysis is right, hidraw_ioctl+0xfc should be around line
-> 361 in hidraw.c (with your patch applied):
-> 
-> struct hid_device *hid = dev->hid;
-> 
-> It looks like 'dev' (which is hidraw_table[minor]) can be NULL
-> sometimes, can't it?
-> This is not introduced by your changes tho.
-> 
-> Just as a side note, the bug does not show up if the userspace program
-> handles return values properly and exits as soon as it gets an error
-> from the HID layer, see the XXX comment in test_hidraw_feature.c.
-> 
-> This fixes it, if it looks ok I will resend the patch rebased on
-> mainline code:
-> 
-> diff --git a/drivers/hid/hidraw.c b/drivers/hid/hidraw.c
-> index 7df1310..3c040c6 100644
-> --- a/drivers/hid/hidraw.c
-> +++ b/drivers/hid/hidraw.c
-> @@ -322,6 +322,10 @@ static long hidraw_ioctl(struct file *file, unsigned int cmd,
-> 
->         mutex_lock(&minors_lock);
->         dev = hidraw_table[minor];
-> +       if (!dev) {
-> +               ret = -ENODEV;
-> +               goto out;
-> +       }
-> 
->         switch (cmd) {
->                 case HIDIOCGRDESCSIZE:
-> @@ -412,6 +416,7 @@ static long hidraw_ioctl(struct file *file, unsigned int cmd,
-> 
->                 ret = -ENOTTY;
->         }
-> +out:
->         mutex_unlock(&minors_lock);
->         return ret;
->  }
+Sorry our driver is not in upstream yet.
 
-Yes, this patch makes sense even for current mainline code. Could you 
-please resend it to me with Signed-off-by: and changelog text, so that I 
-could apply it?
-
-Thanks!
-
--- 
-Jiri Kosina
-SUSE Labs, Novell Inc.
+Please discard.
