@@ -1,71 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1285943147-2546-1-git-send-email-haijun.liu@atheros.com>
-References: <1285943147-2546-1-git-send-email-haijun.liu@atheros.com>
+In-Reply-To: <20100930135618.GA4615@vigoh>
+References: <1285836760-3234-1-git-send-email-haijun.liu@atheros.com> <20100930135618.GA4615@vigoh>
 From: haijun liu <liuhaijun.er@gmail.com>
-Date: Fri, 1 Oct 2010 22:43:52 +0800
-Message-ID: <AANLkTi=-4yF2qew7YVnESPd_jt7g8bvS12XYkhx27ko8@mail.gmail.com>
-Subject: [PATCH] Bluetooth: Replace hard code of configuration continuous flag
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc: dan.tian@atheros.com, suraj <suraj@atheros.com>,
-	Ville Tervo <ville.tervo@nokia.com>
+Date: Fri, 1 Oct 2010 22:40:30 +0800
+Message-ID: <AANLkTikSO5K5LfB6FDKrjeTFoHNEDxnn0d_zqTw_QDKX@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Bluetooth: Replace hard code of configuration flag
+ with self-comment macro.
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: "Haijun.Liu" <haijun.liu@atheros.com>,
+	linux-bluetooth@vger.kernel.org, ville.tervo@nokia.com,
+	dan.tian@atheros.com, suraj@atheros.com
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Replace hard code of configuration continuous flag with
-self-commented macro L2CAP_CONF_FLAG_CONT in functions
-l2cap_config_req() and l2cap_config_rsp().
+Hi Gustavo,
 
-Signed-off-by: Haijun.Liu <haijun.liu@atheros.com>
----
- include/net/bluetooth/l2cap.h |    2 ++
- net/bluetooth/l2cap_core.c    |    6 +++---
- 2 files changed, 5 insertions(+), 3 deletions(-)
+On Thu, Sep 30, 2010 at 9:56 PM, Gustavo F. Padovan
+<padovan@profusion.mobi> wrote:
+> Hi Haijun,
+>
+> * Haijun.Liu <haijun.liu@atheros.com> [2010-09-30 16:52:39 +0800]:
+>
+>>
+>> Signed-off-by: Haijun.Liu <haijun.liu@atheros.com>
+>> ---
+>>  net/bluetooth/l2cap_core.c |    6 +++---
+>>  1 files changed, 3 insertions(+), 3 deletions(-)
+>
+> Your patch doesn't build:
+>
+> net/bluetooth/l2cap_core.c: In function 'l2cap_config_req':
+> net/bluetooth/l2cap_core.c:2988: error: 'L2CAP_CONF_FLAG_CONT'
+> undeclared (first use in this function)
+> net/bluetooth/l2cap_core.c:2988: error: (Each undeclared identifier is
+> reported only once
+> net/bluetooth/l2cap_core.c:2988: error: for each function it appears
+> in.)
+> net/bluetooth/l2cap_core.c: In function 'l2cap_config_rsp':
+> net/bluetooth/l2cap_core.c:3096: error: 'L2CAP_CONF_FLAG_CONT'
+> undeclared (first use in this function)
+>
+>
+> You also have to fix your commit subject, it would be good if you can do
+> it with 50 characters, but never overstep the 72 characters. If need to
+> add more info the commit message is there for you ;)
+>
+> --
+> Gustavo F. Padovan
+> ProFUSION embedded systems - http://profusion.mobi
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index df599dc..2b114ca 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -193,6 +193,8 @@ struct l2cap_conf_rsp {
- #define L2CAP_CONF_REJECT      0x0002
- #define L2CAP_CONF_UNKNOWN     0x0003
+Sorry for this mistake, I'll mail out right one soon.
 
-+#define L2CAP_CONF_FLAG_CONT   0x0001
-+
- struct l2cap_conf_opt {
-       __u8       type;
-       __u8       len;
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 07b55c1..9e788c2 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -2985,11 +2985,11 @@ static inline int l2cap_config_req(struct
-l2cap_conn *conn, struct l2cap_cmd_hdr
-       memcpy(l2cap_pi(sk)->conf_req + l2cap_pi(sk)->conf_len, req->data, len);
-       l2cap_pi(sk)->conf_len += len;
-
--       if (flags & 0x0001) {
-+       if (flags & L2CAP_CONF_FLAG_CONT) {
-               /* Incomplete config. Send empty response. */
-               l2cap_send_cmd(conn, cmd->ident, L2CAP_CONF_RSP,
-                               l2cap_build_conf_rsp(sk, rsp,
--                                       L2CAP_CONF_SUCCESS, 0x0001), rsp);
-+                                       L2CAP_CONF_SUCCESS,
-L2CAP_CONF_FLAG_CONT), rsp);
-               goto unlock;
-       }
-
-@@ -3093,7 +3093,7 @@ static inline int l2cap_config_rsp(struct
-l2cap_conn *conn, struct l2cap_cmd_hdr
-               goto done;
-       }
-
--       if (flags & 0x01)
-+       if (flags & L2CAP_CONF_FLAG_CONT)
-               goto done;
-
-       l2cap_pi(sk)->conf_state |= L2CAP_CONF_INPUT_DONE;
---
-1.6.3.3
+-- 
+Haijun Liu
