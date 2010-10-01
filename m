@@ -1,160 +1,170 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <99B09243E1A5DA4898CDD8B700111448097CF4A9D9@EXMB04.eu.tieto.com>
-References: <AANLkTimDw_obL=cV-CjU5OPCH+PiTqSyQ+0JTy1o+=3Q@mail.gmail.com>
-	<99B09243E1A5DA4898CDD8B700111448097CF4A9D9@EXMB04.eu.tieto.com>
-Date: Fri, 1 Oct 2010 16:29:56 +0530
-Message-ID: <AANLkTincT1K8tHBox0+JYi+Hhj65RSBdtYcaZNU+RfOW@mail.gmail.com>
-Subject: Re: How to ensure pairing is done
-From: "Yedire, Sandeep" <syedire@gmail.com>
-To: Waldemar.Rymarkiewicz@tieto.com
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: clean up rfcomm code
+Date: Fri,  1 Oct 2010 12:05:11 +0300
+Message-Id: <1285923911-12902-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Thanks for help. I could not make out "Connection Refused - security block"
+From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 
-Please find my hcidump log message below. I have taken this during
-./agent 0000 <bdaddr> and  executing ex_3_5.c application to test my
-L2CAP connection. Please find source ex_3_5.c file below this email.
+Remove dead code and unused rfcomm thread events
 
-hcidump during agent 0000 <bdaddr>
-_________________________________
-#
-# lockd: cannot monitor 136.170.194.184
-lockd: failed to monitor 136.170.194.184
-lockd: cannot monitor 136.170.194.184
-lockd: failed to monitor 136.170.194.184
-lockd: cannot monitor 136.170.194.184
-lockd: failed to monitor 136.170.194.184
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-> HCI Event: Command Status (0x0f) plen 4
-> HCI Event: Connect Complete (0x03) plen 11
-< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
-> HCI Event: Command Status (0x0f) plen 4
-< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
-> HCI Event: Read Remote Supported
-Features (0x0b) plen 11
-> HCI Event: Command Complete (0x0e) plen 6
-< HCI Command: Authentication Requested (0x01|0x0011) plen 2
-> HCI Event: Command Status (0x0f) plen 4
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
-> HCI Event: Link Key Request (0x17) plen 6
-> HCI Event: Command Status (0x0f) plen 4
-> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
-< HCI Command: Link Key Request Negative Reply (0x01|0x000c) plen 6
-> HCI Event: Max Slots Change (0x1b) plen 3
-> HCI Event: Command Complete (0x0e) plen 10
-> HCI Event: PIN Code Request (0x16) plen 6
-< HCI Command: PIN Code Request Reply (0x01|0x000d) plen 23
-> HCI Event: Command Complete (0x0e) plen 10
-> HCI Event: Remote Name Req Complete (0x07) plen 3
-< HCI Command: Read Remote Version Information (0x01|0x001d) plen 2
-> HCI Event: Command Status (0x0f) plen 4
-> HCI Event: Read Remote Ver Info Complete (0x0c) plen 8
-> HCI Event: Link Key Notification (0x18) plen 23
-> HCI Event: Auth Complete (0x06) plen 3
-< HCI Command: Disconnect (0x01|0x0006) plen 3
-> HCI Event: Command Status (0x0f) plen 4
-> HCI Event: Disconn Complete (0x05) plen 4
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+---
+ include/net/bluetooth/rfcomm.h |    5 -----
+ net/bluetooth/rfcomm/core.c    |   29 ++++++++++++++---------------
+ 2 files changed, 14 insertions(+), 20 deletions(-)
 
---------------------------------------------------------------------------------
-hcidump during ex_3 application.
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-> HCI Event: Command Status (0x0f) plen 4
-> HCI Event: Connect Complete (0x03) plen 11
-< ACL data: handle 11 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 25 scid 0x0040
-< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
-> HCI Event: Command Status (0x0f) plen 4
-< HCI Command: Write Link
-Policy Settings (0x02|0x000d) plen 4
-> HCI Event: Read Remote Supported Feature
-s (0x0b) plen 11
-> HCI Event: Command Complete (0x0e) plen 6
-> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
-> HCI Event: Max Slots Change (0x1b) plen 3
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
-> ACL data: handle 11 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0040 result 1 status 2
-      Connection pending - Authorization pending
-> HCI Event: Command Status (0x0f) plen 4
-> HCI Event: Remote Name Req Complete (0x07) plen 255
-< HCI Command: Read Remote Version Information (0x01|0x001d) plen 2
-> HCI Event: Command Status (0x0f) plen 4
-> HCI Event: Read Remote Ver Info Complete (0x0c) plen 8
-> HCI Event: Link Key Request (0x17) plen 6
-lockd: failed to monitor 136.170.194.184
-> HCI Event: Number of Completed Packets (0x13) plen 5
-< HCI Command: Link Key Request Negative Reply (0x01|0x000c) plen 6
-> HCI Event: Command Complete (0x0e) plen 10
-> ACL data: handle 11 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0040 result 3 status 0
-      Connection refused - security block
-> HCI Event: Disconn Complete (0x05) plen 4
------------------------------------------------------------------------------------------
-#include<stdio.h>
-#include<unistd.h>
-#include<sys/socket.h>
-#include<bluetooth/bluetooth.h>
-#include<bluetooth/l2cap.h>
-#include<errno.h>
-int main(int argc,char **argv)
-{
-	struct sockaddr_l2 addr = { 0 } ;
-	int s , status;
-	short i = 0;
-	char dest[18] = "00:1E:7C:00:B7:AD" ;
-	/*if(argc < 2){
-		fprintf(stderr , "usage: %s <bt_addr>\n" , argv [0]) ;
-		return 1;
-	}*/
-	//strncpy(dest , argv[1] , 18);
-	//allocate a socket
-	s = socket(AF_BLUETOOTH , SOCK_SEQPACKET , BTPROTO_L2CAP ) ;
-	//set the connection parameters (who to connect to)
-	addr.l2_family = AF_BLUETOOTH;
-	addr.l2_psm = htobs(25);
-	str2ba (dest,&addr.l2_bdaddr);
-	//connect to server
-	if(status = connect (s, (struct sockaddr *)&addr, sizeof(addr))<0){
-		fprintf(stderr,"Connection error errno-%s(%d\n",strerror(errno),errno);
-		perror(errno);
-		exit(-1);
-	}
-	else
-		printf("Connected-Status =%d\n",status);
-		 ;
-	//send a message
-	for(i=0 ; i< 10; i++){
-	//if(0 == status){
-		status = send(s,"hello!", 6, 0);
-		printf("send return-%d\n",status);
-	}
-	//}
-	if(status <0) perror("uh oh") ;
-	close (s ) ;
-	return 0;
-}
-----------------------------------------------------------------------------------------------
-Regards,
-Sandeep.Yedire
+diff --git a/include/net/bluetooth/rfcomm.h b/include/net/bluetooth/rfcomm.h
+index a140847..71047bc 100644
+--- a/include/net/bluetooth/rfcomm.h
++++ b/include/net/bluetooth/rfcomm.h
+@@ -213,11 +213,6 @@ struct rfcomm_dlc {
+ #define RFCOMM_DEFER_SETUP  8
+ 
+ /* Scheduling flags and events */
+-#define RFCOMM_SCHED_STATE  0
+-#define RFCOMM_SCHED_RX     1
+-#define RFCOMM_SCHED_TX     2
+-#define RFCOMM_SCHED_TIMEO  3
+-#define RFCOMM_SCHED_AUTH   4
+ #define RFCOMM_SCHED_WAKEUP 31
+ 
+ /* MSC exchange flags */
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index d326ad7..7af619c 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -113,11 +113,10 @@ static void rfcomm_session_del(struct rfcomm_session *s);
+ #define __get_rpn_stop_bits(line) (((line) >> 2) & 0x1)
+ #define __get_rpn_parity(line)    (((line) >> 3) & 0x7)
+ 
+-static inline void rfcomm_schedule(uint event)
++static inline void rfcomm_schedule(void)
+ {
+ 	if (!rfcomm_thread)
+ 		return;
+-	//set_bit(event, &rfcomm_event);
+ 	set_bit(RFCOMM_SCHED_WAKEUP, &rfcomm_event);
+ 	wake_up_process(rfcomm_thread);
+ }
+@@ -203,13 +202,13 @@ static inline int __check_fcs(u8 *data, int type, u8 fcs)
+ static void rfcomm_l2state_change(struct sock *sk)
+ {
+ 	BT_DBG("%p state %d", sk, sk->sk_state);
+-	rfcomm_schedule(RFCOMM_SCHED_STATE);
++	rfcomm_schedule();
+ }
+ 
+ static void rfcomm_l2data_ready(struct sock *sk, int bytes)
+ {
+ 	BT_DBG("%p bytes %d", sk, bytes);
+-	rfcomm_schedule(RFCOMM_SCHED_RX);
++	rfcomm_schedule();
+ }
+ 
+ static int rfcomm_l2sock_create(struct socket **sock)
+@@ -255,7 +254,7 @@ static void rfcomm_session_timeout(unsigned long arg)
+ 	BT_DBG("session %p state %ld", s, s->state);
+ 
+ 	set_bit(RFCOMM_TIMED_OUT, &s->flags);
+-	rfcomm_schedule(RFCOMM_SCHED_TIMEO);
++	rfcomm_schedule();
+ }
+ 
+ static void rfcomm_session_set_timer(struct rfcomm_session *s, long timeout)
+@@ -283,7 +282,7 @@ static void rfcomm_dlc_timeout(unsigned long arg)
+ 
+ 	set_bit(RFCOMM_TIMED_OUT, &d->flags);
+ 	rfcomm_dlc_put(d);
+-	rfcomm_schedule(RFCOMM_SCHED_TIMEO);
++	rfcomm_schedule();
+ }
+ 
+ static void rfcomm_dlc_set_timer(struct rfcomm_dlc *d, long timeout)
+@@ -465,7 +464,7 @@ static int __rfcomm_dlc_close(struct rfcomm_dlc *d, int err)
+ 	case BT_CONFIG:
+ 		if (test_and_clear_bit(RFCOMM_DEFER_SETUP, &d->flags)) {
+ 			set_bit(RFCOMM_AUTH_REJECT, &d->flags);
+-			rfcomm_schedule(RFCOMM_SCHED_AUTH);
++			rfcomm_schedule();
+ 			break;
+ 		}
+ 		/* Fall through */
+@@ -485,7 +484,7 @@ static int __rfcomm_dlc_close(struct rfcomm_dlc *d, int err)
+ 	case BT_CONNECT2:
+ 		if (test_and_clear_bit(RFCOMM_DEFER_SETUP, &d->flags)) {
+ 			set_bit(RFCOMM_AUTH_REJECT, &d->flags);
+-			rfcomm_schedule(RFCOMM_SCHED_AUTH);
++			rfcomm_schedule();
+ 			break;
+ 		}
+ 		/* Fall through */
+@@ -533,7 +532,7 @@ int rfcomm_dlc_send(struct rfcomm_dlc *d, struct sk_buff *skb)
+ 	skb_queue_tail(&d->tx_queue, skb);
+ 
+ 	if (!test_bit(RFCOMM_TX_THROTTLED, &d->flags))
+-		rfcomm_schedule(RFCOMM_SCHED_TX);
++		rfcomm_schedule();
+ 	return len;
+ }
+ 
+@@ -545,7 +544,7 @@ void __rfcomm_dlc_throttle(struct rfcomm_dlc *d)
+ 		d->v24_sig |= RFCOMM_V24_FC;
+ 		set_bit(RFCOMM_MSC_PENDING, &d->flags);
+ 	}
+-	rfcomm_schedule(RFCOMM_SCHED_TX);
++	rfcomm_schedule();
+ }
+ 
+ void __rfcomm_dlc_unthrottle(struct rfcomm_dlc *d)
+@@ -556,7 +555,7 @@ void __rfcomm_dlc_unthrottle(struct rfcomm_dlc *d)
+ 		d->v24_sig &= ~RFCOMM_V24_FC;
+ 		set_bit(RFCOMM_MSC_PENDING, &d->flags);
+ 	}
+-	rfcomm_schedule(RFCOMM_SCHED_TX);
++	rfcomm_schedule();
+ }
+ 
+ /*
+@@ -577,7 +576,7 @@ int rfcomm_dlc_set_modem_status(struct rfcomm_dlc *d, u8 v24_sig)
+ 	d->v24_sig = v24_sig;
+ 
+ 	if (!test_and_set_bit(RFCOMM_MSC_PENDING, &d->flags))
+-		rfcomm_schedule(RFCOMM_SCHED_TX);
++		rfcomm_schedule();
+ 
+ 	return 0;
+ }
+@@ -816,7 +815,7 @@ static int rfcomm_queue_disc(struct rfcomm_dlc *d)
+ 	cmd->fcs  = __fcs2((u8 *) cmd);
+ 
+ 	skb_queue_tail(&d->tx_queue, skb);
+-	rfcomm_schedule(RFCOMM_SCHED_TX);
++	rfcomm_schedule();
+ 	return 0;
+ }
+ 
+@@ -1884,7 +1883,7 @@ static inline void rfcomm_accept_connection(struct rfcomm_session *s)
+ 		 * L2CAP MTU minus UIH header and FCS. */
+ 		s->mtu = min(l2cap_pi(nsock->sk)->omtu, l2cap_pi(nsock->sk)->imtu) - 5;
+ 
+-		rfcomm_schedule(RFCOMM_SCHED_RX);
++		rfcomm_schedule();
+ 	} else
+ 		sock_release(nsock);
+ }
+@@ -2093,7 +2092,7 @@ static void rfcomm_security_cfm(struct hci_conn *conn, u8 status, u8 encrypt)
+ 
+ 	rfcomm_session_put(s);
+ 
+-	rfcomm_schedule(RFCOMM_SCHED_AUTH);
++	rfcomm_schedule();
+ }
+ 
+ static struct hci_cb rfcomm_cb = {
+-- 
+1.7.0.4
 
-----------------------------------------------------------
-T.Jefferson, 'Victory and defeat are each of the same price"
-
-
-
-On 1 October 2010 12:21,  <Waldemar.Rymarkiewicz@tieto.com> wrote:
-> Hi
->
->>I get below error message
->>l2test[476]: Can't connect: Connection refused (146)
->>
->
-> I suggest to analyse hcidump first.
->
-> Regards,
-> /Waldek
->
