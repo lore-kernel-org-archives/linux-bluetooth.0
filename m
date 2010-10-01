@@ -1,55 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20100930140042.GB4615@vigoh>
-References: <1285836760-3234-1-git-send-email-haijun.liu@atheros.com>
- <1285836760-3234-2-git-send-email-haijun.liu@atheros.com> <20100930140042.GB4615@vigoh>
-From: haijun liu <liuhaijun.er@gmail.com>
-Date: Fri, 1 Oct 2010 22:31:14 +0800
-Message-ID: <AANLkTi=nOWzTQU0N1BtNpDe6i+g5N43bwXOYHVw0rj+S@mail.gmail.com>
-Subject: Re: [PATCH 2/2] Bluetooth: Update conf_state with L2CAP_CONF_REQ_SENT
- before send config_req out in l2cap_config_req().
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: "Haijun.Liu" <haijun.liu@atheros.com>,
-	linux-bluetooth@vger.kernel.org, ville.tervo@nokia.com,
-	dan.tian@atheros.com, suraj@atheros.com
+In-Reply-To: <1879C724-F5EC-48FE-AD5D-46C8B290DEC6@signove.com>
+References: <1879C724-F5EC-48FE-AD5D-46C8B290DEC6@signove.com>
+From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+Date: Fri, 1 Oct 2010 16:29:57 +0200
+Message-ID: <AANLkTi=xdBH5prtbfkviPdzfLrBkt5ixGFrM36G-jJ-D@mail.gmail.com>
+Subject: Re: HDP development status and collaboration
+To: =?ISO-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	"Jarvenpaa Jarmo (Nokia/Oulu)" <jarmo.jarvenpaa@nokia.com>,
+	Aldenor Martins <aldenor.martins@signove.com>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Santiago Carot-Nemesio <scarot@libresoft.es>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Elvis,
 
-On Thu, Sep 30, 2010 at 10:00 PM, Gustavo F. Padovan
-<padovan@profusion.mobi> wrote:
-> Hi Haijun,
->
-> * Haijun.Liu <haijun.liu@atheros.com> [2010-09-30 16:52:40 +0800]:
->
->>
->> Signed-off-by: Haijun.Liu <haijun.liu@atheros.com>
->> ---
->>  net/bluetooth/l2cap_core.c |    1 +
->>  1 files changed, 1 insertions(+), 0 deletions(-)
->>
->> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
->> index 279f98a..9e788c2 100644
->> --- a/net/bluetooth/l2cap_core.c
->> +++ b/net/bluetooth/l2cap_core.c
->
-> Patch has been applied to my bluetooth-next-2.6 tree with modifications
-> to the commit message and subject. Next time pay attention to not
-> overstep the 72 characters in the commit subject and do not add a "." in
-> the end of your subject. Thanks.
->
-> --
-> Gustavo F. Padovan
-> ProFUSION embedded systems - http://profusion.mobi
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+Find inline comments about the state of the development
 
-Thank you.
+2010/9/29 Elvis Pfützenreuter <epx@signove.com>:
+> Attached is a spreadsheet with a simple breakdown of HDP development tasks. Managers like spreadsheets, most of us don't, so the most relevant part -- the pending tasks -- are listed below for convenience:
+>
+> device.Echo                     PENDING
 
--- 
-Haijun Liu
+Partially done win the CreateChanel petition (almost complete)
+
+> device.CreateChannel            IN PROGRESS (OpenHealth)
+
+Done, needs a little bit more testing
+
+> device.DestroyChannel           PENDING
+
+In progress
+
+> device.ChannelConnected         PENDING
+
+This is already done
+
+> device.ChannelDeleted           PENDING
+
+This one is also done.
+
+> device properties               PENDING
+> Channel object                  PENDING
+
+The object channel is also created, but not the methods.
+
+> channel.Acquire                 PENDING
+> channel.Release                 PENDING
+> channel properties              PENDING
+> HDP verification against PTS    PENDING (depends on the rest)
+>
+> I'd say that we are getting near completion. Would be nearer if we could distribute those tasks; currently, only OpenHealth friends are working on HDP code, in their repository.
+>
+> I know it's sometimes difficult to collaborate while working on the very same source files, but we should try; the breakdown by API calls seem to be the way to divide work among available developers.
+>
+>
+>
+As you say, the collaboration over the same code is difficult, event
+for Satiago and me working in the same office, because all the code is
+very related. I think that the development is going quite fast and we
+plan to finisht it soon, note that the last week we were a little bit
+delayed because we were creating most of the core functions that will
+be reused for the other petitions, so the development of the other
+functionality will be faster than expected.
+
+Regards.
+
+Jose.
