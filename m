@@ -1,94 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1285931572-3592-1-git-send-email-sbalashanmugam@atheros.com>
-References: <1285931572-3592-1-git-send-email-sbalashanmugam@atheros.com>
-From: "Luis R. Rodriguez" <mcgrof@gmail.com>
-Date: Fri, 1 Oct 2010 13:47:08 -0700
-Message-ID: <AANLkTinjiJ6FyoAi4aP=8pr9EwV0wpV7LtwQx-hwaOFs@mail.gmail.com>
-Subject: Re: [PATCH] Added firmware load patch to crap directory. This patch
- loads firmware from btusb when device is plugged in.
-To: Bala Shanmugam <sbalashanmugam@atheros.com>
-Cc: linux-wireless@vger.kernel.org, marcel@holtmann.org,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: HDP development status and collaboration
+Mime-Version: 1.0 (Apple Message framework v1081)
+Content-Type: text/plain; charset=iso-8859-1
+From: =?iso-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
+In-Reply-To: <AANLkTi=xdBH5prtbfkviPdzfLrBkt5ixGFrM36G-jJ-D@mail.gmail.com>
+Date: Fri, 1 Oct 2010 13:38:24 -0300
+Cc: linux-bluetooth@vger.kernel.org,
+	Aldenor Martins <aldenor.martins@signove.com>,
+	Santiago Carot-Nemesio <scarot@libresoft.es>
+Message-Id: <0952AD43-0136-45A3-8FDA-47FDD78190A7@signove.com>
+References: <1879C724-F5EC-48FE-AD5D-46C8B290DEC6@signove.com> <AANLkTi=xdBH5prtbfkviPdzfLrBkt5ixGFrM36G-jJ-D@mail.gmail.com>
+To: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Oct 1, 2010 at 4:12 AM, Bala Shanmugam
-<sbalashanmugam@atheros.com> wrote:
-> Disabled staging directory compilation for bt target.
 
-Huh? This commit log message also is unrelated to the patch below,
-please separate and submit two separate patches.
+On 01/10/2010, at 11:29, Jose Antonio Santos Cadenas wrote:
 
-> Signed-off-by: Bala Shanmugam <sbalashanmugam@atheros.com>
-> ---
-> =C2=A0Makefile =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| =C2=A0 =C2=
-=A09 +-
-> =C2=A0crap/0003-btusb-Add-fw-load-support.patch | =C2=A0424 +++++++++++++=
-++++++++++++++++
-> =C2=A02 files changed, 428 insertions(+), 5 deletions(-)
-> =C2=A0create mode 100644 crap/0003-btusb-Add-fw-load-support.patch
->
-> diff --git a/Makefile b/Makefile
-> index e2c594a..4505080 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -31,17 +31,16 @@ obj-$(CONFIG_COMPAT_NET_USB_MODULES) +=3D drivers/net=
-/usb/
->
-> =C2=A0obj-$(CONFIG_COMPAT_NETWORK_MODULES) +=3D drivers/net/
-> =C2=A0obj-$(CONFIG_COMPAT_VAR_MODULES) +=3D =C2=A0drivers/ssb/ drivers/mi=
-sc/eeprom/
-> -endif
-> -
-> -obj-$(CONFIG_COMPAT_BLUETOOTH) +=3D net/bluetooth/
-> -obj-$(CONFIG_COMPAT_BLUETOOTH_MODULES) +=3D drivers/bluetooth/
-> -
->
-> =C2=A0ifeq ($(CONFIG_STAGING_EXCLUDE_BUILD),)
-> =C2=A0obj-$(CONFIG_COMPAT_STAGING) +=3D drivers/staging/ath6kl/
-> =C2=A0obj-$(CONFIG_COMPAT_STAGING) +=3D drivers/staging/brcm80211/
-> =C2=A0endif
->
-> +endif
-> +
-> +obj-$(CONFIG_COMPAT_BLUETOOTH) +=3D net/bluetooth/
-> +obj-$(CONFIG_COMPAT_BLUETOOTH_MODULES) +=3D drivers/bluetooth/
->
-> =C2=A0else
->
-> diff --git a/crap/0003-btusb-Add-fw-load-support.patch b/crap/0003-btusb-=
-Add-fw-load-support.patch
-> new file mode 100644
-> index 0000000..2fc1abe
-> --- /dev/null
-> +++ b/crap/0003-btusb-Add-fw-load-support.patch
+> Hi Elvis,
+> 
+> Find inline comments about the state of the development
+> 
+> 2010/9/29 Elvis Pfützenreuter <epx@signove.com>:
+>> Attached is a spreadsheet with a simple breakdown of HDP development tasks. Managers like spreadsheets, most of us don't, so the most relevant part -- the pending tasks -- are listed below for convenience:
+>> 
+>> device.Echo                     PENDING
+> 
+> Partially done win the CreateChanel petition (almost complete)
+> 
+>> device.CreateChannel            IN PROGRESS (OpenHealth)
+> 
+> Done, needs a little bit more testing
+> 
+>> device.DestroyChannel           PENDING
+> 
+> In progress
+> 
+>> device.ChannelConnected         PENDING
+> 
+> This is already done
+> 
+>> device.ChannelDeleted           PENDING
+> 
+> This one is also done.
+> 
+>> device properties               PENDING
+>> Channel object                  PENDING
+> 
+> The object channel is also created, but not the methods.
+> 
+>> channel.Acquire                 PENDING
+>> channel.Release                 PENDING
+>> channel properties              PENDING
+>> HDP verification against PTS    PENDING (depends on the rest)
+>> 
+>> I'd say that we are getting near completion. Would be nearer if we could distribute those tasks; currently, only OpenHealth friends are working on HDP code, in their repository.
+>> 
+>> I know it's sometimes difficult to collaborate while working on the very same source files, but we should try; the breakdown by API calls seem to be the way to divide work among available developers.
+>> 
 
-Actually I'd like to apply this patch to linux-next-pending/ not to
-crap/ as you *did* post the patch upstream right? It just is not
-getting applied yet for the reasons you stated.
+Lots of progress, congratulations. I had seen some of those in the repository, before the e-mail.
 
-> @@ -0,0 +1,424 @@
-> +Reason for not yet publishing:
+>> 
+>> 
+> As you say, the collaboration over the same code is difficult, event
+> for Satiago and me working in the same office, because all the code is
+> very related. I think that the development is going quite fast and we
+> plan to finisht it soon, note that the last week we were a little bit
+> delayed because we were creating most of the core functions that will
+> be reused for the other petitions, so the development of the other
+> functionality will be faster than expected.
 
-This not accurate, you did publish the patch, this goes into
-linux-next-pending and you instead need a "Reason for not being merged
-yet" or for adding it to the linux-next-pending/ directory.
+Please let us know if you need help in anything.
 
-> Marcel feels that Atheros sflash based BT device
-> +doesn't follow bluetooth H:2 specification and HCI commands should be su=
-pported
-> +in firmware if it is detected as bluetooth device. Using HCI command, fi=
-rmware
-> +should be loaded.
-> +
-> +In sfash based device we don't have enough memory to support HCI command=
-s in firmware.
-> +So load firmware from btusb when the device comes up.
-> +
+We will begin to test and PTS the code as it progresses, so at least that one is parallelized.
 
-You should still ask the maintainer for an alternative, otherwise the
-device unusable. Did you submit the patch first in [PATCH] form? If
-not please submit the patch, all I saw as an RFC and no followup at
-all.
+That Python-based implementation of HDP (HDPy), that mimics the (future) D-Bus BlueZ API, already passes PTS tests, save by 8 of them (which I am investigating). So we have something to compare against, if needed.
+
+> 
+> Regards.
+> 
+> Jose.
+
