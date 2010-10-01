@@ -1,72 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 1 Oct 2010 15:30:21 +0200 (CEST)
+From: Jiri Kosina <jkosina@suse.cz>
+To: Antonio Ospite <ospite@studenti.unina.it>
+Cc: Alan Ott <alan@signal11.us>,
+	Stefan Achatz <erazor_de@users.sourceforge.net>,
+	Alexey Dobriyan <adobriyan@gmail.com>, Tejun Heo <tj@kernel.org>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	Greg Kroah-Hartman <gregkh@suse.de>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Stephane Chatty <chatty@enac.fr>,
+	Michael Poole <mdpoole@troilus.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Bastien Nocera <hadess@hadess.net>,
+	Eric Dumazet <eric.dumazet@gmail.com>, linux-input@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v4 1/2] HID: Add Support for Setting and Getting Feature
+ Reports from hidraw
+In-Reply-To: <20100928153011.32750e5d.ospite@studenti.unina.it>
+Message-ID: <alpine.LNX.2.00.1010011529460.29535@pobox.suse.cz>
+References: <1281442367.12579.206.camel@localhost.localdomain> <1281990059-3562-2-git-send-email-alan@signal11.us> <20100928153011.32750e5d.ospite@studenti.unina.it>
 MIME-Version: 1.0
-In-Reply-To: <1879C724-F5EC-48FE-AD5D-46C8B290DEC6@signove.com>
-References: <1879C724-F5EC-48FE-AD5D-46C8B290DEC6@signove.com>
-From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Date: Fri, 1 Oct 2010 16:29:57 +0200
-Message-ID: <AANLkTi=xdBH5prtbfkviPdzfLrBkt5ixGFrM36G-jJ-D@mail.gmail.com>
-Subject: Re: HDP development status and collaboration
-To: =?ISO-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	"Jarvenpaa Jarmo (Nokia/Oulu)" <jarmo.jarvenpaa@nokia.com>,
-	Aldenor Martins <aldenor.martins@signove.com>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Santiago Carot-Nemesio <scarot@libresoft.es>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Elvis,
+On Tue, 28 Sep 2010, Antonio Ospite wrote:
 
-Find inline comments about the state of the development
+> Hi Alan, I am doing some stress testing on hidraw, if I have a loop with
+> HIDIOCGFEATURE on a given report and I disconnect the device while the
+> loop is running I get this:
+> 
+> BUG: unable to handle kernel NULL pointer dereference at 0000000000000028
+> IP: [<ffffffffa02c66b4>] hidraw_ioctl+0xfc/0x32c [hid]
+> 
+> Full log attached along with the test program, the device is a Sony PS3
+> Controller (sixaxis).
+> 
+> If my objdump analysis is right, hidraw_ioctl+0xfc should be around line
+> 361 in hidraw.c (with your patch applied):
+> 
+> struct hid_device *hid = dev->hid;
+> 
+> It looks like 'dev' (which is hidraw_table[minor]) can be NULL
+> sometimes, can't it?
+> This is not introduced by your changes tho.
+> 
+> Just as a side note, the bug does not show up if the userspace program
+> handles return values properly and exits as soon as it gets an error
+> from the HID layer, see the XXX comment in test_hidraw_feature.c.
+> 
+> This fixes it, if it looks ok I will resend the patch rebased on
+> mainline code:
+> 
+> diff --git a/drivers/hid/hidraw.c b/drivers/hid/hidraw.c
+> index 7df1310..3c040c6 100644
+> --- a/drivers/hid/hidraw.c
+> +++ b/drivers/hid/hidraw.c
+> @@ -322,6 +322,10 @@ static long hidraw_ioctl(struct file *file, unsigned int cmd,
+> 
+>         mutex_lock(&minors_lock);
+>         dev = hidraw_table[minor];
+> +       if (!dev) {
+> +               ret = -ENODEV;
+> +               goto out;
+> +       }
+> 
+>         switch (cmd) {
+>                 case HIDIOCGRDESCSIZE:
+> @@ -412,6 +416,7 @@ static long hidraw_ioctl(struct file *file, unsigned int cmd,
+> 
+>                 ret = -ENOTTY;
+>         }
+> +out:
+>         mutex_unlock(&minors_lock);
+>         return ret;
+>  }
 
-2010/9/29 Elvis Pfützenreuter <epx@signove.com>:
-> Attached is a spreadsheet with a simple breakdown of HDP development tasks. Managers like spreadsheets, most of us don't, so the most relevant part -- the pending tasks -- are listed below for convenience:
->
-> device.Echo                     PENDING
+Yes, this patch makes sense even for current mainline code. Could you 
+please resend it to me with Signed-off-by: and changelog text, so that I 
+could apply it?
 
-Partially done win the CreateChanel petition (almost complete)
+Thanks!
 
-> device.CreateChannel            IN PROGRESS (OpenHealth)
-
-Done, needs a little bit more testing
-
-> device.DestroyChannel           PENDING
-
-In progress
-
-> device.ChannelConnected         PENDING
-
-This is already done
-
-> device.ChannelDeleted           PENDING
-
-This one is also done.
-
-> device properties               PENDING
-> Channel object                  PENDING
-
-The object channel is also created, but not the methods.
-
-> channel.Acquire                 PENDING
-> channel.Release                 PENDING
-> channel properties              PENDING
-> HDP verification against PTS    PENDING (depends on the rest)
->
-> I'd say that we are getting near completion. Would be nearer if we could distribute those tasks; currently, only OpenHealth friends are working on HDP code, in their repository.
->
-> I know it's sometimes difficult to collaborate while working on the very same source files, but we should try; the breakdown by API calls seem to be the way to divide work among available developers.
->
->
->
-As you say, the collaboration over the same code is difficult, event
-for Satiago and me working in the same office, because all the code is
-very related. I think that the development is going quite fast and we
-plan to finisht it soon, note that the last week we were a little bit
-delayed because we were creating most of the core functions that will
-be reused for the other petitions, so the development of the other
-functionality will be faster than expected.
-
-Regards.
-
-Jose.
+-- 
+Jiri Kosina
+SUSE Labs, Novell Inc.
