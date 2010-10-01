@@ -1,84 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: HDP development status and collaboration
-Mime-Version: 1.0 (Apple Message framework v1081)
-Content-Type: text/plain; charset=iso-8859-1
-From: =?iso-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
-In-Reply-To: <AANLkTi=xdBH5prtbfkviPdzfLrBkt5ixGFrM36G-jJ-D@mail.gmail.com>
-Date: Fri, 1 Oct 2010 13:38:24 -0300
-Cc: linux-bluetooth@vger.kernel.org,
-	Aldenor Martins <aldenor.martins@signove.com>,
-	Santiago Carot-Nemesio <scarot@libresoft.es>
-Message-Id: <0952AD43-0136-45A3-8FDA-47FDD78190A7@signove.com>
-References: <1879C724-F5EC-48FE-AD5D-46C8B290DEC6@signove.com> <AANLkTi=xdBH5prtbfkviPdzfLrBkt5ixGFrM36G-jJ-D@mail.gmail.com>
-To: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1285943147-2546-1-git-send-email-haijun.liu@atheros.com>
+References: <1285943147-2546-1-git-send-email-haijun.liu@atheros.com>
+From: haijun liu <liuhaijun.er@gmail.com>
+Date: Fri, 1 Oct 2010 22:43:52 +0800
+Message-ID: <AANLkTi=-4yF2qew7YVnESPd_jt7g8bvS12XYkhx27ko8@mail.gmail.com>
+Subject: [PATCH] Bluetooth: Replace hard code of configuration continuous flag
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: dan.tian@atheros.com, suraj <suraj@atheros.com>,
+	Ville Tervo <ville.tervo@nokia.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Replace hard code of configuration continuous flag with
+self-commented macro L2CAP_CONF_FLAG_CONT in functions
+l2cap_config_req() and l2cap_config_rsp().
 
-On 01/10/2010, at 11:29, Jose Antonio Santos Cadenas wrote:
+Signed-off-by: Haijun.Liu <haijun.liu@atheros.com>
+---
+ include/net/bluetooth/l2cap.h |    2 ++
+ net/bluetooth/l2cap_core.c    |    6 +++---
+ 2 files changed, 5 insertions(+), 3 deletions(-)
 
-> Hi Elvis,
-> 
-> Find inline comments about the state of the development
-> 
-> 2010/9/29 Elvis Pfützenreuter <epx@signove.com>:
->> Attached is a spreadsheet with a simple breakdown of HDP development tasks. Managers like spreadsheets, most of us don't, so the most relevant part -- the pending tasks -- are listed below for convenience:
->> 
->> device.Echo                     PENDING
-> 
-> Partially done win the CreateChanel petition (almost complete)
-> 
->> device.CreateChannel            IN PROGRESS (OpenHealth)
-> 
-> Done, needs a little bit more testing
-> 
->> device.DestroyChannel           PENDING
-> 
-> In progress
-> 
->> device.ChannelConnected         PENDING
-> 
-> This is already done
-> 
->> device.ChannelDeleted           PENDING
-> 
-> This one is also done.
-> 
->> device properties               PENDING
->> Channel object                  PENDING
-> 
-> The object channel is also created, but not the methods.
-> 
->> channel.Acquire                 PENDING
->> channel.Release                 PENDING
->> channel properties              PENDING
->> HDP verification against PTS    PENDING (depends on the rest)
->> 
->> I'd say that we are getting near completion. Would be nearer if we could distribute those tasks; currently, only OpenHealth friends are working on HDP code, in their repository.
->> 
->> I know it's sometimes difficult to collaborate while working on the very same source files, but we should try; the breakdown by API calls seem to be the way to divide work among available developers.
->> 
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index df599dc..2b114ca 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -193,6 +193,8 @@ struct l2cap_conf_rsp {
+ #define L2CAP_CONF_REJECT      0x0002
+ #define L2CAP_CONF_UNKNOWN     0x0003
 
-Lots of progress, congratulations. I had seen some of those in the repository, before the e-mail.
++#define L2CAP_CONF_FLAG_CONT   0x0001
++
+ struct l2cap_conf_opt {
+       __u8       type;
+       __u8       len;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 07b55c1..9e788c2 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -2985,11 +2985,11 @@ static inline int l2cap_config_req(struct
+l2cap_conn *conn, struct l2cap_cmd_hdr
+       memcpy(l2cap_pi(sk)->conf_req + l2cap_pi(sk)->conf_len, req->data, len);
+       l2cap_pi(sk)->conf_len += len;
 
->> 
->> 
-> As you say, the collaboration over the same code is difficult, event
-> for Satiago and me working in the same office, because all the code is
-> very related. I think that the development is going quite fast and we
-> plan to finisht it soon, note that the last week we were a little bit
-> delayed because we were creating most of the core functions that will
-> be reused for the other petitions, so the development of the other
-> functionality will be faster than expected.
+-       if (flags & 0x0001) {
++       if (flags & L2CAP_CONF_FLAG_CONT) {
+               /* Incomplete config. Send empty response. */
+               l2cap_send_cmd(conn, cmd->ident, L2CAP_CONF_RSP,
+                               l2cap_build_conf_rsp(sk, rsp,
+-                                       L2CAP_CONF_SUCCESS, 0x0001), rsp);
++                                       L2CAP_CONF_SUCCESS,
+L2CAP_CONF_FLAG_CONT), rsp);
+               goto unlock;
+       }
 
-Please let us know if you need help in anything.
+@@ -3093,7 +3093,7 @@ static inline int l2cap_config_rsp(struct
+l2cap_conn *conn, struct l2cap_cmd_hdr
+               goto done;
+       }
 
-We will begin to test and PTS the code as it progresses, so at least that one is parallelized.
+-       if (flags & 0x01)
++       if (flags & L2CAP_CONF_FLAG_CONT)
+               goto done;
 
-That Python-based implementation of HDP (HDPy), that mimics the (future) D-Bus BlueZ API, already passes PTS tests, save by 8 of them (which I am investigating). So we have something to compare against, if needed.
-
-> 
-> Regards.
-> 
-> Jose.
-
+       l2cap_pi(sk)->conf_state |= L2CAP_CONF_INPUT_DONE;
+--
+1.6.3.3
