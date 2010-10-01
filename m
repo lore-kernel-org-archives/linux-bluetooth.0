@@ -1,478 +1,160 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bala Shanmugam <sbalashanmugam@atheros.com>
-To: <linux-wireless@vger.kernel.org>
-CC: <marcel@holtmann.org>, <linux-bluetooth@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Bala Shanmugam <sbalashanmugam@atheros.com>
-Subject: [PATCH] Added firmware load patch to crap directory. This patch loads firmware from btusb when device is plugged in.
-Date: Fri, 1 Oct 2010 16:42:52 +0530
-Message-ID: <1285931572-3592-1-git-send-email-sbalashanmugam@atheros.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <99B09243E1A5DA4898CDD8B700111448097CF4A9D9@EXMB04.eu.tieto.com>
+References: <AANLkTimDw_obL=cV-CjU5OPCH+PiTqSyQ+0JTy1o+=3Q@mail.gmail.com>
+	<99B09243E1A5DA4898CDD8B700111448097CF4A9D9@EXMB04.eu.tieto.com>
+Date: Fri, 1 Oct 2010 16:29:56 +0530
+Message-ID: <AANLkTincT1K8tHBox0+JYi+Hhj65RSBdtYcaZNU+RfOW@mail.gmail.com>
+Subject: Re: How to ensure pairing is done
+From: "Yedire, Sandeep" <syedire@gmail.com>
+To: Waldemar.Rymarkiewicz@tieto.com
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Disabled staging directory compilation for bt target.
-Signed-off-by: Bala Shanmugam <sbalashanmugam@atheros.com>
----
- Makefile                                  |    9 +-
- crap/0003-btusb-Add-fw-load-support.patch |  424 +++++++++++++++++++++++++++++
- 2 files changed, 428 insertions(+), 5 deletions(-)
- create mode 100644 crap/0003-btusb-Add-fw-load-support.patch
+Thanks for help. I could not make out "Connection Refused - security block"
 
-diff --git a/Makefile b/Makefile
-index e2c594a..4505080 100644
---- a/Makefile
-+++ b/Makefile
-@@ -31,17 +31,16 @@ obj-$(CONFIG_COMPAT_NET_USB_MODULES) += drivers/net/usb/
- 
- obj-$(CONFIG_COMPAT_NETWORK_MODULES) += drivers/net/
- obj-$(CONFIG_COMPAT_VAR_MODULES) +=  drivers/ssb/ drivers/misc/eeprom/
--endif
--
--obj-$(CONFIG_COMPAT_BLUETOOTH) += net/bluetooth/
--obj-$(CONFIG_COMPAT_BLUETOOTH_MODULES) += drivers/bluetooth/
--
- 
- ifeq ($(CONFIG_STAGING_EXCLUDE_BUILD),)
- obj-$(CONFIG_COMPAT_STAGING) += drivers/staging/ath6kl/
- obj-$(CONFIG_COMPAT_STAGING) += drivers/staging/brcm80211/
- endif
- 
-+endif
-+
-+obj-$(CONFIG_COMPAT_BLUETOOTH) += net/bluetooth/
-+obj-$(CONFIG_COMPAT_BLUETOOTH_MODULES) += drivers/bluetooth/
- 
- else
- 
-diff --git a/crap/0003-btusb-Add-fw-load-support.patch b/crap/0003-btusb-Add-fw-load-support.patch
-new file mode 100644
-index 0000000..2fc1abe
---- /dev/null
-+++ b/crap/0003-btusb-Add-fw-load-support.patch
-@@ -0,0 +1,424 @@
-+Reason for not yet publishing: Marcel feels that Atheros sflash based BT device
-+doesn't follow bluetooth H:2 specification and HCI commands should be supported
-+in firmware if it is detected as bluetooth device. Using HCI command, firmware
-+should be loaded.
-+
-+In sfash based device we don't have enough memory to support HCI commands in firmware.
-+So load firmware from btusb when the device comes up.
-+
-+From 4ac276c14578b380d0c6a27658eeaa364efe6432 Mon Sep 17 00:00:00 2001
-+From: Bala Shanmugam <sbalashanmugam@atheros.com>
-+Date: Fri, 1 Oct 2010 15:18:02 +0530
-+Subject: [PATCH] Added support to load firmware to target RAM from btusb transport driver.
-+ Each BT device vendor can add their product ID, firmware file, load and unload function
-+ to btusb_fwcbs array. When the device is inserted btusb will call appropriate
-+ firmware load function.  This support will significantly reduce cost of
-+ BT chip because of RAM based firmware.
-+ Signed-off-by: Bala Shanmugam <sbalashanmugam@atheros.com>
-+
-+---
-+ drivers/bluetooth/Makefile |    1 +
-+ drivers/bluetooth/btusb.c  |   67 +++++++++++++++
-+ drivers/bluetooth/fwload.c |  199 ++++++++++++++++++++++++++++++++++++++++++++
-+ drivers/bluetooth/fwload.h |   39 +++++++++
-+ 4 files changed, 306 insertions(+), 0 deletions(-)
-+ create mode 100644 drivers/bluetooth/fwload.c
-+ create mode 100644 drivers/bluetooth/fwload.h
-+
-+diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
-+index 71bdf13..5a55cbb 100644
-+--- a/drivers/bluetooth/Makefile
-++++ b/drivers/bluetooth/Makefile
-+@@ -13,6 +13,7 @@ obj-$(CONFIG_BT_HCIBLUECARD)	+= bluecard_cs.o
-+ obj-$(CONFIG_BT_HCIBTUART)	+= btuart_cs.o
-+
-+ obj-$(CONFIG_BT_HCIBTUSB)	+= btusb.o
-++obj-$(CONFIG_BT_HCIBTUSB)	+= fwload.o
-+ obj-$(CONFIG_BT_HCIBTSDIO)	+= btsdio.o
-+
-+ obj-$(CONFIG_BT_ATH3K)		+= ath3k.o
-+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-+index d22ce3c..13e0fb8 100644
-+--- a/drivers/bluetooth/btusb.c
-++++ b/drivers/bluetooth/btusb.c
-+@@ -34,6 +34,7 @@
-+
-+ #include <net/bluetooth/bluetooth.h>
-+ #include <net/bluetooth/hci_core.h>
-++#include "fwload.h"
-+
-+ #define VERSION "0.6"
-+
-+@@ -55,6 +56,26 @@ static struct usb_driver btusb_driver;
-+ #define BTUSB_BROKEN_ISOC	0x20
-+ #define BTUSB_WRONG_SCO_MTU	0x40
-+
-++static struct usb_device_id ath_table[] = {
-++	/* Atheros AR3011 */
-++	{ USB_DEVICE(0x0CF3, 0x3002) },
-++	{ USB_DEVICE(0x13D3, 0x3304) },
-++	{ }	/* Terminating entry */
-++};
-++
-++/* Add firmware file, load and unload function
-++ * to download the firmware to target RAM
-++ */
-++static struct fw_cb_config btusb_fwcbs[] = {
-++	{
-++		.fwfile = "ath3k-1.fw",
-++		.usb_id_table = ath_table,
-++		.fwload = ath_fw_load,
-++		.fwunload = ath_fw_unload
-++	},
-++	{}
-++};
-++
-+ static struct usb_device_id btusb_table[] = {
-+ 	/* Generic Bluetooth USB device */
-+ 	{ USB_DEVICE_INFO(0xe0, 0x01, 0x01) },
-+@@ -863,6 +884,7 @@ static int btusb_probe(struct usb_interface *intf,
-+ 	struct btusb_data *data;
-+ 	struct hci_dev *hdev;
-+ 	int i, err;
-++	const struct usb_device_id *match;
-+
-+ 	BT_DBG("intf %p id %p", intf, id);
-+
-+@@ -922,6 +944,19 @@ static int btusb_probe(struct usb_interface *intf,
-+ 	data->udev = interface_to_usbdev(intf);
-+ 	data->intf = intf;
-+
-++	for (i = 0; btusb_fwcbs[i].fwfile; i++) {
-++		match = usb_match_id(intf, btusb_fwcbs[i].usb_id_table);
-++		if (match) {
-++			if (btusb_fwcbs[i].fwload) {
-++				btusb_fwcbs[i].data =
-++					btusb_fwcbs[i].fwload(intf,
-++						btusb_fwcbs[i].fwfile,
-++						&btusb_fwcbs[i].bsuspend);
-++			}
-++			break;
-++		}
-++	}
-++
-+ 	spin_lock_init(&data->lock);
-+
-+ 	INIT_WORK(&data->work, btusb_work);
-+@@ -1030,12 +1065,26 @@ static void btusb_disconnect(struct usb_interface *intf)
-+ {
-+ 	struct btusb_data *data = usb_get_intfdata(intf);
-+ 	struct hci_dev *hdev;
-++	const struct usb_device_id *match;
-++	int i;
-+
-+ 	BT_DBG("intf %p", intf);
-+
-+ 	if (!data)
-+ 		return;
-+
-++	for (i = 0; btusb_fwcbs[i].fwfile; i++) {
-++		match = usb_match_id(intf, btusb_fwcbs[i].usb_id_table);
-++		if (match) {
-++			if (btusb_fwcbs[i].fwunload) {
-++				btusb_fwcbs[i].fwunload(btusb_fwcbs[i].data,
-++						btusb_fwcbs[i].bsuspend);
-++				btusb_fwcbs[i].data = NULL;
-++			}
-++			break;
-++		}
-++	}
-++
-+ 	hdev = data->hdev;
-+
-+ 	__hci_dev_hold(hdev);
-+@@ -1061,12 +1110,22 @@ static void btusb_disconnect(struct usb_interface *intf)
-+ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
-+ {
-+ 	struct btusb_data *data = usb_get_intfdata(intf);
-++	const struct usb_device_id *match;
-++	int i;
-+
-+ 	BT_DBG("intf %p", intf);
-+
-+ 	if (data->suspend_count++)
-+ 		return 0;
-+
-++	for (i = 0; btusb_fwcbs[i].fwfile; i++) {
-++		match = usb_match_id(intf, btusb_fwcbs[i].usb_id_table);
-++		if (match) {
-++			btusb_fwcbs[i].bsuspend = 1;
-++			break;
-++		}
-++	}
-++
-+ 	spin_lock_irq(&data->txlock);
-+ 	if (!((message.event & PM_EVENT_AUTO) && data->tx_in_flight)) {
-+ 		set_bit(BTUSB_SUSPENDING, &data->flags);
-+@@ -1179,6 +1238,14 @@ static int __init btusb_init(void)
-+
-+ static void __exit btusb_exit(void)
-+ {
-++	int i;
-++	for (i = 0; btusb_fwcbs[i].fwfile; i++) {
-++		if (btusb_fwcbs[i].fwunload && btusb_fwcbs[i].data) {
-++			btusb_fwcbs[i].fwunload(btusb_fwcbs[i].data,
-++					btusb_fwcbs[i].bsuspend);
-++			btusb_fwcbs[i].data = NULL;
-++		}
-++	}
-+ 	usb_deregister(&btusb_driver);
-+ }
-+
-+diff --git a/drivers/bluetooth/fwload.c b/drivers/bluetooth/fwload.c
-+new file mode 100644
-+index 0000000..a9a586a
-+--- /dev/null
-++++ b/drivers/bluetooth/fwload.c
-+@@ -0,0 +1,199 @@
-++/*
-++ *
-++ *  Generic Bluetooth USB DFU driver to download firmware to target RAM
-++ *
-++ *  Copyright (c) 2009-2010 Atheros Communications Inc.
-++ *
-++ *  This program is free software; you can redistribute it and/or modify
-++ *  it under the terms of the GNU General Public License as published by
-++ *  the Free Software Foundation; either version 2 of the License, or
-++ *  (at your option) any later version.
-++ *
-++ *  This program is distributed in the hope that it will be useful,
-++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-++ *  GNU General Public License for more details.
-++ *
-++ *  You should have received a copy of the GNU General Public License
-++ *  along with this program; if not, write to the Free Software
-++ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-++ *
-++ */
-++
-++#include <linux/module.h>
-++#include <linux/kernel.h>
-++#include <linux/init.h>
-++#include <linux/slab.h>
-++#include <linux/types.h>
-++#include <linux/device.h>
-++#include <linux/firmware.h>
-++#include <linux/usb.h>
-++#include <net/bluetooth/bluetooth.h>
-++
-++#define USB_REQ_DFU_DNLOAD	1
-++#define USB_REQ_GET_STATE	5
-++#define USB_FIRMWARE_RAM_MODE 11
-++#define USB_FIRMWARE_FLASH_MODE 12
-++#define BULK_SIZE		4096
-++#define VERSION "1.0"
-++
-++struct firmware_data {
-++	struct usb_device *udev;
-++	u8 *fw_data;
-++	u32 fw_size;
-++	u32 fw_sent;
-++};
-++
-++static int load_firmware(struct firmware_data *data,
-++				unsigned char *firmware,
-++				int count)
-++{
-++	u8 *send_buf;
-++	int err, pipe, len, size, sent = 0;
-++	char ucFirmware = 0;
-++
-++	BT_DBG("ath3k %p udev %p", data, data->udev);
-++
-++	if ((usb_control_msg(data->udev, usb_rcvctrlpipe(data->udev, 0),
-++				USB_REQ_GET_STATE,
-++				USB_TYPE_VENDOR | USB_DIR_IN, 0, 0,
-++				&ucFirmware, 1, USB_CTRL_SET_TIMEOUT)) < 0) {
-++		BT_ERR("Can't change to loading configuration err");
-++		return -EBUSY;
-++	}
-++
-++	if (ucFirmware == USB_FIRMWARE_RAM_MODE) {
-++		/* RAM based firmware is available in the target.
-++		 * No need to load the firmware to RAM */
-++		BT_DBG("RAM based firmware is available");
-++		return 0;
-++	}
-++
-++	pipe = usb_sndctrlpipe(data->udev, 0);
-++	if ((usb_control_msg(data->udev, pipe,
-++				USB_REQ_DFU_DNLOAD,
-++				USB_TYPE_VENDOR, 0, 0,
-++				firmware, 20, USB_CTRL_SET_TIMEOUT)) < 0) {
-++		BT_ERR("Can't change to loading configuration err");
-++		return -EBUSY;
-++	}
-++	sent += 20;
-++	count -= 20;
-++
-++	send_buf = kmalloc(BULK_SIZE, GFP_ATOMIC);
-++	if (!send_buf) {
-++		BT_ERR("Can't allocate memory chunk for firmware");
-++		return -ENOMEM;
-++	}
-++
-++	while (count) {
-++		size = min_t(uint, count, BULK_SIZE);
-++		pipe = usb_sndbulkpipe(data->udev, 0x02);
-++		memcpy(send_buf, firmware + sent, size);
-++
-++		err = usb_bulk_msg(data->udev, pipe, send_buf, size,
-++					&len, 3000);
-++
-++		if (err || (len != size)) {
-++			BT_ERR("Error in firmware loading err = %d,"
-++				"len = %d, size = %d", err, len, size);
-++			goto error;
-++		}
-++
-++		sent  += size;
-++		count -= size;
-++	}
-++
-++	kfree(send_buf);
-++	return 0;
-++
-++error:
-++	kfree(send_buf);
-++	return err;
-++}
-++
-++void *ath_fw_load(struct usb_interface *intf,
-++			const char *fwfile, bool *suspend)
-++{
-++	const struct firmware *firmware;
-++	struct usb_device *udev = interface_to_usbdev(intf);
-++	static struct firmware_data *data;
-++	int size;
-++
-++	BT_DBG("\nintf %p suspend %d\n", intf, *suspend);
-++
-++	if (*suspend) {
-++		load_firmware(data, data->fw_data, data->fw_size);
-++		*suspend = 0;
-++		return data;
-++	}
-++
-++	if (intf->cur_altsetting->desc.bInterfaceNumber != 0)
-++		return NULL;
-++
-++	data = kzalloc(sizeof(*data), GFP_KERNEL);
-++	if (!data)
-++		return NULL;
-++	data->udev = udev;
-++
-++	if (request_firmware(&firmware, fwfile, &udev->dev) < 0) {
-++		kfree(data);
-++		return NULL;
-++	}
-++
-++	size = max_t(uint, firmware->size, 4096);
-++	data->fw_data = kmalloc(size, GFP_KERNEL);
-++	if (!data->fw_data) {
-++		release_firmware(firmware);
-++		kfree(data);
-++		return NULL;
-++	}
-++
-++	memcpy(data->fw_data, firmware->data, firmware->size);
-++	data->fw_size = firmware->size;
-++	data->fw_sent = 0;
-++	release_firmware(firmware);
-++
-++	if (load_firmware(data, data->fw_data, data->fw_size)) {
-++		kfree(data->fw_data);
-++		kfree(data);
-++		return NULL;
-++	}
-++	return data;
-++}
-++EXPORT_SYMBOL(ath_fw_load);
-++
-++void ath_fw_unload(void *pdata, bool bsuspend)
-++{
-++	struct firmware_data *data = (struct firmware_data *)pdata;
-++
-++	if (data == NULL)
-++		return;
-++
-++	/* do not free the data on suspend as we will
-++	 * use it on resume */
-++	if (!bsuspend) {
-++		kfree(data->fw_data);
-++		kfree(data);
-++	}
-++}
-++EXPORT_SYMBOL(ath_fw_unload);
-++
-++static int __init fwload_init(void)
-++{
-++	BT_INFO("Firmware load driver init. Version:%s", VERSION);
-++	return 0;
-++}
-++
-++static void __exit fwload_deinit(void)
-++{
-++	BT_INFO("Firmware load driver deinit");
-++}
-++
-++module_init(fwload_init);
-++module_exit(fwload_deinit);
-++
-++MODULE_AUTHOR("Atheros Communications");
-++MODULE_DESCRIPTION("Firmware load driver");
-++MODULE_VERSION(VERSION);
-++MODULE_LICENSE("GPL");
-+diff --git a/drivers/bluetooth/fwload.h b/drivers/bluetooth/fwload.h
-+new file mode 100644
-+index 0000000..5c1136a
-+--- /dev/null
-++++ b/drivers/bluetooth/fwload.h
-+@@ -0,0 +1,39 @@
-++/*
-++ *
-++ *  Generic Bluetooth USB DFU driver to download firmware to target RAM
-++ *
-++ *  Copyright (c) 2009-2010 Atheros Communications Inc.
-++ *
-++ *  This program is free software; you can redistribute it and/or modify
-++ *  it under the terms of the GNU General Public License as published by
-++ *  the Free Software Foundation; either version 2 of the License, or
-++ *  (at your option) any later version.
-++ *
-++ *  This program is distributed in the hope that it will be useful,
-++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-++ *  GNU General Public License for more details.
-++ *
-++ *  You should have received a copy of the GNU General Public License
-++ *  along with this program; if not, write to the Free Software
-++ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-++ *
-++ */
-++#ifndef _FWLOAD_H_
-++#define _FWLOAD_H_
-++
-++/* callbacks to load firmware to BT device RAM
-++ * when it is inserted */
-++struct fw_cb_config {
-++	const char *fwfile;
-++	void * (*fwload)(struct usb_interface *intf, const char *fwfile,
-++			 bool *bsuspend);
-++	void (*fwunload)(void *, bool);
-++	const struct usb_device_id *usb_id_table;
-++	void *data;
-++	bool bsuspend;
-++};
-++void *ath_fw_load(struct usb_interface *intf, const char *, bool *);
-++void ath_fw_unload(void *pdata, bool bsuspend);
-++
-++#endif /* _FWLOAD_H_ */
-+--
-+1.6.3.3
-+
--- 
-1.6.3.3
+Please find my hcidump log message below. I have taken this during
+./agent 0000 <bdaddr> and  executing ex_3_5.c application to test my
+L2CAP connection. Please find source ex_3_5.c file below this email.
+
+hcidump during agent 0000 <bdaddr>
+_________________________________
+#
+# lockd: cannot monitor 136.170.194.184
+lockd: failed to monitor 136.170.194.184
+lockd: cannot monitor 136.170.194.184
+lockd: failed to monitor 136.170.194.184
+lockd: cannot monitor 136.170.194.184
+lockd: failed to monitor 136.170.194.184
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+> HCI Event: Command Status (0x0f) plen 4
+> HCI Event: Connect Complete (0x03) plen 11
+< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
+> HCI Event: Command Status (0x0f) plen 4
+< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
+> HCI Event: Read Remote Supported
+Features (0x0b) plen 11
+> HCI Event: Command Complete (0x0e) plen 6
+< HCI Command: Authentication Requested (0x01|0x0011) plen 2
+> HCI Event: Command Status (0x0f) plen 4
+< HCI Command: Remote Name Request (0x01|0x0019) plen 10
+> HCI Event: Link Key Request (0x17) plen 6
+> HCI Event: Command Status (0x0f) plen 4
+> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
+< HCI Command: Link Key Request Negative Reply (0x01|0x000c) plen 6
+> HCI Event: Max Slots Change (0x1b) plen 3
+> HCI Event: Command Complete (0x0e) plen 10
+> HCI Event: PIN Code Request (0x16) plen 6
+< HCI Command: PIN Code Request Reply (0x01|0x000d) plen 23
+> HCI Event: Command Complete (0x0e) plen 10
+> HCI Event: Remote Name Req Complete (0x07) plen 3
+< HCI Command: Read Remote Version Information (0x01|0x001d) plen 2
+> HCI Event: Command Status (0x0f) plen 4
+> HCI Event: Read Remote Ver Info Complete (0x0c) plen 8
+> HCI Event: Link Key Notification (0x18) plen 23
+> HCI Event: Auth Complete (0x06) plen 3
+< HCI Command: Disconnect (0x01|0x0006) plen 3
+> HCI Event: Command Status (0x0f) plen 4
+> HCI Event: Disconn Complete (0x05) plen 4
+
+--------------------------------------------------------------------------------
+hcidump during ex_3 application.
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+> HCI Event: Command Status (0x0f) plen 4
+> HCI Event: Connect Complete (0x03) plen 11
+< ACL data: handle 11 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 25 scid 0x0040
+< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
+> HCI Event: Command Status (0x0f) plen 4
+< HCI Command: Write Link
+Policy Settings (0x02|0x000d) plen 4
+> HCI Event: Read Remote Supported Feature
+s (0x0b) plen 11
+> HCI Event: Command Complete (0x0e) plen 6
+> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
+> HCI Event: Max Slots Change (0x1b) plen 3
+< HCI Command: Remote Name Request (0x01|0x0019) plen 10
+> ACL data: handle 11 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0040 result 1 status 2
+      Connection pending - Authorization pending
+> HCI Event: Command Status (0x0f) plen 4
+> HCI Event: Remote Name Req Complete (0x07) plen 255
+< HCI Command: Read Remote Version Information (0x01|0x001d) plen 2
+> HCI Event: Command Status (0x0f) plen 4
+> HCI Event: Read Remote Ver Info Complete (0x0c) plen 8
+> HCI Event: Link Key Request (0x17) plen 6
+lockd: failed to monitor 136.170.194.184
+> HCI Event: Number of Completed Packets (0x13) plen 5
+< HCI Command: Link Key Request Negative Reply (0x01|0x000c) plen 6
+> HCI Event: Command Complete (0x0e) plen 10
+> ACL data: handle 11 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0040 result 3 status 0
+      Connection refused - security block
+> HCI Event: Disconn Complete (0x05) plen 4
+-----------------------------------------------------------------------------------------
+#include<stdio.h>
+#include<unistd.h>
+#include<sys/socket.h>
+#include<bluetooth/bluetooth.h>
+#include<bluetooth/l2cap.h>
+#include<errno.h>
+int main(int argc,char **argv)
+{
+	struct sockaddr_l2 addr = { 0 } ;
+	int s , status;
+	short i = 0;
+	char dest[18] = "00:1E:7C:00:B7:AD" ;
+	/*if(argc < 2){
+		fprintf(stderr , "usage: %s <bt_addr>\n" , argv [0]) ;
+		return 1;
+	}*/
+	//strncpy(dest , argv[1] , 18);
+	//allocate a socket
+	s = socket(AF_BLUETOOTH , SOCK_SEQPACKET , BTPROTO_L2CAP ) ;
+	//set the connection parameters (who to connect to)
+	addr.l2_family = AF_BLUETOOTH;
+	addr.l2_psm = htobs(25);
+	str2ba (dest,&addr.l2_bdaddr);
+	//connect to server
+	if(status = connect (s, (struct sockaddr *)&addr, sizeof(addr))<0){
+		fprintf(stderr,"Connection error errno-%s(%d\n",strerror(errno),errno);
+		perror(errno);
+		exit(-1);
+	}
+	else
+		printf("Connected-Status =%d\n",status);
+		 ;
+	//send a message
+	for(i=0 ; i< 10; i++){
+	//if(0 == status){
+		status = send(s,"hello!", 6, 0);
+		printf("send return-%d\n",status);
+	}
+	//}
+	if(status <0) perror("uh oh") ;
+	close (s ) ;
+	return 0;
+}
+----------------------------------------------------------------------------------------------
+Regards,
+Sandeep.Yedire
+
+----------------------------------------------------------
+T.Jefferson, 'Victory and defeat are each of the same price"
+
+
+
+On 1 October 2010 12:21,  <Waldemar.Rymarkiewicz@tieto.com> wrote:
+> Hi
+>
+>>I get below error message
+>>l2test[476]: Can't connect: Connection refused (146)
+>>
+>
+> I suggest to analyse hcidump first.
+>
+> Regards,
+> /Waldek
+>
