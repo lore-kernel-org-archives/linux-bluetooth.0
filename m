@@ -1,202 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: >net-wireless/bluez-4.63 unable to connect audio streams due
- commit
-From: Pacho Ramos <pacho@condmat1.ciencias.uniovi.es>
-Reply-To: pacho@condmat1.ciencias.uniovi.es
-To: Johan Hedberg <johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <AANLkTi=bx1Bv1GD9SuMGbYcE-NNK5e0x5N3Oz-FkH-Zm@mail.gmail.com>
+References: <AANLkTingVh3OaAGQzsxWJQddqrPwgFssMeOq5Rp_DbS6@mail.gmail.com>
+	<201009291337.40197.sander@outrightsolutions.nl>
+	<AANLkTi=voJHxhTa4VXNnhUBm2v8ouX6cQNWgToip=wVi@mail.gmail.com>
+	<201009291708.01026.sander@outrightsolutions.nl>
+	<AANLkTi=bx1Bv1GD9SuMGbYcE-NNK5e0x5N3Oz-FkH-Zm@mail.gmail.com>
+Date: Fri, 1 Oct 2010 18:45:49 -0600
+Message-ID: <AANLkTikuh82wX5ZhwihKC+WBwdJD78SSDq13Ks=qZCc6@mail.gmail.com>
+Subject: Re: a2dp, myth, pulse
+From: Brad Midgley <bmidgley@gmail.com>
+To: Sander van Grieken <sander@outrightsolutions.nl>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20100920184943.GA22968@jh-x301>
-References: <20100920184943.GA22968@jh-x301>
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-vh/k2vttchoGwMXrWus5"
-Date: Sat, 02 Oct 2010 15:58:10 +0200
-Message-ID: <1286027890.12944.1.camel@localhost.localdomain>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Guys
 
---=-vh/k2vttchoGwMXrWus5
-Content-Type: multipart/mixed; boundary="=-ugYqNiWa2xyQ01Tv82bJ"
+> unfortunately there isn't a clear way to merge a udp/hdhomerun remote
+> coming in on lircd with avrcp events from inputlircd. I'll take it up
+> with the lirc folks and summarize here later.
 
+lirc should be used to inject input events and probably nothing else.
+There are three different lirc daemon flavors, each one missing key
+features. If you need to merge multiple sources, you have to do a
+confusing dance with tcp sockets, master servers, etc. Unfortunately,
+the event driver interface is one thing in lirc that apparently
+doesn't work at all.
 
---=-ugYqNiWa2xyQ01Tv82bJ
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+I made it work instead with gizmod talking to the mythtv telnet
+control connection, see script.
 
-El lun, 20-09-2010 a las 21:49 +0300, Johan Hedberg escribi=C3=B3:
-> Hi,
->=20
-> On Mon, Sep 20, 2010, Pacho Ramos wrote:
-> > Reporter found that the problem with his dongle was introduced in commi=
-t
-> > aee26b30bbc24cde464ba1a557c2b258ddec6432 "Make BtIO default security
-> > level MEDIUM", he asked here, on upstream mailing list, but didn't get
-> > any reply clarifying this:
-> > http://marc.info/?l=3Dlinux-bluetooth&m=3D127893935109510&w=3D2
->=20
-> The important piece of info missing here is an HCI trace of the failure
-> (i.e. output of hcidump). There was a similar issue reported on IRC a
-> few days back and the hcidump there revealed a LMP response timeout
-> after BlueZ issues a HCI_Set_Connection_Encryption command. This would
-> seem to indicate a bug either in the local adapter or the remote device
-> (headset). Only an airtrace would really reveal what's going on.
-> However, I suspect it might be possible to work around this by looking
-> into possibilities of changing the ordering and timing of when the
-> kernel sends the encryption request.
->=20
-> Johan
->=20
+Gizmod does have a problem with its compile prefix, see
+https://bugs.launchpad.net/ubuntu/+source/gizmod/+bug/645058
 
-Sorry for the delay but downstream reporter wasn't able to provide the
-information sooner.
+So, the complete hack under ubuntu 10.04...
 
-Attached is hcidump output, I hope it helps :-)
+* add uinput to /etc/modules
+* tell myth to use the pulse device
+* add to /etc/pulse/default.pa: load-module module-alsa-sink device=plug:dmix
+* click the headset button to connect it
+* use pavucontrol to move the myth stream over to the headset
+* install the script below in ~/.gizmod/modules.d/001-AVRCP-MythTV.py
+* sudo ln -s /etc /usr/etc
+* sudo gizmod
 
-Thanks a lot
+-- 
+Brad Midgley
 
---=-ugYqNiWa2xyQ01Tv82bJ
-Content-Disposition: attachment; filename="hcidump.out"
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; name="hcidump.out"; charset="UTF-8"
+from GizmoDaemon import *
+from GizmoScriptEnableChecker import *
+import sys
+import telnetlib
 
-SENJIHNuaWZmZXIgLSBCbHVldG9vdGggcGFja2V0IGFuYWx5emVyIHZlciAxLjQyDQpkZXZpY2U6
-IGhjaTAgc25hcF9sZW46IDEwMjggZmlsdGVyOiAweGZmZmZmZmZmZmZmZmZmZmYNCjwgSENJIENv
-bW1hbmQ6IENyZWF0ZSBDb25uZWN0aW9uICgweDAxfDB4MDAwNSkgcGxlbiAxMw0KPiBIQ0kgRXZl
-bnQ6IENvbW1hbmQgU3RhdHVzICgweDBmKSBwbGVuIDQNCj4gSENJIEV2ZW50OiBMaW5rIEtleSBS
-ZXF1ZXN0ICgweDE3KSBwbGVuIDYNCjwgSENJIENvbW1hbmQ6IExpbmsgS2V5IFJlcXVlc3QgUmVw
-bHkgKDB4MDF8MHgwMDBiKSBwbGVuIDIyDQo+IEhDSSBFdmVudDogQ29tbWFuZCBDb21wbGV0ZSAo
-MHgwZSkgcGxlbiAxMA0KPiBIQ0kgRXZlbnQ6IENvbm5lY3QgQ29tcGxldGUgKDB4MDMpIHBsZW4g
-MTENCjwgSENJIENvbW1hbmQ6IFJlYWQgUmVtb3RlIFN1cHBvcnRlZCBGZWF0dXJlcyAoMHgwMXww
-eDAwMWIpIHBsZW4gMg0KPiBIQ0kgRXZlbnQ6IENvbW1hbmQgU3RhdHVzICgweDBmKSBwbGVuIDQN
-CjwgSENJIENvbW1hbmQ6IFJlbW90ZSBOYW1lIFJlcXVlc3QgKDB4MDF8MHgwMDE5KSBwbGVuIDEw
-DQo+IEhDSSBFdmVudDogUmVhZCBSZW1vdGUgU3VwcG9ydGVkIEZlYXR1cmVzICgweDBiKSBwbGVu
-IDExDQo8IEFDTCBkYXRhOiBoYW5kbGUgMTIgZmxhZ3MgMHgwMiBkbGVuIDEwDQogICAgTDJDQVAo
-cyk6IEluZm8gcmVxOiB0eXBlIDINCj4gSENJIEV2ZW50OiBDb21tYW5kIFN0YXR1cyAoMHgwZikg
-cGxlbiA0DQo+IEhDSSBFdmVudDogTWF4IFNsb3RzIENoYW5nZSAoMHgxYikgcGxlbiAzDQo+IEFD
-TCBkYXRhOiBoYW5kbGUgMTIgZmxhZ3MgMHgwMiBkbGVuIDE2DQogICAgTDJDQVAocyk6IEluZm8g
-cnNwOiB0eXBlIDIgcmVzdWx0IDANCiAgICAgIEV4dGVuZGVkIGZlYXR1cmUgbWFzayAweDAwMDAN
-CjwgQUNMIGRhdGE6IGhhbmRsZSAxMiBmbGFncyAweDAyIGRsZW4gMTINCiAgICBMMkNBUChzKTog
-Q29ubmVjdCByZXE6IHBzbSAxIHNjaWQgMHgwMDQwDQo+IEFDTCBkYXRhOiBoYW5kbGUgMTIgZmxh
-Z3MgMHgwMiBkbGVuIDE2DQogICAgTDJDQVAocyk6IENvbm5lY3QgcnNwOiBkY2lkIDB4MDA0OSBz
-Y2lkIDB4MDA0MCByZXN1bHQgMSBzdGF0dXMgMg0KICAgICAgQ29ubmVjdGlvbiBwZW5kaW5nIC0g
-QXV0aG9yaXphdGlvbiBwZW5kaW5nDQo+IEhDSSBFdmVudDogUmVtb3RlIE5hbWUgUmVxIENvbXBs
-ZXRlICgweDA3KSBwbGVuIDI1NQ0KPiBBQ0wgZGF0YTogaGFuZGxlIDEyIGZsYWdzIDB4MDIgZGxl
-biAxNg0KICAgIEwyQ0FQKHMpOiBDb25uZWN0IHJzcDogZGNpZCAweDAwNDkgc2NpZCAweDAwNDAg
-cmVzdWx0IDAgc3RhdHVzIDANCiAgICAgIENvbm5lY3Rpb24gc3VjY2Vzc2Z1bA0KPCBBQ0wgZGF0
-YTogaGFuZGxlIDEyIGZsYWdzIDB4MDIgZGxlbiAxMg0KICAgIEwyQ0FQKHMpOiBDb25maWcgcmVx
-OiBkY2lkIDB4MDA0OSBmbGFncyAweDAwIGNsZW4gMA0KPiBBQ0wgZGF0YTogaGFuZGxlIDEyIGZs
-YWdzIDB4MDIgZGxlbiAxNA0KICAgIEwyQ0FQKHMpOiBDb25maWcgcnNwOiBzY2lkIDB4MDA0MCBm
-bGFncyAweDAwIHJlc3VsdCAwIGNsZW4gMA0KICAgICAgU3VjY2Vzcw0KPiBBQ0wgZGF0YTogaGFu
-ZGxlIDEyIGZsYWdzIDB4MDIgZGxlbiAxNg0KICAgIEwyQ0FQKHMpOiBDb25maWcgcmVxOiBkY2lk
-IDB4MDA0MCBmbGFncyAweDAwIGNsZW4gNA0KICAgICAgTVRVIDQ4IA0KPCBBQ0wgZGF0YTogaGFu
-ZGxlIDEyIGZsYWdzIDB4MDIgZGxlbiAxOA0KICAgIEwyQ0FQKHMpOiBDb25maWcgcnNwOiBzY2lk
-IDB4MDA0OSBmbGFncyAweDAwIHJlc3VsdCAwIGNsZW4gNA0KICAgICAgTVRVIDQ4IA0KPCBBQ0wg
-ZGF0YTogaGFuZGxlIDEyIGZsYWdzIDB4MDIgZGxlbiAyNA0KICAgIEwyQ0FQKGQpOiBjaWQgMHgw
-MDQ5IGxlbiAyMCBbcHNtIDFdDQogICAgICAgIFNEUCBTU0EgUmVxOiB0aWQgMHgwIGxlbiAweGYN
-CiAgICAgICAgICBwYXQgdXVpZC0xNiAweDExMWUgKEhhbmRzZnJlZSkNCiAgICAgICAgICBtYXgg
-NjU1MzUNCiAgICAgICAgICBhaWQocykgMHgwMDAwIC0gMHhmZmZmDQogICAgICAgICAgY29udCAw
-MA0KPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1
-DQo+IEFDTCBkYXRhOiBoYW5kbGUgMTIgZmxhZ3MgMHgwMiBkbGVuIDUyDQogICAgTDJDQVAoZCk6
-IGNpZCAweDAwNDAgbGVuIDQ4IFtwc20gMV0NCiAgICAgICAgU0RQIFNTQSBSc3A6IHRpZCAweDAg
-bGVuIDB4MmINCiAgICAgICAgICBjb3VudCAzOA0KICAgICAgICAgIGNvbnQgMDIgMDAgMzkNCjwg
-QUNMIGRhdGE6IGhhbmRsZSAxMiBmbGFncyAweDAyIGRsZW4gMjYNCiAgICBMMkNBUChkKTogY2lk
-IDB4MDA0OSBsZW4gMjIgW3BzbSAxXQ0KICAgICAgICBTRFAgU1NBIFJlcTogdGlkIDB4MSBsZW4g
-MHgxMQ0KICAgICAgICAgIHBhdCB1dWlkLTE2IDB4MTExZSAoSGFuZHNmcmVlKQ0KICAgICAgICAg
-IG1heCA2NTUzNQ0KICAgICAgICAgIGFpZChzKSAweDAwMDAgLSAweGZmZmYNCiAgICAgICAgICBj
-b250IDAyIDAwIDM5DQo+IEFDTCBkYXRhOiBoYW5kbGUgMTIgZmxhZ3MgMHgwMiBkbGVuIDUyDQog
-ICAgTDJDQVAoZCk6IGNpZCAweDAwNDAgbGVuIDQ4IFtwc20gMV0NCiAgICAgICAgU0RQIFNTQSBS
-c3A6IHRpZCAweDEgbGVuIDB4MmINCiAgICAgICAgICBjb3VudCAzOA0KICAgICAgICAgIGNvbnQg
-MDIgMDAgMTMNCjwgQUNMIGRhdGE6IGhhbmRsZSAxMiBmbGFncyAweDAyIGRsZW4gMjYNCiAgICBM
-MkNBUChkKTogY2lkIDB4MDA0OSBsZW4gMjIgW3BzbSAxXQ0KICAgICAgICBTRFAgU1NBIFJlcTog
-dGlkIDB4MiBsZW4gMHgxMQ0KICAgICAgICAgIHBhdCB1dWlkLTE2IDB4MTExZSAoSGFuZHNmcmVl
-KQ0KICAgICAgICAgIG1heCA2NTUzNQ0KICAgICAgICAgIGFpZChzKSAweDAwMDAgLSAweGZmZmYN
-CiAgICAgICAgICBjb250IDAyIDAwIDEzDQo+IEFDTCBkYXRhOiBoYW5kbGUgMTIgZmxhZ3MgMHgw
-MiBkbGVuIDMxDQogICAgTDJDQVAoZCk6IGNpZCAweDAwNDAgbGVuIDI3IFtwc20gMV0NCiAgICAg
-ICAgU0RQIFNTQSBSc3A6IHRpZCAweDIgbGVuIDB4MTYNCiAgICAgICAgICBjb3VudCAxOQ0KICAg
-ICAgICAgIHJlY29yZCAjMA0KICAgICAgICAgICAgICBhaWQgMHgwMDAwIChTcnZSZWNIbmRsKQ0K
-ICAgICAgICAgICAgICAgICB1aW50IDB4MTAwMDINCiAgICAgICAgICAgICAgYWlkIDB4MDAwMSAo
-U3J2Q2xhc3NJRExpc3QpDQogICAgICAgICAgICAgICAgIDwgdXVpZC0xNiAweDExMWUgKEhhbmRz
-ZnJlZSkgdXVpZC0xNiAweDEyMDMgKEF1ZGlvKSA+DQogICAgICAgICAgICAgIGFpZCAweDAwMDQg
-KFByb3RvY29sRGVzY0xpc3QpDQogICAgICAgICAgICAgICAgIDwgPCB1dWlkLTE2IDB4MDEwMCAo
-TDJDQVApID4gPA0KICAgICAgICAgICAgICAgICB1dWlkLTE2IDB4MDAwMyAoUkZDT01NKSB1aW50
-IDB4MSA+ID4NCiAgICAgICAgICAgICAgYWlkIDB4MDAwNiAoTGFuZ0Jhc2VBdHRySURMaXN0KQ0K
-ICAgICAgICAgICAgICAgICA8IHVpbnQgMHg2NTZlIHVpbnQgMHg2YSB1aW50IDB4MTAwID4NCiAg
-ICAgICAgICAgICAgYWlkIDB4MDAwOSAoQlRQcm9maWxlRGVzY0xpc3QpDQogICAgICAgICAgICAg
-ICAgIDwgPCB1dWlkLTE2IDB4MTExZSAoSGFuZHNmcmVlKSB1aW50IDB4MTAxID4gPg0KICAgICAg
-ICAgICAgICBhaWQgMHgwMTAwIChTcnZOYW1lKQ0KICAgICAgICAgICAgICAgICBzdHIgIkhhbmRz
-LUZyZWUgdW5pdCINCiAgICAgICAgICAgICAgYWlkIDB4MDMxMSAoU3VwcEZlYXR1cmVzKQ0KICAg
-ICAgICAgICAgICAgICB1aW50IDB4MTgNCiAgICAgICAgICBjb250IDAwDQo8IEFDTCBkYXRhOiBo
-YW5kbGUgMTIgZmxhZ3MgMHgwMiBkbGVuIDEyDQogICAgTDJDQVAocyk6IENvbm5lY3QgcmVxOiBw
-c20gMyBzY2lkIDB4MDA0MQ0KPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0
-cyAoMHgxMykgcGxlbiA1DQo+IEFDTCBkYXRhOiBoYW5kbGUgMTIgZmxhZ3MgMHgwMiBkbGVuIDE2
-DQogICAgTDJDQVAocyk6IENvbm5lY3QgcnNwOiBkY2lkIDB4MDA0YSBzY2lkIDB4MDA0MSByZXN1
-bHQgMSBzdGF0dXMgMg0KICAgICAgQ29ubmVjdGlvbiBwZW5kaW5nIC0gQXV0aG9yaXphdGlvbiBw
-ZW5kaW5nDQo+IEFDTCBkYXRhOiBoYW5kbGUgMTIgZmxhZ3MgMHgwMiBkbGVuIDE2DQogICAgTDJD
-QVAocyk6IENvbm5lY3QgcnNwOiBkY2lkIDB4MDA0YSBzY2lkIDB4MDA0MSByZXN1bHQgMCBzdGF0
-dXMgMA0KICAgICAgQ29ubmVjdGlvbiBzdWNjZXNzZnVsDQo8IEFDTCBkYXRhOiBoYW5kbGUgMTIg
-ZmxhZ3MgMHgwMiBkbGVuIDE2DQogICAgTDJDQVAocyk6IENvbmZpZyByZXE6IGRjaWQgMHgwMDRh
-IGZsYWdzIDB4MDAgY2xlbiA0DQogICAgICBNVFUgMTAxMyANCj4gQUNMIGRhdGE6IGhhbmRsZSAx
-MiBmbGFncyAweDAyIGRsZW4gMTQNCiAgICBMMkNBUChzKTogQ29uZmlnIHJzcDogc2NpZCAweDAw
-NDEgZmxhZ3MgMHgwMCByZXN1bHQgMCBjbGVuIDANCiAgICAgIFN1Y2Nlc3MNCj4gQUNMIGRhdGE6
-IGhhbmRsZSAxMiBmbGFncyAweDAyIGRsZW4gMTYNCiAgICBMMkNBUChzKTogQ29uZmlnIHJlcTog
-ZGNpZCAweDAwNDEgZmxhZ3MgMHgwMCBjbGVuIDQNCiAgICAgIE1UVSAxMDEzIA0KPCBBQ0wgZGF0
-YTogaGFuZGxlIDEyIGZsYWdzIDB4MDIgZGxlbiAxOA0KICAgIEwyQ0FQKHMpOiBDb25maWcgcnNw
-OiBzY2lkIDB4MDA0YSBmbGFncyAweDAwIHJlc3VsdCAwIGNsZW4gNA0KICAgICAgTVRVIDEwMTMg
-DQo8IEFDTCBkYXRhOiBoYW5kbGUgMTIgZmxhZ3MgMHgwMiBkbGVuIDgNCiAgICBMMkNBUChkKTog
-Y2lkIDB4MDA0YSBsZW4gNCBbcHNtIDNdDQogICAgICBSRkNPTU0ocyk6IFNBQk06IGNyIDEgZGxj
-aSAwIHBmIDEgaWxlbiAwIGZjcyAweDFjIA0KPiBBQ0wgZGF0YTogaGFuZGxlIDEyIGZsYWdzIDB4
-MDIgZGxlbiA4DQogICAgTDJDQVAoZCk6IGNpZCAweDAwNDEgbGVuIDQgW3BzbSAzXQ0KICAgICAg
-UkZDT01NKHMpOiBVQTogY3IgMSBkbGNpIDAgcGYgMSBpbGVuIDAgZmNzIDB4ZDcgDQo8IEhDSSBD
-b21tYW5kOiBBdXRoZW50aWNhdGlvbiBSZXF1ZXN0ZWQgKDB4MDF8MHgwMDExKSBwbGVuIDINCj4g
-SENJIEV2ZW50OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0DQo+IEhDSSBFdmVudDogQXV0
-aCBDb21wbGV0ZSAoMHgwNikgcGxlbiAzDQo8IEhDSSBDb21tYW5kOiBTZXQgQ29ubmVjdGlvbiBF
-bmNyeXB0aW9uICgweDAxfDB4MDAxMykgcGxlbiAzDQo+IEhDSSBFdmVudDogQ29tbWFuZCBTdGF0
-dXMgKDB4MGYpIHBsZW4gNA0KPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0
-cyAoMHgxMykgcGxlbiA1DQo8IEFDTCBkYXRhOiBoYW5kbGUgMTIgZmxhZ3MgMHgwMiBkbGVuIDEy
-DQogICAgTDJDQVAocyk6IERpc2Nvbm4gcmVxOiBkY2lkIDB4MDA0OSBzY2lkIDB4MDA0MA0KPCBB
-Q0wgZGF0YTogaGFuZGxlIDEyIGZsYWdzIDB4MDIgZGxlbiA4DQogICAgTDJDQVAoZCk6IGNpZCAw
-eDAwNGEgbGVuIDQgW3BzbSAzXQ0KICAgICAgUkZDT01NKHMpOiBESVNDOiBjciAxIGRsY2kgMiBw
-ZiAxIGlsZW4gMCBmY3MgMHhiOCANCj4gSENJIEV2ZW50OiBOdW1iZXIgb2YgQ29tcGxldGVkIFBh
-Y2tldHMgKDB4MTMpIHBsZW4gNQ0KPiBIQ0kgRXZlbnQ6IERpc2Nvbm4gQ29tcGxldGUgKDB4MDUp
-IHBsZW4gNA0KPCBIQ0kgQ29tbWFuZDogQ3JlYXRlIENvbm5lY3Rpb24gKDB4MDF8MHgwMDA1KSBw
-bGVuIDEzDQo+IEhDSSBFdmVudDogQ29tbWFuZCBTdGF0dXMgKDB4MGYpIHBsZW4gNA0KPiBIQ0kg
-RXZlbnQ6IExpbmsgS2V5IFJlcXVlc3QgKDB4MTcpIHBsZW4gNg0KPCBIQ0kgQ29tbWFuZDogTGlu
-ayBLZXkgUmVxdWVzdCBSZXBseSAoMHgwMXwweDAwMGIpIHBsZW4gMjINCj4gSENJIEV2ZW50OiBD
-b21tYW5kIENvbXBsZXRlICgweDBlKSBwbGVuIDEwDQo+IEhDSSBFdmVudDogQ29ubmVjdCBDb21w
-bGV0ZSAoMHgwMykgcGxlbiAxMQ0KPCBIQ0kgQ29tbWFuZDogUmVhZCBSZW1vdGUgU3VwcG9ydGVk
-IEZlYXR1cmVzICgweDAxfDB4MDAxYikgcGxlbiAyDQo+IEhDSSBFdmVudDogTWF4IFNsb3RzIENo
-YW5nZSAoMHgxYikgcGxlbiAzDQo+IEhDSSBFdmVudDogQ29tbWFuZCBTdGF0dXMgKDB4MGYpIHBs
-ZW4gNA0KPCBIQ0kgQ29tbWFuZDogUmVtb3RlIE5hbWUgUmVxdWVzdCAoMHgwMXwweDAwMTkpIHBs
-ZW4gMTANCj4gSENJIEV2ZW50OiBSZWFkIFJlbW90ZSBTdXBwb3J0ZWQgRmVhdHVyZXMgKDB4MGIp
-IHBsZW4gMTENCjwgQUNMIGRhdGE6IGhhbmRsZSAxMSBmbGFncyAweDAyIGRsZW4gMTANCiAgICBM
-MkNBUChzKTogSW5mbyByZXE6IHR5cGUgMg0KPiBIQ0kgRXZlbnQ6IENvbW1hbmQgU3RhdHVzICgw
-eDBmKSBwbGVuIDQNCj4gQUNMIGRhdGE6IGhhbmRsZSAxMSBmbGFncyAweDAyIGRsZW4gMTYNCiAg
-ICBMMkNBUChzKTogSW5mbyByc3A6IHR5cGUgMiByZXN1bHQgMA0KICAgICAgRXh0ZW5kZWQgZmVh
-dHVyZSBtYXNrIDB4MDAwMA0KPCBIQ0kgQ29tbWFuZDogQXV0aGVudGljYXRpb24gUmVxdWVzdGVk
-ICgweDAxfDB4MDAxMSkgcGxlbiAyDQo+IEhDSSBFdmVudDogUmVtb3RlIE5hbWUgUmVxIENvbXBs
-ZXRlICgweDA3KSBwbGVuIDI1NQ0KPiBIQ0kgRXZlbnQ6IENvbW1hbmQgU3RhdHVzICgweDBmKSBw
-bGVuIDQNCj4gSENJIEV2ZW50OiBBdXRoIENvbXBsZXRlICgweDA2KSBwbGVuIDMNCjwgSENJIENv
-bW1hbmQ6IFNldCBDb25uZWN0aW9uIEVuY3J5cHRpb24gKDB4MDF8MHgwMDEzKSBwbGVuIDMNCj4g
-SENJIEV2ZW50OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0DQo+IEhDSSBFdmVudDogTnVt
-YmVyIG9mIENvbXBsZXRlZCBQYWNrZXRzICgweDEzKSBwbGVuIDUNCj4gSENJIEV2ZW50OiBEaXNj
-b25uIENvbXBsZXRlICgweDA1KSBwbGVuIDQNCjwgSENJIENvbW1hbmQ6IFJlc2V0ICgweDAzfDB4
-MDAwMykgcGxlbiAwDQo+IEhDSSBFdmVudDogQ29tbWFuZCBDb21wbGV0ZSAoMHgwZSkgcGxlbiA0
-DQo=
+ENABLED = True
+VERSION_NEEDED = 3.2
 
+class AVRCPMythTV(GizmoScriptEnableChecker):
 
---=-ugYqNiWa2xyQ01Tv82bJ--
+	def msend(self, msg):
+		telnet = telnetlib.Telnet("localhost", 6546)
+		telnet.read_until("# ")
+		telnet.write(msg + "\n")
+		telnet.close
+	
+	def onEvent(self, Event, Gizmo = None):
+		if Event.Remote:
+			return False
+		
+		if Event.Class != GizmoEventClass.Standard:
+			return False
 
---=-vh/k2vttchoGwMXrWus5
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
+		if Event.Type != GizmoEventType.EV_KEY:
+			return False
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.16 (GNU/Linux)
+		if Event.Value != 1:
+			return False
 
-iEYEABECAAYFAkynOnIACgkQCaWpQKGI+9SWNwCght5Auvay9zG+rOGa7ZcXSeGf
-HZ8AnjMzpPD4Lh2W91QL1+39qKpupqOT
-=5g85
------END PGP SIGNATURE-----
+		name = str(Event.Code)
+		if name == "KEY_NEXTSONG":
+			self.msend("key right")
+	   		return True
+		elif name == "KEY_PLAYCD" or name == "KEY_PAUSECD":
+			self.msend("key p")
+	   		return True
+	   	elif name == "KEY_STOPCD":
+			self.msend("key escape")
+	   		return True
+	   	elif name == "KEY_PREVIOUSSONG":
+			self.msend("key left")
+	   		return True	
 
---=-vh/k2vttchoGwMXrWus5--
+		return False
 
+	def __init__(self):
+		GizmoScriptEnableChecker.__init__(self, ENABLED, VERSION_NEEDED)
