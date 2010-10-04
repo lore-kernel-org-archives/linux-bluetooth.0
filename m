@@ -1,57 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
+From: Suraj Sumangala <suraj@atheros.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <Jothikumar.Mothilal@Atheros.com>,
+	Suraj Sumangala <suraj@atheros.com>
+Subject: [PATCH] Bluetooth: Add support to specify patch download location
+Date: Mon, 4 Oct 2010 12:36:16 +0530
+Message-ID: <1286175976-20477-1-git-send-email-suraj@atheros.com>
 MIME-Version: 1.0
-In-Reply-To: <1286027890.12944.1.camel@localhost.localdomain>
-References: <20100920184943.GA22968@jh-x301>
-	<1286027890.12944.1.camel@localhost.localdomain>
-Date: Mon, 4 Oct 2010 13:00:21 +0300
-Message-ID: <AANLkTikFrvyeoXV0uLYcvD4GCj2s3ML2-q8f5GhXMxAK@mail.gmail.com>
-Subject: Re: >net-wireless/bluez-4.63 unable to connect audio streams due commit
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: pacho@condmat1.ciencias.uniovi.es
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This patch add support for specifying patch download address for
+AR300x patch download logic.
 
-On Sat, Oct 2, 2010 at 4:58 PM, Pacho Ramos
-<pacho@condmat1.ciencias.uniovi.es> wrote:
-> El lun, 20-09-2010 a las 21:49 +0300, Johan Hedberg escribió:
->> Hi,
->>
->> On Mon, Sep 20, 2010, Pacho Ramos wrote:
->> > Reporter found that the problem with his dongle was introduced in commit
->> > aee26b30bbc24cde464ba1a557c2b258ddec6432 "Make BtIO default security
->> > level MEDIUM", he asked here, on upstream mailing list, but didn't get
->> > any reply clarifying this:
->> > http://marc.info/?l=linux-bluetooth&m=127893935109510&w=2
->>
->> The important piece of info missing here is an HCI trace of the failure
->> (i.e. output of hcidump). There was a similar issue reported on IRC a
->> few days back and the hcidump there revealed a LMP response timeout
->> after BlueZ issues a HCI_Set_Connection_Encryption command. This would
->> seem to indicate a bug either in the local adapter or the remote device
->> (headset). Only an airtrace would really reveal what's going on.
->> However, I suspect it might be possible to work around this by looking
->> into possibilities of changing the ordering and timing of when the
->> kernel sends the encryption request.
->>
->> Johan
->>
->
-> Sorry for the delay but downstream reporter wasn't able to provide the
-> information sooner.
->
-> Attached is hcidump output, I hope it helps :-)
+---
+ tools/hciattach_ath3k.c |   52 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 50 insertions(+), 2 deletions(-)
 
-I would say this was because of double authentication request, but it
-seems it is not the case, actually ssp doesn't seems to be used at all
-here so this must be something else, maybe you should try this:
-
-http://thread.gmane.org/gmane.linux.bluez.kernel/7256
-
+diff --git a/tools/hciattach_ath3k.c b/tools/hciattach_ath3k.c
+index 5589254..e27cc4b 100644
+--- a/tools/hciattach_ath3k.c
++++ b/tools/hciattach_ath3k.c
+@@ -461,20 +461,68 @@ struct patch_entry {
+ 	uint8_t data[MAX_PATCH_CMD];
+ };
+ 
++#define SET_PATCH_RAM_ID	0x0D
++#define SET_PATCH_RAM_CMD_SIZE	11
++#define ADDRESS_LEN		4
++static int set_patch_ram(int dev, char *patch_loc, int len)
++{
++	int err;
++	uint8_t cmd[20];
++	int i, j;
++	char loc_byte[3];
++	uint8_t *event;
++	uint8_t *loc_ptr = (uint8_t *)&cmd[7];
++
++	if (!patch_loc)
++		return -1;
++
++	loc_byte[2] = '\0';
++
++	load_hci_ps_hdr(cmd, SET_PATCH_RAM_ID, ADDRESS_LEN, 0);
++
++	for (i = 0, j = 3; i < 4; i++, j--) {
++		loc_byte[0] = patch_loc[0];
++		loc_byte[1] = patch_loc[1];
++		loc_ptr[j] = strtol(loc_byte, NULL, 16);
++		patch_loc += 2;
++	}
++
++	err = send_hci_cmd_sync(dev, cmd, SET_PATCH_RAM_CMD_SIZE, &event);
++	if (err < 0)
++		return err;
++
++	err = read_ps_event(event, HCI_PS_CMD_OCF);
++
++	if (event)
++		free(event);
++
++	return err;
++}
++
++#define PATCH_LOC_KEY    "DA:"
++#define PATCH_LOC_STRING_LEN    8
+ static int ps_patch_download(int fd, FILE *stream)
+ {
+ 	char byte[3];
+ 	char ptr[MAX_PATCH_CMD + 1];
+ 	int byte_cnt;
+ 	int patch_count = 0;
++	char patch_loc[PATCH_LOC_STRING_LEN + 1];
+ 
+ 	byte[2] = '\0';
+ 
+ 	while (fgets(ptr, MAX_PATCH_CMD, stream)) {
+-		if (strlen(ptr) <= 1 || !isxdigit(ptr[0]))
++		if (strlen(ptr) <= 1)
+ 			continue;
+-		else
++		else if (strstr(ptr, PATCH_LOC_KEY) == ptr) {
++			strncpy(patch_loc, &ptr[sizeof(PATCH_LOC_KEY) - 1],
++							PATCH_LOC_STRING_LEN);
++			if (set_patch_ram(fd, patch_loc, sizeof(patch_loc)) < 0)
++				return -1;
++		} else if (isxdigit(ptr[0]))
+ 			break;
++		else
++			return -1;
+ 	}
+ 
+ 	byte_cnt = strtol(ptr, NULL, 16);
 -- 
-Luiz Augusto von Dentz
-Computer Engineer
+1.7.0.4
+
