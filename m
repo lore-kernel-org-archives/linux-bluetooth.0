@@ -1,50 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <52A922E83075C847A59D7DF98C66017501871E@MTW02MBX03.mindtree.com>
-References: <20100920184943.GA22968@jh-x301>
-	<1286027890.12944.1.camel@localhost.localdomain>
-	<AANLkTikFrvyeoXV0uLYcvD4GCj2s3ML2-q8f5GhXMxAK@mail.gmail.com>
-	<1286187946.7898.0.camel@localhost.localdomain>
-	<20101004123552.GC11737@pengutronix.de>
-	<52A922E83075C847A59D7DF98C66017501871E@MTW02MBX03.mindtree.com>
-Date: Mon, 4 Oct 2010 21:05:35 +0530
-Message-ID: <AANLkTimguxTRuPB2Dgqm4w5k-MeOxDdCYDn-T_UvOFRL@mail.gmail.com>
-Subject: Re: How add support of LLMNR for PAN
-From: Arun Kumar <arunkat@gmail.com>
-To: Chetankumar Manjegowda <Chetankumar_Manjegowda@mindtree.com>
+Date: Mon, 4 Oct 2010 17:16:28 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: Pull request:
+ git://gitorious.org/~lizardo/bluez/lizardo-bluez.git for-upstream
+Message-ID: <20101004151628.GA19781@jh-x301>
+References: <AANLkTimfiie4L6CBm_oTiyFRmB92dt6bugvBREY6vuzN@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <AANLkTimfiie4L6CBm_oTiyFRmB92dt6bugvBREY6vuzN@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Shouldn't this support come from linux ip stack rather than bluez?
+Hi,
 
+On Mon, Oct 04, 2010, Anderson Lizardo wrote:
+> The following changes since commit bb061d925ad661836d5279b543a07d17683d9b6e:
+>   Marcel Holtmann (1):
+>         Update list of company identifiers
+> 
+> are available in the git repository at:
+> 
+>   git://gitorious.org/~lizardo/bluez/lizardo-bluez.git for-upstream
+> 
+> Anderson Lizardo (7):
+>       Remove unnecessary check for watcher path
+>       Rename global "handle" variable to "sdp_handle"
+>       Add test/test-attrib for testing Attribute API
+>       Add org.bluez.Watcher interface to default policy
+>       Fix and refactor characteristic value update code
+>       Add Write Characteristic Value support to attribute server
+>       Allow errors to propagate from connection callback
+> 
+> Bruna Moreira (8):
+>       Add encoders/decoders for the Write command
+>       Implement Write command in GATT API
+>       Move connection common code to l2cap_connect()
+>       Write new value for characteristic value
+>       Use g_slist_foreach() instead of a for loop
+>       Make handle parameter mandatory in gatttool
+>       Add new option for char value write in gatttool
+>       Implement characteristic_write callback in gatttool
+> 
+>  attrib/att.c        |   45 ++++++++++++++++
+>  attrib/att.h        |    4 ++
+>  attrib/client.c     |  145 ++++++++++++++++++++++++---------------------------
+>  attrib/gatt.c       |   11 ++++
+>  attrib/gatt.h       |    3 +
+>  attrib/gatttool.c   |  120 ++++++++++++++++++++++++++++++++++++------
+>  src/attrib-server.c |   32 ++++++++++--
+>  src/bluetooth.conf  |    1 +
+>  test/test-attrib    |  120 ++++++++++++++++++++++++++++++++++++++++++
+>  9 files changed, 381 insertions(+), 100 deletions(-)
+>  create mode 100755 test/test-attrib
 
-Best Regards,
-Arun Kumar Singh
-www.crazydaks.com
+Thanks, all patches have been pushed upstream.
 
-
-On Mon, Oct 4, 2010 at 6:15 PM, Chetankumar Manjegowda
-<Chetankumar_Manjegowda@mindtree.com> wrote:
->
-> Hi All,
->
-> I want to know how to enable/Integrate LLMNR for PAN profile.
->
-> Can anyone give some suggestions or link where I can refer the same ??
->
-> Rgds
-> Chetan
->
-> ________________________________
->
-> http://www.mindtree.com/email/disclaimer.html
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
---
+Johan
