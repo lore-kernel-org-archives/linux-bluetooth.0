@@ -1,38 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 4 Oct 2010 20:44:58 +0200
-From: Dominik Brodowski <linux@dominikbrodowski.net>
-To: "Luis R. Rodriguez" <mcgrof@gmail.com>
-Cc: "Rafael J. Wysocki" <rjw@sisk.pl>,
-	linux-wireless <linux-wireless@vger.kernel.org>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	justinmattock@gmail.com, Bob Copeland <me@bobcopeland.com>,
-	Pavel Machek <pavel@ucw.cz>
-Subject: Re: 2.6.36-rc6-git2: Reported regressions from 2.6.35
-Message-ID: <20101004184458.GA18119@isilmar-3.linta.de>
-References: <-jYMINoCtaK.A.F5.8CPqMB@chimera> <AANLkTimUdaUkpXmNt5mPkCdWmHvBbXWA6smAP4U80yc4@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <AANLkTimUdaUkpXmNt5mPkCdWmHvBbXWA6smAP4U80yc4@mail.gmail.com>
+In-Reply-To: <-jYMINoCtaK.A.F5.8CPqMB@chimera>
+References: <-jYMINoCtaK.A.F5.8CPqMB@chimera>
+From: "Luis R. Rodriguez" <mcgrof@gmail.com>
+Date: Mon, 4 Oct 2010 11:35:25 -0700
+Message-ID: <AANLkTimUdaUkpXmNt5mPkCdWmHvBbXWA6smAP4U80yc4@mail.gmail.com>
+Subject: Re: 2.6.36-rc6-git2: Reported regressions from 2.6.35
+To: "Rafael J. Wysocki" <rjw@sisk.pl>,
+	linux-wireless <linux-wireless@vger.kernel.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Cc: justinmattock@gmail.com, Bob Copeland <me@bobcopeland.com>,
+	Pavel Machek <pavel@ucw.cz>, linux@brodo.de
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hey,
+Below are the 802.11 and Bluetooth ones:
 
-On Mon, Oct 04, 2010 at 11:35:25AM -0700, Luis R. Rodriguez wrote:
-> > Bug-Entry � � � : http://bugzilla.kernel.org/show_bug.cgi?id=17061
-> > Subject � � � � : 2.6.36-rc1 on zaurus: bluetooth regression
-> > Submitter � � � : Pavel Machek <pavel@ucw.cz>
-> > Date � � � � � �: 2010-08-21 15:24 (44 days old)
-> > Message-ID � � �: <20100821152445.GA1536@ucw.cz>
-> > References � � �: http://marc.info/?l=linux-kernel&m=128240433828087&w=2
-> 
-> I see no updates to this since August. There are boat load of PCMCIA
-> changes recently, is bisect possible here?
+On Sun, Oct 3, 2010 at 2:15 PM, Rafael J. Wysocki <rjw@sisk.pl> wrote:
+> Unresolved regressions
+> ----------------------
 
-Pavel already verified the PCMCIA-bigdiff since 2.6.35 does work, so it is
-_not_ a PCMCIA issue.
+> Bug-Entry       : http://bugzilla.kernel.org/show_bug.cgi?id=19392
+> Subject         : WARNING: at drivers/net/wireless/ath/ath5k/base.c:3475 ath5k_bss_info_changed+0x44/0x168 [ath5k]()
+> Submitter       : Justin Mattock <justinmattock@gmail.com>
+> Date            : 2010-09-28 22:30 (6 days old)
+> Message-ID      : <AANLkTim5WCGKPvEkOkO_YnMF9pg8mvLfQoFBNUFpfa_k@mail.gmail.com>
+> References      : http://marc.info/?l=linux-kernel&m=128571307018635&w=2
 
-http://www.mail-archive.com/linux-pcmcia@lists.infradead.org/msg03460.html
+WTF -- this ended up in a bisect pointing to some PCMCIA patch! Justin:
 
-Best,
-	Dominik
+  * does this happen with wireless-testing.git ?
+  * Did you do the bisect on the entire kernel? What git tree are you
+using to bisect?
+
+Did you simply bring up the interface and then suspsend? Did you not
+add a new interface in between this? ath5k's add_interace has:
+
+        if (sc->vif) {
+                ret = 0;
+                goto end;
+        }
+
+But why does it just allow this to go through without complaining if
+multiple vifs are not supported?
+
+
+>
+> Bug-Entry       : http://bugzilla.kernel.org/show_bug.cgi?id=17061
+> Subject         : 2.6.36-rc1 on zaurus: bluetooth regression
+> Submitter       : Pavel Machek <pavel@ucw.cz>
+> Date            : 2010-08-21 15:24 (44 days old)
+> Message-ID      : <20100821152445.GA1536@ucw.cz>
+> References      : http://marc.info/?l=linux-kernel&m=128240433828087&w=2
+
+I see no updates to this since August. There are boat load of PCMCIA
+changes recently, is bisect possible here?
+
+
+> Regressions with patches
+> ------------------------
+
+
+> Bug-Entry       : http://bugzilla.kernel.org/show_bug.cgi?id=17722
+> Subject         : 2.6.36-rc3: WARNING: at net/mac80211/scan.c:269 ieee80211_scan_completed
+> Submitter       : Thomas Meyer <thomas@m3y3r.de>
+> Date            : 2010-08-31 20:14 (34 days old)
+> Message-ID      : <201008312214.52473.thomas@m3y3r.de>
+> References      : http://marc.info/?l=linux-kernel&m=128328580504227&w=2
+>                  http://www.spinics.net/lists/netdev/msg140769.html
+> Handled-By      : Florian Mickler <florian@mickler.org>
+> Patch           : https://bugzilla.kernel.org/attachment.cgi?id=31671
+
+This seems fixed.
+
+  Luis
