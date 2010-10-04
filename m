@@ -1,49 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 4 Oct 2010 18:00:53 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: haijun liu <liuhaijun.er@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	dan.tian@atheros.com, suraj <suraj@atheros.com>,
-	Ville Tervo <ville.tervo@nokia.com>
-Subject: Re: [PATCH] Bluetooth: Replace hard code of configuration
- continuous flag
-Message-ID: <20101004210053.GA3234@vigoh>
-References: <1285943147-2546-1-git-send-email-haijun.liu@atheros.com>
- <AANLkTi=-4yF2qew7YVnESPd_jt7g8bvS12XYkhx27ko8@mail.gmail.com>
+Date: Mon, 4 Oct 2010 22:43:20 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: Pull request:
+ git://git.infradead.org/users/cktakahasi/bluez.git for-upstream
+Message-ID: <20101004204320.GA11846@jh-x301>
+References: <AANLkTindKFz1fx9cJMu9aSpehG5LaUHHO7TkgWqMzqj=@mail.gmail.com>
+ <20100929134521.GA19362@jh-x301>
+ <AANLkTimvvp=D+X+TcP3Ji7WuGaMZF7+LA+8BWZiQCStr@mail.gmail.com>
+ <20100930073938.GA6964@jh-x301>
+ <AANLkTikADcqHYfOjmRQVEDdPuU9mrGVvAVGNUdRTsQcd@mail.gmail.com>
+ <AANLkTin5RWCfX07xRUfVvkq+C47AOJXCCRpMVa-vqrRA@mail.gmail.com>
+ <AANLkTinF1OWKMzuArUS6ptWiDTtvQuXxxW9B5ks3tebW@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <AANLkTi=-4yF2qew7YVnESPd_jt7g8bvS12XYkhx27ko8@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <AANLkTinF1OWKMzuArUS6ptWiDTtvQuXxxW9B5ks3tebW@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Haijun,
+Hi Claudio,
 
-* haijun liu <liuhaijun.er@gmail.com> [2010-10-01 22:43:52 +0800]:
-
-> Replace hard code of configuration continuous flag with
-> self-commented macro L2CAP_CONF_FLAG_CONT in functions
-> l2cap_config_req() and l2cap_config_rsp().
+On Mon, Oct 04, 2010, Claudio Takahasi wrote:
+> The following changes since commit 19c8e310329bb6b369f11501afec9ff4223c2971:
 > 
-> Signed-off-by: Haijun.Liu <haijun.liu@atheros.com>
+>   Allow errors to propagate from connection callback (2010-10-04 17:06:49 +0200)
+> 
+> are available in the git repository at:
+>   git://git.infradead.org/users/cktakahasi/bluez.git for-upstream
+> 
+> Claudio Takahasi (23):
+>       Add LE start and stop scanning
+>       Remove RSSI field from the advertising report event
+>       Decoding the RSSI parameter from the advertising report event
+>       Send Discovering property "FALSE" when the interleave finishes
+>       Add length argument on hciops start discovery function
+>       Stop inquiry using the length parameter
+>       Fix remote name resolution for interleave discovery
+>       Add Write LE host supported function
+>       Set the LE host supported and disable simultaneous LE and BR/EDR flags
+>       Add extended feature mask constants definition
+>       Read the local extended features
+>       Stop LE scanning when discovery is suspended
+>       Rename hciops {start, stop}_discovery to {start, stop}_inquiry
+>       Don't enter on interleave mode if there isn't active sessions
+>       Code cleanup: improving inquiry logic
+>       Clear the remote device found list in the state transition
+>       Fix periodic inquiry signals
+>       Fixing DeviceDisappeared signal
+>       Postpone discovery if still resolving names
+>       Add adapter discovery type function
+>       Do not send another Discovering TRUE signal if still resolving names
+>       Forcing periodic inquiry exit
+>       Fix interleave scanning
+> 
+> Vinicius Costa Gomes (1):
+>       Add BR/EDR LE interleaved discovery
+> 
+>  lib/hci.c        |   29 +++++
+>  lib/hci.h        |   17 +++-
+>  lib/hci_lib.h    |    1 +
+>  plugins/hciops.c |   69 +++++++++++-
+>  src/adapter.c    |  301 +++++++++++++++++++++++++++++++++++++-----------------
+>  src/adapter.h    |   38 ++++---
+>  src/dbus-hci.c   |   45 +++++++--
+>  src/dbus-hci.h   |    1 +
+>  src/security.c   |  131 ++++++++++++++----------
+>  9 files changed, 449 insertions(+), 183 deletions(-)
 
-Put a ' ' instead of '.' to separate your surname.
+Thanks. Pushed upstream.
 
-> ---
->  include/net/bluetooth/l2cap.h |    2 ++
->  net/bluetooth/l2cap_core.c    |    6 +++---
->  2 files changed, 5 insertions(+), 3 deletions(-)
-
-Patch is corrupted again, please check where you are screwing up on
-sending patches to the mailing list, then we can save my time and your
-time. ;)
-
-Applying: Bluetooth: Replace hard code of configuration continuous flag
-fatal: corrupt patch at line 11
-Patch failed at 0001 Bluetooth: Replace hard code of configuration
-continuous flag
-
-Regards,
-
--- 
-Gustavo F. Padovan
-ProFUSION embedded systems - http://profusion.mobi
+Johan
