@@ -1,54 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
+From: Chetankumar Manjegowda <Chetankumar_Manjegowda@mindtree.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: How add support of LLMNR for PAN
+Date: Mon, 4 Oct 2010 12:45:16 +0000
+Message-ID: <52A922E83075C847A59D7DF98C66017501871E@MTW02MBX03.mindtree.com>
+References: <20100920184943.GA22968@jh-x301>
+ <1286027890.12944.1.camel@localhost.localdomain>
+ <AANLkTikFrvyeoXV0uLYcvD4GCj2s3ML2-q8f5GhXMxAK@mail.gmail.com>
+ <1286187946.7898.0.camel@localhost.localdomain>
+ <20101004123552.GC11737@pengutronix.de>
+In-Reply-To: <20101004123552.GC11737@pengutronix.de>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Date: Mon, 4 Oct 2010 10:11:19 -0400
-Message-ID: <AANLkTimfiie4L6CBm_oTiyFRmB92dt6bugvBREY6vuzN@mail.gmail.com>
-Subject: Pull request: git://gitorious.org/~lizardo/bluez/lizardo-bluez.git for-upstream
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The following changes since commit bb061d925ad661836d5279b543a07d17683d9b6e:
-  Marcel Holtmann (1):
-        Update list of company identifiers
+Hi All,
 
-are available in the git repository at:
+I want to know how to enable/Integrate LLMNR for PAN profile.
 
-  git://gitorious.org/~lizardo/bluez/lizardo-bluez.git for-upstream
+Can anyone give some suggestions or link where I can refer the same ??
 
-Anderson Lizardo (7):
-      Remove unnecessary check for watcher path
-      Rename global "handle" variable to "sdp_handle"
-      Add test/test-attrib for testing Attribute API
-      Add org.bluez.Watcher interface to default policy
-      Fix and refactor characteristic value update code
-      Add Write Characteristic Value support to attribute server
-      Allow errors to propagate from connection callback
+Rgds
+Chetan
 
-Bruna Moreira (8):
-      Add encoders/decoders for the Write command
-      Implement Write command in GATT API
-      Move connection common code to l2cap_connect()
-      Write new value for characteristic value
-      Use g_slist_foreach() instead of a for loop
-      Make handle parameter mandatory in gatttool
-      Add new option for char value write in gatttool
-      Implement characteristic_write callback in gatttool
+________________________________
 
- attrib/att.c        |   45 ++++++++++++++++
- attrib/att.h        |    4 ++
- attrib/client.c     |  145 ++++++++++++++++++++++++---------------------------
- attrib/gatt.c       |   11 ++++
- attrib/gatt.h       |    3 +
- attrib/gatttool.c   |  120 ++++++++++++++++++++++++++++++++++++------
- src/attrib-server.c |   32 ++++++++++--
- src/bluetooth.conf  |    1 +
- test/test-attrib    |  120 ++++++++++++++++++++++++++++++++++++++++++
- 9 files changed, 381 insertions(+), 100 deletions(-)
- create mode 100755 test/test-attrib
-
--- 
-Anderson Lizardo
-OpenBossa Labs - INdT
-Manaus - Brazil
+http://www.mindtree.com/email/disclaimer.html
