@@ -2,453 +2,242 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH v2 3/4] Replace hardcoded minimum length values with constants
-Date: Mon,  4 Oct 2010 15:13:03 -0400
-Message-Id: <1286219584-8199-3-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH v2 2/4] Remove typecast from att_get_u16() calls
+Date: Mon,  4 Oct 2010 15:13:02 -0400
+Message-Id: <1286219584-8199-2-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1286219584-8199-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1286219584-8199-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+att_get_u16() already does a cast of the void* parameter to uint16_t*.
 ---
- attrib/att.c |  128 ++++++++++++++++++++++++++++++++++++++--------------------
- 1 files changed, 84 insertions(+), 44 deletions(-)
+ attrib/att.c      |   26 +++++++++++++-------------
+ attrib/client.c   |   19 +++++++++----------
+ attrib/gatttool.c |   21 +++++++++------------
+ 3 files changed, 31 insertions(+), 35 deletions(-)
 
 diff --git a/attrib/att.c b/attrib/att.c
-index 21659f0..b18e1d6 100644
+index 6c697f8..21659f0 100644
 --- a/attrib/att.c
 +++ b/attrib/att.c
-@@ -90,6 +90,7 @@ void att_data_list_free(struct att_data_list *list)
- uint16_t enc_read_by_grp_req(uint16_t start, uint16_t end, uuid_t *uuid,
- 							uint8_t *pdu, int len)
- {
-+	const uint16_t min_len = sizeof(pdu[0]) + sizeof(start) + sizeof(end);
- 	uint16_t length;
- 
- 	if (!uuid)
-@@ -102,7 +103,7 @@ uint16_t enc_read_by_grp_req(uint16_t start, uint16_t end, uuid_t *uuid,
- 	else
+@@ -132,10 +132,10 @@ uint16_t dec_read_by_grp_req(const uint8_t *pdu, int len, uint16_t *start,
+ 	if (len < 7)
  		return 0;
  
--	if (len < 5 + length)
-+	if (len < min_len + length)
- 		return 0;
- 
- 	pdu[0] = ATT_OP_READ_BY_GROUP_REQ;
-@@ -114,12 +115,14 @@ uint16_t enc_read_by_grp_req(uint16_t start, uint16_t end, uuid_t *uuid,
- 	else
- 		memcpy(&pdu[5], &uuid->value.uuid128, length);
- 
--	return 5 + length;
-+	return min_len + length;
- }
- 
- uint16_t dec_read_by_grp_req(const uint8_t *pdu, int len, uint16_t *start,
- 						uint16_t *end, uuid_t *uuid)
- {
-+	const uint16_t min_len = sizeof(pdu[0]) + sizeof(*start) + sizeof(*end);
-+
- 	if (pdu == NULL)
- 		return 0;
- 
-@@ -129,12 +132,12 @@ uint16_t dec_read_by_grp_req(const uint8_t *pdu, int len, uint16_t *start,
- 	if (pdu[0] != ATT_OP_READ_BY_GROUP_REQ)
- 		return 0;
- 
--	if (len < 7)
-+	if (len < min_len + 2)
- 		return 0;
- 
- 	*start = att_get_u16(&pdu[1]);
- 	*end = att_get_u16(&pdu[3]);
--	if (len == 7)
-+	if (len == min_len + 2)
- 		sdp_uuid16_create(uuid, att_get_u16(&pdu[5]));
+-	*start = att_get_u16((uint16_t *) &pdu[1]);
+-	*end = att_get_u16((uint16_t *) &pdu[3]);
++	*start = att_get_u16(&pdu[1]);
++	*end = att_get_u16(&pdu[3]);
+ 	if (len == 7)
+-		sdp_uuid16_create(uuid, att_get_u16((uint16_t *) &pdu[5]));
++		sdp_uuid16_create(uuid, att_get_u16(&pdu[5]));
  	else
  		sdp_uuid128_create(uuid, &pdu[5]);
-@@ -203,6 +206,7 @@ uint16_t enc_find_by_type_req(uint16_t start, uint16_t end, uuid_t *uuid,
- uint16_t enc_read_by_type_req(uint16_t start, uint16_t end, uuid_t *uuid,
- 							uint8_t *pdu, int len)
- {
-+	const uint16_t min_len = sizeof(pdu[0]) + sizeof(start) + sizeof(end);
- 	uint16_t length;
  
- 	if (!uuid)
-@@ -215,7 +219,7 @@ uint16_t enc_read_by_type_req(uint16_t start, uint16_t end, uuid_t *uuid,
- 	else
- 		return 0;
- 
--	if (len < 5 + length)
-+	if (len < min_len + length)
- 		return 0;
- 
- 	pdu[0] = ATT_OP_READ_BY_TYPE_REQ;
-@@ -227,19 +231,21 @@ uint16_t enc_read_by_type_req(uint16_t start, uint16_t end, uuid_t *uuid,
- 	else
- 		memcpy(&pdu[5], &uuid->value.uuid128, length);
- 
--	return 5 + length;
-+	return min_len + length;
- }
- 
- uint16_t dec_read_by_type_req(const uint8_t *pdu, int len, uint16_t *start,
- 						uint16_t *end, uuid_t *uuid)
- {
-+	const uint16_t min_len = sizeof(pdu[0]) + sizeof(*start) + sizeof(*end);
-+
- 	if (pdu == NULL)
- 		return 0;
- 
- 	if (start == NULL || end == NULL || uuid == NULL)
- 		return 0;
- 
--	if (len < 7)
-+	if (len < min_len + 2)
- 		return 0;
- 
+@@ -245,11 +245,11 @@ uint16_t dec_read_by_type_req(const uint8_t *pdu, int len, uint16_t *start,
  	if (pdu[0] != ATT_OP_READ_BY_TYPE_REQ)
-@@ -248,7 +254,7 @@ uint16_t dec_read_by_type_req(const uint8_t *pdu, int len, uint16_t *start,
- 	*start = att_get_u16(&pdu[1]);
- 	*end = att_get_u16(&pdu[3]);
+ 		return 0;
  
--	if (len == 7)
-+	if (len == min_len + 2)
- 		sdp_uuid16_create(uuid, att_get_u16(&pdu[5]));
+-	*start = att_get_u16((uint16_t *) &pdu[1]);
+-	*end = att_get_u16((uint16_t *) &pdu[3]);
++	*start = att_get_u16(&pdu[1]);
++	*end = att_get_u16(&pdu[3]);
+ 
+ 	if (len == 7)
+-		sdp_uuid16_create(uuid, att_get_u16((uint16_t *) &pdu[5]));
++		sdp_uuid16_create(uuid, att_get_u16(&pdu[5]));
  	else
  		sdp_uuid128_create(uuid, &pdu[5]);
-@@ -311,64 +317,72 @@ struct att_data_list *dec_read_by_type_resp(const uint8_t *pdu, int len)
- uint16_t enc_write_cmd(uint16_t handle, const uint8_t *value, int vlen,
- 							uint8_t *pdu, int len)
- {
-+	const uint16_t min_len = sizeof(pdu[0]) + sizeof(handle);
-+
- 	if (pdu == NULL)
- 		return 0;
  
--	if (len < 3)
-+	if (len < min_len)
- 		return 0;
- 
--	if (vlen > len - 3)
--		vlen = len - 3;
-+	if (vlen > len - min_len)
-+		vlen = len - min_len;
- 
- 	pdu[0] = ATT_OP_WRITE_CMD;
- 	att_put_u16(handle, &pdu[1]);
- 
- 	if (vlen > 0) {
--		memcpy(pdu + 3, value, vlen);
--		return 3 + vlen;
-+		memcpy(&pdu[3], value, vlen);
-+		return min_len + vlen;
- 	}
- 
--	return 3;
-+	return min_len;
- }
- 
- uint16_t dec_write_cmd(const uint8_t *pdu, int len, uint16_t *handle,
- 						uint8_t *value, int *vlen)
- {
-+	const uint16_t min_len = sizeof(pdu[0]) + sizeof(*handle);
-+
- 	if (pdu == NULL)
- 		return 0;
- 
- 	if (value == NULL || vlen == NULL || handle == NULL)
- 		return 0;
- 
--	if (len < 3)
-+	if (len < min_len)
- 		return 0;
- 
+@@ -346,7 +346,7 @@ uint16_t dec_write_cmd(const uint8_t *pdu, int len, uint16_t *handle,
  	if (pdu[0] != ATT_OP_WRITE_CMD)
  		return 0;
  
- 	*handle = att_get_u16(&pdu[1]);
--	memcpy(value, pdu + 3, len - 3);
--	*vlen = len - 3;
-+	memcpy(value, pdu + min_len, len - min_len);
-+	*vlen = len - min_len;
+-	*handle = att_get_u16((uint16_t *) &pdu[1]);
++	*handle = att_get_u16(&pdu[1]);
+ 	memcpy(value, pdu + 3, len - 3);
+ 	*vlen = len - 3;
  
- 	return len;
+@@ -378,7 +378,7 @@ uint16_t dec_read_req(const uint8_t *pdu, uint16_t *handle)
+ 	if (pdu[0] != ATT_OP_READ_REQ)
+ 		return 0;
+ 
+-	*handle = att_get_u16((uint16_t *) &pdu[1]);
++	*handle = att_get_u16(&pdu[1]);
+ 
+ 	return 3;
  }
- 
- uint16_t enc_read_req(uint16_t handle, uint8_t *pdu, int len)
- {
-+	const uint16_t min_len = sizeof(pdu[0]) + sizeof(handle);
-+
- 	if (pdu == NULL)
+@@ -466,8 +466,8 @@ uint16_t dec_find_info_req(const uint8_t *pdu, int len, uint16_t *start,
+ 	if (pdu[0] != ATT_OP_FIND_INFO_REQ)
  		return 0;
  
--	if (len < 3)
-+	if (len < min_len)
- 		return 0;
+-	*start = att_get_u16((uint16_t *) &pdu[1]);
+-	*end = att_get_u16((uint16_t *) &pdu[3]);
++	*start = att_get_u16(&pdu[1]);
++	*end = att_get_u16(&pdu[3]);
  
- 	pdu[0] = ATT_OP_READ_REQ;
- 	att_put_u16(handle, &pdu[1]);
- 
--	return 3;
-+	return min_len;
+ 	return 5;
  }
+@@ -585,7 +585,7 @@ struct attribute *dec_indication(const uint8_t *pdu, int len)
  
- uint16_t dec_read_req(const uint8_t *pdu, uint16_t *handle)
- {
-+	const uint16_t min_len = sizeof(pdu[0]) + sizeof(*handle);
-+
- 	if (pdu == NULL)
- 		return 0;
+ 	a->len = len - 3;
  
-@@ -380,7 +394,7 @@ uint16_t dec_read_req(const uint8_t *pdu, uint16_t *handle)
- 
- 	*handle = att_get_u16(&pdu[1]);
- 
--	return 3;
-+	return min_len;
- }
- 
- uint16_t enc_read_resp(uint8_t *value, int vlen, uint8_t *pdu, int len)
-@@ -422,9 +436,11 @@ uint16_t dec_read_resp(const uint8_t *pdu, int len, uint8_t *value, int *vlen)
- uint16_t enc_error_resp(uint8_t opcode, uint16_t handle, uint8_t status,
- 							uint8_t *pdu, int len)
- {
-+	const uint16_t min_len = sizeof(pdu[0]) + sizeof(opcode) +
-+						sizeof(handle) + sizeof(status);
- 	uint16_t u16;
- 
--	if (len < 5)
-+	if (len < min_len)
- 		return 0;
- 
- 	u16 = htobs(handle);
-@@ -433,31 +449,35 @@ uint16_t enc_error_resp(uint8_t opcode, uint16_t handle, uint8_t status,
- 	memcpy(&pdu[2], &u16, sizeof(u16));
- 	pdu[4] = status;
- 
--	return 5;
-+	return min_len;
- }
- 
- uint16_t enc_find_info_req(uint16_t start, uint16_t end, uint8_t *pdu, int len)
- {
-+	const uint16_t min_len = sizeof(pdu[0]) + sizeof(start) + sizeof(end);
-+
- 	if (pdu == NULL)
- 		return 0;
- 
--	if (len < 5)
-+	if (len < min_len)
- 		return 0;
- 
- 	pdu[0] = ATT_OP_FIND_INFO_REQ;
- 	att_put_u16(start, &pdu[1]);
- 	att_put_u16(end, &pdu[3]);
- 
--	return 5;
-+	return min_len;
- }
- 
- uint16_t dec_find_info_req(const uint8_t *pdu, int len, uint16_t *start,
- 								uint16_t *end)
- {
-+	const uint16_t min_len = sizeof(pdu[0]) + sizeof(*start) + sizeof(*end);
-+
- 	if (pdu == NULL)
- 		return 0;
- 
--	if (len < 5)
-+	if (len < min_len)
- 		return 0;
- 
- 	if (start == NULL || end == NULL)
-@@ -469,7 +489,7 @@ uint16_t dec_find_info_req(const uint8_t *pdu, int len, uint16_t *start,
- 	*start = att_get_u16(&pdu[1]);
- 	*end = att_get_u16(&pdu[3]);
- 
--	return 5;
-+	return min_len;
- }
- 
- uint16_t enc_find_info_resp(uint8_t format, struct att_data_list *list,
-@@ -520,10 +540,11 @@ struct att_data_list *dec_find_info_resp(const uint8_t *pdu, int len,
- 
- 	list = malloc(sizeof(struct att_data_list));
- 
-+	list->len = sizeof(pdu[0]) + sizeof(*format);
- 	if (*format == 0x01)
--		list->len = 4;
-+		list->len += 2;
- 	else if (*format == 0x02)
--		list->len = 18;
-+		list->len += 16;
- 
- 	list->num = (len - 2) / list->len;
- 	list->data = malloc(sizeof(uint8_t *) * list->num);
-@@ -541,36 +562,42 @@ struct att_data_list *dec_find_info_resp(const uint8_t *pdu, int len,
- 
- uint16_t enc_notification(struct attribute *a, uint8_t *pdu, int len)
- {
-+	const uint16_t min_len = sizeof(pdu[0]) + sizeof(uint16_t);
-+
- 	if (pdu == NULL)
- 		return 0;
- 
--	if (len < (a->len + 3))
-+	if (len < (a->len + min_len))
- 		return 0;
- 
- 	pdu[0] = ATT_OP_HANDLE_NOTIFY;
- 	att_put_u16(a->handle, &pdu[1]);
- 	memcpy(&pdu[3], a->data, a->len);
- 
--	return a->len + 3;
-+	return a->len + min_len;
- }
- 
- uint16_t enc_indication(struct attribute *a, uint8_t *pdu, int len)
- {
-+	const uint16_t min_len = sizeof(pdu[0]) + sizeof(uint16_t);
-+
- 	if (pdu == NULL)
- 		return 0;
- 
--	if (len < (a->len + 3))
-+	if (len < (a->len + min_len))
- 		return 0;
- 
- 	pdu[0] = ATT_OP_HANDLE_IND;
- 	att_put_u16(a->handle, &pdu[1]);
- 	memcpy(&pdu[3], a->data, a->len);
- 
--	return a->len + 3;
-+	return a->len + min_len;
- }
- 
- struct attribute *dec_indication(const uint8_t *pdu, int len)
- {
-+	const uint16_t min_len = sizeof(pdu[0]) + sizeof(uint16_t);
-+
- 	struct attribute *a;
- 
- 	if (pdu == NULL)
-@@ -579,11 +606,14 @@ struct attribute *dec_indication(const uint8_t *pdu, int len)
- 	if (pdu[0] != ATT_OP_HANDLE_IND)
- 		return NULL;
- 
--	a = malloc(sizeof(struct attribute) + len - 3);
-+	if (len < min_len)
-+		return NULL;
-+
-+	a = malloc(sizeof(struct attribute) + len - min_len);
- 	if (a == NULL)
- 		return NULL;
- 
--	a->len = len - 3;
-+	a->len = len - min_len;
- 
- 	a->handle = att_get_u16(&pdu[1]);
+-	a->handle = att_get_u16((uint16_t *) &pdu[1]);
++	a->handle = att_get_u16(&pdu[1]);
  	memcpy(a->data, &pdu[3], a->len);
-@@ -593,40 +623,46 @@ struct attribute *dec_indication(const uint8_t *pdu, int len)
  
- uint16_t enc_confirmation(uint8_t *pdu, int len)
- {
-+	const uint16_t min_len = sizeof(pdu[0]);
-+
- 	if (pdu == NULL)
- 		return 0;
- 
--	if (len < 1)
-+	if (len < min_len)
- 		return 0;
- 
- 	pdu[0] = ATT_OP_HANDLE_CNF;
- 
--	return 1;
-+	return min_len;
- }
- 
- uint16_t enc_mtu_req(uint16_t mtu, uint8_t *pdu, int len)
- {
-+	const uint16_t min_len = sizeof(pdu[0]) + sizeof(mtu);
-+
- 	if (pdu == NULL)
- 		return 0;
- 
--	if (len < 3)
-+	if (len < min_len)
- 		return 0;
- 
- 	pdu[0] = ATT_OP_MTU_REQ;
- 	att_put_u16(mtu, &pdu[1]);
- 
--	return 3;
-+	return min_len;
- }
- 
- uint16_t dec_mtu_req(const uint8_t *pdu, int len, uint16_t *mtu)
- {
-+	const uint16_t min_len = sizeof(pdu[0]) + sizeof(*mtu);
-+
- 	if (pdu == NULL)
- 		return 0;
- 
- 	if (mtu == NULL)
- 		return 0;
- 
--	if (len < 3)
-+	if (len < min_len)
- 		return 0;
- 
+ 	return a;
+@@ -632,7 +632,7 @@ uint16_t dec_mtu_req(const uint8_t *pdu, int len, uint16_t *mtu)
  	if (pdu[0] != ATT_OP_MTU_REQ)
-@@ -634,32 +670,36 @@ uint16_t dec_mtu_req(const uint8_t *pdu, int len, uint16_t *mtu)
+ 		return 0;
  
- 	*mtu = att_get_u16(&pdu[1]);
+-	*mtu = att_get_u16((uint16_t *) &pdu[1]);
++	*mtu = att_get_u16(&pdu[1]);
  
--	return 3;
-+	return min_len;
+ 	return 3;
  }
- 
- uint16_t enc_mtu_resp(uint16_t mtu, uint8_t *pdu, int len)
- {
-+	const uint16_t min_len = sizeof(pdu[0]) + sizeof(mtu);
-+
- 	if (pdu == NULL)
- 		return 0;
- 
--	if (len < 3)
-+	if (len < min_len)
- 		return 0;
- 
- 	pdu[0] = ATT_OP_MTU_RESP;
- 	att_put_u16(mtu, &pdu[1]);
- 
--	return 3;
-+	return min_len;
- }
- 
- uint16_t dec_mtu_resp(const uint8_t *pdu, int len, uint16_t *mtu)
- {
-+	const uint16_t min_len = sizeof(pdu[0]) + sizeof(*mtu);
-+
- 	if (pdu == NULL)
- 		return 0;
- 
- 	if (mtu == NULL)
- 		return 0;
- 
--	if (len < 3)
-+	if (len < min_len)
- 		return 0;
- 
+@@ -665,7 +665,7 @@ uint16_t dec_mtu_resp(const uint8_t *pdu, int len, uint16_t *mtu)
  	if (pdu[0] != ATT_OP_MTU_RESP)
-@@ -667,5 +707,5 @@ uint16_t dec_mtu_resp(const uint8_t *pdu, int len, uint16_t *mtu)
+ 		return 0;
  
- 	*mtu = att_get_u16(&pdu[1]);
+-	*mtu = att_get_u16((uint16_t *) &pdu[1]);
++	*mtu = att_get_u16(&pdu[1]);
  
--	return 3;
-+	return min_len;
+ 	return 3;
  }
+diff --git a/attrib/client.c b/attrib/client.c
+index db84b78..cd720e6 100644
+--- a/attrib/client.c
++++ b/attrib/client.c
+@@ -286,7 +286,7 @@ static void events_handler(const uint8_t *pdu, uint16_t len,
+ 	struct primary *prim;
+ 	GSList *lprim, *lchr;
+ 	uint8_t opdu[ATT_MAX_MTU];
+-	guint handle = att_get_u16((uint16_t *) &pdu[1]);
++	guint handle = att_get_u16(&pdu[1]);
+ 	uint16_t olen;
+ 
+ 	for (lprim = gatt->primary, prim = NULL, chr = NULL; lprim;
+@@ -872,11 +872,10 @@ static void descriptor_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 		uint8_t *info = list->data[i];
+ 		struct query_data *qfmt;
+ 
+-		handle = att_get_u16((uint16_t *) info);
++		handle = att_get_u16(info);
+ 
+ 		if (format == 0x01) {
+-			sdp_uuid16_create(&uuid, att_get_u16((uint16_t *)
+-								&info[2]));
++			sdp_uuid16_create(&uuid, att_get_u16(&info[2]));
+ 		} else {
+ 			/* Currently, only "user description" and "presentation
+ 			 * format" descriptors are used, and both have 16-bit
+@@ -963,17 +962,17 @@ static void char_discovered_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 		chr = g_new0(struct characteristic, 1);
+ 		chr->prim = prim;
+ 		chr->perm = decl[2];
+-		chr->handle = att_get_u16((uint16_t *) &decl[3]);
++		chr->handle = att_get_u16(&decl[3]);
+ 		chr->path = g_strdup_printf("%s/characteristic%04x",
+ 						prim->path, chr->handle);
+ 		if (list->len == 7) {
+ 			sdp_uuid16_create(&chr->type,
+-					att_get_u16((uint16_t *) &decl[5]));
++					att_get_u16(&decl[5]));
+ 		} else
+ 			sdp_uuid128_create(&chr->type, &decl[5]);
+ 
+ 		if (previous_end) {
+-			*previous_end = att_get_u16((uint16_t *) decl);
++			*previous_end = att_get_u16(decl);
+ 		}
+ 
+ 		last = chr->handle;
+@@ -1270,8 +1269,8 @@ static void primary_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 
+ 		/* Each element contains: attribute handle, end group handle
+ 		 * and attribute value */
+-		start = att_get_u16((uint16_t *) info);
+-		end = att_get_u16((uint16_t *) &info[2]);
++		start = att_get_u16(info);
++		end = att_get_u16(&info[2]);
+ 
+ 		prim = g_new0(struct primary, 1);
+ 		prim->gatt = gatt;
+@@ -1280,7 +1279,7 @@ static void primary_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 
+ 		if (list->len == 6) {
+ 			sdp_uuid16_create(&prim->uuid,
+-					att_get_u16((uint16_t *) &info[4]));
++					att_get_u16(&info[4]));
+ 
+ 		} else if (list->len == 20) {
+ 			/* FIXME: endianness */
+diff --git a/attrib/gatttool.c b/attrib/gatttool.c
+index 18f32a2..4a66340 100644
+--- a/attrib/gatttool.c
++++ b/attrib/gatttool.c
+@@ -167,14 +167,13 @@ static void primary_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 		/* Each element contains: attribute handle, end group handle
+ 		 * and attribute value */
+ 		length = list->len - 2 * sizeof(uint16_t);
+-		start = att_get_u16((uint16_t *) value);
+-		end = att_get_u16((uint16_t *) &value[2]);
++		start = att_get_u16(value);
++		end = att_get_u16(&value[2]);
+ 
+ 		g_print("attr handle = 0x%04x, end grp handle = 0x%04x, ",
+ 								start, end);
+ 		if (length == 2)
+-			sdp_uuid16_create(&uuid, att_get_u16((uint16_t *)
+-								&value[4]));
++			sdp_uuid16_create(&uuid, att_get_u16(&value[4]));
+ 		else
+ 			sdp_uuid128_create(&uuid, value + 4);
+ 
+@@ -204,7 +203,7 @@ static void events_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
+ 	uint8_t opdu[ATT_MAX_MTU];
+ 	uint16_t handle, i, olen = 0;
+ 
+-	handle = att_get_u16((uint16_t *) &pdu[1]);
++	handle = att_get_u16(&pdu[1]);
+ 
+ 	switch (pdu[0]) {
+ 	case ATT_OP_HANDLE_NOTIFY:
+@@ -279,15 +278,14 @@ static void char_discovered_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 		char uuidstr[MAX_LEN_UUID_STR];
+ 		uuid_t uuid;
+ 
+-		last = att_get_u16((uint16_t *) value);
++		last = att_get_u16(value);
+ 
+ 		g_print("handle = 0x%04x, char properties = 0x%02x, "
+ 			"char value handle = 0x%04x, ", last, value[2],
+-			att_get_u16((uint16_t *) &value[3]));
++			att_get_u16(&value[3]));
+ 
+ 		if (list->len == 7)
+-			sdp_uuid16_create(&uuid, att_get_u16((uint16_t *)
+-								&value[5]));
++			sdp_uuid16_create(&uuid, att_get_u16(&value[5]));
+ 		else
+ 			sdp_uuid128_create(&uuid, value + 5);
+ 
+@@ -447,11 +445,10 @@ static void char_desc_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 		uuid_t uuid;
+ 
+ 		value = list->data[i];
+-		handle = att_get_u16((uint16_t *) value);
++		handle = att_get_u16(value);
+ 
+ 		if (format == 0x01)
+-			sdp_uuid16_create(&uuid, att_get_u16((uint16_t *)
+-								&value[2]));
++			sdp_uuid16_create(&uuid, att_get_u16(&value[2]));
+ 		else
+ 			sdp_uuid128_create(&uuid, &value[2]);
+ 
 -- 
 1.7.0.4
 
