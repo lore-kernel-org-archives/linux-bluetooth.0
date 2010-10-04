@@ -1,51 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4CAA0F17.3070906@Atheros.com>
+Date: Mon, 4 Oct 2010 22:59:59 +0530
+From: Suraj Sumangala <suraj@Atheros.com>
 MIME-Version: 1.0
-In-Reply-To: <OjxVjYbf_EJ.A.ReC.pTPqMB@chimera>
-References: <OjxVjYbf_EJ.A.ReC.pTPqMB@chimera>
-From: "Luis R. Rodriguez" <mcgrof@gmail.com>
-Date: Mon, 4 Oct 2010 11:17:32 -0700
-Message-ID: <AANLkTingYRH0_1VP4Q5BqBO2rV7yWctVQ3kAcyB_mibK@mail.gmail.com>
-Subject: Re: 2.6.36-rc6-git2: Reported regressions 2.6.34 -> 2.6.35
-To: "Rafael J. Wysocki" <rjw@sisk.pl>,
-	linux-wireless <linux-wireless@vger.kernel.org>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: "Guy, Wey-Yi W" <wey-yi.w.guy@intel.com>, dtonator@gmail.com,
-	florian@mickler.org, oliver@neukum.org
-Content-Type: text/plain; charset=UTF-8
+To: Suraj Sumangala <Suraj.Sumangala@Atheros.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>
+Subject: Re: [PATCH 1/2] Bluetooth: hci open callback for hci UART transport
+ driver
+References: <1285075981-8941-1-git-send-email-suraj@atheros.com> <4CA44AF2.7050908@Atheros.com>
+In-Reply-To: <4CA44AF2.7050908@Atheros.com>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Here are the 802.11 and Bluetooth ones:
+Hi,
 
-On Sun, Oct 3, 2010 at 2:36 PM, Rafael J. Wysocki <rjw@sisk.pl> wrote:
-
-> Bug-Entry       : http://bugzilla.kernel.org/show_bug.cgi?id=16691
-> Subject         : IPW5100: iwlagn broken with 2.6.34.x to 2.6.35.2 update
-> Submitter       : Can Celasun <dcelasun@gmail.com>
-> Date            : 2010-08-21 08:28 (44 days old)
-
-This is awaiting some new uCode code drop by Intel.
-
-> Bug-Entry       : http://bugzilla.kernel.org/show_bug.cgi?id=16458
-> Subject         : Bluetooth disabled after resume
-> Submitter       : AttilaN <attila123456@gmail.com>
-> Date            : 2010-07-25 09:33 (71 days old)
-
-No followup on this one.
-
-> Regressions with patches
-> ------------------------
+On 9/30/2010 2:01 PM, Suraj Sumangala wrote:
+> *ping*
 >
-> Bug-Entry       : http://bugzilla.kernel.org/show_bug.cgi?id=16462
-> Subject         : unable to connect to hidden SSID AP on legal channel 13
-> Submitter       : Daniel J Blueman <daniel.blueman@gmail.com>
-> Date            : 2010-07-25 17:06 (71 days old)
-> Handled-By      : Johannes Berg <johannes.berg@intel.com>
-> Patch           : https://bugzilla.kernel.org/attachment.cgi?id=31862
+> On 9/21/2010 7:03 PM, Suraj Sumangala wrote:
+>> This patch provides option for hci transport driver protocol implementation
+>> to have a callback for hci open.
+>>
+>> Signed-off-by: Suraj Sumangala<suraj@atheros.com>
+>> ---
+>>    drivers/bluetooth/hci_ldisc.c |    5 ++++-
+>>    drivers/bluetooth/hci_uart.h  |    1 +
+>>    2 files changed, 5 insertions(+), 1 deletions(-)
+>>
+>
+> Regards
+> Suraj
 
-Fixed by Johannes, this was an Intel specific issue. Reviewed the
-possibility of this also affecting mac80211 but since we lift the
-passive scan on a beacon for the AP this should not affect mac80211 in
-the future.
+Is there any comments on this patch?
 
-  Luis
+Regards
+Suraj
