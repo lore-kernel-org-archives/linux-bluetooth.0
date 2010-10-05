@@ -1,44 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Added firmware load patch to crap directory. This
- patch loads firmware from btusb when device is plugged in.
+Subject: Re: [PATCHv1 0/5] Bluetooth: experimental support for pm_limits
 From: Marcel Holtmann <marcel@holtmann.org>
-To: "Luis R. Rodriguez" <mcgrof@gmail.com>
-Cc: Bala Shanmugam <sbalashanmugam@atheros.com>,
-	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-In-Reply-To: <AANLkTinjiJ6FyoAi4aP=8pr9EwV0wpV7LtwQx-hwaOFs@mail.gmail.com>
-References: <1285931572-3592-1-git-send-email-sbalashanmugam@atheros.com>
-	 <AANLkTinjiJ6FyoAi4aP=8pr9EwV0wpV7LtwQx-hwaOFs@mail.gmail.com>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1285937230-547-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1285937230-547-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 05 Oct 2010 09:52:35 +0200
-Message-ID: <1286265155.17473.25.camel@aeonflux>
+Date: Tue, 05 Oct 2010 09:49:42 +0200
+Message-ID: <1286264982.17473.22.camel@aeonflux>
 Mime-Version: 1.0
-Sender: linux-wireless-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luis,
+Hi Andrei,
 
-> > Marcel feels that Atheros sflash based BT device
-> > +doesn't follow bluetooth H:2 specification and HCI commands should be supported
-> > +in firmware if it is detected as bluetooth device. Using HCI command, firmware
-> > +should be loaded.
-> > +
-> > +In sfash based device we don't have enough memory to support HCI commands in firmware.
-> > +So load firmware from btusb when the device comes up.
-> > +
+> First version of using power constraints interface to achieve
+> maximum bluetooth transfer speed. Otherwise HW goes to idle mode
+> and speed decreases 3 times.
 > 
-> You should still ask the maintainer for an alternative, otherwise the
-> device unusable. Did you submit the patch first in [PATCH] form? If
-> not please submit the patch, all I saw as an RFC and no followup at
-> all.
+> Use empirical power management analyzer (TM) to define amount
+> of time device set high power constraints for.
+> 
+> May include hacks :-)
 
-I think it is pretty clear how these devices should be designed when it
-comes to firmware loading. Just having different USB PIDs for firmware
-loading stage and fully functional Bluetooth device stage is not that
-hard to do. Other companies have done this.
-
-If you device claims Bluetooth USB class descriptors, then it should
-behave like that and offer HCI protocol running on it.
+please send these as [RFC] and not as [PATCH] if they are meant for
+review.
 
 Regards
 
