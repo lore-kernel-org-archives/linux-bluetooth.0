@@ -1,68 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: <Waldemar.Rymarkiewicz@tieto.com>
-To: <marcel@holtmann.org>, <suraj@atheros.com>
-CC: <linux-bluetooth@vger.kernel.org>,
-	<Jothikumar.Mothilal@Atheros.com>, <joakim.xj.ceder@stericsson.com>
-Date: Tue, 5 Oct 2010 13:45:15 +0300
-Subject: RE: Sim Access profile server implementation
-Message-ID: <99B09243E1A5DA4898CDD8B700111448097D01B371@EXMB04.eu.tieto.com>
-References: <1285657515.12097.7.camel@atheros013-desktop>
- <1286265730.17473.29.camel@aeonflux>
-In-Reply-To: <1286265730.17473.29.camel@aeonflux>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Subject: Re: New Broadcom chip in W510
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Lu Ran <hephooey@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <201009190926.51131.hephooey@gmail.com>
+References: <201009190926.51131.hephooey@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Tue, 05 Oct 2010 11:30:48 +0200
+Message-ID: <1286271048.17473.66.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel, 
+Hi Lu,
 
-I understand you concerns about dbus reliability and I agree with you , but I guess we should find a compromise solution as ofono is not used widely in Linux mobile platforms nowadays.
+> I am having trouble to make my headset work in my new W510, it works fine in an 
+> T61, with has almost identical software and setup with the new W510. The only 
+> difference is I am now using a pure 64 bit system, while the old T61 is a 32 
+> bit one, and the bluetooth chip is different. the id of the chip in T61 is 
+> 0A5C:2110, while W510 has a chip from Broadcom with id 0A5C:217F. I noticed 
+> there is a SCO fix for 0A5C:2110 in btusb.c. I tried to copy the line and 
+> change the id to 0A5C:217F, but nothing changes. The headset can pair with the 
+> laptop with no problem, but there seems to be no data transmition. And I get a 
+> lot error messages in dmesg output like this:
+> 
+> btusb_submit_isoc_urb: hci0 urb ffff880060136e00 submission failed (28)
+> 
+> and
+> 
+> btusb_send_frame: hci0 urb ffff8801320e1a00 submission failed
+> 
+> the output of "hciconfig hci0 version" is
+> 
+> hci0:   Type: BR/EDR  Bus: USB
+>         BD Address: 70:F3:95:34:2F:29  ACL MTU: 1021:8  SCO MTU: 64:8
+>         HCI Version: 2.1 (0x4)  Revision: 0x168
+>         LMP Version: 2.1 (0x4)  Subversion: 0x4203
+>         Manufacturer: Broadcom Corporation (15)
+> 
+> And the output of "lsusb -v" is in the attachment. I will try to provide any 
+> other information you need to analyse the problem.
 
-I my view, combination of a bluez plugin for sap and a platform dependend sim driver is a reliable and most available solution so far. The SAP plugin implements BT SAP spec and require simple API (connect, disconnect, apdu, atr, status) which is implemented in SIM driver for a certain platform. This way it's relatively easy to support SAP in different platforms. Ofono can have its own driver as well.
+can you show me the content of /proc/bus/usb/devices (or usbdevices.sh)
+for that device.
 
-What's you view on such design?
-Can we also have a double solution one in ofono for ofono aware platforms and the second as a plugin for others? 
+Regards
 
-BTW, I already have this implemented and tested with real hardware (STEricsson). Bluez SAP works fine with Nokia 616 carkit :)
+Marcel
 
-Regards,
-/Waldek
 
->-----Original Message-----
->From: linux-bluetooth-owner@vger.kernel.org 
->[mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of 
->Marcel Holtmann
->Sent: Tuesday, October 05, 2010 10:02 AM
->To: suraj
->Cc: linux-bluetooth@vger.kernel.org; Jothikumar Mothilal
->Subject: Re: Sim Access profile server implementation
->
->Hi Suraj,
->
->> Please find the Git tree for the Sim access profile server role 
->> implementation I have been working on at
->> 
->> git://gitorious.org/sap-server/sap-server.git
->> 
->> Not sure it could be directly used with Bluez. Nevertheless, it has 
->> the parser implementation of Bluetooth SAP packet. Someone could 
->> possibly reuse it in their implementation.
->
->have you actually tested this with real SAP server capable 
->hardware? I am still not convinced at all to push APDU over 
->D-Bus. First, there is potential security issue here and 
->second the latency that D-Bus introduces seems not be 
->acceptable. So what I am getting it, can this be actually used 
->in a product that seriously wants to support SAP server?
->
->Regards
->
->Marcel
->
->
->--
->To unsubscribe from this list: send the line "unsubscribe 
->linux-bluetooth" in the body of a message to 
->majordomo@vger.kernel.org More majordomo info at  
->http://vger.kernel.org/majordomo-info.html
->
