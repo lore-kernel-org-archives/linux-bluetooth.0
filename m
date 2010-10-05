@@ -1,66 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: RFC: btusb firmware load help
-From: Marcel Holtmann <holtmann@linux.intel.com>
-To: "Luis R. Rodriguez" <lrodriguez@atheros.com>
-Cc: Luis Rodriguez <Luis.Rodriguez@Atheros.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-	Deepak Dhamdhere <Deepak.Dhamdhere@Atheros.com>,
-	Sree Durbha <Sree.Durbha@Atheros.com>
-In-Reply-To: <20101005192814.GB11831@tux>
-References: <20100924230730.GB6566@tux> <1286266981.17473.33.camel@aeonflux>
-	 <20101005192814.GB11831@tux>
-Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 05 Oct 2010 21:58:51 +0200
-Message-ID: <1286308731.2588.13.camel@aeonflux>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Tue, 5 Oct 2010 16:42:58 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: clean up rfcomm code
+Message-ID: <20101005194258.GC3234@vigoh>
+References: <1285923911-12902-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1286265236.17473.26.camel@aeonflux>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1286265236.17473.26.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luis,
+Hi Andrei,
 
-> > > Marcel, I was just poked about this thread:
-> > > 
-> > > http://www.spinics.net/lists/linux-bluetooth/msg06087.html
-> > > 
-> > > The hack is required because our BT hardware does not accept HCI commands
-> > > when the device is plugged in. If I understood your position you did not
-> > > want to accept the patch because our BT USB devices are violating the
-> > > specification by not acceping HCI commands and yet claiming to be BT
-> > > devices, is that right?
+* Marcel Holtmann <marcel@holtmann.org> [2010-10-05 09:53:56 +0200]:
+
+> Hi Andrei,
+> 
+> > Remove dead code and unused rfcomm thread events
 > > 
-> > you don't have to accept HCI commands when your device has no firmware
-> > loaded. That is just fine. However at that point you should not claim to
-> > be a Bluetooth H:2 device with USB Bluetooth descriptors.
+> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> > ---
+> >  include/net/bluetooth/rfcomm.h |    5 -----
+> >  net/bluetooth/rfcomm/core.c    |   29 ++++++++++++++---------------
+> >  2 files changed, 14 insertions(+), 20 deletions(-)
 > > 
-> > Just having different USB PIDs for without firmware and with firmware
-> > stages would have been fine. The ancient Broadcom 203x devices even got
-> > that part right.
+> > diff --git a/include/net/bluetooth/rfcomm.h b/include/net/bluetooth/rfcomm.h
+> > index a140847..71047bc 100644
+> > --- a/include/net/bluetooth/rfcomm.h
+> > +++ b/include/net/bluetooth/rfcomm.h
+> > @@ -213,11 +213,6 @@ struct rfcomm_dlc {
+> >  #define RFCOMM_DEFER_SETUP  8
+> >  
+> >  /* Scheduling flags and events */
+> > -#define RFCOMM_SCHED_STATE  0
+> > -#define RFCOMM_SCHED_RX     1
+> > -#define RFCOMM_SCHED_TX     2
+> > -#define RFCOMM_SCHED_TIMEO  3
+> > -#define RFCOMM_SCHED_AUTH   4
+> >  #define RFCOMM_SCHED_WAKEUP 31
 > 
-> Ah I see.
+> we had some big ambition to use these, but never did in the end or
+> realized that they are not needed. So I am fine with removing these.
 > 
-> > So what about sticking with the current VID:PID for the device without
-> > firmware and we blacklist it in btusb driver. And then the firmware
-> > loading ensures that after reset it uses a different PID for the device
-> > with valid HCI firmware.
-> 
-> How would firmware be uploaded to the device if no module
-> is claiming it?
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-most likely via a separate firmware loading driver. Your ath3k driver is
-such a driver. Same as the bcm203x driver. They don't do anything than
-claiming that USB device, loading the firmware, and then let it reset.
-
-And after the reset the btusb can claim the one where the firmware has
-been loaded and which behaves like a proper USB dongle.
-
-The part that I don't understand is that you have the ath3k driver doing
-it exactly how it should be done, why now started to make nasty hacks in
-the btusb driver.
-
-Regards
-
-Marcel
+Patch has been applied. Thanks.
 
 
+-- 
+Gustavo F. Padovan
+ProFUSION embedded systems - http://profusion.mobi
