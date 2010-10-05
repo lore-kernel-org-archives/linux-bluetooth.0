@@ -1,59 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Fix use of uninitialised variable on legacy pairing
-Date: Tue,  5 Oct 2010 10:40:25 +0300
-Message-Id: <1286264425-24281-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: Inquiry_with_RSSI compatible dongles
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Giedo Mak <giedomak@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <AANLkTi=uuyRQ-9Qj1THDvOroE3yLU7ZBJS_tX26h0O4y@mail.gmail.com>
+References: <AANLkTinU4+-Meyz_BmL+Lw-ESCR_NVhdu7esTE8wCWuc@mail.gmail.com>
+	 <AANLkTinbYqYrFrJDCEm3U0Mto8fYJyQLDa8s0KB6T3qi@mail.gmail.com>
+	 <AANLkTi=uuyRQ-9Qj1THDvOroE3yLU7ZBJS_tX26h0O4y@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Tue, 05 Oct 2010 09:36:56 +0200
+Message-ID: <1286264216.17473.17.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+Hi Giedo,
 
-Regression caused by e7daece858070d71cecf6ade4f0e3c93272c53ac:
+> I'm working on a bluetooth program with some sort of distance sensing/tracking.
+> To make this easier I came across a feature called inquiry_with_RSSI.
+> Could somebody tell me what kind of dongles support this feature. I
+> mean, does every 2.1 BT dongle support it, or can you only find out
+> once you get one in your hands?
 
-==23899== Use of uninitialised value of size 4
-==23899==    at 0x49CD888: _itoa_word (_itoa.c:196)
-==23899==    by 0x49D1109: vfprintf (vfprintf.c:1613)
-==23899==    by 0x4A7506C: __vsprintf_chk (vsprintf_chk.c:86)
-==23899==    by 0x4A74FAC: __sprintf_chk (sprintf_chk.c:33)
-==23899==    by 0x4830E08: ba2str (stdio2.h:34)
-==23899==    by 0x1496B3: set_pin_length (security.c:514)
-==23899==    by 0x168399: pincode_cb (dbus-hci.c:179)
-==23899==    by 0x162E0D: pincode_cb (device.c:2135)
-==23899==    by 0x15AD55: pincode_reply (agent.c:416)
-==23899==    by 0x49467E0: ??? (in /lib/libdbus-1.so.3.5.2)
-==23899==    by 0x4934975: ??? (in /lib/libdbus-1.so.3.5.2)
-==23899==    by 0x4937B81: dbus_connection_dispatch (in /lib/libdbus-1.so.3.5.2)
-==23899==
-==23899== Conditional jump or move depends on uninitialised value(s)
-==23899==    at 0x49CD893: _itoa_word (_itoa.c:196)
-==23899==    by 0x49D1109: vfprintf (vfprintf.c:1613)
-==23899==    by 0x4A7506C: __vsprintf_chk (vsprintf_chk.c:86)
-==23899==    by 0x4A74FAC: __sprintf_chk (sprintf_chk.c:33)
-==23899==    by 0x4830E08: ba2str (stdio2.h:34)
-==23899==    by 0x1496B3: set_pin_length (security.c:514)
-==23899==    by 0x168399: pincode_cb (dbus-hci.c:179)
-==23899==    by 0x162E0D: pincode_cb (device.c:2135)
-==23899==    by 0x15AD55: pincode_reply (agent.c:416)
-==23899==    by 0x49467E0: ??? (in /lib/libdbus-1.so.3.5.2)
-==23899==    by 0x4934975: ??? (in /lib/libdbus-1.so.3.5.2)
-==23899==    by 0x4937B81: dbus_connection_dispatch (in /lib/libdbus-1.so.3.5.2)
----
- src/dbus-hci.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+in general every Bluetooth 1.2 dongle and later should support Inquiry
+with RSSI. I still have to come across a 2.1 dongle that doesn't.
 
-diff --git a/src/dbus-hci.c b/src/dbus-hci.c
-index b93dbcd..7309883 100644
---- a/src/dbus-hci.c
-+++ b/src/dbus-hci.c
-@@ -167,6 +167,7 @@ static void pincode_cb(struct agent *agent, DBusError *derr,
- 	bdaddr_t sba, dba;
- 	int err;
- 
-+	adapter_get_address(adapter, &sba);
- 	device_get_address(device, &dba);
- 
- 	err = btd_adapter_pincode_reply(adapter, &dba, derr ? NULL : pincode);
--- 
-1.7.1
+Regards
+
+Marcel
+
 
