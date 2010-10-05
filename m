@@ -1,55 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4CAAEB19.5090907@Atheros.com>
-Date: Tue, 5 Oct 2010 14:38:41 +0530
-From: Suraj Sumangala <suraj@Atheros.com>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Suraj Sumangala <Suraj.Sumangala@Atheros.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>
-Subject: Re: Sim Access profile server implementation
-References: <1285657515.12097.7.camel@atheros013-desktop> <1286265730.17473.29.camel@aeonflux>
-In-Reply-To: <1286265730.17473.29.camel@aeonflux>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Subject: Re: [PATCH 6/6] This patch adds support for using the ST-Ericsson
+ CG2900
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Par-Gunnar Hjalmdahl <pghatwork@gmail.com>
+Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linus.walleij@stericsson.com, Pavan Savoy <pavan_savoy@sify.com>
+In-Reply-To: <AANLkTimdAxaF2gyXXXgYtjQ5+3eXuTpnpQ5n2KFtDwth@mail.gmail.com>
+References: <AANLkTimOai9_92VuJUZMo26es9Wsu_6d+z36Sv_Q4i+L@mail.gmail.com>
+	 <20100927164502.GB30310@vigoh>
+	 <AANLkTimdAxaF2gyXXXgYtjQ5+3eXuTpnpQ5n2KFtDwth@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Tue, 05 Oct 2010 10:27:50 +0200
+Message-ID: <1286267270.17473.36.camel@aeonflux>
+Mime-Version: 1.0
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Par-Gunnar,
 
-On 10/5/2010 1:32 PM, Marcel Holtmann wrote:
-> Hi Suraj,
->
->> Please find the Git tree for the Sim access profile server role
->> implementation I have been working on at
->>
->> git://gitorious.org/sap-server/sap-server.git
->>
->> Not sure it could be directly used with Bluez. Nevertheless, it has the
->> parser implementation of Bluetooth SAP packet. Someone could possibly
->> reuse it in their implementation.
->
-> have you actually tested this with real SAP server capable hardware? I
-> am still not convinced at all to push APDU over D-Bus. First, there is
-> potential security issue here and second the latency that D-Bus
-> introduces seems not be acceptable. So what I am getting it, can this be
-> actually used in a product that seriously wants to support SAP server?
+> > * Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com> [2010-09-24 15:52:16 +0200]:
+> >
+> >> This patch adds support for using the ST-Ericsson CG2900
+> >>  connectivity controller as a driver for the BlueZ Bluetooth
+> >>  stack.
+> >>  This patch registers as a driver into the BlueZ framework and, when
+> >>  opened by BlueZ, it registers as user for bt_cmd, bt_acl, and bt_evt
+> >>  channels.
+> >
+> > First of all your your commit message and subject should be improved.
+> > The subject should bee something like:
+> >
+> > "Bluetooth: Add support for ST-Ericsson CG2900"
+> >
+> > and in the commit message you explain the details of the patch.
+> > And normally we do not use the BlueZ word in kernelspace.
+> >
+> 
+> OK. This is the first patch I've created within the community and of
+> course there are bound to be errors... ;-)
+> Since it was part of a big patch delivery I used quite similar names
+> across the different patches and I understand that this is an error
+> since the different patches are targeting different communities.
+> 
+> >>
+> >> Signed-off-by: Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
+> >> ---
+> >>  drivers/bluetooth/Kconfig      |    7 +
+> >>  drivers/bluetooth/Makefile     |    2 +
+> >>  drivers/bluetooth/cg2900_hci.c |  896 ++++++++++++++++++++++++++++++++++++++++
+> >>  3 files changed, 905 insertions(+), 0 deletions(-)
+> >>  create mode 100644 drivers/bluetooth/cg2900_hci.c
+> >
+> > Your patch looks a way complicated to a UART driver. Look at the others
+> > drivers at drivers/bluetooth/ and see how we implemented other UART
+> > drivers.
+> >
+> 
+> Well, mainly that's because it is not a UART driver. It is a driver
+> against CG2900 which currently have only UART as transport but quite
+> soon will get SPI as transport as well. For this Bluetooth driver the
+> actual physical transport used is not known. It just knows it has a
+> reliable transport below which delivers complete Bluetooth packets.
 
-No, This was tested with a dummy Agent and PTS. I am yet to get hold of 
-a hardware.
+inside the Bluetooth driver please just use BT_DBG. That is hooked up
+into dynamic_debug feature of the kernel and you can do whatever you
+need for debugging.
 
-The reason for sharing the source code was because any later SAP server 
-implementation can re-use the SAP packet parser implementation I have 
-already done.
-
-I think we should be able to change the interface later depending on the 
-actual hardware/system requirement. But, I believe the internal 
-implementation could stay the same.
-
->
-> Regards
->
-> Marcel
->
->
+I will not accept huge debug frameworks in the Bluetooth subsystem. Use
+what the kernel offers you. You selective control based on every single
+debug statement. It doesn't get better than that.
 
 Regards
-Suraj
+
+Marcel
+
+
