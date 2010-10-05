@@ -1,48 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: New Broadcom chip in W510
+Subject: Re: [PATCH 1/2] Bluetooth: hci open callback for hci UART
+ transport driver
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Lu Ran <hephooey@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <201009190926.51131.hephooey@gmail.com>
-References: <201009190926.51131.hephooey@gmail.com>
+To: Suraj Sumangala <suraj@atheros.com>
+Cc: linux-bluetooth@vger.kernel.org, Jothikumar.Mothilal@Atheros.com
+In-Reply-To: <1285075981-8941-1-git-send-email-suraj@atheros.com>
+References: <1285075981-8941-1-git-send-email-suraj@atheros.com>
 Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 05 Oct 2010 11:30:48 +0200
-Message-ID: <1286271048.17473.66.camel@aeonflux>
+Date: Tue, 05 Oct 2010 11:27:19 +0200
+Message-ID: <1286270839.17473.65.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lu,
+Hi Suraj,
 
-> I am having trouble to make my headset work in my new W510, it works fine in an 
-> T61, with has almost identical software and setup with the new W510. The only 
-> difference is I am now using a pure 64 bit system, while the old T61 is a 32 
-> bit one, and the bluetooth chip is different. the id of the chip in T61 is 
-> 0A5C:2110, while W510 has a chip from Broadcom with id 0A5C:217F. I noticed 
-> there is a SCO fix for 0A5C:2110 in btusb.c. I tried to copy the line and 
-> change the id to 0A5C:217F, but nothing changes. The headset can pair with the 
-> laptop with no problem, but there seems to be no data transmition. And I get a 
-> lot error messages in dmesg output like this:
+> This patch provides option for hci transport driver protocol implementation
+> to have a callback for hci open.
 > 
-> btusb_submit_isoc_urb: hci0 urb ffff880060136e00 submission failed (28)
+> Signed-off-by: Suraj Sumangala <suraj@atheros.com>
+> ---
+>  drivers/bluetooth/hci_ldisc.c |    5 ++++-
+>  drivers/bluetooth/hci_uart.h  |    1 +
+>  2 files changed, 5 insertions(+), 1 deletions(-)
 > 
-> and
-> 
-> btusb_send_frame: hci0 urb ffff8801320e1a00 submission failed
-> 
-> the output of "hciconfig hci0 version" is
-> 
-> hci0:   Type: BR/EDR  Bus: USB
->         BD Address: 70:F3:95:34:2F:29  ACL MTU: 1021:8  SCO MTU: 64:8
->         HCI Version: 2.1 (0x4)  Revision: 0x168
->         LMP Version: 2.1 (0x4)  Subversion: 0x4203
->         Manufacturer: Broadcom Corporation (15)
-> 
-> And the output of "lsusb -v" is in the attachment. I will try to provide any 
-> other information you need to analyse the problem.
+> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+> index 998833d..5e02501 100644
+> --- a/drivers/bluetooth/hci_ldisc.c
+> +++ b/drivers/bluetooth/hci_ldisc.c
+> @@ -162,9 +162,12 @@ restart:
+>  /* Initialize device */
+>  static int hci_uart_open(struct hci_dev *hdev)
+>  {
+> +	struct hci_uart *hu  = (struct hci_uart *) hdev->driver_data;
+> +
+>  	BT_DBG("%s %p", hdev->name, hdev);
+>  
+> -	/* Nothing to do for UART driver */
+> +	if (hu->proto->hci_open)
+> +		hu->proto->hci_open(hu);
+>  
+>  	set_bit(HCI_RUNNING, &hdev->flags);
+>  
+> diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+> index 99fb352..d0198ec 100644
+> --- a/drivers/bluetooth/hci_uart.h
+> +++ b/drivers/bluetooth/hci_uart.h
+> @@ -51,6 +51,7 @@ struct hci_uart;
+>  struct hci_uart_proto {
+>  	unsigned int id;
+>  	int (*open)(struct hci_uart *hu);
+> +	int (*hci_open)(struct hci_uart *hu);
+>  	int (*close)(struct hci_uart *hu);
+>  	int (*flush)(struct hci_uart *hu);
+>  	int (*recv)(struct hci_uart *hu, void *data, int len);
 
-can you show me the content of /proc/bus/usb/devices (or usbdevices.sh)
-for that device.
+I don't like this. It is not what any other driver is doing. For me this
+is just hacking around something that would need to be solved for all
+Bluetooth transport drivers. Just trying to solve this for UART based
+drivers is not going to help.
+
+So we talked about adding a setup stage to the HCI driver interface.
+That is the way you should proceed if doing this in hciattach is not
+enough for you.
 
 Regards
 
