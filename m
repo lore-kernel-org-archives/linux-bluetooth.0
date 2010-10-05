@@ -1,66 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Suraj Sumangala <suraj@atheros.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <Jothikumar.Mothilal@Atheros.com>,
-	Suraj Sumangala <suraj@atheros.com>
-Subject: [PATCH] Bluetooth: Support for new firmware for ath3k USB Bluetooth device
-Date: Tue, 5 Oct 2010 11:47:16 +0530
-Message-ID: <1286259436-25424-1-git-send-email-suraj@atheros.com>
+From: Chetankumar Manjegowda <Chetankumar_Manjegowda@mindtree.com>
+To: Arun Kumar <arunkat@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: How add support of LLMNR for PAN
+Date: Tue, 5 Oct 2010 04:47:09 +0000
+Message-ID: <52A922E83075C847A59D7DF98C660175018842@MTW02MBX03.mindtree.com>
+References: <20100920184943.GA22968@jh-x301>
+	<1286027890.12944.1.camel@localhost.localdomain>
+	<AANLkTikFrvyeoXV0uLYcvD4GCj2s3ML2-q8f5GhXMxAK@mail.gmail.com>
+	<1286187946.7898.0.camel@localhost.localdomain>
+	<20101004123552.GC11737@pengutronix.de>
+	<52A922E83075C847A59D7DF98C66017501871E@MTW02MBX03.mindtree.com>
+ <AANLkTimguxTRuPB2Dgqm4w5k-MeOxDdCYDn-T_UvOFRL@mail.gmail.com>
+In-Reply-To: <AANLkTimguxTRuPB2Dgqm4w5k-MeOxDdCYDn-T_UvOFRL@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch add support for new ath3k USB Bluetooth device firmare.
-The firmware implements shared antenna support and
-fixes few critical bugs.
-
-Signed-off-by: Suraj Sumangala <suraj@atheros.com>
----
- drivers/bluetooth/ath3k.c |   16 +++++++++++++++-
- 1 files changed, 15 insertions(+), 1 deletions(-)
-
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 128cae4..eb79a8f 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -103,6 +103,9 @@ error:
- 	return err;
- }
- 
-+#define FW_COUNT	2
-+#define FW_PREFIX	"ath3k-"
-+#define MAXPATHLEN	30
- static int ath3k_probe(struct usb_interface *intf,
- 			const struct usb_device_id *id)
- {
-@@ -110,6 +113,8 @@ static int ath3k_probe(struct usb_interface *intf,
- 	struct usb_device *udev = interface_to_usbdev(intf);
- 	struct ath3k_data *data;
- 	int size;
-+	int i;
-+	char fw_file[MAXPATHLEN];
- 
- 	BT_DBG("intf %p id %p", intf, id);
- 
-@@ -122,7 +127,16 @@ static int ath3k_probe(struct usb_interface *intf,
- 
- 	data->udev = udev;
- 
--	if (request_firmware(&firmware, "ath3k-1.fw", &udev->dev) < 0) {
-+	for (i = FW_COUNT; i > 0; i--) {
-+		snprintf(fw_file, MAXPATHLEN - 1, "%s%d.fw", FW_PREFIX, i);
-+
-+		if (request_firmware(&firmware, fw_file,
-+						&udev->dev) >= 0)
-+			break;
-+
-+	}
-+
-+	if (!i) {
- 		kfree(data);
- 		return -EIO;
- 	}
--- 
-1.7.0.4
-
+SGkgQXJ1biwNClRoYW5rcyBmb3IgeW91ciByZXBseS4NCg0KSSBhbSBuZXcgdG8gbmV0d29ya2lu
+ZyBJIGFtIG5vdCBzdXJlIGFib3V0IHRoYXQuDQoNCkkgd2FudCB0byBzZW5kIExMTU5SIHF1ZXJ5
+IHNvIGkgYW0gcGxhbm5pbmcgdG8gdXNlIGF2YWhpLTAuNi4yNyhhdmFoaS1hdXRvaXBkKSBpcyB0
+aGlzIGlzIGZpbmUgb3IgYW55IG90aGVyIGlzIGF2YWlsYWJsZSA/DQoNClJnZHMNCkNoZXRhbg0K
+DQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBBcnVuIEt1bWFyIFttYWlsdG86
+YXJ1bmthdEBnbWFpbC5jb21dIA0KU2VudDogTW9uZGF5LCBPY3RvYmVyIDA0LCAyMDEwIDk6MDYg
+UE0NClRvOiBDaGV0YW5rdW1hciBNYW5qZWdvd2RhDQpDYzogbGludXgtYmx1ZXRvb3RoQHZnZXIu
+a2VybmVsLm9yZw0KU3ViamVjdDogUmU6IEhvdyBhZGQgc3VwcG9ydCBvZiBMTE1OUiBmb3IgUEFO
+DQoNClNob3VsZG4ndCB0aGlzIHN1cHBvcnQgY29tZSBmcm9tIGxpbnV4IGlwIHN0YWNrIHJhdGhl
+ciB0aGFuIGJsdWV6Pw0KDQoNCkJlc3QgUmVnYXJkcywNCkFydW4gS3VtYXIgU2luZ2gNCnd3dy5j
+cmF6eWRha3MuY29tDQoNCg0KT24gTW9uLCBPY3QgNCwgMjAxMCBhdCA2OjE1IFBNLCBDaGV0YW5r
+dW1hciBNYW5qZWdvd2RhDQo8Q2hldGFua3VtYXJfTWFuamVnb3dkYUBtaW5kdHJlZS5jb20+IHdy
+b3RlOg0KPg0KPiBIaSBBbGwsDQo+DQo+IEkgd2FudCB0byBrbm93IGhvdyB0byBlbmFibGUvSW50
+ZWdyYXRlIExMTU5SIGZvciBQQU4gcHJvZmlsZS4NCj4NCj4gQ2FuIGFueW9uZSBnaXZlIHNvbWUg
+c3VnZ2VzdGlvbnMgb3IgbGluayB3aGVyZSBJIGNhbiByZWZlciB0aGUgc2FtZSA/Pw0KPg0KPiBS
+Z2RzDQo+IENoZXRhbg0KPg0KPiBfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXw0KPg0K
+PiBodHRwOi8vd3d3Lm1pbmR0cmVlLmNvbS9lbWFpbC9kaXNjbGFpbWVyLmh0bWwNCj4gLS0NCj4g
+VG8gdW5zdWJzY3JpYmUgZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVuc3Vic2NyaWJl
+IGxpbnV4LWJsdWV0b290aCIgaW4NCj4gdGhlIGJvZHkgb2YgYSBtZXNzYWdlIHRvIG1ham9yZG9t
+b0B2Z2VyLmtlcm5lbC5vcmcNCj4gTW9yZSBtYWpvcmRvbW8gaW5mbyBhdCDCoGh0dHA6Ly92Z2Vy
+Lmtlcm5lbC5vcmcvbWFqb3Jkb21vLWluZm8uaHRtbA0KDQoNCg0KLS0NCg==
