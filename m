@@ -1,30 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCHv1 0/5] Bluetooth: experimental support for pm_limits
+Subject: Re: [PATCH] Added firmware load patch to crap directory.
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1285937230-547-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1285937230-547-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Bala Shanmugam <sbalashanmugam@atheros.com>
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+In-Reply-To: <1286118002-2354-1-git-send-email-sbalashanmugam@atheros.com>
+References: <1286118002-2354-1-git-send-email-sbalashanmugam@atheros.com>
 Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 05 Oct 2010 09:49:42 +0200
-Message-ID: <1286264982.17473.22.camel@aeonflux>
+Date: Tue, 05 Oct 2010 09:46:43 +0200
+Message-ID: <1286264803.17473.21.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Bala,
 
-> First version of using power constraints interface to achieve
-> maximum bluetooth transfer speed. Otherwise HW goes to idle mode
-> and speed decreases 3 times.
+> This patch in crap directory enables btusb to load firmware 
+> to device RAM when it is plugged in.
+>  Signed-off-by: Bala Shanmugam <sbalashanmugam@atheros.com>
+> ---
+>  crap/0003-btusb-Add-fw-load-support.patch |  424 +++++++++++++++++++++++++++++
+>  1 files changed, 424 insertions(+), 0 deletions(-)
+>  create mode 100644 crap/0003-btusb-Add-fw-load-support.patch
 > 
-> Use empirical power management analyzer (TM) to define amount
-> of time device set high power constraints for.
-> 
-> May include hacks :-)
+> diff --git a/crap/0003-btusb-Add-fw-load-support.patch b/crap/0003-btusb-Add-fw-load-support.patch
+> new file mode 100644
+> index 0000000..6642d6b
+> --- /dev/null
+> +++ b/crap/0003-btusb-Add-fw-load-support.patch
+> @@ -0,0 +1,424 @@
+> +Reason for not yet publishing: Marcel feels that Atheros sflash based BT device
+> +doesn't follow bluetooth H:2 specification and HCI commands should be supported
+> +in firmware if it is detected as bluetooth device. Using HCI command, firmware
+> +should be loaded.
+> +
+> +In sflash based device there is not enough memory to support HCI commands in firmware.
+> +So load firmware from btusb when the device comes up.
 
-please send these as [RFC] and not as [PATCH] if they are meant for
-review.
+and why are you just not fixing this properly. You can have a custom
+firmware loader with a different product ID. Load the firmware and then
+on reset it brings it up with proper Bluetooth USB class identifiers.
+
+Nothing demands that the firmware loading happens via HCI. You can
+invent your own protocol easily. See bcm203x firmware loader driver that
+has been around since the beginning of Bluetooth.
 
 Regards
 
