@@ -1,60 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: Support for new firmware for ath3k USB
- Bluetooth device
-From: Marcel Holtmann <marcel@holtmann.org>
-To: David Vrabel <david.vrabel@csr.com>
-Cc: Suraj Sumangala <suraj@atheros.com>,
-	linux-bluetooth@vger.kernel.org, Jothikumar.Mothilal@atheros.com
-In-Reply-To: <4CAACD5A.8040304@csr.com>
-References: <1286259436-25424-1-git-send-email-suraj@atheros.com>
-	 <4CAACD5A.8040304@csr.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 05 Oct 2010 09:38:55 +0200
-Message-ID: <1286264335.17473.18.camel@aeonflux>
-Mime-Version: 1.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Fix use of uninitialised variable on legacy pairing
+Date: Tue,  5 Oct 2010 10:40:25 +0300
+Message-Id: <1286264425-24281-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-> > This patch add support for new ath3k USB Bluetooth device firmare.
-> > The firmware implements shared antenna support and
-> > fixes few critical bugs.
-> [...]
-> >  static int ath3k_probe(struct usb_interface *intf,
-> >  			const struct usb_device_id *id)
-> >  {
-> > @@ -110,6 +113,8 @@ static int ath3k_probe(struct usb_interface *intf,
-> >  	struct usb_device *udev = interface_to_usbdev(intf);
-> >  	struct ath3k_data *data;
-> >  	int size;
-> > +	int i;
-> > +	char fw_file[MAXPATHLEN]
-> 
-> Suggest FW_PATH_LEN here to avoid confusion as most people would expect
-> MAXPATHLEN to be enormous.
-> 
-> >  	BT_DBG("intf %p id %p", intf, id);
-> >  
-> > @@ -122,7 +127,16 @@ static int ath3k_probe(struct usb_interface *intf,
-> >  
-> >  	data->udev = udev;
-> >  
-> > -	if (request_firmware(&firmware, "ath3k-1.fw", &udev->dev) < 0) {
-> 
-> Why not request ath3k-1.fw (for backward compatibility) and ath3k.fw and
-> symlink this name to ath3k-2.fw or any future version of firmware?
-> 
-> I think users should be able to update firmware without a kernel update
-> where possible.
+Regression caused by e7daece858070d71cecf6ade4f0e3c93272c53ac:
 
-yes, it is mandatory to support at least the last two firmware version.
-Just forcing a firmware update with a new kernel is not going to work.
+==23899== Use of uninitialised value of size 4
+==23899==    at 0x49CD888: _itoa_word (_itoa.c:196)
+==23899==    by 0x49D1109: vfprintf (vfprintf.c:1613)
+==23899==    by 0x4A7506C: __vsprintf_chk (vsprintf_chk.c:86)
+==23899==    by 0x4A74FAC: __sprintf_chk (sprintf_chk.c:33)
+==23899==    by 0x4830E08: ba2str (stdio2.h:34)
+==23899==    by 0x1496B3: set_pin_length (security.c:514)
+==23899==    by 0x168399: pincode_cb (dbus-hci.c:179)
+==23899==    by 0x162E0D: pincode_cb (device.c:2135)
+==23899==    by 0x15AD55: pincode_reply (agent.c:416)
+==23899==    by 0x49467E0: ??? (in /lib/libdbus-1.so.3.5.2)
+==23899==    by 0x4934975: ??? (in /lib/libdbus-1.so.3.5.2)
+==23899==    by 0x4937B81: dbus_connection_dispatch (in /lib/libdbus-1.so.3.5.2)
+==23899==
+==23899== Conditional jump or move depends on uninitialised value(s)
+==23899==    at 0x49CD893: _itoa_word (_itoa.c:196)
+==23899==    by 0x49D1109: vfprintf (vfprintf.c:1613)
+==23899==    by 0x4A7506C: __vsprintf_chk (vsprintf_chk.c:86)
+==23899==    by 0x4A74FAC: __sprintf_chk (sprintf_chk.c:33)
+==23899==    by 0x4830E08: ba2str (stdio2.h:34)
+==23899==    by 0x1496B3: set_pin_length (security.c:514)
+==23899==    by 0x168399: pincode_cb (dbus-hci.c:179)
+==23899==    by 0x162E0D: pincode_cb (device.c:2135)
+==23899==    by 0x15AD55: pincode_reply (agent.c:416)
+==23899==    by 0x49467E0: ??? (in /lib/libdbus-1.so.3.5.2)
+==23899==    by 0x4934975: ??? (in /lib/libdbus-1.so.3.5.2)
+==23899==    by 0x4937B81: dbus_connection_dispatch (in /lib/libdbus-1.so.3.5.2)
+---
+ src/dbus-hci.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-So NAK on this patch.
-
-Regards
-
-Marcel
-
+diff --git a/src/dbus-hci.c b/src/dbus-hci.c
+index b93dbcd..7309883 100644
+--- a/src/dbus-hci.c
++++ b/src/dbus-hci.c
+@@ -167,6 +167,7 @@ static void pincode_cb(struct agent *agent, DBusError *derr,
+ 	bdaddr_t sba, dba;
+ 	int err;
+ 
++	adapter_get_address(adapter, &sba);
+ 	device_get_address(device, &dba);
+ 
+ 	err = btd_adapter_pincode_reply(adapter, &dba, derr ? NULL : pincode);
+-- 
+1.7.1
 
