@@ -1,75 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 6/6] This patch adds support for using the ST-Ericsson
- CG2900
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Par-Gunnar Hjalmdahl <pghatwork@gmail.com>
-Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linus.walleij@stericsson.com, Pavan Savoy <pavan_savoy@sify.com>
-In-Reply-To: <AANLkTimdAxaF2gyXXXgYtjQ5+3eXuTpnpQ5n2KFtDwth@mail.gmail.com>
-References: <AANLkTimOai9_92VuJUZMo26es9Wsu_6d+z36Sv_Q4i+L@mail.gmail.com>
-	 <20100927164502.GB30310@vigoh>
-	 <AANLkTimdAxaF2gyXXXgYtjQ5+3eXuTpnpQ5n2KFtDwth@mail.gmail.com>
+Subject: Re: RFC: btusb firmware load help
+From: Marcel Holtmann <holtmann@linux.intel.com>
+To: "Luis R. Rodriguez" <lrodriguez@atheros.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+	Deepak Dhamdhere <Deepak.Dhamdhere@Atheros.com>,
+	Sree Durbha <Sree.Durbha@Atheros.com>
+In-Reply-To: <20100924230730.GB6566@tux>
+References: <20100924230730.GB6566@tux>
 Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 05 Oct 2010 10:27:50 +0200
-Message-ID: <1286267270.17473.36.camel@aeonflux>
+Date: Tue, 05 Oct 2010 10:23:01 +0200
+Message-ID: <1286266981.17473.33.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Par-Gunnar,
+Hi Luis,
 
-> > * Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com> [2010-09-24 15:52:16 +0200]:
-> >
-> >> This patch adds support for using the ST-Ericsson CG2900
-> >>  connectivity controller as a driver for the BlueZ Bluetooth
-> >>  stack.
-> >>  This patch registers as a driver into the BlueZ framework and, when
-> >>  opened by BlueZ, it registers as user for bt_cmd, bt_acl, and bt_evt
-> >>  channels.
-> >
-> > First of all your your commit message and subject should be improved.
-> > The subject should bee something like:
-> >
-> > "Bluetooth: Add support for ST-Ericsson CG2900"
-> >
-> > and in the commit message you explain the details of the patch.
-> > And normally we do not use the BlueZ word in kernelspace.
-> >
+> Marcel, I was just poked about this thread:
 > 
-> OK. This is the first patch I've created within the community and of
-> course there are bound to be errors... ;-)
-> Since it was part of a big patch delivery I used quite similar names
-> across the different patches and I understand that this is an error
-> since the different patches are targeting different communities.
+> http://www.spinics.net/lists/linux-bluetooth/msg06087.html
 > 
-> >>
-> >> Signed-off-by: Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
-> >> ---
-> >>  drivers/bluetooth/Kconfig      |    7 +
-> >>  drivers/bluetooth/Makefile     |    2 +
-> >>  drivers/bluetooth/cg2900_hci.c |  896 ++++++++++++++++++++++++++++++++++++++++
-> >>  3 files changed, 905 insertions(+), 0 deletions(-)
-> >>  create mode 100644 drivers/bluetooth/cg2900_hci.c
-> >
-> > Your patch looks a way complicated to a UART driver. Look at the others
-> > drivers at drivers/bluetooth/ and see how we implemented other UART
-> > drivers.
-> >
-> 
-> Well, mainly that's because it is not a UART driver. It is a driver
-> against CG2900 which currently have only UART as transport but quite
-> soon will get SPI as transport as well. For this Bluetooth driver the
-> actual physical transport used is not known. It just knows it has a
-> reliable transport below which delivers complete Bluetooth packets.
+> The hack is required because our BT hardware does not accept HCI commands
+> when the device is plugged in. If I understood your position you did not
+> want to accept the patch because our BT USB devices are violating the
+> specification by not acceping HCI commands and yet claiming to be BT
+> devices, is that right?
 
-inside the Bluetooth driver please just use BT_DBG. That is hooked up
-into dynamic_debug feature of the kernel and you can do whatever you
-need for debugging.
+you don't have to accept HCI commands when your device has no firmware
+loaded. That is just fine. However at that point you should not claim to
+be a Bluetooth H:2 device with USB Bluetooth descriptors.
 
-I will not accept huge debug frameworks in the Bluetooth subsystem. Use
-what the kernel offers you. You selective control based on every single
-debug statement. It doesn't get better than that.
+Just having different USB PIDs for without firmware and with firmware
+stages would have been fine. The ancient Broadcom 203x devices even got
+that part right.
+
+So what about sticking with the current VID:PID for the device without
+firmware and we blacklist it in btusb driver. And then the firmware
+loading ensures that after reset it uses a different PID for the device
+with valid HCI firmware.
 
 Regards
 
