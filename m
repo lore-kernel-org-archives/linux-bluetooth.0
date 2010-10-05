@@ -1,46 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: clean up rfcomm code
+Subject: Re: [PATCH] Added firmware load patch to crap directory. This
+ patch loads firmware from btusb when device is plugged in.
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1285923911-12902-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1285923911-12902-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: "Luis R. Rodriguez" <mcgrof@gmail.com>
+Cc: Bala Shanmugam <sbalashanmugam@atheros.com>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+In-Reply-To: <AANLkTinjiJ6FyoAi4aP=8pr9EwV0wpV7LtwQx-hwaOFs@mail.gmail.com>
+References: <1285931572-3592-1-git-send-email-sbalashanmugam@atheros.com>
+	 <AANLkTinjiJ6FyoAi4aP=8pr9EwV0wpV7LtwQx-hwaOFs@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 05 Oct 2010 09:53:56 +0200
-Message-ID: <1286265236.17473.26.camel@aeonflux>
+Date: Tue, 05 Oct 2010 09:52:35 +0200
+Message-ID: <1286265155.17473.25.camel@aeonflux>
 Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Luis,
 
-> Remove dead code and unused rfcomm thread events
+> > Marcel feels that Atheros sflash based BT device
+> > +doesn't follow bluetooth H:2 specification and HCI commands should be supported
+> > +in firmware if it is detected as bluetooth device. Using HCI command, firmware
+> > +should be loaded.
+> > +
+> > +In sfash based device we don't have enough memory to support HCI commands in firmware.
+> > +So load firmware from btusb when the device comes up.
+> > +
 > 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
-> ---
->  include/net/bluetooth/rfcomm.h |    5 -----
->  net/bluetooth/rfcomm/core.c    |   29 ++++++++++++++---------------
->  2 files changed, 14 insertions(+), 20 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/rfcomm.h b/include/net/bluetooth/rfcomm.h
-> index a140847..71047bc 100644
-> --- a/include/net/bluetooth/rfcomm.h
-> +++ b/include/net/bluetooth/rfcomm.h
-> @@ -213,11 +213,6 @@ struct rfcomm_dlc {
->  #define RFCOMM_DEFER_SETUP  8
->  
->  /* Scheduling flags and events */
-> -#define RFCOMM_SCHED_STATE  0
-> -#define RFCOMM_SCHED_RX     1
-> -#define RFCOMM_SCHED_TX     2
-> -#define RFCOMM_SCHED_TIMEO  3
-> -#define RFCOMM_SCHED_AUTH   4
->  #define RFCOMM_SCHED_WAKEUP 31
+> You should still ask the maintainer for an alternative, otherwise the
+> device unusable. Did you submit the patch first in [PATCH] form? If
+> not please submit the patch, all I saw as an RFC and no followup at
+> all.
 
-we had some big ambition to use these, but never did in the end or
-realized that they are not needed. So I am fine with removing these.
+I think it is pretty clear how these devices should be designed when it
+comes to firmware loading. Just having different USB PIDs for firmware
+loading stage and fully functional Bluetooth device stage is not that
+hard to do. Other companies have done this.
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+If you device claims Bluetooth USB class descriptors, then it should
+behave like that and offer HCI protocol running on it.
 
 Regards
 
