@@ -1,51 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4CAC6E61.20708@Atheros.com>
-Date: Wed, 6 Oct 2010 18:11:05 +0530
-From: Suraj Sumangala <suraj@Atheros.com>
 MIME-Version: 1.0
-To: "Waldemar.Rymarkiewicz@tieto.com" <Waldemar.Rymarkiewicz@tieto.com>
-CC: Suraj Sumangala <Suraj.Sumangala@Atheros.com>, "marcel@holtmann.org"
-	<marcel@holtmann.org>, "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>, Jothikumar Mothilal
-	<Jothikumar.Mothilal@Atheros.com>, "joakim.xj.ceder@stericsson.com"
-	<joakim.xj.ceder@stericsson.com>, "arunkr.singh@stericsson.com"
-	<arunkr.singh@stericsson.com>
-Subject: Re: Sim Access profile server implementation
-References: <1285657515.12097.7.camel@atheros013-desktop>	 <1286265730.17473.29.camel@aeonflux>	 <99B09243E1A5DA4898CDD8B700111448097D01B371@EXMB04.eu.tieto.com> <1286280767.17473.89.camel@aeonflux> <99B09243E1A5DA4898CDD8B700111448097D01B6CF@EXMB04.eu.tieto.com> <99B09243E1A5DA4898CDD8B700111448097D01B814@EXMB04.eu.tieto.com> <4A2A3D7B.60701@Atheros.com> <99B09243E1A5DA4898CDD8B700111448097D01B868@EXMB04.eu.tieto.com>
-In-Reply-To: <99B09243E1A5DA4898CDD8B700111448097D01B868@EXMB04.eu.tieto.com>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+In-Reply-To: <20101006095919.GA3066@jh-x301>
+References: <AANLkTikqpge1KU4w4aQhtxz21097iQjWTKekdgg_+JeX@mail.gmail.com>
+	<20101006095919.GA3066@jh-x301>
+Date: Wed, 6 Oct 2010 13:53:11 +0200
+Message-ID: <AANLkTim1Aa3t5OtPP6CUCGP4WWEPf36M6BsKuL5e6Qwr@mail.gmail.com>
+Subject: Re: SCO Socket input.
+From: Pepe Aracil <pepe.aracil.gomez@gmail.com>
+To: Pepe Aracil <pepe.aracil.gomez@gmail.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Waldek,
+Hi.
 
-On 10/6/2010 3:43 PM, Waldemar.Rymarkiewicz@tieto.com wrote:
-> Hi suraj,
->
->> Which part of this is the driver and which is the agent here?
->
-> sap-ste.c is a driver for u8500 platform. The agent is not involved in this design.
->
->> If I am not mistaken, you are sending the responses directly
->>from code here, how can we extend this to another
->> hardware/agent without source code change?
->
-> You are right. You can add a new driver that implements interfaces in sap.h then configure with ./configure --enable-sap=yes --with-sap=DRIVER
-> You don't have to modify the code, but you have to rebuild with your driver. Usually, there will be one driver per platform so it shoudl not be a problem.
->
->> I don't see D-bus being used other than for set/get property.
->
-> We use D-bus only for enable/disable sap server. Data flow to sim is done over unix sockets (for u8500) as I have doubts to dbus reliability. However, it's good option to do tests with dbus oriented design as discussed before.
+I test DisablePlugins=audio with the same result :(.
 
-So basically your implementation does not use d-bus for basic SAP 
-operations and the SIM access driver is compiled as part of bluetoothd 
-right?
+SCO input connection only works in this order:
+  1 - application turns UP hci0 interface.
+  1 - application opens SCO socket for listen.
+  2 - application launch bluetoothd.
+  3 - application open rfcomm to AG profile on mobile phone.
+       (I can't open rfcomm connection without bluetoothd because pin
+and key exchange issues)
+If my application opens SCO socket for listen after the launch of
+bluetoothd, SCO socket never gets an incoming connection.
 
+Thanks.
+
+
+2010/10/6 Johan Hedberg <johan.hedberg@gmail.com>:
+> Hi,
 >
->> Correct me if my understanding is wrong.
+> On Wed, Oct 06, 2010, Pepe Aracil wrote:
+>> I have compiled bluez without audio support to avoid SCO socket be
+>> blocked by bluetoothd. Without positive results.
 >>
+>> ¿Some idea?
 >
-> Regards,
-> /Waldek
-
-Regards
-Suraj
+> Just to be sure you could add DisablePlugins=audio to
+> /etc/bluetooth/main.conf.
+>
+> Johan
+>
