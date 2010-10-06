@@ -1,26 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 6 Oct 2010 11:59:19 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Pepe Aracil <pepe.aracil.gomez@gmail.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: SCO Socket input.
-Message-ID: <20101006095919.GA3066@jh-x301>
-References: <AANLkTikqpge1KU4w4aQhtxz21097iQjWTKekdgg_+JeX@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <AANLkTikqpge1KU4w4aQhtxz21097iQjWTKekdgg_+JeX@mail.gmail.com>
+Date: Wed, 6 Oct 2010 11:53:24 +0200
+Message-ID: <AANLkTikqpge1KU4w4aQhtxz21097iQjWTKekdgg_+JeX@mail.gmail.com>
+Subject: SCO Socket input.
+From: Pepe Aracil <pepe.aracil.gomez@gmail.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hello.
 
-On Wed, Oct 06, 2010, Pepe Aracil wrote:
-> I have compiled bluez without audio support to avoid SCO socket be
-> blocked by bluetoothd. Without positive results.
-> 
-> ¿Some idea?
+If I create SCO socket listening input connections it not works if
+bluetoothd is running but if I kill bluetoothd SCO input connections
+works fine.
 
-Just to be sure you could add DisablePlugins=audio to
-/etc/bluetooth/main.conf.
+I need bluetoothd running for (mobile rfcomm connection) keys exchange
+purposes but I must kill bluetoothd after rfcomm connection if i want
+SCO input socket connections works well.
 
-Johan
+I have compiled bluez without audio support to avoid SCO socket be
+blocked by bluetoothd. Without positive results.
+
+Â¿Some idea?
+
+Thanks
