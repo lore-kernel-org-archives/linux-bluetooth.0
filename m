@@ -1,25 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 6 Oct 2010 23:38:24 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] TODO: Add attribute permission verification for
- attribute server
-Message-ID: <20101006213824.GA21326@jh-x301>
-References: <1286397282-11921-1-git-send-email-claudio.takahasi@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1286397282-11921-1-git-send-email-claudio.takahasi@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: pavan-savoy@ti.com
+To: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        johan.hedberg@gmail.com
+Cc: greg@kroah.com, linux-kernel@vger.kernel.org,
+        Pavan Savoy <pavan_savoy@ti.com>
+Subject: [PATCH 2/2] drivers:bluetooth: Kconfig & Makefile for TI BT
+Date: Wed,  6 Oct 2010 18:34:53 -0400
+Message-Id: <1286404493-23816-3-git-send-email-pavan-savoy@ti.com>
+In-Reply-To: <1286404493-23816-2-git-send-email-pavan-savoy@ti.com>
+References: <1286404493-23816-1-git-send-email-pavan-savoy@ti.com>
+ <1286404493-23816-2-git-send-email-pavan-savoy@ti.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+From: Pavan Savoy <pavan_savoy@ti.com>
 
-On Wed, Oct 06, 2010, Claudio Takahasi wrote:
-> ---
->  TODO |    7 +++++++
->  1 files changed, 7 insertions(+), 0 deletions(-)
+Kconfig and Makefile modifications to enable the Bluetooth
+driver for Texas Instrument's WiLink 7 chipset.
 
-Pushed upstream. Thanks.
+Signed-off-by: Pavan Savoy <pavan_savoy@ti.com>
+---
+ drivers/bluetooth/Kconfig      |   11 +++++++++++
+ drivers/bluetooth/Makefile     |    1 +
+ drivers/staging/ti-st/Kconfig  |   14 --------------
+ drivers/staging/ti-st/Makefile |    5 -----
+ 4 files changed, 12 insertions(+), 19 deletions(-)
+ delete mode 100644 drivers/staging/ti-st/Kconfig
+ delete mode 100644 drivers/staging/ti-st/Makefile
 
-Johan
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index 02deef4..91a18b3 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -219,4 +219,15 @@ config BT_ATH3K
+ 	  Say Y here to compile support for "Atheros firmware download driver"
+ 	  into the kernel or say M to compile it as module (ath3k).
+ 
++config BT_TI
++	tristate "BlueZ bluetooth driver for TI ST"
++	depends on BT && RFKILL
++	select TI_ST
++	help
++	  This enables the Bluetooth driver for Texas Instrument's BT/FM/GPS
++	  combo devices. This makes use of shared transport line discipline
++	  core driver to communicate with the BT core of the combo chip.
++
++	  Say Y here to compile support for Texas Instrument's WiLink7 driver
++	  into the kernel or say M to compile it as module.
+ endmenu
+diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
+index 71bdf13..63156da 100644
+--- a/drivers/bluetooth/Makefile
++++ b/drivers/bluetooth/Makefile
+@@ -28,3 +28,4 @@ hci_uart-$(CONFIG_BT_HCIUART_BCSP)	+= hci_bcsp.o
+ hci_uart-$(CONFIG_BT_HCIUART_LL)	+= hci_ll.o
+ hci_uart-$(CONFIG_BT_HCIUART_ATH3K)	+= hci_ath.o
+ hci_uart-objs				:= $(hci_uart-y)
++obj-$(CONFIG_BT_TI)			:= bt_ti.o
+diff --git a/drivers/staging/ti-st/Kconfig b/drivers/staging/ti-st/Kconfig
+deleted file mode 100644
+index 074b8e8..0000000
+--- a/drivers/staging/ti-st/Kconfig
++++ /dev/null
+@@ -1,14 +0,0 @@
+-#
+-# TI's shared transport line discipline and the protocol
+-# drivers (BT, FM and GPS)
+-#
+-menu "Texas Instruments shared transport line discipline"
+-config ST_BT
+-	tristate "BlueZ bluetooth driver for ST"
+-	depends on BT && RFKILL
+-	select TI_ST
+-	help
+-	  This enables the Bluetooth driver for TI BT/FM/GPS combo devices.
+-	  This makes use of shared transport line discipline core driver to
+-	  communicate with the BT core of the combo chip.
+-endmenu
+diff --git a/drivers/staging/ti-st/Makefile b/drivers/staging/ti-st/Makefile
+deleted file mode 100644
+index 5f11b82..0000000
+--- a/drivers/staging/ti-st/Makefile
++++ /dev/null
+@@ -1,5 +0,0 @@
+-#
+-# Makefile for TI's shared transport line discipline
+-# and its protocol drivers (BT, FM, GPS)
+-#
+-obj-$(CONFIG_ST_BT) 		+= bt_drv.o
+-- 
+1.6.5
