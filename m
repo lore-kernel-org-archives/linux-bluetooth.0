@@ -1,88 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: RFC: btusb firmware load help
-From: Marcel Holtmann <holtmann@linux.intel.com>
-To: "Luis R. Rodriguez" <lrodriguez@atheros.com>
-Cc: Luis Rodriguez <Luis.Rodriguez@atheros.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-	Deepak Dhamdhere <Deepak.Dhamdhere@atheros.com>,
-	Sree Durbha <Sree.Durbha@atheros.com>
-In-Reply-To: <AANLkTimDvgFtoGLEjgWyYRrhQy6Num-rn_2WYO4Lf84b@mail.gmail.com>
-References: <20100924230730.GB6566@tux> <1286266981.17473.33.camel@aeonflux>
-	 <20101005192814.GB11831@tux> <1286308731.2588.13.camel@aeonflux>
-	 <AANLkTimz7U52_qHaTutQDOFQde+GrWJRA0WpqY__FPgi@mail.gmail.com>
-	 <1286349552.6145.11.camel@aeonflux>
-	 <AANLkTimDvgFtoGLEjgWyYRrhQy6Num-rn_2WYO4Lf84b@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 06 Oct 2010 17:56:06 +0200
-Message-ID: <1286380566.6145.42.camel@aeonflux>
-Mime-Version: 1.0
-Sender: linux-wireless-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <20101006133206.GA8696@jh-x301>
+References: <1286369566-1453-1-git-send-email-lucas.pawlik@gmail.com>
+	<20101006133206.GA8696@jh-x301>
+Date: Wed, 6 Oct 2010 17:33:07 +0200
+Message-ID: <AANLkTim4WEh7ZLTiWbhiWcv1VXV+jpb_V8NqJjeq=OzH@mail.gmail.com>
+Subject: Re: [PATCH] Fix problem with invalid read from array
+From: Lukasz Pawlik <lucas.pawlik@gmail.com>
+To: Lukasz Pawlik <lucas.pawlik@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luis,
+Hi,
 
-> > Now I am failing to understand why this was done wrong in the first
-> > place. Especially if the loading procedure happens as you say it
-> > happens.
-> 
-> You got me :) Anyone?
-> 
-> > This is the example for the Broadcom 203x devices:
-> >
-> > static struct usb_device_id blacklist_table[] = {
-> >        /* Broadcom BCM2033 without firmware */
-> >        { USB_DEVICE(0x0a5c, 0x2033), .driver_info = BTUSB_IGNORE },
-> >
-> > The btusb driver clearly blacklists them. And then bcm203x can take over
-> > loading the firmware:
-> >
-> > static const struct usb_device_id bcm203x_table[] = {
-> >        /* Broadcom Blutonium (BCM2033) */
-> >        { USB_DEVICE(0x0a5c, 0x2033) },
-> >
-> > So there is a working example of this already in the kernel tree since
-> > forever.
-> 
-> Nice, thanks for the pointer. Our team will review and try to address
-> an alternative patch.
-> 
-> Now for my own sanity -- I still don't think I get this how this
-> BCM2033 blacklist trick works, I take it the device once plugged in
-> gets a generic btusb USB device vendor:device ID. The btusb driver
-> then picks up the the blacklist table, and searches for a
-> usb_match_id() on it for the given interface... What I don't get is
-> how there will be a match here if the USB vendor:device ID is just the
-> generic btusb one. Can you help me understand how this trick works?
+Sorry. My bad. It was never my intention to change src/adapter.c. I've
+prepared two patches with the same name and of course send the wrong
+one. Problem with invalid read fix change made in src/sdpd-service.c
+file.
 
-the generic Bluetooth USB class descriptors is what btusb uses. With a
-few expectation for devices that use VID:PID combination.
+Lukasz
 
-So in general what happens if a device gets matched via the Bluetooth
-USB class descriptors the btusb driver will claim. We do however check
-against out blacklist first. If the VID:PID is listed in the blacklist
-we do return ENODEV. That means that the USB subsystem goes ahead and
-tries the next driver. In this case bcm203x driver. This will claim it,
-load the firmware, reset it and come back with different VID:PID values.
-After that the btusb can successfully claim it since it is no longer in
-the blacklist.
-
-If I understand this all correct without having the hardware available
-for verifying this, then it should be like this:
-
-Just add this to blacklist_table[] in btusb.c:
-
-        /* Atheros AR3011 without firmware */
-        { USB_DEVICE(0x0cf3, 0x3002), .driver_info = BTUSB_IGNORE },
-
-And then we can add the firmware loading to ath3k driver to load the
-specific 1st stage firmware. And then ath3k can load the 2nd stage as
-well. After that it should become a default Bluetooth USB device and the
-btusb driver can take care of it.
-
-Regards
-
-Marcel
-
-
+2010/10/6 Johan Hedberg <johan.hedberg@gmail.com>:
+> Hi Lukasz,
+>
+> On Wed, Oct 06, 2010, Lukasz Pawlik wrote:
+>> This patch fix problem with reading data from out of the array range in
+>> function used to create EIR response.
+>
+> You'll need to explain in more detail exactly what was wrong with the
+> old code and how your patch fixes it (and why it is the correct fix).
+>
+>> -     uint8_t data[240];
+>> +     uint8_t data[242];
+>
+> Why 242? The core spec defines the EIR data as a 240 byte field.
+>
+>> -                                     uuid128_data[SIZEOF_UUID128 - k])
+>> +                                     uuid128_data[SIZEOF_UUID128 - 1 - k])
+>
+> This change looks fine (the index of the last byte is sizeof(uuid128) - 1).
+>
+> Johan
+>
