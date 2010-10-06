@@ -1,62 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 6 Oct 2010 19:52:06 +0200 (CEST)
-From: Sven-Haegar Koch <haegar@sdinet.de>
+Subject: Re: RFC: btusb firmware load help
+From: Johannes Berg <johannes@sipsolutions.net>
 To: "Luis R. Rodriguez" <lrodriguez@atheros.com>
-cc: Marcel Holtmann <holtmann@linux.intel.com>,
-	Luis Rodriguez <Luis.Rodriguez@atheros.com>,
+Cc: Marcel Holtmann <holtmann@linux.intel.com>,
+	Luis Rodriguez <Luis.Rodriguez@Atheros.com>,
 	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-	Deepak Dhamdhere <Deepak.Dhamdhere@atheros.com>,
-	Sree Durbha <Sree.Durbha@atheros.com>
-Subject: Re: RFC: btusb firmware load help
-In-Reply-To: <AANLkTik9w4_PdcEsbRHakLcxcD334_1Q8hGArxTXPCGF@mail.gmail.com>
-Message-ID: <alpine.DEB.2.02.1010061948470.24463@aurora.sdinet.de>
-References: <20100924230730.GB6566@tux> <1286266981.17473.33.camel@aeonflux> <20101005192814.GB11831@tux> <1286308731.2588.13.camel@aeonflux> <AANLkTimz7U52_qHaTutQDOFQde+GrWJRA0WpqY__FPgi@mail.gmail.com> <1286349552.6145.11.camel@aeonflux>
- <AANLkTimDvgFtoGLEjgWyYRrhQy6Num-rn_2WYO4Lf84b@mail.gmail.com> <1286380566.6145.42.camel@aeonflux> <20101006163816.GE7070@tux> <AANLkTik9w4_PdcEsbRHakLcxcD334_1Q8hGArxTXPCGF@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Sender: linux-kernel-owner@vger.kernel.org
+	Deepak Dhamdhere <Deepak.Dhamdhere@Atheros.com>,
+	Sree Durbha <Sree.Durbha@Atheros.com>
+In-Reply-To: <20101006173949.GG7070@tux>
+References: <20100924230730.GB6566@tux> <1286266981.17473.33.camel@aeonflux>
+	 <20101005192814.GB11831@tux> <1286308731.2588.13.camel@aeonflux>
+	 <AANLkTimz7U52_qHaTutQDOFQde+GrWJRA0WpqY__FPgi@mail.gmail.com>
+	 <1286349552.6145.11.camel@aeonflux>
+	 <AANLkTimDvgFtoGLEjgWyYRrhQy6Num-rn_2WYO4Lf84b@mail.gmail.com>
+	 <1286380566.6145.42.camel@aeonflux> <20101006163816.GE7070@tux>
+	 <AANLkTik9w4_PdcEsbRHakLcxcD334_1Q8hGArxTXPCGF@mail.gmail.com>
+	 <20101006173949.GG7070@tux>
+Content-Type: text/plain; charset="UTF-8"
+Date: Wed, 06 Oct 2010 19:54:20 +0200
+Message-ID: <1286387660.3655.382.camel@jlt3.sipsolutions.net>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 6 Oct 2010, Luis R. Rodriguez wrote:
+On Wed, 2010-10-06 at 10:39 -0700, Luis R. Rodriguez wrote:
 
-> I just got this description from Sady:
-> 
-> -------------------------------------------------------------------------------------------------------------------
-> With eeprom based AR3011 hardware, normally this device gets detected
-> as a normal USB device with VID=0x0CF3, PID=0x3000.
-> Ath3k DFU driver will download the firmware in to RAM.
-> Due to firmware download in the RAM it is exposed as new device
-> with VID=0x0CF3, PID=0x3002 to host Bluetooth sub system and btusb.ko
-> driver probe routine gets called to bring up Bluetooth interface.
-> This is the normal procedure we have done so far on Linux.
-> 
-> With sflash based AR3011 hardware, when we connect the device to USB
-> port it gets detected as a Bluetooth device because of firmware in
-> Flash (VID=0x0CF3, PID=0x3002). This triggers the Bluetooth sub
-> system driver (btusb.ko) directly in the host instead of ath3k
-> DFU driver. Therefore, there is no firmware downloaded in to the
-> RAM to bring up Bluetooth at this point. This is the problem
-> we're trying to "fix".
-> -------------------------------------------------------------------------------------------------------------------
-> 
-> With the above patch we'd get ath3k to do the firmware uploading but
-> I'm afraid that we'll go into a loop here unless we can figure out a
-> way to get btusb to know the device is now ready.
 
-Modify the firmware file so that after loading the firmware it gets for 
-example VID=0x0CF3, PID=0x3003.
+> > With sflash based AR3011 hardware, when we connect the device to USB
+> > port it gets detected as a Bluetooth device because of firmware in
+> > Flash (VID=0x0CF3, PID=0x3002). This triggers the Bluetooth sub
+> > system driver (btusb.ko) directly in the host instead of ath3k
+> > DFU driver. Therefore, there is no firmware downloaded in to the
+> > RAM to bring up Bluetooth at this point. This is the problem
+> > we're trying to "fix".
 
-Blacklist VID=0x0CF3, PID=0x3002 in btusb and add it to ath3k.
+So the easiest fix for this would be to
+ a) ignore 0x0cf3,0x3002 in btusb
+ b) add it to ath3k firmware loading
+ c) change the ath3k firmware to load with 0x0cf3,0x3003 (or whatever
+    else you want, as long as it's not 0x3000 and not 0x3002)
 
->From then on VID=0x0CF3, PID=0x3000 and PID=0x3002 mean "need firmware" 
-and PID=0x3003 is the operational state (like half of your PID=0x3002 
-usage is now)
+Then the ignore in btusb won't affect ath3k after that new firmware was
+loaded.
 
-c'ya
-sven-haegar
+johannes
 
--- 
-Three may keep a secret, if two of them are dead.
-- Ben F.
