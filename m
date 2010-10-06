@@ -1,43 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: pavan-savoy@ti.com
-To: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        johan.hedberg@gmail.com
-Cc: greg@kroah.com, linux-kernel@vger.kernel.org,
-        Pavan Savoy <pavan_savoy@ti.com>
-Subject: [PATCH 0/2] Bluetooth driver for TI WiLink 7
-Date: Wed,  6 Oct 2010 18:34:51 -0400
-Message-Id: <1286404493-23816-1-git-send-email-pavan-savoy@ti.com>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH] TODO: Attribute server should process queued commands at disconnection
+Date: Wed,  6 Oct 2010 18:00:05 -0300
+Message-Id: <1286398805-12542-1-git-send-email-claudio.takahasi@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Pavan Savoy <pavan_savoy@ti.com>
+---
+ TODO |    9 +++++++++
+ 1 files changed, 9 insertions(+), 0 deletions(-)
 
-Marcel/Johan and the linux-bluetooth list,
+diff --git a/TODO b/TODO
+index 59a20d3..a9f1339 100644
+--- a/TODO
++++ b/TODO
+@@ -42,6 +42,15 @@ ATT/GATT
+   Priority: Low
+   Complexity: C2
+ 
++- Attribute server should process queued GATT/ATT commands if the
++  client disconnects. The client can simply send a command and quit,
++  without wait for a response(ex: Write Command). For this scenario
++  that the client disconnects the link quickly the queued received
++  command is ignored.
++
++  Priority: Low
++  Complecity: C1
++
+ - Long reads/writes don't work (consisting of multiple request packets)
+ 
+   Priority: Low
+-- 
+1.7.3.1
 
-I have begun cleaning up the code for the Bluetooth drivers for
-Texas Instrument's WiLink 7 chips.
-This driver works on top the Texas Instrument's shared transport line
-discipline driver.
-
-So, apart from the transport part of it, the driver is like other regular
-bluetooth drivers.
-These patches is to move it out of staging/ into the drivers/bluetooth/
-
-Please review and provide comments.
-
-Pavan Savoy (2):
-  drivers:bluetooth: TI_ST bluetooth driver
-  drivers:bluetooth: Kconfig & Makefile for TI BT
-
- drivers/bluetooth/Kconfig      |   11 +
- drivers/bluetooth/Makefile     |    1 +
- drivers/bluetooth/bt_ti.c      |  464 ++++++++++++++++++++++++++++++++++++
- drivers/staging/ti-st/Kconfig  |   14 -
- drivers/staging/ti-st/Makefile |    5 -
- drivers/staging/ti-st/bt_drv.c |  509 ----------------------------------------
- drivers/staging/ti-st/bt_drv.h |   61 -----
- 7 files changed, 476 insertions(+), 589 deletions(-)
- create mode 100644 drivers/bluetooth/bt_ti.c
- delete mode 100644 drivers/staging/ti-st/Kconfig
- delete mode 100644 drivers/staging/ti-st/Makefile
- delete mode 100644 drivers/staging/ti-st/bt_drv.c
- delete mode 100644 drivers/staging/ti-st/bt_drv.h
