@@ -1,54 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: Suraj Sumangala <suraj@atheros.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <Jothikumar.Mothilal@Atheros.com>,
-	Suraj Sumangala <suraj@atheros.com>
-Subject: [PATCH v2] Bluetooth: Latest firmware support for ath3k USB device
-Date: Wed, 6 Oct 2010 14:01:36 +0530
-Message-ID: <1286353896-8811-1-git-send-email-suraj@atheros.com>
+From: <Waldemar.Rymarkiewicz@tieto.com>
+To: <marcel@holtmann.org>
+CC: <suraj@atheros.com>, <linux-bluetooth@vger.kernel.org>,
+	<Jothikumar.Mothilal@Atheros.com>, <joakim.xj.ceder@stericsson.com>
+Date: Wed, 6 Oct 2010 10:28:41 +0300
+Subject: RE: Sim Access profile server implementation
+Message-ID: <99B09243E1A5DA4898CDD8B700111448097D01B6CF@EXMB04.eu.tieto.com>
+References: <1285657515.12097.7.camel@atheros013-desktop>
+	 <1286265730.17473.29.camel@aeonflux>
+	 <99B09243E1A5DA4898CDD8B700111448097D01B371@EXMB04.eu.tieto.com>
+ <1286280767.17473.89.camel@aeonflux>
+In-Reply-To: <1286280767.17473.89.camel@aeonflux>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch add support for latest ath3k USB Bluetooth device firmare.
-The firmware implements shared antenna support and
-fixes few critical bugs.
+Marcel,
 
-Signed-off-by: Suraj Sumangala <suraj@atheros.com>
----
- drivers/bluetooth/ath3k.c |   11 ++++++++---
- 1 files changed, 8 insertions(+), 3 deletions(-)
+>
+>please no top posting on this mailing list.
+>
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 128cae4..6eb4bcf 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -103,6 +103,8 @@ error:
- 	return err;
- }
- 
-+#define ATH3K_FW	"ath3k-fw.fw"
-+#define ATH3K_FW_LEGACY	"ath3k-1.fw"
- static int ath3k_probe(struct usb_interface *intf,
- 			const struct usb_device_id *id)
- {
-@@ -122,9 +124,12 @@ static int ath3k_probe(struct usb_interface *intf,
- 
- 	data->udev = udev;
- 
--	if (request_firmware(&firmware, "ath3k-1.fw", &udev->dev) < 0) {
--		kfree(data);
--		return -EIO;
-+	if (request_firmware(&firmware, ATH3K_FW, &udev->dev) < 0) {
-+		if (request_firmware(&firmware, ATH3K_FW_LEGACY,
-+							&udev->dev) < 0) {
-+			kfree(data);
-+			return -EIO;
-+		}
- 	}
- 
- 	size = max_t(uint, firmware->size, 4096);
--- 
-1.7.0.4
+Sorry, didn't know that.  Thanks for pointing this out.
 
+>> I understand you concerns about dbus reliability and I agree=20
+>with you , but I guess we should find a compromise solution as=20
+>ofono is not used widely in Linux mobile platforms nowadays.
+>>=20
+>> I my view, combination of a bluez plugin for sap and a=20
+>platform dependend sim driver is a reliable and most available=20
+>solution so far. The SAP plugin implements BT SAP spec and=20
+>require simple API (connect, disconnect, apdu, atr, status)=20
+>which is implemented in SIM driver for a certain platform.=20
+>This way it's relatively easy to support SAP in different=20
+>platforms. Ofono can have its own driver as well.
+>>=20
+>> What's you view on such design?
+>> Can we also have a double solution one in ofono for ofono=20
+>aware platforms and the second as a plugin for others?=20
+>
+>I am fine with starting this in BlueZ and see how far we get.=20
+>And yes, plugin based is a must from my point of view. It is=20
+>most likely similar to our different telephony drivers for=20
+>Handsfree support.
+
+It's nice to here that.
+
+>We will move strongly in the direction of oFono being the main=20
+>telephony stack. So I do care mostly that this work in=20
+>conjunction with oFono.
+>Everything else is just a nice benefit if it doesn't clutter=20
+>the overhaul implementation and requires pointless abstraction=20
+>everywhere.
+>> BTW, I already have this implemented and tested with real hardware=20
+>> (STEricsson). Bluez SAP works fine with Nokia 616 carkit :)
+>
+>Can you share that code with us. And also hardware if you. We=20
+>are still having hard time to find proper hardware to test this on.
+
+Will send a patch soon. I use http://www.stericsson.com/platforms/U8500.jsp=
+ hw, but need to check if I can share one with you.
+
+Regards,
+/Waldek=
