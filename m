@@ -1,37 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH] TODO: Attribute server should process queued commands at disconnection
-Date: Wed,  6 Oct 2010 18:00:05 -0300
-Message-Id: <1286398805-12542-1-git-send-email-claudio.takahasi@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <1286390535-27462-7-git-send-email-ville.tervo@nokia.com>
+References: <1286390535-27462-1-git-send-email-ville.tervo@nokia.com>
+	<1286390535-27462-7-git-send-email-ville.tervo@nokia.com>
+Date: Wed, 6 Oct 2010 16:49:14 -0400
+Message-ID: <AANLkTinfWn12Tg4Q8GxXr=C+7u4rN0hX9m-BBj_PbTn9@mail.gmail.com>
+Subject: Re: [PATCH 6/7] Bluetooth: Add server socket support for LE connection
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Ville Tervo <ville.tervo@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- TODO |    9 +++++++++
- 1 files changed, 9 insertions(+), 0 deletions(-)
+On Wed, Oct 6, 2010 at 2:42 PM, Ville Tervo <ville.tervo@nokia.com> wrote:
+>                if (conn->hcon->type == LE_LINK) {
+> -                       l2cap_sock_clear_timer(sk);
+> -                       sk->sk_state = BT_CONNECTED;
+> -                       sk->sk_state_change(sk);
+> +                               l2cap_sock_clear_timer(sk);
+> +                               sk->sk_state = BT_CONNECTED;
+> +                               sk->sk_state_change(sk);
+>                }
+>
+>                if (sk->sk_type != SOCK_SEQPACKET &&
 
-diff --git a/TODO b/TODO
-index 59a20d3..a9f1339 100644
---- a/TODO
-+++ b/TODO
-@@ -42,6 +42,15 @@ ATT/GATT
-   Priority: Low
-   Complexity: C2
- 
-+- Attribute server should process queued GATT/ATT commands if the
-+  client disconnects. The client can simply send a command and quit,
-+  without wait for a response(ex: Write Command). For this scenario
-+  that the client disconnects the link quickly the queued received
-+  command is ignored.
-+
-+  Priority: Low
-+  Complecity: C1
-+
- - Long reads/writes don't work (consisting of multiple request packets)
- 
-   Priority: Low
+Unrelated indentation above.
+
+> @@ -1029,13 +1077,13 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
+>        len = min_t(unsigned int, sizeof(la), alen);
+>        memcpy(&la, addr, len);
+>
+> -+      if (la.l2_cid && la.l2_psm)
+> +       if (la.l2_cid && la.l2_psm)
+>                return -EINVAL;
+>
+>        lock_sock(sk);
+>
+>        if ((sk->sk_type == SOCK_SEQPACKET || sk->sk_type == SOCK_STREAM)
+> -                       && !(la.l2_psm || la.la_cid)) {
+> +                       && !(la.l2_psm || la.l2_cid)) {
+>                err = -EINVAL;
+>                goto done;
+>        }
+
+These typos were introduced in a previous patch. You should fix there instead.
+
 -- 
-1.7.3.1
-
+Anderson Lizardo
+OpenBossa Labs - INdT
+Manaus - Brazil
