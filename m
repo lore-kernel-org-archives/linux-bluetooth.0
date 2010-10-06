@@ -1,34 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 6 Oct 2010 15:32:07 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lukasz Pawlik <lucas.pawlik@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix problem with invalid read from array
-Message-ID: <20101006133206.GA8696@jh-x301>
-References: <1286369566-1453-1-git-send-email-lucas.pawlik@gmail.com>
+From: <Waldemar.Rymarkiewicz@tieto.com>
+To: <suraj@Atheros.com>
+CC: <Suraj.Sumangala@Atheros.com>, <marcel@holtmann.org>,
+	<linux-bluetooth@vger.kernel.org>, <Jothikumar.Mothilal@Atheros.com>,
+	<joakim.xj.ceder@stericsson.com>, <arunkr.singh@stericsson.com>
+Date: Wed, 6 Oct 2010 16:22:54 +0300
+Subject: RE: Sim Access profile server implementation
+Message-ID: <99B09243E1A5DA4898CDD8B700111448097D01BA04@EXMB04.eu.tieto.com>
+References: <1285657515.12097.7.camel@atheros013-desktop>
+	 <1286265730.17473.29.camel@aeonflux>
+	 <99B09243E1A5DA4898CDD8B700111448097D01B371@EXMB04.eu.tieto.com>
+ <1286280767.17473.89.camel@aeonflux>
+ <99B09243E1A5DA4898CDD8B700111448097D01B6CF@EXMB04.eu.tieto.com>
+ <99B09243E1A5DA4898CDD8B700111448097D01B814@EXMB04.eu.tieto.com>
+ <4A2A3D7B.60701@Atheros.com>
+ <99B09243E1A5DA4898CDD8B700111448097D01B868@EXMB04.eu.tieto.com>
+ <4CAC6E61.20708@Atheros.com>
+In-Reply-To: <4CAC6E61.20708@Atheros.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1286369566-1453-1-git-send-email-lucas.pawlik@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+Hi Suraj,
+=20
+>
+>So basically your implementation does not use d-bus for basic=20
+>SAP operations and the SIM access driver is compiled as part=20
+>of bluetoothd right?
+>
+>>
+>>> Correct me if my understanding is wrong.
+>>>
 
-On Wed, Oct 06, 2010, Lukasz Pawlik wrote:
-> This patch fix problem with reading data from out of the array range in
-> function used to create EIR response.
+Exactly.
 
-You'll need to explain in more detail exactly what was wrong with the
-old code and how your patch fixes it (and why it is the correct fix).
-
-> -	uint8_t data[240];
-> +	uint8_t data[242];
-
-Why 242? The core spec defines the EIR data as a 240 byte field.
-
-> -					uuid128_data[SIZEOF_UUID128 - k])
-> +					uuid128_data[SIZEOF_UUID128 - 1 - k])
-
-This change looks fine (the index of the last byte is sizeof(uuid128) - 1).
-
-Johan
+Regards,
+/Waldek
