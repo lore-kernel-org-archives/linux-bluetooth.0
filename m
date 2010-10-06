@@ -1,7 +1,18 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <1286387660.3655.382.camel@jlt3.sipsolutions.net>
+References: <20100924230730.GB6566@tux> <1286266981.17473.33.camel@aeonflux>
+ <20101005192814.GB11831@tux> <1286308731.2588.13.camel@aeonflux>
+ <AANLkTimz7U52_qHaTutQDOFQde+GrWJRA0WpqY__FPgi@mail.gmail.com>
+ <1286349552.6145.11.camel@aeonflux> <AANLkTimDvgFtoGLEjgWyYRrhQy6Num-rn_2WYO4Lf84b@mail.gmail.com>
+ <1286380566.6145.42.camel@aeonflux> <20101006163816.GE7070@tux>
+ <AANLkTik9w4_PdcEsbRHakLcxcD334_1Q8hGArxTXPCGF@mail.gmail.com>
+ <20101006173949.GG7070@tux> <1286387660.3655.382.camel@jlt3.sipsolutions.net>
+From: "Luis R. Rodriguez" <lrodriguez@atheros.com>
+Date: Wed, 6 Oct 2010 11:22:13 -0700
+Message-ID: <AANLkTikYRSQw-+Tcj4VS1qxi=OaeF9C5hjAMWVu+0M=v@mail.gmail.com>
 Subject: Re: RFC: btusb firmware load help
-From: Johannes Berg <johannes@sipsolutions.net>
-To: "Luis R. Rodriguez" <lrodriguez@atheros.com>
+To: Johannes Berg <johannes@sipsolutions.net>
 Cc: Marcel Holtmann <holtmann@linux.intel.com>,
 	Luis Rodriguez <Luis.Rodriguez@atheros.com>,
 	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
@@ -9,41 +20,33 @@ Cc: Marcel Holtmann <holtmann@linux.intel.com>,
 	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
 	Deepak Dhamdhere <Deepak.Dhamdhere@atheros.com>,
 	Sree Durbha <Sree.Durbha@atheros.com>
-In-Reply-To: <AANLkTi=o4Mc72NrNoALBdS3YHeY7RMyyAJPsCy=uW3+F@mail.gmail.com>
-References: <20100924230730.GB6566@tux> <1286266981.17473.33.camel@aeonflux>
-	 <20101005192814.GB11831@tux> <1286308731.2588.13.camel@aeonflux>
-	 <AANLkTimz7U52_qHaTutQDOFQde+GrWJRA0WpqY__FPgi@mail.gmail.com>
-	 <1286349552.6145.11.camel@aeonflux>
-	 <AANLkTimDvgFtoGLEjgWyYRrhQy6Num-rn_2WYO4Lf84b@mail.gmail.com>
-	 <1286380566.6145.42.camel@aeonflux> <20101006163816.GE7070@tux>
-	 <AANLkTik9w4_PdcEsbRHakLcxcD334_1Q8hGArxTXPCGF@mail.gmail.com>
-	 <20101006173949.GG7070@tux>
-	 <1286387660.3655.382.camel@jlt3.sipsolutions.net>
-	 <AANLkTikYRSQw-+Tcj4VS1qxi=OaeF9C5hjAMWVu+0M=v@mail.gmail.com>
-	 <AANLkTi=o4Mc72NrNoALBdS3YHeY7RMyyAJPsCy=uW3+F@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 06 Oct 2010 20:28:17 +0200
-Message-ID: <1286389697.3655.401.camel@jlt3.sipsolutions.net>
-Mime-Version: 1.0
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2010-10-06 at 11:26 -0700, Luis R. Rodriguez wrote:
+On Wed, Oct 6, 2010 at 10:54 AM, Johannes Berg
+<johannes@sipsolutions.net> wrote:
+> On Wed, 2010-10-06 at 10:39 -0700, Luis R. Rodriguez wrote:
+>
+>
+>> > With sflash based AR3011 hardware, when we connect the device to USB
+>> > port it gets detected as a Bluetooth device because of firmware in
+>> > Flash (VID=0x0CF3, PID=0x3002). This triggers the Bluetooth sub
+>> > system driver (btusb.ko) directly in the host instead of ath3k
+>> > DFU driver. Therefore, there is no firmware downloaded in to the
+>> > RAM to bring up Bluetooth at this point. This is the problem
+>> > we're trying to "fix".
+>
+> So the easiest fix for this would be to
+>  a) ignore 0x0cf3,0x3002 in btusb
+>  b) add it to ath3k firmware loading
+>  c) change the ath3k firmware to load with 0x0cf3,0x3003 (or whatever
+>    else you want, as long as it's not 0x3000 and not 0x3002)
+>
+> Then the ignore in btusb won't affect ath3k after that new firmware was
+> loaded.
 
-> > Good idea, I forgot about possible firmware changes :) Lets see if our
-> > team can do that. Thanks for all the feedback.
-> 
-> Deepak a proof of concept test can involve simply hex-editing the
-> ath3k-1.fw and replacing 0x3002 to 0x3003, then the above patch might
-> work.
+Good idea, I forgot about possible firmware changes :) Lets see if our
+team can do that. Thanks for all the feedback.
 
-$ hd ath3k-1.fw
-...
-00000670  00 00 00 00 00 00 00 00  00 00 00 00 f3 0c 02 30  |...............0|
-00000680  12 01 10 01 e0 01 01 40  f3 0c 02 30 01 00 00 00  |.......@...0....|
-...
-
-that looks a lot like the IDs right there, in little endian :-)
-
-johannes
-
+  Luis
