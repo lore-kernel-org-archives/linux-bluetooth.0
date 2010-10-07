@@ -1,40 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: RE: RFC: btusb firmware load help
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Shanmugamkamatchi Balashanmugam
+From: Shanmugamkamatchi Balashanmugam
 	<Shanmugamkamatchi.Balashanmugam@Atheros.com>
-Cc: Luis Rodriguez <Luis.Rodriguez@Atheros.com>,
+To: Luis Rodriguez <Luis.Rodriguez@Atheros.com>,
+	Johannes Berg <johannes@sipsolutions.net>
+CC: Luis Rodriguez <Luis.Rodriguez@Atheros.com>,
 	Marcel Holtmann <holtmann@linux.intel.com>,
 	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
 	Deepak Dhamdhere <Deepak.Dhamdhere@Atheros.com>,
 	Sree Durbha <Sree.Durbha@Atheros.com>
-In-Reply-To: <44EE5C37ADC36343B0625A05DD408C4850DAD2CA31@CHEXMB-01.global.atheros.com>
+Date: Thu, 7 Oct 2010 20:39:37 +0530
+Subject: RE: RFC: btusb firmware load help
+Message-ID: <44EE5C37ADC36343B0625A05DD408C4850DAD2CA31@CHEXMB-01.global.atheros.com>
 References: <1286349552.6145.11.camel@aeonflux>
-	 <AANLkTimDvgFtoGLEjgWyYRrhQy6Num-rn_2WYO4Lf84b@mail.gmail.com>
-	 <1286380566.6145.42.camel@aeonflux> <20101006163816.GE7070@tux>
-	 <AANLkTik9w4_PdcEsbRHakLcxcD334_1Q8hGArxTXPCGF@mail.gmail.com>
-	 <20101006173949.GG7070@tux>
-	 <1286387660.3655.382.camel@jlt3.sipsolutions.net>
-	 <AANLkTikYRSQw-+Tcj4VS1qxi=OaeF9C5hjAMWVu+0M=v@mail.gmail.com>
-	 <AANLkTi=o4Mc72NrNoALBdS3YHeY7RMyyAJPsCy=uW3+F@mail.gmail.com>
-	 <1286389697.3655.401.camel@jlt3.sipsolutions.net>
-	 ,<20101006183340.GI7070@tux>
-	 <44EE5C37ADC36343B0625A05DD408C4850DAD2CA31@CHEXMB-01.global.atheros.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Thu, 07 Oct 2010 17:15:55 +0200
-Message-ID: <1286464555.20974.3.camel@jlt3.sipsolutions.net>
-Mime-Version: 1.0
-Sender: linux-kernel-owner@vger.kernel.org
+ <AANLkTimDvgFtoGLEjgWyYRrhQy6Num-rn_2WYO4Lf84b@mail.gmail.com>
+ <1286380566.6145.42.camel@aeonflux> <20101006163816.GE7070@tux>
+ <AANLkTik9w4_PdcEsbRHakLcxcD334_1Q8hGArxTXPCGF@mail.gmail.com>
+ <20101006173949.GG7070@tux>
+ <1286387660.3655.382.camel@jlt3.sipsolutions.net>
+ <AANLkTikYRSQw-+Tcj4VS1qxi=OaeF9C5hjAMWVu+0M=v@mail.gmail.com>
+ <AANLkTi=o4Mc72NrNoALBdS3YHeY7RMyyAJPsCy=uW3+F@mail.gmail.com>
+ <1286389697.3655.401.camel@jlt3.sipsolutions.net>,<20101006183340.GI7070@tux>
+In-Reply-To: <20101006183340.GI7070@tux>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
-> Thanks Johannes.  This would be better option to change PID in firmware
-> as blacklisting 3002 might create problems for 3011 chipsets.
+________________________________________
+From: linux-bluetooth-owner@vger.kernel.org [linux-bluetooth-owner@vger.kernel.org] On Behalf Of Luis R. Rodriguez [lrodriguez@atheros.com]
+Sent: Thursday, October 07, 2010 12:03 AM
+To: Johannes Berg
+Cc: Luis Rodriguez; Marcel Holtmann; linux-bluetooth; linux-kernel@vger.kernel.org; linux-wireless@vger.kernel.org; Deepak Dhamdhere; Sree Durbha
+Subject: Re: RFC: btusb firmware load help
 
-What would be the problem with 3011? Does it also use the 3002 ID, but
-not use firmware upload???
+On Wed, Oct 06, 2010 at 11:28:17AM -0700, Johannes Berg wrote:
+> On Wed, 2010-10-06 at 11:26 -0700, Luis R. Rodriguez wrote:
+>
+> > > Good idea, I forgot about possible firmware changes :) Lets see if our
+> > > team can do that. Thanks for all the feedback.
+> >
+> > Deepak a proof of concept test can involve simply hex-editing the
+> > ath3k-1.fw and replacing 0x3002 to 0x3003, then the above patch might
+> > work.
+>
+> $ hd ath3k-1.fw
+> ...
+> 00000670  00 00 00 00 00 00 00 00  00 00 00 00 f3 0c 02 30  |...............0|
+> 00000680  12 01 10 01 e0 01 01 40  f3 0c 02 30 01 00 00 00  |.......@...0....|
+> ...
+>
+> that looks a lot like the IDs right there, in little endian :-)
 
-johannes
+>Furthermore another idea by johannes is that if we cannot fix this
+>in firmware by changing the exposed device ID, we could just check
+>in btusb for some USB component that would come alive once the firmware
+>does get loaded, like endpoints, or speed, or whatever. But that would
+>be last resort.
 
+ > Luis
+>--
+>To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>the body of a message to majordomo@vger.kernel.org
+>More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+Thanks Johannes.  This would be better option to change PID in firmware
+as blacklisting 3002 might create problems for 3011 chipsets.
+Will try and let you people know. 
+
+Regards,
+Bala.
