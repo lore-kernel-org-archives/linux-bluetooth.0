@@ -1,41 +1,112 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4CADF634.1030203@atheros.com>
-Date: Thu, 7 Oct 2010 22:02:52 +0530
-From: Bala Shanmugam <sbalashanmugam@atheros.com>
-MIME-Version: 1.0
-To: Johannes Berg <johannes@sipsolutions.net>
-CC: Shanmugamkamatchi Balashanmugam
-	<Shanmugamkamatchi.Balashanmugam@Atheros.com>,
-	Luis Rodriguez <Luis.Rodriguez@Atheros.com>,
-	Marcel Holtmann <holtmann@linux.intel.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-	Deepak Dhamdhere <Deepak.Dhamdhere@Atheros.com>,
-	Sree Durbha <Sree.Durbha@Atheros.com>
-Subject: Re: RFC: btusb firmware load help
-References: <1286349552.6145.11.camel@aeonflux>	 <AANLkTimDvgFtoGLEjgWyYRrhQy6Num-rn_2WYO4Lf84b@mail.gmail.com>	 <1286380566.6145.42.camel@aeonflux> <20101006163816.GE7070@tux>	 <AANLkTik9w4_PdcEsbRHakLcxcD334_1Q8hGArxTXPCGF@mail.gmail.com>	 <20101006173949.GG7070@tux>	 <1286387660.3655.382.camel@jlt3.sipsolutions.net>	 <AANLkTikYRSQw-+Tcj4VS1qxi=OaeF9C5hjAMWVu+0M=v@mail.gmail.com>	 <AANLkTi=o4Mc72NrNoALBdS3YHeY7RMyyAJPsCy=uW3+F@mail.gmail.com>	 <1286389697.3655.401.camel@jlt3.sipsolutions.net>	 ,<20101006183340.GI7070@tux>	 <44EE5C37ADC36343B0625A05DD408C4850DAD2CA31@CHEXMB-01.global.atheros.com> <1286464555.20974.3.camel@jlt3.sipsolutions.net>
-In-Reply-To: <1286464555.20974.3.camel@jlt3.sipsolutions.net>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Sort TODO by priority
+Date: Thu,  7 Oct 2010 19:21:55 +0300
+Message-Id: <1286468515-20738-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-  On 10/7/2010 8:45 PM, Johannes Berg wrote:
->> Thanks Johannes.  This would be better option to change PID in firmware
->> as blacklisting 3002 might create problems for 3011 chipsets.
-> What would be the problem with 3011? Does it also use the 3002 ID, but
-> not use firmware upload???
->
-> johannes
->
-AR3011 when plugged-in uses PID 3000 and control goes to DFU driver [ath3k].
-ath3k downloads the firmware to the device changing its PID to 3002.
-Now btusb gets the control and attaches the device to bluetooth core.
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-So blacklisting 3002 in btusb will create issues for AR3011 chipsets.
-In firmware if we change the PID from 3002 to 3003 as you suggested and 
-blacklist 3002 in btusb
-we can make both devices work.
+Items shall be sorted by priority and latter by complexity so that tasks
+with higher priority and lower complexity always appear on top.
+---
+ TODO |   58 +++++++++++++++++++++++++++++-----------------------------
+ 1 files changed, 29 insertions(+), 29 deletions(-)
 
-Regards,
-Bala.
+diff --git a/TODO b/TODO
+index 271fc45..3885c78 100644
+--- a/TODO
++++ b/TODO
+@@ -25,6 +25,29 @@ ATT/GATT
+   Complexity: C2
+   Owner: Claudio Takahasi <claudio.takahasi@openbossa.org>
+ 
++- Add ATT/GATT parsing to hcidump
++
++  Priority: Medium
++  Complexity: C2
++
++- GATT server: fix MTU exchange
++
++  Priority: Medium
++  Complexity: C2
++
++- GATT server: fix read by UUID (read by handle works)
++
++  Priority: Medium
++  Complexity: C2
++
++- gatttool: add an interactive command prompt mode. Many LE devices
++  expect the connection to stay up a long time and disable advertising
++  after a disconnection so it's inconvenient to use gatttool in the
++  current "single operation at a time" mode.
++
++  Priority: Medium
++  Complexity: C2
++
+ - gatttool should have the ability to wait for req responses before
+   quitting (some servers require a small sleep even with cmd's). Maybe a
+   --delay-exit or --timeout command line switch.
+@@ -42,13 +65,6 @@ ATT/GATT
+   Priority: Low
+   Complexity: C1
+ 
+-- Attribute server shall implement attribute permission verification,
+-  returning an error code if necessary. See Volume 3, Part F, 3.2.5
+-  for more information.
+-
+-  Priority: Low
+-  Complexity: C2
+-
+ - Attribute server should process queued GATT/ATT commands if the
+   client disconnects. The client can simply send a command and quit,
+   without wait for a response(ex: Write Command). For this scenario
+@@ -58,11 +74,6 @@ ATT/GATT
+   Priority: Low
+   Complecity: C1
+ 
+-- Long reads/writes don't work (consisting of multiple request packets)
+-
+-  Priority: Low
+-  Complexity: C2
+-
+ - Add sdp discovery support to gattool with BR (--sdp, default is 0x1f)
+ 
+   Priority: Low
+@@ -74,25 +85,14 @@ ATT/GATT
+   Priority: Low
+   Complexity: C1
+ 
+-- Add ATT/GATT parsing to hcidump
+-
+-  Priority: Medium
+-  Complexity: C2
+-
+-- GATT server: fix MTU exchange
+-
+-  Priority: Medium
+-  Complexity: C2
+-
+-- GATT server: fix read by UUID (read by handle works)
++- Long reads/writes don't work (consisting of multiple request packets)
+ 
+-  Priority: Medium
++  Priority: Low
+   Complexity: C2
+ 
+-- gatttool: add an interactive command prompt mode. Many LE devices
+-  expect the connection to stay up a long time and disable advertising
+-  after a disconnection so it's inconvenient to use gatttool in the
+-  current "single operation at a time" mode.
++- Attribute server shall implement attribute permission verification,
++  returning an error code if necessary. See Volume 3, Part F, 3.2.5
++  for more information.
+ 
+-  Priority: Medium
++  Priority: Low
+   Complexity: C2
+-- 
+1.7.1
+
