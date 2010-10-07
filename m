@@ -1,64 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Thu, 7 Oct 2010 14:51:48 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Greg KH <greg@kroah.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, pavan-savoy@ti.com,
-	linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com,
-	linux-kernel@vger.kernel.org, Pavan Savoy <pavan_savoy@ti.com>
-Subject: Re: [PATCH 1/2] drivers:bluetooth: TI_ST bluetooth driver
-Message-ID: <20101007175148.GC4893@vigoh>
-References: <1286404493-23816-1-git-send-email-pavan-savoy@ti.com>
- <1286404493-23816-2-git-send-email-pavan-savoy@ti.com>
- <1286445948.6145.70.camel@aeonflux>
- <20101007143409.GB14913@kroah.com>
+From: "Savoy, Pavan" <pavan_savoy@ti.com>
+To: Alan Cox <alan@lxorguk.ukuu.org.uk>
+CC: Jiri Slaby <jirislaby@gmail.com>,
+	"gregkh@suse.de" <gregkh@suse.de>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Fri, 8 Oct 2010 02:16:35 +0530
+Subject: RE: [PATCH 1/2] drivers:staging:ti-st: move TI_ST from staging
+Message-ID: <19F8576C6E063C45BE387C64729E739404AA21D24F@dbde02.ent.ti.com>
+References: <1286381895-11329-1-git-send-email-pavan_savoy@ti.com>
+	<1286381895-11329-2-git-send-email-pavan_savoy@ti.com>
+	<4CACD234.7020900@gmail.com>
+	<19F8576C6E063C45BE387C64729E739404AA21CEA1@dbde02.ent.ti.com>
+	<4CACF5A7.3010601@gmail.com>
+	<19F8576C6E063C45BE387C64729E739404AA21CEC6@dbde02.ent.ti.com>
+	<4CAD7DAB.8030209@gmail.com>
+	<19F8576C6E063C45BE387C64729E739404AA21D193@dbde02.ent.ti.com>
+	<4CAE10C0.9000106@gmail.com>
+	<19F8576C6E063C45BE387C64729E739404AA21D220@dbde02.ent.ti.com>
+	<20101007203801.1c55a1d3@lxorguk.ukuu.org.uk>
+	<19F8576C6E063C45BE387C64729E739404AA21D23B@dbde02.ent.ti.com>
+	<20101007213503.657bcab0@lxorguk.ukuu.org.uk>
+	<19F8576C6E063C45BE387C64729E739404AA21D248@dbde02.ent.ti.com>
+ <20101007215943.45365f45@lxorguk.ukuu.org.uk>
+In-Reply-To: <20101007215943.45365f45@lxorguk.ukuu.org.uk>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20101007143409.GB14913@kroah.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Greg,
 
-* Greg KH <greg@kroah.com> [2010-10-07 07:34:09 -0700]:
-
-> On Thu, Oct 07, 2010 at 12:05:48PM +0200, Marcel Holtmann wrote:
-> > Hi Pavan,
-> > 
-> > > This is the bluetooth protocol driver for the TI WiLink7 chipsets.
-> > > Texas Instrument's WiLink chipsets combine wireless technologies
-> > > like BT, FM, GPS and WLAN onto a single chip.
-> > > 
-> > > This Bluetooth driver works on top of the TI_ST shared transport
-> > > line discipline driver which also allows other drivers like
-> > > FM V4L2 and GPS character driver to make use of the same UART interface.
-> > > 
-> > > Signed-off-by: Pavan Savoy <pavan_savoy@ti.com>
-> > > ---
-> > >  drivers/bluetooth/bt_ti.c      |  463 ++++++++++++++++++++++++++++++++++++
-> > >  drivers/staging/ti-st/bt_drv.c |  509 ----------------------------------------
-> > >  drivers/staging/ti-st/bt_drv.h |   61 -----
-> > >  3 files changed, 463 insertions(+), 570 deletions(-)
-> > >  create mode 100644 drivers/bluetooth/bt_ti.c
-> > >  delete mode 100644 drivers/staging/ti-st/bt_drv.c
-> > >  delete mode 100644 drivers/staging/ti-st/bt_drv.h
-> > 
-> > I don't care about staging at all. So you sort that out with Greg.
-> > 
-> > Submit your driver for upstream inclusion. And once accepted you can pin
-> > Greg about removing it.
+> -----Original Message-----
+> From: Alan Cox [mailto:alan@lxorguk.ukuu.org.uk]
+> Sent: Thursday, October 07, 2010 4:00 PM
+> To: Savoy, Pavan
+> Cc: Jiri Slaby; gregkh@suse.de; linux-kernel@vger.kernel.org;
+> devel@driverdev.osuosl.org; linux-bluetooth@vger.kernel.org
+> Subject: Re: [PATCH 1/2] drivers:staging:ti-st: move TI_ST from staging
 > 
-> The driver is already in staging, this is the request to move it out of
-> staging and into the "correct" place in the tree.  The core of the ti-st
-> code is now in the drivers/misc/ directory in the linux-next tree, and
-> this patch is the request to move the bluetooth drive into the proper
-> drivers/bluetooth/ location.
+> > But, I want to attach my data not when ldsic is opened, but when ldisc is
+> registered.
+> > I want to begin accessing the data when ldisc is opened.
+> 
+> How can you attach per tty data when the ldisc is registered - the
+> relevant tty driver might not even have been loaded at that point. The
+> user may not even have been to the shop and bought it even !
+> 
+> What sort of data is this ?
 
-I'm wondering why this driver never touched linux-bluetooth before. It
-is on staging because it is not ready for a proper merge and while it is
-not ready it needs the comments from the bluetooth developers here to
-get it ready for merge in drivers/bluetooth. So why this never arrived 
-here before?
+Data related to requesting the user-space to open/install the ldisc.
+Imagine a UEVENT structure or PID of the user-space process to which I need
+to send a signal .. I currently use rfkill.
 
--- 
-Gustavo F. Padovan
-ProFUSION embedded systems - http://profusion.mobi
+> > to be like a bunch of helpers (1 for FM, 1 for GPS, 1 for NFC, 1 for power-
+> management), also the problem of who owns the /dev/tty begins to occur,
+> Bluetooth has a utility called hciattach, I don't want my FM radio software to
+> run hciattach when /dev/radio0 is opened and communicated via FM.
+> 
+> I would have assumed the hotplug script would have run your own attach
+> and daemon and the FM radio etc would talk to the ldisc via other kernel
+> interfaces it presented.
+> 
+> So whenever the hardware is detected it would load the hardware driver
+> The hardware driver would create a tty instance for each physical port
+> The hotplug user space would run 'ti-st-attach' as a helper which would
+> load the ldisc and set up the bluetooth as well as providing exported
+> methods for FM radio etc.
+
+Yes, pretty similar to what I am doing now. I have this daemon which waits
+for events from my ldisc driver, and on receiving the notification it
+opens the uart, ioctl's the TIOCSETD and allows the tty to be accessed over
+the ldisc.
+
+> > In any case, the ti-st/ seems better now by look of things, I certainly
+> welcome suggestions to improve it.
+> > Also, is there any plan to re-write whole of TTY like a the i2C or the SPI
+> bus structure?
+> >
+> > Here I can imagine, all TTY line disciplines being sort of protocol/client
+> drivers, the TTY sub-system in itself would be like the algos driver and then
+> > The uart drivers (like 8250.c) can be the adapter drivers.. What say?
+> 
+> They already are, with the one oddity being that something needs to have
+> it opened from user space and to attach the ldisc. Thats fixable but hard
+> to fix and I'm not aware of any plan to do so - mostly because nobody
+> needs it so far.
+
+Yes, that oddity was the reason this notification had to be done.
+I could as well have opened it up on boot and attached the ldisc, but I chose
+to use it whenever other drivers wanted to - as in when hci0 is UP, or /dev/radio0 is opened.
+
+> Alan
