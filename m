@@ -1,47 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: RE: Sim Access profile server implementation
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Waldemar.Rymarkiewicz@tieto.com
-Cc: suraj@atheros.com, linux-bluetooth@vger.kernel.org,
-	Jothikumar.Mothilal@Atheros.com, joakim.xj.ceder@stericsson.com,
-	arunkr.singh@stericsson.com
-In-Reply-To: <99B09243E1A5DA4898CDD8B700111448097D01B814@EXMB04.eu.tieto.com>
-References: <1285657515.12097.7.camel@atheros013-desktop>
-	 <1286265730.17473.29.camel@aeonflux>
-	 <99B09243E1A5DA4898CDD8B700111448097D01B371@EXMB04.eu.tieto.com>
-	 <1286280767.17473.89.camel@aeonflux>
-	 <99B09243E1A5DA4898CDD8B700111448097D01B6CF@EXMB04.eu.tieto.com>
-	 <99B09243E1A5DA4898CDD8B700111448097D01B814@EXMB04.eu.tieto.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Thu, 07 Oct 2010 17:42:16 +0200
-Message-ID: <1286466136.6145.159.camel@aeonflux>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 7 Oct 2010 08:35:27 -0700
+From: Greg KH <greg@kroah.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: pavan-savoy@ti.com, linux-bluetooth@vger.kernel.org,
+	johan.hedberg@gmail.com, linux-kernel@vger.kernel.org,
+	Pavan Savoy <pavan_savoy@ti.com>
+Subject: Re: [PATCH 1/2] drivers:bluetooth: TI_ST bluetooth driver
+Message-ID: <20101007153527.GA26129@kroah.com>
+References: <1286404493-23816-1-git-send-email-pavan-savoy@ti.com>
+ <1286404493-23816-2-git-send-email-pavan-savoy@ti.com>
+ <1286445948.6145.70.camel@aeonflux>
+ <20101007143409.GB14913@kroah.com>
+ <1286464867.6145.148.camel@aeonflux>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1286464867.6145.148.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Waldemar,
-
-> >>Can you share that code with us. And also hardware if you. We 
-> >are still 
-> >>having hard time to find proper hardware to test this on.
-> >
-> >Will send a patch soon. I use 
-> >http://www.stericsson.com/platforms/U8500.jsp hw, but need to 
-> >check if I can share one with you.
-> >
+On Thu, Oct 07, 2010 at 05:21:07PM +0200, Marcel Holtmann wrote:
+> Hi Greg,
 > 
-> Here you are the patch. Just note that it is based on an old bluez 4.4x
-> If you consider to accept the design I will update the patch upon the latest release. 
+> > > > This is the bluetooth protocol driver for the TI WiLink7 chipsets.
+> > > > Texas Instrument's WiLink chipsets combine wireless technologies
+> > > > like BT, FM, GPS and WLAN onto a single chip.
+> > > > 
+> > > > This Bluetooth driver works on top of the TI_ST shared transport
+> > > > line discipline driver which also allows other drivers like
+> > > > FM V4L2 and GPS character driver to make use of the same UART interface.
+> > > > 
+> > > > Signed-off-by: Pavan Savoy <pavan_savoy@ti.com>
+> > > > ---
+> > > >  drivers/bluetooth/bt_ti.c      |  463 ++++++++++++++++++++++++++++++++++++
+> > > >  drivers/staging/ti-st/bt_drv.c |  509 ----------------------------------------
+> > > >  drivers/staging/ti-st/bt_drv.h |   61 -----
+> > > >  3 files changed, 463 insertions(+), 570 deletions(-)
+> > > >  create mode 100644 drivers/bluetooth/bt_ti.c
+> > > >  delete mode 100644 drivers/staging/ti-st/bt_drv.c
+> > > >  delete mode 100644 drivers/staging/ti-st/bt_drv.h
+> > > 
+> > > I don't care about staging at all. So you sort that out with Greg.
+> > > 
+> > > Submit your driver for upstream inclusion. And once accepted you can pin
+> > > Greg about removing it.
+> > 
+> > The driver is already in staging, this is the request to move it out of
+> > staging and into the "correct" place in the tree.  The core of the ti-st
+> > code is now in the drivers/misc/ directory in the linux-next tree, and
+> > this patch is the request to move the bluetooth drive into the proper
+> > drivers/bluetooth/ location.
+> 
+> nice idea, but I don't want it that way. I am not dealing with staging
+> at all. They can submit this driver for upstream inclusion and then
+> delete it in a second step from staging. Or the other way around.
 
-in general I am fine if we do this similar to what we do with the
-different telephony backend. So yes, go ahead with this.
+That's fine, then consider this a "please add the driver to your tree"
+type of request.
 
-However, please clean this up. The patch needs a lot of work before it
-would be ready upstream. And of course it requires a dummy SAP plugin as
-well. Same as we do have for telephony.
+> And as long as this driver registers a Bluetooth HCI device in its
+> module_init routine it is not ready for upstream. This needs to be fixed
+> first and I mentioned that already before.
 
-Regards
+That's also fine, it's an iterative process :)
 
-Marcel
+thanks,
 
-
+greg k-h
