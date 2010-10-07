@@ -1,15 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 7 Oct 2010 21:59:43 +0100
-From: Alan Cox <alan@lxorguk.ukuu.org.uk>
-To: "Savoy, Pavan" <pavan_savoy@ti.com>
-Cc: Jiri Slaby <jirislaby@gmail.com>,
+From: "Savoy, Pavan" <pavan_savoy@ti.com>
+To: Alan Cox <alan@lxorguk.ukuu.org.uk>
+CC: Jiri Slaby <jirislaby@gmail.com>,
 	"gregkh@suse.de" <gregkh@suse.de>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
 	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 1/2] drivers:staging:ti-st: move TI_ST from staging
-Message-ID: <20101007215943.45365f45@lxorguk.ukuu.org.uk>
-In-Reply-To: <19F8576C6E063C45BE387C64729E739404AA21D248@dbde02.ent.ti.com>
+Date: Fri, 8 Oct 2010 01:47:56 +0530
+Subject: RE: [PATCH 1/2] drivers:staging:ti-st: move TI_ST from staging
+Message-ID: <19F8576C6E063C45BE387C64729E739404AA21D248@dbde02.ent.ti.com>
 References: <1286381895-11329-1-git-send-email-pavan_savoy@ti.com>
 	<1286381895-11329-2-git-send-email-pavan_savoy@ti.com>
 	<4CACD234.7020900@gmail.com>
@@ -22,43 +21,73 @@ References: <1286381895-11329-1-git-send-email-pavan_savoy@ti.com>
 	<19F8576C6E063C45BE387C64729E739404AA21D220@dbde02.ent.ti.com>
 	<20101007203801.1c55a1d3@lxorguk.ukuu.org.uk>
 	<19F8576C6E063C45BE387C64729E739404AA21D23B@dbde02.ent.ti.com>
-	<20101007213503.657bcab0@lxorguk.ukuu.org.uk>
-	<19F8576C6E063C45BE387C64729E739404AA21D248@dbde02.ent.ti.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+ <20101007213503.657bcab0@lxorguk.ukuu.org.uk>
+In-Reply-To: <20101007213503.657bcab0@lxorguk.ukuu.org.uk>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> But, I want to attach my data not when ldsic is opened, but when ldisc is registered.
-> I want to begin accessing the data when ldisc is opened.
 
-How can you attach per tty data when the ldisc is registered - the
-relevant tty driver might not even have been loaded at that point. The
-user may not even have been to the shop and bought it even !
-
-What sort of data is this ?
-
-> to be like a bunch of helpers (1 for FM, 1 for GPS, 1 for NFC, 1 for power-management), also the problem of who owns the /dev/tty begins to occur, Bluetooth has a utility called hciattach, I don't want my FM radio software to run hciattach when /dev/radio0 is opened and communicated via FM.
-
-I would have assumed the hotplug script would have run your own attach
-and daemon and the FM radio etc would talk to the ldisc via other kernel
-interfaces it presented.
-
-So whenever the hardware is detected it would load the hardware driver
-The hardware driver would create a tty instance for each physical port
-The hotplug user space would run 'ti-st-attach' as a helper which would
-load the ldisc and set up the bluetooth as well as providing exported
-methods for FM radio etc.
-
-> In any case, the ti-st/ seems better now by look of things, I certainly welcome suggestions to improve it.
-> Also, is there any plan to re-write whole of TTY like a the i2C or the SPI bus structure?
+> -----Original Message-----
+> From: Alan Cox [mailto:alan@lxorguk.ukuu.org.uk]
+> Sent: Thursday, October 07, 2010 3:35 PM
+> To: Savoy, Pavan
+> Cc: Jiri Slaby; gregkh@suse.de; linux-kernel@vger.kernel.org;
+> devel@driverdev.osuosl.org; linux-bluetooth@vger.kernel.org
+> Subject: Re: [PATCH 1/2] drivers:staging:ti-st: move TI_ST from staging
 > 
-> Here I can imagine, all TTY line disciplines being sort of protocol/client drivers, the TTY sub-system in itself would be like the algos driver and then
-> The uart drivers (like 8250.c) can be the adapter drivers.. What say?
+> > ldisc is the ONLY way to do it, isn't it? Do I have any other option?
+> 
+> Userspace but even then it wouldn't solve your problem
+> 
+> > The situation was something similar here.
+> > What I was trying to get to is how we can have a per-device context if a
+> driver is just a line discipline driver?
+> 
+> tty->driver_data
+> 		TTY private data
+> tty->disc_data
+> 		LDISC per instance private data
+> 
+> So when your ldisc is opened attach your data to the tty->disc_data, and
+> when it is closed free the data.
 
-They already are, with the one oddity being that something needs to have
-it opened from user space and to attach the ldisc. Thats fixable but hard
-to fix and I'm not aware of any plan to do so - mostly because nobody
-needs it so far.
+But, I want to attach my data not when ldsic is opened, but when ldisc is registered.
+I want to begin accessing the data when ldisc is opened.
 
-Alan
+> > I have 3 sub-devices if you will on a device which is interfaced over UART,
+> > One of them is Bluetooth which requires any UART Bluetooth device to have
+> its
+> > Own line discipline - N_HCI.
+> 
+> The problem is that your chip by the sound of it does not talk the
+> bluetooth ldisc - it talks something more complex.
+> 
+> The obvious question then is
+> 
+> Does it talk
+> 
+> 1.	HCI with bits nailed on
+> 2.	Something rather different which contains muxed data some of
+> which is reformatted up to create HCI
+> 
+> In the first case it may be worth seeing if the existing N_HCI could
+> support forwarding unknown frame types to a helper. In the latter it's a
+> lot trickier. It is possible to create a mux tty layer (see n_gsm.c) but
+> that is almost certainly overkill for this.
+> 
+> I wonder what Marcel thinks in terms of re-using the bluetooth ldisc ?
+
+Yes, Marcel did suggest extending N_HCI, But even then, there need
+to be like a bunch of helpers (1 for FM, 1 for GPS, 1 for NFC, 1 for power-management), also the problem of who owns the /dev/tty begins to occur, Bluetooth has a utility called hciattach, I don't want my FM radio software to run hciattach when /dev/radio0 is opened and communicated via FM.
+
+In any case, the ti-st/ seems better now by look of things, I certainly welcome suggestions to improve it.
+Also, is there any plan to re-write whole of TTY like a the i2C or the SPI bus structure?
+
+Here I can imagine, all TTY line disciplines being sort of protocol/client drivers, the TTY sub-system in itself would be like the algos driver and then
+The uart drivers (like 8250.c) can be the adapter drivers.. What say?
+
+With something like this all I had to do was to write a new client driver.
+
+
