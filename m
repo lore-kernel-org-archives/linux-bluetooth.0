@@ -1,117 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Savoy, Pavan" <pavan_savoy@ti.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
-        "greg@kroah.com"
-	<greg@kroah.com>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Date: Thu, 7 Oct 2010 21:17:42 +0530
-Subject: RE: [PATCH 1/2] drivers:bluetooth: TI_ST bluetooth driver
-Message-ID: <19F8576C6E063C45BE387C64729E739404AA21D1BD@dbde02.ent.ti.com>
-References: <1286404493-23816-1-git-send-email-pavan-savoy@ti.com>
-	 <1286404493-23816-2-git-send-email-pavan-savoy@ti.com>
-	 <1286445948.6145.70.camel@aeonflux>
-	 <19F8576C6E063C45BE387C64729E739404AA21D19E@dbde02.ent.ti.com>
-	 <1286464659.6145.144.camel@aeonflux>
-	 <19F8576C6E063C45BE387C64729E739404AA21D1B4@dbde02.ent.ti.com>
- <1286465843.6145.157.camel@aeonflux>
-In-Reply-To: <1286465843.6145.157.camel@aeonflux>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Subject: RE: Sim Access profile server implementation
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Waldemar.Rymarkiewicz@tieto.com
+Cc: suraj@atheros.com, linux-bluetooth@vger.kernel.org,
+	Jothikumar.Mothilal@Atheros.com, joakim.xj.ceder@stericsson.com,
+	arunkr.singh@stericsson.com
+In-Reply-To: <99B09243E1A5DA4898CDD8B700111448097D01B814@EXMB04.eu.tieto.com>
+References: <1285657515.12097.7.camel@atheros013-desktop>
+	 <1286265730.17473.29.camel@aeonflux>
+	 <99B09243E1A5DA4898CDD8B700111448097D01B371@EXMB04.eu.tieto.com>
+	 <1286280767.17473.89.camel@aeonflux>
+	 <99B09243E1A5DA4898CDD8B700111448097D01B6CF@EXMB04.eu.tieto.com>
+	 <99B09243E1A5DA4898CDD8B700111448097D01B814@EXMB04.eu.tieto.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 07 Oct 2010 17:42:16 +0200
+Message-ID: <1286466136.6145.159.camel@aeonflux>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Waldemar,
 
-
-> -----Original Message-----
-> From: Marcel Holtmann [mailto:marcel@holtmann.org]
-> Sent: Thursday, October 07, 2010 10:37 AM
-> To: Savoy, Pavan
-> Cc: linux-bluetooth@vger.kernel.org; johan.hedberg@gmail.com; greg@kroah.=
-com;
-> linux-kernel@vger.kernel.org
-> Subject: RE: [PATCH 1/2] drivers:bluetooth: TI_ST bluetooth driver
->=20
-> Hi Pavan,
->=20
-> > > > > Registering the Bluetooth HCI driver in module_init/module_exit i=
-s not
-> > > > > acceptable. Turn your shared transport into a proper bus.
-> > > >
-> > > > Yes, you did comment on it before, I remember, I did prototype the
-> driver as
-> > > > a bus driver, However I didn't find any advantages by converting it=
- to a
-> bus
-> > > > driver.
-> > > > As in, currently the shared transport driver is a line discipline d=
-river
-> > > because
-> > > > it is the only way it can communicate over TTY without being tightl=
-y
-> coupled
-> > > with the UART driver.
-> > > >
-> > > > > We want to be able to have generic kernels where this module is
-> enabled,
-> > > > > but no Shared Transport is available.
-> > > >
-> > > > Oh if this is the reason I cannot have hci_register/_unregister in
-> > > module_init/_exit, Can I do this module "depends" on TI_ST, Then it w=
-ould
-> not
-> > > > even be visible to build if TI_ST is not selected.
-> > >
-> > > this is not helping either. Then TI_ST can not be selected and so you
-> > > still end up with some weird platform specific kernels. We don't want
-> > > that. We want generic kernels that can detect the hardware they are
-> > > running on.
-> > >
-> > > As I said, I will not accept this driver if it registers HCI device i=
-n
-> > > module_init. No other driver is doing this and it is in general a rea=
-lly
-> > > really really bad idea.
-> > >
+> >>Can you share that code with us. And also hardware if you. We 
+> >are still 
+> >>having hard time to find proper hardware to test this on.
 > >
-> > Ok, now I am beginning to get what you say, Let me check, may be what
-> > I can do is, have something like a st_prepare() function called in the
-> > module_init, and a _probe function of the bluetooth driver will be call=
-ed,
-> > _ONLY_ if the _probe of my platform driver has been called..
-> > Do you think this would be a good idea?
+> >Will send a patch soon. I use 
+> >http://www.stericsson.com/platforms/U8500.jsp hw, but need to 
+> >check if I can share one with you.
 > >
-> > Note: the TI_ST driver is also a platform device driver, so that TI_ST'=
-s
-> > Probe is not called, if a arch/xx/board-xx doesn't add it.
->=20
-> that that should be your bus right there.
+> 
+> Here you are the patch. Just note that it is based on an old bluez 4.4x
+> If you consider to accept the design I will update the patch upon the latest release. 
 
-I understand the perspective, but "bus" is not device-driver type of model =
-right? I mean I need a device which will be added in some platform specific
-board file, and the driver in my driver core file.
+in general I am fine if we do this similar to what we do with the
+different telephony backend. So yes, go ahead with this.
 
-> Let me repeat this. If you register the HCI device in module_init then
-> it will be registered on all platform this module is selected. Even if
-> the kernel runs on x86. And that is not acceptable. Registering devices
-> in module_init is a bad idea no matter what. That is why all other
-> drivers just register a driver here and not a device.
+However, please clean this up. The patch needs a lot of work before it
+would be ready upstream. And of course it requires a dummy SAP plugin as
+well. Same as we do have for telephony.
 
-I did initially think about making each of the protocol drivers a=20
-platform devices as well.
-As in Bluetooth/FM/GPS TI_ST driver would also be a platform device and its=
- _probe doing the HCI/v4L2/character device registration.
+Regards
 
-So which one do you think makes more sense here?
-1. Do I EXPORT a new symbol called st_prepare? And allow hci registration t=
-here?
+Marcel
 
-2. Or make Bluetooth device a platform device and this driver a platform dr=
-iver
-and add this Bluetooth device only when I add TI_ST platform device?
 
-> Regards
->=20
-> Marcel
->=20
