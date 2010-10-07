@@ -1,50 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 7 Oct 2010 07:34:09 -0700
-From: Greg KH <greg@kroah.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: pavan-savoy@ti.com, linux-bluetooth@vger.kernel.org,
-	johan.hedberg@gmail.com, linux-kernel@vger.kernel.org,
-	Pavan Savoy <pavan_savoy@ti.com>
-Subject: Re: [PATCH 1/2] drivers:bluetooth: TI_ST bluetooth driver
-Message-ID: <20101007143409.GB14913@kroah.com>
-References: <1286404493-23816-1-git-send-email-pavan-savoy@ti.com> <1286404493-23816-2-git-send-email-pavan-savoy@ti.com> <1286445948.6145.70.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1286445948.6145.70.camel@aeonflux>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH] TODO: Implement Server Characteristic Configuration
+Date: Thu,  7 Oct 2010 11:12:53 -0300
+Message-Id: <1286460773-25436-1-git-send-email-claudio.takahasi@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Oct 07, 2010 at 12:05:48PM +0200, Marcel Holtmann wrote:
-> Hi Pavan,
-> 
-> > This is the bluetooth protocol driver for the TI WiLink7 chipsets.
-> > Texas Instrument's WiLink chipsets combine wireless technologies
-> > like BT, FM, GPS and WLAN onto a single chip.
-> > 
-> > This Bluetooth driver works on top of the TI_ST shared transport
-> > line discipline driver which also allows other drivers like
-> > FM V4L2 and GPS character driver to make use of the same UART interface.
-> > 
-> > Signed-off-by: Pavan Savoy <pavan_savoy@ti.com>
-> > ---
-> >  drivers/bluetooth/bt_ti.c      |  463 ++++++++++++++++++++++++++++++++++++
-> >  drivers/staging/ti-st/bt_drv.c |  509 ----------------------------------------
-> >  drivers/staging/ti-st/bt_drv.h |   61 -----
-> >  3 files changed, 463 insertions(+), 570 deletions(-)
-> >  create mode 100644 drivers/bluetooth/bt_ti.c
-> >  delete mode 100644 drivers/staging/ti-st/bt_drv.c
-> >  delete mode 100644 drivers/staging/ti-st/bt_drv.h
-> 
-> I don't care about staging at all. So you sort that out with Greg.
-> 
-> Submit your driver for upstream inclusion. And once accepted you can pin
-> Greg about removing it.
+---
+ TODO |    8 ++++++++
+ 1 files changed, 8 insertions(+), 0 deletions(-)
 
-The driver is already in staging, this is the request to move it out of
-staging and into the "correct" place in the tree.  The core of the ti-st
-code is now in the drivers/misc/ directory in the linux-next tree, and
-this patch is the request to move the bluetooth drive into the proper
-drivers/bluetooth/ location.
+diff --git a/TODO b/TODO
+index 75a929c..d594592 100644
+--- a/TODO
++++ b/TODO
+@@ -18,6 +18,14 @@ Background
+ ATT/GATT
+ ========
+ 
++- Implement Server characteristic Configuration support in the attribute
++  server to manage characteristic value broadcasting. There is a single
++  instance of the Server Characteristic Configuration for all clients.
++  See Volume 3, Part G, section 3.3.3.4 for more information.
++
++  Priority: Low
++  Complexity: C1
++
+ - Implement Client Characteristic Configuration support in the attribute
+   server to manage indications and notications. This is a per client attribute
+   to control how the client wants to receive reports of changes in a given
+-- 
+1.7.3.1
 
-thanks,
-
-greg k-h
