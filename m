@@ -1,16 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: RE: RFC: btusb firmware load help
+Subject: Re: RFC: btusb firmware load help
 From: Johannes Berg <johannes@sipsolutions.net>
-To: Marcel Holtmann <holtmann@linux.intel.com>
+To: Bala Shanmugam <sbalashanmugam@atheros.com>
 Cc: Shanmugamkamatchi Balashanmugam
 	<Shanmugamkamatchi.Balashanmugam@Atheros.com>,
 	Luis Rodriguez <Luis.Rodriguez@Atheros.com>,
+	Marcel Holtmann <holtmann@linux.intel.com>,
 	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
 	Deepak Dhamdhere <Deepak.Dhamdhere@Atheros.com>,
 	Sree Durbha <Sree.Durbha@Atheros.com>
-In-Reply-To: <1286465072.6145.151.camel@aeonflux>
+In-Reply-To: <4CADF634.1030203@atheros.com>
 References: <1286349552.6145.11.camel@aeonflux>
 	 <AANLkTimDvgFtoGLEjgWyYRrhQy6Num-rn_2WYO4Lf84b@mail.gmail.com>
 	 <1286380566.6145.42.camel@aeonflux> <20101006163816.GE7070@tux>
@@ -22,25 +23,27 @@ References: <1286349552.6145.11.camel@aeonflux>
 	 <1286389697.3655.401.camel@jlt3.sipsolutions.net>
 	 ,<20101006183340.GI7070@tux>
 	 <44EE5C37ADC36343B0625A05DD408C4850DAD2CA31@CHEXMB-01.global.atheros.com>
-	 <1286465072.6145.151.camel@aeonflux>
+	 <1286464555.20974.3.camel@jlt3.sipsolutions.net>
+	 <4CADF634.1030203@atheros.com>
 Content-Type: text/plain; charset="UTF-8"
-Date: Thu, 07 Oct 2010 19:59:19 +0200
-Message-ID: <1286474359.20974.13.camel@jlt3.sipsolutions.net>
+Date: Thu, 07 Oct 2010 19:57:53 +0200
+Message-ID: <1286474273.20974.11.camel@jlt3.sipsolutions.net>
 Mime-Version: 1.0
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2010-10-07 at 17:24 +0200, Marcel Holtmann wrote:
+On Thu, 2010-10-07 at 22:02 +0530, Bala Shanmugam wrote:
 
-> I am still trying to figure out if this is one stage firmware loading or
-> a two stage firmware loading. This is all pretty unclear and nobody has
-> answered this clearly so far.
+> AR3011 when plugged-in uses PID 3000 and control goes to DFU driver [ath3k].
+> ath3k downloads the firmware to the device changing its PID to 3002.
+> Now btusb gets the control and attaches the device to bluetooth core.
+> 
+> So blacklisting 3002 in btusb will create issues for AR3011 chipsets.
+> In firmware if we change the PID from 3002 to 3003 as you suggested and 
+> blacklist 3002 in btusb we can make both devices work.
 
-afaict, it's just one stage -- either it has sflash and you load ath3k
-firmware over it (the problematic 3002-before-loading case), or it
-doesn't have any firmware (and comes up with 3000) and you load the same
-ath3k firmware over it with a different mechanism, which currently
-announces itself as 3002 but can be changed.
+Yeah, that still seems like the best approach, or maybe 3004 instead of
+3003 if 3003 is already in use by a different chip, or whatever.
 
 johannes
 
