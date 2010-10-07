@@ -1,66 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20101006214303.GB21610@jh-x301>
-References: <1286397594-12366-1-git-send-email-claudio.takahasi@openbossa.org>
-	<1286397594-12366-2-git-send-email-claudio.takahasi@openbossa.org>
-	<20101006214303.GB21610@jh-x301>
-Date: Thu, 7 Oct 2010 10:50:53 -0300
-Message-ID: <AANLkTi=RfJa4MsnboDWRZvJdH+dmXkUsnA-mcya-NBZt@mail.gmail.com>
-Subject: Re: [PATCH 2/2] Client Characteristic Configuration on attribute server
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH 4/7] Bluetooth: Use LE buffers for LE traffic
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Ville Tervo <ville.tervo@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1286390535-27462-5-git-send-email-ville.tervo@nokia.com>
+References: <1286390535-27462-1-git-send-email-ville.tervo@nokia.com>
+	 <1286390535-27462-5-git-send-email-ville.tervo@nokia.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 07 Oct 2010 13:07:53 +0200
+Message-ID: <1286449673.6145.99.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Oct 6, 2010 at 6:43 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Claudio,
->
-> On Wed, Oct 06, 2010, Claudio Takahasi wrote:
->> Initial implementation of per client attribute configuration for the
->> attribute server. Notification and indication shall be sent to the peer
->> only if Client Characteristic Configuration bit field is set.
->> ---
->>  TODO                |    7 --
->>  src/attrib-server.c |  194 +++++++++++++++++++++++++++++++++++---------------
->>  src/storage.c       |   44 ++++++++++++
->>  src/storage.h       |    4 +
->>  4 files changed, 184 insertions(+), 65 deletions(-)
->
-> I feel a bit conflicted about this one. Do we really want to have a
-> generic storage for all characteristics? I'd think that it'd make sense
-> to let each service implementation take care of how to store their state
-> persistently (if it needs to be done at all).
->
-> Would it be possible for you to create a patch that fixes the
-> notification sending to clients that haven't subscribed for them but
-> leaves out the storage stuff?
->
-> Johan
->
+Hi Ville,
 
-Hi Johan,
+> BLuetooth chips may have separate buffers for
+> LE traffic. This patch add support to use LE
+> buffers provided by the chip.
+> 
+> Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
+> ---
+>  include/net/bluetooth/hci_core.h |    6 +++
+>  net/bluetooth/hci_conn.c         |   11 +++++-
+>  net/bluetooth/hci_core.c         |   77 +++++++++++++++++++++++++++++++++++--
+>  net/bluetooth/hci_event.c        |   34 ++++++++++++++++-
+>  4 files changed, 120 insertions(+), 8 deletions(-)
 
-"clientconfig" file stores the <<Client Characteristic Configuration>>
-attribute only. Each characteristic declaration can have this optional
-attribute.
-The file format is:
-MAC#handle xxxx, where the handle is the <<Client Characteristic
-Configuration>> handle.
+this whole patch needs some re-thinking and proper LE init phase for
+combo chips where BR/EDR and LE can share the buffers.
 
-Only <<Client Characteristic Configuration>> and <<Server
-Characteristic Configuration>> descriptors are writeable. If you want
-to test this feature, my suggestion is to push this code upstream and
-move it to the service implementation if necessary in the future.
-Currently, we don't have this API/interface between the attrib server
-and service implementation, this is the reason why I implemented the
-storage inside the attrib server. IMHO, the attribute server can
-manage indications, notifications and broadcasting, otherwise we will
-duplicate the code in the services implementations.
+Regards
 
- I gonna send another patch to disable the automatic
-notification/indication in the sample server and it is up to you to
-decide which one to apply.
+Marcel
 
-Claudio
+
