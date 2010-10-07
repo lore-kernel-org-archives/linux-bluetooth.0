@@ -1,49 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: RFC: btusb firmware load help
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Bala Shanmugam <sbalashanmugam@atheros.com>
-Cc: Shanmugamkamatchi Balashanmugam
-	<Shanmugamkamatchi.Balashanmugam@Atheros.com>,
-	Luis Rodriguez <Luis.Rodriguez@Atheros.com>,
-	Marcel Holtmann <holtmann@linux.intel.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-	Deepak Dhamdhere <Deepak.Dhamdhere@Atheros.com>,
-	Sree Durbha <Sree.Durbha@Atheros.com>
-In-Reply-To: <4CADF634.1030203@atheros.com>
-References: <1286349552.6145.11.camel@aeonflux>
-	 <AANLkTimDvgFtoGLEjgWyYRrhQy6Num-rn_2WYO4Lf84b@mail.gmail.com>
-	 <1286380566.6145.42.camel@aeonflux> <20101006163816.GE7070@tux>
-	 <AANLkTik9w4_PdcEsbRHakLcxcD334_1Q8hGArxTXPCGF@mail.gmail.com>
-	 <20101006173949.GG7070@tux>
-	 <1286387660.3655.382.camel@jlt3.sipsolutions.net>
-	 <AANLkTikYRSQw-+Tcj4VS1qxi=OaeF9C5hjAMWVu+0M=v@mail.gmail.com>
-	 <AANLkTi=o4Mc72NrNoALBdS3YHeY7RMyyAJPsCy=uW3+F@mail.gmail.com>
-	 <1286389697.3655.401.camel@jlt3.sipsolutions.net>
-	 ,<20101006183340.GI7070@tux>
-	 <44EE5C37ADC36343B0625A05DD408C4850DAD2CA31@CHEXMB-01.global.atheros.com>
-	 <1286464555.20974.3.camel@jlt3.sipsolutions.net>
-	 <4CADF634.1030203@atheros.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Thu, 07 Oct 2010 19:57:53 +0200
-Message-ID: <1286474273.20974.11.camel@jlt3.sipsolutions.net>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: pavan_savoy@ti.com
+To: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+Cc: greg@kroah.com, linux-kernel@vger.kernel.org,
+        Pavan Savoy <pavan_savoy@ti.com>
+Subject: [PATCH 2/2] drivers:bluetooth: Kconfig & Makefile for TI BT
+Date: Thu,  7 Oct 2010 14:47:17 -0400
+Message-Id: <1286477237-7526-3-git-send-email-pavan_savoy@ti.com>
+In-Reply-To: <1286477237-7526-2-git-send-email-pavan_savoy@ti.com>
+References: <1286477237-7526-1-git-send-email-pavan_savoy@ti.com>
+ <1286477237-7526-2-git-send-email-pavan_savoy@ti.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2010-10-07 at 22:02 +0530, Bala Shanmugam wrote:
+From: Pavan Savoy <pavan_savoy@ti.com>
 
-> AR3011 when plugged-in uses PID 3000 and control goes to DFU driver [ath3k].
-> ath3k downloads the firmware to the device changing its PID to 3002.
-> Now btusb gets the control and attaches the device to bluetooth core.
-> 
-> So blacklisting 3002 in btusb will create issues for AR3011 chipsets.
-> In firmware if we change the PID from 3002 to 3003 as you suggested and 
-> blacklist 3002 in btusb we can make both devices work.
+Kconfig and Makefile modifications to enable the Bluetooth
+driver for Texas Instrument's WiLink 7 chipset.
 
-Yeah, that still seems like the best approach, or maybe 3004 instead of
-3003 if 3003 is already in use by a different chip, or whatever.
+Signed-off-by: Pavan Savoy <pavan_savoy@ti.com>
+---
+ drivers/bluetooth/Kconfig  |   10 ++++++++++
+ drivers/bluetooth/Makefile |    1 +
+ 2 files changed, 11 insertions(+), 0 deletions(-)
 
-johannes
-
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index 02deef4..936d8ce 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -219,4 +219,14 @@ config BT_ATH3K
+ 	  Say Y here to compile support for "Atheros firmware download driver"
+ 	  into the kernel or say M to compile it as module (ath3k).
+ 
++config BT_TI
++	tristate "BlueZ bluetooth driver for TI ST"
++	depends on TI_ST
++	help
++	  This enables the Bluetooth driver for Texas Instrument's BT/FM/GPS
++	  combo devices. This makes use of shared transport line discipline
++	  core driver to communicate with the BT core of the combo chip.
++
++	  Say Y here to compile support for Texas Instrument's WiLink7 driver
++	  into the kernel or say M to compile it as module.
+ endmenu
+diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
+index 71bdf13..63156da 100644
+--- a/drivers/bluetooth/Makefile
++++ b/drivers/bluetooth/Makefile
+@@ -28,3 +28,4 @@ hci_uart-$(CONFIG_BT_HCIUART_BCSP)	+= hci_bcsp.o
+ hci_uart-$(CONFIG_BT_HCIUART_LL)	+= hci_ll.o
+ hci_uart-$(CONFIG_BT_HCIUART_ATH3K)	+= hci_ath.o
+ hci_uart-objs				:= $(hci_uart-y)
++obj-$(CONFIG_BT_TI)			:= bt_ti.o
+-- 
+1.6.5
