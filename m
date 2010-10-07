@@ -1,23 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 07 Oct 2010 01:02:18 -0700 (PDT)
-Message-Id: <20101007.010218.57483410.davem@davemloft.net>
-To: padovan@profusion.mobi
-Cc: linville@tuxdriver.com, marcel@holtmann.org,
- linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: pull-request: bluetooth-2.6 2010-10-05
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20101005171349.GA16520@vigoh>
-References: <20101005171349.GA16520@vigoh>
+Subject: Re: Check for connections and disable bluetooth in shell
+From: Jonathan Haug <jonathanhaug@wolke7.net>
+To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20100831060429.GA15844@vigoh>
+References: <1283234299.1702.12.camel@josua>  <20100831060429.GA15844@vigoh>
+Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 07 Oct 2010 07:01:00 +0200
+Message-ID: <1286427660.2181.5.camel@josua>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Date: Tue, 5 Oct 2010 14:13:49 -0300
+Am Dienstag, den 31.08.2010, 03:04 -0300 schrieb Gustavo F. Padovan:
+> > 
+> > I want to disable bluetooth on my system (via commandline), if there is
+> > no active bluetooth connection -- without being root.
+> > 
+> > Therefor I need a way to
+> > 
+> > 1.  check if there is an active bluetooth connection
+> 
+> 'hcitool conn' can show that to you.
+> 
 
-> In this patch set we have two fixes for regressions in L2CAP due to ERTM code
-> we added in L2CAP for 2.6.36, a bugfix in the L2CAP Streaming Mode that was
-> making the kernel crash. And a fix for a deadlock issue between the sk_sndbuf
-> and the backlog queue in ERTM. The rest are also needed bug fixes.
+Just to complete this thread:
 
-Pulled, thanks.
+Thanks Gustavo! I'm now using the following script:
+
+		if grep -q off-line /proc/acpi/ac_adapter/ACAD/state; then
+			if !(hcitool con | grep -q "state"); then
+				rfkill block bluetooth
+			fi
+		fi
+
+May it be helpful for someone.
+
+Greetings
+
+Jonathan
+
