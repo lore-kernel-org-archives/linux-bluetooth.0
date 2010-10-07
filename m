@@ -1,33 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-From: pavan_savoy@ti.com
-To: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Cc: greg@kroah.com, linux-kernel@vger.kernel.org,
-        Pavan Savoy <pavan_savoy@ti.com>
-Subject: [PATCH 0/2] v2: Bluetooth driver for TI_ST
-Date: Thu,  7 Oct 2010 14:47:15 -0400
-Message-Id: <1286477237-7526-1-git-send-email-pavan_savoy@ti.com>
+Message-ID: <4CADFE1E.1070708@atheros.com>
+Date: Thu, 7 Oct 2010 22:36:38 +0530
+From: Bala Shanmugam <sbalashanmugam@atheros.com>
+MIME-Version: 1.0
+To: Marcel Holtmann <holtmann@linux.intel.com>
+CC: Shanmugamkamatchi Balashanmugam
+	<Shanmugamkamatchi.Balashanmugam@Atheros.com>,
+	Luis Rodriguez <Luis.Rodriguez@Atheros.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+	Deepak Dhamdhere <Deepak.Dhamdhere@Atheros.com>,
+	Sree Durbha <Sree.Durbha@Atheros.com>
+Subject: Re: RFC: btusb firmware load help
+References: <1286349552.6145.11.camel@aeonflux>	 <AANLkTimDvgFtoGLEjgWyYRrhQy6Num-rn_2WYO4Lf84b@mail.gmail.com>	 <1286380566.6145.42.camel@aeonflux> <20101006163816.GE7070@tux>	 <AANLkTik9w4_PdcEsbRHakLcxcD334_1Q8hGArxTXPCGF@mail.gmail.com>	 <20101006173949.GG7070@tux>	 <1286387660.3655.382.camel@jlt3.sipsolutions.net>	 <AANLkTikYRSQw-+Tcj4VS1qxi=OaeF9C5hjAMWVu+0M=v@mail.gmail.com>	 <AANLkTi=o4Mc72NrNoALBdS3YHeY7RMyyAJPsCy=uW3+F@mail.gmail.com>	 <1286389697.3655.401.camel@jlt3.sipsolutions.net>	 ,<20101006183340.GI7070@tux>	 <44EE5C37ADC36343B0625A05DD408C4850DAD2CA31@CHEXMB-01.global.atheros.com>	 <1286465072.6145.151.camel@aeonflux>  <4CADF6BF.6070305@atheros.com> <1286469741.6145.165.camel@aeonflux>
+In-Reply-To: <1286469741.6145.165.camel@aeonflux>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Pavan Savoy <pavan_savoy@ti.com>
+  On 10/7/2010 10:12 PM, Marcel Holtmann wrote:
+> Hi Bala,
+>
+>>>> Thanks Johannes.  This would be better option to change PID in firmware
+>>>> as blacklisting 3002 might create problems for 3011 chipsets.
+>>>> Will try and let you people know.
+>>> The misbehaving 3002 needs to be blacklisted in btusb.c anyway. However
+>>> after loading the firmware to 3002 device, it should change its PID to
+>>> something else.
+>>>
+>>> I am still trying to figure out if this is one stage firmware loading or
+>>> a two stage firmware loading. This is all pretty unclear and nobody has
+>>> answered this clearly so far.
+>> eeprom based 3011 chips comes up with PID 3000 giving control to DFU
+>> driver [ath3k].  ath3k downloads the
+>> firmware changing PID to 3002.  Now btusb gets control.
+>>
+>> In sflash based devices to reduce windows suspend/resume time we had a
+>> small firmware in flash which
+>> enables the device to get detected as Generic Bluetooth USB device with
+>> PID 3002.  So control reaches btusb when device is plugged in, leaving
+>> no option for us to load the actual firmware.
+>>
+>> Solution would be to blacklist 3002 in btusb, enable ath3k to get
+>> control for both the devices, download the firmware and change PID to
+>> 3003 so that control with come to btusb.
+> so here is the thing that needs to be done.
+>
+> a) Get a firmware for PID 3000 devices that change the firmware to some
+> other PID. Since 3003 is already in use as well, using 3004 or later is
+> better approach.
+>
+> b) Blacklist PID 3002 in btusb.c.
+>
+> c) Handle special firmware loading case for PID 3002 sflash devices. If
+> firmware is loaded changed to 3005 or other.
+>
+> And as a general note, I prefer that the PID after loading firmware is
+> different if you don't happen to actually load the same firmware.
+>
+> So please sort out your USB PID assignment for Bluetooth in general.
+> This seems to be a mess that is not thought through properly.
+>
+> Regards
+>
+> Marcel
+>
+>
+Thanks for your suggestion Marcel.
+Can't we have same PID[3004 or later] for both the devices after loading 
+the firmware by ath3k?
+We need two different firmware if we plan to have two different PIDs for 
+these two bluetooth devices.
 
-Marcel,
-
-I have taken care of the changes you've mentioned, Now the
-bluetooth driver is also a platform driver and it requires a
-platform device and this platform driver's probe will do the
-registration to HCI.
-
-other changes include the usage of BT_DBG instead of pr_*
-and removal of piece of code which was redundant.
-
-Please review and comment...
-
-Pavan Savoy (2):
-  drivers:bluetooth: TI_ST bluetooth driver
-  drivers:bluetooth: Kconfig & Makefile for TI BT
-
- drivers/bluetooth/Kconfig  |   10 +
- drivers/bluetooth/Makefile |    1 +
- drivers/bluetooth/bt_ti.c  |  489 ++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 500 insertions(+), 0 deletions(-)
- create mode 100644 drivers/bluetooth/bt_ti.c
+Regards,
+Bala.
