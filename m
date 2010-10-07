@@ -1,84 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Savoy, Pavan" <pavan_savoy@ti.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
-        "greg@kroah.com"
-	<greg@kroah.com>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Date: Thu, 7 Oct 2010 20:53:09 +0530
-Subject: RE: [PATCH 1/2] drivers:bluetooth: TI_ST bluetooth driver
-Message-ID: <19F8576C6E063C45BE387C64729E739404AA21D1B4@dbde02.ent.ti.com>
+Subject: Re: [PATCH 1/2] drivers:bluetooth: TI_ST bluetooth driver
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Greg KH <greg@kroah.com>
+Cc: pavan-savoy@ti.com, linux-bluetooth@vger.kernel.org,
+	johan.hedberg@gmail.com, linux-kernel@vger.kernel.org,
+	Pavan Savoy <pavan_savoy@ti.com>
+In-Reply-To: <20101007143409.GB14913@kroah.com>
 References: <1286404493-23816-1-git-send-email-pavan-savoy@ti.com>
 	 <1286404493-23816-2-git-send-email-pavan-savoy@ti.com>
-	 <1286445948.6145.70.camel@aeonflux>
-	 <19F8576C6E063C45BE387C64729E739404AA21D19E@dbde02.ent.ti.com>
- <1286464659.6145.144.camel@aeonflux>
-In-Reply-To: <1286464659.6145.144.camel@aeonflux>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+	 <1286445948.6145.70.camel@aeonflux>  <20101007143409.GB14913@kroah.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 07 Oct 2010 17:21:07 +0200
+Message-ID: <1286464867.6145.148.camel@aeonflux>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Greg,
 
-> -----Original Message-----
-> From: Marcel Holtmann [mailto:marcel@holtmann.org]
-> Sent: Thursday, October 07, 2010 10:18 AM
-> To: Savoy, Pavan
-> Cc: linux-bluetooth@vger.kernel.org; johan.hedberg@gmail.com; greg@kroah.=
-com;
-> linux-kernel@vger.kernel.org
-> Subject: RE: [PATCH 1/2] drivers:bluetooth: TI_ST bluetooth driver
->=20
-> Hi Pavan,
->=20
-> > > Registering the Bluetooth HCI driver in module_init/module_exit is no=
-t
-> > > acceptable. Turn your shared transport into a proper bus.
-> >
-> > Yes, you did comment on it before, I remember, I did prototype the driv=
-er as
-> > a bus driver, However I didn't find any advantages by converting it to =
-a bus
-> > driver.
-> > As in, currently the shared transport driver is a line discipline drive=
-r
-> because
-> > it is the only way it can communicate over TTY without being tightly co=
-upled
-> with the UART driver.
-> >
-> > > We want to be able to have generic kernels where this module is enabl=
-ed,
-> > > but no Shared Transport is available.
-> >
-> > Oh if this is the reason I cannot have hci_register/_unregister in
-> module_init/_exit, Can I do this module "depends" on TI_ST, Then it would=
- not
-> > even be visible to build if TI_ST is not selected.
->=20
-> this is not helping either. Then TI_ST can not be selected and so you
-> still end up with some weird platform specific kernels. We don't want
-> that. We want generic kernels that can detect the hardware they are
-> running on.
->=20
-> As I said, I will not accept this driver if it registers HCI device in
-> module_init. No other driver is doing this and it is in general a really
-> really really bad idea.
->=20
+> > > This is the bluetooth protocol driver for the TI WiLink7 chipsets.
+> > > Texas Instrument's WiLink chipsets combine wireless technologies
+> > > like BT, FM, GPS and WLAN onto a single chip.
+> > > 
+> > > This Bluetooth driver works on top of the TI_ST shared transport
+> > > line discipline driver which also allows other drivers like
+> > > FM V4L2 and GPS character driver to make use of the same UART interface.
+> > > 
+> > > Signed-off-by: Pavan Savoy <pavan_savoy@ti.com>
+> > > ---
+> > >  drivers/bluetooth/bt_ti.c      |  463 ++++++++++++++++++++++++++++++++++++
+> > >  drivers/staging/ti-st/bt_drv.c |  509 ----------------------------------------
+> > >  drivers/staging/ti-st/bt_drv.h |   61 -----
+> > >  3 files changed, 463 insertions(+), 570 deletions(-)
+> > >  create mode 100644 drivers/bluetooth/bt_ti.c
+> > >  delete mode 100644 drivers/staging/ti-st/bt_drv.c
+> > >  delete mode 100644 drivers/staging/ti-st/bt_drv.h
+> > 
+> > I don't care about staging at all. So you sort that out with Greg.
+> > 
+> > Submit your driver for upstream inclusion. And once accepted you can pin
+> > Greg about removing it.
+> 
+> The driver is already in staging, this is the request to move it out of
+> staging and into the "correct" place in the tree.  The core of the ti-st
+> code is now in the drivers/misc/ directory in the linux-next tree, and
+> this patch is the request to move the bluetooth drive into the proper
+> drivers/bluetooth/ location.
 
-Ok, now I am beginning to get what you say, Let me check, may be what
-I can do is, have something like a st_prepare() function called in the
-module_init, and a _probe function of the bluetooth driver will be called,
-_ONLY_ if the _probe of my platform driver has been called..
-Do you think this would be a good idea?
+nice idea, but I don't want it that way. I am not dealing with staging
+at all. They can submit this driver for upstream inclusion and then
+delete it in a second step from staging. Or the other way around.
 
-Note: the TI_ST driver is also a platform device driver, so that TI_ST's
-Probe is not called, if a arch/xx/board-xx doesn't add it.
+And as long as this driver registers a Bluetooth HCI device in its
+module_init routine it is not ready for upstream. This needs to be fixed
+first and I mentioned that already before.
 
-Please suggest.
+Regards
+
+Marcel
 
 
->=20
-> Marcel
->=20
