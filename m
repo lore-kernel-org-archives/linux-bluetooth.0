@@ -1,56 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 1/2] drivers:bluetooth: TI_ST bluetooth driver
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: pavan_savoy@ti.com, linux-bluetooth@vger.kernel.org,
-	greg@kroah.com, linux-kernel@vger.kernel.org
-In-Reply-To: <20101007184534.GB13602@vigoh>
-References: <1286477237-7526-1-git-send-email-pavan_savoy@ti.com>
-	 <1286477237-7526-2-git-send-email-pavan_savoy@ti.com>
-	 <20101007184534.GB13602@vigoh>
-Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 08 Oct 2010 10:37:42 +0200
-Message-ID: <1286527062.6145.182.camel@aeonflux>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <AANLkTim4WEh7ZLTiWbhiWcv1VXV+jpb_V8NqJjeq=OzH@mail.gmail.com>
+References: <1286369566-1453-1-git-send-email-lucas.pawlik@gmail.com>
+	<20101006133206.GA8696@jh-x301>
+	<AANLkTim4WEh7ZLTiWbhiWcv1VXV+jpb_V8NqJjeq=OzH@mail.gmail.com>
+Date: Fri, 8 Oct 2010 10:35:56 +0200
+Message-ID: <AANLkTim4tHR+3ccDJi+X8jLDiZo+PXTQjfCWtZ85bhjZ@mail.gmail.com>
+Subject: Re: [PATCH] Fix problem with invalid read from array
+From: Lukasz Pawlik <lucas.pawlik@gmail.com>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=0022152d7fed42c2de049216e681
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+--0022152d7fed42c2de049216e681
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-> Change the commit subject to "Bluetooth: TI_ST bluetooth driver" 
-> 
-> * pavan_savoy@ti.com <pavan_savoy@ti.com> [2010-10-07 14:47:16 -0400]:
-> 
-> > From: Pavan Savoy <pavan_savoy@ti.com>
-> > 
-> > This is the bluetooth protocol driver for the TI WiLink7 chipsets.
-> > Texas Instrument's WiLink chipsets combine wireless technologies
-> > like BT, FM, GPS and WLAN onto a single chip.
-> > 
-> > This Bluetooth driver works on top of the TI_ST shared transport
-> > line discipline driver which also allows other drivers like
-> > FM V4L2 and GPS character driver to make use of the same UART interface.
-> > 
-> > Signed-off-by: Pavan Savoy <pavan_savoy@ti.com>
-> > ---
-> >  drivers/bluetooth/bt_ti.c |  489 +++++++++++++++++++++++++++++++++++++++++++++
-> >  1 files changed, 489 insertions(+), 0 deletions(-)
-> >  create mode 100644 drivers/bluetooth/bt_ti.c
-> 
-> We don't have filename with bt_.. in drivers/bluetooth/. Maybe ti_st.c
-> should be a better name, or something like that.
+Attaching patch without change in src/adapter.c file.
 
-actually we have the bt prefix for company generic ones where they
-didn't wanna use the hardware name.
+Lukasz Pawlik
 
-So I prefer to use the hardware for a driver since it is much more clear
-that way. You acronym naming here is bad. It is confusing like hell.
+2010/10/6 Lukasz Pawlik <lucas.pawlik@gmail.com>:
+> Hi,
+>
+> Sorry. My bad. It was never my intention to change src/adapter.c. I've
+> prepared two patches with the same name and of course send the wrong
+> one. Problem with invalid read fix change made in src/sdpd-service.c
+> file.
+>
+> Lukasz
+>
+> 2010/10/6 Johan Hedberg <johan.hedberg@gmail.com>:
+>> Hi Lukasz,
+>>
+>> On Wed, Oct 06, 2010, Lukasz Pawlik wrote:
+>>> This patch fix problem with reading data from out of the array range in
+>>> function used to create EIR response.
+>>
+>> You'll need to explain in more detail exactly what was wrong with the
+>> old code and how your patch fixes it (and why it is the correct fix).
+>>
+>>> - =A0 =A0 uint8_t data[240];
+>>> + =A0 =A0 uint8_t data[242];
+>>
+>> Why 242? The core spec defines the EIR data as a 240 byte field.
+>>
+>>> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 uuid128_data[SIZEOF_UUID128 - k])
+>>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 uuid128_data[SIZEOF_UUID128 - 1 - k])
+>>
+>> This change looks fine (the index of the last byte is sizeof(uuid128) - =
+1).
+>>
+>> Johan
+>>
+>
 
-What about just calling this btwilink.c or something. I just spinning
-ideas here.
+--0022152d7fed42c2de049216e681
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-Fix-problem-with-invalid-read-from-array.patch"
+Content-Disposition: attachment;
+	filename="0001-Fix-problem-with-invalid-read-from-array.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gf0shyhf0
 
-Regards
-
-Marcel
-
-
+RnJvbSA1ZTZjYThlOWRmZjBjZWQ1YWFjYzFjYmZhMTIzMTg2ODBhZGU5NTdhIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBMdWthc3ogUGF3bGlrIDxsdWNhcy5wYXdsaWtAZ21haWwuY29t
+PgpEYXRlOiBGcmksIDggT2N0IDIwMTAgMDk6MjM6MjYgKzAyMDAKU3ViamVjdDogW1BBVENIXSBG
+aXggcHJvYmxlbSB3aXRoIGludmFsaWQgcmVhZCBmcm9tIGFycmF5CgpUaGlzIHBhdGNoIGZpeCBw
+cm9ibGVtIHdpdGggcmVhZGluZyBkYXRhIGZyb20gb3V0IG9mIHRoZSBhcnJheSByYW5nZSBpbgpm
+dW5jdGlvbiB1c2VkIHRvIGNyZWF0ZSBFSVIgcmVzcG9uc2UuCi0tLQogc3JjL3NkcGQtc2Vydmlj
+ZS5jIHwgICAgMiArLQogMSBmaWxlcyBjaGFuZ2VkLCAxIGluc2VydGlvbnMoKyksIDEgZGVsZXRp
+b25zKC0pCgpkaWZmIC0tZ2l0IGEvc3JjL3NkcGQtc2VydmljZS5jIGIvc3JjL3NkcGQtc2Vydmlj
+ZS5jCmluZGV4IDI2YWI5YTUuLjY3ZGQ5YWYgMTAwNjQ0Ci0tLSBhL3NyYy9zZHBkLXNlcnZpY2Uu
+YworKysgYi9zcmMvc2RwZC1zZXJ2aWNlLmMKQEAgLTIwNCw3ICsyMDQsNyBAQCBzdGF0aWMgdm9p
+ZCBlaXJfZ2VuZXJhdGVfdXVpZDEyOChzZHBfbGlzdF90ICpsaXN0LAogCQlmb3IgKGkgPSAwOyBp
+IDwgaW5kZXg7IGkrKykgewogCQkJZm9yIChrID0gMDsgayA8IFNJWkVPRl9VVUlEMTI4OyBrKysp
+IHsKIAkJCQlpZiAodXVpZDEyOFtpICogU0laRU9GX1VVSUQxMjggKyBrXSAhPQotCQkJCQl1dWlk
+MTI4X2RhdGFbU0laRU9GX1VVSUQxMjggLSBrXSkKKwkJCQkJdXVpZDEyOF9kYXRhW1NJWkVPRl9V
+VUlEMTI4IC0gMSAtIGtdKQogCQkJCQlicmVhazsKIAkJCX0KIAkJCWlmIChrID09IFNJWkVPRl9V
+VUlEMTI4KQotLSAKMS43LjAuNAoK
+--0022152d7fed42c2de049216e681--
