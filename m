@@ -1,44 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 9 Oct 2010 00:47:37 +0200 (CEST)
-From: Sven-Haegar Koch <haegar@sdinet.de>
-To: "Luis R. Rodriguez" <lrodriguez@atheros.com>
-cc: Suraj Sumangala <Suraj.Sumangala@Atheros.com>,
-    Luis Rodriguez <Luis.Rodriguez@Atheros.com>,
-    David Woodhouse <dwmw2@infradead.org>,
-    Marcel Holtmann <marcel@holtmann.org>,
-    linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-    "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-    linux-wireless <linux-wireless@vger.kernel.org>
-Subject: Re: Firmware versioning best practices: ath3k-2.fw rename or replace
- ath3k-1.fw ?
-In-Reply-To: <20101008181508.GM10149@tux>
-Message-ID: <alpine.DEB.2.02.1010090040240.19472@aurora.sdinet.de>
-References: <20101008170258.GJ10149@tux> <4CAF5488.3030706@Atheros.com> <20101008181508.GM10149@tux>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org
+Subject: [PATCH] Bluetooth: update MAINTAINERS for Bluetooth subsys
+Date: Fri,  8 Oct 2010 09:24:18 -0300
+Message-Id: <1286540658-2890-1-git-send-email-padovan@profusion.mobi>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 8 Oct 2010, Luis R. Rodriguez wrote:
+Add myself to MAINTAINERS and update the git trees.
 
-> > > I last tried to document a thread we had over this here:
-> > >
-> > > http://wireless.kernel.org/en/developers/Documentation/firmware-versioning
-> > >
-> 
-> Thanks, I've updated that link above to document bug fixing does not require
-> a filename change.
+Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+---
+ MAINTAINERS |    5 ++++-
+ 1 files changed, 4 insertions(+), 1 deletions(-)
 
-I would summarize it as:
-
-If a new firmware version also works with an old driver, keep the filename.
-
-If a new firmware version also requires a new driver, change the name.
-
-If a new driver requires a new firmware, change the name.
-
-c'ya
-sven-haegar
-
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 9ddb5ac..07ca793 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1351,16 +1351,19 @@ F:	drivers/mtd/devices/block2mtd.c
+ 
+ BLUETOOTH DRIVERS
+ M:	Marcel Holtmann <marcel@holtmann.org>
++M:	Gustavo F. Padovan <padovan@profusion.mobi>
+ L:	linux-bluetooth@vger.kernel.org
+ W:	http://www.bluez.org/
++T:	git git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git
+ S:	Maintained
+ F:	drivers/bluetooth/
+ 
+ BLUETOOTH SUBSYSTEM
+ M:	Marcel Holtmann <marcel@holtmann.org>
++M:	Gustavo F. Padovan <padovan@profusion.mobi>
+ L:	linux-bluetooth@vger.kernel.org
+ W:	http://www.bluez.org/
+-T:	git git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6.git
++T:	git git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git
+ S:	Maintained
+ F:	net/bluetooth/
+ F:	include/net/bluetooth/
 -- 
-Three may keep a secret, if two of them are dead.
-- Ben F.
+1.7.3.1
