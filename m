@@ -1,76 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Firmware versioning best practices: ath3k-2.fw rename or
- replace ath3k-1.fw ?
-From: Marcel Holtmann <marcel@holtmann.org>
+Date: Sat, 9 Oct 2010 00:47:37 +0200 (CEST)
+From: Sven-Haegar Koch <haegar@sdinet.de>
 To: "Luis R. Rodriguez" <lrodriguez@atheros.com>
-Cc: Suraj Sumangala <Suraj.Sumangala@Atheros.com>,
-	David Woodhouse <dwmw2@infradead.org>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	linux-kernel@vger.kernel.org,
-	linux-wireless <linux-wireless@vger.kernel.org>
-In-Reply-To: <20101008170258.GJ10149@tux>
-References: <20101008170258.GJ10149@tux>
-Content-Type: text/plain; charset="UTF-8"
-Date: Sat, 09 Oct 2010 10:01:28 +0200
-Message-ID: <1286611288.6145.430.camel@aeonflux>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+cc: Suraj Sumangala <Suraj.Sumangala@Atheros.com>,
+    Luis Rodriguez <Luis.Rodriguez@Atheros.com>,
+    David Woodhouse <dwmw2@infradead.org>,
+    Marcel Holtmann <marcel@holtmann.org>,
+    linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+    "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+    linux-wireless <linux-wireless@vger.kernel.org>
+Subject: Re: Firmware versioning best practices: ath3k-2.fw rename or replace
+ ath3k-1.fw ?
+In-Reply-To: <20101008181508.GM10149@tux>
+Message-ID: <alpine.DEB.2.02.1010090040240.19472@aurora.sdinet.de>
+References: <20101008170258.GJ10149@tux> <4CAF5488.3030706@Atheros.com> <20101008181508.GM10149@tux>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luis,
+On Fri, 8 Oct 2010, Luis R. Rodriguez wrote:
 
-> What is the difference between ath3k-2.fw and ath3k-1.fw ?
+> > > I last tried to document a thread we had over this here:
+> > >
+> > > http://wireless.kernel.org/en/developers/Documentation/firmware-versioning
+> > >
 > 
-> Won't the API change now that you are addressing the sflash
-> configuration fix? Would it not help to identify the two
-> different firmwares then?
-> 
-> David, Marcel, what are your preferences for a firmware upgrade
-> where the firmware does not change API (lets just pretend it does
-> not for a moment) ? Do we keep the same filename?
+> Thanks, I've updated that link above to document bug fixing does not require
+> a filename change.
 
-that is what most companies do and that is what iwlwifi has done so far.
-Only if the API breaks a different suffix is used.
+I would summarize it as:
 
-With Bluetooth this should be never needed at all. The reason is that
-you need to expose Bluetooth HCI. And that has generic version, support
-commands and supported features commands.
+If a new firmware version also works with an old driver, keep the filename.
 
-We are not even using the version information for anything useful these
-days since the firmware has to identify its features and its supported
-commands with standard HCI commands. So it is pretty simple to detect
-what Bluetooth subsystem needs to do.
+If a new firmware version also requires a new driver, change the name.
 
-> In this particular case I would assume our new sflash configuration
-> fix that might be being worked on might change the re-enumerated
-> USB device IDs so it seems to me a good idea to use a new filename.
-> I should note ath3k-2.fw already made it to linux-firmware.git...
+If a new driver requires a new firmware, change the name.
 
-No it does not. The changed PID is not a breakage. It will just keep
-working. So please fix this in linux-firmware.git right away and remove
-the new firmware file.
+c'ya
+sven-haegar
 
-And here is something that is wrong with your process as well. Don't
-submit firmware files upstream before the upstream maintainers accepted
-your driver or patch.
-
-I know it is nice to have the firmware available quickly, but if your
-driver gets rejected for the reason we have stated in this thread, you
-have dangling firmware somewhere.
-
-> I last tried to document a thread we had over this here:
-> 
-> http://wireless.kernel.org/en/developers/Documentation/firmware-versioning
-> 
-> Does this sound sane? If so then the sflash configuration fix
-> would seem to me like it would require a new filename. Now, while
-> we're at it, how about bug fixes?
-
-If your firmware files are identical and the exposed API is identical
-(in this case Bluetooth HCI), then you do NO need a new filename.
-
-Regards
-
-Marcel
-
-
+-- 
+Three may keep a secret, if two of them are dead.
+- Ben F.
