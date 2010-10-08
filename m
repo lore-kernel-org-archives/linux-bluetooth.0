@@ -1,35 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: <Waldemar.Rymarkiewicz@tieto.com>
-To: <marcel@holtmann.org>
-CC: <suraj@atheros.com>, <linux-bluetooth@vger.kernel.org>,
-	<Jothikumar.Mothilal@Atheros.com>, <joakim.xj.ceder@stericsson.com>,
-	<arunkr.singh@stericsson.com>
-Date: Fri, 8 Oct 2010 17:27:16 +0300
-Subject: RE: Sim Access profile server implementation
-Message-ID: <99B09243E1A5DA4898CDD8B700111448097D09EF3F@EXMB04.eu.tieto.com>
-References: <1285657515.12097.7.camel@atheros013-desktop>
-	 <1286265730.17473.29.camel@aeonflux>
-	 <99B09243E1A5DA4898CDD8B700111448097D01B371@EXMB04.eu.tieto.com>
-	 <1286280767.17473.89.camel@aeonflux>
-	 <99B09243E1A5DA4898CDD8B700111448097D01B6CF@EXMB04.eu.tieto.com>
-	 <99B09243E1A5DA4898CDD8B700111448097D01B814@EXMB04.eu.tieto.com>
- <1286466136.6145.159.camel@aeonflux>
-In-Reply-To: <1286466136.6145.159.camel@aeonflux>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+Date: Fri, 8 Oct 2010 16:00:20 +0200
+Message-ID: <AANLkTinLGQj+CSGRK+UX2oVyCW-XOsq_U4ZQTYuYRC1n@mail.gmail.com>
+Subject: [PATCH] Reduction memory leaks in phonebook module
+From: =?ISO-8859-2?Q?Rafa=B3_Michalski?= <michalski.raf@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: =?ISO-8859-2?Q?Rafa=B3_Michalski?= <michalski.raf@gmail.com>
+Content-Type: multipart/mixed; boundary=0015174c441c677e0304921b6e16
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,=20
+--0015174c441c677e0304921b6e16
+Content-Type: text/plain; charset=ISO-8859-1
 
->in general I am fine if we do this similar to what we do with=20
->the different telephony backend. So yes, go ahead with this.
->
->However, please clean this up. The patch needs a lot of work=20
->before it would be ready upstream. And of course it requires a=20
->dummy SAP plugin as well. Same as we do have for telephony.
->
 
-Then, I will prepare it for upstream.=20
 
-Regards,
-/Waldek
+--0015174c441c677e0304921b6e16
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-Reduction-memory-leaks-in-phonebook-module.patch"
+Content-Disposition: attachment;
+	filename="0001-Reduction-memory-leaks-in-phonebook-module.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gf14hg3o0
+
+RnJvbSA0MDM5OWI2MmVjNjI1NjkyMTM5NDhmN2ViNzdmZDM5ZDFmZjQyZWExIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBSYWZhbCBNaWNoYWxza2kgPG1pY2hhbHNraS5yYWZAZ21haWwu
+Y29tPgpEYXRlOiBGcmksIDggT2N0IDIwMTAgMTU6MTY6NTAgKzAyMDAKU3ViamVjdDogW1BBVENI
+XSBSZWR1Y3Rpb24gbWVtb3J5IGxlYWtzIGluIHBob25lYm9vayBtb2R1bGUKCk1lbW9yeSwgcG9p
+bnRlZCBieSBwb2ludGVycyBob21lX2FkZHIgYW5kIHdvcmtfYWRkciwgaXMgYWxsb2NhdGVkCnRl
+bXBvcmFyaWx5IGFuZCBub3QgZnJlZWQuIE9ubHkgZHVwbGljYXRlcyBvZiB0aGlzIG1lbW9yeSAo
+bWFkZSBhZnRlcgppbnZva2luZyBhZGRfYWRkcmVzcyBmdW5jdGlvbikgYXJlIGZyZWVkIGxhdGVy
+LgotLS0KIHBsdWdpbnMvcGhvbmVib29rLXRyYWNrZXIuYyB8ICAgIDMgKysrCiAxIGZpbGVzIGNo
+YW5nZWQsIDMgaW5zZXJ0aW9ucygrKSwgMCBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9wbHVn
+aW5zL3Bob25lYm9vay10cmFja2VyLmMgYi9wbHVnaW5zL3Bob25lYm9vay10cmFja2VyLmMKaW5k
+ZXggYzEwNDkxZC4uZDBjZWEyZSAxMDA2NDQKLS0tIGEvcGx1Z2lucy9waG9uZWJvb2stdHJhY2tl
+ci5jCisrKyBiL3BsdWdpbnMvcGhvbmVib29rLXRyYWNrZXIuYwpAQCAtMTAwNyw2ICsxMDA3LDkg
+QEAgYWRkX251bWJlcnM6CiAJYWRkX2FkZHJlc3MoY29udGFjdCwgaG9tZV9hZGRyLCBBRERSX1RZ
+UEVfSE9NRSk7CiAJYWRkX2FkZHJlc3MoY29udGFjdCwgd29ya19hZGRyLCBBRERSX1RZUEVfV09S
+Syk7CiAKKwlnX2ZyZWUoaG9tZV9hZGRyKTsKKwlnX2ZyZWUod29ya19hZGRyKTsKKwogCURCRygi
+Y29udGFjdCAlcCIsIGNvbnRhY3QpOwogCiAJLyogQWRkaW5nIGNvbnRhY3RzIGRhdGEgdG8gd3Jh
+cHBlciBzdHJ1Y3QgLSB0aGlzIGRhdGEgd2lsbCBiZSB1c2VkIHRvCi0tIAoxLjYuMy4zCgo=
+--0015174c441c677e0304921b6e16--
