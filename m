@@ -1,43 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Fri, 8 Oct 2010 16:00:20 +0200
-Message-ID: <AANLkTinLGQj+CSGRK+UX2oVyCW-XOsq_U4ZQTYuYRC1n@mail.gmail.com>
-Subject: [PATCH] Reduction memory leaks in phonebook module
-From: =?ISO-8859-2?Q?Rafa=B3_Michalski?= <michalski.raf@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?ISO-8859-2?Q?Rafa=B3_Michalski?= <michalski.raf@gmail.com>
-Content-Type: multipart/mixed; boundary=0015174c441c677e0304921b6e16
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 8 Oct 2010 11:48:55 +0100
+From: Alan Cox <alan@lxorguk.ukuu.org.uk>
+To: Suraj Sumangala <suraj@Atheros.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "marcel@holtmann.org" <marcel@holtmann.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Peculiar stuff in hci_ath3k/badness in hci_uart
+Message-ID: <20101008114855.7dfd255d@lxorguk.ukuu.org.uk>
+In-Reply-To: <4CAEE1DB.1070202@Atheros.com>
+References: <20101007214134.6bcd2e8f@lxorguk.ukuu.org.uk>
+	<4CAEE1DB.1070202@Atheros.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---0015174c441c677e0304921b6e16
-Content-Type: text/plain; charset=ISO-8859-1
+On Fri, 8 Oct 2010 14:48:19 +0530
+Suraj Sumangala <suraj@Atheros.com> wrote:
 
+> Hi Alan,
+> 
+> On 10/8/2010 2:11 AM, Alan Cox wrote:
+> > Noticed this while looking at Savoy's stuff
+> >
+> >
+> > ath_wakeup_ar3k:
+> >
+> >         int status = tty->driver->ops->tiocmget(tty, NULL);
+> >
+> I agree, it will be a problem if the underlying driver try to access the 
+> "struct file". Is there any other way I can get the MCR status here 
+> without providing user space pointer?
 
+Currently no - that should get fixed in the tty layer and I will look
+into it end of next week as a priority.
 
---0015174c441c677e0304921b6e16
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Reduction-memory-leaks-in-phonebook-module.patch"
-Content-Disposition: attachment;
-	filename="0001-Reduction-memory-leaks-in-phonebook-module.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_gf14hg3o0
-
-RnJvbSA0MDM5OWI2MmVjNjI1NjkyMTM5NDhmN2ViNzdmZDM5ZDFmZjQyZWExIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBSYWZhbCBNaWNoYWxza2kgPG1pY2hhbHNraS5yYWZAZ21haWwu
-Y29tPgpEYXRlOiBGcmksIDggT2N0IDIwMTAgMTU6MTY6NTAgKzAyMDAKU3ViamVjdDogW1BBVENI
-XSBSZWR1Y3Rpb24gbWVtb3J5IGxlYWtzIGluIHBob25lYm9vayBtb2R1bGUKCk1lbW9yeSwgcG9p
-bnRlZCBieSBwb2ludGVycyBob21lX2FkZHIgYW5kIHdvcmtfYWRkciwgaXMgYWxsb2NhdGVkCnRl
-bXBvcmFyaWx5IGFuZCBub3QgZnJlZWQuIE9ubHkgZHVwbGljYXRlcyBvZiB0aGlzIG1lbW9yeSAo
-bWFkZSBhZnRlcgppbnZva2luZyBhZGRfYWRkcmVzcyBmdW5jdGlvbikgYXJlIGZyZWVkIGxhdGVy
-LgotLS0KIHBsdWdpbnMvcGhvbmVib29rLXRyYWNrZXIuYyB8ICAgIDMgKysrCiAxIGZpbGVzIGNo
-YW5nZWQsIDMgaW5zZXJ0aW9ucygrKSwgMCBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9wbHVn
-aW5zL3Bob25lYm9vay10cmFja2VyLmMgYi9wbHVnaW5zL3Bob25lYm9vay10cmFja2VyLmMKaW5k
-ZXggYzEwNDkxZC4uZDBjZWEyZSAxMDA2NDQKLS0tIGEvcGx1Z2lucy9waG9uZWJvb2stdHJhY2tl
-ci5jCisrKyBiL3BsdWdpbnMvcGhvbmVib29rLXRyYWNrZXIuYwpAQCAtMTAwNyw2ICsxMDA3LDkg
-QEAgYWRkX251bWJlcnM6CiAJYWRkX2FkZHJlc3MoY29udGFjdCwgaG9tZV9hZGRyLCBBRERSX1RZ
-UEVfSE9NRSk7CiAJYWRkX2FkZHJlc3MoY29udGFjdCwgd29ya19hZGRyLCBBRERSX1RZUEVfV09S
-Syk7CiAKKwlnX2ZyZWUoaG9tZV9hZGRyKTsKKwlnX2ZyZWUod29ya19hZGRyKTsKKwogCURCRygi
-Y29udGFjdCAlcCIsIGNvbnRhY3QpOwogCiAJLyogQWRkaW5nIGNvbnRhY3RzIGRhdGEgdG8gd3Jh
-cHBlciBzdHJ1Y3QgLSB0aGlzIGRhdGEgd2lsbCBiZSB1c2VkIHRvCi0tIAoxLjYuMy4zCgo=
---0015174c441c677e0304921b6e16--
+Alan
