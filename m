@@ -1,43 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 8 Oct 2010 10:02:59 -0700
-From: "Luis R. Rodriguez" <lrodriguez@atheros.com>
-To: Suraj Sumangala <Suraj.Sumangala@Atheros.com>, David Woodhouse
-	<dwmw2@infradead.org>, Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, linux-wireless
-	<linux-wireless@vger.kernel.org>
-Subject: Firmware versioning best practices: ath3k-2.fw rename or replace
- ath3k-1.fw ?
-Message-ID: <20101008170258.GJ10149@tux>
+Date: Fri, 8 Oct 2010 08:16:42 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org
+cc: marcel@holtmann.org, johan.hedberg@gmail.com,
+	rshaffer@codeaurora.org, gustavo@padovan.org
+Subject: [PATCH] Use a valid PSM as the default in l2test.
+Message-ID: <alpine.DEB.2.00.1010080809510.31147@linux-sea-02>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Suraj,
 
-What is the difference between ath3k-2.fw and ath3k-1.fw ?
 
-Won't the API change now that you are addressing the sflash
-configuration fix? Would it not help to identify the two
-different firmwares then?
+---------- Forwarded message ----------
+Date: Wed, 4 Aug 2010 15:31:13 -0700
+From: Mat Martineau <mathewm@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, rshaffer@codeaurora.org,
+     Mat Martineau <mathewm@codeaurora.org>
+Subject: [PATCH] Use a valid PSM as the default in l2test.
 
-David, Marcel, what are your preferences for a firmware upgrade
-where the firmware does not change API (lets just pretend it does
-not for a moment) ? Do we keep the same filename?
+The Bluetooth spec requires PSMs to be odd numbers, with the least
+significant bit of the most significant byte set to 0.  This
+change is a prerequisite for PSM validation in the kernel.
+---
+  test/l2test.c |    2 +-
+  1 files changed, 1 insertions(+), 1 deletions(-)
 
-In this particular case I would assume our new sflash configuration
-fix that might be being worked on might change the re-enumerated
-USB device IDs so it seems to me a good idea to use a new filename.
-I should note ath3k-2.fw already made it to linux-firmware.git...
+diff --git a/test/l2test.c b/test/l2test.c
+index 0bb46f3..32cd27a 100644
+--- a/test/l2test.c
++++ b/test/l2test.c
+@@ -87,7 +87,7 @@ static long buffer_size = 2048;
 
-I last tried to document a thread we had over this here:
+  /* Default addr and psm */
+  static bdaddr_t bdaddr;
+-static unsigned short psm = 10;
++static unsigned short psm = 0x1001;
 
-http://wireless.kernel.org/en/developers/Documentation/firmware-versioning
+  /* Default number of frames to send (-1 = infinite) */
+  static int num_frames = -1;
+-- 
+1.7.1
 
-Does this sound sane? If so then the sflash configuration fix
-would seem to me like it would require a new filename. Now, while
-we're at it, how about bug fixes?
 
-Suraj -- keep these discussions public please....
+Ping.  Marcel requested this patch to go with the "Validate PSM values 
+in calls to connect() and bind()" change to the kernel code.
 
-  Luis
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
