@@ -1,16 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: RE: RFC: btusb firmware load help
+Subject: Re: RFC: btusb firmware load help
 From: Marcel Holtmann <holtmann@linux.intel.com>
-To: Johannes Berg <johannes@sipsolutions.net>
+To: Bala Shanmugam <sbalashanmugam@atheros.com>
 Cc: Shanmugamkamatchi Balashanmugam
 	<Shanmugamkamatchi.Balashanmugam@Atheros.com>,
 	Luis Rodriguez <Luis.Rodriguez@Atheros.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
 	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
 	Deepak Dhamdhere <Deepak.Dhamdhere@Atheros.com>,
 	Sree Durbha <Sree.Durbha@Atheros.com>
-In-Reply-To: <1286474359.20974.13.camel@jlt3.sipsolutions.net>
+In-Reply-To: <4CADFE1E.1070708@atheros.com>
 References: <1286349552.6145.11.camel@aeonflux>
 	 <AANLkTimDvgFtoGLEjgWyYRrhQy6Num-rn_2WYO4Lf84b@mail.gmail.com>
 	 <1286380566.6145.42.camel@aeonflux> <20101006163816.GE7070@tux>
@@ -22,30 +23,70 @@ References: <1286349552.6145.11.camel@aeonflux>
 	 <1286389697.3655.401.camel@jlt3.sipsolutions.net>
 	 ,<20101006183340.GI7070@tux>
 	 <44EE5C37ADC36343B0625A05DD408C4850DAD2CA31@CHEXMB-01.global.atheros.com>
-	 <1286465072.6145.151.camel@aeonflux>
-	 <1286474359.20974.13.camel@jlt3.sipsolutions.net>
+	 <1286465072.6145.151.camel@aeonflux>  <4CADF6BF.6070305@atheros.com>
+	 <1286469741.6145.165.camel@aeonflux>  <4CADFE1E.1070708@atheros.com>
 Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 08 Oct 2010 10:26:58 +0200
-Message-ID: <1286526418.6145.174.camel@aeonflux>
+Date: Fri, 08 Oct 2010 10:24:49 +0200
+Message-ID: <1286526289.6145.172.camel@aeonflux>
 Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johannes,
+Hi Bala,
 
-> > I am still trying to figure out if this is one stage firmware loading or
-> > a two stage firmware loading. This is all pretty unclear and nobody has
-> > answered this clearly so far.
-> 
-> afaict, it's just one stage -- either it has sflash and you load ath3k
-> firmware over it (the problematic 3002-before-loading case), or it
-> doesn't have any firmware (and comes up with 3000) and you load the same
-> ath3k firmware over it with a different mechanism, which currently
-> announces itself as 3002 but can be changed.
+> >>>> Thanks Johannes.  This would be better option to change PID in firmware
+> >>>> as blacklisting 3002 might create problems for 3011 chipsets.
+> >>>> Will try and let you people know.
+> >>> The misbehaving 3002 needs to be blacklisted in btusb.c anyway. However
+> >>> after loading the firmware to 3002 device, it should change its PID to
+> >>> something else.
+> >>>
+> >>> I am still trying to figure out if this is one stage firmware loading or
+> >>> a two stage firmware loading. This is all pretty unclear and nobody has
+> >>> answered this clearly so far.
+> >> eeprom based 3011 chips comes up with PID 3000 giving control to DFU
+> >> driver [ath3k].  ath3k downloads the
+> >> firmware changing PID to 3002.  Now btusb gets control.
+> >>
+> >> In sflash based devices to reduce windows suspend/resume time we had a
+> >> small firmware in flash which
+> >> enables the device to get detected as Generic Bluetooth USB device with
+> >> PID 3002.  So control reaches btusb when device is plugged in, leaving
+> >> no option for us to load the actual firmware.
+> >>
+> >> Solution would be to blacklist 3002 in btusb, enable ath3k to get
+> >> control for both the devices, download the firmware and change PID to
+> >> 3003 so that control with come to btusb.
+> > so here is the thing that needs to be done.
+> >
+> > a) Get a firmware for PID 3000 devices that change the firmware to some
+> > other PID. Since 3003 is already in use as well, using 3004 or later is
+> > better approach.
+> >
+> > b) Blacklist PID 3002 in btusb.c.
+> >
+> > c) Handle special firmware loading case for PID 3002 sflash devices. If
+> > firmware is loaded changed to 3005 or other.
+> >
+> > And as a general note, I prefer that the PID after loading firmware is
+> > different if you don't happen to actually load the same firmware.
+> >
+> > So please sort out your USB PID assignment for Bluetooth in general.
+> > This seems to be a mess that is not thought through properly.
+> >
+> >
+> Thanks for your suggestion Marcel.
+> Can't we have same PID[3004 or later] for both the devices after loading 
+> the firmware by ath3k?
+> We need two different firmware if we plan to have two different PIDs for 
+> these two bluetooth devices.
 
-sounds a lot better than what I understood initially. So essentially the
-PID assigned for their different devices got screwed up. So that needs
-to be fixed now.
+if it loads the same firmware into the device, then it is just fine to
+share a PID. If it loads different firmware, then I would propose
+different PIDs.
+
+So yes, you can use the PID since you wanna keep the firmware the same.
+That is perfectly fine and reasonable.
 
 Regards
 
