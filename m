@@ -1,24 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: update MAINTAINERS for Bluetooth subsys
+Subject: Re: Firmware versioning best practices: ath3k-2.fw rename or
+ replace ath3k-1.fw ?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1286540658-2890-1-git-send-email-padovan@profusion.mobi>
-References: <1286540658-2890-1-git-send-email-padovan@profusion.mobi>
+To: Sven-Haegar Koch <haegar@sdinet.de>
+Cc: "Luis R. Rodriguez" <lrodriguez@atheros.com>,
+	Suraj Sumangala <Suraj.Sumangala@Atheros.com>,
+	Luis Rodriguez <Luis.Rodriguez@Atheros.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	linux-wireless <linux-wireless@vger.kernel.org>
+In-Reply-To: <alpine.DEB.2.02.1010090040240.19472@aurora.sdinet.de>
+References: <20101008170258.GJ10149@tux> <4CAF5488.3030706@Atheros.com>
+	 <20101008181508.GM10149@tux>
+	 <alpine.DEB.2.02.1010090040240.19472@aurora.sdinet.de>
 Content-Type: text/plain; charset="UTF-8"
-Date: Sat, 09 Oct 2010 10:07:25 +0200
-Message-ID: <1286611645.6145.436.camel@aeonflux>
+Date: Sat, 09 Oct 2010 10:06:39 +0200
+Message-ID: <1286611599.6145.435.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Sven-Haeger,
 
-> Add myself to MAINTAINERS and update the git trees.
+> > > > I last tried to document a thread we had over this here:
+> > > >
+> > > > http://wireless.kernel.org/en/developers/Documentation/firmware-versioning
+> > > >
+> > 
+> > Thanks, I've updated that link above to document bug fixing does not require
+> > a filename change.
 > 
-> Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+> I would summarize it as:
+> 
+> If a new firmware version also works with an old driver, keep the filename.
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+correct.
+
+> If a new firmware version also requires a new driver, change the name.
+> 
+> If a new driver requires a new firmware, change the name.
+
+These two depend. The exposed API stays the same. The firmware file
+itself is the same. Just the loading procedure is different. So no need
+to change the firmware name.
+
+Let me repeat this. If the API of the firmware exposed after loading it,
+breaks or is incompatible, then you need a new name.
+
+If you have generic commands to detect features in the firmware, then
+you should never be needed to change your firmware name. So you could
+extend the API as much as you like with keeping the same name.
+
+The different firmware names are for the driver to be able to detect the
+API of the firmware. And only if that is only possible via the filename
+you should use different filenames. Otherwise don't bother and use the
+generic feature detection of the firmware itself.
+
+And for Bluetooth in specific that is HCI. So any company needed
+different firmware filenames for Bluetooth have done something really
+really wrong in their development cycles.
 
 Regards
 
