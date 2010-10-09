@@ -1,32 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 9 Oct 2010 18:26:04 +0300
+Date: Sat, 9 Oct 2010 18:23:41 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?utf-8?B?UmFmYcWC?= Michalski <michalski.raf@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Reduction memory leaks in phonebook module
-Message-ID: <20101009152604.GA18989@jh-x301>
-References: <AANLkTinLGQj+CSGRK+UX2oVyCW-XOsq_U4ZQTYuYRC1n@mail.gmail.com>
+Subject: Re: [PATCH] Add support for Attribute Write Request
+Message-ID: <20101009152341.GA18538@jh-x301>
+References: <1286474561-23905-1-git-send-email-anderson.lizardo@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <AANLkTinLGQj+CSGRK+UX2oVyCW-XOsq_U4ZQTYuYRC1n@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1286474561-23905-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Rafał,
+Hi Anderson,
 
-On Fri, Oct 08, 2010, Rafał Michalski wrote:
-> From 40399b62ec62569213948f7eb77fd39d1ff42ea1 Mon Sep 17 00:00:00 2001
-> From: Rafal Michalski <michalski.raf@gmail.com>
-> Date: Fri, 8 Oct 2010 15:16:50 +0200
-> Subject: [PATCH] Reduction memory leaks in phonebook module
-> 
-> Memory, pointed by pointers home_addr and work_addr, is allocated
-> temporarily and not freed. Only duplicates of this memory (made after
-> invoking add_address function) are freed later.
+On Thu, Oct 07, 2010, Anderson Lizardo wrote:
+> Implement encoders/decoders for Write Request/Response and the handling
+> on attribute server. The attribute client still uses the Write Command
+> because currently SetProperty() has no means to wait for the server
+> response.
 > ---
->  plugins/phonebook-tracker.c |    3 +++
->  1 files changed, 3 insertions(+), 0 deletions(-)
+>  attrib/att.c        |   50 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  attrib/att.h        |    4 ++++
+>  attrib/gatt.c       |   11 +++++++++++
+>  attrib/gatt.h       |    3 +++
+>  src/attrib-server.c |   12 +++++++++++-
+>  5 files changed, 79 insertions(+), 1 deletions(-)
 
-Thanks. The patch has been pushed to the upstream obexd tree.
+Thanks. The patch is now upstream.
 
 Johan
