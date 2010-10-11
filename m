@@ -1,40 +1,97 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Date: Mon, 11 Oct 2010 14:25:02 +0200
-Message-ID: <AANLkTi=Ogzb3kUX7O4fz-w9gNpU9PCyTFo0GnhfePjC6@mail.gmail.com>
-Subject: Pull request git://gitorious.org/bluez-mcap-hdp/mcap-hdp.git for_upstream
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <52A922E83075C847A59D7DF98C660175018842@MTW02MBX03.mindtree.com>
+References: <20100920184943.GA22968@jh-x301>
+	<1286027890.12944.1.camel@localhost.localdomain>
+	<AANLkTikFrvyeoXV0uLYcvD4GCj2s3ML2-q8f5GhXMxAK@mail.gmail.com>
+	<1286187946.7898.0.camel@localhost.localdomain>
+	<20101004123552.GC11737@pengutronix.de>
+	<52A922E83075C847A59D7DF98C66017501871E@MTW02MBX03.mindtree.com>
+	<AANLkTimguxTRuPB2Dgqm4w5k-MeOxDdCYDn-T_UvOFRL@mail.gmail.com>
+	<52A922E83075C847A59D7DF98C660175018842@MTW02MBX03.mindtree.com>
+Date: Mon, 11 Oct 2010 16:47:19 +0530
+Message-ID: <AANLkTin7_EJzX9pSBp=b6Zwk+fQyOjftK4OmA+oLbHDc@mail.gmail.com>
+Subject: Re: How add support of LLMNR for PAN
+From: "Arun K. Singh" <arunkat@gmail.com>
+To: Chetankumar Manjegowda <Chetankumar_Manjegowda@mindtree.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The following changes since commit 646f0c7e6b557c5413825ce7b04bee52bf0129e8:
+Hello Chetan,
 
-  Move remote name and version requests to hciops (2010-10-10 22:44:25 +0100)
+Based on my limited understanding of networking, avahi should
+implement DNS-SD on Linux, which is quite close to Microsoft's version
+of LLMNR.  You may also want to use any other utility that may be
+required for supporting Link-local addresses etc on your host distro.
 
-are available in the git repository at:
-  git://gitorious.org/bluez-mcap-hdp/mcap-hdp.git for_upstream
 
-José Antonio Santos Cadenas (6):
-      Remove mdl_conn from struct hdp_channel
-      Remove app paramter from hdp_establish_mcl, it is not needed
-      Imcoming connection in control channel should be ERTM
-      Fix multiple emission of main channel property signal.
-      Return MCAP_MDL_BUSY when health channel can't be created
-      Implement callback for responding echo petitions
+But from Bluez perspective, pand should be really transparent as long
+as endpoints TCP/IP stacks support LLMNR or similar variants of LL
+name resolution protocols. It is pretty much a TCP/IP stack feature or
+so I believe.
 
-Santiago Carot-Nemesio (6):
-      Add a new function to create channels
-      Process request of of echo channels creation
-      Correctly notify the deletion of the reliable data channel
-      Add extra checks for avoid notifiying incoming echo channels
-      Delete all channels DBus interface when the instance is removed
-      Check first reliable configuration during channel creation
+Good Luck!
 
- health/hdp.c       |  249 +++++++++++++++++++++++++++++++++++----------------
- health/hdp_types.h |    3 +-
- health/hdp_util.c  |    3 -
- health/hdp_util.h  |    1 -
- health/mcap.c      |    1 +
- 5 files changed, 174 insertions(+), 83 deletions(-)
+
+-- 
+Best Regards,
+Arun Kumar Singh
+www.crazydaks.com
+
+
+
+
+On Tue, Oct 5, 2010 at 10:17 AM, Chetankumar Manjegowda
+<Chetankumar_Manjegowda@mindtree.com> wrote:
+>
+> Hi Arun,
+> Thanks for your reply.
+>
+> I am new to networking I am not sure about that.
+>
+> I want to send LLMNR query so i am planning to use avahi-0.6.27(avahi-autoipd) is this is fine or any other is available ?
+>
+> Rgds
+> Chetan
+>
+>
+> -----Original Message-----
+> From: Arun Kumar [mailto:arunkat@gmail.com]
+> Sent: Monday, October 04, 2010 9:06 PM
+> To: Chetankumar Manjegowda
+> Cc: linux-bluetooth@vger.kernel.org
+> Subject: Re: How add support of LLMNR for PAN
+>
+> Shouldn't this support come from linux ip stack rather than bluez?
+>
+>
+> Best Regards,
+> Arun Kumar Singh
+> www.crazydaks.com
+>
+>
+> On Mon, Oct 4, 2010 at 6:15 PM, Chetankumar Manjegowda
+> <Chetankumar_Manjegowda@mindtree.com> wrote:
+> >
+> > Hi All,
+> >
+> > I want to know how to enable/Integrate LLMNR for PAN profile.
+> >
+> > Can anyone give some suggestions or link where I can refer the same ??
+> >
+> > Rgds
+> > Chetan
+> >
+> > ________________________________
+> >
+> > http://www.mindtree.com/email/disclaimer.html
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> > the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at Â http://vger.kernel.org/majordomo-info.html
+>
+>
+>
+> --
