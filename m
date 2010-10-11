@@ -1,72 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 11 Oct 2010 22:36:18 +0100
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Pull request
+ git://gitorious.org/~vudentz/bluez/vudentzs-clone.git for-upstream
+Message-ID: <20101011213618.GA12650@jh-x301>
+References: <AANLkTikWCgaXMyRZcpKAsZq19-NzPD_U7YpA=_cFtFQX@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20101011213154.GA12131@jh-x301>
-References: <AANLkTi=Ogzb3kUX7O4fz-w9gNpU9PCyTFo0GnhfePjC6@mail.gmail.com> <20101011213154.GA12131@jh-x301>
-From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Date: Tue, 12 Oct 2010 00:25:54 +0200
-Message-ID: <AANLkTik8k84qwMM3nHc4z2gVWm6Vo0HaLME2PEcwMyeg@mail.gmail.com>
-Subject: Re: Pull request git://gitorious.org/bluez-mcap-hdp/mcap-hdp.git for_upstream
-To: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <AANLkTikWCgaXMyRZcpKAsZq19-NzPD_U7YpA=_cFtFQX@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Luiz,
 
-2010/10/11 Johan Hedberg <johan.hedberg@gmail.com>:
-> Hi,
->
-> On Mon, Oct 11, 2010, Jose Antonio Santos Cadenas wrote:
->> The following changes since commit 646f0c7e6b557c5413825ce7b04bee52bf0129e8:
->>
->>   Move remote name and version requests to hciops (2010-10-10 22:44:25 +0100)
->>
->> are available in the git repository at:
->>   git://gitorious.org/bluez-mcap-hdp/mcap-hdp.git for_upstream
->>
->> José Antonio Santos Cadenas (6):
->>       Remove mdl_conn from struct hdp_channel
->>       Remove app paramter from hdp_establish_mcl, it is not needed
->>       Imcoming connection in control channel should be ERTM
->>       Fix multiple emission of main channel property signal.
->>       Return MCAP_MDL_BUSY when health channel can't be created
->>       Implement callback for responding echo petitions
->>
->> Santiago Carot-Nemesio (6):
->>       Add a new function to create channels
->>       Process request of of echo channels creation
->>       Correctly notify the deletion of the reliable data channel
->>       Add extra checks for avoid notifiying incoming echo channels
->>       Delete all channels DBus interface when the instance is removed
->>       Check first reliable configuration during channel creation
->>
->>  health/hdp.c       |  249 +++++++++++++++++++++++++++++++++++----------------
->>  health/hdp_types.h |    3 +-
->>  health/hdp_util.c  |    3 -
->>  health/hdp_util.h  |    1 -
->>  health/mcap.c      |    1 +
->>  5 files changed, 174 insertions(+), 83 deletions(-)
->
-> Could you try to ping me on IRC when possible so we can solve a few
-> issues with these patches. It seems e.g. that you're doing GIOChannel
-> reference counting incorrectly in one place. There are also some english
-> language errors in the commit messages that would be good to fix (let's
-> see if you can spot them yourselves, otherwise I'll point them out when
-> we go over the other issues ;)
+On Mon, Oct 11, 2010, Luiz Augusto von Dentz wrote:
+> The following changes since commit 646f0c7e6b557c5413825ce7b04bee52bf0129e8:
+> 
+>   Move remote name and version requests to hciops (2010-10-10 22:44:25 +0100)
+> 
+> are available in the git repository at:
+>   git://gitorious.org/~vudentz/bluez/vudentzs-clone.git for-upstream
+> 
+> Luiz Augusto von Dentz (8):
+>       Fix not always signalling new streams when acting as a sink
+>       Fix not replying an error in case of endpoint request timeout
+>       Add source if the device attempt to configure a stream with a local sink
+>       Make use of avdtp category when setting errors
+>       Fix blocking on setconf confirmation callback
+>       Fix blocking on setconf indication callback
+>       Fix blocking when calling endpoint on hsp/hfp connection
+>       Remove unused code
+> 
+>  audio/a2dp.c   |  239 ++++++++++++++++++++++++++++++++++++++++----------------
+>  audio/avdtp.c  |  117 ++++++++++++++++++----------
+>  audio/avdtp.h  |   19 +++--
+>  audio/media.c  |   54 +++++--------
+>  audio/sink.c   |    4 +-
+>  audio/source.c |    4 +-
+>  6 files changed, 281 insertions(+), 156 deletions(-)
 
-I'm sorry but I can't connect to the IRC rigth now. Nevertheless, I
-think that I've found the issues:
+Thanks. The patches have been pushed upstream.
 
-- The iochannel should be unrefereed when the watcher is explicitly removed
-- The commit message s/paramter/parameter
-
-Are there any more?
-
-I will solve them in half an hour.
-
->
-> Johan
->
-
-Jose.
+Johan
