@@ -1,48 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 12 Oct 2010 14:17:26 -0700
-From: "Henry Ptasinski" <henryp@broadcom.com>
-To: "Luis R. Rodriguez" <lrodriguez@atheros.com>
-cc: "Suraj Sumangala" <Suraj.Sumangala@Atheros.com>,
-	"Luis Rodriguez" <Luis.Rodriguez@Atheros.com>,
-	"David Woodhouse" <dwmw2@infradead.org>,
-	"Marcel Holtmann" <marcel@holtmann.org>,
+From: Kevin Hayes <kevin@Atheros.com>
+To: Marcel Holtmann <holtmann@linux.intel.com>,
+	Shanmugamkamatchi Balashanmugam
+	<Shanmugamkamatchi.Balashanmugam@Atheros.com>
+CC: Shanmugamkamatchi Balashanmugam
+	<Shanmugamkamatchi.Balashanmugam@Atheros.com>,
+	Luis Rodriguez <Luis.Rodriguez@Atheros.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
 	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	linux-wireless <linux-wireless@vger.kernel.org>,
-	"Henry Ptasinski" <henryp@broadcom.com>
-Subject: Re: Firmware versioning best practices: ath3k-2.fw rename or
- replace ath3k-1.fw ?
-Message-ID: <20101012211726.GE2678@broadcom.com>
-References: <20101008170258.GJ10149@tux> <4CAF5488.3030706@Atheros.com>
- <20101008181508.GM10149@tux>
+	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+	Deepak Dhamdhere <Deepak.Dhamdhere@Atheros.com>,
+	Sree Durbha <Sree.Durbha@Atheros.com>
+Date: Tue, 12 Oct 2010 06:38:51 -0700
+Subject: RE: RFC: btusb firmware load help
+Message-ID: <B7132A25476D334D9130FE7532F2A56314B58158FF@SC1EXMB-MBCL.global.atheros.com>
+References: <1286349552.6145.11.camel@aeonflux>
+	 <AANLkTimDvgFtoGLEjgWyYRrhQy6Num-rn_2WYO4Lf84b@mail.gmail.com>
+	 <1286380566.6145.42.camel@aeonflux> <20101006163816.GE7070@tux>
+	 <AANLkTik9w4_PdcEsbRHakLcxcD334_1Q8hGArxTXPCGF@mail.gmail.com>
+	 <20101006173949.GG7070@tux>
+	 <1286387660.3655.382.camel@jlt3.sipsolutions.net>
+	 <AANLkTikYRSQw-+Tcj4VS1qxi=OaeF9C5hjAMWVu+0M=v@mail.gmail.com>
+	 <AANLkTi=o4Mc72NrNoALBdS3YHeY7RMyyAJPsCy=uW3+F@mail.gmail.com>
+	 <1286389697.3655.401.camel@jlt3.sipsolutions.net>
+	 ,<20101006183340.GI7070@tux>
+	 <44EE5C37ADC36343B0625A05DD408C4850DAD2CA31@CHEXMB-01.global.atheros.com>
+	 <1286465072.6145.151.camel@aeonflux>  <4CADF6BF.6070305@atheros.com>
+ <1286469741.6145.165.camel@aeonflux>
+In-Reply-To: <1286469741.6145.165.camel@aeonflux>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20101008181508.GM10149@tux>
-Content-Type: text/plain;
- charset=us-ascii
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Oct 08, 2010 at 11:15:08AM -0700, Luis R. Rodriguez wrote:
-> On Fri, Oct 08, 2010 at 10:27:36AM -0700, Suraj Sumangala wrote:
-> > Marcel had answered me before. It makes sense to have same file name.
-> > Other ways we end up changing the driver whenever there is a firmware 
-> > change.
-> 
-> > > I last tried to document a thread we had over this here:
-> > >
-> > > http://wireless.kernel.org/en/developers/Documentation/firmware-versioning
-> > >
-> 
-> Thanks, I've updated that link above to document bug fixing does not require
-> a filename change.
-
-I don't really understand why you would not want to change the code revision
-part of the filename.  
-
-I totally agree that you don't want to change the driver every time the
-firmware gets a bug fix, but wasn't that the whole point of splitting the name
-into API and code revisions portions, and symlinking the file to one that just
-has the API version?
-
-What's the issue with using the process as originally documented?
-
-- Henry
+SGkgTWFyY2VsLCBCYWxhLA0KDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJv
+bTogbGludXgtYmx1ZXRvb3RoLW93bmVyQHZnZXIua2VybmVsLm9yZyBbbWFpbHRvOmxpbnV4LWJs
+dWV0b290aC0NCj4gb3duZXJAdmdlci5rZXJuZWwub3JnXSBPbiBCZWhhbGYgT2YgTWFyY2VsIEhv
+bHRtYW5uDQo+IFNlbnQ6IFRodXJzZGF5LCBPY3RvYmVyIDA3LCAyMDEwIDk6NDIgQU0NCj4gVG86
+IFNoYW5tdWdhbWthbWF0Y2hpIEJhbGFzaGFubXVnYW0NCj4gQ2M6IFNoYW5tdWdhbWthbWF0Y2hp
+IEJhbGFzaGFubXVnYW07IEx1aXMgUm9kcmlndWV6OyBKb2hhbm5lcyBCZXJnOw0KPiBsaW51eC1i
+bHVldG9vdGg7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LQ0KPiB3aXJlbGVz
+c0B2Z2VyLmtlcm5lbC5vcmc7IERlZXBhayBEaGFtZGhlcmU7IFNyZWUgRHVyYmhhDQo+IFN1Ympl
+Y3Q6IFJlOiBSRkM6IGJ0dXNiIGZpcm13YXJlIGxvYWQgaGVscA0KPiANCj4gSGkgQmFsYSwNCj4g
+DQo+ID4gPj4gVGhhbmtzIEpvaGFubmVzLiAgVGhpcyB3b3VsZCBiZSBiZXR0ZXIgb3B0aW9uIHRv
+IGNoYW5nZSBQSUQgaW4NCj4gZmlybXdhcmUNCj4gPiA+PiBhcyBibGFja2xpc3RpbmcgMzAwMiBt
+aWdodCBjcmVhdGUgcHJvYmxlbXMgZm9yIDMwMTEgY2hpcHNldHMuDQo+ID4gPj4gV2lsbCB0cnkg
+YW5kIGxldCB5b3UgcGVvcGxlIGtub3cuDQo+ID4gPiBUaGUgbWlzYmVoYXZpbmcgMzAwMiBuZWVk
+cyB0byBiZSBibGFja2xpc3RlZCBpbiBidHVzYi5jIGFueXdheS4NCj4gSG93ZXZlcg0KPiA+ID4g
+YWZ0ZXIgbG9hZGluZyB0aGUgZmlybXdhcmUgdG8gMzAwMiBkZXZpY2UsIGl0IHNob3VsZCBjaGFu
+Z2UgaXRzIFBJRA0KPiB0bw0KPiA+ID4gc29tZXRoaW5nIGVsc2UuDQo+ID4gPg0KPiA+ID4gSSBh
+bSBzdGlsbCB0cnlpbmcgdG8gZmlndXJlIG91dCBpZiB0aGlzIGlzIG9uZSBzdGFnZSBmaXJtd2Fy
+ZQ0KPiBsb2FkaW5nIG9yDQo+ID4gPiBhIHR3byBzdGFnZSBmaXJtd2FyZSBsb2FkaW5nLiBUaGlz
+IGlzIGFsbCBwcmV0dHkgdW5jbGVhciBhbmQgbm9ib2R5DQo+IGhhcw0KPiA+ID4gYW5zd2VyZWQg
+dGhpcyBjbGVhcmx5IHNvIGZhci4NCj4gPg0KPiA+IGVlcHJvbSBiYXNlZCAzMDExIGNoaXBzIGNv
+bWVzIHVwIHdpdGggUElEIDMwMDAgZ2l2aW5nIGNvbnRyb2wgdG8gREZVDQo+ID4gZHJpdmVyIFth
+dGgza10uICBhdGgzayBkb3dubG9hZHMgdGhlDQo+ID4gZmlybXdhcmUgY2hhbmdpbmcgUElEIHRv
+IDMwMDIuICBOb3cgYnR1c2IgZ2V0cyBjb250cm9sLg0KPiA+DQo+ID4gSW4gc2ZsYXNoIGJhc2Vk
+IGRldmljZXMgdG8gcmVkdWNlIHdpbmRvd3Mgc3VzcGVuZC9yZXN1bWUgdGltZSB3ZSBoYWQNCj4g
+YQ0KPiA+IHNtYWxsIGZpcm13YXJlIGluIGZsYXNoIHdoaWNoDQo+ID4gZW5hYmxlcyB0aGUgZGV2
+aWNlIHRvIGdldCBkZXRlY3RlZCBhcyBHZW5lcmljIEJsdWV0b290aCBVU0IgZGV2aWNlDQo+IHdp
+dGgNCj4gPiBQSUQgMzAwMi4gIFNvIGNvbnRyb2wgcmVhY2hlcyBidHVzYiB3aGVuIGRldmljZSBp
+cyBwbHVnZ2VkIGluLA0KPiBsZWF2aW5nDQo+ID4gbm8gb3B0aW9uIGZvciB1cyB0byBsb2FkIHRo
+ZSBhY3R1YWwgZmlybXdhcmUuDQo+ID4NCj4gPiBTb2x1dGlvbiB3b3VsZCBiZSB0byBibGFja2xp
+c3QgMzAwMiBpbiBidHVzYiwgZW5hYmxlIGF0aDNrIHRvIGdldA0KPiA+IGNvbnRyb2wgZm9yIGJv
+dGggdGhlIGRldmljZXMsIGRvd25sb2FkIHRoZSBmaXJtd2FyZSBhbmQgY2hhbmdlIFBJRCB0bw0K
+PiA+IDMwMDMgc28gdGhhdCBjb250cm9sIHdpdGggY29tZSB0byBidHVzYi4NCj4gDQo+IHNvIGhl
+cmUgaXMgdGhlIHRoaW5nIHRoYXQgbmVlZHMgdG8gYmUgZG9uZS4NCj4gDQo+IGEpIEdldCBhIGZp
+cm13YXJlIGZvciBQSUQgMzAwMCBkZXZpY2VzIHRoYXQgY2hhbmdlIHRoZSBmaXJtd2FyZSB0byBz
+b21lDQo+IG90aGVyIFBJRC4gU2luY2UgMzAwMyBpcyBhbHJlYWR5IGluIHVzZSBhcyB3ZWxsLCB1
+c2luZyAzMDA0IG9yIGxhdGVyIGlzDQo+IGJldHRlciBhcHByb2FjaC4NCj4gDQo+IGIpIEJsYWNr
+bGlzdCBQSUQgMzAwMiBpbiBidHVzYi5jLg0KPiANCj4gYykgSGFuZGxlIHNwZWNpYWwgZmlybXdh
+cmUgbG9hZGluZyBjYXNlIGZvciBQSUQgMzAwMiBzZmxhc2ggZGV2aWNlcy4gSWYNCj4gZmlybXdh
+cmUgaXMgbG9hZGVkIGNoYW5nZWQgdG8gMzAwNSBvciBvdGhlci4NCj4gDQo+IEFuZCBhcyBhIGdl
+bmVyYWwgbm90ZSwgSSBwcmVmZXIgdGhhdCB0aGUgUElEIGFmdGVyIGxvYWRpbmcgZmlybXdhcmUg
+aXMNCj4gZGlmZmVyZW50IGlmIHlvdSBkb24ndCBoYXBwZW4gdG8gYWN0dWFsbHkgbG9hZCB0aGUg
+c2FtZSBmaXJtd2FyZS4NCj4gDQo+IFNvIHBsZWFzZSBzb3J0IG91dCB5b3VyIFVTQiBQSUQgYXNz
+aWdubWVudCBmb3IgQmx1ZXRvb3RoIGluIGdlbmVyYWwuDQo+IFRoaXMgc2VlbXMgdG8gYmUgYSBt
+ZXNzIHRoYXQgaXMgbm90IHRob3VnaHQgdGhyb3VnaCBwcm9wZXJseS4NCj4gDQo+IFJlZ2FyZHMN
+Cj4gDQo+IE1hcmNlbA0KPiANCg0KWWVzLCBpdCBpcyBhIGdvb2QgaWRlYSB0byBsZXQgdGhlIGRv
+d25sb2FkYWJsZSBmaXJtd2FyZSBzZXQgYSBuZXcgUElELCBhbG9uZyB3aXRoIHRoZSBibGFja2xp
+c3Qgb24gdGhlIDMwMDIgUElEIGZvciB0aGUgZmlyc3QgZ28gcm91bmQuICBJIGVtcGhhc2l6ZSwg
+aXQgaXMgdGhlIGRvd25sb2FkZWQgZmlybXdhcmUgdGhhdCB3aWxsIGJlIHJlcXVpcmVkIHRvIGRv
+IHRoZSBQSUQgc3dpenpsaW5nLCBub3QgdGhlIHNmbGFzaCBmaXJtd2FyZS4gIEFuZCBJIGFncmVl
+IHdlIHNob3VsZCBoYXZlIGEgbWFwIG9mIHRoZSBQSURzIGluIHVzZSBhbmQgd2hhdCB0aGV5IGFy
+ZSB1c2VkIGZvciwgb25jZSB3ZSBnZXQgdGhyb3VnaCB0aGlzIGltbWVkaWF0ZSBmaXhpbmcgcGhh
+c2UuDQoNClRoYW5rcywNCg0KCUsrKw0KDQoNCg0K
