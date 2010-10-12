@@ -5,15 +5,16 @@ References: <AANLkTi=Ogzb3kUX7O4fz-w9gNpU9PCyTFo0GnhfePjC6@mail.gmail.com>
  <20101011213154.GA12131@jh-x301> <AANLkTik8k84qwMM3nHc4z2gVWm6Vo0HaLME2PEcwMyeg@mail.gmail.com>
  <20101012093531.GA22165@jh-x301>
 From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Date: Tue, 12 Oct 2010 12:02:00 +0200
-Message-ID: <AANLkTikPOQm0MBQVL7Ax=v8nfp5wJCY+W5=9Fqn384Ur@mail.gmail.com>
+Date: Tue, 12 Oct 2010 11:57:00 +0200
+Message-ID: <AANLkTikfAtEJrqrMr3HvZo+Wgv-CzWgkAAT4MB6TxmCf@mail.gmail.com>
 Subject: Re: Pull request git://gitorious.org/bluez-mcap-hdp/mcap-hdp.git for_upstream
 To: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>,
 	linux-bluetooth@vger.kernel.org
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
+
+Hi,
 
 2010/10/12 Johan Hedberg <johan.hedberg@gmail.com>:
 > Hi Jose,
@@ -28,15 +29,15 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 > the GLib watch callback GLib itself holds a reference, so if you don't
 > need one just remove chan->echo_chan and do an unref after calling
 > add_watch.
-
-Sorry I've forgot this one. Gonna solve it.
-
 >
 >> - The commit message s/paramter/parameter
 >>
 >> Are there any more?
 >
 > s/Imcoming/Incoming/
+
+Solved this one
+
 > s/DBus/D-Bus/
 >
 > And the following doesn't make much sense to me:
@@ -49,6 +50,13 @@ Sorry I've forgot this one. Gonna solve it.
 > complex. You can just say "Fix D-Bus channel removal when removing
 > instances" and then in the message body do the more detailed
 > explanation.
+
+I've changed the commit message and added an explanation. I hope now is clearer.
+
 >
 > Johan
 >
+
+Regards.
+
+Jose.
