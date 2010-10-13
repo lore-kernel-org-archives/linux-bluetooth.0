@@ -1,42 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Rafal Michalski <michalski.raf@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Rafal Michalski <michalski.raf@gmail.com>
-Subject: [PATCH] Adjust mce_bt_set flag to gboolean type values
-Date: Wed, 13 Oct 2010 15:08:20 +0200
-Message-Id: <1286975300-2832-1-git-send-email-michalski.raf@gmail.com>
+Date: Wed, 13 Oct 2010 15:30:44 +0300
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fix suspend stream on opening if no data
+Message-ID: <20101013123044.GA2821@jh-x301>
+References: <1286972456-6168-1-git-send-email-dmitriy.paliy@nokia.com>
+ <1286972456-6168-2-git-send-email-dmitriy.paliy@nokia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1286972456-6168-2-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch makes assignment to mce_bt_set flag more readable and makes
-sure that it takes only TRUE or FALSE value from gboolean type.
----
- plugins/maemo6.c |    5 +++--
- 1 files changed, 3 insertions(+), 2 deletions(-)
+Hi Dmitriy,
 
-diff --git a/plugins/maemo6.c b/plugins/maemo6.c
-index c396db0..0a1e551 100644
---- a/plugins/maemo6.c
-+++ b/plugins/maemo6.c
-@@ -71,7 +71,8 @@ static gboolean mce_signal_callback(DBusConnection *connection,
- 
- 		/* set the adapter according to the mce signal
- 		   and remember the value */
--		mce_bt_set = !!(sigvalue & MCE_RADIO_STATE_BLUETOOTH);
-+		mce_bt_set = sigvalue & MCE_RADIO_STATE_BLUETOOTH ?
-+								TRUE : FALSE;
- 
- 		if (mce_bt_set)
- 			btd_adapter_switch_online(adapter);
-@@ -111,7 +112,7 @@ static void read_radio_states_cb(DBusPendingCall *call, void *user_data)
- 
- 	DBG("radio_states: %d", radio_states);
- 
--	mce_bt_set = radio_states & MCE_RADIO_STATE_BLUETOOTH;
-+	mce_bt_set = radio_states & MCE_RADIO_STATE_BLUETOOTH ? TRUE : FALSE;
- 
- 	/* check if the adapter has not completed the initial power
- 	 * cycle, if so delay action to mce_notify_powered */
--- 
-1.6.3.3
+On Wed, Oct 13, 2010, Dmitriy Paliy wrote:
+> Fix write to stream and suspend it immidiately if there is no data
+> available.
+> ---
+>  src/obex.c |   14 +++++++++++++-
+>  1 files changed, 13 insertions(+), 1 deletions(-)
 
+Looks good. The patch has been pushed upstream. Do pay attention to
+whitespace issues in the future though. I got this when applying it:
+
+Applying: Fix suspend stream on opening if no data
+/home/jh/src/obexd/.git/rebase-apply/patch:18: trailing whitespace.
+warning: 1 line applied after fixing whitespace errors.
+
+This came from the empty line with two tabs after the AddHeader call:
+
+>  		OBEX_ObjectAddHeader (obex, obj, OBEX_HDR_BODY,
+>  				hd, 0, OBEX_FL_STREAM_START);
+> +		
+
+Johan
