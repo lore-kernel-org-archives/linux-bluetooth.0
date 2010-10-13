@@ -1,42 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH] TODO: Device Name Characteristic for Low Energy
-Date: Wed, 13 Oct 2010 14:44:27 -0300
-Message-Id: <1286991867-26866-1-git-send-email-claudio.takahasi@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+Sender: mcgrof@gmail.com
+In-Reply-To: <1286964370.3316.6.camel@aeonflux>
+References: <20101008170258.GJ10149@tux> <4CAF5488.3030706@Atheros.com>
+ <20101008181508.GM10149@tux> <20101012211726.GE2678@broadcom.com> <1286964370.3316.6.camel@aeonflux>
+From: "Luis R. Rodriguez" <lrodriguez@atheros.com>
+Date: Wed, 13 Oct 2010 10:42:38 -0700
+Message-ID: <AANLkTimAeoS2Vi7GhKSTrghqaOQ=XKSzjcou15dn+YDR@mail.gmail.com>
+Subject: Re: Firmware versioning best practices: ath3k-2.fw rename or replace
+ ath3k-1.fw ?
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Henry Ptasinski <henryp@broadcom.com>, Suraj Sumangala <Suraj.Sumangala@atheros.com>,
+	Luis Rodriguez <Luis.Rodriguez@atheros.com>, David Woodhouse <dwmw2@infradead.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	linux-wireless <linux-wireless@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- TODO |   14 ++++++++++++++
- 1 files changed, 14 insertions(+), 0 deletions(-)
+On Wed, Oct 13, 2010 at 3:06 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Henry,
+>
+>> > > Marcel had answered me before. It makes sense to have same file name.
+>> > > Other ways we end up changing the driver whenever there is a firmware
+>> > > change.
+>> >
+>> > > > I last tried to document a thread we had over this here:
+>> > > >
+>> > > > http://wireless.kernel.org/en/developers/Documentation/firmware-versioning
+>> > > >
+>> >
+>> > Thanks, I've updated that link above to document bug fixing does not require
+>> > a filename change.
+>>
+>> I don't really understand why you would not want to change the code revision
+>> part of the filename.
+>>
+>> I totally agree that you don't want to change the driver every time the
+>> firmware gets a bug fix, but wasn't that the whole point of splitting the name
+>> into API and code revisions portions, and symlinking the file to one that just
+>> has the API version?
+>>
+>> What's the issue with using the process as originally documented?
+>
+> as I stated before, for Bluetooth this makes no sense. You don't need
+> API version numbers since the API is a STANDARD. It is called HCI. So
+> please don't use API version numbers in the firmware files.
+>
+> I will reject firmware file versions for upstream drivers.
 
-diff --git a/TODO b/TODO
-index 0a7b482..2c17c6b 100644
---- a/TODO
-+++ b/TODO
-@@ -14,6 +14,20 @@ Background
-   Higher complexity tasks should be refined into several lower complexity tasks
-   once the task is better understood.
- 
-+LE Generic Access Profile
-+=========================
-+
-+- Device Name Characteristic is a GAP characteristic for Low Energy. This
-+  characteristic shall be integrated/used in the discovery procedure. The
-+  ideia is to report the value of this characteristic using DeviceFound signals.
-+  Discussion with the community is needed before to start this task. Other GAP
-+  characteristics for LE needs to follow a similar approach. It is not clear
-+  if all GAP characteristics can be exposed using properties instead of a primary
-+  service characteristics.
-+  See Volume 3, Part C, section 12.1 for more information.
-+
-+  Priority: Low
-+  Complexity: C2
- 
- ATT/GATT
- ========
--- 
-1.7.3.1
+Does the HCI standard ever get improved upon? If so, how do devices
+never get firmware updates that would allow them to use some newer HCI
+APIs?
 
+I've updated the documentation above for 802.11 and Bluetooth with the
+above, please feel free to further extend it as you see fit.
+
+  Luis
