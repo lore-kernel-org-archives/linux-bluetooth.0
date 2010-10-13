@@ -1,92 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-From: Kevin Hayes <kevin@Atheros.com>
-To: "Luis R. Rodriguez" <mcgrof@gmail.com>
-CC: Luis Rodriguez <Luis.Rodriguez@Atheros.com>, Marcel Holtmann
-	<marcel@holtmann.org>, Henry Ptasinski <henryp@broadcom.com>, Suraj Sumangala
-	<Suraj.Sumangala@Atheros.com>, David Woodhouse <dwmw2@infradead.org>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-wireless
-	<linux-wireless@vger.kernel.org>
-Date: Wed, 13 Oct 2010 11:41:12 -0700
-Subject: RE: Firmware versioning best practices: ath3k-2.fw rename or
- replace ath3k-1.fw ?
-Message-ID: <B7132A25476D334D9130FE7532F2A56314B5929686@SC1EXMB-MBCL.global.atheros.com>
+MIME-Version: 1.0
+In-Reply-To: <B7132A25476D334D9130FE7532F2A56314B5929629@SC1EXMB-MBCL.global.atheros.com>
 References: <20101008170258.GJ10149@tux> <4CAF5488.3030706@Atheros.com>
  <20101008181508.GM10149@tux> <20101012211726.GE2678@broadcom.com>
- <1286964370.3316.6.camel@aeonflux>
- <AANLkTimAeoS2Vi7GhKSTrghqaOQ=XKSzjcou15dn+YDR@mail.gmail.com>
+ <1286964370.3316.6.camel@aeonflux> <AANLkTimAeoS2Vi7GhKSTrghqaOQ=XKSzjcou15dn+YDR@mail.gmail.com>
  <B7132A25476D334D9130FE7532F2A56314B5929629@SC1EXMB-MBCL.global.atheros.com>
- <AANLkTik9oYwspVG4KFbMMq63SpBp++iZe=vxOSQhxRki@mail.gmail.com>
-In-Reply-To: <AANLkTik9oYwspVG4KFbMMq63SpBp++iZe=vxOSQhxRki@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+From: "Luis R. Rodriguez" <mcgrof@gmail.com>
+Date: Wed, 13 Oct 2010 11:09:51 -0700
+Message-ID: <AANLkTik9oYwspVG4KFbMMq63SpBp++iZe=vxOSQhxRki@mail.gmail.com>
+Subject: Re: Firmware versioning best practices: ath3k-2.fw rename or replace
+ ath3k-1.fw ?
+To: Kevin Hayes <kevin@atheros.com>
+Cc: Luis Rodriguez <Luis.Rodriguez@atheros.com>, Marcel Holtmann <marcel@holtmann.org>,
+	Henry Ptasinski <henryp@broadcom.com>, Suraj Sumangala <Suraj.Sumangala@atheros.com>,
+	David Woodhouse <dwmw2@infradead.org>, linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	linux-wireless <linux-wireless@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTHVpcywNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBsaW51eC1i
-bHVldG9vdGgtb3duZXJAdmdlci5rZXJuZWwub3JnIFttYWlsdG86bGludXgtYmx1ZXRvb3RoLQ0K
-PiBvd25lckB2Z2VyLmtlcm5lbC5vcmddIE9uIEJlaGFsZiBPZiBMdWlzIFIuIFJvZHJpZ3Vleg0K
-PiBTZW50OiBXZWRuZXNkYXksIE9jdG9iZXIgMTMsIDIwMTAgMTE6MTAgQU0NCj4gVG86IEtldmlu
-IEhheWVzDQo+IENjOiBMdWlzIFJvZHJpZ3VlejsgTWFyY2VsIEhvbHRtYW5uOyBIZW5yeSBQdGFz
-aW5za2k7IFN1cmFqIFN1bWFuZ2FsYTsNCj4gRGF2aWQgV29vZGhvdXNlOyBsaW51eC1ibHVldG9v
-dGg7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LQ0KPiB3aXJlbGVzcw0KPiBT
-dWJqZWN0OiBSZTogRmlybXdhcmUgdmVyc2lvbmluZyBiZXN0IHByYWN0aWNlczogYXRoM2stMi5m
-dyByZW5hbWUgb3INCj4gcmVwbGFjZSBhdGgzay0xLmZ3ID8NCj4gDQo+IE9uIFdlZCwgT2N0IDEz
-LCAyMDEwIGF0IDEwOjU0IEFNLCBLZXZpbiBIYXllcyA8a2V2aW5AYXRoZXJvcy5jb20+DQo+IHdy
-b3RlOg0KPiA+IEhpIEx1aXMsDQo+ID4NCj4gPg0KPiA+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2Ut
-LS0tLQ0KPiA+PiBGcm9tOiBsaW51eC1ibHVldG9vdGgtb3duZXJAdmdlci5rZXJuZWwub3JnIFtt
-YWlsdG86bGludXgtYmx1ZXRvb3RoLQ0KPiA+PiBvd25lckB2Z2VyLmtlcm5lbC5vcmddIE9uIEJl
-aGFsZiBPZiBMdWlzIFIuIFJvZHJpZ3Vleg0KPiA+PiBTZW50OiBXZWRuZXNkYXksIE9jdG9iZXIg
-MTMsIDIwMTAgMTA6NDMgQU0NCj4gPj4gVG86IE1hcmNlbCBIb2x0bWFubg0KPiA+PiBDYzogSGVu
-cnkgUHRhc2luc2tpOyBTdXJhaiBTdW1hbmdhbGE7IEx1aXMgUm9kcmlndWV6OyBEYXZpZA0KPiBX
-b29kaG91c2U7DQo+ID4+IGxpbnV4LWJsdWV0b290aDsgbGludXgta2VybmVsQHZnZXIua2VybmVs
-Lm9yZzsgbGludXgtd2lyZWxlc3MNCj4gPj4gU3ViamVjdDogUmU6IEZpcm13YXJlIHZlcnNpb25p
-bmcgYmVzdCBwcmFjdGljZXM6IGF0aDNrLTIuZncgcmVuYW1lDQo+IG9yDQo+ID4+IHJlcGxhY2Ug
-YXRoM2stMS5mdyA/DQo+ID4+DQo+ID4+IE9uIFdlZCwgT2N0IDEzLCAyMDEwIGF0IDM6MDYgQU0s
-IE1hcmNlbCBIb2x0bWFubg0KPiA8bWFyY2VsQGhvbHRtYW5uLm9yZz4NCj4gPj4gd3JvdGU6DQo+
-ID4+ID4gSGkgSGVucnksDQo+ID4+ID4NCj4gPj4gPj4gPiA+IE1hcmNlbCBoYWQgYW5zd2VyZWQg
-bWUgYmVmb3JlLiBJdCBtYWtlcyBzZW5zZSB0byBoYXZlIHNhbWUNCj4gZmlsZQ0KPiA+PiBuYW1l
-Lg0KPiA+PiA+PiA+ID4gT3RoZXIgd2F5cyB3ZSBlbmQgdXAgY2hhbmdpbmcgdGhlIGRyaXZlciB3
-aGVuZXZlciB0aGVyZSBpcyBhDQo+ID4+IGZpcm13YXJlDQo+ID4+ID4+ID4gPiBjaGFuZ2UuDQo+
-ID4+ID4+ID4NCj4gPj4gPj4gPiA+ID4gSSBsYXN0IHRyaWVkIHRvIGRvY3VtZW50IGEgdGhyZWFk
-IHdlIGhhZCBvdmVyIHRoaXMgaGVyZToNCj4gPj4gPj4gPiA+ID4NCj4gPj4gPj4gPiA+ID4NCj4g
-Pj4gaHR0cDovL3dpcmVsZXNzLmtlcm5lbC5vcmcvZW4vZGV2ZWxvcGVycy9Eb2N1bWVudGF0aW9u
-L2Zpcm13YXJlLQ0KPiA+PiB2ZXJzaW9uaW5nDQo+ID4+ID4+ID4gPiA+DQo+ID4+ID4+ID4NCj4g
-Pj4gPj4gPiBUaGFua3MsIEkndmUgdXBkYXRlZCB0aGF0IGxpbmsgYWJvdmUgdG8gZG9jdW1lbnQg
-YnVnIGZpeGluZw0KPiBkb2VzDQo+ID4+IG5vdCByZXF1aXJlDQo+ID4+ID4+ID4gYSBmaWxlbmFt
-ZSBjaGFuZ2UuDQo+ID4+ID4+DQo+ID4+ID4+IEkgZG9uJ3QgcmVhbGx5IHVuZGVyc3RhbmQgd2h5
-IHlvdSB3b3VsZCBub3Qgd2FudCB0byBjaGFuZ2UgdGhlDQo+IGNvZGUNCj4gPj4gcmV2aXNpb24N
-Cj4gPj4gPj4gcGFydCBvZiB0aGUgZmlsZW5hbWUuDQo+ID4+ID4+DQo+ID4+ID4+IEkgdG90YWxs
-eSBhZ3JlZSB0aGF0IHlvdSBkb24ndCB3YW50IHRvIGNoYW5nZSB0aGUgZHJpdmVyIGV2ZXJ5DQo+
-IHRpbWUNCj4gPj4gdGhlDQo+ID4+ID4+IGZpcm13YXJlIGdldHMgYSBidWcgZml4LCBidXQgd2Fz
-bid0IHRoYXQgdGhlIHdob2xlIHBvaW50IG9mDQo+ID4+IHNwbGl0dGluZyB0aGUgbmFtZQ0KPiA+
-PiA+PiBpbnRvIEFQSSBhbmQgY29kZSByZXZpc2lvbnMgcG9ydGlvbnMsIGFuZCBzeW1saW5raW5n
-IHRoZSBmaWxlIHRvDQo+IG9uZQ0KPiA+PiB0aGF0IGp1c3QNCj4gPj4gPj4gaGFzIHRoZSBBUEkg
-dmVyc2lvbj8NCj4gPj4gPj4NCj4gPj4gPj4gV2hhdCdzIHRoZSBpc3N1ZSB3aXRoIHVzaW5nIHRo
-ZSBwcm9jZXNzIGFzIG9yaWdpbmFsbHkgZG9jdW1lbnRlZD8NCj4gPj4gPg0KPiA+PiA+IGFzIEkg
-c3RhdGVkIGJlZm9yZSwgZm9yIEJsdWV0b290aCB0aGlzIG1ha2VzIG5vIHNlbnNlLiBZb3UgZG9u
-J3QNCj4gbmVlZA0KPiA+PiA+IEFQSSB2ZXJzaW9uIG51bWJlcnMgc2luY2UgdGhlIEFQSSBpcyBh
-IFNUQU5EQVJELiBJdCBpcyBjYWxsZWQgSENJLg0KPiBTbw0KPiA+PiA+IHBsZWFzZSBkb24ndCB1
-c2UgQVBJIHZlcnNpb24gbnVtYmVycyBpbiB0aGUgZmlybXdhcmUgZmlsZXMuDQo+ID4+ID4NCj4g
-Pj4gPiBJIHdpbGwgcmVqZWN0IGZpcm13YXJlIGZpbGUgdmVyc2lvbnMgZm9yIHVwc3RyZWFtIGRy
-aXZlcnMuDQo+ID4+DQo+ID4+IERvZXMgdGhlIEhDSSBzdGFuZGFyZCBldmVyIGdldCBpbXByb3Zl
-ZCB1cG9uPyBJZiBzbywgaG93IGRvIGRldmljZXMNCj4gPj4gbmV2ZXIgZ2V0IGZpcm13YXJlIHVw
-ZGF0ZXMgdGhhdCB3b3VsZCBhbGxvdyB0aGVtIHRvIHVzZSBzb21lIG5ld2VyDQo+IEhDSQ0KPiA+
-PiBBUElzPw0KPiA+Pg0KPiA+PiBJJ3ZlIHVwZGF0ZWQgdGhlIGRvY3VtZW50YXRpb24gYWJvdmUg
-Zm9yIDgwMi4xMSBhbmQgQmx1ZXRvb3RoIHdpdGgNCj4gdGhlDQo+ID4+IGFib3ZlLCBwbGVhc2Ug
-ZmVlbCBmcmVlIHRvIGZ1cnRoZXIgZXh0ZW5kIGl0IGFzIHlvdSBzZWUgZml0Lg0KPiA+Pg0KPiA+
-PiDCoCBMdWlzDQo+ID4NCj4gPiBIQ0kgaXMgYWx3YXlzIGJhY2t3YXJkIGNvbXBhdGlibGUuIMKg
-TmV3ZXIgY29tbWFuZHMgYXJlIHByb3Blcmx5DQo+IGRpc2NvdmVyYWJsZSBieSBib3RoIHNpZGVz
-IG9mIHRoZSBIQ0kgbGluay4NCj4gPiBBcyBsb25nIGFzIHRoZSBwcm9jZWR1cmUgdG8gZG93bmxv
-YWQgZmlybXdhcmUgZG9lcyBub3QgZGVwZW5kIG9uIG5ldw0KPiBIQ0kgY29tbWFuZHMgKGl0IGRv
-ZXMgbm90KSwgdGhlbiB0aGUgZmlybXdhcmUgaXRzZWxmIGNhbiB0ZWFjaCBhbiBvbGQNCj4gY29u
-dHJvbGxlciB0byBsZWFybiBuZXcgdHJpY2tzLg0KPiANCj4gRG9lcyBIQ0kgc3VwcG9ydCB1cGxv
-YWRpbmcgZmlybXdhcmU/IENhbid0IHdlIHJlc29sdmUgdGhpcyBibGFja2xpc3QNCj4gY3JhcCBp
-c3N1ZSBpZiBkZXZpY2VzIGp1c3QgdXNlZCBIQ0kgdG8gdXBsb2FkIGZpcm13YXJlPw0KPiANCj4g
-ICBMdWlzDQo+IC0tDQoNCk5vdCByZWFsbHkgYmVjYXVzZSB0aGVyZSBpcyBub3QgZW5vdWdoIHNw
-YWNlIGluIHRoZSBzZmxhc2ggdG8gZG8gbXVjaCBvZiBhbnl0aGluZyBleGNlcHQgcmVwb3J0IHRo
-ZSBQSUQuDQpJdCBtdXN0IGJlIHNvbWUgZXh0ZXJuYWwgY29kZSB0aGF0IHBpY2tzIHRoZSBmaXJt
-d2FyZSB0byBsb2FkIGFuZCBpbmplY3QgaXQgaW50byB0aGUgY29udHJvbGxlci4NClRoYXQgZXh0
-ZXJuYWwgY29kZSBpcyB0aGUgREZVIGJpdC4gIFdlIG11c3QgYmxhY2tsaXN0IHRoZSBkZXZpY2Ug
-c28gdGhhdCBidHVzYiBkb2VzIG5vdCBjbGFpbSBpdCwgc28gd2UgY2FuIHVzZSB0aGUgREZVLg0K
-DQogICAgSysrDQoNCltQYXJkb24gdGhlIGdhcmJhZ2UgdGhhdCBvdXIgbWFpbCBzZXJ2ZXIgYWRk
-cy4uLl0NCg0KDQoNCg0KDQo=
+On Wed, Oct 13, 2010 at 10:54 AM, Kevin Hayes <kevin@atheros.com> wrote:
+> Hi Luis,
+>
+>
+>> -----Original Message-----
+>> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+>> owner@vger.kernel.org] On Behalf Of Luis R. Rodriguez
+>> Sent: Wednesday, October 13, 2010 10:43 AM
+>> To: Marcel Holtmann
+>> Cc: Henry Ptasinski; Suraj Sumangala; Luis Rodriguez; David Woodhouse;
+>> linux-bluetooth; linux-kernel@vger.kernel.org; linux-wireless
+>> Subject: Re: Firmware versioning best practices: ath3k-2.fw rename or
+>> replace ath3k-1.fw ?
+>>
+>> On Wed, Oct 13, 2010 at 3:06 AM, Marcel Holtmann <marcel@holtmann.org>
+>> wrote:
+>> > Hi Henry,
+>> >
+>> >> > > Marcel had answered me before. It makes sense to have same file
+>> name.
+>> >> > > Other ways we end up changing the driver whenever there is a
+>> firmware
+>> >> > > change.
+>> >> >
+>> >> > > > I last tried to document a thread we had over this here:
+>> >> > > >
+>> >> > > >
+>> http://wireless.kernel.org/en/developers/Documentation/firmware-
+>> versioning
+>> >> > > >
+>> >> >
+>> >> > Thanks, I've updated that link above to document bug fixing does
+>> not require
+>> >> > a filename change.
+>> >>
+>> >> I don't really understand why you would not want to change the code
+>> revision
+>> >> part of the filename.
+>> >>
+>> >> I totally agree that you don't want to change the driver every time
+>> the
+>> >> firmware gets a bug fix, but wasn't that the whole point of
+>> splitting the name
+>> >> into API and code revisions portions, and symlinking the file to one
+>> that just
+>> >> has the API version?
+>> >>
+>> >> What's the issue with using the process as originally documented?
+>> >
+>> > as I stated before, for Bluetooth this makes no sense. You don't need
+>> > API version numbers since the API is a STANDARD. It is called HCI. So
+>> > please don't use API version numbers in the firmware files.
+>> >
+>> > I will reject firmware file versions for upstream drivers.
+>>
+>> Does the HCI standard ever get improved upon? If so, how do devices
+>> never get firmware updates that would allow them to use some newer HCI
+>> APIs?
+>>
+>> I've updated the documentation above for 802.11 and Bluetooth with the
+>> above, please feel free to further extend it as you see fit.
+>>
+>> =C2=A0 Luis
+>
+> HCI is always backward compatible. =C2=A0Newer commands are properly disc=
+overable by both sides of the HCI link.
+> As long as the procedure to download firmware does not depend on new HCI =
+commands (it does not), then the firmware itself can teach an old controlle=
+r to learn new tricks.
+
+Does HCI support uploading firmware? Can't we resolve this blacklist
+crap issue if devices just used HCI to upload firmware?
+
+  Luis
