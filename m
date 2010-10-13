@@ -1,38 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 13 Oct 2010 15:30:44 +0300
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix suspend stream on opening if no data
-Message-ID: <20101013123044.GA2821@jh-x301>
-References: <1286972456-6168-1-git-send-email-dmitriy.paliy@nokia.com>
- <1286972456-6168-2-git-send-email-dmitriy.paliy@nokia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1286972456-6168-2-git-send-email-dmitriy.paliy@nokia.com>
+From: Lukasz Pawlik <lucas.pawlik@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lukasz Pawlik <lucas.pawlik@gmail.com>
+Subject: [PATCH] Fix problem with operator name length
+Date: Wed, 13 Oct 2010 14:49:30 +0200
+Message-Id: <1286974170-12282-1-git-send-email-lucas.pawlik@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitriy,
+To follow the HFP specification we must ensure that network operator name
+will have at maximum 16 characters. In current implementation we do not
+check this constraint. This patch fix this. Now operator name with more
+than 16 characters will be truncated to 16 characters.
+---
+ audio/telephony-maemo6.c |    3 +--
+ 1 files changed, 1 insertions(+), 2 deletions(-)
 
-On Wed, Oct 13, 2010, Dmitriy Paliy wrote:
-> Fix write to stream and suspend it immidiately if there is no data
-> available.
-> ---
->  src/obex.c |   14 +++++++++++++-
->  1 files changed, 13 insertions(+), 1 deletions(-)
+diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
+index 1aac034..bbd2d2f 100644
+--- a/audio/telephony-maemo6.c
++++ b/audio/telephony-maemo6.c
+@@ -1498,8 +1498,7 @@ static void update_operator_name(const char *name)
+ 		return;
+ 
+ 	g_free(net.operator_name);
+-	net.operator_name = g_strdup(name);
+-
++	net.operator_name = g_strndup(name, 16);
+ 	DBG("telephony-maemo6: operator name updated: %s", name);
+ }
+ 
+-- 
+1.7.0.4
 
-Looks good. The patch has been pushed upstream. Do pay attention to
-whitespace issues in the future though. I got this when applying it:
-
-Applying: Fix suspend stream on opening if no data
-/home/jh/src/obexd/.git/rebase-apply/patch:18: trailing whitespace.
-warning: 1 line applied after fixing whitespace errors.
-
-This came from the empty line with two tabs after the AddHeader call:
-
->  		OBEX_ObjectAddHeader (obex, obj, OBEX_HDR_BODY,
->  				hd, 0, OBEX_FL_STREAM_START);
-> +		
-
-Johan
