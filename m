@@ -1,48 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] gdbus: fix not handling bus disconnects
-Date: Wed, 13 Oct 2010 15:06:46 +0300
-Message-Id: <1286971606-11790-1-git-send-email-luiz.dentz@gmail.com>
+Date: Wed, 13 Oct 2010 09:04:10 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Check for SCO type before setting retr.
+ effort
+Message-ID: <20101013120410.GA26552@vigoh>
+References: <1284724018-26731-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1284724018-26731-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+Hi Andrei,
 
-We where not dispatching data when a bus disconnects which cause
-Disconnected signal to not be processed and thus causing the process to
-either not exit or to not trigger callbacks registered with
-g_dbus_set_disconnect_function.
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2010-09-17 14:46:58 +0300]:
 
-To fix this now we always schedule a dispatch which will make sure data
-still not processed will make its way to the proper handlers even if
-disconnected.
----
- gdbus/mainloop.c |    4 ++++
- 1 files changed, 4 insertions(+), 0 deletions(-)
+> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> 
+> Check eSCO / SCO type before setting retransmission effort flag
+> in Setup SCO command. We found that 0x01 is better for power
+> consupmtion but we cannot use it always since controller tries
+> to setup eSCO even for old devices.
+> 
+> Might be controller-specific.
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> ---
+>  net/bluetooth/hci_conn.c |    8 +++++++-
+>  1 files changed, 7 insertions(+), 1 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index 0b1e460..145993f 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -150,7 +150,13 @@ void hci_setup_sync(struct hci_conn *conn, __u16 handle)
+>  	cp.rx_bandwidth   = cpu_to_le32(0x00001f40);
+>  	cp.max_latency    = cpu_to_le16(0xffff);
+>  	cp.voice_setting  = cpu_to_le16(hdev->voice_setting);
+> -	cp.retrans_effort = 0xff;
+> +
+> +	/* If remote device supports eSCO use optimization for power
+> +	   retransmission effort, otherwise use standard flag do-not-care */
+> +	if (conn->link->features[3] & LMP_ESCO)
 
-diff --git a/gdbus/mainloop.c b/gdbus/mainloop.c
-index ec10ab0..862c434 100644
---- a/gdbus/mainloop.c
-+++ b/gdbus/mainloop.c
-@@ -95,6 +95,7 @@ static gboolean watch_func(GIOChannel *chan, GIOCondition cond, gpointer data)
- {
- 	struct watch_info *info = data;
- 	unsigned int flags = 0;
-+	DBusDispatchStatus status;
- 
- 	dbus_connection_ref(info->conn);
- 
-@@ -105,6 +106,9 @@ static gboolean watch_func(GIOChannel *chan, GIOCondition cond, gpointer data)
- 
- 	dbus_watch_handle(info->watch, flags);
- 
-+	status = dbus_connection_get_dispatch_status(info->conn);
-+	queue_dispatch(info->conn, status);
-+
- 	dbus_connection_unref(info->conn);
- 
- 	return TRUE;
+This should be lmp_esco_capable()
+
 -- 
-1.7.1
-
+Gustavo F. Padovan
+ProFUSION embedded systems - http://profusion.mobi
