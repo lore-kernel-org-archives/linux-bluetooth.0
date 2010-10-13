@@ -1,32 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] gdbus: fix not handling bus disconnects
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1286971606-11790-1-git-send-email-luiz.dentz@gmail.com>
-References: <1286971606-11790-1-git-send-email-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 13 Oct 2010 15:52:56 +0300
-Message-ID: <1286974376.3316.8.camel@aeonflux>
-Mime-Version: 1.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Fix X-IRMC-CALL-DATETIME format
+Date: Wed, 13 Oct 2010 16:15:56 +0300
+Message-Id: <1286975756-13134-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-> We where not dispatching data when a bus disconnects which cause
-> Disconnected signal to not be processed and thus causing the process to
-> either not exit or to not trigger callbacks registered with
-> g_dbus_set_disconnect_function.
-> 
-> To fix this now we always schedule a dispatch which will make sure data
-> still not processed will make its way to the proper handlers even if
-> disconnected.
+Use the format suggested in the spec:
 
-this looks fine to me. Went ahead and applied to all repositories.
+"For instance, a call that was missed on March 20th, 2005 at 10 am would
+be stamped: X-IRMC-CALL-DATETIME;MISSED:20050320T100000"
+---
+ plugins/phonebook-tracker.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-Regards
-
-Marcel
-
+diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
+index d0cea2e..39e4c81 100644
+--- a/plugins/phonebook-tracker.c
++++ b/plugins/phonebook-tracker.c
+@@ -705,7 +705,7 @@ static char *iso8601_utc_to_localtime(const char *datetime)
+ 
+ 	memset(&tm, 0, sizeof(tm));
+ 
+-	nr = sscanf(datetime, "%04u-%02u-%02uT%02u:%02u:%02u%c",
++	nr = sscanf(datetime, "%04u%02u%02uT%02u%02u%02u%c",
+ 			&tm.tm_year, &tm.tm_mon, &tm.tm_mday,
+ 			&tm.tm_hour, &tm.tm_min, &tm.tm_sec,
+ 			&tz);
+@@ -726,7 +726,7 @@ static char *iso8601_utc_to_localtime(const char *datetime)
+ 
+ 	local = localtime(&time);
+ 
+-	strftime(localdate, sizeof(localdate), "%Y-%m-%dT%H:%M:%S", local);
++	strftime(localdate, sizeof(localdate), "%Y%m%dT%H%M%S", local);
+ 
+ 	return g_strdup(localdate);
+ }
+-- 
+1.7.1
 
