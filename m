@@ -1,27 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 13 Oct 2010 17:19:21 +0300
+Date: Wed, 13 Oct 2010 17:16:25 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lukasz Pawlik <lucas.pawlik@gmail.com>
+To: Daniel =?iso-8859-1?Q?=D6rstadius?= <daniel.orstadius@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix problem with operator name length
-Message-ID: <20101013141921.GB4828@jh-x301>
-References: <1286974170-12282-1-git-send-email-lucas.pawlik@gmail.com>
+Subject: Re: [PATCH] Fix telephony-maemo6: call notification with call on
+ hold
+Message-ID: <20101013141625.GA4828@jh-x301>
+References: <AANLkTimb82Ykv9fg2Oew4YoN1767e5_NX4Tid+3wHOzE@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1286974170-12282-1-git-send-email-lucas.pawlik@gmail.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <AANLkTimb82Ykv9fg2Oew4YoN1767e5_NX4Tid+3wHOzE@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+Hi Daniel,
 
-On Wed, Oct 13, 2010, Lukasz Pawlik wrote:
-> -	net.operator_name = g_strdup(name);
-> -
-> +	net.operator_name = g_strndup(name, 16);
+On Wed, Oct 13, 2010, Daniel Örstadius wrote:
+> BlueZ sends +CLIP and RING when there is an incoming call and no
+> currently active call. If there is an active call it sends AT+CCWA
+> (call waiting notification).
+> 
+> Modification to send AT+CCWA instead of +CLIP and RING also when
+> there is a call on hold (the incoming call goes into the waiting
+> state).
+> ---
+>  audio/telephony-maemo6.c |    3 ++-
+>  1 files changed, 2 insertions(+), 1 deletions(-)
 
-Is it possible that the the format of the name would be such that byte
-boundaries are not always the same as character boundaries (e.g. UTF-8)?
-If so, using g_strndup sounds dangerous since it assumes one byte per
-character.
+Pushed upstream. Thanks.
 
 Johan
