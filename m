@@ -1,47 +1,21 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Wed, 13 Oct 2010 15:38:39 +0300
-Message-ID: <AANLkTimb82Ykv9fg2Oew4YoN1767e5_NX4Tid+3wHOzE@mail.gmail.com>
-Subject: [PATCH] Fix telephony-maemo6: call notification with call on hold
-From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=0015175cb89675e63604927edf97
+Subject: Re: [PATCH] Fix suspend stream on opening if no data
+From: Bastien Nocera <hadess@hadess.net>
+To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1286972456-6168-2-git-send-email-dmitriy.paliy@nokia.com>
+References: <1286972456-6168-1-git-send-email-dmitriy.paliy@nokia.com>
+	 <1286972456-6168-2-git-send-email-dmitriy.paliy@nokia.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Date: Wed, 13 Oct 2010 13:24:42 +0100
+Message-ID: <1286972682.12284.43.camel@novo.hadess.net>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---0015175cb89675e63604927edf97
-Content-Type: text/plain; charset=ISO-8859-1
+On Wed, 2010-10-13 at 15:20 +0300, Dmitriy Paliy wrote:
+> +               /* Try to write to stream and suspend the stream
+> immidiately
 
+Should be immediately (and in the log message as well)
 
-
---0015175cb89675e63604927edf97
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Fix-telephony-maemo6-call-notification-with-call-on.patch"
-Content-Disposition: attachment;
-	filename="0001-Fix-telephony-maemo6-call-notification-with-call-on.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_gf86ron40
-
-RnJvbSBmYzQzMjcxOTM3ODEyY2Y2NjhiNDUwZGMwN2Y3N2Y1Njg4ZWY2Yzg3IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
-a2lhLmNvbT4KRGF0ZTogVHVlLCAxMiBPY3QgMjAxMCAxNDowOTo1NSArMDMwMApTdWJqZWN0OiBb
-UEFUQ0hdIEZpeCB0ZWxlcGhvbnktbWFlbW82OiBjYWxsIG5vdGlmaWNhdGlvbiB3aXRoIGNhbGwg
-b24gaG9sZAoKQmx1ZVogc2VuZHMgK0NMSVAgYW5kIFJJTkcgd2hlbiB0aGVyZSBpcyBhbiBpbmNv
-bWluZyBjYWxsIGFuZCBubwpjdXJyZW50bHkgYWN0aXZlIGNhbGwuIElmIHRoZXJlIGlzIGFuIGFj
-dGl2ZSBjYWxsIGl0IHNlbmRzIEFUK0NDV0EKKGNhbGwgd2FpdGluZyBub3RpZmljYXRpb24pLgoK
-TW9kaWZpY2F0aW9uIHRvIHNlbmQgQVQrQ0NXQSBpbnN0ZWFkIG9mICtDTElQIGFuZCBSSU5HIGFs
-c28gd2hlbgp0aGVyZSBpcyBhIGNhbGwgb24gaG9sZCAodGhlIGluY29taW5nIGNhbGwgZ29lcyBp
-bnRvIHRoZSB3YWl0aW5nCnN0YXRlKS4KLS0tCiBhdWRpby90ZWxlcGhvbnktbWFlbW82LmMgfCAg
-ICAzICsrLQogMSBmaWxlcyBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKyksIDEgZGVsZXRpb25zKC0p
-CgpkaWZmIC0tZ2l0IGEvYXVkaW8vdGVsZXBob255LW1hZW1vNi5jIGIvYXVkaW8vdGVsZXBob255
-LW1hZW1vNi5jCmluZGV4IDA1ZmYzMzIuLmYwMjczZWUgMTAwNjQ0Ci0tLSBhL2F1ZGlvL3RlbGVw
-aG9ueS1tYWVtbzYuYworKysgYi9hdWRpby90ZWxlcGhvbnktbWFlbW82LmMKQEAgLTkxMCw3ICs5
-MTAsOCBAQCBzdGF0aWMgdm9pZCBoYW5kbGVfaW5jb21pbmdfY2FsbChEQnVzTWVzc2FnZSAqbXNn
-KQogCXRlbGVwaG9ueV91cGRhdGVfaW5kaWNhdG9yKG1hZW1vX2luZGljYXRvcnMsICJjYWxsc2V0
-dXAiLAogCQkJCQlFVl9DQUxMU0VUVVBfSU5DT01JTkcpOwogCi0JaWYgKGZpbmRfY2FsbF93aXRo
-X3N0YXR1cyhDU0RfQ0FMTF9TVEFUVVNfQUNUSVZFKSkKKwlpZiAoZmluZF9jYWxsX3dpdGhfc3Rh
-dHVzKENTRF9DQUxMX1NUQVRVU19BQ1RJVkUpIHx8CisJCQlmaW5kX2NhbGxfd2l0aF9zdGF0dXMo
-Q1NEX0NBTExfU1RBVFVTX0hPTEQpKQogCQl0ZWxlcGhvbnlfY2FsbF93YWl0aW5nX2luZChjYWxs
-LT5udW1iZXIsCiAJCQkJCQludW1iZXJfdHlwZShjYWxsLT5udW1iZXIpKTsKIAllbHNlCi0tIAox
-LjYuMC40Cgo=
---0015175cb89675e63604927edf97--
