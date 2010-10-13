@@ -1,52 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 13 Oct 2010 09:04:10 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Date: Wed, 13 Oct 2010 15:03:34 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Lukasz Pawlik <lucas.pawlik@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Check for SCO type before setting retr.
- effort
-Message-ID: <20101013120410.GA26552@vigoh>
-References: <1284724018-26731-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH] Fix problem with hanging up held call
+Message-ID: <20101013120334.GA2208@jh-x301>
+References: <1286959079-3566-1-git-send-email-lucas.pawlik@gmail.com>
+ <AANLkTimEv+RYqUC76dOYc7t4ciwC2FSi-AYG0d8KdaUn@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1284724018-26731-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <AANLkTimEv+RYqUC76dOYc7t4ciwC2FSi-AYG0d8KdaUn@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Lukasz,
 
-* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2010-09-17 14:46:58 +0300]:
+On Wed, Oct 13, 2010, Lukasz Pawlik wrote:
+> There was an error in my patch. Patch attached to this mail fix it.
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
-> 
-> Check eSCO / SCO type before setting retransmission effort flag
-> in Setup SCO command. We found that 0x01 is better for power
-> consupmtion but we cannot use it always since controller tries
-> to setup eSCO even for old devices.
-> 
-> Might be controller-specific.
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
-> ---
->  net/bluetooth/hci_conn.c |    8 +++++++-
->  1 files changed, 7 insertions(+), 1 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 0b1e460..145993f 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -150,7 +150,13 @@ void hci_setup_sync(struct hci_conn *conn, __u16 handle)
->  	cp.rx_bandwidth   = cpu_to_le32(0x00001f40);
->  	cp.max_latency    = cpu_to_le16(0xffff);
->  	cp.voice_setting  = cpu_to_le16(hdev->voice_setting);
-> -	cp.retrans_effort = 0xff;
-> +
-> +	/* If remote device supports eSCO use optimization for power
-> +	   retransmission effort, otherwise use standard flag do-not-care */
-> +	if (conn->link->features[3] & LMP_ESCO)
+Thanks. The (updated) patch has been pushed upstream.
 
-This should be lmp_esco_capable()
-
--- 
-Gustavo F. Padovan
-ProFUSION embedded systems - http://profusion.mobi
+Johan
