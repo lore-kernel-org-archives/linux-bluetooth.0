@@ -1,26 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <734620.13775.qm@web65716.mail.ac4.yahoo.com>
-Date: Wed, 13 Oct 2010 08:45:12 -0700 (PDT)
-From: Greg Mercurio <gmercurio@yahoo.com>
-Subject: Enabling SCO mode
-To: linux-bluetooth@vger.kernel.org
+Date: Wed, 13 Oct 2010 18:09:54 +0300
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Cc: Lukasz Pawlik <lucas.pawlik@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Fix problem with operator name length
+Message-ID: <20101013150954.GA7208@jh-x301>
+References: <1286974170-12282-1-git-send-email-lucas.pawlik@gmail.com>
+ <20101013141921.GB4828@jh-x301>
+ <1286981571.2142.5.camel@dp-x301>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1286981571.2142.5.camel@dp-x301>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I am new to Bluez and have a question about sco audio.  I am using Bluez version 4.47 in an Android environment.  
+Hi Dmitriy,
 
-The Bluetooth chip I’m using is initialized to use the PCM interface for sco audio data.  So, the chip should be ready to transmit the sco audio when enabled.  
+First of all, don't top-post on this list.
 
->From what I can tell by looking at the Android code, the Bluetooth Handsfree Java application in initiates a sco connection by opening a sco socket connection with the stack.  
+On Wed, Oct 13, 2010, Dmitriy Paliy wrote:
+> At the moment it is received in ascii from csd since not all car kits
+> can handle utf8.
 
-I assume that opening the sco connection will send vendor independent HCI commands to the Bluetooth chip to put it into sco mode.  I don’t see in the code where this is done.
+Ok, in that case it should be safe. I went ahead and and pushed the
+patch along with a clarification in the commit message about this
+guarantee that the csd API gives.
 
-Can someone confirm my assumptions and point me to the place in the code where enabling the sco commands are sent to the chip?
+Johan
 
-Thanks,
-Greg
-
-
-      
