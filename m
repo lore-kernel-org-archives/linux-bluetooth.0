@@ -1,33 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 13 Oct 2010 19:59:05 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Disable automatic notification/indication in the
- attribute server
-Message-ID: <20101013165905.GA9636@jh-x301>
-References: <1286459639-25194-1-git-send-email-claudio.takahasi@openbossa.org>
- <1286987539-25833-1-git-send-email-claudio.takahasi@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1286987539-25833-1-git-send-email-claudio.takahasi@openbossa.org>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH] TODO: Implement Server Characteristic Configuration
+Date: Wed, 13 Oct 2010 13:37:13 -0300
+Message-Id: <1286987833-25972-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1286460773-25436-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1286460773-25436-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+---
+ TODO |    8 ++++++++
+ 1 files changed, 8 insertions(+), 0 deletions(-)
 
-On Wed, Oct 13, 2010, Claudio Takahasi wrote:
-> Attribute server shall not send automatic indication/notification
-> messages if the client didn't request them. Client shall use Client
-> /Server Characteristic Configuration descriptors to be notified about
-> attribute changes. If the server doesn't support these descriptors,
-> the client shall implement a polling mechanism to check for attribute
-> value changes.
-> ---
->  TODO                |    7 ------
->  src/attrib-server.c |   60 ++++----------------------------------------------
->  2 files changed, 5 insertions(+), 62 deletions(-)
+diff --git a/TODO b/TODO
+index 7939d9d..0a7b482 100644
+--- a/TODO
++++ b/TODO
+@@ -78,6 +78,14 @@ ATT/GATT
+   Priority: Low
+   Complexity: C1
+ 
++- Implement Server characteristic Configuration support in the attribute
++  server to manage characteristic value broadcasting. There is a single
++  instance of the Server Characteristic Configuration for all clients.
++  See Volume 3, Part G, section 3.3.3.4 for more information.
++
++  Priority: Low
++  Complexity: C1
++
+ - Long reads/writes don't work (consisting of multiple request packets)
+ 
+   Priority: Low
+-- 
+1.7.3.1
 
-Thanks. The patch is now upstream.
-
-Johan
