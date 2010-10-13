@@ -1,44 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Rafal Michalski <michalski.raf@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Fix X-IRMC-CALL-DATETIME format
-Date: Wed, 13 Oct 2010 16:15:56 +0300
-Message-Id: <1286975756-13134-1-git-send-email-luiz.dentz@gmail.com>
+Cc: Rafal Michalski <michalski.raf@gmail.com>
+Subject: [PATCH] Adjust mce_bt_set flag to gboolean type values
+Date: Wed, 13 Oct 2010 15:08:20 +0200
+Message-Id: <1286975300-2832-1-git-send-email-michalski.raf@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
-
-Use the format suggested in the spec:
-
-"For instance, a call that was missed on March 20th, 2005 at 10 am would
-be stamped: X-IRMC-CALL-DATETIME;MISSED:20050320T100000"
+This patch makes assignment to mce_bt_set flag more readable and makes
+sure that it takes only TRUE or FALSE value from gboolean type.
 ---
- plugins/phonebook-tracker.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+ plugins/maemo6.c |    5 +++--
+ 1 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index d0cea2e..39e4c81 100644
---- a/plugins/phonebook-tracker.c
-+++ b/plugins/phonebook-tracker.c
-@@ -705,7 +705,7 @@ static char *iso8601_utc_to_localtime(const char *datetime)
+diff --git a/plugins/maemo6.c b/plugins/maemo6.c
+index c396db0..0a1e551 100644
+--- a/plugins/maemo6.c
++++ b/plugins/maemo6.c
+@@ -71,7 +71,8 @@ static gboolean mce_signal_callback(DBusConnection *connection,
  
- 	memset(&tm, 0, sizeof(tm));
+ 		/* set the adapter according to the mce signal
+ 		   and remember the value */
+-		mce_bt_set = !!(sigvalue & MCE_RADIO_STATE_BLUETOOTH);
++		mce_bt_set = sigvalue & MCE_RADIO_STATE_BLUETOOTH ?
++								TRUE : FALSE;
  
--	nr = sscanf(datetime, "%04u-%02u-%02uT%02u:%02u:%02u%c",
-+	nr = sscanf(datetime, "%04u%02u%02uT%02u%02u%02u%c",
- 			&tm.tm_year, &tm.tm_mon, &tm.tm_mday,
- 			&tm.tm_hour, &tm.tm_min, &tm.tm_sec,
- 			&tz);
-@@ -726,7 +726,7 @@ static char *iso8601_utc_to_localtime(const char *datetime)
+ 		if (mce_bt_set)
+ 			btd_adapter_switch_online(adapter);
+@@ -111,7 +112,7 @@ static void read_radio_states_cb(DBusPendingCall *call, void *user_data)
  
- 	local = localtime(&time);
+ 	DBG("radio_states: %d", radio_states);
  
--	strftime(localdate, sizeof(localdate), "%Y-%m-%dT%H:%M:%S", local);
-+	strftime(localdate, sizeof(localdate), "%Y%m%dT%H%M%S", local);
+-	mce_bt_set = radio_states & MCE_RADIO_STATE_BLUETOOTH;
++	mce_bt_set = radio_states & MCE_RADIO_STATE_BLUETOOTH ? TRUE : FALSE;
  
- 	return g_strdup(localdate);
- }
+ 	/* check if the adapter has not completed the initial power
+ 	 * cycle, if so delay action to mce_notify_powered */
 -- 
-1.7.1
+1.6.3.3
 
