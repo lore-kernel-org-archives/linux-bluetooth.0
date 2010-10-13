@@ -1,33 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 13 Oct 2010 18:16:52 -0700
-From: Randy Dunlap <randy.dunlap@oracle.com>
-To: lkml <linux-kernel@vger.kernel.org>
-Cc: akpm <akpm@linux-foundation.org>, Marcel Holtmann <marcel@holtmann.org>,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH -next] bluetooth: fix hidp kconfig dependency warning
-Message-Id: <20101013181652.7ddf481e.randy.dunlap@oracle.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Wed, 13 Oct 2010 19:01:07 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: "Luis R. Rodriguez" <mcgrof@gmail.com>
+Cc: linville@tuxdriver.com, marcel@holtmann.org,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth-next-2.6 2010-10-13
+Message-ID: <20101013220107.GB26552@vigoh>
+References: <20101013034808.GA3205@vigoh>
+ <AANLkTinH38ut+Uj1d+MJXjUQygdpUOVw=7rMKTk-Y-8d@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <AANLkTinH38ut+Uj1d+MJXjUQygdpUOVw=7rMKTk-Y-8d@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Randy Dunlap <randy.dunlap@oracle.com>
+Hi Luis,
 
-Fix kconfig dependency warning to satisfy dependencies:
+* Luis R. Rodriguez <mcgrof@gmail.com> [2010-10-13 14:41:24 -0700]:
 
-warning: (BT_HIDP && NET && BT && BT_L2CAP && INPUT || USB_HID && HID_SUPPORT && USB && INPUT) selects HID which has unmet direct dependencies (HID_SUPPORT && INPUT)
+> On Tue, Oct 12, 2010 at 8:48 PM, Gustavo F. Padovan
+> <padovan@profusion.mobi> wrote:
+> > One notable change is in the MAINTAINERS file, From now and on I'm going
+> > to maintain the Bluetooth trees as well as send the pull requests to you.
+> 
+> I noted here you mentioned "as well", does this mean there may be
+> updates from two people now instead of just one?
 
-Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
----
- net/bluetooth/hidp/Kconfig |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+No, updates are coming only from me. You misunderstood it due to my poor
+English. I'm going to maitain the trees and send the pull requests.
+That's what I said. Sorry, for the bad English. ;)
 
---- linux-next-20101013.orig/net/bluetooth/hidp/Kconfig
-+++ linux-next-20101013/net/bluetooth/hidp/Kconfig
-@@ -1,6 +1,6 @@
- config BT_HIDP
- 	tristate "HIDP protocol support"
--	depends on BT && BT_L2CAP && INPUT
-+	depends on BT && BT_L2CAP && INPUT && HID_SUPPORT
- 	select HID
- 	help
- 	  HIDP (Human Interface Device Protocol) is a transport layer
+-- 
+Gustavo F. Padovan
+ProFUSION embedded systems - http://profusion.mobi
