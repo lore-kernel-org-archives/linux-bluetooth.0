@@ -1,23 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4CB685A4.8030301@Atheros.com>
+Date: Thu, 14 Oct 2010 09:53:00 +0530
+From: Suraj Sumangala <suraj@Atheros.com>
 MIME-Version: 1.0
-Date: Thu, 14 Oct 2010 10:57:21 +0530
-Message-ID: <AANLkTincuwLZnBhjj=vrmghDEcmZhL=dy1VP=SH6vK_Y@mail.gmail.com>
-Subject: Query regarding Virtual simulators
-From: steven bluez <steven.bluez@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>, "Gustavo F. Padovan\"" <gustavo@padovan.org>,
-	Suraj Sumangala <suraj@atheros.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+To: "Luis R. Rodriguez" <mcgrof@gmail.com>
+CC: Kevin Hayes <kevin@Atheros.com>, Luis Rodriguez
+	<Luis.Rodriguez@Atheros.com>, Marcel Holtmann <marcel@holtmann.org>, "Henry
+ Ptasinski" <henryp@broadcom.com>, Suraj Sumangala
+	<Suraj.Sumangala@Atheros.com>, David Woodhouse <dwmw2@infradead.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-wireless
+	<linux-wireless@vger.kernel.org>
+Subject: Re: Firmware versioning best practices: ath3k-2.fw rename or replace
+ ath3k-1.fw ?
+References: <20101008170258.GJ10149@tux> <4CAF5488.3030706@Atheros.com> <20101008181508.GM10149@tux> <20101012211726.GE2678@broadcom.com> <1286964370.3316.6.camel@aeonflux> <AANLkTimAeoS2Vi7GhKSTrghqaOQ=XKSzjcou15dn+YDR@mail.gmail.com> <B7132A25476D334D9130FE7532F2A56314B5929629@SC1EXMB-MBCL.global.atheros.com> <AANLkTik9oYwspVG4KFbMMq63SpBp++iZe=vxOSQhxRki@mail.gmail.com>
+In-Reply-To: <AANLkTik9oYwspVG4KFbMMq63SpBp++iZe=vxOSQhxRki@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-HI MARCEL,GUSTAVO,Suraj
+Hi Luis,
 
-=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0If I am developing a profile thats not y=
-et been
-implemented in bluez and if i dont have a Hardware that supports the
-profile.How can i validate it to fix a situation that this profile
-really works.Is there any virutal dummy simulators?
-Do help me out by giving certain ideas on how to perform the same? .
+On 10/13/2010 11:39 PM, Luis R. Rodriguez wrote:
+> Does HCI support uploading firmware? Can't we resolve this blacklist
+> crap issue if devices just used HCI to upload firmware?
 
-Thanks,
-Steven
+HCI does not support uploading firmware. But HCI does provide options 
+for vendor specific commands that can be used for uploading firmware as 
+long as your device has enough intelligence to understand the command 
+when it comes.
+
+This is what we do for AR300x serial devices. We do not download 
+firmware,  but we do download all configuration entries as VS HCI commands.
+>
+>    Luis
+
+Regards
+Suraj
