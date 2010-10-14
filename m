@@ -1,36 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Thu, 14 Oct 2010 09:18:45 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Randy Dunlap <randy.dunlap@oracle.com>
-Cc: lkml <linux-kernel@vger.kernel.org>, akpm <akpm@linux-foundation.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH -next] bluetooth: fix hidp kconfig dependency warning
-Message-ID: <20101014121845.GB9250@vigoh>
-References: <20101013181652.7ddf481e.randy.dunlap@oracle.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <Par-Gunnar.p.HJALMDAHL@stericsson.com>,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH] Unref pending call in fallback scenario.
+Date: Thu, 14 Oct 2010 17:13:47 +0200
+Message-ID: <1287069227-4076-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20101013181652.7ddf481e.randy.dunlap@oracle.com>
+Content-Type: text/plain
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Randy,
+Drop the reference to pending call in fallback scenario.
+Otherwise, dbus will assert once timer expires.
+---
+ src/agent.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-* Randy Dunlap <randy.dunlap@oracle.com> [2010-10-13 18:16:52 -0700]:
-
-> From: Randy Dunlap <randy.dunlap@oracle.com>
-> 
-> Fix kconfig dependency warning to satisfy dependencies:
-> 
-> warning: (BT_HIDP && NET && BT && BT_L2CAP && INPUT || USB_HID && HID_SUPPORT && USB && INPUT) selects HID which has unmet direct dependencies (HID_SUPPORT && INPUT)
-> 
-> Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
-> ---
->  net/bluetooth/hidp/Kconfig |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-
-Applied, thanks.
-
+diff --git a/src/agent.c b/src/agent.c
+index c7fdbd4..b65a550 100644
+--- a/src/agent.c
++++ b/src/agent.c
+@@ -706,6 +706,7 @@ static int request_fallback(struct agent_request *req,
+ 		return -EINVAL;
+ 
+ 	dbus_pending_call_cancel(req->call);
++	dbus_pending_call_unref(req->call);
+ 
+ 	msg = dbus_message_copy(req->msg);
+ 
 -- 
-Gustavo F. Padovan
-ProFUSION embedded systems - http://profusion.mobi
+1.6.3.3
+
