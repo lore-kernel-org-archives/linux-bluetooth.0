@@ -1,41 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4CB69D35.2010802@Atheros.com>
+Date: Thu, 14 Oct 2010 11:33:33 +0530
+From: Suraj Sumangala <suraj@Atheros.com>
 MIME-Version: 1.0
-From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Date: Thu, 14 Oct 2010 12:57:46 +0200
-Message-ID: <AANLkTimBnzJzW_YLjW+NJq-MJ_aEMtSFNy_eKS5v70N4@mail.gmail.com>
-Subject: Pull request git://gitorious.org/bluez-mcap-hdp/mcap-hdp.git for_upstream
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+To: steven bluez <steven.bluez@gmail.com>
+CC: Marcel Holtmann <marcel@holtmann.org>, <gustavo@padovan.org>,
+	Suraj Sumangala <Suraj.Sumangala@Atheros.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Query regarding Virtual simulators
+References: <AANLkTincuwLZnBhjj=vrmghDEcmZhL=dy1VP=SH6vK_Y@mail.gmail.com>
+In-Reply-To: <AANLkTincuwLZnBhjj=vrmghDEcmZhL=dy1VP=SH6vK_Y@mail.gmail.com>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The following changes since commit 6b9deca15d0824ad5b3c38f8c0dd3a3c482572ea:
+Hi Steven,
 
-  TODO: Device Name Characteristic for Low Energy (2010-10-13 22:26:59 +0300)
+On 10/14/2010 10:57 AM, steven bluez wrote:
+> HI MARCEL,GUSTAVO,Suraj
+>
+>                   If I am developing a profile thats not yet been
+> implemented in bluez and if i dont have a Hardware that supports the
+> profile.How can i validate it to fix a situation that this profile
+> really works.Is there any virutal dummy simulators?
+> Do help me out by giving certain ideas on how to perform the same? .
+>
+> Thanks,
+> Steven
 
-are available in the git repository at:
-  git://gitorious.org/bluez-mcap-hdp/mcap-hdp.git for_upstream
+I am not sure about any virtual dummy simulator.
+But, you should be able to write a dummy agent and test the profile 
+against PTS if the profile is supported by it.
 
-José Antonio Santos Cadenas (7):
-      Connect echo channel
-      Initial steps to send echo data
-      Generate random echo packet
-      Create a function for closing mcl correctly
-      Notify channel deletion correctly
-      Separate private echo data from data channels
-      Add initial support for deleting an echo channel
+PTS would be able to give you a fair idea of what is missing.
 
-Santiago Carot-Nemesio (8):
-      Add support to initiate echo
-      Remove unnecessary variable
-      Set watcher to check echo response
-      Check echo response
-      Add timeout to wait for echo reply
-      Abort echo channel if connection was not successful
-      Remove MDL when delete operation fails with INVALID_MDLID error
-      Remove unnecessary function
+It would be great if you can send a mail to the community regarding the 
+profile and how you intent to implement it. There would be people with 
+access to the hardware and they would be able to guide you accordingly.
 
- health/hdp.c       |  431 +++++++++++++++++++++++++++++++++++++++++-----------
- health/hdp_types.h |    5 +-
- health/mcap.c      |   14 ++-
- 3 files changed, 361 insertions(+), 89 deletions(-)
+Regards
+Suraj
+
