@@ -2,31 +2,34 @@ Return-Path: <cyrus@holtmann.org>
 From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH 2/2] Code cleanup: immidiately to immediately in comments
-Date: Thu, 14 Oct 2010 15:35:30 +0300
-Message-Id: <1287059730-10988-3-git-send-email-dmitriy.paliy@nokia.com>
+Subject: [PATCH 1/2] Fix regression on suspend on opening
+Date: Thu, 14 Oct 2010 15:35:29 +0300
+Message-Id: <1287059730-10988-2-git-send-email-dmitriy.paliy@nokia.com>
 In-Reply-To: <1287059730-10988-1-git-send-email-dmitriy.paliy@nokia.com>
 References: <1287059730-10988-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This fixes regression on suspend on opening when obex_write_stream
+returns length of buffer, which is treated as error response
+afterwards.
 ---
  src/obex.c |    2 +-
  1 files changed, 1 insertions(+), 1 deletions(-)
 
 diff --git a/src/obex.c b/src/obex.c
-index 4e1db9c..5f6ad47 100644
+index d1ac339..4e1db9c 100644
 --- a/src/obex.c
 +++ b/src/obex.c
-@@ -818,7 +818,7 @@ static void cmd_get(struct obex_session *os, obex_t *obex, obex_object_t *obj)
- 		OBEX_ObjectAddHeader (obex, obj, OBEX_HDR_BODY,
- 				hd, 0, OBEX_FL_STREAM_START);
+@@ -683,7 +683,7 @@ add_header:
  
--		/* Try to write to stream and suspend the stream immidiately
-+		/* Try to write to stream and suspend the stream immediately
- 		 * if no data available to send. */
- 		err = obex_write_stream(os, obex, obj);
- 		if (err == -EAGAIN) {
+ 	os->offset += len;
+ 
+-	return len;
++	return 0;
+ }
+ 
+ static gboolean handle_async_io(void *object, int flags, int err,
 -- 
 1.7.0.4
 
