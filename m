@@ -1,38 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4CB685A4.8030301@Atheros.com>
-Date: Thu, 14 Oct 2010 09:53:00 +0530
-From: Suraj Sumangala <suraj@Atheros.com>
-MIME-Version: 1.0
-To: "Luis R. Rodriguez" <mcgrof@gmail.com>
-CC: Kevin Hayes <kevin@Atheros.com>, Luis Rodriguez
-	<Luis.Rodriguez@Atheros.com>, Marcel Holtmann <marcel@holtmann.org>, "Henry
- Ptasinski" <henryp@broadcom.com>, Suraj Sumangala
-	<Suraj.Sumangala@Atheros.com>, David Woodhouse <dwmw2@infradead.org>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-wireless
-	<linux-wireless@vger.kernel.org>
-Subject: Re: Firmware versioning best practices: ath3k-2.fw rename or replace
- ath3k-1.fw ?
-References: <20101008170258.GJ10149@tux> <4CAF5488.3030706@Atheros.com> <20101008181508.GM10149@tux> <20101012211726.GE2678@broadcom.com> <1286964370.3316.6.camel@aeonflux> <AANLkTimAeoS2Vi7GhKSTrghqaOQ=XKSzjcou15dn+YDR@mail.gmail.com> <B7132A25476D334D9130FE7532F2A56314B5929629@SC1EXMB-MBCL.global.atheros.com> <AANLkTik9oYwspVG4KFbMMq63SpBp++iZe=vxOSQhxRki@mail.gmail.com>
-In-Reply-To: <AANLkTik9oYwspVG4KFbMMq63SpBp++iZe=vxOSQhxRki@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Subject: Re: [PATCH -next] bluetooth: fix hidp kconfig dependency warning
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Randy Dunlap <randy.dunlap@oracle.com>
+Cc: lkml <linux-kernel@vger.kernel.org>,
+	akpm <akpm@linux-foundation.org>, linux-bluetooth@vger.kernel.org
+In-Reply-To: <20101013181652.7ddf481e.randy.dunlap@oracle.com>
+References: <20101013181652.7ddf481e.randy.dunlap@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 14 Oct 2010 07:22:35 +0300
+Message-ID: <1287030155.3316.20.camel@aeonflux>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luis,
+Hi Randy,
 
-On 10/13/2010 11:39 PM, Luis R. Rodriguez wrote:
-> Does HCI support uploading firmware? Can't we resolve this blacklist
-> crap issue if devices just used HCI to upload firmware?
+> Fix kconfig dependency warning to satisfy dependencies:
+> 
+> warning: (BT_HIDP && NET && BT && BT_L2CAP && INPUT || USB_HID && HID_SUPPORT && USB && INPUT) selects HID which has unmet direct dependencies (HID_SUPPORT && INPUT)
+> 
+> Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
 
-HCI does not support uploading firmware. But HCI does provide options 
-for vendor specific commands that can be used for uploading firmware as 
-long as your device has enough intelligence to understand the command 
-when it comes.
+looks fine to me.
 
-This is what we do for AR300x serial devices. We do not download 
-firmware,  but we do download all configuration entries as VS HCI commands.
->
->    Luis
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
 Regards
-Suraj
+
+Marcel
+
+
