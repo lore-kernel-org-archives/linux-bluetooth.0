@@ -1,31 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 15 Oct 2010 16:04:34 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: marcel@holtmann.org, linux-wireless@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org
+Subject: Re: pull request: bluetooth-next-2.6 2010-10-13
+Message-ID: <20101015200434.GB2438@tuxdriver.com>
+References: <20101013034808.GA3205@vigoh>
 MIME-Version: 1.0
-Date: Sat, 16 Oct 2010 18:59:44 +0800
-Message-ID: <AANLkTinAsRe1=MMJe4co3rsaA93F9+wV0MfPQmodXS4h@mail.gmail.com>
-Subject: problem in Multiple Connection
-From: nirav rabara <niravrabara@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20101013034808.GA3205@vigoh>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Wed, Oct 13, 2010 at 12:48:08AM -0300, Gustavo F. Padovan wrote:
+> Hi John,
+> 
+> Here goes the Bluetooth patches for the next merge window. In this
+> patchset we have a new stream-oriented recvmsg() which is used in L2CAP
+> and RFCOMM. Support for two new MacBookPro devices. A buffer overflow
+> check for L2CAP to prevent frames exceeding the receiving MTU. All the
+> rest are simple bugfixes. No big features this time.
+> 
+> One notable change is in the MAINTAINERS file, From now and on I'm going
+> to maintain the Bluetooth trees as well as send the pull requests to you.
+> Despite this maintenance change, Marcel will remain helping with patch
+> review, and ACK/NAK in the Bluetooth subsystem as he always did. Not a
+> big change in the end. ;)
+> 
+> Thanks,
+> 
+> The following changes since commit 29b4433d991c88d86ca48a4c1cc33c671475be4b:
+> 
+>   net: percpu net_device refcount (2010-10-12 12:35:25 -0700)
+> 
+> are available in the git repository at:
+>   git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next-2.6.git master
 
-I am using one Headset and one Serial port Device.
+Pulled, thanks -- I plan to send a pull request to Dave later today.
 
-1) I create the ACL connection and then SCO connection with HS.
-2) Try to create connection with Serial Port Device but during Service
-Discovery i receive HCI PAGE TIMOUT.
-
-But, If i create the only ACL Connection with HS,then able to connect
-with Serial port device.
-
-What is wrong with SCO connection? when I connect SCO link after that
-not able to connect other Device.
-
-Please can anybody suggest me what I am missing?
-
-
---
-With Regards,
-Nirav Rabara
+John
+-- 
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
