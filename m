@@ -1,29 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/2] Fix regression on suspend on opening
-Date: Fri, 15 Oct 2010 09:57:06 +0300
-Message-Id: <1287125828-5479-1-git-send-email-dmitriy.paliy@nokia.com>
+Date: Fri, 15 Oct 2010 08:59:23 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Update Gustavo's email in AUTHORS
+Message-ID: <20101015055923.GA8472@jh-x301>
+References: <1287098803-22806-1-git-send-email-padovan@profusion.mobi>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1287098803-22806-1-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Gustavo,
 
-This fixes regression when doing suspend on opening obex stream. If
-obex_write_stream returns length of buffer, it is treated as an error
-response later on, which is not correct.
+On Thu, Oct 14, 2010, Gustavo F. Padovan wrote:
+> ---
+>  AUTHORS |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/AUTHORS b/AUTHORS
+> index 8e0a012..e063569 100644
+> --- a/AUTHORS
+> +++ b/AUTHORS
+> @@ -35,7 +35,7 @@ Pekka Pessi <pekka.pessi@nokia.com>
+>  Siarhei Siamashka <siarhei.siamashka@nokia.com>
+>  Nick Pelly <npelly@google.com>
+>  Lennart Poettering <lennart@poettering.net>
+> -Gustavo F. Padovan <gustavo@las.ic.unicamp.br>
+> +Gustavo F. Padovan <padovan@profusion.mobi>
+>  Marc-Andre Lureau <marc-andre.lureau@nokia.com>
+>  Bea Lam <bea.lam@nokia.com>
+>  Zygo Blaxell <zygo.blaxell@xandros.com>
 
-Negative values returned by obex_write_stream are error codes, while
-positive ones mean length of buffer. Positive values are never used
-afterwards in the code. Therefore, due to this reason, and for being
-compliant with obex_read_stream, which also returns 0 only, it was
-decided to remove return of positive value representing length at all.
+Pushed upstream. Thanks.
 
-Result of such is also some code cleanup that removes unnecessary return
-len when it is zero.
-
-A typo is fixed in comments as well.
-
-Br,
-Dmitriy
-
+Johan
