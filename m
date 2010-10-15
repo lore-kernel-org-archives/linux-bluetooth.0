@@ -1,51 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH] Type conversion in read and write obex streams
-Date: Fri, 15 Oct 2010 13:27:38 +0300
-Message-Id: <1287138458-10780-1-git-send-email-dmitriy.paliy@nokia.com>
+Date: Fri, 15 Oct 2010 12:58:50 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fix not responding Not Found for filtered vcard-listing
+Message-ID: <20101015095850.GA9788@jh-x301>
+References: <1287135959-6605-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1287135959-6605-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Integer types in obex_write_stream and obex_read_stream shell be the
-same as those returned by read and write function prototypes of
-obex_mime_type_driver.
----
- src/obex.c |    6 +++---
- 1 files changed, 3 insertions(+), 3 deletions(-)
+Hi Luiz,
 
-diff --git a/src/obex.c b/src/obex.c
-index adfcc95..0a0b6b9 100644
---- a/src/obex.c
-+++ b/src/obex.c
-@@ -555,7 +555,7 @@ static int obex_read_stream(struct obex_session *os, obex_t *obex,
- 						obex_object_t *obj)
- {
- 	int size;
--	int32_t len = 0;
-+	ssize_t len = 0;
- 	const uint8_t *buffer;
- 
- 	DBG("name=%s type=%s rx_mtu=%d file=%p",
-@@ -596,7 +596,7 @@ static int obex_read_stream(struct obex_session *os, obex_t *obex,
- 
- write:
- 	while (os->pending > 0) {
--		int w;
-+		ssize_t w;
- 
- 		w = os->driver->write(os->object, os->buf + len,
- 					os->pending);
-@@ -622,7 +622,7 @@ static int obex_write_stream(struct obex_session *os,
- {
- 	obex_headerdata_t hd;
- 	uint8_t *ptr;
--	int32_t len;
-+	ssize_t len;
- 	unsigned int flags;
- 	uint8_t hi;
- 
--- 
-1.7.0.4
+On Fri, Oct 15, 2010, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+> 
+> In this case entries may be found but it still may not match the filter
+> criteria.
+> ---
+>  plugins/pbap.c |   12 ++++++------
+>  1 files changed, 6 insertions(+), 6 deletions(-)
 
+Thanks. Pushed upstream.
+
+Johan
