@@ -1,38 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 15 Oct 2010 10:21:53 +0300
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/2] Fix regression on suspend on opening
-Message-ID: <20101015072153.GA3409@jh-x301>
-References: <1287125828-5479-1-git-send-email-dmitriy.paliy@nokia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH 1/2] Fix regression on suspend on opening
+Date: Fri, 15 Oct 2010 09:57:07 +0300
+Message-Id: <1287125828-5479-2-git-send-email-dmitriy.paliy@nokia.com>
 In-Reply-To: <1287125828-5479-1-git-send-email-dmitriy.paliy@nokia.com>
+References: <1287125828-5479-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitriy,
+This fixes regression on suspend on opening when obex_write_stream
+returns length of buffer, which is treated as error response
+afterwards.
+---
+ src/obex.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-On Fri, Oct 15, 2010, Dmitriy Paliy wrote:
-> This fixes regression when doing suspend on opening obex stream. If
-> obex_write_stream returns length of buffer, it is treated as an error
-> response later on, which is not correct.
-> 
-> Negative values returned by obex_write_stream are error codes, while
-> positive ones mean length of buffer. Positive values are never used
-> afterwards in the code. Therefore, due to this reason, and for being
-> compliant with obex_read_stream, which also returns 0 only, it was
-> decided to remove return of positive value representing length at all.
-> 
-> Result of such is also some code cleanup that removes unnecessary return
-> len when it is zero.
-> 
-> A typo is fixed in comments as well.
+diff --git a/src/obex.c b/src/obex.c
+index d1ac339..4e1db9c 100644
+--- a/src/obex.c
++++ b/src/obex.c
+@@ -683,7 +683,7 @@ add_header:
+ 
+ 	os->offset += len;
+ 
+-	return len;
++	return 0;
+ }
+ 
+ static gboolean handle_async_io(void *object, int flags, int err,
+-- 
+1.7.0.4
 
-Both patches have been pushed upstream. Thanks. Btw, don't be afraid to
-put this kind of explanations in the commit messages themselves since
-that info is easier to find in a couple of years time than this cover
-letter email.
-
-Johan
