@@ -1,58 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Johan Hedberg <johan.hedberg@nokia.com>
-Subject: [PATCH] Bluetooth: Fix non-SSP auth request for HIGH security level sockets
-Date: Fri, 15 Oct 2010 10:46:09 +0300
-Message-Id: <1287128769-5078-1-git-send-email-johan.hedberg@gmail.com>
+Date: Fri, 15 Oct 2010 10:21:53 +0300
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 0/2] Fix regression on suspend on opening
+Message-ID: <20101015072153.GA3409@jh-x301>
+References: <1287125828-5479-1-git-send-email-dmitriy.paliy@nokia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1287125828-5479-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@nokia.com>
+Hi Dmitriy,
 
-When initiating dedicated bonding a L2CAP raw socket with HIGH security
-level is used. The kernel is supposed to trigger the authentication
-request in this case but this doesn't happen currently for non-SSP
-(pre-2.1) devices. The reason is that the authentication request happens
-in the remote extended features callback which never gets called for
-non-SSP devices. This patch fixes the issue by requesting also
-authentiation in the (normal) remote features callback in the case of
-non-SSP devices.
+On Fri, Oct 15, 2010, Dmitriy Paliy wrote:
+> This fixes regression when doing suspend on opening obex stream. If
+> obex_write_stream returns length of buffer, it is treated as an error
+> response later on, which is not correct.
+> 
+> Negative values returned by obex_write_stream are error codes, while
+> positive ones mean length of buffer. Positive values are never used
+> afterwards in the code. Therefore, due to this reason, and for being
+> compliant with obex_read_stream, which also returns 0 only, it was
+> decided to remove return of positive value representing length at all.
+> 
+> Result of such is also some code cleanup that removes unnecessary return
+> len when it is zero.
+> 
+> A typo is fixed in comments as well.
 
-This rule is applied only for HIGH security level which might at first
-seem unintuitive since on the server socket side MEDIUM is already
-enough for authentication. However, for the clients we really want to
-prefer the server side to decide the authentication requrement in most
-cases, and since most client sockets use MEDIUM it's better to be
-avoided on the kernel side for these sockets. The important socket to
-request it for is the dedicated bonding one and that socket uses HIGH
-security level.
+Both patches have been pushed upstream. Thanks. Btw, don't be afraid to
+put this kind of explanations in the commit messages themselves since
+that info is easier to find in a couple of years time than this cover
+letter email.
 
-The patch is based on the initial investigation and patch proposal from
-Andrei Emeltchenko <endrei.emeltchenko@nokia.com>.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
----
- net/bluetooth/hci_event.c |    6 ++++++
- 1 files changed, 6 insertions(+), 0 deletions(-)
-
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index bfef5ba..84093b0 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1175,6 +1175,12 @@ static inline void hci_remote_features_evt(struct hci_dev *hdev, struct sk_buff
- 				hci_send_cmd(hdev,
- 					HCI_OP_READ_REMOTE_EXT_FEATURES,
- 							sizeof(cp), &cp);
-+			} else if (!ev->status && conn->out &&
-+					conn->sec_level == BT_SECURITY_HIGH) {
-+				struct hci_cp_auth_requested cp;
-+				cp.handle = ev->handle;
-+				hci_send_cmd(hdev, HCI_OP_AUTH_REQUESTED,
-+							sizeof(cp), &cp);
- 			} else {
- 				conn->state = BT_CONNECTED;
- 				hci_proto_connect_cfm(conn, ev->status);
--- 
-1.7.1
-
+Johan
