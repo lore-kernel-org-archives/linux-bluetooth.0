@@ -1,25 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 15 Oct 2010 16:55:35 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] TODO: Avoid Characteristic discovery for non
- connectable device
-Message-ID: <20101015135535.GA25884@jh-x301>
-References: <1287147783-14998-1-git-send-email-claudio.takahasi@openbossa.org>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: =?UTF-8?q?=5BPATCH=5D=20Add=20INdT=20developers=20in=20AUTHORS?=
+Date: Fri, 15 Oct 2010 10:36:23 -0300
+Message-Id: <1287149783-15672-1-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1287147783-14998-1-git-send-email-claudio.takahasi@openbossa.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+---
+ AUTHORS |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
-On Fri, Oct 15, 2010, Claudio Takahasi wrote:
-> ---
->  TODO |   13 +++++++++++--
->  1 files changed, 11 insertions(+), 2 deletions(-)
+diff --git a/AUTHORS b/AUTHORS
+index e063569..15351a3 100644
+--- a/AUTHORS
++++ b/AUTHORS
+@@ -50,3 +50,6 @@ Santiago Carot-Nemesio <scarot@libresoft.es>
+ José Antonio Santos Cadenas <jcaden@libresoft.es>
+ Francisco Alecrim <francisco.alecrim@openbossa.org>
+ Daniel Orstadius <daniel.orstadius@gmail.com>
++Anderson Briglia <anderson.briglia@openbossa.org>
++Anderson Lizardo <anderson.lizardo@openbossa.org>
++Bruna Moreira <bruna.moreira@openbossa.org>
+-- 
+1.7.3.1
 
-Pushed upstream.
-
-Johan
