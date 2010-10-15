@@ -1,44 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 15 Oct 2010 16:04:34 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: marcel@holtmann.org, linux-wireless@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org
-Subject: Re: pull request: bluetooth-next-2.6 2010-10-13
-Message-ID: <20101015200434.GB2438@tuxdriver.com>
-References: <20101013034808.GA3205@vigoh>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20101013034808.GA3205@vigoh>
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Fix linkage failure for bluetoothd
+Date: Fri, 15 Oct 2010 16:46:11 -0300
+Message-Id: <1287171971-32246-1-git-send-email-padovan@profusion.mobi>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Oct 13, 2010 at 12:48:08AM -0300, Gustavo F. Padovan wrote:
-> Hi John,
-> 
-> Here goes the Bluetooth patches for the next merge window. In this
-> patchset we have a new stream-oriented recvmsg() which is used in L2CAP
-> and RFCOMM. Support for two new MacBookPro devices. A buffer overflow
-> check for L2CAP to prevent frames exceeding the receiving MTU. All the
-> rest are simple bugfixes. No big features this time.
-> 
-> One notable change is in the MAINTAINERS file, From now and on I'm going
-> to maintain the Bluetooth trees as well as send the pull requests to you.
-> Despite this maintenance change, Marcel will remain helping with patch
-> review, and ACK/NAK in the Bluetooth subsystem as he always did. Not a
-> big change in the end. ;)
-> 
-> Thanks,
-> 
-> The following changes since commit 29b4433d991c88d86ca48a4c1cc33c671475be4b:
-> 
->   net: percpu net_device refcount (2010-10-12 12:35:25 -0700)
-> 
-> are available in the git repository at:
->   git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next-2.6.git master
+Adding -lrt fix the following errors in one of my systems:
 
-Pulled, thanks -- I plan to send a pull request to Dave later today.
+health/mcap_sync.o: In function `initialize_caps':
+/root/bluez/health/mcap_sync.c:341: undefined reference to `clock_getres'
+/root/bluez/health/mcap_sync.c:350: undefined reference to `clock_gettime'
+/root/bluez/health/mcap_sync.c:358: undefined reference to `clock_gettime'
+/root/bluez/health/mcap_sync.c:363: undefined reference to `clock_gettime'
+health/mcap_sync.o: In function `reset_tmstamp':
+/root/bluez/health/mcap_sync.c:163: undefined reference to `clock_gettime'
+health/mcap_sync.o: In function `mcap_get_timestamp':
+/root/bluez/health/mcap_sync.c:309: undefined reference to `clock_gettime'
+health/mcap_sync.o:/root/bluez/health/mcap_sync.c:514: more undefined references to `clock_gettime' follow
+collect2: ld returned 1 exit status
+make[1]: *** [src/bluetoothd] Error 1
+make: *** [all] Error 2
+---
+ Makefile.am |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-John
+diff --git a/Makefile.am b/Makefile.am
+index 8f9f5d3..6e8fc7d 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -240,7 +240,7 @@ src_bluetoothd_SOURCES = $(gdbus_sources) $(builtin_sources) \
+ 			src/dbus-common.c src/dbus-common.h \
+ 			src/dbus-hci.h src/dbus-hci.c
+ src_bluetoothd_LDADD = lib/libbluetooth.la @GLIB_LIBS@ @DBUS_LIBS@ \
+-							@CAPNG_LIBS@ -ldl
++							@CAPNG_LIBS@ -ldl -lrt
+ src_bluetoothd_LDFLAGS = -Wl,--export-dynamic \
+ 				-Wl,--version-script=$(srcdir)/src/bluetooth.ver
+ 
 -- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+1.7.3.1
+
