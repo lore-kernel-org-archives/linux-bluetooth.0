@@ -1,50 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Fix not responding Not Found for filtered vcard-listing
-Date: Fri, 15 Oct 2010 12:45:59 +0300
-Message-Id: <1287135959-6605-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [PATCH] Bluetooth: Fix non-SSP auth request for HIGH security
+ level sockets
+From: Marcel Holtmann <marcel@holtmann.org>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@nokia.com>
+In-Reply-To: <1287128769-5078-1-git-send-email-johan.hedberg@gmail.com>
+References: <1287128769-5078-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 15 Oct 2010 12:16:35 +0300
+Message-ID: <1287134195.3316.60.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+Hi Johan,
 
-In this case entries may be found but it still may not match the filter
-criteria.
----
- plugins/pbap.c |   12 ++++++------
- 1 files changed, 6 insertions(+), 6 deletions(-)
+> When initiating dedicated bonding a L2CAP raw socket with HIGH security
+> level is used. The kernel is supposed to trigger the authentication
+> request in this case but this doesn't happen currently for non-SSP
+> (pre-2.1) devices. The reason is that the authentication request happens
+> in the remote extended features callback which never gets called for
+> non-SSP devices. This patch fixes the issue by requesting also
+> authentiation in the (normal) remote features callback in the case of
+> non-SSP devices.
+> 
+> This rule is applied only for HIGH security level which might at first
+> seem unintuitive since on the server socket side MEDIUM is already
+> enough for authentication. However, for the clients we really want to
+> prefer the server side to decide the authentication requrement in most
+> cases, and since most client sockets use MEDIUM it's better to be
+> avoided on the kernel side for these sockets. The important socket to
+> request it for is the dedicated bonding one and that socket uses HIGH
+> security level.
+> 
+> The patch is based on the initial investigation and patch proposal from
+> Andrei Emeltchenko <endrei.emeltchenko@nokia.com>.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
 
-diff --git a/plugins/pbap.c b/plugins/pbap.c
-index 13742da..11cb678 100644
---- a/plugins/pbap.c
-+++ b/plugins/pbap.c
-@@ -398,12 +398,6 @@ static void cache_ready_notify(void *user_data)
- 		goto done;
- 	}
- 
--	if (pbap->cache.entries == NULL) {
--		pbap->cache.valid = TRUE;
--		obex_object_set_io_flags(pbap, G_IO_ERR, -ENOENT);
--		return;
--	}
--
- 	/*
- 	 * Don't free the sorted list content: this list contains
- 	 * only the reference for the "real" cache entry.
-@@ -412,6 +406,12 @@ static void cache_ready_notify(void *user_data)
- 			pbap->params->searchattrib,
- 			(const char *) pbap->params->searchval);
- 
-+	if (sorted == NULL) {
-+		pbap->cache.valid = TRUE;
-+		obex_object_set_io_flags(pbap, G_IO_ERR, -ENOENT);
-+		return;
-+	}
-+
- 	/* Computing offset considering first entry of the phonebook */
- 	l = g_slist_nth(sorted, pbap->params->liststartoffset);
- 
--- 
-1.7.1
+so I had a quick review here on this one. Looks fine to me and it makes
+sense.
+
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+
+Regards
+
+Marcel
+
 
