@@ -1,41 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH] TODO: Avoid Characteristic discovery for non connectable device
-Date: Fri, 15 Oct 2010 10:03:01 -0300
-Message-Id: <1287147783-14998-1-git-send-email-claudio.takahasi@openbossa.org>
+Date: Fri, 15 Oct 2010 14:52:03 +0300
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Type conversion in read and write obex streams
+Message-ID: <20101015115203.GA14659@jh-x301>
+References: <1287143179-22136-1-git-send-email-dmitriy.paliy@nokia.com>
+ <1287143179-22136-2-git-send-email-dmitriy.paliy@nokia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1287143179-22136-2-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- TODO |   13 +++++++++++--
- 1 files changed, 11 insertions(+), 2 deletions(-)
+Hi Dmitriy,
 
-diff --git a/TODO b/TODO
-index 2c17c6b..1d4e789 100644
---- a/TODO
-+++ b/TODO
-@@ -14,8 +14,17 @@ Background
-   Higher complexity tasks should be refined into several lower complexity tasks
-   once the task is better understood.
- 
--LE Generic Access Profile
--=========================
-+Low Energy
-+==========
-+
-+- Avoid Characteristic discovery for non connectable devices. Proper parsing
-+  of LE Advertising Report Event is missing. Event_Type field needs to be
-+  extracted and its value shall be considered before to start the LE
-+  connection on the channel 4. Characteristic discovery should not be
-+  started for non connectable devices.
-+
-+  Priority: Medium
-+  Complexity: C2
- 
- - Device Name Characteristic is a GAP characteristic for Low Energy. This
-   characteristic shall be integrated/used in the discovery procedure. The
--- 
-1.7.3.1
+On Fri, Oct 15, 2010, Dmitriy Paliy wrote:
+> Integer types in obex_write_stream and obex_read_stream shell be the
+> same as those returned by read and write function prototypes of
+> obex_mime_type_driver.
+> ---
+>  src/obex.c |    8 ++++----
+>  1 files changed, 4 insertions(+), 4 deletions(-)
 
+Thanks. Pushed upstream.
+
+Johan
