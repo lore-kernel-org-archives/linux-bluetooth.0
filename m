@@ -1,53 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 16 Oct 2010 20:09:07 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	Johan Hedberg <johan.hedberg@nokia.com>
-Subject: Re: [PATCH] Bluetooth: Fix non-SSP auth request for HIGH security
- level sockets
-Message-ID: <20101016230907.GA12187@vigoh>
-References: <1287128769-5078-1-git-send-email-johan.hedberg@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1287128769-5078-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Mike Frysinger <vapier@gentoo.org>
+To: linux-bluetooth@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>
+Cc: uclinux-dist-devel@blackfin.uclinux.org,
+	linux-kernel@vger.kernel.org,
+	Andrew Morton <akpm@linux-foundation.org>,
+	steven miao <realmz6@gmail.com>
+Subject: [PATCH] bluetooth: fix unaligned access to l2cap conf data
+Date: Sat, 16 Oct 2010 18:29:47 -0400
+Message-Id: <1287268187-9628-1-git-send-email-vapier@gentoo.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: steven miao <realmz6@gmail.com>
 
-* johan.hedberg@gmail.com <johan.hedberg@gmail.com> [2010-10-15 10:46:09 +0300]:
+In function l2cap_get_conf_opt() and l2cap_add_conf_opt() the address of
+opt->val sometimes is not at the edge of 2-bytes/4-bytes, so 2-bytes/4 bytes
+access will cause data misalignment exeception.  Use get_unaligned_le16/32
+and put_unaligned_le16/32 function to avoid data misalignment execption.
 
-> From: Johan Hedberg <johan.hedberg@nokia.com>
-> 
-> When initiating dedicated bonding a L2CAP raw socket with HIGH security
-> level is used. The kernel is supposed to trigger the authentication
-> request in this case but this doesn't happen currently for non-SSP
-> (pre-2.1) devices. The reason is that the authentication request happens
-> in the remote extended features callback which never gets called for
-> non-SSP devices. This patch fixes the issue by requesting also
-> authentiation in the (normal) remote features callback in the case of
-> non-SSP devices.
-> 
-> This rule is applied only for HIGH security level which might at first
-> seem unintuitive since on the server socket side MEDIUM is already
-> enough for authentication. However, for the clients we really want to
-> prefer the server side to decide the authentication requrement in most
-> cases, and since most client sockets use MEDIUM it's better to be
-> avoided on the kernel side for these sockets. The important socket to
-> request it for is the dedicated bonding one and that socket uses HIGH
-> security level.
-> 
-> The patch is based on the initial investigation and patch proposal from
-> Andrei Emeltchenko <endrei.emeltchenko@nokia.com>.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
-> ---
->  net/bluetooth/hci_event.c |    6 ++++++
->  1 files changed, 6 insertions(+), 0 deletions(-)
+Signed-off-by: steven miao <realmz6@gmail.com>
+Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+---
+was posted a month ago with no feedback ...
 
-Applied, thanks.
+ net/bluetooth/l2cap.c |    8 ++++----
+ 1 files changed, 4 insertions(+), 4 deletions(-)
 
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index 0b54b7d..65bcdc1 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -2401,11 +2401,11 @@ static inline int l2cap_get_conf_opt(void **ptr, int *type, int *olen, unsigned
+ 		break;
+ 
+ 	case 2:
+-		*val = __le16_to_cpu(*((__le16 *) opt->val));
++		*val = get_unaligned_le16(opt->val);
+ 		break;
+ 
+ 	case 4:
+-		*val = __le32_to_cpu(*((__le32 *) opt->val));
++		*val = get_unaligned_le32(opt->val);
+ 		break;
+ 
+ 	default:
+@@ -2432,11 +2432,11 @@ static void l2cap_add_conf_opt(void **ptr, u8 type, u8 len, unsigned long val)
+ 		break;
+ 
+ 	case 2:
+-		*((__le16 *) opt->val) = cpu_to_le16(val);
++		put_unaligned_le16(cpu_to_le16(val), opt->val);
+ 		break;
+ 
+ 	case 4:
+-		*((__le32 *) opt->val) = cpu_to_le32(val);
++		put_unaligned_le32(cpu_to_le32(val), opt->val);
+ 		break;
+ 
+ 	default:
 -- 
-Gustavo F. Padovan
-ProFUSION embedded systems - http://profusion.mobi
+1.7.3.1
