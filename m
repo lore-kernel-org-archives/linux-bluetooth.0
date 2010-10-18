@@ -1,39 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 18 Oct 2010 17:16:31 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Santiago Carot-Nemesio <sancane@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Get mode option for L2CAP sockets
-Message-ID: <20101018141631.GA20917@jh-x301>
-References: <1287408102-25344-1-git-send-email-sancane@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1287408102-25344-1-git-send-email-sancane@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/3] Fix not setting proper errors when canceling suspended requests
+Date: Mon, 18 Oct 2010 17:18:48 +0300
+Message-Id: <1287411529-5806-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1287411529-5806-1-git-send-email-luiz.dentz@gmail.com>
+References: <1287411529-5806-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-On Mon, Oct 18, 2010, Santiago Carot-Nemesio wrote:
-> ---
->  btio/btio.c |    3 +++
->  1 files changed, 3 insertions(+), 0 deletions(-)
-> 
-> diff --git a/btio/btio.c b/btio/btio.c
-> index 2f719b1..d8439e0 100644
-> --- a/btio/btio.c
-> +++ b/btio/btio.c
-> @@ -839,6 +839,9 @@ static gboolean l2cap_get(int sock, GError **err, BtIOOption opt1,
->  			}
->  			memcpy(va_arg(args, uint8_t *), dev_class, 3);
->  			break;
-> +		case BT_IO_OPT_MODE:
-> +			*(va_arg(args, uint8_t *)) = l2o.mode;
-> +			break;
->  		default:
->  			g_set_error(err, BT_IO_ERROR, BT_IO_ERROR_INVALID_ARGS,
->  					"Unknown option %d", opt);
+---
+ src/obex.c |    5 +++--
+ 1 files changed, 3 insertions(+), 2 deletions(-)
 
-Pushed upstream. Thanks.
+diff --git a/src/obex.c b/src/obex.c
+index f37cd90..6d4430d 100644
+--- a/src/obex.c
++++ b/src/obex.c
+@@ -702,9 +702,10 @@ static gboolean handle_async_io(void *object, int flags, int err,
+ 		ret = obex_read_stream(os, os->obex, os->obj);
+ 
+ proceed:
+-	if (ret < 0)
++	if (ret < 0) {
++		os_set_response(os->obj, err);
+ 		OBEX_CancelRequest(os->obex, TRUE);
+-	else
++	} else
+ 		OBEX_ResumeRequest(os->obex);
+ 
+ 	return FALSE;
+-- 
+1.7.1
 
-Johan
