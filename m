@@ -1,57 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Mon, 18 Oct 2010 04:06:25 -0200
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Matthew Garrett <mjg@redhat.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-usb@vger.kernel.org,
+	marcel@holtmann.org
+Subject: Re: [PATCH 3/3] bluetooth: Enable USB autosuspend by default on
+ btusb
+Message-ID: <20101018060625.GA5217@vigoh>
+References: <1284659895-27984-1-git-send-email-mjg@redhat.com>
+ <1284659895-27984-3-git-send-email-mjg@redhat.com>
 MIME-Version: 1.0
-Date: Mon, 18 Oct 2010 11:36:36 +0300
-Message-ID: <AANLkTikmpwse=s3Z5+RzgrPCSy-qVhYkLxA1kRZrECnJ@mail.gmail.com>
-Subject: [PATCH] Fix process pending request if transfer canceled
-From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=0016361e7fe40ac8bc0492e01311
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1284659895-27984-3-git-send-email-mjg@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---0016361e7fe40ac8bc0492e01311
-Content-Type: text/plain; charset=ISO-8859-1
+Hi Matthew,
 
-Hi,
+* Matthew Garrett <mjg@redhat.com> [2010-09-16 13:58:15 -0400]:
 
-Please review.
+> We've done this for a while in Fedora without any obvious problems other
+> than some interaction with input devices. Those should be fixed now, so
+> let's try this in mainline.
+> 
+> Signed-off-by: Matthew Garrett <mjg@redhat.com>
+> ---
+>  drivers/bluetooth/btusb.c |    2 ++
+>  1 files changed, 2 insertions(+), 0 deletions(-)
 
-/Daniel
+Patch has been applied, thanks.
 
---0016361e7fe40ac8bc0492e01311
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Fix-process-pending-request-if-transfer-canceled.patch"
-Content-Disposition: attachment;
-	filename="0001-Fix-process-pending-request-if-transfer-canceled.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_gff3cx6e0
-
-RnJvbSA3YTBiZDcwNjk1MWFlYmY3ZDY2YmQ2M2YxNGQ2NWU1Nzk5YzllYTY5IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
-a2lhLmNvbT4KRGF0ZTogTW9uLCAxOCBPY3QgMjAxMCAxMToxNjo0MCArMDMwMApTdWJqZWN0OiBb
-UEFUQ0hdIEZpeCBwcm9jZXNzIHBlbmRpbmcgcmVxdWVzdCBpZiB0cmFuc2ZlciBjYW5jZWxlZAoK
-SWYgdGhlIGNhbGwgdG8gdGhlIFJlcXVlc3QgbWV0aG9kIG9mIHRoZSBvYmV4IGNsaWVudCBhZ2Vu
-dCByZXR1cm5zCndpdGggYW4gZXJyb3IgKGZvciBleGFtcGxlIGlmIHRoZSB0cmFuc2ZlciBpcyBy
-ZWplY3RlZCksIGNhbGwKZnVuY3Rpb24gc2Vzc2lvbl90ZXJtaW5hdGVfdHJhbnNmZXIgaW5zdGVh
-ZCBvZiB1bnJlZ2lzdGVyX3RyYW5zZmVyCnRvIGJvdGggdW5yZWdpc3RlciB0aGUgdHJhbnNmZXIg
-YW5kIGhhbmRsZSB0aGUgcGVuZGluZyByZXF1ZXN0LgotLS0KIGNsaWVudC9zZXNzaW9uLmMgfCAg
-IDExICsrKysrKysrKystCiAxIGZpbGVzIGNoYW5nZWQsIDEwIGluc2VydGlvbnMoKyksIDEgZGVs
-ZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvY2xpZW50L3Nlc3Npb24uYyBiL2NsaWVudC9zZXNzaW9u
-LmMKaW5kZXggY2UzNDMyZC4uMGU2MzVlNyAxMDA2NDQKLS0tIGEvY2xpZW50L3Nlc3Npb24uYwor
-KysgYi9jbGllbnQvc2Vzc2lvbi5jCkBAIC04OSw2ICs4OSw5IEBAIHN0cnVjdCBhZ2VudF9kYXRh
-IHsKIAogc3RhdGljIHZvaWQgc2Vzc2lvbl9wcmVwYXJlX3B1dChzdHJ1Y3Qgc2Vzc2lvbl9kYXRh
-ICpzZXNzaW9uLCBHRXJyb3IgKmVyciwKIAkJCQkJCQkJdm9pZCAqZGF0YSk7CitzdGF0aWMgdm9p
-ZCBzZXNzaW9uX3Rlcm1pbmF0ZV90cmFuc2ZlcihzdHJ1Y3Qgc2Vzc2lvbl9kYXRhICpzZXNzaW9u
-LAorCQkJCQlzdHJ1Y3QgdHJhbnNmZXJfZGF0YSAqdHJhbnNmZXIsCisJCQkJCUdFcnJvciAqZ2Vy
-cik7CiAKIHN0YXRpYyBHUXVhcmsgb2JleF9pb19lcnJvcl9xdWFyayh2b2lkKQogewpAQCAtODAz
-LDExICs4MDYsMTcgQEAgc3RhdGljIHZvaWQgc2Vzc2lvbl9yZXF1ZXN0X3JlcGx5KERCdXNQZW5k
-aW5nQ2FsbCAqY2FsbCwgZ3BvaW50ZXIgdXNlcl9kYXRhKQogCiAJZGJ1c19lcnJvcl9pbml0KCZk
-ZXJyKTsKIAlpZiAoZGJ1c19zZXRfZXJyb3JfZnJvbV9tZXNzYWdlKCZkZXJyLCByZXBseSkpIHsK
-KwkJR0Vycm9yICpnZXJyID0gTlVMTDsKKwogCQllcnJvcigiUmVwbGllZCB3aXRoIGFuIGVycm9y
-OiAlcywgJXMiLAogCQkJCWRlcnIubmFtZSwgZGVyci5tZXNzYWdlKTsKIAkJZGJ1c19lcnJvcl9m
-cmVlKCZkZXJyKTsKIAkJZGJ1c19tZXNzYWdlX3VucmVmKHJlcGx5KTsKLQkJdHJhbnNmZXJfdW5y
-ZWdpc3RlcihwZW5kaW5nLT50cmFuc2Zlcik7CisKKwkJZ19zZXRfZXJyb3IoJmdlcnIsIE9CRVhf
-SU9fRVJST1IsIC1FQ0FOQ0VMRUQsICIlcyIsIGRlcnIubWVzc2FnZSk7CisJCXNlc3Npb25fdGVy
-bWluYXRlX3RyYW5zZmVyKHNlc3Npb24sIHBlbmRpbmctPnRyYW5zZmVyLCBnZXJyKTsKKwkJZ19j
-bGVhcl9lcnJvcigmZ2Vycik7CisKIAkJcmV0dXJuOwogCX0KIAotLSAKMS42LjAuNAoK
---0016361e7fe40ac8bc0492e01311--
+-- 
+Gustavo F. Padovan
+ProFUSION embedded systems - http://profusion.mobi
