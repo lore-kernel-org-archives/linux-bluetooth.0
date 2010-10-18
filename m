@@ -1,180 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: >net-wireless/bluez-4.63 unable to connect audio streams due
- commit
-From: Pacho Ramos <pacho@condmat1.ciencias.uniovi.es>
-Reply-To: pacho@condmat1.ciencias.uniovi.es
-To: Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?=
-	<u.kleine-koenig@pengutronix.de>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-In-Reply-To: <20101004123552.GC11737@pengutronix.de>
-References: <20101004123552.GC11737@pengutronix.de>
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-rurb00c29fmgpQlMNJTw"
-Date: Mon, 18 Oct 2010 20:24:50 +0200
-Message-ID: <1287426290.6820.1.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1287268187-9628-1-git-send-email-vapier@gentoo.org>
+References: <1287268187-9628-1-git-send-email-vapier@gentoo.org>
+Date: Mon, 18 Oct 2010 11:17:28 -0700
+Message-ID: <AANLkTinMSbhTkH0zQn_YO7hFF7zkuv-Gj-B0BUFWy5nP@mail.gmail.com>
+Subject: Re: [PATCH] bluetooth: fix unaligned access to l2cap conf data
+From: Harvey Harrison <harvey.harrison@gmail.com>
+To: Mike Frysinger <vapier@gentoo.org>
+Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
+	uclinux-dist-devel@blackfin.uclinux.org, linux-kernel@vger.kernel.org,
+	Andrew Morton <akpm@linux-foundation.org>, steven miao <realmz6@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Sat, Oct 16, 2010 at 3:29 PM, Mike Frysinger <vapier@gentoo.org> wrote:
+> From: steven miao <realmz6@gmail.com>
+>
+>
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0case 2:
+> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 *((__le16 *) opt->val)=
+ =3D cpu_to_le16(val);
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 put_unaligned_le16(cpu=
+_to_le16(val), opt->val);
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;
+>
 
---=-rurb00c29fmgpQlMNJTw
-Content-Type: multipart/mixed; boundary="=-Y1HswG9smdhK5jUHx/fB"
+I think you wanted:
+put_unaligned_le16(val, opt->val);
 
+Cheers,
 
---=-Y1HswG9smdhK5jUHx/fB
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-El lun, 04-10-2010 a las 14:35 +0200, Uwe Kleine-K=C3=B6nig escribi=C3=B3:
-> Hello Pacho,
->=20
-> On Mon, Oct 04, 2010 at 12:25:46PM +0200, Pacho Ramos wrote:
-> > > I would say this was because of double authentication request, but it
-> > > seems it is not the case, actually ssp doesn't seems to be used at al=
-l
-> > > here so this must be something else, maybe you should try this:
-> > >=20
-> > > http://thread.gmane.org/gmane.linux.bluez.kernel/7256
-> > >=20
-> >=20
-> > Thanks but, how should I try to apply that patch? Looks like
-> > net/bluetooth/rfcomm/core.c is not present on bluez-4.72 sources
-> I guess this is a patch to apply to your kernel, not bluez.
->=20
-> Best regards
-> Uwe
->=20
-
-Downstream affected reported told me it's still failing even with the
-patch:
-
-http://bugs.gentoo.org/show_bug.cgi?id=3D327705#c19
-
-Attached is the new hcidump output
-
-Thanks a lot for your help :-)
-
-
---=-Y1HswG9smdhK5jUHx/fB
-Content-Disposition: attachment; filename="hcidump.out"
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; name="hcidump.out"; charset="UTF-8"
-
-SENJIHNuaWZmZXIgLSBCbHVldG9vdGggcGFja2V0IGFuYWx5emVyIHZlciAxLjQyDQpkZXZpY2U6
-IGhjaTAgc25hcF9sZW46IDEwMjggZmlsdGVyOiAweGZmZmZmZmZmZmZmZmZmZmYNCjwgSENJIENv
-bW1hbmQ6IENyZWF0ZSBDb25uZWN0aW9uICgweDAxfDB4MDAwNSkgcGxlbiAxMw0KPiBIQ0kgRXZl
-bnQ6IENvbW1hbmQgU3RhdHVzICgweDBmKSBwbGVuIDQNCj4gSENJIEV2ZW50OiBMaW5rIEtleSBS
-ZXF1ZXN0ICgweDE3KSBwbGVuIDYNCjwgSENJIENvbW1hbmQ6IExpbmsgS2V5IFJlcXVlc3QgUmVw
-bHkgKDB4MDF8MHgwMDBiKSBwbGVuIDIyDQo+IEhDSSBFdmVudDogQ29tbWFuZCBDb21wbGV0ZSAo
-MHgwZSkgcGxlbiAxMA0KPiBIQ0kgRXZlbnQ6IENvbm5lY3QgQ29tcGxldGUgKDB4MDMpIHBsZW4g
-MTENCjwgSENJIENvbW1hbmQ6IFJlYWQgUmVtb3RlIFN1cHBvcnRlZCBGZWF0dXJlcyAoMHgwMXww
-eDAwMWIpIHBsZW4gMg0KPiBIQ0kgRXZlbnQ6IENvbW1hbmQgU3RhdHVzICgweDBmKSBwbGVuIDQN
-CjwgSENJIENvbW1hbmQ6IFJlbW90ZSBOYW1lIFJlcXVlc3QgKDB4MDF8MHgwMDE5KSBwbGVuIDEw
-DQo+IEhDSSBFdmVudDogTWF4IFNsb3RzIENoYW5nZSAoMHgxYikgcGxlbiAzDQo+IEhDSSBFdmVu
-dDogUmVhZCBSZW1vdGUgU3VwcG9ydGVkIEZlYXR1cmVzICgweDBiKSBwbGVuIDExDQo8IEFDTCBk
-YXRhOiBoYW5kbGUgMTIgZmxhZ3MgMHgwMiBkbGVuIDEwDQogICAgTDJDQVAocyk6IEluZm8gcmVx
-OiB0eXBlIDINCj4gSENJIEV2ZW50OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0DQo+IEFD
-TCBkYXRhOiBoYW5kbGUgMTIgZmxhZ3MgMHgwMiBkbGVuIDE2DQogICAgTDJDQVAocyk6IEluZm8g
-cnNwOiB0eXBlIDIgcmVzdWx0IDANCiAgICAgIEV4dGVuZGVkIGZlYXR1cmUgbWFzayAweDAwMDAN
-CjwgQUNMIGRhdGE6IGhhbmRsZSAxMiBmbGFncyAweDAyIGRsZW4gMTINCiAgICBMMkNBUChzKTog
-Q29ubmVjdCByZXE6IHBzbSAxIHNjaWQgMHgwMDQwDQo+IEFDTCBkYXRhOiBoYW5kbGUgMTIgZmxh
-Z3MgMHgwMiBkbGVuIDE2DQogICAgTDJDQVAocyk6IENvbm5lY3QgcnNwOiBkY2lkIDB4MDA1YSBz
-Y2lkIDB4MDA0MCByZXN1bHQgMSBzdGF0dXMgMg0KICAgICAgQ29ubmVjdGlvbiBwZW5kaW5nIC0g
-QXV0aG9yaXphdGlvbiBwZW5kaW5nDQo+IEFDTCBkYXRhOiBoYW5kbGUgMTIgZmxhZ3MgMHgwMiBk
-bGVuIDE2DQogICAgTDJDQVAocyk6IENvbm5lY3QgcnNwOiBkY2lkIDB4MDA1YSBzY2lkIDB4MDA0
-MCByZXN1bHQgMCBzdGF0dXMgMA0KICAgICAgQ29ubmVjdGlvbiBzdWNjZXNzZnVsDQo8IEFDTCBk
-YXRhOiBoYW5kbGUgMTIgZmxhZ3MgMHgwMiBkbGVuIDEyDQogICAgTDJDQVAocyk6IENvbmZpZyBy
-ZXE6IGRjaWQgMHgwMDVhIGZsYWdzIDB4MDAgY2xlbiAwDQo+IEhDSSBFdmVudDogUmVtb3RlIE5h
-bWUgUmVxIENvbXBsZXRlICgweDA3KSBwbGVuIDI1NQ0KPiBBQ0wgZGF0YTogaGFuZGxlIDEyIGZs
-YWdzIDB4MDIgZGxlbiAxNA0KICAgIEwyQ0FQKHMpOiBDb25maWcgcnNwOiBzY2lkIDB4MDA0MCBm
-bGFncyAweDAwIHJlc3VsdCAwIGNsZW4gMA0KICAgICAgU3VjY2Vzcw0KPiBBQ0wgZGF0YTogaGFu
-ZGxlIDEyIGZsYWdzIDB4MDIgZGxlbiAxNg0KICAgIEwyQ0FQKHMpOiBDb25maWcgcmVxOiBkY2lk
-IDB4MDA0MCBmbGFncyAweDAwIGNsZW4gNA0KICAgICAgTVRVIDQ4IA0KPCBBQ0wgZGF0YTogaGFu
-ZGxlIDEyIGZsYWdzIDB4MDIgZGxlbiAxOA0KICAgIEwyQ0FQKHMpOiBDb25maWcgcnNwOiBzY2lk
-IDB4MDA1YSBmbGFncyAweDAwIHJlc3VsdCAwIGNsZW4gNA0KICAgICAgTVRVIDQ4IA0KPCBBQ0wg
-ZGF0YTogaGFuZGxlIDEyIGZsYWdzIDB4MDIgZGxlbiAyNA0KICAgIEwyQ0FQKGQpOiBjaWQgMHgw
-MDVhIGxlbiAyMCBbcHNtIDFdDQogICAgICAgIFNEUCBTU0EgUmVxOiB0aWQgMHgwIGxlbiAweGYN
-CiAgICAgICAgICBwYXQgdXVpZC0xNiAweDExMWUgKEhhbmRzZnJlZSkNCiAgICAgICAgICBtYXgg
-NjU1MzUNCiAgICAgICAgICBhaWQocykgMHgwMDAwIC0gMHhmZmZmDQogICAgICAgICAgY29udCAw
-MA0KPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1
-DQo+IEFDTCBkYXRhOiBoYW5kbGUgMTIgZmxhZ3MgMHgwMiBkbGVuIDUyDQogICAgTDJDQVAoZCk6
-IGNpZCAweDAwNDAgbGVuIDQ4IFtwc20gMV0NCiAgICAgICAgU0RQIFNTQSBSc3A6IHRpZCAweDAg
-bGVuIDB4MmINCiAgICAgICAgICBjb3VudCAzOA0KICAgICAgICAgIGNvbnQgMDIgMDAgMzkNCjwg
-QUNMIGRhdGE6IGhhbmRsZSAxMiBmbGFncyAweDAyIGRsZW4gMjYNCiAgICBMMkNBUChkKTogY2lk
-IDB4MDA1YSBsZW4gMjIgW3BzbSAxXQ0KICAgICAgICBTRFAgU1NBIFJlcTogdGlkIDB4MSBsZW4g
-MHgxMQ0KICAgICAgICAgIHBhdCB1dWlkLTE2IDB4MTExZSAoSGFuZHNmcmVlKQ0KICAgICAgICAg
-IG1heCA2NTUzNQ0KICAgICAgICAgIGFpZChzKSAweDAwMDAgLSAweGZmZmYNCiAgICAgICAgICBj
-b250IDAyIDAwIDM5DQo+IEFDTCBkYXRhOiBoYW5kbGUgMTIgZmxhZ3MgMHgwMiBkbGVuIDUyDQog
-ICAgTDJDQVAoZCk6IGNpZCAweDAwNDAgbGVuIDQ4IFtwc20gMV0NCiAgICAgICAgU0RQIFNTQSBS
-c3A6IHRpZCAweDEgbGVuIDB4MmINCiAgICAgICAgICBjb3VudCAzOA0KICAgICAgICAgIGNvbnQg
-MDIgMDAgMTMNCjwgQUNMIGRhdGE6IGhhbmRsZSAxMiBmbGFncyAweDAyIGRsZW4gMjYNCiAgICBM
-MkNBUChkKTogY2lkIDB4MDA1YSBsZW4gMjIgW3BzbSAxXQ0KICAgICAgICBTRFAgU1NBIFJlcTog
-dGlkIDB4MiBsZW4gMHgxMQ0KICAgICAgICAgIHBhdCB1dWlkLTE2IDB4MTExZSAoSGFuZHNmcmVl
-KQ0KICAgICAgICAgIG1heCA2NTUzNQ0KICAgICAgICAgIGFpZChzKSAweDAwMDAgLSAweGZmZmYN
-CiAgICAgICAgICBjb250IDAyIDAwIDEzDQo+IEFDTCBkYXRhOiBoYW5kbGUgMTIgZmxhZ3MgMHgw
-MiBkbGVuIDMxDQogICAgTDJDQVAoZCk6IGNpZCAweDAwNDAgbGVuIDI3IFtwc20gMV0NCiAgICAg
-ICAgU0RQIFNTQSBSc3A6IHRpZCAweDIgbGVuIDB4MTYNCiAgICAgICAgICBjb3VudCAxOQ0KICAg
-ICAgICAgIHJlY29yZCAjMA0KICAgICAgICAgICAgICBhaWQgMHgwMDAwIChTcnZSZWNIbmRsKQ0K
-ICAgICAgICAgICAgICAgICB1aW50IDB4MTAwMDQNCiAgICAgICAgICAgICAgYWlkIDB4MDAwMSAo
-U3J2Q2xhc3NJRExpc3QpDQogICAgICAgICAgICAgICAgIDwgdXVpZC0xNiAweDExMWUgKEhhbmRz
-ZnJlZSkgdXVpZC0xNiAweDEyMDMgKEF1ZGlvKSA+DQogICAgICAgICAgICAgIGFpZCAweDAwMDQg
-KFByb3RvY29sRGVzY0xpc3QpDQogICAgICAgICAgICAgICAgIDwgPCB1dWlkLTE2IDB4MDEwMCAo
-TDJDQVApID4gPA0KICAgICAgICAgICAgICAgICB1dWlkLTE2IDB4MDAwMyAoUkZDT01NKSB1aW50
-IDB4MSA+ID4NCiAgICAgICAgICAgICAgYWlkIDB4MDAwNiAoTGFuZ0Jhc2VBdHRySURMaXN0KQ0K
-ICAgICAgICAgICAgICAgICA8IHVpbnQgMHg2NTZlIHVpbnQgMHg2YSB1aW50IDB4MTAwID4NCiAg
-ICAgICAgICAgICAgYWlkIDB4MDAwOSAoQlRQcm9maWxlRGVzY0xpc3QpDQogICAgICAgICAgICAg
-ICAgIDwgPCB1dWlkLTE2IDB4MTExZSAoSGFuZHNmcmVlKSB1aW50IDB4MTAxID4gPg0KICAgICAg
-ICAgICAgICBhaWQgMHgwMTAwIChTcnZOYW1lKQ0KICAgICAgICAgICAgICAgICBzdHIgIkhhbmRz
-LUZyZWUgdW5pdCINCiAgICAgICAgICAgICAgYWlkIDB4MDMxMSAoU3VwcEZlYXR1cmVzKQ0KICAg
-ICAgICAgICAgICAgICB1aW50IDB4MTgNCiAgICAgICAgICBjb250IDAwDQo8IEhDSSBDb21tYW5k
-OiBBdXRoZW50aWNhdGlvbiBSZXF1ZXN0ZWQgKDB4MDF8MHgwMDExKSBwbGVuIDINCj4gSENJIEV2
-ZW50OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0DQo+IEhDSSBFdmVudDogQXV0aCBDb21w
-bGV0ZSAoMHgwNikgcGxlbiAzDQo8IEhDSSBDb21tYW5kOiBTZXQgQ29ubmVjdGlvbiBFbmNyeXB0
-aW9uICgweDAxfDB4MDAxMykgcGxlbiAzDQo+IEhDSSBFdmVudDogQ29tbWFuZCBTdGF0dXMgKDB4
-MGYpIHBsZW4gNA0KPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgx
-MykgcGxlbiA1DQo8IEFDTCBkYXRhOiBoYW5kbGUgMTIgZmxhZ3MgMHgwMiBkbGVuIDEyDQogICAg
-TDJDQVAocyk6IERpc2Nvbm4gcmVxOiBkY2lkIDB4MDA1YSBzY2lkIDB4MDA0MA0KPiBIQ0kgRXZl
-bnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1DQo+IEhDSSBFdmVu
-dDogRGlzY29ubiBDb21wbGV0ZSAoMHgwNSkgcGxlbiA0DQo8IEhDSSBDb21tYW5kOiBDcmVhdGUg
-Q29ubmVjdGlvbiAoMHgwMXwweDAwMDUpIHBsZW4gMTMNCj4gSENJIEV2ZW50OiBDb21tYW5kIFN0
-YXR1cyAoMHgwZikgcGxlbiA0DQo+IEhDSSBFdmVudDogTGluayBLZXkgUmVxdWVzdCAoMHgxNykg
-cGxlbiA2DQo8IEhDSSBDb21tYW5kOiBMaW5rIEtleSBSZXF1ZXN0IFJlcGx5ICgweDAxfDB4MDAw
-YikgcGxlbiAyMg0KPiBIQ0kgRXZlbnQ6IENvbW1hbmQgQ29tcGxldGUgKDB4MGUpIHBsZW4gMTAN
-Cj4gSENJIEV2ZW50OiBDb25uZWN0IENvbXBsZXRlICgweDAzKSBwbGVuIDExDQo8IEhDSSBDb21t
-YW5kOiBSZWFkIFJlbW90ZSBTdXBwb3J0ZWQgRmVhdHVyZXMgKDB4MDF8MHgwMDFiKSBwbGVuIDIN
-Cj4gSENJIEV2ZW50OiBNYXggU2xvdHMgQ2hhbmdlICgweDFiKSBwbGVuIDMNCj4gSENJIEV2ZW50
-OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0DQo8IEhDSSBDb21tYW5kOiBSZW1vdGUgTmFt
-ZSBSZXF1ZXN0ICgweDAxfDB4MDAxOSkgcGxlbiAxMA0KPiBIQ0kgRXZlbnQ6IFJlYWQgUmVtb3Rl
-IFN1cHBvcnRlZCBGZWF0dXJlcyAoMHgwYikgcGxlbiAxMQ0KPCBBQ0wgZGF0YTogaGFuZGxlIDEx
-IGZsYWdzIDB4MDIgZGxlbiAxMA0KICAgIEwyQ0FQKHMpOiBJbmZvIHJlcTogdHlwZSAyDQo+IEhD
-SSBFdmVudDogQ29tbWFuZCBTdGF0dXMgKDB4MGYpIHBsZW4gNA0KPiBBQ0wgZGF0YTogaGFuZGxl
-IDExIGZsYWdzIDB4MDIgZGxlbiAxNg0KICAgIEwyQ0FQKHMpOiBJbmZvIHJzcDogdHlwZSAyIHJl
-c3VsdCAwDQogICAgICBFeHRlbmRlZCBmZWF0dXJlIG1hc2sgMHgwMDAwDQo8IEhDSSBDb21tYW5k
-OiBBdXRoZW50aWNhdGlvbiBSZXF1ZXN0ZWQgKDB4MDF8MHgwMDExKSBwbGVuIDINCj4gSENJIEV2
-ZW50OiBSZW1vdGUgTmFtZSBSZXEgQ29tcGxldGUgKDB4MDcpIHBsZW4gMjU1DQo+IEhDSSBFdmVu
-dDogQ29tbWFuZCBTdGF0dXMgKDB4MGYpIHBsZW4gNA0KPiBIQ0kgRXZlbnQ6IEF1dGggQ29tcGxl
-dGUgKDB4MDYpIHBsZW4gMw0KPCBIQ0kgQ29tbWFuZDogU2V0IENvbm5lY3Rpb24gRW5jcnlwdGlv
-biAoMHgwMXwweDAwMTMpIHBsZW4gMw0KPiBIQ0kgRXZlbnQ6IENvbW1hbmQgU3RhdHVzICgweDBm
-KSBwbGVuIDQNCj4gSENJIEV2ZW50OiBOdW1iZXIgb2YgQ29tcGxldGVkIFBhY2tldHMgKDB4MTMp
-IHBsZW4gNQ0KPiBIQ0kgRXZlbnQ6IERpc2Nvbm4gQ29tcGxldGUgKDB4MDUpIHBsZW4gNA0KPCBI
-Q0kgQ29tbWFuZDogUmVzZXQgKDB4MDN8MHgwMDAzKSBwbGVuIDANCj4gSENJIEV2ZW50OiBDb21t
-YW5kIENvbXBsZXRlICgweDBlKSBwbGVuIDQNCg==
-
-
---=-Y1HswG9smdhK5jUHx/fB--
-
---=-rurb00c29fmgpQlMNJTw
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.16 (GNU/Linux)
-
-iEYEABECAAYFAky8kPIACgkQCaWpQKGI+9Td6wCdGI52Qr0zwE5t2s3iEOc7tbCH
-9UIAoIK5ICnNfpk8y/vDpTUkbKC2wz+5
-=mbnN
------END PGP SIGNATURE-----
-
---=-rurb00c29fmgpQlMNJTw--
-
+Harvey
