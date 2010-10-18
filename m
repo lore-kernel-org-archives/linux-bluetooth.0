@@ -1,39 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 18 Oct 2010 12:22:31 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix linkage failure for bluetoothd
-Message-ID: <20101018092231.GA17402@jh-x301>
-References: <1287171971-32246-1-git-send-email-padovan@profusion.mobi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1287171971-32246-1-git-send-email-padovan@profusion.mobi>
+Date: Mon, 18 Oct 2010 11:36:36 +0300
+Message-ID: <AANLkTikmpwse=s3Z5+RzgrPCSy-qVhYkLxA1kRZrECnJ@mail.gmail.com>
+Subject: [PATCH] Fix process pending request if transfer canceled
+From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=0016361e7fe40ac8bc0492e01311
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+--0016361e7fe40ac8bc0492e01311
+Content-Type: text/plain; charset=ISO-8859-1
 
-On Fri, Oct 15, 2010, Gustavo F. Padovan wrote:
-> Adding -lrt fix the following errors in one of my systems:
-> 
-> health/mcap_sync.o: In function `initialize_caps':
-> /root/bluez/health/mcap_sync.c:341: undefined reference to `clock_getres'
-> /root/bluez/health/mcap_sync.c:350: undefined reference to `clock_gettime'
-> /root/bluez/health/mcap_sync.c:358: undefined reference to `clock_gettime'
-> /root/bluez/health/mcap_sync.c:363: undefined reference to `clock_gettime'
-> health/mcap_sync.o: In function `reset_tmstamp':
-> /root/bluez/health/mcap_sync.c:163: undefined reference to `clock_gettime'
-> health/mcap_sync.o: In function `mcap_get_timestamp':
-> /root/bluez/health/mcap_sync.c:309: undefined reference to `clock_gettime'
-> health/mcap_sync.o:/root/bluez/health/mcap_sync.c:514: more undefined references to `clock_gettime' follow
-> collect2: ld returned 1 exit status
-> make[1]: *** [src/bluetoothd] Error 1
-> make: *** [all] Error 2
-> ---
->  Makefile.am |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+Hi,
 
-Pushed upstream. Thanks.
+Please review.
 
-Johan
+/Daniel
+
+--0016361e7fe40ac8bc0492e01311
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-Fix-process-pending-request-if-transfer-canceled.patch"
+Content-Disposition: attachment;
+	filename="0001-Fix-process-pending-request-if-transfer-canceled.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gff3cx6e0
+
+RnJvbSA3YTBiZDcwNjk1MWFlYmY3ZDY2YmQ2M2YxNGQ2NWU1Nzk5YzllYTY5IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
+a2lhLmNvbT4KRGF0ZTogTW9uLCAxOCBPY3QgMjAxMCAxMToxNjo0MCArMDMwMApTdWJqZWN0OiBb
+UEFUQ0hdIEZpeCBwcm9jZXNzIHBlbmRpbmcgcmVxdWVzdCBpZiB0cmFuc2ZlciBjYW5jZWxlZAoK
+SWYgdGhlIGNhbGwgdG8gdGhlIFJlcXVlc3QgbWV0aG9kIG9mIHRoZSBvYmV4IGNsaWVudCBhZ2Vu
+dCByZXR1cm5zCndpdGggYW4gZXJyb3IgKGZvciBleGFtcGxlIGlmIHRoZSB0cmFuc2ZlciBpcyBy
+ZWplY3RlZCksIGNhbGwKZnVuY3Rpb24gc2Vzc2lvbl90ZXJtaW5hdGVfdHJhbnNmZXIgaW5zdGVh
+ZCBvZiB1bnJlZ2lzdGVyX3RyYW5zZmVyCnRvIGJvdGggdW5yZWdpc3RlciB0aGUgdHJhbnNmZXIg
+YW5kIGhhbmRsZSB0aGUgcGVuZGluZyByZXF1ZXN0LgotLS0KIGNsaWVudC9zZXNzaW9uLmMgfCAg
+IDExICsrKysrKysrKystCiAxIGZpbGVzIGNoYW5nZWQsIDEwIGluc2VydGlvbnMoKyksIDEgZGVs
+ZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvY2xpZW50L3Nlc3Npb24uYyBiL2NsaWVudC9zZXNzaW9u
+LmMKaW5kZXggY2UzNDMyZC4uMGU2MzVlNyAxMDA2NDQKLS0tIGEvY2xpZW50L3Nlc3Npb24uYwor
+KysgYi9jbGllbnQvc2Vzc2lvbi5jCkBAIC04OSw2ICs4OSw5IEBAIHN0cnVjdCBhZ2VudF9kYXRh
+IHsKIAogc3RhdGljIHZvaWQgc2Vzc2lvbl9wcmVwYXJlX3B1dChzdHJ1Y3Qgc2Vzc2lvbl9kYXRh
+ICpzZXNzaW9uLCBHRXJyb3IgKmVyciwKIAkJCQkJCQkJdm9pZCAqZGF0YSk7CitzdGF0aWMgdm9p
+ZCBzZXNzaW9uX3Rlcm1pbmF0ZV90cmFuc2ZlcihzdHJ1Y3Qgc2Vzc2lvbl9kYXRhICpzZXNzaW9u
+LAorCQkJCQlzdHJ1Y3QgdHJhbnNmZXJfZGF0YSAqdHJhbnNmZXIsCisJCQkJCUdFcnJvciAqZ2Vy
+cik7CiAKIHN0YXRpYyBHUXVhcmsgb2JleF9pb19lcnJvcl9xdWFyayh2b2lkKQogewpAQCAtODAz
+LDExICs4MDYsMTcgQEAgc3RhdGljIHZvaWQgc2Vzc2lvbl9yZXF1ZXN0X3JlcGx5KERCdXNQZW5k
+aW5nQ2FsbCAqY2FsbCwgZ3BvaW50ZXIgdXNlcl9kYXRhKQogCiAJZGJ1c19lcnJvcl9pbml0KCZk
+ZXJyKTsKIAlpZiAoZGJ1c19zZXRfZXJyb3JfZnJvbV9tZXNzYWdlKCZkZXJyLCByZXBseSkpIHsK
+KwkJR0Vycm9yICpnZXJyID0gTlVMTDsKKwogCQllcnJvcigiUmVwbGllZCB3aXRoIGFuIGVycm9y
+OiAlcywgJXMiLAogCQkJCWRlcnIubmFtZSwgZGVyci5tZXNzYWdlKTsKIAkJZGJ1c19lcnJvcl9m
+cmVlKCZkZXJyKTsKIAkJZGJ1c19tZXNzYWdlX3VucmVmKHJlcGx5KTsKLQkJdHJhbnNmZXJfdW5y
+ZWdpc3RlcihwZW5kaW5nLT50cmFuc2Zlcik7CisKKwkJZ19zZXRfZXJyb3IoJmdlcnIsIE9CRVhf
+SU9fRVJST1IsIC1FQ0FOQ0VMRUQsICIlcyIsIGRlcnIubWVzc2FnZSk7CisJCXNlc3Npb25fdGVy
+bWluYXRlX3RyYW5zZmVyKHNlc3Npb24sIHBlbmRpbmctPnRyYW5zZmVyLCBnZXJyKTsKKwkJZ19j
+bGVhcl9lcnJvcigmZ2Vycik7CisKIAkJcmV0dXJuOwogCX0KIAotLSAKMS42LjAuNAoK
+--0016361e7fe40ac8bc0492e01311--
