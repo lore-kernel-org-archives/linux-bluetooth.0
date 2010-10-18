@@ -1,43 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] Fix possible invalid read
-Date: Mon, 18 Oct 2010 17:18:49 +0300
-Message-Id: <1287411529-5806-3-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1287411529-5806-1-git-send-email-luiz.dentz@gmail.com>
-References: <1287411529-5806-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH 1/3] Make use of transfer->err to store transfer errors
+Date: Mon, 18 Oct 2010 17:18:47 +0300
+Message-Id: <1287411529-5806-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-==3229== Invalid read of size 4
-==3229==    at 0x1D218: obex_object_set_io_flags (in /usr/lib/obex/obexd)
-==3229==  Address 0x4c95e9c is 4 bytes inside a block of size 8 free'd
-==3229==    at 0x4833E98: free (vg_replace_malloc.c:366)
-==3229==    by 0x4910D23: g_free (gmem.c:191)
-==3229==    by 0x492B8EF: g_slist_remove (gslist.c:441)
-==3229==    by 0x1D15B: ??? (in /usr/lib/obex/obexd)
 ---
- src/mimetype.c |    4 +++-
- 1 files changed, 3 insertions(+), 1 deletions(-)
+ client/transfer.c |   10 +++++-----
+ 1 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/src/mimetype.c b/src/mimetype.c
-index 4a30222..078d97c 100644
---- a/src/mimetype.c
-+++ b/src/mimetype.c
-@@ -50,9 +50,11 @@ void obex_object_set_io_flags(void *object, int flags, int err)
+diff --git a/client/transfer.c b/client/transfer.c
+index ea98b32..6eec513 100644
+--- a/client/transfer.c
++++ b/client/transfer.c
+@@ -360,7 +360,7 @@ static void put_xfer_progress(GwObexXfer *xfer, gpointer user_data)
  {
- 	GSList *l;
+ 	struct transfer_data *transfer = user_data;
+ 	struct transfer_callback *callback = transfer->callback;
+-	gint written, err = 0;
++	gint written;
  
--	for (l = watches; l; l = l->next) {
-+	for (l = watches; l;) {
- 		struct io_watch *watch = l->data;
+ 	if (transfer->buffer_len == 0) {
+ 		transfer->buffer_len = DEFAULT_BUFFER_SIZE;
+@@ -373,20 +373,20 @@ static void put_xfer_progress(GwObexXfer *xfer, gpointer user_data)
+ 		len = read(transfer->fd, transfer->buffer + transfer->filled,
+ 				transfer->buffer_len - transfer->filled);
+ 		if (len < 0) {
+-			err = -errno;
++			transfer->err = -errno;
+ 			goto done;
+ 		}
  
-+		l = l->next;
-+
- 		if (watch->object != object)
- 			continue;
+ 		transfer->filled += len;
+ 
+ 		if (transfer->filled == 0) {
+-			gw_obex_xfer_close(xfer, &err);
++			gw_obex_xfer_close(xfer, &transfer->err);
+ 			goto done;
+ 		}
+ 
+ 		if (gw_obex_xfer_write(xfer, transfer->buffer,
+ 					transfer->filled,
+-					&written, &err) == FALSE)
++					&written, &transfer->err) == FALSE)
+ 			goto done;
+ 
+ 		transfer->filled -= written;
+@@ -397,7 +397,7 @@ static void put_xfer_progress(GwObexXfer *xfer, gpointer user_data)
+ 
+ done:
+ 	if (callback)
+-		callback->func(transfer, transfer->transferred, err,
++		callback->func(transfer, transfer->transferred, transfer->err,
+ 				callback->data);
+ }
  
 -- 
 1.7.1
