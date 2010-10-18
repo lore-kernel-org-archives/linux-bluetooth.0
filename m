@@ -1,26 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 2/3] bluetooth: Remove some unnecessary error messages
+Subject: Re: [PATCH] bluetooth: fix unaligned access to l2cap conf data
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Matthew Garrett <mjg@redhat.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-usb@vger.kernel.org
-In-Reply-To: <1284659895-27984-2-git-send-email-mjg@redhat.com>
-References: <1284659895-27984-1-git-send-email-mjg@redhat.com>
-	 <1284659895-27984-2-git-send-email-mjg@redhat.com>
+To: Mike Frysinger <vapier@gentoo.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	uclinux-dist-devel@blackfin.uclinux.org,
+	linux-kernel@vger.kernel.org,
+	Andrew Morton <akpm@linux-foundation.org>,
+	steven miao <realmz6@gmail.com>
+In-Reply-To: <1287268187-9628-1-git-send-email-vapier@gentoo.org>
+References: <1287268187-9628-1-git-send-email-vapier@gentoo.org>
 Content-Type: text/plain; charset="UTF-8"
-Date: Mon, 18 Oct 2010 13:55:17 +0200
-Message-ID: <1287402917.3316.128.camel@aeonflux>
+Date: Mon, 18 Oct 2010 13:51:46 +0200
+Message-ID: <1287402706.3316.126.camel@aeonflux>
 Mime-Version: 1.0
-Sender: linux-usb-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Matthew,
+Hi Mike,
 
-> The main reason for these urbs to error out on submission is that runtime
-> pm has kicked in, which is unnecessary noise. Let's just drop them.
+> In function l2cap_get_conf_opt() and l2cap_add_conf_opt() the address of
+> opt->val sometimes is not at the edge of 2-bytes/4-bytes, so 2-bytes/4 bytes
+> access will cause data misalignment exeception.  Use get_unaligned_le16/32
+> and put_unaligned_le16/32 function to avoid data misalignment execption.
+> 
+> Signed-off-by: steven miao <realmz6@gmail.com>
+> Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+> ---
+> was posted a month ago with no feedback ...
 
-do we wanna remove them or just turn into BT_DBG which is under dynamic
-debug control. Or do we have a set of error results that we do wanna
-print and others that we wanna ignore?
+must have slipped through. However I don't remember it being on
+linux-bluetooth at all. Maybe it was on the other mailing lists :(
+
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
 Regards
 
