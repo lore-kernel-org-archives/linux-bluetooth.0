@@ -1,33 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1287268187-9628-1-git-send-email-vapier@gentoo.org>
-References: <1287268187-9628-1-git-send-email-vapier@gentoo.org>
-Date: Mon, 18 Oct 2010 11:17:28 -0700
-Message-ID: <AANLkTinMSbhTkH0zQn_YO7hFF7zkuv-Gj-B0BUFWy5nP@mail.gmail.com>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Mon, 18 Oct 2010 13:59:16 -0200
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Mike Frysinger <vapier@gentoo.org>, linux-bluetooth@vger.kernel.org,
+	uclinux-dist-devel@blackfin.uclinux.org,
+	linux-kernel@vger.kernel.org,
+	Andrew Morton <akpm@linux-foundation.org>,
+	steven miao <realmz6@gmail.com>
 Subject: Re: [PATCH] bluetooth: fix unaligned access to l2cap conf data
-From: Harvey Harrison <harvey.harrison@gmail.com>
-To: Mike Frysinger <vapier@gentoo.org>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
-	uclinux-dist-devel@blackfin.uclinux.org, linux-kernel@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>, steven miao <realmz6@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Message-ID: <20101018155916.GB2468@vigoh>
+References: <1287268187-9628-1-git-send-email-vapier@gentoo.org>
+ <1287402706.3316.126.camel@aeonflux>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1287402706.3316.126.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, Oct 16, 2010 at 3:29 PM, Mike Frysinger <vapier@gentoo.org> wrote:
-> From: steven miao <realmz6@gmail.com>
->
->
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0case 2:
-> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 *((__le16 *) opt->val)=
- =3D cpu_to_le16(val);
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 put_unaligned_le16(cpu=
-_to_le16(val), opt->val);
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;
->
+Hi Mike,
 
-I think you wanted:
-put_unaligned_le16(val, opt->val);
+* Marcel Holtmann <marcel@holtmann.org> [2010-10-18 13:51:46 +0200]:
 
-Cheers,
+> Hi Mike,
+> 
+> > In function l2cap_get_conf_opt() and l2cap_add_conf_opt() the address of
+> > opt->val sometimes is not at the edge of 2-bytes/4-bytes, so 2-bytes/4 bytes
+> > access will cause data misalignment exeception.  Use get_unaligned_le16/32
+> > and put_unaligned_le16/32 function to avoid data misalignment execption.
+> > 
+> > Signed-off-by: steven miao <realmz6@gmail.com>
+> > Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+> > ---
+> > was posted a month ago with no feedback ...
+> 
+> must have slipped through. However I don't remember it being on
+> linux-bluetooth at all. Maybe it was on the other mailing lists :(
 
-Harvey
+Actually I remember it, but it got lost by some way. :(
+
+> 
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+
+Applied, thanks.
+
+-- 
+Gustavo F. Padovan
+ProFUSION embedded systems - http://profusion.mobi
