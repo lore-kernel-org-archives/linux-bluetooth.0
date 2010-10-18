@@ -1,30 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <AANLkTikmpwse=s3Z5+RzgrPCSy-qVhYkLxA1kRZrECnJ@mail.gmail.com>
-References: <AANLkTikmpwse=s3Z5+RzgrPCSy-qVhYkLxA1kRZrECnJ@mail.gmail.com>
-Date: Mon, 18 Oct 2010 16:28:13 +0300
-Message-ID: <AANLkTi=1=gS_UFqEE+SiEGMpacnFn8D=ipZeD15W6jSu@mail.gmail.com>
-Subject: Re: [PATCH] Fix process pending request if transfer canceled
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Santiago Carot-Nemesio <sancane@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Santiago Carot-Nemesio <sancane@gmail.com>
+Subject: [PATCH] Get mode option for L2CAP sockets
+Date: Mon, 18 Oct 2010 15:21:42 +0200
+Message-Id: <1287408102-25344-1-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+---
+ btio/btio.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
-On Mon, Oct 18, 2010 at 11:36 AM, Daniel Örstadius
-<daniel.orstadius@gmail.com> wrote:
-> Hi,
->
-> Please review.
->
-> /Daniel
->
-
-Acked-by: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
-
+diff --git a/btio/btio.c b/btio/btio.c
+index 2f719b1..d8439e0 100644
+--- a/btio/btio.c
++++ b/btio/btio.c
+@@ -839,6 +839,9 @@ static gboolean l2cap_get(int sock, GError **err, BtIOOption opt1,
+ 			}
+ 			memcpy(va_arg(args, uint8_t *), dev_class, 3);
+ 			break;
++		case BT_IO_OPT_MODE:
++			*(va_arg(args, uint8_t *)) = l2o.mode;
++			break;
+ 		default:
+ 			g_set_error(err, BT_IO_ERROR, BT_IO_ERROR_INVALID_ARGS,
+ 					"Unknown option %d", opt);
 -- 
-Luiz Augusto von Dentz
-Computer Engineer
+1.7.3.1
+
