@@ -1,40 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] bluetooth: fix unaligned access to l2cap conf data
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Mike Frysinger <vapier@gentoo.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	uclinux-dist-devel@blackfin.uclinux.org,
-	linux-kernel@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>,
-	steven miao <realmz6@gmail.com>
-In-Reply-To: <1287268187-9628-1-git-send-email-vapier@gentoo.org>
-References: <1287268187-9628-1-git-send-email-vapier@gentoo.org>
-Content-Type: text/plain; charset="UTF-8"
-Date: Mon, 18 Oct 2010 13:51:46 +0200
-Message-ID: <1287402706.3316.126.camel@aeonflux>
-Mime-Version: 1.0
+Date: Mon, 18 Oct 2010 12:22:31 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fix linkage failure for bluetoothd
+Message-ID: <20101018092231.GA17402@jh-x301>
+References: <1287171971-32246-1-git-send-email-padovan@profusion.mobi>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1287171971-32246-1-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mike,
+Hi Gustavo,
 
-> In function l2cap_get_conf_opt() and l2cap_add_conf_opt() the address of
-> opt->val sometimes is not at the edge of 2-bytes/4-bytes, so 2-bytes/4 bytes
-> access will cause data misalignment exeception.  Use get_unaligned_le16/32
-> and put_unaligned_le16/32 function to avoid data misalignment execption.
+On Fri, Oct 15, 2010, Gustavo F. Padovan wrote:
+> Adding -lrt fix the following errors in one of my systems:
 > 
-> Signed-off-by: steven miao <realmz6@gmail.com>
-> Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+> health/mcap_sync.o: In function `initialize_caps':
+> /root/bluez/health/mcap_sync.c:341: undefined reference to `clock_getres'
+> /root/bluez/health/mcap_sync.c:350: undefined reference to `clock_gettime'
+> /root/bluez/health/mcap_sync.c:358: undefined reference to `clock_gettime'
+> /root/bluez/health/mcap_sync.c:363: undefined reference to `clock_gettime'
+> health/mcap_sync.o: In function `reset_tmstamp':
+> /root/bluez/health/mcap_sync.c:163: undefined reference to `clock_gettime'
+> health/mcap_sync.o: In function `mcap_get_timestamp':
+> /root/bluez/health/mcap_sync.c:309: undefined reference to `clock_gettime'
+> health/mcap_sync.o:/root/bluez/health/mcap_sync.c:514: more undefined references to `clock_gettime' follow
+> collect2: ld returned 1 exit status
+> make[1]: *** [src/bluetoothd] Error 1
+> make: *** [all] Error 2
 > ---
-> was posted a month ago with no feedback ...
+>  Makefile.am |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
-must have slipped through. However I don't remember it being on
-linux-bluetooth at all. Maybe it was on the other mailing lists :(
+Pushed upstream. Thanks.
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
-
-Regards
-
-Marcel
-
-
+Johan
