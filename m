@@ -1,32 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 19 Oct 2010 17:03:26 +0100
+Date: Tue, 19 Oct 2010 17:01:18 +0100
 From: Matthew Garrett <mjg59@srcf.ucam.org>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org, linux-usb@vger.kernel.org
-Subject: Re: [PATCH 1/3] bluetooth: Take a runtime pm reference on hid
-	connections
-Message-ID: <20101019160326.GC25861@srcf.ucam.org>
-References: <1284659895-27984-1-git-send-email-mjg@redhat.com> <1286962345.3316.1.camel@aeonflux>
+Subject: Re: [PATCH 2/3] bluetooth: Remove some unnecessary error messages
+Message-ID: <20101019160118.GA25861@srcf.ucam.org>
+References: <1284659895-27984-1-git-send-email-mjg@redhat.com> <1284659895-27984-2-git-send-email-mjg@redhat.com> <1287402917.3316.128.camel@aeonflux>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1286962345.3316.1.camel@aeonflux>
+In-Reply-To: <1287402917.3316.128.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Oct 13, 2010 at 12:32:25PM +0300, Marcel Holtmann wrote:
+On Mon, Oct 18, 2010 at 01:55:17PM +0200, Marcel Holtmann wrote:
 > Hi Matthew,
 > 
-> > Bluetooth runtime PM interacts badly with input devices - the connection
-> > will be dropped if the device becomes idle, resulting in noticable lag when
-> > the user interacts with the input device again. Bump the pm runtime count
-> > when the device is associated and release it when it's disassociated in
-> > order to avoid this.
+> > The main reason for these urbs to error out on submission is that runtime
+> > pm has kicked in, which is unnecessary noise. Let's just drop them.
 > 
-> we already have hci_conn_hold_device() and hci_conn_put_device() calls
-> for HID to hold reference of the ACL connection. Why do we need more?
+> do we wanna remove them or just turn into BT_DBG which is under dynamic
+> debug control. Or do we have a set of error results that we do wanna
+> print and others that we wanna ignore?
 
-Because doing so doesn't do anything to influence runtime PM behaviour. 
-Putting the calls in these functions might be reasonable though - would 
-you prefer that?
+BT_DBG doesn't seem like an obvious problem. Are there any cases where 
+this will actually trigger in a problematic way?
 
 -- 
 Matthew Garrett | mjg59@srcf.ucam.org
