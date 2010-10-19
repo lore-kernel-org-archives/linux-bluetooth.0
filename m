@@ -1,54 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4CBD88A8.1050909@atheros.com>
-Date: Tue, 19 Oct 2010 17:31:44 +0530
-From: Balamurugan Mahalingam <mbalamurugan@atheros.com>
-MIME-Version: 1.0
-To: Balamurugan Mahalingam <mbalamurugan@atheros.com>, <marcel@holtmann.org>,
-	<linux-bluetooth@vger.kernel.org>, <charubala@charubala.com>
-Subject: Re: [PATCH] Fix GUI crash while connecting Interlink Bluetooth Mouse
- in android platform.
-References: <1287482080-10093-1-git-send-email-mbalamurugan@atheros.com> <20101019112328.GA12554@jh-x301>
-In-Reply-To: <20101019112328.GA12554@jh-x301>
-Content-Type: text/plain; charset="us-ascii"; format=flowed
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Fix regression when formatting timestamps from tracker
+Date: Tue, 19 Oct 2010 14:53:56 +0300
+Message-Id: <1287489236-4558-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Johan Hedberg wrote:
-> Hi,
->
-> On Tue, Oct 19, 2010, Balamurugan Mahalingam wrote:
->   
->> Crash is due to some junk characters in the device name.
->> The device name is copied from a string variable after freeing the memory it points to, so there were some junk characters in it which was the reason for the crash.
->> Fixing the issue by freeing the memory in string variable after device name is copied.
->>
->> Signed-off-by: Balamurugan Mahalingam <mbalamurugan@atheros.com>
->> ---
->>  compat/sdp.c |    2 +-
->>  1 files changed, 1 insertions(+), 1 deletions(-)
->>     
->
-> Looks like a good fix, but could you please fix your commit message and
-> resend:
->
-> 1. The commit message doesn't so much describe the change as it does
-> some symptom in a downstream system (android). E.g. the summary line
-> should be something like "Fix accessing freed memory". You can still
-> talk about the background to this issue wrt. android but the main point
-> should be in a bluez-only context.
->
-> 2. Keep the commit message lines below 74 characters so that it's
-> properly viewable on a 80-character wide terminal when running "git log"
->
-> 3. Remove the signed-off-by line. We don't use that in userspace.
->
-> Johan
-> .
->
->   
-Hi Johan,
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-Thanks for your comments. I will do the changes and send the patch once 
-again
+Tracker format user delimiters like '-' and ':' which need to be keep in
+order to sscanf to work.
+---
+ plugins/phonebook-tracker.c |    9 ++++++---
+ 1 files changed, 6 insertions(+), 3 deletions(-)
 
-Thanks
-Balamurugan Mahalingam
+diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
+index 2da825b..f0e00b8 100644
+--- a/plugins/phonebook-tracker.c
++++ b/plugins/phonebook-tracker.c
+@@ -705,18 +705,21 @@ static char *iso8601_utc_to_localtime(const char *datetime)
+ 
+ 	memset(&tm, 0, sizeof(tm));
+ 
+-	nr = sscanf(datetime, "%04u%02u%02uT%02u%02u%02u%c",
++	nr = sscanf(datetime, "%04u-%02u-%02uT%02u:%02u:%02u%c",
+ 			&tm.tm_year, &tm.tm_mon, &tm.tm_mday,
+ 			&tm.tm_hour, &tm.tm_min, &tm.tm_sec,
+ 			&tz);
+ 	if (nr < 6) {
+ 		/* Invalid time format */
++		error("sscanf(): %s (%d)", strerror(errno), errno);
+ 		return g_strdup("");
+ 	}
+ 
+ 	/* Time already in localtime */
+-	if (nr == 6)
+-		return g_strdup(datetime);
++	if (nr == 6) {
++		strftime(localdate, sizeof(localdate), "%Y%m%dT%H%M%S", &tm);
++		return g_strdup(localdate);
++	}
+ 
+ 	tm.tm_year -= 1900;	/* Year since 1900 */
+ 	tm.tm_mon--;		/* Months since January, values 0-11 */
+-- 
+1.7.1
+
