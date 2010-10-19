@@ -1,39 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Pawlik <lucas.pawlik@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Pawlik <lucas.pawlik@gmail.com>
-Subject: [PATCH] Fix problem with handling CHLD=0 command
-Date: Tue, 19 Oct 2010 14:32:04 +0200
-Message-Id: <1287491524-8384-1-git-send-email-lucas.pawlik@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Balamurugan Mahalingam <mbalamurugan@atheros.com>
+To: <marcel@holtmann.org>
+CC: <linux-bluetooth@vger.kernel.org>, <charubala@charubala.com>, Balamurugan
+ Mahalingam <mbalamurugan@atheros.com>
+Subject: [PATCH] Fix accessing freed memory
+Date: Tue, 19 Oct 2010 18:00:14 +0530
+Message-ID: <1287491414-14015-1-git-send-email-mbalamurugan@atheros.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch change handling of CHLD=0 command. Previously both calls
-(held and waiting) were terminated when HS sent CHLD=0. Now all held
-calls will be released or only incoming call will be rejected without
-affecting any held calls.
+Crash is due to some junk characters in the device name.
+The device name is copied from a string variable after freeing the memory 
+it points to, so there were some junk characters in it which was the reason 
+for the crash.
+
+Fixing the issue by freeing the memory in string variable after 
+device name is copied.
+
 ---
- audio/telephony-maemo6.c |    7 +++++--
- 1 files changed, 5 insertions(+), 2 deletions(-)
+ compat/sdp.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
-index f4dfbde..33fd13f 100644
---- a/audio/telephony-maemo6.c
-+++ b/audio/telephony-maemo6.c
-@@ -784,8 +784,11 @@ void telephony_call_hold_req(void *telephony_device, const char *cmd)
+diff --git a/compat/sdp.c b/compat/sdp.c
+index 8898136..ff2e39f 100644
+--- a/compat/sdp.c
++++ b/compat/sdp.c
+@@ -152,7 +152,6 @@ int get_stored_device_info(const bdaddr_t *src, const bdaddr_t *dst, struct hidp
+ 			&vendor, &product, &version, &subclass, &country,
+ 			&parser, desc, &req->flags, &pos);
  
- 	switch (cmd[0]) {
- 	case '0':
--		foreach_call_with_status(CSD_CALL_STATUS_HOLD, release_call);
--		foreach_call_with_status(CSD_CALL_STATUS_WAITING,
-+		if (find_call_with_status(CSD_CALL_STATUS_WAITING))
-+			foreach_call_with_status(CSD_CALL_STATUS_WAITING,
-+								release_call);
-+		else
-+			foreach_call_with_status(CSD_CALL_STATUS_HOLD,
- 								release_call);
- 		break;
- 	case '1':
+-	free(str);
+ 
+ 	req->vendor   = vendor;
+ 	req->product  = product;
+@@ -163,6 +162,7 @@ int get_stored_device_info(const bdaddr_t *src, const bdaddr_t *dst, struct hidp
+ 
+ 	snprintf(req->name, 128, "%s", str + pos);
+ 
++	free(str);
+ 	req->rd_size = strlen(desc) / 2;
+ 	req->rd_data = malloc(req->rd_size);
+ 	if (!req->rd_data) {
 -- 
-1.7.0.4
-
+1.6.3.3
