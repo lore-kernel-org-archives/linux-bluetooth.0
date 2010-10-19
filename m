@@ -1,28 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 19 Oct 2010 16:42:24 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix regression when formatting timestamps from tracker
-Message-ID: <20101019134224.GA13310@jh-x301>
-References: <1287489236-4558-1-git-send-email-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1287489236-4558-1-git-send-email-luiz.dentz@gmail.com>
+From: Lukasz Pawlik <lucas.pawlik@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lukasz Pawlik <lucas.pawlik@gmail.com>
+Subject: [PATCH] Fix problem with handling CHLD=0 command
+Date: Tue, 19 Oct 2010 14:32:04 +0200
+Message-Id: <1287491524-8384-1-git-send-email-lucas.pawlik@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+This patch change handling of CHLD=0 command. Previously both calls
+(held and waiting) were terminated when HS sent CHLD=0. Now all held
+calls will be released or only incoming call will be rejected without
+affecting any held calls.
+---
+ audio/telephony-maemo6.c |    7 +++++--
+ 1 files changed, 5 insertions(+), 2 deletions(-)
 
-On Tue, Oct 19, 2010, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
-> 
-> Tracker format user delimiters like '-' and ':' which need to be keep in
-> order to sscanf to work.
-> ---
->  plugins/phonebook-tracker.c |    9 ++++++---
->  1 files changed, 6 insertions(+), 3 deletions(-)
+diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
+index f4dfbde..33fd13f 100644
+--- a/audio/telephony-maemo6.c
++++ b/audio/telephony-maemo6.c
+@@ -784,8 +784,11 @@ void telephony_call_hold_req(void *telephony_device, const char *cmd)
+ 
+ 	switch (cmd[0]) {
+ 	case '0':
+-		foreach_call_with_status(CSD_CALL_STATUS_HOLD, release_call);
+-		foreach_call_with_status(CSD_CALL_STATUS_WAITING,
++		if (find_call_with_status(CSD_CALL_STATUS_WAITING))
++			foreach_call_with_status(CSD_CALL_STATUS_WAITING,
++								release_call);
++		else
++			foreach_call_with_status(CSD_CALL_STATUS_HOLD,
+ 								release_call);
+ 		break;
+ 	case '1':
+-- 
+1.7.0.4
 
-Pushed upstream. Thanks.
-
-Johan
