@@ -1,32 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 19 Oct 2010 16:43:20 +0300
+Date: Tue, 19 Oct 2010 16:42:24 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Balamurugan Mahalingam <mbalamurugan@atheros.com>
-Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
-	charubala@charubala.com
-Subject: Re: [PATCH] Fix accessing freed memory
-Message-ID: <20101019134320.GB13310@jh-x301>
-References: <1287491414-14015-1-git-send-email-mbalamurugan@atheros.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fix regression when formatting timestamps from tracker
+Message-ID: <20101019134224.GA13310@jh-x301>
+References: <1287489236-4558-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1287491414-14015-1-git-send-email-mbalamurugan@atheros.com>
+In-Reply-To: <1287489236-4558-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Luiz,
 
-On Tue, Oct 19, 2010, Balamurugan Mahalingam wrote:
-> Crash is due to some junk characters in the device name.
-> The device name is copied from a string variable after freeing the memory 
-> it points to, so there were some junk characters in it which was the reason 
-> for the crash.
+On Tue, Oct 19, 2010, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 > 
-> Fixing the issue by freeing the memory in string variable after 
-> device name is copied.
-> 
+> Tracker format user delimiters like '-' and ':' which need to be keep in
+> order to sscanf to work.
 > ---
->  compat/sdp.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+>  plugins/phonebook-tracker.c |    9 ++++++---
+>  1 files changed, 6 insertions(+), 3 deletions(-)
 
-Thanks. The patch has been pushed upstream.
+Pushed upstream. Thanks.
 
 Johan
