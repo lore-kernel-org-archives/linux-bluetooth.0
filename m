@@ -1,27 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: greg@kroah.com, linux-bluetooth@vger.kernel.org
-Cc: stable@kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 0/1] Bluetooth: fix crash in L2CAP
-Date: Thu, 21 Oct 2010 03:19:52 -0200
-Message-Id: <1287638393-8573-1-git-send-email-padovan@profusion.mobi>
-Sender: linux-kernel-owner@vger.kernel.org
+Message-ID: <4CBF754F.4050109@theserrs.net>
+Date: Wed, 20 Oct 2010 17:03:43 -0600
+From: Scott Serr <serrs@theserrs.net>
+MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org
+Subject: keep-alive on mouse and keyboard
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Greg,
+  I've been searching for a way to keep my MS 6000 keyboard and MS 5000 
+mouse awake.  I'm using Ubuntu 10.10 with bluez 4.69, it works very well 
+but I'd like to figure out how to keep them from falling asleep.  (they 
+do wake up after a key-press and reconnect, but takes about 5 seconds 
+each time)
 
-The following patch is good for 2.6.36.1. It arrived too late in linux-bluetooth
-and we didn't had time to put it into 2.6.36. It fixes a serious crash into
-the L2CAP layer. The issue isn't in 2.6.35 and below.
+I hoped l2ping might do it, but no luck.
 
-Thanks.
+I'll be programming for a bluetooth barcode scanner soon, is there a 
+general way to keep all these devices awake?
 
-Nathan Holstein (1):
-  Bluetooth: fix oops in l2cap_connect_req
-
- net/bluetooth/l2cap.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
-
--- 
-1.7.3.1
-
+Thank you,
+Scott Serr
