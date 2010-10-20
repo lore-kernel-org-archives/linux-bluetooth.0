@@ -1,45 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <442C56D12F0C4CE0B6625FF181846FED@freqoneremote>
-From: "David Stockwell" <dstockwell@frequency-one.com>
-To: "Shivendra Agrawal" <ag.shivendra@gmail.com>,
-	<linux-bluetooth@vger.kernel.org>
-References: <201010191147.34241.sander@outrightsolutions.nl><AANLkTikgKM1MNpwP2JL1GdERZ60dE6dkFNC=rdyQDhOV@mail.gmail.com> <AANLkTim9ypGcMEJ4+HqSZT_uxH4x9chHUW3mU0uDbfrR@mail.gmail.com>
-In-Reply-To: <AANLkTim9ypGcMEJ4+HqSZT_uxH4x9chHUW3mU0uDbfrR@mail.gmail.com>
-Subject: Re: AVRCP 1.4 : Future on Target Role
-Date: Wed, 20 Oct 2010 17:24:40 -0500
+Date: Wed, 20 Oct 2010 20:23:30 -0200
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Change in Bluetooth Subsystem maintainership
+Message-ID: <20101020222329.GC3741@vigoh>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	format=flowed;
-	charset="iso-8859-1";
-	reply-type=original
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Shivendra,
+Hi everyone,
 
-> Hi All,
->
-> David,
-> If you are going to resume AVRCP 1.3 implementation, can we sync
-> together as I have done some study on this part as well.
-> So far I don't have any device and guess PTS can be taken as start point.
+As some of you have noticed already, I'm on charge of maintain the
+Bluetooth subsystem tree since the beginning of the month. Marcel will
+be around as before, but now only reviewing, ACKing and NACKing patches.
+Pick the patches and put them on the way to mainline is my job now.
 
-(PTS??)
+The tree for development looking the -next linux release is
 
-Regarding an AVRCP device, I have not found any on the market.  I designed 
-and built a remote control based on a CSR BC4 chip, with LCD display and 
-keypad controller (and battery charger, USB, etc., etc.).  Firmware is 
-programmed using the CSR BlueCore SDK.  The latest version (version 4.1.2) 
-of the SDK includes functions that provide support for AVRCP 1.3, but 
-probably not for 1.4 AFAIK.
+http://git.kernel.org/?p=linux/kernel/git/padovan/bluetooth-next-2.6.git
 
-For my purposes, I am not implementing A2DP and headset capability in this 
-remote.
+and the tree for fixes in the current release is
 
-David
->
-> Regards,
-> Shivendra
->
- 
+http://git.kernel.org/?p=linux/kernel/git/padovan/bluetooth-2.6.git
 
+
+Regards,
+
+-- 
+Gustavo F. Padovan
+ProFUSION embedded systems - http://profusion.mobi
