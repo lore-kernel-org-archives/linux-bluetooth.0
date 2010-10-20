@@ -1,70 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
+From: <Waldemar.Rymarkiewicz@tieto.com>
+To: <suraj@Atheros.com>
+CC: <linux-bluetooth@vger.kernel.org>, <marcel@holtmann.org>,
+	<Suraj.Sumangala@Atheros.com>, <johan.hedberg@gmail.com>,
+	<joakim.xj.ceder@stericsson.com>, <arunkr.singh@stericsson.com>
+Date: Wed, 20 Oct 2010 11:47:13 +0300
+Subject: RE: [PATCH 1/1] Add Sim Access Plugin
+Message-ID: <99B09243E1A5DA4898CDD8B700111448097D1DCFD3@EXMB04.eu.tieto.com>
+References: <1287561308-18611-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+ <1287561308-18611-2-git-send-email-waldemar.rymarkiewicz@tieto.com>
+ <4CBEAA45.4010702@Atheros.com>
+In-Reply-To: <4CBEAA45.4010702@Atheros.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Date: Wed, 20 Oct 2010 11:52:33 +0300
-Message-ID: <AANLkTinAybAb8Kyux0keA26_ASVDFZFMu3vAB_5ke2zo@mail.gmail.com>
-Subject: [PATCH] audio/device.h: use lower case in profile UUIDs
-From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=20cf300fb10fc57c970493088731
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---20cf300fb10fc57c970493088731
-Content-Type: text/plain; charset=ISO-8859-1
+Hi Suraj,
 
-Hi,
+>>   create mode 100644 sap/sap-ste.c
+>I am assuming that this is the ST specific plugin. May be you=20
+>can just keep the dummy plugin only so that someone can use=20
+>that as a reference.
 
-Please review.
+In fact, you are right. Will remove this for the time being.=20
 
-/Daniel
+>>   create mode 100644 sap/sap.h
+>>   create mode 100644 sap/server.c
+>>   create mode 100644 sap/server.h
+>
+>I guess it would be better if you can split this into multiple=20
+>patches so that it would be easier to review.
 
---20cf300fb10fc57c970493088731
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-audio-device.h-use-lower-case-in-profile-UUIDs.patch"
-Content-Disposition: attachment;
-	filename="0001-audio-device.h-use-lower-case-in-profile-UUIDs.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_gfhyruxd0
+Ok.=20
 
-RnJvbSA0Yjc5NTJiNTFiNmI2NjYzYmRhY2JkMGFiMGYyMWY5ZDFmMmIyNzIwIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
-a2lhLmNvbT4KRGF0ZTogVHVlLCAxOSBPY3QgMjAxMCAxNzo0MToyNyArMDMwMApTdWJqZWN0OiBb
-UEFUQ0hdIGF1ZGlvL2RldmljZS5oOiB1c2UgbG93ZXIgY2FzZSBpbiBwcm9maWxlIFVVSURzCgpC
-bHVlWiBzZWVtcyB0byB1c2UgbG93ZXIgY2FzZSB3aGVuIGVtaXR0aW5nIHNpZ25hbHMgY29udGFp
-bmluZwpVVUlEcyByZXRyaXZlZCBmcm9tIGEgcmVtb3RlIGRldmljZS4KClRoZSBkZWZpbml0aW9u
-cyBhZmZlY3RlZCBieSB0aGlzIHBhdGNoIGxvb2sgdG8gYmUgdXNlZCBmb3IgZXhhbXBsZQppZiB0
-aGUgcmVtb3RlIGNvbm5lY3RzIGFuIGF1ZGlvIHByb2ZpbGUgd2hpY2ggQmx1ZVogaGFzIG5vdApk
-aXNjb3ZlcmVkIChwZXJoYXBzIGl0IGhhZCBub3QgeWV0IGJyb3dzZWQgdGhlIHNlcnZpY2UgcmVj
-b3JkcyBvZgp0aGUgcmVtb3RlKS4KCkluIHRoYXQgY2FzZSB0aGUgZm9ybWF0IG9mIHRoZSBzdG9y
-ZWQgYW5kIGVtaXR0ZWQgVVVJRCBzaG91bGQgYmUKY29uc2lzdGVudCB3aXRoIHRoZSBVVUlEcyBy
-ZWNlaXZlZCBkdXJpbmcgc2VydmljZSBkaXNjb3ZlcnkuCi0tLQogYXVkaW8vZGV2aWNlLmggfCAg
-IDIwICsrKysrKysrKystLS0tLS0tLS0tCiAxIGZpbGVzIGNoYW5nZWQsIDEwIGluc2VydGlvbnMo
-KyksIDEwIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2F1ZGlvL2RldmljZS5oIGIvYXVkaW8v
-ZGV2aWNlLmgKaW5kZXggNmVjMzkzOC4uMzVhZjc4OCAxMDA2NDQKLS0tIGEvYXVkaW8vZGV2aWNl
-LmgKKysrIGIvYXVkaW8vZGV2aWNlLmgKQEAgLTIyLDIxICsyMiwyMSBAQAogICoKICAqLwogCi0j
-ZGVmaW5lIEdFTkVSSUNfQVVESU9fVVVJRAkiMDAwMDEyMDMtMDAwMC0xMDAwLTgwMDAtMDA4MDVG
-OUIzNEZCIgorI2RlZmluZSBHRU5FUklDX0FVRElPX1VVSUQJIjAwMDAxMjAzLTAwMDAtMTAwMC04
-MDAwLTAwODA1ZjliMzRmYiIKIAotI2RlZmluZSBIU1BfSFNfVVVJRAkJIjAwMDAxMTA4LTAwMDAt
-MTAwMC04MDAwLTAwODA1RjlCMzRGQiIKLSNkZWZpbmUgSFNQX0FHX1VVSUQJCSIwMDAwMTExMi0w
-MDAwLTEwMDAtODAwMC0wMDgwNUY5QjM0RkIiCisjZGVmaW5lIEhTUF9IU19VVUlECQkiMDAwMDEx
-MDgtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiIgorI2RlZmluZSBIU1BfQUdfVVVJRAkJIjAw
-MDAxMTEyLTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYiIKIAotI2RlZmluZSBIRlBfSFNfVVVJ
-RAkJIjAwMDAxMTFFLTAwMDAtMTAwMC04MDAwLTAwODA1RjlCMzRGQiIKLSNkZWZpbmUgSEZQX0FH
-X1VVSUQJCSIwMDAwMTExRi0wMDAwLTEwMDAtODAwMC0wMDgwNUY5QjM0RkIiCisjZGVmaW5lIEhG
-UF9IU19VVUlECQkiMDAwMDExMWUtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiIgorI2RlZmlu
-ZSBIRlBfQUdfVVVJRAkJIjAwMDAxMTFmLTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYiIKIAot
-I2RlZmluZSBBRFZBTkNFRF9BVURJT19VVUlECSIwMDAwMTEwRC0wMDAwLTEwMDAtODAwMC0wMDgw
-NUY5QjM0RkIiCisjZGVmaW5lIEFEVkFOQ0VEX0FVRElPX1VVSUQJIjAwMDAxMTBkLTAwMDAtMTAw
-MC04MDAwLTAwODA1ZjliMzRmYiIKIAotI2RlZmluZSBBMkRQX1NPVVJDRV9VVUlECSIwMDAwMTEw
-QS0wMDAwLTEwMDAtODAwMC0wMDgwNUY5QjM0RkIiCi0jZGVmaW5lIEEyRFBfU0lOS19VVUlECQki
-MDAwMDExMEItMDAwMC0xMDAwLTgwMDAtMDA4MDVGOUIzNEZCIgorI2RlZmluZSBBMkRQX1NPVVJD
-RV9VVUlECSIwMDAwMTEwYS0wMDAwLTEwMDAtODAwMC0wMDgwNWY5YjM0ZmIiCisjZGVmaW5lIEEy
-RFBfU0lOS19VVUlECQkiMDAwMDExMGItMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiIgogCi0j
-ZGVmaW5lIEFWUkNQX1JFTU9URV9VVUlECSIwMDAwMTEwRS0wMDAwLTEwMDAtODAwMC0wMDgwNUY5
-QjM0RkIiCi0jZGVmaW5lIEFWUkNQX1RBUkdFVF9VVUlECSIwMDAwMTEwQy0wMDAwLTEwMDAtODAw
-MC0wMDgwNUY5QjM0RkIiCisjZGVmaW5lIEFWUkNQX1JFTU9URV9VVUlECSIwMDAwMTEwZS0wMDAw
-LTEwMDAtODAwMC0wMDgwNWY5YjM0ZmIiCisjZGVmaW5lIEFWUkNQX1RBUkdFVF9VVUlECSIwMDAw
-MTEwYy0wMDAwLTEwMDAtODAwMC0wMDgwNWY5YjM0ZmIiCiAKIC8qIE1vdmUgdGhlc2UgdG8gcmVz
-cGVjdGl2ZSAuaCBmaWxlcyBvbmNlIHRoZXkgZXhpc3QgKi8KICNkZWZpbmUgQVVESU9fU09VUkNF
-X0lOVEVSRkFDRQkJIm9yZy5ibHVlei5BdWRpb1NvdXJjZSIKLS0gCjEuNi4wLjQKCg==
---20cf300fb10fc57c970493088731--
+Regards,
+/Waldek
