@@ -1,32 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 20 Oct 2010 20:23:30 -0200
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Change in Bluetooth Subsystem maintainership
-Message-ID: <20101020222329.GC3741@vigoh>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <AANLkTi=QGnn5bhWSvBvaAE-k0NiRcKoybQM+pjGtn9ua@mail.gmail.com>
+References: <AANLkTikmAHP8JiBw=cYqHCbiLot6rLjjboc7wnySmEmj@mail.gmail.com>
+	<20101020144004.GA14607@jh-x301>
+	<AANLkTi=QGnn5bhWSvBvaAE-k0NiRcKoybQM+pjGtn9ua@mail.gmail.com>
+Date: Wed, 20 Oct 2010 12:56:27 -0400
+Message-ID: <AANLkTikuM7hRCBgsv=EQvQoxaS64eAZM9NT4QC-JW5RC@mail.gmail.com>
+Subject: Re: Activating a serial connection with qdbus
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Igor pesando <ipesando@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi everyone,
+On Wed, Oct 20, 2010 at 11:17 AM, Igor pesando <ipesando@gmail.com> wrote:
+> The issue I have is therefore associated with blueman:
+> when you switch off the adapter with blueman and then kill blueman-applet
+> hciconfig hci0 up does not work and returns an error (Can't init
+> device hci1: Unknown error 132 (132) )
+> and sometimes
+> dbus-send and test-adapter do the same (
+> dbus.exceptions.DBusException: org.bluez.Error.Failed: Unknown error
+> 132)
+> while blueman-applet can solve the problem if restarted.
 
-As some of you have noticed already, I'm on charge of maintain the
-Bluetooth subsystem tree since the beginning of the month. Marcel will
-be around as before, but now only reviewing, ACKing and NACKing patches.
-Pick the patches and put them on the way to mainline is my job now.
+Might not be related but... it  could be that RFKILL has disabled the
+device. Run "rfkill list" and see if is either hard or soft blocked.
+If it is, unblock it with "rfkill unblock <id>".
 
-The tree for development looking the -next linux release is
-
-http://git.kernel.org/?p=linux/kernel/git/padovan/bluetooth-next-2.6.git
-
-and the tree for fixes in the current release is
-
-http://git.kernel.org/?p=linux/kernel/git/padovan/bluetooth-2.6.git
-
+I've seen many times bluetoothd blocking devices on shutdown, maybe
+because it thinks the device is blocked during start.
 
 Regards,
-
 -- 
-Gustavo F. Padovan
-ProFUSION embedded systems - http://profusion.mobi
+Anderson Lizardo
+OpenBossa Labs - INdT
+Manaus - Brazil
