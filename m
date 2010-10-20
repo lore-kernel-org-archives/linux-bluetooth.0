@@ -1,56 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4CBEB27F.1000308@atheros.com>
-Date: Wed, 20 Oct 2010 14:42:31 +0530
-From: Balamurugan Mahalingam <mbalamurugan@atheros.com>
+Date: Wed, 20 Oct 2010 12:02:49 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Daniel =?iso-8859-1?Q?=D6rstadius?= <daniel.orstadius@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] audio/device.h: use lower case in profile UUIDs
+Message-ID: <20101020090249.GA7955@jh-x301>
+References: <AANLkTinAybAb8Kyux0keA26_ASVDFZFMu3vAB_5ke2zo@mail.gmail.com>
 MIME-Version: 1.0
-To: Balamurugan Mahalingam <mbalamurugan@atheros.com>, <marcel@holtmann.org>,
-	<linux-bluetooth@vger.kernel.org>, <charubala@charubala.com>
-Subject: Re: [PATCH] hidd shows different names for same device when connected
- from GUI and CLI.
-References: <1287496282-16170-1-git-send-email-mbalamurugan@atheros.com> <20101019140916.GA14730@jh-x301>
-In-Reply-To: <20101019140916.GA14730@jh-x301>
-Content-Type: text/plain; charset="us-ascii"; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <AANLkTinAybAb8Kyux0keA26_ASVDFZFMu3vAB_5ke2zo@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Johan Hedberg wrote:
-> Hi,
->
-> On Tue, Oct 19, 2010, Balamurugan Mahalingam wrote:
->   
->> Blueman and other GUIs use the string from ServiceName attribute as
->> device name in the SDP response, but hidd tool uses strings from
->> Service Description and Provider Name atrribute.
->>
->> SDP response from Microsoft Bluetooth device has extended ASCII
->> character 174(registered symbol) in its ServiceDescription attribute.
->> Android platform expects the device name to have only printable
->> characters and therefore GUI Crashes while connecting Microsoft
->> Bluetooth Mouse using hidd
->>
->> Using the ServiceName attribute from the SDP response
->> instead of ProviderName+ServiceDescription for device name in the
->> hidd tool solves both the issues.
->> ---
->>  compat/sdp.c |   33 +++++++++++++++++----------------
->>  1 files changed, 17 insertions(+), 16 deletions(-)
->>     
->
-> Same issues as with the previous commit message. Lines should be max 74
-> characters long and please redo the summary line to be of the format
-> "Fix ..." and shorter than it is now.
->
-> Btw, why are you using hidd and not the bluetoothd input plugin? hidd is
-> legacy stuff which will disappear from BlueZ in the future.
->
-> Johan
-> .
->
->   
+Hi Daniel,
 
-Johan,
+On Wed, Oct 20, 2010, Daniel Örstadius wrote:
+> BlueZ seems to use lower case when emitting signals containing
+> UUIDs retrived from a remote device.
+> 
+> The definitions affected by this patch look to be used for example
+> if the remote connects an audio profile which BlueZ has not
+> discovered (perhaps it had not yet browsed the service records of
+> the remote).
+> 
+> In that case the format of the stored and emitted UUID should be
+> consistent with the UUIDs received during service discovery.
+> ---
+>  audio/device.h |   20 ++++++++++----------
+>  1 files changed, 10 insertions(+), 10 deletions(-)
 
-We use the bluetooth input plugin too.
-We use hidd for some scripting works.
+Looks fine to me. Pushed upstream. Thanks.
 
-Regards
-Balamurugan
+Johan
