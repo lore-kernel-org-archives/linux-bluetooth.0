@@ -1,68 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4CBEC148.1000606@atheros.com>
+Date: Wed, 20 Oct 2010 15:45:36 +0530
 From: Balamurugan Mahalingam <mbalamurugan@atheros.com>
-To: <marcel@holtmann.org>
-CC: <johan.hedberg@gmail.com>, <linux-bluetooth@vger.kernel.org>,
-	<charubala@charubala.com>, Balamurugan Mahalingam <mbalamurugan@atheros.com>
-Subject: [PATCH] Fix hidd to use ServiceName attribute for device name
-Date: Wed, 20 Oct 2010 15:51:17 +0530
-Message-ID: <1287570077-5669-1-git-send-email-mbalamurugan@atheros.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+To: Suraj Sumangala <Suraj.Sumangala@Atheros.com>
+CC: Mahalingam Balamurugan <Mahalingam.Balamurugan@Atheros.com>,
+	"marcel@holtmann.org" <marcel@holtmann.org>, "johan.hedberg@gmail.com"
+	<johan.hedberg@gmail.com>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>, "charubala@charubala.com"
+	<charubala@charubala.com>
+Subject: Re: [PATCH] Fix hidd showing different names for same device
+References: <1287565973-5350-1-git-send-email-mbalamurugan@atheros.com> <4CBEBA32.3040806@Atheros.com>
+In-Reply-To: <4CBEBA32.3040806@Atheros.com>
+Content-Type: text/plain; charset="iso-8859-1"; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch lets hidd use ServiceName attribute from the SDP response
-instead of ProviderName+ServiceDescription for device name.
-SDP response from Microsoft Bluetooth device has extended ASCII
-character 174(registered symbol) in its ServiceDescription attribute.
-This causes some Bluetooth application which expects only printable
-characters as device name to crash.
----
- compat/sdp.c |   33 +++++++++++++++++----------------
- 1 files changed, 17 insertions(+), 16 deletions(-)
+Suraj Sumangala wrote:
+> Hi Bala,
+>
+> On 10/20/2010 2:42 PM, Balamurugan Mahalingam wrote:
+>   
+>> hidd shows different names for a same device when
+>> connected from GUI and CLI
+>>
+>> Blueman and other GUIs use the string from ServiceName attribute as
+>> device name in the SDP response, but hidd tool uses strings from
+>> Service Description and Provider Name atrribute.
+>>
+>> SDP response from Microsoft Bluetooth device has extended ASCII
+>> character 174(registered symbol) in its ServiceDescription attribute.
+>> Android platform expects the device name to have only printable
+>> characters and therefore GUI Crashes while connecting Microsoft
+>> Bluetooth Mouse using hidd
+>>
+>> Using the ServiceName attribute from the SDP response
+>> instead of ProviderName+ServiceDescription for device name in the
+>> hidd tool solves both the issues.
+>> ---
+>>     
+>
+> may be you can shorten the commit message. May be have something like this
+>
+> This patch lets hidd use ServiceName attribute from the SDP response
+> instead of ProviderName+ServiceDescription for device name.
+> SDP response from Microsoft Bluetooth device has extended ASCII
+> character 174(registered symbol) in its ServiceDescription attribute.
+> This causes some Bluetooth application which expects only printable 
+> characters as device name to crash.
+>
+> Regards
+> Suraj
+> .
+>
+>   
 
-diff --git a/compat/sdp.c b/compat/sdp.c
-index ff2e39f..f384844 100644
---- a/compat/sdp.c
-+++ b/compat/sdp.c
-@@ -248,22 +248,23 @@ int get_sdp_device_info(const bdaddr_t *src, const bdaddr_t *dst, struct hidp_co
- 
- 	rec = (sdp_record_t *) hid_rsp->data;
- 
--	pdlist = sdp_data_get(rec, 0x0101);
--	pdlist2 = sdp_data_get(rec, 0x0102);
--	if (pdlist) {
--		if (pdlist2) {
--			if (strncmp(pdlist->val.str, pdlist2->val.str, 5)) {
--				strncpy(req->name, pdlist2->val.str, sizeof(req->name) - 1);
--				strcat(req->name, " ");
--			}
--			strncat(req->name, pdlist->val.str,
--					sizeof(req->name) - strlen(req->name));
--		} else
--			strncpy(req->name, pdlist->val.str, sizeof(req->name) - 1);
--	} else {
--		pdlist2 = sdp_data_get(rec, 0x0100);
--		if (pdlist2)
--			strncpy(req->name, pdlist2->val.str, sizeof(req->name) - 1);
-+	pdlist2 = sdp_data_get(rec, 0x0100);
-+	if (pdlist2)
-+		strncpy(req->name, pdlist2->val.str, sizeof(req->name) - 1);
-+	else {
-+		pdlist = sdp_data_get(rec, 0x0101);
-+		pdlist2 = sdp_data_get(rec, 0x0102);
-+		if (pdlist) {
-+			if (pdlist2) {
-+				if (strncmp(pdlist->val.str, pdlist2->val.str, 5)) {
-+					strncpy(req->name, pdlist2->val.str, sizeof(req->name) - 1);
-+					strcat(req->name, " ");
-+				}
-+				strncat(req->name, pdlist->val.str,
-+						sizeof(req->name) - strlen(req->name));
-+			} else
-+				strncpy(req->name, pdlist->val.str, sizeof(req->name) - 1);
-+		}
- 	}
- 
- 	pdlist = sdp_data_get(rec, 0x0201);
--- 
-1.6.3.3
+Ok Suraj. I will send the patch once again
+
+Thanks & Regards
+Balamurugan Mahalingam
