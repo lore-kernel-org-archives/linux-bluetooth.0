@@ -3,352 +3,95 @@ From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Marcel Holtmann <marcel@holtmann.org>, <suraj@atheros.com>, Waldemar
  Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Subject: [PATCH 2/4] Sim Access Profile Manager
-Date: Wed, 20 Oct 2010 14:11:19 +0200
-Message-ID: <1287576681-12669-2-git-send-email-waldemar.rymarkiewicz@tieto.com>
-In-Reply-To: <1287576681-12669-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
-References: <1287576681-12669-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+Subject: [PATCH 1/4] Sim Access Profile API
+Date: Wed, 20 Oct 2010 14:11:18 +0200
+Message-ID: <1287576681-12669-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add a SAP plugin main file and the plugin manager. Also include the SAP
-plugin in the Makefile.
+New API for Sim Access Profile.
 ---
- Makefile.am   |    7 ++++
- acinclude.m4  |    6 ++++
- sap/main.c    |   54 ++++++++++++++++++++++++++++++++
- sap/manager.c |   94 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- sap/manager.h |   21 +++++++++++++
- sap/server.c  |   48 +++++++++++++++++++++++++++++
- sap/server.h  |   25 +++++++++++++++
- 7 files changed, 255 insertions(+), 0 deletions(-)
- create mode 100644 sap/main.c
- create mode 100644 sap/manager.c
- create mode 100644 sap/manager.h
- create mode 100644 sap/server.c
- create mode 100644 sap/server.h
+ Makefile.am     |    2 +-
+ doc/sap-api.txt |   57 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 58 insertions(+), 1 deletions(-)
+ create mode 100644 doc/sap-api.txt
 
 diff --git a/Makefile.am b/Makefile.am
-index eeb1780..4c91469 100644
+index 6e8fc7d..eeb1780 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -142,6 +142,13 @@ audio_libtelephony_a_SOURCES = audio/telephony.h audio/telephony-dummy.c \
- 				audio/telephony-maemo6.c
- endif
+@@ -352,7 +352,7 @@ EXTRA_DIST += doc/manager-api.txt \
+ 		doc/service-api.txt doc/agent-api.txt doc/attribute-api.txt \
+ 		doc/serial-api.txt doc/network-api.txt \
+ 		doc/input-api.txt doc/audio-api.txt doc/control-api.txt \
+-		doc/hfp-api.txt doc/assigned-numbers.txt
++		doc/hfp-api.txt doc/assigned-numbers.txt doc/sap-api.txt
  
-+if SAPPLUGIN
-+builtin_modules += sap
-+builtin_sources += sap/main.c \
-+			sap/manager.h sap/manager.c \
-+			sap/server.h sap/server.c
-+endif
-+
- if INPUTPLUGIN
- builtin_modules += input
- builtin_sources += input/main.c \
-diff --git a/acinclude.m4 b/acinclude.m4
-index 287f07d..1f76b4d 100644
---- a/acinclude.m4
-+++ b/acinclude.m4
-@@ -174,6 +174,7 @@ AC_DEFUN([AC_ARG_BLUEZ], [
- 	input_enable=yes
- 	serial_enable=yes
- 	network_enable=yes
-+	sap_enable=yes
- 	service_enable=yes
- 	health_enable=no
- 	pnat_enable=no
-@@ -210,6 +211,10 @@ AC_DEFUN([AC_ARG_BLUEZ], [
- 		network_enable=${enableval}
- 	])
+ AM_YFLAGS = -d
  
-+	AC_ARG_ENABLE(sap, AC_HELP_STRING([--disable-sap], [disable sap plugin]), [
-+		sap_enable=${enableval}
-+	])
-+
- 	AC_ARG_ENABLE(serial, AC_HELP_STRING([--disable-serial], [disable serial plugin]), [
- 		serial_enable=${enableval}
- 	])
-@@ -351,6 +356,7 @@ AC_DEFUN([AC_ARG_BLUEZ], [
- 	AM_CONDITIONAL(INPUTPLUGIN, test "${input_enable}" = "yes")
- 	AM_CONDITIONAL(SERIALPLUGIN, test "${serial_enable}" = "yes")
- 	AM_CONDITIONAL(NETWORKPLUGIN, test "${network_enable}" = "yes")
-+	AM_CONDITIONAL(SAPPLUGIN, test "${sap_enable}" = "yes")
- 	AM_CONDITIONAL(SERVICEPLUGIN, test "${service_enable}" = "yes")
- 	AM_CONDITIONAL(HEALTHPLUGIN, test "${health_enable}" = "yes")
- 	AM_CONDITIONAL(MCAP, test "${health_enable}" = "yes")
-diff --git a/sap/main.c b/sap/main.c
+diff --git a/doc/sap-api.txt b/doc/sap-api.txt
 new file mode 100644
-index 0000000..b3efcf8
+index 0000000..7951f56
 --- /dev/null
-+++ b/sap/main.c
-@@ -0,0 +1,54 @@
-+/*
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2010 Claudio Takahasi<claudio.takahasi@openbossa.org>
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; version 2 of the License.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ */
++++ b/doc/sap-api.txt
+@@ -0,0 +1,57 @@
++BlueZ D-Bus Sim Access Profile API description
++***********************************
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <errno.h>
-+#include <gdbus.h>
-+#include "plugin.h"
-+#include "manager.h"
-+
-+static DBusConnection *connection;
-+
-+static int sap_init(void)
-+{
-+	connection = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
-+
-+	if (!connection)
-+		return -EIO;
-+
-+	if (sap_manager_init(connection) < 0) {
-+		dbus_connection_unref(connection);
-+		return -EIO;
-+	}
-+
-+	return 0;
-+}
-+
-+static void sap_exit(void)
-+{
-+	sap_manager_exit();
-+
-+	dbus_connection_unref(connection);
-+}
-+
-+BLUETOOTH_PLUGIN_DEFINE(sap, VERSION,
-+		BLUETOOTH_PLUGIN_PRIORITY_DEFAULT, sap_init, sap_exit)
-diff --git a/sap/manager.c b/sap/manager.c
-new file mode 100644
-index 0000000..972a46b
---- /dev/null
-+++ b/sap/manager.c
-@@ -0,0 +1,94 @@
-+/*
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2010 Claudio Takahasi<claudio.takahasi@openbossa.org>
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; version 2 of the License.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <errno.h>
-+
-+#include <bluetooth/bluetooth.h>
-+#include <bluetooth/hci.h>
-+#include <bluetooth/sdp.h>
-+#include <bluetooth/sdp_lib.h>
-+
-+#include <gdbus.h>
-+
-+#include "log.h"
-+#include "adapter.h"
-+#include "device.h"
-+
-+#include "manager.h"
-+
-+#include "server.h"
-+
-+static DBusConnection *connection = NULL;
++Copyright (C) 2010 ST-Ericsson SA
 +
 +
-+static int sap_server_probe(struct btd_adapter *adapter)
-+{
-+	const gchar *path = adapter_get_path(adapter);
-+	bdaddr_t src;
++Sim Access Profile hierarchy
++============================
 +
-+	DBG("path %s", path);
++Service		org.bluez
++Interface	org.bluez.SimAccess
++Object path	[variable prefix]/{hci0,hci1,...}
 +
-+	adapter_get_address(adapter, &src);
++Methods		void Enable()
 +
-+	return sap_server_register(path, &src);
-+}
++			Start up SAP server and register SDP record for it.
 +
-+static void sap_server_remove(struct btd_adapter *adapter)
-+{
-+	const gchar *path = adapter_get_path(adapter);
++			Possible errors: org.bluez.Error.Failed
 +
-+	DBG("path %s", path);
++		void Disable()
 +
-+	sap_server_unregister(path);
-+}
++			Shudown SAP server and remove the SDP record.
 +
-+static struct btd_adapter_driver sap_server_driver = {
-+	.name	= "sap-server",
-+	.probe	= sap_server_probe,
-+	.remove	= sap_server_remove,
-+};
++			Possible errors: org.bluez.Error.Failed
 +
-+int sap_manager_init(DBusConnection *conn)
-+{
-+	connection = dbus_connection_ref(conn);
++		void Disconnect(boolean type)
 +
-+	if (sap_server_init(connection) < 0) {
-+		error("Can't init SAP server");
-+		dbus_connection_unref(conn);
-+		return -1;
-+	}
++			Disconnect SAP client from the server. The 'type'
++			parameter indicates disconnection type.
 +
-+	btd_register_adapter_driver(&sap_server_driver);
++			True  - gracefull disconnection
++			False - immediate disconnection
 +
-+	return 0;
-+}
++			Possible errors: org.bluez.Error.Failed
 +
-+void sap_manager_exit(void)
-+{
-+	btd_unregister_adapter_driver(&sap_server_driver);
++		dict GetProperties()
 +
-+	dbus_connection_unref(connection);
-+	connection = NULL;
++			Return all properties for the interface. See the
++			properties section for available properties.
 +
-+	sap_server_exit();
-+}
-diff --git a/sap/manager.h b/sap/manager.h
-new file mode 100644
-index 0000000..5a779df
---- /dev/null
-+++ b/sap/manager.h
-@@ -0,0 +1,21 @@
-+/*
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2010 Claudio Takahasi<claudio.takahasi@openbossa.org>
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; version 2 of the License.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ */
++			Possible Errors: org.bluez.Error.Failed
 +
-+int sap_manager_init(DBusConnection *conn);
-+void sap_manager_exit(void);
-diff --git a/sap/server.c b/sap/server.c
-new file mode 100644
-index 0000000..2728778
---- /dev/null
-+++ b/sap/server.c
-@@ -0,0 +1,48 @@
-+/*
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2010 ST-Ericsson SA
-+ *
-+ *  Author: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com> for ST-Ericsson.
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; version 2 of the License.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ */
++Signals		PropertyChanged(string name, variant value)
 +
-+#include "bluetooth.h"
-+#include "log.h"
++			This signal indicates a changed value of the given
++			property.
 +
-+#include "server.h"
 +
-+int sap_server_register(const char *path, bdaddr_t *src)
-+{
-+	DBG("Register SAP server.");
-+	return 0;
-+}
++Properties	boolean Enabled [readonly]
 +
-+int sap_server_unregister(const char *path)
-+{
-+	DBG("Unregister SAP server.");
-+	return 0;
-+}
++				Indicates the state of the server. True if the server
++				is enabled and False otherwise.
 +
-+int sap_server_init(DBusConnection *conn)
-+{
-+	DBG("Init SAP server.");
-+	return 0;
-+}
++			boolean Connected [readonly]
 +
-+void sap_server_exit(void)
-+{
-+	DBG("Exit SAP server.");
-+}
-diff --git a/sap/server.h b/sap/server.h
-new file mode 100644
-index 0000000..cb77828
---- /dev/null
-+++ b/sap/server.h
-@@ -0,0 +1,25 @@
-+/*
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2010 Claudio Takahasi<claudio.takahasi@openbossa.org>
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; version 2 of the License.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ */
++				Indicates if SAP client is connected to the server.
 +
-+#include <gdbus.h>
-+
-+int sap_server_init(DBusConnection *conn);
-+void sap_server_exit(void);
-+int sap_server_register(const char *path, bdaddr_t *src);
-+int sap_server_unregister(const char *path);
 -- 
 1.7.0.4
