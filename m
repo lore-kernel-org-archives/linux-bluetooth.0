@@ -1,52 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 20 Oct 2010 17:40:04 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Igor pesando <ipesando@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Activating a serial connection with qdbus
+Message-ID: <20101020144004.GA14607@jh-x301>
+References: <AANLkTikmAHP8JiBw=cYqHCbiLot6rLjjboc7wnySmEmj@mail.gmail.com>
 MIME-Version: 1.0
-Date: Wed, 20 Oct 2010 17:59:46 +0300
-Message-ID: <AANLkTimpjr1Kc23zn=7uf0WNV5784ccPq8hWtBYrNADh@mail.gmail.com>
-Subject: [PATCH] Fix Maemo6 MCE: set state variable directly
-From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=001636284a6800fc3804930da990
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <AANLkTikmAHP8JiBw=cYqHCbiLot6rLjjboc7wnySmEmj@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---001636284a6800fc3804930da990
-Content-Type: text/plain; charset=ISO-8859-1
+Hi Igor,
 
-Hi,
+On Wed, Oct 20, 2010, Igor pesando wrote:
+> If I try to connect with the spp profile to a device using qdbus o dbus.send as
+> 
+> qdbus --system org.bluez /org/bluez/5989/hci1/dev_00_11_22_33_44
+> org.bluez.Serial.Connect spp
+> 
+> I get the proper reply /dev/rfcomm0 but the connection is dropped
+> immediately as rfcomm shows.
+> On the other side if I use rfcomm or the python script test-serial the
+> connection is established and kept alive.
+> 
+> So the questions is whether this is the expected behaviour.
+> Equivalently I ask whether one should interact with the dbus interface
+> only by programs and use rfcomm otherwise.
 
-Please review.
+bluetoothd is "intelligent" and cleans up after the D-Bus client if the
+client exists unexpectedly without calling Serial.Disconnect() first
+(which is what qdbus does when it receives the reply). So the only way
+to keep the connection alive is to also keep the process alive that
+requested it. I.e. probably you can't use qdbus for this.
 
-/Daniel
+> If so I do not understand why it is not possible to set the Powered
+> property using hciconfig since if the device property Powered is false
+> it is not possible to initialize HCI device.
 
---001636284a6800fc3804930da990
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Fix-Maemo6-MCE-set-state-variable-directly.patch"
-Content-Disposition: attachment;
-	filename="0001-Fix-Maemo6-MCE-set-state-variable-directly.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_gfibubau1
+I'm not quite following your question. You can use "test-adapter powered
+yes/no" and even "hciconfig hci0 up/down" should also work.
 
-RnJvbSBiOWFkZmJlMWRiN2I2Zjc4M2QzYmQ2Yjk4OTYyYTMyMTYxMjg0MTI3IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
-a2lhLmNvbT4KRGF0ZTogV2VkLCAyMCBPY3QgMjAxMCAxNzoxMzoxNyArMDMwMApTdWJqZWN0OiBb
-UEFUQ0hdIEZpeCBNYWVtbzYgTUNFOiBzZXQgc3RhdGUgdmFyaWFibGUgZGlyZWN0bHkKCklmIHRo
-ZSBzdGF0ZSB2YXJpYWJsZSBpcyBub3QgdXBkYXRlZCB1bnRpbCBtY2Vfc2lnbmFsX2NhbGxiYWNr
-IGFuZApTZXRQcm9wZXJ0eShQb3dlcmVkKSBpcyBjYWxsZWQgdHdvIHRpbWVzIHF1aWNrbHksIHRo
-ZW4gdGhlIHNlY29uZApjYWxsIHdpbGwgbm90IGdlbmVyYXRlIGEgcmVxdWVzdCB0byBjaGFuZ2Ug
-dGhlIHJhZGlvIHN0YXRlIG9mIHRoZQpNQ0UgaWYgaXRzIGNvcnJlc3BvbmRpbmcgY2FsbCB0byBh
-ZGFwdGVyX3Bvd2VyZWQgb2NjdXJzIGJlZm9yZSB0aGUKZmlyc3QgdHJpZ2dlcmluZyBvZiBtY2Vf
-c2lnbmFsX2NhbGxiYWNrLgoKV2l0aCB0aGlzIHBhdGNoIHR3byBjYWxscyB0byB0aGUgTUNFIGFy
-ZSBleGVjdXRlZCwgYWx0aG91Z2ggdGhlcmUKbWlnaHQgc3RpbGwgYmUgYW4gdW5uZWNlc3Nhcnkg
-cG93ZXIgY3ljbGUgaW4gdGhhdAptY2Vfc2lnbmFsX2NhbGxiYWNrIGlzIGFsc28gdHJpZ2dlcmVk
-IHR3aWNlLgotLS0KIHBsdWdpbnMvbWFlbW82LmMgfCAgICA0ICsrKy0KIDEgZmlsZXMgY2hhbmdl
-ZCwgMyBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL3BsdWdpbnMv
-bWFlbW82LmMgYi9wbHVnaW5zL21hZW1vNi5jCmluZGV4IDBhMWU1NTEuLjNjOTE5MjYgMTAwNjQ0
-Ci0tLSBhL3BsdWdpbnMvbWFlbW82LmMKKysrIGIvcGx1Z2lucy9tYWVtbzYuYwpAQCAtMTY2LDcg
-KzE2Niw5IEBAIHN0YXRpYyB2b2lkIGFkYXB0ZXJfcG93ZXJlZChzdHJ1Y3QgYnRkX2FkYXB0ZXIg
-KmFkYXB0ZXIsIGdib29sZWFuIHBvd2VyZWQpCiAJCQkJREJVU19UWVBFX1VJTlQzMiwgJnJhZGlv
-X21hc2ssCiAJCQkJREJVU19UWVBFX0lOVkFMSUQpOwogCi0JaWYgKCFkYnVzX2Nvbm5lY3Rpb25f
-c2VuZChjb25uLCBtc2csIE5VTEwpKQorCWlmIChkYnVzX2Nvbm5lY3Rpb25fc2VuZChjb25uLCBt
-c2csIE5VTEwpKQorCQltY2VfYnRfc2V0ID0gcG93ZXJlZDsKKwllbHNlCiAJCWVycm9yKCJjYWxs
-aW5nICVzIGZhaWxlZCIsIE1DRV9SQURJT19TVEFURVNfQ0hBTkdFX1JFUSk7CiAKIAlkYnVzX21l
-c3NhZ2VfdW5yZWYobXNnKTsKLS0gCjEuNi4wLjQKCg==
---001636284a6800fc3804930da990--
+Johan
