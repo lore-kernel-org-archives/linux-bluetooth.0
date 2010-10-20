@@ -1,24 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4CBF754F.4050109@theserrs.net>
-Date: Wed, 20 Oct 2010 17:03:43 -0600
-From: Scott Serr <serrs@theserrs.net>
+Message-ID: <442C56D12F0C4CE0B6625FF181846FED@freqoneremote>
+From: "David Stockwell" <dstockwell@frequency-one.com>
+To: "Shivendra Agrawal" <ag.shivendra@gmail.com>,
+	<linux-bluetooth@vger.kernel.org>
+References: <201010191147.34241.sander@outrightsolutions.nl><AANLkTikgKM1MNpwP2JL1GdERZ60dE6dkFNC=rdyQDhOV@mail.gmail.com> <AANLkTim9ypGcMEJ4+HqSZT_uxH4x9chHUW3mU0uDbfrR@mail.gmail.com>
+In-Reply-To: <AANLkTim9ypGcMEJ4+HqSZT_uxH4x9chHUW3mU0uDbfrR@mail.gmail.com>
+Subject: Re: AVRCP 1.4 : Future on Target Role
+Date: Wed, 20 Oct 2010 17:24:40 -0500
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: keep-alive on mouse and keyboard
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain;
+	format=flowed;
+	charset="iso-8859-1";
+	reply-type=original
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-  I've been searching for a way to keep my MS 6000 keyboard and MS 5000 
-mouse awake.  I'm using Ubuntu 10.10 with bluez 4.69, it works very well 
-but I'd like to figure out how to keep them from falling asleep.  (they 
-do wake up after a key-press and reconnect, but takes about 5 seconds 
-each time)
+Hi Shivendra,
 
-I hoped l2ping might do it, but no luck.
+> Hi All,
+>
+> David,
+> If you are going to resume AVRCP 1.3 implementation, can we sync
+> together as I have done some study on this part as well.
+> So far I don't have any device and guess PTS can be taken as start point.
 
-I'll be programming for a bluetooth barcode scanner soon, is there a 
-general way to keep all these devices awake?
+(PTS??)
 
-Thank you,
-Scott Serr
+Regarding an AVRCP device, I have not found any on the market.  I designed 
+and built a remote control based on a CSR BC4 chip, with LCD display and 
+keypad controller (and battery charger, USB, etc., etc.).  Firmware is 
+programmed using the CSR BlueCore SDK.  The latest version (version 4.1.2) 
+of the SDK includes functions that provide support for AVRCP 1.3, but 
+probably not for 1.4 AFAIK.
+
+For my purposes, I am not implementing A2DP and headset capability in this 
+remote.
+
+David
+>
+> Regards,
+> Shivendra
+>
+ 
+
