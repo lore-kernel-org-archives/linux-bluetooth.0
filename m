@@ -1,27 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
 From: <Waldemar.Rymarkiewicz@tieto.com>
-To: <suraj@Atheros.com>
-CC: <linux-bluetooth@vger.kernel.org>, <marcel@holtmann.org>,
-	<Suraj.Sumangala@Atheros.com>
-Date: Thu, 21 Oct 2010 11:38:00 +0300
-Subject: RE: [PATCH 3/4] Sim Access Profile Server
-Message-ID: <99B09243E1A5DA4898CDD8B700111448097D287CDD@EXMB04.eu.tieto.com>
-References: <1287576681-12669-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
- <1287576681-12669-3-git-send-email-waldemar.rymarkiewicz@tieto.com>
- <4CBFE96A.9090805@Atheros.com>
-In-Reply-To: <4CBFE96A.9090805@Atheros.com>
+To: <dstockwell@frequency-one.com>, <ag.shivendra@gmail.com>,
+	<linux-bluetooth@vger.kernel.org>
+Date: Thu, 21 Oct 2010 11:30:52 +0300
+Subject: RE: AVRCP 1.4 : Future on Target Role
+Message-ID: <99B09243E1A5DA4898CDD8B700111448097D287CCF@EXMB04.eu.tieto.com>
+References: <201010191147.34241.sander@outrightsolutions.nl><AANLkTikgKM1MNpwP2JL1GdERZ60dE6dkFNC=rdyQDhOV@mail.gmail.com>
+ <AANLkTim9ypGcMEJ4+HqSZT_uxH4x9chHUW3mU0uDbfrR@mail.gmail.com>
+ <442C56D12F0C4CE0B6625FF181846FED@freqoneremote>
+In-Reply-To: <442C56D12F0C4CE0B6625FF181846FED@freqoneremote>
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Suraj,
+Hi David, 
 
->
->Looks like this patch does not apply successfully on the=20
->latest Bluez tree after applying the first two. Can you verify that?
->
+>Regarding an AVRCP device, I have not found any on the market. 
 
-I've just git pull the latest upstream, git am for all the patches and don'=
-t have the problem with applying them.
+There are already devices with AVRCP 1.4 on the market. See https://www.bluetooth.org/tpg/listings.cfm  for listing (use advanced searching).
 
-/Waldek=
+Reagrads 
+/Waldek
+
+
