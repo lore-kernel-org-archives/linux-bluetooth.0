@@ -1,202 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-Subject: [PATCH] Fix history listing queries in phonebook-tracker
-Date: Thu, 21 Oct 2010 15:26:39 +0300
-Message-Id: <1287663999-22701-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <4CBFFCD5.8030406@Atheros.com>
+Date: Thu, 21 Oct 2010 14:11:57 +0530
+From: Suraj Sumangala <suraj@Atheros.com>
+MIME-Version: 1.0
+To: "Waldemar.Rymarkiewicz@tieto.com" <Waldemar.Rymarkiewicz@tieto.com>
+CC: Suraj Sumangala <Suraj.Sumangala@Atheros.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"marcel@holtmann.org" <marcel@holtmann.org>
+Subject: Re: [PATCH 3/4] Sim Access Profile Server
+References: <1287576681-12669-1-git-send-email-waldemar.rymarkiewicz@tieto.com> <1287576681-12669-3-git-send-email-waldemar.rymarkiewicz@tieto.com> <4CBFE96A.9090805@Atheros.com> <99B09243E1A5DA4898CDD8B700111448097D287CDD@EXMB04.eu.tieto.com>
+In-Reply-To: <99B09243E1A5DA4898CDD8B700111448097D287CDD@EXMB04.eu.tieto.com>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Now we are able to display contact's name in vcard-listing when
-contact has entry in phonebook available.
----
- plugins/phonebook-tracker.c |  140 ++++++++++++++++++++++++++++++++++++-------
- 1 files changed, 118 insertions(+), 22 deletions(-)
+Hi,
 
-diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index f0e00b8..1c579d1 100644
---- a/plugins/phonebook-tracker.c
-+++ b/plugins/phonebook-tracker.c
-@@ -172,13 +172,34 @@
- 	"nco:nameHonorificPrefix(?c) nco:nameHonorificSuffix(?c) "	\
- 	"nco:phoneNumber(?h) "						\
- 	"WHERE { "							\
-+	"{"								\
-+		"?c a nco:Contact . "					\
-+		"?c nco:hasPhoneNumber ?h . "				\
- 		"?call a nmo:Call ; "					\
- 		"nmo:from ?c ; "					\
- 		"nmo:isSent false ; "					\
- 		"nmo:isAnswered false ."				\
--		"?c a nco:Contact . "					\
--	"OPTIONAL { ?c nco:hasPhoneNumber ?h . } "			\
--	"} ORDER BY DESC(nmo:receivedDate(?call))"
-+	"}UNION{"							\
-+		"?x a nco:Contact . "					\
-+		"?x nco:hasPhoneNumber ?h . "				\
-+		"?call a nmo:Call ; "					\
-+		"nmo:from ?x ; "					\
-+		"nmo:isSent false ; "					\
-+		"nmo:isAnswered false ."				\
-+		"?c a nco:PersonContact . "				\
-+		"?c nco:hasPhoneNumber ?h . "				\
-+	"} UNION { "							\
-+		"?x a nco:Contact . "					\
-+		"?x nco:hasPhoneNumber ?h . "				\
-+		"?call a nmo:Call ; "					\
-+		"nmo:from ?x ; "					\
-+		"nmo:isSent false ; "					\
-+		"nmo:isAnswered false ."				\
-+		"?c a nco:PersonContact . "				\
-+		"?c nco:hasAffiliation ?a . "				\
-+		"?a nco:hasPhoneNumber ?h . "				\
-+	"} "								\
-+	"} GROUP BY ?call ORDER BY DESC(nmo:receivedDate(?call))"
- 
- #define INCOMING_CALLS_QUERY						\
- 	"SELECT nco:phoneNumber(?h) nco:fullname(?c) "			\
-@@ -244,13 +265,34 @@
- 	"nco:nameHonorificPrefix(?c) nco:nameHonorificSuffix(?c) "	\
- 	"nco:phoneNumber(?h) "						\
- 	"WHERE { "							\
-+	"{"								\
-+		"?c a nco:Contact . "					\
-+		"?c nco:hasPhoneNumber ?h . "				\
- 		"?call a nmo:Call ; "					\
- 		"nmo:from ?c ; "					\
- 		"nmo:isSent false ; "					\
- 		"nmo:isAnswered true ."					\
--		"?c a nco:Contact . "					\
--	"OPTIONAL { ?c nco:hasPhoneNumber ?h . } "			\
--	"} ORDER BY DESC(nmo:receivedDate(?call))"
-+	"} UNION { "							\
-+		"?x a nco:Contact . "					\
-+		"?x nco:hasPhoneNumber ?h ."				\
-+		"?call a nmo:Call ; "					\
-+		"nmo:from ?x ; "					\
-+		"nmo:isSent false ; "					\
-+		"nmo:isAnswered true ."					\
-+		"?c a nco:PersonContact . "				\
-+		"?c nco:hasPhoneNumber ?h ."				\
-+	"}UNION { "							\
-+		"?x a nco:Contact . "					\
-+		"?x nco:hasPhoneNumber ?h ."				\
-+		"?call a nmo:Call ; "					\
-+		"nmo:from ?x ; "					\
-+		"nmo:isSent false ; "					\
-+		"nmo:isAnswered true ."					\
-+		"?c a nco:PersonContact . "				\
-+		"?c nco:hasAffiliation ?a . "				\
-+		"?a nco:hasPhoneNumber ?h . "				\
-+	"}"								\
-+	"} GROUP BY ?call ORDER BY DESC(nmo:receivedDate(?call))"
- 
- #define OUTGOING_CALLS_QUERY						\
- 	"SELECT nco:phoneNumber(?h) nco:fullname(?c) "			\
-@@ -313,12 +355,31 @@
- 	"nco:nameHonorificPrefix(?c) nco:nameHonorificSuffix(?c) "	\
- 	"nco:phoneNumber(?h) "						\
- 	"WHERE { "							\
-+	"{"								\
-+		"?c a nco:Contact . "					\
-+		"?c nco:hasPhoneNumber ?h . "				\
- 		"?call a nmo:Call ; "					\
- 		"nmo:to ?c ; "						\
- 		"nmo:isSent true . "					\
--		"?c a nco:Contact . "					\
--	"OPTIONAL { ?c nco:hasPhoneNumber ?h . } "			\
--	"} ORDER BY DESC(nmo:sentDate(?call))"
-+	"} UNION {"							\
-+		"?x a nco:Contact . "					\
-+		"?x nco:hasPhoneNumber ?h . "				\
-+		"?call a nmo:Call ; "					\
-+		"nmo:to ?x ; "						\
-+		"nmo:isSent true . "					\
-+		"?c a nco:PersonContact . "				\
-+		"?c nco:hasPhoneNumber ?h . "				\
-+	"} UNION {"							\
-+		"?x a nco:Contact . "					\
-+		"?x nco:hasPhoneNumber ?h . "				\
-+		"?call a nmo:Call ; "					\
-+		"nmo:to ?x ; "						\
-+		"nmo:isSent true . "					\
-+		"?c a nco:PersonContact . "				\
-+		"?c nco:hasAffiliation ?a . "				\
-+		"?a nco:hasPhoneNumber ?h . "				\
-+	"}"								\
-+	"} GROUP BY ?call ORDER BY DESC(nmo:sentDate(?call))"
- 
- #define COMBINED_CALLS_QUERY						\
- 	"SELECT nco:phoneNumber(?h) nco:fullname(?c) "			\
-@@ -420,19 +481,54 @@
- 	"nco:nameAdditional(?c) nco:nameHonorificPrefix(?c) "		\
- 	"nco:nameHonorificSuffix(?c) nco:phoneNumber(?h) "		\
- 	"WHERE { "							\
--	"{ "								\
--		"?call a nmo:Call ; "					\
--		"nmo:to ?c ; "						\
--		"nmo:isSent true . "					\
--		"?c a nco:Contact . "					\
--		"OPTIONAL { ?c nco:hasPhoneNumber ?h . } "		\
--	"} UNION { "							\
--		"?call a nmo:Call ; "					\
--		"nmo:from ?c ; "					\
--		"nmo:isSent false . "					\
--		"?c a nco:Contact . "					\
--		"OPTIONAL { ?c nco:hasPhoneNumber ?h . } "		\
--	"} } ORDER BY DESC(nmo:receivedDate(?call))"
-+	"	{ "							\
-+			"?c a nco:Contact . "				\
-+			"?c nco:hasPhoneNumber ?h . "			\
-+			"?call a nmo:Call ; "				\
-+			"nmo:to ?c ; "					\
-+			"nmo:isSent true . "				\
-+		"} UNION {"						\
-+			"?x a nco:Contact . "				\
-+			"?x nco:hasPhoneNumber ?h . "			\
-+			"?call a nmo:Call ; "				\
-+			"nmo:to ?x ; "					\
-+			"nmo:isSent true . "				\
-+			"?c a nco:PersonContact . "			\
-+			"?c nco:hasPhoneNumber ?h . "			\
-+		"} UNION {"						\
-+			"?x a nco:Contact . "				\
-+			"?x nco:hasPhoneNumber ?h . "			\
-+			"?call a nmo:Call ; "				\
-+			"nmo:to ?x ; "					\
-+			"nmo:isSent true . "				\
-+			"?c a nco:PersonContact . "			\
-+			"?c nco:hasAffiliation ?a . "			\
-+			"?a nco:hasPhoneNumber ?h . "			\
-+		"}UNION {"						\
-+			"?c a nco:Contact . "				\
-+			"?c nco:hasPhoneNumber ?h . "			\
-+			"?call a nmo:Call ; "				\
-+			"nmo:from ?c ; "				\
-+			"nmo:isSent false . "				\
-+		"} UNION {"						\
-+			"?x a nco:Contact . "				\
-+			"?x nco:hasPhoneNumber ?h . "			\
-+			"?call a nmo:Call ; "				\
-+			"nmo:from ?x ; "				\
-+			"nmo:isSent false . "				\
-+			"?c a nco:PersonContact . "			\
-+			"?c nco:hasPhoneNumber ?h . "			\
-+		"} UNION {"						\
-+			"?x a nco:Contact . "				\
-+			"?x nco:hasPhoneNumber ?h . "			\
-+			"?call a nmo:Call ; "				\
-+			"nmo:from ?x ; "				\
-+			"nmo:isSent false . "				\
-+			"?c a nco:PersonContact . "			\
-+			"?c nco:hasAffiliation ?a . "			\
-+			"?a nco:hasPhoneNumber ?h . "			\
-+		"}"							\
-+	"} GROUP BY ?call ORDER BY DESC(nmo:receivedDate(?call))"
- 
- 
- #define CONTACTS_QUERY_FROM_URI						\
--- 
-1.7.0.4
+On 10/21/2010 2:08 PM, Waldemar.Rymarkiewicz@tieto.com wrote:
+> Hi Suraj,
+>
+>>
+>> Looks like this patch does not apply successfully on the
+>> latest Bluez tree after applying the first two. Can you verify that?
+>>
+>
+> I've just git pull the latest upstream, git am for all the patches and don't have the problem with applying them.
+>
+> /Waldek
 
+Alright, may be it has something to do with my mail client.
+
+Regards
+Suraj
