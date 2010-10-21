@@ -1,42 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Haijun Liu <haijun.liu@atheros.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <padovan@profusion.mobi>, Haijun Liu <haijun.liu@atheros.com>
-Subject: [PATCH 1/2 v2] Bluetooth: Fix system crash caused by del_timer()
-Date: Fri, 22 Oct 2010 10:26:58 +0800
-Message-ID: <1287714419-13545-1-git-send-email-haijun.liu@atheros.com>
+Message-ID: <E4C5FFB2C4274729B4720A28040B7258@freqoneremote>
+From: "David Stockwell" <dstockwell@frequency-one.com>
+To: <Waldemar.Rymarkiewicz@tieto.com>, <ag.shivendra@gmail.com>,
+	<linux-bluetooth@vger.kernel.org>
+References: <201010191147.34241.sander@outrightsolutions.nl><AANLkTikgKM1MNpwP2JL1GdERZ60dE6dkFNC=rdyQDhOV@mail.gmail.com> <AANLkTim9ypGcMEJ4+HqSZT_uxH4x9chHUW3mU0uDbfrR@mail.gmail.com> <442C56D12F0C4CE0B6625FF181846FED@freqoneremote> <99B09243E1A5DA4898CDD8B700111448097D287CCF@EXMB04.eu.tieto.com>
+In-Reply-To: <99B09243E1A5DA4898CDD8B700111448097D287CCF@EXMB04.eu.tieto.com>
+Subject: Re: AVRCP 1.4 : Future on Target Role
+Date: Thu, 21 Oct 2010 16:27:11 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain;
+	format=flowed;
+	charset="iso-8859-1";
+	reply-type=original
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-During test session with another vendor's bt stack, found that in
-l2cap_chan_del() using del_timer() caused l2cap_monitor_timeout()
-be called after the sock was freed, so it raised a system crash.
-So I just replaced del_timer() with del_timer_sync() to solve it.
+Hi Waldek,
 
-Signed-off-by: Haijun Liu <haijun.liu@atheros.com>
----
- net/bluetooth/l2cap.c |    6 +++---
- 1 files changed, 3 insertions(+), 3 deletions(-)
+> Hi David,
+>
+>>Regarding an AVRCP device, I have not found any on the market.
+>
+> There are already devices with AVRCP 1.4 on the market. See 
+> https://www.bluetooth.org/tpg/listings.cfm  for listing (use advanced 
+> searching).
 
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 6f931cc..879f386 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -283,9 +283,9 @@ static void l2cap_chan_del(struct sock *sk, int err)
- 	if (l2cap_pi(sk)->mode == L2CAP_MODE_ERTM) {
- 		struct srej_list *l, *tmp;
- 
--		del_timer(&l2cap_pi(sk)->retrans_timer);
--		del_timer(&l2cap_pi(sk)->monitor_timer);
--		del_timer(&l2cap_pi(sk)->ack_timer);
-+		del_timer_sync(&l2cap_pi(sk)->retrans_timer);
-+		del_timer_sync(&l2cap_pi(sk)->monitor_timer);
-+		del_timer_sync(&l2cap_pi(sk)->ack_timer);
- 
- 		skb_queue_purge(SREJ_QUEUE(sk));
- 		skb_queue_purge(BUSY_QUEUE(sk));
--- 
-1.6.3.3
+Thanks...I should have looked there, and will do so.
 
+>
+> Reagrads
+> /Waldek
+>
+> 
