@@ -1,42 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 21 Oct 2010 00:54:53 -0700 (PDT)
-Message-Id: <20101021.005453.193707125.davem@davemloft.net>
-To: padovan@profusion.mobi
-Cc: linville@tuxdriver.com, marcel@holtmann.org,
- linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: pull request: bluetooth-2.6 2010-10-18
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20101018190208.GA3080@vigoh>
-References: <20101018055540.GA13511@vigoh>
-	<20101018200830.GA2443@tuxdriver.com>
-	<20101018190208.GA3080@vigoh>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+MIME-Version: 1.0
+From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+Date: Thu, 21 Oct 2010 09:52:49 +0200
+Message-ID: <AANLkTikei6=MbLUQBYNmzbkEQ-12ufzVAf0CA2f3uLu2@mail.gmail.com>
+Subject: Pull request git://gitorious.org/bluez-mcap-hdp/mcap-hdp.git for_upstream
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Date: Mon, 18 Oct 2010 17:02:09 -0200
+The following changes since commit a4b1673b878a358d2492f24b46e92ea36d8f8bbf:
 
-> * John W. Linville <linville@tuxdriver.com> [2010-10-18 16:08:31 -0400]:
-> 
->> On Mon, Oct 18, 2010 at 03:55:40AM -0200, Gustavo F. Padovan wrote:
->> > Hi John,
->> > 
->> > Not sure if we still have time for a last minute fix, but here goes a
->> > fix for a NULL dereference in L2CAP layer for 2.6.36-rc8. Please also let
->> > me know if this is the right way to handle such last minute fix. Maybe you
->> > should want this directly through Dave. 
->> > 
->> > Thanks.
->> 
->> The fix seems fine to me.  Given the short schedule, it might be best
->> to skip the middleman and have Dave pull directly from you?
->> 
->> Dave, be forewarned that Gustavo has based his tree off 2.6.36-rc8 --
->> dunno if you are ready to pull that into net-2.6 or not.
-> 
-> If you guys think that rebase against Linus' tree could be a problem, I
-> can start to base bluetooth-2.6 against net-2.6 for the next pull
-> requests.
+  Fix hidd to use ServiceName attribute for device name (2010-10-20
+13:37:36 +0300)
 
-I've now pulled this.
+are available in the git repository at:
+  git://gitorious.org/bluez-mcap-hdp/mcap-hdp.git for_upstream
+
+José Antonio Santos Cadenas (6):
+      Receive an string instead of an integer for ChannelType
+      Modify test-health script to make it more interactive
+      Notify main channel when it is locally opened
+      Emit a valid path when main channel is deleted
+      Delete data channels when their device is removed.
+      Check if the channel mode is correct when opening data channels
+
+Santiago Carot-Nemesio (6):
+      Remove obsolete comment from MCAP
+      Fix segmentation fault freeing uninitialized pointers
+      Check l2cap configuration when data channels are connected
+      Close the data channel if remote side changes the configuration
+      Enable support to change mode for incoming data channels connections
+      Change data channel mode for incoming connections
+
+ health/hdp.c      |  106 +++++++++++++++++++++++++--
+ health/hdp_util.c |   35 +++++++---
+ health/mcap.c     |   15 ++++-
+ health/mcap_lib.h |    3 +
+ test/test-health  |  207 +++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 5 files changed, 340 insertions(+), 26 deletions(-)
