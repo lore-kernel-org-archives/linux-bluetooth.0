@@ -1,26 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: <Waldemar.Rymarkiewicz@tieto.com>
-To: <dstockwell@frequency-one.com>, <ag.shivendra@gmail.com>,
-	<linux-bluetooth@vger.kernel.org>
-Date: Thu, 21 Oct 2010 11:30:52 +0300
-Subject: RE: AVRCP 1.4 : Future on Target Role
-Message-ID: <99B09243E1A5DA4898CDD8B700111448097D287CCF@EXMB04.eu.tieto.com>
-References: <201010191147.34241.sander@outrightsolutions.nl><AANLkTikgKM1MNpwP2JL1GdERZ60dE6dkFNC=rdyQDhOV@mail.gmail.com>
- <AANLkTim9ypGcMEJ4+HqSZT_uxH4x9chHUW3mU0uDbfrR@mail.gmail.com>
- <442C56D12F0C4CE0B6625FF181846FED@freqoneremote>
-In-Reply-To: <442C56D12F0C4CE0B6625FF181846FED@freqoneremote>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 21 Oct 2010 00:54:53 -0700 (PDT)
+Message-Id: <20101021.005453.193707125.davem@davemloft.net>
+To: padovan@profusion.mobi
+Cc: linville@tuxdriver.com, marcel@holtmann.org,
+ linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: pull request: bluetooth-2.6 2010-10-18
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20101018190208.GA3080@vigoh>
+References: <20101018055540.GA13511@vigoh>
+	<20101018200830.GA2443@tuxdriver.com>
+	<20101018190208.GA3080@vigoh>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David, 
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Date: Mon, 18 Oct 2010 17:02:09 -0200
 
->Regarding an AVRCP device, I have not found any on the market. 
+> * John W. Linville <linville@tuxdriver.com> [2010-10-18 16:08:31 -0400]:
+> 
+>> On Mon, Oct 18, 2010 at 03:55:40AM -0200, Gustavo F. Padovan wrote:
+>> > Hi John,
+>> > 
+>> > Not sure if we still have time for a last minute fix, but here goes a
+>> > fix for a NULL dereference in L2CAP layer for 2.6.36-rc8. Please also let
+>> > me know if this is the right way to handle such last minute fix. Maybe you
+>> > should want this directly through Dave. 
+>> > 
+>> > Thanks.
+>> 
+>> The fix seems fine to me.  Given the short schedule, it might be best
+>> to skip the middleman and have Dave pull directly from you?
+>> 
+>> Dave, be forewarned that Gustavo has based his tree off 2.6.36-rc8 --
+>> dunno if you are ready to pull that into net-2.6 or not.
+> 
+> If you guys think that rebase against Linus' tree could be a problem, I
+> can start to base bluetooth-2.6 against net-2.6 for the next pull
+> requests.
 
-There are already devices with AVRCP 1.4 on the market. See https://www.bluetooth.org/tpg/listings.cfm  for listing (use advanced searching).
-
-Reagrads 
-/Waldek
-
-
+I've now pulled this.
