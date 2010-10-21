@@ -1,42 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Haijun Liu <haijun.liu@atheros.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Haijun Liu <haijun.liu@atheros.com>
-Subject: [PATCH 1/2] Bluetooth: Fix system crash caused by del_timer()
-Date: Thu, 21 Oct 2010 15:09:15 +0800
-Message-ID: <1287644956-12602-1-git-send-email-haijun.liu@atheros.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: greg@kroah.com, linux-bluetooth@vger.kernel.org
+Cc: stable@kernel.org, linux-kernel@vger.kernel.org,
+	Nathan Holstein <nathan.holstein@gmail.com>
+Subject: [PATCH 1/1] Bluetooth: fix oops in l2cap_connect_req
+Date: Thu, 21 Oct 2010 03:19:53 -0200
+Message-Id: <1287638393-8573-2-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1287638393-8573-1-git-send-email-padovan@profusion.mobi>
+References: <1287638393-8573-1-git-send-email-padovan@profusion.mobi>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-At UPF37, during test session of bt3.0 with Marvel, found that in
-l2cap_chan_del() using del_timer() caused l2cap_monitor_timeout()
-be called after the sock was freed, so it raised a system crash.
-So I just replaced del_timer() with del_timer_sync() to solve it.
+From: Nathan Holstein <nathan.holstein@gmail.com>
 
-Signed-off-by: Haijun Liu <haijun.liu@atheros.com>
+In error cases when the ACL is insecure or we fail to allocate a new
+struct sock, we jump to the "response" label.  If so, "sk" will be
+null and the kernel crashes.
+
+Signed-off-by: Nathan Holstein <nathan.holstein@gmail.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 ---
- net/bluetooth/l2cap.c |    6 +++---
- 1 files changed, 3 insertions(+), 3 deletions(-)
+ net/bluetooth/l2cap.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 6f931cc..879f386 100644
+index 0b54b7d..dc60205 100644
 --- a/net/bluetooth/l2cap.c
 +++ b/net/bluetooth/l2cap.c
-@@ -283,9 +283,9 @@ static void l2cap_chan_del(struct sock *sk, int err)
- 	if (l2cap_pi(sk)->mode == L2CAP_MODE_ERTM) {
- 		struct srej_list *l, *tmp;
+@@ -2891,7 +2891,7 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
+ 	struct l2cap_chan_list *list = &conn->chan_list;
+ 	struct l2cap_conn_req *req = (struct l2cap_conn_req *) data;
+ 	struct l2cap_conn_rsp rsp;
+-	struct sock *parent, *uninitialized_var(sk);
++	struct sock *parent, *sk = NULL;
+ 	int result, status = L2CAP_CS_NO_INFO;
  
--		del_timer(&l2cap_pi(sk)->retrans_timer);
--		del_timer(&l2cap_pi(sk)->monitor_timer);
--		del_timer(&l2cap_pi(sk)->ack_timer);
-+		del_timer_sync(&l2cap_pi(sk)->retrans_timer);
-+		del_timer_sync(&l2cap_pi(sk)->monitor_timer);
-+		del_timer_sync(&l2cap_pi(sk)->ack_timer);
+ 	u16 dcid = 0, scid = __le16_to_cpu(req->scid);
+@@ -3000,7 +3000,7 @@ sendresp:
+ 					L2CAP_INFO_REQ, sizeof(info), &info);
+ 	}
  
- 		skb_queue_purge(SREJ_QUEUE(sk));
- 		skb_queue_purge(BUSY_QUEUE(sk));
+-	if (!(l2cap_pi(sk)->conf_state & L2CAP_CONF_REQ_SENT) &&
++	if (sk && !(l2cap_pi(sk)->conf_state & L2CAP_CONF_REQ_SENT) &&
+ 				result == L2CAP_CR_SUCCESS) {
+ 		u8 buf[128];
+ 		l2cap_pi(sk)->conf_state |= L2CAP_CONF_REQ_SENT;
 -- 
-1.6.3.3
+1.7.3.1
 
