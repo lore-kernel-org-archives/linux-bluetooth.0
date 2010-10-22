@@ -1,37 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 22 Oct 2010 11:12:07 -0200
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: ext-tommi.keisala@nokia.comt
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fix crash when GetProperties req is received before
+ any adapters are set up
+Message-ID: <20101022131207.GA29655@jh-x301>
+References: <1287743558-17002-1-git-send-email-ext-tommi.keisala@nokia.com>
+ <1287743558-17002-2-git-send-email-ext-tommi.keisala@nokia.com>
 MIME-Version: 1.0
-Date: Fri, 22 Oct 2010 11:21:09 -0200
-Message-ID: <AANLkTinBqjTmLiXwd5LkzZRXOkuYkfS=48m6gWQ9AQO7@mail.gmail.com>
-Subject: RFCOMM connection from android device to desktop pc
-From: Leandro de Oliveira <lehphyro@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1287743558-17002-2-git-send-email-ext-tommi.keisala@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Tommi,
 
-I'm trying to open an RFCOMM connection from my android device to my
-desktop pc running Ubuntu 10.04, send some data, close the connection
-and then do it again. My desktop program is written in Java and relies
-on BlueCove[1] to handle bluetooth details which calls Bluez 4.x in
-this case.
+On Fri, Oct 22, 2010, ext-tommi.keisala@nokia.com wrote:
+> This patch avoids a crash when org.bluez.Manager GetProperties request is
+> received and there is not yet any adapters ready. Happens often for example
+> when bluetoothd and ofonod is started next ot each other.
+> 
+> Signed-off-by: Tommi Keisala <ext-tommi.keisala@nokia.com>
+> ---
+>  src/manager.c |    6 +++++-
+>  1 files changed, 5 insertions(+), 1 deletions(-)
 
-The problem is that I get a successful connection and data transfer in
-the first communication attempt but nothing in subsequent attempts.
+Looks like a bugfix is definitely in order here, but why introduce a new
+variable to the function? Wouldn't something like the folling be good
+enough:
 
-There is this thread[2] in the android-platform mailing list with much
-more detail, but I think you could just take a look at this hcidump
-that has been requested there to let me know if this is a problem in
-bluez on the android or desktop side:
-http://dl.dropbox.com/u/1401233/pc-hcidump.txt
+--- a/src/manager.c
++++ b/src/manager.c
+@@ -197,13 +197,14 @@ static DBusMessage *get_properties(DBusConnection *conn,
+                        DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
+ 
+        array = g_new0(char *, g_slist_length(adapters) + 1);
+-       for (i = 0, list = adapters; list; list = list->next, i++) {
++       for (i = 0, list = adapters; list; list = list->next) {
+                struct btd_adapter *adapter = list->data;
+ 
+                if (!adapter_is_ready(adapter))
+                        continue;
+ 
+                array[i] = (char *) adapter_get_path(adapter);
++               i++;
+        }
+        dict_append_array(&dict, "Adapters", DBUS_TYPE_OBJECT_PATH, &array, i);
+        g_free(array);
 
-Please, let me know if you need more info.
+Could you send a new patch which doesn't introduce a new variable? Also,
+please leave out the signed-off-by from the commit message since it's
+not used for userspace bluez patches. Thanks.
 
-The same program works perfectly when the android application connects
-to it running on Windows 7 using the Microsoft Bluetooth Stack.
-
-[1] http://www.bluecove.org/
-[2] http://groups.google.com/group/android-platform/browse_thread/thread/485db57409304d3e?hl=en
-
-Thank you very much
+Johan
