@@ -1,287 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arnd Bergmann <arnd@arndb.de>
-To: "Par-Gunnar Hjalmdahl" <pghatwork@gmail.com>
-Subject: Re: [PATCH 1/9] mfd: Add support for the ST-Ericsson CG2900.
-Date: Fri, 22 Oct 2010 17:36:57 +0200
+Date: Fri, 22 Oct 2010 16:33:59 +0100
+From: Alan Cox <alan@lxorguk.ukuu.org.uk>
+To: Par-Gunnar Hjalmdahl <pghatwork@gmail.com>
 Cc: linus.walleij@stericsson.com, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-References: <AANLkTineXA2ZY0J7+dZhqywz+4aAVgzihu+LDDbsL8mu@mail.gmail.com>
-In-Reply-To: <AANLkTineXA2ZY0J7+dZhqywz+4aAVgzihu+LDDbsL8mu@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201010221736.57671.arnd@arndb.de>
+	linux-kernel@vger.kernel.org, Lukasz.Rymanowski@tieto.com
+Subject: Re: [PATCH 5/9] mfd: Add UART support for the ST-Ericsson CG2900.
+Message-ID: <20101022163359.5b22a61b@lxorguk.ukuu.org.uk>
+In-Reply-To: <AANLkTik-S50ZX6mFG+vWhBv0x_WmipP=t+4VqmAgssRC@mail.gmail.com>
+References: <AANLkTi=XTUau_GbASJEUBgsZ_FYYmRAX6W43YtRdv2wS@mail.gmail.com>
+	<20101022135130.617f0ce8@lxorguk.ukuu.org.uk>
+	<AANLkTik-S50ZX6mFG+vWhBv0x_WmipP=t+4VqmAgssRC@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-14
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Friday 22 October 2010 12:35:16 Par-Gunnar Hjalmdahl wrote:
-> This patch adds support for the ST-Ericsson CG2900 Connectivity
-> Combo controller.
-> This patch adds the central framework to be able to register CG2900 users,
-> transports, and chip handlers.
+> The existence of the callback is checked in the function
+> uart_tty_open. If either break_ctl or tiocmget is NULL we do not allow
+> sleep and this code will never run.
+
+OK yes see this now.
+
+> >> +             CG2900_ERR("Failed to alloc memory for uart_work_struct!");
+> >
+> > Please use the standard dev_dbg etc functionality - or pr_err etc when
+> > you have no device pointer. The newest kernel tty object has a device
+> > pointer added so you could use that.
+> >
 > 
-> Signed-off-by: Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
+> OK. I like the debug system we have now (using module parameter to set
+> debug level in runtime), but I've received comments regarding this
+> before so I assume we will have to switch to standard printouts.
+> Is it OK to use defines or inline functions to add "CG2900" before and
+> '\n' after (as BT_INFO in include/net/bluetooth/bluetooth.h)?
 
-Looks ok from a coding style perspective, but some important information is
-missing from the description:
+The pr_fmt bit will do what you want for a non dev_dbg type thing. See
+include/linux/kernel.h
 
-* What is a CG2900?
-* Why is it a MFD device rather than e.g. a bus or a subsystem?
+> >> + * unset_cts_irq() - Disable interrupt on CTS.
+> >> + */
+> >> +static void unset_cts_irq(void)
+> >
+> > And no ability to support multiple devices
+> >
+> 
+> OK. We will try to fix this.
 
-> +config MFD_CG2900
-> +	tristate "Support ST-Ericsson CG2900 main structure"
-> +	depends on NET
-> +	help
-> +	  Support for ST-Ericsson CG2900 Connectivity Combo controller main structure.
-> +	  Supports multiple functionalities muxed over a Bluetooth HCI H:4 interface.
-> +	  CG2900 support Bluetooth, FM radio, and GPS.
-> +
+That may go away when you clean up the device side. The line discipline
+can be attached to any device so must be multi-device aware, the hardware
+driver can certainly be single device only if you can only ever have one
 
-Can you explain what it means to mux over a H:4 interface? Does this mean
-you use bluetooth infrastructure that is designed for wireless communication
-in order to connect on-board or on-chip devices?
+[Although its a good idea to design it so it can be fixed because you
+ never know when you'll find your sales team just sold someone a two
+ device solution ;) ]
 
-> @@ -0,0 +1,2401 @@
-> +/*
-> + * drivers/mfd/cg2900/cg2900_core.c
-> + *
-> + * Copyright (C) ST-Ericsson SA 2010
-> + * Authors:
-> + * Par-Gunnar Hjalmdahl (par-gunnar.p.hjalmdahl@stericsson.com) for
-> ST-Ericsson.
+> >> +             set_bit(TTY_DO_WRITE_WAKEUP, &tty->flags);
+> >> +             len = tty->ops->write(tty, skb->data, skb->len);
+> >
+> > A tty isn't required to have a write function
+> 
+> I don't quite understand your comment here. This particular code is
+> inspired of the Bluetooth ldisc code and there it is used like. It
+> seems to work fine so we do it the same way.
 
-Your email client rewraps lines. You need to fix so that other people
-can apply your patches.
+You copied a security hole from the bluetooth driver which we found a
+couple of weeks ago
 
-> +/*
-> + * chip_handlers - List of the register handlers for different chips.
-> + */
-> +LIST_HEAD(chip_handlers);
+> How would you prefer it to be?
 
-Should this be static? Don't you need a lock to access the list?
+Check it is valid, in your case probably on open just refuse to attach to
+a read only port.
 
-> +/**
-> + * find_h4_user() - Get H4 user based on supplied H4 channel.
-> + * @h4_channel:	H4 channel.
-> + * @dev:	Stored CG2900 device.
-> + * @skb:	(optional) skb with received packet. Set to NULL if NA.
-> + *
-> + * Returns:
-> + *   0 if there is no error.
-> + *   -EINVAL if bad channel is supplied or no user was found.
-> + *   -ENXIO if channel is audio channel but not registered with CG2900.
-> + */
-> +static int find_h4_user(int h4_channel, struct cg2900_device **dev,
-> +			const struct sk_buff * const skb)
-> +{
-> +	int err = 0;
-> +	struct cg2900_users *users = &(core_info->users);
-> +	struct cg2900_h4_channels *chan = &(core_info->h4_channels);
-> +
-> +	if (h4_channel == chan->bt_cmd_channel) {
-> +		*dev = users->bt_cmd;
-> +	} else if (h4_channel == chan->bt_acl_channel) {
-> +		*dev = users->bt_acl;
-> +	} else if (h4_channel == chan->bt_evt_channel) {
-> +		*dev = users->bt_evt;
-> +		/* Check if it's event generated by previously sent audio user
-> +		 * command. If so then that event should be dispatched to audio
-> +		 * user*/
-> +		err = find_bt_audio_user(h4_channel, dev, skb);
-> +	} else if (h4_channel == chan->gnss_channel) {
-> +		*dev = users->gnss;
-> +	} else if (h4_channel == chan->fm_radio_channel) {
-> +		*dev = users->fm_radio;
-> +		/* Check if it's an event generated by previously sent audio
-> +		 * user command. If so then that event should be dispatched to
-> +		 * audio user */
-> +		err = find_fm_audio_user(h4_channel, dev, skb);
-> +	} else if (h4_channel == chan->debug_channel) {
-> +		*dev = users->debug;
-> +	} else if (h4_channel == chan->ste_tools_channel) {
-> +		*dev = users->ste_tools;
-> +	} else if (h4_channel == chan->hci_logger_channel) {
-> +		*dev = users->hci_logger;
-> +	} else if (h4_channel == chan->us_ctrl_channel) {
-> +		*dev = users->us_ctrl;
-> +	} else if (h4_channel == chan->core_channel) {
-> +		*dev = users->core;
-> +	} else {
-> +		*dev = NULL;
-> +		CG2900_ERR("Bad H:4 channel supplied: 0x%X", h4_channel);
-> +		return -EINVAL;
-> +	}
-> +
-> +	return err;
-> +}
+> OK. We will try to figure out a new design.
+> I'm not too happy about putting the ldisc part in Bluetooth though
+> since it is only partly Bluetooth, it is also GPS and FM. Better could
+> maybe be under char/?
 
-You seem to have a number of functions that need to go through each
-possible user/channel/submodule. This looks like somethin is not
-abstracted well enough.
+Works for me - there is an ongoing "we must move tty ldiscs and core tty
+code somewhere more sensible of their own" discussion, so if it is
+dropped into char, it'll move with them just fine.
 
-> +
-> +/**
-> + * add_h4_user() - Add H4 user to user storage based on supplied H4 channel.
-> + * @dev:	Stored CG2900 device.
-> + * @name:	Device name to identify different devices that are using
-> + *		the same H4 channel.
-> + *
-> + * Returns:
-> + *   0 if there is no error.
-> + *   -EINVAL if NULL pointer or bad channel is supplied.
-> + *   -EBUSY if there already is a user for supplied channel.
-> + */
-> +static int add_h4_user(struct cg2900_device *dev, const char * const name)
-> +{
-
-Where does that name come from? Why not just use an enum if the name is
-only use for strncmp?
-
-> +static ssize_t test_char_dev_read(struct file *filp, char __user *buf,
-> +				  size_t count, loff_t *f_pos)
-> +{
-> +	struct sk_buff *skb;
-> +	int bytes_to_copy;
-> +	int err;
-> +	struct sk_buff_head *rx_queue = &core_info->test_char_dev->rx_queue;
-
-What is this read/write interface used for?
-
-The name suggests that this is only for testing and not an essential
-part of your driver. Could this be made a separate driver?
-
-It also looks like you do socket communication here, can't you use
-a proper AF_BLUETOOTH socket to do the same?
-
-> +	CG2900_INFO("test_char_dev_read");
-> +
-> +	if (skb_queue_empty(rx_queue))
-> +		wait_event_interruptible(char_wait_queue,
-> +					 !(skb_queue_empty(rx_queue)));
-> +
-> +	skb = skb_dequeue(rx_queue);
-> +	if (!skb) {
-> +		CG2900_INFO("skb queue is empty - return with zero bytes");
-> +		bytes_to_copy = 0;
-> +		goto finished;
-> +	}
-> +
-> +	bytes_to_copy = min(count, skb->len);
-> +	err = copy_to_user(buf, skb->data, bytes_to_copy);
-> +	if (err) {
-> +		skb_queue_head(rx_queue, skb);
-> +		return -EFAULT;
-> +	}
-> +
-> +	skb_pull(skb, bytes_to_copy);
-> +
-> +	if (skb->len > 0)
-> +		skb_queue_head(rx_queue, skb);
-> +	else
-> +		kfree_skb(skb);
-> +
-> +finished:
-> +	return bytes_to_copy;
-> +}
-
-This does not handle short/continued reads.
-
-> +EXPORT_SYMBOL(cg2900_reset);
-
-How about making your symbols EXPORT_SYMBOL_GPL instead of EXPORT_SYMBOL?
-
-> +module_param(cg2900_debug_level, int, S_IRUGO | S_IWUSR | S_IWGRP);
-> +MODULE_PARM_DESC(cg2900_debug_level,
-> +		 "Debug level. Default 1. Possible values:\n"
-> +		 "\t0  = No debug\n"
-> +		 "\t1  = Error prints\n"
-> +		 "\t10 = General info, e.g. function entries\n"
-> +		 "\t20 = Debug info, e.g. steps in a functionality\n"
-> +		 "\t25 = Data info, i.e. prints when data is transferred\n"
-> +		 "\t30 = Data content, i.e. contents of the transferred data");
-
-Please don't introduce new debugging frameworks, we have enough of them
-already. Syslog handles different levels of output just fine, so just
-remove all your debugging stuff and use dev_dbg, dev_info, etc to print
-messages about the device if you must.
-
-Many messages can probably be removed entirely.
-
-> +#define CG2900_DEFAULT_DEBUG_LEVEL 1
-> +
-> +/* module_param declared in cg2900_core.c */
-> +extern int cg2900_debug_level;
-> +
-> +#if defined(NDEBUG) || CG2900_DEFAULT_DEBUG_LEVEL == 0
-> +	#define CG2900_DBG_DATA_CONTENT(__prefix, __buf, __len)
-> +	#define CG2900_DBG_DATA(fmt, arg...)
-> +	#define CG2900_DBG(fmt, arg...)
-> +	#define CG2900_INFO(fmt, arg...)
-> +	#define CG2900_ERR(fmt, arg...)
-> +#else
-> +
-> +	#define CG2900_DBG_DATA_CONTENT(__prefix, __buf, __len)		\
-> +	do {								\
-> +		if (cg2900_debug_level >= 30)				\
-> +			print_hex_dump_bytes("CG2900 " __prefix ": " ,	\
-> +					     DUMP_PREFIX_NONE, __buf, __len); \
-> +	} while (0)
-> +
-> +	#define CG2900_DBG_DATA(fmt, arg...)				\
-> +	do {								\
-> +		if (cg2900_debug_level >= 25)				\
-> +			pr_debug("CG2900 %s: " fmt "\n" , __func__ , ## arg); \
-> +	} while (0)
-> +
-> +	#define CG2900_DBG(fmt, arg...)					\
-> +	do {								\
-> +		if (cg2900_debug_level >= 20)				\
-> +			pr_debug("CG2900 %s: " fmt "\n" , __func__ , ## arg); \
-> +	} while (0)
-> +
-> +	#define CG2900_INFO(fmt, arg...)				\
-> +	do {								\
-> +		if (cg2900_debug_level >= 10)				\
-> +			pr_info("CG2900: " fmt "\n" , ## arg);		\
-> +	} while (0)
-> +
-> +	#define CG2900_ERR(fmt, arg...)					\
-> +	do {								\
-> +		if (cg2900_debug_level >= 1)				\
-> +			pr_err("CG2900 %s: " fmt "\n" , __func__ , ## arg); \
-> +	} while (0)
-> +
-> +#endif /* NDEBUG */
-
-You'll feel relieved when all this is gone...
-
-> +
-> +#ifndef _BLUETOOTH_DEFINES_H_
-> +#define _BLUETOOTH_DEFINES_H_
-> +
-> +#include <linux/types.h>
-> +
-> +/* H:4 offset in an HCI packet */
-> +#define HCI_H4_POS				0
-> +#define HCI_H4_SIZE				1
-> +
-> +/* Standardized Bluetooth H:4 channels */
-> +#define HCI_BT_CMD_H4_CHANNEL			0x01
-> +#define HCI_BT_ACL_H4_CHANNEL			0x02
-> +#define HCI_BT_SCO_H4_CHANNEL			0x03
-> +#define HCI_BT_EVT_H4_CHANNEL			0x04
-> +
-> +/* Bluetooth Opcode Group Field (OGF) */
-> +#define HCI_BT_OGF_LINK_CTRL			0x01
-> +#define HCI_BT_OGF_LINK_POLICY			0x02
-> +#define HCI_BT_OGF_CTRL_BB			0x03
-> +#define HCI_BT_OGF_LINK_INFO			0x04
-> +#define HCI_BT_OGF_LINK_STATUS			0x05
-> +#define HCI_BT_OGF_LINK_TESTING			0x06
-> +#define HCI_BT_OGF_VS				0x3F
-
-These all look like generic bluetooth definitions, not cg2900
-specific. Should they be part of global headers? Are they perhaps
-already?
-
-	Arnd
+Alan
