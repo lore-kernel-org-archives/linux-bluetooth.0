@@ -1,13 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
-From: ext-tommi.keisala@nokia.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Fix crash when GetProperties req is received before any adapters are set up
-Date: Fri, 22 Oct 2010 13:32:37 +0300
-Message-Id: <1287743558-17002-1-git-send-email-ext-tommi.keisala@nokia.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+Date: Fri, 22 Oct 2010 15:26:03 +0530
+Message-ID: <AANLkTin6V+FTUjnj+CqKpxWBDe2xd6_EjPwVqXXBjL+J@mail.gmail.com>
+Subject: Regarding BLUEZ WIKI
+From: steven bluez <steven.bluez@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>, "Gustavo F. Padovan\"" <gustavo@padovan.org>
+Cc: Suraj Sumangala <suraj@atheros.com>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In-Reply-To: 
+Hi Marcel,
+        There was supposed to be a page "wiki.bluez.org" its missing
+?. Its been moved or deleted??
 
-
-We have observed bluetoothd crashing on startup and I traced the issue being dict_append_array call with empty array but elements_n being 1.
+Regards,
+   Steven
