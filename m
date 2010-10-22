@@ -1,33 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Fri, 22 Oct 2010 11:58:59 -0200
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Yuri Ershov <ext-yuri.ershov@nokia.com>
-Cc: marcel@holtmann.org, davem@davemloft.net, jprvita@profusion.mobi,
-	linux-bluetooth@vger.kernel.org, ville.tervo@nokia.com,
-	andrei.emeltchenko@nokia.com
-Subject: Re: [PATCH] bluetooth: Fix NULL pointer dereference issue
-Message-ID: <20101022135859.GA15476@vigoh>
-References: <1987fd374e92ea2e4ebb06b24c6321e65ab933c6.1287676475.git.ext-yuri.ershov@nokia.com>
+Date: Fri, 22 Oct 2010 11:43:26 -0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Pull request git://gitorious.org/bluez-mcap-hdp/mcap-hdp.git
+ for_upstream
+Message-ID: <20101022134325.GA30929@jh-x301>
+References: <AANLkTikei6=MbLUQBYNmzbkEQ-12ufzVAf0CA2f3uLu2@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1987fd374e92ea2e4ebb06b24c6321e65ab933c6.1287676475.git.ext-yuri.ershov@nokia.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <AANLkTikei6=MbLUQBYNmzbkEQ-12ufzVAf0CA2f3uLu2@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Yuri,
+Hi Jose,
 
-* Yuri Ershov <ext-yuri.ershov@nokia.com> [2010-10-21 20:08:58 +0400]:
+On Thu, Oct 21, 2010, Jose Antonio Santos Cadenas wrote:
+> The following changes since commit a4b1673b878a358d2492f24b46e92ea36d8f8bbf:
+> 
+>   Fix hidd to use ServiceName attribute for device name (2010-10-20
+> 13:37:36 +0300)
+> 
+> are available in the git repository at:
+>   git://gitorious.org/bluez-mcap-hdp/mcap-hdp.git for_upstream
+> 
+> José Antonio Santos Cadenas (6):
+>       Receive an string instead of an integer for ChannelType
+>       Modify test-health script to make it more interactive
+>       Notify main channel when it is locally opened
+>       Emit a valid path when main channel is deleted
+>       Delete data channels when their device is removed.
+>       Check if the channel mode is correct when opening data channels
+> 
+> Santiago Carot-Nemesio (6):
+>       Remove obsolete comment from MCAP
+>       Fix segmentation fault freeing uninitialized pointers
+>       Check l2cap configuration when data channels are connected
+>       Close the data channel if remote side changes the configuration
+>       Enable support to change mode for incoming data channels connections
+>       Change data channel mode for incoming connections
+> 
+>  health/hdp.c      |  106 +++++++++++++++++++++++++--
+>  health/hdp_util.c |   35 +++++++---
+>  health/mcap.c     |   15 ++++-
+>  health/mcap_lib.h |    3 +
+>  test/test-health  |  207 +++++++++++++++++++++++++++++++++++++++++++++++++++--
+>  5 files changed, 340 insertions(+), 26 deletions(-)
 
-> This patch fixes NULL pointer dereference at running test with
-> connect-transfer-disconnect in loop. Sometimes sk_state is 
-> BT_CLOSED and sk_refcnt equal to 0, so there is oops in 
-> bt_accept_unlink. In normal case removed block is not used.
+Pushed upstream. Thanks.
 
-Question here is: Why sk_refcnt is 0 at that point of the code?  The
-socket should be destroyed if it ref is 0, but it wasn't, so something
-in another point of the code went is wrong. "Sometimes" is not a good
-description of the problem, you have to show why that happened.
-
--- 
-Gustavo F. Padovan
-ProFUSION embedded systems - http://profusion.mobi
+Johan
