@@ -1,47 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <295EA951-2357-4B6B-B558-0B3F1D6FFDD9@signove.com>
-References: <295EA951-2357-4B6B-B558-0B3F1D6FFDD9@signove.com>
-Date: Sat, 23 Oct 2010 09:50:58 +0200
-Message-ID: <AANLkTi=65C7HQXQW1Bqbgf4sNY3wbV2CzqoENBc-b04g@mail.gmail.com>
-Subject: Re: (Health) ChannelConnected signal when MDL aborted?
-From: Santiago Carot <sancane@gmail.com>
-To: =?ISO-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
-Cc: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Tommi Keisala <ext-tommi.keisala@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Tommi Keisala <ext-tommi.keisala@nokia.com>
+Subject: [PATCH] This patch avoids a crash when org.bluez.Manager GetProperties request is received and there is not yet any adapters ready. Happens often for example when bluetoothd and ofonod is started next ot each other.
+Date: Sat, 23 Oct 2010 08:33:18 +0300
+Message-Id: <1287811998-20490-2-git-send-email-ext-tommi.keisala@nokia.com>
+In-Reply-To: <20101022131207.GA29655 () jh-x301>
+References: <20101022131207.GA29655 () jh-x301>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+---
+ src/manager.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
-2010/10/22 Elvis Pfützenreuter <epx@signove.com>:
-> Taking a look in the code, I saw that hdp_mcap_mdl_aborted_cb() emits a ChannelConnected signal.
->
-> I understand that after an abort, the MDL still exists, and can be reconnected, so I understand the intention of informing the application that a channel has been "created". But I'm not sure that it is opportune.
->
-> The first thing the application will do is trying to Acquire() the channel's file descriptor (that does not exist) and that triggers a reconnection attempt, from acceptor to initiator. While the most sensible thing (in my view) is waiting for the initiator to reconnect -- if it aborted, it must have a good reason, and it will probably reject the immediate call back.
->
+diff --git a/src/manager.c b/src/manager.c
+index aff069c..dd9560f 100644
+--- a/src/manager.c
++++ b/src/manager.c
+@@ -197,13 +197,14 @@ static DBusMessage *get_properties(DBusConnection *conn,
+ 			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
+ 
+ 	array = g_new0(char *, g_slist_length(adapters) + 1);
+-	for (i = 0, list = adapters; list; list = list->next, i++) {
++	for (i = 0, list = adapters; list; list = list->next) {
+ 		struct btd_adapter *adapter = list->data;
+ 
+ 		if (!adapter_is_ready(adapter))
+ 			continue;
+ 
+ 		array[i] = (char *) adapter_get_path(adapter);
++		i++;
+ 	}
+ 	dict_append_array(&dict, "Adapters", DBUS_TYPE_OBJECT_PATH, &array, i);
+ 	g_free(array);
+-- 
+1.7.0.4
 
-You are forgetting that there may be more than one health applications
-running over HDP at the same time, if one of them creates a data
-channel, that data data channel will be exist at MCAP level even if
-the initiator abort the connection. If other application wants to
-create a new data channel with the same configuration, it may be want
-reconnect that data channel avoiding to create another data channel.
-It is a best practise wich is recomended in MCAP and best explained in
-the Health Device Profile white paper document to reduce the amount of
-data interchanged between medical devices (in IEEE/11073-20601
-terminology: "agents" and "managers"). Remember that channels may be
-shared between applications.
-
-That is the reason why HDP sends out a signal when a data channel has
-been created.
-Of course, the efficence of the protocol will depend on intelligence
-of the programmer of the applications to take advantages of MCAP
-reconnections. In any case, you will need to know when a data channel
-has been created over the MCL (by you, or by other application).
-
-Regards,
-
-Santiago
