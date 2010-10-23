@@ -1,31 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 23 Oct 2010 10:31:11 -0200
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: Tommi Keisala <ext-tommi.keisala@nokia.com>
+Date: Sat, 23 Oct 2010 10:28:28 -0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Elvis =?iso-8859-1?Q?Pf=FCtzenreuter?= <epx@signove.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] This patch avoids a crash when org.bluez.Manager
- GetProperties request is received and there is not yet any adapters ready.
- Happens often for example when bluetoothd and ofonod is started next ot
- each other.
-Message-ID: <20101023123111.GB19333@jh-x301>
-References: <1287811998-20490-2-git-send-email-ext-tommi.keisala@nokia.com>
+Subject: Re: [PATCH 1/1] Fix small coding style issues
+Message-ID: <20101023122828.GA19333@jh-x301>
+References: <1287775122-12536-1-git-send-email-epx@signove.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1287811998-20490-2-git-send-email-ext-tommi.keisala@nokia.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1287775122-12536-1-git-send-email-epx@signove.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tommi,
+Hi Elvis,
 
-On Sat, Oct 23, 2010, Tommi Keisala wrote:
+On Fri, Oct 22, 2010, Elvis Pfützenreuter wrote:
+> Based on http://lxr.linux.no/linux+v2.6.36/Documentation/CodingStyle#L171
 > ---
->  src/manager.c |    3 ++-
->  1 files changed, 2 insertions(+), 1 deletions(-)
+>  health/hdp_util.c |   24 +++++++++++++-----------
+>  health/mcap_lib.h |    8 ++++----
+>  2 files changed, 17 insertions(+), 15 deletions(-)
 
-You seem to have somehow managed to screw up the commit message this
-time: everything in the summary line and nothing in the message body.
-Anyway, to avoid further feedback rounds (since the patch itself is fine
-now) I went ahead and fixed the commit message and pushed your patch
-upstream. Thanks.
+Thanks, I've pushed the patch upstream. FWIW, The BlueZ code base
+doesn't really enforce the kernel style rule of having braces for all
+parts of if-else statements when at least one branch has them.
 
 Johan
