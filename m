@@ -1,49 +1,118 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: (Health) ChannelConnected signal when MDL aborted?
-Mime-Version: 1.0 (Apple Message framework v1081)
-Content-Type: text/plain; charset=us-ascii
-From: =?iso-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
-In-Reply-To: <AANLkTim3m1ogwwx5MqF+z1FDKn4w3xHEN7MOAO5iW_ms@mail.gmail.com>
-Date: Sun, 24 Oct 2010 11:28:13 -0200
-Cc: Santiago Carot <sancane@gmail.com>, linux-bluetooth@vger.kernel.org
-Message-Id: <3511AB9E-2F29-4E9C-845A-674A3EA437E7@signove.com>
-References: <295EA951-2357-4B6B-B558-0B3F1D6FFDD9@signove.com> <AANLkTi=65C7HQXQW1Bqbgf4sNY3wbV2CzqoENBc-b04g@mail.gmail.com> <4B999390-7FFB-4B90-98BA-D9F9C17771F5@signove.com> <AANLkTim3m1ogwwx5MqF+z1FDKn4w3xHEN7MOAO5iW_ms@mail.gmail.com>
-To: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+Date: Sun, 24 Oct 2010 16:38:02 +0400
+From: Ilya Basin <basinilya@gmail.com>
+Reply-To: Ilya Basin <basinilya@gmail.com>
+Message-ID: <453819375.20101024163802@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: 4.76 possible regression: bluetoothd segfaults when launching bluetooth programs
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+ boundary="----------B103254142A6E8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+------------B103254142A6E8
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-> In that case, the problem is in the remote side, because the Bluetooth
-> SIG certification requires the devices to support reconnections, so
-> the problem is not in our side but in the remote side that isn't
-> compliant with the standard. I think we don't  have to change our
-> implementation regarding buggy devices that don't follow the
-> specification correctly.
+It all started after upgrading bluez from 4.69 to 4.76 .
+'hcitool scan' work and bluetoothd starts normally, but when launching
+any related program (e.g. Gnome bluetooth-applet), bluetoothd dies with segfault:
+  Oct 24 11:31:01 IL kernel: bluetoothd[3894]: segfault at 0 ip
+  b7632653 sp bfee9b5c error 4 in libc-2.12.1.so[b75be000+145000]
 
-I think an HDP device is NOT required to support reconnections. In HDP spec item 5.2.11   there is that bitmap in SDP record that says whether device supports reconnections and CSP.
+Downgrading to 4.69 helps, I don't even have to reboot, just
+restarting bluetoothd
 
-> More over, the situation that you mention. When receiving a
-> ChannelDeletion, the application shouldn't close the data channel,
-> because the in the normal situation, the DBus object for the data
-> channel will be removed, so no closing of the channel will be
-> performed, the only thing that should happen is that the application
-> will "forget" about this channel. When the second ChannelConnected is
-> received, the application will typically perform an acquire that, in
-> this case, will be very simple because the channel will be already
-> connected and the fd will be transmitted.
+Additional info:
+* package version(s)
+kernel26 2.6.35.7
+bluez 4.76
+dbus 1.4.0
 
-So the application must follow a very specific behaviour when handling a ChannelDeleted signal, and worse yet, it must do it to fix a problem that we could fix simply by changing the way channel paths are named.
+$ lsusb | grep lue
+Bus 003 Device 002: ID 0a5c:2121 Broadcom Corp. BCM2210 Bluetooth
 
-If it was the case that we simply could not change the channel path naming, this behaviour should at least written very clearly in API.
+Compiled with debug flags, gdb output attached
+dbus_message_iter_append_basic () is called 7 times after another bt
+program starts.
+Params seem valid:
 
-> In general, I think, guys, that we are thinking again in very estrange
-> situations. As we said in the Recife's meeting we should design the
-> implementation and the API for working with compliants devices, not
-> with buggy ones and also we have to simplify the use for the API,
-> making it simple for the application programmers in the most usual
-> cases not in the strange ones, that will happen very rarely.
+Breakpoint 1, 0xb7e4e616 in dbus_message_iter_append_basic () from /usr/lib/libdbus-1.so.3
+(gdb) print (void*)($esp+0)
+$1 = (void *) 0xbffff3c0
+(gdb) print *(char*)($esp+4)
+$2 = 115 's'
+(gdb) print **(char***)($esp+8)
+$3 = 0xb80474f0 "0000110e-0000-1000-8000-00805f9b34fb"
+(gdb) finish
+Run till exit from #0  0xb7e4e616 in dbus_message_iter_append_basic () from /usr/lib/libdbus-1.so.3
 
-It's weekend, and playing devil's advocate is fun :P 
+Program received signal SIGSEGV, Segmentation fault.
+0xb7d3e653 in strlen () from /lib/libc.so.6
+(gdb) 
+------------B103254142A6E8
+Content-Type: TEXT/PLAIN;
+ name="gdb.txt"
+Content-transfer-encoding: base64
+Content-Disposition: attachment;
+ filename="gdb.txt"
 
-Seriously now, my objective is the same, avoiding that a perfectly sensible application act (closing fd after receiving a ChannelDeleted event) causing a race condition. And IMHO a condition that may happen with compliant devices as well.
+W3Jvb3RASUwgcGFja2FnZXNdIyBnZGIgLS1hcmdzIC9ob21lL2lsL2J1aWxkcy9ibHVlei1k
+ZWJ1Zy9zcmMvc3JjL2JsdWV6LTQuNzYvc3JjLy5saWJzL2JsdWV0b290aGQgLW4KR05VIGdk
+YiAoR0RCKSA3LjIKQ29weXJpZ2h0IChDKSAyMDEwIEZyZWUgU29mdHdhcmUgRm91bmRhdGlv
+biwgSW5jLgpMaWNlbnNlIEdQTHYzKzogR05VIEdQTCB2ZXJzaW9uIDMgb3IgbGF0ZXIgPGh0
+dHA6Ly9nbnUub3JnL2xpY2Vuc2VzL2dwbC5odG1sPgpUaGlzIGlzIGZyZWUgc29mdHdhcmU6
+IHlvdSBhcmUgZnJlZSB0byBjaGFuZ2UgYW5kIHJlZGlzdHJpYnV0ZSBpdC4KVGhlcmUgaXMg
+Tk8gV0FSUkFOVFksIHRvIHRoZSBleHRlbnQgcGVybWl0dGVkIGJ5IGxhdy4gIFR5cGUgInNo
+b3cgY29weWluZyIKYW5kICJzaG93IHdhcnJhbnR5IiBmb3IgZGV0YWlscy4KVGhpcyBHREIg
+d2FzIGNvbmZpZ3VyZWQgYXMgImk2ODYtcGMtbGludXgtZ251Ii4KRm9yIGJ1ZyByZXBvcnRp
+bmcgaW5zdHJ1Y3Rpb25zLCBwbGVhc2Ugc2VlOgo8aHR0cDovL3d3dy5nbnUub3JnL3NvZnR3
+YXJlL2dkYi9idWdzLz4uLi4KUmVhZGluZyBzeW1ib2xzIGZyb20gLy5zbmFwc2hvdHMvcGVy
+c2lzdC9idWlsZHMvYmx1ZXotZGVidWcvc3JjL3NyYy9ibHVlei00Ljc2L3NyYy8ubGlicy9i
+bHVldG9vdGhkLi4uKG5vIGRlYnVnZ2luZyBzeW1ib2xzIGZvdW5kKS4uLmRvbmUuCihnZGIp
+IHIKU3RhcnRpbmcgcHJvZ3JhbTogLy5zbmFwc2hvdHMvcGVyc2lzdC9idWlsZHMvYmx1ZXot
+ZGVidWcvc3JjL3NyYy9ibHVlei00Ljc2L3NyYy8ubGlicy9ibHVldG9vdGhkIC1uCltUaHJl
+YWQgZGVidWdnaW5nIHVzaW5nIGxpYnRocmVhZF9kYiBlbmFibGVkXQpibHVldG9vdGhkWzIw
+NTYxXTogQmx1ZXRvb3RoIGRlYW1vbiA0Ljc2CmJsdWV0b290aGRbMjA1NjFdOiBTdGFydGlu
+ZyBTRFAgc2VydmVyCmJsdWV0b290aGRbMjA1NjFdOiBIQ0kgZGV2IDAgcmVnaXN0ZXJlZApi
+bHVldG9vdGhkWzIwNTYxXTogSENJIGRldiAwIHVwCmJsdWV0b290aGRbMjA1NjFdOiBTdGFy
+dGluZyBzZWN1cml0eSBtYW5hZ2VyIDAKYmx1ZXRvb3RoZFsyMDU2MV06IENsZWFyaW5nIGJs
+b2NrZWQgbGlzdCBmYWlsZWQ6IEludmFsaWQgYXJndW1lbnQgKDIyKQpibHVldG9vdGhkWzIw
+NTYxXTogcHJvYmUgZmFpbGVkIHdpdGggZHJpdmVyIGlucHV0LWhlYWRzZXQgZm9yIGRldmlj
+ZSAvb3JnL2JsdWV6LzIwNTYxL2hjaTAvZGV2XzAwXzFCXzk4X0EzX0E1XzJCCmJsdWV0b290
+aGRbMjA1NjFdOiBwcm9iZSBmYWlsZWQgd2l0aCBkcml2ZXIgaW5wdXQtaGVhZHNldCBmb3Ig
+ZGV2aWNlIC9vcmcvYmx1ZXovMjA1NjEvaGNpMC9kZXZfMDBfMURfNkVfNEZfNTRfRUEKYmx1
+ZXRvb3RoZFsyMDU2MV06IHByb2JlIGZhaWxlZCB3aXRoIGRyaXZlciBpbnB1dC1oZWFkc2V0
+IGZvciBkZXZpY2UgL29yZy9ibHVlei8yMDU2MS9oY2kwL2Rldl9BOF83RV8zM19EN18yOV9E
+QgpibHVldG9vdGhkWzIwNTYxXTogQWRhcHRlciAvb3JnL2JsdWV6LzIwNTYxL2hjaTAgaGFz
+IGJlZW4gZW5hYmxlZApibHVldG9vdGhkWzIwNTYxXTogSW5xdWlyeSBGYWlsZWQgd2l0aCBz
+dGF0dXMgMHgxMgpeQwpQcm9ncmFtIHJlY2VpdmVkIHNpZ25hbCBTSUdJTlQsIEludGVycnVw
+dC4KMHhiN2Y3MzQyNCBpbiBfX2tlcm5lbF92c3lzY2FsbCAoKQooZ2RiKSBiIGRidXNfbWVz
+c2FnZV9pdGVyX2FwcGVuZF9iYXNpYwpCcmVha3BvaW50IDEgYXQgMHhiN2U0ZTYxNgooZ2Ri
+KSBjCkNvbnRpbnVpbmcuCgo9PT09PT09PT09PT09PT09PT09PQpoZXJlIGkgc3RhcnQgYW5v
+dGhlciBwcm9ncmFtCj09PT09PT09PT09PT09PT09PT09CgpCcmVha3BvaW50IDEsIDB4Yjdl
+NGU2MTYgaW4gZGJ1c19tZXNzYWdlX2l0ZXJfYXBwZW5kX2Jhc2ljICgpIGZyb20gL3Vzci9s
+aWIvbGliZGJ1cy0xLnNvLjMKKGdkYikgYyA2CldpbGwgaWdub3JlIG5leHQgNSBjcm9zc2lu
+Z3Mgb2YgYnJlYWtwb2ludCAxLiAgQ29udGludWluZy4KCkJyZWFrcG9pbnQgMSwgMHhiN2U0
+ZTYxNiBpbiBkYnVzX21lc3NhZ2VfaXRlcl9hcHBlbmRfYmFzaWMgKCkgZnJvbSAvdXNyL2xp
+Yi9saWJkYnVzLTEuc28uMwooZ2RiKSBjCkNvbnRpbnVpbmcuCgpQcm9ncmFtIHJlY2VpdmVk
+IHNpZ25hbCBTSUdTRUdWLCBTZWdtZW50YXRpb24gZmF1bHQuCjB4YjdkM2U2NTMgaW4gc3Ry
+bGVuICgpIGZyb20gL2xpYi9saWJjLnNvLjYKKGdkYikgYnQKIzAgIDB4YjdkM2U2NTMgaW4g
+c3RybGVuICgpIGZyb20gL2xpYi9saWJjLnNvLjYKIzEgIDB4YjdlNWViMTAgaW4gPz8gKCkg
+ZnJvbSAvdXNyL2xpYi9saWJkYnVzLTEuc28uMwojMiAgMHhiN2U0YTM0YiBpbiA/PyAoKSBm
+cm9tIC91c3IvbGliL2xpYmRidXMtMS5zby4zCiMzICAweGI3ZTRlN2E5IGluIGRidXNfbWVz
+c2FnZV9pdGVyX2FwcGVuZF9iYXNpYyAoKSBmcm9tIC91c3IvbGliL2xpYmRidXMtMS5zby4z
+CiM0ICAweGI3ZmVmMDNkIGluIGFwcGVuZF9hcnJheV92YXJpYW50ICgpCiM1ICAweGI3ZmVm
+Nzk5IGluIGVtaXRfYXJyYXlfcHJvcGVydHlfY2hhbmdlZCAoKQojNiAgMHhiN2ZlNGRlNCBp
+biBhZGFwdGVyX3NlcnZpY2VfaW5zX3JlbSAoKQojNyAgMHhiN2ZkN2ZiMSBpbiBzZHBfcmVj
+b3JkX2FkZCAoKQojOCAgMHhiN2ZkNzlkZSBpbiBzZXJ2aWNlX3JlZ2lzdGVyX3JlcSAoKQoj
+OSAgMHhiN2ZkNWRmYyBpbiBoYW5kbGVfcmVxdWVzdCAoKQojMTAgMHhiN2ZkNDk2ZSBpbiBp
+b19zZXNzaW9uX2V2ZW50ICgpCiMxMSAweGI3ZWY3YTJiIGluID8/ICgpIGZyb20gL3Vzci9s
+aWIvbGliZ2xpYi0yLjAuc28uMAojMTIgMHhiN2ViMGI3MiBpbiBnX21haW5fY29udGV4dF9k
+aXNwYXRjaCAoKSBmcm9tIC91c3IvbGliL2xpYmdsaWItMi4wLnNvLjAKIzEzIDB4YjdlYjEz
+NTAgaW4gPz8gKCkgZnJvbSAvdXNyL2xpYi9saWJnbGliLTIuMC5zby4wCiMxNCAweGI3ZWIx
+YTFiIGluIGdfbWFpbl9sb29wX3J1biAoKSBmcm9tIC91c3IvbGliL2xpYmdsaWItMi4wLnNv
+LjAKIzE1IDB4YjdmZDFiYmQgaW4gbWFpbiAoKQooZ2RiKSAKCg==
+------------B103254142A6E8--
+
