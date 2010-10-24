@@ -1,39 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20101022171825.GA980@vigoh>
-References: <1287714419-13545-1-git-send-email-haijun.liu@atheros.com> <20101022171825.GA980@vigoh>
-From: haijun liu <liuhaijun.er@gmail.com>
-Date: Mon, 25 Oct 2010 09:35:33 +0800
-Message-ID: <AANLkTi=C5biCuJV335yfNWkY77xK29aa5JQ+9xvaE1yr@mail.gmail.com>
-Subject: Re: [PATCH 1/2 v2] Bluetooth: Fix system crash caused by del_timer()
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: Haijun Liu <haijun.liu@atheros.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: (Health) ChannelConnected signal when MDL aborted?
+Mime-Version: 1.0 (Apple Message framework v1081)
+Content-Type: text/plain; charset=us-ascii
+From: =?iso-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
+In-Reply-To: <AANLkTikLByb4qKBJP_iBUw2H0EqLo1MA9bttLwBO9s-u@mail.gmail.com>
+Date: Sun, 24 Oct 2010 16:44:04 -0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <5AA6D2CA-9EE2-49EC-BBE0-F1185DE42BF5@signove.com>
+References: <295EA951-2357-4B6B-B558-0B3F1D6FFDD9@signove.com> <AANLkTi=65C7HQXQW1Bqbgf4sNY3wbV2CzqoENBc-b04g@mail.gmail.com> <4B999390-7FFB-4B90-98BA-D9F9C17771F5@signove.com> <AANLkTikLByb4qKBJP_iBUw2H0EqLo1MA9bttLwBO9s-u@mail.gmail.com>
+To: Santiago Carot <sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
 
->> During test session with another vendor's bt stack, found that in
->> l2cap_chan_del() using del_timer() caused l2cap_monitor_timeout()
->> be called after the sock was freed, so it raised a system crash.
->> So I just replaced del_timer() with del_timer_sync() to solve it.
->
-> NAK on this. If you read the del_timer_sync() documentation you can
-> see that you can't call del_timer_sync() on interrupt context. The
-> possible solution here is to check in the beginning of
-> l2cap_monitor_timeout() if your sock is still valid.
->
+> sure?
+> Then you should think what happen with the First reliable data channel
+> in case that you are running multiples IEEE specializations over the
+> same HDP instance (that is pretty common in IEEE level). Remember that
+> the First Relible data channel is used for IEEE association and
+> confirmed event traffic. If you dont allow use that channel by other
+> application it won't associate with the other device at IEEE layer.
+> Please, think that with current HDP implementation you can develop
+> IEEE agent specializations too, not only managers.
 
-You are right, I only considered close() interface, so missed the interrupt
-context.
-
-It's very difficult to check sock valid or not in timeout procedure, since it's
-an interrupt context, and only can get context from parameter pre-stored,
-except global variables.
-
-Let's think about it and come up a good solution for this situation.
-
--- 
-Haijun Liu
+Ok, I think I see your point now. Thanks for the patience :)
