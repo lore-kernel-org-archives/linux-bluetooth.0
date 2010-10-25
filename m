@@ -1,36 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <AANLkTin8pUACCu4YYuhLpFB7DxCfsYhN3cOpYYaVcTQ6@mail.gmail.com>
-References: <AANLkTin8pUACCu4YYuhLpFB7DxCfsYhN3cOpYYaVcTQ6@mail.gmail.com>
-Date: Mon, 25 Oct 2010 09:34:52 -0400
-Message-ID: <AANLkTikXg0gX8BwujjzR4b_yuN1GTe-+oQPcFYbZR1O7@mail.gmail.com>
-Subject: Re: [RFC] LE connections and advertising management
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: =?UTF-8?q?Elvis=20Pf=C3=BCtzenreuter?= <epx@signove.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: epx@signove.com
+Subject: [PATCH 1/1] Fix fd comparison and comment
+Date: Mon, 25 Oct 2010 11:29:12 -0200
+Message-Id: <1288013352-23258-1-git-send-email-epx@signove.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Oct 25, 2010 at 8:53 AM, Claudio Takahasi
-<claudio.takahasi@openbossa.org> wrote:
-> 4. Kernel manages the connection establishment, currently there isn't
-> a  way to change the connection parameters. BMI or ioctls will be
-> required to change the default parameters and also to trigger SMP
-> negotiation.
+---
+ health/hdp.c       |    6 +++---
+ health/mcap_sync.c |    2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-Another idea would be to use setsockopt(), like it's currently being
-used for HCI filters (see lib/hci.c). E.g.:
-
-hci_filter_clear(&nf);
-hci_filter_set_ptype(HCI_EVENT_PKT, &nf);
-hci_filter_set_event(EVT_LE_META_EVENT, &nf);
-setsockopt(dd, SOL_HCI, HCI_FILTER, &nf, sizeof(nf);
-
-Not sure if the SMP negotiation happens too soon to use it though.
-
-Regards,
+diff --git a/health/hdp.c b/health/hdp.c
+index fd3b1ca..7332cd5 100644
+--- a/health/hdp.c
++++ b/health/hdp.c
+@@ -339,7 +339,7 @@ static DBusMessage *manager_create_application(DBusConnection *conn,
+ 					"Can't get sender name");
+ 	}
+ 
+-	if (!set_app_path(app)){
++	if (!set_app_path(app)) {
+ 		free_application(app);
+ 		return g_dbus_create_error(msg,
+ 				ERROR_INTERFACE ".HealthError",
+@@ -477,7 +477,7 @@ static void hdp_mdl_reconn_cb(struct mcap_mdl *mdl, GError *err, gpointer data)
+ 	}
+ 
+ 	fd = mcap_mdl_get_fd(dc_data->hdp_chann->mdl);
+-	if (fd <= 0)
++	if (fd < 0)
+ 		reply = g_dbus_create_error(dc_data->msg,
+ 						ERROR_INTERFACE ".HealthError",
+ 						"Cannot get file descriptor");
+@@ -568,7 +568,7 @@ static DBusMessage *channel_acquire_continue(struct hdp_tmp_dc_data *data,
+ 	}
+ 
+ 	fd = mcap_mdl_get_fd(data->hdp_chann->mdl);
+-	if (fd > 0)
++	if (fd >= 0)
+ 		return g_dbus_create_reply(data->msg, DBUS_TYPE_UNIX_FD, &fd,
+ 							DBUS_TYPE_INVALID);
+ 
+diff --git a/health/mcap_sync.c b/health/mcap_sync.c
+index 49661a7..57ba0fd 100644
+--- a/health/mcap_sync.c
++++ b/health/mcap_sync.c
+@@ -350,7 +350,7 @@ static gboolean initialize_caps(struct mcap_mcl *mcl)
+ 	clock_gettime(CLK, &t1);
+ 	read_btclock_retry(mcl, &btclock, &btaccuracy);
+ 
+-	/* Do clock read a number of times and measure latency */
++	/* Read clock a number of times and measure latency */
+ 	avg = 0;
+ 	i = 0;
+ 	retries = MAX_RETRIES;
 -- 
-Anderson Lizardo
-OpenBossa Labs - INdT
-Manaus - Brazil
+1.7.0.4
+
