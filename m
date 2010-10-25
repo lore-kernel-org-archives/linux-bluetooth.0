@@ -1,47 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 25 Oct 2010 09:01:31 -0200
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: haijun liu <liuhaijun.er@gmail.com>
-Cc: Haijun Liu <haijun.liu@atheros.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2 v2] Bluetooth: Fix system crash caused by
- del_timer()
-Message-ID: <20101025110131.GA7721@vigoh>
-References: <1287714419-13545-1-git-send-email-haijun.liu@atheros.com>
- <20101022171825.GA980@vigoh>
- <AANLkTi=C5biCuJV335yfNWkY77xK29aa5JQ+9xvaE1yr@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTi=C5biCuJV335yfNWkY77xK29aa5JQ+9xvaE1yr@mail.gmail.com>
+From: Rafal Michalski <michalski.raf@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Rafal Michalski <michalski.raf@gmail.com>
+Subject: [PATCH] Provide extra query for vCard single call
+Date: Mon, 25 Oct 2010 11:04:58 +0200
+Message-Id: <1287997498-2576-1-git-send-email-michalski.raf@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Haijun,
+This patch makes that additional circumstance is recognized - after
+making a call with number that is out of phonebook it can be downloaded
+as a single vCard containing number with OTHER type.
+---
+ plugins/phonebook-tracker.c |   20 ++++++++++++++++++--
+ 1 files changed, 18 insertions(+), 2 deletions(-)
 
-* haijun liu <liuhaijun.er@gmail.com> [2010-10-25 09:35:33 +0800]:
-
-> Hi Gustavo,
-> 
-> >> During test session with another vendor's bt stack, found that in
-> >> l2cap_chan_del() using del_timer() caused l2cap_monitor_timeout()
-> >> be called after the sock was freed, so it raised a system crash.
-> >> So I just replaced del_timer() with del_timer_sync() to solve it.
-> >
-> > NAK on this. If you read the del_timer_sync() documentation you can
-> > see that you can't call del_timer_sync() on interrupt context. The
-> > possible solution here is to check in the beginning of
-> > l2cap_monitor_timeout() if your sock is still valid.
-> >
-> 
-> You are right, I only considered close() interface, so missed the interrupt
-> context.
-> 
-> It's very difficult to check sock valid or not in timeout procedure, since it's
-> an interrupt context, and only can get context from parameter pre-stored,
-> except global variables.
-
-I think you can check for sk == null there.
-
+diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
+index 1c579d1..f25708a 100644
+--- a/plugins/phonebook-tracker.c
++++ b/plugins/phonebook-tracker.c
+@@ -55,6 +55,7 @@
+ #define COL_SENT 36
+ #define COL_ANSWERED 37
+ #define ADDR_FIELD_AMOUNT 7
++#define CONTACT_ID_PREFIX "contact:"
+ 
+ #define CONTACTS_QUERY_ALL						\
+ 	"SELECT ?v nco:fullname(?c) "					\
+@@ -569,6 +570,16 @@
+ 	"} "								\
+ 	"}"
+ 
++#define CONTACTS_OTHER_QUERY_FROM_URI					\
++	"SELECT \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" "\
++	"\"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" "	\
++	"\"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" "	\
++	"nco:phoneNumber(?t) \"NOTACALL\" \"false\" \"false\" <%s> "	\
++	"WHERE { "							\
++		"<%s> a nco:Contact . "					\
++		"<%s> nco:hasPhoneNumber ?t . "				\
++	"} "
++
+ typedef void (*reply_list_foreach_t) (char **reply, int num_fields,
+ 		void *user_data);
+ 
+@@ -1305,9 +1316,14 @@ int phonebook_get_entry(const char *folder, const char *id,
+ 	data->cb = cb;
+ 	data->vcardentry = TRUE;
+ 
+-	query = g_strdup_printf(CONTACTS_QUERY_FROM_URI, id, id, id, id, id,
+-						id, id, id, id, id, id, id,
++	if (strncmp(id, CONTACT_ID_PREFIX, strlen(CONTACT_ID_PREFIX)) == 0) {
++		query = g_strdup_printf(CONTACTS_QUERY_FROM_URI, id, id, id, id,
++						id, id, id, id, id, id, id, id,
+ 						id, id, id, id, id);
++	} else {
++		query = g_strdup_printf(CONTACTS_OTHER_QUERY_FROM_URI,
++								id, id, id);
++	}
+ 
+ 	ret = query_tracker(query, PULL_QUERY_COL_AMOUNT, pull_contacts, data);
+ 
 -- 
-Gustavo F. Padovan
-ProFUSION embedded systems - http://profusion.mobi
+1.6.3.3
+
