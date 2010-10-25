@@ -1,55 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Brian Redding" <bredding@codeaurora.org>
+To: "'Claudio Takahasi'" <claudio.takahasi@openbossa.org>
+Cc: "'BlueZ development'" <linux-bluetooth@vger.kernel.org>
+References: <AANLkTin8pUACCu4YYuhLpFB7DxCfsYhN3cOpYYaVcTQ6@mail.gmail.com>	<35B17FE5076C7040809188FBE7913F983F844057B9@SC1EXMB-MBCL.global.atheros.com>	<AANLkTinS-NhD3FhqcnpNRRdHKxn4mm+2zTmysrSeSjW8@mail.gmail.com>	<35B17FE5076C7040809188FBE7913F983F8440581D@SC1EXMB-MBCL.global.atheros.com> <AANLkTinnjXuAOBTY8VZz756VdrDFv0-OVKPNkwWbxi9-@mail.gmail.com>
+In-Reply-To: <AANLkTinnjXuAOBTY8VZz756VdrDFv0-OVKPNkwWbxi9-@mail.gmail.com>
+Subject: RE: [RFC] LE connections and advertising management
+Date: Mon, 25 Oct 2010 14:27:11 -0500
+Message-ID: <000001cb747a$9fd61270$df823750$@org>
 MIME-Version: 1.0
-In-Reply-To: <1288009280-5149-3-git-send-email-ville.tervo@nokia.com>
-References: <1288009280-5149-1-git-send-email-ville.tervo@nokia.com>
-	<1288009280-5149-3-git-send-email-ville.tervo@nokia.com>
-Date: Mon, 25 Oct 2010 16:33:05 -0400
-Message-ID: <AANLkTi=3VB-q-H6vcTAMAC1hYdYVJiF9wVOBKchYEktt@mail.gmail.com>
-Subject: Re: [PATCH 2/6] Bluetooth: Add LE connect support
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Ville Tervo <ville.tervo@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain;
+	charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
 
-On Mon, Oct 25, 2010 at 8:21 AM, Ville Tervo <ville.tervo@nokia.com> wrote:
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 0b1e460..0944c0c 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -45,6 +45,32 @@
->  #include <net/bluetooth/bluetooth.h>
->  #include <net/bluetooth/hci_core.h>
->
-> +void hci_le_connect(struct hci_conn *conn)
+> GAttrib will not be exposed to the UI. UI needs to access BlueZ GATT
+> clients services using D-Bus.
+> GATT clients in general will have two pieces:
+> 1- UI: Qt, GTK, python, ...
+> 2- "module" in the BlueZ for profile specific tasks and D-Bus service
+> interface.
 
-This function could be made static, right? (just noticed this now)
+> You can find the current attribute API in the file: doc/attribute-api.txt
 
-> +{
-> +       struct hci_dev *hdev = conn->hdev;
-> +       struct hci_cp_le_create_conn cp;
-> +
-> +       conn->state = BT_CONNECT;
-> +       conn->out = 1;
-> +
-> +       memset(&cp, 0, sizeof(cp));
-> +       cp.scan_interval = cpu_to_le16(0x0004);
-> +       cp.scan_window = cpu_to_le16(0x0004);
-> +       bacpy(&cp.peer_addr, &conn->dst);
-> +       cp.conn_interval_min = cpu_to_le16(0x0008);
-> +       cp.conn_interval_max = cpu_to_le16(0x0100);
-> +       cp.supervision_timeout = cpu_to_le16(0x0064);
-> +       cp.min_ce_len = cpu_to_le16(0x0001);
-> +       cp.max_ce_len = cpu_to_le16(0x0001);
-> +
-> +       hci_send_cmd(hdev, HCI_OP_LE_CREATE_CONN, sizeof(cp), &cp);
-> +}
+> Claudio
 
-Regards,
--- 
-Anderson Lizardo
-OpenBossa Labs - INdT
-Manaus - Brazil
+Hi Claudio,
+
+Are there still interfaces that need to be added to attribute-api.txt to handle client and server characteristic configuration as well as presentation and aggregate formats?  I see those as TODO items but wondered if the APIs for them have been defined yet.
+
+One thing to note on the server API is that a GATT-based profile could specify behavior on a characteristic value that when the characteristic value is read to perform some action in a similar way as a hardware register.  It appears that the notes I'm reading in the code thus far only consider changes (or writes) to characteristic values for the watch code.
+
+Also does the current API handle included services?
+
+The Bluetooth SIG is beginning to look at 3rd party application developer API's for both client and servers for various platforms so understanding what is currently defined in BlueZ and what still needs to be added would be useful.
+
+Thanks,
+Brian
+---
+Brian A. Redding
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+
+
