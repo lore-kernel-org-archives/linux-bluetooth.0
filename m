@@ -1,66 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Rafal Michalski <michalski.raf@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Rafal Michalski <michalski.raf@gmail.com>
-Subject: [PATCH] Provide extra query for vCard single call
-Date: Mon, 25 Oct 2010 11:04:58 +0200
-Message-Id: <1287997498-2576-1-git-send-email-michalski.raf@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <5AA6D2CA-9EE2-49EC-BBE0-F1185DE42BF5@signove.com>
+References: <295EA951-2357-4B6B-B558-0B3F1D6FFDD9@signove.com>
+	<AANLkTi=65C7HQXQW1Bqbgf4sNY3wbV2CzqoENBc-b04g@mail.gmail.com>
+	<4B999390-7FFB-4B90-98BA-D9F9C17771F5@signove.com>
+	<AANLkTikLByb4qKBJP_iBUw2H0EqLo1MA9bttLwBO9s-u@mail.gmail.com>
+	<5AA6D2CA-9EE2-49EC-BBE0-F1185DE42BF5@signove.com>
+Date: Mon, 25 Oct 2010 09:26:41 +0200
+Message-ID: <AANLkTikYY85G59-HC4824oYK9u6zJkjFGAP9YqOH8oJW@mail.gmail.com>
+Subject: Re: (Health) ChannelConnected signal when MDL aborted?
+From: Santiago Carot <sancane@gmail.com>
+To: =?ISO-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch makes that additional circumstance is recognized - after
-making a call with number that is out of phonebook it can be downloaded
-as a single vCard containing number with OTHER type.
----
- plugins/phonebook-tracker.c |   20 ++++++++++++++++++--
- 1 files changed, 18 insertions(+), 2 deletions(-)
+Hello Elvis,
 
-diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index 1c579d1..f25708a 100644
---- a/plugins/phonebook-tracker.c
-+++ b/plugins/phonebook-tracker.c
-@@ -55,6 +55,7 @@
- #define COL_SENT 36
- #define COL_ANSWERED 37
- #define ADDR_FIELD_AMOUNT 7
-+#define CONTACT_ID_PREFIX "contact:"
- 
- #define CONTACTS_QUERY_ALL						\
- 	"SELECT ?v nco:fullname(?c) "					\
-@@ -569,6 +570,16 @@
- 	"} "								\
- 	"}"
- 
-+#define CONTACTS_OTHER_QUERY_FROM_URI					\
-+	"SELECT \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" "\
-+	"\"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" "	\
-+	"\"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" "	\
-+	"nco:phoneNumber(?t) \"NOTACALL\" \"false\" \"false\" <%s> "	\
-+	"WHERE { "							\
-+		"<%s> a nco:Contact . "					\
-+		"<%s> nco:hasPhoneNumber ?t . "				\
-+	"} "
-+
- typedef void (*reply_list_foreach_t) (char **reply, int num_fields,
- 		void *user_data);
- 
-@@ -1305,9 +1316,14 @@ int phonebook_get_entry(const char *folder, const char *id,
- 	data->cb = cb;
- 	data->vcardentry = TRUE;
- 
--	query = g_strdup_printf(CONTACTS_QUERY_FROM_URI, id, id, id, id, id,
--						id, id, id, id, id, id, id,
-+	if (strncmp(id, CONTACT_ID_PREFIX, strlen(CONTACT_ID_PREFIX)) == 0) {
-+		query = g_strdup_printf(CONTACTS_QUERY_FROM_URI, id, id, id, id,
-+						id, id, id, id, id, id, id, id,
- 						id, id, id, id, id);
-+	} else {
-+		query = g_strdup_printf(CONTACTS_OTHER_QUERY_FROM_URI,
-+								id, id, id);
-+	}
- 
- 	ret = query_tracker(query, PULL_QUERY_COL_AMOUNT, pull_contacts, data);
- 
--- 
-1.6.3.3
+2010/10/24 Elvis Pfützenreuter <epx@signove.com>:
+>
+>> sure?
+>> Then you should think what happen with the First reliable data channel
+>> in case that you are running multiples IEEE specializations over the
+>> same HDP instance (that is pretty common in IEEE level). Remember that
+>> the First Relible data channel is used for IEEE association and
+>> confirmed event traffic. If you dont allow use that channel by other
+>> application it won't associate with the other device at IEEE layer.
+>> Please, think that with current HDP implementation you can develop
+>> IEEE agent specializations too, not only managers.
+>
+> Ok, I think I see your point now. Thanks for the patience :)
+>
 
+Don't worry. comments are welcome, in any case, If you have more
+doubts, please don't hesitate in contact with me, we can talk more
+about that and others issues in IRC, the only problem may be the time
+difference ;)
+
+Regards
