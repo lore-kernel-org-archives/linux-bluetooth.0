@@ -1,26 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 25 Oct 2010 12:22:00 -0400
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Elvis =?iso-8859-1?Q?Pf=FCtzenreuter?= <epx@signove.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/1] Fix fd comparison and comment
-Message-ID: <20101025162200.GA13537@jh-x301>
-References: <1288013352-23258-1-git-send-email-epx@signove.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1288013352-23258-1-git-send-email-epx@signove.com>
+From: Santiago Carot-Nemesio <sancane@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Santiago Carot-Nemesio <sancane@gmail.com>
+Subject: [PATCH] Send a proper configuration when a source doesn't have a first reliable
+Date: Mon, 25 Oct 2010 15:43:59 +0200
+Message-Id: <1288014239-10832-1-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Elvis,
+---
+ health/hdp.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-On Mon, Oct 25, 2010, Elvis Pfützenreuter wrote:
-> ---
->  health/hdp.c       |    6 +++---
->  health/mcap_sync.c |    2 +-
->  2 files changed, 4 insertions(+), 4 deletions(-)
+diff --git a/health/hdp.c b/health/hdp.c
+index fd3b1ca..10f4c5f 100644
+--- a/health/hdp.c
++++ b/health/hdp.c
+@@ -1026,7 +1026,7 @@ static uint8_t hdp_mcap_mdl_conn_req_cb(struct mcap_mcl *mcl, uint8_t mdepid,
+ 	case HDP_NO_PREFERENCE_DC:
+ 		if (app->role == HDP_SINK)
+ 			return MCAP_CONFIGURATION_REJECTED;
+-		else if (app->chan_type_set)
++		else if (dev->fr && app->chan_type_set)
+ 			*conf = app->chan_type;
+ 		else
+ 			*conf = HDP_RELIABLE_DC;
+-- 
+1.7.3.1
 
-Please don't mix coding style cleanup and real bug fixes into a single
-patch. I.e. could you please split these up. Thanks.
-
-Johan
