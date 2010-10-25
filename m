@@ -2,303 +2,135 @@ Return-Path: <cyrus@holtmann.org>
 From: Ville Tervo <ville.tervo@nokia.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ville Tervo <ville.tervo@nokia.com>
-Subject: [PATCH 2/6] Bluetooth: Add LE connect support
-Date: Mon, 25 Oct 2010 15:21:16 +0300
-Message-Id: <1288009280-5149-3-git-send-email-ville.tervo@nokia.com>
+Subject: [PATCH 4/6] Bluetooth: Add LE connection support to L2CAP
+Date: Mon, 25 Oct 2010 15:21:18 +0300
+Message-Id: <1288009280-5149-5-git-send-email-ville.tervo@nokia.com>
 In-Reply-To: <1288009280-5149-1-git-send-email-ville.tervo@nokia.com>
 References: <1288009280-5149-1-git-send-email-ville.tervo@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Bluetooth V4.0 adds support for Low Energy (LE)
-connections. Specification introduses new set
-of hci commands to control LE connection.
-This patch adds logic to create, cancel and
-disconnect LE connections
+Add basic LE connection support to L2CAP. LE
+connection can be created by specifying cid
+in struct sockaddr_l2
 
 Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
 ---
- include/net/bluetooth/hci.h      |    2 +
- include/net/bluetooth/hci_core.h |   25 +++++++++--
- net/bluetooth/hci_conn.c         |   51 +++++++++++++++++++-
- net/bluetooth/hci_event.c        |   93 ++++++++++++++++++++++++++++++++++++++
- 4 files changed, 164 insertions(+), 7 deletions(-)
+ include/net/bluetooth/l2cap.h |    3 +++
+ net/bluetooth/l2cap.c         |   32 ++++++++++++++++++++++++--------
+ 2 files changed, 27 insertions(+), 8 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index ee5beec..02055b9 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -159,6 +159,8 @@ enum {
- #define SCO_LINK	0x00
- #define ACL_LINK	0x01
- #define ESCO_LINK	0x02
-+/* Low Energy links do not have defined link type. Use invented one */
-+#define LE_LINK		0x80
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index c819c8b..cc3a140 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -160,6 +160,9 @@ struct l2cap_conn_rsp {
+ /* channel indentifier */
+ #define L2CAP_CID_SIGNALING	0x0001
+ #define L2CAP_CID_CONN_LESS	0x0002
++#define L2CAP_CID_LE_DATA	0x0004
++#define L2CAP_CID_LE_SIGNALING	0x0005
++#define L2CAP_CID_SMP		0x0006
+ #define L2CAP_CID_DYN_START	0x0040
+ #define L2CAP_CID_DYN_END	0xffff
  
- /* LMP features */
- #define LMP_3SLOT	0x01
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index ebec8c9..2b7f94a 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -60,6 +60,7 @@ struct hci_conn_hash {
- 	spinlock_t       lock;
- 	unsigned int     acl_num;
- 	unsigned int     sco_num;
-+	unsigned int     le_num;
- };
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index 6f931cc..18643af 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -617,6 +617,12 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
+ 	for (sk = l->head; sk; sk = l2cap_pi(sk)->next_c) {
+ 		bh_lock_sock(sk);
  
- struct bdaddr_list {
-@@ -272,20 +273,36 @@ static inline void hci_conn_hash_add(struct hci_dev *hdev, struct hci_conn *c)
- {
- 	struct hci_conn_hash *h = &hdev->conn_hash;
- 	list_add(&c->list, &h->list);
--	if (c->type == ACL_LINK)
-+	switch (c->type) {
-+	case ACL_LINK:
- 		h->acl_num++;
--	else
-+		break;
-+	case LE_LINK:
-+		h->le_num++;
-+		break;
-+	case SCO_LINK:
-+	case ESCO_LINK:
- 		h->sco_num++;
-+		break;
-+	}
- }
- 
- static inline void hci_conn_hash_del(struct hci_dev *hdev, struct hci_conn *c)
- {
- 	struct hci_conn_hash *h = &hdev->conn_hash;
- 	list_del(&c->list);
--	if (c->type == ACL_LINK)
-+	switch (c->type) {
-+	case ACL_LINK:
- 		h->acl_num--;
--	else
-+		break;
-+	case LE_LINK:
-+		h->le_num--;
-+		break;
-+	case SCO_LINK:
-+	case ESCO_LINK:
- 		h->sco_num--;
-+		break;
-+	}
- }
- 
- static inline struct hci_conn *hci_conn_hash_lookup_handle(struct hci_dev *hdev,
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 0b1e460..0944c0c 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -45,6 +45,32 @@
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
- 
-+void hci_le_connect(struct hci_conn *conn)
-+{
-+	struct hci_dev *hdev = conn->hdev;
-+	struct hci_cp_le_create_conn cp;
-+
-+	conn->state = BT_CONNECT;
-+	conn->out = 1;
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp.scan_interval = cpu_to_le16(0x0004);
-+	cp.scan_window = cpu_to_le16(0x0004);
-+	bacpy(&cp.peer_addr, &conn->dst);
-+	cp.conn_interval_min = cpu_to_le16(0x0008);
-+	cp.conn_interval_max = cpu_to_le16(0x0100);
-+	cp.supervision_timeout = cpu_to_le16(0x0064);
-+	cp.min_ce_len = cpu_to_le16(0x0001);
-+	cp.max_ce_len = cpu_to_le16(0x0001);
-+
-+	hci_send_cmd(hdev, HCI_OP_LE_CREATE_CONN, sizeof(cp), &cp);
-+}
-+
-+static void hci_le_connect_cancel(struct hci_conn *conn)
-+{
-+	hci_send_cmd(conn->hdev, HCI_OP_LE_CREATE_CONN_CANCEL, 0, NULL);
-+}
-+
- void hci_acl_connect(struct hci_conn *conn)
- {
- 	struct hci_dev *hdev = conn->hdev;
-@@ -192,8 +218,12 @@ static void hci_conn_timeout(unsigned long arg)
- 	switch (conn->state) {
- 	case BT_CONNECT:
- 	case BT_CONNECT2:
--		if (conn->type == ACL_LINK && conn->out)
--			hci_acl_connect_cancel(conn);
-+		if (conn->out) {
-+			if (conn->type == ACL_LINK)
-+				hci_acl_connect_cancel(conn);
-+			else if (conn->type == LE_LINK)
-+				hci_le_connect_cancel(conn);
++		if (conn->hcon->type == LE_LINK) {
++			l2cap_sock_clear_timer(sk);
++			sk->sk_state = BT_CONNECTED;
++			sk->sk_state_change(sk);
 +		}
- 		break;
- 	case BT_CONFIG:
- 	case BT_CONNECTED:
-@@ -359,15 +389,30 @@ struct hci_dev *hci_get_route(bdaddr_t *dst, bdaddr_t *src)
- }
- EXPORT_SYMBOL(hci_get_route);
++
+ 		if (sk->sk_type != SOCK_SEQPACKET &&
+ 				sk->sk_type != SOCK_STREAM) {
+ 			l2cap_sock_clear_timer(sk);
+@@ -675,7 +681,11 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
  
--/* Create SCO or ACL connection.
-+/* Create SCO, ACL or LE connection.
-  * Device _must_ be locked */
- struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8 sec_level, __u8 auth_type)
+ 	BT_DBG("hcon %p conn %p", hcon, conn);
+ 
+-	conn->mtu = hcon->hdev->acl_mtu;
++	if (hcon->hdev->le_mtu && hcon->type == LE_LINK)
++		conn->mtu = hcon->hdev->le_mtu;
++	else
++		conn->mtu = hcon->hdev->acl_mtu;
++
+ 	conn->src = &hcon->hdev->bdaddr;
+ 	conn->dst = &hcon->dst;
+ 
+@@ -1102,8 +1112,13 @@ static int l2cap_do_connect(struct sock *sk)
+ 		}
+ 	}
+ 
+-	hcon = hci_connect(hdev, ACL_LINK, dst,
++	if (l2cap_pi(sk)->dcid == L2CAP_CID_LE_DATA)
++		hcon = hci_connect(hdev, LE_LINK, dst,
++					l2cap_pi(sk)->sec_level, auth_type);
++	else
++		hcon = hci_connect(hdev, ACL_LINK, dst,
+ 					l2cap_pi(sk)->sec_level, auth_type);
++
+ 	if (!hcon)
+ 		goto done;
+ 
+@@ -1154,13 +1169,13 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
+ 	len = min_t(unsigned int, sizeof(la), alen);
+ 	memcpy(&la, addr, len);
+ 
+-	if (la.l2_cid)
++	if (la.l2_cid && la.l2_psm)
+ 		return -EINVAL;
+ 
+ 	lock_sock(sk);
+ 
+ 	if ((sk->sk_type == SOCK_SEQPACKET || sk->sk_type == SOCK_STREAM)
+-			&& !la.l2_psm) {
++			&& !(la.l2_psm || la.l2_cid)) {
+ 		err = -EINVAL;
+ 		goto done;
+ 	}
+@@ -1202,14 +1217,15 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
+ 
+ 	/* PSM must be odd and lsb of upper byte must be 0 */
+ 	if ((__le16_to_cpu(la.l2_psm) & 0x0101) != 0x0001 &&
+-		sk->sk_type != SOCK_RAW) {
++		sk->sk_type != SOCK_RAW && !la.l2_cid) {
+ 		err = -EINVAL;
+ 		goto done;
+ 	}
+ 
+-	/* Set destination address and psm */
++	/* Set destination address and psm or cid */
+ 	bacpy(&bt_sk(sk)->dst, &la.l2_bdaddr);
+ 	l2cap_pi(sk)->psm = la.l2_psm;
++	l2cap_pi(sk)->dcid = la.l2_cid;
+ 
+ 	err = l2cap_do_connect(sk);
+ 	if (err)
+@@ -4525,7 +4541,7 @@ static int l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
+ 
+ 	BT_DBG("hcon %p bdaddr %s status %d", hcon, batostr(&hcon->dst), status);
+ 
+-	if (hcon->type != ACL_LINK)
++	if (!(hcon->type == ACL_LINK || hcon->type == LE_LINK))
+ 		return -EINVAL;
+ 
+ 	if (!status) {
+@@ -4554,7 +4570,7 @@ static int l2cap_disconn_cfm(struct hci_conn *hcon, u8 reason)
  {
- 	struct hci_conn *acl;
- 	struct hci_conn *sco;
-+	struct hci_conn *le;
+ 	BT_DBG("hcon %p reason %d", hcon, reason);
  
- 	BT_DBG("%s dst %s", hdev->name, batostr(dst));
+-	if (hcon->type != ACL_LINK)
++	if (!(hcon->type == ACL_LINK || hcon->type == LE_LINK))
+ 		return -EINVAL;
  
-+	if (type == LE_LINK) {
-+		le = hci_conn_hash_lookup_ba(hdev, LE_LINK, dst);
-+		if (!le)
-+			le = hci_conn_add(hdev, LE_LINK, dst);
-+		if (!le)
-+			return NULL;
-+		if (le->state == BT_OPEN)
-+			hci_le_connect(le);
-+
-+		hci_conn_hold(le);
-+
-+		return le;
-+	}
-+
- 	if (!(acl = hci_conn_hash_lookup_ba(hdev, ACL_LINK, dst))) {
- 		if (!(acl = hci_conn_add(hdev, ACL_LINK, dst)))
- 			return NULL;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 84093b0..92c8621 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -822,6 +822,43 @@ static void hci_cs_exit_sniff_mode(struct hci_dev *hdev, __u8 status)
- 	hci_dev_unlock(hdev);
- }
- 
-+static void hci_cs_le_create_conn(struct hci_dev *hdev, __u8 status)
-+{
-+	struct hci_cp_le_create_conn *cp;
-+	struct hci_conn *conn;
-+
-+	BT_DBG("%s status 0x%x", hdev->name, status);
-+
-+	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_CREATE_CONN);
-+	if (!cp)
-+		return;
-+
-+	hci_dev_lock(hdev);
-+
-+	conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &cp->peer_addr);
-+
-+	BT_DBG("%s bdaddr %s conn %p", hdev->name, batostr(&cp->peer_addr),
-+		conn);
-+
-+	if (status) {
-+		if (conn && conn->state == BT_CONNECT) {
-+			conn->state = BT_CLOSED;
-+			hci_proto_connect_cfm(conn, status);
-+			hci_conn_del(conn);
-+		}
-+	} else {
-+		if (!conn) {
-+			conn = hci_conn_add(hdev, LE_LINK, &cp->peer_addr);
-+			if (conn)
-+				conn->out = 1;
-+			else
-+				BT_ERR("No memory for new connection");
-+		}
-+	}
-+
-+	hci_dev_unlock(hdev);
-+}
-+
- static inline void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	__u8 status = *((__u8 *) skb->data);
-@@ -1382,6 +1419,10 @@ static inline void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cs_exit_sniff_mode(hdev, ev->status);
- 		break;
- 
-+	case HCI_OP_LE_CREATE_CONN:
-+		hci_cs_le_create_conn(hdev, ev->status);
-+		break;
-+
- 	default:
- 		BT_DBG("%s opcode 0x%x", hdev->name, opcode);
- 		break;
-@@ -1827,6 +1868,54 @@ static inline void hci_remote_host_features_evt(struct hci_dev *hdev, struct sk_
- 	hci_dev_unlock(hdev);
- }
- 
-+static inline void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	struct hci_ev_le_conn_complete *ev = (void *) skb->data;
-+	struct hci_conn *conn;
-+
-+	BT_DBG("%s status %d", hdev->name, ev->status);
-+
-+	hci_dev_lock(hdev);
-+
-+	conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &ev->bdaddr);
-+	if (!conn)
-+		goto unlock;
-+
-+	if (ev->status) {
-+		hci_proto_connect_cfm(conn, ev->status);
-+		conn->state = BT_CLOSED;
-+		hci_conn_del(conn);
-+		goto unlock;
-+	}
-+
-+	conn->handle = __le16_to_cpu(ev->handle);
-+	conn->state = BT_CONNECTED;
-+
-+	hci_conn_hold_device(conn);
-+	hci_conn_add_sysfs(conn);
-+
-+	hci_proto_connect_cfm(conn, ev->status);
-+
-+unlock:
-+	hci_dev_unlock(hdev);
-+}
-+
-+static inline void hci_le_meta_evt(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	struct hci_ev_le_meta *le_ev = (void *) skb->data;
-+
-+	skb_pull(skb, sizeof(*le_ev));
-+
-+	switch (le_ev->subevent) {
-+	case HCI_EV_LE_CONN_COMPLETE:
-+		hci_le_conn_complete_evt(hdev, skb);
-+		break;
-+
-+	default:
-+		break;
-+	}
-+}
-+
- void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_event_hdr *hdr = (void *) skb->data;
-@@ -1963,6 +2052,10 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_remote_host_features_evt(hdev, skb);
- 		break;
- 
-+	case HCI_EV_LE_META:
-+		hci_le_meta_evt(hdev, skb);
-+		break;
-+
- 	default:
- 		BT_DBG("%s event 0x%x", hdev->name, event);
- 		break;
+ 	l2cap_conn_del(hcon, bt_err(reason));
 -- 
 1.7.1
 
