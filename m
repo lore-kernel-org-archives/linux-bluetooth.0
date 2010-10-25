@@ -1,30 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Santiago Carot-Nemesio <sancane@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH] Send a proper configuration when a source doesn't have a first reliable
-Date: Mon, 25 Oct 2010 15:43:59 +0200
-Message-Id: <1288014239-10832-1-git-send-email-sancane@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <AANLkTin8pUACCu4YYuhLpFB7DxCfsYhN3cOpYYaVcTQ6@mail.gmail.com>
+References: <AANLkTin8pUACCu4YYuhLpFB7DxCfsYhN3cOpYYaVcTQ6@mail.gmail.com>
+Date: Mon, 25 Oct 2010 09:34:52 -0400
+Message-ID: <AANLkTikXg0gX8BwujjzR4b_yuN1GTe-+oQPcFYbZR1O7@mail.gmail.com>
+Subject: Re: [RFC] LE connections and advertising management
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- health/hdp.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+On Mon, Oct 25, 2010 at 8:53 AM, Claudio Takahasi
+<claudio.takahasi@openbossa.org> wrote:
+> 4. Kernel manages the connection establishment, currently there isn't
+> a  way to change the connection parameters. BMI or ioctls will be
+> required to change the default parameters and also to trigger SMP
+> negotiation.
 
-diff --git a/health/hdp.c b/health/hdp.c
-index fd3b1ca..10f4c5f 100644
---- a/health/hdp.c
-+++ b/health/hdp.c
-@@ -1026,7 +1026,7 @@ static uint8_t hdp_mcap_mdl_conn_req_cb(struct mcap_mcl *mcl, uint8_t mdepid,
- 	case HDP_NO_PREFERENCE_DC:
- 		if (app->role == HDP_SINK)
- 			return MCAP_CONFIGURATION_REJECTED;
--		else if (app->chan_type_set)
-+		else if (dev->fr && app->chan_type_set)
- 			*conf = app->chan_type;
- 		else
- 			*conf = HDP_RELIABLE_DC;
+Another idea would be to use setsockopt(), like it's currently being
+used for HCI filters (see lib/hci.c). E.g.:
+
+hci_filter_clear(&nf);
+hci_filter_set_ptype(HCI_EVENT_PKT, &nf);
+hci_filter_set_event(EVT_LE_META_EVENT, &nf);
+setsockopt(dd, SOL_HCI, HCI_FILTER, &nf, sizeof(nf);
+
+Not sure if the SMP negotiation happens too soon to use it though.
+
+Regards,
 -- 
-1.7.3.1
-
+Anderson Lizardo
+OpenBossa Labs - INdT
+Manaus - Brazil
