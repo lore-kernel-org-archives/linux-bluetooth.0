@@ -1,133 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mike Tsai <Mike.Tsai@Atheros.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-CC: BlueZ development <linux-bluetooth@vger.kernel.org>
-Date: Tue, 26 Oct 2010 14:10:45 -0700
+From: "Brian Redding" <bredding@codeaurora.org>
+To: "'Claudio Takahasi'" <claudio.takahasi@openbossa.org>
+Cc: "'BlueZ development'" <linux-bluetooth@vger.kernel.org>
+References: <AANLkTin8pUACCu4YYuhLpFB7DxCfsYhN3cOpYYaVcTQ6@mail.gmail.com>	<35B17FE5076C7040809188FBE7913F983F844057B9@SC1EXMB-MBCL.global.atheros.com>	<AANLkTinS-NhD3FhqcnpNRRdHKxn4mm+2zTmysrSeSjW8@mail.gmail.com>	<35B17FE5076C7040809188FBE7913F983F8440581D@SC1EXMB-MBCL.global.atheros.com>	<AANLkTinnjXuAOBTY8VZz756VdrDFv0-OVKPNkwWbxi9-@mail.gmail.com>	<000001cb747a$9fd61270$df823750$@org> <AANLkTimTgRV=Ang1JFQpOKXc0bVA6PSOA8WAUo4B7_Wv@mail.gmail.com>
+In-Reply-To: <AANLkTimTgRV=Ang1JFQpOKXc0bVA6PSOA8WAUo4B7_Wv@mail.gmail.com>
 Subject: RE: [RFC] LE connections and advertising management
-Message-ID: <35B17FE5076C7040809188FBE7913F983F84405C72@SC1EXMB-MBCL.global.atheros.com>
-References: <AANLkTin8pUACCu4YYuhLpFB7DxCfsYhN3cOpYYaVcTQ6@mail.gmail.com>
-	<35B17FE5076C7040809188FBE7913F983F844057B9@SC1EXMB-MBCL.global.atheros.com>
-	<AANLkTinS-NhD3FhqcnpNRRdHKxn4mm+2zTmysrSeSjW8@mail.gmail.com>
-	<35B17FE5076C7040809188FBE7913F983F8440581D@SC1EXMB-MBCL.global.atheros.com>
- <AANLkTinnjXuAOBTY8VZz756VdrDFv0-OVKPNkwWbxi9-@mail.gmail.com>
-In-Reply-To: <AANLkTinnjXuAOBTY8VZz756VdrDFv0-OVKPNkwWbxi9-@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+Date: Tue, 26 Oct 2010 15:26:12 -0500
+Message-ID: <000101cb754c$08d67db0$1a837910$@org>
 MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-LS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IENsYXVkaW8gVGFrYWhhc2kgW21haWx0
-bzpjbGF1ZGlvLnRha2FoYXNpQG9wZW5ib3NzYS5vcmddIA0KU2VudDogTW9uZGF5LCBPY3RvYmVy
-IDI1LCAyMDEwIDExOjU1IEFNDQpUbzogTWlrZSBUc2FpDQpDYzogQmx1ZVogZGV2ZWxvcG1lbnQN
-ClN1YmplY3Q6IFJlOiBbUkZDXSBMRSBjb25uZWN0aW9ucyBhbmQgYWR2ZXJ0aXNpbmcgbWFuYWdl
-bWVudA0KDQpPbiBNb24sIE9jdCAyNSwgMjAxMCBhdCAzOjE2IFBNLCBNaWtlIFRzYWkgPE1pa2Uu
-VHNhaUBhdGhlcm9zLmNvbT4gd3JvdGU6DQo+DQo+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0t
-LS0tDQo+IEZyb206IENsYXVkaW8gVGFrYWhhc2kgW21haWx0bzpjbGF1ZGlvLnRha2FoYXNpQG9w
-ZW5ib3NzYS5vcmddDQo+IFNlbnQ6IE1vbmRheSwgT2N0b2JlciAyNSwgMjAxMCAxMDo1NiBBTQ0K
-PiBUbzogTWlrZSBUc2FpDQo+IENjOiBCbHVlWiBkZXZlbG9wbWVudA0KPiBTdWJqZWN0OiBSZTog
-W1JGQ10gTEUgY29ubmVjdGlvbnMgYW5kIGFkdmVydGlzaW5nIG1hbmFnZW1lbnQNCj4NCj4gT24g
-TW9uLCBPY3QgMjUsIDIwMTAgYXQgMjoxMSBQTSwgTWlrZSBUc2FpIDxNaWtlLlRzYWlAYXRoZXJv
-cy5jb20+IHdyb3RlOg0KPj4NCj4+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+PiBGcm9t
-OiBsaW51eC1ibHVldG9vdGgtb3duZXJAdmdlci5rZXJuZWwub3JnIFttYWlsdG86bGludXgtYmx1
-ZXRvb3RoLW93bmVyQHZnZXIua2VybmVsLm9yZ10gT24gQmVoYWxmIE9mIENsYXVkaW8gVGFrYWhh
-c2kNCj4+IFNlbnQ6IE1vbmRheSwgT2N0b2JlciAyNSwgMjAxMCA1OjUzIEFNDQo+PiBUbzogQmx1
-ZVogZGV2ZWxvcG1lbnQNCj4+IFN1YmplY3Q6IFtSRkNdIExFIGNvbm5lY3Rpb25zIGFuZCBhZHZl
-cnRpc2luZyBtYW5hZ2VtZW50DQo+Pg0KPj4gSGkgYWxsLA0KPj4NCj4+IEludGVybGVhdmUgQlIv
-RURSL0xFIGRpc2NvdmVyeSBpcyBpbXBsZW1lbnRlZCwgdGhlIG5leHQgc3RlcCBpbiB0aGUNCj4+
-IHVzZXIgc3BhY2UgaXMgaG93IHRvIG1hbmFnZSBhZHZlcnRpc2luZyBhbmQgTEUgY29ubmVjdGlv
-bnMuDQo+Pg0KPj4gU29tZSBhc3BlY3RzOg0KPj4gMS4gT25seSBvbmUgTEUgY29ubmVjdGlvbiBp
-cyBhbGxvd2VkKHBlciBwZWVyKSwgbWVhbmluZyBvbmx5IG9uZQ0KPj4gR0F0dHJpYiBpbnN0YW5j
-ZSB3aWxsIGJlIGFsbG93ZWQgb3RoZXJ3aXNlIGl0IHdpbGwgbm90IGJlIHBvc3NpYmxlIHRvDQo+
-PiBzZXJpYWxpemUgY29tbWFuZHMvZXZlbnRzDQo+PiAyLiBUaGUgcmVtb3RlL1BlcmlwaGVyYWwg
-Y2FuIHN1cHBvcnQgbW9yZSB0aGFuIG9uZSBHQVRUIHByaW1hcnkgc2VydmljZQ0KPj4gMy4gV2Ug
-YXJlIHBsYW5uaW5nIHRvIHVzZSAiZGlyZWN0IiBjb25uZWN0aW9ucyBvbmx5LCBtZWFuaW5nIHRo
-YXQgd2UNCj4+IHdpbGwgbm90IHVzZSB3aGl0ZWxpc3QgYW5kIHRoZSBhcHBsaWNhdGlvbiBpbnRl
-cmVzdGVkIG11c3QgaW5mb3JtIHRoZQ0KPj4gcmVtb3RlIGFkZHJlc3Mvb2JqZWN0IHRvIGNvbm5l
-Y3QgdG8uDQo+PiA0LiBLZXJuZWwgbWFuYWdlcyB0aGUgY29ubmVjdGlvbiBlc3RhYmxpc2htZW50
-LCBjdXJyZW50bHkgdGhlcmUgaXNuJ3QNCj4+IGEgwqB3YXkgdG8gY2hhbmdlIHRoZSBjb25uZWN0
-aW9uIHBhcmFtZXRlcnMuIEJNSSBvciBpb2N0bHMgd2lsbCBiZQ0KPj4gcmVxdWlyZWQgdG8gY2hh
-bmdlIHRoZSBkZWZhdWx0IHBhcmFtZXRlcnMgYW5kIGFsc28gdG8gdHJpZ2dlciBTTVANCj4+IG5l
-Z290aWF0aW9uLg0KPj4NCj4+DQo+PiBTb21lIGlkZWFzOg0KPj4gMS4gaW1wbGVtZW50IGEgY2hh
-cmFjdGVyaXN0aWMgZHJpdmVyOiBiYXNpY2FsbHkgdG8gcHJvdmlkZSBhbg0KPj4gYWJzdHJhY3Rp
-b24gdG8gR0FUVCBjbGllbnRzLiBleDogUHJveGltaXR5LCBIZWFsdGgsIC4uLg0KPj4gMi4gV2Ug
-ZG9uJ3QgbmVlZCB0byBpbXBsZW1lbnQgUHJveGltaXR5IGFuZCBvdGhlciBHQVRUIGNsaWVudHMg
-YXMgYQ0KPj4gcGx1Z2luIGF0IHRoZSBtb21lbnQsIGl0IGNhbiBiZSBlbmFibGVkIGF1dG9tYXRp
-Y2FsbHkgYnkNCj4+IC0tZW5hYmxlLWF0dHJpYg0KPj4gMy4gR0FUVCBjbGllbnRzIGNvdWxkIHJl
-Z2lzdGVyIGEgd2F0Y2hlci9maWx0ZXIgZm9yIGFkdmVydGlzaW5nIGV2ZW50cw0KPj4gNC4gR0FU
-VCBjbGllbnRzIGRvZXNuJ3QgbmVlZCB0byBrbm93IEFUVCwgaW4gdGhlb3J5IGl0IGNhbiBoYW5k
-bGUNCj4+IGNoYXJhY3RlcmlzdGljcyBvbmx5DQo+PiA1LiBHQVRUIGNsaWVudHMgbmVlZHMgdG8g
-Y29udHJvbC9yZXF1ZXN0IExFIGNvbm5lY3Rpb25zIGJhc2VkIG9uIHRoZQ0KPj4gYWR2ZXJ0aXNl
-bWVudCByZWNlaXZlZA0KPj4NCj4+IEFuIGluaXRpYWwgZHJhZnQgaW1wbGVtZW50aW5nIHBhcnQg
-b2YgdGhpcyBpZGVhIGlzIGhlcmU6DQo+PiBnaXQ6Ly9naXQuaW5mcmFkZWFkLm9yZy91c2Vycy9j
-a3Rha2FoYXNpL2JsdWV6LmdpdCBkZXZlbA0KPj4NCj4+IENvbW1lbnRzPw0KPj4NCj4+IFJlZ2Fy
-ZHMsDQo+PiBDbGF1ZGlvDQo+Pj4+TVQgY29tbWVudHMsDQo+Pg0KPj4gMS4gT25seSBvbmUgTEUg
-Y29ubmVjdGlvbiBpcyBhbGxvd2VkKHBlciBwZWVyKSwgbWVhbmluZyBvbmx5IG9uZQ0KPj4gR0F0
-dHJpYiBpbnN0YW5jZSB3aWxsIGJlIGFsbG93ZWQgb3RoZXJ3aXNlIGl0IHdpbGwgbm90IGJlIHBv
-c3NpYmxlIHRvDQo+PiBzZXJpYWxpemUgY29tbWFuZHMvZXZlbnRzDQo+Pg0KPj4+PiBZb3UgbWVh
-biB0aGUgbWFzdGVyIChvciBjbGllbnQpIGNhbiBvbmx5IGNvbm5lY3QgdG8gMSBzbGF2ZSAob3Ig
-c2VydmVyKSBvciBhIHNsYXZlIGNhbiBvbmx5IGNvbm5lY3QgdG8gMSBtYXN0ZXI/DQo+IFtDbGF1
-ZGlvIFRha2FoYXNpXQ0KPiBUaGUgbWFzdGVyIGNhbiBiZSBjb25uZWN0ZWQgdG8gbW9yZSB0aGFu
-IG9uZSBzbGF2ZS4gQnV0IGhlcmUsIEkgd2FubmENCj4gZW1waGFzaXplIHRoYXQgb25seSBvbmUg
-aW5zdGFuY2Ugb2YgR0F0dHRyaWIgc2hhbGwgYmUgY3JlYXRlZCB0bw0KPiByZXByZXNlbnQgdGhl
-IHBoeXNpY2FsIGNoYW5uZWwgYmV0d2VlbiB0d28gTEUgY2FwYWJsZSBkZXZpY2VzLiBHQXR0cmli
-DQo+IGlzIHRoZSBhYnN0cmFjdGlvbiB0aGF0IHdlIGNyZWF0ZWQgaW4gQmx1ZVogdG8gcmVwcmVz
-ZW50IHRoZSBHQVRUL0FUVA0KPiBjb25uZWN0aW9uLCBpdCBpcyBuZWNlc3NhcnkgdG8gYWRkcmVz
-cyBtdWx0aXBsZSBhcHBsaWNhdGlvbnMvcHJvZmlsZXMNCj4gYW5kIHF1ZXVlIGNvbW1hbmRzL2V2
-ZW50cy4NCj4gW01pa2UgVHNhaV0NCj4gSSBzZWUuIEluIG9yZGVyIHRvIGhhbmRsZSBtdWx0aXBs
-ZSBwcm9maWxlcyAoYXMgbXVsdGlwbGUgYXBwbGljYXRpb25zIHJ1bm5pbmcgb24gdG9wIG9mIHRo
-ZSBHQXR0cmliKSBpbiBhIHNpbmdsZSBwaHlzaWNhbCBsaW5rLCB5b3Ugd2lsbCBuZWVkIHNvbWV0
-aGluZyBsaWtlICJhcHBsaWNhdGlvbiBoYW5kbGUiIHRvIGRpc3BhdGNoIHRoZSByZXNwb25zZS9p
-ZGVudGlmaWNhdGlvbiB0byB0aGUgYXBwcm9wcmlhdGUgYXBwbGljYXRpb24gY29ycmVjdGx5Lg0K
-PiBNYXkgeW91IHJlZmVyIG1lIHRvIHRoZSBBUEkgZG9jdW1lbnQgdGhhdCB5b3UgYXJlIG9wZW5p
-bmcgdG8gdGhlIEdBVFQgY2xpZW50KHMpIGZyb20gdGhpcyBHQXR0cmliPw0KW0NsYXVkaW8gVGFr
-YWhhc2ldDQpIaSBNaWtlLA0KDQpBdCB0aGUgbW9tZW50IGl0IGlzIG5vdCBjbGVhciB0byBtZSBp
-ZiBhbiAiYXBwbGljYXRpb24gaGFuZGxlIiB3aWxsIGJlDQpuZWVkZWQsIG1heWJlIHdlIGNhbiBh
-bHNvIGhpZGUgaXQgZnJvbSB0aGUgaGlnaGVyIGxheWVycy4gQWxsIHJlcXVlc3RzDQphcmUgc2Vy
-aWFsaXplZCBhbmQgZm9yIGVhY2ggcmVxdWVzdCB0aGVyZSBpcyBhIHJlc3BvbnNlLCB0aGUNCmV4
-Y2VwdGlvbnMgYXJlIHdyaXRlIHdpdGhvdXQgcmVzcG9uc2UgYW5kIG5vdGlmaWNhdGlvbi4gRWFj
-aCBwcmltYXJ5DQpzZXJ2aWNlIHJlcHJlc2VudGF0aW9uIHdpbGwgaGF2ZSBhbiBvYmplY3QgcGF0
-aCwgbWVhbmluZyB0aGF0IG1heWJlIGl0DQppcyBwb3NzaWJsZSBmb3J3YXJkIHRoZSByZXNwb25z
-ZSB0byB0aGUgcmlnaHQgc291cmNlIGJhc2VkIG9uIHRoZSBsYXN0DQpyZXF1ZXN0IGFuZCBoYW5k
-bGUgaW5mb3JtYXRpb24uDQoNCkdBdHRyaWIgd2lsbCBub3QgYmUgZXhwb3NlZCB0byB0aGUgVUku
-IFVJIG5lZWRzIHRvIGFjY2VzcyBCbHVlWiBHQVRUDQpjbGllbnRzIHNlcnZpY2VzIHVzaW5nIEQt
-QnVzLg0KR0FUVCBjbGllbnRzIGluIGdlbmVyYWwgd2lsbCBoYXZlIHR3byBwaWVjZXM6DQogMS0g
-VUk6IFF0LCBHVEssIHB5dGhvbiwgLi4uDQogMi0gIm1vZHVsZSIgaW4gdGhlIEJsdWVaIGZvciBw
-cm9maWxlIHNwZWNpZmljIHRhc2tzIGFuZCBELUJ1cyBzZXJ2aWNlDQppbnRlcmZhY2UuDQoNCllv
-dSBjYW4gZmluZCB0aGUgY3VycmVudCBhdHRyaWJ1dGUgQVBJIGluIHRoZSBmaWxlOiBkb2MvYXR0
-cmlidXRlLWFwaS50eHQNCg0KQ2xhdWRpbw0KDQpbTWlrZSBUc2FpXQ0KSGkgQ2xhdWRpbywNCg0K
-CUkgbG9vayBhdCB0aGUgQVBJIGFuZCBpdCBpcyB3ZWxsLWRlZmluZWQgd2l0aCBoaWdoIGxldmVs
-IG9mIGFic3RyYWN0aW9uLiBIb3dldmVyLCBJIGRpZCBoYXZlIGEgZmV3IHF1ZXN0aW9ucyBoZXJl
-LCBob3BlZnVsbHkgeW91IGNhbiBhbnN3ZXIgdGhlbSwNCg0KCU9uIENsaWVudCBzaWRlOg0KDQoJ
-CTEuIEkgc2VlIHlvdSBkaWRuJ3Qgb2ZmZXIgYW55IHNlcnZpY2UgZGlzY292ZXJ5IEFQSSBmb3Ig
-Y2xpZW50IHRvIGRpc2NvdmVyIHRoZSBzZXJ2ZXIgc2VydmljZSBkYXRhYmFzZSAoYmFzaWNhbGx5
-IHRvIGdldCB0aGUgYXR0cmlidXRlIGhhbmRsZXMpLiBTbyBJIGFzc3VtZSB0aGF0IHlvdSBjb25z
-aWRlciBHQVRUIGRpc2NvdmVyeSBwcm9jZWR1cmUgd29ya3MgdGhlIHNhbWUgd2F5IGFzIFNEUCwg
-ZG9uZSBhdXRvbWF0aWNhbGx5IGJ5IEdBVFQgYWZ0ZXIgbGluayBpcyBlc3RhYmxpc2hlZCB3aXRo
-b3V0IGFwcGxpY2F0aW9uJ3MgaW5pdGlhdGl2ZS4gQW0gSSBjb3JyZWN0Pw0KDQoJCTIuIFRoZSBj
-aGFyYWN0ZXJpc3RpYyBkZXNjcmlwdG9yIHNldCB2aWEgU2V0UHJvcGVydHkgQVBJIGlzIGxpbWl0
-ZWQgdG8gdGhlIDYgY2hhcmFjdGVyaXN0aWMgZGVzY3JpcHRvcnMgZGVmaW5lZCBpbiBHQVRUIHNw
-ZWMuIEhvd2V2ZXIsIHRoZXJlIGNvdWxkIGJlIHByb2ZpbGUgc3BlY2lmaWMgY2hhcmFjdGVyaXN0
-aWMgZGVzY3JpcHRvcnMgYmV5b25kIHRoZXNlLCB3aWxsIHRoZSBTZXRQcm9wZXJ0eSBhYmxlIHRv
-IHN1cHBvcnQgdGhlc2U/DQoNCgkJMy4gVGhlIGNoYXJhY3RlcmlzdGljIG1vbml0b3JpbmcgaXMg
-c2V0IHVwIHZpYSAxMjggYml0cyBVVUlELiBEbyB5b3UgaGF2ZSBtZWNoYW5pc20gdG8gaGFuZGxl
-IGR1cGxpY2F0ZWQgY2hhcmFjdGVyaXN0aWMgd2l0aGluIGEgc2VydmVyJ3MgZGF0YWJhc2U/IEhv
-dyBkbyB5b3UgaWRlbnRpZnkgdGhlbSB2aWEgeW91ciBBUEk/DQoNCg0KCU9uIFNlcnZlciBzaWRl
-Og0KDQoJCTEuIElzIHRoZXJlIGFuIEFQSSB0aGF0IGFsbG93cyBzZXJ2ZXIgYXBwbGljYXRpb24g
-dG8gcmVnaXN0ZXIgbmV3IGF0dHJpYnV0ZXM/IChwcmltYXJ5IHNlcnZpY2UsIGNoYXJhY3Rlcmlz
-dGljLCBpbmNsdWRlZCBzZXJ2aWNlLCBldCBhbCksDQoNClJlZ2FyZHMsDQoNCk1pa2UNCg0KDQo+
-DQo+Pg0KPj4gNC4gR0FUVCBjbGllbnRzIGRvZXNuJ3QgbmVlZCB0byBrbm93IEFUVCwgaW4gdGhl
-b3J5IGl0IGNhbiBoYW5kbGUNCj4+IGNoYXJhY3RlcmlzdGljcyBvbmx5DQo+Pg0KPj4+PiBZb3Ug
-bWVhbiBib3RoIGNoYXJhY3RlcmlzdGljIHZhbHVlIGFuZCBjaGFyYWN0ZXJpc3RpYyBkZXNjcmlw
-dG9ycyBvZiBjaGFyYWN0ZXJpc3RpYz8NCj4gW0NsYXVkaW8gVGFrYWhhc2ldDQo+IEJvdGguIEZv
-ciB0aGUgR0FUVCBjbGllbnQgcm9sZSwgYW4gaW50ZXJmYWNlIGNhbiBiZSBjcmVhdGVkIGV4cG9y
-dGluZw0KPiBwcm9maWxlIHNwZWNpZmljIGRldGFpbHMuDQo+IFNvbWV0aW1lcyBHQVRUIGNsaWVu
-dHMgd2lsbCBhbHNvIG5lZWQgdG8gYWNjZXNzIHNvbWUgbG93IGxldmVsIGluZm9ybWF0aW9uLg0K
-PiBbTWlrZSBUc2FpXQ0KPiBZZXMsIEkgd2lsbCByZWFsbHkgYXBwcmVjaWF0ZSBpZiB5b3UgbWF5
-IHNob3cgbWUgdGhlIHBsYW5uZWQgQVBJIGZvciB0aGlzIEdBdHRyaWIsDQo+DQo+DQo+IFJlZ2Fy
-ZHMsDQo+IENsYXVkaW8NCj4+DQo+PiBSZWdhcmRzLA0KPj4NCj4+IE1pa2UNCj4+DQo+PiAtLQ0K
-Pj4gVG8gdW5zdWJzY3JpYmUgZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVuc3Vic2Ny
-aWJlIGxpbnV4LWJsdWV0b290aCIgaW4NCj4+IHRoZSBib2R5IG9mIGEgbWVzc2FnZSB0byBtYWpv
-cmRvbW9Admdlci5rZXJuZWwub3JnDQo+PiBNb3JlIG1ham9yZG9tbyBpbmZvIGF0IMKgaHR0cDov
-L3ZnZXIua2VybmVsLm9yZy9tYWpvcmRvbW8taW5mby5odG1sDQo+Pg0KPg0KDQoNCg0KLS0gDQot
-LQ0KQ2xhdWRpbyBUYWthaGFzaQ0KSW5zdGl0dXRvIE5va2lhIGRlIFRlY25vbG9naWENClJlY2lm
-ZSAtIFBlcm5hbWJ1Y28gLSBCcmFzaWwNCis1NSA4MSAzMDg3OTk5OQ0K
+> -----Original Message-----
+> From: Claudio Takahasi [mailto:claudio.takahasi@openbossa.org]
+> Sent: Monday, October 25, 2010 9:52 PM
+> 
+> Hi Brian,
+> 
+> On Mon, Oct 25, 2010 at 4:27 PM, Brian Redding
+> <bredding@codeaurora.org> wrote:
+> > Hi Claudio,
+> >
+> > Are there still interfaces that need to be added to attribute-api.txt
+> > to handle client and server characteristic configuration as well as
+> > presentation and aggregate formats?  I see those as TODO items but
+> > wondered if the APIs for them have been defined yet.
+> >
+> > One thing to note on the server API is that a GATT-based profile
+> > could specify behavior on a characteristic value that when the
+> > characteristic value is read to perform some action in a similar way as
+> > a hardware register.  It appears that the notes I'm reading in the code
+> > thus far only consider changes (or writes) to characteristic values for
+> > the watch code.
+> >
+> > Also does the current API handle included services?
+> >
+> > The Bluetooth SIG is beginning to look at 3rd party application
+> > developer API's for both client and servers for various platforms so
+> > understanding what is currently defined in BlueZ and what still needs
+> > to be added would be useful.
+> >
+> > Thanks,
+> > Brian
+> 
+> The API to address characteristic descriptors is still being defined.
+> We are focusing in the advertising and connection management at the
+> moment. If you have suggestion of how to represent the descriptors in
+> the attribute API, suggestions are welcome!
+
+Once I feel more comfortable with the current API approach, I will see
+if I can suggest something.  One thing to note is that GATT only list
+the current characteristic descriptors.  Profiles can specify additional
+ones or a group of generic ones could also be adopted in the future.
+One example of this is a characteristic descriptor that defines triggers
+that cause a particular behavior to occur when a condition on the characteristic
+value occurs.
+
+> 
+> There isn't a server API at the moment, we implemented a server for
+> testing purpose only. But we will need to define it soon.
+> Which pages/section of the spec describes this read characteristic
+> behavior?
+
+The GATT does not specify the read characteristic behavior but it can be
+specified by a profile.  I just wanted to point that out so that the design
+takes that into account.  You may need to have a call back when a characteristic
+value is read as well as written.
+
+> 
+> Included services are not supported by our client. How important is
+> it? It is mandatory for qualification?
+
+It is only mandatory on the server.
+
+> 
+> Regards,
+> Claudio.
+
+Cheers,
+Brian
+---
+Brian A. Redding
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+
+
+
+
