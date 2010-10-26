@@ -1,420 +1,259 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 26 Oct 2010 17:04:45 +0400
-From: Ilya Basin <basinilya@gmail.com>
-Reply-To: Ilya Basin <basinilya@gmail.com>
-Message-ID: <1602793498.20101026170445@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re[2]: 4.76 possible regression: bluetoothd segfaults when launching bluetooth programs
-In-Reply-To: <20101025204015.GA19748@jh-x301>
-References: <453819375.20101024163802@gmail.com> <20101025204015.GA19748@jh-x301>
+From: Arnd Bergmann <arnd@arndb.de>
+To: "Par-Gunnar Hjalmdahl" <pghatwork@gmail.com>
+Subject: Re: [PATCH 1/9] mfd: Add support for the ST-Ericsson CG2900.
+Date: Tue, 26 Oct 2010 14:06:10 +0200
+Cc: linus.walleij@stericsson.com, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+References: <AANLkTineXA2ZY0J7+dZhqywz+4aAVgzihu+LDDbsL8mu@mail.gmail.com> <201010221736.57671.arnd@arndb.de> <AANLkTinY0qmt6uFo4PZ3xH2BF5-AJ0C7ptctzNdOkRU2@mail.gmail.com>
+In-Reply-To: <AANLkTinY0qmt6uFo4PZ3xH2BF5-AJ0C7ptctzNdOkRU2@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="----------904A3F3197996E"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201010261406.10996.arnd@arndb.de>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-------------904A3F3197996E
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+On Tuesday 26 October 2010, Par-Gunnar Hjalmdahl wrote:
 
-JH> have all debug symbols enabled. Could you try to reproduce this with
-JH> latest bluez git. You don't need to install anything but just compile
+> 2010/10/22 Arnd Bergmann <arnd@arndb.de>:
+> > On Friday 22 October 2010 12:35:16 Par-Gunnar Hjalmdahl wrote:
+> >> This patch adds support for the ST-Ericsson CG2900 Connectivity
+> >> Combo controller.
+> >> This patch adds the central framework to be able to register CG2900 users,
+> >> transports, and chip handlers.
+> >>
+> >> Signed-off-by: Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
+> >
+> > Looks ok from a coding style perspective, but some important information is
+> > missing from the description:
+> >
+> > * What is a CG2900?
+> > * Why is it a MFD device rather than e.g. a bus or a subsystem?
+> >
+> 
+> I will add some more info:
+>  - CG2900 is a GPS, Bluetooth, FM controller
+>  - I do not really know what makes a device qualify as a certain type,
+> but at least for us this is a multifunction device. But I can't really
+> say that it isn't really a bus (could be stated as multifunction HCI
+> bus). I guess it could be qualified as a subsystem as well, but I
+> cannot give you a reason to have it as either.
 
-segfaults start after this commit:
-[d5e700051b1263b2028331d41d60de02a5a6f90e] Fix append_variant_array()
-to take a number of elements
+It's not often completely clear, but I would draw the distinction like
+this:
 
-Not every BT program kills bluetoothd, but Smartcam does.
-http://sourceforge.net/projects/smartcam/
-  [il@IL bluez]$ smartcam
-  smartcam: registered DBUS service "org.gnome.smartcam"
-  Found smartcam device file: /dev/video0
-  smartcam: started comm thread
-  smartcam: port = 1
-  sdp_record_register: Protocol error
+* A multi-function device is a single device that sits on a given bus
+with one host I/O interface and provides functionality to different
+logical subsystems like serial or alsa. A typical case for an MFD would
+be a to solve the problem of sharing resources between the child drivers
+because you cannot bind one device to two drivers. If CG2900 is a single
+piece of silicon that always looks the same way, it's probably an MFD.
 
--- 
-------------904A3F3197996E
-Content-Type: TEXT/PLAIN;
- name="gdb-new.txt"
-Content-transfer-encoding: base64
-Content-Disposition: attachment;
- filename="gdb-new.txt"
+* A bus is a much more general abstraction which has multiple devices
+and multiple device types behind it. The bus has no idea what devices
+are attached to it at compile time, so you either probe the devices at
+boot time or define a set of devices in a board definition (platform
+devices). Driver modules then register a struct device_driver for the
+bus, which gives all matching devices to the bus. If you can have
+future CG2900 compatible devices that need to have other drivers, e.g.
+for HID or video, it should probably be a bus.
 
-W3Jvb3RASUwgYmx1ZXpdIyBnZGIgLS1hcmdzIC4vc3JjLy5saWJzL2JsdWV0b290aGQgLW5k
-CkdOVSBnZGIgKEdEQikgNy4yCkNvcHlyaWdodCAoQykgMjAxMCBGcmVlIFNvZnR3YXJlIEZv
-dW5kYXRpb24sIEluYy4KTGljZW5zZSBHUEx2Mys6IEdOVSBHUEwgdmVyc2lvbiAzIG9yIGxh
-dGVyIDxodHRwOi8vZ251Lm9yZy9saWNlbnNlcy9ncGwuaHRtbD4KVGhpcyBpcyBmcmVlIHNv
-ZnR3YXJlOiB5b3UgYXJlIGZyZWUgdG8gY2hhbmdlIGFuZCByZWRpc3RyaWJ1dGUgaXQuClRo
-ZXJlIGlzIE5PIFdBUlJBTlRZLCB0byB0aGUgZXh0ZW50IHBlcm1pdHRlZCBieSBsYXcuICBU
-eXBlICJzaG93IGNvcHlpbmciCmFuZCAic2hvdyB3YXJyYW50eSIgZm9yIGRldGFpbHMuClRo
-aXMgR0RCIHdhcyBjb25maWd1cmVkIGFzICJpNjg2LXBjLWxpbnV4LWdudSIuCkZvciBidWcg
-cmVwb3J0aW5nIGluc3RydWN0aW9ucywgcGxlYXNlIHNlZToKPGh0dHA6Ly93d3cuZ251Lm9y
-Zy9zb2Z0d2FyZS9nZGIvYnVncy8+Li4uClJlYWRpbmcgc3ltYm9scyBmcm9tIC8uc25hcHNo
-b3RzL3BlcnNpc3QvYnVpbGRzL2JsdWV6LWdpdC9ibHVlei9zcmMvLmxpYnMvYmx1ZXRvb3Ro
-ZC4uLmRvbmUuCihnZGIpIHIKU3RhcnRpbmcgcHJvZ3JhbTogLy5zbmFwc2hvdHMvcGVyc2lz
-dC9idWlsZHMvYmx1ZXotZ2l0L2JsdWV6L3NyYy8ubGlicy9ibHVldG9vdGhkIC1uZApbVGhy
-ZWFkIGRlYnVnZ2luZyB1c2luZyBsaWJ0aHJlYWRfZGIgZW5hYmxlZF0KYmx1ZXRvb3RoZFs1
-MzI5XTogQmx1ZXRvb3RoIGRlYW1vbiA0Ljc2CmJsdWV0b290aGRbNTMyOV06IHNyYy9tYWlu
-LmM6cGFyc2VfY29uZmlnKCkgcGFyc2luZyBtYWluLmNvbmYKYmx1ZXRvb3RoZFs1MzI5XTog
-c3JjL21haW4uYzpwYXJzZV9jb25maWcoKSBkaXNjb3Z0bz0wCmJsdWV0b290aGRbNTMyOV06
-IHNyYy9tYWluLmM6cGFyc2VfY29uZmlnKCkgcGFpcnRvPTAKYmx1ZXRvb3RoZFs1MzI5XTog
-c3JjL21haW4uYzpwYXJzZV9jb25maWcoKSBwYWdldG89ODE5MgpibHVldG9vdGhkWzUzMjld
-OiBzcmMvbWFpbi5jOnBhcnNlX2NvbmZpZygpIG5hbWU9JWgtJWQKYmx1ZXRvb3RoZFs1MzI5
-XTogc3JjL21haW4uYzpwYXJzZV9jb25maWcoKSBjbGFzcz0weDAwMDEwMApibHVldG9vdGhk
-WzUzMjldOiBzcmMvbWFpbi5jOnBhcnNlX2NvbmZpZygpIGRpc2Nvdl9pbnRlcnZhbD0wCmJs
-dWV0b290aGRbNTMyOV06IHNyYy9tYWluLmM6cGFyc2VfY29uZmlnKCkgS2V5IGZpbGUgZG9l
-cyBub3QgaGF2ZSBrZXkgJ0RldmljZUlEJwpibHVldG9vdGhkWzUzMjldOiBTdGFydGluZyBT
-RFAgc2VydmVyCmJsdWV0b290aGRbNTMyOV06IHNyYy9wbHVnaW4uYzpwbHVnaW5faW5pdCgp
-IExvYWRpbmcgYnVpbHRpbiBwbHVnaW5zCmJsdWV0b290aGRbNTMyOV06IHNyYy9wbHVnaW4u
-YzphZGRfcGx1Z2luKCkgTG9hZGluZyBhdWRpbyBwbHVnaW4KYmx1ZXRvb3RoZFs1MzI5XTog
-c3JjL3BsdWdpbi5jOmFkZF9wbHVnaW4oKSBMb2FkaW5nIGlucHV0IHBsdWdpbgpibHVldG9v
-dGhkWzUzMjldOiBzcmMvcGx1Z2luLmM6YWRkX3BsdWdpbigpIExvYWRpbmcgc2VyaWFsIHBs
-dWdpbgpibHVldG9vdGhkWzUzMjldOiBzcmMvcGx1Z2luLmM6YWRkX3BsdWdpbigpIExvYWRp
-bmcgbmV0d29yayBwbHVnaW4KYmx1ZXRvb3RoZFs1MzI5XTogc3JjL3BsdWdpbi5jOmFkZF9w
-bHVnaW4oKSBMb2FkaW5nIHNlcnZpY2UgcGx1Z2luCmJsdWV0b290aGRbNTMyOV06IHNyYy9w
-bHVnaW4uYzphZGRfcGx1Z2luKCkgTG9hZGluZyBoY2lvcHMgcGx1Z2luCmJsdWV0b290aGRb
-NTMyOV06IHNyYy9wbHVnaW4uYzphZGRfcGx1Z2luKCkgTG9hZGluZyBmb3JtZmFjdG9yIHBs
-dWdpbgpibHVldG9vdGhkWzUzMjldOiBzcmMvcGx1Z2luLmM6YWRkX3BsdWdpbigpIExvYWRp
-bmcgc3RvcmFnZSBwbHVnaW4KYmx1ZXRvb3RoZFs1MzI5XTogc3JjL3BsdWdpbi5jOnBsdWdp
-bl9pbml0KCkgTG9hZGluZyBwbHVnaW5zIC91c3IvbGliL2JsdWV0b290aC9wbHVnaW5zCmJs
-dWV0b290aGRbNTMyOV06IFZlcnNpb24gbWlzbWF0Y2ggZm9yIG5ldGxpbmsKYmx1ZXRvb3Ro
-ZFs1MzI5XTogcGx1Z2lucy9zZXJ2aWNlLmM6cmVnaXN0ZXJfaW50ZXJmYWNlKCkgcGF0aCAv
-b3JnL2JsdWV6LzUzMjkvYW55CmJsdWV0b290aGRbNTMyOV06IHBsdWdpbnMvc2VydmljZS5j
-OnJlZ2lzdGVyX2ludGVyZmFjZSgpIFJlZ2lzdGVyZWQgaW50ZXJmYWNlIG9yZy5ibHVlei5T
-ZXJ2aWNlIG9uIHBhdGggL29yZy9ibHVlei81MzI5L2FueQpibHVldG9vdGhkWzUzMjldOiBu
-ZXR3b3JrL21hbmFnZXIuYzpyZWFkX2NvbmZpZygpIC9ldGMvYmx1ZXRvb3RoL25ldHdvcmsu
-Y29uZjogS2V5IGZpbGUgZG9lcyBub3QgaGF2ZSBrZXkgJ0Rpc2FibGVTZWN1cml0eScKYmx1
-ZXRvb3RoZFs1MzI5XTogbmV0d29yay9tYW5hZ2VyLmM6cmVhZF9jb25maWcoKSBDb25maWcg
-b3B0aW9uczogU2VjdXJpdHk9dHJ1ZQpibHVldG9vdGhkWzUzMjldOiBpbnB1dC9tYW5hZ2Vy
-LmM6aW5wdXRfbWFuYWdlcl9pbml0KCkgaW5wdXQuY29uZjogS2V5IGZpbGUgZG9lcyBub3Qg
-aGF2ZSBrZXkgJ0lkbGVUaW1lb3V0JwpibHVldG9vdGhkWzUzMjldOiBhdWRpby9tYW5hZ2Vy
-LmM6YXVkaW9fbWFuYWdlcl9pbml0KCkgYXVkaW8uY29uZjogS2V5IGZpbGUgZG9lcyBub3Qg
-aGF2ZSBrZXkgJ0F1dG9Db25uZWN0JwpibHVldG9vdGhkWzUzMjldOiBhdWRpby91bml4LmM6
-dW5peF9pbml0KCkgVW5peCBzb2NrZXQgY3JlYXRlZDogMTAKYmx1ZXRvb3RoZFs1MzI5XTog
-YXVkaW8vaGVhZHNldC5jOnRlbGVwaG9ueV9yZWFkeV9pbmQoKSBUZWxlcGhvbnkgcGx1Z2lu
-IGluaXRpYWxpemVkCmJsdWV0b290aGRbNTMyOV06IGF1ZGlvL2hlYWRzZXQuYzpwcmludF9h
-Z19mZWF0dXJlcygpIEhGUCBBRyBmZWF0dXJlczogIkFiaWxpdHkgdG8gcmVqZWN0IGEgY2Fs
-bCIgIkVuaGFuY2VkIGNhbGwgc3RhdHVzIiAiRXh0ZW5kZWQgRXJyb3IgUmVzdWx0IENvZGVz
-IgpibHVldG9vdGhkWzUzMjldOiBIQ0kgZGV2IDAgcmVnaXN0ZXJlZApibHVldG9vdGhkWzUz
-MjldOiBwbHVnaW5zL2hjaW9wcy5jOmluaXRfZGV2aWNlKCkgY2hpbGQgNTMzMiBmb3JrZWQK
-Ymx1ZXRvb3RoZFs1MzI5XTogc3JjL2FkYXB0ZXIuYzpidGRfYWRhcHRlcl9yZWYoKSAweGI4
-MDBkNjAwOiByZWY9MQpibHVldG9vdGhkWzUzMjldOiBIQ0kgZGV2IDAgdXAKYmx1ZXRvb3Ro
-ZFs1MzI5XTogU3RhcnRpbmcgc2VjdXJpdHkgbWFuYWdlciAwCmJsdWV0b290aGRbNTMyOV06
-IHNyYy9hZGFwdGVyLmM6YnRkX2FkYXB0ZXJfc2V0X2NsYXNzKCkgQ2hhbmdpbmcgTWFqb3Iv
-TWlub3IgY2xhc3MgdG8gMHgwMDAxMDAKYmx1ZXRvb3RoZFs1MzI5XTogc3JjL2FkYXB0ZXIu
-YzphZGFwdGVyX3N0YXJ0KCkgU3RvcHBpbmcgSW5xdWlyeSBhdCBhZGFwdGVyIHN0YXJ0dXAK
-Ymx1ZXRvb3RoZFs1MzI5XTogcGx1Z2lucy9zZXJ2aWNlLmM6cmVnaXN0ZXJfaW50ZXJmYWNl
-KCkgcGF0aCAvb3JnL2JsdWV6LzUzMjkvaGNpMApibHVldG9vdGhkWzUzMjldOiBwbHVnaW5z
-L3NlcnZpY2UuYzpyZWdpc3Rlcl9pbnRlcmZhY2UoKSBSZWdpc3RlcmVkIGludGVyZmFjZSBv
-cmcuYmx1ZXouU2VydmljZSBvbiBwYXRoIC9vcmcvYmx1ZXovNTMyOS9oY2kwCmJsdWV0b290
-aGRbNTMyOV06IG5ldHdvcmsvbWFuYWdlci5jOm5ldHdvcmtfc2VydmVyX3Byb2JlKCkgcGF0
-aCAvb3JnL2JsdWV6LzUzMjkvaGNpMApibHVldG9vdGhkWzUzMjldOiBzcmMvYWRhcHRlci5j
-OmJ0ZF9hZGFwdGVyX3JlZigpIDB4YjgwMGQ2MDA6IHJlZj0yCmJsdWV0b290aGRbNTMyOV06
-IG5ldHdvcmsvc2VydmVyLmM6c2VydmVyX3JlZ2lzdGVyKCkgUmVnaXN0ZXJlZCBpbnRlcmZh
-Y2Ugb3JnLmJsdWV6Lk5ldHdvcmtTZXJ2ZXIgb24gcGF0aCAvb3JnL2JsdWV6LzUzMjkvaGNp
-MApibHVldG9vdGhkWzUzMjldOiBzZXJpYWwvbWFuYWdlci5jOnByb3h5X3Byb2JlKCkgcGF0
-aCAvb3JnL2JsdWV6LzUzMjkvaGNpMApibHVldG9vdGhkWzUzMjldOiBzcmMvYWRhcHRlci5j
-OmJ0ZF9hZGFwdGVyX3JlZigpIDB4YjgwMGQ2MDA6IHJlZj0zCmJsdWV0b290aGRbNTMyOV06
-IHNlcmlhbC9wcm94eS5jOnByb3h5X3JlZ2lzdGVyKCkgUmVnaXN0ZXJlZCBpbnRlcmZhY2Ug
-b3JnLmJsdWV6LlNlcmlhbFByb3h5TWFuYWdlciBvbiBwYXRoIC9vcmcvYmx1ZXovNTMyOS9o
-Y2kwCmJsdWV0b290aGRbNTMyOV06IHNyYy9hZGFwdGVyLmM6YnRkX2FkYXB0ZXJfcmVmKCkg
-MHhiODAwZDYwMDogcmVmPTQKYmx1ZXRvb3RoZFs1MzI5XTogYXVkaW8vbWFuYWdlci5jOmhl
-YWRzZXRfc2VydmVyX3Byb2JlKCkgcGF0aCAvb3JnL2JsdWV6LzUzMjkvaGNpMApibHVldG9v
-dGhkWzUzMjldOiBzcmMvYWRhcHRlci5jOmJ0ZF9hZGFwdGVyX3JlZigpIDB4YjgwMGQ2MDA6
-IHJlZj01CmJsdWV0b290aGRbNTMyOV06IGF1ZGlvL21hbmFnZXIuYzphdWRpb19hZGFwdGVy
-X3JlZigpIDB4YjgwMGRkODA6IHJlZj0xCmJsdWV0b290aGRbNTMyOV06IGF1ZGlvL21hbmFn
-ZXIuYzpoZWFkc2V0X3NlcnZlcl9pbml0KCkgYXVkaW8uY29uZjogS2V5IGZpbGUgZG9lcyBu
-b3QgaGF2ZSBrZXkgJ01hc3RlcicKYmx1ZXRvb3RoZFs1MzI5XTogc3JjL3NkcGQtc2Vydmlj
-ZS5jOmFkZF9yZWNvcmRfdG9fc2VydmVyKCkgQWRkaW5nIHJlY29yZCB3aXRoIGhhbmRsZSAw
-eDEwMDAwCmJsdWV0b290aGRbNTMyOV06IHNyYy9zZHBkLXNlcnZpY2UuYzphZGRfcmVjb3Jk
-X3RvX3NlcnZlcigpIFJlY29yZCBwYXR0ZXJuIFVVSUQgMDAwMDAwMDMtMDAwMC0xMDAwLTgw
-MDAtMDA4MDVmOQpibHVldG9vdGhkWzUzMjldOiBzcmMvc2RwZC1zZXJ2aWNlLmM6YWRkX3Jl
-Y29yZF90b19zZXJ2ZXIoKSBSZWNvcmQgcGF0dGVybiBVVUlEIDAwMDAwMTAwLTAwMDAtMTAw
-MC04MDAwLTAwODA1ZjkKYmx1ZXRvb3RoZFs1MzI5XTogc3JjL3NkcGQtc2VydmljZS5jOmFk
-ZF9yZWNvcmRfdG9fc2VydmVyKCkgUmVjb3JkIHBhdHRlcm4gVVVJRCAwMDAwMTAwMi0wMDAw
-LTEwMDAtODAwMC0wMDgwNWY5CmJsdWV0b290aGRbNTMyOV06IHNyYy9zZHBkLXNlcnZpY2Uu
-YzphZGRfcmVjb3JkX3RvX3NlcnZlcigpIFJlY29yZCBwYXR0ZXJuIFVVSUQgMDAwMDExMDgt
-MDAwMC0xMDAwLTgwMDAtMDA4MDVmOQpibHVldG9vdGhkWzUzMjldOiBzcmMvc2RwZC1zZXJ2
-aWNlLmM6YWRkX3JlY29yZF90b19zZXJ2ZXIoKSBSZWNvcmQgcGF0dGVybiBVVUlEIDAwMDAx
-MTEyLTAwMDAtMTAwMC04MDAwLTAwODA1ZjkKYmx1ZXRvb3RoZFs1MzI5XTogc3JjL3NkcGQt
-c2VydmljZS5jOmFkZF9yZWNvcmRfdG9fc2VydmVyKCkgUmVjb3JkIHBhdHRlcm4gVVVJRCAw
-MDAwMTIwMy0wMDAwLTEwMDAtODAwMC0wMDgwNWY5CmJsdWV0b290aGRbNTMyOV06IGF1ZGlv
-L2hlYWRzZXQuYzpoZWFkc2V0X2NvbmZpZ19pbml0KCkgYXVkaW8uY29uZjogS2V5IGZpbGUg
-ZG9lcyBub3QgaGF2ZSBrZXkgJ1NDT1JvdXRpbmcnCmJsdWV0b290aGRbNTMyOV06IGF1ZGlv
-L2hlYWRzZXQuYzpoZWFkc2V0X2NvbmZpZ19pbml0KCkgYXVkaW8uY29uZjogS2V5IGZpbGUg
-ZG9lcyBub3QgaGF2ZSBrZXkgJ0Zhc3RDb25uZWN0YWJsZScKYmx1ZXRvb3RoZFs1MzI5XTog
-c3JjL3NkcGQtc2VydmljZS5jOmFkZF9yZWNvcmRfdG9fc2VydmVyKCkgQWRkaW5nIHJlY29y
-ZCB3aXRoIGhhbmRsZSAweDEwMDAxCmJsdWV0b290aGRbNTMyOV06IHNyYy9zZHBkLXNlcnZp
-Y2UuYzphZGRfcmVjb3JkX3RvX3NlcnZlcigpIFJlY29yZCBwYXR0ZXJuIFVVSUQgMDAwMDAw
-MDMtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOQpibHVldG9vdGhkWzUzMjldOiBzcmMvc2RwZC1z
-ZXJ2aWNlLmM6YWRkX3JlY29yZF90b19zZXJ2ZXIoKSBSZWNvcmQgcGF0dGVybiBVVUlEIDAw
-MDAwMTAwLTAwMDAtMTAwMC04MDAwLTAwODA1ZjkKYmx1ZXRvb3RoZFs1MzI5XTogc3JjL3Nk
-cGQtc2VydmljZS5jOmFkZF9yZWNvcmRfdG9fc2VydmVyKCkgUmVjb3JkIHBhdHRlcm4gVVVJ
-RCAwMDAwMTAwMi0wMDAwLTEwMDAtODAwMC0wMDgwNWY5CmJsdWV0b290aGRbNTMyOV06IHNy
-Yy9zZHBkLXNlcnZpY2UuYzphZGRfcmVjb3JkX3RvX3NlcnZlcigpIFJlY29yZCBwYXR0ZXJu
-IFVVSUQgMDAwMDExMWUtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOQpibHVldG9vdGhkWzUzMjld
-OiBzcmMvc2RwZC1zZXJ2aWNlLmM6YWRkX3JlY29yZF90b19zZXJ2ZXIoKSBSZWNvcmQgcGF0
-dGVybiBVVUlEIDAwMDAxMTFmLTAwMDAtMTAwMC04MDAwLTAwODA1ZjkKYmx1ZXRvb3RoZFs1
-MzI5XTogc3JjL3NkcGQtc2VydmljZS5jOmFkZF9yZWNvcmRfdG9fc2VydmVyKCkgUmVjb3Jk
-IHBhdHRlcm4gVVVJRCAwMDAwMTIwMy0wMDAwLTEwMDAtODAwMC0wMDgwNWY5CmJsdWV0b290
-aGRbNTMyOV06IGF1ZGlvL21hbmFnZXIuYzphMmRwX3NlcnZlcl9wcm9iZSgpIHBhdGggL29y
-Zy9ibHVlei81MzI5L2hjaTAKYmx1ZXRvb3RoZFs1MzI5XTogYXVkaW8vbWFuYWdlci5jOmF1
-ZGlvX2FkYXB0ZXJfcmVmKCkgMHhiODAwZGQ4MDogcmVmPTIKYmx1ZXRvb3RoZFs1MzI5XTog
-YXVkaW8vYTJkcC5jOmEyZHBfcmVnaXN0ZXIoKSBhdWRpby5jb25mOiBLZXkgZmlsZSBkb2Vz
-IG5vdCBoYXZlIGtleSAnRW5hYmxlJwpibHVldG9vdGhkWzUzMjldOiBhdWRpby9hMmRwLmM6
-YTJkcF9yZWdpc3RlcigpIGF1ZGlvLmNvbmY6IEtleSBmaWxlIGRvZXMgbm90IGhhdmUga2V5
-ICdEaXNhYmxlJwpibHVldG9vdGhkWzUzMjldOiBhdWRpby9hMmRwLmM6YTJkcF9yZWdpc3Rl
-cigpIGF1ZGlvLmNvbmY6IEtleSBmaWxlIGRvZXMgbm90IGhhdmUgZ3JvdXAgJ0EyRFAnCmJs
-dWV0b290aGRbNTMyOV06IGF1ZGlvL2EyZHAuYzphMmRwX3JlZ2lzdGVyKCkgYXVkaW8uY29u
-ZjogS2V5IGZpbGUgZG9lcyBub3QgaGF2ZSBncm91cCAnQTJEUCcKYmx1ZXRvb3RoZFs1MzI5
-XTogYXVkaW8vYTJkcC5jOmEyZHBfcmVnaXN0ZXIoKSBhdWRpby5jb25mOiBLZXkgZmlsZSBk
-b2VzIG5vdCBoYXZlIGdyb3VwICdBMkRQJwpibHVldG9vdGhkWzUzMjldOiBhdWRpby9hMmRw
-LmM6YTJkcF9yZWdpc3RlcigpIGF1ZGlvLmNvbmY6IEtleSBmaWxlIGRvZXMgbm90IGhhdmUg
-Z3JvdXAgJ0EyRFAnCmJsdWV0b290aGRbNTMyOV06IGF1ZGlvL2F2ZHRwLmM6YXZkdHBfaW5p
-dCgpIGF1ZGlvLmNvbmY6IEtleSBmaWxlIGRvZXMgbm90IGhhdmUga2V5ICdNYXN0ZXInCmJs
-dWV0b290aGRbNTMyOV06IGF1ZGlvL2F2ZHRwLmM6YXZkdHBfcmVnaXN0ZXJfc2VwKCkgU0VQ
-IDB4YjgwMGU3MzAgcmVnaXN0ZXJlZDogdHlwZTowIGNvZGVjOjAgc2VpZDoxCmJsdWV0b290
-aGRbNTMyOV06IHNyYy9zZHBkLXNlcnZpY2UuYzphZGRfcmVjb3JkX3RvX3NlcnZlcigpIEFk
-ZGluZyByZWNvcmQgd2l0aCBoYW5kbGUgMHgxMDAwMgpibHVldG9vdGhkWzUzMjldOiBzcmMv
-c2RwZC1zZXJ2aWNlLmM6YWRkX3JlY29yZF90b19zZXJ2ZXIoKSBSZWNvcmQgcGF0dGVybiBV
-VUlEIDAwMDAwMDE5LTAwMDAtMTAwMC04MDAwLTAwODA1ZjkKYmx1ZXRvb3RoZFs1MzI5XTog
-c3JjL3NkcGQtc2VydmljZS5jOmFkZF9yZWNvcmRfdG9fc2VydmVyKCkgUmVjb3JkIHBhdHRl
-cm4gVVVJRCAwMDAwMDEwMC0wMDAwLTEwMDAtODAwMC0wMDgwNWY5CmJsdWV0b290aGRbNTMy
-OV06IHNyYy9zZHBkLXNlcnZpY2UuYzphZGRfcmVjb3JkX3RvX3NlcnZlcigpIFJlY29yZCBw
-YXR0ZXJuIFVVSUQgMDAwMDEwMDItMDAwMC0xMDAwLTgwMDAtMDA4MDVmOQpibHVldG9vdGhk
-WzUzMjldOiBzcmMvc2RwZC1zZXJ2aWNlLmM6YWRkX3JlY29yZF90b19zZXJ2ZXIoKSBSZWNv
-cmQgcGF0dGVybiBVVUlEIDAwMDAxMTBhLTAwMDAtMTAwMC04MDAwLTAwODA1ZjkKYmx1ZXRv
-b3RoZFs1MzI5XTogc3JjL3NkcGQtc2VydmljZS5jOmFkZF9yZWNvcmRfdG9fc2VydmVyKCkg
-UmVjb3JkIHBhdHRlcm4gVVVJRCAwMDAwMTEwZC0wMDAwLTEwMDAtODAwMC0wMDgwNWY5CmJs
-dWV0b290aGRbNTMyOV06IGF1ZGlvL21hbmFnZXIuYzphdnJjcF9zZXJ2ZXJfcHJvYmUoKSBw
-YXRoIC9vcmcvYmx1ZXovNTMyOS9oY2kwCmJsdWV0b290aGRbNTMyOV06IGF1ZGlvL21hbmFn
-ZXIuYzphdWRpb19hZGFwdGVyX3JlZigpIDB4YjgwMGRkODA6IHJlZj0zCmJsdWV0b290aGRb
-NTMyOV06IGF1ZGlvL2NvbnRyb2wuYzphdnJjcF9yZWdpc3RlcigpIGF1ZGlvLmNvbmY6IEtl
-eSBmaWxlIGRvZXMgbm90IGhhdmUga2V5ICdNYXN0ZXInCmJsdWV0b290aGRbNTMyOV06IHNy
-Yy9zZHBkLXNlcnZpY2UuYzphZGRfcmVjb3JkX3RvX3NlcnZlcigpIEFkZGluZyByZWNvcmQg
-d2l0aCBoYW5kbGUgMHgxMDAwMwpibHVldG9vdGhkWzUzMjldOiBzcmMvc2RwZC1zZXJ2aWNl
-LmM6YWRkX3JlY29yZF90b19zZXJ2ZXIoKSBSZWNvcmQgcGF0dGVybiBVVUlEIDAwMDAwMDE3
-LTAwMDAtMTAwMC04MDAwLTAwODA1ZjkKYmx1ZXRvb3RoZFs1MzI5XTogc3JjL3NkcGQtc2Vy
-dmljZS5jOmFkZF9yZWNvcmRfdG9fc2VydmVyKCkgUmVjb3JkIHBhdHRlcm4gVVVJRCAwMDAw
-MDEwMC0wMDAwLTEwMDAtODAwMC0wMDgwNWY5CmJsdWV0b290aGRbNTMyOV06IHNyYy9zZHBk
-LXNlcnZpY2UuYzphZGRfcmVjb3JkX3RvX3NlcnZlcigpIFJlY29yZCBwYXR0ZXJuIFVVSUQg
-MDAwMDEwMDItMDAwMC0xMDAwLTgwMDAtMDA4MDVmOQpibHVldG9vdGhkWzUzMjldOiBzcmMv
-c2RwZC1zZXJ2aWNlLmM6YWRkX3JlY29yZF90b19zZXJ2ZXIoKSBSZWNvcmQgcGF0dGVybiBV
-VUlEIDAwMDAxMTBjLTAwMDAtMTAwMC04MDAwLTAwODA1ZjkKYmx1ZXRvb3RoZFs1MzI5XTog
-c3JjL3NkcGQtc2VydmljZS5jOmFkZF9yZWNvcmRfdG9fc2VydmVyKCkgUmVjb3JkIHBhdHRl
-cm4gVVVJRCAwMDAwMTEwZS0wMDAwLTEwMDAtODAwMC0wMDgwNWY5CmJsdWV0b290aGRbNTMy
-OV06IHNyYy9zZHBkLXNlcnZpY2UuYzphZGRfcmVjb3JkX3RvX3NlcnZlcigpIEFkZGluZyBy
-ZWNvcmQgd2l0aCBoYW5kbGUgMHgxMDAwNApibHVldG9vdGhkWzUzMjldOiBzcmMvc2RwZC1z
-ZXJ2aWNlLmM6YWRkX3JlY29yZF90b19zZXJ2ZXIoKSBSZWNvcmQgcGF0dGVybiBVVUlEIDAw
-MDAwMDE3LTAwMDAtMTAwMC04MDAwLTAwODA1ZjkKYmx1ZXRvb3RoZFs1MzI5XTogc3JjL3Nk
-cGQtc2VydmljZS5jOmFkZF9yZWNvcmRfdG9fc2VydmVyKCkgUmVjb3JkIHBhdHRlcm4gVVVJ
-RCAwMDAwMDEwMC0wMDAwLTEwMDAtODAwMC0wMDgwNWY5CmJsdWV0b290aGRbNTMyOV06IHNy
-Yy9zZHBkLXNlcnZpY2UuYzphZGRfcmVjb3JkX3RvX3NlcnZlcigpIFJlY29yZCBwYXR0ZXJu
-IFVVSUQgMDAwMDEwMDItMDAwMC0xMDAwLTgwMDAtMDA4MDVmOQpibHVldG9vdGhkWzUzMjld
-OiBzcmMvc2RwZC1zZXJ2aWNlLmM6YWRkX3JlY29yZF90b19zZXJ2ZXIoKSBSZWNvcmQgcGF0
-dGVybiBVVUlEIDAwMDAxMTBlLTAwMDAtMTAwMC04MDAwLTAwODA1ZjkKYmx1ZXRvb3RoZFs1
-MzI5XTogcGx1Z2lucy9mb3JtZmFjdG9yLmM6Zm9ybWZhY3Rvcl9wcm9iZSgpIFNldHRpbmcg
-MHgwMDAxMDAgZm9yIG1ham9yL21pbm9yIGRldmljZSBjbGFzcwpibHVldG9vdGhkWzUzMjld
-OiBDbGVhcmluZyBibG9ja2VkIGxpc3QgZmFpbGVkOiBJbnZhbGlkIGFyZ3VtZW50ICgyMikK
-Ymx1ZXRvb3RoZFs1MzI5XTogc3JjL2RldmljZS5jOmRldmljZV9jcmVhdGUoKSBDcmVhdGlu
-ZyBkZXZpY2UgL29yZy9ibHVlei81MzI5L2hjaTAvZGV2XzAwXzFCXzk4X0EzX0E1XzJCCmJs
-dWV0b290aGRbNTMyOV06IHNyYy9kZXZpY2UuYzpidGRfZGV2aWNlX3JlZigpIDB4YjgwMjk5
-ZTA6IHJlZj0xCmJsdWV0b290aGRbNTMyOV06IHNyYy9kZXZpY2UuYzpkZXZpY2VfcHJvYmVf
-ZHJpdmVycygpIFByb2JlIGRyaXZlcnMgZm9yIC9vcmcvYmx1ZXovNTMyOS9oY2kwL2Rldl8w
-MF8xQl85OF9BM19BNV8yQgpibHVldG9vdGhkWzUzMjldOiBzZXJpYWwvbWFuYWdlci5jOnNl
-cmlhbF9wcm9iZSgpIHBhdGggL29yZy9ibHVlei81MzI5L2hjaTAvZGV2XzAwXzFCXzk4X0Ez
-X0E1XzJCOiAwMDAwMTEwMS0wMDAwLTEwMDAtODAwMC0wMDgwNWY5YjM0ZmIKYmx1ZXRvb3Ro
-ZFs1MzI5XTogc2VyaWFsL3BvcnQuYzpjcmVhdGVfc2VyaWFsX2RldmljZSgpIFJlZ2lzdGVy
-ZWQgaW50ZXJmYWNlIG9yZy5ibHVlei5TZXJpYWwgb24gcGF0aCAvb3JnL2JsdWV6LzUzMjkv
-aGNpMC9kZXZfMDBfMUJfOThfQTNfQTVfMkIKYmx1ZXRvb3RoZFs1MzI5XTogc2VyaWFsL21h
-bmFnZXIuYzpzZXJpYWxfcHJvYmUoKSBwYXRoIC9vcmcvYmx1ZXovNTMyOS9oY2kwL2Rldl8w
-MF8xQl85OF9BM19BNV8yQjogMDAwMDExMDMtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZi
-CmJsdWV0b290aGRbNTMyOV06IHNlcmlhbC9tYW5hZ2VyLmM6c2VyaWFsX3Byb2JlKCkgcGF0
-aCAvb3JnL2JsdWV6LzUzMjkvaGNpMC9kZXZfMDBfMUJfOThfQTNfQTVfMkI6IDAwMDAxMTA1
-LTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYgpibHVldG9vdGhkWzUzMjldOiBzZXJpYWwv
-bWFuYWdlci5jOnNlcmlhbF9wcm9iZSgpIHBhdGggL29yZy9ibHVlei81MzI5L2hjaTAvZGV2
-XzAwXzFCXzk4X0EzX0E1XzJCOiAwMDAwMTEwNi0wMDAwLTEwMDAtODAwMC0wMDgwNWY5YjM0
-ZmIKYmx1ZXRvb3RoZFs1MzI5XTogc2VyaWFsL21hbmFnZXIuYzpzZXJpYWxfcHJvYmUoKSBw
-YXRoIC9vcmcvYmx1ZXovNTMyOS9oY2kwL2Rldl8wMF8xQl85OF9BM19BNV8yQjogMDAwMDEx
-MTItMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiCmJsdWV0b290aGRbNTMyOV06IHNlcmlh
-bC9tYW5hZ2VyLmM6c2VyaWFsX3Byb2JlKCkgcGF0aCAvb3JnL2JsdWV6LzUzMjkvaGNpMC9k
-ZXZfMDBfMUJfOThfQTNfQTVfMkI6IDAwMDAxMTFmLTAwMDAtMTAwMC04MDAwLTAwODA1Zjli
-MzRmYgpibHVldG9vdGhkWzUzMjldOiBzZXJpYWwvbWFuYWdlci5jOnNlcmlhbF9wcm9iZSgp
-IHBhdGggL29yZy9ibHVlei81MzI5L2hjaTAvZGV2XzAwXzFCXzk4X0EzX0E1XzJCOiBkYjFk
-OGYxMi05NWYzLTQwMmMtOWI5Ny1iYzUwNGM5YTU1YzQKYmx1ZXRvb3RoZFs1MzI5XTogaW5w
-dXQvbWFuYWdlci5jOmhlYWRzZXRfcHJvYmUoKSBwYXRoIC9vcmcvYmx1ZXovNTMyOS9oY2kw
-L2Rldl8wMF8xQl85OF9BM19BNV8yQgpibHVldG9vdGhkWzUzMjldOiBwcm9iZSBmYWlsZWQg
-d2l0aCBkcml2ZXIgaW5wdXQtaGVhZHNldCBmb3IgZGV2aWNlIC9vcmcvYmx1ZXovNTMyOS9o
-Y2kwL2Rldl8wMF8xQl85OF9BM19BNV8yQgpibHVldG9vdGhkWzUzMjldOiBzcmMvYWRhcHRl
-ci5jOmFkYXB0ZXJfZ2V0X2RldmljZSgpIDAwOjFCOjk4OkEzOkE1OjJCCmJsdWV0b290aGRb
-NTMyOV06IHNyYy9kZXZpY2UuYzpidGRfZGV2aWNlX3JlZigpIDB4YjgwMjk5ZTA6IHJlZj0y
-CmJsdWV0b290aGRbNTMyOV06IGF1ZGlvL2RldmljZS5jOmF1ZGlvX2RldmljZV9yZWdpc3Rl
-cigpIFJlZ2lzdGVyZWQgaW50ZXJmYWNlIG9yZy5ibHVlei5BdWRpbyBvbiBwYXRoIC9vcmcv
-Ymx1ZXovNTMyOS9oY2kwL2Rldl8wMF8xQl85OF9BM19BNV8yQgpibHVldG9vdGhkWzUzMjld
-OiBhdWRpby9tYW5hZ2VyLmM6aGFuZGxlX3V1aWQoKSBzZXJ2ZXIgbm90IGVuYWJsZWQgZm9y
-IDAwMDAxMTEyLTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYiAoMHgxMTEyKQpibHVldG9v
-dGhkWzUzMjldOiBhdWRpby9tYW5hZ2VyLmM6aGFuZGxlX3V1aWQoKSBzZXJ2ZXIgbm90IGVu
-YWJsZWQgZm9yIDAwMDAxMTFmLTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYiAoMHgxMTFm
-KQpibHVldG9vdGhkWzUzMjldOiBhdWRpby9tYW5hZ2VyLmM6aGFuZGxlX3V1aWQoKSBzZXJ2
-ZXIgbm90IGVuYWJsZWQgZm9yIDAwMDAxMTBhLTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRm
-YiAoMHgxMTBhKQpibHVldG9vdGhkWzUzMjldOiBhdWRpby9tYW5hZ2VyLmM6aGFuZGxlX3V1
-aWQoKSBGb3VuZCBBViBUYXJnZXQKYmx1ZXRvb3RoZFs1MzI5XTogYXVkaW8vY29udHJvbC5j
-OmNvbnRyb2xfaW5pdCgpIFJlZ2lzdGVyZWQgaW50ZXJmYWNlIG9yZy5ibHVlei5Db250cm9s
-IG9uIHBhdGggL29yZy9ibHVlei81MzI5L2hjaTAvZGV2XzAwXzFCXzk4X0EzX0E1XzJCCmJs
-dWV0b290aGRbNTMyOV06IGF1ZGlvL21hbmFnZXIuYzpoYW5kbGVfdXVpZCgpIEZvdW5kIEFW
-IFRhcmdldApibHVldG9vdGhkWzUzMjldOiBzcmMvZGV2aWNlLmM6ZGV2aWNlX2NyZWF0ZSgp
-IENyZWF0aW5nIGRldmljZSAvb3JnL2JsdWV6LzUzMjkvaGNpMC9kZXZfMDBfMURfNkVfNEZf
-NTRfRUEKYmx1ZXRvb3RoZFs1MzI5XTogc3JjL2RldmljZS5jOmJ0ZF9kZXZpY2VfcmVmKCkg
-MHhiODAyY2YwODogcmVmPTEKYmx1ZXRvb3RoZFs1MzI5XTogc3JjL2RldmljZS5jOmRldmlj
-ZV9wcm9iZV9kcml2ZXJzKCkgUHJvYmUgZHJpdmVycyBmb3IgL29yZy9ibHVlei81MzI5L2hj
-aTAvZGV2XzAwXzFEXzZFXzRGXzU0X0VBCmJsdWV0b290aGRbNTMyOV06IHNlcmlhbC9tYW5h
-Z2VyLmM6c2VyaWFsX3Byb2JlKCkgcGF0aCAvb3JnL2JsdWV6LzUzMjkvaGNpMC9kZXZfMDBf
-MURfNkVfNEZfNTRfRUE6IDAwMDAwMDAyLTAwMDAtMTAwMC04MDAwLTAwMDJlZTAwMDAwMgpi
-bHVldG9vdGhkWzUzMjldOiBzZXJpYWwvcG9ydC5jOmNyZWF0ZV9zZXJpYWxfZGV2aWNlKCkg
-UmVnaXN0ZXJlZCBpbnRlcmZhY2Ugb3JnLmJsdWV6LlNlcmlhbCBvbiBwYXRoIC9vcmcvYmx1
-ZXovNTMyOS9oY2kwL2Rldl8wMF8xRF82RV80Rl81NF9FQQpibHVldG9vdGhkWzUzMjldOiBz
-ZXJpYWwvbWFuYWdlci5jOnNlcmlhbF9wcm9iZSgpIHBhdGggL29yZy9ibHVlei81MzI5L2hj
-aTAvZGV2XzAwXzFEXzZFXzRGXzU0X0VBOiAwMDAwMTEwMy0wMDAwLTEwMDAtODAwMC0wMDgw
-NWY5YjM0ZmIKYmx1ZXRvb3RoZFs1MzI5XTogc2VyaWFsL21hbmFnZXIuYzpzZXJpYWxfcHJv
-YmUoKSBwYXRoIC9vcmcvYmx1ZXovNTMyOS9oY2kwL2Rldl8wMF8xRF82RV80Rl81NF9FQTog
-MDAwMDExMDUtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiCmJsdWV0b290aGRbNTMyOV06
-IHNlcmlhbC9tYW5hZ2VyLmM6c2VyaWFsX3Byb2JlKCkgcGF0aCAvb3JnL2JsdWV6LzUzMjkv
-aGNpMC9kZXZfMDBfMURfNkVfNEZfNTRfRUE6IDAwMDAxMTA2LTAwMDAtMTAwMC04MDAwLTAw
-ODA1ZjliMzRmYgpibHVldG9vdGhkWzUzMjldOiBzZXJpYWwvbWFuYWdlci5jOnNlcmlhbF9w
-cm9iZSgpIHBhdGggL29yZy9ibHVlei81MzI5L2hjaTAvZGV2XzAwXzFEXzZFXzRGXzU0X0VB
-OiAwMDAwMTExMi0wMDAwLTEwMDAtODAwMC0wMDgwNWY5YjM0ZmIKYmx1ZXRvb3RoZFs1MzI5
-XTogc2VyaWFsL21hbmFnZXIuYzpzZXJpYWxfcHJvYmUoKSBwYXRoIC9vcmcvYmx1ZXovNTMy
-OS9oY2kwL2Rldl8wMF8xRF82RV80Rl81NF9FQTogMDAwMDExMWItMDAwMC0xMDAwLTgwMDAt
-MDA4MDVmOWIzNGZiCmJsdWV0b290aGRbNTMyOV06IHNlcmlhbC9tYW5hZ2VyLmM6c2VyaWFs
-X3Byb2JlKCkgcGF0aCAvb3JnL2JsdWV6LzUzMjkvaGNpMC9kZXZfMDBfMURfNkVfNEZfNTRf
-RUE6IDAwMDAxMTFmLTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYgpibHVldG9vdGhkWzUz
-MjldOiBzZXJpYWwvbWFuYWdlci5jOnNlcmlhbF9wcm9iZSgpIHBhdGggL29yZy9ibHVlei81
-MzI5L2hjaTAvZGV2XzAwXzFEXzZFXzRGXzU0X0VBOiAwMDAwNTAwNS0wMDAwLTEwMDAtODAw
-MC0wMDAyZWUwMDAwMDEKYmx1ZXRvb3RoZFs1MzI5XTogc2VyaWFsL21hbmFnZXIuYzpzZXJp
-YWxfcHJvYmUoKSBwYXRoIC9vcmcvYmx1ZXovNTMyOS9oY2kwL2Rldl8wMF8xRF82RV80Rl81
-NF9FQTogMDAwMDU2MDEtMDAwMC0xMDAwLTgwMDAtMDAwMmVlMDAwMDAxCmJsdWV0b290aGRb
-NTMyOV06IGlucHV0L21hbmFnZXIuYzpoZWFkc2V0X3Byb2JlKCkgcGF0aCAvb3JnL2JsdWV6
-LzUzMjkvaGNpMC9kZXZfMDBfMURfNkVfNEZfNTRfRUEKYmx1ZXRvb3RoZFs1MzI5XTogcHJv
-YmUgZmFpbGVkIHdpdGggZHJpdmVyIGlucHV0LWhlYWRzZXQgZm9yIGRldmljZSAvb3JnL2Js
-dWV6LzUzMjkvaGNpMC9kZXZfMDBfMURfNkVfNEZfNTRfRUEKYmx1ZXRvb3RoZFs1MzI5XTog
-c3JjL2FkYXB0ZXIuYzphZGFwdGVyX2dldF9kZXZpY2UoKSAwMDoxRDo2RTo0Rjo1NDpFQQpi
-bHVldG9vdGhkWzUzMjldOiBzcmMvZGV2aWNlLmM6YnRkX2RldmljZV9yZWYoKSAweGI4MDJj
-ZjA4OiByZWY9MgpibHVldG9vdGhkWzUzMjldOiBhdWRpby9kZXZpY2UuYzphdWRpb19kZXZp
-Y2VfcmVnaXN0ZXIoKSBSZWdpc3RlcmVkIGludGVyZmFjZSBvcmcuYmx1ZXouQXVkaW8gb24g
-cGF0aCAvb3JnL2JsdWV6LzUzMjkvaGNpMC9kZXZfMDBfMURfNkVfNEZfNTRfRUEKYmx1ZXRv
-b3RoZFs1MzI5XTogYXVkaW8vbWFuYWdlci5jOmhhbmRsZV91dWlkKCkgc2VydmVyIG5vdCBl
-bmFibGVkIGZvciAwMDAwMTExMi0wMDAwLTEwMDAtODAwMC0wMDgwNWY5YjM0ZmIgKDB4MTEx
-MikKYmx1ZXRvb3RoZFs1MzI5XTogYXVkaW8vbWFuYWdlci5jOmhhbmRsZV91dWlkKCkgc2Vy
-dmVyIG5vdCBlbmFibGVkIGZvciAwMDAwMTExZi0wMDAwLTEwMDAtODAwMC0wMDgwNWY5YjM0
-ZmIgKDB4MTExZikKYmx1ZXRvb3RoZFs1MzI5XTogYXVkaW8vbWFuYWdlci5jOmhhbmRsZV91
-dWlkKCkgc2VydmVyIG5vdCBlbmFibGVkIGZvciAwMDAwMTEwYS0wMDAwLTEwMDAtODAwMC0w
-MDgwNWY5YjM0ZmIgKDB4MTEwYSkKYmx1ZXRvb3RoZFs1MzI5XTogYXVkaW8vbWFuYWdlci5j
-OmhhbmRsZV91dWlkKCkgRm91bmQgQVYgVGFyZ2V0CmJsdWV0b290aGRbNTMyOV06IGF1ZGlv
-L2NvbnRyb2wuYzpjb250cm9sX2luaXQoKSBSZWdpc3RlcmVkIGludGVyZmFjZSBvcmcuYmx1
-ZXouQ29udHJvbCBvbiBwYXRoIC9vcmcvYmx1ZXovNTMyOS9oY2kwL2Rldl8wMF8xRF82RV80
-Rl81NF9FQQpibHVldG9vdGhkWzUzMjldOiBhdWRpby9tYW5hZ2VyLmM6aGFuZGxlX3V1aWQo
-KSBGb3VuZCBBViBUYXJnZXQKYmx1ZXRvb3RoZFs1MzI5XTogc3JjL2RldmljZS5jOmRldmlj
-ZV9jcmVhdGUoKSBDcmVhdGluZyBkZXZpY2UgL29yZy9ibHVlei81MzI5L2hjaTAvZGV2X0E4
-XzdFXzMzX0Q3XzI5X0RCCmJsdWV0b290aGRbNTMyOV06IHNyYy9kZXZpY2UuYzpidGRfZGV2
-aWNlX3JlZigpIDB4YjgwMzFkZjA6IHJlZj0xCmJsdWV0b290aGRbNTMyOV06IHNyYy9kZXZp
-Y2UuYzpkZXZpY2VfcHJvYmVfZHJpdmVycygpIFByb2JlIGRyaXZlcnMgZm9yIC9vcmcvYmx1
-ZXovNTMyOS9oY2kwL2Rldl9BOF83RV8zM19EN18yOV9EQgpibHVldG9vdGhkWzUzMjldOiBz
-ZXJpYWwvbWFuYWdlci5jOnNlcmlhbF9wcm9iZSgpIHBhdGggL29yZy9ibHVlei81MzI5L2hj
-aTAvZGV2X0E4XzdFXzMzX0Q3XzI5X0RCOiAwMDAwMDAwMi0wMDAwLTEwMDAtODAwMC0wMDAy
-ZWUwMDAwMDIKYmx1ZXRvb3RoZFs1MzI5XTogc2VyaWFsL3BvcnQuYzpjcmVhdGVfc2VyaWFs
-X2RldmljZSgpIFJlZ2lzdGVyZWQgaW50ZXJmYWNlIG9yZy5ibHVlei5TZXJpYWwgb24gcGF0
-aCAvb3JnL2JsdWV6LzUzMjkvaGNpMC9kZXZfQThfN0VfMzNfRDdfMjlfREIKYmx1ZXRvb3Ro
-ZFs1MzI5XTogc2VyaWFsL21hbmFnZXIuYzpzZXJpYWxfcHJvYmUoKSBwYXRoIC9vcmcvYmx1
-ZXovNTMyOS9oY2kwL2Rldl9BOF83RV8zM19EN18yOV9EQjogMDAwMDAwMDQtMDAwMC0xMDAw
-LTgwMDAtMDAwMmVlMDAwMDAyCmJsdWV0b290aGRbNTMyOV06IHNlcmlhbC9tYW5hZ2VyLmM6
-c2VyaWFsX3Byb2JlKCkgcGF0aCAvb3JnL2JsdWV6LzUzMjkvaGNpMC9kZXZfQThfN0VfMzNf
-RDdfMjlfREI6IDAwMDAxMTAzLTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYgpibHVldG9v
-dGhkWzUzMjldOiBzZXJpYWwvbWFuYWdlci5jOnNlcmlhbF9wcm9iZSgpIHBhdGggL29yZy9i
-bHVlei81MzI5L2hjaTAvZGV2X0E4XzdFXzMzX0Q3XzI5X0RCOiAwMDAwMTEwNS0wMDAwLTEw
-MDAtODAwMC0wMDgwNWY5YjM0ZmIKYmx1ZXRvb3RoZFs1MzI5XTogc2VyaWFsL21hbmFnZXIu
-YzpzZXJpYWxfcHJvYmUoKSBwYXRoIC9vcmcvYmx1ZXovNTMyOS9oY2kwL2Rldl9BOF83RV8z
-M19EN18yOV9EQjogMDAwMDExMDYtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiCmJsdWV0
-b290aGRbNTMyOV06IHNlcmlhbC9tYW5hZ2VyLmM6c2VyaWFsX3Byb2JlKCkgcGF0aCAvb3Jn
-L2JsdWV6LzUzMjkvaGNpMC9kZXZfQThfN0VfMzNfRDdfMjlfREI6IDAwMDAxMTEyLTAwMDAt
-MTAwMC04MDAwLTAwODA1ZjliMzRmYgpibHVldG9vdGhkWzUzMjldOiBzZXJpYWwvbWFuYWdl
-ci5jOnNlcmlhbF9wcm9iZSgpIHBhdGggL29yZy9ibHVlei81MzI5L2hjaTAvZGV2X0E4XzdF
-XzMzX0Q3XzI5X0RCOiAwMDAwMTExYi0wMDAwLTEwMDAtODAwMC0wMDgwNWY5YjM0ZmIKYmx1
-ZXRvb3RoZFs1MzI5XTogc2VyaWFsL21hbmFnZXIuYzpzZXJpYWxfcHJvYmUoKSBwYXRoIC9v
-cmcvYmx1ZXovNTMyOS9oY2kwL2Rldl9BOF83RV8zM19EN18yOV9EQjogMDAwMDExMWYtMDAw
-MC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiCmJsdWV0b290aGRbNTMyOV06IHNlcmlhbC9tYW5h
-Z2VyLmM6c2VyaWFsX3Byb2JlKCkgcGF0aCAvb3JnL2JsdWV6LzUzMjkvaGNpMC9kZXZfQThf
-N0VfMzNfRDdfMjlfREI6IDAwMDAxMTJmLTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYgpi
-bHVldG9vdGhkWzUzMjldOiBzZXJpYWwvbWFuYWdlci5jOnNlcmlhbF9wcm9iZSgpIHBhdGgg
-L29yZy9ibHVlei81MzI5L2hjaTAvZGV2X0E4XzdFXzMzX0Q3XzI5X0RCOiAwMDAwNTAwNS0w
-MDAwLTEwMDAtODAwMC0wMDAyZWUwMDAwMDEKYmx1ZXRvb3RoZFs1MzI5XTogc2VyaWFsL21h
-bmFnZXIuYzpzZXJpYWxfcHJvYmUoKSBwYXRoIC9vcmcvYmx1ZXovNTMyOS9oY2kwL2Rldl9B
-OF83RV8zM19EN18yOV9EQjogMDAwMDU1NTctMDAwMC0xMDAwLTgwMDAtMDAwMmVlMDAwMDAx
-CmJsdWV0b290aGRbNTMyOV06IHNlcmlhbC9tYW5hZ2VyLmM6c2VyaWFsX3Byb2JlKCkgcGF0
-aCAvb3JnL2JsdWV6LzUzMjkvaGNpMC9kZXZfQThfN0VfMzNfRDdfMjlfREI6IDAwMDA1NjAx
-LTAwMDAtMTAwMC04MDAwLTAwMDJlZTAwMDAwMQpibHVldG9vdGhkWzUzMjldOiBpbnB1dC9t
-YW5hZ2VyLmM6aGVhZHNldF9wcm9iZSgpIHBhdGggL29yZy9ibHVlei81MzI5L2hjaTAvZGV2
-X0E4XzdFXzMzX0Q3XzI5X0RCCmJsdWV0b290aGRbNTMyOV06IHByb2JlIGZhaWxlZCB3aXRo
-IGRyaXZlciBpbnB1dC1oZWFkc2V0IGZvciBkZXZpY2UgL29yZy9ibHVlei81MzI5L2hjaTAv
-ZGV2X0E4XzdFXzMzX0Q3XzI5X0RCCmJsdWV0b290aGRbNTMyOV06IHNyYy9hZGFwdGVyLmM6
-YWRhcHRlcl9nZXRfZGV2aWNlKCkgQTg6N0U6MzM6RDc6Mjk6REIKYmx1ZXRvb3RoZFs1MzI5
-XTogc3JjL2RldmljZS5jOmJ0ZF9kZXZpY2VfcmVmKCkgMHhiODAzMWRmMDogcmVmPTIKYmx1
-ZXRvb3RoZFs1MzI5XTogYXVkaW8vZGV2aWNlLmM6YXVkaW9fZGV2aWNlX3JlZ2lzdGVyKCkg
-UmVnaXN0ZXJlZCBpbnRlcmZhY2Ugb3JnLmJsdWV6LkF1ZGlvIG9uIHBhdGggL29yZy9ibHVl
-ei81MzI5L2hjaTAvZGV2X0E4XzdFXzMzX0Q3XzI5X0RCCmJsdWV0b290aGRbNTMyOV06IGF1
-ZGlvL21hbmFnZXIuYzpoYW5kbGVfdXVpZCgpIHNlcnZlciBub3QgZW5hYmxlZCBmb3IgMDAw
-MDExMTItMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiICgweDExMTIpCmJsdWV0b290aGRb
-NTMyOV06IGF1ZGlvL21hbmFnZXIuYzpoYW5kbGVfdXVpZCgpIHNlcnZlciBub3QgZW5hYmxl
-ZCBmb3IgMDAwMDExMWYtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiICgweDExMWYpCmJs
-dWV0b290aGRbNTMyOV06IGF1ZGlvL21hbmFnZXIuYzpoYW5kbGVfdXVpZCgpIHNlcnZlciBu
-b3QgZW5hYmxlZCBmb3IgMDAwMDExMGEtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiICgw
-eDExMGEpCmJsdWV0b290aGRbNTMyOV06IGF1ZGlvL21hbmFnZXIuYzpoYW5kbGVfdXVpZCgp
-IEZvdW5kIEFWIFRhcmdldApibHVldG9vdGhkWzUzMjldOiBhdWRpby9jb250cm9sLmM6Y29u
-dHJvbF9pbml0KCkgUmVnaXN0ZXJlZCBpbnRlcmZhY2Ugb3JnLmJsdWV6LkNvbnRyb2wgb24g
-cGF0aCAvb3JnL2JsdWV6LzUzMjkvaGNpMC9kZXZfQThfN0VfMzNfRDdfMjlfREIKYmx1ZXRv
-b3RoZFs1MzI5XTogYXVkaW8vbWFuYWdlci5jOmhhbmRsZV91dWlkKCkgRm91bmQgQVYgUmVt
-b3RlCmJsdWV0b290aGRbNTMyOV06IEFkYXB0ZXIgL29yZy9ibHVlei81MzI5L2hjaTAgaGFz
-IGJlZW4gZW5hYmxlZApibHVldG9vdGhkWzUzMjldOiBzcmMvbWFpbi5jOm1haW4oKSBFbnRl
-cmluZyBtYWluIGxvb3AKYmx1ZXRvb3RoZFs1MzI5XTogcGx1Z2lucy9oY2lvcHMuYzpjaGls
-ZF9leGl0KCkgY2hpbGQgNTMzMiBleGl0ZWQKYmx1ZXRvb3RoZFs1MzI5XTogc3JjL3Jma2ls
-bC5jOnJma2lsbF9ldmVudCgpIFJGS0lMTCBldmVudCBpZHggMCB0eXBlIDIgb3AgMCBzb2Z0
-IDAgaGFyZCAwCmJsdWV0b290aGRbNTMyOV06IHNyYy9yZmtpbGwuYzpyZmtpbGxfZXZlbnQo
-KSBSRktJTEwgZXZlbnQgaWR4IDEgdHlwZSAxIG9wIDAgc29mdCAwIGhhcmQgMApibHVldG9v
-dGhkWzUzMjldOiBJbnF1aXJ5IEZhaWxlZCB3aXRoIHN0YXR1cyAweDEyCgpQcm9ncmFtIHJl
-Y2VpdmVkIHNpZ25hbCBTSUdTRUdWLCBTZWdtZW50YXRpb24gZmF1bHQuCjB4YjdkMmE2NTMg
-aW4gc3RybGVuICgpIGZyb20gL2xpYi9saWJjLnNvLjYKKGdkYikgYnQKIzAgIDB4YjdkMmE2
-NTMgaW4gc3RybGVuICgpIGZyb20gL2xpYi9saWJjLnNvLjYKIzEgIDB4YjdlNTNiMTAgaW4g
-Pz8gKCkgZnJvbSAvdXNyL2xpYi9saWJkYnVzLTEuc28uMwojMiAgMHhiN2UzZjM0YiBpbiA/
-PyAoKSBmcm9tIC91c3IvbGliL2xpYmRidXMtMS5zby4zCiMzICAweGI3ZTQzN2E5IGluIGRi
-dXNfbWVzc2FnZV9pdGVyX2FwcGVuZF9iYXNpYyAoKSBmcm9tIC91c3IvbGliL2xpYmRidXMt
-MS5zby4zCiM0ICAweGI3ZmVlYmI0IGluIGFwcGVuZF9hcnJheV92YXJpYW50IChpdGVyPTB4
-YmZmZmY1ODQsIHR5cGU9MTE1LCB2YWw9MHhiZmZmZjVmMCwgbl9lbGVtZW50cz02KSBhdCBz
-cmMvZGJ1cy1jb21tb24uYzoyMjgKIzUgIDB4YjdmZWVlNTggaW4gZW1pdF9hcnJheV9wcm9w
-ZXJ0eV9jaGFuZ2VkIChjb25uPTB4YjgwMDllYjgsIHBhdGg9MHhiODAxNTg2MCAiL29yZy9i
-bHVlei81MzI5L2hjaTAiLCBpbnRlcmZhY2U9MHhiN2ZmZDRiOCAib3JnLmJsdWV6LkFkYXB0
-ZXIiLAogICAgbmFtZT0weGI3ZmZkNjM4ICJVVUlEcyIsIHR5cGU9MTE1LCB2YWx1ZT0weGJm
-ZmZmNWYwLCBudW09NikgYXQgc3JjL2RidXMtY29tbW9uLmM6MzIwCiM2ICAweGI3ZmU0MDBl
-IGluIGFkYXB0ZXJfZW1pdF91dWlkc191cGRhdGVkIChhZGFwdGVyPTB4YjgwMGQ2MDApIGF0
-IHNyYy9hZGFwdGVyLmM6MTEwNwojNyAgMHhiN2ZlNDBmYiBpbiBhZGFwdGVyX3NlcnZpY2Vf
-aW5zX3JlbSAoYmRhZGRyPTB4YmZmZmY3NzAsIHJlYz0weGI4MDBkNWQ4LCBpbnNlcnQ9MSkg
-YXQgc3JjL2FkYXB0ZXIuYzoxMTQ2CiM4ICAweGI3ZmU0MTMzIGluIGFkYXB0ZXJfc2Vydmlj
-ZV9pbnNlcnQgKGJkYWRkcj0weGJmZmZmNzcwLCByZWM9MHhiODAwZDVkOCkgYXQgc3JjL2Fk
-YXB0ZXIuYzoxMTUzCiM5ICAweGI3ZmQ1OTZhIGluIHNkcF9yZWNvcmRfYWRkIChkZXZpY2U9
-MHhiZmZmZjc3MCwgcmVjPTB4YjgwMGQ1ZDgpIGF0IHNyYy9zZHBkLWRhdGFiYXNlLmM6MTg4
-CiMxMCAweGI3ZmQ1MjBlIGluIHNlcnZpY2VfcmVnaXN0ZXJfcmVxIChyZXE9MHhiZmZmZjc3
-MCwgcnNwPTB4YmZmZmY3MGMpIGF0IHNyYy9zZHBkLXNlcnZpY2UuYzo2ODQKIzExIDB4Yjdm
-ZDNhYjIgaW4gcHJvY2Vzc19yZXF1ZXN0IChyZXE9MHhiZmZmZjc3MCkgYXQgc3JjL3NkcGQt
-cmVxdWVzdC5jOjk5MgojMTIgMHhiN2ZkM2RlMSBpbiBoYW5kbGVfcmVxdWVzdCAoc2s9MjUs
-IGRhdGE9MHhiODAyOTg5MCAidSIsIGxlbj0xMTkpIGF0IHNyYy9zZHBkLXJlcXVlc3QuYzox
-MDg3CiMxMyAweGI3ZmQxZTAxIGluIGlvX3Nlc3Npb25fZXZlbnQgKGNoYW49MHhiODAwY2Rh
-MCwgY29uZD1HX0lPX0lOLCBkYXRhPTB4YjgwMDQ5OTApIGF0IHNyYy9zZHBkLXNlcnZlci5j
-OjE4OAojMTQgMHhiN2VlY2EyYiBpbiA/PyAoKSBmcm9tIC91c3IvbGliL2xpYmdsaWItMi4w
-LnNvLjAKIzE1IDB4YjdlYTViNzIgaW4gZ19tYWluX2NvbnRleHRfZGlzcGF0Y2ggKCkgZnJv
-bSAvdXNyL2xpYi9saWJnbGliLTIuMC5zby4wCiMxNiAweGI3ZWE2MzUwIGluID8/ICgpIGZy
-b20gL3Vzci9saWIvbGliZ2xpYi0yLjAuc28uMAojMTcgMHhiN2VhNmExYiBpbiBnX21haW5f
-bG9vcF9ydW4gKCkgZnJvbSAvdXNyL2xpYi9saWJnbGliLTIuMC5zby4wCiMxOCAweGI3ZmNl
-OTNjIGluIG1haW4gKGFyZ2M9MSwgYXJndj0weGJmZmZmYWQ0KSBhdCBzcmMvbWFpbi5jOjQ4
-NgooZ2RiKQo=
-------------904A3F3197996E--
+* A subsystem is less clearly defined, I would call bluetooth a subsystem
+instead of just a bus because it not only matches devices with drivers
+but also has its own user-level interfaces for raw communication.
+If you want to be able to have drivers in the kernel and in user space,
+you might want to consider starting a new drivers/cg2900 subsystem, or
+integrating into the bluetooth subsystem if that makes sense.
 
+> >> +config MFD_CG2900
+> >> +     tristate "Support ST-Ericsson CG2900 main structure"
+> >> +     depends on NET
+> >> +     help
+> >> +       Support for ST-Ericsson CG2900 Connectivity Combo controller main structure.
+> >> +       Supports multiple functionalities muxed over a Bluetooth HCI H:4 interface.
+> >> +       CG2900 support Bluetooth, FM radio, and GPS.
+> >> +
+> >
+> > Can you explain what it means to mux over a H:4 interface? Does this mean
+> > you use bluetooth infrastructure that is designed for wireless communication
+> > in order to connect on-board or on-chip devices?
+> >
+> 
+> The H:4 protocol is defined in the Bluetooth Core specification. It
+> uses a single byte first in the data packet to determine an HCI
+> channel. In the Bluetooth Core specification there are 4 channels
+> specified, 0x01-0x04 (0x01 is BT command, etc). The rest of the
+> channels are reserved, but these have been used on a proprietary basis
+> to transport data to different IPs within the controller. In our API
+> we have chosen to have a channel separation on an API basis and the
+> H:4 byte is then added within the driver. So we have multiple channels
+> coming in from the users that we mux onto a single data transport.
+> That's what I mean in the text. I guess I could rewrite it a bit to
+> make it clearer.
+
+I still don't understand it, though that may be a problem on my side.
+
+Does that mean that cg2900 is to the host side a standard bluetooth HCI,
+but it uses extensions to the HCI in order to make the other functions
+available to the host?
+
+What chapter in the bluetooth core specification describes this?
+
+> >> +
+> >> +/**
+> >> + * add_h4_user() - Add H4 user to user storage based on supplied H4 channel.
+> >> + * @dev:     Stored CG2900 device.
+> >> + * @name:    Device name to identify different devices that are using
+> >> + *           the same H4 channel.
+> >> + *
+> >> + * Returns:
+> >> + *   0 if there is no error.
+> >> + *   -EINVAL if NULL pointer or bad channel is supplied.
+> >> + *   -EBUSY if there already is a user for supplied channel.
+> >> + */
+> >> +static int add_h4_user(struct cg2900_device *dev, const char * const name)
+> >> +{
+> >
+> > Where does that name come from? Why not just use an enum if the name is
+> > only use for strncmp?
+> >
+> 
+> At a point in time we used to have an enum, but from what I can see it
+> is easier to keep an API stable if you use name lookup instead. If we
+> want to have minimal changes to the API in the future this is quite a
+> flexible solution, but this code should be moved to each respective
+> chip handler.
+
+You haven't really answered the first question, where the name comes from
+(I guess the question was not too clear). Does this e.g. get passed by a
+user application, or does it come from a hardware description of some
+sort?
+
+It looks a bit like a handcoded version of the code we use for device/driver
+matching in drivers/core. If that's the case, it would be better to use
+the existing infrastructure and create a bus with devices that can be
+matched with drivers.
+
+> >> +static ssize_t test_char_dev_read(struct file *filp, char __user *buf,
+> >> +                               size_t count, loff_t *f_pos)
+> >> +{
+> >> +     struct sk_buff *skb;
+> >> +     int bytes_to_copy;
+> >> +     int err;
+> >> +     struct sk_buff_head *rx_queue = &core_info->test_char_dev->rx_queue;
+> >
+> > What is this read/write interface used for?
+> >
+> > The name suggests that this is only for testing and not an essential
+> > part of your driver. Could this be made a separate driver?
+> >
+> > It also looks like you do socket communication here, can't you use
+> > a proper AF_BLUETOOTH socket to do the same?
+> >
+> 
+> This interface can be used for module testing where you can have a
+> test engine in user space that acts as a chip. Yes, it could be made
+> into a separate driver but it would be a very small driver. Don't know
+> if it will be worth having it in a separate file...
+
+I don't think file size is a major argument here. If it's used for
+testing, I'd make it a separate module that defaults to not being
+built, in order to prevent people from relying on what you intended
+as a testing interface.
+
+> We use the sk_buffer, which I guess is the reason that you mention
+> sockets. We could of course use a socket instead of a char dev, both
+> here and in the cg2900_char_dev file (which of course then would be
+> renamed). It was just a choice we made during development. We think
+> that the transport as such is more like a streaming interface, but I
+> see no real problem to have sockets. We already have several users
+> using char dev though so I would prefer to keep char dev rather than
+> switching to sockets unless you have a strong reason for this.
+> I see no reason to use AF_BLUETOOTH though, the transport is not only
+> for Bluetooth.
+
+The question here is what is appropriate. My guess was that the frame
+format was the one used in bluetooth sockets. If that's not the
+case, AF_BLUETOOTH would obviously be wrong.
+
+For the test interface, it doesn't matter that much what you use, but
+for the cg2900_char_dev we should make sure that you considered all
+the options and made a reasonable decision. What does the data format
+look like there? My impression is that the character device might be
+too low-level and it could be better to use some structured interface
+like a socket, but it really depends on what it actually does.
+
+In particular, if you can address multiple hardware units over one
+character device, it may be better to have separate devices for each
+of them.
+
+> >> +     CG2900_INFO("test_char_dev_read");
+> >> +
+> >> +     if (skb_queue_empty(rx_queue))
+> >> +             wait_event_interruptible(char_wait_queue,
+> >> +                                      !(skb_queue_empty(rx_queue)));
+> >> +
+> >> +     skb = skb_dequeue(rx_queue);
+> >> +     if (!skb) {
+> >> +             CG2900_INFO("skb queue is empty - return with zero bytes");
+> >> +             bytes_to_copy = 0;
+> >> +             goto finished;
+> >> +     }
+> >> +
+> >> +     bytes_to_copy = min(count, skb->len);
+> >> +     err = copy_to_user(buf, skb->data, bytes_to_copy);
+> >> +     if (err) {
+> >> +             skb_queue_head(rx_queue, skb);
+> >> +             return -EFAULT;
+> >> +     }
+> >> +
+> >> +     skb_pull(skb, bytes_to_copy);
+> >> +
+> >> +     if (skb->len > 0)
+> >> +             skb_queue_head(rx_queue, skb);
+> >> +     else
+> >> +             kfree_skb(skb);
+> >> +
+> >> +finished:
+> >> +     return bytes_to_copy;
+> >> +}
+> >
+> > This does not handle short/continued reads.
+> >
+> 
+> As I mentioned above this interface is used for testing and we
+> therefore have some restriction of usage. I don't think we need to
+> impose all things necessary for a full interface upon it.
+
+This is where it gets complicated. We don't normally add interfaces
+to the kernel unless we expect to fully support them for the forseeable
+future. It has happened more than enough in the past that somebody
+introduced a debugging interface which subsequently became a supported
+ABI because some application started relying on it.
+
+Is the code that uses the test interface even publically available?
+If not, I would recommend saving the trouble of arguing about it
+and leaving out the interface.
+
+> >> +     #define CG2900_ERR(fmt, arg...)                                 \
+> >> +     do {                                                            \
+> >> +             if (cg2900_debug_level >= 1)                            \
+> >> +                     pr_err("CG2900 %s: " fmt "\n" , __func__ , ## arg); \
+> >> +     } while (0)
+> >> +
+> >> +#endif /* NDEBUG */
+> >
+> > You'll feel relieved when all this is gone...
+> >
+> 
+> The only thing is it's been pretty nice to have it, but I will remove it.
+> Is it OK to keep defines so we can have "CG2900" in front and "\n"
+> after the text?
+
+Ideally, you would use the dev_* functions instead of the pr_* functions,
+which print the name of the device before the message. I also wouldn't
+add the "\n" in the macro because all the regular printing functions don't
+do it. It will likely only confuse people and the binary remains the same.
+
+	Arnd
