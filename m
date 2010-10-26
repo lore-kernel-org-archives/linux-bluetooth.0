@@ -1,60 +1,177 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 26 Oct 2010 10:55:52 +0300
-From: Ville Tervo <ville.tervo@nokia.com>
-To: ext Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 2/6] Bluetooth: Add LE connect support
-Message-ID: <20101026075552.GB15050@null>
-References: <1288009280-5149-1-git-send-email-ville.tervo@nokia.com>
- <1288009280-5149-3-git-send-email-ville.tervo@nokia.com>
- <AANLkTi=3VB-q-H6vcTAMAC1hYdYVJiF9wVOBKchYEktt@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <AANLkTi=3VB-q-H6vcTAMAC1hYdYVJiF9wVOBKchYEktt@mail.gmail.com>
+From: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+Subject: [PATCH] Add separate queries for listing size in PBAP
+Date: Tue, 26 Oct 2010 10:42:12 +0300
+Message-Id: <1288078932-9547-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Previosly to get phonebook-size or call history size, full phonebook
+query was used and a lot of unnecessary operations need to be done on
+that returned data.  Now separate query is used to get size of each
+listing so performance for "getPhonebookSize" operations improved a lot.
+---
+ plugins/phonebook-tracker.c |  107 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 105 insertions(+), 2 deletions(-)
 
-
-On Mon, Oct 25, 2010 at 10:33:05PM +0200, ext Anderson Lizardo wrote:
-> Hi,
-> 
-> On Mon, Oct 25, 2010 at 8:21 AM, Ville Tervo <ville.tervo@nokia.com> wrote:
-> > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> > index 0b1e460..0944c0c 100644
-> > --- a/net/bluetooth/hci_conn.c
-> > +++ b/net/bluetooth/hci_conn.c
-> > @@ -45,6 +45,32 @@
-> >  #include <net/bluetooth/bluetooth.h>
-> >  #include <net/bluetooth/hci_core.h>
-> >
-> > +void hci_le_connect(struct hci_conn *conn)
-> 
-> This function could be made static, right? (just noticed this now)
-
-Yes. Thanks.
-
-> 
-> > +{
-> > +       struct hci_dev *hdev = conn->hdev;
-> > +       struct hci_cp_le_create_conn cp;
-> > +
-> > +       conn->state = BT_CONNECT;
-> > +       conn->out = 1;
-> > +
-> > +       memset(&cp, 0, sizeof(cp));
-> > +       cp.scan_interval = cpu_to_le16(0x0004);
-> > +       cp.scan_window = cpu_to_le16(0x0004);
-> > +       bacpy(&cp.peer_addr, &conn->dst);
-> > +       cp.conn_interval_min = cpu_to_le16(0x0008);
-> > +       cp.conn_interval_max = cpu_to_le16(0x0100);
-> > +       cp.supervision_timeout = cpu_to_le16(0x0064);
-> > +       cp.min_ce_len = cpu_to_le16(0x0001);
-> > +       cp.max_ce_len = cpu_to_le16(0x0001);
-> > +
-> > +       hci_send_cmd(hdev, HCI_OP_LE_CREATE_CONN, sizeof(cp), &cp);
-> > +}
-
+diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
+index a6e21f8..1919698 100644
+--- a/plugins/phonebook-tracker.c
++++ b/plugins/phonebook-tracker.c
+@@ -45,6 +45,7 @@
+ #define TRACKER_DEFAULT_CONTACT_ME "http://www.semanticdesktop.org/ontologies/2007/03/22/nco#default-contact-me"
+ #define CONTACTS_ID_COL 38
+ #define PULL_QUERY_COL_AMOUNT 39
++#define COUNT_QUERY_COL_AMOUNT 1
+ #define COL_HOME_NUMBER 0
+ #define COL_HOME_EMAIL 7
+ #define COL_WORK_NUMBER 8
+@@ -580,6 +581,61 @@
+ 		"<%s> nco:hasPhoneNumber ?t . "				\
+ 	"} "
+ 
++#define CONTACTS_COUNT_QUERY						\
++	"SELECT COUNT(?c) "						\
++	"WHERE {"							\
++		"?c a nco:PersonContact ."				\
++		"FILTER (regex(str(?c), \"contact:\") || "		\
++		"regex(str(?c), \"nco#default-contact-me\"))"		\
++	"}"
++
++#define MISSED_CALLS_COUNT_QUERY					\
++	"SELECT COUNT(?call) WHERE {"					\
++		"?c a nco:Contact ;"					\
++		"nco:hasPhoneNumber ?h ."				\
++		"?call a nmo:Call ;"					\
++		"nmo:isSent false ;"					\
++		"nmo:from ?c ;"						\
++		"nmo:isAnswered false ."				\
++	"}"
++
++
++#define INCOMING_CALLS_COUNT_QUERY					\
++	"SELECT COUNT(?call) WHERE {"					\
++		"?c a nco:Contact ;"					\
++		"nco:hasPhoneNumber ?h ."				\
++		"?call a nmo:Call ;"					\
++		"nmo:isSent false ;"					\
++		"nmo:from ?c ;"						\
++		"nmo:isAnswered true ."					\
++	"}"
++
++#define OUTGOING_CALLS_COUNT_QUERY					\
++	"SELECT COUNT(?call) WHERE {"					\
++		"?c a nco:Contact ;"					\
++		"nco:hasPhoneNumber ?h ."				\
++		"?call a nmo:Call ;"					\
++		"nmo:isSent true ;"					\
++		"nmo:to ?c ."						\
++	"}"
++
++
++#define COMBINED_CALLS_COUNT_QUERY					\
++	"SELECT COUNT(?call) WHERE {"					\
++	"{"								\
++		"?c a nco:Contact ;"					\
++		"nco:hasPhoneNumber ?h ."				\
++		"?call a nmo:Call ;"					\
++		"nmo:isSent true ;"					\
++		"nmo:to ?c ."						\
++	"}UNION {"							\
++		"?c a nco:Contact ;"					\
++		"nco:hasPhoneNumber ?h ."				\
++		"?call a nmo:Call ;"					\
++		"nmo:from ?c ."						\
++	"}"								\
++	"}"
++
+ typedef void (*reply_list_foreach_t) (char **reply, int num_fields,
+ 		void *user_data);
+ 
+@@ -634,6 +690,22 @@ static const char *name2query(const char *name)
+ 	return NULL;
+ }
+ 
++static const char *name2count_query(const char *name)
++{
++	if (g_str_equal(name, "telecom/pb.vcf"))
++		return CONTACTS_COUNT_QUERY;
++	else if (g_str_equal(name, "telecom/ich.vcf"))
++		return INCOMING_CALLS_COUNT_QUERY;
++	else if (g_str_equal(name, "telecom/och.vcf"))
++		return OUTGOING_CALLS_COUNT_QUERY;
++	else if (g_str_equal(name, "telecom/mch.vcf"))
++		return MISSED_CALLS_COUNT_QUERY;
++	else if (g_str_equal(name, "telecom/cch.vcf"))
++		return COMBINED_CALLS_COUNT_QUERY;
++
++	return NULL;
++}
++
+ static gboolean folder_is_valid(const char *folder)
+ {
+ 	if (folder == NULL)
+@@ -1023,6 +1095,26 @@ static GString *gen_vcards(GSList *contacts,
+ 	return vcards;
+ }
+ 
++static void pull_contacts_size (char **reply, int num_fields, void *user_data)
++{
++	struct phonebook_data *data = user_data;
++
++	if (num_fields < 0) {
++		data->cb(NULL, 0, num_fields, 0, data->user_data);
++		goto fail;
++	}
++
++	if (reply != NULL) {
++		data->index = atoi(reply[0]);
++		return;
++	}
++
++	data->cb(NULL, 0, data->index, 0, data->user_data);
++
++fail:
++	g_free(data);
++}
++
+ static void pull_contacts(char **reply, int num_fields, void *user_data)
+ {
+ 	struct phonebook_data *data = user_data;
+@@ -1285,10 +1377,21 @@ int phonebook_pull(const char *name, const struct apparam_field *params,
+ {
+ 	struct phonebook_data *data;
+ 	const char *query;
++	reply_list_foreach_t pull_cb;
++	int col_amount;
+ 
+ 	DBG("name %s", name);
+ 
+-	query = name2query(name);
++	if (params->maxlistcount == 0) {
++		query = name2count_query(name);
++		col_amount = COUNT_QUERY_COL_AMOUNT;
++		pull_cb = pull_contacts_size;
++	} else {
++		query = name2query(name);
++		col_amount = PULL_QUERY_COL_AMOUNT;
++		pull_cb = pull_contacts;
++	}
++
+ 	if (query == NULL)
+ 		return -ENOENT;
+ 
+@@ -1297,7 +1400,7 @@ int phonebook_pull(const char *name, const struct apparam_field *params,
+ 	data->user_data = user_data;
+ 	data->cb = cb;
+ 
+-	return query_tracker(query, PULL_QUERY_COL_AMOUNT, pull_contacts, data);
++	return query_tracker(query, col_amount, pull_cb, data);
+ }
+ 
+ int phonebook_get_entry(const char *folder, const char *id,
 -- 
-Ville
+1.7.0.4
+
