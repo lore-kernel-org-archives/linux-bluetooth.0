@@ -1,35 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Tue, 26 Oct 2010 08:32:39 -0700
-Message-ID: <AANLkTikksLAeocFsM5vO0rnvphgOo_CoF1ZA_wkABY=c@mail.gmail.com>
-Subject: [PATCH] Fix a2dp play when sample rate changed
-From: John Crosbie <john@excelfore.com>
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20101026092623.GC15050@null>
+References: <linux-bluetooth@vger.kernel.org>
+	<1287791820-22693-4-git-send-email-anderson.briglia@openbossa.org>
+	<20101025130356.GA8862@vigoh>
+	<20101026092623.GC15050@null>
+Date: Tue, 26 Oct 2010 08:22:16 -0700
+Message-ID: <AANLkTikVG-gjd1d7T6ETbfXCU0jp2GsR0miWJFO55hps@mail.gmail.com>
+Subject: Re: [PATCH 3/6] Bluetooth: Implement the first SMP commands
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Ville Tervo <ville.tervo@nokia.com>
+Cc: "ext Gustavo F. Padovan" <padovan@profusion.mobi>,
+	Anderson Briglia <anderson.briglia@openbossa.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I have found that playing a 48KHz wav file immediately after playing a
-44.1K file (or vice-versa) with aplay will fail.  After this failure
-no a2dp stream will play.  The problem is that after determining the
-current avdtp stream doesn't match the new configuration the stream is
-closed and a reconfiguration is attempted but fails because
-setup->rsep is null.  The patch below fixes the reconfiguration.
+Hi,
 
-John Crosbie
-Excelfore Corporation
+On Tue, Oct 26, 2010 at 2:26 AM, Ville Tervo <ville.tervo@nokia.com> wrote:
+> On Mon, Oct 25, 2010 at 03:03:56PM +0200, ext Gustavo F. Padovan wrote:
+>> Hi Vinicius,
+>>
+>> * Anderson Briglia <anderson.briglia@openbossa.org> [2010-10-22 19:56:57 -0400]:
+>>
+>> > From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+>> >
+>> > These simple commands will allow the SMP procedure to be started
+>> > and terminated with a not supported error. This is the first step
+>> > toward something useful.
+>> >
+>> > Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+>> > ---
+>> >  net/bluetooth/l2cap.c |  117 +++++++++++++++++++++++++++++++++++++++++++++++++
+>> >  1 files changed, 117 insertions(+), 0 deletions(-)
+>> >
+>> > diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+>> > index 1ac44f4..ba87c84 100644
+>> > --- a/net/bluetooth/l2cap.c
+>> > +++ b/net/bluetooth/l2cap.c
+>> > @@ -54,6 +54,7 @@
+>> >  #include <net/bluetooth/bluetooth.h>
+>> >  #include <net/bluetooth/hci_core.h>
+>> >  #include <net/bluetooth/l2cap.h>
+>> > +#include <net/bluetooth/smp.h>
+>> >
+>> >  #define VERSION "2.15"
+>> >
+>> > @@ -307,6 +308,85 @@ static void l2cap_chan_del(struct sock *sk, int err)
+>> >     }
+>> >  }
+>> >
+>> > +static struct sk_buff *smp_build_cmd(struct l2cap_conn *conn, u8 code,
+>> > +                                                   u16 dlen, void *data)
+>>
+>> Call this l2cap_smp_build_cmd()
+>
+> Should the whole smp stuff be in separate file (smp.c)? It's not a l2cap feature but a
+> protocol using l2cap. In that case smp_build_cmd would be good name.
+
++1
+
+It is also much better for maintenance and development since there is
+less patches touching the l2cap.c so less chances of conflicts,
+rebases and regressions on l2cap.
 
 
-diff --git a/audio/a2dp.c b/audio/a2dp.c
-index 7a36132..b9b5e4a 100644
---- a/audio/a2dp.c
-+++ b/audio/a2dp.c
-@@ -1028,6 +1028,12 @@ static gboolean a2dp_reconfigure(gpointer data)
-        struct a2dp_sep *sep = setup->sep;
-        int posix_err;
-
-+       if(!setup->rsep)
-+               setup->rsep = avdtp_find_remote_sep(setup->session, sep->lsep);
-        posix_err = avdtp_set_configuration(setup->session, setup->rsep,
-                                                sep->lsep,
-                                                setup->client_caps,
+-- 
+Luiz Augusto von Dentz
+Computer Engineer
