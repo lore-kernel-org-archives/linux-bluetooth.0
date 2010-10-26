@@ -1,53 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <000001cb747a$9fd61270$df823750$@org>
-References: <AANLkTin8pUACCu4YYuhLpFB7DxCfsYhN3cOpYYaVcTQ6@mail.gmail.com>
-	<35B17FE5076C7040809188FBE7913F983F844057B9@SC1EXMB-MBCL.global.atheros.com>
-	<AANLkTinS-NhD3FhqcnpNRRdHKxn4mm+2zTmysrSeSjW8@mail.gmail.com>
-	<35B17FE5076C7040809188FBE7913F983F8440581D@SC1EXMB-MBCL.global.atheros.com>
-	<AANLkTinnjXuAOBTY8VZz756VdrDFv0-OVKPNkwWbxi9-@mail.gmail.com>
-	<000001cb747a$9fd61270$df823750$@org>
-Date: Mon, 25 Oct 2010 23:51:46 -0300
-Message-ID: <AANLkTimTgRV=Ang1JFQpOKXc0bVA6PSOA8WAUo4B7_Wv@mail.gmail.com>
-Subject: Re: [RFC] LE connections and advertising management
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Brian Redding <bredding@codeaurora.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20101025110131.GA7721@vigoh>
+References: <1287714419-13545-1-git-send-email-haijun.liu@atheros.com>
+ <20101022171825.GA980@vigoh> <AANLkTi=C5biCuJV335yfNWkY77xK29aa5JQ+9xvaE1yr@mail.gmail.com>
+ <20101025110131.GA7721@vigoh>
+From: haijun liu <liuhaijun.er@gmail.com>
+Date: Tue, 26 Oct 2010 09:32:19 +0800
+Message-ID: <AANLkTin2RaOZbRbg4faCFUxMLVi-FoY2xnNqq0a8cHpN@mail.gmail.com>
+Subject: Re: [PATCH 1/2 v2] Bluetooth: Fix system crash caused by del_timer()
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: Haijun Liu <haijun.liu@atheros.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
+Hi Gustavo,
 
-On Mon, Oct 25, 2010 at 4:27 PM, Brian Redding <bredding@codeaurora.org> wrote:
-> Hi Claudio,
+>> >> During test session with another vendor's bt stack, found that in
+>> >> l2cap_chan_del() using del_timer() caused l2cap_monitor_timeout()
+>> >> be called after the sock was freed, so it raised a system crash.
+>> >> So I just replaced del_timer() with del_timer_sync() to solve it.
+>> >
+>> > NAK on this. If you read the del_timer_sync() documentation you can
+>> > see that you can't call del_timer_sync() on interrupt context. The
+>> > possible solution here is to check in the beginning of
+>> > l2cap_monitor_timeout() if your sock is still valid.
+>> >
+>>
+>> You are right, I only considered close() interface, so missed the interrupt
+>> context.
+>>
+>> It's very difficult to check sock valid or not in timeout procedure, since it's
+>> an interrupt context, and only can get context from parameter pre-stored,
+>> except global variables.
 >
-> Are there still interfaces that need to be added to attribute-api.txt to handle client and server characteristic configuration as well as presentation and aggregate formats?  I see those as TODO items but wondered if the APIs for them have been defined yet.
+> I think you can check for sk == null there.
 >
-> One thing to note on the server API is that a GATT-based profile could specify behavior on a characteristic value that when the characteristic value is read to perform some action in a similar way as a hardware register.  It appears that the notes I'm reading in the code thus far only consider changes (or writes) to characteristic values for the watch code.
->
-> Also does the current API handle included services?
->
-> The Bluetooth SIG is beginning to look at 3rd party application developer API's for both client and servers for various platforms so understanding what is currently defined in BlueZ and what still needs to be added would be useful.
->
-> Thanks,
-> Brian
-> ---
-> Brian A. Redding
-> Employee of Qualcomm Innovation Center, Inc.
-> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
 
-The API to address characteristic descriptors is still being defined.
-We are focusing in the advertising and connection management at the
-moment. If you have suggestion of how to represent the descriptors in
-the attribute API, suggestions are welcome!
+It's a pre-stored parameter, it will not change by itself.
 
-There isn't a server API at the moment, we implemented a server for
-testing purpose only. But we will need to define it soon.
-Which pages/section of the spec describes this read characteristic behavior?
-
-Included services are not supported by our client. How important is
-it? It is mandatory for qualification?
-
-Regards,
-Claudio.
+-- 
+Haijun Liu
