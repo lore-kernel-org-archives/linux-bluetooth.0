@@ -1,38 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 26 Oct 2010 12:38:08 +0300
+From: Ville Tervo <ville.tervo@nokia.com>
+To: ext Anderson Briglia <anderson.briglia@openbossa.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [RFC] SMP initial draft
+Message-ID: <20101026093808.GE15050@null>
+References: <linux-bluetooth@vger.kernel.org>
+ <1287791820-22693-1-git-send-email-anderson.briglia@openbossa.org>
 MIME-Version: 1.0
-In-Reply-To: <20101025110908.GB7721@vigoh>
-References: <1287714419-13545-1-git-send-email-haijun.liu@atheros.com>
- <1287714419-13545-2-git-send-email-haijun.liu@atheros.com>
- <20101022173411.GB980@vigoh> <AANLkTinbP=N-pTKG1dN9PEPFHSLk9N98cq8aC=dfzav7@mail.gmail.com>
- <20101025110908.GB7721@vigoh>
-From: haijun liu <liuhaijun.er@gmail.com>
-Date: Tue, 26 Oct 2010 19:50:48 +0800
-Message-ID: <AANLkTi=qJunx=jP+E7quEeBSUCSvAryCvkO1MYEdsuv3@mail.gmail.com>
-Subject: Re: [PATCH 2/2 v2] Bluetooth: Fix system crash bug of no send queue protect
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: Haijun Liu <haijun.liu@atheros.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1287791820-22693-1-git-send-email-anderson.briglia@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi,
 
-> sk->sk_send_head is also protected by the socket lock.
->
+On Sat, Oct 23, 2010 at 01:56:54AM +0200, ext Anderson Briglia wrote:
+> This RFC is about Security Manager Protocol (SMP).
+> Basically this patchset implements the initial negotiation over L2CAP and LE
+> connections between a Master and a Slave. TK and STK keys are not being generated
+> and/or exchanged yet, do not expect real encryption/decryption by now.
+> Actually, our next tasks are related to integrate current implementation and
+> Criptographic Toolbox ah, c1 and s1 functions for TK and STK key generation for
+> Just Works SMP pairing method.
 
-I thought you mean sk->tx_queue.lock, actually it's sk->sk_lock.slock.
+I think some kind of mechanism to start encryption on already existing
+connection is needed. It depends on attribute if security is needed or not. One
+might read unsecure attributes and then needs to start encryption because it
+wants to read encrypted attribute.
 
-But there could be some paths have not been covered.
+Is that already planned somehow?
 
-> This dump shows that the crash happens for a code that is not mainline
-> yet. I can't take a patch that fix a bug for code not in mainline. You
-> have to show the bug using mainline code.
->
+> 
+> To test this RFC you need to have the Ville Tervo[1] kernel tree with LE connection
+> patches. Of course you need LE devices and bluez git tree (master branch). Just run
+> the bluetoothd and try to list the primary services using gatttool over an LE channel.
+> eg.: gatttool --primary --le -i hci0 -b 00:17:E7:DD:08:FF
 
-Yes, it is not mainline code, but this issue could be common issue.
+I guess I should take patches which are fixing plain LE (2/6) and (5/6)
+connection to my tree alread. How it sounds to you?
 
-OK, let me try use sk->sk_lock.slock to solve this bug.
-
--- 
-Haijun Liu
+> Comments are welcome.
+> 
+> [1] git://git.kernel.org/pub/scm/linux/kernel/git/vtervo/bluetooth-le-2.6.git
+> 
+> [PATCH 1/6] Bluetooth: Add SMP command structures
+> [PATCH 2/6] Bluetooth: fix receiving L2CAP packets over LE
+> [PATCH 3/6] Bluetooth: Implement the first SMP commands
+> [PATCH 4/6] Bluetooth: Start SMP procedure
+> [PATCH 5/6] Bluetooth: Fix initiated LE connections
+> [PATCH 6/6] Bluetooth: simple SMP pairing negotiation
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
