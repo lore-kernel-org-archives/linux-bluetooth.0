@@ -1,48 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 26 Oct 2010 12:28:51 +0300
+Date: Tue, 26 Oct 2010 12:26:23 +0300
 From: Ville Tervo <ville.tervo@nokia.com>
-To: ext Anderson Briglia <anderson.briglia@openbossa.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+To: "ext Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: Anderson Briglia <anderson.briglia@openbossa.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
 	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: Re: [PATCH 5/6] Bluetooth: Fix initiated LE connections
-Message-ID: <20101026092851.GD15050@null>
+Subject: Re: [PATCH 3/6] Bluetooth: Implement the first SMP commands
+Message-ID: <20101026092623.GC15050@null>
 References: <linux-bluetooth@vger.kernel.org>
- <1287791820-22693-6-git-send-email-anderson.briglia@openbossa.org>
+ <1287791820-22693-4-git-send-email-anderson.briglia@openbossa.org>
+ <20101025130356.GA8862@vigoh>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1287791820-22693-6-git-send-email-anderson.briglia@openbossa.org>
+In-Reply-To: <20101025130356.GA8862@vigoh>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-On Sat, Oct 23, 2010 at 01:56:59AM +0200, ext Anderson Briglia wrote:
-> From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+On Mon, Oct 25, 2010 at 03:03:56PM +0200, ext Gustavo F. Padovan wrote:
+> Hi Vinicius,
 > 
-> Fix LE connections not being marked as master.
+> * Anderson Briglia <anderson.briglia@openbossa.org> [2010-10-22 19:56:57 -0400]:
 > 
-> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-> ---
->  net/bluetooth/hci_conn.c |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
+> > From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> > 
+> > These simple commands will allow the SMP procedure to be started
+> > and terminated with a not supported error. This is the first step
+> > toward something useful.
+> > 
+> > Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> > ---
+> >  net/bluetooth/l2cap.c |  117 +++++++++++++++++++++++++++++++++++++++++++++++++
+> >  1 files changed, 117 insertions(+), 0 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> > index 1ac44f4..ba87c84 100644
+> > --- a/net/bluetooth/l2cap.c
+> > +++ b/net/bluetooth/l2cap.c
+> > @@ -54,6 +54,7 @@
+> >  #include <net/bluetooth/bluetooth.h>
+> >  #include <net/bluetooth/hci_core.h>
+> >  #include <net/bluetooth/l2cap.h>
+> > +#include <net/bluetooth/smp.h>
+> >  
+> >  #define VERSION "2.15"
+> >  
+> > @@ -307,6 +308,85 @@ static void l2cap_chan_del(struct sock *sk, int err)
+> >  	}
+> >  }
+> >  
+> > +static struct sk_buff *smp_build_cmd(struct l2cap_conn *conn, u8 code,
+> > +							u16 dlen, void *data)
 > 
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index c7309e4..1a48c6a 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -52,6 +52,7 @@ void hci_le_connect(struct hci_conn *conn)
->  
->  	conn->state = BT_CONNECT;
->  	conn->out = 1;
-> +	conn->link_mode |= HCI_LM_MASTER;
+> Call this l2cap_smp_build_cmd()
 
-conn->out and conn->link_mode are redutant information. The role cannot be changed.
-
->  
->  	memset(&cp, 0, sizeof(cp));
->  	cp.scan_interval = cpu_to_le16(0x0004);
-> -- 
-> 1.7.0.4
+Should the whole smp stuff be in separate file (smp.c)? It's not a l2cap feature but a
+protocol using l2cap. In that case smp_build_cmd would be good name.
 
 -- 
 Ville
