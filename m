@@ -1,32 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 27 Oct 2010 09:51:19 -0400
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: =?utf-8?B?UmFmYcWC?= Michalski <michalski.raf@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] Remove redundant code in phonebook module
+Message-ID: <20101027135119.GB27339@jh-x301>
+References: <AANLkTinnbp6DFvivhX1WC6cvE5G1tzTSV5VhNNphieqn@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <201010261406.10996.arnd@arndb.de>
-References: <AANLkTineXA2ZY0J7+dZhqywz+4aAVgzihu+LDDbsL8mu@mail.gmail.com>
-	<201010221736.57671.arnd@arndb.de>
-	<AANLkTinY0qmt6uFo4PZ3xH2BF5-AJ0C7ptctzNdOkRU2@mail.gmail.com>
-	<201010261406.10996.arnd@arndb.de>
-Date: Wed, 27 Oct 2010 10:58:02 -0400
-Message-ID: <AANLkTi=wkXHRTvaZCivrgthK=0riEL=j7-m=S6kTHw+5@mail.gmail.com>
-Subject: Re: [PATCH 1/9] mfd: Add support for the ST-Ericsson CG2900.
-From: Linus Walleij <linus.ml.walleij@gmail.com>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Par-Gunnar Hjalmdahl <pghatwork@gmail.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <AANLkTinnbp6DFvivhX1WC6cvE5G1tzTSV5VhNNphieqn@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-2010/10/26 Arnd Bergmann <arnd@arndb.de>:
+Hi Rafal,
 
-> If CG2900 is a single
-> piece of silicon that always looks the same way, it's probably an MFD.
+On Wed, Oct 27, 2010, Rafał Michalski wrote:
+> Some extra code is redundant and not needed anymore. It is an effect
+> of call history queries optimization.
+> ---
+>  plugins/phonebook-tracker.c |   18 ++----------------
+>  1 files changed, 2 insertions(+), 16 deletions(-)
 
-It is:
-http://www.stericsson.com/product/223489.jsp
+This patch has also been pushed upstream. Thanks.
 
-So atleast we have that part right :-)
-
-(And thanks for all the good feedback Arnd, really appreciated!)
-
-Yours,
-Linus Walleij
+Johan
