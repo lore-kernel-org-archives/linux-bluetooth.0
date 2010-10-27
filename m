@@ -1,30 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 27 Oct 2010 09:49:10 -0400
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?utf-8?B?UmFmYcWC?= Michalski <michalski.raf@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Optimize call history queries
-Message-ID: <20101027134910.GA27339@jh-x301>
-References: <AANLkTikwCntXxSzqc1VpA1L27UChsHK=GLmhcHXb8coX@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <AANLkTikwCntXxSzqc1VpA1L27UChsHK=GLmhcHXb8coX@mail.gmail.com>
+Date: Wed, 27 Oct 2010 10:53:52 +0200
+Message-ID: <AANLkTinnbp6DFvivhX1WC6cvE5G1tzTSV5VhNNphieqn@mail.gmail.com>
+Subject: [PATCH 2/2] Remove redundant code in phonebook module
+From: =?ISO-8859-2?Q?Rafa=B3_Michalski?= <michalski.raf@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: =?ISO-8859-2?Q?Rafa=B3_Michalski?= <michalski.raf@gmail.com>
+Content-Type: multipart/mixed; boundary=0016363b8f2a57bb560493955d9b
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Rafal,
+--0016363b8f2a57bb560493955d9b
+Content-Type: text/plain; charset=ISO-8859-1
 
-On Wed, Oct 27, 2010, Rafał Michalski wrote:
-> This patch optimizes call history queries - now there is no redundant
-> results of invoking them.
-> ---
->  plugins/phonebook-tracker.c |   74 ++++++++++++++++++++----------------------
->  1 files changed, 35 insertions(+), 39 deletions(-)
 
-Pushed upstream. Thanks. Btw, if possible please send the patches in the
-message body instead of an attachment (use e.g. git send-email for
-this).  This would make your patch submissions more consistent with the
-rest and ease my work (by not having to always check if I should pipe
-the main message or the attachment to git am).
 
-Johan
+--0016363b8f2a57bb560493955d9b
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0002-Remove-redundant-code-in-phonebook-module.patch"
+Content-Disposition: attachment;
+	filename="0002-Remove-redundant-code-in-phonebook-module.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gfrysr5o0
+
+RnJvbSA5MzQ2NWFiNjQyODkzYTUwOGI4NTQzZWRjNDkxOWExYmNkNDc0MzZiIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBSYWZhbCBNaWNoYWxza2kgPG1pY2hhbHNraS5yYWZAZ21haWwu
+Y29tPgpEYXRlOiBXZWQsIDI3IE9jdCAyMDEwIDA5OjIwOjAwICswMjAwClN1YmplY3Q6IFtQQVRD
+SCAyLzJdIFJlbW92ZSByZWR1bmRhbnQgY29kZSBpbiBwaG9uZWJvb2sgbW9kdWxlCgpTb21lIGV4
+dHJhIGNvZGUgaXMgcmVkdW5kYW50IGFuZCBub3QgbmVlZGVkIGFueW1vcmUuIEl0IGlzIGFuIGVm
+ZmVjdApvZiBjYWxsIGhpc3RvcnkgcXVlcmllcyBvcHRpbWl6YXRpb24uCi0tLQogcGx1Z2lucy9w
+aG9uZWJvb2stdHJhY2tlci5jIHwgICAxOCArKy0tLS0tLS0tLS0tLS0tLS0KIDEgZmlsZXMgY2hh
+bmdlZCwgMiBpbnNlcnRpb25zKCspLCAxNiBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9wbHVn
+aW5zL3Bob25lYm9vay10cmFja2VyLmMgYi9wbHVnaW5zL3Bob25lYm9vay10cmFja2VyLmMKaW5k
+ZXggZTAzNzY3Ny4uOTYyOTBhNCAxMDA2NDQKLS0tIGEvcGx1Z2lucy9waG9uZWJvb2stdHJhY2tl
+ci5jCisrKyBiL3BsdWdpbnMvcGhvbmVib29rLXRyYWNrZXIuYwpAQCAtOTQ5LDI0ICs5NDksMTAg
+QEAgc3RhdGljIHN0cnVjdCBwaG9uZWJvb2tfY29udGFjdCAqZmluZF9jb250YWN0KEdTTGlzdCAq
+Y29udGFjdHMsIGNvbnN0IGNoYXIgKmlkKQogc3RhdGljIHN0cnVjdCBwaG9uZWJvb2tfbnVtYmVy
+ICpmaW5kX3Bob25lKEdTTGlzdCAqbnVtYmVycywgY29uc3QgY2hhciAqcGhvbmUsCiAJCQkJCQkJ
+CWludCB0eXBlKQogewotCUdTTGlzdCAqbCA9IG51bWJlcnM7CisJR1NMaXN0ICpsOwogCXN0cnVj
+dCBwaG9uZWJvb2tfbnVtYmVyICpwYl9udW07CiAKLQlpZiAoZ19zbGlzdF9sZW5ndGgobCkgPT0g
+MSAmJiAocGJfbnVtID0gbC0+ZGF0YSkgJiYKLQkJCQkJZ19zdHJjbXAwKHBiX251bS0+dGVsLCBw
+aG9uZSkgPT0gMCkgewotCi0JCWlmICgodHlwZSA9PSBURUxfVFlQRV9IT01FIHx8IHR5cGUgPT0g
+VEVMX1RZUEVfV09SSykgJiYKLQkJCQkJcGJfbnVtLT50eXBlID09IFRFTF9UWVBFX09USEVSKQl7
+Ci0JCQlwYl9udW0tPnR5cGUgPSB0eXBlOwotCQkJcmV0dXJuIHBiX251bTsKLQkJfQotCi0JCWlm
+ICh0eXBlID09IFRFTF9UWVBFX09USEVSICYmIChwYl9udW0tPnR5cGUgPT0gVEVMX1RZUEVfSE9N
+RSB8fAotCQkJCQlwYl9udW0tPnR5cGUgPT0gVEVMX1RZUEVfV09SSykpCi0JCQlyZXR1cm4gcGJf
+bnVtOwotCX0KLQotCWZvciAoOyBsOyBsID0gbC0+bmV4dCkgeworCWZvciAobCA9IG51bWJlcnM7
+IGw7IGwgPSBsLT5uZXh0KSB7CiAJCXBiX251bSA9IGwtPmRhdGE7CiAJCS8qIFJldHVybmluZyBw
+aG9uZWJvb2sgbnVtYmVyIGlmIHBob25lIHZhbHVlcyBhbmQgdHlwZSB2YWx1ZXMKIAkJICogYXJl
+IGVxdWFsICovCi0tIAoxLjYuMy4zCgo=
+--0016363b8f2a57bb560493955d9b--
