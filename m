@@ -1,33 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1288009280-5149-6-git-send-email-ville.tervo@nokia.com>
-References: <1288009280-5149-1-git-send-email-ville.tervo@nokia.com>
-	<1288009280-5149-6-git-send-email-ville.tervo@nokia.com>
-Date: Wed, 27 Oct 2010 15:09:32 -0400
-Message-ID: <AANLkTi=r0yodYL8N0SnswWH7JQbquttcsjmUruQT0rAs@mail.gmail.com>
-Subject: Re: [PATCH 5/6] Bluetooth: Add server socket support for LE connection
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Ville Tervo <ville.tervo@nokia.com>
+Date: Wed, 27 Oct 2010 15:03:47 -0400
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH v2] Fix obexd crash for empty listing invalid cache
+Message-ID: <20101027190347.GA8025@jh-x301>
+References: <1288202201-861-1-git-send-email-dmitriy.paliy@nokia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1288202201-861-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Oct 25, 2010 at 8:21 AM, Ville Tervo <ville.tervo@nokia.com> wrote:
-> +static void l2cap_le_conn_ready(struct l2cap_conn *conn)
-> +{
-> +       struct l2cap_chan_list *list = &conn->chan_list;
-> +       struct sock *parent, *uninitialized_var(sk);
-> +
-> +       BT_DBG("");
-> +
-> +       /* Check if we have socket listening on cid */
-> +       parent = l2cap_get_sock_by_cid(BT_LISTEN, 0x04, conn->src);
+Hi Dmitriy,
 
-You can use L2CAP_CID_LE_DATA instead of 0x04.
+On Wed, Oct 27, 2010, Dmitriy Paliy wrote:
+> This fixes obexd crash in 3-way calling scenario when listing response is
+> empty. Valid cache and empty pbap buffer mean that cache was already attempted
+> to be created within a single session, but no data was available. Hence, it
+> is not notified and no such file error returned. New cache is not created
+> within current obex session or unless path is changed. Such removes necessity
+> of querying and filtering contacts for each incoming call in the other case,
+> which is extensive for large phone books. On the other hand, if user updates
+> contacts, cache will not be renewed till obex session is closed or path is
+> changed. Therefore TODO: note is added that clear of cache should be defined
+> besides of end of session or change of path.
 
-Regards,
--- 
-Anderson Lizardo
-OpenBossa Labs - INdT
-Manaus - Brazil
+The commit message seems to have a max width of 78 characters which
+means that it's not viewable with git log on a 80 character terminal
+(git log indents the output by 4 characters). Please keep the max commit
+message width to 74 characters or so. Also, if possible try to split it
+up into multiple paragraphs. Paragraphs longer than 6 lines tend to be a
+bit harder to follow.
+
+> +		 * TODO: Define clear cache besides end of session or change
+> +		 * of path.
+
+That doesn't sound like proper english to me and I'm not sure what
+you're trying to say. Should it be "Define a clear distinction between
+end of session and change of path"?
+
+Johan
