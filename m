@@ -1,124 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Wed, 27 Oct 2010 10:53:28 +0200
-Message-ID: <AANLkTikwCntXxSzqc1VpA1L27UChsHK=GLmhcHXb8coX@mail.gmail.com>
-Subject: [PATCH 1/2] Optimize call history queries
-From: =?ISO-8859-2?Q?Rafa=B3_Michalski?= <michalski.raf@gmail.com>
+In-Reply-To: <AANLkTi=ThA2ojhj8PBHK_VybmFcHO91K0g=y7nhfTBAO@mail.gmail.com>
+References: <201010191147.34241.sander@outrightsolutions.nl>
+	<AANLkTikgKM1MNpwP2JL1GdERZ60dE6dkFNC=rdyQDhOV@mail.gmail.com>
+	<AANLkTi=ThA2ojhj8PBHK_VybmFcHO91K0g=y7nhfTBAO@mail.gmail.com>
+Date: Wed, 27 Oct 2010 14:16:05 +0530
+Message-ID: <AANLkTimO4YQANwRouovMc02Dsv-AdS2QH+u_vbunb58W@mail.gmail.com>
+Subject: Re: AVRCP 1.4 : Future on Target Role
+From: "shivendra.agrawal@stericsson.com" <ag.shivendra@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: =?ISO-8859-2?Q?Rafa=B3_Michalski?= <michalski.raf@gmail.com>
-Content-Type: multipart/mixed; boundary=0003255767a6e7bb400493955b3a
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---0003255767a6e7bb400493955b3a
-Content-Type: text/plain; charset=ISO-8859-1
-
-
-
---0003255767a6e7bb400493955b3a
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Optimize-call-history-queries.patch"
-Content-Disposition: attachment;
-	filename="0001-Optimize-call-history-queries.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_gfrysiwj0
-
-RnJvbSA1OWJhZDEwN2VjNTFlNjgyNGIwYzQ0NTBmNGM2N2FiMWU0NTA1Y2ZmIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBSYWZhbCBNaWNoYWxza2kgPG1pY2hhbHNraS5yYWZAZ21haWwu
-Y29tPgpEYXRlOiBXZWQsIDI3IE9jdCAyMDEwIDA5OjE5OjIxICswMjAwClN1YmplY3Q6IFtQQVRD
-SCAxLzJdIE9wdGltaXplIGNhbGwgaGlzdG9yeSBxdWVyaWVzCgpUaGlzIHBhdGNoIG9wdGltaXpl
-cyBjYWxsIGhpc3RvcnkgcXVlcmllcyAtIG5vdyB0aGVyZSBpcyBubyByZWR1bmRhbnQKcmVzdWx0
-cyBvZiBpbnZva2luZyB0aGVtLgotLS0KIHBsdWdpbnMvcGhvbmVib29rLXRyYWNrZXIuYyB8ICAg
-NzQgKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tLS0tLS0tCiAxIGZpbGVzIGNo
-YW5nZWQsIDM1IGluc2VydGlvbnMoKyksIDM5IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL3Bs
-dWdpbnMvcGhvbmVib29rLXRyYWNrZXIuYyBiL3BsdWdpbnMvcGhvbmVib29rLXRyYWNrZXIuYwpp
-bmRleCAzMzY3ZTQ5Li5lMDM3Njc3IDEwMDY0NAotLS0gYS9wbHVnaW5zL3Bob25lYm9vay10cmFj
-a2VyLmMKKysrIGIvcGx1Z2lucy9waG9uZWJvb2stdHJhY2tlci5jCkBAIC0xMjgsNiArMTI4LDEz
-IEBACiAJIldIRVJFIHsgIgkJCQkJCQlcCiAJInsgIgkJCQkJCQkJXAogCQkiP3ggYSBuY286Q29u
-dGFjdCAuICIJCQkJCVwKKwkJIj94IG5jbzpoYXNQaG9uZU51bWJlciA/dCAuICIJCQkJXAorCQki
-P2NhbGwgYSBubW86Q2FsbCA7ICIJCQkJCVwKKwkJIm5tbzpmcm9tID94IDsgIgkJCQkJXAorCQki
-bm1vOmlzU2VudCBmYWxzZSA7ICIJCQkJCVwKKwkJIm5tbzppc0Fuc3dlcmVkIGZhbHNlIC4gIgkJ
-CQlcCisJIn0gVU5JT04geyAiCQkJCQkJCVwKKwkJIj94IGEgbmNvOkNvbnRhY3QgLiAiCQkJCQlc
-CiAJCSI/eCBuY286aGFzUGhvbmVOdW1iZXIgP2ggLiAiCQkJCVwKIAkJIj9jYWxsIGEgbm1vOkNh
-bGwgOyAiCQkJCQlcCiAJCSJubW86ZnJvbSA/eCA7ICIJCQkJCVwKQEAgLTE1OCwxNSArMTY1LDgg
-QEAKIAkJIk9QVElPTkFMIHsgP2EgbmNvOmhhc0VtYWlsQWRkcmVzcyA/ZXcgLiB9ICIJCVwKIAkJ
-Ik9QVElPTkFMIHsgP2EgbmNvOmhhc1Bvc3RhbEFkZHJlc3MgP3B3IC4gfSAiCQlcCiAJCSJPUFRJ
-T05BTCB7ID9hIG5jbzpvcmcgP28gLiB9ICIJCQkJXAotCSJ9IFVOSU9OIHsgIgkJCQkJCQlcCi0J
-CSI/eCBhIG5jbzpDb250YWN0IC4gIgkJCQkJXAotCQkiP3ggbmNvOmhhc1Bob25lTnVtYmVyID90
-IC4gIgkJCQlcCi0JCSI/Y2FsbCBhIG5tbzpDYWxsIDsgIgkJCQkJXAotCQkibm1vOmZyb20gP3gg
-OyAiCQkJCQlcCi0JCSJubW86aXNTZW50IGZhbHNlIDsgIgkJCQkJXAotCQkibm1vOmlzQW5zd2Vy
-ZWQgZmFsc2UgLiAiCQkJCVwKIAkifSAiCQkJCQkJCQlcCi0JIn0gT1JERVIgQlkgREVTQyhubW86
-cmVjZWl2ZWREYXRlKD9jYWxsKSkgIgorCSJ9IEdST1VQIEJZID9jYWxsIE9SREVSIEJZIERFU0Mo
-bm1vOnJlY2VpdmVkRGF0ZSg/Y2FsbCkpICIKIAogI2RlZmluZSBNSVNTRURfQ0FMTFNfTElTVAkJ
-CQkJCVwKIAkiU0VMRUNUID9jIG5jbzpuYW1lRmFtaWx5KD9jKSAiCQkJCQlcCkBAIC0yMjEsNiAr
-MjIxLDEzIEBACiAJIldIRVJFIHsgIgkJCQkJCQlcCiAJInsgIgkJCQkJCQkJXAogCQkiP3ggYSBu
-Y286Q29udGFjdCAuICIJCQkJCVwKKwkJIj94IG5jbzpoYXNQaG9uZU51bWJlciA/dCAuICIJCQkJ
-XAorCQkiP2NhbGwgYSBubW86Q2FsbCA7ICIJCQkJCVwKKwkJIm5tbzpmcm9tID94IDsgIgkJCQkJ
-XAorCQkibm1vOmlzU2VudCBmYWxzZSA7ICIJCQkJCVwKKwkJIm5tbzppc0Fuc3dlcmVkIHRydWUg
-LiAiCQkJCVwKKwkifSBVTklPTiB7ICIJCQkJCQkJXAorCQkiP3ggYSBuY286Q29udGFjdCAuICIJ
-CQkJCVwKIAkJIj94IG5jbzpoYXNQaG9uZU51bWJlciA/aCAuICIJCQkJXAogCQkiP2NhbGwgYSBu
-bW86Q2FsbCA7ICIJCQkJCVwKIAkJIm5tbzpmcm9tID94IDsgIgkJCQkJXApAQCAtMjUxLDE1ICsy
-NTgsOCBAQAogCQkiT1BUSU9OQUwgeyA/YSBuY286aGFzRW1haWxBZGRyZXNzID9ldyAuIH0gIgkJ
-XAogCQkiT1BUSU9OQUwgeyA/YSBuY286aGFzUG9zdGFsQWRkcmVzcyA/cHcgLiB9ICIJCVwKIAkJ
-Ik9QVElPTkFMIHsgP2EgbmNvOm9yZyA/byAuIH0gIgkJCQlcCi0JIn0gVU5JT04geyAiCQkJCQkJ
-CVwKLQkJIj94IGEgbmNvOkNvbnRhY3QgLiAiCQkJCQlcCi0JCSI/eCBuY286aGFzUGhvbmVOdW1i
-ZXIgP3QgLiAiCQkJCVwKLQkJIj9jYWxsIGEgbm1vOkNhbGwgOyAiCQkJCQlcCi0JCSJubW86ZnJv
-bSA/eCA7ICIJCQkJCVwKLQkJIm5tbzppc1NlbnQgZmFsc2UgOyAiCQkJCQlcCi0JCSJubW86aXNB
-bnN3ZXJlZCB0cnVlIC4gIgkJCQlcCiAJIn0gIgkJCQkJCQkJXAotCSJ9IE9SREVSIEJZIERFU0Mo
-bm1vOnJlY2VpdmVkRGF0ZSg/Y2FsbCkpICIKKwkifSBHUk9VUCBCWSA/Y2FsbCBPUkRFUiBCWSBE
-RVNDKG5tbzpyZWNlaXZlZERhdGUoP2NhbGwpKSAiCiAKICNkZWZpbmUgSU5DT01JTkdfQ0FMTFNf
-TElTVAkJCQkJCVwKIAkiU0VMRUNUID9jIG5jbzpuYW1lRmFtaWx5KD9jKSAiCQkJCQlcCkBAIC0z
-MTQsNiArMzE0LDEyIEBACiAJIldIRVJFIHsgIgkJCQkJCQlcCiAJInsgIgkJCQkJCQkJXAogCQki
-P3ggYSBuY286Q29udGFjdCAuICIJCQkJCVwKKwkJIj94IG5jbzpoYXNQaG9uZU51bWJlciA/dCAu
-ICIJCQkJXAorCQkiP2NhbGwgYSBubW86Q2FsbCA7ICIJCQkJCVwKKwkJIm5tbzp0byA/eCA7ICIJ
-CQkJCQlcCisJCSJubW86aXNTZW50IHRydWUgLiAiCQkJCQlcCisJIn0gVU5JT04geyAiCQkJCQkJ
-CVwKKwkJIj94IGEgbmNvOkNvbnRhY3QgLiAiCQkJCQlcCiAJCSI/eCBuY286aGFzUGhvbmVOdW1i
-ZXIgP2ggLiAiCQkJCVwKIAkJIj9jYWxsIGEgbm1vOkNhbGwgOyAiCQkJCQlcCiAJCSJubW86dG8g
-P3ggOyAiCQkJCQkJXApAQCAtMzQyLDE0ICszNDgsOCBAQAogCQkiT1BUSU9OQUwgeyA/YSBuY286
-aGFzRW1haWxBZGRyZXNzID9ldyAuIH0gIgkJXAogCQkiT1BUSU9OQUwgeyA/YSBuY286aGFzUG9z
-dGFsQWRkcmVzcyA/cHcgLiB9ICIJCVwKIAkJIk9QVElPTkFMIHsgP2EgbmNvOm9yZyA/byAuIH0g
-IgkJCQlcCi0JIn0gVU5JT04geyAiCQkJCQkJCVwKLQkJIj94IGEgbmNvOkNvbnRhY3QgLiAiCQkJ
-CQlcCi0JCSI/eCBuY286aGFzUGhvbmVOdW1iZXIgP3QgLiAiCQkJCVwKLQkJIj9jYWxsIGEgbm1v
-OkNhbGwgOyAiCQkJCQlcCi0JCSJubW86dG8gP3ggOyAiCQkJCQkJXAotCQkibm1vOmlzU2VudCB0
-cnVlIC4gIgkJCQkJXAogCSJ9ICIJCQkJCQkJCVwKLQkifSBPUkRFUiBCWSBERVNDKG5tbzpzZW50
-RGF0ZSg/Y2FsbCkpICIKKwkifSBHUk9VUCBCWSA/Y2FsbCBPUkRFUiBCWSBERVNDKG5tbzpzZW50
-RGF0ZSg/Y2FsbCkpICIKIAogI2RlZmluZSBPVVRHT0lOR19DQUxMU19MSVNUCQkJCQkJXAogCSJT
-RUxFQ1QgP2MgbmNvOm5hbWVGYW1pbHkoP2MpICIJCQkJCVwKQEAgLTQwMCw3ICs0MDAsMTIgQEAK
-IAkibm1vOmlzU2VudCg/Y2FsbCkgbm1vOmlzQW5zd2VyZWQoP2NhbGwpID94ICIJCQlcCiAJIldI
-RVJFIHsgIgkJCQkJCQlcCiAJInsgIgkJCQkJCQkJXAotCQkieyAiCQkJCQkJCVwKKwkJIj94IGEg
-bmNvOkNvbnRhY3QgLiAiCQkJCQlcCisJCSI/eCBuY286aGFzUGhvbmVOdW1iZXIgP3QgLiAiCQkJ
-CVwKKwkJIj9jYWxsIGEgbm1vOkNhbGwgOyAiCQkJCQlcCisJCSJubW86dG8gP3ggOyAiCQkJCQkJ
-XAorCQkibm1vOmlzU2VudCB0cnVlIC4gIgkJCQkJXAorCSJ9IFVOSU9OIHsgIgkJCQkJCQlcCiAJ
-CSI/eCBhIG5jbzpDb250YWN0IC4gIgkJCQkJXAogCQkiP3ggbmNvOmhhc1Bob25lTnVtYmVyID9o
-IC4gIgkJCQlcCiAJCSI/Y2FsbCBhIG5tbzpDYWxsIDsgIgkJCQkJXApAQCAtNDE2LDcgKzQyMSw3
-IEBACiAJCQkiT1BUSU9OQUwgeyA/YSBuY286aGFzUG9zdGFsQWRkcmVzcyA/cHcgLiB9ICIJXAog
-CQkJIk9QVElPTkFMIHsgP2EgbmNvOm9yZyA/byAuIH0gIgkJCVwKIAkJIn0gIgkJCQkJCQlcCi0J
-CSJ9IFVOSU9OIHsgIgkJCQkJCVwKKwkifSBVTklPTiB7ICIJCQkJCQkJXAogCQkiP3ggYSBuY286
-Q29udGFjdCAuICIJCQkJCVwKIAkJIj94IG5jbzpoYXNQaG9uZU51bWJlciA/dyAuICIJCQkJXAog
-CQkiP2NhbGwgYSBubW86Q2FsbCA7ICIJCQkJCVwKQEAgLTQzMCwxNSArNDM1LDEzIEBACiAJCSJP
-UFRJT05BTCB7ID9hIG5jbzpoYXNFbWFpbEFkZHJlc3MgP2V3IC4gfSAiCQlcCiAJCSJPUFRJT05B
-TCB7ID9hIG5jbzpoYXNQb3N0YWxBZGRyZXNzID9wdyAuIH0gIgkJXAogCQkiT1BUSU9OQUwgeyA/
-YSBuY286b3JnID9vIC4gfSAiCQkJCVwKLQkJIn0gVU5JT04geyAiCQkJCQkJXAorCSJ9IFVOSU9O
-IHsgIgkJCQkJCQlcCiAJCSI/eCBhIG5jbzpDb250YWN0IC4gIgkJCQkJXAogCQkiP3ggbmNvOmhh
-c1Bob25lTnVtYmVyID90IC4gIgkJCQlcCiAJCSI/Y2FsbCBhIG5tbzpDYWxsIDsgIgkJCQkJXAot
-CQkibm1vOnRvID94IDsgIgkJCQkJCVwKLQkJIm5tbzppc1NlbnQgdHJ1ZSAuICIJCQkJCVwKLQkJ
-In0gIgkJCQkJCQlcCisJCSJubW86ZnJvbSA/eCA7ICIJCQkJCVwKKwkJIm5tbzppc1NlbnQgZmFs
-c2UgLiAiCQkJCQlcCiAJIn0gVU5JT04geyAiCQkJCQkJCVwKLQkJInsgIgkJCQkJCQlcCiAJCSI/
-eCBhIG5jbzpDb250YWN0IC4gIgkJCQkJXAogCQkiP3ggbmNvOmhhc1Bob25lTnVtYmVyID9oIC4g
-IgkJCQlcCiAJCSI/Y2FsbCBhIG5tbzpDYWxsIDsgIgkJCQkJXApAQCAtNDU0LDcgKzQ1Nyw3IEBA
-CiAJCQkiT1BUSU9OQUwgeyA/YSBuY286aGFzUG9zdGFsQWRkcmVzcyA/cHcgLiB9ICIJXAogCQkJ
-Ik9QVElPTkFMIHsgP2EgbmNvOm9yZyA/byAuIH0gIgkJCVwKIAkJIn0gIgkJCQkJCQlcCi0JCSJ9
-IFVOSU9OIHsgIgkJCQkJCVwKKwkifSBVTklPTiB7ICIJCQkJCQkJXAogCQkiP3ggYSBuY286Q29u
-dGFjdCAuICIJCQkJCVwKIAkJIj94IG5jbzpoYXNQaG9uZU51bWJlciA/dyAuICIJCQkJXAogCQki
-P2NhbGwgYSBubW86Q2FsbCA7ICIJCQkJCVwKQEAgLTQ2OCwxNSArNDcxLDggQEAKIAkJIk9QVElP
-TkFMIHsgP2EgbmNvOmhhc0VtYWlsQWRkcmVzcyA/ZXcgLiB9ICIJCVwKIAkJIk9QVElPTkFMIHsg
-P2EgbmNvOmhhc1Bvc3RhbEFkZHJlc3MgP3B3IC4gfSAiCQlcCiAJCSJPUFRJT05BTCB7ID9hIG5j
-bzpvcmcgP28gLiB9ICIJCQkJXAotCQkifSBVTklPTiB7ICIJCQkJCQlcCi0JCSI/eCBhIG5jbzpD
-b250YWN0IC4gIgkJCQkJXAotCQkiP3ggbmNvOmhhc1Bob25lTnVtYmVyID90IC4gIgkJCQlcCi0J
-CSI/Y2FsbCBhIG5tbzpDYWxsIDsgIgkJCQkJXAotCQkibm1vOmZyb20gP3ggOyAiCQkJCQlcCi0J
-CSJubW86aXNTZW50IGZhbHNlIC4gIgkJCQkJXAotCQkifSAiCQkJCQkJCVwKIAkifSAiCQkJCQkJ
-CQlcCi0JIn0gT1JERVIgQlkgREVTQyhubW86cmVjZWl2ZWREYXRlKD9jYWxsKSkgIgorCSJ9IEdS
-T1VQIEJZID9jYWxsIE9SREVSIEJZIERFU0Mobm1vOnJlY2VpdmVkRGF0ZSg/Y2FsbCkpICIKIAog
-I2RlZmluZSBDT01CSU5FRF9DQUxMU19MSVNUCQkJCQkJXAogCSJTRUxFQ1QgP2MgbmNvOm5hbWVG
-YW1pbHkoP2MpIG5jbzpuYW1lR2l2ZW4oP2MpICIJCVwKLS0gCjEuNi4zLjMKCg==
---0003255767a6e7bb400493955b3a--
+2010/10/23 João Paulo Rechi Vita <jprvita@gmail.com>:
+> Hello all,
+>
+> I've seen some discuss regarding how to add support for AVRCP 1.3 and
+> 1.4 versions on the ML lately, and some expectations over the related
+> work I've done in BlueZ. Sorry for the long delay on replying, I've
+> been pretty busy lately and just didn't got the time. I'm planing to
+> put some effort again on this work on the coming weeks.
+>
+> On Tue, Oct 19, 2010 at 14:14, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi,
+>>
+>> On Tue, Oct 19, 2010 at 12:47 PM, Sander van Grieken
+>> <sander@outrightsolutions.nl> wrote:
+>>> I am very much in favor of not directly depending on MPRIS, but instead letting
+>>> applications registering themselves as a target. For two reasons:
+>>>
+>>> - AVRCP seems to be a superset of MPRIS (which is very limited IMO), and might have
+>>> different semantics, especially w.r.t. event notifications. So we would limit ourselves to
+>>> the intersecting subset of both technologies.
+>>> - A separate AVRCP/TG <-> MPRIS bridge agent would still allow controlling all MPRIS-
+>>> enabled players, so we can have both full implementation of the AVRCP spec, AND generic
+>>> MPRIS support.
+>>
+>> Sounds good to me, we can use Media API to register players as well.
+>>
+>
+> I agree with Sander's opinion that MPRIS seems a bit limited for 1.4.
+> OTOH it's an already defined and under-adoption standard. If we have
+> applications registering themselves directly with us, we'll have to
+> define a new interface for that and push this to the player
+> applications. Do you guys already have a draft of these interfaces
+> (for the applications and extensions to the Media API)? I guess we
+> should try to define exactly what we need first, and them see what's
+> missing from MPRIS.
+>
+>>>> > I am keen to receive your feedback with some ideas and thoughts to put
+>>>> > my effort in right direction.
+>>>> >
+>>>> > Question:
+>>>> > Is anyone working on AVRCP 1.4 Target role profile development?
+>>>>
+>>>> Joao Paulo (http://jprvita.wordpress.com/2010/07/22/avrcp-metadata/)
+>>>
+>>> Actually, the metadata work is not part of v1.4 of the spec, but 1.3
+>>>
+>>> Second, I have already added some boilerplate stuff (like a DBUS Connect method for RCP and
+>>> some fixes for CT commands), but I've based on Joao's branch, so I have to wait until his
+>>> stuff gets merged. Alternatively, I could rebase that stuff on HEAD, but that would overlap
+>>> and conflict with Joao's stuff, so I'm hesitant to go there.
+>>
+>
+> Have you published this code somewhere?
+>
+>> I hope to see this code being push upstream soon, I will try to
+>> contact Joao Paulo to get an idea if the code is ready to be
+>> reviewed/pushed so we get the things rolling.
+>>
+>
+> I'm finally here :) I've focused mostly in the 1.3 version of the spec
+> and having pulseaudio as a middle-man in my work, and have written
+> most of the code in pulseaudio to handle these new functionality. Even
+> if we take the approach described above for 1.4, IMO it makes sense to
+> upstream this so we can have earlier support for 1.3 and also to
+> support Sander's work. Luiz, Johan, what do you think?
+>
+> I'll review the code once more, since I've written it a few months
+> ago, but my main concern about pushing it upstream right now is that
+> it hasn't been tested yet. I have no device to test against and PTS
+> can't give us no guarantee whether the code really works in practice
+> or not (but it's still better than nothing). Sander, David, have you
+> tested my code against any real device?
+>
+I have requested some inputs from all to start exchange our ideas as
+Subject: [RFC] AVRCP 1.4 : Design proposal for future on Target Role
+I would be keen to receive your feedback. Thanks in advance.
