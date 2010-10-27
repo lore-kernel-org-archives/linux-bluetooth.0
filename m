@@ -1,45 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 27 Oct 2010 18:26:02 -0400
+Date: Wed, 27 Oct 2010 18:16:27 -0400
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Thomas =?iso-8859-1?Q?W=E4lti?= <twaelti@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, Krisztian.Litkey@nokia.com,
-	Jyri.Sarha@nokia.com
-Subject: Re: HFP Pulseaudio Source destroyed "too quickly" at the end of a
- call
-Message-ID: <20101027222602.GB24756@jh-x301>
-References: <AANLkTikQqPqJdFgLpUrKiqyAC0HNUFnj+8NtbPxazY18@mail.gmail.com>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	marcel@holtmann.org
+Subject: Re: Downstream patches
+Message-ID: <20101027221627.GA24756@jh-x301>
+References: <1288202527.30124.107.camel@novo.hadess.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <AANLkTikQqPqJdFgLpUrKiqyAC0HNUFnj+8NtbPxazY18@mail.gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1288202527.30124.107.camel@novo.hadess.net>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tom,
+Hi Bastien,
 
-On Wed, Oct 27, 2010, Thomas Wälti wrote:
-> I'm developing an application that records all kinds of audio using GStreamer.
-> Target platform is the Nokia N900, the app is called Recaller
-> (http://maemo.org/downloads/product/Maemo5/recaller/)
-
-Looks like a pretty cool app!
-
-> All works well except when ending the recording of Bluetooth
-> Conversations: Once a party hangs up the call, the PulseAudio source
-> and sink disappear before I can stop GStreamer recording (I'm
-> listening to D-Bus events). Unfortunately, this causes my GStreamer
-> pipeline to crash.
+On Wed, Oct 27, 2010, Bastien Nocera wrote:
+> 0001-systemd-install-systemd-unit-files.patch installs a systemd unit,
+> which, when systemd is used, replaces the udev rule to launch
+> bluetoothd. This was pretty heavily tested as part of the alpha for
+> Fedora 14, though systemd was not included in the end.
 > 
-> Is there a way to either delay the destruction of the sink/source by
-> Bluez or a D-Bus message I could intercept/attach to? How can I "win
-> the race"?
+> This patch is used in Fedora 15 now.
 
-Probably this isn't really BlueZ related, but the audio policy module
-(on the PulseAudio side) in the N900 kicks in and requests these changes
-to the audio streams. Unfortunately I'm not really an expert with that
-code (and afaik the audio policy part is closed) so I can't really offer
-more insight on the issue. Just speculating, but you might be able to
-accomplish something by hacking in some delays into the pulse bluetooth
-modules (but again, I'm not really familiar with them so this might not
-be a feasible approach).
+I'll let Marcel comment on this since IIRC he had previously some issues
+with systemd related patches.
+
+> 0002-build-Fix-parallel-build.patch fixes a parallel build problem I
+> encountered on my machine, running "make -j8".
+
+This one has been pushed upstream. Thanks.
 
 Johan
