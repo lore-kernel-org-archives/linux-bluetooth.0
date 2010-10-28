@@ -1,57 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 28 Oct 2010 09:49:17 +0100
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: haijun liu <liuhaijun.er@gmail.com>
-Cc: Haijun Liu <haijun.liu@atheros.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2 v2] Bluetooth: Fix system crash caused by
- del_timer()
-Message-ID: <20101028075346.GA15997@vigoh>
-References: <1287714419-13545-1-git-send-email-haijun.liu@atheros.com>
- <20101022171825.GA980@vigoh>
- <AANLkTi=C5biCuJV335yfNWkY77xK29aa5JQ+9xvaE1yr@mail.gmail.com>
- <20101025110131.GA7721@vigoh>
- <AANLkTin2RaOZbRbg4faCFUxMLVi-FoY2xnNqq0a8cHpN@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTin2RaOZbRbg4faCFUxMLVi-FoY2xnNqq0a8cHpN@mail.gmail.com>
+From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH v3] Fix obexd crash for empty listing invalid cache
+Date: Thu, 28 Oct 2010 11:43:28 +0300
+Message-Id: <1288255408-3967-2-git-send-email-dmitriy.paliy@nokia.com>
+In-Reply-To: <1288255408-3967-1-git-send-email-dmitriy.paliy@nokia.com>
+References: <1288255408-3967-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Haijun,
+This fixes obexd crash in 3-way calling scenario when filtered listing
+response is empty. Valid cache and empty pbap buffer mean that cache was
+already attempted to be created within a single session, but no data was
+available. Hence, it is not notified and no such file error returned.
 
-* haijun liu <liuhaijun.er@gmail.com> [2010-10-26 09:32:19 +0800]:
+Such avoids clearing and creating a new cache operations for each incoming
+call, which is one of possible solution to fix this bug. It can be
+extensive for large phone books. New cache is not created within current
+obex session or unless path is changed.
+---
+ plugins/pbap.c |    9 +++++++++
+ 1 files changed, 9 insertions(+), 0 deletions(-)
 
-> Hi Gustavo,
-> 
-> >> >> During test session with another vendor's bt stack, found that in
-> >> >> l2cap_chan_del() using del_timer() caused l2cap_monitor_timeout()
-> >> >> be called after the sock was freed, so it raised a system crash.
-> >> >> So I just replaced del_timer() with del_timer_sync() to solve it.
-> >> >
-> >> > NAK on this. If you read the del_timer_sync() documentation you can
-> >> > see that you can't call del_timer_sync() on interrupt context. The
-> >> > possible solution here is to check in the beginning of
-> >> > l2cap_monitor_timeout() if your sock is still valid.
-> >> >
-> >>
-> >> You are right, I only considered close() interface, so missed the interrupt
-> >> context.
-> >>
-> >> It's very difficult to check sock valid or not in timeout procedure, since it's
-> >> an interrupt context, and only can get context from parameter pre-stored,
-> >> except global variables.
-> >
-> > I think you can check for sk == null there.
-> >
-> 
-> It's a pre-stored parameter, it will not change by itself.
-
-I looked a bit into this and a good solution seems to be to hold a
-reference to the sock when we call a mod_timer() and then put the
-reference when we call del_timer() and the timer is inactive or when
-l2cap_monitor_timeout(). Look net/sctp/ for examples.
-
+diff --git a/plugins/pbap.c b/plugins/pbap.c
+index 11cb678..3ea7d6b 100644
+--- a/plugins/pbap.c
++++ b/plugins/pbap.c
+@@ -751,6 +751,15 @@ static void *vobject_list_open(const char *name, int oflag, mode_t mode,
+ 	/* PullvCardListing always get the contacts from the cache */
+ 
+ 	if (pbap->cache.valid) {
++		/*
++		 * Valid cache and empty buffer mean that cache was already
++		 * created within a single session, but no data is available.
++		 */
++		if (!pbap->buffer) {
++			ret = -ENOENT;
++			goto fail;
++		}
++
+ 		cache_ready_notify(pbap);
+ 		goto done;
+ 	}
 -- 
-Gustavo F. Padovan
-ProFUSION embedded systems - http://profusion.mobi
+1.7.0.4
+
