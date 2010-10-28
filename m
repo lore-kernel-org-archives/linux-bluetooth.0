@@ -1,61 +1,244 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20101028120950.GB17930@vigoh>
-References: <AANLkTimTzSMQW3cJQPphWgTBKgn0fbN7zui7tRA1enmi@mail.gmail.com>
-	<20101028120950.GB17930@vigoh>
-Date: Thu, 28 Oct 2010 22:48:20 +0530
-Message-ID: <AANLkTi=H+zqzZb6f303VJRXA_zmibiG=Zec0unxy5b-=@mail.gmail.com>
-Subject: Re: Unable to get on D-Bus: bluez 4.77
-From: Puneet Pant <pant.puneet464@gmail.com>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Cc: Johan Hedberg <johan.hedberg@nokia.com>
+Subject: [PATCH v2] Bluetooth: Automate remote name requests
+Date: Thu, 28 Oct 2010 12:20:24 -0400
+Message-Id: <1288282824-30736-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+From: Johan Hedberg <johan.hedberg@nokia.com>
 
-On Thu, Oct 28, 2010 at 5:39 PM, Gustavo F. Padovan
-<padovan@profusion.mobi> wrote:
-> Hi Puneet,
->
-> * Puneet Pant <pant.puneet464@gmail.com> [2010-10-28 17:02:48 +0530]:
->
->> Hello,
->>
->> I have compiled Bluez 4.77. But I'm getting the following error when
->> trying to start Bluetooth Daemon:
->>
->> root@puneet-VirtualBox:/home/puneet/packages/bluez-4.77/src#
->> dbus-daemon --system
->> root@puneet-VirtualBox:/home/puneet/packages/bluez-4.77/src# ./bluetoothd -nd
->> bluetoothd[11819]: Bluetooth deamon 4.77
->> bluetoothd[11819]: src/main.c:parse_config() parsing main.conf
->> bluetoothd[11819]: src/main.c:parse_config() discovto=0
->> bluetoothd[11819]: src/main.c:parse_config() pairto=0
->> bluetoothd[11819]: src/main.c:parse_config() pageto=8192
->> bluetoothd[11819]: src/main.c:parse_config() name=%h-%d
->> bluetoothd[11819]: src/main.c:parse_config() class=0x000100
->> bluetoothd[11819]: src/main.c:parse_config() discov_interval=0
->> bluetoothd[11819]: src/main.c:parse_config() Key file does not have
->> key 'DeviceID'
->> bluetoothd[11819]: Unable to get on D-Bus
->
-> One of the reasons could be that you already have the bluetoothd daemon
-> running.
->
+In Bluetooth there are no automatic updates of remote device names when
+they get changed on the remote side. Instead, it is a good idea to do a
+manual name request when a new connection gets created (for whatever
+reason) since at this point it is very cheap (no costly baseband
+connection creation needed just for the sake of the name request).
 
-I did "ps -e | grep bluetooth" and found no bluetoothd running.
-Could this be related to D-Bus library version incompatibility with ubuntu.
-As I see, Ubuntu 10.10 comes with Dbus 1.4.0 installed, but when I run
-./configure for bluez, it does not detect the installed D-Bus. I had
-to manually download and install D-Bus 1.2.24 for bluez configure to
-detect and compile?
+So far userspace has been responsible for this extra name request but
+tighter control is needed in order not to flood Bluetooth controllers
+with two many commands during connection creation. It has been shown
+that some controllers simply fail to function correctly if they get too
+many (almost) simultaneous commands during connection creation. The
+simplest way to acheive better control of these commands is to move
+their sending completely to the kernel side.
 
-> --
-> Gustavo F. Padovan
-> ProFUSION embedded systems - http://profusion.mobi
->
+This patch inserts name requests into the sequence of events that the
+kernel performs during connection creation. It does this after the
+remote features have been successfully requested and before any pending
+authentication requests are performed. The code will work sub-optimally
+with userspace versions that still do the name requesting themselves (it
+shouldn't break anything though) so it is recommended to combine this
+with a userspace software version that doesn't have automated name
+requests.
 
-Thanks,
-Puneet
+Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
+---
+v2 makes sure that the name request gets always sent instead of just
+doing it for cases when we're also going to request authentication.
+
+ net/bluetooth/hci_event.c |  151 ++++++++++++++++++++++++++++++++-------------
+ 1 files changed, 107 insertions(+), 44 deletions(-)
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 84093b0..6e770e8 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -677,9 +677,51 @@ static void hci_cs_set_conn_encrypt(struct hci_dev *hdev, __u8 status)
+ 	hci_dev_unlock(hdev);
+ }
+ 
++static void request_outgoing_auth(struct hci_dev *hdev, bdaddr_t *bdaddr)
++{
++	struct hci_cp_auth_requested cp;
++	struct hci_conn *conn;
++
++	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, bdaddr);
++	if (!conn)
++		return;
++
++	if (conn->state != BT_CONFIG || !conn->out)
++		return;
++
++	if (conn->sec_level == BT_SECURITY_SDP)
++		return;
++
++	/* Only request authentication for SSP connections or non-SSP
++	 * devices with sec_level HIGH */
++	if (!(hdev->ssp_mode > 0 && conn->ssp_mode > 0) &&
++					conn->sec_level != BT_SECURITY_HIGH)
++		return;
++
++	cp.handle = __cpu_to_le16(conn->handle);
++	hci_send_cmd(hdev, HCI_OP_AUTH_REQUESTED, sizeof(cp), &cp);
++}
++
+ static void hci_cs_remote_name_req(struct hci_dev *hdev, __u8 status)
+ {
++	struct hci_cp_remote_name_req *cp;
++
+ 	BT_DBG("%s status 0x%x", hdev->name, status);
++
++	/* If successful wait for the name req complete event before
++	 * checking for the need to do authentication */
++	if (!status)
++		return;
++
++	cp = hci_sent_cmd_data(hdev, HCI_OP_REMOTE_NAME_REQ);
++	if (!cp)
++		return;
++
++	hci_dev_lock(hdev);
++
++	request_outgoing_auth(hdev, &cp->bdaddr);
++
++	hci_dev_unlock(hdev);
+ }
+ 
+ static void hci_cs_read_remote_features(struct hci_dev *hdev, __u8 status)
+@@ -1090,9 +1132,17 @@ static inline void hci_auth_complete_evt(struct hci_dev *hdev, struct sk_buff *s
+ 
+ static inline void hci_remote_name_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ {
++	struct hci_ev_remote_name *ev = (void *) skb->data;
++
+ 	BT_DBG("%s", hdev->name);
+ 
+ 	hci_conn_check_pending(hdev);
++
++	hci_dev_lock(hdev);
++
++	request_outgoing_auth(hdev, &ev->bdaddr);
++
++	hci_dev_unlock(hdev);
+ }
+ 
+ static inline void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -1162,33 +1212,39 @@ static inline void hci_remote_features_evt(struct hci_dev *hdev, struct sk_buff
+ 	hci_dev_lock(hdev);
+ 
+ 	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->handle));
+-	if (conn) {
+-		if (!ev->status)
+-			memcpy(conn->features, ev->features, 8);
++	if (!conn)
++		goto unlock;
+ 
+-		if (conn->state == BT_CONFIG) {
+-			if (!ev->status && lmp_ssp_capable(hdev) &&
+-						lmp_ssp_capable(conn)) {
+-				struct hci_cp_read_remote_ext_features cp;
+-				cp.handle = ev->handle;
+-				cp.page = 0x01;
+-				hci_send_cmd(hdev,
+-					HCI_OP_READ_REMOTE_EXT_FEATURES,
+-							sizeof(cp), &cp);
+-			} else if (!ev->status && conn->out &&
+-					conn->sec_level == BT_SECURITY_HIGH) {
+-				struct hci_cp_auth_requested cp;
+-				cp.handle = ev->handle;
+-				hci_send_cmd(hdev, HCI_OP_AUTH_REQUESTED,
++	if (!ev->status)
++		memcpy(conn->features, ev->features, 8);
++
++	if (conn->state != BT_CONFIG)
++		goto unlock;
++
++	if (!ev->status && lmp_ssp_capable(hdev) && lmp_ssp_capable(conn)) {
++		struct hci_cp_read_remote_ext_features cp;
++		cp.handle = ev->handle;
++		cp.page = 0x01;
++		hci_send_cmd(hdev, HCI_OP_READ_REMOTE_EXT_FEATURES,
+ 							sizeof(cp), &cp);
+-			} else {
+-				conn->state = BT_CONNECTED;
+-				hci_proto_connect_cfm(conn, ev->status);
+-				hci_conn_put(conn);
+-			}
+-		}
++		goto unlock;
++	}
++
++	if (!ev->status) {
++		struct hci_cp_remote_name_req cp;
++		memset(&cp, 0, sizeof(cp));
++		bacpy(&cp.bdaddr, &conn->dst);
++		cp.pscan_rep_mode = 0x02;
++		hci_send_cmd(hdev, HCI_OP_REMOTE_NAME_REQ, sizeof(cp), &cp);
++	}
++
++	if (!conn->out || conn->sec_level != BT_SECURITY_HIGH) {
++		conn->state = BT_CONNECTED;
++		hci_proto_connect_cfm(conn, ev->status);
++		hci_conn_put(conn);
+ 	}
+ 
++unlock:
+ 	hci_dev_unlock(hdev);
+ }
+ 
+@@ -1646,32 +1702,39 @@ static inline void hci_remote_ext_features_evt(struct hci_dev *hdev, struct sk_b
+ 	hci_dev_lock(hdev);
+ 
+ 	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->handle));
+-	if (conn) {
+-		if (!ev->status && ev->page == 0x01) {
+-			struct inquiry_entry *ie;
++	if (!conn)
++		goto unlock;
+ 
+-			if ((ie = hci_inquiry_cache_lookup(hdev, &conn->dst)))
+-				ie->data.ssp_mode = (ev->features[0] & 0x01);
++	if (!ev->status && ev->page == 0x01) {
++		struct inquiry_entry *ie;
+ 
+-			conn->ssp_mode = (ev->features[0] & 0x01);
+-		}
++		if ((ie = hci_inquiry_cache_lookup(hdev, &conn->dst)))
++			ie->data.ssp_mode = (ev->features[0] & 0x01);
+ 
+-		if (conn->state == BT_CONFIG) {
+-			if (!ev->status && hdev->ssp_mode > 0 &&
+-					conn->ssp_mode > 0 && conn->out &&
+-					conn->sec_level != BT_SECURITY_SDP) {
+-				struct hci_cp_auth_requested cp;
+-				cp.handle = ev->handle;
+-				hci_send_cmd(hdev, HCI_OP_AUTH_REQUESTED,
+-							sizeof(cp), &cp);
+-			} else {
+-				conn->state = BT_CONNECTED;
+-				hci_proto_connect_cfm(conn, ev->status);
+-				hci_conn_put(conn);
+-			}
+-		}
++		conn->ssp_mode = (ev->features[0] & 0x01);
+ 	}
+ 
++	if (conn->state != BT_CONFIG)
++		goto unlock;
++
++	if (!ev->status) {
++		struct hci_cp_remote_name_req cp;
++		memset(&cp, 0, sizeof(cp));
++		bacpy(&cp.bdaddr, &conn->dst);
++		cp.pscan_rep_mode = 0x02;
++		hci_send_cmd(hdev, HCI_OP_REMOTE_NAME_REQ, sizeof(cp), &cp);
++	}
++
++	/* If legacy pairing, or an incoming connection, or SDP security
++	 * consider ourself connected */
++	if (!(hdev->ssp_mode > 0 && conn->ssp_mode > 0) || !conn->out ||
++					conn->sec_level == BT_SECURITY_SDP) {
++		conn->state = BT_CONNECTED;
++		hci_proto_connect_cfm(conn, ev->status);
++		hci_conn_put(conn);
++	}
++
++unlock:
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-- 
+1.7.1
+
