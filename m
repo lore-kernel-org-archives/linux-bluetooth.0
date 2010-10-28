@@ -1,315 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 28 Oct 2010 10:17:33 +0100
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Remove old hcid.conf
-Date: Thu, 28 Oct 2010 10:21:15 +0100
-Message-Id: <1288257675-17086-1-git-send-email-padovan@profusion.mobi>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Ville Tervo <ville.tervo@nokia.com>,
+	Anderson Briglia <anderson.briglia@openbossa.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: Re: [PATCH 3/6] Bluetooth: Implement the first SMP commands
+Message-ID: <20101028091733.GB15997@vigoh>
+References: <linux-bluetooth@vger.kernel.org>
+ <1287791820-22693-4-git-send-email-anderson.briglia@openbossa.org>
+ <20101025130356.GA8862@vigoh>
+ <20101026092623.GC15050@null>
+ <AANLkTikVG-gjd1d7T6ETbfXCU0jp2GsR0miWJFO55hps@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <AANLkTikVG-gjd1d7T6ETbfXCU0jp2GsR0miWJFO55hps@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/hcid.conf      |   57 -------------
- src/hcid.conf.5.in |  227 ----------------------------------------------------
- 2 files changed, 0 insertions(+), 284 deletions(-)
- delete mode 100644 src/hcid.conf
- delete mode 100644 src/hcid.conf.5.in
+* Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2010-10-26 08:22:16 -0700]:
 
-diff --git a/src/hcid.conf b/src/hcid.conf
-deleted file mode 100644
-index b6ce3b4..0000000
---- a/src/hcid.conf
-+++ /dev/null
-@@ -1,57 +0,0 @@
--#
--# HCI daemon configuration file.
--#
--
--# HCId options
--options {
--	# Automatically initialize new devices
--	autoinit yes;
--
--	# Security Manager mode
--	#   none - Security manager disabled
--	#   auto - Use local PIN for incoming connections
--	#   user - Always ask user for a PIN
--	#
--	security user;
--
--	# Pairing mode
--	#   none  - Pairing disabled
--	#   multi - Allow pairing with already paired devices
--	#   once  - Pair once and deny successive attempts
--	pairing multi;
--
--	# Default PIN code for incoming connections
--	passkey "BlueZ";
--}
--
--# Default settings for HCI devices
--device {
--	# Local device name
--	#   %d - device id
--	#   %h - host name
--	name "BlueZ (%d)";
--
--	# Local device class
--	class 0x000100;
--
--	# Default packet type
--	#pkt_type DH1,DM1,HV1;
--
--	# Inquiry and Page scan
--	iscan enable; pscan enable;
--
--	# Default link mode
--	#   none   - no specific policy 
--	#   accept - always accept incoming connections
--	#   master - become master on incoming connections,
--	#            deny role switch on outgoing connections
--	lm accept;
--
--	# Default link policy
--	#   none    - no specific policy
--	#   rswitch - allow role switch
--	#   hold    - allow hold mode
--	#   sniff   - allow sniff mode
--	#   park    - allow park mode
--	lp rswitch,hold,sniff,park;
--}
-diff --git a/src/hcid.conf.5.in b/src/hcid.conf.5.in
-deleted file mode 100644
-index b771389..0000000
---- a/src/hcid.conf.5.in
-+++ /dev/null
-@@ -1,227 +0,0 @@
--.TH "HCID.CONF" "5" "March 2004" "hcid.conf - HCI daemon" "System management commands"
--.SH "NAME"
--@CONFIGDIR@/hcid.conf \- Configuration file for the hcid Bluetooth HCI daemon
--
--.SH "DESCRIPTION"
--@CONFIGDIR@/hcid.conf contains all the options needed by the Bluetooth Host Controller Interface daemon.
--
--It consists of sections and parameters. A section begins with
--the name of the section followed by optional specifiers and the
--parameters inside curly brackets. Sections contain parameters of
--the form:
--.TP
--\fIname\fP \fIvalue1\fP, \fIvalue2\fP ... ;
--
--.PP
--Any character after a hash ('#') character is ignored until newline.
--Whitespace is also ignored.
--
--
--The valid section names for
--.B hcid.conf
--are, at the moment:
--
--.TP
--.B options
--contains generic options for hcid and the pairing policy.
--.TP
--.B device
--contains lower\-level options for the hci devices connected to the computer.
--.SH "OPTIONS SECTION"
--The following parameters may be present in an option section:
--
--
--.TP
--\fBautoinit\fP  yes|no
--
--Automatically initialize newly connected devices. The default is \fIno\fP.
--
--
--.TP
--\fBpairing\fP  none|multi|once
--
--\fInone\fP means that pairing is disabled. \fImulti\fP allows pairing
--with already paired devices. \fIonce\fP allows pairing once and denies
--successive attempts. The default hcid configuration is shipped with \fBmulti\fP
--enabled
--
--.TP
--\fBoffmode\fP  noscan|devdown
--
--\fInoscan\fP means that page and inquiry scans are disabled when you call
--SetMode("off"). \fIdevdown\fP sets the adapter into down state (same what
--\fIhciconfig hci0 down\fP does).
--
--.TP
--\fBdeviceid\fP	<vendor>:<product>:<version>
--
--This option allows to specify the vendor and product information of the
--Bluetooth device ID service record.
--
--.TP
--\fBpasskey\fP "\fIpin\fP"
--
--The default PIN for incoming connections if \fBsecurity\fP has been
--set to \fIauto\fP.
--
--.TP
--\fBsecurity\fP  none|auto|user
--
--\fInone\fP means the security manager is disabled. \fIauto\fP uses
--local PIN, by default from pin_code, for incoming
--connections. \fIuser\fP always asks the user for a PIN.
--
--.SH "DEVICE SECTION"
--Parameters within a device section with no specifier, the default
--device section, will be applied to all devices and device sections
--where these are unspecified. The following optional device specifiers
--are supported:
--
--.TP
--\fInn\fP\fB:\fP\fInn\fP\fB:\fP\fInn\fP\fB:\fP\fInn\fP\fB:\fP\fInn\fP\fB:\fP\fInn\fP
--
--Parameters specified within this section will be applied to the device
--with this \fIdevice bluetooth address\fP. All other parameters are applied from
--the default section.
--
--.TP
--\fBhci\fIn\fP
--
--Parameters specified within this section will be applied to the device
--with this \fIdevice interface\fP, unless that device is matched by a
--\fIdevice address\fP section. All other parameters are applied from
--the default section.
--
--
--.PP
--\fBNote\fP: Most of the options supported in the \fBdevice\fP section are described to some extent in the bluetooth specification version 1.2 Vol2, Part E section 6. Please refer to it for technical details.
--
--.PP
--The following parameters may be present in a device section:
--
--.TP
--\fBname\fP  "\fIname\fP"
--
--The device name. \fI%d\fP inserts the device id. \fI%h\fP inserts
--the host name.
--
--
--.TP
--\fBclass\fP  0x\fISSDDdd\fP (three bytes)
--
--The Bluetooth Device Class is described in the Bluetooth Specification section 1.2 ("Assigned Numbers \- Bluetooth Baseband").
--
--The default shipped with hcid is 0x000100 which simply stands for "Computer".
--
--The Bluetooth device class is a high\-level description of the bluetooth device, composed of three bytes: the "Major Service Class" (byte "SS" above), the "Major Device Class" (byte "DD" above) and the "Minor Device Class" (byte "dd" above). These classes describe the high\-level capabilities of the device, such as "Networking Device", "Computer", etc. This information is often used by clients who are looking for a certain type of service around them.
--
--Where it becomes tricky is that another type of mechanism for service discovery exists: "SDP", as in "Service Discovery Protocol".
--
--In practice, most Bluetooth clients scan their surroundings in two successive steps: they first look for all bluetooth devices around them and find out their "class". You can do this on Linux with the \fBhcitool scan\fP command. Then, they use SDP in order to check if a device in a given class offers the type of service that they want.
--
--This means that the hcid.conf "class" parameter needs to be set up properly if particular services are running on the host, such as "PAN", or "OBEX Obect Push", etc: in general a device looking for a service such as "Network Access Point" will only scan for this service on devices containing "Networking" in their major service class.
--
--
--.IP
--Major service class byte allocation (from LSB to MSB):
--
--Bit 1:	Positioning (Location identification)
--
--Bit 2:  Networking (LAN, Ad hoc, ...)
--
--Bit 3:  Rendering (Printing, Speaker, ...)
--
--Bit 4:  Capturing (Scanner, Microphone, ...)
--
--Bit 5:  Object Transfer (v\-Inbox, v\-Folder, ...)
--
--Bit 6:  Audio (Speaker, Microphone, Headset service, ...)
--
--Bit 7:  Telephony (Cordless telephony, Modem, Headset service, ...)
--
--Bit 8:  Information (WEB\-server, WAP\-server, ...)
--
--.IP
--Example: class 0x02hhhh : the device offers networking service
--
--
--.IP
--Major device class allocation:
--
--0x00: Miscellaneous
--
--0x01: Computer (desktop,notebook, PDA, organizers, .... )
--
--0x02: Phone (cellular, cordless, payphone, modem, ...)
--
--0x03: LAN /Network Access point
--
--0x04: Audio/Video (headset,speaker,stereo, video display, vcr.....
--
--0x05: Peripheral (mouse, joystick, keyboards, ..... )
--
--0x06: Imaging (printing, scanner, camera, display, ...)
--
--Other values are not defined (refer to the Bluetooth specification for more details
--
--.IP
--Minor device class allocation: the meaning of this byte depends on the major class allocation, please refer to the Bluetooth specifications for more details).
--
--.IP
--.B Example:
--if PAND runs on your server, you need to set up at least \fBclass 0x020100\fP, which stands for "Service Class: Networking" and "Device Class: Computer, Uncategorized".
--
--
--.TP
--\fBiscan\fP  enable|disable
--.TP
--\fBpscan\fP  enable|disable
--
--Bluetooth devices discover and connect to each other through the use of two special Bluetooth channels, the Inquiry and Page channels (described in the Bluetooth Spec Volume 1, Part A, Section 3.3.3, page 35). These two options enable the channels on the bluetooth device.
--
--\fBiscan enable\fP: makes the bluetooth device "discoverable" by enabling it to answer "inquiries" from other nearby bluetooth devices.
--
--\fBpscan enable\fP: makes the bluetooth device "connectable to" by enabling the use of the "page scan" channel.
--
--.TP
--\fBlm\fP  none|accept,master
--
--\fInone\fP means no specific policy. \fIaccept\fP means always accept
--incoming connections. \fImaster\fP means become master on incoming
--connections and deny role switch on outgoing connections.
--
--.TP
--\fBlp\fP  none|rswitch,hold,sniff,park
--
--\fInone\fP means no specific policy. \fIrswitch\fP means allow role
--switch. \fIhold\fP means allow hold mode. \fIsniff\fP means allow
--sniff mode. \fIpark\fP means allow park mode. Several options can be
--combined.
--
--This option determines the various operational modes that are allowed for this device when it participates to a piconet. Normally  hold and sniff should be enabled for standard operations.
--
--hold: this mode is related to synchronous communications (SCO voice channel for example).
--
--sniff: when in this mode, a device is only present on the piconet during determined slots of time, allowing it to do other things when it is "absent", for example to scan for other bluetooth devices.
--
--park:  this is a mode where the device is put on standby on the piconet, for power\-saving purposes for example.
--
--rswitch: this is a mode that enables role\-switch (master <\-> slave) between two devices in a piconet. It is not clear whether this needs to be enabled in order to make the "lm master" setting work properly or not.
--
--.TP
--\fBpageto\fP  \fIn\fP
--
--Page Timeout measured in number of baseband slots. Interval length = N * 0.625 msec (1 baseband slot)
--
--.TP
--\fBdiscovto\fP  \fIn\fP
--
--The time in seconds that the device will stay in discoverable mode. 0 disables this feature and forces the device to be always discoverable.
--
--.SH "FILES"
--.TP
--.I @CONFIGDIR@/hcid.conf
--Default location of the global configuration file.
--
--.SH "AUTHOR"
--This manual page was written by Edouard Lafargue, Fredrik Noring, Maxim Krasnyansky and Marcel Holtmann.
+> Hi,
+> 
+> On Tue, Oct 26, 2010 at 2:26 AM, Ville Tervo <ville.tervo@nokia.com> wrote:
+> > On Mon, Oct 25, 2010 at 03:03:56PM +0200, ext Gustavo F. Padovan wrote:
+> >> Hi Vinicius,
+> >>
+> >> * Anderson Briglia <anderson.briglia@openbossa.org> [2010-10-22 19:56:57 -0400]:
+> >>
+> >> > From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> >> >
+> >> > These simple commands will allow the SMP procedure to be started
+> >> > and terminated with a not supported error. This is the first step
+> >> > toward something useful.
+> >> >
+> >> > Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> >> > ---
+> >> >  net/bluetooth/l2cap.c |  117 +++++++++++++++++++++++++++++++++++++++++++++++++
+> >> >  1 files changed, 117 insertions(+), 0 deletions(-)
+> >> >
+> >> > diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> >> > index 1ac44f4..ba87c84 100644
+> >> > --- a/net/bluetooth/l2cap.c
+> >> > +++ b/net/bluetooth/l2cap.c
+> >> > @@ -54,6 +54,7 @@
+> >> >  #include <net/bluetooth/bluetooth.h>
+> >> >  #include <net/bluetooth/hci_core.h>
+> >> >  #include <net/bluetooth/l2cap.h>
+> >> > +#include <net/bluetooth/smp.h>
+> >> >
+> >> >  #define VERSION "2.15"
+> >> >
+> >> > @@ -307,6 +308,85 @@ static void l2cap_chan_del(struct sock *sk, int err)
+> >> >     }
+> >> >  }
+> >> >
+> >> > +static struct sk_buff *smp_build_cmd(struct l2cap_conn *conn, u8 code,
+> >> > +                                                   u16 dlen, void *data)
+> >>
+> >> Call this l2cap_smp_build_cmd()
+> >
+> > Should the whole smp stuff be in separate file (smp.c)? It's not a l2cap feature but a
+> > protocol using l2cap. In that case smp_build_cmd would be good name.
+> 
+> +1
+> 
+> It is also much better for maintenance and development since there is
+> less patches touching the l2cap.c so less chances of conflicts,
+> rebases and regressions on l2cap.
+
+Yep, we may need a new smp.c file.
+
 -- 
-1.7.3.1
-
+Gustavo F. Padovan
+ProFUSION embedded systems - http://profusion.mobi
