@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/5] Fix not replying when mode is limited discoverable or discoverable
-Date: Thu, 28 Oct 2010 11:00:58 +0300
-Message-Id: <1288252859-10337-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH 2/5] Fix not waiting mode change when setting powered property
+Date: Thu, 28 Oct 2010 11:00:56 +0300
+Message-Id: <1288252859-10337-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1288252859-10337-1-git-send-email-luiz.dentz@gmail.com>
 References: <1288252859-10337-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,103 +11,131 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-When changing from/to limited discoverable or discoverable it won't
-change the scan mode thus causing set_mode_complete to not be called.
+This may cause errors if the user application immediately set another
+mode.
 ---
- src/adapter.c |   49 +++++++++++++++++++++++++++++++++----------------
- 1 files changed, 33 insertions(+), 16 deletions(-)
+ src/adapter.c |   84 +++++++++++++++++++++++++++++---------------------------
+ 1 files changed, 43 insertions(+), 41 deletions(-)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index e5f7730..b5e73b7 100644
+index 98d96e2..f4fc3c1 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -584,25 +584,41 @@ done:
- 
- 	DBG("%s", modestr);
- 
--	if (msg != NULL)
--		/* Wait for mode change to reply */
--		adapter->pending_mode = create_session(adapter, connection,
--							msg, new_mode, NULL);
--	else
-+	if (msg != NULL) {
-+		/* Limited to Discoverable and vice-versa doesn't cause any
-+		   change to scan mode */
-+		if (g_str_equal(modestr, mode2str(adapter->mode)) == TRUE) {
-+			DBusMessage *reply;
-+
-+			reply = g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
-+
-+			g_dbus_send_message(connection, reply);
-+		} else
-+			/* Wait for mode change to reply */
-+			adapter->pending_mode = create_session(adapter,
-+								connection,
-+								msg, new_mode,
-+								NULL);
-+	} else
- 		/* Nothing to reply just write the new mode */
- 		adapter->mode = new_mode;
- 
- 	return 0;
- }
- 
--static DBusMessage *set_powered(DBusConnection *conn, DBusMessage *msg,
--				gboolean powered, void *data)
-+static DBusMessage *set_discoverable(DBusConnection *conn, DBusMessage *msg,
-+				gboolean discoverable, void *data)
- {
- 	struct btd_adapter *adapter = data;
- 	uint8_t mode;
- 	int err;
- 
--	mode = powered ? get_mode(&adapter->bdaddr, "on") : MODE_OFF;
-+	mode = discoverable ? MODE_DISCOVERABLE : MODE_CONNECTABLE;
-+
-+	if (mode == MODE_DISCOVERABLE && adapter->pairable &&
-+					adapter->discov_timeout > 0 &&
-+					adapter->discov_timeout <= 60)
-+		mode = MODE_LIMITED;
- 
+@@ -604,11 +604,11 @@ static DBusMessage *set_powered(DBusConnection *conn, DBusMessage *msg,
  	if (mode == adapter->mode)
  		return dbus_message_new_method_return(msg);
-@@ -614,19 +630,20 @@ static DBusMessage *set_powered(DBusConnection *conn, DBusMessage *msg,
- 	return NULL;
- }
  
--static DBusMessage *set_discoverable(DBusConnection *conn, DBusMessage *msg,
--				gboolean discoverable, void *data)
-+static DBusMessage *set_powered(DBusConnection *conn, DBusMessage *msg,
-+				gboolean powered, void *data)
- {
- 	struct btd_adapter *adapter = data;
- 	uint8_t mode;
- 	int err;
- 
--	mode = discoverable ? MODE_DISCOVERABLE : MODE_CONNECTABLE;
-+	if (powered) {
-+		mode = get_mode(&adapter->bdaddr, "on");
-+		return set_discoverable(conn, msg, mode == MODE_DISCOVERABLE,
-+									data);
-+	}
- 
--	if (mode == MODE_DISCOVERABLE && adapter->pairable &&
--					adapter->discov_timeout > 0 &&
--					adapter->discov_timeout <= 60)
--		mode = MODE_LIMITED;
-+	mode = MODE_OFF;
- 
- 	if (mode == adapter->mode)
- 		return dbus_message_new_method_return(msg);
-@@ -635,7 +652,7 @@ static DBusMessage *set_discoverable(DBusConnection *conn, DBusMessage *msg,
+-	err = set_mode(adapter, mode, NULL);
++	err = set_mode(adapter, mode, msg);
  	if (err < 0)
  		return failed_strerror(msg, -err);
  
--	return 0;
+-	return dbus_message_new_method_return(msg);
 +	return NULL;
  }
  
- static DBusMessage *set_pairable(DBusConnection *conn, DBusMessage *msg,
+ static DBusMessage *set_discoverable(DBusConnection *conn, DBusMessage *msg,
+@@ -2570,6 +2570,45 @@ static void unload_drivers(struct btd_adapter *adapter)
+ 	}
+ }
+ 
++static void set_mode_complete(struct btd_adapter *adapter)
++{
++	struct session_req *pending;
++	const char *modestr;
++	int err;
++
++	if (adapter->pending_mode == NULL)
++		return;
++
++	pending = adapter->pending_mode;
++	adapter->pending_mode = NULL;
++
++	err = (pending->mode != adapter->mode) ? -EINVAL : 0;
++
++	if (pending->msg != NULL) {
++		DBusMessage *msg = pending->msg;
++		DBusMessage *reply;
++
++		if (err < 0)
++			reply = failed_strerror(msg, -err);
++		else
++			reply = g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
++
++		g_dbus_send_message(connection, reply);
++	}
++
++	modestr = mode2str(adapter->mode);
++
++	DBG("%s", modestr);
++
++	/* Only store if the mode matches the pending */
++	if (err == 0)
++		write_device_mode(&adapter->bdaddr, modestr);
++	else
++		error("unable to set mode: %s", mode2str(pending->mode));
++
++	session_unref(pending);
++}
++
+ int adapter_stop(struct btd_adapter *adapter)
+ {
+ 	gboolean powered, discoverable, pairable;
+@@ -2628,6 +2667,8 @@ int adapter_stop(struct btd_adapter *adapter)
+ 
+ 	info("Adapter %s has been disabled", adapter->path);
+ 
++	set_mode_complete(adapter);
++
+ 	return 0;
+ }
+ 
+@@ -3137,45 +3178,6 @@ int adapter_remove_found_device(struct btd_adapter *adapter, bdaddr_t *bdaddr)
+ 	return 0;
+ }
+ 
+-static void set_mode_complete(struct btd_adapter *adapter)
+-{
+-	struct session_req *pending;
+-	const char *modestr;
+-	int err;
+-
+-	if (adapter->pending_mode == NULL)
+-		return;
+-
+-	pending = adapter->pending_mode;
+-	adapter->pending_mode = NULL;
+-
+-	err = (pending->mode != adapter->mode) ? -EINVAL : 0;
+-
+-	if (pending->msg != NULL) {
+-		DBusMessage *msg = pending->msg;
+-		DBusMessage *reply;
+-
+-		if (err < 0)
+-			reply = failed_strerror(msg, -err);
+-		else
+-			reply = g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+-
+-		g_dbus_send_message(connection, reply);
+-	}
+-
+-	modestr = mode2str(adapter->mode);
+-
+-	DBG("%s", modestr);
+-
+-	/* Only store if the mode matches the pending */
+-	if (err == 0)
+-		write_device_mode(&adapter->bdaddr, modestr);
+-	else
+-		error("unable to set mode: %s", mode2str(pending->mode));
+-
+-	session_unref(pending);
+-}
+-
+ void adapter_mode_changed(struct btd_adapter *adapter, uint8_t scan_mode)
+ {
+ 	const gchar *path = adapter_get_path(adapter);
 -- 
 1.7.1
 
