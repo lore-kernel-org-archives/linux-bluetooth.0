@@ -1,27 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 28 Oct 2010 14:24:01 -0400
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/5] Fix issue when setting limited discoverable mode
-Message-ID: <20101028182401.GA1693@jh-x301>
-References: <1288252859-10337-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1288252859-10337-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <AANLkTinBqjTmLiXwd5LkzZRXOkuYkfS=48m6gWQ9AQO7@mail.gmail.com>
+References: <AANLkTinBqjTmLiXwd5LkzZRXOkuYkfS=48m6gWQ9AQO7@mail.gmail.com>
+Date: Thu, 28 Oct 2010 16:11:40 -0200
+Message-ID: <AANLkTimU3vT0MiqiTk0E8mFhVJJWXB5xJ50RosiYHCBy@mail.gmail.com>
+Subject: Re: RFCOMM connection from android device to desktop pc
+From: Leandro de Oliveira <lehphyro@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+So, any ideas? Don't you find it strange that bluez can't communicate
+with itself?
 
-On Thu, Oct 28, 2010, Luiz Augusto von Dentz wrote:
->  	if (discoverable && adapter->pairable && adapter->discov_timeout > 0 &&
-> -						adapter->discov_timeout <= 60)
-> +						adapter->discov_timeout <= 60) {
-> +		adapter->mode = MODE_LIMITED;
->  		adapter_set_limited_discoverable(adapter, TRUE);
-
-Wouldn't it make more sense to do the fix to adapter->mode inside the
-adapter_set_limited_discoverable function?
-
-Johan
+2010/10/22 Leandro de Oliveira <lehphyro@gmail.com>:
+> Hi,
+>
+> I'm trying to open an RFCOMM connection from my android device to my
+> desktop pc running Ubuntu 10.04, send some data, close the connection
+> and then do it again. My desktop program is written in Java and relies
+> on BlueCove[1] to handle bluetooth details which calls Bluez 4.x in
+> this case.
+>
+> The problem is that I get a successful connection and data transfer in
+> the first communication attempt but nothing in subsequent attempts.
+>
+> There is this thread[2] in the android-platform mailing list with much
+> more detail, but I think you could just take a look at this hcidump
+> that has been requested there to let me know if this is a problem in
+> bluez on the android or desktop side:
+> http://dl.dropbox.com/u/1401233/pc-hcidump.txt
+>
+> Please, let me know if you need more info.
+>
+> The same program works perfectly when the android application connects
+> to it running on Windows 7 using the Microsoft Bluetooth Stack.
+>
+> [1] http://www.bluecove.org/
+> [2] http://groups.google.com/group/android-platform/browse_thread/thread/485db57409304d3e?hl=en
+>
+> Thank you very much
+>
