@@ -1,40 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 28 Oct 2010 09:49:17 +0100
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: haijun liu <liuhaijun.er@gmail.com>
+Cc: Haijun Liu <haijun.liu@atheros.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2 v2] Bluetooth: Fix system crash caused by
+ del_timer()
+Message-ID: <20101028075346.GA15997@vigoh>
+References: <1287714419-13545-1-git-send-email-haijun.liu@atheros.com>
+ <20101022171825.GA980@vigoh>
+ <AANLkTi=C5biCuJV335yfNWkY77xK29aa5JQ+9xvaE1yr@mail.gmail.com>
+ <20101025110131.GA7721@vigoh>
+ <AANLkTin2RaOZbRbg4faCFUxMLVi-FoY2xnNqq0a8cHpN@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20101027222602.GB24756@jh-x301>
-References: <AANLkTikQqPqJdFgLpUrKiqyAC0HNUFnj+8NtbPxazY18@mail.gmail.com>
-	<20101027222602.GB24756@jh-x301>
-Date: Thu, 28 Oct 2010 10:57:33 +0200
-Message-ID: <AANLkTimS8qU_kb94BBvnkQFDK32ssmEmHvbBefcfSkDx@mail.gmail.com>
-Subject: Re: HFP Pulseaudio Source destroyed "too quickly" at the end of a call
-From: =?ISO-8859-1?Q?Thomas_W=E4lti?= <twaelti@gmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
-	Krisztian.Litkey@nokia.com, Jyri.Sarha@nokia.com
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <AANLkTin2RaOZbRbg4faCFUxMLVi-FoY2xnNqq0a8cHpN@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-2010/10/28 Johan Hedberg <johan.hedberg@gmail.com>:
-> Probably this isn't really BlueZ related, but the audio policy module
-> (on the PulseAudio side) in the N900 kicks in and requests these changes
-> to the audio streams. Unfortunately I'm not really an expert with that
-> code (and afaik the audio policy part is closed) so I can't really offer
-> more insight on the issue. Just speculating, but you might be able to
-> accomplish something by hacking in some delays into the pulse bluetooth
-> modules (but again, I'm not really familiar with them so this might not
-> be a feasible approach).
+Hi Haijun,
 
-Thanks for the prompt feedback, Johan.
-I had looked at the PulseAudio Bluetooth Modules source
-(http://git.0pointer.de/?p=pulseaudio.git;a=tree;f=src/modules/bluetooth;hb=HEAD)
-before, but didn't see anything (but then, it's a bit over my head :-)
-It seems like Joao Paulo Rechi Vita is the author of the relevant
-source, and as he also did the Bluez HFP implementation (IIRC), I hope
-he might shed a light on this. I'm asking on this list because once
-HFP "hangs up", it probably issues some teardown event to its
-consumers.
+* haijun liu <liuhaijun.er@gmail.com> [2010-10-26 09:32:19 +0800]:
 
-(It would be nice if I could get this solved this before heading to
-the MeeGo conf in Dublin - see you there :-)
+> Hi Gustavo,
+> 
+> >> >> During test session with another vendor's bt stack, found that in
+> >> >> l2cap_chan_del() using del_timer() caused l2cap_monitor_timeout()
+> >> >> be called after the sock was freed, so it raised a system crash.
+> >> >> So I just replaced del_timer() with del_timer_sync() to solve it.
+> >> >
+> >> > NAK on this. If you read the del_timer_sync() documentation you can
+> >> > see that you can't call del_timer_sync() on interrupt context. The
+> >> > possible solution here is to check in the beginning of
+> >> > l2cap_monitor_timeout() if your sock is still valid.
+> >> >
+> >>
+> >> You are right, I only considered close() interface, so missed the interrupt
+> >> context.
+> >>
+> >> It's very difficult to check sock valid or not in timeout procedure, since it's
+> >> an interrupt context, and only can get context from parameter pre-stored,
+> >> except global variables.
+> >
+> > I think you can check for sk == null there.
+> >
+> 
+> It's a pre-stored parameter, it will not change by itself.
 
-Best regards
--Tom
+I looked a bit into this and a good solution seems to be to hold a
+reference to the sock when we call a mod_timer() and then put the
+reference when we call del_timer() and the timer is inactive or when
+l2cap_monitor_timeout(). Look net/sctp/ for examples.
+
+-- 
+Gustavo F. Padovan
+ProFUSION embedded systems - http://profusion.mobi
