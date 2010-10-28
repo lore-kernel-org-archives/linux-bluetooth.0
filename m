@@ -1,77 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 28 Oct 2010 10:17:33 +0100
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Ville Tervo <ville.tervo@nokia.com>,
-	Anderson Briglia <anderson.briglia@openbossa.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: Re: [PATCH 3/6] Bluetooth: Implement the first SMP commands
-Message-ID: <20101028091733.GB15997@vigoh>
-References: <linux-bluetooth@vger.kernel.org>
- <1287791820-22693-4-git-send-email-anderson.briglia@openbossa.org>
- <20101025130356.GA8862@vigoh>
- <20101026092623.GC15050@null>
- <AANLkTikVG-gjd1d7T6ETbfXCU0jp2GsR0miWJFO55hps@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <AANLkTikVG-gjd1d7T6ETbfXCU0jp2GsR0miWJFO55hps@mail.gmail.com>
+In-Reply-To: <20101027222602.GB24756@jh-x301>
+References: <AANLkTikQqPqJdFgLpUrKiqyAC0HNUFnj+8NtbPxazY18@mail.gmail.com>
+	<20101027222602.GB24756@jh-x301>
+Date: Thu, 28 Oct 2010 10:57:33 +0200
+Message-ID: <AANLkTimS8qU_kb94BBvnkQFDK32ssmEmHvbBefcfSkDx@mail.gmail.com>
+Subject: Re: HFP Pulseaudio Source destroyed "too quickly" at the end of a call
+From: =?ISO-8859-1?Q?Thomas_W=E4lti?= <twaelti@gmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
+	Krisztian.Litkey@nokia.com, Jyri.Sarha@nokia.com
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2010-10-26 08:22:16 -0700]:
+2010/10/28 Johan Hedberg <johan.hedberg@gmail.com>:
+> Probably this isn't really BlueZ related, but the audio policy module
+> (on the PulseAudio side) in the N900 kicks in and requests these changes
+> to the audio streams. Unfortunately I'm not really an expert with that
+> code (and afaik the audio policy part is closed) so I can't really offer
+> more insight on the issue. Just speculating, but you might be able to
+> accomplish something by hacking in some delays into the pulse bluetooth
+> modules (but again, I'm not really familiar with them so this might not
+> be a feasible approach).
 
-> Hi,
-> 
-> On Tue, Oct 26, 2010 at 2:26 AM, Ville Tervo <ville.tervo@nokia.com> wrote:
-> > On Mon, Oct 25, 2010 at 03:03:56PM +0200, ext Gustavo F. Padovan wrote:
-> >> Hi Vinicius,
-> >>
-> >> * Anderson Briglia <anderson.briglia@openbossa.org> [2010-10-22 19:56:57 -0400]:
-> >>
-> >> > From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-> >> >
-> >> > These simple commands will allow the SMP procedure to be started
-> >> > and terminated with a not supported error. This is the first step
-> >> > toward something useful.
-> >> >
-> >> > Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-> >> > ---
-> >> >  net/bluetooth/l2cap.c |  117 +++++++++++++++++++++++++++++++++++++++++++++++++
-> >> >  1 files changed, 117 insertions(+), 0 deletions(-)
-> >> >
-> >> > diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-> >> > index 1ac44f4..ba87c84 100644
-> >> > --- a/net/bluetooth/l2cap.c
-> >> > +++ b/net/bluetooth/l2cap.c
-> >> > @@ -54,6 +54,7 @@
-> >> >  #include <net/bluetooth/bluetooth.h>
-> >> >  #include <net/bluetooth/hci_core.h>
-> >> >  #include <net/bluetooth/l2cap.h>
-> >> > +#include <net/bluetooth/smp.h>
-> >> >
-> >> >  #define VERSION "2.15"
-> >> >
-> >> > @@ -307,6 +308,85 @@ static void l2cap_chan_del(struct sock *sk, int err)
-> >> >     }
-> >> >  }
-> >> >
-> >> > +static struct sk_buff *smp_build_cmd(struct l2cap_conn *conn, u8 code,
-> >> > +                                                   u16 dlen, void *data)
-> >>
-> >> Call this l2cap_smp_build_cmd()
-> >
-> > Should the whole smp stuff be in separate file (smp.c)? It's not a l2cap feature but a
-> > protocol using l2cap. In that case smp_build_cmd would be good name.
-> 
-> +1
-> 
-> It is also much better for maintenance and development since there is
-> less patches touching the l2cap.c so less chances of conflicts,
-> rebases and regressions on l2cap.
+Thanks for the prompt feedback, Johan.
+I had looked at the PulseAudio Bluetooth Modules source
+(http://git.0pointer.de/?p=pulseaudio.git;a=tree;f=src/modules/bluetooth;hb=HEAD)
+before, but didn't see anything (but then, it's a bit over my head :-)
+It seems like Joao Paulo Rechi Vita is the author of the relevant
+source, and as he also did the Bluez HFP implementation (IIRC), I hope
+he might shed a light on this. I'm asking on this list because once
+HFP "hangs up", it probably issues some teardown event to its
+consumers.
 
-Yep, we may need a new smp.c file.
+(It would be nice if I could get this solved this before heading to
+the MeeGo conf in Dublin - see you there :-)
 
--- 
-Gustavo F. Padovan
-ProFUSION embedded systems - http://profusion.mobi
+Best regards
+-Tom
