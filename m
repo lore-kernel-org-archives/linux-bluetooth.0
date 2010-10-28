@@ -1,35 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 28 Oct 2010 14:07:08 +0100
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, ville.tervo@nokia.com
-Subject: Re: [PATCH] bluetooth: fix not setting security level when
- creating a rfcomm session
-Message-ID: <20101028130708.GC17930@vigoh>
-References: <1282215970-32758-1-git-send-email-luiz.dentz@gmail.com>
+From: Arnd Bergmann <arnd@arndb.de>
+To: "Par-Gunnar Hjalmdahl" <pghatwork@gmail.com>
+Subject: Re: [PATCH 5/9] mfd: Add UART support for the ST-Ericsson CG2900.
+Date: Thu, 28 Oct 2010 14:22:46 +0200
+Cc: Alan Cox <alan@lxorguk.ukuu.org.uk>, linus.walleij@stericsson.com,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Lukasz.Rymanowski@tieto.com
+References: <AANLkTi=XTUau_GbASJEUBgsZ_FYYmRAX6W43YtRdv2wS@mail.gmail.com> <20101022135130.617f0ce8@lxorguk.ukuu.org.uk> <AANLkTik-S50ZX6mFG+vWhBv0x_WmipP=t+4VqmAgssRC@mail.gmail.com>
+In-Reply-To: <AANLkTik-S50ZX6mFG+vWhBv0x_WmipP=t+4VqmAgssRC@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1282215970-32758-1-git-send-email-luiz.dentz@gmail.com>
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201010281422.46687.arnd@arndb.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+On Friday 22 October 2010, Par-Gunnar Hjalmdahl wrote:
 
-* Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2010-08-19 14:06:10 +0300]:
-
-> From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+> >
+> > So - NAK this for the moment, it needs to be split cleanly into ldisc
+> > (thing which speaks the protocol and eg sees "speed change required" and
+> > acts on it) and device (thing which knows about the hardware).
 > 
-> This cause 'No Bonding' to be used if userspace has not yet been paired
-> with remote device since the l2cap socket used to create the rfcomm
-> session does not have any security level set.
-> 
-> Signed-off-by: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
-> ---
->  net/bluetooth/rfcomm/core.c |   13 ++++++++++---
->  1 files changed, 10 insertions(+), 3 deletions(-)
+> OK. We will try to figure out a new design.
+> I'm not too happy about putting the ldisc part in Bluetooth though
+> since it is only partly Bluetooth, it is also GPS and FM. Better could
+> maybe be under char/?
 
-Patch has been applied to the bluetooth-2.6 tree. Thanks.
+After getting a better idea of what the base mfd driver does, my impression
+is now that you should not register a second N_HCI line discipline at all,
+but instead extend the existing line discipline with this number.
 
--- 
-Gustavo F. Padovan
-ProFUSION embedded systems - http://profusion.mobi
+I'm not sure what happens if you need two modules that try to register
+the same ldisc number, but I imagine it is not good.
+
+Shouldn't you instead be using the drivers/bluetooth/hci_{ldisc,h4} code?
+
+	Arnd
