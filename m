@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 5/5] Fix not being able to set discoverable when discoverable timeout is set
-Date: Thu, 28 Oct 2010 11:00:59 +0300
-Message-Id: <1288252859-10337-5-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH 3/5] Fix setting Discoverable when adapter is down
+Date: Thu, 28 Oct 2010 11:00:57 +0300
+Message-Id: <1288252859-10337-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1288252859-10337-1-git-send-email-luiz.dentz@gmail.com>
 References: <1288252859-10337-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,98 +11,75 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-Since setting Discoverable property now has the ability to turn on the
-adapter if off we should no longer ignore discoverable mode if a timeout
-is set.
+This cause an error because adapter_up will load the mode from storage
+ignoring pending mode which cause modes to mismatch.
+
+To fix this behavior now when attempting to change mode we first store
+the new mode and wait DEVUP to complete set the mode stored.
 ---
- src/adapter.c |   51 +++++++++++++++++++++++++++++----------------------
- 1 files changed, 29 insertions(+), 22 deletions(-)
+ src/adapter.c |   19 +++++++++++--------
+ 1 files changed, 11 insertions(+), 8 deletions(-)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index b5e73b7..19fe5a8 100644
+index f4fc3c1..e5f7730 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -529,6 +529,32 @@ static struct session_req *create_session(struct btd_adapter *adapter,
- 	return session_ref(req);
- }
- 
-+static int adapter_set_mode(struct btd_adapter *adapter, uint8_t mode)
-+{
-+	int err;
-+
-+	if (mode == MODE_CONNECTABLE)
-+		err = adapter_ops->set_connectable(adapter->dev_id);
-+	else
-+		err = adapter_ops->set_discoverable(adapter->dev_id);
-+
-+	if (err < 0)
-+		return err;
-+
-+	if (mode == MODE_CONNECTABLE)
-+		return 0;
-+
-+	adapter_remove_discov_timeout(adapter);
-+
-+	if (adapter->discov_timeout)
-+		adapter_set_discov_timeout(adapter, adapter->discov_timeout);
-+
-+	if (mode != MODE_LIMITED && adapter->mode == MODE_LIMITED)
-+		adapter_set_limited_discoverable(adapter, FALSE);
-+
-+	return 0;
-+}
-+
- static int set_mode(struct btd_adapter *adapter, uint8_t new_mode,
+@@ -533,6 +533,7 @@ static int set_mode(struct btd_adapter *adapter, uint8_t new_mode,
  			DBusMessage *msg)
  {
-@@ -559,25 +585,11 @@ static int set_mode(struct btd_adapter *adapter, uint8_t new_mode,
- 	if (new_mode == adapter->mode)
- 		return 0;
+ 	int err;
++	const char *modestr;
  
--	if (new_mode == MODE_CONNECTABLE)
--		err = adapter_ops->set_connectable(adapter->dev_id);
--	else
--		err = adapter_ops->set_discoverable(adapter->dev_id);
-+	err = adapter_set_mode(adapter, new_mode);
- 
- 	if (err < 0)
- 		return err;
- 
--	if (new_mode > MODE_CONNECTABLE) {
--		adapter_remove_discov_timeout(adapter);
--
--		if (adapter->discov_timeout)
--			adapter_set_discov_timeout(adapter,
--						adapter->discov_timeout);
--
--		if (new_mode != MODE_LIMITED && adapter->mode == MODE_LIMITED)
--			adapter_set_limited_discoverable(adapter, FALSE);
--	}
--
- done:
- 	modestr = mode2str(new_mode);
- 	write_device_mode(&adapter->bdaddr, modestr);
-@@ -2429,18 +2441,13 @@ static int adapter_up(struct btd_adapter *adapter, const char *mode)
- 		write_device_mode(&adapter->bdaddr, onmode);
- 
- 		return adapter_up(adapter, onmode);
--	} else if (!g_str_equal(mode, "connectable") &&
--			adapter->discov_timeout == 0) {
--		/* Set discoverable only if timeout is 0 */
-+	} else if (!g_str_equal(mode, "connectable")) {
- 		adapter->mode = MODE_DISCOVERABLE;
- 		scan_mode = SCAN_PAGE | SCAN_INQUIRY;
+ 	if (adapter->pending_mode != NULL)
+ 		return -EALREADY;
+@@ -541,6 +542,8 @@ static int set_mode(struct btd_adapter *adapter, uint8_t new_mode,
+ 		err = adapter_ops->set_powered(adapter->dev_id, TRUE);
+ 		if (err < 0)
+ 			return err;
++
++		goto done;
  	}
  
- proceed:
--	if (scan_mode == SCAN_PAGE)
--		err = adapter_ops->set_connectable(adapter->dev_id);
--	else
--		err = adapter_ops->set_discoverable(adapter->dev_id);
-+	err = adapter_set_mode(adapter, adapter->mode);
+ 	if (adapter->up && new_mode == MODE_OFF) {
+@@ -576,18 +579,18 @@ static int set_mode(struct btd_adapter *adapter, uint8_t new_mode,
+ 	}
  
- 	if (err < 0)
- 		return err;
+ done:
+-	DBG("%s", mode2str(new_mode));
++	modestr = mode2str(new_mode);
++	write_device_mode(&adapter->bdaddr, modestr);
++
++	DBG("%s", modestr);
+ 
+ 	if (msg != NULL)
+ 		/* Wait for mode change to reply */
+ 		adapter->pending_mode = create_session(adapter, connection,
+ 							msg, new_mode, NULL);
+-	else {
++	else
+ 		/* Nothing to reply just write the new mode */
+-		const char *modestr = mode2str(new_mode);
+ 		adapter->mode = new_mode;
+-		write_device_mode(&adapter->bdaddr, modestr);
+-	}
+ 
+ 	return 0;
+ }
+@@ -2600,11 +2603,11 @@ static void set_mode_complete(struct btd_adapter *adapter)
+ 
+ 	DBG("%s", modestr);
+ 
+-	/* Only store if the mode matches the pending */
+-	if (err == 0)
++	/* restore if the mode doesn't matches the pending */
++	if (err != 0) {
+ 		write_device_mode(&adapter->bdaddr, modestr);
+-	else
+ 		error("unable to set mode: %s", mode2str(pending->mode));
++	}
+ 
+ 	session_unref(pending);
+ }
 -- 
 1.7.1
 
