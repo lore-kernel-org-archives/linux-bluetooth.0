@@ -1,103 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 29 Oct 2010 22:27:07 +0100
+Date: Fri, 29 Oct 2010 22:17:18 +0100
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv3 1/2] Bluetooth: Check sk is not owned before freeing
- l2cap_conn
-Message-ID: <20101029212707.GD14961@vigoh>
+Subject: Re: [PATCHv3 2/2] Bluetooth: timer check sk is not owned before
+ freeing
+Message-ID: <20101029211718.GC14961@vigoh>
 References: <1288359781-4059-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1288359781-4059-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1288359781-4059-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1288359781-4059-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1288359781-4059-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2010-10-29 16:43:00 +0300]:
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2010-10-29 16:43:01 +0300]:
 
 > From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 > 
-> Check that socket sk is not locked in user process before removing
-> l2cap connection handler.
-> 
-> lock_sock and release_sock do not hold a normal spinlock directly but
-> instead hold the owner field. This means bh_lock_sock can still execute
-> even if the socket is "locked". More info can be found here:
-> http://www.linuxfoundation.org/collaborate/workgroups/networking/socketlocks
-> 
-> krfcommd kernel thread may be preempted with l2cap tasklet which remove
-> l2cap_conn structure. If krfcommd is in process of sending of RFCOMM reply
-> (like "RFCOMM UA" reply to "RFCOMM DISC") then kernel crash happens.
-> 
-> ...
-> [  694.175933] Unable to handle kernel NULL pointer dereference at virtual address 00000000
-> [  694.184936] pgd = c0004000
-> [  694.187683] [00000000] *pgd=00000000
-> [  694.191711] Internal error: Oops: 5 [#1] PREEMPT
-> [  694.196350] last sysfs file: /sys/devices/platform/hci_h4p/firmware/hci_h4p/loading
-> [  694.260375] CPU: 0    Not tainted  (2.6.32.10 #1)
-> [  694.265106] PC is at l2cap_sock_sendmsg+0x43c/0x73c [l2cap]
-> [  694.270721] LR is at 0xd7017303
-> ...
-> [  694.525085] Backtrace:
-> [  694.527587] [<bf266be0>] (l2cap_sock_sendmsg+0x0/0x73c [l2cap]) from [<c02f2cc8>] (sock_sendmsg+0xb8/0xd8)
-> [  694.537292] [<c02f2c10>] (sock_sendmsg+0x0/0xd8) from [<c02f3044>] (kernel_sendmsg+0x48/0x80)
+> In timer context we might delete l2cap channel used by krfcommd.
+> The check makes sure that sk is not owned. If sk is owned we
+> restart timer for HZ/5.
 > 
 > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 > ---
->  net/bluetooth/l2cap.c |   26 ++++++++++++++++++++++++++
->  1 files changed, 26 insertions(+), 0 deletions(-)
+>  net/bluetooth/l2cap.c |   32 ++++++++++++++++++++------------
+>  1 files changed, 20 insertions(+), 12 deletions(-)
 > 
 > diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-> index 6f931cc..b1344d8 100644
+> index b1344d8..c67b3c6 100644
 > --- a/net/bluetooth/l2cap.c
 > +++ b/net/bluetooth/l2cap.c
-> @@ -3078,6 +3078,14 @@ static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hd
->  		break;
+> @@ -83,6 +83,18 @@ static struct sk_buff *l2cap_build_cmd(struct l2cap_conn *conn,
+>  static int l2cap_ertm_data_rcv(struct sock *sk, struct sk_buff *skb);
 >  
->  	default:
-> +		/* don't delete l2cap channel if sk is owned by user */
-> +		if (sock_owned_by_user(sk)) {
-> +			sk->sk_state = BT_DISCONN;
-> +			l2cap_sock_clear_timer(sk);
-> +			l2cap_sock_set_timer(sk, HZ);
-> +			break;
-> +		}
+>  /* ---- L2CAP timers ---- */
+> +static void l2cap_sock_set_timer(struct sock *sk, long timeout)
+> +{
+> +	BT_DBG("sk %p state %d timeout %ld", sk, sk->sk_state, timeout);
+> +	sk_reset_timer(sk, &sk->sk_timer, jiffies + timeout);
+> +}
 > +
->  		l2cap_chan_del(sk, ECONNREFUSED);
->  		break;
->  	}
-> @@ -3283,6 +3291,15 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn, struct l2cap_cmd
+> +static void l2cap_sock_clear_timer(struct sock *sk)
+> +{
+> +	BT_DBG("sock %p state %d", sk, sk->sk_state);
+> +	sk_stop_timer(sk, &sk->sk_timer);
+> +}
+> +
+>  static void l2cap_sock_timeout(unsigned long arg)
+>  {
+>  	struct sock *sk = (struct sock *) arg;
+> @@ -92,6 +104,14 @@ static void l2cap_sock_timeout(unsigned long arg)
 >  
->  	sk->sk_shutdown = SHUTDOWN_MASK;
+>  	bh_lock_sock(sk);
 >  
-> +	/* don't delete l2cap channel if sk is owned by user */
 > +	if (sock_owned_by_user(sk)) {
-> +		sk->sk_state = BT_DISCONN;
-> +		l2cap_sock_clear_timer(sk);
-> +		l2cap_sock_set_timer(sk, HZ);
+> +		/* sk is owned by user. Try again later */
+> +		l2cap_sock_set_timer(sk, HZ / 5);
 > +		bh_unlock_sock(sk);
-> +		return 0;
-> +	}
-> +
->  	l2cap_chan_del(sk, ECONNRESET);
->  	bh_unlock_sock(sk);
->  
-> @@ -3305,6 +3322,15 @@ static inline int l2cap_disconnect_rsp(struct l2cap_conn *conn, struct l2cap_cmd
->  	if (!sk)
->  		return 0;
->  
-> +	/* don't delete l2cap channel if sk is owned by user */
-> +	if (sock_owned_by_user(sk)) {
-> +		sk->sk_state = BT_DISCONN;
-> +		l2cap_sock_clear_timer(sk);
-> +		l2cap_sock_set_timer(sk, HZ);
+> +		sock_put(sk);
 
-1 second is too much. Change it to HZ/5 as well. I think it is a
-reasonable value. 
+You can't do a sock_put() here, you have to keep the referencee to the
+socket while the timer is enabled.
 
 -- 
 Gustavo F. Padovan
