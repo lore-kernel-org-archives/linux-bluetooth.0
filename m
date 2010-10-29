@@ -1,36 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arnd Bergmann <arnd@arndb.de>
-To: Alan Cox <alan@lxorguk.ukuu.org.uk>
-Subject: Re: [PATCH 5/9] mfd: Add UART support for the ST-Ericsson CG2900.
-Date: Sat, 30 Oct 2010 02:01:01 +0200
-Cc: "Par-Gunnar Hjalmdahl" <pghatwork@gmail.com>,
-	linus.walleij@stericsson.com, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Lukasz.Rymanowski@tieto.com
-References: <AANLkTi=XTUau_GbASJEUBgsZ_FYYmRAX6W43YtRdv2wS@mail.gmail.com> <AANLkTinh3D8V8UaN8FyCouwUQ98A4RRWEHXU7Tr9XMbs@mail.gmail.com> <20101029172214.25b14c2a@pyx>
-In-Reply-To: <20101029172214.25b14c2a@pyx>
+Date: Fri, 29 Oct 2010 15:05:40 -0700
+From: Greg KH <greg@kroah.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org, stable@kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [stable] [PATCH 0/1] Bluetooth: fix crash in L2CAP
+Message-ID: <20101029220540.GA16819@kroah.com>
+References: <1287638393-8573-1-git-send-email-padovan@profusion.mobi>
+ <20101021133507.GB20184@kroah.com>
+ <20101025111530.GC7721@vigoh>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201010300201.01940.arnd@arndb.de>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20101025111530.GC7721@vigoh>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Friday 29 October 2010, Alan Cox wrote:
-
-> > line discipline then even though that could cause other problems. I do
-> > not know if it is possible to add a condition in Kconfig otherwise so
-> > the CG2900 ldisc cannot be active while the "normal" ldisc driver is
-> > selected.
+On Mon, Oct 25, 2010 at 09:15:30AM -0200, Gustavo F. Padovan wrote:
+> Hi Greg,
 > 
-> Not sure I follow the concern here ?
+> * Greg KH <greg@kroah.com> [2010-10-21 06:35:07 -0700]:
+> 
+> > On Thu, Oct 21, 2010 at 03:19:52AM -0200, Gustavo F. Padovan wrote:
+> > > Hi Greg,
+> > > 
+> > > The following patch is good for 2.6.36.1. It arrived too late in linux-bluetooth
+> > > and we didn't had time to put it into 2.6.36. It fixes a serious crash into
+> > > the L2CAP layer. The issue isn't in 2.6.35 and below.
+> > 
+> > It needs to get into Linus's tree before I can accept it into the
+> > -stable trees.  Please get it there and then send stable@kernel.org the
+> > git commit id and I will add it.
+> 
+> It is now on Linus' tree, sorry for doing this wrong first time. It was
+> my first report to stable. ;)
 
-It's about the ldisc number. Both bluetooth and cg2900 register themselves
-to ldisc 15 (N_HCI). A user doing TIOCSETD can only get one of the two.
+No problem.
 
-The solution would not be to make the two ldisc implementations mutually
-exclusive, but to make cg2900 use a new ldisc number, e.g. N_HCI_CG2900.
-However, I'm still not convinced that this is actually necessary, we might
-be able to add hooks into the existing N_HCI implementation for the
-extensions in cg2900.
+> commit d793fe8caa3911e6a1e826b45d4ee00d250cdec8
 
-	Arnd
+Now queued up, thanks.
+
+greg k-h
