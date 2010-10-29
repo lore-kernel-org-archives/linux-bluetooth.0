@@ -1,36 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 29 Oct 2010 09:57:11 -0400
+Date: Fri, 29 Oct 2010 09:53:04 -0400
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lukasz Pawlik <lucas.pawlik@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix issue when setting limited discoverable mode
-Message-ID: <20101029135710.GA2453@jh-x301>
-References: <1288357083-24664-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [PATCH] Fix handling nco affiliation fields
+Message-ID: <20101029135304.GA2357@jh-x301>
+References: <1288344619-18133-1-git-send-email-lucas.pawlik@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1288357083-24664-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1288344619-18133-1-git-send-email-lucas.pawlik@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Lukasz,
 
-On Fri, Oct 29, 2010, Luiz Augusto von Dentz wrote:
-> When setting limited discoverable mode it will always switch to
-> discoverable on adapter_mode_changed which doesn't match the pending mode
-> requested.
-> 
-> To fix this MODE_LIMITED was removed since it didn't represent a real
-> scan mode but a discoverable mode so that limited discoverable and
-> general discoverable are now both represented by MODE_DISCOVERABLE.
-> 
-> Also limited bits are now set at same point the timeout start and removed
-> when mode change to something different then discoverable or when
-> discoverable timeout is removed permanently (set to 0).
+On Fri, Oct 29, 2010, Lukasz Pawlik wrote:
+> Previously when contact record was divided into separate replies,
+> phonebook-tracker would use first reply and merge only phone numbers,
+> addresses and emails from next. Now it's merging all fields dependent on the
+> nco:hasAffiliation as well.
 > ---
->  src/adapter.c |   76 +++++++++++++++++++++++++-------------------------------
->  src/hcid.h    |    1 -
->  2 files changed, 34 insertions(+), 43 deletions(-)
+>  plugins/phonebook-tracker.c |   15 +++++++++++++++
+>  1 files changed, 15 insertions(+), 0 deletions(-)
 
-The patch has been pushed upstream. Thanks.
+You'll need to fix the coding style before this goes upstream:
+
+> +static void add_affiliation(char **field, const char *value)
+> +{
+> +        if(strlen(*field) != 0 || value == NULL || strlen(value) == 0)
+
+Space between "if" and "(". Also, I'd prefer > 0 instead of != 0 for the
+first strlen check. Then, you're also using spaces instead of tabs for
+the indentation of all code in this patch. Did you forget to switch your
+editor into bluez/kernel mode?
 
 Johan
