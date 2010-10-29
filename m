@@ -1,37 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 29 Oct 2010 09:53:04 -0400
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lukasz Pawlik <lucas.pawlik@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix handling nco affiliation fields
-Message-ID: <20101029135304.GA2357@jh-x301>
-References: <1288344619-18133-1-git-send-email-lucas.pawlik@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1288344619-18133-1-git-send-email-lucas.pawlik@gmail.com>
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv3 1/2] Bluetooth: Check sk is not owned before freeing l2cap_conn
+Date: Fri, 29 Oct 2010 16:43:00 +0300
+Message-Id: <1288359781-4059-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1288359781-4059-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1288359781-4059-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 
-On Fri, Oct 29, 2010, Lukasz Pawlik wrote:
-> Previously when contact record was divided into separate replies,
-> phonebook-tracker would use first reply and merge only phone numbers,
-> addresses and emails from next. Now it's merging all fields dependent on the
-> nco:hasAffiliation as well.
-> ---
->  plugins/phonebook-tracker.c |   15 +++++++++++++++
->  1 files changed, 15 insertions(+), 0 deletions(-)
+Check that socket sk is not locked in user process before removing
+l2cap connection handler.
 
-You'll need to fix the coding style before this goes upstream:
+lock_sock and release_sock do not hold a normal spinlock directly but
+instead hold the owner field. This means bh_lock_sock can still execute
+even if the socket is "locked". More info can be found here:
+http://www.linuxfoundation.org/collaborate/workgroups/networking/socketlocks
 
-> +static void add_affiliation(char **field, const char *value)
-> +{
-> +        if(strlen(*field) != 0 || value == NULL || strlen(value) == 0)
+krfcommd kernel thread may be preempted with l2cap tasklet which remove
+l2cap_conn structure. If krfcommd is in process of sending of RFCOMM reply
+(like "RFCOMM UA" reply to "RFCOMM DISC") then kernel crash happens.
 
-Space between "if" and "(". Also, I'd prefer > 0 instead of != 0 for the
-first strlen check. Then, you're also using spaces instead of tabs for
-the indentation of all code in this patch. Did you forget to switch your
-editor into bluez/kernel mode?
+...
+[  694.175933] Unable to handle kernel NULL pointer dereference at virtual address 00000000
+[  694.184936] pgd = c0004000
+[  694.187683] [00000000] *pgd=00000000
+[  694.191711] Internal error: Oops: 5 [#1] PREEMPT
+[  694.196350] last sysfs file: /sys/devices/platform/hci_h4p/firmware/hci_h4p/loading
+[  694.260375] CPU: 0    Not tainted  (2.6.32.10 #1)
+[  694.265106] PC is at l2cap_sock_sendmsg+0x43c/0x73c [l2cap]
+[  694.270721] LR is at 0xd7017303
+...
+[  694.525085] Backtrace:
+[  694.527587] [<bf266be0>] (l2cap_sock_sendmsg+0x0/0x73c [l2cap]) from [<c02f2cc8>] (sock_sendmsg+0xb8/0xd8)
+[  694.537292] [<c02f2c10>] (sock_sendmsg+0x0/0xd8) from [<c02f3044>] (kernel_sendmsg+0x48/0x80)
 
-Johan
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+---
+ net/bluetooth/l2cap.c |   26 ++++++++++++++++++++++++++
+ 1 files changed, 26 insertions(+), 0 deletions(-)
+
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index 6f931cc..b1344d8 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -3078,6 +3078,14 @@ static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hd
+ 		break;
+ 
+ 	default:
++		/* don't delete l2cap channel if sk is owned by user */
++		if (sock_owned_by_user(sk)) {
++			sk->sk_state = BT_DISCONN;
++			l2cap_sock_clear_timer(sk);
++			l2cap_sock_set_timer(sk, HZ);
++			break;
++		}
++
+ 		l2cap_chan_del(sk, ECONNREFUSED);
+ 		break;
+ 	}
+@@ -3283,6 +3291,15 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn, struct l2cap_cmd
+ 
+ 	sk->sk_shutdown = SHUTDOWN_MASK;
+ 
++	/* don't delete l2cap channel if sk is owned by user */
++	if (sock_owned_by_user(sk)) {
++		sk->sk_state = BT_DISCONN;
++		l2cap_sock_clear_timer(sk);
++		l2cap_sock_set_timer(sk, HZ);
++		bh_unlock_sock(sk);
++		return 0;
++	}
++
+ 	l2cap_chan_del(sk, ECONNRESET);
+ 	bh_unlock_sock(sk);
+ 
+@@ -3305,6 +3322,15 @@ static inline int l2cap_disconnect_rsp(struct l2cap_conn *conn, struct l2cap_cmd
+ 	if (!sk)
+ 		return 0;
+ 
++	/* don't delete l2cap channel if sk is owned by user */
++	if (sock_owned_by_user(sk)) {
++		sk->sk_state = BT_DISCONN;
++		l2cap_sock_clear_timer(sk);
++		l2cap_sock_set_timer(sk, HZ);
++		bh_unlock_sock(sk);
++		return 0;
++	}
++
+ 	l2cap_chan_del(sk, 0);
+ 	bh_unlock_sock(sk);
+ 
+-- 
+1.7.0.4
+
