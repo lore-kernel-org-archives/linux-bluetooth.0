@@ -1,55 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <201010281422.46687.arnd@arndb.de>
+In-Reply-To: <20101022135130.617f0ce8@lxorguk.ukuu.org.uk>
 References: <AANLkTi=XTUau_GbASJEUBgsZ_FYYmRAX6W43YtRdv2wS@mail.gmail.com>
 	<20101022135130.617f0ce8@lxorguk.ukuu.org.uk>
-	<AANLkTik-S50ZX6mFG+vWhBv0x_WmipP=t+4VqmAgssRC@mail.gmail.com>
-	<201010281422.46687.arnd@arndb.de>
-Date: Fri, 29 Oct 2010 13:58:51 +0200
-Message-ID: <AANLkTinh3D8V8UaN8FyCouwUQ98A4RRWEHXU7Tr9XMbs@mail.gmail.com>
+Date: Fri, 29 Oct 2010 13:53:57 +0200
+Message-ID: <AANLkTinj93zAXJAipB3HjE62Xa1Z=9k9gPBxaT=+MLtg@mail.gmail.com>
 Subject: Re: [PATCH 5/9] mfd: Add UART support for the ST-Ericsson CG2900.
 From: Par-Gunnar Hjalmdahl <pghatwork@gmail.com>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Alan Cox <alan@lxorguk.ukuu.org.uk>, linus.walleij@stericsson.com,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Lukasz.Rymanowski@tieto.com
+To: Alan Cox <alan@lxorguk.ukuu.org.uk>
+Cc: linus.walleij@stericsson.com, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-2010/10/28 Arnd Bergmann <arnd@arndb.de>:
-> On Friday 22 October 2010, Par-Gunnar Hjalmdahl wrote:
+2010/10/22 Alan Cox <alan@lxorguk.ukuu.org.uk>:
+>> +
+>> +/**
+>> + * create_work_item() - Create work item and add it to the work queue.
+>> + * @wq:              work queue struct where the work will be added.
+>> + * @work_func:       Work function.
+>> + * @data:    Private data for the work.
+>> + *
+>> + * Returns:
+>> + *   0 if there is no error.
+>> + *   -EBUSY if not possible to queue work.
+>> + *   -ENOMEM if allocation fails.
+>> + */
+>> +static int create_work_item(struct workqueue_struct *wq, work_func_t work_func,
+>> +                         void *data)
+>> +{
+>> +     struct uart_work_struct *new_work;
+>> +     int err;
+>> +
+>> +     new_work = kmalloc(sizeof(*new_work), GFP_ATOMIC);
 >
->> >
->> > So - NAK this for the moment, it needs to be split cleanly into ldisc
->> > (thing which speaks the protocol and eg sees "speed change required" and
->> > acts on it) and device (thing which knows about the hardware).
->>
->> OK. We will try to figure out a new design.
->> I'm not too happy about putting the ldisc part in Bluetooth though
->> since it is only partly Bluetooth, it is also GPS and FM. Better could
->> maybe be under char/?
->
-> After getting a better idea of what the base mfd driver does, my impression
-> is now that you should not register a second N_HCI line discipline at all,
-> but instead extend the existing line discipline with this number.
->
-> I'm not sure what happens if you need two modules that try to register
-> the same ldisc number, but I imagine it is not good.
->
-> Shouldn't you instead be using the drivers/bluetooth/hci_{ldisc,h4} code?
->
->        Arnd
+> So instead of a tiny object embedded in your device you've got a whole
+> error path to worry about, a printk disguised in a macro and a text
+> string longer than the struct size ? Surely this should be part of the
+> device
 >
 
-We also need the ldisc code to handle events from FM and GPS and since
-that is chip specific we cannot add that to the generic hci_ldisc
-code.
-I agree that we might run into problems if two drivers try to register
-the same line discipline. It might then be better to introduce a new
-line discipline then even though that could cause other problems. I do
-not know if it is possible to add a condition in Kconfig otherwise so
-the CG2900 ldisc cannot be active while the "normal" ldisc driver is
-selected.
+I've tried now to use 3 separate work_structs in the device (one for
+each work function used), but this doesn't work out.
+The reason is that the work is generated so often that a work is not
+finished before next work of same type comes. This is especially true
+for transmit and receive. Then I get 0 back when queuing the work and
+there is no real way to solve it from what I can see than to allocate
+new work structures every time.
 
 /P-G
