@@ -1,43 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 29 Oct 2010 15:05:40 -0700
-From: Greg KH <greg@kroah.com>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org, stable@kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [stable] [PATCH 0/1] Bluetooth: fix crash in L2CAP
-Message-ID: <20101029220540.GA16819@kroah.com>
-References: <1287638393-8573-1-git-send-email-padovan@profusion.mobi>
- <20101021133507.GB20184@kroah.com>
- <20101025111530.GC7721@vigoh>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20101025111530.GC7721@vigoh>
+Subject: Re: [PATCH] bluetooth: Fix NULL pointer dereference issue
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Yuri Ershov <ext-yuri.ershov@nokia.com>
+Cc: davem@davemloft.net, padovan@profusion.mobi,
+	jprvita@profusion.mobi, linux-bluetooth@vger.kernel.org,
+	ville.tervo@nokia.com, andrei.emeltchenko@nokia.com
+In-Reply-To: <456b20879a6fc3e434463389ef25c4d5cf8803d4.1288262806.git.ext-yuri.ershov@nokia.com>
+References: <456b20879a6fc3e434463389ef25c4d5cf8803d4.1288262806.git.ext-yuri.ershov@nokia.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 29 Oct 2010 23:43:29 +0200
+Message-ID: <1288388609.3322.40.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Oct 25, 2010 at 09:15:30AM -0200, Gustavo F. Padovan wrote:
-> Hi Greg,
-> 
-> * Greg KH <greg@kroah.com> [2010-10-21 06:35:07 -0700]:
-> 
-> > On Thu, Oct 21, 2010 at 03:19:52AM -0200, Gustavo F. Padovan wrote:
-> > > Hi Greg,
-> > > 
-> > > The following patch is good for 2.6.36.1. It arrived too late in linux-bluetooth
-> > > and we didn't had time to put it into 2.6.36. It fixes a serious crash into
-> > > the L2CAP layer. The issue isn't in 2.6.35 and below.
-> > 
-> > It needs to get into Linus's tree before I can accept it into the
-> > -stable trees.  Please get it there and then send stable@kernel.org the
-> > git commit id and I will add it.
-> 
-> It is now on Linus' tree, sorry for doing this wrong first time. It was
-> my first report to stable. ;)
+Hi Yuri,
 
-No problem.
+> This patch fixes NULL pointer dereference at running test with
+> connect-transfer-disconnect in loop. The problem conditions are the
+> following: there are 2 BT devices. The first one listens and
+> receives (l2test -r), the second one makes "connect-disconnect-
+> connect..." sequence (l2test -c -b 1000 -i hci0 -P 10 <addr>).
+> After some time this will cause the race between functions
+> bt_accept_dequeue and l2cap_chan_del. The function l2cap_chan_del
+> sets the socket state to BT_CLOSED, unlinks and kills the socket
+> in the middle of bt_accept_dequeue, then at running the removed code
+> kernel oops appears.
 
-> commit d793fe8caa3911e6a1e826b45d4ee00d250cdec8
+it could be that we have this in here for RFCOMM. Can you retest it with
+this with using RFCOMM and see if we get dangling RFCOMM sockets. You
+need to test both directions, incoming and outgoing.
 
-Now queued up, thanks.
+Regards
 
-greg k-h
+Marcel
+
+
