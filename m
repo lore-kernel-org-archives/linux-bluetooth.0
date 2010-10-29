@@ -1,40 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: HFP Pulseaudio Source destroyed "too quickly" at the end of a
- call
-From: Peter Dons Tychsen <donpedro@tdcadsl.dk>
-To: Thomas =?ISO-8859-1?Q?W=E4lti?= <twaelti@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <AANLkTikQqPqJdFgLpUrKiqyAC0HNUFnj+8NtbPxazY18@mail.gmail.com>
-References: <AANLkTikQqPqJdFgLpUrKiqyAC0HNUFnj+8NtbPxazY18@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 29 Oct 2010 18:19:29 +0200
-Message-ID: <1288369169.4351.8.camel@donpedro>
+Date: Fri, 29 Oct 2010 17:24:43 +0100
+From: Alan Cox <alan@lxorguk.ukuu.org.uk>
+To: Par-Gunnar Hjalmdahl <pghatwork@gmail.com>
+Cc: linus.walleij@stericsson.com, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 5/9] mfd: Add UART support for the ST-Ericsson CG2900.
+Message-ID: <20101029172443.61f7b067@pyx>
+In-Reply-To: <AANLkTinj93zAXJAipB3HjE62Xa1Z=9k9gPBxaT=+MLtg@mail.gmail.com>
+References: <AANLkTi=XTUau_GbASJEUBgsZ_FYYmRAX6W43YtRdv2wS@mail.gmail.com>
+	<20101022135130.617f0ce8@lxorguk.ukuu.org.uk>
+	<AANLkTinj93zAXJAipB3HjE62Xa1Z=9k9gPBxaT=+MLtg@mail.gmail.com>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2010-10-27 at 22:03 +0200, Thomas Wälti wrote:
+> The reason is that the work is generated so often that a work is not
+> finished before next work of same type comes. This is especially true
+> for transmit and receive. Then I get 0 back when queuing the work and
+> there is no real way to solve it from what I can see than to allocate
+> new work structures every time.
 
-> All works well except when ending the recording of Bluetooth
-> Conversations: Once a party hangs up the call, the PulseAudio source
-> and sink disappear before I can stop GStreamer recording (I'm
-> listening to D-Bus events). Unfortunately, this causes my GStreamer
-> pipeline to crash.
-
-There are many reasons (especially for wireless device) that the source
-or sink could disappear at any time. Audio disappearing before or after
-the accompanying signaling furthermore a classic scenario which apps
-should be built to handle. So fixing the race (which i am not sure is
-really a race) does not seem like the correct solution. Trying to fix
-such "races" can lead to inefficiency by using unneeded timers and
-spin-locks, and will not provide robustness, as the audio streams can
-disappear for other reasons anyway.
-
-Maybe the crash is more interesting. What actually crashes when this
-happens, and why?
-
-Thanks,
-
-/pedro
-
+So if that is the case what bounds your memory usage - can a busy box end
+up with thousands of work queue slos used ? It sounds like your model is
+perhaps wrong - if there is a continual stream of work maybe you should
+simply have a kernel thread to handle it if it cannot be deferred
+- remember ldisc code is able to sleep in most paths.
 
