@@ -1,55 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Pawlik <lucas.pawlik@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Pawlik <lucas.pawlik@gmail.com>
-Subject: [PATCHv2] Fix handling nco affiliation fields
-Date: Fri, 29 Oct 2010 16:04:26 +0200
-Message-Id: <1288361066-21203-1-git-send-email-lucas.pawlik@gmail.com>
+Date: Fri, 29 Oct 2010 09:57:11 -0400
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fix issue when setting limited discoverable mode
+Message-ID: <20101029135710.GA2453@jh-x301>
+References: <1288357083-24664-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1288357083-24664-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Previously when contact record was divided into separate replies,
-phonebook-tracker would use first reply and merge only phone numbers,
-addresses and emails from next. Now it's merging all fields dependent on the
-nco:hasAffiliation as well.
----
- plugins/phonebook-tracker.c |   16 ++++++++++++++++
- 1 files changed, 16 insertions(+), 0 deletions(-)
+Hi Luiz,
 
-diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index 96290a4..30be895 100644
---- a/plugins/phonebook-tracker.c
-+++ b/plugins/phonebook-tracker.c
-@@ -982,6 +982,15 @@ static void add_phone_number(struct phonebook_contact *contact,
- 	contact->numbers = g_slist_append(contact->numbers, number);
- }
- 
-+static void add_affiliation(char **field, const char *value)
-+{
-+	if (strlen(*field) > 0 || value == NULL || strlen(value) == 0)
-+		return;
-+
-+	g_free(*field);
-+	*field = g_strdup(value);
-+}
-+
- static struct phonebook_email *find_email(GSList *emails, const char *address,
- 								int type)
- {
-@@ -1196,6 +1205,13 @@ add_numbers:
- 	g_free(home_addr);
- 	g_free(work_addr);
- 
-+	/* Adding fields connected by nco:hasAffiliation - they may be in
-+	 * separate replies */
-+	add_affiliation(&contact->title, reply[33]);
-+	add_affiliation(&contact->company, reply[22]);
-+	add_affiliation(&contact->department, reply[23]);
-+	add_affiliation(&contact->role, reply[24]);
-+
- 	DBG("contact %p", contact);
- 
- 	/* Adding contacts data to wrapper struct - this data will be used to
--- 
-1.7.0.4
+On Fri, Oct 29, 2010, Luiz Augusto von Dentz wrote:
+> When setting limited discoverable mode it will always switch to
+> discoverable on adapter_mode_changed which doesn't match the pending mode
+> requested.
+> 
+> To fix this MODE_LIMITED was removed since it didn't represent a real
+> scan mode but a discoverable mode so that limited discoverable and
+> general discoverable are now both represented by MODE_DISCOVERABLE.
+> 
+> Also limited bits are now set at same point the timeout start and removed
+> when mode change to something different then discoverable or when
+> discoverable timeout is removed permanently (set to 0).
+> ---
+>  src/adapter.c |   76 +++++++++++++++++++++++++-------------------------------
+>  src/hcid.h    |    1 -
+>  2 files changed, 34 insertions(+), 43 deletions(-)
 
+The patch has been pushed upstream. Thanks.
+
+Johan
