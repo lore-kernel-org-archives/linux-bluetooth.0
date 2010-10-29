@@ -1,38 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] bluetooth: Fix NULL pointer dereference issue
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Yuri Ershov <ext-yuri.ershov@nokia.com>
-Cc: davem@davemloft.net, padovan@profusion.mobi,
-	jprvita@profusion.mobi, linux-bluetooth@vger.kernel.org,
-	ville.tervo@nokia.com, andrei.emeltchenko@nokia.com
-In-Reply-To: <456b20879a6fc3e434463389ef25c4d5cf8803d4.1288262806.git.ext-yuri.ershov@nokia.com>
-References: <456b20879a6fc3e434463389ef25c4d5cf8803d4.1288262806.git.ext-yuri.ershov@nokia.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 29 Oct 2010 23:43:29 +0200
-Message-ID: <1288388609.3322.40.camel@aeonflux>
-Mime-Version: 1.0
+Date: Fri, 29 Oct 2010 22:27:07 +0100
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv3 1/2] Bluetooth: Check sk is not owned before freeing
+ l2cap_conn
+Message-ID: <20101029212707.GD14961@vigoh>
+References: <1288359781-4059-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1288359781-4059-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1288359781-4059-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Yuri,
+Hi Andrei,
 
-> This patch fixes NULL pointer dereference at running test with
-> connect-transfer-disconnect in loop. The problem conditions are the
-> following: there are 2 BT devices. The first one listens and
-> receives (l2test -r), the second one makes "connect-disconnect-
-> connect..." sequence (l2test -c -b 1000 -i hci0 -P 10 <addr>).
-> After some time this will cause the race between functions
-> bt_accept_dequeue and l2cap_chan_del. The function l2cap_chan_del
-> sets the socket state to BT_CLOSED, unlinks and kills the socket
-> in the middle of bt_accept_dequeue, then at running the removed code
-> kernel oops appears.
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2010-10-29 16:43:00 +0300]:
 
-it could be that we have this in here for RFCOMM. Can you retest it with
-this with using RFCOMM and see if we get dangling RFCOMM sockets. You
-need to test both directions, incoming and outgoing.
+> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> 
+> Check that socket sk is not locked in user process before removing
+> l2cap connection handler.
+> 
+> lock_sock and release_sock do not hold a normal spinlock directly but
+> instead hold the owner field. This means bh_lock_sock can still execute
+> even if the socket is "locked". More info can be found here:
+> http://www.linuxfoundation.org/collaborate/workgroups/networking/socketlocks
+> 
+> krfcommd kernel thread may be preempted with l2cap tasklet which remove
+> l2cap_conn structure. If krfcommd is in process of sending of RFCOMM reply
+> (like "RFCOMM UA" reply to "RFCOMM DISC") then kernel crash happens.
+> 
+> ...
+> [  694.175933] Unable to handle kernel NULL pointer dereference at virtual address 00000000
+> [  694.184936] pgd = c0004000
+> [  694.187683] [00000000] *pgd=00000000
+> [  694.191711] Internal error: Oops: 5 [#1] PREEMPT
+> [  694.196350] last sysfs file: /sys/devices/platform/hci_h4p/firmware/hci_h4p/loading
+> [  694.260375] CPU: 0    Not tainted  (2.6.32.10 #1)
+> [  694.265106] PC is at l2cap_sock_sendmsg+0x43c/0x73c [l2cap]
+> [  694.270721] LR is at 0xd7017303
+> ...
+> [  694.525085] Backtrace:
+> [  694.527587] [<bf266be0>] (l2cap_sock_sendmsg+0x0/0x73c [l2cap]) from [<c02f2cc8>] (sock_sendmsg+0xb8/0xd8)
+> [  694.537292] [<c02f2c10>] (sock_sendmsg+0x0/0xd8) from [<c02f3044>] (kernel_sendmsg+0x48/0x80)
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> ---
+>  net/bluetooth/l2cap.c |   26 ++++++++++++++++++++++++++
+>  1 files changed, 26 insertions(+), 0 deletions(-)
+> 
+> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> index 6f931cc..b1344d8 100644
+> --- a/net/bluetooth/l2cap.c
+> +++ b/net/bluetooth/l2cap.c
+> @@ -3078,6 +3078,14 @@ static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hd
+>  		break;
+>  
+>  	default:
+> +		/* don't delete l2cap channel if sk is owned by user */
+> +		if (sock_owned_by_user(sk)) {
+> +			sk->sk_state = BT_DISCONN;
+> +			l2cap_sock_clear_timer(sk);
+> +			l2cap_sock_set_timer(sk, HZ);
+> +			break;
+> +		}
+> +
+>  		l2cap_chan_del(sk, ECONNREFUSED);
+>  		break;
+>  	}
+> @@ -3283,6 +3291,15 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn, struct l2cap_cmd
+>  
+>  	sk->sk_shutdown = SHUTDOWN_MASK;
+>  
+> +	/* don't delete l2cap channel if sk is owned by user */
+> +	if (sock_owned_by_user(sk)) {
+> +		sk->sk_state = BT_DISCONN;
+> +		l2cap_sock_clear_timer(sk);
+> +		l2cap_sock_set_timer(sk, HZ);
+> +		bh_unlock_sock(sk);
+> +		return 0;
+> +	}
+> +
+>  	l2cap_chan_del(sk, ECONNRESET);
+>  	bh_unlock_sock(sk);
+>  
+> @@ -3305,6 +3322,15 @@ static inline int l2cap_disconnect_rsp(struct l2cap_conn *conn, struct l2cap_cmd
+>  	if (!sk)
+>  		return 0;
+>  
+> +	/* don't delete l2cap channel if sk is owned by user */
+> +	if (sock_owned_by_user(sk)) {
+> +		sk->sk_state = BT_DISCONN;
+> +		l2cap_sock_clear_timer(sk);
+> +		l2cap_sock_set_timer(sk, HZ);
 
-Regards
+1 second is too much. Change it to HZ/5 as well. I think it is a
+reasonable value. 
 
-Marcel
-
-
+-- 
+Gustavo F. Padovan
+ProFUSION embedded systems - http://profusion.mobi
