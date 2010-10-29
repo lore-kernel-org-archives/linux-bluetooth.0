@@ -1,63 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Fri, 29 Oct 2010 10:41:14 +0200
-Message-ID: <AANLkTikFbjk8Siva51=zH=KbYE_kkFpqRAqCbyphgEBU@mail.gmail.com>
-Subject: btusb Headset Microphone not working
-From: Michael Kopp <mikopp@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <AANLkTi=H+zqzZb6f303VJRXA_zmibiG=Zec0unxy5b-=@mail.gmail.com>
+References: <AANLkTimTzSMQW3cJQPphWgTBKgn0fbN7zui7tRA1enmi@mail.gmail.com>
+	<20101028120950.GB17930@vigoh>
+	<AANLkTi=H+zqzZb6f303VJRXA_zmibiG=Zec0unxy5b-=@mail.gmail.com>
+Date: Fri, 29 Oct 2010 13:00:09 +0530
+Message-ID: <AANLkTimZZYW2SkQnYPvk3Yo5dAUiQmqPuJXqLnOXCBwU@mail.gmail.com>
+Subject: Re: Unable to get on D-Bus: bluez 4.77
+From: Puneet Pant <pant.puneet464@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+To: unlisted-recipients:; (no To-header on input)
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hello,
 
-I upgraded my notebook recently and as of now the headset microphone
-is not working anymore. When trying arecord no data is being recorded.
-I already tried several versions of bluez up and to including 4.75
-with kernels 2.6.32, 2.6.34 2.6.35, no joy.
+On Thu, Oct 28, 2010 at 10:48 PM, Puneet Pant <pant.puneet464@gmail.com> wrote:
+> Hi Gustavo,
+>
+> On Thu, Oct 28, 2010 at 5:39 PM, Gustavo F. Padovan
+> <padovan@profusion.mobi> wrote:
+>> Hi Puneet,
+>>
+>> * Puneet Pant <pant.puneet464@gmail.com> [2010-10-28 17:02:48 +0530]:
+>>
+>>> Hello,
+>>>
+>>> I have compiled Bluez 4.77. But I'm getting the following error when
+>>> trying to start Bluetooth Daemon:
+>>>
+>>> root@puneet-VirtualBox:/home/puneet/packages/bluez-4.77/src#
+>>> dbus-daemon --system
+>>> root@puneet-VirtualBox:/home/puneet/packages/bluez-4.77/src# ./bluetoothd -nd
+>>> bluetoothd[11819]: Bluetooth deamon 4.77
+>>> bluetoothd[11819]: src/main.c:parse_config() parsing main.conf
+>>> bluetoothd[11819]: src/main.c:parse_config() discovto=0
+>>> bluetoothd[11819]: src/main.c:parse_config() pairto=0
+>>> bluetoothd[11819]: src/main.c:parse_config() pageto=8192
+>>> bluetoothd[11819]: src/main.c:parse_config() name=%h-%d
+>>> bluetoothd[11819]: src/main.c:parse_config() class=0x000100
+>>> bluetoothd[11819]: src/main.c:parse_config() discov_interval=0
+>>> bluetoothd[11819]: src/main.c:parse_config() Key file does not have
+>>> key 'DeviceID'
+>>> bluetoothd[11819]: Unable to get on D-Bus
+>>
+>> One of the reasons could be that you already have the bluetoothd daemon
+>> running.
+>>
+>
+> I did "ps -e | grep bluetooth" and found no bluetoothd running.
+> Could this be related to D-Bus library version incompatibility with ubuntu.
+> As I see, Ubuntu 10.10 comes with Dbus 1.4.0 installed, but when I run
+> ./configure for bluez, it does not detect the installed D-Bus. I had
+> to manually download and install D-Bus 1.2.24 for bluez configure to
+> detect and compile?
+>
+>> --
 
-I get the following error in dmesg
-
-btusb_submit_isoc_urb: hci0 urb f359fe00 submission failed (28)
-btusb_submit_isoc_urb: hci0 urb f5f37200 submission failed (28)
-
-/var/log/messages reveals a little more
-
-
-ct 29 08:40:54 mkopp bluetoothd[5751]: link_key_request
-(sba=1C:65:9D:02:DE:E0, dba=00:16:94:09:DB:88)
-Oct 29 08:40:54 mkopp bluetoothd[5751]: link_key_request
-(sba=1C:65:9D:02:DE:E0, dba=00:16:94:09:DB:88)
-Oct 29 08:40:57 mkopp kernel: input: 00:16:94:09:DB:88 as
-/devices/virtual/input/input16
-Oct 29 08:42:21 mkopp kernel: btusb_submit_isoc_urb: hci0 urb f359fe00
-submission failed (28)
-Oct 29 08:43:28 mkopp bluetoothd[5751]: No matching connection found
-for handle 6
-Oct 29 08:45:28 mkopp kernel: btusb_submit_isoc_urb: hci0 urb f5f37200
-submission failed (28)
-Oct 29 08:45:50 mkopp bluetoothd[5751]: No matching connection found
-for handle 6
-Oct 29 08:49:19 mkopp kernel: input: 00:16:94:09:DB:88 as
-/devices/virtual/input/input17
-Oct 29 08:49:20 mkopp bluetoothd[5751]: Disconnected from
-00:16:94:09:DB:88, /org/bluez/5751/hci0/dev_00_16_94_09_DB_88
+I am able to resolve the issue by installing appropriate D-Bus library
+headers through Synaptic Manager on Ubuntu 10.10 and rebuilding Bluez
+code.
+Installing Dbus separately seems to have caused the problem.
+After building the code, bluetooth daemon is working fine.
 
 
-Audio output works for both AD2P and SCO, input works on neither
-although the headset supports it and works on my cell phone.
+>> Gustavo F. Padovan
+>> ProFUSION embedded systems - http://profusion.mobi
+>>
+>
+> Thanks,
+> Puneet
+>
 
-my .asoundrc is as simple as it gets
-
-pcm.bluetooth {
-   type bluetooth
-   device "00:16:94:09:DB:88"
-   profile "voice"
-}
-
-I've tried google and all sorts of forums but although I've seen this
-error several times I was not able to find a solution. I would be
-grateful if somebody could point me towards a solution.
-
-Best regards
-Michael Kopp
+Thanks,
+Puneet
