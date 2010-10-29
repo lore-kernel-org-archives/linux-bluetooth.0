@@ -1,45 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20101028091733.GB15997@vigoh>
-References: <linux-bluetooth@vger.kernel.org>
-	<1287791820-22693-4-git-send-email-anderson.briglia@openbossa.org>
-	<20101025130356.GA8862@vigoh>
-	<20101026092623.GC15050@null>
-	<AANLkTikVG-gjd1d7T6ETbfXCU0jp2GsR0miWJFO55hps@mail.gmail.com>
-	<20101028091733.GB15997@vigoh>
-Date: Fri, 29 Oct 2010 16:28:32 -0400
-Message-ID: <AANLkTiny4xmZ3KBSvUCrpmQacD8m7dCRQymeJkc_hrDb@mail.gmail.com>
-Subject: Re: [PATCH 3/6] Bluetooth: Implement the first SMP commands
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Ville Tervo <ville.tervo@nokia.com>,
-	Anderson Briglia <anderson.briglia@openbossa.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: HFP Pulseaudio Source destroyed "too quickly" at the end of a
+ call
+From: Peter Dons Tychsen <donpedro@tdcadsl.dk>
+To: Thomas =?ISO-8859-1?Q?W=E4lti?= <twaelti@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <AANLkTikQqPqJdFgLpUrKiqyAC0HNUFnj+8NtbPxazY18@mail.gmail.com>
+References: <AANLkTikQqPqJdFgLpUrKiqyAC0HNUFnj+8NtbPxazY18@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 29 Oct 2010 18:19:29 +0200
+Message-ID: <1288369169.4351.8.camel@donpedro>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Oct 28, 2010 at 5:17 AM, Gustavo F. Padovan
-<padovan@profusion.mobi> wrote:
-> Yep, we may need a new smp.c file.
+On Wed, 2010-10-27 at 22:03 +0200, Thomas Wälti wrote:
 
-It seems that to support multiple C files, there should not be a .c
-file with the same basename as the final module. This means we would
-need to rename l2cap.c to something else.
+> All works well except when ending the recording of Bluetooth
+> Conversations: Once a party hangs up the call, the PulseAudio source
+> and sink disappear before I can stop GStreamer recording (I'm
+> listening to D-Bus events). Unfortunately, this causes my GStreamer
+> pipeline to crash.
 
-Gustavo, I remember you had some patches to split l2cap.c... Do you
-still intend to apply them? If so, having a separate "smp.c" file will
-be much easier.
+There are many reasons (especially for wireless device) that the source
+or sink could disappear at any time. Audio disappearing before or after
+the accompanying signaling furthermore a classic scenario which apps
+should be built to handle. So fixing the race (which i am not sure is
+really a race) does not seem like the correct solution. Trying to fix
+such "races" can lead to inefficiency by using unneeded timers and
+spin-locks, and will not provide robustness, as the audio streams can
+disappear for other reasons anyway.
 
-For now, in our branch we renamed "l2cap.c" to "l2cap_core.c" and
-added the following to net/bluetooth/Makefile:
+Maybe the crash is more interesting. What actually crashes when this
+happens, and why?
 
-l2cap-objs := l2cap_core.o smp.o
+Thanks,
 
-Regards,
--- 
-Anderson Lizardo
-OpenBossa Labs - INdT
-Manaus - Brazil
+/pedro
+
+
