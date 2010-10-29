@@ -1,52 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 29 Oct 2010 13:44:35 +0300
+From: Ville Tervo <ville.tervo@nokia.com>
+To: ext Anderson Briglia <anderson.briglia@openbossa.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: Re: [PATCH 2/6] Bluetooth: fix receiving L2CAP packets over LE
+Message-ID: <20101029104435.GQ15050@null>
+References: <linux-bluetooth@vger.kernel.org>
+ <1287791820-22693-3-git-send-email-anderson.briglia@openbossa.org>
 MIME-Version: 1.0
-In-Reply-To: <20101022135130.617f0ce8@lxorguk.ukuu.org.uk>
-References: <AANLkTi=XTUau_GbASJEUBgsZ_FYYmRAX6W43YtRdv2wS@mail.gmail.com>
-	<20101022135130.617f0ce8@lxorguk.ukuu.org.uk>
-Date: Fri, 29 Oct 2010 13:53:57 +0200
-Message-ID: <AANLkTinj93zAXJAipB3HjE62Xa1Z=9k9gPBxaT=+MLtg@mail.gmail.com>
-Subject: Re: [PATCH 5/9] mfd: Add UART support for the ST-Ericsson CG2900.
-From: Par-Gunnar Hjalmdahl <pghatwork@gmail.com>
-To: Alan Cox <alan@lxorguk.ukuu.org.uk>
-Cc: linus.walleij@stericsson.com, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1287791820-22693-3-git-send-email-anderson.briglia@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-2010/10/22 Alan Cox <alan@lxorguk.ukuu.org.uk>:
->> +
->> +/**
->> + * create_work_item() - Create work item and add it to the work queue.
->> + * @wq:              work queue struct where the work will be added.
->> + * @work_func:       Work function.
->> + * @data:    Private data for the work.
->> + *
->> + * Returns:
->> + *   0 if there is no error.
->> + *   -EBUSY if not possible to queue work.
->> + *   -ENOMEM if allocation fails.
->> + */
->> +static int create_work_item(struct workqueue_struct *wq, work_func_t work_func,
->> +                         void *data)
->> +{
->> +     struct uart_work_struct *new_work;
->> +     int err;
->> +
->> +     new_work = kmalloc(sizeof(*new_work), GFP_ATOMIC);
->
-> So instead of a tiny object embedded in your device you've got a whole
-> error path to worry about, a printk disguised in a macro and a text
-> string longer than the struct size ? Surely this should be part of the
-> device
->
+Hi Anderson,
 
-I've tried now to use 3 separate work_structs in the device (one for
-each work function used), but this doesn't work out.
-The reason is that the work is generated so often that a work is not
-finished before next work of same type comes. This is especially true
-for transmit and receive. Then I get 0 back when queuing the work and
-there is no real way to solve it from what I can see than to allocate
-new work structures every time.
+On Sat, Oct 23, 2010 at 01:56:56AM +0200, ext Anderson Briglia wrote:
+> From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> 
+> As L2CAP packets coming over LE don't have any more encapsulation,
+> other than L2CAP, we are able to process them as soon as they arrive.
 
-/P-G
+Why is this change needed? Was something broken without this patch?
+
+
+
+> 
+> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> ---
+>  net/bluetooth/l2cap.c |   17 +++++++++++++++--
+>  1 files changed, 15 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> index 2bf083e..1ac44f4 100644
+> --- a/net/bluetooth/l2cap.c
+> +++ b/net/bluetooth/l2cap.c
+> @@ -4768,17 +4768,30 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+>  static int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+>  {
+>  	struct l2cap_conn *conn = hcon->l2cap_data;
+> +	struct l2cap_hdr *hdr;
+> +	int len;
+>  
+>  	if (!conn && !(conn = l2cap_conn_add(hcon, 0)))
+>  		goto drop;
+>  
+>  	BT_DBG("conn %p len %d flags 0x%x", conn, skb->len, flags);
+>  
+> +	if (hcon->type == LE_LINK) {
+> +		hdr = (struct l2cap_hdr *) skb->data;
+> +		len = __le16_to_cpu(hdr->len) + L2CAP_HDR_SIZE;
+> +
+> +		if (len == skb->len) {
+> +			/* Complete frame received */
+> +			l2cap_recv_frame(conn, skb);
+> +			return 0;
+> +		}
+> +
+> +		goto drop;
+> +	}
+> +
+>  	if (flags & ACL_START) {
+> -		struct l2cap_hdr *hdr;
+>  		struct sock *sk;
+>  		u16 cid;
+> -		int len;
+>  
+>  		if (conn->rx_len) {
+>  			BT_ERR("Unexpected start frame (len %d)", skb->len);
+> -- 
+> 1.7.0.4
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+-- 
+Ville
