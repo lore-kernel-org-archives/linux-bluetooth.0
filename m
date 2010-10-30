@@ -5,35 +5,39 @@ Cc: Marcel Holtmann <marcel@holtmann.org>,
 	"Gustavo F. Padovan" <padovan@profusion.mobi>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <eric.dumazet@gmail.com>,
+	Thadeu Lima de Souza Cascardo <cascardo@holoscopio.com>,
+	Tejun Heo <tj@kernel.org>,
+	Jiri Kosina <jkosina@suse.cz>,
 	linux-bluetooth@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] bluetooth: cmtp: fix information leak to userland
-Date: Sat, 30 Oct 2010 18:26:26 +0400
-Message-Id: <1288448787-5848-1-git-send-email-segooon@gmail.com>
+Subject: [PATCH] bluetooth: bnep: fix information leak to userland
+Date: Sat, 30 Oct 2010 18:26:21 +0400
+Message-Id: <1288448782-5582-1-git-send-email-segooon@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Structure cmtp_conninfo is copied to userland with some padding fields
-unitialized.  It leads to leaking of contents of kernel stack memory.
+Structure bnep_conninfo is copied to userland with the field "device"
+that has the last elements unitialized.  It leads to leaking of
+contents of kernel stack memory.
 
 Signed-off-by: Vasiliy Kulikov <segooon@gmail.com>
 ---
  Compile tested.
 
- net/bluetooth/cmtp/core.c |    1 +
+ net/bluetooth/bnep/core.c |    1 +
  1 files changed, 1 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/cmtp/core.c b/net/bluetooth/cmtp/core.c
-index ec0a134..8e5f292 100644
---- a/net/bluetooth/cmtp/core.c
-+++ b/net/bluetooth/cmtp/core.c
-@@ -78,6 +78,7 @@ static void __cmtp_unlink_session(struct cmtp_session *session)
+diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+index f10b41f..5868597 100644
+--- a/net/bluetooth/bnep/core.c
++++ b/net/bluetooth/bnep/core.c
+@@ -648,6 +648,7 @@ int bnep_del_connection(struct bnep_conndel_req *req)
  
- static void __cmtp_copy_session(struct cmtp_session *session, struct cmtp_conninfo *ci)
+ static void __bnep_copy_ci(struct bnep_conninfo *ci, struct bnep_session *s)
  {
 +	memset(ci, 0, sizeof(*ci));
- 	bacpy(&ci->bdaddr, &session->bdaddr);
- 
- 	ci->flags = session->flags;
+ 	memcpy(ci->dst, s->eh.h_source, ETH_ALEN);
+ 	strcpy(ci->device, s->dev->name);
+ 	ci->flags = s->flags;
 -- 
 1.7.0.4
