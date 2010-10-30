@@ -1,56 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 30 Oct 2010 04:15:03 +0100
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: linville@tuxdriver.com
-Cc: linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org
-Subject: pull request: bluetooth-2.6 2010-10-30
-Message-ID: <20101030031503.GB24188@vigoh>
+From: Arnd Bergmann <arnd@arndb.de>
+To: "Par-Gunnar Hjalmdahl" <pghatwork@gmail.com>
+Subject: Re: [PATCH 5/9] mfd: Add UART support for the ST-Ericsson CG2900.
+Date: Sat, 30 Oct 2010 02:09:11 +0200
+Cc: Alan Cox <alan@lxorguk.ukuu.org.uk>, linus.walleij@stericsson.com,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Lukasz.Rymanowski@tieto.com
+References: <AANLkTi=XTUau_GbASJEUBgsZ_FYYmRAX6W43YtRdv2wS@mail.gmail.com> <AANLkTinh3D8V8UaN8FyCouwUQ98A4RRWEHXU7Tr9XMbs@mail.gmail.com> <AANLkTimyR7f=PdQbxxBLCnznTA4PT1TWEFiNX3C_qaZo@mail.gmail.com>
+In-Reply-To: <AANLkTimyR7f=PdQbxxBLCnznTA4PT1TWEFiNX3C_qaZo@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201010300209.11220.arnd@arndb.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+On Friday 29 October 2010, Par-Gunnar Hjalmdahl wrote:
+> I might have been a bit too quick there.
+> The actual channel matching and packet creation is done in hci_h4.c
+> while ldisc registration is done in hci_ldisc.c.
+> So it might to be enough to create a new hci_h4-cg2900.c (or similar
+> name) that can separate the right channels.
 
-The following batch contains some bugfixes for 2.6.37. A fix for unaligned
-access in L2CAP, a Kconfig error, and two fixes related to security of
-the Bluetooth links. There is also a one line patch from Matthew Garret,
-that enables USB autosuspend for btusb module, which shall be completely
-safe. Please pull, thanks.
+That sounds good, but would that still be h4?
 
+There are currently six UART protocols that have drivers in Linux:
+H4, bcsp, 3Weire, h4ds, ll and ath3k.
 
-The following changes since commit c1758012971e0410790b2bc96a77e26d7b286593:
+Can cg2900 be simply another one of those, or is it different
+from the others?
 
-  igb: Fix unused variable warning. (2010-10-27 19:43:55 -0700)
+> We must however do changes
+> to hci_ldisc as well since it seems to always register to the
+> Bluetooth stack here, which we definitely don't want since that is
+> handled by btcg2900.c.
 
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git master
+Can you elaborate? You said earlier that cg2900 is a standard HCI
+with some extensions. If that's the case, why do you need your own
+btcg2900 driver to handle bluetooth instead of the regular hci code?
 
-Gustavo F. Padovan (1):
-      Bluetooth: fix endianness conversion in L2CAP
+> Also note that this ldisc issue is only valid when using UART as
+> transport. We will also support SPI and then we will probably run into
+> completely new, interesting problems. :-)
 
-Johan Hedberg (1):
-      Bluetooth: Fix non-SSP auth request for HIGH security level sockets
+Is the link layer on SPI different from the UART variant? Maybe you cna
+just add a SPI TTY driver if that doesn't exist yet and bind the same
+ldisc to the SPI device.
 
-Luiz Augusto von Dentz (1):
-      Bluetooth: fix not setting security level when creating a rfcomm session
-
-Matthew Garrett (1):
-      Bluetooth: Enable USB autosuspend by default on btusb
-
-Randy Dunlap (1):
-      Bluetooth: fix hidp kconfig dependency warning
-
-steven miao (1):
-      bluetooth: fix unaligned access to l2cap conf data
-
- drivers/bluetooth/btusb.c   |    2 ++
- net/bluetooth/hci_event.c   |    6 ++++++
- net/bluetooth/hidp/Kconfig  |    2 +-
- net/bluetooth/l2cap.c       |    8 ++++----
- net/bluetooth/rfcomm/core.c |   13 ++++++++++---
- 5 files changed, 23 insertions(+), 8 deletions(-)
-
--- 
-Gustavo F. Padovan
-ProFUSION embedded systems - http://profusion.mobi
+	Arnd
