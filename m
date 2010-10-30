@@ -1,69 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Sat, 30 Oct 2010 04:15:03 +0100
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: linville@tuxdriver.com
+Cc: linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org
+Subject: pull request: bluetooth-2.6 2010-10-30
+Message-ID: <20101030031503.GB24188@vigoh>
 MIME-Version: 1.0
-In-Reply-To: <20101029205033.GB14961@vigoh>
-References: <linux-bluetooth@vger.kernel.org>
-	<1287791820-22693-3-git-send-email-anderson.briglia@openbossa.org>
-	<20101029104435.GQ15050@null>
-	<AANLkTimTUFK9id6kQyggt_xWsB-RspwbPoB4m39XU2cP@mail.gmail.com>
-	<20101029205033.GB14961@vigoh>
-Date: Sat, 30 Oct 2010 00:31:37 -0300
-Message-ID: <AANLkTimVb4z5CkykTuGW0ug_eTtJKP+ZDvwyjcGcmCaX@mail.gmail.com>
-Subject: Re: [PATCH 2/6] Bluetooth: fix receiving L2CAP packets over LE
-From: Vinicius Gomes <vinicius.gomes@openbossa.org>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: Ville Tervo <ville.tervo@nokia.com>,
-	ext Anderson Briglia <anderson.briglia@openbossa.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi John,
 
-On Fri, Oct 29, 2010 at 5:50 PM, Gustavo F. Padovan
-<padovan@profusion.mobi> wrote:
-> Hi,
->
-> * Vinicius Gomes <vinicius.gomes@openbossa.org> [2010-10-29 09:41:55 -0400]:
->
->> Hi Ville,
->>
->> On Fri, Oct 29, 2010 at 6:44 AM, Ville Tervo <ville.tervo@nokia.com> wrote:
->> > Hi Anderson,
->> >
->> > On Sat, Oct 23, 2010 at 01:56:56AM +0200, ext Anderson Briglia wrote:
->> >> From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
->> >>
->> >> As L2CAP packets coming over LE don't have any more encapsulation,
->> >> other than L2CAP, we are able to process them as soon as they arrive.
->> >
->> > Why is this change needed? Was something broken without this patch?
->> >
->>
->> This change is needed because without it the receiving side would
->> always think that it was receiving continuation frames.
->>
->> As the flags parameter is zero, it would fall into the "} else {"
->> condition, and because no frame was received before, conn->rx_len
->> would be zero and the frame would be discarded. Without this patch I
->> was seeing those "Unexpected continuation frame ..." messages on the
->> receiving side.
->
-> From what I understood the flags are only for ACL connections and LE
-> links doesn't have fragmentation, right? So we don't need to check flags
-> here, actually it seems we don't have flags for LE like ACL.
->
-
-Yeah, that is what the patch tries to solve. I was just trying to make
-clear why the old code doesn't work (seems that I didn't do a good job
-;-) .
-
-> --
-> Gustavo F. Padovan
-> ProFUSION embedded systems - http://profusion.mobi
->
+The following batch contains some bugfixes for 2.6.37. A fix for unaligned
+access in L2CAP, a Kconfig error, and two fixes related to security of
+the Bluetooth links. There is also a one line patch from Matthew Garret,
+that enables USB autosuspend for btusb module, which shall be completely
+safe. Please pull, thanks.
 
 
-Cheers,
+The following changes since commit c1758012971e0410790b2bc96a77e26d7b286593:
+
+  igb: Fix unused variable warning. (2010-10-27 19:43:55 -0700)
+
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git master
+
+Gustavo F. Padovan (1):
+      Bluetooth: fix endianness conversion in L2CAP
+
+Johan Hedberg (1):
+      Bluetooth: Fix non-SSP auth request for HIGH security level sockets
+
+Luiz Augusto von Dentz (1):
+      Bluetooth: fix not setting security level when creating a rfcomm session
+
+Matthew Garrett (1):
+      Bluetooth: Enable USB autosuspend by default on btusb
+
+Randy Dunlap (1):
+      Bluetooth: fix hidp kconfig dependency warning
+
+steven miao (1):
+      bluetooth: fix unaligned access to l2cap conf data
+
+ drivers/bluetooth/btusb.c   |    2 ++
+ net/bluetooth/hci_event.c   |    6 ++++++
+ net/bluetooth/hidp/Kconfig  |    2 +-
+ net/bluetooth/l2cap.c       |    8 ++++----
+ net/bluetooth/rfcomm/core.c |   13 ++++++++++---
+ 5 files changed, 23 insertions(+), 8 deletions(-)
+
 -- 
-Vinicius
+Gustavo F. Padovan
+ProFUSION embedded systems - http://profusion.mobi
