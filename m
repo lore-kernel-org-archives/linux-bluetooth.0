@@ -1,75 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: >net-wireless/bluez-4.63 unable to connect audio streams due
- commit
-From: Pacho Ramos <pacho@condmat1.ciencias.uniovi.es>
-Reply-To: pacho@condmat1.ciencias.uniovi.es
-To: Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?=
-	<u.kleine-koenig@pengutronix.de>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-In-Reply-To: <1287426290.6820.1.camel@localhost.localdomain>
-References: <1287426290.6820.1.camel@localhost.localdomain>
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-smxwXs/sFo2kEE+m1skJ"
-Date: Sun, 31 Oct 2010 12:25:58 +0100
-Message-ID: <1288524358.2654.4.camel@localhost.localdomain>
-Mime-Version: 1.0
+From: Sander van Grieken <sander@outrightsolutions.nl>
+To: "David Stockwell" <dstockwell@frequency-one.com>
+Subject: Re: AVRCP 1.3/1.4 current implementation
+Date: Sat, 30 Oct 2010 20:54:47 +0200
+Cc: =?iso-8859-1?q?Jo=E3o_Paulo_Rechi_Vita?= <jprvita@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	"Shivendra Agrawal" <ag.shivendra@gmail.com>,
+	"Waldemar Rymarkiewicz" <Waldemar.Rymarkiewicz@tieto.com>,
+	"Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
+	"Johan Hedberg" <johan.hedberg@gmail.com>
+References: <201010191147.34241.sander@outrightsolutions.nl> <AANLkTi=ThA2ojhj8PBHK_VybmFcHO91K0g=y7nhfTBAO@mail.gmail.com> <AF6253527A02449484D3BA2FF254AE2B@freqoneremote>
+In-Reply-To: <AF6253527A02449484D3BA2FF254AE2B@freqoneremote>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Message-Id: <201010302054.47867.sander@outrightsolutions.nl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Saturday 30 October 2010 19:57:31 David Stockwell wrote:
+> Hello to all,
+> 
+> In my earlier work, I noticed that in audio/manager.c, function 
+> handle_uuids, when the UUID was found for an AVRCP target or controller, it 
+> would only launch avrcp_connect IF a Sink was enabled and present.
+> 
+> I suspect this was done to make sure that if a headset or similar was 
+> connecting, it would make sure the audio side of the connection was up and 
+> running before enabling the control side of the interface.
+> 
+> However, my device has no audio side, it is a pure AVRCP CT, so there is no 
+> audio-side connection.  In previous testing, I just unconditionally started 
+> avrcp_connect and it all worked fine for my purposes.  I am wondering if 
+> there is any other impact.
 
---=-smxwXs/sFo2kEE+m1skJ
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Yes the current implementation only (implicitly) connects the RCP if a connection is made 
+to a DTP (audio) profile, or if a RCP connection request is received from the peer.
 
-El lun, 18-10-2010 a las 20:24 +0200, Pacho Ramos escribi=C3=B3:
-> El lun, 04-10-2010 a las 14:35 +0200, Uwe Kleine-K=C3=B6nig escribi=C3=B3=
-:
-> > Hello Pacho,
-> >=20
-> > On Mon, Oct 04, 2010 at 12:25:46PM +0200, Pacho Ramos wrote:
-> > > > I would say this was because of double authentication request, but =
-it
-> > > > seems it is not the case, actually ssp doesn't seems to be used at =
-all
-> > > > here so this must be something else, maybe you should try this:
-> > > >=20
-> > > > http://thread.gmane.org/gmane.linux.bluez.kernel/7256
-> > > >=20
-> > >=20
-> > > Thanks but, how should I try to apply that patch? Looks like
-> > > net/bluetooth/rfcomm/core.c is not present on bluez-4.72 sources
-> > I guess this is a patch to apply to your kernel, not bluez.
-> >=20
-> > Best regards
-> > Uwe
-> >=20
->=20
-> Downstream affected reported told me it's still failing even with the
-> patch:
->=20
-> http://bugs.gentoo.org/show_bug.cgi?id=3D327705#c19
->=20
-> Attached is the new hcidump output
->=20
-> Thanks a lot for your help :-)
->=20
+I have already implemented a DBUS method to connect only the RCP, but is only tested with 
+devices that also have the DTP profile, so this might not work if there's no DTP profile 
+detected on the peer. The code uses a struct audio_device * to pass along to the various 
+RCP functions, that might or might not be available when the peer has no DTP profile..
 
-There is no possible solution to this? :-(
+I think we can add the factoring out of the audio_device dependency to the TODO list. 
+Probably something along the lines of defining a struct control_device and have a pointer 
+to an optional audio_device struct in there.
 
-Thanks
+I've made this stuff available in my git at github:
 
---=-smxwXs/sFo2kEE+m1skJ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
+git://github.com/accumulator/bluez.git
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.16 (GNU/Linux)
-
-iEYEABECAAYFAkzNUkYACgkQCaWpQKGI+9QnDwCfcWbWUN/973a0eJK1AKRL4IJd
-FAwAnA8f8XyYtTXRyvdh/JherThtusQd
-=8N1y
------END PGP SIGNATURE-----
-
---=-smxwXs/sFo2kEE+m1skJ--
-
+grtz,
+Sander
