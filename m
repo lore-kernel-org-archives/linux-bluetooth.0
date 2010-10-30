@@ -1,43 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vasiliy Kulikov <segooon@gmail.com>
-To: kernel-janitors@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <eric.dumazet@gmail.com>,
-	Thadeu Lima de Souza Cascardo <cascardo@holoscopio.com>,
-	Tejun Heo <tj@kernel.org>,
-	Jiri Kosina <jkosina@suse.cz>,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] bluetooth: bnep: fix information leak to userland
-Date: Sat, 30 Oct 2010 18:26:21 +0400
-Message-Id: <1288448782-5582-1-git-send-email-segooon@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20101030031503.GB24188@vigoh>
+References: <20101030031503.GB24188@vigoh>
+From: "Luis R. Rodriguez" <mcgrof@gmail.com>
+Date: Fri, 29 Oct 2010 23:29:05 -0700
+Message-ID: <AANLkTimyNLEsrNcUF3LfBR7_Rj+gKZzvbaU5Yxw1RnY-@mail.gmail.com>
+Subject: Re: pull request: bluetooth-2.6 2010-10-30
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>,
+	Matthew Garrett <mjg59@srcf.ucam.org>
+Cc: linville@tuxdriver.com, linux-bluetooth@vger.kernel.org,
+	linux-wireless@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Structure bnep_conninfo is copied to userland with the field "device"
-that has the last elements unitialized.  It leads to leaking of
-contents of kernel stack memory.
+On Fri, Oct 29, 2010 at 8:15 PM, Gustavo F. Padovan
+<padovan@profusion.mobi> wrote:
+> Hi John,
+>
+> The following batch contains some bugfixes for 2.6.37. A fix for unaligned
+> access in L2CAP, a Kconfig error, and two fixes related to security of
+> the Bluetooth links. There is also a one line patch from Matthew Garret,
+> that enables USB autosuspend for btusb module, which shall be completely
+> safe. Please pull, thanks.
 
-Signed-off-by: Vasiliy Kulikov <segooon@gmail.com>
----
- Compile tested.
+> Matthew Garrett (1):
+>      Bluetooth: Enable USB autosuspend by default on btusb
 
- net/bluetooth/bnep/core.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+BTW, is this the thing that powertop nags about?
 
-diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
-index f10b41f..5868597 100644
---- a/net/bluetooth/bnep/core.c
-+++ b/net/bluetooth/bnep/core.c
-@@ -648,6 +648,7 @@ int bnep_del_connection(struct bnep_conndel_req *req)
- 
- static void __bnep_copy_ci(struct bnep_conninfo *ci, struct bnep_session *s)
- {
-+	memset(ci, 0, sizeof(*ci));
- 	memcpy(ci->dst, s->eh.h_source, ETH_ALEN);
- 	strcpy(ci->device, s->dev->name);
- 	ci->flags = s->flags;
--- 
-1.7.0.4
+  Luis
