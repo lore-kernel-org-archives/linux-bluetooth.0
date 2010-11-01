@@ -1,40 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTi=BeeuAKjt8bKro2KH0SXMJDUuwMznRS5NcDj4K@mail.gmail.com>
-References: <AANLkTikQqPqJdFgLpUrKiqyAC0HNUFnj+8NtbPxazY18@mail.gmail.com>
-	<1288369169.4351.8.camel@donpedro>
-	<AANLkTi=BeeuAKjt8bKro2KH0SXMJDUuwMznRS5NcDj4K@mail.gmail.com>
-Date: Mon, 1 Nov 2010 09:11:40 +0100
-Message-ID: <AANLkTikPsyrod-GODJnXipsk+ysm3rOr0o_vrv8uYD9U@mail.gmail.com>
-Subject: Re: HFP Pulseaudio Source destroyed "too quickly" at the end of a call
-From: =?ISO-8859-1?Q?Thomas_W=E4lti?= <twaelti@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Peter Dons Tychsen <donpedro@tdcadsl.dk>,
+In-Reply-To: <20101028075346.GA15997@vigoh>
+References: <1287714419-13545-1-git-send-email-haijun.liu@atheros.com>
+ <20101022171825.GA980@vigoh> <AANLkTi=C5biCuJV335yfNWkY77xK29aa5JQ+9xvaE1yr@mail.gmail.com>
+ <20101025110131.GA7721@vigoh> <AANLkTin2RaOZbRbg4faCFUxMLVi-FoY2xnNqq0a8cHpN@mail.gmail.com>
+ <20101028075346.GA15997@vigoh>
+From: haijun liu <liuhaijun.er@gmail.com>
+Date: Mon, 1 Nov 2010 09:22:14 +0800
+Message-ID: <AANLkTi=Q3g2UTiHV1i2gBa=POY0jS6GbBWAD1ddOaETx@mail.gmail.com>
+Subject: Re: [PATCH 1/2 v2] Bluetooth: Fix system crash caused by del_timer()
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: Haijun Liu <haijun.liu@atheros.com>,
 	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-2010/10/31 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
->> On Wed, 2010-10-27 at 22:03 +0200, Thomas Wälti wrote:
+Hi Gustavo,
+
+>> >> >> During test session with another vendor's bt stack, found that in
+>> >> >> l2cap_chan_del() using del_timer() caused l2cap_monitor_timeout()
+>> >> >> be called after the sock was freed, so it raised a system crash.
+>> >> >> So I just replaced del_timer() with del_timer_sync() to solve it.
+>> >> >
+>> >> > NAK on this. If you read the del_timer_sync() documentation you can
+>> >> > see that you can't call del_timer_sync() on interrupt context. The
+>> >> > possible solution here is to check in the beginning of
+>> >> > l2cap_monitor_timeout() if your sock is still valid.
+>> >> >
+>> >>
+>> >> You are right, I only considered close() interface, so missed the interrupt
+>> >> context.
+>> >>
+>> >> It's very difficult to check sock valid or not in timeout procedure, since it's
+>> >> an interrupt context, and only can get context from parameter pre-stored,
+>> >> except global variables.
+>> >
+>> > I think you can check for sk == null there.
+>> >
 >>
->>> All works well except when ending the recording of Bluetooth
->>> Conversations: Once a party hangs up the call, the PulseAudio source
->>> and sink disappear before I can stop GStreamer recording (I'm
->>> listening to D-Bus events). Unfortunately, this causes my GStreamer
->>> pipeline to crash.
+>> It's a pre-stored parameter, it will not change by itself.
 >
-> Well then there is a problem in your pipeline, bluetooth sinks and
-> sources may disappear at any point and in fact PA do move audio,
-> depending on the system policy, when that occurs. Also note that
-> bluetooth modules do handle DisconnectRequest signal so it might react
-> a bit faster when user request audio to be disconnected, but that
-> should not make any difference for an application using PA.
+> I looked a bit into this and a good solution seems to be to hold a
+> reference to the sock when we call a mod_timer() and then put the
+> reference when we call del_timer() and the timer is inactive or when
+> l2cap_monitor_timeout(). Look net/sctp/ for examples.
+>
 
-Thanks everybody for the helpful comments and valuable details,
-helping me to understand how the "underworld" of my app works in the
-Bluez/PA corner.
-I'll now shift my focus towards GStreamer :-)
+Same situation still is there, in this case, l2cap_monitor_timeout()
+how to know the reference has been released by del_timer()?
 
-Best regards
--Tom
+If we refer to net/sctp, use timer_pending() to detect it, unless we can
+ensure del_timer() always be called in interrupt context and same
+level compare to timer interrupt, otherwise it's not an atomic operation
+for this case.
+
+-- 
+Haijun Liu
