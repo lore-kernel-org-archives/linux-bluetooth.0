@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1288608899-23032-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
-References: <1288608899-23032-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
-Date: Tue, 2 Nov 2010 01:10:52 +0200
-Message-ID: <AANLkTi=DYpOHkifzuUNjwz7tm0vY-CimRaPx27qE40A1@mail.gmail.com>
-Subject: Re: [PATCH 1/2] Add support for sending PBAP response in many parts
+In-Reply-To: <1288603499-16456-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+References: <1288603499-16456-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+Date: Tue, 2 Nov 2010 01:01:18 +0200
+Message-ID: <AANLkTinqFDsMUW=uuyMicgVMw2B3A-Pkr1H5_B3_dh25@mail.gmail.com>
+Subject: Re: [PATCH] Add support for sending small data through obex
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
 Cc: linux-bluetooth@vger.kernel.org
@@ -14,81 +14,102 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Mon, Nov 1, 2010 at 12:54 PM, Radoslaw Jablonski
+On Mon, Nov 1, 2010 at 11:24 AM, Radoslaw Jablonski
 <ext-jablonski.radoslaw@nokia.com> wrote:
-> Previously pull result from PBAP was returned always in one big
-> part - a lot of memory was used to store all data. Now it is
-> possible to send data from pbap in many smaller chunks.
+> Added handling packets smaller than mtu in obex_write_stream. Now trying
+> to read from source until mtu will be filled properly and not sending
+> immediately data if it is smaller than mtu.
 > ---
->  plugins/pbap.c |   29 ++++++++++++++++++++++++++++-
->  1 files changed, 28 insertions(+), 1 deletions(-)
+>  src/obex.c |   48 +++++++++++++++++++++++++++++++++++++-----------
+>  1 files changed, 37 insertions(+), 11 deletions(-)
 >
-> diff --git a/plugins/pbap.c b/plugins/pbap.c
-> index 3ea7d6b..b4c1f00 100644
-> --- a/plugins/pbap.c
-> +++ b/plugins/pbap.c
-> @@ -143,6 +143,7 @@ struct pbap_session {
->        uint32_t find_handle;
->        GString *buffer;
->        struct cache cache;
-> +       gboolean partial_resp;
->  };
->
->  static const uint8_t PBAP_TARGET[TARGET_SIZE] = {
-> @@ -262,6 +263,10 @@ static void query_result(const char *buffer, size_t bufsize, int vcards,
->                pbap->buffer = g_string_append_len(pbap->buffer, buffer,
->                                                                bufsize);
->
-> +       /* If partial_resp will be set to TRUE, then we won't end transmission
-> +        * after sending one part of results to the client via obex*/
-> +       pbap->partial_resp = missed ? TRUE : FALSE;
-> +
->        obex_object_set_io_flags(pbap, G_IO_IN, 0);
->  }
->
-> @@ -829,6 +834,28 @@ fail:
->        return NULL;
->  }
->
-> +static ssize_t string_read_part(void *object, void *buf, size_t count,
-> +                               gboolean partial)
-> +{
-> +       GString *string = object;
-> +       ssize_t len;
-> +
-> +       if (string->len == 0) {
-> +               /* if more data will be available later, returning -EAGAIN
-> +               * instead of 0 (it will suspend request) */
-> +               if (partial)
-> +                       return -EAGAIN;
-> +               else
-> +                       return 0;
-> +       }
-> +
-> +       len = MIN(string->len, count);
-> +       memcpy(buf, string->str, len);
-> +       string = g_string_erase(string, 0, len);
-> +
-> +       return len;
-> +}
-> +
->  static ssize_t vobject_pull_read(void *object, void *buf, size_t count,
->                                                                uint8_t *hi)
->  {
-> @@ -847,7 +874,7 @@ static ssize_t vobject_pull_read(void *object, void *buf, size_t count,
->                /* Stream data */
->                *hi = OBEX_HDR_BODY;
->
-> -       return string_read(pbap->buffer, buf, count);
-> +       return string_read_part(pbap->buffer, buf, count, pbap->partial_resp);
->  }
+> diff --git a/src/obex.c b/src/obex.c
+> index 6d4430d..d3a6ccd 100644
+> --- a/src/obex.c
+> +++ b/src/obex.c
+> @@ -623,6 +623,7 @@ static int obex_write_stream(struct obex_session *os,
+>        obex_headerdata_t hd;
+>        uint8_t *ptr;
+>        ssize_t len;
+> +       ssize_t r_len;
 
-Im not sure why you decided to create another string_read copy to
-handle this, why not using string_read return and check if it is a
-partial response on directly on vobject_pull_read? Sounds simple to me
-and don't duplicate any code.
+You can have len and r_len in the same line above.
 
->  static ssize_t vobject_list_read(void *object, void *buf, size_t count,
+>        unsigned int flags;
+>        uint8_t hi;
+>
+> @@ -642,18 +643,37 @@ static int obex_write_stream(struct obex_session *os,
+>                goto add_header;
+>        }
+>
+> -       len = os->driver->read(os->object, os->buf, os->tx_mtu, &hi);
+> -       if (len < 0) {
+> -               error("read(): %s (%zd)", strerror(-len), -len);
+> -               if (len == -EAGAIN)
+> -                       return len;
+> -               else if (len == -ENOSTR)
+> -                       return 0;
+> +       /* Copying data from source until we reach end of the stream. Sending
+> +        * data only if MTU will be filled in 100% or we reach end of data.
+> +        * Remaining data in buffer will be sent with next amount of data
+> +        * from source.*/
+> +       do {
+> +               r_len = os->driver->read(os->object, os->buf + os->pending,
+> +                                       os->tx_mtu - os->pending, &hi);
+
+It looks like you should add one more tab in the line above it that
+doesn't go over 80 columns.
+
+> +               if (r_len < 0) {
+> +                       error("read(): %s (%zd)", strerror(-r_len), -r_len);
+> +
+> +                       switch(r_len) {
+> +                       case -EAGAIN:
+> +                               return r_len;
+> +                       case -EINTR:
+> +                               continue;
+> +                       case -ENOSTR:
+> +                               return 0;
+> +                       default:
+> +                               g_free(os->buf);
+> +                               os->buf = NULL;
+> +                               return r_len;
+> +                       }
+> +               }
+
+I think it is probably more efficiently to handle rlen == 0 here, like
+if (rlen == 0) break; else if (rlen < 0)
+
+> -               g_free(os->buf);
+> -               os->buf = NULL;
+> -               return len;
+> -       }
+> +               /* Saving amount of data accumulated in obex buffer */
+> +               os->pending += r_len;
+> +       } while (os->pending < os->tx_mtu && r_len != 0);
+
+That simplify here too, just do while (os->pending < os->txt_mtu) if
+you handle rlen == 0 like I said before.
+
+> +
+> +       len = os->pending;
+> +       os->pending = 0;
+>
+>        ptr = os->buf;
+>
+> @@ -702,6 +722,12 @@ static gboolean handle_async_io(void *object, int flags, int err,
+>                ret = obex_read_stream(os, os->obex, os->obj);
+>
+>  proceed:
+> +
+> +       /* Returning TRUE to not delete current watcher - it need to be active
+> +        * to handle next io flag changes (more data will be available later)*/
+> +       if (ret == -EAGAIN)
+> +               return TRUE;
+> +
+>        if (ret < 0) {
+>                os_set_response(os->obj, err);
+>                OBEX_CancelRequest(os->obex, TRUE);
 > --
 > 1.7.0.4
 >
