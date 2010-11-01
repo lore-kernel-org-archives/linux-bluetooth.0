@@ -1,65 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 1 Nov 2010 15:23:34 -0400 (EDT)
-From: Jiri Kosina <jkosina@suse.cz>
-To: Alan Ott <alan@signal11.us>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: Stefan Achatz <erazor_de@users.sourceforge.net>,
-	Antonio Ospite <ospite@studenti.unina.it>,
-	Alexey Dobriyan <adobriyan@gmail.com>, Tejun Heo <tj@kernel.org>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Greg Kroah-Hartman <gregkh@suse.de>,
-	Stephane Chatty <chatty@enac.fr>,
-	Michael Poole <mdpoole@troilus.org>,
-	Bastien Nocera <hadess@hadess.net>,
-	Eric Dumazet <eric.dumazet@gmail.com>, linux-input@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v4 0/2] Get and Set Feature Reports on HIDRAW (USB and
- Bluetooth)
-In-Reply-To: <alpine.LNX.2.00.1009221408330.26813@pobox.suse.cz>
-Message-ID: <alpine.LNX.2.00.1011011523150.15851@pobox.suse.cz>
-References: <1281442367.12579.206.camel@localhost.localdomain> <1281990059-3562-1-git-send-email-alan@signal11.us> <alpine.LNX.2.00.1008231459370.1019@pobox.suse.cz> <alpine.LNX.2.00.1009021724480.26813@pobox.suse.cz>
- <alpine.LNX.2.00.1009221408330.26813@pobox.suse.cz>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+From: =?UTF-8?q?Elvis=20Pf=C3=BCtzenreuter?= <epx@signove.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: epx@signove.com
+Subject: [PATCH] [RFC] Add Application property to HealthChannel
+Date: Mon,  1 Nov 2010 16:16:22 -0200
+Message-Id: <1288635382-2032-1-git-send-email-epx@signove.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 22 Sep 2010, Jiri Kosina wrote:
+This patch adds the Application property to HealthChannel, which
+allows to unambiguously relate a channel to an application.
 
-> > > > This is version 4. Built against 2.6.35+ revision 320b2b8de12698 .
-> > > > 
-> > > > Alan Ott (2):
-> > > >   HID: Add Support for Setting and Getting Feature Reports from hidraw
-> > > >   Bluetooth: hidp: Add support for hidraw  HIDIOCGFEATURE  and
-> > > >     HIDIOCSFEATURE
-> > > > 
-> > > >  drivers/hid/hidraw.c          |  105 ++++++++++++++++++++++++++++++++++++--
-> > > >  drivers/hid/usbhid/hid-core.c |   37 +++++++++++++-
-> > > >  include/linux/hid.h           |    3 +
-> > > >  include/linux/hidraw.h        |    3 +
-> > > >  net/bluetooth/hidp/core.c     |  114 +++++++++++++++++++++++++++++++++++++++--
-> > > >  net/bluetooth/hidp/hidp.h     |    8 +++
-> > > >  6 files changed, 260 insertions(+), 10 deletions(-)
-> > > 
-> > > Marcel, as per our previous discussion -- what is your word on this? I'd 
-> > > be glad taking it once you Ack the bluetooth bits (which, as far as I 
-> > > understood from your last mail, don't have strong objections against any 
-> > > more).
-> > 
-> > ... Marcel?
-> > 
-> > I'd really like not to miss 2.6.37 merge window with this.
-> 
-> Seemingly I have not enought powers to get statement from Marcel here 
-> these days/weeks.
-> 
-> Davem, would you perhaps be able to step in here?
+This property is useful when there are several processes interested
+in accepting HealthChannels but device address is not sufficient
+criteria to engage upon, or ignore, the ChannelConnected signal.
+Having the application path allows to determine role and data type,
+in the context of the process that has created that application.
 
-Marcel, any word on this patchset by chance?
+Also, channel path skeleton is fixed in documentation, in order to
+reflect atual implementation.
+---
+ doc/health-api.txt |    8 ++++++--
+ health/hdp.c       |    3 +++
+ 2 files changed, 9 insertions(+), 2 deletions(-)
 
-Thanks,
-
+diff --git a/doc/health-api.txt b/doc/health-api.txt
+index 89d5ff9..a0a1685 100644
+--- a/doc/health-api.txt
++++ b/doc/health-api.txt
+@@ -119,8 +119,7 @@ Properties:
+ 
+ Service		org.bluez
+ Interface	org.bluez.HealthChannel
+-Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/
+-							hdp_YYYY/channel_ZZ
++Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/chanZZZ
+ 
+ Only the process that created the data channel or the creator of the
+ HealthApplication that received it will be able to call this methods.
+@@ -160,3 +159,8 @@ Properties:
+ 
+ 		Identifies the Remote Device that is connected with. Maps with
+ 		a HealthDevice object.
++
++	object Application [readonly]
++
++		Identifies the HealthApplication to which this channel is
++		related to (which indirectly defines its role and data type).
+diff --git a/health/hdp.c b/health/hdp.c
+index be30204..1eba8e1 100644
+--- a/health/hdp.c
++++ b/health/hdp.c
+@@ -423,6 +423,9 @@ static DBusMessage *channel_get_properties(DBusConnection *conn,
+ 	path = device_get_path(chan->dev->dev);
+ 	dict_append_entry(&dict, "Device", DBUS_TYPE_OBJECT_PATH, &path);
+ 
++	path = chan->app->path;
++	dict_append_entry(&dict, "Application", DBUS_TYPE_OBJECT_PATH, &path);
++
+ 	if (chan->config == HDP_RELIABLE_DC)
+ 		type = g_strdup("Reliable");
+ 	else
 -- 
-Jiri Kosina
-SUSE Labs, Novell Inc.
+1.7.0.4
+
