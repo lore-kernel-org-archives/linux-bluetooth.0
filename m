@@ -1,52 +1,173 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Mon, 1 Nov 2010 15:36:49 +0200
-Message-ID: <AANLkTikPhBzAhQ=CeDkQokMK39k=c-VxU3re5GtMdiFZ@mail.gmail.com>
-Subject: [PATCH] Fix avoid starting AVDTP disconnect timer twice
-From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
+From: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=20cf303b389d76c40e0493fde66b
+Cc: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+Subject: [PATCH 2/2] Add support for generating pull response in many parts
+Date: Mon,  1 Nov 2010 12:54:59 +0200
+Message-Id: <1288608899-23032-2-git-send-email-ext-jablonski.radoslaw@nokia.com>
+In-Reply-To: <1288608899-23032-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+References: <1288608899-23032-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---20cf303b389d76c40e0493fde66b
-Content-Type: text/plain; charset=ISO-8859-1
+Now data from tracker is fetched in many smaller parts (instead of one
+big query before). This is needed to save memory and to not overload
+dbus and tracker when generating query result.
+---
+ plugins/phonebook-tracker.c |   71 ++++++++++++++++++++++++++++++++++++-------
+ 1 files changed, 60 insertions(+), 11 deletions(-)
 
-Patch proposal for review.
+diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
+index 58f52ab..46ef5fb 100644
+--- a/plugins/phonebook-tracker.c
++++ b/plugins/phonebook-tracker.c
+@@ -57,6 +57,8 @@
+ #define COL_ANSWERED 37
+ #define ADDR_FIELD_AMOUNT 7
+ #define CONTACT_ID_PREFIX "contact:"
++#define QUERY_LIMIT_FORMAT "%s LIMIT %d OFFSET %d"
++#define QUERY_LIMIT 50
+ 
+ #define CONTACTS_QUERY_ALL						\
+ 	"SELECT ?v nco:fullname(?c) "					\
+@@ -650,6 +652,9 @@ struct phonebook_data {
+ 	gboolean vcardentry;
+ 	const struct apparam_field *params;
+ 	GSList *contacts;
++	char *name;
++	int offset;
++	int num_row;
+ };
+ 
+ struct cache_data {
+@@ -1098,6 +1103,12 @@ static void add_affiliation(char **field, const char *value)
+ 	*field = g_strdup(value);
+ }
+ 
++static char *gen_partial_query(const char *name, int limit, int offset)
++{
++	return g_strdup_printf(QUERY_LIMIT_FORMAT, name2query(name),
++				limit, offset);
++}
++
+ static void pull_contacts(char **reply, int num_fields, void *user_data)
+ {
+ 	struct phonebook_data *data = user_data;
+@@ -1107,13 +1118,17 @@ static void pull_contacts(char **reply, int num_fields, void *user_data)
+ 	GString *vcards;
+ 	int last_index, i;
+ 	gboolean cdata_present = FALSE;
+-	char *home_addr, *work_addr;
++	gboolean last_resp = FALSE;
++	char *home_addr, *work_addr, *query;
+ 
+ 	if (num_fields < 0) {
+ 		data->cb(NULL, 0, num_fields, 0, data->user_data);
+ 		goto fail;
+ 	}
+ 
++	data->num_row++;
++	last_index = params->liststartoffset + params->maxlistcount;
++
+ 	DBG("reply %p", reply);
+ 
+ 	if (reply == NULL)
+@@ -1145,8 +1160,6 @@ static void pull_contacts(char **reply, int num_fields, void *user_data)
+ 
+ 	data->index++;
+ 
+-	last_index = params->liststartoffset + params->maxlistcount;
+-
+ 	if ((data->index <= params->liststartoffset ||
+ 						data->index > last_index) &&
+ 						params->maxlistcount > 0)
+@@ -1222,14 +1235,46 @@ add_numbers:
+ done:
+ 	vcards = gen_vcards(data->contacts, params);
+ 
+-	if (num_fields == 0)
++	/* If tracker returned only empty row - all results already returned */
++	if (num_fields == 0 && data->num_row == 1)
++		last_resp = TRUE;
++
++	/* Check if tracker could return desired number of results - if coldn't,
++	 * all results are fetched already and this is last response */
++	if (data->num_row < QUERY_LIMIT)
++		last_resp = TRUE;
++
++	/* Check needed for 'maxlistcount' and 'liststartoffset' parameters */
++	if (data->index > last_index)
++		last_resp = TRUE;
++
++	/* Data won't be send if starting offset has not been achieved (unless
++	 * now handling last response from tracker) */
++	if (data->index > params->liststartoffset || last_resp)
++		/* 4th parameter of callback is used to mark if stream should be
++		 * closed or more data will be sent*/
+ 		data->cb(vcards->str, vcards->len,
+-					g_slist_length(data->contacts), 0,
+-					data->user_data);
++				g_slist_length(data->contacts), !last_resp,
++				data->user_data);
+ 
++	g_slist_free(data->contacts);data->contacts = NULL;
+ 	g_string_free(vcards, TRUE);
++	data->num_row = 0;
++
++	/* Sending query to tracker to get next part of results (only for pull
++	 * phonebook queries) */
++	if (!data->vcardentry && !last_resp) {
++		data->offset += QUERY_LIMIT;
++		query = gen_partial_query(data->name, QUERY_LIMIT,
++					data->offset);
++		query_tracker(query, PULL_QUERY_COL_AMOUNT,
++				pull_contacts, data);
++		g_free(query);
++		return;
++	}
+ fail:
+ 	g_slist_free(data->contacts);
++	g_free(data->name);
+ 	g_free(data);
+ }
+ 
+@@ -1367,18 +1412,18 @@ int phonebook_pull(const char *name, const struct apparam_field *params,
+ 					phonebook_cb cb, void *user_data)
+ {
+ 	struct phonebook_data *data;
+-	const char *query;
++	char *query;
+ 	reply_list_foreach_t pull_cb;
+-	int col_amount;
++	int col_amount, ret;
+ 
+ 	DBG("name %s", name);
+ 
+ 	if (params->maxlistcount == 0) {
+-		query = name2count_query(name);
++		query = g_strdup(name2count_query(name));
+ 		col_amount = COUNT_QUERY_COL_AMOUNT;
+ 		pull_cb = pull_contacts_size;
+ 	} else {
+-		query = name2query(name);
++		query = gen_partial_query(name, QUERY_LIMIT, 0);
+ 		col_amount = PULL_QUERY_COL_AMOUNT;
+ 		pull_cb = pull_contacts;
+ 	}
+@@ -1390,8 +1435,12 @@ int phonebook_pull(const char *name, const struct apparam_field *params,
+ 	data->params = params;
+ 	data->user_data = user_data;
+ 	data->cb = cb;
++	data->name = g_strdup(name);
++
++	ret = query_tracker(query, col_amount, pull_cb, data);
++	g_free(query);
+ 
+-	return query_tracker(query, col_amount, pull_cb, data);
++	return ret;
+ }
+ 
+ int phonebook_get_entry(const char *folder, const char *id,
+-- 
+1.7.0.4
 
-/Daniel
-
---20cf303b389d76c40e0493fde66b
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Fix-avoid-starting-AVDTP-disconnect-timer-twice.patch"
-Content-Disposition: attachment;
-	filename="0001-Fix-avoid-starting-AVDTP-disconnect-timer-twice.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_gfzdyfv40
-
-RnJvbSAwYWFkNDRlOTA1ODVlNmE3YzlhNTljZWUyY2RlZmYwMDMxNmE1MjdjIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
-a2lhLmNvbT4KRGF0ZTogTW9uLCAxIE5vdiAyMDEwIDEyOjQ0OjI1ICswMjAwClN1YmplY3Q6IFtQ
-QVRDSF0gRml4IGF2b2lkIHN0YXJ0aW5nIEFWRFRQIGRpc2Nvbm5lY3QgdGltZXIgdHdpY2UKClJl
-bW92ZSBzdGFydGluZyB0aGUgdGltZXIgd2hlbiBzZXR0aW5nIHRoZSBBVkRUUCBzdGF0ZSB0byBp
-ZGxlLiBJZgpuZWVkZWQsIHRoZSB0aW1lciBzaG91bGQgcHJvYmFibHkgYWxyZWFkeSBoYXZlIGJl
-ZW4gc3RhcnRlZCBpbgphdmR0cF91bnJlZiB3aGVuIHRoZSByZWZlcmVuY2UgY291bnQgZ29lcyB0
-byBvbmUuCgpTaW5jZSByZWZlcmVuY2UgY291bnRpbmcgaXMgaGFuZGxlZCBpbiBhdmR0cF9yZWYg
-YW5kIGF2ZHRwX3VucmVmLCBpdApzZWVtcyByZWFzb25hYmxlIHRoYXQgbm90IHRvIGluc3BlY3Qg
-dGhlIGNvdW50IG91dHNpZGUgb2YgdGhvc2UKZnVuY3Rpb25zLgoKVGhlIGlzc3VlIHdhcyBmb3Vu
-ZCB3aGVuIHVzaW5nIERldmljZS5EaXNjb25uZWN0IHRvIGRpc2Nvbm5lY3QgYQpoZWFkc2V0LiBJ
-dCB3YXMgcmV2ZWFsZWQgYnkgY29tbWl0CmM3MmNlMGYxMmE4Mzg3YTcwYTZmMDEwOWYxM2JkNmY0
-MTRmMzJiZTguCgpCZWZvcmUgdGhlIGNvbW1pdCwgdGhlIHRpbWVyIHdhcyByZW1vdmVkIGFuZCB0
-aGVuIHN0YXJ0ZWQgYWdhaW4uCkFmdGVyIGFwcGx5aW5nIGl0LCB0aGUgaWRsZSBjYWxsYmFjayAo
-ZGlzY29ubmVjdF90aW1lb3V0KSBpcyBjYWxsZWQKdHdpY2UsIGNhdXNpbmcgYSBjcmFzaC4KLS0t
-CiBhdWRpby9hdmR0cC5jIHwgICAgMiAtLQogMSBmaWxlcyBjaGFuZ2VkLCAwIGluc2VydGlvbnMo
-KyksIDIgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvYXVkaW8vYXZkdHAuYyBiL2F1ZGlvL2F2
-ZHRwLmMKaW5kZXggNWU4NGE0NS4uNjExZmQ3YiAxMDA2NDQKLS0tIGEvYXVkaW8vYXZkdHAuYwor
-KysgYi9hdWRpby9hdmR0cC5jCkBAIC0xMDM0LDggKzEwMzQsNiBAQCBzdGF0aWMgdm9pZCBhdmR0
-cF9zZXBfc2V0X3N0YXRlKHN0cnVjdCBhdmR0cCAqc2Vzc2lvbiwKIAkJLyogUmVtb3ZlIHBlbmRp
-bmcgY29tbWFuZHMgZm9yIHRoaXMgc3RyZWFtIGZyb20gdGhlIHF1ZXVlICovCiAJCWNsZWFudXBf
-cXVldWUoc2Vzc2lvbiwgc3RyZWFtKTsKIAkJc3RyZWFtX2ZyZWUoc3RyZWFtKTsKLQkJaWYgKHNl
-c3Npb24tPnJlZiA9PSAxICYmICFzZXNzaW9uLT5zdHJlYW1zKQotCQkJc2V0X2Rpc2Nvbm5lY3Rf
-dGltZXIoc2Vzc2lvbik7CiAJCWJyZWFrOwogCWRlZmF1bHQ6CiAJCWJyZWFrOwotLSAKMS42LjAu
-NAoK
---20cf303b389d76c40e0493fde66b--
