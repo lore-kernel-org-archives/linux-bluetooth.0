@@ -1,94 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-Subject: [PATCH] Add support for sending small data through obex
-Date: Mon,  1 Nov 2010 11:24:59 +0200
-Message-Id: <1288603499-16456-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+Date: Mon, 1 Nov 2010 10:51:49 +0200
+From: Ville Tervo <ville.tervo@nokia.com>
+To: "ext Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: Vinicius Gomes <vinicius.gomes@openbossa.org>,
+	ext Anderson Briglia <anderson.briglia@openbossa.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 2/6] Bluetooth: fix receiving L2CAP packets over LE
+Message-ID: <20101101085149.GA10917@null>
+References: <linux-bluetooth@vger.kernel.org>
+ <1287791820-22693-3-git-send-email-anderson.briglia@openbossa.org>
+ <20101029104435.GQ15050@null>
+ <AANLkTimTUFK9id6kQyggt_xWsB-RspwbPoB4m39XU2cP@mail.gmail.com>
+ <20101029205033.GB14961@vigoh>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20101029205033.GB14961@vigoh>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added handling packets smaller than mtu in obex_write_stream. Now trying
-to read from source until mtu will be filled properly and not sending
-immediately data if it is smaller than mtu.
----
- src/obex.c |   48 +++++++++++++++++++++++++++++++++++++-----------
- 1 files changed, 37 insertions(+), 11 deletions(-)
+Hi,
 
-diff --git a/src/obex.c b/src/obex.c
-index 6d4430d..d3a6ccd 100644
---- a/src/obex.c
-+++ b/src/obex.c
-@@ -623,6 +623,7 @@ static int obex_write_stream(struct obex_session *os,
- 	obex_headerdata_t hd;
- 	uint8_t *ptr;
- 	ssize_t len;
-+	ssize_t r_len;
- 	unsigned int flags;
- 	uint8_t hi;
- 
-@@ -642,18 +643,37 @@ static int obex_write_stream(struct obex_session *os,
- 		goto add_header;
- 	}
- 
--	len = os->driver->read(os->object, os->buf, os->tx_mtu, &hi);
--	if (len < 0) {
--		error("read(): %s (%zd)", strerror(-len), -len);
--		if (len == -EAGAIN)
--			return len;
--		else if (len == -ENOSTR)
--			return 0;
-+	/* Copying data from source until we reach end of the stream. Sending
-+	 * data only if MTU will be filled in 100% or we reach end of data.
-+	 * Remaining data in buffer will be sent with next amount of data
-+	 * from source.*/
-+	do {
-+		r_len = os->driver->read(os->object, os->buf + os->pending,
-+					os->tx_mtu - os->pending, &hi);
-+
-+		if (r_len < 0) {
-+			error("read(): %s (%zd)", strerror(-r_len), -r_len);
-+
-+			switch(r_len) {
-+			case -EAGAIN:
-+				return r_len;
-+			case -EINTR:
-+				continue;
-+			case -ENOSTR:
-+				return 0;
-+			default:
-+				g_free(os->buf);
-+				os->buf = NULL;
-+				return r_len;
-+			}
-+		}
- 
--		g_free(os->buf);
--		os->buf = NULL;
--		return len;
--	}
-+		/* Saving amount of data accumulated in obex buffer */
-+		os->pending += r_len;
-+	} while (os->pending < os->tx_mtu && r_len != 0);
-+
-+	len = os->pending;
-+	os->pending = 0;
- 
- 	ptr = os->buf;
- 
-@@ -702,6 +722,12 @@ static gboolean handle_async_io(void *object, int flags, int err,
- 		ret = obex_read_stream(os, os->obex, os->obj);
- 
- proceed:
-+
-+	/* Returning TRUE to not delete current watcher - it need to be active
-+	 * to handle next io flag changes (more data will be available later)*/
-+	if (ret == -EAGAIN)
-+		return TRUE;
-+
- 	if (ret < 0) {
- 		os_set_response(os->obj, err);
- 		OBEX_CancelRequest(os->obex, TRUE);
+On Fri, Oct 29, 2010 at 10:50:33PM +0200, ext Gustavo F. Padovan wrote:
+> Hi,
+> 
+> * Vinicius Gomes <vinicius.gomes@openbossa.org> [2010-10-29 09:41:55 -0400]:
+> 
+> > Hi Ville,
+> > 
+> > On Fri, Oct 29, 2010 at 6:44 AM, Ville Tervo <ville.tervo@nokia.com> wrote:
+> > > Hi Anderson,
+> > >
+> > > On Sat, Oct 23, 2010 at 01:56:56AM +0200, ext Anderson Briglia wrote:
+> > >> From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> > >>
+> > >> As L2CAP packets coming over LE don't have any more encapsulation,
+> > >> other than L2CAP, we are able to process them as soon as they arrive.
+> > >
+> > > Why is this change needed? Was something broken without this patch?
+> > >
+> > 
+> > This change is needed because without it the receiving side would
+> > always think that it was receiving continuation frames.
+> > 
+> > As the flags parameter is zero, it would fall into the "} else {"
+> > condition, and because no frame was received before, conn->rx_len
+> > would be zero and the frame would be discarded. Without this patch I
+> > was seeing those "Unexpected continuation frame ..." messages on the
+> > receiving side.
+> 
+> From what I understood the flags are only for ACL connections and LE
+> links doesn't have fragmentation, right? So we don't need to check flags
+> here, actually it seems we don't have flags for LE like ACL.
+
+Yes it has. See spec. Vol 2 Part E 5.4.2.
+
+It seems that controller should not be sending 0 PB flag in any situation
+(except loopback). Vinicius that controller are you using?
+
+I haven't seen this ever in my testing.
+
 -- 
-1.7.0.4
-
+Ville
