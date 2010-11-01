@@ -1,63 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 1 Nov 2010 10:51:49 +0200
-From: Ville Tervo <ville.tervo@nokia.com>
-To: "ext Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: Vinicius Gomes <vinicius.gomes@openbossa.org>,
-	ext Anderson Briglia <anderson.briglia@openbossa.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 2/6] Bluetooth: fix receiving L2CAP packets over LE
-Message-ID: <20101101085149.GA10917@null>
-References: <linux-bluetooth@vger.kernel.org>
- <1287791820-22693-3-git-send-email-anderson.briglia@openbossa.org>
- <20101029104435.GQ15050@null>
- <AANLkTimTUFK9id6kQyggt_xWsB-RspwbPoB4m39XU2cP@mail.gmail.com>
- <20101029205033.GB14961@vigoh>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20101029205033.GB14961@vigoh>
+In-Reply-To: <AANLkTi=BeeuAKjt8bKro2KH0SXMJDUuwMznRS5NcDj4K@mail.gmail.com>
+References: <AANLkTikQqPqJdFgLpUrKiqyAC0HNUFnj+8NtbPxazY18@mail.gmail.com>
+	<1288369169.4351.8.camel@donpedro>
+	<AANLkTi=BeeuAKjt8bKro2KH0SXMJDUuwMznRS5NcDj4K@mail.gmail.com>
+Date: Mon, 1 Nov 2010 09:11:40 +0100
+Message-ID: <AANLkTikPsyrod-GODJnXipsk+ysm3rOr0o_vrv8uYD9U@mail.gmail.com>
+Subject: Re: HFP Pulseaudio Source destroyed "too quickly" at the end of a call
+From: =?ISO-8859-1?Q?Thomas_W=E4lti?= <twaelti@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Peter Dons Tychsen <donpedro@tdcadsl.dk>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+2010/10/31 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
+>> On Wed, 2010-10-27 at 22:03 +0200, Thomas Wälti wrote:
+>>
+>>> All works well except when ending the recording of Bluetooth
+>>> Conversations: Once a party hangs up the call, the PulseAudio source
+>>> and sink disappear before I can stop GStreamer recording (I'm
+>>> listening to D-Bus events). Unfortunately, this causes my GStreamer
+>>> pipeline to crash.
+>
+> Well then there is a problem in your pipeline, bluetooth sinks and
+> sources may disappear at any point and in fact PA do move audio,
+> depending on the system policy, when that occurs. Also note that
+> bluetooth modules do handle DisconnectRequest signal so it might react
+> a bit faster when user request audio to be disconnected, but that
+> should not make any difference for an application using PA.
 
-On Fri, Oct 29, 2010 at 10:50:33PM +0200, ext Gustavo F. Padovan wrote:
-> Hi,
-> 
-> * Vinicius Gomes <vinicius.gomes@openbossa.org> [2010-10-29 09:41:55 -0400]:
-> 
-> > Hi Ville,
-> > 
-> > On Fri, Oct 29, 2010 at 6:44 AM, Ville Tervo <ville.tervo@nokia.com> wrote:
-> > > Hi Anderson,
-> > >
-> > > On Sat, Oct 23, 2010 at 01:56:56AM +0200, ext Anderson Briglia wrote:
-> > >> From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-> > >>
-> > >> As L2CAP packets coming over LE don't have any more encapsulation,
-> > >> other than L2CAP, we are able to process them as soon as they arrive.
-> > >
-> > > Why is this change needed? Was something broken without this patch?
-> > >
-> > 
-> > This change is needed because without it the receiving side would
-> > always think that it was receiving continuation frames.
-> > 
-> > As the flags parameter is zero, it would fall into the "} else {"
-> > condition, and because no frame was received before, conn->rx_len
-> > would be zero and the frame would be discarded. Without this patch I
-> > was seeing those "Unexpected continuation frame ..." messages on the
-> > receiving side.
-> 
-> From what I understood the flags are only for ACL connections and LE
-> links doesn't have fragmentation, right? So we don't need to check flags
-> here, actually it seems we don't have flags for LE like ACL.
+Thanks everybody for the helpful comments and valuable details,
+helping me to understand how the "underworld" of my app works in the
+Bluez/PA corner.
+I'll now shift my focus towards GStreamer :-)
 
-Yes it has. See spec. Vol 2 Part E 5.4.2.
-
-It seems that controller should not be sending 0 PB flag in any situation
-(except loopback). Vinicius that controller are you using?
-
-I haven't seen this ever in my testing.
-
--- 
-Ville
+Best regards
+-Tom
