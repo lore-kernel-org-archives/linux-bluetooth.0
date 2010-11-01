@@ -1,126 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 1 Nov 2010 15:23:34 -0400 (EDT)
+From: Jiri Kosina <jkosina@suse.cz>
+To: Alan Ott <alan@signal11.us>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: Stefan Achatz <erazor_de@users.sourceforge.net>,
+	Antonio Ospite <ospite@studenti.unina.it>,
+	Alexey Dobriyan <adobriyan@gmail.com>, Tejun Heo <tj@kernel.org>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	Greg Kroah-Hartman <gregkh@suse.de>,
+	Stephane Chatty <chatty@enac.fr>,
+	Michael Poole <mdpoole@troilus.org>,
+	Bastien Nocera <hadess@hadess.net>,
+	Eric Dumazet <eric.dumazet@gmail.com>, linux-input@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v4 0/2] Get and Set Feature Reports on HIDRAW (USB and
+ Bluetooth)
+In-Reply-To: <alpine.LNX.2.00.1009221408330.26813@pobox.suse.cz>
+Message-ID: <alpine.LNX.2.00.1011011523150.15851@pobox.suse.cz>
+References: <1281442367.12579.206.camel@localhost.localdomain> <1281990059-3562-1-git-send-email-alan@signal11.us> <alpine.LNX.2.00.1008231459370.1019@pobox.suse.cz> <alpine.LNX.2.00.1009021724480.26813@pobox.suse.cz>
+ <alpine.LNX.2.00.1009221408330.26813@pobox.suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <1288603499-16456-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
-References: <1288603499-16456-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
-Date: Tue, 2 Nov 2010 01:01:18 +0200
-Message-ID: <AANLkTinqFDsMUW=uuyMicgVMw2B3A-Pkr1H5_B3_dh25@mail.gmail.com>
-Subject: Re: [PATCH] Add support for sending small data through obex
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Wed, 22 Sep 2010, Jiri Kosina wrote:
 
-On Mon, Nov 1, 2010 at 11:24 AM, Radoslaw Jablonski
-<ext-jablonski.radoslaw@nokia.com> wrote:
-> Added handling packets smaller than mtu in obex_write_stream. Now trying
-> to read from source until mtu will be filled properly and not sending
-> immediately data if it is smaller than mtu.
-> ---
->  src/obex.c |   48 +++++++++++++++++++++++++++++++++++++-----------
->  1 files changed, 37 insertions(+), 11 deletions(-)
->
-> diff --git a/src/obex.c b/src/obex.c
-> index 6d4430d..d3a6ccd 100644
-> --- a/src/obex.c
-> +++ b/src/obex.c
-> @@ -623,6 +623,7 @@ static int obex_write_stream(struct obex_session *os,
->        obex_headerdata_t hd;
->        uint8_t *ptr;
->        ssize_t len;
-> +       ssize_t r_len;
+> > > > This is version 4. Built against 2.6.35+ revision 320b2b8de12698 .
+> > > > 
+> > > > Alan Ott (2):
+> > > >   HID: Add Support for Setting and Getting Feature Reports from hidraw
+> > > >   Bluetooth: hidp: Add support for hidraw  HIDIOCGFEATURE  and
+> > > >     HIDIOCSFEATURE
+> > > > 
+> > > >  drivers/hid/hidraw.c          |  105 ++++++++++++++++++++++++++++++++++++--
+> > > >  drivers/hid/usbhid/hid-core.c |   37 +++++++++++++-
+> > > >  include/linux/hid.h           |    3 +
+> > > >  include/linux/hidraw.h        |    3 +
+> > > >  net/bluetooth/hidp/core.c     |  114 +++++++++++++++++++++++++++++++++++++++--
+> > > >  net/bluetooth/hidp/hidp.h     |    8 +++
+> > > >  6 files changed, 260 insertions(+), 10 deletions(-)
+> > > 
+> > > Marcel, as per our previous discussion -- what is your word on this? I'd 
+> > > be glad taking it once you Ack the bluetooth bits (which, as far as I 
+> > > understood from your last mail, don't have strong objections against any 
+> > > more).
+> > 
+> > ... Marcel?
+> > 
+> > I'd really like not to miss 2.6.37 merge window with this.
+> 
+> Seemingly I have not enought powers to get statement from Marcel here 
+> these days/weeks.
+> 
+> Davem, would you perhaps be able to step in here?
 
-You can have len and r_len in the same line above.
+Marcel, any word on this patchset by chance?
 
->        unsigned int flags;
->        uint8_t hi;
->
-> @@ -642,18 +643,37 @@ static int obex_write_stream(struct obex_session *os,
->                goto add_header;
->        }
->
-> -       len = os->driver->read(os->object, os->buf, os->tx_mtu, &hi);
-> -       if (len < 0) {
-> -               error("read(): %s (%zd)", strerror(-len), -len);
-> -               if (len == -EAGAIN)
-> -                       return len;
-> -               else if (len == -ENOSTR)
-> -                       return 0;
-> +       /* Copying data from source until we reach end of the stream. Sending
-> +        * data only if MTU will be filled in 100% or we reach end of data.
-> +        * Remaining data in buffer will be sent with next amount of data
-> +        * from source.*/
-> +       do {
-> +               r_len = os->driver->read(os->object, os->buf + os->pending,
-> +                                       os->tx_mtu - os->pending, &hi);
-
-It looks like you should add one more tab in the line above it that
-doesn't go over 80 columns.
-
-> +               if (r_len < 0) {
-> +                       error("read(): %s (%zd)", strerror(-r_len), -r_len);
-> +
-> +                       switch(r_len) {
-> +                       case -EAGAIN:
-> +                               return r_len;
-> +                       case -EINTR:
-> +                               continue;
-> +                       case -ENOSTR:
-> +                               return 0;
-> +                       default:
-> +                               g_free(os->buf);
-> +                               os->buf = NULL;
-> +                               return r_len;
-> +                       }
-> +               }
-
-I think it is probably more efficiently to handle rlen == 0 here, like
-if (rlen == 0) break; else if (rlen < 0)
-
-> -               g_free(os->buf);
-> -               os->buf = NULL;
-> -               return len;
-> -       }
-> +               /* Saving amount of data accumulated in obex buffer */
-> +               os->pending += r_len;
-> +       } while (os->pending < os->tx_mtu && r_len != 0);
-
-That simplify here too, just do while (os->pending < os->txt_mtu) if
-you handle rlen == 0 like I said before.
-
-> +
-> +       len = os->pending;
-> +       os->pending = 0;
->
->        ptr = os->buf;
->
-> @@ -702,6 +722,12 @@ static gboolean handle_async_io(void *object, int flags, int err,
->                ret = obex_read_stream(os, os->obex, os->obj);
->
->  proceed:
-> +
-> +       /* Returning TRUE to not delete current watcher - it need to be active
-> +        * to handle next io flag changes (more data will be available later)*/
-> +       if (ret == -EAGAIN)
-> +               return TRUE;
-> +
->        if (ret < 0) {
->                os_set_response(os->obj, err);
->                OBEX_CancelRequest(os->obex, TRUE);
-> --
-> 1.7.0.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-
-
+Thanks,
 
 -- 
-Luiz Augusto von Dentz
-Computer Engineer
+Jiri Kosina
+SUSE Labs, Novell Inc.
