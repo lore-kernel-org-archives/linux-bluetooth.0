@@ -1,77 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 5/7] Bluetooth: Get ride of __rfcomm_get_sock_by_channel()
-Date: Tue,  2 Nov 2010 15:03:16 +0000
-Message-Id: <1288710198-6108-5-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1288710198-6108-4-git-send-email-padovan@profusion.mobi>
+Subject: [PATCH 4/7] Bluetooth: Get ride of __l2cap_get_sock_by_psm()
+Date: Tue,  2 Nov 2010 15:03:15 +0000
+Message-Id: <1288710198-6108-4-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1288710198-6108-3-git-send-email-padovan@profusion.mobi>
 References: <1288710198-6108-1-git-send-email-padovan@profusion.mobi>
  <1288710198-6108-2-git-send-email-padovan@profusion.mobi>
  <1288710198-6108-3-git-send-email-padovan@profusion.mobi>
- <1288710198-6108-4-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-rfcomm_get_sock_by_channel() was the only user of this function, so I merged
-both into rfcomm_get_sock_by_channel(). The socket lock now should be hold
-outside of rfcomm_get_sock_by_channel() once we hold and release it inside the
+l2cap_get_sock_by_psm() was the only user of this function, so I merged
+both into l2cap_get_sock_by_psm(). The socket lock now should be hold
+outside of l2cap_get_sock_by_psm() once we hold and release it inside the
 same function now.
 
 Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 ---
- net/bluetooth/rfcomm/sock.c |   19 +++++++------------
- 1 files changed, 7 insertions(+), 12 deletions(-)
+ net/bluetooth/l2cap.c |   22 +++++++++-------------
+ 1 files changed, 9 insertions(+), 13 deletions(-)
 
-diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-index 4ed9499..e48fbca 100644
---- a/net/bluetooth/rfcomm/sock.c
-+++ b/net/bluetooth/rfcomm/sock.c
-@@ -142,11 +142,13 @@ static struct sock *rfcomm_get_sock_by_addr(u8 channel, bdaddr_t *src)
- /* Find socket with channel and source bdaddr.
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index 3d48867..27199bc 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -746,11 +746,13 @@ found:
+ /* Find socket with psm and source bdaddr.
   * Returns closest match.
   */
--static struct sock *__rfcomm_get_sock_by_channel(int state, u8 channel, bdaddr_t *src)
-+static struct sock *rfcomm_get_sock_by_channel(int state, u8 channel, bdaddr_t *src)
+-static struct sock *__l2cap_get_sock_by_psm(int state, __le16 psm, bdaddr_t *src)
++static struct sock *l2cap_get_sock_by_psm(int state, __le16 psm, bdaddr_t *src)
  {
  	struct sock *sk = NULL, *sk1 = NULL;
  	struct hlist_node *node;
  
-+	read_lock(&rfcomm_sk_list.lock);
++	read_lock(&l2cap_sk_list.lock);
 +
- 	sk_for_each(sk, node, &rfcomm_sk_list.head) {
+ 	sk_for_each(sk, node, &l2cap_sk_list.head) {
  		if (state && sk->sk_state != state)
  			continue;
-@@ -161,19 +163,10 @@ static struct sock *__rfcomm_get_sock_by_channel(int state, u8 channel, bdaddr_t
+@@ -765,20 +767,10 @@ static struct sock *__l2cap_get_sock_by_psm(int state, __le16 psm, bdaddr_t *src
  				sk1 = sk;
  		}
  	}
 -	return node ? sk : sk1;
 -}
  
--/* Find socket with given address (channel, src).
+-/* Find socket with given address (psm, src).
 - * Returns locked socket */
--static inline struct sock *rfcomm_get_sock_by_channel(int state, u8 channel, bdaddr_t *src)
+-static inline struct sock *l2cap_get_sock_by_psm(int state, __le16 psm, bdaddr_t *src)
 -{
 -	struct sock *s;
--	read_lock(&rfcomm_sk_list.lock);
--	s = __rfcomm_get_sock_by_channel(state, channel, src);
--	if (s) bh_lock_sock(s);
- 	read_unlock(&rfcomm_sk_list.lock);
+-	read_lock(&l2cap_sk_list.lock);
+-	s = __l2cap_get_sock_by_psm(state, psm, src);
+-	if (s)
+-		bh_lock_sock(s);
+ 	read_unlock(&l2cap_sk_list.lock);
 -	return s;
 +
 +	return node ? sk : sk1;
  }
  
- static void rfcomm_sock_destruct(struct sock *sk)
-@@ -939,6 +932,8 @@ int rfcomm_connect_ind(struct rfcomm_session *s, u8 channel, struct rfcomm_dlc *
- 	if (!parent)
- 		return 0;
+ static void l2cap_sock_destruct(struct sock *sk)
+@@ -2921,6 +2913,8 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
+ 		goto sendresp;
+ 	}
  
 +	bh_lock_sock(parent);
 +
- 	/* Check for backlog size */
- 	if (sk_acceptq_is_full(parent)) {
- 		BT_DBG("backlog full %d", parent->sk_ack_backlog);
+ 	/* Check if the ACL is secure enough (if not SDP) */
+ 	if (psm != cpu_to_le16(0x0001) &&
+ 				!hci_conn_check_link_mode(conn->hcon)) {
+@@ -4425,6 +4419,8 @@ static inline int l2cap_conless_channel(struct l2cap_conn *conn, __le16 psm, str
+ 	if (!sk)
+ 		goto drop;
+ 
++	bh_lock_sock(sk);
++
+ 	BT_DBG("sk %p, len %d", sk, skb->len);
+ 
+ 	if (sk->sk_state != BT_BOUND && sk->sk_state != BT_CONNECTED)
 -- 
 1.7.3.1
 
