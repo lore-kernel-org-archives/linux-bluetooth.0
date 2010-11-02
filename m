@@ -1,38 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 2 Nov 2010 08:24:55 -0700
-From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, gimli <gimli@dark-green.com>,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH 3/6] MacBookAir3,1(3,2) btusb support
-Message-ID: <20101102152454.GC11778@core.coreip.homeip.net>
-References: <9e7738c0461aa509dd55fe470df3855e@mognix.dark-green.com>
+Date: Tue, 2 Nov 2010 15:15:09 +0000
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv3 2/2] Bluetooth: timer check sk is not owned before
+ freeing
+Message-ID: <20101102151509.GA3685@vigoh>
+References: <1288359781-4059-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1288359781-4059-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20101029211718.GC14961@vigoh>
+ <AANLkTiksc7jKPqxkFEZqvgBJ5ATvGh0nurWS9SZcdtit@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <9e7738c0461aa509dd55fe470df3855e@mognix.dark-green.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <AANLkTiksc7jKPqxkFEZqvgBJ5ATvGh0nurWS9SZcdtit@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Not sure of you guys monitor LKML...
+Hi Andrei,
 
-On Tue, Nov 02, 2010 at 08:19:43AM +0100, gimli wrote:
-> This patch add support for the MacBookAir3,1 and MacBookAir3,2 to the btusb
-> driver.
+* Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2010-11-01 16:20:15 +0200]:
+
+> Hi Gustavo
 > 
-> Signed-off-by: Edgar (gimli) Hucek <gimli@dark-green.com>
+> On Sat, Oct 30, 2010 at 12:17 AM, Gustavo F. Padovan
+> <padovan@profusion.mobi> wrote:
+> > Hi Andrei,
+> >
+> > * Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2010-10-29 16:43:01 +0300]:
+> >
+> >> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> >>
+> >> In timer context we might delete l2cap channel used by krfcommd.
+> >> The check makes sure that sk is not owned. If sk is owned we
+> >> restart timer for HZ/5.
+> >>
+> >> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> >> ---
+> >>  net/bluetooth/l2cap.c |   32 ++++++++++++++++++++------------
+> >>  1 files changed, 20 insertions(+), 12 deletions(-)
+> >>
+> >> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> >> index b1344d8..c67b3c6 100644
+> >> --- a/net/bluetooth/l2cap.c
+> >> +++ b/net/bluetooth/l2cap.c
+> >> @@ -83,6 +83,18 @@ static struct sk_buff *l2cap_build_cmd(struct l2cap_conn *conn,
+> >>  static int l2cap_ertm_data_rcv(struct sock *sk, struct sk_buff *skb);
+> >>
+> >>  /* ---- L2CAP timers ---- */
+> >> +static void l2cap_sock_set_timer(struct sock *sk, long timeout)
+> >> +{
+> >> +     BT_DBG("sk %p state %d timeout %ld", sk, sk->sk_state, timeout);
+> >> +     sk_reset_timer(sk, &sk->sk_timer, jiffies + timeout);
+> >> +}
+> >> +
+> >> +static void l2cap_sock_clear_timer(struct sock *sk)
+> >> +{
+> >> +     BT_DBG("sock %p state %d", sk, sk->sk_state);
+> >> +     sk_stop_timer(sk, &sk->sk_timer);
+> >> +}
+> >> +
+> >>  static void l2cap_sock_timeout(unsigned long arg)
+> >>  {
+> >>       struct sock *sk = (struct sock *) arg;
+> >> @@ -92,6 +104,14 @@ static void l2cap_sock_timeout(unsigned long arg)
+> >>
+> >>       bh_lock_sock(sk);
+> >>
+> >> +     if (sock_owned_by_user(sk)) {
+> >> +             /* sk is owned by user. Try again later */
+> >> +             l2cap_sock_set_timer(sk, HZ / 5);
+> >> +             bh_unlock_sock(sk);
+> >> +             sock_put(sk);
+> >
+> > You can't do a sock_put() here, you have to keep the referencee to the
+> > socket while the timer is enabled.
+> 
+> sk_reset_timer is holding sock when timer restarts. The same way done
+> in TCP code in function:
+> static void tcp_delack_timer(unsigned long data)
 
-> --- a/drivers/bluetooth/btusb.c	2010-10-30 21:08:45.170492002 +0200
-> +++ b/drivers/bluetooth/btusb.c	2010-10-30 21:18:11.820492000 +0200
-> @@ -62,6 +62,9 @@
->  	/* Apple iMac11,1 */
->  	{ USB_DEVICE(0x05ac, 0x8215) },
->  
-> +	/* Apple MacBookAir3,1, MacBookAir3,2 */
-> +	{ USB_DEVICE(0x05ac, 0x821b) },
-> +
->  	/* AVM BlueFRITZ! USB v2.0 */
->  	{ USB_DEVICE(0x057c, 0x3800) },
->  
-
+Yes, I got confused, you're right.
 
 -- 
-Dmitry
+Gustavo F. Padovan
+ProFUSION embedded systems - http://profusion.mobi
