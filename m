@@ -1,97 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-Subject: [PATCH v2] Add support for sending small data through obex
-Date: Tue,  2 Nov 2010 11:25:11 +0200
-Message-Id: <1288689911-18507-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+Date: Tue, 2 Nov 2010 03:35:31 +0000
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Elvis =?iso-8859-1?Q?Pf=FCtzenreuter?= <epx@signove.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] [RFC] Add Application property to HealthChannel
+Message-ID: <20101102033531.GA2662@vigoh>
+References: <1288635382-2032-1-git-send-email-epx@signove.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1288635382-2032-1-git-send-email-epx@signove.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added handling packets smaller than mtu in obex_write_stream. Now trying
-to read from source until mtu will be filled properly and not sending
-immediately data if it is smaller than mtu.
----
- src/obex.c |   51 +++++++++++++++++++++++++++++++++++++++------------
- 1 files changed, 39 insertions(+), 12 deletions(-)
+* Elvis Pfützenreuter <epx@signove.com> [2010-11-01 16:16:22 -0200]:
 
-diff --git a/src/obex.c b/src/obex.c
-index 6d4430d..4cbc1f8 100644
---- a/src/obex.c
-+++ b/src/obex.c
-@@ -622,7 +622,7 @@ static int obex_write_stream(struct obex_session *os,
- {
- 	obex_headerdata_t hd;
- 	uint8_t *ptr;
--	ssize_t len;
-+	ssize_t len, r_len;
- 	unsigned int flags;
- 	uint8_t hi;
- 
-@@ -642,18 +642,39 @@ static int obex_write_stream(struct obex_session *os,
- 		goto add_header;
- 	}
- 
--	len = os->driver->read(os->object, os->buf, os->tx_mtu, &hi);
--	if (len < 0) {
--		error("read(): %s (%zd)", strerror(-len), -len);
--		if (len == -EAGAIN)
--			return len;
--		else if (len == -ENOSTR)
--			return 0;
-+	/* Copying data from source until we reach end of the stream. Sending
-+	 * data only if MTU will be filled in 100% or we reach end of data.
-+	 * Remaining data in buffer will be sent with next amount of data
-+	 * from source.*/
-+	do {
-+		r_len = os->driver->read(os->object, os->buf + os->pending,
-+						os->tx_mtu - os->pending, &hi);
- 
--		g_free(os->buf);
--		os->buf = NULL;
--		return len;
--	}
-+		if (r_len == 0)
-+			break;
-+		else if (r_len < 0) {
-+			error("read(): %s (%zd)", strerror(-r_len), -r_len);
-+
-+			switch(r_len) {
-+			case -EAGAIN:
-+				return r_len;
-+			case -EINTR:
-+				continue;
-+			case -ENOSTR:
-+				return 0;
-+			default:
-+				g_free(os->buf);
-+				os->buf = NULL;
-+				return r_len;
-+			}
-+		}
-+
-+		/* Saving amount of data accumulated in obex buffer */
-+		os->pending += r_len;
-+	} while (os->pending < os->tx_mtu);
-+
-+	len = os->pending;
-+	os->pending = 0;
- 
- 	ptr = os->buf;
- 
-@@ -702,6 +723,12 @@ static gboolean handle_async_io(void *object, int flags, int err,
- 		ret = obex_read_stream(os, os->obex, os->obj);
- 
- proceed:
-+
-+	/* Returning TRUE to not delete current watcher - it need to be active
-+	 * to handle next io flag changes (more data will be available later)*/
-+	if (ret == -EAGAIN)
-+		return TRUE;
-+
- 	if (ret < 0) {
- 		os_set_response(os->obj, err);
- 		OBEX_CancelRequest(os->obex, TRUE);
+> This patch adds the Application property to HealthChannel, which
+> allows to unambiguously relate a channel to an application.
+> 
+> This property is useful when there are several processes interested
+> in accepting HealthChannels but device address is not sufficient
+> criteria to engage upon, or ignore, the ChannelConnected signal.
+> Having the application path allows to determine role and data type,
+> in the context of the process that has created that application.
+> 
+> Also, channel path skeleton is fixed in documentation, in order to
+> reflect atual implementation.
+
+So a separeted patch here.
+
 -- 
-1.7.0.4
-
+Gustavo F. Padovan
+ProFUSION embedded systems - http://profusion.mobi
