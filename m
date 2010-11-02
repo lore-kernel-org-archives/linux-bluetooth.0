@@ -1,36 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] bluetooth: bnep: fix information leak to userland
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Vasiliy Kulikov <segooon@gmail.com>
-Cc: kernel-janitors@vger.kernel.org,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <eric.dumazet@gmail.com>,
-	Thadeu Lima de Souza Cascardo <cascardo@holoscopio.com>,
-	Tejun Heo <tj@kernel.org>, Jiri Kosina <jkosina@suse.cz>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-In-Reply-To: <1288448782-5582-1-git-send-email-segooon@gmail.com>
-References: <1288448782-5582-1-git-send-email-segooon@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 02 Nov 2010 16:35:31 +0100
-Message-ID: <1288712131.3322.178.camel@aeonflux>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 2 Nov 2010 08:24:55 -0700
+From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, gimli <gimli@dark-green.com>,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH 3/6] MacBookAir3,1(3,2) btusb support
+Message-ID: <20101102152454.GC11778@core.coreip.homeip.net>
+References: <9e7738c0461aa509dd55fe470df3855e@mognix.dark-green.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <9e7738c0461aa509dd55fe470df3855e@mognix.dark-green.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vasiiy,
+Not sure of you guys monitor LKML...
 
-> Structure bnep_conninfo is copied to userland with the field "device"
-> that has the last elements unitialized.  It leads to leaking of
-> contents of kernel stack memory.
+On Tue, Nov 02, 2010 at 08:19:43AM +0100, gimli wrote:
+> This patch add support for the MacBookAir3,1 and MacBookAir3,2 to the btusb
+> driver.
 > 
-> Signed-off-by: Vasiliy Kulikov <segooon@gmail.com>
+> Signed-off-by: Edgar (gimli) Hucek <gimli@dark-green.com>
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> --- a/drivers/bluetooth/btusb.c	2010-10-30 21:08:45.170492002 +0200
+> +++ b/drivers/bluetooth/btusb.c	2010-10-30 21:18:11.820492000 +0200
+> @@ -62,6 +62,9 @@
+>  	/* Apple iMac11,1 */
+>  	{ USB_DEVICE(0x05ac, 0x8215) },
+>  
+> +	/* Apple MacBookAir3,1, MacBookAir3,2 */
+> +	{ USB_DEVICE(0x05ac, 0x821b) },
+> +
+>  	/* AVM BlueFRITZ! USB v2.0 */
+>  	{ USB_DEVICE(0x057c, 0x3800) },
+>  
 
-Regards
 
-Marcel
-
-
+-- 
+Dmitry
