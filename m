@@ -1,44 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Brian Redding" <bredding@codeaurora.org>
-To: "'Mike Tsai'" <Mike.Tsai@Atheros.com>,
-	"'Claudio Takahasi'" <claudio.takahasi@openbossa.org>
-Cc: "'BlueZ development'" <linux-bluetooth@vger.kernel.org>
-References: <AANLkTin8pUACCu4YYuhLpFB7DxCfsYhN3cOpYYaVcTQ6@mail.gmail.com>	<35B17FE5076C7040809188FBE7913F983F844057B9@SC1EXMB-MBCL.global.atheros.com>	<AANLkTinS-NhD3FhqcnpNRRdHKxn4mm+2zTmysrSeSjW8@mail.gmail.com>	<35B17FE5076C7040809188FBE7913F983F8440581D@SC1EXMB-MBCL.global.atheros.com>	<AANLkTinnjXuAOBTY8VZz756VdrDFv0-OVKPNkwWbxi9-@mail.gmail.com>	<35B17FE5076C7040809188FBE7913F983F84405C72@SC1EXMB-MBCL.global.atheros.com> <AANLkTim7iLhzALuxX07veEwVEObwcfVFuQEpnjTVABAn@mail.gmail.com> <35B17FE5076C7040809188FBE7913F983F847B44A8@SC1EXMB-MBCL.global.atheros.com>
-In-Reply-To: <35B17FE5076C7040809188FBE7913F983F847B44A8@SC1EXMB-MBCL.global.atheros.com>
-Subject: RE: [RFC] LE connections and advertising management
-Date: Tue, 2 Nov 2010 15:23:29 -0500
-Message-ID: <000201cb7acb$d05ac330$71104990$@org>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+Subject: Re: >net-wireless/bluez-4.63 unable to connect audio streams due
+ commit
+From: Peter Hurley <phurley@charter.net>
+To: pacho@condmat1.ciencias.uniovi.es
+Cc: Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?=
+	<u.kleine-koenig@pengutronix.de>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+In-Reply-To: <1288524358.2654.4.camel@localhost.localdomain>
+References: <1287426290.6820.1.camel@localhost.localdomain>
+	 <1288524358.2654.4.camel@localhost.localdomain>
+Content-Type: text/plain; charset="ISO-8859-1"
+Date: Tue, 02 Nov 2010 13:25:32 -0400
+Message-ID: <1288718732.6420.84.camel@thor>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> [Claudio]
-> Is it allowed duplicated UUIDs for the same primary service? We are
-> not handling this right now.
-> It seems that you already have a proprietary implementation ;-)
+Hi Pacho,
+
+On Sun, 2010-10-31 at 12:25 +0100, Pacho Ramos wrote:
+> El lun, 18-10-2010 a las 20:24 +0200, Pacho Ramos escribió:
+> > El lun, 04-10-2010 a las 14:35 +0200, Uwe Kleine-König escribió:
+> > > Hello Pacho,
+> > > 
+> > > On Mon, Oct 04, 2010 at 12:25:46PM +0200, Pacho Ramos wrote:
+> > > > > I would say this was because of double authentication request, but it
+> > > > > seems it is not the case, actually ssp doesn't seems to be used at all
+> > > > > here so this must be something else, maybe you should try this:
+> > > > > 
+> > > > > http://thread.gmane.org/gmane.linux.bluez.kernel/7256
+> > > > > 
+> > > > 
+> > > > Thanks but, how should I try to apply that patch? Looks like
+> > > > net/bluetooth/rfcomm/core.c is not present on bluez-4.72 sources
+> > > I guess this is a patch to apply to your kernel, not bluez.
+> > > 
+> > > Best regards
+> > > Uwe
+> > > 
+> > 
+> > Downstream affected reported told me it's still failing even with the
+> > patch:
+> > 
+> > http://bugs.gentoo.org/show_bug.cgi?id=327705#c19
+> > 
+> > Attached is the new hcidump output
+> > 
+> > Thanks a lot for your help :-)
+> > 
 > 
-> [Mike Tsai] I think it is probably not allowed to duplicate
-> characteristic within the same primary services. However, there may be
-> duplicated primary services within a server or duplicated included
-> service within a server, or same characteristic inside 2 different
-> primary services. So I don't know if you have any mechanism to let
-> GAttrib get the correct characteristic within all these duplicated
-> services by just passing the 128 bits UUID?
+> There is no possible solution to this? :-(
+> 
+> Thanks
 
-The GATT places no limitation on multiple instances of characteristics or
-services.  The recommendation to profile writers when duplicate
-characteristics exist within a service is that each characteristic has a
-characteristic presentation descriptor that distinguishes each instance of
-the characteristic.  The same would apply to multiple instances of a
-service.  There are other methods to distinguish multiple instances of
-services and characteristics including different UUIDs so there isn't a
-single approach.  The approach though is specified by the profile.
+The hcidump output reported is unfortunately insufficient to determine
+the actual cause of failure. The indicated cause of failure appears to
+be an error return from the Set Connection Encryption cmd (as indicated
+by the absence of an Encryption Change evt). The actual error code is
+not indicated in the hcidump output -- really, 'hcidump -tVx' is more
+helpful for troubleshooting remotely.
 
-Brian
----
-Brian A. Redding
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+The "Function not implemented (38)" message (which is in the bluetoothd
+output capture in the downstream report) is the kernel bt stack's
+translation to errno for bluetooth error codes primarily associated with
+piconet errors (like Reserved Slot Violation(s), LMP Response Timeout,
+etc. Actually, it's a catchall for errors the kernel bt stack thinks it
+can't really do anything about).
+
+Although I'd be happy to take a look at a more complete hcidump, the
+reality is that there are bluetooth device incompatibilities/bugs that
+are often unfixable - even when the hardware's available. My own bt
+dongle reports that it's eSCO capable but hangs the LM when actually
+attempting to negotiate an eSCO connection.
+
+Hope that helps,
+Peter Hurley
 
