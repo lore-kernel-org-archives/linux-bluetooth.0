@@ -1,53 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1288689911-18507-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
-References: <1288689911-18507-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
-Date: Wed, 3 Nov 2010 07:44:26 -0400
-Message-ID: <AANLkTi=zQ1aKZ84HGAJ90Bwo=ugJuC7+u36oEoW=KR7C@mail.gmail.com>
-Subject: Re: [PATCH v2] Add support for sending small data through obex
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv4 2/2] Bluetooth: timer check sk is not owned before freeing
+Date: Wed,  3 Nov 2010 12:32:45 +0200
+Message-Id: <1288780365-32099-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1288780365-32099-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1288780365-32099-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Nov 2, 2010 at 5:25 AM, Radoslaw Jablonski
-<ext-jablonski.radoslaw@nokia.com> wrote:
-> @@ -642,18 +642,39 @@ static int obex_write_stream(struct obex_session *os,
->                goto add_header;
->        }
->
-> -       len = os->driver->read(os->object, os->buf, os->tx_mtu, &hi);
-> -       if (len < 0) {
-> -               error("read(): %s (%zd)", strerror(-len), -len);
-> -               if (len == -EAGAIN)
-> -                       return len;
-> -               else if (len == -ENOSTR)
-> -                       return 0;
-> +       /* Copying data from source until we reach end of the stream. Sending
-> +        * data only if MTU will be filled in 100% or we reach end of data.
-> +        * Remaining data in buffer will be sent with next amount of data
-> +        * from source.*/
-> +       do {
-> +               r_len = os->driver->read(os->object, os->buf + os->pending,
-> +                                               os->tx_mtu - os->pending, &hi);
->
-> -               g_free(os->buf);
-> -               os->buf = NULL;
-> -               return len;
-> -       }
-> +               if (r_len == 0)
-> +                       break;
-> +               else if (r_len < 0) {
-> +                       error("read(): %s (%zd)", strerror(-r_len), -r_len);
-> +
-> +                       switch(r_len) {
+From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 
-Small coding style issue above: a missing space between "switch" and "(".
+In timer context we might delete l2cap channel used by krfcommd.
+The check makes sure that sk is not owned. If sk is owned we
+restart timer for HZ/5.
 
-Regards,
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+---
+ net/bluetooth/l2cap.c |   32 ++++++++++++++++++++------------
+ 1 files changed, 20 insertions(+), 12 deletions(-)
+
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index b5436f7..b2f309d 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -83,6 +83,18 @@ static struct sk_buff *l2cap_build_cmd(struct l2cap_conn *conn,
+ static int l2cap_ertm_data_rcv(struct sock *sk, struct sk_buff *skb);
+ 
+ /* ---- L2CAP timers ---- */
++static void l2cap_sock_set_timer(struct sock *sk, long timeout)
++{
++	BT_DBG("sk %p state %d timeout %ld", sk, sk->sk_state, timeout);
++	sk_reset_timer(sk, &sk->sk_timer, jiffies + timeout);
++}
++
++static void l2cap_sock_clear_timer(struct sock *sk)
++{
++	BT_DBG("sock %p state %d", sk, sk->sk_state);
++	sk_stop_timer(sk, &sk->sk_timer);
++}
++
+ static void l2cap_sock_timeout(unsigned long arg)
+ {
+ 	struct sock *sk = (struct sock *) arg;
+@@ -92,6 +104,14 @@ static void l2cap_sock_timeout(unsigned long arg)
+ 
+ 	bh_lock_sock(sk);
+ 
++	if (sock_owned_by_user(sk)) {
++		/* sk is owned by user. Try again later */
++		l2cap_sock_set_timer(sk, HZ / 5);
++		bh_unlock_sock(sk);
++		sock_put(sk);
++		return;
++	}
++
+ 	if (sk->sk_state == BT_CONNECTED || sk->sk_state == BT_CONFIG)
+ 		reason = ECONNREFUSED;
+ 	else if (sk->sk_state == BT_CONNECT &&
+@@ -108,18 +128,6 @@ static void l2cap_sock_timeout(unsigned long arg)
+ 	sock_put(sk);
+ }
+ 
+-static void l2cap_sock_set_timer(struct sock *sk, long timeout)
+-{
+-	BT_DBG("sk %p state %d timeout %ld", sk, sk->sk_state, timeout);
+-	sk_reset_timer(sk, &sk->sk_timer, jiffies + timeout);
+-}
+-
+-static void l2cap_sock_clear_timer(struct sock *sk)
+-{
+-	BT_DBG("sock %p state %d", sk, sk->sk_state);
+-	sk_stop_timer(sk, &sk->sk_timer);
+-}
+-
+ /* ---- L2CAP channels ---- */
+ static struct sock *__l2cap_get_chan_by_dcid(struct l2cap_chan_list *l, u16 cid)
+ {
 -- 
-Anderson Lizardo
-OpenBossa Labs - INdT
-Manaus - Brazil
+1.7.0.4
+
