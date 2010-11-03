@@ -1,62 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Wed, 3 Nov 2010 15:14:29 -0400
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: gimli <gimli@dark-green.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/6] MacBookAir3,1(3,2) btusb support
-Message-ID: <20101103191429.GA21114@vigoh>
-References: <9e7738c0461aa509dd55fe470df3855e@mognix.dark-green.com>
- <20101102152454.GC11778@core.coreip.homeip.net>
- <1288712282.3322.181.camel@aeonflux>
- <20101103182159.GA17943@vigoh>
- <4CD1B30C.6010904@dark-green.com>
+Message-ID: <4CD1B30C.6010904@dark-green.com>
+Date: Wed, 03 Nov 2010 20:07:56 +0100
+From: gimli <gimli@dark-green.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4CD1B30C.6010904@dark-green.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+ Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/6] MacBookAir3,1(3,2) btusb support
+References: <9e7738c0461aa509dd55fe470df3855e@mognix.dark-green.com> <20101102152454.GC11778@core.coreip.homeip.net> <1288712282.3322.181.camel@aeonflux> <20101103182159.GA17943@vigoh>
+In-Reply-To: <20101103182159.GA17943@vigoh>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gimli,
+Hi,
 
-We don't allow top posting in this mailing, please keep that in mind
-next time. Thanks.
+in what form i should provide it ?
 
-* gimli <gimli@dark-green.com> [2010-11-03 20:07:56 +0100]:
+cu
 
-> Hi,
-> 
-> in what form i should provide it ?
+Edgar (gimli) Hucek
 
-
-This is a example:
-
-commit 3cd01976e702ccaffb907727caff4f8789353599
-Author: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
-Date:   Fri Aug 20 16:24:07 2010 +0900
-
-    Bluetooth: Add support Bluetooth controller of MacbookPro 7,1
-    
-    Bluetooth controller of MacbookPro 7,1 does not work.
-    Because Device Class of these controllers was set 255 (Vendor Sepecific Class).
-    
-    T:  Bus=04 Lev=02 Prnt=04 Port=00 Cnt=01 Dev#=  5 Spd=12  MxCh= 0
-    D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-    P:  Vendor=05ac ProdID=8213 Rev=01.86
-    S:  Manufacturer=Apple Inc.
-    S:  Product=Bluetooth USB Host Controller
-    S:  SerialNumber=5C5948C81B99
-    C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-    I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-    I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-    I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-    I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
-    
-    Signed-off-by: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
-    Acked-by: Marcel Holtmann <marcel@holtmann.org>
-    Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
-
--- 
-Gustavo F. Padovan
-ProFUSION embedded systems - http://profusion.mobi
+Am 03.11.10 19:21, schrieb Gustavo F. Padovan:
+> Hi Edgar,
+>
+> * Marcel Holtmann<marcel@holtmann.org>  [2010-11-02 16:38:02 +0100]:
+>
+>> Hi Dmitry,
+>>
+>>> Not sure of you guys monitor LKML...
+>>
+>> not on a regular basis.
+>>
+>>>> This patch add support for the MacBookAir3,1 and MacBookAir3,2 to the btusb
+>>>> driver.
+>>>>
+>>>> Signed-off-by: Edgar (gimli) Hucek<gimli@dark-green.com>
+>
+> Please also provide the output of usb-devices for this hardware in
+> commit message when resubmitting the patch.
+>
+>>>
+>>>> --- a/drivers/bluetooth/btusb.c	2010-10-30 21:08:45.170492002 +0200
+>>>> +++ b/drivers/bluetooth/btusb.c	2010-10-30 21:18:11.820492000 +0200
+>>>> @@ -62,6 +62,9 @@
+>>>>   	/* Apple iMac11,1 */
+>>>>   	{ USB_DEVICE(0x05ac, 0x8215) },
+>>>>
+>>>> +	/* Apple MacBookAir3,1, MacBookAir3,2 */
+>>>> +	{ USB_DEVICE(0x05ac, 0x821b) },
+>>>> +
+>>>>   	/* AVM BlueFRITZ! USB v2.0 */
+>>>>   	{ USB_DEVICE(0x057c, 0x3800) },
+>>
+>> patch looks fine to me, but it should be send to linux-bluetooth mailing
+>> list.
+>>
+>> Acked-by: Marcel Holtmann<marcel@holtmann.org>
+>
