@@ -1,52 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <suraj@atheros.com>, Johan Hedberg <johan.hedberg@gmail.com>,
-	<joakim.xj.ceder@stericsson.com>,
-	Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Subject: [PATCH 0/4] Sim Access Profile
-Date: Wed, 3 Nov 2010 14:34:27 +0100
-Message-ID: <1288791271-13857-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1288689911-18507-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+References: <1288689911-18507-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+Date: Wed, 3 Nov 2010 07:44:26 -0400
+Message-ID: <AANLkTi=zQ1aKZ84HGAJ90Bwo=ugJuC7+u36oEoW=KR7C@mail.gmail.com>
+Subject: Re: [PATCH v2] Add support for sending small data through obex
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Tue, Nov 2, 2010 at 5:25 AM, Radoslaw Jablonski
+<ext-jablonski.radoslaw@nokia.com> wrote:
+> @@ -642,18 +642,39 @@ static int obex_write_stream(struct obex_session *os,
+>                goto add_header;
+>        }
+>
+> -       len = os->driver->read(os->object, os->buf, os->tx_mtu, &hi);
+> -       if (len < 0) {
+> -               error("read(): %s (%zd)", strerror(-len), -len);
+> -               if (len == -EAGAIN)
+> -                       return len;
+> -               else if (len == -ENOSTR)
+> -                       return 0;
+> +       /* Copying data from source until we reach end of the stream. Sending
+> +        * data only if MTU will be filled in 100% or we reach end of data.
+> +        * Remaining data in buffer will be sent with next amount of data
+> +        * from source.*/
+> +       do {
+> +               r_len = os->driver->read(os->object, os->buf + os->pending,
+> +                                               os->tx_mtu - os->pending, &hi);
+>
+> -               g_free(os->buf);
+> -               os->buf = NULL;
+> -               return len;
+> -       }
+> +               if (r_len == 0)
+> +                       break;
+> +               else if (r_len < 0) {
+> +                       error("read(): %s (%zd)", strerror(-r_len), -r_len);
+> +
+> +                       switch(r_len) {
 
-I fixed some issues raised by  Johan.
-I will send patches in seperate emails.
-
-@Johan: If there is no more comments could you consider to push it upstream?
+Small coding style issue above: a missing space between "switch" and "(".
 
 Regards,
-/Waldek
-
-
-Waldemar Rymarkiewicz (4):
-  Sim Access Profile API
-  Sim Access Profile Manager
-  Sim Access Profile Server
-  Sim Access Profile dummy driver
-
- .gitignore      |    1 +
- Makefile.am     |   21 +-
- acinclude.m4    |   12 +
- doc/sap-api.txt |   57 ++
- sap/main.c      |   54 ++
- sap/manager.c   |   94 ++++
- sap/manager.h   |   21 +
- sap/sap-dummy.c |  304 +++++++++++
- sap/sap.h       |  187 +++++++
- sap/server.c    | 1514 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- sap/server.h    |   25 +
- 11 files changed, 2288 insertions(+), 2 deletions(-)
- create mode 100644 doc/sap-api.txt
- create mode 100644 sap/main.c
- create mode 100644 sap/manager.c
- create mode 100644 sap/manager.h
- create mode 100644 sap/sap-dummy.c
- create mode 100644 sap/sap.h
- create mode 100644 sap/server.c
- create mode 100644 sap/server.h
-
+-- 
+Anderson Lizardo
+OpenBossa Labs - INdT
+Manaus - Brazil
