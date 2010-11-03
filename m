@@ -4,99 +4,49 @@ To: <linux-bluetooth@vger.kernel.org>
 CC: <suraj@atheros.com>, Johan Hedberg <johan.hedberg@gmail.com>,
 	<joakim.xj.ceder@stericsson.com>,
 	Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Subject: [PATCH 1/4] Sim Access Profile API
-Date: Wed, 3 Nov 2010 14:34:28 +0100
-Message-ID: <1288791271-13857-2-git-send-email-waldemar.rymarkiewicz@tieto.com>
-In-Reply-To: <1288791271-13857-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
-References: <1288791271-13857-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+Subject: [PATCH 0/4] Sim Access Profile
+Date: Wed, 3 Nov 2010 14:34:27 +0100
+Message-ID: <1288791271-13857-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-New API for Sim Access Profile.
----
- Makefile.am     |    2 +-
- doc/sap-api.txt |   57 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 58 insertions(+), 1 deletions(-)
- create mode 100644 doc/sap-api.txt
+Hi,
 
-diff --git a/Makefile.am b/Makefile.am
-index 873f2df..e1183de 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -352,7 +352,7 @@ EXTRA_DIST += doc/manager-api.txt \
- 		doc/service-api.txt doc/agent-api.txt doc/attribute-api.txt \
- 		doc/serial-api.txt doc/network-api.txt \
- 		doc/input-api.txt doc/audio-api.txt doc/control-api.txt \
--		doc/hfp-api.txt doc/assigned-numbers.txt
-+		doc/hfp-api.txt doc/assigned-numbers.txt doc/sap-api.txt
- 
- AM_YFLAGS = -d
- 
-diff --git a/doc/sap-api.txt b/doc/sap-api.txt
-new file mode 100644
-index 0000000..7951f56
---- /dev/null
-+++ b/doc/sap-api.txt
-@@ -0,0 +1,57 @@
-+BlueZ D-Bus Sim Access Profile API description
-+***********************************
-+
-+Copyright (C) 2010 ST-Ericsson SA
-+
-+
-+Sim Access Profile hierarchy
-+============================
-+
-+Service		org.bluez
-+Interface	org.bluez.SimAccess
-+Object path	[variable prefix]/{hci0,hci1,...}
-+
-+Methods		void Enable()
-+
-+			Start up SAP server and register SDP record for it.
-+
-+			Possible errors: org.bluez.Error.Failed
-+
-+		void Disable()
-+
-+			Shudown SAP server and remove the SDP record.
-+
-+			Possible errors: org.bluez.Error.Failed
-+
-+		void Disconnect(boolean type)
-+
-+			Disconnect SAP client from the server. The 'type'
-+			parameter indicates disconnection type.
-+
-+			True  - gracefull disconnection
-+			False - immediate disconnection
-+
-+			Possible errors: org.bluez.Error.Failed
-+
-+		dict GetProperties()
-+
-+			Return all properties for the interface. See the
-+			properties section for available properties.
-+
-+			Possible Errors: org.bluez.Error.Failed
-+
-+Signals		PropertyChanged(string name, variant value)
-+
-+			This signal indicates a changed value of the given
-+			property.
-+
-+
-+Properties	boolean Enabled [readonly]
-+
-+				Indicates the state of the server. True if the server
-+				is enabled and False otherwise.
-+
-+			boolean Connected [readonly]
-+
-+				Indicates if SAP client is connected to the server.
-+
--- 
-1.7.0.4
+I fixed some issues raised by  Johan.
+I will send patches in seperate emails.
+
+@Johan: If there is no more comments could you consider to push it upstream?
+
+Regards,
+/Waldek
+
+
+Waldemar Rymarkiewicz (4):
+  Sim Access Profile API
+  Sim Access Profile Manager
+  Sim Access Profile Server
+  Sim Access Profile dummy driver
+
+ .gitignore      |    1 +
+ Makefile.am     |   21 +-
+ acinclude.m4    |   12 +
+ doc/sap-api.txt |   57 ++
+ sap/main.c      |   54 ++
+ sap/manager.c   |   94 ++++
+ sap/manager.h   |   21 +
+ sap/sap-dummy.c |  304 +++++++++++
+ sap/sap.h       |  187 +++++++
+ sap/server.c    | 1514 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ sap/server.h    |   25 +
+ 11 files changed, 2288 insertions(+), 2 deletions(-)
+ create mode 100644 doc/sap-api.txt
+ create mode 100644 sap/main.c
+ create mode 100644 sap/manager.c
+ create mode 100644 sap/manager.h
+ create mode 100644 sap/sap-dummy.c
+ create mode 100644 sap/sap.h
+ create mode 100644 sap/server.c
+ create mode 100644 sap/server.h
 
