@@ -1,75 +1,124 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 3 Nov 2010 13:56:45 -0400
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: haijun liu <liuhaijun.er@gmail.com>
-Cc: Haijun Liu <haijun.liu@atheros.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2 v2] Bluetooth: Fix system crash caused by
- del_timer()
-Message-ID: <20101103175645.GA17561@vigoh>
-References: <1287714419-13545-1-git-send-email-haijun.liu@atheros.com>
- <20101022171825.GA980@vigoh>
- <AANLkTi=C5biCuJV335yfNWkY77xK29aa5JQ+9xvaE1yr@mail.gmail.com>
- <20101025110131.GA7721@vigoh>
- <AANLkTin2RaOZbRbg4faCFUxMLVi-FoY2xnNqq0a8cHpN@mail.gmail.com>
- <20101028075346.GA15997@vigoh>
- <AANLkTi=Q3g2UTiHV1i2gBa=POY0jS6GbBWAD1ddOaETx@mail.gmail.com>
+From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann
+	<marcel@holtmann.org>, Waldemar Rymarkiewicz
+	<waldemar.rymarkiewicz@tieto.com>
+Subject: [PATCH] Remove doc/bluez-docs.xml.
+Date: Wed, 3 Nov 2010 16:55:02 +0100
+Message-ID: <1288799702-17309-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTi=Q3g2UTiHV1i2gBa=POY0jS6GbBWAD1ddOaETx@mail.gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Haijun,
+doc/bluez-docs.xml seems to be obsolate and not used anymore.
+---
+ doc/bluez-docs.xml |   97 ----------------------------------------------------
+ 1 files changed, 0 insertions(+), 97 deletions(-)
+ delete mode 100644 doc/bluez-docs.xml
 
-* haijun liu <liuhaijun.er@gmail.com> [2010-11-01 09:22:14 +0800]:
-
-> Hi Gustavo,
-> 
-> >> >> >> During test session with another vendor's bt stack, found that in
-> >> >> >> l2cap_chan_del() using del_timer() caused l2cap_monitor_timeout()
-> >> >> >> be called after the sock was freed, so it raised a system crash.
-> >> >> >> So I just replaced del_timer() with del_timer_sync() to solve it.
-> >> >> >
-> >> >> > NAK on this. If you read the del_timer_sync() documentation you can
-> >> >> > see that you can't call del_timer_sync() on interrupt context. The
-> >> >> > possible solution here is to check in the beginning of
-> >> >> > l2cap_monitor_timeout() if your sock is still valid.
-> >> >> >
-> >> >>
-> >> >> You are right, I only considered close() interface, so missed the interrupt
-> >> >> context.
-> >> >>
-> >> >> It's very difficult to check sock valid or not in timeout procedure, since it's
-> >> >> an interrupt context, and only can get context from parameter pre-stored,
-> >> >> except global variables.
-> >> >
-> >> > I think you can check for sk == null there.
-> >> >
-> >>
-> >> It's a pre-stored parameter, it will not change by itself.
-> >
-> > I looked a bit into this and a good solution seems to be to hold a
-> > reference to the sock when we call a mod_timer() and then put the
-> > reference when we call del_timer() and the timer is inactive or when
-> > l2cap_monitor_timeout(). Look net/sctp/ for examples.
-> >
-> 
-> Same situation still is there, in this case, l2cap_monitor_timeout()
-> how to know the reference has been released by del_timer()?
-> 
-> If we refer to net/sctp, use timer_pending() to detect it, unless we can
-> ensure del_timer() always be called in interrupt context and same
-> level compare to timer interrupt, otherwise it's not an atomic operation
-> for this case.
-
-No, the socket lock take care of that, so there will be no race
-condition here. One related thing that we should fix is a locking
-problem in l2cap_monitor_timeout() and l2cap_retrans_timeout() already
-reported by Mat Martineau. (I just can't find his e-mail about that).
-So I think you should go ahead and this problem using ref counting and
-then we can also fix the problem reported by Mat.
-
+diff --git a/doc/bluez-docs.xml b/doc/bluez-docs.xml
+deleted file mode 100644
+index 74a8bd1..0000000
+--- a/doc/bluez-docs.xml
++++ /dev/null
+@@ -1,97 +0,0 @@
+-<?xml version="1.0"?>
+-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+-               "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+-<!ENTITY version SYSTEM "version.xml">
+-]>
+-<book id="index" xmlns:xi="http://www.w3.org/2003/XInclude">
+-  <bookinfo>
+-    <title>BlueZ Reference Manual</title>
+-    <releaseinfo>Version &version;</releaseinfo>
+-    <authorgroup>
+-      <author>
+-	<firstname>Marcel</firstname>
+-	<surname>Holtmann</surname>
+-	<affiliation>
+-	  <address>
+-	    <email>marcel@holtmann.org</email>
+-	  </address>
+-	</affiliation>
+-      </author>
+-    </authorgroup>
+-
+-    <copyright>
+-      <year>2002-2008</year>
+-      <holder>Marcel Holtmann</holder>
+-    </copyright>
+-
+-    <legalnotice>
+-      <para>
+-	Permission is granted to copy, distribute and/or modify this
+-	document under the terms of the <citetitle>GNU Free
+-	Documentation License</citetitle>, Version 1.1 or any later
+-	version published by the Free Software Foundation with no
+-	Invariant Sections, no Front-Cover Texts, and no Back-Cover
+-	Texts. You may obtain a copy of the <citetitle>GNU Free
+-	Documentation License</citetitle> from the Free Software
+-	Foundation by visiting <ulink type="http"
+-	url="http://www.fsf.org">their Web site</ulink> or by writing
+-	to:
+-
+-	<address>
+-	  The Free Software Foundation, Inc.,
+-	  <street>59 Temple Place</street> - Suite 330,
+-	  <city>Boston</city>, <state>MA</state> <postcode>02111-1307</postcode>,
+-	  <country>USA</country>
+-	</address>
+-      </para>
+-    </legalnotice>
+-  </bookinfo>
+-
+-  <reference id="manager">
+-    <title>Manager interface</title>
+-    <para>
+-<programlisting><xi:include href="manager-api.txt" parse="text" /></programlisting>
+-    </para>
+-  </reference>
+-
+-  <reference id="adapter">
+-    <title>Adapter interface</title>
+-    <para>
+-<programlisting><xi:include href="adapter-api.txt" parse="text" /></programlisting>
+-    </para>
+-  </reference>
+-
+-  <reference id="device">
+-    <title>Device interface</title>
+-    <para>
+-<programlisting><xi:include href="device-api.txt" parse="text" /></programlisting>
+-    </para>
+-  </reference>
+-
+-  <reference id="agent">
+-    <title>Agent interface</title>
+-    <para>
+-<programlisting><xi:include href="agent-api.txt" parse="text" /></programlisting>
+-    </para>
+-  </reference>
+-
+-  <reference id="reference">
+-    <title>API Reference</title>
+-    <partintro>
+-      <para>
+-	This part presents the function reference for BlueZ.
+-      </para>
+-    </partintro>
+-  </reference>
+-
+-  <appendix id="license">
+-    <title>License</title>
+-    <para>
+-<programlisting><xi:include href="../COPYING" parse="text" /></programlisting>
+-    </para>
+-  </appendix>
+-
+-  <index>
+-    <title>Index</title>
+-  </index>
+-</book>
 -- 
-Gustavo F. Padovan
-ProFUSION embedded systems - http://profusion.mobi
+1.7.0.4
