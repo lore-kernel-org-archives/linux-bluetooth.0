@@ -1,71 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Wed, 3 Nov 2010 17:51:06 -0400
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: gimli <gimli@dark-green.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/6] MacBookAir3,1(3,2) btusb support
-Message-ID: <20101103215106.GA21950@vigoh>
-References: <9e7738c0461aa509dd55fe470df3855e@mognix.dark-green.com>
- <20101102152454.GC11778@core.coreip.homeip.net>
- <1288712282.3322.181.camel@aeonflux>
- <20101103182159.GA17943@vigoh>
- <4CD1B30C.6010904@dark-green.com>
- <20101103191429.GA21114@vigoh>
- <4CD1C3E5.3030507@dark-green.com>
+Date: Wed, 3 Nov 2010 14:12:48 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+cc: haijun liu <liuhaijun.er@gmail.com>,
+	Haijun Liu <haijun.liu@atheros.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2 v2] Bluetooth: Fix system crash caused by
+ del_timer()
+In-Reply-To: <20101103175645.GA17561@vigoh>
+Message-ID: <alpine.DEB.2.00.1011031309090.23497@linux-sea-02>
+References: <1287714419-13545-1-git-send-email-haijun.liu@atheros.com> <20101022171825.GA980@vigoh> <AANLkTi=C5biCuJV335yfNWkY77xK29aa5JQ+9xvaE1yr@mail.gmail.com> <20101025110131.GA7721@vigoh> <AANLkTin2RaOZbRbg4faCFUxMLVi-FoY2xnNqq0a8cHpN@mail.gmail.com>
+ <20101028075346.GA15997@vigoh> <AANLkTi=Q3g2UTiHV1i2gBa=POY0jS6GbBWAD1ddOaETx@mail.gmail.com> <20101103175645.GA17561@vigoh>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4CD1C3E5.3030507@dark-green.com>
+Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gimli,
 
-Again, please stop top posting, it's not accepted here.
+Gustavo and Haijun -
 
-* gimli <gimli@dark-green.com> [2010-11-03 21:19:49 +0100]:
+On Wed, 3 Nov 2010, Gustavo F. Padovan wrote:
 
-> Here is the output :
-> 
-> T:  Bus=03 Lev=02 Prnt=03 Port=02 Cnt=01 Dev#=  6 Spd=12  MxCh= 0
-> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=05ac ProdID=821b Rev= 0.34
-> S:  Manufacturer=Apple Inc.
-> S:  Product=Bluetooth USB Host Controller
-> C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  32 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  32 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  64 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  64 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  64 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  64 Ivl=1ms
-> I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-> E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-> I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+> Hi Haijun,
+>
+> * haijun liu <liuhaijun.er@gmail.com> [2010-11-01 09:22:14 +0800]:
+>
+>> Hi Gustavo,
+>>
+>>>>>>>> During test session with another vendor's bt stack, found that in
+>>>>>>>> l2cap_chan_del() using del_timer() caused l2cap_monitor_timeout()
+>>>>>>>> be called after the sock was freed, so it raised a system crash.
+>>>>>>>> So I just replaced del_timer() with del_timer_sync() to solve it.
+>>>>>>>
+>>>>>>> NAK on this. If you read the del_timer_sync() documentation you can
+>>>>>>> see that you can't call del_timer_sync() on interrupt context. The
+>>>>>>> possible solution here is to check in the beginning of
+>>>>>>> l2cap_monitor_timeout() if your sock is still valid.
+>>>>>>>
+>>>>>>
+>>>>>> You are right, I only considered close() interface, so missed the interrupt
+>>>>>> context.
+>>>>>>
+>>>>>> It's very difficult to check sock valid or not in timeout procedure, since it's
+>>>>>> an interrupt context, and only can get context from parameter pre-stored,
+>>>>>> except global variables.
+>>>>>
+>>>>> I think you can check for sk == null there.
+>>>>>
+>>>>
+>>>> It's a pre-stored parameter, it will not change by itself.
+>>>
+>>> I looked a bit into this and a good solution seems to be to hold a
+>>> reference to the sock when we call a mod_timer() and then put the
+>>> reference when we call del_timer() and the timer is inactive or when
+>>> l2cap_monitor_timeout(). Look net/sctp/ for examples.
+>>>
+>>
+>> Same situation still is there, in this case, l2cap_monitor_timeout()
+>> how to know the reference has been released by del_timer()?
+>>
+>> If we refer to net/sctp, use timer_pending() to detect it, unless we can
+>> ensure del_timer() always be called in interrupt context and same
+>> level compare to timer interrupt, otherwise it's not an atomic operation
+>> for this case.
+>
+> No, the socket lock take care of that, so there will be no race
+> condition here. One related thing that we should fix is a locking
+> problem in l2cap_monitor_timeout() and l2cap_retrans_timeout() already
+> reported by Mat Martineau. (I just can't find his e-mail about that).
+> So I think you should go ahead and this problem using ref counting and
+> then we can also fix the problem reported by Mat.
 
-Actually you have to post the output of usb-devices without your patch
-to show why your patch need is needed. And you should add that to the
-commit message and resend your patch to linux-bluetooth instead of
-posting it on this thread.
+Here's the message you're referring to:
 
--- 
-Gustavo F. Padovan
-ProFUSION embedded systems - http://profusion.mobi
+http://www.spinics.net/lists/linux-bluetooth/msg06734.html
+
+I do have patches to use a workqueue instead of timers that I'll 
+upstream soon, but it looks like some kind of reference counting is 
+still necessary.
+
+del_timer_sync() or cancel_delayed_work_sync() could be called by a 
+workqueue function.  We could sock_hold(), queue the cancellation 
+work, then let the workqueue function call sock_put() after the 
+timeouts (monitor, retrans, and ack) are all synchronously cancelled.
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+
