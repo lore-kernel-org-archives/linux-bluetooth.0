@@ -1,42 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Thu, 4 Nov 2010 15:20:21 +0200
-Message-ID: <AANLkTikyPtikmH=ep2va2iLke9NoteTr5wpThfR6v=vf@mail.gmail.com>
-Subject: [PATCH] Fix add disconnect watch in connecting state
-From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=20cf303b389d205bd304943a05c0
+From: =?iso-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
+Content-Type: text/plain; charset=us-ascii
+Subject: HDP stress test script
+Date: Thu, 4 Nov 2010 10:59:18 -0200
+Message-Id: <1EEF2306-56E6-4C77-8BB6-02F16050BC0A@signove.com>
+Cc: linux-bluetooth@vger.kernel.org
+To: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+Mime-Version: 1.0 (Apple Message framework v1081)
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---20cf303b389d205bd304943a05c0
-Content-Type: text/plain; charset=ISO-8859-1
+I put together a kind of "stress test" or "torture" script for HDP profile and API. It is available at http://gitorious.org/hdpy project, path is scripts/bluez/hdp_stress_test. Major features:
 
+a) useful either as a test tool and as an API usage example (though scripts/bluez/hdp_oxi_sink is probably a better example);
 
+b) any number of machines can participate (minimum 2, tested with 3);
 
---20cf303b389d205bd304943a05c0
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Fix-add-disconnect-watch-in-connecting-state.patch"
-Content-Disposition: attachment;
-	filename="0001-Fix-add-disconnect-watch-in-connecting-state.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_gg3nyntm0
+c) each machine finds the others semi-automatically (tries to contact paired devices that publish an HDP record).
 
-RnJvbSBmNzA1NTMyMzIwYmRmYjQ3YTA2ZGY3MmM2ZDAzMWNhMDk2ODM0YTNhIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
-a2lhLmNvbT4KRGF0ZTogV2VkLCAzIE5vdiAyMDEwIDE0OjEyOjI5ICswMjAwClN1YmplY3Q6IFtQ
-QVRDSF0gRml4IGFkZCBkaXNjb25uZWN0IHdhdGNoIGluIGNvbm5lY3Rpbmcgc3RhdGUKCklmIGRp
-c2Nvbm5lY3RfY2IgaXMgYWRkZWQgb25seSBpbiB0aGUgY29ubmVjdGVkIHN0YXRlLCB0aGUgY2Fs
-bGJhY2sKd2lsbCBub3QgYmUgdHJpZ2dlcmVkIGlmIERldmljZS5EaXNjb25uZWN0ZWQgaXMgY2Fs
-bGVkIGR1cmluZyBhCmNvbm5lY3Rpb24gc2V0dXAgYW5kIHRoZSBSRkNPTU0gY2hhbm5lbCBvZiBI
-RlAgd2lsbCBub3QgYmUgY2xlYW5seQpkaXNjb25uZWN0ZWQuCi0tLQogYXVkaW8vZGV2aWNlLmMg
-fCAgICAyICstCiAxIGZpbGVzIGNoYW5nZWQsIDEgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbnMo
-LSkKCmRpZmYgLS1naXQgYS9hdWRpby9kZXZpY2UuYyBiL2F1ZGlvL2RldmljZS5jCmluZGV4IDk1
-NTRjN2IuLjJlNzU1MzggMTAwNjQ0Ci0tLSBhL2F1ZGlvL2RldmljZS5jCisrKyBiL2F1ZGlvL2Rl
-dmljZS5jCkBAIC0yMzEsNyArMjMxLDcgQEAgc3RhdGljIHZvaWQgZGV2aWNlX3NldF9zdGF0ZShz
-dHJ1Y3QgYXVkaW9fZGV2aWNlICpkZXYsIGF1ZGlvX3N0YXRlX3QgbmV3X3N0YXRlKQogCQkJCQkJ
-CXByaXYtPmRjX2lkKTsKIAkJCXByaXYtPmRjX2lkID0gMDsKIAkJfQotCX0gZWxzZSBpZiAobmV3
-X3N0YXRlID09IEFVRElPX1NUQVRFX0NPTk5FQ1RFRCkKKwl9IGVsc2UKIAkJcHJpdi0+ZGNfaWQg
-PSBkZXZpY2VfYWRkX2Rpc2Nvbm5lY3Rfd2F0Y2goZGV2LT5idGRfZGV2LAogCQkJCQkJZGlzY29u
-bmVjdF9jYiwgZGV2LCBOVUxMKTsKIAotLSAKMS42LjAuNAoK
---20cf303b389d205bd304943a05c0--
+I could extract a segfault with it already, but did not have time to pinpoint the cause. It happened when there were a couple of async Echo's pending and script was killed (which triggers HealthApplication destruction).
+
+Note: it uses the 'Application' property of HealthChannel, which is pending acceptance. This can be easily disabled by changing a flag in script.
+
+Another thing I stumbled on, was the UUIDs property of Device object. The script creates sources and sinks, but 'UUIDs' only shows the sink (0x1402). For now, the script assumes that every source is also a sink in order to find the counterparts, but this needs to be truly fixed in near future.
