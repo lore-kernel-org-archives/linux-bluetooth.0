@@ -1,46 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Pawlik <lucas.pawlik@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Pawlik <lucas.pawlik@gmail.com>
-Subject: [PATCH] Fix handling call waiting indicators in telephony
-Date: Thu,  4 Nov 2010 16:00:37 +0100
-Message-Id: <1288882837-9163-1-git-send-email-lucas.pawlik@gmail.com>
+Subject: [PATCH] Fix not ignoring case of uuid given to RegisterEndpoint
+Date: Thu,  4 Nov 2010 16:29:50 +0200
+Message-Id: <1288880990-2125-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Previously +CIEV: "callsetup" was sent before +CCWA: (call waiting)
-notification. According to the HFP specification AG reports new
-call waiting by sending +CCWA before +CIEV indicator. Some HF did
-not handle properly ending active call after rejecting 2nd incoming call
-if "callsetup" indicator was sent before call waiting.
----
- audio/telephony-maemo6.c |    6 +++---
- 1 files changed, 3 insertions(+), 3 deletions(-)
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
-index 33fd13f..72c8e36 100644
---- a/audio/telephony-maemo6.c
-+++ b/audio/telephony-maemo6.c
-@@ -914,9 +914,6 @@ static void handle_incoming_call(DBusMessage *msg)
- 	g_free(call->number);
- 	call->number = g_strdup(number);
+---
+ audio/media.c     |    6 +++---
+ audio/transport.c |    8 ++++----
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/audio/media.c b/audio/media.c
+index 661f81a..b6c90f9 100644
+--- a/audio/media.c
++++ b/audio/media.c
+@@ -190,19 +190,19 @@ static struct media_endpoint *media_endpoint_create(struct media_adapter *adapte
+ 	endpoint->size = size;
+ 	endpoint->adapter = adapter;
  
--	telephony_update_indicator(maemo_indicators, "callsetup",
--					EV_CALLSETUP_INCOMING);
--
- 	if (find_call_with_status(CSD_CALL_STATUS_ACTIVE) ||
- 			find_call_with_status(CSD_CALL_STATUS_HOLD))
- 		telephony_call_waiting_ind(call->number,
-@@ -924,6 +921,9 @@ static void handle_incoming_call(DBusMessage *msg)
- 	else
- 		telephony_incoming_call_ind(call->number,
- 						number_type(call->number));
-+
-+	telephony_update_indicator(maemo_indicators, "callsetup",
-+					EV_CALLSETUP_INCOMING);
- }
+-	if (g_strcmp0(uuid, A2DP_SOURCE_UUID) == 0) {
++	if (strcasecmp(uuid, A2DP_SOURCE_UUID) == 0) {
+ 		endpoint->sep = a2dp_add_sep(&adapter->src,
+ 					AVDTP_SEP_TYPE_SOURCE, codec,
+ 					delay_reporting, endpoint);
+ 		if (endpoint->sep == NULL)
+ 			goto failed;
+-	} else if (g_strcmp0(uuid, A2DP_SINK_UUID) == 0) {
++	} else if (strcasecmp(uuid, A2DP_SINK_UUID) == 0) {
+ 		endpoint->sep = a2dp_add_sep(&adapter->src,
+ 						AVDTP_SEP_TYPE_SINK, codec,
+ 						delay_reporting, endpoint);
+ 		if (endpoint->sep == NULL)
+ 			goto failed;
+-	} else if (g_strcmp0(uuid, HFP_AG_UUID) == 0 ||
++	} else if (strcasecmp(uuid, HFP_AG_UUID) == 0 ||
+ 					g_strcmp0(uuid, HSP_AG_UUID) == 0)
+ 		endpoint->hs_watch = headset_add_state_cb(headset_state_changed,
+ 								endpoint);
+diff --git a/audio/transport.c b/audio/transport.c
+index 6d78b73..eda46e1 100644
+--- a/audio/transport.c
++++ b/audio/transport.c
+@@ -711,15 +711,15 @@ struct media_transport *media_transport_create(DBusConnection *conn,
+ 	transport->fd = -1;
  
- static void handle_outgoing_call(DBusMessage *msg)
+ 	uuid = media_endpoint_get_uuid(endpoint);
+-	if (g_strcmp0(uuid, A2DP_SOURCE_UUID) == 0 ||
+-			g_strcmp0(uuid, A2DP_SINK_UUID) == 0) {
++	if (strcasecmp(uuid, A2DP_SOURCE_UUID) == 0 ||
++			strcasecmp(uuid, A2DP_SINK_UUID) == 0) {
+ 		transport->resume = resume_a2dp;
+ 		transport->suspend = suspend_a2dp;
+ 		transport->cancel = cancel_a2dp;
+ 		transport->get_properties = get_properties_a2dp;
+ 		transport->set_property = set_property_a2dp;
+-	} else if (g_strcmp0(uuid, HFP_AG_UUID) == 0 ||
+-			g_strcmp0(uuid, HSP_AG_UUID) == 0) {
++	} else if (strcasecmp(uuid, HFP_AG_UUID) == 0 ||
++			strcasecmp(uuid, HSP_AG_UUID) == 0) {
+ 		transport->resume = resume_headset;
+ 		transport->suspend = suspend_headset;
+ 		transport->cancel = cancel_headset;
 -- 
-1.7.0.4
+1.7.1
 
