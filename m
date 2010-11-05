@@ -1,75 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 5 Nov 2010 11:30:32 +0200
+Date: Fri, 5 Nov 2010 11:18:09 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, suraj@atheros.com,
-	joakim.xj.ceder@stericsson.com
-Subject: Re: [PATCH 2/4] Sim Access Profile Manager
-Message-ID: <20101105093032.GA32149@jh-x301>
-References: <1288791271-13857-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
- <1288791271-13857-3-git-send-email-waldemar.rymarkiewicz@tieto.com>
+To: Daniel =?iso-8859-1?Q?=D6rstadius?= <daniel.orstadius@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fix add disconnect watch in connecting state
+Message-ID: <20101105091808.GA31519@jh-x301>
+References: <AANLkTikyPtikmH=ep2va2iLke9NoteTr5wpThfR6v=vf@mail.gmail.com>
+ <20101104181606.GA15745@jh-x301>
+ <AANLkTimKWv3XcJ6qfJK6QNCY38vza+Nj12cGfdAELXxu@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1288791271-13857-3-git-send-email-waldemar.rymarkiewicz@tieto.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <AANLkTimKWv3XcJ6qfJK6QNCY38vza+Nj12cGfdAELXxu@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Waldek,
+Hi Daniel,
 
-On Wed, Nov 03, 2010, Waldemar Rymarkiewicz wrote:
-> +++ b/sap/main.c
-> @@ -0,0 +1,54 @@
-> +/*
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2010 Claudio Takahasi<claudio.takahasi@openbossa.org>
+On Fri, Nov 05, 2010, Daniel Örstadius wrote:
+> On Thu, Nov 4, 2010 at 8:16 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> > This doesn't seem quite right to me. Aren't you now adding a disconnect
+> > callback twice: once for CONNECTING and a second time for CONNECTED? It
+> > seems like you should only add it when new_state == CONNECTING, right?
+> >
+> 
+> Yes, that seems right, attaching updated patch.
 
-As discussed off-list, this needs fixing.
-
-> +++ b/sap/manager.c
-> @@ -0,0 +1,94 @@
-> +/*
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2010 Claudio Takahasi<claudio.takahasi@openbossa.org>
-
-Same here.
-
-> +static DBusConnection *connection = NULL;
-> +
-> +
-> +static int sap_server_probe(struct btd_adapter *adapter)
-
-There should never be the need to have two consecutive empty lines.
-Please remove one.
-
-> +	const gchar *path = adapter_get_path(adapter);
-
-Please avoid using the glib specific types when standard C types can be
-used. I.e. use just "char" here.
-
-> +static void sap_server_remove(struct btd_adapter *adapter)
-> +{
-> +	const gchar *path = adapter_get_path(adapter);
-
-Same here.
-
-> +++ b/sap/manager.h
-> @@ -0,0 +1,21 @@
-> +/*
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2010 Claudio Takahasi<claudio.takahasi@openbossa.org>
-
-Same copyright fix needed as previously discussed.
-
-> +++ b/sap/server.h
-> @@ -0,0 +1,25 @@
-> +/*
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2010 Claudio Takahasi<claudio.takahasi@openbossa.org>
-
-Same here.
+Thanks. The patch is now in the upstream tree.
 
 Johan
