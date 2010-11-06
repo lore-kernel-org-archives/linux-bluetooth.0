@@ -1,44 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 6 Nov 2010 13:08:21 +0200
+Date: Sat, 6 Nov 2010 12:56:17 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: Socket type in audio IPC
-Message-ID: <20101106110821.GA18604@jh-x301>
-References: <4CD26B4F.8070709@tieto.com>
+To: Elvis =?iso-8859-1?Q?Pf=FCtzenreuter?= <epx@signove.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] Add Application property to HealthChannel
+Message-ID: <20101106105617.GA18590@jh-x301>
+References: <1288793188-11514-1-git-send-email-epx@signove.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4CD26B4F.8070709@tieto.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1288793188-11514-1-git-send-email-epx@signove.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+Hi Elvis,
 
-On Thu, Nov 04, 2010, Andrzej Kaczmarek wrote:
-> We have a problem with audio IPC, sometimes following printout can be
-> seen in logs when A2DP connection fails:
-> external/bluetooth/bluez/audio/pcm_bluetooth.c:1609:(audioservice_recv)
-> Too short (1 bytes) IPC packet from bluetoothd
+On Wed, Nov 03, 2010, Elvis Pfützenreuter wrote:
+> This patch adds the Application property to HealthChannel, which
+> allows to unambiguously relate a channel to an application.
 > 
-> I was not able to catch this issue on my workstation for debugging so
-> far, but it does not seem like ipc.h mismatch between BlueZ and ALSA
-> plugin - we use one BlueZ version for a long time. Perhaps it's
-> because of some unusual fragmentation (not sure how exactly sockets
-> work internally) so my questions is why SOCK_STREAM sockets are used
-> in audio IPC? Doesn't SOCK_SEQPACKET fit better here since we're
-> dealing with messages rather than byte stream? There's no handling of
-> fragmented packets in pcm_bluetooth.c at all so in case recv() returns
-> less bytes than expected this is immediately returned as an error.
+> This property is useful when there are several processes interested
+> in accepting HealthChannels but device address is not sufficient
+> criteria to engage upon, or ignore, the ChannelConnected signal.
+> Having the application path allows to determine role and data type,
+> in the context of the process that has created that application.
+> ---
+>  doc/health-api.txt |    5 +++++
+>  health/hdp.c       |    3 +++
+>  2 files changed, 8 insertions(+), 0 deletions(-)
 
-You're right that SOCK_SEQPACKET would be a better choice. However,
-changing it would break all existing clients that use SOCK_STREAM. Since
-we've already introduced the new D-Bus based solution for this which
-requires updating the clients anyway I don't think it's worth trying to
-fix this for the old unix socket based solution. FWIW, there are no
-current plans to keep maintaining pcm_bluetooth.c since most people use
-pulseaudio or some other solution and since it's quite tricky to make an
-ALSA userspace plugin use D-Bus properly. Feel free to try to come up
-with a patch to update pcm_bluetooth.c to use the new Media API though,
-and it might just live a little bit longer ;)
+Both patches have been pushed upstream. Thanks.
 
 Johan
