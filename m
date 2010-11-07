@@ -1,111 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 8 Nov 2010 02:37:40 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Stefan Seyfried <stefan.seyfried@googlemail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: bluez-4.78 broken for me
-Message-ID: <20101108003740.GA7213@jh-x301>
-References: <20101108003042.35493250@susi.home.s3e.de>
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="7AUc2qLy4jB3hD7Z"
-In-Reply-To: <20101108003042.35493250@susi.home.s3e.de>
+Date: Mon, 8 Nov 2010 00:30:42 +0100
+From: Stefan Seyfried <stefan.seyfried@googlemail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: bluez-4.78 broken for me
+Message-ID: <20101108003042.35493250@susi.home.s3e.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi,
 
---7AUc2qLy4jB3hD7Z
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+since I did upgrade to bluez-4.78, all I get when enabling the bluetooth
+adapter on my Thinkpad X200s is:
 
-Hi Stefan,
+kernel: [248420.020080] usb 4-2: new full speed USB device using uhci_hcd and address 7
+kernel: [248420.179082] usb 4-2: New USB device found, idVendor=0a5c, idProduct=2145
+kernel: [248420.179087] usb 4-2: New USB device strings: Mfr=1, Product=2, SerialNumber=0
+kernel: [248420.179090] usb 4-2: Product: ThinkPad Bluetooth with Enhanced Data Rate II
+kernel: [248420.179094] usb 4-2: Manufacturer: Lenovo Computer Corp
+bluetoothd[4390]: Bluetooth deamon 4.78
+bluetoothd[4393]: Starting SDP server
+bluetoothd[4393]: Parsing /etc/bluetooth/input.conf failed: No such file or directory
+bluetoothd[4393]: Parsing /etc/bluetooth/audio.conf failed: No such file or directory
+bluetoothd[4393]: HCI dev 0 registered
+bluetoothd[4393]: HCI dev 0 up
+bluetoothd[4393]: Starting security manager 0
+bluetoothd[4393]: Parsing /etc/bluetooth/serial.conf failed: No such file or directory
+bluetoothd[4393]: Adapter /org/bluez/4390/hci0 has been enabled
+bluetoothd[4393]: Unable to find matching adapter
+bluetoothd[4393]: No matching adapter found
+bluetoothd[4393]: Unable to find matching adapter
+bluetoothd[4393]: No matching adapter found
+bluetoothd[4393]: Unable to find matching adapter
+bluetoothd[4393]: No matching adapter found
+bluetoothd[4393]: Unable to find matching adapter
 
-On Mon, Nov 08, 2010, Stefan Seyfried wrote:
-> since I did upgrade to bluez-4.78, all I get when enabling the bluetooth
-> adapter on my Thinkpad X200s is:
-> 
-> kernel: [248420.020080] usb 4-2: new full speed USB device using uhci_hcd and address 7
-> kernel: [248420.179082] usb 4-2: New USB device found, idVendor=0a5c, idProduct=2145
-> kernel: [248420.179087] usb 4-2: New USB device strings: Mfr=1, Product=2, SerialNumber=0
-> kernel: [248420.179090] usb 4-2: Product: ThinkPad Bluetooth with Enhanced Data Rate II
-> kernel: [248420.179094] usb 4-2: Manufacturer: Lenovo Computer Corp
-> bluetoothd[4390]: Bluetooth deamon 4.78
-> bluetoothd[4393]: Starting SDP server
-> bluetoothd[4393]: Parsing /etc/bluetooth/input.conf failed: No such file or directory
-> bluetoothd[4393]: Parsing /etc/bluetooth/audio.conf failed: No such file or directory
-> bluetoothd[4393]: HCI dev 0 registered
-> bluetoothd[4393]: HCI dev 0 up
-> bluetoothd[4393]: Starting security manager 0
-> bluetoothd[4393]: Parsing /etc/bluetooth/serial.conf failed: No such file or directory
-> bluetoothd[4393]: Adapter /org/bluez/4390/hci0 has been enabled
-> bluetoothd[4393]: Unable to find matching adapter
-> bluetoothd[4393]: No matching adapter found
-> bluetoothd[4393]: Unable to find matching adapter
-> bluetoothd[4393]: No matching adapter found
-> bluetoothd[4393]: Unable to find matching adapter
-> bluetoothd[4393]: No matching adapter found
-> bluetoothd[4393]: Unable to find matching adapter
+And it does not work at all. Downgrading to 4.77 brings:
+kernel: [248504.361041] usb 4-2: new full speed USB device using uhci_hcd and address 8
+kernel: [248504.517100] usb 4-2: New USB device found, idVendor=0a5c, idProduct=2145
+kernel: [248504.517104] usb 4-2: New USB device strings: Mfr=1, Product=2, SerialNumber=0
+kernel: [248504.517107] usb 4-2: Product: ThinkPad Bluetooth with Enhanced Data Rate II
+kernel: [248504.517109] usb 4-2: Manufacturer: Lenovo Computer Corp
+bluetoothd[4570]: Bluetooth deamon 4.77
+bluetoothd[4573]: Starting SDP server
+bluetoothd[4573]: Parsing /etc/bluetooth/input.conf failed: No such file or directory
+bluetoothd[4573]: Parsing /etc/bluetooth/audio.conf failed: No such file or directory
+bluetoothd[4573]: HCI dev 0 registered
+bluetoothd[4573]: HCI dev 0 up
+bluetoothd[4573]: Starting security manager 0
+bluetoothd[4573]: Parsing /etc/bluetooth/serial.conf failed: No such file or directory
+bluetoothd[4573]: probe failed with driver input-headset for device /org/bluez/4570/hci0/dev_00_24_EF_D1_B3_23
+bluetoothd[4573]: probe failed with driver input-headset for device /org/bluez/4570/hci0/dev_C0_E4_22_68_82_5E
+bluetoothd[4573]: probe failed with driver input-headset for device /org/bluez/4570/hci0/dev_00_12_EE_23_CE_EA
+bluetoothd[4573]: Adapter /org/bluez/4570/hci0 has been enabled
 
-You really should enable debug logs (-d switch) to get more info about
-which code paths are being traveresed here (since there are many places
-which can cause those log messages). However, my suspicion goes to a
-possible mismatch in the adapter address upon initialization and later
-lookups. Could you try if the attached patch fixes the issue? Thanks.
+and then the usual messages from NetworkManager:
+kernel: [248504.741917] NetworkManager[1228]: <warn> (00:24:EF:D1:B3:23): failed to look up interface index
+kernel: [248504.741929] NetworkManager[1228]: <info> BT device seife C510 (00:24:EF:D1:B3:23) added (DUN NAP)
+kernel: [248504.741939] NetworkManager[1228]: <info> (00:24:EF:D1:B3:23): new Bluetooth device (driver: 'bluez' ifindex: -1)
+kernel: [248504.741948] NetworkManager[1228]: <info> (00:24:EF:D1:B3:23): exported as /org/freedesktop/NetworkManager/Devices/9
+....
 
-Johan
+and moving the mouse gives:
+kernel: [248514.682684] input: Bluetooth Travel Mouse as /devices/pci0000:00/0000:00:1a.1/usb4/4-2/4-2:1.0/bluetooth/hci0/hci0:11/input24
+kernel: [248514.682950] generic-bluetooth 0005:046D:B002.000B: input,hidraw0: BLUETOOTH HID v48.09 Mouse [Bluetooth Travel Mouse] on 0C:60:76:88:2C:4C
 
---7AUc2qLy4jB3hD7Z
-Content-Type: text/x-diff; charset=us-ascii
-Content-Disposition: attachment; filename="0001-Revert-Cache-adapter-address-for-quick-lookup.patch"
-
->From 045cbbe3d50119388afc04abbde514e88138c08a Mon Sep 17 00:00:00 2001
-From: Johan Hedberg <johan.hedberg@nokia.com>
-Date: Mon, 8 Nov 2010 02:33:50 +0200
-Subject: [PATCH] Revert "Cache adapter address for quick lookup"
-
-This reverts commit a352058752e541539b09e55124d411a534cc14af.
----
- plugins/hciops.c |    8 +++-----
- 1 files changed, 3 insertions(+), 5 deletions(-)
-
-diff --git a/plugins/hciops.c b/plugins/hciops.c
-index c7be417..73a7455 100644
---- a/plugins/hciops.c
-+++ b/plugins/hciops.c
-@@ -56,12 +56,10 @@ static guint child_io_id = 0;
- static guint ctl_io_id = 0;
- 
- #define SK(index) devs[(index)].sk
--#define BDADDR(index) devs[(index)].bdaddr
- 
- static int max_dev = -1;
- static struct dev_info {
- 	int sk;
--	bdaddr_t bdaddr;
- } *devs = NULL;
- 
- static int ignore_device(struct hci_dev_info *di)
-@@ -1312,8 +1310,6 @@ static void device_devup_setup(int index)
- 	if (ignore_device(&di))
- 		return;
- 
--	bacpy(&BDADDR(index), &di.bdaddr);
--
- 	/* Set page timeout */
- 	if ((main_opts.flags & (1 << HCID_SET_PAGETO))) {
- 		write_page_timeout_cp cp;
-@@ -1939,7 +1935,9 @@ static int hciops_write_eir_data(int index, uint8_t *data)
- 
- static int hciops_read_bdaddr(int index, bdaddr_t *bdaddr)
- {
--	bacpy(bdaddr, &BDADDR(index));
-+	if (hci_read_bd_addr(SK(index), bdaddr, HCI_REQ_TIMEOUT) < 0)
-+		return -errno;
-+
- 	return 0;
- }
- 
+This all is missing with 4.78
 -- 
-1.7.1
+Stefan Seyfried
 
-
---7AUc2qLy4jB3hD7Z--
+"Any ideas, John?"
+"Well, surrounding them's out."
