@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 8/9] Add __btd_error_does_not_exist()
-Date: Mon,  8 Nov 2010 04:29:46 -0200
-Message-Id: <1289197787-16715-9-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1289197787-16715-8-git-send-email-padovan@profusion.mobi>
+Subject: [PATCH 7/9] Add __btd_error_busy()
+Date: Mon,  8 Nov 2010 04:29:45 -0200
+Message-Id: <1289197787-16715-8-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1289197787-16715-7-git-send-email-padovan@profusion.mobi>
 References: <1289197787-16715-1-git-send-email-padovan@profusion.mobi>
  <1289197787-16715-2-git-send-email-padovan@profusion.mobi>
  <1289197787-16715-3-git-send-email-padovan@profusion.mobi>
@@ -12,187 +12,117 @@ References: <1289197787-16715-1-git-send-email-padovan@profusion.mobi>
  <1289197787-16715-5-git-send-email-padovan@profusion.mobi>
  <1289197787-16715-6-git-send-email-padovan@profusion.mobi>
  <1289197787-16715-7-git-send-email-padovan@profusion.mobi>
- <1289197787-16715-8-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- plugins/service.c |   10 ++--------
- serial/port.c     |   12 ++----------
- serial/proxy.c    |    9 +--------
- src/adapter.c     |   13 ++++---------
- src/error.c       |    7 +++++++
- src/error.h       |    1 +
- 6 files changed, 17 insertions(+), 35 deletions(-)
+ audio/headset.c |    4 +---
+ audio/sink.c    |    6 ++----
+ audio/source.c  |    3 +--
+ input/device.c  |    6 ------
+ src/error.c     |    6 ++++++
+ src/error.h     |    1 +
+ 6 files changed, 11 insertions(+), 15 deletions(-)
 
-diff --git a/plugins/service.c b/plugins/service.c
-index f4b71ae..b9f4b97 100644
---- a/plugins/service.c
-+++ b/plugins/service.c
-@@ -356,12 +356,6 @@ static inline DBusMessage *not_authorized(DBusMessage *msg)
- 					"Not Authorized");
+diff --git a/audio/headset.c b/audio/headset.c
+index 017f02e..15853a8 100644
+--- a/audio/headset.c
++++ b/audio/headset.c
+@@ -1808,9 +1808,7 @@ static DBusMessage *hs_play(DBusConnection *conn, DBusMessage *msg,
+ 			hs->pending->msg = dbus_message_ref(msg);
+ 			return NULL;
+ 		}
+-		return g_dbus_create_error(msg, ERROR_INTERFACE
+-						".InProgress",
+-						"Play in Progress");
++		return __btd_error_busy(msg);
+ 	case HEADSET_STATE_PLAYING:
+ 		return g_dbus_create_error(msg, ERROR_INTERFACE
+ 						".AlreadyConnected",
+diff --git a/audio/sink.c b/audio/sink.c
+index 3c55c74..49c8bfc 100644
+--- a/audio/sink.c
++++ b/audio/sink.c
+@@ -423,8 +423,7 @@ static DBusMessage *sink_connect(DBusConnection *conn,
+ 						"Unable to get a session");
+ 
+ 	if (sink->connect || sink->disconnect)
+-		return g_dbus_create_error(msg, ERROR_INTERFACE ".Failed",
+-						"%s", strerror(EBUSY));
++		return __btd_error_busy(msg);
+ 
+ 	if (sink->stream_state >= AVDTP_STATE_OPEN)
+ 		return g_dbus_create_error(msg, ERROR_INTERFACE
+@@ -459,8 +458,7 @@ static DBusMessage *sink_disconnect(DBusConnection *conn,
+ 		return __btd_error_not_connected(msg);
+ 
+ 	if (sink->connect || sink->disconnect)
+-		return g_dbus_create_error(msg, ERROR_INTERFACE ".Failed",
+-						"%s", strerror(EBUSY));
++		return __btd_error_busy(msg);
+ 
+ 	if (sink->stream_state < AVDTP_STATE_OPEN) {
+ 		DBusMessage *reply = dbus_message_new_method_return(msg);
+diff --git a/audio/source.c b/audio/source.c
+index 4d47853..6767591 100644
+--- a/audio/source.c
++++ b/audio/source.c
+@@ -390,8 +390,7 @@ static DBusMessage *source_connect(DBusConnection *conn,
+ 						"Unable to get a session");
+ 
+ 	if (source->connect || source->disconnect)
+-		return g_dbus_create_error(msg, ERROR_INTERFACE ".Failed",
+-						"%s", strerror(EBUSY));
++		return __btd_error_busy(msg);
+ 
+ 	if (source->stream_state >= AVDTP_STATE_OPEN)
+ 		return g_dbus_create_error(msg, ERROR_INTERFACE
+diff --git a/input/device.c b/input/device.c
+index 1ccb2b0..6968b6c 100644
+--- a/input/device.c
++++ b/input/device.c
+@@ -325,12 +325,6 @@ static inline DBusMessage *not_supported(DBusMessage *msg)
+ 							"Not supported");
  }
  
--static inline DBusMessage *does_not_exist(DBusMessage *msg)
+-static inline DBusMessage *in_progress(DBusMessage *msg)
 -{
--	return g_dbus_create_error(msg, ERROR_INTERFACE ".DoesNotExist",
--					"Does Not Exist");
+-	return g_dbus_create_error(msg, ERROR_INTERFACE ".InProgress",
+-				"Device connection already in progress");
 -}
 -
- static int add_xml_record(DBusConnection *conn, const char *sender,
- 			struct service_adapter *serv_adapter,
- 			const char *record, dbus_uint32_t *handle)
-@@ -658,7 +652,7 @@ static DBusMessage *request_authorization(DBusConnection *conn,
- 
- 	auth = next_pending(serv_adapter);
- 	if (auth == NULL)
--		return does_not_exist(msg);
-+		return __btd_error_does_not_exist(msg);
- 
- 	if (serv_adapter->adapter)
- 		adapter_get_address(serv_adapter->adapter, &src);
-@@ -689,7 +683,7 @@ static DBusMessage *cancel_authorization(DBusConnection *conn,
- 
- 	auth = find_pending_by_sender(serv_adapter, sender);
- 	if (auth == NULL)
--		return does_not_exist(msg);
-+		return __btd_error_does_not_exist(msg);
- 
- 	if (serv_adapter->adapter)
- 		adapter_get_address(serv_adapter->adapter, &src);
-diff --git a/serial/port.c b/serial/port.c
-index b593311..c79243e 100644
---- a/serial/port.c
-+++ b/serial/port.c
-@@ -57,7 +57,6 @@
- #include "port.h"
- 
- #define SERIAL_PORT_INTERFACE	"org.bluez.Serial"
--#define ERROR_DOES_NOT_EXIST	"org.bluez.Error.DoesNotExist"
- 
- #define MAX_OPEN_TRIES		5
- #define OPEN_WAIT		300	/* ms. udev node creation retry wait */
-@@ -235,13 +234,6 @@ void port_release_all(void)
- 	g_slist_free(devices);
- }
- 
--static inline DBusMessage *does_not_exist(DBusMessage *msg,
--					const char *description)
--{
--	return g_dbus_create_error(msg, ERROR_INTERFACE ".DoesNotExist",
--							"%s", description);
--}
--
- static inline DBusMessage *failed(DBusMessage *msg, const char *description)
+ static inline DBusMessage *already_connected(DBusMessage *msg)
  {
- 	return g_dbus_create_error(msg, ERROR_INTERFACE ".Failed",
-@@ -497,7 +489,7 @@ static DBusMessage *port_connect(DBusConnection *conn,
- 
- 		channel = strtol(pattern, &endptr, 10);
- 		if ((endptr && *endptr != '\0') || channel < 1 || channel > 30)
--			return does_not_exist(msg, "Does not match");
-+			return __btd_error_does_not_exist(msg);
- 
- 		port = create_port(device, NULL, channel);
- 	}
-@@ -538,7 +530,7 @@ static DBusMessage *port_disconnect(DBusConnection *conn,
- 
- 	port = find_port(device->ports, dev);
- 	if (!port)
--		return does_not_exist(msg, "Port does not exist");
-+		return __btd_error_does_not_exist(msg);
- 
- 	if (!port->listener_id)
- 		return failed(msg, "Not connected");
-diff --git a/serial/proxy.c b/serial/proxy.c
-index de82f9a..9321bd4 100644
---- a/serial/proxy.c
-+++ b/serial/proxy.c
-@@ -133,13 +133,6 @@ static void proxy_free(struct serial_proxy *prx)
- 	g_free(prx);
- }
- 
--static inline DBusMessage *does_not_exist(DBusMessage *msg,
--					const char *description)
--{
--	return g_dbus_create_error(msg, ERROR_INTERFACE ".DoesNotExist",
--							"%s", description);
--}
--
- static inline DBusMessage *failed(DBusMessage *msg, const char *description)
- {
- 	return g_dbus_create_error(msg, ERROR_INTERFACE ".Failed",
-@@ -1115,7 +1108,7 @@ static DBusMessage *remove_proxy(DBusConnection *conn,
- 
- 	l = g_slist_find_custom(adapter->proxies, path, proxy_pathcmp);
- 	if (!l)
--		return does_not_exist(msg, "Invalid proxy path");
-+		return __btd_error_does_not_exist(msg);
- 
- 	prx = l->data;
- 
-diff --git a/src/adapter.c b/src/adapter.c
-index ffbc943..68ae6e4 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1829,9 +1829,8 @@ static DBusMessage *remove_device(DBusConnection *conn, DBusMessage *msg,
- 	l = g_slist_find_custom(adapter->devices,
- 			path, (GCompareFunc) device_path_cmp);
- 	if (!l)
--		return g_dbus_create_error(msg,
--				ERROR_INTERFACE ".DoesNotExist",
--				"Device does not exist");
-+		return __btd_error_does_not_exist(msg);
-+
- 	device = l->data;
- 
- 	if (device_is_temporary(device) || device_is_busy(device))
-@@ -1867,9 +1866,7 @@ static DBusMessage *find_device(DBusConnection *conn, DBusMessage *msg,
- 	l = g_slist_find_custom(adapter->devices,
- 			address, (GCompareFunc) device_address_cmp);
- 	if (!l)
--		return g_dbus_create_error(msg,
--				ERROR_INTERFACE ".DoesNotExist",
--				"Device does not exist");
-+		return __btd_error_does_not_exist(msg);
- 
- 	device = l->data;
- 
-@@ -1940,9 +1937,7 @@ static DBusMessage *unregister_agent(DBusConnection *conn, DBusMessage *msg,
- 	name = dbus_message_get_sender(msg);
- 
- 	if (!adapter->agent || !agent_matches(adapter->agent, name, path))
--		return g_dbus_create_error(msg,
--					ERROR_INTERFACE ".DoesNotExist",
--					"No such agent");
-+		return __btd_error_does_not_exist(msg);
- 
- 	agent_free(adapter->agent);
- 	adapter->agent = NULL;
+ 	return g_dbus_create_error(msg, ERROR_INTERFACE ".AlreadyConnected",
 diff --git a/src/error.c b/src/error.c
-index 8000467..c8e5ed7 100644
+index 8b91a03..8000467 100644
 --- a/src/error.c
 +++ b/src/error.c
-@@ -96,3 +96,10 @@ DBusMessage *__btd_error_not_available(DBusMessage *msg)
- 					".NotAvailable",
- 					"Operation currently not available");
+@@ -56,6 +56,12 @@ DBusMessage *__btd_error_invalid_args(DBusMessage *msg)
+ 					"Invalid arguments in method call");
  }
-+
-+DBusMessage *__btd_error_does_not_exist(DBusMessage *msg)
+ 
++DBusMessage *__btd_error_busy(DBusMessage *msg)
 +{
-+	return g_dbus_create_error(msg, ERROR_INTERFACE
-+					".DoesNotExist",
-+					"Does Not Exist");
++	return g_dbus_create_error(msg, ERROR_INTERFACE ".InProgress",
++					"Operation already in progress");
 +}
++
+ DBusMessage *__btd_error_already_exists(DBusMessage *msg)
+ {
+ 	return g_dbus_create_error(msg,
 diff --git a/src/error.h b/src/error.h
-index c023809..bd8d724 100644
+index dfdc933..c023809 100644
 --- a/src/error.h
 +++ b/src/error.h
-@@ -37,3 +37,4 @@ DBusMessage *__btd_error_not_supported(DBusMessage *msg);
+@@ -31,6 +31,7 @@ DBusHandlerResult error_common_reply(DBusConnection *conn, DBusMessage *msg,
+ 					const char *name, const char *descr);
+ 
+ DBusMessage *__btd_error_invalid_args(DBusMessage *msg);
++DBusMessage *__btd_error_busy(DBusMessage *msg);
+ DBusMessage *__btd_error_already_exists(DBusMessage *msg);
+ DBusMessage *__btd_error_not_supported(DBusMessage *msg);
  DBusMessage *__btd_error_not_connected(DBusMessage *msg);
- DBusMessage *__btd_error_not_available(DBusMessage *msg);
- DBusMessage *__btd_error_in_progress(DBusMessage *msg);
-+DBusMessage *__btd_error_does_not_exist(DBusMessage *msg);
 -- 
 1.7.3.1
 
