@@ -1,147 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/9] Add __btd_error_already_exists()
-Date: Mon,  8 Nov 2010 04:29:40 -0200
-Message-Id: <1289197787-16715-3-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1289197787-16715-2-git-send-email-padovan@profusion.mobi>
-References: <1289197787-16715-1-git-send-email-padovan@profusion.mobi>
- <1289197787-16715-2-git-send-email-padovan@profusion.mobi>
+Subject: [PATCH 0/9] Fixing DBus error system in BlueZ
+Date: Mon,  8 Nov 2010 04:29:38 -0200
+Message-Id: <1289197787-16715-1-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- audio/gateway.c  |    4 +---
- audio/media.c    |    3 +--
- network/server.c |    2 +-
- serial/proxy.c   |    3 +--
- src/adapter.c    |    8 ++------
- src/device.c     |    4 +---
- src/error.c      |    7 +++++++
- src/error.h      |    1 +
- 8 files changed, 15 insertions(+), 17 deletions(-)
+Hi,
 
-diff --git a/audio/gateway.c b/audio/gateway.c
-index ab7d310..ae0ee75 100644
---- a/audio/gateway.c
-+++ b/audio/gateway.c
-@@ -488,9 +488,7 @@ static DBusMessage *register_agent(DBusConnection *conn,
- 	const char *path, *name;
- 
- 	if (gw->agent)
--		return g_dbus_create_error(msg,
--					ERROR_INTERFACE ".AlreadyExists",
--					"Agent already exists");
-+		return __btd_error_already_exists(msg);
- 
- 	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
- 						DBUS_TYPE_INVALID))
-diff --git a/audio/media.c b/audio/media.c
-index 862cee6..8821ee1 100644
---- a/audio/media.c
-+++ b/audio/media.c
-@@ -318,8 +318,7 @@ static DBusMessage *register_endpoint(DBusConnection *conn, DBusMessage *msg,
- 	dbus_message_iter_next(&args);
- 
- 	if (media_adapter_find_endpoint(adapter, sender, path, NULL) != NULL)
--		return g_dbus_create_error(msg, ERROR_INTERFACE ".Failed",
--				"Endpoint already registered");
-+		return __btd_error_already_exists(msg);
- 
- 	dbus_message_iter_recurse(&args, &props);
- 	if (dbus_message_iter_get_arg_type(&props) != DBUS_TYPE_DICT_ENTRY)
-diff --git a/network/server.c b/network/server.c
-index ce1fe5e..41c9ec3 100644
---- a/network/server.c
-+++ b/network/server.c
-@@ -605,7 +605,7 @@ static DBusMessage *register_server(DBusConnection *conn,
- 		return failed(msg, "Invalid UUID");
- 
- 	if (ns->record_id)
--		return failed(msg, "Already registered");
-+		return __btd_error_already_exists(msg);
- 
- 	reply = dbus_message_new_method_return(msg);
- 	if (!reply)
-diff --git a/serial/proxy.c b/serial/proxy.c
-index 8e182b6..de82f9a 100644
---- a/serial/proxy.c
-+++ b/serial/proxy.c
-@@ -1058,8 +1058,7 @@ static DBusMessage *create_proxy(DBusConnection *conn,
- 	if (err == -EINVAL)
- 		return __btd_error_invalid_args(msg);
- 	else if (err == -EALREADY)
--		return g_dbus_create_error(msg, ERROR_INTERFACE ".AlreadyExist",
--						"Proxy already exists");
-+		return __btd_error_already_exists(msg);
- 	else if (err < 0)
- 		return g_dbus_create_error(msg, ERROR_INTERFACE "Failed",
- 				"Proxy creation failed (%s)", strerror(-err));
-diff --git a/src/adapter.c b/src/adapter.c
-index cc51816..ffbc943 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1742,9 +1742,7 @@ static DBusMessage *create_device(DBusConnection *conn,
- 		return __btd_error_invalid_args(msg);
- 
- 	if (adapter_find_device(adapter, address))
--		return g_dbus_create_error(msg,
--				ERROR_INTERFACE ".AlreadyExists",
--				"Device already exists");
-+		return __btd_error_already_exists(msg);
- 
- 	DBG("%s", address);
- 
-@@ -1906,9 +1904,7 @@ static DBusMessage *register_agent(DBusConnection *conn, DBusMessage *msg,
- 		return NULL;
- 
- 	if (adapter->agent)
--		return g_dbus_create_error(msg,
--				ERROR_INTERFACE ".AlreadyExists",
--				"Agent already exists");
-+		return __btd_error_already_exists(msg);
- 
- 	cap = parse_io_capability(capability);
- 	if (cap == IO_CAPABILITY_INVALID)
-diff --git a/src/device.c b/src/device.c
-index ef1a910..6d110dc 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1944,9 +1944,7 @@ DBusMessage *device_create_bonding(struct btd_device *device,
- 	str = textfile_caseget(filename, dstaddr);
- 	if (str) {
- 		free(str);
--		return g_dbus_create_error(msg,
--				ERROR_INTERFACE ".AlreadyExists",
--				"Bonding already exists");
-+		return __btd_error_already_exists(msg);
- 	}
- 
- 	/* If our IO capability is NoInputNoOutput use medium security
-diff --git a/src/error.c b/src/error.c
-index a30c050..e268163 100644
---- a/src/error.c
-+++ b/src/error.c
-@@ -55,3 +55,10 @@ DBusMessage *__btd_error_invalid_args(DBusMessage *msg)
- 					".InvalidArguments",
- 					"Invalid arguments in method call");
- }
-+
-+DBusMessage *__btd_error_already_exists(DBusMessage *msg)
-+{
-+	return g_dbus_create_error(msg,
-+				ERROR_INTERFACE ".AlreadyExists",
-+				"Already Exists");
-+}
-diff --git a/src/error.h b/src/error.h
-index 51c094c..284889f 100644
---- a/src/error.h
-+++ b/src/error.h
-@@ -31,3 +31,4 @@ DBusHandlerResult error_common_reply(DBusConnection *conn, DBusMessage *msg,
- 					const char *name, const char *descr);
- 
- DBusMessage *__btd_error_invalid_args(DBusMessage *msg);
-+DBusMessage *__btd_error_already_exists(DBusMessage *msg);
+Here are some patches that try to fix the mess of reporting error to
+DBus inside BlueZ. It follows the oFono and ConnMan error system.
+
+The goal is to get ride of any directly call to g_dbus_create_error()
+inside bluez code, changing that to __btd_error_*. This patch set
+doesn't fix all of them yet, but is a very good start. Please review.
+
+
+Gustavo F. Padovan (9):
+  Create __btd_error_invalid_args()
+  Add __btd_error_already_exists()
+  Add __btd_error_not_supported()
+  Add __btd_error_not_connected()
+  Add __btd_error_in_progress()
+  Add __btd_error_not_available()
+  Add __btd_error_busy()
+  Add __btd_error_does_not_exist()
+  Add __btd_error_not_authorized()
+
+ attrib/client.c          |   28 ++++-----------
+ audio/control.c          |   16 ++-------
+ audio/device.c           |    6 +--
+ audio/gateway.c          |   16 ++-------
+ audio/headset.c          |   58 ++++++++++-----------------------
+ audio/media.c            |   12 ++----
+ audio/sink.c             |   10 ++----
+ audio/source.c           |    7 +---
+ audio/telephony-dummy.c  |   25 ++++++--------
+ audio/telephony-maemo5.c |   11 ++----
+ audio/telephony-maemo6.c |   11 ++----
+ audio/transport.c        |   14 ++------
+ health/hdp.c             |   58 ++++++++------------------------
+ input/device.c           |    8 +----
+ network/server.c         |    9 +----
+ plugins/service.c        |   56 ++++++++------------------------
+ serial/port.c            |   20 +----------
+ serial/proxy.c           |   31 ++++-------------
+ src/adapter.c            |   81 +++++++++++++++++-----------------------------
+ src/device.c             |   49 ++++++++--------------------
+ src/error.c              |   62 +++++++++++++++++++++++++++++++++++
+ src/error.h              |   10 ++++++
+ src/manager.c            |    7 ----
+ 23 files changed, 221 insertions(+), 384 deletions(-)
+
 -- 
 1.7.3.1
 
