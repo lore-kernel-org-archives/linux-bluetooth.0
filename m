@@ -1,106 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 9 Nov 2010 01:15:22 -0200
+Date: Mon, 8 Nov 2010 19:15:31 -0200
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: gimli <gimli@dark-green.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/1] Add MacBookAir3,1(2) support
-Message-ID: <20101109031522.GA27554@vigoh>
-References: <20101102152454.GC11778@core.coreip.homeip.net>
- <1288712282.3322.181.camel@aeonflux>
- <20101103182159.GA17943@vigoh>
- <4CD1B30C.6010904@dark-green.com>
- <20101103191429.GA21114@vigoh>
- <4CD1C3E5.3030507@dark-green.com>
- <20101103215106.GA21950@vigoh>
- <c528a2a6fd9e96601997600559812f10@mognix.dark-green.com>
- <20101104023923.GA24092@vigoh>
- <ffd9073aaab3142681f1b1340aea1cf0@mognix.dark-green.com>
+To: "John W. Linville" <linville@tuxdriver.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org
+Subject: Re: pull request: bluetooth-2.6 2010-10-30
+Message-ID: <20101108211531.GC19199@vigoh>
+References: <20101030031503.GB24188@vigoh>
+ <20101108205704.GB2310@tuxdriver.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <ffd9073aaab3142681f1b1340aea1cf0@mognix.dark-green.com>
+In-Reply-To: <20101108205704.GB2310@tuxdriver.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* gimli <gimli@dark-green.com> [2010-11-04 08:04:33 +0100]:
+Hi John,
 
-> bluetooth: Add MacBookAir3,1(2) support
-> 
-> Adding the new MacBookAir3,1(2) to btusb.
-> 
-> Output without the patch and btusb loaded :
-> 
-> T:  Bus=03 Lev=02 Prnt=03 Port=02 Cnt=01 Dev#=  6 Spd=12  MxCh= 0
-> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=05ac ProdID=821b Rev= 0.34
-> S:  Manufacturer=Apple Inc.
-> S:  Product=Bluetooth USB Host Controller
-> C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  32 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  32 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  64 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  64 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  64 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  64 Ivl=1ms
-> I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-> E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-> I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
-> 
-> Output with the patch and btusb loaded :
-> 
-> T:  Bus=03 Lev=02 Prnt=03 Port=02 Cnt=01 Dev#=  6 Spd=12  MxCh= 0
-> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=05ac ProdID=821b Rev= 0.34
-> S:  Manufacturer=Apple Inc.
-> S:  Product=Bluetooth USB Host Controller
-> C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  32 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  32 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  64 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  64 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  64 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  64 Ivl=1ms
-> I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-> E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-> I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
-> 
-> Signed-off-by: Edgar (gimli) Hucek <gimli@dark-green.com>
+* John W. Linville <linville@tuxdriver.com> [2010-11-08 15:57:05 -0500]:
 
-Applied, thanks. (And next time please fix your From: to like the
-Signed-off-by message)
+> On Sat, Oct 30, 2010 at 04:15:03AM +0100, Gustavo F. Padovan wrote:
+> > Hi John,
+> > 
+> > The following batch contains some bugfixes for 2.6.37. A fix for unaligned
+> > access in L2CAP, a Kconfig error, and two fixes related to security of
+> > the Bluetooth links. There is also a one line patch from Matthew Garret,
+> > that enables USB autosuspend for btusb module, which shall be completely
+> > safe. Please pull, thanks.
+> > 
+> > 
+> > The following changes since commit c1758012971e0410790b2bc96a77e26d7b286593:
+> > 
+> >   igb: Fix unused variable warning. (2010-10-27 19:43:55 -0700)
+> > 
+> > are available in the git repository at:
+> >   git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git master
+> 
+> Gustavo,
+> 
+> I'm happy to take your patches.  But if you want me to pull from you
+> then I need your bluetooth-2.6 tree to be based upon wireless-2.6
+> (and bluetooth-next-2.6 to be based upon wireless-next-2.6), with only
+> the bluetooth patches on top.
+> 
+> If that is a problem, then you can send me a stack of patches for
+> me to apply manually instead.  Otherwise I will get patches I don't
+> necessarily want pulled into wireless-2.6 and could even accidentally
+> push patches to davem that he might not want either.
+
+No problem to me, sure I can rebase on top of your trees. I'll re-base my
+trees and resend the pull request to you.
 
 -- 
 Gustavo F. Padovan
