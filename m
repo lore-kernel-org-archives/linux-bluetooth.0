@@ -1,46 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 8 Nov 2010 14:33:30 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/9] Fixing DBus error system in BlueZ
-Message-ID: <20101108123330.GA1751@jh-x301>
-References: <1289197787-16715-1-git-send-email-padovan@profusion.mobi>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1289197787-16715-1-git-send-email-padovan@profusion.mobi>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 8 Nov 2010 12:17:15 +0100
+From: Antonio Ospite <ospite@studenti.unina.it>
+To: Jiri Kosina <jkosina@suse.cz>
+Cc: Alan Ott <alan@signal11.us>, Marcel Holtmann <marcel@holtmann.org>,
+ "David S. Miller" <davem@davemloft.net>, Stefan Achatz
+ <erazor_de@users.sourceforge.net>, Alexey Dobriyan <adobriyan@gmail.com>,
+ Tejun Heo <tj@kernel.org>, Alan Stern <stern@rowland.harvard.edu>, Greg
+ Kroah-Hartman <gregkh@suse.de>, Stephane Chatty <chatty@enac.fr>, Michael
+ Poole <mdpoole@troilus.org>, Bastien Nocera <hadess@hadess.net>, Eric
+ Dumazet <eric.dumazet@gmail.com>, linux-input@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v4 0/2] Get and Set Feature Reports on HIDRAW (USB and
+ Bluetooth)
+Message-Id: <20101108121715.ae2da4af.ospite@studenti.unina.it>
+In-Reply-To: <alpine.LNX.2.00.1011011523150.15851@pobox.suse.cz>
+References: <1281442367.12579.206.camel@localhost.localdomain>
+	<1281990059-3562-1-git-send-email-alan@signal11.us>
+	<alpine.LNX.2.00.1008231459370.1019@pobox.suse.cz>
+	<alpine.LNX.2.00.1009021724480.26813@pobox.suse.cz>
+	<alpine.LNX.2.00.1009221408330.26813@pobox.suse.cz>
+	<alpine.LNX.2.00.1011011523150.15851@pobox.suse.cz>
+Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA1";
+ boundary="Signature=_Mon__8_Nov_2010_12_17_15_+0100_wOAKV+vaqM7S8DO7"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+--Signature=_Mon__8_Nov_2010_12_17_15_+0100_wOAKV+vaqM7S8DO7
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 08, 2010, Gustavo F. Padovan wrote:
-> Here are some patches that try to fix the mess of reporting error to
-> DBus inside BlueZ. It follows the oFono and ConnMan error system.
-> 
-> The goal is to get ride of any directly call to g_dbus_create_error()
-> inside bluez code, changing that to __btd_error_*. This patch set
-> doesn't fix all of them yet, but is a very good start. Please review.
-> 
-> 
-> Gustavo F. Padovan (9):
->   Create __btd_error_invalid_args()
->   Add __btd_error_already_exists()
->   Add __btd_error_not_supported()
->   Add __btd_error_not_connected()
->   Add __btd_error_in_progress()
->   Add __btd_error_not_available()
->   Add __btd_error_busy()
->   Add __btd_error_does_not_exist()
->   Add __btd_error_not_authorized()
+On Mon, 1 Nov 2010 15:23:34 -0400 (EDT)
+Jiri Kosina <jkosina@suse.cz> wrote:
 
-The patches seem fine to me, but before pushing upstream I'd like to
-understand the reason for prefixing these with  with __btd instead of
-btd. What's the criteria used to decide what to use and when and why is
-__btd the correct choice for these new functions? My first guess would
-have been that __btd is for things only accessible by the core-daemon
-whereas btd is for functions exported to plugins, but that doesn't seem
-to be the case with your patches since many of these __btd functions get
-called from plugins.
+> On Wed, 22 Sep 2010, Jiri Kosina wrote:
+>=20
+> > > > > This is version 4. Built against 2.6.35+ revision 320b2b8de12698 .
+> > > > >=20
+> > > > > Alan Ott (2):
+> > > > >   HID: Add Support for Setting and Getting Feature Reports from h=
+idraw
+> > > > >   Bluetooth: hidp: Add support for hidraw  HIDIOCGFEATURE  and
+> > > > >     HIDIOCSFEATURE
+[...]
+> > > ... Marcel?
+> > >=20
+> > > I'd really like not to miss 2.6.37 merge window with this.
+> >=20
+> > Seemingly I have not enought powers to get statement from Marcel here=20
+> > these days/weeks.
+> >=20
+> > Davem, would you perhaps be able to step in here?
+>=20
+> Marcel, any word on this patchset by chance?
+>=20
 
-Johan
+Hopefully Alan will manage to send a v5 sometime soon, Alan I don't want
+to pressure you, just remember to CC Gustavo F. Padovan (see
+MAINTAINERS) as he looks to be the most active bluetooth maintainer
+these days.
+
+Thanks,
+   Antonio
+
+--=20
+Antonio Ospite
+http://ao2.it
+
+PGP public key ID: 0x4553B001
+
+A: Because it messes up the order in which people normally read text.
+   See http://en.wikipedia.org/wiki/Posting_style
+Q: Why is top-posting such a bad thing?
+
+--Signature=_Mon__8_Nov_2010_12_17_15_+0100_wOAKV+vaqM7S8DO7
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAkzX3DsACgkQ5xr2akVTsAEZagCgmarMRB+cv6ZnfEtdAF8ekkkf
+/f0Anj1kzzXCG73SZ+dLjuMVQiyQojpe
+=6gey
+-----END PGP SIGNATURE-----
+
+--Signature=_Mon__8_Nov_2010_12_17_15_+0100_wOAKV+vaqM7S8DO7--
