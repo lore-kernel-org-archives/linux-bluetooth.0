@@ -1,93 +1,161 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arnd Bergmann <arnd@arndb.de>
-To: "Par-Gunnar Hjalmdahl" <pghatwork@gmail.com>
-Subject: Re: [PATCH 5/9] mfd: Add UART support for the ST-Ericsson CG2900.
-Date: Mon, 8 Nov 2010 06:24:49 +0100
-Cc: Alan Cox <alan@lxorguk.ukuu.org.uk>, linus.walleij@stericsson.com,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Lukasz.Rymanowski@tieto.com
-References: <AANLkTi=XTUau_GbASJEUBgsZ_FYYmRAX6W43YtRdv2wS@mail.gmail.com> <20101031120429.1ca38140@pyx> <AANLkTimEYAmocFh_c-KftpL2zRm+LaHzgJOBX31iicLj@mail.gmail.com>
-In-Reply-To: <AANLkTimEYAmocFh_c-KftpL2zRm+LaHzgJOBX31iicLj@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201011080624.49224.arnd@arndb.de>
+In-Reply-To: <1289197787-16715-3-git-send-email-padovan@profusion.mobi>
+References: <1289197787-16715-1-git-send-email-padovan@profusion.mobi>
+ <1289197787-16715-2-git-send-email-padovan@profusion.mobi> <1289197787-16715-3-git-send-email-padovan@profusion.mobi>
+From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+Date: Tue, 9 Nov 2010 09:22:56 +0100
+Message-ID: <AANLkTinK_6hrW+FJMdfoUPuq+V5EcqaXVQNd0mWu4vZR@mail.gmail.com>
+Subject: Re: [PATCH 2/9] Add __btd_error_already_exists()
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Friday 05 November 2010, Par-Gunnar Hjalmdahl wrote:
-> 2010/10/31, Alan Cox <alan@lxorguk.ukuu.org.uk>:
-> >> It's about the ldisc number. Both bluetooth and cg2900 register themselves
-> >> to ldisc 15 (N_HCI). A user doing TIOCSETD can only get one of the two.
-> >
-> > Ah I see - I had assumed any actual final merge would be assigning it a
-> > new LDISC code as is required.
-> 
-> Sorry for not answering quicker. We in my department have been
-> discussing new design as well as trying out some solutions.
-> 
-> As an answer to previous comments, both from Arnd and Alan, we would
-> like to do the following:
->  - Introduce a new ldisc called N_H4_COMBO with a ldisc driver
-> accordingly that will be placed under drivers/char
+Hi,
 
-I'm not convinced, although that's what Alan was suggesting. I'd like
-to hear from the bluetooth people what they think about this.
+2010/11/8 Gustavo F. Padovan <padovan@profusion.mobi>:
+> ---
+>  audio/gateway.c  |    4 +---
+>  audio/media.c    |    3 +--
+>  network/server.c |    2 +-
+>  serial/proxy.c   |    3 +--
+>  src/adapter.c    |    8 ++------
+>  src/device.c     |    4 +---
+>  src/error.c      |    7 +++++++
+>  src/error.h      |    1 +
+>  8 files changed, 15 insertions(+), 17 deletions(-)
+>
+> diff --git a/audio/gateway.c b/audio/gateway.c
+> index ab7d310..ae0ee75 100644
+> --- a/audio/gateway.c
+> +++ b/audio/gateway.c
+> @@ -488,9 +488,7 @@ static DBusMessage *register_agent(DBusConnection *conn,
+>        const char *path, *name;
+>
+>        if (gw->agent)
+> -               return g_dbus_create_error(msg,
+> -                                       ERROR_INTERFACE ".AlreadyExists",
+> -                                       "Agent already exists");
+> +               return __btd_error_already_exists(msg);
+>
+>        if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
+>                                                DBUS_TYPE_INVALID))
+> diff --git a/audio/media.c b/audio/media.c
+> index 862cee6..8821ee1 100644
+> --- a/audio/media.c
+> +++ b/audio/media.c
+> @@ -318,8 +318,7 @@ static DBusMessage *register_endpoint(DBusConnection *conn, DBusMessage *msg,
+>        dbus_message_iter_next(&args);
+>
+>        if (media_adapter_find_endpoint(adapter, sender, path, NULL) != NULL)
+> -               return g_dbus_create_error(msg, ERROR_INTERFACE ".Failed",
+> -                               "Endpoint already registered");
+> +               return __btd_error_already_exists(msg);
+>
+>        dbus_message_iter_recurse(&args, &props);
+>        if (dbus_message_iter_get_arg_type(&props) != DBUS_TYPE_DICT_ENTRY)
+> diff --git a/network/server.c b/network/server.c
+> index ce1fe5e..41c9ec3 100644
+> --- a/network/server.c
+> +++ b/network/server.c
+> @@ -605,7 +605,7 @@ static DBusMessage *register_server(DBusConnection *conn,
+>                return failed(msg, "Invalid UUID");
+>
+>        if (ns->record_id)
+> -               return failed(msg, "Already registered");
+> +               return __btd_error_already_exists(msg);
+>
+>        reply = dbus_message_new_method_return(msg);
+>        if (!reply)
+> diff --git a/serial/proxy.c b/serial/proxy.c
+> index 8e182b6..de82f9a 100644
+> --- a/serial/proxy.c
+> +++ b/serial/proxy.c
+> @@ -1058,8 +1058,7 @@ static DBusMessage *create_proxy(DBusConnection *conn,
+>        if (err == -EINVAL)
+>                return __btd_error_invalid_args(msg);
+>        else if (err == -EALREADY)
+> -               return g_dbus_create_error(msg, ERROR_INTERFACE ".AlreadyExist",
+> -                                               "Proxy already exists");
+> +               return __btd_error_already_exists(msg);
+>        else if (err < 0)
+>                return g_dbus_create_error(msg, ERROR_INTERFACE "Failed",
+>                                "Proxy creation failed (%s)", strerror(-err));
+> diff --git a/src/adapter.c b/src/adapter.c
+> index cc51816..ffbc943 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -1742,9 +1742,7 @@ static DBusMessage *create_device(DBusConnection *conn,
+>                return __btd_error_invalid_args(msg);
+>
+>        if (adapter_find_device(adapter, address))
+> -               return g_dbus_create_error(msg,
+> -                               ERROR_INTERFACE ".AlreadyExists",
+> -                               "Device already exists");
+> +               return __btd_error_already_exists(msg);
+>
+>        DBG("%s", address);
+>
+> @@ -1906,9 +1904,7 @@ static DBusMessage *register_agent(DBusConnection *conn, DBusMessage *msg,
+>                return NULL;
+>
+>        if (adapter->agent)
+> -               return g_dbus_create_error(msg,
+> -                               ERROR_INTERFACE ".AlreadyExists",
+> -                               "Agent already exists");
+> +               return __btd_error_already_exists(msg);
+>
+>        cap = parse_io_capability(capability);
+>        if (cap == IO_CAPABILITY_INVALID)
+> diff --git a/src/device.c b/src/device.c
+> index ef1a910..6d110dc 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -1944,9 +1944,7 @@ DBusMessage *device_create_bonding(struct btd_device *device,
+>        str = textfile_caseget(filename, dstaddr);
+>        if (str) {
+>                free(str);
+> -               return g_dbus_create_error(msg,
+> -                               ERROR_INTERFACE ".AlreadyExists",
+> -                               "Bonding already exists");
+> +               return __btd_error_already_exists(msg);
+>        }
+>
+>        /* If our IO capability is NoInputNoOutput use medium security
+> diff --git a/src/error.c b/src/error.c
+> index a30c050..e268163 100644
+> --- a/src/error.c
+> +++ b/src/error.c
+> @@ -55,3 +55,10 @@ DBusMessage *__btd_error_invalid_args(DBusMessage *msg)
+>                                        ".InvalidArguments",
+>                                        "Invalid arguments in method call");
+>  }
+> +
+> +DBusMessage *__btd_error_already_exists(DBusMessage *msg)
 
-Could you summarize why you think that cg2900 is different enough from
-an HCI to require a different line discipline? From your previous
-explanation it sounded like it was mostly added functionality,
-not something entirely different.
+I also think that an additional message will be great for a better description.
 
->  - Keep CG2900 driver as an MFD. We will however register the MFD
-> cells in each driver and remove the function API. The functions
-> (write, reset, etc) will instead be placed in each MFD cell using
-> function pointers. This way we can use different functions for
-> different channels as needed. By placing the MFD cell registration in
-> each chip driver we will also only expose the channels that are
-> actually supported by each chip. This way we can also remove the
-> pretty ugly matching between the devices and respective H4 channel as
-> well as the add_h4_user function and the similar other functions.
-
-Ok, excellent.
-
-> We were thinking about if we could re-use the existing hci_ldisc
-> driver. As stated before the big problem here is however that
-> hci_ldisc directly registers to the Bluetooth stack. We could separate
-> the data for FM and GPS in the protocol driver, but it is pretty ugly
-> to have two separate data paths within the same driver.
-
-One of us must be misreading the code. As far as I can tell, hci_ldisc
-does not register to the bluetooth stack at all, it just provides
-the basic multiplex for multiple HCI protocols, while hci_h4.c
-communicates to the bluetooth stack.
-
-If I read it correctly, that means that you can still use hci_ldisc,
-but need to add another protocol next to hci_h4 and hci_bcsp for
-your cg2900.
-
-> As I've state earlier this would also not work with other transports
-> such as SPI.I appreciate Arnd's suggestion to create a TTY for SPI,
-> but I think that would overcomplicate the situation and create a
-> solution more complex than actually needed. We think that creating a
-> new ldisc creates a cleaner solution. It will to some extent remind of
-> hci_ldisc, but it will not register to any framework except tty.
-
-How would registering ony to tty solve the problem of SPI?
-
-If you just add another hci_cg2900 module, it can register to both
-the hci_ldisc and the spi code.
-
-> We've thought about if we should switch cg2900 to a bus, but after
-> discussing this we feel that CG2900 has such individual
-> characteristics that it could be hard to create a bus that would suite
-> it. We therefore will keep the MFD type. We might in the future add
-> new chips to the driver, but they will most likely not require so much
-> rework of the driver that we will have to create something completely
-> new. We will rather create a lib file that contains common code to
-> reduce total code size of the driver.
-
-Yes, makes sense.
-
-	Arnd
-
+> +{
+> +       return g_dbus_create_error(msg,
+> +                               ERROR_INTERFACE ".AlreadyExists",
+> +                               "Already Exists");
+> +}
+> diff --git a/src/error.h b/src/error.h
+> index 51c094c..284889f 100644
+> --- a/src/error.h
+> +++ b/src/error.h
+> @@ -31,3 +31,4 @@ DBusHandlerResult error_common_reply(DBusConnection *conn, DBusMessage *msg,
+>                                        const char *name, const char *descr);
+>
+>  DBusMessage *__btd_error_invalid_args(DBusMessage *msg);
+> +DBusMessage *__btd_error_already_exists(DBusMessage *msg);
+> --
+> 1.7.3.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
