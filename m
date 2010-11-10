@@ -1,93 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 1/4] Sim Access Profile API
+Subject: Re: [PATCH] Move gattrib source files to src directory
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, suraj@atheros.com,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	joakim.xj.ceder@stericsson.com
-In-Reply-To: <1288791271-13857-2-git-send-email-waldemar.rymarkiewicz@tieto.com>
-References: <1288791271-13857-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
-	 <1288791271-13857-2-git-send-email-waldemar.rymarkiewicz@tieto.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+In-Reply-To: <20101105050602.GD25270@jh-x301>
+References: <1288901266-32547-1-git-send-email-claudio.takahasi@openbossa.org>
+	 <20101105050602.GD25270@jh-x301>
 Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 10 Nov 2010 14:33:10 +0900
-Message-ID: <1289367190.9615.235.camel@aeonflux>
+Date: Wed, 10 Nov 2010 14:26:35 +0900
+Message-ID: <1289366795.9615.232.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Waldemar,
+Hi Johan,
 
-> New API for Sim Access Profile.
-> ---
->  Makefile.am     |    2 +-
->  doc/sap-api.txt |   57 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 58 insertions(+), 1 deletions(-)
->  create mode 100644 doc/sap-api.txt
+> > gattrib related functions will be required during the device creation
+> > for GATT enabled devices(BR/EDR and LE). Primary service discovery is
+> > a pre-condition to probe the GATT device driver.
+> > ---
+> >  Makefile.am      |    7 +-
+> >  attrib/att.c     |  764 ------------------------------------------------------
+> >  attrib/att.h     |  206 ---------------
+> >  attrib/gatt.c    |  113 --------
+> >  attrib/gatt.h    |   43 ---
+> >  attrib/gattrib.c |  535 --------------------------------------
+> >  attrib/gattrib.h |   72 -----
+> >  src/att.c        |  764 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  src/att.h        |  206 +++++++++++++++
+> >  src/gatt.c       |  113 ++++++++
+> >  src/gatt.h       |   43 +++
+> >  src/gattrib.c    |  535 ++++++++++++++++++++++++++++++++++++++
+> >  src/gattrib.h    |   72 +++++
+> >  13 files changed, 1736 insertions(+), 1737 deletions(-)
+> >  delete mode 100644 attrib/att.c
+> >  delete mode 100644 attrib/att.h
+> >  delete mode 100644 attrib/gatt.c
+> >  delete mode 100644 attrib/gatt.h
+> >  delete mode 100644 attrib/gattrib.c
+> >  delete mode 100644 attrib/gattrib.h
+> >  create mode 100644 src/att.c
+> >  create mode 100644 src/att.h
+> >  create mode 100644 src/gatt.c
+> >  create mode 100644 src/gatt.h
+> >  create mode 100644 src/gattrib.c
+> >  create mode 100644 src/gattrib.h
 > 
-> diff --git a/Makefile.am b/Makefile.am
-> index 873f2df..e1183de 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -352,7 +352,7 @@ EXTRA_DIST += doc/manager-api.txt \
->  		doc/service-api.txt doc/agent-api.txt doc/attribute-api.txt \
->  		doc/serial-api.txt doc/network-api.txt \
->  		doc/input-api.txt doc/audio-api.txt doc/control-api.txt \
-> -		doc/hfp-api.txt doc/assigned-numbers.txt
-> +		doc/hfp-api.txt doc/assigned-numbers.txt doc/sap-api.txt
->  
->  AM_YFLAGS = -d
->  
-> diff --git a/doc/sap-api.txt b/doc/sap-api.txt
-> new file mode 100644
-> index 0000000..7951f56
-> --- /dev/null
-> +++ b/doc/sap-api.txt
-> @@ -0,0 +1,57 @@
-> +BlueZ D-Bus Sim Access Profile API description
-> +***********************************
-> +
-> +Copyright (C) 2010 ST-Ericsson SA
-> +
-> +
-> +Sim Access Profile hierarchy
-> +============================
-> +
-> +Service		org.bluez
-> +Interface	org.bluez.SimAccess
-> +Object path	[variable prefix]/{hci0,hci1,...}
-> +
-> +Methods		void Enable()
-> +
-> +			Start up SAP server and register SDP record for it.
-> +
-> +			Possible errors: org.bluez.Error.Failed
-> +
-> +		void Disable()
-> +
-> +			Shudown SAP server and remove the SDP record.
-> +
-> +			Possible errors: org.bluez.Error.Failed
+> I'll wait a little bit with this one. I agree that the gattrib
+> funcionality needs to be available within the core daemon, but does that
+> necessarily mean that the source files for need to be in src? It'd be
+> good to get some comment from Marcel about this too.
 
-I don't like this. If you have properties then just changing the
-property should be enough. So a SetProperty is more appropriate.
+I think that this change is actually bad. Since we have non-recursive
+build system, we are not bound to have code under the same directory.
 
-> +
-> +		void Disconnect(boolean type)
-> +
-> +			Disconnect SAP client from the server. The 'type'
-> +			parameter indicates disconnection type.
-> +
-> +			True  - gracefull disconnection
-> +			False - immediate disconnection
-> +
-> +			Possible errors: org.bluez.Error.Failed
-
-I don't like this style of method names at all. Using method names like
-GracefulDisconnect and ImmediateDisconnect would be better.
-
-However I am not sure we should differentiate here at all. We should
-always to the graceful disconnect. What will the immediate disconnect
-bring us?
+So my advise would be to not do this and just link the attrib/* code
+into the bluetoothd.
 
 Regards
 
