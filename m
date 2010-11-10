@@ -1,55 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCHv4 0/2] Fix kernel crash in rfcomm/l2cap
+Subject: Re: [PATCH 1/4] Sim Access Profile API
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1288780365-32099-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1288780365-32099-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org, suraj@atheros.com,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	joakim.xj.ceder@stericsson.com
+In-Reply-To: <1288791271-13857-2-git-send-email-waldemar.rymarkiewicz@tieto.com>
+References: <1288791271-13857-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+	 <1288791271-13857-2-git-send-email-waldemar.rymarkiewicz@tieto.com>
 Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 10 Nov 2010 14:36:36 +0900
-Message-ID: <1289367396.9615.238.camel@aeonflux>
+Date: Wed, 10 Nov 2010 14:33:10 +0900
+Message-ID: <1289367190.9615.235.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Waldemar,
 
-> Yet another version of patches fixing kernel crash in RFCOMM / L2CAP.
-> *v4: taken Gustavo comments about timer HZ -> HZ/5
+> New API for Sim Access Profile.
+> ---
+>  Makefile.am     |    2 +-
+>  doc/sap-api.txt |   57 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 58 insertions(+), 1 deletions(-)
+>  create mode 100644 doc/sap-api.txt
 > 
-> Do not delete l2cap channel and socket sk when sk is owned by user.
-> To delete l2cap channel standard timer is used.
-> 
-> lock_sock and release_sock do not hold a normal spinlock directly but 
-> instead hold the owner field. This means bh_lock_sock can still execute
-> even if the socket is "locked". More info can be found here:
-> http://www.linuxfoundation.org/collaborate/workgroups/networking/socketlocks
-> 
-> When sending following sequence:
-> ...
-> No.     Time        Source                Destination           Protocol Info
->     89 1.951202            RFCOMM   Rcvd DISC DLCI=20
->     90 1.951324            RFCOMM   Sent UA DLCI=20
->     91 1.959381            HCI_EVT   Number of Completed Packets
->     92 1.966461            RFCOMM   Rcvd DISC DLCI=0
->     93 1.966492            L2CAP    Rcvd Disconnect Request
->     94 1.972595            L2CAP    Sent Disconnect Response
-> 
-> ...
-> 
-> krfcommd kernel thread is preempted with l2cap tasklet which remove l2cap_conn
-> (L2CAP connection handler structure). Then rfcomm thread tries to send RFCOMM
-> UA which is reply to RFCOMM DISC and when de-referencing l2cap_conn crash
-> happens.
+> diff --git a/Makefile.am b/Makefile.am
+> index 873f2df..e1183de 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -352,7 +352,7 @@ EXTRA_DIST += doc/manager-api.txt \
+>  		doc/service-api.txt doc/agent-api.txt doc/attribute-api.txt \
+>  		doc/serial-api.txt doc/network-api.txt \
+>  		doc/input-api.txt doc/audio-api.txt doc/control-api.txt \
+> -		doc/hfp-api.txt doc/assigned-numbers.txt
+> +		doc/hfp-api.txt doc/assigned-numbers.txt doc/sap-api.txt
+>  
+>  AM_YFLAGS = -d
+>  
+> diff --git a/doc/sap-api.txt b/doc/sap-api.txt
+> new file mode 100644
+> index 0000000..7951f56
+> --- /dev/null
+> +++ b/doc/sap-api.txt
+> @@ -0,0 +1,57 @@
+> +BlueZ D-Bus Sim Access Profile API description
+> +***********************************
+> +
+> +Copyright (C) 2010 ST-Ericsson SA
+> +
+> +
+> +Sim Access Profile hierarchy
+> +============================
+> +
+> +Service		org.bluez
+> +Interface	org.bluez.SimAccess
+> +Object path	[variable prefix]/{hci0,hci1,...}
+> +
+> +Methods		void Enable()
+> +
+> +			Start up SAP server and register SDP record for it.
+> +
+> +			Possible errors: org.bluez.Error.Failed
+> +
+> +		void Disable()
+> +
+> +			Shudown SAP server and remove the SDP record.
+> +
+> +			Possible errors: org.bluez.Error.Failed
 
-so I assume you have tested this extensively with various RFCOMM corner
-cases like incoming RFCOMM. Since a lot of profiles require proper
-disconnects and we have to ensure that our reference counting is
-correct.
+I don't like this. If you have properties then just changing the
+property should be enough. So a SetProperty is more appropriate.
 
-Other then that it seems fine to me.
+> +
+> +		void Disconnect(boolean type)
+> +
+> +			Disconnect SAP client from the server. The 'type'
+> +			parameter indicates disconnection type.
+> +
+> +			True  - gracefull disconnection
+> +			False - immediate disconnection
+> +
+> +			Possible errors: org.bluez.Error.Failed
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+I don't like this style of method names at all. Using method names like
+GracefulDisconnect and ImmediateDisconnect would be better.
+
+However I am not sure we should differentiate here at all. We should
+always to the graceful disconnect. What will the immediate disconnect
+bring us?
 
 Regards
 
