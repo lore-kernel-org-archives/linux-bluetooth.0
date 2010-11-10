@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCHv2 7/7] simple-agent - add RequestApproval method for OOB pairing
-Date: Wed, 10 Nov 2010 14:31:17 +0100
-Message-ID: <1289395877-12384-8-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCHv2 6/7] Update DBus OOB API with RequestApproval method.
+Date: Wed, 10 Nov 2010 14:31:16 +0100
+Message-ID: <1289395877-12384-7-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1289395877-12384-1-git-send-email-szymon.janc@tieto.com>
 References: <1289395877-12384-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -13,30 +13,31 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- test/simple-agent |   10 ++++++++++
- 1 files changed, 10 insertions(+), 0 deletions(-)
+ doc/oob-api.txt |   14 ++++++++++++++
+ 1 files changed, 14 insertions(+), 0 deletions(-)
 
-diff --git a/test/simple-agent b/test/simple-agent
-index f2cc3dd..43f03fe 100755
---- a/test/simple-agent
-+++ b/test/simple-agent
-@@ -69,6 +69,16 @@ class Agent(dbus.service.Object):
- 		raise Rejected("Mode change by user")
- 
- 	@dbus.service.method("org.bluez.Agent",
-+			in_signature="o", out_signature="")
+diff --git a/doc/oob-api.txt b/doc/oob-api.txt
+index b0f76db..7b93514 100644
+--- a/doc/oob-api.txt
++++ b/doc/oob-api.txt
+@@ -59,3 +59,17 @@ Methods		void RegisterProvider(object provider)
+ 			Possible errors: org.bluez.Error.UpdateFailed
+ 					 org.bluez.Error.NoProvider
+ 					 org.bluez.Error.InProgress
 +
-+	def RequestApproval(self, device):
-+		print "RequestApproval (%s)" % (device)
-+		approve = raw_input("Approve pairing (yes/no): ")
-+		if (approve == "yes"):
-+			return
-+		raise Rejected("Not approved")
++--------------------------------------------------------------------------------
 +
-+	@dbus.service.method("org.bluez.Agent",
- 					in_signature="", out_signature="")
- 	def Cancel(self):
- 		print "Cancel"
++Service		unique name
++Interface	org.bluez.Agent
++Object path	freely definable
++
++Methods		void RequestApproval(object device)
++
++			This method gets called when the service daemon
++			needs to confirm incoming OOB pairing request.
++
++			Possible errors: org.bluez.Error.Rejected
++					 org.bluez.Error.Canceled
 -- 
 1.7.1
 
