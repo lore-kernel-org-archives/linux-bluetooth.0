@@ -1,58 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: <Waldemar.Rymarkiewicz@tieto.com>
-To: <marcel@holtmann.org>
-CC: <linux-bluetooth@vger.kernel.org>, <suraj@atheros.com>,
-	<johan.hedberg@gmail.com>, <joakim.xj.ceder@stericsson.com>
-Date: Wed, 10 Nov 2010 13:12:53 +0200
-Subject: RE: [PATCH 1/4] Sim Access Profile API
-Message-ID: <99B09243E1A5DA4898CDD8B7001114480BD700C239@EXMB04.eu.tieto.com>
-References: <1288791271-13857-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
-	 <1288791271-13857-2-git-send-email-waldemar.rymarkiewicz@tieto.com>
- <1289367190.9615.235.camel@aeonflux>
-In-Reply-To: <1289367190.9615.235.camel@aeonflux>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+In-Reply-To: <20101110062030.GE20384@null>
+References: <1287406976-13463-1-git-send-email-ville.tervo@nokia.com>
+	<AANLkTina_HUT3SGEUMemVLrD4N3+Ni+xCsaC57whHDZG@mail.gmail.com>
+	<20101110062030.GE20384@null>
+Date: Wed, 10 Nov 2010 06:46:47 -0400
+Message-ID: <AANLkTi=iCXfycMzHbgwS3jbvCxJvzVh97iSDRf4WhQeQ@mail.gmail.com>
+Subject: Re: [RFC] Bluetooth Low energy support
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Ville Tervo <ville.tervo@nokia.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,=20
-
->> +		void Disable()
->> +
->> +			Shudown SAP server and remove the SDP record.
->> +
->> +			Possible errors: org.bluez.Error.Failed
+On Wed, Nov 10, 2010 at 2:20 AM, Ville Tervo <ville.tervo@nokia.com> wrote:
+> On Tue, Nov 09, 2010 at 05:25:10PM +0100, ext Anderson Lizardo wrote:
+>> While doing tests with your most recent trees (using devel HW from
+>> TI), I'm getting consistent panic on the following test:
+>>
+>> (dev1) hciconfig hciX leadv
+>> (dev2) hcitool -i hciX lecc <dev2_addr>
 >
->I don't like this. If you have properties then just changing=20
->the property should be enough. So a SetProperty is more appropriate.
+> Did you have server listening on dev 2 on ATT socket?
 
-I see another option to get rid of 'Enabled' property and leave the methods=
-. What would you say on that?
+I had no bluetoothd running on any side (not sure if that was your question).
 
->> +
->> +		void Disconnect(boolean type)
->> +
->> +			Disconnect SAP client from the server.=20
->The 'type'
->> +			parameter indicates disconnection type.
->> +
->> +			True  - gracefull disconnection
->> +			False - immediate disconnection
->> +
->> +			Possible errors: org.bluez.Error.Failed
+>> I attached two logs. One is from dev1 machine (which has the oops),
+>> the other is from the dev2 machine.
 >
->I don't like this style of method names at all. Using method=20
->names like GracefulDisconnect and ImmediateDisconnect would be better.
-
-That's fine.
-
->However I am not sure we should differentiate here at all. We=20
->should always to the graceful disconnect. What will the=20
->immediate disconnect bring us?
-
-That's actually intended for testing only. One of PTS test cases expects th=
-e tester to trigger immediate disconnect.
-In practce, it is only used when connection to sim card is lost, but this i=
-s obviously done internally.
+> I'll try to fix this today.
 
 Thanks,
-/Waldek=
+-- 
+Anderson Lizardo
+OpenBossa Labs - INdT
+Manaus - Brazil
