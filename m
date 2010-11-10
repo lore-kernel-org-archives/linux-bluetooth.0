@@ -1,73 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
 Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Wed, 10 Nov 2010 14:07:57 -0200
+Date: Wed, 10 Nov 2010 13:47:35 -0200
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Waldemar.Rymarkiewicz@tieto.com
-Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org, suraj@atheros.com,
-	johan.hedberg@gmail.com, joakim.xj.ceder@stericsson.com
-Subject: Re: [PATCH 1/4] Sim Access Profile API
-Message-ID: <20101110160757.GC3275@vigoh>
-References: <1288791271-13857-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
- <1288791271-13857-2-git-send-email-waldemar.rymarkiewicz@tieto.com>
- <1289367190.9615.235.camel@aeonflux>
- <99B09243E1A5DA4898CDD8B7001114480BD700C239@EXMB04.eu.tieto.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Ville Tervo <ville.tervo@nokia.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 1/7] Bluetooth: Hold the lock inside
+ l2cap_get_sock_by_addr()
+Message-ID: <20101110154735.GB3275@vigoh>
+References: <1288710198-6108-1-git-send-email-padovan@profusion.mobi>
+ <20101105134935.GD19903@null>
+ <20101105143711.GB9116@vigoh>
+ <1289367595.9615.240.camel@aeonflux>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <99B09243E1A5DA4898CDD8B7001114480BD700C239@EXMB04.eu.tieto.com>
+In-Reply-To: <1289367595.9615.240.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Waldemar,
+Hi Marcel,
 
-* Waldemar.Rymarkiewicz@tieto.com <Waldemar.Rymarkiewicz@tieto.com> [2010-11-10 13:12:53 +0200]:
+* Marcel Holtmann <marcel@holtmann.org> [2010-11-10 14:39:55 +0900]:
 
-> Hi Marcel, 
+> Hi Gustavo,
 > 
-> >> +		void Disable()
-> >> +
-> >> +			Shudown SAP server and remove the SDP record.
-> >> +
-> >> +			Possible errors: org.bluez.Error.Failed
-> >
-> >I don't like this. If you have properties then just changing 
-> >the property should be enough. So a SetProperty is more appropriate.
+> > > On Tue, Nov 02, 2010 at 04:03:12PM +0100, ext Gustavo F. Padovan wrote:
+> > > > It also have to change the name of the function to
+> > > > l2cap_get_sock_by_addr() because we do hold the lock inside it now.
+> > > > 
+> > > > Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+> > > > ---
+> > > >  net/bluetooth/l2cap.c |   17 ++++++-----------
+> > > >  1 files changed, 6 insertions(+), 11 deletions(-)
+> > > > 
+> > > > diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> > > > index 6f931cc..3d48867 100644
+> > > > --- a/net/bluetooth/l2cap.c
+> > > > +++ b/net/bluetooth/l2cap.c
+> > > > @@ -728,15 +728,18 @@ static inline void l2cap_chan_add(struct l2cap_conn *conn, struct sock *sk, stru
+> > > >  }
+> > > >  
+> > > >  /* ---- Socket interface ---- */
+> > > > -static struct sock *__l2cap_get_sock_by_addr(__le16 psm, bdaddr_t *src)
+> > > > +static struct sock *l2cap_get_sock_by_addr(__le16 psm, bdaddr_t *src)
+> > > >  {
+> > > >  	struct sock *sk;
+> > > >  	struct hlist_node *node;
+> > > > +
+> > > > +	write_lock_bh(&l2cap_sk_list.lock);
+> > > 
+> > > Code is only reading so read_lock_bh would be enough?
+> > 
+> > Sure, I didn't looked to that, I just keept the same code that we were
+> > using before. I'll fix it.
 > 
-> I see another option to get rid of 'Enabled' property and leave the methods. What would you say on that?
-
-It's not a good a idea. We have been moving everything we can to a set
-property operation instead of a method call. Do that as method is add
-unnecessary code to BlueZ once we already have set property there.
-
-> 
-> >> +
-> >> +		void Disconnect(boolean type)
-> >> +
-> >> +			Disconnect SAP client from the server. 
-> >The 'type'
-> >> +			parameter indicates disconnection type.
-> >> +
-> >> +			True  - gracefull disconnection
-> >> +			False - immediate disconnection
-> >> +
-> >> +			Possible errors: org.bluez.Error.Failed
-> >
-> >I don't like this style of method names at all. Using method 
-> >names like GracefulDisconnect and ImmediateDisconnect would be better.
-> 
-> That's fine.
-> 
-> >However I am not sure we should differentiate here at all. We 
-> >should always to the graceful disconnect. What will the 
-> >immediate disconnect bring us?
-> 
-> That's actually intended for testing only. One of PTS test cases expects the tester to trigger immediate disconnect.
-> In practce, it is only used when connection to sim card is lost, but this is obviously done internally.
+> we might also not just bother with read/write locks. Since they are not
+> always the right thing to do. In a lot of cases a pure spinlock is just
+> better. And in case of Bluetooth I think we would be just fine with
+> using a pure spinlock. You might run some tests with this.
 
 
-So this shouldn't be in the API, no one is going to use it. You can
-create something internally for the immediate disconnection that you go
-and set manually inside the code. Make sure to comment in the code why
-you are adding this there. That can also be a option in some of the
-bluetooth config files. Let's see what others think here.
+Better than spinlock is move everything to RCU, than we will just need a
+mutex or spinlock in the write operations. Using a RCU is a lot simpler.
+
+These patches are a clean up to add RCU to sk_list, so I propose to
+upstream the new version of my patches and do the RCU change on top
+of them.
+
+After all these changes we will be ready for the l2cap.c split.
 
 -- 
 Gustavo F. Padovan
