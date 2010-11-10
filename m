@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCHv2 2/7] Add DBus OOB plugin.
-Date: Wed, 10 Nov 2010 14:31:12 +0100
-Message-ID: <1289395877-12384-3-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCHv2 1/7] Add support for Out of Band (OOB) association model.
+Date: Wed, 10 Nov 2010 14:31:11 +0100
+Message-ID: <1289395877-12384-2-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1289395877-12384-1-git-send-email-szymon.janc@tieto.com>
 References: <1289395877-12384-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -13,63 +13,571 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- Makefile.am       |    5 +
- acinclude.m4      |    6 +
- plugins/dbusoob.c |  353 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 364 insertions(+), 0 deletions(-)
- create mode 100644 plugins/dbusoob.c
+ Makefile.am      |    3 +-
+ lib/hci.h        |    3 ++
+ plugins/hciops.c |   72 +++++++++++++++++++++++++++++++++++++++++---------
+ src/adapter.c    |    7 ++++-
+ src/adapter.h    |    3 ++
+ src/device.c     |   76 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/device.h     |   12 ++++++++
+ src/event.c      |   75 +++++++++++++++++++++++++++++++++++++++-------------
+ src/event.h      |    3 +-
+ src/oob.c        |   61 +++++++++++++++++++++++++++++++++++++++++++
+ src/oob.h        |   47 +++++++++++++++++++++++++++++++++
+ 11 files changed, 326 insertions(+), 36 deletions(-)
+ create mode 100644 src/oob.c
+ create mode 100644 src/oob.h
 
 diff --git a/Makefile.am b/Makefile.am
-index a61e754..1f8f7fb 100644
+index da308a7..a61e754 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -216,6 +216,11 @@ builtin_modules += maemo6
- builtin_sources += plugins/maemo6.c
- endif
+@@ -238,7 +238,8 @@ src_bluetoothd_SOURCES = $(gdbus_sources) $(builtin_sources) \
+ 			src/adapter.h src/adapter.c \
+ 			src/device.h src/device.c \
+ 			src/dbus-common.c src/dbus-common.h \
+-			src/event.h src/event.c
++			src/event.h src/event.c \
++			src/oob.c
+ src_bluetoothd_LDADD = lib/libbluetooth.la @GLIB_LIBS@ @DBUS_LIBS@ \
+ 							@CAPNG_LIBS@ -ldl -lrt
+ src_bluetoothd_LDFLAGS = -Wl,--export-dynamic \
+diff --git a/lib/hci.h b/lib/hci.h
+index 0cb120f..409abd9 100644
+--- a/lib/hci.h
++++ b/lib/hci.h
+@@ -524,6 +524,9 @@ typedef struct {
  
-+if DBUSOOBPLUGIN
-+builtin_modules += dbusoob
-+builtin_sources += plugins/dbusoob.c
-+endif
+ #define OCF_REMOTE_OOB_DATA_NEG_REPLY	0x0033
+ 
++#define OOB_DATA_NOT_PRESENT	0x00
++#define OOB_DATA_PRESENT	0x01
 +
- sbin_PROGRAMS += src/bluetoothd
+ #define OCF_IO_CAPABILITY_NEG_REPLY	0x0034
+ typedef struct {
+ 	bdaddr_t	bdaddr;
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index 829011a..88bcf15 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -3,6 +3,7 @@
+  *  BlueZ - Bluetooth protocol stack for Linux
+  *
+  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
++ *  Copyright (C) 2010  ST-Ericsson SA
+  *
+  *  This program is free software; you can redistribute it and/or modify
+  *  it under the terms of the GNU General Public License as published by
+@@ -47,6 +48,7 @@
+ #include "event.h"
+ #include "device.h"
+ #include "manager.h"
++#include "oob.h"
  
- src_bluetoothd_SOURCES = $(gdbus_sources) $(builtin_sources) \
-diff --git a/acinclude.m4 b/acinclude.m4
-index 287f07d..a52d063 100644
---- a/acinclude.m4
-+++ b/acinclude.m4
-@@ -193,6 +193,7 @@ AC_DEFUN([AC_ARG_BLUEZ], [
- 	configfiles_enable=yes
- 	telephony_driver=dummy
- 	maemo6_enable=no
-+	dbusoob_enable=no
+ #define HCI_REQ_TIMEOUT         5000
  
- 	AC_ARG_ENABLE(optimization, AC_HELP_STRING([--disable-optimization], [disable code optimization]), [
- 		optimization_enable=${enableval}
-@@ -316,6 +317,10 @@ AC_DEFUN([AC_ARG_BLUEZ], [
- 		maemo6_enable=${enableval}
- 	])
+@@ -509,20 +511,41 @@ static void user_passkey_notify(int index, void *ptr)
  
-+	AC_ARG_ENABLE(dbusoob, AC_HELP_STRING([--enable-dbusoob], [compile with DBUS OOB plugin]), [
-+		dbusoob_enable=${enableval}
-+	])
+ static void remote_oob_data_request(int index, void *ptr)
+ {
+-	hci_send_cmd(SK(index), OGF_LINK_CTL,
+-				OCF_REMOTE_OOB_DATA_NEG_REPLY, 6, ptr);
++	bdaddr_t *dba = ptr;
++	struct btd_adapter *adapter;
++	struct btd_device *device;
++	char da[18];
 +
- 	AC_ARG_ENABLE(hal, AC_HELP_STRING([--enable-hal], [Use HAL to determine adapter class]), [
- 		hal_enable=${enableval}
- 	])
-@@ -372,4 +377,5 @@ AC_DEFUN([AC_ARG_BLUEZ], [
- 	AM_CONDITIONAL(UDEVRULES, test "${udevrules_enable}" = "yes")
- 	AM_CONDITIONAL(CONFIGFILES, test "${configfiles_enable}" = "yes")
- 	AM_CONDITIONAL(MAEMO6PLUGIN, test "${maemo6_enable}" = "yes")
-+	AM_CONDITIONAL(DBUSOOBPLUGIN, test "${dbusoob_enable}" = "yes")
- ])
-diff --git a/plugins/dbusoob.c b/plugins/dbusoob.c
++	ba2str(dba, da);
++	adapter = manager_find_adapter(&BDADDR(index));
++	device = adapter_find_device(adapter, da);
++
++	if (device_has_oob_data(device)) {
++		remote_oob_data_reply_cp cp;
++
++		bacpy(&cp.bdaddr, dba);
++		device_get_oob_data(device,cp.hash,cp.randomizer);
++
++		hci_send_cmd(SK(index), OGF_LINK_CTL, OCF_REMOTE_OOB_DATA_REPLY,
++				REMOTE_OOB_DATA_REPLY_CP_SIZE, &cp);
++	} else
++		hci_send_cmd(SK(index),
++				OGF_LINK_CTL, OCF_REMOTE_OOB_DATA_NEG_REPLY, 6,
++				ptr);
+ }
+ 
+ static void io_capa_request(int index, void *ptr)
+ {
+ 	bdaddr_t *dba = ptr;
+ 	char sa[18], da[18];
+-	uint8_t cap, auth;
+ 
+ 	ba2str(&BDADDR(index), sa); ba2str(dba, da);
+ 	info("io_capa_request (sba=%s, dba=%s)", sa, da);
+ 
+-	if (btd_event_get_io_cap(&BDADDR(index), dba, &cap, &auth) < 0) {
++	/* If failed to establish IO capabilities then send negative reply
++	 * immediately. Positive reply will be sent when IO capabilities are
++	 * established. */
++	if (btd_event_request_io_cap(&BDADDR(index), dba)) {
+ 		io_capability_neg_reply_cp cp;
+ 		memset(&cp, 0, sizeof(cp));
+ 		bacpy(&cp.bdaddr, dba);
+@@ -530,15 +553,6 @@ static void io_capa_request(int index, void *ptr)
+ 		hci_send_cmd(SK(index), OGF_LINK_CTL,
+ 					OCF_IO_CAPABILITY_NEG_REPLY,
+ 					IO_CAPABILITY_NEG_REPLY_CP_SIZE, &cp);
+-	} else {
+-		io_capability_reply_cp cp;
+-		memset(&cp, 0, sizeof(cp));
+-		bacpy(&cp.bdaddr, dba);
+-		cp.capability = cap;
+-		cp.oob_data = 0x00;
+-		cp.authentication = auth;
+-		hci_send_cmd(SK(index), OGF_LINK_CTL, OCF_IO_CAPABILITY_REPLY,
+-					IO_CAPABILITY_REPLY_CP_SIZE, &cp);
+ 	}
+ }
+ 
+@@ -748,6 +762,15 @@ static void read_scan_complete(int index, uint8_t status, void *ptr)
+ 	adapter_mode_changed(adapter, rp->enable);
+ }
+ 
++static void read_local_oob_data_complete(bdaddr_t *local, uint8_t status,
++		read_local_oob_data_rp *rp)
++{
++	if (status)
++		oob_local_data_updated(local, NULL, NULL);
++	else
++		oob_local_data_updated(local, rp->hash, rp->randomizer);
++}
++
+ static inline void cmd_complete(int index, void *ptr)
+ {
+ 	evt_cmd_complete *evt = ptr;
+@@ -808,6 +831,10 @@ static inline void cmd_complete(int index, void *ptr)
+ 		ptr += sizeof(evt_cmd_complete);
+ 		adapter_update_tx_power(&BDADDR(index), status, ptr);
+ 		break;
++	case cmd_opcode_pack(OGF_HOST_CTL, OCF_READ_LOCAL_OOB_DATA):
++		ptr += sizeof(evt_cmd_complete);
++		read_local_oob_data_complete(&BDADDR(index), status, ptr);
++		break;
+ 	};
+ }
+ 
+@@ -2280,6 +2307,24 @@ static int hciops_get_remote_version(int index, uint16_t handle,
+ 	return 0;
+ }
+ 
++static int hciops_read_local_oob_data(int index)
++{
++	int dd;
++	int err = 0;
++
++	dd = hci_open_dev(index);
++	if (dd < 0)
++		return -EIO;
++
++	err = hci_send_cmd(dd, OGF_HOST_CTL, OCF_READ_LOCAL_OOB_DATA, 0, 0);
++	if (err < 0)
++		err = -errno;
++
++	hci_close_dev(dd);
++
++	return err;
++}
++
+ static struct btd_adapter_ops hci_ops = {
+ 	.setup = hciops_setup,
+ 	.cleanup = hciops_cleanup,
+@@ -2326,6 +2371,7 @@ static struct btd_adapter_ops hci_ops = {
+ 	.write_le_host = hciops_write_le_host,
+ 	.get_remote_version = hciops_get_remote_version,
+ 	.encrypt_link = hciops_encrypt_link,
++	.read_local_oob_data = hciops_read_local_oob_data,
+ };
+ 
+ static int hciops_init(void)
+diff --git a/src/adapter.c b/src/adapter.c
+index 31014e5..39a6514 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -3265,7 +3265,7 @@ void adapter_remove_connection(struct btd_adapter *adapter,
+ 	/* clean pending HCI cmds */
+ 	device_get_address(device, &bdaddr);
+ 
+-	if (device_is_authenticating(device))
++	if (device_is_authenticating(device) || device_has_oob_data(device))
+ 		device_cancel_authentication(device, TRUE);
+ 
+ 	if (device_is_temporary(device)) {
+@@ -3738,3 +3738,8 @@ int btd_adapter_encrypt_link(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+ {
+ 	return adapter_ops->encrypt_link(adapter->dev_id, bdaddr, cb, user_data);
+ }
++
++int btd_adapter_read_local_oob_data(struct btd_adapter *adapter)
++{
++	return adapter_ops->read_local_oob_data(adapter->dev_id);
++}
+diff --git a/src/adapter.h b/src/adapter.h
+index 8019cfc..cc62865 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -229,6 +229,7 @@ struct btd_adapter_ops {
+ 						gboolean delayed);
+ 	int (*encrypt_link) (int index, bdaddr_t *bdaddr, bt_hci_result_t cb,
+ 							gpointer user_data);
++	int (*read_local_oob_data) (int index);
+ };
+ 
+ int btd_register_adapter_ops(struct btd_adapter_ops *ops, gboolean priority);
+@@ -289,3 +290,5 @@ int btd_adapter_get_remote_version(struct btd_adapter *adapter,
+ 
+ int btd_adapter_encrypt_link(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+ 				bt_hci_result_t cb, gpointer user_data);
++
++int btd_adapter_read_local_oob_data(struct btd_adapter *adapter);
+diff --git a/src/device.c b/src/device.c
+index 7c421e3..24fd44d 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -4,6 +4,7 @@
+  *
+  *  Copyright (C) 2006-2010  Nokia Corporation
+  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
++ *  Copyright (C) 2010  ST-Ericsson SA
+  *
+  *
+  *  This program is free software; you can redistribute it and/or modify
+@@ -59,6 +60,7 @@
+ #include "sdp-xml.h"
+ #include "storage.h"
+ #include "btio.h"
++#include "oob.h"
+ 
+ #define DEFAULT_XML_BUF_SIZE	1024
+ #define DISCONNECT_TIMER	2
+@@ -132,6 +134,9 @@ struct btd_device {
+ 	uint8_t		cap;
+ 	uint8_t		auth;
+ 
++	uint8_t		local_cap;
++	uint8_t		local_auth;
++
+ 	uint16_t	handle;			/* Connection handle */
+ 
+ 	/* Whether were creating a security mode 3 connection */
+@@ -149,6 +154,12 @@ struct btd_device {
+ 
+ 	gboolean	has_debug_key;
+ 	uint8_t		debug_key[16];
++
++	/* For OOB association model */
++	void (*oob_request_cb)(struct btd_device *device);
++	gboolean	has_oob_data;
++	uint8_t		hash[16];
++	uint8_t		randomizer[16];
+ };
+ 
+ static uint16_t uuid_list[] = {
+@@ -829,6 +840,69 @@ static DBusMessage *disconnect(DBusConnection *conn, DBusMessage *msg,
+ 	return NULL;
+ }
+ 
++void device_set_oob_data(struct btd_device *device, uint8_t *hash,
++		uint8_t *randomizer)
++{
++	if (!device)
++		return;
++
++	if (hash && randomizer) {
++		memcpy(device->hash, hash, 16);
++		memcpy(device->randomizer, randomizer, 16);
++		device->has_oob_data = TRUE;
++	}
++
++	if (device->oob_request_cb) {
++		device->oob_request_cb(device);
++		device->oob_request_cb = NULL;
++	}
++}
++
++gboolean device_get_oob_data(struct btd_device *device, uint8_t *hash,
++		uint8_t *randomizer)
++{
++	if (!device || !device->has_oob_data)
++		return FALSE;
++
++	memcpy(hash, device->hash, 16);
++	memcpy(randomizer, device->randomizer, 16);
++
++	return TRUE;
++}
++
++gboolean device_has_oob_data(struct btd_device *device)
++{
++	return device && device->has_oob_data;
++}
++
++gboolean device_request_oob_data(struct btd_device *device, void *cb)
++{
++	if (!device)
++		return FALSE;
++
++	device->oob_request_cb = cb;
++	return oob_request_remote_data(device);
++}
++
++void device_set_local_auth_cap(struct btd_device *device, uint8_t auth,
++		uint8_t cap)
++{
++	if (!device)
++		return;
++
++	device->local_auth = auth;
++	device->local_cap = cap;
++}
++void device_get_local_auth_cap(struct btd_device *device, uint8_t *auth,
++		uint8_t *cap)
++{
++	if (!device)
++		return;
++
++	*auth = device->local_auth;
++	*cap = device->local_cap;
++}
++
+ static GDBusMethodTable device_methods[] = {
+ 	{ "GetProperties",	"",	"a{sv}",	get_properties	},
+ 	{ "SetProperty",	"sv",	"",		set_property	},
+@@ -2264,6 +2338,8 @@ void device_cancel_authentication(struct btd_device *device, gboolean aborted)
+ {
+ 	struct authentication_req *auth = device->authr;
+ 
++	device->has_oob_data = FALSE;
++
+ 	if (!auth)
+ 		return;
+ 
+diff --git a/src/device.h b/src/device.h
+index b570bd1..b62cdc5 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -4,6 +4,7 @@
+  *
+  *  Copyright (C) 2006-2010  Nokia Corporation
+  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
++ *  Copyright (C) 2010  ST-Ericsson SA
+  *
+  *
+  *  This program is free software; you can redistribute it and/or modify
+@@ -89,6 +90,17 @@ void device_remove_connection(struct btd_device *device, DBusConnection *conn,
+ gboolean device_has_connection(struct btd_device *device, uint16_t handle);
+ void device_request_disconnect(struct btd_device *device, DBusMessage *msg);
+ 
++void device_set_oob_data(struct btd_device *device, uint8_t *hash,
++		uint8_t *randomizer);
++gboolean device_get_oob_data(struct btd_device *device, uint8_t *hash,
++		uint8_t *randomizer);
++gboolean device_has_oob_data(struct btd_device *device);
++gboolean device_request_oob_data(struct btd_device *device, void *cb);
++void device_set_local_auth_cap(struct btd_device *device, uint8_t auth,
++		uint8_t cap);
++void device_get_local_auth_cap(struct btd_device *device, uint8_t *auth,
++		uint8_t *cap);
++
+ typedef void (*disconnect_watch) (struct btd_device *device, gboolean removal,
+ 					void *user_data);
+ 
+diff --git a/src/event.c b/src/event.c
+index e943c63..5a5a288 100644
+--- a/src/event.c
++++ b/src/event.c
+@@ -4,6 +4,7 @@
+  *
+  *  Copyright (C) 2006-2010  Nokia Corporation
+  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
++ *  Copyright (C) 2010  ST-Ericsson SA
+  *
+  *
+  *  This program is free software; you can redistribute it and/or modify
+@@ -274,7 +275,7 @@ void btd_event_bonding_process_complete(bdaddr_t *local, bdaddr_t *peer,
+ 	if (!get_adapter_and_device(local, peer, &adapter, &device, TRUE))
+ 		return;
+ 
+-	if (!device_is_authenticating(device)) {
++	if (!device_is_authenticating(device) && !device_has_oob_data(device)) {
+ 		/* This means that there was no pending PIN or SSP token
+ 		 * request from the controller, i.e. this is not a new
+ 		 * pairing */
+@@ -756,26 +757,56 @@ void btd_event_returned_link_key(bdaddr_t *local, bdaddr_t *peer)
+ 	device_set_paired(device, TRUE);
+ }
+ 
+-int btd_event_get_io_cap(bdaddr_t *local, bdaddr_t *remote,
+-						uint8_t *cap, uint8_t *auth)
++static void btd_event_io_cap_reply(struct btd_device *device)
++{
++	io_capability_reply_cp cp;
++	int dev;
++	struct btd_adapter *adapter = device_get_adapter(device);
++	uint16_t dev_id = adapter_get_dev_id(adapter);
++
++	dev = hci_open_dev(dev_id);
++	if (dev < 0) {
++		error("hci_open_dev(%d): %s (%d)", dev_id,
++		strerror(errno), errno);
++		return;
++	}
++
++	memset(&cp, 0, sizeof(cp));
++	device_get_address(device, &cp.bdaddr);
++	device_get_local_auth_cap(device, &cp.authentication, &cp.capability);
++	cp.oob_data = device_has_oob_data(device)
++			? OOB_DATA_PRESENT : OOB_DATA_NOT_PRESENT;
++
++	DBG("final capabilities reply is cap=0x%02x, auth=0x%02x, oob=0x%02x",
++	cp.capability, cp.authentication, cp.oob_data);
++
++	hci_send_cmd(dev, OGF_LINK_CTL, OCF_IO_CAPABILITY_REPLY,
++					IO_CAPABILITY_REPLY_CP_SIZE, &cp);
++
++	hci_close_dev(dev);
++}
++
++int btd_event_request_io_cap(bdaddr_t *local, bdaddr_t *remote)
+ {
+ 	struct btd_adapter *adapter;
+ 	struct btd_device *device;
+ 	struct agent *agent = NULL;
+ 	uint8_t agent_cap;
+ 	int err;
++	uint8_t cap;
++	uint8_t auth;
+ 
+ 	if (!get_adapter_and_device(local, remote, &adapter, &device, TRUE))
+ 		return -ENODEV;
+ 
+-	err = btd_adapter_get_auth_info(adapter, remote, auth);
++	err = btd_adapter_get_auth_info(adapter, remote, &auth);
+ 	if (err < 0)
+ 		return err;
+ 
+-	DBG("initial authentication requirement is 0x%02x", *auth);
++	DBG("initial authentication requirement is 0x%02x", auth);
+ 
+-	if (*auth == 0xff)
+-		*auth = device_get_auth(device);
++	if (auth == 0xff)
++		auth = device_get_auth(device);
+ 
+ 	/* Check if the adapter is not pairable and if there isn't a bonding
+ 	 * in progress */
+@@ -784,11 +815,11 @@ int btd_event_get_io_cap(bdaddr_t *local, bdaddr_t *remote,
+ 		if (device_get_auth(device) < 0x02) {
+ 			DBG("Allowing no bonding in non-bondable mode");
+ 			/* No input, no output */
+-			*cap = 0x03;
++			cap = 0x03;
+ 			/* Kernel defaults to general bonding and so
+ 			 * overwrite for this special case. Otherwise
+ 			 * non-pairable test cases will fail. */
+-			*auth = 0x00;
++			auth = 0x00;
+ 			goto done;
+ 		}
+ 		return -EPERM;
+@@ -804,13 +835,13 @@ int btd_event_get_io_cap(bdaddr_t *local, bdaddr_t *remote,
+ 		}
+ 
+ 		/* No agent available, and no bonding case */
+-		if (*auth == 0x00 || *auth == 0x04) {
++		if (auth == 0x00 || auth == 0x04) {
+ 			DBG("Allowing no bonding without agent");
+ 			/* No input, no output */
+-			*cap = 0x03;
++			cap = 0x03;
+ 			/* If kernel defaults to general bonding, set it
+ 			 * back to no bonding */
+-			*auth = 0x00;
++			auth = 0x00;
+ 			goto done;
+ 		}
+ 
+@@ -820,7 +851,7 @@ int btd_event_get_io_cap(bdaddr_t *local, bdaddr_t *remote,
+ 
+ 	agent_cap = agent_get_io_capability(agent);
+ 
+-	if (*auth == 0x00 || *auth == 0x04) {
++	if (auth == 0x00 || auth == 0x04) {
+ 		/* If remote requests dedicated bonding follow that lead */
+ 		if (device_get_auth(device) == 0x02 ||
+ 				device_get_auth(device) == 0x03) {
+@@ -829,9 +860,9 @@ int btd_event_get_io_cap(bdaddr_t *local, bdaddr_t *remote,
+ 			 * then require it, otherwise don't */
+ 			if (device_get_cap(device) == 0x03 ||
+ 							agent_cap == 0x03)
+-				*auth = 0x02;
++				auth = 0x02;
+ 			else
+-				*auth = 0x03;
++				auth = 0x03;
+ 		}
+ 
+ 		/* If remote indicates no bonding then follow that. This
+@@ -839,7 +870,7 @@ int btd_event_get_io_cap(bdaddr_t *local, bdaddr_t *remote,
+ 		 * as default. */
+ 		if (device_get_auth(device) == 0x00 ||
+ 					device_get_auth(device) == 0x01)
+-			*auth = 0x00;
++			auth = 0x00;
+ 
+ 		/* If remote requires MITM then also require it, unless
+ 		 * our IO capability is NoInputNoOutput (so some
+@@ -847,13 +878,19 @@ int btd_event_get_io_cap(bdaddr_t *local, bdaddr_t *remote,
+ 		if (device_get_auth(device) != 0xff &&
+ 					(device_get_auth(device) & 0x01) &&
+ 					agent_cap != 0x03)
+-			*auth |= 0x01;
++			auth |= 0x01;
+ 	}
+ 
+-	*cap = agent_get_io_capability(agent);
++	cap = agent_get_io_capability(agent);
+ 
+ done:
+-	DBG("final authentication requirement is 0x%02x", *auth);
++	DBG("final authentication requirement is 0x%02x", auth);
++
++	device_set_local_auth_cap(device, auth, cap);
++
++	/* If failed to request remote OOB data then reply immediately. */
++	if (!device_request_oob_data(device, btd_event_io_cap_reply))
++		btd_event_io_cap_reply(device);
+ 
+ 	return 0;
+ }
+diff --git a/src/event.h b/src/event.h
+index 4a7b9c9..a3e7dda 100644
+--- a/src/event.h
++++ b/src/event.h
+@@ -36,8 +36,7 @@ void btd_event_le_set_scan_enable_complete(bdaddr_t *local, uint8_t status);
+ void btd_event_write_simple_pairing_mode_complete(bdaddr_t *local);
+ void btd_event_read_simple_pairing_mode_complete(bdaddr_t *local, void *ptr);
+ void btd_event_returned_link_key(bdaddr_t *local, bdaddr_t *peer);
+-int btd_event_get_io_cap(bdaddr_t *local, bdaddr_t *remote,
+-						uint8_t *cap, uint8_t *auth);
++int btd_event_request_io_cap(bdaddr_t *local, bdaddr_t *remote);
+ int btd_event_set_io_cap(bdaddr_t *local, bdaddr_t *remote,
+ 						uint8_t cap, uint8_t auth);
+ int btd_event_user_confirm(bdaddr_t *sba, bdaddr_t *dba, uint32_t passkey);
+diff --git a/src/oob.c b/src/oob.c
 new file mode 100644
-index 0000000..7fc0c52
+index 0000000..cc20c67
 --- /dev/null
-+++ b/plugins/dbusoob.c
-@@ -0,0 +1,353 @@
++++ b/src/oob.c
+@@ -0,0 +1,61 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
@@ -95,334 +603,95 @@ index 0000000..7fc0c52
 + *
 + */
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <errno.h>
-+#include <gdbus.h>
-+
-+#include <bluetooth/bluetooth.h>
-+#include <bluetooth/hci.h>
-+#include <bluetooth/sdp.h>
-+
-+#include "plugin.h"
-+#include "log.h"
++#include <glib.h>
 +#include "manager.h"
-+#include "device.h"
 +#include "adapter.h"
-+#include "dbus-common.h"
-+#include "event.h"
-+#include "error.h"
 +#include "oob.h"
 +
-+#define REQUEST_TIMEOUT	(10 * 1000)	/* 10 seconds */
-+#define OOB_INTERFACE	"org.bluez.OOB"
-+#define OOB_PATH	"/org/bluez"
++static struct oob_plugin *active_plugin = NULL;
 +
-+struct oob_provider {
-+	char *name;
-+	char *path;
++void oob_activate_plugin(struct oob_plugin *plugin)
++{
++	if (!plugin || !plugin->local_data_updated|| !plugin->plugin_deactivated
++			|| !plugin->request_remote_data
++			|| active_plugin == plugin)
++		return;
 +
-+	struct btd_adapter *adapter;
-+	DBusMessage *msg;
++	if (active_plugin)
++		active_plugin->plugin_deactivated();
 +
-+	guint listener_id;
-+	gboolean exited;
++	active_plugin = plugin;
++}
++
++void oob_deactivate_plugin(struct oob_plugin *plugin)
++{
++	if (active_plugin == plugin)
++		active_plugin = NULL;
++}
++
++gboolean oob_request_remote_data(struct btd_device *device)
++{
++	return active_plugin && active_plugin->request_remote_data(device);
++}
++
++void oob_local_data_updated(bdaddr_t *ba, uint8_t *hash, uint8_t *randomizer)
++{
++	if (active_plugin)
++		active_plugin->local_data_updated(ba, hash, randomizer);
++}
+diff --git a/src/oob.h b/src/oob.h
+new file mode 100644
+index 0000000..b3e3623
+--- /dev/null
++++ b/src/oob.h
+@@ -0,0 +1,47 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2010  ST-Ericsson SA
++ *
++ *  Author: Szymon Janc <szymon.janc@tieto.com> for ST-Ericsson
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++struct oob_plugin
++{
++	/* If request was successfully send this functions should return TRUE.
++	 * Function should not block for too long. */
++	gboolean (*request_remote_data)(struct btd_device *device);
++
++	/* Local OOB data updated. If corresponding HCI command failed, hash
++	 * and randomizer are NULL */
++	void (*local_data_updated)(bdaddr_t *ba, uint8_t *hash,
++			uint8_t *randomizer);
++
++	/* Plug-in was deactivated (called only for active plug-in). */
++	void (*plugin_deactivated)(void);
 +};
 +
-+static struct oob_provider *provider = NULL;
-+static DBusConnection *connection = NULL;
-+static struct oob_plugin dbusoob;
++/* These functions are called by OOB plug-in. */
++void oob_activate_plugin(struct oob_plugin *plugin);
++void oob_deactivate_plugin(struct oob_plugin *plugin);
 +
-+static void destroy_provider(void)
-+{
-+	if (!provider->exited)
-+		g_dbus_remove_watch(connection, provider->listener_id);
-+
-+	if (provider->msg)
-+		dbus_message_unref(provider->msg);
-+
-+	g_free(provider->name);
-+	g_free(provider->path);
-+	g_free(provider);
-+	provider = NULL;
-+
-+	oob_deactivate_plugin(&dbusoob);
-+}
-+
-+static void provider_exited(DBusConnection *conn, void *user_data)
-+{
-+	DBG("Provider exited without calling Unregister");
-+
-+	provider->exited = TRUE;
-+	destroy_provider();
-+}
-+
-+static void create_provider(const char *path, const char *name)
-+{
-+	provider = g_new(struct oob_provider, 1);
-+	provider->path = g_strdup(path);
-+	provider->name = g_strdup(name);
-+	provider->adapter = NULL;
-+	provider->msg = NULL;
-+	provider->exited = FALSE;
-+	provider->listener_id = g_dbus_add_disconnect_watch(connection, name,
-+			provider_exited, NULL, NULL);
-+
-+	oob_activate_plugin(&dbusoob);
-+}
-+
-+static void request_remote_data_reply(DBusPendingCall *call, void *data)
-+{
-+	DBusMessage *msg;
-+	DBusError err;
-+	struct btd_device *device = data;
-+	uint8_t *hash = NULL;
-+	uint8_t *randomizer = NULL;
-+	int32_t hlen, rlen;
-+
-+	msg = dbus_pending_call_steal_reply(call);
-+
-+	dbus_error_init(&err);
-+	if (dbus_set_error_from_message(&err, msg)) {
-+		error("Provider replied with an error: %s, %s", err.name,
-+				err.message);
-+		dbus_error_free(&err);
-+		goto error;
-+	}
-+
-+	dbus_error_init(&err);
-+	if (!dbus_message_get_args(msg, &err,
-+			DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE, &hash, &hlen,
-+			DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE, &randomizer, &rlen,
-+			DBUS_TYPE_INVALID) || hlen != 16 || rlen != 16) {
-+		error("RequestRemoteOobData reply signature error: %s, %s",
-+				err.name, err.message);
-+		dbus_error_free(&err);
-+		hash = NULL;
-+		randomizer = NULL;
-+	}
-+
-+error:
-+	dbus_message_unref(msg);
-+	dbus_pending_call_unref(call);
-+
-+	device_set_oob_data(device, hash, randomizer);
-+}
-+
-+static gboolean request_remote_data(struct btd_device *device)
-+{
-+	DBusMessage* msg;
-+	DBusPendingCall *call = NULL;
-+	const gchar *path;
-+	gboolean ret = FALSE;
-+
-+	msg = dbus_message_new_method_call(provider->name, provider->path,
-+			OOB_INTERFACE, "RequestRemoteOobData");
-+
-+	if (!msg) {
-+		error("Couldn't allocate D-Bus message");
-+		goto error;
-+	}
-+
-+	path = device_get_path(device);
-+
-+	if (!dbus_message_append_args(msg, DBUS_TYPE_OBJECT_PATH, &path,
-+			DBUS_TYPE_INVALID)) {
-+		error ("Couldn't append arguments");
-+		goto error;
-+	}
-+
-+	if (!dbus_connection_send_with_reply(connection, msg, &call,
-+			REQUEST_TIMEOUT)) {
-+		error("D-Bus send failed");
-+		goto error;
-+	}
-+
-+	if (!dbus_pending_call_set_notify(call, request_remote_data_reply,
-+			device, NULL)) {
-+		error("Couldn't set reply notification.");
-+		dbus_pending_call_unref(call);
-+		goto error;
-+	}
-+
-+	ret = TRUE;
-+
-+error:
-+	if (msg)
-+		dbus_message_unref(msg);
-+
-+	return ret;
-+}
-+
-+static void local_data_updated(bdaddr_t *ba, uint8_t *hash, uint8_t *randomizer)
-+{
-+	struct DBusMessage *reply;
-+	bdaddr_t addr;
-+
-+	if (!provider)
-+		return;
-+
-+	adapter_get_address(provider->adapter, &addr);
-+	if (bacmp(ba, &addr))
-+		return;
-+
-+	if (hash && randomizer)
-+		reply = g_dbus_create_reply(provider->msg,
-+			DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE, &hash, 16,
-+			DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE, &randomizer, 16,
-+			DBUS_TYPE_INVALID);
-+	else
-+		reply = g_dbus_create_error(provider->msg,
-+				ERROR_INTERFACE ".UpdateFailed",
-+				"Failed to update local OOB.");
-+
-+	dbus_message_unref(provider->msg);
-+	provider->msg = NULL;
-+	provider->adapter = NULL;
-+
-+	if (!reply) {
-+		error("Couldn't allocate D-Bus message");
-+		return;
-+	}
-+
-+	if (!g_dbus_send_message(connection, reply))
-+		error("D-Bus send failed");
-+}
-+
-+static DBusMessage *update_local_data(DBusConnection *conn, DBusMessage *msg,
-+								void *data)
-+{
-+	const char *name;
-+	const char *path;
-+
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
-+			DBUS_TYPE_INVALID))
-+		return NULL;
-+
-+	name = dbus_message_get_sender(msg);
-+	if (!provider || strcmp(provider->name, name) != 0)
-+		return g_dbus_create_error(msg, ERROR_INTERFACE ".NoProvider",
-+				"Not OOB provider or no provider registered");
-+
-+	if (provider->msg)
-+		return g_dbus_create_error(msg, ERROR_INTERFACE ".InProgress",
-+				"Another request in progress.");
-+
-+	provider->adapter = manager_find_adapter_by_path(path);
-+	if (!provider->adapter)
-+		return g_dbus_create_error(msg, ERROR_INTERFACE ".UpdateFailed",
-+				"No adapter with given address found");
-+
-+	if (btd_adapter_read_local_oob_data(provider->adapter))
-+		return g_dbus_create_error(msg, ERROR_INTERFACE ".UpdateFailed",
-+				"HCI request failed");
-+
-+	provider->msg = dbus_message_ref(msg);
-+	return NULL;
-+}
-+
-+static void plugin_deactivated(void)
-+{
-+	DBusMessage *msg;
-+
-+	msg = dbus_message_new_method_call(provider->name, provider->path,
-+				OOB_INTERFACE, "Deactivate");
-+
-+	if (!msg)
-+		error("Couldn't allocate D-Bus message");
-+	else if (!g_dbus_send_message(connection, msg))
-+		error("D-Bus send failed");
-+
-+	destroy_provider();
-+}
-+
-+static DBusMessage *register_provider(DBusConnection *conn, DBusMessage *msg,
-+								void *data)
-+{
-+	const char *path;
-+	const char *name;
-+
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
-+			DBUS_TYPE_INVALID))
-+		return NULL;
-+
-+	if (provider)
-+		return g_dbus_create_error(msg, ERROR_INTERFACE ".AlreadyExists",
-+				"OOB provider already registered");
-+
-+	name = dbus_message_get_sender(msg);
-+	create_provider(path, name);
-+
-+	DBG("OOB provider registered at %s:%s", provider->name, provider->path);
-+	return dbus_message_new_method_return(msg);
-+}
-+
-+static DBusMessage *unregister_provider(DBusConnection *conn, DBusMessage *msg,
-+								void *data)
-+{
-+	const char *path;
-+	const char *name;
-+
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
-+			DBUS_TYPE_INVALID))
-+		return NULL;
-+
-+	name = dbus_message_get_sender(msg);
-+
-+	if (!provider || !g_str_equal(provider->path, path)
-+			|| !g_str_equal(provider->name, name))
-+		return g_dbus_create_error(msg, ERROR_INTERFACE ".DoesNotExist",
-+				"No such OOB provider registered");
-+
-+	DBG("OOB provider (%s:%s) unregistered", provider->name, provider->path);
-+
-+	destroy_provider();
-+
-+	return dbus_message_new_method_return(msg);
-+}
-+
-+static GDBusMethodTable oob_methods[] = {
-+	{ "RegisterProvider",	"o", "", register_provider},
-+	{ "UnregisterProvider",	"o", "", unregister_provider},
-+	{ "UpdateLocalOobData",	"o", "ayay", update_local_data,
-+			G_DBUS_METHOD_FLAG_ASYNC},
-+	{ }
-+};
-+
-+static gboolean register_on_dbus(void)
-+{
-+	connection = get_dbus_connection();
-+
-+	if (!g_dbus_register_interface(connection, OOB_PATH, OOB_INTERFACE,
-+				oob_methods, NULL, NULL, NULL, NULL)) {
-+			error("OOB interface init failed on path %s", OOB_PATH);
-+			return FALSE;
-+		}
-+
-+	return TRUE;
-+}
-+
-+static int dbusoob_init(void)
-+{
-+	DBG("Setup dbusoob plugin");
-+
-+	dbusoob.request_remote_data = request_remote_data;
-+	dbusoob.local_data_updated = local_data_updated;
-+	dbusoob.plugin_deactivated = plugin_deactivated;
-+
-+	return register_on_dbus();
-+}
-+
-+static void dbusoob_exit(void)
-+{
-+	DBG("Cleanup dbusoob plugin");
-+	oob_deactivate_plugin(&dbusoob);
-+}
-+
-+BLUETOOTH_PLUGIN_DEFINE(dbusoob, VERSION,
-+		BLUETOOTH_PLUGIN_PRIORITY_DEFAULT, dbusoob_init, dbusoob_exit)
++/* These functions are called from stack to interact with OOB plug-in. */
++gboolean oob_request_remote_data(struct btd_device *device);
++void oob_local_data_updated(bdaddr_t *ba, uint8_t *hash, uint8_t *randomizer);
 -- 
 1.7.1
 
