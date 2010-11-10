@@ -1,33 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 10 Nov 2010 15:17:22 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: Automate remote name requests
-Message-ID: <20101110131721.GA20570@jh-x301>
-References: <1288282824-30736-1-git-send-email-johan.hedberg@gmail.com>
- <1289367862.9615.243.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1289367862.9615.243.camel@aeonflux>
+From: Bartosz Szatkowski <bulislaw@linux.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Bartosz Szatkowski <bulislaw@linux.com>
+Subject: [PATCH 7/7] Changed number of fields selected via pbap queries
+Date: Wed, 10 Nov 2010 14:15:30 +0100
+Message-Id: <1289394930-6694-7-git-send-email-bulislaw@linux.com>
+In-Reply-To: <1289394930-6694-1-git-send-email-bulislaw@linux.com>
+References: <1289394930-6694-1-git-send-email-bulislaw@linux.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+After fixing type handling in PBAP, there are more fields selected in each
+query, contacts_other_query_from_uri needed to be adjusted.
+---
+ plugins/phonebook-tracker.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-On Wed, Nov 10, 2010, Marcel Holtmann wrote:
-> please split this patch into two. One creating the common function for
-> the authentication requested and one for adding the name request.
-> 
-> My brain actually core dumps when following the logic and making sure
-> that it is still correct. I pretty sure it is correct, but the whole
-> patch is damn hard to review.
+diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
+index f195f3f..672d59f 100644
+--- a/plugins/phonebook-tracker.c
++++ b/plugins/phonebook-tracker.c
+@@ -822,6 +822,7 @@
+ 	"SELECT \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" "\
+ 	"\"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" "	\
+ 	"\"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" "	\
++	"\"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" "			\
+ 	"nco:phoneNumber(?t) \"NOTACALL\" \"false\" \"false\" <%s> "	\
+ 	"WHERE { "							\
+ 		"<%s> a nco:Contact . "					\
+-- 
+1.7.0.4
 
-Yeah, sorry about this. I know the patch ended up being quite complex.
-I'll resend it in three parts in a moment:
-
-1. getting rid of multiple nested if-statements in the remote features
-callbacks.
-2. create a unified authentication request function
-3. add the remote name request
-
-Johan
