@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Bartosz Szatkowski <bulislaw@linux.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bartosz Szatkowski <bulislaw@linux.com>
-Subject: [PATCH 3/7] Fix proper type handling in incoming_calls_query
-Date: Wed, 10 Nov 2010 14:15:26 +0100
-Message-Id: <1289394930-6694-3-git-send-email-bulislaw@linux.com>
+Subject: [PATCH 2/7] Fix proper type handling in missed_calls_query
+Date: Wed, 10 Nov 2010 14:15:25 +0100
+Message-Id: <1289394930-6694-2-git-send-email-bulislaw@linux.com>
 In-Reply-To: <1289394930-6694-1-git-send-email-bulislaw@linux.com>
 References: <1289394930-6694-1-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,17 +14,17 @@ Previously all phone numbers, addresses and emails was considered to be "work".
 Now there are three working types for emails and addresses: "work", "home",
 "other" and four for phone numbers - these three as well as "cell".
 ---
- plugins/phonebook-tracker.c |   83 +++++++++++++++++++++++++++++++++----------
- 1 files changed, 64 insertions(+), 19 deletions(-)
+ plugins/phonebook-tracker.c |   84 +++++++++++++++++++++++++++++++++----------
+ 1 files changed, 65 insertions(+), 19 deletions(-)
 
 diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index e84c589..bd67699 100644
+index 83327e0..e84c589 100644
 --- a/plugins/phonebook-tracker.c
 +++ b/plugins/phonebook-tracker.c
-@@ -266,11 +266,11 @@
- 	"} GROUP BY ?call ORDER BY DESC(nmo:receivedDate(?call))"
+@@ -127,11 +127,11 @@
+ 	"} GROUP BY ?c"
  
- #define INCOMING_CALLS_QUERY						\
+ #define MISSED_CALLS_QUERY						\
 -	"SELECT nco:phoneNumber(?h) nco:fullname(?c) "			\
 +	"SELECT ?h nco:fullname(?c) "					\
  	"nco:nameFamily(?c) nco:nameGiven(?c) "				\
@@ -35,7 +35,7 @@ index e84c589..bd67699 100644
  	"nco:streetAddress(?p) nco:locality(?p) nco:region(?p) "	\
  	"nco:postalcode(?p) nco:country(?p) \"\" nco:emailAddress(?ew) "\
  	"nco:birthDate(?c) nco:nickname(?c) nco:url(?c) "		\
-@@ -278,7 +278,11 @@
+@@ -139,7 +139,11 @@
  	"nco:role(?a) nco:pobox(?pw) nco:extendedAddress(?pw) "		\
  	"nco:streetAddress(?pw) nco:locality(?pw) nco:region(?pw) "	\
  	"nco:postalcode(?pw) nco:country(?pw) nco:contactUID(?c) "	\
@@ -48,10 +48,10 @@ index e84c589..bd67699 100644
  	"nmo:isSent(?call) nmo:isAnswered(?call) ?x "			\
  	"WHERE { "							\
  	"{ "								\
-@@ -288,40 +292,81 @@
+@@ -149,40 +153,82 @@
  		"nmo:from ?x ; "					\
  		"nmo:isSent false ; "					\
- 		"nmo:isAnswered true . "				\
+ 		"nmo:isAnswered false . "				\
 +		"?c a nco:PersonContact . "				\
 +		"?c nco:hasPhoneNumber ?t . "				\
 +		"OPTIONAL { "						\
@@ -81,7 +81,7 @@ index e84c589..bd67699 100644
  		"?call a nmo:Call ; "					\
  		"nmo:from ?x ; "					\
  		"nmo:isSent false ; "					\
- 		"nmo:isAnswered true . "				\
+ 		"nmo:isAnswered false . "				\
  		"?c a nco:PersonContact . "				\
 -		"?c nco:hasPhoneNumber ?h . "				\
 -		"OPTIONAL { ?c nco:hasEmailAddress ?e . } "		\
@@ -125,7 +125,7 @@ index e84c589..bd67699 100644
  		"?call a nmo:Call ; "					\
  		"nmo:from ?x ; "					\
  		"nmo:isSent false ; "					\
- 		"nmo:isAnswered true . "				\
+ 		"nmo:isAnswered false . "				\
 -		"?c a nco:PersonContact . "				\
 -		"OPTIONAL { ?c nco:hasEmailAddress ?e . } "		\
 -		"OPTIONAL { ?c nco:hasPostalAddress ?p . } "		\
@@ -143,8 +143,9 @@ index e84c589..bd67699 100644
  	"} "								\
 -	"} GROUP BY ?call ORDER BY DESC(nmo:receivedDate(?call)) "
 +	"} ORDER BY DESC(nmo:receivedDate(?call)) "
++
  
- #define INCOMING_CALLS_LIST						\
+ #define MISSED_CALLS_LIST						\
  	"SELECT ?c nco:nameFamily(?c) "					\
 -- 
 1.7.0.4
