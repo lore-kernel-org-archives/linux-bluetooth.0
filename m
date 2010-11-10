@@ -1,56 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4CDA53AF.6000701@ihug.co.nz>
-Date: Wed, 10 Nov 2010 21:11:27 +1300
-From: elroy <elroy@ihug.co.nz>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: Ubuntu 10.04 - BlueZ 4.60 - Console-only BlueZ setup
-References: <4CD7A05F.1080805@ihug.co.nz> <930b6b5d0fcdfd10087260af984b94ac@libresoft.es>
-In-Reply-To: <930b6b5d0fcdfd10087260af984b94ac@libresoft.es>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <1289358915-6612-1-git-send-email-epx@signove.com>
+References: <1289358915-6612-1-git-send-email-epx@signove.com>
+From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+Date: Wed, 10 Nov 2010 09:02:24 +0100
+Message-ID: <AANLkTimS755Kk5Mf9wOhijANLBXAYYjqdCfBfJm=4aEK@mail.gmail.com>
+Subject: Re: [PATCH] [RFC] Fix HDP-related segfault upon device recreation
+To: =?ISO-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Elvis,
 
+2010/11/10 Elvis Pfützenreuter <epx@signove.com>:
+> When device is removed and paired again, hdp_device is destroyed
+> but a cached mcap_mcl may retain a pointer in mcl->cb->user_data.
+> This patch ensures that such MCL is destroyed.
+>
+> There is probably a better solution to this e.g. changing cache
+> strategy for accepted connections. A loop can be removed if 1:1
+> relationship between hdp_device and MCL is guaranteed.
+> ---
+>  health/hdp.c      |    1 +
+>  health/mcap.c     |   23 ++++++++++++++++++++++-
+>  health/mcap_lib.h |    2 ++
+>  3 files changed, 25 insertions(+), 1 deletions(-)
+>
+> diff --git a/health/hdp.c b/health/hdp.c
+> index b141fe7..44ebe75 100644
+> --- a/health/hdp.c
+> +++ b/health/hdp.c
+> @@ -277,6 +277,7 @@ static void free_health_device(struct hdp_device *device)
+>        }
+>
+>        device_unref_mcl(device);
+> +       mcap_invalidate_by_user_data(device->hdp_adapter->mi, device);
+>
+>        g_free(device);
+>  }
+> diff --git a/health/mcap.c b/health/mcap.c
+> index cb7b74c..34ccdaa 100644
+> --- a/health/mcap.c
+> +++ b/health/mcap.c
+> @@ -938,6 +938,27 @@ gboolean mcap_mcl_set_cb(struct mcap_mcl *mcl, gpointer user_data,
+>        return TRUE;
+>  }
+>
+> +static gint cmp_mcl_user_data(gconstpointer a, gconstpointer b)
+> +{
+> +       const struct mcap_mcl *mcl = a;
+> +       gconstpointer user_data = b;
+> +
+> +       if (mcl->cb)
+> +               if (mcl->cb->user_data == user_data)
+> +                       return 0;
+> +
+> +       return 1;
+> +}
+> +
+> +void mcap_invalidate_by_user_data(struct mcap_instance *mi, gpointer user_data)
+> +{
+> +       GSList *l;
+> +
+> +       while ((l = g_slist_find_custom(mi->cached, user_data,
+> +                                               cmp_mcl_user_data)))
+> +               mcap_close_mcl(l->data, FALSE);
+> +}
+> +
+>  void mcap_mcl_get_addr(struct mcap_mcl *mcl, bdaddr_t *addr)
+>  {
+>        bacpy(addr, &mcl->addr);
+> @@ -2143,4 +2164,4 @@ gboolean mcap_set_data_chan_mode(struct mcap_instance *mi, uint8_t mode,
+>
+>        return bt_io_set(mi->dcio, BT_IO_L2CAP, err, BT_IO_OPT_MODE, mode,
+>                                                        BT_IO_OPT_INVALID);
+> -}
+> \ No newline at end of file
+> +}
+> diff --git a/health/mcap_lib.h b/health/mcap_lib.h
+> index 7740623..cc10c17 100644
+> --- a/health/mcap_lib.h
+> +++ b/health/mcap_lib.h
+> @@ -172,6 +172,8 @@ void mcap_mcl_get_addr(struct mcap_mcl *mcl, bdaddr_t *addr);
+>  struct mcap_mcl *mcap_mcl_ref(struct mcap_mcl *mcl);
+>  void mcap_mcl_unref(struct mcap_mcl *mcl);
+>
+> +void mcap_invalidate_by_user_data(struct mcap_instance *mi, gpointer user_data);
+> +
+>  /* CSP operations */
+>
+>  void mcap_enable_csp(struct mcap_instance *ms);
 
-JosÃ© Antonio Santos Cadenas wrote:
-> Hi Elroy,
-> 
-> 
-> 
-> Did you try simple-agent? It is a python scrypt in the bluez
-> test/folder that doesn't require any gui. I don't if Ubuntu installs it,
-> but if you download the source code from the web page or the git repo
-> you will find it. Probably with this agent you will be able to pair your
-> cell phone. 
-> 
-> 
->>
->>I have been documenting my progress so far, to try to aid others
->>following my path - this may be useful to elaborate on what I am doing
->>and have achieved so far.
->>
->>
->>Regards,
->>
->>Elroy Liddington.
+I'm not sure if this is the best way to face this issue. It seems that
+this solution is a workaround to avoid the real problem. Let me have a
+look and search for a better solution.
 
-
-
-Cheers Jose.
-
-
-I'll add this gem to the page I'm documenting this on.
-
-Looks like those other scripts would be useful too.
-
-
-How would I be able to help in regards to knocking up a basic BlueZ MAN 
-page etc so that others could at least be pointed in the right direction 
-on where to go for help/docs?
-
-
-Regards,
-
-Elroy Liddington.
-
+Regards.
