@@ -1,44 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Fix segfault in HDP during device re-creation
-Mime-Version: 1.0 (Apple Message framework v1081)
-Content-Type: text/plain; charset=us-ascii
-From: =?iso-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
-In-Reply-To: <AANLkTimoQRAHXJ65xa1-TMKGUfLujw8f9MhzxrxPXHmY@mail.gmail.com>
-Date: Wed, 10 Nov 2010 09:36:11 -0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <126814B4-25DA-4BA4-A0B8-0E5D57001EF7@signove.com>
-References: <1289358915-6612-1-git-send-email-epx@signove.com> <1289382461-10510-1-git-send-email-santoscadenas@gmail.com> <AANLkTimoQRAHXJ65xa1-TMKGUfLujw8f9MhzxrxPXHmY@mail.gmail.com>
-To: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: <Waldemar.Rymarkiewicz@tieto.com>
+To: <marcel@holtmann.org>
+CC: <linux-bluetooth@vger.kernel.org>, <suraj@atheros.com>,
+	<johan.hedberg@gmail.com>, <joakim.xj.ceder@stericsson.com>
+Date: Wed, 10 Nov 2010 13:12:53 +0200
+Subject: RE: [PATCH 1/4] Sim Access Profile API
+Message-ID: <99B09243E1A5DA4898CDD8B7001114480BD700C239@EXMB04.eu.tieto.com>
+References: <1288791271-13857-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+	 <1288791271-13857-2-git-send-email-waldemar.rymarkiewicz@tieto.com>
+ <1289367190.9615.235.camel@aeonflux>
+In-Reply-To: <1289367190.9615.235.camel@aeonflux>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
->> ---
->>  health/hdp.c |    1 +
->>  1 files changed, 1 insertions(+), 0 deletions(-)
->> 
->> diff --git a/health/hdp.c b/health/hdp.c
->> index 1eba8e1..d361b27 100644
->> --- a/health/hdp.c
->> +++ b/health/hdp.c
->> @@ -259,6 +259,7 @@ static void device_unref_mcl(struct hdp_device *hdp_device)
->>        if (!hdp_device->mcl)
->>                return;
->> 
->> +       mcap_close_mcl(hdp_device->mcl, FALSE);
->>        mcap_mcl_unref(hdp_device->mcl);
->>        hdp_device->mcl = NULL;
->>        hdp_device->mcl_conn = FALSE;
->> --
->> 1.7.1
->> 
->> 
-> 
-> Please Elvis, try this solution and tell us if it fix the segfault problem.
+Hi Marcel,=20
 
-Yes, it seems to have fixed the problem. And far cleaner :)
+>> +		void Disable()
+>> +
+>> +			Shudown SAP server and remove the SDP record.
+>> +
+>> +			Possible errors: org.bluez.Error.Failed
+>
+>I don't like this. If you have properties then just changing=20
+>the property should be enough. So a SetProperty is more appropriate.
 
-I hadn't proposed a lookalike solution because this seems to disable MCL caching completely. HDP already calls mcap_close_mcl(cache=FALSE) when takes the initiative of closing the MCL; this patch takes care of remaining case.
+I see another option to get rid of 'Enabled' property and leave the methods=
+. What would you say on that?
 
-The only place hdp.c calls mcap_close_mcl(cache=TRUE) is when mcap_mcl_set_cb() fails, which seems "impossible", because it only depends on valid parameters to succeed.
+>> +
+>> +		void Disconnect(boolean type)
+>> +
+>> +			Disconnect SAP client from the server.=20
+>The 'type'
+>> +			parameter indicates disconnection type.
+>> +
+>> +			True  - gracefull disconnection
+>> +			False - immediate disconnection
+>> +
+>> +			Possible errors: org.bluez.Error.Failed
+>
+>I don't like this style of method names at all. Using method=20
+>names like GracefulDisconnect and ImmediateDisconnect would be better.
 
-So, perhaps it would be better to get rid of caching code in mcap.c?
+That's fine.
+
+>However I am not sure we should differentiate here at all. We=20
+>should always to the graceful disconnect. What will the=20
+>immediate disconnect bring us?
+
+That's actually intended for testing only. One of PTS test cases expects th=
+e tester to trigger immediate disconnect.
+In practce, it is only used when connection to sim card is lost, but this i=
+s obviously done internally.
+
+Thanks,
+/Waldek=
