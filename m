@@ -1,82 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4CDAE550.8090202@atheros.com>
-Date: Thu, 11 Nov 2010 00:02:48 +0530
-From: Bala Shanmugam <sbalashanmugam@atheros.com>
-MIME-Version: 1.0
-To: Marcel Holtmann <holtmann@linux.intel.com>
-CC: Shanmugamkamatchi Balashanmugam
-	<Shanmugamkamatchi.Balashanmugam@Atheros.com>,
-	Luis Rodriguez <Luis.Rodriguez@Atheros.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-	Deepak Dhamdhere <Deepak.Dhamdhere@Atheros.com>,
-	Sree Durbha <Sree.Durbha@Atheros.com>
-Subject: Re: RFC: btusb firmware load help
-References: <1286349552.6145.11.camel@aeonflux>	 <AANLkTimDvgFtoGLEjgWyYRrhQy6Num-rn_2WYO4Lf84b@mail.gmail.com>	 <1286380566.6145.42.camel@aeonflux> <20101006163816.GE7070@tux>	 <AANLkTik9w4_PdcEsbRHakLcxcD334_1Q8hGArxTXPCGF@mail.gmail.com>	 <20101006173949.GG7070@tux>	 <1286387660.3655.382.camel@jlt3.sipsolutions.net>	 <AANLkTikYRSQw-+Tcj4VS1qxi=OaeF9C5hjAMWVu+0M=v@mail.gmail.com>	 <AANLkTi=o4Mc72NrNoALBdS3YHeY7RMyyAJPsCy=uW3+F@mail.gmail.com>	 <1286389697.3655.401.camel@jlt3.sipsolutions.net>	 ,<20101006183340.GI7070@tux>	 <44EE5C37ADC36343B0625A05DD408C4850DAD2CA31@CHEXMB-01.global.atheros.com> <1286465072.6145.151.camel@aeonflux> <4CADF6BF.6070305@atheros.com>
-In-Reply-To: <4CADF6BF.6070305@atheros.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: [PATCH 7/7] Emit "DeviceFound" signal for LE devices
+Date: Wed, 10 Nov 2010 13:51:27 -0400
+Message-Id: <1289411487-6113-7-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1289411487-6113-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1289411487-6113-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-  Hi Marcel,
-On 10/7/2010 10:05 PM, Bala Shanmugam wrote:
->    On 10/7/2010 8:54 PM, Marcel Holtmann wrote:
->> Hi Bala,
->>
->>> Thanks Johannes.  This would be better option to change PID in firmware
->>> as blacklisting 3002 might create problems for 3011 chipsets.
->>> Will try and let you people know.
->> The misbehaving 3002 needs to be blacklisted in btusb.c anyway. However
->> after loading the firmware to 3002 device, it should change its PID to
->> something else.
->>
->> I am still trying to figure out if this is one stage firmware loading or
->> a two stage firmware loading. This is all pretty unclear and nobody has
->> answered this clearly so far.
->>
->> Regards
->>
->> Marcel
->>
->>
-> Marcel,
->
-> eeprom based 3011 chips comes up with PID 3000 giving control to DFU
-> driver [ath3k].  ath3k downloads the
-> firmware changing PID to 3002.  Now btusb gets control.
->
-> In sflash based devices to reduce windows suspend/resume time we had a
-> small firmware in flash which
-> enables the device to get detected as Generic Bluetooth USB device with
-> PID 3002.  So control reaches btusb when device is plugged in, leaving
-> no option for us to load the actual firmware.
->
-> Solution would be to blacklist 3002 in btusb, enable ath3k to get
-> control for both the devices, download the firmware and change PID to
-> 3003 so that control with come to btusb.
->
-> Thanks for your time.
->
-> Regards,
-> Bala.
+From: Bruna Moreira <bruna.moreira@openbossa.org>
 
-As you suggested we blacklisted PID 3002 in btusb and loaded firmware 
-using ath3k and it worked.
-Thanks.
-Many of our customers are using their own PIDs and blacklisting 3002 
-won't work for them.
-Can we blacklist all the PIDs used by different customers?
+The adapter_emit_device_found() function was modified to emit
+DeviceFound signal for LE devices as well.
+---
+ src/adapter.c |   30 +++++++++++++++++++++++++-----
+ 1 files changed, 25 insertions(+), 5 deletions(-)
 
-We have another device similar to above one, it doesn't do a USB reset 
-after downloading firmware.
-This is basically to reduce bring-up and suspend/resume time.
-Can we add an infrastructure in btusb to download configuration or 
-firmware for these devices?
-If not can you please suggest a solution for this device.
+diff --git a/src/adapter.c b/src/adapter.c
+index b263096..dab9087 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -3102,6 +3102,27 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
+ 	if (device)
+ 		paired = device_is_paired(device);
+ 
++	/* Extract UUIDs from extended inquiry response if any */
++	dev->services = get_eir_uuids(eir_data, eir_length, dev->services);
++	uuid_count = g_slist_length(dev->services);
++
++	if (dev->services)
++		uuids = strlist2array(dev->services);
++
++	if (dev->le) {
++		emit_device_found(adapter->path, paddr,
++				"Address", DBUS_TYPE_STRING, &paddr,
++				"RSSI", DBUS_TYPE_INT16, &rssi,
++				"Name", DBUS_TYPE_STRING, &dev->name,
++				"Paired", DBUS_TYPE_BOOLEAN, &paired,
++				"UUIDs", DBUS_TYPE_ARRAY, &uuids, uuid_count,
++				NULL);
++
++		g_strfreev(uuids);
++
++		return;
++	}
++
+ 	icon = class_to_icon(dev->class);
+ 
+ 	if (!dev->alias) {
+@@ -3113,12 +3134,7 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
+ 	} else
+ 		alias = g_strdup(dev->alias);
+ 
+-	/* Extract UUIDs from extended inquiry response if any */
+-	dev->services = get_eir_uuids(eir_data, eir_length, dev->services);
+-	uuid_count = g_slist_length(dev->services);
+-
+ 	if (dev->services) {
+-		uuids = strlist2array(dev->services);
+ 		g_slist_foreach(dev->services, (GFunc) g_free, NULL);
+ 		g_slist_free(dev->services);
+ 		dev->services = NULL;
+@@ -3196,6 +3212,10 @@ void adapter_update_adv(struct btd_adapter *adapter, le_advertising_info *info)
+ 		if (tmp_name)
+ 			dev->name = tmp_name;
+ 	}
++
++	/* FIXME: check if other information was changed before emitting the
++	 * signal */
++	adapter_emit_device_found(adapter, dev, info->data, info->length);
+ }
+ 
+ void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+-- 
+1.7.0.4
 
-Thanks in advance.
-
-Regards,
-Bala.
