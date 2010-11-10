@@ -1,154 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bartosz Szatkowski <bulislaw@linux.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Bartosz Szatkowski <bulislaw@linux.com>
-Subject: [PATCH 1/7] Fix proper type handling in contacts_query_all
-Date: Wed, 10 Nov 2010 14:15:24 +0100
-Message-Id: <1289394930-6694-1-git-send-email-bulislaw@linux.com>
+MIME-Version: 1.0
+In-Reply-To: <BCBAC715-C7A9-415F-BE62-F843DE5A72D1@signove.com>
+References: <1289358915-6612-1-git-send-email-epx@signove.com>
+ <1289382461-10510-1-git-send-email-santoscadenas@gmail.com>
+ <AANLkTimoQRAHXJ65xa1-TMKGUfLujw8f9MhzxrxPXHmY@mail.gmail.com>
+ <126814B4-25DA-4BA4-A0B8-0E5D57001EF7@signove.com> <AANLkTim=3tZWao0Kzqq8nr4Z=dOrXL_aK76Ernx=UqQS@mail.gmail.com>
+ <BCBAC715-C7A9-415F-BE62-F843DE5A72D1@signove.com>
+From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+Date: Wed, 10 Nov 2010 14:02:12 +0100
+Message-ID: <AANLkTi=5yNRrLgVroj6_82JYC73mOoq_mYf5svwsH_6F@mail.gmail.com>
+Subject: Re: [PATCH] Fix segfault in HDP during device re-creation
+To: =?ISO-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Previously all phone numbers, addresses and emails was considered to be "work".
-Now there are three working types for emails and addresses: "work", "home",
-"other" and four for phone numbers - these three as well as "cell".
----
- plugins/phonebook-tracker.c |   61 +++++++++++++++++++++++++++++++------------
- 1 files changed, 44 insertions(+), 17 deletions(-)
+Hi Elvis,
 
-diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index 58f52ab..83327e0 100644
---- a/plugins/phonebook-tracker.c
-+++ b/plugins/phonebook-tracker.c
-@@ -43,8 +43,8 @@
- #define TRACKER_RESOURCES_INTERFACE "org.freedesktop.Tracker1.Resources"
- 
- #define TRACKER_DEFAULT_CONTACT_ME "http://www.semanticdesktop.org/ontologies/2007/03/22/nco#default-contact-me"
--#define CONTACTS_ID_COL 38
--#define PULL_QUERY_COL_AMOUNT 39
-+#define CONTACTS_ID_COL 47
-+#define PULL_QUERY_COL_AMOUNT 48
- #define COUNT_QUERY_COL_AMOUNT 1
- #define COL_HOME_NUMBER 0
- #define COL_HOME_EMAIL 7
-@@ -52,14 +52,16 @@
- #define COL_FAX_NUMBER 16
- #define COL_WORK_EMAIL 17
- #define COL_OTHER_NUMBER 34
--#define COL_DATE 35
--#define COL_SENT 36
--#define COL_ANSWERED 37
-+#define COL_OTHER_EMAIL 42
-+#define COL_CELL_NUMBER 43
-+#define COL_DATE 44
-+#define COL_SENT 45
-+#define COL_ANSWERED 46
- #define ADDR_FIELD_AMOUNT 7
- #define CONTACT_ID_PREFIX "contact:"
- 
- #define CONTACTS_QUERY_ALL						\
--	"SELECT ?v nco:fullname(?c) "					\
-+	"SELECT nco:phoneNumber(?v) nco:fullname(?c) "			\
- 	"nco:nameFamily(?c) nco:nameGiven(?c) "				\
- 	"nco:nameAdditional(?c) nco:nameHonorificPrefix(?c) "		\
- 	"nco:nameHonorificSuffix(?c) nco:emailAddress(?e) "		\
-@@ -71,29 +73,43 @@
- 	"nco:role(?a) nco:pobox(?pw) nco:extendedAddress(?pw) "		\
- 	"nco:streetAddress(?pw) nco:locality(?pw) nco:region(?pw) "	\
- 	"nco:postalcode(?pw) nco:country(?pw) nco:contactUID(?c) "	\
--	"nco:title(?a) nco:phoneNumber(?t) "				\
-+	"nco:title(?a) ?t nco:pobox(?po) nco:extendedAddress(?po) "	\
-+	"nco:streetAddress(?po) nco:locality(?po) nco:region(?po) "	\
-+        "nco:postalcode(?po) nco:country(?po) nco:emailAddress(?eo) "	\
-+	"?vc "								\
- 	"\"NOTACALL\" \"false\" \"false\" ?c "				\
- 	"WHERE { "							\
- 		"?c a nco:PersonContact . "				\
--	"OPTIONAL { ?c nco:hasPhoneNumber ?h . 				\
--		OPTIONAL {"						\
-+	"OPTIONAL { ?c nco:hasPhoneNumber ?h . "			\
-+		"OPTIONAL {"						\
- 		"?h a nco:FaxNumber ; "					\
- 		"nco:phoneNumber ?f . "					\
- 		"}"							\
- 		"OPTIONAL {"						\
-+		"?h a nco:CellPhoneNumber ; "				\
-+		"nco:phoneNumber ?vc"					\
-+		"}"							\
-+		"OPTIONAL {"						\
- 		"?h a nco:VoicePhoneNumber ; "				\
--		"nco:phoneNumber ?v"					\
-+		"nco:phoneNumber ?t"					\
- 		"}"							\
- 	"}"								\
--	"OPTIONAL { ?c nco:hasEmailAddress ?e . } "			\
--	"OPTIONAL { ?c nco:hasPostalAddress ?p . } "			\
- 	"OPTIONAL { "							\
- 		"?c nco:hasAffiliation ?a . "				\
--		"OPTIONAL { ?a nco:hasPhoneNumber ?w . } " 		\
--		"OPTIONAL { ?a nco:hasEmailAddress ?ew . } "		\
--		"OPTIONAL { ?a nco:hasPostalAddress ?pw . } "		\
-+		"OPTIONAL { ?a rdfs:label \"Work\" . "			\
-+			"OPTIONAL { ?a nco:hasEmailAddress ?ew . } "	\
-+			"OPTIONAL { ?a nco:hasPostalAddress ?pw . } "	\
-+			"OPTIONAL { ?a nco:hasPhoneNumber ?w . } "	\
-+		"}"							\
-+		"OPTIONAL { ?a rdfs:label \"Home\" . "			\
-+			"OPTIONAL { ?a nco:hasEmailAddress ?e . } "	\
-+			"OPTIONAL { ?a nco:hasPostalAddress ?p . } "	\
-+			"OPTIONAL { ?a nco:hasPhoneNumber ?v . } "	\
-+		"}"							\
- 		"OPTIONAL { ?a nco:org ?o . } "				\
- 	"} "								\
-+	"OPTIONAL { ?c nco:hasPostalAddress ?po . } "			\
-+	"OPTIONAL { ?c nco:hasEmailAddress ?eo . } "			\
- 	"}"
- 
- #define CONTACTS_QUERY_ALL_LIST						\
-@@ -1107,7 +1123,7 @@ static void pull_contacts(char **reply, int num_fields, void *user_data)
- 	GString *vcards;
- 	int last_index, i;
- 	gboolean cdata_present = FALSE;
--	char *home_addr, *work_addr;
-+	char *home_addr, *work_addr, *other_addr;
- 
- 	if (num_fields < 0) {
- 		data->cb(NULL, 0, num_fields, 0, data->user_data);
-@@ -1178,11 +1194,16 @@ add_numbers:
- 	add_phone_number(contact, reply[COL_HOME_NUMBER], TEL_TYPE_HOME);
- 	add_phone_number(contact, reply[COL_WORK_NUMBER], TEL_TYPE_WORK);
- 	add_phone_number(contact, reply[COL_FAX_NUMBER], TEL_TYPE_FAX);
--	add_phone_number(contact, reply[COL_OTHER_NUMBER], TEL_TYPE_OTHER);
-+	add_phone_number(contact, reply[COL_CELL_NUMBER], TEL_TYPE_MOBILE);
-+	if ((g_strcmp0(reply[COL_OTHER_NUMBER], reply[COL_CELL_NUMBER]) != 0) &&
-+			(g_strcmp0(reply[COL_OTHER_NUMBER], reply[COL_WORK_NUMBER]) != 0) &&
-+			(g_strcmp0(reply[COL_OTHER_NUMBER], reply[COL_HOME_NUMBER]) != 0))
-+		add_phone_number(contact, reply[COL_OTHER_NUMBER], TEL_TYPE_OTHER);
- 
- 	/* Adding emails */
- 	add_email(contact, reply[COL_HOME_EMAIL], EMAIL_TYPE_HOME);
- 	add_email(contact, reply[COL_WORK_EMAIL], EMAIL_TYPE_WORK);
-+	add_email(contact, reply[COL_OTHER_EMAIL], EMAIL_TYPE_OTHER);
- 
- 	/* Adding addresses */
- 	home_addr = g_strdup_printf("%s;%s;%s;%s;%s;%s;%s",
-@@ -1193,11 +1214,17 @@ add_numbers:
- 				reply[25], reply[26], reply[27], reply[28],
- 				reply[29], reply[30], reply[31]);
- 
-+	other_addr = g_strdup_printf("%s;%s;%s;%s;%s;%s;%s",
-+				reply[35], reply[36], reply[37], reply[38],
-+				reply[39], reply[40], reply[41]);
-+
- 	add_address(contact, home_addr, ADDR_TYPE_HOME);
- 	add_address(contact, work_addr, ADDR_TYPE_WORK);
-+	add_address(contact, other_addr, ADDR_TYPE_OTHER);
- 
- 	g_free(home_addr);
- 	g_free(work_addr);
-+	g_free(other_addr);
- 
- 	/* Adding fields connected by nco:hasAffiliation - they may be in
- 	 * separate replies */
--- 
-1.7.0.4
+2010/11/10 Elvis Pfützenreuter <epx@signove.com>:
+>> Hi Elvis,
+>>
+>> 2010/11/10 Elvis Pfützenreuter <epx@signove.com>:
+>>>>> ---
+>>>>>  health/hdp.c |    1 +
+>>>>>  1 files changed, 1 insertions(+), 0 deletions(-)
+>>>>>
+>>>>> diff --git a/health/hdp.c b/health/hdp.c
+>>>>> index 1eba8e1..d361b27 100644
+>>>>> --- a/health/hdp.c
+>>>>> +++ b/health/hdp.c
+>>>>> @@ -259,6 +259,7 @@ static void device_unref_mcl(struct hdp_device *hdp_device)
+>>>>>        if (!hdp_device->mcl)
+>>>>>                return;
+>>>>>
+>>>>> +       mcap_close_mcl(hdp_device->mcl, FALSE);
+>>>>>        mcap_mcl_unref(hdp_device->mcl);
+>>>>>        hdp_device->mcl = NULL;
+>>>>>        hdp_device->mcl_conn = FALSE;
+>>>>> --
+>>>>> 1.7.1
+>>>>>
+>>>>>
+>>>>
+>>>> Please Elvis, try this solution and tell us if it fix the segfault problem.
+>>>
+>>> Yes, it seems to have fixed the problem. And far cleaner :)
+>>>
+>>> I hadn't proposed a lookalike solution because this seems to disable MCL caching completely. HDP already calls mcap_close_mcl(cache=FALSE) when takes the initiative of closing the MCL; this patch takes care of remaining case.
+>>
+>> This function doesn't disable the caching in general, it just closes
+>> this MCL without catching it, but caching is still active for all the
+>> other MCL's. Additionally, nothing happens if mcap_close_mcl is called
+>> more than once, so this patch takes care of this too.
+>
+> Indeed, MCL disconnection and hdp_device destruction are different moments. Still fulfilling the caffeine quota for this morning :P
 
+Of course they are, but when a device is removed, is completely normal
+that you (HDP) would like to delete the MCAP cache because you (HDP)
+are forgetting this device so you won't have any structures for the
+data channels nor other structs in HDP needed to manage the
+reconnections of the data channels that could be cached. The way to
+uncache an mcl in MCAP is to close it indicating that you don't want
+to cache it. This is just what this patch to.
+
+>
+>>>
+>>> So, perhaps it would be better to get rid of caching code in mcap.c?
+>>
+>> I can't understand this, can you explain this more?. As I see, MCAP
+>> should do the catching because it holds all the information about the
+>> channels that are connected and can cache it, HDP could not do this
+>> without MCAP. More over, if in the future more profiles use MCAP they
+>> may want to cache too.
+>
+> I do have the opinion that caching in mcap.c is more complicated than it could be.
+
+My opinion is that caching in MCAP is the correct way because MCAP is
+dealing with sending and receiving commands and need to retain certain
+structures that are necessary for it, this structures do not concern
+to HDP, only concerns to MCAP and should be MCAP who stores (caches)
+them.
+
+> I'd have used a single list with a CLOSED flag. Also, there is some confusion in nomenclature (mcap_uncache_mcl() recovers from the cache, while mcl_uncached_cb callback means that MCL has been invalidated). This is source of bugs like this one.
+
+This is a different issue. Probably the nomenclature is not as clear
+as it should be but I think that this is not the point here,
+nevertheless we can change it too.
+
+>
+> At the very least, cached MCLs should have mcl->cb zeroed. if MCAP level caches MCLs, very well, but HDP level should be asked to set callbacks and user data again, as if it were a new MCL. (Actually, mcl_reconnected in hdp.c seems to do that; not sure why it did not avoid the particular bug that is under discussion.)
+
+It is supposed that if HDP (or any other profile using MCAP) wants to
+use cache, it should keep its variables all the time that it is
+interested in caching them. If the profile using MCAP don't want to
+keep its state should tell MCAP that it is not interested in caching
+(as the patch in this thread does) because it is deleting its own
+state.
+
+
+Regards.
+
+Jose
