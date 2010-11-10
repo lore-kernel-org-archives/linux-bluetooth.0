@@ -1,91 +1,202 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sheldon Demario <sheldon.demario@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sheldon Demario <sheldon.demario@openbossa.org>
-Subject: [PATCH] Adding a new option to specify medium security level for gatttool
-Date: Wed, 10 Nov 2010 16:21:35 -0500
-Message-Id: <1289424095-26628-1-git-send-email-sheldon.demario@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <1289401913-22982-3-git-send-email-johan.hedberg@gmail.com>
+References: <1289401913-22982-1-git-send-email-johan.hedberg@gmail.com>
+	<1289401913-22982-3-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 10 Nov 2010 23:11:06 +0200
+Message-ID: <AANLkTi=oXJq7-ueN=LZEd21OACuOxagL=d1tbMddDSib@mail.gmail.com>
+Subject: Re: [PATCH 3/3] Bluetooth: Automate remote name requests
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@nokia.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- TODO              |    6 ------
- attrib/gatttool.c |   11 +++++++++--
- 2 files changed, 9 insertions(+), 8 deletions(-)
+Hi,
 
-diff --git a/TODO b/TODO
-index c0a25f1..49a9e76 100644
---- a/TODO
-+++ b/TODO
-@@ -123,12 +123,6 @@ ATT/GATT
-   Priority: Low
-   Complexity: C1
- 
--- Add command line support to use medium instead of (default) low
--  security level with gatttool (--sec-level)
--
--  Priority: Low
--  Complexity: C1
--
- - Implement Server characteristic Configuration support in the attribute
-   server to manage characteristic value broadcasting. There is a single
-   instance of the Server Characteristic Configuration for all clients.
-diff --git a/attrib/gatttool.c b/attrib/gatttool.c
-index b9f5138..929ee5d 100644
---- a/attrib/gatttool.c
-+++ b/attrib/gatttool.c
-@@ -54,6 +54,7 @@ static int opt_end = 0xffff;
- static int opt_handle = -1;
- static int opt_mtu = 0;
- static int opt_psm = 0x1f;
-+static gboolean opt_medium_sec = FALSE;
- static gboolean opt_primary = FALSE;
- static gboolean opt_characteristics = FALSE;
- static gboolean opt_char_read = FALSE;
-@@ -84,6 +85,7 @@ static GIOChannel *do_connect(gboolean le)
- 	GIOChannel *chan;
- 	bdaddr_t sba, dba;
- 	GError *err = NULL;
-+	BtIOSecLevel sec_level;
- 
- 	/* This check is required because currently setsockopt() returns no
- 	 * errors for MTU values smaller than the allowed minimum. */
-@@ -109,13 +111,15 @@ static GIOChannel *do_connect(gboolean le)
- 	} else
- 		bacpy(&sba, BDADDR_ANY);
- 
-+	sec_level = opt_medium_sec ? BT_IO_SEC_MEDIUM : BT_IO_SEC_LOW;
-+
- 	if (le)
- 		chan = bt_io_connect(BT_IO_L2CAP, connect_cb, NULL, NULL, &err,
- 				BT_IO_OPT_SOURCE_BDADDR, &sba,
- 				BT_IO_OPT_DEST_BDADDR, &dba,
- 				BT_IO_OPT_CID, GATT_CID,
- 				BT_IO_OPT_OMTU, opt_mtu,
--				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
-+				BT_IO_OPT_SEC_LEVEL, sec_level,
- 				BT_IO_OPT_INVALID);
- 	else
- 		chan = bt_io_connect(BT_IO_L2CAP, connect_cb, NULL, NULL, &err,
-@@ -123,7 +127,7 @@ static GIOChannel *do_connect(gboolean le)
- 				BT_IO_OPT_DEST_BDADDR, &dba,
- 				BT_IO_OPT_PSM, opt_psm,
- 				BT_IO_OPT_OMTU, opt_mtu,
--				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
-+				BT_IO_OPT_SEC_LEVEL, sec_level,
- 				BT_IO_OPT_INVALID);
- 
- 	if (err) {
-@@ -519,6 +523,9 @@ static GOptionEntry options[] = {
- 		"Specify the MTU size", "MTU" },
- 	{ "psm", 'p', 0, G_OPTION_ARG_INT, &opt_psm,
- 		"Specify the PSM for GATT/ATT over BR/EDR", "PSM" },
-+	{ "sec-medium", 's', 0, G_OPTION_ARG_NONE, &opt_medium_sec,
-+		"Use medium instead of default low security level",
-+		NULL},
- 	{ NULL },
- };
- 
+On Wed, Nov 10, 2010 at 5:11 PM,  <johan.hedberg@gmail.com> wrote:
+> From: Johan Hedberg <johan.hedberg@nokia.com>
+>
+> In Bluetooth there are no automatic updates of remote device names when
+> they get changed on the remote side. Instead, it is a good idea to do a
+> manual name request when a new connection gets created (for whatever
+> reason) since at this point it is very cheap (no costly baseband
+> connection creation needed just for the sake of the name request).
+>
+> So far userspace has been responsible for this extra name request but
+> tighter control is needed in order not to flood Bluetooth controllers
+> with two many commands during connection creation. It has been shown
+> that some controllers simply fail to function correctly if they get too
+> many (almost) simultaneous commands during connection creation. The
+> simplest way to acheive better control of these commands is to move
+> their sending completely to the kernel side.
+>
+> This patch inserts name requests into the sequence of events that the
+> kernel performs during connection creation. It does this after the
+> remote features have been successfully requested and before any pending
+> authentication requests are performed. The code will work sub-optimally
+> with userspace versions that still do the name requesting themselves (it
+> shouldn't break anything though) so it is recommended to combine this
+> with a userspace software version that doesn't have automated name
+> requests.
+>
+> Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
+> ---
+>  net/bluetooth/hci_event.c |   74 ++++++++++++++++++++++++++++++++++----------
+>  1 files changed, 57 insertions(+), 17 deletions(-)
+>
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 45569f2..cef970f 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -677,9 +677,8 @@ static void hci_cs_set_conn_encrypt(struct hci_dev *hdev, __u8 status)
+>        hci_dev_unlock(hdev);
+>  }
+>
+> -static int request_outgoing_auth(struct hci_dev *hdev, bdaddr_t *bdaddr)
+> +static int outgoing_auth_needed(struct hci_dev *hdev, bdaddr_t *bdaddr)
+>  {
+> -       struct hci_cp_auth_requested cp;
+>        struct hci_conn *conn;
+>
+>        conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, bdaddr);
+> @@ -698,15 +697,43 @@ static int request_outgoing_auth(struct hci_dev *hdev, bdaddr_t *bdaddr)
+>                                        conn->sec_level != BT_SECURITY_HIGH)
+>                return 0;
+>
+> -       cp.handle = __cpu_to_le16(conn->handle);
+> -       hci_send_cmd(hdev, HCI_OP_AUTH_REQUESTED, sizeof(cp), &cp);
+> -
+>        return 1;
+>  }
+>
+> +static int request_auth(struct hci_dev *hdev, bdaddr_t *bdaddr)
+> +{
+> +       struct hci_cp_auth_requested cp;
+> +       struct hci_conn *conn;
+> +
+> +       conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, bdaddr);
+> +       if (!conn)
+> +               return -ENOTCONN;
+> +
+> +       cp.handle = __cpu_to_le16(conn->handle);
+> +       return hci_send_cmd(hdev, HCI_OP_AUTH_REQUESTED, sizeof(cp), &cp);
+> +}
+> +
+>  static void hci_cs_remote_name_req(struct hci_dev *hdev, __u8 status)
+>  {
+> +       struct hci_cp_remote_name_req *cp;
+> +
+>        BT_DBG("%s status 0x%x", hdev->name, status);
+> +
+> +       /* If successful wait for the name req complete event before
+> +        * checking for the need to do authentication */
+> +       if (!status)
+> +               return;
+> +
+> +       cp = hci_sent_cmd_data(hdev, HCI_OP_REMOTE_NAME_REQ);
+> +       if (!cp)
+> +               return;
+> +
+> +       hci_dev_lock(hdev);
+> +
+> +       if (outgoing_auth_needed(hdev, &cp->bdaddr))
+> +               request_auth(hdev, &cp->bdaddr);
+> +
+> +       hci_dev_unlock(hdev);
+>  }
+>
+>  static void hci_cs_read_remote_features(struct hci_dev *hdev, __u8 status)
+> @@ -1117,9 +1144,18 @@ static inline void hci_auth_complete_evt(struct hci_dev *hdev, struct sk_buff *s
+>
+>  static inline void hci_remote_name_evt(struct hci_dev *hdev, struct sk_buff *skb)
+>  {
+> +       struct hci_ev_remote_name *ev = (void *) skb->data;
+> +
+>        BT_DBG("%s", hdev->name);
+>
+>        hci_conn_check_pending(hdev);
+> +
+> +       hci_dev_lock(hdev);
+> +
+> +       if (outgoing_auth_needed(hdev, &ev->bdaddr))
+> +               request_auth(hdev, &ev->bdaddr);
+> +
+> +       hci_dev_unlock(hdev);
+>  }
+>
+>  static inline void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
+> @@ -1183,7 +1219,6 @@ static inline void hci_remote_features_evt(struct hci_dev *hdev, struct sk_buff
+>  {
+>        struct hci_ev_remote_features *ev = (void *) skb->data;
+>        struct hci_conn *conn;
+> -       int auth_requested;
+>
+>        BT_DBG("%s status %d", hdev->name, ev->status);
+>
+> @@ -1208,12 +1243,15 @@ static inline void hci_remote_features_evt(struct hci_dev *hdev, struct sk_buff
+>                goto unlock;
+>        }
+>
+> -       if (!ev->status)
+> -               auth_requested = request_outgoing_auth(hdev, &conn->dst);
+> -       else
+> -               auth_requested = 0;
+> +       if (!ev->status) {
+> +               struct hci_cp_remote_name_req cp;
+> +               memset(&cp, 0, sizeof(cp));
+> +               bacpy(&cp.bdaddr, &conn->dst);
+> +               cp.pscan_rep_mode = 0x02;
+> +               hci_send_cmd(hdev, HCI_OP_REMOTE_NAME_REQ, sizeof(cp), &cp);
+> +       }
+>
+> -       if (!auth_requested) {
+> +       if (!outgoing_auth_needed(hdev, &conn->dst)) {
+>                conn->state = BT_CONNECTED;
+>                hci_proto_connect_cfm(conn, ev->status);
+>                hci_conn_put(conn);
+> @@ -1671,7 +1709,6 @@ static inline void hci_remote_ext_features_evt(struct hci_dev *hdev, struct sk_b
+>  {
+>        struct hci_ev_remote_ext_features *ev = (void *) skb->data;
+>        struct hci_conn *conn;
+> -       int auth_requested;
+>
+>        BT_DBG("%s", hdev->name);
+>
+> @@ -1693,12 +1730,15 @@ static inline void hci_remote_ext_features_evt(struct hci_dev *hdev, struct sk_b
+>        if (conn->state != BT_CONFIG)
+>                goto unlock;
+>
+> -       if (!ev->status)
+> -               auth_requested = request_outgoing_auth(hdev, &conn->dst);
+> -       else
+> -               auth_requested = 0;
+> +       if (!ev->status) {
+> +               struct hci_cp_remote_name_req cp;
+> +               memset(&cp, 0, sizeof(cp));
+> +               bacpy(&cp.bdaddr, &conn->dst);
+> +               cp.pscan_rep_mode = 0x02;
+> +               hci_send_cmd(hdev, HCI_OP_REMOTE_NAME_REQ, sizeof(cp), &cp);
+> +       }
+>
+> -       if (!auth_requested) {
+> +       if (!outgoing_auth_needed(hdev, &conn->dst)) {
+>                conn->state = BT_CONNECTED;
+>                hci_proto_connect_cfm(conn, ev->status);
+>                hci_conn_put(conn);
+> --
+> 1.7.2.3
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+
+Acked-by: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+
 -- 
-1.6.2.rc2
-
+Luiz Augusto von Dentz
+Computer Engineer
