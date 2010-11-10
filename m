@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Bartosz Szatkowski <bulislaw@linux.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bartosz Szatkowski <bulislaw@linux.com>
-Subject: [PATCH 4/7] Fix proper type handling in outgoing_calls_query
-Date: Wed, 10 Nov 2010 14:15:27 +0100
-Message-Id: <1289394930-6694-4-git-send-email-bulislaw@linux.com>
+Subject: [PATCH 3/7] Fix proper type handling in incoming_calls_query
+Date: Wed, 10 Nov 2010 14:15:26 +0100
+Message-Id: <1289394930-6694-3-git-send-email-bulislaw@linux.com>
 In-Reply-To: <1289394930-6694-1-git-send-email-bulislaw@linux.com>
 References: <1289394930-6694-1-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,17 +14,17 @@ Previously all phone numbers, addresses and emails was considered to be "work".
 Now there are three working types for emails and addresses: "work", "home",
 "other" and four for phone numbers - these three as well as "cell".
 ---
- plugins/phonebook-tracker.c |   85 +++++++++++++++++++++++++++++++++----------
- 1 files changed, 65 insertions(+), 20 deletions(-)
+ plugins/phonebook-tracker.c |   83 +++++++++++++++++++++++++++++++++----------
+ 1 files changed, 64 insertions(+), 19 deletions(-)
 
 diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index bd67699..c40eb63 100644
+index e84c589..bd67699 100644
 --- a/plugins/phonebook-tracker.c
 +++ b/plugins/phonebook-tracker.c
-@@ -404,19 +404,23 @@
+@@ -266,11 +266,11 @@
  	"} GROUP BY ?call ORDER BY DESC(nmo:receivedDate(?call))"
  
- #define OUTGOING_CALLS_QUERY						\
+ #define INCOMING_CALLS_QUERY						\
 -	"SELECT nco:phoneNumber(?h) nco:fullname(?c) "			\
 +	"SELECT ?h nco:fullname(?c) "					\
  	"nco:nameFamily(?c) nco:nameGiven(?c) "				\
@@ -33,10 +33,9 @@ index bd67699..c40eb63 100644
 -	"nco:phoneNumber(?w) nco:pobox(?p) nco:extendedAddress(?p) "	\
 +	"?w nco:pobox(?p) nco:extendedAddress(?p) "			\
  	"nco:streetAddress(?p) nco:locality(?p) nco:region(?p) "	\
--	"nco:postalcode(?p) nco:country(?p) \"\" nco:emailAddress(?ew)"	\
-+	"nco:postalcode(?p) nco:country(?p) \"\" nco:emailAddress(?ew) "\
+ 	"nco:postalcode(?p) nco:country(?p) \"\" nco:emailAddress(?ew) "\
  	"nco:birthDate(?c) nco:nickname(?c) nco:url(?c) "		\
- 	"nco:photo(?c) nco:fullname(?o) nco:department(?a) "		\
+@@ -278,7 +278,11 @@
  	"nco:role(?a) nco:pobox(?pw) nco:extendedAddress(?pw) "		\
  	"nco:streetAddress(?pw) nco:locality(?pw) nco:region(?pw) "	\
  	"nco:postalcode(?pw) nco:country(?pw) nco:contactUID(?c) "	\
@@ -49,10 +48,10 @@ index bd67699..c40eb63 100644
  	"nmo:isSent(?call) nmo:isAnswered(?call) ?x "			\
  	"WHERE { "							\
  	"{ "								\
-@@ -425,38 +429,79 @@
- 		"?call a nmo:Call ; "					\
- 		"nmo:to ?x ; "						\
- 		"nmo:isSent true . "					\
+@@ -288,40 +292,81 @@
+ 		"nmo:from ?x ; "					\
+ 		"nmo:isSent false ; "					\
+ 		"nmo:isAnswered true . "				\
 +		"?c a nco:PersonContact . "				\
 +		"?c nco:hasPhoneNumber ?t . "				\
 +		"OPTIONAL { "						\
@@ -80,8 +79,9 @@ index bd67699..c40eb63 100644
 -		"?x nco:hasPhoneNumber ?h . "				\
 +		"?x nco:hasPhoneNumber ?tmp . "				\
  		"?call a nmo:Call ; "					\
- 		"nmo:to ?x ; "						\
- 		"nmo:isSent true . "					\
+ 		"nmo:from ?x ; "					\
+ 		"nmo:isSent false ; "					\
+ 		"nmo:isAnswered true . "				\
  		"?c a nco:PersonContact . "				\
 -		"?c nco:hasPhoneNumber ?h . "				\
 -		"OPTIONAL { ?c nco:hasEmailAddress ?e . } "		\
@@ -123,8 +123,9 @@ index bd67699..c40eb63 100644
 -		"?x nco:hasPhoneNumber ?w . "				\
 +		"?x nco:hasPhoneNumber ?t . "				\
  		"?call a nmo:Call ; "					\
- 		"nmo:to ?x ; "						\
- 		"nmo:isSent true . "					\
+ 		"nmo:from ?x ; "					\
+ 		"nmo:isSent false ; "					\
+ 		"nmo:isAnswered true . "				\
 -		"?c a nco:PersonContact . "				\
 -		"OPTIONAL { ?c nco:hasEmailAddress ?e . } "		\
 -		"OPTIONAL { ?c nco:hasPostalAddress ?p . } "		\
@@ -140,10 +141,10 @@ index bd67699..c40eb63 100644
 +			"?a nco:hasPhoneNumber ?t . } "			\
 +		"FILTER ( !bound(?c) && !bound(?a) ) . "		\
  	"} "								\
--	"} GROUP BY ?call ORDER BY DESC(nmo:sentDate(?call)) "
-+	"} ORDER BY DESC(nmo:sentDate(?call)) "
+-	"} GROUP BY ?call ORDER BY DESC(nmo:receivedDate(?call)) "
++	"} ORDER BY DESC(nmo:receivedDate(?call)) "
  
- #define OUTGOING_CALLS_LIST						\
+ #define INCOMING_CALLS_LIST						\
  	"SELECT ?c nco:nameFamily(?c) "					\
 -- 
 1.7.0.4
