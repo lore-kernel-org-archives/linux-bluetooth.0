@@ -1,38 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20101110062030.GE20384@null>
-References: <1287406976-13463-1-git-send-email-ville.tervo@nokia.com>
-	<AANLkTina_HUT3SGEUMemVLrD4N3+Ni+xCsaC57whHDZG@mail.gmail.com>
-	<20101110062030.GE20384@null>
-Date: Wed, 10 Nov 2010 06:46:47 -0400
-Message-ID: <AANLkTi=iCXfycMzHbgwS3jbvCxJvzVh97iSDRf4WhQeQ@mail.gmail.com>
-Subject: Re: [RFC] Bluetooth Low energy support
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Ville Tervo <ville.tervo@nokia.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1289382461-10510-1-git-send-email-santoscadenas@gmail.com>
+References: <1289358915-6612-1-git-send-email-epx@signove.com> <1289382461-10510-1-git-send-email-santoscadenas@gmail.com>
+From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+Date: Wed, 10 Nov 2010 10:49:11 +0100
+Message-ID: <AANLkTimoQRAHXJ65xa1-TMKGUfLujw8f9MhzxrxPXHmY@mail.gmail.com>
+Subject: Re: [PATCH] Fix segfault in HDP during device re-creation
+To: linux-bluetooth@vger.kernel.org
+Cc: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Nov 10, 2010 at 2:20 AM, Ville Tervo <ville.tervo@nokia.com> wrote:
-> On Tue, Nov 09, 2010 at 05:25:10PM +0100, ext Anderson Lizardo wrote:
->> While doing tests with your most recent trees (using devel HW from
->> TI), I'm getting consistent panic on the following test:
->>
->> (dev1) hciconfig hciX leadv
->> (dev2) hcitool -i hciX lecc <dev2_addr>
+2010/11/10 Jose Antonio Santos Cadenas <santoscadenas@gmail.com>:
+> ---
+>  health/hdp.c |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
 >
-> Did you have server listening on dev 2 on ATT socket?
-
-I had no bluetoothd running on any side (not sure if that was your question).
-
->> I attached two logs. One is from dev1 machine (which has the oops),
->> the other is from the dev2 machine.
+> diff --git a/health/hdp.c b/health/hdp.c
+> index 1eba8e1..d361b27 100644
+> --- a/health/hdp.c
+> +++ b/health/hdp.c
+> @@ -259,6 +259,7 @@ static void device_unref_mcl(struct hdp_device *hdp_device)
+>        if (!hdp_device->mcl)
+>                return;
 >
-> I'll try to fix this today.
+> +       mcap_close_mcl(hdp_device->mcl, FALSE);
+>        mcap_mcl_unref(hdp_device->mcl);
+>        hdp_device->mcl = NULL;
+>        hdp_device->mcl_conn = FALSE;
+> --
+> 1.7.1
+>
+>
 
-Thanks,
--- 
-Anderson Lizardo
-OpenBossa Labs - INdT
-Manaus - Brazil
+Please Elvis, try this solution and tell us if it fix the segfault problem.
+
+Regards
