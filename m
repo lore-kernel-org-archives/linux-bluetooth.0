@@ -1,75 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Wed, 10 Nov 2010 13:38:36 -0200
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Reply-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/9] Fixing DBus error system in BlueZ
-Message-ID: <20101110153836.GA3275@vigoh>
-References: <1289197787-16715-1-git-send-email-padovan@profusion.mobi>
- <20101108123330.GA1751@jh-x301>
- <20101108173133.GA18818@vigoh>
- <1289366622.9615.230.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1289366622.9615.230.camel@aeonflux>
+Subject: Re: [PATCHv4 0/2] Fix kernel crash in rfcomm/l2cap
+References: 
+	 <1288780365-32099-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	  <1289367396.9615.238.camel@aeonflux>
+In-Reply-To: <1289367396.9615.238.camel@aeonflux>
+Content-Type: text/plain; charset=utf-8
+Date: Wed, 10 Nov 2010 17:24:54 +0200
+Message-Id: <1289402694.23417.2.camel@Nokia-N900>
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-* Marcel Holtmann <marcel@holtmann.org> [2010-11-10 14:23:42 +0900]:
-
-> Hi Gustavo,
+> Hi Andrei,
 > 
-> > > On Mon, Nov 08, 2010, Gustavo F. Padovan wrote:
-> > > > Here are some patches that try to fix the mess of reporting error to
-> > > > DBus inside BlueZ. It follows the oFono and ConnMan error system.
-> > > > 
-> > > > The goal is to get ride of any directly call to g_dbus_create_error()
-> > > > inside bluez code, changing that to __btd_error_*. This patch set
-> > > > doesn't fix all of them yet, but is a very good start. Please review.
-> > > > 
-> > > > 
-> > > > Gustavo F. Padovan (9):
-> > > >   Create __btd_error_invalid_args()
-> > > >   Add __btd_error_already_exists()
-> > > >   Add __btd_error_not_supported()
-> > > >   Add __btd_error_not_connected()
-> > > >   Add __btd_error_in_progress()
-> > > >   Add __btd_error_not_available()
-> > > >   Add __btd_error_busy()
-> > > >   Add __btd_error_does_not_exist()
-> > > >   Add __btd_error_not_authorized()
-> > > 
-> > > The patches seem fine to me, but before pushing upstream I'd like to
-> > > understand the reason for prefixing these with  with __btd instead of
-> > > btd. What's the criteria used to decide what to use and when and why is
-> > > __btd the correct choice for these new functions? My first guess would
-> > > have been that __btd is for things only accessible by the core-daemon
-> > > whereas btd is for functions exported to plugins, but that doesn't seem
-> > > to be the case with your patches since many of these __btd functions get
-> > > called from plugins.
+> > Yet another version of patches fixing kernel crash in RFCOMM / L2CAP.
+> > *v4: taken Gustavo comments about timer HZ -> HZ/5
 > > 
-> > I just followed oFono and ConnMan on this. That is the reason and I
-> > didn't asked myself why have a __ in this case.. But I see your point.
-> > Do you think that change that to btd_error_* will fit better inside
-> > BlueZ? I can change that then.
+> > Do not delete l2cap channel and socket sk when sk is owned by user.
+> > To delete l2cap channel standard timer is used.
+> > 
+> > lock_sock and release_sock do not hold a normal spinlock directly but 
+> > instead hold the owner field. This means bh_lock_sock can still execute
+> > even if the socket is "locked". More info can be found here:
+> > http://www.linuxfoundation.org/collaborate/workgroups/networking/socketlocks
+> > 
+> > When sending following sequence:
+> > ...
+> > No.         Time               Source                               Destination                   
+> > Protocol Info 89 1.951202                       RFCOMM     Rcvd DISC DLCI=20
+> > 90 1.951324                       RFCOMM     Sent UA DLCI=20
+> > 91 1.959381                       HCI_EVT     Number of Completed Packets
+> > 92 1.966461                       RFCOMM     Rcvd DISC DLCI=0
+> > 93 1.966492                       L2CAP       Rcvd Disconnect Request
+> > 94 1.972595                       L2CAP       Sent Disconnect Response
+> > 
+> > ...
+> > 
+> > krfcommd kernel thread is preempted with l2cap tasklet which remove
+> > l2cap_conn (L2CAP connection handler structure). Then rfcomm thread
+> > tries to send RFCOMM UA which is reply to RFCOMM DISC and when
+> > de-referencing l2cap_conn crash happens.
 > 
-> so within ConnMan and oFono we make a difference between public symbols
-> that are reachable from within plugins and other which are not.
-> 
-> In general btd_ should be public symbols available to plugins and __btd_
-> for internal symbols that are no available to plugins.
-> 
-> For builtin plugins that makes no difference of course, but this is not
-> about internal builtin plugins. It is for protecting against external
-> plugins to not allow access to internal details.
-> 
-> That said, bluetoothd is not linked with the case to hide certain
-> symbols anyway so that right now there is no real difference here.
+> so I assume you have tested this extensively with various RFCOMM corner
+> cases like incoming RFCOMM. Since a lot of profiles require proper
+> disconnects and we have to ensure that our reference counting is
+> correct.
 
-So to make that more clear, I'll change these functions to btd_
+We have the slightly modified patch applied for a several months. No regression found.
 
--- 
-Gustavo F. Padovan
-http://profusion.mobi
+Regards,
+Andrei
+
+> 
+> Other then that it seems fine to me.
+> 
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
