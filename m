@@ -1,68 +1,184 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-Reply-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv4 0/2] Fix kernel crash in rfcomm/l2cap
-References: 
-	 <1288780365-32099-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	  <1289367396.9615.238.camel@aeonflux>
-In-Reply-To: <1289367396.9615.238.camel@aeonflux>
-Content-Type: text/plain; charset=utf-8
-Date: Wed, 10 Nov 2010 17:24:54 +0200
-Message-Id: <1289402694.23417.2.camel@Nokia-N900>
-Mime-Version: 1.0
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Cc: Johan Hedberg <johan.hedberg@nokia.com>
+Subject: [PATCH 3/3] Bluetooth: Automate remote name requests
+Date: Wed, 10 Nov 2010 17:11:53 +0200
+Message-Id: <1289401913-22982-3-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1289401913-22982-1-git-send-email-johan.hedberg@gmail.com>
+References: <1289401913-22982-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Johan Hedberg <johan.hedberg@nokia.com>
 
-> Hi Andrei,
-> 
-> > Yet another version of patches fixing kernel crash in RFCOMM / L2CAP.
-> > *v4: taken Gustavo comments about timer HZ -> HZ/5
-> > 
-> > Do not delete l2cap channel and socket sk when sk is owned by user.
-> > To delete l2cap channel standard timer is used.
-> > 
-> > lock_sock and release_sock do not hold a normal spinlock directly but 
-> > instead hold the owner field. This means bh_lock_sock can still execute
-> > even if the socket is "locked". More info can be found here:
-> > http://www.linuxfoundation.org/collaborate/workgroups/networking/socketlocks
-> > 
-> > When sending following sequence:
-> > ...
-> > No.         Time               Source                               Destination                   
-> > Protocol Info 89 1.951202                       RFCOMM     Rcvd DISC DLCI=20
-> > 90 1.951324                       RFCOMM     Sent UA DLCI=20
-> > 91 1.959381                       HCI_EVT     Number of Completed Packets
-> > 92 1.966461                       RFCOMM     Rcvd DISC DLCI=0
-> > 93 1.966492                       L2CAP       Rcvd Disconnect Request
-> > 94 1.972595                       L2CAP       Sent Disconnect Response
-> > 
-> > ...
-> > 
-> > krfcommd kernel thread is preempted with l2cap tasklet which remove
-> > l2cap_conn (L2CAP connection handler structure). Then rfcomm thread
-> > tries to send RFCOMM UA which is reply to RFCOMM DISC and when
-> > de-referencing l2cap_conn crash happens.
-> 
-> so I assume you have tested this extensively with various RFCOMM corner
-> cases like incoming RFCOMM. Since a lot of profiles require proper
-> disconnects and we have to ensure that our reference counting is
-> correct.
+In Bluetooth there are no automatic updates of remote device names when
+they get changed on the remote side. Instead, it is a good idea to do a
+manual name request when a new connection gets created (for whatever
+reason) since at this point it is very cheap (no costly baseband
+connection creation needed just for the sake of the name request).
 
-We have the slightly modified patch applied for a several months. No regression found.
+So far userspace has been responsible for this extra name request but
+tighter control is needed in order not to flood Bluetooth controllers
+with two many commands during connection creation. It has been shown
+that some controllers simply fail to function correctly if they get too
+many (almost) simultaneous commands during connection creation. The
+simplest way to acheive better control of these commands is to move
+their sending completely to the kernel side.
 
-Regards,
-Andrei
+This patch inserts name requests into the sequence of events that the
+kernel performs during connection creation. It does this after the
+remote features have been successfully requested and before any pending
+authentication requests are performed. The code will work sub-optimally
+with userspace versions that still do the name requesting themselves (it
+shouldn't break anything though) so it is recommended to combine this
+with a userspace software version that doesn't have automated name
+requests.
 
-> 
-> Other then that it seems fine to me.
-> 
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
+Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
+---
+ net/bluetooth/hci_event.c |   74 ++++++++++++++++++++++++++++++++++----------
+ 1 files changed, 57 insertions(+), 17 deletions(-)
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 45569f2..cef970f 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -677,9 +677,8 @@ static void hci_cs_set_conn_encrypt(struct hci_dev *hdev, __u8 status)
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-static int request_outgoing_auth(struct hci_dev *hdev, bdaddr_t *bdaddr)
++static int outgoing_auth_needed(struct hci_dev *hdev, bdaddr_t *bdaddr)
+ {
+-	struct hci_cp_auth_requested cp;
+ 	struct hci_conn *conn;
+ 
+ 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, bdaddr);
+@@ -698,15 +697,43 @@ static int request_outgoing_auth(struct hci_dev *hdev, bdaddr_t *bdaddr)
+ 					conn->sec_level != BT_SECURITY_HIGH)
+ 		return 0;
+ 
+-	cp.handle = __cpu_to_le16(conn->handle);
+-	hci_send_cmd(hdev, HCI_OP_AUTH_REQUESTED, sizeof(cp), &cp);
+-
+ 	return 1;
+ }
+ 
++static int request_auth(struct hci_dev *hdev, bdaddr_t *bdaddr)
++{
++	struct hci_cp_auth_requested cp;
++	struct hci_conn *conn;
++
++	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, bdaddr);
++	if (!conn)
++		return -ENOTCONN;
++
++	cp.handle = __cpu_to_le16(conn->handle);
++	return hci_send_cmd(hdev, HCI_OP_AUTH_REQUESTED, sizeof(cp), &cp);
++}
++
+ static void hci_cs_remote_name_req(struct hci_dev *hdev, __u8 status)
+ {
++	struct hci_cp_remote_name_req *cp;
++
+ 	BT_DBG("%s status 0x%x", hdev->name, status);
++
++	/* If successful wait for the name req complete event before
++	 * checking for the need to do authentication */
++	if (!status)
++		return;
++
++	cp = hci_sent_cmd_data(hdev, HCI_OP_REMOTE_NAME_REQ);
++	if (!cp)
++		return;
++
++	hci_dev_lock(hdev);
++
++	if (outgoing_auth_needed(hdev, &cp->bdaddr))
++		request_auth(hdev, &cp->bdaddr);
++
++	hci_dev_unlock(hdev);
+ }
+ 
+ static void hci_cs_read_remote_features(struct hci_dev *hdev, __u8 status)
+@@ -1117,9 +1144,18 @@ static inline void hci_auth_complete_evt(struct hci_dev *hdev, struct sk_buff *s
+ 
+ static inline void hci_remote_name_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ {
++	struct hci_ev_remote_name *ev = (void *) skb->data;
++
+ 	BT_DBG("%s", hdev->name);
+ 
+ 	hci_conn_check_pending(hdev);
++
++	hci_dev_lock(hdev);
++
++	if (outgoing_auth_needed(hdev, &ev->bdaddr))
++		request_auth(hdev, &ev->bdaddr);
++
++	hci_dev_unlock(hdev);
+ }
+ 
+ static inline void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -1183,7 +1219,6 @@ static inline void hci_remote_features_evt(struct hci_dev *hdev, struct sk_buff
+ {
+ 	struct hci_ev_remote_features *ev = (void *) skb->data;
+ 	struct hci_conn *conn;
+-	int auth_requested;
+ 
+ 	BT_DBG("%s status %d", hdev->name, ev->status);
+ 
+@@ -1208,12 +1243,15 @@ static inline void hci_remote_features_evt(struct hci_dev *hdev, struct sk_buff
+ 		goto unlock;
+ 	}
+ 
+-	if (!ev->status)
+-		auth_requested = request_outgoing_auth(hdev, &conn->dst);
+-	else
+-		auth_requested = 0;
++	if (!ev->status) {
++		struct hci_cp_remote_name_req cp;
++		memset(&cp, 0, sizeof(cp));
++		bacpy(&cp.bdaddr, &conn->dst);
++		cp.pscan_rep_mode = 0x02;
++		hci_send_cmd(hdev, HCI_OP_REMOTE_NAME_REQ, sizeof(cp), &cp);
++	}
+ 
+-	if (!auth_requested) {
++	if (!outgoing_auth_needed(hdev, &conn->dst)) {
+ 		conn->state = BT_CONNECTED;
+ 		hci_proto_connect_cfm(conn, ev->status);
+ 		hci_conn_put(conn);
+@@ -1671,7 +1709,6 @@ static inline void hci_remote_ext_features_evt(struct hci_dev *hdev, struct sk_b
+ {
+ 	struct hci_ev_remote_ext_features *ev = (void *) skb->data;
+ 	struct hci_conn *conn;
+-	int auth_requested;
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
+@@ -1693,12 +1730,15 @@ static inline void hci_remote_ext_features_evt(struct hci_dev *hdev, struct sk_b
+ 	if (conn->state != BT_CONFIG)
+ 		goto unlock;
+ 
+-	if (!ev->status)
+-		auth_requested = request_outgoing_auth(hdev, &conn->dst);
+-	else
+-		auth_requested = 0;
++	if (!ev->status) {
++		struct hci_cp_remote_name_req cp;
++		memset(&cp, 0, sizeof(cp));
++		bacpy(&cp.bdaddr, &conn->dst);
++		cp.pscan_rep_mode = 0x02;
++		hci_send_cmd(hdev, HCI_OP_REMOTE_NAME_REQ, sizeof(cp), &cp);
++	}
+ 
+-	if (!auth_requested) {
++	if (!outgoing_auth_needed(hdev, &conn->dst)) {
+ 		conn->state = BT_CONNECTED;
+ 		hci_proto_connect_cfm(conn, ev->status);
+ 		hci_conn_put(conn);
+-- 
+1.7.2.3
+
