@@ -1,306 +1,197 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH 1/3] Split up pbap object and pbap session
-Date: Thu, 11 Nov 2010 09:36:10 +0200
-Message-Id: <1289460972-2971-1-git-send-email-dmitriy.paliy@nokia.com>
+Date: Thu, 11 Nov 2010 07:53:38 +0200
+From: Ville Tervo <ville.tervo@nokia.com>
+To: ext Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 3/6] Bluetooth: Use LE buffers for LE traffic
+Message-ID: <20101111055338.GA27346@null>
+References: <1288009280-5149-1-git-send-email-ville.tervo@nokia.com>
+ <1288009280-5149-4-git-send-email-ville.tervo@nokia.com>
+ <AANLkTiktxkQQXH2m2+s-zyfyWh-jUT9rwjU+GPyPWyhS@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <AANLkTiktxkQQXH2m2+s-zyfyWh-jUT9rwjU+GPyPWyhS@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Pbap object and session are splitted in this patch. Reason is that
-obex firstly makes disconnect of service_data, which corresponds to
-session in pbap, and than it closes object, which also corresponds
-to session in pbap.
+Hi Claudio,
 
-When the session is disconnected, it also deallocates memory. When
-obex closes the object, it is trying to dereference the deallocated
-memory in order to free pbap->buffer data.
+On Wed, Nov 10, 2010 at 05:53:02PM +0100, ext Claudio Takahasi wrote:
+> Hi Ville,
+> 
+> On Mon, Oct 25, 2010 at 10:21 AM, Ville Tervo <ville.tervo@nokia.com> wrote:
+> > BLuetooth chips may have separate buffers for
+> > LE traffic. This patch add support to use LE
+> > buffers provided by the chip.
+> >
+> > Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
+> > ---
+> >  include/net/bluetooth/hci.h      |    1 +
+> >  include/net/bluetooth/hci_core.h |    5 +++
+> >  net/bluetooth/hci_conn.c         |    5 +++
+> >  net/bluetooth/hci_core.c         |   74 +++++++++++++++++++++++++++++++++++--
+> >  net/bluetooth/hci_event.c        |   40 +++++++++++++++++++-
+> >  5 files changed, 119 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> > index 02055b9..2103731 100644
+> > --- a/include/net/bluetooth/hci.h
+> > +++ b/include/net/bluetooth/hci.h
+> > @@ -189,6 +189,7 @@ enum {
+> >
+> >  #define LMP_EV4                0x01
+> >  #define LMP_EV5                0x02
+> > +#define LMP_LE         0x40
+> >
+> >  #define LMP_SNIFF_SUBR 0x02
+> >  #define LMP_EDR_ESCO_2M        0x20
+> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> > index 2b7f94a..e2d857a 100644
+> > --- a/include/net/bluetooth/hci_core.h
+> > +++ b/include/net/bluetooth/hci_core.h
+> > @@ -103,15 +103,19 @@ struct hci_dev {
+> >        atomic_t        cmd_cnt;
+> >        unsigned int    acl_cnt;
+> >        unsigned int    sco_cnt;
+> > +       unsigned int    le_cnt;
+> >
+> >        unsigned int    acl_mtu;
+> >        unsigned int    sco_mtu;
+> > +       unsigned int    le_mtu;
+> >        unsigned int    acl_pkts;
+> >        unsigned int    sco_pkts;
+> > +       unsigned int    le_pkts;
+> >
+> >        unsigned long   cmd_last_tx;
+> >        unsigned long   acl_last_tx;
+> >        unsigned long   sco_last_tx;
+> > +       unsigned long   le_last_tx;
+> >
+> >        struct workqueue_struct *workqueue;
+> >
+> > @@ -473,6 +477,7 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+> >  #define lmp_sniffsubr_capable(dev) ((dev)->features[5] & LMP_SNIFF_SUBR)
+> >  #define lmp_esco_capable(dev)      ((dev)->features[3] & LMP_ESCO)
+> >  #define lmp_ssp_capable(dev)       ((dev)->features[6] & LMP_SIMPLE_PAIR)
+> > +#define lmp_le_capable(dev)        ((dev)->features[4] & LMP_LE)
+> >
+> >  /* ----- HCI protocols ----- */
+> >  struct hci_proto {
+> > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> > index 0944c0c..ddc2e5e 100644
+> > --- a/net/bluetooth/hci_conn.c
+> > +++ b/net/bluetooth/hci_conn.c
+> > @@ -324,6 +324,11 @@ int hci_conn_del(struct hci_conn *conn)
+> >
+> >                /* Unacked frames */
+> >                hdev->acl_cnt += conn->sent;
+> > +       } else if (conn->type == LE_LINK) {
+> > +               if (hdev->le_pkts)
+> > +                       hdev->le_cnt += conn->sent;
+> > +               else
+> > +                       hdev->acl_cnt += conn->sent;
+> >        } else {
+> >                struct hci_conn *acl = conn->link;
+> >                if (acl) {
+> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> > index bc2a052..45c78c2 100644
+> > --- a/net/bluetooth/hci_core.c
+> > +++ b/net/bluetooth/hci_core.c
+> > @@ -254,6 +254,14 @@ static void hci_init_req(struct hci_dev *hdev, unsigned long opt)
+> >        hci_send_cmd(hdev, HCI_OP_WRITE_CA_TIMEOUT, 2, &param);
+> >  }
+> >
+> > +static void hci_le_init_req(struct hci_dev *hdev, unsigned long opt)
+> > +{
+> > +       BT_DBG("%s", hdev->name);
+> > +
+> > +       /* Read LE buffer size */
+> > +       hci_send_cmd(hdev, HCI_OP_LE_READ_BUFFER_SIZE, 0, NULL);
+> > +}
+> > +
+> >  static void hci_scan_req(struct hci_dev *hdev, unsigned long opt)
+> >  {
+> >        __u8 scan = opt;
+> > @@ -509,6 +517,10 @@ int hci_dev_open(__u16 dev)
+> >                ret = __hci_request(hdev, hci_init_req, 0,
+> >                                        msecs_to_jiffies(HCI_INIT_TIMEOUT));
+> >
+> > +               if (lmp_le_capable(hdev))
+> > +                       ret = __hci_request(hdev, hci_le_init_req, 0,
+> > +                                       msecs_to_jiffies(HCI_INIT_TIMEOUT));
+> > +
+> >                clear_bit(HCI_INIT, &hdev->flags);
+> >        }
+> >
+> > @@ -645,7 +657,7 @@ int hci_dev_reset(__u16 dev)
+> >                hdev->flush(hdev);
+> >
+> >        atomic_set(&hdev->cmd_cnt, 1);
+> > -       hdev->acl_cnt = 0; hdev->sco_cnt = 0;
+> > +       hdev->acl_cnt = 0; hdev->sco_cnt = 0; hdev->le_cnt = 0;
+> >
+> >        if (!test_bit(HCI_RAW, &hdev->flags))
+> >                ret = __hci_request(hdev, hci_reset_req, 0,
+> > @@ -1456,8 +1468,25 @@ static inline struct hci_conn *hci_low_sent(struct hci_dev *hdev, __u8 type, int
+> >        }
+> >
+> >        if (conn) {
+> > -               int cnt = (type == ACL_LINK ? hdev->acl_cnt : hdev->sco_cnt);
+> > -               int q = cnt / num;
+> > +               int cnt, q;
+> > +
+> > +               switch (conn->type) {
+> > +               case ACL_LINK:
+> > +                       cnt = hdev->acl_cnt;
+> > +                       break;
+> > +               case SCO_LINK:
+> > +               case ESCO_LINK:
+> > +                       cnt = hdev->sco_cnt;
+> > +                       break;
+> > +               case LE_LINK:
+> > +                       cnt = hdev->le_mtu ? hdev->le_cnt : hdev->acl_cnt;
+> > +                       break;
+> > +               default:
+> > +                       cnt = 0;
+> > +                       BT_ERR("Unknown link type");
+> > +               }
+> > +
+> > +               q = cnt / num;
+> >                *quote = q ? q : 1;
+> >        } else
+> >                *quote = 0;
+> > @@ -1556,6 +1585,40 @@ static inline void hci_sched_esco(struct hci_dev *hdev)
+> >        }
+> >  }
+> >
+> > +static inline void hci_sched_le(struct hci_dev *hdev)
+> > +{
+> > +       struct hci_conn *conn;
+> > +       struct sk_buff *skb;
+> > +       int quote, cnt;
+> > +
+> > +       BT_DBG("%s", hdev->name);
+> > +
+> > +       if (!test_bit(HCI_RAW, &hdev->flags)) {
+> > +               /* ACL tx timeout must be longer than maximum
+> > +                * link supervision timeout (40.9 seconds) */
+> > +               if (!hdev->le_cnt &&
+> > +                   time_after(jiffies, hdev->le_last_tx + HZ * 45))
+> > +                       hci_acl_tx_to(hdev);
+> > +       }
+> 
+> It seems that the ACL tx timeout is causing some problems: BR/EDR and
+> LE connections are not working properly on macbooks! Don't ask me why
+> on macbooks only! But I double checked. I tested your branch and also
+> bluetooth-next + LE patches and both are not working as expected. I
+> didn't have time to investigate it, do you have any clue?
+> 
+> For BR/EDR I am receiving "killing stalled ACL connection" messages
+> for all connections.
+> 
 
-Here object and session are separated, while pointers are created to
-make one-to-one mapping. Pbap object is created in vobject_..._open
-functions. Session and object are handled separately when freed.
----
- plugins/pbap.c |   89 +++++++++++++++++++++++++++++++++++++------------------
- 1 files changed, 60 insertions(+), 29 deletions(-)
+Yes you are right. I found this also yesterday and I have a patch to fix it
+already. I'll clean it up and submit later today.
 
-diff --git a/plugins/pbap.c b/plugins/pbap.c
-index a40563c..7b9f1ff 100644
---- a/plugins/pbap.c
-+++ b/plugins/pbap.c
-@@ -141,8 +141,13 @@ struct pbap_session {
- 	struct apparam_field *params;
- 	char *folder;
- 	uint32_t find_handle;
--	GString *buffer;
- 	struct cache cache;
-+	struct pbap_object *obj;
-+};
-+
-+struct pbap_object {
-+	GString *buffer;
-+	struct pbap_session *session;
- };
- 
- static const uint8_t PBAP_TARGET[TARGET_SIZE] = {
-@@ -239,9 +244,9 @@ static void phonebook_size_result(const char *buffer, size_t bufsize,
- 	hdr->len = PHONEBOOKSIZE_LEN;
- 	memcpy(hdr->val, &phonebooksize, sizeof(phonebooksize));
- 
--	pbap->buffer = g_string_new_len(aparam, sizeof(aparam));
-+	pbap->obj->buffer = g_string_new_len(aparam, sizeof(aparam));
- 
--	obex_object_set_io_flags(pbap, G_IO_IN, 0);
-+	obex_object_set_io_flags(pbap->obj, G_IO_IN, 0);
- }
- 
- static void query_result(const char *buffer, size_t bufsize, int vcards,
-@@ -252,17 +257,17 @@ static void query_result(const char *buffer, size_t bufsize, int vcards,
- 	DBG("");
- 
- 	if (vcards <= 0) {
--		obex_object_set_io_flags(pbap, G_IO_ERR, -ENOENT);
-+		obex_object_set_io_flags(pbap->obj, G_IO_ERR, -ENOENT);
- 		return;
- 	}
- 
--	if (!pbap->buffer)
--		pbap->buffer = g_string_new_len(buffer, bufsize);
-+	if (!pbap->obj->buffer)
-+		pbap->obj->buffer = g_string_new_len(buffer, bufsize);
- 	else
--		pbap->buffer = g_string_append_len(pbap->buffer, buffer,
-+		pbap->obj->buffer = g_string_append_len(pbap->obj->buffer, buffer,
- 								bufsize);
- 
--	obex_object_set_io_flags(pbap, G_IO_IN, 0);
-+	obex_object_set_io_flags(pbap->obj, G_IO_IN, 0);
- }
- 
- static void cache_entry_notify(const char *id, uint32_t handle,
-@@ -394,7 +399,7 @@ static void cache_ready_notify(void *user_data)
- 		hdr->len = PHONEBOOKSIZE_LEN;
- 		memcpy(hdr->val, &size, sizeof(size));
- 
--		pbap->buffer = g_string_new_len(aparam, sizeof(aparam));
-+		pbap->obj->buffer = g_string_new_len(aparam, sizeof(aparam));
- 		goto done;
- 	}
- 
-@@ -408,29 +413,29 @@ static void cache_ready_notify(void *user_data)
- 
- 	if (sorted == NULL) {
- 		pbap->cache.valid = TRUE;
--		obex_object_set_io_flags(pbap, G_IO_ERR, -ENOENT);
-+		obex_object_set_io_flags(pbap->obj, G_IO_ERR, -ENOENT);
- 		return;
- 	}
- 
- 	/* Computing offset considering first entry of the phonebook */
- 	l = g_slist_nth(sorted, pbap->params->liststartoffset);
- 
--	pbap->buffer = g_string_new(VCARD_LISTING_BEGIN);
-+	pbap->obj->buffer = g_string_new(VCARD_LISTING_BEGIN);
- 	for (; l && max; l = l->next, max--) {
- 		const struct cache_entry *entry = l->data;
- 
--		g_string_append_printf(pbap->buffer, VCARD_LISTING_ELEMENT,
-+		g_string_append_printf(pbap->obj->buffer, VCARD_LISTING_ELEMENT,
- 						entry->handle, entry->name);
- 	}
- 
--	pbap->buffer = g_string_append(pbap->buffer, VCARD_LISTING_END);
-+	pbap->obj->buffer = g_string_append(pbap->obj->buffer, VCARD_LISTING_END);
- 
- 	g_slist_free(sorted);
- 
- done:
- 	if (!pbap->cache.valid) {
- 		pbap->cache.valid = TRUE;
--		obex_object_set_io_flags(pbap, G_IO_IN, 0);
-+		obex_object_set_io_flags(pbap->obj, G_IO_IN, 0);
- 	}
- }
- 
-@@ -446,15 +451,14 @@ static void cache_entry_done(void *user_data)
- 
- 	id = cache_find(&pbap->cache, pbap->find_handle);
- 	if (id == NULL) {
--		DBG("Entry %d not found on cache", pbap->find_handle);
--		obex_object_set_io_flags(pbap, G_IO_ERR, -ENOENT);
-+		obex_object_set_io_flags(pbap->obj, G_IO_ERR, -ENOENT);
- 		return;
- 	}
- 
- 	ret = phonebook_get_entry(pbap->folder, id, pbap->params,
- 						query_result, pbap);
- 	if (ret < 0)
--		obex_object_set_io_flags(pbap, G_IO_ERR, ret);
-+		obex_object_set_io_flags(pbap->obj, G_IO_ERR, ret);
- }
- 
- static struct apparam_field *parse_aparam(const uint8_t *buffer, uint32_t hlen)
-@@ -549,6 +553,7 @@ static void *pbap_connect(struct obex_session *os, int *err)
- 	pbap = g_new0(struct pbap_session, 1);
- 	pbap->folder = g_strdup("/");
- 	pbap->find_handle = PHONEBOOK_INVALID_HANDLE;
-+	pbap->obj = NULL;
- 
- 	if (err)
- 		*err = 0;
-@@ -692,10 +697,23 @@ static struct obex_service_driver pbap = {
- 	.chkput = pbap_chkput
- };
- 
-+static void *vobject_create(void *user_data)
-+{
-+	struct pbap_session *pbap = user_data;
-+	struct pbap_object *obj;
-+
-+	obj = g_new0(struct pbap_object, 1);
-+	obj->session = pbap;
-+	pbap->obj = obj;
-+
-+	return obj;
-+}
-+
- static void *vobject_pull_open(const char *name, int oflag, mode_t mode,
- 				void *context, size_t *size, int *err)
- {
- 	struct pbap_session *pbap = context;
-+	struct pbap_object *obj;
- 	phonebook_cb cb;
- 	int ret;
- 
-@@ -718,10 +736,13 @@ static void *vobject_pull_open(const char *name, int oflag, mode_t mode,
- 		cb = query_result;
- 
- 	ret = phonebook_pull(name, pbap->params, cb, pbap);
-+
- 	if (ret < 0)
- 		goto fail;
- 
--	return pbap;
-+	obj = vobject_create(pbap);
-+
-+	return obj;
- 
- fail:
- 	if (err)
-@@ -734,6 +755,7 @@ static void *vobject_list_open(const char *name, int oflag, mode_t mode,
- 				void *context, size_t *size, int *err)
- {
- 	struct pbap_session *pbap = context;
-+	struct pbap_object *obj;
- 	int ret;
- 
- 	DBG("name %s context %p valid %d", name, context, pbap->cache.valid);
-@@ -755,7 +777,7 @@ static void *vobject_list_open(const char *name, int oflag, mode_t mode,
- 		 * Valid cache and empty buffer mean that cache was already
- 		 * created within a single session, but no data is available.
- 		 */
--		if (!pbap->buffer) {
-+		if (!pbap->obj->buffer) {
- 			ret = -ENOENT;
- 			goto fail;
- 		}
-@@ -771,7 +793,9 @@ static void *vobject_list_open(const char *name, int oflag, mode_t mode,
- 		goto fail;
- 
- done:
--	return pbap;
-+	obj = vobject_create(pbap);
-+
-+	return obj;
- 
- fail:
- 	if (err)
-@@ -784,6 +808,7 @@ static void *vobject_vcard_open(const char *name, int oflag, mode_t mode,
- 					void *context, size_t *size, int *err)
- {
- 	struct pbap_session *pbap = context;
-+	struct pbap_object *obj;
- 	const char *id;
- 	uint32_t handle;
- 	int ret;
-@@ -820,7 +845,9 @@ done:
- 	if (ret < 0)
- 		goto fail;
- 
--	return pbap;
-+	obj = vobject_create(pbap);
-+
-+	return obj;
- 
- fail:
- 	if (err)
-@@ -832,12 +859,13 @@ fail:
- static ssize_t vobject_pull_read(void *object, void *buf, size_t count,
- 								uint8_t *hi)
- {
--	struct pbap_session *pbap = object;
-+	struct pbap_object *obj = object;
-+	struct pbap_session *pbap = obj->session;
- 
--	DBG("buffer %p maxlistcount %d", pbap->buffer,
-+	DBG("buffer %p maxlistcount %d", obj->buffer,
- 						pbap->params->maxlistcount);
- 
--	if (!pbap->buffer)
-+	if (!obj->buffer)
- 		return -EAGAIN;
- 
- 	/* PhoneBookSize */
-@@ -847,13 +875,14 @@ static ssize_t vobject_pull_read(void *object, void *buf, size_t count,
- 		/* Stream data */
- 		*hi = OBEX_HDR_BODY;
- 
--	return string_read(pbap->buffer, buf, count);
-+	return string_read(obj->buffer, buf, count);
- }
- 
- static ssize_t vobject_list_read(void *object, void *buf, size_t count,
- 								uint8_t *hi)
- {
--	struct pbap_session *pbap = object;
-+	struct pbap_object *obj = object;
-+	struct pbap_session *pbap = obj->session;
- 
- 	DBG("valid %d maxlistcount %d", pbap->cache.valid,
- 						pbap->params->maxlistcount);
-@@ -867,13 +896,13 @@ static ssize_t vobject_list_read(void *object, void *buf, size_t count,
- 	else
- 		*hi = OBEX_HDR_BODY;
- 
--	return string_read(pbap->buffer, buf, count);
-+	return string_read(obj->buffer, buf, count);
- }
- 
- static ssize_t vobject_vcard_read(void *object, void *buf, size_t count,
- 								uint8_t *hi)
- {
--	struct pbap_session *pbap = object;
-+	struct pbap_object *pbap = object;
- 
- 	DBG("buffer %p", pbap->buffer);
- 
-@@ -886,13 +915,15 @@ static ssize_t vobject_vcard_read(void *object, void *buf, size_t count,
- 
- static int vobject_close(void *object)
- {
--	struct pbap_session *pbap = object;
-+	struct pbap_object *pbap = object;
- 
- 	if (pbap->buffer) {
- 		string_free(pbap->buffer);
- 		pbap->buffer = NULL;
- 	}
- 
-+	g_free(pbap);
-+
- 	return 0;
- }
- 
 -- 
-1.7.0.4
-
+Ville
