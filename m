@@ -1,67 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Inga Stotland" <ingas@codeaurora.org>
-To: "'Johan Hedberg'" <johan.hedberg@gmail.com>,
-	"'Vinicius Costa Gomes'" <vinicius.gomes@openbossa.org>
-Cc: <linux-bluetooth@vger.kernel.org>,
-	"'Bruna Moreira'" <bruna.moreira@openbossa.org>
-References: <1289501521-21825-1-git-send-email-vinicius.gomes@openbossa.org> <20101111210705.GB24514@jh-x301>
-In-Reply-To: <20101111210705.GB24514@jh-x301>
-Subject: RE: [PATCH v2 1/7] Fix invalid memory access when EIR field length is zero
-Date: Thu, 11 Nov 2010 16:24:45 -0800
-Message-ID: <000b01cb8200$02c24c90$0846e5b0$@org>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: [PATCH v3 4/4] Emit "DeviceFound" signal for LE devices
+Date: Thu, 11 Nov 2010 20:39:29 -0300
+Message-Id: <1289518769-3009-4-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1289518769-3009-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1289518769-3009-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Bruna Moreira <bruna.moreira@openbossa.org>
 
------Original Message-----
-From: linux-bluetooth-owner@vger.kernel.org
-[mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Johan Hedberg
-Sent: Thursday, November 11, 2010 1:07 PM
-To: Vinicius Costa Gomes
-Cc: linux-bluetooth@vger.kernel.org; Bruna Moreira
-Subject: Re: [PATCH v2 1/7] Fix invalid memory access when EIR field length
-is zero
+The adapter_emit_device_found() function was modified to emit
+DeviceFound signal for LE devices as well.
+---
+ src/adapter.c |   30 +++++++++++++++++++++++++-----
+ 1 files changed, 25 insertions(+), 5 deletions(-)
 
-Hi,
-
-On Thu, Nov 11, 2010, Vinicius Costa Gomes wrote:
-> diff --git a/src/adapter.c b/src/adapter.c
-> index b1aabbd..8b742b7 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -2977,14 +2977,13 @@ static char **get_eir_uuids(uint8_t *eir_data,
-size_t *uuid_count)
->  	unsigned int i;
->  
->  	while (len < EIR_DATA_LENGTH - 1) {
-> -		uint8_t type = eir_data[1];
->  		uint8_t field_len = eir_data[0];
->  
->  		/* Check for the end of EIR */
->  		if (field_len == 0)
->  			break;
->  
-> -		switch (type) {
-> +		switch (eir_data[1]) {
->  		case EIR_UUID16_SOME:
->  		case EIR_UUID16_ALL:
->  			uuid16_count = field_len / 2;
-
-Pushed upstream. Thanks.
-
-Johan
---
-
-Was there a bug to begin with? :)
-The access to eir_data[1] was always valid due to the check (len <
-EIR_DATA_LENGTH - 1)
-and the fact that eir_data is a buffer of fixed length of EIR_DATA_LENGTH
-(240 bytes).
-Oh well, it's upstream already.
-
-Inga
+diff --git a/src/adapter.c b/src/adapter.c
+index 49ba5fc..92087f6 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -3110,6 +3110,27 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
+ 	if (device)
+ 		paired = device_is_paired(device);
+ 
++	/* Extract UUIDs from extended inquiry response if any */
++	dev->services = get_eir_uuids(eir_data, eir_length, dev->services);
++	uuid_count = g_slist_length(dev->services);
++
++	if (dev->services)
++		uuids = strlist2array(dev->services);
++
++	if (dev->le) {
++		emit_device_found(adapter->path, paddr,
++				"Address", DBUS_TYPE_STRING, &paddr,
++				"RSSI", DBUS_TYPE_INT16, &rssi,
++				"Name", DBUS_TYPE_STRING, &dev->name,
++				"Paired", DBUS_TYPE_BOOLEAN, &paired,
++				"UUIDs", DBUS_TYPE_ARRAY, &uuids, uuid_count,
++				NULL);
++
++		g_strfreev(uuids);
++
++		return;
++	}
++
+ 	icon = class_to_icon(dev->class);
+ 
+ 	if (!dev->alias) {
+@@ -3121,12 +3142,7 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
+ 	} else
+ 		alias = g_strdup(dev->alias);
+ 
+-	/* Extract UUIDs from extended inquiry response if any */
+-	dev->services = get_eir_uuids(eir_data, eir_length, dev->services);
+-	uuid_count = g_slist_length(dev->services);
+-
+ 	if (dev->services) {
+-		uuids = strlist2array(dev->services);
+ 		g_slist_foreach(dev->services, (GFunc) g_free, NULL);
+ 		g_slist_free(dev->services);
+ 		dev->services = NULL;
+@@ -3205,6 +3221,10 @@ void adapter_update_device_from_info(struct btd_adapter *adapter,
+ 		if (tmp_name)
+ 			dev->name = tmp_name;
+ 	}
++
++	/* FIXME: check if other information was changed before emitting the
++	 * signal */
++	adapter_emit_device_found(adapter, dev, info->data, info->length);
+ }
+ 
+ void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+-- 
+1.7.3.2
 
