@@ -1,46 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 11 Nov 2010 15:07:30 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Siarhei Siamashka <siarhei.siamashka@nokia.com>
+Subject: Re: [PATCH] sbc: added "cc" to the clobber list of mmx inline
+ assembly
+Message-ID: <20101111130730.GA14724@jh-x301>
+References: <1289467782-2472-1-git-send-email-siarhei.siamashka@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20101111091857.GA2862@jh-x301>
-References: <1289426161-10045-1-git-send-email-claudio.takahasi@openbossa.org>
-	<1289426161-10045-3-git-send-email-claudio.takahasi@openbossa.org>
-	<20101111091857.GA2862@jh-x301>
-Date: Thu, 11 Nov 2010 11:20:50 -0200
-Message-ID: <AANLkTinhT+sauN0HXPom_53i6FRQWDjeSLeBaneLwAmb@mail.gmail.com>
-Subject: Re: [PATCH] Add a new configuration option to disable Low Energy support
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1289467782-2472-1-git-send-email-siarhei.siamashka@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Siarhei,
 
-On Thu, Nov 11, 2010 at 7:18 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Claudio,
->
-> On Wed, Nov 10, 2010, Claudio Takahasi wrote:
->> @@ -623,6 +624,9 @@ int attrib_server_init(void)
->>
->>       sdp_handle = record->handle;
->>
->> +     if (!main_opts.le)
->> +             return 0;
->> +
->
-> If the option is called "le" it shouldn't affect GATT over BR/EDR, so I
-> think the check in attrib_server_init should only affect the LE socket
-> (or then rename the option to e.g. main.opts.attrib).
->
-> Johan
->
+On Thu, Nov 11, 2010, Siarhei Siamashka wrote:
+> In the case of scale factors calculation optimizations, the inline
+> assembly code has instructions which update flags register, but
+> "cc" was not mentioned in the clobber list. When optimizing code,
+> gcc theoretically is allowed to do a comparison before the inline
+> assembly block, and a conditional branch after it which would lead
+> to a problem if the flags register gets clobbered. While this is
+> apparently not happening in practice with the current versions of
+> gcc, the clobber list needs to be corrected.
+> 
+> Regarding the other inline assembly blocks. While most likely it
+> is actually unnecessary based on quick review, "cc" is also added
+> there to the clobber list because it should have no impact on
+> performance in practice. It's kind of cargo cult, but relieves
+> us from the need to track the potential updates of flags register
+> in all these places.
+> ---
+>  sbc/sbc_primitives_mmx.c |    6 +++---
+>  1 files changed, 3 insertions(+), 3 deletions(-)
 
+Thanks for the patch! It has now been pushed upstream.
 
-It is not affecting GATT over BR/EDR. bt_io_listen for BR/EDR is above
-this checking.
-
-My patch "[PATCH] Fix possible memory leak of the GIOChannel in the
-attribute server" switched the order of the bt_io_listen calls between
-BR/EDR and LE. I forgot to send these patches as patch sequence.
-
-Claudio.
+Johan
