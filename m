@@ -2,46 +2,54 @@ Return-Path: <cyrus@holtmann.org>
 From: Dmitriy Paliy <dmitriy.paliy@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH 2/2] string_free is specific to filesystem only
-Date: Thu, 11 Nov 2010 22:46:20 +0200
-Message-Id: <1289508380-8873-2-git-send-email-dmitriy.paliy@nokia.com>
-In-Reply-To: <1289508380-8873-1-git-send-email-dmitriy.paliy@nokia.com>
-References: <1289508380-8873-1-git-send-email-dmitriy.paliy@nokia.com>
+Subject: [PATCH 1/2] g_string_free shell be used in IRMC
+Date: Thu, 11 Nov 2010 22:46:19 +0200
+Message-Id: <1289508380-8873-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-string_free is a callback function specific to filesystem plugin only.
-It is used by OBEX drivers when closing OBEX object and not API
-exposed to other plugins. g_string_free can be used instead of it when
-required.
+g_string_free instead of string_free shell be used in IRMC plugin.
+string_free is a callback function specific to filesystem plugin
+only and used by OBEX drivers to close an OBEX object.
 ---
- plugins/filesystem.c |    2 +-
- plugins/filesystem.h |    1 -
- 2 files changed, 1 insertions(+), 2 deletions(-)
+ plugins/irmc.c |   10 ++++------
+ 1 files changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/plugins/filesystem.c b/plugins/filesystem.c
-index bf00ac2..bb758ab 100644
---- a/plugins/filesystem.c
-+++ b/plugins/filesystem.c
-@@ -474,7 +474,7 @@ static void *pcsuite_open(const char *name, int oflag, mode_t mode,
- 	return append_listing(object, name, TRUE, size, err);
+diff --git a/plugins/irmc.c b/plugins/irmc.c
+index 28c5e50..f7ad33b 100644
+--- a/plugins/irmc.c
++++ b/plugins/irmc.c
+@@ -254,10 +254,8 @@ static void irmc_disconnect(struct obex_session *os, void *user_data)
+ 		g_free(irmc->params);
+ 	}
+ 
+-	if (irmc->buffer) {
+-		string_free(irmc->buffer);
+-		irmc->buffer = NULL;
+-	}
++	if (irmc->buffer)
++		g_string_free(irmc->buffer, TRUE);
+ 
+ 	g_free(irmc);
  }
+@@ -355,7 +353,7 @@ static void *irmc_open_pb(const char *name, struct irmc_session *irmc,
+ 		irmc->buffer = mybuf;
+ 	else {
+ 		irmc->buffer = g_string_append(irmc->buffer, mybuf->str);
+-		string_free(mybuf);
++		g_string_free(mybuf, TRUE);
+ 	}
  
--int string_free(void *object)
-+static int string_free(void *object)
- {
- 	GString *string = object;
+ 	return irmc;
+@@ -433,7 +431,7 @@ static int irmc_close(void *object)
+ 	DBG("");
  
-diff --git a/plugins/filesystem.h b/plugins/filesystem.h
-index 712653f..9c7ad9a 100644
---- a/plugins/filesystem.h
-+++ b/plugins/filesystem.h
-@@ -21,5 +21,4 @@
-  *
-  */
+ 	if (irmc->buffer) {
+-		string_free(irmc->buffer);
++		g_string_free(irmc->buffer, TRUE);
+ 		irmc->buffer = NULL;
+ 	}
  
--int string_free(void *object);
- ssize_t string_read(void *object, void *buf, size_t count);
 -- 
 1.7.0.4
 
