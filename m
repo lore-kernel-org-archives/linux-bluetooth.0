@@ -1,61 +1,152 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 11 Nov 2010 12:01:58 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: Re: [PATCH 3/7] Refactoring adapter_update_found_devices() function
-Message-ID: <20101111100158.GE4132@jh-x301>
-References: <1289411487-6113-1-git-send-email-anderson.lizardo@openbossa.org>
- <1289411487-6113-3-git-send-email-anderson.lizardo@openbossa.org>
+From: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Scripts which have been used to calculate the 'magic' constants for sbc encoder
+Date: Thu, 11 Nov 2010 12:47:57 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1289411487-6113-3-git-send-email-anderson.lizardo@openbossa.org>
+Content-Type: multipart/signed;
+  boundary="nextPart13584325.6JrTevByxL";
+  protocol="application/pgp-signature";
+  micalg=pgp-sha1
+Message-Id: <201011111248.08393.siarhei.siamashka@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+--nextPart13584325.6JrTevByxL
+Content-Type: multipart/mixed;
+  boundary="Boundary-01=_en82MT6dBjmG2yN"
+Content-Transfer-Encoding: 7bit
+
+
+--Boundary-01=_en82MT6dBjmG2yN
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
 Hi,
 
-On Wed, Nov 10, 2010, Anderson Lizardo wrote:
-> +void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
-> +				int8_t rssi, uint32_t class, const char *name,
-> +				const char *alias, gboolean legacy,
-> +				name_status_t name_status, uint8_t *eir_data)
-> +{
-> +	struct remote_dev_info *dev;
-> +
-> +	if (!update_found_devices(adapter, bdaddr, rssi, &dev)) {
-> +		dev->class = class;
-> +		if (name)
-> +			dev->name = g_strdup(name);
-> +		if (alias)
-> +			dev->alias = g_strdup(alias);
-> +		dev->legacy = legacy;
-> +		dev->name_status = name_status;
-> +	} else if (dev->rssi == rssi)
-> +		return;
+The scripts which have been used to calculate the 'magic' constants introdu=
+ced=20
+in commit:
+http://git.kernel.org/?p=3Dbluetooth/bluez.git;a=3Dcommit;h=3Df70d1ada0aba5=
+567fbf67cedfb4a4ba1a9f9852e
 
-I find the name and signature of update_found_devices() a little bit
-unintuitive which makes following the code that uses it a bit hard.
-Additionally it seems you're not using the rssi anymore within the
-update_found_devices function so there's no point in passing the rssi to
-it. To make the code more readable, could you change the function so
-that its usage would look something like:
+Remembered that these are not available in bluez repository so sending them
+here basically for archival purposes. I also had scripts for finding a suit=
+able
+SIMD permutation, but IIRC these were totally unmaintainable (required seve=
+ral
+scripts to run, with human intervention in between and tweaking intermediate
+data).
 
-	struct remote_dev_info *dev;
-	gboolean new_dev;
+=2D-=20
+Best regards,
+Siarhei Siamashka
 
-	dev = get_found_dev(adapter, bdaddr, &new_dev);
+--Boundary-01=_en82MT6dBjmG2yN
+Content-Type: application/x-compressed-tar;
+  name="sbc-encoder-quality-tuning-scripts.tar.gz"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+	filename="sbc-encoder-quality-tuning-scripts.tar.gz"
 
-	if (new_dev) {
-		<set the fields for the new device>
-	} else if (dev->rssi == rssi)
-		return;
+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
+g7b/A836WJUAoAAA
 
-	dev->rssi = rssi;
-	...
+--Boundary-01=_en82MT6dBjmG2yN--
 
-Since the rest of the patches seem to depend on this one I'll stop the
-review here and wait until you fix the issues I've mentioned so far.
+--nextPart13584325.6JrTevByxL
+Content-Type: application/pgp-signature; name=signature.asc 
+Content-Description: This is a digitally signed message part.
 
-Johan
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.16 (GNU/Linux)
+
+iEYEABECAAYFAkzbyegACgkQvyB/CfYEEt7nvACfdbJkbyMs9T5kOylK8DWuM+Bq
+OCAAnicJfiLxaAEp3i7ZH3S525RtBRN9
+=AC+B
+-----END PGP SIGNATURE-----
+
+--nextPart13584325.6JrTevByxL--
