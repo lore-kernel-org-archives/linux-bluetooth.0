@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH v2] Fix interleave discovery regression
-Date: Thu, 11 Nov 2010 18:45:26 -0200
-Message-Id: <1289508326-18143-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH] Fix interleave discovery regression
+Date: Thu, 11 Nov 2010 18:28:52 -0200
+Message-Id: <1289507332-17004-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -17,7 +17,7 @@ discovery mode.
  1 files changed, 26 insertions(+), 8 deletions(-)
 
 diff --git a/plugins/hciops.c b/plugins/hciops.c
-index fc99275..418c824 100644
+index fc99275..d2308be 100644
 --- a/plugins/hciops.c
 +++ b/plugins/hciops.c
 @@ -1778,24 +1778,42 @@ static int hciops_stop_inquiry(int index)
@@ -51,11 +51,11 @@ index fc99275..418c824 100644
 +	le_set_scan_parameters_cp cp;
 +
 +	memset(&cp, 0, sizeof(cp));
-+	cp.type = 0x01;			/* Active scanning */
++	cp.type = 0x01;
 +	cp.interval = htobs(0x0010);
 +	cp.window = htobs(0x0010);
-+	cp.own_bdaddr_type = 0;		/* Public address */
-+	cp.filter = 0;			/* Accept all adv packets */
++	cp.own_bdaddr_type = 0;
++	cp.filter = 0;
 +
 +	if (hci_send_cmd(SK(index), OGF_LE_CTL, OCF_LE_SET_SCAN_PARAMETERS,
 +				LE_SET_SCAN_PARAMETERS_CP_SIZE, &cp) < 0)
@@ -67,7 +67,7 @@ index fc99275..418c824 100644
 +
 +static int hciops_stop_scanning(int index)
 +{
-+	return le_set_scan_enable(index, 0);
++	return le_set_scan_enable(index, 0);;
  }
  
  static int hciops_resolve_name(int index, bdaddr_t *bdaddr)
