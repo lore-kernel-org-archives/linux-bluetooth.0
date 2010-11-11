@@ -1,65 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Siarhei Siamashka <siarhei.siamashka@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Siarhei Siamashka <siarhei.siamashka@nokia.com>
-Subject: [PATCH] sbc: added "cc" to the clobber list of mmx inline assembly
-Date: Thu, 11 Nov 2010 11:29:42 +0200
-Message-Id: <1289467782-2472-1-git-send-email-siarhei.siamashka@gmail.com>
+Date: Thu, 11 Nov 2010 11:29:14 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Lukasz Pawlik <lucas.pawlik@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fix pull phonebook reply if filter not set
+Message-ID: <20101111092914.GA4132@jh-x301>
+References: <1289389387-14308-1-git-send-email-lucas.pawlik@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1289389387-14308-1-git-send-email-lucas.pawlik@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
+Hi Lukasz,
 
-In the case of scale factors calculation optimizations, the inline
-assembly code has instructions which update flags register, but
-"cc" was not mentioned in the clobber list. When optimizing code,
-gcc theoretically is allowed to do a comparison before the inline
-assembly block, and a conditional branch after it which would lead
-to a problem if the flags register gets clobbered. While this is
-apparently not happening in practice with the current versions of
-gcc, the clobber list needs to be corrected.
+On Wed, Nov 10, 2010, Lukasz Pawlik wrote:
+> According to the PBAP specification if filter is not set or is set to
+> 0x00000000 in the application parameters header all attributes of the vCard
+> should be returned. Previously only mandatory attributes were returned in
+> phonebook pull reply. This patch fix this and now all currently supported
+> vCards attributes will be returned.
+> ---
+>  plugins/vcard.c |   10 ++++++++--
+>  1 files changed, 8 insertions(+), 2 deletions(-)
 
-Regarding the other inline assembly blocks. While most likely it
-is actually unnecessary based on quick review, "cc" is also added
-there to the clobber list because it should have no impact on
-performance in practice. It's kind of cargo cult, but relieves
-us from the need to track the potential updates of flags register
-in all these places.
----
- sbc/sbc_primitives_mmx.c |    6 +++---
- 1 files changed, 3 insertions(+), 3 deletions(-)
+Pushed upstream. Thanks.
 
-diff --git a/sbc/sbc_primitives_mmx.c b/sbc/sbc_primitives_mmx.c
-index 45c62ac..7f2fbc3 100644
---- a/sbc/sbc_primitives_mmx.c
-+++ b/sbc/sbc_primitives_mmx.c
-@@ -101,7 +101,7 @@ static inline void sbc_analyze_four_mmx(const int16_t *in, int32_t *out,
- 		:
- 		: "r" (in), "r" (consts), "r" (&round_c), "r" (out),
- 			"i" (SBC_PROTO_FIXED4_SCALE)
--		: "memory");
-+		: "cc", "memory");
- }
- 
- static inline void sbc_analyze_eight_mmx(const int16_t *in, int32_t *out,
-@@ -243,7 +243,7 @@ static inline void sbc_analyze_eight_mmx(const int16_t *in, int32_t *out,
- 		:
- 		: "r" (in), "r" (consts), "r" (&round_c), "r" (out),
- 			"i" (SBC_PROTO_FIXED8_SCALE)
--		: "memory");
-+		: "cc", "memory");
- }
- 
- static inline void sbc_analyze_4b_4s_mmx(int16_t *x, int32_t *out,
-@@ -323,7 +323,7 @@ static void sbc_calc_scalefactors_mmx(
- 				"r" (&scale_factor[ch][sb]),
- 				"r" (&consts),
- 				"i" (SCALE_OUT_BITS)
--			: "memory");
-+			: "cc", "memory");
- 		}
- 	}
- 	asm volatile ("emms\n");
--- 
-1.7.2.2
-
+Johan
