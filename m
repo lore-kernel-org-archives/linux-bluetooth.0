@@ -1,76 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH] Fix interleave discovery regression
-Date: Thu, 11 Nov 2010 18:28:52 -0200
-Message-Id: <1289507332-17004-1-git-send-email-claudio.takahasi@openbossa.org>
+Cc: Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: [PATCH v2 7/7] Emit "DeviceFound" signal for LE devices
+Date: Thu, 11 Nov 2010 15:52:01 -0300
+Message-Id: <1289501521-21825-7-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1289501521-21825-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1289501521-21825-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Command complete event for LE commands are not being handled properly
-due blocking calls of LE Set Scan Parameters and LE Set Scan Enable
-Commands. Fix wrong Discovering signal emission in the interleaved
-discovery mode.
----
- plugins/hciops.c |   34 ++++++++++++++++++++++++++--------
- 1 files changed, 26 insertions(+), 8 deletions(-)
+From: Bruna Moreira <bruna.moreira@openbossa.org>
 
-diff --git a/plugins/hciops.c b/plugins/hciops.c
-index fc99275..d2308be 100644
---- a/plugins/hciops.c
-+++ b/plugins/hciops.c
-@@ -1778,24 +1778,42 @@ static int hciops_stop_inquiry(int index)
- 	return err;
+The adapter_emit_device_found() function was modified to emit
+DeviceFound signal for LE devices as well.
+---
+ src/adapter.c |   30 +++++++++++++++++++++++++-----
+ 1 files changed, 25 insertions(+), 5 deletions(-)
+
+diff --git a/src/adapter.c b/src/adapter.c
+index cd2d8d5..7edec41 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -3102,6 +3102,27 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
+ 	if (device)
+ 		paired = device_is_paired(device);
+ 
++	/* Extract UUIDs from extended inquiry response if any */
++	dev->services = get_eir_uuids(eir_data, eir_length, dev->services);
++	uuid_count = g_slist_length(dev->services);
++
++	if (dev->services)
++		uuids = strlist2array(dev->services);
++
++	if (dev->le) {
++		emit_device_found(adapter->path, paddr,
++				"Address", DBUS_TYPE_STRING, &paddr,
++				"RSSI", DBUS_TYPE_INT16, &rssi,
++				"Name", DBUS_TYPE_STRING, &dev->name,
++				"Paired", DBUS_TYPE_BOOLEAN, &paired,
++				"UUIDs", DBUS_TYPE_ARRAY, &uuids, uuid_count,
++				NULL);
++
++		g_strfreev(uuids);
++
++		return;
++	}
++
+ 	icon = class_to_icon(dev->class);
+ 
+ 	if (!dev->alias) {
+@@ -3113,12 +3134,7 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
+ 	} else
+ 		alias = g_strdup(dev->alias);
+ 
+-	/* Extract UUIDs from extended inquiry response if any */
+-	dev->services = get_eir_uuids(eir_data, eir_length, dev->services);
+-	uuid_count = g_slist_length(dev->services);
+-
+ 	if (dev->services) {
+-		uuids = strlist2array(dev->services);
+ 		g_slist_foreach(dev->services, (GFunc) g_free, NULL);
+ 		g_slist_free(dev->services);
+ 		dev->services = NULL;
+@@ -3195,6 +3211,10 @@ void adapter_update_adv(struct btd_adapter *adapter, le_advertising_info *info)
+ 		if (tmp_name)
+ 			dev->name = tmp_name;
+ 	}
++
++	/* FIXME: check if other information was changed before emitting the
++	 * signal */
++	adapter_emit_device_found(adapter, dev, info->data, info->length);
  }
  
--static int hciops_start_scanning(int index)
-+static int le_set_scan_enable(int index, uint8_t enable)
- {
--	if (hci_le_set_scan_parameters(SK(index), 0x01, htobs(0x0010),
--					htobs(0x0010), 0x00, 0x00) < 0)
--		return -errno;
-+	le_set_scan_enable_cp cp;
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp.enable = enable;
-+	cp.filter_dup = 0;
- 
--	if (hci_le_set_scan_enable(SK(index), 0x01, 0x00) < 0)
-+	if (hci_send_cmd(SK(index), OGF_LE_CTL, OCF_LE_SET_SCAN_ENABLE,
-+				LE_SET_SCAN_ENABLE_CP_SIZE, &cp) < 0)
- 		return -errno;
- 
- 	return 0;
- }
- 
--static int hciops_stop_scanning(int index)
-+static int hciops_start_scanning(int index)
- {
--	if (hci_le_set_scan_enable(SK(index), 0x00, 0x00) < 0)
-+	le_set_scan_parameters_cp cp;
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp.type = 0x01;
-+	cp.interval = htobs(0x0010);
-+	cp.window = htobs(0x0010);
-+	cp.own_bdaddr_type = 0;
-+	cp.filter = 0;
-+
-+	if (hci_send_cmd(SK(index), OGF_LE_CTL, OCF_LE_SET_SCAN_PARAMETERS,
-+				LE_SET_SCAN_PARAMETERS_CP_SIZE, &cp) < 0)
- 		return -errno;
- 
--	return 0;
-+	return le_set_scan_enable(index, 1);
-+}
-+
-+static int hciops_stop_scanning(int index)
-+{
-+	return le_set_scan_enable(index, 0);;
- }
- 
- static int hciops_resolve_name(int index, bdaddr_t *bdaddr)
+ void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
 -- 
 1.7.3.2
 
