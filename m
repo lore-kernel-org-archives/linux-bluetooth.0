@@ -1,52 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 11 Nov 2010 22:54:48 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Sheldon Demario <sheldon.demario@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Adding a new option to specify medium security level
+ for gatttool
+Message-ID: <20101111205448.GA22890@jh-x301>
+References: <1289424095-26628-1-git-send-email-sheldon.demario@openbossa.org>
 MIME-Version: 1.0
-In-Reply-To: <1289501521-21825-1-git-send-email-vinicius.gomes@openbossa.org>
-References: <1289501521-21825-1-git-send-email-vinicius.gomes@openbossa.org>
-Date: Thu, 11 Nov 2010 22:54:56 +0200
-Message-ID: <AANLkTinSrAkbcZpK9cO=xLJyH253LDuZrGZCgzEKymLG@mail.gmail.com>
-Subject: Re: [PATCH v2 1/7] Fix invalid memory access when EIR field length is zero
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Bruna Moreira <bruna.moreira@openbossa.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1289424095-26628-1-git-send-email-sheldon.demario@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Sheldon,
 
-2010/11/11 Vinicius Costa Gomes <vinicius.gomes@openbossa.org>:
-> From: Bruna Moreira <bruna.moreira@openbossa.org>
->
-> ---
->  src/adapter.c |    3 +--
->  1 files changed, 1 insertions(+), 2 deletions(-)
->
-> diff --git a/src/adapter.c b/src/adapter.c
-> index b1aabbd..8b742b7 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -2977,14 +2977,13 @@ static char **get_eir_uuids(uint8_t *eir_data, size_t *uuid_count)
->        unsigned int i;
->
->        while (len < EIR_DATA_LENGTH - 1) {
-> -               uint8_t type = eir_data[1];
->                uint8_t field_len = eir_data[0];
->
->                /* Check for the end of EIR */
->                if (field_len == 0)
->                        break;
->
-> -               switch (type) {
-> +               switch (eir_data[1]) {
->                case EIR_UUID16_SOME:
->                case EIR_UUID16_ALL:
->                        uuid16_count = field_len / 2;
+On Wed, Nov 10, 2010, Sheldon Demario wrote:
+> -- Add command line support to use medium instead of (default) low
+> -  security level with gatttool (--sec-level)
+> -
+> -  Priority: Low
+> -  Complexity: C1
+> -
+<snip>
+> +	{ "sec-medium", 's', 0, G_OPTION_ARG_NONE, &opt_medium_sec,
+> +		"Use medium instead of default low security level",
+> +		NULL},
 
-IMO type is easier to understand here, we just need to initialize it
-latter after the length check.
+Maybe the TODO entry should have been more clear, but I'd prefer if the
+option would be of the format "--sec-level <level>" where <level> is
+"low", "medium" or "high". I'm not completely sure I like --sec-level
+either (even though I did write the original TODO entry :) What do you
+think about simply "--security <level>"?
 
-
--- 
-Luiz Augusto von Dentz
-Computer Engineer
+Johan
