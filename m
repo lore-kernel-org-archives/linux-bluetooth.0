@@ -1,31 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 11 Nov 2010 23:23:03 +0200
+Date: Thu, 11 Nov 2010 23:17:19 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Dmitriy Paliy <dmitriy.paliy@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: Re: [PATCH 1/2] g_string_free shell be used in IRMC
-Message-ID: <20101111212303.GG24514@jh-x301>
-References: <1289508380-8873-1-git-send-email-dmitriy.paliy@nokia.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] Fix interleave discovery regression
+Message-ID: <20101111211719.GF24514@jh-x301>
+References: <1289508326-18143-1-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1289508380-8873-1-git-send-email-dmitriy.paliy@nokia.com>
+In-Reply-To: <1289508326-18143-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitriy,
+Hi Claudio,
 
-On Thu, Nov 11, 2010, Dmitriy Paliy wrote:
-> g_string_free instead of string_free shell be used in IRMC plugin.
-> string_free is a callback function specific to filesystem plugin
-> only and used by OBEX drivers to close an OBEX object.
+On Thu, Nov 11, 2010, Claudio Takahasi wrote:
+> Command complete event for LE commands are not being handled properly
+> due blocking calls of LE Set Scan Parameters and LE Set Scan Enable
+> Commands. Fix wrong Discovering signal emission in the interleaved
+> discovery mode.
 > ---
->  plugins/irmc.c |   10 ++++------
->  1 files changed, 4 insertions(+), 6 deletions(-)
+>  plugins/hciops.c |   34 ++++++++++++++++++++++++++--------
+>  1 files changed, 26 insertions(+), 8 deletions(-)
 
-Thanks, pushed upstream after I fixed your email address (should be
-@nokia.com, check your gitconfig) and summary line (which should start
-with Add/Fix/Make/Use etc to be consistent with the rest of the commit
-history.
+Pushed upstream. Thanks.
 
 Johan
