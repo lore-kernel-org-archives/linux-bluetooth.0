@@ -1,24 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 11 Nov 2010 12:08:49 +0200
+Date: Thu, 11 Nov 2010 12:08:11 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Sheldon Demario <sheldon.demario@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Use reference counting of the device object while
- discovering services
-Message-ID: <20101111100849.GG4132@jh-x301>
-References: <1289426161-10045-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: Re: [PATCH] Print LE link type on hcitool
+Message-ID: <20101111100811.GF4132@jh-x301>
+References: <1289415288-18470-1-git-send-email-sheldon.demario@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1289426161-10045-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1289415288-18470-1-git-send-email-sheldon.demario@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Sheldon,
 
-On Wed, Nov 10, 2010, Claudio Takahasi wrote:
+On Wed, Nov 10, 2010, Sheldon Demario wrote:
 > ---
->  attrib/client.c |    3 ++-
->  1 files changed, 2 insertions(+), 1 deletions(-)
+>  lib/hci.h       |    1 +
+>  tools/hcitool.c |    2 ++
+>  2 files changed, 3 insertions(+), 0 deletions(-)
 
 Pushed upstream. Thanks.
 
