@@ -1,38 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 11 Nov 2010 22:57:12 +0200
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3] Split up object and session in pbap.c
-Message-ID: <20101111205712.GB22890@jh-x301>
-References: <1289460972-2971-1-git-send-email-dmitriy.paliy@nokia.com>
- <1289490660-14884-1-git-send-email-dmitriy.paliy@nokia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1289490660-14884-1-git-send-email-dmitriy.paliy@nokia.com>
+In-Reply-To: <1289501521-21825-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1289501521-21825-1-git-send-email-vinicius.gomes@openbossa.org>
+Date: Thu, 11 Nov 2010 22:54:56 +0200
+Message-ID: <AANLkTinSrAkbcZpK9cO=xLJyH253LDuZrGZCgzEKymLG@mail.gmail.com>
+Subject: Re: [PATCH v2 1/7] Fix invalid memory access when EIR field length is zero
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Bruna Moreira <bruna.moreira@openbossa.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitriy,
+Hi,
 
-On Thu, Nov 11, 2010, Dmitriy Paliy wrote:
-> Object and session data is separated in PBAP plugin. Reason is that
-> when OBEX session firstly makes disconnect of service_data, which
-> corresponds to session in pbap.c, it than closes object, which also
-> corresponds to session in pbap.c.
-> 
-> Memory is deallocated after PBAP session is disconnected. When OBEX
-> driver closes the object, it is trying to dereference the deallocated
-> memory in order to free pbap->buffer data.
-> 
-> Here object and session are separated, while pointers are created to
-> make one-to-one mapping. pbap_object is created in vobject_..._open
-> functions after query to tracker submitted. Session and object are
-> handled separately when freed.
+2010/11/11 Vinicius Costa Gomes <vinicius.gomes@openbossa.org>:
+> From: Bruna Moreira <bruna.moreira@openbossa.org>
+>
 > ---
->  plugins/pbap.c |   94 +++++++++++++++++++++++++++++++++++---------------------
->  1 files changed, 59 insertions(+), 35 deletions(-)
+>  src/adapter.c |    3 +--
+>  1 files changed, 1 insertions(+), 2 deletions(-)
+>
+> diff --git a/src/adapter.c b/src/adapter.c
+> index b1aabbd..8b742b7 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -2977,14 +2977,13 @@ static char **get_eir_uuids(uint8_t *eir_data, size_t *uuid_count)
+>        unsigned int i;
+>
+>        while (len < EIR_DATA_LENGTH - 1) {
+> -               uint8_t type = eir_data[1];
+>                uint8_t field_len = eir_data[0];
+>
+>                /* Check for the end of EIR */
+>                if (field_len == 0)
+>                        break;
+>
+> -               switch (type) {
+> +               switch (eir_data[1]) {
+>                case EIR_UUID16_SOME:
+>                case EIR_UUID16_ALL:
+>                        uuid16_count = field_len / 2;
 
-The patch has been pushed upstream. Thanks.
+IMO type is easier to understand here, we just need to initialize it
+latter after the length check.
 
-Johan
+
+-- 
+Luiz Augusto von Dentz
+Computer Engineer
