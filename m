@@ -1,123 +1,118 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 12 Nov 2010 13:13:48 -0500
+From: "John W. Linville" <linville@tuxdriver.com>
+To: "Luis R. Rodriguez" <lrodriguez@atheros.com>
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: [PATCH] compat-wireless: support backporting bluetooth to RHEL 6
+Message-ID: <20101112181348.GG2338@tuxdriver.com>
 MIME-Version: 1.0
-In-Reply-To: <1288865461-3760-4-git-send-email-szymon.janc@tieto.com>
-References: <1288865461-3760-1-git-send-email-szymon.janc@tieto.com> <1288865461-3760-4-git-send-email-szymon.janc@tieto.com>
-From: jaikumar Ganesh <jaikumarg@gmail.com>
-Date: Fri, 12 Nov 2010 10:20:01 -0800
-Message-ID: <AANLkTikZrbVTCDB2HRtqRJjUjYP3Z5PBieOovZZgP9id@mail.gmail.com>
-Subject: Re: [PATCH 3/4] Add DBus OOB API documentation.
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon:
+RHEL kernels in general (and RHEL 6 kernels in particular) often
+contain features backported from later upstream kernels.  This means
+that the normal KERNEL_VERSION checks are not always correct for RHEL
+kernels.  This patch augments a number of such tests to be compatible
+with building compat-wireless on RHEL 6 kernels.
 
-On Thu, Nov 4, 2010 at 3:11 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> ---
->  Makefile.am     |    3 +-
->  doc/oob-api.txt |   62 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 64 insertions(+), 1 deletions(-)
->  create mode 100644 doc/oob-api.txt
->
-> diff --git a/Makefile.am b/Makefile.am
-> index d6cbf92..b5157cd 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -358,7 +358,8 @@ EXTRA_DIST += doc/manager-api.txt \
->                doc/service-api.txt doc/agent-api.txt doc/attribute-api.txt \
->                doc/serial-api.txt doc/network-api.txt \
->                doc/input-api.txt doc/audio-api.txt doc/control-api.txt \
-> -               doc/hfp-api.txt doc/assigned-numbers.txt
-> +               doc/hfp-api.txt doc/assigned-numbers.txt doc/oob-api.txt
-> +
->
->  AM_YFLAGS = -d
->
-> diff --git a/doc/oob-api.txt b/doc/oob-api.txt
-> new file mode 100644
-> index 0000000..fce18a7
-> --- /dev/null
-> +++ b/doc/oob-api.txt
-> @@ -0,0 +1,62 @@
-> +BlueZ D-Bus OOB API description
-> +*******************************
-> +
-> +Copyright (C) 2010  ST-Ericsson SA
-> +
-> +Author: Szymon Janc <szymon.janc@tieto.com> for ST-Ericsson
-> +
-> +OOB hierarchy
-> +=================
-> +
-> +Service         unique name
-> +Interface       org.bluez.OOB
-> +Object path     freely definable
-> +
-> +Methods                array{bye}, array{byte} RequestRemoteOobData(string address)
-> +
-> +                       This method gets called when the service daemon needs to
-> +                       get hash and randomizer for an OOB authentication.
-> +
-> +                       The return value should be pair of arrays of 16 bytes
-> +                       each. First hash, second randomizer.
-> +
-> +                       If no OOB data is present for specified address empty
-> +                       reply should be returned.
-> +
-> +               void Deactivate()
+Signed-off-by: John W. Linville <linville@tuxdriver.com>
+---
+This patch contains the bluetooth backporting portions...
 
-Would it better to make this a signal ? Deactivate by itself as the
-only method doesn't seem to be right.
-
-> +
-> +                       This method gets called when DBus plug-in for OOB was
-> +                       deactivated. There is no need to unregister provider,
-> +                       because when this method gets called it has already been
-> +                       unregistered.
-> +
-> +--------------------------------------------------------------------------------
-> +
-> +Service         org.bluez
-> +Interface       org.bluez.OOB
-> +Object path     /org/bluez
-> +
-> +               void RegisterProvider(object provider)
-> +
-> +                       This method registers provider for DBus OOB plug-in.
-> +                       When provider is successfully registered plug-in becomes
-> +                       active. Only one provider can be registered at time.
-
-Why are we enforcing this limitation ?
-> +
-> +                       Possible errors: org.bluez.Error.AlreadyExists
-> +
-> +               void UnregisterProvider(object provider)
-> +
-> +                       This method unregisters provider for DBus OOB plug-in.
-> +                       When provider is successfully unregistered plug-in
-> +                       becomes inactive and will emit Deactivated() signal.
-> +
-> +                       Possible errors: org.bluez.Error.DoesNotExist
-> +
-> +               array{bye}, array{byte} UpdateLocalOobData(string address)
-
-You are not updating anything here. You are just reading the local
-adapter OOB data
-
-> +
-> +                       This method generates new local OOB data for specified
-> +                       address (adapter). Return value is pair of arrays 16
-> +                       bytes each. First hash, second randomizer. Only
-> +                       registered provider should call this method.
-> +
-> +                       Possible errors: org.bluez.Error.UpdateFailed
-> --
-> 1.7.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+diff -up compat-wireless-2.6.36-4/patches/16-bluetooth.patch.orig compat-wireless-2.6.36-4/patches/16-bluetooth.patch
+--- compat-wireless-2.6.36-4/patches/16-bluetooth.patch.orig	2010-11-12 12:42:52.602182539 -0500
++++ compat-wireless-2.6.36-4/patches/16-bluetooth.patch	2010-11-12 12:46:36.049287339 -0500
+@@ -35,7 +35,7 @@ here still, but for now we keep this her
+  }
+  EXPORT_SYMBOL(bt_sock_unregister);
+  
+-+#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32))
+++#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32)) || (defined(RHEL_MAJOR) && (RHEL_MAJOR == 6))
+  static int bt_sock_create(struct net *net, struct socket *sock, int proto,
+  			  int kern)
+ +#else
+@@ -48,7 +48,7 @@ here still, but for now we keep this her
+  	read_lock(&bt_proto_lock);
+  
+  	if (bt_proto[proto] && try_module_get(bt_proto[proto]->owner)) {
+-+#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32))
+++#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32)) || (defined(RHEL_MAJOR) && (RHEL_MAJOR == 6))
+  		err = bt_proto[proto]->create(net, sock, proto, kern);
+ +#else
+ +		err = bt_proto[proto]->create(net, sock, proto);
+@@ -127,7 +127,7 @@ here still, but for now we keep this her
+  	.obj_size	= sizeof(struct hci_pinfo)
+  };
+  
+-+#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32))
+++#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32)) || (defined(RHEL_MAJOR) && (RHEL_MAJOR == 6))
+  static int hci_sock_create(struct net *net, struct socket *sock, int protocol,
+  			   int kern)
+ +#else
+@@ -180,7 +180,7 @@ here still, but for now we keep this her
+  	return hidp_queue_report(session, buf, rsize);
+  }
+  
+-+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,34))
+++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,34)) || (defined(RHEL_MAJOR) && (RHEL_MAJOR == 6))
+  static int hidp_output_raw_report(struct hid_device *hid, unsigned char *data, size_t count,
+  		unsigned char report_type)
+  {
+@@ -438,7 +438,7 @@ here still, but for now we keep this her
+  	return sk;
+  }
+  
+-+#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32))
+++#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32)) || (defined(RHEL_MAJOR) && (RHEL_MAJOR == 6))
+  static int rfcomm_sock_create(struct net *net, struct socket *sock,
+  			      int protocol, int kern)
+ +#else
+@@ -505,7 +505,7 @@ here still, but for now we keep this her
+  	return sk;
+  }
+  
+-+#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32))
+++#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32)) || (defined(RHEL_MAJOR) && (RHEL_MAJOR == 6))
+  static int sco_sock_create(struct net *net, struct socket *sock, int protocol,
+  			   int kern)
+ +#else
+@@ -532,7 +532,7 @@ here still, but for now we keep this her
+  	.obj_size	= sizeof(struct bt_sock)
+  };
+  
+-+#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32))
+++#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32)) || (defined(RHEL_MAJOR) && (RHEL_MAJOR == 6))
+  static int bnep_sock_create(struct net *net, struct socket *sock, int protocol,
+  			    int kern)
+ +#else
+@@ -547,7 +547,7 @@ here still, but for now we keep this her
+  	.obj_size	= sizeof(struct bt_sock)
+  };
+  
+-+#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32))
+++#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32)) || (defined(RHEL_MAJOR) && (RHEL_MAJOR == 6))
+  static int cmtp_sock_create(struct net *net, struct socket *sock, int protocol,
+  			    int kern)
+ +#else
+@@ -562,7 +562,7 @@ here still, but for now we keep this her
+  	.obj_size	= sizeof(struct bt_sock)
+  };
+  
+-+#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32))
+++#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32)) || (defined(RHEL_MAJOR) && (RHEL_MAJOR == 6))
+  static int hidp_sock_create(struct net *net, struct socket *sock, int protocol,
+  			    int kern)
+ +#else
+@@ -577,7 +577,7 @@ here still, but for now we keep this her
+  	return sk;
+  }
+  
+-+#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32))
+++#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32)) || (defined(RHEL_MAJOR) && (RHEL_MAJOR == 6))
+  static int l2cap_sock_create(struct net *net, struct socket *sock, int protocol,
+  			     int kern)
+ +#else
+-- 
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
