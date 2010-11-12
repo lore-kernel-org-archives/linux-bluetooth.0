@@ -1,49 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20101112182921.GA15584@jh-x301>
-References: <1288865461-3760-1-git-send-email-szymon.janc@tieto.com>
- <1288865461-3760-4-git-send-email-szymon.janc@tieto.com> <AANLkTikZrbVTCDB2HRtqRJjUjYP3Z5PBieOovZZgP9id@mail.gmail.com>
- <20101112182921.GA15584@jh-x301>
-From: jaikumar Ganesh <jaikumarg@gmail.com>
-Date: Fri, 12 Nov 2010 11:07:06 -0800
-Message-ID: <AANLkTikFAc43uU-976tRSFrntFHYApe9h9zzVHto22_6@mail.gmail.com>
-Subject: Re: [PATCH 3/4] Add DBus OOB API documentation.
-To: jaikumar Ganesh <jaikumarg@gmail.com>,
-	Szymon Janc <szymon.janc@tieto.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH] compat-wireless: support backporting bluetooth to RHEL
+ 6
+From: Johannes Berg <johannes@sipsolutions.net>
+To: "John W. Linville" <linville@tuxdriver.com>
+Cc: "Luis R. Rodriguez" <lrodriguez@atheros.com>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
+In-Reply-To: <20101112181348.GG2338@tuxdriver.com>
+References: <20101112181348.GG2338@tuxdriver.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 12 Nov 2010 10:39:32 -0800
+Message-ID: <1289587172.3736.7.camel@jlt3.sipsolutions.net>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon:
+On Fri, 2010-11-12 at 13:13 -0500, John W. Linville wrote:
+>   
+> -+#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32))
+> ++#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32)) || (defined(RHEL_MAJOR) && (RHEL_MAJOR == 6))
 
-On Fri, Nov 12, 2010 at 10:29 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Jaikumar,
->
-> On Fri, Nov 12, 2010, jaikumar Ganesh wrote:
->> > +               void Deactivate()
->>
->> Would it better to make this a signal ? Deactivate by itself as the
->> only method doesn't seem to be right.
->
-> I guess this is analogous to the Release() method which we have for
-> agents, so in that sense a method call would be consistent with the rest
-> of the BlueZ D-Bus API (but you'd really need to rename this to Release
-> then).
->
-> Johan
->
+Hmmm. I kinda support this, but I'd rather see something like a header
+file having
 
-So the only APIs added are these provider ones and one API in Agent
-code for approval.
+#if (LINUX_VERSION ...) || ...
+#define OLD_BT_API 1
+#endif
 
-So how does bluetoothd decide whether OOB is present for a particular
-remote device for an outgoing pairing case ? Just on the basis of
-whether a provider is registered or am I missing something here.
+and then using ifdef OLD_BT_API? That way, other distros don't get into
+a huge mess trying to add that too, and something like we had two days
+ago where we had to make it work on some other custom kernel would be
+much easier too since we can just amend the one check or define/undef
+the OLD_BT_API symbol.
 
-RequestRemoteOobData is called before initiating pairing or when the
-remote end asks for the OOB data ?
-Its unclear from the API description.
+johannes
 
-Thanks
-Jaikumar
