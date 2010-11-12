@@ -1,230 +1,189 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Elvis=20Pf=C3=BCtzenreuter?= <epx@signove.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: epx@signove.com
-Subject: [PATCH] [RFC] Show multiple classes in Device UUIDs property
-Date: Fri, 12 Nov 2010 12:52:08 -0200
-Message-Id: <1289573528-14404-1-git-send-email-epx@signove.com>
+From: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+To: Keith Mok <ek9852@gmail.com>
+Subject: Re: [PATCH v2] Add iwmmxt optimization for sbc for pxa series cpu
+Date: Fri, 12 Nov 2010 15:22:44 +0200
+Cc: linux-bluetooth@vger.kernel.org
+References: <AANLkTikPiwr+OtsDVbgoya281Zncg0P5Joq_v0UCzZDi@mail.gmail.com> <201011111346.58906.siarhei.siamashka@gmail.com> <AANLkTi=rVvmwXwtZgMgwfBigyFXKsWRGy==rdcVjkitW@mail.gmail.com>
+In-Reply-To: <AANLkTi=rVvmwXwtZgMgwfBigyFXKsWRGy==rdcVjkitW@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed;
+  boundary="nextPart1844846.W9SxtCkjnb";
+  protocol="application/pgp-signature";
+  micalg=pgp-sha1
+Message-Id: <201011121522.51428.siarhei.siamashka@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support for multiple service classes in a single SDP record,
-This is a common case for HDP profile (a HDP device which is both source and
-sink will have classes 0x1401 and 0x1402, but often just one SDP record).
+--nextPart1844846.W9SxtCkjnb
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-Current implementation gets only the first UUID in record, which can be
-any of the two, and prevents an application to filter e.g. sources by
-UUIDs property alone.
+On Friday 12 November 2010 09:35:04 Keith Mok wrote:
+> > Did you run some benchmarks with these optimizations to measure how much
+> > they are helping?
+>=20
+> Tested on Marvell PXA platform.
+> =3D=3D Before =3D=3D
+> $ time ./sbcenc   -b53 -s8 -j  c.au  > /dev/null
+> real    0m 0.41s
+> user    0m 0.40s
+> sys     0m 0.00s
+>=20
+> =3D=3D After =3D=3D
+> $ time ./sbcenc   -b53 -s8 -j  c.au  > /dev/null
+> real    0m 0.19s
+> user    0m 0.17s
+> sys     0m 0.02s
 
-The patch also prevents a device driver from being probed and/or removed
-twice, if two different UUIDs are served by the same driver. Moreover, it
-detects the case when one UUID is removed (e.g. 0x1401) but another one
-showed up (0x1402) and both are served by the same driver, which means
-the driver must not be removed.
+Thanks, this looks consistent with the results of optimizations on the other
+platforms where the performance increases roughly twice after adding SIMD=20
+optimizations to the sbc analysis filter.
 
-NOTE: the main reason I am submitting this patch, is to reopen the
-multiple-UUIDs-in-a-profile discussion. This has been tested mainly with
-HDP but there may be issues that affect other drivers and invalidates this
-solution completely. I am prepared for the lapidation :)
----
- src/device.c |  123 +++++++++++++++++++++++++++++++++++++++++----------------
- 1 files changed, 88 insertions(+), 35 deletions(-)
+But maybe it's better to use a bit bigger test file, so that the total time=
+=20
+increases to at least several seconds. With very small times, it's hard to =
+say
+whether it is an actual improvement or random noise. It may be ok for such a
+huge performance improvement, but with less significant optimizations the=20
+precision of measurements may become a problem.
 
-diff --git a/src/device.c b/src/device.c
-index 7c421e3..83ca441 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1186,6 +1186,14 @@ static GSList *device_match_driver(struct btd_device *device,
- 	return uuids;
- }
- 
-+static int device_drivers_cmp(const void *a, const void *b)
-+{
-+	const struct btd_driver_data *driver_data = a;
-+	const struct btd_device_driver *driver = b;
-+
-+	return (driver_data->driver == driver ? 0 : 1);
-+}
-+
- void device_probe_drivers(struct btd_device *device, GSList *profiles)
- {
- 	GSList *list;
-@@ -1208,20 +1216,25 @@ void device_probe_drivers(struct btd_device *device, GSList *profiles)
- 		if (!probe_uuids)
- 			continue;
- 
--		driver_data = g_new0(struct btd_driver_data, 1);
--
- 		err = driver->probe(device, probe_uuids);
- 		if (err < 0) {
- 			error("probe failed with driver %s for device %s",
- 					driver->name, device->path);
- 
--			g_free(driver_data);
- 			g_slist_free(probe_uuids);
- 			continue;
- 		}
- 
-+		if (g_slist_find_custom(device->drivers, driver,
-+				(GCompareFunc) device_drivers_cmp)) {
-+			g_slist_free(probe_uuids);
-+			continue;
-+		}
-+
-+		driver_data = g_new0(struct btd_driver_data, 1);
- 		driver_data->driver = driver;
- 		device->drivers = g_slist_append(device->drivers, driver_data);
-+
- 		g_slist_free(probe_uuids);
- 	}
- 
-@@ -1254,13 +1267,45 @@ static void device_remove_drivers(struct btd_device *device, GSList *uuids)
- 
- 	DBG("Remove drivers for %s", device->path);
- 
-+	for (list = uuids; list; list = list->next) {
-+		sdp_record_t *rec;
-+
-+		device->uuids = g_slist_remove(device->uuids, list->data);
-+
-+		rec = find_record_in_list(records, list->data);
-+		if (!rec)
-+			continue;
-+
-+		delete_record(srcaddr, dstaddr, rec->handle);
-+
-+		records = sdp_list_remove(records, rec);
-+		sdp_record_free(rec);
-+
-+	}
-+
-+	if (records)
-+		sdp_list_free(records, (sdp_free_func_t) sdp_record_free);
-+
- 	for (list = device->drivers; list; list = next) {
- 		struct btd_driver_data *driver_data = list->data;
- 		struct btd_device_driver *driver = driver_data->driver;
- 		const char **uuid;
-+		gboolean in_use_by_another_uuid;
- 
- 		next = list->next;
- 
-+		in_use_by_another_uuid = FALSE;
-+		for (uuid = driver->uuids; *uuid; uuid++) {
-+			if (g_slist_find_custom(device->uuids, *uuid,
-+						(GCompareFunc) strcasecmp)) {
-+				in_use_by_another_uuid = TRUE;
-+				break;
-+			}
-+		}
-+
-+		if (in_use_by_another_uuid)
-+			continue;
-+
- 		for (uuid = driver->uuids; *uuid; uuid++) {
- 			if (!g_slist_find_custom(uuids, *uuid,
- 						(GCompareFunc) strcasecmp))
-@@ -1277,25 +1322,6 @@ static void device_remove_drivers(struct btd_device *device, GSList *uuids)
- 			break;
- 		}
- 	}
--
--	for (list = uuids; list; list = list->next) {
--		sdp_record_t *rec;
--
--		device->uuids = g_slist_remove(device->uuids, list->data);
--
--		rec = find_record_in_list(records, list->data);
--		if (!rec)
--			continue;
--
--		delete_record(srcaddr, dstaddr, rec->handle);
--
--		records = sdp_list_remove(records, rec);
--		sdp_record_free(rec);
--
--	}
--
--	if (records)
--		sdp_list_free(records, (sdp_free_func_t) sdp_record_free);
- }
- 
- static void services_changed(struct btd_device *device)
-@@ -1323,6 +1349,43 @@ static int rec_cmp(const void *a, const void *b)
- 	return r1->handle - r2->handle;
- }
- 
-+static void append_uuids(GSList *existing, GSList **uuids, sdp_list_t *svcclass)
-+{
-+	gchar *uuid;
-+	GSList *l;
-+
-+	do {
-+		uuid = bt_uuid2string(svcclass->data);
-+
-+		l = g_slist_find_custom(existing, uuid, (GCompareFunc) strcmp);
-+		if (l) {
-+			g_free(uuid);
-+			continue;
-+		}
-+
-+		l = g_slist_find_custom(*uuids, uuid, (GCompareFunc) strcmp);
-+		if (!l) 
-+			*uuids = g_slist_append(*uuids, uuid);
-+		else
-+			g_free(uuid);
-+	} while ((svcclass = svcclass->next));
-+}
-+
-+static void remove_uuids(GSList **uuids, sdp_list_t *svcclass)
-+{
-+	gchar *uuid;
-+	GSList *l;
-+
-+	do {
-+		uuid = bt_uuid2string(svcclass->data);
-+		l = g_slist_find_custom(*uuids, uuid, (GCompareFunc) strcmp);
-+
-+		if (l) 
-+			*uuids = g_slist_remove(*uuids, l->data);
-+		g_free(uuid);
-+	} while ((svcclass = svcclass->next));
-+}
-+
- static void update_services(struct browse_req *req, sdp_list_t *recs)
- {
- 	struct btd_device *device = req->device;
-@@ -1339,7 +1402,6 @@ static void update_services(struct browse_req *req, sdp_list_t *recs)
- 		sdp_record_t *rec = (sdp_record_t *) seq->data;
- 		sdp_list_t *svcclass = NULL;
- 		gchar *profile_uuid;
--		GSList *l;
- 
- 		if (!rec)
- 			break;
-@@ -1394,19 +1456,10 @@ static void update_services(struct browse_req *req, sdp_list_t *recs)
- 		req->records = sdp_list_append(req->records,
- 							sdp_copy_record(rec));
- 
--		l = g_slist_find_custom(device->uuids, profile_uuid,
--							(GCompareFunc) strcmp);
--		if (!l)
--			req->profiles_added =
--					g_slist_append(req->profiles_added,
--							profile_uuid);
--		else {
--			req->profiles_removed =
--					g_slist_remove(req->profiles_removed,
--							l->data);
--			g_free(profile_uuid);
--		}
-+		append_uuids(device->uuids, &req->profiles_added, svcclass);
-+		remove_uuids(&req->profiles_removed, svcclass);
- 
-+		g_free(profile_uuid);
- 		sdp_list_free(svcclass, free);
- 	}
- }
--- 
-1.7.0.4
+Also do you have oprofile available on PXA platform? It may provide a nice=
+=20
+statistics about what functions are used and are the performance hot spots.=
+=20
 
+> > Using back-to-back WLDRD instructions has some performance penalty
+>=20
+> I rearrange the instructions and keep the original one as for reference in
+> the block that comment out. Since the code is really difficult to read
+> after interleaved.
+
+Thanks, this looks like it really should run quite a bit faster than the
+previous variant (based on my understanding of intel pdf files).=20
+
+I sometimes use different indentation levels in such cases in order to impr=
+ove=20
+readability after instructions reordering, so that each logically independe=
+nt
+block of code has its own indentation level and it is still easily visible
+after instructions reordering. For example, with the original code:
+
+A1
+A2
+A3
+A4
+B1
+B2
+B3
+B4
+
+If the instructions need to be reordered in order to improve scheduling for=
+ the
+cpu pipeline, then for example
+
+A1
+A2
+  B1
+A3
+  B2
+A4
+  B3
+  B4
+
+looks much more readable to me than
+
+A1
+A2
+B1
+A3
+B2
+A4
+B3
+B4
+
+With different indentation levels, one can still see the flow of instructio=
+ns=20
+as independent streams. If different levels of indentation in inline assemb=
+ly=20
+pass coding style test by checkpatch.pl script, then it should be fine.
+
+Also I'm quite curious whether better instructions scheduling provide any c=
+lear
+improvement, so some numbers comparing older and newer implementation would
+be appreciated. I did not suggest that just for entertainment purposes ;) It
+really should provide some practical benefit.
+
+If you have time and want to make such a test, iwmmxt intrinsics could be a=
+lso
+tried, so that instructions scheduling and registers allocation becomes a
+responsibility of the compiler. But my previous experiments with arm neon
+intrinsics showed that the compiler does a very poor job and can't be trust=
+ed
+to generate fast code. But maybe iwmmxt could be different or gcc could have
+improved since than.
+
+> > The MMX code was using PCMPGTD and the other instructions just because
+> > MMX instruction set is very limited and did not have the needed
+> > instructions. But you can use WABS and WMAX instructions to do this job
+> > better. You can refer to the original C code and also to ARM NEON
+> > optimizations to get some ideas about how to do this operation faster.
+>=20
+> Changed as suggested.
+> But got a question that the __IWMMXT__ builtin gcc definition is not a
+> reliable way to
+> determine whether mcpu=3Diwmmxt2 is turned on or not. It will break when
+> compile under pxa270
+> which does not support wabs with just mcpu=3Diwmmx on.
+
+Well, as I said before, I'm not familiar with iwmmxt and pxa platform. And I
+did not notice that there are actually several revisions of iwmmxt isa, my =
+bad.
+So looks like iwmmxt1 is just as restrictive as the original mmx and the di=
+rect=20
+conversion from mmx like you did before may be the right thing. For arm neo=
+n=20
+optimizations, the effect of using vector ABS/MAX instructions was just
+about 1% of overall performance improvement. Not so much, but every little =
+bit
+helps. And if for iwmmxt it causes such backwards compatibility issues, the=
+n it
+might be not worth it. It's up to you to decide.
+
+I would still suggest to initially have just optimizations for=20
+sbc_analyze_four_iwmmxt/sbc_analyze_eight_iwmmxt in the first patch (or may=
+be=20
+in two patches). And then add optimization for sbc_calc_scalefactors in a
+separate patch later.
+
+Regarding the benchmarks and functions usage:
+1. sbc_analyze_four_iwmmxt is important for 4 subbands case ('-s4' option f=
+or=20
+sbcenc)
+2. sbc_analyze_eight_iwmmxt is important for 8 subbands case ('-s8' option =
+for=20
+sbcenc)
+3. sbc_calc_scalefactors is important for either mono audio, or when joint=
+=20
+stereo is *not* used (sbcenc is run without '-j' option).
+
+All of this is better to be benchmarked/tested separately.
+
+=2D-=20
+Best regards,
+Siarhei Siamashka
+
+--nextPart1844846.W9SxtCkjnb
+Content-Type: application/pgp-signature; name=signature.asc 
+Content-Description: This is a digitally signed message part.
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.16 (GNU/Linux)
+
+iEYEABECAAYFAkzdP6sACgkQvyB/CfYEEt7BkACgpEJbmD1+WN1TBAmC64O6o5a7
+BhMAoMUwdPZBUchSL4yU0SMOQQxIXFg2
+=fOkF
+-----END PGP SIGNATURE-----
+
+--nextPart1844846.W9SxtCkjnb--
