@@ -1,87 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Siarhei Siamashka <siarhei.siamashka@gmail.com>
-To: Keith Mok <ek9852@gmail.com>
-Subject: Re: [PATCH v3] Add iwmmxt optimization for sbc for pxa series cpu
-Date: Mon, 15 Nov 2010 13:08:19 +0200
-Cc: linux-bluetooth@vger.kernel.org
-References: <AANLkTikPiwr+OtsDVbgoya281Zncg0P5Joq_v0UCzZDi@mail.gmail.com> <201011121522.51428.siarhei.siamashka@gmail.com> <AANLkTimQR5wMTTEO6KGuv3YvPBaftO-i+96WKYQEOzFU@mail.gmail.com>
-In-Reply-To: <AANLkTimQR5wMTTEO6KGuv3YvPBaftO-i+96WKYQEOzFU@mail.gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: jaikumar Ganesh <jaikumarg@gmail.com>
+Subject: Re: [PATCH 3/4] Add DBus OOB API documentation.
+Date: Mon, 15 Nov 2010 09:54:23 +0100
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <1288865461-3760-1-git-send-email-szymon.janc@tieto.com> <1288865461-3760-4-git-send-email-szymon.janc@tieto.com> <AANLkTikZrbVTCDB2HRtqRJjUjYP3Z5PBieOovZZgP9id@mail.gmail.com>
+In-Reply-To: <AANLkTikZrbVTCDB2HRtqRJjUjYP3Z5PBieOovZZgP9id@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed;
-  boundary="nextPart1639289.ttqiGpaNB8";
-  protocol="application/pgp-signature";
-  micalg=pgp-sha1
-Message-Id: <201011151308.31972.siarhei.siamashka@gmail.com>
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Message-Id: <201011150954.23553.szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---nextPart1639289.ttqiGpaNB8
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Hi Jaikumar,
 
-On Monday 15 November 2010 04:46:25 Keith Mok wrote:
-> > I sometimes use different indentation levels in such cases in order to
-> > improve readability after instructions reordering, so that each
-> > logically independent block of code has its own indentation level and it
-> > is still easily visible
->=20
-> > after instructions reordering. For example, with the original code:
-> Thanks for the hints. I rearranged the code.
+> > +               void Deactivate()
+> 
+> Would it better to make this a signal ? Deactivate by itself as the
+> only method doesn't seem to be right.
 
-Thanks, now the assembly code looks ok to me. I also discovered that qemu
-supports iwmmxt1 emulation just fine and also tried to test your optimizati=
-ons
-for correctness myself (with a script which tries different encoding parama=
-ters=20
-for different audio samples and checks md5 checksums), no problems detected.
+I'll change it to Release() to be consistent with other (Agent) API as
+suggested by Johan.
 
-So if somebody else could check whether the other things are right (copyrig=
-ht
-notices for example), then we are done with it.
+> > +               void RegisterProvider(object provider)
+> > +
+> > +                       This method registers provider for DBus OOB plug-in.
+> > +                       When provider is successfully registered plug-in becomes
+> > +                       active. Only one provider can be registered at time.
+> 
+> Why are we enforcing this limitation ?
 
-> I removed the scale_factor optimization since from the result I
-> tested, it shows little help in performance.
+Spec requires that each hash&randomizer values should be used only for one OOB
+transfer. Implementation enforces that by allowing only one active OOB plugin
+at time and DBUS OOB plugin only 'expose' plugin API over DBUS. So this
+limitation is a consequence of that.
 
-I guess after easily doubling performance by adding simd optimizations to t=
-he
-sbc analysis filter, just roughly ~10% improvement (as measured for x86 and
-arm neon) does not look particularly impressive anymore:=20
-http://git.kernel.org/?p=3Dbluetooth/bluez.git;a=3Dcommit;h=3D95465b816f0ce=
-7f0ec10a183ce7ff0c6f83d86eb
-http://git.kernel.org/?p=3Dbluetooth/bluez.git;a=3Dcommit;h=3Dd049a9a2aec2b=
-518e04f11ef0ecc355db8237291
+This limitation also allows for (IMHO) simpler plugins implementation as they
+don't have to care about other plugins hanging around to fulfill that
+requirement.
 
-But I still think that every little bit helps. Did you also get something l=
-ike=20
-10% speedup, or was it even worse than that?
+> > +               array{bye}, array{byte} UpdateLocalOobData(string address)
+> 
+> You are not updating anything here. You are just reading the local
+> adapter OOB data
 
-A bit more important in practice is the optimization for joint stereo scale=
-=20
-factors calculation (because it is typically used for A2DP). And it provided
-almost 20% of performance improvement for arm neon:
-http://git.kernel.org/?p=3Dbluetooth/bluez.git;a=3Dcommit;h=3De1ea3e76c72d5=
-6041c30b317818e8d7b5a0c7350
+It is updating hash and randomizer. Underlying functions are called Read* as
+this is how corresponding HCI command is called (see Vol2. Part E. 7.3.60).
+I'll change it to Read to keep all calls name consistent with HCI command name
+and add appropriate note in API documentation as this name may be somewhat
+misleading (yet OOB plugin implementer should be aware of that already).
 
-So 'sbc_calc_scalefactors_j_iwmmxt' may be a nice addition too, optimized=20
-either as a whole for best performance (like in arm neon code), or just with
-some small chunks of assembly like in 'sbc_calc_scalefactors_mmx' because it
-is easier this way.
-
-=2D-=20
-Best regards,
-Siarhei Siamashka
-
---nextPart1639289.ttqiGpaNB8
-Content-Type: application/pgp-signature; name=signature.asc 
-Content-Description: This is a digitally signed message part.
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.16 (GNU/Linux)
-
-iEYEABECAAYFAkzhFK8ACgkQvyB/CfYEEt5UIACgqi777yfvx8jErA2mcpcsPBfo
-tPsAoMSsCnxb8YVuR78TwJqDhSStZNLR
-=RsLr
------END PGP SIGNATURE-----
-
---nextPart1639289.ttqiGpaNB8--
+-- 
+Szymon Janc
