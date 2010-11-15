@@ -1,51 +1,207 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 15 Nov 2010 14:06:32 +0200
-From: Ville Tervo <ville.tervo@nokia.com>
+From: Bartosz Szatkowski <bulislaw@linux.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] Interface to set LE connection parameters
-Message-ID: <20101115120632.GB16464@null>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Cc: Bartosz Szatkowski <bulislaw@linux.com>
+Subject: [PATCH 2/2] Split pull_contacts to smaller functions
+Date: Mon, 15 Nov 2010 13:01:37 +0100
+Message-Id: <1289822497-5338-2-git-send-email-bulislaw@linux.com>
+In-Reply-To: <1289822497-5338-1-git-send-email-bulislaw@linux.com>
+References: <1289822497-5338-1-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Parts of pull_contact responsible for filling contact fields moved
+to new functions.
+---
+ plugins/phonebook-tracker.c |  159 ++++++++++++++++++++++++------------------
+ 1 files changed, 91 insertions(+), 68 deletions(-)
 
-LE profiles have different requirements for connection parameters. Mainly
-trying to balance between power consumption and latencies. Probably more will
-factors will be in future.
-
-Currently I have plan to introduce new l2cap socket option which can be used
-before connection creation to set inital settings and also change settings
-while having a connection.
-
-Since there is no equivalents in EDR/BR connection I'm planning to make then
-apply only LE connection.
-
-
-Other question which parameters should be exposed to user space? Connection
-creation and connection update have these common parameters. Connection
-creation has in addition some other parameters also but they should be handled
-in some other way.
-
-	__le16   conn_interval_min;
-	__le16   conn_interval_max;
-	__le16   conn_latency;
-	__le16   supervision_timeout;
-	__le16   min_ce_len;
-	__le16   max_ce_len;
-
-So far I have had two ideas. The first is to simply expose all these fields
-with sock_opt. In that way profiles would be able to define their requirements
-also in future without any sock opt changes.
-
-Second is to define BT_LE_LOW_LAT for low latency connection requirements and
-BT_LE_LOW_POWER connection where the latency is not an issue. It would make
-usage of this sock opt interface simplier. OTOH the only user should be
-bluetoothd so it doesn't need to be as simple as possible.
-
-
-Comments please.
-
+diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
+index 8f8a6e2..e9fc3ab 100644
+--- a/plugins/phonebook-tracker.c
++++ b/plugins/phonebook-tracker.c
+@@ -1395,6 +1395,92 @@ static void add_affiliation(char **field, const char *value)
+ 	*field = g_strdup(value);
+ }
+ 
++static void contact_init(struct phonebook_contact **contact, char **reply)
++{
++	if (*contact == NULL)
++		*contact = g_new0(struct phonebook_contact, 1);
++
++	(*contact)->fullname = g_strdup(reply[COL_FULL_NAME]);
++	(*contact)->family = g_strdup(reply[COL_FAMILY_NAME]);
++	(*contact)->given = g_strdup(reply[COL_GIVEN_NAME]);
++	(*contact)->additional = g_strdup(reply[COL_ADDITIONAL_NAME]);
++	(*contact)->prefix = g_strdup(reply[COL_NAME_PREFIX]);
++	(*contact)->suffix = g_strdup(reply[COL_NAME_SUFFIX]);
++	(*contact)->birthday = g_strdup(reply[COL_BIRTH_DATE]);
++	(*contact)->nickname = g_strdup(reply[COL_NICKNAME]);
++	(*contact)->website = g_strdup(reply[COL_URL]);
++	(*contact)->photo = g_strdup(reply[COL_PHOTO]);
++	(*contact)->company = g_strdup(reply[COL_ORG_NAME]);
++	(*contact)->department = g_strdup(reply[COL_ORG_DEPARTMENT]);
++	(*contact)->role = g_strdup(reply[COL_ORG_ROLE]);
++	(*contact)->uid = g_strdup(reply[COL_UID]);
++	(*contact)->title = g_strdup(reply[COL_TITLE]);
++
++	set_call_type(*contact, reply[COL_DATE], reply[COL_SENT],
++							reply[COL_ANSWERED]);
++}
++
++static void contact_add_numbers(struct phonebook_contact **contact, char **reply)
++{
++	add_phone_number(*contact, reply[COL_HOME_NUMBER], TEL_TYPE_HOME);
++	add_phone_number(*contact, reply[COL_WORK_NUMBER], TEL_TYPE_WORK);
++	add_phone_number(*contact, reply[COL_FAX_NUMBER], TEL_TYPE_FAX);
++	add_phone_number(*contact, reply[COL_CELL_NUMBER], TEL_TYPE_MOBILE);
++	if ((g_strcmp0(reply[COL_OTHER_NUMBER], reply[COL_CELL_NUMBER]) != 0) &&
++			(g_strcmp0(reply[COL_OTHER_NUMBER], reply[COL_WORK_NUMBER]) != 0) &&
++			(g_strcmp0(reply[COL_OTHER_NUMBER], reply[COL_HOME_NUMBER]) != 0))
++		add_phone_number(*contact, reply[COL_OTHER_NUMBER], TEL_TYPE_OTHER);
++}
++
++static void contact_add_emails(struct phonebook_contact **contact, char **reply)
++{
++	add_email(*contact, reply[COL_HOME_EMAIL], EMAIL_TYPE_HOME);
++	add_email(*contact, reply[COL_WORK_EMAIL], EMAIL_TYPE_WORK);
++	add_email(*contact, reply[COL_OTHER_EMAIL], EMAIL_TYPE_OTHER);
++}
++
++static void contact_add_addresses(struct phonebook_contact **contact, char **reply)
++{
++
++	char *home_addr, *work_addr, *other_addr;
++
++	home_addr = g_strdup_printf("%s;%s;%s;%s;%s;%s;%s",
++				reply[COL_HOME_ADDR_POBOX], reply[COL_HOME_ADDR_EXT],
++				reply[COL_HOME_ADDR_STREET], reply[COL_HOME_ADDR_LOCALITY],
++				reply[COL_HOME_ADDR_REGION], reply[COL_HOME_ADDR_CODE],
++				reply[COL_HOME_ADDR_COUNTRY]);
++
++	work_addr = g_strdup_printf("%s;%s;%s;%s;%s;%s;%s",
++				reply[COL_WORK_ADDR_POBOX], reply[COL_WORK_ADDR_EXT],
++				reply[COL_WORK_ADDR_STREET], reply[COL_WORK_ADDR_LOCALITY],
++				reply[COL_WORK_ADDR_REGION], reply[COL_WORK_ADDR_CODE],
++				reply[COL_WORK_ADDR_COUNTRY]);
++
++	other_addr = g_strdup_printf("%s;%s;%s;%s;%s;%s;%s",
++				reply[COL_OTHER_ADDR_POBOX], reply[COL_OTHER_ADDR_EXT],
++				reply[COL_OTHER_ADDR_STREET], reply[COL_OTHER_ADDR_LOCALITY],
++				reply[COL_OTHER_ADDR_REGION], reply[COL_OTHER_ADDR_CODE],
++				reply[COL_OTHER_ADDR_COUNTRY]);
++
++	add_address(*contact, home_addr, ADDR_TYPE_HOME);
++	add_address(*contact, work_addr, ADDR_TYPE_WORK);
++	add_address(*contact, other_addr, ADDR_TYPE_OTHER);
++
++	g_free(home_addr);
++	g_free(work_addr);
++	g_free(other_addr);
++}
++
++static void contact_add_organization(struct phonebook_contact **contact, char **reply)
++{
++	/* Adding fields connected by nco:hasAffiliation - they may be in
++	 * separate replies */
++	add_affiliation(&(*contact)->title, reply[COL_TITLE]);
++	add_affiliation(&(*contact)->company, reply[COL_ORG_NAME]);
++	add_affiliation(&(*contact)->department, reply[COL_ORG_DEPARTMENT]);
++	add_affiliation(&(*contact)->role, reply[COL_ORG_ROLE]);
++}
++
+ static void pull_contacts(char **reply, int num_fields, void *user_data)
+ {
+ 	struct phonebook_data *data = user_data;
+@@ -1404,7 +1490,6 @@ static void pull_contacts(char **reply, int num_fields, void *user_data)
+ 	GString *vcards;
+ 	int last_index, i;
+ 	gboolean cdata_present = FALSE;
+-	char *home_addr, *work_addr, *other_addr;
+ 
+ 	if (num_fields < 0) {
+ 		data->cb(NULL, 0, num_fields, 0, data->user_data);
+@@ -1450,75 +1535,13 @@ static void pull_contacts(char **reply, int num_fields, void *user_data)
+ 		return;
+ 
+ add_entry:
+-	contact = g_new0(struct phonebook_contact, 1);
+-	contact->fullname = g_strdup(reply[COL_FULL_NAME]);
+-	contact->family = g_strdup(reply[COL_FAMILY_NAME]);
+-	contact->given = g_strdup(reply[COL_GIVEN_NAME]);
+-	contact->additional = g_strdup(reply[COL_ADDITIONAL_NAME]);
+-	contact->prefix = g_strdup(reply[COL_NAME_PREFIX]);
+-	contact->suffix = g_strdup(reply[COL_NAME_SUFFIX]);
+-	contact->birthday = g_strdup(reply[COL_BIRTH_DATE]);
+-	contact->nickname = g_strdup(reply[COL_NICKNAME]);
+-	contact->website = g_strdup(reply[COL_URL]);
+-	contact->photo = g_strdup(reply[COL_PHOTO]);
+-	contact->company = g_strdup(reply[COL_ORG_NAME]);
+-	contact->department = g_strdup(reply[COL_ORG_DEPARTMENT]);
+-	contact->role = g_strdup(reply[COL_ORG_ROLE]);
+-	contact->uid = g_strdup(reply[COL_UID]);
+-	contact->title = g_strdup(reply[COL_TITLE]);
+-
+-	set_call_type(contact, reply[COL_DATE], reply[COL_SENT],
+-							reply[COL_ANSWERED]);
++	contact_init(&contact, reply);
+ 
+ add_numbers:
+-	/* Adding phone numbers to contact struct */
+-	add_phone_number(contact, reply[COL_HOME_NUMBER], TEL_TYPE_HOME);
+-	add_phone_number(contact, reply[COL_WORK_NUMBER], TEL_TYPE_WORK);
+-	add_phone_number(contact, reply[COL_FAX_NUMBER], TEL_TYPE_FAX);
+-	add_phone_number(contact, reply[COL_CELL_NUMBER], TEL_TYPE_MOBILE);
+-	if ((g_strcmp0(reply[COL_OTHER_NUMBER], reply[COL_CELL_NUMBER]) != 0) &&
+-			(g_strcmp0(reply[COL_OTHER_NUMBER], reply[COL_WORK_NUMBER]) != 0) &&
+-			(g_strcmp0(reply[COL_OTHER_NUMBER], reply[COL_HOME_NUMBER]) != 0))
+-		add_phone_number(contact, reply[COL_OTHER_NUMBER], TEL_TYPE_OTHER);
+-
+-	/* Adding emails */
+-	add_email(contact, reply[COL_HOME_EMAIL], EMAIL_TYPE_HOME);
+-	add_email(contact, reply[COL_WORK_EMAIL], EMAIL_TYPE_WORK);
+-	add_email(contact, reply[COL_OTHER_EMAIL], EMAIL_TYPE_OTHER);
+-
+-	/* Adding addresses */
+-	home_addr = g_strdup_printf("%s;%s;%s;%s;%s;%s;%s",
+-				reply[COL_HOME_ADDR_POBOX], reply[COL_HOME_ADDR_EXT],
+-				reply[COL_HOME_ADDR_STREET], reply[COL_HOME_ADDR_LOCALITY],
+-				reply[COL_HOME_ADDR_REGION], reply[COL_HOME_ADDR_CODE],
+-				reply[COL_HOME_ADDR_COUNTRY]);
+-
+-	work_addr = g_strdup_printf("%s;%s;%s;%s;%s;%s;%s",
+-				reply[COL_WORK_ADDR_POBOX], reply[COL_WORK_ADDR_EXT],
+-				reply[COL_WORK_ADDR_STREET], reply[COL_WORK_ADDR_LOCALITY],
+-				reply[COL_WORK_ADDR_REGION], reply[COL_WORK_ADDR_CODE],
+-				reply[COL_WORK_ADDR_COUNTRY]);
+-
+-	other_addr = g_strdup_printf("%s;%s;%s;%s;%s;%s;%s",
+-				reply[COL_OTHER_ADDR_POBOX], reply[COL_OTHER_ADDR_EXT],
+-				reply[COL_OTHER_ADDR_STREET], reply[COL_OTHER_ADDR_LOCALITY],
+-				reply[COL_OTHER_ADDR_REGION], reply[COL_OTHER_ADDR_CODE],
+-				reply[COL_OTHER_ADDR_COUNTRY]);
+-
+-	add_address(contact, home_addr, ADDR_TYPE_HOME);
+-	add_address(contact, work_addr, ADDR_TYPE_WORK);
+-	add_address(contact, other_addr, ADDR_TYPE_OTHER);
+-
+-	g_free(home_addr);
+-	g_free(work_addr);
+-	g_free(other_addr);
+-
+-	/* Adding fields connected by nco:hasAffiliation - they may be in
+-	 * separate replies */
+-	add_affiliation(&contact->title, reply[COL_TITLE]);
+-	add_affiliation(&contact->company, reply[COL_ORG_NAME]);
+-	add_affiliation(&contact->department, reply[COL_ORG_DEPARTMENT]);
+-	add_affiliation(&contact->role, reply[COL_ORG_ROLE]);
++	contact_add_numbers(&contact, reply);
++	contact_add_emails(&contact, reply);
++	contact_add_addresses(&contact, reply);
++	contact_add_organization(&contact, reply);
+ 
+ 	DBG("contact %p", contact);
+ 
 -- 
-Ville
+1.7.0.4
+
