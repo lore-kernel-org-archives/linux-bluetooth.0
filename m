@@ -1,120 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: <Waldemar.Rymarkiewicz@tieto.com>
-To: <luiz.dentz@gmail.com>, <padovan@profusion.mobi>
-CC: <marcel@holtmann.org>, <linux-bluetooth@vger.kernel.org>,
-	<suraj@atheros.com>, <johan.hedberg@gmail.com>,
-	<joakim.xj.ceder@stericsson.com>
-Date: Mon, 15 Nov 2010 19:29:53 +0200
-Subject: RE: [PATCH 1/4] Sim Access Profile API
-Message-ID: <99B09243E1A5DA4898CDD8B7001114480BD8C2DB1D@EXMB04.eu.tieto.com>
-References: <1288791271-13857-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
-	<1288791271-13857-2-git-send-email-waldemar.rymarkiewicz@tieto.com>
-	<1289367190.9615.235.camel@aeonflux>
-	<99B09243E1A5DA4898CDD8B7001114480BD700C239@EXMB04.eu.tieto.com>
-	<20101110160757.GC3275@vigoh>
- <AANLkTino6tJbpEMWxz-PLBmOyb8=3KCr1uDm9dxSbp98@mail.gmail.com>
-In-Reply-To: <AANLkTino6tJbpEMWxz-PLBmOyb8=3KCr1uDm9dxSbp98@mail.gmail.com>
-Content-Type: text/plain; charset="iso-8859-2"
+Date: Mon, 15 Nov 2010 17:17:39 +0200
+From: Ville Tervo <ville.tervo@nokia.com>
+To: "ext tim.howes@accenture.com" <tim.howes@accenture.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [RFC] Interface to set LE connection parameters
+Message-ID: <20101115151739.GD16464@null>
+References: <20101115120632.GB16464@null>
+ <1AFE20D16950C745A2A83986B72E8748011F571E6CE6@EMEXM3131.dir.svc.accenture.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1AFE20D16950C745A2A83986B72E8748011F571E6CE6@EMEXM3131.dir.svc.accenture.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,=20
+Hi Tim,
 
->Hi,
+Please stop top posting on this ml.
 
->>> >> + =A0 =A0 =A0 =A0 =A0void Disconnect(boolean type)
->>> >> +
->>> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0Disconnect SAP client from the =
-server.
->>> >The 'type'
->>> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0parameter indicates disconnecti=
-on type.
->>> >> +
->>> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0True =A0- gracefull disconnecti=
-on
->>> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0False - immediate disconnection
->>> >> +
->>> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0Possible errors: org.bluez.Erro=
-r.Failed
->>> >
->>> >I don't like this style of method names at all. Using method names=20
->>> >like GracefulDisconnect and ImmediateDisconnect would be better.
->>>
->>> That's fine.
->>>
->>> >However I am not sure we should differentiate here at all.=20
->We should=20
->>> >always to the graceful disconnect. What will the immediate=20
->>> >disconnect bring us?
->>>
->>> That's actually intended for testing only. One of PTS test=20
->cases expects the tester to trigger immediate disconnect.
->>> In practce, it is only used when connection to sim card is=20
->lost, but this is obviously done internally.
->>
->>
->> So this shouldn't be in the API, no one is going to use it. You can=20
->> create something internally for the immediate disconnection that you=20
->> go and set manually inside the code. Make sure to comment in=20
->the code=20
->> why you are adding this there. That can also be a option in some of=20
->> the bluetooth config files. Let's see what others think here.
->
->Actually this looks a lot like virtual cable unplug that PTS=20
->wants to hid, it is just crap that nobody use, so maybe e.g.
->--enable-pts-bullshit would actually make sense to activate=20
->the nonsense that pts wants, well it is still annoying to=20
->recompile just to run PTS tests. For hid the virtual cable=20
->unplug can be emulate via RemoveDevice, so maybe it make sense=20
->to do a immediate disconnect in such case for sap too, but=20
->this is still inconvenient since you have to repair after doing it.
->
+On Mon, Nov 15, 2010 at 03:24:29PM +0100, ext tim.howes@accenture.com wrote:
+> Hi Ville,
+> 
+> As you note the different profiles would likely have different connection parameters.  The different profiles may be running on the same LE link (indeed the same L2CAP [fixed] channel).
+> 
 
-So, simply let's get rid of immediate disconnect from sap api and leave if =
-for sap-driver (sap-*.c file ) provider. I could extend sap-dummy api just =
-for an example.
+I guess the latency should override power requirements. Low power profile can
+operate on low latency link but low latency profile fails on high latency. Of
+course this gets much more complicated if there are more requirements.
 
-Service		org.bluez=20
-Interface	org.bluez.SimAccess=20
-Object path	[variable prefix]/{hci0,hci1,...}
+Are these (latency and power) the only characteristics we need to deal with.
+There might be some also. I'm not too familiar with profile drafts.
 
-Methods		void Disconnect()
+> Do you have a view on how the different profiles - on the same link - would have different requests arbitrated, and where that arbitration would be done?  I'd imagine that the API towards the profiles should be of the abstract form - such as you mention (eg BT_LE_LOW_LAT).  This would make it easier to arbitrate the different requests, as compared to if the profiles see an API of the "numerical" form (eg interval = N ms).  I guess the arbitration could happen in user or kernel space; as long as there is something with singleton-like semantics to do it.
+> 
 
-			Disconnects SAP client from the server.
+I think I need to get more details from profile specs and try to find out the
+requirements from them.
 
-			Possible errors: org.bluez.Error.Failed
+Right now I'm trying to find out what would be the right interface from kernel
+to user space. 
 
-		void SetProperty(string name, variant value)
+> Also - a quick observation: yes, the connection parameters are only for LE links; however they have some semantic similarity with sniff mode in BR. Especially in the abstract form ("Low Latency" verus "Low Power").  Does BlueZ present an API like this already for BR (I'm new to BlueZ...I was more of a Symbian guy ;)?  If not it might be worth having one API for both BR/Sniff and LE/Connection Parameters - and do the appropriate mapping "under the hood".  
 
-			Changes the value of the specified property. Only
-			properties that are listed a read-write are changeable.
+Actually this has been discussed earlier and we need also some api to change
+sniff behaviour. Reason for this is broken devices which does not turn on
+normal mode when low latency is needed. I guess Jaikumar had some patches
+regarding this?
 
-			Possible Errors: org.bluez.Error.DoesNotExist=20
-					org.bluez.Error.InvalidArguments
-
-		dict GetProperties()
-
-			Return all properties for the interface. See the
-			properties section for available properties.
-
-			Possible Errors: org.bluez.Error.Failed
-
-Signals		PropertyChanged(string name, variant value)
-
-			This signal indicates a changed value of the given
-			property.
-
-Properties	boolean Enabled [readwrite]
-
-			Set to true to start-up SAP server and register SDP record for=20
-			it. Set to false to shutdown SAP server and remove the SDP record.
-
-		boolean Connected [readonly]
-
-			Indicates if SAP client is connected to the server.=20
-
-
-More comments ?
-
-Thanks,
-/Waldek
+-- 
+Ville
