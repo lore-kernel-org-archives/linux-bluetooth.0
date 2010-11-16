@@ -1,49 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 16 Nov 2010 16:30:15 +0000
+Date: Tue, 16 Nov 2010 16:24:12 +0000
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv3 2/7] Add DBus OOB plugin.
-Message-ID: <20101116163015.GC3638@jh-x301>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+Subject: Re: [PATCHv3 5/7] Add approval request for incoming pairing
+ requests with OOB mechanism
+Message-ID: <20101116162412.GB3638@jh-x301>
 References: <1289922247-20712-1-git-send-email-szymon.janc@tieto.com>
- <1289922247-20712-3-git-send-email-szymon.janc@tieto.com>
+ <1289922247-20712-6-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1289922247-20712-3-git-send-email-szymon.janc@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1289922247-20712-6-git-send-email-szymon.janc@tieto.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Szymon,
 
 On Tue, Nov 16, 2010, Szymon Janc wrote:
-> +#define REQUEST_TIMEOUT	(10 * 1000)	/* 10 seconds */
+> +	if (!device_has_oob_data(device)
+> +			|| btd_event_user_approve(&BDADDR(index), dba))
 
-Are you sure 10 seconds is enough. What if the provider does user
-interaction? In that case I suppose 30 seconds or even a minute (which I
-think we use elsewhere for user interaction) would be better.
+That should be:
 
-> +static DBusMessage *register_provider(DBusConnection *conn, DBusMessage *msg,
-> +								void *data)
-> +{
-> +	const char *path;
-> +	const char *name;
+if (!device_has_oob_data(device) ||
+			btd_event_user_approve(&BDADDR(index), dba) < 0)
 
-Just combine these on the same line.
+Otherwise it looks like btd_event_user_approve might return a boolean.
 
-> +static DBusMessage *unregister_provider(DBusConnection *conn, DBusMessage *msg,
-> +								void *data)
-> +{
-> +	const char *path;
-> +	const char *name;
+> +	req->msg = dbus_message_new_method_call(agent->name, agent->path,
+> +				"org.bluez.Agent", "RequestApproval");
 
-Same here.
-
-> +	if (!provider || !g_str_equal(provider->path, path)
-> +			|| !g_str_equal(provider->name, name))
-> +		return g_dbus_create_error(msg, ERROR_INTERFACE ".DoesNotExist",
-> +				"No such OOB provider registered");
-
-Same thing about line splitting and || as I mentioned in the other
-email, i.e. line break comes after || and not before it.
+I think the name of this method is one of the more important things to
+get right before we push this upstream. I'm not so sure of the current
+proposal. I have a feeling that it'd be a good idea to have the term
+"pair" somewhere explicitly in the name. How about "RequestPairing"? I
+know Marcel will have something to say about this too.
 
 Johan
