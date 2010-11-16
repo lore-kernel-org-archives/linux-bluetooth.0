@@ -1,85 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 16 Nov 2010 16:16:11 +0000
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv3 1/7] Add support for Out of Band (OOB) association
- model.
-Message-ID: <20101116161611.GA3638@jh-x301>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCHv3 7/7] simple-agent - add RequestApproval method for OOB pairing
+Date: Tue, 16 Nov 2010 16:44:07 +0100
+Message-ID: <1289922247-20712-8-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1289922247-20712-1-git-send-email-szymon.janc@tieto.com>
 References: <1289922247-20712-1-git-send-email-szymon.janc@tieto.com>
- <1289922247-20712-2-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1289922247-20712-2-git-send-email-szymon.janc@tieto.com>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+---
+ test/simple-agent |   10 ++++++++++
+ 1 files changed, 10 insertions(+), 0 deletions(-)
 
-On Tue, Nov 16, 2010, Szymon Janc wrote:
-> +gboolean device_get_oob_data(struct btd_device *device, uint8_t *hash,
-> +		uint8_t *randomizer)
+diff --git a/test/simple-agent b/test/simple-agent
+index f2cc3dd..43f03fe 100755
+--- a/test/simple-agent
++++ b/test/simple-agent
+@@ -69,6 +69,16 @@ class Agent(dbus.service.Object):
+ 		raise Rejected("Mode change by user")
+ 
+ 	@dbus.service.method("org.bluez.Agent",
++			in_signature="o", out_signature="")
++
++	def RequestApproval(self, device):
++		print "RequestApproval (%s)" % (device)
++		approve = raw_input("Approve pairing (yes/no): ")
++		if (approve == "yes"):
++			return
++		raise Rejected("Not approved")
++
++	@dbus.service.method("org.bluez.Agent",
+ 					in_signature="", out_signature="")
+ 	def Cancel(self):
+ 		print "Cancel"
+-- 
+1.7.1
 
-Looks like the continuation line should be indented a bit more. Basicly
-indent at least past the ( on the above line and as much as possible as
-long as the entire line stays under 79 columns. I think I saw other
-places with the same issue so please fix those too.
-
-> +void device_set_oob_data(struct btd_device *device, uint8_t *hash,
-> +		uint8_t *randomizer);
-> +gboolean device_get_oob_data(struct btd_device *device, uint8_t *hash,
-> +		uint8_t *randomizer);
-> +gboolean device_has_oob_data(struct btd_device *device);
-
-I suppose you could just use get_oob_data(dev, NULL, NULL) instead of
-having a separate has_oob_data function.
-
-> +gboolean device_request_oob_data(struct btd_device *device, void *cb);
-
-Why is the callback type void* instead of having a well defined
-signature?
-
-> +void device_set_local_auth_cap(struct btd_device *device, uint8_t auth,
-> +		uint8_t cap);
-> +void device_get_local_auth_cap(struct btd_device *device, uint8_t *auth,
-> +		uint8_t *cap);
-
-This local_cap/auth in struct device had me wondering a little bit since
-it felt like that should actually be in struct adapter, however this is
-really per adapter-device pair data in which case it should be fine,
-right?
-
-> +static void btd_event_io_cap_reply(struct btd_device *device)
-> +{
-> +	io_capability_reply_cp cp;
-> +	int dev;
-> +	struct btd_adapter *adapter = device_get_adapter(device);
-> +	uint16_t dev_id = adapter_get_dev_id(adapter);
-> +
-> +	dev = hci_open_dev(dev_id);
-
-That's a no no. Only hciops should use raw HCI sockets anymore. If you
-need to do something like this you'll need to add a new adapter_ops
-callback and send your HCI command through that.
-
->  {
->  	struct btd_adapter *adapter;
->  	struct btd_device *device;
->  	struct agent *agent = NULL;
->  	uint8_t agent_cap;
->  	int err;
-> +	uint8_t cap;
-> +	uint8_t auth;
-
-These can be on the same line.
-
-> +	if (!plugin || !plugin->local_data_read|| !plugin->plugin_deactivated
-> +			|| !plugin->request_remote_data
-> +			|| active_plugin == plugin)
-> +		return;
-
-When you split lines the break should be after || && etc. In this case
-you could also consider splitting this up into multiple if-statements
-for better readability.
-
-Johan
