@@ -1,65 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Inga Stotland" <ingas@codeaurora.org>
+To: "'Anderson Lizardo'" <anderson.lizardo@openbossa.org>,
+	"'Vinicius Costa Gomes'" <vinicius.gomes@openbossa.org>,
+	<linux-bluetooth@vger.kernel.org>,
+	"'Bruna Moreira'" <bruna.moreira@openbossa.org>
+References: <1289501521-21825-1-git-send-email-vinicius.gomes@openbossa.org>	<20101111210705.GB24514@jh-x301>	<000b01cb8200$02c24c90$0846e5b0$@org>	<20101112165434.GA13238@jh-x301> <AANLkTi=J39omUnYYWLpB0ncd6Kd8LukdFopM4WDyWNJ1@mail.gmail.com>
+In-Reply-To: <AANLkTi=J39omUnYYWLpB0ncd6Kd8LukdFopM4WDyWNJ1@mail.gmail.com>
+Subject: RE: [PATCH v2 1/7] Fix invalid memory access when EIR field length is zero
+Date: Mon, 15 Nov 2010 16:41:07 -0800
+Message-ID: <000001cb8526$f580edf0$e082c9d0$@org>
 MIME-Version: 1.0
-In-Reply-To: <201011150954.23553.szymon.janc@tieto.com>
-References: <1288865461-3760-1-git-send-email-szymon.janc@tieto.com>
- <1288865461-3760-4-git-send-email-szymon.janc@tieto.com> <AANLkTikZrbVTCDB2HRtqRJjUjYP3Z5PBieOovZZgP9id@mail.gmail.com>
- <201011150954.23553.szymon.janc@tieto.com>
-From: jaikumar Ganesh <jaikumarg@gmail.com>
-Date: Mon, 15 Nov 2010 20:16:39 -0800
-Message-ID: <AANLkTik+LOzvJMG=of7cwrQ3j2a0mDvN4Rnq_d4rtwKB@mail.gmail.com>
-Subject: Re: [PATCH 3/4] Add DBus OOB API documentation.
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain;
+	charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Nov 15, 2010 at 12:54 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> Hi Jaikumar,
->
->> > +               void Deactivate()
->>
->> Would it better to make this a signal ? Deactivate by itself as the
->> only method doesn't seem to be right.
->
-> I'll change it to Release() to be consistent with other (Agent) API as
-> suggested by Johan.
->
->> > +               void RegisterProvider(object provider)
->> > +
->> > +                       This method registers provider for DBus OOB plug-in.
->> > +                       When provider is successfully registered plug-in becomes
->> > +                       active. Only one provider can be registered at time.
->>
->> Why are we enforcing this limitation ?
->
-> Spec requires that each hash&randomizer values should be used only for one OOB
-> transfer. Implementation enforces that by allowing only one active OOB plugin
-> at time and DBUS OOB plugin only 'expose' plugin API over DBUS. So this
-> limitation is a consequence of that.
+Hi Anderson,
 
-I don't think the spec says that. It just says every single time the
-call to read the local adapters hash
-and randomizer is done you get new values. You can use the value that
-you have obtained for as many OOB pairings
-as you wish.
+-----Original Message-----
+From: linux-bluetooth-owner@vger.kernel.org
+[mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Anderson Lizardo
+Sent: Friday, November 12, 2010 5:01 PM
+To: Inga Stotland; Vinicius Costa Gomes; linux-bluetooth@vger.kernel.org;
+Bruna Moreira
+Subject: Re: [PATCH v2 1/7] Fix invalid memory access when EIR field length
+is zero
 
+On 11/12/10, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Inga,
 >
-> This limitation also allows for (IMHO) simpler plugins implementation as they
-> don't have to care about other plugins hanging around to fulfill that
-> requirement.
+> On Thu, Nov 11, 2010, Inga Stotland wrote:
+>> Was there a bug to begin with? :)
+>> The access to eir_data[1] was always valid due to the check (len <
+>> EIR_DATA_LENGTH - 1)
+>> and the fact that eir_data is a buffer of fixed length of EIR_DATA_LENGTH
+>> (240 bytes).
 >
->> > +               array{bye}, array{byte} UpdateLocalOobData(string address)
->>
->> You are not updating anything here. You are just reading the local
->> adapter OOB data
->
-> It is updating hash and randomizer. Underlying functions are called Read* as
-> this is how corresponding HCI command is called (see Vol2. Part E. 7.3.60).
-> I'll change it to Read to keep all calls name consistent with HCI command name
-> and add appropriate note in API documentation as this name may be somewhat
-> misleading (yet OOB plugin implementer should be aware of that already).
->
-> --
-> Szymon Janc
->
+> On closer inspection it seems you might be right, however it'd be nice
+> to get some comments from the original patch author about this (were
+> there e.g. crashes or some valgrind warnings observed or was this just
+> speculation based on looking at the code).
+
+There were valgrind "unintialized value" warnings related to this
+after we started using it for parsing adv data (which is max 31 bytes
+long but may be smaller because spec allows radio to strip non
+significant bytes before sending, which explains why we added a length
+parameter in a later patch). Actually I dont think the current code is
+"safe" as it assumes the EIR data is aways 240 bytes long, which seems
+true as per spec , but less data could be sent, causing reading beyond
+buffer.
+
+---------------
+Just a note...
+When Extended Inquiry Response HCI event comes to the upper layer parser
+from 
+HCI layer it is guaranteed to contain 240 bytes where of course the non 
+significant part is zeroed out. This is ensured by internal implementation 
+in BlueZ and is spec compliant.
+
+The fix is fine since it takes care of warnings, but personally I am a big
+fan of 
+keeping meaningful variable names :)
+
+Regards, 
+
+Inga Stotland
+
+Sent by an employee of the Qualcomm Innovation Center, Inc.
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
+
+
