@@ -1,36 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <AANLkTi=ZZcbEP+NX9PxT_K_9XnCQfKbSugCYJa_na=SY@mail.gmail.com>
-References: <AANLkTi=ZZcbEP+NX9PxT_K_9XnCQfKbSugCYJa_na=SY@mail.gmail.com>
-Date: Tue, 16 Nov 2010 10:39:59 -0300
-Message-ID: <AANLkTimumkv_SH+KroAxgqp3RTmzDaCbsLoGPVoKgVAr@mail.gmail.com>
-Subject: Re: Regarding HDP
-From: Raul Herbster <raul.herbster@signove.com>
-To: steven bluez <steven.bluez@gmail.com>
+Date: Tue, 16 Nov 2010 13:37:43 +0000
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Bartosz Szatkowski <bulislaw@linux.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH 2/2] Split pull_contacts to smaller functions
+Message-ID: <20101116133743.GC10566@jh-x301>
+References: <1289822497-5338-1-git-send-email-bulislaw@linux.com>
+ <1289822497-5338-2-git-send-email-bulislaw@linux.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1289822497-5338-2-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Steve,
+Hi Bartosz,
 
-HDP profile is available in PTS for testing. At project wizard, you
-have to select the HDP profile option, so HDP test suite is enabled.
-In addition, don´t forget to enable option TSPC_ALL at PTS PICS
-configuration.
+On Mon, Nov 15, 2010, Bartosz Szatkowski wrote:
+> Parts of pull_contact responsible for filling contact fields moved
+> to new functions.
+> ---
+>  plugins/phonebook-tracker.c |  159 ++++++++++++++++++++++++------------------
+>  1 files changed, 91 insertions(+), 68 deletions(-)
 
-[]´s
---Raul
+This one doesn't apply cleanly to current git. Could you please resend it?
 
-2010/11/16 steven bluez <steven.bluez@gmail.com>:
-> Hi All,
->         How to test the following HDP profile with Pts?.Is it
-> available in PTs as option or any other way  is available??
->
-> Thanks,
-> Steven.
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+Johan
