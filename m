@@ -1,17 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: <tim.howes@accenture.com>
-To: <Mike.Tsai@Atheros.com>
-Cc: <linux-bluetooth@vger.kernel.org>
-Date: Wed, 17 Nov 2010 16:03:53 +0100
-Subject: RE: [PATCH] Adding a new option to specify security level for gatttool
-Message-ID: <1AFE20D16950C745A2A83986B72E8748011F571E7497@EMEXM3131.dir.svc.accenture.com>
-References: <1289913613-3717-1-git-send-email-sheldon.demario@openbossa.org> <20101116153648.GA2710@jh-x301> <35B17FE5076C7040809188FBE7913F98406D465C43@SC1EXMB-MBCL.global.atheros.com>
-In-Reply-To: <35B17FE5076C7040809188FBE7913F98406D465C43@SC1EXMB-MBCL.global.atheros.com>
-Content-Type: text/plain;
-	charset="us-ascii"
+From: Mike Tsai <Mike.Tsai@Atheros.com>
+To: "tim.howes@accenture.com" <tim.howes@accenture.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Wed, 17 Nov 2010 08:57:38 -0800
+Subject: RE: [PATCH] Adding a new option to specify security level for
+ gatttool
+Message-ID: <35B17FE5076C7040809188FBE7913F98406D465C7D@SC1EXMB-MBCL.global.atheros.com>
+References: <1289913613-3717-1-git-send-email-sheldon.demario@openbossa.org>
+ <20101116153648.GA2710@jh-x301>
+ <35B17FE5076C7040809188FBE7913F98406D465C43@SC1EXMB-MBCL.global.atheros.com>
+ <1AFE20D16950C745A2A83986B72E8748011F571E7497@EMEXM3131.dir.svc.accenture.com>
+In-Reply-To: <1AFE20D16950C745A2A83986B72E8748011F571E7497@EMEXM3131.dir.svc.accenture.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
+
+Hi Tim,
+
+-----Original Message-----
+From: tim.howes@accenture.com [mailto:tim.howes@accenture.com] 
+Sent: Wednesday, November 17, 2010 7:04 AM
+To: Mike Tsai
+Cc: linux-bluetooth@vger.kernel.org
+Subject: RE: [PATCH] Adding a new option to specify security level for gatttool
 
 Hi Mike,
 
@@ -65,6 +77,12 @@ To some extent I agree; however, the semantics of such an API would have to be c
 Cheers
 
 Tim
+
+[Mtsai] I fully embrace the "abstract" API concept. However, all new LE profiles have clearly defined the security request per each attribute now. As a generic attribute profile (as GATT), without clear indication from Application what level of security is requested, GATT/GAP can handle the security request incorrectly and cause IOP issues. For example, what does "low" mean when GAP/SM gets this request from Application? It does not tell GAP/SM what kind of pairing shall be performed and if encryption or data signing for accessing the attributes. 
+
+Cheers,
+
+Mike
 
 
 
