@@ -2,124 +2,110 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH 3/6] Implement Find by Type Value Request in the atttribute server
-Date: Wed, 17 Nov 2010 16:09:43 -0200
-Message-Id: <1290017386-23969-3-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH 2/6] Add Find By Type Value Response encoding/decoding functions
+Date: Wed, 17 Nov 2010 16:09:42 -0200
+Message-Id: <1290017386-23969-2-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1290017386-23969-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1290017386-23969-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-GATT Discover Primary Service by Service UUID sub-procedure is based
-on ATT Find By Type Value Request/Response.
-
-Implement an extra verification for broken requests: "Ending Handle"
-different than 0xFFFF. The Group End Handle may be greater than the
-"Ending Handle" in the Find By Type Value Request. Forces the "Ending
-Handle" in the response to 0xFFFF to avoid another request from the
-clients. 0xFFFF means that the sub-procedure is complete.
+Find by type operation is used by Discover Primary Service by Service
+UUID. Find By Type Value Response shall contain one or more group handles.
 ---
- src/attrib-server.c |   80 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 80 insertions(+), 0 deletions(-)
+ attrib/att.c |   46 ++++++++++++++++++++++++++++++++++++++++++++++
+ attrib/att.h |    7 +++++++
+ 2 files changed, 53 insertions(+), 0 deletions(-)
 
-diff --git a/src/attrib-server.c b/src/attrib-server.c
-index 375b731..05a0fb7 100644
---- a/src/attrib-server.c
-+++ b/src/attrib-server.c
-@@ -383,6 +383,76 @@ static int find_info(uint16_t start, uint16_t end, uint8_t *pdu, int len)
- 	return length;
+diff --git a/attrib/att.c b/attrib/att.c
+index 6c889f2..60fc74b 100644
+--- a/attrib/att.c
++++ b/attrib/att.c
+@@ -30,6 +30,8 @@
+ #include <bluetooth/sdp.h>
+ #include <bluetooth/sdp_lib.h>
+ 
++#include <glib.h>
++
+ #include "att.h"
+ 
+ const char *att_ecode2str(uint8_t status)
+@@ -271,6 +273,50 @@ uint16_t dec_find_by_type_req(const uint8_t *pdu, int len, uint16_t *start,
+ 	return len;
  }
  
-+static int find_by_type(uint16_t start, uint16_t end, uuid_t *uuid,
-+			const uint8_t *value, int vlen, uint8_t *opdu, int mtu)
++uint16_t enc_find_by_type_resp(GSList *matches, uint8_t *pdu, int len)
 +{
-+	struct attribute *a;
-+	struct range *range;
-+	GSList *l, *matches;
-+	int len;
++	GSList *l;
++	uint16_t offset;
 +
-+	if (start > end || start == 0x0000)
-+		return enc_error_resp(ATT_OP_FIND_BY_TYPE_REQ, start,
-+					ATT_ECODE_INVALID_HANDLE, opdu, mtu);
++	if (pdu == NULL || len < 5)
++		return 0;
 +
-+	/* Searching first requested handle number */
-+	for (l = database, matches = NULL, range = NULL; l; l = l->next) {
-+		a = l->data;
++	pdu[0] = ATT_OP_FIND_BY_TYPE_RESP;
 +
-+		if (a->handle < start)
-+			continue;
++	for (l = matches, offset = 1; l && len >= (offset + 4);
++					l = l->next, offset += 4) {
++		struct range *range = l->data;
 +
-+		if (a->handle > end)
-+			break;
-+
-+		/* Primary service? Attribute value matches? */
-+		if ((sdp_uuid_cmp(&a->uuid, uuid) == 0) && (a->len == vlen) &&
-+					(memcmp(a->data, value, vlen) == 0)) {
-+
-+			range = g_new0(struct range, 1);
-+			range->start = a->handle;
-+
-+			matches = g_slist_append(matches, range);
-+		} else if (range) {
-+			/*
-+			 * Update the last found handle or reset the pointer
-+			 * to track that a new group started: Primary or
-+			 * Secondary service.
-+			 */
-+			if (sdp_uuid_cmp(&a->uuid, &prim_uuid) == 0 ||
-+					sdp_uuid_cmp(&a->uuid, &snd_uuid) == 0)
-+				range = NULL;
-+			else
-+				range->end = a->handle;
-+		}
++		att_put_u16(range->start, &pdu[offset]);
++		att_put_u16(range->end, &pdu[offset + 2]);
 +	}
 +
-+	if (range) {
-+		if (l == NULL) {
-+			/* Avoids another iteration */
-+			range->end = 0xFFFF;
-+		} else if (range->end == 0) {
-+			/*
-+			 * Broken requests: requested End Handle is not 0xFFFF.
-+			 * Given handle is in the middle of a service definition.
-+			 */
-+			matches = g_slist_remove(matches, range);
-+			g_free(range);
-+		}
-+	}
-+
-+	if (matches == NULL)
-+		return enc_error_resp(ATT_OP_FIND_BY_TYPE_REQ, start,
-+				ATT_ECODE_ATTR_NOT_FOUND, opdu, mtu);
-+
-+	len = enc_find_by_type_resp(matches, opdu, mtu);
-+
-+	g_slist_foreach(matches, (GFunc) g_free, NULL);
-+	g_slist_free(matches);
-+
-+	return len;
++	return offset;
 +}
 +
- static int handle_cmp(gconstpointer a, gconstpointer b)
- {
- 	const struct attribute *attrib = a;
-@@ -522,6 +592,16 @@ static void channel_handler(const uint8_t *ipdu, uint16_t len,
- 			write_value(start, value, vlen);
- 		return;
- 	case ATT_OP_FIND_BY_TYPE_REQ:
-+		length = dec_find_by_type_req(ipdu, len, &start, &end,
-+							&uuid, value, &vlen);
-+		if (length == 0) {
-+			status = ATT_ECODE_INVALID_PDU;
-+			goto done;
-+		}
++GSList *dec_find_by_type_resp(const uint8_t *pdu, int len)
++{
++	struct range *range;
++	GSList *matches;
++	int offset;
 +
-+		length = find_by_type(start, end, &uuid, value, vlen,
-+							opdu, channel->mtu);
-+		break;
- 	case ATT_OP_READ_BLOB_REQ:
- 	case ATT_OP_READ_MULTI_REQ:
- 	case ATT_OP_PREP_WRITE_REQ:
++	if (pdu == NULL || len < 5)
++		return NULL;
++
++	if (pdu[0] != ATT_OP_FIND_BY_TYPE_RESP)
++		return NULL;
++
++	for (offset = 1, matches = NULL; len >= (offset + 4); offset += 4) {
++		range = malloc(sizeof(struct range));
++		range->start = att_get_u16(&pdu[offset]);
++		range->end = att_get_u16(&pdu[offset + 2]);
++
++		matches = g_slist_append(matches, range);
++	}
++
++	return matches;
++}
++
+ uint16_t enc_read_by_type_req(uint16_t start, uint16_t end, uuid_t *uuid,
+ 							uint8_t *pdu, int len)
+ {
+diff --git a/attrib/att.h b/attrib/att.h
+index 9de338d..c7260ff 100644
+--- a/attrib/att.h
++++ b/attrib/att.h
+@@ -122,6 +122,11 @@ struct att_data_list {
+ 	uint8_t **data;
+ };
+ 
++struct range {
++	uint16_t start;
++	uint16_t end;
++};
++
+ /* These functions do byte conversion */
+ static inline uint8_t att_get_u8(const void *ptr)
+ {
+@@ -168,6 +173,8 @@ uint16_t enc_find_by_type_req(uint16_t start, uint16_t end, uuid_t *uuid,
+ 			const uint8_t *value, int vlen, uint8_t *pdu, int len);
+ uint16_t dec_find_by_type_req(const uint8_t *pdu, int len, uint16_t *start,
+ 		uint16_t *end, uuid_t *uuid, uint8_t *value, int *vlen);
++uint16_t enc_find_by_type_resp(GSList *ranges, uint8_t *pdu, int len);
++GSList *dec_find_by_type_resp(const uint8_t *pdu, int len);
+ struct att_data_list *dec_read_by_grp_resp(const uint8_t *pdu, int len);
+ uint16_t enc_read_by_type_req(uint16_t start, uint16_t end, uuid_t *uuid,
+ 							uint8_t *pdu, int len);
 -- 
 1.7.3.2
 
