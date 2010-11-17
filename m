@@ -2,185 +2,136 @@ Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [PATCH 2/3] Extract service UUIDs from advertising data
-Date: Wed, 17 Nov 2010 11:59:52 -0400
-Message-Id: <1290009593-13658-2-git-send-email-bruna.moreira@openbossa.org>
-In-Reply-To: <1290009593-13658-1-git-send-email-bruna.moreira@openbossa.org>
-References: <1290009593-13658-1-git-send-email-bruna.moreira@openbossa.org>
+Subject: [PATCH 1/3] Advertising data: extract local name
+Date: Wed, 17 Nov 2010 11:59:51 -0400
+Message-Id: <1290009593-13658-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Make get_eir_uuids() return a GSList of strings, so it can be reused to
-extract UUIDs from LE advertising data. The bt_strlist2array() helper
-function was created to convert a GSList into a plain array of strings
-(needed to send through D-Bus).
+Move extract_eir_name() to glib-helper.c file and rename function to
+bt_extract_eir_name(). The local name is extracted from the advertising
+data.
 ---
- src/adapter.c |   71 ++++++++++++++++++++++++++++++++++++++++++++-------------
- src/adapter.h |    1 +
- 2 files changed, 56 insertions(+), 16 deletions(-)
+ src/adapter.c     |    9 +++++++++
+ src/event.c       |   23 +----------------------
+ src/glib-helper.c |   22 ++++++++++++++++++++++
+ src/glib-helper.h |    1 +
+ 4 files changed, 33 insertions(+), 22 deletions(-)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index 0089d6d..a7e78bc 100644
+index 7fb0d3f..0089d6d 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -202,6 +202,8 @@ static void dev_info_free(struct remote_dev_info *dev)
- {
- 	g_free(dev->name);
- 	g_free(dev->alias);
-+	g_slist_foreach(dev->services, (GFunc) g_free, NULL);
-+	g_slist_free(dev->services);
- 	g_free(dev);
+@@ -3007,6 +3007,7 @@ void adapter_update_device_from_info(struct btd_adapter *adapter,
+ 	bdaddr_t bdaddr;
+ 	gboolean new_dev;
+ 	int8_t rssi;
++	uint8_t type;
+ 
+ 	rssi = *(info->data + info->length);
+ 	bdaddr = info->bdaddr;
+@@ -3023,6 +3024,14 @@ void adapter_update_device_from_info(struct btd_adapter *adapter,
+ 
+ 	adapter->found_devices = g_slist_sort(adapter->found_devices,
+ 						(GCompareFunc) dev_rssi_cmp);
++
++	if (info->length) {
++		char *tmp_name = bt_extract_eir_name(info->data, &type);
++		if (tmp_name) {
++			g_free(dev->name);
++			dev->name = tmp_name;
++		}
++	}
  }
  
-@@ -2826,11 +2828,27 @@ static void emit_device_found(const char *path, const char *address,
- 	g_dbus_send_message(connection, signal);
+ void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+diff --git a/src/event.c b/src/event.c
+index 008bbe3..daab71a 100644
+--- a/src/event.c
++++ b/src/event.c
+@@ -301,27 +301,6 @@ void btd_event_simple_pairing_complete(bdaddr_t *local, bdaddr_t *peer,
+ 	device_simple_pairing_complete(device, status);
  }
  
--static char **get_eir_uuids(uint8_t *eir_data, size_t eir_length,
--							size_t *uuid_count)
-+static char **strlist2array(GSList *list)
-+{
-+	GSList *l;
-+	unsigned int i, n;
-+	char **array;
-+
-+	if (list == NULL)
-+		return NULL;
-+
-+	n = g_slist_length(list);
-+	array = g_new0(char *, n + 1);
-+
-+	for (l = list, i = 0; l; l = l->next, i++)
-+		array[i] = g_strdup((const gchar *) l->data);
-+
-+	return array;
-+}
-+
-+static GSList *get_eir_uuids(uint8_t *eir_data, size_t eir_length, GSList *list)
- {
- 	uint16_t len = 0;
--	char **uuids;
- 	size_t total;
- 	size_t uuid16_count = 0;
- 	size_t uuid32_count = 0;
-@@ -2839,10 +2857,11 @@ static char **get_eir_uuids(uint8_t *eir_data, size_t eir_length,
- 	uint8_t *uuid32;
- 	uint8_t *uuid128;
- 	uuid_t service;
-+	char *uuid_str;
- 	unsigned int i;
- 
- 	if (eir_data == NULL || eir_length == 0)
--		return NULL;
-+		return list;
- 
- 	while (len < eir_length - 1) {
- 		uint8_t field_len = eir_data[0];
-@@ -2875,15 +2894,12 @@ static char **get_eir_uuids(uint8_t *eir_data, size_t eir_length,
- 
- 	/* Bail out if got incorrect length */
- 	if (len > eir_length)
--		return NULL;
-+		return list;
- 
- 	total = uuid16_count + uuid32_count + uuid128_count;
--	*uuid_count = total;
- 
- 	if (!total)
+-static char *extract_eir_name(uint8_t *data, uint8_t *type)
+-{
+-	if (!data || !type)
 -		return NULL;
 -
--	uuids = g_new0(char *, total + 1);
-+		return list;
- 
- 	/* Generate uuids in SDP format (EIR data is Little Endian) */
- 	service.type = SDP_UUID16;
-@@ -2892,7 +2908,12 @@ static char **get_eir_uuids(uint8_t *eir_data, size_t eir_length,
- 
- 		val16 = (val16 << 8) + uuid16[0];
- 		service.value.uuid16 = val16;
--		uuids[i] = bt_uuid2string(&service);
-+		uuid_str = bt_uuid2string(&service);
-+		if (g_slist_find_custom(list, uuid_str,
-+						(GCompareFunc) strcmp) == NULL)
-+			list = g_slist_append(list, uuid_str);
-+		else
-+			g_free(uuid_str);
- 		uuid16 += 2;
- 	}
- 
-@@ -2905,7 +2926,12 @@ static char **get_eir_uuids(uint8_t *eir_data, size_t eir_length,
- 			val32 = (val32 << 8) + uuid32[k];
- 
- 		service.value.uuid32 = val32;
--		uuids[i] = bt_uuid2string(&service);
-+		uuid_str = bt_uuid2string(&service);
-+		if (g_slist_find_custom(list, uuid_str,
-+						(GCompareFunc) strcmp) == NULL)
-+			list = g_slist_append(list, uuid_str);
-+		else
-+			g_free(uuid_str);
- 		uuid32 += 4;
- 	}
- 
-@@ -2916,11 +2942,16 @@ static char **get_eir_uuids(uint8_t *eir_data, size_t eir_length,
- 		for (k = 0; k < 16; k++)
- 			service.value.uuid128.data[k] = uuid128[16 - k - 1];
- 
--		uuids[i] = bt_uuid2string(&service);
-+		uuid_str = bt_uuid2string(&service);
-+		if (g_slist_find_custom(list, uuid_str,
-+						(GCompareFunc) strcmp) == NULL)
-+			list = g_slist_append(list, uuid_str);
-+		else
-+			g_free(uuid_str);
- 		uuid128 += 16;
- 	}
- 
--	return uuids;
-+	return list;
- }
- 
- void adapter_emit_device_found(struct btd_adapter *adapter,
-@@ -2934,7 +2965,7 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
- 	dbus_int16_t rssi = dev->rssi;
- 	char *alias;
- 	char **uuids = NULL;
--	size_t uuid_count = 0;
-+	size_t uuid_count;
- 
- 	ba2str(&dev->bdaddr, peer_addr);
- 	ba2str(&adapter->bdaddr, local_addr);
-@@ -2954,8 +2985,16 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
+-	if (data[0] == 0)
+-		return NULL;
+-
+-	*type = data[1];
+-
+-	switch (*type) {
+-	case 0x08:
+-	case 0x09:
+-		if (!g_utf8_validate((char *) (data + 2), data[0] - 1, NULL))
+-			return strdup("");
+-		return strndup((char *) (data + 2), data[0] - 1);
+-	}
+-
+-	return NULL;
+-}
+-
+ void btd_event_advertising_report(bdaddr_t *local, le_advertising_info *info)
+ {
+ 	struct btd_adapter *adapter;
+@@ -410,7 +389,7 @@ void btd_event_inquiry_result(bdaddr_t *local, bdaddr_t *peer, uint32_t class,
  	} else
- 		alias = g_strdup(dev->alias);
+ 		legacy = TRUE;
  
--	/* Extract UUIDs from extended inquiry response if any*/
--	uuids = get_eir_uuids(eir_data, eir_length, &uuid_count);
-+	/* Extract UUIDs from extended inquiry response if any */
-+	dev->services = get_eir_uuids(eir_data, eir_length, dev->services);
-+	uuid_count = g_slist_length(dev->services);
+-	tmp_name = extract_eir_name(data, &name_type);
++	tmp_name = bt_extract_eir_name(data, &name_type);
+ 	if (tmp_name) {
+ 		if (name_type == 0x09) {
+ 			write_device_name(local, peer, tmp_name);
+diff --git a/src/glib-helper.c b/src/glib-helper.c
+index 9d76626..33668d7 100644
+--- a/src/glib-helper.c
++++ b/src/glib-helper.c
+@@ -43,6 +43,7 @@
+ #include <glib.h>
+ 
+ #include "glib-helper.h"
++#include "sdpd.h"
+ 
+ /* Number of seconds to keep a sdp_session_t in the cache */
+ #define CACHE_TIMEOUT 2
+@@ -576,3 +577,24 @@ GSList *bt_string2list(const gchar *str)
+ 
+ 	return l;
+ }
 +
-+	if (dev->services) {
-+		uuids = strlist2array(dev->services);
-+		g_slist_foreach(dev->services, (GFunc) g_free, NULL);
-+		g_slist_free(dev->services);
-+		dev->services = NULL;
++char *bt_extract_eir_name(uint8_t *data, uint8_t *type)
++{
++	if (!data || !type)
++		return NULL;
++
++	if (data[0] == 0)
++		return NULL;
++
++	*type = data[1];
++
++	switch (*type) {
++	case EIR_NAME_SHORT:
++	case EIR_NAME_COMPLETE:
++		if (!g_utf8_validate((char *) (data + 2), data[0] - 1, NULL))
++			return strdup("");
++		return strndup((char *) (data + 2), data[0] - 1);
 +	}
- 
- 	emit_device_found(adapter->path, paddr,
- 			"Address", DBUS_TYPE_STRING, &paddr,
-diff --git a/src/adapter.h b/src/adapter.h
-index a744f61..4af69b3 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -71,6 +71,7 @@ struct remote_dev_info {
- 	name_status_t name_status;
- 	gboolean le;
- 	/* LE adv data */
-+	GSList *services;
- 	uint8_t evt_type;
- 	uint8_t bdaddr_type;
- };
++
++	return NULL;
++}
+diff --git a/src/glib-helper.h b/src/glib-helper.h
+index e89c2c6..dfe4123 100644
+--- a/src/glib-helper.h
++++ b/src/glib-helper.h
+@@ -38,3 +38,4 @@ char *bt_name2string(const char *string);
+ int bt_string2uuid(uuid_t *uuid, const char *string);
+ gchar *bt_list2string(GSList *list);
+ GSList *bt_string2list(const gchar *str);
++char *bt_extract_eir_name(uint8_t *data, uint8_t *type);
 -- 
 1.7.0.4
 
