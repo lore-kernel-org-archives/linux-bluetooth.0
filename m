@@ -1,108 +1,116 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH 2/6] Add Find By Type Value Response encoding/decoding functions
-Date: Wed, 17 Nov 2010 16:09:42 -0200
-Message-Id: <1290017386-23969-2-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1290017386-23969-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1290017386-23969-1-git-send-email-claudio.takahasi@openbossa.org>
+Cc: Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: [PATCH 1/6] Implement Find by Type request encode/decoding
+Date: Wed, 17 Nov 2010 16:09:41 -0200
+Message-Id: <1290017386-23969-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Find by type operation is used by Discover Primary Service by Service
-UUID. Find By Type Value Response shall contain one or more group handles.
+From: Bruna Moreira <bruna.moreira@openbossa.org>
+
 ---
- attrib/att.c |   46 ++++++++++++++++++++++++++++++++++++++++++++++
- attrib/att.h |    7 +++++++
- 2 files changed, 53 insertions(+), 0 deletions(-)
+ attrib/att.c |   72 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ attrib/att.h |    4 ++-
+ 2 files changed, 73 insertions(+), 3 deletions(-)
 
 diff --git a/attrib/att.c b/attrib/att.c
-index 6c889f2..60fc74b 100644
+index fe41d0e..6c889f2 100644
 --- a/attrib/att.c
 +++ b/attrib/att.c
-@@ -30,6 +30,8 @@
- #include <bluetooth/sdp.h>
- #include <bluetooth/sdp_lib.h>
- 
-+#include <glib.h>
-+
- #include "att.h"
- 
- const char *att_ecode2str(uint8_t status)
-@@ -271,6 +273,50 @@ uint16_t dec_find_by_type_req(const uint8_t *pdu, int len, uint16_t *start,
- 	return len;
+@@ -198,9 +198,77 @@ struct att_data_list *dec_read_by_grp_resp(const uint8_t *pdu, int len)
  }
  
-+uint16_t enc_find_by_type_resp(GSList *matches, uint8_t *pdu, int len)
+ uint16_t enc_find_by_type_req(uint16_t start, uint16_t end, uuid_t *uuid,
+-							uint8_t *pdu, int len)
++			const uint8_t *value, int vlen, uint8_t *pdu, int len)
 +{
-+	GSList *l;
-+	uint16_t offset;
++	uint16_t min_len = sizeof(pdu[0]) + sizeof(start) + sizeof(end) +
++							sizeof(uint16_t);
 +
-+	if (pdu == NULL || len < 5)
++	if (pdu == NULL)
 +		return 0;
 +
-+	pdu[0] = ATT_OP_FIND_BY_TYPE_RESP;
++	if (!uuid)
++		return 0;
 +
-+	for (l = matches, offset = 1; l && len >= (offset + 4);
-+					l = l->next, offset += 4) {
-+		struct range *range = l->data;
++	if (uuid->type != SDP_UUID16)
++		return 0;
 +
-+		att_put_u16(range->start, &pdu[offset]);
-+		att_put_u16(range->end, &pdu[offset + 2]);
++	if (len < min_len)
++		return 0;
++
++	if (vlen > len - min_len)
++		vlen = len - min_len;
++
++	pdu[0] = ATT_OP_FIND_BY_TYPE_REQ;
++	att_put_u16(start, &pdu[1]);
++	att_put_u16(end, &pdu[3]);
++	att_put_u16(uuid->value.uuid16, &pdu[5]);
++
++	if (vlen > 0) {
++		memcpy(&pdu[7], value, vlen);
++		return min_len + vlen;
 +	}
 +
-+	return offset;
++	return min_len;
 +}
 +
-+GSList *dec_find_by_type_resp(const uint8_t *pdu, int len)
-+{
-+	struct range *range;
-+	GSList *matches;
-+	int offset;
-+
-+	if (pdu == NULL || len < 5)
-+		return NULL;
-+
-+	if (pdu[0] != ATT_OP_FIND_BY_TYPE_RESP)
-+		return NULL;
-+
-+	for (offset = 1, matches = NULL; len >= (offset + 4); offset += 4) {
-+		range = malloc(sizeof(struct range));
-+		range->start = att_get_u16(&pdu[offset]);
-+		range->end = att_get_u16(&pdu[offset + 2]);
-+
-+		matches = g_slist_append(matches, range);
-+	}
-+
-+	return matches;
-+}
-+
- uint16_t enc_read_by_type_req(uint16_t start, uint16_t end, uuid_t *uuid,
- 							uint8_t *pdu, int len)
++uint16_t dec_find_by_type_req(const uint8_t *pdu, int len, uint16_t *start,
++			uint16_t *end, uuid_t *uuid, uint8_t *value, int *vlen)
  {
+-	return 0;
++	int valuelen;
++	uint16_t min_len = sizeof(pdu[0]) + sizeof(*start) +
++						sizeof(*end) + sizeof(uint16_t);
++
++	if (pdu == NULL)
++		return 0;
++
++	if (len < min_len)
++		return 0;
++
++	if (pdu[0] != ATT_OP_FIND_BY_TYPE_REQ)
++		return 0;
++
++	/* First requested handle number */
++	if (start)
++		*start = att_get_u16(&pdu[1]);
++
++	/* Last requested handle number */
++	if (end)
++		*end = att_get_u16(&pdu[3]);
++
++	/* Always UUID16 */
++	if (uuid)
++		sdp_uuid16_create(uuid, att_get_u16(&pdu[5]));
++
++	valuelen = len - min_len;
++
++	/* Attribute value to find */
++	if (valuelen > 0 && value)
++		memcpy(value, pdu + min_len, valuelen);
++
++	if (vlen)
++		*vlen = valuelen;
++
++	return len;
+ }
+ 
+ uint16_t enc_read_by_type_req(uint16_t start, uint16_t end, uuid_t *uuid,
 diff --git a/attrib/att.h b/attrib/att.h
-index 9de338d..c7260ff 100644
+index ea49dc2..9de338d 100644
 --- a/attrib/att.h
 +++ b/attrib/att.h
-@@ -122,6 +122,11 @@ struct att_data_list {
- 	uint8_t **data;
- };
- 
-+struct range {
-+	uint16_t start;
-+	uint16_t end;
-+};
-+
- /* These functions do byte conversion */
- static inline uint8_t att_get_u8(const void *ptr)
- {
-@@ -168,6 +173,8 @@ uint16_t enc_find_by_type_req(uint16_t start, uint16_t end, uuid_t *uuid,
- 			const uint8_t *value, int vlen, uint8_t *pdu, int len);
- uint16_t dec_find_by_type_req(const uint8_t *pdu, int len, uint16_t *start,
- 		uint16_t *end, uuid_t *uuid, uint8_t *value, int *vlen);
-+uint16_t enc_find_by_type_resp(GSList *ranges, uint8_t *pdu, int len);
-+GSList *dec_find_by_type_resp(const uint8_t *pdu, int len);
+@@ -165,7 +165,9 @@ uint16_t dec_read_by_grp_req(const uint8_t *pdu, int len, uint16_t *start,
+ 						uint16_t *end, uuid_t *uuid);
+ uint16_t enc_read_by_grp_resp(struct att_data_list *list, uint8_t *pdu, int len);
+ uint16_t enc_find_by_type_req(uint16_t start, uint16_t end, uuid_t *uuid,
+-							uint8_t *pdu, int len);
++			const uint8_t *value, int vlen, uint8_t *pdu, int len);
++uint16_t dec_find_by_type_req(const uint8_t *pdu, int len, uint16_t *start,
++		uint16_t *end, uuid_t *uuid, uint8_t *value, int *vlen);
  struct att_data_list *dec_read_by_grp_resp(const uint8_t *pdu, int len);
  uint16_t enc_read_by_type_req(uint16_t start, uint16_t end, uuid_t *uuid,
  							uint8_t *pdu, int len);
