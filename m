@@ -1,21 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 16 Nov 2010 23:30:09 -0200
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: =?iso-8859-1?B?IkFuZHLpIEv8aG5lIg==?= <andre.kuehne@gmx.net>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Apple Wireless Keyboard connection issue
+Message-ID: <20101117013009.GA15855@vigoh>
+References: <20101116212701.50060@gmx.net>
 MIME-Version: 1.0
-From: liang yu <iamyuliang@gmail.com>
-Date: Wed, 17 Nov 2010 11:43:19 +0800
-Message-ID: <AANLkTikTyH+3LLbr=ytu+9jcE8Sk_wTqdRyn9jwK821a@mail.gmail.com>
-Subject: Does OBEX authentication works in OPP?
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20101116212701.50060@gmx.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello all:
-     I am not sure it is the right place to ask the question.
-According to the Bluetooth SIG profile OBEX authentication is not used
-in OPP. But in source code of Obexd-0.36/plugins/opp.c, the function
-opp_chkput invokes manager_request_authorization. Does this mean that
-in your implementation it is still checked OBEX authentication in opp?
-    Doea anybody give me some tips.
-    Thanks advance.
+* "André Kühne" <andre.kuehne@gmx.net> [2010-11-16 22:27:01 +0100]:
 
-Best regards
+> Hi everyone
+> 
+> I noticed the following on my system: After upgrading to bluez-4.79 connecting my Apple Wireless Keyboard does not work anymore. With bluez-4.77 the connection works just fine.
+> 
+
+My Microsoft keyboard is not working too. That is probably due to commit
+abe7cd44124a from Johan. It should be fixed soon.
+
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
