@@ -1,28 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 18 Nov 2010 16:45:34 +0200
+Date: Thu, 18 Nov 2010 16:44:03 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: Re: [PATCH 1/6] Implement Find by Type request encode/decoding
-Message-ID: <20101118144534.GC7811@jh-x301>
-References: <1290017386-23969-1-git-send-email-claudio.takahasi@openbossa.org>
+To: Bruna Moreira <bruna.moreira@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 3/3] Emit "DeviceFound" signal for LE devices
+Message-ID: <20101118144403.GB7811@jh-x301>
+References: <1290009593-13658-1-git-send-email-bruna.moreira@openbossa.org>
+ <1290009593-13658-3-git-send-email-bruna.moreira@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1290017386-23969-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1290009593-13658-3-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Bruna,
 
-On Wed, Nov 17, 2010, Claudio Takahasi wrote:
-> From: Bruna Moreira <bruna.moreira@openbossa.org>
-> 
+On Wed, Nov 17, 2010, Bruna Moreira wrote:
+> The adapter_emit_device_found() function was modified to emit
+> DeviceFound signal for LE devices as well.
 > ---
->  attrib/att.c |   72 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
->  attrib/att.h |    4 ++-
->  2 files changed, 73 insertions(+), 3 deletions(-)
+>  src/adapter.c |   30 +++++++++++++++++++++++++-----
+>  1 files changed, 25 insertions(+), 5 deletions(-)
 
-Pushed upstream. Thanks.
+This patch has also been pushed upstream. Thanks.
 
 Johan
