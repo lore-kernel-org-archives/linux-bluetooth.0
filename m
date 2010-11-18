@@ -1,55 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Siarhei Siamashka <siarhei.siamashka@gmail.com>
-To: Keith Mok <ek9852@gmail.com>
-Subject: Re: [PATCH v3] Add iwmmxt optimization for sbc for pxa series cpu
-Date: Thu, 18 Nov 2010 15:05:29 +0200
+Date: Thu, 18 Nov 2010 14:43:20 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Bruna Moreira <bruna.moreira@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-References: <AANLkTikPiwr+OtsDVbgoya281Zncg0P5Joq_v0UCzZDi@mail.gmail.com> <AANLkTimQR5wMTTEO6KGuv3YvPBaftO-i+96WKYQEOzFU@mail.gmail.com> <201011151308.31972.siarhei.siamashka@gmail.com>
-In-Reply-To: <201011151308.31972.siarhei.siamashka@gmail.com>
+Subject: Re: [PATCH 2/3] Extract service UUIDs from advertising data
+Message-ID: <20101118124320.GA4918@jh-x301>
+References: <1290009593-13658-1-git-send-email-bruna.moreira@openbossa.org>
+ <1290009593-13658-2-git-send-email-bruna.moreira@openbossa.org>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Message-Id: <201011181505.29428.siarhei.siamashka@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1290009593-13658-2-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Monday 15 November 2010 13:08:19 Siarhei Siamashka wrote:
-> On Monday 15 November 2010 04:46:25 Keith Mok wrote:
-> > > I sometimes use different indentation levels in such cases in order to
-> > > improve readability after instructions reordering, so that each
-> > > logically independent block of code has its own indentation level and
-> > > it is still easily visible
-> > 
-> > > after instructions reordering. For example, with the original code:
-> > Thanks for the hints. I rearranged the code.
-> 
-> Thanks, now the assembly code looks ok to me. I also discovered that qemu
-> supports iwmmxt1 emulation just fine and also tried to test your
-> optimizations for correctness myself (with a script which tries different
-> encoding paramaters for different audio samples and checks md5 checksums),
-> no problems detected.
-> 
-> So if somebody else could check whether the other things are right
-> (copyright notices for example), then we are done with it.
+Hi Bruna,
 
-As nobody else has stepped in, I guess it's still my responsibility to provide
-some further guidance even though I'm a very infrequent contributor myself.
-Hopefully somebody will correct me if I'm wrong.
+On Wed, Nov 17, 2010, Bruna Moreira wrote:
+> +	/* Extract UUIDs from extended inquiry response if any */
+> +	dev->services = get_eir_uuids(eir_data, eir_length, dev->services);
+> +	uuid_count = g_slist_length(dev->services);
+> +
+> +	if (dev->services) {
+> +		uuids = strlist2array(dev->services);
+> +		g_slist_foreach(dev->services, (GFunc) g_free, NULL);
+> +		g_slist_free(dev->services);
+> +		dev->services = NULL;
+> +	}
 
-So please
+What's the reason that the get_eir_uuids API is designed so that it can
+handle a list which already contains elements before calling the
+function? Since you free the list right after creating the uuids array
+it seems like this shouldn't happen. Or am I missing something?
 
-1. Make a final patch in such a form that can be pushed to git repository 
-without any modifications, it means that you need a clean commit message and 
-not just some text intermixed with the parts and quotations of discussion from
-this mailing list.
-2. "Signed-off-by" header is not needed for the userspace parts of bluez.
-3. All files must have copyright notices, even a small one like 
-'sbc_primitives_iwmmxt.h'. And probably you should just replicate all the
-copyright notices from the source files with sbc mmx optimizations and add your
-own copyright on top.
+Btw, is there something that could be optimized here since it seems like
+you're regenerating the uuids array before every signal even though the
+set of service might not have changed since the previous one. Maybe you
+should track this and only regenerate the array if there has been a
+changed from the previous signal. What do you think?
 
-Hopefully that should be enough to get your optimizations applied. Thanks.
-
--- 
-Best regards,
-Siarhei Siamashka
+Johan
