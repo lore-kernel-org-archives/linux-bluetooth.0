@@ -1,279 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bartosz Szatkowski <bulislaw@linux.com>
+From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Bartosz Szatkowski <bulislaw@linux.com>
-Subject: [PATCH] Fix queries for contact with only one affiliation
-Date: Thu, 18 Nov 2010 16:01:43 +0100
-Message-Id: <1290092503-10324-1-git-send-email-bulislaw@linux.com>
+Subject: =?UTF-8?q?Pull=20request=20git=3A//gitorious=2Eorg/bluez-mcap-hdp/mcap-hdp=2Egit=20for=5Fupstream?=
+Date: Thu, 18 Nov 2010 15:53:34 +0100
+Message-Id: <1290092014-32574-1-git-send-email-sancane@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Previously some fields may be omitted for contacts with only one affiliation,
-when querying for call history.
----
- plugins/phonebook-tracker.c |   83 ++++++++++++++++++++++++++++---------------
- 1 files changed, 54 insertions(+), 29 deletions(-)
+  Fix typos in adapter documentation (2010-11-16 13:39:43 +0000)
 
-diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index 6d8915e..2cf8ba2 100644
---- a/plugins/phonebook-tracker.c
-+++ b/plugins/phonebook-tracker.c
-@@ -183,7 +183,7 @@
- 	"nco:role(?a) nco:pobox(?pw) nco:extendedAddress(?pw) "		\
- 	"nco:streetAddress(?pw) nco:locality(?pw) nco:region(?pw) "	\
- 	"nco:postalcode(?pw) nco:country(?pw) nco:contactUID(?c) "	\
--	"nco:title(?a) nco:phoneNumber(?t) nco:pobox(?po) "		\
-+	"?title nco:phoneNumber(?t) nco:pobox(?po) "			\
- 	"nco:extendedAddress(?po) nco:streetAddress(?po) "		\
- 	"nco:locality(?po) nco:region(?po) nco:postalcode(?po) "	\
- 	"nco:country(?po) nco:emailAddress(?eo) ?vc "			\
-@@ -211,6 +211,7 @@
- 			"?a rdfs:label \"Work\" . "			\
- 			"OPTIONAL { ?a nco:hasEmailAddress ?ew . } "	\
- 			"OPTIONAL { ?a nco:hasPostalAddress ?pw . } "	\
-+			"OPTIONAL { ?a nco:title ?title } "		\
- 			"}"						\
- 			"OPTIONAL { "					\
- 			"?a rdfs:label \"Home\" . "			\
-@@ -235,12 +236,13 @@
- 			"OPTIONAL { ?a nco:hasEmailAddress ?ew . } "	\
- 			"OPTIONAL { ?a nco:hasPostalAddress ?pw . } "	\
- 			"OPTIONAL { ?a nco:org ?o . } "			\
-+			"OPTIONAL { ?a nco:title ?title } "		\
- 			"{ "						\
- 			"SELECT ?p ?e ?c WHERE { "			\
- 			"?c nco:hasAffiliation ?b . "			\
--			"?b rdfs:label \"Home\" . "			\
-+			"OPTIONAL {?b rdfs:label \"Home\" . "		\
- 			"OPTIONAL {?b nco:hasEmailAddress ?e . } "	\
--			"OPTIONAL {?b nco:hasPostalAddress ?p . }} "	\
-+			"OPTIONAL {?b nco:hasPostalAddress ?p . }}} "	\
- 			"} "						\
- 		"}"							\
- 		"OPTIONAL { "						\
-@@ -250,13 +252,16 @@
- 			"OPTIONAL { ?a nco:hasPostalAddress ?p . } "	\
- 			"OPTIONAL { ?a nco:org ?o . } "			\
- 			"{ "						\
--			"SELECT ?pw ?ew ?c WHERE { "			\
-+			"SELECT ?pw ?ew ?title ?c WHERE { "		\
- 			"?c nco:hasAffiliation ?b . "			\
--			"?b rdfs:label \"Work\" . "			\
-+			"OPTIONAL {?b rdfs:label \"Work\" . "		\
- 			"OPTIONAL {?b nco:hasEmailAddress ?ew . } "	\
--			"OPTIONAL {?b nco:hasPostalAddress ?pw . }} "	\
-+			"OPTIONAL {?b nco:title ?title } "		\
-+			"OPTIONAL {?b nco:hasPostalAddress ?pw . }}} "	\
- 			"} "						\
- 		"}"							\
-+		"OPTIONAL { ?c nco:hasPostalAddress ?po . } "		\
-+		"OPTIONAL { ?c nco:hasEmailAddress ?eo . } "		\
- 	"} UNION { "							\
- 		"?x a nco:Contact . "					\
- 		"?x nco:hasPhoneNumber ?t . "				\
-@@ -322,7 +327,7 @@
- 	"nco:role(?a) nco:pobox(?pw) nco:extendedAddress(?pw) "		\
- 	"nco:streetAddress(?pw) nco:locality(?pw) nco:region(?pw) "	\
- 	"nco:postalcode(?pw) nco:country(?pw) nco:contactUID(?c) "	\
--	"nco:title(?a) nco:phoneNumber(?t) nco:pobox(?po) "		\
-+	"?title nco:phoneNumber(?t) nco:pobox(?po) "			\
- 	"nco:extendedAddress(?po) nco:streetAddress(?po) "		\
- 	"nco:locality(?po) nco:region(?po) nco:postalcode(?po) "	\
- 	"nco:country(?po) nco:emailAddress(?eo) ?vc "			\
-@@ -348,6 +353,7 @@
- 			"?c nco:hasAffiliation ?a . "			\
- 			"OPTIONAL { "					\
- 			"?a rdfs:label \"Work\" . "			\
-+			"OPTIONAL { ?a nco:title ?title } "		\
- 			"OPTIONAL { ?a nco:hasEmailAddress ?ew . } "	\
- 			"OPTIONAL { ?a nco:hasPostalAddress ?pw . } "	\
- 			"}"						\
-@@ -374,12 +380,13 @@
- 			"OPTIONAL { ?a nco:hasEmailAddress ?ew . } "	\
- 			"OPTIONAL { ?a nco:hasPostalAddress ?pw . } "	\
- 			"OPTIONAL { ?a nco:org ?o . } "			\
-+			"OPTIONAL { ?a nco:title ?title } "		\
- 			"{ "						\
- 			"SELECT ?p ?e ?c WHERE { "			\
- 			"?c nco:hasAffiliation ?b . "			\
--			"?b rdfs:label \"Home\" . "			\
-+			"OPTIONAL {?b rdfs:label \"Home\" . "		\
- 			"OPTIONAL {?b nco:hasEmailAddress ?e . } "	\
--			"OPTIONAL {?b nco:hasPostalAddress ?p . }} "	\
-+			"OPTIONAL {?b nco:hasPostalAddress ?p . }}} "	\
- 			"} "						\
- 		"}"							\
- 		"OPTIONAL { "						\
-@@ -389,13 +396,16 @@
- 			"OPTIONAL { ?a nco:hasPostalAddress ?p . } "	\
- 			"OPTIONAL { ?a nco:org ?o . } "			\
- 			"{ "						\
--			"SELECT ?pw ?ew ?c WHERE { "			\
-+			"SELECT ?pw ?ew ?title ?c WHERE { "		\
- 			"?c nco:hasAffiliation ?b . "			\
--			"?b rdfs:label \"Work\" . "			\
-+			"OPTIONAL {?b rdfs:label \"Work\" . "		\
- 			"OPTIONAL {?b nco:hasEmailAddress ?ew . } "	\
--			"OPTIONAL {?b nco:hasPostalAddress ?pw . }} "	\
-+			"OPTIONAL {?b nco:title ?title } "		\
-+			"OPTIONAL {?b nco:hasPostalAddress ?pw . }}} "	\
- 			"} "						\
- 		"}"							\
-+		"OPTIONAL { ?c nco:hasPostalAddress ?po . } "		\
-+		"OPTIONAL { ?c nco:hasEmailAddress ?eo . } "		\
- 	"} UNION { "							\
- 		"?x a nco:Contact . "					\
- 		"?x nco:hasPhoneNumber ?t . "				\
-@@ -460,7 +470,7 @@
- 	"nco:role(?a) nco:pobox(?pw) nco:extendedAddress(?pw) "		\
- 	"nco:streetAddress(?pw) nco:locality(?pw) nco:region(?pw) "	\
- 	"nco:postalcode(?pw) nco:country(?pw) nco:contactUID(?c) "	\
--	"nco:title(?a) nco:phoneNumber(?t) nco:pobox(?po) "		\
-+	"?title nco:phoneNumber(?t) nco:pobox(?po) "			\
- 	"nco:extendedAddress(?po) nco:streetAddress(?po) "		\
- 	"nco:locality(?po) nco:region(?po) nco:postalcode(?po) "	\
- 	"nco:country(?po) nco:emailAddress(?eo) ?vc "			\
-@@ -487,6 +497,7 @@
- 			"?a rdfs:label \"Work\" . "			\
- 			"OPTIONAL { ?a nco:hasEmailAddress ?ew . } "	\
- 			"OPTIONAL { ?a nco:hasPostalAddress ?pw . } "	\
-+			"OPTIONAL { ?a nco:title ?title } "		\
- 			"}"						\
- 			"OPTIONAL { "					\
- 			"?a rdfs:label \"Home\" . "			\
-@@ -510,12 +521,13 @@
- 			"OPTIONAL { ?a nco:hasEmailAddress ?ew . } "	\
- 			"OPTIONAL { ?a nco:hasPostalAddress ?pw . } "	\
- 			"OPTIONAL { ?a nco:org ?o . } "			\
-+			"OPTIONAL { ?a nco:title ?title } "		\
- 			"{ "						\
- 			"SELECT ?p ?e ?c WHERE { "			\
- 			"?c nco:hasAffiliation ?b . "			\
--			"?b rdfs:label \"Home\" . "			\
-+			"OPTIONAL {?b rdfs:label \"Home\" . "		\
- 			"OPTIONAL {?b nco:hasEmailAddress ?e . } "	\
--			"OPTIONAL {?b nco:hasPostalAddress ?p . }} "	\
-+			"OPTIONAL {?b nco:hasPostalAddress ?p . }}} "	\
- 			"} "						\
- 		"}"							\
- 		"OPTIONAL { "						\
-@@ -525,13 +537,16 @@
- 			"OPTIONAL { ?a nco:hasPostalAddress ?p . } "	\
- 			"OPTIONAL { ?a nco:org ?o . } "			\
- 			"{ "						\
--			"SELECT ?pw ?ew ?c WHERE { "			\
-+			"SELECT ?pw ?ew ?title ?c WHERE { "		\
- 			"?c nco:hasAffiliation ?b . "			\
--			"?b rdfs:label \"Work\" . "			\
-+			"OPTIONAL {?b rdfs:label \"Work\" . "		\
- 			"OPTIONAL {?b nco:hasEmailAddress ?ew . } "	\
--			"OPTIONAL {?b nco:hasPostalAddress ?pw . }} "	\
-+			"OPTIONAL { ?a nco:title ?title } "		\
-+			"OPTIONAL {?b nco:hasPostalAddress ?pw . }}} "	\
- 			"} "						\
- 		"}"							\
-+		"OPTIONAL { ?c nco:hasPostalAddress ?po . } "		\
-+		"OPTIONAL { ?c nco:hasEmailAddress ?eo . } "		\
- 	"} UNION { "							\
- 		"?x a nco:Contact . "					\
- 		"?x nco:hasPhoneNumber ?t . "				\
-@@ -592,7 +607,7 @@
- 	"nco:role(?a) nco:pobox(?pw) nco:extendedAddress(?pw) "		\
- 	"nco:streetAddress(?pw) nco:locality(?pw) nco:region(?pw) "	\
- 	"nco:postalcode(?pw) nco:country(?pw) nco:contactUID(?c) "	\
--	"nco:title(?a) nco:phoneNumber(?t) nco:pobox(?po) "		\
-+	"?title nco:phoneNumber(?t) nco:pobox(?po) "			\
- 	"nco:extendedAddress(?po) nco:streetAddress(?po) "		\
- 	"nco:locality(?po) nco:region(?po) nco:postalcode(?po) "	\
- 	"nco:country(?po) nco:emailAddress(?eo) ?vc "			\
-@@ -619,6 +634,7 @@
- 			"?a rdfs:label \"Work\" . "			\
- 			"OPTIONAL { ?a nco:hasEmailAddress ?ew . } "	\
- 			"OPTIONAL { ?a nco:hasPostalAddress ?pw . } "	\
-+			"OPTIONAL { ?a nco:title ?title } "		\
- 			"}"						\
- 			"OPTIONAL { "					\
- 			"?a rdfs:label \"Home\" . "			\
-@@ -642,12 +658,13 @@
- 			"OPTIONAL { ?a nco:hasEmailAddress ?ew . } "	\
- 			"OPTIONAL { ?a nco:hasPostalAddress ?pw . } "	\
- 			"OPTIONAL { ?a nco:org ?o . } "			\
-+			"OPTIONAL { ?a nco:title ?title } "		\
- 			"{ "						\
- 			"SELECT ?p ?e ?c WHERE { "			\
- 			"?c nco:hasAffiliation ?b . "			\
--			"?b rdfs:label \"Home\" . "			\
-+			"OPTIONAL {?b rdfs:label \"Home\" . "		\
- 			"OPTIONAL {?b nco:hasEmailAddress ?e . } "	\
--			"OPTIONAL {?b nco:hasPostalAddress ?p . }} "	\
-+			"OPTIONAL {?b nco:hasPostalAddress ?p . }}} "	\
- 			"} "						\
- 		"}"							\
- 		"OPTIONAL { "						\
-@@ -657,13 +674,16 @@
- 			"OPTIONAL { ?a nco:hasPostalAddress ?p . } "	\
- 			"OPTIONAL { ?a nco:org ?o . } "			\
- 			"{ "						\
--			"SELECT ?pw ?ew ?c WHERE { "			\
-+			"SELECT ?pw ?ew ?title ?c WHERE { "		\
- 			"?c nco:hasAffiliation ?b . "			\
--			"?b rdfs:label \"Work\" . "			\
-+			"OPTIONAL {?b rdfs:label \"Work\" . "		\
- 			"OPTIONAL {?b nco:hasEmailAddress ?ew . } "	\
--			"OPTIONAL {?b nco:hasPostalAddress ?pw . }} "	\
-+			"OPTIONAL {?b nco:title ?title } "		\
-+			"OPTIONAL {?b nco:hasPostalAddress ?pw . }}} "	\
- 			"} "						\
- 		"}"							\
-+		"OPTIONAL { ?c nco:hasPostalAddress ?po . } "		\
-+		"OPTIONAL { ?c nco:hasEmailAddress ?eo . } "		\
- 	"} UNION { "							\
- 		"?x a nco:Contact . "					\
- 		"?x nco:hasPhoneNumber ?t . "				\
-@@ -696,6 +716,7 @@
- 			"?a rdfs:label \"Work\" . "			\
- 			"OPTIONAL { ?a nco:hasEmailAddress ?ew . } "	\
- 			"OPTIONAL { ?a nco:hasPostalAddress ?pw . } "	\
-+			"OPTIONAL { ?a nco:title ?title } "		\
- 			"}"						\
- 			"OPTIONAL { "					\
- 			"?a rdfs:label \"Home\" . "			\
-@@ -719,12 +740,13 @@
- 			"OPTIONAL { ?a nco:hasEmailAddress ?ew . } "	\
- 			"OPTIONAL { ?a nco:hasPostalAddress ?pw . } "	\
- 			"OPTIONAL { ?a nco:org ?o . } "			\
-+			"OPTIONAL { ?a nco:title ?title } "		\
- 			"{ "						\
- 			"SELECT ?p ?e ?c WHERE { "			\
- 			"?c nco:hasAffiliation ?b . "			\
--			"?b rdfs:label \"Home\" . "			\
-+			"OPTIONAL {?b rdfs:label \"Home\" . "		\
- 			"OPTIONAL {?b nco:hasEmailAddress ?e . } "	\
--			"OPTIONAL {?b nco:hasPostalAddress ?p . }} "	\
-+			"OPTIONAL {?b nco:hasPostalAddress ?p . }}} "	\
- 			"} "						\
- 		"}"							\
- 		"OPTIONAL { "						\
-@@ -734,13 +756,16 @@
- 			"OPTIONAL { ?a nco:hasPostalAddress ?p . } "	\
- 			"OPTIONAL { ?a nco:org ?o . } "			\
- 			"{ "						\
--			"SELECT ?pw ?ew ?c WHERE { "			\
-+			"SELECT ?pw ?ew ?title ?c WHERE { "		\
- 			"?c nco:hasAffiliation ?b . "			\
--			"?b rdfs:label \"Work\" . "			\
-+			"OPTIONAL {?b rdfs:label \"Work\" . "		\
- 			"OPTIONAL {?b nco:hasEmailAddress ?ew . } "	\
--			"OPTIONAL {?b nco:hasPostalAddress ?pw . }} "	\
-+			"OPTIONAL {?b nco:title ?title } "		\
-+			"OPTIONAL {?b nco:hasPostalAddress ?pw . }}} "	\
- 			"} "						\
- 		"}"							\
-+		"OPTIONAL { ?c nco:hasPostalAddress ?po . } "		\
-+		"OPTIONAL { ?c nco:hasEmailAddress ?eo . } "		\
- 	"} UNION { "							\
- 		"?x a nco:Contact . "					\
- 		"?x nco:hasPhoneNumber ?t . "				\
--- 
-1.7.0.4
+are available in the git repository at:
+  git://gitorious.org/bluez-mcap-hdp/mcap-hdp.git for_upstream
 
+José Antonio Santos Cadenas (9):
+      Add reference counter to hdp_application
+      Add reference counter to hdp_channel
+      Notify a channel deleted when remote side has already deleted it
+      Fix typos in mcap
+      Set reference counter for mcls to gint
+      Fix message error
+      Remove magic number to check ECHO MDEPs in HDP
+      Fixes to echo
+      Check if the mcl insiede the device is correctly set before use it
+
+Santiago Carot-Nemesio (10):
+      Add reference counter to hdp_device
+      Remove MCL's before removing the application
+      Add missed unrefs for hdp_tmp_dc_data
+      Add reference counter to mcap_instances
+      Add reference counter to mcap_mdl
+      Remove old reference to mcap session in the name of variables
+      Code refactorization in MCAP
+      Fix dereference to NULL pointers during data channels creation
+      Return proper response code if there is an error creating echo channel
+      Check if MCAP Instance is already released when a callbacks comes back.
+
+ health/hdp.c           |  266 ++++++++++++++++++++++++++++++++----------------
+ health/hdp_types.h     |    4 +
+ health/hdp_util.c      |   55 ++++++++++-
+ health/hdp_util.h      |    8 ++
+ health/mcap.c          |  242 +++++++++++++++++++++++++------------------
+ health/mcap_internal.h |    9 +-
+ health/mcap_lib.h      |   13 ++-
+ health/mcap_sync.c     |   22 ++--
+ 8 files changed, 407 insertions(+), 212 deletions(-)
