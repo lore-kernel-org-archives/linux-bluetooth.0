@@ -1,222 +1,139 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bartosz Szatkowski <bulislaw@linux.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Bartosz Szatkowski <bulislaw@linux.com>
-Subject: [PATCH v3 2/2] Split pull_contacts to smaller functions
-Date: Thu, 18 Nov 2010 12:04:26 +0100
-Message-Id: <1290078266-16279-1-git-send-email-bulislaw@linux.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Subject: Re: [PATCHv3 3/7] Add DBus OOB API documentation.
+Date: Thu, 18 Nov 2010 11:51:48 +0100
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <1289922247-20712-1-git-send-email-szymon.janc@tieto.com> <20101116163729.GA3854@jh-x301> <201011171349.51512.szymon.janc@tieto.com>
+In-Reply-To: <201011171349.51512.szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Message-Id: <201011181151.48796.szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Parts of pull_contact responsible for filling contact fields moved
-to new functions.
----
- plugins/phonebook-tracker.c |  176 ++++++++++++++++++++++++++----------------
- 1 files changed, 109 insertions(+), 67 deletions(-)
+> > > +Service         org.bluez
+> > > +Interface       org.bluez.OOB
+> > > +Object path     /org/bluez
+> > 
+> > I think this should use the same path as the Manager API, which at the
+> > moment is /
+> 
+> I was following HealthManager way, but I'm fine if you prefer / path.
+> 
+> > > +		array{byte} hash, array{byte} randomizer
+> > > +			ReadLocalOobData(object adapter)
+> > 
+> > Having to pass an adapter path as a parameter seems weird. Wouldn't it
+> > make more sense to have this method in the Adapter path/interface
+> > instead? Also, we could toy around with the thought of putting the two
+> > other methods into the current Manager interface.
+> 
+> It is OK to me to move ReadLocalOobData to adapter path as this is an adapter
+> related data.
+> 
+> My initial idea was to keep all oob related methods in org.bluez.OOB interface
+> but I'm not going to insist on it.
 
-diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index 71ed2f0..6d8915e 100644
---- a/plugins/phonebook-tracker.c
-+++ b/plugins/phonebook-tracker.c
-@@ -1395,6 +1395,110 @@ static void add_affiliation(char **field, const char *value)
- 	*field = g_strdup(value);
- }
- 
-+static void contact_init(struct phonebook_contact *contact, char **reply)
-+{
-+
-+	contact->fullname = g_strdup(reply[COL_FULL_NAME]);
-+	contact->family = g_strdup(reply[COL_FAMILY_NAME]);
-+	contact->given = g_strdup(reply[COL_GIVEN_NAME]);
-+	contact->additional = g_strdup(reply[COL_ADDITIONAL_NAME]);
-+	contact->prefix = g_strdup(reply[COL_NAME_PREFIX]);
-+	contact->suffix = g_strdup(reply[COL_NAME_SUFFIX]);
-+	contact->birthday = g_strdup(reply[COL_BIRTH_DATE]);
-+	contact->nickname = g_strdup(reply[COL_NICKNAME]);
-+	contact->website = g_strdup(reply[COL_URL]);
-+	contact->photo = g_strdup(reply[COL_PHOTO]);
-+	contact->company = g_strdup(reply[COL_ORG_NAME]);
-+	contact->department = g_strdup(reply[COL_ORG_DEPARTMENT]);
-+	contact->role = g_strdup(reply[COL_ORG_ROLE]);
-+	contact->uid = g_strdup(reply[COL_UID]);
-+	contact->title = g_strdup(reply[COL_TITLE]);
-+
-+	set_call_type(contact, reply[COL_DATE], reply[COL_SENT],
-+							reply[COL_ANSWERED]);
-+}
-+
-+static void contact_add_numbers(struct phonebook_contact *contact,
-+								char **reply)
-+{
-+	add_phone_number(contact, reply[COL_HOME_NUMBER], TEL_TYPE_HOME);
-+	add_phone_number(contact, reply[COL_WORK_NUMBER], TEL_TYPE_WORK);
-+	add_phone_number(contact, reply[COL_FAX_NUMBER], TEL_TYPE_FAX);
-+	add_phone_number(contact, reply[COL_CELL_NUMBER], TEL_TYPE_MOBILE);
-+
-+	if (g_strcmp0(reply[COL_OTHER_NUMBER], reply[COL_CELL_NUMBER]) == 0)
-+		return;
-+
-+	if (g_strcmp0(reply[COL_OTHER_NUMBER], reply[COL_WORK_NUMBER]) == 0)
-+		return;
-+
-+	if (g_strcmp0(reply[COL_OTHER_NUMBER], reply[COL_HOME_NUMBER]) == 0)
-+		return;
-+
-+	add_phone_number(contact, reply[COL_OTHER_NUMBER], TEL_TYPE_OTHER);
-+}
-+
-+static void contact_add_emails(struct phonebook_contact *contact,
-+								char **reply)
-+{
-+	add_email(contact, reply[COL_HOME_EMAIL], EMAIL_TYPE_HOME);
-+	add_email(contact, reply[COL_WORK_EMAIL], EMAIL_TYPE_WORK);
-+	add_email(contact, reply[COL_OTHER_EMAIL], EMAIL_TYPE_OTHER);
-+}
-+
-+static void contact_add_addresses(struct phonebook_contact *contact,
-+								char **reply)
-+{
-+
-+	char *home_addr, *work_addr, *other_addr;
-+
-+	home_addr = g_strdup_printf("%s;%s;%s;%s;%s;%s;%s",
-+					reply[COL_HOME_ADDR_POBOX],
-+					reply[COL_HOME_ADDR_EXT],
-+					reply[COL_HOME_ADDR_STREET],
-+					reply[COL_HOME_ADDR_LOCALITY],
-+					reply[COL_HOME_ADDR_REGION],
-+					reply[COL_HOME_ADDR_CODE],
-+					reply[COL_HOME_ADDR_COUNTRY]);
-+
-+	work_addr = g_strdup_printf("%s;%s;%s;%s;%s;%s;%s",
-+					reply[COL_WORK_ADDR_POBOX],
-+					reply[COL_WORK_ADDR_EXT],
-+					reply[COL_WORK_ADDR_STREET],
-+					reply[COL_WORK_ADDR_LOCALITY],
-+					reply[COL_WORK_ADDR_REGION],
-+					reply[COL_WORK_ADDR_CODE],
-+					reply[COL_WORK_ADDR_COUNTRY]);
-+
-+	other_addr = g_strdup_printf("%s;%s;%s;%s;%s;%s;%s",
-+					reply[COL_OTHER_ADDR_POBOX],
-+					reply[COL_OTHER_ADDR_EXT],
-+					reply[COL_OTHER_ADDR_STREET],
-+					reply[COL_OTHER_ADDR_LOCALITY],
-+					reply[COL_OTHER_ADDR_REGION],
-+					reply[COL_OTHER_ADDR_CODE],
-+					reply[COL_OTHER_ADDR_COUNTRY]);
-+
-+	add_address(contact, home_addr, ADDR_TYPE_HOME);
-+	add_address(contact, work_addr, ADDR_TYPE_WORK);
-+	add_address(contact, other_addr, ADDR_TYPE_OTHER);
-+
-+	g_free(home_addr);
-+	g_free(work_addr);
-+	g_free(other_addr);
-+}
-+
-+static void contact_add_organization(struct phonebook_contact *contact,
-+								char **reply)
-+{
-+	/* Adding fields connected by nco:hasAffiliation - they may be in
-+	 * separate replies */
-+	add_affiliation(&contact->title, reply[COL_TITLE]);
-+	add_affiliation(&contact->company, reply[COL_ORG_NAME]);
-+	add_affiliation(&contact->department, reply[COL_ORG_DEPARTMENT]);
-+	add_affiliation(&contact->role, reply[COL_ORG_ROLE]);
-+}
-+
- static void pull_contacts(char **reply, int num_fields, void *user_data)
- {
- 	struct phonebook_data *data = user_data;
-@@ -1404,7 +1508,6 @@ static void pull_contacts(char **reply, int num_fields, void *user_data)
- 	GString *vcards;
- 	int last_index, i;
- 	gboolean cdata_present = FALSE;
--	char *home_addr, *work_addr, *other_addr;
- 	static char *temp_id = NULL;
- 
- 	if (num_fields < 0) {
-@@ -1456,74 +1559,13 @@ static void pull_contacts(char **reply, int num_fields, void *user_data)
- 
- add_entry:
- 	contact = g_new0(struct phonebook_contact, 1);
--	contact->fullname = g_strdup(reply[COL_FULL_NAME]);
--	contact->family = g_strdup(reply[COL_FAMILY_NAME]);
--	contact->given = g_strdup(reply[COL_GIVEN_NAME]);
--	contact->additional = g_strdup(reply[COL_ADDITIONAL_NAME]);
--	contact->prefix = g_strdup(reply[COL_NAME_PREFIX]);
--	contact->suffix = g_strdup(reply[COL_NAME_SUFFIX]);
--	contact->birthday = g_strdup(reply[COL_BIRTH_DATE]);
--	contact->nickname = g_strdup(reply[COL_NICKNAME]);
--	contact->website = g_strdup(reply[COL_URL]);
--	contact->photo = g_strdup(reply[COL_PHOTO]);
--	contact->company = g_strdup(reply[COL_ORG_NAME]);
--	contact->department = g_strdup(reply[COL_ORG_DEPARTMENT]);
--	contact->role = g_strdup(reply[COL_ORG_ROLE]);
--	contact->uid = g_strdup(reply[COL_UID]);
--	contact->title = g_strdup(reply[COL_TITLE]);
--
--	set_call_type(contact, reply[COL_DATE], reply[COL_SENT],
--							reply[COL_ANSWERED]);
-+	contact_init(contact, reply);
- 
- add_numbers:
--	/* Adding phone numbers to contact struct */
--	add_phone_number(contact, reply[COL_HOME_NUMBER], TEL_TYPE_HOME);
--	add_phone_number(contact, reply[COL_WORK_NUMBER], TEL_TYPE_WORK);
--	add_phone_number(contact, reply[COL_FAX_NUMBER], TEL_TYPE_FAX);
--	add_phone_number(contact, reply[COL_CELL_NUMBER], TEL_TYPE_MOBILE);
--	if ((g_strcmp0(reply[COL_OTHER_NUMBER], reply[COL_CELL_NUMBER]) != 0) &&
--			(g_strcmp0(reply[COL_OTHER_NUMBER], reply[COL_WORK_NUMBER]) != 0) &&
--			(g_strcmp0(reply[COL_OTHER_NUMBER], reply[COL_HOME_NUMBER]) != 0))
--		add_phone_number(contact, reply[COL_OTHER_NUMBER], TEL_TYPE_OTHER);
--
--	/* Adding emails */
--	add_email(contact, reply[COL_HOME_EMAIL], EMAIL_TYPE_HOME);
--	add_email(contact, reply[COL_WORK_EMAIL], EMAIL_TYPE_WORK);
--	add_email(contact, reply[COL_OTHER_EMAIL], EMAIL_TYPE_OTHER);
--
--	/* Adding addresses */
--	home_addr = g_strdup_printf("%s;%s;%s;%s;%s;%s;%s",
--				reply[COL_HOME_ADDR_POBOX], reply[COL_HOME_ADDR_EXT],
--				reply[COL_HOME_ADDR_STREET], reply[COL_HOME_ADDR_LOCALITY],
--				reply[COL_HOME_ADDR_REGION], reply[COL_HOME_ADDR_CODE],
--				reply[COL_HOME_ADDR_COUNTRY]);
--
--	work_addr = g_strdup_printf("%s;%s;%s;%s;%s;%s;%s",
--				reply[COL_WORK_ADDR_POBOX], reply[COL_WORK_ADDR_EXT],
--				reply[COL_WORK_ADDR_STREET], reply[COL_WORK_ADDR_LOCALITY],
--				reply[COL_WORK_ADDR_REGION], reply[COL_WORK_ADDR_CODE],
--				reply[COL_WORK_ADDR_COUNTRY]);
--
--	other_addr = g_strdup_printf("%s;%s;%s;%s;%s;%s;%s",
--				reply[COL_OTHER_ADDR_POBOX], reply[COL_OTHER_ADDR_EXT],
--				reply[COL_OTHER_ADDR_STREET], reply[COL_OTHER_ADDR_LOCALITY],
--				reply[COL_OTHER_ADDR_REGION], reply[COL_OTHER_ADDR_CODE],
--				reply[COL_OTHER_ADDR_COUNTRY]);
--
--	add_address(contact, home_addr, ADDR_TYPE_HOME);
--	add_address(contact, work_addr, ADDR_TYPE_WORK);
--	add_address(contact, other_addr, ADDR_TYPE_OTHER);
--
--	g_free(home_addr);
--	g_free(work_addr);
--	g_free(other_addr);
--
--	/* Adding fields connected by nco:hasAffiliation - they may be in
--	 * separate replies */
--	add_affiliation(&contact->title, reply[COL_TITLE]);
--	add_affiliation(&contact->company, reply[COL_ORG_NAME]);
--	add_affiliation(&contact->department, reply[COL_ORG_DEPARTMENT]);
--	add_affiliation(&contact->role, reply[COL_ORG_ROLE]);
-+	contact_add_numbers(contact, reply);
-+	contact_add_emails(contact, reply);
-+	contact_add_addresses(contact, reply);
-+	contact_add_organization(contact, reply);
- 
- 	DBG("contact %p", contact);
- 
+Please see the following proposal.
+
+Register/UnregisterProvider methods can be easily moved to manager interface if
+decided (with name changes to i.e. RegisterOobProvider for clarity).
+
+Moving ReadLocalOobData to adapter path requires some code changes in dbusoob
+plugin so I prefer to clarify that before coding.
+
+
+Any comments?
+
+
+BlueZ D-Bus OOB API description
+*******************************
+
+Copyright (C) 2010  ST-Ericsson SA
+
+Author: Szymon Janc <szymon.janc@tieto.com> for ST-Ericsson
+
+OOB hierarchy
+=================
+
+Service         unique name
+Interface       org.bluez.OOB
+Object path     freely definable
+
+Methods		array{byte} hash, array{byte} randomizer
+			RequestRemoteOobData(object device)
+
+			This method gets called when the service daemon needs to
+			get device's hash and randomizer for an OOB
+			authentication. Each array should be 16 bytes long.
+
+			Possible errors: org.bluez.Error.NoData
+
+		void Release()
+
+			This method gets called when D-Bus plug-in for OOB was
+			deactivated. There is no need to unregister provider,
+			because when this method gets called it has already been
+			unregistered.
+
+--------------------------------------------------------------------------------
+
+Service         org.bluez
+Interface       org.bluez.OOB
+Object path     /
+
+Methods		void RegisterProvider(object provider)
+
+			This method registers provider for D-Bus OOB plug-in.
+			When provider is successfully registered plug-in becomes
+			active. Only one provider can be registered at time.
+
+			Possible errors: org.bluez.Error.AlreadyExists
+
+		void UnregisterProvider(object provider)
+
+			This method unregisters provider for D-Bus OOB plug-in.
+
+			Possible errors: org.bluez.Error.DoesNotExist
+
+--------------------------------------------------------------------------------
+
+Service		org.bluez
+Interface	org.bluez.Adapter
+Object path	[variable prefix]/{hci0,hci1,...}
+
+		array{byte} hash, array{byte} randomizer ReadLocalOobData()
+
+			This method reads local OOB data for adapter. Return
+			value is pair of arrays 16 bytes each. Only registered
+			provider should call this method. This method is
+			available only for 2.1 (or higher) adapters.
+
+			Note: This method will generate and return new local
+			OOB data.
+
+			Possible errors: org.bluez.Error.ReadFailed
+					 org.bluez.Error.NoProvider
+					 org.bluez.Error.InProgress
+
+--------------------------------------------------------------------------------
+
+Service		unique name
+Interface	org.bluez.Agent
+Object path	freely definable
+
+Methods		void RequestPairingApproval(object device)
+
+			This method gets called when the service daemon
+			needs to confirm incoming OOB pairing request.
+
+			Possible errors: org.bluez.Error.Rejected
+					 org.bluez.Error.Canceled
+
+
+
 -- 
-1.7.0.4
-
+Szymon Janc
+on behalf of ST-Ericsson
