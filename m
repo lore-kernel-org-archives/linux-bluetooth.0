@@ -1,117 +1,183 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sheldon Demario <sheldon.demario@openbossa.org>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Cc: Sheldon Demario <sheldon.demario@openbossa.org>
-Subject: [PATCH] Implement Characteristic Value Read using UUID in the gatttool
-Date: Thu, 18 Nov 2010 15:55:36 -0500
-Message-Id: <1290113736-9432-1-git-send-email-sheldon.demario@openbossa.org>
+Cc: Johan Hedberg <johan.hedberg@nokia.com>
+Subject: [PATCH 2/2] Bluetooth: Automate remote name requests
+Date: Thu, 18 Nov 2010 22:22:29 +0200
+Message-Id: <1290111749-8968-2-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1290111749-8968-1-git-send-email-johan.hedberg@gmail.com>
+References: <1290111749-8968-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Sub-procedure used to read a Characteristic Value when the client
-only knows the characteristic UUID and doesn't know the handle.
-More than one handle and attribute value pair can be returned,
-it is up to the user define the handles range based on the service
-handles range.
+From: Johan Hedberg <johan.hedberg@nokia.com>
 
-Usage example:
-$gatttool --char-read --uuid=2a00 -i hcix -b xx:xx:xx:xx:xx:xx
+In Bluetooth there are no automatic updates of remote device names when
+they get changed on the remote side. Instead, it is a good idea to do a
+manual name request when a new connection gets created (for whatever
+reason) since at this point it is very cheap (no costly baseband
+connection creation needed just for the sake of the name request).
+
+So far userspace has been responsible for this extra name request but
+tighter control is needed in order not to flood Bluetooth controllers
+with two many commands during connection creation. It has been shown
+that some controllers simply fail to function correctly if they get too
+many (almost) simultaneous commands during connection creation. The
+simplest way to acheive better control of these commands is to move
+their sending completely to the kernel side.
+
+This patch inserts name requests into the sequence of events that the
+kernel performs during connection creation. It does this after the
+remote features have been successfully requested and before any pending
+authentication requests are performed. The code will work sub-optimally
+with userspace versions that still do the name requesting themselves (it
+shouldn't break anything though) so it is recommended to combine this
+with a userspace software version that doesn't have automated name
+requests.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
 ---
- attrib/gatt.c     |   13 ++++++++++++-
- attrib/gatt.h     |    4 ++++
- attrib/gatttool.c |   39 +++++++++++++++++++++++++++++++++++++++
- 3 files changed, 55 insertions(+), 1 deletions(-)
+ net/bluetooth/hci_event.c |   72 +++++++++++++++++++++++++++++++++-----------
+ 1 files changed, 54 insertions(+), 18 deletions(-)
 
-diff --git a/attrib/gatt.c b/attrib/gatt.c
-index 2c87daf..72c6f5f 100644
---- a/attrib/gatt.c
-+++ b/attrib/gatt.c
-@@ -80,7 +80,18 @@ guint gatt_discover_char(GAttrib *attrib, uint16_t start, uint16_t end,
- 
- 	sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
- 
--	plen = enc_read_by_type_req(start, end, &uuid, pdu, sizeof(pdu));
-+	return gatt_read_char_by_uuid(attrib, start, end, &uuid, func,
-+							user_data);
-+}
-+
-+guint gatt_read_char_by_uuid(GAttrib *attrib, uint16_t start, uint16_t end,
-+					uuid_t *uuid, GAttribResultFunc func,
-+							gpointer user_data)
-+{
-+	uint8_t pdu[ATT_DEFAULT_MTU];
-+	guint16 plen;
-+
-+	plen = enc_read_by_type_req(start, end, uuid, pdu, sizeof(pdu));
- 	if (plen == 0)
- 		return 0;
- 
-diff --git a/attrib/gatt.h b/attrib/gatt.h
-index 4e7d88b..1e1e628 100644
---- a/attrib/gatt.h
-+++ b/attrib/gatt.h
-@@ -41,3 +41,7 @@ guint gatt_find_info(GAttrib *attrib, uint16_t start, uint16_t end,
- 
- guint gatt_write_cmd(GAttrib *attrib, uint16_t handle, uint8_t *value, int vlen,
- 				GDestroyNotify notify, gpointer user_data);
-+
-+guint gatt_read_char_by_uuid(GAttrib *attrib, uint16_t start, uint16_t end,
-+				uuid_t *uuid, GAttribResultFunc func,
-+				gpointer user_data);
-diff --git a/attrib/gatttool.c b/attrib/gatttool.c
-index e961431..d0ef6d3 100644
---- a/attrib/gatttool.c
-+++ b/attrib/gatttool.c
-@@ -398,10 +398,49 @@ done:
- 		g_main_loop_quit(event_loop);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 9c6d9bc..4165895 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -677,11 +677,9 @@ static void hci_cs_set_conn_encrypt(struct hci_dev *hdev, __u8 status)
+ 	hci_dev_unlock(hdev);
  }
  
-+static void char_read_by_uuid_cb(guint8 status, const guint8 *pdu,
-+					guint16 plen, gpointer user_data)
-+{
-+	struct att_data_list *list;
-+	int i;
-+
-+	if (status != 0) {
-+		g_printerr("Read characteristics by UUID failed: %s\n",
-+							att_ecode2str(status));
-+		goto done;
-+	}
-+
-+	list = dec_read_by_type_resp(pdu, plen);
-+	if (list == NULL)
-+		goto done;
-+
-+	for (i = 0; i < list->num; i++) {
-+		uint8_t *value = list->data[i];
-+		int j;
-+
-+		g_print("handle: 0x%04x \t value: ", att_get_u16(value));
-+		value += 2;
-+		for (j = 0; j < list->len - 2; j++, value++)
-+			g_print("%02x ", *value);
-+		g_print("\n");
-+	}
-+
-+	att_data_list_free(list);
-+
-+done:
-+	g_main_loop_quit(event_loop);
-+}
-+
- static gboolean characteristics_read(gpointer user_data)
+-static int hci_request_outgoing_auth(struct hci_dev *hdev,
++static int hci_outgoing_auth_needed(struct hci_dev *hdev,
+ 						struct hci_conn *conn)
  {
- 	GAttrib *attrib = user_data;
+-	struct hci_cp_auth_requested cp;
+-
+ 	if (conn->state != BT_CONFIG || !conn->out)
+ 		return 0;
  
-+	if (opt_uuid != NULL) {
-+		gatt_read_char_by_uuid(attrib, opt_start, opt_end, opt_uuid,
-+						char_read_by_uuid_cb, attrib);
-+		return FALSE;
+@@ -694,15 +692,35 @@ static int hci_request_outgoing_auth(struct hci_dev *hdev,
+ 					conn->sec_level != BT_SECURITY_HIGH)
+ 		return 0;
+ 
+-	cp.handle = __cpu_to_le16(conn->handle);
+-	hci_send_cmd(hdev, HCI_OP_AUTH_REQUESTED, sizeof(cp), &cp);
+-
+ 	return 1;
+ }
+ 
+ static void hci_cs_remote_name_req(struct hci_dev *hdev, __u8 status)
+ {
++	struct hci_cp_remote_name_req *cp;
++	struct hci_conn *conn;
++
+ 	BT_DBG("%s status 0x%x", hdev->name, status);
++
++	/* If successful wait for the name req complete event before
++	 * checking for the need to do authentication */
++	if (!status)
++		return;
++
++	cp = hci_sent_cmd_data(hdev, HCI_OP_REMOTE_NAME_REQ);
++	if (!cp)
++		return;
++
++	hci_dev_lock(hdev);
++
++	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &cp->bdaddr);
++	if (conn && hci_outgoing_auth_needed(hdev, conn)) {
++		struct hci_cp_auth_requested cp;
++		cp.handle = __cpu_to_le16(conn->handle);
++		hci_send_cmd(hdev, HCI_OP_AUTH_REQUESTED, sizeof(cp), &cp);
 +	}
 +
- 	if (opt_handle <= 0) {
- 		g_printerr("A valid handle is required\n");
- 		g_main_loop_quit(event_loop);
++	hci_dev_unlock(hdev);
+ }
+ 
+ static void hci_cs_read_remote_features(struct hci_dev *hdev, __u8 status)
+@@ -1113,9 +1131,23 @@ static inline void hci_auth_complete_evt(struct hci_dev *hdev, struct sk_buff *s
+ 
+ static inline void hci_remote_name_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ {
++	struct hci_ev_remote_name *ev = (void *) skb->data;
++	struct hci_conn *conn;
++
+ 	BT_DBG("%s", hdev->name);
+ 
+ 	hci_conn_check_pending(hdev);
++
++	hci_dev_lock(hdev);
++
++	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
++	if (conn && hci_outgoing_auth_needed(hdev, conn)) {
++		struct hci_cp_auth_requested cp;
++		cp.handle = __cpu_to_le16(conn->handle);
++		hci_send_cmd(hdev, HCI_OP_AUTH_REQUESTED, sizeof(cp), &cp);
++	}
++
++	hci_dev_unlock(hdev);
+ }
+ 
+ static inline void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -1179,7 +1211,6 @@ static inline void hci_remote_features_evt(struct hci_dev *hdev, struct sk_buff
+ {
+ 	struct hci_ev_remote_features *ev = (void *) skb->data;
+ 	struct hci_conn *conn;
+-	int auth_requested;
+ 
+ 	BT_DBG("%s status %d", hdev->name, ev->status);
+ 
+@@ -1204,12 +1235,15 @@ static inline void hci_remote_features_evt(struct hci_dev *hdev, struct sk_buff
+ 		goto unlock;
+ 	}
+ 
+-	if (!ev->status)
+-		auth_requested = hci_request_outgoing_auth(hdev, conn);
+-	else
+-		auth_requested = 0;
++	if (!ev->status) {
++		struct hci_cp_remote_name_req cp;
++		memset(&cp, 0, sizeof(cp));
++		bacpy(&cp.bdaddr, &conn->dst);
++		cp.pscan_rep_mode = 0x02;
++		hci_send_cmd(hdev, HCI_OP_REMOTE_NAME_REQ, sizeof(cp), &cp);
++	}
+ 
+-	if (!auth_requested) {
++	if (!hci_outgoing_auth_needed(hdev, conn)) {
+ 		conn->state = BT_CONNECTED;
+ 		hci_proto_connect_cfm(conn, ev->status);
+ 		hci_conn_put(conn);
+@@ -1667,7 +1701,6 @@ static inline void hci_remote_ext_features_evt(struct hci_dev *hdev, struct sk_b
+ {
+ 	struct hci_ev_remote_ext_features *ev = (void *) skb->data;
+ 	struct hci_conn *conn;
+-	int auth_requested;
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
+@@ -1689,12 +1722,15 @@ static inline void hci_remote_ext_features_evt(struct hci_dev *hdev, struct sk_b
+ 	if (conn->state != BT_CONFIG)
+ 		goto unlock;
+ 
+-	if (!ev->status)
+-		auth_requested = hci_request_outgoing_auth(hdev, conn);
+-	else
+-		auth_requested = 0;
++	if (!ev->status) {
++		struct hci_cp_remote_name_req cp;
++		memset(&cp, 0, sizeof(cp));
++		bacpy(&cp.bdaddr, &conn->dst);
++		cp.pscan_rep_mode = 0x02;
++		hci_send_cmd(hdev, HCI_OP_REMOTE_NAME_REQ, sizeof(cp), &cp);
++	}
+ 
+-	if (!auth_requested) {
++	if (!hci_outgoing_auth_needed(hdev, conn)) {
+ 		conn->state = BT_CONNECTED;
+ 		hci_proto_connect_cfm(conn, ev->status);
+ 		hci_conn_put(conn);
 -- 
-1.7.3.2
+1.7.2.3
 
