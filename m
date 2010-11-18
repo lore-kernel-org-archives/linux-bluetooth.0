@@ -1,37 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 18 Nov 2010 16:47:10 +0200
+Date: Thu, 18 Nov 2010 16:45:34 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/6] Add Find By Type Value Response encoding/decoding
- functions
-Message-ID: <20101118144710.GD7811@jh-x301>
+Cc: linux-bluetooth@vger.kernel.org,
+	Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: Re: [PATCH 1/6] Implement Find by Type request encode/decoding
+Message-ID: <20101118144534.GC7811@jh-x301>
 References: <1290017386-23969-1-git-send-email-claudio.takahasi@openbossa.org>
- <1290017386-23969-2-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1290017386-23969-2-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1290017386-23969-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi,
 
 On Wed, Nov 17, 2010, Claudio Takahasi wrote:
-> --- a/attrib/att.h
-> +++ b/attrib/att.h
-> @@ -122,6 +122,11 @@ struct att_data_list {
->  	uint8_t **data;
->  };
->  
-> +struct range {
-> +	uint16_t start;
-> +	uint16_t end;
-> +};
-> +
+> From: Bruna Moreira <bruna.moreira@openbossa.org>
+> 
+> ---
+>  attrib/att.c |   72 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  attrib/att.h |    4 ++-
+>  2 files changed, 73 insertions(+), 3 deletions(-)
 
-Since this is in the public header file it should be prefixed with att_,
-right? (which should also apply for all public symbols here). However,
-it seems like you're only using the struct internally in att.c so
-probably it doesn't even need to be in the public header file?
+Pushed upstream. Thanks.
 
 Johan
