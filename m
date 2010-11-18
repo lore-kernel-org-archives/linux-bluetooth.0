@@ -1,51 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 18 Nov 2010 23:16:13 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Sheldon Demario <sheldon.demario@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Implement Characteristic Value Read using UUID in the
- gatttool
-Message-ID: <20101118211613.GA9786@jh-x301>
-References: <1290113736-9432-1-git-send-email-sheldon.demario@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1290113736-9432-1-git-send-email-sheldon.demario@openbossa.org>
+From: Sheldon Demario <sheldon.demario@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sheldon Demario <sheldon.demario@openbossa.org>
+Subject: [PATCH] Implement Characteristic Value Read using UUID in the gatttool
+Date: Thu, 18 Nov 2010 15:55:36 -0500
+Message-Id: <1290113736-9432-1-git-send-email-sheldon.demario@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sheldon,
+Sub-procedure used to read a Characteristic Value when the client
+only knows the characteristic UUID and doesn't know the handle.
+More than one handle and attribute value pair can be returned,
+it is up to the user define the handles range based on the service
+handles range.
 
-On Thu, Nov 18, 2010, Sheldon Demario wrote:
-> Sub-procedure used to read a Characteristic Value when the client
-> only knows the characteristic UUID and doesn't know the handle.
-> More than one handle and attribute value pair can be returned,
-> it is up to the user define the handles range based on the service
-> handles range.
-> 
-> Usage example:
-> $gatttool --char-read --uuid=2a00 -i hcix -b xx:xx:xx:xx:xx:xx
-> ---
->  attrib/gatt.c     |   13 ++++++++++++-
->  attrib/gatt.h     |    4 ++++
->  attrib/gatttool.c |   39 +++++++++++++++++++++++++++++++++++++++
->  3 files changed, 55 insertions(+), 1 deletions(-)
+Usage example:
+$gatttool --char-read --uuid=2a00 -i hcix -b xx:xx:xx:xx:xx:xx
+---
+ attrib/gatt.c     |   13 ++++++++++++-
+ attrib/gatt.h     |    4 ++++
+ attrib/gatttool.c |   39 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 55 insertions(+), 1 deletions(-)
 
-Doesn't compile:
+diff --git a/attrib/gatt.c b/attrib/gatt.c
+index 2c87daf..72c6f5f 100644
+--- a/attrib/gatt.c
++++ b/attrib/gatt.c
+@@ -80,7 +80,18 @@ guint gatt_discover_char(GAttrib *attrib, uint16_t start, uint16_t end,
+ 
+ 	sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
+ 
+-	plen = enc_read_by_type_req(start, end, &uuid, pdu, sizeof(pdu));
++	return gatt_read_char_by_uuid(attrib, start, end, &uuid, func,
++							user_data);
++}
++
++guint gatt_read_char_by_uuid(GAttrib *attrib, uint16_t start, uint16_t end,
++					uuid_t *uuid, GAttribResultFunc func,
++							gpointer user_data)
++{
++	uint8_t pdu[ATT_DEFAULT_MTU];
++	guint16 plen;
++
++	plen = enc_read_by_type_req(start, end, uuid, pdu, sizeof(pdu));
+ 	if (plen == 0)
+ 		return 0;
+ 
+diff --git a/attrib/gatt.h b/attrib/gatt.h
+index 4e7d88b..1e1e628 100644
+--- a/attrib/gatt.h
++++ b/attrib/gatt.h
+@@ -41,3 +41,7 @@ guint gatt_find_info(GAttrib *attrib, uint16_t start, uint16_t end,
+ 
+ guint gatt_write_cmd(GAttrib *attrib, uint16_t handle, uint8_t *value, int vlen,
+ 				GDestroyNotify notify, gpointer user_data);
++
++guint gatt_read_char_by_uuid(GAttrib *attrib, uint16_t start, uint16_t end,
++				uuid_t *uuid, GAttribResultFunc func,
++				gpointer user_data);
+diff --git a/attrib/gatttool.c b/attrib/gatttool.c
+index e961431..d0ef6d3 100644
+--- a/attrib/gatttool.c
++++ b/attrib/gatttool.c
+@@ -398,10 +398,49 @@ done:
+ 		g_main_loop_quit(event_loop);
+ }
+ 
++static void char_read_by_uuid_cb(guint8 status, const guint8 *pdu,
++					guint16 plen, gpointer user_data)
++{
++	struct att_data_list *list;
++	int i;
++
++	if (status != 0) {
++		g_printerr("Read characteristics by UUID failed: %s\n",
++							att_ecode2str(status));
++		goto done;
++	}
++
++	list = dec_read_by_type_resp(pdu, plen);
++	if (list == NULL)
++		goto done;
++
++	for (i = 0; i < list->num; i++) {
++		uint8_t *value = list->data[i];
++		int j;
++
++		g_print("handle: 0x%04x \t value: ", att_get_u16(value));
++		value += 2;
++		for (j = 0; j < list->len - 2; j++, value++)
++			g_print("%02x ", *value);
++		g_print("\n");
++	}
++
++	att_data_list_free(list);
++
++done:
++	g_main_loop_quit(event_loop);
++}
++
+ static gboolean characteristics_read(gpointer user_data)
+ {
+ 	GAttrib *attrib = user_data;
+ 
++	if (opt_uuid != NULL) {
++		gatt_read_char_by_uuid(attrib, opt_start, opt_end, opt_uuid,
++						char_read_by_uuid_cb, attrib);
++		return FALSE;
++	}
++
+ 	if (opt_handle <= 0) {
+ 		g_printerr("A valid handle is required\n");
+ 		g_main_loop_quit(event_loop);
+-- 
+1.7.3.2
 
-attrib/gatt.c: In function ‘gatt_discover_char’:
-attrib/gatt.c:79: error: unused variable ‘plen’
-attrib/gatt.c:77: error: unused variable ‘pdu’
-make[1]: *** [attrib/gatt.o] Error 1
-
-Always check your patches against ./bootstrap-configure
-
-Furthermore, there's at least one coding style issue:
-
-> +guint gatt_read_char_by_uuid(GAttrib *attrib, uint16_t start, uint16_t end,
-> +					uuid_t *uuid, GAttribResultFunc func,
-> +							gpointer user_data)
-
-The lines after the first one should all have the same indentation, i.e.
-the third one has one tab too much.
-
-Johan
