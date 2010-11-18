@@ -1,125 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH v2 3/6] Implement Find by Type Value Request in the atttribute server
-Date: Thu, 18 Nov 2010 16:02:33 -0200
-Message-Id: <1290103353-26631-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1290017386-23969-3-git-send-email-claudio.takahasi@openbossa.org>
-References: <1290017386-23969-3-git-send-email-claudio.takahasi@openbossa.org>
+Message-ID: <4CE576DB.5090205@gmx.net>
+Date: Thu, 18 Nov 2010 19:56:27 +0100
+From: Andre Kuehne <andre.kuehne@gmx.net>
+MIME-Version: 1.0
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: Apple Wireless Keyboard connection issue
+References: <20101116212701.50060@gmx.net> <20101117013009.GA15855@vigoh> <20101117090534.GA11494@jh-x301> <4CE45F63.7030902@gmx.net> <20101117222751.GA20735@jh-x301> <4CE48602.1000009@gmx.net> <20101118084449.GA29790@jh-x301>
+In-Reply-To: <20101118084449.GA29790@jh-x301>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-GATT Discover Primary Service by Service UUID sub-procedure is based
-on ATT Find By Type Value Request/Response.
+On 11/18/2010 09:44 AM, Johan Hedberg wrote:
+> I was now able to get hold of a Bluetooth keyboard and fixed the issue.
+> The problem was indeed in the commit that Gustavo originally pointed
+> out. It's just that my original patch for it was incomplete and so
+> didn't properly fix the issue. Anyway, a proper fix has now been pushed
+> to git. Please test with that.
 
-Implement an extra verification for broken requests: "Ending Handle"
-different than 0xFFFF. The Group End Handle may be greater than the
-"Ending Handle" in the Find By Type Value Request. Forces the "Ending
-Handle" in the response to 0xFFFF to avoid another request from the
-clients. 0xFFFF means that the sub-procedure is complete.
----
- src/attrib-server.c |   80 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 80 insertions(+), 0 deletions(-)
+Thank you Johan and Gustavo, current git works fine for me.
 
-diff --git a/src/attrib-server.c b/src/attrib-server.c
-index 375b731..41c0ffc 100644
---- a/src/attrib-server.c
-+++ b/src/attrib-server.c
-@@ -383,6 +383,76 @@ static int find_info(uint16_t start, uint16_t end, uint8_t *pdu, int len)
- 	return length;
- }
- 
-+static int find_by_type(uint16_t start, uint16_t end, uuid_t *uuid,
-+			const uint8_t *value, int vlen, uint8_t *opdu, int mtu)
-+{
-+	struct attribute *a;
-+	struct att_range *range;
-+	GSList *l, *matches;
-+	int len;
-+
-+	if (start > end || start == 0x0000)
-+		return enc_error_resp(ATT_OP_FIND_BY_TYPE_REQ, start,
-+					ATT_ECODE_INVALID_HANDLE, opdu, mtu);
-+
-+	/* Searching first requested handle number */
-+	for (l = database, matches = NULL, range = NULL; l; l = l->next) {
-+		a = l->data;
-+
-+		if (a->handle < start)
-+			continue;
-+
-+		if (a->handle > end)
-+			break;
-+
-+		/* Primary service? Attribute value matches? */
-+		if ((sdp_uuid_cmp(&a->uuid, uuid) == 0) && (a->len == vlen) &&
-+					(memcmp(a->data, value, vlen) == 0)) {
-+
-+			range = g_new0(struct att_range, 1);
-+			range->start = a->handle;
-+
-+			matches = g_slist_append(matches, range);
-+		} else if (range) {
-+			/*
-+			 * Update the last found handle or reset the pointer
-+			 * to track that a new group started: Primary or
-+			 * Secondary service.
-+			 */
-+			if (sdp_uuid_cmp(&a->uuid, &prim_uuid) == 0 ||
-+					sdp_uuid_cmp(&a->uuid, &snd_uuid) == 0)
-+				range = NULL;
-+			else
-+				range->end = a->handle;
-+		}
-+	}
-+
-+	if (range) {
-+		if (l == NULL) {
-+			/* Avoids another iteration */
-+			range->end = 0xFFFF;
-+		} else if (range->end == 0) {
-+			/*
-+			 * Broken requests: requested End Handle is not 0xFFFF.
-+			 * Given handle is in the middle of a service definition.
-+			 */
-+			matches = g_slist_remove(matches, range);
-+			g_free(range);
-+		}
-+	}
-+
-+	if (matches == NULL)
-+		return enc_error_resp(ATT_OP_FIND_BY_TYPE_REQ, start,
-+				ATT_ECODE_ATTR_NOT_FOUND, opdu, mtu);
-+
-+	len = enc_find_by_type_resp(matches, opdu, mtu);
-+
-+	g_slist_foreach(matches, (GFunc) g_free, NULL);
-+	g_slist_free(matches);
-+
-+	return len;
-+}
-+
- static int handle_cmp(gconstpointer a, gconstpointer b)
- {
- 	const struct attribute *attrib = a;
-@@ -522,6 +592,16 @@ static void channel_handler(const uint8_t *ipdu, uint16_t len,
- 			write_value(start, value, vlen);
- 		return;
- 	case ATT_OP_FIND_BY_TYPE_REQ:
-+		length = dec_find_by_type_req(ipdu, len, &start, &end,
-+							&uuid, value, &vlen);
-+		if (length == 0) {
-+			status = ATT_ECODE_INVALID_PDU;
-+			goto done;
-+		}
-+
-+		length = find_by_type(start, end, &uuid, value, vlen,
-+							opdu, channel->mtu);
-+		break;
- 	case ATT_OP_READ_BLOB_REQ:
- 	case ATT_OP_READ_MULTI_REQ:
- 	case ATT_OP_PREP_WRITE_REQ:
--- 
-1.7.3.2
-
+Andre
