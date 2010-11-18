@@ -1,43 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
+From: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+To: Keith Mok <ek9852@gmail.com>
+Subject: Re: [PATCH v3] Add iwmmxt optimization for sbc for pxa series cpu
+Date: Thu, 18 Nov 2010 15:05:29 +0200
+Cc: linux-bluetooth@vger.kernel.org
+References: <AANLkTikPiwr+OtsDVbgoya281Zncg0P5Joq_v0UCzZDi@mail.gmail.com> <AANLkTimQR5wMTTEO6KGuv3YvPBaftO-i+96WKYQEOzFU@mail.gmail.com> <201011151308.31972.siarhei.siamashka@gmail.com>
+In-Reply-To: <201011151308.31972.siarhei.siamashka@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20101118123310.GA4101@jh-x301>
-References: <1290009593-13658-1-git-send-email-bruna.moreira@openbossa.org>
-	<20101118123310.GA4101@jh-x301>
-Date: Thu, 18 Nov 2010 09:29:34 -0400
-Message-ID: <AANLkTimGk6B-eDvP3yU3SNN8KNFvqZ_N4vPUXrPQk0ns@mail.gmail.com>
-Subject: Re: [PATCH 1/3] Advertising data: extract local name
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Bruna Moreira <bruna.moreira@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Message-Id: <201011181505.29428.siarhei.siamashka@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+On Monday 15 November 2010 13:08:19 Siarhei Siamashka wrote:
+> On Monday 15 November 2010 04:46:25 Keith Mok wrote:
+> > > I sometimes use different indentation levels in such cases in order to
+> > > improve readability after instructions reordering, so that each
+> > > logically independent block of code has its own indentation level and
+> > > it is still easily visible
+> > 
+> > > after instructions reordering. For example, with the original code:
+> > Thanks for the hints. I rearranged the code.
+> 
+> Thanks, now the assembly code looks ok to me. I also discovered that qemu
+> supports iwmmxt1 emulation just fine and also tried to test your
+> optimizations for correctness myself (with a script which tries different
+> encoding paramaters for different audio samples and checks md5 checksums),
+> no problems detected.
+> 
+> So if somebody else could check whether the other things are right
+> (copyright notices for example), then we are done with it.
 
-On Thu, Nov 18, 2010 at 8:33 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Variables should be always declared in the smallest possible scope, so
-> your new type variable is in the wrong place (it should be declared
-> inside the if-statement. Since this was the only issue I found with this
-> patch I fixed it myself and pushed it upstream. Btw, is it really safe
-> to ignore the type here? What if it's EIR_NAME_SHORT? Wouldn't you then
-> want to perform full name discovery using e.g. the GAP GATT service
-> later?
+As nobody else has stepped in, I guess it's still my responsibility to provide
+some further guidance even though I'm a very infrequent contributor myself.
+Hopefully somebody will correct me if I'm wrong.
 
-The idea is to populate dev->name with some temporary information
-available on the advertising data, and later when GATT service
-discovery happens (as part of device creation), we get the definitive
-name. At the moment, the GATT service discovery is not happening
-automatically (but Claudio's patches are a beginning of that, IIRC),
-so the advertising information is the only name source for LE devices,
-currently.
+So please
 
-Of course, we need to make sure that once name resolution through GATT
-service discovery is done, any future names in advertising data would
-be ignored, but we have not implemented this yet.
+1. Make a final patch in such a form that can be pushed to git repository 
+without any modifications, it means that you need a clean commit message and 
+not just some text intermixed with the parts and quotations of discussion from
+this mailing list.
+2. "Signed-off-by" header is not needed for the userspace parts of bluez.
+3. All files must have copyright notices, even a small one like 
+'sbc_primitives_iwmmxt.h'. And probably you should just replicate all the
+copyright notices from the source files with sbc mmx optimizations and add your
+own copyright on top.
 
-Regards,
+Hopefully that should be enough to get your optimizations applied. Thanks.
+
 -- 
-Anderson Lizardo
-OpenBossa Labs - INdT
-Manaus - Brazil
+Best regards,
+Siarhei Siamashka
