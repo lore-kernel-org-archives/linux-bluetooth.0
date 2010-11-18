@@ -1,118 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Johan Hedberg <johan.hedberg@nokia.com>
-Subject: [PATCH 1/2] Bluetooth: Create a unified authentication request function
-Date: Thu, 18 Nov 2010 22:22:28 +0200
-Message-Id: <1290111749-8968-1-git-send-email-johan.hedberg@gmail.com>
+Date: Thu, 18 Nov 2010 22:01:40 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 2/6] Add Find By Type Value Response
+ encoding/decoding functions
+Message-ID: <20101118200140.GA8260@jh-x301>
+References: <AANLkTikKFkhyjCQi4PzWbn4Y6kt3kqhNgvyUv4zNKxAQ@mail.gmail.com>
+ <1290102524-26493-1-git-send-email-claudio.takahasi@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1290102524-26493-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@nokia.com>
+Hi Claudio,
 
-This patch adds a single function that's responsible for requesting
-authentication for outgoing connections. This is preparation for the
-next patch which will add automated name requests and thereby move the
-authentication requests to a different location.
+On Thu, Nov 18, 2010, Claudio Takahasi wrote:
+> Find by type operation is used by Discover Primary Service by Service
+> UUID. Find By Type Value Response shall contain one or more group handles.
+> ---
+>  attrib/att.c |   46 ++++++++++++++++++++++++++++++++++++++++++++++
+>  attrib/att.h |    7 +++++++
+>  2 files changed, 53 insertions(+), 0 deletions(-)
 
-Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
----
- net/bluetooth/hci_event.c |   54 +++++++++++++++++++++++++++++++++-----------
- 1 files changed, 40 insertions(+), 14 deletions(-)
+Thanks for the update. This and the rest of your patches have been
+pushed upstream.
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 8430276..9c6d9bc 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -677,6 +677,29 @@ static void hci_cs_set_conn_encrypt(struct hci_dev *hdev, __u8 status)
- 	hci_dev_unlock(hdev);
- }
- 
-+static int hci_request_outgoing_auth(struct hci_dev *hdev,
-+						struct hci_conn *conn)
-+{
-+	struct hci_cp_auth_requested cp;
-+
-+	if (conn->state != BT_CONFIG || !conn->out)
-+		return 0;
-+
-+	if (conn->sec_level == BT_SECURITY_SDP)
-+		return 0;
-+
-+	/* Only request authentication for SSP connections or non-SSP
-+	 * devices with sec_level HIGH */
-+	if (!(hdev->ssp_mode > 0 && conn->ssp_mode > 0) &&
-+					conn->sec_level != BT_SECURITY_HIGH)
-+		return 0;
-+
-+	cp.handle = __cpu_to_le16(conn->handle);
-+	hci_send_cmd(hdev, HCI_OP_AUTH_REQUESTED, sizeof(cp), &cp);
-+
-+	return 1;
-+}
-+
- static void hci_cs_remote_name_req(struct hci_dev *hdev, __u8 status)
- {
- 	BT_DBG("%s status 0x%x", hdev->name, status);
-@@ -1156,6 +1179,7 @@ static inline void hci_remote_features_evt(struct hci_dev *hdev, struct sk_buff
- {
- 	struct hci_ev_remote_features *ev = (void *) skb->data;
- 	struct hci_conn *conn;
-+	int auth_requested;
- 
- 	BT_DBG("%s status %d", hdev->name, ev->status);
- 
-@@ -1177,12 +1201,15 @@ static inline void hci_remote_features_evt(struct hci_dev *hdev, struct sk_buff
- 		cp.page = 0x01;
- 		hci_send_cmd(hdev, HCI_OP_READ_REMOTE_EXT_FEATURES,
- 							sizeof(cp), &cp);
--	} else if (!ev->status && conn->out &&
--			conn->sec_level == BT_SECURITY_HIGH) {
--		struct hci_cp_auth_requested cp;
--		cp.handle = ev->handle;
--		hci_send_cmd(hdev, HCI_OP_AUTH_REQUESTED, sizeof(cp), &cp);
--	} else {
-+		goto unlock;
-+	}
-+
-+	if (!ev->status)
-+		auth_requested = hci_request_outgoing_auth(hdev, conn);
-+	else
-+		auth_requested = 0;
-+
-+	if (!auth_requested) {
- 		conn->state = BT_CONNECTED;
- 		hci_proto_connect_cfm(conn, ev->status);
- 		hci_conn_put(conn);
-@@ -1640,6 +1667,7 @@ static inline void hci_remote_ext_features_evt(struct hci_dev *hdev, struct sk_b
- {
- 	struct hci_ev_remote_ext_features *ev = (void *) skb->data;
- 	struct hci_conn *conn;
-+	int auth_requested;
- 
- 	BT_DBG("%s", hdev->name);
- 
-@@ -1661,14 +1689,12 @@ static inline void hci_remote_ext_features_evt(struct hci_dev *hdev, struct sk_b
- 	if (conn->state != BT_CONFIG)
- 		goto unlock;
- 
--	if (!ev->status && hdev->ssp_mode > 0 &&
--			conn->ssp_mode > 0 && conn->out &&
--			conn->sec_level != BT_SECURITY_SDP) {
--		struct hci_cp_auth_requested cp;
--		cp.handle = ev->handle;
--		hci_send_cmd(hdev, HCI_OP_AUTH_REQUESTED,
--				sizeof(cp), &cp);
--	} else {
-+	if (!ev->status)
-+		auth_requested = hci_request_outgoing_auth(hdev, conn);
-+	else
-+		auth_requested = 0;
-+
-+	if (!auth_requested) {
- 		conn->state = BT_CONNECTED;
- 		hci_proto_connect_cfm(conn, ev->status);
- 		hci_conn_put(conn);
--- 
-1.7.2.3
-
+Johan
