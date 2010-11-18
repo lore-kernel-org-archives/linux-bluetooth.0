@@ -1,48 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Santiago Carot-Nemesio <sancane@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: =?UTF-8?q?Pull=20request=20git=3A//gitorious=2Eorg/bluez-mcap-hdp/mcap-hdp=2Egit=20for=5Fupstream?=
-Date: Thu, 18 Nov 2010 15:53:34 +0100
-Message-Id: <1290092014-32574-1-git-send-email-sancane@gmail.com>
+Date: Thu, 18 Nov 2010 16:47:10 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/6] Add Find By Type Value Response encoding/decoding
+ functions
+Message-ID: <20101118144710.GD7811@jh-x301>
+References: <1290017386-23969-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1290017386-23969-2-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1290017386-23969-2-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-  Fix typos in adapter documentation (2010-11-16 13:39:43 +0000)
+Hi Claudio,
 
-are available in the git repository at:
-  git://gitorious.org/bluez-mcap-hdp/mcap-hdp.git for_upstream
+On Wed, Nov 17, 2010, Claudio Takahasi wrote:
+> --- a/attrib/att.h
+> +++ b/attrib/att.h
+> @@ -122,6 +122,11 @@ struct att_data_list {
+>  	uint8_t **data;
+>  };
+>  
+> +struct range {
+> +	uint16_t start;
+> +	uint16_t end;
+> +};
+> +
 
-José Antonio Santos Cadenas (9):
-      Add reference counter to hdp_application
-      Add reference counter to hdp_channel
-      Notify a channel deleted when remote side has already deleted it
-      Fix typos in mcap
-      Set reference counter for mcls to gint
-      Fix message error
-      Remove magic number to check ECHO MDEPs in HDP
-      Fixes to echo
-      Check if the mcl insiede the device is correctly set before use it
+Since this is in the public header file it should be prefixed with att_,
+right? (which should also apply for all public symbols here). However,
+it seems like you're only using the struct internally in att.c so
+probably it doesn't even need to be in the public header file?
 
-Santiago Carot-Nemesio (10):
-      Add reference counter to hdp_device
-      Remove MCL's before removing the application
-      Add missed unrefs for hdp_tmp_dc_data
-      Add reference counter to mcap_instances
-      Add reference counter to mcap_mdl
-      Remove old reference to mcap session in the name of variables
-      Code refactorization in MCAP
-      Fix dereference to NULL pointers during data channels creation
-      Return proper response code if there is an error creating echo channel
-      Check if MCAP Instance is already released when a callbacks comes back.
-
- health/hdp.c           |  266 ++++++++++++++++++++++++++++++++----------------
- health/hdp_types.h     |    4 +
- health/hdp_util.c      |   55 ++++++++++-
- health/hdp_util.h      |    8 ++
- health/mcap.c          |  242 +++++++++++++++++++++++++------------------
- health/mcap_internal.h |    9 +-
- health/mcap_lib.h      |   13 ++-
- health/mcap_sync.c     |   22 ++--
- 8 files changed, 407 insertions(+), 212 deletions(-)
+Johan
