@@ -2,171 +2,124 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH v2 6/6] Implement Discover Primary Service by Service UUID in the gatttool
-Date: Thu, 18 Nov 2010 16:07:34 -0200
-Message-Id: <1290103654-26788-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1290017386-23969-6-git-send-email-claudio.takahasi@openbossa.org>
-References: <1290017386-23969-6-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH v2 3/6] Implement Find by Type Value Request in the atttribute server
+Date: Thu, 18 Nov 2010 16:02:33 -0200
+Message-Id: <1290103353-26631-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1290017386-23969-3-git-send-email-claudio.takahasi@openbossa.org>
+References: <1290017386-23969-3-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Implement only the first interaction of the discovery procedure. If the
-response doesn't fit in the MTU, "start" and "end" options can be used
-to discover the handles ranges of the remaining primary service instances.
-UUID16 and UUID128 are supported in the uuid option.
+GATT Discover Primary Service by Service UUID sub-procedure is based
+on ATT Find By Type Value Request/Response.
 
-Usage example:
-$gatttool -i hcix -b xx:xx:xx:xx:xx:xx --uuid=1801 --primary
+Implement an extra verification for broken requests: "Ending Handle"
+different than 0xFFFF. The Group End Handle may be greater than the
+"Ending Handle" in the Find By Type Value Request. Forces the "Ending
+Handle" in the response to 0xFFFF to avoid another request from the
+clients. 0xFFFF means that the sub-procedure is complete.
 ---
- Makefile.am       |    3 +-
- attrib/gatttool.c |   65 ++++++++++++++++++++++++++++++++++++++++++++++++----
- 2 files changed, 62 insertions(+), 6 deletions(-)
+ src/attrib-server.c |   80 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 80 insertions(+), 0 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index 03a9bf2..5f96975 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -178,7 +178,8 @@ if ATTRIBPLUGIN
- bin_PROGRAMS += attrib/gatttool
- 
- attrib_gatttool_SOURCES = attrib/gatttool.c attrib/att.c attrib/gatt.c \
--			  attrib/gattrib.c btio/btio.c
-+			  attrib/gattrib.c btio/btio.c \
-+			  src/glib-helper.h src/glib-helper.c
- attrib_gatttool_LDADD = lib/libbluetooth.la @GLIB_LIBS@
- 
- builtin_modules += attrib
-diff --git a/attrib/gatttool.c b/attrib/gatttool.c
-index 1a74edd..e961431 100644
---- a/attrib/gatttool.c
-+++ b/attrib/gatttool.c
-@@ -41,6 +41,7 @@
- #include "att.h"
- #include "btio.h"
- #include "gattrib.h"
-+#include "glib-helper.h"
- #include "gatt.h"
- 
- /* Minimum MTU for L2CAP connections over BR/EDR */
-@@ -50,6 +51,7 @@ static gchar *opt_src = NULL;
- static gchar *opt_dst = NULL;
- static gchar *opt_value = NULL;
- static gchar *opt_sec_level = "low";
-+static uuid_t *opt_uuid = NULL;
- static int opt_start = 0x0001;
- static int opt_end = 0xffff;
- static int opt_handle = -1;
-@@ -144,7 +146,7 @@ static GIOChannel *do_connect(gboolean le)
- 	return chan;
+diff --git a/src/attrib-server.c b/src/attrib-server.c
+index 375b731..41c0ffc 100644
+--- a/src/attrib-server.c
++++ b/src/attrib-server.c
+@@ -383,6 +383,76 @@ static int find_info(uint16_t start, uint16_t end, uint8_t *pdu, int len)
+ 	return length;
  }
  
--static void primary_cb(guint8 status, const guint8 *pdu, guint16 plen,
-+static void primary_all_cb(guint8 status, const guint8 *pdu, guint16 plen,
- 							gpointer user_data)
- {
- 	GAttrib *attrib = user_data;
-@@ -200,9 +202,9 @@ static void primary_cb(guint8 status, const guint8 *pdu, guint16 plen,
- 	 * Read by Group Type Request until Error Response is received and
- 	 * the Error Code is set to Attribute Not Found.
- 	 */
--	gatt_discover_primary(attrib, end + 1, opt_end, NULL, primary_cb,
--								attrib);
- 
-+	gatt_discover_primary(attrib, end + 1, opt_end, NULL, primary_all_cb,
-+								attrib);
- 	return;
- 
- done:
-@@ -210,6 +212,36 @@ done:
- 		g_main_loop_quit(event_loop);
- }
- 
-+static void primary_by_uuid_cb(guint8 status, const guint8 *pdu, guint16 plen,
-+							gpointer user_data)
++static int find_by_type(uint16_t start, uint16_t end, uuid_t *uuid,
++			const uint8_t *value, int vlen, uint8_t *opdu, int mtu)
 +{
-+	GSList *ranges, *l;
++	struct attribute *a;
++	struct att_range *range;
++	GSList *l, *matches;
++	int len;
 +
-+	if (status != 0) {
-+		g_printerr("Discover primary services by UUID failed: %s\n",
-+							att_ecode2str(status));
-+		goto done;
++	if (start > end || start == 0x0000)
++		return enc_error_resp(ATT_OP_FIND_BY_TYPE_REQ, start,
++					ATT_ECODE_INVALID_HANDLE, opdu, mtu);
++
++	/* Searching first requested handle number */
++	for (l = database, matches = NULL, range = NULL; l; l = l->next) {
++		a = l->data;
++
++		if (a->handle < start)
++			continue;
++
++		if (a->handle > end)
++			break;
++
++		/* Primary service? Attribute value matches? */
++		if ((sdp_uuid_cmp(&a->uuid, uuid) == 0) && (a->len == vlen) &&
++					(memcmp(a->data, value, vlen) == 0)) {
++
++			range = g_new0(struct att_range, 1);
++			range->start = a->handle;
++
++			matches = g_slist_append(matches, range);
++		} else if (range) {
++			/*
++			 * Update the last found handle or reset the pointer
++			 * to track that a new group started: Primary or
++			 * Secondary service.
++			 */
++			if (sdp_uuid_cmp(&a->uuid, &prim_uuid) == 0 ||
++					sdp_uuid_cmp(&a->uuid, &snd_uuid) == 0)
++				range = NULL;
++			else
++				range->end = a->handle;
++		}
 +	}
 +
-+	ranges = dec_find_by_type_resp(pdu, plen);
-+	if (ranges == NULL) {
-+		g_printerr("Protocol error!\n");
-+		goto done;
++	if (range) {
++		if (l == NULL) {
++			/* Avoids another iteration */
++			range->end = 0xFFFF;
++		} else if (range->end == 0) {
++			/*
++			 * Broken requests: requested End Handle is not 0xFFFF.
++			 * Given handle is in the middle of a service definition.
++			 */
++			matches = g_slist_remove(matches, range);
++			g_free(range);
++		}
 +	}
 +
-+	for (l = ranges; l; l = l->next) {
-+		struct att_range *range = l->data;
-+		g_print("Starting handle: %04x Ending handle: %04x\n",
-+						range->start, range->end);
-+	}
++	if (matches == NULL)
++		return enc_error_resp(ATT_OP_FIND_BY_TYPE_REQ, start,
++				ATT_ECODE_ATTR_NOT_FOUND, opdu, mtu);
 +
-+	g_slist_foreach(ranges, (GFunc) g_free, NULL);
-+	g_slist_free(ranges);
++	len = enc_find_by_type_resp(matches, opdu, mtu);
 +
-+done:
-+	g_main_loop_quit(event_loop);
++	g_slist_foreach(matches, (GFunc) g_free, NULL);
++	g_slist_free(matches);
++
++	return len;
 +}
 +
- static void events_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
+ static int handle_cmp(gconstpointer a, gconstpointer b)
  {
- 	GAttrib *attrib = user_data;
-@@ -260,8 +292,12 @@ static gboolean primary(gpointer user_data)
- {
- 	GAttrib *attrib = user_data;
- 
--	gatt_discover_primary(attrib, opt_start, opt_end, NULL, primary_cb,
--								attrib);
-+	if (opt_uuid)
-+		gatt_discover_primary(attrib, opt_start, opt_end, opt_uuid,
-+						primary_by_uuid_cb, attrib);
-+	else
-+		gatt_discover_primary(attrib, opt_start, opt_end, NULL,
-+						primary_all_cb, attrib);
- 
- 	return FALSE;
- }
-@@ -486,11 +522,29 @@ static gboolean characteristics_desc(gpointer user_data)
- 	return FALSE;
- }
- 
-+static gboolean parse_uuid(const char *key, const char *value,
-+				gpointer user_data, GError **error)
-+{
-+	if (!value)
-+		return FALSE;
+ 	const struct attribute *attrib = a;
+@@ -522,6 +592,16 @@ static void channel_handler(const uint8_t *ipdu, uint16_t len,
+ 			write_value(start, value, vlen);
+ 		return;
+ 	case ATT_OP_FIND_BY_TYPE_REQ:
++		length = dec_find_by_type_req(ipdu, len, &start, &end,
++							&uuid, value, &vlen);
++		if (length == 0) {
++			status = ATT_ECODE_INVALID_PDU;
++			goto done;
++		}
 +
-+	opt_uuid = g_try_malloc(sizeof(uuid_t));
-+	if (opt_uuid == NULL)
-+		return FALSE;
-+
-+	if (bt_string2uuid(opt_uuid, value) < 0)
-+		return FALSE;
-+
-+	return TRUE;
-+}
-+
- static GOptionEntry primary_char_options[] = {
- 	{ "start", 's' , 0, G_OPTION_ARG_INT, &opt_start,
- 		"Starting handle(optional)", "0x0001" },
- 	{ "end", 'e' , 0, G_OPTION_ARG_INT, &opt_end,
- 		"Ending handle(optional)", "0xffff" },
-+	{ "uuid", 'u', G_OPTION_FLAG_OPTIONAL_ARG, G_OPTION_ARG_CALLBACK,
-+		parse_uuid, "UUID16 or UUID128(optional)", "0x1801"},
- 	{ NULL },
- };
- 
-@@ -621,6 +675,7 @@ done:
- 	g_option_context_free(context);
- 	g_free(opt_src);
- 	g_free(opt_dst);
-+	g_free(opt_uuid);
- 
- 	if (got_error)
- 		exit(EXIT_FAILURE);
++		length = find_by_type(start, end, &uuid, value, vlen,
++							opdu, channel->mtu);
++		break;
+ 	case ATT_OP_READ_BLOB_REQ:
+ 	case ATT_OP_READ_MULTI_REQ:
+ 	case ATT_OP_PREP_WRITE_REQ:
 -- 
 1.7.3.2
 
