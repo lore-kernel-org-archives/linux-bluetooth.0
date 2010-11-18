@@ -1,89 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4CE48602.1000009@gmx.net>
+Date: Thu, 18 Nov 2010 02:48:50 +0100
+From: Andre Kuehne <andre.kuehne@gmx.net>
 MIME-Version: 1.0
-In-Reply-To: <20101117165248.GB21729@vigoh>
-References: <1289394446-14021-1-git-send-email-pavan_savoy@ti.com>
-	<20101116225418.GA15101@vigoh>
-	<AANLkTi=TxKKxjLdK-6Jwu9oBCiGHXJ8UxrAQH+C82wNK@mail.gmail.com>
-	<AANLkTi=NH8gbW8iCKOQN0bmbL=nqewsZkUik+VkvWUgi@mail.gmail.com>
-	<20101117165248.GB21729@vigoh>
-Date: Thu, 18 Nov 2010 10:48:50 +0530
-Message-ID: <AANLkTi=W1+ZFSDLDyt_+4NMbaaJikr25NkPtT9iYDv_H@mail.gmail.com>
-Subject: Re: [PATCH v5] Bluetooth: btwilink driver
-From: Pavan Savoy <pavan_savoy@sify.com>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: Vitaly Wool <vitalywool@gmail.com>, marcel@holtmann.org,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: Apple Wireless Keyboard connection issue
+References: <20101116212701.50060@gmx.net> <20101117013009.GA15855@vigoh> <20101117090534.GA11494@jh-x301> <4CE45F63.7030902@gmx.net> <20101117222751.GA20735@jh-x301>
+In-Reply-To: <20101117222751.GA20735@jh-x301>
+Content-Type: multipart/mixed;
+ boundary="------------050109060402080401040809"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Nov 17, 2010 at 10:22 PM, Gustavo F. Padovan
-<padovan@profusion.mobi> wrote:
-> Hi Pavan,
+This is a multi-part message in MIME format.
+--------------050109060402080401040809
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 8bit
+
+On 11/17/2010 11:27 PM, Johan Hedberg wrote:
+> Hi,
 >
-> * Pavan Savoy <pavan_savoy@sify.com> [2010-11-17 11:13:26 +0530]:
+> On Thu, Nov 18, 2010, Andre Kuehne wrote:
+>> On 11/17/2010 10:05 AM, Johan Hedberg wrote:
+>>> On Tue, Nov 16, 2010, Gustavo F. Padovan wrote:
+>>>> * "André Kühne"<andre.kuehne@gmx.net>   [2010-11-16 22:27:01 +0100]:
+>>>>> I noticed the following on my system: After upgrading to bluez-4.79
+>>>>> connecting my Apple Wireless Keyboard does not work anymore. With
+>>>>> bluez-4.77 the connection works just fine.
+>>>>
+>>>> My Microsoft keyboard is not working too. That is probably due to commit
+>>>> abe7cd44124a from Johan. It should be fixed soon.
+>>>
+>>> The only real difference that patch makes is the reuse of the HCI socket
+>>> inside hciops.c. Maybe that screws up the event filters somehow or
+>>> something similar. I don't have a keyboard to verify a fix, but could
+>>> you try the attached patch and see if it helps?
+>>>
+>> I installed
+>>
+>>    http://www.kernel.org/pub/linux/bluetooth/bluez-4.79.tar.gz + hciops_encrypt.patch
+>>
+>> but the patch does not work for me. For verification I downloaded
+>>
+>>    http://www.kernel.org/pub/linux/bluetooth/bluez-4.77.tar.gz
+>>
+>> and compiled/installed it the same way (without the patch) and the connection works.
+>>
+>> I did the same using bluez-4.78 with the result that both my keyboard and mouse failed to connect.
 >
->> On Wed, Nov 17, 2010 at 4:50 AM, Vitaly Wool <vitalywool@gmail.com> wrot=
-e:
->> >>> + =C2=A0 =C2=A0 /* Registration with ST layer is successful,
->> >>> + =C2=A0 =C2=A0 =C2=A0* hardware is ready to accept commands from HC=
-I core.
->> >>> + =C2=A0 =C2=A0 =C2=A0*/
->> >>> + =C2=A0 =C2=A0 if (test_and_set_bit(HCI_RUNNING, &hdev->flags)) {
->> >>> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 clear_bit(HCI_RUNNING, &=
-hdev->flags);
->> >>> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 err =3D st_unregister(ST=
-_BT);
->> >>> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (err)
->> >>> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 BT_ERR("st_unregister() failed with error %d", err);
->> >>> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 hst->st_write =3D NULL;
->> >>> + =C2=A0 =C2=A0 }
->> >>
->> >>
->> >> What are you trying to do here? test_and_set_bit() result doesn't say
->> >> nothing about error and you shall put test_and_set_bit should be in t=
-he
->> >> beginning, to know if your device is already opened or not and then
->> >> clear_bit if some error ocurrs during the function.
->> >>
->> >
->> > Yeap, this piece of code beats me is well. Why is it an error if this
->> > bit wasn't already set?
->>
->> Vitaly, Gustavo,
->>
->> I suppose I never understood HCI_RUNNING flag that way, as in an error
->> check mechanism to avoid multiple hci0 ups.
->>
->> What I understood was that HCI_RUNNING suggested as to when hci0 was
->> ready to be used. With this understanding, I wanted to make sure I
->> downloaded the firmware for the chip before I proclaim to the world
->> that the hci0 is ready to be used, as in HCI_RUNNING.
->>
->> For example, I didn't want my _send_frame to be called before I did
->> the firmware download - since firmware download takes time - 45kb
->> send/wait commands :(
->>
->> But I suppose I now understand - What I would rather do is test_bit in
->> the beginning of function and do a set_bit at the end of function -
->> does this make sense ?
+> Ok, so then it seems like abe7cd44124a might not be to blame. Could you
+> do a proper git bisect so we can figure out exactly at which point this
+> broke. abe7cd44124a is really the only commit touching HID code since
+> 4.77 so this is starting to get a bit strange.
 >
-> It does, but does it as test_and_set and then clear if error as we do in
-> other drivers.
-
-Ok, I understand, will do it this way.
-However, still I am not too convinced - I honestly don't want to set
-HCI_RUNNING before firmware download required for WiLink happens - and
-this happens inside the st_register function here.
-
-So the question again, How can I ensure _send_frame is not called when
-firmware download is in progress - one of the major reasons why I
-delayed the setting of HCI_RUNNING.
-
-As mentioned before I will go ahead and create the patch - But would
-still like to have an answer to this.
-
-
-> Gustavo F. Padovan
-> http://profusion.mobi
+> Johan
 >
+Please find attached my bisect results.
+
+Best regards
+Andre
+
+--------------050109060402080401040809
+Content-Type: text/plain;
+ name="bluez-bisect.txt"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="bluez-bisect.txt"
+
+> git bisect good
+a352058752e541539b09e55124d411a534cc14af is the first bad commit
+commit a352058752e541539b09e55124d411a534cc14af
+Author: Johan Hedberg <johan.hedberg@nokia.com>
+Date:   Thu Nov 4 04:38:35 2010 +0200
+
+    Cache adapter address for quick lookup
+
+:040000 040000 b7b14eb9f69c0b74ebda87b2fa40a4574f08be44 b96739e2d58fcc5a5c6654431ba49a36ee623932 M	plugins
+
+> git bisect log
+git bisect start
+# good: [b079cca768419d11e011cc5a7d59bc802226e633] Release 4.77
+git bisect good b079cca768419d11e011cc5a7d59bc802226e633
+# bad: [018c5b71748c178dcd2ffb0164c1d975788a2acc] Release 4.78
+git bisect bad 018c5b71748c178dcd2ffb0164c1d975788a2acc
+# good: [d5d0fa3be8f7a20d128dcbaf8fc529c38bc52395] Optimize device disconnect callback processing
+git bisect good d5d0fa3be8f7a20d128dcbaf8fc529c38bc52395
+# good: [b67a8a42e6ea9c2d2b0877ac3832de75ec4e00e5] Fix bdaddr naming consistency
+git bisect good b67a8a42e6ea9c2d2b0877ac3832de75ec4e00e5
+# bad: [5295b6a0ab0ad67a27926273a3fbf61f02663219] Fix not ignoring case of uuid given to RegisterEndpoint
+git bisect bad 5295b6a0ab0ad67a27926273a3fbf61f02663219
+# good: [db5266f0afedc33e2fd6fc3601c16498865f746d] Remove redundant tracking of ignored adapters
+git bisect good db5266f0afedc33e2fd6fc3601c16498865f746d
+# bad: [a352058752e541539b09e55124d411a534cc14af] Cache adapter address for quick lookup
+git bisect bad a352058752e541539b09e55124d411a534cc14af
+# good: [b289e54d53c332a51be483c1660a42c267991dd3] Remove redundant hci_devinfo call
+git bisect good b289e54d53c332a51be483c1660a42c267991dd3
+
+--------------050109060402080401040809--
