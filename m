@@ -1,154 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Wade Brown <BrownW@us.panasonic.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Fri, 19 Nov 2010 11:26:30 -0800
-Subject: RE: [PATCH] Add command line option to change BCSP rate
-Message-ID: <6EBC2ED6C3CFDC428167C1FF4764F0710A96D8BEB33E@SJEXBEC1.research.us.panasonic.com>
-References: <6EBC2ED6C3CFDC428167C1FF4764F0710A96D8BE9A1A@SJEXBEC1.research.us.panasonic.com>,<20101119152346.GA28815@jh-x301>
-In-Reply-To: <20101119152346.GA28815@jh-x301>
-Content-Type: multipart/mixed;
-	boundary="_002_6EBC2ED6C3CFDC428167C1FF4764F0710A96D8BEB33ESJEXBEC1res_"
+Date: Fri, 19 Nov 2010 18:50:00 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Pull request
+ git://gitorious.org/~vudentz/bluez/vudentzs-clone.git for-upstream
+Message-ID: <20101119165000.GA1103@jh-x301>
+References: <AANLkTimQB+-odX2Yw+gxrdd2SBajxZ3nswtffW+L-g9_@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <AANLkTimQB+-odX2Yw+gxrdd2SBajxZ3nswtffW+L-g9_@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---_002_6EBC2ED6C3CFDC428167C1FF4764F0710A96D8BEB33ESJEXBEC1res_
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Hi Luiz,
 
-Johan,
+On Fri, Nov 19, 2010, Luiz Augusto von Dentz wrote:
+> Those changes fixes several issues when doing a Device.Disconnect
+> while some audio profile is still connecting. I did some cleanups to
+> make it easier to track references and reuse more code, and also did a
+> lot o testing to make sure it doesn't cause any regression for cases
+> where the client is using Media API or unix socket.
+> 
+> The following changes since commit 55685d2037d33ed29ed7365150fd14b5326690fb:
+> 
+>   Fix minor typo (2010-11-19 17:39:15 +0200)
+> 
+> are available in the git repository at:
+>   git://gitorious.org/~vudentz/bluez/vudentzs-clone.git for-upstream
+> 
+> Luiz Augusto von Dentz (9):
+>       Cleanup a2dp setup code
+>       Cleanup a2dp_cancel code
+>       Fix not removing all timers when user request to disconnect audio
+>       Fix abort not being send when the state is idle
+>       Fix reference count of a2dp stream setup
+>       Add debug logs for state changes on sink
+>       Fix possible crashes when attempting to connect avdtp
+>       Fix not dropping avdtp session reference when cancelling stream setup
+>       Fix not indicating disconnected state when connecting to avdtp
+> 
+>  audio/a2dp.c   |  258 +++++++++++++++++++++++++------------------------------
+>  audio/avdtp.c  |   26 +++---
+>  audio/device.c |   36 ++++----
+>  audio/sink.c   |   13 +++
+>  4 files changed, 163 insertions(+), 170 deletions(-)
 
-Sorry about that, I seem to be a bit behind the times.  My git version is m=
-issing that feature, and evolution as a mail client seems to love attaching=
- other bits.  If this fails I'll work on updating my system and mail client=
-s.
-
-
---
-Wade Brown
-________________________________________
-From: Johan Hedberg [johan.hedberg@gmail.com]
-Sent: Friday, November 19, 2010 7:23 AM
-To: Wade Brown
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Add command line option to change BCSP rate
-
-Hi,
-
-On Thu, Nov 18, 2010, Wade Brown wrote:
-> Currently when using bccmd to do any communication, the UART is always
-> opened at 38.4kbps.  Once the CSR has been initialized to any other
-> speed, bccmd can no longer communicate with with the radio (unless by
-> resetting it through rfkill).  This patch adds a -b option allowing a
-> user to manually set a different speed, with the default 38400 still in
-> place.
->
-> Usage example:
-> $bccmd -t BCSP -b 921600 -d /dev/ttyHS1 chiprev
->
-> ---
->  tools/bccmd.c    |   45 ++++++++++++++++++++++++++++++++++++++++-----
->  tools/csr.h      |    3 ++-
->  tools/csr_bcsp.c |    4 ++--
->  3 files changed, 44 insertions(+), 8 deletions(-)
-
-The patch seems fine to me but I can't figure out how to apply it either
-due to your mail client or your mail server. It's not sent inline and
-the attachment isn't a complete git patch as such. Additionally there's
-some strange winmail.dat attachment in the mail. Could you try resending
-e.g. using git send-email?
+Thanks! The patches have been pushed upstream.
 
 Johan
-
---_002_6EBC2ED6C3CFDC428167C1FF4764F0710A96D8BEB33ESJEXBEC1res_
-Content-Type: text/x-patch; name="bccmd-set-bcsp-rate.patch"
-Content-Description: bccmd-set-bcsp-rate.patch
-Content-Disposition: attachment; filename="bccmd-set-bcsp-rate.patch";
-	size=4615; creation-date="Fri, 19 Nov 2010 11:27:57 GMT";
-	modification-date="Fri, 19 Nov 2010 11:27:57 GMT"
-Content-Transfer-Encoding: base64
-
-IHRvb2xzL2JjY21kLmMgICAgfCAgIDQ1ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKystLS0tLQogdG9vbHMvY3NyLmggICAgICB8ICAgIDMgKystCiB0b29scy9jc3JfYmNz
-cC5jIHwgICAgNCArKy0tCiAzIGZpbGVzIGNoYW5nZWQsIDQ0IGluc2VydGlvbnMoKyksIDggZGVs
-ZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvdG9vbHMvYmNjbWQuYyBiL3Rvb2xzL2JjY21kLmMKaW5k
-ZXggNjg2ZTg1OC4uNWNiOTI1NSAxMDA2NDQKLS0tIGEvdG9vbHMvYmNjbWQuYworKysgYi90b29s
-cy9iY2NtZC5jCkBAIC01OSw3ICs1OSw3IEBACiAjZGVmaW5lIENTUl9UWVBFX0FSUkFZCQlDU1Jf
-VFlQRV9DT01QTEVYCiAjZGVmaW5lIENTUl9UWVBFX0JEQUREUgkJQ1NSX1RZUEVfQ09NUExFWAog
-Ci1zdGF0aWMgaW5saW5lIGludCB0cmFuc3BvcnRfb3BlbihpbnQgdHJhbnNwb3J0LCBjaGFyICpk
-ZXZpY2UpCitzdGF0aWMgaW5saW5lIGludCB0cmFuc3BvcnRfb3BlbihpbnQgdHJhbnNwb3J0LCBj
-aGFyICpkZXZpY2UsIHNwZWVkX3QgYmNzcF9yYXRlKQogewogCXN3aXRjaCAodHJhbnNwb3J0KSB7
-CiAJY2FzZSBDU1JfVFJBTlNQT1JUX0hDSToKQEAgLTY5LDcgKzY5LDcgQEAgc3RhdGljIGlubGlu
-ZSBpbnQgdHJhbnNwb3J0X29wZW4oaW50IHRyYW5zcG9ydCwgY2hhciAqZGV2aWNlKQogCQlyZXR1
-cm4gY3NyX29wZW5fdXNiKGRldmljZSk7CiAjZW5kaWYKIAljYXNlIENTUl9UUkFOU1BPUlRfQkNT
-UDoKLQkJcmV0dXJuIGNzcl9vcGVuX2Jjc3AoZGV2aWNlKTsKKwkJcmV0dXJuIGNzcl9vcGVuX2Jj
-c3AoZGV2aWNlLCBiY3NwX3JhdGUpOwogCWNhc2UgQ1NSX1RSQU5TUE9SVF9INDoKIAkJcmV0dXJu
-IGNzcl9vcGVuX2g0KGRldmljZSk7CiAJY2FzZSBDU1JfVFJBTlNQT1JUXzNXSVJFOgpAQCAtMTEw
-OSw2ICsxMTA5LDcgQEAgc3RhdGljIHZvaWQgdXNhZ2Uodm9pZCkKIAlwcmludGYoIk9wdGlvbnM6
-XG4iCiAJCSJcdC10IDx0cmFuc3BvcnQ+ICAgICBTZWxlY3QgdGhlIHRyYW5zcG9ydFxuIgogCQki
-XHQtZCA8ZGV2aWNlPiAgICAgICAgU2VsZWN0IHRoZSBkZXZpY2VcbiIKKwkJIlx0LWIgPGJjc3Ag
-cmF0ZT4gICAgIFNlbGVjdCB0aGUgYmNzcCB0cmFuc2ZlciByYXRlXG4iCiAJCSJcdC1oLCAtLWhl
-bHAgICAgICAgICBEaXNwbGF5IGhlbHBcbiIKIAkJIlxuIik7CiAKQEAgLTExMzcsNiArMTEzOCw3
-IEBAIHN0YXRpYyB2b2lkIHVzYWdlKHZvaWQpCiBzdGF0aWMgc3RydWN0IG9wdGlvbiBtYWluX29w
-dGlvbnNbXSA9IHsKIAl7ICJ0cmFuc3BvcnQiLAkxLCAwLCAndCcgfSwKIAl7ICJkZXZpY2UiLAkx
-LCAwLCAnZCcgfSwKKwl7ICJiY3NwcmF0ZSIsIDEsIDAsICdiJ30sCiAJeyAiaGVscCIsCTAsIDAs
-ICdoJyB9LAogCXsgMCwgMCwgMCwgMCB9CiB9OwpAQCAtMTE0NSw4ICsxMTQ3LDkgQEAgaW50IG1h
-aW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKIHsKIAljaGFyICpkZXZpY2UgPSBOVUxMOwogCWlu
-dCBpLCBlcnIsIG9wdCwgdHJhbnNwb3J0ID0gQ1NSX1RSQU5TUE9SVF9IQ0k7CisJc3BlZWRfdCBi
-Y3NwX3JhdGUgPSBCMzg0MDA7CiAKLQl3aGlsZSAoKG9wdD1nZXRvcHRfbG9uZyhhcmdjLCBhcmd2
-LCAiK3Q6ZDppOmgiLCBtYWluX29wdGlvbnMsIE5VTEwpKSAhPSBFT0YpIHsKKwl3aGlsZSAoKG9w
-dD1nZXRvcHRfbG9uZyhhcmdjLCBhcmd2LCAiK3Q6ZDppOmI6aCIsIG1haW5fb3B0aW9ucywgTlVM
-TCkpICE9IEVPRikgewogCQlzd2l0Y2ggKG9wdCkgewogCQljYXNlICd0JzoKIAkJCWlmICghc3Ry
-Y2FzZWNtcChvcHRhcmcsICJoY2kiKSkKQEAgLTExNzEsNyArMTE3NCwzOSBAQCBpbnQgbWFpbihp
-bnQgYXJnYywgY2hhciAqYXJndltdKQogCQljYXNlICdpJzoKIAkJCWRldmljZSA9IHN0cmR1cChv
-cHRhcmcpOwogCQkJYnJlYWs7Ci0KKwkJY2FzZSAnYic6CisJCQlzd2l0Y2ggKGF0b2kob3B0YXJn
-KSkgeworCQkJY2FzZSA5NjAwOiBiY3NwX3JhdGUgPSBCOTYwMDsgYnJlYWs7CisJCQljYXNlIDE5
-MjAwOiBiY3NwX3JhdGUgPSBCMTkyMDA7IGJyZWFrOworCQkJY2FzZSAzODQwMDogYmNzcF9yYXRl
-ID0gQjM4NDAwOyBicmVhazsKKwkJCWNhc2UgNTc2MDA6IGJjc3BfcmF0ZSA9IEI1NzYwMDsgYnJl
-YWs7CisJCQljYXNlIDExNTIwMDogYmNzcF9yYXRlID0gQjExNTIwMDsgYnJlYWs7CisJCQljYXNl
-IDIzMDQwMDogYmNzcF9yYXRlID0gQjIzMDQwMDsgYnJlYWs7CisJCQljYXNlIDQ2MDgwMDogYmNz
-cF9yYXRlID0gQjQ2MDgwMDsgYnJlYWs7CisJCQljYXNlIDUwMDAwMDogYmNzcF9yYXRlID0gQjUw
-MDAwMDsgYnJlYWs7CisJCQljYXNlIDU3NjAwMDogYmNzcF9yYXRlID0gQjU3NjAwMDsgYnJlYWs7
-CisJCQljYXNlIDkyMTYwMDogYmNzcF9yYXRlID0gQjkyMTYwMDsgYnJlYWs7CisJCQljYXNlIDEw
-MDAwMDA6IGJjc3BfcmF0ZSA9IEIxMDAwMDAwOyBicmVhazsKKwkJCWNhc2UgMTE1MjAwMDogYmNz
-cF9yYXRlID0gQjExNTIwMDA7IGJyZWFrOworCQkJY2FzZSAxNTAwMDAwOiBiY3NwX3JhdGUgPSBC
-MTUwMDAwMDsgYnJlYWs7CisJCQljYXNlIDIwMDAwMDA6IGJjc3BfcmF0ZSA9IEIyMDAwMDAwOyBi
-cmVhazsKKyNpZmRlZiBCMjUwMDAwMAorCQkJY2FzZSAyNTAwMDAwOiBiY3NwX3JhdGUgPSBCMjUw
-MDAwMDsgYnJlYWs7CisjZW5kaWYKKyNpZmRlZiBCMzAwMDAwMAorCQkJY2FzZSAzMDAwMDAwOiBi
-Y3NwX3JhdGUgPSBCMzAwMDAwMDsgYnJlYWs7CisjZW5kaWYKKyNpZmRlZiBCMzUwMDAwMAorCQkJ
-Y2FzZSAzNTAwMDAwOiBiY3NwX3JhdGUgPSBCMzUwMDAwMDsgYnJlYWs7CisjZW5kaWYKKyNpZmRl
-ZiBCNDAwMDAwMAorCQkJY2FzZSA0MDAwMDAwOiBiY3NwX3JhdGUgPSBCNDAwMDAwMDsgYnJlYWs7
-CisjZW5kaWYKKwkJCWRlZmF1bHQ6CisJCQkJcHJpbnRmKCJVbmtub3duIEJDU1AgYmF1ZCByYXRl
-IHNwZWNpZmllZCwgZGVmYXVsdGluZyB0byAzODQwMGJwc1xuIik7CisJCQkJYmNzcF9yYXRlID0g
-QjM4NDAwOworCQkJfQorCQkJYnJlYWs7CiAJCWNhc2UgJ2gnOgogCQlkZWZhdWx0OgogCQkJdXNh
-Z2UoKTsKQEAgLTExODgsNyArMTIyMyw3IEBAIGludCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2
-W10pCiAJCWV4aXQoMSk7CiAJfQogCi0JaWYgKHRyYW5zcG9ydF9vcGVuKHRyYW5zcG9ydCwgZGV2
-aWNlKSA8IDApCisJaWYgKHRyYW5zcG9ydF9vcGVuKHRyYW5zcG9ydCwgZGV2aWNlLCBiY3NwX3Jh
-dGUpIDwgMCkKIAkJZXhpdCgxKTsKIAogCWlmIChkZXZpY2UpCmRpZmYgLS1naXQgYS90b29scy9j
-c3IuaCBiL3Rvb2xzL2Nzci5oCmluZGV4IDFkNzA0OTEuLjhiOTRkN2IgMTAwNjQ0Ci0tLSBhL3Rv
-b2xzL2Nzci5oCisrKyBiL3Rvb2xzL2Nzci5oCkBAIC0yMiw2ICsyMiw3IEBACiAgKi8KIAogI2lu
-Y2x1ZGUgPHN0ZGludC5oPgorI2luY2x1ZGUgPHRlcm1pb3MuaD4KIAogI2RlZmluZSBDU1JfVkFS
-SURfUFNfQ0xSX0FMTAkJCTB4MDAwYgkvKiB2YWx1ZWxlc3MgKi8KICNkZWZpbmUgQ1NSX1ZBUklE
-X1BTX0ZBQ1RPUllfU0VUCQkweDAwMGMJLyogdmFsdWVsZXNzICovCkBAIC01MTksNyArNTIwLDcg
-QEAgaW50IGNzcl9yZWFkX3VzYih1aW50MTZfdCB2YXJpZCwgdWludDhfdCAqdmFsdWUsIHVpbnQx
-Nl90IGxlbmd0aCk7CiBpbnQgY3NyX3dyaXRlX3VzYih1aW50MTZfdCB2YXJpZCwgdWludDhfdCAq
-dmFsdWUsIHVpbnQxNl90IGxlbmd0aCk7CiB2b2lkIGNzcl9jbG9zZV91c2Iodm9pZCk7CiAKLWlu
-dCBjc3Jfb3Blbl9iY3NwKGNoYXIgKmRldmljZSk7CitpbnQgY3NyX29wZW5fYmNzcChjaGFyICpk
-ZXZpY2UsIHNwZWVkX3QgYmNzcF9yYXRlKTsKIGludCBjc3JfcmVhZF9iY3NwKHVpbnQxNl90IHZh
-cmlkLCB1aW50OF90ICp2YWx1ZSwgdWludDE2X3QgbGVuZ3RoKTsKIGludCBjc3Jfd3JpdGVfYmNz
-cCh1aW50MTZfdCB2YXJpZCwgdWludDhfdCAqdmFsdWUsIHVpbnQxNl90IGxlbmd0aCk7CiB2b2lk
-IGNzcl9jbG9zZV9iY3NwKHZvaWQpOwpkaWZmIC0tZ2l0IGEvdG9vbHMvY3NyX2Jjc3AuYyBiL3Rv
-b2xzL2Nzcl9iY3NwLmMKaW5kZXggZTU1MTMxMS4uZGYyNDdhMiAxMDA2NDQKLS0tIGEvdG9vbHMv
-Y3NyX2Jjc3AuYworKysgYi90b29scy9jc3JfYmNzcC5jCkBAIC00Niw3ICs0Niw3IEBAIHN0YXRp
-YyB1aW50OF90IHNlbmRfYnVmZmVyWzUxMl07CiBzdGF0aWMgc3RydWN0IHViY3NwX3BhY2tldCBy
-ZWNlaXZlX3BhY2tldDsKIHN0YXRpYyB1aW50OF90IHJlY2VpdmVfYnVmZmVyWzUxMl07CiAKLWlu
-dCBjc3Jfb3Blbl9iY3NwKGNoYXIgKmRldmljZSkKK2ludCBjc3Jfb3Blbl9iY3NwKGNoYXIgKmRl
-dmljZSwgc3BlZWRfdCBiY3NwX3JhdGUpCiB7CiAJc3RydWN0IHRlcm1pb3MgdGk7CiAJdWludDhf
-dCBkZWxheSwgYWN0aXZpdHkgPSAweDAwOwpAQCAtODQsNyArODQsNyBAQCBpbnQgY3NyX29wZW5f
-YmNzcChjaGFyICpkZXZpY2UpCiAJdGkuY19jY1tWTUlOXSA9IDE7CiAJdGkuY19jY1tWVElNRV0g
-PSAwOwogCi0JY2ZzZXRvc3BlZWQoJnRpLCBCMzg0MDApOworCWNmc2V0b3NwZWVkKCZ0aSwgYmNz
-cF9yYXRlKTsKIAogCWlmICh0Y3NldGF0dHIoZmQsIFRDU0FOT1csICZ0aSkgPCAwKSB7CiAJCWZw
-cmludGYoc3RkZXJyLCAiQ2FuJ3QgY2hhbmdlIHBvcnQgc2V0dGluZ3M6ICVzICglZClcbiIsCg==
-
---_002_6EBC2ED6C3CFDC428167C1FF4764F0710A96D8BEB33ESJEXBEC1res_--
