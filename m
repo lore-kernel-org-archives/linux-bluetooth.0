@@ -1,94 +1,123 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bruna Moreira <bruna.moreira@openbossa.org>
+From: Sheldon Demario <sheldon.demario@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [PATCH] Extract flags from advertising data
-Date: Fri, 19 Nov 2010 09:57:28 -0400
-Message-Id: <1290175048-16026-1-git-send-email-bruna.moreira@openbossa.org>
+Cc: Sheldon Demario <sheldon.demario@openbossa.org>
+Subject: [PATCH v2] Implement Characteristic Value Read using UUID in the gatttool
+Date: Fri, 19 Nov 2010 08:34:57 -0500
+Message-Id: <1290173697-20097-1-git-send-email-sheldon.demario@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These flags will be used to decide if GATT service discovery will happen
-over LE (for single mode devices) or BR/EDR (for dual mode and non-LE
-devices).
----
- src/adapter.c |   14 ++++++++++++++
- src/adapter.h |    1 +
- src/sdpd.h    |   10 ++++++++++
- 3 files changed, 25 insertions(+), 0 deletions(-)
+Sub-procedure used to read a Characteristic Value when the client
+only knows the characteristic UUID and doesn't know the handle.
+More than one handle and attribute value pair can be returned,
+it is up to the user define the handles range based on the service
+handles range.
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 8136229..648d2a8 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -3053,6 +3053,18 @@ static struct remote_dev_info *get_found_dev(struct btd_adapter *adapter,
- 	return dev;
- }
+Usage example:
+$gatttool --char-read --uuid=2a00 -i hcix -b xx:xx:xx:xx:xx:xx
+---
+ attrib/gatt.c     |   15 ++++++++++++---
+ attrib/gatt.h     |    4 ++++
+ attrib/gatttool.c |   39 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 55 insertions(+), 3 deletions(-)
+
+diff --git a/attrib/gatt.c b/attrib/gatt.c
+index 2c87daf..bca8b49 100644
+--- a/attrib/gatt.c
++++ b/attrib/gatt.c
+@@ -74,13 +74,22 @@ guint gatt_discover_primary(GAttrib *attrib, uint16_t start, uint16_t end,
+ guint gatt_discover_char(GAttrib *attrib, uint16_t start, uint16_t end,
+ 				GAttribResultFunc func, gpointer user_data)
+ {
+-	uint8_t pdu[ATT_DEFAULT_MTU];
+ 	uuid_t uuid;
+-	guint16 plen;
  
-+static uint8_t extract_eir_flags(uint8_t *eir_data)
-+{
-+	if (eir_data[0] == 0)
-+		return 0;
-+
-+	if (eir_data[1] != EIR_FLAGS)
-+		return 0;
-+
-+	/* For now, only one octet is used for flags */
-+	return eir_data[2];
+ 	sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
+ 
+-	plen = enc_read_by_type_req(start, end, &uuid, pdu, sizeof(pdu));
++	return gatt_read_char_by_uuid(attrib, start, end, &uuid, func,
++							user_data);
 +}
 +
- void adapter_update_device_from_info(struct btd_adapter *adapter,
- 						le_advertising_info *info)
++guint gatt_read_char_by_uuid(GAttrib *attrib, uint16_t start, uint16_t end,
++					uuid_t *uuid, GAttribResultFunc func,
++					gpointer user_data)
++{
++	uint8_t pdu[ATT_DEFAULT_MTU];
++	guint16 plen;
++
++	plen = enc_read_by_type_req(start, end, uuid, pdu, sizeof(pdu));
+ 	if (plen == 0)
+ 		return 0;
+ 
+diff --git a/attrib/gatt.h b/attrib/gatt.h
+index 4e7d88b..1e1e628 100644
+--- a/attrib/gatt.h
++++ b/attrib/gatt.h
+@@ -41,3 +41,7 @@ guint gatt_find_info(GAttrib *attrib, uint16_t start, uint16_t end,
+ 
+ guint gatt_write_cmd(GAttrib *attrib, uint16_t handle, uint8_t *value, int vlen,
+ 				GDestroyNotify notify, gpointer user_data);
++
++guint gatt_read_char_by_uuid(GAttrib *attrib, uint16_t start, uint16_t end,
++				uuid_t *uuid, GAttribResultFunc func,
++				gpointer user_data);
+diff --git a/attrib/gatttool.c b/attrib/gatttool.c
+index e961431..d0ef6d3 100644
+--- a/attrib/gatttool.c
++++ b/attrib/gatttool.c
+@@ -398,10 +398,49 @@ done:
+ 		g_main_loop_quit(event_loop);
+ }
+ 
++static void char_read_by_uuid_cb(guint8 status, const guint8 *pdu,
++					guint16 plen, gpointer user_data)
++{
++	struct att_data_list *list;
++	int i;
++
++	if (status != 0) {
++		g_printerr("Read characteristics by UUID failed: %s\n",
++							att_ecode2str(status));
++		goto done;
++	}
++
++	list = dec_read_by_type_resp(pdu, plen);
++	if (list == NULL)
++		goto done;
++
++	for (i = 0; i < list->num; i++) {
++		uint8_t *value = list->data[i];
++		int j;
++
++		g_print("handle: 0x%04x \t value: ", att_get_u16(value));
++		value += 2;
++		for (j = 0; j < list->len - 2; j++, value++)
++			g_print("%02x ", *value);
++		g_print("\n");
++	}
++
++	att_data_list_free(list);
++
++done:
++	g_main_loop_quit(event_loop);
++}
++
+ static gboolean characteristics_read(gpointer user_data)
  {
-@@ -3084,6 +3096,8 @@ void adapter_update_device_from_info(struct btd_adapter *adapter,
- 			g_free(dev->name);
- 			dev->name = tmp_name;
- 		}
+ 	GAttrib *attrib = user_data;
+ 
++	if (opt_uuid != NULL) {
++		gatt_read_char_by_uuid(attrib, opt_start, opt_end, opt_uuid,
++						char_read_by_uuid_cb, attrib);
++		return FALSE;
++	}
 +
-+		dev->flags = extract_eir_flags(info->data);
- 	}
- 
- 	/* FIXME: check if other information was changed before emitting the
-diff --git a/src/adapter.h b/src/adapter.h
-index 4af69b3..3a67539 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -74,6 +74,7 @@ struct remote_dev_info {
- 	GSList *services;
- 	uint8_t evt_type;
- 	uint8_t bdaddr_type;
-+	uint8_t flags;
- };
- 
- struct hci_dev {
-diff --git a/src/sdpd.h b/src/sdpd.h
-index 5bab869..a46ad3c 100644
---- a/src/sdpd.h
-+++ b/src/sdpd.h
-@@ -36,6 +36,7 @@
- 
- #define EIR_DATA_LENGTH  240
- 
-+#define EIR_FLAGS                   0x01  /* flags */
- #define EIR_UUID16_SOME             0x02  /* 16-bit UUID, more available */
- #define EIR_UUID16_ALL              0x03  /* 16-bit UUID, all listed */
- #define EIR_UUID32_SOME             0x04  /* 32-bit UUID, more available */
-@@ -47,6 +48,15 @@
- #define EIR_TX_POWER                0x0A  /* transmit power level */
- #define EIR_DEVICE_ID               0x10  /* device ID */
- 
-+/* Flags Descriptions */
-+#define EIR_LIM_DISC                0x01 /* LE Limited Discoverable Mode */
-+#define EIR_GEN_DISC                0x02 /* LE General Discoverable Mode */
-+#define EIR_BREDR_UNSUP             0x04 /* BR/EDR Not Supported */
-+#define EIR_SIM_CONTROLLER          0x08 /* Simultaneous LE and BR/EDR to Same
-+					    Device Capable (Controller) */
-+#define EIR_SIM_HOST                0x10 /* Simultaneous LE and BR/EDR to Same
-+					    Device Capable (Host) */
-+
- typedef struct request {
- 	bdaddr_t device;
- 	bdaddr_t bdaddr;
+ 	if (opt_handle <= 0) {
+ 		g_printerr("A valid handle is required\n");
+ 		g_main_loop_quit(event_loop);
 -- 
-1.7.0.4
+1.7.3.2
 
