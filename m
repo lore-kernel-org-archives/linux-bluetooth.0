@@ -1,40 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 19 Nov 2010 17:23:46 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Wade Brown <BrownW@us.panasonic.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Add command line option to change BCSP rate
-Message-ID: <20101119152346.GA28815@jh-x301>
-References: <6EBC2ED6C3CFDC428167C1FF4764F0710A96D8BE9A1A@SJEXBEC1.research.us.panasonic.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <6EBC2ED6C3CFDC428167C1FF4764F0710A96D8BE9A1A@SJEXBEC1.research.us.panasonic.com>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH v2 2/2] Avoid reallocations of services UUID array
+Date: Fri, 19 Nov 2010 10:59:19 -0400
+Message-Id: <1290178759-9270-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+The array of service UUIDs used by the DeviceFound signal contains the
+same information from the GSList of services. Instead of reallocating
+this array on each signal, store it on the remote_dev_info structure and
+only reallocate it if there are new UUIDs.
+---
+ src/adapter.c |   18 +++++++++---------
+ src/adapter.h |    3 ++-
+ 2 files changed, 11 insertions(+), 10 deletions(-)
 
-On Thu, Nov 18, 2010, Wade Brown wrote:
-> Currently when using bccmd to do any communication, the UART is always
-> opened at 38.4kbps.  Once the CSR has been initialized to any other
-> speed, bccmd can no longer communicate with with the radio (unless by
-> resetting it through rfkill).  This patch adds a -b option allowing a
-> user to manually set a different speed, with the default 38400 still in
-> place.
-> 
-> Usage example:
-> $bccmd -t BCSP -b 921600 -d /dev/ttyHS1 chiprev
-> 
-> ---
->  tools/bccmd.c    |   45 ++++++++++++++++++++++++++++++++++++++++-----
->  tools/csr.h      |    3 ++-
->  tools/csr_bcsp.c |    4 ++--
->  3 files changed, 44 insertions(+), 8 deletions(-)
+diff --git a/src/adapter.c b/src/adapter.c
+index c650a63..4fe8276 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -204,6 +204,7 @@ static void dev_info_free(struct remote_dev_info *dev)
+ 	g_free(dev->alias);
+ 	g_slist_foreach(dev->services, (GFunc) g_free, NULL);
+ 	g_slist_free(dev->services);
++	g_strfreev(dev->uuids);
+ 	g_free(dev);
+ }
+ 
+@@ -2964,7 +2965,6 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
+ 	dbus_bool_t paired = FALSE;
+ 	dbus_int16_t rssi = dev->rssi;
+ 	char *alias;
+-	char **uuids = NULL;
+ 	size_t uuid_count;
+ 
+ 	ba2str(&dev->bdaddr, peer_addr);
+@@ -2977,9 +2977,11 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
+ 	/* Extract UUIDs from extended inquiry response if any */
+ 	dev->services = get_eir_uuids(eir_data, eir_length, dev->services);
+ 	uuid_count = g_slist_length(dev->services);
+-
+-	if (dev->services)
+-		uuids = strlist2array(dev->services);
++	if (dev->services && dev->uuid_count != uuid_count) {
++		g_strfreev(dev->uuids);
++		dev->uuids = strlist2array(dev->services);
++		dev->uuid_count = uuid_count;
++	}
+ 
+ 	if (dev->le) {
+ 		emit_device_found(adapter->path, paddr,
+@@ -2987,9 +2989,8 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
+ 				"RSSI", DBUS_TYPE_INT16, &rssi,
+ 				"Name", DBUS_TYPE_STRING, &dev->name,
+ 				"Paired", DBUS_TYPE_BOOLEAN, &paired,
+-				"UUIDs", DBUS_TYPE_ARRAY, &uuids, uuid_count,
+-				NULL);
+-		g_strfreev(uuids);
++				"UUIDs", DBUS_TYPE_ARRAY, &dev->uuids,
++				dev->uuid_count, NULL);
+ 		return;
+ 	}
+ 
+@@ -3013,11 +3014,10 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
+ 			"Alias", DBUS_TYPE_STRING, &alias,
+ 			"LegacyPairing", DBUS_TYPE_BOOLEAN, &dev->legacy,
+ 			"Paired", DBUS_TYPE_BOOLEAN, &paired,
+-			"UUIDs", DBUS_TYPE_ARRAY, &uuids, uuid_count,
++			"UUIDs", DBUS_TYPE_ARRAY, &dev->uuids, dev->uuid_count,
+ 			NULL);
+ 
+ 	g_free(alias);
+-	g_strfreev(uuids);
+ }
+ 
+ static struct remote_dev_info *get_found_dev(struct btd_adapter *adapter,
+diff --git a/src/adapter.h b/src/adapter.h
+index 4af69b3..955bb9a 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -70,7 +70,8 @@ struct remote_dev_info {
+ 	dbus_bool_t legacy;
+ 	name_status_t name_status;
+ 	gboolean le;
+-	/* LE adv data */
++	char **uuids;
++	size_t uuid_count;
+ 	GSList *services;
+ 	uint8_t evt_type;
+ 	uint8_t bdaddr_type;
+-- 
+1.7.0.4
 
-The patch seems fine to me but I can't figure out how to apply it either
-due to your mail client or your mail server. It's not sent inline and
-the attachment isn't a complete git patch as such. Additionally there's
-some strange winmail.dat attachment in the mail. Could you try resending
-e.g. using git send-email?
-
-Johan
