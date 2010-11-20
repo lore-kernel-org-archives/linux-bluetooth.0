@@ -2,10 +2,10 @@ Return-Path: <cyrus@holtmann.org>
 From: Mike Tsai <Mike.Tsai@Atheros.com>
 To: Sheldon Demario <sheldon.demario@openbossa.org>,
 	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Fri, 19 Nov 2010 17:36:58 -0800
+Date: Fri, 19 Nov 2010 16:49:52 -0800
 Subject: RE: [PATCH v2] Implement Characteristic Value Read using UUID in
  the gatttool
-Message-ID: <35B17FE5076C7040809188FBE7913F98406D58BBF0@SC1EXMB-MBCL.global.atheros.com>
+Message-ID: <35B17FE5076C7040809188FBE7913F98406D58BBA3@SC1EXMB-MBCL.global.atheros.com>
 References: <1290173697-20097-1-git-send-email-sheldon.demario@openbossa.org>
 In-Reply-To: <1290173697-20097-1-git-send-email-sheldon.demario@openbossa.org>
 Content-Type: text/plain; charset="us-ascii"
