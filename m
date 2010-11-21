@@ -1,48 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20101121131442.GA22320@jh-x301>
-References: <1290343578-986-1-git-send-email-santoscadenas@gmail.com> <20101121131442.GA22320@jh-x301>
-From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Date: Sun, 21 Nov 2010 17:07:42 +0100
-Message-ID: <AANLkTi=_BVKOptuGTz8eoHPaTQrkr6-3oCK8mzJq4oea@mail.gmail.com>
-Subject: Re: [PATCH] Remove parameter entered from the DisplayPasskey agent method
-To: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH] Fix error handling for l2cap_init()
+Date: Sun, 21 Nov 2010 11:13:38 -0400
+Message-Id: <1290352418-4589-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+create_singlethread_workqueue() may fail with errors such as -ENOMEM. If
+this happens, the return value is not set to a negative value and the
+module load will succeed. It will then crash on module unload because of
+a destroy_workqueue() call on a NULL pointer.
 
-2010/11/21 Johan Hedberg <johan.hedberg@gmail.com>:
-> Hi Jose,
->
-> On Sun, Nov 21, 2010, Jose Antonio Santos Cadenas wrote:
->> In the current method implementation the parameter is not used.
->> ---
->>  doc/agent-api.txt |    5 +----
->>  1 files changed, 1 insertions(+), 4 deletions(-)
->
-> Do you actually have a BT 2.1 keyboard to test this with?
+Additionally, the _busy_wq workqueue is not being destroyed if any
+errors happen on l2cap_init().
 
-I'm lost, why do I need a BT keyboard?
+Signed-off-by: Anderson Lizardo <anderson.lizardo@openbossa.org>
+---
+ net/bluetooth/l2cap.c |    8 ++++++--
+ 1 files changed, 6 insertions(+), 2 deletions(-)
 
-> The right fix
-> is to fix the code and not the spec since we do want the UI to get the
-> hints about entered characters.
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index 18a802c..7980e24 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -4875,8 +4875,10 @@ static int __init l2cap_init(void)
+ 		return err;
+ 
+ 	_busy_wq = create_singlethread_workqueue("l2cap");
+-	if (!_busy_wq)
+-		goto error;
++	if (!_busy_wq) {
++		err = -ENOMEM;
++		goto error_busy_wq;
++	}
+ 
+ 	err = bt_sock_register(BTPROTO_L2CAP, &l2cap_sock_family_ops);
+ 	if (err < 0) {
+@@ -4904,6 +4906,8 @@ static int __init l2cap_init(void)
+ 	return 0;
+ 
+ error:
++	destroy_workqueue(_busy_wq);
++error_busy_wq:
+ 	proto_unregister(&l2cap_proto);
+ 	return err;
+ }
+-- 
+1.7.0.4
 
-I also think that an other way to correct this is to change the code
-to follow the specification, but as I see that the specification
-didn't have changes since 2008 I thought that was an obsolete
-documentation, because in the source code there is no reference to the
-entered parameter. Have you got any suggestions about the better way
-to add this parameter in order to follow the API in the documentation?
- Nevertheless I'll have a deeper look to the code looking for hints.
-
->
-> Johan
->
-
-Regards.
-
-Jose.
