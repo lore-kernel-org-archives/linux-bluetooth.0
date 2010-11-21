@@ -1,50 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Tracey Dent <tdent48227@gmail.com>
-To: davem@davemloft.net
-Cc: marcel@holtmann.org,
-	padovan@profusion.mobi,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	sjur.brandeland@stericsson.com,
-	socketcan@hartkopp.net,
-	urs.thuermann@volkswagen.de,
-	socketcan-core@lists.berlios.de,
-	sage@newdream.net,
-	ceph-devel@vger.kernel.org,
-	wang840925@gmail.com,
-	jlayton@redhat.com,
-	kaber@trash.net,
-	pekkas@netcore.fi,
-	linux-kernel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	netfilter@vger.kernel.org,
-	samuel@sortiz.org,
-	Tracey Dent <tdent48227@gmail.com>
-Subject: [PATCH 01/17] Net: bluetooth: Makefile: Remove deprecated kbuild goal definitions
-Date: Sun, 21 Nov 2010 20:03:12 -0500
-Message-Id: <1290387808-2239-2-git-send-email-tdent48227@gmail.com>
-In-Reply-To: <1290387808-2239-1-git-send-email-tdent48227@gmail.com>
-References: <1290387808-2239-1-git-send-email-tdent48227@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20101121192538.GA12163@jh-x301>
+References: <1290343578-986-1-git-send-email-santoscadenas@gmail.com>
+ <20101121131442.GA22320@jh-x301> <AANLkTi=_BVKOptuGTz8eoHPaTQrkr6-3oCK8mzJq4oea@mail.gmail.com>
+ <20101121192538.GA12163@jh-x301>
+From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+Date: Sun, 21 Nov 2010 20:38:33 +0100
+Message-ID: <AANLkTikkUT7SUnSEgcEV6Nfbkq++b8Wq8VJdwvACdEus@mail.gmail.com>
+Subject: Re: [PATCH] Remove parameter entered from the DisplayPasskey agent method
+To: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Changed Makefile to use <modules>-y instead of <modules>-objs
-because -objs is deprecated and not mentioned in
-Documentation/kbuild/makefiles.txt.
+Hi Johan,
 
-Signed-off-by: Tracey Dent <tdent48227@gmail.com>
----
- net/bluetooth/Makefile |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+2010/11/21 Johan Hedberg <johan.hedberg@gmail.com>:
+> Hi Jose,
+>
+> On Sun, Nov 21, 2010, Jose Antonio Santos Cadenas wrote:
+>> > On Sun, Nov 21, 2010, Jose Antonio Santos Cadenas wrote:
+>> >> In the current method implementation the parameter is not used.
+>> >> ---
+>> >>  doc/agent-api.txt |    5 +----
+>> >>  1 files changed, 1 insertions(+), 4 deletions(-)
+>> >
+>> > Do you actually have a BT 2.1 keyboard to test this with?
+>>
+>> I'm lost, why do I need a BT keyboard?
+>
+> Because DisplayPasskey will only happen if the other side has
+> KeyboardOnly as its SSP IO capability.
+>
+>> > The right fix
+>> > is to fix the code and not the spec since we do want the UI to get the
+>> > hints about entered characters.
+>>
+>> I also think that an other way to correct this is to change the code
+>> to follow the specification, but as I see that the specification
+>> didn't have changes since 2008 I thought that was an obsolete
+>> documentation, because in the source code there is no reference to the
+>> entered parameter. Have you got any suggestions about the better way
+>> to add this parameter in order to follow the API in the documentation?
+>>  Nevertheless I'll have a deeper look to the code looking for hints.
+>
+> The third parameter is supposed to be bound to the Keypress Notification
+> HCI event which should come when the remote side does a
+> HCI_Send_Keypress_Notification HCI command (again only a keyboard would
+> do something like this).
 
-diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
-index d1e433f..7ca1f46 100644
---- a/net/bluetooth/Makefile
-+++ b/net/bluetooth/Makefile
-@@ -10,4 +10,4 @@ obj-$(CONFIG_BT_BNEP)	+= bnep/
- obj-$(CONFIG_BT_CMTP)	+= cmtp/
- obj-$(CONFIG_BT_HIDP)	+= hidp/
- 
--bluetooth-objs := af_bluetooth.o hci_core.o hci_conn.o hci_event.o hci_sock.o hci_sysfs.o lib.o
-+bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o hci_sock.o hci_sysfs.o lib.o
--- 
-1.7.3.2.245.g03276
+Thanks for the explanation now I understand the use of the method.
+Unfortunately right now I don't have a 2.1 keyboard so I can't test
+it.
+
+>
+> Johan
+>
+
+Jose.
