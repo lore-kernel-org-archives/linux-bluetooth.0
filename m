@@ -1,33 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 22 Nov 2010 18:05:25 +0100
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] Fix: increment MDL and MCL reference counter in IO
- watchers.
-Message-ID: <20101122170525.GA13003@jh-x301>
-References: <AANLkTinQAeN8jyBmmPnw0tMWDfvOVamOU5+gBXLF-hTT@mail.gmail.com>
- <1290437712-28991-1-git-send-email-santoscadenas@gmail.com>
+Date: Mon, 22 Nov 2010 19:46:23 +0300
+From: Dan Carpenter <error27@gmail.com>
+To: pavan_savoy@ti.com
+Cc: marcel@holtmann.org, padovan@profusion.mobi,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6] Bluetooth: btwilink driver
+Message-ID: <20101122164623.GB8882@bicker>
+References: <1290424125-2717-1-git-send-email-pavan_savoy@ti.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1290437712-28991-1-git-send-email-santoscadenas@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1290424125-2717-1-git-send-email-pavan_savoy@ti.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jose,
+On Mon, Nov 22, 2010 at 06:08:45AM -0500, pavan_savoy@ti.com wrote:
+> +static int bt_ti_probe(struct platform_device *pdev)
+> +{
+> +	static struct ti_st *hst;
+> +	struct hci_dev *hdev;
+> +	int err;
+> +
+> +	hst = kzalloc(sizeof(struct ti_st), GFP_KERNEL);
+> +	if (!hst)
+> +		return -ENOMEM;
+> +
+> +	/* Expose "hciX" device to user space */
+> +	hdev = hci_alloc_dev();
+> +	if (!hdev) {
+> +		kfree(hst);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	BT_DBG("hdev %p", hdev);
+> +
+> +	hst->hdev = hdev;
+> +	hdev->bus = HCI_UART;
+> +	hdev->driver_data = hst;
+> +	hdev->open = ti_st_open;
+> +	hdev->close = ti_st_close;
+> +	hdev->flush = NULL;
+> +	hdev->send = ti_st_send_frame;
+> +	hdev->destruct = ti_st_destruct;
+> +	hdev->owner = THIS_MODULE;
+> +
+> +	err = hci_register_dev(hdev);
+> +	if (err < 0) {
+> +		BT_ERR("Can't register HCI device error %d", err);
+> +		hci_free_dev(hdev);
 
-On Mon, Nov 22, 2010, Jose Antonio Santos Cadenas wrote:
-> When a io_watcher is added to an MDL or an MCL channel, its reference
-> should be incremented because the watcher should keep its own
-> reference the the structure.
-> 
-> Also  a destroy function is added in order to decrement the reference
-> once the watcher is removed.
-> ---
->  health/mcap.c |   28 +++++++++++++++++++---------
->  1 files changed, 19 insertions(+), 9 deletions(-)
+	Should there be a kfree(hst); here?  That's how it's done in
+	bpa10x_probe() from drivers/bluetooth/bpa10x.c
 
-Thanks. Pushed upstream, but I still had to tweak the summary line a
-little bit (take a look at the upstream tree if you're interested).
+> +		return err;
+> +	}
+> +
+> +	BT_DBG(" HCI device registered (hdev %p)", hdev);
+                ^
+	Quite a few places have an extra space at the start.
 
-Johan
+> +
+> +	dev_set_drvdata(&pdev->dev, hst);
+> +	return err;
+> +}
+
+regards,
+dan carpenter
