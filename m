@@ -20,9 +20,9 @@ Cc: marcel@holtmann.org,
 	netfilter@vger.kernel.org,
 	samuel@sortiz.org,
 	Tracey Dent <tdent48227@gmail.com>
-Subject: [PATCH 03/17] Net: can: Makefile: Remove deprecated kbuild goal definitions
-Date: Sun, 21 Nov 2010 20:03:14 -0500
-Message-Id: <1290387808-2239-4-git-send-email-tdent48227@gmail.com>
+Subject: [PATCH 02/17] Net: caif: Makefile: Remove deprecated items
+Date: Sun, 21 Nov 2010 20:03:13 -0500
+Message-Id: <1290387808-2239-3-git-send-email-tdent48227@gmail.com>
 In-Reply-To: <1290387808-2239-1-git-send-email-tdent48227@gmail.com>
 References: <1290387808-2239-1-git-send-email-tdent48227@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -31,28 +31,36 @@ Changed Makefile to use <modules>-y instead of <modules>-objs
 because -objs is deprecated and not mentioned in
 Documentation/kbuild/makefiles.txt.
 
+Also, use the ccflags-$ flag instead of EXTRA_CFLAGS because EXTRA_CFLAGS is
+deprecated and should now be switched.
+
+Last but not least, took out if-conditionals.
+
 Signed-off-by: Tracey Dent <tdent48227@gmail.com>
 ---
- net/can/Makefile |    6 +++---
- 1 files changed, 3 insertions(+), 3 deletions(-)
+ net/caif/Makefile |    8 +++-----
+ 1 files changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/net/can/Makefile b/net/can/Makefile
-index 9cd3c4b..2d3894b 100644
---- a/net/can/Makefile
-+++ b/net/can/Makefile
-@@ -3,10 +3,10 @@
- #
+diff --git a/net/caif/Makefile b/net/caif/Makefile
+index f87481f..9d38e40 100644
+--- a/net/caif/Makefile
++++ b/net/caif/Makefile
+@@ -1,8 +1,6 @@
+-ifeq ($(CONFIG_CAIF_DEBUG),y)
+-EXTRA_CFLAGS += -DDEBUG
+-endif
++ccflags-$(CONFIG_CAIF_DEBUG)     :=      -DDEBUG
  
- obj-$(CONFIG_CAN)	+= can.o
--can-objs		:= af_can.o proc.o
-+can-y			:= af_can.o proc.o
+-caif-objs := caif_dev.o \
++caif-y := caif_dev.o \
+ 	cfcnfg.o cfmuxl.o cfctrl.o  \
+ 	cffrml.o cfveil.o cfdbgl.o\
+ 	cfserl.o cfdgml.o  \
+@@ -13,4 +11,4 @@ obj-$(CONFIG_CAIF) += caif.o
+ obj-$(CONFIG_CAIF_NETDEV) += chnl_net.o
+ obj-$(CONFIG_CAIF) += caif_socket.o
  
- obj-$(CONFIG_CAN_RAW)	+= can-raw.o
--can-raw-objs		:= raw.o
-+can-raw-y		:= raw.o
- 
- obj-$(CONFIG_CAN_BCM)	+= can-bcm.o
--can-bcm-objs		:= bcm.o
-+can-bcm-y		:= bcm.o
+-export-objs := caif.o
++export-y := caif.o
 -- 
 1.7.3.2.245.g03276
