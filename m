@@ -20,9 +20,9 @@ Cc: marcel@holtmann.org,
 	netfilter@vger.kernel.org,
 	samuel@sortiz.org,
 	Tracey Dent <tdent48227@gmail.com>
-Subject: [PATCH 05/17] Net: dns_resolver: Makefile: Remove deprecated kbuild goal definitions
-Date: Sun, 21 Nov 2010 20:03:16 -0500
-Message-Id: <1290387808-2239-6-git-send-email-tdent48227@gmail.com>
+Subject: [PATCH 04/17] Net: ceph: Makefile: remove deprecated kbuild goal definitions
+Date: Sun, 21 Nov 2010 20:03:15 -0500
+Message-Id: <1290387808-2239-5-git-send-email-tdent48227@gmail.com>
 In-Reply-To: <1290387808-2239-1-git-send-email-tdent48227@gmail.com>
 References: <1290387808-2239-1-git-send-email-tdent48227@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -33,18 +33,21 @@ Documentation/kbuild/makefiles.txt.
 
 Signed-off-by: Tracey Dent <tdent48227@gmail.com>
 ---
- net/dns_resolver/Makefile |    2 +-
+ net/ceph/Makefile |    2 +-
  1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/net/dns_resolver/Makefile b/net/dns_resolver/Makefile
-index c0ef4e7..d5c13c2 100644
---- a/net/dns_resolver/Makefile
-+++ b/net/dns_resolver/Makefile
-@@ -4,4 +4,4 @@
+diff --git a/net/ceph/Makefile b/net/ceph/Makefile
+index aab1cab..153bdec 100644
+--- a/net/ceph/Makefile
++++ b/net/ceph/Makefile
+@@ -6,7 +6,7 @@ ifneq ($(KERNELRELEASE),)
  
- obj-$(CONFIG_DNS_RESOLVER) += dns_resolver.o
+ obj-$(CONFIG_CEPH_LIB) += libceph.o
  
--dns_resolver-objs :=  dns_key.o dns_query.o
-+dns_resolver-y :=  dns_key.o dns_query.o
+-libceph-objs := ceph_common.o messenger.o msgpool.o buffer.o pagelist.o \
++libceph-y := ceph_common.o messenger.o msgpool.o buffer.o pagelist.o \
+ 	mon_client.o \
+ 	osd_client.o osdmap.o crush/crush.o crush/mapper.o crush/hash.o \
+ 	debugfs.o \
 -- 
 1.7.3.2.245.g03276
