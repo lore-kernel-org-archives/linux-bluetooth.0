@@ -18,18 +18,33 @@ Cc: marcel@holtmann.org,
 	linux-kernel@vger.kernel.org,
 	netfilter-devel@vger.kernel.org,
 	netfilter@vger.kernel.org,
-	samuel@sortiz.org
-Subject: [PATCH 00/00] Remove deprecated items from Makefiles
-Date: Sun, 21 Nov 2010 20:03:11 -0500
-Message-Id: <1290387808-2239-1-git-send-email-tdent48227@gmail.com>
+	samuel@sortiz.org,
+	Tracey Dent <tdent48227@gmail.com>
+Subject: [PATCH 01/17] Net: bluetooth: Makefile: Remove deprecated kbuild goal definitions
+Date: Sun, 21 Nov 2010 20:03:12 -0500
+Message-Id: <1290387808-2239-2-git-send-email-tdent48227@gmail.com>
+In-Reply-To: <1290387808-2239-1-git-send-email-tdent48227@gmail.com>
+References: <1290387808-2239-1-git-send-email-tdent48227@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I changed Makefiles to use <modules>-y instead of <modules>-objs because -objs
-is deprecated and not even mentioned in Documentation/kbuild/makefiles.txt.
+Changed Makefile to use <modules>-y instead of <modules>-objs
+because -objs is deprecated and not mentioned in
+Documentation/kbuild/makefiles.txt.
 
-Also, remove some if-conditional statments because I used the ccflags-$ flag 
-instead of EXTRA_CFLAGS because EXTRA_CFLAGS.
+Signed-off-by: Tracey Dent <tdent48227@gmail.com>
+---
+ net/bluetooth/Makefile |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-regards,
-
-Tracey Dent
+diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+index d1e433f..7ca1f46 100644
+--- a/net/bluetooth/Makefile
++++ b/net/bluetooth/Makefile
+@@ -10,4 +10,4 @@ obj-$(CONFIG_BT_BNEP)	+= bnep/
+ obj-$(CONFIG_BT_CMTP)	+= cmtp/
+ obj-$(CONFIG_BT_HIDP)	+= hidp/
+ 
+-bluetooth-objs := af_bluetooth.o hci_core.o hci_conn.o hci_event.o hci_sock.o hci_sysfs.o lib.o
++bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o hci_sock.o hci_sysfs.o lib.o
+-- 
+1.7.3.2.245.g03276
