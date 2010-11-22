@@ -1,33 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 22 Nov 2010 15:44:51 -0200
+Date: Mon, 22 Nov 2010 15:40:50 -0200
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] Bluetooth: Get ride of
- __rfcomm_get_sock_by_channel()
-Message-ID: <20101122174451.GC23109@vigoh>
-References: <1290036176-4022-1-git-send-email-padovan@profusion.mobi>
- <1290036176-4022-2-git-send-email-padovan@profusion.mobi>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: do not use assignment in if condition
+Message-ID: <20101122174050.GB23109@vigoh>
+References: <1290424897-32463-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1290036176-4022-2-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1290424897-32463-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Gustavo F. Padovan <padovan@profusion.mobi> [2010-11-17 21:22:56 -0200]:
+Hi Andrei,
 
-> rfcomm_get_sock_by_channel() was the only user of this function, so I merged
-> both into rfcomm_get_sock_by_channel(). The socket lock now should be hold
-> outside of rfcomm_get_sock_by_channel() once we hold and release it inside the
-> same function now.
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2010-11-22 13:21:37 +0200]:
+
+> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 > 
-> Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+> Fix checkpatch errors like:
+> "ERROR: do not use assignment in if condition"
+> Simplify code and fix one long line.
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 > ---
->  net/bluetooth/rfcomm/sock.c |   19 +++++++------------
->  1 files changed, 7 insertions(+), 12 deletions(-)
+>  net/bluetooth/hci_event.c |   18 ++++++++++++------
+>  1 files changed, 12 insertions(+), 6 deletions(-)
 
-I'm also pushing these two to bluetooth-next. It should be good as
-nobody commented on it, or people don't looked to it since there is a
-clear typo and in commit messase (ride -> rid)
+Applied, thanks.
 
 -- 
 Gustavo F. Padovan
