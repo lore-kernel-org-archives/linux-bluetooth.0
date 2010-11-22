@@ -20,9 +20,9 @@ Cc: marcel@holtmann.org,
 	netfilter@vger.kernel.org,
 	samuel@sortiz.org,
 	Tracey Dent <tdent48227@gmail.com>
-Subject: [PATCH 04/17] Net: ceph: Makefile: remove deprecated kbuild goal definitions
-Date: Sun, 21 Nov 2010 20:03:15 -0500
-Message-Id: <1290387808-2239-5-git-send-email-tdent48227@gmail.com>
+Subject: [PATCH 03/17] Net: can: Makefile: Remove deprecated kbuild goal definitions
+Date: Sun, 21 Nov 2010 20:03:14 -0500
+Message-Id: <1290387808-2239-4-git-send-email-tdent48227@gmail.com>
 In-Reply-To: <1290387808-2239-1-git-send-email-tdent48227@gmail.com>
 References: <1290387808-2239-1-git-send-email-tdent48227@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -33,21 +33,26 @@ Documentation/kbuild/makefiles.txt.
 
 Signed-off-by: Tracey Dent <tdent48227@gmail.com>
 ---
- net/ceph/Makefile |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ net/can/Makefile |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/net/ceph/Makefile b/net/ceph/Makefile
-index aab1cab..153bdec 100644
---- a/net/ceph/Makefile
-+++ b/net/ceph/Makefile
-@@ -6,7 +6,7 @@ ifneq ($(KERNELRELEASE),)
+diff --git a/net/can/Makefile b/net/can/Makefile
+index 9cd3c4b..2d3894b 100644
+--- a/net/can/Makefile
++++ b/net/can/Makefile
+@@ -3,10 +3,10 @@
+ #
  
- obj-$(CONFIG_CEPH_LIB) += libceph.o
+ obj-$(CONFIG_CAN)	+= can.o
+-can-objs		:= af_can.o proc.o
++can-y			:= af_can.o proc.o
  
--libceph-objs := ceph_common.o messenger.o msgpool.o buffer.o pagelist.o \
-+libceph-y := ceph_common.o messenger.o msgpool.o buffer.o pagelist.o \
- 	mon_client.o \
- 	osd_client.o osdmap.o crush/crush.o crush/mapper.o crush/hash.o \
- 	debugfs.o \
+ obj-$(CONFIG_CAN_RAW)	+= can-raw.o
+-can-raw-objs		:= raw.o
++can-raw-y		:= raw.o
+ 
+ obj-$(CONFIG_CAN_BCM)	+= can-bcm.o
+-can-bcm-objs		:= bcm.o
++can-bcm-y		:= bcm.o
 -- 
 1.7.3.2.245.g03276
