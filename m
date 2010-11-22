@@ -20,9 +20,9 @@ Cc: marcel@holtmann.org,
 	netfilter@vger.kernel.org,
 	samuel@sortiz.org,
 	Tracey Dent <tdent48227@gmail.com>
-Subject: [PATCH 06/17] Net: econet: Makefile: Remove deprecated kbuild goal definitions
-Date: Sun, 21 Nov 2010 20:03:17 -0500
-Message-Id: <1290387808-2239-7-git-send-email-tdent48227@gmail.com>
+Subject: [PATCH 05/17] Net: dns_resolver: Makefile: Remove deprecated kbuild goal definitions
+Date: Sun, 21 Nov 2010 20:03:16 -0500
+Message-Id: <1290387808-2239-6-git-send-email-tdent48227@gmail.com>
 In-Reply-To: <1290387808-2239-1-git-send-email-tdent48227@gmail.com>
 References: <1290387808-2239-1-git-send-email-tdent48227@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -33,18 +33,18 @@ Documentation/kbuild/makefiles.txt.
 
 Signed-off-by: Tracey Dent <tdent48227@gmail.com>
 ---
- net/econet/Makefile |    2 +-
+ net/dns_resolver/Makefile |    2 +-
  1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/net/econet/Makefile b/net/econet/Makefile
-index 39f0a77..05fae8b 100644
---- a/net/econet/Makefile
-+++ b/net/econet/Makefile
+diff --git a/net/dns_resolver/Makefile b/net/dns_resolver/Makefile
+index c0ef4e7..d5c13c2 100644
+--- a/net/dns_resolver/Makefile
++++ b/net/dns_resolver/Makefile
 @@ -4,4 +4,4 @@
  
- obj-$(CONFIG_ECONET) += econet.o
+ obj-$(CONFIG_DNS_RESOLVER) += dns_resolver.o
  
--econet-objs := af_econet.o
-+econet-y := af_econet.o
+-dns_resolver-objs :=  dns_key.o dns_query.o
++dns_resolver-y :=  dns_key.o dns_query.o
 -- 
 1.7.3.2.245.g03276
