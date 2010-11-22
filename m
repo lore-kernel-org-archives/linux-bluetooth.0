@@ -1,86 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <20101122144301.GC2303@jh-x301>
+References: <1290413446-5391-1-git-send-email-sancane@gmail.com>
+ <1290413266-3949-1-git-send-email-santoscadenas@gmail.com> <20101122144301.GC2303@jh-x301>
 From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Subject: [PATCH 2/2] Fix: increment MDL and MCL reference counter in IO watchers.
-Date: Mon, 22 Nov 2010 15:55:12 +0100
-Message-Id: <1290437712-28991-1-git-send-email-santoscadenas@gmail.com>
-In-Reply-To: <AANLkTinQAeN8jyBmmPnw0tMWDfvOVamOU5+gBXLF-hTT@mail.gmail.com>
-References: <AANLkTinQAeN8jyBmmPnw0tMWDfvOVamOU5+gBXLF-hTT@mail.gmail.com>
+Date: Mon, 22 Nov 2010 15:54:03 +0100
+Message-ID: <AANLkTinQAeN8jyBmmPnw0tMWDfvOVamOU5+gBXLF-hTT@mail.gmail.com>
+Subject: Re: [PATCH 2/2] Increment reference counter when a io_watcher is added
+To: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When a io_watcher is added to an MDL or an MCL channel, its reference
-should be incremented because the watcher should keep its own
-reference the the structure.
+Hi Johan,
 
-Also  a destroy function is added in order to decrement the reference
-once the watcher is removed.
----
- health/mcap.c |   28 +++++++++++++++++++---------
- 1 files changed, 19 insertions(+), 9 deletions(-)
+2010/11/22 Johan Hedberg <johan.hedberg@gmail.com>:
+> Hi Jose,
+>
+> On Mon, Nov 22, 2010, Jose Antonio Santos Cadenas wrote:
+>> Also a destroy function is added in order to avoid memory leaks
+>> ---
+>>  health/mcap.c |   28 +++++++++++++++++++---------
+>>  1 files changed, 19 insertions(+), 9 deletions(-)
+>
+> The patch content itself is fine but you need to fix the commit message.
+> Now you have half of the info in the summary and half in the message
+> body (both halves being equaly relevant). The summary line should be a
+> summary of the whole patch (in this case it could be e.g. "Fix MDL
+> reference counting for IO watchers") and the body should contain the
+> details. So please reformulate, resend, and pay more attention to this
+> kind of things in the future. Thanks :)
 
-diff --git a/health/mcap.c b/health/mcap.c
-index 8ecdc68..81fd8df 100644
---- a/health/mcap.c
-+++ b/health/mcap.c
-@@ -1638,8 +1638,11 @@ static void mcap_connect_mdl_cb(GIOChannel *chan, GError *conn_err,
- 	}
- 
- 	mdl->state = MDL_CONNECTED;
--	mdl->wid = g_io_add_watch(mdl->dc, G_IO_ERR | G_IO_HUP | G_IO_NVAL,
--						(GIOFunc) mdl_event_cb, mdl);
-+	mdl->wid = g_io_add_watch_full(mdl->dc, G_PRIORITY_DEFAULT,
-+					G_IO_ERR | G_IO_HUP | G_IO_NVAL,
-+					(GIOFunc) mdl_event_cb,
-+					mcap_mdl_ref(mdl),
-+					(GDestroyNotify) mcap_mdl_unref);
- 
- 	cb(mdl, conn_err, user_data);
- }
-@@ -1774,9 +1777,11 @@ static void mcap_connect_mcl_cb(GIOChannel *chan, GError *conn_err,
- 							mcap_mcl_ref(mcl));
- 	}
- 
--	mcl->wid = g_io_add_watch(mcl->cc,
-+	mcl->wid = g_io_add_watch_full(mcl->cc, G_PRIORITY_DEFAULT,
- 				G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
--				(GIOFunc) mcl_control_cb, mcl);
-+				(GIOFunc) mcl_control_cb,
-+				mcap_mcl_ref(mcl),
-+				(GDestroyNotify) mcap_mcl_unref);
- 	connect_cb(mcl, gerr, data);
- }
- 
-@@ -1786,8 +1791,11 @@ static void set_mdl_properties(GIOChannel *chan, struct mcap_mdl *mdl)
- 
- 	mdl->state = MDL_CONNECTED;
- 	mdl->dc = g_io_channel_ref(chan);
--	mdl->wid = g_io_add_watch(mdl->dc, G_IO_ERR | G_IO_HUP | G_IO_NVAL,
--						(GIOFunc) mdl_event_cb, mdl);
-+	mdl->wid = g_io_add_watch_full(mdl->dc, G_PRIORITY_DEFAULT,
-+					G_IO_ERR | G_IO_HUP | G_IO_NVAL,
-+					(GIOFunc) mdl_event_cb,
-+					mcap_mdl_ref(mdl),
-+					(GDestroyNotify) mcap_mdl_unref);
- 
- 	mcl->state = MCL_ACTIVE;
- 	mcl->cb->mdl_connected(mdl, mcl->cb->user_data);
-@@ -1919,9 +1927,11 @@ static void set_mcl_conf(GIOChannel *chan, struct mcap_mcl *mcl)
- 		mcl->mi->mcls = g_slist_prepend(mcl->mi->mcls,
- 							mcap_mcl_ref(mcl));
- 
--	mcl->wid = g_io_add_watch(mcl->cc,
--			G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
--			(GIOFunc) mcl_control_cb, mcl);
-+	mcl->wid = g_io_add_watch_full(mcl->cc, G_PRIORITY_DEFAULT,
-+				G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
-+				(GIOFunc) mcl_control_cb,
-+				mcap_mcl_ref(mcl),
-+				(GDestroyNotify) mcap_mcl_unref);
- 
- 	/* Callback to report new MCL */
- 	if (reconn)
--- 
-1.7.1
+Sorry for for the inconvenience, I'm fixing this and sending the new
+patch. I'll try be more carefully with the commit messages in the
+future.
 
+Regards
+
+>
+> Johan
+>
