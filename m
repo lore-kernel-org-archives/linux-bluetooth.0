@@ -1,44 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 22 Nov 2010 18:13:31 -0200
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: "John W. Linville" <linville@tuxdriver.com>
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: pull request: bluetooth-2.6 2010-11-22
+Message-ID: <20101122201330.GE23109@vigoh>
+References: <20101122181411.GD23109@vigoh>
+ <20101122193029.GE2117@tuxdriver.com>
 MIME-Version: 1.0
-In-Reply-To: <20101122071243.GA23443@jh-x301>
-References: <1290111749-8968-1-git-send-email-johan.hedberg@gmail.com>
-	<1290111749-8968-2-git-send-email-johan.hedberg@gmail.com>
-	<AANLkTinMq-3K09y-bCWM1Z254FsWoRuZ=QEuZM11WPMb@mail.gmail.com>
-	<20101122071243.GA23443@jh-x301>
-Date: Mon, 22 Nov 2010 22:35:51 +0200
-Message-ID: <AANLkTikHPWyjS+m2NMrxcL0FP6WhX+APExNELRuw4=Pe@mail.gmail.com>
-Subject: Re: [PATCH 2/2] Bluetooth: Automate remote name requests
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "Arun K. Singh" <arunkat@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20101122193029.GE2117@tuxdriver.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+* John W. Linville <linville@tuxdriver.com> [2010-11-22 14:30:30 -0500]:
 
-On Mon, Nov 22, 2010 at 9:12 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Arun,
->
-> On Mon, Nov 22, 2010, Arun K. Singh wrote:
->> > The code will work sub-optimally with userspace versions that still
->> > do the name requesting themselves (it shouldn't break anything
->> > though) so it is recommended to combine this with a userspace
->> > software version that doesn't have automated name requests.
->>
->> Could you be bit more explicit about such user space versions that you
->> recommend? Would latest bluez versions such as 4.80 qualify for your
->> recommendation?
->
-> The automated name requests upon "connect complete" events were removed
-> in 4.78 so any version from there onwards would qualify.
+> On Mon, Nov 22, 2010 at 04:14:11PM -0200, Gustavo F. Padovan wrote:
+> > Hi John,
+> > 
+> > Following batch is intended to 2.6.37, it includes a very trivial return
+> > err fix from myself and an remote name request fix from Johan Hedberg.
+> > This fix move the remote name request (during the connection creation
+> > process) to the kernelspace. In addition we have removed this operation
+> > from BlueZ in userspace. Quoting part of Johan's patch which already
+> > explain the change:
+> > 
+> >    "So far userspace has been responsible for this extra name request but
+> >     tighter control is needed in order not to flood Bluetooth controllers
+> >     with two many commands during connection creation. It has been shown
+> >     that some controllers simply fail to function correctly if they get too
+> >     many (almost) simultaneous commands during connection creation. The
+> >     simplest way to acheive better control of these commands is to move
+> >     their sending completely to the kernel side."
+> > 
+> > As side effect, we have a clean up patch in preparation to this fix.
+> > 
+> > Please pull, or let me know any problems you find here. Thanks.
+> 
+> The return code fix seems reasonable -- small and obvious, etc.
+> 
+> The other fixes are larger than I would like to see.  What is the
+> effect of the bug?  Does the Bluetooth controller stop completely?
+> Does it cause a crash?
+> 
+> Is this a newly-introduced bug?  Or one that has been around for
+> a while?
 
-Maybe there is some way to detect that the kernel is not doing it, or
-at least force bluetoothd to resolve once to make sure it can be used
-with older kernel versions so it doesn't have to always update as it
-was used to be but if we are to authenticate or authorize a device it
-should have a name so the ui can display it to the user.
+No, it is not serious like that. By not having this patch we won't have
+the remote name request command during connection setup, The remote name
+request was done by bluetoothd, but we already removed it from
+userspace. It is not a really big problem once we also cache the remote
+devices names in bluetoothd.
+So I'm seeing no way to convince you tou pull this patch (actually I'm
+now also covinced to queue this to bluetooth-next).  I'll sent a new
+pull request soon, after wait some time for new patches.
 
 -- 
-Luiz Augusto von Dentz
-Computer Engineer
+Gustavo F. Padovan
+http://profusion.mobi
