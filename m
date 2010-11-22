@@ -18,49 +18,18 @@ Cc: marcel@holtmann.org,
 	linux-kernel@vger.kernel.org,
 	netfilter-devel@vger.kernel.org,
 	netfilter@vger.kernel.org,
-	samuel@sortiz.org,
-	Tracey Dent <tdent48227@gmail.com>
-Subject: [PATCH 02/17] Net: caif: Makefile: Remove deprecated items
-Date: Sun, 21 Nov 2010 20:03:13 -0500
-Message-Id: <1290387808-2239-3-git-send-email-tdent48227@gmail.com>
-In-Reply-To: <1290387808-2239-1-git-send-email-tdent48227@gmail.com>
-References: <1290387808-2239-1-git-send-email-tdent48227@gmail.com>
+	samuel@sortiz.org
+Subject: [PATCH 00/00] Remove deprecated items from Makefiles
+Date: Sun, 21 Nov 2010 20:03:11 -0500
+Message-Id: <1290387808-2239-1-git-send-email-tdent48227@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Changed Makefile to use <modules>-y instead of <modules>-objs
-because -objs is deprecated and not mentioned in
-Documentation/kbuild/makefiles.txt.
+I changed Makefiles to use <modules>-y instead of <modules>-objs because -objs
+is deprecated and not even mentioned in Documentation/kbuild/makefiles.txt.
 
-Also, use the ccflags-$ flag instead of EXTRA_CFLAGS because EXTRA_CFLAGS is
-deprecated and should now be switched.
+Also, remove some if-conditional statments because I used the ccflags-$ flag 
+instead of EXTRA_CFLAGS because EXTRA_CFLAGS.
 
-Last but not least, took out if-conditionals.
+regards,
 
-Signed-off-by: Tracey Dent <tdent48227@gmail.com>
----
- net/caif/Makefile |    8 +++-----
- 1 files changed, 3 insertions(+), 5 deletions(-)
-
-diff --git a/net/caif/Makefile b/net/caif/Makefile
-index f87481f..9d38e40 100644
---- a/net/caif/Makefile
-+++ b/net/caif/Makefile
-@@ -1,8 +1,6 @@
--ifeq ($(CONFIG_CAIF_DEBUG),y)
--EXTRA_CFLAGS += -DDEBUG
--endif
-+ccflags-$(CONFIG_CAIF_DEBUG)     :=      -DDEBUG
- 
--caif-objs := caif_dev.o \
-+caif-y := caif_dev.o \
- 	cfcnfg.o cfmuxl.o cfctrl.o  \
- 	cffrml.o cfveil.o cfdbgl.o\
- 	cfserl.o cfdgml.o  \
-@@ -13,4 +11,4 @@ obj-$(CONFIG_CAIF) += caif.o
- obj-$(CONFIG_CAIF_NETDEV) += chnl_net.o
- obj-$(CONFIG_CAIF) += caif_socket.o
- 
--export-objs := caif.o
-+export-y := caif.o
--- 
-1.7.3.2.245.g03276
+Tracey Dent
