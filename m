@@ -20,9 +20,9 @@ Cc: marcel@holtmann.org,
 	netfilter@vger.kernel.org,
 	samuel@sortiz.org,
 	Tracey Dent <tdent48227@gmail.com>
-Subject: [PATCH 10/17] Net: irda: irlan: Makefile: Remove deprecated kbuild goal definitions
-Date: Sun, 21 Nov 2010 20:03:21 -0500
-Message-Id: <1290387808-2239-11-git-send-email-tdent48227@gmail.com>
+Subject: [PATCH 09/17] Net: irda: ircomm: Makefile: Remove deprecated kbuild goal defintions
+Date: Sun, 21 Nov 2010 20:03:20 -0500
+Message-Id: <1290387808-2239-10-git-send-email-tdent48227@gmail.com>
 In-Reply-To: <1290387808-2239-1-git-send-email-tdent48227@gmail.com>
 References: <1290387808-2239-1-git-send-email-tdent48227@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -33,18 +33,20 @@ Documentation/kbuild/makefiles.txt.
 
 Signed-off-by: Tracey Dent <tdent48227@gmail.com>
 ---
- net/irda/irlan/Makefile |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ net/irda/ircomm/Makefile |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/irda/irlan/Makefile b/net/irda/irlan/Makefile
-index 77549bc..94eefbc 100644
---- a/net/irda/irlan/Makefile
-+++ b/net/irda/irlan/Makefile
-@@ -4,4 +4,4 @@
+diff --git a/net/irda/ircomm/Makefile b/net/irda/ircomm/Makefile
+index 4868945..ab23b5b 100644
+--- a/net/irda/ircomm/Makefile
++++ b/net/irda/ircomm/Makefile
+@@ -4,5 +4,5 @@
  
- obj-$(CONFIG_IRLAN) += irlan.o
+ obj-$(CONFIG_IRCOMM) += ircomm.o ircomm-tty.o
  
--irlan-objs := irlan_common.o irlan_eth.o irlan_event.o irlan_client.o irlan_provider.o irlan_filter.o irlan_provider_event.o irlan_client_event.o
-+irlan-y := irlan_common.o irlan_eth.o irlan_event.o irlan_client.o irlan_provider.o irlan_filter.o irlan_provider_event.o irlan_client_event.o
+-ircomm-objs := ircomm_core.o ircomm_event.o ircomm_lmp.o ircomm_ttp.o
+-ircomm-tty-objs := ircomm_tty.o ircomm_tty_attach.o ircomm_tty_ioctl.o ircomm_param.o
++ircomm-y := ircomm_core.o ircomm_event.o ircomm_lmp.o ircomm_ttp.o
++ircomm-tty-y := ircomm_tty.o ircomm_tty_attach.o ircomm_tty_ioctl.o ircomm_param.o
 -- 
 1.7.3.2.245.g03276
